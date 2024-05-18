@@ -23,7 +23,7 @@ use ::puroro::google::protobuf::compiler::{
 use ::puroro::message::MessageLite;
 use ::puroro::Result as PResult;
 use ::thiserror::Error;
-use descriptor::{Context, FileDescriptor};
+use descriptor::{FileDescriptor, RootContext};
 
 #[derive(Error, Debug)]
 pub enum ErrorKind {
@@ -50,12 +50,14 @@ pub fn compile(request: &CodeGeneratorRequest) -> Result<CodeGeneratorResponse<'
         .map_ok(TryInto::try_into)
         .collect::<PResult<Result<Vec<_>>>>()??;
 
-    let root_context: Context<'static> = descriptors.into();
+    let root_context: RootContext = descriptors.into();
 
-    let mut file = code_generator_response::File::default();
-    file.set_name("test.rs")?;
-    file.set_content("pub fn yeah() { }")?;
-    response.push_file(file)?;
+    for fd in root_context.files() {
+        let mut file = code_generator_response::File::default();
+        file.set_name(fd.name()?)?;
+        file.set_content("pub fn yeah() { }")?;
+        response.push_file(file)?;
+    }
 
     Ok(response)
 }

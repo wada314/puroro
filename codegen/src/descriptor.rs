@@ -326,19 +326,19 @@ impl<'a> TryFrom<OneofDescriptorProto<'a>> for OneofDescriptor {
 /// The struct types with the "context".
 /// The context here means the path from the root of the descriptor tree to the current node.
 
-// region: Context
+// region: RootContext
 
-pub struct Context<'a> {
+pub struct RootContext<'a> {
     files: Vec<(FileDescriptor, OnceCell<FileDescriptorWithContext<'a>>)>,
 }
-impl From<FileDescriptor> for Context<'_> {
+impl From<FileDescriptor> for RootContext<'_> {
     fn from(f: FileDescriptor) -> Self {
         Self {
             files: vec![(f, OnceCell::default())],
         }
     }
 }
-impl<T: IntoIterator<Item = FileDescriptor>> From<T> for Context<'_> {
+impl<T: IntoIterator<Item = FileDescriptor>> From<T> for RootContext<'_> {
     fn from(files: T) -> Self {
         Self {
             files: files
@@ -348,8 +348,8 @@ impl<T: IntoIterator<Item = FileDescriptor>> From<T> for Context<'_> {
         }
     }
 }
-impl<'a> Context<'a> {
-    fn files(&'a self) -> impl 'a + IntoIterator<Item = &'a FileDescriptorWithContext<'a>> {
+impl<'a> RootContext<'a> {
+    pub fn files(&'a self) -> impl 'a + IntoIterator<Item = &'a FileDescriptorWithContext<'a>> {
         self.files.iter().map(|(f, c)| {
             c.get_or_init(|| FileDescriptorWithContext {
                 root: self,
@@ -358,7 +358,7 @@ impl<'a> Context<'a> {
             })
         })
     }
-    fn file_from_name(&'a self, name: &str) -> Result<&'a FileDescriptorWithContext<'a>> {
+    pub fn file_from_name(&'a self, name: &str) -> Result<&'a FileDescriptorWithContext<'a>> {
         self.files()
             .into_iter()
             .find(|f| f.name().is_ok_and(|n| n == name))
@@ -371,7 +371,7 @@ impl<'a> Context<'a> {
 // region: FileDescriptorWithContext
 
 pub struct FileDescriptorWithContext<'a> {
-    root: &'a Context<'a>,
+    root: &'a RootContext<'a>,
     body: &'a FileDescriptor,
     cache: FileDescriptorCache<'a>,
 }
@@ -384,13 +384,13 @@ pub struct FileDescriptorCache<'a> {
 }
 
 impl<'a> FileDescriptorWithContext<'a> {
-    fn name(&self) -> Result<&str> {
+    pub fn name(&self) -> Result<&str> {
         Ok(&self.body.name)
     }
-    fn package(&self) -> Result<Option<&str>> {
+    pub fn package(&self) -> Result<Option<&str>> {
         Ok(self.body.package.as_deref())
     }
-    fn dependencies(
+    pub fn dependencies(
         &'a self,
     ) -> Result<impl IntoIterator<Item = &'a FileDescriptorWithContext<'a>>> {
         self.cache
@@ -405,7 +405,7 @@ impl<'a> FileDescriptorWithContext<'a> {
             })
             .map(|v| v.into_iter().map(|f| *f))
     }
-    fn messages(&'a self) -> Result<impl 'a + IntoIterator<Item = &DescriptorWithContext>> {
+    pub fn messages(&'a self) -> Result<impl 'a + IntoIterator<Item = &DescriptorWithContext>> {
         self.cache.messages.get_or_try_init(|| {
             self.body
                 .message_types
@@ -421,7 +421,7 @@ impl<'a> FileDescriptorWithContext<'a> {
                 .collect()
         })
     }
-    fn enums(&'a self) -> Result<impl 'a + IntoIterator<Item = &EnumDescriptorWithContext>> {
+    pub fn enums(&'a self) -> Result<impl 'a + IntoIterator<Item = &EnumDescriptorWithContext>> {
         self.cache.enums.get_or_try_init(|| {
             self.body
                 .enum_types
@@ -467,10 +467,10 @@ pub struct DescriptorCache<'a> {
 }
 
 impl<'a> DescriptorWithContext<'a> {
-    fn name(&self) -> Result<&str> {
+    pub fn name(&self) -> Result<&str> {
         Ok(&self.body.name)
     }
-    fn full_name(&self) -> Result<&str> {
+    pub fn full_name(&self) -> Result<&str> {
         self.cache
             .full_name
             .get_or_try_init(|| {
@@ -487,17 +487,17 @@ impl<'a> DescriptorWithContext<'a> {
             })
             .map(|s| s.as_ref())
     }
-    fn file(&'a self) -> Result<&FileDescriptorWithContext> {
+    pub fn file(&'a self) -> Result<&FileDescriptorWithContext> {
         Ok(self.file)
     }
-    fn all_fields(&'a self) -> Result<impl 'a + IntoIterator<Item = &FieldDescriptorWithContext>> {
+    pub fn all_fields(&'a self) -> Result<impl 'a + IntoIterator<Item = &FieldDescriptorWithContext>> {
         Ok(self
             .non_oneof_fields()?
             .into_iter()
             .chain(self.real_oneof_fields()?.into_iter())
             .chain(self.synthetic_oneof_fields()?.into_iter()))
     }
-    fn filtered_fields(
+    pub fn filtered_fields(
         &'a self,
         f: impl Fn(&&FieldDescriptor) -> bool,
     ) -> Result<Vec<FieldDescriptorWithContext<'a>>> {
@@ -514,34 +514,34 @@ impl<'a> DescriptorWithContext<'a> {
             })
             .collect()
     }
-    fn non_oneof_fields(
+    pub fn non_oneof_fields(
         &'a self,
     ) -> Result<impl 'a + IntoIterator<Item = &FieldDescriptorWithContext>> {
         self.cache
             .non_oneof_fields
             .get_or_try_init(|| self.filtered_fields(|f| f.oneof_index.is_none()))
     }
-    fn real_oneof_fields(
+    pub fn real_oneof_fields(
         &'a self,
     ) -> Result<impl 'a + IntoIterator<Item = &FieldDescriptorWithContext>> {
         self.cache.real_oneof_fields.get_or_try_init(|| {
             self.filtered_fields(|f| f.oneof_index.is_some() && !f.proto3_optional)
         })
     }
-    fn synthetic_oneof_fields(
+    pub fn synthetic_oneof_fields(
         &'a self,
     ) -> Result<impl 'a + IntoIterator<Item = &FieldDescriptorWithContext>> {
         self.cache.synthetic_oneof_fields.get_or_try_init(|| {
             self.filtered_fields(|f| f.oneof_index.is_some() && f.proto3_optional)
         })
     }
-    fn all_oneofs(&'a self) -> Result<impl 'a + IntoIterator<Item = &OneofDescriptorWithContext>> {
+    pub fn all_oneofs(&'a self) -> Result<impl 'a + IntoIterator<Item = &OneofDescriptorWithContext>> {
         Ok(self
             .real_oneofs()?
             .into_iter()
             .chain(self.synthetic_oneofs()?.into_iter()))
     }
-    fn real_and_synthetic_oneofs(
+    pub fn real_and_synthetic_oneofs(
         &'a self,
     ) -> Result<(
         impl IntoIterator<Item = &'a OneofDescriptorWithContext<'a>>,
@@ -578,15 +578,15 @@ impl<'a> DescriptorWithContext<'a> {
         })?;
         Ok((real, synthetic))
     }
-    fn real_oneofs(&'a self) -> Result<impl IntoIterator<Item = &'a OneofDescriptorWithContext>> {
+    pub fn real_oneofs(&'a self) -> Result<impl IntoIterator<Item = &'a OneofDescriptorWithContext>> {
         Ok(self.real_and_synthetic_oneofs()?.0)
     }
-    fn synthetic_oneofs(
+    pub fn synthetic_oneofs(
         &'a self,
     ) -> Result<impl IntoIterator<Item = &'a OneofDescriptorWithContext>> {
         Ok(self.real_and_synthetic_oneofs()?.1)
     }
-    fn nested_types(&'a self) -> Result<impl 'a + IntoIterator<Item = &DescriptorWithContext>> {
+    pub fn nested_types(&'a self) -> Result<impl 'a + IntoIterator<Item = &DescriptorWithContext>> {
         self.cache.nested_types.get_or_try_init(|| {
             self.body
                 .nested_types
@@ -602,7 +602,7 @@ impl<'a> DescriptorWithContext<'a> {
                 .collect()
         })
     }
-    fn enum_types(&'a self) -> Result<impl 'a + IntoIterator<Item = &EnumDescriptorWithContext>> {
+    pub fn enum_types(&'a self) -> Result<impl 'a + IntoIterator<Item = &EnumDescriptorWithContext>> {
         self.cache.enum_types.get_or_try_init(|| {
             self.body
                 .enum_types
@@ -638,10 +638,10 @@ pub struct EnumDescriptorCache<'a> {
 }
 
 impl<'a> EnumDescriptorWithContext<'a> {
-    fn name(&self) -> Result<&str> {
+    pub fn name(&self) -> Result<&str> {
         Ok(self.body.name.as_ref())
     }
-    fn full_name(&self) -> Result<&str> {
+    pub fn full_name(&self) -> Result<&str> {
         self.cache
             .full_name
             .get_or_try_init(|| {
@@ -658,10 +658,10 @@ impl<'a> EnumDescriptorWithContext<'a> {
             })
             .map(|s| s.as_ref())
     }
-    fn file(&'a self) -> Result<&FileDescriptorWithContext> {
+    pub fn file(&'a self) -> Result<&FileDescriptorWithContext> {
         Ok(self.file)
     }
-    fn values(&'a self) -> Result<impl 'a + IntoIterator<Item = &EnumValueDescriptorWithContext>> {
+    pub fn values(&'a self) -> Result<impl 'a + IntoIterator<Item = &EnumValueDescriptorWithContext>> {
         self.cache.values.get_or_try_init(|| {
             self.body
                 .values
@@ -692,10 +692,10 @@ pub struct EnumValueDescriptorCache {
     full_name: OnceCell<String>,
 }
 impl<'a> EnumValueDescriptorWithContext<'a> {
-    fn name(&self) -> Result<&str> {
+    pub fn name(&self) -> Result<&str> {
         Ok(self.body.name.as_ref())
     }
-    fn full_name(&self) -> Result<&str> {
+    pub fn full_name(&self) -> Result<&str> {
         self.cache
             .full_name
             .get_or_try_init(|| {
@@ -732,10 +732,10 @@ pub struct FieldDescriptorCache {
 }
 
 impl<'a> FieldDescriptorWithContext<'a> {
-    fn name(&self) -> Result<&str> {
+    pub fn name(&self) -> Result<&str> {
         Ok(&self.body.name)
     }
-    fn full_name(&self) -> Result<&str> {
+    pub fn full_name(&self) -> Result<&str> {
         self.cache
             .full_name
             .get_or_try_init(|| {
