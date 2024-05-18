@@ -1,0 +1,13 @@
+[package]
+name = "tests"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+
+
+[build-dependencies]
+anyhow = "1.0.85"
+itertools = "0.12.1"
+puroro-protoc-wrapper = { path = "../protoc-wrapper" }
+puroro-codegen = { path = "../codegen" }

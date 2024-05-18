@@ -14,22 +14,28 @@
 
 use ::anyhow::Error;
 use ::itertools::Itertools;
+use ::puroro_codegen::compile;
 use ::puroro_protoc_wrapper::Protoc;
 use ::std::fs;
-use ::std::path::PathBuf;
+use ::std::path::Path;
 
 fn main() -> Result<(), Error> {
-    if !cfg!(test) {
-        return Ok(());
-    }
+    print!("cargo::rerun-if-changed=tests/protos");
+    print!("cargo::rerun-if-changed=../codegen");
 
-    fs::remove_dir_all("tests/generated").unwrap();
+    let _ = fs::remove_dir_all("tests/generated"); // Allow error: directory may not exist
+    fs::create_dir("tests/generated").unwrap();
 
-    let file_paths_in_protos = fs::read_dir("tests/protos")
+    let file_paths_in_protos_dir = fs::read_dir("tests/protos")
         .unwrap()
         .filter_ok(|e| e.metadata().map(|m| m.is_file()).unwrap_or(false))
-        .map_ok(|e| e.path().strip_prefix("tests/protos"))
+        .map_ok(|e| e.path().strip_prefix("tests/protos").map(Path::to_owned))
         .collect::<Result<Result<Vec<_>, _>, _>>()??;
 
-    Protoc::new().out_dir("tests/generated").proto_files()
+    Protoc::new()
+        .out_dir("tests/generated")
+        .proto_files(file_paths_in_protos_dir)
+        .proto_path("tests/protos")
+        .run(|req| compile(&req).map_err(|e| e.to_string()))?;
+    Ok(())
 }
