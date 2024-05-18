@@ -30,9 +30,9 @@ use ::thiserror::Error;
 
 #[derive(Error, Debug)]
 pub enum ErrorKind {
-    #[error("io error")]
+    #[error("io error: {0}")]
     IoError(#[from] ::std::io::Error),
-    #[error("std::num::TryFromIntError")]
+    #[error("std::num::TryFromIntError: {0}")]
     StdTryFromIntError(#[from] ::std::num::TryFromIntError),
     #[error("integer to boolean conversion error")]
     IntegerToBoolError,
@@ -48,7 +48,7 @@ pub enum ErrorKind {
     DeserUnexpectedEof,
     #[error("Error when matching the GenericMessage type's field type.")]
     GenericMessageFieldTypeError,
-    #[error("Error when converting an int32 to an (closed) enum value.")]
+    #[error("Error when converting an int32 to an (closed) enum value: {0}")]
     TryFromIntIntoEnumError(i32),
 }
 pub type Result<T> = ::std::result::Result<T, ErrorKind>;

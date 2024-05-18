@@ -140,7 +140,7 @@ impl From<FieldLabelProto> for FieldLabel {
 pub struct FileDescriptor {
     name: String,
     dependencies: Vec<String>,
-    package: String,
+    package: Option<String>,
     message_types: Vec<Descriptor>,
     enum_types: Vec<EnumDescriptor>,
     syntax: Option<String>,
@@ -157,9 +157,7 @@ impl<'a> TryFrom<FileDescriptorProto<'a>> for FileDescriptor {
                 .into_iter()
                 .map_ok(str::to_string)
                 .collect::<PResult<_>>()?,
-            package: proto
-                .package()?
-                .try_into_string("No FileDescriptor package")?,
+            package: proto.package()?.map(str::to_string),
             message_types: proto
                 .message_type()
                 .into_iter()
@@ -389,8 +387,8 @@ impl<'a> FileDescriptorWithContext<'a> {
     fn name(&self) -> Result<&str> {
         Ok(&self.body.name)
     }
-    fn package(&self) -> Result<&str> {
-        Ok(&self.body.package)
+    fn package(&self) -> Result<Option<&str>> {
+        Ok(self.body.package.as_deref())
     }
     fn dependencies(
         &'a self,
@@ -479,7 +477,7 @@ impl<'a> DescriptorWithContext<'a> {
                 let mut full_name = if let Some(nested) = self.maybe_containing {
                     nested.full_name()?.to_string()
                 } else {
-                    self.file.package()?.to_string()
+                    self.file.package()?.unwrap_or_default().to_string()
                 };
                 if !full_name.is_empty() {
                     full_name.push('.');
@@ -650,7 +648,7 @@ impl<'a> EnumDescriptorWithContext<'a> {
                 let mut full_name = if let Some(nested) = self.maybe_containing {
                     nested.full_name()?.to_string()
                 } else {
-                    self.file.package()?.to_string()
+                    self.file.package()?.unwrap_or_default().to_string()
                 };
                 if !full_name.is_empty() {
                     full_name.push('.');
@@ -705,7 +703,7 @@ impl<'a> EnumValueDescriptorWithContext<'a> {
                 let mut full_name = if let Some(m) = self.enum_.maybe_containing {
                     m.full_name()?.to_string()
                 } else {
-                    self.enum_.file.package()?.to_string()
+                    self.enum_.file.package()?.unwrap_or_default().to_string()
                 };
                 if !full_name.is_empty() {
                     full_name.push('.');

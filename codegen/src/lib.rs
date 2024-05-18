@@ -33,11 +33,11 @@ pub enum ErrorKind {
     PuroroError(#[from] ::puroro::ErrorKind),
     #[error("Unknown Edition.")]
     UnknownEdition,
-    #[error("Error while validating the input descriptor protos. %s")]
+    #[error("Error while validating the input descriptor protos. {0}")]
     DescriptorProtoValidationError(String),
     #[error("std::num::TryFromIntError")]
     StdTryFromIntError(#[from] ::std::num::TryFromIntError),
-    #[error("Error while constructing a descriptor tree structure. %s")]
+    #[error("Error while constructing a descriptor tree structure. {0}")]
     DescriptorStructureError(String),
 }
 pub type Result<T> = ::std::result::Result<T, ErrorKind>;
