@@ -54,7 +54,11 @@ pub fn compile(request: &CodeGeneratorRequest) -> Result<CodeGeneratorResponse<'
 
     for fd in root_context.files() {
         let mut file = code_generator_response::File::default();
-        file.set_name(fd.name()?)?;
+        if let Some(package) = fd.package()? {
+            file.set_name(&(package.split('.').join("/") + ".rs"))?;
+        } else {
+            file.set_name("mod.rs")?;
+        }
         file.set_content("pub fn yeah() { }")?;
         response.push_file(file)?;
     }
