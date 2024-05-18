@@ -339,18 +339,8 @@ impl From<FileDescriptor> for Context<'_> {
         }
     }
 }
-impl From<Vec<FileDescriptor>> for Context<'_> {
-    fn from(files: Vec<FileDescriptor>) -> Self {
-        Self {
-            files: files
-                .into_iter()
-                .map(|f| (f, OnceCell::default()))
-                .collect(),
-        }
-    }
-}
-impl<const N: usize> From<[FileDescriptor; N]> for Context<'_> {
-    fn from(files: [FileDescriptor; N]) -> Self {
+impl<T: IntoIterator<Item = FileDescriptor>> From<T> for Context<'_> {
+    fn from(files: T) -> Self {
         Self {
             files: files
                 .into_iter()
