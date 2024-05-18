@@ -360,16 +360,9 @@ impl<'a> Context<'a> {
         })
     }
     fn file_from_name(&'a self, name: &str) -> Result<&'a FileDescriptorWithContext<'a>> {
-        self.files
-            .iter()
-            .find(|(f, _)| f.name == name)
-            .map(|(f, c)| {
-                c.get_or_init(|| FileDescriptorWithContext {
-                    root: self,
-                    body: f,
-                    cache: Default::default(),
-                })
-            })
+        self.files()
+            .into_iter()
+            .find(|f| f.name().is_ok_and(|n| n == name))
             .ok_or_else(|| ErrorKind::DescriptorStructureError("No such file".to_string()))
     }
 }
