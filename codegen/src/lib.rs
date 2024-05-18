@@ -16,11 +16,14 @@
 
 pub mod descriptor;
 
+use ::itertools::Itertools;
 use ::puroro::google::protobuf::compiler::{
     code_generator_response, CodeGeneratorRequest, CodeGeneratorResponse,
 };
 use ::puroro::message::MessageLite;
+use ::puroro::Result as PResult;
 use ::thiserror::Error;
+use descriptor::{Context, FileDescriptor};
 
 #[derive(Error, Debug)]
 pub enum ErrorKind {
@@ -28,11 +31,26 @@ pub enum ErrorKind {
     CompileError,
     #[error("puroro error")]
     PuroroError(#[from] ::puroro::ErrorKind),
+    #[error("Unknown Edition.")]
+    UnknownEdition,
+    #[error("Error while validating the input descriptor protos. %s")]
+    DescriptorProtoValidationError(String),
+    #[error("std::num::TryFromIntError")]
+    StdTryFromIntError(#[from] ::std::num::TryFromIntError),
+    #[error("Error while constructing a descriptor tree structure. %s")]
+    DescriptorStructureError(String),
 }
 pub type Result<T> = ::std::result::Result<T, ErrorKind>;
 
-pub fn compile(_input: &CodeGeneratorRequest) -> Result<CodeGeneratorResponse<'static>> {
+pub fn compile(request: &CodeGeneratorRequest) -> Result<CodeGeneratorResponse<'static>> {
     let mut response = CodeGeneratorResponse::default();
+
+    let descriptors: Vec<FileDescriptor> = request
+        .proto_file()
+        .map_ok(TryInto::try_into)
+        .collect::<PResult<Result<Vec<_>>>>()??;
+
+    let root_context: Context<'static> = descriptors.into();
 
     let mut file = code_generator_response::File::default();
     file.set_name("test.rs")?;

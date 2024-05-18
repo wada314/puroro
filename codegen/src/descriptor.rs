@@ -14,6 +14,7 @@
 
 #![allow(unused)]
 
+use crate::{ErrorKind, Result};
 use ::itertools::{Either, Itertools};
 use ::puroro::google::protobuf::{
     field_descriptor_proto::Label as FieldLabelProto,
@@ -21,7 +22,7 @@ use ::puroro::google::protobuf::{
     EnumDescriptorProto, EnumValueDescriptorProto, FieldDescriptorProto, FileDescriptorProto,
     FileDescriptorSet, OneofDescriptorProto,
 };
-use ::puroro::{ErrorKind, Result};
+use ::puroro::Result as PResult;
 use ::std::cell::OnceCell;
 
 // region: Edition
@@ -155,7 +156,7 @@ impl<'a> TryFrom<FileDescriptorProto<'a>> for FileDescriptor {
                 .dependency()
                 .into_iter()
                 .map_ok(str::to_string)
-                .collect::<Result<_>>()?,
+                .collect::<PResult<_>>()?,
             package: proto
                 .package()?
                 .try_into_string("No FileDescriptor package")?,
@@ -163,12 +164,12 @@ impl<'a> TryFrom<FileDescriptorProto<'a>> for FileDescriptor {
                 .message_type()
                 .into_iter()
                 .map_ok(Descriptor::try_from)
-                .collect::<Result<Result<Vec<_>>>>()??,
+                .collect::<PResult<Result<Vec<_>>>>()??,
             enum_types: proto
                 .enum_type()
                 .into_iter()
                 .map_ok(EnumDescriptor::try_from)
-                .collect::<Result<Result<Vec<_>>>>()??,
+                .collect::<PResult<Result<Vec<_>>>>()??,
             syntax: proto.syntax()?.map(str::to_string),
             edition: proto.edition()?.map(EditionProto::try_into).transpose()?,
         })
@@ -197,22 +198,22 @@ impl<'a> TryFrom<DescriptorProto<'a>> for Descriptor {
                 .field()
                 .into_iter()
                 .map_ok(FieldDescriptor::try_from)
-                .collect::<Result<Result<Vec<_>>>>()??,
+                .collect::<PResult<Result<Vec<_>>>>()??,
             oneof_decls: proto
                 .oneof_decl()
                 .into_iter()
                 .map_ok(OneofDescriptor::try_from)
-                .collect::<Result<Result<Vec<_>>>>()??,
+                .collect::<PResult<Result<Vec<_>>>>()??,
             nested_types: proto
                 .nested_type()
                 .into_iter()
                 .map_ok(Descriptor::try_from)
-                .collect::<Result<Result<Vec<_>>>>()??,
+                .collect::<PResult<Result<Vec<_>>>>()??,
             enum_types: proto
                 .enum_type()
                 .into_iter()
                 .map_ok(EnumDescriptor::try_from)
-                .collect::<Result<Result<Vec<_>>>>()??,
+                .collect::<PResult<Result<Vec<_>>>>()??,
         })
     }
 }
@@ -273,7 +274,7 @@ impl<'a> TryFrom<EnumDescriptorProto<'a>> for EnumDescriptor {
                 .value()
                 .into_iter()
                 .map_ok(EnumValueDescriptor::try_from)
-                .collect::<Result<Result<Vec<_>>>>()??,
+                .collect::<PResult<Result<Vec<_>>>>()??,
         })
     }
 }
