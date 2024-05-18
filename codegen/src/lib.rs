@@ -16,7 +16,9 @@
 
 pub mod descriptor;
 
-use ::puroro::google::protobuf::compiler::{CodeGeneratorRequest, CodeGeneratorResponse};
+use ::puroro::google::protobuf::compiler::{
+    code_generator_response, CodeGeneratorRequest, CodeGeneratorResponse,
+};
 use ::puroro::message::MessageLite;
 use ::thiserror::Error;
 
@@ -24,11 +26,19 @@ use ::thiserror::Error;
 pub enum ErrorKind {
     #[error("Unknown compile error")]
     CompileError,
+    #[error("puroro error")]
+    PuroroError(#[from] ::puroro::ErrorKind),
 }
 pub type Result<T> = ::std::result::Result<T, ErrorKind>;
 
 pub fn compile(_input: &CodeGeneratorRequest) -> Result<CodeGeneratorResponse<'static>> {
-    let response = CodeGeneratorResponse::default();
+    let mut response = CodeGeneratorResponse::default();
+
+    let mut file = code_generator_response::File::default();
+    file.set_name("test.rs")?;
+    file.set_content("pub fn yeah() { }")?;
+    response.push_file(file)?;
+
     Ok(response)
 }
 

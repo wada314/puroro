@@ -13,4 +13,9 @@ quote = "1.0.36"
 syn = "2.0.60"
 thiserror = "1.0.60"
 
+[build-dependencies]
+anyhow = "1.0.85"
+itertools = "0.12.1"
+puroro-protoc-wrapper = { path = "../protoc-wrapper" }
+
 [lib]

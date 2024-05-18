@@ -16,6 +16,7 @@ use ::ipc_channel::ipc::{IpcBytesReceiver, IpcBytesSender, IpcOneShotServer};
 use ::puroro::google::protobuf::compiler::{CodeGeneratorRequest, CodeGeneratorResponse};
 use ::puroro::message::MessageLite;
 use ::std::env;
+use ::std::path::{Path, PathBuf};
 use ::std::process::{Command, ExitStatus};
 use ::std::time::Duration;
 #[cfg(feature = "on-memory")]
@@ -41,49 +42,50 @@ pub enum ErrorKind {
     ProtocTimeoutError,
     #[error("ProtocProcessError: {0}")]
     ProtocProcessError(ExitStatus),
-    #[cfg(feature = "on-memory")]
     #[error("FileNameError")]
     FileNameError,
 }
 pub type Result<T> = ::std::result::Result<T, ErrorKind>;
 
 pub struct Protoc {
-    protoc_path: String,
-    out_dir: Option<String>,
-    proto_files: Vec<String>,
-    proto_paths: Vec<String>,
+    protoc_path: PathBuf,
+    out_dir: Option<PathBuf>,
+    proto_files: Vec<PathBuf>,
+    proto_paths: Vec<PathBuf>,
 }
 
 impl Protoc {
     pub fn new() -> Self {
         Self {
-            protoc_path: "protoc".to_string(),
+            protoc_path: "protoc".into(),
             out_dir: None,
             proto_files: Vec::new(),
             proto_paths: Vec::new(),
         }
     }
-    pub fn protoc_path(mut self, path: &str) -> Self {
-        self.protoc_path = path.to_string();
+    pub fn protoc_path(mut self, path: impl AsRef<Path>) -> Self {
+        self.protoc_path = path.as_ref().to_owned();
         self
     }
-    pub fn out_dir(mut self, path: &str) -> Self {
-        self.out_dir = Some(path.to_string());
+    pub fn out_dir(mut self, path: impl AsRef<Path>) -> Self {
+        self.out_dir = Some(path.as_ref().to_owned());
         self
     }
-    pub fn proto_file(mut self, path: &str) -> Self {
-        self.proto_files.push(path.to_string());
+    pub fn proto_file(mut self, path: impl AsRef<Path>) -> Self {
+        self.proto_files.push(path.as_ref().to_owned());
         self
     }
     pub fn proto_files<I>(mut self, paths: I) -> Self
     where
-        I: IntoIterator<Item = String>,
+        I: IntoIterator,
+        I::Item: AsRef<Path>,
     {
-        self.proto_files.extend(paths);
+        self.proto_files
+            .extend(paths.into_iter().map(|p| p.as_ref().to_owned()));
         self
     }
-    pub fn proto_path(mut self, path: &str) -> Self {
-        self.proto_paths.push(path.to_string());
+    pub fn proto_path(mut self, path: impl AsRef<Path>) -> Self {
+        self.proto_paths.push(path.as_ref().to_owned());
         self
     }
 
@@ -96,13 +98,26 @@ impl Protoc {
         let mut process = Command::new(&self.protoc_path)
             .args(&[
                 format!("--plugin=protoc-gen-puroro={}", PLUGIN_PATH),
-                format!("--puroro_out={}", self.out_dir.unwrap_or(".".to_string())),
+                format!(
+                    "--puroro_out={}",
+                    self.out_dir
+                        .as_ref()
+                        .map(|p| p.to_str().ok_or(ErrorKind::FileNameError))
+                        .transpose()?
+                        .unwrap_or(".")
+                ),
                 format!("--puroro_opt={}", ipc_init_name),
             ])
             .args(
                 self.proto_paths
                     .iter()
-                    .map(|x| format!("--proto_path={}", x)),
+                    .map(|x| {
+                        Ok(format!(
+                            "--proto_path={}",
+                            x.to_str().ok_or(ErrorKind::FileNameError)?
+                        ))
+                    })
+                    .collect::<Result<Vec<_>>>()?,
             )
             .args(&self.proto_files)
             .spawn()?;
@@ -144,7 +159,7 @@ impl ProtocOnMemory {
             in_files: Vec::new(),
         }
     }
-    pub fn protoc_path(mut self, path: &str) -> Self {
+    pub fn protoc_path(mut self, path: impl AsRef<Path>) -> Self {
         self.protoc = self.protoc.protoc_path(path);
         self
     }
