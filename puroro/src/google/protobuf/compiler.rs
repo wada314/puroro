@@ -16,9 +16,9 @@ use crate::google::protobuf::FileDescriptorProto;
 use crate::untyped_message::UntypedMessage;
 use crate::variant::{Int32, UInt64, VariantIntegerType};
 use crate::{ErrorKind, Result};
-use ::derive_more::{Deref as DDeref, DerefMut as DDerefMut, From as DFrom};
+use ::derive_more::{Deref as DDeref, DerefMut as DDerefMut, From as DFrom, Into as DInto};
 
-#[derive(DDeref, DDerefMut, DFrom, Default, Debug)]
+#[derive(DDeref, DDerefMut, DFrom, DInto, Default, Debug)]
 pub struct Version<'a>(UntypedMessage<'a>);
 impl<'a> Version<'a> {
     pub fn major(&self) -> Result<i32> {
@@ -35,7 +35,7 @@ impl<'a> Version<'a> {
     }
 }
 
-#[derive(DDeref, DDerefMut, DFrom, Default, Debug)]
+#[derive(DDeref, DDerefMut, DFrom, DInto, Default, Debug)]
 pub struct CodeGeneratorRequest<'a>(UntypedMessage<'a>);
 impl<'a> CodeGeneratorRequest<'a> {
     pub fn file_to_generate(&self) -> impl IntoIterator<Item = Result<&str>> {
@@ -86,8 +86,8 @@ pub mod code_generator_response {
         }
     }
 
-    #[derive(DDeref, DDerefMut, DFrom, Default, Debug)]
-    pub struct File<'a>(pub(crate) UntypedMessage<'a>);
+    #[derive(DDeref, DDerefMut, DFrom, DInto, Default, Debug)]
+    pub struct File<'a>(UntypedMessage<'a>);
     impl<'a> File<'a> {
         pub fn name(&self) -> Result<Option<&str>> {
             self.0.field(1).as_scalar_string()
@@ -114,7 +114,7 @@ pub mod code_generator_response {
     }
 }
 
-#[derive(DDeref, DDerefMut, DFrom, Default, Debug)]
+#[derive(DDeref, DDerefMut, DFrom, DInto, Default, Debug)]
 pub struct CodeGeneratorResponse<'a>(UntypedMessage<'a>);
 impl<'a> CodeGeneratorResponse<'a> {
     pub fn error(&self) -> Result<Option<&str>> {
@@ -130,8 +130,7 @@ impl<'a> CodeGeneratorResponse<'a> {
         self.0.scalar_variant_field::<Int32>(4)
     }
     pub fn file(&self) -> impl Iterator<Item = Result<code_generator_response::File>> {
-        self.0
-            .repeated_message_field(15, code_generator_response::File)
+        self.0.repeated_message_field(15, Into::into)
     }
 
     pub fn set_error(&mut self, error: &str) -> Result<()> {
@@ -151,6 +150,6 @@ impl<'a> CodeGeneratorResponse<'a> {
             .push_variant(Int32::try_into_variant(edition)?)
     }
     pub fn push_file(&mut self, file: code_generator_response::File<'a>) -> Result<()> {
-        self.0.field_mut(15).push_message(file.0)
+        self.0.field_mut(15).push_message(file.into())
     }
 }
