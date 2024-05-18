@@ -42,6 +42,52 @@ pub enum ErrorKind {
 }
 pub type Result<T> = ::std::result::Result<T, ErrorKind>;
 
+struct GeneratedFile {
+    name: String,
+    sources: Vec<String>,
+    content: String,
+}
+impl GeneratedFile {
+    fn new(name: impl Into<String>) -> Self {
+        Self {
+            name: name.into(),
+            sources: Vec::new(),
+            content: String::new(),
+        }
+    }
+    fn name(&self) -> &str {
+        &self.name
+    }
+    fn append(&mut self, source: impl AsRef<str>) {
+        self.content.push_str(source.as_ref());
+    }
+    fn add_source(&mut self, source: impl Into<String>) {
+        self.sources.push(source.into());
+    }
+}
+impl TryFrom<GeneratedFile> for code_generator_response::File<'_> {
+    type Error = ErrorKind;
+    fn try_from(from: GeneratedFile) -> Result<Self> {
+        let mut file = code_generator_response::File::default();
+        file.set_name(from.name())?;
+        let source_list = from
+            .sources
+            .into_iter()
+            .map(|s| format!("//   {}\n", s))
+            .join("");
+        file.set_content(&format!(
+            "\
+            // THIS FILE IS A GENERATED FILE! DO NOT EDIT! \n\
+            // Source(s): \n\
+            {}\n\
+\n\
+            {}\n",
+            source_list, from.content
+        ))?;
+        Ok(file)
+    }
+}
+
 pub fn compile(request: &CodeGeneratorRequest) -> Result<CodeGeneratorResponse<'static>> {
     let mut response = CodeGeneratorResponse::default();
 
@@ -53,14 +99,14 @@ pub fn compile(request: &CodeGeneratorRequest) -> Result<CodeGeneratorResponse<'
     let root_context: RootContext = descriptors.into();
 
     for fd in root_context.files() {
-        let mut file = code_generator_response::File::default();
-        if let Some(package) = fd.package()? {
-            file.set_name(&(package.split('.').join("/") + ".rs"))?;
+        let mut file = if let Some(package) = fd.package()? {
+            GeneratedFile::new(package.split('.').join("/") + ".rs")
         } else {
-            file.set_name("mod.rs")?;
-        }
-        file.set_content("pub fn yeah() { }")?;
-        response.push_file(file)?;
+            GeneratedFile::new("mod.rs")
+        };
+        file.append("pub fn yeah() { }");
+        file.add_source(fd.name()?);
+        response.push_file(file.try_into()?)?;
     }
 
     Ok(response)
