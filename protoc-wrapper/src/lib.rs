@@ -16,7 +16,7 @@ use ::ipc_channel::ipc::{IpcBytesReceiver, IpcBytesSender, IpcOneShotServer};
 use ::puroro::google::protobuf::compiler::{CodeGeneratorRequest, CodeGeneratorResponse};
 use ::puroro::message::MessageLite;
 use ::std::env;
-use ::std::path::{Path, PathBuf};
+use ::std::path::PathBuf;
 use ::std::process::{Command, ExitStatus};
 use ::std::time::Duration;
 #[cfg(feature = "on-memory")]
