@@ -34,6 +34,9 @@ impl ProtoPath {
             .map(|(parent, _)| ProtoPath::new(parent))
             .or_else(|| self.is_relative().then_some(ProtoPath::new("")))
     }
+    pub fn last_component(&self) -> Option<&str> {
+        self.0.rsplit_once('.').map(|(_, last)| last)
+    }
     pub fn ancestors(&self) -> impl Iterator<Item = &Self> {
         ::std::iter::successors(Some(self), |path| path.parent())
     }
