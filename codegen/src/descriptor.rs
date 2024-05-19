@@ -642,7 +642,7 @@ pub struct EnumDescriptorWithContext<'a> {
 
 #[derive(Default)]
 pub struct EnumDescriptorCache<'a> {
-    full_name: OnceCell<String>,
+    full_name: OnceCell<ProtoPathBuf>,
     values: OnceCell<Vec<EnumValueDescriptorWithContext<'a>>>,
 }
 
@@ -655,14 +655,13 @@ impl<'a> EnumDescriptorWithContext<'a> {
             .full_name
             .get_or_try_init(|| {
                 let mut full_name = if let Some(nested) = self.maybe_containing {
-                    nested.full_name()?.to_string()
+                    nested.full_name()?.to_owned()
                 } else {
-                    self.file.package()?.unwrap_or_default().to_string()
+                    self.file
+                        .package()?
+                        .map_or_else(ProtoPathBuf::new, |p| p.to_owned())
                 };
-                if !full_name.is_empty() {
-                    full_name.push('.');
-                }
-                full_name.push_str(&self.body.name);
+                full_name.push(ProtoPath::new(&self.body.name));
                 Ok(full_name)
             })
             .map(|s| s.as_ref())
@@ -700,26 +699,26 @@ pub struct EnumValueDescriptorWithContext<'a> {
 }
 #[derive(Default)]
 pub struct EnumValueDescriptorCache {
-    full_name: OnceCell<String>,
+    full_name: OnceCell<ProtoPathBuf>,
 }
 impl<'a> EnumValueDescriptorWithContext<'a> {
     pub fn name(&self) -> Result<&str> {
         Ok(self.body.name.as_ref())
     }
-    pub fn full_name(&self) -> Result<&str> {
+    pub fn full_name(&self) -> Result<&ProtoPath> {
         self.cache
             .full_name
             .get_or_try_init(|| {
                 // This full_name is a sibling of EnumDescriptor, not a child.
                 let mut full_name = if let Some(m) = self.enum_.maybe_containing {
-                    m.full_name()?.to_string()
+                    m.full_name()?.to_owned()
                 } else {
-                    self.enum_.file.package()?.unwrap_or_default().to_string()
+                    self.enum_
+                        .file
+                        .package()?
+                        .map_or_else(ProtoPathBuf::new, |p| p.to_owned())
                 };
-                if !full_name.is_empty() {
-                    full_name.push('.');
-                }
-                full_name.push_str(&self.body.name);
+                full_name.push(ProtoPath::new(&self.enum_.name()?));
                 Ok(full_name)
             })
             .map(|s| s.as_ref())
@@ -738,7 +737,7 @@ pub struct FieldDescriptorWithContext<'a> {
 
 #[derive(Default)]
 pub struct FieldDescriptorCache {
-    full_name: OnceCell<String>,
+    full_name: OnceCell<ProtoPathBuf>,
     type_: OnceCell<()>,
 }
 
@@ -750,9 +749,8 @@ impl<'a> FieldDescriptorWithContext<'a> {
         self.cache
             .full_name
             .get_or_try_init(|| {
-                let mut full_name = self.message.full_name()?.to_string();
-                full_name.push('.');
-                full_name.push_str(&self.body.name);
+                let mut full_name = self.message.full_name()?.to_owned();
+                full_name.push(ProtoPath::new(&format!(".{}", self.body.name)));
                 Ok(full_name)
             })
             .map(|s| s.as_ref())
