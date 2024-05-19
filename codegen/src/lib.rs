@@ -16,14 +16,15 @@
 
 pub mod descriptor;
 
+use self::descriptor::{FileDescriptor, RootContext};
 use ::itertools::Itertools;
 use ::puroro::google::protobuf::compiler::{
     code_generator_response, CodeGeneratorRequest, CodeGeneratorResponse,
 };
 use ::puroro::message::MessageLite;
 use ::puroro::Result as PResult;
+use ::std::collections::HashMap;
 use ::thiserror::Error;
-use descriptor::{FileDescriptor, RootContext};
 
 #[derive(Error, Debug)]
 pub enum ErrorKind {
@@ -77,8 +78,8 @@ impl TryFrom<GeneratedFile> for code_generator_response::File<'_> {
             .join("");
         file.set_content(&format!(
             "\
-            // THIS FILE IS A GENERATED FILE! DO NOT EDIT! \n\
-            // Source(s): \n\
+            // THIS FILE IS A GENERATED FILE! DO NOT EDIT!\n\
+            // Source(s):\n\
             {}\n\
             \n\
             {}\n",
@@ -97,15 +98,22 @@ pub fn compile(request: &CodeGeneratorRequest) -> Result<CodeGeneratorResponse<'
         .collect::<PResult<Result<Vec<_>>>>()??;
 
     let root_context: RootContext = descriptors.into();
+    let mut out_files = HashMap::new();
 
     for fd in root_context.files() {
-        let mut file = if let Some(package) = fd.package()? {
-            GeneratedFile::new(package.split('.').join("/") + ".rs")
+        let file_name = if let Some(package) = fd.package()? {
+            package.split('.').join("/") + ".rs"
         } else {
-            GeneratedFile::new("mod.rs")
+            "mod.rs".to_string()
         };
+        let file = out_files
+            .entry(file_name.clone())
+            .or_insert_with(|| GeneratedFile::new(file_name));
         file.append("pub fn yeah() { }");
         file.add_source(fd.name()?);
+    }
+
+    for file in out_files.into_values() {
         response.push_file(file.try_into()?)?;
     }
 
