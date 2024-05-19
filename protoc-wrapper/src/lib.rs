@@ -63,29 +63,28 @@ impl Protoc {
             proto_paths: Vec::new(),
         }
     }
-    pub fn protoc_path(mut self, path: impl AsRef<Path>) -> Self {
-        self.protoc_path = path.as_ref().to_owned();
+    pub fn protoc_path(mut self, path: impl Into<PathBuf>) -> Self {
+        self.protoc_path = path.into();
         self
     }
-    pub fn out_dir(mut self, path: impl AsRef<Path>) -> Self {
-        self.out_dir = Some(path.as_ref().to_owned());
+    pub fn out_dir(mut self, path: impl Into<PathBuf>) -> Self {
+        self.out_dir = Some(path.into());
         self
     }
-    pub fn proto_file(mut self, path: impl AsRef<Path>) -> Self {
-        self.proto_files.push(path.as_ref().to_owned());
+    pub fn proto_file(mut self, path: impl Into<PathBuf>) -> Self {
+        self.proto_files.push(path.into());
         self
     }
     pub fn proto_files<I>(mut self, paths: I) -> Self
     where
         I: IntoIterator,
-        I::Item: AsRef<Path>,
+        I::Item: Into<PathBuf>,
     {
-        self.proto_files
-            .extend(paths.into_iter().map(|p| p.as_ref().to_owned()));
+        self.proto_files.extend(paths.into_iter().map(|p| p.into()));
         self
     }
-    pub fn proto_path(mut self, path: impl AsRef<Path>) -> Self {
-        self.proto_paths.push(path.as_ref().to_owned());
+    pub fn proto_path(mut self, path: impl Into<PathBuf>) -> Self {
+        self.proto_paths.push(path.into());
         self
     }
 
@@ -159,7 +158,7 @@ impl ProtocOnMemory {
             in_files: Vec::new(),
         }
     }
-    pub fn protoc_path(mut self, path: impl AsRef<Path>) -> Self {
+    pub fn protoc_path(mut self, path: impl Into<PathBuf>) -> Self {
         self.protoc = self.protoc.protoc_path(path);
         self
     }

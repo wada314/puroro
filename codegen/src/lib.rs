@@ -80,7 +80,7 @@ impl TryFrom<GeneratedFile> for code_generator_response::File<'_> {
             // THIS FILE IS A GENERATED FILE! DO NOT EDIT! \n\
             // Source(s): \n\
             {}\n\
-\n\
+            \n\
             {}\n",
             source_list, from.content
         ))?;
