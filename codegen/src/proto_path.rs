@@ -13,9 +13,12 @@
 // limitations under the License.
 
 use crate::{ErrorKind, Result};
+use ::std::borrow::Borrow;
 use ::std::ops::Deref;
 
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct ProtoPath(str);
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Clone, Default)]
 pub struct ProtoPathBuf(String);
 
 impl ProtoPath {
@@ -67,11 +70,19 @@ impl ProtoPathBuf {
     pub fn new() -> Self {
         Self("".to_string())
     }
+    pub fn push(&mut self, path: impl AsRef<ProtoPath>) {
+        self.0.push_str(&path.as_ref().0);
+    }
 }
 
 impl AsRef<str> for ProtoPath {
     fn as_ref(&self) -> &str {
         &self.0
+    }
+}
+impl AsRef<ProtoPath> for ProtoPath {
+    fn as_ref(&self) -> &ProtoPath {
+        self
     }
 }
 impl From<&ProtoPath> for String {
@@ -83,6 +94,12 @@ impl From<&ProtoPath> for String {
 impl From<&ProtoPath> for ProtoPathBuf {
     fn from(v: &ProtoPath) -> ProtoPathBuf {
         ProtoPathBuf(v.0.to_string())
+    }
+}
+impl ToOwned for ProtoPath {
+    type Owned = ProtoPathBuf;
+    fn to_owned(&self) -> Self::Owned {
+        ProtoPathBuf(self.0.to_string())
     }
 }
 impl Deref for ProtoPathBuf {
@@ -97,8 +114,28 @@ impl AsRef<str> for ProtoPathBuf {
         &self.0
     }
 }
+impl AsRef<ProtoPath> for ProtoPathBuf {
+    fn as_ref(&self) -> &ProtoPath {
+        ProtoPath::new(&self.0)
+    }
+}
+impl Borrow<ProtoPath> for ProtoPathBuf {
+    fn borrow(&self) -> &ProtoPath {
+        ProtoPath::new(&self.0)
+    }
+}
 impl From<ProtoPathBuf> for String {
     fn from(v: ProtoPathBuf) -> String {
         v.0
+    }
+}
+impl From<String> for ProtoPathBuf {
+    fn from(v: String) -> ProtoPathBuf {
+        ProtoPathBuf(v)
+    }
+}
+impl From<&str> for ProtoPathBuf {
+    fn from(v: &str) -> ProtoPathBuf {
+        ProtoPathBuf(v.to_string())
     }
 }

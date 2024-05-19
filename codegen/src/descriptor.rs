@@ -14,6 +14,7 @@
 
 #![allow(unused)]
 
+use crate::proto_path::{ProtoPath, ProtoPathBuf};
 use crate::{ErrorKind, Result};
 use ::itertools::{Either, Itertools};
 use ::puroro::google::protobuf::{
@@ -140,7 +141,7 @@ impl From<FieldLabelProto> for FieldLabel {
 pub struct FileDescriptor {
     name: String,
     dependencies: Vec<String>,
-    package: Option<String>,
+    package: Option<ProtoPathBuf>,
     message_types: Vec<Descriptor>,
     enum_types: Vec<EnumDescriptor>,
     syntax: Option<String>,
@@ -157,7 +158,7 @@ impl<'a> TryFrom<FileDescriptorProto<'a>> for FileDescriptor {
                 .into_iter()
                 .map_ok(str::to_string)
                 .collect::<PResult<_>>()?,
-            package: proto.package()?.map(str::to_string),
+            package: proto.package()?.map(|s| s.to_string().into()),
             message_types: proto
                 .message_type()
                 .into_iter()
@@ -387,7 +388,7 @@ impl<'a> FileDescriptorWithContext<'a> {
     pub fn name(&self) -> Result<&str> {
         Ok(&self.body.name)
     }
-    pub fn package(&self) -> Result<Option<&str>> {
+    pub fn package(&self) -> Result<Option<&ProtoPath>> {
         Ok(self.body.package.as_deref())
     }
     pub fn dependencies(
@@ -452,7 +453,7 @@ pub struct DescriptorWithContext<'a> {
 
 #[derive(Default)]
 pub struct DescriptorCache<'a> {
-    full_name: OnceCell<String>,
+    full_name: OnceCell<ProtoPathBuf>,
     non_oneof_fields: OnceCell<Vec<FieldDescriptorWithContext<'a>>>,
     real_oneof_fields: OnceCell<Vec<FieldDescriptorWithContext<'a>>>,
     synthetic_oneof_fields: OnceCell<Vec<FieldDescriptorWithContext<'a>>>,
@@ -470,19 +471,19 @@ impl<'a> DescriptorWithContext<'a> {
     pub fn name(&self) -> Result<&str> {
         Ok(&self.body.name)
     }
-    pub fn full_name(&self) -> Result<&str> {
+    pub fn full_name(&self) -> Result<&ProtoPath> {
         self.cache
             .full_name
             .get_or_try_init(|| {
                 let mut full_name = if let Some(nested) = self.maybe_containing {
-                    nested.full_name()?.to_string()
+                    nested.full_name()?.to_owned()
                 } else {
-                    self.file.package()?.unwrap_or_default().to_string()
+                    self.file
+                        .package()?
+                        .map_or_else(ProtoPathBuf::new, |p| p.to_owned())
                 };
-                if !full_name.is_empty() {
-                    full_name.push('.');
-                }
-                full_name.push_str(&self.body.name);
+                // todo!("absl path check?");
+                full_name.push(ProtoPath::new(&self.body.name));
                 Ok(full_name)
             })
             .map(|s| s.as_ref())
@@ -490,7 +491,9 @@ impl<'a> DescriptorWithContext<'a> {
     pub fn file(&'a self) -> Result<&FileDescriptorWithContext> {
         Ok(self.file)
     }
-    pub fn all_fields(&'a self) -> Result<impl 'a + IntoIterator<Item = &FieldDescriptorWithContext>> {
+    pub fn all_fields(
+        &'a self,
+    ) -> Result<impl 'a + IntoIterator<Item = &FieldDescriptorWithContext>> {
         Ok(self
             .non_oneof_fields()?
             .into_iter()
@@ -535,7 +538,9 @@ impl<'a> DescriptorWithContext<'a> {
             self.filtered_fields(|f| f.oneof_index.is_some() && f.proto3_optional)
         })
     }
-    pub fn all_oneofs(&'a self) -> Result<impl 'a + IntoIterator<Item = &OneofDescriptorWithContext>> {
+    pub fn all_oneofs(
+        &'a self,
+    ) -> Result<impl 'a + IntoIterator<Item = &OneofDescriptorWithContext>> {
         Ok(self
             .real_oneofs()?
             .into_iter()
@@ -578,7 +583,9 @@ impl<'a> DescriptorWithContext<'a> {
         })?;
         Ok((real, synthetic))
     }
-    pub fn real_oneofs(&'a self) -> Result<impl IntoIterator<Item = &'a OneofDescriptorWithContext>> {
+    pub fn real_oneofs(
+        &'a self,
+    ) -> Result<impl IntoIterator<Item = &'a OneofDescriptorWithContext>> {
         Ok(self.real_and_synthetic_oneofs()?.0)
     }
     pub fn synthetic_oneofs(
@@ -602,7 +609,9 @@ impl<'a> DescriptorWithContext<'a> {
                 .collect()
         })
     }
-    pub fn enum_types(&'a self) -> Result<impl 'a + IntoIterator<Item = &EnumDescriptorWithContext>> {
+    pub fn enum_types(
+        &'a self,
+    ) -> Result<impl 'a + IntoIterator<Item = &EnumDescriptorWithContext>> {
         self.cache.enum_types.get_or_try_init(|| {
             self.body
                 .enum_types
@@ -661,7 +670,9 @@ impl<'a> EnumDescriptorWithContext<'a> {
     pub fn file(&'a self) -> Result<&FileDescriptorWithContext> {
         Ok(self.file)
     }
-    pub fn values(&'a self) -> Result<impl 'a + IntoIterator<Item = &EnumValueDescriptorWithContext>> {
+    pub fn values(
+        &'a self,
+    ) -> Result<impl 'a + IntoIterator<Item = &EnumValueDescriptorWithContext>> {
         self.cache.values.get_or_try_init(|| {
             self.body
                 .values
