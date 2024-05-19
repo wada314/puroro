@@ -41,6 +41,8 @@ pub enum ErrorKind {
     StdTryFromIntError(#[from] ::std::num::TryFromIntError),
     #[error("Error while constructing a descriptor tree structure. {0}")]
     DescriptorStructureError(String),
+    #[error("ProtoPath strip prefix error: Tried to split \"{1}\" from \"{0}\"")]
+    ProtoPathStripPrefixError(String, String),
 }
 pub type Result<T> = ::std::result::Result<T, ErrorKind>;
 
