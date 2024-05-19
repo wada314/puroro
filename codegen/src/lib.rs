@@ -15,6 +15,7 @@
 #![feature(once_cell_try)]
 
 pub mod descriptor;
+pub mod proto_path;
 
 use self::descriptor::{FileDescriptor, RootContext};
 use ::itertools::Itertools;
