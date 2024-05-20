@@ -14,6 +14,7 @@
 
 #![feature(once_cell_try)]
 
+pub mod cases;
 pub mod descriptor;
 pub mod proto_path;
 

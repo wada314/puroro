@@ -25,6 +25,7 @@ impl ProtoPath {
     pub fn new<S: AsRef<str> + ?Sized>(path: &S) -> &Self {
         unsafe { &*(path.as_ref() as *const str as *const ProtoPath) }
     }
+
     pub fn is_absolute(&self) -> bool {
         self.0.starts_with('.')
     }
@@ -139,5 +140,3 @@ impl From<&str> for ProtoPathBuf {
         ProtoPathBuf(v.to_string())
     }
 }
-
-
