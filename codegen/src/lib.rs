@@ -106,7 +106,7 @@ pub fn compile(request: &CodeGeneratorRequest) -> Result<CodeGeneratorResponse<'
 
     for fd in root_context.files() {
         let file_name = if let Some(package) = fd.package()? {
-            package.split('.').join("/") + ".rs"
+            package.to_rust_file_path()
         } else {
             "mod.rs".to_string()
         };

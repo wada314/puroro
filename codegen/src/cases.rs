@@ -34,38 +34,14 @@ pub fn guess_case(s: &str) -> Case {
         }
     }
     match (has_upper, has_lower, has_underscore) {
-        (true, false, false) => Case::CamelCase,
-        (false, true, false) => Case::LowerSnakeCase,
-        (false, false, true) => Case::UpperSnakeCase,
+        (true, true, false) => Case::CamelCase,
+        (false, true, true) => Case::LowerSnakeCase,
+        (true, false, true) => Case::UpperSnakeCase,
         _ => Case::Unknown,
     }
 }
 
-pub fn split_into_words(s: &str, case: Option<Case>) -> impl Iterator<Item = &str> {
-    let case = case.unwrap_or_else(|| guess_case(s));
-    // WTF
-    split_camel_case_into_words(if matches!(case, Case::CamelCase) {
-        s
-    } else {
-        ""
-    })
-    .chain(
-        split_snake_case_into_words(
-            if matches!(case, Case::UpperSnakeCase | Case::LowerSnakeCase) {
-                s
-            } else {
-                ""
-            },
-        )
-        .chain(split_unkown_into_words(if matches!(case, Case::Unknown) {
-            s
-        } else {
-            ""
-        })),
-    )
-}
-
-fn split_unkown_into_words(s: &str) -> impl Iterator<Item = &str> {
+pub fn split_into_words(s: &str) -> impl Iterator<Item = &str> {
     let mut pos = 0;
     #[derive(Debug, PartialEq, Eq, Clone, Copy)]
     enum State {
@@ -79,14 +55,13 @@ fn split_unkown_into_words(s: &str) -> impl Iterator<Item = &str> {
         use State::*;
         let mut start_pos = pos;
         while pos < s.len() {
-            pos += 1;
-            let c = s.chars().nth(pos).unwrap();
+            let c = s.as_bytes()[pos];
             let last_state = state;
-            state = if c.is_lowercase() {
+            state = if c.is_ascii_lowercase() {
                 State::Lower
-            } else if c.is_uppercase() {
+            } else if c.is_ascii_uppercase() {
                 State::Upper
-            } else if c == '_' {
+            } else if c == b'_' {
                 State::Underscore
             } else {
                 State::Neutral
@@ -103,28 +78,28 @@ fn split_unkown_into_words(s: &str) -> impl Iterator<Item = &str> {
                 }
                 _ => {}
             }
-        }
-        Some(&s[start_pos..pos])
-    })
-}
-
-fn split_camel_case_into_words(s: &str) -> impl Iterator<Item = &str> {
-    let mut pos = 0;
-    ::std::iter::from_fn(move || {
-        let start_pos = pos;
-        while pos < s.len() {
             pos += 1;
-            let c = s.chars().nth(pos).unwrap();
-            if c.is_uppercase() {
-                return Some(&s[start_pos..pos]);
-            }
         }
         Some(&s[start_pos..pos])
     })
 }
 
-fn split_snake_case_into_words(s: &str) -> impl Iterator<Item = &str> {
-    s.split('_')
+pub fn convert_into_case(s: &str, case: Case) -> String {
+    let words = split_into_words(s).collect::<Vec<_>>();
+    match case {
+        Case::CamelCase => words.into_iter().map(|w| w).collect::<String>(),
+        Case::LowerSnakeCase => words.join("_").to_lowercase(),
+        Case::UpperSnakeCase => words.join("_").to_uppercase(),
+        Case::Unknown => s.to_string(),
+    }
+}
+
+pub fn capitalize(s: &str) -> String {
+    if let Some((first, rem)) = s.split_at_checked(1) {
+        first.to_uppercase() + rem
+    } else {
+        s.to_string()
+    }
 }
 
 #[cfg(test)]
@@ -142,31 +117,9 @@ mod tests {
     }
 
     #[test]
-    fn test_split_camel_case_into_words() {
-        let s = "FooBarDam";
-        let words: Vec<_> = split_camel_case_into_words(s).collect();
-        assert_eq!(words, vec!["foo", "Bar", "Dam"]);
-
-        let s = "foo";
-        let words: Vec<_> = split_camel_case_into_words(s).collect();
-        assert_eq!(words, vec!["foo"]);
-    }
-
-    #[test]
-    fn test_split_snake_case_into_words() {
-        let s = "foo_bar_dam";
-        let words: Vec<_> = split_snake_case_into_words(s).collect();
-        assert_eq!(words, vec!["foo", "bar", "dam"]);
-
-        let s = "foo";
-        let words: Vec<_> = split_snake_case_into_words(s).collect();
-        assert_eq!(words, vec!["foo"]);
-    }
-
-    #[test]
-    fn test_split_unknown_case_into_words() {
+    fn test_split_into_words() {
         fn do_test(s: &str, expected: Vec<&str>) {
-            let words: Vec<_> = split_unkown_into_words(s).collect();
+            let words: Vec<_> = split_into_words(s).collect();
             assert_eq!(words, expected);
         }
         do_test("FooBarDam", vec!["Foo", "Bar", "Dam"]);

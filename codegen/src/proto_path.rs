@@ -12,7 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use crate::cases::{convert_into_case, Case};
 use crate::{ErrorKind, Result};
+use ::itertools::Itertools;
 use ::std::borrow::Borrow;
 use ::std::ops::Deref;
 
@@ -63,6 +65,21 @@ impl ProtoPath {
                     prefix.0.to_string(),
                 ))?
             }
+        }
+    }
+
+    pub fn to_rust_file_path(&self) -> String {
+        let mut result = self
+            .0
+            .split('.')
+            .filter(|s| !s.is_empty())
+            .map(|s| convert_into_case(s, Case::LowerSnakeCase))
+            .join("/");
+        if result.is_empty() {
+            return "mod.rs".to_string();
+        } else {
+            result += ".rs";
+            return result;
         }
     }
 }
