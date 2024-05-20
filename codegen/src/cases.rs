@@ -67,20 +67,20 @@ pub fn split_into_words(s: &str) -> impl Iterator<Item = &str> {
                 State::Neutral
             };
             match (last_state, state) {
-                (Lower | Neutral, Upper) => {
+                (Lower | Neutral, Upper) if start_pos != pos => {
                     return Some(&s[start_pos..pos]);
                 }
                 (Underscore, _) => {
                     start_pos = pos;
                 }
-                (_, Underscore) => {
+                (_, Underscore) if start_pos != pos => {
                     return Some(&s[start_pos..pos]);
                 }
                 _ => {}
             }
             pos += 1;
         }
-        Some(&s[start_pos..pos])
+        (start_pos != pos).then_some(&s[start_pos..pos])
     })
 }
 
