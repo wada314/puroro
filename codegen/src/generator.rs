@@ -58,7 +58,7 @@ struct GeneratedFile {
     full_path: String,
     sources: BTreeSet<String>,
     submodules: BTreeSet<String>,
-    content: Vec<TokenStream>,
+    body: Vec<TokenStream>,
 }
 impl GeneratedFile {
     fn new(full_path: impl Into<String>) -> Self {
@@ -66,14 +66,14 @@ impl GeneratedFile {
             full_path: full_path.into(),
             sources: BTreeSet::new(),
             submodules: BTreeSet::new(),
-            content: Vec::new(),
+            body: Vec::new(),
         }
     }
     fn full_path(&self) -> &str {
         &self.full_path
     }
     fn append(&mut self, source: TokenStream) {
-        self.content.push(source);
+        self.body.push(source);
     }
     fn add_source(&mut self, source: impl Into<String>) {
         self.sources.insert(source.into());
@@ -105,7 +105,7 @@ impl TryFrom<GeneratedFile> for code_generator_response::File<'_> {
                 quote! { pub mod #id; }
             })
             .collect::<Vec<_>>();
-        let body = from.content;
+        let body = from.body;
         let content = quote! {
             #![doc=" THIS FILE IS A GENERATED FILE! DO NOT EDIT!"]
             #![doc=" Source(s):"]
