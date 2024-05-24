@@ -16,10 +16,10 @@ use crate::cases::{convert_into_case, Case};
 use crate::descriptor::DescriptorWithContext;
 use crate::Result;
 use ::proc_macro2::TokenStream;
-use ::quote::quote;
+use ::quote::{format_ident, quote};
 
 pub fn generate_open_struct_from_message(desc: &DescriptorWithContext) -> Result<TokenStream> {
-    let struct_name = convert_into_case(desc.name()?, Case::CamelCase);
+    let struct_name = format_ident!("{}", convert_into_case(desc.name()?, Case::CamelCase));
     Ok(quote! {
         pub struct #struct_name {
             yeah: String,

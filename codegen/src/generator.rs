@@ -14,6 +14,7 @@
 
 pub mod message;
 
+use self::message::generate_open_struct_from_message;
 use crate::descriptor::{FileDescriptor, RootContext};
 use crate::{ErrorKind, Result};
 use ::itertools::Itertools;
@@ -43,7 +44,11 @@ pub fn compile(request: &CodeGeneratorRequest) -> Result<CodeGeneratorResponse<'
             "mod.rs".to_string()
         };
         let file = out_files.file_mut(file_path);
-        file.append(quote! { pub fn yeah() { } });
+
+        for message in fd.messages()? {
+            file.append(generate_open_struct_from_message(message)?);
+        }
+
         file.add_source(fd.name()?);
     }
 

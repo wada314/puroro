@@ -2,4 +2,6 @@
 //! Source(s):
 //!   p2-example.proto
 pub mod com;
-pub fn yeah() {}
+pub struct Test1 {
+    yeah: String,
+}
