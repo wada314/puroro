@@ -2,5 +2,8 @@
 //! Source(s):
 //!   hoge.proto
 pub struct Person {
-    yeah: String,
+    name: String,
+    id: String,
+    email: String,
+    phones: String,
 }

@@ -3,5 +3,5 @@
 //!   p2-example.proto
 pub mod com;
 pub struct Test1 {
-    yeah: String,
+    a: String,
 }

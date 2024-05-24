@@ -13,16 +13,30 @@
 // limitations under the License.
 
 use crate::cases::{convert_into_case, Case};
-use crate::descriptor::DescriptorWithContext;
+use crate::descriptor::{DescriptorWithContext, FieldDescriptorWithContext};
 use crate::Result;
 use ::proc_macro2::TokenStream;
 use ::quote::{format_ident, quote};
 
-pub fn generate_open_struct_from_message(desc: &DescriptorWithContext) -> Result<TokenStream> {
+pub fn generate_open_struct_from_message<'a>(
+    desc: &'a DescriptorWithContext<'a>,
+) -> Result<TokenStream> {
     let struct_name = format_ident!("{}", convert_into_case(desc.name()?, Case::CamelCase));
+    let field_names = desc
+        .non_oneof_fields()?
+        .into_iter()
+        .map(|field| {
+            let name = convert_into_case(field.name()?, Case::LowerSnakeCase);
+            Ok(format_ident!("{name}"))
+        })
+        .collect::<Result<Vec<_>>>()?;
     Ok(quote! {
         pub struct #struct_name {
-            yeah: String,
+            #(#field_names: String,)*
         }
     })
+}
+
+fn generate_open_struct_field_type(field: &FieldDescriptorWithContext) -> Result<TokenStream> {
+    todo!()
 }
