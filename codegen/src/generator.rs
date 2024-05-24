@@ -17,9 +17,12 @@ pub mod message;
 use crate::descriptor::{FileDescriptor, RootContext};
 use crate::{ErrorKind, Result};
 use ::itertools::Itertools;
+use ::prettyplease::unparse;
+use ::proc_macro2::TokenStream;
 use ::puroro::google::protobuf::compiler::code_generator_response;
 use ::puroro::google::protobuf::compiler::{CodeGeneratorRequest, CodeGeneratorResponse};
 use ::puroro::Result as PResult;
+use ::quote::{format_ident, quote};
 use ::std::collections::{BTreeSet, HashMap};
 
 pub fn compile(request: &CodeGeneratorRequest) -> Result<CodeGeneratorResponse<'static>> {
@@ -40,7 +43,7 @@ pub fn compile(request: &CodeGeneratorRequest) -> Result<CodeGeneratorResponse<'
             "mod.rs".to_string()
         };
         let file = out_files.file_mut(file_path);
-        file.append("pub fn yeah() { }");
+        file.append(quote! { pub fn yeah() { } });
         file.add_source(fd.name()?);
     }
 
@@ -55,7 +58,7 @@ struct GeneratedFile {
     full_path: String,
     sources: BTreeSet<String>,
     submodules: BTreeSet<String>,
-    content: String,
+    content: Vec<TokenStream>,
 }
 impl GeneratedFile {
     fn new(full_path: impl Into<String>) -> Self {
@@ -63,14 +66,14 @@ impl GeneratedFile {
             full_path: full_path.into(),
             sources: BTreeSet::new(),
             submodules: BTreeSet::new(),
-            content: String::new(),
+            content: Vec::new(),
         }
     }
     fn full_path(&self) -> &str {
         &self.full_path
     }
-    fn append(&mut self, source: impl AsRef<str>) {
-        self.content.push_str(source.as_ref());
+    fn append(&mut self, source: TokenStream) {
+        self.content.push(source);
     }
     fn add_source(&mut self, source: impl Into<String>) {
         self.sources.insert(source.into());
@@ -87,24 +90,33 @@ impl TryFrom<GeneratedFile> for code_generator_response::File<'_> {
         let source_list = from
             .sources
             .into_iter()
-            .map(|s| format!("//   {}\n", s))
-            .join("");
+            .map(|s| {
+                let doc = format!("   {s}");
+                quote! {
+                    #![doc=#doc]
+                }
+            })
+            .collect::<Vec<_>>();
         let submodule_decls = from
             .submodules
             .into_iter()
-            .map(|s| format!("pub mod {};\n", s))
-            .join("");
-        file.set_content(&format!(
-            "\
-            // THIS FILE IS A GENERATED FILE! DO NOT EDIT!\n\
-            // Source(s):\n\
-            {source_list}\
-            \n\
-            {submodule_decls}\
-            \n\
-            {}\n",
-            from.content
-        ))?;
+            .map(|s| {
+                let id = format_ident!("{}", s);
+                quote! { pub mod #id; }
+            })
+            .collect::<Vec<_>>();
+        let body = from.content;
+        let content = quote! {
+            #![doc=" THIS FILE IS A GENERATED FILE! DO NOT EDIT!"]
+            #![doc=" Source(s):"]
+            #(#source_list)*
+
+            #(#submodule_decls)*
+            #(#body)*
+        };
+        let syn_file: ::syn::File =
+            syn::parse2(content).map_err(|e| ErrorKind::SynParseError(e))?;
+        file.set_content(&unparse(&syn_file))?;
         Ok(file)
     }
 }

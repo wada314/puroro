@@ -19,7 +19,7 @@ pub mod descriptor;
 pub mod generator;
 pub mod proto_path;
 
-use crate::generator::compile;
+pub use crate::generator::compile;
 use ::puroro::google::protobuf::compiler::CodeGeneratorRequest;
 use ::puroro::message::MessageLite;
 use ::thiserror::Error;
@@ -40,6 +40,8 @@ pub enum ErrorKind {
     DescriptorStructureError(String),
     #[error("ProtoPath strip prefix error: Tried to split \"{1}\" from \"{0}\"")]
     ProtoPathStripPrefixError(String, String),
+    #[error("syn error: {0}")]
+    SynParseError(#[from] ::syn::Error),
 }
 pub type Result<T> = ::std::result::Result<T, ErrorKind>;
 

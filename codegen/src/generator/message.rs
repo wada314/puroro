@@ -14,7 +14,7 @@
 
 use crate::cases::{convert_into_case, Case};
 use crate::descriptor::DescriptorWithContext;
-use crate::{ErrorKind, Result};
+use crate::Result;
 use ::proc_macro2::TokenStream;
 use ::quote::quote;
 
