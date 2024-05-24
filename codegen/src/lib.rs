@@ -25,7 +25,7 @@ use ::puroro::google::protobuf::compiler::{
 };
 use ::puroro::message::MessageLite;
 use ::puroro::Result as PResult;
-use ::std::collections::HashMap;
+use ::std::collections::{BTreeSet, HashMap};
 use ::thiserror::Error;
 
 #[derive(Error, Debug)]
@@ -49,14 +49,16 @@ pub type Result<T> = ::std::result::Result<T, ErrorKind>;
 
 struct GeneratedFile {
     name: String,
-    sources: Vec<String>,
+    sources: BTreeSet<String>,
+    submodules: BTreeSet<String>,
     content: String,
 }
 impl GeneratedFile {
     fn new(name: impl Into<String>) -> Self {
         Self {
             name: name.into(),
-            sources: Vec::new(),
+            sources: BTreeSet::new(),
+            submodules: BTreeSet::new(),
             content: String::new(),
         }
     }
@@ -67,7 +69,10 @@ impl GeneratedFile {
         self.content.push_str(source.as_ref());
     }
     fn add_source(&mut self, source: impl Into<String>) {
-        self.sources.push(source.into());
+        self.sources.insert(source.into());
+    }
+    fn add_submodule(&mut self, submodule: impl Into<String>) {
+        self.submodules.insert(submodule.into());
     }
 }
 impl TryFrom<GeneratedFile> for code_generator_response::File<'_> {
@@ -80,14 +85,21 @@ impl TryFrom<GeneratedFile> for code_generator_response::File<'_> {
             .into_iter()
             .map(|s| format!("//   {}\n", s))
             .join("");
+        let submodule_decls = from
+            .submodules
+            .into_iter()
+            .map(|s| format!("pub mod {};\n", s))
+            .join("");
         file.set_content(&format!(
             "\
             // THIS FILE IS A GENERATED FILE! DO NOT EDIT!\n\
             // Source(s):\n\
-            {}\n\
+            {source_list}\
+            \n\
+            {submodule_decls}\
             \n\
             {}\n",
-            source_list, from.content
+            from.content
         ))?;
         Ok(file)
     }
