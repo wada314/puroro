@@ -48,22 +48,22 @@ pub enum ErrorKind {
 pub type Result<T> = ::std::result::Result<T, ErrorKind>;
 
 struct GeneratedFile {
-    name: String,
+    full_path: String,
     sources: BTreeSet<String>,
     submodules: BTreeSet<String>,
     content: String,
 }
 impl GeneratedFile {
-    fn new(name: impl Into<String>) -> Self {
+    fn new(full_path: impl Into<String>) -> Self {
         Self {
-            name: name.into(),
+            full_path: full_path.into(),
             sources: BTreeSet::new(),
             submodules: BTreeSet::new(),
             content: String::new(),
         }
     }
-    fn name(&self) -> &str {
-        &self.name
+    fn full_path(&self) -> &str {
+        &self.full_path
     }
     fn append(&mut self, source: impl AsRef<str>) {
         self.content.push_str(source.as_ref());
@@ -79,7 +79,7 @@ impl TryFrom<GeneratedFile> for code_generator_response::File<'_> {
     type Error = ErrorKind;
     fn try_from(from: GeneratedFile) -> Result<Self> {
         let mut file = code_generator_response::File::default();
-        file.set_name(from.name())?;
+        file.set_name(from.full_path())?;
         let source_list = from
             .sources
             .into_iter()
@@ -105,6 +105,60 @@ impl TryFrom<GeneratedFile> for code_generator_response::File<'_> {
     }
 }
 
+struct GeneratedFileSet {
+    files: HashMap<String, GeneratedFile>,
+}
+impl GeneratedFileSet {
+    fn new() -> Self {
+        Self {
+            files: HashMap::new(),
+        }
+    }
+
+    // Get file by full path.
+    // Also make sure that the parent modules are created.
+    fn file_mut(&mut self, full_path: impl Into<String>) -> &mut GeneratedFile {
+        let full_path: String = full_path.into();
+
+        // if the input file path is "mod.rs", then we skip the parent module creation.
+        if full_path == "mod.rs" {
+            return self
+                .files
+                .entry("mod.rs".to_string())
+                .or_insert_with(|| GeneratedFile::new("mod.rs"));
+        }
+
+        // create parent modules.
+        let mut module_path = full_path.trim_end_matches(".rs");
+        while let Some((parent, submodule)) = module_path.rsplit_once('/') {
+            self.files.entry(format!("{parent}.rs")).or_insert_with(|| {
+                let mut file = GeneratedFile::new(format!("{parent}.rs"));
+                file.add_submodule(submodule);
+                file
+            });
+            module_path = parent;
+        }
+        self.files.entry("mod.rs".to_string()).or_insert_with(|| {
+            let mut file = GeneratedFile::new("mod.rs");
+            file.add_submodule(module_path);
+            file
+        });
+
+        // return the target file.
+        self.files
+            .entry(full_path.clone())
+            .or_insert_with(|| GeneratedFile::new(full_path))
+    }
+}
+impl IntoIterator for GeneratedFileSet {
+    type Item = GeneratedFile;
+    type IntoIter = ::std::collections::hash_map::IntoValues<String, GeneratedFile>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.files.into_values()
+    }
+}
+
 pub fn compile(request: &CodeGeneratorRequest) -> Result<CodeGeneratorResponse<'static>> {
     let mut response = CodeGeneratorResponse::default();
 
@@ -114,22 +168,20 @@ pub fn compile(request: &CodeGeneratorRequest) -> Result<CodeGeneratorResponse<'
         .collect::<PResult<Result<Vec<_>>>>()??;
 
     let root_context: RootContext = descriptors.into();
-    let mut out_files = HashMap::new();
+    let mut out_files = GeneratedFileSet::new();
 
     for fd in root_context.files() {
-        let file_name = if let Some(package) = fd.package()? {
+        let file_path = if let Some(package) = fd.package()? {
             package.to_rust_file_path()
         } else {
             "mod.rs".to_string()
         };
-        let file = out_files
-            .entry(file_name.clone())
-            .or_insert_with(|| GeneratedFile::new(file_name));
+        let file = out_files.file_mut(file_path);
         file.append("pub fn yeah() { }");
         file.add_source(fd.name()?);
     }
 
-    for file in out_files.into_values() {
+    for file in out_files {
         response.push_file(file.try_into()?)?;
     }
 
