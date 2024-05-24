@@ -16,6 +16,7 @@
 
 pub mod cases;
 pub mod descriptor;
+pub mod generator;
 pub mod proto_path;
 
 use self::descriptor::{FileDescriptor, RootContext};
