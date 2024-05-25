@@ -55,53 +55,72 @@ impl TryFrom<EditionProto> for Edition {
 
 // region: FieldType
 
-#[derive(Clone, Copy, Debug, Eq, PartialEq, Default)]
-pub enum FieldTypeTemplate<E, M> {
+#[derive(Debug, Default)]
+pub enum FieldType<'a> {
+    BOOL,
+    BYTES,
     DOUBLE,
+    ENUM(&'a EnumDescriptorWithContext<'a>),
+    FIXED32,
+    FIXED64,
     FLOAT,
-    INT64,
-    UINT64,
+    GROUP,
     #[default]
     INT32,
-    FIXED64,
-    FIXED32,
-    BOOL,
-    STRING,
-    GROUP,
-    MESSAGE(M),
-    BYTES,
-    UINT32,
-    ENUM(E),
+    INT64,
+    MESSAGE(&'a DescriptorWithContext<'a>),
     SFIXED32,
     SFIXED64,
     SINT32,
     SINT64,
+    STRING,
+    UINT32,
+    UINT64,
 }
-pub type FieldType = FieldTypeTemplate<(), ()>;
-pub type FieldTypeWithConcreteType<'a> =
-    FieldTypeTemplate<&'a EnumDescriptorWithContext<'a>, &'a DescriptorWithContext<'a>>;
+#[derive(Clone, Copy, Debug, Eq, PartialEq, Default)]
+pub enum FieldTypeCase {
+    BOOL,
+    BYTES,
+    DOUBLE,
+    ENUM,
+    FIXED32,
+    FIXED64,
+    FLOAT,
+    GROUP,
+    #[default]
+    INT32,
+    INT64,
+    MESSAGE,
+    SFIXED32,
+    SFIXED64,
+    SINT32,
+    SINT64,
+    STRING,
+    UINT32,
+    UINT64,
+}
 
-impl From<FieldTypeProto> for FieldType {
+impl From<FieldTypeProto> for FieldTypeCase {
     fn from(proto: FieldTypeProto) -> Self {
         match proto {
-            FieldTypeProto::TypeDouble => FieldType::DOUBLE,
-            FieldTypeProto::TypeFloat => FieldType::FLOAT,
-            FieldTypeProto::TypeInt64 => FieldType::INT64,
-            FieldTypeProto::TypeUInt64 => FieldType::UINT64,
-            FieldTypeProto::TypeInt32 => FieldType::INT32,
-            FieldTypeProto::TypeFixed64 => FieldType::FIXED64,
-            FieldTypeProto::TypeFixed32 => FieldType::FIXED32,
-            FieldTypeProto::TypeBool => FieldType::BOOL,
-            FieldTypeProto::TypeString => FieldType::STRING,
-            FieldTypeProto::TypeGroup => FieldType::GROUP,
-            FieldTypeProto::TypeMessage => FieldType::MESSAGE(()),
-            FieldTypeProto::TypeBytes => FieldType::BYTES,
-            FieldTypeProto::TypeUInt32 => FieldType::UINT32,
-            FieldTypeProto::TypeEnum => FieldType::ENUM(()),
-            FieldTypeProto::TypeSFixed32 => FieldType::SFIXED32,
-            FieldTypeProto::TypeSFixed64 => FieldType::SFIXED64,
-            FieldTypeProto::TypeSInt32 => FieldType::SINT32,
-            FieldTypeProto::TypeSInt64 => FieldType::SINT64,
+            FieldTypeProto::TypeBool => FieldTypeCase::BOOL,
+            FieldTypeProto::TypeBytes => FieldTypeCase::BYTES,
+            FieldTypeProto::TypeDouble => FieldTypeCase::DOUBLE,
+            FieldTypeProto::TypeEnum => FieldTypeCase::ENUM,
+            FieldTypeProto::TypeFixed32 => FieldTypeCase::FIXED32,
+            FieldTypeProto::TypeFixed64 => FieldTypeCase::FIXED64,
+            FieldTypeProto::TypeFloat => FieldTypeCase::FLOAT,
+            FieldTypeProto::TypeGroup => FieldTypeCase::GROUP,
+            FieldTypeProto::TypeInt32 => FieldTypeCase::INT32,
+            FieldTypeProto::TypeInt64 => FieldTypeCase::INT64,
+            FieldTypeProto::TypeMessage => FieldTypeCase::MESSAGE,
+            FieldTypeProto::TypeSFixed32 => FieldTypeCase::SFIXED32,
+            FieldTypeProto::TypeSFixed64 => FieldTypeCase::SFIXED64,
+            FieldTypeProto::TypeSInt32 => FieldTypeCase::SINT32,
+            FieldTypeProto::TypeSInt64 => FieldTypeCase::SINT64,
+            FieldTypeProto::TypeString => FieldTypeCase::STRING,
+            FieldTypeProto::TypeUInt32 => FieldTypeCase::UINT32,
+            FieldTypeProto::TypeUInt64 => FieldTypeCase::UINT64,
         }
     }
 }
@@ -225,7 +244,7 @@ impl<'a> TryFrom<DescriptorProto<'a>> for Descriptor {
 pub struct FieldDescriptor {
     name: String,
     number: i32,
-    type_: FieldType,
+    type_: FieldTypeCase,
     type_name: Option<String>,
     label: Option<FieldLabel>,
     oneof_index: Option<usize>,
@@ -329,6 +348,7 @@ impl<'a> TryFrom<OneofDescriptorProto<'a>> for OneofDescriptor {
 
 // region: RootContext
 
+#[derive(Debug)]
 pub struct RootContext<'a> {
     files: Vec<(FileDescriptor, OnceCell<FileDescriptorWithContext<'a>>)>,
 }
@@ -371,13 +391,14 @@ impl<'a> RootContext<'a> {
 
 // region: FileDescriptorWithContext
 
+#[derive(Debug)]
 pub struct FileDescriptorWithContext<'a> {
     root: &'a RootContext<'a>,
     body: &'a FileDescriptor,
     cache: FileDescriptorCache<'a>,
 }
 
-#[derive(Default)]
+#[derive(Default, Debug)]
 pub struct FileDescriptorCache<'a> {
     dependencies: OnceCell<Vec<&'a FileDescriptorWithContext<'a>>>,
     messages: OnceCell<Vec<DescriptorWithContext<'a>>>,
@@ -444,6 +465,7 @@ impl<'a> FileDescriptorWithContext<'a> {
 
 // region: DescriptorWithContext
 
+#[derive(Debug)]
 pub struct DescriptorWithContext<'a> {
     file: &'a FileDescriptorWithContext<'a>,
     maybe_containing: Option<&'a DescriptorWithContext<'a>>,
@@ -451,7 +473,7 @@ pub struct DescriptorWithContext<'a> {
     cache: DescriptorCache<'a>,
 }
 
-#[derive(Default)]
+#[derive(Default, Debug)]
 pub struct DescriptorCache<'a> {
     full_name: OnceCell<ProtoPathBuf>,
     non_oneof_fields: OnceCell<Vec<FieldDescriptorWithContext<'a>>>,
@@ -633,6 +655,7 @@ impl<'a> DescriptorWithContext<'a> {
 
 // region: EnumDescriptorWithContext
 
+#[derive(Debug)]
 pub struct EnumDescriptorWithContext<'a> {
     file: &'a FileDescriptorWithContext<'a>,
     maybe_containing: Option<&'a DescriptorWithContext<'a>>,
@@ -640,7 +663,7 @@ pub struct EnumDescriptorWithContext<'a> {
     cache: EnumDescriptorCache<'a>,
 }
 
-#[derive(Default)]
+#[derive(Default, Debug)]
 pub struct EnumDescriptorCache<'a> {
     full_name: OnceCell<ProtoPathBuf>,
     values: OnceCell<Vec<EnumValueDescriptorWithContext<'a>>>,
@@ -692,12 +715,13 @@ impl<'a> EnumDescriptorWithContext<'a> {
 
 // region: EnumValueDescriptorWithContext
 
+#[derive(Debug)]
 pub struct EnumValueDescriptorWithContext<'a> {
     enum_: &'a EnumDescriptorWithContext<'a>,
     body: &'a EnumValueDescriptor,
     cache: EnumValueDescriptorCache,
 }
-#[derive(Default)]
+#[derive(Default, Debug)]
 pub struct EnumValueDescriptorCache {
     full_name: OnceCell<ProtoPathBuf>,
 }
@@ -729,13 +753,14 @@ impl<'a> EnumValueDescriptorWithContext<'a> {
 
 // region: FieldDescriptorWithContext
 
+#[derive(Debug)]
 pub struct FieldDescriptorWithContext<'a> {
     message: &'a DescriptorWithContext<'a>,
     body: &'a FieldDescriptor,
     cache: FieldDescriptorCache,
 }
 
-#[derive(Default)]
+#[derive(Default, Debug)]
 pub struct FieldDescriptorCache {
     full_name: OnceCell<ProtoPathBuf>,
     type_: OnceCell<()>,
@@ -761,13 +786,14 @@ impl<'a> FieldDescriptorWithContext<'a> {
 
 // region: OneofDescriptorWithContext
 
+#[derive(Debug)]
 pub struct OneofDescriptorWithContext<'a> {
     message: &'a DescriptorWithContext<'a>,
     body: &'a OneofDescriptor,
     cache: OneofDescriptorCache,
 }
 
-#[derive(Default)]
+#[derive(Default, Debug)]
 pub struct OneofDescriptorCache {}
 
 // endregion:
