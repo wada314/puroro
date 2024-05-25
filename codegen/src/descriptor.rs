@@ -125,6 +125,40 @@ impl From<FieldTypeProto> for FieldTypeCase {
     }
 }
 
+impl FieldTypeCase {
+    pub fn with_type_ref<'a, F, G>(
+        self,
+        type_name: Option<&str>,
+        msg_case: F,
+        enum_case: G,
+    ) -> Result<FieldType<'a>>
+    where
+        F: FnOnce(Option<&str>) -> Result<&'a DescriptorWithContext<'a>>,
+        G: FnOnce(Option<&str>) -> Result<&'a EnumDescriptorWithContext<'a>>,
+    {
+        match self {
+            FieldTypeCase::BOOL => Ok(FieldType::BOOL),
+            FieldTypeCase::BYTES => Ok(FieldType::BYTES),
+            FieldTypeCase::DOUBLE => Ok(FieldType::DOUBLE),
+            FieldTypeCase::ENUM => Ok(FieldType::ENUM(enum_case(type_name)?)),
+            FieldTypeCase::FIXED32 => Ok(FieldType::FIXED32),
+            FieldTypeCase::FIXED64 => Ok(FieldType::FIXED64),
+            FieldTypeCase::FLOAT => Ok(FieldType::FLOAT),
+            FieldTypeCase::GROUP => Ok(FieldType::GROUP),
+            FieldTypeCase::INT32 => Ok(FieldType::INT32),
+            FieldTypeCase::INT64 => Ok(FieldType::INT64),
+            FieldTypeCase::MESSAGE => Ok(FieldType::MESSAGE(msg_case(type_name)?)),
+            FieldTypeCase::SFIXED32 => Ok(FieldType::SFIXED32),
+            FieldTypeCase::SFIXED64 => Ok(FieldType::SFIXED64),
+            FieldTypeCase::SINT32 => Ok(FieldType::SINT32),
+            FieldTypeCase::SINT64 => Ok(FieldType::SINT64),
+            FieldTypeCase::STRING => Ok(FieldType::STRING),
+            FieldTypeCase::UINT32 => Ok(FieldType::UINT32),
+            FieldTypeCase::UINT64 => Ok(FieldType::UINT64),
+        }
+    }
+}
+
 // endregion:
 
 // region: FieldLabel
@@ -757,13 +791,13 @@ impl<'a> EnumValueDescriptorWithContext<'a> {
 pub struct FieldDescriptorWithContext<'a> {
     message: &'a DescriptorWithContext<'a>,
     body: &'a FieldDescriptor,
-    cache: FieldDescriptorCache,
+    cache: FieldDescriptorCache<'a>,
 }
 
 #[derive(Default, Debug)]
-pub struct FieldDescriptorCache {
+pub struct FieldDescriptorCache<'a> {
     full_name: OnceCell<ProtoPathBuf>,
-    type_: OnceCell<()>,
+    r#type: OnceCell<FieldType<'a>>,
 }
 
 impl<'a> FieldDescriptorWithContext<'a> {
@@ -779,6 +813,9 @@ impl<'a> FieldDescriptorWithContext<'a> {
                 Ok(full_name)
             })
             .map(|s| s.as_ref())
+    }
+    pub fn r#type(&self) -> Result<&FieldType> {
+        todo!()
     }
 }
 
