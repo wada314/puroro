@@ -25,6 +25,7 @@ use ::puroro::google::protobuf::{
 };
 use ::puroro::Result as PResult;
 use ::std::cell::OnceCell;
+use ::std::collections::HashMap;
 
 // region: Edition
 
@@ -385,11 +386,13 @@ impl<'a> TryFrom<OneofDescriptorProto<'a>> for OneofDescriptor {
 #[derive(Debug)]
 pub struct RootContext<'a> {
     files: Vec<(FileDescriptor, OnceCell<FileDescriptorWithContext<'a>>)>,
+    package_to_files: OnceCell<HashMap<ProtoPathBuf, Vec<&'a FileDescriptorWithContext<'a>>>>,
 }
 impl From<FileDescriptor> for RootContext<'_> {
     fn from(f: FileDescriptor) -> Self {
         Self {
             files: vec![(f, OnceCell::default())],
+            package_to_files: Default::default(),
         }
     }
 }
@@ -400,6 +403,7 @@ impl<T: IntoIterator<Item = FileDescriptor>> From<T> for RootContext<'_> {
                 .into_iter()
                 .map(|f| (f, OnceCell::default()))
                 .collect(),
+            package_to_files: Default::default(),
         }
     }
 }
@@ -418,6 +422,22 @@ impl<'a> RootContext<'a> {
             .into_iter()
             .find(|f| f.name().is_ok_and(|n| n == name))
             .ok_or_else(|| ErrorKind::DescriptorStructureError("No such file".to_string()))
+    }
+    pub fn package_to_files(
+        &'a self,
+        package: &ProtoPath,
+    ) -> Result<impl 'a + IntoIterator<Item = &'a FileDescriptorWithContext<'a>>> {
+        let map = self.package_to_files.get_or_try_init(|| -> Result<_> {
+            let mut map = HashMap::new();
+            for f in self.files() {
+                let package = f.package()?.map_or(ProtoPathBuf::new(), |p| p.to_owned());
+                map.entry(package.to_owned())
+                    .or_insert_with(Vec::new)
+                    .push(f);
+            }
+            Ok(map)
+        })?;
+        todo!()
     }
 }
 
