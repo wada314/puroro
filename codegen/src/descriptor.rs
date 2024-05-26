@@ -517,6 +517,25 @@ impl<'a> FileDescriptorWithContext<'a> {
                 .collect()
         })
     }
+    pub fn all_messages_or_enums(
+        &'a self,
+    ) -> Result<
+        impl 'a + IntoIterator<Item = MessageOrEnum<&DescriptorWithContext, &EnumDescriptorWithContext>>,
+    > {
+        let direct_messages = self.messages()?.into_iter().map(MessageOrEnum::Message);
+        let direct_enums = self.enums()?.into_iter().map(MessageOrEnum::Enum);
+        let indirect_messages_vec = self
+            .messages()?
+            .into_iter()
+            .map(|child| child.all_messages_or_enums())
+            .collect::<Result<Vec<_>>>()?;
+        let indirect_messages = indirect_messages_vec
+            .into_iter()
+            .flat_map(|v| v.into_iter());
+        let boxed: Box<dyn Iterator<Item = _>> =
+            Box::new(direct_messages.chain(direct_enums).chain(indirect_messages));
+        Ok(boxed)
+    }
 }
 
 // endregion:
