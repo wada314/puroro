@@ -437,7 +437,11 @@ impl<'a> RootContext<'a> {
             }
             Ok(map)
         })?;
-        todo!()
+        Ok(map
+            .get(package)
+            .map_or(Default::default(), Vec::as_slice)
+            .into_iter()
+            .map(|f| *f))
     }
 }
 
