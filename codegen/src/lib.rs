@@ -42,6 +42,8 @@ pub enum ErrorKind {
     ProtoPathStripPrefixError(String, String),
     #[error("syn error: {0}")]
     SynParseError(#[from] ::syn::Error),
+    #[error("Proto type (message or enum) path not found: {0}")]
+    ProtoPathNotFoundError(String),
 }
 pub type Result<T> = ::std::result::Result<T, ErrorKind>;
 

@@ -447,8 +447,46 @@ impl<'a> RootContext<'a> {
         &'a self,
         path: &ProtoPath,
         cur: Option<&ProtoPath>,
-    ) -> Result<Either<&DescriptorWithContext, &EnumDescriptorWithContext>> {
-        todo!()
+    ) -> Result<MessageOrEnum<&DescriptorWithContext, &EnumDescriptorWithContext>> {
+        if path.is_absolute() {
+            return self
+                .resolve_absolute_path(path)?
+                .ok_or_else(|| ErrorKind::ProtoPathNotFoundError(path.to_string()));
+        } else if let Some(cur) = cur {
+            if !cur.is_absolute() {
+                return Err(ErrorKind::ProtoPathNotFoundError(path.to_string()));
+            }
+            let cur = cur.to_owned();
+            for cur2 in cur.ancestors() {
+                let full_path = {
+                    let mut full_path = cur2.to_owned();
+                    full_path.push(path);
+                    full_path
+                };
+                if let Some(result) = self.resolve_absolute_path(&full_path)? {
+                    return Ok(result);
+                }
+            }
+        }
+        Err(ErrorKind::ProtoPathNotFoundError(path.to_string()))
+    }
+
+    fn resolve_absolute_path(
+        &'a self,
+        path: &ProtoPath,
+    ) -> Result<Option<MessageOrEnum<&DescriptorWithContext, &EnumDescriptorWithContext>>> {
+        debug_assert!(path.is_absolute());
+        // Can improve the complexity here. Maybe later.
+        for package_path in path.ancestors() {
+            for file in self.package_to_files(package_path)? {
+                for message_or_enum in file.all_messages_or_enums()? {
+                    if message_or_enum.full_name()? == path {
+                        return Ok(Some(message_or_enum));
+                    }
+                }
+            }
+        }
+        Ok(None)
     }
 }
 
@@ -776,7 +814,7 @@ impl<'a> EnumDescriptorWithContext<'a> {
     pub fn name(&self) -> Result<&str> {
         Ok(self.body.name.as_ref())
     }
-    pub fn full_name(&self) -> Result<&str> {
+    pub fn full_name(&self) -> Result<&ProtoPath> {
         self.cache
             .full_name
             .get_or_try_init(|| {
@@ -909,6 +947,14 @@ pub struct OneofDescriptorCache {}
 pub enum MessageOrEnum<M, E> {
     Message(M),
     Enum(E),
+}
+impl<'a> MessageOrEnum<&'a DescriptorWithContext<'a>, &'a EnumDescriptorWithContext<'a>> {
+    pub fn full_name(&self) -> Result<&ProtoPath> {
+        match self {
+            MessageOrEnum::Message(m) => m.full_name(),
+            MessageOrEnum::Enum(e) => e.full_name(),
+        }
+    }
 }
 
 trait TryIntoString {
