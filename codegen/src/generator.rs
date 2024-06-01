@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-pub mod message;
+pub mod message_open_struct;
 
-use self::message::generate_open_struct_from_message;
+use self::message_open_struct::MessageOpenStruct;
 use crate::descriptor::{FileDescriptor, RootContext};
 use crate::{ErrorKind, Result};
 use ::itertools::Itertools;
@@ -46,7 +46,8 @@ pub fn compile(request: &CodeGeneratorRequest) -> Result<CodeGeneratorResponse<'
         let file = out_files.file_mut(file_path);
 
         for message in fd.messages()? {
-            file.append(generate_open_struct_from_message(message)?);
+            let open_struct = MessageOpenStruct::try_new(message)?;
+            file.append(quote! { #open_struct });
         }
 
         file.add_source(fd.name()?);
@@ -63,6 +64,10 @@ struct GeneratedFile {
     full_path: String,
     sources: BTreeSet<String>,
     submodules: BTreeSet<String>,
+
+    /// The body part of the file, except:
+    /// - The header comments
+    /// - The submodule definitions (like "pub mod foo;")
     body: Vec<TokenStream>,
 }
 impl GeneratedFile {
