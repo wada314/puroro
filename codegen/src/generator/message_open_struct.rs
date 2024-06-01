@@ -18,7 +18,6 @@ use crate::Result;
 use ::proc_macro2::TokenStream;
 use ::quote::{quote, ToTokens, TokenStreamExt};
 use ::syn::{parse_str, Ident, Type};
-use syn::parse;
 
 pub struct MessageOpenStruct {
     name: Ident,
@@ -52,14 +51,15 @@ impl Field {
     }
 
     fn gen_type(ty: FieldType) -> Result<Type> {
-        let tmp;
+        // let tmp;
         Ok(parse_str(match ty {
             FieldType::BOOL => "bool",
             FieldType::BYTES => "::std::vec::Vec<u8>",
             FieldType::DOUBLE => "f64",
             FieldType::ENUM(e) => {
-                tmp = e.full_name()?.to_rust_path()?;
-                &tmp
+                // tmp = e.full_name()?.to_rust_path()?;
+                // &tmp
+                "i32"
             }
             FieldType::FIXED32 => "u32",
             FieldType::FIXED64 => "u64",
@@ -68,8 +68,10 @@ impl Field {
             FieldType::INT32 => "i32",
             FieldType::INT64 => "i64",
             FieldType::MESSAGE(m) => {
-                tmp = m.full_name()?.to_rust_path()?;
-                &tmp
+                // tmp = m.full_name()?.to_rust_path()?;
+                // tmp = m.full_name()?.to_string();
+                // &tmp
+                "i32"
             }
             FieldType::SFIXED32 => "i32",
             FieldType::SFIXED64 => "i64",
@@ -97,8 +99,9 @@ impl ToTokens for MessageOpenStruct {
 impl ToTokens for Field {
     fn to_tokens(&self, tokens: &mut TokenStream) {
         let name = &self.name;
+        let r#type = &self.r#type;
         tokens.append_all(quote! {
-            #name: String,
+            #name: #r#type,
         })
     }
 }

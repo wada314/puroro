@@ -35,6 +35,9 @@ impl ProtoPath {
         !self.is_absolute()
     }
     pub fn parent(&self) -> Option<&Self> {
+        if self.0.is_empty() {
+            return None;
+        }
         self.0
             .rsplit_once('.')
             .map(|(parent, _)| ProtoPath::new(parent))
