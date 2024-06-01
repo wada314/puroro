@@ -443,6 +443,13 @@ impl<'a> RootContext<'a> {
             .into_iter()
             .map(|f| *f))
     }
+    pub fn resolve_path(
+        &'a self,
+        path: &ProtoPath,
+        cur: Option<&ProtoPath>,
+    ) -> Result<Either<&DescriptorWithContext, &EnumDescriptorWithContext>> {
+        todo!()
+    }
 }
 
 // endregion:
