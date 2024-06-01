@@ -134,21 +134,37 @@ impl FieldTypeCase {
         enum_case: G,
     ) -> Result<FieldType<'a>>
     where
-        F: FnOnce(Option<&str>) -> Result<&'a DescriptorWithContext<'a>>,
-        G: FnOnce(Option<&str>) -> Result<&'a EnumDescriptorWithContext<'a>>,
+        F: FnOnce(&ProtoPath) -> Result<&'a DescriptorWithContext<'a>>,
+        G: FnOnce(&ProtoPath) -> Result<&'a EnumDescriptorWithContext<'a>>,
     {
         match self {
             FieldTypeCase::BOOL => Ok(FieldType::BOOL),
             FieldTypeCase::BYTES => Ok(FieldType::BYTES),
             FieldTypeCase::DOUBLE => Ok(FieldType::DOUBLE),
-            FieldTypeCase::ENUM => Ok(FieldType::ENUM(enum_case(type_name)?)),
+            FieldTypeCase::ENUM => {
+                let type_name: ProtoPathBuf = type_name
+                    .ok_or_else(|| {
+                        ErrorKind::DescriptorProtoValidationError("No enum type name".to_string())
+                    })?
+                    .into();
+                Ok(FieldType::ENUM(enum_case(&type_name)?))
+            }
             FieldTypeCase::FIXED32 => Ok(FieldType::FIXED32),
             FieldTypeCase::FIXED64 => Ok(FieldType::FIXED64),
             FieldTypeCase::FLOAT => Ok(FieldType::FLOAT),
             FieldTypeCase::GROUP => Ok(FieldType::GROUP),
             FieldTypeCase::INT32 => Ok(FieldType::INT32),
             FieldTypeCase::INT64 => Ok(FieldType::INT64),
-            FieldTypeCase::MESSAGE => Ok(FieldType::MESSAGE(msg_case(type_name)?)),
+            FieldTypeCase::MESSAGE => {
+                let type_name: ProtoPathBuf = type_name
+                    .ok_or_else(|| {
+                        ErrorKind::DescriptorProtoValidationError(
+                            "No message type name".to_string(),
+                        )
+                    })?
+                    .into();
+                Ok(FieldType::MESSAGE(msg_case(&type_name)?))
+            }
             FieldTypeCase::SFIXED32 => Ok(FieldType::SFIXED32),
             FieldTypeCase::SFIXED64 => Ok(FieldType::SFIXED64),
             FieldTypeCase::SINT32 => Ok(FieldType::SINT32),
@@ -279,7 +295,7 @@ impl<'a> TryFrom<DescriptorProto<'a>> for Descriptor {
 pub struct FieldDescriptor {
     name: String,
     number: i32,
-    type_: FieldTypeCase,
+    r#type: FieldTypeCase,
     type_name: Option<String>,
     label: Option<FieldLabel>,
     oneof_index: Option<usize>,
@@ -294,7 +310,7 @@ impl<'a> TryFrom<FieldDescriptorProto<'a>> for FieldDescriptor {
             number: proto
                 .number()?
                 .try_into_number("No FieldDescriptor number")?,
-            type_: proto
+            r#type: proto
                 .type_()?
                 .ok_or_else(|| {
                     ErrorKind::DescriptorProtoValidationError("No FieldDescriptor type".to_string())
@@ -921,8 +937,32 @@ impl<'a> FieldDescriptorWithContext<'a> {
             })
             .map(|s| s.as_ref())
     }
-    pub fn r#type(&self) -> Result<&FieldType> {
-        todo!()
+    pub fn r#type(&self) -> Result<&FieldType<'a>> {
+        self.cache.r#type.get_or_try_init(|| {
+            self.body.r#type.with_type_ref(
+                self.body.type_name.as_deref(),
+                |name| {
+                    self.message
+                        .file
+                        .root
+                        .resolve_path(&name, Some(self.message.full_name()?))?
+                        .maybe_message()
+                        .ok_or_else(|| {
+                            ErrorKind::DescriptorStructureError("Not a message".to_string())
+                        })
+                },
+                |name| {
+                    self.message
+                        .file
+                        .root
+                        .resolve_path(&name, Some(self.message.full_name()?))?
+                        .maybe_enum()
+                        .ok_or_else(|| {
+                            ErrorKind::DescriptorStructureError("Not an enum".to_string())
+                        })
+                },
+            )
+        })
     }
 }
 
@@ -953,6 +993,20 @@ impl<'a> MessageOrEnum<&'a DescriptorWithContext<'a>, &'a EnumDescriptorWithCont
         match self {
             MessageOrEnum::Message(m) => m.full_name(),
             MessageOrEnum::Enum(e) => e.full_name(),
+        }
+    }
+}
+impl<M, E> MessageOrEnum<M, E> {
+    pub fn maybe_message(self) -> Option<M> {
+        match self {
+            MessageOrEnum::Message(m) => Some(m),
+            MessageOrEnum::Enum(_) => None,
+        }
+    }
+    pub fn maybe_enum(self) -> Option<E> {
+        match self {
+            MessageOrEnum::Message(_) => None,
+            MessageOrEnum::Enum(e) => Some(e),
         }
     }
 }
