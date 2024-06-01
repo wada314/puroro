@@ -52,26 +52,33 @@ impl Field {
     }
 
     fn gen_type(ty: FieldType) -> Result<Type> {
-        Ok(match ty {
-            FieldType::BOOL => parse_str("bool")?,
-            FieldType::BYTES => parse_str("::std::vec::Vec<u8>")?,
-            FieldType::DOUBLE => parse_str("f64")?,
-            FieldType::ENUM(e) => todo!(),
-            FieldType::FIXED32 => parse_str("u32")?,
-            FieldType::FIXED64 => parse_str("u64")?,
-            FieldType::FLOAT => parse_str("f32")?,
+        let tmp;
+        Ok(parse_str(match ty {
+            FieldType::BOOL => "bool",
+            FieldType::BYTES => "::std::vec::Vec<u8>",
+            FieldType::DOUBLE => "f64",
+            FieldType::ENUM(e) => {
+                tmp = e.full_name()?.to_rust_path()?;
+                &tmp
+            }
+            FieldType::FIXED32 => "u32",
+            FieldType::FIXED64 => "u64",
+            FieldType::FLOAT => "f32",
             FieldType::GROUP => todo!(),
-            FieldType::INT32 => parse_str("i32")?,
-            FieldType::INT64 => parse_str("i64")?,
-            FieldType::MESSAGE(m) => todo!(),
-            FieldType::SFIXED32 => parse_str("i32")?,
-            FieldType::SFIXED64 => parse_str("i64")?,
-            FieldType::SINT32 => parse_str("i32")?,
-            FieldType::SINT64 => parse_str("i64")?,
-            FieldType::STRING => parse_str("::std::string::String")?,
-            FieldType::UINT32 => parse_str("u32")?,
-            FieldType::UINT64 => parse_str("u64")?,
-        })
+            FieldType::INT32 => "i32",
+            FieldType::INT64 => "i64",
+            FieldType::MESSAGE(m) => {
+                tmp = m.full_name()?.to_rust_path()?;
+                &tmp
+            }
+            FieldType::SFIXED32 => "i32",
+            FieldType::SFIXED64 => "i64",
+            FieldType::SINT32 => "i32",
+            FieldType::SINT64 => "i64",
+            FieldType::STRING => "::std::string::String",
+            FieldType::UINT32 => "u32",
+            FieldType::UINT64 => "u64",
+        })?)
     }
 }
 
