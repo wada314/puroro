@@ -13,11 +13,12 @@
 // limitations under the License.
 
 use crate::cases::{convert_into_case, Case};
-use crate::descriptor::{DescriptorWithContext, FieldDescriptorWithContext};
+use crate::descriptor::{DescriptorWithContext, FieldDescriptorWithContext, FieldType};
 use crate::Result;
 use ::proc_macro2::TokenStream;
-use ::quote::{format_ident, quote, ToTokens, TokenStreamExt};
-use ::syn::{parse_str, Ident};
+use ::quote::{quote, ToTokens, TokenStreamExt};
+use ::syn::{parse_str, Ident, Type};
+use syn::parse;
 
 pub struct MessageOpenStruct {
     name: Ident,
@@ -26,6 +27,7 @@ pub struct MessageOpenStruct {
 
 struct Field {
     name: Ident,
+    r#type: Type,
 }
 
 impl MessageOpenStruct {
@@ -35,12 +37,40 @@ impl MessageOpenStruct {
             fields: desc
                 .non_oneof_fields()?
                 .into_iter()
-                .map(|field| {
-                    Ok(Field {
-                        name: parse_str(&convert_into_case(field.name()?, Case::LowerSnakeCase))?,
-                    })
-                })
+                .map(Field::try_new)
                 .collect::<Result<Vec<_>>>()?,
+        })
+    }
+}
+
+impl Field {
+    pub fn try_new<'a>(desc: &'a FieldDescriptorWithContext<'a>) -> Result<Self> {
+        Ok(Self {
+            name: parse_str(&convert_into_case(desc.name()?, Case::LowerSnakeCase))?,
+            r#type: Self::gen_type(desc.r#type()?)?,
+        })
+    }
+
+    fn gen_type(ty: FieldType) -> Result<Type> {
+        Ok(match ty {
+            FieldType::BOOL => parse_str("bool")?,
+            FieldType::BYTES => parse_str("::std::vec::Vec<u8>")?,
+            FieldType::DOUBLE => parse_str("f64")?,
+            FieldType::ENUM(e) => todo!(),
+            FieldType::FIXED32 => parse_str("u32")?,
+            FieldType::FIXED64 => parse_str("u64")?,
+            FieldType::FLOAT => parse_str("f32")?,
+            FieldType::GROUP => todo!(),
+            FieldType::INT32 => parse_str("i32")?,
+            FieldType::INT64 => parse_str("i64")?,
+            FieldType::MESSAGE(m) => todo!(),
+            FieldType::SFIXED32 => parse_str("i32")?,
+            FieldType::SFIXED64 => parse_str("i64")?,
+            FieldType::SINT32 => parse_str("i32")?,
+            FieldType::SINT64 => parse_str("i64")?,
+            FieldType::STRING => parse_str("::std::string::String")?,
+            FieldType::UINT32 => parse_str("u32")?,
+            FieldType::UINT64 => parse_str("u64")?,
         })
     }
 }

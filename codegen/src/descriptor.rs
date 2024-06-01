@@ -56,7 +56,7 @@ impl TryFrom<EditionProto> for Edition {
 
 // region: FieldType
 
-#[derive(Debug, Default)]
+#[derive(Clone, Debug, Default)]
 pub enum FieldType<'a> {
     BOOL,
     BYTES,
@@ -937,32 +937,35 @@ impl<'a> FieldDescriptorWithContext<'a> {
             })
             .map(|s| s.as_ref())
     }
-    pub fn r#type(&self) -> Result<&FieldType<'a>> {
-        self.cache.r#type.get_or_try_init(|| {
-            self.body.r#type.with_type_ref(
-                self.body.type_name.as_deref(),
-                |name| {
-                    self.message
-                        .file
-                        .root
-                        .resolve_path(&name, Some(self.message.full_name()?))?
-                        .maybe_message()
-                        .ok_or_else(|| {
-                            ErrorKind::DescriptorStructureError("Not a message".to_string())
-                        })
-                },
-                |name| {
-                    self.message
-                        .file
-                        .root
-                        .resolve_path(&name, Some(self.message.full_name()?))?
-                        .maybe_enum()
-                        .ok_or_else(|| {
-                            ErrorKind::DescriptorStructureError("Not an enum".to_string())
-                        })
-                },
-            )
-        })
+    pub fn r#type(&self) -> Result<FieldType<'a>> {
+        self.cache
+            .r#type
+            .get_or_try_init(|| {
+                self.body.r#type.with_type_ref(
+                    self.body.type_name.as_deref(),
+                    |name| {
+                        self.message
+                            .file
+                            .root
+                            .resolve_path(&name, Some(self.message.full_name()?))?
+                            .maybe_message()
+                            .ok_or_else(|| {
+                                ErrorKind::DescriptorStructureError("Not a message".to_string())
+                            })
+                    },
+                    |name| {
+                        self.message
+                            .file
+                            .root
+                            .resolve_path(&name, Some(self.message.full_name()?))?
+                            .maybe_enum()
+                            .ok_or_else(|| {
+                                ErrorKind::DescriptorStructureError("Not an enum".to_string())
+                            })
+                    },
+                )
+            })
+            .cloned()
     }
 }
 
