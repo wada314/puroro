@@ -23,13 +23,12 @@ pub mod proto_path;
 pub use crate::generator::compile;
 use ::puroro::google::protobuf::compiler::CodeGeneratorRequest;
 use ::puroro::message::MessageLite;
-use ::std::backtrace::Backtrace;
 use ::thiserror::Error;
 
 #[derive(Error, Debug)]
 pub enum ErrorKind {
     #[error("Unknown compile error")]
-    CompileError(#[cfg(test)] Backtrace),
+    CompileError(),
     #[error("puroro error")]
     PuroroError(#[from] ::puroro::ErrorKind),
     #[error("Unknown Edition.")]
@@ -42,7 +41,7 @@ pub enum ErrorKind {
     DescriptorStructureError(String),
     #[error("ProtoPath strip prefix error: Tried to split \"{1}\" from \"{0}\"")]
     ProtoPathStripPrefixError(String, String),
-    #[error("syn error: {0}, bt: {1}")]
+    #[error("syn error: {0}")]
     SynParseError(#[from] ::syn::Error, Backtrace),
     #[error("Proto type (message or enum) path not found: {0}")]
     ProtoPathNotFoundError(String),
