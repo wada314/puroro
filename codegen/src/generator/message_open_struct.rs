@@ -99,9 +99,9 @@ impl ToTokens for MessageOpenStruct {
 impl ToTokens for Field {
     fn to_tokens(&self, tokens: &mut TokenStream) {
         let name = &self.name;
-        let r#type = &self.r#type;
+        let ty = &self.r#type;
         tokens.append_all(quote! {
-            #name: #r#type,
+            #name: #ty,
         })
     }
 }

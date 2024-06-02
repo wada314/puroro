@@ -44,7 +44,7 @@ pub fn compile(request: &CodeGeneratorRequest) -> Result<CodeGeneratorResponse<'
         .collect::<Result<Vec<_>>>()?;
     let messages = messages_iters.into_iter().flatten().collect::<Vec<_>>();
     for message in &messages {
-        let file_path = if let Some(package) = message.full_name()?.parent() {
+        let file_path = if let Some(package) = message.full_path()?.parent() {
             package.to_rust_file_path()
         } else {
             "mod.rs".to_string()

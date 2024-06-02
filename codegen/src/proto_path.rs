@@ -129,6 +129,9 @@ impl ProtoPathBuf {
         Self("".to_string())
     }
     pub fn push(&mut self, path: impl AsRef<ProtoPath>) {
+        if !self.0.ends_with('.') {
+            self.0.push('.');
+        }
         self.0.push_str(&path.as_ref().0);
     }
 }

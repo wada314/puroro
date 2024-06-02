@@ -443,13 +443,14 @@ impl<'a> RootContext<'a> {
         &'a self,
         package: &ProtoPath,
     ) -> Result<impl 'a + IntoIterator<Item = &'a FileDescriptorWithContext<'a>>> {
+        debug_assert!(package.is_absolute());
         let map = self.package_to_files.get_or_try_init(|| -> Result<_> {
             let mut map = HashMap::new();
-            for f in self.files() {
-                let package = f.package()?.map_or(ProtoPathBuf::new(), |p| p.to_owned());
+            for fd in self.files() {
+                let package = fd.absolute_package()?.to_owned();
                 map.entry(package.to_owned())
                     .or_insert_with(Vec::new)
-                    .push(f);
+                    .push(fd);
             }
             Ok(map)
         })?;
@@ -530,6 +531,17 @@ impl<'a> FileDescriptorWithContext<'a> {
     }
     pub fn package(&self) -> Result<Option<&ProtoPath>> {
         Ok(self.body.package.as_deref())
+    }
+    pub fn absolute_package(&self) -> Result<ProtoPathBuf> {
+        let mut package = self
+            .package()?
+            .map_or_else(ProtoPathBuf::new, |p| p.to_owned());
+        if package.is_relative() {
+            let mut new_package = Into::<ProtoPathBuf>::into(".");
+            new_package.push(&package);
+            package = new_package;
+        }
+        Ok(package)
     }
     pub fn dependencies(
         &'a self,
@@ -636,16 +648,14 @@ impl<'a> DescriptorWithContext<'a> {
     pub fn name(&self) -> Result<&str> {
         Ok(&self.body.name)
     }
-    pub fn full_name(&self) -> Result<&ProtoPath> {
+    pub fn full_path(&self) -> Result<&ProtoPath> {
         self.cache
             .full_name
             .get_or_try_init(|| {
                 let mut full_name = if let Some(nested) = self.maybe_containing {
-                    nested.full_name()?.to_owned()
+                    nested.full_path()?.to_owned()
                 } else {
-                    self.file
-                        .package()?
-                        .map_or_else(ProtoPathBuf::new, |p| p.to_owned())
+                    self.file.absolute_package()?.to_owned()
                 };
                 // todo!("absl path check?");
                 full_name.push(ProtoPath::new(&self.body.name));
@@ -840,12 +850,12 @@ impl<'a> EnumDescriptorWithContext<'a> {
     pub fn name(&self) -> Result<&str> {
         Ok(self.body.name.as_ref())
     }
-    pub fn full_name(&self) -> Result<&ProtoPath> {
+    pub fn full_path(&self) -> Result<&ProtoPath> {
         self.cache
             .full_name
             .get_or_try_init(|| {
                 let mut full_name = if let Some(nested) = self.maybe_containing {
-                    nested.full_name()?.to_owned()
+                    nested.full_path()?.to_owned()
                 } else {
                     self.file
                         .package()?
@@ -902,7 +912,7 @@ impl<'a> EnumValueDescriptorWithContext<'a> {
             .get_or_try_init(|| {
                 // This full_name is a sibling of EnumDescriptor, not a child.
                 let mut full_name = if let Some(m) = self.enum_.maybe_containing {
-                    m.full_name()?.to_owned()
+                    m.full_path()?.to_owned()
                 } else {
                     self.enum_
                         .file
@@ -941,7 +951,7 @@ impl<'a> FieldDescriptorWithContext<'a> {
         self.cache
             .full_name
             .get_or_try_init(|| {
-                let mut full_name = self.message.full_name()?.to_owned();
+                let mut full_name = self.message.full_path()?.to_owned();
                 full_name.push(ProtoPath::new(&format!(".{}", self.body.name)));
                 Ok(full_name)
             })
@@ -957,7 +967,7 @@ impl<'a> FieldDescriptorWithContext<'a> {
                         self.message
                             .file
                             .root
-                            .resolve_path(&name, Some(self.message.full_name()?))?
+                            .resolve_path(&name, Some(self.message.full_path()?))?
                             .maybe_message()
                             .ok_or_else(|| {
                                 ErrorKind::DescriptorStructureError("Not a message".to_string())
@@ -967,7 +977,7 @@ impl<'a> FieldDescriptorWithContext<'a> {
                         self.message
                             .file
                             .root
-                            .resolve_path(&name, Some(self.message.full_name()?))?
+                            .resolve_path(&name, Some(self.message.full_path()?))?
                             .maybe_enum()
                             .ok_or_else(|| {
                                 ErrorKind::DescriptorStructureError("Not an enum".to_string())
@@ -997,6 +1007,7 @@ pub struct OneofDescriptorCache {}
 
 // region: utils
 
+#[derive(Debug, Clone)]
 pub enum MessageOrEnum<M, E> {
     Message(M),
     Enum(E),
@@ -1004,8 +1015,8 @@ pub enum MessageOrEnum<M, E> {
 impl<'a> MessageOrEnum<&'a DescriptorWithContext<'a>, &'a EnumDescriptorWithContext<'a>> {
     pub fn full_name(&self) -> Result<&ProtoPath> {
         match self {
-            MessageOrEnum::Message(m) => m.full_name(),
-            MessageOrEnum::Enum(e) => e.full_name(),
+            MessageOrEnum::Message(m) => m.full_path(),
+            MessageOrEnum::Enum(e) => e.full_path(),
         }
     }
 }
