@@ -127,8 +127,7 @@ impl TryFrom<GeneratedFile> for code_generator_response::File<'_> {
             #(#submodule_decls)*
             #(#body)*
         };
-        let syn_file: ::syn::File =
-            syn::parse2(content).map_err(|e| ErrorKind::SynParseError(e))?;
+        let syn_file: ::syn::File = syn::parse2(content)?;
         file.set_content(&unparse(&syn_file))?;
         Ok(file)
     }
