@@ -438,30 +438,36 @@ impl<'a> RootContext<'a> {
     }
     pub fn package_to_files(
         &'a self,
-        package: &ProtoPath,
+        package: impl AsRef<ProtoPath>,
     ) -> Result<impl 'a + IntoIterator<Item = &'a FileDescriptorWithContext<'a>>> {
+        let package = if package.as_ref().is_relative() {
+            // This method is a root method, so the relative path should be converted
+            // to the absolute path by just adding '.' at the beginning.
+            format!(".{}", package.as_ref()).into()
+        } else {
+            package.as_ref().to_owned()
+        };
         debug_assert!(package.is_absolute());
         let map = self.package_to_files.get_or_try_init(|| -> Result<_> {
             let mut map = HashMap::new();
             for fd in self.files() {
                 let package = fd.absolute_package()?.to_owned();
-                map.entry(package.to_owned())
-                    .or_insert_with(Vec::new)
-                    .push(fd);
+                map.entry(package.clone()).or_insert_with(Vec::new).push(fd);
             }
             Ok(map)
         })?;
         Ok(map
-            .get(package)
+            .get(&package)
             .map_or(Default::default(), Vec::as_slice)
             .into_iter()
             .map(|f| *f))
     }
     pub fn resolve_path(
         &'a self,
-        path: &ProtoPath,
+        path: impl AsRef<ProtoPath>,
         cur: Option<&ProtoPath>,
     ) -> Result<MessageOrEnum<&DescriptorWithContext, &EnumDescriptorWithContext>> {
+        let path = path.as_ref();
         if path.is_absolute() {
             return Ok(self
                 .resolve_absolute_path(path)?
@@ -1050,3 +1056,60 @@ impl<T> TryIntoNumber<T> for Option<T> {
 }
 
 // endregion:
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_package_to_files() {
+        fn make_fd(name: &str, package: &str) -> FileDescriptor {
+            FileDescriptor {
+                name: name.to_string(),
+                dependencies: vec![],
+                package: Some(package.into()),
+                message_types: vec![],
+                enum_types: vec![],
+                syntax: None,
+                edition: None,
+            }
+        }
+        let fd1 = make_fd("fd1.proto", "a");
+        let fd2 = make_fd("fd2.proto", "a.b");
+        let fd3 = make_fd("fd3.proto", "a.b");
+        let fd4 = make_fd("fd4.proto", "a.b.c");
+        let root = RootContext::from(vec![fd1, fd2, fd3, fd4]);
+
+        let package_a_files = root
+            .package_to_files("a")
+            .unwrap()
+            .into_iter()
+            .collect::<Vec<_>>();
+        let package_a_b_files = root
+            .package_to_files("a.b")
+            .unwrap()
+            .into_iter()
+            .collect::<Vec<_>>();
+        let package_a_b_c_files = root
+            .package_to_files("a.b.c")
+            .unwrap()
+            .into_iter()
+            .collect::<Vec<_>>();
+
+        assert_eq!(1, package_a_files.len());
+        assert_eq!(2, package_a_b_files.len());
+        assert_eq!(1, package_a_b_c_files.len());
+        assert!(package_a_files
+            .iter()
+            .any(|f| f.name().unwrap() == "fd1.proto"));
+        assert!(package_a_b_files
+            .iter()
+            .any(|f| f.name().unwrap() == "fd2.proto"));
+        assert!(package_a_b_files
+            .iter()
+            .any(|f| f.name().unwrap() == "fd3.proto"));
+        assert!(package_a_b_c_files
+            .iter()
+            .any(|f| f.name().unwrap() == "fd4.proto"));
+    }
+}

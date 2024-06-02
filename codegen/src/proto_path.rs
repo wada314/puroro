@@ -166,6 +166,16 @@ impl AsRef<ProtoPath> for ProtoPath {
         self
     }
 }
+impl AsRef<ProtoPath> for str {
+    fn as_ref(&self) -> &ProtoPath {
+        ProtoPath::new(self)
+    }
+}
+impl AsRef<ProtoPath> for String {
+    fn as_ref(&self) -> &ProtoPath {
+        ProtoPath::new(self)
+    }
+}
 impl From<&ProtoPath> for String {
     fn from(v: &ProtoPath) -> String {
         v.0.to_string()
