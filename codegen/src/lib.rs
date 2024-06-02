@@ -13,7 +13,6 @@
 // limitations under the License.
 
 #![feature(once_cell_try)]
-#![feature(error_generic_member_access)]
 
 pub mod cases;
 pub mod descriptor;
@@ -42,7 +41,7 @@ pub enum ErrorKind {
     #[error("ProtoPath strip prefix error: Tried to split \"{1}\" from \"{0}\"")]
     ProtoPathStripPrefixError(String, String),
     #[error("syn error: {0}")]
-    SynParseError(#[from] ::syn::Error, Backtrace),
+    SynParseError(#[from] ::syn::Error),
     #[error("Proto type (message or enum) path not found: {0}")]
     ProtoPathNotFoundError(String),
 }
