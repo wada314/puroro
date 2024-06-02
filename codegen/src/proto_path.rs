@@ -36,26 +36,13 @@ impl ProtoPath {
         !self.is_absolute()
     }
     pub fn parent(&self) -> Option<&Self> {
-        if self.is_absolute() {
-            if &self.0 == "." {
-                return None;
-            }
-            match self.0.rsplit_once('.') {
-                None => panic!(
-                    "Assuming the absolute proto path contains at least one '.'. But got: {:?}",
-                    &self.0
-                ),
-                Some(("", _)) => Some(ProtoPath::new(".")),
-                Some((parent, _)) => Some(ProtoPath::new(parent)),
-            }
-        } else {
-            if self.0.is_empty() {
-                return None;
-            }
-            self.0
-                .rsplit_once('.')
-                .map(|(parent, _)| ProtoPath::new(parent))
-                .or_else(|| Some(ProtoPath::new("")))
+        match self.0.rsplit_once('.') {
+            None => None,
+            // rsplit(".") returns ("", "").
+            Some(("", "")) => None,
+            // rsplit(".a") returns ("", "a").
+            Some(("", _)) => Some(ProtoPath::new(".")),
+            Some((parent, _)) => Some(ProtoPath::new(parent)),
         }
     }
     pub fn last_component(&self) -> Option<&str> {
@@ -244,5 +231,23 @@ impl PartialEq for ProtoPath {
 impl PartialOrd for ProtoPath {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
         self.0.as_bytes().partial_cmp(&other.0.as_bytes())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_parent() {
+        assert_eq!(ProtoPath::new("a.b.c").parent().unwrap().as_str(), "a.b");
+        assert_eq!(ProtoPath::new("a.b").parent().unwrap().as_str(), "a");
+        assert_eq!(ProtoPath::new("a").parent(), None);
+        assert_eq!(ProtoPath::new("").parent(), None);
+
+        assert_eq!(ProtoPath::new(".a.b.c").parent().unwrap().as_str(), ".a.b");
+        assert_eq!(ProtoPath::new(".a.b").parent().unwrap().as_str(), ".a");
+        assert_eq!(ProtoPath::new(".a").parent().unwrap().as_str(), ".");
+        assert_eq!(ProtoPath::new(".").parent(), None);
     }
 }
