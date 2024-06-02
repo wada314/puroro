@@ -14,6 +14,7 @@
 
 #![feature(once_cell_try)]
 #![feature(error_generic_member_access)]
+#![feature(assert_matches)]
 
 pub mod cases;
 pub mod descriptor;

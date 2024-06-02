@@ -498,7 +498,7 @@ impl<'a> RootContext<'a> {
         debug_assert!(path.is_absolute());
         // Can improve the complexity here. Maybe later.
         for package_path in path.ancestors() {
-            for file in self.package_to_files(dbg!(package_path))? {
+            for file in self.package_to_files(package_path)? {
                 for message_or_enum in file.all_messages_or_enums()? {
                     if message_or_enum.full_path()? == path {
                         return Ok(Some(message_or_enum));
@@ -1060,18 +1060,36 @@ impl<T> TryIntoNumber<T> for Option<T> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use ::std::assert_matches::assert_matches;
+
+    const FD_DEFAULT: FileDescriptor = FileDescriptor {
+        name: String::new(),
+        dependencies: vec![],
+        package: None,
+        message_types: vec![],
+        enum_types: vec![],
+        syntax: None,
+        edition: None,
+    };
+    const MD_DEFAULT: Descriptor = Descriptor {
+        name: String::new(),
+        fields: vec![],
+        oneof_decls: vec![],
+        nested_types: vec![],
+        enum_types: vec![],
+    };
+    const ED_DEFAULT: EnumDescriptor = EnumDescriptor {
+        name: String::new(),
+        values: vec![],
+    };
 
     #[test]
     fn test_package_to_files() {
         fn make_fd(name: &str, package: &str) -> FileDescriptor {
             FileDescriptor {
                 name: name.to_string(),
-                dependencies: vec![],
                 package: Some(package.into()),
-                message_types: vec![],
-                enum_types: vec![],
-                syntax: None,
-                edition: None,
+                ..FD_DEFAULT
             }
         }
         let fd1 = make_fd("fd1.proto", "a");
@@ -1111,5 +1129,72 @@ mod tests {
         assert!(package_a_b_c_files
             .iter()
             .any(|f| f.name().unwrap() == "fd4.proto"));
+    }
+
+    #[test]
+    fn test_resolve_path() {
+        fn make_fd(name: &str, package: &str) -> FileDescriptor {
+            FileDescriptor {
+                name: name.to_string(),
+                package: Some(package.into()),
+                message_types: vec![
+                    Descriptor {
+                        name: "A".to_string(),
+                        nested_types: vec![
+                            Descriptor {
+                                name: "B".to_string(),
+                                nested_types: vec![Descriptor {
+                                    name: "C".to_string(),
+                                    ..MD_DEFAULT
+                                }],
+                                ..MD_DEFAULT
+                            },
+                            Descriptor {
+                                name: "B2".to_string(),
+                                ..MD_DEFAULT
+                            },
+                        ],
+                        enum_types: vec![EnumDescriptor {
+                            name: "F".to_string(),
+                            ..ED_DEFAULT
+                        }],
+                        ..MD_DEFAULT
+                    },
+                    Descriptor {
+                        name: "A2".to_string(),
+                        ..MD_DEFAULT
+                    },
+                ],
+                enum_types: vec![EnumDescriptor {
+                    name: "E".to_string(),
+                    ..ED_DEFAULT
+                }],
+                ..FD_DEFAULT
+            }
+        }
+        let fd1 = make_fd("fd1.proto", "a");
+        let fd2 = make_fd("fd2.proto", "a.b");
+        let fd3 = make_fd("fd3.proto", "a.b");
+        let fd4 = make_fd("fd4.proto", "a.b.c");
+
+        let root = RootContext::from(vec![fd1, fd2, fd3, fd4]);
+
+        macro_rules! assert_is_message {
+            ($path:expr, $cur:expr, $name:expr) => {{
+                let result = root.resolve_path($path, $cur).unwrap();
+                let MessageOrEnum::Message(m) = result else {
+                    panic!("Expected a message: {}", $path);
+                };
+                assert_eq!(m.name().unwrap(), $name);
+            }};
+        }
+        assert_is_message!("a.A", None, "A");
+        assert_is_message!("a.A.B", None, "B");
+        assert_is_message!("a.A.B2", None, "B2");
+        assert_is_message!("a.A.B.C", None, "C");
+        assert_is_message!("a.A", Some("."), "A");
+        assert_is_message!("a.A.B", Some("."), "B");
+        assert_is_message!("a.A.B2", Some("."), "B2");
+        assert_is_message!("a.A.B.C", Some("."), "C");
     }
 }
