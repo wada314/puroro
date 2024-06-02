@@ -112,7 +112,7 @@ impl ProtoPath {
                 Ok(format!("{first_component}::{modules}::{item}"))
             }
         } else {
-            Err(ErrorKind::CompileError)?
+            Err(ErrorKind::CompileError())?
         }
     }
 

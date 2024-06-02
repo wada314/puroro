@@ -27,7 +27,7 @@ use ::thiserror::Error;
 #[derive(Error, Debug)]
 pub enum ErrorKind {
     #[error("Unknown compile error")]
-    CompileError,
+    CompileError(#[cfg(test)] Backtrace),
     #[error("puroro error")]
     PuroroError(#[from] ::puroro::ErrorKind),
     #[error("Unknown Edition.")]
