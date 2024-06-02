@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #![feature(once_cell_try)]
+#![feature(error_generic_member_access)]
 
 pub mod cases;
 pub mod descriptor;
@@ -22,28 +23,24 @@ pub mod proto_path;
 pub use crate::generator::compile;
 use ::puroro::google::protobuf::compiler::CodeGeneratorRequest;
 use ::puroro::message::MessageLite;
+use ::std::backtrace::Backtrace;
 use ::thiserror::Error;
 
 #[derive(Error, Debug)]
 pub enum ErrorKind {
-    #[error("Unknown compile error")]
-    CompileError(),
-    #[error("puroro error")]
-    PuroroError(#[from] ::puroro::ErrorKind),
-    #[error("Unknown Edition.")]
-    UnknownEdition,
-    #[error("Error while validating the input descriptor protos. {0}")]
-    DescriptorProtoValidationError(String),
-    #[error("std::num::TryFromIntError")]
-    StdTryFromIntError(#[from] ::std::num::TryFromIntError),
-    #[error("Error while constructing a descriptor tree structure. {0}")]
-    DescriptorStructureError(String),
-    #[error("ProtoPath strip prefix error: Tried to split \"{1}\" from \"{0}\"")]
-    ProtoPathStripPrefixError(String, String),
-    #[error("syn error: {0}")]
-    SynParseError(#[from] ::syn::Error),
-    #[error("Proto type (message or enum) path not found: {0}")]
-    ProtoPathNotFoundError(String),
+    #[error("Compile error: {0}")]
+    CompileError(String, Backtrace),
+    #[error("::puroro error: {0}")]
+    PuroroError(#[from] ::puroro::ErrorKind, Backtrace),
+    #[error("::std::num::TryFromIntError: {0}")]
+    StdTryFromIntError(#[from] ::std::num::TryFromIntError, Backtrace),
+    #[error("::syn error: {0}")]
+    SynParseError(#[from] ::syn::Error, Backtrace),
+}
+impl From<String> for ErrorKind {
+    fn from(s: String) -> Self {
+        ErrorKind::CompileError(s, Backtrace::capture())
+    }
 }
 pub type Result<T> = ::std::result::Result<T, ErrorKind>;
 

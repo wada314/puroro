@@ -27,7 +27,9 @@ impl<'a> FileDescriptorSet<'a> {
     }
 }
 
+#[derive(Default, Debug)]
 pub enum Edition {
+    #[default]
     EditionUnknown = 0,
     EditionProto2 = 998,
     EditionProto3 = 999,
@@ -159,11 +161,13 @@ impl<'a> FieldDescriptorProto<'a> {
 
 pub mod field_descriptor_proto {
     use super::*;
+    #[derive(Default, Debug)]
     pub enum Type {
         TypeDouble = 1,
         TypeFloat = 2,
         TypeInt64 = 3,
         TypeUInt64 = 4,
+        #[default]
         TypeInt32 = 5,
         TypeFixed64 = 6,
         TypeFixed32 = 7,
@@ -180,7 +184,9 @@ pub mod field_descriptor_proto {
         TypeSInt64 = 18,
     }
 
+    #[derive(Default, Debug)]
     pub enum Label {
+        #[default]
         LabelOptional = 1,
         LabelRepeated = 2,
         LabelRequired = 3,

@@ -41,13 +41,13 @@ pub enum Edition {
 
 impl TryFrom<EditionProto> for Edition {
     type Error = ErrorKind;
-    fn try_from(proto: EditionProto) -> Result<Self> {
-        match proto {
+    fn try_from(edition: EditionProto) -> Result<Self> {
+        match edition {
             EditionProto::EditionProto2 => Ok(Edition::Proto2),
             EditionProto::EditionProto3 => Ok(Edition::Proto3),
             EditionProto::Edition2023 => Ok(Edition::Edition2023),
             EditionProto::Edition2024 => Ok(Edition::Edition2024),
-            _ => Err(ErrorKind::UnknownEdition),
+            _ => Err(format!("Unknown edition: {:?}", edition).into()),
         }
     }
 }
@@ -144,7 +144,7 @@ impl FieldTypeCase {
             FieldTypeCase::ENUM => {
                 let type_name: ProtoPathBuf = type_name
                     .ok_or_else(|| {
-                        ErrorKind::DescriptorProtoValidationError("No enum type name".to_string())
+                        format!("No enum type name \"{}\"", type_name.unwrap_or_default())
                     })?
                     .into();
                 Ok(FieldType::ENUM(enum_case(&type_name)?))
@@ -158,9 +158,7 @@ impl FieldTypeCase {
             FieldTypeCase::MESSAGE => {
                 let type_name: ProtoPathBuf = type_name
                     .ok_or_else(|| {
-                        ErrorKind::DescriptorProtoValidationError(
-                            "No message type name".to_string(),
-                        )
+                        format!("No message type name \"{}\"", type_name.unwrap_or_default())
                     })?
                     .into();
                 Ok(FieldType::MESSAGE(msg_case(&type_name)?))
@@ -312,9 +310,7 @@ impl<'a> TryFrom<FieldDescriptorProto<'a>> for FieldDescriptor {
                 .try_into_number("No FieldDescriptor number")?,
             r#type: proto
                 .type_()?
-                .ok_or_else(|| {
-                    ErrorKind::DescriptorProtoValidationError("No FieldDescriptor type".to_string())
-                })?
+                .ok_or_else(|| format!("No FieldDescriptor type"))?
                 .into(),
             type_name: proto.type_name()?.map(str::to_string),
             label: proto.label()?.map(FieldLabelProto::into),
@@ -434,10 +430,11 @@ impl<'a> RootContext<'a> {
         })
     }
     pub fn file_from_name(&'a self, name: &str) -> Result<&'a FileDescriptorWithContext<'a>> {
-        self.files()
+        Ok(self
+            .files()
             .into_iter()
             .find(|f| f.name().is_ok_and(|n| n == name))
-            .ok_or_else(|| ErrorKind::DescriptorStructureError("No such file".to_string()))
+            .ok_or_else(|| format!("No such file: {}", name))?)
     }
     pub fn package_to_files(
         &'a self,
@@ -466,12 +463,12 @@ impl<'a> RootContext<'a> {
         cur: Option<&ProtoPath>,
     ) -> Result<MessageOrEnum<&DescriptorWithContext, &EnumDescriptorWithContext>> {
         if path.is_absolute() {
-            return self
+            return Ok(self
                 .resolve_absolute_path(path)?
-                .ok_or_else(|| ErrorKind::ProtoPathNotFoundError(path.to_string()));
+                .ok_or_else(|| format!("Path not found: {}", path))?);
         } else if let Some(cur) = cur {
             if !cur.is_absolute() {
-                return Err(ErrorKind::ProtoPathNotFoundError(path.to_string()));
+                Err(format!("Path not found: {}", path))?;
             }
             let cur = cur.to_owned();
             for cur2 in cur.ancestors() {
@@ -485,7 +482,7 @@ impl<'a> RootContext<'a> {
                 }
             }
         }
-        Err(ErrorKind::ProtoPathNotFoundError(path.to_string()))
+        Err(format!("Path not found: {}", path))?
     }
 
     fn resolve_absolute_path(
@@ -964,24 +961,22 @@ impl<'a> FieldDescriptorWithContext<'a> {
                 self.body.r#type.with_type_ref(
                     self.body.type_name.as_deref(),
                     |name| {
-                        self.message
+                        Ok(self
+                            .message
                             .file
                             .root
                             .resolve_path(&name, Some(self.message.full_path()?))?
                             .maybe_message()
-                            .ok_or_else(|| {
-                                ErrorKind::DescriptorStructureError("Not a message".to_string())
-                            })
+                            .ok_or_else(|| format!("Not a message: {}", name))?)
                     },
                     |name| {
-                        self.message
+                        Ok(self
+                            .message
                             .file
                             .root
                             .resolve_path(&name, Some(self.message.full_path()?))?
                             .maybe_enum()
-                            .ok_or_else(|| {
-                                ErrorKind::DescriptorStructureError("Not an enum".to_string())
-                            })
+                            .ok_or_else(|| format!("Not an enum: {}", name))?)
                     },
                 )
             })
@@ -1040,8 +1035,9 @@ trait TryIntoString {
 }
 impl TryIntoString for Option<&str> {
     fn try_into_string(self, error_message: &str) -> Result<String> {
-        self.ok_or_else(|| ErrorKind::DescriptorProtoValidationError(error_message.to_string()))
-            .map(str::to_string)
+        Ok(self
+            .ok_or_else(|| error_message.to_string())
+            .map(str::to_string)?)
     }
 }
 trait TryIntoNumber<T> {
@@ -1049,7 +1045,7 @@ trait TryIntoNumber<T> {
 }
 impl<T> TryIntoNumber<T> for Option<T> {
     fn try_into_number(self, error_message: &str) -> Result<T> {
-        self.ok_or_else(|| ErrorKind::DescriptorProtoValidationError(error_message.to_string()))
+        Ok(self.ok_or_else(|| error_message.to_string())?)
     }
 }
 

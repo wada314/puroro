@@ -13,9 +13,10 @@
 // limitations under the License.
 
 use crate::cases::{convert_into_case, Case};
-use crate::{ErrorKind, Result};
+use crate::Result;
 use ::itertools::Itertools;
 use ::std::borrow::Borrow;
+use ::std::fmt::Display;
 use ::std::ops::Deref;
 
 #[derive(Debug, Eq, Ord, Hash)]
@@ -81,7 +82,8 @@ impl ProtoPath {
             if self.0.starts_with(&prefix.0) {
                 Ok(ProtoPath::new(&self.0[prefix.0.len()..]))
             } else {
-                Err(ErrorKind::ProtoPathStripPrefixError(
+                Err(format!(
+                    "Failed to strip prefix: {} from {}.",
                     self.0.to_string(),
                     prefix.0.to_string(),
                 ))?
@@ -90,7 +92,8 @@ impl ProtoPath {
             if self.0.starts_with(&prefix.0) && self.0[prefix.0.len()..].starts_with('.') {
                 Ok(ProtoPath::new(&self.0[prefix.0.len() + 1..]))
             } else {
-                Err(ErrorKind::ProtoPathStripPrefixError(
+                Err(format!(
+                    "Failed to strip prefix: {} from {}.",
                     self.0.to_string(),
                     prefix.0.to_string(),
                 ))?
@@ -126,7 +129,10 @@ impl ProtoPath {
                 Ok(format!("{first_component}::{modules}::{item}"))
             }
         } else {
-            Err(ErrorKind::CompileError())?
+            Err(format!(
+                "The proto path {} cannot be converted to a rust path.",
+                self.as_str()
+            ))?
         }
     }
 
@@ -163,6 +169,11 @@ impl AsRef<ProtoPath> for ProtoPath {
 impl From<&ProtoPath> for String {
     fn from(v: &ProtoPath) -> String {
         v.0.to_string()
+    }
+}
+impl Display for ProtoPath {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        write!(f, "{}", &self.0)
     }
 }
 
