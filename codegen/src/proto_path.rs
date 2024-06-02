@@ -37,7 +37,9 @@ impl ProtoPath {
     }
     pub fn parent(&self) -> Option<&Self> {
         match self.0.rsplit_once('.') {
-            None => None,
+            None if self.0.is_empty() => None,
+            // parent of "a" is "".
+            None => Some(ProtoPath::new("")),
             // rsplit(".") returns ("", "").
             Some(("", "")) => None,
             // rsplit(".a") returns ("", "a").
@@ -246,7 +248,7 @@ mod tests {
     fn test_parent() {
         assert_eq!(ProtoPath::new("a.b.c").parent().unwrap().as_str(), "a.b");
         assert_eq!(ProtoPath::new("a.b").parent().unwrap().as_str(), "a");
-        assert_eq!(ProtoPath::new("a").parent(), None);
+        assert_eq!(ProtoPath::new("a").parent().unwrap().as_str(), "");
         assert_eq!(ProtoPath::new("").parent(), None);
 
         assert_eq!(ProtoPath::new(".a.b.c").parent().unwrap().as_str(), ".a.b");
@@ -291,5 +293,66 @@ mod tests {
         );
         assert_eq!(ProtoPath::new(".a").components().collect_vec(), vec!["a",]);
         assert_eq!(ProtoPath::new(".").components().next(), None);
+    }
+
+    #[test]
+    fn test_ancestors() {
+        assert_eq!(
+            ProtoPath::new("a.b.c")
+                .ancestors()
+                .map(|p| p.as_str())
+                .collect_vec(),
+            vec!["a.b.c", "a.b", "a", ""]
+        );
+        assert_eq!(
+            ProtoPath::new("a.b")
+                .ancestors()
+                .map(|p| p.as_str())
+                .collect_vec(),
+            vec!["a.b", "a", ""]
+        );
+        assert_eq!(
+            ProtoPath::new("a")
+                .ancestors()
+                .map(|p| p.as_str())
+                .collect_vec(),
+            vec!["a", ""]
+        );
+        assert_eq!(
+            ProtoPath::new("")
+                .ancestors()
+                .map(|p| p.as_str())
+                .collect_vec(),
+            vec![""]
+        );
+
+        assert_eq!(
+            ProtoPath::new(".a.b.c")
+                .ancestors()
+                .map(|p| p.as_str())
+                .collect_vec(),
+            vec![".a.b.c", ".a.b", ".a", "."]
+        );
+        assert_eq!(
+            ProtoPath::new(".a.b")
+                .ancestors()
+                .map(|p| p.as_str())
+                .collect_vec(),
+            vec![".a.b", ".a", "."]
+        );
+        assert_eq!(
+            ProtoPath::new(".a")
+                .ancestors()
+                .map(|p| p.as_str())
+                .collect_vec(),
+            vec![".a", "."]
+        );
+        assert_eq!(
+            ProtoPath::new(".")
+                .ancestors()
+                .map(|p| p.as_str())
+                .collect_vec(),
+            vec!["."]
+        );
     }
 }
