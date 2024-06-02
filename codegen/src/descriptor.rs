@@ -495,7 +495,7 @@ impl<'a> RootContext<'a> {
         debug_assert!(path.is_absolute());
         // Can improve the complexity here. Maybe later.
         for package_path in path.ancestors() {
-            for file in self.package_to_files(package_path)? {
+            for file in self.package_to_files(dbg!(package_path))? {
                 for message_or_enum in file.all_messages_or_enums()? {
                     if message_or_enum.full_name()? == path {
                         return Ok(Some(message_or_enum));

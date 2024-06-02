@@ -39,10 +39,14 @@ impl ProtoPath {
             if &self.0 == "." {
                 return None;
             }
-            self.0
-                .rsplit_once('.')
-                .map(|(parent, _)| ProtoPath::new(parent))
-                .or_else(|| Some(ProtoPath::new(".")))
+            match self.0.rsplit_once('.') {
+                None => panic!(
+                    "Assuming the absolute proto path contains at least one '.'. But got: {:?}",
+                    &self.0
+                ),
+                Some(("", _)) => Some(ProtoPath::new(".")),
+                Some((parent, _)) => Some(ProtoPath::new(parent)),
+            }
         } else {
             if self.0.is_empty() {
                 return None;
