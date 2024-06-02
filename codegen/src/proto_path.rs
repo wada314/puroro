@@ -35,13 +35,23 @@ impl ProtoPath {
         !self.is_absolute()
     }
     pub fn parent(&self) -> Option<&Self> {
-        if self.0.is_empty() {
-            return None;
+        if self.is_absolute() {
+            if &self.0 == "." {
+                return None;
+            }
+            self.0
+                .rsplit_once('.')
+                .map(|(parent, _)| ProtoPath::new(parent))
+                .or_else(|| Some(ProtoPath::new(".")))
+        } else {
+            if self.0.is_empty() {
+                return None;
+            }
+            self.0
+                .rsplit_once('.')
+                .map(|(parent, _)| ProtoPath::new(parent))
+                .or_else(|| Some(ProtoPath::new("")))
         }
-        self.0
-            .rsplit_once('.')
-            .map(|(parent, _)| ProtoPath::new(parent))
-            .or_else(|| self.is_relative().then_some(ProtoPath::new("")))
     }
     pub fn last_component(&self) -> Option<&str> {
         self.0.rsplit_once('.').map(|(_, last)| last)
