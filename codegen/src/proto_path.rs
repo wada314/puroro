@@ -227,6 +227,11 @@ impl From<&str> for ProtoPathBuf {
         ProtoPathBuf(v.to_string())
     }
 }
+impl Display for ProtoPathBuf {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        write!(f, "{}", &self.0)
+    }
+}
 
 impl PartialEq for ProtoPath {
     fn eq(&self, other: &Self) -> bool {

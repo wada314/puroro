@@ -465,30 +465,38 @@ impl<'a> RootContext<'a> {
     pub fn resolve_path(
         &'a self,
         path: impl AsRef<ProtoPath>,
-        cur: Option<&ProtoPath>,
     ) -> Result<MessageOrEnum<&DescriptorWithContext, &EnumDescriptorWithContext>> {
         let path = path.as_ref();
+        return Ok(self
+            .resolve_absolute_path(path)?
+            .ok_or_else(|| format!("Path not found: {}", path))?);
+        Err(format!("Path not found: {}", path))?
+    }
+    pub fn resolve_relative_path(
+        &'a self,
+        path: impl AsRef<ProtoPath>,
+        cur: impl AsRef<ProtoPath>,
+    ) -> Result<MessageOrEnum<&DescriptorWithContext, &EnumDescriptorWithContext>> {
+        let path = path.as_ref();
+        let cur = cur.as_ref();
         if path.is_absolute() {
-            return Ok(self
-                .resolve_absolute_path(path)?
-                .ok_or_else(|| format!("Path not found: {}", path))?);
-        } else if let Some(cur) = cur {
-            if !cur.is_absolute() {
-                Err(format!("Path not found: {}", path))?;
-            }
-            let cur = cur.to_owned();
-            for cur2 in cur.ancestors() {
-                let full_path = {
-                    let mut full_path = cur2.to_owned();
-                    full_path.push(path);
-                    full_path
-                };
-                if let Some(result) = self.resolve_absolute_path(&full_path)? {
-                    return Ok(result);
-                }
+            return self.resolve_path(path);
+        }
+        if !cur.is_absolute() {
+            Err(format!("Path not found: \"{cur}\" / \"{path}\""))?;
+        }
+        let cur = cur.to_owned();
+        for cur2 in cur.ancestors() {
+            let full_path = {
+                let mut full_path = cur2.to_owned();
+                full_path.push(path);
+                full_path
+            };
+            if let Some(result) = self.resolve_absolute_path(&full_path)? {
+                return Ok(result);
             }
         }
-        Err(format!("Path not found: {}", path))?
+        Err(format!("Path not found: \"{cur}\" / \"{path}\""))?
     }
 
     fn resolve_absolute_path(
@@ -971,7 +979,7 @@ impl<'a> FieldDescriptorWithContext<'a> {
                             .message
                             .file
                             .root
-                            .resolve_path(&name, Some(self.message.full_path()?))?
+                            .resolve_relative_path(&name, self.message.full_path()?)?
                             .maybe_message()
                             .ok_or_else(|| format!("Not a message: {}", name))?)
                     },
@@ -980,7 +988,7 @@ impl<'a> FieldDescriptorWithContext<'a> {
                             .message
                             .file
                             .root
-                            .resolve_path(&name, Some(self.message.full_path()?))?
+                            .resolve_relative_path(&name, self.message.full_path()?)?
                             .maybe_enum()
                             .ok_or_else(|| format!("Not an enum: {}", name))?)
                     },
@@ -1180,21 +1188,17 @@ mod tests {
         let root = RootContext::from(vec![fd1, fd2, fd3, fd4]);
 
         macro_rules! assert_is_message {
-            ($path:expr, $cur:expr, $name:expr) => {{
-                let result = root.resolve_path($path, $cur).unwrap();
+            ($path:expr, $name:expr) => {{
+                let result = root.resolve_path($path).unwrap();
                 let MessageOrEnum::Message(m) = result else {
                     panic!("Expected a message: {}", $path);
                 };
                 assert_eq!(m.name().unwrap(), $name);
             }};
         }
-        assert_is_message!("a.A", None, "A");
-        assert_is_message!("a.A.B", None, "B");
-        assert_is_message!("a.A.B2", None, "B2");
-        assert_is_message!("a.A.B.C", None, "C");
-        assert_is_message!("a.A", Some("."), "A");
-        assert_is_message!("a.A.B", Some("."), "B");
-        assert_is_message!("a.A.B2", Some("."), "B2");
-        assert_is_message!("a.A.B.C", Some("."), "C");
+        assert_is_message!("a.A", "A");
+        assert_is_message!("a.A.B", "B");
+        assert_is_message!("a.A.B2", "B2");
+        assert_is_message!("a.A.B.C", "C");
     }
 }
