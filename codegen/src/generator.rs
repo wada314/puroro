@@ -44,13 +44,24 @@ pub fn compile(request: &CodeGeneratorRequest) -> Result<CodeGeneratorResponse<'
             "mod.rs".to_string()
         };
         let file = out_files.file_mut(file_path);
+    }
 
-        for message in fd.messages()? {
-            let open_struct = MessageOpenStruct::try_new(message)?;
-            file.append(quote! { #open_struct });
-        }
+    let messages_iters = root_context
+        .files()
+        .into_iter()
+        .map(|fd| fd.all_messages())
+        .collect::<Result<Vec<_>>>()?;
+    for message in messages_iters.into_iter().flatten() {
+        let file_path = if let Some(package) = message.full_name()?.parent() {
+            package.to_rust_file_path()
+        } else {
+            "mod.rs".to_string()
+        };
+        let file = out_files.file_mut(file_path);
+        file.add_source(message.file()?.name()?);
 
-        file.add_source(fd.name()?);
+        let open_struct = MessageOpenStruct::try_new(message)?;
+        file.append(quote! { #open_struct });
     }
 
     for file in out_files {

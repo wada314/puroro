@@ -583,18 +583,23 @@ impl<'a> FileDescriptorWithContext<'a> {
     ) -> Result<
         impl 'a + IntoIterator<Item = MessageOrEnum<&DescriptorWithContext, &EnumDescriptorWithContext>>,
     > {
-        let direct_messages = self.messages()?.into_iter().map(MessageOrEnum::Message);
-        let direct_enums = self.enums()?.into_iter().map(MessageOrEnum::Enum);
+        Ok(self
+            .all_messages()?
+            .into_iter()
+            .map(MessageOrEnum::Message)
+            .chain(self.enums()?.into_iter().map(MessageOrEnum::Enum)))
+    }
+    pub fn all_messages(&'a self) -> Result<impl 'a + IntoIterator<Item = &DescriptorWithContext>> {
+        let direct_messages = self.messages()?.into_iter();
         let indirect_messages_vec = self
             .messages()?
             .into_iter()
-            .map(|child| child.all_messages_or_enums())
+            .map(|child| child.all_messages())
             .collect::<Result<Vec<_>>>()?;
         let indirect_messages = indirect_messages_vec
             .into_iter()
             .flat_map(|v| v.into_iter());
-        let boxed: Box<dyn Iterator<Item = _>> =
-            Box::new(direct_messages.chain(direct_enums).chain(indirect_messages));
+        let boxed: Box<dyn Iterator<Item = _>> = Box::new(direct_messages.chain(indirect_messages));
         Ok(boxed)
     }
 }
@@ -792,18 +797,23 @@ impl<'a> DescriptorWithContext<'a> {
     ) -> Result<
         impl 'a + IntoIterator<Item = MessageOrEnum<&DescriptorWithContext, &EnumDescriptorWithContext>>,
     > {
-        let direct_messages = self.nested_types()?.into_iter().map(MessageOrEnum::Message);
-        let direct_enums = self.enum_types()?.into_iter().map(MessageOrEnum::Enum);
+        Ok(self
+            .all_messages()?
+            .into_iter()
+            .map(MessageOrEnum::Message)
+            .chain(self.enum_types()?.into_iter().map(MessageOrEnum::Enum)))
+    }
+    pub fn all_messages(&'a self) -> Result<impl 'a + IntoIterator<Item = &DescriptorWithContext>> {
+        let direct_messages = self.nested_types()?.into_iter();
         let indirect_messages_vec = self
             .nested_types()?
             .into_iter()
-            .map(|child| child.all_messages_or_enums())
+            .map(|child| child.all_messages())
             .collect::<Result<Vec<_>>>()?;
         let indirect_messages = indirect_messages_vec
             .into_iter()
             .flat_map(|v| v.into_iter());
-        let boxed: Box<dyn Iterator<Item = _>> =
-            Box::new(direct_messages.chain(direct_enums).chain(indirect_messages));
+        let boxed: Box<dyn Iterator<Item = _>> = Box::new(direct_messages.chain(indirect_messages));
         Ok(boxed)
     }
 }
