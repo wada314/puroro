@@ -37,21 +37,13 @@ pub fn compile(request: &CodeGeneratorRequest) -> Result<CodeGeneratorResponse<'
     let root_context: RootContext = descriptors.into();
     let mut out_files = GeneratedFileSet::new();
 
-    for fd in root_context.files() {
-        let file_path = if let Some(package) = fd.package()? {
-            package.to_rust_file_path()
-        } else {
-            "mod.rs".to_string()
-        };
-        let file = out_files.file_mut(file_path);
-    }
-
     let messages_iters = root_context
         .files()
         .into_iter()
         .map(|fd| fd.all_messages())
         .collect::<Result<Vec<_>>>()?;
-    for message in messages_iters.into_iter().flatten() {
+    let messages = messages_iters.into_iter().flatten().collect::<Vec<_>>();
+    for message in &messages {
         let file_path = if let Some(package) = message.full_name()?.parent() {
             package.to_rust_file_path()
         } else {
