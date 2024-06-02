@@ -28,13 +28,13 @@ use ::thiserror::Error;
 
 #[derive(Error, Debug)]
 pub enum ErrorKind {
-    #[error("Compile error: {0}")]
+    #[error("Compile error: {0}\n{1}")]
     CompileError(String, Backtrace),
-    #[error("::puroro error: {0}")]
+    #[error("::puroro error: {0}\n{1}")]
     PuroroError(#[from] ::puroro::ErrorKind, Backtrace),
-    #[error("::std::num::TryFromIntError: {0}")]
+    #[error("::std::num::TryFromIntError: {0}\n{1}")]
     StdTryFromIntError(#[from] ::std::num::TryFromIntError, Backtrace),
-    #[error("::syn error: {0}")]
+    #[error("::syn error: {0}\n{1}")]
     SynParseError(#[from] ::syn::Error, Backtrace),
 }
 impl From<String> for ErrorKind {
