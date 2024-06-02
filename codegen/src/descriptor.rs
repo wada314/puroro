@@ -497,7 +497,7 @@ impl<'a> RootContext<'a> {
         for package_path in path.ancestors() {
             for file in self.package_to_files(dbg!(package_path))? {
                 for message_or_enum in file.all_messages_or_enums()? {
-                    if message_or_enum.full_name()? == path {
+                    if message_or_enum.full_path()? == path {
                         return Ok(Some(message_or_enum));
                     }
                 }
@@ -1013,7 +1013,7 @@ pub enum MessageOrEnum<M, E> {
     Enum(E),
 }
 impl<'a> MessageOrEnum<&'a DescriptorWithContext<'a>, &'a EnumDescriptorWithContext<'a>> {
-    pub fn full_name(&self) -> Result<&ProtoPath> {
+    pub fn full_path(&self) -> Result<&ProtoPath> {
         match self {
             MessageOrEnum::Message(m) => m.full_path(),
             MessageOrEnum::Enum(e) => e.full_path(),

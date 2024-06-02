@@ -18,7 +18,7 @@ use ::itertools::Itertools;
 use ::std::borrow::Borrow;
 use ::std::ops::Deref;
 
-#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Eq, Ord, Hash)]
 pub struct ProtoPath(str);
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Clone, Default)]
 pub struct ProtoPathBuf(String);
@@ -212,5 +212,16 @@ impl From<String> for ProtoPathBuf {
 impl From<&str> for ProtoPathBuf {
     fn from(v: &str) -> ProtoPathBuf {
         ProtoPathBuf(v.to_string())
+    }
+}
+
+impl PartialEq for ProtoPath {
+    fn eq(&self, other: &Self) -> bool {
+        self.0.as_bytes() == other.0.as_bytes()
+    }
+}
+impl PartialOrd for ProtoPath {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        self.0.as_bytes().partial_cmp(&other.0.as_bytes())
     }
 }
