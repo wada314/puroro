@@ -47,13 +47,8 @@ impl ProtoPath {
     }
     pub fn last_component(&self) -> Option<&str> {
         match self.0.rsplit_once('.') {
-            None => {
-                if self.0.is_empty() {
-                    None
-                } else {
-                    Some(&self.0)
-                }
-            }
+            None if self.0.is_empty() => None,
+            None => Some(&self.0),
             // rsplit(".") returns ("", "").
             Some(("", "")) => None,
             Some((_, last)) => Some(last),
@@ -61,7 +56,10 @@ impl ProtoPath {
     }
     pub fn components(&self) -> impl Iterator<Item = &str> {
         let relative = self.0.strip_prefix('.').unwrap_or(&self.0);
-        relative.split('.')
+        (!relative.is_empty())
+            .then(|| relative.split('.'))
+            .into_iter()
+            .flatten()
     }
     pub fn ancestors(&self) -> impl Iterator<Item = &Self> {
         ::std::iter::successors(Some(self), |path| path.parent())
@@ -242,6 +240,7 @@ impl PartialOrd for ProtoPath {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use ::itertools::Itertools;
 
     #[test]
     fn test_parent() {
@@ -267,5 +266,30 @@ mod tests {
         assert_eq!(ProtoPath::new(".a.b").last_component().unwrap(), "b");
         assert_eq!(ProtoPath::new(".a").last_component().unwrap(), "a");
         assert_eq!(ProtoPath::new(".").last_component(), None);
+    }
+
+    #[test]
+    fn test_compenents() {
+        assert_eq!(
+            ProtoPath::new("a.b.c").components().collect_vec(),
+            vec!["a", "b", "c",]
+        );
+        assert_eq!(
+            ProtoPath::new("a.b").components().collect_vec(),
+            vec!["a", "b",]
+        );
+        assert_eq!(ProtoPath::new("a").components().collect_vec(), vec!["a",]);
+        assert_eq!(ProtoPath::new("").components().next(), None);
+
+        assert_eq!(
+            ProtoPath::new(".a.b.c").components().collect_vec(),
+            vec!["a", "b", "c",]
+        );
+        assert_eq!(
+            ProtoPath::new(".a.b").components().collect_vec(),
+            vec!["a", "b",]
+        );
+        assert_eq!(ProtoPath::new(".a").components().collect_vec(), vec!["a",]);
+        assert_eq!(ProtoPath::new(".").components().next(), None);
     }
 }
