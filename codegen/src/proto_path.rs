@@ -46,20 +46,22 @@ impl ProtoPath {
         }
     }
     pub fn last_component(&self) -> Option<&str> {
-        self.0.rsplit_once('.').map(|(_, last)| last)
-    }
-    pub fn except_last_component(&self) -> impl Iterator<Item = &str> {
-        self.0
-            .rsplit_once('.')
-            .map(|(p, _)| {
-                if p.as_bytes().len() > 0 && p.as_bytes()[0] == b'.' {
-                    p[1..].split('.')
+        match self.0.rsplit_once('.') {
+            None => {
+                if self.0.is_empty() {
+                    None
                 } else {
-                    p.split('.')
+                    Some(&self.0)
                 }
-            })
-            .into_iter()
-            .flatten()
+            }
+            // rsplit(".") returns ("", "").
+            Some(("", "")) => None,
+            Some((_, last)) => Some(last),
+        }
+    }
+    pub fn components(&self) -> impl Iterator<Item = &str> {
+        let relative = self.0.strip_prefix('.').unwrap_or(&self.0);
+        relative.split('.')
     }
     pub fn ancestors(&self) -> impl Iterator<Item = &Self> {
         ::std::iter::successors(Some(self), |path| path.parent())
@@ -105,8 +107,11 @@ impl ProtoPath {
 
     pub fn to_rust_path(&self) -> Result<String> {
         let first_component = if self.is_absolute() { "crate" } else { "self" };
-        if let (modules, Some(item)) = (self.except_last_component(), self.last_component()) {
-            let modules = modules
+        if let (components_iter, Some(item)) = (
+            self.parent().into_iter().flat_map(|p| p.components()),
+            self.last_component(),
+        ) {
+            let modules = components_iter
                 .map(|s| convert_into_case(s, Case::LowerSnakeCase))
                 .join("::");
             let item = convert_into_case(item, Case::CamelCase);
@@ -249,5 +254,18 @@ mod tests {
         assert_eq!(ProtoPath::new(".a.b").parent().unwrap().as_str(), ".a");
         assert_eq!(ProtoPath::new(".a").parent().unwrap().as_str(), ".");
         assert_eq!(ProtoPath::new(".").parent(), None);
+    }
+
+    #[test]
+    fn test_last_component() {
+        assert_eq!(ProtoPath::new("a.b.c").last_component().unwrap(), "c");
+        assert_eq!(ProtoPath::new("a.b").last_component().unwrap(), "b");
+        assert_eq!(ProtoPath::new("a").last_component().unwrap(), "a");
+        assert_eq!(ProtoPath::new("").last_component(), None);
+
+        assert_eq!(ProtoPath::new(".a.b.c").last_component().unwrap(), "c");
+        assert_eq!(ProtoPath::new(".a.b").last_component().unwrap(), "b");
+        assert_eq!(ProtoPath::new(".a").last_component().unwrap(), "a");
+        assert_eq!(ProtoPath::new(".").last_component(), None);
     }
 }
