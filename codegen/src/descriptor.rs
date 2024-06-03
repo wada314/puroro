@@ -467,8 +467,13 @@ impl<'a> RootContext<'a> {
         path: impl AsRef<ProtoPath>,
     ) -> Result<MessageOrEnum<&DescriptorWithContext, &EnumDescriptorWithContext>> {
         let path = path.as_ref();
+        let path = if path.is_relative() {
+            ProtoPathBuf::from(format!(".{}", path))
+        } else {
+            path.to_owned()
+        };
         return Ok(self
-            .resolve_absolute_path(path)?
+            .resolve_absolute_path(&path)?
             .ok_or_else(|| format!("Path not found: {}", path))?);
         Err(format!("Path not found: {}", path))?
     }
@@ -1100,12 +1105,14 @@ mod tests {
                 ..FD_DEFAULT
             }
         }
+        let fd0 = make_fd("fd0.proto", "");
         let fd1 = make_fd("fd1.proto", "a");
         let fd2 = make_fd("fd2.proto", "a.b");
         let fd3 = make_fd("fd3.proto", "a.b");
         let fd4 = make_fd("fd4.proto", "a.b.c");
-        let root = RootContext::from(vec![fd1, fd2, fd3, fd4]);
+        let root = RootContext::from(vec![fd0, fd1, fd2, fd3, fd4]);
 
+        let root_package_files = root.package_to_files("").unwrap().into_iter().collect_vec();
         let package_a_files = root
             .package_to_files("a")
             .unwrap()
@@ -1122,6 +1129,7 @@ mod tests {
             .into_iter()
             .collect::<Vec<_>>();
 
+        assert_eq!(0, root_package_files.len());
         assert_eq!(1, package_a_files.len());
         assert_eq!(2, package_a_b_files.len());
         assert_eq!(1, package_a_b_c_files.len());
@@ -1180,25 +1188,60 @@ mod tests {
                 ..FD_DEFAULT
             }
         }
+        let fd0 = make_fd("fd0.proto", "");
         let fd1 = make_fd("fd1.proto", "a");
         let fd2 = make_fd("fd2.proto", "a.b");
-        let fd3 = make_fd("fd3.proto", "a.b");
+        let fd3 = make_fd("fd3.proto", "a.b2");
         let fd4 = make_fd("fd4.proto", "a.b.c");
 
-        let root = RootContext::from(vec![fd1, fd2, fd3, fd4]);
+        let root = RootContext::from(vec![fd0, fd1, fd2, fd3, fd4]);
 
-        macro_rules! assert_is_message {
-            ($path:expr, $name:expr) => {{
-                let result = root.resolve_path($path).unwrap();
-                let MessageOrEnum::Message(m) = result else {
-                    panic!("Expected a message: {}", $path);
-                };
-                assert_eq!(m.name().unwrap(), $name);
-            }};
-        }
-        assert_is_message!("a.A", "A");
-        assert_is_message!("a.A.B", "B");
-        assert_is_message!("a.A.B2", "B2");
-        assert_is_message!("a.A.B.C", "C");
+        let assert_is_message = |path: &str, name: &str| {
+            let result = root.resolve_path(path).unwrap();
+            let MessageOrEnum::Message(m) = result else {
+                panic!("Expected a message: {}", path);
+            };
+            assert_eq!(m.name().unwrap(), name);
+        };
+        assert_is_message("A", "A");
+        assert_is_message("A.B", "B");
+        assert_is_message("A.B2", "B2");
+        assert_is_message("A.B.C", "C");
+        assert_is_message(".A", "A");
+        assert_is_message(".A.B", "B");
+        assert_is_message(".A.B2", "B2");
+        assert_is_message(".A.B.C", "C");
+        assert_is_message("a.A", "A");
+        assert_is_message("a.A.B", "B");
+        assert_is_message("a.A.B2", "B2");
+        assert_is_message("a.A.B.C", "C");
+        assert_is_message(".a.A", "A");
+        assert_is_message(".a.A.B", "B");
+        assert_is_message(".a.A.B2", "B2");
+        assert_is_message(".a.A.B.C", "C");
+        assert_is_message("a.b.A", "A");
+        assert_is_message("a.b.A.B", "B");
+        assert_is_message("a.b.A.B2", "B2");
+        assert_is_message("a.b.A.B.C", "C");
+        assert_is_message(".a.b.A", "A");
+        assert_is_message(".a.b.A.B", "B");
+        assert_is_message(".a.b.A.B2", "B2");
+        assert_is_message(".a.b.A.B.C", "C");
+        assert_is_message("a.b.c.A", "A");
+        assert_is_message("a.b.c.A.B", "B");
+        assert_is_message("a.b.c.A.B2", "B2");
+        assert_is_message("a.b.c.A.B.C", "C");
+        assert_is_message(".a.b.c.A", "A");
+        assert_is_message(".a.b.c.A.B", "B");
+        assert_is_message(".a.b.c.A.B2", "B2");
+        assert_is_message(".a.b.c.A.B.C", "C");
+        assert_is_message("a.b2.A", "A");
+        assert_is_message("a.b2.A.B", "B");
+        assert_is_message("a.b2.A.B2", "B2");
+        assert_is_message("a.b2.A.B.C", "C");
+        assert_is_message(".a.b2.A", "A");
+        assert_is_message(".a.b2.A.B", "B");
+        assert_is_message(".a.b2.A.B2", "B2");
+        assert_is_message(".a.b2.A.B.C", "C");
     }
 }
