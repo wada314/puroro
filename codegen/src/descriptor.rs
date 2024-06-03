@@ -615,7 +615,7 @@ impl<'a> FileDescriptorWithContext<'a> {
             .all_messages()?
             .into_iter()
             .map(MessageOrEnum::Message)
-            .chain(self.enums()?.into_iter().map(MessageOrEnum::Enum)))
+            .chain(self.all_enums()?.into_iter().map(MessageOrEnum::Enum)))
     }
     pub fn all_messages(&'a self) -> Result<impl 'a + IntoIterator<Item = &DescriptorWithContext>> {
         let direct_messages = self.messages()?.into_iter();
@@ -628,6 +628,19 @@ impl<'a> FileDescriptorWithContext<'a> {
             .into_iter()
             .flat_map(|v| v.into_iter());
         let boxed: Box<dyn Iterator<Item = _>> = Box::new(direct_messages.chain(indirect_messages));
+        Ok(boxed)
+    }
+    pub fn all_enums(
+        &'a self,
+    ) -> Result<impl 'a + IntoIterator<Item = &EnumDescriptorWithContext>> {
+        let direct_enums = self.enums()?.into_iter();
+        let indirect_enums_vec = self
+            .messages()?
+            .into_iter()
+            .map(|child| child.all_enums())
+            .collect::<Result<Vec<_>>>()?;
+        let indirect_enums = indirect_enums_vec.into_iter().flat_map(|v| v.into_iter());
+        let boxed: Box<dyn Iterator<Item = _>> = Box::new(direct_enums.chain(indirect_enums));
         Ok(boxed)
     }
 }
@@ -827,7 +840,7 @@ impl<'a> DescriptorWithContext<'a> {
             .all_messages()?
             .into_iter()
             .map(MessageOrEnum::Message)
-            .chain(self.enum_types()?.into_iter().map(MessageOrEnum::Enum)))
+            .chain(self.all_enums()?.into_iter().map(MessageOrEnum::Enum)))
     }
     pub fn all_messages(&'a self) -> Result<impl 'a + IntoIterator<Item = &DescriptorWithContext>> {
         let direct_messages = self.nested_types()?.into_iter();
@@ -840,6 +853,19 @@ impl<'a> DescriptorWithContext<'a> {
             .into_iter()
             .flat_map(|v| v.into_iter());
         let boxed: Box<dyn Iterator<Item = _>> = Box::new(direct_messages.chain(indirect_messages));
+        Ok(boxed)
+    }
+    pub fn all_enums(
+        &'a self,
+    ) -> Result<impl 'a + IntoIterator<Item = &EnumDescriptorWithContext>> {
+        let direct_enums = self.enum_types()?.into_iter();
+        let indirect_enums_vec = self
+            .nested_types()?
+            .into_iter()
+            .map(|child| child.all_enums())
+            .collect::<Result<Vec<_>>>()?;
+        let indirect_enums = indirect_enums_vec.into_iter().flat_map(|v| v.into_iter());
+        let boxed: Box<dyn Iterator<Item = _>> = Box::new(direct_enums.chain(indirect_enums));
         Ok(boxed)
     }
 }
