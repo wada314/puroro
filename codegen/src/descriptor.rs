@@ -659,7 +659,7 @@ pub struct DescriptorWithContext<'a> {
 
 #[derive(Default, Debug)]
 pub struct DescriptorCache<'a> {
-    full_name: OnceCell<ProtoPathBuf>,
+    full_path: OnceCell<ProtoPathBuf>,
     non_oneof_fields: OnceCell<Vec<FieldDescriptorWithContext<'a>>>,
     real_oneof_fields: OnceCell<Vec<FieldDescriptorWithContext<'a>>>,
     synthetic_oneof_fields: OnceCell<Vec<FieldDescriptorWithContext<'a>>>,
@@ -679,7 +679,7 @@ impl<'a> DescriptorWithContext<'a> {
     }
     pub fn full_path(&self) -> Result<&ProtoPath> {
         self.cache
-            .full_name
+            .full_path
             .get_or_try_init(|| {
                 let mut full_name = if let Some(nested) = self.maybe_containing {
                     nested.full_path()?.to_owned()
@@ -884,7 +884,7 @@ pub struct EnumDescriptorWithContext<'a> {
 
 #[derive(Default, Debug)]
 pub struct EnumDescriptorCache<'a> {
-    full_name: OnceCell<ProtoPathBuf>,
+    full_path: OnceCell<ProtoPathBuf>,
     values: OnceCell<Vec<EnumValueDescriptorWithContext<'a>>>,
 }
 
@@ -894,17 +894,17 @@ impl<'a> EnumDescriptorWithContext<'a> {
     }
     pub fn full_path(&self) -> Result<&ProtoPath> {
         self.cache
-            .full_name
+            .full_path
             .get_or_try_init(|| {
-                let mut full_name = if let Some(nested) = self.maybe_containing {
+                let mut full_path = if let Some(nested) = self.maybe_containing {
                     nested.full_path()?.to_owned()
                 } else {
                     self.file
                         .package()?
-                        .map_or_else(ProtoPathBuf::new, |p| p.to_owned())
+                        .map_or_else(|| Into::<ProtoPathBuf>::into("."), |p| p.to_owned())
                 };
-                full_name.push(ProtoPath::new(&self.body.name));
-                Ok(full_name)
+                full_path.push(ProtoPath::new(&self.body.name));
+                Ok(full_path)
             })
             .map(|s| s.as_ref())
     }
@@ -1155,10 +1155,13 @@ mod tests {
             .into_iter()
             .collect::<Vec<_>>();
 
-        assert_eq!(0, root_package_files.len());
+        assert_eq!(1, root_package_files.len());
         assert_eq!(1, package_a_files.len());
         assert_eq!(2, package_a_b_files.len());
         assert_eq!(1, package_a_b_c_files.len());
+        assert!(root_package_files
+            .iter()
+            .any(|f| f.name().unwrap() == "fd0.proto"));
         assert!(package_a_files
             .iter()
             .any(|f| f.name().unwrap() == "fd1.proto"));
