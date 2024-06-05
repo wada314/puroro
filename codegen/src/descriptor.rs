@@ -687,7 +687,7 @@ impl<'a> DescriptorWithContext<'a> {
                     self.file.absolute_package()?.to_owned()
                 };
                 // todo!("absl path check?");
-                full_name.push(ProtoPath::new(&self.body.name));
+                full_name.push(&self.body.name);
                 Ok(full_name)
             })
             .map(|s| s.as_ref())
@@ -903,7 +903,7 @@ impl<'a> EnumDescriptorWithContext<'a> {
                         .package()?
                         .map_or_else(|| Into::<ProtoPathBuf>::into("."), |p| p.to_owned())
                 };
-                full_path.push(ProtoPath::new(&self.body.name));
+                full_path.push(&self.body.name);
                 Ok(full_path)
             })
             .map(|s| s.as_ref())
