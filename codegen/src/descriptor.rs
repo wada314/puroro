@@ -58,70 +58,70 @@ impl TryFrom<EditionProto> for Edition {
 
 #[derive(Clone, Debug, Default)]
 pub enum FieldType<'a> {
-    BOOL,
-    BYTES,
-    DOUBLE,
-    ENUM(&'a EnumDescriptorWithContext<'a>),
-    FIXED32,
-    FIXED64,
-    FLOAT,
-    GROUP,
+    Bool,
+    Bytes,
+    Double,
+    Enum(&'a EnumDescriptorWithContext<'a>),
+    Fixed32,
+    Fixed64,
+    Float,
+    Group,
     #[default]
-    INT32,
-    INT64,
-    MESSAGE(&'a DescriptorWithContext<'a>),
-    SFIXED32,
-    SFIXED64,
-    SINT32,
-    SINT64,
-    STRING,
-    UINT32,
-    UINT64,
+    Int32,
+    Int64,
+    Message(&'a DescriptorWithContext<'a>),
+    SFixed32,
+    SFixed64,
+    SInt32,
+    SInt64,
+    String,
+    UInt32,
+    UInt64,
 }
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Default)]
 pub enum FieldTypeCase {
-    BOOL,
-    BYTES,
-    DOUBLE,
-    ENUM,
-    FIXED32,
-    FIXED64,
-    FLOAT,
-    GROUP,
+    Bool,
+    Bytes,
+    Double,
+    Enum,
+    Fixed32,
+    Fixed64,
+    Float,
+    Group,
     #[default]
-    INT32,
-    INT64,
-    MESSAGE,
-    SFIXED32,
-    SFIXED64,
-    SINT32,
-    SINT64,
-    STRING,
-    UINT32,
-    UINT64,
+    Int32,
+    Int64,
+    Message,
+    SFixed32,
+    SFixed64,
+    SInt32,
+    SInt64,
+    String,
+    UInt32,
+    UInt64,
 }
 
 impl From<FieldTypeProto> for FieldTypeCase {
     fn from(proto: FieldTypeProto) -> Self {
         match proto {
-            FieldTypeProto::TypeBool => FieldTypeCase::BOOL,
-            FieldTypeProto::TypeBytes => FieldTypeCase::BYTES,
-            FieldTypeProto::TypeDouble => FieldTypeCase::DOUBLE,
-            FieldTypeProto::TypeEnum => FieldTypeCase::ENUM,
-            FieldTypeProto::TypeFixed32 => FieldTypeCase::FIXED32,
-            FieldTypeProto::TypeFixed64 => FieldTypeCase::FIXED64,
-            FieldTypeProto::TypeFloat => FieldTypeCase::FLOAT,
-            FieldTypeProto::TypeGroup => FieldTypeCase::GROUP,
-            FieldTypeProto::TypeInt32 => FieldTypeCase::INT32,
-            FieldTypeProto::TypeInt64 => FieldTypeCase::INT64,
-            FieldTypeProto::TypeMessage => FieldTypeCase::MESSAGE,
-            FieldTypeProto::TypeSFixed32 => FieldTypeCase::SFIXED32,
-            FieldTypeProto::TypeSFixed64 => FieldTypeCase::SFIXED64,
-            FieldTypeProto::TypeSInt32 => FieldTypeCase::SINT32,
-            FieldTypeProto::TypeSInt64 => FieldTypeCase::SINT64,
-            FieldTypeProto::TypeString => FieldTypeCase::STRING,
-            FieldTypeProto::TypeUInt32 => FieldTypeCase::UINT32,
-            FieldTypeProto::TypeUInt64 => FieldTypeCase::UINT64,
+            FieldTypeProto::TypeBool => FieldTypeCase::Bool,
+            FieldTypeProto::TypeBytes => FieldTypeCase::Bytes,
+            FieldTypeProto::TypeDouble => FieldTypeCase::Double,
+            FieldTypeProto::TypeEnum => FieldTypeCase::Enum,
+            FieldTypeProto::TypeFixed32 => FieldTypeCase::Fixed32,
+            FieldTypeProto::TypeFixed64 => FieldTypeCase::Fixed64,
+            FieldTypeProto::TypeFloat => FieldTypeCase::Float,
+            FieldTypeProto::TypeGroup => FieldTypeCase::Group,
+            FieldTypeProto::TypeInt32 => FieldTypeCase::Int32,
+            FieldTypeProto::TypeInt64 => FieldTypeCase::Int64,
+            FieldTypeProto::TypeMessage => FieldTypeCase::Message,
+            FieldTypeProto::TypeSFixed32 => FieldTypeCase::SFixed32,
+            FieldTypeProto::TypeSFixed64 => FieldTypeCase::SFixed64,
+            FieldTypeProto::TypeSInt32 => FieldTypeCase::SInt32,
+            FieldTypeProto::TypeSInt64 => FieldTypeCase::SInt64,
+            FieldTypeProto::TypeString => FieldTypeCase::String,
+            FieldTypeProto::TypeUInt32 => FieldTypeCase::UInt32,
+            FieldTypeProto::TypeUInt64 => FieldTypeCase::UInt64,
         }
     }
 }
@@ -138,38 +138,38 @@ impl FieldTypeCase {
         G: FnOnce(&ProtoPath) -> Result<&'a EnumDescriptorWithContext<'a>>,
     {
         match self {
-            FieldTypeCase::BOOL => Ok(FieldType::BOOL),
-            FieldTypeCase::BYTES => Ok(FieldType::BYTES),
-            FieldTypeCase::DOUBLE => Ok(FieldType::DOUBLE),
-            FieldTypeCase::ENUM => {
+            FieldTypeCase::Bool => Ok(FieldType::Bool),
+            FieldTypeCase::Bytes => Ok(FieldType::Bytes),
+            FieldTypeCase::Double => Ok(FieldType::Double),
+            FieldTypeCase::Enum => {
                 let type_name: ProtoPathBuf = type_name
                     .ok_or_else(|| {
                         format!("No enum type name \"{}\"", type_name.unwrap_or_default())
                     })?
                     .into();
-                Ok(FieldType::ENUM(enum_case(&type_name)?))
+                Ok(FieldType::Enum(enum_case(&type_name)?))
             }
-            FieldTypeCase::FIXED32 => Ok(FieldType::FIXED32),
-            FieldTypeCase::FIXED64 => Ok(FieldType::FIXED64),
-            FieldTypeCase::FLOAT => Ok(FieldType::FLOAT),
-            FieldTypeCase::GROUP => Ok(FieldType::GROUP),
-            FieldTypeCase::INT32 => Ok(FieldType::INT32),
-            FieldTypeCase::INT64 => Ok(FieldType::INT64),
-            FieldTypeCase::MESSAGE => {
+            FieldTypeCase::Fixed32 => Ok(FieldType::Fixed32),
+            FieldTypeCase::Fixed64 => Ok(FieldType::Fixed64),
+            FieldTypeCase::Float => Ok(FieldType::Float),
+            FieldTypeCase::Group => Ok(FieldType::Group),
+            FieldTypeCase::Int32 => Ok(FieldType::Int32),
+            FieldTypeCase::Int64 => Ok(FieldType::Int64),
+            FieldTypeCase::Message => {
                 let type_name: ProtoPathBuf = type_name
                     .ok_or_else(|| {
                         format!("No message type name \"{}\"", type_name.unwrap_or_default())
                     })?
                     .into();
-                Ok(FieldType::MESSAGE(msg_case(&type_name)?))
+                Ok(FieldType::Message(msg_case(&type_name)?))
             }
-            FieldTypeCase::SFIXED32 => Ok(FieldType::SFIXED32),
-            FieldTypeCase::SFIXED64 => Ok(FieldType::SFIXED64),
-            FieldTypeCase::SINT32 => Ok(FieldType::SINT32),
-            FieldTypeCase::SINT64 => Ok(FieldType::SINT64),
-            FieldTypeCase::STRING => Ok(FieldType::STRING),
-            FieldTypeCase::UINT32 => Ok(FieldType::UINT32),
-            FieldTypeCase::UINT64 => Ok(FieldType::UINT64),
+            FieldTypeCase::SFixed32 => Ok(FieldType::SFixed32),
+            FieldTypeCase::SFixed64 => Ok(FieldType::SFixed64),
+            FieldTypeCase::SInt32 => Ok(FieldType::SInt32),
+            FieldTypeCase::SInt64 => Ok(FieldType::SInt64),
+            FieldTypeCase::String => Ok(FieldType::String),
+            FieldTypeCase::UInt32 => Ok(FieldType::UInt32),
+            FieldTypeCase::UInt64 => Ok(FieldType::UInt64),
         }
     }
 }
@@ -181,17 +181,17 @@ impl FieldTypeCase {
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Default)]
 pub enum FieldLabel {
     #[default]
-    OPTIONAL,
-    REQUIRED,
-    REPEATED,
+    Optional,
+    Required,
+    Repeated,
 }
 
 impl From<FieldLabelProto> for FieldLabel {
     fn from(proto: FieldLabelProto) -> Self {
         match proto {
-            FieldLabelProto::LabelOptional => FieldLabel::OPTIONAL,
-            FieldLabelProto::LabelRequired => FieldLabel::REQUIRED,
-            FieldLabelProto::LabelRepeated => FieldLabel::REPEATED,
+            FieldLabelProto::LabelOptional => FieldLabel::Optional,
+            FieldLabelProto::LabelRequired => FieldLabel::Required,
+            FieldLabelProto::LabelRepeated => FieldLabel::Repeated,
         }
     }
 }
@@ -1024,6 +1024,12 @@ impl<'a> FieldDescriptorWithContext<'a> {
                 )
             })
             .cloned()
+    }
+    pub fn label(&self) -> Result<Option<FieldLabel>> {
+        Ok(self.body.label)
+    }
+    pub fn is_proto3_optional(&self) -> Result<bool> {
+        Ok(self.body.proto3_optional)
     }
 }
 
