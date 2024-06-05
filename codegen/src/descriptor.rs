@@ -681,14 +681,14 @@ impl<'a> DescriptorWithContext<'a> {
         self.cache
             .full_path
             .get_or_try_init(|| {
-                let mut full_name = if let Some(nested) = self.maybe_containing {
+                let mut full_path = if let Some(nested) = self.maybe_containing {
                     nested.full_path()?.to_owned()
                 } else {
                     self.file.absolute_package()?.to_owned()
                 };
                 // todo!("absl path check?");
-                full_name.push(&self.body.name);
-                Ok(full_name)
+                full_path.push(&self.body.name);
+                Ok(full_path)
             })
             .map(|s| s.as_ref())
     }
@@ -899,9 +899,7 @@ impl<'a> EnumDescriptorWithContext<'a> {
                 let mut full_path = if let Some(nested) = self.maybe_containing {
                     nested.full_path()?.to_owned()
                 } else {
-                    self.file
-                        .package()?
-                        .map_or_else(|| Into::<ProtoPathBuf>::into("."), |p| p.to_owned())
+                    self.file.absolute_package()?.to_owned()
                 };
                 full_path.push(&self.body.name);
                 Ok(full_path)
