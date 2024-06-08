@@ -66,7 +66,7 @@ impl Field {
         let tmp;
         Ok(parse_str(match ty {
             FieldType::Bool => "bool",
-            FieldType::Bytes => "::std::vec::Vec<u8>",
+            FieldType::Bytes => "::std::vec::Vec<u8, A>",
             FieldType::Double => "f64",
             FieldType::Enum(e) => {
                 tmp = e.full_path()?.to_rust_path()?;
@@ -79,7 +79,7 @@ impl Field {
             FieldType::Int32 => "i32",
             FieldType::Int64 => "i64",
             FieldType::Message(m) => {
-                tmp = format!("::std::boxed::Box::<{}>", m.full_path()?.to_rust_path()?);
+                tmp = format!("::std::boxed::Box::<{}, A>", m.full_path()?.to_rust_path()?);
                 &tmp
             }
             FieldType::SFixed32 => "i32",
@@ -113,7 +113,7 @@ impl ToTokens for MessageOpenStruct {
         let name = &self.name;
         let fields = &self.fields;
         tokens.append_all(quote! {
-            pub struct #name {
+            pub struct #name<#[cfg(allocator)]A: ::std::alloc::Allocator = ::std::alloc::Global> {
                 #(#fields)*
             }
         })

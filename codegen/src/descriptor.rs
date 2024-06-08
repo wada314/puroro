@@ -26,6 +26,7 @@ use ::puroro::google::protobuf::{
 use ::puroro::Result as PResult;
 use ::std::cell::OnceCell;
 use ::std::collections::HashMap;
+use ::std::fmt::Debug;
 
 // region: Edition
 
@@ -56,7 +57,7 @@ impl TryFrom<EditionProto> for Edition {
 
 // region: FieldType
 
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Default)]
 pub enum FieldType<'a> {
     Bool,
     Bytes,
@@ -77,6 +78,42 @@ pub enum FieldType<'a> {
     String,
     UInt32,
     UInt64,
+}
+// We need a special implementation for Debug to avoid infinite recursion like:
+// field -> message -> field -> message -> ...
+impl Debug for FieldType<'_> {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Bool => write!(f, "Bool"),
+            Self::Bytes => write!(f, "Bytes"),
+            Self::Double => write!(f, "Double"),
+            Self::Enum(arg0) => {
+                let full_path = &arg0
+                    .full_path()
+                    .unwrap_or_else(|_| ProtoPath::new("<error>"));
+                f.debug_tuple("Enum").field(full_path).finish()
+            }
+            Self::Fixed32 => write!(f, "Fixed32"),
+            Self::Fixed64 => write!(f, "Fixed64"),
+            Self::Float => write!(f, "Float"),
+            Self::Group => write!(f, "Group"),
+            Self::Int32 => write!(f, "Int32"),
+            Self::Int64 => write!(f, "Int64"),
+            Self::Message(arg0) => {
+                let full_path = &arg0
+                    .full_path()
+                    .unwrap_or_else(|_| ProtoPath::new("<error>"));
+                f.debug_tuple("Message").field(full_path).finish()
+            }
+            Self::SFixed32 => write!(f, "SFixed32"),
+            Self::SFixed64 => write!(f, "SFixed64"),
+            Self::SInt32 => write!(f, "SInt32"),
+            Self::SInt64 => write!(f, "SInt64"),
+            Self::String => write!(f, "String"),
+            Self::UInt32 => write!(f, "UInt32"),
+            Self::UInt64 => write!(f, "UInt64"),
+        }
+    }
 }
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Default)]
 pub enum FieldTypeCase {
