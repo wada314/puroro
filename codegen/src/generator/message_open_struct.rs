@@ -14,9 +14,10 @@
 
 use crate::cases::{convert_into_case, Case};
 use crate::descriptor::{DescriptorWithContext, FieldDescriptorWithContext, FieldLabel, FieldType};
+use crate::proto_path::ProtoPath;
 use crate::Result;
 use ::proc_macro2::TokenStream;
-use ::quote::{quote, ToTokens, TokenStreamExt};
+use ::quote::{format_ident, quote, ToTokens, TokenStreamExt};
 use ::syn::{parse2, parse_str, Ident, Type};
 
 pub struct MessageOpenStruct {
@@ -32,13 +33,41 @@ struct Field {
 impl MessageOpenStruct {
     pub fn try_new<'a>(desc: &'a DescriptorWithContext<'a>) -> Result<Self> {
         Ok(Self {
-            name: parse_str(&convert_into_case(desc.name()?, Case::CamelCase))?,
+            name: Self::rust_name_from_message_name(desc.name()?)?,
             fields: desc
                 .non_oneof_fields()?
                 .into_iter()
                 .map(Field::try_new)
                 .collect::<Result<Vec<_>>>()?,
         })
+    }
+
+    pub fn rust_name_from_message_name(name: &str) -> Result<Ident> {
+        Ok(format_ident!(
+            "{}Struct",
+            convert_into_case(name, Case::CamelCase)
+        ))
+    }
+
+    pub fn rust_path_from_message_path(
+        path: impl AsRef<ProtoPath>,
+        allocator: &Type,
+    ) -> Result<Type> {
+        let modules = path
+            .as_ref()
+            .parent()
+            .into_iter()
+            .flat_map(|p| p.components())
+            .map(|name| Ok(parse_str(&convert_into_case(name, Case::LowerSnakeCase))?))
+            .collect::<Result<Vec<Ident>>>()?;
+        let struct_name = Self::rust_name_from_message_name(
+            path.as_ref()
+                .last_component()
+                .ok_or_else(|| format!("Invalid message path: {}", path.as_ref()))?,
+        )?;
+        Ok(parse2(quote! {
+            crate #(:: #modules)* :: #struct_name :: <#allocator>
+        })?)
     }
 }
 
@@ -63,32 +92,35 @@ impl Field {
     }
 
     fn gen_scalar_type(ty: FieldType) -> Result<Type> {
-        let tmp;
-        Ok(parse_str(match ty {
-            FieldType::Bool => "bool",
-            FieldType::Bytes => "::std::vec::Vec<u8, A>",
-            FieldType::Double => "f64",
+        Ok(parse2(match ty {
+            FieldType::Bool => quote! { bool },
+            FieldType::Bytes => quote! { ::std::vec::Vec<u8, A> },
+            FieldType::Double => quote! { f64 },
             FieldType::Enum(e) => {
-                tmp = e.full_path()?.to_rust_path()?;
-                &tmp
+                quote! { TODO }
             }
-            FieldType::Fixed32 => "u32",
-            FieldType::Fixed64 => "u64",
-            FieldType::Float => "f32",
+            FieldType::Fixed32 => quote! { u32 },
+            FieldType::Fixed64 => quote! { u64 },
+            FieldType::Float => quote! { f32 },
             FieldType::Group => todo!(),
-            FieldType::Int32 => "i32",
-            FieldType::Int64 => "i64",
+            FieldType::Int32 => quote! { i32 },
+            FieldType::Int64 => quote! { i64 },
             FieldType::Message(m) => {
-                tmp = format!("::std::boxed::Box::<{}, A>", m.full_path()?.to_rust_path()?);
-                &tmp
+                let struct_path = MessageOpenStruct::rust_path_from_message_path(
+                    m.full_path()?,
+                    &parse_str("A")?,
+                )?;
+                quote! {
+                    ::std::boxed::Box::<#struct_path, A>
+                }
             }
-            FieldType::SFixed32 => "i32",
-            FieldType::SFixed64 => "i64",
-            FieldType::SInt32 => "i32",
-            FieldType::SInt64 => "i64",
-            FieldType::String => "::puroro::string::String<A>",
-            FieldType::UInt32 => "u32",
-            FieldType::UInt64 => "u64",
+            FieldType::SFixed32 => quote! { i32 },
+            FieldType::SFixed64 => quote! { i64 },
+            FieldType::SInt32 => quote! { i32 },
+            FieldType::SInt64 => quote! { i64 },
+            FieldType::String => quote! { ::puroro::string::String<A> },
+            FieldType::UInt32 => quote! { u32 },
+            FieldType::UInt64 => quote! { u64 },
         })?)
     }
 
@@ -101,10 +133,12 @@ impl Field {
 
     fn gen_repeated_type(ty: FieldType) -> Result<Type> {
         let scalar_type = match ty {
-            FieldType::Message(m) => parse_str(&m.full_path()?.to_rust_path()?)?,
+            FieldType::Message(m) => {
+                MessageOpenStruct::rust_path_from_message_path(m.full_path()?, &parse_str("A")?)?
+            }
             _ => Self::gen_scalar_type(ty)?,
         };
-        Ok(parse2(quote! {quote! {::std::vec::Vec::<#scalar_type>}})?)
+        Ok(parse2(quote! { ::std::vec::Vec::<#scalar_type, A> })?)
     }
 }
 
