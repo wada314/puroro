@@ -79,7 +79,7 @@ impl Field {
             FieldType::Int32 => "i32",
             FieldType::Int64 => "i64",
             FieldType::Message(m) => {
-                tmp = m.full_path()?.to_rust_path()?;
+                tmp = format!("::std::box::Box::<{}>", m.full_path()?.to_rust_path()?);
                 &tmp
             }
             FieldType::SFixed32 => "i32",
@@ -100,10 +100,11 @@ impl Field {
     }
 
     fn gen_repeated_type(ty: FieldType) -> Result<Type> {
-        let scalar = Self::gen_scalar_type(ty)?;
-        Ok(parse2(quote! {
-            ::std::vec::Vec::<#scalar>
-        })?)
+        let scalar_type = match ty {
+            FieldType::Message(m) => parse_str(&m.full_path()?.to_rust_path()?)?,
+            _ => Self::gen_scalar_type(ty)?,
+        };
+        Ok(parse2(quote! {quote! {::std::vec::Vec::<#scalar_type>}})?)
     }
 }
 
