@@ -79,7 +79,7 @@ impl Field {
             FieldType::Int32 => "i32",
             FieldType::Int64 => "i64",
             FieldType::Message(m) => {
-                tmp = format!("::std::box::Box::<{}>", m.full_path()?.to_rust_path()?);
+                tmp = format!("::std::boxed::Box::<{}>", m.full_path()?.to_rust_path()?);
                 &tmp
             }
             FieldType::SFixed32 => "i32",
