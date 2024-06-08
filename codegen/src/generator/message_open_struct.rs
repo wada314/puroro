@@ -86,7 +86,7 @@ impl Field {
             FieldType::SFixed64 => "i64",
             FieldType::SInt32 => "i32",
             FieldType::SInt64 => "i64",
-            FieldType::String => "::std::string::String",
+            FieldType::String => "::puroro::string::String<A>",
             FieldType::UInt32 => "u32",
             FieldType::UInt64 => "u64",
         })?)
