@@ -87,9 +87,23 @@ pub fn split_into_words(s: &str) -> impl Iterator<Item = &str> {
 pub fn convert_into_case(s: &str, case: Case) -> String {
     let words = split_into_words(s).collect::<Vec<_>>();
     match case {
-        Case::CamelCase => words.into_iter().map(|w| w).collect::<String>(),
-        Case::LowerSnakeCase => words.join("_").to_lowercase(),
-        Case::UpperSnakeCase => words.join("_").to_uppercase(),
+        Case::CamelCase => words
+            .into_iter()
+            .map(|w| {
+                w.chars()
+                    .enumerate()
+                    .map(|(i, c)| {
+                        if i == 0 {
+                            c.to_ascii_uppercase()
+                        } else {
+                            c.to_ascii_lowercase()
+                        }
+                    })
+                    .collect::<String>()
+            })
+            .collect::<String>(),
+        Case::LowerSnakeCase => words.join("_").to_ascii_lowercase(),
+        Case::UpperSnakeCase => words.join("_").to_ascii_uppercase(),
         Case::Unknown => s.to_string(),
     }
 }

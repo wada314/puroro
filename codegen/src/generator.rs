@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+pub mod r#enum;
 pub mod message_open_struct;
 
 use self::message_open_struct::MessageOpenStruct;
@@ -56,6 +57,27 @@ pub fn compile(request: &CodeGeneratorRequest) -> Result<CodeGeneratorResponse<'
 
         let open_struct = MessageOpenStruct::try_new(message)?;
         file.append(quote! { #open_struct });
+    }
+
+    let enums = root_context
+        .files()
+        .into_iter()
+        .map(|fd| fd.all_enums())
+        .collect::<Result<Vec<_>>>()?
+        .into_iter()
+        .flatten()
+        .collect::<Vec<_>>();
+    for e in &enums {
+        let file_path = if let Some(package) = e.full_path()?.parent() {
+            package.to_rust_file_path()
+        } else {
+            "mod.rs".to_string()
+        };
+        let file = out_files.file_mut(file_path);
+        file.add_source(e.file()?.name()?);
+
+        let enum_ = r#enum::Enum::try_new(e)?;
+        file.append(quote! { #enum_ });
     }
 
     for file in out_files {

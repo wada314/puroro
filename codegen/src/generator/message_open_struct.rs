@@ -14,6 +14,7 @@
 
 use crate::cases::{convert_into_case, Case};
 use crate::descriptor::{DescriptorWithContext, FieldDescriptorWithContext, FieldLabel, FieldType};
+use crate::generator::r#enum::Enum;
 use crate::proto_path::ProtoPath;
 use crate::Result;
 use ::proc_macro2::TokenStream;
@@ -63,7 +64,7 @@ impl MessageOpenStruct {
         let struct_name = Self::rust_name_from_message_name(
             path.as_ref()
                 .last_component()
-                .ok_or_else(|| format!("Invalid message path: {}", path.as_ref()))?,
+                .ok_or_else(|| format!("Invalid message path: {:?}", path.as_ref()))?,
         )?;
         Ok(parse2(quote! {
             crate #(:: #modules)* :: #struct_name :: <#allocator>
@@ -97,7 +98,8 @@ impl Field {
             FieldType::Bytes => quote! { ::std::vec::Vec<u8, A> },
             FieldType::Double => quote! { f64 },
             FieldType::Enum(e) => {
-                quote! { TODO }
+                let enum_path = Enum::rust_path_from_enum_path(e.full_path()?)?;
+                quote! { #enum_path }
             }
             FieldType::Fixed32 => quote! { u32 },
             FieldType::Fixed64 => quote! { u64 },

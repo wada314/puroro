@@ -1001,6 +1001,9 @@ impl<'a> EnumValueDescriptorWithContext<'a> {
             })
             .map(|s| s.as_ref())
     }
+    pub fn number(&self) -> Result<i32> {
+        Ok(self.body.number)
+    }
 }
 
 // endregion:
