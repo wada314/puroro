@@ -18,7 +18,7 @@ use crate::proto_path::ProtoPath;
 use crate::Result;
 use ::proc_macro2::TokenStream;
 use ::quote::{format_ident, quote, ToTokens, TokenStreamExt};
-use ::syn::{parse2, parse_str, Ident, Type, Variant};
+use ::syn::{parse2, parse_str, Ident, Item, Type, Variant};
 
 pub struct Enum {
     name: Ident,
@@ -64,10 +64,10 @@ impl Enum {
             crate #(:: #modules)* :: #name
         })?)
     }
-}
-
-impl ToTokens for Enum {
-    fn to_tokens(&self, tokens: &mut TokenStream) {
+    pub fn rust_items(&self) -> Result<Vec<Item>> {
+        Ok(vec![self.rust_item_enum()?])
+    }
+    fn rust_item_enum(&self) -> Result<Item> {
         let name = &self.name;
         let variants = self
             .variants
@@ -75,11 +75,11 @@ impl ToTokens for Enum {
             .map(|v| v.rust_enum_variant())
             .collect::<Result<Vec<_>>>()
             .unwrap();
-        tokens.append_all(quote! {
+        Ok(parse2(quote! {
             pub enum #name {
                 #(#variants ,)*
             }
-        });
+        })?)
     }
 }
 

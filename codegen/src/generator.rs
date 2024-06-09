@@ -76,8 +76,8 @@ pub fn compile(request: &CodeGeneratorRequest) -> Result<CodeGeneratorResponse<'
         let file = out_files.file_mut(file_path);
         file.add_source(e.file()?.name()?);
 
-        let enum_ = r#enum::Enum::try_new(e)?;
-        file.append(quote! { #enum_ });
+        let enum_ = r#enum::Enum::try_new(e)?.rust_items()?;
+        file.append(quote! { #(#enum_)* });
     }
 
     for file in out_files {
