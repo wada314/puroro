@@ -16,8 +16,7 @@ use crate::cases::{convert_into_case, Case};
 use crate::descriptor::{EnumDescriptorWithContext, EnumValueDescriptorWithContext};
 use crate::proto_path::ProtoPath;
 use crate::Result;
-use ::proc_macro2::TokenStream;
-use ::quote::{format_ident, quote, ToTokens, TokenStreamExt};
+use ::quote::{format_ident, quote};
 use ::syn::{parse2, parse_str, Ident, Item, Type, Variant};
 
 pub struct Enum {
