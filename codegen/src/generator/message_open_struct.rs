@@ -19,7 +19,7 @@ use crate::proto_path::ProtoPath;
 use crate::Result;
 use ::proc_macro2::TokenStream;
 use ::quote::{format_ident, quote, ToTokens, TokenStreamExt};
-use ::syn::{parse2, parse_str, Ident, Type};
+use ::syn::{parse2, parse_str, Ident, Item, Type};
 
 pub struct MessageOpenStruct {
     name: Ident,
@@ -69,6 +69,16 @@ impl MessageOpenStruct {
         Ok(parse2(quote! {
             crate #(:: #modules)* :: #struct_name :: <#allocator>
         })?)
+    }
+
+    pub fn rust_items(&self) -> Result<Vec<Item>> {
+        let name = &self.name;
+        let fields = &self.fields;
+        Ok(vec![parse2(quote! {
+            pub struct #name<#[cfg(allocator)]A: ::std::alloc::Allocator = ::std::alloc::Global> {
+                #(#fields)*
+            }
+        })?])
     }
 }
 
@@ -141,18 +151,6 @@ impl Field {
             _ => Self::gen_scalar_type(ty)?,
         };
         Ok(parse2(quote! { ::std::vec::Vec::<#scalar_type, A> })?)
-    }
-}
-
-impl ToTokens for MessageOpenStruct {
-    fn to_tokens(&self, tokens: &mut TokenStream) {
-        let name = &self.name;
-        let fields = &self.fields;
-        tokens.append_all(quote! {
-            pub struct #name<#[cfg(allocator)]A: ::std::alloc::Allocator = ::std::alloc::Global> {
-                #(#fields)*
-            }
-        })
     }
 }
 

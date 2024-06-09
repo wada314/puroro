@@ -55,8 +55,8 @@ pub fn compile(request: &CodeGeneratorRequest) -> Result<CodeGeneratorResponse<'
         let file = out_files.file_mut(file_path);
         file.add_source(message.file()?.name()?);
 
-        let open_struct = MessageOpenStruct::try_new(message)?;
-        file.append(quote! { #open_struct });
+        let open_struct = MessageOpenStruct::try_new(message)?.rust_items()?;
+        file.append(quote! { #(#open_struct)* });
     }
 
     let enums = root_context
