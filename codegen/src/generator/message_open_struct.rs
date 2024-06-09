@@ -72,13 +72,35 @@ impl MessageOpenStruct {
     }
 
     pub fn rust_items(&self) -> Result<Vec<Item>> {
+        Ok(vec![
+            self.rust_struct_item()?,
+            self.rust_impl_message_lite()?,
+        ])
+    }
+
+    fn rust_struct_item(&self) -> Result<Item> {
         let name = &self.name;
         let fields = &self.fields;
-        Ok(vec![parse2(quote! {
+        Ok(parse2(quote! {
             pub struct #name<#[cfg(allocator)]A: ::std::alloc::Allocator = ::std::alloc::Global> {
                 #(#fields)*
             }
-        })?])
+        })?)
+    }
+    fn rust_impl_message_lite(&self) -> Result<Item> {
+        let name = &self.name;
+        Ok(parse2(quote! {
+            impl<#[cfg(allocator)]A: ::std::alloc::Allocator> ::puroro::MessageLite<A> for self::#name<A> {
+                fn merge_from_bufread<R: ::std::io::BufRead>(
+                    &mut self, _bufread: &mut R,
+                ) -> ::puroro::Result<Self> {
+                    unimplemented!()
+                }
+                fn write<W: ::std::io::Write>(&self, _write: &mut W) -> Result<usize> {
+                    unimplemented!()
+                }
+            }
+        })?)
     }
 }
 
