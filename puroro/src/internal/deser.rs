@@ -86,14 +86,17 @@ impl<R: BufRead> BufRead for ScopeRead<R> {
     }
 }
 
-pub trait DeserMessageHandler<LenBody> {
+pub trait DeserMessageHandlerBase {
     fn parse_variant(&mut self, num: i32, var: Variant) -> Result<()>;
     fn parse_i32(&mut self, num: i32, val: [u8; 4]) -> Result<()>;
     fn parse_i64(&mut self, num: i32, val: [u8; 8]) -> Result<()>;
-    fn parse_len(&mut self, num: i32, val: &mut LenBody) -> Result<()>;
     fn is_message_field(&self, num: i32) -> bool;
     fn start_message(&mut self, num: i32) -> Result<()>;
     fn end_message(&mut self) -> Result<()>;
+}
+
+pub trait DeserMessageHandlerForRead<R>: DeserMessageHandlerBase {
+    fn parse_len(&mut self, num: i32, val: &mut R) -> Result<()>;
 }
 
 trait ReadExt: Sized {
@@ -114,7 +117,7 @@ impl<T: Read> ReadExt for T {
     }
 }
 
-pub fn deser_from_bufread<R: BufRead, H: DeserMessageHandler<ScopeRead<R>>>(
+pub fn deser_from_bufread<R: BufRead, H: DeserMessageHandlerForRead<ScopeRead<R>>>(
     read: R,
     handler: &mut H,
 ) -> Result<()> {
@@ -199,7 +202,7 @@ mod test {
             self.cur
         }
     }
-    impl<R: BufRead> DeserMessageHandler<R> for SampleMessageHandler {
+    impl DeserMessageHandlerBase for SampleMessageHandler {
         fn parse_variant(&mut self, num: i32, var: Variant) -> Result<()> {
             self.cur.variants.push(Field { num, val: var });
             Ok(())
@@ -218,12 +221,6 @@ mod test {
             });
             Ok(())
         }
-        fn parse_len(&mut self, num: i32, read: &mut R) -> Result<()> {
-            let mut val = String::new();
-            read.read_to_string(&mut val)?;
-            self.cur.strings.push(Field { num, val });
-            Ok(())
-        }
         fn is_message_field(&self, num: i32) -> bool {
             num % 2 == 1
         }
@@ -238,6 +235,14 @@ mod test {
                 num: field_num,
                 val: Box::new(child),
             });
+            Ok(())
+        }
+    }
+    impl<R: Read> DeserMessageHandlerForRead<R> for SampleMessageHandler {
+        fn parse_len(&mut self, num: i32, read: &mut R) -> Result<()> {
+            let mut val = String::new();
+            read.read_to_string(&mut val)?;
+            self.cur.strings.push(Field { num, val });
             Ok(())
         }
     }

@@ -13,7 +13,9 @@
 // limitations under the License.
 
 use crate::internal::deser::record::{Payload, Record};
-use crate::internal::deser::{deser_from_bufread, DeserMessageHandler};
+use crate::internal::deser::{
+    deser_from_bufread, DeserMessageHandlerBase, DeserMessageHandlerForRead,
+};
 use crate::internal::WireType;
 use crate::message::MessageLite;
 use crate::variant::{ReadExtVariant, UInt32, Variant, VariantIntegerType, WriteExtVariant};
@@ -253,7 +255,7 @@ where
     }
 }
 
-impl<'a, R: Read> DeserMessageHandler<R> for UntypedMessage<'a> {
+impl DeserMessageHandlerBase for UntypedMessage<'_> {
     fn start_message(&mut self, #[allow(unused)] num: i32) -> Result<()> {
         unimplemented!()
     }
@@ -275,14 +277,16 @@ impl<'a, R: Read> DeserMessageHandler<R> for UntypedMessage<'a> {
             .push(WireTypeAndPayload::Fixed64(val));
         Ok(())
     }
+    fn is_message_field(&self, #[allow(unused)] num: i32) -> bool {
+        false
+    }
+}
+impl<R: Read> DeserMessageHandlerForRead<R> for UntypedMessage<'_> {
     fn parse_len(&mut self, num: i32, val: &mut R) -> Result<()> {
         let mut buf = Vec::new();
         val.read_to_end(&mut buf)?;
         self.payloads_for_field_mut(num)
             .push(WireTypeAndPayload::Len(buf.into()));
         Ok(())
-    }
-    fn is_message_field(&self, #[allow(unused)] num: i32) -> bool {
-        false
     }
 }
