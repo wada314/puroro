@@ -14,18 +14,29 @@
 
 use crate::Result;
 use ::futures::io::{AsyncRead, AsyncWrite};
-use ::std::io::{Read, Write};
+use ::std::io::{BufRead, BufReader, Read, Write};
 use ::std::ops::{Deref, DerefMut};
 
 /// Protobuf message, which can be serialized, deserialized, and field accessible.
 pub trait MessageLite {
-    fn merge_from_read<R: Read>(&mut self, read: R) -> Result<()>;
+    fn merge_from_read<R: Read>(&mut self, read: R) -> Result<()> {
+        self.merge_from_bufread(BufReader::new(read))
+    }
+    fn merge_from_bufread<R: BufRead>(&mut self, read: R) -> Result<()>;
     fn deser_from_read<R: Read>(read: R) -> Result<Self>
     where
         Self: Sized + Default,
     {
         let mut msg = Self::default();
         msg.merge_from_read(read)?;
+        Ok(msg)
+    }
+    fn deser_from_bufread<R: BufRead>(read: R) -> Result<Self>
+    where
+        Self: Sized + Default,
+    {
+        let mut msg = Self::default();
+        msg.merge_from_bufread(read)?;
         Ok(msg)
     }
     fn write<W: Write>(&self, write: W) -> Result<usize>;
@@ -36,9 +47,11 @@ where
     T: Deref + DerefMut,
     <T as Deref>::Target: MessageLite,
 {
-    fn merge_from_read<R: Read>(&mut self, mut read: R) -> Result<()> {
-        DerefMut::deref_mut(self).merge_from_read(&mut read)?;
-        Ok(())
+    fn merge_from_read<R: Read>(&mut self, read: R) -> Result<()> {
+        DerefMut::deref_mut(self).merge_from_read(read)
+    }
+    fn merge_from_bufread<R: BufRead>(&mut self, read: R) -> Result<()> {
+        DerefMut::deref_mut(self).merge_from_bufread(read)
     }
     fn write<W: Write>(&self, mut write: W) -> Result<usize> {
         Deref::deref(self).write(&mut write)

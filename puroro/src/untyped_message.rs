@@ -24,7 +24,7 @@ use ::itertools::Either;
 use ::once_cell::unsync::Lazy;
 use ::std::borrow::Cow;
 use ::std::collections::HashMap;
-use ::std::io::{BufReader, Read, Write};
+use ::std::io::{BufRead, Read, Write};
 
 /// Assuming proto2 syntax.
 #[derive(Clone, Debug, Default)]
@@ -33,8 +33,8 @@ pub struct UntypedMessage<'a> {
 }
 
 impl MessageLite for UntypedMessage<'_> {
-    fn merge_from_read<R: Read>(&mut self, read: R) -> Result<()> {
-        deser_from_bufread(BufReader::new(read), self)
+    fn merge_from_bufread<R: BufRead>(&mut self, read: R) -> Result<()> {
+        deser_from_bufread(read, self)
     }
     fn write<W: Write>(&self, mut write: W) -> Result<usize> {
         let mut total_bytes = 0;
