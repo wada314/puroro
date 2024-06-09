@@ -64,7 +64,7 @@ impl Enum {
         })?)
     }
     pub fn rust_items(&self) -> Result<Vec<Item>> {
-        Ok(vec![self.rust_item_enum()?])
+        Ok(vec![self.rust_item_enum()?, self.rust_item_try_from_i32()?])
     }
     fn rust_item_enum(&self) -> Result<Item> {
         let name = &self.name;
@@ -77,6 +77,25 @@ impl Enum {
         Ok(parse2(quote! {
             pub enum #name {
                 #(#variants ,)*
+            }
+        })?)
+    }
+    fn rust_item_try_from_i32(&self) -> Result<Item> {
+        let name = &self.name;
+        let (var_names, var_numbers) = self
+            .variants
+            .iter()
+            .map(|v| (&v.name, v.number))
+            .collect::<(Vec<_>, Vec<_>)>();
+        Ok(parse2(quote! {
+            impl ::std::convert::TryFrom<i32> for self::#name {
+                type Error = i32;
+                fn try_from(value: i32) -> ::std::result::Result<Self, Self::Error> {
+                    match value {
+                        #( #var_numbers => Ok(Self::#var_names), )*
+                        _ => Err(value),
+                    }
+                }
             }
         })?)
     }
