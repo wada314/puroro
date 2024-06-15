@@ -44,7 +44,7 @@ impl<R> DeserMessageHandlerBase for Handler<'_, R> {
 
     fn start_message(&mut self, num: i32) -> Result<()> {
         self.stack
-            .apply_last(|msg| msg.get_or_insert_mut(num).unwrap());
+            .apply_last_mut(|msg| msg.get_or_insert_mut(num))?;
         Ok(())
     }
 
@@ -71,11 +71,24 @@ impl<T> Stack<T> {
     pub fn last(&self) -> Option<&T> {
         self.0.last()
     }
-    pub fn apply_last(&mut self, f: impl FnOnce(&mut T) -> Option<T>) {
+    pub fn last_mut(&mut self) -> Option<&mut T> {
+        self.0.last_mut()
+    }
+}
+impl<'a, T: ?Sized> Stack<&'a mut T> {
+    pub fn apply_last_mut(
+        &mut self,
+        f: impl FnOnce(&'a mut T) -> Result<Option<&'a mut T>>,
+    ) -> Result<()> {
         if let Some(last) = self.0.last_mut() {
-            if let Some(new_last) = f(last) {
-                self.0.push(new_last);
+            let mut copied_last = ::std::mem::MaybeUninit::<&mut T>::uninit();
+            unsafe {
+                ::std::ptr::copy_nonoverlapping(last, copied_last.as_mut_ptr(), 1);
+            }
+            if let Some(new_msg) = f(unsafe { copied_last.assume_init() })? {
+                self.0.push(new_msg);
             }
         }
+        Ok(())
     }
 }
