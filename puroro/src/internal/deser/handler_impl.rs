@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use super::{DeserMessageHandlerBase, DeserMessageHandlerForRead};
 use crate::Result;
 use ::std::marker::PhantomData;
 
@@ -19,11 +20,62 @@ use ::std::marker::PhantomData;
 /// Note this is not an exclusive implementation for [DeserMessageHandlerForRead].
 /// Anyone can implement this trait for their own type.
 
-pub struct Handler<R> {
+pub struct Handler<'a, R> {
     _phantom: PhantomData<R>,
-    stack: Vec<Box<dyn FnOnce()>>,
+    stack: Stack<&'a mut dyn Message>,
+}
+
+impl<R> DeserMessageHandlerBase for Handler<'_, R> {
+    fn parse_variant(&mut self, num: i32, var: crate::variant::Variant) -> Result<()> {
+        todo!()
+    }
+
+    fn parse_i32(&mut self, num: i32, val: [u8; 4]) -> Result<()> {
+        todo!()
+    }
+
+    fn parse_i64(&mut self, num: i32, val: [u8; 8]) -> Result<()> {
+        todo!()
+    }
+
+    fn is_message_field(&self, num: i32) -> bool {
+        todo!()
+    }
+
+    fn start_message(&mut self, num: i32) -> Result<()> {
+        self.stack
+            .apply_last(|msg| msg.get_or_insert_mut(num).unwrap());
+        Ok(())
+    }
+
+    fn end_message(&mut self) -> Result<()> {
+        todo!()
+    }
 }
 
 pub trait Message {
+    fn get_or_insert_mut(&mut self, field_number: i32) -> Result<Option<&mut dyn Message>>;
+}
 
+pub struct Stack<T>(Vec<T>);
+impl<T> Stack<T> {
+    pub fn new() -> Self {
+        Self(Vec::new())
+    }
+    pub fn push(&mut self, item: T) {
+        self.0.push(item);
+    }
+    pub fn pop(&mut self) -> Option<T> {
+        self.0.pop()
+    }
+    pub fn last(&self) -> Option<&T> {
+        self.0.last()
+    }
+    pub fn apply_last(&mut self, f: impl FnOnce(&mut T) -> Option<T>) {
+        if let Some(last) = self.0.last_mut() {
+            if let Some(new_last) = f(last) {
+                self.0.push(new_last);
+            }
+        }
+    }
 }
