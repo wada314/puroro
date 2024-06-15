@@ -13,7 +13,9 @@
 // limitations under the License.
 
 use super::{DeserMessageHandlerBase, DeserMessageHandlerForRead};
+use crate::variant::Variant;
 use crate::Result;
+use ::std::io::Read;
 use ::std::marker::PhantomData;
 
 /// An implementation for [DeserMessageHandlerForRead] type.
@@ -44,7 +46,7 @@ impl<R> DeserMessageHandlerBase for Handler<'_, R> {
 
     fn start_message(&mut self, num: i32) -> Result<()> {
         self.stack
-            .apply_last_mut(|msg| msg.get_or_insert_mut(num))?;
+            .apply_last_mut(|msg| msg.get_or_insert_message(num))?;
         Ok(())
     }
 
@@ -54,7 +56,12 @@ impl<R> DeserMessageHandlerBase for Handler<'_, R> {
 }
 
 pub trait Message {
-    fn get_or_insert_mut(&mut self, field_number: i32) -> Result<Option<&mut dyn Message>>;
+    fn set_variant_field(&mut self, field_number: i32, value: Variant) -> Result<()>;
+    fn set_bytes4_field(&mut self, field_number: i32, value: [u8; 4]) -> Result<()>;
+    fn set_bytes8_field(&mut self, field_number: i32, value: [u8; 8]) -> Result<()>;
+    fn is_message_field(&mut self, field_number: i32) -> bool;
+    fn get_or_insert_message(&mut self, field_number: i32) -> Result<Option<&mut dyn Message>>;
+    // todo: len fields?
 }
 
 pub struct Stack<T>(Vec<T>);
