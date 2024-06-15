@@ -28,28 +28,25 @@ pub struct Handler<'a, R> {
 }
 
 impl<R> DeserMessageHandlerBase for Handler<'_, R> {
-    fn parse_variant(&mut self, num: i32, var: crate::variant::Variant) -> Result<()> {
-        todo!()
+    fn parse_variant(&mut self, num: i32, var: Variant) -> Result<()> {
+        self.stack.assume_last_mut()?.set_variant_field(num, var)
     }
-
     fn parse_i32(&mut self, num: i32, val: [u8; 4]) -> Result<()> {
-        todo!()
+        self.stack.assume_last_mut()?.set_bytes4_field(num, val)
     }
-
     fn parse_i64(&mut self, num: i32, val: [u8; 8]) -> Result<()> {
-        todo!()
+        self.stack.assume_last_mut()?.set_bytes8_field(num, val)
     }
-
     fn is_message_field(&self, num: i32) -> bool {
-        todo!()
+        self.stack
+            .last()
+            .map_or(false, |msg| msg.is_message_field(num))
     }
-
     fn start_message(&mut self, num: i32) -> Result<()> {
         self.stack
             .apply_last_mut(|msg| msg.get_or_insert_message(num))?;
         Ok(())
     }
-
     fn end_message(&mut self) -> Result<()> {
         self.stack
             .pop()
@@ -57,14 +54,21 @@ impl<R> DeserMessageHandlerBase for Handler<'_, R> {
         Ok(())
     }
 }
+impl<R: Read> DeserMessageHandlerForRead<R> for Handler<'_, R> {
+    fn parse_len(&mut self, num: i32, read: &mut R) -> Result<usize> {
+        self.stack
+            .assume_last_mut()?
+            .set_len_field_from_read(num, read)
+    }
+}
 
 pub trait Message {
     fn set_variant_field(&mut self, field_number: i32, value: Variant) -> Result<()>;
     fn set_bytes4_field(&mut self, field_number: i32, value: [u8; 4]) -> Result<()>;
     fn set_bytes8_field(&mut self, field_number: i32, value: [u8; 8]) -> Result<()>;
-    fn is_message_field(&mut self, field_number: i32) -> bool;
+    fn set_len_field_from_read(&mut self, field_number: i32, read: &mut dyn Read) -> Result<usize>;
+    fn is_message_field(&self, field_number: i32) -> bool;
     fn get_or_insert_message(&mut self, field_number: i32) -> Result<Option<&mut dyn Message>>;
-    // todo: len fields?
 }
 
 pub struct Stack<T>(Vec<T>);
@@ -84,7 +88,20 @@ impl<T> Stack<T> {
     pub fn last_mut(&mut self) -> Option<&mut T> {
         self.0.last_mut()
     }
+    pub fn assume_last(&self) -> Result<&T> {
+        Ok(self
+            .0
+            .last()
+            .ok_or_else(|| "deser stack underflow".to_string())?)
+    }
+    pub fn assume_last_mut(&mut self) -> Result<&mut T> {
+        Ok(self
+            .0
+            .last_mut()
+            .ok_or_else(|| "deser stack underflow".to_string())?)
+    }
 }
+
 impl<'a, T: ?Sized> Stack<&'a mut T> {
     pub fn apply_last_mut(
         &mut self,

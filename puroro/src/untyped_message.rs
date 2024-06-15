@@ -282,11 +282,11 @@ impl DeserMessageHandlerBase for UntypedMessage<'_> {
     }
 }
 impl<R: Read> DeserMessageHandlerForRead<R> for UntypedMessage<'_> {
-    fn parse_len(&mut self, num: i32, val: &mut R) -> Result<()> {
+    fn parse_len(&mut self, num: i32, val: &mut R) -> Result<usize> {
         let mut buf = Vec::new();
-        val.read_to_end(&mut buf)?;
+        let len = val.read_to_end(&mut buf)?;
         self.payloads_for_field_mut(num)
             .push(WireTypeAndPayload::Len(buf.into()));
-        Ok(())
+        Ok(len)
     }
 }

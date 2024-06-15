@@ -97,7 +97,7 @@ pub trait DeserMessageHandlerBase {
 }
 
 pub trait DeserMessageHandlerForRead<R>: DeserMessageHandlerBase {
-    fn parse_len(&mut self, num: i32, val: &mut R) -> Result<()>;
+    fn parse_len(&mut self, num: i32, val: &mut R) -> Result<usize>;
 }
 
 trait ReadExt: Sized {
@@ -242,9 +242,9 @@ mod test {
     impl<R: Read> DeserMessageHandlerForRead<R> for SampleMessageHandler {
         fn parse_len(&mut self, num: i32, read: &mut R) -> Result<()> {
             let mut val = String::new();
-            read.read_to_string(&mut val)?;
+            let len = read.read_to_string(&mut val)?;
             self.cur.strings.push(Field { num, val });
-            Ok(())
+            Ok(len)
         }
     }
 
