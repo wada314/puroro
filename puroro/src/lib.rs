@@ -34,6 +34,8 @@ pub enum ErrorKind {
     IoError(#[from] ::std::io::Error),
     #[error("std::num::TryFromIntError: {0}")]
     StdTryFromIntError(#[from] ::std::num::TryFromIntError),
+    #[error("puroro error: {0}")]
+    PuroroError(String),
     #[error("integer to boolean conversion error")]
     IntegerToBoolError,
     #[error("Deserializing invalid variant (too long).")]
@@ -50,5 +52,10 @@ pub enum ErrorKind {
     GenericMessageFieldTypeError,
     #[error("Error when converting an int32 to an (closed) enum value: {0}")]
     TryFromIntIntoEnumError(i32),
+}
+impl From<String> for ErrorKind {
+    fn from(s: String) -> Self {
+        ErrorKind::PuroroError(s)
+    }
 }
 pub type Result<T> = ::std::result::Result<T, ErrorKind>;

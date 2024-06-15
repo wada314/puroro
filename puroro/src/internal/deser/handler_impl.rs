@@ -51,7 +51,10 @@ impl<R> DeserMessageHandlerBase for Handler<'_, R> {
     }
 
     fn end_message(&mut self) -> Result<()> {
-        todo!()
+        self.stack
+            .pop()
+            .ok_or_else(|| "deser stack underflow".to_string())?;
+        Ok(())
     }
 }
 
