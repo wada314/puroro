@@ -13,7 +13,9 @@
 // limitations under the License.
 
 use crate::cases::{convert_into_case, Case};
-use crate::descriptor::{DescriptorWithContext, FieldDescriptorWithContext, FieldLabel, FieldType};
+use crate::descriptor::{
+    DescriptorWithContext, FieldDescriptorWithContext, FieldLabel, FieldType as ProtoFieldType,
+};
 use crate::generator::r#enum::Enum;
 use crate::proto_path::ProtoPath;
 use crate::Result;
@@ -21,18 +23,27 @@ use ::proc_macro2::TokenStream;
 use ::quote::{format_ident, quote, ToTokens, TokenStreamExt};
 use ::syn::{parse2, parse_str, Ident, Item, Type};
 
-pub struct MessageOpenStruct {
+pub struct MessageOpenStruct<'a> {
     name: Ident,
-    fields: Vec<Field>,
+    fields: Vec<Field<'a>>,
 }
 
-struct Field {
+struct Field<'a> {
     name: Ident,
     r#type: Type,
+    proto_type: ProtoFieldType<'a>,
+    field_wrapper: FieldWrapper,
 }
 
-impl MessageOpenStruct {
-    pub fn try_new<'a>(desc: &'a DescriptorWithContext<'a>) -> Result<Self> {
+enum FieldWrapper {
+    Bare,
+    Optional,
+    OptionalBoxed,
+    Vec,
+}
+
+impl<'a> MessageOpenStruct<'a> {
+    pub fn try_new(desc: &'a DescriptorWithContext<'a>) -> Result<Self> {
         Ok(Self {
             name: Self::rust_name_from_message_name(desc.name()?)?,
             fields: desc
@@ -89,12 +100,30 @@ impl MessageOpenStruct {
     }
     fn rust_impl_message_lite(&self) -> Result<Item> {
         let name = &self.name;
+        let scalar_variant_fields = self
+            .fields
+            .iter()
+            .filter(|f| f.r#type.to_token_stream().to_string().contains("Variant"));
         Ok(parse2(quote! {
             impl<#[cfg(allocator)]A: ::std::alloc::Allocator> ::puroro::MessageLite<A> for self::#name<A> {
                 fn merge_from_bufread<R: ::std::io::BufRead>(
                     &mut self, _bufread: &mut R,
                 ) -> ::puroro::Result<Self> {
-                    unimplemented!()
+                    use ::puroro::Result;
+                    use ::puroro::internal::deser::{DeserMessageHandlerBase, DeserMessageHandlerForRead}
+                    use ::puroro::variant::Variant;
+                    impl DeserMessageHandlerBase for Self {
+                        fn parse_variant(&mut self, num: i32, var: Variant) -> Result<()>;
+                        fn parse_i32(&mut self, num: i32, val: [u8; 4]) -> Result<()>;
+                        fn parse_i64(&mut self, num: i32, val: [u8; 8]) -> Result<()>;
+                        fn is_message_field(&self, num: i32) -> bool;
+                        fn start_message(&mut self, num: i32) -> Result<()>;
+                        fn end_message(&mut self) -> Result<()>;
+                    }
+                    impl<R: ::std::io::Read> DeserMessageHandlerForRead<R> for Self {
+                        fn parse_len(&mut self, num: i32, read: &mut R) -> Result<usize>;
+                    }
+                    todo!()
                 }
                 fn write<W: ::std::io::Write>(&self, _write: &mut W) -> Result<usize> {
                     unimplemented!()
@@ -104,16 +133,25 @@ impl MessageOpenStruct {
     }
 }
 
-impl Field {
-    pub fn try_new<'a>(desc: &'a FieldDescriptorWithContext<'a>) -> Result<Self> {
+impl<'a> Field<'a> {
+    pub fn try_new(desc: &'a FieldDescriptorWithContext<'a>) -> Result<Self> {
         Ok(Self {
             name: parse_str(&convert_into_case(desc.name()?, Case::LowerSnakeCase))?,
             r#type: Self::gen_type(desc.r#type()?, desc.label()?, desc.is_proto3_optional()?)?,
+            proto_type: desc.r#type()?,
+            field_wrapper: match (desc.label()?, desc.r#type()?, desc.is_proto3_optional()?) {
+                (Some(FieldLabel::Repeated), _, _) => FieldWrapper::Vec,
+                (_ /* Not repeated */, ProtoFieldType::Message(_), _) => {
+                    FieldWrapper::OptionalBoxed
+                }
+                (None, _ /* Not message */, false) => FieldWrapper::Bare,
+                _ => FieldWrapper::Optional,
+            },
         })
     }
 
     fn gen_type(
-        ty: FieldType,
+        ty: ProtoFieldType,
         label: Option<FieldLabel>,
         is_proto3_optional: bool,
     ) -> Result<Type> {
@@ -124,22 +162,22 @@ impl Field {
         }
     }
 
-    fn gen_scalar_type(ty: FieldType) -> Result<Type> {
+    fn gen_scalar_type(ty: ProtoFieldType) -> Result<Type> {
         Ok(parse2(match ty {
-            FieldType::Bool => quote! { bool },
-            FieldType::Bytes => quote! { ::std::vec::Vec<u8, A> },
-            FieldType::Double => quote! { f64 },
-            FieldType::Enum(e) => {
+            ProtoFieldType::Bool => quote! { bool },
+            ProtoFieldType::Bytes => quote! { ::std::vec::Vec<u8, A> },
+            ProtoFieldType::Double => quote! { f64 },
+            ProtoFieldType::Enum(e) => {
                 let enum_path = Enum::rust_path_from_enum_path(e.full_path()?)?;
                 quote! { #enum_path }
             }
-            FieldType::Fixed32 => quote! { u32 },
-            FieldType::Fixed64 => quote! { u64 },
-            FieldType::Float => quote! { f32 },
-            FieldType::Group => todo!(),
-            FieldType::Int32 => quote! { i32 },
-            FieldType::Int64 => quote! { i64 },
-            FieldType::Message(m) => {
+            ProtoFieldType::Fixed32 => quote! { u32 },
+            ProtoFieldType::Fixed64 => quote! { u64 },
+            ProtoFieldType::Float => quote! { f32 },
+            ProtoFieldType::Group => todo!(),
+            ProtoFieldType::Int32 => quote! { i32 },
+            ProtoFieldType::Int64 => quote! { i64 },
+            ProtoFieldType::Message(m) => {
                 let struct_path = MessageOpenStruct::rust_path_from_message_path(
                     m.full_path()?,
                     &parse_str("A")?,
@@ -148,26 +186,26 @@ impl Field {
                     ::std::boxed::Box::<#struct_path, A>
                 }
             }
-            FieldType::SFixed32 => quote! { i32 },
-            FieldType::SFixed64 => quote! { i64 },
-            FieldType::SInt32 => quote! { i32 },
-            FieldType::SInt64 => quote! { i64 },
-            FieldType::String => quote! { ::puroro::string::String<A> },
-            FieldType::UInt32 => quote! { u32 },
-            FieldType::UInt64 => quote! { u64 },
+            ProtoFieldType::SFixed32 => quote! { i32 },
+            ProtoFieldType::SFixed64 => quote! { i64 },
+            ProtoFieldType::SInt32 => quote! { i32 },
+            ProtoFieldType::SInt64 => quote! { i64 },
+            ProtoFieldType::String => quote! { ::puroro::string::String<A> },
+            ProtoFieldType::UInt32 => quote! { u32 },
+            ProtoFieldType::UInt64 => quote! { u64 },
         })?)
     }
 
-    fn gen_optional_type(ty: FieldType) -> Result<Type> {
+    fn gen_optional_type(ty: ProtoFieldType) -> Result<Type> {
         let scalar = Self::gen_scalar_type(ty)?;
         Ok(parse2(quote! {
             ::std::option::Option::<#scalar>
         })?)
     }
 
-    fn gen_repeated_type(ty: FieldType) -> Result<Type> {
+    fn gen_repeated_type(ty: ProtoFieldType) -> Result<Type> {
         let scalar_type = match ty {
-            FieldType::Message(m) => {
+            ProtoFieldType::Message(m) => {
                 MessageOpenStruct::rust_path_from_message_path(m.full_path()?, &parse_str("A")?)?
             }
             _ => Self::gen_scalar_type(ty)?,
@@ -176,7 +214,7 @@ impl Field {
     }
 }
 
-impl ToTokens for Field {
+impl ToTokens for Field<'_> {
     fn to_tokens(&self, tokens: &mut TokenStream) {
         let name = &self.name;
         let ty = &self.r#type;
