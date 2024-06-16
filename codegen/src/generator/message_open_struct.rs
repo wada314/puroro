@@ -21,7 +21,28 @@ use crate::proto_path::ProtoPath;
 use crate::Result;
 use ::proc_macro2::TokenStream;
 use ::quote::{format_ident, quote, ToTokens, TokenStreamExt};
+use ::std::any::Any;
+use ::std::cell::OnceCell;
+use ::std::collections::HashMap;
+use ::std::sync::RwLock;
 use ::syn::{parse2, parse_str, Ident, Item, Type};
+
+#[derive(Default)]
+struct Cache(RwLock<HashMap<*const (), OnceCell<Box<dyn Any>>>>);
+impl Cache {
+    fn get<T, R: Any>(&self, key: &T, f: impl FnOnce() -> Result<R>) -> Result<&R> {
+        let ref_cell = self
+            .0
+            .write()
+            .map_err(|_| "RwLock write failed".to_string())?
+            .entry(::std::ptr::from_ref(key) as *const ())
+            .or_default();
+        Ok(ref_cell
+            .get_or_try_init(|| -> Result<_> { Ok(Box::new(f()?) as Box<dyn Any>) })?
+            .downcast_ref::<R>()
+            .ok_or_else(|| "downcast failed".to_string())?)
+    }
+}
 
 pub struct MessageOpenStruct<'a> {
     name: Ident,
