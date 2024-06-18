@@ -19,20 +19,29 @@ use crate::proto_path::ProtoPath;
 use crate::Result;
 use ::proc_macro2::TokenStream;
 use ::quote::{format_ident, quote, ToTokens, TokenStreamExt};
+use ::std::cell::OnceCell;
 use ::syn::{parse2, parse_str, Ident, Item, Type};
 
 pub struct MessageOpenStruct<'a> {
     rust_name: Ident,
     fields: Vec<Field<'a>>,
+    cache: MessageOpenStructCache,
 }
+#[derive(Default)]
+struct MessageOpenStructCache {}
 
 struct Field<'a> {
+    desc: &'a FieldDescriptorWithContext<'a>,
     rust_name: Ident,
-    rust_type: Type,
-    proto_type: FieldType<'a>,
-    rust_field_wrapper: FieldWrapper,
+    cache: FieldCache,
+}
+#[derive(Default)]
+struct FieldCache {
+    rust_type: OnceCell<Type>,
+    rust_field_wrapper: OnceCell<FieldWrapper>,
 }
 
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 enum FieldWrapper {
     Bare,
     Optional,
@@ -49,6 +58,7 @@ impl<'a> MessageOpenStruct<'a> {
                 .into_iter()
                 .map(Field::try_new)
                 .collect::<Result<Vec<_>>>()?,
+            cache: Default::default(),
         })
     }
 
@@ -98,12 +108,6 @@ impl<'a> MessageOpenStruct<'a> {
     }
     fn rust_impl_message_lite(&self) -> Result<Item> {
         let name = &self.rust_name;
-        let scalar_variant_fields = self.fields.iter().filter(|f| {
-            f.rust_type
-                .to_token_stream()
-                .to_string()
-                .contains("Variant")
-        });
         Ok(parse2(quote! {
             impl<#[cfg(allocator)]A: ::std::alloc::Allocator> ::puroro::MessageLite<A> for self::#name<A> {
                 fn merge_from_bufread<R: ::std::io::BufRead>(
@@ -136,28 +140,39 @@ impl<'a> MessageOpenStruct<'a> {
 impl<'a> Field<'a> {
     pub fn try_new(desc: &'a FieldDescriptorWithContext<'a>) -> Result<Self> {
         Ok(Self {
+            desc,
             rust_name: parse_str(&convert_into_case(desc.name()?, Case::LowerSnakeCase))?,
-            rust_type: Self::gen_type(desc.r#type()?, desc.label()?, desc.is_proto3_optional()?)?,
-            proto_type: desc.r#type()?,
-            rust_field_wrapper: match (desc.label()?, desc.r#type()?, desc.is_proto3_optional()?) {
+            cache: Default::default(),
+        })
+    }
+
+    pub fn rust_type(&self) -> Result<Type> {
+        let body = || {
+            let ty = self.desc.r#type()?;
+            match (self.desc.label()?, self.desc.is_proto3_optional()?) {
+                (Some(FieldLabel::Repeated), _) => Self::gen_repeated_type(ty),
+                (None, false) => Self::gen_scalar_type(ty),
+                _ => Self::gen_optional_type(ty),
+            }
+        };
+        self.cache.rust_type.get_or_try_init(body).cloned()
+    }
+
+    pub fn rust_field_wrapper(&self) -> Result<FieldWrapper> {
+        let body = || {
+            let result = match (
+                self.desc.label()?,
+                self.desc.r#type()?,
+                self.desc.is_proto3_optional()?,
+            ) {
                 (Some(FieldLabel::Repeated), _, _) => FieldWrapper::Vec,
                 (_ /* Not repeated */, FieldType::Message(_), _) => FieldWrapper::OptionalBoxed,
                 (None, _ /* Not message */, false) => FieldWrapper::Bare,
                 _ => FieldWrapper::Optional,
-            },
-        })
-    }
-
-    fn gen_type(
-        ty: FieldType,
-        label: Option<FieldLabel>,
-        is_proto3_optional: bool,
-    ) -> Result<Type> {
-        match (label, is_proto3_optional) {
-            (Some(FieldLabel::Repeated), _) => Self::gen_repeated_type(ty),
-            (None, false) => Self::gen_scalar_type(ty),
-            _ => Self::gen_optional_type(ty),
-        }
+            };
+            Ok(result)
+        };
+        self.cache.rust_field_wrapper.get_or_try_init(body).cloned()
     }
 
     fn gen_scalar_type(ty: FieldType) -> Result<Type> {
@@ -215,7 +230,7 @@ impl<'a> Field<'a> {
 impl ToTokens for Field<'_> {
     fn to_tokens(&self, tokens: &mut TokenStream) {
         let name = &self.rust_name;
-        let ty = &self.rust_type;
+        let ty = &self.rust_type().unwrap();
         tokens.append_all(quote! {
             pub #name: #ty,
         })
