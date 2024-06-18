@@ -15,7 +15,6 @@
 #![feature(allocator_api)]
 #![feature(slice_as_chunks)]
 #![feature(assert_matches)]
-#![feature(lazy_cell)]
 #![feature(once_cell_try)]
 
 pub mod editions;

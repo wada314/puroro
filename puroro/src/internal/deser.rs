@@ -240,7 +240,7 @@ mod test {
         }
     }
     impl<R: Read> DeserMessageHandlerForRead<R> for SampleMessageHandler {
-        fn parse_len(&mut self, num: i32, read: &mut R) -> Result<()> {
+        fn parse_len(&mut self, num: i32, read: &mut R) -> Result<usize> {
             let mut val = String::new();
             let len = read.read_to_string(&mut val)?;
             self.cur.strings.push(Field { num, val });

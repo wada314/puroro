@@ -22,6 +22,7 @@ use ::std::marker::PhantomData;
 /// Note this is not an exclusive implementation for [DeserMessageHandlerForRead].
 /// Anyone can implement this trait for their own type.
 
+#[derive(Default)]
 pub struct Handler<'a, R> {
     _phantom: PhantomData<R>,
     stack: Stack<&'a mut dyn Message>,
@@ -72,6 +73,11 @@ pub trait Message {
 }
 
 pub struct Stack<T>(Vec<T>);
+impl<T> Default for Stack<T> {
+    fn default() -> Self {
+        Self(Vec::new())
+    }
+}
 impl<T> Stack<T> {
     pub fn new() -> Self {
         Self(Vec::new())
