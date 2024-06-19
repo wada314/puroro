@@ -163,12 +163,15 @@ impl<'a> Field<'a> {
 
     pub fn rust_type(&self) -> Result<Type> {
         let body = || {
-            let ty = self.desc.r#type()?;
-            match (self.desc.label()?, self.desc.is_proto3_optional()?) {
-                (Some(FieldLabel::Repeated), _) => Self::gen_repeated_type(ty),
-                (None, false) => Self::gen_scalar_type(ty),
-                _ => Self::gen_optional_type(ty),
-            }
+            let ty = Self::gen_scalar_type(self.desc.r#type()?)?;
+            Ok(match self.rust_field_wrapper()? {
+                FieldWrapper::Bare => ty,
+                FieldWrapper::Optional => parse2(quote! { ::std::option::Option::<#ty> })?,
+                FieldWrapper::OptionalBoxed => {
+                    parse2(quote! { ::std::option::Option::<::std::boxed::Box::<#ty>> })?
+                }
+                FieldWrapper::Vec => parse2(quote! { ::std::vec::Vec::<#ty> })?,
+            })
         };
         self.cache.rust_type.get_or_try_init(body).cloned()
     }
@@ -192,53 +195,24 @@ impl<'a> Field<'a> {
 
     fn gen_scalar_type(ty: FieldType) -> Result<Type> {
         Ok(parse2(match ty {
-            FieldType::Bool => quote! { bool },
             FieldType::Bytes => quote! { ::std::vec::Vec<u8, A> },
-            FieldType::Double => quote! { f64 },
-            FieldType::Enum(e) => {
-                let enum_path = Enum::rust_path_from_enum_path(e.full_path()?)?;
-                quote! { #enum_path }
-            }
-            FieldType::Fixed32 => quote! { u32 },
-            FieldType::Fixed64 => quote! { u64 },
+            FieldType::String => quote! { ::puroro::string::String<A> },
+            FieldType::Bool => quote! { bool },
             FieldType::Float => quote! { f32 },
-            FieldType::Group => todo!(),
-            FieldType::Int32 => quote! { i32 },
-            FieldType::Int64 => quote! { i64 },
+            FieldType::Double => quote! { f64 },
+            FieldType::Int64 | FieldType::SFixed64 | FieldType::SInt64 => quote! { i64 },
+            FieldType::Int32 | FieldType::SFixed32 | FieldType::SInt32 => quote! { i32 },
+            FieldType::UInt32 | FieldType::Fixed32 => quote! { u32 },
+            FieldType::UInt64 | FieldType::Fixed64 => quote! { u64 },
             FieldType::Message(m) => {
-                let struct_path = MessageOpenStruct::rust_path_from_message_path(
+                return Ok(MessageOpenStruct::rust_path_from_message_path(
                     m.full_path()?,
                     &parse_str("A")?,
-                )?;
-                quote! {
-                    ::std::boxed::Box::<#struct_path, A>
-                }
+                )?)
             }
-            FieldType::SFixed32 => quote! { i32 },
-            FieldType::SFixed64 => quote! { i64 },
-            FieldType::SInt32 => quote! { i32 },
-            FieldType::SInt64 => quote! { i64 },
-            FieldType::String => quote! { ::puroro::string::String<A> },
-            FieldType::UInt32 => quote! { u32 },
-            FieldType::UInt64 => quote! { u64 },
+            FieldType::Enum(e) => return Ok(Enum::rust_path_from_enum_path(e.full_path()?)?),
+            FieldType::Group => todo!(),
         })?)
-    }
-
-    fn gen_optional_type(ty: FieldType) -> Result<Type> {
-        let scalar = Self::gen_scalar_type(ty)?;
-        Ok(parse2(quote! {
-            ::std::option::Option::<#scalar>
-        })?)
-    }
-
-    fn gen_repeated_type(ty: FieldType) -> Result<Type> {
-        let scalar_type = match ty {
-            FieldType::Message(m) => {
-                MessageOpenStruct::rust_path_from_message_path(m.full_path()?, &parse_str("A")?)?
-            }
-            _ => Self::gen_scalar_type(ty)?,
-        };
-        Ok(parse2(quote! { ::std::vec::Vec::<#scalar_type, A> })?)
     }
 }
 
