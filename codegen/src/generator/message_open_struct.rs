@@ -106,34 +106,49 @@ impl<'a> MessageOpenStruct<'a> {
             }
         })?)
     }
+
     fn rust_impl_message_lite(&self) -> Result<Item> {
         let name = &self.rust_name;
         Ok(parse2(quote! {
-            impl<#[cfg(allocator)]A: ::std::alloc::Allocator> ::puroro::MessageLite<A> for self::#name<A> {
-                fn merge_from_bufread<R: ::std::io::BufRead>(
-                    &mut self, _bufread: &mut R,
-                ) -> ::puroro::Result<Self> {
-                    use ::puroro::Result;
-                    use ::puroro::internal::deser::{DeserMessageHandlerBase, DeserMessageHandlerForRead}
-                    use ::puroro::variant::Variant;
-                    impl DeserMessageHandlerBase for Self {
-                        fn parse_variant(&mut self, num: i32, var: Variant) -> Result<()>;
-                        fn parse_i32(&mut self, num: i32, val: [u8; 4]) -> Result<()>;
-                        fn parse_i64(&mut self, num: i32, val: [u8; 8]) -> Result<()>;
-                        fn is_message_field(&self, num: i32) -> bool;
-                        fn start_message(&mut self, num: i32) -> Result<()>;
-                        fn end_message(&mut self) -> Result<()>;
+        impl<#[cfg(allocator)]A: ::std::alloc::Allocator> ::puroro::MessageLite<A> for self::#name<A> {
+            fn merge_from_bufread<R: ::std::io::BufRead>(
+                &mut self, _bufread: &mut R,
+            ) -> ::puroro::Result<Self> {
+                use ::puroro::Result;
+                use ::puroro::internal::deser::{DeserMessageHandlerBase, DeserMessageHandlerForRead};
+                use ::puroro::variant::Variant;
+                impl DeserMessageHandlerBase for Self {
+                    fn parse_variant(&mut self, num: i32, var: Variant) -> Result<()> {
+                        todo!()
                     }
-                    impl<R: ::std::io::Read> DeserMessageHandlerForRead<R> for Self {
-                        fn parse_len(&mut self, num: i32, read: &mut R) -> Result<usize>;
+                    fn parse_i32(&mut self, num: i32, val: [u8; 4]) -> Result<()> {
+                        todo!()
                     }
-                    todo!()
+                    fn parse_i64(&mut self, num: i32, val: [u8; 8]) -> Result<()> {
+                        todo!()
+                    }
+                    fn is_message_field(&self, num: i32) -> bool {
+                        todo!()
+                    }
+                    fn start_message(&mut self, num: i32) -> Result<()> {
+                        todo!()
+                    }
+                    fn end_message(&mut self) -> Result<()> {
+                        todo!()
+                    }
                 }
-                fn write<W: ::std::io::Write>(&self, _write: &mut W) -> Result<usize> {
-                    unimplemented!()
+                impl<R: ::std::io::Read> DeserMessageHandlerForRead<R> for Self {
+                    fn parse_len(&mut self, num: i32, read: &mut R) -> Result<usize> {
+                        todo!()
+                    }
                 }
+                todo!()
             }
-        })?)
+            fn write<W: ::std::io::Write>(&self, _write: &mut W) -> Result<usize> {
+                unimplemented!()
+            }
+        }
+                    })?)
     }
 }
 
