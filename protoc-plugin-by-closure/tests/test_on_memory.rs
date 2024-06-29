@@ -13,8 +13,11 @@
 // limitations under the License.
 
 use ::protoc_plugin_by_closure::ProtocOnMemory;
-use ::puroro::google::protobuf::compiler::code_generator_response::File as ResFile;
-use ::puroro::google::protobuf::compiler::{CodeGeneratorRequest, CodeGeneratorResponse};
+use ::puroro::protobuf::google::protobuf::compiler::code_generator_response::File as ResFile;
+use ::puroro::protobuf::google::protobuf::compiler::{CodeGeneratorRequest, CodeGeneratorResponse};
+use ::puroro::{Message, MessageView};
+use ::std::io::Read;
+use ::std::time::Duration;
 
 #[test]
 fn test_on_memory() {
@@ -28,7 +31,7 @@ package empty;
 
     let result_files = ProtocOnMemory::new()
         .add_file(proto_file_name, proto_file_content)
-        .run(|req| {
+        .run(Duration::from_secs(3), |req| {
             Ok(test_call_wrapper_inner(
                 req,
                 out_file_name,
@@ -44,16 +47,19 @@ package empty;
 }
 
 fn test_call_wrapper_inner(
-    req: CodeGeneratorRequest,
+    req_bytes: &[u8],
     out_file_name: &str,
     out_file_content: &str,
-) -> CodeGeneratorResponse<'static> {
-    let input_files = req.proto_file().collect::<Result<Vec<_>, _>>().unwrap();
+) -> Vec<u8> {
+    let req = CodeGeneratorRequest::from_bytes_iter(req_bytes.bytes()).unwrap();
+    let input_files = req.proto_file().into_iter().collect::<Vec<_>>();
     assert_eq!(input_files.len(), 1);
     let mut res = CodeGeneratorResponse::default();
     let mut file = ResFile::default();
-    file.set_name(out_file_name).unwrap();
-    file.set_content(out_file_content).unwrap();
-    res.push_file(file).unwrap();
-    res
+    *file.name_mut() = out_file_name.to_string();
+    *file.content_mut() = out_file_content.to_string();
+    res.file_mut().push(file);
+    let mut res_bytes = Vec::new();
+    res.to_bytes(&mut res_bytes).unwrap();
+    res_bytes
 }

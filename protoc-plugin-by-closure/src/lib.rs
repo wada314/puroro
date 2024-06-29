@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#![doc = include_str!("../README.md")]
+
 use ::ipc_channel::ipc::{IpcBytesReceiver, IpcBytesSender, IpcOneShotServer};
-use ::puroro::google::protobuf::compiler::{CodeGeneratorRequest, CodeGeneratorResponse};
-use ::puroro::message::MessageLite;
 use ::std::env;
 use ::std::path::PathBuf;
 use ::std::process::{Command, ExitStatus};
@@ -26,6 +26,7 @@ use ::wait_timeout::ChildExt;
 
 const PLUGIN_PATH: &'static str = env!("CARGO_BIN_FILE_PROTOC_PLUGIN_BIN");
 
+/// Error type for this crate.
 #[derive(Error, Debug)]
 pub enum ErrorKind {
     #[error("IpcIpcError: {0}")]
@@ -34,8 +35,6 @@ pub enum ErrorKind {
     IpcError(#[from] ::ipc_channel::Error),
     #[error("IoError: {0}")]
     IoError(#[from] ::std::io::Error),
-    #[error("PuroroError: {0}")]
-    PuroroError(#[from] ::puroro::ErrorKind),
     #[error("CallbackError: {0}")]
     CallbackError(String),
     #[error("ProtocTimeoutError")]
@@ -45,8 +44,37 @@ pub enum ErrorKind {
     #[error("FileNameError")]
     FileNameError,
 }
+
+/// Result type for this crate.
 pub type Result<T> = ::std::result::Result<T, ErrorKind>;
 
+/// A convenient wrapper for running protoc command with your own plugin code as a closure.
+///
+/// See the [crate level documentation](crate) for the basic explanation.
+///
+/// # Example
+/// ```no_run
+/// # fn run_protoc() {
+///     use protoc_plugin_by_closure::Protoc;
+///     use std::time::Duration;
+///     Protoc::new()
+///         .proto_file("my_protobuf_file.proto")
+///         .proto_file("my_protobuf_file2.proto")
+///         .proto_path("path/to/my/input_proto_dir/")
+///         .out_dir("path/to/my/output_dir/")
+///         .run(Duration::from_sec(3), |request_bytes| {
+///             // Your plugin logic here, which takes the CodeGeneratorRequest bytes
+///             // and returns the Result of CodeGeneratorResponse bytes.
+/// #           unimplemented!()
+///         })
+///         .unwrap();
+///
+///     // The generated file names depend on your plugin logic and the contents of
+///     // the input proto files, but typically they will be like this:
+///     assert!(std::path::Path("path/to/my/output_dir/my_protobuf_file.rs").exists());
+///     assert!(std::path::Path("path/to/my/output_dir/my_protobuf_file2.rs").exists());
+/// # }
+/// ```
 pub struct Protoc {
     protoc_path: PathBuf,
     out_dir: Option<PathBuf>,
@@ -55,6 +83,7 @@ pub struct Protoc {
 }
 
 impl Protoc {
+    /// Creates a new `Protoc` instance.
     pub fn new() -> Self {
         Self {
             protoc_path: "protoc".into(),
@@ -63,18 +92,22 @@ impl Protoc {
             proto_paths: Vec::new(),
         }
     }
+    /// Sets the path to the `protoc` command. Default is `"protoc"`.
     pub fn protoc_path(mut self, path: impl Into<PathBuf>) -> Self {
         self.protoc_path = path.into();
         self
     }
+    /// Sets the output directory for the generated files. Corresponds to `--rust_out` option of `protoc`.
     pub fn out_dir(mut self, path: impl Into<PathBuf>) -> Self {
         self.out_dir = Some(path.into());
         self
     }
+    /// Sets the path to the input proto file. Corresponds to the unnamed argument of `protoc`.
     pub fn proto_file(mut self, path: impl Into<PathBuf>) -> Self {
         self.proto_files.push(path.into());
         self
     }
+    /// Sets the paths to the input proto files. Corresponds to the unnamed arguments of `protoc`.
     pub fn proto_files<I>(mut self, paths: I) -> Self
     where
         I: IntoIterator,
@@ -83,29 +116,37 @@ impl Protoc {
         self.proto_files.extend(paths.into_iter().map(|p| p.into()));
         self
     }
+    /// Sets the path to the input proto file directory. Corresponds to `--proto_path` option of `protoc`.
     pub fn proto_path(mut self, path: impl Into<PathBuf>) -> Self {
         self.proto_paths.push(path.into());
         self
     }
 
-    pub fn run<F>(self, body: F) -> Result<()>
+    /// Runs the `protoc` command with the given closure as a plugin code.
+    ///
+    /// The `body` param can be any `FnOnce` closure which takes the encoded `CodeGeneratorRequest` bytes
+    /// and returns the `Result` of encoded `CodeGeneratorResponse` bytes.
+    ///
+    /// Set the `timeout` to the maximum duration of the `protoc` command execution.
+    pub fn run<F>(self, timeout: Duration, body: F) -> Result<()>
     where
-        F: FnOnce(CodeGeneratorRequest) -> ::std::result::Result<CodeGeneratorResponse, String>,
+        F: FnOnce(&[u8]) -> ::std::result::Result<Vec<u8>, String>,
     {
         let (ipc_init_server, ipc_init_name) = IpcOneShotServer::new()?;
 
         let mut process = Command::new(&self.protoc_path)
             .args(&[
-                format!("--plugin=protoc-gen-puroro={}", PLUGIN_PATH),
+                // We name our plugin binary name as "rust-ppbc" here.
+                format!("--plugin=protoc-gen-rust-ppbc={}", PLUGIN_PATH),
                 format!(
-                    "--puroro_out={}",
+                    "--rust-ppbc_out={}",
                     self.out_dir
                         .as_ref()
                         .map(|p| p.to_str().ok_or(ErrorKind::FileNameError))
                         .transpose()?
                         .unwrap_or(".")
                 ),
-                format!("--puroro_opt={}", ipc_init_name),
+                format!("--rust-ppbc_opt={}", ipc_init_name),
             ])
             .args(
                 self.proto_paths
@@ -122,19 +163,17 @@ impl Protoc {
             .spawn()?;
 
         {
-            // revieve the ipc channels from the plugin exe.
+            // recieve the ipc channels from the plugin exe.
             let (req_recv, res_send): (IpcBytesReceiver, IpcBytesSender) =
                 ipc_init_server.accept()?.1;
 
-            let req = CodeGeneratorRequest::deser_from_read(req_recv.recv()?.as_slice())?;
-            let res = (body)(req).map_err(|x| ErrorKind::CallbackError(x))?;
+            let req = req_recv.recv()?;
+            let res = (body)(&req).map_err(|x| ErrorKind::CallbackError(x))?;
 
-            let mut res_bytes = Vec::new();
-            res.write(&mut res_bytes)?;
-            res_send.send(&res_bytes)?;
+            res_send.send(&res)?;
         }
 
-        let Some(exit_code) = process.wait_timeout(Duration::from_secs(1))? else {
+        let Some(exit_code) = process.wait_timeout(timeout)? else {
             return Err(ErrorKind::ProtocTimeoutError);
         };
         if !exit_code.success() {
@@ -145,6 +184,46 @@ impl Protoc {
     }
 }
 
+/// A variant of [`Protoc`] which you can run the `protoc` command without touching the actual filesystem.
+///
+/// Instead of using the actual filesystem, you can pass the name-value pairs of
+/// proto files to this struct, and it returns the generated files as name-value pairs.
+///
+/// This is useful when you want to test your plugin code, or when you want to implement your
+/// procedual macro which generates the inlined generated code.
+///
+/// See the [crate level documentation](crate) or [`Protoc`] for the basic explanations.
+///
+/// # Example
+/// ```no_run
+/// # fn run_protoc() {
+///     use protoc_plugin_by_closure::ProtocOnMemory;
+///     use std::time::Duration;
+///     let result_files = Protoc::new()
+///         .add_file("my_protobuf_file.proto", r#"
+/// syntax = "proto3";
+/// package my_package;
+/// message MyMessage {
+///   string name = 1;
+/// }"#)
+///         .add_file("another/path/to/my_protobuf_file2.proto", r#"
+/// syntax = "proto3";
+/// package my_package2;
+/// message MyMessage2 {
+///   string name2 = 2;
+/// }"#)
+///         .run(Duration::from_sec(3), |request_bytes| {
+///             // Your plugin logic here, which takes the CodeGeneratorRequest bytes
+///             // and returns the Result of CodeGeneratorResponse bytes.
+/// #           unimplemented!()
+///         })
+///         .unwrap();
+///
+///     // The generated filenames depend on your plugin logic, but typically they will be like this:
+///     assert!(result_files.iter().any(|(name, _)| name == "my_package.rs"));
+///     assert!(result_files.iter().any(|(name, _)| name == "my_package2.rs"));
+/// # }
+/// ```
 #[cfg(feature = "on-memory")]
 pub struct ProtocOnMemory {
     protoc: Protoc,
@@ -152,20 +231,24 @@ pub struct ProtocOnMemory {
 }
 
 impl ProtocOnMemory {
+    /// Creates a new `ProtocOnMemory` instance.
     pub fn new() -> Self {
         Self {
             protoc: Protoc::new(),
             in_files: Vec::new(),
         }
     }
+    /// Sets the path to the `protoc` command. Default is `"protoc"`.
     pub fn protoc_path(mut self, path: impl Into<PathBuf>) -> Self {
         self.protoc = self.protoc.protoc_path(path);
         self
     }
+    /// Adds a (virtual) input proto file. Corresponds to the `protoc` command's unnamed argument.
     pub fn add_file(mut self, name: &str, content: &str) -> Self {
         self.in_files.push((name.to_string(), content.to_string()));
         self
     }
+    /// Adds (virtual) input proto files. Corresponds to the `protoc` command's unnamed arguments.
     pub fn add_files<I>(mut self, files: I) -> Self
     where
         I: IntoIterator<Item = (String, String)>,
@@ -174,9 +257,15 @@ impl ProtocOnMemory {
         self
     }
 
-    pub fn run<F>(self, func: F) -> Result<Vec<(String, String)>>
+    /// Runs the `protoc` command with the given closure as a plugin code.
+    ///
+    /// The `body` param can be any `FnOnce` closure which takes the encoded `CodeGeneratorRequest` bytes
+    /// and returns the `Result` of encoded `CodeGeneratorResponse` bytes.
+    ///
+    /// Set the `timeout` to the maximum duration of the `protoc` command execution.
+    pub fn run<F>(self, timeout: Duration, func: F) -> Result<Vec<(String, String)>>
     where
-        F: FnOnce(CodeGeneratorRequest) -> ::std::result::Result<CodeGeneratorResponse, String>,
+        F: FnOnce(&[u8]) -> ::std::result::Result<Vec<u8>, String>,
     {
         let proto_dir = TempDir::new()?;
         let out_dir = TempDir::new()?;
@@ -206,7 +295,7 @@ impl ProtocOnMemory {
             .out_dir(&out_dir_path)
             .proto_path(proto_dir.path().to_str().unwrap())
             .proto_files(proto_file_paths)
-            .run(func)?;
+            .run(timeout, func)?;
 
         // read the generated files
         let output_files = ::std::fs::read_dir(out_dir.path())?

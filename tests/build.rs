@@ -15,9 +15,10 @@
 use ::anyhow::Error;
 use ::itertools::Itertools;
 use ::protoc_plugin_by_closure::Protoc;
-use ::puroro_codegen::compile;
+use ::puroro_codegen::compile_binary;
 use ::std::fs;
 use ::std::path::Path;
+use ::std::time::Duration;
 
 fn main() -> Result<(), Error> {
     print!("cargo::rerun-if-changed=tests/protos");
@@ -36,6 +37,8 @@ fn main() -> Result<(), Error> {
         .out_dir("tests/generated")
         .proto_files(file_paths_in_protos_dir)
         .proto_path("tests/protos")
-        .run(|req| compile(&req).map_err(|e| e.to_string()))?;
+        .run(Duration::from_secs(3), |req| {
+            compile_binary(&req).map_err(|e| e.to_string())
+        })?;
     Ok(())
 }
