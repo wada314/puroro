@@ -86,7 +86,7 @@ impl Protoc {
 
     pub fn run<F>(self, timeout: Duration, body: F) -> Result<()>
     where
-        F: FnOnce(&'static [u8]) -> ::std::result::Result<Vec<u8>, String>,
+        F: FnOnce(&[u8]) -> ::std::result::Result<Vec<u8>, String>,
     {
         let (ipc_init_server, ipc_init_name) = IpcOneShotServer::new()?;
 
@@ -123,8 +123,8 @@ impl Protoc {
             let (req_recv, res_send): (IpcBytesReceiver, IpcBytesSender) =
                 ipc_init_server.accept()?.1;
 
-            let req = req_recv.recv()?.as_slice();
-            let res = (body)(req).map_err(|x| ErrorKind::CallbackError(x))?;
+            let req = req_recv.recv()?;
+            let res = (body)(&req).map_err(|x| ErrorKind::CallbackError(x))?;
 
             res_send.send(&res)?;
         }
@@ -171,7 +171,7 @@ impl ProtocOnMemory {
 
     pub fn run<F>(self, timeout: Duration, func: F) -> Result<Vec<(String, String)>>
     where
-        F: FnOnce(&'static [u8]) -> ::std::result::Result<Vec<u8>, String>,
+        F: FnOnce(&[u8]) -> ::std::result::Result<Vec<u8>, String>,
     {
         let proto_dir = TempDir::new()?;
         let out_dir = TempDir::new()?;
