@@ -1,0 +1,13 @@
+[package]
+name = "protoc-plugin-bin"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+anyhow = "1.0.83"
+ipc-channel = "0.18.0"
+puroro = { path = "../puroro" }
+
+[[bin]]
+name = "protoc-plugin-bin"
+path = "src/main.rs"
