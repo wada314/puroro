@@ -14,8 +14,8 @@
 
 use crate::cases::{convert_into_case, Case};
 use crate::descriptor::{DescriptorWithContext, FieldDescriptorWithContext, FieldLabel, FieldType};
+use crate::generator::proto_path_ext::ProtoPathExt as _;
 use crate::generator::r#enum::Enum;
-use crate::proto_path::ProtoPath;
 use crate::Result;
 use ::proc_macro2::TokenStream;
 use ::quote::{format_ident, quote, ToTokens, TokenStreamExt};
@@ -67,27 +67,6 @@ impl<'a> MessageOpenStruct<'a> {
             "{}Struct",
             convert_into_case(name, Case::CamelCase)
         ))
-    }
-
-    pub fn rust_path_from_message_path(
-        path: impl AsRef<ProtoPath>,
-        allocator: &Type,
-    ) -> Result<Type> {
-        let modules = path
-            .as_ref()
-            .parent()
-            .into_iter()
-            .flat_map(|p| p.components())
-            .map(|name| Ok(parse_str(&convert_into_case(name, Case::LowerSnakeCase))?))
-            .collect::<Result<Vec<Ident>>>()?;
-        let struct_name = Self::rust_name_from_message_name(
-            path.as_ref()
-                .last_component()
-                .ok_or_else(|| format!("Invalid message path: {:?}", path.as_ref()))?,
-        )?;
-        Ok(parse2(quote! {
-            crate #(:: #modules)* :: #struct_name :: <#allocator>
-        })?)
     }
 
     pub fn rust_items(&self) -> Result<Vec<Item>> {
@@ -205,10 +184,9 @@ impl<'a> Field<'a> {
             FieldType::UInt32 | FieldType::Fixed32 => quote! { u32 },
             FieldType::UInt64 | FieldType::Fixed64 => quote! { u64 },
             FieldType::Message(m) => {
-                return Ok(MessageOpenStruct::rust_path_from_message_path(
-                    m.full_path()?,
-                    &parse_str("A")?,
-                )?)
+                return Ok(m
+                    .full_path()?
+                    .into_rust_message_open_struct_path(&parse_str("A")?)?)
             }
             FieldType::Enum(e) => return Ok(Enum::rust_path_from_enum_path(e.full_path()?)?),
             FieldType::Group => todo!(),

@@ -14,6 +14,7 @@
 
 pub mod r#enum;
 pub mod message_open_struct;
+mod proto_path_ext;
 
 use self::message_open_struct::MessageOpenStruct;
 use crate::descriptor::{FileDescriptor, RootContext};
