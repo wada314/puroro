@@ -119,7 +119,7 @@ impl Protoc {
             .spawn()?;
 
         {
-            // revieve the ipc channels from the plugin exe.
+            // recieve the ipc channels from the plugin exe.
             let (req_recv, res_send): (IpcBytesReceiver, IpcBytesSender) =
                 ipc_init_server.accept()?.1;
 
