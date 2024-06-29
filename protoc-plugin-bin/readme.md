@@ -2,4 +2,4 @@
 
 **!!!THIS PACKAGE IS NOT FOR MANUAL USE!!!**
 
-WIP
+Please see `protoc-plugin-by-closure` crate document.
