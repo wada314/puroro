@@ -15,7 +15,8 @@
 #![feature(proc_macro_span)]
 
 use ::litrs::StringLit;
-use ::proc_macro::{LineColumn, Span, TokenStream};
+use ::proc_macro::TokenStream as TokenStream1;
+use ::proc_macro2::{LineColumn, Span, TokenStream};
 use ::protoc_bin_vendored::protoc_bin_path;
 use ::puroro_codegen::puroro::Message;
 use ::puroro_codegen::{
@@ -31,7 +32,7 @@ use ::tempdir::TempDir;
 // https://github.com/protocolbuffers/protobuf/issues/4163
 
 #[proc_macro]
-pub fn puroro_inline(input: TokenStream) -> TokenStream {
+pub fn puroro_inline(input: TokenStream1) -> TokenStream1 {
     let mut input_iter = input.into_iter();
     let Some(token) = input_iter.next() else {
         panic!("No token inside the puroro inline macro.");
@@ -45,12 +46,12 @@ pub fn puroro_inline(input: TokenStream) -> TokenStream {
         Err(e) => return e.to_compile_error(),
     };
 
-    gen_code(string_lit.value())
+    gen_code(string_lit.value()).into()
 }
 
 #[proc_macro]
-pub fn puroro_inline2(input: TokenStream) -> TokenStream {
-    gen_code(&input.to_string())
+pub fn puroro_inline2(input: TokenStream1) -> TokenStream1 {
+    gen_code(&input.to_string()).into()
 }
 
 fn gen_code(input_str: &str) -> TokenStream {

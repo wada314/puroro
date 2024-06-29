@@ -12,10 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#![allow(incomplete_features)]
 #![feature(error_generic_member_access)]
-#![feature(provide_any)]
-#![feature(is_some_and)]
 #![feature(result_flattening)]
 #![feature(try_find)]
 #![feature(trait_upcasting)]

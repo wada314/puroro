@@ -5,13 +5,18 @@ members = [
     "inline",
     "update-puroro-doc-samples",
     "update-puroro-protobuf",
+    "protoc-plugin-by-closure",
+    "protoc-plugin-bin",
     "tests",
 ]
 default-members = [
     "puroro",
     "codegen",
     "inline",
-#    "update-puroro-doc-samples",
-#    "update-puroro-protobuf",
+    #    "update-puroro-doc-samples",
+    #    "update-puroro-protobuf",
+    "protoc-plugin-by-closure",
+    "protoc-plugin-bin",
     "tests",
 ]
+resolver = "2"
