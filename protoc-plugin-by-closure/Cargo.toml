@@ -2,6 +2,8 @@
 name = "protoc-plugin-by-closure"
 version = "0.1.0"
 edition = "2021"
+description = "Use Google Protocol Buffer compiler (`protoc`) with your closure code."
+license = "Apache-2.0"
 
 [dependencies]
 ipc-channel = "0.18.0"
