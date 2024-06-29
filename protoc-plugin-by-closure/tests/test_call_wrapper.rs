@@ -16,6 +16,7 @@ use ::protoc_plugin_by_closure::Protoc;
 use ::puroro::google::protobuf::compiler::code_generator_response::File as ResFile;
 use ::puroro::google::protobuf::compiler::{CodeGeneratorRequest, CodeGeneratorResponse};
 use ::std::io::Write;
+use ::std::time::Duration;
 use ::tempfile::{tempdir, NamedTempFile};
 
 #[test]
@@ -54,10 +55,10 @@ package empty;
 }
 
 fn test_call_wrapper_inner(
-    req: CodeGeneratorRequest,
+    req: &'static [u8],
     out_file_name: &str,
     out_file_content: &str,
-) -> CodeGeneratorResponse<'static> {
+) -> Vec<u8> {
     let input_files = req.proto_file().collect::<Result<Vec<_>, _>>().unwrap();
     assert_eq!(input_files.len(), 1);
     let mut res = CodeGeneratorResponse::default();

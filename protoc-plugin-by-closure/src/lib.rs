@@ -13,8 +13,6 @@
 // limitations under the License.
 
 use ::ipc_channel::ipc::{IpcBytesReceiver, IpcBytesSender, IpcOneShotServer};
-use ::puroro::google::protobuf::compiler::{CodeGeneratorRequest, CodeGeneratorResponse};
-use ::puroro::message::MessageLite;
 use ::std::env;
 use ::std::path::PathBuf;
 use ::std::process::{Command, ExitStatus};
@@ -34,8 +32,6 @@ pub enum ErrorKind {
     IpcError(#[from] ::ipc_channel::Error),
     #[error("IoError: {0}")]
     IoError(#[from] ::std::io::Error),
-    #[error("PuroroError: {0}")]
-    PuroroError(#[from] ::puroro::ErrorKind),
     #[error("CallbackError: {0}")]
     CallbackError(String),
     #[error("ProtocTimeoutError")]
@@ -88,24 +84,25 @@ impl Protoc {
         self
     }
 
-    pub fn run<F>(self, body: F) -> Result<()>
+    pub fn run<F>(self, timeout: Duration, body: F) -> Result<()>
     where
-        F: FnOnce(CodeGeneratorRequest) -> ::std::result::Result<CodeGeneratorResponse, String>,
+        F: FnOnce(&'static [u8]) -> ::std::result::Result<Vec<u8>, String>,
     {
         let (ipc_init_server, ipc_init_name) = IpcOneShotServer::new()?;
 
         let mut process = Command::new(&self.protoc_path)
             .args(&[
-                format!("--plugin=protoc-gen-puroro={}", PLUGIN_PATH),
+                // We name our plugin binary name as "rust-ppbc" here.
+                format!("--plugin=protoc-gen-rust-ppbc={}", PLUGIN_PATH),
                 format!(
-                    "--puroro_out={}",
+                    "--rust-ppbc_out={}",
                     self.out_dir
                         .as_ref()
                         .map(|p| p.to_str().ok_or(ErrorKind::FileNameError))
                         .transpose()?
                         .unwrap_or(".")
                 ),
-                format!("--puroro_opt={}", ipc_init_name),
+                format!("--rust-ppbc_opt={}", ipc_init_name),
             ])
             .args(
                 self.proto_paths
@@ -126,15 +123,13 @@ impl Protoc {
             let (req_recv, res_send): (IpcBytesReceiver, IpcBytesSender) =
                 ipc_init_server.accept()?.1;
 
-            let req = CodeGeneratorRequest::deser_from_read(req_recv.recv()?.as_slice())?;
+            let req = req_recv.recv()?.as_slice();
             let res = (body)(req).map_err(|x| ErrorKind::CallbackError(x))?;
 
-            let mut res_bytes = Vec::new();
-            res.write(&mut res_bytes)?;
-            res_send.send(&res_bytes)?;
+            res_send.send(&res)?;
         }
 
-        let Some(exit_code) = process.wait_timeout(Duration::from_secs(1))? else {
+        let Some(exit_code) = process.wait_timeout(timeout)? else {
             return Err(ErrorKind::ProtocTimeoutError);
         };
         if !exit_code.success() {
@@ -174,9 +169,9 @@ impl ProtocOnMemory {
         self
     }
 
-    pub fn run<F>(self, func: F) -> Result<Vec<(String, String)>>
+    pub fn run<F>(self, timeout: Duration, func: F) -> Result<Vec<(String, String)>>
     where
-        F: FnOnce(CodeGeneratorRequest) -> ::std::result::Result<CodeGeneratorResponse, String>,
+        F: FnOnce(&'static [u8]) -> ::std::result::Result<Vec<u8>, String>,
     {
         let proto_dir = TempDir::new()?;
         let out_dir = TempDir::new()?;
@@ -206,7 +201,7 @@ impl ProtocOnMemory {
             .out_dir(&out_dir_path)
             .proto_path(proto_dir.path().to_str().unwrap())
             .proto_files(proto_file_paths)
-            .run(func)?;
+            .run(timeout, func)?;
 
         // read the generated files
         let output_files = ::std::fs::read_dir(out_dir.path())?

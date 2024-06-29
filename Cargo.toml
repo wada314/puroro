@@ -19,3 +19,4 @@ default-members = [
     "protoc-plugin-bin",
     "tests",
 ]
+resolver = "2"
