@@ -13,9 +13,11 @@
 // limitations under the License.
 
 use ::protoc_plugin_by_closure::Protoc;
-use ::puroro::google::protobuf::compiler::code_generator_response::File as ResFile;
-use ::puroro::google::protobuf::compiler::{CodeGeneratorRequest, CodeGeneratorResponse};
-use ::std::io::Write;
+use ::puroro::protobuf::google::protobuf::compiler::{
+    code_generator_response::File as ResFile, CodeGeneratorRequest, CodeGeneratorResponse,
+};
+use ::puroro::{Message, MessageView};
+use ::std::io::{Read, Write};
 use ::std::time::Duration;
 use ::tempfile::{tempdir, NamedTempFile};
 
@@ -41,7 +43,7 @@ package empty;
         .out_dir(out_dir.path().to_str().unwrap())
         .proto_file(proto_file.path().to_str().unwrap())
         .proto_path(proto_dir.path().to_str().unwrap())
-        .run(|req| {
+        .run(Duration::from_secs(3), |req| {
             Ok(test_call_wrapper_inner(
                 req,
                 out_file_name,
@@ -55,16 +57,19 @@ package empty;
 }
 
 fn test_call_wrapper_inner(
-    req: &'static [u8],
+    req_bytes: &[u8],
     out_file_name: &str,
     out_file_content: &str,
 ) -> Vec<u8> {
-    let input_files = req.proto_file().collect::<Result<Vec<_>, _>>().unwrap();
+    let req = CodeGeneratorRequest::from_bytes_iter(req_bytes.bytes()).unwrap();
+    let input_files = req.proto_file().into_iter().collect::<Vec<_>>();
     assert_eq!(input_files.len(), 1);
     let mut res = CodeGeneratorResponse::default();
     let mut file = ResFile::default();
-    file.set_name(out_file_name).unwrap();
-    file.set_content(out_file_content).unwrap();
-    res.push_file(file).unwrap();
-    res
+    *file.name_mut() = out_file_name.to_string();
+    *file.content_mut() = out_file_content.to_string();
+    res.file_mut().push(file);
+    let mut res_bytes = Vec::new();
+    res.to_bytes(&mut res_bytes).unwrap();
+    res_bytes
 }
