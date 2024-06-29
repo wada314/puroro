@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use ::protoc_plugin_by_closure::ProtocOnMemory;
 use ::puroro::google::protobuf::compiler::code_generator_response::File as ResFile;
 use ::puroro::google::protobuf::compiler::{CodeGeneratorRequest, CodeGeneratorResponse};
-use ::puroro_protoc_wrapper::ProtocOnMemory;
 
 #[test]
 fn test_on_memory() {

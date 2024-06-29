@@ -1,12 +1,12 @@
 [package]
-name = "puroro-protoc-wrapper"
+name = "protoc-plugin-by-closure"
 version = "0.1.0"
 edition = "2021"
 
 [dependencies]
 ipc-channel = "0.18.0"
 thiserror = "1.0.60"
-puroro-plugin = { path = "../plugin", artifact = "bin:puroro-plugin" }
+protoc-plugin-bin = { path = "../protoc-plugin-bin", artifact = "bin:protoc-plugin-bin" }
 puroro = { path = "../puroro" }
 wait-timeout = "0.2.0"
 tempfile = { version = "3.10.1", optional = true }

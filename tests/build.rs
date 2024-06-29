@@ -14,8 +14,8 @@
 
 use ::anyhow::Error;
 use ::itertools::Itertools;
+use ::protoc_plugin_by_closure::Protoc;
 use ::puroro_codegen::compile;
-use ::puroro_protoc_wrapper::Protoc;
 use ::std::fs;
 use ::std::path::Path;
 

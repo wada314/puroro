@@ -1,5 +1,5 @@
 [package]
-name = "puroro-plugin"
+name = "protoc-plugin-bin"
 version = "0.1.0"
 edition = "2021"
 
@@ -9,5 +9,5 @@ ipc-channel = "0.18.0"
 puroro = { path = "../puroro" }
 
 [[bin]]
-name = "puroro-plugin"
+name = "protoc-plugin-bin"
 path = "src/main.rs"

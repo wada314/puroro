@@ -24,7 +24,7 @@ use ::tempfile::TempDir;
 use ::thiserror::Error;
 use ::wait_timeout::ChildExt;
 
-const PLUGIN_PATH: &'static str = env!("CARGO_BIN_FILE_PURORO_PLUGIN");
+const PLUGIN_PATH: &'static str = env!("CARGO_BIN_FILE_PROTOC_PLUGIN_BIN");
 
 #[derive(Error, Debug)]
 pub enum ErrorKind {
