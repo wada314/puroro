@@ -1,9 +1,12 @@
 [package]
 name = "protoc-plugin-by-closure"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2021"
 description = "Use Google Protocol Buffer compiler (`protoc`) with your closure code."
 license = "Apache-2.0"
+
+[lib]
+doctest = false
 
 [dependencies]
 ipc-channel = "0.18.0"
@@ -19,6 +22,3 @@ puroro = "0.14.0"
 [features]
 default = ["on-memory"]
 on-memory = ["tempfile"]
-
-[lib]
-doctest = false
