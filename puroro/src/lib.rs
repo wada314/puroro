@@ -47,6 +47,8 @@ pub enum ErrorKind {
     UnknownWireType,
     #[error("Unexpected EOF detected while deserializing")]
     DeserUnexpectedEof,
+    #[error("The field type and wire type are not matching")]
+    UnmatchingWireAndFieldType,
     #[error("Error when matching the GenericMessage type's field type.")]
     GenericMessageFieldTypeError,
     #[error("Error when converting an int32 to an (closed) enum value: {0}")]

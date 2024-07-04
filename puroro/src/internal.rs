@@ -13,6 +13,7 @@
 // limitations under the License.
 
 pub mod deser;
+pub mod open_struct_types;
 
 use crate::{ErrorKind, Result};
 
@@ -40,3 +41,6 @@ impl From<WireType> for u32 {
         value as u32
     }
 }
+
+pub trait Any {}
+impl<T> Any for T {}
