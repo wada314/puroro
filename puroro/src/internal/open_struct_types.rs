@@ -26,11 +26,31 @@ pub trait OpenStructFieldType<FT: FieldType> {
 }
 
 impl OpenStructFieldType<ft::Int32> for i32 {
+    #[inline]
     fn get(&self) -> impl Any {
         *self
     }
+    #[inline]
     fn deser_parse_variant(&mut self, var: Variant) -> Result<()> {
         *self = vt::Int32::try_from_variant(var)?;
+        Ok(())
+    }
+}
+
+impl<E> OpenStructFieldType<ft::Enum> for E
+where
+    E: Clone + TryFrom<i32>,
+    i32: From<E>,
+    crate::ErrorKind: From<<E as TryFrom<i32>>::Error>,
+{
+    #[inline]
+    fn get(&self) -> impl Any {
+        self.clone()
+    }
+    // TODO: Open / closed enums?
+    #[inline]
+    fn deser_parse_variant(&mut self, var: Variant) -> Result<()> {
+        *self = vt::Int32::try_from_variant(var)?.try_into()?;
         Ok(())
     }
 }
