@@ -18,7 +18,9 @@ use crate::internal::deser::{
 };
 use crate::internal::WireType;
 use crate::message::MessageLite;
-use crate::variant::{ReadExtVariant, UInt32, Variant, VariantIntegerType, WriteExtVariant};
+use crate::variant::{
+    variant_types::UInt32, ReadExtVariant, Variant, VariantIntegerType, WriteExtVariant,
+};
 use crate::{ErrorKind, Result};
 use ::itertools::Either;
 use ::once_cell::unsync::Lazy;

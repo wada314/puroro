@@ -15,7 +15,7 @@
 pub mod compiler;
 
 use crate::untyped_message::UntypedMessage;
-use crate::variant::{Bool, Int32};
+use crate::variant::variant_types::{Bool, Int32};
 use crate::{ErrorKind, Result};
 use ::derive_more::{Deref as DDeref, DerefMut as DDerefMut, From as DFrom, Into as DInto};
 

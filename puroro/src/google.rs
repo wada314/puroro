@@ -15,7 +15,7 @@
 pub mod protobuf;
 
 use crate::untyped_message::UntypedMessage;
-use crate::variant::{Int32, VariantIntegerType};
+use crate::variant::{variant_types::Int32, VariantIntegerType};
 use crate::{ErrorKind, Result};
 use ::itertools::Itertools;
 

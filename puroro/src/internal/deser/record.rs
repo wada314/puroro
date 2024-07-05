@@ -13,7 +13,8 @@
 // limitations under the License.
 
 use crate::internal::WireType;
-use crate::variant::{Int32, Variant, VariantIntegerType};
+use crate::variant::variant_types::Int32;
+use crate::variant::{Variant, VariantIntegerType};
 use crate::{ErrorKind, Result};
 use ::std::io::{Read, Take};
 

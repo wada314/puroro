@@ -16,7 +16,8 @@ pub mod handler_impl;
 pub mod record;
 
 use crate::internal::WireType;
-use crate::variant::{Int32, Variant, VariantIntegerType};
+use crate::variant::variant_types::Int32;
+use crate::variant::{Variant, VariantIntegerType};
 use crate::Result;
 use ::std::io::{BufRead, Read};
 

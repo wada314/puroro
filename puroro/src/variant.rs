@@ -25,15 +25,19 @@ pub trait VariantIntegerType {
     fn try_into_variant(x: Self::RustType) -> Result<Variant>;
 }
 
-pub type Int32 = i32;
-pub type Int64 = i64;
-pub type UInt32 = u32;
-pub type UInt64 = u64;
-pub type Bool = bool;
-pub struct SInt32;
-pub struct SInt64;
+pub mod variant_types {
+    pub type Int32 = i32;
+    pub type Int64 = i64;
+    pub type UInt32 = u32;
+    pub type UInt64 = u64;
+    pub type Bool = bool;
+    pub struct SInt32;
+    pub struct SInt64;
+    pub struct Enum;
+}
+use variant_types as vt;
 
-impl VariantIntegerType for Int32 {
+impl VariantIntegerType for vt::Int32 {
     type RustType = i32;
     #[inline]
     fn try_from_variant(var: Variant) -> Result<Self::RustType> {
@@ -44,7 +48,7 @@ impl VariantIntegerType for Int32 {
         i64::try_into_variant(x.into())
     }
 }
-impl VariantIntegerType for Int64 {
+impl VariantIntegerType for vt::Int64 {
     type RustType = i64;
     #[inline]
     fn try_from_variant(var: Variant) -> Result<Self::RustType> {
@@ -55,7 +59,7 @@ impl VariantIntegerType for Int64 {
         Ok(Variant(x.to_le_bytes()))
     }
 }
-impl VariantIntegerType for UInt32 {
+impl VariantIntegerType for vt::UInt32 {
     type RustType = u32;
     #[inline]
     fn try_from_variant(var: Variant) -> Result<Self::RustType> {
@@ -66,7 +70,7 @@ impl VariantIntegerType for UInt32 {
         u64::try_into_variant(x as u64)
     }
 }
-impl VariantIntegerType for UInt64 {
+impl VariantIntegerType for vt::UInt64 {
     type RustType = u64;
     #[inline]
     fn try_from_variant(var: Variant) -> Result<Self::RustType> {
@@ -77,7 +81,7 @@ impl VariantIntegerType for UInt64 {
         Ok(Variant(x.to_le_bytes()))
     }
 }
-impl VariantIntegerType for Bool {
+impl VariantIntegerType for vt::Bool {
     type RustType = bool;
     #[inline]
     fn try_from_variant(var: Variant) -> Result<Self::RustType> {
@@ -92,18 +96,18 @@ impl VariantIntegerType for Bool {
         u64::try_into_variant(x as u64)
     }
 }
-impl VariantIntegerType for SInt32 {
+impl VariantIntegerType for vt::SInt32 {
     type RustType = i32;
     #[inline]
     fn try_from_variant(var: Variant) -> Result<Self::RustType> {
-        Ok(SInt64::try_from_variant(var)?.try_into()?)
+        Ok(vt::SInt64::try_from_variant(var)?.try_into()?)
     }
     #[inline]
     fn try_into_variant(x: Self::RustType) -> Result<Variant> {
-        Ok(SInt64::try_into_variant(x as i64)?)
+        Ok(vt::SInt64::try_into_variant(x as i64)?)
     }
 }
-impl VariantIntegerType for SInt64 {
+impl VariantIntegerType for vt::SInt64 {
     type RustType = i64;
     #[inline]
     fn try_from_variant(var: Variant) -> Result<Self::RustType> {

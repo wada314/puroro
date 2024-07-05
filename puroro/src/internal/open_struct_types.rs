@@ -13,31 +13,24 @@
 // limitations under the License.
 
 use super::Any;
-use crate::google::protobuf::field_descriptor_proto::Type as FieldType;
-use crate::variant::{Int32, SInt32, Variant, VariantIntegerType as _};
+use crate::internal::types::{field_types as ft, FieldType};
+use crate::variant::variant_types as vt;
+use crate::variant::{Variant, VariantIntegerType as _};
 use crate::{ErrorKind, Result};
 
-pub trait OpenStructFieldType {
+pub trait OpenStructFieldType<FT: FieldType> {
     fn get(&self) -> impl Any;
-    fn deser_parse_variant(&mut self, _var: Variant, _field_type: FieldType) -> Result<()> {
+    fn deser_parse_variant(&mut self, _var: Variant) -> Result<()> {
         Err(ErrorKind::UnmatchingWireAndFieldType)?
     }
 }
 
-impl OpenStructFieldType for i32 {
+impl OpenStructFieldType<ft::Int32> for i32 {
     fn get(&self) -> impl Any {
         *self
     }
-    fn deser_parse_variant(&mut self, var: Variant, field_type: FieldType) -> Result<()> {
-        match field_type {
-            FieldType::TypeInt32 => {
-                *self = Int32::try_from_variant(var)?;
-            }
-            FieldType::TypeSInt32 => {
-                *self = SInt32::try_from_variant(var)?;
-            }
-            _ => Err(ErrorKind::PuroroError(format!("bad field_type given")))?,
-        }
+    fn deser_parse_variant(&mut self, var: Variant) -> Result<()> {
+        *self = vt::Int32::try_from_variant(var)?;
         Ok(())
     }
 }
