@@ -97,7 +97,7 @@ pub trait DeserMessageHandlerBase {
     fn end_message(&mut self) -> Result<()>;
 }
 
-pub trait DeserMessageHandlerForRead<R>: DeserMessageHandlerBase {
+pub trait DeserMessageHandlerForRead<R: Read>: DeserMessageHandlerBase {
     fn parse_len(&mut self, num: i32, val: &mut R) -> Result<usize>;
 }
 

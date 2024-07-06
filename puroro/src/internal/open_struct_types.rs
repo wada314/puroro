@@ -12,22 +12,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#![allow(refining_impl_trait)]
+
 use super::Any;
 use crate::internal::types::{field_types as ft, FieldType};
+use crate::string::{StrExt as _, String as PString};
 use crate::variant::variant_types as vt;
 use crate::variant::{Variant, VariantIntegerType as _};
 use crate::{ErrorKind, Result};
+use ::std::alloc::Allocator;
+use ::std::io::Read;
 
 pub trait OpenStructFieldType<FT: FieldType> {
     fn get(&self) -> impl Any;
     fn deser_parse_variant(&mut self, _var: Variant) -> Result<()> {
         Err(ErrorKind::UnmatchingWireAndFieldType)?
     }
+    fn deser_parse_len<R: Read>(&mut self, _read: &mut R) -> Result<usize> {
+        Err(ErrorKind::UnmatchingWireAndFieldType)?
+    }
 }
 
 impl OpenStructFieldType<ft::Int32> for i32 {
     #[inline]
-    fn get(&self) -> impl Any {
+    fn get(&self) -> i32 {
         *self
     }
     #[inline]
@@ -44,12 +52,35 @@ where
     crate::ErrorKind: From<<E as TryFrom<i32>>::Error>,
 {
     #[inline]
-    fn get(&self) -> impl Any {
+    fn get(&self) -> E {
         self.clone()
     }
     #[inline]
     fn deser_parse_variant(&mut self, var: Variant) -> Result<()> {
         *self = vt::Int32::try_from_variant(var)?.try_into()?;
         Ok(())
+    }
+}
+
+impl<A: Allocator> OpenStructFieldType<ft::String> for PString<A> {
+    #[inline]
+    fn get(&self) -> &str {
+        self.as_ref()
+    }
+    #[inline]
+    fn deser_parse_len<R: Read>(&mut self, read: &mut R) -> Result<usize> {
+        // Inefficient but easy implementation
+        let mut std_str = String::new();
+        let len = read.read_to_string(&mut std_str)?;
+        self.clear();
+        self.push_str(&std_str);
+        Ok(len)
+    }
+}
+
+impl<M, A: Allocator> OpenStructFieldType<ft::Message> for Option<Box<M, A>> {
+    #[inline]
+    fn get(&self) -> Option<&M> {
+        self.as_deref()
     }
 }

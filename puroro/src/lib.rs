@@ -29,6 +29,8 @@ use ::thiserror::Error;
 
 #[derive(Error, Debug)]
 pub enum ErrorKind {
+    #[error("infallible error")]
+    Infallible(#[from] ::std::convert::Infallible),
     #[error("io error: {0}")]
     IoError(#[from] ::std::io::Error),
     #[error("std::num::TryFromIntError: {0}")]

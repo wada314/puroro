@@ -30,6 +30,15 @@ impl<A: Allocator> String<A> {
             vec: Vec::new_in(alloc),
         }
     }
+    pub fn allocator(&self) -> &A {
+        self.vec.allocator()
+    }
+    pub fn clear(&mut self) {
+        self.vec.clear();
+    }
+    pub fn push_str(&mut self, s: &str) {
+        self.vec.extend_from_slice(s.as_bytes());
+    }
 }
 impl String<Global> {
     pub fn new() -> Self {
@@ -94,5 +103,16 @@ impl From<::std::string::String> for String<Global> {
 impl From<String<Global>> for ::std::string::String {
     fn from(s: String<Global>) -> Self {
         unsafe { ::std::string::String::from_utf8_unchecked(s.vec) }
+    }
+}
+
+pub trait StrExt {
+    fn to_string_in<A: Allocator>(&self, alloc: A) -> String<A>;
+}
+
+impl StrExt for str {
+    fn to_string_in<A: Allocator>(&self, alloc: A) -> String<A> {
+        let vec = self.as_bytes().to_vec_in(alloc);
+        String { vec }
     }
 }
