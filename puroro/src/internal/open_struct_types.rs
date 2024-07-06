@@ -47,7 +47,6 @@ where
     fn get(&self) -> impl Any {
         self.clone()
     }
-    // TODO: Open / closed enums?
     #[inline]
     fn deser_parse_variant(&mut self, var: Variant) -> Result<()> {
         *self = vt::Int32::try_from_variant(var)?.try_into()?;
