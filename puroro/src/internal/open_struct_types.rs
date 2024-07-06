@@ -83,4 +83,8 @@ impl<M, A: Allocator> OpenStructFieldType<ft::Message> for Option<Box<M, A>> {
     fn get(&self) -> Option<&M> {
         self.as_deref()
     }
+    #[inline]
+    fn deser_parse_len<R: Read>(&mut self, _read: &mut R) -> Result<usize> {
+        todo!()
+    }
 }
