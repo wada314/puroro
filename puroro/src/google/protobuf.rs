@@ -188,8 +188,8 @@ pub mod field_descriptor_proto {
     pub enum Label {
         #[default]
         LabelOptional = 1,
-        LabelRepeated = 2,
-        LabelRequired = 3,
+        LabelRepeated = 3,
+        LabelRequired = 2,
     }
 
     impl TryFrom<i32> for Type {
@@ -224,8 +224,8 @@ pub mod field_descriptor_proto {
         fn try_from(value: i32) -> Result<Self> {
             match value {
                 1 => Ok(Self::LabelOptional),
-                2 => Ok(Self::LabelRepeated),
-                3 => Ok(Self::LabelRequired),
+                3 => Ok(Self::LabelRepeated),
+                2 => Ok(Self::LabelRequired),
                 _ => Err(ErrorKind::TryFromIntIntoEnumError(value)),
             }
         }

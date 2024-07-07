@@ -117,14 +117,13 @@ impl FieldWrapper {
     fn try_from_field_desc(desc: &FieldDescriptorWithContext) -> Result<Self> {
         Ok(match desc.label()? {
             Some(FieldLabel::Repeated) => FieldWrapper::Vec,
-            Some(FieldLabel::Optional) => {
+            Some(FieldLabel::Optional | FieldLabel::Required) => {
                 if desc.type_case() == FieldTypeCase::Message {
                     FieldWrapper::OptionalBoxed
                 } else {
                     FieldWrapper::Optional
                 }
             }
-            Some(FieldLabel::Required) => FieldWrapper::Bare,
             None => {
                 if desc.type_case() == FieldTypeCase::Message {
                     FieldWrapper::OptionalBoxed
