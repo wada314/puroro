@@ -13,7 +13,10 @@
 // limitations under the License.
 
 use crate::cases::{convert_into_case, Case};
-use crate::descriptor::{DescriptorWithContext, FieldDescriptorWithContext, FieldLabel, FieldType};
+use crate::descriptor::{
+    DescriptorWithContext, EnumDescriptorWithContext, FieldDescriptorWithContext, FieldLabel,
+    FieldType,
+};
 use crate::generator::proto_path_ext::ProtoPathExt as _;
 use crate::generator::r#enum::Enum;
 use crate::Result;
@@ -168,7 +171,9 @@ impl<'a> Field<'a> {
         self.cache.rust_field_wrapper.get_or_try_init(body).cloned()
     }
 
-    fn gen_scalar_type(ty: FieldType) -> Result<Type> {
+    fn gen_scalar_type(
+        ty: FieldType<&'a DescriptorWithContext<'a>, &'a EnumDescriptorWithContext<'a>>,
+    ) -> Result<Type> {
         Ok(parse2(match ty {
             FieldType::Bytes => quote! { ::std::vec::Vec<u8, A> },
             FieldType::String => quote! { ::puroro::string::String<A> },

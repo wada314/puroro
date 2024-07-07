@@ -58,11 +58,11 @@ impl TryFrom<EditionProto> for Edition {
 // region: FieldType
 
 #[derive(Clone, Default)]
-pub enum FieldType<'a> {
+pub enum FieldType<M, E> {
     Bool,
     Bytes,
     Double,
-    Enum(&'a EnumDescriptorWithContext<'a>),
+    Enum(E),
     Fixed32,
     Fixed64,
     Float,
@@ -70,7 +70,7 @@ pub enum FieldType<'a> {
     #[default]
     Int32,
     Int64,
-    Message(&'a DescriptorWithContext<'a>),
+    Message(M),
     SFixed32,
     SFixed64,
     SInt32,
@@ -81,30 +81,20 @@ pub enum FieldType<'a> {
 }
 // We need a special implementation for Debug to avoid infinite recursion like:
 // field -> message -> field -> message -> ...
-impl Debug for FieldType<'_> {
+impl<M, E> Debug for FieldType<M, E> {
     fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::Bool => write!(f, "Bool"),
             Self::Bytes => write!(f, "Bytes"),
             Self::Double => write!(f, "Double"),
-            Self::Enum(arg0) => {
-                let full_path = &arg0
-                    .full_path()
-                    .unwrap_or_else(|_| ProtoPath::new("<error>"));
-                f.debug_tuple("Enum").field(full_path).finish()
-            }
+            Self::Enum(_) => write!(f, "Enum"),
             Self::Fixed32 => write!(f, "Fixed32"),
             Self::Fixed64 => write!(f, "Fixed64"),
             Self::Float => write!(f, "Float"),
             Self::Group => write!(f, "Group"),
             Self::Int32 => write!(f, "Int32"),
             Self::Int64 => write!(f, "Int64"),
-            Self::Message(arg0) => {
-                let full_path = &arg0
-                    .full_path()
-                    .unwrap_or_else(|_| ProtoPath::new("<error>"));
-                f.debug_tuple("Message").field(full_path).finish()
-            }
+            Self::Message(_) => write!(f, "Message"),
             Self::SFixed32 => write!(f, "SFixed32"),
             Self::SFixed64 => write!(f, "SFixed64"),
             Self::SInt32 => write!(f, "SInt32"),
@@ -164,15 +154,15 @@ impl From<FieldTypeProto> for FieldTypeCase {
 }
 
 impl FieldTypeCase {
-    pub fn with_type_ref<'a, F, G>(
+    pub fn with_type_ref<'a, F, G, M, E>(
         self,
         type_name: Option<&str>,
         msg_case: F,
         enum_case: G,
-    ) -> Result<FieldType<'a>>
+    ) -> Result<FieldType<M, E>>
     where
-        F: FnOnce(&ProtoPath) -> Result<&'a DescriptorWithContext<'a>>,
-        G: FnOnce(&ProtoPath) -> Result<&'a EnumDescriptorWithContext<'a>>,
+        F: FnOnce(&ProtoPath) -> Result<M>,
+        G: FnOnce(&ProtoPath) -> Result<E>,
     {
         match self {
             FieldTypeCase::Bool => Ok(FieldType::Bool),
@@ -1020,7 +1010,7 @@ pub struct FieldDescriptorWithContext<'a> {
 #[derive(Default, Debug)]
 pub struct FieldDescriptorCache<'a> {
     full_name: OnceCell<ProtoPathBuf>,
-    r#type: OnceCell<FieldType<'a>>,
+    r#type: OnceCell<FieldType<&'a DescriptorWithContext<'a>, &'a EnumDescriptorWithContext<'a>>>,
 }
 
 impl<'a> FieldDescriptorWithContext<'a> {
@@ -1037,7 +1027,9 @@ impl<'a> FieldDescriptorWithContext<'a> {
             })
             .map(|s| s.as_ref())
     }
-    pub fn r#type(&self) -> Result<FieldType<'a>> {
+    pub fn r#type(
+        &self,
+    ) -> Result<FieldType<&'a DescriptorWithContext<'a>, &'a EnumDescriptorWithContext<'a>>> {
         let init = || {
             self.body.type_case.with_type_ref(
                 self.body.type_name.as_deref(),
