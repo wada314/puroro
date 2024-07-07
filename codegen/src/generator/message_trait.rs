@@ -55,8 +55,8 @@ impl Field {
     fn try_new(desc: &FieldDescriptorWithContext) -> Result<Self> {
         Ok(Self {
             original_name: desc.name()?.to_string(),
-            wrapper: todo!(),
-            scalar_type: todo!(),
+            wrapper: FieldWrapper::try_from_field_desc(desc)?,
+            scalar_type: FieldScalarType::try_from_field_desc(desc)?,
         })
     }
 }
@@ -113,11 +113,12 @@ enum FieldScalarType {
     String,
     Bytes,
     Message,
+    Group,
 }
 
 impl FieldScalarType {
     fn try_from_field_desc(desc: &FieldDescriptorWithContext) -> Result<Self> {
-        Ok(match desc.type_case()? {
+        Ok(match desc.type_case() {
             FieldTypeCase::Int32 => FieldScalarType::Int32,
             FieldTypeCase::SInt32 => FieldScalarType::SInt32,
             FieldTypeCase::UInt32 => FieldScalarType::UInt32,
@@ -135,6 +136,7 @@ impl FieldScalarType {
             FieldTypeCase::String => FieldScalarType::String,
             FieldTypeCase::Bytes => FieldScalarType::Bytes,
             FieldTypeCase::Message => FieldScalarType::Message,
+            FieldTypeCase::Group => FieldScalarType::Group,
         })
     }
 }
