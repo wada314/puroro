@@ -25,10 +25,7 @@ use ::syn::{parse2, parse_str, Ident, Item, Type};
 pub struct MessageOpenStruct<'a> {
     rust_name: Ident,
     fields: Vec<Field<'a>>,
-    cache: MessageOpenStructCache,
 }
-#[derive(Default)]
-struct MessageOpenStructCache {}
 
 struct Field<'a> {
     desc: &'a FieldDescriptorWithContext<'a>,
@@ -58,7 +55,6 @@ impl<'a> MessageOpenStruct<'a> {
                 .into_iter()
                 .map(Field::try_new)
                 .collect::<Result<Vec<_>>>()?,
-            cache: Default::default(),
         })
     }
 

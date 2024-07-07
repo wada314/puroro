@@ -14,6 +14,7 @@
 
 pub mod r#enum;
 pub mod message_open_struct;
+pub mod message_trait;
 mod proto_path_ext;
 
 use self::message_open_struct::MessageOpenStruct;
