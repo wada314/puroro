@@ -114,7 +114,7 @@ impl Enum {
             impl ::std::convert::From::<self::#name> for i32 {
                 fn from(value: self::#name) -> i32 {
                     match value {
-                        #( Self::#var_names => #var_numbers, )*
+                        #( self::#name::#var_names => #var_numbers, )*
                     }
                 }
             }
@@ -132,9 +132,8 @@ impl EnumVariant {
 
     fn rust_enum_variant(&self) -> Result<Variant> {
         let name = &self.name;
-        let number = self.number;
         Ok(parse2(quote! {
-            #name = #number
+            #name
         })?)
     }
 }

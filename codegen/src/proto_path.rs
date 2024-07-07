@@ -121,8 +121,11 @@ impl ProtoPath {
         &self,
         last_item_naming: impl FnOnce(&str) -> Result<PathSegment>,
     ) -> Result<Path> {
-        let first_component: PathSegment =
-            parse_str(if self.is_absolute() { "crate" } else { "self" })?;
+        let first_component: Path = parse_str(if self.is_absolute() {
+            "self::_puroro_root"
+        } else {
+            "self"
+        })?;
         if let (components_iter, Some(item)) = (
             self.parent().into_iter().flat_map(|p| p.components()),
             self.last_component(),

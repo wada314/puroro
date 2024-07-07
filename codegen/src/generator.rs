@@ -133,7 +133,7 @@ impl TryFrom<GeneratedFile> for code_generator_response::File<'_> {
         file.set_name(from.full_path())?;
         let source_list = from
             .sources
-            .into_iter()
+            .iter()
             .map(|s| {
                 let doc = format!("   {s}");
                 quote! {
@@ -143,12 +143,17 @@ impl TryFrom<GeneratedFile> for code_generator_response::File<'_> {
             .collect::<Vec<_>>();
         let submodule_decls = from
             .submodules
-            .into_iter()
+            .iter()
             .map(|s| {
                 let id = format_ident!("{}", s);
                 quote! { pub mod #id; }
             })
             .collect::<Vec<_>>();
+        let puroro_root = if from.full_path() == "mod.rs" {
+            quote! { pub(crate) mod _puroro_root { pub(crate) use super::*; } }
+        } else {
+            quote! { pub(crate) mod _puroro_root { pub(crate) use super::super::_puroro_root::*; } }
+        };
         let body = from.body;
         let content = quote! {
             #![doc=" THIS FILE IS A GENERATED FILE! DO NOT EDIT!"]
@@ -156,6 +161,7 @@ impl TryFrom<GeneratedFile> for code_generator_response::File<'_> {
             #(#source_list)*
 
             #(#submodule_decls)*
+            #puroro_root
             #(#body)*
         };
         let syn_file: ::syn::File = syn::parse2(content)?;
@@ -190,11 +196,10 @@ impl GeneratedFileSet {
         // create parent modules.
         let mut module_path = full_path.trim_end_matches(".rs");
         while let Some((parent, submodule)) = module_path.rsplit_once('/') {
-            self.files.entry(format!("{parent}.rs")).or_insert_with(|| {
-                let mut file = GeneratedFile::new(format!("{parent}.rs"));
-                file.add_submodule(submodule);
-                file
-            });
+            self.files
+                .entry(format!("{parent}.rs"))
+                .or_insert_with(|| GeneratedFile::new(format!("{parent}.rs")))
+                .add_submodule(submodule);
             module_path = parent;
         }
         self.files
