@@ -13,7 +13,9 @@
 // limitations under the License.
 
 use crate::cases::{convert_into_case, Case};
-use crate::descriptor::{DescriptorWithContext, FieldDescriptorWithContext, FieldLabel, FieldType};
+use crate::descriptor::{
+    DescriptorWithContext, FieldDescriptorWithContext, FieldLabel, FieldTypeCase,
+};
 use crate::Result;
 use ::quote::{format_ident, quote};
 use ::syn::{parse2, parse_str, Ident, Item, Type};
@@ -66,6 +68,32 @@ enum FieldWrapper {
     OptionalBoxed,
     Vec,
 }
+
+impl FieldWrapper {
+    fn try_from_field_desc(desc: &FieldDescriptorWithContext) -> Result<Self> {
+        Ok(match desc.label()? {
+            Some(FieldLabel::Repeated) => FieldWrapper::Vec,
+            Some(FieldLabel::Optional) => {
+                if desc.type_case() == FieldTypeCase::Message {
+                    FieldWrapper::OptionalBoxed
+                } else {
+                    FieldWrapper::Optional
+                }
+            }
+            Some(FieldLabel::Required) => FieldWrapper::Bare,
+            None => {
+                if desc.type_case() == FieldTypeCase::Message {
+                    FieldWrapper::OptionalBoxed
+                } else if desc.is_proto3_optional()? {
+                    FieldWrapper::Optional
+                } else {
+                    FieldWrapper::Bare
+                }
+            }
+        })
+    }
+}
+
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 enum FieldScalarType {
     Int32,
@@ -85,4 +113,28 @@ enum FieldScalarType {
     String,
     Bytes,
     Message,
+}
+
+impl FieldScalarType {
+    fn try_from_field_desc(desc: &FieldDescriptorWithContext) -> Result<Self> {
+        Ok(match desc.type_case()? {
+            FieldTypeCase::Int32 => FieldScalarType::Int32,
+            FieldTypeCase::SInt32 => FieldScalarType::SInt32,
+            FieldTypeCase::UInt32 => FieldScalarType::UInt32,
+            FieldTypeCase::Int64 => FieldScalarType::Int64,
+            FieldTypeCase::SInt64 => FieldScalarType::SInt64,
+            FieldTypeCase::UInt64 => FieldScalarType::UInt64,
+            FieldTypeCase::Bool => FieldScalarType::Bool,
+            FieldTypeCase::Enum => FieldScalarType::Enum,
+            FieldTypeCase::Float => FieldScalarType::Float,
+            FieldTypeCase::Fixed32 => FieldScalarType::Fixed32,
+            FieldTypeCase::SFixed32 => FieldScalarType::SFixed32,
+            FieldTypeCase::Double => FieldScalarType::Double,
+            FieldTypeCase::Fixed64 => FieldScalarType::Fixed64,
+            FieldTypeCase::SFixed64 => FieldScalarType::SFixed64,
+            FieldTypeCase::String => FieldScalarType::String,
+            FieldTypeCase::Bytes => FieldScalarType::Bytes,
+            FieldTypeCase::Message => FieldScalarType::Message,
+        })
+    }
 }

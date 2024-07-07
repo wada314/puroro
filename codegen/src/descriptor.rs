@@ -330,7 +330,7 @@ impl<'a> TryFrom<DescriptorProto<'a>> for Descriptor {
 pub struct FieldDescriptor {
     name: String,
     number: i32,
-    r#type: FieldTypeCase,
+    type_case: FieldTypeCase,
     type_name: Option<String>,
     label: Option<FieldLabel>,
     oneof_index: Option<usize>,
@@ -345,7 +345,7 @@ impl<'a> TryFrom<FieldDescriptorProto<'a>> for FieldDescriptor {
             number: proto
                 .number()?
                 .try_into_number("No FieldDescriptor number")?,
-            r#type: proto
+            type_case: proto
                 .type_()?
                 .ok_or_else(|| format!("No FieldDescriptor type"))?
                 .into(),
@@ -1038,32 +1038,33 @@ impl<'a> FieldDescriptorWithContext<'a> {
             .map(|s| s.as_ref())
     }
     pub fn r#type(&self) -> Result<FieldType<'a>> {
-        self.cache
-            .r#type
-            .get_or_try_init(|| {
-                self.body.r#type.with_type_ref(
-                    self.body.type_name.as_deref(),
-                    |name| {
-                        Ok(self
-                            .message
-                            .file
-                            .root
-                            .resolve_relative_path(&name, self.message.full_path()?)?
-                            .maybe_message()
-                            .ok_or_else(|| format!("Not a message: {}", name))?)
-                    },
-                    |name| {
-                        Ok(self
-                            .message
-                            .file
-                            .root
-                            .resolve_relative_path(&name, self.message.full_path()?)?
-                            .maybe_enum()
-                            .ok_or_else(|| format!("Not an enum: {}", name))?)
-                    },
-                )
-            })
-            .cloned()
+        let init = || {
+            self.body.type_case.with_type_ref(
+                self.body.type_name.as_deref(),
+                |name| {
+                    Ok(self
+                        .message
+                        .file
+                        .root
+                        .resolve_relative_path(&name, self.message.full_path()?)?
+                        .maybe_message()
+                        .ok_or_else(|| format!("Not a message: {}", name))?)
+                },
+                |name| {
+                    Ok(self
+                        .message
+                        .file
+                        .root
+                        .resolve_relative_path(&name, self.message.full_path()?)?
+                        .maybe_enum()
+                        .ok_or_else(|| format!("Not an enum: {}", name))?)
+                },
+            )
+        };
+        self.cache.r#type.get_or_try_init(init).cloned()
+    }
+    pub fn type_case(&self) -> FieldTypeCase {
+        self.body.type_case
     }
     pub fn label(&self) -> Result<Option<FieldLabel>> {
         Ok(self.body.label)
