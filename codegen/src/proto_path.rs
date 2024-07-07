@@ -16,9 +16,11 @@ use crate::cases::{convert_into_case, Case};
 use crate::generator::avoid_reserved_keywords;
 use crate::Result;
 use ::itertools::Itertools;
+use ::quote::quote;
 use ::std::borrow::Borrow;
 use ::std::fmt::Display;
 use ::std::ops::Deref;
+use ::syn::{parse2, parse_str, Ident, Path, PathSegment};
 
 #[derive(Debug, Eq, Ord, Hash)]
 pub struct ProtoPath(str);
@@ -107,35 +109,40 @@ impl ProtoPath {
         }
     }
 
+    pub fn to_rust_path(&self) -> Result<Path> {
+        self.to_rust_path_with(|item| {
+            Ok(parse_str(&avoid_reserved_keywords(&convert_into_case(
+                item,
+                Case::CamelCase,
+            )))?)
+        })
+    }
     pub fn to_rust_path_with(
         &self,
-        last_item_naming: impl FnOnce(&str) -> String,
-    ) -> Result<String> {
-        let first_component = if self.is_absolute() { "crate" } else { "self" };
+        last_item_naming: impl FnOnce(&str) -> Result<PathSegment>,
+    ) -> Result<Path> {
+        let first_component: PathSegment =
+            parse_str(if self.is_absolute() { "crate" } else { "self" })?;
         if let (components_iter, Some(item)) = (
             self.parent().into_iter().flat_map(|p| p.components()),
             self.last_component(),
         ) {
             let modules = components_iter
-                .map(|s| convert_into_case(s, Case::LowerSnakeCase))
-                .join("::");
-            let item = convert_into_case(item, Case::CamelCase);
-            if modules.is_empty() {
-                Ok(format!("{first_component}::{item}"))
-            } else {
-                Ok(format!("{first_component}::{modules}::{item}"))
-            }
+                .map(|s| {
+                    Ok(parse_str(&avoid_reserved_keywords(&convert_into_case(
+                        s,
+                        Case::LowerSnakeCase,
+                    )))?)
+                })
+                .collect::<Result<Vec<PathSegment>>>()?;
+            let item = last_item_naming(item)?;
+            Ok(parse2(quote! { #first_component :: #(#modules::)* #item})?)
         } else {
             Err(format!(
                 "The proto path {} cannot be converted to a rust path.",
                 self.as_str()
             ))?
         }
-    }
-    pub fn to_rust_path(&self) -> Result<String> {
-        self.to_rust_path_with(|item| {
-            avoid_reserved_keywords(&convert_into_case(item, Case::CamelCase)).to_string()
-        })
     }
 
     pub fn as_str(&self) -> &str {

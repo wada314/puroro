@@ -46,7 +46,10 @@ impl MessageTrait {
         ))
     }
     pub fn rust_path_from_proto_path(path: &ProtoPath) -> Result<Path> {
-        path.to_rust_path_with(|s| Self::rust_name_from_message_name(s))
+        path.to_rust_path_with(|s| {
+            let ident = Self::rust_name_from_message_name(s)?;
+            Ok(parse2(quote! { #ident })?)
+        })
     }
 
     pub fn gen_message_trait(&self) -> Result<Item> {
