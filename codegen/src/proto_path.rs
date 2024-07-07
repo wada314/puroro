@@ -20,7 +20,7 @@ use ::quote::quote;
 use ::std::borrow::Borrow;
 use ::std::fmt::Display;
 use ::std::ops::Deref;
-use ::syn::{parse2, parse_str, Ident, Path, PathSegment};
+use ::syn::{parse2, parse_str, Path, PathSegment};
 
 #[derive(Debug, Eq, Ord, Hash)]
 pub struct ProtoPath(str);

@@ -14,13 +14,14 @@
 
 use crate::cases::{convert_into_case, Case};
 use crate::descriptor::{
-    DescriptorWithContext, FieldDescriptorWithContext, FieldLabel, FieldTypeCase,
+    DescriptorWithContext, FieldDescriptorWithContext, FieldLabel, FieldType, FieldTypeCase,
 };
 use crate::generator::avoid_reserved_keywords;
-use crate::proto_path::ProtoPath;
+use crate::proto_path::{ProtoPath, ProtoPathBuf};
 use crate::Result;
 use ::quote::{format_ident, quote};
-use ::syn::{parse2, parse_str, Ident, Item, Path};
+use ::syn::Lifetime;
+use ::syn::{parse2, parse_str, Ident, Item, Path, Type};
 
 pub struct MessageTrait {
     rust_name: Ident,
@@ -71,7 +72,7 @@ impl MessageTrait {
 pub struct Field {
     original_name: String,
     wrapper: FieldWrapper,
-    scalar_type: FieldTypeCase,
+    scalar_type: FieldType<ProtoPathBuf, ProtoPathBuf>,
 }
 
 impl Field {
@@ -79,7 +80,7 @@ impl Field {
         Ok(Self {
             original_name: desc.name()?.to_string(),
             wrapper: FieldWrapper::try_from_field_desc(desc)?,
-            scalar_type: desc.type_case(),
+            scalar_type: desc.type_with_full_path()?,
         })
     }
 
@@ -89,12 +90,17 @@ impl Field {
     }
 
     fn gen_getter(&self) -> Result<Item> {
+        let lifetime = parse2(quote! { '_ })?;
         let getter_name: Ident = {
             let lower_cased = convert_into_case(&self.original_name, Case::LowerSnakeCase);
             parse_str(&avoid_reserved_keywords(&lower_cased))?
         };
+        let getter_type = match self.wrapper {
+            FieldWrapper::Vec => self.scalar_type.gen_repeated_getter_type(&lifetime)?,
+            _ => self.scalar_type.gen_scalar_getter_type(&lifetime)?,
+        };
         Ok(parse2(quote! {
-            fn #getter_name(&self) -> ();
+            fn #getter_name(& #lifetime self) -> #getter_type;
         })?)
     }
 }
@@ -129,5 +135,54 @@ impl FieldWrapper {
                 }
             }
         })
+    }
+}
+
+impl FieldType<ProtoPathBuf, ProtoPathBuf> {
+    fn gen_bare_getter_type(&self, lifetime: &Lifetime) -> Result<Type> {
+        Ok(match self {
+            FieldType::Message(path) => {
+                let path = path.to_rust_path_with(|name| {
+                    let ident = MessageTrait::rust_name_from_message_name(name)?;
+                    Ok(parse2(quote! { #ident })?)
+                })?;
+                parse2(quote! { & #lifetime impl #path })?
+            }
+            FieldType::Enum(path) => {
+                let path = path.to_rust_path()?;
+                parse2(quote! { #path })?
+            }
+            FieldType::Int32 => parse_str("i32")?,
+            FieldType::Int64 => parse_str("i64")?,
+            FieldType::UInt32 => parse_str("u32")?,
+            FieldType::UInt64 => parse_str("u64")?,
+            FieldType::SInt32 => parse_str("i32")?,
+            FieldType::SInt64 => parse_str("i64")?,
+            FieldType::Fixed32 => parse_str("u32")?,
+            FieldType::Fixed64 => parse_str("u64")?,
+            FieldType::SFixed32 => parse_str("i32")?,
+            FieldType::SFixed64 => parse_str("i64")?,
+            FieldType::Float => parse_str("f32")?,
+            FieldType::Double => parse_str("f64")?,
+            FieldType::Bool => parse_str("bool")?,
+            FieldType::String => parse2(quote! { & #lifetime str })?,
+            FieldType::Bytes => parse2(quote! { & #lifetime [u8] })?,
+            FieldType::Group => Err(format!("Group field is not supported"))?,
+        })
+    }
+    fn gen_scalar_getter_type(&self, lifetime: &Lifetime) -> Result<Type> {
+        let bare_type = self.gen_bare_getter_type(lifetime)?;
+        Ok(match self {
+            FieldType::Message(_) => parse2(quote! {
+                ::std::option::Option::< #bare_type >
+            })?,
+            _ => bare_type,
+        })
+    }
+    fn gen_repeated_getter_type(&self, lifetime: &Lifetime) -> Result<Type> {
+        let bare_type = self.gen_bare_getter_type(lifetime)?;
+        Ok(parse2(quote! {
+            impl ::std::iter::Iterator::<Item = #bare_type >
+        })?)
     }
 }

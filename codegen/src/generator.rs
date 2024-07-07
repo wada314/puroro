@@ -197,11 +197,10 @@ impl GeneratedFileSet {
             });
             module_path = parent;
         }
-        self.files.entry("mod.rs".to_string()).or_insert_with(|| {
-            let mut file = GeneratedFile::new("mod.rs");
-            file.add_submodule(module_path);
-            file
-        });
+        self.files
+            .entry("mod.rs".to_string())
+            .or_insert_with(|| GeneratedFile::new("mod.rs"))
+            .add_submodule(module_path);
 
         // return the target file.
         self.files

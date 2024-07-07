@@ -16,7 +16,7 @@
 
 use super::Any;
 use crate::internal::types::{field_types as ft, FieldType};
-use crate::string::{StrExt as _, String as PString};
+use crate::string::String as PString;
 use crate::variant::variant_types as vt;
 use crate::variant::{Variant, VariantIntegerType as _};
 use crate::{ErrorKind, Result};
