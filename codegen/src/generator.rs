@@ -17,7 +17,7 @@ pub mod message_open_struct;
 pub mod message_trait;
 mod proto_path_ext;
 
-use self::message_open_struct::MessageOpenStruct;
+use self::message_trait::MessageTrait;
 use crate::descriptor::{FileDescriptor, RootContext};
 use crate::{ErrorKind, Result};
 use ::itertools::Itertools;
@@ -27,6 +27,9 @@ use ::puroro::google::protobuf::compiler::code_generator_response;
 use ::puroro::google::protobuf::compiler::{CodeGeneratorRequest, CodeGeneratorResponse};
 use ::puroro::Result as PResult;
 use ::quote::{format_ident, quote};
+use ::std::borrow::Cow;
+use ::std::cell::LazyCell;
+use ::std::collections::HashSet;
 use ::std::collections::{BTreeSet, HashMap};
 
 pub fn compile(request: &CodeGeneratorRequest) -> Result<CodeGeneratorResponse<'static>> {
@@ -57,8 +60,10 @@ pub fn compile(request: &CodeGeneratorRequest) -> Result<CodeGeneratorResponse<'
         let file = out_files.file_mut(file_path);
         file.add_source(message.file()?.name()?);
 
-        let open_struct = MessageOpenStruct::try_new(message)?.rust_items()?;
-        file.append(quote! { #(#open_struct)* });
+        // let open_struct = MessageOpenStruct::try_new(message)?.rust_items()?;
+        // file.append(quote! { #(#open_struct)* });
+        let trait_item = MessageTrait::try_new(message)?.gen_message_trait()?;
+        file.append(quote! { #trait_item });
     }
 
     let enums = root_context
@@ -211,4 +216,28 @@ impl IntoIterator for GeneratedFileSet {
     fn into_iter(self) -> Self::IntoIter {
         self.files.into_values()
     }
+}
+
+// List of the Rust "strict" and "reserved" keywords except not-"r#" prefixed ones.
+const KEYWORDS_LIST: &[&str] = &[
+    "abstract", "alignof", "as", "become", "box", "break", "const", "continue",
+    /*"crate",*/ "do", "else", "enum", "extern", "false", "final", "fn", "for", "if", "impl",
+    "in", "let", "loop", "macro", "match", "mod", "move", "mut", "offsetof", "override", "priv",
+    "proc", "pub", "pure", "ref", "return", /*"Self",*/ /*"self",*/ "sizeof", "static",
+    "struct", /*"super",*/ "trait", "true", "type", "typeof", "unsafe", "unsized", "use",
+    "virtual", "where", "while", "yield",
+];
+const KEYWORDS: LazyCell<HashSet<&'static str>> =
+    LazyCell::new(|| KEYWORDS_LIST.iter().copied().collect());
+const NOT_RAWNIZEABLE_KEYWORDS: LazyCell<HashSet<&'static str>> =
+    LazyCell::new(|| ["crate", "Self", "self", "super"].iter().copied().collect());
+
+pub fn avoid_reserved_keywords(s: &str) -> Cow<str> {
+    if KEYWORDS.contains(&s) {
+        return Cow::Owned(format!("r#{}", s));
+    }
+    if NOT_RAWNIZEABLE_KEYWORDS.contains(&s) {
+        return Cow::Owned(format!("_{}", s));
+    }
+    return Cow::Borrowed(s);
 }

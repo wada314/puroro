@@ -16,6 +16,7 @@ use crate::cases::{convert_into_case, Case};
 use crate::descriptor::{
     DescriptorWithContext, FieldDescriptorWithContext, FieldLabel, FieldTypeCase,
 };
+use crate::generator::avoid_reserved_keywords;
 use crate::Result;
 use ::quote::{format_ident, quote};
 use ::syn::{parse2, parse_str, Ident, Item, Type};
@@ -43,12 +44,27 @@ impl MessageTrait {
             convert_into_case(name, Case::CamelCase)
         ))
     }
+
+    pub fn gen_message_trait(&self) -> Result<Item> {
+        let trait_name = &self.rust_name;
+        let field_items_vv = self
+            .fields
+            .iter()
+            .map(Field::gen_field_items)
+            .collect::<Result<Vec<_>>>()?;
+        let field_items = field_items_vv.into_iter().flatten().collect::<Vec<_>>();
+        Ok(parse2(quote! {
+            pub trait #trait_name {
+                #(#field_items)*
+            }
+        })?)
+    }
 }
 
 pub struct Field {
     original_name: String,
     wrapper: FieldWrapper,
-    scalar_type: FieldScalarType,
+    scalar_type: FieldTypeCase,
 }
 
 impl Field {
@@ -56,8 +72,23 @@ impl Field {
         Ok(Self {
             original_name: desc.name()?.to_string(),
             wrapper: FieldWrapper::try_from_field_desc(desc)?,
-            scalar_type: FieldScalarType::try_from_field_desc(desc)?,
+            scalar_type: desc.type_case(),
         })
+    }
+
+    fn gen_field_items(&self) -> Result<Vec<Item>> {
+        let getter = self.gen_getter()?;
+        Ok(vec![getter])
+    }
+
+    fn gen_getter(&self) -> Result<Item> {
+        let getter_name: Ident = {
+            let lower_cased = convert_into_case(&self.original_name, Case::LowerSnakeCase);
+            parse_str(&avoid_reserved_keywords(&lower_cased))?
+        };
+        Ok(parse2(quote! {
+            fn #getter_name(&self) -> ();
+        })?)
     }
 }
 
@@ -90,53 +121,6 @@ impl FieldWrapper {
                     FieldWrapper::Bare
                 }
             }
-        })
-    }
-}
-
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-enum FieldScalarType {
-    Int32,
-    SInt32,
-    UInt32,
-    Int64,
-    SInt64,
-    UInt64,
-    Bool,
-    Enum,
-    Float,
-    Fixed32,
-    SFixed32,
-    Double,
-    Fixed64,
-    SFixed64,
-    String,
-    Bytes,
-    Message,
-    Group,
-}
-
-impl FieldScalarType {
-    fn try_from_field_desc(desc: &FieldDescriptorWithContext) -> Result<Self> {
-        Ok(match desc.type_case() {
-            FieldTypeCase::Int32 => FieldScalarType::Int32,
-            FieldTypeCase::SInt32 => FieldScalarType::SInt32,
-            FieldTypeCase::UInt32 => FieldScalarType::UInt32,
-            FieldTypeCase::Int64 => FieldScalarType::Int64,
-            FieldTypeCase::SInt64 => FieldScalarType::SInt64,
-            FieldTypeCase::UInt64 => FieldScalarType::UInt64,
-            FieldTypeCase::Bool => FieldScalarType::Bool,
-            FieldTypeCase::Enum => FieldScalarType::Enum,
-            FieldTypeCase::Float => FieldScalarType::Float,
-            FieldTypeCase::Fixed32 => FieldScalarType::Fixed32,
-            FieldTypeCase::SFixed32 => FieldScalarType::SFixed32,
-            FieldTypeCase::Double => FieldScalarType::Double,
-            FieldTypeCase::Fixed64 => FieldScalarType::Fixed64,
-            FieldTypeCase::SFixed64 => FieldScalarType::SFixed64,
-            FieldTypeCase::String => FieldScalarType::String,
-            FieldTypeCase::Bytes => FieldScalarType::Bytes,
-            FieldTypeCase::Message => FieldScalarType::Message,
-            FieldTypeCase::Group => FieldScalarType::Group,
         })
     }
 }
