@@ -17,9 +17,10 @@ use crate::descriptor::{
     DescriptorWithContext, FieldDescriptorWithContext, FieldLabel, FieldTypeCase,
 };
 use crate::generator::avoid_reserved_keywords;
+use crate::proto_path::ProtoPath;
 use crate::Result;
 use ::quote::{format_ident, quote};
-use ::syn::{parse2, parse_str, Ident, Item, Type};
+use ::syn::{parse2, parse_str, Ident, Item, Path};
 
 pub struct MessageTrait {
     rust_name: Ident,
@@ -43,6 +44,9 @@ impl MessageTrait {
             "{}Trait",
             convert_into_case(name, Case::CamelCase)
         ))
+    }
+    pub fn rust_path_from_proto_path(path: &ProtoPath) -> Result<Path> {
+        path.to_rust_path_with(|s| Self::rust_name_from_message_name(s))
     }
 
     pub fn gen_message_trait(&self) -> Result<Item> {

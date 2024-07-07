@@ -13,6 +13,7 @@
 // limitations under the License.
 
 use crate::cases::{convert_into_case, Case};
+use crate::generator::avoid_reserved_keywords;
 use crate::Result;
 use ::itertools::Itertools;
 use ::std::borrow::Borrow;
@@ -96,6 +97,7 @@ impl ProtoPath {
             .split('.')
             .filter(|s| !s.is_empty())
             .map(|s| convert_into_case(s, Case::LowerSnakeCase))
+            .map(|s| avoid_reserved_keywords(&s).to_string())
             .join("/");
         if result.is_empty() {
             return "mod.rs".to_string();
@@ -105,7 +107,10 @@ impl ProtoPath {
         }
     }
 
-    pub fn to_rust_path(&self) -> Result<String> {
+    pub fn to_rust_path_with(
+        &self,
+        last_item_naming: impl FnOnce(&str) -> String,
+    ) -> Result<String> {
         let first_component = if self.is_absolute() { "crate" } else { "self" };
         if let (components_iter, Some(item)) = (
             self.parent().into_iter().flat_map(|p| p.components()),
@@ -126,6 +131,11 @@ impl ProtoPath {
                 self.as_str()
             ))?
         }
+    }
+    pub fn to_rust_path(&self) -> Result<String> {
+        self.to_rust_path_with(|item| {
+            avoid_reserved_keywords(&convert_into_case(item, Case::CamelCase)).to_string()
+        })
     }
 
     pub fn as_str(&self) -> &str {
