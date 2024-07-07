@@ -105,6 +105,61 @@ impl<M, E> Debug for FieldType<M, E> {
         }
     }
 }
+impl<M, E> FieldType<M, E> {
+    pub fn map<FM, FE, M2, E2>(self, fm: FM, fe: FE) -> FieldType<M2, E2>
+    where
+        FM: FnOnce(M) -> M2,
+        FE: FnOnce(E) -> E2,
+    {
+        match self {
+            FieldType::Bool => FieldType::Bool,
+            FieldType::Bytes => FieldType::Bytes,
+            FieldType::Double => FieldType::Double,
+            FieldType::Enum(e) => FieldType::Enum(fe(e)),
+            FieldType::Fixed32 => FieldType::Fixed32,
+            FieldType::Fixed64 => FieldType::Fixed64,
+            FieldType::Float => FieldType::Float,
+            FieldType::Group => FieldType::Group,
+            FieldType::Int32 => FieldType::Int32,
+            FieldType::Int64 => FieldType::Int64,
+            FieldType::Message(m) => FieldType::Message(fm(m)),
+            FieldType::SFixed32 => FieldType::SFixed32,
+            FieldType::SFixed64 => FieldType::SFixed64,
+            FieldType::SInt32 => FieldType::SInt32,
+            FieldType::SInt64 => FieldType::SInt64,
+            FieldType::String => FieldType::String,
+            FieldType::UInt32 => FieldType::UInt32,
+            FieldType::UInt64 => FieldType::UInt64,
+        }
+    }
+    pub fn try_map<FM, FE, M2, E2>(self, fm: FM, fe: FE) -> Result<FieldType<M2, E2>>
+    where
+        FM: FnOnce(M) -> Result<M2>,
+        FE: FnOnce(E) -> Result<E2>,
+    {
+        Ok(match self {
+            FieldType::Bool => FieldType::Bool,
+            FieldType::Bytes => FieldType::Bytes,
+            FieldType::Double => FieldType::Double,
+            FieldType::Enum(e) => FieldType::Enum(fe(e)?),
+            FieldType::Fixed32 => FieldType::Fixed32,
+            FieldType::Fixed64 => FieldType::Fixed64,
+            FieldType::Float => FieldType::Float,
+            FieldType::Group => FieldType::Group,
+            FieldType::Int32 => FieldType::Int32,
+            FieldType::Int64 => FieldType::Int64,
+            FieldType::Message(m) => FieldType::Message(fm(m)?),
+            FieldType::SFixed32 => FieldType::SFixed32,
+            FieldType::SFixed64 => FieldType::SFixed64,
+            FieldType::SInt32 => FieldType::SInt32,
+            FieldType::SInt64 => FieldType::SInt64,
+            FieldType::String => FieldType::String,
+            FieldType::UInt32 => FieldType::UInt32,
+            FieldType::UInt64 => FieldType::UInt64,
+        })
+    }
+}
+
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Default)]
 pub enum FieldTypeCase {
     Bool,
@@ -1054,6 +1109,12 @@ impl<'a> FieldDescriptorWithContext<'a> {
             )
         };
         self.cache.r#type.get_or_try_init(init).cloned()
+    }
+    pub fn type_with_full_path(&self) -> Result<FieldType<ProtoPathBuf, ProtoPathBuf>> {
+        Ok(self.r#type()?.try_map(
+            |m| Ok(m.full_path()?.to_owned()),
+            |e| Ok(e.full_path()?.to_owned()),
+        )?)
     }
     pub fn type_case(&self) -> FieldTypeCase {
         self.body.type_case
