@@ -13,7 +13,6 @@
 // limitations under the License.
 
 pub mod deser;
-pub mod open_struct_types;
 pub mod types;
 
 use crate::{ErrorKind, Result};
