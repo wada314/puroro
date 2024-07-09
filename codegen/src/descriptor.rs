@@ -27,6 +27,7 @@ use ::puroro::Result as PResult;
 use ::std::cell::OnceCell;
 use ::std::collections::HashMap;
 use ::std::fmt::Debug;
+use ::std::ops::Deref;
 
 // region: Edition
 
@@ -380,6 +381,12 @@ pub struct FieldDescriptor {
     label: Option<FieldLabel>,
     oneof_index: Option<usize>,
     proto3_optional: bool,
+}
+
+impl FieldDescriptor {
+    pub fn number(&self) -> Result<i32> {
+        Ok(self.number)
+    }
 }
 
 impl<'a> TryFrom<FieldDescriptorProto<'a>> for FieldDescriptor {
@@ -1124,6 +1131,13 @@ impl<'a> FieldDescriptorWithContext<'a> {
     }
     pub fn is_proto3_optional(&self) -> Result<bool> {
         Ok(self.body.proto3_optional)
+    }
+}
+
+impl Deref for FieldDescriptorWithContext<'_> {
+    type Target = FieldDescriptor;
+    fn deref(&self) -> &Self::Target {
+        &self.body
     }
 }
 

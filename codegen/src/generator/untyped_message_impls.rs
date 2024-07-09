@@ -30,7 +30,7 @@ pub struct UntypedMessageImpls {
 }
 
 impl UntypedMessageImpls {
-    fn try_new<'a>(desc: &'a DescriptorWithContext<'a>) -> Result<Self> {
+    pub fn try_new<'a>(desc: &'a DescriptorWithContext<'a>) -> Result<Self> {
         Ok(Self {
             rust_trait_name: MessageTrait::rust_name_from_message_name(desc.name()?)?,
             fields: desc
@@ -40,12 +40,25 @@ impl UntypedMessageImpls {
                 .collect::<Result<Vec<_>>>()?,
         })
     }
+
+    pub fn gen_impl_message_trait(&self) -> Result<Item> {
+        let trait_name = &self.rust_trait_name;
+        Ok(parse2(quote! {
+            impl self::#trait_name for ::puroro::untyped_message::UntypedMessage {
+
+            }
+        })?)
+    }
 }
 
-pub struct Field {}
+pub struct Field {
+    number: i32,
+}
 
 impl Field {
     fn try_new(desc: &FieldDescriptorWithContext) -> Result<Self> {
-        Ok(Self {})
+        Ok(Self {
+            number: desc.number()?,
+        })
     }
 }
