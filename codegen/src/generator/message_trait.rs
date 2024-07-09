@@ -20,8 +20,8 @@ use crate::generator::avoid_reserved_keywords;
 use crate::proto_path::{ProtoPath, ProtoPathBuf};
 use crate::Result;
 use ::quote::{format_ident, quote};
-use ::syn::Lifetime;
 use ::syn::{parse2, parse_str, Ident, Item, Path, Type};
+use ::syn::{Lifetime, Signature};
 
 pub struct MessageTrait {
     rust_name: Ident,
@@ -40,7 +40,7 @@ impl MessageTrait {
         })
     }
 
-    fn rust_name_from_message_name(name: &str) -> Result<Ident> {
+    pub fn rust_name_from_message_name(name: &str) -> Result<Ident> {
         Ok(format_ident!(
             "{}Trait",
             convert_into_case(name, Case::CamelCase)
@@ -56,15 +56,14 @@ impl MessageTrait {
 
     pub fn gen_message_trait(&self) -> Result<Item> {
         let trait_name = &self.rust_name;
-        let field_items_vv = self
+        let getters = self
             .fields
             .iter()
-            .map(Field::gen_field_items)
+            .map(Field::gen_getter)
             .collect::<Result<Vec<_>>>()?;
-        let field_items = field_items_vv.into_iter().flatten().collect::<Vec<_>>();
         Ok(parse2(quote! {
             pub trait #trait_name {
-                #(#field_items)*
+                #(#getters;)*
             }
         })?)
     }
@@ -85,12 +84,7 @@ impl Field {
         })
     }
 
-    fn gen_field_items(&self) -> Result<Vec<Item>> {
-        let getter = self.gen_getter()?;
-        Ok(vec![getter])
-    }
-
-    fn gen_getter(&self) -> Result<Item> {
+    fn gen_getter(&self) -> Result<Signature> {
         let getter_name: Ident = {
             let lower_cased = convert_into_case(&self.original_name, Case::LowerSnakeCase);
             parse_str(&avoid_reserved_keywords(&lower_cased))?
@@ -100,7 +94,7 @@ impl Field {
             _ => self.scalar_type.gen_scalar_getter_type(None)?,
         };
         Ok(parse2(quote! {
-            fn #getter_name(&self) -> #getter_type;
+            fn #getter_name(&self) -> #getter_type
         })?)
     }
 }

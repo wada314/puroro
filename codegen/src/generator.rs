@@ -14,6 +14,7 @@
 
 pub mod r#enum;
 pub mod message_trait;
+pub mod untyped_message_impls;
 
 use self::message_trait::MessageTrait;
 use crate::descriptor::{FileDescriptor, RootContext};
