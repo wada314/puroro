@@ -90,17 +90,16 @@ impl Field {
     }
 
     fn gen_getter(&self) -> Result<Item> {
-        let lifetime = parse2(quote! { '_ })?;
         let getter_name: Ident = {
             let lower_cased = convert_into_case(&self.original_name, Case::LowerSnakeCase);
             parse_str(&avoid_reserved_keywords(&lower_cased))?
         };
         let getter_type = match self.wrapper {
-            FieldWrapper::Vec => self.scalar_type.gen_repeated_getter_type(&lifetime)?,
-            _ => self.scalar_type.gen_scalar_getter_type(&lifetime)?,
+            FieldWrapper::Vec => self.scalar_type.gen_repeated_getter_type(None)?,
+            _ => self.scalar_type.gen_scalar_getter_type(None)?,
         };
         Ok(parse2(quote! {
-            fn #getter_name(& #lifetime self) -> #getter_type;
+            fn #getter_name(&self) -> #getter_type;
         })?)
     }
 }
@@ -138,7 +137,7 @@ impl FieldWrapper {
 }
 
 impl FieldType<ProtoPathBuf, ProtoPathBuf> {
-    fn gen_bare_getter_type(&self, lifetime: &Lifetime) -> Result<Type> {
+    fn gen_bare_getter_type(&self, lifetime: Option<&Lifetime>) -> Result<Type> {
         Ok(match self {
             FieldType::Message(path) => {
                 let path = path.to_rust_path_with(|name| {
@@ -169,7 +168,7 @@ impl FieldType<ProtoPathBuf, ProtoPathBuf> {
             FieldType::Group => Err(format!("Group field is not supported"))?,
         })
     }
-    fn gen_scalar_getter_type(&self, lifetime: &Lifetime) -> Result<Type> {
+    fn gen_scalar_getter_type(&self, lifetime: Option<&Lifetime>) -> Result<Type> {
         let bare_type = self.gen_bare_getter_type(lifetime)?;
         Ok(match self {
             FieldType::Message(_) => parse2(quote! {
@@ -178,7 +177,7 @@ impl FieldType<ProtoPathBuf, ProtoPathBuf> {
             _ => bare_type,
         })
     }
-    fn gen_repeated_getter_type(&self, lifetime: &Lifetime) -> Result<Type> {
+    fn gen_repeated_getter_type(&self, lifetime: Option<&Lifetime>) -> Result<Type> {
         let bare_type = self.gen_bare_getter_type(lifetime)?;
         Ok(parse2(quote! {
             impl ::std::iter::Iterator::<Item = #bare_type >
