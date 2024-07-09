@@ -46,6 +46,7 @@ impl MessageTrait {
             convert_into_case(name, Case::CamelCase)
         ))
     }
+
     pub fn rust_path_from_proto_path(path: &ProtoPath) -> Result<Path> {
         path.to_rust_path_with(|s| {
             let ident = Self::rust_name_from_message_name(s)?;
