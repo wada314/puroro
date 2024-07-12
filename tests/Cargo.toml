@@ -11,3 +11,6 @@ anyhow = "1.0.85"
 itertools = "0.12.1"
 protoc-plugin-by-closure = { path = "../protoc-plugin-by-closure" }
 puroro-codegen = { path = "../codegen" }
+
+[dev-dependencies]
+puroro = { path = "../puroro" }

@@ -59,7 +59,7 @@ impl MessageTrait {
         let getters = self
             .fields
             .iter()
-            .map(Field::gen_getter)
+            .map(Field::gen_getter_signature)
             .collect::<Result<Vec<_>>>()?;
         Ok(parse2(quote! {
             pub trait #trait_name {
@@ -76,7 +76,7 @@ pub struct Field {
 }
 
 impl Field {
-    fn try_new(desc: &FieldDescriptorWithContext) -> Result<Self> {
+    pub fn try_new<'a>(desc: &'a FieldDescriptorWithContext<'a>) -> Result<Self> {
         Ok(Self {
             original_name: desc.name()?.to_string(),
             wrapper: FieldWrapper::try_from_field_desc(desc)?,
@@ -84,7 +84,7 @@ impl Field {
         })
     }
 
-    fn gen_getter(&self) -> Result<Signature> {
+    pub fn gen_getter_signature(&self) -> Result<Signature> {
         let getter_name: Ident = {
             let lower_cased = convert_into_case(&self.original_name, Case::LowerSnakeCase);
             parse_str(&avoid_reserved_keywords(&lower_cased))?

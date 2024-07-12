@@ -17,6 +17,7 @@ pub mod message_trait;
 pub mod untyped_message_impls;
 
 use self::message_trait::MessageTrait;
+use self::untyped_message_impls::UntypedMessageImpls;
 use crate::descriptor::{FileDescriptor, RootContext};
 use crate::{ErrorKind, Result};
 use ::itertools::Itertools;
@@ -59,10 +60,11 @@ pub fn compile(request: &CodeGeneratorRequest) -> Result<CodeGeneratorResponse<'
         let file = out_files.file_mut(file_path);
         file.add_source(message.file()?.name()?);
 
-        // let open_struct = MessageOpenStruct::try_new(message)?.rust_items()?;
-        // file.append(quote! { #(#open_struct)* });
         let trait_item = MessageTrait::try_new(message)?.gen_message_trait()?;
         file.append(quote! { #trait_item });
+        let untyped_message_impl =
+            UntypedMessageImpls::try_new(message)?.gen_impl_message_trait()?;
+        file.append(quote! { #untyped_message_impl });
     }
 
     let enums = root_context

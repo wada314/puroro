@@ -43,9 +43,14 @@ impl UntypedMessageImpls {
 
     pub fn gen_impl_message_trait(&self) -> Result<Item> {
         let trait_name = &self.rust_trait_name;
+        let getters = self
+            .fields
+            .iter()
+            .map(Field::gen_getter)
+            .collect::<Result<Vec<_>>>()?;
         Ok(parse2(quote! {
-            impl self::#trait_name for ::puroro::untyped_message::UntypedMessage {
-
+            impl self::#trait_name for ::puroro::untyped_message::UntypedMessage<'_> {
+                #(#getters)*
             }
         })?)
     }
@@ -53,12 +58,24 @@ impl UntypedMessageImpls {
 
 pub struct Field {
     number: i32,
+    trait_field: TraitField,
 }
 
 impl Field {
-    fn try_new(desc: &FieldDescriptorWithContext) -> Result<Self> {
+    fn try_new<'a>(desc: &'a FieldDescriptorWithContext<'a>) -> Result<Self> {
         Ok(Self {
             number: desc.number()?,
+            trait_field: TraitField::try_new(desc)?,
         })
+    }
+
+    fn gen_getter(&self) -> Result<Item> {
+        let signature = self.trait_field.gen_getter_signature()?;
+        let number = self.number;
+        Ok(parse2(quote! {
+            #signature {
+                self.field(#number).unwrap()
+            }
+        })?)
     }
 }
