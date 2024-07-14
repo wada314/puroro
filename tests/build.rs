@@ -37,8 +37,23 @@ fn main() -> Result<(), Error> {
         .out_dir("tests/generated")
         .proto_files(file_paths_in_protos_dir)
         .proto_path("tests/protos")
-        .run(Duration::from_secs(3), |req| {
-            compile_binary(&req).map_err(|e| e.to_string())
-        })?;
+        .run(
+            Duration::from_secs(3),
+            |req| match ::std::panic::catch_unwind(|| compile_binary(&req)) {
+                Ok(Ok(r)) => Ok(r),
+                Ok(Err(e)) => Err(e.to_string()),
+                Err(e) => {
+                    let e = match e.downcast::<String>() {
+                        Ok(s) => return Err(*s),
+                        Err(e) => e,
+                    };
+                    let _ = match e.downcast::<&str>() {
+                        Ok(s) => return Err(s.to_string()),
+                        Err(e) => e,
+                    };
+                    Err("Unknown panic".to_string())
+                }
+            },
+        )?;
     Ok(())
 }

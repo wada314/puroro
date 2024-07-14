@@ -18,7 +18,7 @@ use crate::generator::message_trait::FieldWrapper;
 use crate::Result;
 use ::quote::quote;
 use ::syn::Expr;
-use ::syn::{parse2, Ident, Item};
+use ::syn::{parse2, parse_str, Ident, Item};
 
 pub struct UntypedMessageImpls {
     rust_trait_name: Ident,
@@ -68,8 +68,7 @@ impl Field {
     fn gen_getter(&self) -> Result<Item> {
         let signature = self.trait_field.gen_getter_signature()?;
         let number = self.number;
-        // let body = self.gen_getter_body(&parse_str("f")?)?;
-        let body = "";
+        let body = self.gen_getter_body(&parse_str("f")?)?;
         Ok(parse2(quote! {
             #signature {
                 let f = self.field(#number);
@@ -78,14 +77,15 @@ impl Field {
         })?)
     }
 
-    #[allow(unused)]
-    fn gen_getter_body(&self, field_expr: &Expr) -> Result<Expr> {
+    fn gen_getter_body(&self, _field_expr: &Expr) -> Result<Expr> {
+        #[allow(unused)]
         let result = match self.trait_field.wrapper() {
             FieldWrapper::Bare => todo!(),
             FieldWrapper::Optional => todo!(),
             FieldWrapper::OptionalBoxed => todo!(),
             FieldWrapper::Vec => todo!(),
         };
+        #[allow(unused)]
         Ok(result)
     }
 }
