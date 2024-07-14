@@ -97,10 +97,14 @@ impl Field {
             fn #getter_name(&self) -> #getter_type
         })?)
     }
+
+    pub fn wrapper(&self) -> FieldWrapper {
+        self.wrapper
+    }
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-enum FieldWrapper {
+pub enum FieldWrapper {
     Bare,
     Optional,
     OptionalBoxed,

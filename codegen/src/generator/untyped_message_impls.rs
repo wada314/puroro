@@ -18,11 +18,12 @@ use crate::descriptor::{
     DescriptorWithContext, FieldDescriptorWithContext, FieldLabel, FieldType, FieldTypeCase,
 };
 use crate::generator::avoid_reserved_keywords;
+use crate::generator::message_trait::FieldWrapper;
 use crate::proto_path::{ProtoPath, ProtoPathBuf};
 use crate::Result;
 use ::quote::{format_ident, quote};
-use ::syn::Lifetime;
 use ::syn::{parse2, parse_str, Ident, Item, Path, Type};
+use ::syn::{Expr, Lifetime};
 
 pub struct UntypedMessageImpls {
     rust_trait_name: Ident,
@@ -72,10 +73,22 @@ impl Field {
     fn gen_getter(&self) -> Result<Item> {
         let signature = self.trait_field.gen_getter_signature()?;
         let number = self.number;
+        let body = self.gen_getter_body(&parse_str("f")?)?;
         Ok(parse2(quote! {
             #signature {
-                self.field(#number).unwrap()
+                let f = self.field(#number);
+                #body
             }
         })?)
+    }
+
+    fn gen_getter_body(&self, field_expr: &Expr) -> Result<Expr> {
+        let result = match self.trait_field.wrapper() {
+            FieldWrapper::Bare => todo!(),
+            FieldWrapper::Optional => todo!(),
+            FieldWrapper::OptionalBoxed => todo!(),
+            FieldWrapper::Vec => todo!(),
+        };
+        Ok(result)
     }
 }
