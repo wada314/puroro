@@ -131,17 +131,18 @@ impl<'a> FileDescriptor<'a> {
         Ok(package)
     }
     pub fn dependencies(&'a self) -> Result<impl Iterator<Item = &FileDescriptor>> {
-        self.cache
+        Ok(self
+            .cache
             .dependencies
             .get_or_try_init(|| {
-                Ok(self
-                    .base
+                self.base
                     .dependencies
                     .iter()
                     .map(|name| self.root.file_from_name(name))
-                    .collect::<Result<Vec<_>>>()?)
-            })
-            .map(|v| v.into_iter().map(|f| *f))
+                    .collect::<Result<Vec<_>>>()
+            })?
+            .iter()
+            .copied())
     }
     pub fn messages(&'a self) -> Result<impl Iterator<Item = &Descriptor>> {
         Ok(self
@@ -208,24 +209,15 @@ impl<'a> FileDescriptor<'a> {
 mod tests {
     use super::*;
 
-    const FD_DEFAULT: FileDescriptorBase = FileDescriptorBase {
-        name: String::new(),
-        dependencies: vec![],
-        package: None,
-        message_types: vec![],
-        enum_types: vec![],
-        syntax: None,
-        edition: None,
-    };
-
     #[test]
     fn test_package_to_files() {
         fn make_fd(name: &str, package: &str) -> FileDescriptorBase {
-            FileDescriptorBase {
-                name: name.to_string(),
+            DebugFileDescriptor {
+                name,
                 package: Some(package.into()),
-                ..FD_DEFAULT
+                ..Default::default()
             }
+            .into()
         }
         let fd0 = make_fd("fd0.proto", "");
         let fd1 = make_fd("fd1.proto", "a");
