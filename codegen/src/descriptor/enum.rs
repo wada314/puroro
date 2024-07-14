@@ -64,6 +64,18 @@ pub struct EnumDescriptorCache<'a> {
 }
 
 impl<'a> EnumDescriptorWithContext<'a> {
+    pub fn new(
+        file: &'a FileDescriptorWithContext<'a>,
+        maybe_containing: Option<&'a DescriptorWithContext<'a>>,
+        body: &'a EnumDescriptor,
+    ) -> Self {
+        Self {
+            file,
+            maybe_containing,
+            body,
+            cache: Default::default(),
+        }
+    }
     pub fn name(&self) -> Result<&str> {
         Ok(self.body.name.as_ref())
     }

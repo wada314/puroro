@@ -83,6 +83,7 @@ pub struct DescriptorWithContext<'a> {
 #[derive(Default, Debug)]
 pub struct DescriptorCache<'a> {
     full_path: OnceCell<ProtoPathBuf>,
+    all_fields: OnceCell<Vec<FieldDescriptorWithContext<'a>>>,
     non_oneof_fields: OnceCell<Vec<FieldDescriptorWithContext<'a>>>,
     real_oneof_fields: OnceCell<Vec<FieldDescriptorWithContext<'a>>>,
     synthetic_oneof_fields: OnceCell<Vec<FieldDescriptorWithContext<'a>>>,
@@ -124,11 +125,13 @@ impl<'a> DescriptorWithContext<'a> {
     pub fn all_fields(
         &'a self,
     ) -> Result<impl 'a + IntoIterator<Item = &FieldDescriptorWithContext>> {
-        Ok(self
-            .non_oneof_fields()?
-            .into_iter()
-            .chain(self.real_oneof_fields()?.into_iter())
-            .chain(self.synthetic_oneof_fields()?.into_iter()))
+        self.cache.all_fields.get_or_try_init(|| {
+            self.body
+                .fields
+                .iter()
+                .map(|f| Ok(FieldDescriptorWithContext::new(f, self)))
+                .collect()
+        })
     }
     pub fn filtered_fields(
         &'a self,
@@ -138,13 +141,7 @@ impl<'a> DescriptorWithContext<'a> {
             .fields
             .iter()
             .filter(|field| f(field))
-            .map(|f| {
-                Ok(FieldDescriptorWithContext {
-                    message: self,
-                    body: f,
-                    cache: Default::default(),
-                })
-            })
+            .map(|f| Ok(FieldDescriptorWithContext::new(f, self)))
             .collect()
     }
     pub fn non_oneof_fields(
@@ -152,20 +149,20 @@ impl<'a> DescriptorWithContext<'a> {
     ) -> Result<impl 'a + IntoIterator<Item = &FieldDescriptorWithContext>> {
         self.cache
             .non_oneof_fields
-            .get_or_try_init(|| self.filtered_fields(|f| f.oneof_index.is_none()))
+            .get_or_try_init(|| self.filtered_fields(|f| f.oneof_index().is_none()))
     }
     pub fn real_oneof_fields(
         &'a self,
     ) -> Result<impl 'a + IntoIterator<Item = &FieldDescriptorWithContext>> {
         self.cache.real_oneof_fields.get_or_try_init(|| {
-            self.filtered_fields(|f| f.oneof_index.is_some() && !f.proto3_optional)
+            self.filtered_fields(|f| f.oneof_index().is_some() && !f.is_proto3_optional())
         })
     }
     pub fn synthetic_oneof_fields(
         &'a self,
     ) -> Result<impl 'a + IntoIterator<Item = &FieldDescriptorWithContext>> {
         self.cache.synthetic_oneof_fields.get_or_try_init(|| {
-            self.filtered_fields(|f| f.oneof_index.is_some() && f.proto3_optional)
+            self.filtered_fields(|f| f.oneof_index().is_some() && f.is_proto3_optional())
         })
     }
     pub fn all_oneofs(
@@ -185,8 +182,8 @@ impl<'a> DescriptorWithContext<'a> {
         let (real, synthetic) = self.cache.real_and_synthetic_oneofs.get_or_try_init(|| {
             let mut is_oneof_synthetic = vec![false; self.body.oneof_decls.len()];
             for f in self.all_fields()? {
-                if let Some(i) = f.body.oneof_index {
-                    is_oneof_synthetic[i] |= f.body.proto3_optional;
+                if let Some(i) = f.oneof_index() {
+                    is_oneof_synthetic[i] |= f.is_proto3_optional();
                 }
             }
             let (real, synthetic): (Vec<_>, Vec<_>) = self
@@ -195,11 +192,7 @@ impl<'a> DescriptorWithContext<'a> {
                 .iter()
                 .enumerate()
                 .partition_map(|(i, o)| {
-                    let oneof = Ok(OneofDescriptorWithContext {
-                        message: self,
-                        body: o,
-                        cache: Default::default(),
-                    });
+                    let oneof = Ok(OneofDescriptorWithContext::new(o, self));
                     if is_oneof_synthetic[i] {
                         Either::Right(oneof)
                     } else {
@@ -246,14 +239,7 @@ impl<'a> DescriptorWithContext<'a> {
             self.body
                 .enum_types
                 .iter()
-                .map(|e| {
-                    Ok(EnumDescriptorWithContext {
-                        file: self.file,
-                        maybe_containing: Some(self),
-                        body: e,
-                        cache: Default::default(),
-                    })
-                })
+                .map(|e| Ok(EnumDescriptorWithContext::new(self.file(), Some(self), e)))
                 .collect()
         })
     }

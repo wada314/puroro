@@ -113,7 +113,7 @@ pub enum FieldWrapper {
 
 impl FieldWrapper {
     fn try_from_field_desc(desc: &FieldDescriptorWithContext) -> Result<Self> {
-        Ok(match desc.label()? {
+        Ok(match desc.label() {
             Some(FieldLabel::Repeated) => FieldWrapper::Vec,
             Some(FieldLabel::Optional | FieldLabel::Required) => {
                 if desc.type_case() == FieldTypeCase::Message {
@@ -125,7 +125,7 @@ impl FieldWrapper {
             None => {
                 if desc.type_case() == FieldTypeCase::Message {
                     FieldWrapper::OptionalBoxed
-                } else if desc.is_proto3_optional()? {
+                } else if desc.is_proto3_optional() {
                     FieldWrapper::Optional
                 } else {
                     FieldWrapper::Bare

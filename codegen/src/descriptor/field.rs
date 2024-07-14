@@ -41,8 +41,26 @@ pub struct FieldDescriptor {
 }
 
 impl FieldDescriptor {
-    pub fn number(&self) -> Result<i32> {
-        Ok(self.number)
+    pub fn name(&self) -> &str {
+        &self.name
+    }
+    pub fn number(&self) -> i32 {
+        self.number
+    }
+    pub fn type_case(&self) -> FieldTypeCase {
+        self.type_case
+    }
+    pub fn type_name(&self) -> Option<&str> {
+        self.type_name.as_deref()
+    }
+    pub fn label(&self) -> Option<FieldLabel> {
+        self.label
+    }
+    pub fn oneof_index(&self) -> Option<usize> {
+        self.oneof_index
+    }
+    pub fn is_proto3_optional(&self) -> bool {
+        self.proto3_optional
     }
 }
 
@@ -94,6 +112,13 @@ pub struct FieldDescriptorCache<'a> {
 }
 
 impl<'a> FieldDescriptorWithContext<'a> {
+    pub fn new(body: &'a FieldDescriptor, message: &'a DescriptorWithContext<'a>) -> Self {
+        Self {
+            message,
+            body,
+            cache: Default::default(),
+        }
+    }
     pub fn name(&self) -> Result<&str> {
         Ok(&self.body.name)
     }
@@ -139,15 +164,6 @@ impl<'a> FieldDescriptorWithContext<'a> {
             |e| Ok(e.full_path()?.to_owned()),
         )?)
     }
-    pub fn type_case(&self) -> FieldTypeCase {
-        self.body.type_case
-    }
-    pub fn label(&self) -> Result<Option<FieldLabel>> {
-        Ok(self.body.label)
-    }
-    pub fn is_proto3_optional(&self) -> Result<bool> {
-        Ok(self.body.proto3_optional)
-    }
 }
 
 impl Deref for FieldDescriptorWithContext<'_> {
@@ -166,3 +182,13 @@ pub struct OneofDescriptorWithContext<'a> {
 
 #[derive(Default, Debug)]
 pub struct OneofDescriptorCache {}
+
+impl<'a> OneofDescriptorWithContext<'a> {
+    pub fn new(body: &'a OneofDescriptor, message: &'a DescriptorWithContext<'a>) -> Self {
+        Self {
+            message,
+            body,
+            cache: Default::default(),
+        }
+    }
+}
