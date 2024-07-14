@@ -13,17 +13,12 @@
 // limitations under the License.
 
 use super::message_trait::{Field as TraitField, MessageTrait};
-use crate::cases::{convert_into_case, Case};
-use crate::descriptor::{
-    DescriptorWithContext, FieldDescriptorWithContext, FieldLabel, FieldType, FieldTypeCase,
-};
-use crate::generator::avoid_reserved_keywords;
+use crate::descriptor::{DescriptorWithContext, FieldDescriptorWithContext};
 use crate::generator::message_trait::FieldWrapper;
-use crate::proto_path::{ProtoPath, ProtoPathBuf};
 use crate::Result;
-use ::quote::{format_ident, quote};
-use ::syn::{parse2, parse_str, Ident, Item, Path, Type};
-use ::syn::{Expr, Lifetime};
+use ::quote::quote;
+use ::syn::Expr;
+use ::syn::{parse2, Ident, Item};
 
 pub struct UntypedMessageImpls {
     rust_trait_name: Ident,
@@ -83,6 +78,7 @@ impl Field {
         })?)
     }
 
+    #[allow(unused)]
     fn gen_getter_body(&self, field_expr: &Expr) -> Result<Expr> {
         let result = match self.trait_field.wrapper() {
             FieldWrapper::Bare => todo!(),

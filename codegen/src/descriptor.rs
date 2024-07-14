@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#![allow(unused)]
-
 mod r#enum;
 mod field;
 mod file;
@@ -26,19 +24,10 @@ pub use r#enum::*;
 pub use subtypes::*;
 
 use crate::proto_path::{ProtoPath, ProtoPathBuf};
-use crate::{ErrorKind, Result};
-use ::itertools::{Either, Itertools};
-use ::puroro::google::protobuf::{
-    field_descriptor_proto::Label as FieldLabelProto,
-    field_descriptor_proto::Type as FieldTypeProto, DescriptorProto, Edition as EditionProto,
-    EnumDescriptorProto, EnumValueDescriptorProto, FieldDescriptorProto, FileDescriptorProto,
-    FileDescriptorSet, OneofDescriptorProto,
-};
-use ::puroro::Result as PResult;
+use crate::Result;
 use ::std::cell::OnceCell;
 use ::std::collections::HashMap;
 use ::std::fmt::Debug;
-use ::std::ops::Deref;
 
 #[derive(Debug)]
 pub struct RootContext<'a> {
@@ -116,7 +105,6 @@ impl<'a> RootContext<'a> {
         return Ok(self
             .resolve_absolute_path(&path)?
             .ok_or_else(|| format!("Path not found: {}", path))?);
-        Err(format!("Path not found: {}", path))?
     }
     pub fn resolve_relative_path(
         &'a self,
@@ -218,7 +206,6 @@ impl<T> TryIntoNumber<T> for Option<T> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use ::std::assert_matches::assert_matches;
 
     #[test]
     fn test_resolve_path() {

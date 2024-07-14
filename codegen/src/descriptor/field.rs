@@ -14,16 +14,10 @@
 
 use crate::proto_path::{ProtoPath, ProtoPathBuf};
 use crate::{ErrorKind, Result};
-use itertools::{Either, Itertools};
 use puroro::google::protobuf::{
-    field_descriptor_proto::Label as FieldLabelProto,
-    field_descriptor_proto::Type as FieldTypeProto, DescriptorProto, Edition as EditionProto,
-    EnumDescriptorProto, EnumValueDescriptorProto, FieldDescriptorProto, FileDescriptorProto,
-    FileDescriptorSet, OneofDescriptorProto,
+    field_descriptor_proto::Label as FieldLabelProto, FieldDescriptorProto, OneofDescriptorProto,
 };
-use puroro::Result as PResult;
 use std::cell::OnceCell;
-use std::collections::HashMap;
 use std::fmt::Debug;
 use std::ops::Deref;
 
@@ -86,6 +80,7 @@ impl<'a> TryFrom<FieldDescriptorProto<'a>> for FieldDescriptor {
 
 #[derive(Debug, Clone)]
 pub struct OneofDescriptor {
+    #[allow(unused)]
     name: String,
 }
 
@@ -175,8 +170,11 @@ impl Deref for FieldDescriptorWithContext<'_> {
 
 #[derive(Debug)]
 pub struct OneofDescriptorWithContext<'a> {
+    #[allow(unused)]
     message: &'a DescriptorWithContext<'a>,
+    #[allow(unused)]
     body: &'a OneofDescriptor,
+    #[allow(unused)]
     cache: OneofDescriptorCache,
 }
 

@@ -14,18 +14,11 @@
 
 use crate::proto_path::{ProtoPath, ProtoPathBuf};
 use crate::{ErrorKind, Result};
-use ::itertools::{Either, Itertools};
-use ::puroro::google::protobuf::{
-    field_descriptor_proto::Label as FieldLabelProto,
-    field_descriptor_proto::Type as FieldTypeProto, DescriptorProto, Edition as EditionProto,
-    EnumDescriptorProto, EnumValueDescriptorProto, FieldDescriptorProto, FileDescriptorProto,
-    FileDescriptorSet, OneofDescriptorProto,
-};
+use ::itertools::Itertools;
+use ::puroro::google::protobuf::{EnumDescriptorProto, EnumValueDescriptorProto};
 use ::puroro::Result as PResult;
 use ::std::cell::OnceCell;
-use ::std::collections::HashMap;
 use ::std::fmt::Debug;
-use ::std::ops::Deref;
 
 use super::*;
 
