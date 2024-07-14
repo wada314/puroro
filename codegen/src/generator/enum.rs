@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use crate::cases::{convert_into_case, Case};
-use crate::descriptor::{EnumDescriptorWithContext, EnumValueDescriptorWithContext};
+use crate::descriptor::{EnumDescriptor, EnumValueDescriptor};
 use crate::proto_path::ProtoPath;
 use crate::Result;
 use ::quote::{format_ident, quote};
@@ -30,7 +30,7 @@ struct EnumVariant {
 }
 
 impl Enum {
-    pub fn try_new<'a>(desc: &'a EnumDescriptorWithContext<'a>) -> Result<Self> {
+    pub fn try_new<'a>(desc: &'a EnumDescriptor<'a>) -> Result<Self> {
         Ok(Self {
             name: Self::rust_name_from_enum_name(desc.name()?)?,
             variants: desc
@@ -123,7 +123,7 @@ impl Enum {
 }
 
 impl EnumVariant {
-    fn try_new(desc: &EnumValueDescriptorWithContext) -> Result<Self> {
+    fn try_new(desc: &EnumValueDescriptor) -> Result<Self> {
         Ok(Self {
             name: parse_str(&convert_into_case(desc.name()?, Case::CamelCase))?,
             number: desc.number()?,

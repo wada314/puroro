@@ -25,15 +25,15 @@ use super::*;
 // region: Descriptor
 
 #[derive(Debug, Clone)]
-pub struct Descriptor {
+pub struct DescriptorBase {
     name: String,
-    fields: Vec<FieldDescriptor>,
-    oneof_decls: Vec<OneofDescriptor>,
-    nested_types: Vec<Descriptor>,
-    enum_types: Vec<EnumDescriptor>,
+    fields: Vec<FieldDescriptorBase>,
+    oneof_decls: Vec<OneofDescriptorBase>,
+    nested_types: Vec<DescriptorBase>,
+    enum_types: Vec<EnumDescriptorBase>,
 }
 
-impl<'a> TryFrom<DescriptorProto<'a>> for Descriptor {
+impl<'a> TryFrom<DescriptorProto<'a>> for DescriptorBase {
     type Error = ErrorKind;
     fn try_from(proto: DescriptorProto) -> Result<Self> {
         Ok(Self {
@@ -41,22 +41,22 @@ impl<'a> TryFrom<DescriptorProto<'a>> for Descriptor {
             fields: proto
                 .field()
                 .into_iter()
-                .map_ok(FieldDescriptor::try_from)
+                .map_ok(FieldDescriptorBase::try_from)
                 .collect::<PResult<Result<Vec<_>>>>()??,
             oneof_decls: proto
                 .oneof_decl()
                 .into_iter()
-                .map_ok(OneofDescriptor::try_from)
+                .map_ok(OneofDescriptorBase::try_from)
                 .collect::<PResult<Result<Vec<_>>>>()??,
             nested_types: proto
                 .nested_type()
                 .into_iter()
-                .map_ok(Descriptor::try_from)
+                .map_ok(DescriptorBase::try_from)
                 .collect::<PResult<Result<Vec<_>>>>()??,
             enum_types: proto
                 .enum_type()
                 .into_iter()
-                .map_ok(EnumDescriptor::try_from)
+                .map_ok(EnumDescriptorBase::try_from)
                 .collect::<PResult<Result<Vec<_>>>>()??,
         })
     }
@@ -71,7 +71,7 @@ pub struct DebugDescriptor<'a> {
 }
 
 #[cfg(test)]
-impl From<DebugDescriptor<'_>> for Descriptor {
+impl From<DebugDescriptor<'_>> for DescriptorBase {
     fn from(debug: DebugDescriptor) -> Self {
         Self {
             name: debug.name.to_string(),
@@ -84,53 +84,50 @@ impl From<DebugDescriptor<'_>> for Descriptor {
 }
 
 #[derive(Debug)]
-pub struct DescriptorWithContext<'a> {
-    file: &'a FileDescriptorWithContext<'a>,
-    maybe_containing: Option<&'a DescriptorWithContext<'a>>,
-    body: &'a Descriptor,
+pub struct Descriptor<'a> {
+    file: &'a FileDescriptor<'a>,
+    maybe_containing: Option<&'a Descriptor<'a>>,
+    base: &'a DescriptorBase,
     cache: DescriptorCache<'a>,
 }
 
 #[derive(Default, Debug)]
 pub struct DescriptorCache<'a> {
     full_path: OnceCell<ProtoPathBuf>,
-    all_fields: OnceCell<Vec<FieldDescriptorWithContext<'a>>>,
-    non_oneof_fields: OnceCell<Vec<FieldDescriptorWithContext<'a>>>,
-    real_oneof_fields: OnceCell<Vec<FieldDescriptorWithContext<'a>>>,
-    synthetic_oneof_fields: OnceCell<Vec<FieldDescriptorWithContext<'a>>>,
-    real_and_synthetic_oneofs: OnceCell<(
-        Vec<OneofDescriptorWithContext<'a>>,
-        Vec<OneofDescriptorWithContext<'a>>,
-    )>,
+    all_fields: OnceCell<Vec<FieldDescriptor<'a>>>,
+    non_oneof_fields: OnceCell<Vec<FieldDescriptor<'a>>>,
+    real_oneof_fields: OnceCell<Vec<FieldDescriptor<'a>>>,
+    synthetic_oneof_fields: OnceCell<Vec<FieldDescriptor<'a>>>,
+    real_and_synthetic_oneofs: OnceCell<(Vec<OneofDescriptor<'a>>, Vec<OneofDescriptor<'a>>)>,
     #[allow(unused)]
-    real_oneofs: OnceCell<Vec<OneofDescriptorWithContext<'a>>>,
+    real_oneofs: OnceCell<Vec<OneofDescriptor<'a>>>,
     #[allow(unused)]
-    synthetic_oneofs: OnceCell<Vec<OneofDescriptorWithContext<'a>>>,
-    nested_types: OnceCell<Vec<DescriptorWithContext<'a>>>,
-    enum_types: OnceCell<Vec<EnumDescriptorWithContext<'a>>>,
+    synthetic_oneofs: OnceCell<Vec<OneofDescriptor<'a>>>,
+    nested_types: OnceCell<Vec<Descriptor<'a>>>,
+    enum_types: OnceCell<Vec<EnumDescriptor<'a>>>,
 }
 
-impl<'a> DescriptorWithContext<'a> {
+impl<'a> Descriptor<'a> {
     pub fn new(
-        file: &'a FileDescriptorWithContext<'a>,
-        maybe_containing: Option<&'a DescriptorWithContext<'a>>,
-        body: &'a Descriptor,
+        file: &'a FileDescriptor<'a>,
+        maybe_containing: Option<&'a Descriptor<'a>>,
+        base: &'a DescriptorBase,
     ) -> Self {
         Self {
             file,
             maybe_containing,
-            body,
+            base,
             cache: Default::default(),
         }
     }
-    pub fn file(&self) -> &'a FileDescriptorWithContext<'a> {
+    pub fn file(&self) -> &'a FileDescriptor<'a> {
         self.file
     }
     pub fn root(&self) -> &'a RootContext<'a> {
         self.file().root()
     }
     pub fn name(&self) -> Result<&str> {
-        Ok(&self.body.name)
+        Ok(&self.base.name)
     }
     pub fn full_path(&self) -> Result<&ProtoPath> {
         self.cache
@@ -142,57 +139,49 @@ impl<'a> DescriptorWithContext<'a> {
                     self.file.absolute_package()?.to_owned()
                 };
                 // todo!("absl path check?");
-                full_path.push(&self.body.name);
+                full_path.push(&self.base.name);
                 Ok(full_path)
             })
             .map(|s| s.as_ref())
     }
-    pub fn all_fields(
-        &'a self,
-    ) -> Result<impl 'a + IntoIterator<Item = &FieldDescriptorWithContext>> {
+    pub fn all_fields(&'a self) -> Result<impl 'a + IntoIterator<Item = &FieldDescriptor>> {
         self.cache.all_fields.get_or_try_init(|| {
-            self.body
+            self.base
                 .fields
                 .iter()
-                .map(|f| Ok(FieldDescriptorWithContext::new(f, self)))
+                .map(|f| Ok(FieldDescriptor::new(f, self)))
                 .collect()
         })
     }
     pub fn filtered_fields(
         &'a self,
-        f: impl Fn(&FieldDescriptor) -> bool,
-    ) -> Result<Vec<FieldDescriptorWithContext<'a>>> {
-        self.body
+        f: impl Fn(&FieldDescriptorBase) -> bool,
+    ) -> Result<Vec<FieldDescriptor<'a>>> {
+        self.base
             .fields
             .iter()
             .filter(|field| f(field))
-            .map(|f| Ok(FieldDescriptorWithContext::new(f, self)))
+            .map(|f| Ok(FieldDescriptor::new(f, self)))
             .collect()
     }
-    pub fn non_oneof_fields(
-        &'a self,
-    ) -> Result<impl 'a + IntoIterator<Item = &FieldDescriptorWithContext>> {
+    pub fn non_oneof_fields(&'a self) -> Result<impl 'a + IntoIterator<Item = &FieldDescriptor>> {
         self.cache
             .non_oneof_fields
             .get_or_try_init(|| self.filtered_fields(|f| f.oneof_index().is_none()))
     }
-    pub fn real_oneof_fields(
-        &'a self,
-    ) -> Result<impl 'a + IntoIterator<Item = &FieldDescriptorWithContext>> {
+    pub fn real_oneof_fields(&'a self) -> Result<impl 'a + IntoIterator<Item = &FieldDescriptor>> {
         self.cache.real_oneof_fields.get_or_try_init(|| {
             self.filtered_fields(|f| f.oneof_index().is_some() && !f.is_proto3_optional())
         })
     }
     pub fn synthetic_oneof_fields(
         &'a self,
-    ) -> Result<impl 'a + IntoIterator<Item = &FieldDescriptorWithContext>> {
+    ) -> Result<impl 'a + IntoIterator<Item = &FieldDescriptor>> {
         self.cache.synthetic_oneof_fields.get_or_try_init(|| {
             self.filtered_fields(|f| f.oneof_index().is_some() && f.is_proto3_optional())
         })
     }
-    pub fn all_oneofs(
-        &'a self,
-    ) -> Result<impl 'a + IntoIterator<Item = &OneofDescriptorWithContext>> {
+    pub fn all_oneofs(&'a self) -> Result<impl 'a + IntoIterator<Item = &OneofDescriptor>> {
         Ok(self
             .real_oneofs()?
             .into_iter()
@@ -201,23 +190,23 @@ impl<'a> DescriptorWithContext<'a> {
     pub fn real_and_synthetic_oneofs(
         &'a self,
     ) -> Result<(
-        impl IntoIterator<Item = &'a OneofDescriptorWithContext<'a>>,
-        impl IntoIterator<Item = &'a OneofDescriptorWithContext<'a>>,
+        impl IntoIterator<Item = &'a OneofDescriptor<'a>>,
+        impl IntoIterator<Item = &'a OneofDescriptor<'a>>,
     )> {
         let (real, synthetic) = self.cache.real_and_synthetic_oneofs.get_or_try_init(|| {
-            let mut is_oneof_synthetic = vec![false; self.body.oneof_decls.len()];
+            let mut is_oneof_synthetic = vec![false; self.base.oneof_decls.len()];
             for f in self.all_fields()? {
                 if let Some(i) = f.oneof_index() {
                     is_oneof_synthetic[i] |= f.is_proto3_optional();
                 }
             }
             let (real, synthetic): (Vec<_>, Vec<_>) = self
-                .body
+                .base
                 .oneof_decls
                 .iter()
                 .enumerate()
                 .partition_map(|(i, o)| {
-                    let oneof = Ok(OneofDescriptorWithContext::new(o, self));
+                    let oneof = Ok(OneofDescriptor::new(o, self));
                     if is_oneof_synthetic[i] {
                         Either::Right(oneof)
                     } else {
@@ -231,55 +220,47 @@ impl<'a> DescriptorWithContext<'a> {
         })?;
         Ok((real, synthetic))
     }
-    pub fn real_oneofs(
-        &'a self,
-    ) -> Result<impl IntoIterator<Item = &'a OneofDescriptorWithContext>> {
+    pub fn real_oneofs(&'a self) -> Result<impl IntoIterator<Item = &'a OneofDescriptor>> {
         Ok(self.real_and_synthetic_oneofs()?.0)
     }
-    pub fn synthetic_oneofs(
-        &'a self,
-    ) -> Result<impl IntoIterator<Item = &'a OneofDescriptorWithContext>> {
+    pub fn synthetic_oneofs(&'a self) -> Result<impl IntoIterator<Item = &'a OneofDescriptor>> {
         Ok(self.real_and_synthetic_oneofs()?.1)
     }
-    pub fn nested_types(&'a self) -> Result<impl 'a + IntoIterator<Item = &DescriptorWithContext>> {
+    pub fn nested_types(&'a self) -> Result<impl 'a + IntoIterator<Item = &Descriptor>> {
         self.cache.nested_types.get_or_try_init(|| {
-            self.body
+            self.base
                 .nested_types
                 .iter()
                 .map(|m| {
-                    Ok(DescriptorWithContext {
+                    Ok(Descriptor {
                         file: self.file,
                         maybe_containing: Some(self),
-                        body: m,
+                        base: m,
                         cache: Default::default(),
                     })
                 })
                 .collect()
         })
     }
-    pub fn enum_types(
-        &'a self,
-    ) -> Result<impl 'a + IntoIterator<Item = &EnumDescriptorWithContext>> {
+    pub fn enum_types(&'a self) -> Result<impl 'a + IntoIterator<Item = &EnumDescriptor>> {
         self.cache.enum_types.get_or_try_init(|| {
-            self.body
+            self.base
                 .enum_types
                 .iter()
-                .map(|e| Ok(EnumDescriptorWithContext::new(self.file(), Some(self), e)))
+                .map(|e| Ok(EnumDescriptor::new(self.file(), Some(self), e)))
                 .collect()
         })
     }
     pub fn all_messages_or_enums(
         &'a self,
-    ) -> Result<
-        impl 'a + IntoIterator<Item = MessageOrEnum<&DescriptorWithContext, &EnumDescriptorWithContext>>,
-    > {
+    ) -> Result<impl 'a + IntoIterator<Item = MessageOrEnum<&Descriptor, &EnumDescriptor>>> {
         Ok(self
             .all_messages()?
             .into_iter()
             .map(MessageOrEnum::Message)
             .chain(self.all_enums()?.into_iter().map(MessageOrEnum::Enum)))
     }
-    pub fn all_messages(&'a self) -> Result<impl 'a + IntoIterator<Item = &DescriptorWithContext>> {
+    pub fn all_messages(&'a self) -> Result<impl 'a + IntoIterator<Item = &Descriptor>> {
         let direct_messages = self.nested_types()?.into_iter();
         let indirect_messages_vec = self
             .nested_types()?
@@ -292,9 +273,7 @@ impl<'a> DescriptorWithContext<'a> {
         let boxed: Box<dyn Iterator<Item = _>> = Box::new(direct_messages.chain(indirect_messages));
         Ok(boxed)
     }
-    pub fn all_enums(
-        &'a self,
-    ) -> Result<impl 'a + IntoIterator<Item = &EnumDescriptorWithContext>> {
+    pub fn all_enums(&'a self) -> Result<impl 'a + IntoIterator<Item = &EnumDescriptor>> {
         let direct_enums = self.enum_types()?.into_iter();
         let indirect_enums_vec = self
             .nested_types()?

@@ -23,12 +23,12 @@ use ::std::fmt::Debug;
 use super::*;
 
 #[derive(Debug, Clone)]
-pub struct EnumDescriptor {
+pub struct EnumDescriptorBase {
     name: String,
-    values: Vec<EnumValueDescriptor>,
+    values: Vec<EnumValueDescriptorBase>,
 }
 
-impl<'a> TryFrom<EnumDescriptorProto<'a>> for EnumDescriptor {
+impl<'a> TryFrom<EnumDescriptorProto<'a>> for EnumDescriptorBase {
     type Error = ErrorKind;
     fn try_from(proto: EnumDescriptorProto) -> Result<Self> {
         Ok(Self {
@@ -36,7 +36,7 @@ impl<'a> TryFrom<EnumDescriptorProto<'a>> for EnumDescriptor {
             values: proto
                 .value()
                 .into_iter()
-                .map_ok(EnumValueDescriptor::try_from)
+                .map_ok(EnumValueDescriptorBase::try_from)
                 .collect::<PResult<Result<Vec<_>>>>()??,
         })
     }
@@ -49,7 +49,7 @@ pub struct DebugEnumDescriptor<'a> {
     pub values: Vec<DebugEnumValueDescriptor<'a>>,
 }
 #[cfg(test)]
-impl From<DebugEnumDescriptor<'_>> for EnumDescriptor {
+impl From<DebugEnumDescriptor<'_>> for EnumDescriptorBase {
     fn from(debug: DebugEnumDescriptor) -> Self {
         Self {
             name: debug.name.to_string(),
@@ -59,34 +59,34 @@ impl From<DebugEnumDescriptor<'_>> for EnumDescriptor {
 }
 
 #[derive(Debug)]
-pub struct EnumDescriptorWithContext<'a> {
-    file: &'a FileDescriptorWithContext<'a>,
-    maybe_containing: Option<&'a DescriptorWithContext<'a>>,
-    body: &'a EnumDescriptor,
+pub struct EnumDescriptor<'a> {
+    file: &'a FileDescriptor<'a>,
+    maybe_containing: Option<&'a Descriptor<'a>>,
+    base: &'a EnumDescriptorBase,
     cache: EnumDescriptorCache<'a>,
 }
 
 #[derive(Default, Debug)]
 pub struct EnumDescriptorCache<'a> {
     full_path: OnceCell<ProtoPathBuf>,
-    values: OnceCell<Vec<EnumValueDescriptorWithContext<'a>>>,
+    values: OnceCell<Vec<EnumValueDescriptor<'a>>>,
 }
 
-impl<'a> EnumDescriptorWithContext<'a> {
+impl<'a> EnumDescriptor<'a> {
     pub fn new(
-        file: &'a FileDescriptorWithContext<'a>,
-        maybe_containing: Option<&'a DescriptorWithContext<'a>>,
-        body: &'a EnumDescriptor,
+        file: &'a FileDescriptor<'a>,
+        maybe_containing: Option<&'a Descriptor<'a>>,
+        base: &'a EnumDescriptorBase,
     ) -> Self {
         Self {
             file,
             maybe_containing,
-            body,
+            base,
             cache: Default::default(),
         }
     }
     pub fn name(&self) -> Result<&str> {
-        Ok(self.body.name.as_ref())
+        Ok(self.base.name.as_ref())
     }
     pub fn full_path(&self) -> Result<&ProtoPath> {
         self.cache
@@ -97,25 +97,23 @@ impl<'a> EnumDescriptorWithContext<'a> {
                 } else {
                     self.file.absolute_package()?.to_owned()
                 };
-                full_path.push(&self.body.name);
+                full_path.push(&self.base.name);
                 Ok(full_path)
             })
             .map(|s| s.as_ref())
     }
-    pub fn file(&'a self) -> Result<&FileDescriptorWithContext> {
+    pub fn file(&'a self) -> Result<&FileDescriptor> {
         Ok(self.file)
     }
-    pub fn values(
-        &'a self,
-    ) -> Result<impl 'a + IntoIterator<Item = &EnumValueDescriptorWithContext>> {
+    pub fn values(&'a self) -> Result<impl 'a + IntoIterator<Item = &EnumValueDescriptor>> {
         self.cache.values.get_or_try_init(|| {
-            self.body
+            self.base
                 .values
                 .iter()
                 .map(|v| {
-                    Ok(EnumValueDescriptorWithContext {
+                    Ok(EnumValueDescriptor {
                         enum_: self,
-                        body: v,
+                        base: v,
                         cache: Default::default(),
                     })
                 })
@@ -125,12 +123,12 @@ impl<'a> EnumDescriptorWithContext<'a> {
 }
 
 #[derive(Debug, Clone)]
-pub struct EnumValueDescriptor {
+pub struct EnumValueDescriptorBase {
     name: String,
     number: i32,
 }
 
-impl<'a> TryFrom<EnumValueDescriptorProto<'a>> for EnumValueDescriptor {
+impl<'a> TryFrom<EnumValueDescriptorProto<'a>> for EnumValueDescriptorBase {
     type Error = ErrorKind;
     fn try_from(proto: EnumValueDescriptorProto) -> Result<Self> {
         Ok(Self {
@@ -151,7 +149,7 @@ pub struct DebugEnumValueDescriptor<'a> {
     pub number: i32,
 }
 #[cfg(test)]
-impl From<DebugEnumValueDescriptor<'_>> for EnumValueDescriptor {
+impl From<DebugEnumValueDescriptor<'_>> for EnumValueDescriptorBase {
     fn from(debug: DebugEnumValueDescriptor) -> Self {
         Self {
             name: debug.name.to_string(),
@@ -161,18 +159,18 @@ impl From<DebugEnumValueDescriptor<'_>> for EnumValueDescriptor {
 }
 
 #[derive(Debug)]
-pub struct EnumValueDescriptorWithContext<'a> {
-    enum_: &'a EnumDescriptorWithContext<'a>,
-    body: &'a EnumValueDescriptor,
+pub struct EnumValueDescriptor<'a> {
+    enum_: &'a EnumDescriptor<'a>,
+    base: &'a EnumValueDescriptorBase,
     cache: EnumValueDescriptorCache,
 }
 #[derive(Default, Debug)]
 pub struct EnumValueDescriptorCache {
     full_name: OnceCell<ProtoPathBuf>,
 }
-impl<'a> EnumValueDescriptorWithContext<'a> {
+impl<'a> EnumValueDescriptor<'a> {
     pub fn name(&self) -> Result<&str> {
-        Ok(self.body.name.as_ref())
+        Ok(self.base.name.as_ref())
     }
     pub fn full_name(&self) -> Result<&ProtoPath> {
         self.cache
@@ -193,6 +191,6 @@ impl<'a> EnumValueDescriptorWithContext<'a> {
             .map(|s| s.as_ref())
     }
     pub fn number(&self) -> Result<i32> {
-        Ok(self.body.number)
+        Ok(self.base.number)
     }
 }

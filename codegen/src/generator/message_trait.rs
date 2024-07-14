@@ -13,9 +13,7 @@
 // limitations under the License.
 
 use crate::cases::{convert_into_case, Case};
-use crate::descriptor::{
-    DescriptorWithContext, FieldDescriptorWithContext, FieldLabel, FieldType, FieldTypeCase,
-};
+use crate::descriptor::{Descriptor, FieldDescriptor, FieldLabel, FieldType, FieldTypeCase};
 use crate::generator::avoid_reserved_keywords;
 use crate::proto_path::{ProtoPath, ProtoPathBuf};
 use crate::Result;
@@ -29,7 +27,7 @@ pub struct MessageTrait {
 }
 
 impl MessageTrait {
-    pub fn try_new<'a>(desc: &'a DescriptorWithContext<'a>) -> Result<Self> {
+    pub fn try_new<'a>(desc: &'a Descriptor<'a>) -> Result<Self> {
         Ok(Self {
             rust_name: Self::rust_name_from_message_name(desc.name()?)?,
             fields: desc
@@ -76,7 +74,7 @@ pub struct Field {
 }
 
 impl Field {
-    pub fn try_new<'a>(desc: &'a FieldDescriptorWithContext<'a>) -> Result<Self> {
+    pub fn try_new<'a>(desc: &'a FieldDescriptor<'a>) -> Result<Self> {
         Ok(Self {
             original_name: desc.name()?.to_string(),
             wrapper: FieldWrapper::try_from_field_desc(desc)?,
@@ -112,7 +110,7 @@ pub enum FieldWrapper {
 }
 
 impl FieldWrapper {
-    fn try_from_field_desc(desc: &FieldDescriptorWithContext) -> Result<Self> {
+    fn try_from_field_desc(desc: &FieldDescriptor) -> Result<Self> {
         Ok(match desc.label() {
             Some(FieldLabel::Repeated) => FieldWrapper::Vec,
             Some(FieldLabel::Optional | FieldLabel::Required) => {

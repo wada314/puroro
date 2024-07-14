@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use super::message_trait::{Field as TraitField, MessageTrait};
-use crate::descriptor::{DescriptorWithContext, FieldDescriptorWithContext};
+use crate::descriptor::{Descriptor, FieldDescriptor};
 use crate::generator::message_trait::FieldWrapper;
 use crate::Result;
 use ::quote::quote;
@@ -26,7 +26,7 @@ pub struct UntypedMessageImpls {
 }
 
 impl UntypedMessageImpls {
-    pub fn try_new<'a>(desc: &'a DescriptorWithContext<'a>) -> Result<Self> {
+    pub fn try_new<'a>(desc: &'a Descriptor<'a>) -> Result<Self> {
         Ok(Self {
             rust_trait_name: MessageTrait::rust_name_from_message_name(desc.name()?)?,
             fields: desc
@@ -58,7 +58,7 @@ pub struct Field {
 }
 
 impl Field {
-    fn try_new<'a>(desc: &'a FieldDescriptorWithContext<'a>) -> Result<Self> {
+    fn try_new<'a>(desc: &'a FieldDescriptor<'a>) -> Result<Self> {
         Ok(Self {
             number: desc.number(),
             trait_field: TraitField::try_new(desc)?,

@@ -14,18 +14,11 @@
 
 use crate::proto_path::{ProtoPath, ProtoPathBuf};
 use crate::{ErrorKind, Result};
-use itertools::{Either, Itertools};
 use puroro::google::protobuf::{
     field_descriptor_proto::Label as FieldLabelProto,
-    field_descriptor_proto::Type as FieldTypeProto, DescriptorProto, Edition as EditionProto,
-    EnumDescriptorProto, EnumValueDescriptorProto, FieldDescriptorProto, FileDescriptorProto,
-    FileDescriptorSet, OneofDescriptorProto,
+    field_descriptor_proto::Type as FieldTypeProto, Edition as EditionProto,
 };
-use puroro::Result as PResult;
-use std::cell::OnceCell;
-use std::collections::HashMap;
 use std::fmt::Debug;
-use std::ops::Deref;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub enum Edition {
@@ -251,12 +244,62 @@ impl FieldTypeCase {
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum WireType<V, I32, I64, L> {
-    Varint(V),
+    Variant(V),
     I64(I64),
     Len(L),
     StartGroup,
     EndGroup,
     I32(I32),
+}
+
+impl<M, E> From<FieldType<M, E>> for WireType<VariantType<E>, I32Type, I64Type, LenType<M>> {
+    fn from(field_type: FieldType<M, E>) -> Self {
+        match field_type {
+            FieldType::Int32 => WireType::Variant(VariantType::Int32),
+            FieldType::UInt32 => WireType::Variant(VariantType::UInt32),
+            FieldType::SInt32 => WireType::Variant(VariantType::SInt32),
+            FieldType::Int64 => WireType::Variant(VariantType::Int64),
+            FieldType::UInt64 => WireType::Variant(VariantType::UInt64),
+            FieldType::SInt64 => WireType::Variant(VariantType::SInt64),
+            FieldType::Bool => WireType::Variant(VariantType::Bool),
+            FieldType::Enum(e) => WireType::Variant(VariantType::Enum(e)),
+            FieldType::Float => WireType::I32(I32Type::Float),
+            FieldType::Fixed32 => WireType::I32(I32Type::Fixed32),
+            FieldType::SFixed32 => WireType::I32(I32Type::SFixed32),
+            FieldType::Double => WireType::I64(I64Type::Double),
+            FieldType::Fixed64 => WireType::I64(I64Type::Fixed64),
+            FieldType::SFixed64 => WireType::I64(I64Type::SFixed64),
+            FieldType::Bytes => WireType::Len(LenType::Bytes),
+            FieldType::String => WireType::Len(LenType::String),
+            FieldType::Message(m) => WireType::Len(LenType::Message(m)),
+            FieldType::Group => WireType::StartGroup,
+        }
+    }
+}
+
+impl From<FieldTypeCase> for WireType<VariantTypeCase, I32TypeCase, I64TypeCase, LenTypeCase> {
+    fn from(field_type: FieldTypeCase) -> Self {
+        match field_type {
+            FieldTypeCase::Int32 => WireType::Variant(VariantTypeCase::Int32),
+            FieldTypeCase::UInt32 => WireType::Variant(VariantTypeCase::UInt32),
+            FieldTypeCase::SInt32 => WireType::Variant(VariantTypeCase::SInt32),
+            FieldTypeCase::Int64 => WireType::Variant(VariantTypeCase::Int64),
+            FieldTypeCase::UInt64 => WireType::Variant(VariantTypeCase::UInt64),
+            FieldTypeCase::SInt64 => WireType::Variant(VariantTypeCase::SInt64),
+            FieldTypeCase::Bool => WireType::Variant(VariantTypeCase::Bool),
+            FieldTypeCase::Enum => WireType::Variant(VariantTypeCase::Enum),
+            FieldTypeCase::Float => WireType::I32(I32TypeCase::Float),
+            FieldTypeCase::Fixed32 => WireType::I32(I32TypeCase::Fixed32),
+            FieldTypeCase::SFixed32 => WireType::I32(I32TypeCase::SFixed32),
+            FieldTypeCase::Double => WireType::I64(I64TypeCase::Double),
+            FieldTypeCase::Fixed64 => WireType::I64(I64TypeCase::Fixed64),
+            FieldTypeCase::SFixed64 => WireType::I64(I64TypeCase::SFixed64),
+            FieldTypeCase::Bytes => WireType::Len(LenTypeCase::Bytes),
+            FieldTypeCase::String => WireType::Len(LenTypeCase::String),
+            FieldTypeCase::Message => WireType::Len(LenTypeCase::Message),
+            FieldTypeCase::Group => WireType::StartGroup,
+        }
+    }
 }
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -267,6 +310,31 @@ pub enum WireTypeCase {
     StartGroup,
     EndGroup,
     I32,
+}
+
+impl From<FieldTypeCase> for WireTypeCase {
+    fn from(field_type: FieldTypeCase) -> Self {
+        match field_type {
+            FieldTypeCase::Int32
+            | FieldTypeCase::UInt32
+            | FieldTypeCase::SInt32
+            | FieldTypeCase::Int64
+            | FieldTypeCase::UInt64
+            | FieldTypeCase::SInt64
+            | FieldTypeCase::Bool
+            | FieldTypeCase::Enum => WireTypeCase::Varint,
+            FieldTypeCase::Float | FieldTypeCase::Fixed32 | FieldTypeCase::SFixed32 => {
+                WireTypeCase::I32
+            }
+            FieldTypeCase::Double | FieldTypeCase::Fixed64 | FieldTypeCase::SFixed64 => {
+                WireTypeCase::I64
+            }
+            FieldTypeCase::Bytes | FieldTypeCase::String | FieldTypeCase::Message => {
+                WireTypeCase::Len
+            }
+            FieldTypeCase::Group => WireTypeCase::StartGroup,
+        }
+    }
 }
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]

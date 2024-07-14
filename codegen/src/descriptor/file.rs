@@ -25,19 +25,19 @@ use super::*;
 // region: FileDescriptor
 
 #[derive(Debug, Clone)]
-pub struct FileDescriptor {
+pub struct FileDescriptorBase {
     name: String,
     dependencies: Vec<String>,
     package: Option<ProtoPathBuf>,
-    message_types: Vec<Descriptor>,
-    enum_types: Vec<EnumDescriptor>,
+    message_types: Vec<DescriptorBase>,
+    enum_types: Vec<EnumDescriptorBase>,
     #[allow(unused)]
     syntax: Option<String>,
     #[allow(unused)]
     edition: Option<Edition>,
 }
 
-impl<'a> TryFrom<FileDescriptorProto<'a>> for FileDescriptor {
+impl<'a> TryFrom<FileDescriptorProto<'a>> for FileDescriptorBase {
     type Error = ErrorKind;
     fn try_from(proto: FileDescriptorProto) -> Result<Self> {
         Ok(Self {
@@ -51,12 +51,12 @@ impl<'a> TryFrom<FileDescriptorProto<'a>> for FileDescriptor {
             message_types: proto
                 .message_type()
                 .into_iter()
-                .map_ok(Descriptor::try_from)
+                .map_ok(DescriptorBase::try_from)
                 .collect::<PResult<Result<Vec<_>>>>()??,
             enum_types: proto
                 .enum_type()
                 .into_iter()
-                .map_ok(EnumDescriptor::try_from)
+                .map_ok(EnumDescriptorBase::try_from)
                 .collect::<PResult<Result<Vec<_>>>>()??,
             syntax: proto.syntax()?.map(str::to_string),
             edition: proto.edition()?.map(EditionProto::try_into).transpose()?,
@@ -74,7 +74,7 @@ pub struct DebugFileDescriptor<'a> {
 }
 
 #[cfg(test)]
-impl From<DebugFileDescriptor<'_>> for FileDescriptor {
+impl From<DebugFileDescriptor<'_>> for FileDescriptorBase {
     fn from(debug: DebugFileDescriptor) -> Self {
         Self {
             name: debug.name.to_string(),
@@ -89,24 +89,24 @@ impl From<DebugFileDescriptor<'_>> for FileDescriptor {
 }
 
 #[derive(Debug)]
-pub struct FileDescriptorWithContext<'a> {
+pub struct FileDescriptor<'a> {
     root: &'a RootContext<'a>,
-    body: &'a FileDescriptor,
+    base: &'a FileDescriptorBase,
     cache: FileDescriptorCache<'a>,
 }
 
 #[derive(Default, Debug)]
 pub struct FileDescriptorCache<'a> {
-    dependencies: OnceCell<Vec<&'a FileDescriptorWithContext<'a>>>,
-    messages: OnceCell<Vec<DescriptorWithContext<'a>>>,
-    enums: OnceCell<Vec<EnumDescriptorWithContext<'a>>>,
+    dependencies: OnceCell<Vec<&'a FileDescriptor<'a>>>,
+    messages: OnceCell<Vec<Descriptor<'a>>>,
+    enums: OnceCell<Vec<EnumDescriptor<'a>>>,
 }
 
-impl<'a> FileDescriptorWithContext<'a> {
-    pub fn new(root: &'a RootContext<'a>, body: &'a FileDescriptor) -> Self {
+impl<'a> FileDescriptor<'a> {
+    pub fn new(root: &'a RootContext<'a>, base: &'a FileDescriptorBase) -> Self {
         Self {
             root,
-            body,
+            base,
             cache: Default::default(),
         }
     }
@@ -114,10 +114,10 @@ impl<'a> FileDescriptorWithContext<'a> {
         self.root
     }
     pub fn name(&self) -> Result<&str> {
-        Ok(&self.body.name)
+        Ok(&self.base.name)
     }
     pub fn package(&self) -> Result<Option<&ProtoPath>> {
-        Ok(self.body.package.as_deref())
+        Ok(self.base.package.as_deref())
     }
     pub fn absolute_package(&self) -> Result<ProtoPathBuf> {
         let mut package = self
@@ -130,14 +130,12 @@ impl<'a> FileDescriptorWithContext<'a> {
         }
         Ok(package)
     }
-    pub fn dependencies(
-        &'a self,
-    ) -> Result<impl IntoIterator<Item = &'a FileDescriptorWithContext<'a>>> {
+    pub fn dependencies(&'a self) -> Result<impl IntoIterator<Item = &'a FileDescriptor<'a>>> {
         self.cache
             .dependencies
             .get_or_try_init(|| {
                 Ok(self
-                    .body
+                    .base
                     .dependencies
                     .iter()
                     .map(|name| self.root.file_from_name(name))
@@ -145,36 +143,35 @@ impl<'a> FileDescriptorWithContext<'a> {
             })
             .map(|v| v.into_iter().map(|f| *f))
     }
-    pub fn messages(&'a self) -> Result<impl 'a + IntoIterator<Item = &DescriptorWithContext>> {
+    pub fn messages(&'a self) -> Result<impl 'a + IntoIterator<Item = &Descriptor>> {
         self.cache.messages.get_or_try_init(|| {
-            self.body
+            self.base
                 .message_types
                 .iter()
-                .map(|m| Ok(DescriptorWithContext::new(self, None, m)))
+                .map(|m| Ok(Descriptor::new(self, None, m)))
                 .collect()
         })
     }
-    pub fn enums(&'a self) -> Result<impl 'a + IntoIterator<Item = &EnumDescriptorWithContext>> {
+    pub fn enums(&'a self) -> Result<impl 'a + IntoIterator<Item = &EnumDescriptor>> {
         self.cache.enums.get_or_try_init(|| {
-            self.body
+            self.base
                 .enum_types
                 .iter()
-                .map(|e| Ok(EnumDescriptorWithContext::new(self, None, e)))
+                .map(|e| Ok(EnumDescriptor::new(self, None, e)))
                 .collect()
         })
     }
     pub fn all_messages_or_enums(
         &'a self,
-    ) -> Result<
-        impl 'a + IntoIterator<Item = MessageOrEnum<&DescriptorWithContext, &EnumDescriptorWithContext>>,
-    > {
+    ) -> Result<impl 'a + IntoIterator<Item = MessageOrEnum<&Descriptor, &EnumDescriptor>>>
+    {
         Ok(self
             .all_messages()?
             .into_iter()
             .map(MessageOrEnum::Message)
             .chain(self.all_enums()?.into_iter().map(MessageOrEnum::Enum)))
     }
-    pub fn all_messages(&'a self) -> Result<impl 'a + IntoIterator<Item = &DescriptorWithContext>> {
+    pub fn all_messages(&'a self) -> Result<impl 'a + IntoIterator<Item = &Descriptor>> {
         let direct_messages = self.messages()?.into_iter();
         let indirect_messages_vec = self
             .messages()?
@@ -187,9 +184,7 @@ impl<'a> FileDescriptorWithContext<'a> {
         let boxed: Box<dyn Iterator<Item = _>> = Box::new(direct_messages.chain(indirect_messages));
         Ok(boxed)
     }
-    pub fn all_enums(
-        &'a self,
-    ) -> Result<impl 'a + IntoIterator<Item = &EnumDescriptorWithContext>> {
+    pub fn all_enums(&'a self) -> Result<impl 'a + IntoIterator<Item = &EnumDescriptor>> {
         let direct_enums = self.enums()?.into_iter();
         let indirect_enums_vec = self
             .messages()?
@@ -206,7 +201,7 @@ impl<'a> FileDescriptorWithContext<'a> {
 mod tests {
     use super::*;
 
-    const FD_DEFAULT: FileDescriptor = FileDescriptor {
+    const FD_DEFAULT: FileDescriptorBase = FileDescriptorBase {
         name: String::new(),
         dependencies: vec![],
         package: None,
@@ -218,8 +213,8 @@ mod tests {
 
     #[test]
     fn test_package_to_files() {
-        fn make_fd(name: &str, package: &str) -> FileDescriptor {
-            FileDescriptor {
+        fn make_fd(name: &str, package: &str) -> FileDescriptorBase {
+            FileDescriptorBase {
                 name: name.to_string(),
                 package: Some(package.into()),
                 ..FD_DEFAULT

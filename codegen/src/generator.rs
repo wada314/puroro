@@ -18,7 +18,7 @@ pub mod untyped_message_impls;
 
 use self::message_trait::MessageTrait;
 use self::untyped_message_impls::UntypedMessageImpls;
-use crate::descriptor::{FileDescriptor, RootContext};
+use crate::descriptor::{FileDescriptorBase, RootContext};
 use crate::{ErrorKind, Result};
 use ::itertools::Itertools;
 use ::prettyplease::unparse;
@@ -35,7 +35,7 @@ use ::std::collections::{BTreeSet, HashMap};
 pub fn compile(request: &CodeGeneratorRequest) -> Result<CodeGeneratorResponse<'static>> {
     let mut response = CodeGeneratorResponse::default();
 
-    let descriptors: Vec<FileDescriptor> = request
+    let descriptors: Vec<FileDescriptorBase> = request
         .proto_file()
         .map_ok(TryInto::try_into)
         .collect::<PResult<Result<Vec<_>>>>()??;

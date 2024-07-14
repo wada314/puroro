@@ -24,7 +24,7 @@ use std::ops::Deref;
 use super::*;
 
 #[derive(Debug, Clone)]
-pub struct FieldDescriptor {
+pub struct FieldDescriptorBase {
     name: String,
     number: i32,
     type_case: FieldTypeCase,
@@ -34,7 +34,7 @@ pub struct FieldDescriptor {
     proto3_optional: bool,
 }
 
-impl FieldDescriptor {
+impl FieldDescriptorBase {
     pub fn name(&self) -> &str {
         &self.name
     }
@@ -58,7 +58,7 @@ impl FieldDescriptor {
     }
 }
 
-impl<'a> TryFrom<FieldDescriptorProto<'a>> for FieldDescriptor {
+impl<'a> TryFrom<FieldDescriptorProto<'a>> for FieldDescriptorBase {
     type Error = ErrorKind;
     fn try_from(proto: FieldDescriptorProto) -> Result<Self> {
         Ok(Self {
@@ -78,61 +78,46 @@ impl<'a> TryFrom<FieldDescriptorProto<'a>> for FieldDescriptor {
     }
 }
 
-#[derive(Debug, Clone)]
-pub struct OneofDescriptor {
-    #[allow(unused)]
-    name: String,
-}
-
-impl<'a> TryFrom<OneofDescriptorProto<'a>> for OneofDescriptor {
-    type Error = ErrorKind;
-    fn try_from(proto: OneofDescriptorProto) -> Result<Self> {
-        Ok(Self {
-            name: proto.name()?.try_into_string("No OneofDescriptor name")?,
-        })
-    }
-}
-
 #[derive(Debug)]
-pub struct FieldDescriptorWithContext<'a> {
-    message: &'a DescriptorWithContext<'a>,
-    body: &'a FieldDescriptor,
+pub struct FieldDescriptor<'a> {
+    message: &'a Descriptor<'a>,
+    base: &'a FieldDescriptorBase,
     cache: FieldDescriptorCache<'a>,
 }
 
 #[derive(Default, Debug)]
 pub struct FieldDescriptorCache<'a> {
     full_name: OnceCell<ProtoPathBuf>,
-    r#type: OnceCell<FieldType<&'a DescriptorWithContext<'a>, &'a EnumDescriptorWithContext<'a>>>,
+    r#type: OnceCell<FieldType<&'a Descriptor<'a>, &'a EnumDescriptor<'a>>>,
 }
 
-impl<'a> FieldDescriptorWithContext<'a> {
-    pub fn new(body: &'a FieldDescriptor, message: &'a DescriptorWithContext<'a>) -> Self {
+impl<'a> FieldDescriptor<'a> {
+    pub fn new(base: &'a FieldDescriptorBase, message: &'a Descriptor<'a>) -> Self {
         Self {
             message,
-            body,
+            base,
             cache: Default::default(),
         }
     }
     pub fn name(&self) -> Result<&str> {
-        Ok(&self.body.name)
+        Ok(&self.base.name)
     }
     pub fn full_name(&self) -> Result<&str> {
         self.cache
             .full_name
             .get_or_try_init(|| {
                 let mut full_name = self.message.full_path()?.to_owned();
-                full_name.push(ProtoPath::new(&format!(".{}", self.body.name)));
+                full_name.push(ProtoPath::new(&format!(".{}", self.base.name)));
                 Ok(full_name)
             })
             .map(|s| s.as_ref())
     }
     pub fn r#type(
         &self,
-    ) -> Result<FieldType<&'a DescriptorWithContext<'a>, &'a EnumDescriptorWithContext<'a>>> {
+    ) -> Result<FieldType<&'a Descriptor<'a>, &'a EnumDescriptor<'a>>> {
         let init = || {
-            self.body.type_case.with_type_ref(
-                self.body.type_name.as_deref(),
+            self.base.type_case.with_type_ref(
+                self.base.type_name.as_deref(),
                 |name| {
                     Ok(self
                         .message
@@ -161,19 +146,34 @@ impl<'a> FieldDescriptorWithContext<'a> {
     }
 }
 
-impl Deref for FieldDescriptorWithContext<'_> {
-    type Target = FieldDescriptor;
+impl Deref for FieldDescriptor<'_> {
+    type Target = FieldDescriptorBase;
     fn deref(&self) -> &Self::Target {
-        &self.body
+        &self.base
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct OneofDescriptorBase {
+    #[allow(unused)]
+    name: String,
+}
+
+impl<'a> TryFrom<OneofDescriptorProto<'a>> for OneofDescriptorBase {
+    type Error = ErrorKind;
+    fn try_from(proto: OneofDescriptorProto) -> Result<Self> {
+        Ok(Self {
+            name: proto.name()?.try_into_string("No OneofDescriptor name")?,
+        })
     }
 }
 
 #[derive(Debug)]
-pub struct OneofDescriptorWithContext<'a> {
+pub struct OneofDescriptor<'a> {
     #[allow(unused)]
-    message: &'a DescriptorWithContext<'a>,
+    message: &'a Descriptor<'a>,
     #[allow(unused)]
-    body: &'a OneofDescriptor,
+    body: &'a OneofDescriptorBase,
     #[allow(unused)]
     cache: OneofDescriptorCache,
 }
@@ -181,8 +181,8 @@ pub struct OneofDescriptorWithContext<'a> {
 #[derive(Default, Debug)]
 pub struct OneofDescriptorCache {}
 
-impl<'a> OneofDescriptorWithContext<'a> {
-    pub fn new(body: &'a OneofDescriptor, message: &'a DescriptorWithContext<'a>) -> Self {
+impl<'a> OneofDescriptor<'a> {
+    pub fn new(body: &'a OneofDescriptorBase, message: &'a Descriptor<'a>) -> Self {
         Self {
             message,
             body,
