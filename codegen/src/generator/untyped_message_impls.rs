@@ -65,7 +65,7 @@ pub struct Field {
 impl Field {
     fn try_new<'a>(desc: &'a FieldDescriptorWithContext<'a>) -> Result<Self> {
         Ok(Self {
-            number: desc.number()?,
+            number: desc.number(),
             trait_field: TraitField::try_new(desc)?,
         })
     }

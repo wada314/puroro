@@ -49,6 +49,22 @@ impl<'a> TryFrom<EnumDescriptorProto<'a>> for EnumDescriptor {
     }
 }
 
+#[cfg(test)]
+#[derive(Default)]
+pub struct DebugEnumDescriptor<'a> {
+    pub name: &'a str,
+    pub values: Vec<DebugEnumValueDescriptor<'a>>,
+}
+#[cfg(test)]
+impl From<DebugEnumDescriptor<'_>> for EnumDescriptor {
+    fn from(debug: DebugEnumDescriptor) -> Self {
+        Self {
+            name: debug.name.to_string(),
+            values: debug.values.into_iter().map(Into::into).collect(),
+        }
+    }
+}
+
 #[derive(Debug)]
 pub struct EnumDescriptorWithContext<'a> {
     file: &'a FileDescriptorWithContext<'a>,
@@ -132,6 +148,22 @@ impl<'a> TryFrom<EnumValueDescriptorProto<'a>> for EnumValueDescriptor {
                 .number()?
                 .try_into_number("No EnumValueDescriptor number")?,
         })
+    }
+}
+
+#[cfg(test)]
+#[derive(Default)]
+pub struct DebugEnumValueDescriptor<'a> {
+    pub name: &'a str,
+    pub number: i32,
+}
+#[cfg(test)]
+impl From<DebugEnumValueDescriptor<'_>> for EnumValueDescriptor {
+    fn from(debug: DebugEnumValueDescriptor) -> Self {
+        Self {
+            name: debug.name.to_string(),
+            number: debug.number,
+        }
     }
 }
 

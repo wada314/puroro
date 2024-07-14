@@ -69,8 +69,26 @@ impl<'a> TryFrom<DescriptorProto<'a>> for Descriptor {
     }
 }
 
-// endregion:
-// region: DescriptorWithContext
+#[cfg(test)]
+#[derive(Default)]
+pub struct DebugDescriptor<'a> {
+    pub name: &'a str,
+    pub nested_types: Vec<DebugDescriptor<'a>>,
+    pub enum_types: Vec<DebugEnumDescriptor<'a>>,
+}
+
+#[cfg(test)]
+impl From<DebugDescriptor<'_>> for Descriptor {
+    fn from(debug: DebugDescriptor) -> Self {
+        Self {
+            name: debug.name.to_string(),
+            fields: vec![],
+            oneof_decls: vec![],
+            nested_types: debug.nested_types.into_iter().map(Into::into).collect(),
+            enum_types: debug.enum_types.into_iter().map(Into::into).collect(),
+        }
+    }
+}
 
 #[derive(Debug)]
 pub struct DescriptorWithContext<'a> {
@@ -293,5 +311,3 @@ impl<'a> DescriptorWithContext<'a> {
         Ok(boxed)
     }
 }
-
-// endregion:

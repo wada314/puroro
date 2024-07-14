@@ -69,8 +69,29 @@ impl<'a> TryFrom<FileDescriptorProto<'a>> for FileDescriptor {
     }
 }
 
-// endregion:
-// region: FileDescriptorWithContext
+#[cfg(test)]
+#[derive(Default)]
+pub struct DebugFileDescriptor<'a> {
+    pub name: &'a str,
+    pub package: Option<&'a str>,
+    pub message_types: Vec<DebugDescriptor<'a>>,
+    pub enum_types: Vec<DebugEnumDescriptor<'a>>,
+}
+
+#[cfg(test)]
+impl From<DebugFileDescriptor<'_>> for FileDescriptor {
+    fn from(debug: DebugFileDescriptor) -> Self {
+        Self {
+            name: debug.name.to_string(),
+            dependencies: vec![],
+            package: debug.package.map(ProtoPathBuf::from),
+            message_types: debug.message_types.into_iter().map(Into::into).collect(),
+            enum_types: debug.enum_types.into_iter().map(Into::into).collect(),
+            syntax: None,
+            edition: None,
+        }
+    }
+}
 
 #[derive(Debug)]
 pub struct FileDescriptorWithContext<'a> {
@@ -186,4 +207,71 @@ impl<'a> FileDescriptorWithContext<'a> {
     }
 }
 
-// endregion:
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    const FD_DEFAULT: FileDescriptor = FileDescriptor {
+        name: String::new(),
+        dependencies: vec![],
+        package: None,
+        message_types: vec![],
+        enum_types: vec![],
+        syntax: None,
+        edition: None,
+    };
+
+    #[test]
+    fn test_package_to_files() {
+        fn make_fd(name: &str, package: &str) -> FileDescriptor {
+            FileDescriptor {
+                name: name.to_string(),
+                package: Some(package.into()),
+                ..FD_DEFAULT
+            }
+        }
+        let fd0 = make_fd("fd0.proto", "");
+        let fd1 = make_fd("fd1.proto", "a");
+        let fd2 = make_fd("fd2.proto", "a.b");
+        let fd3 = make_fd("fd3.proto", "a.b");
+        let fd4 = make_fd("fd4.proto", "a.b.c");
+        let root = RootContext::from(vec![fd0, fd1, fd2, fd3, fd4]);
+
+        let root_package_files = root.package_to_files("").unwrap().into_iter().collect_vec();
+        let package_a_files = root
+            .package_to_files("a")
+            .unwrap()
+            .into_iter()
+            .collect::<Vec<_>>();
+        let package_a_b_files = root
+            .package_to_files("a.b")
+            .unwrap()
+            .into_iter()
+            .collect::<Vec<_>>();
+        let package_a_b_c_files = root
+            .package_to_files("a.b.c")
+            .unwrap()
+            .into_iter()
+            .collect::<Vec<_>>();
+
+        assert_eq!(1, root_package_files.len());
+        assert_eq!(1, package_a_files.len());
+        assert_eq!(2, package_a_b_files.len());
+        assert_eq!(1, package_a_b_c_files.len());
+        assert!(root_package_files
+            .iter()
+            .any(|f| f.name().unwrap() == "fd0.proto"));
+        assert!(package_a_files
+            .iter()
+            .any(|f| f.name().unwrap() == "fd1.proto"));
+        assert!(package_a_b_files
+            .iter()
+            .any(|f| f.name().unwrap() == "fd2.proto"));
+        assert!(package_a_b_files
+            .iter()
+            .any(|f| f.name().unwrap() == "fd3.proto"));
+        assert!(package_a_b_c_files
+            .iter()
+            .any(|f| f.name().unwrap() == "fd4.proto"));
+    }
+}

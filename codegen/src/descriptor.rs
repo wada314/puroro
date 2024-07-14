@@ -220,128 +220,55 @@ impl<T> TryIntoNumber<T> for Option<T> {
     }
 }
 
-// endregion:
-
 #[cfg(test)]
 mod tests {
     use super::*;
     use ::std::assert_matches::assert_matches;
 
-    const FD_DEFAULT: FileDescriptor = FileDescriptor {
-        name: String::new(),
-        dependencies: vec![],
-        package: None,
-        message_types: vec![],
-        enum_types: vec![],
-        syntax: None,
-        edition: None,
-    };
-    const MD_DEFAULT: Descriptor = Descriptor {
-        name: String::new(),
-        fields: vec![],
-        oneof_decls: vec![],
-        nested_types: vec![],
-        enum_types: vec![],
-    };
-    const ED_DEFAULT: EnumDescriptor = EnumDescriptor {
-        name: String::new(),
-        values: vec![],
-    };
-
-    #[test]
-    fn test_package_to_files() {
-        fn make_fd(name: &str, package: &str) -> FileDescriptor {
-            FileDescriptor {
-                name: name.to_string(),
-                package: Some(package.into()),
-                ..FD_DEFAULT
-            }
-        }
-        let fd0 = make_fd("fd0.proto", "");
-        let fd1 = make_fd("fd1.proto", "a");
-        let fd2 = make_fd("fd2.proto", "a.b");
-        let fd3 = make_fd("fd3.proto", "a.b");
-        let fd4 = make_fd("fd4.proto", "a.b.c");
-        let root = RootContext::from(vec![fd0, fd1, fd2, fd3, fd4]);
-
-        let root_package_files = root.package_to_files("").unwrap().into_iter().collect_vec();
-        let package_a_files = root
-            .package_to_files("a")
-            .unwrap()
-            .into_iter()
-            .collect::<Vec<_>>();
-        let package_a_b_files = root
-            .package_to_files("a.b")
-            .unwrap()
-            .into_iter()
-            .collect::<Vec<_>>();
-        let package_a_b_c_files = root
-            .package_to_files("a.b.c")
-            .unwrap()
-            .into_iter()
-            .collect::<Vec<_>>();
-
-        assert_eq!(1, root_package_files.len());
-        assert_eq!(1, package_a_files.len());
-        assert_eq!(2, package_a_b_files.len());
-        assert_eq!(1, package_a_b_c_files.len());
-        assert!(root_package_files
-            .iter()
-            .any(|f| f.name().unwrap() == "fd0.proto"));
-        assert!(package_a_files
-            .iter()
-            .any(|f| f.name().unwrap() == "fd1.proto"));
-        assert!(package_a_b_files
-            .iter()
-            .any(|f| f.name().unwrap() == "fd2.proto"));
-        assert!(package_a_b_files
-            .iter()
-            .any(|f| f.name().unwrap() == "fd3.proto"));
-        assert!(package_a_b_c_files
-            .iter()
-            .any(|f| f.name().unwrap() == "fd4.proto"));
-    }
-
     #[test]
     fn test_resolve_path() {
         fn make_fd(name: &str, package: &str) -> FileDescriptor {
-            FileDescriptor {
-                name: name.to_string(),
-                package: Some(package.into()),
+            type FD<'a> = DebugFileDescriptor<'a>;
+            type MD<'a> = DebugDescriptor<'a>;
+            type ED<'a> = DebugEnumDescriptor<'a>;
+            FD {
+                name,
+                package: Some(package),
                 message_types: vec![
-                    Descriptor {
-                        name: "A".to_string(),
+                    MD {
+                        name: "A",
                         nested_types: vec![
-                            Descriptor {
-                                name: "B".to_string(),
-                                nested_types: vec![Descriptor {
-                                    name: "C".to_string(),
-                                    ..MD_DEFAULT
+                            MD {
+                                name: "B",
+                                nested_types: vec![MD {
+                                    name: "C",
+                                    ..Default::default()
                                 }],
-                                ..MD_DEFAULT
+                                ..Default::default()
                             },
-                            Descriptor {
-                                name: "B2".to_string(),
-                                ..MD_DEFAULT
+                            MD {
+                                name: "B2",
+                                ..Default::default()
                             },
                         ],
-                        enum_types: vec![EnumDescriptor {
-                            name: "F".to_string(),
-                            ..ED_DEFAULT
+                        enum_types: vec![ED {
+                            name: "F",
+                            ..Default::default()
                         }],
-                        ..MD_DEFAULT
+                        ..Default::default()
                     },
-                    Descriptor {
-                        name: "A2".to_string(),
-                        ..MD_DEFAULT
+                    MD {
+                        name: "A2",
+                        ..Default::default()
                     },
                 ],
-                enum_types: vec![EnumDescriptor {
-                    name: "E".to_string(),
-                    ..ED_DEFAULT
+                enum_types: vec![ED {
+                    name: "E",
+                    ..Default::default()
                 }],
-                ..FD_DEFAULT
+                ..Default::default()
             }
+            .into()
         }
         let fd0 = make_fd("fd0.proto", "");
         let fd1 = make_fd("fd1.proto", "a");
