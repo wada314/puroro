@@ -16,7 +16,7 @@ use crate::cases::{convert_into_case, Case};
 use crate::descriptor::{EnumDescriptor, EnumValueDescriptor};
 use crate::proto_path::ProtoPath;
 use crate::Result;
-use ::quote::{format_ident, quote};
+use ::quote::quote;
 use ::syn::{parse2, parse_str, Ident, Item, Type, Variant};
 
 pub struct Enum {
@@ -41,10 +41,7 @@ impl Enum {
         })
     }
     pub fn rust_name_from_enum_name(name: &str) -> Result<Ident> {
-        Ok(format_ident!(
-            "{}",
-            convert_into_case(name, Case::CamelCase)
-        ))
+        Ok(parse_str(&convert_into_case(name, Case::CamelCase))?)
     }
     pub fn rust_path_from_enum_path(path: impl AsRef<ProtoPath>) -> Result<Type> {
         let modules = path
@@ -52,8 +49,8 @@ impl Enum {
             .parent()
             .into_iter()
             .flat_map(|p| p.components())
-            .map(|c| format_ident!("{}", c))
-            .collect::<Vec<_>>();
+            .map(|c| Ok(parse_str(c)?))
+            .collect::<Result<Vec<Ident>>>()?;
         let name = Self::rust_name_from_enum_name(
             path.as_ref()
                 .last_component()
