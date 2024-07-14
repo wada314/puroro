@@ -87,6 +87,13 @@ pub struct FileDescriptorCache<'a> {
 }
 
 impl<'a> FileDescriptorWithContext<'a> {
+    pub fn new(root: &'a RootContext<'a>, body: &'a FileDescriptor) -> Self {
+        Self {
+            root,
+            body,
+            cache: Default::default(),
+        }
+    }
     pub fn root(&self) -> &'a RootContext<'a> {
         self.root
     }
@@ -127,14 +134,7 @@ impl<'a> FileDescriptorWithContext<'a> {
             self.body
                 .message_types
                 .iter()
-                .map(|m| {
-                    Ok(DescriptorWithContext {
-                        file: self,
-                        maybe_containing: None,
-                        body: m,
-                        cache: Default::default(),
-                    })
-                })
+                .map(|m| Ok(DescriptorWithContext::new(self, None, m)))
                 .collect()
         })
     }
@@ -143,14 +143,7 @@ impl<'a> FileDescriptorWithContext<'a> {
             self.body
                 .enum_types
                 .iter()
-                .map(|e| {
-                    Ok(EnumDescriptorWithContext {
-                        file: self,
-                        maybe_containing: None,
-                        body: e,
-                        cache: Default::default(),
-                    })
-                })
+                .map(|e| Ok(EnumDescriptorWithContext::new(self, None, e)))
                 .collect()
         })
     }

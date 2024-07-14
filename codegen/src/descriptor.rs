@@ -71,13 +71,9 @@ impl<T: IntoIterator<Item = FileDescriptor>> From<T> for RootContext<'_> {
 }
 impl<'a> RootContext<'a> {
     pub fn files(&'a self) -> impl 'a + IntoIterator<Item = &'a FileDescriptorWithContext<'a>> {
-        self.files.iter().map(|(f, c)| {
-            c.get_or_init(|| FileDescriptorWithContext {
-                root: self,
-                body: f,
-                cache: Default::default(),
-            })
-        })
+        self.files
+            .iter()
+            .map(|(f, c)| c.get_or_init(|| FileDescriptorWithContext::new(self, f)))
     }
     pub fn file_from_name(&'a self, name: &str) -> Result<&'a FileDescriptorWithContext<'a>> {
         Ok(self
@@ -174,12 +170,6 @@ impl<'a> RootContext<'a> {
 }
 
 // endregion:
-
-
-
-
-
-
 
 // region: utils
 

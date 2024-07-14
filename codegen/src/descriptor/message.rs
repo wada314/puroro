@@ -98,6 +98,18 @@ pub struct DescriptorCache<'a> {
 }
 
 impl<'a> DescriptorWithContext<'a> {
+    pub fn new(
+        file: &'a FileDescriptorWithContext<'a>,
+        maybe_containing: Option<&'a DescriptorWithContext<'a>>,
+        body: &'a Descriptor,
+    ) -> Self {
+        Self {
+            file,
+            maybe_containing,
+            body,
+            cache: Default::default(),
+        }
+    }
     pub fn file(&self) -> &'a FileDescriptorWithContext<'a> {
         self.file
     }
