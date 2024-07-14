@@ -113,16 +113,16 @@ impl<'a> Descriptor<'a> {
             cache: Default::default(),
         }
     }
-    pub fn file(&self) -> &'a FileDescriptor<'a> {
+    pub fn file(&'a self) -> &FileDescriptor {
         self.file
     }
-    pub fn root(&self) -> &'a RootContext<'a> {
+    pub fn root(&'a self) -> &RootContext {
         self.file().root()
     }
-    pub fn name(&self) -> Result<&str> {
+    pub fn name(&'a self) -> Result<&str> {
         Ok(&self.base.name)
     }
-    pub fn full_path(&self) -> Result<&ProtoPath> {
+    pub fn full_path(&'a self) -> Result<&ProtoPath> {
         self.cache
             .full_path
             .get_or_try_init(|| {
@@ -137,7 +137,7 @@ impl<'a> Descriptor<'a> {
             })
             .map(|s| s.as_ref())
     }
-    pub fn all_fields(&'a self) -> impl Iterator<Item = &'a FieldDescriptor<'a>> {
+    pub fn all_fields(&'a self) -> impl Iterator<Item = &FieldDescriptor> {
         self.cache
             .all_fields
             .get_or_init(|| {
@@ -149,7 +149,7 @@ impl<'a> Descriptor<'a> {
             })
             .iter()
     }
-    pub fn all_oneofs(&'a self) -> impl Iterator<Item = &'a OneofDescriptor<'a>> {
+    pub fn all_oneofs(&'a self) -> impl Iterator<Item = &OneofDescriptor> {
         self.cache
             .all_oneofs
             .get_or_init(|| {
@@ -164,20 +164,20 @@ impl<'a> Descriptor<'a> {
     pub fn filtered_fields(
         &'a self,
         f: impl 'a + Fn(&FieldDescriptor) -> bool,
-    ) -> Result<impl Iterator<Item = &'a FieldDescriptor<'a>>> {
+    ) -> Result<impl Iterator<Item = &FieldDescriptor>> {
         Ok(self.all_fields().filter(move |field| f(*field)))
     }
-    pub fn non_oneof_fields(&'a self) -> Result<impl Iterator<Item = &'a FieldDescriptor>> {
+    pub fn non_oneof_fields(&'a self) -> Result<impl Iterator<Item = &FieldDescriptor>> {
         Ok(self
             .all_fields()
             .filter(|f| f.oneof_index().is_none() || f.is_proto3_optional()))
     }
-    pub fn real_oneof_fields(&'a self) -> Result<impl Iterator<Item = &'a FieldDescriptor>> {
+    pub fn real_oneof_fields(&'a self) -> Result<impl Iterator<Item = &FieldDescriptor>> {
         Ok(self
             .all_fields()
             .filter(|f| f.oneof_index().is_some() && !f.is_proto3_optional()))
     }
-    pub fn real_oneofs(&'a self) -> Result<impl Iterator<Item = &'a OneofDescriptor>> {
+    pub fn real_oneofs(&'a self) -> Result<impl Iterator<Item = &OneofDescriptor>> {
         Ok(self
             .all_oneofs()
             .filter(|o| o.is_synthetic().is_ok_and(|b| !b)))
@@ -187,7 +187,7 @@ impl<'a> Descriptor<'a> {
             .all_oneofs()
             .filter(|o| o.is_synthetic().is_ok_and(|b| b)))
     }
-    pub fn nested_types(&'a self) -> Result<impl Iterator<Item = &'a Descriptor>> {
+    pub fn nested_types(&'a self) -> Result<impl Iterator<Item = &Descriptor>> {
         Ok(self
             .cache
             .nested_types
@@ -200,25 +200,29 @@ impl<'a> Descriptor<'a> {
             })
             .iter())
     }
-    pub fn enum_types(&'a self) -> Result<impl 'a + IntoIterator<Item = &EnumDescriptor>> {
-        self.cache.enum_types.get_or_try_init(|| {
-            self.base
-                .enum_types
-                .iter()
-                .map(|e| Ok(EnumDescriptor::new(self.file(), Some(self), e)))
-                .collect()
-        })
+    pub fn enum_types(&'a self) -> Result<impl Iterator<Item = &EnumDescriptor>> {
+        Ok(self
+            .cache
+            .enum_types
+            .get_or_init(|| {
+                self.base
+                    .enum_types
+                    .iter()
+                    .map(|e| EnumDescriptor::new(self.file(), Some(self), e))
+                    .collect()
+            })
+            .iter())
     }
     pub fn all_messages_or_enums(
         &'a self,
-    ) -> Result<impl 'a + IntoIterator<Item = MessageOrEnum<&Descriptor, &EnumDescriptor>>> {
+    ) -> Result<impl Iterator<Item = MessageOrEnum<&Descriptor, &EnumDescriptor>>> {
         Ok(self
             .all_messages()?
             .into_iter()
             .map(MessageOrEnum::Message)
             .chain(self.all_enums()?.into_iter().map(MessageOrEnum::Enum)))
     }
-    pub fn all_messages(&'a self) -> Result<impl 'a + IntoIterator<Item = &Descriptor>> {
+    pub fn all_messages(&'a self) -> Result<impl Iterator<Item = &Descriptor>> {
         let direct_messages = self.nested_types()?.into_iter();
         let indirect_messages_vec = self
             .nested_types()?
@@ -231,7 +235,7 @@ impl<'a> Descriptor<'a> {
         let boxed: Box<dyn Iterator<Item = _>> = Box::new(direct_messages.chain(indirect_messages));
         Ok(boxed)
     }
-    pub fn all_enums(&'a self) -> Result<impl 'a + IntoIterator<Item = &EnumDescriptor>> {
+    pub fn all_enums(&'a self) -> Result<impl Iterator<Item = &EnumDescriptor>> {
         let direct_enums = self.enum_types()?.into_iter();
         let indirect_enums_vec = self
             .nested_types()?

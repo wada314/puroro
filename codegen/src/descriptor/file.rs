@@ -110,7 +110,7 @@ impl<'a> FileDescriptor<'a> {
             cache: Default::default(),
         }
     }
-    pub fn root(&self) -> &'a RootContext<'a> {
+    pub fn root(&self) -> &'a RootContext {
         self.root
     }
     pub fn name(&self) -> &str {
@@ -130,7 +130,7 @@ impl<'a> FileDescriptor<'a> {
         }
         Ok(package)
     }
-    pub fn dependencies(&'a self) -> Result<impl IntoIterator<Item = &'a FileDescriptor<'a>>> {
+    pub fn dependencies(&'a self) -> Result<impl Iterator<Item = &FileDescriptor>> {
         self.cache
             .dependencies
             .get_or_try_init(|| {
@@ -143,34 +143,42 @@ impl<'a> FileDescriptor<'a> {
             })
             .map(|v| v.into_iter().map(|f| *f))
     }
-    pub fn messages(&'a self) -> Result<impl 'a + IntoIterator<Item = &Descriptor>> {
-        self.cache.messages.get_or_try_init(|| {
-            self.base
-                .message_types
-                .iter()
-                .map(|m| Ok(Descriptor::new(self, None, m)))
-                .collect()
-        })
+    pub fn messages(&'a self) -> Result<impl Iterator<Item = &Descriptor>> {
+        Ok(self
+            .cache
+            .messages
+            .get_or_init(|| {
+                self.base
+                    .message_types
+                    .iter()
+                    .map(|m| Descriptor::new(self, None, m))
+                    .collect()
+            })
+            .iter())
     }
-    pub fn enums(&'a self) -> Result<impl 'a + IntoIterator<Item = &EnumDescriptor>> {
-        self.cache.enums.get_or_try_init(|| {
-            self.base
-                .enum_types
-                .iter()
-                .map(|e| Ok(EnumDescriptor::new(self, None, e)))
-                .collect()
-        })
+    pub fn enums(&'a self) -> Result<impl Iterator<Item = &EnumDescriptor>> {
+        Ok(self
+            .cache
+            .enums
+            .get_or_init(|| {
+                self.base
+                    .enum_types
+                    .iter()
+                    .map(|e| EnumDescriptor::new(self, None, e))
+                    .collect()
+            })
+            .iter())
     }
     pub fn all_messages_or_enums(
         &'a self,
-    ) -> Result<impl 'a + IntoIterator<Item = MessageOrEnum<&Descriptor, &EnumDescriptor>>> {
+    ) -> Result<impl Iterator<Item = MessageOrEnum<&Descriptor, &EnumDescriptor>>> {
         Ok(self
             .all_messages()?
             .into_iter()
             .map(MessageOrEnum::Message)
             .chain(self.all_enums()?.into_iter().map(MessageOrEnum::Enum)))
     }
-    pub fn all_messages(&'a self) -> Result<impl 'a + IntoIterator<Item = &Descriptor>> {
+    pub fn all_messages(&'a self) -> Result<impl Iterator<Item = &Descriptor>> {
         let direct_messages = self.messages()?.into_iter();
         let indirect_messages_vec = self
             .messages()?
@@ -183,7 +191,7 @@ impl<'a> FileDescriptor<'a> {
         let boxed: Box<dyn Iterator<Item = _>> = Box::new(direct_messages.chain(indirect_messages));
         Ok(boxed)
     }
-    pub fn all_enums(&'a self) -> Result<impl 'a + IntoIterator<Item = &EnumDescriptor>> {
+    pub fn all_enums(&'a self) -> Result<impl Iterator<Item = &EnumDescriptor>> {
         let direct_enums = self.enums()?.into_iter();
         let indirect_enums_vec = self
             .messages()?

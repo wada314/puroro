@@ -54,7 +54,7 @@ impl<T: IntoIterator<Item = FileDescriptorBase>> From<T> for RootContext<'_> {
     }
 }
 impl<'a> RootContext<'a> {
-    pub fn files(&'a self) -> impl 'a + IntoIterator<Item = &'a FileDescriptor<'a>> {
+    pub fn files(&'a self) -> impl Iterator<Item = &'a FileDescriptor> {
         self.files
             .iter()
             .map(|(f, c)| c.get_or_init(|| FileDescriptor::new(self, f)))
@@ -69,7 +69,7 @@ impl<'a> RootContext<'a> {
     pub fn package_to_files(
         &'a self,
         package: impl AsRef<ProtoPath>,
-    ) -> Result<impl 'a + IntoIterator<Item = &'a FileDescriptor<'a>>> {
+    ) -> Result<impl Iterator<Item = &'a FileDescriptor>> {
         let package = if package.as_ref().is_relative() {
             // This method is a root method, so the relative path should be converted
             // to the absolute path by just adding '.' at the beginning.

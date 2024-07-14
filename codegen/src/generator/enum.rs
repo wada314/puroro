@@ -123,7 +123,7 @@ impl Enum {
 }
 
 impl EnumVariant {
-    fn try_new(desc: &EnumValueDescriptor) -> Result<Self> {
+    fn try_new<'a>(desc: &'a EnumValueDescriptor<'a>) -> Result<Self> {
         Ok(Self {
             name: parse_str(&convert_into_case(desc.name(), Case::CamelCase))?,
             number: desc.number(),

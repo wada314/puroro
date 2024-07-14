@@ -85,10 +85,10 @@ impl<'a> EnumDescriptor<'a> {
             cache: Default::default(),
         }
     }
-    pub fn name(&self) -> &str {
+    pub fn name(&'a self) -> &str {
         self.base.name.as_ref()
     }
-    pub fn full_path(&self) -> Result<&ProtoPath> {
+    pub fn full_path(&'a self) -> Result<&ProtoPath> {
         self.cache
             .full_path
             .get_or_try_init(|| {
@@ -105,20 +105,18 @@ impl<'a> EnumDescriptor<'a> {
     pub fn file(&'a self) -> Result<&FileDescriptor> {
         Ok(self.file)
     }
-    pub fn values(&'a self) -> Result<impl 'a + IntoIterator<Item = &EnumValueDescriptor>> {
-        self.cache.values.get_or_try_init(|| {
-            self.base
-                .values
-                .iter()
-                .map(|v| {
-                    Ok(EnumValueDescriptor {
-                        enum_: self,
-                        base: v,
-                        cache: Default::default(),
-                    })
-                })
-                .collect()
-        })
+    pub fn values(&'a self) -> Result<impl Iterator<Item = &EnumValueDescriptor>> {
+        Ok(self
+            .cache
+            .values
+            .get_or_init(|| {
+                self.base
+                    .values
+                    .iter()
+                    .map(|v| EnumValueDescriptor::new(self, v))
+                    .collect()
+            })
+            .iter())
     }
 }
 
@@ -169,10 +167,17 @@ pub struct EnumValueDescriptorCache {
     full_name: OnceCell<ProtoPathBuf>,
 }
 impl<'a> EnumValueDescriptor<'a> {
-    pub fn name(&self) -> &str {
+    fn new(enum_: &'a EnumDescriptor<'a>, base: &'a EnumValueDescriptorBase) -> Self {
+        Self {
+            enum_,
+            base,
+            cache: Default::default(),
+        }
+    }
+    pub fn name(&'a self) -> &str {
         &self.base.name
     }
-    pub fn full_name(&self) -> Result<&ProtoPath> {
+    pub fn full_name(&'a self) -> Result<&ProtoPath> {
         self.cache
             .full_name
             .get_or_try_init(|| {

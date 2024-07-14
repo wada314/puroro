@@ -182,11 +182,11 @@ impl<'a> OneofDescriptor<'a> {
             cache: Default::default(),
         }
     }
-    pub fn name(&self) -> &str {
+    pub fn name(&'a self) -> &str {
         &self.body.name
     }
 
-    pub fn is_synthetic(&self) -> Result<bool> {
+    pub fn is_synthetic(&'a self) -> Result<bool> {
         self.cache
             .is_synthetic
             .get_or_try_init(|| {
@@ -206,7 +206,7 @@ impl<'a> OneofDescriptor<'a> {
             .copied()
     }
 
-    pub fn index_in_oneofs(&self) -> Result<i32> {
+    pub fn index_in_oneofs(&'a self) -> Result<i32> {
         self.cache
             .index_in_oneofs
             .get_or_try_init(|| {
