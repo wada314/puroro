@@ -14,7 +14,7 @@
 
 use crate::proto_path::{ProtoPath, ProtoPathBuf};
 use crate::{ErrorKind, Result};
-use itertools::{Either, Itertools};
+use itertools::Itertools;
 use puroro::google::protobuf::DescriptorProto;
 use puroro::Result as PResult;
 use std::cell::OnceCell;
@@ -95,14 +95,7 @@ pub struct Descriptor<'a> {
 pub struct DescriptorCache<'a> {
     full_path: OnceCell<ProtoPathBuf>,
     all_fields: OnceCell<Vec<FieldDescriptor<'a>>>,
-    non_oneof_fields: OnceCell<Vec<FieldDescriptor<'a>>>,
-    real_oneof_fields: OnceCell<Vec<FieldDescriptor<'a>>>,
-    synthetic_oneof_fields: OnceCell<Vec<FieldDescriptor<'a>>>,
-    real_and_synthetic_oneofs: OnceCell<(Vec<OneofDescriptor<'a>>, Vec<OneofDescriptor<'a>>)>,
-    #[allow(unused)]
-    real_oneofs: OnceCell<Vec<OneofDescriptor<'a>>>,
-    #[allow(unused)]
-    synthetic_oneofs: OnceCell<Vec<OneofDescriptor<'a>>>,
+    all_oneofs: OnceCell<Vec<OneofDescriptor<'a>>>,
     nested_types: OnceCell<Vec<Descriptor<'a>>>,
     enum_types: OnceCell<Vec<EnumDescriptor<'a>>>,
 }
@@ -144,103 +137,68 @@ impl<'a> Descriptor<'a> {
             })
             .map(|s| s.as_ref())
     }
-    pub fn all_fields(&'a self) -> Result<impl 'a + IntoIterator<Item = &FieldDescriptor>> {
-        self.cache.all_fields.get_or_try_init(|| {
-            self.base
-                .fields
-                .iter()
-                .map(|f| Ok(FieldDescriptor::new(f, self)))
-                .collect()
-        })
+    pub fn all_fields(&'a self) -> impl Iterator<Item = &'a FieldDescriptor<'a>> {
+        self.cache
+            .all_fields
+            .get_or_init(|| {
+                self.base
+                    .fields
+                    .iter()
+                    .map(|f| FieldDescriptor::new(f, self))
+                    .collect()
+            })
+            .iter()
+    }
+    pub fn all_oneofs(&'a self) -> impl Iterator<Item = &'a OneofDescriptor<'a>> {
+        self.cache
+            .all_oneofs
+            .get_or_init(|| {
+                self.base
+                    .oneof_decls
+                    .iter()
+                    .map(|o| OneofDescriptor::new(o, self))
+                    .collect()
+            })
+            .iter()
     }
     pub fn filtered_fields(
         &'a self,
-        f: impl Fn(&FieldDescriptorBase) -> bool,
-    ) -> Result<Vec<FieldDescriptor<'a>>> {
-        self.base
-            .fields
-            .iter()
-            .filter(|field| f(field))
-            .map(|f| Ok(FieldDescriptor::new(f, self)))
-            .collect()
+        f: impl 'a + Fn(&FieldDescriptor) -> bool,
+    ) -> Result<impl Iterator<Item = &'a FieldDescriptor<'a>>> {
+        Ok(self.all_fields().filter(move |field| f(*field)))
     }
-    pub fn non_oneof_fields(&'a self) -> Result<impl 'a + IntoIterator<Item = &FieldDescriptor>> {
-        self.cache
-            .non_oneof_fields
-            .get_or_try_init(|| self.filtered_fields(|f| f.oneof_index().is_none()))
-    }
-    pub fn real_oneof_fields(&'a self) -> Result<impl 'a + IntoIterator<Item = &FieldDescriptor>> {
-        self.cache.real_oneof_fields.get_or_try_init(|| {
-            self.filtered_fields(|f| f.oneof_index().is_some() && !f.is_proto3_optional())
-        })
-    }
-    pub fn synthetic_oneof_fields(
-        &'a self,
-    ) -> Result<impl 'a + IntoIterator<Item = &FieldDescriptor>> {
-        self.cache.synthetic_oneof_fields.get_or_try_init(|| {
-            self.filtered_fields(|f| f.oneof_index().is_some() && f.is_proto3_optional())
-        })
-    }
-    pub fn all_oneofs(&'a self) -> Result<impl 'a + IntoIterator<Item = &OneofDescriptor>> {
+    pub fn non_oneof_fields(&'a self) -> Result<impl Iterator<Item = &'a FieldDescriptor>> {
         Ok(self
-            .real_oneofs()?
-            .into_iter()
-            .chain(self.synthetic_oneofs()?.into_iter()))
+            .all_fields()
+            .filter(|f| f.oneof_index().is_none() || f.is_proto3_optional()))
     }
-    pub fn real_and_synthetic_oneofs(
-        &'a self,
-    ) -> Result<(
-        impl IntoIterator<Item = &'a OneofDescriptor<'a>>,
-        impl IntoIterator<Item = &'a OneofDescriptor<'a>>,
-    )> {
-        let (real, synthetic) = self.cache.real_and_synthetic_oneofs.get_or_try_init(|| {
-            let mut is_oneof_synthetic = vec![false; self.base.oneof_decls.len()];
-            for f in self.all_fields()? {
-                if let Some(i) = f.oneof_index() {
-                    is_oneof_synthetic[i] |= f.is_proto3_optional();
-                }
-            }
-            let (real, synthetic): (Vec<_>, Vec<_>) = self
-                .base
-                .oneof_decls
-                .iter()
-                .enumerate()
-                .partition_map(|(i, o)| {
-                    let oneof = Ok(OneofDescriptor::new(o, self));
-                    if is_oneof_synthetic[i] {
-                        Either::Right(oneof)
-                    } else {
-                        Either::Left(oneof)
-                    }
-                });
-            Result::Ok((
-                real.into_iter().collect::<Result<_>>()?,
-                synthetic.into_iter().collect::<Result<_>>()?,
-            ))
-        })?;
-        Ok((real, synthetic))
+    pub fn real_oneof_fields(&'a self) -> Result<impl Iterator<Item = &'a FieldDescriptor>> {
+        Ok(self
+            .all_fields()
+            .filter(|f| f.oneof_index().is_some() && !f.is_proto3_optional()))
     }
-    pub fn real_oneofs(&'a self) -> Result<impl IntoIterator<Item = &'a OneofDescriptor>> {
-        Ok(self.real_and_synthetic_oneofs()?.0)
+    pub fn real_oneofs(&'a self) -> Result<impl Iterator<Item = &'a OneofDescriptor>> {
+        Ok(self
+            .all_oneofs()
+            .filter(|o| o.is_synthetic().is_ok_and(|b| !b)))
     }
-    pub fn synthetic_oneofs(&'a self) -> Result<impl IntoIterator<Item = &'a OneofDescriptor>> {
-        Ok(self.real_and_synthetic_oneofs()?.1)
+    pub fn synthetic_oneofs(&'a self) -> Result<impl Iterator<Item = &'a OneofDescriptor>> {
+        Ok(self
+            .all_oneofs()
+            .filter(|o| o.is_synthetic().is_ok_and(|b| b)))
     }
-    pub fn nested_types(&'a self) -> Result<impl 'a + IntoIterator<Item = &Descriptor>> {
-        self.cache.nested_types.get_or_try_init(|| {
-            self.base
-                .nested_types
-                .iter()
-                .map(|m| {
-                    Ok(Descriptor {
-                        file: self.file,
-                        maybe_containing: Some(self),
-                        base: m,
-                        cache: Default::default(),
-                    })
-                })
-                .collect()
-        })
+    pub fn nested_types(&'a self) -> Result<impl Iterator<Item = &'a Descriptor>> {
+        Ok(self
+            .cache
+            .nested_types
+            .get_or_init(|| {
+                self.base
+                    .nested_types
+                    .iter()
+                    .map(|m| Descriptor::new(self.file, Some(self), m))
+                    .collect()
+            })
+            .iter())
     }
     pub fn enum_types(&'a self) -> Result<impl 'a + IntoIterator<Item = &EnumDescriptor>> {
         self.cache.enum_types.get_or_try_init(|| {

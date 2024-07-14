@@ -30,32 +30,8 @@ pub struct FieldDescriptorBase {
     type_case: FieldTypeCase,
     type_name: Option<String>,
     label: Option<FieldLabel>,
-    oneof_index: Option<usize>,
+    oneof_index: Option<i32>,
     proto3_optional: bool,
-}
-
-impl FieldDescriptorBase {
-    pub fn name(&self) -> &str {
-        &self.name
-    }
-    pub fn number(&self) -> i32 {
-        self.number
-    }
-    pub fn type_case(&self) -> FieldTypeCase {
-        self.type_case
-    }
-    pub fn type_name(&self) -> Option<&str> {
-        self.type_name.as_deref()
-    }
-    pub fn label(&self) -> Option<FieldLabel> {
-        self.label
-    }
-    pub fn oneof_index(&self) -> Option<usize> {
-        self.oneof_index
-    }
-    pub fn is_proto3_optional(&self) -> bool {
-        self.proto3_optional
-    }
 }
 
 impl<'a> TryFrom<FieldDescriptorProto<'a>> for FieldDescriptorBase {
@@ -72,7 +48,7 @@ impl<'a> TryFrom<FieldDescriptorProto<'a>> for FieldDescriptorBase {
                 .into(),
             type_name: proto.type_name()?.map(str::to_string),
             label: proto.label()?.map(FieldLabelProto::into),
-            oneof_index: proto.oneof_index()?.map(|i| i.try_into()).transpose()?,
+            oneof_index: proto.oneof_index()?,
             proto3_optional: proto.proto3_optional()?.unwrap_or(false),
         })
     }
@@ -99,22 +75,38 @@ impl<'a> FieldDescriptor<'a> {
             cache: Default::default(),
         }
     }
-    pub fn name(&self) -> Result<&str> {
-        Ok(&self.base.name)
+    pub fn name(&self) -> &str {
+        &self.base.name
+    }
+    pub fn number(&self) -> i32 {
+        self.base.number
+    }
+    pub fn type_case(&self) -> FieldTypeCase {
+        self.base.type_case
+    }
+    pub fn type_name(&self) -> Option<&str> {
+        self.base.type_name.as_deref()
+    }
+    pub fn label(&self) -> Option<FieldLabel> {
+        self.base.label
+    }
+    pub fn oneof_index(&self) -> Option<i32> {
+        self.base.oneof_index
+    }
+    pub fn is_proto3_optional(&self) -> bool {
+        self.base.proto3_optional
     }
     pub fn full_name(&self) -> Result<&str> {
         self.cache
             .full_name
             .get_or_try_init(|| {
                 let mut full_name = self.message.full_path()?.to_owned();
-                full_name.push(ProtoPath::new(&format!(".{}", self.base.name)));
+                full_name.push(ProtoPath::new(&format!(".{}", self.name())));
                 Ok(full_name)
             })
             .map(|s| s.as_ref())
     }
-    pub fn r#type(
-        &self,
-    ) -> Result<FieldType<&'a Descriptor<'a>, &'a EnumDescriptor<'a>>> {
+    pub fn r#type(&self) -> Result<FieldType<&'a Descriptor<'a>, &'a EnumDescriptor<'a>>> {
         let init = || {
             self.base.type_case.with_type_ref(
                 self.base.type_name.as_deref(),
@@ -170,16 +162,17 @@ impl<'a> TryFrom<OneofDescriptorProto<'a>> for OneofDescriptorBase {
 
 #[derive(Debug)]
 pub struct OneofDescriptor<'a> {
-    #[allow(unused)]
     message: &'a Descriptor<'a>,
-    #[allow(unused)]
     body: &'a OneofDescriptorBase,
     #[allow(unused)]
     cache: OneofDescriptorCache,
 }
 
 #[derive(Default, Debug)]
-pub struct OneofDescriptorCache {}
+pub struct OneofDescriptorCache {
+    index_in_oneofs: OnceCell<i32>,
+    is_synthetic: OnceCell<bool>,
+}
 
 impl<'a> OneofDescriptor<'a> {
     pub fn new(body: &'a OneofDescriptorBase, message: &'a Descriptor<'a>) -> Self {
@@ -188,5 +181,42 @@ impl<'a> OneofDescriptor<'a> {
             body,
             cache: Default::default(),
         }
+    }
+    pub fn name(&self) -> &str {
+        &self.body.name
+    }
+
+    pub fn is_synthetic(&self) -> Result<bool> {
+        self.cache
+            .is_synthetic
+            .get_or_try_init(|| {
+                let index = self.index_in_oneofs()?;
+                let fields = self
+                    .message
+                    .all_fields()
+                    .filter(|f| f.oneof_index() == Some(index))
+                    .collect::<Vec<_>>();
+                if let Some(first) = fields.first() {
+                    if fields.len() == 1 && first.is_proto3_optional() {
+                        return Ok(true);
+                    }
+                }
+                Ok(false)
+            })
+            .copied()
+    }
+
+    pub fn index_in_oneofs(&self) -> Result<i32> {
+        self.cache
+            .index_in_oneofs
+            .get_or_try_init(|| {
+                let index = self
+                    .message
+                    .all_oneofs()
+                    .position(|o| o.name() == self.name())
+                    .ok_or_else(|| format!("Oneof not found: {}", self.name()))?;
+                Ok(index as i32)
+            })
+            .copied()
     }
 }

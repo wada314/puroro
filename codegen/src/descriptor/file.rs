@@ -113,15 +113,15 @@ impl<'a> FileDescriptor<'a> {
     pub fn root(&self) -> &'a RootContext<'a> {
         self.root
     }
-    pub fn name(&self) -> Result<&str> {
-        Ok(&self.base.name)
+    pub fn name(&self) -> &str {
+        &self.base.name
     }
-    pub fn package(&self) -> Result<Option<&ProtoPath>> {
-        Ok(self.base.package.as_deref())
+    pub fn package(&self) -> Option<&ProtoPath> {
+        self.base.package.as_deref()
     }
     pub fn absolute_package(&self) -> Result<ProtoPathBuf> {
         let mut package = self
-            .package()?
+            .package()
             .map_or_else(ProtoPathBuf::new, |p| p.to_owned());
         if package.is_relative() {
             let mut new_package = Into::<ProtoPathBuf>::into(".");
@@ -163,8 +163,7 @@ impl<'a> FileDescriptor<'a> {
     }
     pub fn all_messages_or_enums(
         &'a self,
-    ) -> Result<impl 'a + IntoIterator<Item = MessageOrEnum<&Descriptor, &EnumDescriptor>>>
-    {
+    ) -> Result<impl 'a + IntoIterator<Item = MessageOrEnum<&Descriptor, &EnumDescriptor>>> {
         Ok(self
             .all_messages()?
             .into_iter()
@@ -248,20 +247,10 @@ mod tests {
         assert_eq!(1, package_a_files.len());
         assert_eq!(2, package_a_b_files.len());
         assert_eq!(1, package_a_b_c_files.len());
-        assert!(root_package_files
-            .iter()
-            .any(|f| f.name().unwrap() == "fd0.proto"));
-        assert!(package_a_files
-            .iter()
-            .any(|f| f.name().unwrap() == "fd1.proto"));
-        assert!(package_a_b_files
-            .iter()
-            .any(|f| f.name().unwrap() == "fd2.proto"));
-        assert!(package_a_b_files
-            .iter()
-            .any(|f| f.name().unwrap() == "fd3.proto"));
-        assert!(package_a_b_c_files
-            .iter()
-            .any(|f| f.name().unwrap() == "fd4.proto"));
+        assert!(root_package_files.iter().any(|f| f.name() == "fd0.proto"));
+        assert!(package_a_files.iter().any(|f| f.name() == "fd1.proto"));
+        assert!(package_a_b_files.iter().any(|f| f.name() == "fd2.proto"));
+        assert!(package_a_b_files.iter().any(|f| f.name() == "fd3.proto"));
+        assert!(package_a_b_c_files.iter().any(|f| f.name() == "fd4.proto"));
     }
 }

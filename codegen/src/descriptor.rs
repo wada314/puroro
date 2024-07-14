@@ -63,7 +63,7 @@ impl<'a> RootContext<'a> {
         Ok(self
             .files()
             .into_iter()
-            .find(|f| f.name().is_ok_and(|n| n == name))
+            .find(|f| f.name() == name)
             .ok_or_else(|| format!("No such file: {}", name))?)
     }
     pub fn package_to_files(
@@ -272,7 +272,7 @@ mod tests {
             let MessageOrEnum::Enum(e) = result else {
                 panic!("Expected an enum: {}", path);
             };
-            assert_eq!(e.name().unwrap(), name);
+            assert_eq!(e.name(), name);
         };
         assert_is_message("A", "A");
         assert_is_message("A.B", "B");

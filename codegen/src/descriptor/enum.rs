@@ -85,8 +85,8 @@ impl<'a> EnumDescriptor<'a> {
             cache: Default::default(),
         }
     }
-    pub fn name(&self) -> Result<&str> {
-        Ok(self.base.name.as_ref())
+    pub fn name(&self) -> &str {
+        self.base.name.as_ref()
     }
     pub fn full_path(&self) -> Result<&ProtoPath> {
         self.cache
@@ -169,8 +169,8 @@ pub struct EnumValueDescriptorCache {
     full_name: OnceCell<ProtoPathBuf>,
 }
 impl<'a> EnumValueDescriptor<'a> {
-    pub fn name(&self) -> Result<&str> {
-        Ok(self.base.name.as_ref())
+    pub fn name(&self) -> &str {
+        &self.base.name
     }
     pub fn full_name(&self) -> Result<&ProtoPath> {
         self.cache
@@ -182,15 +182,15 @@ impl<'a> EnumValueDescriptor<'a> {
                 } else {
                     self.enum_
                         .file
-                        .package()?
+                        .package()
                         .map_or_else(ProtoPathBuf::new, |p| p.to_owned())
                 };
-                full_name.push(ProtoPath::new(&self.enum_.name()?));
+                full_name.push(ProtoPath::new(&self.enum_.name()));
                 Ok(full_name)
             })
             .map(|s| s.as_ref())
     }
-    pub fn number(&self) -> Result<i32> {
-        Ok(self.base.number)
+    pub fn number(&self) -> i32 {
+        self.base.number
     }
 }

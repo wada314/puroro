@@ -32,7 +32,7 @@ struct EnumVariant {
 impl Enum {
     pub fn try_new<'a>(desc: &'a EnumDescriptor<'a>) -> Result<Self> {
         Ok(Self {
-            name: Self::rust_name_from_enum_name(desc.name()?)?,
+            name: Self::rust_name_from_enum_name(desc.name())?,
             variants: desc
                 .values()?
                 .into_iter()
@@ -125,8 +125,8 @@ impl Enum {
 impl EnumVariant {
     fn try_new(desc: &EnumValueDescriptor) -> Result<Self> {
         Ok(Self {
-            name: parse_str(&convert_into_case(desc.name()?, Case::CamelCase))?,
-            number: desc.number()?,
+            name: parse_str(&convert_into_case(desc.name(), Case::CamelCase))?,
+            number: desc.number(),
         })
     }
 

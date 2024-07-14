@@ -76,7 +76,7 @@ pub struct Field {
 impl Field {
     pub fn try_new<'a>(desc: &'a FieldDescriptor<'a>) -> Result<Self> {
         Ok(Self {
-            original_name: desc.name()?.to_string(),
+            original_name: desc.name().to_string(),
             wrapper: FieldWrapper::try_from_field_desc(desc)?,
             scalar_type: desc.type_with_full_path()?,
         })

@@ -58,7 +58,7 @@ pub fn compile(request: &CodeGeneratorRequest) -> Result<CodeGeneratorResponse<'
             "mod.rs".to_string()
         };
         let file = out_files.file_mut(file_path);
-        file.add_source(message.file().name()?);
+        file.add_source(message.file().name());
 
         let trait_item = MessageTrait::try_new(message)?.gen_message_trait()?;
         file.append(quote! { #trait_item });
@@ -82,7 +82,7 @@ pub fn compile(request: &CodeGeneratorRequest) -> Result<CodeGeneratorResponse<'
             "mod.rs".to_string()
         };
         let file = out_files.file_mut(file_path);
-        file.add_source(e.file()?.name()?);
+        file.add_source(e.file()?.name());
 
         let enum_ = r#enum::Enum::try_new(e)?.rust_items()?;
         file.append(quote! { #(#enum_)* });
