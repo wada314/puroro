@@ -73,7 +73,8 @@ impl Field {
     fn gen_getter(&self) -> Result<Item> {
         let signature = self.trait_field.gen_getter_signature()?;
         let number = self.number;
-        let body = self.gen_getter_body(&parse_str("f")?)?;
+        // let body = self.gen_getter_body(&parse_str("f")?)?;
+        let body = "";
         Ok(parse2(quote! {
             #signature {
                 let f = self.field(#number);

@@ -40,11 +40,6 @@ use ::std::collections::HashMap;
 use ::std::fmt::Debug;
 use ::std::ops::Deref;
 
-/// The struct types with the "context".
-/// The context here means the path from the root of the descriptor tree to the current node.
-
-// region: RootContext
-
 #[derive(Debug)]
 pub struct RootContext<'a> {
     files: Vec<(FileDescriptor, OnceCell<FileDescriptorWithContext<'a>>)>,
