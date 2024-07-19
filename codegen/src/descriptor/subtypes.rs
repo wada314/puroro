@@ -14,6 +14,7 @@
 
 use crate::proto_path::{ProtoPath, ProtoPathBuf};
 use crate::{ErrorKind, Result};
+use ::std::ops::Deref;
 use puroro::google::protobuf::{
     field_descriptor_proto::Label as FieldLabelProto,
     field_descriptor_proto::Type as FieldTypeProto, Edition as EditionProto,
@@ -143,6 +144,54 @@ impl<M, E> FieldType<M, E> {
             FieldType::UInt32 => FieldType::UInt32,
             FieldType::UInt64 => FieldType::UInt64,
         })
+    }
+    pub const fn as_ref(&self) -> FieldType<&M, &E> {
+        match self {
+            FieldType::Bool => FieldType::Bool,
+            FieldType::Bytes => FieldType::Bytes,
+            FieldType::Double => FieldType::Double,
+            FieldType::Enum(e) => FieldType::Enum(e),
+            FieldType::Fixed32 => FieldType::Fixed32,
+            FieldType::Fixed64 => FieldType::Fixed64,
+            FieldType::Float => FieldType::Float,
+            FieldType::Group => FieldType::Group,
+            FieldType::Int32 => FieldType::Int32,
+            FieldType::Int64 => FieldType::Int64,
+            FieldType::Message(m) => FieldType::Message(m),
+            FieldType::SFixed32 => FieldType::SFixed32,
+            FieldType::SFixed64 => FieldType::SFixed64,
+            FieldType::SInt32 => FieldType::SInt32,
+            FieldType::SInt64 => FieldType::SInt64,
+            FieldType::String => FieldType::String,
+            FieldType::UInt32 => FieldType::UInt32,
+            FieldType::UInt64 => FieldType::UInt64,
+        }
+    }
+    pub fn as_deref(&self) -> FieldType<&<M as Deref>::Target, &<E as Deref>::Target>
+    where
+        M: Deref,
+        E: Deref,
+    {
+        match self {
+            FieldType::Bool => FieldType::Bool,
+            FieldType::Bytes => FieldType::Bytes,
+            FieldType::Double => FieldType::Double,
+            FieldType::Enum(e) => FieldType::Enum(<E as Deref>::deref(e)),
+            FieldType::Fixed32 => FieldType::Fixed32,
+            FieldType::Fixed64 => FieldType::Fixed64,
+            FieldType::Float => FieldType::Float,
+            FieldType::Group => FieldType::Group,
+            FieldType::Int32 => FieldType::Int32,
+            FieldType::Int64 => FieldType::Int64,
+            FieldType::Message(m) => FieldType::Message(<M as Deref>::deref(m)),
+            FieldType::SFixed32 => FieldType::SFixed32,
+            FieldType::SFixed64 => FieldType::SFixed64,
+            FieldType::SInt32 => FieldType::SInt32,
+            FieldType::SInt64 => FieldType::SInt64,
+            FieldType::String => FieldType::String,
+            FieldType::UInt32 => FieldType::UInt32,
+            FieldType::UInt64 => FieldType::UInt64,
+        }
     }
 }
 

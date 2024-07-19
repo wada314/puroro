@@ -82,6 +82,10 @@ impl Field {
         })
     }
 
+    pub fn scalar_type(&self) -> FieldType<&ProtoPath, &ProtoPath> {
+        self.scalar_type.as_deref()
+    }
+
     pub fn gen_getter_signature(&self) -> Result<Signature> {
         let getter_name: Ident = {
             let lower_cased = convert_into_case(&self.original_name, Case::LowerSnakeCase);

@@ -13,8 +13,11 @@
 // limitations under the License.
 
 use super::message_trait::{Field as TraitField, MessageTrait};
-use crate::descriptor::{Descriptor, FieldDescriptor};
+use crate::descriptor::{
+    Descriptor, FieldDescriptor, I32Type, I64Type, LenType, VariantType, WireType,
+};
 use crate::generator::message_trait::FieldWrapper;
+use crate::proto_path::ProtoPath;
 use crate::Result;
 use ::quote::quote;
 use ::syn::Expr;
@@ -77,15 +80,46 @@ impl Field {
         })?)
     }
 
-    fn gen_getter_body(&self, _field_expr: &Expr) -> Result<Expr> {
+    fn gen_getter_body(&self, field_expr: &Expr) -> Result<Expr> {
         #[allow(unused)]
         let result = match self.trait_field.wrapper() {
-            FieldWrapper::Bare => todo!(),
-            FieldWrapper::Optional => todo!(),
-            FieldWrapper::OptionalBoxed => todo!(),
             FieldWrapper::Vec => todo!(),
+            _ => self.gen_non_repeated_getter_body(field_expr)?,
         };
         #[allow(unused)]
         Ok(result)
+    }
+
+    fn gen_non_repeated_getter_body(&self, field_expr: &Expr) -> Result<Expr> {
+        let wire_type: WireType<_, _, _, _> = self.trait_field.scalar_type().into();
+        Ok(match wire_type {
+            WireType::Variant(t) => self.gen_non_repeated_varint_getter_body(field_expr, t)?,
+            WireType::I32(t) => self.gen_non_repeated_i32_getter_body(field_expr, t)?,
+            WireType::I64(t) => self.gen_non_repeated_i64_getter_body(field_expr, t)?,
+            WireType::Len(t) => self.gen_non_repeated_len_getter_body(field_expr, t)?,
+            WireType::StartGroup => todo!(),
+            WireType::EndGroup => todo!(),
+        })
+    }
+
+    fn gen_non_repeated_varint_getter_body(
+        &self,
+        field_expr: &Expr,
+        t: VariantType<&ProtoPath>,
+    ) -> Result<Expr> {
+        todo!()
+    }
+    fn gen_non_repeated_i32_getter_body(&self, field_expr: &Expr, t: I32Type) -> Result<Expr> {
+        todo!()
+    }
+    fn gen_non_repeated_i64_getter_body(&self, field_expr: &Expr, t: I64Type) -> Result<Expr> {
+        todo!()
+    }
+    fn gen_non_repeated_len_getter_body(
+        &self,
+        field_expr: &Expr,
+        t: LenType<&ProtoPath>,
+    ) -> Result<Expr> {
+        todo!()
     }
 }
