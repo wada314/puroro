@@ -213,21 +213,25 @@ impl<'a> Descriptor<'a> {
             })
             .iter())
     }
-    pub fn all_messages_or_enums(
+    pub fn all_descendant_messages_or_enums(
         &'a self,
     ) -> Result<impl Iterator<Item = MessageOrEnum<&Descriptor, &EnumDescriptor>>> {
         Ok(self
-            .all_messages()?
+            .all_descendant_messages()?
             .into_iter()
             .map(MessageOrEnum::Message)
-            .chain(self.all_enums()?.into_iter().map(MessageOrEnum::Enum)))
+            .chain(
+                self.all_descendant_enums()?
+                    .into_iter()
+                    .map(MessageOrEnum::Enum),
+            ))
     }
-    pub fn all_messages(&'a self) -> Result<impl Iterator<Item = &Descriptor>> {
+    pub fn all_descendant_messages(&'a self) -> Result<impl Iterator<Item = &Descriptor>> {
         let direct_messages = self.nested_types()?.into_iter();
         let indirect_messages_vec = self
             .nested_types()?
             .into_iter()
-            .map(|child| child.all_messages())
+            .map(|child| child.all_descendant_messages())
             .collect::<Result<Vec<_>>>()?;
         let indirect_messages = indirect_messages_vec
             .into_iter()
@@ -235,12 +239,12 @@ impl<'a> Descriptor<'a> {
         let boxed: Box<dyn Iterator<Item = _>> = Box::new(direct_messages.chain(indirect_messages));
         Ok(boxed)
     }
-    pub fn all_enums(&'a self) -> Result<impl Iterator<Item = &EnumDescriptor>> {
+    pub fn all_descendant_enums(&'a self) -> Result<impl Iterator<Item = &EnumDescriptor>> {
         let direct_enums = self.enum_types()?.into_iter();
         let indirect_enums_vec = self
             .nested_types()?
             .into_iter()
-            .map(|child| child.all_enums())
+            .map(|child| child.all_descendant_enums())
             .collect::<Result<Vec<_>>>()?;
         let indirect_enums = indirect_enums_vec.into_iter().flat_map(|v| v.into_iter());
         let boxed: Box<dyn Iterator<Item = _>> = Box::new(direct_enums.chain(indirect_enums));

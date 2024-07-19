@@ -184,7 +184,7 @@ impl<'a> FileDescriptor<'a> {
         let indirect_messages_vec = self
             .messages()?
             .into_iter()
-            .map(|child| child.all_messages())
+            .map(|child| child.all_descendant_messages())
             .collect::<Result<Vec<_>>>()?;
         let indirect_messages = indirect_messages_vec
             .into_iter()
@@ -197,7 +197,7 @@ impl<'a> FileDescriptor<'a> {
         let indirect_enums_vec = self
             .messages()?
             .into_iter()
-            .map(|child| child.all_enums())
+            .map(|child| child.all_descendant_enums())
             .collect::<Result<Vec<_>>>()?;
         let indirect_enums = indirect_enums_vec.into_iter().flat_map(|v| v.into_iter());
         let boxed: Box<dyn Iterator<Item = _>> = Box::new(direct_enums.chain(indirect_enums));
