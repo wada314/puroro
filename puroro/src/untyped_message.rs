@@ -47,11 +47,11 @@ impl MessageLite for UntypedMessage<'_> {
                 total_bytes += write.write_variant(UInt32::try_into_variant(tag)?)?;
                 total_bytes += match wire_and_payload {
                     WireTypeAndPayload::Variant(variant) => write.write_variant(variant.clone())?,
-                    WireTypeAndPayload::Fixed64(buf) => {
+                    WireTypeAndPayload::I64(buf) => {
                         write.write_all(buf)?;
                         4usize
                     }
-                    WireTypeAndPayload::Fixed32(buf) => {
+                    WireTypeAndPayload::I32(buf) => {
                         write.write_all(buf)?;
                         8usize
                     }
@@ -71,8 +71,8 @@ impl MessageLite for UntypedMessage<'_> {
 #[derive(Debug, Clone)]
 pub enum WireTypeAndPayload<'a> {
     Variant(Variant),
-    Fixed64([u8; 8]),
-    Fixed32([u8; 4]),
+    I64([u8; 8]),
+    I32([u8; 4]),
     Len(Cow<'a, [u8]>),
     // StartGroup,
     // EndGroup,
@@ -81,8 +81,8 @@ impl WireTypeAndPayload<'_> {
     pub(crate) fn wire_type(&self) -> WireType {
         match self {
             WireTypeAndPayload::Variant(_) => WireType::Variant,
-            WireTypeAndPayload::Fixed64(_) => WireType::I64,
-            WireTypeAndPayload::Fixed32(_) => WireType::I32,
+            WireTypeAndPayload::I64(_) => WireType::I64,
+            WireTypeAndPayload::I32(_) => WireType::I32,
             WireTypeAndPayload::Len(_) => WireType::Len,
         }
     }
@@ -164,16 +164,13 @@ impl<'a> Field<'a> {
     }
 
     pub fn as_scalar_variant(&self, allow_packed: bool) -> Result<Option<Variant>> {
-        self.as_repeated_variant(allow_packed)
-            .into_iter()
-            .last()
-            .transpose()
+        self.as_repeated_variant(allow_packed).last().transpose()
     }
 
     pub fn as_repeated_variant(
         &self,
         allow_packed: bool,
-    ) -> impl 'a + IntoIterator<Item = Result<Variant>> {
+    ) -> impl 'a + Iterator<Item = Result<Variant>> {
         self.wire_and_payloads
             .iter()
             .flat_map(move |record| match (allow_packed, record) {
@@ -185,11 +182,33 @@ impl<'a> Field<'a> {
             })
     }
 
-    pub fn as_scalar_string(&self) -> Result<Option<&'a str>> {
-        self.as_repeated_string().into_iter().last().transpose()
+    pub fn as_scalar_i32(&self) -> Result<Option<[u8; 4]>> {
+        self.as_repeated_i32().last().transpose()
     }
 
-    pub fn as_repeated_string(&self) -> impl 'a + IntoIterator<Item = Result<&'a str>> {
+    pub fn as_repeated_i32(&self) -> impl 'a + Iterator<Item = Result<[u8; 4]>> {
+        self.wire_and_payloads.iter().map(|record| match record {
+            WireTypeAndPayload::I32(buf) => Ok(*buf),
+            _ => Err(ErrorKind::GenericMessageFieldTypeError),
+        })
+    }
+
+    pub fn as_scalar_i64(&self) -> Result<Option<[u8; 8]>> {
+        self.as_repeated_i64().last().transpose()
+    }
+
+    pub fn as_repeated_i64(&self) -> impl 'a + Iterator<Item = Result<[u8; 8]>> {
+        self.wire_and_payloads.iter().map(|record| match record {
+            WireTypeAndPayload::I64(buf) => Ok(*buf),
+            _ => Err(ErrorKind::GenericMessageFieldTypeError),
+        })
+    }
+
+    pub fn as_scalar_string(&self) -> Result<Option<&'a str>> {
+        self.as_repeated_string().last().transpose()
+    }
+
+    pub fn as_repeated_string(&self) -> impl 'a + Iterator<Item = Result<&'a str>> {
         self.wire_and_payloads.iter().map(|record| match record {
             WireTypeAndPayload::Len(ld) => {
                 ::std::str::from_utf8(&ld).map_err(|_| ErrorKind::GenericMessageFieldTypeError)
@@ -211,7 +230,7 @@ impl<'a> Field<'a> {
         Ok(message_opt)
     }
 
-    pub fn as_repeated_message(&self) -> impl 'a + IntoIterator<Item = Result<UntypedMessage<'a>>> {
+    pub fn as_repeated_message(&self) -> impl 'a + Iterator<Item = Result<UntypedMessage<'a>>> {
         self.wire_and_payloads.iter().map(|wire_and_payload| {
             let WireTypeAndPayload::Len(buf) = wire_and_payload else {
                 Err(ErrorKind::GenericMessageFieldTypeError)?
@@ -250,8 +269,8 @@ where
     fn from(record: Record<T>) -> Self {
         match record.payload {
             Payload::Variant(variant) => WireTypeAndPayload::Variant(variant),
-            Payload::I64(buf) => WireTypeAndPayload::Fixed64(buf),
-            Payload::I32(buf) => WireTypeAndPayload::Fixed32(buf),
+            Payload::I64(buf) => WireTypeAndPayload::I64(buf),
+            Payload::I32(buf) => WireTypeAndPayload::I32(buf),
             Payload::Len(buf) => WireTypeAndPayload::Len(buf.into()),
         }
     }
@@ -271,12 +290,12 @@ impl DeserMessageHandlerBase for UntypedMessage<'_> {
     }
     fn parse_i32(&mut self, num: i32, val: [u8; 4]) -> Result<()> {
         self.payloads_for_field_mut(num)
-            .push(WireTypeAndPayload::Fixed32(val));
+            .push(WireTypeAndPayload::I32(val));
         Ok(())
     }
     fn parse_i64(&mut self, num: i32, val: [u8; 8]) -> Result<()> {
         self.payloads_for_field_mut(num)
-            .push(WireTypeAndPayload::Fixed64(val));
+            .push(WireTypeAndPayload::I64(val));
         Ok(())
     }
     fn is_message_field(&self, #[allow(unused)] num: i32) -> bool {

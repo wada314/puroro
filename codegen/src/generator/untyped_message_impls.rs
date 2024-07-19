@@ -110,7 +110,17 @@ impl Field {
         todo!()
     }
     fn gen_non_repeated_i32_getter_body(&self, field_expr: &Expr, t: I32Type) -> Result<Expr> {
-        todo!()
+        Ok(parse2(match t {
+            I32Type::Float => {
+                quote! { ::std::f64::from_le_bytes(#field_expr.as_scalar_i32().unwrap()) }
+            }
+            I32Type::Fixed32 => {
+                quote! { ::std::u32::from_le_bytes(#field_expr.as_scalar_i32().unwrap()) }
+            }
+            I32Type::SFixed32 => {
+                quote! { ::std::i32::from_le_bytes(#field_expr.as_scalar_i32().unwrap()) }
+            }
+        })?)
     }
     fn gen_non_repeated_i64_getter_body(&self, field_expr: &Expr, t: I64Type) -> Result<Expr> {
         todo!()
