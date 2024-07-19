@@ -83,7 +83,7 @@ impl Field {
     fn gen_getter_body(&self, field_expr: &Expr) -> Result<Expr> {
         #[allow(unused)]
         let result = match self.trait_field.wrapper() {
-            FieldWrapper::Vec => todo!(),
+            FieldWrapper::Vec => parse2(quote! { todo!() })?,
             _ => self.gen_non_repeated_getter_body(field_expr)?,
         };
         #[allow(unused)]
@@ -107,29 +107,39 @@ impl Field {
         field_expr: &Expr,
         t: VariantType<&ProtoPath>,
     ) -> Result<Expr> {
-        todo!()
+        Ok(parse2(quote! { todo!() })?)
     }
     fn gen_non_repeated_i32_getter_body(&self, field_expr: &Expr, t: I32Type) -> Result<Expr> {
         Ok(parse2(match t {
             I32Type::Float => {
-                quote! { ::std::f64::from_le_bytes(#field_expr.as_scalar_i32().unwrap()) }
+                quote! { ::std::f64::from_le_bytes((#field_expr).as_scalar_i32().ok().flatten()) }
             }
             I32Type::Fixed32 => {
-                quote! { ::std::u32::from_le_bytes(#field_expr.as_scalar_i32().unwrap()) }
+                quote! { ::std::u32::from_le_bytes((#field_expr).as_scalar_i32().ok().flatten()) }
             }
             I32Type::SFixed32 => {
-                quote! { ::std::i32::from_le_bytes(#field_expr.as_scalar_i32().unwrap()) }
+                quote! { ::std::i32::from_le_bytes((#field_expr).as_scalar_i32().ok().flatten()) }
             }
         })?)
     }
     fn gen_non_repeated_i64_getter_body(&self, field_expr: &Expr, t: I64Type) -> Result<Expr> {
-        todo!()
+        Ok(parse2(match t {
+            I64Type::Double => {
+                quote! { ::std::f64::from_le_bytes((#field_expr).as_scalar_i64().ok().flatten()) }
+            }
+            I64Type::Fixed64 => {
+                quote! { ::std::u64::from_le_bytes((#field_expr).as_scalar_i64().ok().flatten()) }
+            }
+            I64Type::SFixed64 => {
+                quote! { ::std::i64::from_le_bytes((#field_expr).as_scalar_i64().ok().flatten()) }
+            }
+        })?)
     }
     fn gen_non_repeated_len_getter_body(
         &self,
         field_expr: &Expr,
         t: LenType<&ProtoPath>,
     ) -> Result<Expr> {
-        todo!()
+        Ok(parse2(quote! { todo!() })?)
     }
 }
