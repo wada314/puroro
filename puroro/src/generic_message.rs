@@ -30,11 +30,11 @@ use ::std::io::{BufRead, Read, Write};
 
 /// Assuming proto2 syntax.
 #[derive(Clone, Debug, Default)]
-pub struct UntypedMessage<'a> {
+pub struct GenericMessage<'a> {
     fields: HashMap<i32, Vec<WireTypeAndPayload<'a>>>,
 }
 
-impl MessageLite for UntypedMessage<'_> {
+impl MessageLite for GenericMessage<'_> {
     fn merge_from_bufread<R: BufRead>(&mut self, read: R) -> Result<()> {
         deser_from_bufread(read, self)
     }
@@ -103,13 +103,13 @@ pub struct FieldMut<'msg, 'a> {
     >,
 }
 
-impl<'a> UntypedMessage<'a> {
+impl<'a> GenericMessage<'a> {
     pub fn new() -> Self {
         Self::default()
     }
 
     pub fn from_buffer(buf: &'a [u8]) -> Result<Self> {
-        let mut message = UntypedMessage::default();
+        let mut message = GenericMessage::default();
         message.merge_from_buffer(buf)?;
         Ok(message)
     }
@@ -217,25 +217,36 @@ impl<'a> Field<'a> {
         })
     }
 
-    pub fn as_scalar_message(&self) -> Result<Option<UntypedMessage<'a>>> {
-        let mut message_opt: Option<UntypedMessage> = None;
+    pub fn as_scalar_bytes(&self) -> Result<Option<&'a [u8]>> {
+        self.as_repeated_bytes().last().transpose()
+    }
+
+    pub fn as_repeated_bytes(&self) -> impl 'a + Iterator<Item = Result<&'a [u8]>> {
+        self.wire_and_payloads.iter().map(|record| match record {
+            WireTypeAndPayload::Len(ld) => Ok(ld.as_ref()),
+            _ => Err(ErrorKind::GenericMessageFieldTypeError),
+        })
+    }
+
+    pub fn as_scalar_message(&self) -> Result<Option<GenericMessage<'a>>> {
+        let mut message_opt: Option<GenericMessage> = None;
         for wire_and_payload in self.wire_and_payloads {
             let WireTypeAndPayload::Len(buf) = wire_and_payload else {
                 Err(ErrorKind::GenericMessageFieldTypeError)?
             };
             message_opt
-                .get_or_insert_with(UntypedMessage::default)
+                .get_or_insert_with(GenericMessage::default)
                 .merge_from_buffer(buf)?;
         }
         Ok(message_opt)
     }
 
-    pub fn as_repeated_message(&self) -> impl 'a + Iterator<Item = Result<UntypedMessage<'a>>> {
+    pub fn as_repeated_message(&self) -> impl 'a + Iterator<Item = Result<GenericMessage<'a>>> {
         self.wire_and_payloads.iter().map(|wire_and_payload| {
             let WireTypeAndPayload::Len(buf) = wire_and_payload else {
                 Err(ErrorKind::GenericMessageFieldTypeError)?
             };
-            UntypedMessage::from_buffer(buf)
+            GenericMessage::from_buffer(buf)
         })
     }
 }
@@ -253,7 +264,7 @@ impl<'msg, 'a> FieldMut<'msg, 'a> {
             .push(WireTypeAndPayload::Len(val.to_string().into_bytes().into()));
         Ok(())
     }
-    pub fn push_message(&mut self, message: UntypedMessage<'a>) -> Result<()> {
+    pub fn push_message(&mut self, message: GenericMessage<'a>) -> Result<()> {
         let mut buf = Vec::new();
         message.write(&mut buf)?;
         self.mut_ref.push(WireTypeAndPayload::Len(buf.into()));
@@ -276,7 +287,7 @@ where
     }
 }
 
-impl DeserMessageHandlerBase for UntypedMessage<'_> {
+impl DeserMessageHandlerBase for GenericMessage<'_> {
     fn start_message(&mut self, #[allow(unused)] num: i32) -> Result<()> {
         unimplemented!()
     }
@@ -302,7 +313,7 @@ impl DeserMessageHandlerBase for UntypedMessage<'_> {
         false
     }
 }
-impl<R: Read> DeserMessageHandlerForRead<R> for UntypedMessage<'_> {
+impl<R: Read> DeserMessageHandlerForRead<R> for GenericMessage<'_> {
     fn parse_len(&mut self, num: i32, val: &mut R) -> Result<usize> {
         let mut buf = Vec::new();
         let len = val.read_to_end(&mut buf)?;

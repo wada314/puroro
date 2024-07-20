@@ -23,12 +23,12 @@ use ::quote::quote;
 use ::syn::{parse2, parse_str, Ident, Item};
 use ::syn::{Expr, Type};
 
-pub struct UntypedMessageImpls {
+pub struct GenericMessageImpls {
     rust_trait_name: Ident,
     fields: Vec<Field>,
 }
 
-impl UntypedMessageImpls {
+impl GenericMessageImpls {
     pub fn try_new<'a>(desc: &'a Descriptor<'a>) -> Result<Self> {
         Ok(Self {
             rust_trait_name: MessageTrait::rust_name_from_message_name(desc.name()?)?,
@@ -48,7 +48,7 @@ impl UntypedMessageImpls {
             .map(Field::gen_getter)
             .collect::<Result<Vec<_>>>()?;
         Ok(parse2(quote! {
-            impl self::#trait_name for ::puroro::untyped_message::UntypedMessage<'_> {
+            impl self::#trait_name for ::puroro::generic_message::GenericMessage<'_> {
                 #(#getters)*
             }
         })?)
@@ -121,34 +121,38 @@ impl Field {
             }
         })?;
         Ok(parse2(quote! {
-            (#field_expr).as_scalar_variant().ok().flatten().map(
+            (#field_expr).as_scalar_variant(true /* TODO: packed check */).ok().flatten().map(
                 |v| <#vt_type as ::puroro::variant::VariantIntegerType>::try_from_variant(v).ok()
-            ).flatten()
+            ).flatten().unwrap_or_default()
         })?)
     }
     fn gen_non_repeated_i32_getter_body(&self, field_expr: &Expr, t: I32Type) -> Result<Expr> {
+        let bytes_expr: Expr =
+            parse2(quote! { (#field_expr).as_scalar_i32().ok().flatten().unwrap_or_default() })?;
         Ok(parse2(match t {
             I32Type::Float => {
-                quote! { ::std::f64::from_le_bytes((#field_expr).as_scalar_i32().ok().flatten()) }
+                quote! { ::std::f64::from_le_bytes(#bytes_expr) }
             }
             I32Type::Fixed32 => {
-                quote! { ::std::u32::from_le_bytes((#field_expr).as_scalar_i32().ok().flatten()) }
+                quote! { ::std::u32::from_le_bytes(#bytes_expr) }
             }
             I32Type::SFixed32 => {
-                quote! { ::std::i32::from_le_bytes((#field_expr).as_scalar_i32().ok().flatten()) }
+                quote! { ::std::i32::from_le_bytes(#bytes_expr) }
             }
         })?)
     }
     fn gen_non_repeated_i64_getter_body(&self, field_expr: &Expr, t: I64Type) -> Result<Expr> {
+        let bytes_expr: Expr =
+            parse2(quote! { (#field_expr).as_scalar_i64().ok().flatten().unwrap_or_default() })?;
         Ok(parse2(match t {
             I64Type::Double => {
-                quote! { ::std::f64::from_le_bytes((#field_expr).as_scalar_i64().ok().flatten()) }
+                quote! { ::std::f64::from_le_bytes(#bytes_expr) }
             }
             I64Type::Fixed64 => {
-                quote! { ::std::u64::from_le_bytes((#field_expr).as_scalar_i64().ok().flatten()) }
+                quote! { ::std::u64::from_le_bytes(#bytes_expr) }
             }
             I64Type::SFixed64 => {
-                quote! { ::std::i64::from_le_bytes((#field_expr).as_scalar_i64().ok().flatten()) }
+                quote! { ::std::i64::from_le_bytes(#bytes_expr) }
             }
         })?)
     }
@@ -157,6 +161,16 @@ impl Field {
         field_expr: &Expr,
         t: LenType<&ProtoPath>,
     ) -> Result<Expr> {
-        Ok(parse2(quote! { todo!() })?)
+        Ok(parse2(match t {
+            LenType::String => {
+                quote! { (#field_expr).as_scalar_string().ok().flatten().unwrap_or_default() }
+            }
+            LenType::Bytes => {
+                quote! { (#field_expr).as_scalar_bytes().ok().flatten().unwrap_or_default() }
+            }
+            LenType::Message(_) => {
+                quote! { (#field_expr).as_scalar_message().ok().flatten() }
+            }
+        })?)
     }
 }

@@ -22,7 +22,7 @@ pub mod google;
 pub mod internal;
 pub mod message;
 pub mod string;
-pub mod untyped_message;
+pub mod generic_message;
 pub mod variant;
 
 use ::thiserror::Error;

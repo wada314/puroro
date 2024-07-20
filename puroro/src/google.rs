@@ -14,13 +14,13 @@
 
 pub mod protobuf;
 
-use crate::untyped_message::UntypedMessage;
+use crate::generic_message::GenericMessage;
 use crate::variant::{variant_types::Int32, VariantIntegerType};
 use crate::{ErrorKind, Result};
 use ::itertools::Itertools;
 
 /// Some utility impls for `UntypedMessage`.
-impl UntypedMessage<'_> {
+impl GenericMessage<'_> {
     fn scalar_variant_field<T>(&self, number: i32) -> Result<Option<T::RustType>>
     where
         T: VariantIntegerType,
@@ -50,14 +50,14 @@ impl UntypedMessage<'_> {
             .map(|i| i.try_into())
             .transpose()
     }
-    fn scalar_message_field<'a, T, F: Fn(UntypedMessage<'a>) -> T>(
+    fn scalar_message_field<'a, T, F: Fn(GenericMessage<'a>) -> T>(
         &'a self,
         number: i32,
         constructor: F,
     ) -> Result<Option<T>> {
         Ok(self.field(number).as_scalar_message()?.map(constructor))
     }
-    fn repeated_message_field<'a, T, F: 'a + Fn(UntypedMessage<'a>) -> T>(
+    fn repeated_message_field<'a, T, F: 'a + Fn(GenericMessage<'a>) -> T>(
         &'a self,
         number: i32,
         constructor: F,

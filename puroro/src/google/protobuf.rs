@@ -14,13 +14,13 @@
 
 pub mod compiler;
 
-use crate::untyped_message::UntypedMessage;
+use crate::generic_message::GenericMessage;
 use crate::variant::variant_types::{Bool, Int32};
 use crate::{ErrorKind, Result};
 use ::derive_more::{Deref as DDeref, DerefMut as DDerefMut, From as DFrom, Into as DInto};
 
 #[derive(DDeref, DDerefMut, DFrom, DInto, Default, Debug)]
-pub struct FileDescriptorSet<'a>(UntypedMessage<'a>);
+pub struct FileDescriptorSet<'a>(GenericMessage<'a>);
 impl<'a> FileDescriptorSet<'a> {
     pub fn file(&self) -> impl IntoIterator<Item = Result<FileDescriptorProto>> {
         self.0.repeated_message_field(1, FileDescriptorProto)
@@ -61,7 +61,7 @@ impl TryFrom<i32> for Edition {
 }
 
 #[derive(DDeref, DDerefMut, DFrom, DInto, Default, Debug)]
-pub struct FileDescriptorProto<'a>(UntypedMessage<'a>);
+pub struct FileDescriptorProto<'a>(GenericMessage<'a>);
 impl<'a> FileDescriptorProto<'a> {
     pub fn name(&self) -> Result<Option<&str>> {
         self.0.field(1).as_scalar_string()
@@ -97,7 +97,7 @@ impl<'a> FileDescriptorProto<'a> {
 }
 
 #[derive(DDeref, DDerefMut, DFrom, DInto, Default, Debug)]
-pub struct DescriptorProto<'a>(UntypedMessage<'a>);
+pub struct DescriptorProto<'a>(GenericMessage<'a>);
 impl<'a> DescriptorProto<'a> {
     pub fn name(&self) -> Result<Option<&str>> {
         self.0.field(1).as_scalar_string()
@@ -124,7 +124,7 @@ impl<'a> DescriptorProto<'a> {
 }
 
 #[derive(DDeref, DDerefMut, DFrom, DInto, Default, Debug)]
-pub struct FieldDescriptorProto<'a>(UntypedMessage<'a>);
+pub struct FieldDescriptorProto<'a>(GenericMessage<'a>);
 impl<'a> FieldDescriptorProto<'a> {
     pub fn name(&self) -> Result<Option<&str>> {
         self.0.field(1).as_scalar_string()
@@ -233,7 +233,7 @@ pub mod field_descriptor_proto {
 }
 
 #[derive(DDeref, DDerefMut, DFrom, DInto, Default, Debug)]
-pub struct OneofDescriptorProto<'a>(UntypedMessage<'a>);
+pub struct OneofDescriptorProto<'a>(GenericMessage<'a>);
 impl<'a> OneofDescriptorProto<'a> {
     pub fn name(&self) -> Result<Option<&str>> {
         self.0.field(1).as_scalar_string()
@@ -242,7 +242,7 @@ impl<'a> OneofDescriptorProto<'a> {
 }
 
 #[derive(DDeref, DDerefMut, DFrom, DInto, Default, Debug)]
-pub struct EnumDescriptorProto<'a>(UntypedMessage<'a>);
+pub struct EnumDescriptorProto<'a>(GenericMessage<'a>);
 impl<'a> EnumDescriptorProto<'a> {
     pub fn name(&self) -> Result<Option<&str>> {
         self.0.field(1).as_scalar_string()
@@ -256,7 +256,7 @@ impl<'a> EnumDescriptorProto<'a> {
 }
 
 #[derive(DDeref, DDerefMut, DFrom, DInto, Default, Debug)]
-pub struct EnumValueDescriptorProto<'a>(UntypedMessage<'a>);
+pub struct EnumValueDescriptorProto<'a>(GenericMessage<'a>);
 impl<'a> EnumValueDescriptorProto<'a> {
     pub fn name(&self) -> Result<Option<&str>> {
         self.0.field(1).as_scalar_string()

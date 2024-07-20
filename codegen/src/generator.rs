@@ -13,11 +13,11 @@
 // limitations under the License.
 
 pub mod r#enum;
+pub mod generic_message_impls;
 pub mod message_trait;
-pub mod untyped_message_impls;
 
+use self::generic_message_impls::GenericMessageImpls;
 use self::message_trait::MessageTrait;
-use self::untyped_message_impls::UntypedMessageImpls;
 use crate::descriptor::{FileDescriptorBase, RootContext};
 use crate::{ErrorKind, Result};
 use ::itertools::Itertools;
@@ -63,7 +63,7 @@ pub fn compile(request: &CodeGeneratorRequest) -> Result<CodeGeneratorResponse<'
         let trait_item = MessageTrait::try_new(message)?.gen_message_trait()?;
         file.append(quote! { #trait_item });
         let untyped_message_impl =
-            UntypedMessageImpls::try_new(message)?.gen_impl_message_trait()?;
+            GenericMessageImpls::try_new(message)?.gen_impl_message_trait()?;
         file.append(quote! { #untyped_message_impl });
     }
 

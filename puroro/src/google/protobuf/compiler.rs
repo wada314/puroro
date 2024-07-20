@@ -13,14 +13,14 @@
 // limitations under the License.
 
 use crate::google::protobuf::FileDescriptorProto;
-use crate::untyped_message::UntypedMessage;
+use crate::generic_message::GenericMessage;
 use crate::variant::variant_types::{Int32, UInt64};
 use crate::variant::VariantIntegerType;
 use crate::{ErrorKind, Result};
 use ::derive_more::{Deref as DDeref, DerefMut as DDerefMut, From as DFrom, Into as DInto};
 
 #[derive(DDeref, DDerefMut, DFrom, DInto, Default, Debug)]
-pub struct Version<'a>(UntypedMessage<'a>);
+pub struct Version<'a>(GenericMessage<'a>);
 impl<'a> Version<'a> {
     pub fn major(&self) -> Result<i32> {
         Ok(self.0.scalar_variant_field::<Int32>(1)?.unwrap_or(0))
@@ -37,7 +37,7 @@ impl<'a> Version<'a> {
 }
 
 #[derive(DDeref, DDerefMut, DFrom, DInto, Default, Debug)]
-pub struct CodeGeneratorRequest<'a>(UntypedMessage<'a>);
+pub struct CodeGeneratorRequest<'a>(GenericMessage<'a>);
 impl<'a> CodeGeneratorRequest<'a> {
     pub fn file_to_generate(&self) -> impl IntoIterator<Item = Result<&str>> {
         self.0.field(1).as_repeated_string()
@@ -88,7 +88,7 @@ pub mod code_generator_response {
     }
 
     #[derive(DDeref, DDerefMut, DFrom, DInto, Default, Debug)]
-    pub struct File<'a>(UntypedMessage<'a>);
+    pub struct File<'a>(GenericMessage<'a>);
     impl<'a> File<'a> {
         pub fn name(&self) -> Result<Option<&str>> {
             self.0.field(1).as_scalar_string()
@@ -116,7 +116,7 @@ pub mod code_generator_response {
 }
 
 #[derive(DDeref, DDerefMut, DFrom, DInto, Default, Debug)]
-pub struct CodeGeneratorResponse<'a>(UntypedMessage<'a>);
+pub struct CodeGeneratorResponse<'a>(GenericMessage<'a>);
 impl<'a> CodeGeneratorResponse<'a> {
     pub fn error(&self) -> Result<Option<&str>> {
         self.0.field(1).as_scalar_string()
