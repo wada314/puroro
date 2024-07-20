@@ -17,7 +17,7 @@ use crate::descriptor::{EnumDescriptor, EnumValueDescriptor};
 use crate::proto_path::ProtoPath;
 use crate::Result;
 use ::quote::quote;
-use ::syn::{parse2, parse_str, Ident, Item, Type, Variant};
+use ::syn::{parse2, parse_str, Ident, Item, Path, Variant};
 
 pub struct Enum {
     name: Ident,
@@ -43,22 +43,11 @@ impl Enum {
     pub fn rust_name_from_enum_name(name: &str) -> Result<Ident> {
         Ok(parse_str(&convert_into_case(name, Case::CamelCase))?)
     }
-    pub fn rust_path_from_enum_path(path: impl AsRef<ProtoPath>) -> Result<Type> {
-        let modules = path
-            .as_ref()
-            .parent()
-            .into_iter()
-            .flat_map(|p| p.components())
-            .map(|c| Ok(parse_str(c)?))
-            .collect::<Result<Vec<Ident>>>()?;
-        let name = Self::rust_name_from_enum_name(
-            path.as_ref()
-                .last_component()
-                .ok_or_else(|| format!("Enum path is empty: {:?}", path.as_ref()))?,
-        )?;
-        Ok(parse2(quote! {
-            crate #(:: #modules)* :: #name
-        })?)
+    pub fn rust_path_from_proto_path(path: &ProtoPath) -> Result<Path> {
+        path.to_rust_path_with(|s| {
+            let ident = Self::rust_name_from_enum_name(s)?;
+            Ok(parse2(quote! { #ident })?)
+        })
     }
     pub fn rust_items(&self) -> Result<Vec<Item>> {
         Ok(vec![
@@ -76,6 +65,7 @@ impl Enum {
             .collect::<Result<Vec<_>>>()
             .unwrap();
         Ok(parse2(quote! {
+            #[derive(Clone, PartialEq, Eq, Debug, Default)]
             pub enum #name {
                 #(#variants ,)*
             }
