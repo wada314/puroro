@@ -20,8 +20,8 @@ use crate::generator::message_trait::FieldWrapper;
 use crate::proto_path::ProtoPath;
 use crate::Result;
 use ::quote::quote;
-use ::syn::Expr;
 use ::syn::{parse2, parse_str, Ident, Item};
+use ::syn::{Expr, Type};
 
 pub struct UntypedMessageImpls {
     rust_trait_name: Ident,
@@ -107,7 +107,24 @@ impl Field {
         field_expr: &Expr,
         t: VariantType<&ProtoPath>,
     ) -> Result<Expr> {
-        Ok(parse2(quote! { todo!() })?)
+        let vt_type: Type = parse2(match t {
+            VariantType::Int32 => quote! { ::puroro::variant::variant_types::Int32 },
+            VariantType::Int64 => quote! { ::puroro::variant::variant_types::Int64 },
+            VariantType::UInt32 => quote! { ::puroro::variant::variant_types::Uint32 },
+            VariantType::UInt64 => quote! { ::puroro::variant::variant_types::Uint64 },
+            VariantType::SInt32 => quote! { ::puroro::variant::variant_types::Sint32 },
+            VariantType::SInt64 => quote! { ::puroro::variant::variant_types::Sint64 },
+            VariantType::Bool => quote! { ::puroro::variant::variant_types::Bool },
+            VariantType::Enum(e) => {
+                let enum_path = e.to_rust_path()?;
+                quote! { ::puroro::variant::variant_types::Enum::<#enum_path> }
+            }
+        })?;
+        Ok(parse2(quote! {
+            (#field_expr).as_scalar_variant().ok().flatten().map(
+                |v| <#vt_type as ::puroro::variant::VariantIntegerType>::try_from_variant(v).ok()
+            ).flatten()
+        })?)
     }
     fn gen_non_repeated_i32_getter_body(&self, field_expr: &Expr, t: I32Type) -> Result<Expr> {
         Ok(parse2(match t {

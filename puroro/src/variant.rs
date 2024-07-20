@@ -33,7 +33,7 @@ pub mod variant_types {
     pub type Bool = bool;
     pub struct SInt32;
     pub struct SInt64;
-    pub struct Enum;
+    pub struct Enum<E>(::std::marker::PhantomData<E>);
 }
 use variant_types as vt;
 
@@ -118,6 +118,22 @@ impl VariantIntegerType for vt::SInt64 {
     fn try_into_variant(x: Self::RustType) -> Result<Variant> {
         #![allow(unused)]
         todo!()
+    }
+}
+impl<E> VariantIntegerType for vt::Enum<E>
+where
+    E: TryFrom<i32>,
+    i32: TryFrom<E>,
+    ErrorKind: From<<E as TryFrom<i32>>::Error> + From<<i32 as TryFrom<E>>::Error>,
+{
+    type RustType = E;
+    #[inline]
+    fn try_from_variant(var: Variant) -> Result<Self::RustType> {
+        Ok(E::try_from(vt::Int32::try_from_variant(var)?)?)
+    }
+    #[inline]
+    fn try_into_variant(x: Self::RustType) -> Result<Variant> {
+        i32::try_into_variant(x.try_into()?)
     }
 }
 
