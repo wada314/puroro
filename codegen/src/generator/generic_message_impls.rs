@@ -81,25 +81,18 @@ impl Field {
     }
 
     fn gen_getter_body(&self, field_expr: &Expr) -> Result<Expr> {
-        #[allow(unused)]
-        let result = match self.trait_field.wrapper() {
-            FieldWrapper::Vec => parse2(quote! { todo!() })?,
-            _ => self.gen_non_repeated_getter_body(field_expr)?,
-        };
-        #[allow(unused)]
-        Ok(result)
-    }
-
-    fn gen_non_repeated_getter_body(&self, field_expr: &Expr) -> Result<Expr> {
         let wire_type: WireType<_, _, _, _> = self.trait_field.scalar_type().into();
-        Ok(match wire_type {
-            WireType::Variant(t) => self.gen_non_repeated_varint_getter_body(field_expr, t)?,
-            WireType::I32(t) => self.gen_non_repeated_i32_getter_body(field_expr, t)?,
-            WireType::I64(t) => self.gen_non_repeated_i64_getter_body(field_expr, t)?,
-            WireType::Len(t) => self.gen_non_repeated_len_getter_body(field_expr, t)?,
-            WireType::StartGroup => todo!(),
-            WireType::EndGroup => todo!(),
-        })
+        match self.trait_field.wrapper() {
+            FieldWrapper::Vec => Ok(parse2(quote! { todo!() })?),
+            _ => Ok(match wire_type {
+                WireType::Variant(t) => self.gen_non_repeated_varint_getter_body(field_expr, t)?,
+                WireType::I32(t) => self.gen_non_repeated_i32_getter_body(field_expr, t)?,
+                WireType::I64(t) => self.gen_non_repeated_i64_getter_body(field_expr, t)?,
+                WireType::Len(t) => self.gen_non_repeated_len_getter_body(field_expr, t)?,
+                WireType::StartGroup => todo!(),
+                WireType::EndGroup => todo!(),
+            }),
+        }
     }
 
     fn gen_non_repeated_varint_getter_body(
