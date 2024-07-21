@@ -19,7 +19,7 @@ use crate::variant::{variant_types::Int32, VariantIntegerType};
 use crate::{ErrorKind, Result};
 use ::itertools::Itertools;
 
-/// Some utility impls for `UntypedMessage`.
+/// Some utility impls for [`GenericMessage`].
 impl GenericMessage<'_> {
     fn scalar_variant_field<T>(&self, number: i32) -> Result<Option<T::RustType>>
     where

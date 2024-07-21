@@ -161,10 +161,6 @@ impl<'a> RootContext<'a> {
     }
 }
 
-// endregion:
-
-// region: utils
-
 #[derive(Debug, Clone)]
 pub enum MessageOrEnum<M, E> {
     Message(M),
@@ -209,6 +205,26 @@ trait TryIntoNumber<T> {
 impl<T> TryIntoNumber<T> for Option<T> {
     fn try_into_number(self, error_message: &str) -> Result<T> {
         Ok(self.ok_or_else(|| error_message.to_string())?)
+    }
+}
+
+trait UninterpretedOptionExt {
+    fn name_as_string(&self) -> Result<String>;
+}
+impl<'a> UninterpretedOptionExt for ::puroro::google::protobuf::UninterpretedOptionProto<'a> {
+    fn name_as_string(&self) -> Result<String> {
+        let parts = self
+            .name()
+            .map(|n| -> Result<_> {
+                let n = n?;
+                Ok(if n.is_extension()?.unwrap_or_default() {
+                    format!("({})", n.name_part()?.unwrap_or_default())
+                } else {
+                    n.name_part()?.unwrap_or_default().to_string()
+                })
+            })
+            .collect::<Result<Vec<_>>>()?;
+        Ok(parts.join("."))
     }
 }
 

@@ -289,19 +289,15 @@ impl<'a> UninterpretedOptionProto<'a> {
     pub fn positive_int_value(&self) -> Result<Option<u64>> {
         self.0.scalar_variant_field::<UInt64>(4)
     }
-
     pub fn negative_int_value(&self) -> Result<Option<i64>> {
         self.0.scalar_variant_field::<Int64>(5)
     }
-
     pub fn double_value(&self) -> Result<Option<f64>> {
         Ok(self.0.field(6).as_scalar_i64()?.map(f64::from_le_bytes))
     }
-
     pub fn string_value(&self) -> Result<Option<&[u8]>> {
         self.0.field(7).as_scalar_bytes()
     }
-
     pub fn aggregate_value(&self) -> Result<Option<&str>> {
         self.0.field(8).as_scalar_string()
     }
