@@ -82,17 +82,22 @@ impl Field {
 
     fn gen_getter_body(&self, field_expr: &Expr) -> Result<Expr> {
         let wire_type: WireType<_, _, _, _> = self.trait_field.scalar_type().into();
-        match self.trait_field.wrapper() {
-            FieldWrapper::Vec => Ok(parse2(quote! { todo!() })?),
-            _ => Ok(match wire_type {
+        Ok(match self.trait_field.wrapper() {
+            FieldWrapper::Vec => match wire_type {
+                WireType::Variant(t) => self.gen_repeated_variant_getter_body(field_expr, t)?,
+                WireType::I32(t) => self.gen_repeated_i32_getter_body(field_expr, t)?,
+                WireType::I64(t) => self.gen_repeated_i64_getter_body(field_expr, t)?,
+                WireType::Len(t) => self.gen_repeated_len_getter_body(field_expr, t)?,
+                _ => todo!(), // Start / end group
+            },
+            _ => match wire_type {
                 WireType::Variant(t) => self.gen_non_repeated_varint_getter_body(field_expr, t)?,
                 WireType::I32(t) => self.gen_non_repeated_i32_getter_body(field_expr, t)?,
                 WireType::I64(t) => self.gen_non_repeated_i64_getter_body(field_expr, t)?,
                 WireType::Len(t) => self.gen_non_repeated_len_getter_body(field_expr, t)?,
-                WireType::StartGroup => todo!(),
-                WireType::EndGroup => todo!(),
-            }),
-        }
+                _ => todo!(), // Start / end group
+            },
+        })
     }
 
     fn gen_non_repeated_varint_getter_body(
@@ -163,6 +168,68 @@ impl Field {
             }
             LenType::Message(_) => {
                 quote! { (#field_expr).as_scalar_message().ok().flatten() }
+            }
+        })?)
+    }
+
+    fn gen_repeated_variant_getter_body(
+        &self,
+        field_expr: &Expr,
+        t: VariantType<&ProtoPath>,
+    ) -> Result<Expr> {
+        let vt_type: Type = parse2(match t {
+            VariantType::Int32 => quote! { ::puroro::variant::variant_types::Int32 },
+            VariantType::Int64 => quote! { ::puroro::variant::variant_types::Int64 },
+            VariantType::UInt32 => quote! { ::puroro::variant::variant_types::Uint32 },
+            VariantType::UInt64 => quote! { ::puroro::variant::variant_types::Uint64 },
+            VariantType::SInt32 => quote! { ::puroro::variant::variant_types::Sint32 },
+            VariantType::SInt64 => quote! { ::puroro::variant::variant_types::Sint64 },
+            VariantType::Bool => quote! { ::puroro::variant::variant_types::Bool },
+            VariantType::Enum(e) => {
+                let enum_path = e.to_rust_path()?;
+                quote! { ::puroro::variant::variant_types::Enum::<#enum_path> }
+            }
+        })?;
+        Ok(parse2(quote! {
+            (#field_expr).as_repeated_variant(true /* TODO: packed check */).filter_map(
+                |rv| rv.ok().and_then(|v| <#vt_type as ::puroro::variant::VariantIntegerType>::try_from_variant(v).ok())
+            )
+        })?)
+    }
+    fn gen_repeated_i32_getter_body(&self, field_expr: &Expr, t: I32Type) -> Result<Expr> {
+        let map_expr: Expr = parse2(match t {
+            I32Type::Float => quote! { ::std::f64::from_le_bytes },
+            I32Type::Fixed32 => quote! { ::std::u32::from_le_bytes },
+            I32Type::SFixed32 => quote! { ::std::i32::from_le_bytes },
+        })?;
+        Ok(parse2(quote! {
+            (#field_expr).as_repeated_i32().filter_map(
+                |rv| rv.ok().map(|v| #map_expr(v))
+            )
+        })?)
+    }
+    fn gen_repeated_i64_getter_body(&self, field_expr: &Expr, t: I64Type) -> Result<Expr> {
+        let map_expr: Expr = parse2(match t {
+            I64Type::Double => quote! { ::std::f64::from_le_bytes },
+            I64Type::Fixed64 => quote! { ::std::u64::from_le_bytes },
+            I64Type::SFixed64 => quote! { ::std::i64::from_le_bytes },
+        })?;
+        Ok(parse2(quote! {
+            (#field_expr).as_repeated_i64().filter_map(
+                |rv| rv.ok().map(|v| #map_expr(v))
+            )
+        })?)
+    }
+    fn gen_repeated_len_getter_body(
+        &self,
+        field_expr: &Expr,
+        t: LenType<&ProtoPath>,
+    ) -> Result<Expr> {
+        Ok(parse2(match t {
+            LenType::String => quote! { (#field_expr).as_repeated_string().filter_map(Result::ok) },
+            LenType::Bytes => quote! { (#field_expr).as_repeated_bytes().filter_map(Result::ok) },
+            LenType::Message(_) => {
+                quote! { (#field_expr).as_repeated_message().filter_map(Result::ok) }
             }
         })?)
     }

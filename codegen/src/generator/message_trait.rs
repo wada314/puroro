@@ -91,9 +91,12 @@ impl Field {
             let lower_cased = convert_into_case(&self.original_name, Case::LowerSnakeCase);
             parse_str(&avoid_reserved_keywords(&lower_cased))?
         };
+        let lifetime: Option<Lifetime> = Some(parse_str("'_")?);
         let getter_type = match self.wrapper {
-            FieldWrapper::Vec => self.scalar_type.gen_repeated_getter_type(None)?,
-            _ => self.scalar_type.gen_scalar_getter_type(None)?,
+            FieldWrapper::Vec => self
+                .scalar_type
+                .gen_repeated_getter_type(lifetime.as_ref())?,
+            _ => self.scalar_type.gen_scalar_getter_type(lifetime.as_ref())?,
         };
         Ok(parse2(quote! {
             fn #getter_name(&self) -> #getter_type
@@ -139,13 +142,14 @@ impl FieldWrapper {
 
 impl FieldType<ProtoPathBuf, ProtoPathBuf> {
     fn gen_bare_getter_type(&self, lifetime: Option<&Lifetime>) -> Result<Type> {
+        let lifetime_iter = lifetime.iter();
         Ok(match self {
             FieldType::Message(path) => {
                 let path = path.to_rust_path_with(|name| {
                     let ident = MessageTrait::rust_name_from_message_name(name)?;
                     Ok(parse2(quote! { #ident })?)
                 })?;
-                parse2(quote! { & #lifetime impl #path })?
+                parse2(quote! { impl #(#lifetime_iter +)* #path })?
             }
             FieldType::Enum(path) => {
                 let path = path.to_rust_path()?;
