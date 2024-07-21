@@ -208,6 +208,7 @@ impl<T> TryIntoNumber<T> for Option<T> {
     }
 }
 
+#[allow(unused)]
 trait UninterpretedOptionExt {
     fn name_as_string(&self) -> Result<String>;
 }

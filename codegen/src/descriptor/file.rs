@@ -35,24 +35,11 @@ pub struct FileDescriptorBase {
     syntax: Option<String>,
     #[allow(unused)]
     edition: Option<Edition>,
-    use_fqtn_for_primitive_types: bool,
-    use_fqtn_for_prelude_types: bool,
 }
 
 impl<'a> TryFrom<FileDescriptorProto<'a>> for FileDescriptorBase {
     type Error = ErrorKind;
     fn try_from(proto: FileDescriptorProto) -> Result<Self> {
-        let options = proto.options()?;
-        let uninterpreted_option_map = options
-            .iter()
-            .flat_map(|options| {
-                options.uninterpreted_option().map(|uo| {
-                    let uo = uo?;
-                    let name = uo.name_as_string()?;
-                    Ok((name, uo))
-                })
-            })
-            .collect::<Result<HashMap<_, _>>>()?;
         Ok(Self {
             name: proto.name()?.try_into_string("No FileDescriptor name")?,
             dependencies: proto
@@ -73,18 +60,6 @@ impl<'a> TryFrom<FileDescriptorProto<'a>> for FileDescriptorBase {
                 .collect::<PResult<Result<Vec<_>>>>()??,
             syntax: proto.syntax()?.map(str::to_string),
             edition: proto.edition()?.map(EditionProto::try_into).transpose()?,
-            use_fqtn_for_primitive_types: uninterpreted_option_map
-                .get("(puroro.use_fqtn_for_primitive_types)")
-                .map(|uo| -> Result<_> { Ok(uo.positive_int_value()?.unwrap_or_default()) })
-                .transpose()?
-                .unwrap_or_default()
-                != 0,
-            use_fqtn_for_prelude_types: uninterpreted_option_map
-                .get("(puroro.use_fqtn_for_prelude_types)")
-                .map(|uo| -> Result<_> { Ok(uo.positive_int_value()?.unwrap_or_default()) })
-                .transpose()?
-                .unwrap_or_default()
-                != 0,
         })
     }
 }
@@ -109,8 +84,6 @@ impl From<DebugFileDescriptor<'_>> for FileDescriptorBase {
             enum_types: debug.enum_types.into_iter().map(Into::into).collect(),
             syntax: None,
             edition: None,
-            use_fqtn_for_primitive_types: false,
-            use_fqtn_for_prelude_types: false,
         }
     }
 }
@@ -229,13 +202,6 @@ impl<'a> FileDescriptor<'a> {
         let indirect_enums = indirect_enums_vec.into_iter().flat_map(|v| v.into_iter());
         let boxed: Box<dyn Iterator<Item = _>> = Box::new(direct_enums.chain(indirect_enums));
         Ok(boxed)
-    }
-
-    pub fn use_fqtn_for_primitive_types(&self) -> bool {
-        self.base.use_fqtn_for_primitive_types
-    }
-    pub fn use_fqtn_for_prelude_types(&self) -> bool {
-        self.base.use_fqtn_for_prelude_types
     }
 }
 
