@@ -23,7 +23,7 @@ use crate::{ErrorKind, Result};
 use ::itertools::Itertools;
 use ::prettyplease::unparse;
 use ::proc_macro2::TokenStream;
-use ::puroro::google::protobuf::compiler::code_generator_response;
+use ::puroro::google::protobuf::compiler::code_generator_response::{self, Feature};
 use ::puroro::google::protobuf::compiler::{CodeGeneratorRequest, CodeGeneratorResponse};
 use ::puroro::Result as PResult;
 use ::quote::{format_ident, quote};
@@ -34,6 +34,7 @@ use ::std::collections::{BTreeSet, HashMap};
 
 pub fn compile(request: &CodeGeneratorRequest) -> Result<CodeGeneratorResponse<'static>> {
     let mut response = CodeGeneratorResponse::default();
+    response.set_supported_features(Into::<i32>::into(Feature::FeatureProto3Optional) as u64)?;
 
     let descriptors: Vec<FileDescriptorBase> = request
         .proto_file()
@@ -130,6 +131,7 @@ impl GeneratedFile {
 impl TryFrom<GeneratedFile> for code_generator_response::File<'_> {
     type Error = ErrorKind;
     fn try_from(from: GeneratedFile) -> Result<Self> {
+        let is_root_file = from.full_path() == "mod.rs";
         let mut file = code_generator_response::File::default();
         file.set_name(from.full_path())?;
         let source_list = from
@@ -150,10 +152,22 @@ impl TryFrom<GeneratedFile> for code_generator_response::File<'_> {
                 quote! { pub mod #id; }
             })
             .collect::<Vec<_>>();
-        let puroro_root = if from.full_path() == "mod.rs" {
-            quote! { pub(crate) mod _puroro_root { pub(crate) use super::*; } }
+        let puroro_root = if is_root_file {
+            quote! {
+                #[allow(unused)]
+                pub(crate) mod _puroro_root {
+                    #[allow(unused)]
+                    pub(crate) use super::*;
+                }
+            }
         } else {
-            quote! { pub(crate) mod _puroro_root { pub(crate) use super::super::_puroro_root::*; } }
+            quote! {
+                #[allow(unused)]
+                pub(crate) mod _puroro_root {
+                    #[allow(unused)]
+                    pub(crate) use super::super::_puroro_root::*;
+                }
+            }
         };
         let body = from.body;
         let content = quote! {

@@ -129,13 +129,13 @@ impl Field {
             parse2(quote! { (#field_expr).as_scalar_i32().ok().flatten().unwrap_or_default() })?;
         Ok(parse2(match t {
             I32Type::Float => {
-                quote! { ::std::f64::from_le_bytes(#bytes_expr) }
+                quote! { ::std::primitive::f32::from_le_bytes(#bytes_expr) }
             }
             I32Type::Fixed32 => {
-                quote! { ::std::u32::from_le_bytes(#bytes_expr) }
+                quote! { ::std::primitive::u32::from_le_bytes(#bytes_expr) }
             }
             I32Type::SFixed32 => {
-                quote! { ::std::i32::from_le_bytes(#bytes_expr) }
+                quote! { ::std::primitive::i32::from_le_bytes(#bytes_expr) }
             }
         })?)
     }
@@ -144,13 +144,13 @@ impl Field {
             parse2(quote! { (#field_expr).as_scalar_i64().ok().flatten().unwrap_or_default() })?;
         Ok(parse2(match t {
             I64Type::Double => {
-                quote! { ::std::f64::from_le_bytes(#bytes_expr) }
+                quote! { ::std::primitive::f64::from_le_bytes(#bytes_expr) }
             }
             I64Type::Fixed64 => {
-                quote! { ::std::u64::from_le_bytes(#bytes_expr) }
+                quote! { ::std::primitive::u64::from_le_bytes(#bytes_expr) }
             }
             I64Type::SFixed64 => {
-                quote! { ::std::i64::from_le_bytes(#bytes_expr) }
+                quote! { ::std::primitive::i64::from_le_bytes(#bytes_expr) }
             }
         })?)
     }
@@ -198,9 +198,9 @@ impl Field {
     }
     fn gen_repeated_i32_getter_body(&self, field_expr: &Expr, t: I32Type) -> Result<Expr> {
         let map_expr: Expr = parse2(match t {
-            I32Type::Float => quote! { ::std::f64::from_le_bytes },
-            I32Type::Fixed32 => quote! { ::std::u32::from_le_bytes },
-            I32Type::SFixed32 => quote! { ::std::i32::from_le_bytes },
+            I32Type::Float => quote! { ::std::primitive::f32::from_le_bytes },
+            I32Type::Fixed32 => quote! { ::std::primitive::u32::from_le_bytes },
+            I32Type::SFixed32 => quote! { ::std::primitive::i32::from_le_bytes },
         })?;
         Ok(parse2(quote! {
             (#field_expr).as_repeated_i32().filter_map(
@@ -210,9 +210,9 @@ impl Field {
     }
     fn gen_repeated_i64_getter_body(&self, field_expr: &Expr, t: I64Type) -> Result<Expr> {
         let map_expr: Expr = parse2(match t {
-            I64Type::Double => quote! { ::std::f64::from_le_bytes },
-            I64Type::Fixed64 => quote! { ::std::u64::from_le_bytes },
-            I64Type::SFixed64 => quote! { ::std::i64::from_le_bytes },
+            I64Type::Double => quote! { ::std::primitive::f64::from_le_bytes },
+            I64Type::Fixed64 => quote! { ::std::primitive::u64::from_le_bytes },
+            I64Type::SFixed64 => quote! { ::std::primitive::i64::from_le_bytes },
         })?;
         Ok(parse2(quote! {
             (#field_expr).as_repeated_i64().filter_map(

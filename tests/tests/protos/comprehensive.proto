@@ -1,0 +1,122 @@
+syntax = "proto3";
+package comprehensive;
+
+// Important (representative) types
+message Representative {
+    int32 i32_bare = 1;
+    optional int32 i32_opt = 2;
+    repeated int32 i32_rep = 3;
+
+    float float_bare = 4;
+    optional float float_opt = 5;
+    repeated float float_rep = 6;
+
+    double double_bare = 7;
+    optional double double_opt = 8;
+    repeated double double_rep = 9;
+
+    enum MyEnum {
+        Zero = 0;
+        One = 1;
+        FourtyTwo = 42;
+    }
+    MyEnum enum_bare = 10;
+    optional MyEnum enum_opt = 11;
+    repeated MyEnum enum_rep = 12;
+
+    string string_bare = 13;
+    optional string string_opt = 14;
+    repeated string string_rep = 15;
+
+    bytes bytes_bare = 16;
+    optional bytes bytes_opt = 17;
+    repeated bytes bytes_rep = 18;
+
+    message MyMessage {
+        int32 id = 1;
+        string name = 2;
+    }
+    MyMessage message_bare = 19;
+    optional MyMessage message_opt = 20;
+    repeated MyMessage message_rep = 21;
+}
+
+// Exaustic types
+message Exaustic {
+    int32 int32_bare = 1;
+    optional int32 int32_opt = 2;
+    repeated int32 int32_rep = 3;
+
+    int64 int64_bare = 4;
+    optional int64 int64_opt = 5;
+    repeated int64 int64_rep = 6;
+
+    uint32 uint32_bare = 7;
+    optional uint32 uint32_opt = 8;
+    repeated uint32 uint32_rep = 9;
+
+    uint64 uint64_bare = 10;
+    optional uint64 uint64_opt = 11;
+    repeated uint64 uint64_rep = 12;
+
+    sint32 sint32_bare = 13;
+    optional sint32 sint32_opt = 14;
+    repeated sint32 sint32_rep = 15;
+
+    sint64 sint64_bare = 16;
+    optional sint64 sint64_opt = 17;
+    repeated sint64 sint64_rep = 18;
+
+    fixed32 fixed32_bare = 19;
+    optional fixed32 fixed32_opt = 20;
+    repeated fixed32 fixed32_rep = 21;
+
+    fixed64 fixed64_bare = 22;
+    optional fixed64 fixed64_opt = 23;
+    repeated fixed64 fixed64_rep = 24;
+
+    sfixed32 sfixed32_bare = 25;
+    optional sfixed32 sfixed32_opt = 26;
+    repeated sfixed32 sfixed32_rep = 27;
+
+    sfixed64 sfixed64_bare = 28;
+    optional sfixed64 sfixed64_opt = 29;
+    repeated sfixed64 sfixed64_rep = 30;
+
+    bool bool_bare = 31;
+    optional bool bool_opt = 32;
+    repeated bool bool_rep = 33;
+
+    float float_bare = 34;
+    optional float float_opt = 35;
+    repeated float float_rep = 36;
+
+    double double_bare = 37;
+    optional double double_opt = 38;
+    repeated double double_rep = 39;
+
+    string string_bare = 40;
+    optional string string_opt = 41;
+    repeated string string_rep = 42;
+
+    bytes bytes_bare = 43;
+    optional bytes bytes_opt = 44;
+    repeated bytes bytes_rep = 45;
+
+    enum MyEnum {
+        Zero = 0;
+        One = 1;
+        FourtyTwo = 42;
+    }
+    MyEnum enum_bare = 46;
+    optional MyEnum enum_opt = 47;
+    repeated MyEnum enum_rep = 48;
+
+    message MyMessage {
+        int32 id = 1;
+        string name = 2;
+    }
+    MyMessage message_bare = 49;
+    optional MyMessage message_opt = 50;
+    repeated MyMessage message_rep = 51;
+}
