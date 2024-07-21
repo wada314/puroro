@@ -60,8 +60,8 @@ pub fn compile(request: &CodeGeneratorRequest) -> Result<CodeGeneratorResponse<'
         let file = out_files.file_mut(file_path);
         file.add_source(message.file().name());
 
-        let trait_item = MessageTrait::try_new(message)?.gen_message_trait()?;
-        file.append(quote! { #trait_item });
+        let trait_items = MessageTrait::try_new(message)?.gen_items()?;
+        file.append(quote! { #(#trait_items)* });
         let untyped_message_impl =
             GenericMessageImpls::try_new(message)?.gen_impl_message_trait()?;
         file.append(quote! { #untyped_message_impl });

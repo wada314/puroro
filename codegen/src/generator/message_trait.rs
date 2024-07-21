@@ -18,7 +18,7 @@ use crate::generator::avoid_reserved_keywords;
 use crate::proto_path::{ProtoPath, ProtoPathBuf};
 use crate::Result;
 use ::quote::{format_ident, quote};
-use ::syn::{parse2, parse_str, Ident, Item, Path, Type};
+use ::syn::{parse2, parse_str, Expr, Ident, Item, Path, Type};
 use ::syn::{Lifetime, Signature};
 
 pub struct MessageTrait {
@@ -52,7 +52,13 @@ impl MessageTrait {
         })
     }
 
-    pub fn gen_message_trait(&self) -> Result<Item> {
+    pub fn gen_items(&self) -> Result<Vec<Item>> {
+        let trait_def = self.gen_message_trait()?;
+        let blanket_impls = self.gen_blanket_ref_impls()?;
+        Ok(::std::iter::once(trait_def).chain(blanket_impls).collect())
+    }
+
+    fn gen_message_trait(&self) -> Result<Item> {
         let trait_name = &self.rust_name;
         let getters = self
             .fields
@@ -64,6 +70,37 @@ impl MessageTrait {
                 #(#getters;)*
             }
         })?)
+    }
+
+    fn gen_blanket_ref_impls(&self) -> Result<Vec<Item>> {
+        let trait_name = &self.rust_name;
+        let blanket_type: Ident = parse_str("T")?;
+        let getter_signatures = self
+            .fields
+            .iter()
+            .map(Field::gen_getter_signature)
+            .collect::<Result<Vec<_>>>()?;
+        let getter_bodies = self
+            .fields
+            .iter()
+            .map(|f| f.gen_blanket_ref_getter_body(&blanket_type))
+            .collect::<Result<Vec<_>>>()?;
+        Ok(vec![
+            parse2(quote! {
+                impl<T: self::#trait_name> self::#trait_name for &T {
+                    #(#getter_signatures {
+                        #getter_bodies
+                    })*
+                }
+            })?,
+            parse2(quote! {
+                impl<T: self::#trait_name> self::#trait_name for &mut T {
+                    #(#getter_signatures {
+                        #getter_bodies
+                    })*
+                }
+            })?,
+        ])
     }
 }
 
@@ -86,11 +123,13 @@ impl Field {
         self.scalar_type.as_deref()
     }
 
+    fn gen_getter_name(&self) -> Result<Ident> {
+        let lower_cased = convert_into_case(&self.original_name, Case::LowerSnakeCase);
+        Ok(parse_str(&avoid_reserved_keywords(&lower_cased))?)
+    }
+
     pub fn gen_getter_signature(&self) -> Result<Signature> {
-        let getter_name: Ident = {
-            let lower_cased = convert_into_case(&self.original_name, Case::LowerSnakeCase);
-            parse_str(&avoid_reserved_keywords(&lower_cased))?
-        };
+        let getter_name = self.gen_getter_name()?;
         let lifetime: Option<Lifetime> = Some(parse_str("'_")?);
         let getter_type = match self.wrapper {
             FieldWrapper::Vec => self
@@ -100,6 +139,13 @@ impl Field {
         };
         Ok(parse2(quote! {
             fn #getter_name(&self) -> #getter_type
+        })?)
+    }
+
+    fn gen_blanket_ref_getter_body(&self, blanket_type: &Ident) -> Result<Expr> {
+        let getter_name = self.gen_getter_name()?;
+        Ok(parse2(quote! {
+            <#blanket_type>::#getter_name(self)
         })?)
     }
 
