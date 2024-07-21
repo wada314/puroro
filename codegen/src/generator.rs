@@ -12,12 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-pub mod r#enum;
-pub mod generic_message_impls;
-pub mod message_trait;
+pub mod gen_enum_items;
+pub mod gen_message_items;
+pub mod module;
 
-use self::generic_message_impls::GenericMessageImpls;
-use self::message_trait::MessageTrait;
 use crate::descriptor::{FileDescriptorBase, RootContext};
 use crate::{ErrorKind, Result};
 use ::itertools::Itertools;
@@ -85,7 +83,7 @@ pub fn compile(request: &CodeGeneratorRequest) -> Result<CodeGeneratorResponse<'
         let file = out_files.file_mut(file_path);
         file.add_source(e.file()?.name());
 
-        let enum_ = r#enum::Enum::try_new(e)?.rust_items()?;
+        let enum_ = gen_enum_items::GenEnumItems::try_new(e)?.rust_items()?;
         file.append(quote! { #(#enum_)* });
     }
 

@@ -12,26 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::message_trait::{Field as TraitField, MessageTrait};
+use super::gen_message_trait::{Field as TraitField, FieldWrapper, GenTrait};
 use crate::descriptor::{
     Descriptor, FieldDescriptor, I32Type, I64Type, LenType, VariantType, WireType,
 };
-use crate::generator::message_trait::FieldWrapper;
 use crate::proto_path::ProtoPath;
 use crate::Result;
 use ::quote::quote;
 use ::syn::{parse2, parse_str, Ident, Item};
 use ::syn::{Expr, Type};
 
-pub struct GenericMessageImpls {
+pub struct GenGenericMessageImpls {
     rust_trait_name: Ident,
     fields: Vec<Field>,
 }
 
-impl GenericMessageImpls {
+impl GenGenericMessageImpls {
     pub fn try_new<'a>(desc: &'a Descriptor<'a>) -> Result<Self> {
         Ok(Self {
-            rust_trait_name: MessageTrait::rust_name_from_message_name(desc.name()?)?,
+            rust_trait_name: GenTrait::rust_name_from_message_name(desc.name()?)?,
             fields: desc
                 .non_oneof_fields()?
                 .into_iter()

@@ -20,7 +20,7 @@ use ::proc_macro2::TokenStream;
 use ::quote::quote;
 use ::syn::{parse2, parse_str, Ident, Item, Path, Variant};
 
-pub struct Enum {
+pub struct GenEnumItems {
     name: Ident,
     variants: Vec<EnumVariant>,
 }
@@ -31,7 +31,7 @@ struct EnumVariant {
     is_first: bool,
 }
 
-impl Enum {
+impl GenEnumItems {
     pub fn try_new<'a>(desc: &'a EnumDescriptor<'a>) -> Result<Self> {
         Ok(Self {
             name: Self::rust_name_from_enum_name(desc.name())?,

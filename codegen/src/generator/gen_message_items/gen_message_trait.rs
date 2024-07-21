@@ -21,12 +21,12 @@ use ::quote::{format_ident, quote};
 use ::syn::{parse2, parse_str, Expr, Ident, Item, Path, Type};
 use ::syn::{Lifetime, Signature};
 
-pub struct MessageTrait {
+pub struct GenTrait {
     rust_name: Ident,
     fields: Vec<Field>,
 }
 
-impl MessageTrait {
+impl GenTrait {
     pub fn try_new<'a>(desc: &'a Descriptor<'a>) -> Result<Self> {
         Ok(Self {
             rust_name: Self::rust_name_from_message_name(desc.name()?)?,
@@ -192,7 +192,7 @@ impl FieldType<ProtoPathBuf, ProtoPathBuf> {
         Ok(match self {
             FieldType::Message(path) => {
                 let path = path.to_rust_path_with(|name| {
-                    let ident = MessageTrait::rust_name_from_message_name(name)?;
+                    let ident = GenTrait::rust_name_from_message_name(name)?;
                     Ok(parse2(quote! { #ident })?)
                 })?;
                 parse2(quote! { impl #(#lifetime_iter +)* #path })?
