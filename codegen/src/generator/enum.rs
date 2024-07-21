@@ -16,6 +16,7 @@ use crate::cases::{convert_into_case, Case};
 use crate::descriptor::{EnumDescriptor, EnumValueDescriptor};
 use crate::proto_path::ProtoPath;
 use crate::Result;
+use ::proc_macro2::TokenStream;
 use ::quote::quote;
 use ::syn::{parse2, parse_str, Ident, Item, Path, Variant};
 
@@ -27,6 +28,7 @@ pub struct Enum {
 struct EnumVariant {
     name: Ident,
     number: i32,
+    is_first: bool,
 }
 
 impl Enum {
@@ -35,8 +37,8 @@ impl Enum {
             name: Self::rust_name_from_enum_name(desc.name())?,
             variants: desc
                 .values()?
-                .into_iter()
-                .map(EnumVariant::try_new)
+                .enumerate()
+                .map(|(i, e)| EnumVariant::try_new(e, i == 0))
                 .collect::<Result<Vec<_>>>()?,
         })
     }
@@ -110,16 +112,23 @@ impl Enum {
 }
 
 impl EnumVariant {
-    fn try_new<'a>(desc: &'a EnumValueDescriptor<'a>) -> Result<Self> {
+    fn try_new<'a>(desc: &'a EnumValueDescriptor<'a>, is_first: bool) -> Result<Self> {
         Ok(Self {
             name: parse_str(&convert_into_case(desc.name(), Case::CamelCase))?,
             number: desc.number(),
+            is_first,
         })
     }
 
     fn rust_enum_variant(&self) -> Result<Variant> {
         let name = &self.name;
+        let maybe_default_attr: Option<TokenStream> = if self.is_first {
+            Some(quote! { #[default] })
+        } else {
+            None
+        };
         Ok(parse2(quote! {
+            #maybe_default_attr
             #name
         })?)
     }
