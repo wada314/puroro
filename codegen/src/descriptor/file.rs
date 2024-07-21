@@ -100,6 +100,8 @@ pub struct FileDescriptorCache<'a> {
     dependencies: OnceCell<Vec<&'a FileDescriptor<'a>>>,
     messages: OnceCell<Vec<Descriptor<'a>>>,
     enums: OnceCell<Vec<EnumDescriptor<'a>>>,
+    use_fqtn_for_primitive_types: OnceCell<bool>,
+    use_fqtn_for_prelude_types: OnceCell<bool>,
 }
 
 impl<'a> FileDescriptor<'a> {
@@ -202,6 +204,19 @@ impl<'a> FileDescriptor<'a> {
         let indirect_enums = indirect_enums_vec.into_iter().flat_map(|v| v.into_iter());
         let boxed: Box<dyn Iterator<Item = _>> = Box::new(direct_enums.chain(indirect_enums));
         Ok(boxed)
+    }
+
+    pub fn use_fqtn_for_primitive_types(&self) -> bool {
+        *self
+            .cache
+            .use_fqtn_for_primitive_types
+            .get_or_init(|| todo!())
+    }
+    pub fn use_fqtn_for_prelude_types(&self) -> bool {
+        *self
+            .cache
+            .use_fqtn_for_prelude_types
+            .get_or_init(|| todo!())
     }
 }
 

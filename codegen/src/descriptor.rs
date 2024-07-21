@@ -32,13 +32,19 @@ use ::std::fmt::Debug;
 #[derive(Debug)]
 pub struct RootContext<'a> {
     files: Vec<(FileDescriptorBase, OnceCell<FileDescriptor<'a>>)>,
+    cache: RootContextCache<'a>,
+}
+
+#[derive(Default, Debug)]
+struct RootContextCache<'a> {
     package_to_files: OnceCell<HashMap<ProtoPathBuf, Vec<&'a FileDescriptor<'a>>>>,
 }
+
 impl From<FileDescriptorBase> for RootContext<'_> {
     fn from(f: FileDescriptorBase) -> Self {
         Self {
             files: vec![(f, OnceCell::default())],
-            package_to_files: Default::default(),
+            cache: Default::default(),
         }
     }
 }
@@ -49,7 +55,7 @@ impl<T: IntoIterator<Item = FileDescriptorBase>> From<T> for RootContext<'_> {
                 .into_iter()
                 .map(|f| (f, OnceCell::default()))
                 .collect(),
-            package_to_files: Default::default(),
+            cache: Default::default(),
         }
     }
 }
@@ -78,14 +84,17 @@ impl<'a> RootContext<'a> {
             package.as_ref().to_owned()
         };
         debug_assert!(package.is_absolute());
-        let map = self.package_to_files.get_or_try_init(|| -> Result<_> {
-            let mut map = HashMap::new();
-            for fd in self.files() {
-                let package = fd.absolute_package()?.to_owned();
-                map.entry(package.clone()).or_insert_with(Vec::new).push(fd);
-            }
-            Ok(map)
-        })?;
+        let map = self
+            .cache
+            .package_to_files
+            .get_or_try_init(|| -> Result<_> {
+                let mut map = HashMap::new();
+                for fd in self.files() {
+                    let package = fd.absolute_package()?.to_owned();
+                    map.entry(package.clone()).or_insert_with(Vec::new).push(fd);
+                }
+                Ok(map)
+            })?;
         Ok(map
             .get(&package)
             .map_or(Default::default(), Vec::as_slice)
