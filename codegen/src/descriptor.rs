@@ -25,6 +25,7 @@ pub use subtypes::*;
 
 use crate::proto_path::{ProtoPath, ProtoPathBuf};
 use crate::Result;
+use ::itertools::{Either, Itertools};
 use ::std::cell::OnceCell;
 use ::std::collections::HashMap;
 use ::std::fmt::Debug;
@@ -194,12 +195,13 @@ pub enum FilesOrMessage<F, M> {
     Files(Vec<F>),
     Message(M),
 }
-impl FilesOrMessage<FileDescriptor<'_>, Descriptor<'_>> {
-    pub fn direct_messages(&self) -> impl Iterator<Item = Result<&Descriptor>> {
+impl<'a> FilesOrMessage<&'a FileDescriptor<'a>, &'a Descriptor<'a>> {
+    pub fn direct_messages(&self) -> impl Iterator<Item = Result<&Descriptor<'a>>> {
         match self {
-            FilesOrMessage::Files(files) => files.iter().flat_map(|f| f.messages()),
-            FilesOrMessage::Message(m) => m.nested_types(),
-        }
+            FilesOrMessage::Files(files) => todo!()
+            FilesOrMessage::Message(m) => todo!(),
+        };
+        ::std::iter::once(todo!())
     }
 }
 
