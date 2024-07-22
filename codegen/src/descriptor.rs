@@ -189,6 +189,20 @@ impl<M, E> MessageOrEnum<M, E> {
     }
 }
 
+#[derive(Debug, Clone)]
+pub enum FilesOrMessage<F, M> {
+    Files(Vec<F>),
+    Message(M),
+}
+impl FilesOrMessage<FileDescriptor<'_>, Descriptor<'_>> {
+    pub fn direct_messages(&self) -> impl Iterator<Item = Result<&Descriptor>> {
+        match self {
+            FilesOrMessage::Files(files) => files.iter().flat_map(|f| f.messages()),
+            FilesOrMessage::Message(m) => m.nested_types(),
+        }
+    }
+}
+
 trait TryIntoString {
     fn try_into_string(self, error_message: &str) -> Result<String>;
 }

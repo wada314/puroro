@@ -30,7 +30,11 @@ pub struct Module {
     gen_messages: Vec<GenMessageItems>,
 }
 impl Module {
-    pub fn try_new<'a>(package: &ProtoPath, desc_root: &'a RootContext<'a>) -> Result<Self> {
+    pub fn try_new<'a>(
+        package: &ProtoPath,
+        desc_root: &'a RootContext<'a>,
+        file_packages_under_this: impl Iterator<Item = &'a ProtoPath>,
+    ) -> Result<Self> {
         todo!()
     }
 }
