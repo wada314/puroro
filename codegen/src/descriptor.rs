@@ -196,7 +196,7 @@ pub enum FilesOrMessage<F, M> {
     Message(M),
 }
 impl<'a> FilesOrMessage<&'a FileDescriptor<'a>, &'a Descriptor<'a>> {
-    pub fn direct_messages(&self) -> impl Iterator<Item = Result<&Descriptor<'a>>> {
+    pub fn messages(&self) -> impl Iterator<Item = Result<&Descriptor<'a>>> {
         match self {
             FilesOrMessage::Files(files) => todo!(),
             FilesOrMessage::Message(m) => todo!(),
