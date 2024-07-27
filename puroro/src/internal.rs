@@ -44,3 +44,23 @@ impl From<WireType> for u32 {
 
 pub trait Any {}
 impl<T> Any for T {}
+
+macro_rules! impl_message_trait_for_trivial_types {
+    ($vis:vis trait $tname:ident {
+        $(fn $mname:ident(&self $(, $pname:ident : $pty:ty)* ) -> $rty:ty;)*
+    }) => {
+        $vis trait $tname {
+            $(fn $mname(&self $(, $pname : $pty)* ) -> $rty;)*
+        }
+        impl<'a, T: $tname> $tname for &'a T {
+            $(fn $mname(&self $(, $pname : $pty)* ) -> $rty {
+                <T as $tname>::$mname(self $(, $pname)* )
+            })*
+        }
+        impl<'a, T: $tname> $tname for &'a mut T {
+            $(fn $mname(&self $(, $pname : $pty)* ) -> $rty {
+                <T as $tname>::$mname(self $(, $pname)* )
+            })*
+        }
+    };
+}
