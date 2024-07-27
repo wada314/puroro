@@ -144,9 +144,8 @@ impl<'a> FileDescriptor<'a> {
             .iter()
             .copied())
     }
-    pub fn messages(&'a self) -> Result<impl Iterator<Item = &Descriptor>> {
-        Ok(self
-            .cache
+    pub fn messages(&'a self) -> impl Iterator<Item = &Descriptor> {
+        self.cache
             .messages
             .get_or_init(|| {
                 self.base
@@ -155,11 +154,10 @@ impl<'a> FileDescriptor<'a> {
                     .map(|m| Descriptor::new(self, None, m))
                     .collect()
             })
-            .iter())
+            .iter()
     }
-    pub fn enums(&'a self) -> Result<impl Iterator<Item = &EnumDescriptor>> {
-        Ok(self
-            .cache
+    pub fn enums(&'a self) -> impl Iterator<Item = &EnumDescriptor> {
+        self.cache
             .enums
             .get_or_init(|| {
                 self.base
@@ -168,40 +166,30 @@ impl<'a> FileDescriptor<'a> {
                     .map(|e| EnumDescriptor::new(self, None, e))
                     .collect()
             })
-            .iter())
+            .iter()
     }
     pub fn all_messages_or_enums(
         &'a self,
-    ) -> Result<impl Iterator<Item = MessageOrEnum<&Descriptor, &EnumDescriptor>>> {
-        Ok(self
-            .all_messages()?
-            .into_iter()
+    ) -> impl Iterator<Item = MessageOrEnum<&Descriptor, &EnumDescriptor>> {
+        self.all_messages()
             .map(MessageOrEnum::Message)
-            .chain(self.all_enums()?.into_iter().map(MessageOrEnum::Enum)))
+            .chain(self.all_enums().map(MessageOrEnum::Enum))
     }
-    pub fn all_messages(&'a self) -> Result<impl Iterator<Item = &Descriptor>> {
-        let direct_messages = self.messages()?.into_iter();
-        let indirect_messages_vec = self
-            .messages()?
-            .into_iter()
-            .map(|child| child.all_descendant_messages())
-            .collect::<Result<Vec<_>>>()?;
-        let indirect_messages = indirect_messages_vec
-            .into_iter()
-            .flat_map(|v| v.into_iter());
-        let boxed: Box<dyn Iterator<Item = _>> = Box::new(direct_messages.chain(indirect_messages));
-        Ok(boxed)
+    pub fn all_messages(&'a self) -> impl Iterator<Item = &Descriptor> {
+        let direct_messages = self.messages();
+        let indirect_messages = self
+            .messages()
+            .flat_map(|child| child.all_descendant_messages())
+            .collect::<Vec<_>>();
+        Box::new(direct_messages.chain(indirect_messages)) as Box<dyn Iterator<Item = _>>
     }
-    pub fn all_enums(&'a self) -> Result<impl Iterator<Item = &EnumDescriptor>> {
-        let direct_enums = self.enums()?.into_iter();
-        let indirect_enums_vec = self
-            .messages()?
-            .into_iter()
-            .map(|child| child.all_descendant_enums())
-            .collect::<Result<Vec<_>>>()?;
-        let indirect_enums = indirect_enums_vec.into_iter().flat_map(|v| v.into_iter());
-        let boxed: Box<dyn Iterator<Item = _>> = Box::new(direct_enums.chain(indirect_enums));
-        Ok(boxed)
+    pub fn all_enums(&'a self) -> impl Iterator<Item = &EnumDescriptor> {
+        let direct_enums = self.enums();
+        let indirect_enums = self
+            .messages()
+            .flat_map(|child| child.all_descendant_enums())
+            .collect::<Vec<_>>();
+        Box::new(direct_enums.chain(indirect_enums)) as Box<dyn Iterator<Item = _>>
     }
 }
 

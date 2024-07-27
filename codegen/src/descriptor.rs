@@ -151,7 +151,7 @@ impl<'a> RootContext<'a> {
         // Can improve the complexity here. Maybe later.
         for package_path in path.ancestors() {
             for file in self.package_to_files(package_path)? {
-                for message_or_enum in file.all_messages_or_enums()? {
+                for message_or_enum in file.all_messages_or_enums() {
                     if message_or_enum.full_path()? == path {
                         return Ok(Some(message_or_enum));
                     }
@@ -196,12 +196,13 @@ pub enum FilesOrMessage<F, M> {
     Message(M),
 }
 impl<'a> FilesOrMessage<&'a FileDescriptor<'a>, &'a Descriptor<'a>> {
-    pub fn messages(&self) -> impl Iterator<Item = Result<&Descriptor<'a>>> {
+    pub fn messages(&'a self) -> impl Iterator<Item = &Descriptor> {
         match self {
-            FilesOrMessage::Files(files) => todo!(),
-            FilesOrMessage::Message(m) => todo!(),
-        };
-        ::std::iter::once(todo!())
+            FilesOrMessage::Files(files) => {
+                Box::new(files.iter().flat_map(|f| f.messages())) as Box<dyn Iterator<Item = _>>
+            }
+            FilesOrMessage::Message(m) => Box::new(m.nested_types()) as Box<dyn Iterator<Item = _>>,
+        }
     }
 }
 

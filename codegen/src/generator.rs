@@ -44,11 +44,7 @@ pub fn compile(request: &CodeGeneratorRequest) -> Result<CodeGeneratorResponse<'
 
     let messages = root_context
         .files()
-        .into_iter()
-        .map(|fd| fd.all_messages())
-        .collect::<Result<Vec<_>>>()?
-        .into_iter()
-        .flatten()
+        .flat_map(|fd| fd.all_messages())
         .collect::<Vec<_>>();
     for message in &messages {
         let file_path = if let Some(package) = message.full_path()?.parent() {
@@ -68,11 +64,7 @@ pub fn compile(request: &CodeGeneratorRequest) -> Result<CodeGeneratorResponse<'
 
     let enums = root_context
         .files()
-        .into_iter()
-        .map(|fd| fd.all_enums())
-        .collect::<Result<Vec<_>>>()?
-        .into_iter()
-        .flatten()
+        .flat_map(|fd| fd.all_enums())
         .collect::<Vec<_>>();
     for e in &enums {
         let file_path = if let Some(package) = e.full_path()?.parent() {
