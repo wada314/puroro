@@ -16,7 +16,7 @@ pub mod compiler;
 
 use crate::generic_message::GenericMessage;
 use crate::internal::impl_message_trait_for_trivial_types;
-use crate::variant::variant_types::{Bool, Int32, Int64, UInt64};
+use crate::variant::variant_types::{Bool, Enum, Int32, Int64, UInt64};
 use crate::variant::VariantIntegerType;
 use crate::{ErrorKind, Result};
 use ::derive_more::{Deref as DDeref, DerefMut as DDerefMut, From as DFrom, Into as DInto};
@@ -137,10 +137,14 @@ impl<'a> FieldDescriptorProto<'a> {
         self.0.scalar_variant_field::<Int32>(3)
     }
     pub fn label(&self) -> Result<Option<self::field_descriptor_proto::Label>> {
-        self.0.scalar_enum2_field(4)
+        self.0
+            .field(4)
+            .try_as_scalar_variant_opt::<Enum<self::field_descriptor_proto::Label>>(false)
     }
     pub fn type_(&self) -> Result<Option<field_descriptor_proto::Type>> {
-        self.0.scalar_enum2_field(5)
+        self.0
+            .field(5)
+            .try_as_scalar_variant_opt::<Enum<field_descriptor_proto::Type>>(false)
     }
     pub fn type_name(&self) -> Result<Option<&str>> {
         self.0.field(6).try_as_scalar_string_opt()
@@ -164,7 +168,6 @@ impl<'a> FieldDescriptorProto<'a> {
 }
 
 pub mod field_descriptor_proto {
-    use super::*;
     #[derive(Default, Debug)]
     pub enum Type {
         TypeDouble = 1,
@@ -197,8 +200,8 @@ pub mod field_descriptor_proto {
     }
 
     impl TryFrom<i32> for Type {
-        type Error = ErrorKind;
-        fn try_from(value: i32) -> Result<Self> {
+        type Error = i32;
+        fn try_from(value: i32) -> ::std::result::Result<Self, i32> {
             match value {
                 1 => Ok(Self::TypeDouble),
                 2 => Ok(Self::TypeFloat),
@@ -218,20 +221,30 @@ pub mod field_descriptor_proto {
                 16 => Ok(Self::TypeSFixed64),
                 17 => Ok(Self::TypeSInt32),
                 18 => Ok(Self::TypeSInt64),
-                _ => Err(ErrorKind::TryFromIntIntoEnumError(value)),
+                _ => Err(value),
             }
+        }
+    }
+    impl From<Type> for i32 {
+        fn from(value: Type) -> i32 {
+            value as i32
         }
     }
 
     impl TryFrom<i32> for Label {
-        type Error = ErrorKind;
-        fn try_from(value: i32) -> Result<Self> {
+        type Error = i32;
+        fn try_from(value: i32) -> ::std::result::Result<Self, i32> {
             match value {
                 1 => Ok(Self::LabelOptional),
                 3 => Ok(Self::LabelRepeated),
                 2 => Ok(Self::LabelRequired),
-                _ => Err(ErrorKind::TryFromIntIntoEnumError(value)),
+                _ => Err(value),
             }
+        }
+    }
+    impl From<Label> for i32 {
+        fn from(value: Label) -> i32 {
+            value as i32
         }
     }
 }
@@ -374,6 +387,56 @@ impl_message_trait_for_trivial_types! {
     pub trait EnumValueDescriptorTrait {
         fn name(&self) -> &str;
         fn number(&self) -> i32;
+    }
+}
+
+impl FieldDescriptorTrait for GenericMessage<'_> {
+    fn name(&self) -> &str {
+        self.field(1).as_scalar_string()
+    }
+    fn number(&self) -> i32 {
+        self.field(3).as_scalar_variant::<Int32>(false)
+    }
+    fn label(&self) -> field_descriptor_proto::Label {
+        self.field(4)
+            .as_scalar_variant::<Enum<field_descriptor_proto::Label>>(false)
+    }
+    fn r#type(&self) -> field_descriptor_proto::Type {
+        self.field(5)
+            .as_scalar_variant::<Enum<field_descriptor_proto::Type>>(false)
+    }
+    fn type_name(&self) -> &str {
+        self.field(6).as_scalar_string()
+    }
+    fn extendee(&self) -> &str {
+        self.field(2).as_scalar_string()
+    }
+    fn default_value(&self) -> &str {
+        self.field(7).as_scalar_string()
+    }
+    fn oneof_index(&self) -> i32 {
+        self.field(9).as_scalar_variant::<Int32>(false)
+    }
+    fn json_name(&self) -> &str {
+        self.field(10).as_scalar_string()
+    }
+    fn proto3_optional(&self) -> bool {
+        self.field(17).as_scalar_variant::<Bool>(false)
+    }
+}
+
+impl OneofDescriptorTrait for GenericMessage<'_> {
+    fn name(&self) -> &str {
+        self.field(1).as_scalar_string()
+    }
+}
+
+impl EnumDescriptorTrait for GenericMessage<'_> {
+    fn name(&self) -> &str {
+        self.field(1).as_scalar_string()
+    }
+    fn value(&self) -> impl Iterator<Item = impl EnumValueDescriptorTrait> {
+        self.field(2).as_repeated_message()
     }
 }
 
