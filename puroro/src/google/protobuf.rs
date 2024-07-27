@@ -44,8 +44,8 @@ pub enum Edition {
     Edition99999TestOnly = 99999,
 }
 impl TryFrom<i32> for Edition {
-    type Error = ErrorKind;
-    fn try_from(value: i32) -> Result<Self> {
+    type Error = i32;
+    fn try_from(value: i32) -> ::std::result::Result<Self, i32> {
         match value {
             0 => Ok(Self::EditionUnknown),
             998 => Ok(Self::EditionProto2),
@@ -57,8 +57,13 @@ impl TryFrom<i32> for Edition {
             99997 => Ok(Self::Edition99997TestOnly),
             99998 => Ok(Self::Edition99998TestOnly),
             99999 => Ok(Self::Edition99999TestOnly),
-            _ => Err(ErrorKind::TryFromIntIntoEnumError(value)),
+            _ => Err(value),
         }
+    }
+}
+impl From<Edition> for i32 {
+    fn from(value: Edition) -> i32 {
+        value as i32
     }
 }
 
@@ -96,7 +101,9 @@ impl<'a> FileDescriptorProto<'a> {
         self.0.field(12).try_as_scalar_string_opt()
     }
     pub fn edition(&self) -> Result<Option<Edition>> {
-        self.0.scalar_enum2_field(14)
+        self.0
+            .field(14)
+            .try_as_scalar_variant_opt::<Enum<Edition>>(false)
     }
 }
 
@@ -387,6 +394,63 @@ impl_message_trait_for_trivial_types! {
     pub trait EnumValueDescriptorTrait {
         fn name(&self) -> &str;
         fn number(&self) -> i32;
+    }
+}
+
+impl FileDescriptorSetTrait for GenericMessage<'_> {
+    fn file(&self) -> impl Iterator<Item = impl FileDescriptorTrait> {
+        self.field(1).as_repeated_message()
+    }
+}
+
+impl FileDescriptorTrait for GenericMessage<'_> {
+    fn name(&self) -> &str {
+        self.field(1).as_scalar_string()
+    }
+    fn package(&self) -> &str {
+        self.field(2).as_scalar_string()
+    }
+    fn dependency(&self) -> impl Iterator<Item = &str> {
+        self.field(3).as_repeated_string()
+    }
+    fn public_dependency(&self) -> impl Iterator<Item = i32> {
+        self.field(10).as_repeated_variant::<Int32>(false)
+    }
+    fn weak_dependency(&self) -> impl Iterator<Item = i32> {
+        self.field(11).as_repeated_variant::<Int32>(false)
+    }
+    fn message_type(&self) -> impl Iterator<Item = impl DescriptorTrait> {
+        self.field(4).as_repeated_message()
+    }
+    fn enum_type(&self) -> impl Iterator<Item = impl EnumDescriptorTrait> {
+        self.field(5).as_repeated_message()
+    }
+    fn syntax(&self) -> &str {
+        self.field(12).as_scalar_string()
+    }
+    fn edition(&self) -> Edition {
+        self.field(14).as_scalar_variant::<Enum<Edition>>(false)
+    }
+}
+
+impl DescriptorTrait for GenericMessage<'_> {
+    fn name(&self) -> &str {
+        self.field(1).as_scalar_string()
+    }
+    fn field(&self) -> impl Iterator<Item = impl FieldDescriptorTrait> {
+        self.field(2).as_repeated_message()
+    }
+    fn extension(&self) -> impl Iterator<Item = impl FieldDescriptorTrait> {
+        self.field(6).as_repeated_message()
+    }
+    fn nested_type(&self) -> impl Iterator<Item = impl DescriptorTrait> {
+        self.field(3).as_repeated_message()
+    }
+    fn enum_type(&self) -> impl Iterator<Item = impl EnumDescriptorTrait> {
+        self.field(4).as_repeated_message()
+    }
+    fn oneof_decl(&self) -> impl Iterator<Item = impl OneofDescriptorTrait> {
+        self.field(8).as_repeated_message()
     }
 }
 
