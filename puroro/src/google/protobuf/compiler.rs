@@ -239,7 +239,7 @@ impl_message_mut_trait_for_trivial_types! {
         fn set_supported_features(&mut self, features: u64);
         fn set_minimum_edition(&mut self, edition: i32);
         fn set_maximum_edition(&mut self, edition: i32);
-        fn push_file(&mut self, file: impl code_generator_response::FileTrait);
+        fn push_file(&mut self, file: implcode_generator_response::FileTrait);
     }
 }
 
@@ -289,17 +289,17 @@ impl CodeGeneratorRequestTrait for GenericMessage<'_> {
         self.field(3).as_scalar_message()
     }
 }
-impl CodeGeneratorRequestMutTrait for GenericMessage<'_> {
-    fn set_parameter(&mut self, parameter: &str) {
-        self.field_mut(2).set_string(parameter)
-    }
-    fn push_proto_file(&mut self, proto_file: &GenericMessage) {
-        self.field_mut(15).push_message(proto_file)
-    }
-    fn push_source_file_descriptor(&mut self, source_file_descriptor: &GenericMessage) {
-        self.field_mut(17).push_message(source_file_descriptor)
-    }
-    fn set_compiler_version(&mut self, compiler_version: &GenericMessage) {
-        self.field_mut(3).set_message(&compiler_version)
-    }
-}
+// impl CodeGeneratorRequestMutTrait for GenericMessage<'_> {
+//     fn set_parameter(&mut self, parameter: &str) {
+//         self.field_mut(2).set_string(parameter)
+//     }
+//     fn push_proto_file(&mut self, proto_file: &GenericMessage) {
+//         self.field_mut(15).push_message(proto_file)
+//     }
+//     fn push_source_file_descriptor(&mut self, source_file_descriptor: &GenericMessage) {
+//         self.field_mut(17).push_message(source_file_descriptor)
+//     }
+//     fn set_compiler_version(&mut self, compiler_version: &GenericMessage) {
+//         self.field_mut(3).set_message(&compiler_version)
+//     }
+// }
