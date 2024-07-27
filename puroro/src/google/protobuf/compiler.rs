@@ -107,13 +107,16 @@ pub mod code_generator_response {
         }
 
         pub fn set_name(&mut self, name: &str) -> Result<()> {
-            self.0.field_mut(1).push_string(name)
+            self.0.field_mut(1).push_string(name);
+            Ok(())
         }
         pub fn set_insertion_point(&mut self, insertion_point: &str) -> Result<()> {
-            self.0.field_mut(2).push_string(insertion_point)
+            self.0.field_mut(2).push_string(insertion_point);
+            Ok(())
         }
         pub fn set_content(&mut self, content: &str) -> Result<()> {
-            self.0.field_mut(15).push_string(content)
+            self.0.field_mut(15).push_string(content);
+            Ok(())
         }
     }
 
@@ -129,6 +132,28 @@ pub mod code_generator_response {
             fn set_name(&mut self, name: &str);
             fn set_insertion_point(&mut self, insertion_point: &str);
             fn set_content(&mut self, content: &str);
+        }
+    }
+    impl FileTrait for GenericMessage<'_> {
+        fn name(&self) -> &str {
+            self.field(1).as_scalar_string()
+        }
+        fn insertion_point(&self) -> &str {
+            self.field(2).as_scalar_string()
+        }
+        fn content(&self) -> &str {
+            self.field(15).as_scalar_string()
+        }
+    }
+    impl FileMutTrait for GenericMessage<'_> {
+        fn set_name(&mut self, name: &str) {
+            self.field_mut(1).push_string(name)
+        }
+        fn set_insertion_point(&mut self, insertion_point: &str) {
+            self.field_mut(2).push_string(insertion_point)
+        }
+        fn set_content(&mut self, content: &str) {
+            self.field_mut(15).push_string(content)
         }
     }
 }
@@ -153,23 +178,24 @@ impl<'a> CodeGeneratorResponse<'a> {
     }
 
     pub fn set_error(&mut self, error: &str) -> Result<()> {
-        self.0.field_mut(1).push_string(error)
+        self.0.field_mut(1).push_string(error);
+        Ok(())
     }
     pub fn set_supported_features(&mut self, features: u64) -> Result<()> {
-        self.0.field_mut(2).push_variant(features.into())
+        self.0.field_mut(2).push_variant::<UInt64>(features);
+        Ok(())
     }
     pub fn set_minimum_edition(&mut self, edition: i32) -> Result<()> {
-        self.0
-            .field_mut(3)
-            .push_variant(Int32::into_variant(edition))
+        self.0.field_mut(3).push_variant::<Int32>(edition);
+        Ok(())
     }
     pub fn set_maximum_edition(&mut self, edition: i32) -> Result<()> {
-        self.0
-            .field_mut(4)
-            .push_variant(Int32::into_variant(edition))
+        self.0.field_mut(4).push_variant::<Int32>(edition);
+        Ok(())
     }
     pub fn push_file(&mut self, file: code_generator_response::File<'a>) -> Result<()> {
-        self.0.field_mut(15).push_message(file.into())
+        self.0.field_mut(15).push_message(&file);
+        Ok(())
     }
 }
 

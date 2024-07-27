@@ -23,9 +23,9 @@ use crate::variant::{
 };
 use crate::{ErrorKind, Result};
 use ::itertools::Either;
-use ::once_cell::unsync::Lazy;
 use ::std::borrow::Cow;
-use ::std::collections::HashMap;
+use ::std::cell::LazyCell;
+use ::std::collections::{hash_map, HashMap};
 use ::std::io::{BufRead, Read, Write};
 
 /// Assuming proto2 syntax.
@@ -88,21 +88,6 @@ impl WireTypeAndPayload<'_> {
     }
 }
 
-#[derive(Debug, Clone)]
-pub struct Field<'a> {
-    number: i32,
-    wire_and_payloads: &'a [WireTypeAndPayload<'a>],
-}
-
-#[derive(Debug)]
-pub struct FieldMut<'msg, 'a> {
-    number: i32,
-    mut_ref: Lazy<
-        &'msg mut Vec<WireTypeAndPayload<'a>>,
-        Box<dyn 'msg + FnOnce() -> &'msg mut Vec<WireTypeAndPayload<'a>>>,
-    >,
-}
-
 impl<'a> GenericMessage<'a> {
     pub fn new() -> Self {
         Self::default()
@@ -133,10 +118,9 @@ impl<'a> GenericMessage<'a> {
     }
 
     pub fn field_mut(&mut self, number: i32) -> FieldMut<'_, 'a> {
-        let entry = self.fields.entry(number);
         FieldMut {
             number,
-            mut_ref: Lazy::new(Box::new(move || entry.or_default())),
+            wire_and_payloads: self.fields.entry(number).or_default(),
         }
     }
 
@@ -156,6 +140,12 @@ impl<'a> GenericMessage<'a> {
     ) -> &'this mut Vec<WireTypeAndPayload<'a>> {
         self.fields.entry(number).or_default()
     }
+}
+
+#[derive(Debug, Clone)]
+pub struct Field<'a> {
+    number: i32,
+    wire_and_payloads: &'a [WireTypeAndPayload<'a>],
 }
 
 impl<'a> Field<'a> {
@@ -289,24 +279,66 @@ impl<'a> Field<'a> {
     }
 }
 
+#[derive(Debug)]
+pub struct FieldMut<'msg, 'a> {
+    number: i32,
+    wire_and_payloads: &'msg mut Vec<WireTypeAndPayload<'a>>,
+}
+
 impl<'msg, 'a> FieldMut<'msg, 'a> {
     pub fn number(&self) -> i32 {
         self.number
     }
-    pub fn push_variant(&mut self, variant: Variant) -> Result<()> {
-        self.mut_ref.push(WireTypeAndPayload::Variant(variant));
-        Ok(())
+
+    pub fn set_variant<T: VariantIntegerType>(&mut self, val: T::RustType) {
+        self.wire_and_payloads.clear();
+        self.push_variant::<T>(val);
     }
-    pub fn push_string(&mut self, val: &str) -> Result<()> {
-        self.mut_ref
+    pub fn set_i32(&mut self, val: [u8; 4]) {
+        self.wire_and_payloads.clear();
+        self.push_i32(val);
+    }
+    pub fn set_i64(&mut self, val: [u8; 8]) {
+        self.wire_and_payloads.clear();
+        self.push_i64(val);
+    }
+    pub fn set_string(&mut self, val: &str) {
+        self.wire_and_payloads.clear();
+        self.push_string(val);
+    }
+    pub fn set_bytes(&mut self, val: &'a [u8]) {
+        self.wire_and_payloads.clear();
+        self.push_bytes(val);
+    }
+    pub fn set_message(&mut self, message: &GenericMessage<'a>) {
+        self.wire_and_payloads.clear();
+        self.push_message(message);
+    }
+
+    pub fn push_variant<T: VariantIntegerType>(&mut self, val: T::RustType) {
+        self.wire_and_payloads
+            .push(WireTypeAndPayload::Variant(Variant::from::<T>(val)));
+    }
+    pub fn push_i32(&mut self, val: [u8; 4]) {
+        self.wire_and_payloads.push(WireTypeAndPayload::I32(val));
+    }
+    pub fn push_i64(&mut self, val: [u8; 8]) {
+        self.wire_and_payloads.push(WireTypeAndPayload::I64(val));
+    }
+    pub fn push_string(&mut self, val: &str) {
+        self.wire_and_payloads
             .push(WireTypeAndPayload::Len(val.to_string().into_bytes().into()));
-        Ok(())
     }
-    pub fn push_message(&mut self, message: GenericMessage<'a>) -> Result<()> {
+    pub fn push_bytes(&mut self, val: &'a [u8]) {
+        self.wire_and_payloads
+            .push(WireTypeAndPayload::Len(val.into()));
+    }
+    pub fn push_message(&mut self, message: &GenericMessage<'a>) {
         let mut buf = Vec::new();
-        message.write(&mut buf)?;
-        self.mut_ref.push(WireTypeAndPayload::Len(buf.into()));
-        Ok(())
+        if let Ok(_) = message.write(&mut buf) {
+            self.wire_and_payloads
+                .push(WireTypeAndPayload::Len(buf.into()));
+        }
     }
 }
 
