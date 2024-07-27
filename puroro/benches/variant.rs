@@ -13,6 +13,7 @@
 // limitations under the License.
 
 use ::criterion::{black_box, criterion_group, criterion_main, Criterion};
+use ::puroro::variant::variant_types::UInt64;
 use ::puroro::variant::{BufReadExtVariant, ReadExtVariant, Variant, WriteExtVariant};
 use ::rand::prelude::*;
 use ::rand_distr::Exp;
@@ -24,7 +25,7 @@ fn test_cases_random<const SIZE: usize>() -> Box<[u8]> {
     let mut rand = Pcg32::seed_from_u64(1234567890u64);
     let mut output = Vec::with_capacity(10 * SIZE);
     for item_u64 in iter::repeat_with(|| rand.gen::<u64>()).take(SIZE) {
-        let item_var = Variant::from(item_u64);
+        let item_var = Variant::from::<UInt64>(item_u64);
         WriteExtVariant::write_variant(&mut output, item_var).unwrap();
     }
     output.into_boxed_slice()
@@ -42,7 +43,7 @@ fn test_cases_exponential_dist<const SIZE: usize>(
         Exp::new(f64::ln(1.0 - (threshold_percentile / 100.0)) / -f64::exp2(threshold_bits as f64))
             .unwrap();
     for item_f64 in iter::repeat_with(|| exp_distr.sample(&mut rand)).take(SIZE) {
-        let item_var = Variant::from(item_f64 as u64);
+        let item_var = Variant::from::<UInt64>(item_f64 as u64);
         WriteExtVariant::write_variant(&mut output, item_var).unwrap();
     }
     output.into_boxed_slice()

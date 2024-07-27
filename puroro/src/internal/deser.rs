@@ -16,7 +16,7 @@ pub mod handler_impl;
 pub mod record;
 
 use crate::internal::WireType;
-use crate::variant::variant_types::Int32;
+use crate::variant::variant_types::{Int32, UInt32};
 use crate::variant::{Variant, VariantIntegerType};
 use crate::Result;
 use ::std::io::{BufRead, Read};
@@ -111,7 +111,7 @@ impl<T: Read> ReadExt for T {
         let Some(tag_var) = self.read_variant_or_eof()? else {
             return Ok(None);
         };
-        let tag: u32 = tag_var.try_into()?;
+        let tag: u32 = tag_var.try_into::<UInt32>()?;
         let wire_type: WireType = (tag & 0x7).try_into()?;
         // safe because the `tag >> 3` is less than 29 bits
         let field_number: i32 = (tag >> 3).try_into()?;
@@ -168,6 +168,8 @@ pub fn deser_from_bufread<R: BufRead, H: DeserMessageHandlerForRead<ScopeRead<R>
 
 #[cfg(test)]
 mod test {
+    use variant_types::UInt64;
+
     use super::*;
     use crate::{variant::*, ErrorKind};
 
@@ -261,12 +263,14 @@ mod test {
     fn gen_submessage_bytes(num: i32, submessage_bytes: impl AsRef<[u8]>) -> Vec<u8> {
         let mut result = Vec::new();
         result
-            .write_variant(Variant::from(((num as u64) << 3) | WireType::Len as u64))
+            .write_variant(Variant::from::<UInt64>(
+                ((num as u64) << 3) | WireType::Len as u64,
+            ))
             .unwrap();
         result
-            .write_variant(
-                Int32::into_variant(submessage_bytes.as_ref().len().try_into().unwrap()).unwrap(),
-            )
+            .write_variant(Int32::into_variant(
+                submessage_bytes.as_ref().len().try_into().unwrap(),
+            ))
             .unwrap();
         result.extend_from_slice(submessage_bytes.as_ref());
         result

@@ -143,12 +143,12 @@ impl<'a> CodeGeneratorResponse<'a> {
     pub fn set_minimum_edition(&mut self, edition: i32) -> Result<()> {
         self.0
             .field_mut(3)
-            .push_variant(Int32::into_variant(edition)?)
+            .push_variant(Int32::into_variant(edition))
     }
     pub fn set_maximum_edition(&mut self, edition: i32) -> Result<()> {
         self.0
             .field_mut(4)
-            .push_variant(Int32::into_variant(edition)?)
+            .push_variant(Int32::into_variant(edition))
     }
     pub fn push_file(&mut self, file: code_generator_response::File<'a>) -> Result<()> {
         self.0.field_mut(15).push_message(file.into())

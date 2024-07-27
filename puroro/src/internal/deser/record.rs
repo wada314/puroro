@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use crate::internal::WireType;
-use crate::variant::variant_types::Int32;
+use crate::variant::variant_types::{Int32, UInt32};
 use crate::variant::{Variant, VariantIntegerType};
 use crate::{ErrorKind, Result};
 use ::std::io::{Read, Take};
@@ -42,7 +42,7 @@ pub trait SliceExtReadRecord<'a> {
 impl<'a> SliceExtReadRecord<'a> for &'a [u8] {
     fn read_record<'b>(&'b mut self) -> Result<Record<&'a [u8]>> {
         use crate::variant::ReadExtVariant;
-        let tag: u32 = self.read_variant()?.try_into()?;
+        let tag: u32 = self.read_variant()?.try_into::<UInt32>()?;
         let wire_type: WireType = (tag & 0x7).try_into()?;
         // safe because the `tag >> 3` is less than 29 bits
         let number: i32 = (tag >> 3).try_into().unwrap();
@@ -92,7 +92,7 @@ impl<T: Read> ReadExtReadRecord for T {
         let Some(tag_var) = self.read_variant_or_eof()? else {
             return Ok(None);
         };
-        let tag: u32 = tag_var.try_into()?;
+        let tag: u32 = tag_var.try_into::<UInt32>()?;
         let wire_type: WireType = (tag & 0x7).try_into()?;
         // safe because the `tag >> 3` is less than 29 bits
         let number: i32 = (tag >> 3).try_into().unwrap();
