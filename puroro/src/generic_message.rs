@@ -24,8 +24,7 @@ use crate::variant::{
 use crate::{ErrorKind, Result};
 use ::itertools::Either;
 use ::std::borrow::Cow;
-use ::std::cell::LazyCell;
-use ::std::collections::{hash_map, HashMap};
+use ::std::collections::HashMap;
 use ::std::io::{BufRead, Read, Write};
 
 /// Assuming proto2 syntax.
