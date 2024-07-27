@@ -230,8 +230,8 @@ impl_message_mut_trait_for_trivial_types! {
     }
     pub trait CodeGeneratorRequestMutTrait: CodeGeneratorRequestTrait {
         fn set_parameter(&mut self, parameter: &str);
-        fn push_proto_file(&mut self, proto_file: &impl FileDescriptorTrait);
-        fn push_source_file_descriptor(&mut self, source_file_descriptor: &impl FileDescriptorTrait);
+        fn push_proto_file(&mut self, proto_file: impl FileDescriptorTrait);
+        fn push_source_file_descriptor(&mut self, source_file_descriptor: impl FileDescriptorTrait);
         fn set_compiler_version(&mut self, compiler_version: impl VersionTrait);
     }
     pub trait CodeGeneratorResponseMutTrait: CodeGeneratorResponseTrait {
