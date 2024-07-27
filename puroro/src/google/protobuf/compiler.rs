@@ -239,7 +239,7 @@ impl_message_mut_trait_for_trivial_types! {
         fn set_supported_features(&mut self, features: u64);
         fn set_minimum_edition(&mut self, edition: i32);
         fn set_maximum_edition(&mut self, edition: i32);
-        fn push_file(&mut self, file: implcode_generator_response::FileTrait);
+        fn push_file(&mut self, file: impl code_generator_response::FileTrait);
     }
 }
 
