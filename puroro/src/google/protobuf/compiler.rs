@@ -218,7 +218,7 @@ impl_message_trait_for_trivial_types! {
         fn supported_features(&self) -> u64;
         fn minimum_edition(&self) -> i32;
         fn maximum_edition(&self) -> i32;
-        fn file(&self) -> impl Iterator<Item = code_generator_response::File>;
+        fn file(&self) -> impl Iterator<Item = impl code_generator_response::FileTrait>;
     }
 }
 impl_message_mut_trait_for_trivial_types! {
@@ -239,7 +239,7 @@ impl_message_mut_trait_for_trivial_types! {
         fn set_supported_features(&mut self, features: u64);
         fn set_minimum_edition(&mut self, edition: i32);
         fn set_maximum_edition(&mut self, edition: i32);
-        fn push_file(&mut self, file: code_generator_response::File);
+        fn push_file(&mut self, file: impl code_generator_response::FileTrait);
     }
 }
 
