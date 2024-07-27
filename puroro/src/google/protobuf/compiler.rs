@@ -13,7 +13,10 @@
 // limitations under the License.
 
 use crate::generic_message::GenericMessage;
-use crate::google::protobuf::FileDescriptorProto;
+use crate::google::protobuf::{FileDescriptorProto, FileDescriptorTrait};
+use crate::internal::{
+    impl_message_mut_trait_for_trivial_types, impl_message_trait_for_trivial_types,
+};
 use crate::variant::variant_types::{Int32, UInt64};
 use crate::variant::VariantIntegerType;
 use crate::Result;
@@ -113,6 +116,21 @@ pub mod code_generator_response {
             self.0.field_mut(15).push_string(content)
         }
     }
+
+    impl_message_trait_for_trivial_types! {
+        pub trait FileTrait {
+            fn name(&self) -> &str;
+            fn insertion_point(&self) -> &str;
+            fn content(&self) -> &str;
+        }
+    }
+    impl_message_mut_trait_for_trivial_types! {
+        pub trait FileMutTrait: FileTrait {
+            fn set_name(&mut self, name: &str);
+            fn set_insertion_point(&mut self, insertion_point: &str);
+            fn set_content(&mut self, content: &str);
+        }
+    }
 }
 
 #[derive(DDeref, DDerefMut, DFrom, DInto, Default, Debug)]
@@ -152,5 +170,49 @@ impl<'a> CodeGeneratorResponse<'a> {
     }
     pub fn push_file(&mut self, file: code_generator_response::File<'a>) -> Result<()> {
         self.0.field_mut(15).push_message(file.into())
+    }
+}
+
+impl_message_trait_for_trivial_types! {
+    pub trait VersionTrait {
+        fn major(&self) -> i32;
+        fn minor(&self) -> i32;
+        fn patch(&self) -> i32;
+        fn suffix(&self) -> &str;
+    }
+    pub trait CodeGeneratorRequestTrait {
+        fn file_to_generate(&self) -> impl Iterator<Item = &str>;
+        fn parameter(&self) -> &str;
+        fn proto_file(&self) -> impl Iterator<Item = impl FileDescriptorTrait>;
+        fn source_file_descriptors(&self) -> impl Iterator<Item = impl FileDescriptorTrait>;
+        fn compiler_version(&self) -> impl VersionTrait;
+    }
+    pub trait CodeGeneratorResponseTrait {
+        fn error(&self) -> &str;
+        fn supported_features(&self) -> u64;
+        fn minimum_edition(&self) -> i32;
+        fn maximum_edition(&self) -> i32;
+        fn file(&self) -> impl Iterator<Item = code_generator_response::File>;
+    }
+}
+impl_message_mut_trait_for_trivial_types! {
+    pub trait VersionMutTrait: VersionTrait {
+        fn set_major(&mut self, major: i32);
+        fn set_minor(&mut self, minor: i32);
+        fn set_patch(&mut self, patch: i32);
+        fn set_suffix(&mut self, suffix: &str);
+    }
+    pub trait CodeGeneratorRequestMutTrait: CodeGeneratorRequestTrait {
+        fn set_parameter(&mut self, parameter: &str);
+        fn push_proto_file(&mut self, proto_file: &impl FileDescriptorTrait);
+        fn push_source_file_descriptor(&mut self, source_file_descriptor: &impl FileDescriptorTrait);
+        fn set_compiler_version(&mut self, compiler_version: Version);
+    }
+    pub trait CodeGeneratorResponseMutTrait: CodeGeneratorResponseTrait {
+        fn set_error(&mut self, error: &str);
+        fn set_supported_features(&mut self, features: u64);
+        fn set_minimum_edition(&mut self, edition: i32);
+        fn set_maximum_edition(&mut self, edition: i32);
+        fn push_file(&mut self, file: code_generator_response::File);
     }
 }
