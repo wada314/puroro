@@ -15,8 +15,8 @@
 pub mod protobuf;
 
 use crate::generic_message::GenericMessage;
-use crate::variant::{variant_types::Int32, VariantIntegerType};
-use crate::{ErrorKind, Result};
+use crate::variant::VariantIntegerType;
+use crate::Result;
 use ::itertools::Itertools;
 
 /// Some utility impls for [`GenericMessage`].
@@ -35,14 +35,6 @@ impl GenericMessage<'_> {
         T: VariantIntegerType,
     {
         self.field(number).try_as_repeated_variant::<T>(false)
-    }
-    fn scalar_enum2_field<T>(&self, number: i32) -> Result<Option<T>>
-    where
-        T: TryFrom<i32, Error = ErrorKind>,
-    {
-        self.scalar_variant_field::<Int32>(number)?
-            .map(|i| i.try_into())
-            .transpose()
     }
     fn scalar_message_field<'a, T, F: Fn(GenericMessage<'a>) -> T>(
         &'a self,

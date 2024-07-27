@@ -17,8 +17,7 @@ pub mod compiler;
 use crate::generic_message::GenericMessage;
 use crate::internal::impl_message_trait_for_trivial_types;
 use crate::variant::variant_types::{Bool, Enum, Int32, Int64, UInt64};
-use crate::variant::VariantIntegerType;
-use crate::{ErrorKind, Result};
+use crate::Result;
 use ::derive_more::{Deref as DDeref, DerefMut as DDerefMut, From as DFrom, Into as DInto};
 
 #[derive(DDeref, DDerefMut, DFrom, DInto, Default, Debug)]

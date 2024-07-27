@@ -16,7 +16,7 @@ use crate::generic_message::GenericMessage;
 use crate::google::protobuf::FileDescriptorProto;
 use crate::variant::variant_types::{Int32, UInt64};
 use crate::variant::VariantIntegerType;
-use crate::{ErrorKind, Result};
+use crate::Result;
 use ::derive_more::{Deref as DDeref, DerefMut as DDerefMut, From as DFrom, Into as DInto};
 
 #[derive(DDeref, DDerefMut, DFrom, DInto, Default, Debug)]
@@ -67,13 +67,13 @@ pub mod code_generator_response {
         FeatureSupportsEditions = 2,
     }
     impl TryFrom<i32> for Feature {
-        type Error = ErrorKind;
-        fn try_from(value: i32) -> Result<Self> {
+        type Error = i32;
+        fn try_from(value: i32) -> ::std::result::Result<Self, i32> {
             match value {
                 0 => Ok(Self::FeatureNone),
                 1 => Ok(Self::FeatureProto3Optional),
                 2 => Ok(Self::FeatureSupportsEditions),
-                _ => Err(ErrorKind::TryFromIntIntoEnumError(value)),
+                _ => Err(value),
             }
         }
     }
