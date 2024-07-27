@@ -26,7 +26,7 @@ impl GenericMessage<'_> {
         T: VariantIntegerType,
     {
         self.field(number)
-            .as_scalar_variant(false)?
+            .try_as_scalar_variant_opt(false)?
             .map(|v| T::try_from_variant(v))
             .transpose()
     }
@@ -38,7 +38,7 @@ impl GenericMessage<'_> {
         T: VariantIntegerType,
     {
         self.field(number)
-            .as_repeated_variant(false)
+            .try_as_repeated_variant(false)
             .into_iter()
             .map(|var| T::try_from_variant(var?))
     }
@@ -55,7 +55,7 @@ impl GenericMessage<'_> {
         number: i32,
         constructor: F,
     ) -> Result<Option<T>> {
-        Ok(self.field(number).as_scalar_message()?.map(constructor))
+        Ok(self.field(number).try_as_scalar_message()?.map(constructor))
     }
     fn repeated_message_field<'a, T, F: 'a + Fn(GenericMessage<'a>) -> T>(
         &'a self,
@@ -63,7 +63,7 @@ impl GenericMessage<'_> {
         constructor: F,
     ) -> impl 'a + Iterator<Item = Result<T>> {
         self.field(number)
-            .as_repeated_message()
+            .try_as_repeated_message()
             .into_iter()
             .map_ok(constructor)
     }

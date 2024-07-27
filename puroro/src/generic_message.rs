@@ -163,11 +163,13 @@ impl<'a> Field<'a> {
         self.number
     }
 
-    pub fn as_scalar_variant(&self, allow_packed: bool) -> Result<Option<Variant>> {
-        self.as_repeated_variant(allow_packed).last().transpose()
+    pub fn try_as_scalar_variant_opt(&self, allow_packed: bool) -> Result<Option<Variant>> {
+        self.try_as_repeated_variant(allow_packed)
+            .last()
+            .transpose()
     }
 
-    pub fn as_repeated_variant(
+    pub fn try_as_repeated_variant(
         &self,
         allow_packed: bool,
     ) -> impl 'a + Iterator<Item = Result<Variant>> {
@@ -182,33 +184,33 @@ impl<'a> Field<'a> {
             })
     }
 
-    pub fn as_scalar_i32(&self) -> Result<Option<[u8; 4]>> {
-        self.as_repeated_i32().last().transpose()
+    pub fn try_as_scalar_i32_opt(&self) -> Result<Option<[u8; 4]>> {
+        self.try_as_repeated_i32().last().transpose()
     }
 
-    pub fn as_repeated_i32(&self) -> impl 'a + Iterator<Item = Result<[u8; 4]>> {
+    pub fn try_as_repeated_i32(&self) -> impl 'a + Iterator<Item = Result<[u8; 4]>> {
         self.wire_and_payloads.iter().map(|record| match record {
             WireTypeAndPayload::I32(buf) => Ok(*buf),
             _ => Err(ErrorKind::GenericMessageFieldTypeError),
         })
     }
 
-    pub fn as_scalar_i64(&self) -> Result<Option<[u8; 8]>> {
-        self.as_repeated_i64().last().transpose()
+    pub fn try_as_scalar_i64_opt(&self) -> Result<Option<[u8; 8]>> {
+        self.try_as_repeated_i64().last().transpose()
     }
 
-    pub fn as_repeated_i64(&self) -> impl 'a + Iterator<Item = Result<[u8; 8]>> {
+    pub fn try_as_repeated_i64(&self) -> impl 'a + Iterator<Item = Result<[u8; 8]>> {
         self.wire_and_payloads.iter().map(|record| match record {
             WireTypeAndPayload::I64(buf) => Ok(*buf),
             _ => Err(ErrorKind::GenericMessageFieldTypeError),
         })
     }
 
-    pub fn as_scalar_string(&self) -> Result<Option<&'a str>> {
-        self.as_repeated_string().last().transpose()
+    pub fn try_as_scalar_string_opt(&self) -> Result<Option<&'a str>> {
+        self.try_as_repeated_string().last().transpose()
     }
 
-    pub fn as_repeated_string(&self) -> impl 'a + Iterator<Item = Result<&'a str>> {
+    pub fn try_as_repeated_string(&self) -> impl 'a + Iterator<Item = Result<&'a str>> {
         self.wire_and_payloads.iter().map(|record| match record {
             WireTypeAndPayload::Len(ld) => {
                 ::std::str::from_utf8(&ld).map_err(|_| ErrorKind::GenericMessageFieldTypeError)
@@ -217,18 +219,18 @@ impl<'a> Field<'a> {
         })
     }
 
-    pub fn as_scalar_bytes(&self) -> Result<Option<&'a [u8]>> {
-        self.as_repeated_bytes().last().transpose()
+    pub fn try_as_scalar_bytes_opt(&self) -> Result<Option<&'a [u8]>> {
+        self.try_as_repeated_bytes().last().transpose()
     }
 
-    pub fn as_repeated_bytes(&self) -> impl 'a + Iterator<Item = Result<&'a [u8]>> {
+    pub fn try_as_repeated_bytes(&self) -> impl 'a + Iterator<Item = Result<&'a [u8]>> {
         self.wire_and_payloads.iter().map(|record| match record {
             WireTypeAndPayload::Len(ld) => Ok(ld.as_ref()),
             _ => Err(ErrorKind::GenericMessageFieldTypeError),
         })
     }
 
-    pub fn as_scalar_message(&self) -> Result<Option<GenericMessage<'a>>> {
+    pub fn try_as_scalar_message(&self) -> Result<Option<GenericMessage<'a>>> {
         let mut message_opt: Option<GenericMessage> = None;
         for wire_and_payload in self.wire_and_payloads {
             let WireTypeAndPayload::Len(buf) = wire_and_payload else {
@@ -241,7 +243,7 @@ impl<'a> Field<'a> {
         Ok(message_opt)
     }
 
-    pub fn as_repeated_message(&self) -> impl 'a + Iterator<Item = Result<GenericMessage<'a>>> {
+    pub fn try_as_repeated_message(&self) -> impl 'a + Iterator<Item = Result<GenericMessage<'a>>> {
         self.wire_and_payloads.iter().map(|wire_and_payload| {
             let WireTypeAndPayload::Len(buf) = wire_and_payload else {
                 Err(ErrorKind::GenericMessageFieldTypeError)?

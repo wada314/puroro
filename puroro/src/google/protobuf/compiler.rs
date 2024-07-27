@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::google::protobuf::FileDescriptorProto;
 use crate::generic_message::GenericMessage;
+use crate::google::protobuf::FileDescriptorProto;
 use crate::variant::variant_types::{Int32, UInt64};
 use crate::variant::VariantIntegerType;
 use crate::{ErrorKind, Result};
@@ -32,7 +32,7 @@ impl<'a> Version<'a> {
         Ok(self.0.scalar_variant_field::<Int32>(3)?.unwrap_or(0))
     }
     pub fn suffix(&self) -> Result<&str> {
-        Ok(self.0.field(4).as_scalar_string()?.unwrap_or(""))
+        Ok(self.0.field(4).try_as_scalar_string_opt()?.unwrap_or(""))
     }
 }
 
@@ -40,10 +40,10 @@ impl<'a> Version<'a> {
 pub struct CodeGeneratorRequest<'a>(GenericMessage<'a>);
 impl<'a> CodeGeneratorRequest<'a> {
     pub fn file_to_generate(&self) -> impl IntoIterator<Item = Result<&str>> {
-        self.0.field(1).as_repeated_string()
+        self.0.field(1).try_as_repeated_string()
     }
     pub fn parameter(&self) -> Result<Option<&str>> {
-        self.0.field(2).as_scalar_string()
+        self.0.field(2).try_as_scalar_string_opt()
     }
     pub fn proto_file(&self) -> impl Iterator<Item = Result<FileDescriptorProto>> {
         self.0.repeated_message_field(15, Into::into)
@@ -91,15 +91,15 @@ pub mod code_generator_response {
     pub struct File<'a>(GenericMessage<'a>);
     impl<'a> File<'a> {
         pub fn name(&self) -> Result<Option<&str>> {
-            self.0.field(1).as_scalar_string()
+            self.0.field(1).try_as_scalar_string_opt()
         }
         pub fn insertion_point(&self) -> Result<Option<&str>> {
-            self.0.field(2).as_scalar_string()
+            self.0.field(2).try_as_scalar_string_opt()
         }
         pub fn content(&self) -> Result<&str> {
             self.0
                 .field(15)
-                .as_scalar_string()
+                .try_as_scalar_string_opt()
                 .map(|opt| opt.unwrap_or(""))
         }
 
@@ -119,7 +119,7 @@ pub mod code_generator_response {
 pub struct CodeGeneratorResponse<'a>(GenericMessage<'a>);
 impl<'a> CodeGeneratorResponse<'a> {
     pub fn error(&self) -> Result<Option<&str>> {
-        self.0.field(1).as_scalar_string()
+        self.0.field(1).try_as_scalar_string_opt()
     }
     pub fn supported_features(&self) -> Result<Option<u64>> {
         self.0.scalar_variant_field::<UInt64>(2)
