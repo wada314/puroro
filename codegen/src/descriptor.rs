@@ -25,7 +25,6 @@ pub use subtypes::*;
 
 use crate::proto_path::{ProtoPath, ProtoPathBuf};
 use crate::Result;
-use ::itertools::{Either, Itertools};
 use ::std::cell::OnceCell;
 use ::std::collections::HashMap;
 use ::std::fmt::Debug;
