@@ -22,7 +22,10 @@ use crate::variant::{
     variant_types::UInt32, ReadExtVariant, Variant, VariantIntegerType, WriteExtVariant,
 };
 use crate::{ErrorKind, Result};
-use ::itertools::Either;
+use ::hashbrown::hash_map::DefaultHashBuilder;
+use ::hashbrown::HashMap as HashMap2;
+use ::itertools::{Either, EitherOrBoth};
+use ::std::alloc::{Allocator, Global};
 use ::std::borrow::Cow;
 use ::std::collections::HashMap;
 use ::std::io::{BufRead, Read, Write};
@@ -31,40 +34,6 @@ use ::std::io::{BufRead, Read, Write};
 #[derive(Clone, Debug, Default)]
 pub struct GenericMessage<'a> {
     fields: HashMap<i32, Vec<WireTypeAndPayload<'a>>>,
-}
-
-impl MessageLite for GenericMessage<'_> {
-    fn merge_from_bufread<R: BufRead>(&mut self, read: R) -> Result<()> {
-        deser_from_bufread(read, self)
-    }
-    fn write<W: Write>(&self, mut write: W) -> Result<usize> {
-        let mut total_bytes = 0;
-        for (number, wire_and_payloads) in &self.fields {
-            for wire_and_payload in wire_and_payloads {
-                let tag = (TryInto::<u32>::try_into(*number)? << 3)
-                    | Into::<u32>::into(wire_and_payload.wire_type());
-                total_bytes += write.write_variant(UInt32::into_variant(tag))?;
-                total_bytes += match wire_and_payload {
-                    WireTypeAndPayload::Variant(variant) => write.write_variant(variant.clone())?,
-                    WireTypeAndPayload::I64(buf) => {
-                        write.write_all(buf)?;
-                        4usize
-                    }
-                    WireTypeAndPayload::I32(buf) => {
-                        write.write_all(buf)?;
-                        8usize
-                    }
-                    WireTypeAndPayload::Len(ld) => {
-                        let len_len =
-                            write.write_variant(UInt32::into_variant(ld.len().try_into()?))?;
-                        write.write_all(ld)?;
-                        len_len + ld.len()
-                    }
-                };
-            }
-        }
-        Ok(total_bytes)
-    }
 }
 
 #[derive(Debug, Clone)]
@@ -138,6 +107,40 @@ impl<'a> GenericMessage<'a> {
         number: i32,
     ) -> &'this mut Vec<WireTypeAndPayload<'a>> {
         self.fields.entry(number).or_default()
+    }
+}
+
+impl MessageLite for GenericMessage<'_> {
+    fn merge_from_bufread<R: BufRead>(&mut self, read: R) -> Result<()> {
+        deser_from_bufread(read, self)
+    }
+    fn write<W: Write>(&self, mut write: W) -> Result<usize> {
+        let mut total_bytes = 0;
+        for (number, wire_and_payloads) in &self.fields {
+            for wire_and_payload in wire_and_payloads {
+                let tag = (TryInto::<u32>::try_into(*number)? << 3)
+                    | Into::<u32>::into(wire_and_payload.wire_type());
+                total_bytes += write.write_variant(UInt32::into_variant(tag))?;
+                total_bytes += match wire_and_payload {
+                    WireTypeAndPayload::Variant(variant) => write.write_variant(variant.clone())?,
+                    WireTypeAndPayload::I64(buf) => {
+                        write.write_all(buf)?;
+                        4usize
+                    }
+                    WireTypeAndPayload::I32(buf) => {
+                        write.write_all(buf)?;
+                        8usize
+                    }
+                    WireTypeAndPayload::Len(ld) => {
+                        let len_len =
+                            write.write_variant(UInt32::into_variant(ld.len().try_into()?))?;
+                        write.write_all(ld)?;
+                        len_len + ld.len()
+                    }
+                };
+            }
+        }
+        Ok(total_bytes)
     }
 }
 
@@ -390,4 +393,42 @@ impl<R: Read> DeserMessageHandlerForRead<R> for GenericMessage<'_> {
             .push(WireTypeAndPayload::Len(buf.into()));
         Ok(len)
     }
+}
+
+#[derive(Default)]
+pub struct GenericMessage2<A: Allocator = Global> {
+    fields: HashMap2<i32, Vec<WireTypeAndPayload2<A>, A>, DefaultHashBuilder, A>,
+    alloc: A,
+}
+pub enum WireTypeAndPayload2<A: Allocator = Global> {
+    Variant(Variant),
+    I64([u8; 8]),
+    I32([u8; 4]),
+    Len(Either<Vec<u8, A>, GenericMessage2<A>>),
+}
+
+impl GenericMessage2<Global> {
+    pub fn new() -> Self {
+        Self {
+            fields: HashMap2::new(),
+            alloc: Global,
+        }
+    }
+}
+impl<A: Allocator + Clone> GenericMessage2<A> {
+    pub fn new_in(alloc: A) -> Self {
+        Self {
+            fields: HashMap2::new_in(alloc.clone()),
+            alloc: alloc.clone(),
+        }
+    }
+}
+
+pub struct Field2<I: Iterator<Item = ()>> {
+    number: i32,
+    wire_and_payloads: I,
+}
+pub struct FieldMut2<'a, A: Allocator = Global> {
+    number: i32,
+    wire_and_payloads: &'a mut Vec<WireTypeAndPayload2<A>>,
 }
