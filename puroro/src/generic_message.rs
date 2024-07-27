@@ -333,7 +333,7 @@ impl<'msg, 'a> FieldMut<'msg, 'a> {
         self.wire_and_payloads
             .push(WireTypeAndPayload::Len(val.into()));
     }
-    pub fn push_message(&mut self, message: &GenericMessage<'a>) {
+    pub fn push_message(&mut self, message: &GenericMessage) {
         let mut buf = Vec::new();
         if let Ok(_) = message.write(&mut buf) {
             self.wire_and_payloads

@@ -147,13 +147,13 @@ pub mod code_generator_response {
     }
     impl FileMutTrait for GenericMessage<'_> {
         fn set_name(&mut self, name: &str) {
-            self.field_mut(1).push_string(name)
+            self.field_mut(1).set_string(name)
         }
         fn set_insertion_point(&mut self, insertion_point: &str) {
-            self.field_mut(2).push_string(insertion_point)
+            self.field_mut(2).set_string(insertion_point)
         }
         fn set_content(&mut self, content: &str) {
-            self.field_mut(15).push_string(content)
+            self.field_mut(15).set_string(content)
         }
     }
 }
@@ -211,7 +211,7 @@ impl_message_trait_for_trivial_types! {
         fn parameter(&self) -> &str;
         fn proto_file(&self) -> impl Iterator<Item = impl FileDescriptorTrait>;
         fn source_file_descriptors(&self) -> impl Iterator<Item = impl FileDescriptorTrait>;
-        fn compiler_version(&self) -> impl VersionTrait;
+        fn compiler_version(&self) -> Option<impl VersionTrait>;
     }
     pub trait CodeGeneratorResponseTrait {
         fn error(&self) -> &str;
@@ -232,7 +232,7 @@ impl_message_mut_trait_for_trivial_types! {
         fn set_parameter(&mut self, parameter: &str);
         fn push_proto_file(&mut self, proto_file: &impl FileDescriptorTrait);
         fn push_source_file_descriptor(&mut self, source_file_descriptor: &impl FileDescriptorTrait);
-        fn set_compiler_version(&mut self, compiler_version: Version);
+        fn set_compiler_version(&mut self, compiler_version: impl VersionTrait);
     }
     pub trait CodeGeneratorResponseMutTrait: CodeGeneratorResponseTrait {
         fn set_error(&mut self, error: &str);
@@ -240,5 +240,66 @@ impl_message_mut_trait_for_trivial_types! {
         fn set_minimum_edition(&mut self, edition: i32);
         fn set_maximum_edition(&mut self, edition: i32);
         fn push_file(&mut self, file: code_generator_response::File);
+    }
+}
+
+impl VersionTrait for GenericMessage<'_> {
+    fn major(&self) -> i32 {
+        self.field(1).as_scalar_variant::<Int32>(false)
+    }
+    fn minor(&self) -> i32 {
+        self.field(2).as_scalar_variant::<Int32>(false)
+    }
+    fn patch(&self) -> i32 {
+        self.field(3).as_scalar_variant::<Int32>(false)
+    }
+    fn suffix(&self) -> &str {
+        self.field(4).as_scalar_string()
+    }
+}
+impl VersionMutTrait for GenericMessage<'_> {
+    fn set_major(&mut self, major: i32) {
+        self.field_mut(1).set_variant::<Int32>(major)
+    }
+    fn set_minor(&mut self, minor: i32) {
+        self.field_mut(2).set_variant::<Int32>(minor)
+    }
+    fn set_patch(&mut self, patch: i32) {
+        self.field_mut(3).set_variant::<Int32>(patch)
+    }
+    fn set_suffix(&mut self, suffix: &str) {
+        self.field_mut(4).set_string(suffix)
+    }
+}
+
+impl CodeGeneratorRequestTrait for GenericMessage<'_> {
+    fn file_to_generate(&self) -> impl Iterator<Item = &str> {
+        self.field(1).as_repeated_string()
+    }
+    fn parameter(&self) -> &str {
+        self.field(2).as_scalar_string()
+    }
+    fn proto_file(&self) -> impl Iterator<Item = impl FileDescriptorTrait> {
+        self.field(15).as_repeated_message()
+    }
+    fn source_file_descriptors(&self) -> impl Iterator<Item = impl FileDescriptorTrait> {
+        self.field(17).as_repeated_message()
+    }
+    fn compiler_version(&self) -> Option<impl VersionTrait> {
+        self.field(3).as_scalar_message()
+    }
+}
+impl CodeGeneratorRequestMutTrait for GenericMessage<'_> {
+    fn set_parameter(&mut self, parameter: &str) {
+        self.field_mut(2).set_string(parameter)
+    }
+    fn push_proto_file(&mut self, proto_file: &GenericMessage) {
+        self.field_mut(15).push_message(proto_file)
+    }
+    fn push_source_file_descriptor(&mut self, source_file_descriptor: &GenericMessage) {
+        self.field_mut(17).push_message(source_file_descriptor)
+    }
+    fn set_compiler_version(&mut self, compiler_version: &GenericMessage) {
+        self.field_mut(3).set_message(&compiler_version)
     }
 }
