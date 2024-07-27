@@ -44,7 +44,7 @@ impl MessageLite for GenericMessage<'_> {
             for wire_and_payload in wire_and_payloads {
                 let tag = (TryInto::<u32>::try_into(*number)? << 3)
                     | Into::<u32>::into(wire_and_payload.wire_type());
-                total_bytes += write.write_variant(UInt32::try_into_variant(tag)?)?;
+                total_bytes += write.write_variant(UInt32::into_variant(tag))?;
                 total_bytes += match wire_and_payload {
                     WireTypeAndPayload::Variant(variant) => write.write_variant(variant.clone())?,
                     WireTypeAndPayload::I64(buf) => {
@@ -57,7 +57,7 @@ impl MessageLite for GenericMessage<'_> {
                     }
                     WireTypeAndPayload::Len(ld) => {
                         let len_len =
-                            write.write_variant(UInt32::try_into_variant(ld.len().try_into()?)?)?;
+                            write.write_variant(UInt32::into_variant(ld.len().try_into()?))?;
                         write.write_all(ld)?;
                         len_len + ld.len()
                     }
@@ -163,13 +163,16 @@ impl<'a> Field<'a> {
         self.number
     }
 
-    pub fn as_scalar_variant(&self, allow_packed: bool) -> Variant {
-        self.as_repeated_variant(allow_packed)
+    pub fn as_scalar_variant<T: VariantIntegerType>(&self, allow_packed: bool) -> T::RustType {
+        self.as_repeated_variant::<T>(allow_packed)
             .last()
             .unwrap_or_default()
     }
-    pub fn as_repeated_variant(&self, allow_packed: bool) -> impl 'a + Iterator<Item = Variant> {
-        self.try_as_repeated_variant(allow_packed)
+    pub fn as_repeated_variant<T: VariantIntegerType>(
+        &self,
+        allow_packed: bool,
+    ) -> impl 'a + Iterator<Item = T::RustType> {
+        self.try_as_repeated_variant::<T>(allow_packed)
             .filter_map(Result::ok)
     }
     pub fn as_scalar_i32(&self) -> [u8; 4] {
@@ -203,15 +206,18 @@ impl<'a> Field<'a> {
         self.try_as_repeated_message().filter_map(Result::ok)
     }
 
-    pub fn try_as_scalar_variant_opt(&self, allow_packed: bool) -> Result<Option<Variant>> {
-        self.try_as_repeated_variant(allow_packed)
+    pub fn try_as_scalar_variant_opt<T: VariantIntegerType>(
+        &self,
+        allow_packed: bool,
+    ) -> Result<Option<T::RustType>> {
+        self.try_as_repeated_variant::<T>(allow_packed)
             .last()
             .transpose()
     }
-    pub fn try_as_repeated_variant(
+    pub fn try_as_repeated_variant<T: VariantIntegerType>(
         &self,
         allow_packed: bool,
-    ) -> impl 'a + Iterator<Item = Result<Variant>> {
+    ) -> impl 'a + Iterator<Item = Result<T::RustType>> {
         self.wire_and_payloads
             .iter()
             .flat_map(move |record| match (allow_packed, record) {
@@ -221,6 +227,7 @@ impl<'a> Field<'a> {
                 (true, WireTypeAndPayload::Len(ld)) => Either::Right(ld.into_variant_iter()),
                 _ => Either::Left(Some(Err(ErrorKind::GenericMessageFieldTypeError)).into_iter()),
             })
+            .map(|rv| rv.and_then(T::try_from_variant))
     }
     pub fn try_as_scalar_i32_opt(&self) -> Result<Option<[u8; 4]>> {
         self.try_as_repeated_i32().last().transpose()

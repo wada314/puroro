@@ -17,12 +17,19 @@ use ::std::io::{BufRead, Read, Write};
 
 #[derive(Debug, PartialEq, Eq, Default, Copy, Clone)]
 pub struct Variant([u8; 8]);
+impl Variant {
+    pub fn try_into<T: VariantIntegerType>(self) -> Result<T::RustType> {
+        T::try_from_variant(self)
+    }
+    pub fn from<T: VariantIntegerType>(x: T::RustType) -> Self {
+        T::into_variant(x)
+    }
+}
 
-// region: Traits for variant int types of proto
 pub trait VariantIntegerType {
-    type RustType;
+    type RustType: 'static + Default;
     fn try_from_variant(var: Variant) -> Result<Self::RustType>;
-    fn try_into_variant(x: Self::RustType) -> Result<Variant>;
+    fn into_variant(x: Self::RustType) -> Variant;
 }
 
 pub mod variant_types {
@@ -44,8 +51,8 @@ impl VariantIntegerType for vt::Int32 {
         Ok(i64::try_from_variant(var)?.try_into()?)
     }
     #[inline]
-    fn try_into_variant(x: Self::RustType) -> Result<Variant> {
-        i64::try_into_variant(x.into())
+    fn into_variant(x: Self::RustType) -> Variant {
+        i64::into_variant(x.into())
     }
 }
 impl VariantIntegerType for vt::Int64 {
@@ -55,8 +62,8 @@ impl VariantIntegerType for vt::Int64 {
         Ok(i64::from_le_bytes(var.0))
     }
     #[inline]
-    fn try_into_variant(x: Self::RustType) -> Result<Variant> {
-        Ok(Variant(x.to_le_bytes()))
+    fn into_variant(x: Self::RustType) -> Variant {
+        Variant(x.to_le_bytes())
     }
 }
 impl VariantIntegerType for vt::UInt32 {
@@ -66,8 +73,8 @@ impl VariantIntegerType for vt::UInt32 {
         Ok(u64::try_from_variant(var)?.try_into()?)
     }
     #[inline]
-    fn try_into_variant(x: Self::RustType) -> Result<Variant> {
-        u64::try_into_variant(x as u64)
+    fn into_variant(x: Self::RustType) -> Variant {
+        u64::into_variant(x as u64)
     }
 }
 impl VariantIntegerType for vt::UInt64 {
@@ -77,8 +84,8 @@ impl VariantIntegerType for vt::UInt64 {
         Ok(u64::from_le_bytes(var.0))
     }
     #[inline]
-    fn try_into_variant(x: Self::RustType) -> Result<Variant> {
-        Ok(Variant(x.to_le_bytes()))
+    fn into_variant(x: Self::RustType) -> Variant {
+        Variant(x.to_le_bytes())
     }
 }
 impl VariantIntegerType for vt::Bool {
@@ -92,8 +99,8 @@ impl VariantIntegerType for vt::Bool {
         }
     }
     #[inline]
-    fn try_into_variant(x: Self::RustType) -> Result<Variant> {
-        u64::try_into_variant(x as u64)
+    fn into_variant(x: Self::RustType) -> Variant {
+        u64::into_variant(x as u64)
     }
 }
 impl VariantIntegerType for vt::SInt32 {
@@ -103,8 +110,8 @@ impl VariantIntegerType for vt::SInt32 {
         Ok(vt::SInt64::try_from_variant(var)?.try_into()?)
     }
     #[inline]
-    fn try_into_variant(x: Self::RustType) -> Result<Variant> {
-        Ok(vt::SInt64::try_into_variant(x as i64)?)
+    fn into_variant(x: Self::RustType) -> Variant {
+        vt::SInt64::into_variant(x as i64)
     }
 }
 impl VariantIntegerType for vt::SInt64 {
@@ -115,14 +122,14 @@ impl VariantIntegerType for vt::SInt64 {
         todo!()
     }
     #[inline]
-    fn try_into_variant(x: Self::RustType) -> Result<Variant> {
+    fn into_variant(x: Self::RustType) -> Variant {
         #![allow(unused)]
         todo!()
     }
 }
 impl<E> VariantIntegerType for vt::Enum<E>
 where
-    E: TryFrom<i32, Error = i32>,
+    E: 'static + TryFrom<i32, Error = i32> + Default,
     i32: From<E>,
 {
     type RustType = E;
@@ -132,14 +139,11 @@ where
             .map_err(|i| ErrorKind::TryFromIntIntoEnumError(i))?)
     }
     #[inline]
-    fn try_into_variant(e: Self::RustType) -> Result<Variant> {
-        i32::try_into_variant(e.into())
+    fn into_variant(e: Self::RustType) -> Variant {
+        i32::into_variant(e.into())
     }
 }
 
-// endregion
-
-// region: From unsigned
 // To and from unsigned integers are unique (where signed integers are not)
 impl From<u32> for Variant {
     fn from(value: u32) -> Self {
@@ -162,10 +166,6 @@ impl TryFrom<Variant> for u32 {
         Ok(Into::<u64>::into(variant).try_into()?)
     }
 }
-
-// endregion
-
-// region: Variant readers
 
 pub trait ReadExtVariant {
     fn read_variant(&mut self) -> Result<Variant>;
@@ -222,17 +222,8 @@ impl<T: Read> ReadExtVariant for T {
         }
         Ok(Some(Variant(result.to_le_bytes())))
     }
-    fn into_variant_iter(self) -> impl Iterator<Item = Result<Variant>> {
-        struct Iter<T> {
-            reader: T,
-        }
-        impl<T: Read> Iterator for Iter<T> {
-            type Item = Result<Variant>;
-            fn next(&mut self) -> Option<Self::Item> {
-                self.reader.read_variant_or_eof().transpose()
-            }
-        }
-        Iter { reader: self }
+    fn into_variant_iter(mut self) -> impl Iterator<Item = Result<Variant>> {
+        ::std::iter::from_fn(move || self.read_variant_or_eof().transpose())
     }
 }
 
@@ -330,10 +321,6 @@ impl<T: BufRead> BufReadExtVariant for T {
     }
 }
 
-// endregion:
-
-// region: Variant writers
-
 impl<T: Write> WriteExtVariant for T {
     fn write_variant(&mut self, variant: Variant) -> Result<usize> {
         let mut v = u64::from_le_bytes(variant.0);
@@ -353,8 +340,6 @@ impl<T: Write> WriteExtVariant for T {
         Ok(byte_len)
     }
 }
-
-// endregion:
 
 #[cfg(test)]
 mod test {

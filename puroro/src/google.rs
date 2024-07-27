@@ -25,10 +25,7 @@ impl GenericMessage<'_> {
     where
         T: VariantIntegerType,
     {
-        self.field(number)
-            .try_as_scalar_variant_opt(false)?
-            .map(|v| T::try_from_variant(v))
-            .transpose()
+        Ok(self.field(number).try_as_scalar_variant_opt::<T>(false)?)
     }
     fn repeated_variant_field<'a, T>(
         &'a self,
@@ -37,10 +34,7 @@ impl GenericMessage<'_> {
     where
         T: VariantIntegerType,
     {
-        self.field(number)
-            .try_as_repeated_variant(false)
-            .into_iter()
-            .map(|var| T::try_from_variant(var?))
+        self.field(number).try_as_repeated_variant::<T>(false)
     }
     fn scalar_enum2_field<T>(&self, number: i32) -> Result<Option<T>>
     where

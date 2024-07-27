@@ -265,8 +265,7 @@ mod test {
             .unwrap();
         result
             .write_variant(
-                Int32::try_into_variant(submessage_bytes.as_ref().len().try_into().unwrap())
-                    .unwrap(),
+                Int32::into_variant(submessage_bytes.as_ref().len().try_into().unwrap()).unwrap(),
             )
             .unwrap();
         result.extend_from_slice(submessage_bytes.as_ref());

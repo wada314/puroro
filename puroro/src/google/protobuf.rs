@@ -17,6 +17,7 @@ pub mod compiler;
 use crate::generic_message::GenericMessage;
 use crate::internal::impl_message_trait_for_trivial_types;
 use crate::variant::variant_types::{Bool, Int32, Int64, UInt64};
+use crate::variant::VariantIntegerType;
 use crate::{ErrorKind, Result};
 use ::derive_more::{Deref as DDeref, DerefMut as DDerefMut, From as DFrom, Into as DInto};
 
@@ -373,5 +374,14 @@ impl_message_trait_for_trivial_types! {
     pub trait EnumValueDescriptorTrait {
         fn name(&self) -> &str;
         fn number(&self) -> i32;
+    }
+}
+
+impl EnumValueDescriptorTrait for GenericMessage<'_> {
+    fn name(&self) -> &str {
+        self.field(1).as_scalar_string()
+    }
+    fn number(&self) -> i32 {
+        self.field(2).as_scalar_variant::<Int32>(false)
     }
 }
