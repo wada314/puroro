@@ -424,18 +424,15 @@ impl<A: Allocator + Clone> GenericMessage2<A> {
         }
     }
     pub fn field_mut(&mut self, number: i32) -> &mut Field2<A> {
-            self.fields
-                .entry(number)
-                .or_insert_with(|| Field2(Vec::new_in(self.alloc.clone()))),
+        self.fields
+            .entry(number)
+            .or_insert_with(|| Field2(Vec::new_in(self.alloc.clone())))
     }
 }
 impl<A: Allocator> GenericMessage2<A> {
     pub fn field(&self, number: i32) -> &Field2<A> {
-        self
-            .fields
-            .get(&number)
-            .unwrap_or(todo!())
+        self.fields.get(&number).unwrap_or(todo!())
     }
 }
 
-pub struct Field2<A: Allocator = Global>(Vec<WireTypeAndPayload2<A>>);
+pub struct Field2<A: Allocator = Global>(Vec<WireTypeAndPayload2<A>, A>);
