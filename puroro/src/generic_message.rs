@@ -422,13 +422,34 @@ impl<A: Allocator + Clone> GenericMessage2<A> {
             alloc: alloc.clone(),
         }
     }
+    pub fn field_mut(&mut self, number: i32) -> FieldMut2<'_, A> {
+        FieldMut2 {
+            number,
+            wire_and_payloads: self
+                .fields
+                .entry(number)
+                .or_insert_with(|| Vec::new_in(self.alloc.clone())),
+        }
+    }
+}
+impl<A: Allocator> GenericMessage2<A> {
+    pub fn field(&self, number: i32) -> Field2<'_, A> {
+        Field2 {
+            number,
+            wire_and_payloads: self
+                .fields
+                .get(&number)
+                .map(Vec::as_slice)
+                .unwrap_or_default(),
+        }
+    }
 }
 
-pub struct Field2<I: Iterator<Item = ()>> {
+pub struct Field2<'a, A: Allocator = Global> {
     number: i32,
-    wire_and_payloads: I,
+    wire_and_payloads: &'a [WireTypeAndPayload2<A>],
 }
 pub struct FieldMut2<'a, A: Allocator = Global> {
     number: i32,
-    wire_and_payloads: &'a mut Vec<WireTypeAndPayload2<A>>,
+    wire_and_payloads: &'a mut Vec<WireTypeAndPayload2<A>, A>,
 }
