@@ -29,6 +29,7 @@ use ::std::alloc::{Allocator, Global};
 use ::std::borrow::Cow;
 use ::std::collections::HashMap;
 use ::std::io::{BufRead, Read, Write};
+use ::std::ops::Deref;
 
 /// Assuming proto2 syntax.
 #[derive(Clone, Debug, Default)]
@@ -397,7 +398,7 @@ impl<R: Read> DeserMessageHandlerForRead<R> for GenericMessage<'_> {
 
 #[derive(Default)]
 pub struct GenericMessage2<A: Allocator = Global> {
-    fields: HashMap2<i32, Vec<WireTypeAndPayload2<A>, A>, DefaultHashBuilder, A>,
+    fields: HashMap2<i32, Field2<A>, DefaultHashBuilder, A>,
     alloc: A,
 }
 pub enum WireTypeAndPayload2<A: Allocator = Global> {
@@ -422,34 +423,19 @@ impl<A: Allocator + Clone> GenericMessage2<A> {
             alloc: alloc.clone(),
         }
     }
-    pub fn field_mut(&mut self, number: i32) -> FieldMut2<'_, A> {
-        FieldMut2 {
-            number,
-            wire_and_payloads: self
-                .fields
+    pub fn field_mut(&mut self, number: i32) -> &mut Field2<A> {
+            self.fields
                 .entry(number)
-                .or_insert_with(|| Vec::new_in(self.alloc.clone())),
-        }
+                .or_insert_with(|| Field2(Vec::new_in(self.alloc.clone()))),
     }
 }
 impl<A: Allocator> GenericMessage2<A> {
-    pub fn field(&self, number: i32) -> Field2<'_, A> {
-        Field2 {
-            number,
-            wire_and_payloads: self
-                .fields
-                .get(&number)
-                .map(Vec::as_slice)
-                .unwrap_or_default(),
-        }
+    pub fn field(&self, number: i32) -> &Field2<A> {
+        self
+            .fields
+            .get(&number)
+            .unwrap_or(todo!())
     }
 }
 
-pub struct Field2<'a, A: Allocator = Global> {
-    number: i32,
-    wire_and_payloads: &'a [WireTypeAndPayload2<A>],
-}
-pub struct FieldMut2<'a, A: Allocator = Global> {
-    number: i32,
-    wire_and_payloads: &'a mut Vec<WireTypeAndPayload2<A>, A>,
-}
+pub struct Field2<A: Allocator = Global>(Vec<WireTypeAndPayload2<A>>);
