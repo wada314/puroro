@@ -398,7 +398,7 @@ impl<R: Read> DeserMessageHandlerForRead<R> for GenericMessage<'_> {
 
 #[derive(Default)]
 pub struct GenericMessage2<A: Allocator = Global> {
-    fields: HashMap2<i32, Field2<A>, DefaultHashBuilder, A>,
+    fields: HashMap2<i32, Vec<WireTypeAndPayload2<A>, A>, DefaultHashBuilder, A>,
     alloc: A,
 }
 pub enum WireTypeAndPayload2<A: Allocator = Global> {
@@ -423,16 +423,50 @@ impl<A: Allocator + Clone> GenericMessage2<A> {
             alloc: alloc.clone(),
         }
     }
-    pub fn field_mut(&mut self, number: i32) -> &mut Field2<A> {
-        self.fields
-            .entry(number)
-            .or_insert_with(|| Field2(Vec::new_in(self.alloc.clone())))
+    pub fn field_mut(&mut self, number: i32) -> FieldMut2<A> {
+        FieldMut2(
+            self.fields
+                .entry(number)
+                .or_insert_with(|| Vec::new_in(self.alloc.clone())),
+        )
     }
 }
 impl<A: Allocator> GenericMessage2<A> {
-    pub fn field(&self, number: i32) -> &Field2<A> {
-        self.fields.get(&number).unwrap_or(todo!())
+    pub fn field(&self, number: i32) -> FieldRef2<A> {
+        FieldRef2(
+            self.fields
+                .get(&number)
+                .map(Vec::as_slice)
+                .unwrap_or_default(),
+        )
     }
 }
 
-pub struct Field2<A: Allocator = Global>(Vec<WireTypeAndPayload2<A>, A>);
+pub struct FieldRef2<'a, A: Allocator = Global>(&'a [WireTypeAndPayload2<A>]);
+pub struct FieldMut2<'a, A: Allocator = Global>(&'a mut Vec<WireTypeAndPayload2<A>, A>);
+
+impl<A: Allocator + Clone> FieldMut2<'_, A> {
+    pub fn push_variant<T: VariantIntegerType>(&mut self, val: T::RustType) {
+        self.0
+            .push(WireTypeAndPayload2::Variant(Variant::from::<T>(val)));
+    }
+    pub fn push_i32(&mut self, val: [u8; 4]) {
+        self.0.push(WireTypeAndPayload2::I32(val));
+    }
+    pub fn push_i64(&mut self, val: [u8; 8]) {
+        self.0.push(WireTypeAndPayload2::I64(val));
+    }
+    pub fn push_string(&mut self, val: &str) {
+        self.0.push(WireTypeAndPayload2::Len(Either::Left(
+            val.as_bytes().to_vec_in(self.0.allocator().clone()),
+        )));
+    }
+    pub fn push_bytes(&mut self, val: &[u8]) {
+        self.0.push(WireTypeAndPayload2::Len(Either::Left(
+            val.to_vec_in(self.0.allocator().clone()),
+        )));
+    }
+    pub fn push_message(&mut self, val: GenericMessage2<A>) {
+        self.0.push(WireTypeAndPayload2::Len(Either::Right(val)));
+    }
+}
