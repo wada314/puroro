@@ -481,7 +481,9 @@ impl<A: Allocator + Clone> MessageLite for GenericMessage2<A> {
                         write.write_all(&bytes)?;
                         len
                     }
-                    WireTypeAndPayload2::Len(Either::Right(message)) => message.write(write)?,
+                    WireTypeAndPayload2::Len(Either::Right(message)) => {
+                        message.write(&mut write)?
+                    }
                 };
             }
         }
