@@ -407,6 +407,16 @@ pub enum WireTypeAndPayload2<A: Allocator = Global> {
     I32([u8; 4]),
     Len(Either<Vec<u8, A>, GenericMessage2<A>>),
 }
+impl<A: Allocator> WireTypeAndPayload2<A> {
+    pub fn wire_type(&self) -> WireType {
+        match self {
+            WireTypeAndPayload2::Variant(_) => WireType::Variant,
+            WireTypeAndPayload2::I64(_) => WireType::I64,
+            WireTypeAndPayload2::I32(_) => WireType::I32,
+            WireTypeAndPayload2::Len(_) => WireType::Len,
+        }
+    }
+}
 
 impl GenericMessage2<Global> {
     pub fn new() -> Self {
@@ -442,10 +452,90 @@ impl<A: Allocator> GenericMessage2<A> {
     }
 }
 
+impl<A: Allocator + Clone> MessageLite for GenericMessage2<A> {
+    fn merge_from_bufread<R: BufRead>(&mut self, read: R) -> Result<()> {
+        deser_from_bufread(read, self)
+    }
+
+    fn write<W: Write>(&self, mut write: W) -> Result<usize> {
+        let mut total_bytes = 0;
+        for (number, wire_and_payloads) in &self.fields {
+            for wire_and_payload in wire_and_payloads {
+                let tag = (TryInto::<u32>::try_into(*number)? << 3)
+                    | Into::<u32>::into(wire_and_payload.wire_type());
+                total_bytes += write.write_variant(UInt32::into_variant(tag))?;
+                total_bytes += match wire_and_payload {
+                    WireTypeAndPayload2::Variant(variant) => {
+                        write.write_variant(variant.clone())?
+                    }
+                    WireTypeAndPayload2::I64(buf) => {
+                        write.write_all(buf)?;
+                        4usize
+                    }
+                    WireTypeAndPayload2::I32(buf) => {
+                        write.write_all(buf)?;
+                        8usize
+                    }
+                    WireTypeAndPayload2::Len(Either::Left(bytes)) => {
+                        let len = bytes.len();
+                        write.write_all(&bytes)?;
+                        len
+                    }
+                    WireTypeAndPayload2::Len(Either::Right(message)) => message.write(write)?,
+                };
+            }
+        }
+        Ok(total_bytes)
+    }
+}
+
+impl<A: Allocator + Clone> DeserMessageHandlerBase for GenericMessage2<A> {
+    fn parse_variant(&mut self, num: i32, var: Variant) -> Result<()> {
+        self.field_mut(num)
+            .0
+            .push(WireTypeAndPayload2::Variant(var));
+        Ok(())
+    }
+    fn parse_i32(&mut self, num: i32, val: [u8; 4]) -> Result<()> {
+        self.field_mut(num).push_i32(val);
+        Ok(())
+    }
+    fn parse_i64(&mut self, num: i32, val: [u8; 8]) -> Result<()> {
+        self.field_mut(num).push_i64(val);
+        Ok(())
+    }
+    fn is_message_field(&self, _num: i32) -> bool {
+        false
+    }
+    fn start_message(&mut self, _num: i32) -> Result<()> {
+        // Every message fields are deserialized as a bytes initially,
+        // and then might be deserialized on demand.
+        unreachable!()
+    }
+    fn end_message(&mut self) -> Result<()> {
+        unreachable!()
+    }
+}
+impl<A: Allocator + Clone, R: Read> DeserMessageHandlerForRead<R> for GenericMessage2<A> {
+    fn parse_len(&mut self, num: i32, read: &mut R) -> Result<usize> {
+        let alloc = self.alloc.clone();
+        // Facepalm
+        let mut buf = Vec::new();
+        let len = read.read_to_end(&mut buf)?;
+        self.field_mut(num)
+            .0
+            .push(WireTypeAndPayload2::Len(Either::Left(buf.to_vec_in(alloc))));
+        Ok(len)
+    }
+}
+
 pub struct FieldRef2<'a, A: Allocator = Global>(&'a [WireTypeAndPayload2<A>]);
 pub struct FieldMut2<'a, A: Allocator = Global>(&'a mut Vec<WireTypeAndPayload2<A>, A>);
 
 impl<A: Allocator + Clone> FieldMut2<'_, A> {
+    pub fn clear(&mut self) {
+        self.0.clear();
+    }
     pub fn push_variant<T: VariantIntegerType>(&mut self, val: T::RustType) {
         self.0
             .push(WireTypeAndPayload2::Variant(Variant::from::<T>(val)));
