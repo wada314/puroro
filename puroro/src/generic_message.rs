@@ -408,7 +408,7 @@ pub enum WireTypeAndPayload2<A: Allocator = Global> {
     Len(Either<Vec<u8, A>, GenericMessage2<A>>),
 }
 impl<A: Allocator> WireTypeAndPayload2<A> {
-    pub fn wire_type(&self) -> WireType {
+    pub(crate) fn wire_type(&self) -> WireType {
         match self {
             WireTypeAndPayload2::Variant(_) => WireType::Variant,
             WireTypeAndPayload2::I64(_) => WireType::I64,
@@ -533,6 +533,132 @@ impl<A: Allocator + Clone, R: Read> DeserMessageHandlerForRead<R> for GenericMes
 
 pub struct FieldRef2<'a, A: Allocator = Global>(&'a [WireTypeAndPayload2<A>]);
 pub struct FieldMut2<'a, A: Allocator = Global>(&'a mut Vec<WireTypeAndPayload2<A>, A>);
+
+impl<'a, A: Allocator> FieldRef2<'a, A> {
+    pub fn as_scalar_variant<T: VariantIntegerType>(&self, allow_packed: bool) -> T::RustType {
+        self.as_repeated_variant::<T>(allow_packed)
+            .last()
+            .unwrap_or_default()
+    }
+    pub fn as_repeated_variant<T: VariantIntegerType>(
+        &self,
+        allow_packed: bool,
+    ) -> impl 'a + Iterator<Item = T::RustType> {
+        self.try_as_repeated_variant::<T>(allow_packed)
+            .filter_map(Result::ok)
+    }
+    pub fn as_scalar_i32(&self) -> [u8; 4] {
+        self.as_repeated_i32().last().unwrap_or_default()
+    }
+    pub fn as_repeated_i32(&self) -> impl 'a + Iterator<Item = [u8; 4]> {
+        self.try_as_repeated_i32().filter_map(Result::ok)
+    }
+    pub fn as_scalar_i64(&self) -> [u8; 8] {
+        self.as_repeated_i64().last().unwrap_or_default()
+    }
+    pub fn as_repeated_i64(&self) -> impl 'a + Iterator<Item = [u8; 8]> {
+        self.try_as_repeated_i64().filter_map(Result::ok)
+    }
+    pub fn as_scalar_string(&self) -> Cow<'a, str> {
+        self.as_repeated_string().last().unwrap_or_default()
+    }
+    pub fn as_repeated_string(&self) -> impl 'a + Iterator<Item = Cow<'a, str>> {
+        self.try_as_repeated_string().filter_map(Result::ok)
+    }
+    pub fn as_scalar_bytes(&self) -> Cow<'a, [u8]> {
+        self.as_repeated_bytes().last().unwrap_or_default()
+    }
+    pub fn as_repeated_bytes(&self) -> impl 'a + Iterator<Item = Cow<'a, [u8]>> {
+        self.try_as_repeated_bytes().filter_map(Result::ok)
+    }
+    pub fn as_scalar_message(&self) -> Option<GenericMessage2<A>> {
+        self.as_repeated_message().last()
+    }
+    pub fn as_repeated_message(&self) -> impl 'a + Iterator<Item = GenericMessage2<A>> {
+        self.try_as_repeated_message().filter_map(Result::ok)
+    }
+    pub fn try_as_scalar_variant_opt<T: VariantIntegerType>(
+        &self,
+        allow_packed: bool,
+    ) -> Result<Option<T::RustType>> {
+        self.try_as_repeated_variant::<T>(allow_packed)
+            .last()
+            .transpose()
+    }
+    pub fn try_as_repeated_variant<T: VariantIntegerType>(
+        &self,
+        allow_packed: bool,
+    ) -> impl 'a + Iterator<Item = Result<T::RustType>> {
+        self.0.iter().flat_map(move |record| match (allow_packed, record) {
+            (_, WireTypeAndPayload2::Variant(variant)) => {
+                Either::Left(Some(Ok(variant.clone())).into_iter())
+            }
+            (true, WireTypeAndPayload2::Len(ld)) => Either::Right(ld.as_variant_iter()),
+            _ => Either::Left(Some(Err(ErrorKind::GenericMessageFieldTypeError)).into_iter()),
+        })
+        .map(|rv| rv.and_then(T::try_from_variant))
+    }
+    pub fn try_as_scalar_i32_opt(&self) -> Result<Option<[u8; 4]>> {
+        self.try_as_repeated_i32().last().transpose()
+    }
+    pub fn try_as_repeated_i32(&self) -> impl 'a + Iterator<Item = Result<[u8; 4]>> {
+        self.0.iter().map(|record| match record {
+            WireTypeAndPayload2::I32(buf) => Ok(*buf),
+            _ => Err(ErrorKind::GenericMessageFieldTypeError),
+        })
+    }
+    pub fn try_as_scalar_i64_opt(&self) -> Result<Option<[u8; 8]>> {
+        self.try_as_repeated_i64().last().transpose()
+    }
+    pub fn try_as_repeated_i64(&self) -> impl 'a + Iterator<Item = Result<[u8; 8]>> {
+        self.0.iter().map(|record| match record {
+            WireTypeAndPayload2::I64(buf) => Ok(*buf),
+            _ => Err(ErrorKind::GenericMessageFieldTypeError),
+        })
+    }
+    pub fn try_as_scalar_string_opt(&self) -> Result<Option<Cow<'a, str>> {
+        self.try_as_repeated_string().last().transpose()
+    }
+    pub fn try_as_repeated_string(&self) -> impl 'a + Iterator<Item = Result<Cow<'a, str>>> {
+        self.0.iter().map(|record| match record {
+            WireTypeAndPayload2::Len(ld) => {
+                ::std::str::from_utf8(&ld).map(Cow::Borrowed).map_err(|_| {
+                    ErrorKind::GenericMessageFieldTypeError
+                })
+            }
+            _ => Err(ErrorKind::GenericMessageFieldTypeError),
+        })
+    }
+    pub fn try_as_scalar_bytes_opt(&self) -> Result<Option<Cow<'a, [u8]>> {
+        self.try_as_repeated_bytes().last().transpose()
+    }
+    pub fn try_as_repeated_bytes(&self) -> impl 'a + Iterator<Item = Result<Cow<'a, [u8]>> {
+        self.0.iter().map(|record| match record {
+            WireTypeAndPayload2::Len(ld) => Ok(Cow::Borrowed(ld)),
+            _ => Err(ErrorKind::GenericMessageFieldTypeError),
+        })
+    }
+    pub fn try_as_scalar_message(&self) -> Result<Option<GenericMessage2<A>>> {
+        let mut message_opt: Option<GenericMessage2<A>> = None;
+        for wire_and_payload in self.0 {
+            let WireTypeAndPayload2::Len(buf) = wire_and_payload else {
+                Err(ErrorKind::GenericMessageFieldTypeError)?
+            };
+            message_opt
+                .get_or_insert_with(|| GenericMessage2::new_in(buf.alloc().clone()))
+                .merge_from_buffer(buf.as_ref())?;
+        }
+        Ok(message_opt)
+    }
+    pub fn try_as_repeated_message(&self) -> impl 'a + Iterator<Item = Result<GenericMessage2<A>>> {
+        self.0.iter().map(|wire_and_payload| {
+            let WireTypeAndPayload2::Len(buf) = wire_and_payload else {
+                Err(ErrorKind::GenericMessageFieldTypeError)?
+            };
+            GenericMessage2::from_buffer(buf.as_ref())
+        })
+    }
+}
 
 impl<A: Allocator + Clone> FieldMut2<'_, A> {
     pub fn clear(&mut self) {
