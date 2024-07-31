@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use ::std::cell::OnceCell;
 use crate::internal::deser::record::{Payload, Record};
 use crate::internal::deser::{
     deser_from_bufread, DeserMessageHandlerBase, DeserMessageHandlerForRead,
@@ -24,12 +25,10 @@ use crate::variant::{
 use crate::{ErrorKind, Result};
 use ::hashbrown::hash_map::DefaultHashBuilder;
 use ::hashbrown::HashMap as HashMap2;
-use ::itertools::{Either, EitherOrBoth};
 use ::std::alloc::{Allocator, Global};
 use ::std::borrow::Cow;
 use ::std::collections::HashMap;
 use ::std::io::{BufRead, Read, Write};
-use ::std::ops::Deref;
 
 /// Assuming proto2 syntax.
 #[derive(Clone, Debug, Default)]
@@ -405,7 +404,11 @@ pub enum WireTypeAndPayload2<A: Allocator = Global> {
     Variant(Variant),
     I64([u8; 8]),
     I32([u8; 4]),
-    Len(Either<Vec<u8, A>, GenericMessage2<A>>),
+    Len(InnerMutableBytesOrMsg<A>),
+}
+pub struct InnerMutableBytesOrMsg<A: Allocator> {
+    bytes_cell: OnceCell<Vec<u8, A>>,
+    msg_cell: OnceCell<GenericMessage2<A>>,
 }
 impl<A: Allocator> WireTypeAndPayload2<A> {
     pub(crate) fn wire_type(&self) -> WireType {
@@ -476,13 +479,12 @@ impl<A: Allocator + Clone> MessageLite for GenericMessage2<A> {
                         write.write_all(buf)?;
                         8usize
                     }
-                    WireTypeAndPayload2::Len(Either::Left(bytes)) => {
+                    WireTypeAndPayload2::Len(bytes_or_msg) => {
+                        // If bytes buffer is vacant, generate it from msg.
+                        let bytes = bytes_or_msg.as_bytes()?;
                         let len = bytes.len();
-                        write.write_all(&bytes)?;
+                        write.write_all(bytes)?;
                         len
-                    }
-                    WireTypeAndPayload2::Len(Either::Right(message)) => {
-                        message.write(&mut write)?
                     }
                 };
             }
@@ -528,6 +530,50 @@ impl<A: Allocator + Clone, R: Read> DeserMessageHandlerForRead<R> for GenericMes
             .0
             .push(WireTypeAndPayload2::Len(Either::Left(buf.to_vec_in(alloc))));
         Ok(len)
+    }
+}
+
+impl<A: Allocator + Clone> InnerMutableBytesOrMsg<A> {
+    pub fn as_bytes(&self) -> Result<&[u8]> {
+        let v = self.bytes_cell.get_or_try_init(|| -> Result<_> {
+                            let Some(msg) = self.msg_cell.get() else {
+                                unreachable!("either bytes_cell or msg_cell must be initialized");
+                            };
+                            let mut buf = Vec::new_in(msg.alloc.clone());
+                            msg.write(&mut buf)?;
+                            Ok(buf)
+                        })?;
+        Ok(v)
+    }
+    pub fn as_msg(&self) -> Result<&GenericMessage2<A>> {
+        self.msg_cell.get_or_try_init(|| -> Result<_> {
+            let Some(bytes) = self.bytes_cell.get() else {
+                unreachable!("either bytes_cell or msg_cell must be initialized");
+            };
+            let mut msg = GenericMessage2::new_in(bytes.allocator().clone());
+            msg.merge_from_read(&mut bytes.as_slice())?;
+            Ok(msg)
+        })
+    }
+    pub fn as_bytes_mut(&mut self) -> Result<&mut Vec<u8, A>> {
+        // Make sure the bytes_cell is initialized.
+        self.as_bytes()?;
+        // Dispose msg_cell.
+        self.msg_cell.take();
+        let Some(mut_bytes) = self.bytes_cell.get_mut() else {
+            unreachable!("bytes_cell must be already initialized in as_bytes() call");
+        };
+        Ok(mut_bytes)
+    }
+    pub fn as_msg_mut(&mut self) -> Result<&mut GenericMessage2<A>> {
+        // Make sure the msg_cell is initialized.
+        self.as_msg()?;
+        // Dispose bytes_cell.
+        self.bytes_cell.take();
+        let Some(mut_msg) = self.msg_cell.get_mut() else {
+            unreachable!("msg_cell must be already initialized in as_msg() call");
+        };
+        Ok(mut_msg)
     }
 }
 
