@@ -598,7 +598,7 @@ impl<A: Allocator + Clone> InnerMutableBytesOrMsg<A> {
 pub struct FieldRef2<'a, A: Allocator = Global>(&'a [WireTypeAndPayload2<A>]);
 pub struct FieldMut2<'a, A: Allocator = Global>(&'a mut Vec<WireTypeAndPayload2<A>, A>);
 
-impl<'a, A: Allocator> FieldRef2<'a, A> {
+impl<'a, A: Allocator + Clone> FieldRef2<'a, A> {
     pub fn as_scalar_variant<T: VariantIntegerType>(&self, allow_packed: bool) -> T::RustType {
         self.as_repeated_variant::<T>(allow_packed)
             .last()
@@ -659,7 +659,9 @@ impl<'a, A: Allocator> FieldRef2<'a, A> {
                 (_, WireTypeAndPayload2::Variant(variant)) => {
                     Either::Left(Some(Ok(variant.clone())).into_iter())
                 }
-                (true, WireTypeAndPayload2::Len(ld)) => Either::Right(ld.as_variant_iter()),
+                (true, WireTypeAndPayload2::Len(bytes_or_msg)) => {
+                    Either::Right(bytes_or_msg.as_bytes()?.into_variant_iter())
+                }
                 _ => Either::Left(Some(Err(ErrorKind::GenericMessageFieldTypeError)).into_iter()),
             })
             .map(|rv| rv.and_then(T::try_from_variant))
@@ -687,9 +689,9 @@ impl<'a, A: Allocator> FieldRef2<'a, A> {
     }
     pub fn try_as_repeated_string(&self) -> impl 'a + Iterator<Item = Result<&'a str>> {
         self.0.iter().map(|record| match record {
-            WireTypeAndPayload2::Len(ld) => ::std::str::from_utf8(&ld)
-                .map(Cow::Borrowed)
-                .map_err(|_| ErrorKind::GenericMessageFieldTypeError),
+            WireTypeAndPayload2::Len(bytes_or_msg) => bytes_or_msg
+                .as_bytes()?
+                .map(|bytes| ::std::str::from_utf8(bytes)),
             _ => Err(ErrorKind::GenericMessageFieldTypeError),
         })
     }
