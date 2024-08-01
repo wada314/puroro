@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use ::std::cell::OnceCell;
 use crate::internal::deser::record::{Payload, Record};
 use crate::internal::deser::{
     deser_from_bufread, DeserMessageHandlerBase, DeserMessageHandlerForRead,
@@ -25,8 +24,10 @@ use crate::variant::{
 use crate::{ErrorKind, Result};
 use ::hashbrown::hash_map::DefaultHashBuilder;
 use ::hashbrown::HashMap as HashMap2;
+use ::itertools::Either;
 use ::std::alloc::{Allocator, Global};
 use ::std::borrow::Cow;
+use ::std::cell::OnceCell;
 use ::std::collections::HashMap;
 use ::std::io::{BufRead, Read, Write};
 
@@ -526,23 +527,40 @@ impl<A: Allocator + Clone, R: Read> DeserMessageHandlerForRead<R> for GenericMes
         // Facepalm
         let mut buf = Vec::new();
         let len = read.read_to_end(&mut buf)?;
-        self.field_mut(num)
-            .0
-            .push(WireTypeAndPayload2::Len(Either::Left(buf.to_vec_in(alloc))));
+        self.field_mut(num).0.push(WireTypeAndPayload2::Len(
+            InnerMutableBytesOrMsg::from_bytes(buf.as_slice().to_vec_in(alloc)),
+        ));
         Ok(len)
     }
 }
 
 impl<A: Allocator + Clone> InnerMutableBytesOrMsg<A> {
+    pub fn from_bytes(bytes: Vec<u8, A>) -> Self {
+        let s = Self {
+            bytes_cell: OnceCell::new(),
+            msg_cell: OnceCell::new(),
+        };
+        s.bytes_cell.set(bytes);
+        s
+    }
+    pub fn from_msg(msg: GenericMessage2<A>) -> Self {
+        let s = Self {
+            bytes_cell: OnceCell::new(),
+            msg_cell: OnceCell::new(),
+        };
+        s.msg_cell.set(msg);
+        s
+    }
+
     pub fn as_bytes(&self) -> Result<&[u8]> {
         let v = self.bytes_cell.get_or_try_init(|| -> Result<_> {
-                            let Some(msg) = self.msg_cell.get() else {
-                                unreachable!("either bytes_cell or msg_cell must be initialized");
-                            };
-                            let mut buf = Vec::new_in(msg.alloc.clone());
-                            msg.write(&mut buf)?;
-                            Ok(buf)
-                        })?;
+            let Some(msg) = self.msg_cell.get() else {
+                unreachable!("either bytes_cell or msg_cell must be initialized");
+            };
+            let mut buf = Vec::new_in(msg.alloc.clone());
+            msg.write(&mut buf)?;
+            Ok(buf)
+        })?;
         Ok(v)
     }
     pub fn as_msg(&self) -> Result<&GenericMessage2<A>> {
@@ -605,22 +623,22 @@ impl<'a, A: Allocator> FieldRef2<'a, A> {
     pub fn as_repeated_i64(&self) -> impl 'a + Iterator<Item = [u8; 8]> {
         self.try_as_repeated_i64().filter_map(Result::ok)
     }
-    pub fn as_scalar_string(&self) -> Cow<'a, str> {
+    pub fn as_scalar_string(&self) -> &'a str {
         self.as_repeated_string().last().unwrap_or_default()
     }
-    pub fn as_repeated_string(&self) -> impl 'a + Iterator<Item = Cow<'a, str>> {
+    pub fn as_repeated_string(&self) -> impl 'a + Iterator<Item = &'a str> {
         self.try_as_repeated_string().filter_map(Result::ok)
     }
-    pub fn as_scalar_bytes(&self) -> Cow<'a, [u8]> {
+    pub fn as_scalar_bytes(&self) -> &'a [u8] {
         self.as_repeated_bytes().last().unwrap_or_default()
     }
-    pub fn as_repeated_bytes(&self) -> impl 'a + Iterator<Item = Cow<'a, [u8]>> {
+    pub fn as_repeated_bytes(&self) -> impl 'a + Iterator<Item = &'a [u8]> {
         self.try_as_repeated_bytes().filter_map(Result::ok)
     }
-    pub fn as_scalar_message(&self) -> Option<GenericMessage2<A>> {
+    pub fn as_scalar_message(&self) -> Option<&'a GenericMessage2<A>> {
         self.as_repeated_message().last()
     }
-    pub fn as_repeated_message(&self) -> impl 'a + Iterator<Item = GenericMessage2<A>> {
+    pub fn as_repeated_message(&self) -> impl 'a + Iterator<Item = &'a GenericMessage2<A>> {
         self.try_as_repeated_message().filter_map(Result::ok)
     }
     pub fn try_as_scalar_variant_opt<T: VariantIntegerType>(
@@ -635,14 +653,16 @@ impl<'a, A: Allocator> FieldRef2<'a, A> {
         &self,
         allow_packed: bool,
     ) -> impl 'a + Iterator<Item = Result<T::RustType>> {
-        self.0.iter().flat_map(move |record| match (allow_packed, record) {
-            (_, WireTypeAndPayload2::Variant(variant)) => {
-                Either::Left(Some(Ok(variant.clone())).into_iter())
-            }
-            (true, WireTypeAndPayload2::Len(ld)) => Either::Right(ld.as_variant_iter()),
-            _ => Either::Left(Some(Err(ErrorKind::GenericMessageFieldTypeError)).into_iter()),
-        })
-        .map(|rv| rv.and_then(T::try_from_variant))
+        self.0
+            .iter()
+            .flat_map(move |record| match (allow_packed, record) {
+                (_, WireTypeAndPayload2::Variant(variant)) => {
+                    Either::Left(Some(Ok(variant.clone())).into_iter())
+                }
+                (true, WireTypeAndPayload2::Len(ld)) => Either::Right(ld.as_variant_iter()),
+                _ => Either::Left(Some(Err(ErrorKind::GenericMessageFieldTypeError)).into_iter()),
+            })
+            .map(|rv| rv.and_then(T::try_from_variant))
     }
     pub fn try_as_scalar_i32_opt(&self) -> Result<Option<[u8; 4]>> {
         self.try_as_repeated_i32().last().transpose()
@@ -662,29 +682,27 @@ impl<'a, A: Allocator> FieldRef2<'a, A> {
             _ => Err(ErrorKind::GenericMessageFieldTypeError),
         })
     }
-    pub fn try_as_scalar_string_opt(&self) -> Result<Option<Cow<'a, str>> {
+    pub fn try_as_scalar_string_opt(&self) -> Result<Option<&'a str>> {
         self.try_as_repeated_string().last().transpose()
     }
-    pub fn try_as_repeated_string(&self) -> impl 'a + Iterator<Item = Result<Cow<'a, str>>> {
+    pub fn try_as_repeated_string(&self) -> impl 'a + Iterator<Item = Result<&'a str>> {
         self.0.iter().map(|record| match record {
-            WireTypeAndPayload2::Len(ld) => {
-                ::std::str::from_utf8(&ld).map(Cow::Borrowed).map_err(|_| {
-                    ErrorKind::GenericMessageFieldTypeError
-                })
-            }
+            WireTypeAndPayload2::Len(ld) => ::std::str::from_utf8(&ld)
+                .map(Cow::Borrowed)
+                .map_err(|_| ErrorKind::GenericMessageFieldTypeError),
             _ => Err(ErrorKind::GenericMessageFieldTypeError),
         })
     }
-    pub fn try_as_scalar_bytes_opt(&self) -> Result<Option<Cow<'a, [u8]>> {
+    pub fn try_as_scalar_bytes_opt(&self) -> Result<Option<&'a [u8]>> {
         self.try_as_repeated_bytes().last().transpose()
     }
-    pub fn try_as_repeated_bytes(&self) -> impl 'a + Iterator<Item = Result<Cow<'a, [u8]>> {
+    pub fn try_as_repeated_bytes(&self) -> impl 'a + Iterator<Item = Result<&'a [u8]>> {
         self.0.iter().map(|record| match record {
             WireTypeAndPayload2::Len(ld) => Ok(Cow::Borrowed(ld)),
             _ => Err(ErrorKind::GenericMessageFieldTypeError),
         })
     }
-    pub fn try_as_scalar_message(&self) -> Result<Option<GenericMessage2<A>>> {
+    pub fn try_as_scalar_message(&self) -> Result<Option<&'a GenericMessage2<A>>> {
         let mut message_opt: Option<GenericMessage2<A>> = None;
         for wire_and_payload in self.0 {
             let WireTypeAndPayload2::Len(buf) = wire_and_payload else {
@@ -696,7 +714,7 @@ impl<'a, A: Allocator> FieldRef2<'a, A> {
         }
         Ok(message_opt)
     }
-    pub fn try_as_repeated_message(&self) -> impl 'a + Iterator<Item = Result<GenericMessage2<A>>> {
+    pub fn try_as_repeated_message(&self) -> impl Iterator<Item = Result<&'a GenericMessage2<A>>> {
         self.0.iter().map(|wire_and_payload| {
             let WireTypeAndPayload2::Len(buf) = wire_and_payload else {
                 Err(ErrorKind::GenericMessageFieldTypeError)?
@@ -721,16 +739,21 @@ impl<A: Allocator + Clone> FieldMut2<'_, A> {
         self.0.push(WireTypeAndPayload2::I64(val));
     }
     pub fn push_string(&mut self, val: &str) {
-        self.0.push(WireTypeAndPayload2::Len(Either::Left(
-            val.as_bytes().to_vec_in(self.0.allocator().clone()),
-        )));
+        self.0.push(WireTypeAndPayload2::Len(
+            InnerMutableBytesOrMsg::from_bytes(
+                val.as_bytes().to_vec_in(self.0.allocator().clone()),
+            ),
+        ));
     }
     pub fn push_bytes(&mut self, val: &[u8]) {
-        self.0.push(WireTypeAndPayload2::Len(Either::Left(
-            val.to_vec_in(self.0.allocator().clone()),
-        )));
+        self.0.push(WireTypeAndPayload2::Len(
+            InnerMutableBytesOrMsg::from_bytes(val.to_vec_in(self.0.allocator().clone())),
+        ));
     }
     pub fn push_message(&mut self, val: GenericMessage2<A>) {
-        self.0.push(WireTypeAndPayload2::Len(Either::Right(val)));
+        self.0
+            .push(WireTypeAndPayload2::Len(InnerMutableBytesOrMsg::from_msg(
+                val,
+            )));
     }
 }
