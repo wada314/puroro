@@ -18,11 +18,11 @@
 #![feature(once_cell_try)]
 
 pub mod editions;
+pub mod generic_message;
 pub mod google;
 pub mod internal;
 pub mod message;
 pub mod string;
-pub mod generic_message;
 pub mod variant;
 
 use ::thiserror::Error;
@@ -35,6 +35,8 @@ pub enum ErrorKind {
     IoError(#[from] ::std::io::Error),
     #[error("std::num::TryFromIntError: {0}")]
     StdTryFromIntError(#[from] ::std::num::TryFromIntError),
+    #[error("std::str::Utf8Error: {0}")]
+    Utf8Error(#[from] ::std::str::Utf8Error),
     #[error("puroro error: {0}")]
     PuroroError(String),
     #[error("integer to boolean conversion error")]

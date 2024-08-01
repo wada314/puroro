@@ -22,13 +22,14 @@ use crate::variant::{
     variant_types::UInt32, ReadExtVariant, Variant, VariantIntegerType, WriteExtVariant,
 };
 use crate::{ErrorKind, Result};
-use ::hashbrown::hash_map::DefaultHashBuilder;
+use ::hashbrown::hash_map::{DefaultHashBuilder, Entry};
 use ::hashbrown::HashMap as HashMap2;
 use ::itertools::Either;
 use ::std::alloc::{Allocator, Global};
 use ::std::borrow::Cow;
 use ::std::cell::OnceCell;
 use ::std::collections::HashMap;
+use ::std::fmt::Debug;
 use ::std::io::{BufRead, Read, Write};
 
 /// Assuming proto2 syntax.
@@ -396,17 +397,19 @@ impl<R: Read> DeserMessageHandlerForRead<R> for GenericMessage<'_> {
     }
 }
 
-#[derive(Default)]
+#[derive(Default, Clone)]
 pub struct GenericMessage2<A: Allocator = Global> {
     fields: HashMap2<i32, Vec<WireTypeAndPayload2<A>, A>, DefaultHashBuilder, A>,
     alloc: A,
 }
+#[derive(Clone)]
 pub enum WireTypeAndPayload2<A: Allocator = Global> {
     Variant(Variant),
     I64([u8; 8]),
     I32([u8; 4]),
     Len(InnerMutableBytesOrMsg<A>),
 }
+#[derive(Clone)]
 pub struct InnerMutableBytesOrMsg<A: Allocator> {
     bytes_cell: OnceCell<Vec<u8, A>>,
     msg_cell: OnceCell<GenericMessage2<A>>,
@@ -453,6 +456,45 @@ impl<A: Allocator> GenericMessage2<A> {
                 .map(Vec::as_slice)
                 .unwrap_or_default(),
         )
+    }
+    pub fn merge(&mut self, other: Self) {
+        for (number, wire_and_payloads) in other.fields {
+            match self.fields.entry(number) {
+                Entry::Occupied(mut entry) => {
+                    entry.get_mut().extend(wire_and_payloads);
+                }
+                Entry::Vacant(entry) => {
+                    entry.insert(wire_and_payloads);
+                }
+            }
+        }
+    }
+}
+impl<A: Allocator> Debug for GenericMessage2<A> {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        let mut ds = f.debug_struct("GenericMessage2");
+        for (number, wire_and_payloads) in &self.fields {
+            ds.field(&format!("field{}", number), &wire_and_payloads.as_slice());
+        }
+        ds.finish()
+    }
+}
+impl<A: Allocator> Debug for WireTypeAndPayload2<A> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        match self {
+            Self::Variant(arg0) => f.debug_tuple("Variant").field(arg0).finish(),
+            Self::I64(arg0) => f.debug_tuple("I64").field(arg0).finish(),
+            Self::I32(arg0) => f.debug_tuple("I32").field(arg0).finish(),
+            Self::Len(arg0) => f.debug_tuple("Len").field(arg0).finish(),
+        }
+    }
+}
+impl<A: Allocator> Debug for InnerMutableBytesOrMsg<A> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        f.debug_struct("InnerMutableBytesOrMsg")
+            .field("bytes_cell", &self.bytes_cell)
+            .field("msg_cell", &self.msg_cell)
+            .finish()
     }
 }
 
@@ -540,7 +582,7 @@ impl<A: Allocator + Clone> InnerMutableBytesOrMsg<A> {
             bytes_cell: OnceCell::new(),
             msg_cell: OnceCell::new(),
         };
-        s.bytes_cell.set(bytes);
+        s.bytes_cell.set(bytes).expect("This is the first time set");
         s
     }
     pub fn from_msg(msg: GenericMessage2<A>) -> Self {
@@ -548,7 +590,7 @@ impl<A: Allocator + Clone> InnerMutableBytesOrMsg<A> {
             bytes_cell: OnceCell::new(),
             msg_cell: OnceCell::new(),
         };
-        s.msg_cell.set(msg);
+        s.msg_cell.set(msg).expect("This is the first time set");
         s
     }
 
@@ -690,9 +732,9 @@ impl<'a, A: Allocator + Clone> FieldRef2<'a, A> {
     }
     pub fn try_as_repeated_string(&self) -> impl 'a + Iterator<Item = Result<&'a str>> {
         self.0.iter().map(|record| match record {
-            WireTypeAndPayload2::Len(bytes_or_msg) => bytes_or_msg
-                .as_bytes()?
-                .map(|bytes| ::std::str::from_utf8(bytes)),
+            WireTypeAndPayload2::Len(bytes_or_msg) => {
+                Ok(::std::str::from_utf8(bytes_or_msg.as_bytes()?)?)
+            }
             _ => Err(ErrorKind::GenericMessageFieldTypeError),
         })
     }
@@ -714,16 +756,16 @@ impl<'a, A: Allocator + Clone> FieldRef2<'a, A> {
             let msg = bytes_or_msg.as_msg()?;
             message_opt
                 .get_or_insert_with(|| GenericMessage2::new_in(msg.alloc.clone()))
-                .merge()?;
+                .merge(msg.clone());
         }
         Ok(message_opt)
     }
     pub fn try_as_repeated_message(&self) -> impl Iterator<Item = Result<&'a GenericMessage2<A>>> {
         self.0.iter().map(|wire_and_payload| {
-            let WireTypeAndPayload2::Len(buf) = wire_and_payload else {
+            let WireTypeAndPayload2::Len(bytes_or_msg) = wire_and_payload else {
                 Err(ErrorKind::GenericMessageFieldTypeError)?
             };
-            GenericMessage2::from_buffer(buf.as_ref())
+            Ok(bytes_or_msg.as_msg()?)
         })
     }
 }
