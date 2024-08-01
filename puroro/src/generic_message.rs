@@ -659,9 +659,10 @@ impl<'a, A: Allocator + Clone> FieldRef2<'a, A> {
                 (_, WireTypeAndPayload2::Variant(variant)) => {
                     Either::Left(Some(Ok(variant.clone())).into_iter())
                 }
-                (true, WireTypeAndPayload2::Len(bytes_or_msg)) => {
-                    Either::Right(bytes_or_msg.as_bytes()?.into_variant_iter())
-                }
+                (true, WireTypeAndPayload2::Len(bytes_or_msg)) => match bytes_or_msg.as_bytes() {
+                    Ok(bytes) => Either::Right(bytes.into_variant_iter()),
+                    Err(e) => Either::Left(Some(Err(e)).into_iter()),
+                },
                 _ => Either::Left(Some(Err(ErrorKind::GenericMessageFieldTypeError)).into_iter()),
             })
             .map(|rv| rv.and_then(T::try_from_variant))
@@ -700,19 +701,20 @@ impl<'a, A: Allocator + Clone> FieldRef2<'a, A> {
     }
     pub fn try_as_repeated_bytes(&self) -> impl 'a + Iterator<Item = Result<&'a [u8]>> {
         self.0.iter().map(|record| match record {
-            WireTypeAndPayload2::Len(ld) => Ok(Cow::Borrowed(ld)),
+            WireTypeAndPayload2::Len(bytes_or_msg) => Ok(bytes_or_msg.as_bytes()?),
             _ => Err(ErrorKind::GenericMessageFieldTypeError),
         })
     }
-    pub fn try_as_scalar_message(&self) -> Result<Option<&'a GenericMessage2<A>>> {
-        let mut message_opt: Option<GenericMessage2<A>> = None;
+    pub fn try_as_scalar_message(&self) -> Result<Option<GenericMessage2<A>>> {
+        let mut message_opt = None;
         for wire_and_payload in self.0 {
-            let WireTypeAndPayload2::Len(buf) = wire_and_payload else {
+            let WireTypeAndPayload2::Len(bytes_or_msg) = wire_and_payload else {
                 Err(ErrorKind::GenericMessageFieldTypeError)?
             };
+            let msg = bytes_or_msg.as_msg()?;
             message_opt
-                .get_or_insert_with(|| GenericMessage2::new_in(buf.alloc().clone()))
-                .merge_from_buffer(buf.as_ref())?;
+                .get_or_insert_with(|| GenericMessage2::new_in(msg.alloc.clone()))
+                .merge()?;
         }
         Ok(message_opt)
     }
