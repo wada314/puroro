@@ -791,25 +791,6 @@ impl<A: Allocator + Clone> FieldMut2<'_, A> {
         self.0.clear();
     }
 
-    pub fn as_repeated_variants_mut<T: VariantIntegerType>(
-        &mut self,
-        allow_packed: bool,
-    ) -> impl '_ + Iterator<Item = impl DerefMut<Target = T::RustType>> {
-        self.0
-            .iter_mut()
-            .flat_map(move |record| match (allow_packed, record) {
-                (_, WireTypeAndPayload2::Variant(variant)) => {
-                    Either::Left(Some(variant).into_iter())
-                }
-                (true, WireTypeAndPayload2::Len(bytes_or_msg)) => match bytes_or_msg.as_bytes_mut()
-                {
-                    Ok(bytes) => Either::Right(bytes.into_variant_iter_mut()),
-                    Err(e) => Either::Left(Some(Err(e)).into_iter()),
-                },
-                _ => Either::Left(Some(Err(ErrorKind::GenericMessageFieldTypeError)).into_iter()),
-            })
-    }
-
     pub fn push_variant<T: VariantIntegerType>(&mut self, val: T::RustType) {
         self.0
             .push(WireTypeAndPayload2::Variant(Variant::from::<T>(val)));
