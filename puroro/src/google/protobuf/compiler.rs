@@ -223,23 +223,10 @@ impl_message_trait_for_trivial_types! {
 }
 impl_message_mut_trait_for_trivial_types! {
     pub trait VersionMutTrait: VersionTrait {
-        fn set_major(&mut self, major: i32);
-        fn set_minor(&mut self, minor: i32);
-        fn set_patch(&mut self, patch: i32);
-        fn set_suffix(&mut self, suffix: &str);
-    }
-    pub trait CodeGeneratorRequestMutTrait: CodeGeneratorRequestTrait {
-        fn set_parameter(&mut self, parameter: &str);
-        fn push_proto_file(&mut self, proto_file: impl FileDescriptorTrait);
-        fn push_source_file_descriptor(&mut self, source_file_descriptor: impl FileDescriptorTrait);
-        fn set_compiler_version(&mut self, compiler_version: impl VersionTrait);
-    }
-    pub trait CodeGeneratorResponseMutTrait: CodeGeneratorResponseTrait {
-        fn set_error(&mut self, error: &str);
-        fn set_supported_features(&mut self, features: u64);
-        fn set_minimum_edition(&mut self, edition: i32);
-        fn set_maximum_edition(&mut self, edition: i32);
-        fn push_file(&mut self, file: impl code_generator_response::FileTrait);
+        fn major_mut(&mut self) -> impl ::std::ops::DerefMut<Target = i32>;
+        fn minor_mut(&mut self) -> impl ::std::ops::DerefMut<Target = i32>;
+        fn patch_mut(&mut self) -> impl ::std::ops::DerefMut<Target = i32>;
+        fn suffix_mut(&mut self) -> impl ::std::ops::DerefMut<Target = String>;
     }
 }
 
@@ -257,20 +244,7 @@ impl VersionTrait for GenericMessage<'_> {
         self.field(4).as_scalar_string()
     }
 }
-impl VersionMutTrait for GenericMessage<'_> {
-    fn set_major(&mut self, major: i32) {
-        self.field_mut(1).set_variant::<Int32>(major)
-    }
-    fn set_minor(&mut self, minor: i32) {
-        self.field_mut(2).set_variant::<Int32>(minor)
-    }
-    fn set_patch(&mut self, patch: i32) {
-        self.field_mut(3).set_variant::<Int32>(patch)
-    }
-    fn set_suffix(&mut self, suffix: &str) {
-        self.field_mut(4).set_string(suffix)
-    }
-}
+// impl VersionMutTrait for GenericMessage<'_> {}
 
 impl CodeGeneratorRequestTrait for GenericMessage<'_> {
     fn file_to_generate(&self) -> impl Iterator<Item = &str> {

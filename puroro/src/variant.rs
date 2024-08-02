@@ -13,7 +13,11 @@
 // limitations under the License.
 
 use crate::{ErrorKind, Result};
-use ::std::io::{BufRead, Read, Write};
+use ::std::{
+    io::{BufRead, Read, Write},
+    marker::PhantomData,
+    ops::{Deref, DerefMut},
+};
 
 #[derive(Debug, PartialEq, Eq, Default, Copy, Clone)]
 pub struct Variant([u8; 8]);
@@ -141,6 +145,31 @@ where
     #[inline]
     fn into_variant(e: Self::RustType) -> Variant {
         i32::into_variant(e.into())
+    }
+}
+
+pub struct RefMutVariant<'a, T: VariantIntegerType>(&'a mut Variant, Option<T::RustType>);
+impl<'a, T: VariantIntegerType> RefMutVariant<'a, T> {
+    pub fn try_new(var: &'a mut Variant) -> Result<Self> {
+        Ok(Self(var, Some(T::try_from_variant(var.clone())?)))
+    }
+}
+impl<'a, T: VariantIntegerType> Deref for RefMutVariant<'a, T> {
+    type Target = T::RustType;
+    fn deref(&self) -> &Self::Target {
+        self.1.as_ref().expect("RefMutVariant.1 cannot be None")
+    }
+}
+impl<'a, T: VariantIntegerType> DerefMut for RefMutVariant<'a, T> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        self.1.as_mut().expect("RefMutVariant.1 cannot be None")
+    }
+}
+impl<'a, T: VariantIntegerType> Drop for RefMutVariant<'a, T> {
+    fn drop(&mut self) {
+        if let Some(value) = self.1.take() {
+            *self.0 = T::into_variant(value);
+        }
     }
 }
 
