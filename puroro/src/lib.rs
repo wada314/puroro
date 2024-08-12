@@ -22,6 +22,7 @@ pub mod generic_message;
 pub mod google;
 pub mod internal;
 pub mod message;
+pub mod repeated;
 pub mod string;
 pub mod variant;
 

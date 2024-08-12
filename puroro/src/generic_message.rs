@@ -18,7 +18,6 @@ use crate::internal::deser::{
 };
 use crate::internal::WireType;
 use crate::message::MessageLite;
-use crate::variant::RefMutVariant;
 use crate::variant::{
     variant_types::UInt32, ReadExtVariant, Variant, VariantIntegerType, WriteExtVariant,
 };
@@ -32,7 +31,7 @@ use ::std::cell::OnceCell;
 use ::std::collections::HashMap;
 use ::std::fmt::Debug;
 use ::std::io::{BufRead, Read, Write};
-use ::std::ops::{Deref, DerefMut};
+use ::std::ops::Deref;
 
 /// Assuming proto2 syntax.
 #[derive(Clone, Debug, Default)]
