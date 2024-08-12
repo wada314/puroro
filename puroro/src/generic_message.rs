@@ -617,7 +617,7 @@ impl<A: Allocator + Clone> InnerMutableBytesOrMsg<A> {
             Ok(msg)
         })
     }
-    pub fn try_as_bytes_mutt(&mut self) -> Result<&mut Vec<u8, A>> {
+    pub fn try_as_bytes_mut(&mut self) -> Result<&mut Vec<u8, A>> {
         // Make sure the bytes_cell is initialized.
         let _ = self.try_as_bytes()?;
         // Dispose msg_cell.
