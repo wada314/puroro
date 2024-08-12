@@ -526,7 +526,7 @@ impl<A: Allocator + Clone> MessageLite for GenericMessage2<A> {
                     }
                     WireTypeAndPayload2::Len(bytes_or_msg) => {
                         // If bytes buffer is vacant, generate it from msg.
-                        let bytes = bytes_or_msg.as_bytes()?;
+                        let bytes = bytes_or_msg.try_as_bytes()?;
                         let len = bytes.len();
                         write.write_all(bytes)?;
                         len
@@ -596,7 +596,7 @@ impl<A: Allocator + Clone> InnerMutableBytesOrMsg<A> {
         s
     }
 
-    pub fn as_bytes(&self) -> Result<&[u8]> {
+    pub fn try_as_bytes(&self) -> Result<&[u8]> {
         let v = self.bytes_cell.get_or_try_init(|| -> Result<_> {
             let Some(msg) = self.msg_cell.get() else {
                 unreachable!("either bytes_cell or msg_cell must be initialized");
@@ -607,7 +607,7 @@ impl<A: Allocator + Clone> InnerMutableBytesOrMsg<A> {
         })?;
         Ok(v)
     }
-    pub fn as_msg(&self) -> Result<&GenericMessage2<A>> {
+    pub fn try_as_msg(&self) -> Result<&GenericMessage2<A>> {
         self.msg_cell.get_or_try_init(|| -> Result<_> {
             let Some(bytes) = self.bytes_cell.get() else {
                 unreachable!("either bytes_cell or msg_cell must be initialized");
@@ -617,23 +617,23 @@ impl<A: Allocator + Clone> InnerMutableBytesOrMsg<A> {
             Ok(msg)
         })
     }
-    pub fn as_bytes_mut(&mut self) -> Result<&mut Vec<u8, A>> {
+    pub fn try_as_bytes_mutt(&mut self) -> Result<&mut Vec<u8, A>> {
         // Make sure the bytes_cell is initialized.
-        self.as_bytes()?;
+        let _ = self.try_as_bytes()?;
         // Dispose msg_cell.
         self.msg_cell.take();
         let Some(mut_bytes) = self.bytes_cell.get_mut() else {
-            unreachable!("bytes_cell must be already initialized in as_bytes() call");
+            unreachable!("bytes_cell must be already initialized in try_as_bytes() call");
         };
         Ok(mut_bytes)
     }
-    pub fn as_msg_mut(&mut self) -> Result<&mut GenericMessage2<A>> {
+    pub fn try_as_msg_mut(&mut self) -> Result<&mut GenericMessage2<A>> {
         // Make sure the msg_cell is initialized.
-        self.as_msg()?;
+        let _ = self.try_as_msg()?;
         // Dispose bytes_cell.
         self.bytes_cell.take();
         let Some(mut_msg) = self.msg_cell.get_mut() else {
-            unreachable!("msg_cell must be already initialized in as_msg() call");
+            unreachable!("msg_cell must be already initialized in try_as_msg() call");
         };
         Ok(mut_msg)
     }
@@ -704,7 +704,8 @@ impl<A: Allocator + Clone> Field2<A> {
                 (_, WireTypeAndPayload2::Variant(variant)) => {
                     Either::Left(Some(Ok(variant.clone())).into_iter())
                 }
-                (true, WireTypeAndPayload2::Len(bytes_or_msg)) => match bytes_or_msg.as_bytes() {
+                (true, WireTypeAndPayload2::Len(bytes_or_msg)) => match bytes_or_msg.try_as_bytes()
+                {
                     Ok(bytes) => Either::Right(bytes.into_variant_iter()),
                     Err(e) => Either::Left(Some(Err(e)).into_iter()),
                 },
@@ -736,7 +737,7 @@ impl<A: Allocator + Clone> Field2<A> {
     pub fn try_as_repeated_string(&self) -> impl '_ + Iterator<Item = Result<&str>> {
         self.0.iter().map(|record| match record {
             WireTypeAndPayload2::Len(bytes_or_msg) => {
-                Ok(::std::str::from_utf8(bytes_or_msg.as_bytes()?)?)
+                Ok(::std::str::from_utf8(bytes_or_msg.try_as_bytes()?)?)
             }
             _ => Err(ErrorKind::GenericMessageFieldTypeError),
         })
@@ -746,7 +747,7 @@ impl<A: Allocator + Clone> Field2<A> {
     }
     pub fn try_as_repeated_bytes(&self) -> impl '_ + Iterator<Item = Result<&[u8]>> {
         self.0.iter().map(|record| match record {
-            WireTypeAndPayload2::Len(bytes_or_msg) => Ok(bytes_or_msg.as_bytes()?),
+            WireTypeAndPayload2::Len(bytes_or_msg) => Ok(bytes_or_msg.try_as_bytes()?),
             _ => Err(ErrorKind::GenericMessageFieldTypeError),
         })
     }
@@ -756,7 +757,7 @@ impl<A: Allocator + Clone> Field2<A> {
             let WireTypeAndPayload2::Len(bytes_or_msg) = wire_and_payload else {
                 Err(ErrorKind::GenericMessageFieldTypeError)?
             };
-            let msg = bytes_or_msg.as_msg()?;
+            let msg = bytes_or_msg.try_as_msg()?;
             message_opt
                 .get_or_insert_with(|| GenericMessage2::new_in(msg.alloc.clone()))
                 .merge(msg.clone());
@@ -768,7 +769,7 @@ impl<A: Allocator + Clone> Field2<A> {
             let WireTypeAndPayload2::Len(bytes_or_msg) = wire_and_payload else {
                 Err(ErrorKind::GenericMessageFieldTypeError)?
             };
-            Ok(bytes_or_msg.as_msg()?)
+            Ok(bytes_or_msg.try_as_msg()?)
         })
     }
 }
