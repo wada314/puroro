@@ -28,19 +28,37 @@ where
     pub fn try_left(&self) -> Result<&T, E> {
         match self {
             TransmutableEitherOrBoth::Left(left, _) => Ok(left),
-            TransmutableEitherOrBoth::Both(left, _) => Ok(left),
             TransmutableEitherOrBoth::Right(right, left_cell) => {
                 left_cell.get_or_try_init(|| <&U>::try_into(right))
             }
+            TransmutableEitherOrBoth::Both(left, _) => Ok(left),
         }
     }
     pub fn try_right(&self) -> Result<&U, E> {
         match self {
-            TransmutableEitherOrBoth::Right(right, _) => Ok(right),
-            TransmutableEitherOrBoth::Both(_, right) => Ok(right),
             TransmutableEitherOrBoth::Left(left, right_cell) => {
                 right_cell.get_or_try_init(|| <&T>::try_into(left))
             }
+            TransmutableEitherOrBoth::Right(right, _) => Ok(right),
+            TransmutableEitherOrBoth::Both(_, right) => Ok(right),
         }
+    }
+
+    pub fn try_left_mut(&mut self) -> Result<&mut T, E> {
+        match *self {
+            TransmutableEitherOrBoth::Left(left, _) => {
+                *self = TransmutableEitherOrBoth::Left(left, OnceCell::new());
+            }
+            TransmutableEitherOrBoth::Right(right, _) => {
+                *self = TransmutableEitherOrBoth::Left(<&U>::try_into(&right)?, OnceCell::new());
+            }
+            TransmutableEitherOrBoth::Both(left, _) => {
+                *self = TransmutableEitherOrBoth::Left(left, OnceCell::new());
+            }
+        };
+        let TransmutableEitherOrBoth::Left(left, _) = self else {
+            unreachable!();
+        };
+        Ok(left)
     }
 }
