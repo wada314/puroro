@@ -12,16 +12,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-pub trait RepeatedView<'a>: IntoIterator<Item = <Self as RepeatedView<'a>>::Item> {
-    type Item: 'a;
+use ::std::ops::{Deref, DerefMut};
+
+pub trait RepeatedView<'a>: IntoIterator<Item = Self::Ref> {
+    type Ref: 'a + Deref<Target = <Self as RepeatedView<'a>>::Item>;
+    type Item;
     fn len(&self) -> usize;
     fn is_empty(&self) -> bool {
         self.len() == 0
     }
-    fn iter(&self) -> impl Iterator<Item = <Self as RepeatedView<'a>>::Item>;
+    fn iter(&self) -> impl Iterator<Item = Self::Ref>;
 }
 
-pub trait RepeatedViewMut<'a>: RepeatedView<'a> {
-    //fn push(&mut self, value: <Self as RepeatedView<'a>>::Item);
+pub trait RepeatedViewMut<'a>:
+    IntoIterator<Item = Self::RefMut> + Extend<<Self as RepeatedViewMut<'a>>::Item>
+{
+    type RefMut: 'a + DerefMut<Target = <Self as RepeatedViewMut<'a>>::Item>;
+    type Item;
+    fn len(&self) -> usize;
+    fn is_empty(&self) -> bool {
+        self.len() == 0
+    }
+    fn iter(&self) -> impl Iterator<Item = Self::RefMut>;
+
+    fn push(&mut self, value: <Self as RepeatedViewMut<'a>>::Item);
     fn clear(&mut self);
 }
