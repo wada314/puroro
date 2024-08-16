@@ -14,6 +14,7 @@
 
 pub mod deser;
 pub mod types;
+pub mod utils;
 
 use crate::{ErrorKind, Result};
 
