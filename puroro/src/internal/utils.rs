@@ -54,6 +54,17 @@ where
             TransmutableEitherOrBoth::Both(left, _) => left,
         })
     }
+    pub fn try_into_right(self) -> Result<U, (E, T)> {
+        Ok(match self {
+            TransmutableEitherOrBoth::Left(left, mut right_cell) => match right_cell.take() {
+                Some(right) => right,
+                None => <&T>::try_into(&left).map_err(|e| (e, left))?,
+            },
+            TransmutableEitherOrBoth::Right(right, _) => right,
+            TransmutableEitherOrBoth::Both(_, right) => right,
+        })
+    }
+
     pub fn try_left_mut(&mut self) -> Result<&mut T, E> {
         unsafe {
             let taken_self = ::std::ptr::read(self);
@@ -74,5 +85,26 @@ where
             unreachable!();
         };
         Ok(left)
+    }
+    pub fn try_right_mut(&mut self) -> Result<&mut U, E> {
+        unsafe {
+            let taken_self = ::std::ptr::read(self);
+            let (new_self, result) = match taken_self.try_into_right() {
+                Ok(right) => (
+                    TransmutableEitherOrBoth::Right(right, OnceCell::new()),
+                    Ok(()),
+                ),
+                Err((e, left)) => (
+                    TransmutableEitherOrBoth::Left(left, OnceCell::new()),
+                    Err(e),
+                ),
+            };
+            ::std::ptr::write(self, new_self);
+            result
+        }?;
+        let TransmutableEitherOrBoth::Right(right, _) = self else {
+            unreachable!();
+        };
+        Ok(right)
     }
 }
