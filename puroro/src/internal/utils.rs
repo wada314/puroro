@@ -45,17 +45,28 @@ where
     }
 
     pub fn try_left_mut(&mut self) -> Result<&mut T, E> {
-        match *self {
-            TransmutableEitherOrBoth::Left(left, _) => {
-                *self = TransmutableEitherOrBoth::Left(left, OnceCell::new());
-            }
-            TransmutableEitherOrBoth::Right(right, _) => {
-                *self = TransmutableEitherOrBoth::Left(<&U>::try_into(&right)?, OnceCell::new());
-            }
-            TransmutableEitherOrBoth::Both(left, _) => {
-                *self = TransmutableEitherOrBoth::Left(left, OnceCell::new());
-            }
-        };
+        unsafe {
+            let taken_self = ::std::ptr::read(self);
+
+            let (new_self, result) = match taken_self {
+                TransmutableEitherOrBoth::Left(left, _) => (
+                    TransmutableEitherOrBoth::Left(left, OnceCell::new()),
+                    Ok(()),
+                ),
+                TransmutableEitherOrBoth::Right(right, _) => match <&U>::try_into(&right) {
+                    Ok(left) => (
+                        TransmutableEitherOrBoth::Left(left, OnceCell::new()),
+                        Ok(()),
+                    ),
+                    Err(e) => (
+                        TransmutableEitherOrBoth::Right(right, OnceCell::new()),
+                        Err(e),
+                    ),
+                },
+                TransmutableEitherOrBoth::Both(left, _) => {}
+            };
+        }
+
         let TransmutableEitherOrBoth::Left(left, _) = self else {
             unreachable!();
         };
