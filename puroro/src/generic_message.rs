@@ -411,11 +411,6 @@ pub enum WireTypeAndPayload2<A: Allocator = Global> {
     I32([u8; 4]),
     Len(TransmutableEitherOrBoth<Vec<u8, A>, GenericMessage2<A>>),
 }
-#[derive(Clone)]
-pub struct InnerMutableBytesOrMsg<A: Allocator> {
-    bytes_cell: OnceCell<Vec<u8, A>>,
-    msg_cell: OnceCell<GenericMessage2<A>>,
-}
 impl<A: Allocator> WireTypeAndPayload2<A> {
     pub(crate) fn wire_type(&self) -> WireType {
         match self {
@@ -442,22 +437,22 @@ impl<A: Allocator + Clone> GenericMessage2<A> {
             alloc: alloc.clone(),
         }
     }
-    pub fn field_mut(&mut self, number: i32) -> FieldMut2<A> {
-        FieldMut2(
-            self.fields
-                .entry(number)
-                .or_insert_with(|| Vec::new_in(self.alloc.clone())),
-        )
+    pub fn field_mut(&mut self, number: i32) -> &mut FieldMut2<A> {
+        let mut_vec_ref = self
+            .fields
+            .entry(number)
+            .or_insert_with(|| Vec::new_in(self.alloc.clone()));
+        unsafe { ::std::mem::transmute(mut_vec_ref) }
     }
 }
 impl<A: Allocator> GenericMessage2<A> {
-    pub fn field(&self, number: i32) -> FieldRef2<A> {
-        FieldRef2(
-            self.fields
-                .get(&number)
-                .map(Vec::as_slice)
-                .unwrap_or_default(),
-        )
+    pub fn field(&self, number: i32) -> &Field2<A> {
+        let vec_ref = self
+            .fields
+            .get(&number)
+            .map(Vec::as_slice)
+            .unwrap_or_default();
+        unsafe { ::std::mem::transmute(vec_ref) }
     }
     pub fn merge(&mut self, other: Self) {
         for (number, wire_and_payloads) in other.fields {
@@ -491,15 +486,6 @@ impl<A: Allocator> Debug for WireTypeAndPayload2<A> {
         }
     }
 }
-impl<A: Allocator> Debug for InnerMutableBytesOrMsg<A> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        f.debug_struct("InnerMutableBytesOrMsg")
-            .field("bytes_cell", &self.bytes_cell)
-            .field("msg_cell", &self.msg_cell)
-            .finish()
-    }
-}
-
 impl<A: Allocator + Clone> TryFrom<&Vec<u8, A>> for GenericMessage2<A> {
     type Error = ErrorKind;
     fn try_from(buf: &Vec<u8, A>) -> Result<Self> {
@@ -595,70 +581,10 @@ impl<A: Allocator + Clone, R: Read> DeserMessageHandlerForRead<R> for GenericMes
     }
 }
 
-impl<A: Allocator + Clone> InnerMutableBytesOrMsg<A> {
-    pub fn from_bytes(bytes: Vec<u8, A>) -> Self {
-        let s = Self {
-            bytes_cell: OnceCell::new(),
-            msg_cell: OnceCell::new(),
-        };
-        s.bytes_cell.set(bytes).expect("This is the first time set");
-        s
-    }
-    pub fn from_msg(msg: GenericMessage2<A>) -> Self {
-        let s = Self {
-            bytes_cell: OnceCell::new(),
-            msg_cell: OnceCell::new(),
-        };
-        s.msg_cell.set(msg).expect("This is the first time set");
-        s
-    }
-
-    pub fn try_as_bytes(&self) -> Result<&[u8]> {
-        let v = self.bytes_cell.get_or_try_init(|| -> Result<_> {
-            let Some(msg) = self.msg_cell.get() else {
-                unreachable!("either bytes_cell or msg_cell must be initialized");
-            };
-            let mut buf = Vec::new_in(msg.alloc.clone());
-            msg.write(&mut buf)?;
-            Ok(buf)
-        })?;
-        Ok(v)
-    }
-    pub fn try_as_msg(&self) -> Result<&GenericMessage2<A>> {
-        self.msg_cell.get_or_try_init(|| -> Result<_> {
-            let Some(bytes) = self.bytes_cell.get() else {
-                unreachable!("either bytes_cell or msg_cell must be initialized");
-            };
-            let mut msg = GenericMessage2::new_in(bytes.allocator().clone());
-            msg.merge_from_read(&mut bytes.as_slice())?;
-            Ok(msg)
-        })
-    }
-    pub fn try_as_bytes_mut(&mut self) -> Result<&mut Vec<u8, A>> {
-        // Make sure the bytes_cell is initialized.
-        let _ = self.try_as_bytes()?;
-        // Dispose msg_cell.
-        self.msg_cell.take();
-        let Some(mut_bytes) = self.bytes_cell.get_mut() else {
-            unreachable!("bytes_cell must be already initialized in try_as_bytes() call");
-        };
-        Ok(mut_bytes)
-    }
-    pub fn try_as_msg_mut(&mut self) -> Result<&mut GenericMessage2<A>> {
-        // Make sure the msg_cell is initialized.
-        let _ = self.try_as_msg()?;
-        // Dispose bytes_cell.
-        self.bytes_cell.take();
-        let Some(mut_msg) = self.msg_cell.get_mut() else {
-            unreachable!("msg_cell must be already initialized in try_as_msg() call");
-        };
-        Ok(mut_msg)
-    }
-}
-
+#[repr(transparent)]
 pub struct Field2<A: Allocator = Global>([WireTypeAndPayload2<A>]);
-pub struct FieldRef2<'a, A: Allocator = Global>(&'a [WireTypeAndPayload2<A>]);
-pub struct FieldMut2<'a, A: Allocator = Global>(&'a mut Vec<WireTypeAndPayload2<A>, A>);
+#[repr(transparent)]
+pub struct FieldMut2<A: Allocator = Global>(Vec<WireTypeAndPayload2<A>, A>);
 
 impl<A: Allocator + Clone> Field2<A> {
     pub fn as_scalar_variant<T: VariantIntegerType>(&self, allow_packed: bool) -> T::RustType {
@@ -790,20 +716,14 @@ impl<A: Allocator + Clone> Field2<A> {
     }
 }
 
-impl<A: Allocator> Deref for FieldRef2<'_, A> {
-    type Target = Field2;
-    fn deref(&self) -> &Self::Target {
-        unsafe { ::std::mem::transmute(self.0) }
-    }
-}
-impl<A: Allocator> Deref for FieldMut2<'_, A> {
+impl<A: Allocator> Deref for FieldMut2<A> {
     type Target = Field2;
     fn deref(&self) -> &Self::Target {
         unsafe { ::std::mem::transmute(self.0.as_slice()) }
     }
 }
 
-impl<A: Allocator + Clone> FieldMut2<'_, A> {
+impl<A: Allocator + Clone> FieldMut2<A> {
     pub fn clear(&mut self) {
         self.0.clear();
     }

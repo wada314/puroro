@@ -14,17 +14,39 @@
 
 pub mod compiler;
 
-use crate::generic_message::GenericMessage;
+use crate::generic_message::GenericMessage2;
 use crate::internal::impl_message_trait_for_trivial_types;
 use crate::variant::variant_types::{Bool, Enum, Int32, Int64, UInt64};
 use crate::Result;
 use ::derive_more::{Deref as DDeref, DerefMut as DDerefMut, From as DFrom, Into as DInto};
+use ::std::alloc::Allocator;
+
+trait GenericMessageExt {
+    type Alloc: Allocator;
+    fn as_repeated_message_with<F: Fn(&GenericMessage2<Self::Alloc>) -> T, T>(
+        &self,
+        number: i32,
+        f: F,
+    ) -> impl Iterator<Item = T>;
+}
+impl<A: Allocator + Clone> GenericMessageExt for GenericMessage2<A> {
+    type Alloc = A;
+    fn as_repeated_message_with<F: Fn(&GenericMessage2<Self::Alloc>) -> T, T>(
+        &self,
+        number: i32,
+        f: F,
+    ) -> impl Iterator<Item = T> {
+        self.field(number).as_repeated_message().map(f)
+    }
+}
 
 #[derive(DDeref, DDerefMut, DFrom, DInto, Default, Debug)]
-pub struct FileDescriptorSet<'a>(GenericMessage<'a>);
-impl<'a> FileDescriptorSet<'a> {
-    pub fn file(&self) -> impl Iterator<Item = Result<FileDescriptorProto>> {
-        self.0.repeated_message_field(1, FileDescriptorProto)
+#[repr(transparent)]
+pub struct FileDescriptorSet(GenericMessage2);
+impl FileDescriptorSet {
+    pub fn file(&self) -> impl Iterator<Item = Result<&FileDescriptorProto>> {
+        self.0
+            .as_repeated_message_with(1, |m| unsafe { ::std::mem::transmute(m) })
     }
 }
 
@@ -67,8 +89,8 @@ impl From<Edition> for i32 {
 }
 
 #[derive(DDeref, DDerefMut, DFrom, DInto, Default, Debug)]
-pub struct FileDescriptorProto<'a>(GenericMessage<'a>);
-impl<'a> FileDescriptorProto<'a> {
+pub struct FileDescriptorProto(GenericMessage2);
+impl FileDescriptorProto {
     pub fn name(&self) -> Result<Option<&str>> {
         self.0.field(1).try_as_scalar_string_opt()
     }
@@ -107,8 +129,8 @@ impl<'a> FileDescriptorProto<'a> {
 }
 
 #[derive(DDeref, DDerefMut, DFrom, DInto, Default, Debug)]
-pub struct DescriptorProto<'a>(GenericMessage<'a>);
-impl<'a> DescriptorProto<'a> {
+pub struct DescriptorProto(GenericMessage2);
+impl DescriptorProto {
     pub fn name(&self) -> Result<Option<&str>> {
         self.0.field(1).try_as_scalar_string_opt()
     }
@@ -134,8 +156,8 @@ impl<'a> DescriptorProto<'a> {
 }
 
 #[derive(DDeref, DDerefMut, DFrom, DInto, Default, Debug)]
-pub struct FieldDescriptorProto<'a>(GenericMessage<'a>);
-impl<'a> FieldDescriptorProto<'a> {
+pub struct FieldDescriptorProto(GenericMessage2);
+impl FieldDescriptorProto {
     pub fn name(&self) -> Result<Option<&str>> {
         self.0.field(1).try_as_scalar_string_opt()
     }
@@ -256,8 +278,8 @@ pub mod field_descriptor_proto {
 }
 
 #[derive(DDeref, DDerefMut, DFrom, DInto, Default, Debug)]
-pub struct OneofDescriptorProto<'a>(GenericMessage<'a>);
-impl<'a> OneofDescriptorProto<'a> {
+pub struct OneofDescriptorProto(GenericMessage2);
+impl OneofDescriptorProto {
     pub fn name(&self) -> Result<Option<&str>> {
         self.0.field(1).try_as_scalar_string_opt()
     }
@@ -265,8 +287,8 @@ impl<'a> OneofDescriptorProto<'a> {
 }
 
 #[derive(DDeref, DDerefMut, DFrom, DInto, Default, Debug)]
-pub struct EnumDescriptorProto<'a>(GenericMessage<'a>);
-impl<'a> EnumDescriptorProto<'a> {
+pub struct EnumDescriptorProto(GenericMessage2);
+impl EnumDescriptorProto {
     pub fn name(&self) -> Result<Option<&str>> {
         self.0.field(1).try_as_scalar_string_opt()
     }
@@ -279,8 +301,8 @@ impl<'a> EnumDescriptorProto<'a> {
 }
 
 #[derive(DDeref, DDerefMut, DFrom, DInto, Default, Debug)]
-pub struct EnumValueDescriptorProto<'a>(GenericMessage<'a>);
-impl<'a> EnumValueDescriptorProto<'a> {
+pub struct EnumValueDescriptorProto(GenericMessage2);
+impl EnumValueDescriptorProto {
     pub fn name(&self) -> Result<Option<&str>> {
         self.0.field(1).try_as_scalar_string_opt()
     }
@@ -290,16 +312,16 @@ impl<'a> EnumValueDescriptorProto<'a> {
 }
 
 #[derive(DDeref, DDerefMut, DFrom, DInto, Default, Debug)]
-pub struct FileOptionsProto<'a>(GenericMessage<'a>);
-impl<'a> FileOptionsProto<'a> {
+pub struct FileOptionsProto(GenericMessage2);
+impl FileOptionsProto {
     pub fn uninterpreted_option(&self) -> impl Iterator<Item = Result<UninterpretedOptionProto>> {
         self.0.repeated_message_field(999, UninterpretedOptionProto)
     }
 }
 
 #[derive(DDeref, DDerefMut, DFrom, DInto, Default, Debug)]
-pub struct UninterpretedOptionProto<'a>(GenericMessage<'a>);
-impl<'a> UninterpretedOptionProto<'a> {
+pub struct UninterpretedOptionProto(GenericMessage2);
+impl UninterpretedOptionProto {
     pub fn name(&self) -> impl Iterator<Item = Result<uninterpreted_option::NamePart>> {
         self.0
             .repeated_message_field(2, uninterpreted_option::NamePart)
@@ -331,8 +353,8 @@ impl<'a> UninterpretedOptionProto<'a> {
 pub mod uninterpreted_option {
     use super::*;
     #[derive(DDeref, DDerefMut, DFrom, DInto, Default, Debug)]
-    pub struct NamePart<'a>(pub(crate) GenericMessage<'a>);
-    impl<'a> NamePart<'a> {
+    pub struct NamePart(pub(crate) GenericMessage2);
+    impl NamePart {
         pub fn name_part(&self) -> Result<Option<&str>> {
             self.0.field(1).try_as_scalar_string_opt()
         }
@@ -396,13 +418,13 @@ impl_message_trait_for_trivial_types! {
     }
 }
 
-impl FileDescriptorSetTrait for GenericMessage<'_> {
+impl FileDescriptorSetTrait for GenericMessage2<'_> {
     fn file(&self) -> impl Iterator<Item = impl FileDescriptorTrait> {
         self.field(1).as_repeated_message()
     }
 }
 
-impl FileDescriptorTrait for GenericMessage<'_> {
+impl FileDescriptorTrait for GenericMessage2<'_> {
     fn name(&self) -> &str {
         self.field(1).as_scalar_string()
     }
@@ -432,7 +454,7 @@ impl FileDescriptorTrait for GenericMessage<'_> {
     }
 }
 
-impl DescriptorTrait for GenericMessage<'_> {
+impl DescriptorTrait for GenericMessage2<'_> {
     fn name(&self) -> &str {
         self.field(1).as_scalar_string()
     }
@@ -453,7 +475,7 @@ impl DescriptorTrait for GenericMessage<'_> {
     }
 }
 
-impl FieldDescriptorTrait for GenericMessage<'_> {
+impl FieldDescriptorTrait for GenericMessage2<'_> {
     fn name(&self) -> &str {
         self.field(1).as_scalar_string()
     }
@@ -488,13 +510,13 @@ impl FieldDescriptorTrait for GenericMessage<'_> {
     }
 }
 
-impl OneofDescriptorTrait for GenericMessage<'_> {
+impl OneofDescriptorTrait for GenericMessage2<'_> {
     fn name(&self) -> &str {
         self.field(1).as_scalar_string()
     }
 }
 
-impl EnumDescriptorTrait for GenericMessage<'_> {
+impl EnumDescriptorTrait for GenericMessage2<'_> {
     fn name(&self) -> &str {
         self.field(1).as_scalar_string()
     }
@@ -503,7 +525,7 @@ impl EnumDescriptorTrait for GenericMessage<'_> {
     }
 }
 
-impl EnumValueDescriptorTrait for GenericMessage<'_> {
+impl EnumValueDescriptorTrait for GenericMessage2<'_> {
     fn name(&self) -> &str {
         self.field(1).as_scalar_string()
     }

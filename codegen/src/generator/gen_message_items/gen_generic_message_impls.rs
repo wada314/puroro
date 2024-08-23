@@ -47,7 +47,7 @@ impl GenGenericMessageImpls {
             .map(Field::gen_getter)
             .collect::<Result<Vec<_>>>()?;
         Ok(parse2(quote! {
-            impl self::#trait_name for ::puroro::generic_message::GenericMessage<'_> {
+            impl<A: ::std::alloc::Allocator> self::#trait_name for ::puroro::generic_message::GenericMessage2<A> {
                 #(#getters)*
             }
         })?)
@@ -118,14 +118,11 @@ impl Field {
             }
         })?;
         Ok(parse2(quote! {
-            (#field_expr).as_scalar_variant(true /* TODO: packed check */).ok().flatten().map(
-                |v| <#vt_type as ::puroro::variant::VariantIntegerType>::try_from_variant(v).ok()
-            ).flatten().unwrap_or_default()
+            (#field_expr).as_scalar_variant::<#vt_type>(true /* TODO: packed check */)
         })?)
     }
     fn gen_non_repeated_i32_getter_body(&self, field_expr: &Expr, t: I32Type) -> Result<Expr> {
-        let bytes_expr: Expr =
-            parse2(quote! { (#field_expr).as_scalar_i32().ok().flatten().unwrap_or_default() })?;
+        let bytes_expr: Expr = parse2(quote! { (#field_expr).as_scalar_i32() })?;
         Ok(parse2(match t {
             I32Type::Float => {
                 quote! { ::std::primitive::f32::from_le_bytes(#bytes_expr) }
@@ -139,8 +136,7 @@ impl Field {
         })?)
     }
     fn gen_non_repeated_i64_getter_body(&self, field_expr: &Expr, t: I64Type) -> Result<Expr> {
-        let bytes_expr: Expr =
-            parse2(quote! { (#field_expr).as_scalar_i64().ok().flatten().unwrap_or_default() })?;
+        let bytes_expr: Expr = parse2(quote! { (#field_expr).as_scalar_i64() })?;
         Ok(parse2(match t {
             I64Type::Double => {
                 quote! { ::std::primitive::f64::from_le_bytes(#bytes_expr) }
@@ -160,13 +156,13 @@ impl Field {
     ) -> Result<Expr> {
         Ok(parse2(match t {
             LenType::String => {
-                quote! { (#field_expr).as_scalar_string().ok().flatten().unwrap_or_default() }
+                quote! { (#field_expr).as_scalar_string() }
             }
             LenType::Bytes => {
-                quote! { (#field_expr).as_scalar_bytes().ok().flatten().unwrap_or_default() }
+                quote! { (#field_expr).as_scalar_bytes() }
             }
             LenType::Message(_) => {
-                quote! { (#field_expr).as_scalar_message().ok().flatten() }
+                quote! { (#field_expr).as_scalar_message() }
             }
         })?)
     }
@@ -190,9 +186,7 @@ impl Field {
             }
         })?;
         Ok(parse2(quote! {
-            (#field_expr).as_repeated_variant(true /* TODO: packed check */).filter_map(
-                |rv| rv.ok().and_then(|v| <#vt_type as ::puroro::variant::VariantIntegerType>::try_from_variant(v).ok())
-            )
+            (#field_expr).as_repeated_variant::<#vt_type>(true /* TODO: packed check */)
         })?)
     }
     fn gen_repeated_i32_getter_body(&self, field_expr: &Expr, t: I32Type) -> Result<Expr> {
@@ -202,9 +196,7 @@ impl Field {
             I32Type::SFixed32 => quote! { ::std::primitive::i32::from_le_bytes },
         })?;
         Ok(parse2(quote! {
-            (#field_expr).as_repeated_i32().filter_map(
-                |rv| rv.ok().map(|v| #map_expr(v))
-            )
+            (#field_expr).as_repeated_i32().map(#map_expr)
         })?)
     }
     fn gen_repeated_i64_getter_body(&self, field_expr: &Expr, t: I64Type) -> Result<Expr> {
@@ -214,9 +206,7 @@ impl Field {
             I64Type::SFixed64 => quote! { ::std::primitive::i64::from_le_bytes },
         })?;
         Ok(parse2(quote! {
-            (#field_expr).as_repeated_i64().filter_map(
-                |rv| rv.ok().map(|v| #map_expr(v))
-            )
+            (#field_expr).as_repeated_i64().map(#map_expr)
         })?)
     }
     fn gen_repeated_len_getter_body(
@@ -225,10 +215,10 @@ impl Field {
         t: LenType<&ProtoPath>,
     ) -> Result<Expr> {
         Ok(parse2(match t {
-            LenType::String => quote! { (#field_expr).as_repeated_string().filter_map(Result::ok) },
-            LenType::Bytes => quote! { (#field_expr).as_repeated_bytes().filter_map(Result::ok) },
+            LenType::String => quote! { (#field_expr).as_repeated_string() },
+            LenType::Bytes => quote! { (#field_expr).as_repeated_bytes() },
             LenType::Message(_) => {
-                quote! { (#field_expr).as_repeated_message().filter_map(Result::ok) }
+                quote! { (#field_expr).as_repeated_message() }
             }
         })?)
     }

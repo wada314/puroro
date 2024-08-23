@@ -144,6 +144,11 @@ impl TryFrom<GeneratedFile> for code_generator_response::File<'_> {
                 quote! { pub mod #id; }
             })
             .collect::<Vec<_>>();
+        let crate_attributes = is_root_file.then(|| {
+            quote! {
+                #![allow(allocator_api)]
+            }
+        });
         let puroro_root = if is_root_file {
             quote! {
                 #[allow(unused)]
@@ -166,6 +171,7 @@ impl TryFrom<GeneratedFile> for code_generator_response::File<'_> {
             #![doc=" THIS FILE IS A GENERATED FILE! DO NOT EDIT!"]
             #![doc=" Source(s):"]
             #(#source_list)*
+            #crate_attributes
 
             #(#submodule_decls)*
             #puroro_root
