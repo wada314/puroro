@@ -12,7 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::generic_message::GenericMessage;
+use super::GenericMessageExt;
+use crate::generic_message::GenericMessage2;
 use crate::google::protobuf::{FileDescriptorProto, FileDescriptorTrait};
 use crate::internal::{
     impl_message_mut_trait_for_trivial_types, impl_message_trait_for_trivial_types,
@@ -21,41 +22,44 @@ use crate::variant::variant_types::{Int32, UInt64};
 use crate::variant::VariantIntegerType;
 use crate::Result;
 use ::derive_more::{Deref as DDeref, DerefMut as DDerefMut, From as DFrom, Into as DInto};
+use ::ref_cast::RefCast;
 
-#[derive(DDeref, DDerefMut, DFrom, DInto, Default, Debug)]
-pub struct Version<'a>(GenericMessage<'a>);
-impl<'a> Version<'a> {
-    pub fn major(&self) -> Result<i32> {
-        Ok(self.0.scalar_variant_field::<Int32>(1)?.unwrap_or(0))
+#[derive(DDeref, DDerefMut, DFrom, DInto, Default, Debug, RefCast)]
+#[repr(transparent)]
+pub struct Version(GenericMessage2);
+impl Version {
+    pub fn major(&self) -> Result<Option<i32>> {
+        self.0.field(1).try_as_scalar_variant_opt::<Int32>(false)
     }
-    pub fn minor(&self) -> Result<i32> {
-        Ok(self.0.scalar_variant_field::<Int32>(2)?.unwrap_or(0))
+    pub fn minor(&self) -> Result<Option<i32>> {
+        self.0.field(2).try_as_scalar_variant_opt::<Int32>(false)
     }
-    pub fn patch(&self) -> Result<i32> {
-        Ok(self.0.scalar_variant_field::<Int32>(3)?.unwrap_or(0))
+    pub fn patch(&self) -> Result<Option<i32>> {
+        self.0.field(3).try_as_scalar_variant_opt::<Int32>(false)
     }
     pub fn suffix(&self) -> Result<&str> {
         Ok(self.0.field(4).try_as_scalar_string_opt()?.unwrap_or(""))
     }
 }
 
-#[derive(DDeref, DDerefMut, DFrom, DInto, Default, Debug)]
-pub struct CodeGeneratorRequest<'a>(GenericMessage<'a>);
-impl<'a> CodeGeneratorRequest<'a> {
+#[derive(DDeref, DDerefMut, DFrom, DInto, Default, Debug, RefCast)]
+#[repr(transparent)]
+pub struct CodeGeneratorRequest(GenericMessage2);
+impl CodeGeneratorRequest {
     pub fn file_to_generate(&self) -> impl IntoIterator<Item = Result<&str>> {
         self.0.field(1).try_as_repeated_string()
     }
     pub fn parameter(&self) -> Result<Option<&str>> {
         self.0.field(2).try_as_scalar_string_opt()
     }
-    pub fn proto_file(&self) -> impl Iterator<Item = Result<FileDescriptorProto>> {
-        self.0.repeated_message_field(15, Into::into)
+    pub fn proto_file(&self) -> impl Iterator<Item = Result<&FileDescriptorProto>> {
+        self.try_as_repeated_message(15)
     }
-    pub fn source_file_descriptors(&self) -> impl Iterator<Item = Result<FileDescriptorProto>> {
-        self.0.repeated_message_field(17, Into::into)
+    pub fn source_file_descriptors(&self) -> impl Iterator<Item = Result<&FileDescriptorProto>> {
+        self.try_as_repeated_message(17)
     }
-    pub fn compiler_version(&self) -> Result<Option<Version>> {
-        self.0.scalar_message_field(3, Version)
+    pub fn compiler_version(&self) -> Result<Option<&Version>> {
+        self.try_as_scalar_message(3)
     }
 }
 
@@ -90,9 +94,10 @@ pub mod code_generator_response {
         }
     }
 
-    #[derive(DDeref, DDerefMut, DFrom, DInto, Default, Debug)]
-    pub struct File<'a>(GenericMessage<'a>);
-    impl<'a> File<'a> {
+    #[derive(DDeref, DDerefMut, DFrom, DInto, Default, Debug, RefCast)]
+    #[repr(transparent)]
+    pub struct File(GenericMessage2);
+    impl File {
         pub fn name(&self) -> Result<Option<&str>> {
             self.0.field(1).try_as_scalar_string_opt()
         }
@@ -134,7 +139,7 @@ pub mod code_generator_response {
             fn set_content(&mut self, content: &str);
         }
     }
-    impl FileTrait for GenericMessage<'_> {
+    impl FileTrait for GenericMessage2 {
         fn name(&self) -> &str {
             self.field(1).as_scalar_string()
         }
@@ -145,7 +150,7 @@ pub mod code_generator_response {
             self.field(15).as_scalar_string()
         }
     }
-    impl FileMutTrait for GenericMessage<'_> {
+    impl FileMutTrait for GenericMessage2 {
         fn set_name(&mut self, name: &str) {
             self.field_mut(1).set_string(name)
         }
@@ -158,23 +163,24 @@ pub mod code_generator_response {
     }
 }
 
-#[derive(DDeref, DDerefMut, DFrom, DInto, Default, Debug)]
-pub struct CodeGeneratorResponse<'a>(GenericMessage<'a>);
-impl<'a> CodeGeneratorResponse<'a> {
+#[derive(DDeref, DDerefMut, DFrom, DInto, Default, Debug, RefCast)]
+#[repr(transparent)]
+pub struct CodeGeneratorResponse(GenericMessage2);
+impl CodeGeneratorResponse {
     pub fn error(&self) -> Result<Option<&str>> {
         self.0.field(1).try_as_scalar_string_opt()
     }
     pub fn supported_features(&self) -> Result<Option<u64>> {
-        self.0.scalar_variant_field::<UInt64>(2)
+        self.0.field(2).try_as_scalar_variant_opt::<UInt64>(false)
     }
     pub fn minimum_edition(&self) -> Result<Option<i32>> {
-        self.0.scalar_variant_field::<Int32>(3)
+        self.0.field(3).try_as_scalar_variant_opt::<Int32>(false)
     }
     pub fn maximum_edition(&self) -> Result<Option<i32>> {
-        self.0.scalar_variant_field::<Int32>(4)
+        self.0.field(4).try_as_scalar_variant_opt::<Int32>(false)
     }
-    pub fn file(&self) -> impl Iterator<Item = Result<code_generator_response::File>> {
-        self.0.repeated_message_field(15, Into::into)
+    pub fn file(&self) -> impl Iterator<Item = Result<&code_generator_response::File>> {
+        self.try_as_repeated_message(15)
     }
 
     pub fn set_error(&mut self, error: &str) -> Result<()> {
@@ -230,7 +236,7 @@ impl_message_mut_trait_for_trivial_types! {
     }
 }
 
-impl VersionTrait for GenericMessage<'_> {
+impl VersionTrait for GenericMessage2 {
     fn major(&self) -> i32 {
         self.field(1).as_scalar_variant::<Int32>(false)
     }
@@ -244,9 +250,9 @@ impl VersionTrait for GenericMessage<'_> {
         self.field(4).as_scalar_string()
     }
 }
-// impl VersionMutTrait for GenericMessage<'_> {}
+// impl VersionMutTrait for GenericMessage2 {}
 
-impl CodeGeneratorRequestTrait for GenericMessage<'_> {
+impl CodeGeneratorRequestTrait for GenericMessage2 {
     fn file_to_generate(&self) -> impl Iterator<Item = &str> {
         self.field(1).as_repeated_string()
     }
@@ -263,7 +269,7 @@ impl CodeGeneratorRequestTrait for GenericMessage<'_> {
         self.field(3).as_scalar_message()
     }
 }
-// impl CodeGeneratorRequestMutTrait for GenericMessage<'_> {
+// impl CodeGeneratorRequestMutTrait for GenericMessage2 {
 //     fn set_parameter(&mut self, parameter: &str) {
 //         self.field_mut(2).set_string(parameter)
 //     }
