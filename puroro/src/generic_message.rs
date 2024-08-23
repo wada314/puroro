@@ -16,6 +16,7 @@ use crate::internal::deser::record::{Payload, Record};
 use crate::internal::deser::{
     deser_from_bufread, DeserMessageHandlerBase, DeserMessageHandlerForRead,
 };
+use crate::internal::utils::TransmutableEitherOrBoth;
 use crate::internal::WireType;
 use crate::message::MessageLite;
 use crate::variant::{
@@ -408,7 +409,7 @@ pub enum WireTypeAndPayload2<A: Allocator = Global> {
     Variant(Variant),
     I64([u8; 8]),
     I32([u8; 4]),
-    Len(InnerMutableBytesOrMsg<A>),
+    Len(TransmutableEitherOrBoth<Vec<u8, A>, GenericMessage2<A>>),
 }
 #[derive(Clone)]
 pub struct InnerMutableBytesOrMsg<A: Allocator> {
@@ -499,6 +500,23 @@ impl<A: Allocator> Debug for InnerMutableBytesOrMsg<A> {
     }
 }
 
+impl<A: Allocator + Clone> TryFrom<&Vec<u8, A>> for GenericMessage2<A> {
+    type Error = ErrorKind;
+    fn try_from(buf: &Vec<u8, A>) -> Result<Self> {
+        let mut msg = GenericMessage2::new_in(buf.allocator().clone());
+        msg.merge_from_bufread(buf.as_slice())?;
+        Ok(msg)
+    }
+}
+impl<A: Allocator + Clone> TryFrom<&GenericMessage2<A>> for Vec<u8, A> {
+    type Error = ErrorKind;
+    fn try_from(value: &GenericMessage2<A>) -> Result<Self> {
+        let mut buf = Vec::new_in(value.alloc.clone());
+        value.write(&mut buf)?;
+        Ok(buf)
+    }
+}
+
 impl<A: Allocator + Clone> MessageLite for GenericMessage2<A> {
     fn merge_from_bufread<R: BufRead>(&mut self, read: R) -> Result<()> {
         deser_from_bufread(read, self)
@@ -525,7 +543,7 @@ impl<A: Allocator + Clone> MessageLite for GenericMessage2<A> {
                     }
                     WireTypeAndPayload2::Len(bytes_or_msg) => {
                         // If bytes buffer is vacant, generate it from msg.
-                        let bytes = bytes_or_msg.try_as_bytes()?;
+                        let bytes = bytes_or_msg.try_left()?;
                         let len = bytes.len();
                         write.write_all(bytes)?;
                         len
@@ -571,7 +589,7 @@ impl<A: Allocator + Clone, R: Read> DeserMessageHandlerForRead<R> for GenericMes
         let mut buf = Vec::new();
         let len = read.read_to_end(&mut buf)?;
         self.field_mut(num).0.push(WireTypeAndPayload2::Len(
-            InnerMutableBytesOrMsg::from_bytes(buf.as_slice().to_vec_in(alloc)),
+            TransmutableEitherOrBoth::from_left(buf.as_slice().to_vec_in(alloc)),
         ));
         Ok(len)
     }
@@ -703,8 +721,7 @@ impl<A: Allocator + Clone> Field2<A> {
                 (_, WireTypeAndPayload2::Variant(variant)) => {
                     Either::Left(Some(Ok(variant.clone())).into_iter())
                 }
-                (true, WireTypeAndPayload2::Len(bytes_or_msg)) => match bytes_or_msg.try_as_bytes()
-                {
+                (true, WireTypeAndPayload2::Len(bytes_or_msg)) => match bytes_or_msg.try_left() {
                     Ok(bytes) => Either::Right(bytes.into_variant_iter()),
                     Err(e) => Either::Left(Some(Err(e)).into_iter()),
                 },
@@ -736,7 +753,7 @@ impl<A: Allocator + Clone> Field2<A> {
     pub fn try_as_repeated_string(&self) -> impl '_ + Iterator<Item = Result<&str>> {
         self.0.iter().map(|record| match record {
             WireTypeAndPayload2::Len(bytes_or_msg) => {
-                Ok(::std::str::from_utf8(bytes_or_msg.try_as_bytes()?)?)
+                Ok(::std::str::from_utf8(bytes_or_msg.try_left()?)?)
             }
             _ => Err(ErrorKind::GenericMessageFieldTypeError),
         })
@@ -746,7 +763,7 @@ impl<A: Allocator + Clone> Field2<A> {
     }
     pub fn try_as_repeated_bytes(&self) -> impl '_ + Iterator<Item = Result<&[u8]>> {
         self.0.iter().map(|record| match record {
-            WireTypeAndPayload2::Len(bytes_or_msg) => Ok(bytes_or_msg.try_as_bytes()?),
+            WireTypeAndPayload2::Len(bytes_or_msg) => Ok(bytes_or_msg.try_left()?.as_slice()),
             _ => Err(ErrorKind::GenericMessageFieldTypeError),
         })
     }
@@ -756,7 +773,7 @@ impl<A: Allocator + Clone> Field2<A> {
             let WireTypeAndPayload2::Len(bytes_or_msg) = wire_and_payload else {
                 Err(ErrorKind::GenericMessageFieldTypeError)?
             };
-            let msg = bytes_or_msg.try_as_msg()?;
+            let msg = bytes_or_msg.try_right()?;
             message_opt
                 .get_or_insert_with(|| GenericMessage2::new_in(msg.alloc.clone()))
                 .merge(msg.clone());
@@ -768,7 +785,7 @@ impl<A: Allocator + Clone> Field2<A> {
             let WireTypeAndPayload2::Len(bytes_or_msg) = wire_and_payload else {
                 Err(ErrorKind::GenericMessageFieldTypeError)?
             };
-            Ok(bytes_or_msg.try_as_msg()?)
+            Ok(bytes_or_msg.try_right()?)
         })
     }
 }
@@ -803,20 +820,19 @@ impl<A: Allocator + Clone> FieldMut2<'_, A> {
     }
     pub fn push_string(&mut self, val: &str) {
         self.0.push(WireTypeAndPayload2::Len(
-            InnerMutableBytesOrMsg::from_bytes(
+            TransmutableEitherOrBoth::from_left(
                 val.as_bytes().to_vec_in(self.0.allocator().clone()),
             ),
         ));
     }
     pub fn push_bytes(&mut self, val: &[u8]) {
         self.0.push(WireTypeAndPayload2::Len(
-            InnerMutableBytesOrMsg::from_bytes(val.to_vec_in(self.0.allocator().clone())),
+            TransmutableEitherOrBoth::from_left(val.to_vec_in(self.0.allocator().clone())),
         ));
     }
     pub fn push_message(&mut self, val: GenericMessage2<A>) {
-        self.0
-            .push(WireTypeAndPayload2::Len(InnerMutableBytesOrMsg::from_msg(
-                val,
-            )));
+        self.0.push(WireTypeAndPayload2::Len(
+            TransmutableEitherOrBoth::from_right(val),
+        ));
     }
 }

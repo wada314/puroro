@@ -14,6 +14,7 @@
 
 use ::std::cell::OnceCell;
 
+#[derive(Clone, Debug)]
 pub enum TransmutableEitherOrBoth<T, U> {
     Left(T, OnceCell<U>),
     Right(U, OnceCell<T>),
@@ -25,6 +26,16 @@ where
     T: for<'a> TryFrom<&'a U, Error = E>,
     U: for<'a> TryFrom<&'a T, Error = E>,
 {
+    pub fn from_left(left: T) -> Self {
+        TransmutableEitherOrBoth::Left(left, OnceCell::new())
+    }
+    pub fn from_right(right: U) -> Self {
+        TransmutableEitherOrBoth::Right(right, OnceCell::new())
+    }
+    pub fn from_both(left: T, right: U) -> Self {
+        TransmutableEitherOrBoth::Both(left, right)
+    }
+
     pub fn try_left(&self) -> Result<&T, E> {
         match self {
             TransmutableEitherOrBoth::Left(left, _) => Ok(left),
