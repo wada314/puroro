@@ -693,7 +693,7 @@ impl<A: Allocator + Clone> Field2<A> {
             _ => Err(ErrorKind::GenericMessageFieldTypeError),
         })
     }
-    pub fn try_as_scalar_message(&self) -> Result<Option<GenericMessage2<A>>> {
+    pub fn try_as_scalar_message(&self) -> Result<Option<&GenericMessage2<A>>> {
         let mut message_opt = None;
         for wire_and_payload in &self.0 {
             let WireTypeAndPayload2::Len(bytes_or_msg) = wire_and_payload else {
@@ -704,9 +704,10 @@ impl<A: Allocator + Clone> Field2<A> {
                 .get_or_insert_with(|| GenericMessage2::new_in(msg.alloc.clone()))
                 .merge(msg.clone());
         }
-        Ok(message_opt)
+        // Ok(message_opt)
+        todo!()
     }
-    pub fn try_as_repeated_message(&self) -> impl Iterator<Item = Result<&'_ GenericMessage2<A>>> {
+    pub fn try_as_repeated_message(&self) -> impl Iterator<Item = Result<&GenericMessage2<A>>> {
         self.0.iter().map(|wire_and_payload| {
             let WireTypeAndPayload2::Len(bytes_or_msg) = wire_and_payload else {
                 Err(ErrorKind::GenericMessageFieldTypeError)?
