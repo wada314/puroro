@@ -19,7 +19,6 @@ use crate::internal::{
     impl_message_mut_trait_for_trivial_types, impl_message_trait_for_trivial_types,
 };
 use crate::variant::variant_types::{Int32, UInt64};
-use crate::variant::VariantIntegerType;
 use crate::Result;
 use ::derive_more::{Deref as DDeref, DerefMut as DDerefMut, From as DFrom, Into as DInto};
 use ::ref_cast::RefCast;
