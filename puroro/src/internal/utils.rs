@@ -119,3 +119,98 @@ where
         Ok(right)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use ::std::assert_matches::assert_matches;
+    use ::std::result::Result;
+
+    #[derive(Debug)]
+    struct Mul2(u32);
+    #[derive(Debug)]
+    struct Mul3(u32);
+
+    impl TryFrom<&Mul2> for Mul3 {
+        type Error = u32;
+        fn try_from(mul2: &Mul2) -> Result<Self, Self::Error> {
+            if mul2.0 % 3 == 0 {
+                Ok(Mul3(mul2.0))
+            } else {
+                Err(mul2.0)
+            }
+        }
+    }
+    impl TryFrom<&Mul3> for Mul2 {
+        type Error = u32;
+        fn try_from(mul3: &Mul3) -> Result<Self, Self::Error> {
+            if mul3.0 % 2 == 0 {
+                Ok(Mul2(mul3.0))
+            } else {
+                Err(mul3.0)
+            }
+        }
+    }
+
+    impl PartialEq<u32> for Mul2 {
+        fn eq(&self, other: &u32) -> bool {
+            self.0 == *other
+        }
+    }
+    impl PartialEq<u32> for Mul3 {
+        fn eq(&self, other: &u32) -> bool {
+            self.0 == *other
+        }
+    }
+
+    #[test]
+    fn test_from_left_ok_right() {
+        let eob = TransmutableEitherOrBoth::from_left(Mul2(6));
+        assert_matches!(eob.try_left(), Ok(&Mul2(6)));
+        assert_matches!(eob.try_right(), Ok(&Mul3(6)));
+    }
+
+    #[test]
+    fn test_from_right_ok_left() {
+        let eob = TransmutableEitherOrBoth::from_right(Mul3(6));
+        assert_matches!(eob.try_left(), Ok(&Mul2(6)));
+        assert_matches!(eob.try_right(), Ok(&Mul3(6)));
+    }
+
+    #[test]
+    fn test_from_both() {
+        let eob = TransmutableEitherOrBoth::from_both(Mul2(6), Mul3(6));
+        assert_matches!(eob.try_left(), Ok(&Mul2(6)));
+        assert_matches!(eob.try_right(), Ok(&Mul3(6)));
+    }
+
+    #[test]
+    fn test_from_left_err_right() {
+        let eob = TransmutableEitherOrBoth::from_left(Mul2(4));
+        assert_matches!(eob.try_left(), Ok(&Mul2(4)));
+        assert_matches!(eob.try_right(), Err(4));
+    }
+
+    #[test]
+    fn test_from_right_err_left() {
+        let eob = TransmutableEitherOrBoth::from_right(Mul3(9));
+        assert_matches!(eob.try_left(), Err(9));
+        assert_matches!(eob.try_right(), Ok(&Mul3(9)));
+    }
+
+    #[test]
+    fn test_mut_left() {
+        let mut eob = TransmutableEitherOrBoth::from_right(Mul3(6));
+        *(eob.try_left_mut().unwrap()) = Mul2(12);
+        assert_matches!(eob.try_left(), Ok(&Mul2(12)));
+        assert_matches!(eob.try_right(), Ok(&Mul3(12)));
+    }
+
+    #[test]
+    fn test_mut_right() {
+        let mut eob = TransmutableEitherOrBoth::from_left(Mul2(6));
+        *(eob.try_right_mut().unwrap()) = Mul3(12);
+        assert_matches!(eob.try_right(), Ok(&Mul3(12)));
+        assert_matches!(eob.try_left(), Ok(&Mul2(12)));
+    }
+}
