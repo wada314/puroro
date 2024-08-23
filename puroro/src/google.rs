@@ -15,42 +15,35 @@
 pub mod protobuf;
 
 use crate::generic_message::GenericMessage;
-use crate::variant::VariantIntegerType;
 use crate::Result;
-use ::itertools::Itertools;
+use ::ref_cast::RefCast;
+use ::std::alloc::Allocator;
 
-/// Some utility impls for [`GenericMessage`].
-impl GenericMessage<'_> {
-    fn scalar_variant_field<T>(&self, number: i32) -> Result<Option<T::RustType>>
+trait GenericMessageExt {
+    type Alloc: Allocator;
+    fn try_as_scalar_message<'a, T>(&'a self, number: i32) -> Result<Option<&T>>
     where
-        T: VariantIntegerType,
-    {
-        Ok(self.field(number).try_as_scalar_variant_opt::<T>(false)?)
-    }
-    fn repeated_variant_field<'a, T>(
-        &'a self,
-        number: i32,
-    ) -> impl 'a + Iterator<Item = Result<T::RustType>>
+        T: 'a + RefCast<From = GenericMessage<Self::Alloc>>;
+    fn try_as_repeated_message<'a, T>(&'a self, number: i32) -> impl Iterator<Item = Result<&T>>
     where
-        T: VariantIntegerType,
+        T: 'a + RefCast<From = GenericMessage<Self::Alloc>>;
+}
+impl<A: Allocator + Clone> GenericMessageExt for GenericMessage<A> {
+    type Alloc = A;
+    fn try_as_scalar_message<'a, T>(&'a self, number: i32) -> Result<Option<&T>>
+    where
+        T: 'a + RefCast<From = GenericMessage<Self::Alloc>>,
     {
-        self.field(number).try_as_repeated_variant::<T>(false)
+        self.field(number)
+            .try_as_scalar_message()
+            .map(|o| o.map(RefCast::ref_cast))
     }
-    fn scalar_message_field<'a, T, F: Fn(GenericMessage<'a>) -> T>(
-        &'a self,
-        number: i32,
-        constructor: F,
-    ) -> Result<Option<T>> {
-        Ok(self.field(number).try_as_scalar_message()?.map(constructor))
-    }
-    fn repeated_message_field<'a, T, F: 'a + Fn(GenericMessage<'a>) -> T>(
-        &'a self,
-        number: i32,
-        constructor: F,
-    ) -> impl 'a + Iterator<Item = Result<T>> {
+    fn try_as_repeated_message<'a, T>(&'a self, number: i32) -> impl Iterator<Item = Result<&T>>
+    where
+        T: 'a + RefCast<From = GenericMessage<Self::Alloc>>,
+    {
         self.field(number)
             .try_as_repeated_message()
-            .into_iter()
-            .map_ok(constructor)
+            .map(|r| r.map(RefCast::ref_cast))
     }
 }
