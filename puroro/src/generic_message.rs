@@ -131,11 +131,14 @@ impl<A: Allocator + Clone> Interconverter<Vec<u8, A>, GenericMessage<A>> for () 
     }
 }
 
-impl<A: Allocator + Clone> Interconverter<Vec<WireTypeAndPayload2<A>, A>, GenericMessage<A>>
+impl<A: Allocator + Clone> Interconverter<Vec<WireTypeAndPayload2<A>, A>, Option<GenericMessage<A>>>
     for ()
 {
     type Error = ErrorKind;
-    fn try_into_left(right: &GenericMessage<A>) -> Result<Vec<WireTypeAndPayload2<A>, A>> {
+    fn try_into_left(right: &Option<GenericMessage<A>>) -> Result<Vec<WireTypeAndPayload2<A>, A>> {
+        let Some(msg) = right else {
+            return Ok(Vec::new_in(right.alloc.clone()));
+        };
         let mut buf = Vec::new_in(right.alloc.clone());
         right.write(&mut buf)?;
         let mut vec = Vec::with_capacity_in(1, right.alloc.clone());
@@ -144,28 +147,9 @@ impl<A: Allocator + Clone> Interconverter<Vec<WireTypeAndPayload2<A>, A>, Generi
         )));
         Ok(vec)
     }
-    fn try_into_right(left: &Vec<WireTypeAndPayload2<A>, A>) -> Result<GenericMessage<A>> {
+    fn try_into_right(left: &Vec<WireTypeAndPayload2<A>, A>) -> Result<Option<GenericMessage<A>>> {
         let mut msg_opt: Option<GenericMessage<A>> = None;
         for wire_and_payload in left {
-            let WireTypeAndPayload2::Len(bytes_or_msg) = wire_and_payload else {
-                Err(ErrorKind::GenericMessageFieldTypeError)?
-            };
-            match msg_opt {
-                Some(ref mut msg) => msg.merge(bytes_or_msg.try_right()?.clone()),
-                None => {
-                    msg_opt = Some(bytes_or_msg.try_right()?.clone());
-                }
-            }
-        }
-        Ok(msg_opt)
-    }
-}
-
-impl<A: Allocator + Clone> TryFrom<&Vec<WireTypeAndPayload2<A>, A>> for Option<GenericMessage<A>> {
-    type Error = ErrorKind;
-    fn try_from(value: &Vec<WireTypeAndPayload2<A>, A>) -> Result<Self> {
-        let mut msg_opt: Option<GenericMessage<A>> = None;
-        for wire_and_payload in value {
             let WireTypeAndPayload2::Len(bytes_or_msg) = wire_and_payload else {
                 Err(ErrorKind::GenericMessageFieldTypeError)?
             };
