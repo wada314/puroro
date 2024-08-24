@@ -13,107 +13,115 @@
 // limitations under the License.
 
 use ::std::cell::OnceCell;
+use ::std::marker::PhantomData;
 
 #[derive(Clone, Debug)]
-pub enum TransmutableEitherOrBoth<T, U> {
-    Left(T, OnceCell<U>),
-    Right(U, OnceCell<T>),
-    Both(T, U),
+pub enum InterconvertiblePair<T, U, I> {
+    Left(T, OnceCell<U>, PhantomData<I>),
+    Right(U, OnceCell<T>, PhantomData<I>),
+    Both(T, U, PhantomData<I>),
 }
 
-impl<T, U, E> TransmutableEitherOrBoth<T, U>
+pub trait Interconverter {
+    type Left;
+    type Right;
+    type Error;
+    fn try_into_left(right: &Self::Right) -> Result<Self::Left, Self::Error>;
+    fn try_into_right(left: &Self::Left) -> Result<Self::Right, Self::Error>;
+}
+
+impl<T, U, I> InterconvertiblePair<T, U, I>
 where
-    T: for<'a> TryFrom<&'a U, Error = E>,
-    U: for<'a> TryFrom<&'a T, Error = E>,
+    I: Interconverter<Left = T, Right = U>,
 {
     pub fn from_left(left: T) -> Self {
-        TransmutableEitherOrBoth::Left(left, OnceCell::new())
+        InterconvertiblePair::Left(left, OnceCell::new(), PhantomData)
     }
     pub fn from_right(right: U) -> Self {
-        TransmutableEitherOrBoth::Right(right, OnceCell::new())
+        InterconvertiblePair::Right(right, OnceCell::new(), PhantomData)
     }
     pub fn from_both(left: T, right: U) -> Self {
-        TransmutableEitherOrBoth::Both(left, right)
+        InterconvertiblePair::Both(left, right, PhantomData)
     }
 
-    pub fn try_left(&self) -> Result<&T, E> {
+    pub fn try_left(&self) -> Result<&T, I::Error> {
         match self {
-            TransmutableEitherOrBoth::Left(left, _) => Ok(left),
-            TransmutableEitherOrBoth::Right(right, left_cell) => {
-                left_cell.get_or_try_init(|| <&U>::try_into(right))
+            InterconvertiblePair::Left(left, _, _) => Ok(left),
+            InterconvertiblePair::Right(right, left_cell, _) => {
+                left_cell.get_or_try_init(|| I::try_into_left(right))
             }
-            TransmutableEitherOrBoth::Both(left, _) => Ok(left),
+            InterconvertiblePair::Both(left, _, _) => Ok(left),
         }
     }
-    pub fn try_right(&self) -> Result<&U, E> {
+    pub fn try_right(&self) -> Result<&U, I::Error> {
         match self {
-            TransmutableEitherOrBoth::Left(left, right_cell) => {
-                right_cell.get_or_try_init(|| <&T>::try_into(left))
+            InterconvertiblePair::Left(left, right_cell, _) => {
+                right_cell.get_or_try_init(|| I::try_into_right(left))
             }
-            TransmutableEitherOrBoth::Right(right, _) => Ok(right),
-            TransmutableEitherOrBoth::Both(_, right) => Ok(right),
+            InterconvertiblePair::Right(right, _, _) => Ok(right),
+            InterconvertiblePair::Both(_, right, _) => Ok(right),
         }
     }
 
-    pub fn try_into_left(self) -> Result<T, (E, U)> {
+    pub fn try_into_left(self) -> Result<T, (I::Error, U)> {
         Ok(match self {
-            TransmutableEitherOrBoth::Left(left, _) => left,
-            TransmutableEitherOrBoth::Right(right, mut left_cell) => match left_cell.take() {
+            InterconvertiblePair::Left(left, _, _) => left,
+            InterconvertiblePair::Right(right, mut left_cell, _) => match left_cell.take() {
                 Some(left) => left,
-                None => <&U>::try_into(&right).map_err(|e| (e, right))?,
+                None => I::try_into_left(&right).map_err(|e| (e, right))?,
             },
-            TransmutableEitherOrBoth::Both(left, _) => left,
+            InterconvertiblePair::Both(left, _, _) => left,
         })
     }
-    pub fn try_into_right(self) -> Result<U, (E, T)> {
+    pub fn try_into_right(self) -> Result<U, (I::Error, T)> {
         Ok(match self {
-            TransmutableEitherOrBoth::Left(left, mut right_cell) => match right_cell.take() {
+            InterconvertiblePair::Left(left, mut right_cell, _) => match right_cell.take() {
                 Some(right) => right,
-                None => <&T>::try_into(&left).map_err(|e| (e, left))?,
+                None => I::try_into_right(&left).map_err(|e| (e, left))?,
             },
-            TransmutableEitherOrBoth::Right(right, _) => right,
-            TransmutableEitherOrBoth::Both(_, right) => right,
+            InterconvertiblePair::Right(right, _, _) => right,
+            InterconvertiblePair::Both(_, right, _) => right,
         })
     }
 
-    pub fn try_left_mut(&mut self) -> Result<&mut T, E> {
+    pub fn try_left_mut(&mut self) -> Result<&mut T, I::Error> {
         unsafe {
             let taken_self = ::std::ptr::read(self);
             let (new_self, result) = match taken_self.try_into_left() {
                 Ok(left) => (
-                    TransmutableEitherOrBoth::Left(left, OnceCell::new()),
+                    InterconvertiblePair::Left(left, OnceCell::new(), PhantomData),
                     Ok(()),
                 ),
                 Err((e, right)) => (
-                    TransmutableEitherOrBoth::Right(right, OnceCell::new()),
+                    InterconvertiblePair::Right(right, OnceCell::new(), PhantomData),
                     Err(e),
                 ),
             };
             ::std::ptr::write(self, new_self);
             result
         }?;
-        let TransmutableEitherOrBoth::Left(left, _) = self else {
+        let InterconvertiblePair::Left(left, _, _) = self else {
             unreachable!();
         };
         Ok(left)
     }
-    pub fn try_right_mut(&mut self) -> Result<&mut U, E> {
+    pub fn try_right_mut(&mut self) -> Result<&mut U, I::Error> {
         unsafe {
             let taken_self = ::std::ptr::read(self);
             let (new_self, result) = match taken_self.try_into_right() {
                 Ok(right) => (
-                    TransmutableEitherOrBoth::Right(right, OnceCell::new()),
+                    InterconvertiblePair::Right(right, OnceCell::new(), PhantomData),
                     Ok(()),
                 ),
                 Err((e, left)) => (
-                    TransmutableEitherOrBoth::Left(left, OnceCell::new()),
+                    InterconvertiblePair::Left(left, OnceCell::new(), PhantomData),
                     Err(e),
                 ),
             };
             ::std::ptr::write(self, new_self);
             result
         }?;
-        let TransmutableEitherOrBoth::Right(right, _) = self else {
+        let InterconvertiblePair::Right(right, _, _) = self else {
             unreachable!();
         };
         Ok(right)
@@ -131,26 +139,27 @@ mod tests {
     #[derive(Debug)]
     struct Mul3(u32);
 
-    impl TryFrom<&Mul2> for Mul3 {
+    struct InterconvertMul2Mul3;
+    impl Interconverter for InterconvertMul2Mul3 {
+        type Left = Mul2;
+        type Right = Mul3;
         type Error = u32;
-        fn try_from(mul2: &Mul2) -> Result<Self, Self::Error> {
-            if mul2.0 % 3 == 0 {
-                Ok(Mul3(mul2.0))
+        fn try_into_left(right: &Mul3) -> Result<Mul2, u32> {
+            if right.0 % 2 == 0 {
+                Ok(Mul2(right.0))
             } else {
-                Err(mul2.0)
+                Err(right.0)
+            }
+        }
+        fn try_into_right(left: &Mul2) -> Result<Mul3, u32> {
+            if left.0 % 3 == 0 {
+                Ok(Mul3(left.0))
+            } else {
+                Err(left.0)
             }
         }
     }
-    impl TryFrom<&Mul3> for Mul2 {
-        type Error = u32;
-        fn try_from(mul3: &Mul3) -> Result<Self, Self::Error> {
-            if mul3.0 % 2 == 0 {
-                Ok(Mul2(mul3.0))
-            } else {
-                Err(mul3.0)
-            }
-        }
-    }
+    type Mul2Mul3Pair = InterconvertiblePair<Mul2, Mul3, InterconvertMul2Mul3>;
 
     impl PartialEq<u32> for Mul2 {
         fn eq(&self, other: &u32) -> bool {
@@ -165,42 +174,42 @@ mod tests {
 
     #[test]
     fn test_from_left_ok_right() {
-        let eob = TransmutableEitherOrBoth::from_left(Mul2(6));
+        let eob = Mul2Mul3Pair::from_left(Mul2(6));
         assert_matches!(eob.try_left(), Ok(&Mul2(6)));
         assert_matches!(eob.try_right(), Ok(&Mul3(6)));
     }
 
     #[test]
     fn test_from_right_ok_left() {
-        let eob = TransmutableEitherOrBoth::from_right(Mul3(6));
+        let eob = Mul2Mul3Pair::from_right(Mul3(6));
         assert_matches!(eob.try_left(), Ok(&Mul2(6)));
         assert_matches!(eob.try_right(), Ok(&Mul3(6)));
     }
 
     #[test]
     fn test_from_both() {
-        let eob = TransmutableEitherOrBoth::from_both(Mul2(6), Mul3(6));
+        let eob = Mul2Mul3Pair::from_both(Mul2(6), Mul3(6));
         assert_matches!(eob.try_left(), Ok(&Mul2(6)));
         assert_matches!(eob.try_right(), Ok(&Mul3(6)));
     }
 
     #[test]
     fn test_from_left_err_right() {
-        let eob = TransmutableEitherOrBoth::from_left(Mul2(4));
+        let eob = Mul2Mul3Pair::from_left(Mul2(4));
         assert_matches!(eob.try_left(), Ok(&Mul2(4)));
         assert_matches!(eob.try_right(), Err(4));
     }
 
     #[test]
     fn test_from_right_err_left() {
-        let eob = TransmutableEitherOrBoth::from_right(Mul3(9));
+        let eob = Mul2Mul3Pair::from_right(Mul3(9));
         assert_matches!(eob.try_left(), Err(9));
         assert_matches!(eob.try_right(), Ok(&Mul3(9)));
     }
 
     #[test]
     fn test_mut_left() {
-        let mut eob = TransmutableEitherOrBoth::from_right(Mul3(6));
+        let mut eob = Mul2Mul3Pair::from_right(Mul3(6));
         *(eob.try_left_mut().unwrap()) = Mul2(12);
         assert_matches!(eob.try_left(), Ok(&Mul2(12)));
         assert_matches!(eob.try_right(), Ok(&Mul3(12)));
@@ -208,7 +217,7 @@ mod tests {
 
     #[test]
     fn test_mut_right() {
-        let mut eob = TransmutableEitherOrBoth::from_left(Mul2(6));
+        let mut eob = Mul2Mul3Pair::from_left(Mul2(6));
         *(eob.try_right_mut().unwrap()) = Mul3(12);
         assert_matches!(eob.try_right(), Ok(&Mul3(12)));
         assert_matches!(eob.try_left(), Ok(&Mul2(12)));

@@ -15,7 +15,7 @@
 use crate::internal::deser::{
     deser_from_bufread, DeserMessageHandlerBase, DeserMessageHandlerForRead,
 };
-use crate::internal::utils::TransmutableEitherOrBoth;
+use crate::internal::utils::InterconvertiblePair;
 use crate::internal::WireType;
 use crate::message::MessageLite;
 use crate::variant::{
@@ -25,6 +25,7 @@ use crate::{ErrorKind, Result};
 use ::hashbrown::hash_map::{DefaultHashBuilder, Entry};
 use ::hashbrown::HashMap as HashMap2;
 use ::itertools::Either;
+use ::rand_distr::num_traits::ops::bytes;
 use ::std::alloc::{Allocator, Global};
 use ::std::fmt::Debug;
 use ::std::io::{BufRead, Read, Write};
@@ -40,7 +41,7 @@ pub enum WireTypeAndPayload2<A: Allocator = Global> {
     Variant(Variant),
     I64([u8; 8]),
     I32([u8; 4]),
-    Len(TransmutableEitherOrBoth<Vec<u8, A>, GenericMessage<A>>),
+    Len(InterconvertiblePair<Vec<u8, A>, GenericMessage<A>>),
 }
 impl<A: Allocator> WireTypeAndPayload2<A> {
     pub(crate) fn wire_type(&self) -> WireType {
@@ -117,6 +118,7 @@ impl<A: Allocator> Debug for WireTypeAndPayload2<A> {
         }
     }
 }
+
 impl<A: Allocator + Clone> TryFrom<&Vec<u8, A>> for GenericMessage<A> {
     type Error = ErrorKind;
     fn try_from(buf: &Vec<u8, A>) -> Result<Self> {
@@ -131,6 +133,24 @@ impl<A: Allocator + Clone> TryFrom<&GenericMessage<A>> for Vec<u8, A> {
         let mut buf = Vec::new_in(value.alloc.clone());
         value.write(&mut buf)?;
         Ok(buf)
+    }
+}
+impl<A: Allocator + Clone> TryFrom<&Vec<WireTypeAndPayload2<A>, A>> for Option<GenericMessage<A>> {
+    type Error = ErrorKind;
+    fn try_from(value: &Vec<WireTypeAndPayload2<A>, A>) -> Result<Self> {
+        let mut msg_opt: Option<GenericMessage<A>> = None;
+        for wire_and_payload in value {
+            let WireTypeAndPayload2::Len(bytes_or_msg) = wire_and_payload else {
+                Err(ErrorKind::GenericMessageFieldTypeError)?
+            };
+            match msg_opt {
+                Some(ref mut msg) => msg.merge(bytes_or_msg.try_right()?.clone()),
+                None => {
+                    msg_opt = Some(bytes_or_msg.try_right()?.clone());
+                }
+            }
+        }
+        Ok(msg_opt)
     }
 }
 
@@ -205,9 +225,11 @@ impl<A: Allocator + Clone, R: Read> DeserMessageHandlerForRead<R> for GenericMes
         // Facepalm
         let mut buf = Vec::new();
         let len = read.read_to_end(&mut buf)?;
-        self.field_mut(num).0.push(WireTypeAndPayload2::Len(
-            TransmutableEitherOrBoth::from_left(buf.as_slice().to_vec_in(alloc)),
-        ));
+        self.field_mut(num)
+            .0
+            .push(WireTypeAndPayload2::Len(InterconvertiblePair::from_left(
+                buf.as_slice().to_vec_in(alloc),
+            )));
         Ok(len)
     }
 }
@@ -371,20 +393,21 @@ impl<A: Allocator + Clone> FieldMut2<A> {
         self.0.push(WireTypeAndPayload2::I64(val));
     }
     pub fn push_string(&mut self, val: &str) {
-        self.0.push(WireTypeAndPayload2::Len(
-            TransmutableEitherOrBoth::from_left(
+        self.0
+            .push(WireTypeAndPayload2::Len(InterconvertiblePair::from_left(
                 val.as_bytes().to_vec_in(self.0.allocator().clone()),
-            ),
-        ));
+            )));
     }
     pub fn push_bytes(&mut self, val: &[u8]) {
-        self.0.push(WireTypeAndPayload2::Len(
-            TransmutableEitherOrBoth::from_left(val.to_vec_in(self.0.allocator().clone())),
-        ));
+        self.0
+            .push(WireTypeAndPayload2::Len(InterconvertiblePair::from_left(
+                val.to_vec_in(self.0.allocator().clone()),
+            )));
     }
     pub fn push_message(&mut self, val: GenericMessage<A>) {
-        self.0.push(WireTypeAndPayload2::Len(
-            TransmutableEitherOrBoth::from_right(val),
-        ));
+        self.0
+            .push(WireTypeAndPayload2::Len(InterconvertiblePair::from_right(
+                val,
+            )));
     }
 }
