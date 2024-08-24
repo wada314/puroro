@@ -15,17 +15,14 @@
 use crate::internal::deser::{
     deser_from_bufread, DeserMessageHandlerBase, DeserMessageHandlerForRead,
 };
-use crate::internal::utils::InterconvertiblePair;
+use crate::internal::utils::{Interconverter, InterconvertiblePair};
 use crate::internal::WireType;
 use crate::message::MessageLite;
-use crate::variant::{
-    variant_types::UInt32, ReadExtVariant, Variant, VariantIntegerType, WriteExtVariant,
-};
+use crate::variant::{variant_types::UInt32, Variant, VariantIntegerType, WriteExtVariant};
 use crate::{ErrorKind, Result};
 use ::hashbrown::hash_map::{DefaultHashBuilder, Entry};
 use ::hashbrown::HashMap as HashMap2;
 use ::itertools::Either;
-use ::rand_distr::num_traits::ops::bytes;
 use ::std::alloc::{Allocator, Global};
 use ::std::fmt::Debug;
 use ::std::io::{BufRead, Read, Write};
@@ -119,22 +116,48 @@ impl<A: Allocator> Debug for WireTypeAndPayload2<A> {
     }
 }
 
-impl<A: Allocator + Clone> TryFrom<&Vec<u8, A>> for GenericMessage<A> {
+impl<A: Allocator + Clone> Interconverter<Vec<u8, A>, GenericMessage<A>> for () {
     type Error = ErrorKind;
-    fn try_from(buf: &Vec<u8, A>) -> Result<Self> {
-        let mut msg = GenericMessage::new_in(buf.allocator().clone());
-        msg.merge_from_bufread(buf.as_slice())?;
+    fn try_into_left(right: &GenericMessage<A>) -> Result<Vec<u8, A>> {
+        let mut buf = Vec::new_in(right.alloc.clone());
+        right.write(&mut buf)?;
+        Ok(buf)
+    }
+    fn try_into_right(left: &Vec<u8, A>) -> Result<GenericMessage<A>> {
+        let mut msg = GenericMessage::new_in(left.allocator().clone());
+        msg.merge_from_bufread(left.as_slice())?;
         Ok(msg)
     }
 }
-impl<A: Allocator + Clone> TryFrom<&GenericMessage<A>> for Vec<u8, A> {
+
+impl<A: Allocator + Clone> Interconverter<Vec<WireTypeAndPayload2<A>, A>, GenericMessage<A>>
+    for ()
+{
     type Error = ErrorKind;
-    fn try_from(value: &GenericMessage<A>) -> Result<Self> {
-        let mut buf = Vec::new_in(value.alloc.clone());
-        value.write(&mut buf)?;
-        Ok(buf)
+    fn try_into_left(right: &GenericMessage<A>) -> Result<Vec<WireTypeAndPayload2<A>, A>> {
+        let mut buf = Vec::new_in(right.alloc.clone());
+        right.write(&mut buf)?;
+        Ok(vec![WireTypeAndPayload2::Len(
+            InterconvertiblePair::from_left(buf),
+        )])
+    }
+    fn try_into_right(left: &Vec<WireTypeAndPayload2<A>, A>) -> Result<GenericMessage<A>> {
+        let mut msg_opt: Option<GenericMessage<A>> = None;
+        for wire_and_payload in left {
+            let WireTypeAndPayload2::Len(bytes_or_msg) = wire_and_payload else {
+                Err(ErrorKind::GenericMessageFieldTypeError)?
+            };
+            match msg_opt {
+                Some(ref mut msg) => msg.merge(bytes_or_msg.try_right()?.clone()),
+                None => {
+                    msg_opt = Some(bytes_or_msg.try_right()?.clone());
+                }
+            }
+        }
+        Ok(msg_opt)
     }
 }
+
 impl<A: Allocator + Clone> TryFrom<&Vec<WireTypeAndPayload2<A>, A>> for Option<GenericMessage<A>> {
     type Error = ErrorKind;
     fn try_from(value: &Vec<WireTypeAndPayload2<A>, A>) -> Result<Self> {

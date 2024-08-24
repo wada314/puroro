@@ -22,17 +22,15 @@ pub enum InterconvertiblePair<T, U, I> {
     Both(T, U, PhantomData<I>),
 }
 
-pub trait Interconverter {
-    type Left;
-    type Right;
+pub trait Interconverter<L, R> {
     type Error;
-    fn try_into_left(right: &Self::Right) -> Result<Self::Left, Self::Error>;
-    fn try_into_right(left: &Self::Left) -> Result<Self::Right, Self::Error>;
+    fn try_into_left(right: &R) -> Result<L, Self::Error>;
+    fn try_into_right(left: &L) -> Result<R, Self::Error>;
 }
 
 impl<T, U, I> InterconvertiblePair<T, U, I>
 where
-    I: Interconverter<Left = T, Right = U>,
+    I: Interconverter<T, U>,
 {
     pub fn from_left(left: T) -> Self {
         InterconvertiblePair::Left(left, OnceCell::new(), PhantomData)
@@ -140,9 +138,7 @@ mod tests {
     struct Mul3(u32);
 
     struct InterconvertMul2Mul3;
-    impl Interconverter for InterconvertMul2Mul3 {
-        type Left = Mul2;
-        type Right = Mul3;
+    impl Interconverter<Mul2, Mul3> for InterconvertMul2Mul3 {
         type Error = u32;
         fn try_into_left(right: &Mul3) -> Result<Mul2, u32> {
             if right.0 % 2 == 0 {
