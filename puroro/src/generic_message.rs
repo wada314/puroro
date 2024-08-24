@@ -27,6 +27,7 @@ use ::std::alloc::{Allocator, Global};
 use ::std::fmt::Debug;
 use ::std::io::{BufRead, Read, Write};
 use ::std::ops::Deref;
+use ::std::vec;
 
 #[derive(Default, Clone)]
 pub struct GenericMessage<A: Allocator = Global> {
@@ -38,7 +39,7 @@ pub enum WireTypeAndPayload2<A: Allocator = Global> {
     Variant(Variant),
     I64([u8; 8]),
     I32([u8; 4]),
-    Len(InterconvertiblePair<Vec<u8, A>, GenericMessage<A>>),
+    Len(InterconvertiblePair<Vec<u8, A>, GenericMessage<A>, ()>),
 }
 impl<A: Allocator> WireTypeAndPayload2<A> {
     pub(crate) fn wire_type(&self) -> WireType {
@@ -137,9 +138,11 @@ impl<A: Allocator + Clone> Interconverter<Vec<WireTypeAndPayload2<A>, A>, Generi
     fn try_into_left(right: &GenericMessage<A>) -> Result<Vec<WireTypeAndPayload2<A>, A>> {
         let mut buf = Vec::new_in(right.alloc.clone());
         right.write(&mut buf)?;
-        Ok(vec![WireTypeAndPayload2::Len(
-            InterconvertiblePair::from_left(buf),
-        )])
+        let mut vec = Vec::with_capacity_in(1, right.alloc.clone());
+        vec.push(WireTypeAndPayload2::Len(InterconvertiblePair::from_left(
+            buf,
+        )));
+        Ok(vec)
     }
     fn try_into_right(left: &Vec<WireTypeAndPayload2<A>, A>) -> Result<GenericMessage<A>> {
         let mut msg_opt: Option<GenericMessage<A>> = None;
