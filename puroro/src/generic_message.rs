@@ -30,6 +30,33 @@ use ::std::fmt::Debug;
 use ::std::io::{BufRead, Read, Write};
 use ::std::ops::Deref;
 
+enum DerivedFieldContent<A: Allocator> {
+    ScalarMessage(Option<GenericMessage<A>>),
+    Map(HashMap<WireTypeAndPayload2<A>, WireTypeAndPayload2<A>, DefaultHashBuilder, A>),
+}
+
+type PayloadsOrDerivedType<A> =
+    InterconvertiblePair<Vec<WireTypeAndPayload2<A>, A>, DerivedFieldContent<A>, ()>;
+
+impl<A: Allocator + Clone> Interconverter<Vec<WireTypeAndPayload2<A>, A>, DerivedFieldContent<A>>
+    for ()
+{
+    type Error = ErrorKind;
+    type Context = A;
+    fn try_into_left_with_context(
+        right: &DerivedFieldContent<A>,
+        alloc: &A,
+    ) -> Result<Vec<WireTypeAndPayload2<A>, A>> {
+        todo!()
+    }
+    fn try_into_right_with_context(
+        left: &Vec<WireTypeAndPayload2<A>, A>,
+        alloc: &A,
+    ) -> Result<DerivedFieldContent<A>> {
+        todo!()
+    }
+}
+
 #[derive(Default, Clone)]
 pub struct GenericMessage<A: Allocator = Global> {
     fields: HashMap<i32, Vec<WireTypeAndPayload2<A>, A>, DefaultHashBuilder, A>,
