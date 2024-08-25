@@ -15,6 +15,12 @@
 use ::std::cell::OnceCell;
 use ::std::marker::PhantomData;
 
+pub trait Derived<T>: ::std::any::Any {
+    type Context;
+    fn from_base(base: &T, context: &Self::Context) -> Self;
+    fn into_base(&self, context: &Self::Context) -> T;
+}
+
 #[derive(Clone, Debug)]
 pub enum InterconvertiblePair<T, U, I> {
     Left(T, OnceCell<U>, PhantomData<I>),
