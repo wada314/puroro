@@ -18,20 +18,21 @@ use crate::internal::deser::{
 use crate::internal::utils::{Interconverter, InterconvertiblePair};
 use crate::internal::WireType;
 use crate::message::MessageLite;
-use crate::variant::{variant_types::UInt32, Variant, VariantIntegerType, WriteExtVariant};
+use crate::variant::{
+    variant_types::UInt32, ReadExtVariant, Variant, VariantIntegerType, WriteExtVariant,
+};
 use crate::{ErrorKind, Result};
 use ::hashbrown::hash_map::{DefaultHashBuilder, Entry};
-use ::hashbrown::HashMap as HashMap2;
+use ::hashbrown::HashMap;
 use ::itertools::Either;
 use ::std::alloc::{Allocator, Global};
 use ::std::fmt::Debug;
 use ::std::io::{BufRead, Read, Write};
 use ::std::ops::Deref;
-use ::std::vec;
 
 #[derive(Default, Clone)]
 pub struct GenericMessage<A: Allocator = Global> {
-    fields: HashMap2<i32, Vec<WireTypeAndPayload2<A>, A>, DefaultHashBuilder, A>,
+    fields: HashMap<i32, Vec<WireTypeAndPayload2<A>, A>, DefaultHashBuilder, A>,
     alloc: A,
 }
 #[derive(Clone)]
@@ -55,7 +56,7 @@ impl<A: Allocator> WireTypeAndPayload2<A> {
 impl GenericMessage<Global> {
     pub fn new() -> Self {
         Self {
-            fields: HashMap2::new(),
+            fields: HashMap::new(),
             alloc: Global,
         }
     }
@@ -63,7 +64,7 @@ impl GenericMessage<Global> {
 impl<A: Allocator + Clone> GenericMessage<A> {
     pub fn new_in(alloc: A) -> Self {
         Self {
-            fields: HashMap2::new_in(alloc.clone()),
+            fields: HashMap::new_in(alloc.clone()),
             alloc: alloc.clone(),
         }
     }
