@@ -15,7 +15,6 @@
 use crate::{ErrorKind, Result};
 use ::std::{
     io::{BufRead, Read, Write},
-    marker::PhantomData,
     ops::{Deref, DerefMut},
 };
 
