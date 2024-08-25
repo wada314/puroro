@@ -24,8 +24,21 @@ pub enum InterconvertiblePair<T, U, I> {
 
 pub trait Interconverter<L, R> {
     type Error;
-    fn try_into_left(right: &R) -> Result<L, Self::Error>;
-    fn try_into_right(left: &L) -> Result<R, Self::Error>;
+    type Context;
+    fn try_into_left(right: &R) -> Result<L, Self::Error>
+    where
+        Self: Interconverter<L, R, Context = ()>,
+    {
+        Self::try_into_left_with_context(right, &())
+    }
+    fn try_into_right(left: &L) -> Result<R, Self::Error>
+    where
+        Self: Interconverter<L, R, Context = ()>,
+    {
+        Self::try_into_right_with_context(left, &())
+    }
+    fn try_into_left_with_context(right: &R, context: &Self::Context) -> Result<L, Self::Error>;
+    fn try_into_right_with_context(left: &L, context: &Self::Context) -> Result<R, Self::Error>;
 }
 
 impl<T, U, I> InterconvertiblePair<T, U, I>
@@ -42,50 +55,50 @@ where
         InterconvertiblePair::Both(left, right, PhantomData)
     }
 
-    pub fn try_left(&self) -> Result<&T, I::Error> {
+    pub fn try_left_with_context(&self, context: &I::Context) -> Result<&T, I::Error> {
         match self {
             InterconvertiblePair::Left(left, _, _) => Ok(left),
             InterconvertiblePair::Right(right, left_cell, _) => {
-                left_cell.get_or_try_init(|| I::try_into_left(right))
+                left_cell.get_or_try_init(|| I::try_into_left_with_context(right, context))
             }
             InterconvertiblePair::Both(left, _, _) => Ok(left),
         }
     }
-    pub fn try_right(&self) -> Result<&U, I::Error> {
+    pub fn try_right_with_context(&self, context: &I::Context) -> Result<&U, I::Error> {
         match self {
             InterconvertiblePair::Left(left, right_cell, _) => {
-                right_cell.get_or_try_init(|| I::try_into_right(left))
+                right_cell.get_or_try_init(|| I::try_into_right_with_context(left, context))
             }
             InterconvertiblePair::Right(right, _, _) => Ok(right),
             InterconvertiblePair::Both(_, right, _) => Ok(right),
         }
     }
 
-    pub fn try_into_left(self) -> Result<T, (I::Error, U)> {
+    pub fn try_into_left_with_context(self, context: &I::Context) -> Result<T, (I::Error, U)> {
         Ok(match self {
             InterconvertiblePair::Left(left, _, _) => left,
             InterconvertiblePair::Right(right, mut left_cell, _) => match left_cell.take() {
                 Some(left) => left,
-                None => I::try_into_left(&right).map_err(|e| (e, right))?,
+                None => I::try_into_left_with_context(&right, context).map_err(|e| (e, right))?,
             },
             InterconvertiblePair::Both(left, _, _) => left,
         })
     }
-    pub fn try_into_right(self) -> Result<U, (I::Error, T)> {
+    pub fn try_into_right_with_context(self, context: &I::Context) -> Result<U, (I::Error, T)> {
         Ok(match self {
             InterconvertiblePair::Left(left, mut right_cell, _) => match right_cell.take() {
                 Some(right) => right,
-                None => I::try_into_right(&left).map_err(|e| (e, left))?,
+                None => I::try_into_right_with_context(&left, context).map_err(|e| (e, left))?,
             },
             InterconvertiblePair::Right(right, _, _) => right,
             InterconvertiblePair::Both(_, right, _) => right,
         })
     }
 
-    pub fn try_left_mut(&mut self) -> Result<&mut T, I::Error> {
+    pub fn try_left_mut_with_context(&mut self, context: &I::Context) -> Result<&mut T, I::Error> {
         unsafe {
             let taken_self = ::std::ptr::read(self);
-            let (new_self, result) = match taken_self.try_into_left() {
+            let (new_self, result) = match taken_self.try_into_left_with_context(context) {
                 Ok(left) => (
                     InterconvertiblePair::Left(left, OnceCell::new(), PhantomData),
                     Ok(()),
@@ -103,10 +116,10 @@ where
         };
         Ok(left)
     }
-    pub fn try_right_mut(&mut self) -> Result<&mut U, I::Error> {
+    pub fn try_right_mut_with_context(&mut self, context: &I::Context) -> Result<&mut U, I::Error> {
         unsafe {
             let taken_self = ::std::ptr::read(self);
-            let (new_self, result) = match taken_self.try_into_right() {
+            let (new_self, result) = match taken_self.try_into_right_with_context(context) {
                 Ok(right) => (
                     InterconvertiblePair::Right(right, OnceCell::new(), PhantomData),
                     Ok(()),
@@ -126,6 +139,30 @@ where
     }
 }
 
+impl<T, U, I> InterconvertiblePair<T, U, I>
+where
+    I: Interconverter<T, U, Context = ()>,
+{
+    pub fn try_left(&self) -> Result<&T, I::Error> {
+        self.try_left_with_context(&())
+    }
+    pub fn try_right(&self) -> Result<&U, I::Error> {
+        self.try_right_with_context(&())
+    }
+    pub fn try_into_left(self) -> Result<T, (I::Error, U)> {
+        self.try_into_left_with_context(&())
+    }
+    pub fn try_into_right(self) -> Result<U, (I::Error, T)> {
+        self.try_into_right_with_context(&())
+    }
+    pub fn try_left_mut(&mut self) -> Result<&mut T, I::Error> {
+        self.try_left_mut_with_context(&())
+    }
+    pub fn try_right_mut(&mut self) -> Result<&mut U, I::Error> {
+        self.try_right_mut_with_context(&())
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -140,14 +177,15 @@ mod tests {
     struct InterconvertMul2Mul3;
     impl Interconverter<Mul2, Mul3> for InterconvertMul2Mul3 {
         type Error = u32;
-        fn try_into_left(right: &Mul3) -> Result<Mul2, u32> {
+        type Context = ();
+        fn try_into_left_with_context(right: &Mul3, _context: &()) -> Result<Mul2, u32> {
             if right.0 % 2 == 0 {
                 Ok(Mul2(right.0))
             } else {
                 Err(right.0)
             }
         }
-        fn try_into_right(left: &Mul2) -> Result<Mul3, u32> {
+        fn try_into_right_with_context(left: &Mul2, _context: &()) -> Result<Mul3, u32> {
             if left.0 % 3 == 0 {
                 Ok(Mul3(left.0))
             } else {

@@ -119,12 +119,19 @@ impl<A: Allocator> Debug for WireTypeAndPayload2<A> {
 
 impl<A: Allocator + Clone> Interconverter<Vec<u8, A>, GenericMessage<A>> for () {
     type Error = ErrorKind;
-    fn try_into_left(right: &GenericMessage<A>) -> Result<Vec<u8, A>> {
+    type Context = ();
+    fn try_into_left_with_context(
+        right: &GenericMessage<A>,
+        _context: &Self::Context,
+    ) -> std::result::Result<Vec<u8, A>, Self::Error> {
         let mut buf = Vec::new_in(right.alloc.clone());
         right.write(&mut buf)?;
         Ok(buf)
     }
-    fn try_into_right(left: &Vec<u8, A>) -> Result<GenericMessage<A>> {
+    fn try_into_right_with_context(
+        left: &Vec<u8, A>,
+        _context: &Self::Context,
+    ) -> Result<GenericMessage<A>> {
         let mut msg = GenericMessage::new_in(left.allocator().clone());
         msg.merge_from_bufread(left.as_slice())?;
         Ok(msg)
@@ -135,19 +142,26 @@ impl<A: Allocator + Clone> Interconverter<Vec<WireTypeAndPayload2<A>, A>, Option
     for ()
 {
     type Error = ErrorKind;
-    fn try_into_left(right: &Option<GenericMessage<A>>) -> Result<Vec<WireTypeAndPayload2<A>, A>> {
+    type Context = A;
+    fn try_into_left_with_context(
+        right: &Option<GenericMessage<A>>,
+        alloc: &A,
+    ) -> Result<Vec<WireTypeAndPayload2<A>, A>> {
         let Some(msg) = right else {
-            return Ok(Vec::new_in(right.alloc.clone()));
+            return Ok(Vec::new_in(alloc.clone()));
         };
-        let mut buf = Vec::new_in(right.alloc.clone());
-        right.write(&mut buf)?;
-        let mut vec = Vec::with_capacity_in(1, right.alloc.clone());
+        let mut buf = Vec::new_in(alloc.clone());
+        msg.write(&mut buf)?;
+        let mut vec = Vec::with_capacity_in(1, alloc.clone());
         vec.push(WireTypeAndPayload2::Len(InterconvertiblePair::from_left(
             buf,
         )));
         Ok(vec)
     }
-    fn try_into_right(left: &Vec<WireTypeAndPayload2<A>, A>) -> Result<Option<GenericMessage<A>>> {
+    fn try_into_right_with_context(
+        left: &Vec<WireTypeAndPayload2<A>, A>,
+        _alloc: &A,
+    ) -> std::result::Result<Option<GenericMessage<A>>, Self::Error> {
         let mut msg_opt: Option<GenericMessage<A>> = None;
         for wire_and_payload in left {
             let WireTypeAndPayload2::Len(bytes_or_msg) = wire_and_payload else {
