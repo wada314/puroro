@@ -15,11 +15,13 @@
 use ::std::alloc::Allocator;
 use ::std::cell::OnceCell;
 
+#[derive(Debug)]
 pub struct OnceList<T, A: Allocator> {
     head: OnceCell<Box<Cons<T, A>, A>>,
     alloc: A,
 }
 
+#[derive(Debug)]
 struct Cons<T, A: Allocator> {
     next: OnceCell<Box<Cons<T, A>, A>>,
     val: T,
@@ -46,6 +48,51 @@ impl<T, A: Allocator + Clone> OnceList<T, A> {
                 }
             }
         }
+    }
+
+    pub fn get_or_push<P, F>(&self, pred: P, f: F) -> &T
+    where
+        P: Fn(&T) -> bool,
+        F: Fn() -> T,
+    {
+        self.get_or_try_push(pred, || -> Result<_, ()> { Ok(f()) })
+            .unwrap()
+    }
+
+    pub fn get_or_try_push<P, F, E>(&self, pred: P, f: F) -> Result<&T, E>
+    where
+        P: Fn(&T) -> bool,
+        F: Fn() -> Result<T, E>,
+    {
+        let mut next = &self.head;
+        while let Some(c) = next.get() {
+            if pred(&c.val) {
+                return Ok(&c.val);
+            }
+            next = &c.next;
+        }
+        let Ok(_) = next.set(Box::new_in(Cons::new(f()?), self.alloc.clone())) else {
+            unreachable!("This should not fail because we confirmed that next.get() is None.");
+        };
+        let Some(last_cons) = next.get() else {
+            unreachable!("This should not fail because we set the cell content at the line above.");
+        };
+        Ok(&last_cons.val)
+    }
+
+    pub fn iter(&self) -> impl Iterator<Item = &T> {
+        let mut next = &self.head;
+        ::std::iter::from_fn(move || match next.get() {
+            Some(c) => {
+                next = &c.next;
+                Some(&c.val)
+            }
+            None => None,
+        })
+    }
+
+    pub fn clear(&mut self) {
+        self.head = OnceCell::new();
     }
 }
 
