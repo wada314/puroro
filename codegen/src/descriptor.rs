@@ -228,7 +228,7 @@ impl<T> TryIntoNumber<T> for Option<T> {
 trait UninterpretedOptionExt {
     fn name_as_string(&self) -> Result<String>;
 }
-impl<'a> UninterpretedOptionExt for ::puroro::google::protobuf::UninterpretedOptionProto<'a> {
+impl UninterpretedOptionExt for ::puroro::google::protobuf::UninterpretedOptionProto {
     fn name_as_string(&self) -> Result<String> {
         let parts = self
             .name()

@@ -33,30 +33,30 @@ pub struct DescriptorBase {
     enum_types: Vec<EnumDescriptorBase>,
 }
 
-impl<'a> TryFrom<DescriptorProto<'a>> for DescriptorBase {
+impl TryFrom<&DescriptorProto> for DescriptorBase {
     type Error = ErrorKind;
-    fn try_from(proto: DescriptorProto) -> Result<Self> {
+    fn try_from(proto: &DescriptorProto) -> Result<Self> {
         Ok(Self {
             name: proto.name()?.try_into_string("No Descriptor name")?,
             fields: proto
                 .field()
                 .into_iter()
-                .map_ok(FieldDescriptorBase::try_from)
+                .map_ok(TryInto::try_into)
                 .collect::<PResult<Result<Vec<_>>>>()??,
             oneof_decls: proto
                 .oneof_decl()
                 .into_iter()
-                .map_ok(OneofDescriptorBase::try_from)
+                .map_ok(TryInto::try_into)
                 .collect::<PResult<Result<Vec<_>>>>()??,
             nested_types: proto
                 .nested_type()
                 .into_iter()
-                .map_ok(DescriptorBase::try_from)
+                .map_ok(TryInto::try_into)
                 .collect::<PResult<Result<Vec<_>>>>()??,
             enum_types: proto
                 .enum_type()
                 .into_iter()
-                .map_ok(EnumDescriptorBase::try_from)
+                .map_ok(TryInto::try_into)
                 .collect::<PResult<Result<Vec<_>>>>()??,
         })
     }

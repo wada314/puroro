@@ -37,9 +37,9 @@ pub struct FileDescriptorBase {
     edition: Option<Edition>,
 }
 
-impl TryFrom<FileDescriptorProto> for FileDescriptorBase {
+impl TryFrom<&FileDescriptorProto> for FileDescriptorBase {
     type Error = ErrorKind;
-    fn try_from(proto: FileDescriptorProto) -> Result<Self> {
+    fn try_from(proto: &FileDescriptorProto) -> Result<Self> {
         Ok(Self {
             name: proto.name()?.try_into_string("No FileDescriptor name")?,
             dependencies: proto
@@ -51,12 +51,12 @@ impl TryFrom<FileDescriptorProto> for FileDescriptorBase {
             message_types: proto
                 .message_type()
                 .into_iter()
-                .map_ok(DescriptorBase::try_from)
+                .map_ok(TryInto::try_into)
                 .collect::<PResult<Result<Vec<_>>>>()??,
             enum_types: proto
                 .enum_type()
                 .into_iter()
-                .map_ok(EnumDescriptorBase::try_from)
+                .map_ok(TryInto::try_into)
                 .collect::<PResult<Result<Vec<_>>>>()??,
             syntax: proto.syntax()?.map(str::to_string),
             edition: proto.edition()?.map(EditionProto::try_into).transpose()?,

@@ -28,15 +28,15 @@ pub struct EnumDescriptorBase {
     values: Vec<EnumValueDescriptorBase>,
 }
 
-impl<'a> TryFrom<EnumDescriptorProto<'a>> for EnumDescriptorBase {
+impl TryFrom<&EnumDescriptorProto> for EnumDescriptorBase {
     type Error = ErrorKind;
-    fn try_from(proto: EnumDescriptorProto) -> Result<Self> {
+    fn try_from(proto: &EnumDescriptorProto) -> Result<Self> {
         Ok(Self {
             name: proto.name()?.try_into_string("No EnumDescriptor name")?,
             values: proto
                 .value()
                 .into_iter()
-                .map_ok(EnumValueDescriptorBase::try_from)
+                .map_ok(TryInto::try_into)
                 .collect::<PResult<Result<Vec<_>>>>()??,
         })
     }
@@ -126,9 +126,9 @@ pub struct EnumValueDescriptorBase {
     number: i32,
 }
 
-impl<'a> TryFrom<EnumValueDescriptorProto<'a>> for EnumValueDescriptorBase {
+impl TryFrom<&EnumValueDescriptorProto> for EnumValueDescriptorBase {
     type Error = ErrorKind;
-    fn try_from(proto: EnumValueDescriptorProto) -> Result<Self> {
+    fn try_from(proto: &EnumValueDescriptorProto) -> Result<Self> {
         Ok(Self {
             name: proto
                 .name()?

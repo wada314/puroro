@@ -34,9 +34,9 @@ pub struct FieldDescriptorBase {
     proto3_optional: bool,
 }
 
-impl<'a> TryFrom<FieldDescriptorProto<'a>> for FieldDescriptorBase {
+impl TryFrom<&FieldDescriptorProto> for FieldDescriptorBase {
     type Error = ErrorKind;
-    fn try_from(proto: FieldDescriptorProto) -> Result<Self> {
+    fn try_from(proto: &FieldDescriptorProto) -> Result<Self> {
         Ok(Self {
             name: proto.name()?.try_into_string("No FieldDescriptor name")?,
             number: proto
@@ -151,9 +151,9 @@ pub struct OneofDescriptorBase {
     name: String,
 }
 
-impl<'a> TryFrom<OneofDescriptorProto<'a>> for OneofDescriptorBase {
+impl TryFrom<&OneofDescriptorProto> for OneofDescriptorBase {
     type Error = ErrorKind;
-    fn try_from(proto: OneofDescriptorProto) -> Result<Self> {
+    fn try_from(proto: &OneofDescriptorProto) -> Result<Self> {
         Ok(Self {
             name: proto.name()?.try_into_string("No OneofDescriptor name")?,
         })
