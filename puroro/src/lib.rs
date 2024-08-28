@@ -17,6 +17,8 @@
 #![feature(assert_matches)]
 #![feature(once_cell_try)]
 #![feature(once_cell_try_insert)]
+#![feature(coerce_unsized)]
+#![feature(unsize)]
 
 pub mod editions;
 pub mod generic_message;

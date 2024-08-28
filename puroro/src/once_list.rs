@@ -12,19 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use ::std::alloc::Allocator;
+use ::std::alloc::{Allocator, Global};
 use ::std::cell::OnceCell;
+use ::std::marker::Unsize;
+use ::std::ops::CoerceUnsized;
 
 #[derive(Debug)]
-pub struct OnceList<T, A: Allocator> {
-    head: OnceCell<Box<Cons<T, A>, A>>,
+pub struct OnceList<T: ?Sized, A: Allocator = Global> {
+    head: OnceCell<Box<Cons<T, T, A>, A>>,
     alloc: A,
 }
 
 #[derive(Debug)]
-struct Cons<T, A: Allocator> {
-    next: OnceCell<Box<Cons<T, A>, A>>,
+struct Cons<T: ?Sized, NexT: ?Sized, A: Allocator> {
+    // We cannot use T here because of unsized coercion condition:
+    // T can only appear in the last field of the struct.
+    next: OnceCell<Box<Cons<NexT, NexT, A>, A>>,
     val: T,
+}
+
+impl<T, NexT, U, A: Allocator> CoerceUnsized<Cons<T, NexT, A>> for Cons<U, NexT, A> where
+    U: Unsize<T> + CoerceUnsized<T>
+{
 }
 
 impl<T, A: Allocator> OnceList<T, A> {
@@ -35,7 +44,7 @@ impl<T, A: Allocator> OnceList<T, A> {
         }
     }
 }
-impl<T, A: Allocator + Clone> OnceList<T, A> {
+impl<T: Sized, A: Allocator + Clone> OnceList<T, A> {
     pub fn push(&self, val: T) -> &T {
         let mut next = &self.head;
         let mut val_cons = Box::new_in(Cons::new(val), self.alloc.clone());
@@ -79,7 +88,61 @@ impl<T, A: Allocator + Clone> OnceList<T, A> {
         };
         Ok(&last_cons.val)
     }
+}
 
+impl<T: ?Sized, A: Allocator + Clone> OnceList<T, A> {
+    pub fn push_unsized<U: Sized + Unsize<T>>(&self, val: U) -> &T {
+        let mut next = &self.head;
+        let mut val_cons =
+            Box::new_in(Cons::<U, T, A>::new(val), self.alloc.clone()) as Box<Cons<T, T, A>, A>;
+        loop {
+            match next.try_insert(val_cons) {
+                Ok(c) => return &c.val,
+                Err((inner, new_val_cons)) => {
+                    next = &inner.next;
+                    val_cons = new_val_cons;
+                }
+            }
+        }
+    }
+
+    pub fn get_or_push_unsized<P, F, U>(&self, pred: P, f: F) -> &T
+    where
+        P: Fn(&T) -> bool,
+        F: Fn() -> U,
+        U: Sized + Unsize<T>,
+    {
+        self.get_or_try_push_unsized(pred, || -> Result<_, ()> { Ok(f()) })
+            .unwrap()
+    }
+
+    pub fn get_or_try_push_unsized<P, F, E, U>(&self, pred: P, f: F) -> Result<&T, E>
+    where
+        P: Fn(&T) -> bool,
+        F: Fn() -> Result<U, E>,
+        U: Sized + Unsize<T>,
+    {
+        let mut next = &self.head;
+        while let Some(c) = next.get() {
+            if pred(&c.val) {
+                return Ok(&c.val);
+            }
+            next = &c.next;
+        }
+        let Ok(_) = next
+            .set(Box::new_in(Cons::<U, T, A>::new(f()?), self.alloc.clone())
+                as Box<Cons<T, T, A>, A>)
+        else {
+            unreachable!("This should not fail because we confirmed that next.get() is None.");
+        };
+        let Some(last_cons) = next.get() else {
+            unreachable!("This should not fail because we set the cell content at the line above.");
+        };
+        Ok(&last_cons.val)
+    }
+}
+
+impl<T, A: Allocator> OnceList<T, A> {
     pub fn iter(&self) -> impl Iterator<Item = &T> {
         let mut next = &self.head;
         ::std::iter::from_fn(move || match next.get() {
@@ -96,7 +159,7 @@ impl<T, A: Allocator + Clone> OnceList<T, A> {
     }
 }
 
-impl<T, A: Allocator> Cons<T, A> {
+impl<T, NexT: ?Sized, A: Allocator> Cons<T, NexT, A> {
     fn new(val: T) -> Self {
         Self {
             next: OnceCell::new(),
