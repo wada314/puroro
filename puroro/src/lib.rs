@@ -16,12 +16,14 @@
 #![feature(slice_as_chunks)]
 #![feature(assert_matches)]
 #![feature(once_cell_try)]
+#![feature(once_cell_try_insert)]
 
 pub mod editions;
 pub mod generic_message;
 pub mod google;
 pub mod internal;
 pub mod message;
+pub mod once_list;
 pub mod repeated;
 pub mod string;
 pub mod variant;
