@@ -151,13 +151,16 @@ pub mod code_generator_response {
     }
     impl FileMutTrait for GenericMessage {
         fn set_name(&mut self, name: &str) {
-            self.field_mut(1).set_string(name)
+            // self.field_mut(1).set_string(name)
+            todo!()
         }
         fn set_insertion_point(&mut self, insertion_point: &str) {
-            self.field_mut(2).set_string(insertion_point)
+            // self.field_mut(2).set_string(insertion_point)
+            todo!()
         }
         fn set_content(&mut self, content: &str) {
-            self.field_mut(15).set_string(content)
+            // self.field_mut(15).set_string(content)
+            todo!()
         }
     }
 }
@@ -198,8 +201,9 @@ impl CodeGeneratorResponse {
         self.0.field_mut(4).push_variant::<Int32>(edition);
         Ok(())
     }
-    pub fn push_file(&mut self, file: code_generator_response::File<'a>) -> Result<()> {
-        self.0.field_mut(15).push_message(&file);
+    pub fn push_file(&mut self, file: code_generator_response::File) -> Result<()> {
+        todo!();
+        // self.0.field_mut(15).push_message(&file);
         Ok(())
     }
 }

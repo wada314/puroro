@@ -30,7 +30,7 @@ use ::std::cell::LazyCell;
 use ::std::collections::HashSet;
 use ::std::collections::{BTreeSet, HashMap};
 
-pub fn compile(request: &CodeGeneratorRequest) -> Result<CodeGeneratorResponse<'static>> {
+pub fn compile(request: &CodeGeneratorRequest) -> Result<CodeGeneratorResponse> {
     let mut response = CodeGeneratorResponse::default();
     response.set_supported_features(Into::<i32>::into(Feature::FeatureProto3Optional) as u64)?;
 
@@ -120,7 +120,7 @@ impl GeneratedFile {
         self.submodules.insert(submodule.into());
     }
 }
-impl TryFrom<GeneratedFile> for code_generator_response::File<'_> {
+impl TryFrom<GeneratedFile> for code_generator_response::File {
     type Error = ErrorKind;
     fn try_from(from: GeneratedFile) -> Result<Self> {
         let is_root_file = from.full_path() == "mod.rs";

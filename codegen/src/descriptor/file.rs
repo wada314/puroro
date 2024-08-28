@@ -37,7 +37,7 @@ pub struct FileDescriptorBase {
     edition: Option<Edition>,
 }
 
-impl<'a> TryFrom<FileDescriptorProto<'a>> for FileDescriptorBase {
+impl TryFrom<FileDescriptorProto> for FileDescriptorBase {
     type Error = ErrorKind;
     fn try_from(proto: FileDescriptorProto) -> Result<Self> {
         Ok(Self {
