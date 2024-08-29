@@ -27,6 +27,7 @@ pub struct OnceList<T: ?Sized, A: Allocator = Global> {
 struct Cons<T: ?Sized, NexT: ?Sized, A: Allocator> {
     // We cannot use T here because of unsized coercion condition:
     // T can only appear in the last field of the struct.
+    // Instead of T, we use NexT here.
     next: OnceCell<Box<Cons<NexT, NexT, A>, A>>,
     val: T,
 }
@@ -80,11 +81,9 @@ impl<T: Sized, A: Allocator + Clone> OnceList<T, A> {
             }
             next = &c.next;
         }
-        let Ok(_) = next.set(Box::new_in(Cons::new(f()?), self.alloc.clone())) else {
+        let Ok(last_cons) = next.try_insert(Box::new_in(Cons::new(f()?), self.alloc.clone()))
+        else {
             unreachable!("This should not fail because we confirmed that next.get() is None.");
-        };
-        let Some(last_cons) = next.get() else {
-            unreachable!("This should not fail because we set the cell content at the line above.");
         };
         Ok(&last_cons.val)
     }
@@ -129,14 +128,11 @@ impl<T: ?Sized, A: Allocator + Clone> OnceList<T, A> {
             }
             next = &c.next;
         }
-        let Ok(_) = next
-            .set(Box::new_in(Cons::<U, T, A>::new(f()?), self.alloc.clone())
+        let Ok(last_cons) = next
+            .try_insert(Box::new_in(Cons::<U, T, A>::new(f()?), self.alloc.clone())
                 as Box<Cons<T, T, A>, A>)
         else {
             unreachable!("This should not fail because we confirmed that next.get() is None.");
-        };
-        let Some(last_cons) = next.get() else {
-            unreachable!("This should not fail because we set the cell content at the line above.");
         };
         Ok(&last_cons.val)
     }
