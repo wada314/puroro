@@ -12,13 +12,44 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use crate::once_list::OnceList;
+use ::std::alloc::Global;
 use ::std::cell::OnceCell;
 use ::std::marker::PhantomData;
+use ::std::sync::Once;
 
 pub trait Derived<T>: ::std::any::Any {
     type Context;
     fn from_base(base: &T, context: &Self::Context) -> Self;
     fn into_base(&self, context: &Self::Context) -> T;
+}
+
+pub enum BaseAndDerived<T, A: Allocator = Global> {
+    StartFromBase {
+        base: T,
+        derived_cells: OnceList<dyn Derived<T>, A>,
+    },
+    StartFromDerived {
+        derived: Box<dyn Derived<T>, A>,
+        base_cell: OnceCell<T>,
+        derived_cells: OnceList<dyn Derived<T>, A>,
+    },
+}
+
+impl<T, A: Allocator> BaseAndDerived<T, A> {
+    pub fn from_base(base: T, alloc: A) -> Self {
+        BaseAndDerived::StartFromBase {
+            base,
+            derived_cells: OnceList::new_in(alloc),
+        }
+    }
+    pub fn from_derived(derived: Box<dyn Derived<T>, A>, alloc: A) -> Self {
+        BaseAndDerived::StartFromDerived {
+            derived,
+            base_cell: OnceCell::new(),
+            derived_cells: OnceList::new_in(alloc),
+        }
+    }
 }
 
 #[derive(Clone, Debug)]
