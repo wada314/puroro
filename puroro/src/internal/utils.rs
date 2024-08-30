@@ -15,10 +15,11 @@
 use crate::once_list::OnceList;
 use ::std::alloc::Allocator;
 use ::std::alloc::Global;
+use ::std::any::Any;
 use ::std::cell::OnceCell;
 use ::std::marker::PhantomData;
 
-pub trait Derived<T> {
+pub trait Derived<T>: Any {
     type Error;
     fn from_base(base: &T) -> Result<Self, Self::Error>
     where
@@ -26,19 +27,19 @@ pub trait Derived<T> {
     fn into_base(&self) -> Result<T, Self::Error>;
 }
 
-pub enum BaseAndDerived<'a, T, E, A: Allocator = Global> {
+pub enum BaseAndDerived<T, E, A: Allocator = Global> {
     StartFromBase {
         base: T,
         derived_cells: OnceList<dyn Derived<T, Error = E>, A>,
     },
     StartFromDerived {
-        derived: Box<dyn 'a + Derived<T, Error = E>, A>,
+        derived: Box<dyn Derived<T, Error = E>, A>,
         base_cell: OnceCell<T>,
         derived_cells: OnceList<dyn Derived<T, Error = E>, A>,
     },
 }
 
-impl<T, E, A: Allocator> BaseAndDerived<'_, T, E, A> {
+impl<T, E, A: Allocator> BaseAndDerived<T, E, A> {
     pub fn from_base(base: T, alloc: A) -> Self {
         BaseAndDerived::StartFromBase {
             base,
@@ -46,8 +47,8 @@ impl<T, E, A: Allocator> BaseAndDerived<'_, T, E, A> {
         }
     }
 }
-impl<'a, T, E, A: Allocator + Clone> BaseAndDerived<'a, T, E, A> {
-    pub fn from_derived<D: 'a + Derived<T, Error = E>>(derived: D, alloc: A) -> Self {
+impl<T, E, A: Allocator + Clone> BaseAndDerived<T, E, A> {
+    pub fn from_derived<D: Derived<T, Error = E>>(derived: D, alloc: A) -> Self {
         BaseAndDerived::StartFromDerived {
             derived: Box::new_in(derived, alloc.clone()),
             base_cell: OnceCell::new(),
