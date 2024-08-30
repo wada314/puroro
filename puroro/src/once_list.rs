@@ -16,7 +16,6 @@ use ::std::alloc::{Allocator, Global};
 use ::std::cell::OnceCell;
 use ::std::marker::Unsize;
 use ::std::ops::CoerceUnsized;
-use ::std::sync::Once;
 
 #[derive(Debug)]
 pub struct OnceList<T: ?Sized, A: Allocator = Global> {
@@ -38,7 +37,7 @@ impl<T, NexT, U, A: Allocator> CoerceUnsized<Cons<T, NexT, A>> for Cons<U, NexT,
 {
 }
 
-impl<T> OnceList<T, Global> {
+impl<T: ?Sized> OnceList<T, Global> {
     pub fn new() -> Self {
         Self {
             head: OnceCell::new(),
@@ -46,7 +45,7 @@ impl<T> OnceList<T, Global> {
         }
     }
 }
-impl<T, A: Allocator> OnceList<T, A> {
+impl<T: ?Sized, A: Allocator> OnceList<T, A> {
     pub fn new_in(alloc: A) -> Self {
         Self {
             head: OnceCell::new(),

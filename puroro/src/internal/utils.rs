@@ -13,44 +13,62 @@
 // limitations under the License.
 
 use crate::once_list::OnceList;
+use ::std::alloc::Allocator;
 use ::std::alloc::Global;
 use ::std::cell::OnceCell;
 use ::std::marker::PhantomData;
-use ::std::sync::Once;
 
-pub trait Derived<T>: ::std::any::Any {
-    type Context;
-    fn from_base(base: &T, context: &Self::Context) -> Self;
-    fn into_base(&self, context: &Self::Context) -> T;
+pub trait Derived<T> {
+    type Error;
+    fn from_base(base: &T) -> Result<Self, Self::Error>
+    where
+        Self: Sized;
+    fn into_base(&self) -> Result<T, Self::Error>;
 }
 
-pub enum BaseAndDerived<T, A: Allocator = Global> {
+pub enum BaseAndDerived<T, E, A: Allocator = Global> {
     StartFromBase {
         base: T,
-        derived_cells: OnceList<dyn Derived<T>, A>,
+        derived_cells: OnceList<dyn Derived<T, Error = E>, A>,
     },
     StartFromDerived {
-        derived: Box<dyn Derived<T>, A>,
+        derived: Box<dyn Derived<T, Error = E>, A>,
         base_cell: OnceCell<T>,
-        derived_cells: OnceList<dyn Derived<T>, A>,
+        derived_cells: OnceList<dyn Derived<T, Error = E>, A>,
     },
 }
 
-impl<T, A: Allocator> BaseAndDerived<T, A> {
+impl<T, E, A: Allocator> BaseAndDerived<T, E, A> {
     pub fn from_base(base: T, alloc: A) -> Self {
         BaseAndDerived::StartFromBase {
             base,
             derived_cells: OnceList::new_in(alloc),
         }
     }
-    pub fn from_derived(derived: Box<dyn Derived<T>, A>, alloc: A) -> Self {
+}
+impl<T, E, A: Allocator + Clone> BaseAndDerived<T, E, A> {
+    pub fn from_derived<D: Derived<T, Error = E>>(derived: D, alloc: A) -> Self {
         BaseAndDerived::StartFromDerived {
-            derived,
+            derived: Box::new_in(derived, alloc.clone()),
             base_cell: OnceCell::new(),
             derived_cells: OnceList::new_in(alloc),
         }
     }
+
+    pub fn try_as_base(&self) -> Result<&T, E> {
+        match self {
+            BaseAndDerived::StartFromBase { base, .. } => Ok(base),
+            BaseAndDerived::StartFromDerived {
+                base_cell, derived, ..
+            } => {
+                base_cell.get_or_try_init(|| derived.into_base());
+                todo!()
+            }
+        }
+    }
 }
+
+impl<T, A: Allocator + Clone> BaseAndDerived<T, A> {}
 
 #[derive(Clone, Debug)]
 pub enum InterconvertiblePair<T, U, I> {
