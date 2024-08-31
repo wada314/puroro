@@ -96,6 +96,26 @@ impl<T: Sized, A: Allocator + Clone> OnceList<T, A> {
         };
         Ok(&last_cons.val)
     }
+
+    pub fn take<P>(&mut self, pred: P) -> Option<T>
+    where
+        P: Fn(&T) -> bool,
+    {
+        let mut next = &mut self.head;
+        while let Some(mut taken_next) = next.take() {
+            if pred(&taken_next.val) {
+                // reconnect the list
+                if let Some(next_next) = taken_next.next.take() {
+                    next.set(next_next);
+                }
+                return Some(taken_next.val);
+            }
+
+            next.set(taken_next);
+            next = &mut unsafe { next.get_mut().unwrap_unchecked() }.next;
+        }
+        None
+    }
 }
 
 impl<T: ?Sized, A: Allocator + Clone> OnceList<T, A> {

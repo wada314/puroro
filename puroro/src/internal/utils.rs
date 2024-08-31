@@ -125,6 +125,24 @@ impl<T: 'static, E: 'static, A: Allocator + Clone> BaseAndDerived<T, E, A> {
             }
         }
     }
+
+    pub fn try_as_derived_mut<D: Derived<T, Error = E>>(&mut self) -> Result<&mut D, E> {
+        match self {
+            BaseAndDerived::StartFromBase {
+                base,
+                derived_cells,
+            } => {
+                todo!();
+            }
+            BaseAndDerived::StartFromDerived {
+                base_cell,
+                derived,
+                derived_cells,
+            } => {
+                todo!();
+            }
+        }
+    }
 }
 
 #[derive(Clone, Debug)]
