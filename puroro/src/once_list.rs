@@ -108,7 +108,7 @@ impl<T: Sized, A: Allocator + Clone> OnceList<T, A> {
                 if let Some(next_next) = taken_next.next.take() {
                     next.set(next_next);
                 }
-                return Some(taken_next.val);
+                return Some(Box::into_inner(taken_next).val);
             }
 
             next.set(taken_next);
@@ -170,22 +170,14 @@ impl<T: ?Sized, A: Allocator + Clone> OnceList<T, A> {
         }
     }
 
-    pub fn take_unsized<P, U>(&mut self, pred_result: P) -> Option<U>
+    pub fn take_unsized<F, U>(&mut self, downcast: F) -> Option<U>
     where
-        P: Fn(&T) -> Result<&U, &T>,
+        F: Fn(Box<T, A>) -> Result<Box<U, A>, Box<T, A>>,
         U: Sized + Unsize<T>,
     {
         let mut next = &mut self.head;
         while let Some(mut taken_next) = next.take() {
-            match pred_result(&taken_next.val) {
-                Ok(u) => {
-                    // reconnect the list
-                    if let Some(next_next) = taken_next.next.take() {
-                        next.set(next_next);
-                    }
-                    return Some(u);
-                }
-            }
+            todo!();
 
             next.set(taken_next);
             next = &mut unsafe { next.get_mut().unwrap_unchecked() }.next;
