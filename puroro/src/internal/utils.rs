@@ -55,7 +55,9 @@ impl<T, E, A: Allocator + Clone> BaseAndDerived<T, E, A> {
             derived_cells: OnceList::new_in(alloc),
         }
     }
+}
 
+impl<T: 'static, E: 'static, A: Allocator + Clone> BaseAndDerived<T, E, A> {
     pub fn try_as_base(&self) -> Result<&T, E> {
         match self {
             BaseAndDerived::StartFromBase { base, .. } => Ok(base),
