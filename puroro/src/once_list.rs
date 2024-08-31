@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use ::std::alloc::{Allocator, Global};
-use ::std::cell::OnceCell;
-use ::std::marker::Unsize;
-use ::std::ops::CoerceUnsized;
+use std::alloc::{Allocator, Global};
+use std::cell::OnceCell;
+use std::marker::Unsize;
+use std::ops::CoerceUnsized;
 
 #[derive(Debug)]
 pub struct OnceList<T: ?Sized, A: Allocator = Global> {
@@ -99,51 +99,57 @@ impl<T: Sized, A: Allocator + Clone> OnceList<T, A> {
 }
 
 impl<T: ?Sized, A: Allocator + Clone> OnceList<T, A> {
-    pub fn push_unsized<U: Sized + Unsize<T>>(&self, val: U) -> &T {
+    pub fn push_unsized<U: Sized + Unsize<T>>(&self, val: U) -> &U {
         let mut next = &self.head;
-        let mut val_cons =
-            Box::new_in(Cons::<U, T, A>::new(val), self.alloc.clone()) as Box<Cons<T, T, A>, A>;
+        let val_cons = Box::new_in(Cons::<U, T, A>::new(val), self.alloc.clone());
+        let result_ptr: *const U = &val_cons.val;
+        let mut val_cons = val_cons as Box<Cons<T, T, A>, A>;
         loop {
             match next.try_insert(val_cons) {
-                Ok(c) => return &c.val,
-                Err((inner, new_val_cons)) => {
-                    next = &inner.next;
+                Ok(_) => {
+                    // This is safe because the address of the pointee of Box is stable even after the box is moved.
+                    unsafe { return &*result_ptr }
+                }
+                Err((current, new_val_cons)) => {
+                    next = &current.next;
                     val_cons = new_val_cons;
                 }
             }
         }
     }
 
-    pub fn get_or_push_unsized<P, F, U>(&self, pred: P, f: F) -> &T
+    pub fn get_or_push_unsized<P, F, U>(&self, pred_opt: P, f: F) -> &U
     where
-        P: Fn(&T) -> bool,
+        P: Fn(&T) -> Option<&U>,
         F: Fn() -> U,
         U: Sized + Unsize<T>,
     {
-        self.get_or_try_push_unsized(pred, || -> Result<_, ()> { Ok(f()) })
+        self.get_or_try_push_unsized(pred_opt, || -> Result<_, ()> { Ok(f()) })
             .unwrap()
     }
 
-    pub fn get_or_try_push_unsized<P, F, E, U>(&self, pred: P, f: F) -> Result<&T, E>
+    pub fn get_or_try_push_unsized<P, F, E, U>(&self, pred_opt: P, f: F) -> Result<&U, E>
     where
-        P: Fn(&T) -> bool,
+        P: Fn(&T) -> Option<&U>,
         F: Fn() -> Result<U, E>,
         U: Sized + Unsize<T>,
     {
         let mut next = &self.head;
         while let Some(c) = next.get() {
-            if pred(&c.val) {
-                return Ok(&c.val);
+            if let Some(u) = pred_opt(&c.val) {
+                return Ok(u);
             }
             next = &c.next;
         }
-        let Ok(last_cons) = next
-            .try_insert(Box::new_in(Cons::<U, T, A>::new(f()?), self.alloc.clone())
-                as Box<Cons<T, T, A>, A>)
-        else {
+        let new_boxed = Box::new_in(Cons::<U, T, A>::new(f()?), self.alloc.clone());
+        let result_ptr: *const U = &new_boxed.val;
+        let Ok(_) = next.set(new_boxed as Box<Cons<T, T, A>, A>) else {
             unreachable!("This should not fail because we confirmed that next.get() is None.");
         };
-        Ok(&last_cons.val)
+        // This is safe because the address of the pointee of Box is stable even after the box is moved.
+        unsafe {
+            return Ok(&*result_ptr);
+        }
     }
 }
 

@@ -26,6 +26,15 @@ pub trait Derived<T>: Any {
         Self: Sized;
     fn into_base(&self) -> Result<T, Self::Error>;
 }
+impl<T, E> dyn Derived<T, Error = E> {
+    // Utility: from Any
+    fn is<D: Derived<T>>(&self) -> bool {
+        <dyn Any>::is::<D>(self as &dyn Any)
+    }
+    fn downcast_ref<D: Derived<T>>(&self) -> Option<&D> {
+        <dyn Any>::downcast_ref(self as &dyn Any)
+    }
+}
 
 pub enum BaseAndDerived<T, E, A: Allocator = Global> {
     StartFromBase {
@@ -64,6 +73,32 @@ impl<T: 'static, E: 'static, A: Allocator + Clone> BaseAndDerived<T, E, A> {
             BaseAndDerived::StartFromDerived {
                 base_cell, derived, ..
             } => base_cell.get_or_try_init(|| derived.into_base()),
+        }
+    }
+
+    pub fn try_as_derived<D: Derived<T, Error = E>>(&self) -> Result<&D, E> {
+        match self {
+            BaseAndDerived::StartFromBase {
+                base,
+                derived_cells,
+            } => derived_cells
+                .get_or_try_push_unsized(|d| d.downcast_ref::<D>(), || D::from_base(base)),
+            BaseAndDerived::StartFromDerived {
+                derived,
+                base_cell,
+                derived_cells,
+            } => {
+                if let Some(d) = derived.downcast_ref::<D>() {
+                    return Ok(d);
+                }
+                derived_cells.get_or_try_push_unsized(
+                    |d| d.downcast_ref::<D>(),
+                    || {
+                        let base = base_cell.get_or_try_init(|| derived.into_base())?;
+                        D::from_base(base)
+                    },
+                )
+            }
         }
     }
 }
