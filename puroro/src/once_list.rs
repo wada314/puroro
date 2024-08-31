@@ -153,7 +153,7 @@ impl<T: ?Sized, A: Allocator + Clone> OnceList<T, A> {
     }
 }
 
-impl<T, A: Allocator> OnceList<T, A> {
+impl<T: ?Sized, A: Allocator> OnceList<T, A> {
     pub fn iter(&self) -> impl Iterator<Item = &T> {
         let mut next = &self.head;
         ::std::iter::from_fn(move || match next.get() {
@@ -167,6 +167,10 @@ impl<T, A: Allocator> OnceList<T, A> {
 
     pub fn clear(&mut self) {
         self.head = OnceCell::new();
+    }
+
+    pub fn alloc(&self) -> &A {
+        &self.alloc
     }
 }
 

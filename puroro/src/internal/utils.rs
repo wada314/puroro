@@ -101,6 +101,30 @@ impl<T: 'static, E: 'static, A: Allocator + Clone> BaseAndDerived<T, E, A> {
             }
         }
     }
+
+    pub fn try_as_base_mut(&mut self) -> Result<&mut T, E> {
+        match self {
+            BaseAndDerived::StartFromBase {
+                base,
+                derived_cells,
+            } => {
+                derived_cells.clear();
+                Ok(base)
+            }
+            BaseAndDerived::StartFromDerived {
+                base_cell,
+                derived,
+                derived_cells,
+            } => {
+                let base = base_cell.take.unwrap_or_else(|| derived.into_base());
+                *self = BaseAndDerived::from_base(base, derived_cells.alloc().clone());
+                let BaseAndDerived::StartFromBase { base, .. } = self else {
+                    unreachable!();
+                };
+                Ok(base)
+            }
+        }
+    }
 }
 
 #[derive(Clone, Debug)]
