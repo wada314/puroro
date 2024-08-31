@@ -14,30 +14,20 @@
 
 use std::alloc::{Allocator, Global};
 use std::cell::OnceCell;
-use std::marker::Unsize;
-use std::ops::CoerceUnsized;
 
 #[derive(Debug)]
-pub struct OnceList<T: ?Sized, A: Allocator = Global> {
-    head: OnceCell<Box<Cons<T, T, A>, A>>,
+pub struct OnceList<T, A: Allocator = Global> {
+    head: OnceCell<Box<Cons<T, A>, A>>,
     alloc: A,
 }
 
 #[derive(Debug)]
-struct Cons<T: ?Sized, NexT: ?Sized, A: Allocator> {
-    // We cannot use T here because of unsized coercion condition:
-    // T can only appear in the last field of the struct.
-    // Instead of T, we use NexT here.
-    next: OnceCell<Box<Cons<NexT, NexT, A>, A>>,
+struct Cons<T, A: Allocator> {
+    next: OnceCell<Box<Cons<T, A>, A>>,
     val: T,
 }
 
-impl<T, NexT, U, A: Allocator> CoerceUnsized<Cons<T, NexT, A>> for Cons<U, NexT, A> where
-    U: Unsize<T> + CoerceUnsized<T>
-{
-}
-
-impl<T: ?Sized> OnceList<T, Global> {
+impl<T> OnceList<T, Global> {
     pub fn new() -> Self {
         Self {
             head: OnceCell::new(),
@@ -45,12 +35,30 @@ impl<T: ?Sized> OnceList<T, Global> {
         }
     }
 }
-impl<T: ?Sized, A: Allocator> OnceList<T, A> {
+impl<T, A: Allocator> OnceList<T, A> {
     pub fn new_in(alloc: A) -> Self {
         Self {
             head: OnceCell::new(),
             alloc,
         }
+    }
+    pub fn iter(&self) -> impl Iterator<Item = &T> {
+        let mut next = &self.head;
+        ::std::iter::from_fn(move || match next.get() {
+            Some(c) => {
+                next = &c.next;
+                Some(&c.val)
+            }
+            None => None,
+        })
+    }
+
+    pub fn clear(&mut self) {
+        self.head = OnceCell::new();
+    }
+
+    pub fn alloc(&self) -> &A {
+        &self.alloc
     }
 }
 
@@ -108,7 +116,7 @@ impl<T: Sized, A: Allocator + Clone> OnceList<T, A> {
                 if let Some(next_next) = taken_next.next.take() {
                     next.set(next_next);
                 }
-                return Some(Box::into_inner(taken_next).val);
+                return Some(taken_next.val);
             }
 
             next.set(taken_next);
@@ -116,98 +124,33 @@ impl<T: Sized, A: Allocator + Clone> OnceList<T, A> {
         }
         None
     }
-}
 
-impl<T: ?Sized, A: Allocator + Clone> OnceList<T, A> {
-    pub fn push_unsized<U: Sized + Unsize<T>>(&self, val: U) -> &U {
-        let mut next = &self.head;
-        let val_cons = Box::new_in(Cons::<U, T, A>::new(val), self.alloc.clone());
-        let result_ptr: *const U = &val_cons.val;
-        let mut val_cons = val_cons as Box<Cons<T, T, A>, A>;
-        loop {
-            match next.try_insert(val_cons) {
-                Ok(_) => {
-                    // This is safe because the address of the pointee of Box is stable even after the box is moved.
-                    unsafe { return &*result_ptr }
-                }
-                Err((current, new_val_cons)) => {
-                    next = &current.next;
-                    val_cons = new_val_cons;
-                }
-            }
-        }
-    }
-
-    pub fn get_or_push_unsized<P, F, U>(&self, pred_opt: P, f: F) -> &U
+    pub fn take_map<F, U>(&mut self, f: F) -> Option<U>
     where
-        P: Fn(&T) -> Option<&U>,
-        F: Fn() -> U,
-        U: Sized + Unsize<T>,
-    {
-        self.get_or_try_push_unsized(pred_opt, || -> Result<_, ()> { Ok(f()) })
-            .unwrap()
-    }
-
-    pub fn get_or_try_push_unsized<P, F, E, U>(&self, pred_opt: P, f: F) -> Result<&U, E>
-    where
-        P: Fn(&T) -> Option<&U>,
-        F: Fn() -> Result<U, E>,
-        U: Sized + Unsize<T>,
-    {
-        let mut next = &self.head;
-        while let Some(c) = next.get() {
-            if let Some(u) = pred_opt(&c.val) {
-                return Ok(u);
-            }
-            next = &c.next;
-        }
-        let new_boxed = Box::new_in(Cons::<U, T, A>::new(f()?), self.alloc.clone());
-        let result_ptr: *const U = &new_boxed.val;
-        next.set(new_boxed as Box<Cons<T, T, A>, A>);
-        // This is safe because the address of the pointee of Box is stable even after the box is moved.
-        unsafe {
-            return Ok(&*result_ptr);
-        }
-    }
-
-    pub fn take_unsized<F, U>(&mut self, downcast: F) -> Option<U>
-    where
-        F: Fn(Box<T, A>) -> Result<Box<U, A>, Box<T, A>>,
-        U: Sized + Unsize<T>,
+        F: Fn(T) -> Result<U, T>,
     {
         let mut next = &mut self.head;
         while let Some(mut taken_next) = next.take() {
-            todo!();
-
-            next.set(taken_next);
-            next = &mut unsafe { next.get_mut().unwrap_unchecked() }.next;
+            match f(taken_next.val) {
+                Ok(u) => {
+                    // reconnect the list
+                    if let Some(next_next) = taken_next.next.take() {
+                        next.set(next_next);
+                    }
+                    return Some(u);
+                }
+                Err(t) => {
+                    taken_next.val = t;
+                    next.set(taken_next);
+                    next = &mut unsafe { next.get_mut().unwrap_unchecked() }.next;
+                }
+            }
         }
         None
     }
 }
 
-impl<T: ?Sized, A: Allocator> OnceList<T, A> {
-    pub fn iter(&self) -> impl Iterator<Item = &T> {
-        let mut next = &self.head;
-        ::std::iter::from_fn(move || match next.get() {
-            Some(c) => {
-                next = &c.next;
-                Some(&c.val)
-            }
-            None => None,
-        })
-    }
-
-    pub fn clear(&mut self) {
-        self.head = OnceCell::new();
-    }
-
-    pub fn alloc(&self) -> &A {
-        &self.alloc
-    }
-}
-
-impl<T, NexT: ?Sized, A: Allocator> Cons<T, NexT, A> {
+impl<T, A: Allocator> Cons<T, A> {
     fn new(val: T) -> Self {
         Self {
             next: OnceCell::new(),

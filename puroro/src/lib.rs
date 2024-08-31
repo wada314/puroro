@@ -17,8 +17,6 @@
 #![feature(assert_matches)]
 #![feature(once_cell_try)]
 #![feature(once_cell_try_insert)]
-#![feature(coerce_unsized)]
-#![feature(unsize)]
 #![feature(trait_upcasting)]
 
 pub mod editions;
