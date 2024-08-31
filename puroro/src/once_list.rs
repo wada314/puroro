@@ -163,13 +163,34 @@ impl<T: ?Sized, A: Allocator + Clone> OnceList<T, A> {
         }
         let new_boxed = Box::new_in(Cons::<U, T, A>::new(f()?), self.alloc.clone());
         let result_ptr: *const U = &new_boxed.val;
-        let Ok(_) = next.set(new_boxed as Box<Cons<T, T, A>, A>) else {
-            unreachable!("This should not fail because we confirmed that next.get() is None.");
-        };
+        next.set(new_boxed as Box<Cons<T, T, A>, A>);
         // This is safe because the address of the pointee of Box is stable even after the box is moved.
         unsafe {
             return Ok(&*result_ptr);
         }
+    }
+
+    pub fn take_unsized<P, U>(&mut self, pred_result: P) -> Option<U>
+    where
+        P: Fn(&T) -> Result<&U, &T>,
+        U: Sized + Unsize<T>,
+    {
+        let mut next = &mut self.head;
+        while let Some(mut taken_next) = next.take() {
+            match pred_result(&taken_next.val) {
+                Ok(u) => {
+                    // reconnect the list
+                    if let Some(next_next) = taken_next.next.take() {
+                        next.set(next_next);
+                    }
+                    return Some(u);
+                }
+            }
+
+            next.set(taken_next);
+            next = &mut unsafe { next.get_mut().unwrap_unchecked() }.next;
+        }
+        None
     }
 }
 
