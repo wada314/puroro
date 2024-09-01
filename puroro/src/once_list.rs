@@ -12,16 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::alloc::{Allocator, Global};
-use std::cell::OnceCell;
+use ::derive_more::Debug;
+use ::std::alloc::{Allocator, Global};
+use ::std::cell::OnceCell;
 
 #[derive(Debug, Clone)]
 pub struct OnceList<T, A: Allocator = Global> {
     head: OnceCell<Box<Cons<T, A>, A>>,
+    #[debug(skip)]
     alloc: A,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 struct Cons<T, A: Allocator> {
     next: OnceCell<Box<Cons<T, A>, A>>,
     val: T,
@@ -150,5 +152,14 @@ impl<T, A: Allocator> Cons<T, A> {
             next: OnceCell::new(),
             val,
         }
+    }
+}
+
+impl<T: Debug, A: Allocator> Debug for Cons<T, A> {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        f.debug_struct("Cons")
+            .field("val", &self.val)
+            .field("next", &self.next)
+            .finish()
     }
 }
