@@ -108,12 +108,12 @@ impl<T: Sized, A: Allocator + Clone> OnceList<T, A> {
             if pred(&taken_next.val) {
                 // reconnect the list
                 if let Some(next_next) = taken_next.next.take() {
-                    next.set(next_next);
+                    let _ = next.set(next_next);
                 }
                 return Some(taken_next.val);
             }
 
-            next.set(taken_next);
+            let _ = next.set(taken_next);
             next = &mut unsafe { next.get_mut().unwrap_unchecked() }.next;
         }
         None
@@ -129,13 +129,13 @@ impl<T: Sized, A: Allocator + Clone> OnceList<T, A> {
                 Ok(u) => {
                     // reconnect the list
                     if let Some(next_next) = taken_next.next.take() {
-                        next.set(next_next);
+                        let _ = next.set(next_next);
                     }
                     return Some(u);
                 }
                 Err(t) => {
                     taken_next.val = t;
-                    next.set(taken_next);
+                    let _ = next.set(taken_next);
                     next = &mut unsafe { next.get_mut().unwrap_unchecked() }.next;
                 }
             }
