@@ -16,17 +16,11 @@ use crate::once_list::OnceList;
 use ::replace_with::replace_with_or_abort_and_return;
 use ::std::alloc::Allocator;
 use ::std::alloc::Global;
-use ::std::any::Any;
 use ::std::cell::OnceCell;
 use ::std::marker::PhantomData;
+use ::std::ops::{Deref, DerefMut};
 
-pub trait Enum: Sized {
-    type VariantsDynTrait: ?Sized;
-    fn as_ref(&self) -> &Self::VariantsDynTrait;
-    fn as_mut(&self) -> &mut Self::VariantsDynTrait;
-    fn into_boxed(self) -> Box<Self::VariantsDynTrait>;
-}
-pub trait EnumVariant<E: Enum>: Sized {
+pub trait EnumVariant<E>: Sized {
     fn from_enum(e: E) -> Result<Self, E>;
     fn into_enum(self) -> E;
     fn from_enum_ref(e: &E) -> Option<&Self>;
@@ -61,7 +55,7 @@ impl<T, E, A: Allocator> BaseAndDerived<T, E, A> {
         }
     }
 }
-impl<T, E: Enum, A: Allocator + Clone> BaseAndDerived<T, E, A> {
+impl<T, E, A: Allocator + Clone> BaseAndDerived<T, E, A> {
     pub fn from_derived<D: Derived<T> + EnumVariant<E>>(derived: D, alloc: A) -> Self {
         BaseAndDerived::StartFromDerived {
             derived: derived.into_enum(),
@@ -73,14 +67,14 @@ impl<T, E: Enum, A: Allocator + Clone> BaseAndDerived<T, E, A> {
 
 impl<T, E, Er, A: Allocator + Clone> BaseAndDerived<T, E, A>
 where
-    E: Enum<VariantsDynTrait = dyn Derived<T, Error = Er>>,
+    E: Deref<Target = dyn Derived<T, Error = Er>> + DerefMut,
 {
     pub fn try_as_base(&self) -> Result<&T, Er> {
         match self {
             BaseAndDerived::StartFromBase { base, .. } => Ok(base),
             BaseAndDerived::StartFromDerived {
                 base_cell, derived, ..
-            } => base_cell.get_or_try_init(|| derived.as_ref().to_base()),
+            } => base_cell.get_or_try_init(|| derived.to_base()),
         }
     }
 
@@ -106,7 +100,7 @@ where
                 if let Some(d) = derived_cells.find_map(D::from_enum_ref) {
                     return Ok(d);
                 }
-                let base = base_cell.get_or_try_init(|| derived.as_ref().to_base())?;
+                let base = base_cell.get_or_try_init(|| derived.to_base())?;
                 Ok(self.push_and_get(base)?)
             }
         }
@@ -142,7 +136,7 @@ where
                 let base = base_cell
                     .take()
                     .map(Ok)
-                    .unwrap_or_else(|| derived.as_ref().to_base())?;
+                    .unwrap_or_else(|| derived.to_base())?;
                 *self = BaseAndDerived::from_base(base, derived_cells.alloc().clone());
                 let BaseAndDerived::StartFromBase { base: base_mut, .. } = self else {
                     unreachable!();
@@ -184,9 +178,7 @@ where
                     match D::from_enum(derived_taken) {
                         Ok(d) => return (Ok(()), d.into_enum()),
                         Err(derived_taken) => {
-                            let base = match base_cell
-                                .get_or_try_init(|| derived_taken.as_ref().to_base())
-                            {
+                            let base = match base_cell.get_or_try_init(|| derived_taken.to_base()) {
                                 Ok(base) => base,
                                 Err(e) => return (Err(e), derived_taken),
                             };
