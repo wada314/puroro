@@ -15,7 +15,7 @@
 use crate::internal::deser::{
     deser_from_bufread, DeserMessageHandlerBase, DeserMessageHandlerForRead,
 };
-use crate::internal::utils::{BaseAndDerived, Derived, Interconverter, InterconvertiblePair};
+use crate::internal::utils::{Interconverter, InterconvertiblePair};
 use crate::internal::WireType;
 use crate::message::MessageLite;
 use crate::variant::{
