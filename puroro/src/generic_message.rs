@@ -15,26 +15,30 @@
 use crate::internal::deser::{
     deser_from_bufread, DeserMessageHandlerBase, DeserMessageHandlerForRead,
 };
-use crate::internal::utils::{Interconverter, InterconvertiblePair};
+use crate::internal::utils::{
+    BaseAndDerived, Derived, EnumOfDeriveds, EnumVariant, Interconverter, InterconvertiblePair,
+};
 use crate::internal::WireType;
 use crate::message::MessageLite;
 use crate::variant::{
     variant_types::UInt32, ReadExtVariant, Variant, VariantIntegerType, WriteExtVariant,
 };
 use crate::{ErrorKind, Result};
+use ::derive_more::TryUnwrap;
 use ::hashbrown::hash_map::{DefaultHashBuilder, Entry};
 use ::hashbrown::HashMap;
 use ::itertools::Either;
 use ::std::alloc::{Allocator, Global};
 use ::std::fmt::Debug;
 use ::std::io::{BufRead, Read, Write};
-use ::std::ops::Deref;
+use ::std::ops::{Deref, DerefMut};
 
 #[derive(Default, Clone)]
 pub struct GenericMessage<A: Allocator = Global> {
     fields: HashMap<i32, Vec<WireTypeAndPayload2<A>, A>, DefaultHashBuilder, A>,
     alloc: A,
 }
+
 #[derive(Clone)]
 pub enum WireTypeAndPayload2<A: Allocator = Global> {
     Variant(Variant),
@@ -50,6 +54,36 @@ impl<A: Allocator> WireTypeAndPayload2<A> {
             WireTypeAndPayload2::I32(_) => WireType::I32,
             WireTypeAndPayload2::Len(_) => WireType::Len,
         }
+    }
+}
+
+#[derive(Clone, TryUnwrap)]
+#[try_unwrap(ref, ref_mut)]
+enum LenCustomPayloadView<A: Allocator = Global> {
+    Message(GenericMessage<A>),
+}
+impl<A: Allocator + Clone> EnumOfDeriveds<Vec<u8, A>> for LenCustomPayloadView<A> {
+    type Error = ErrorKind;
+    fn as_ref(&self) -> &dyn Derived<Vec<u8, A>, Error = Self::Error> {
+        match self {
+            Self::Message(msg) => msg,
+        }
+    }
+}
+impl<A: Allocator> EnumVariant<LenCustomPayloadView<A>> for GenericMessage<A> {
+    fn from_enum(
+        e: LenCustomPayloadView<A>,
+    ) -> ::std::result::Result<Self, LenCustomPayloadView<A>> {
+        e.try_unwrap_message().map_err(|e| e.input)
+    }
+    fn into_enum(self) -> LenCustomPayloadView<A> {
+        LenCustomPayloadView::Message(self)
+    }
+    fn from_enum_ref(e: &LenCustomPayloadView<A>) -> Option<&Self> {
+        e.try_unwrap_message_ref().ok()
+    }
+    fn from_enum_mut(e: &mut LenCustomPayloadView<A>) -> Option<&mut Self> {
+        e.try_unwrap_message_mut().ok()
     }
 }
 
@@ -115,6 +149,24 @@ impl<A: Allocator> Debug for WireTypeAndPayload2<A> {
             Self::I32(arg0) => f.debug_tuple("I32").field(arg0).finish(),
             Self::Len(arg0) => f.debug_tuple("Len").field(arg0).finish(),
         }
+    }
+}
+
+impl<A: Allocator + Clone> Derived<Vec<u8, A>> for GenericMessage<A> {
+    type Error = ErrorKind;
+    fn from_base(base: &Vec<u8, A>) -> Result<Self>
+    where
+        Self: Sized,
+    {
+        let mut msg = GenericMessage::new_in(base.allocator().clone());
+        msg.merge_from_bufread(base.as_slice())?;
+        Ok(msg)
+    }
+
+    fn to_base(&self) -> Result<Vec<u8, A>> {
+        let mut buf = Vec::new_in(self.alloc.clone());
+        self.write(&mut buf)?;
+        Ok(buf)
     }
 }
 

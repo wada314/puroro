@@ -18,7 +18,7 @@ name = "variant"
 harness = false
 
 [dependencies]
-derive_more = "0.99.17"
+derive_more = { version = "1.0.0", features = ["unwrap", "try_unwrap", "deref", "deref_mut", "from", "into"]}
 futures = "0.3.30"
 hashbrown = { version = "0.14.5", features = ["nightly"] }
 itertools = "0.12.1"
