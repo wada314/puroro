@@ -13,6 +13,7 @@
 // limitations under the License.
 
 use crate::once_list::OnceList;
+use ::replace_with::replace_with_or_abort_and_return;
 use ::std::alloc::Allocator;
 use ::std::alloc::Global;
 use ::std::any::Any;
@@ -28,9 +29,6 @@ pub trait Derived<T>: Any {
 }
 impl<T, E> dyn Derived<T, Error = E> {
     // Utility: from Any
-    fn is<D: Derived<T>>(&self) -> bool {
-        <dyn Any>::is::<D>(self as &dyn Any)
-    }
     fn downcast_ref<D: Derived<T>>(&self) -> Option<&D> {
         <dyn Any>::downcast_ref(self as &dyn Any)
     }
@@ -195,34 +193,28 @@ impl<T: 'static, E: 'static, A: Allocator + Clone> BaseAndDerived<T, E, A> {
                 derived,
                 derived_cells,
             } => {
-                let taken_derived = unsafe { ::std::ptr::read(derived) };
-                let boxed_d_result: Result<_, (E, _)> = match taken_derived.downcast::<D, _>() {
-                    Ok(d) => Ok(d),
-                    Err(taken_derived) => {
-                        let alloc = derived_cells.alloc().clone();
-                        derived_cells
-                            .take_map(|d| d.downcast::<D, _>())
-                            .map(Ok)
-                            .unwrap_or_else(|| {
-                                Ok(Box::new_in(
-                                    D::from_base(
-                                        base_cell.get_or_try_init(|| taken_derived.into_base())?,
-                                    )?,
-                                    alloc,
-                                ))
-                            })
-                            .map_err(|e| (e, taken_derived))
+                replace_with_or_abort_and_return(derived, |derived_taken| {
+                    match derived_taken.downcast::<D, _>() {
+                        Ok(d) => return (Ok(()), d),
+                        Err(derived_taken) => {
+                            let base = match base_cell.get_or_try_init(|| derived_taken.into_base())
+                            {
+                                Ok(base) => base,
+                                Err(e) => return (Err(e), derived_taken),
+                            };
+                            let new_derived = match D::from_base(&base) {
+                                Ok(d) => d,
+                                Err(e) => return (Err(e), derived_taken),
+                            };
+                            (
+                                Ok(()),
+                                Box::new_in(new_derived, derived_cells.alloc().clone()),
+                            )
+                        }
                     }
-                };
-                match boxed_d_result {
-                    Ok(boxed_d) => unsafe {
-                        ::std::ptr::write(derived, boxed_d);
-                    },
-                    Err((e, taken_derived)) => unsafe {
-                        ::std::ptr::write(derived, taken_derived);
-                        Err(e)?;
-                    },
-                };
+                })?;
+                base_cell.take();
+                derived_cells.clear();
                 Ok(derived.downcast_mut().unwrap())
             }
         }
