@@ -195,21 +195,35 @@ impl<T: 'static, E: 'static, A: Allocator + Clone> BaseAndDerived<T, E, A> {
                 derived,
                 derived_cells,
             } => {
-                if let Some(d) = derived.downcast_mut::<D>() {
-                    base_cell.take();
-                    derived_cells.clear();
-                    return Ok(d);
-                }
-                if let Some(d) = derived_cells.take_map(|d| d.downcast::<D, _>()) {
-                    // *derived = d as Box<dyn Derived<T, Error = E>, A>;
-                    *self = BaseAndDerived::StartFromDerived {
-                        derived: d,
-                        base_cell: OnceCell::new(),
-                        derived_cells: OnceList::new_in(derived_cells.alloc().clone()),
-                    };
-                    todo!()
-                }
-                todo!()
+                let taken_derived = unsafe { ::std::ptr::read(derived) };
+                let boxed_d_result: Result<_, (E, _)> = match taken_derived.downcast::<D, _>() {
+                    Ok(d) => Ok(d),
+                    Err(taken_derived) => {
+                        let alloc = derived_cells.alloc().clone();
+                        derived_cells
+                            .take_map(|d| d.downcast::<D, _>())
+                            .map(Ok)
+                            .unwrap_or_else(|| {
+                                Ok(Box::new_in(
+                                    D::from_base(
+                                        base_cell.get_or_try_init(|| taken_derived.into_base())?,
+                                    )?,
+                                    alloc,
+                                ))
+                            })
+                            .map_err(|e| (e, taken_derived))
+                    }
+                };
+                match boxed_d_result {
+                    Ok(boxed_d) => unsafe {
+                        ::std::ptr::write(derived, boxed_d);
+                    },
+                    Err((e, taken_derived)) => unsafe {
+                        ::std::ptr::write(derived, taken_derived);
+                        Err(e)?;
+                    },
+                };
+                Ok(derived.downcast_mut().unwrap())
             }
         }
     }
