@@ -138,22 +138,6 @@ impl<A: Allocator + Clone> Interconverter<Vec<u8, A>, GenericMessage<A>> for () 
         Ok(msg)
     }
 }
-impl<A: Allocator + Clone> Derived<Vec<u8, A>> for GenericMessage<A> {
-    type Error = ErrorKind;
-    fn from_base(base: &Vec<u8, A>) -> Result<Self>
-    where
-        Self: Sized,
-    {
-        let mut msg = GenericMessage::new_in(base.allocator().clone());
-        msg.merge_from_bufread(base.as_slice())?;
-        Ok(msg)
-    }
-    fn into_base(&self) -> Result<Vec<u8, A>> {
-        let mut buf = Vec::new_in(self.alloc.clone());
-        self.write(&mut buf)?;
-        Ok(buf)
-    }
-}
 
 impl<A: Allocator + Clone> Interconverter<Vec<WireTypeAndPayload2<A>, A>, Option<GenericMessage<A>>>
     for ()

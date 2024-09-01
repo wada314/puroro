@@ -53,19 +53,19 @@ impl<T, E> dyn Derived<T, Error = E> {
     }
 }
 
-pub enum BaseAndDerived<T, D, A: Allocator = Global> {
+pub enum BaseAndDerived<T, E, A: Allocator = Global> {
     StartFromBase {
         base: T,
-        derived_cells: OnceList<D, A>,
+        derived_cells: OnceList<Box<dyn Derived<T, Error = E>, A>, A>,
     },
     StartFromDerived {
-        derived: D,
+        derived: Box<dyn Derived<T, Error = E>, A>,
         base_cell: OnceCell<T>,
-        derived_cells: OnceList<D, A>,
+        derived_cells: OnceList<Box<dyn Derived<T, Error = E>, A>, A>,
     },
 }
 
-impl<T, D, A: Allocator> BaseAndDerived<T, D, A> {
+impl<T, E, A: Allocator> BaseAndDerived<T, E, A> {
     pub fn from_base(base: T, alloc: A) -> Self {
         BaseAndDerived::StartFromBase {
             base,
@@ -73,10 +73,10 @@ impl<T, D, A: Allocator> BaseAndDerived<T, D, A> {
         }
     }
 }
-impl<T, D, A: Allocator + Clone> BaseAndDerived<T, D, A> {
-    pub fn from_derived(derived: D, alloc: A) -> Self {
+impl<T, E, A: Allocator + Clone> BaseAndDerived<T, E, A> {
+    pub fn from_derived<D: Derived<T, Error = E>>(derived: D, alloc: A) -> Self {
         BaseAndDerived::StartFromDerived {
-            derived: derived,
+            derived: Box::new_in(derived, alloc.clone()),
             base_cell: OnceCell::new(),
             derived_cells: OnceList::new_in(alloc),
         }
