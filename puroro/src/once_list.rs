@@ -77,32 +77,26 @@ impl<T: Sized, A: Allocator + Clone> OnceList<T, A> {
         }
     }
 
-    pub fn get_or_push<P, F>(&self, pred: P, f: F) -> &T
-    where
-        P: Fn(&T) -> bool,
-        F: Fn() -> T,
-    {
-        self.get_or_try_push(pred, || -> Result<_, ()> { Ok(f()) })
-            .unwrap()
-    }
-
-    pub fn get_or_try_push<P, F, E>(&self, pred: P, f: F) -> Result<&T, E>
-    where
-        P: Fn(&T) -> bool,
-        F: Fn() -> Result<T, E>,
-    {
+    pub fn find<P: Fn(&T) -> bool>(&self, pred: P) -> Option<&T> {
         let mut next = &self.head;
         while let Some(c) = next.get() {
             if pred(&c.val) {
-                return Ok(&c.val);
+                return Some(&c.val);
             }
             next = &c.next;
         }
-        let Ok(last_cons) = next.try_insert(Box::new_in(Cons::new(f()?), self.alloc.clone()))
-        else {
-            unreachable!("This should not fail because we confirmed that next.get() is None.");
-        };
-        Ok(&last_cons.val)
+        None
+    }
+
+    pub fn find_map<F: Fn(&T) -> Option<&U>, U>(&self, f: F) -> Option<&U> {
+        let mut next = &self.head;
+        while let Some(c) = next.get() {
+            if let Some(u) = f(&c.val) {
+                return Some(u);
+            }
+            next = &c.next;
+        }
+        None
     }
 
     pub fn take<P>(&mut self, pred: P) -> Option<T>
