@@ -15,7 +15,7 @@
 use crate::internal::deser::{
     deser_from_bufread, DeserMessageHandlerBase, DeserMessageHandlerForRead,
 };
-use crate::internal::utils::{Interconverter, InterconvertiblePair};
+use crate::internal::utils::{BaseAndDerived, Derived, Interconverter, InterconvertiblePair};
 use crate::internal::WireType;
 use crate::message::MessageLite;
 use crate::variant::{
@@ -29,33 +29,6 @@ use ::std::alloc::{Allocator, Global};
 use ::std::fmt::Debug;
 use ::std::io::{BufRead, Read, Write};
 use ::std::ops::Deref;
-
-enum DerivedFieldContent<A: Allocator> {
-    ScalarMessage(Option<GenericMessage<A>>),
-    Map(HashMap<WireTypeAndPayload2<A>, WireTypeAndPayload2<A>, DefaultHashBuilder, A>),
-}
-
-type PayloadsOrDerivedType<A> =
-    InterconvertiblePair<Vec<WireTypeAndPayload2<A>, A>, DerivedFieldContent<A>, ()>;
-
-impl<A: Allocator + Clone> Interconverter<Vec<WireTypeAndPayload2<A>, A>, DerivedFieldContent<A>>
-    for ()
-{
-    type Error = ErrorKind;
-    type Context = A;
-    fn try_into_left_with_context(
-        right: &DerivedFieldContent<A>,
-        alloc: &A,
-    ) -> Result<Vec<WireTypeAndPayload2<A>, A>> {
-        todo!()
-    }
-    fn try_into_right_with_context(
-        left: &Vec<WireTypeAndPayload2<A>, A>,
-        alloc: &A,
-    ) -> Result<DerivedFieldContent<A>> {
-        todo!()
-    }
-}
 
 #[derive(Default, Clone)]
 pub struct GenericMessage<A: Allocator = Global> {
@@ -163,6 +136,22 @@ impl<A: Allocator + Clone> Interconverter<Vec<u8, A>, GenericMessage<A>> for () 
         let mut msg = GenericMessage::new_in(left.allocator().clone());
         msg.merge_from_bufread(left.as_slice())?;
         Ok(msg)
+    }
+}
+impl<A: Allocator + Clone> Derived<Vec<u8, A>> for GenericMessage<A> {
+    type Error = ErrorKind;
+    fn from_base(base: &Vec<u8, A>) -> Result<Self>
+    where
+        Self: Sized,
+    {
+        let mut msg = GenericMessage::new_in(base.allocator().clone());
+        msg.merge_from_bufread(base.as_slice())?;
+        Ok(msg)
+    }
+    fn into_base(&self) -> Result<Vec<u8, A>> {
+        let mut buf = Vec::new_in(self.alloc.clone());
+        self.write(&mut buf)?;
+        Ok(buf)
     }
 }
 
