@@ -18,6 +18,7 @@
 #![feature(once_cell_try)]
 #![feature(once_cell_try_insert)]
 #![feature(trait_upcasting)]
+#![feature(downcast_unchecked)]
 
 pub mod editions;
 pub mod generic_message;

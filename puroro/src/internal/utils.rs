@@ -34,6 +34,14 @@ impl<T, E> dyn Derived<T, Error = E> {
     fn downcast_ref<D: Derived<T>>(&self) -> Option<&D> {
         <dyn Any>::downcast_ref(self as &dyn Any)
     }
+    fn downcast<D: Derived<T>, A: Allocator>(
+        self: Box<Self, A>,
+    ) -> Result<Box<D, A>, Box<Self, A>> {
+        let self_backup: *const Box<Self, A> = &self;
+        let r = <Box<dyn Any, A>>::downcast::<D>(self as Box<dyn Any, A>);
+        // Safe because the error case is the same as the input.
+        r.map_err(|b| unsafe { b.downcast_unchecked() })
+    }
 }
 
 pub enum BaseAndDerived<T, E, A: Allocator = Global> {
@@ -150,7 +158,20 @@ impl<T: 'static, E: 'static, A: Allocator + Clone> BaseAndDerived<T, E, A> {
                 base,
                 derived_cells,
             } => {
-                todo!();
+                let mut boxed_d = if let Some(d) = derived_cells.take_map(|d| d.downcast::<D, _>())
+                {
+                    d
+                } else {
+                    Box::new_in(D::from_base(base)?, derived_cells.alloc().clone())
+                };
+                let d_mut: *mut D = &mut *boxed_d;
+                *self = BaseAndDerived::StartFromDerived {
+                    derived: boxed_d,
+                    base_cell: OnceCell::new(),
+                    derived_cells: OnceList::new_in(derived_cells.alloc().clone()),
+                };
+                // Safety: Box's pointee address is stable.
+                Ok(unsafe { &mut *d_mut })
             }
             BaseAndDerived::StartFromDerived {
                 base_cell,
