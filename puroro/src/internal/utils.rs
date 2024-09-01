@@ -39,6 +39,7 @@ pub trait Derived<T> {
     fn to_base(&self) -> Result<T, Self::Error>;
 }
 
+#[derive(Clone, Debug)]
 pub enum BaseAndDerived<T, E, A: Allocator = Global> {
     StartFromBase {
         base: T,

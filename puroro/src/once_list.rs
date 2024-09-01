@@ -15,13 +15,13 @@
 use std::alloc::{Allocator, Global};
 use std::cell::OnceCell;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct OnceList<T, A: Allocator = Global> {
     head: OnceCell<Box<Cons<T, A>, A>>,
     alloc: A,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 struct Cons<T, A: Allocator> {
     next: OnceCell<Box<Cons<T, A>, A>>,
     val: T,

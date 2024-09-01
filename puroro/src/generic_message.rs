@@ -44,7 +44,7 @@ pub enum WireTypeAndPayload2<A: Allocator = Global> {
     Variant(Variant),
     I64([u8; 8]),
     I32([u8; 4]),
-    Len(InterconvertiblePair<Vec<u8, A>, GenericMessage<A>, ()>),
+    Len(BaseAndDerived<Vec<u8, A>, LenCustomPayloadView<A>, A>),
 }
 impl<A: Allocator> WireTypeAndPayload2<A> {
     pub(crate) fn wire_type(&self) -> WireType {
@@ -57,7 +57,7 @@ impl<A: Allocator> WireTypeAndPayload2<A> {
     }
 }
 
-#[derive(Clone, TryUnwrap)]
+#[derive(Clone, Debug, TryUnwrap)]
 #[try_unwrap(ref, ref_mut)]
 enum LenCustomPayloadView<A: Allocator = Global> {
     Message(GenericMessage<A>),
@@ -134,7 +134,7 @@ impl<A: Allocator> GenericMessage<A> {
 }
 impl<A: Allocator> Debug for GenericMessage<A> {
     fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        let mut ds = f.debug_struct("GenericMessage2");
+        let mut ds = f.debug_struct("GenericMessage");
         for (number, wire_and_payloads) in &self.fields {
             ds.field(&format!("field{}", number), &wire_and_payloads.as_slice());
         }
