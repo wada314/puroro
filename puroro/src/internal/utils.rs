@@ -20,48 +20,36 @@ use ::std::any::Any;
 use ::std::cell::OnceCell;
 use ::std::marker::PhantomData;
 
-pub trait Derived<T>: Any {
+pub trait Enum: Sized {
+    type VariantsDynTrait: ?Sized;
+    fn as_ref(&self) -> &Self::VariantsDynTrait;
+    fn as_mut(&self) -> &mut Self::VariantsDynTrait;
+    fn into_boxed(self) -> Box<Self::VariantsDynTrait>;
+}
+pub trait EnumVariant<E: Enum>: Sized {
+    fn from_enum(e: E) -> Result<Self, E>;
+    fn into_enum(self) -> E;
+    fn from_enum_ref(e: &E) -> Option<&Self>;
+    fn from_enum_mut(e: &mut E) -> Option<&mut Self>;
+}
+
+pub trait Derived<T> {
     type Error;
     fn from_base(base: &T) -> Result<Self, Self::Error>
     where
         Self: Sized;
-    fn into_base(&self) -> Result<T, Self::Error>;
-}
-impl<T, E> dyn Derived<T, Error = E> {
-    // Utility: from Any
-    fn downcast_ref<D: Derived<T>>(&self) -> Option<&D> {
-        <dyn Any>::downcast_ref(self as &dyn Any)
-    }
-    fn downcast_mut<D: Derived<T>>(&mut self) -> Option<&mut D> {
-        <dyn Any>::downcast_mut(self as &mut dyn Any)
-    }
-    fn downcast<D: Derived<T>, A: Allocator>(
-        self: Box<Self, A>,
-    ) -> Result<Box<D, A>, Box<Self, A>> {
-        // Safety: Forget either self or self_backup later.
-        let self_backup = unsafe { ::std::ptr::read(&self) };
-        match <Box<dyn Any, A>>::downcast::<D>(self as Box<dyn Any, A>) {
-            Ok(d) => {
-                ::std::mem::forget(self_backup);
-                Ok(d)
-            }
-            Err(e) => {
-                ::std::mem::forget(e);
-                Err(self_backup)
-            }
-        }
-    }
+    fn to_base(&self) -> Result<T, Self::Error>;
 }
 
 pub enum BaseAndDerived<T, E, A: Allocator = Global> {
     StartFromBase {
         base: T,
-        derived_cells: OnceList<Box<dyn Derived<T, Error = E>, A>, A>,
+        derived_cells: OnceList<E, A>,
     },
     StartFromDerived {
-        derived: Box<dyn Derived<T, Error = E>, A>,
+        derived: E,
         base_cell: OnceCell<T>,
-        derived_cells: OnceList<Box<dyn Derived<T, Error = E>, A>, A>,
+        derived_cells: OnceList<E, A>,
     },
 }
 
@@ -73,33 +61,36 @@ impl<T, E, A: Allocator> BaseAndDerived<T, E, A> {
         }
     }
 }
-impl<T, E, A: Allocator + Clone> BaseAndDerived<T, E, A> {
-    pub fn from_derived<D: Derived<T, Error = E>>(derived: D, alloc: A) -> Self {
+impl<T, E: Enum, A: Allocator + Clone> BaseAndDerived<T, E, A> {
+    pub fn from_derived<D: Derived<T> + EnumVariant<E>>(derived: D, alloc: A) -> Self {
         BaseAndDerived::StartFromDerived {
-            derived: Box::new_in(derived, alloc.clone()),
+            derived: derived.into_enum(),
             base_cell: OnceCell::new(),
             derived_cells: OnceList::new_in(alloc),
         }
     }
 }
 
-impl<T: 'static, E: 'static, A: Allocator + Clone> BaseAndDerived<T, E, A> {
-    pub fn try_as_base(&self) -> Result<&T, E> {
+impl<T, E, Er, A: Allocator + Clone> BaseAndDerived<T, E, A>
+where
+    E: Enum<VariantsDynTrait = dyn Derived<T, Error = Er>>,
+{
+    pub fn try_as_base(&self) -> Result<&T, Er> {
         match self {
             BaseAndDerived::StartFromBase { base, .. } => Ok(base),
             BaseAndDerived::StartFromDerived {
                 base_cell, derived, ..
-            } => base_cell.get_or_try_init(|| derived.into_base()),
+            } => base_cell.get_or_try_init(|| derived.as_ref().to_base()),
         }
     }
 
-    pub fn try_as_derived<D: Derived<T, Error = E>>(&self) -> Result<&D, E> {
+    pub fn try_as_derived<D: Derived<T, Error = Er> + EnumVariant<E>>(&self) -> Result<&D, Er> {
         match self {
             BaseAndDerived::StartFromBase {
                 base,
                 derived_cells,
             } => {
-                if let Some(d) = derived_cells.find_map(|d| d.downcast_ref::<D>()) {
+                if let Some(d) = derived_cells.find_map(|d| D::from_enum_ref(d)) {
                     return Ok(d);
                 }
                 Ok(self.push_and_get(base)?)
@@ -109,35 +100,32 @@ impl<T: 'static, E: 'static, A: Allocator + Clone> BaseAndDerived<T, E, A> {
                 base_cell,
                 derived_cells,
             } => {
-                if let Some(d) = derived.downcast_ref::<D>() {
+                if let Some(d) = D::from_enum_ref(derived) {
                     return Ok(d);
                 }
-                if let Some(d) = derived_cells.find_map(|d| d.downcast_ref::<D>()) {
+                if let Some(d) = derived_cells.find_map(D::from_enum_ref) {
                     return Ok(d);
                 }
-                let base = base_cell.get_or_try_init(|| derived.into_base())?;
+                let base = base_cell.get_or_try_init(|| derived.as_ref().to_base())?;
                 Ok(self.push_and_get(base)?)
             }
         }
     }
 
-    fn derived_cells(&self) -> &OnceList<Box<dyn Derived<T, Error = E>, A>, A> {
+    fn derived_cells(&self) -> &OnceList<E, A> {
         match self {
             BaseAndDerived::StartFromBase { derived_cells, .. } => derived_cells,
             BaseAndDerived::StartFromDerived { derived_cells, .. } => derived_cells,
         }
     }
 
-    fn push_and_get<D: Derived<T, Error = E>>(&self, base: &T) -> Result<&D, E> {
+    fn push_and_get<D: Derived<T, Error = Er> + EnumVariant<E>>(&self, base: &T) -> Result<&D, Er> {
         let derived_cells = self.derived_cells();
-        let boxed = Box::new_in(D::from_base(base)?, derived_cells.alloc().clone());
-        let item_ptr: *const D = &*boxed;
-        derived_cells.push(boxed);
-        // Safety: Box's pointee address is stable.
-        Ok(unsafe { &*item_ptr })
+        let pushed_enum = derived_cells.push(D::from_base(base)?.into_enum());
+        Ok(D::from_enum_ref(pushed_enum).unwrap())
     }
 
-    pub fn try_as_base_mut(&mut self) -> Result<&mut T, E> {
+    pub fn try_as_base_mut(&mut self) -> Result<&mut T, Er> {
         match self {
             BaseAndDerived::StartFromBase {
                 base,
@@ -154,7 +142,7 @@ impl<T: 'static, E: 'static, A: Allocator + Clone> BaseAndDerived<T, E, A> {
                 let base = base_cell
                     .take()
                     .map(Ok)
-                    .unwrap_or_else(|| derived.into_base())?;
+                    .unwrap_or_else(|| derived.as_ref().to_base())?;
                 *self = BaseAndDerived::from_base(base, derived_cells.alloc().clone());
                 let BaseAndDerived::StartFromBase { base: base_mut, .. } = self else {
                     unreachable!();
@@ -164,29 +152,28 @@ impl<T: 'static, E: 'static, A: Allocator + Clone> BaseAndDerived<T, E, A> {
         }
     }
 
-    pub fn try_as_derived_mut<D: Derived<T, Error = E>>(&mut self) -> Result<&mut D, E> {
+    pub fn try_as_derived_mut<D: Derived<T, Error = Er> + EnumVariant<E>>(
+        &mut self,
+    ) -> Result<&mut D, Er> {
         match self {
             BaseAndDerived::StartFromBase {
                 base,
                 derived_cells,
             } => {
-                let mut boxed_d = derived_cells
-                    .take_map(|d| d.downcast::<D, _>())
+                let new_derived = derived_cells
+                    .take_map(|d| D::from_enum(d))
                     .map(Ok)
-                    .unwrap_or_else(|| {
-                        Ok(Box::new_in(
-                            D::from_base(base)?,
-                            derived_cells.alloc().clone(),
-                        ))
-                    })?;
-                let d_mut: *mut D = &mut *boxed_d;
+                    .unwrap_or_else(|| Ok(D::from_base(base)?))?;
                 *self = BaseAndDerived::StartFromDerived {
-                    derived: boxed_d,
+                    derived: new_derived.into_enum(),
                     base_cell: OnceCell::new(),
                     derived_cells: OnceList::new_in(derived_cells.alloc().clone()),
                 };
-                // Safety: Box's pointee address is stable.
-                Ok(unsafe { &mut *d_mut })
+                if let BaseAndDerived::StartFromDerived { derived, .. } = self {
+                    Ok(D::from_enum_mut(derived).unwrap())
+                } else {
+                    unreachable!();
+                }
             }
             BaseAndDerived::StartFromDerived {
                 base_cell,
@@ -194,10 +181,11 @@ impl<T: 'static, E: 'static, A: Allocator + Clone> BaseAndDerived<T, E, A> {
                 derived_cells,
             } => {
                 replace_with_or_abort_and_return(derived, |derived_taken| {
-                    match derived_taken.downcast::<D, _>() {
-                        Ok(d) => return (Ok(()), d),
+                    match D::from_enum(derived_taken) {
+                        Ok(d) => return (Ok(()), d.into_enum()),
                         Err(derived_taken) => {
-                            let base = match base_cell.get_or_try_init(|| derived_taken.into_base())
+                            let base = match base_cell
+                                .get_or_try_init(|| derived_taken.as_ref().to_base())
                             {
                                 Ok(base) => base,
                                 Err(e) => return (Err(e), derived_taken),
@@ -206,16 +194,13 @@ impl<T: 'static, E: 'static, A: Allocator + Clone> BaseAndDerived<T, E, A> {
                                 Ok(d) => d,
                                 Err(e) => return (Err(e), derived_taken),
                             };
-                            (
-                                Ok(()),
-                                Box::new_in(new_derived, derived_cells.alloc().clone()),
-                            )
+                            (Ok(()), new_derived.into_enum())
                         }
                     }
                 })?;
                 base_cell.take();
                 derived_cells.clear();
-                Ok(derived.downcast_mut().unwrap())
+                Ok(D::from_enum_mut(derived).unwrap())
             }
         }
     }
