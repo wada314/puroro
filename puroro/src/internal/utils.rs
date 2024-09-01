@@ -34,13 +34,24 @@ impl<T, E> dyn Derived<T, Error = E> {
     fn downcast_ref<D: Derived<T>>(&self) -> Option<&D> {
         <dyn Any>::downcast_ref(self as &dyn Any)
     }
+    fn downcast_mut<D: Derived<T>>(&mut self) -> Option<&mut D> {
+        <dyn Any>::downcast_mut(self as &mut dyn Any)
+    }
     fn downcast<D: Derived<T>, A: Allocator>(
         self: Box<Self, A>,
     ) -> Result<Box<D, A>, Box<Self, A>> {
-        let self_backup: *const Box<Self, A> = &self;
-        let r = <Box<dyn Any, A>>::downcast::<D>(self as Box<dyn Any, A>);
-        // Safe because the error case is the same as the input.
-        r.map_err(|b| unsafe { b.downcast_unchecked() })
+        // Safety: Forget either self or self_backup later.
+        let self_backup = unsafe { ::std::ptr::read(&self) };
+        match <Box<dyn Any, A>>::downcast::<D>(self as Box<dyn Any, A>) {
+            Ok(d) => {
+                ::std::mem::forget(self_backup);
+                Ok(d)
+            }
+            Err(e) => {
+                ::std::mem::forget(e);
+                Err(self_backup)
+            }
+        }
     }
 }
 
@@ -142,7 +153,10 @@ impl<T: 'static, E: 'static, A: Allocator + Clone> BaseAndDerived<T, E, A> {
                 derived,
                 derived_cells,
             } => {
-                let base = base_cell.take.unwrap_or_else(|| derived.into_base());
+                let base = base_cell
+                    .take()
+                    .map(Ok)
+                    .unwrap_or_else(|| derived.into_base())?;
                 *self = BaseAndDerived::from_base(base, derived_cells.alloc().clone());
                 let BaseAndDerived::StartFromBase { base: base_mut, .. } = self else {
                     unreachable!();
@@ -158,12 +172,15 @@ impl<T: 'static, E: 'static, A: Allocator + Clone> BaseAndDerived<T, E, A> {
                 base,
                 derived_cells,
             } => {
-                let mut boxed_d = if let Some(d) = derived_cells.take_map(|d| d.downcast::<D, _>())
-                {
-                    d
-                } else {
-                    Box::new_in(D::from_base(base)?, derived_cells.alloc().clone())
-                };
+                let mut boxed_d = derived_cells
+                    .take_map(|d| d.downcast::<D, _>())
+                    .map(Ok)
+                    .unwrap_or_else(|| {
+                        Ok(Box::new_in(
+                            D::from_base(base)?,
+                            derived_cells.alloc().clone(),
+                        ))
+                    })?;
                 let d_mut: *mut D = &mut *boxed_d;
                 *self = BaseAndDerived::StartFromDerived {
                     derived: boxed_d,
@@ -178,7 +195,21 @@ impl<T: 'static, E: 'static, A: Allocator + Clone> BaseAndDerived<T, E, A> {
                 derived,
                 derived_cells,
             } => {
-                todo!();
+                if let Some(d) = derived.downcast_mut::<D>() {
+                    base_cell.take();
+                    derived_cells.clear();
+                    return Ok(d);
+                }
+                if let Some(d) = derived_cells.take_map(|d| d.downcast::<D, _>()) {
+                    // *derived = d as Box<dyn Derived<T, Error = E>, A>;
+                    *self = BaseAndDerived::StartFromDerived {
+                        derived: d,
+                        base_cell: OnceCell::new(),
+                        derived_cells: OnceList::new_in(derived_cells.alloc().clone()),
+                    };
+                    todo!()
+                }
+                todo!()
             }
         }
     }
