@@ -59,7 +59,7 @@ impl<T, A: Allocator> OnceList<T, A> {
         self.head = OnceCell::new();
     }
 
-    pub fn alloc(&self) -> &A {
+    pub fn allocator(&self) -> &A {
         &self.alloc
     }
 }

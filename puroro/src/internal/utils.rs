@@ -143,7 +143,7 @@ where
                     .take()
                     .map(Ok)
                     .unwrap_or_else(|| derived.as_ref().to_base())?;
-                *self = BaseAndDerived::from_base(base, derived_cells.alloc().clone());
+                *self = BaseAndDerived::from_base(base, derived_cells.allocator().clone());
                 let BaseAndDerived::StartFromBase { base: base_mut, .. } = self else {
                     unreachable!();
                 };
@@ -167,7 +167,7 @@ where
                 *self = BaseAndDerived::StartFromDerived {
                     derived: new_derived.into_enum(),
                     base_cell: OnceCell::new(),
-                    derived_cells: OnceList::new_in(derived_cells.alloc().clone()),
+                    derived_cells: OnceList::new_in(derived_cells.allocator().clone()),
                 };
                 if let BaseAndDerived::StartFromDerived { derived, .. } = self {
                     Ok(D::from_enum_mut(derived).unwrap())

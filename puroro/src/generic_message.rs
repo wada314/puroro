@@ -29,6 +29,7 @@ use ::itertools::Either;
 use ::std::alloc::{Allocator, Global};
 use ::std::io::{BufRead, Read, Write};
 use ::std::ops::Deref;
+use ::std::vec;
 
 #[derive(Default, Clone)]
 pub struct GenericMessage<A: Allocator = Global> {
@@ -140,6 +141,7 @@ impl<A: Allocator> Debug for GenericMessage<A> {
     }
 }
 
+// Corresponds to a repeated message field.
 impl<A: Allocator + Clone> Derived<Vec<u8, A>> for GenericMessage<A> {
     type Error = ErrorKind;
     fn from_base(base: &Vec<u8, A>) -> Result<Self>
@@ -155,6 +157,44 @@ impl<A: Allocator + Clone> Derived<Vec<u8, A>> for GenericMessage<A> {
         let mut buf = Vec::new_in(self.alloc.clone());
         self.write(&mut buf)?;
         Ok(buf)
+    }
+}
+
+// Corresponds to a scalar message field -- A message can be consist of multiple LEN payloads.
+impl<A: Allocator + Clone> Derived<Vec<WireTypeAndPayload<A>, A>>
+    for (Option<GenericMessage<A>>, A)
+{
+    type Error = ErrorKind;
+    fn from_base(base: &Vec<WireTypeAndPayload<A>, A>) -> Result<Self>
+    where
+        Self: Sized,
+    {
+        let mut msg_opt = None;
+        let allocator = base.allocator().clone();
+        for wire_and_payload in base {
+            let WireTypeAndPayload::Len(bytes_or_msg) = wire_and_payload else {
+                // found a non-message field. What is the expected behavior here?
+                return Err(ErrorKind::GenericMessageFieldTypeError)?;
+            };
+            let msg = msg_opt.get_or_insert_with(|| GenericMessage::new_in(allocator.clone()));
+            msg.merge_from_bufread(bytes_or_msg.try_as_base()?.as_slice())?;
+        }
+        Ok((msg_opt, allocator))
+    }
+
+    fn to_base(&self) -> Result<Vec<WireTypeAndPayload<A>, A>> {
+        match self {
+            (Some(msg), alloc) => {
+                let mut buf = Vec::new_in(alloc.clone());
+                msg.write(&mut buf)?;
+                let payload =
+                    WireTypeAndPayload::Len(BaseAndDerived::from_base(buf, alloc.clone()));
+                let mut vec = Vec::with_capacity_in(1, alloc.clone());
+                vec.push(payload);
+                Ok(vec)
+            }
+            (None, alloc) => Ok(Vec::new_in(alloc.clone())),
+        }
     }
 }
 
@@ -278,7 +318,7 @@ impl<A: Allocator + Clone> Field<A> {
         self.try_as_repeated_bytes().filter_map(Result::ok)
     }
     pub fn as_scalar_message(&self) -> Option<&GenericMessage<A>> {
-        self.as_repeated_message().last()
+        todo!()
     }
     pub fn as_repeated_message(&self) -> impl '_ + Iterator<Item = &GenericMessage<A>> {
         self.try_as_repeated_message().filter_map(Result::ok)
