@@ -135,13 +135,13 @@ impl<A: Allocator + Clone> GenericMessage<A> {
         }
     }
     pub fn field_mut(&mut self, number: i32) -> &mut FieldMut<A> {
-        let mut_vec_ref = self.fields.entry(number).or_insert_with(|| {
+        let field_base = self.fields.entry(number).or_insert_with(|| {
             BaseAndDerived::<_, _, A>::from_base(
                 Vec::new_in(self.alloc.clone()),
                 self.alloc.clone(),
             )
         });
-        unsafe { ::std::mem::transmute(mut_vec_ref) }
+        FieldMut::ref_cast_mut(field_base)
     }
 }
 impl<A: Allocator + Clone> GenericMessage<A> {
@@ -279,7 +279,7 @@ impl<A: Allocator + Clone> MessageLite for GenericMessage<A> {
 
 impl<A: Allocator + Clone> DeserMessageHandlerBase for GenericMessage<A> {
     fn parse_variant(&mut self, num: i32, var: Variant) -> Result<()> {
-        self.field_mut(num).0.push(WireTypeAndPayload::Variant(var));
+        self.field_mut(num).push_variant(var);
         Ok(())
     }
     fn parse_i32(&mut self, num: i32, val: [u8; 4]) -> Result<()> {
@@ -310,6 +310,7 @@ impl<A: Allocator + Clone, R: Read> DeserMessageHandlerForRead<R> for GenericMes
         let len = read.read_to_end(&mut buf)?;
         self.field_mut(num)
             .0
+            .try_as_base_mut()?
             .push(WireTypeAndPayload::Len(BaseAndDerived::from_base(
                 buf.as_slice().to_vec_in(alloc.clone()),
                 alloc,
@@ -323,7 +324,9 @@ impl<A: Allocator + Clone, R: Read> DeserMessageHandlerForRead<R> for GenericMes
 pub struct Field<A: Allocator = Global>([WireTypeAndPayload<A>]);
 #[repr(transparent)]
 #[derive(RefCast)]
-pub struct FieldMut<A: Allocator = Global>(Vec<WireTypeAndPayload<A>, A>);
+pub struct FieldMut<A: Allocator = Global>(
+    BaseAndDerived<Vec<WireTypeAndPayload<A>, A>, FieldCustomView<A>, A>,
+);
 
 impl<A: Allocator + Clone> Field<A> {
     pub fn as_scalar_variant<T: VariantIntegerType>(&self, allow_packed: bool) -> T::RustType {
@@ -456,51 +459,73 @@ impl<A: Allocator + Clone> Field<A> {
     }
 }
 
-impl<A: Allocator> Deref for FieldMut<A> {
-    type Target = Field;
+impl<A: Allocator + Clone> Deref for FieldMut<A> {
+    type Target = Field<A>;
     fn deref(&self) -> &Self::Target {
-        unsafe { ::std::mem::transmute(self.0.as_slice()) }
+        Field::ref_cast(self.0.try_as_base().unwrap().as_slice())
     }
 }
 
 impl<A: Allocator + Clone> FieldMut<A> {
-    fn alloc(&self) -> &A {
+    fn allocator(&self) -> &A {
         self.0.allocator()
     }
 
     pub fn clear(&mut self) {
-        self.0.clear();
+        self.0.try_as_base_mut().unwrap().clear();
     }
 
-    pub fn push_variant<T: VariantIntegerType>(&mut self, val: T::RustType) {
+    pub fn push_variant(&mut self, val: Variant) {
         self.0
+            .try_as_base_mut()
+            .unwrap()
+            .push(WireTypeAndPayload::Variant(val));
+    }
+    pub fn push_variant_from<T: VariantIntegerType>(&mut self, val: T::RustType) {
+        self.0
+            .try_as_base_mut()
+            .unwrap()
             .push(WireTypeAndPayload::Variant(Variant::from::<T>(val)));
     }
     pub fn push_i32(&mut self, val: [u8; 4]) {
-        self.0.push(WireTypeAndPayload::I32(val));
+        self.0
+            .try_as_base_mut()
+            .unwrap()
+            .push(WireTypeAndPayload::I32(val));
     }
     pub fn push_i64(&mut self, val: [u8; 8]) {
-        self.0.push(WireTypeAndPayload::I64(val));
+        self.0
+            .try_as_base_mut()
+            .unwrap()
+            .push(WireTypeAndPayload::I64(val));
     }
     pub fn push_string(&mut self, val: &str) {
+        let alloc = self.allocator().clone();
         self.0
+            .try_as_base_mut()
+            .unwrap()
             .push(WireTypeAndPayload::Len(BaseAndDerived::from_base(
-                val.as_bytes().to_vec_in(self.alloc().clone()),
-                self.alloc().clone(),
+                val.as_bytes().to_vec_in(alloc.clone()),
+                alloc.clone(),
             )));
     }
     pub fn push_bytes(&mut self, val: &[u8]) {
+        let alloc = self.allocator().clone();
         self.0
+            .try_as_base_mut()
+            .unwrap()
             .push(WireTypeAndPayload::Len(BaseAndDerived::from_base(
-                val.to_vec_in(self.alloc().clone()),
-                self.alloc().clone(),
+                val.to_vec_in(alloc.clone()),
+                alloc.clone(),
             )));
     }
     pub fn push_message(&mut self, val: GenericMessage<A>) {
+        let alloc = self.allocator().clone();
         self.0
+            .try_as_base_mut()
+            .unwrap()
             .push(WireTypeAndPayload::Len(BaseAndDerived::from_derived(
-                val,
-                self.alloc().clone(),
+                val, alloc,
             )));
     }
 }

@@ -59,6 +59,13 @@ impl<T, E, A: Allocator> BaseAndDerived<T, E, A> {
             derived_cells: OnceList::new_in(alloc),
         }
     }
+
+    pub fn allocator(&self) -> &A {
+        match self {
+            BaseAndDerived::StartFromBase { derived_cells, .. } => derived_cells.allocator(),
+            BaseAndDerived::StartFromDerived { derived_cells, .. } => derived_cells.allocator(),
+        }
+    }
 }
 impl<T, E, A: Allocator + Clone> BaseAndDerived<T, E, A> {
     pub fn from_derived<D: Derived<T> + EnumVariant<E>>(derived: D, alloc: A) -> Self {
