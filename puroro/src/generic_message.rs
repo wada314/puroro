@@ -93,6 +93,7 @@ impl<A: Allocator> EnumVariant<LenCustomPayloadView<A>> for GenericMessage<A> {
 #[derive(Clone, Debug, TryUnwrap)]
 #[try_unwrap(ref, ref_mut)]
 pub enum FieldCustomView<A: Allocator = Global> {
+    #[debug("{:?}", _0.0)] // Ignore allocator
     ScalarMessage((Option<GenericMessage<A>>, A)),
 }
 impl<A: Allocator + Clone> EnumOfDeriveds<Vec<WireTypeAndPayload<A>, A>> for FieldCustomView<A> {
@@ -176,8 +177,8 @@ impl<A: Allocator + Clone> GenericMessage<A> {
 impl<A: Allocator> Debug for GenericMessage<A> {
     fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
         let mut ds = f.debug_struct("GenericMessage");
-        for (number, wire_and_payloads) in &self.fields {
-            ds.field(&format!("field{}", number), &wire_and_payloads.as_slice());
+        for (number, field_base) in &self.fields {
+            ds.field(&format!("field{}", number), field_base);
         }
         ds.finish()
     }
@@ -247,8 +248,8 @@ impl<A: Allocator + Clone> MessageLite for GenericMessage<A> {
 
     fn write<W: Write>(&self, mut write: W) -> Result<usize> {
         let mut total_bytes = 0;
-        for (number, wire_and_payloads) in &self.fields {
-            for wire_and_payload in wire_and_payloads {
+        for (number, field_base) in &self.fields {
+            for wire_and_payload in field_base.try_as_base()? {
                 let tag = (TryInto::<u32>::try_into(*number)? << 3)
                     | Into::<u32>::into(wire_and_payload.wire_type());
                 total_bytes += write.write_variant(UInt32::into_variant(tag))?;
