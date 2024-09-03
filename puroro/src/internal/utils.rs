@@ -14,7 +14,6 @@
 
 use crate::once_list::OnceList;
 use ::derive_more::Debug;
-use ::itertools::Either;
 use ::replace_with::replace_with_or_abort_and_return;
 use ::std::alloc::Allocator;
 use ::std::alloc::Global;
