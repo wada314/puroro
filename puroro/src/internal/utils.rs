@@ -226,10 +226,11 @@ where
             BaseAndDerived::StartFromBase {
                 base,
                 derived_cells,
-            } => Ok(derived_cells
-                .take_map(|d| D::from_enum(d).ok())
+            } => derived_cells
+                .into_iter()
+                .find_map(|d| D::from_enum(d).ok())
                 .map(Ok)
-                .unwrap_or_else(|| D::from_base(&base))?),
+                .unwrap_or_else(|| D::from_base(&base)),
             BaseAndDerived::StartFromDerived {
                 mut base_cell,
                 derived,
@@ -240,7 +241,8 @@ where
                     Err(derived) => derived,
                 };
                 Ok(derived_cells
-                    .take_map(|d| D::from_enum(d).ok())
+                    .into_iter()
+                    .find_map(|d| D::from_enum(d).ok())
                     .map(Ok)
                     .unwrap_or_else(|| {
                         let base = match base_cell.take() {
