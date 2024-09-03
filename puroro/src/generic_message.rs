@@ -26,13 +26,19 @@ use ::derive_more::{Debug, TryUnwrap};
 use ::hashbrown::hash_map::{DefaultHashBuilder, Entry};
 use ::hashbrown::HashMap;
 use ::itertools::Either;
+use ::ref_cast::RefCast;
 use ::std::alloc::{Allocator, Global};
 use ::std::io::{BufRead, Read, Write};
 use ::std::ops::Deref;
 
 #[derive(Default, Clone)]
 pub struct GenericMessage<A: Allocator = Global> {
-    fields: HashMap<i32, Vec<WireTypeAndPayload<A>, A>, DefaultHashBuilder, A>,
+    fields: HashMap<
+        i32,
+        BaseAndDerived<Vec<WireTypeAndPayload<A>, A>, FieldCustomView<A>, A>,
+        DefaultHashBuilder,
+        A,
+    >,
     alloc: A,
 }
 
@@ -128,33 +134,42 @@ impl<A: Allocator + Clone> GenericMessage<A> {
         }
     }
     pub fn field_mut(&mut self, number: i32) -> &mut FieldMut<A> {
-        let mut_vec_ref = self
-            .fields
-            .entry(number)
-            .or_insert_with(|| Vec::new_in(self.alloc.clone()));
+        let mut_vec_ref = self.fields.entry(number).or_insert_with(|| {
+            BaseAndDerived::<_, _, A>::from_base(
+                Vec::new_in(self.alloc.clone()),
+                self.alloc.clone(),
+            )
+        });
         unsafe { ::std::mem::transmute(mut_vec_ref) }
     }
 }
-impl<A: Allocator> GenericMessage<A> {
+impl<A: Allocator + Clone> GenericMessage<A> {
     pub fn field(&self, number: i32) -> &Field<A> {
-        let vec_ref = self
-            .fields
-            .get(&number)
-            .map(Vec::as_slice)
-            .unwrap_or_default();
-        unsafe { ::std::mem::transmute(vec_ref) }
+        self.try_field(number).unwrap()
     }
-    pub fn merge(&mut self, other: Self) {
-        for (number, wire_and_payloads) in other.fields {
+    pub fn try_field(&self, number: i32) -> Result<&Field<A>> {
+        let slice = match self.fields.get(&number) {
+            Some(vec_or_derived) => vec_or_derived.try_as_base()?.as_slice(),
+            None => <&[_]>::default(),
+        };
+        Ok(Field::ref_cast(slice))
+    }
+    pub fn merge(&mut self, other: Self) -> Result<()> {
+        for (number, other_field_base) in other.fields {
+            let other_payloads = other_field_base.try_take_base()?;
             match self.fields.entry(number) {
                 Entry::Occupied(mut entry) => {
-                    entry.get_mut().extend(wire_and_payloads);
+                    entry.get_mut().try_as_base_mut()?.extend(other_payloads);
                 }
                 Entry::Vacant(entry) => {
-                    entry.insert(wire_and_payloads);
+                    entry.insert(BaseAndDerived::from_base(
+                        other_payloads,
+                        self.alloc.clone(),
+                    ));
                 }
             }
         }
+        Ok(())
     }
 }
 
@@ -303,8 +318,10 @@ impl<A: Allocator + Clone, R: Read> DeserMessageHandlerForRead<R> for GenericMes
 }
 
 #[repr(transparent)]
+#[derive(RefCast)]
 pub struct Field<A: Allocator = Global>([WireTypeAndPayload<A>]);
 #[repr(transparent)]
+#[derive(RefCast)]
 pub struct FieldMut<A: Allocator = Global>(Vec<WireTypeAndPayload<A>, A>);
 
 impl<A: Allocator + Clone> Field<A> {

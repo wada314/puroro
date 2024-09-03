@@ -204,6 +204,54 @@ where
             }
         }
     }
+
+    pub fn try_take_base(self) -> Result<T, E::Error> {
+        match self {
+            BaseAndDerived::StartFromBase { base, .. } => Ok(base),
+            BaseAndDerived::StartFromDerived {
+                mut base_cell,
+                derived,
+                ..
+            } => Ok(match base_cell.take() {
+                Some(base) => base,
+                None => derived.as_ref().to_base()?,
+            }),
+        }
+    }
+
+    pub fn try_take_derived<D: Derived<T, Error = E::Error> + EnumVariant<E>>(
+        self,
+    ) -> Result<D, E::Error> {
+        match self {
+            BaseAndDerived::StartFromBase {
+                base,
+                mut derived_cells,
+            } => Ok(derived_cells
+                .take_map(|d| D::from_enum(d))
+                .map(Ok)
+                .unwrap_or_else(|| D::from_base(&base))?),
+            BaseAndDerived::StartFromDerived {
+                mut base_cell,
+                derived,
+                mut derived_cells,
+            } => {
+                let derived = match D::from_enum(derived) {
+                    Ok(d) => return Ok(d),
+                    Err(derived) => derived,
+                };
+                Ok(derived_cells
+                    .take_map(|d| D::from_enum(d))
+                    .map(Ok)
+                    .unwrap_or_else(|| {
+                        let base = match base_cell.take() {
+                            Some(base) => base,
+                            None => derived.as_ref().to_base()?,
+                        };
+                        D::from_base(&base)
+                    })?)
+            }
+        }
+    }
 }
 
 #[cfg(test)]
