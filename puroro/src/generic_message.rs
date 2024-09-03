@@ -376,7 +376,7 @@ impl<A: Allocator + Clone> Field<A> {
             .filter_map(Result::ok)
     }
     pub fn as_scalar_message(&self) -> Option<&GenericMessage<A>> {
-        todo!()
+        self.try_as_scalar_message().ok().flatten()
     }
     pub fn as_repeated_message(&self) -> impl '_ + Iterator<Item = &GenericMessage<A>> {
         self.try_as_repeated_message()
@@ -451,18 +451,8 @@ impl<A: Allocator + Clone> Field<A> {
         }))
     }
     pub fn try_as_scalar_message(&self) -> Result<Option<&GenericMessage<A>>> {
-        let mut message_opt = None;
-        for wire_and_payload in self.0.try_as_base()? {
-            let WireTypeAndPayload::Len(bytes_or_msg) = wire_and_payload else {
-                Err(ErrorKind::GenericMessageFieldTypeError)?
-            };
-            let msg = bytes_or_msg.try_as_derived::<GenericMessage<A>>()?;
-            message_opt
-                .get_or_insert_with(|| GenericMessage::new_in(msg.alloc.clone()))
-                .merge(msg.clone());
-        }
-        // Ok(message_opt)
-        todo!()
+        let (opt_msg, _) = self.0.try_as_derived::<(Option<GenericMessage<A>>, A)>()?;
+        Ok(opt_msg.as_ref())
     }
     pub fn try_as_repeated_message(
         &self,
