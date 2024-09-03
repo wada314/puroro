@@ -101,7 +101,35 @@ impl<T: Sized, A: Allocator + Clone> OnceList<T, A> {
         None
     }
 
-    pub fn take<P>(&mut self, pred: P) -> Option<T>
+    pub fn take<P>(self, pred: P) -> Option<T>
+    where
+        P: Fn(&T) -> bool,
+    {
+        let mut next = self.head;
+        while let Some(taken_next) = next.take() {
+            if pred(&taken_next.val) {
+                return Some(taken_next.val);
+            }
+            next = taken_next.next;
+        }
+        None
+    }
+
+    pub fn take_map<F, U>(self, f: F) -> Option<U>
+    where
+        F: Fn(T) -> Option<U>,
+    {
+        let mut next = self.head;
+        while let Some(taken_next) = next.take() {
+            match f(taken_next.val) {
+                Some(u) => return Some(u),
+                None => next = taken_next.next,
+            }
+        }
+        None
+    }
+
+    pub fn remove<P>(&mut self, pred: P) -> Option<T>
     where
         P: Fn(&T) -> bool,
     {
@@ -121,7 +149,7 @@ impl<T: Sized, A: Allocator + Clone> OnceList<T, A> {
         None
     }
 
-    pub fn take_map<F, U>(&mut self, f: F) -> Option<U>
+    pub fn remove_map<F, U>(&mut self, f: F) -> Option<U>
     where
         F: Fn(T) -> Result<U, T>,
     {

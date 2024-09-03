@@ -161,7 +161,7 @@ where
                 derived_cells,
             } => {
                 let new_derived = derived_cells
-                    .take_map(|d| D::from_enum(d))
+                    .remove_map(|d| D::from_enum(d))
                     .map(Ok)
                     .unwrap_or_else(|| Ok(D::from_base(base)?))?;
                 *self = BaseAndDerived::StartFromDerived {
@@ -225,22 +225,22 @@ where
         match self {
             BaseAndDerived::StartFromBase {
                 base,
-                mut derived_cells,
+                derived_cells,
             } => Ok(derived_cells
-                .take_map(|d| D::from_enum(d))
+                .take_map(|d| D::from_enum(d).ok())
                 .map(Ok)
                 .unwrap_or_else(|| D::from_base(&base))?),
             BaseAndDerived::StartFromDerived {
                 mut base_cell,
                 derived,
-                mut derived_cells,
+                derived_cells,
             } => {
                 let derived = match D::from_enum(derived) {
                     Ok(d) => return Ok(d),
                     Err(derived) => derived,
                 };
                 Ok(derived_cells
-                    .take_map(|d| D::from_enum(d))
+                    .take_map(|d| D::from_enum(d).ok())
                     .map(Ok)
                     .unwrap_or_else(|| {
                         let base = match base_cell.take() {
