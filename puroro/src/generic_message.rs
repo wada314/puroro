@@ -29,7 +29,6 @@ use ::itertools::Either;
 use ::std::alloc::{Allocator, Global};
 use ::std::io::{BufRead, Read, Write};
 use ::std::ops::Deref;
-use ::std::vec;
 
 #[derive(Default, Clone)]
 pub struct GenericMessage<A: Allocator = Global> {
@@ -82,6 +81,34 @@ impl<A: Allocator> EnumVariant<LenCustomPayloadView<A>> for GenericMessage<A> {
     }
     fn from_enum_mut(e: &mut LenCustomPayloadView<A>) -> Option<&mut Self> {
         e.try_unwrap_message_mut().ok()
+    }
+}
+
+#[derive(Clone, Debug, TryUnwrap)]
+#[try_unwrap(ref, ref_mut)]
+pub enum FieldCustomView<A: Allocator = Global> {
+    ScalarMessage((Option<GenericMessage<A>>, A)),
+}
+impl<A: Allocator + Clone> EnumOfDeriveds<Vec<WireTypeAndPayload<A>, A>> for FieldCustomView<A> {
+    type Error = ErrorKind;
+    fn as_ref(&self) -> &dyn Derived<Vec<WireTypeAndPayload<A>, A>, Error = Self::Error> {
+        match self {
+            Self::ScalarMessage(msg) => msg,
+        }
+    }
+}
+impl<A: Allocator> EnumVariant<FieldCustomView<A>> for (Option<GenericMessage<A>>, A) {
+    fn from_enum(e: FieldCustomView<A>) -> ::std::result::Result<Self, FieldCustomView<A>> {
+        e.try_unwrap_scalar_message().map_err(|e| e.input)
+    }
+    fn into_enum(self) -> FieldCustomView<A> {
+        FieldCustomView::ScalarMessage(self)
+    }
+    fn from_enum_ref(e: &FieldCustomView<A>) -> Option<&Self> {
+        e.try_unwrap_scalar_message_ref().ok()
+    }
+    fn from_enum_mut(e: &mut FieldCustomView<A>) -> Option<&mut Self> {
+        e.try_unwrap_scalar_message_mut().ok()
     }
 }
 
