@@ -18,6 +18,7 @@ use ::replace_with::replace_with_or_abort_and_return;
 use ::std::alloc::Allocator;
 use ::std::alloc::Global;
 use ::std::cell::OnceCell;
+use ::std::convert::Infallible;
 
 pub trait EnumOfDeriveds<T> {
     type FromBaseError;
@@ -86,6 +87,54 @@ impl<T, E, A: Allocator + Clone> BaseAndDerived<T, E, A>
 where
     E: EnumOfDeriveds<T>,
 {
+    pub fn as_base(&self) -> &T
+    where
+        E: EnumOfDeriveds<T, ToBaseError = Infallible>,
+    {
+        self.try_as_base().unwrap()
+    }
+
+    pub fn as_derived<D>(&self) -> &D
+    where
+        D: Derived<T, ToBaseError = E::ToBaseError, FromBaseError = E::FromBaseError>
+            + EnumVariant<E>,
+        E: EnumOfDeriveds<T, Error = Infallible>,
+    {
+        self.try_as_derived::<D>().unwrap()
+    }
+
+    pub fn as_base_mut(&mut self) -> &mut T
+    where
+        E: EnumOfDeriveds<T, ToBaseError = Infallible>,
+    {
+        self.try_as_base_mut().unwrap()
+    }
+
+    pub fn as_derived_mut<D>(&mut self) -> &mut D
+    where
+        D: Derived<T, ToBaseError = E::ToBaseError, FromBaseError = E::FromBaseError>
+            + EnumVariant<E>,
+        E: EnumOfDeriveds<T, Error = Infallible>,
+    {
+        self.try_as_derived_mut::<D>().unwrap()
+    }
+
+    pub fn take_base(self) -> T
+    where
+        E: EnumOfDeriveds<T, ToBaseError = Infallible>,
+    {
+        self.try_take_base().unwrap()
+    }
+
+    pub fn take_derived<D>(self) -> D
+    where
+        D: Derived<T, ToBaseError = E::ToBaseError, FromBaseError = E::FromBaseError>
+            + EnumVariant<E>,
+        E: EnumOfDeriveds<T, Error = Infallible>,
+    {
+        self.try_take_derived::<D>().unwrap()
+    }
+
     pub fn try_as_base(&self) -> Result<&T, E::ToBaseError> {
         match self {
             BaseAndDerived::StartFromBase { base, .. } => Ok(base),
