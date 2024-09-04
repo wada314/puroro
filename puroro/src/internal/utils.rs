@@ -20,8 +20,12 @@ use ::std::alloc::Global;
 use ::std::cell::OnceCell;
 
 pub trait EnumOfDeriveds<T> {
-    type Error;
-    fn as_ref(&self) -> &dyn Derived<T, Error = Self::Error>;
+    type FromBaseError;
+    type ToBaseError;
+    type Error: From<Self::FromBaseError> + From<Self::ToBaseError>;
+    fn as_ref(
+        &self,
+    ) -> &dyn Derived<T, FromBaseError = Self::FromBaseError, ToBaseError = Self::ToBaseError>;
 }
 
 pub trait EnumVariant<E>: Sized {
@@ -32,11 +36,12 @@ pub trait EnumVariant<E>: Sized {
 }
 
 pub trait Derived<T> {
-    type Error;
-    fn from_base(base: &T) -> Result<Self, Self::Error>
+    type FromBaseError;
+    type ToBaseError;
+    fn from_base(base: &T) -> Result<Self, Self::FromBaseError>
     where
         Self: Sized;
-    fn to_base(&self) -> Result<T, Self::Error>;
+    fn to_base(&self) -> Result<T, Self::ToBaseError>;
 }
 
 #[derive(Clone, Debug)]
@@ -81,7 +86,7 @@ impl<T, E, A: Allocator + Clone> BaseAndDerived<T, E, A>
 where
     E: EnumOfDeriveds<T>,
 {
-    pub fn try_as_base(&self) -> Result<&T, E::Error> {
+    pub fn try_as_base(&self) -> Result<&T, E::ToBaseError> {
         match self {
             BaseAndDerived::StartFromBase { base, .. } => Ok(base),
             BaseAndDerived::StartFromDerived {
@@ -90,9 +95,11 @@ where
         }
     }
 
-    pub fn try_as_derived<D: Derived<T, Error = E::Error> + EnumVariant<E>>(
-        &self,
-    ) -> Result<&D, E::Error> {
+    pub fn try_as_derived<D>(&self) -> Result<&D, E::Error>
+    where
+        D: Derived<T, ToBaseError = E::ToBaseError, FromBaseError = E::FromBaseError>
+            + EnumVariant<E>,
+    {
         match self {
             BaseAndDerived::StartFromBase {
                 base,
@@ -120,19 +127,21 @@ where
         }
     }
 
-    fn push_and_get<D: Derived<T, Error = E::Error> + EnumVariant<E>>(
-        &self,
-        base: &T,
-    ) -> Result<&D, E::Error> {
+    fn push_and_get<D>(&self, base: &T) -> Result<&D, E::FromBaseError>
+    where
+        D: Derived<T, ToBaseError = E::ToBaseError, FromBaseError = E::FromBaseError>
+            + EnumVariant<E>,
+    {
         let derived_cells = match self {
             BaseAndDerived::StartFromBase { derived_cells, .. } => derived_cells,
             BaseAndDerived::StartFromDerived { derived_cells, .. } => derived_cells,
         };
         let pushed_enum = derived_cells.push(D::from_base(base)?.into_enum());
-        Ok(D::from_enum_ref(pushed_enum).unwrap())
+        // Safe because we just pushed the exact matching enum.
+        Ok(unsafe { D::from_enum_ref(pushed_enum).unwrap_unchecked() })
     }
 
-    pub fn try_as_base_mut(&mut self) -> Result<&mut T, E::Error> {
+    pub fn try_as_base_mut(&mut self) -> Result<&mut T, E::ToBaseError> {
         match self {
             BaseAndDerived::StartFromBase {
                 base,
@@ -159,9 +168,11 @@ where
         }
     }
 
-    pub fn try_as_derived_mut<D: Derived<T, Error = E::Error> + EnumVariant<E>>(
-        &mut self,
-    ) -> Result<&mut D, E::Error> {
+    pub fn try_as_derived_mut<D>(&mut self) -> Result<&mut D, E::Error>
+    where
+        D: Derived<T, ToBaseError = E::ToBaseError, FromBaseError = E::FromBaseError>
+            + EnumVariant<E>,
+    {
         match self {
             BaseAndDerived::StartFromBase {
                 base,
@@ -169,7 +180,7 @@ where
             } => {
                 let new_derived = derived_cells
                     .remove_map(|d| D::from_enum(d))
-                    .map(Ok)
+                    .map(Result::<_, E::Error>::Ok)
                     .unwrap_or_else(|| Ok(D::from_base(base)?))?;
                 *self = BaseAndDerived::StartFromDerived {
                     derived: new_derived.into_enum(),
@@ -189,17 +200,17 @@ where
             } => {
                 replace_with_or_abort_and_return(derived, |derived_taken| {
                     match D::from_enum(derived_taken) {
-                        Ok(d) => return (Ok(()), d.into_enum()),
+                        Ok(d) => return (Result::<_, E::Error>::Ok(()), d.into_enum()),
                         Err(derived_taken) => {
                             let base = match base_cell
                                 .get_or_try_init(|| derived_taken.as_ref().to_base())
                             {
                                 Ok(base) => base,
-                                Err(e) => return (Err(e), derived_taken),
+                                Err(e) => return (Err(e.into()), derived_taken),
                             };
                             let new_derived = match D::from_base(&base) {
                                 Ok(d) => d,
-                                Err(e) => return (Err(e), derived_taken),
+                                Err(e) => return (Err(e.into()), derived_taken),
                             };
                             (Ok(()), new_derived.into_enum())
                         }
@@ -212,7 +223,7 @@ where
         }
     }
 
-    pub fn try_take_base(self) -> Result<T, E::Error> {
+    pub fn try_take_base(self) -> Result<T, E::ToBaseError> {
         match self {
             BaseAndDerived::StartFromBase { base, .. } => Ok(base),
             BaseAndDerived::StartFromDerived {
@@ -226,18 +237,20 @@ where
         }
     }
 
-    pub fn try_take_derived<D: Derived<T, Error = E::Error> + EnumVariant<E>>(
-        self,
-    ) -> Result<D, E::Error> {
+    pub fn try_take_derived<D>(self) -> Result<D, E::Error>
+    where
+        D: Derived<T, ToBaseError = E::ToBaseError, FromBaseError = E::FromBaseError>
+            + EnumVariant<E>,
+    {
         match self {
             BaseAndDerived::StartFromBase {
                 base,
                 derived_cells,
-            } => derived_cells
+            } => Ok(derived_cells
                 .into_iter()
                 .find_map(|d| D::from_enum(d).ok())
                 .map(Ok)
-                .unwrap_or_else(|| D::from_base(&base)),
+                .unwrap_or_else(|| D::from_base(&base))?),
             BaseAndDerived::StartFromDerived {
                 mut base_cell,
                 derived,
@@ -250,13 +263,13 @@ where
                 Ok(derived_cells
                     .into_iter()
                     .find_map(|d| D::from_enum(d).ok())
-                    .map(Ok)
+                    .map(Result::<_, E::Error>::Ok)
                     .unwrap_or_else(|| {
                         let base = match base_cell.take() {
                             Some(base) => base,
                             None => derived.as_ref().to_base()?,
                         };
-                        D::from_base(&base)
+                        Ok(D::from_base(&base)?)
                     })?)
             }
         }
