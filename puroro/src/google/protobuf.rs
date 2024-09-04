@@ -105,9 +105,7 @@ impl FileDescriptorProto {
         self.as_scalar_string(12)
     }
     pub fn edition(&self) -> Edition {
-        self.0
-            .field(14)
-            .try_as_scalar_variant_opt::<Enum<Edition>>(false)
+        self.as_scalar_enum(14)
     }
 }
 
