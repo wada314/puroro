@@ -21,13 +21,13 @@ use crate::variant::variant_types::{Bool, Enum, Int32, Int64, UInt64};
 use crate::Result;
 use ::derive_more::{Deref as DDeref, DerefMut as DDerefMut, From as DFrom, Into as DInto};
 use ::ref_cast::RefCast;
-use ::std::alloc::Allocator;
+use ::std::alloc::{Allocator, Global};
 
 #[derive(DDeref, DDerefMut, DFrom, DInto, Default, Debug, RefCast)]
 #[repr(transparent)]
-pub struct FileDescriptorSet(GenericMessage);
-impl FileDescriptorSet {
-    pub fn file(&self) -> impl Iterator<Item = &FileDescriptorProto> {
+pub struct FileDescriptorSet<A: Allocator = Global>(GenericMessage<A>);
+impl<A: Allocator + Clone> FileDescriptorSet<A> {
+    pub fn file(&self) -> impl Iterator<Item = &FileDescriptorProto<A>> {
         self.0.as_repeated_message(1)
     }
 }
@@ -72,8 +72,8 @@ impl From<Edition> for i32 {
 
 #[derive(DDeref, DDerefMut, DFrom, DInto, Default, Debug, RefCast)]
 #[repr(transparent)]
-pub struct FileDescriptorProto(GenericMessage);
-impl FileDescriptorProto {
+pub struct FileDescriptorProto<A: Allocator = Global>(GenericMessage<A>);
+impl<A: Allocator + Clone> FileDescriptorProto<A> {
     pub fn name(&self) -> &str {
         self.as_scalar_string(1)
     }
@@ -89,10 +89,10 @@ impl FileDescriptorProto {
     pub fn weak_dependency(&self) -> impl '_ + Iterator<Item = i32> {
         self.as_repeated_int32(11)
     }
-    pub fn message_type(&self) -> impl Iterator<Item = &DescriptorProto> {
+    pub fn message_type(&self) -> impl Iterator<Item = &DescriptorProto<A>> {
         self.as_repeated_message(4)
     }
-    pub fn enum_type(&self) -> impl Iterator<Item = &EnumDescriptorProto> {
+    pub fn enum_type(&self) -> impl Iterator<Item = &EnumDescriptorProto<A>> {
         self.as_repeated_message(5)
     }
     pub fn syntax(&self) -> &str {
@@ -105,32 +105,32 @@ impl FileDescriptorProto {
 
 #[derive(DDeref, DDerefMut, DFrom, DInto, Default, Debug, RefCast)]
 #[repr(transparent)]
-pub struct DescriptorProto(GenericMessage);
-impl DescriptorProto {
+pub struct DescriptorProto<A: Allocator = Global>(GenericMessage<A>);
+impl<A: Allocator + Clone> DescriptorProto<A> {
     pub fn name(&self) -> &str {
         self.as_scalar_string(1)
     }
-    pub fn field(&self) -> impl Iterator<Item = &FieldDescriptorProto> {
+    pub fn field(&self) -> impl Iterator<Item = &FieldDescriptorProto<A>> {
         self.as_repeated_message(2)
     }
-    pub fn extension(&self) -> impl Iterator<Item = &FieldDescriptorProto> {
+    pub fn extension(&self) -> impl Iterator<Item = &FieldDescriptorProto<A>> {
         self.as_repeated_message(6)
     }
-    pub fn nested_type(&self) -> impl Iterator<Item = &DescriptorProto> {
+    pub fn nested_type(&self) -> impl Iterator<Item = &DescriptorProto<A>> {
         self.as_repeated_message(3)
     }
-    pub fn enum_type(&self) -> impl Iterator<Item = &EnumDescriptorProto> {
+    pub fn enum_type(&self) -> impl Iterator<Item = &EnumDescriptorProto<A>> {
         self.as_repeated_message(4)
     }
-    pub fn oneof_decl(&self) -> impl Iterator<Item = &OneofDescriptorProto> {
+    pub fn oneof_decl(&self) -> impl Iterator<Item = &OneofDescriptorProto<A>> {
         self.as_repeated_message(8)
     }
 }
 
 #[derive(DDeref, DDerefMut, DFrom, DInto, Default, Debug, RefCast)]
 #[repr(transparent)]
-pub struct FieldDescriptorProto(GenericMessage);
-impl FieldDescriptorProto {
+pub struct FieldDescriptorProto<A: Allocator = Global>(GenericMessage<A>);
+impl<A: Allocator + Clone> FieldDescriptorProto<A> {
     pub fn name(&self) -> &str {
         self.as_scalar_string(1)
     }
@@ -247,8 +247,8 @@ pub mod field_descriptor_proto {
 
 #[derive(DDeref, DDerefMut, DFrom, DInto, Default, Debug, RefCast)]
 #[repr(transparent)]
-pub struct OneofDescriptorProto(GenericMessage);
-impl OneofDescriptorProto {
+pub struct OneofDescriptorProto<A: Allocator = Global>(GenericMessage<A>);
+impl<A: Allocator + Clone> OneofDescriptorProto<A> {
     pub fn name(&self) -> &str {
         self.as_scalar_string(1)
     }
@@ -256,20 +256,20 @@ impl OneofDescriptorProto {
 
 #[derive(DDeref, DDerefMut, DFrom, DInto, Default, Debug, RefCast)]
 #[repr(transparent)]
-pub struct EnumDescriptorProto(GenericMessage);
-impl EnumDescriptorProto {
+pub struct EnumDescriptorProto<A: Allocator = Global>(GenericMessage<A>);
+impl<A: Allocator + Clone> EnumDescriptorProto<A> {
     pub fn name(&self) -> &str {
         self.as_scalar_string(1)
     }
-    pub fn value(&self) -> impl Iterator<Item = &EnumValueDescriptorProto> {
+    pub fn value(&self) -> impl Iterator<Item = &EnumValueDescriptorProto<A>> {
         self.as_repeated_message(2)
     }
 }
 
 #[derive(DDeref, DDerefMut, DFrom, DInto, Default, Debug, RefCast)]
 #[repr(transparent)]
-pub struct EnumValueDescriptorProto(GenericMessage);
-impl EnumValueDescriptorProto {
+pub struct EnumValueDescriptorProto<A: Allocator = Global>(GenericMessage<A>);
+impl<A: Allocator + Clone> EnumValueDescriptorProto<A> {
     pub fn name(&self) -> &str {
         self.as_scalar_string(1)
     }
@@ -334,7 +334,7 @@ impl_message_trait_for_trivial_types! {
 
 impl<A: Allocator + Clone> FileDescriptorSetTrait for GenericMessage<A> {
     fn file(&self) -> impl Iterator<Item = impl FileDescriptorTrait> {
-        self.field(1).as_repeated_message()
+        self.as_repeated_message::<FileDescriptorSet>(1)
     }
 }
 
@@ -355,10 +355,10 @@ impl<A: Allocator + Clone> FileDescriptorTrait for GenericMessage<A> {
         self.field(11).as_repeated_variant::<Int32>(false)
     }
     fn message_type(&self) -> impl Iterator<Item = impl DescriptorTrait> {
-        self.field(4).as_repeated_message()
+        self.as_repeated_message(4)
     }
     fn enum_type(&self) -> impl Iterator<Item = impl EnumDescriptorTrait> {
-        self.field(5).as_repeated_message()
+        self.as_repeated_message(5)
     }
     fn syntax(&self) -> &str {
         self.field(12).as_scalar_string()
@@ -373,19 +373,19 @@ impl<A: Allocator + Clone> DescriptorTrait for GenericMessage<A> {
         self.field(1).as_scalar_string()
     }
     fn field(&self) -> impl Iterator<Item = impl FieldDescriptorTrait> {
-        self.field(2).as_repeated_message()
+        self.as_repeated_message(2)
     }
     fn extension(&self) -> impl Iterator<Item = impl FieldDescriptorTrait> {
-        self.field(6).as_repeated_message()
+        self.as_repeated_message(6)
     }
     fn nested_type(&self) -> impl Iterator<Item = impl DescriptorTrait> {
-        self.field(3).as_repeated_message()
+        self.as_repeated_message(3)
     }
     fn enum_type(&self) -> impl Iterator<Item = impl EnumDescriptorTrait> {
-        self.field(4).as_repeated_message()
+        self.as_repeated_message(4)
     }
     fn oneof_decl(&self) -> impl Iterator<Item = impl OneofDescriptorTrait> {
-        self.field(8).as_repeated_message()
+        self.as_repeated_message(8)
     }
 }
 
@@ -435,7 +435,7 @@ impl<A: Allocator + Clone> EnumDescriptorTrait for GenericMessage<A> {
         self.field(1).as_scalar_string()
     }
     fn value(&self) -> impl Iterator<Item = impl EnumValueDescriptorTrait> {
-        self.field(2).as_repeated_message()
+        self.as_repeated_message(2)
     }
 }
 
