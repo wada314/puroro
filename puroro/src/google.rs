@@ -15,50 +15,34 @@
 pub mod protobuf;
 
 use crate::generic_message::GenericMessage;
-use crate::Result;
-use ::itertools::Either;
 use ::ref_cast::RefCast;
 use ::std::alloc::Allocator;
 
 trait GenericMessageExt {
     type Alloc: Allocator;
-    fn try_as_scalar_message<T>(&self, number: i32) -> Result<Option<&T>>
+    fn as_scalar_message<T>(&self, number: i32) -> Option<&T>
     where
         T: RefCast<From = GenericMessage<Self::Alloc>>;
-    fn try_as_repeated_message<'a, T: 'a>(
-        &'a self,
-        number: i32,
-    ) -> Result<impl Iterator<Item = Result<&'a T>>>
+    fn as_repeated_message<'a, T: 'a>(&'a self, number: i32) -> impl Iterator<Item = &'a T>
     where
         T: RefCast<From = GenericMessage<Self::Alloc>>;
 }
 impl<A: Allocator + Clone> GenericMessageExt for GenericMessage<A> {
     type Alloc = A;
-    fn try_as_scalar_message<T>(&self, number: i32) -> Result<Option<&T>>
+    fn as_scalar_message<T>(&self, number: i32) -> Option<&T>
     where
         T: RefCast<From = GenericMessage<Self::Alloc>>,
     {
-        let Some(field) = self.field(number) else {
-            return Ok(None);
-        };
-        field
-            .try_as_scalar_message()
-            .map(|o| o.map(RefCast::ref_cast))
+        self.field(number)?
+            .as_scalar_message()
+            .map(RefCast::ref_cast)
     }
-    fn try_as_repeated_message<'a, T>(
-        &'a self,
-        number: i32,
-    ) -> Result<impl Iterator<Item = Result<&'a T>>>
+    fn as_repeated_message<'a, T>(&'a self, number: i32) -> impl Iterator<Item = &'a T>
     where
         T: 'a + RefCast<From = GenericMessage<Self::Alloc>>,
     {
-        let Some(field) = self.field(number) else {
-            return Ok(Either::Left(::std::iter::empty()));
-        };
-        Ok(Either::Right(
-            field
-                .try_as_repeated_message()?
-                .map(|r| r.map(RefCast::ref_cast)),
-        ))
+        self.field(number)
+            .into_iter()
+            .flat_map(|f| f.as_repeated_message().map(RefCast::ref_cast))
     }
 }

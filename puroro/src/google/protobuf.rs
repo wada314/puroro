@@ -27,8 +27,8 @@ use ::std::alloc::Allocator;
 #[repr(transparent)]
 pub struct FileDescriptorSet(GenericMessage);
 impl FileDescriptorSet {
-    pub fn file(&self) -> impl Iterator<Item = Result<&FileDescriptorProto>> {
-        self.0.try_as_repeated_message(1)
+    pub fn file(&self) -> impl Iterator<Item = &FileDescriptorProto> {
+        self.0.as_repeated_message(1)
     }
 }
 
