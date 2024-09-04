@@ -22,21 +22,21 @@ use ::std::alloc::Allocator;
 
 trait GenericMessageExt {
     type Alloc: Allocator;
-    fn try_as_scalar_message<'a, T>(&'a self, number: i32) -> Result<Option<&T>>
+    fn try_as_scalar_message<T>(&self, number: i32) -> Result<Option<&T>>
     where
-        T: 'a + RefCast<From = GenericMessage<Self::Alloc>>;
-    fn try_as_repeated_message<'a, T>(
+        T: RefCast<From = GenericMessage<Self::Alloc>>;
+    fn try_as_repeated_message<'a, T: 'a>(
         &'a self,
         number: i32,
-    ) -> Result<impl Iterator<Item = Result<&T>>>
+    ) -> Result<impl Iterator<Item = Result<&'a T>>>
     where
-        T: 'a + RefCast<From = GenericMessage<Self::Alloc>>;
+        T: RefCast<From = GenericMessage<Self::Alloc>>;
 }
 impl<A: Allocator + Clone> GenericMessageExt for GenericMessage<A> {
     type Alloc = A;
-    fn try_as_scalar_message<'a, T>(&'a self, number: i32) -> Result<Option<&T>>
+    fn try_as_scalar_message<T>(&self, number: i32) -> Result<Option<&T>>
     where
-        T: 'a + RefCast<From = GenericMessage<Self::Alloc>>,
+        T: RefCast<From = GenericMessage<Self::Alloc>>,
     {
         let Some(field) = self.field(number) else {
             return Ok(None);
@@ -48,7 +48,7 @@ impl<A: Allocator + Clone> GenericMessageExt for GenericMessage<A> {
     fn try_as_repeated_message<'a, T>(
         &'a self,
         number: i32,
-    ) -> Result<impl Iterator<Item = Result<&T>>>
+    ) -> Result<impl Iterator<Item = Result<&'a T>>>
     where
         T: 'a + RefCast<From = GenericMessage<Self::Alloc>>,
     {
