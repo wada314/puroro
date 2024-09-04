@@ -21,8 +21,8 @@ use ::std::alloc::Allocator;
 
 trait GenericMessageExt {
     type Alloc: Allocator;
-    fn as_scalar_i32(&self, number: i32) -> i32;
-    fn as_repeated_i32(&self, number: i32) -> impl Iterator<Item = i32>;
+    fn as_scalar_int32(&self, number: i32) -> i32;
+    fn as_repeated_int32(&self, number: i32) -> impl Iterator<Item = i32>;
     fn as_scalar_enum<E>(&self, number: i32) -> E
     where
         E: 'static + TryFrom<i32, Error = i32> + Default,
@@ -43,12 +43,12 @@ trait GenericMessageExt {
 impl<A: Allocator + Clone> GenericMessageExt for GenericMessage<A> {
     type Alloc = A;
 
-    fn as_scalar_i32(&self, number: i32) -> i32 {
+    fn as_scalar_int32(&self, number: i32) -> i32 {
         self.field(number)
             .map(|f| f.as_scalar_variant::<variant_types::Int32>(false))
             .unwrap_or_default()
     }
-    fn as_repeated_i32(&self, number: i32) -> impl Iterator<Item = i32> {
+    fn as_repeated_int32(&self, number: i32) -> impl Iterator<Item = i32> {
         self.field(number)
             .into_iter()
             .flat_map(|f| f.as_repeated_variant::<variant_types::Int32>(false))

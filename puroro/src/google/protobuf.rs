@@ -84,10 +84,10 @@ impl FileDescriptorProto {
         self.as_repeated_string(3)
     }
     pub fn public_dependency(&self) -> impl '_ + Iterator<Item = i32> {
-        self.as_repeated_i32(10)
+        self.as_repeated_int32(10)
     }
     pub fn weak_dependency(&self) -> impl '_ + Iterator<Item = i32> {
-        self.as_repeated_i32(11)
+        self.as_repeated_int32(11)
     }
     pub fn message_type(&self) -> impl Iterator<Item = &DescriptorProto> {
         self.as_repeated_message(4)
@@ -95,12 +95,6 @@ impl FileDescriptorProto {
     pub fn enum_type(&self) -> impl Iterator<Item = &EnumDescriptorProto> {
         self.as_repeated_message(5)
     }
-    // pub fn service(&self) -> impl Iterator<Item = &ServiceDescriptorProto>
-    // pub fn extension(&self) -> impl Iterator<Item = &FieldDescriptorProto>
-    pub fn options(&self) -> Option<&FileOptionsProto> {
-        self.as_scalar_message(8)
-    }
-    // pub fn source_code_info(&self) -> Option<&SourceCodeInfoProto>
     pub fn syntax(&self) -> &str {
         self.as_scalar_string(12)
     }
@@ -113,68 +107,59 @@ impl FileDescriptorProto {
 #[repr(transparent)]
 pub struct DescriptorProto(GenericMessage);
 impl DescriptorProto {
-    pub fn name(&self) -> Result<Option<&str>> {
-        self.0.field(1).try_as_scalar_string_opt()
+    pub fn name(&self) -> &str {
+        self.as_scalar_string(1)
     }
-    pub fn field(&self) -> impl Iterator<Item = Result<&FieldDescriptorProto>> {
-        self.try_as_repeated_message(2)
+    pub fn field(&self) -> impl Iterator<Item = &FieldDescriptorProto> {
+        self.as_repeated_message(2)
     }
-    pub fn extension(&self) -> impl Iterator<Item = Result<&FieldDescriptorProto>> {
-        self.try_as_repeated_message(6)
+    pub fn extension(&self) -> impl Iterator<Item = &FieldDescriptorProto> {
+        self.as_repeated_message(6)
     }
-    pub fn nested_type(&self) -> impl Iterator<Item = Result<&DescriptorProto>> {
-        self.try_as_repeated_message(3)
+    pub fn nested_type(&self) -> impl Iterator<Item = &DescriptorProto> {
+        self.as_repeated_message(3)
     }
-    // pub fn extension_range(&self) -> impl Iterator<Item = Result<descriptor_proto::ExtensionRangeProto>>
-    pub fn enum_type(&self) -> impl Iterator<Item = Result<&EnumDescriptorProto>> {
-        self.try_as_repeated_message(4)
+    pub fn enum_type(&self) -> impl Iterator<Item = &EnumDescriptorProto> {
+        self.as_repeated_message(4)
     }
-    pub fn oneof_decl(&self) -> impl Iterator<Item = Result<&OneofDescriptorProto>> {
-        self.try_as_repeated_message(8)
+    pub fn oneof_decl(&self) -> impl Iterator<Item = &OneofDescriptorProto> {
+        self.as_repeated_message(8)
     }
-    // pub fn options(&self) -> Result<Option<MessageOptions>>
-    // pub fn reserved_range(&self) -> impl Iterator<Item = Result<descriptor_proto::ReservedRangeProto>>
-    // pub fn reserved_name(&self) -> impl Iterator<Item = Result<&'a str>>
 }
 
 #[derive(DDeref, DDerefMut, DFrom, DInto, Default, Debug, RefCast)]
 #[repr(transparent)]
 pub struct FieldDescriptorProto(GenericMessage);
 impl FieldDescriptorProto {
-    pub fn name(&self) -> Result<Option<&str>> {
-        self.0.field(1).try_as_scalar_string_opt()
+    pub fn name(&self) -> &str {
+        self.as_scalar_string(1)
     }
-    pub fn number(&self) -> Result<Option<i32>> {
-        self.0.field(3).try_as_scalar_variant_opt::<Int32>(false)
+    pub fn number(&self) -> i32 {
+        self.as_scalar_int32(3)
     }
-    pub fn label(&self) -> Result<Option<self::field_descriptor_proto::Label>> {
-        self.0
-            .field(4)
-            .try_as_scalar_variant_opt::<Enum<self::field_descriptor_proto::Label>>(false)
+    pub fn label(&self) -> self::field_descriptor_proto::Label {
+        self.as_scalar_enum(4)
     }
-    pub fn type_(&self) -> Result<Option<field_descriptor_proto::Type>> {
-        self.0
-            .field(5)
-            .try_as_scalar_variant_opt::<Enum<field_descriptor_proto::Type>>(false)
+    pub fn type_(&self) -> field_descriptor_proto::Type {
+        self.as_scalar_enum(5)
     }
-    pub fn type_name(&self) -> Result<Option<&str>> {
-        self.0.field(6).try_as_scalar_string_opt()
+    pub fn type_name(&self) -> &str {
+        self.as_scalar_string(6)
     }
-    pub fn extendee(&self) -> Result<Option<&str>> {
-        self.0.field(2).try_as_scalar_string_opt()
+    pub fn extendee(&self) -> &str {
+        self.as_scalar_string(2)
     }
-    pub fn default_value(&self) -> Result<Option<&str>> {
-        self.0.field(7).try_as_scalar_string_opt()
+    pub fn default_value(&self) -> &str {
+        self.as_scalar_string(7)
     }
-    pub fn oneof_index(&self) -> Result<Option<i32>> {
-        self.0.field(9).try_as_scalar_variant_opt::<Int32>(false)
+    pub fn oneof_index(&self) -> i32 {
+        self.as_scalar_int32(9)
     }
-    pub fn json_name(&self) -> Result<Option<&str>> {
-        self.0.field(10).try_as_scalar_string_opt()
+    pub fn json_name(&self) -> &str {
+        self.as_scalar_string(10)
     }
-    // pub fn options(&self) -> Result<Option<FieldOptions>>
-    pub fn proto3_optional(&self) -> Result<Option<bool>> {
-        self.0.field(17).try_as_scalar_variant_opt::<Bool>(false)
+    pub fn proto3_optional(&self) -> bool {
+        self.as_scalar_int32(17) != 0
     }
 }
 
@@ -264,91 +249,32 @@ pub mod field_descriptor_proto {
 #[repr(transparent)]
 pub struct OneofDescriptorProto(GenericMessage);
 impl OneofDescriptorProto {
-    pub fn name(&self) -> Result<Option<&str>> {
-        self.0.field(1).try_as_scalar_string_opt()
+    pub fn name(&self) -> &str {
+        self.as_scalar_string(1)
     }
-    // pub fn options(&self) -> Result<Option<OneofOptions>>
 }
 
 #[derive(DDeref, DDerefMut, DFrom, DInto, Default, Debug, RefCast)]
 #[repr(transparent)]
 pub struct EnumDescriptorProto(GenericMessage);
 impl EnumDescriptorProto {
-    pub fn name(&self) -> Result<Option<&str>> {
-        self.0.field(1).try_as_scalar_string_opt()
+    pub fn name(&self) -> &str {
+        self.as_scalar_string(1)
     }
-    pub fn value(&self) -> impl Iterator<Item = Result<&EnumValueDescriptorProto>> {
-        self.try_as_repeated_message(2)
+    pub fn value(&self) -> impl Iterator<Item = &EnumValueDescriptorProto> {
+        self.as_repeated_message(2)
     }
-    // pub fn options(&self) -> Result<Option<EnumOptions>>
-    // pub fn reserved_range(&self) -> impl Iterator<Item = Result<ReservedRange>>
-    // pub fn reserved_name(&self) -> impl Iterator<Item = Result<&'a str>>
 }
 
 #[derive(DDeref, DDerefMut, DFrom, DInto, Default, Debug, RefCast)]
 #[repr(transparent)]
 pub struct EnumValueDescriptorProto(GenericMessage);
 impl EnumValueDescriptorProto {
-    pub fn name(&self) -> Result<Option<&str>> {
-        self.0.field(1).try_as_scalar_string_opt()
+    pub fn name(&self) -> &str {
+        self.as_scalar_string(1)
     }
-    pub fn number(&self) -> Result<Option<i32>> {
-        self.0.field(2).try_as_scalar_variant_opt::<Int32>(false)
-    }
-}
-
-#[derive(DDeref, DDerefMut, DFrom, DInto, Default, Debug, RefCast)]
-#[repr(transparent)]
-pub struct FileOptionsProto(GenericMessage);
-impl FileOptionsProto {
-    pub fn uninterpreted_option(&self) -> impl Iterator<Item = Result<&UninterpretedOptionProto>> {
-        self.try_as_repeated_message(9)
-    }
-}
-
-#[derive(DDeref, DDerefMut, DFrom, DInto, Default, Debug, RefCast)]
-#[repr(transparent)]
-pub struct UninterpretedOptionProto(GenericMessage);
-impl UninterpretedOptionProto {
-    pub fn name(&self) -> impl Iterator<Item = Result<&uninterpreted_option::NamePart>> {
-        self.0.try_as_repeated_message(2)
-    }
-    pub fn identifier_value(&self) -> Result<Option<&str>> {
-        self.0.field(3).try_as_scalar_string_opt()
-    }
-    pub fn positive_int_value(&self) -> Result<Option<u64>> {
-        self.0.field(4).try_as_scalar_variant_opt::<UInt64>(false)
-    }
-    pub fn negative_int_value(&self) -> Result<Option<i64>> {
-        self.0.field(5).try_as_scalar_variant_opt::<Int64>(false)
-    }
-    pub fn double_value(&self) -> Result<Option<f64>> {
-        Ok(self
-            .0
-            .field(6)
-            .try_as_scalar_i64_opt()?
-            .map(f64::from_le_bytes))
-    }
-    pub fn string_value(&self) -> Result<Option<&[u8]>> {
-        self.0.field(7).try_as_scalar_bytes_opt()
-    }
-    pub fn aggregate_value(&self) -> Result<Option<&str>> {
-        self.0.field(8).try_as_scalar_string_opt()
-    }
-}
-
-pub mod uninterpreted_option {
-    use super::*;
-    #[derive(DDeref, DDerefMut, DFrom, DInto, Default, Debug, RefCast)]
-    #[repr(transparent)]
-    pub struct NamePart(pub(crate) GenericMessage);
-    impl NamePart {
-        pub fn name_part(&self) -> Result<Option<&str>> {
-            self.0.field(1).try_as_scalar_string_opt()
-        }
-        pub fn is_extension(&self) -> Result<Option<bool>> {
-            self.0.field(2).try_as_scalar_variant_opt::<Bool>(false)
-        }
+    pub fn number(&self) -> i32 {
+        self.as_scalar_int32(2)
     }
 }
 
