@@ -15,11 +15,24 @@
 pub mod protobuf;
 
 use crate::generic_message::GenericMessage;
+use crate::variant::variant_types;
 use ::ref_cast::RefCast;
 use ::std::alloc::Allocator;
 
 trait GenericMessageExt {
     type Alloc: Allocator;
+    fn as_scalar_i32(&self, number: i32) -> i32;
+    fn as_repeated_i32(&self, number: i32) -> impl Iterator<Item = i32>;
+    fn as_scalar_enum<E>(&self, number: i32) -> E
+    where
+        E: 'static + TryFrom<i32, Error = i32> + Default,
+        i32: From<E>;
+    fn as_repeated_enum<E>(&self, number: i32) -> impl Iterator<Item = E>
+    where
+        E: 'static + TryFrom<i32, Error = i32> + Default,
+        i32: From<E>;
+    fn as_scalar_string(&self, number: i32) -> &str;
+    fn as_repeated_string(&self, number: i32) -> impl Iterator<Item = &str>;
     fn as_scalar_message<T>(&self, number: i32) -> Option<&T>
     where
         T: RefCast<From = GenericMessage<Self::Alloc>>;
@@ -29,6 +42,46 @@ trait GenericMessageExt {
 }
 impl<A: Allocator + Clone> GenericMessageExt for GenericMessage<A> {
     type Alloc = A;
+
+    fn as_scalar_i32(&self, number: i32) -> i32 {
+        self.field(number)
+            .map(|f| f.as_scalar_variant::<variant_types::Int32>(false))
+            .unwrap_or_default()
+    }
+    fn as_repeated_i32(&self, number: i32) -> impl Iterator<Item = i32> {
+        self.field(number)
+            .into_iter()
+            .flat_map(|f| f.as_repeated_variant::<variant_types::Int32>(false))
+    }
+    fn as_scalar_enum<E>(&self, number: i32) -> E
+    where
+        E: 'static + TryFrom<i32, Error = i32> + Default,
+        i32: From<E>,
+    {
+        self.field(number)
+            .map(|f| f.as_scalar_variant::<variant_types::Enum<E>>(false))
+            .unwrap_or_default()
+    }
+    fn as_repeated_enum<E>(&self, number: i32) -> impl Iterator<Item = E>
+    where
+        E: 'static + TryFrom<i32, Error = i32> + Default,
+        i32: From<E>,
+    {
+        self.field(number)
+            .into_iter()
+            .flat_map(|f| f.as_repeated_variant::<variant_types::Enum<E>>(false))
+    }
+    fn as_scalar_string(&self, number: i32) -> &str {
+        self.field(number)
+            .map(|f| f.as_scalar_string())
+            .unwrap_or_default()
+    }
+    fn as_repeated_string(&self, number: i32) -> impl Iterator<Item = &str> {
+        self.field(number)
+            .into_iter()
+            .flat_map(|f| f.as_repeated_string())
+    }
+
     fn as_scalar_message<T>(&self, number: i32) -> Option<&T>
     where
         T: RefCast<From = GenericMessage<Self::Alloc>>,

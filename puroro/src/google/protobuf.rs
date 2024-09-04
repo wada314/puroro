@@ -74,37 +74,37 @@ impl From<Edition> for i32 {
 #[repr(transparent)]
 pub struct FileDescriptorProto(GenericMessage);
 impl FileDescriptorProto {
-    pub fn name(&self) -> Result<Option<&str>> {
-        self.0.field(1).try_as_scalar_string_opt()
+    pub fn name(&self) -> &str {
+        self.as_scalar_string(1)
     }
-    pub fn package(&self) -> Result<Option<&str>> {
-        self.0.field(2).try_as_scalar_string_opt()
+    pub fn package(&self) -> &str {
+        self.as_scalar_string(2)
     }
-    pub fn dependency(&self) -> impl Iterator<Item = Result<&str>> {
-        self.0.field(3).try_as_repeated_string()
+    pub fn dependency(&self) -> impl Iterator<Item = &str> {
+        self.as_repeated_string(3)
     }
-    pub fn public_dependency(&self) -> impl '_ + Iterator<Item = Result<i32>> {
-        self.0.field(10).try_as_repeated_variant::<Int32>(false)
+    pub fn public_dependency(&self) -> impl '_ + Iterator<Item = i32> {
+        self.as_repeated_i32(10)
     }
-    pub fn weak_dependency(&self) -> impl '_ + Iterator<Item = Result<i32>> {
-        self.0.field(11).try_as_repeated_variant::<Int32>(false)
+    pub fn weak_dependency(&self) -> impl '_ + Iterator<Item = i32> {
+        self.as_repeated_i32(11)
     }
-    pub fn message_type(&self) -> impl Iterator<Item = Result<&DescriptorProto>> {
-        self.try_as_repeated_message(4)
+    pub fn message_type(&self) -> impl Iterator<Item = &DescriptorProto> {
+        self.as_repeated_message(4)
     }
-    pub fn enum_type(&self) -> impl Iterator<Item = Result<&EnumDescriptorProto>> {
-        self.try_as_repeated_message(5)
+    pub fn enum_type(&self) -> impl Iterator<Item = &EnumDescriptorProto> {
+        self.as_repeated_message(5)
     }
-    // pub fn service(&self) -> impl Iterator<Item = Result<ServiceDescriptorProto>>
-    // pub fn extension(&self) -> impl Iterator<Item = Result<FieldDescriptorProto>>
-    pub fn options(&self) -> Result<Option<&FileOptionsProto>> {
-        self.try_as_scalar_message(8)
+    // pub fn service(&self) -> impl Iterator<Item = &ServiceDescriptorProto>
+    // pub fn extension(&self) -> impl Iterator<Item = &FieldDescriptorProto>
+    pub fn options(&self) -> Option<&FileOptionsProto> {
+        self.as_scalar_message(8)
     }
-    // pub fn source_code_info(&self) -> Result<Option<SourceCodeInfoProto>>
-    pub fn syntax(&self) -> Result<Option<&str>> {
-        self.0.field(12).try_as_scalar_string_opt()
+    // pub fn source_code_info(&self) -> Option<&SourceCodeInfoProto>
+    pub fn syntax(&self) -> &str {
+        self.as_scalar_string(12)
     }
-    pub fn edition(&self) -> Result<Option<Edition>> {
+    pub fn edition(&self) -> Edition {
         self.0
             .field(14)
             .try_as_scalar_variant_opt::<Enum<Edition>>(false)
