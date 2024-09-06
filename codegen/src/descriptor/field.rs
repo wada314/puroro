@@ -21,36 +21,10 @@ use std::ops::Deref;
 
 use super::*;
 
-#[derive(Debug, Clone)]
-pub struct FieldDescriptorBase {
-    name: Option<String>,
-    number: Option<i32>,
-    type_case: Option<FieldTypeCase>,
-    type_name: Option<String>,
-    label: Option<FieldLabel>,
-    oneof_index: Option<i32>,
-    proto3_optional: Option<bool>,
-}
-
-impl TryFrom<&protobuf::FieldDescriptor> for FieldDescriptorBase {
-    type Error = ErrorKind;
-    fn try_from(proto: &protobuf::FieldDescriptor) -> Result<Self> {
-        Ok(Self {
-            name: proto.name().map(str::to_string),
-            number: proto.number(),
-            type_case: proto.type_().map(Into::into),
-            type_name: proto.type_name().map(str::to_string),
-            label: proto.label().map(Into::into),
-            oneof_index: proto.oneof_index(),
-            proto3_optional: proto.proto3_optional(),
-        })
-    }
-}
-
 #[derive(Debug)]
 pub struct FieldDescriptor<'a> {
     message: &'a Descriptor<'a>,
-    base: &'a FieldDescriptorBase,
+    base: &'a protobuf::FieldDescriptorProto,
     cache: FieldDescriptorCache<'a>,
 }
 
@@ -61,33 +35,33 @@ pub struct FieldDescriptorCache<'a> {
 }
 
 impl<'a> FieldDescriptor<'a> {
-    pub fn new(base: &'a FieldDescriptorBase, message: &'a Descriptor<'a>) -> Self {
+    pub fn new(base: &'a protobuf::FieldDescriptorProto, message: &'a Descriptor<'a>) -> Self {
         Self {
             message,
             base,
             cache: Default::default(),
         }
     }
-    pub fn name(&self) -> &str {
-        &self.base.name
+    pub fn name(&self) -> Option<&str> {
+        self.base.name()
     }
-    pub fn number(&self) -> i32 {
-        self.base.number
+    pub fn number(&self) -> Option<i32> {
+        self.base.number()
     }
-    pub fn type_case(&self) -> FieldTypeCase {
-        self.base.type_case
+    pub fn type_case(&self) -> Option<FieldTypeCase> {
+        self.base.type_case()
     }
-    pub fn type_name(&self) -> &str {
-        &self.base.type_name
+    pub fn type_name(&self) -> Option<&str> {
+        self.base.type_name()
     }
-    pub fn label(&self) -> FieldLabel {
-        self.base.label
+    pub fn label(&self) -> Option<protobuf::field_descriptor_proto::Label> {
+        self.base.label()
     }
-    pub fn oneof_index(&self) -> i32 {
-        self.base.oneof_index
+    pub fn oneof_index(&self) -> Option<i32> {
+        self.base.oneof_index()
     }
-    pub fn is_proto3_optional(&self) -> bool {
-        self.base.proto3_optional
+    pub fn is_proto3_optional(&self) -> Option<bool> {
+        self.base.proto3_optional()
     }
     pub fn full_name(&self) -> Result<&str> {
         self.cache
@@ -144,7 +118,7 @@ pub struct OneofDescriptorBase {
     name: String,
 }
 
-impl TryFrom<&protobuf::OneofDescriptor> for OneofDescriptorBase {
+impl TryFrom<&protobuf::OneofDescriptorProto> for OneofDescriptorBase {
     type Error = ErrorKind;
     fn try_from(proto: &OneofDescriptor) -> Result<Self> {
         Ok(Self {

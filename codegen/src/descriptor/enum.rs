@@ -28,7 +28,7 @@ pub struct EnumDescriptorBase {
     values: Vec<EnumValueDescriptorBase>,
 }
 
-impl TryFrom<&protobuf::EnumDescriptor> for EnumDescriptorBase {
+impl TryFrom<&protobuf::EnumDescriptorProto> for EnumDescriptorBase {
     type Error = ErrorKind;
     fn try_from(proto: &EnumDescriptor) -> Result<Self> {
         Ok(Self {
@@ -126,7 +126,7 @@ pub struct EnumValueDescriptorBase {
     number: i32,
 }
 
-impl TryFrom<&protobuf::EnumValueDescriptor> for EnumValueDescriptorBase {
+impl TryFrom<&protobuf::EnumValueDescriptorProto> for EnumValueDescriptorBase {
     type Error = ErrorKind;
     fn try_from(proto: &EnumValueDescriptor) -> Result<Self> {
         Ok(Self {

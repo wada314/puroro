@@ -13,10 +13,7 @@
 // limitations under the License.
 
 use crate::cases::{convert_into_case, Case};
-// use crate::generator::avoid_reserved_keywords;
-fn avoid_reserved_keywords(s: &str) -> String {
-    todo!()
-}
+use crate::generator::avoid_reserved_keywords;
 use crate::Result;
 use ::itertools::Itertools;
 use ::quote::quote;

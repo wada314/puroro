@@ -33,7 +33,7 @@ pub struct DescriptorBase {
     enum_types: Vec<EnumDescriptorBase>,
 }
 
-impl TryFrom<&protobuf::Descriptor> for DescriptorBase {
+impl TryFrom<&protobuf::DescriptorProto> for DescriptorBase {
     type Error = ErrorKind;
     fn try_from(proto: &Descriptor) -> Result<Self> {
         Ok(Self {
