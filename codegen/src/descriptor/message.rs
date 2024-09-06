@@ -13,10 +13,8 @@
 // limitations under the License.
 
 use crate::proto_path::{ProtoPath, ProtoPathBuf};
-use crate::{ErrorKind, Result};
-use itertools::Itertools;
+use crate::Result;
 use puroro::google::protobuf;
-use puroro::Result as PResult;
 use std::cell::OnceCell;
 use std::fmt::Debug;
 
@@ -24,70 +22,11 @@ use super::*;
 
 // region: Descriptor
 
-#[derive(Debug, Clone)]
-pub struct DescriptorBase {
-    name: String,
-    fields: Vec<FieldDescriptorBase>,
-    oneof_decls: Vec<OneofDescriptorBase>,
-    nested_types: Vec<DescriptorBase>,
-    enum_types: Vec<EnumDescriptorBase>,
-}
-
-impl TryFrom<&protobuf::DescriptorProto> for DescriptorBase {
-    type Error = ErrorKind;
-    fn try_from(proto: &Descriptor) -> Result<Self> {
-        Ok(Self {
-            name: proto.name()?.try_into_string("No Descriptor name")?,
-            fields: proto
-                .field()
-                .into_iter()
-                .map_ok(TryInto::try_into)
-                .collect::<PResult<Result<Vec<_>>>>()??,
-            oneof_decls: proto
-                .oneof_decl()
-                .into_iter()
-                .map_ok(TryInto::try_into)
-                .collect::<PResult<Result<Vec<_>>>>()??,
-            nested_types: proto
-                .nested_type()
-                .into_iter()
-                .map_ok(TryInto::try_into)
-                .collect::<PResult<Result<Vec<_>>>>()??,
-            enum_types: proto
-                .enum_type()
-                .into_iter()
-                .map_ok(TryInto::try_into)
-                .collect::<PResult<Result<Vec<_>>>>()??,
-        })
-    }
-}
-
-#[cfg(test)]
-#[derive(Default)]
-pub struct DebugDescriptor<'a> {
-    pub name: &'a str,
-    pub nested_types: Vec<DebugDescriptor<'a>>,
-    pub enum_types: Vec<DebugEnumDescriptor<'a>>,
-}
-
-#[cfg(test)]
-impl From<DebugDescriptor<'_>> for DescriptorBase {
-    fn from(debug: DebugDescriptor) -> Self {
-        Self {
-            name: debug.name.to_string(),
-            fields: vec![],
-            oneof_decls: vec![],
-            nested_types: debug.nested_types.into_iter().map(Into::into).collect(),
-            enum_types: debug.enum_types.into_iter().map(Into::into).collect(),
-        }
-    }
-}
-
 #[derive(Debug)]
 pub struct Descriptor<'a> {
     file: &'a FileDescriptor<'a>,
     maybe_containing: Option<&'a Descriptor<'a>>,
-    base: &'a DescriptorBase,
+    base: &'a protobuf::DescriptorProto,
     cache: DescriptorCache<'a>,
 }
 
@@ -104,7 +43,7 @@ impl<'a> Descriptor<'a> {
     pub fn new(
         file: &'a FileDescriptor<'a>,
         maybe_containing: Option<&'a Descriptor<'a>>,
-        base: &'a DescriptorBase,
+        base: &'a protobuf::DescriptorProto,
     ) -> Self {
         Self {
             file,
@@ -120,7 +59,7 @@ impl<'a> Descriptor<'a> {
         self.file().root()
     }
     pub fn name(&'a self) -> Result<&str> {
-        Ok(&self.base.name)
+        Ok(&self.base.name().unwrap_or_default())
     }
     pub fn full_path(&'a self) -> Result<&ProtoPath> {
         self.cache
@@ -132,7 +71,7 @@ impl<'a> Descriptor<'a> {
                     self.file.absolute_package()?.to_owned()
                 };
                 // todo!("absl path check?");
-                full_path.push(&self.base.name);
+                full_path.push(&self.base.name().unwrap_or_default());
                 Ok(full_path)
             })
             .map(|s| s.as_ref())
@@ -142,8 +81,7 @@ impl<'a> Descriptor<'a> {
             .all_fields
             .get_or_init(|| {
                 self.base
-                    .fields
-                    .iter()
+                    .field()
                     .map(|f| FieldDescriptor::new(f, self))
                     .collect()
             })
@@ -154,8 +92,7 @@ impl<'a> Descriptor<'a> {
             .all_oneofs
             .get_or_init(|| {
                 self.base
-                    .oneof_decls
-                    .iter()
+                    .oneof_decl()
                     .map(|o| OneofDescriptor::new(o, self))
                     .collect()
             })
@@ -170,12 +107,12 @@ impl<'a> Descriptor<'a> {
     pub fn non_oneof_fields(&'a self) -> Result<impl Iterator<Item = &FieldDescriptor>> {
         Ok(self
             .all_fields()
-            .filter(|f| f.oneof_index().is_none() || f.is_proto3_optional()))
+            .filter(|f| f.oneof_index().is_none() || f.is_proto3_optional().unwrap_or_default()))
     }
     pub fn real_oneof_fields(&'a self) -> Result<impl Iterator<Item = &FieldDescriptor>> {
         Ok(self
             .all_fields()
-            .filter(|f| f.oneof_index().is_some() && !f.is_proto3_optional()))
+            .filter(|f| f.oneof_index().is_some() && !f.is_proto3_optional().unwrap_or_default()))
     }
     pub fn real_oneofs(&'a self) -> Result<impl Iterator<Item = &OneofDescriptor>> {
         Ok(self
@@ -192,8 +129,7 @@ impl<'a> Descriptor<'a> {
             .nested_types
             .get_or_init(|| {
                 self.base
-                    .nested_types
-                    .iter()
+                    .nested_type()
                     .map(|m| Descriptor::new(self.file, Some(self), m))
                     .collect()
             })
@@ -204,8 +140,7 @@ impl<'a> Descriptor<'a> {
             .enum_types
             .get_or_init(|| {
                 self.base
-                    .enum_types
-                    .iter()
+                    .enum_type()
                     .map(|e| EnumDescriptor::new(self.file(), Some(self), e))
                     .collect()
             })

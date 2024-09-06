@@ -24,74 +24,10 @@ use super::*;
 
 // region: FileDescriptor
 
-#[derive(Debug, Clone)]
-pub struct FileDescriptorBase {
-    name: String,
-    dependencies: Vec<String>,
-    package: Option<ProtoPathBuf>,
-    message_types: Vec<DescriptorBase>,
-    enum_types: Vec<EnumDescriptorBase>,
-    #[allow(unused)]
-    syntax: Option<String>,
-    #[allow(unused)]
-    edition: Option<Edition>,
-}
-
-impl TryFrom<&protobuf::FileDescriptorProto> for FileDescriptorBase {
-    type Error = ErrorKind;
-    fn try_from(proto: &FileDescriptor) -> Result<Self> {
-        Ok(Self {
-            name: proto.name()?.try_into_string("No FileDescriptor name")?,
-            dependencies: proto
-                .dependency()
-                .into_iter()
-                .map_ok(str::to_string)
-                .collect::<PResult<_>>()?,
-            package: proto.package()?.map(|s| s.to_string().into()),
-            message_types: proto
-                .message_type()
-                .into_iter()
-                .map_ok(TryInto::try_into)
-                .collect::<PResult<Result<Vec<_>>>>()??,
-            enum_types: proto
-                .enum_type()
-                .into_iter()
-                .map_ok(TryInto::try_into)
-                .collect::<PResult<Result<Vec<_>>>>()??,
-            syntax: proto.syntax()?.map(str::to_string),
-            edition: proto.edition()?.map(EditionProto::try_into).transpose()?,
-        })
-    }
-}
-
-#[cfg(test)]
-#[derive(Default)]
-pub struct DebugFileDescriptor<'a> {
-    pub name: &'a str,
-    pub package: Option<&'a str>,
-    pub message_types: Vec<DebugDescriptor<'a>>,
-    pub enum_types: Vec<DebugEnumDescriptor<'a>>,
-}
-
-#[cfg(test)]
-impl From<DebugFileDescriptor<'_>> for FileDescriptorBase {
-    fn from(debug: DebugFileDescriptor) -> Self {
-        Self {
-            name: debug.name.to_string(),
-            dependencies: vec![],
-            package: debug.package.map(ProtoPathBuf::from),
-            message_types: debug.message_types.into_iter().map(Into::into).collect(),
-            enum_types: debug.enum_types.into_iter().map(Into::into).collect(),
-            syntax: None,
-            edition: None,
-        }
-    }
-}
-
 #[derive(Debug)]
 pub struct FileDescriptor<'a> {
     root: &'a RootContext<'a>,
-    base: &'a FileDescriptorBase,
+    base: &'a protobuf::FileDescriptorProto,
     cache: FileDescriptorCache<'a>,
 }
 
@@ -103,7 +39,7 @@ pub struct FileDescriptorCache<'a> {
 }
 
 impl<'a> FileDescriptor<'a> {
-    pub fn new(root: &'a RootContext<'a>, base: &'a FileDescriptorBase) -> Self {
+    pub fn new(root: &'a RootContext<'a>, base: &'a protobuf::FileDescriptorProto) -> Self {
         Self {
             root,
             base,
@@ -113,11 +49,11 @@ impl<'a> FileDescriptor<'a> {
     pub fn root(&self) -> &'a RootContext {
         self.root
     }
-    pub fn name(&self) -> &str {
-        &self.base.name
+    pub fn name(&self) -> Option<&str> {
+        self.base.name()
     }
     pub fn package(&self) -> Option<&ProtoPath> {
-        self.base.package.as_deref()
+        self.base.package().map(Into::into)
     }
     pub fn absolute_package(&self) -> Result<ProtoPathBuf> {
         let mut package = self
@@ -136,8 +72,7 @@ impl<'a> FileDescriptor<'a> {
             .dependencies
             .get_or_try_init(|| {
                 self.base
-                    .dependencies
-                    .iter()
+                    .dependency()
                     .map(|name| self.root.file_from_name(name))
                     .collect::<Result<Vec<_>>>()
             })?
@@ -149,8 +84,7 @@ impl<'a> FileDescriptor<'a> {
             .messages
             .get_or_init(|| {
                 self.base
-                    .message_types
-                    .iter()
+                    .message_type()
                     .map(|m| Descriptor::new(self, None, m))
                     .collect()
             })
@@ -161,8 +95,7 @@ impl<'a> FileDescriptor<'a> {
             .enums
             .get_or_init(|| {
                 self.base
-                    .enum_types
-                    .iter()
+                    .enum_type()
                     .map(|e| EnumDescriptor::new(self, None, e))
                     .collect()
             })
