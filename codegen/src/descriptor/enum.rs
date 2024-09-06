@@ -15,7 +15,7 @@
 use crate::proto_path::{ProtoPath, ProtoPathBuf};
 use crate::{ErrorKind, Result};
 use ::itertools::Itertools;
-use ::puroro::google::protobuf::{EnumDescriptor, EnumValueDescriptor};
+use ::puroro::google::protobuf;
 use ::puroro::Result as PResult;
 use ::std::cell::OnceCell;
 use ::std::fmt::Debug;
@@ -28,7 +28,7 @@ pub struct EnumDescriptorBase {
     values: Vec<EnumValueDescriptorBase>,
 }
 
-impl TryFrom<&EnumDescriptor> for EnumDescriptorBase {
+impl TryFrom<&protobuf::EnumDescriptor> for EnumDescriptorBase {
     type Error = ErrorKind;
     fn try_from(proto: &EnumDescriptor) -> Result<Self> {
         Ok(Self {
@@ -126,7 +126,7 @@ pub struct EnumValueDescriptorBase {
     number: i32,
 }
 
-impl TryFrom<&EnumValueDescriptor> for EnumValueDescriptorBase {
+impl TryFrom<&protobuf::EnumValueDescriptor> for EnumValueDescriptorBase {
     type Error = ErrorKind;
     fn try_from(proto: &EnumValueDescriptor) -> Result<Self> {
         Ok(Self {

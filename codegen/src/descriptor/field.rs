@@ -14,9 +14,7 @@
 
 use crate::proto_path::{ProtoPath, ProtoPathBuf};
 use crate::{ErrorKind, Result};
-use puroro::google::protobuf::{
-    field_descriptor_proto::Label as FieldLabelProto, FieldDescriptor, OneofDescriptor,
-};
+use puroro::google::protobuf;
 use std::cell::OnceCell;
 use std::fmt::Debug;
 use std::ops::Deref;
@@ -34,9 +32,9 @@ pub struct FieldDescriptorBase {
     proto3_optional: Option<bool>,
 }
 
-impl TryFrom<&FieldDescriptor> for FieldDescriptorBase {
+impl TryFrom<&protobuf::FieldDescriptor> for FieldDescriptorBase {
     type Error = ErrorKind;
-    fn try_from(proto: &FieldDescriptor) -> Result<Self> {
+    fn try_from(proto: &protobuf::FieldDescriptor) -> Result<Self> {
         Ok(Self {
             name: proto.name().map(str::to_string),
             number: proto.number(),
@@ -146,7 +144,7 @@ pub struct OneofDescriptorBase {
     name: String,
 }
 
-impl TryFrom<&OneofDescriptor> for OneofDescriptorBase {
+impl TryFrom<&protobuf::OneofDescriptor> for OneofDescriptorBase {
     type Error = ErrorKind;
     fn try_from(proto: &OneofDescriptor) -> Result<Self> {
         Ok(Self {

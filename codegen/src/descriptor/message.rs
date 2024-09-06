@@ -15,7 +15,7 @@
 use crate::proto_path::{ProtoPath, ProtoPathBuf};
 use crate::{ErrorKind, Result};
 use itertools::Itertools;
-use puroro::google::protobuf::Descriptor;
+use puroro::google::protobuf;
 use puroro::Result as PResult;
 use std::cell::OnceCell;
 use std::fmt::Debug;
@@ -33,7 +33,7 @@ pub struct DescriptorBase {
     enum_types: Vec<EnumDescriptorBase>,
 }
 
-impl TryFrom<&Descriptor> for DescriptorBase {
+impl TryFrom<&protobuf::Descriptor> for DescriptorBase {
     type Error = ErrorKind;
     fn try_from(proto: &Descriptor) -> Result<Self> {
         Ok(Self {

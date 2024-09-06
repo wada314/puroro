@@ -15,7 +15,7 @@
 use crate::proto_path::{ProtoPath, ProtoPathBuf};
 use crate::{ErrorKind, Result};
 use ::itertools::Itertools;
-use ::puroro::google::protobuf::{Edition as EditionProto, FileDescriptor};
+use ::puroro::google::protobuf;
 use ::puroro::Result as PResult;
 use ::std::cell::OnceCell;
 use ::std::fmt::Debug;
@@ -37,7 +37,7 @@ pub struct FileDescriptorBase {
     edition: Option<Edition>,
 }
 
-impl TryFrom<&FileDescriptor> for FileDescriptorBase {
+impl TryFrom<&protobuf::FileDescriptor> for FileDescriptorBase {
     type Error = ErrorKind;
     fn try_from(proto: &FileDescriptor) -> Result<Self> {
         Ok(Self {
