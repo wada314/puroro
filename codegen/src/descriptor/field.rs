@@ -41,11 +41,13 @@ impl<'a> FieldDescriptor<'a> {
             cache: Default::default(),
         }
     }
-    pub fn name(&self) -> Option<&str> {
-        self.base.name()
+    pub fn name(&self) -> &str {
+        debug_assert!(self.base.name().is_some() && !self.base.name().unwrap().is_empty());
+        self.base.name().unwrap_or_default()
     }
-    pub fn number(&self) -> Option<i32> {
-        self.base.number()
+    pub fn number(&self) -> i32 {
+        debug_assert!(self.base.number().is_some() && self.base.number().unwrap() > 0);
+        self.base.number().unwrap_or_default()
     }
     pub fn type_case(&self) -> Option<FieldTypeCase> {
         self.base.type_().map(Into::into)
@@ -59,21 +61,18 @@ impl<'a> FieldDescriptor<'a> {
     pub fn oneof_index(&self) -> Option<i32> {
         self.base.oneof_index()
     }
-    pub fn is_proto3_optional(&self) -> Option<bool> {
-        self.base.proto3_optional()
+    pub fn is_proto3_optional(&self) -> bool {
+        self.base.proto3_optional().unwrap_or_default()
     }
-    pub fn full_name(&self) -> Result<&str> {
+    pub fn full_name(&self) -> &str {
         self.cache
             .full_name
-            .get_or_try_init(|| {
-                let mut full_name = self.message.full_path()?.to_owned();
-                full_name.push(ProtoPath::new(&format!(
-                    ".{}",
-                    self.name().unwrap_or_default()
-                )));
-                Ok(full_name)
+            .get_or_init(|| {
+                let mut full_name = self.message.full_path().to_owned();
+                full_name.push(ProtoPath::new(&format!(".{}", self.name())));
+                full_name
             })
-            .map(|s| s.as_ref())
+            .as_str()
     }
     pub fn r#type(&self) -> Result<FieldType<&'a Descriptor<'a>, &'a EnumDescriptor<'a>>> {
         self.cache
@@ -85,7 +84,7 @@ impl<'a> FieldDescriptor<'a> {
                         Ok(self
                             .message
                             .root()
-                            .resolve_relative_path(&name, self.message.full_path()?)?
+                            .resolve_relative_path(&name, self.message.full_path())?
                             .maybe_message()
                             .ok_or_else(|| format!("Not a message: {}", name))?)
                     },
@@ -93,7 +92,7 @@ impl<'a> FieldDescriptor<'a> {
                         Ok(self
                             .message
                             .root()
-                            .resolve_relative_path(&name, self.message.full_path()?)?
+                            .resolve_relative_path(&name, self.message.full_path())?
                             .maybe_enum()
                             .ok_or_else(|| format!("Not an enum: {}", name))?)
                     },
@@ -103,8 +102,8 @@ impl<'a> FieldDescriptor<'a> {
     }
     pub fn type_with_full_path(&self) -> Result<FieldType<ProtoPathBuf, ProtoPathBuf>> {
         Ok(self.r#type()?.try_map(
-            |m| Ok(m.full_path()?.to_owned()),
-            |e| Ok(e.full_path()?.to_owned()),
+            |m| Ok(m.full_path().to_owned()),
+            |e| Ok(e.full_path().to_owned()),
         )?)
     }
 }
@@ -131,8 +130,9 @@ impl<'a> OneofDescriptor<'a> {
             cache: Default::default(),
         }
     }
-    pub fn name(&'a self) -> Option<&'a str> {
-        self.base.name()
+    pub fn name(&self) -> &str {
+        debug_assert!(self.base.name().is_some() && !self.base.name().unwrap().is_empty());
+        self.base.name().unwrap_or_default()
     }
 
     pub fn is_synthetic(&'a self) -> Result<bool> {
@@ -146,7 +146,7 @@ impl<'a> OneofDescriptor<'a> {
                     .filter(|f| f.oneof_index() == Some(index))
                     .collect::<Vec<_>>();
                 if let Some(first) = fields.first() {
-                    if fields.len() == 1 && first.is_proto3_optional().unwrap_or_default() {
+                    if fields.len() == 1 && first.is_proto3_optional() {
                         return Ok(true);
                     }
                 }
@@ -163,9 +163,7 @@ impl<'a> OneofDescriptor<'a> {
                     .message
                     .all_oneofs()
                     .position(|o| o.name() == self.name())
-                    .ok_or_else(|| {
-                        format!("Oneof not found: {}", self.name().unwrap_or_default())
-                    })?;
+                    .ok_or_else(|| format!("Oneof not found: {}", self.name()))?;
                 Ok(index as i32)
             })
             .copied()

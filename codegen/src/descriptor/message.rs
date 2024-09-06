@@ -58,23 +58,21 @@ impl<'a> Descriptor<'a> {
     pub fn root(&'a self) -> &RootContext {
         self.file().root()
     }
-    pub fn name(&'a self) -> Result<&str> {
-        Ok(&self.base.name().unwrap_or_default())
+    pub fn name(&'a self) -> &str {
+        debug_assert!(self.base.name().is_some() && !self.base.name().unwrap().is_empty());
+        self.base.name().unwrap_or_default()
     }
-    pub fn full_path(&'a self) -> Result<&ProtoPath> {
-        self.cache
-            .full_path
-            .get_or_try_init(|| {
-                let mut full_path = if let Some(nested) = self.maybe_containing {
-                    nested.full_path()?.to_owned()
-                } else {
-                    self.file.absolute_package()?.to_owned()
-                };
-                // todo!("absl path check?");
-                full_path.push(&self.base.name().unwrap_or_default());
-                Ok(full_path)
-            })
-            .map(|s| s.as_ref())
+    pub fn full_path(&'a self) -> &ProtoPath {
+        self.cache.full_path.get_or_init(|| {
+            let mut full_path = if let Some(nested) = self.maybe_containing {
+                nested.full_path().to_owned()
+            } else {
+                self.file.absolute_package().to_owned()
+            };
+            // todo!("absl path check?");
+            full_path.push(&self.base.name().unwrap_or_default());
+            full_path
+        })
     }
     pub fn all_fields(&'a self) -> impl Iterator<Item = &FieldDescriptor> {
         self.cache
@@ -107,12 +105,12 @@ impl<'a> Descriptor<'a> {
     pub fn non_oneof_fields(&'a self) -> Result<impl Iterator<Item = &FieldDescriptor>> {
         Ok(self
             .all_fields()
-            .filter(|f| f.oneof_index().is_none() || f.is_proto3_optional().unwrap_or_default()))
+            .filter(|f| f.oneof_index().is_none() || f.is_proto3_optional()))
     }
     pub fn real_oneof_fields(&'a self) -> Result<impl Iterator<Item = &FieldDescriptor>> {
         Ok(self
             .all_fields()
-            .filter(|f| f.oneof_index().is_some() && !f.is_proto3_optional().unwrap_or_default()))
+            .filter(|f| f.oneof_index().is_some() && !f.is_proto3_optional()))
     }
     pub fn real_oneofs(&'a self) -> Result<impl Iterator<Item = &OneofDescriptor>> {
         Ok(self

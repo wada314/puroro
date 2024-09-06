@@ -47,22 +47,20 @@ impl<'a> EnumDescriptor<'a> {
             cache: Default::default(),
         }
     }
-    pub fn name(&self) -> Option<&str> {
-        self.base.name()
+    pub fn name(&self) -> &str {
+        debug_assert!(self.base.name().is_some() && !self.base.name().unwrap().is_empty());
+        self.base.name().unwrap_or_default()
     }
-    pub fn full_path(&self) -> Result<&ProtoPath> {
-        self.cache
-            .full_path
-            .get_or_try_init(|| {
-                let mut full_path = if let Some(nested) = self.maybe_containing {
-                    nested.full_path()?.to_owned()
-                } else {
-                    self.file.absolute_package()?.to_owned()
-                };
-                full_path.push(&self.name().unwrap_or_default());
-                Ok(full_path)
-            })
-            .map(|s| s.as_ref())
+    pub fn full_path(&self) -> &ProtoPath {
+        self.cache.full_path.get_or_init(|| {
+            let mut full_path = if let Some(nested) = self.maybe_containing {
+                nested.full_path().to_owned()
+            } else {
+                self.file.absolute_package().to_owned()
+            };
+            full_path.push(&self.name());
+            full_path
+        })
     }
     pub fn file(&self) -> Result<&FileDescriptor<'a>> {
         Ok(self.file)
@@ -102,23 +100,20 @@ impl<'a> EnumValueDescriptor<'a> {
     pub fn name(&self) -> Option<&str> {
         self.base.name()
     }
-    pub fn full_name(&self) -> Result<&ProtoPath> {
-        self.cache
-            .full_name
-            .get_or_try_init(|| {
-                // This full_name is a sibling of EnumDescriptor, not a child.
-                let mut full_name = if let Some(m) = self.enum_.maybe_containing {
-                    m.full_path()?.to_owned()
-                } else {
-                    self.enum_
-                        .file
-                        .package()
-                        .map_or_else(ProtoPathBuf::new, |p| p.to_owned())
-                };
-                full_name.push(ProtoPath::new(&self.enum_.name().unwrap_or_default()));
-                Ok(full_name)
-            })
-            .map(|s| s.as_ref())
+    pub fn full_name(&self) -> &ProtoPath {
+        self.cache.full_name.get_or_init(|| {
+            // This full_name is a sibling of EnumDescriptor, not a child.
+            let mut full_name = if let Some(m) = self.enum_.maybe_containing {
+                m.full_path().to_owned()
+            } else {
+                self.enum_
+                    .file
+                    .package()
+                    .map_or_else(ProtoPathBuf::new, |p| p.to_owned())
+            };
+            full_name.push(ProtoPath::new(&self.enum_.name()));
+            full_name
+        })
     }
     pub fn number(&self) -> Option<i32> {
         self.base.number()
