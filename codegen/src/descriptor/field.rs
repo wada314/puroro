@@ -38,16 +38,14 @@ impl TryFrom<&FieldDescriptorProto> for FieldDescriptorBase {
     type Error = ErrorKind;
     fn try_from(proto: &FieldDescriptorProto) -> Result<Self> {
         Ok(Self {
-            name: proto.name()?.try_into_string("No FieldDescriptor name")?,
-            number: proto
-                .number()?
-                .try_into_number("No FieldDescriptor number")?,
-            type_case: proto
-                .type_()?
-                .ok_or_else(|| format!("No FieldDescriptor type"))?
-                .into(),
-            type_name: proto.type_name()?.map(str::to_string),
-            label: proto.label()?.map(FieldLabelProto::into),
+            name: proto.name().to_string(),
+            number: proto.number(),
+            type_case: proto.type_().into(),
+            type_name: {
+                let t = proto.type_name();
+                (!t.is_empty()).then(|| t.to_string())
+            },
+            label: proto.label(),
             oneof_index: proto.oneof_index()?,
             proto3_optional: proto.proto3_optional()?.unwrap_or(false),
         })
