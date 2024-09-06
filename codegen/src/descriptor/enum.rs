@@ -13,56 +13,18 @@
 // limitations under the License.
 
 use crate::proto_path::{ProtoPath, ProtoPathBuf};
-use crate::{ErrorKind, Result};
-use ::itertools::Itertools;
+use crate::Result;
 use ::puroro::google::protobuf;
-use ::puroro::Result as PResult;
 use ::std::cell::OnceCell;
 use ::std::fmt::Debug;
 
 use super::*;
 
-#[derive(Debug, Clone)]
-pub struct EnumDescriptorBase {
-    name: String,
-    values: Vec<EnumValueDescriptorBase>,
-}
-
-impl TryFrom<&protobuf::EnumDescriptorProto> for EnumDescriptorBase {
-    type Error = ErrorKind;
-    fn try_from(proto: &EnumDescriptor) -> Result<Self> {
-        Ok(Self {
-            name: proto.name()?.try_into_string("No EnumDescriptor name")?,
-            values: proto
-                .value()
-                .into_iter()
-                .map_ok(TryInto::try_into)
-                .collect::<PResult<Result<Vec<_>>>>()??,
-        })
-    }
-}
-
-#[cfg(test)]
-#[derive(Default)]
-pub struct DebugEnumDescriptor<'a> {
-    pub name: &'a str,
-    pub values: Vec<DebugEnumValueDescriptor<'a>>,
-}
-#[cfg(test)]
-impl From<DebugEnumDescriptor<'_>> for EnumDescriptorBase {
-    fn from(debug: DebugEnumDescriptor) -> Self {
-        Self {
-            name: debug.name.to_string(),
-            values: debug.values.into_iter().map(Into::into).collect(),
-        }
-    }
-}
-
 #[derive(Debug)]
 pub struct EnumDescriptor<'a> {
     file: &'a FileDescriptor<'a>,
     maybe_containing: Option<&'a Descriptor<'a>>,
-    base: &'a EnumDescriptorBase,
+    base: &'a protobuf::EnumDescriptorProto,
     cache: EnumDescriptorCache<'a>,
 }
 
@@ -76,7 +38,7 @@ impl<'a> EnumDescriptor<'a> {
     pub fn new(
         file: &'a FileDescriptor<'a>,
         maybe_containing: Option<&'a Descriptor<'a>>,
-        base: &'a EnumDescriptorBase,
+        base: &'a protobuf::EnumDescriptorProto,
     ) -> Self {
         Self {
             file,
@@ -85,10 +47,10 @@ impl<'a> EnumDescriptor<'a> {
             cache: Default::default(),
         }
     }
-    pub fn name(&'a self) -> &str {
-        self.base.name.as_ref()
+    pub fn name(&self) -> Option<&str> {
+        self.base.name()
     }
-    pub fn full_path(&'a self) -> Result<&ProtoPath> {
+    pub fn full_path(&self) -> Result<&ProtoPath> {
         self.cache
             .full_path
             .get_or_try_init(|| {
@@ -97,22 +59,21 @@ impl<'a> EnumDescriptor<'a> {
                 } else {
                     self.file.absolute_package()?.to_owned()
                 };
-                full_path.push(&self.base.name);
+                full_path.push(&self.name().unwrap_or_default());
                 Ok(full_path)
             })
             .map(|s| s.as_ref())
     }
-    pub fn file(&'a self) -> Result<&FileDescriptor> {
+    pub fn file(&self) -> Result<&FileDescriptor<'a>> {
         Ok(self.file)
     }
-    pub fn values(&'a self) -> Result<impl Iterator<Item = &EnumValueDescriptor>> {
+    pub fn values(&'a self) -> Result<impl Iterator<Item = &'a EnumValueDescriptor<'a>>> {
         Ok(self
             .cache
             .values
             .get_or_init(|| {
                 self.base
-                    .values
-                    .iter()
+                    .value()
                     .map(|v| EnumValueDescriptor::new(self, v))
                     .collect()
             })
@@ -120,46 +81,10 @@ impl<'a> EnumDescriptor<'a> {
     }
 }
 
-#[derive(Debug, Clone)]
-pub struct EnumValueDescriptorBase {
-    name: String,
-    number: i32,
-}
-
-impl TryFrom<&protobuf::EnumValueDescriptorProto> for EnumValueDescriptorBase {
-    type Error = ErrorKind;
-    fn try_from(proto: &EnumValueDescriptor) -> Result<Self> {
-        Ok(Self {
-            name: proto
-                .name()?
-                .try_into_string("No EnumValueDescriptor name")?,
-            number: proto
-                .number()?
-                .try_into_number("No EnumValueDescriptor number")?,
-        })
-    }
-}
-
-#[cfg(test)]
-#[derive(Default)]
-pub struct DebugEnumValueDescriptor<'a> {
-    pub name: &'a str,
-    pub number: i32,
-}
-#[cfg(test)]
-impl From<DebugEnumValueDescriptor<'_>> for EnumValueDescriptorBase {
-    fn from(debug: DebugEnumValueDescriptor) -> Self {
-        Self {
-            name: debug.name.to_string(),
-            number: debug.number,
-        }
-    }
-}
-
 #[derive(Debug)]
 pub struct EnumValueDescriptor<'a> {
     enum_: &'a EnumDescriptor<'a>,
-    base: &'a EnumValueDescriptorBase,
+    base: &'a protobuf::EnumValueDescriptorProto,
     cache: EnumValueDescriptorCache,
 }
 #[derive(Default, Debug)]
@@ -167,17 +92,17 @@ pub struct EnumValueDescriptorCache {
     full_name: OnceCell<ProtoPathBuf>,
 }
 impl<'a> EnumValueDescriptor<'a> {
-    fn new(enum_: &'a EnumDescriptor<'a>, base: &'a EnumValueDescriptorBase) -> Self {
+    fn new(enum_: &'a EnumDescriptor<'a>, base: &'a protobuf::EnumValueDescriptorProto) -> Self {
         Self {
             enum_,
             base,
             cache: Default::default(),
         }
     }
-    pub fn name(&'a self) -> &str {
-        &self.base.name
+    pub fn name(&self) -> Option<&str> {
+        self.base.name()
     }
-    pub fn full_name(&'a self) -> Result<&ProtoPath> {
+    pub fn full_name(&self) -> Result<&ProtoPath> {
         self.cache
             .full_name
             .get_or_try_init(|| {
@@ -190,12 +115,12 @@ impl<'a> EnumValueDescriptor<'a> {
                         .package()
                         .map_or_else(ProtoPathBuf::new, |p| p.to_owned())
                 };
-                full_name.push(ProtoPath::new(&self.enum_.name()));
+                full_name.push(ProtoPath::new(&self.enum_.name().unwrap_or_default()));
                 Ok(full_name)
             })
             .map(|s| s.as_ref())
     }
-    pub fn number(&self) -> i32 {
-        self.base.number
+    pub fn number(&self) -> Option<i32> {
+        self.base.number()
     }
 }
