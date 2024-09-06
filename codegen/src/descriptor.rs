@@ -60,7 +60,7 @@ impl<T: IntoIterator<Item = FileDescriptorBase>> From<T> for RootContext<'_> {
     }
 }
 impl<'a> RootContext<'a> {
-    pub fn files(&'a self) -> impl Iterator<Item = &'a FileDescriptor> {
+    pub fn files(&'a self) -> impl Iterator<Item = &'a FileDescriptor<'a>> {
         self.files
             .iter()
             .map(|(f, c)| c.get_or_init(|| FileDescriptor::new(self, f)))
@@ -75,7 +75,7 @@ impl<'a> RootContext<'a> {
     pub fn package_to_files(
         &'a self,
         package: impl AsRef<ProtoPath>,
-    ) -> Result<impl Iterator<Item = &'a FileDescriptor>> {
+    ) -> Result<impl Iterator<Item = &'a FileDescriptor<'a>>> {
         let package = if package.as_ref().is_relative() {
             // This method is a root method, so the relative path should be converted
             // to the absolute path by just adding '.' at the beginning.
@@ -104,7 +104,7 @@ impl<'a> RootContext<'a> {
     pub fn resolve_path(
         &'a self,
         path: impl AsRef<ProtoPath>,
-    ) -> Result<MessageOrEnum<&Descriptor, &EnumDescriptor>> {
+    ) -> Result<MessageOrEnum<&'a Descriptor<'a>, &'a EnumDescriptor<'a>>> {
         let path = path.as_ref();
         let path = if path.is_relative() {
             ProtoPathBuf::from(format!(".{}", path))
@@ -119,7 +119,7 @@ impl<'a> RootContext<'a> {
         &'a self,
         path: impl AsRef<ProtoPath>,
         cur: impl AsRef<ProtoPath>,
-    ) -> Result<MessageOrEnum<&Descriptor, &EnumDescriptor>> {
+    ) -> Result<MessageOrEnum<&'a Descriptor<'a>, &'a EnumDescriptor<'a>>> {
         let path = path.as_ref();
         let cur = cur.as_ref();
         if path.is_absolute() {
@@ -145,7 +145,7 @@ impl<'a> RootContext<'a> {
     fn resolve_absolute_path(
         &'a self,
         path: &ProtoPath,
-    ) -> Result<Option<MessageOrEnum<&Descriptor, &EnumDescriptor>>> {
+    ) -> Result<Option<MessageOrEnum<&'a Descriptor<'a>, &'a EnumDescriptor<'a>>>> {
         debug_assert!(path.is_absolute());
         // Can improve the complexity here. Maybe later.
         for package_path in path.ancestors() {
@@ -195,7 +195,7 @@ pub enum FilesOrMessage<F, M> {
     Message(M),
 }
 impl<'a> FilesOrMessage<&'a FileDescriptor<'a>, &'a Descriptor<'a>> {
-    pub fn messages(&'a self) -> impl Iterator<Item = &Descriptor> {
+    pub fn messages(&'a self) -> impl Iterator<Item = &'a Descriptor<'a>> {
         match self {
             FilesOrMessage::Files(files) => {
                 Box::new(files.iter().flat_map(|f| f.messages())) as Box<dyn Iterator<Item = _>>
@@ -221,27 +221,6 @@ trait TryIntoNumber<T> {
 impl<T> TryIntoNumber<T> for Option<T> {
     fn try_into_number(self, error_message: &str) -> Result<T> {
         Ok(self.ok_or_else(|| error_message.to_string())?)
-    }
-}
-
-#[allow(unused)]
-trait UninterpretedOptionExt {
-    fn name_as_string(&self) -> Result<String>;
-}
-impl UninterpretedOptionExt for ::puroro::google::protobuf::UninterpretedOptionProto {
-    fn name_as_string(&self) -> Result<String> {
-        let parts = self
-            .name()
-            .map(|n| -> Result<_> {
-                let n = n?;
-                Ok(if n.is_extension()?.unwrap_or_default() {
-                    format!("({})", n.name_part()?.unwrap_or_default())
-                } else {
-                    n.name_part()?.unwrap_or_default().to_string()
-                })
-            })
-            .collect::<Result<Vec<_>>>()?;
-        Ok(parts.join("."))
     }
 }
 

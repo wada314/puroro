@@ -18,12 +18,10 @@ pub mod module;
 
 use crate::descriptor::{FileDescriptorBase, RootContext};
 use crate::{ErrorKind, Result};
-use ::itertools::Itertools;
 use ::prettyplease::unparse;
 use ::proc_macro2::TokenStream;
 use ::puroro::google::protobuf::compiler::code_generator_response::{self, Feature};
 use ::puroro::google::protobuf::compiler::{CodeGeneratorRequest, CodeGeneratorResponse};
-use ::puroro::Result as PResult;
 use ::quote::{format_ident, quote};
 use ::std::borrow::Cow;
 use ::std::cell::LazyCell;
@@ -36,8 +34,8 @@ pub fn compile(request: &CodeGeneratorRequest) -> Result<CodeGeneratorResponse> 
 
     let descriptors: Vec<FileDescriptorBase> = request
         .proto_file()
-        .map_ok(TryInto::try_into)
-        .collect::<PResult<Result<Vec<_>>>>()??;
+        .map(TryInto::try_into)
+        .collect::<Result<Vec<_>>>()?;
 
     let root_context: RootContext = descriptors.into();
     let mut out_files = GeneratedFileSet::new();
