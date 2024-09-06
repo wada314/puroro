@@ -16,7 +16,7 @@ use ::std::alloc::{Allocator, Global};
 
 use super::GenericMessageExt;
 use crate::generic_message::GenericMessage;
-use crate::google::protobuf::{FileDescriptorProto, FileDescriptorTrait};
+use crate::google::protobuf::{FileDescriptor, FileDescriptorTrait};
 use crate::internal::{
     impl_message_mut_trait_for_trivial_types, impl_message_trait_for_trivial_types,
 };
@@ -53,10 +53,10 @@ impl<A: Allocator + Clone> CodeGeneratorRequest<A> {
     pub fn parameter(&self) -> Option<&str> {
         self.as_scalar_string(2)
     }
-    pub fn proto_file(&self) -> impl Iterator<Item = &FileDescriptorProto<A>> {
+    pub fn proto_file(&self) -> impl Iterator<Item = &FileDescriptor<A>> {
         self.as_repeated_message(15)
     }
-    pub fn source_file_descriptors(&self) -> impl Iterator<Item = &FileDescriptorProto<A>> {
+    pub fn source_file_descriptors(&self) -> impl Iterator<Item = &FileDescriptor<A>> {
         self.as_repeated_message(17)
     }
     pub fn compiler_version(&self) -> Option<&Version<A>> {

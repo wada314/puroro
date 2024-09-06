@@ -15,7 +15,7 @@
 use crate::proto_path::{ProtoPath, ProtoPathBuf};
 use crate::{ErrorKind, Result};
 use ::itertools::Itertools;
-use ::puroro::google::protobuf::{Edition as EditionProto, FileDescriptorProto};
+use ::puroro::google::protobuf::{Edition as EditionProto, FileDescriptor};
 use ::puroro::Result as PResult;
 use ::std::cell::OnceCell;
 use ::std::fmt::Debug;
@@ -37,9 +37,9 @@ pub struct FileDescriptorBase {
     edition: Option<Edition>,
 }
 
-impl TryFrom<&FileDescriptorProto> for FileDescriptorBase {
+impl TryFrom<&FileDescriptor> for FileDescriptorBase {
     type Error = ErrorKind;
-    fn try_from(proto: &FileDescriptorProto) -> Result<Self> {
+    fn try_from(proto: &FileDescriptor) -> Result<Self> {
         Ok(Self {
             name: proto.name()?.try_into_string("No FileDescriptor name")?,
             dependencies: proto
