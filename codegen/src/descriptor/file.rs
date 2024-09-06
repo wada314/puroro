@@ -13,10 +13,8 @@
 // limitations under the License.
 
 use crate::proto_path::{ProtoPath, ProtoPathBuf};
-use crate::{ErrorKind, Result};
-use ::itertools::Itertools;
+use crate::Result;
 use ::puroro::google::protobuf;
-use ::puroro::Result as PResult;
 use ::std::cell::OnceCell;
 use ::std::fmt::Debug;
 
@@ -36,6 +34,8 @@ pub struct FileDescriptorCache<'a> {
     dependencies: OnceCell<Vec<&'a FileDescriptor<'a>>>,
     messages: OnceCell<Vec<Descriptor<'a>>>,
     enums: OnceCell<Vec<EnumDescriptor<'a>>>,
+    package: OnceCell<Option<ProtoPathBuf>>,
+    absolute_package: OnceCell<ProtoPathBuf>,
 }
 
 impl<'a> FileDescriptor<'a> {
@@ -46,27 +46,33 @@ impl<'a> FileDescriptor<'a> {
             cache: Default::default(),
         }
     }
-    pub fn root(&self) -> &'a RootContext {
+    pub fn root(&self) -> &'a RootContext<'a> {
         self.root
     }
-    pub fn name(&self) -> Option<&str> {
-        self.base.name()
+    pub fn name(&self) -> &str {
+        debug_assert!(self.base.name().is_some() && !self.base.name().unwrap().is_empty());
+        self.base.name().unwrap_or_default()
     }
     pub fn package(&self) -> Option<&ProtoPath> {
-        self.base.package().map(Into::into)
+        self.cache
+            .package
+            .get_or_init(|| self.base.package().map(Into::into))
+            .as_deref()
     }
-    pub fn absolute_package(&self) -> Result<ProtoPathBuf> {
-        let mut package = self
-            .package()
-            .map_or_else(ProtoPathBuf::new, |p| p.to_owned());
-        if package.is_relative() {
-            let mut new_package = Into::<ProtoPathBuf>::into(".");
-            new_package.push(&package);
-            package = new_package;
-        }
-        Ok(package)
+    pub fn absolute_package(&self) -> &ProtoPath {
+        self.cache.absolute_package.get_or_init(|| {
+            let mut package = self
+                .package()
+                .map_or_else(ProtoPathBuf::new, |p| p.to_owned());
+            if package.is_relative() {
+                let mut new_package = Into::<ProtoPathBuf>::into(".");
+                new_package.push(&package);
+                package = new_package;
+            }
+            package
+        })
     }
-    pub fn dependencies(&'a self) -> Result<impl Iterator<Item = &FileDescriptor>> {
+    pub fn dependencies(&'a self) -> Result<impl Iterator<Item = &'a FileDescriptor<'a>>> {
         Ok(self
             .cache
             .dependencies
@@ -79,7 +85,7 @@ impl<'a> FileDescriptor<'a> {
             .iter()
             .copied())
     }
-    pub fn messages(&'a self) -> impl Iterator<Item = &Descriptor> {
+    pub fn messages(&'a self) -> impl Iterator<Item = &'a Descriptor<'a>> {
         self.cache
             .messages
             .get_or_init(|| {
@@ -90,7 +96,7 @@ impl<'a> FileDescriptor<'a> {
             })
             .iter()
     }
-    pub fn enums(&'a self) -> impl Iterator<Item = &EnumDescriptor> {
+    pub fn enums(&'a self) -> impl Iterator<Item = &'a EnumDescriptor<'a>> {
         self.cache
             .enums
             .get_or_init(|| {
@@ -103,12 +109,12 @@ impl<'a> FileDescriptor<'a> {
     }
     pub fn all_messages_or_enums(
         &'a self,
-    ) -> impl Iterator<Item = MessageOrEnum<&Descriptor, &EnumDescriptor>> {
+    ) -> impl Iterator<Item = MessageOrEnum<&'a Descriptor<'a>, &'a EnumDescriptor<'a>>> {
         self.all_messages()
             .map(MessageOrEnum::Message)
             .chain(self.all_enums().map(MessageOrEnum::Enum))
     }
-    pub fn all_messages(&'a self) -> impl Iterator<Item = &Descriptor> {
+    pub fn all_messages(&'a self) -> impl Iterator<Item = &'a Descriptor<'a>> {
         let direct_messages = self.messages();
         let indirect_messages = self
             .messages()
@@ -116,7 +122,7 @@ impl<'a> FileDescriptor<'a> {
             .collect::<Vec<_>>();
         Box::new(direct_messages.chain(indirect_messages)) as Box<dyn Iterator<Item = _>>
     }
-    pub fn all_enums(&'a self) -> impl Iterator<Item = &EnumDescriptor> {
+    pub fn all_enums(&'a self) -> impl Iterator<Item = &'a EnumDescriptor<'a>> {
         let direct_enums = self.enums();
         let indirect_enums = self
             .messages()
