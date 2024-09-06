@@ -25,29 +25,26 @@ use super::*;
 
 #[derive(Debug, Clone)]
 pub struct FieldDescriptorBase {
-    name: String,
-    number: i32,
-    type_case: FieldTypeCase,
+    name: Option<String>,
+    number: Option<i32>,
+    type_case: Option<FieldTypeCase>,
     type_name: Option<String>,
     label: Option<FieldLabel>,
     oneof_index: Option<i32>,
-    proto3_optional: bool,
+    proto3_optional: Option<bool>,
 }
 
 impl TryFrom<&FieldDescriptorProto> for FieldDescriptorBase {
     type Error = ErrorKind;
     fn try_from(proto: &FieldDescriptorProto) -> Result<Self> {
         Ok(Self {
-            name: proto.name().to_string(),
+            name: proto.name().map(str::to_string),
             number: proto.number(),
-            type_case: proto.type_().into(),
-            type_name: {
-                let t = proto.type_name();
-                (!t.is_empty()).then(|| t.to_string())
-            },
-            label: proto.label(),
-            oneof_index: proto.oneof_index()?,
-            proto3_optional: proto.proto3_optional()?.unwrap_or(false),
+            type_case: proto.type_().map(Into::into),
+            type_name: proto.type_name().map(str::to_string),
+            label: proto.label().map(Into::into),
+            oneof_index: proto.oneof_index(),
+            proto3_optional: proto.proto3_optional(),
         })
     }
 }
@@ -82,13 +79,13 @@ impl<'a> FieldDescriptor<'a> {
     pub fn type_case(&self) -> FieldTypeCase {
         self.base.type_case
     }
-    pub fn type_name(&self) -> Option<&str> {
-        self.base.type_name.as_deref()
+    pub fn type_name(&self) -> &str {
+        &self.base.type_name
     }
-    pub fn label(&self) -> Option<FieldLabel> {
+    pub fn label(&self) -> FieldLabel {
         self.base.label
     }
-    pub fn oneof_index(&self) -> Option<i32> {
+    pub fn oneof_index(&self) -> i32 {
         self.base.oneof_index
     }
     pub fn is_proto3_optional(&self) -> bool {
@@ -107,7 +104,7 @@ impl<'a> FieldDescriptor<'a> {
     pub fn r#type(&self) -> Result<FieldType<&'a Descriptor<'a>, &'a EnumDescriptor<'a>>> {
         let init = || {
             self.base.type_case.with_type_ref(
-                self.base.type_name.as_deref(),
+                &self.base.type_name,
                 |name| {
                     Ok(self
                         .message
@@ -153,7 +150,7 @@ impl TryFrom<&OneofDescriptorProto> for OneofDescriptorBase {
     type Error = ErrorKind;
     fn try_from(proto: &OneofDescriptorProto) -> Result<Self> {
         Ok(Self {
-            name: proto.name()?.try_into_string("No OneofDescriptor name")?,
+            name: proto.name().to_string(),
         })
     }
 }
@@ -180,7 +177,7 @@ impl<'a> OneofDescriptor<'a> {
             cache: Default::default(),
         }
     }
-    pub fn name(&'a self) -> &str {
+    pub fn name(&'a self) -> &'a str {
         &self.body.name
     }
 
@@ -192,7 +189,7 @@ impl<'a> OneofDescriptor<'a> {
                 let fields = self
                     .message
                     .all_fields()
-                    .filter(|f| f.oneof_index() == Some(index))
+                    .filter(|f| f.oneof_index() == index)
                     .collect::<Vec<_>>();
                 if let Some(first) = fields.first() {
                     if fields.len() == 1 && first.is_proto3_optional() {

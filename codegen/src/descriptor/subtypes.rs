@@ -246,7 +246,7 @@ impl From<FieldTypeProto> for FieldTypeCase {
 impl FieldTypeCase {
     pub fn with_type_ref<'a, F, G, M, E>(
         self,
-        type_name: Option<&str>,
+        type_name: &str,
         msg_case: F,
         enum_case: G,
     ) -> Result<FieldType<M, E>>
@@ -259,11 +259,7 @@ impl FieldTypeCase {
             FieldTypeCase::Bytes => Ok(FieldType::Bytes),
             FieldTypeCase::Double => Ok(FieldType::Double),
             FieldTypeCase::Enum => {
-                let type_name: ProtoPathBuf = type_name
-                    .ok_or_else(|| {
-                        format!("No enum type name \"{}\"", type_name.unwrap_or_default())
-                    })?
-                    .into();
+                let type_name: ProtoPathBuf = type_name.into();
                 Ok(FieldType::Enum(enum_case(&type_name)?))
             }
             FieldTypeCase::Fixed32 => Ok(FieldType::Fixed32),
@@ -273,11 +269,7 @@ impl FieldTypeCase {
             FieldTypeCase::Int32 => Ok(FieldType::Int32),
             FieldTypeCase::Int64 => Ok(FieldType::Int64),
             FieldTypeCase::Message => {
-                let type_name: ProtoPathBuf = type_name
-                    .ok_or_else(|| {
-                        format!("No message type name \"{}\"", type_name.unwrap_or_default())
-                    })?
-                    .into();
+                let type_name: ProtoPathBuf = type_name.into();
                 Ok(FieldType::Message(msg_case(&type_name)?))
             }
             FieldTypeCase::SFixed32 => Ok(FieldType::SFixed32),

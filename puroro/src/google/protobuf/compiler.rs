@@ -29,16 +29,16 @@ use ::ref_cast::RefCast;
 #[repr(transparent)]
 pub struct Version<A: Allocator = Global>(GenericMessage<A>);
 impl<A: Allocator + Clone> Version<A> {
-    pub fn major(&self) -> i32 {
+    pub fn major(&self) -> Option<i32> {
         self.as_scalar_int32(1)
     }
-    pub fn minor(&self) -> i32 {
+    pub fn minor(&self) -> Option<i32> {
         self.as_scalar_int32(2)
     }
-    pub fn patch(&self) -> i32 {
+    pub fn patch(&self) -> Option<i32> {
         self.as_scalar_int32(3)
     }
-    pub fn suffix(&self) -> &str {
+    pub fn suffix(&self) -> Option<&str> {
         self.as_scalar_string(4)
     }
 }
@@ -50,7 +50,7 @@ impl<A: Allocator + Clone> CodeGeneratorRequest<A> {
     pub fn file_to_generate(&self) -> impl IntoIterator<Item = &str> {
         self.as_repeated_string(1)
     }
-    pub fn parameter(&self) -> &str {
+    pub fn parameter(&self) -> Option<&str> {
         self.as_scalar_string(2)
     }
     pub fn proto_file(&self) -> impl Iterator<Item = &FileDescriptorProto<A>> {
@@ -99,13 +99,13 @@ pub mod code_generator_response {
     #[repr(transparent)]
     pub struct File<A: Allocator = Global>(GenericMessage<A>);
     impl<A: Allocator + Clone> File<A> {
-        pub fn name(&self) -> &str {
+        pub fn name(&self) -> Option<&str> {
             self.as_scalar_string(1)
         }
-        pub fn insertion_point(&self) -> &str {
+        pub fn insertion_point(&self) -> Option<&str> {
             self.as_scalar_string(2)
         }
-        pub fn content(&self) -> &str {
+        pub fn content(&self) -> Option<&str> {
             self.as_scalar_string(15)
         }
 
@@ -125,9 +125,9 @@ pub mod code_generator_response {
 
     impl_message_trait_for_trivial_types! {
         pub trait FileTrait {
-            fn name(&self) -> &str;
-            fn insertion_point(&self) -> &str;
-            fn content(&self) -> &str;
+            fn name(&self) -> Option<&str>;
+            fn insertion_point(&self) -> Option<&str>;
+            fn content(&self) -> Option<&str>;
         }
     }
     impl_message_mut_trait_for_trivial_types! {
@@ -143,7 +143,7 @@ pub mod code_generator_response {
 #[repr(transparent)]
 pub struct CodeGeneratorResponse<A: Allocator = Global>(GenericMessage<A>);
 impl<A: Allocator + Clone> CodeGeneratorResponse<A> {
-    pub fn error(&self) -> &str {
+    pub fn error(&self) -> Option<&str> {
         self.as_scalar_string(1)
     }
     pub fn supported_features(&self) -> u64 {
@@ -152,10 +152,10 @@ impl<A: Allocator + Clone> CodeGeneratorResponse<A> {
             .map(|f| f.as_scalar_variant::<UInt64>(false))
             .unwrap_or_default()
     }
-    pub fn minimum_edition(&self) -> i32 {
+    pub fn minimum_edition(&self) -> Option<i32> {
         self.as_scalar_int32(3)
     }
-    pub fn maximum_edition(&self) -> i32 {
+    pub fn maximum_edition(&self) -> Option<i32> {
         self.as_scalar_int32(4)
     }
     pub fn file(&self) -> impl Iterator<Item = &code_generator_response::File<A>> {
@@ -186,23 +186,23 @@ impl<A: Allocator + Clone> CodeGeneratorResponse<A> {
 
 impl_message_trait_for_trivial_types! {
     pub trait VersionTrait {
-        fn major(&self) -> i32;
-        fn minor(&self) -> i32;
-        fn patch(&self) -> i32;
-        fn suffix(&self) -> &str;
+        fn major(&self) -> Option<i32>;
+        fn minor(&self) -> Option<i32>;
+        fn patch(&self) -> Option<i32>;
+        fn suffix(&self) -> Option<&str>;
     }
     pub trait CodeGeneratorRequestTrait {
         fn file_to_generate(&self) -> impl Iterator<Item = &str>;
-        fn parameter(&self) -> &str;
+        fn parameter(&self) -> Option<&str>;
         fn proto_file(&self) -> impl Iterator<Item = impl FileDescriptorTrait>;
         fn source_file_descriptors(&self) -> impl Iterator<Item = impl FileDescriptorTrait>;
         fn compiler_version(&self) -> Option<impl VersionTrait>;
     }
     pub trait CodeGeneratorResponseTrait {
-        fn error(&self) -> &str;
+        fn error(&self) -> Option<&str>;
         fn supported_features(&self) -> u64;
-        fn minimum_edition(&self) -> i32;
-        fn maximum_edition(&self) -> i32;
+        fn minimum_edition(&self) -> Option<i32>;
+        fn maximum_edition(&self) -> Option<i32>;
         fn file(&self) -> impl Iterator<Item = impl code_generator_response::FileTrait>;
     }
 }
