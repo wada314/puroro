@@ -13,11 +13,10 @@
 // limitations under the License.
 
 use crate::proto_path::{ProtoPath, ProtoPathBuf};
-use crate::{ErrorKind, Result};
+use crate::Result;
 use puroro::google::protobuf;
 use std::cell::OnceCell;
 use std::fmt::Debug;
-use std::ops::Deref;
 
 use super::*;
 
@@ -49,13 +48,13 @@ impl<'a> FieldDescriptor<'a> {
         self.base.number()
     }
     pub fn type_case(&self) -> Option<FieldTypeCase> {
-        self.base.type_case()
+        self.base.type_().map(Into::into)
     }
     pub fn type_name(&self) -> Option<&str> {
         self.base.type_name()
     }
-    pub fn label(&self) -> Option<protobuf::field_descriptor_proto::Label> {
-        self.base.label()
+    pub fn label(&self) -> Option<FieldLabel> {
+        self.base.label().map(Into::into)
     }
     pub fn oneof_index(&self) -> Option<i32> {
         self.base.oneof_index()
@@ -68,34 +67,39 @@ impl<'a> FieldDescriptor<'a> {
             .full_name
             .get_or_try_init(|| {
                 let mut full_name = self.message.full_path()?.to_owned();
-                full_name.push(ProtoPath::new(&format!(".{}", self.name())));
+                full_name.push(ProtoPath::new(&format!(
+                    ".{}",
+                    self.name().unwrap_or_default()
+                )));
                 Ok(full_name)
             })
             .map(|s| s.as_ref())
     }
     pub fn r#type(&self) -> Result<FieldType<&'a Descriptor<'a>, &'a EnumDescriptor<'a>>> {
-        let init = || {
-            self.base.type_case.with_type_ref(
-                &self.base.type_name,
-                |name| {
-                    Ok(self
-                        .message
-                        .root()
-                        .resolve_relative_path(&name, self.message.full_path()?)?
-                        .maybe_message()
-                        .ok_or_else(|| format!("Not a message: {}", name))?)
-                },
-                |name| {
-                    Ok(self
-                        .message
-                        .root()
-                        .resolve_relative_path(&name, self.message.full_path()?)?
-                        .maybe_enum()
-                        .ok_or_else(|| format!("Not an enum: {}", name))?)
-                },
-            )
-        };
-        self.cache.r#type.get_or_try_init(init).cloned()
+        self.cache
+            .r#type
+            .get_or_try_init(|| {
+                self.type_case().unwrap_or_default().with_type_ref(
+                    self.type_name().unwrap_or_default(),
+                    |name| {
+                        Ok(self
+                            .message
+                            .root()
+                            .resolve_relative_path(&name, self.message.full_path()?)?
+                            .maybe_message()
+                            .ok_or_else(|| format!("Not a message: {}", name))?)
+                    },
+                    |name| {
+                        Ok(self
+                            .message
+                            .root()
+                            .resolve_relative_path(&name, self.message.full_path()?)?
+                            .maybe_enum()
+                            .ok_or_else(|| format!("Not an enum: {}", name))?)
+                    },
+                )
+            })
+            .cloned()
     }
     pub fn type_with_full_path(&self) -> Result<FieldType<ProtoPathBuf, ProtoPathBuf>> {
         Ok(self.r#type()?.try_map(
@@ -105,32 +109,10 @@ impl<'a> FieldDescriptor<'a> {
     }
 }
 
-impl Deref for FieldDescriptor<'_> {
-    type Target = FieldDescriptorBase;
-    fn deref(&self) -> &Self::Target {
-        &self.base
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct OneofDescriptorBase {
-    #[allow(unused)]
-    name: String,
-}
-
-impl TryFrom<&protobuf::OneofDescriptorProto> for OneofDescriptorBase {
-    type Error = ErrorKind;
-    fn try_from(proto: &OneofDescriptor) -> Result<Self> {
-        Ok(Self {
-            name: proto.name().to_string(),
-        })
-    }
-}
-
 #[derive(Debug)]
 pub struct OneofDescriptor<'a> {
     message: &'a Descriptor<'a>,
-    body: &'a OneofDescriptorBase,
+    base: &'a protobuf::OneofDescriptorProto,
     #[allow(unused)]
     cache: OneofDescriptorCache,
 }
@@ -142,15 +124,15 @@ pub struct OneofDescriptorCache {
 }
 
 impl<'a> OneofDescriptor<'a> {
-    pub fn new(body: &'a OneofDescriptorBase, message: &'a Descriptor<'a>) -> Self {
+    pub fn new(base: &'a protobuf::OneofDescriptorProto, message: &'a Descriptor<'a>) -> Self {
         Self {
             message,
-            body,
+            base,
             cache: Default::default(),
         }
     }
-    pub fn name(&'a self) -> &'a str {
-        &self.body.name
+    pub fn name(&'a self) -> Option<&'a str> {
+        self.base.name()
     }
 
     pub fn is_synthetic(&'a self) -> Result<bool> {
@@ -161,10 +143,10 @@ impl<'a> OneofDescriptor<'a> {
                 let fields = self
                     .message
                     .all_fields()
-                    .filter(|f| f.oneof_index() == index)
+                    .filter(|f| f.oneof_index() == Some(index))
                     .collect::<Vec<_>>();
                 if let Some(first) = fields.first() {
-                    if fields.len() == 1 && first.is_proto3_optional() {
+                    if fields.len() == 1 && first.is_proto3_optional().unwrap_or_default() {
                         return Ok(true);
                     }
                 }
@@ -181,7 +163,9 @@ impl<'a> OneofDescriptor<'a> {
                     .message
                     .all_oneofs()
                     .position(|o| o.name() == self.name())
-                    .ok_or_else(|| format!("Oneof not found: {}", self.name()))?;
+                    .ok_or_else(|| {
+                        format!("Oneof not found: {}", self.name().unwrap_or_default())
+                    })?;
                 Ok(index as i32)
             })
             .copied()
