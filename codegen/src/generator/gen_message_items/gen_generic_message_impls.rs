@@ -47,7 +47,8 @@ impl GenGenericMessageImpls {
             .map(Field::gen_getter)
             .collect::<Result<Vec<_>>>()?;
         Ok(parse2(quote! {
-            impl<A: ::std::alloc::Allocator> self::#trait_name for ::puroro::generic_message::GenericMessage2<A> {
+            impl<A: ::std::alloc::Allocator + ::std::clone::Clone> self::#trait_name
+            for ::puroro::generic_message::GenericMessage<A> {
                 #(#getters)*
             }
         })?)

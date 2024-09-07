@@ -18,6 +18,7 @@ use crate::internal::deser::{
 use crate::internal::utils::{BaseAndDerived, Derived, EnumOfDeriveds, EnumVariant};
 use crate::internal::WireType;
 use crate::message::MessageLite;
+use crate::variant::variant_types::Int32;
 use crate::variant::{
     variant_types::UInt32, ReadExtVariant, Variant, VariantIntegerType, WriteExtVariant,
 };
@@ -282,6 +283,7 @@ impl<A: Allocator + Clone> MessageLite for GenericMessage<A> {
                     WireTypeAndPayload::Len(bytes_or_msg) => {
                         let bytes = bytes_or_msg.as_base();
                         let len = bytes.len();
+                        write.write_variant(Variant::from::<Int32>(len.try_into()?))?;
                         write.write_all(bytes)?;
                         len
                     }

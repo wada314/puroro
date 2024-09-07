@@ -139,7 +139,7 @@ impl TryFrom<GeneratedFile> for code_generator_response::File {
             .collect::<Vec<_>>();
         let crate_attributes = is_root_file.then(|| {
             quote! {
-                #![allow(allocator_api)]
+                #![feature(allocator_api)]
             }
         });
         let puroro_root = if is_root_file {
