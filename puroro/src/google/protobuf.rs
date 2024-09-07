@@ -21,7 +21,7 @@ use ::derive_more::{Deref, DerefMut, From, Into};
 use ::ref_cast::RefCast;
 use ::std::alloc::{Allocator, Global};
 
-#[derive(Deref, DerefMut, From, Into, Default, Debug, RefCast)]
+#[derive(Deref, DerefMut, From, Into, Default, Debug, RefCast, Clone)]
 #[repr(transparent)]
 pub struct FileDescriptorSet<A: Allocator = Global>(GenericMessage<A>);
 impl<A: Allocator + Clone> FileDescriptorSet<A> {
@@ -68,7 +68,7 @@ impl From<Edition> for i32 {
     }
 }
 
-#[derive(Deref, DerefMut, From, Into, Default, Debug, RefCast)]
+#[derive(Deref, DerefMut, From, Into, Default, Debug, RefCast, Clone)]
 #[repr(transparent)]
 pub struct FileDescriptorProto<A: Allocator = Global>(GenericMessage<A>);
 impl<A: Allocator + Clone> FileDescriptorProto<A> {
@@ -101,7 +101,7 @@ impl<A: Allocator + Clone> FileDescriptorProto<A> {
     }
 }
 
-#[derive(Deref, DerefMut, From, Into, Default, Debug, RefCast)]
+#[derive(Deref, DerefMut, From, Into, Default, Debug, RefCast, Clone)]
 #[repr(transparent)]
 pub struct DescriptorProto<A: Allocator = Global>(GenericMessage<A>);
 impl<A: Allocator + Clone> DescriptorProto<A> {
@@ -125,7 +125,7 @@ impl<A: Allocator + Clone> DescriptorProto<A> {
     }
 }
 
-#[derive(Deref, DerefMut, From, Into, Default, Debug, RefCast)]
+#[derive(Deref, DerefMut, From, Into, Default, Debug, RefCast, Clone)]
 #[repr(transparent)]
 pub struct FieldDescriptorProto<A: Allocator = Global>(GenericMessage<A>);
 impl<A: Allocator + Clone> FieldDescriptorProto<A> {
@@ -243,7 +243,7 @@ pub mod field_descriptor_proto {
     }
 }
 
-#[derive(Deref, DerefMut, From, Into, Default, Debug, RefCast)]
+#[derive(Deref, DerefMut, From, Into, Default, Debug, RefCast, Clone)]
 #[repr(transparent)]
 pub struct OneofDescriptorProto<A: Allocator = Global>(GenericMessage<A>);
 impl<A: Allocator + Clone> OneofDescriptorProto<A> {
@@ -252,7 +252,7 @@ impl<A: Allocator + Clone> OneofDescriptorProto<A> {
     }
 }
 
-#[derive(Deref, DerefMut, From, Into, Default, Debug, RefCast)]
+#[derive(Deref, DerefMut, From, Into, Default, Debug, RefCast, Clone)]
 #[repr(transparent)]
 pub struct EnumDescriptorProto<A: Allocator = Global>(GenericMessage<A>);
 impl<A: Allocator + Clone> EnumDescriptorProto<A> {
@@ -264,7 +264,7 @@ impl<A: Allocator + Clone> EnumDescriptorProto<A> {
     }
 }
 
-#[derive(Deref, DerefMut, From, Into, Default, Debug, RefCast)]
+#[derive(Deref, DerefMut, From, Into, Default, Debug, RefCast, Clone)]
 #[repr(transparent)]
 pub struct EnumValueDescriptorProto<A: Allocator = Global>(GenericMessage<A>);
 impl<A: Allocator + Clone> EnumValueDescriptorProto<A> {

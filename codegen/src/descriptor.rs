@@ -25,13 +25,17 @@ pub use subtypes::*;
 
 use crate::proto_path::{ProtoPath, ProtoPathBuf};
 use crate::Result;
+use ::puroro::google::protobuf;
 use ::std::cell::OnceCell;
 use ::std::collections::HashMap;
 use ::std::fmt::Debug;
 
 #[derive(Debug)]
 pub struct RootContext<'a> {
-    files: Vec<(FileDescriptorBase, OnceCell<FileDescriptorExt<'a>>)>,
+    files: Vec<(
+        protobuf::FileDescriptorProto,
+        OnceCell<FileDescriptorExt<'a>>,
+    )>,
     cache: RootContextCache<'a>,
 }
 
@@ -40,15 +44,7 @@ struct RootContextCache<'a> {
     package_to_files: OnceCell<HashMap<ProtoPathBuf, Vec<&'a FileDescriptorExt<'a>>>>,
 }
 
-impl From<FileDescriptorBase> for RootContext<'_> {
-    fn from(f: FileDescriptorBase) -> Self {
-        Self {
-            files: vec![(f, OnceCell::default())],
-            cache: Default::default(),
-        }
-    }
-}
-impl<T: IntoIterator<Item = FileDescriptorBase>> From<T> for RootContext<'_> {
+impl<T: IntoIterator<Item = protobuf::FileDescriptorProto>> From<T> for RootContext<'_> {
     fn from(files: T) -> Self {
         Self {
             files: files
@@ -90,7 +86,7 @@ impl<'a> RootContext<'a> {
             .get_or_try_init(|| -> Result<_> {
                 let mut map = HashMap::new();
                 for fd in self.files() {
-                    let package = fd.absolute_package()?.to_owned();
+                    let package = fd.absolute_package().to_owned();
                     map.entry(package.clone()).or_insert_with(Vec::new).push(fd);
                 }
                 Ok(map)
@@ -151,7 +147,7 @@ impl<'a> RootContext<'a> {
         for package_path in path.ancestors() {
             for file in self.package_to_files(package_path)? {
                 for message_or_enum in file.all_messages_or_enums() {
-                    if message_or_enum.full_path()? == path {
+                    if message_or_enum.full_path() == path {
                         return Ok(Some(message_or_enum));
                     }
                 }
@@ -167,7 +163,7 @@ pub enum MessageOrEnum<M, E> {
     Enum(E),
 }
 impl<'a> MessageOrEnum<&'a DescriptorExt<'a>, &'a EnumDescriptorExt<'a>> {
-    pub fn full_path(&self) -> Result<&ProtoPath> {
+    pub fn full_path(&self) -> &ProtoPath {
         match self {
             MessageOrEnum::Message(m) => m.full_path(),
             MessageOrEnum::Enum(e) => e.full_path(),
@@ -230,7 +226,7 @@ mod tests {
 
     #[test]
     fn test_resolve_path() {
-        fn make_fd(name: &str, package: &str) -> FileDescriptorBase {
+        fn make_fd(name: &str, package: &str) -> protobuf::FileDescriptorProto {
             type FD<'a> = DebugFileDescriptor<'a>;
             type MD<'a> = DebugDescriptor<'a>;
             type ED<'a> = DebugEnumDescriptor<'a>;

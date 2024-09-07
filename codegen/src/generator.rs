@@ -16,7 +16,7 @@ pub mod gen_enum_items;
 pub mod gen_message_items;
 pub mod module;
 
-use crate::descriptor::{FileDescriptorBase, RootContext};
+use crate::descriptor::RootContext;
 use crate::{ErrorKind, Result};
 use ::prettyplease::unparse;
 use ::proc_macro2::TokenStream;
@@ -32,12 +32,7 @@ pub fn compile(request: &CodeGeneratorRequest) -> Result<CodeGeneratorResponse> 
     let mut response = CodeGeneratorResponse::default();
     response.set_supported_features(Into::<i32>::into(Feature::FeatureProto3Optional) as u64)?;
 
-    let descriptors: Vec<FileDescriptorBase> = request
-        .proto_file()
-        .map(TryInto::try_into)
-        .collect::<Result<Vec<_>>>()?;
-
-    let root_context: RootContext = descriptors.into();
+    let root_context: RootContext = request.proto_file().cloned().into();
     let mut out_files = GeneratedFileSet::new();
 
     let messages = root_context
@@ -45,7 +40,7 @@ pub fn compile(request: &CodeGeneratorRequest) -> Result<CodeGeneratorResponse> 
         .flat_map(|fd| fd.all_messages())
         .collect::<Vec<_>>();
     for message in &messages {
-        let file_path = if let Some(package) = message.full_path()?.parent() {
+        let file_path = if let Some(package) = message.full_path().parent() {
             package.to_rust_file_path()
         } else {
             "mod.rs".to_string()
@@ -67,7 +62,7 @@ pub fn compile(request: &CodeGeneratorRequest) -> Result<CodeGeneratorResponse> 
         .flat_map(|fd| fd.all_enums())
         .collect::<Vec<_>>();
     for e in &enums {
-        let file_path = if let Some(package) = e.full_path()?.parent() {
+        let file_path = if let Some(package) = e.full_path().parent() {
             package.to_rust_file_path()
         } else {
             "mod.rs".to_string()

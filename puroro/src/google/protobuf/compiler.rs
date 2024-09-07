@@ -25,7 +25,7 @@ use crate::Result;
 use ::derive_more::{Deref, DerefMut, From, Into};
 use ::ref_cast::RefCast;
 
-#[derive(Deref, DerefMut, From, Into, Default, Debug, RefCast)]
+#[derive(Deref, DerefMut, From, Into, Default, Debug, RefCast, Clone)]
 #[repr(transparent)]
 pub struct Version<A: Allocator = Global>(GenericMessage<A>);
 impl<A: Allocator + Clone> Version<A> {
@@ -43,7 +43,7 @@ impl<A: Allocator + Clone> Version<A> {
     }
 }
 
-#[derive(Deref, DerefMut, From, Into, Default, Debug, RefCast)]
+#[derive(Deref, DerefMut, From, Into, Default, Debug, RefCast, Clone)]
 #[repr(transparent)]
 pub struct CodeGeneratorRequest<A: Allocator = Global>(GenericMessage<A>);
 impl<A: Allocator + Clone> CodeGeneratorRequest<A> {
@@ -95,7 +95,7 @@ pub mod code_generator_response {
         }
     }
 
-    #[derive(Deref, DerefMut, From, Into, Default, Debug, RefCast)]
+    #[derive(Deref, DerefMut, From, Into, Default, Debug, RefCast, Clone)]
     #[repr(transparent)]
     pub struct File<A: Allocator = Global>(GenericMessage<A>);
     impl<A: Allocator + Clone> File<A> {
@@ -139,7 +139,7 @@ pub mod code_generator_response {
     }
 }
 
-#[derive(Deref, DerefMut, From, Into, Default, Debug, RefCast)]
+#[derive(Deref, DerefMut, From, Into, Default, Debug, RefCast, Clone)]
 #[repr(transparent)]
 pub struct CodeGeneratorResponse<A: Allocator = Global>(GenericMessage<A>);
 impl<A: Allocator + Clone> CodeGeneratorResponse<A> {
