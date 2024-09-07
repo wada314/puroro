@@ -23,7 +23,7 @@ use super::*;
 // region: FileDescriptor
 
 #[derive(Debug)]
-pub struct FileDescriptor<'a> {
+pub struct FileDescriptorExt<'a> {
     root: &'a RootContext<'a>,
     base: &'a protobuf::FileDescriptorProto,
     cache: FileDescriptorCache<'a>,
@@ -31,14 +31,14 @@ pub struct FileDescriptor<'a> {
 
 #[derive(Default, Debug)]
 pub struct FileDescriptorCache<'a> {
-    dependencies: OnceCell<Vec<&'a FileDescriptor<'a>>>,
-    messages: OnceCell<Vec<Descriptor<'a>>>,
-    enums: OnceCell<Vec<EnumDescriptor<'a>>>,
+    dependencies: OnceCell<Vec<&'a FileDescriptorExt<'a>>>,
+    messages: OnceCell<Vec<DescriptorExt<'a>>>,
+    enums: OnceCell<Vec<EnumDescriptorExt<'a>>>,
     package: OnceCell<Option<ProtoPathBuf>>,
     absolute_package: OnceCell<ProtoPathBuf>,
 }
 
-impl<'a> FileDescriptor<'a> {
+impl<'a> FileDescriptorExt<'a> {
     pub fn new(root: &'a RootContext<'a>, base: &'a protobuf::FileDescriptorProto) -> Self {
         Self {
             root,
@@ -72,7 +72,7 @@ impl<'a> FileDescriptor<'a> {
             package
         })
     }
-    pub fn dependencies(&'a self) -> Result<impl Iterator<Item = &'a FileDescriptor<'a>>> {
+    pub fn dependencies(&'a self) -> Result<impl Iterator<Item = &'a FileDescriptorExt<'a>>> {
         Ok(self
             .cache
             .dependencies
@@ -85,36 +85,36 @@ impl<'a> FileDescriptor<'a> {
             .iter()
             .copied())
     }
-    pub fn messages(&'a self) -> impl Iterator<Item = &'a Descriptor<'a>> {
+    pub fn messages(&'a self) -> impl Iterator<Item = &'a DescriptorExt<'a>> {
         self.cache
             .messages
             .get_or_init(|| {
                 self.base
                     .message_type()
-                    .map(|m| Descriptor::new(self, None, m))
+                    .map(|m| DescriptorExt::new(self, None, m))
                     .collect()
             })
             .iter()
     }
-    pub fn enums(&'a self) -> impl Iterator<Item = &'a EnumDescriptor<'a>> {
+    pub fn enums(&'a self) -> impl Iterator<Item = &'a EnumDescriptorExt<'a>> {
         self.cache
             .enums
             .get_or_init(|| {
                 self.base
                     .enum_type()
-                    .map(|e| EnumDescriptor::new(self, None, e))
+                    .map(|e| EnumDescriptorExt::new(self, None, e))
                     .collect()
             })
             .iter()
     }
     pub fn all_messages_or_enums(
         &'a self,
-    ) -> impl Iterator<Item = MessageOrEnum<&'a Descriptor<'a>, &'a EnumDescriptor<'a>>> {
+    ) -> impl Iterator<Item = MessageOrEnum<&'a DescriptorExt<'a>, &'a EnumDescriptorExt<'a>>> {
         self.all_messages()
             .map(MessageOrEnum::Message)
             .chain(self.all_enums().map(MessageOrEnum::Enum))
     }
-    pub fn all_messages(&'a self) -> impl Iterator<Item = &'a Descriptor<'a>> {
+    pub fn all_messages(&'a self) -> impl Iterator<Item = &'a DescriptorExt<'a>> {
         let direct_messages = self.messages();
         let indirect_messages = self
             .messages()
@@ -122,7 +122,7 @@ impl<'a> FileDescriptor<'a> {
             .collect::<Vec<_>>();
         Box::new(direct_messages.chain(indirect_messages)) as Box<dyn Iterator<Item = _>>
     }
-    pub fn all_enums(&'a self) -> impl Iterator<Item = &'a EnumDescriptor<'a>> {
+    pub fn all_enums(&'a self) -> impl Iterator<Item = &'a EnumDescriptorExt<'a>> {
         let direct_enums = self.enums();
         let indirect_enums = self
             .messages()

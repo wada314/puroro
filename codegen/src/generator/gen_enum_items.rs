@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use crate::cases::{convert_into_case, Case};
-use crate::descriptor::{EnumDescriptor, EnumValueDescriptor};
+use crate::descriptor::{EnumDescriptorExt, EnumValueDescriptor};
 use crate::proto_path::ProtoPath;
 use crate::Result;
 use ::proc_macro2::TokenStream;
@@ -32,7 +32,7 @@ struct EnumVariant {
 }
 
 impl GenEnumItems {
-    pub fn try_new<'a>(desc: &'a EnumDescriptor<'a>) -> Result<Self> {
+    pub fn try_new<'a>(desc: &'a EnumDescriptorExt<'a>) -> Result<Self> {
         Ok(Self {
             name: Self::rust_name_from_enum_name(desc.name())?,
             variants: desc

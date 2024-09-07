@@ -19,7 +19,7 @@ use ::syn::Item;
 
 use self::gen_generic_message_impls::GenGenericMessageImpls;
 use self::gen_message_trait::GenTrait;
-use crate::descriptor::Descriptor;
+use crate::descriptor::DescriptorExt;
 use crate::Result;
 
 pub struct GenMessageItems {
@@ -28,7 +28,7 @@ pub struct GenMessageItems {
 }
 
 impl GenMessageItems {
-    pub fn try_new<'a>(desc: &'a Descriptor<'a>) -> Result<Self> {
+    pub fn try_new<'a>(desc: &'a DescriptorExt<'a>) -> Result<Self> {
         Ok(Self {
             gen_trait: GenTrait::try_new(desc)?,
             gen_gm_impls: GenGenericMessageImpls::try_new(desc)?,

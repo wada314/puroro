@@ -21,8 +21,8 @@ use std::fmt::Debug;
 use super::*;
 
 #[derive(Debug)]
-pub struct FieldDescriptor<'a> {
-    message: &'a Descriptor<'a>,
+pub struct FieldDescriptorExt<'a> {
+    message: &'a DescriptorExt<'a>,
     base: &'a protobuf::FieldDescriptorProto,
     cache: FieldDescriptorCache<'a>,
 }
@@ -30,11 +30,11 @@ pub struct FieldDescriptor<'a> {
 #[derive(Default, Debug)]
 pub struct FieldDescriptorCache<'a> {
     full_name: OnceCell<ProtoPathBuf>,
-    r#type: OnceCell<FieldType<&'a Descriptor<'a>, &'a EnumDescriptor<'a>>>,
+    r#type: OnceCell<FieldType<&'a DescriptorExt<'a>, &'a EnumDescriptorExt<'a>>>,
 }
 
-impl<'a> FieldDescriptor<'a> {
-    pub fn new(base: &'a protobuf::FieldDescriptorProto, message: &'a Descriptor<'a>) -> Self {
+impl<'a> FieldDescriptorExt<'a> {
+    pub fn new(base: &'a protobuf::FieldDescriptorProto, message: &'a DescriptorExt<'a>) -> Self {
         Self {
             message,
             base,
@@ -74,7 +74,7 @@ impl<'a> FieldDescriptor<'a> {
             })
             .as_str()
     }
-    pub fn r#type(&self) -> Result<FieldType<&'a Descriptor<'a>, &'a EnumDescriptor<'a>>> {
+    pub fn r#type(&self) -> Result<FieldType<&'a DescriptorExt<'a>, &'a EnumDescriptorExt<'a>>> {
         self.cache
             .r#type
             .get_or_try_init(|| {
@@ -109,8 +109,8 @@ impl<'a> FieldDescriptor<'a> {
 }
 
 #[derive(Debug)]
-pub struct OneofDescriptor<'a> {
-    message: &'a Descriptor<'a>,
+pub struct OneofDescriptorExt<'a> {
+    message: &'a DescriptorExt<'a>,
     base: &'a protobuf::OneofDescriptorProto,
     #[allow(unused)]
     cache: OneofDescriptorCache,
@@ -122,8 +122,8 @@ pub struct OneofDescriptorCache {
     is_synthetic: OnceCell<bool>,
 }
 
-impl<'a> OneofDescriptor<'a> {
-    pub fn new(base: &'a protobuf::OneofDescriptorProto, message: &'a Descriptor<'a>) -> Self {
+impl<'a> OneofDescriptorExt<'a> {
+    pub fn new(base: &'a protobuf::OneofDescriptorProto, message: &'a DescriptorExt<'a>) -> Self {
         Self {
             message,
             base,

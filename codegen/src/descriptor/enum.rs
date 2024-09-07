@@ -21,9 +21,9 @@ use ::std::fmt::Debug;
 use super::*;
 
 #[derive(Debug)]
-pub struct EnumDescriptor<'a> {
-    file: &'a FileDescriptor<'a>,
-    maybe_containing: Option<&'a Descriptor<'a>>,
+pub struct EnumDescriptorExt<'a> {
+    file: &'a FileDescriptorExt<'a>,
+    maybe_containing: Option<&'a DescriptorExt<'a>>,
     base: &'a protobuf::EnumDescriptorProto,
     cache: EnumDescriptorCache<'a>,
 }
@@ -34,10 +34,10 @@ pub struct EnumDescriptorCache<'a> {
     values: OnceCell<Vec<EnumValueDescriptor<'a>>>,
 }
 
-impl<'a> EnumDescriptor<'a> {
+impl<'a> EnumDescriptorExt<'a> {
     pub fn new(
-        file: &'a FileDescriptor<'a>,
-        maybe_containing: Option<&'a Descriptor<'a>>,
+        file: &'a FileDescriptorExt<'a>,
+        maybe_containing: Option<&'a DescriptorExt<'a>>,
         base: &'a protobuf::EnumDescriptorProto,
     ) -> Self {
         Self {
@@ -62,7 +62,7 @@ impl<'a> EnumDescriptor<'a> {
             full_path
         })
     }
-    pub fn file(&self) -> Result<&FileDescriptor<'a>> {
+    pub fn file(&self) -> Result<&FileDescriptorExt<'a>> {
         Ok(self.file)
     }
     pub fn values(&'a self) -> Result<impl Iterator<Item = &'a EnumValueDescriptor<'a>>> {
@@ -81,7 +81,7 @@ impl<'a> EnumDescriptor<'a> {
 
 #[derive(Debug)]
 pub struct EnumValueDescriptor<'a> {
-    enum_: &'a EnumDescriptor<'a>,
+    enum_: &'a EnumDescriptorExt<'a>,
     base: &'a protobuf::EnumValueDescriptorProto,
     cache: EnumValueDescriptorCache,
 }
@@ -90,7 +90,7 @@ pub struct EnumValueDescriptorCache {
     full_name: OnceCell<ProtoPathBuf>,
 }
 impl<'a> EnumValueDescriptor<'a> {
-    fn new(enum_: &'a EnumDescriptor<'a>, base: &'a protobuf::EnumValueDescriptorProto) -> Self {
+    fn new(enum_: &'a EnumDescriptorExt<'a>, base: &'a protobuf::EnumValueDescriptorProto) -> Self {
         Self {
             enum_,
             base,

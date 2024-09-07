@@ -31,13 +31,13 @@ use ::std::fmt::Debug;
 
 #[derive(Debug)]
 pub struct RootContext<'a> {
-    files: Vec<(FileDescriptorBase, OnceCell<FileDescriptor<'a>>)>,
+    files: Vec<(FileDescriptorBase, OnceCell<FileDescriptorExt<'a>>)>,
     cache: RootContextCache<'a>,
 }
 
 #[derive(Default, Debug)]
 struct RootContextCache<'a> {
-    package_to_files: OnceCell<HashMap<ProtoPathBuf, Vec<&'a FileDescriptor<'a>>>>,
+    package_to_files: OnceCell<HashMap<ProtoPathBuf, Vec<&'a FileDescriptorExt<'a>>>>,
 }
 
 impl From<FileDescriptorBase> for RootContext<'_> {
@@ -60,12 +60,12 @@ impl<T: IntoIterator<Item = FileDescriptorBase>> From<T> for RootContext<'_> {
     }
 }
 impl<'a> RootContext<'a> {
-    pub fn files(&'a self) -> impl Iterator<Item = &'a FileDescriptor<'a>> {
+    pub fn files(&'a self) -> impl Iterator<Item = &'a FileDescriptorExt<'a>> {
         self.files
             .iter()
-            .map(|(f, c)| c.get_or_init(|| FileDescriptor::new(self, f)))
+            .map(|(f, c)| c.get_or_init(|| FileDescriptorExt::new(self, f)))
     }
-    pub fn file_from_name(&'a self, name: &str) -> Result<&'a FileDescriptor<'a>> {
+    pub fn file_from_name(&'a self, name: &str) -> Result<&'a FileDescriptorExt<'a>> {
         Ok(self
             .files()
             .into_iter()
@@ -75,7 +75,7 @@ impl<'a> RootContext<'a> {
     pub fn package_to_files(
         &'a self,
         package: impl AsRef<ProtoPath>,
-    ) -> Result<impl Iterator<Item = &'a FileDescriptor<'a>>> {
+    ) -> Result<impl Iterator<Item = &'a FileDescriptorExt<'a>>> {
         let package = if package.as_ref().is_relative() {
             // This method is a root method, so the relative path should be converted
             // to the absolute path by just adding '.' at the beginning.
@@ -104,7 +104,7 @@ impl<'a> RootContext<'a> {
     pub fn resolve_path(
         &'a self,
         path: impl AsRef<ProtoPath>,
-    ) -> Result<MessageOrEnum<&'a Descriptor<'a>, &'a EnumDescriptor<'a>>> {
+    ) -> Result<MessageOrEnum<&'a DescriptorExt<'a>, &'a EnumDescriptorExt<'a>>> {
         let path = path.as_ref();
         let path = if path.is_relative() {
             ProtoPathBuf::from(format!(".{}", path))
@@ -119,7 +119,7 @@ impl<'a> RootContext<'a> {
         &'a self,
         path: impl AsRef<ProtoPath>,
         cur: impl AsRef<ProtoPath>,
-    ) -> Result<MessageOrEnum<&'a Descriptor<'a>, &'a EnumDescriptor<'a>>> {
+    ) -> Result<MessageOrEnum<&'a DescriptorExt<'a>, &'a EnumDescriptorExt<'a>>> {
         let path = path.as_ref();
         let cur = cur.as_ref();
         if path.is_absolute() {
@@ -145,7 +145,7 @@ impl<'a> RootContext<'a> {
     fn resolve_absolute_path(
         &'a self,
         path: &ProtoPath,
-    ) -> Result<Option<MessageOrEnum<&'a Descriptor<'a>, &'a EnumDescriptor<'a>>>> {
+    ) -> Result<Option<MessageOrEnum<&'a DescriptorExt<'a>, &'a EnumDescriptorExt<'a>>>> {
         debug_assert!(path.is_absolute());
         // Can improve the complexity here. Maybe later.
         for package_path in path.ancestors() {
@@ -166,7 +166,7 @@ pub enum MessageOrEnum<M, E> {
     Message(M),
     Enum(E),
 }
-impl<'a> MessageOrEnum<&'a Descriptor<'a>, &'a EnumDescriptor<'a>> {
+impl<'a> MessageOrEnum<&'a DescriptorExt<'a>, &'a EnumDescriptorExt<'a>> {
     pub fn full_path(&self) -> Result<&ProtoPath> {
         match self {
             MessageOrEnum::Message(m) => m.full_path(),
@@ -194,8 +194,8 @@ pub enum FilesOrMessage<F, M> {
     Files(Vec<F>),
     Message(M),
 }
-impl<'a> FilesOrMessage<&'a FileDescriptor<'a>, &'a Descriptor<'a>> {
-    pub fn messages(&'a self) -> impl Iterator<Item = &'a Descriptor<'a>> {
+impl<'a> FilesOrMessage<&'a FileDescriptorExt<'a>, &'a DescriptorExt<'a>> {
+    pub fn messages(&'a self) -> impl Iterator<Item = &'a DescriptorExt<'a>> {
         match self {
             FilesOrMessage::Files(files) => {
                 Box::new(files.iter().flat_map(|f| f.messages())) as Box<dyn Iterator<Item = _>>
