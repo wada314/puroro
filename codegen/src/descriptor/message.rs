@@ -62,7 +62,7 @@ impl<'a> DescriptorExt<'a> {
         debug_assert!(self.base.name().is_some() && !self.base.name().unwrap().is_empty());
         self.base.name().unwrap_or_default()
     }
-    pub fn full_path(&'a self) -> &ProtoPath {
+    pub fn full_path(&self) -> &ProtoPath {
         self.cache.full_path.get_or_init(|| {
             let mut full_path = if let Some(nested) = self.maybe_containing {
                 nested.full_path().to_owned()
@@ -74,7 +74,7 @@ impl<'a> DescriptorExt<'a> {
             full_path
         })
     }
-    pub fn all_fields(&'a self) -> impl Iterator<Item = &FieldDescriptorExt> {
+    pub fn all_fields(&'a self) -> impl Iterator<Item = &'a FieldDescriptorExt<'a>> {
         self.cache
             .all_fields
             .get_or_init(|| {
@@ -85,7 +85,7 @@ impl<'a> DescriptorExt<'a> {
             })
             .iter()
     }
-    pub fn all_oneofs(&'a self) -> impl Iterator<Item = &OneofDescriptorExt> {
+    pub fn all_oneofs(&'a self) -> impl Iterator<Item = &'a OneofDescriptorExt<'a>> {
         self.cache
             .all_oneofs
             .get_or_init(|| {
@@ -99,30 +99,30 @@ impl<'a> DescriptorExt<'a> {
     pub fn filtered_fields(
         &'a self,
         f: impl 'a + Fn(&FieldDescriptorExt) -> bool,
-    ) -> Result<impl Iterator<Item = &FieldDescriptorExt>> {
+    ) -> Result<impl Iterator<Item = &'a FieldDescriptorExt<'a>>> {
         Ok(self.all_fields().filter(move |field| f(*field)))
     }
-    pub fn non_oneof_fields(&'a self) -> Result<impl Iterator<Item = &FieldDescriptorExt>> {
+    pub fn non_oneof_fields(&'a self) -> Result<impl Iterator<Item = &'a FieldDescriptorExt<'a>>> {
         Ok(self
             .all_fields()
             .filter(|f| f.oneof_index().is_none() || f.is_proto3_optional()))
     }
-    pub fn real_oneof_fields(&'a self) -> Result<impl Iterator<Item = &FieldDescriptorExt>> {
+    pub fn real_oneof_fields(&'a self) -> Result<impl Iterator<Item = &'a FieldDescriptorExt<'a>>> {
         Ok(self
             .all_fields()
             .filter(|f| f.oneof_index().is_some() && !f.is_proto3_optional()))
     }
-    pub fn real_oneofs(&'a self) -> Result<impl Iterator<Item = &OneofDescriptorExt>> {
+    pub fn real_oneofs(&'a self) -> Result<impl Iterator<Item = &'a OneofDescriptorExt<'a>>> {
         Ok(self
             .all_oneofs()
             .filter(|o| o.is_synthetic().is_ok_and(|b| !b)))
     }
-    pub fn synthetic_oneofs(&'a self) -> Result<impl Iterator<Item = &'a OneofDescriptorExt>> {
+    pub fn synthetic_oneofs(&'a self) -> Result<impl Iterator<Item = &'a OneofDescriptorExt<'a>>> {
         Ok(self
             .all_oneofs()
             .filter(|o| o.is_synthetic().is_ok_and(|b| b)))
     }
-    pub fn nested_types(&'a self) -> impl Iterator<Item = &DescriptorExt> {
+    pub fn nested_types(&'a self) -> impl Iterator<Item = &'a DescriptorExt<'a>> {
         self.cache
             .nested_types
             .get_or_init(|| {
@@ -133,7 +133,7 @@ impl<'a> DescriptorExt<'a> {
             })
             .iter()
     }
-    pub fn enum_types(&'a self) -> impl Iterator<Item = &EnumDescriptorExt> {
+    pub fn enum_types(&'a self) -> impl Iterator<Item = &'a EnumDescriptorExt<'a>> {
         self.cache
             .enum_types
             .get_or_init(|| {
@@ -146,12 +146,12 @@ impl<'a> DescriptorExt<'a> {
     }
     pub fn all_descendant_messages_or_enums(
         &'a self,
-    ) -> impl Iterator<Item = MessageOrEnum<&DescriptorExt, &EnumDescriptorExt>> {
+    ) -> impl Iterator<Item = MessageOrEnum<&'a DescriptorExt<'a>, &'a EnumDescriptorExt<'a>>> {
         self.all_descendant_messages()
             .map(MessageOrEnum::Message)
             .chain(self.all_descendant_enums().map(MessageOrEnum::Enum))
     }
-    pub fn all_descendant_messages(&'a self) -> impl Iterator<Item = &DescriptorExt> {
+    pub fn all_descendant_messages(&'a self) -> impl Iterator<Item = &'a DescriptorExt<'a>> {
         let direct_messages = self.nested_types();
         let indirect_messages_vec = self
             .nested_types()
@@ -162,7 +162,7 @@ impl<'a> DescriptorExt<'a> {
             .flat_map(|v| v.into_iter());
         Box::new(direct_messages.chain(indirect_messages)) as Box<dyn Iterator<Item = _>>
     }
-    pub fn all_descendant_enums(&'a self) -> impl Iterator<Item = &EnumDescriptorExt> {
+    pub fn all_descendant_enums(&'a self) -> impl Iterator<Item = &'a EnumDescriptorExt<'a>> {
         let direct_enums = self.enum_types();
         let indirect_enums_vec = self
             .nested_types()

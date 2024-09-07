@@ -201,25 +201,6 @@ impl<'a> FilesOrMessage<&'a FileDescriptorExt<'a>, &'a DescriptorExt<'a>> {
     }
 }
 
-trait TryIntoString {
-    fn try_into_string(self, error_message: &str) -> Result<String>;
-}
-impl TryIntoString for Option<&str> {
-    fn try_into_string(self, error_message: &str) -> Result<String> {
-        Ok(self
-            .ok_or_else(|| error_message.to_string())
-            .map(str::to_string)?)
-    }
-}
-trait TryIntoNumber<T> {
-    fn try_into_number(self, error_message: &str) -> Result<T>;
-}
-impl<T> TryIntoNumber<T> for Option<T> {
-    fn try_into_number(self, error_message: &str) -> Result<T> {
-        Ok(self.ok_or_else(|| error_message.to_string())?)
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
