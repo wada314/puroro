@@ -29,7 +29,7 @@ pub struct GenTrait {
 impl GenTrait {
     pub fn try_new<'a>(desc: &'a DescriptorExt<'a>) -> Result<Self> {
         Ok(Self {
-            rust_name: Self::rust_name_from_message_name(desc.name()?)?,
+            rust_name: Self::rust_name_from_message_name(desc.name())?,
             fields: desc
                 .non_oneof_fields()?
                 .into_iter()
@@ -167,14 +167,14 @@ impl FieldWrapper {
         Ok(match desc.label() {
             Some(FieldLabel::Repeated) => FieldWrapper::Vec,
             Some(FieldLabel::Optional | FieldLabel::Required) => {
-                if desc.type_case() == FieldTypeCase::Message {
+                if desc.type_case() == Some(FieldTypeCase::Message) {
                     FieldWrapper::OptionalBoxed
                 } else {
                     FieldWrapper::Optional
                 }
             }
             None => {
-                if desc.type_case() == FieldTypeCase::Message {
+                if desc.type_case() == Some(FieldTypeCase::Message) {
                     FieldWrapper::OptionalBoxed
                 } else if desc.is_proto3_optional() {
                     FieldWrapper::Optional

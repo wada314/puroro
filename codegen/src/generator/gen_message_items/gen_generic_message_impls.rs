@@ -30,7 +30,7 @@ pub struct GenGenericMessageImpls {
 impl GenGenericMessageImpls {
     pub fn try_new<'a>(desc: &'a DescriptorExt<'a>) -> Result<Self> {
         Ok(Self {
-            rust_trait_name: GenTrait::rust_name_from_message_name(desc.name()?)?,
+            rust_trait_name: GenTrait::rust_name_from_message_name(desc.name())?,
             fields: desc
                 .non_oneof_fields()?
                 .into_iter()

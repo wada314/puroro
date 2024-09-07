@@ -97,8 +97,9 @@ impl<'a> EnumValueDescriptor<'a> {
             cache: Default::default(),
         }
     }
-    pub fn name(&self) -> Option<&str> {
-        self.base.name()
+    pub fn name(&self) -> &str {
+        debug_assert!(self.base.name().is_some() && !self.base.name().unwrap().is_empty());
+        self.base.name().unwrap_or_default()
     }
     pub fn full_name(&self) -> &ProtoPath {
         self.cache.full_name.get_or_init(|| {
@@ -115,7 +116,7 @@ impl<'a> EnumValueDescriptor<'a> {
             full_name
         })
     }
-    pub fn number(&self) -> Option<i32> {
-        self.base.number()
+    pub fn number(&self) -> i32 {
+        self.base.number().unwrap_or_default()
     }
 }
