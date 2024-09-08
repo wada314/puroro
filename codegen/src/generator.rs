@@ -68,7 +68,7 @@ pub fn compile(request: &CodeGeneratorRequest) -> Result<CodeGeneratorResponse> 
             "mod.rs".to_string()
         };
         let file = out_files.file_mut(file_path);
-        file.add_source(e.file()?.name());
+        file.add_source(e.file().name());
 
         let enum_ = gen_enum_items::GenEnumItems::try_new(e)?.rust_items()?;
         file.append(quote! { #(#enum_)* });

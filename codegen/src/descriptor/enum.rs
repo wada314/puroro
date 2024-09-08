@@ -13,7 +13,6 @@
 // limitations under the License.
 
 use crate::proto_path::{ProtoPath, ProtoPathBuf};
-use crate::Result;
 use ::puroro::google::protobuf;
 use ::std::cell::OnceCell;
 use ::std::fmt::Debug;
@@ -62,12 +61,11 @@ impl<'a> EnumDescriptorExt<'a> {
             full_path
         })
     }
-    pub fn file(&self) -> Result<&FileDescriptorExt<'a>> {
-        Ok(self.file)
+    pub fn file(&self) -> &FileDescriptorExt<'a> {
+        self.file
     }
-    pub fn values(&'a self) -> Result<impl Iterator<Item = &'a EnumValueDescriptor<'a>>> {
-        Ok(self
-            .cache
+    pub fn values(&'a self) -> impl Iterator<Item = &'a EnumValueDescriptor<'a>> {
+        self.cache
             .values
             .get_or_init(|| {
                 self.base
@@ -75,7 +73,7 @@ impl<'a> EnumDescriptorExt<'a> {
                     .map(|v| EnumValueDescriptor::new(self, v))
                     .collect()
             })
-            .iter())
+            .iter()
     }
 }
 

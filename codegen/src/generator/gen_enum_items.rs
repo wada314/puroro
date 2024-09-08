@@ -36,7 +36,7 @@ impl GenEnumItems {
         Ok(Self {
             name: Self::rust_name_from_enum_name(desc.name())?,
             variants: desc
-                .values()?
+                .values()
                 .enumerate()
                 .map(|(i, e)| EnumVariant::try_new(e, i == 0))
                 .collect::<Result<Vec<_>>>()?,
