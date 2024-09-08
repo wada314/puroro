@@ -71,32 +71,47 @@ impl Field {
     fn gen_getter(&self) -> Result<Item> {
         let signature = self.trait_field.gen_getter_signature()?;
         let number = self.number;
-        let body = self.gen_getter_body(&parse_str("f")?)?;
+        let body = self.gen_getter_body(&parse_str("f_opt")?)?;
         Ok(parse2(quote! {
             #signature {
-                let f = self.field(#number);
+                let f_opt = self.field(#number);
                 #body
             }
         })?)
     }
 
-    fn gen_getter_body(&self, field_expr: &Expr) -> Result<Expr> {
+    fn gen_getter_body(&self, field_opt_expr: &Expr) -> Result<Expr> {
         let wire_type: WireType<_, _, _, _> = self.trait_field.scalar_type().into();
+        let field_expr: Expr = parse_str("f")?;
         Ok(match self.trait_field.wrapper() {
-            FieldWrapper::Vec => match wire_type {
-                WireType::Variant(t) => self.gen_repeated_variant_getter_body(field_expr, t)?,
-                WireType::I32(t) => self.gen_repeated_i32_getter_body(field_expr, t)?,
-                WireType::I64(t) => self.gen_repeated_i64_getter_body(field_expr, t)?,
-                WireType::Len(t) => self.gen_repeated_len_getter_body(field_expr, t)?,
-                _ => todo!(), // Start / end group
-            },
-            _ => match wire_type {
-                WireType::Variant(t) => self.gen_non_repeated_varint_getter_body(field_expr, t)?,
-                WireType::I32(t) => self.gen_non_repeated_i32_getter_body(field_expr, t)?,
-                WireType::I64(t) => self.gen_non_repeated_i64_getter_body(field_expr, t)?,
-                WireType::Len(t) => self.gen_non_repeated_len_getter_body(field_expr, t)?,
-                _ => todo!(), // Start / end group
-            },
+            FieldWrapper::Vec => {
+                let body = match wire_type {
+                    WireType::Variant(t) => {
+                        self.gen_repeated_variant_getter_body(&field_expr, t)?
+                    }
+                    WireType::I32(t) => self.gen_repeated_i32_getter_body(&field_expr, t)?,
+                    WireType::I64(t) => self.gen_repeated_i64_getter_body(&field_expr, t)?,
+                    WireType::Len(t) => self.gen_repeated_len_getter_body(&field_expr, t)?,
+                    _ => todo!(), // Start / end group
+                };
+                parse2(quote! {
+                    (#field_opt_expr).into_iter().flat_map(|f| #body)
+                })?
+            }
+            _ => {
+                let body = match wire_type {
+                    WireType::Variant(t) => {
+                        self.gen_non_repeated_varint_getter_body(&field_expr, t)?
+                    }
+                    WireType::I32(t) => self.gen_non_repeated_i32_getter_body(&field_expr, t)?,
+                    WireType::I64(t) => self.gen_non_repeated_i64_getter_body(&field_expr, t)?,
+                    WireType::Len(t) => self.gen_non_repeated_len_getter_body(&field_expr, t)?,
+                    _ => todo!(), // Start / end group
+                };
+                parse2(quote! {
+                    (#field_opt_expr).map(|f| #body).unwrap_or_default()
+                })?
+            }
         })
     }
 
