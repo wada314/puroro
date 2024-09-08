@@ -205,12 +205,71 @@ impl<'a> FilesOrMessage<&'a FileDescriptorExt<'a>, &'a DescriptorExt<'a>> {
 mod tests {
     use super::*;
 
+    #[derive(Default)]
+    struct DebugFileDescriptor {
+        name: &'static str,
+        package: Option<&'static str>,
+        message_types: Vec<DebugDescriptor>,
+        enum_types: Vec<DebugEnumDescriptor>,
+    }
+    #[derive(Default)]
+    struct DebugDescriptor {
+        name: &'static str,
+        nested_types: Vec<DebugDescriptor>,
+        enum_types: Vec<DebugEnumDescriptor>,
+    }
+    #[derive(Default)]
+    struct DebugEnumDescriptor {
+        name: &'static str,
+    }
+
+    impl From<DebugEnumDescriptor> for protobuf::EnumDescriptorProto {
+        fn from(d: DebugEnumDescriptor) -> Self {
+            let mut e = protobuf::EnumDescriptorProto::default();
+            e.field_mut(1).push_string(d.name);
+            e
+        }
+    }
+    impl From<DebugDescriptor> for protobuf::DescriptorProto {
+        fn from(d: DebugDescriptor) -> Self {
+            let mut m = protobuf::DescriptorProto::default();
+            m.field_mut(1).push_string(d.name);
+            for n in d.nested_types {
+                m.field_mut(3)
+                    .push_message(Into::<protobuf::DescriptorProto>::into(n).into());
+            }
+            for e in d.enum_types {
+                m.field_mut(4)
+                    .push_message(Into::<protobuf::EnumDescriptorProto>::into(e).into());
+            }
+            m
+        }
+    }
+    impl From<DebugFileDescriptor> for protobuf::FileDescriptorProto {
+        fn from(d: DebugFileDescriptor) -> Self {
+            let mut fd = protobuf::FileDescriptorProto::default();
+            fd.field_mut(1).push_string(d.name);
+            if let Some(p) = d.package {
+                fd.field_mut(2).push_string(p);
+            }
+            for m in d.message_types {
+                fd.field_mut(4)
+                    .push_message(Into::<protobuf::DescriptorProto>::into(m).into());
+            }
+            for e in d.enum_types {
+                fd.field_mut(5)
+                    .push_message(Into::<protobuf::EnumDescriptorProto>::into(e).into());
+            }
+            fd
+        }
+    }
+
     #[test]
     fn test_resolve_path() {
-        fn make_fd(name: &str, package: &str) -> protobuf::FileDescriptorProto {
-            type FD<'a> = DebugFileDescriptor<'a>;
-            type MD<'a> = DebugDescriptor<'a>;
-            type ED<'a> = DebugEnumDescriptor<'a>;
+        fn make_fd(name: &'static str, package: &'static str) -> protobuf::FileDescriptorProto {
+            type FD = DebugFileDescriptor;
+            type MD = DebugDescriptor;
+            type ED = DebugEnumDescriptor;
             FD {
                 name,
                 package: Some(package),
@@ -231,22 +290,14 @@ mod tests {
                                 ..Default::default()
                             },
                         ],
-                        enum_types: vec![ED {
-                            name: "F",
-                            ..Default::default()
-                        }],
-                        ..Default::default()
+                        enum_types: vec![ED { name: "F" }],
                     },
                     MD {
                         name: "A2",
                         ..Default::default()
                     },
                 ],
-                enum_types: vec![ED {
-                    name: "E",
-                    ..Default::default()
-                }],
-                ..Default::default()
+                enum_types: vec![ED { name: "E" }],
             }
             .into()
         }
@@ -263,7 +314,7 @@ mod tests {
             let MessageOrEnum::Message(m) = result else {
                 panic!("Expected a message: {}", path);
             };
-            assert_eq!(m.name().unwrap(), name);
+            assert_eq!(m.name(), name);
         };
         let assert_is_enum = |path: &str, name: &str| {
             let result = root.resolve_path(path).unwrap();
