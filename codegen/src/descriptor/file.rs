@@ -135,16 +135,15 @@ impl<'a> FileDescriptorExt<'a> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use protobuf::FileDescriptorProto;
 
     #[test]
     fn test_package_to_files() {
-        fn make_fd(name: &str, package: &str) -> FileDescriptorBase {
-            DebugFileDescriptor {
-                name,
-                package: Some(package.into()),
-                ..Default::default()
-            }
-            .into()
+        fn make_fd(name: &str, package: &str) -> FileDescriptorProto {
+            let mut fd = FileDescriptorProto::default();
+            fd.field_mut(1).push_string(name);
+            fd.field_mut(2).push_string(package);
+            fd
         }
         let fd0 = make_fd("fd0.proto", "");
         let fd1 = make_fd("fd1.proto", "a");
@@ -153,7 +152,7 @@ mod tests {
         let fd4 = make_fd("fd4.proto", "a.b.c");
         let root = RootContext::from(vec![fd0, fd1, fd2, fd3, fd4]);
 
-        let root_package_files = root.package_to_files("").unwrap().into_iter().collect_vec();
+        let root_package_files = root.package_to_files("").unwrap().collect::<Vec<_>>();
         let package_a_files = root
             .package_to_files("a")
             .unwrap()
