@@ -135,7 +135,10 @@ impl Field {
             FieldWrapper::Vec => self
                 .scalar_type
                 .gen_repeated_getter_type(lifetime.as_ref())?,
-            _ => self.scalar_type.gen_scalar_getter_type(lifetime.as_ref())?,
+            FieldWrapper::Optional | FieldWrapper::OptionalBoxed => self
+                .scalar_type
+                .gen_optional_getter_type(lifetime.as_ref())?,
+            FieldWrapper::Bare => self.scalar_type.gen_bare_getter_type(lifetime.as_ref())?,
         };
         Ok(parse2(quote! {
             fn #getter_name(&self) -> #getter_type
@@ -219,14 +222,11 @@ impl FieldType<ProtoPathBuf, ProtoPathBuf> {
             FieldType::Group => Err(format!("Group field is not supported"))?,
         })
     }
-    fn gen_scalar_getter_type(&self, lifetime: Option<&Lifetime>) -> Result<Type> {
+    fn gen_optional_getter_type(&self, lifetime: Option<&Lifetime>) -> Result<Type> {
         let bare_type = self.gen_bare_getter_type(lifetime)?;
-        Ok(match self {
-            FieldType::Message(_) => parse2(quote! {
-                ::std::option::Option::< #bare_type >
-            })?,
-            _ => bare_type,
-        })
+        Ok(parse2(quote! {
+            ::std::option::Option::< #bare_type >
+        })?)
     }
     fn gen_repeated_getter_type(&self, lifetime: Option<&Lifetime>) -> Result<Type> {
         let bare_type = self.gen_bare_getter_type(lifetime)?;

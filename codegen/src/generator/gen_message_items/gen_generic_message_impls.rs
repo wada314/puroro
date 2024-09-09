@@ -98,7 +98,7 @@ impl Field {
                     (#field_opt_expr).into_iter().flat_map(|f| #body)
                 })?
             }
-            _ => {
+            FieldWrapper::Bare | FieldWrapper::Optional | FieldWrapper::OptionalBoxed => {
                 let body = match wire_type {
                     WireType::Variant(t) => {
                         self.gen_non_repeated_varint_getter_body(&field_expr, t)?
@@ -108,8 +108,12 @@ impl Field {
                     WireType::Len(t) => self.gen_non_repeated_len_getter_body(&field_expr, t)?,
                     _ => todo!(), // Start / end group
                 };
+                let maybe_unwrap = match self.trait_field.wrapper() {
+                    FieldWrapper::Bare => quote! { .unwrap_or_default() },
+                    _ => quote! {},
+                };
                 parse2(quote! {
-                    (#field_opt_expr).map(|f| #body).unwrap_or_default()
+                    (#field_opt_expr).map(|f| #body) #maybe_unwrap
                 })?
             }
         })
