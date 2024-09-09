@@ -36,6 +36,8 @@ pub struct FileDescriptorCache<'a> {
     enums: OnceCell<Vec<EnumDescriptorExt<'a>>>,
     package: OnceCell<Option<ProtoPathBuf>>,
     absolute_package: OnceCell<ProtoPathBuf>,
+
+    field_presence: OnceCell<Option<FieldPresence>>,
 }
 
 impl<'a> FileDescriptorExt<'a> {
@@ -129,6 +131,21 @@ impl<'a> FileDescriptorExt<'a> {
             .flat_map(|child| child.all_descendant_enums())
             .collect::<Vec<_>>();
         Box::new(direct_enums.chain(indirect_enums)) as Box<dyn Iterator<Item = _>>
+    }
+    pub fn field_presence(&'a self) -> Option<FieldPresence> {
+        // TODO: Need to check the file's "option = " setting
+        self.cache
+            .field_presence
+            .get_or_init(|| {
+                use protobuf::Edition;
+                match self.base.edition() {
+                    Edition::EditionProto2 => Some(FieldPresence::Explicit),
+                    Edition::EditionProto3 => Some(FieldPresence::Implicit),
+                    Edition::Edition2023 => Some(FieldPresence::Explicit),
+                    _ => None,
+                }
+            })
+            .clone()
     }
 }
 

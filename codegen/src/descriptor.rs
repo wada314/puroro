@@ -21,10 +21,12 @@
 //! - Renaming some fields. Especially, the repeated fields are renamed to plural.
 
 mod r#enum;
+mod features;
 mod field;
 mod file;
 mod message;
 mod subtypes;
+pub use features::*;
 pub use field::*;
 pub use file::*;
 pub use message::*;

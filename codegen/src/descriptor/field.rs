@@ -31,6 +31,7 @@ pub struct FieldDescriptorExt<'a> {
 pub struct FieldDescriptorCache<'a> {
     full_name: OnceCell<ProtoPathBuf>,
     r#type: OnceCell<FieldType<&'a DescriptorExt<'a>, &'a EnumDescriptorExt<'a>>>,
+    file: OnceCell<&'a FileDescriptorExt<'a>>,
 }
 
 impl<'a> FieldDescriptorExt<'a> {
@@ -105,6 +106,28 @@ impl<'a> FieldDescriptorExt<'a> {
             |m| Ok(m.full_path().to_owned()),
             |e| Ok(e.full_path().to_owned()),
         )?)
+    }
+    pub fn message(&'a self) -> &'a DescriptorExt<'a> {
+        self.message
+    }
+    pub fn file(&'a self) -> &'a FileDescriptorExt<'a> {
+        self.cache.file.get_or_init(|| self.message.file())
+    }
+    pub fn field_presence(&'a self) -> Option<FieldPresence> {
+        todo!()
+    }
+    pub fn has_presence(&'a self) -> bool {
+        if self.label() == Some(FieldLabel::Repeated) {
+            false
+        } else if self.oneof_index().is_some() {
+            true
+        } else if self.type_case() == Some(FieldTypeCase::Message) {
+            true
+        } else if self.field_presence() == Some(FieldPresence::Implicit) {
+            false
+        } else {
+            true
+        }
     }
 }
 
