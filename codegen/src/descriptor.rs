@@ -12,6 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+//! A wrapped descriptor protos. Compared to the original descriptor protos,
+//! this module provides:
+//!
+//! - A non-tree data link traversing: Specifically, the field's type can be
+//!   resolved to the message or enum type.
+//! - Some field's `Option<T>` will be unwrapped if it's a trivial information.
+//! - Renaming some fields. Especially, the repeated fields are renamed to plural.
+
 mod r#enum;
 mod field;
 mod file;
