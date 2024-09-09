@@ -50,7 +50,7 @@ impl<'a> FieldDescriptorExt<'a> {
         self.base.number().unwrap_or_default()
     }
     pub fn type_case(&self) -> Option<FieldTypeCase> {
-        self.base.type_().map(Into::into)
+        self.base.r#type().map(Into::into)
     }
     pub fn type_name(&self) -> Option<&str> {
         self.base.type_name()

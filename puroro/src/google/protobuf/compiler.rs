@@ -28,39 +28,52 @@ use ::ref_cast::RefCast;
 #[derive(Deref, DerefMut, From, Into, Default, Debug, RefCast, Clone)]
 #[repr(transparent)]
 pub struct Version<A: Allocator = Global>(GenericMessage<A>);
+impl<A: Allocator> Version<A> {
+    pub const MAJOR_FIELD_NUMBER: i32 = 1;
+    pub const MINOR_FIELD_NUMBER: i32 = 2;
+    pub const PATCH_FIELD_NUMBER: i32 = 3;
+    pub const SUFFIX_FIELD_NUMBER: i32 = 4;
+}
 impl<A: Allocator + Clone> Version<A> {
     pub fn major(&self) -> Option<i32> {
-        self.as_scalar_int32(1)
+        self.as_scalar_int32(Self::MAJOR_FIELD_NUMBER)
     }
     pub fn minor(&self) -> Option<i32> {
-        self.as_scalar_int32(2)
+        self.as_scalar_int32(Self::MINOR_FIELD_NUMBER)
     }
     pub fn patch(&self) -> Option<i32> {
-        self.as_scalar_int32(3)
+        self.as_scalar_int32(Self::PATCH_FIELD_NUMBER)
     }
     pub fn suffix(&self) -> Option<&str> {
-        self.as_scalar_string(4)
+        self.as_scalar_string(Self::SUFFIX_FIELD_NUMBER)
     }
 }
 
 #[derive(Deref, DerefMut, From, Into, Default, Debug, RefCast, Clone)]
 #[repr(transparent)]
 pub struct CodeGeneratorRequest<A: Allocator = Global>(GenericMessage<A>);
+impl<A: Allocator> CodeGeneratorRequest<A> {
+    pub const FILE_TO_GENERATE_FIELD_NUMBER: i32 = 1;
+    pub const PARAMETER_FIELD_NUMBER: i32 = 2;
+    pub const PROTO_FILE_FIELD_NUMBER: i32 = 15;
+    pub const SOURCE_FILE_DESCRIPTORS_FIELD_NUMBER: i32 = 17;
+    pub const COMPILER_VERSION_FIELD_NUMBER: i32 = 3;
+}
 impl<A: Allocator + Clone> CodeGeneratorRequest<A> {
-    pub fn file_to_generate(&self) -> impl IntoIterator<Item = &str> {
-        self.as_repeated_string(1)
+    pub fn file_to_generate(&self) -> impl '_ + Iterator<Item = &str> {
+        self.as_repeated_string(Self::FILE_TO_GENERATE_FIELD_NUMBER)
     }
     pub fn parameter(&self) -> Option<&str> {
-        self.as_scalar_string(2)
+        self.as_scalar_string(Self::PARAMETER_FIELD_NUMBER)
     }
-    pub fn proto_file(&self) -> impl Iterator<Item = &FileDescriptorProto<A>> {
-        self.as_repeated_message(15)
+    pub fn proto_file(&self) -> impl '_ + Iterator<Item = &FileDescriptorProto<A>> {
+        self.as_repeated_message(Self::PROTO_FILE_FIELD_NUMBER)
     }
-    pub fn source_file_descriptors(&self) -> impl Iterator<Item = &FileDescriptorProto<A>> {
-        self.as_repeated_message(17)
+    pub fn source_file_descriptors(&self) -> impl '_ + Iterator<Item = &FileDescriptorProto<A>> {
+        self.as_repeated_message(Self::SOURCE_FILE_DESCRIPTORS_FIELD_NUMBER)
     }
     pub fn compiler_version(&self) -> Option<&Version<A>> {
-        self.as_scalar_message(3)
+        self.as_scalar_message(Self::COMPILER_VERSION_FIELD_NUMBER)
     }
 }
 
@@ -98,27 +111,36 @@ pub mod code_generator_response {
     #[derive(Deref, DerefMut, From, Into, Default, Debug, RefCast, Clone)]
     #[repr(transparent)]
     pub struct File<A: Allocator = Global>(GenericMessage<A>);
+    impl<A: Allocator> File<A> {
+        pub const NAME_FIELD_NUMBER: i32 = 1;
+        pub const INSERTION_POINT_FIELD_NUMBER: i32 = 2;
+        pub const CONTENT_FIELD_NUMBER: i32 = 15;
+    }
     impl<A: Allocator + Clone> File<A> {
         pub fn name(&self) -> Option<&str> {
-            self.as_scalar_string(1)
+            self.as_scalar_string(Self::NAME_FIELD_NUMBER)
         }
         pub fn insertion_point(&self) -> Option<&str> {
-            self.as_scalar_string(2)
+            self.as_scalar_string(Self::INSERTION_POINT_FIELD_NUMBER)
         }
         pub fn content(&self) -> Option<&str> {
-            self.as_scalar_string(15)
+            self.as_scalar_string(Self::CONTENT_FIELD_NUMBER)
         }
 
         pub fn set_name(&mut self, name: &str) -> Result<()> {
-            self.0.field_mut(1).push_string(name);
+            self.0.field_mut(Self::NAME_FIELD_NUMBER).push_string(name);
             Ok(())
         }
         pub fn set_insertion_point(&mut self, insertion_point: &str) -> Result<()> {
-            self.0.field_mut(2).push_string(insertion_point);
+            self.0
+                .field_mut(Self::INSERTION_POINT_FIELD_NUMBER)
+                .push_string(insertion_point);
             Ok(())
         }
         pub fn set_content(&mut self, content: &str) -> Result<()> {
-            self.0.field_mut(15).push_string(content);
+            self.0
+                .field_mut(Self::CONTENT_FIELD_NUMBER)
+                .push_string(content);
             Ok(())
         }
     }
@@ -142,44 +164,61 @@ pub mod code_generator_response {
 #[derive(Deref, DerefMut, From, Into, Default, Debug, RefCast, Clone)]
 #[repr(transparent)]
 pub struct CodeGeneratorResponse<A: Allocator = Global>(GenericMessage<A>);
+impl<A: Allocator> CodeGeneratorResponse<A> {
+    pub const ERROR_FIELD_NUMBER: i32 = 1;
+    pub const SUPPORTED_FEATURES_FIELD_NUMBER: i32 = 2;
+    pub const MINIMUM_EDITION_FIELD_NUMBER: i32 = 3;
+    pub const MAXIMUM_EDITION_FIELD_NUMBER: i32 = 4;
+    pub const FILE_FIELD_NUMBER: i32 = 15;
+}
 impl<A: Allocator + Clone> CodeGeneratorResponse<A> {
     pub fn error(&self) -> Option<&str> {
-        self.as_scalar_string(1)
+        self.as_scalar_string(Self::ERROR_FIELD_NUMBER)
     }
     pub fn supported_features(&self) -> u64 {
         self.0
-            .field(2)
+            .field(Self::SUPPORTED_FEATURES_FIELD_NUMBER)
             .map(|f| f.as_scalar_variant::<UInt64>(false))
             .unwrap_or_default()
     }
     pub fn minimum_edition(&self) -> Option<i32> {
-        self.as_scalar_int32(3)
+        self.as_scalar_int32(Self::MINIMUM_EDITION_FIELD_NUMBER)
     }
     pub fn maximum_edition(&self) -> Option<i32> {
-        self.as_scalar_int32(4)
+        self.as_scalar_int32(Self::MAXIMUM_EDITION_FIELD_NUMBER)
     }
     pub fn file(&self) -> impl Iterator<Item = &code_generator_response::File<A>> {
-        self.as_repeated_message(15)
+        self.as_repeated_message(Self::FILE_FIELD_NUMBER)
     }
 
     pub fn set_error(&mut self, error: &str) -> Result<()> {
-        self.0.field_mut(1).push_string(error);
+        self.0
+            .field_mut(Self::ERROR_FIELD_NUMBER)
+            .push_string(error);
         Ok(())
     }
     pub fn set_supported_features(&mut self, features: u64) -> Result<()> {
-        self.0.field_mut(2).push_variant_from::<UInt64>(features);
+        self.0
+            .field_mut(Self::SUPPORTED_FEATURES_FIELD_NUMBER)
+            .push_variant_from::<UInt64>(features);
         Ok(())
     }
     pub fn set_minimum_edition(&mut self, edition: i32) -> Result<()> {
-        self.0.field_mut(3).push_variant_from::<Int32>(edition);
+        self.0
+            .field_mut(Self::MINIMUM_EDITION_FIELD_NUMBER)
+            .push_variant_from::<Int32>(edition);
         Ok(())
     }
     pub fn set_maximum_edition(&mut self, edition: i32) -> Result<()> {
-        self.0.field_mut(4).push_variant_from::<Int32>(edition);
+        self.0
+            .field_mut(Self::MAXIMUM_EDITION_FIELD_NUMBER)
+            .push_variant_from::<Int32>(edition);
         Ok(())
     }
     pub fn push_file(&mut self, file: code_generator_response::File<A>) -> Result<()> {
-        self.0.field_mut(15).push_message(file.into());
+        self.0
+            .field_mut(Self::FILE_FIELD_NUMBER)
+            .push_message(file.into());
         Ok(())
     }
 }

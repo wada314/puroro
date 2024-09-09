@@ -24,9 +24,12 @@ use ::std::alloc::{Allocator, Global};
 #[derive(Deref, DerefMut, From, Into, Default, Debug, RefCast, Clone)]
 #[repr(transparent)]
 pub struct FileDescriptorSet<A: Allocator = Global>(GenericMessage<A>);
+impl<A: Allocator> FileDescriptorSet<A> {
+    pub const FILE_FIELD_NUMBER: i32 = 1;
+}
 impl<A: Allocator + Clone> FileDescriptorSet<A> {
     pub fn file(&self) -> impl Iterator<Item = &FileDescriptorProto<A>> {
-        self.0.as_repeated_message(1)
+        self.0.as_repeated_message(Self::FILE_FIELD_NUMBER)
     }
 }
 
@@ -71,93 +74,126 @@ impl From<Edition> for i32 {
 #[derive(Deref, DerefMut, From, Into, Default, Debug, RefCast, Clone)]
 #[repr(transparent)]
 pub struct FileDescriptorProto<A: Allocator = Global>(GenericMessage<A>);
+impl<A: Allocator> FileDescriptorProto<A> {
+    pub const NAME_FIELD_NUMBER: i32 = 1;
+    pub const PACKAGE_FIELD_NUMBER: i32 = 2;
+    pub const DEPENDENCY_FIELD_NUMBER: i32 = 3;
+    pub const PUBLIC_DEPENDENCY_FIELD_NUMBER: i32 = 10;
+    pub const WEAK_DEPENDENCY_FIELD_NUMBER: i32 = 11;
+    pub const MESSAGE_TYPE_FIELD_NUMBER: i32 = 4;
+    pub const ENUM_TYPE_FIELD_NUMBER: i32 = 5;
+    pub const SYNTAX_FIELD_NUMBER: i32 = 12;
+    pub const EDITION_FIELD_NUMBER: i32 = 14;
+}
 impl<A: Allocator + Clone> FileDescriptorProto<A> {
     pub fn name(&self) -> Option<&str> {
-        self.as_scalar_string(1)
+        self.as_scalar_string(Self::NAME_FIELD_NUMBER)
     }
     pub fn package(&self) -> Option<&str> {
-        self.as_scalar_string(2)
+        self.as_scalar_string(Self::PACKAGE_FIELD_NUMBER)
     }
-    pub fn dependency(&self) -> impl Iterator<Item = &str> {
-        self.as_repeated_string(3)
+    pub fn dependency(&self) -> impl '_ + Iterator<Item = &str> {
+        self.as_repeated_string(Self::DEPENDENCY_FIELD_NUMBER)
     }
     pub fn public_dependency(&self) -> impl '_ + Iterator<Item = i32> {
-        self.as_repeated_int32(10)
+        self.as_repeated_int32(Self::PUBLIC_DEPENDENCY_FIELD_NUMBER)
     }
     pub fn weak_dependency(&self) -> impl '_ + Iterator<Item = i32> {
-        self.as_repeated_int32(11)
+        self.as_repeated_int32(Self::WEAK_DEPENDENCY_FIELD_NUMBER)
     }
-    pub fn message_type(&self) -> impl Iterator<Item = &DescriptorProto<A>> {
-        self.as_repeated_message(4)
+    pub fn message_type(&self) -> impl '_ + Iterator<Item = &DescriptorProto<A>> {
+        self.as_repeated_message(Self::MESSAGE_TYPE_FIELD_NUMBER)
     }
-    pub fn enum_type(&self) -> impl Iterator<Item = &EnumDescriptorProto<A>> {
-        self.as_repeated_message(5)
+    pub fn enum_type(&self) -> impl '_ + Iterator<Item = &EnumDescriptorProto<A>> {
+        self.as_repeated_message(Self::ENUM_TYPE_FIELD_NUMBER)
     }
     pub fn syntax(&self) -> Option<&str> {
-        self.as_scalar_string(12)
+        self.as_scalar_string(Self::SYNTAX_FIELD_NUMBER)
     }
-    pub fn edition(&self) -> Option<Edition> {
-        self.as_scalar_enum(14)
+    pub fn edition(&self) -> Edition {
+        self.as_scalar_enum(Self::EDITION_FIELD_NUMBER)
+            .unwrap_or_default()
     }
 }
 
 #[derive(Deref, DerefMut, From, Into, Default, Debug, RefCast, Clone)]
 #[repr(transparent)]
 pub struct DescriptorProto<A: Allocator = Global>(GenericMessage<A>);
+impl<A: Allocator> DescriptorProto<A> {
+    pub const NAME_FIELD_NUMBER: i32 = 1;
+    pub const FIELD_FIELD_NUMBER: i32 = 2;
+    pub const NESTED_TYPE_FIELD_NUMBER: i32 = 3;
+    pub const ENUM_TYPE_FIELD_NUMBER: i32 = 4;
+    pub const EXTENSION_FIELD_NUMBER: i32 = 6;
+    pub const ONEOF_DECL_FIELD_NUMBER: i32 = 8;
+}
 impl<A: Allocator + Clone> DescriptorProto<A> {
     pub fn name(&self) -> Option<&str> {
-        self.as_scalar_string(1)
+        self.as_scalar_string(Self::NAME_FIELD_NUMBER)
     }
-    pub fn field(&self) -> impl Iterator<Item = &FieldDescriptorProto<A>> {
-        self.as_repeated_message(2)
+    pub fn field(&self) -> impl '_ + Iterator<Item = &FieldDescriptorProto<A>> {
+        self.as_repeated_message(Self::FIELD_FIELD_NUMBER)
     }
-    pub fn extension(&self) -> impl Iterator<Item = &FieldDescriptorProto<A>> {
-        self.as_repeated_message(6)
+    pub fn nested_type(&self) -> impl '_ + Iterator<Item = &DescriptorProto<A>> {
+        self.as_repeated_message(Self::NESTED_TYPE_FIELD_NUMBER)
     }
-    pub fn nested_type(&self) -> impl Iterator<Item = &DescriptorProto<A>> {
-        self.as_repeated_message(3)
+    pub fn enum_type(&self) -> impl '_ + Iterator<Item = &EnumDescriptorProto<A>> {
+        self.as_repeated_message(Self::ENUM_TYPE_FIELD_NUMBER)
     }
-    pub fn enum_type(&self) -> impl Iterator<Item = &EnumDescriptorProto<A>> {
-        self.as_repeated_message(4)
+    pub fn extension(&self) -> impl '_ + Iterator<Item = &FieldDescriptorProto<A>> {
+        self.as_repeated_message(Self::EXTENSION_FIELD_NUMBER)
     }
-    pub fn oneof_decl(&self) -> impl Iterator<Item = &OneofDescriptorProto<A>> {
-        self.as_repeated_message(8)
+    pub fn oneof_decl(&self) -> impl '_ + Iterator<Item = &OneofDescriptorProto<A>> {
+        self.as_repeated_message(Self::ONEOF_DECL_FIELD_NUMBER)
     }
 }
 
 #[derive(Deref, DerefMut, From, Into, Default, Debug, RefCast, Clone)]
 #[repr(transparent)]
 pub struct FieldDescriptorProto<A: Allocator = Global>(GenericMessage<A>);
+impl<A: Allocator> FieldDescriptorProto<A> {
+    pub const NAME_FIELD_NUMBER: i32 = 1;
+    pub const NUMBER_FIELD_NUMBER: i32 = 3;
+    pub const LABEL_FIELD_NUMBER: i32 = 4;
+    pub const TYPE_FIELD_NUMBER: i32 = 5;
+    pub const TYPE_NAME_FIELD_NUMBER: i32 = 6;
+    pub const EXTENDEE_FIELD_NUMBER: i32 = 2;
+    pub const DEFAULT_VALUE_FIELD_NUMBER: i32 = 7;
+    pub const ONEOF_INDEX_FIELD_NUMBER: i32 = 9;
+    pub const JSON_NAME_FIELD_NUMBER: i32 = 10;
+    pub const PROTO3_OPTIONAL_FIELD_NUMBER: i32 = 17;
+}
 impl<A: Allocator + Clone> FieldDescriptorProto<A> {
     pub fn name(&self) -> Option<&str> {
-        self.as_scalar_string(1)
+        self.as_scalar_string(Self::NAME_FIELD_NUMBER)
     }
     pub fn number(&self) -> Option<i32> {
-        self.as_scalar_int32(3)
+        self.as_scalar_int32(Self::NUMBER_FIELD_NUMBER)
     }
-    pub fn label(&self) -> Option<self::field_descriptor_proto::Label> {
-        self.as_scalar_enum(4)
+    pub fn label(&self) -> Option<field_descriptor_proto::Label> {
+        self.as_scalar_enum(Self::LABEL_FIELD_NUMBER)
     }
-    pub fn type_(&self) -> Option<field_descriptor_proto::Type> {
-        self.as_scalar_enum(5)
+    pub fn r#type(&self) -> Option<field_descriptor_proto::Type> {
+        self.as_scalar_enum(Self::TYPE_FIELD_NUMBER)
     }
     pub fn type_name(&self) -> Option<&str> {
-        self.as_scalar_string(6)
+        self.as_scalar_string(Self::TYPE_NAME_FIELD_NUMBER)
     }
     pub fn extendee(&self) -> Option<&str> {
-        self.as_scalar_string(2)
+        self.as_scalar_string(Self::EXTENDEE_FIELD_NUMBER)
     }
     pub fn default_value(&self) -> Option<&str> {
-        self.as_scalar_string(7)
+        self.as_scalar_string(Self::DEFAULT_VALUE_FIELD_NUMBER)
     }
     pub fn oneof_index(&self) -> Option<i32> {
-        self.as_scalar_int32(9)
+        self.as_scalar_int32(Self::ONEOF_INDEX_FIELD_NUMBER)
     }
     pub fn json_name(&self) -> Option<&str> {
-        self.as_scalar_string(10)
+        self.as_scalar_string(Self::JSON_NAME_FIELD_NUMBER)
     }
     pub fn proto3_optional(&self) -> Option<bool> {
-        self.as_scalar_int32(17).map(|x| x != 0)
+        self.as_scalar_int32(Self::PROTO3_OPTIONAL_FIELD_NUMBER)
+            .map(|v| v != 0)
     }
 }
 
@@ -246,33 +282,44 @@ pub mod field_descriptor_proto {
 #[derive(Deref, DerefMut, From, Into, Default, Debug, RefCast, Clone)]
 #[repr(transparent)]
 pub struct OneofDescriptorProto<A: Allocator = Global>(GenericMessage<A>);
+impl<A: Allocator> OneofDescriptorProto<A> {
+    pub const NAME_FIELD_NUMBER: i32 = 1;
+}
 impl<A: Allocator + Clone> OneofDescriptorProto<A> {
     pub fn name(&self) -> Option<&str> {
-        self.as_scalar_string(1)
+        self.as_scalar_string(Self::NAME_FIELD_NUMBER)
     }
 }
 
 #[derive(Deref, DerefMut, From, Into, Default, Debug, RefCast, Clone)]
 #[repr(transparent)]
 pub struct EnumDescriptorProto<A: Allocator = Global>(GenericMessage<A>);
+impl<A: Allocator> EnumDescriptorProto<A> {
+    pub const NAME_FIELD_NUMBER: i32 = 1;
+    pub const VALUE_FIELD_NUMBER: i32 = 2;
+}
 impl<A: Allocator + Clone> EnumDescriptorProto<A> {
     pub fn name(&self) -> Option<&str> {
-        self.as_scalar_string(1)
+        self.as_scalar_string(Self::NAME_FIELD_NUMBER)
     }
     pub fn value(&self) -> impl Iterator<Item = &EnumValueDescriptorProto<A>> {
-        self.as_repeated_message(2)
+        self.as_repeated_message(Self::VALUE_FIELD_NUMBER)
     }
 }
 
 #[derive(Deref, DerefMut, From, Into, Default, Debug, RefCast, Clone)]
 #[repr(transparent)]
 pub struct EnumValueDescriptorProto<A: Allocator = Global>(GenericMessage<A>);
+impl<A: Allocator> EnumValueDescriptorProto<A> {
+    pub const NAME_FIELD_NUMBER: i32 = 1;
+    pub const NUMBER_FIELD_NUMBER: i32 = 2;
+}
 impl<A: Allocator + Clone> EnumValueDescriptorProto<A> {
     pub fn name(&self) -> Option<&str> {
-        self.as_scalar_string(1)
+        self.as_scalar_string(Self::NAME_FIELD_NUMBER)
     }
     pub fn number(&self) -> Option<i32> {
-        self.as_scalar_int32(2)
+        self.as_scalar_int32(Self::NUMBER_FIELD_NUMBER)
     }
 }
 
