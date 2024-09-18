@@ -17,7 +17,7 @@ pub mod compiler;
 use super::GenericMessageExt;
 use crate::generic_message::GenericMessage;
 use crate::internal::impl_message_trait_for_trivial_types;
-use ::derive_more::{Deref, DerefMut, From, Into};
+use ::derive_more::{Deref, DerefMut, From, Into, TryFrom};
 use ::ref_cast::RefCast;
 use ::std::alloc::{Allocator, Global};
 
@@ -33,7 +33,7 @@ impl<A: Allocator + Clone> FileDescriptorSet<A> {
     }
 }
 
-#[derive(Default, Debug)]
+#[derive(Default, Debug, Clone)]
 pub enum Edition {
     #[default]
     EditionUnknown = 0,
@@ -82,6 +82,7 @@ impl<A: Allocator> FileDescriptorProto<A> {
     pub const WEAK_DEPENDENCY_FIELD_NUMBER: i32 = 11;
     pub const MESSAGE_TYPE_FIELD_NUMBER: i32 = 4;
     pub const ENUM_TYPE_FIELD_NUMBER: i32 = 5;
+    pub const OPTIONS_FIELD_NUMBER: i32 = 8;
     pub const SYNTAX_FIELD_NUMBER: i32 = 12;
     pub const EDITION_FIELD_NUMBER: i32 = 14;
 }
@@ -106,6 +107,9 @@ impl<A: Allocator + Clone> FileDescriptorProto<A> {
     }
     pub fn enum_type(&self) -> impl '_ + Iterator<Item = &EnumDescriptorProto<A>> {
         self.as_repeated_message(Self::ENUM_TYPE_FIELD_NUMBER)
+    }
+    pub fn options(&self) -> Option<&FileOptions<A>> {
+        self.as_scalar_message(Self::OPTIONS_FIELD_NUMBER)
     }
     pub fn syntax(&self) -> Option<&str> {
         self.as_scalar_string(Self::SYNTAX_FIELD_NUMBER)
@@ -198,7 +202,7 @@ impl<A: Allocator + Clone> FieldDescriptorProto<A> {
 }
 
 pub mod field_descriptor_proto {
-    #[derive(Default, Debug)]
+    #[derive(Default, Debug, Clone)]
     pub enum Type {
         TypeDouble = 1,
         TypeFloat = 2,
@@ -221,7 +225,7 @@ pub mod field_descriptor_proto {
         TypeSInt64 = 18,
     }
 
-    #[derive(Default, Debug)]
+    #[derive(Default, Debug, Clone)]
     pub enum Label {
         #[default]
         LabelOptional = 1,
@@ -320,6 +324,145 @@ impl<A: Allocator + Clone> EnumValueDescriptorProto<A> {
     }
     pub fn number(&self) -> Option<i32> {
         self.as_scalar_int32(Self::NUMBER_FIELD_NUMBER)
+    }
+}
+
+#[derive(Deref, DerefMut, From, Into, Default, Debug, RefCast, Clone)]
+#[repr(transparent)]
+pub struct FileOptions<A: Allocator = Global>(GenericMessage<A>);
+impl<A: Allocator> FileOptions<A> {
+    pub const FEATURES_FIELD_NUMBER: i32 = 50;
+}
+impl<A: Allocator + Clone> FileOptions<A> {
+    pub fn features(&self) -> Option<&FeatureSet<A>> {
+        self.as_scalar_message(Self::FEATURES_FIELD_NUMBER)
+    }
+}
+
+#[derive(Deref, DerefMut, From, Into, Default, Debug, RefCast, Clone)]
+#[repr(transparent)]
+pub struct FeatureSet<A: Allocator = Global>(GenericMessage<A>);
+impl<A: Allocator> FeatureSet<A> {
+    pub const FIELD_PRESENCE_FIELD_NUMBER: i32 = 1;
+    pub const ENUM_TYPE_FIELD_NUMBER: i32 = 2;
+    pub const REPEATED_FIELD_PRESENCE_FIELD_NUMBER: i32 = 3;
+    pub const UTF8_VALIDATION_FIELD_NUMBER: i32 = 4;
+    pub const MESSAGE_ENCODING_FIELD_NUMBER: i32 = 5;
+    pub const JSON_FORMAT_FIELD_NUMBER: i32 = 6;
+}
+impl<A: Allocator + Clone> FeatureSet<A> {
+    pub fn field_presence(&self) -> Option<feature_set::FieldPresence> {
+        self.as_scalar_enum(Self::FIELD_PRESENCE_FIELD_NUMBER)
+    }
+    pub fn enum_type(&self) -> Option<feature_set::EnumType> {
+        self.as_scalar_enum(Self::ENUM_TYPE_FIELD_NUMBER)
+    }
+    pub fn repeated_field_presence(&self) -> Option<feature_set::RepeatedFieldPresence> {
+        self.as_scalar_enum(Self::REPEATED_FIELD_PRESENCE_FIELD_NUMBER)
+    }
+    pub fn utf8_validation(&self) -> Option<feature_set::Utf8Validation> {
+        self.as_scalar_enum(Self::UTF8_VALIDATION_FIELD_NUMBER)
+    }
+    pub fn message_encoding(&self) -> Option<feature_set::MessageEncoding> {
+        self.as_scalar_enum(Self::MESSAGE_ENCODING_FIELD_NUMBER)
+    }
+    pub fn json_format(&self) -> Option<feature_set::JsonFormat> {
+        self.as_scalar_enum(Self::JSON_FORMAT_FIELD_NUMBER)
+    }
+}
+
+pub mod feature_set {
+    use ::derive_more::{Debug, TryFrom};
+
+    #[derive(Default, Debug, Clone, TryFrom)]
+    #[try_from(repr)]
+    #[repr(i32)]
+    pub enum FieldPresence {
+        #[default]
+        FieldPresenceUnknown = 0,
+        Explicit = 1,
+        Implicit = 2,
+        LegacyRequired = 3,
+    }
+    impl From<FieldPresence> for i32 {
+        fn from(value: FieldPresence) -> i32 {
+            value as i32
+        }
+    }
+
+    #[derive(Default, Debug, Clone, TryFrom)]
+    #[try_from(repr)]
+    #[repr(i32)]
+    pub enum EnumType {
+        #[default]
+        EnumTypeUnknown = 0,
+        Open = 1,
+        Closed = 2,
+    }
+    impl From<EnumType> for i32 {
+        fn from(value: EnumType) -> i32 {
+            value as i32
+        }
+    }
+
+    #[derive(Default, Debug, Clone, TryFrom)]
+    #[try_from(repr)]
+    #[repr(i32)]
+    pub enum RepeatedFieldPresence {
+        #[default]
+        RepeatedFieldPresenceUnknown = 0,
+        Packed = 1,
+        Extended = 2,
+    }
+    impl From<RepeatedFieldPresence> for i32 {
+        fn from(value: RepeatedFieldPresence) -> i32 {
+            value as i32
+        }
+    }
+
+    #[derive(Default, Debug, Clone, TryFrom)]
+    #[try_from(repr)]
+    #[repr(i32)]
+    pub enum Utf8Validation {
+        #[default]
+        Utf8ValidationUnknown = 0,
+        Verify = 2,
+        None = 3,
+    }
+    impl From<Utf8Validation> for i32 {
+        fn from(value: Utf8Validation) -> i32 {
+            value as i32
+        }
+    }
+
+    #[derive(Default, Debug, Clone, TryFrom)]
+    #[try_from(repr)]
+    #[repr(i32)]
+    pub enum MessageEncoding {
+        #[default]
+        MessageEncodingUnknown = 0,
+        LengthPrefixed = 1,
+        Delimited = 2,
+    }
+    impl From<MessageEncoding> for i32 {
+        fn from(value: MessageEncoding) -> i32 {
+            value as i32
+        }
+    }
+
+    #[derive(Default, Debug, Clone, TryFrom)]
+    #[try_from(repr)]
+    #[repr(i32)]
+    pub enum JsonFormat {
+        #[default]
+        JsonFormatUnknown = 0,
+        Allow = 1,
+        LegacyBestEffort = 2,
+    }
+    impl From<JsonFormat> for i32 {
+        fn from(value: JsonFormat) -> i32 {
+            value as i32
+        }
     }
 }
 

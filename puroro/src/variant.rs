@@ -132,14 +132,14 @@ impl VariantIntegerType for vt::SInt64 {
 }
 impl<E> VariantIntegerType for vt::Enum<E>
 where
-    E: 'static + TryFrom<i32, Error = i32> + Default,
+    E: 'static + TryFrom<i32> + Default,
     i32: From<E>,
 {
     type RustType = E;
     #[inline]
     fn try_from_variant(var: Variant) -> Result<Self::RustType> {
-        Ok(E::try_from(vt::Int32::try_from_variant(var)?)
-            .map_err(|i| ErrorKind::TryFromIntIntoEnumError(i))?)
+        let i32_var = vt::Int32::try_from_variant(var)?;
+        Ok(E::try_from(i32_var).map_err(|_| ErrorKind::TryFromIntIntoEnumError(i32_var))?)
     }
     #[inline]
     fn into_variant(e: Self::RustType) -> Variant {

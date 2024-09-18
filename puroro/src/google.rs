@@ -25,12 +25,12 @@ trait GenericMessageExt {
     fn as_repeated_int32(&self, number: i32) -> impl Iterator<Item = i32>;
     fn as_scalar_enum<E>(&self, number: i32) -> Option<E>
     where
-        E: 'static + TryFrom<i32, Error = i32> + Default,
+        E: 'static + TryFrom<i32> + Default,
         i32: From<E>;
     #[allow(unused)]
     fn as_repeated_enum<E>(&self, number: i32) -> impl Iterator<Item = E>
     where
-        E: 'static + TryFrom<i32, Error = i32> + Default,
+        E: 'static + TryFrom<i32> + Default,
         i32: From<E>;
     fn as_scalar_string(&self, number: i32) -> Option<&str>;
     fn as_repeated_string(&self, number: i32) -> impl Iterator<Item = &str>;
@@ -55,7 +55,7 @@ impl<A: Allocator + Clone> GenericMessageExt for GenericMessage<A> {
     }
     fn as_scalar_enum<E>(&self, number: i32) -> Option<E>
     where
-        E: 'static + TryFrom<i32, Error = i32> + Default,
+        E: 'static + TryFrom<i32> + Default,
         i32: From<E>,
     {
         self.field(number)
@@ -63,7 +63,7 @@ impl<A: Allocator + Clone> GenericMessageExt for GenericMessage<A> {
     }
     fn as_repeated_enum<E>(&self, number: i32) -> impl Iterator<Item = E>
     where
-        E: 'static + TryFrom<i32, Error = i32> + Default,
+        E: 'static + TryFrom<i32> + Default,
         i32: From<E>,
     {
         self.field(number)
