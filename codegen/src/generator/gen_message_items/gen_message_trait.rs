@@ -77,6 +77,7 @@ impl GenTrait {
 
     fn gen_blanket_ref_impls(&self) -> Result<Vec<Item>> {
         let trait_name = &self.rust_name;
+        let trait_path: Path = parse2(quote! { self::#trait_name })?;
         let blanket_type: Ident = parse_str("T")?;
         let getter_signatures = self
             .fields
@@ -86,11 +87,11 @@ impl GenTrait {
         let getter_bodies = self
             .fields
             .iter()
-            .map(|f| f.gen_blanket_ref_getter_body(&blanket_type))
+            .map(|f| f.gen_blanket_ref_getter_body(&blanket_type, &trait_path))
             .collect::<Result<Vec<_>>>()?;
         Ok(vec![
             parse2(quote! {
-                impl<T: self::#trait_name> self::#trait_name for &T {
+                impl<T: #trait_path> #trait_path for &T {
                     #(#getter_signatures {
                         #getter_bodies
                     })*
@@ -108,6 +109,7 @@ impl GenTrait {
 
     fn gen_blanket_option_impl(&self) -> Result<Item> {
         let trait_name = &self.rust_name;
+        let trait_path: Path = parse2(quote! { self::#trait_name })?;
         let blanket_type: Ident = parse_str("T")?;
         let getter_signatures = self
             .fields
@@ -117,10 +119,10 @@ impl GenTrait {
         let getter_bodies = self
             .fields
             .iter()
-            .map(|f| f.gen_blanket_option_getter_body(&blanket_type))
+            .map(|f| f.gen_blanket_option_getter_body(&blanket_type, &trait_path))
             .collect::<Result<Vec<_>>>()?;
         Ok(parse2(quote! {
-            impl<T: self::#trait_name> self::#trait_name for ::std::option::Option<T> {
+            impl<T: #trait_path> #trait_path for ::std::option::Option<T> {
                 #(#getter_signatures {
                     #getter_bodies
                 })*
@@ -170,24 +172,28 @@ impl Field {
         })?)
     }
 
-    fn gen_blanket_ref_getter_body(&self, blanket_type: &Ident) -> Result<Expr> {
+    fn gen_blanket_ref_getter_body(&self, blanket_type: &Ident, trait_path: &Path) -> Result<Expr> {
         let getter_name = self.gen_getter_name()?;
         Ok(parse2(quote! {
-            <#blanket_type>::#getter_name(self)
+            <#blanket_type as #trait_path>::#getter_name(self)
         })?)
     }
 
-    fn gen_blanket_option_getter_body(&self, blanket_type: &Ident) -> Result<Expr> {
+    fn gen_blanket_option_getter_body(
+        &self,
+        blanket_type: &Ident,
+        trait_path: &Path,
+    ) -> Result<Expr> {
         let getter_name = self.gen_getter_name()?;
         Ok(parse2(match self.wrapper {
             FieldWrapper::Vec => quote! {
-                self.as_ref().map(<#blanket_type>::#getter_name).into_iter().flatten()
+                self.as_ref().map(<#blanket_type as #trait_path>::#getter_name).into_iter().flatten()
             },
             FieldWrapper::Optional | FieldWrapper::OptionalBoxed => quote! {
-                self.as_ref().and_then(<#blanket_type>::#getter_name)
+                self.as_ref().and_then(<#blanket_type as #trait_path>::#getter_name)
             },
             FieldWrapper::Bare => quote! {
-                self.as_ref().map(<#blanket_type>::#getter_name).unwrap_or_default()
+                self.as_ref().map(<#blanket_type as #trait_path>::#getter_name).unwrap_or_default()
             },
         })?)
     }
