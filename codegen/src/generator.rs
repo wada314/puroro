@@ -28,7 +28,7 @@ use ::std::cell::LazyCell;
 use ::std::collections::HashSet;
 use ::std::collections::{BTreeSet, HashMap};
 use ::std::rc::Rc;
-use ::syn::{parse2, parse_str, Ident, Type};
+use ::syn::{parse2, parse_str, Ident, Path, Type};
 
 pub fn compile(request: &CodeGeneratorRequest) -> Result<CodeGeneratorResponse> {
     let mut response = CodeGeneratorResponse::default();
@@ -108,7 +108,7 @@ impl Default for CodeGeneratorOptions {
     }
 }
 impl CodeGeneratorOptions {
-    pub fn primitive_type_path(&self, ty: &str) -> Result<Type> {
+    pub fn primitive_type(&self, ty: &str) -> Result<Type> {
         let ident: Ident = parse_str(ty)?;
         Ok(parse2(if self.strict_type_path {
             quote! { ::std::primitive::#ident }
@@ -116,11 +116,16 @@ impl CodeGeneratorOptions {
             quote! { #ident }
         })?)
     }
-    pub fn vec_type(&self, elem_type: &Type) -> Result<Type> {
-        Ok(parse2(if self.strict_type_path {
-            quote! { ::std::vec::Vec<#elem_type> }
+    pub fn vec_type(&self, elem_type: &Type, alloc: Option<&Type>) -> Result<Type> {
+        let generic_params = if let Some(alloc) = alloc {
+            quote! { #elem_type, #alloc }
         } else {
-            quote! { Vec<#elem_type> }
+            quote! { #elem_type }
+        };
+        Ok(parse2(if self.strict_type_path {
+            quote! { ::std::vec::Vec<#generic_params> }
+        } else {
+            quote! { Vec<#generic_params> }
         })?)
     }
     pub fn option_type(&self, elem_type: &Type) -> Result<Type> {
@@ -135,6 +140,13 @@ impl CodeGeneratorOptions {
             quote! { ::std::iter::Iterator<Item=#elem_type> }
         } else {
             quote! { Iterator<Item=#elem_type> }
+        })?)
+    }
+    pub fn path_in_self_module(&self, ident: &Ident) -> Result<Path> {
+        Ok(parse2(if self.strict_type_path {
+            quote! { self::#ident }
+        } else {
+            quote! { #ident }
         })?)
     }
 }

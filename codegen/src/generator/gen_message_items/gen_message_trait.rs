@@ -19,6 +19,7 @@ use crate::proto_path::{ProtoPath, ProtoPathBuf};
 use crate::Result;
 use ::quote::{format_ident, quote};
 use ::std::rc::Rc;
+use ::std::u8;
 use ::syn::{parse2, parse_str, Expr, Ident, Item, Path, Type};
 use ::syn::{Lifetime, Signature};
 
@@ -111,7 +112,7 @@ impl GenTrait {
 
     fn gen_blanket_ref_impls(&self) -> Result<Vec<Item>> {
         let trait_name = &self.rust_name;
-        let trait_path: Path = parse2(quote! { self::#trait_name })?;
+        let trait_path: Path = self.options.path_in_self_module(trait_name)?;
         let blanket_type: Ident = parse_str("T")?;
         let getter_signatures = self
             .fields
@@ -132,7 +133,7 @@ impl GenTrait {
                 }
             })?,
             parse2(quote! {
-                impl<T: self::#trait_name> self::#trait_name for &mut T {
+                impl<T: self::#trait_name> #trait_path for &mut T {
                     #(#getter_signatures {
                         #getter_bodies
                     })*
@@ -198,7 +199,7 @@ impl Field {
 
     pub fn gen_getter_signature(&self) -> Result<Signature> {
         let getter_name = self.gen_getter_name()?;
-        let lifetime: Option<Lifetime> = Some(parse_str("'_")?);
+        let lifetime: Option<Lifetime> = None;
         let getter_type = match self.wrapper {
             FieldWrapper::Vec => self
                 .scalar_type
@@ -257,7 +258,9 @@ impl Field {
         let mutator_name = self.gen_mutator_name()?;
         let mutator_type = match self.wrapper {
             FieldWrapper::Vec => parse2(quote! { () /* TODO */ })?,
-            _ => self.scalar_type.gen_non_repeated_mutator_type(allocator)?,
+            _ => self
+                .scalar_type
+                .gen_non_repeated_mutator_type(allocator, &self.options)?,
         };
         Ok(parse2(quote! {
             fn #mutator_name(&mut self) -> #mutator_type
@@ -314,25 +317,25 @@ impl FieldType<ProtoPathBuf, ProtoPathBuf> {
                 let path = path.to_rust_path()?;
                 parse2(quote! { #path })?
             }
-            FieldType::Int32 => options.primitive_type_path("i32")?,
-            FieldType::Int64 => options.primitive_type_path("i64")?,
-            FieldType::UInt32 => options.primitive_type_path("u32")?,
-            FieldType::UInt64 => options.primitive_type_path("u64")?,
-            FieldType::SInt32 => options.primitive_type_path("i32")?,
-            FieldType::SInt64 => options.primitive_type_path("i64")?,
-            FieldType::Fixed32 => options.primitive_type_path("u32")?,
-            FieldType::Fixed64 => options.primitive_type_path("u64")?,
-            FieldType::SFixed32 => options.primitive_type_path("i32")?,
-            FieldType::SFixed64 => options.primitive_type_path("i64")?,
-            FieldType::Float => options.primitive_type_path("f32")?,
-            FieldType::Double => options.primitive_type_path("f64")?,
-            FieldType::Bool => options.primitive_type_path("bool")?,
+            FieldType::Int32 => options.primitive_type("i32")?,
+            FieldType::Int64 => options.primitive_type("i64")?,
+            FieldType::UInt32 => options.primitive_type("u32")?,
+            FieldType::UInt64 => options.primitive_type("u64")?,
+            FieldType::SInt32 => options.primitive_type("i32")?,
+            FieldType::SInt64 => options.primitive_type("i64")?,
+            FieldType::Fixed32 => options.primitive_type("u32")?,
+            FieldType::Fixed64 => options.primitive_type("u64")?,
+            FieldType::SFixed32 => options.primitive_type("i32")?,
+            FieldType::SFixed64 => options.primitive_type("i64")?,
+            FieldType::Float => options.primitive_type("f32")?,
+            FieldType::Double => options.primitive_type("f64")?,
+            FieldType::Bool => options.primitive_type("bool")?,
             FieldType::String => {
-                let str_type = options.primitive_type_path("str")?;
+                let str_type = options.primitive_type("str")?;
                 parse2(quote! { & #lifetime #str_type })?
             }
             FieldType::Bytes => {
-                let u8_type = options.primitive_type_path("u8")?;
+                let u8_type = options.primitive_type("u8")?;
                 parse2(quote! { & #lifetime [#u8_type] })?
             }
             FieldType::Group => Err(format!("Group field is not supported"))?,
@@ -358,7 +361,11 @@ impl FieldType<ProtoPathBuf, ProtoPathBuf> {
         })?)
     }
 
-    fn gen_bare_mutator_type(&self, allocator: &Type) -> Result<Type> {
+    fn gen_bare_mutator_type(
+        &self,
+        allocator: &Type,
+        options: &CodeGeneratorOptions,
+    ) -> Result<Type> {
         Ok(match self {
             FieldType::Message(path) => {
                 let path = path.to_rust_path_with(|name| {
@@ -371,28 +378,33 @@ impl FieldType<ProtoPathBuf, ProtoPathBuf> {
                 let path = path.to_rust_path()?;
                 parse2(quote! { #path })?
             }
-            FieldType::Int32 => parse_str("::std::primitive::i32")?,
-            FieldType::Int64 => parse_str("::std::primitive::i64")?,
-            FieldType::UInt32 => parse_str("::std::primitive::u32")?,
-            FieldType::UInt64 => parse_str("::std::primitive::u64")?,
-            FieldType::SInt32 => parse_str("::std::primitive::i32")?,
-            FieldType::SInt64 => parse_str("::std::primitive::i64")?,
-            FieldType::Fixed32 => parse_str("::std::primitive::u32")?,
-            FieldType::Fixed64 => parse_str("::std::primitive::u64")?,
-            FieldType::SFixed32 => parse_str("::std::primitive::i32")?,
-            FieldType::SFixed64 => parse_str("::std::primitive::i64")?,
-            FieldType::Float => parse_str("::std::primitive::f32")?,
-            FieldType::Double => parse_str("::std::primitive::f64")?,
-            FieldType::Bool => parse_str("::std::primitive::bool")?,
+            FieldType::Int32 => options.primitive_type("i32")?,
+            FieldType::Int64 => options.primitive_type("i64")?,
+            FieldType::UInt32 => options.primitive_type("u32")?,
+            FieldType::UInt64 => options.primitive_type("u64")?,
+            FieldType::SInt32 => options.primitive_type("i32")?,
+            FieldType::SInt64 => options.primitive_type("i64")?,
+            FieldType::Fixed32 => options.primitive_type("u32")?,
+            FieldType::Fixed64 => options.primitive_type("u64")?,
+            FieldType::SFixed32 => options.primitive_type("i32")?,
+            FieldType::SFixed64 => options.primitive_type("i64")?,
+            FieldType::Float => options.primitive_type("f32")?,
+            FieldType::Double => options.primitive_type("f64")?,
+            FieldType::Bool => options.primitive_type("bool")?,
             FieldType::String => parse2(quote! { ::puroro::string::String<#allocator> })?,
             FieldType::Bytes => {
-                parse2(quote! { ::std::vec::Vec<::std::primitive::u8, #allocator> })?
+                let u8_type = options.primitive_type("u8")?;
+                options.vec_type(&u8_type, Some(allocator))?
             }
             FieldType::Group => Err(format!("Group field is not supported"))?,
         })
     }
-    fn gen_non_repeated_mutator_type(&self, allocator: &Type) -> Result<Type> {
-        let bare_type = self.gen_bare_mutator_type(allocator)?;
+    fn gen_non_repeated_mutator_type(
+        &self,
+        allocator: &Type,
+        options: &CodeGeneratorOptions,
+    ) -> Result<Type> {
+        let bare_type = self.gen_bare_mutator_type(allocator, options)?;
         Ok(parse2(quote! {
             impl ::std::ops::DerefMut<Target = #bare_type>
         })?)
