@@ -114,7 +114,17 @@ impl<'a> FieldDescriptorExt<'a> {
         self.cache.file.get_or_init(|| self.message.file())
     }
     pub fn field_presence(&'a self) -> Option<protobuf::feature_set::FieldPresence> {
-        todo!()
+        if let Some(options) = self.base.options() {
+            if let Some(features) = options.features() {
+                if let Some(presence) = features.field_presence() {
+                    return Some(presence);
+                }
+            }
+        }
+        if let Some(presence) = self.file().field_presence() {
+            return Some(presence);
+        }
+        None
     }
     pub fn has_presence(&'a self) -> bool {
         if self.label() == Some(FieldLabel::Repeated) {
