@@ -114,6 +114,7 @@ impl<A: Allocator> DescriptorProto<A> {
     pub const ENUM_TYPE_FIELD_NUMBER: i32 = 4;
     pub const EXTENSION_FIELD_NUMBER: i32 = 6;
     pub const ONEOF_DECL_FIELD_NUMBER: i32 = 8;
+    pub const OPTIONS_FIELD_NUMBER: i32 = 7;
 }
 impl<A: Allocator + Clone> DescriptorProto<A> {
     pub fn name(&self) -> Option<&str> {
@@ -134,6 +135,9 @@ impl<A: Allocator + Clone> DescriptorProto<A> {
     pub fn oneof_decl(&self) -> impl '_ + Iterator<Item = &OneofDescriptorProto<A>> {
         self.as_repeated_message(Self::ONEOF_DECL_FIELD_NUMBER)
     }
+    pub fn options(&self) -> Option<&MessageOptions<A>> {
+        self.as_scalar_message(Self::OPTIONS_FIELD_NUMBER)
+    }
 }
 
 #[derive(Deref, DerefMut, From, Into, Default, Debug, RefCast, Clone)]
@@ -149,6 +153,7 @@ impl<A: Allocator> FieldDescriptorProto<A> {
     pub const DEFAULT_VALUE_FIELD_NUMBER: i32 = 7;
     pub const ONEOF_INDEX_FIELD_NUMBER: i32 = 9;
     pub const JSON_NAME_FIELD_NUMBER: i32 = 10;
+    pub const OPTIONS_FIELD_NUMBER: i32 = 8;
     pub const PROTO3_OPTIONAL_FIELD_NUMBER: i32 = 17;
 }
 impl<A: Allocator + Clone> FieldDescriptorProto<A> {
@@ -178,6 +183,9 @@ impl<A: Allocator + Clone> FieldDescriptorProto<A> {
     }
     pub fn json_name(&self) -> Option<&str> {
         self.as_scalar_string(Self::JSON_NAME_FIELD_NUMBER)
+    }
+    pub fn options(&self) -> Option<&FieldOptions<A>> {
+        self.as_scalar_message(Self::OPTIONS_FIELD_NUMBER)
     }
     pub fn proto3_optional(&self) -> Option<bool> {
         self.as_scalar_int32(Self::PROTO3_OPTIONAL_FIELD_NUMBER)
@@ -241,10 +249,14 @@ pub mod field_descriptor_proto {
 pub struct OneofDescriptorProto<A: Allocator = Global>(GenericMessage<A>);
 impl<A: Allocator> OneofDescriptorProto<A> {
     pub const NAME_FIELD_NUMBER: i32 = 1;
+    pub const OPTIONS_FIELD_NUMBER: i32 = 2;
 }
 impl<A: Allocator + Clone> OneofDescriptorProto<A> {
     pub fn name(&self) -> Option<&str> {
         self.as_scalar_string(Self::NAME_FIELD_NUMBER)
+    }
+    pub fn options(&self) -> Option<&OneofOptions<A>> {
+        self.as_scalar_message(Self::OPTIONS_FIELD_NUMBER)
     }
 }
 
@@ -254,6 +266,7 @@ pub struct EnumDescriptorProto<A: Allocator = Global>(GenericMessage<A>);
 impl<A: Allocator> EnumDescriptorProto<A> {
     pub const NAME_FIELD_NUMBER: i32 = 1;
     pub const VALUE_FIELD_NUMBER: i32 = 2;
+    pub const OPTIONS_FIELD_NUMBER: i32 = 3;
 }
 impl<A: Allocator + Clone> EnumDescriptorProto<A> {
     pub fn name(&self) -> Option<&str> {
@@ -261,6 +274,9 @@ impl<A: Allocator + Clone> EnumDescriptorProto<A> {
     }
     pub fn value(&self) -> impl Iterator<Item = &EnumValueDescriptorProto<A>> {
         self.as_repeated_message(Self::VALUE_FIELD_NUMBER)
+    }
+    pub fn options(&self) -> Option<&EnumOptions<A>> {
+        self.as_scalar_message(Self::OPTIONS_FIELD_NUMBER)
     }
 }
 
@@ -270,6 +286,7 @@ pub struct EnumValueDescriptorProto<A: Allocator = Global>(GenericMessage<A>);
 impl<A: Allocator> EnumValueDescriptorProto<A> {
     pub const NAME_FIELD_NUMBER: i32 = 1;
     pub const NUMBER_FIELD_NUMBER: i32 = 2;
+    pub const OPTIONS_FIELD_NUMBER: i32 = 3;
 }
 impl<A: Allocator + Clone> EnumValueDescriptorProto<A> {
     pub fn name(&self) -> Option<&str> {
@@ -277,6 +294,9 @@ impl<A: Allocator + Clone> EnumValueDescriptorProto<A> {
     }
     pub fn number(&self) -> Option<i32> {
         self.as_scalar_int32(Self::NUMBER_FIELD_NUMBER)
+    }
+    pub fn options(&self) -> Option<&EnumValueOptions<A>> {
+        self.as_scalar_message(Self::OPTIONS_FIELD_NUMBER)
     }
 }
 
@@ -287,6 +307,91 @@ impl<A: Allocator> FileOptions<A> {
     pub const FEATURES_FIELD_NUMBER: i32 = 50;
 }
 impl<A: Allocator + Clone> FileOptions<A> {
+    pub fn features(&self) -> Option<&FeatureSet<A>> {
+        self.as_scalar_message(Self::FEATURES_FIELD_NUMBER)
+    }
+}
+
+#[derive(Deref, DerefMut, From, Into, Default, Debug, RefCast, Clone)]
+#[repr(transparent)]
+pub struct MessageOptions<A: Allocator = Global>(GenericMessage<A>);
+impl<A: Allocator> MessageOptions<A> {
+    pub const MAP_ENTRY_FIELD_NUMBER: i32 = 7;
+    pub const FEATURES_FIELD_NUMBER: i32 = 12;
+}
+impl<A: Allocator + Clone> MessageOptions<A> {
+    pub fn map_entry(&self) -> Option<bool> {
+        self.as_scalar_int32(Self::MAP_ENTRY_FIELD_NUMBER)
+            .map(|v| v != 0)
+    }
+    pub fn features(&self) -> Option<&FeatureSet<A>> {
+        self.as_scalar_message(Self::FEATURES_FIELD_NUMBER)
+    }
+}
+
+#[derive(Deref, DerefMut, From, Into, Default, Debug, RefCast, Clone)]
+#[repr(transparent)]
+pub struct FieldOptions<A: Allocator = Global>(GenericMessage<A>);
+impl<A: Allocator> FieldOptions<A> {
+    pub const PACKED_FIELD_NUMBER: i32 = 2;
+    pub const LAZY_FIELD_NUMBER: i32 = 5;
+    pub const UNVERIFIED_LAZY_FIELD_NUMBER: i32 = 15;
+    pub const FEATURES_FIELD_NUMBER: i32 = 21;
+}
+impl<A: Allocator + Clone> FieldOptions<A> {
+    pub fn packed(&self) -> Option<bool> {
+        self.as_scalar_int32(Self::PACKED_FIELD_NUMBER)
+            .map(|v| v != 0)
+    }
+    pub fn lazy(&self) -> Option<bool> {
+        self.as_scalar_int32(Self::LAZY_FIELD_NUMBER)
+            .map(|v| v != 0)
+    }
+    pub fn unverified_lazy(&self) -> Option<bool> {
+        self.as_scalar_int32(Self::UNVERIFIED_LAZY_FIELD_NUMBER)
+            .map(|v| v != 0)
+    }
+    pub fn features(&self) -> Option<&FeatureSet<A>> {
+        self.as_scalar_message(Self::FEATURES_FIELD_NUMBER)
+    }
+}
+
+#[derive(Deref, DerefMut, From, Into, Default, Debug, RefCast, Clone)]
+#[repr(transparent)]
+pub struct OneofOptions<A: Allocator = Global>(GenericMessage<A>);
+impl<A: Allocator> OneofOptions<A> {
+    pub const FEATURES_FIELD_NUMBER: i32 = 1;
+}
+impl<A: Allocator + Clone> OneofOptions<A> {
+    pub fn features(&self) -> Option<&FeatureSet<A>> {
+        self.as_scalar_message(Self::FEATURES_FIELD_NUMBER)
+    }
+}
+
+#[derive(Deref, DerefMut, From, Into, Default, Debug, RefCast, Clone)]
+#[repr(transparent)]
+pub struct EnumOptions<A: Allocator = Global>(GenericMessage<A>);
+impl<A: Allocator> EnumOptions<A> {
+    pub const ALLOW_ALIAS_FIELD_NUMBER: i32 = 2;
+    pub const FEATURES_FIELD_NUMBER: i32 = 7;
+}
+impl<A: Allocator + Clone> EnumOptions<A> {
+    pub fn allow_alias(&self) -> Option<bool> {
+        self.as_scalar_int32(Self::ALLOW_ALIAS_FIELD_NUMBER)
+            .map(|v| v != 0)
+    }
+    pub fn features(&self) -> Option<&FeatureSet<A>> {
+        self.as_scalar_message(Self::FEATURES_FIELD_NUMBER)
+    }
+}
+
+#[derive(Deref, DerefMut, From, Into, Default, Debug, RefCast, Clone)]
+#[repr(transparent)]
+pub struct EnumValueOptions<A: Allocator = Global>(GenericMessage<A>);
+impl<A: Allocator> EnumValueOptions<A> {
+    pub const FEATURES_FIELD_NUMBER: i32 = 2;
+}
+impl<A: Allocator + Clone> EnumValueOptions<A> {
     pub fn features(&self) -> Option<&FeatureSet<A>> {
         self.as_scalar_message(Self::FEATURES_FIELD_NUMBER)
     }
