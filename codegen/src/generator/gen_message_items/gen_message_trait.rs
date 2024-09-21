@@ -18,6 +18,7 @@ use crate::generator::avoid_reserved_keywords;
 use crate::proto_path::{ProtoPath, ProtoPathBuf};
 use crate::Result;
 use ::quote::{format_ident, quote};
+use ::std::iter;
 use ::syn::{parse2, parse_str, Expr, Ident, Item, Path, Type};
 use ::syn::{Lifetime, Signature};
 
@@ -54,8 +55,10 @@ impl GenTrait {
 
     pub fn gen_items(&self) -> Result<Vec<Item>> {
         let trait_def = self.gen_message_trait()?;
-        let blanket_impls = self.gen_blanket_ref_impls()?;
-        Ok(::std::iter::once(trait_def).chain(blanket_impls).collect())
+        let mut blanket_impls = Vec::new();
+        blanket_impls.append(&mut self.gen_blanket_ref_impls()?);
+        blanket_impls.push(self.gen_blanket_option_impl()?);
+        Ok(iter::once(trait_def).chain(blanket_impls).collect())
     }
 
     fn gen_message_trait(&self) -> Result<Item> {
@@ -101,6 +104,28 @@ impl GenTrait {
                 }
             })?,
         ])
+    }
+
+    fn gen_blanket_option_impl(&self) -> Result<Item> {
+        let trait_name = &self.rust_name;
+        let blanket_type: Ident = parse_str("T")?;
+        let getter_signatures = self
+            .fields
+            .iter()
+            .map(Field::gen_getter_signature)
+            .collect::<Result<Vec<_>>>()?;
+        let getter_bodies = self
+            .fields
+            .iter()
+            .map(|f| f.gen_blanket_option_getter_body(&blanket_type))
+            .collect::<Result<Vec<_>>>()?;
+        Ok(parse2(quote! {
+            impl<T: self::#trait_name> self::#trait_name for ::std::option::Option<T> {
+                #(#getter_signatures {
+                    #getter_bodies
+                })*
+            }
+        })?)
     }
 }
 
@@ -149,6 +174,21 @@ impl Field {
         let getter_name = self.gen_getter_name()?;
         Ok(parse2(quote! {
             <#blanket_type>::#getter_name(self)
+        })?)
+    }
+
+    fn gen_blanket_option_getter_body(&self, blanket_type: &Ident) -> Result<Expr> {
+        let getter_name = self.gen_getter_name()?;
+        Ok(parse2(match self.wrapper {
+            FieldWrapper::Vec => quote! {
+                self.as_ref().map(<#blanket_type>::#getter_name).into_iter().flatten()
+            },
+            FieldWrapper::Optional | FieldWrapper::OptionalBoxed => quote! {
+                self.as_ref().and_then(<#blanket_type>::#getter_name)
+            },
+            FieldWrapper::Bare => quote! {
+                self.as_ref().map(<#blanket_type>::#getter_name).unwrap_or_default()
+            },
         })?)
     }
 
