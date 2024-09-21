@@ -33,7 +33,7 @@ impl<A: Allocator + Clone> FileDescriptorSet<A> {
     }
 }
 
-#[derive(Default, Debug, Clone, TryFrom)]
+#[derive(Default, Debug, Clone, PartialEq, TryFrom)]
 #[try_from(repr)]
 #[repr(i32)]
 pub enum Edition {
@@ -196,7 +196,7 @@ impl<A: Allocator + Clone> FieldDescriptorProto<A> {
 pub mod field_descriptor_proto {
     use ::derive_more::TryFrom;
 
-    #[derive(Default, Debug, Clone, TryFrom)]
+    #[derive(Default, Debug, Clone, PartialEq, TryFrom)]
     #[try_from(repr)]
     #[repr(i32)]
     pub enum Type {
@@ -221,7 +221,7 @@ pub mod field_descriptor_proto {
         TypeSInt64 = 18,
     }
 
-    #[derive(Default, Debug, Clone, TryFrom)]
+    #[derive(Default, Debug, Clone, PartialEq, TryFrom)]
     #[try_from(repr)]
     #[repr(i32)]
     pub enum Label {
@@ -432,7 +432,7 @@ impl<A: Allocator + Clone> FeatureSet<A> {
 pub mod feature_set {
     use ::derive_more::{Debug, TryFrom};
 
-    #[derive(Default, Debug, Clone, TryFrom)]
+    #[derive(Default, Debug, Clone, PartialEq, TryFrom)]
     #[try_from(repr)]
     #[repr(i32)]
     pub enum FieldPresence {
@@ -448,7 +448,7 @@ pub mod feature_set {
         }
     }
 
-    #[derive(Default, Debug, Clone, TryFrom)]
+    #[derive(Default, Debug, Clone, PartialEq, TryFrom)]
     #[try_from(repr)]
     #[repr(i32)]
     pub enum EnumType {
@@ -463,7 +463,7 @@ pub mod feature_set {
         }
     }
 
-    #[derive(Default, Debug, Clone, TryFrom)]
+    #[derive(Default, Debug, Clone, PartialEq, TryFrom)]
     #[try_from(repr)]
     #[repr(i32)]
     pub enum RepeatedFieldPresence {
@@ -478,7 +478,7 @@ pub mod feature_set {
         }
     }
 
-    #[derive(Default, Debug, Clone, TryFrom)]
+    #[derive(Default, Debug, Clone, PartialEq, TryFrom)]
     #[try_from(repr)]
     #[repr(i32)]
     pub enum Utf8Validation {
@@ -493,7 +493,7 @@ pub mod feature_set {
         }
     }
 
-    #[derive(Default, Debug, Clone, TryFrom)]
+    #[derive(Default, Debug, Clone, PartialEq, TryFrom)]
     #[try_from(repr)]
     #[repr(i32)]
     pub enum MessageEncoding {
@@ -508,7 +508,7 @@ pub mod feature_set {
         }
     }
 
-    #[derive(Default, Debug, Clone, TryFrom)]
+    #[derive(Default, Debug, Clone, PartialEq, TryFrom)]
     #[try_from(repr)]
     #[repr(i32)]
     pub enum JsonFormat {

@@ -113,7 +113,7 @@ impl<'a> FieldDescriptorExt<'a> {
     pub fn file(&'a self) -> &'a FileDescriptorExt<'a> {
         self.cache.file.get_or_init(|| self.message.file())
     }
-    pub fn field_presence(&'a self) -> Option<FieldPresence> {
+    pub fn field_presence(&'a self) -> Option<protobuf::feature_set::FieldPresence> {
         todo!()
     }
     pub fn has_presence(&'a self) -> bool {
@@ -123,7 +123,7 @@ impl<'a> FieldDescriptorExt<'a> {
             true
         } else if self.type_case() == Some(FieldTypeCase::Message) {
             true
-        } else if self.field_presence() == Some(FieldPresence::Implicit) {
+        } else if self.field_presence() == Some(protobuf::feature_set::FieldPresence::Implicit) {
             false
         } else {
             true
