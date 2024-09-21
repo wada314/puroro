@@ -15,23 +15,29 @@
 pub mod gen_dynamic_message_impl;
 pub mod gen_message_trait;
 
-use ::syn::Item;
-
 use self::gen_dynamic_message_impl::GenDynamicMessageImpls;
 use self::gen_message_trait::GenTrait;
+use super::CodeGeneratorOptions;
 use crate::descriptor::DescriptorExt;
 use crate::Result;
+use ::std::rc::Rc;
+use ::syn::Item;
 
 pub struct GenMessageItems {
     gen_trait: GenTrait,
     gen_gm_impls: GenDynamicMessageImpls,
+    options: Rc<CodeGeneratorOptions>,
 }
 
 impl GenMessageItems {
-    pub fn try_new<'a>(desc: &'a DescriptorExt<'a>) -> Result<Self> {
+    pub fn try_new<'a>(
+        desc: &'a DescriptorExt<'a>,
+        options: Rc<CodeGeneratorOptions>,
+    ) -> Result<Self> {
         Ok(Self {
-            gen_trait: GenTrait::try_new(desc)?,
-            gen_gm_impls: GenDynamicMessageImpls::try_new(desc)?,
+            gen_trait: GenTrait::try_new(desc, Rc::clone(&options))?,
+            gen_gm_impls: GenDynamicMessageImpls::try_new(desc, Rc::clone(&options))?,
+            options,
         })
     }
 

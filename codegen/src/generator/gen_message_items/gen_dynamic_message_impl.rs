@@ -16,26 +16,33 @@ use super::gen_message_trait::{Field as TraitField, FieldWrapper, GenTrait};
 use crate::descriptor::{
     DescriptorExt, FieldDescriptorExt, I32Type, I64Type, LenType, VariantType, WireType,
 };
+use crate::generator::CodeGeneratorOptions;
 use crate::proto_path::ProtoPath;
 use crate::Result;
 use ::quote::quote;
+use ::std::rc::Rc;
 use ::syn::{parse2, parse_str, Ident, Item};
 use ::syn::{Expr, Type};
 
 pub struct GenDynamicMessageImpls {
     rust_trait_name: Ident,
     fields: Vec<Field>,
+    options: Rc<CodeGeneratorOptions>,
 }
 
 impl GenDynamicMessageImpls {
-    pub fn try_new<'a>(desc: &'a DescriptorExt<'a>) -> Result<Self> {
+    pub fn try_new<'a>(
+        desc: &'a DescriptorExt<'a>,
+        options: Rc<CodeGeneratorOptions>,
+    ) -> Result<Self> {
         Ok(Self {
             rust_trait_name: GenTrait::rust_name_from_message_name(desc.name())?,
             fields: desc
                 .non_oneof_fields()?
                 .into_iter()
-                .map(Field::try_new)
+                .map(|f| Field::try_new(f, Rc::clone(&options)))
                 .collect::<Result<Vec<_>>>()?,
+            options,
         })
     }
 
@@ -58,13 +65,18 @@ impl GenDynamicMessageImpls {
 pub struct Field {
     number: i32,
     trait_field: TraitField,
+    options: Rc<CodeGeneratorOptions>,
 }
 
 impl Field {
-    fn try_new<'a>(desc: &'a FieldDescriptorExt<'a>) -> Result<Self> {
+    fn try_new<'a>(
+        desc: &'a FieldDescriptorExt<'a>,
+        options: Rc<CodeGeneratorOptions>,
+    ) -> Result<Self> {
         Ok(Self {
             number: desc.number(),
-            trait_field: TraitField::try_new(desc)?,
+            trait_field: TraitField::try_new(desc, Rc::clone(&options))?,
+            options,
         })
     }
 

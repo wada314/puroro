@@ -14,11 +14,11 @@
 
 use crate::cases::{convert_into_case, Case};
 use crate::descriptor::{DescriptorExt, FieldDescriptorExt, FieldLabel, FieldType, FieldTypeCase};
-use crate::generator::avoid_reserved_keywords;
+use crate::generator::{avoid_reserved_keywords, CodeGeneratorOptions};
 use crate::proto_path::{ProtoPath, ProtoPathBuf};
 use crate::Result;
 use ::quote::{format_ident, quote};
-use ::std::iter;
+use ::std::rc::Rc;
 use ::syn::{parse2, parse_str, Expr, Ident, Item, Path, Type};
 use ::syn::{Lifetime, Signature};
 
@@ -26,18 +26,23 @@ pub struct GenTrait {
     rust_name: Ident,
     rust_mut_name: Ident,
     fields: Vec<Field>,
+    options: Rc<CodeGeneratorOptions>,
 }
 
 impl GenTrait {
-    pub fn try_new<'a>(desc: &'a DescriptorExt<'a>) -> Result<Self> {
+    pub fn try_new<'a>(
+        desc: &'a DescriptorExt<'a>,
+        options: Rc<CodeGeneratorOptions>,
+    ) -> Result<Self> {
         Ok(Self {
             rust_name: Self::rust_name_from_message_name(desc.name())?,
             rust_mut_name: Self::rust_mut_name_from_message_name(desc.name())?,
             fields: desc
                 .non_oneof_fields()?
                 .into_iter()
-                .map(Field::try_new)
+                .map(|f| Field::try_new(f, Rc::clone(&options)))
                 .collect::<Result<Vec<_>>>()?,
+            options,
         })
     }
 
@@ -164,14 +169,19 @@ pub struct Field {
     original_name: String,
     wrapper: FieldWrapper,
     scalar_type: FieldType<ProtoPathBuf, ProtoPathBuf>,
+    options: Rc<CodeGeneratorOptions>,
 }
 
 impl Field {
-    pub fn try_new<'a>(desc: &'a FieldDescriptorExt<'a>) -> Result<Self> {
+    pub fn try_new<'a>(
+        desc: &'a FieldDescriptorExt<'a>,
+        options: Rc<CodeGeneratorOptions>,
+    ) -> Result<Self> {
         Ok(Self {
             original_name: desc.name().to_string(),
             wrapper: FieldWrapper::from_field_desc(desc),
             scalar_type: desc.type_with_full_path()?,
+            options,
         })
     }
 

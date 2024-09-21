@@ -27,10 +27,13 @@ use ::std::borrow::Cow;
 use ::std::cell::LazyCell;
 use ::std::collections::HashSet;
 use ::std::collections::{BTreeSet, HashMap};
+use ::std::rc::Rc;
 
 pub fn compile(request: &CodeGeneratorRequest) -> Result<CodeGeneratorResponse> {
     let mut response = CodeGeneratorResponse::default();
     response.set_supported_features(Into::<i32>::into(Feature::FeatureProto3Optional) as u64)?;
+
+    let options = Rc::new(CodeGeneratorOptions::default());
 
     let root_context: RootContext = request.proto_file().cloned().into();
     let mut out_files = GeneratedFileSet::new();
@@ -49,11 +52,15 @@ pub fn compile(request: &CodeGeneratorRequest) -> Result<CodeGeneratorResponse> 
         file.add_source(message.file().name());
 
         let trait_items =
-            gen_message_items::gen_message_trait::GenTrait::try_new(message)?.gen_items()?;
+            gen_message_items::gen_message_trait::GenTrait::try_new(message, Rc::clone(&options))?
+                .gen_items()?;
         file.append(quote! { #(#trait_items)* });
         let untyped_message_impl =
-            gen_message_items::gen_dynamic_message_impl::GenDynamicMessageImpls::try_new(message)?
-                .gen_impl_message_trait()?;
+            gen_message_items::gen_dynamic_message_impl::GenDynamicMessageImpls::try_new(
+                message,
+                Rc::clone(&options),
+            )?
+            .gen_impl_message_trait()?;
         file.append(quote! { #untyped_message_impl });
     }
 
@@ -80,6 +87,22 @@ pub fn compile(request: &CodeGeneratorRequest) -> Result<CodeGeneratorResponse> 
 
     Ok(response)
 }
+
+#[derive(Clone)]
+struct CodeGeneratorOptions {
+    /// Should the generated code's type name be fully-qualified type name?
+    /// e.g. should we just use `i32` or `::std::primitive::i32` ?
+    /// Default to true.
+    strict_type_path: bool,
+}
+impl Default for CodeGeneratorOptions {
+    fn default() -> Self {
+        Self {
+            strict_type_path: true,
+        }
+    }
+}
+impl CodeGeneratorOptions {}
 
 struct GeneratedFile {
     full_path: String,
