@@ -24,6 +24,7 @@ use ::syn::{Lifetime, Signature};
 
 pub struct GenTrait {
     rust_name: Ident,
+    rust_mut_name: Ident,
     fields: Vec<Field>,
 }
 
@@ -31,6 +32,7 @@ impl GenTrait {
     pub fn try_new<'a>(desc: &'a DescriptorExt<'a>) -> Result<Self> {
         Ok(Self {
             rust_name: Self::rust_name_from_message_name(desc.name())?,
+            rust_mut_name: Self::rust_mut_name_from_message_name(desc.name())?,
             fields: desc
                 .non_oneof_fields()?
                 .into_iter()
@@ -46,6 +48,13 @@ impl GenTrait {
         ))
     }
 
+    pub fn rust_mut_name_from_message_name(name: &str) -> Result<Ident> {
+        Ok(format_ident!(
+            "{}MutTrait",
+            convert_into_case(name, Case::CamelCase)
+        ))
+    }
+
     pub fn rust_path_from_proto_path(path: &ProtoPath) -> Result<Path> {
         path.to_rust_path_with(|s| {
             let ident = Self::rust_name_from_message_name(s)?;
@@ -55,10 +64,14 @@ impl GenTrait {
 
     pub fn gen_items(&self) -> Result<Vec<Item>> {
         let trait_def = self.gen_message_trait()?;
+        let trait_mut_def = self.gen_message_mut_trait()?;
         let mut blanket_impls = Vec::new();
         blanket_impls.append(&mut self.gen_blanket_ref_impls()?);
         blanket_impls.push(self.gen_blanket_option_impl()?);
-        Ok(iter::once(trait_def).chain(blanket_impls).collect())
+        Ok([trait_def, trait_mut_def]
+            .into_iter()
+            .chain(blanket_impls)
+            .collect())
     }
 
     fn gen_message_trait(&self) -> Result<Item> {
@@ -71,6 +84,22 @@ impl GenTrait {
         Ok(parse2(quote! {
             pub trait #trait_name {
                 #(#getters;)*
+            }
+        })?)
+    }
+
+    fn gen_message_mut_trait(&self) -> Result<Item> {
+        let trait_name = &self.rust_mut_name;
+        let allocator_ident: Ident = parse_str("A")?;
+        let allocator: Type = parse2(quote! { #allocator_ident})?;
+        let methods = self
+            .fields
+            .iter()
+            .map(|f| f.gen_mutator_signature(&allocator))
+            .collect::<Result<Vec<_>>>()?;
+        Ok(parse2(quote! {
+            pub trait #trait_name < #allocator_ident: ::std::allocator::Allocator > {
+                #(#methods;)*
             }
         })?)
     }
@@ -150,6 +179,8 @@ impl Field {
         self.scalar_type.as_deref()
     }
 
+    // Getters
+
     fn gen_getter_name(&self) -> Result<Ident> {
         let lower_cased = convert_into_case(&self.original_name, Case::LowerSnakeCase);
         Ok(parse_str(&avoid_reserved_keywords(&lower_cased))?)
@@ -197,6 +228,31 @@ impl Field {
             },
         })?)
     }
+
+    // Appendings
+
+    // Mutators
+
+    fn gen_mutator_name(&self) -> Result<Ident> {
+        let lower_cased = convert_into_case(&self.original_name, Case::LowerSnakeCase);
+        Ok(parse_str(&format!(
+            "{}_mut",
+            avoid_reserved_keywords(&lower_cased)
+        ))?)
+    }
+
+    pub fn gen_mutator_signature(&self, allocator: &Type) -> Result<Signature> {
+        let mutator_name = self.gen_mutator_name()?;
+        let mutator_type = match self.wrapper {
+            FieldWrapper::Vec => parse2(quote! { () /* TODO */ })?,
+            _ => self.scalar_type.gen_non_repeated_mutator_type(allocator)?,
+        };
+        Ok(parse2(quote! {
+            fn #mutator_name(&mut self) -> #mutator_type
+        })?)
+    }
+
+    // Others
 
     pub fn wrapper(&self) -> FieldWrapper {
         self.wrapper
@@ -270,6 +326,46 @@ impl FieldType<ProtoPathBuf, ProtoPathBuf> {
         let bare_type = self.gen_bare_getter_type(lifetime)?;
         Ok(parse2(quote! {
             impl ::std::iter::Iterator::<Item = #bare_type >
+        })?)
+    }
+
+    fn gen_bare_mutator_type(&self, allocator: &Type) -> Result<Type> {
+        Ok(match self {
+            FieldType::Message(path) => {
+                let path = path.to_rust_path_with(|name| {
+                    let ident = GenTrait::rust_mut_name_from_message_name(name)?;
+                    Ok(parse2(quote! { #ident })?)
+                })?;
+                parse2(quote! { impl #path<#allocator> })?
+            }
+            FieldType::Enum(path) => {
+                let path = path.to_rust_path()?;
+                parse2(quote! { #path })?
+            }
+            FieldType::Int32 => parse_str("::std::primitive::i32")?,
+            FieldType::Int64 => parse_str("::std::primitive::i64")?,
+            FieldType::UInt32 => parse_str("::std::primitive::u32")?,
+            FieldType::UInt64 => parse_str("::std::primitive::u64")?,
+            FieldType::SInt32 => parse_str("::std::primitive::i32")?,
+            FieldType::SInt64 => parse_str("::std::primitive::i64")?,
+            FieldType::Fixed32 => parse_str("::std::primitive::u32")?,
+            FieldType::Fixed64 => parse_str("::std::primitive::u64")?,
+            FieldType::SFixed32 => parse_str("::std::primitive::i32")?,
+            FieldType::SFixed64 => parse_str("::std::primitive::i64")?,
+            FieldType::Float => parse_str("::std::primitive::f32")?,
+            FieldType::Double => parse_str("::std::primitive::f64")?,
+            FieldType::Bool => parse_str("::std::primitive::bool")?,
+            FieldType::String => parse_str("::std::string::String")?,
+            FieldType::Bytes => {
+                parse2(quote! { ::std::vec::Vec<::std::primitive::u8, #allocator> })?
+            }
+            FieldType::Group => Err(format!("Group field is not supported"))?,
+        })
+    }
+    fn gen_non_repeated_mutator_type(&self, allocator: &Type) -> Result<Type> {
+        let bare_type = self.gen_bare_mutator_type(allocator)?;
+        Ok(parse2(quote! {
+            impl ::std::ops::DerefMut<Target = #bare_type>
         })?)
     }
 }
