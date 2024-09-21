@@ -33,7 +33,9 @@ impl<A: Allocator + Clone> FileDescriptorSet<A> {
     }
 }
 
-#[derive(Default, Debug, Clone)]
+#[derive(Default, Debug, Clone, TryFrom)]
+#[try_from(repr)]
+#[repr(i32)]
 pub enum Edition {
     #[default]
     EditionUnknown = 0,
@@ -46,24 +48,6 @@ pub enum Edition {
     Edition99997TestOnly = 99997,
     Edition99998TestOnly = 99998,
     Edition99999TestOnly = 99999,
-}
-impl TryFrom<i32> for Edition {
-    type Error = i32;
-    fn try_from(value: i32) -> ::std::result::Result<Self, i32> {
-        match value {
-            0 => Ok(Self::EditionUnknown),
-            998 => Ok(Self::EditionProto2),
-            999 => Ok(Self::EditionProto3),
-            1000 => Ok(Self::Edition2023),
-            1001 => Ok(Self::Edition2024),
-            1 => Ok(Self::Edition1TestOnly),
-            2 => Ok(Self::Edition2TestOnly),
-            99997 => Ok(Self::Edition99997TestOnly),
-            99998 => Ok(Self::Edition99998TestOnly),
-            99999 => Ok(Self::Edition99999TestOnly),
-            _ => Err(value),
-        }
-    }
 }
 impl From<Edition> for i32 {
     fn from(value: Edition) -> i32 {
@@ -202,7 +186,11 @@ impl<A: Allocator + Clone> FieldDescriptorProto<A> {
 }
 
 pub mod field_descriptor_proto {
-    #[derive(Default, Debug, Clone)]
+    use ::derive_more::TryFrom;
+
+    #[derive(Default, Debug, Clone, TryFrom)]
+    #[try_from(repr)]
+    #[repr(i32)]
     pub enum Type {
         TypeDouble = 1,
         TypeFloat = 2,
@@ -225,7 +213,9 @@ pub mod field_descriptor_proto {
         TypeSInt64 = 18,
     }
 
-    #[derive(Default, Debug, Clone)]
+    #[derive(Default, Debug, Clone, TryFrom)]
+    #[try_from(repr)]
+    #[repr(i32)]
     pub enum Label {
         #[default]
         LabelOptional = 1,
@@ -233,49 +223,12 @@ pub mod field_descriptor_proto {
         LabelRequired = 2,
     }
 
-    impl TryFrom<i32> for Type {
-        type Error = i32;
-        fn try_from(value: i32) -> ::std::result::Result<Self, i32> {
-            match value {
-                1 => Ok(Self::TypeDouble),
-                2 => Ok(Self::TypeFloat),
-                3 => Ok(Self::TypeInt64),
-                4 => Ok(Self::TypeUInt64),
-                5 => Ok(Self::TypeInt32),
-                6 => Ok(Self::TypeFixed64),
-                7 => Ok(Self::TypeFixed32),
-                8 => Ok(Self::TypeBool),
-                9 => Ok(Self::TypeString),
-                10 => Ok(Self::TypeGroup),
-                11 => Ok(Self::TypeMessage),
-                12 => Ok(Self::TypeBytes),
-                13 => Ok(Self::TypeUInt32),
-                14 => Ok(Self::TypeEnum),
-                15 => Ok(Self::TypeSFixed32),
-                16 => Ok(Self::TypeSFixed64),
-                17 => Ok(Self::TypeSInt32),
-                18 => Ok(Self::TypeSInt64),
-                _ => Err(value),
-            }
-        }
-    }
     impl From<Type> for i32 {
         fn from(value: Type) -> i32 {
             value as i32
         }
     }
 
-    impl TryFrom<i32> for Label {
-        type Error = i32;
-        fn try_from(value: i32) -> ::std::result::Result<Self, i32> {
-            match value {
-                1 => Ok(Self::LabelOptional),
-                3 => Ok(Self::LabelRepeated),
-                2 => Ok(Self::LabelRequired),
-                _ => Err(value),
-            }
-        }
-    }
     impl From<Label> for i32 {
         fn from(value: Label) -> i32 {
             value as i32
