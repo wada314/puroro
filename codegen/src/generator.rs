@@ -28,12 +28,17 @@ use ::std::cell::LazyCell;
 use ::std::collections::HashSet;
 use ::std::collections::{BTreeSet, HashMap};
 use ::std::rc::Rc;
+use ::syn::{parse2, parse_str, Ident, Type};
 
 pub fn compile(request: &CodeGeneratorRequest) -> Result<CodeGeneratorResponse> {
     let mut response = CodeGeneratorResponse::default();
     response.set_supported_features(Into::<i32>::into(Feature::FeatureProto3Optional) as u64)?;
 
-    let options = Rc::new(CodeGeneratorOptions::default());
+    let options = Rc::new({
+        let mut options = CodeGeneratorOptions::default();
+        options.strict_type_path = false;
+        options
+    });
 
     let root_context: RootContext = request.proto_file().cloned().into();
     let mut out_files = GeneratedFileSet::new();
@@ -89,11 +94,11 @@ pub fn compile(request: &CodeGeneratorRequest) -> Result<CodeGeneratorResponse> 
 }
 
 #[derive(Clone)]
-struct CodeGeneratorOptions {
+pub struct CodeGeneratorOptions {
     /// Should the generated code's type name be fully-qualified type name?
     /// e.g. should we just use `i32` or `::std::primitive::i32` ?
     /// Default to true.
-    strict_type_path: bool,
+    pub strict_type_path: bool,
 }
 impl Default for CodeGeneratorOptions {
     fn default() -> Self {
@@ -102,7 +107,37 @@ impl Default for CodeGeneratorOptions {
         }
     }
 }
-impl CodeGeneratorOptions {}
+impl CodeGeneratorOptions {
+    pub fn primitive_type_path(&self, ty: &str) -> Result<Type> {
+        let ident: Ident = parse_str(ty)?;
+        Ok(parse2(if self.strict_type_path {
+            quote! { ::std::primitive::#ident }
+        } else {
+            quote! { #ident }
+        })?)
+    }
+    pub fn vec_type(&self, elem_type: &Type) -> Result<Type> {
+        Ok(parse2(if self.strict_type_path {
+            quote! { ::std::vec::Vec<#elem_type> }
+        } else {
+            quote! { Vec<#elem_type> }
+        })?)
+    }
+    pub fn option_type(&self, elem_type: &Type) -> Result<Type> {
+        Ok(parse2(if self.strict_type_path {
+            quote! { ::std::option::Option<#elem_type> }
+        } else {
+            quote! { Option<#elem_type> }
+        })?)
+    }
+    pub fn iter_type(&self, elem_type: &Type) -> Result<Type> {
+        Ok(parse2(if self.strict_type_path {
+            quote! { ::std::iter::Iterator<Item=#elem_type> }
+        } else {
+            quote! { Iterator<Item=#elem_type> }
+        })?)
+    }
+}
 
 struct GeneratedFile {
     full_path: String,

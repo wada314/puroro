@@ -202,11 +202,13 @@ impl Field {
         let getter_type = match self.wrapper {
             FieldWrapper::Vec => self
                 .scalar_type
-                .gen_repeated_getter_type(lifetime.as_ref())?,
+                .gen_repeated_getter_type(lifetime.as_ref(), &self.options)?,
             FieldWrapper::Optional | FieldWrapper::OptionalBoxed => self
                 .scalar_type
-                .gen_optional_getter_type(lifetime.as_ref())?,
-            FieldWrapper::Bare => self.scalar_type.gen_bare_getter_type(lifetime.as_ref())?,
+                .gen_optional_getter_type(lifetime.as_ref(), &self.options)?,
+            FieldWrapper::Bare => self
+                .scalar_type
+                .gen_bare_getter_type(lifetime.as_ref(), &self.options)?,
         };
         Ok(parse2(quote! {
             fn #getter_name(&self) -> #getter_type
@@ -294,7 +296,11 @@ impl FieldWrapper {
 }
 
 impl FieldType<ProtoPathBuf, ProtoPathBuf> {
-    fn gen_bare_getter_type(&self, lifetime: Option<&Lifetime>) -> Result<Type> {
+    fn gen_bare_getter_type(
+        &self,
+        lifetime: Option<&Lifetime>,
+        options: &CodeGeneratorOptions,
+    ) -> Result<Type> {
         let lifetime_iter = lifetime.iter();
         Ok(match self {
             FieldType::Message(path) => {
@@ -308,34 +314,47 @@ impl FieldType<ProtoPathBuf, ProtoPathBuf> {
                 let path = path.to_rust_path()?;
                 parse2(quote! { #path })?
             }
-            FieldType::Int32 => parse_str("::std::primitive::i32")?,
-            FieldType::Int64 => parse_str("::std::primitive::i64")?,
-            FieldType::UInt32 => parse_str("::std::primitive::u32")?,
-            FieldType::UInt64 => parse_str("::std::primitive::u64")?,
-            FieldType::SInt32 => parse_str("::std::primitive::i32")?,
-            FieldType::SInt64 => parse_str("::std::primitive::i64")?,
-            FieldType::Fixed32 => parse_str("::std::primitive::u32")?,
-            FieldType::Fixed64 => parse_str("::std::primitive::u64")?,
-            FieldType::SFixed32 => parse_str("::std::primitive::i32")?,
-            FieldType::SFixed64 => parse_str("::std::primitive::i64")?,
-            FieldType::Float => parse_str("::std::primitive::f32")?,
-            FieldType::Double => parse_str("::std::primitive::f64")?,
-            FieldType::Bool => parse_str("::std::primitive::bool")?,
-            FieldType::String => parse2(quote! { & #lifetime ::std::primitive::str })?,
-            FieldType::Bytes => parse2(quote! { & #lifetime [::std::primitive::u8] })?,
+            FieldType::Int32 => options.primitive_type_path("i32")?,
+            FieldType::Int64 => options.primitive_type_path("i64")?,
+            FieldType::UInt32 => options.primitive_type_path("u32")?,
+            FieldType::UInt64 => options.primitive_type_path("u64")?,
+            FieldType::SInt32 => options.primitive_type_path("i32")?,
+            FieldType::SInt64 => options.primitive_type_path("i64")?,
+            FieldType::Fixed32 => options.primitive_type_path("u32")?,
+            FieldType::Fixed64 => options.primitive_type_path("u64")?,
+            FieldType::SFixed32 => options.primitive_type_path("i32")?,
+            FieldType::SFixed64 => options.primitive_type_path("i64")?,
+            FieldType::Float => options.primitive_type_path("f32")?,
+            FieldType::Double => options.primitive_type_path("f64")?,
+            FieldType::Bool => options.primitive_type_path("bool")?,
+            FieldType::String => {
+                let str_type = options.primitive_type_path("str")?;
+                parse2(quote! { & #lifetime #str_type })?
+            }
+            FieldType::Bytes => {
+                let u8_type = options.primitive_type_path("u8")?;
+                parse2(quote! { & #lifetime [#u8_type] })?
+            }
             FieldType::Group => Err(format!("Group field is not supported"))?,
         })
     }
-    fn gen_optional_getter_type(&self, lifetime: Option<&Lifetime>) -> Result<Type> {
-        let bare_type = self.gen_bare_getter_type(lifetime)?;
-        Ok(parse2(quote! {
-            ::std::option::Option::< #bare_type >
-        })?)
+    fn gen_optional_getter_type(
+        &self,
+        lifetime: Option<&Lifetime>,
+        options: &CodeGeneratorOptions,
+    ) -> Result<Type> {
+        let bare_type = self.gen_bare_getter_type(lifetime, options)?;
+        options.option_type(&bare_type)
     }
-    fn gen_repeated_getter_type(&self, lifetime: Option<&Lifetime>) -> Result<Type> {
-        let bare_type = self.gen_bare_getter_type(lifetime)?;
+    fn gen_repeated_getter_type(
+        &self,
+        lifetime: Option<&Lifetime>,
+        options: &CodeGeneratorOptions,
+    ) -> Result<Type> {
+        let bare_type = self.gen_bare_getter_type(lifetime, options)?;
+        let iter_trait = options.iter_type(&bare_type)?;
         Ok(parse2(quote! {
-            impl ::std::iter::Iterator::<Item = #bare_type >
+            impl #iter_trait
         })?)
     }
 
