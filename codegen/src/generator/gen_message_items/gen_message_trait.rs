@@ -355,7 +355,7 @@ impl FieldType<ProtoPathBuf, ProtoPathBuf> {
             FieldType::Float => parse_str("::std::primitive::f32")?,
             FieldType::Double => parse_str("::std::primitive::f64")?,
             FieldType::Bool => parse_str("::std::primitive::bool")?,
-            FieldType::String => parse_str("::std::string::String")?,
+            FieldType::String => parse2(quote! { ::puroro::string::String<#allocator> })?,
             FieldType::Bytes => {
                 parse2(quote! { ::std::vec::Vec<::std::primitive::u8, #allocator> })?
             }
