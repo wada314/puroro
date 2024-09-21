@@ -114,7 +114,7 @@ impl Field {
     pub fn try_new<'a>(desc: &'a FieldDescriptorExt<'a>) -> Result<Self> {
         Ok(Self {
             original_name: desc.name().to_string(),
-            wrapper: FieldWrapper::try_from_field_desc(desc)?,
+            wrapper: FieldWrapper::from_field_desc(desc),
             scalar_type: desc.type_with_full_path()?,
         })
     }
@@ -166,26 +166,18 @@ pub enum FieldWrapper {
 }
 
 impl FieldWrapper {
-    fn try_from_field_desc(desc: &FieldDescriptorExt) -> Result<Self> {
-        Ok(match desc.label() {
-            Some(FieldLabel::Repeated) => FieldWrapper::Vec,
-            Some(FieldLabel::Optional | FieldLabel::Required) => {
-                if desc.type_case() == Some(FieldTypeCase::Message) {
-                    FieldWrapper::OptionalBoxed
-                } else {
-                    FieldWrapper::Optional
-                }
+    fn from_field_desc<'a>(field: &'a FieldDescriptorExt<'a>) -> Self {
+        if field.has_presence() {
+            if field.type_case() == Some(FieldTypeCase::Message) {
+                FieldWrapper::OptionalBoxed
+            } else {
+                FieldWrapper::Optional
             }
-            None => {
-                if desc.type_case() == Some(FieldTypeCase::Message) {
-                    FieldWrapper::OptionalBoxed
-                } else if desc.is_proto3_optional() {
-                    FieldWrapper::Optional
-                } else {
-                    FieldWrapper::Bare
-                }
-            }
-        })
+        } else if field.label() == Some(FieldLabel::Repeated) {
+            FieldWrapper::Vec
+        } else {
+            FieldWrapper::Bare
+        }
     }
 }
 

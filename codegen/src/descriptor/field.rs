@@ -131,6 +131,8 @@ impl<'a> FieldDescriptorExt<'a> {
             false
         } else if self.oneof_index().is_some() {
             true
+        } else if self.is_proto3_optional() {
+            true
         } else if self.type_case() == Some(FieldTypeCase::Message) {
             true
         } else if self.field_presence() == Some(protobuf::feature_set::FieldPresence::Implicit) {

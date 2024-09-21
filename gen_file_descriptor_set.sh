@@ -1,0 +1,2 @@
+ protoc --proto_path=./tests/tests/protos $1 --descriptor_set_out=$TEMP/temp.pb \
+ &&  protoc --decode="google.protobuf.FileDescriptorSet" --proto_path=../protobuf/src/ ../protobuf/src/google/protobuf/descriptor.proto < $TEMP/temp.pb

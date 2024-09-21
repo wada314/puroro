@@ -146,9 +146,20 @@ impl<'a> FileDescriptorExt<'a> {
                     }
                 }
                 match self.base.edition() {
-                    Edition::EditionProto2 => Some(FieldPresence::Explicit),
-                    Edition::EditionProto3 => Some(FieldPresence::Implicit),
-                    Edition::Edition2023 => Some(FieldPresence::Explicit),
+                    Edition::EditionProto2 => {
+                        return Some(FieldPresence::Explicit);
+                    }
+                    Edition::EditionProto3 => {
+                        return Some(FieldPresence::Implicit);
+                    }
+                    Edition::Edition2023 => {
+                        return Some(FieldPresence::Explicit);
+                    }
+                    _ => (),
+                }
+                match self.base.syntax() {
+                    Some("proto2") => Some(FieldPresence::Explicit),
+                    Some("proto3") => Some(FieldPresence::Implicit),
                     _ => None,
                 }
             })
