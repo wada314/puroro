@@ -52,7 +52,7 @@ pub fn compile(request: &CodeGeneratorRequest) -> Result<CodeGeneratorResponse> 
             gen_message_items::gen_message_trait::GenTrait::try_new(message)?.gen_items()?;
         file.append(quote! { #(#trait_items)* });
         let untyped_message_impl =
-            gen_message_items::gen_generic_message_impls::GenGenericMessageImpls::try_new(message)?
+            gen_message_items::gen_dynamic_message_impl::GenDynamicMessageImpls::try_new(message)?
                 .gen_impl_message_trait()?;
         file.append(quote! { #untyped_message_impl });
     }

@@ -58,8 +58,8 @@ pub enum ErrorKind {
     DeserUnexpectedEof,
     #[error("The field type and wire type are not matching")]
     UnmatchingWireAndFieldType,
-    #[error("Error when matching the GenericMessage type's field type.")]
-    GenericMessageFieldTypeError,
+    #[error("Error when matching the DynamicMessage type's field type.")]
+    DynamicMessageFieldTypeError,
     #[error("Error when converting an int32 to an (closed) enum value: {0}")]
     TryFromIntIntoEnumError(i32),
 }

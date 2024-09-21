@@ -22,12 +22,12 @@ use ::quote::quote;
 use ::syn::{parse2, parse_str, Ident, Item};
 use ::syn::{Expr, Type};
 
-pub struct GenGenericMessageImpls {
+pub struct GenDynamicMessageImpls {
     rust_trait_name: Ident,
     fields: Vec<Field>,
 }
 
-impl GenGenericMessageImpls {
+impl GenDynamicMessageImpls {
     pub fn try_new<'a>(desc: &'a DescriptorExt<'a>) -> Result<Self> {
         Ok(Self {
             rust_trait_name: GenTrait::rust_name_from_message_name(desc.name())?,
@@ -48,7 +48,7 @@ impl GenGenericMessageImpls {
             .collect::<Result<Vec<_>>>()?;
         Ok(parse2(quote! {
             impl<A: ::std::alloc::Allocator + ::std::clone::Clone> self::#trait_name
-            for ::puroro::generic_message::GenericMessage<A> {
+            for ::puroro::generic_message::DynamicMessage<A> {
                 #(#getters)*
             }
         })?)

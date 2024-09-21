@@ -14,8 +14,8 @@
 
 use ::std::alloc::{Allocator, Global};
 
-use super::{FileDescriptorProtoTrait, GenericMessageExt};
-use crate::generic_message::GenericMessage;
+use super::{DynamicMessageExt, FileDescriptorProtoTrait};
+use crate::generic_message::DynamicMessage;
 use crate::google::protobuf::FileDescriptorProto;
 use crate::internal::{
     impl_message_mut_trait_for_trivial_types, impl_message_trait_for_trivial_types,
@@ -27,7 +27,7 @@ use ::ref_cast::RefCast;
 
 #[derive(Deref, DerefMut, From, Into, Default, Debug, RefCast, Clone)]
 #[repr(transparent)]
-pub struct Version<A: Allocator = Global>(GenericMessage<A>);
+pub struct Version<A: Allocator = Global>(DynamicMessage<A>);
 impl<A: Allocator> Version<A> {
     pub const MAJOR_FIELD_NUMBER: i32 = 1;
     pub const MINOR_FIELD_NUMBER: i32 = 2;
@@ -51,7 +51,7 @@ impl<A: Allocator + Clone> Version<A> {
 
 #[derive(Deref, DerefMut, From, Into, Default, Debug, RefCast, Clone)]
 #[repr(transparent)]
-pub struct CodeGeneratorRequest<A: Allocator = Global>(GenericMessage<A>);
+pub struct CodeGeneratorRequest<A: Allocator = Global>(DynamicMessage<A>);
 impl<A: Allocator> CodeGeneratorRequest<A> {
     pub const FILE_TO_GENERATE_FIELD_NUMBER: i32 = 1;
     pub const PARAMETER_FIELD_NUMBER: i32 = 2;
@@ -110,7 +110,7 @@ pub mod code_generator_response {
 
     #[derive(Deref, DerefMut, From, Into, Default, Debug, RefCast, Clone)]
     #[repr(transparent)]
-    pub struct File<A: Allocator = Global>(GenericMessage<A>);
+    pub struct File<A: Allocator = Global>(DynamicMessage<A>);
     impl<A: Allocator> File<A> {
         pub const NAME_FIELD_NUMBER: i32 = 1;
         pub const INSERTION_POINT_FIELD_NUMBER: i32 = 2;
@@ -163,7 +163,7 @@ pub mod code_generator_response {
 
 #[derive(Deref, DerefMut, From, Into, Default, Debug, RefCast, Clone)]
 #[repr(transparent)]
-pub struct CodeGeneratorResponse<A: Allocator = Global>(GenericMessage<A>);
+pub struct CodeGeneratorResponse<A: Allocator = Global>(DynamicMessage<A>);
 impl<A: Allocator> CodeGeneratorResponse<A> {
     pub const ERROR_FIELD_NUMBER: i32 = 1;
     pub const SUPPORTED_FEATURES_FIELD_NUMBER: i32 = 2;

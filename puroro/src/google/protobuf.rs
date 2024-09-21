@@ -14,8 +14,8 @@
 
 pub mod compiler;
 
-use super::GenericMessageExt;
-use crate::generic_message::GenericMessage;
+use super::DynamicMessageExt;
+use crate::generic_message::DynamicMessage;
 use crate::internal::impl_message_trait_for_trivial_types;
 use ::derive_more::{Deref, DerefMut, From, Into, TryFrom};
 use ::ref_cast::RefCast;
@@ -23,7 +23,7 @@ use ::std::alloc::{Allocator, Global};
 
 #[derive(Deref, DerefMut, From, Into, Default, Debug, RefCast, Clone)]
 #[repr(transparent)]
-pub struct FileDescriptorSet<A: Allocator = Global>(GenericMessage<A>);
+pub struct FileDescriptorSet<A: Allocator = Global>(DynamicMessage<A>);
 impl<A: Allocator> FileDescriptorSet<A> {
     pub const FILE_FIELD_NUMBER: i32 = 1;
 }
@@ -57,7 +57,7 @@ impl From<Edition> for i32 {
 
 #[derive(Deref, DerefMut, From, Into, Default, Debug, RefCast, Clone)]
 #[repr(transparent)]
-pub struct FileDescriptorProto<A: Allocator = Global>(GenericMessage<A>);
+pub struct FileDescriptorProto<A: Allocator = Global>(DynamicMessage<A>);
 impl<A: Allocator> FileDescriptorProto<A> {
     pub const NAME_FIELD_NUMBER: i32 = 1;
     pub const PACKAGE_FIELD_NUMBER: i32 = 2;
@@ -106,7 +106,7 @@ impl<A: Allocator + Clone> FileDescriptorProto<A> {
 
 #[derive(Deref, DerefMut, From, Into, Default, Debug, RefCast, Clone)]
 #[repr(transparent)]
-pub struct DescriptorProto<A: Allocator = Global>(GenericMessage<A>);
+pub struct DescriptorProto<A: Allocator = Global>(DynamicMessage<A>);
 impl<A: Allocator> DescriptorProto<A> {
     pub const NAME_FIELD_NUMBER: i32 = 1;
     pub const FIELD_FIELD_NUMBER: i32 = 2;
@@ -142,7 +142,7 @@ impl<A: Allocator + Clone> DescriptorProto<A> {
 
 #[derive(Deref, DerefMut, From, Into, Default, Debug, RefCast, Clone)]
 #[repr(transparent)]
-pub struct FieldDescriptorProto<A: Allocator = Global>(GenericMessage<A>);
+pub struct FieldDescriptorProto<A: Allocator = Global>(DynamicMessage<A>);
 impl<A: Allocator> FieldDescriptorProto<A> {
     pub const NAME_FIELD_NUMBER: i32 = 1;
     pub const NUMBER_FIELD_NUMBER: i32 = 3;
@@ -246,7 +246,7 @@ pub mod field_descriptor_proto {
 
 #[derive(Deref, DerefMut, From, Into, Default, Debug, RefCast, Clone)]
 #[repr(transparent)]
-pub struct OneofDescriptorProto<A: Allocator = Global>(GenericMessage<A>);
+pub struct OneofDescriptorProto<A: Allocator = Global>(DynamicMessage<A>);
 impl<A: Allocator> OneofDescriptorProto<A> {
     pub const NAME_FIELD_NUMBER: i32 = 1;
     pub const OPTIONS_FIELD_NUMBER: i32 = 2;
@@ -262,7 +262,7 @@ impl<A: Allocator + Clone> OneofDescriptorProto<A> {
 
 #[derive(Deref, DerefMut, From, Into, Default, Debug, RefCast, Clone)]
 #[repr(transparent)]
-pub struct EnumDescriptorProto<A: Allocator = Global>(GenericMessage<A>);
+pub struct EnumDescriptorProto<A: Allocator = Global>(DynamicMessage<A>);
 impl<A: Allocator> EnumDescriptorProto<A> {
     pub const NAME_FIELD_NUMBER: i32 = 1;
     pub const VALUE_FIELD_NUMBER: i32 = 2;
@@ -282,7 +282,7 @@ impl<A: Allocator + Clone> EnumDescriptorProto<A> {
 
 #[derive(Deref, DerefMut, From, Into, Default, Debug, RefCast, Clone)]
 #[repr(transparent)]
-pub struct EnumValueDescriptorProto<A: Allocator = Global>(GenericMessage<A>);
+pub struct EnumValueDescriptorProto<A: Allocator = Global>(DynamicMessage<A>);
 impl<A: Allocator> EnumValueDescriptorProto<A> {
     pub const NAME_FIELD_NUMBER: i32 = 1;
     pub const NUMBER_FIELD_NUMBER: i32 = 2;
@@ -302,7 +302,7 @@ impl<A: Allocator + Clone> EnumValueDescriptorProto<A> {
 
 #[derive(Deref, DerefMut, From, Into, Default, Debug, RefCast, Clone)]
 #[repr(transparent)]
-pub struct FileOptions<A: Allocator = Global>(GenericMessage<A>);
+pub struct FileOptions<A: Allocator = Global>(DynamicMessage<A>);
 impl<A: Allocator> FileOptions<A> {
     pub const FEATURES_FIELD_NUMBER: i32 = 50;
 }
@@ -314,7 +314,7 @@ impl<A: Allocator + Clone> FileOptions<A> {
 
 #[derive(Deref, DerefMut, From, Into, Default, Debug, RefCast, Clone)]
 #[repr(transparent)]
-pub struct MessageOptions<A: Allocator = Global>(GenericMessage<A>);
+pub struct MessageOptions<A: Allocator = Global>(DynamicMessage<A>);
 impl<A: Allocator> MessageOptions<A> {
     pub const MAP_ENTRY_FIELD_NUMBER: i32 = 7;
     pub const FEATURES_FIELD_NUMBER: i32 = 12;
@@ -331,7 +331,7 @@ impl<A: Allocator + Clone> MessageOptions<A> {
 
 #[derive(Deref, DerefMut, From, Into, Default, Debug, RefCast, Clone)]
 #[repr(transparent)]
-pub struct FieldOptions<A: Allocator = Global>(GenericMessage<A>);
+pub struct FieldOptions<A: Allocator = Global>(DynamicMessage<A>);
 impl<A: Allocator> FieldOptions<A> {
     pub const PACKED_FIELD_NUMBER: i32 = 2;
     pub const LAZY_FIELD_NUMBER: i32 = 5;
@@ -358,7 +358,7 @@ impl<A: Allocator + Clone> FieldOptions<A> {
 
 #[derive(Deref, DerefMut, From, Into, Default, Debug, RefCast, Clone)]
 #[repr(transparent)]
-pub struct OneofOptions<A: Allocator = Global>(GenericMessage<A>);
+pub struct OneofOptions<A: Allocator = Global>(DynamicMessage<A>);
 impl<A: Allocator> OneofOptions<A> {
     pub const FEATURES_FIELD_NUMBER: i32 = 1;
 }
@@ -370,7 +370,7 @@ impl<A: Allocator + Clone> OneofOptions<A> {
 
 #[derive(Deref, DerefMut, From, Into, Default, Debug, RefCast, Clone)]
 #[repr(transparent)]
-pub struct EnumOptions<A: Allocator = Global>(GenericMessage<A>);
+pub struct EnumOptions<A: Allocator = Global>(DynamicMessage<A>);
 impl<A: Allocator> EnumOptions<A> {
     pub const ALLOW_ALIAS_FIELD_NUMBER: i32 = 2;
     pub const FEATURES_FIELD_NUMBER: i32 = 7;
@@ -387,7 +387,7 @@ impl<A: Allocator + Clone> EnumOptions<A> {
 
 #[derive(Deref, DerefMut, From, Into, Default, Debug, RefCast, Clone)]
 #[repr(transparent)]
-pub struct EnumValueOptions<A: Allocator = Global>(GenericMessage<A>);
+pub struct EnumValueOptions<A: Allocator = Global>(DynamicMessage<A>);
 impl<A: Allocator> EnumValueOptions<A> {
     pub const FEATURES_FIELD_NUMBER: i32 = 2;
 }
@@ -399,7 +399,7 @@ impl<A: Allocator + Clone> EnumValueOptions<A> {
 
 #[derive(Deref, DerefMut, From, Into, Default, Debug, RefCast, Clone)]
 #[repr(transparent)]
-pub struct FeatureSet<A: Allocator = Global>(GenericMessage<A>);
+pub struct FeatureSet<A: Allocator = Global>(DynamicMessage<A>);
 impl<A: Allocator> FeatureSet<A> {
     pub const FIELD_PRESENCE_FIELD_NUMBER: i32 = 1;
     pub const ENUM_TYPE_FIELD_NUMBER: i32 = 2;

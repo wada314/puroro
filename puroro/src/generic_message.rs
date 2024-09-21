@@ -33,7 +33,7 @@ use ::std::convert::Infallible;
 use ::std::io::{BufRead, Read, Write};
 
 #[derive(Default, Clone)]
-pub struct GenericMessage<A: Allocator = Global> {
+pub struct DynamicMessage<A: Allocator = Global> {
     fields: HashMap<
         i32,
         BaseAndDerived<Vec<WireTypeAndPayload<A>, A>, FieldCustomView<A>, A>,
@@ -64,7 +64,7 @@ impl<A: Allocator> WireTypeAndPayload<A> {
 #[derive(Clone, Debug, TryUnwrap)]
 #[try_unwrap(ref, ref_mut)]
 pub enum LenCustomPayloadView<A: Allocator = Global> {
-    Message(GenericMessage<A>),
+    Message(DynamicMessage<A>),
 }
 impl<A: Allocator + Clone> EnumOfDeriveds<Vec<u8, A>> for LenCustomPayloadView<A> {
     type ToBaseError = Infallible;
@@ -82,7 +82,7 @@ impl<A: Allocator + Clone> EnumOfDeriveds<Vec<u8, A>> for LenCustomPayloadView<A
         }
     }
 }
-impl<A: Allocator> EnumVariant<LenCustomPayloadView<A>> for GenericMessage<A> {
+impl<A: Allocator> EnumVariant<LenCustomPayloadView<A>> for DynamicMessage<A> {
     fn from_enum(
         e: LenCustomPayloadView<A>,
     ) -> ::std::result::Result<Self, LenCustomPayloadView<A>> {
@@ -103,7 +103,7 @@ impl<A: Allocator> EnumVariant<LenCustomPayloadView<A>> for GenericMessage<A> {
 #[try_unwrap(ref, ref_mut)]
 pub enum FieldCustomView<A: Allocator = Global> {
     #[debug("{:?}", _0.0)] // Ignore allocator
-    ScalarMessage((Option<GenericMessage<A>>, A)),
+    ScalarMessage((Option<DynamicMessage<A>>, A)),
 }
 impl<A: Allocator + Clone> EnumOfDeriveds<Vec<WireTypeAndPayload<A>, A>> for FieldCustomView<A> {
     type ToBaseError = Infallible;
@@ -121,7 +121,7 @@ impl<A: Allocator + Clone> EnumOfDeriveds<Vec<WireTypeAndPayload<A>, A>> for Fie
         }
     }
 }
-impl<A: Allocator> EnumVariant<FieldCustomView<A>> for (Option<GenericMessage<A>>, A) {
+impl<A: Allocator> EnumVariant<FieldCustomView<A>> for (Option<DynamicMessage<A>>, A) {
     fn from_enum(e: FieldCustomView<A>) -> ::std::result::Result<Self, FieldCustomView<A>> {
         e.try_unwrap_scalar_message().map_err(|e| e.input)
     }
@@ -136,7 +136,7 @@ impl<A: Allocator> EnumVariant<FieldCustomView<A>> for (Option<GenericMessage<A>
     }
 }
 
-impl GenericMessage<Global> {
+impl DynamicMessage<Global> {
     pub fn new() -> Self {
         Self {
             fields: HashMap::new(),
@@ -144,7 +144,7 @@ impl GenericMessage<Global> {
         }
     }
 }
-impl<A: Allocator + Clone> GenericMessage<A> {
+impl<A: Allocator + Clone> DynamicMessage<A> {
     pub fn new_in(alloc: A) -> Self {
         Self {
             fields: HashMap::new_in(alloc.clone()),
@@ -165,7 +165,7 @@ impl<A: Allocator + Clone> GenericMessage<A> {
         Field::ref_cast_mut(field_base)
     }
 }
-impl<A: Allocator + Clone> GenericMessage<A> {
+impl<A: Allocator + Clone> DynamicMessage<A> {
     pub fn merge(&mut self, other: Self) {
         for (number, other_field_base) in other.fields {
             let other_payloads = other_field_base.take_base();
@@ -189,9 +189,9 @@ impl<A: Allocator + Clone> GenericMessage<A> {
     }
 }
 
-impl<A: Allocator> Debug for GenericMessage<A> {
+impl<A: Allocator> Debug for DynamicMessage<A> {
     fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        let mut ds = f.debug_struct("GenericMessage");
+        let mut ds = f.debug_struct("DynamicMessage");
         for (number, field_base) in &self.fields {
             ds.field(&format!("field{}", number), field_base);
         }
@@ -200,14 +200,14 @@ impl<A: Allocator> Debug for GenericMessage<A> {
 }
 
 // Corresponds to a repeated message field.
-impl<A: Allocator + Clone> Derived<Vec<u8, A>> for GenericMessage<A> {
+impl<A: Allocator + Clone> Derived<Vec<u8, A>> for DynamicMessage<A> {
     type FromBaseError = ErrorKind;
     type ToBaseError = Infallible;
     fn from_base(base: &Vec<u8, A>) -> Result<Self>
     where
         Self: Sized,
     {
-        let mut msg = GenericMessage::new_in(base.allocator().clone());
+        let mut msg = DynamicMessage::new_in(base.allocator().clone());
         msg.merge_from_bufread(base.as_slice())?;
         Ok(msg)
     }
@@ -221,7 +221,7 @@ impl<A: Allocator + Clone> Derived<Vec<u8, A>> for GenericMessage<A> {
 
 // Corresponds to a scalar message field -- A message can be consist of multiple LEN payloads.
 impl<A: Allocator + Clone> Derived<Vec<WireTypeAndPayload<A>, A>>
-    for (Option<GenericMessage<A>>, A)
+    for (Option<DynamicMessage<A>>, A)
 {
     type FromBaseError = ErrorKind;
     type ToBaseError = Infallible;
@@ -234,9 +234,9 @@ impl<A: Allocator + Clone> Derived<Vec<WireTypeAndPayload<A>, A>>
         for wire_and_payload in base {
             let WireTypeAndPayload::Len(bytes_or_msg) = wire_and_payload else {
                 // found a non-message field. What is the expected behavior here?
-                return Err(ErrorKind::GenericMessageFieldTypeError)?;
+                return Err(ErrorKind::DynamicMessageFieldTypeError)?;
             };
-            let msg = msg_opt.get_or_insert_with(|| GenericMessage::new_in(allocator.clone()));
+            let msg = msg_opt.get_or_insert_with(|| DynamicMessage::new_in(allocator.clone()));
             msg.merge_from_bufread(bytes_or_msg.as_base().as_slice())?;
         }
         Ok((msg_opt, allocator))
@@ -258,7 +258,7 @@ impl<A: Allocator + Clone> Derived<Vec<WireTypeAndPayload<A>, A>>
     }
 }
 
-impl<A: Allocator + Clone> MessageLite for GenericMessage<A> {
+impl<A: Allocator + Clone> MessageLite for DynamicMessage<A> {
     fn merge_from_bufread<R: BufRead>(&mut self, read: R) -> Result<()> {
         deser_from_bufread(read, self)
     }
@@ -294,7 +294,7 @@ impl<A: Allocator + Clone> MessageLite for GenericMessage<A> {
     }
 }
 
-impl<A: Allocator + Clone> DeserMessageHandlerBase for GenericMessage<A> {
+impl<A: Allocator + Clone> DeserMessageHandlerBase for DynamicMessage<A> {
     fn parse_variant(&mut self, num: i32, var: Variant) -> Result<()> {
         self.field_mut(num).push_variant(var);
         Ok(())
@@ -319,7 +319,7 @@ impl<A: Allocator + Clone> DeserMessageHandlerBase for GenericMessage<A> {
         unreachable!()
     }
 }
-impl<A: Allocator + Clone, R: Read> DeserMessageHandlerForRead<R> for GenericMessage<A> {
+impl<A: Allocator + Clone, R: Read> DeserMessageHandlerForRead<R> for DynamicMessage<A> {
     fn parse_len(&mut self, num: i32, read: &mut R) -> Result<usize> {
         let alloc = self.alloc.clone();
         // Facepalm
@@ -399,10 +399,10 @@ impl<A: Allocator + Clone> Field<A> {
             .flatten()
             .filter_map(Result::ok)
     }
-    pub fn as_scalar_message(&self) -> Option<&GenericMessage<A>> {
+    pub fn as_scalar_message(&self) -> Option<&DynamicMessage<A>> {
         self.try_as_scalar_message().ok().flatten()
     }
-    pub fn as_repeated_message(&self) -> impl '_ + Iterator<Item = &GenericMessage<A>> {
+    pub fn as_repeated_message(&self) -> impl '_ + Iterator<Item = &DynamicMessage<A>> {
         self.try_as_repeated_message()
             .into_iter()
             .flatten()
@@ -431,7 +431,7 @@ impl<A: Allocator + Clone> Field<A> {
                 (true, WireTypeAndPayload::Len(bytes_or_msg)) => {
                     Either::Right(bytes_or_msg.as_base().into_variant_iter())
                 }
-                _ => Either::Left(Some(Err(ErrorKind::GenericMessageFieldTypeError)).into_iter()),
+                _ => Either::Left(Some(Err(ErrorKind::DynamicMessageFieldTypeError)).into_iter()),
             })
             .map(|rv| rv.and_then(T::try_from_variant)))
     }
@@ -441,7 +441,7 @@ impl<A: Allocator + Clone> Field<A> {
     pub fn try_as_repeated_i32(&self) -> Result<impl '_ + Iterator<Item = Result<[u8; 4]>>> {
         Ok(self.0.as_base().iter().map(|record| match record {
             WireTypeAndPayload::I32(buf) => Ok(*buf),
-            _ => Err(ErrorKind::GenericMessageFieldTypeError),
+            _ => Err(ErrorKind::DynamicMessageFieldTypeError),
         }))
     }
     pub fn try_as_scalar_i64_opt(&self) -> Result<Option<[u8; 8]>> {
@@ -450,7 +450,7 @@ impl<A: Allocator + Clone> Field<A> {
     pub fn try_as_repeated_i64(&self) -> Result<impl '_ + Iterator<Item = Result<[u8; 8]>>> {
         Ok(self.0.as_base().iter().map(|record| match record {
             WireTypeAndPayload::I64(buf) => Ok(*buf),
-            _ => Err(ErrorKind::GenericMessageFieldTypeError),
+            _ => Err(ErrorKind::DynamicMessageFieldTypeError),
         }))
     }
     pub fn try_as_scalar_string_opt(&self) -> Result<Option<&str>> {
@@ -461,7 +461,7 @@ impl<A: Allocator + Clone> Field<A> {
             WireTypeAndPayload::Len(bytes_or_msg) => {
                 Ok(::std::str::from_utf8(bytes_or_msg.as_base())?)
             }
-            _ => Err(ErrorKind::GenericMessageFieldTypeError),
+            _ => Err(ErrorKind::DynamicMessageFieldTypeError),
         }))
     }
     pub fn try_as_scalar_bytes_opt(&self) -> Result<Option<&[u8]>> {
@@ -470,19 +470,19 @@ impl<A: Allocator + Clone> Field<A> {
     pub fn try_as_repeated_bytes(&self) -> Result<impl '_ + Iterator<Item = Result<&[u8]>>> {
         Ok(self.0.as_base().iter().map(|record| match record {
             WireTypeAndPayload::Len(bytes_or_msg) => Ok(bytes_or_msg.as_base().as_slice()),
-            _ => Err(ErrorKind::GenericMessageFieldTypeError),
+            _ => Err(ErrorKind::DynamicMessageFieldTypeError),
         }))
     }
-    pub fn try_as_scalar_message(&self) -> Result<Option<&GenericMessage<A>>> {
-        let (opt_msg, _) = self.0.try_as_derived::<(Option<GenericMessage<A>>, A)>()?;
+    pub fn try_as_scalar_message(&self) -> Result<Option<&DynamicMessage<A>>> {
+        let (opt_msg, _) = self.0.try_as_derived::<(Option<DynamicMessage<A>>, A)>()?;
         Ok(opt_msg.as_ref())
     }
     pub fn try_as_repeated_message(
         &self,
-    ) -> Result<impl Iterator<Item = Result<&GenericMessage<A>>>> {
+    ) -> Result<impl Iterator<Item = Result<&DynamicMessage<A>>>> {
         Ok(self.0.as_base().iter().map(|wire_and_payload| {
             let WireTypeAndPayload::Len(bytes_or_msg) = wire_and_payload else {
-                Err(ErrorKind::GenericMessageFieldTypeError)?
+                Err(ErrorKind::DynamicMessageFieldTypeError)?
             };
             Ok(bytes_or_msg.try_as_derived()?)
         }))
@@ -524,7 +524,7 @@ impl<A: Allocator + Clone> Field<A> {
                 alloc.clone(),
             )));
     }
-    pub fn push_message(&mut self, val: GenericMessage<A>) {
+    pub fn push_message(&mut self, val: DynamicMessage<A>) {
         let alloc = self.allocator().clone();
         self.0
             .as_base_mut()

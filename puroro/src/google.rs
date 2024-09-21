@@ -14,12 +14,12 @@
 
 pub mod protobuf;
 
-use crate::generic_message::GenericMessage;
+use crate::generic_message::DynamicMessage;
 use crate::variant::variant_types;
 use ::ref_cast::RefCast;
 use ::std::alloc::Allocator;
 
-trait GenericMessageExt {
+trait DynamicMessageExt {
     type Alloc: Allocator;
     fn as_scalar_int32(&self, number: i32) -> Option<i32>;
     fn as_repeated_int32(&self, number: i32) -> impl Iterator<Item = i32>;
@@ -36,12 +36,12 @@ trait GenericMessageExt {
     fn as_repeated_string(&self, number: i32) -> impl Iterator<Item = &str>;
     fn as_scalar_message<T>(&self, number: i32) -> Option<&T>
     where
-        T: RefCast<From = GenericMessage<Self::Alloc>>;
+        T: RefCast<From = DynamicMessage<Self::Alloc>>;
     fn as_repeated_message<'a, T: 'a>(&'a self, number: i32) -> impl Iterator<Item = &'a T>
     where
-        T: RefCast<From = GenericMessage<Self::Alloc>>;
+        T: RefCast<From = DynamicMessage<Self::Alloc>>;
 }
-impl<A: Allocator + Clone> GenericMessageExt for GenericMessage<A> {
+impl<A: Allocator + Clone> DynamicMessageExt for DynamicMessage<A> {
     type Alloc = A;
 
     fn as_scalar_int32(&self, number: i32) -> Option<i32> {
@@ -81,7 +81,7 @@ impl<A: Allocator + Clone> GenericMessageExt for GenericMessage<A> {
 
     fn as_scalar_message<T>(&self, number: i32) -> Option<&T>
     where
-        T: RefCast<From = GenericMessage<Self::Alloc>>,
+        T: RefCast<From = DynamicMessage<Self::Alloc>>,
     {
         self.field(number)?
             .as_scalar_message()
@@ -89,7 +89,7 @@ impl<A: Allocator + Clone> GenericMessageExt for GenericMessage<A> {
     }
     fn as_repeated_message<'a, T>(&'a self, number: i32) -> impl Iterator<Item = &'a T>
     where
-        T: 'a + RefCast<From = GenericMessage<Self::Alloc>>,
+        T: 'a + RefCast<From = DynamicMessage<Self::Alloc>>,
     {
         self.field(number)
             .into_iter()

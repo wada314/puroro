@@ -12,26 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-pub mod gen_generic_message_impls;
+pub mod gen_dynamic_message_impl;
 pub mod gen_message_trait;
 
 use ::syn::Item;
 
-use self::gen_generic_message_impls::GenGenericMessageImpls;
+use self::gen_dynamic_message_impl::GenDynamicMessageImpls;
 use self::gen_message_trait::GenTrait;
 use crate::descriptor::DescriptorExt;
 use crate::Result;
 
 pub struct GenMessageItems {
     gen_trait: GenTrait,
-    gen_gm_impls: GenGenericMessageImpls,
+    gen_gm_impls: GenDynamicMessageImpls,
 }
 
 impl GenMessageItems {
     pub fn try_new<'a>(desc: &'a DescriptorExt<'a>) -> Result<Self> {
         Ok(Self {
             gen_trait: GenTrait::try_new(desc)?,
-            gen_gm_impls: GenGenericMessageImpls::try_new(desc)?,
+            gen_gm_impls: GenDynamicMessageImpls::try_new(desc)?,
         })
     }
 
