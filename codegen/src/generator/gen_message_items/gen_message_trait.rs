@@ -98,7 +98,7 @@ impl GenTrait {
             .map(|f| f.gen_mutator_signature(&allocator))
             .collect::<Result<Vec<_>>>()?;
         Ok(parse2(quote! {
-            pub trait #trait_name < #allocator_ident: ::std::allocator::Allocator > {
+            pub trait #trait_name < #allocator_ident: ::std::alloc::Allocator > {
                 #(#methods;)*
             }
         })?)
