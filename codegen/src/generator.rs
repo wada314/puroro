@@ -116,6 +116,13 @@ impl CodeGeneratorOptions {
             quote! { #ident }
         })?)
     }
+    pub fn clone_trait(&self) -> Result<Path> {
+        Ok(parse2(if self.strict_type_path {
+            quote! { ::std::clone::Clone }
+        } else {
+            quote! { Clone }
+        })?)
+    }
     pub fn vec_type(&self, elem_type: &Type, alloc: Option<&Type>) -> Result<Type> {
         let generic_params = if let Some(alloc) = alloc {
             quote! { #elem_type, #alloc }
@@ -135,14 +142,14 @@ impl CodeGeneratorOptions {
             quote! { Option<#elem_type> }
         })?)
     }
-    pub fn iter_type(&self, elem_type: &Type) -> Result<Type> {
+    pub fn iter_trait(&self, elem_type: &Type) -> Result<Path> {
         Ok(parse2(if self.strict_type_path {
             quote! { ::std::iter::Iterator<Item=#elem_type> }
         } else {
             quote! { Iterator<Item=#elem_type> }
         })?)
     }
-    pub fn deref_mut_type(&self, target: &Type) -> Result<Type> {
+    pub fn deref_mut_trait(&self, target: &Type) -> Result<Path> {
         Ok(parse2(if self.strict_type_path {
             quote! { ::std::ops::DerefMut<Target=#target> }
         } else {

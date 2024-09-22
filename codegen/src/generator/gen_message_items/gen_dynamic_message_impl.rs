@@ -55,8 +55,12 @@ impl GenDynamicMessageImpls {
             .iter()
             .map(Field::gen_getter)
             .collect::<Result<Vec<_>>>()?;
+        let clone_trait = self.options.clone_trait()?;
+        let trait_path = self
+            .options
+            .path_in_self_module(&trait_name.clone().into())?;
         Ok(parse2(quote! {
-            impl<A: ::std::alloc::Allocator + ::std::clone::Clone> self::#trait_name
+            impl<A: ::std::alloc::Allocator + #clone_trait> #trait_path
             for ::puroro::generic_message::DynamicMessage<A> {
                 #(#getters)*
             }

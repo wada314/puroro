@@ -146,8 +146,12 @@ impl GenTrait {
 
     fn gen_blanket_option_impl(&self) -> Result<Item> {
         let trait_name = &self.rust_name;
-        let trait_path: Path = parse2(quote! { self::#trait_name })?;
-        let blanket_type: Ident = parse_str("T")?;
+        let trait_path = self
+            .options
+            .path_in_self_module(&trait_name.clone().into())?;
+        let blanket_type_ident: Ident = parse_str("T")?;
+        let blanket_type = parse2(quote! { #blanket_type_ident })?;
+        let blanket_opt_type = self.options.option_type(&blanket_type)?;
         let getter_signatures = self
             .fields
             .iter()
@@ -156,10 +160,10 @@ impl GenTrait {
         let getter_bodies = self
             .fields
             .iter()
-            .map(|f| f.gen_blanket_option_getter_body(&blanket_type, &trait_path))
+            .map(|f| f.gen_blanket_option_getter_body(&blanket_type_ident, &trait_path))
             .collect::<Result<Vec<_>>>()?;
         Ok(parse2(quote! {
-            impl<T: #trait_path> #trait_path for ::std::option::Option<T> {
+            impl<T: #trait_path> #trait_path for #blanket_opt_type {
                 #(#getter_signatures {
                     #getter_bodies
                 })*
@@ -234,19 +238,19 @@ impl Field {
 
     fn gen_blanket_option_getter_body(
         &self,
-        blanket_type: &Ident,
+        blanket_type_ident: &Ident,
         trait_path: &Path,
     ) -> Result<Expr> {
         let getter_name = self.gen_getter_name()?;
         Ok(parse2(match self.wrapper {
             FieldWrapper::Vec => quote! {
-                self.as_ref().map(<#blanket_type as #trait_path>::#getter_name).into_iter().flatten()
+                self.as_ref().map(<#blanket_type_ident as #trait_path>::#getter_name).into_iter().flatten()
             },
             FieldWrapper::Optional | FieldWrapper::OptionalBoxed => quote! {
-                self.as_ref().and_then(<#blanket_type as #trait_path>::#getter_name)
+                self.as_ref().and_then(<#blanket_type_ident as #trait_path>::#getter_name)
             },
             FieldWrapper::Bare => quote! {
-                self.as_ref().map(<#blanket_type as #trait_path>::#getter_name).unwrap_or_default()
+                self.as_ref().map(<#blanket_type_ident as #trait_path>::#getter_name).unwrap_or_default()
             },
         })?)
     }
@@ -266,7 +270,11 @@ impl Field {
     pub fn gen_mutator_signature(&self, allocator: &Type) -> Result<Signature> {
         let mutator_name = self.gen_mutator_name()?;
         let mutator_type = match self.wrapper {
-            FieldWrapper::Vec => parse2(quote! { () /* TODO */ })?,
+            FieldWrapper::Vec => self.scalar_type.gen_repeated_mutator_type(
+                &self.current_path,
+                allocator,
+                &self.options,
+            )?,
             _ => self.scalar_type.gen_non_repeated_mutator_type(
                 &self.current_path,
                 allocator,
@@ -371,7 +379,7 @@ impl FieldType<ProtoPathBuf, ProtoPathBuf> {
         options: &CodeGeneratorOptions,
     ) -> Result<Type> {
         let bare_type = self.gen_bare_getter_type(current_path, lifetime, options)?;
-        let iter_trait = options.iter_type(&bare_type)?;
+        let iter_trait = options.iter_trait(&bare_type)?;
         Ok(parse2(quote! {
             impl #iter_trait
         })?)
@@ -425,6 +433,22 @@ impl FieldType<ProtoPathBuf, ProtoPathBuf> {
         options: &CodeGeneratorOptions,
     ) -> Result<Type> {
         let bare_type = self.gen_bare_mutator_type(current_path, allocator, options)?;
-        Ok(options.deref_mut_type(&bare_type)?)
+        let deref_mut_trait = options.deref_mut_trait(&bare_type)?;
+        Ok(parse2(quote! {
+            impl #deref_mut_trait
+        })?)
+    }
+    fn gen_repeated_mutator_type(
+        &self,
+        current_path: &ProtoPath,
+        allocator: &Type,
+        options: &CodeGeneratorOptions,
+    ) -> Result<Type> {
+        let bare_type = self.gen_bare_mutator_type(current_path, allocator, options)?;
+        let vec_type = options.vec_type(&bare_type, Some(allocator))?;
+        let deref_mut_trait = options.deref_mut_trait(&vec_type)?;
+        Ok(parse2(quote! {
+            impl #deref_mut_trait
+        })?)
     }
 }
