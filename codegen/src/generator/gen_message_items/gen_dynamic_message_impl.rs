@@ -17,7 +17,7 @@ use crate::descriptor::{
     DescriptorExt, FieldDescriptorExt, I32Type, I64Type, LenType, VariantType, WireType,
 };
 use crate::generator::CodeGeneratorOptions;
-use crate::proto_path::ProtoPath;
+use crate::proto_path::{ProtoPath, ProtoPathBuf};
 use crate::Result;
 use ::quote::quote;
 use ::std::rc::Rc;
@@ -35,12 +35,13 @@ impl GenDynamicMessageImpls {
         desc: &'a DescriptorExt<'a>,
         options: Rc<CodeGeneratorOptions>,
     ) -> Result<Self> {
+        let current_path = Rc::new(desc.current_path().to_owned());
         Ok(Self {
             rust_trait_name: GenTrait::rust_name_from_message_name(desc.name())?,
             fields: desc
                 .non_oneof_fields()?
                 .into_iter()
-                .map(|f| Field::try_new(f, Rc::clone(&options)))
+                .map(|f| Field::try_new(f, Rc::clone(&current_path), Rc::clone(&options)))
                 .collect::<Result<Vec<_>>>()?,
             options,
         })
@@ -65,18 +66,20 @@ impl GenDynamicMessageImpls {
 pub struct Field {
     number: i32,
     trait_field: TraitField,
+    current_path: Rc<ProtoPathBuf>,
     options: Rc<CodeGeneratorOptions>,
 }
 
 impl Field {
     fn try_new<'a>(
         desc: &'a FieldDescriptorExt<'a>,
+        current_path: Rc<ProtoPathBuf>,
         options: Rc<CodeGeneratorOptions>,
     ) -> Result<Self> {
-        let current_path = Rc::new(desc.message().current_path().to_owned());
         Ok(Self {
             number: desc.number(),
             trait_field: TraitField::try_new(desc, Rc::clone(&current_path), Rc::clone(&options))?,
+            current_path,
             options,
         })
     }
@@ -145,8 +148,9 @@ impl Field {
             VariantType::SInt32 => quote! { ::puroro::variant::variant_types::SInt32 },
             VariantType::SInt64 => quote! { ::puroro::variant::variant_types::SInt64 },
             VariantType::Bool => quote! { ::puroro::variant::variant_types::Bool },
-            VariantType::Enum(e) => {
-                let enum_path = e.to_rust_path()?;
+            VariantType::Enum(path) => {
+                let path = path.to_relative_path(&self.current_path).unwrap_or(path);
+                let enum_path = path.to_rust_path()?;
                 quote! { ::puroro::variant::variant_types::Enum::<#enum_path> }
             }
         })?;
@@ -207,8 +211,9 @@ impl Field {
             VariantType::SInt32 => quote! { ::puroro::variant::variant_types::SInt32 },
             VariantType::SInt64 => quote! { ::puroro::variant::variant_types::SInt64 },
             VariantType::Bool => quote! { ::puroro::variant::variant_types::Bool },
-            VariantType::Enum(e) => {
-                let enum_path = e.to_rust_path()?;
+            VariantType::Enum(path) => {
+                let path = path.to_relative_path(&self.current_path).unwrap_or(path);
+                let enum_path = path.to_rust_path()?;
                 quote! { ::puroro::variant::variant_types::Enum::<#enum_path> }
             }
         })?;
