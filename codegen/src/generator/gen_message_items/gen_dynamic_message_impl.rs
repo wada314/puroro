@@ -150,7 +150,7 @@ impl Field {
             VariantType::Bool => quote! { ::puroro::variant::variant_types::Bool },
             VariantType::Enum(path) => {
                 let path = path.to_relative_path(&self.current_path).unwrap_or(path);
-                let enum_path = path.to_rust_path()?;
+                let enum_path = path.to_rust_path(&self.options)?;
                 quote! { ::puroro::variant::variant_types::Enum::<#enum_path> }
             }
         })?;
@@ -213,7 +213,7 @@ impl Field {
             VariantType::Bool => quote! { ::puroro::variant::variant_types::Bool },
             VariantType::Enum(path) => {
                 let path = path.to_relative_path(&self.current_path).unwrap_or(path);
-                let enum_path = path.to_rust_path()?;
+                let enum_path = path.to_rust_path(&self.options)?;
                 quote! { ::puroro::variant::variant_types::Enum::<#enum_path> }
             }
         })?;

@@ -82,7 +82,7 @@ pub fn compile(request: &CodeGeneratorRequest) -> Result<CodeGeneratorResponse> 
         let file = out_files.file_mut(file_path);
         file.add_source(e.file().name());
 
-        let enum_ = gen_enum_items::GenEnumItems::try_new(e)?.rust_items()?;
+        let enum_ = gen_enum_items::GenEnumItems::try_new(e, Rc::clone(&options))?.rust_items()?;
         file.append(quote! { #(#enum_)* });
     }
 
@@ -142,11 +142,11 @@ impl CodeGeneratorOptions {
             quote! { Iterator<Item=#elem_type> }
         })?)
     }
-    pub fn path_in_self_module(&self, ident: &Ident) -> Result<Path> {
+    pub fn path_in_self_module(&self, path: &Path) -> Result<Path> {
         Ok(parse2(if self.strict_type_path {
-            quote! { self::#ident }
+            quote! { self::#path }
         } else {
-            quote! { #ident }
+            quote! { #path }
         })?)
     }
 }

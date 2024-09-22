@@ -13,10 +13,10 @@
 // limitations under the License.
 
 use crate::cases::{convert_into_case, Case};
-use crate::generator::avoid_reserved_keywords;
+use crate::generator::{avoid_reserved_keywords, CodeGeneratorOptions};
 use crate::Result;
 use ::itertools::Itertools;
-use ::quote::quote;
+use ::quote::{format_ident, quote};
 use ::std::borrow::Borrow;
 use ::std::fmt::Display;
 use ::std::ops::Deref;
@@ -111,8 +111,8 @@ impl ProtoPath {
         }
     }
 
-    pub fn to_rust_path(&self) -> Result<Path> {
-        self.to_rust_path_with(|item| {
+    pub fn to_rust_path(&self, options: &CodeGeneratorOptions) -> Result<Path> {
+        self.to_rust_path_with(options, |item| {
             Ok(parse_str(&avoid_reserved_keywords(&convert_into_case(
                 item,
                 Case::CamelCase,
@@ -121,13 +121,13 @@ impl ProtoPath {
     }
     pub fn to_rust_path_with(
         &self,
+        options: &CodeGeneratorOptions,
         last_item_naming: impl FnOnce(&str) -> Result<PathSegment>,
     ) -> Result<Path> {
-        let first_component: Path = parse_str(if self.is_absolute() {
-            "self::_puroro_root"
-        } else {
-            "self"
-        })?;
+        let first_component = self
+            .is_absolute()
+            .then(|| format_ident!("_puroro_root"))
+            .into_iter();
         if let (components_iter, Some(item)) = (
             self.parent().into_iter().flat_map(|p| p.components()),
             self.last_component(),
@@ -141,7 +141,8 @@ impl ProtoPath {
                 })
                 .collect::<Result<Vec<PathSegment>>>()?;
             let item = last_item_naming(item)?;
-            Ok(parse2(quote! { #first_component :: #(#modules::)* #item})?)
+            let path_from_self = parse2(quote! { #(#first_component ::)* #(#modules::)* #item})?;
+            Ok(options.path_in_self_module(&path_from_self)?)
         } else {
             Err(format!(
                 "The proto path {} cannot be converted to a rust path.",

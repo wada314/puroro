@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use ::std::rc::Rc;
+
 use crate::cases::{convert_into_case, Case};
 use crate::descriptor::{EnumDescriptorExt, EnumValueDescriptor};
 use crate::proto_path::ProtoPath;
@@ -20,9 +22,12 @@ use ::proc_macro2::TokenStream;
 use ::quote::quote;
 use ::syn::{parse2, parse_str, Ident, Item, Path, Variant};
 
+use super::CodeGeneratorOptions;
+
 pub struct GenEnumItems {
     name: Ident,
     variants: Vec<EnumVariant>,
+    options: Rc<CodeGeneratorOptions>,
 }
 
 struct EnumVariant {
@@ -32,7 +37,10 @@ struct EnumVariant {
 }
 
 impl GenEnumItems {
-    pub fn try_new<'a>(desc: &'a EnumDescriptorExt<'a>) -> Result<Self> {
+    pub fn try_new<'a>(
+        desc: &'a EnumDescriptorExt<'a>,
+        options: Rc<CodeGeneratorOptions>,
+    ) -> Result<Self> {
         Ok(Self {
             name: Self::rust_name_from_enum_name(desc.name())?,
             variants: desc
@@ -40,13 +48,14 @@ impl GenEnumItems {
                 .enumerate()
                 .map(|(i, e)| EnumVariant::try_new(e, i == 0))
                 .collect::<Result<Vec<_>>>()?,
+            options,
         })
     }
     pub fn rust_name_from_enum_name(name: &str) -> Result<Ident> {
         Ok(parse_str(&convert_into_case(name, Case::CamelCase))?)
     }
-    pub fn rust_path_from_proto_path(path: &ProtoPath) -> Result<Path> {
-        path.to_rust_path_with(|s| {
+    pub fn rust_path_from_proto_path(&self, path: &ProtoPath) -> Result<Path> {
+        path.to_rust_path_with(&self.options, |s| {
             let ident = Self::rust_name_from_enum_name(s)?;
             Ok(parse2(quote! { #ident })?)
         })

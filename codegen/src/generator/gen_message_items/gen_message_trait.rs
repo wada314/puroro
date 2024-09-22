@@ -61,8 +61,8 @@ impl GenTrait {
         ))
     }
 
-    pub fn rust_path_from_proto_path(path: &ProtoPath) -> Result<Path> {
-        path.to_rust_path_with(|s| {
+    pub fn rust_path_from_proto_path(self, path: &ProtoPath) -> Result<Path> {
+        path.to_rust_path_with(&self.options, |s| {
             let ident = Self::rust_name_from_message_name(s)?;
             Ok(parse2(quote! { #ident })?)
         })
@@ -112,7 +112,9 @@ impl GenTrait {
 
     fn gen_blanket_ref_impls(&self) -> Result<Vec<Item>> {
         let trait_name = &self.rust_name;
-        let trait_path: Path = self.options.path_in_self_module(trait_name)?;
+        let trait_path: Path = self
+            .options
+            .path_in_self_module(&trait_name.clone().into())?;
         let blanket_type: Ident = parse_str("T")?;
         let getter_signatures = self
             .fields
@@ -318,7 +320,7 @@ impl FieldType<ProtoPathBuf, ProtoPathBuf> {
         Ok(match self {
             FieldType::Message(path) => {
                 let path = path.to_relative_path(current_path).unwrap_or(path);
-                let path = path.to_rust_path_with(|name| {
+                let path = path.to_rust_path_with(options, |name| {
                     let ident = GenTrait::rust_name_from_message_name(name)?;
                     Ok(parse2(quote! { #ident })?)
                 })?;
@@ -326,7 +328,7 @@ impl FieldType<ProtoPathBuf, ProtoPathBuf> {
             }
             FieldType::Enum(path) => {
                 let path = path.to_relative_path(current_path).unwrap_or(path);
-                let path = path.to_rust_path()?;
+                let path = path.to_rust_path(options)?;
                 parse2(quote! { #path })?
             }
             FieldType::Int32 => options.primitive_type("i32")?,
@@ -384,7 +386,7 @@ impl FieldType<ProtoPathBuf, ProtoPathBuf> {
         Ok(match self {
             FieldType::Message(path) => {
                 let path = path.to_relative_path(current_path).unwrap_or(path);
-                let path = path.to_rust_path_with(|name| {
+                let path = path.to_rust_path_with(options, |name| {
                     let ident = GenTrait::rust_mut_name_from_message_name(name)?;
                     Ok(parse2(quote! { #ident })?)
                 })?;
@@ -392,7 +394,7 @@ impl FieldType<ProtoPathBuf, ProtoPathBuf> {
             }
             FieldType::Enum(path) => {
                 let path = path.to_relative_path(current_path).unwrap_or(path);
-                let path = path.to_rust_path()?;
+                let path = path.to_rust_path(options)?;
                 parse2(quote! { #path })?
             }
             FieldType::Int32 => options.primitive_type("i32")?,
