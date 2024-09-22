@@ -27,6 +27,7 @@ use ::syn::{Expr, Type};
 pub struct GenDynamicMessageImpls {
     rust_trait_name: Ident,
     fields: Vec<Field>,
+    #[allow(unused)]
     options: Rc<CodeGeneratorOptions>,
 }
 

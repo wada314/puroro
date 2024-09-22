@@ -425,8 +425,6 @@ impl FieldType<ProtoPathBuf, ProtoPathBuf> {
         options: &CodeGeneratorOptions,
     ) -> Result<Type> {
         let bare_type = self.gen_bare_mutator_type(current_path, allocator, options)?;
-        Ok(parse2(quote! {
-            impl ::std::ops::DerefMut<Target = #bare_type>
-        })?)
+        Ok(options.deref_mut_type(&bare_type)?)
     }
 }

@@ -26,6 +26,7 @@ use ::syn::Item;
 pub struct GenMessageItems {
     gen_trait: GenTrait,
     gen_gm_impls: GenDynamicMessageImpls,
+    #[allow(unused)]
     options: Rc<CodeGeneratorOptions>,
 }
 

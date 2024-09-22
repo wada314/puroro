@@ -142,6 +142,13 @@ impl CodeGeneratorOptions {
             quote! { Iterator<Item=#elem_type> }
         })?)
     }
+    pub fn deref_mut_type(&self, target: &Type) -> Result<Type> {
+        Ok(parse2(if self.strict_type_path {
+            quote! { ::std::ops::DerefMut<Target=#target> }
+        } else {
+            quote! { DerefMut<Target=#target> }
+        })?)
+    }
     pub fn path_in_self_module(&self, path: &Path) -> Result<Path> {
         Ok(parse2(if self.strict_type_path {
             quote! { self::#path }
