@@ -69,28 +69,30 @@ impl ProtoPath {
     pub fn ancestors(&self) -> impl Iterator<Item = &Self> {
         ::std::iter::successors(Some(self), |path| path.parent())
     }
-    pub fn strip_prefix(&self, prefix: &Self) -> Result<&Self> {
+    pub fn strip_prefix(&self, prefix: &Self) -> Option<&Self> {
         if prefix.0.ends_with('.') {
             if self.0.starts_with(&prefix.0) {
-                Ok(ProtoPath::new(&self.0[prefix.0.len()..]))
+                Some(ProtoPath::new(&self.0[prefix.0.len()..]))
             } else {
-                Err(format!(
-                    "Failed to strip prefix: {} from {}.",
-                    self.0.to_string(),
-                    prefix.0.to_string(),
-                ))?
+                None
             }
         } else {
             if self.0.starts_with(&prefix.0) && self.0[prefix.0.len()..].starts_with('.') {
-                Ok(ProtoPath::new(&self.0[prefix.0.len() + 1..]))
+                Some(ProtoPath::new(&self.0[prefix.0.len() + 1..]))
             } else {
-                Err(format!(
-                    "Failed to strip prefix: {} from {}.",
-                    self.0.to_string(),
-                    prefix.0.to_string(),
-                ))?
+                None
             }
         }
+    }
+    pub fn to_relative_path(&self, base: &Self) -> Option<&Self> {
+        if self.is_absolute() && base.is_absolute() {
+            for ancestors in base.ancestors() {
+                if let Some(relative) = self.strip_prefix(ancestors) {
+                    return Some(relative);
+                }
+            }
+        }
+        None
     }
 
     pub fn to_rust_file_path(&self) -> String {

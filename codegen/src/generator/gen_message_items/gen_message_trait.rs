@@ -19,7 +19,6 @@ use crate::proto_path::{ProtoPath, ProtoPathBuf};
 use crate::Result;
 use ::quote::{format_ident, quote};
 use ::std::rc::Rc;
-use ::std::u8;
 use ::syn::{parse2, parse_str, Expr, Ident, Item, Path, Type};
 use ::syn::{Lifetime, Signature};
 
@@ -35,13 +34,14 @@ impl GenTrait {
         desc: &'a DescriptorExt<'a>,
         options: Rc<CodeGeneratorOptions>,
     ) -> Result<Self> {
+        let current_path = Rc::new(desc.current_path().to_owned());
         Ok(Self {
             rust_name: Self::rust_name_from_message_name(desc.name())?,
             rust_mut_name: Self::rust_mut_name_from_message_name(desc.name())?,
             fields: desc
                 .non_oneof_fields()?
                 .into_iter()
-                .map(|f| Field::try_new(f, Rc::clone(&options)))
+                .map(|f| Field::try_new(f, Rc::clone(&current_path), Rc::clone(&options)))
                 .collect::<Result<Vec<_>>>()?,
             options,
         })
@@ -169,6 +169,7 @@ impl GenTrait {
 pub struct Field {
     original_name: String,
     wrapper: FieldWrapper,
+    current_path: Rc<ProtoPathBuf>,
     scalar_type: FieldType<ProtoPathBuf, ProtoPathBuf>,
     options: Rc<CodeGeneratorOptions>,
 }
@@ -176,11 +177,13 @@ pub struct Field {
 impl Field {
     pub fn try_new<'a>(
         desc: &'a FieldDescriptorExt<'a>,
+        current_path: Rc<ProtoPathBuf>,
         options: Rc<CodeGeneratorOptions>,
     ) -> Result<Self> {
         Ok(Self {
             original_name: desc.name().to_string(),
             wrapper: FieldWrapper::from_field_desc(desc),
+            current_path,
             scalar_type: desc.type_with_full_path()?,
             options,
         })
@@ -201,15 +204,19 @@ impl Field {
         let getter_name = self.gen_getter_name()?;
         let lifetime: Option<Lifetime> = None;
         let getter_type = match self.wrapper {
-            FieldWrapper::Vec => self
-                .scalar_type
-                .gen_repeated_getter_type(lifetime.as_ref(), &self.options)?,
+            FieldWrapper::Vec => self.scalar_type.gen_repeated_getter_type(
+                &self.current_path,
+                lifetime.as_ref(),
+                &self.options,
+            )?,
             FieldWrapper::Optional | FieldWrapper::OptionalBoxed => self
                 .scalar_type
-                .gen_optional_getter_type(lifetime.as_ref(), &self.options)?,
-            FieldWrapper::Bare => self
-                .scalar_type
-                .gen_bare_getter_type(lifetime.as_ref(), &self.options)?,
+                .gen_optional_getter_type(&self.current_path, lifetime.as_ref(), &self.options)?,
+            FieldWrapper::Bare => self.scalar_type.gen_bare_getter_type(
+                &self.current_path,
+                lifetime.as_ref(),
+                &self.options,
+            )?,
         };
         Ok(parse2(quote! {
             fn #getter_name(&self) -> #getter_type
@@ -258,9 +265,11 @@ impl Field {
         let mutator_name = self.gen_mutator_name()?;
         let mutator_type = match self.wrapper {
             FieldWrapper::Vec => parse2(quote! { () /* TODO */ })?,
-            _ => self
-                .scalar_type
-                .gen_non_repeated_mutator_type(allocator, &self.options)?,
+            _ => self.scalar_type.gen_non_repeated_mutator_type(
+                &self.current_path,
+                allocator,
+                &self.options,
+            )?,
         };
         Ok(parse2(quote! {
             fn #mutator_name(&mut self) -> #mutator_type
@@ -301,12 +310,14 @@ impl FieldWrapper {
 impl FieldType<ProtoPathBuf, ProtoPathBuf> {
     fn gen_bare_getter_type(
         &self,
+        current_path: &ProtoPath,
         lifetime: Option<&Lifetime>,
         options: &CodeGeneratorOptions,
     ) -> Result<Type> {
         let lifetime_iter = lifetime.iter();
         Ok(match self {
             FieldType::Message(path) => {
+                let path = path.to_relative_path(current_path).unwrap_or(path);
                 let path = path.to_rust_path_with(|name| {
                     let ident = GenTrait::rust_name_from_message_name(name)?;
                     Ok(parse2(quote! { #ident })?)
@@ -314,6 +325,7 @@ impl FieldType<ProtoPathBuf, ProtoPathBuf> {
                 parse2(quote! { impl #(#lifetime_iter +)* #path })?
             }
             FieldType::Enum(path) => {
+                let path = path.to_relative_path(current_path).unwrap_or(path);
                 let path = path.to_rust_path()?;
                 parse2(quote! { #path })?
             }
@@ -343,18 +355,20 @@ impl FieldType<ProtoPathBuf, ProtoPathBuf> {
     }
     fn gen_optional_getter_type(
         &self,
+        current_path: &ProtoPath,
         lifetime: Option<&Lifetime>,
         options: &CodeGeneratorOptions,
     ) -> Result<Type> {
-        let bare_type = self.gen_bare_getter_type(lifetime, options)?;
+        let bare_type = self.gen_bare_getter_type(current_path, lifetime, options)?;
         options.option_type(&bare_type)
     }
     fn gen_repeated_getter_type(
         &self,
+        current_path: &ProtoPath,
         lifetime: Option<&Lifetime>,
         options: &CodeGeneratorOptions,
     ) -> Result<Type> {
-        let bare_type = self.gen_bare_getter_type(lifetime, options)?;
+        let bare_type = self.gen_bare_getter_type(current_path, lifetime, options)?;
         let iter_trait = options.iter_type(&bare_type)?;
         Ok(parse2(quote! {
             impl #iter_trait
@@ -363,11 +377,13 @@ impl FieldType<ProtoPathBuf, ProtoPathBuf> {
 
     fn gen_bare_mutator_type(
         &self,
+        current_path: &ProtoPath,
         allocator: &Type,
         options: &CodeGeneratorOptions,
     ) -> Result<Type> {
         Ok(match self {
             FieldType::Message(path) => {
+                let path = path.to_relative_path(current_path).unwrap_or(path);
                 let path = path.to_rust_path_with(|name| {
                     let ident = GenTrait::rust_mut_name_from_message_name(name)?;
                     Ok(parse2(quote! { #ident })?)
@@ -375,6 +391,7 @@ impl FieldType<ProtoPathBuf, ProtoPathBuf> {
                 parse2(quote! { impl #path<#allocator> })?
             }
             FieldType::Enum(path) => {
+                let path = path.to_relative_path(current_path).unwrap_or(path);
                 let path = path.to_rust_path()?;
                 parse2(quote! { #path })?
             }
@@ -401,10 +418,11 @@ impl FieldType<ProtoPathBuf, ProtoPathBuf> {
     }
     fn gen_non_repeated_mutator_type(
         &self,
+        current_path: &ProtoPath,
         allocator: &Type,
         options: &CodeGeneratorOptions,
     ) -> Result<Type> {
-        let bare_type = self.gen_bare_mutator_type(allocator, options)?;
+        let bare_type = self.gen_bare_mutator_type(current_path, allocator, options)?;
         Ok(parse2(quote! {
             impl ::std::ops::DerefMut<Target = #bare_type>
         })?)

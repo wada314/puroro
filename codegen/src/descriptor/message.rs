@@ -62,6 +62,13 @@ impl<'a> DescriptorExt<'a> {
         debug_assert!(self.base.name().is_some() && !self.base.name().unwrap().is_empty());
         self.base.name().unwrap_or_default()
     }
+    pub fn current_path(&self) -> &ProtoPath {
+        if let Some(nested) = self.maybe_containing {
+            nested.full_path()
+        } else {
+            self.file.absolute_package()
+        }
+    }
     pub fn full_path(&self) -> &ProtoPath {
         self.cache.full_path.get_or_init(|| {
             let mut full_path = if let Some(nested) = self.maybe_containing {

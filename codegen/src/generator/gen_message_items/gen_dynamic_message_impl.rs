@@ -73,9 +73,10 @@ impl Field {
         desc: &'a FieldDescriptorExt<'a>,
         options: Rc<CodeGeneratorOptions>,
     ) -> Result<Self> {
+        let current_path = Rc::new(desc.message().current_path().to_owned());
         Ok(Self {
             number: desc.number(),
-            trait_field: TraitField::try_new(desc, Rc::clone(&options))?,
+            trait_field: TraitField::try_new(desc, Rc::clone(&current_path), Rc::clone(&options))?,
             options,
         })
     }
@@ -155,31 +156,25 @@ impl Field {
     }
     fn gen_non_repeated_i32_getter_body(&self, field_expr: &Expr, t: I32Type) -> Result<Expr> {
         let bytes_expr: Expr = parse2(quote! { (#field_expr).as_scalar_i32() })?;
-        Ok(parse2(match t {
-            I32Type::Float => {
-                quote! { ::std::primitive::f32::from_le_bytes(#bytes_expr) }
-            }
-            I32Type::Fixed32 => {
-                quote! { ::std::primitive::u32::from_le_bytes(#bytes_expr) }
-            }
-            I32Type::SFixed32 => {
-                quote! { ::std::primitive::i32::from_le_bytes(#bytes_expr) }
-            }
-        })?)
+        let primitive_type: Type = match t {
+            I32Type::Float => self.options.primitive_type("f32")?,
+            I32Type::Fixed32 => self.options.primitive_type("u32")?,
+            I32Type::SFixed32 => self.options.primitive_type("i32")?,
+        };
+        Ok(parse2(
+            quote! { #primitive_type::from_le_bytes(#bytes_expr) },
+        )?)
     }
     fn gen_non_repeated_i64_getter_body(&self, field_expr: &Expr, t: I64Type) -> Result<Expr> {
         let bytes_expr: Expr = parse2(quote! { (#field_expr).as_scalar_i64() })?;
-        Ok(parse2(match t {
-            I64Type::Double => {
-                quote! { ::std::primitive::f64::from_le_bytes(#bytes_expr) }
-            }
-            I64Type::Fixed64 => {
-                quote! { ::std::primitive::u64::from_le_bytes(#bytes_expr) }
-            }
-            I64Type::SFixed64 => {
-                quote! { ::std::primitive::i64::from_le_bytes(#bytes_expr) }
-            }
-        })?)
+        let primitive_type: Type = match t {
+            I64Type::Double => self.options.primitive_type("f64")?,
+            I64Type::Fixed64 => self.options.primitive_type("u64")?,
+            I64Type::SFixed64 => self.options.primitive_type("i64")?,
+        };
+        Ok(parse2(
+            quote! { #primitive_type::from_le_bytes(#bytes_expr) },
+        )?)
     }
     fn gen_non_repeated_len_getter_body(
         &self,
@@ -222,23 +217,23 @@ impl Field {
         })?)
     }
     fn gen_repeated_i32_getter_body(&self, field_expr: &Expr, t: I32Type) -> Result<Expr> {
-        let map_expr: Expr = parse2(match t {
-            I32Type::Float => quote! { ::std::primitive::f32::from_le_bytes },
-            I32Type::Fixed32 => quote! { ::std::primitive::u32::from_le_bytes },
-            I32Type::SFixed32 => quote! { ::std::primitive::i32::from_le_bytes },
-        })?;
+        let primitive_type: Type = match t {
+            I32Type::Float => self.options.primitive_type("f32")?,
+            I32Type::Fixed32 => self.options.primitive_type("u32")?,
+            I32Type::SFixed32 => self.options.primitive_type("i32")?,
+        };
         Ok(parse2(quote! {
-            (#field_expr).as_repeated_i32().map(#map_expr)
+            (#field_expr).as_repeated_i32().map(#primitive_type::from_le_bytes)
         })?)
     }
     fn gen_repeated_i64_getter_body(&self, field_expr: &Expr, t: I64Type) -> Result<Expr> {
-        let map_expr: Expr = parse2(match t {
-            I64Type::Double => quote! { ::std::primitive::f64::from_le_bytes },
-            I64Type::Fixed64 => quote! { ::std::primitive::u64::from_le_bytes },
-            I64Type::SFixed64 => quote! { ::std::primitive::i64::from_le_bytes },
-        })?;
+        let primitive_type: Type = match t {
+            I64Type::Double => self.options.primitive_type("f64")?,
+            I64Type::Fixed64 => self.options.primitive_type("u64")?,
+            I64Type::SFixed64 => self.options.primitive_type("i64")?,
+        };
         Ok(parse2(quote! {
-            (#field_expr).as_repeated_i64().map(#map_expr)
+            (#field_expr).as_repeated_i64().map(#primitive_type::from_le_bytes)
         })?)
     }
     fn gen_repeated_len_getter_body(
