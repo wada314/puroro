@@ -17,6 +17,7 @@ use crate::descriptor::{DescriptorExt, FieldDescriptorExt, FieldLabel, FieldType
 use crate::generator::{avoid_reserved_keywords, CodeGeneratorOptions};
 use crate::proto_path::{ProtoPath, ProtoPathBuf};
 use crate::Result;
+use ::itertools::Itertools;
 use ::quote::{format_ident, quote};
 use ::std::rc::Rc;
 use ::syn::{parse2, parse_str, Expr, Ident, Item, Path, Type};
@@ -25,6 +26,7 @@ use ::syn::{Lifetime, Signature};
 pub struct GenTrait {
     rust_name: Ident,
     rust_mut_name: Ident,
+    rust_app_name: Ident,
     fields: Vec<Field>,
     options: Rc<CodeGeneratorOptions>,
 }
@@ -38,6 +40,7 @@ impl GenTrait {
         Ok(Self {
             rust_name: Self::rust_name_from_message_name(desc.name())?,
             rust_mut_name: Self::rust_mut_name_from_message_name(desc.name())?,
+            rust_app_name: Self::rust_app_name_from_message_name(desc.name())?,
             fields: desc
                 .non_oneof_fields()?
                 .into_iter()
@@ -50,6 +53,13 @@ impl GenTrait {
     pub fn rust_name_from_message_name(name: &str) -> Result<Ident> {
         Ok(format_ident!(
             "{}Trait",
+            convert_into_case(name, Case::CamelCase)
+        ))
+    }
+
+    pub fn rust_app_name_from_message_name(name: &str) -> Result<Ident> {
+        Ok(format_ident!(
+            "{}AppTrait",
             convert_into_case(name, Case::CamelCase)
         ))
     }
@@ -70,11 +80,12 @@ impl GenTrait {
 
     pub fn gen_items(&self) -> Result<Vec<Item>> {
         let trait_def = self.gen_message_trait()?;
+        let trait_app_def = self.gen_message_app_trait()?;
         let trait_mut_def = self.gen_message_mut_trait()?;
         let mut blanket_impls = Vec::new();
         blanket_impls.append(&mut self.gen_blanket_ref_impls()?);
         blanket_impls.push(self.gen_blanket_option_impl()?);
-        Ok([trait_def, trait_mut_def]
+        Ok([trait_def, trait_app_def, trait_mut_def]
             .into_iter()
             .chain(blanket_impls)
             .collect())
@@ -94,17 +105,47 @@ impl GenTrait {
         })?)
     }
 
-    fn gen_message_mut_trait(&self) -> Result<Item> {
-        let trait_name = &self.rust_mut_name;
+    fn gen_message_app_trait(&self) -> Result<Item> {
+        let trait_name = &self.rust_app_name;
+        let base_trait_name = &self.rust_name;
+        let base_trait_path = self
+            .options
+            .path_in_self_module(&base_trait_name.clone().into())?;
         let allocator_ident: Ident = parse_str("A")?;
         let allocator: Type = parse2(quote! { #allocator_ident})?;
         let methods = self
             .fields
             .iter()
-            .map(|f| f.gen_mutator_signature(&allocator))
+            .map(|f| f.gen_appendale_signatures(&allocator))
+            .flatten_ok()
             .collect::<Result<Vec<_>>>()?;
         Ok(parse2(quote! {
-            pub trait #trait_name < #allocator_ident: ::std::alloc::Allocator > {
+            pub trait #trait_name < #allocator_ident: ::std::alloc::Allocator >
+                : #base_trait_path
+            {
+                #(#methods;)*
+            }
+        })?)
+    }
+
+    fn gen_message_mut_trait(&self) -> Result<Item> {
+        let trait_name = &self.rust_mut_name;
+        let base_trait_name = &self.rust_app_name;
+        let base_trait_path = self
+            .options
+            .path_in_self_module(&base_trait_name.clone().into())?;
+        let allocator_ident: Ident = parse_str("A")?;
+        let allocator: Type = parse2(quote! { #allocator_ident})?;
+        let methods = self
+            .fields
+            .iter()
+            .map(|f| f.gen_mutable_methods_signatures(&allocator))
+            .flatten_ok()
+            .collect::<Result<Vec<_>>>()?;
+        Ok(parse2(quote! {
+            pub trait #trait_name < #allocator_ident: ::std::alloc::Allocator >
+                : #base_trait_path < #allocator_ident >
+            {
                 #(#methods;)*
             }
         })?)
@@ -255,7 +296,11 @@ impl Field {
         })?)
     }
 
-    // Appendings
+    // Appendables
+
+    pub fn gen_appendale_signatures(&self, allocator: &Type) -> Result<Vec<Signature>> {
+        Ok(vec![]) // todo!()
+    }
 
     // Mutators
 
@@ -267,7 +312,7 @@ impl Field {
         ))?)
     }
 
-    pub fn gen_mutator_signature(&self, allocator: &Type) -> Result<Signature> {
+    pub fn gen_mutable_methods_signatures(&self, allocator: &Type) -> Result<Vec<Signature>> {
         let mutator_name = self.gen_mutator_name()?;
         let mutator_type = match self.wrapper {
             FieldWrapper::Vec => self.scalar_type.gen_repeated_mutator_type(
@@ -281,9 +326,9 @@ impl Field {
                 &self.options,
             )?,
         };
-        Ok(parse2(quote! {
+        Ok(vec![parse2(quote! {
             fn #mutator_name(&mut self) -> #mutator_type
-        })?)
+        })?])
     }
 
     // Others

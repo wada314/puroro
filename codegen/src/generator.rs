@@ -28,7 +28,7 @@ use ::std::cell::LazyCell;
 use ::std::collections::HashSet;
 use ::std::collections::{BTreeSet, HashMap};
 use ::std::rc::Rc;
-use ::syn::{parse2, parse_str, Ident, Path, Type};
+use ::syn::{parse2, parse_str, Ident, ItemUse, Path, Type};
 
 pub fn compile(request: &CodeGeneratorRequest) -> Result<CodeGeneratorResponse> {
     let mut response = CodeGeneratorResponse::default();
@@ -37,11 +37,12 @@ pub fn compile(request: &CodeGeneratorRequest) -> Result<CodeGeneratorResponse> 
     let options = Rc::new({
         let mut options = CodeGeneratorOptions::default();
         options.strict_type_path = false;
+        options.allow_import_common_types = true;
         options
     });
 
     let root_context: RootContext = request.proto_file().cloned().into();
-    let mut out_files = GeneratedFileSet::new();
+    let mut out_files = GeneratedFileSet::new(Rc::clone(&options));
 
     let messages = root_context
         .files()
@@ -99,11 +100,16 @@ pub struct CodeGeneratorOptions {
     /// e.g. should we just use `i32` or `::std::primitive::i32` ?
     /// Default to true.
     pub strict_type_path: bool,
+
+    /// If true, in the generated code modules, we `use` the common types which
+    /// are not included in the prelude: e.g. `::std::ops::Deref`.
+    pub allow_import_common_types: bool,
 }
 impl Default for CodeGeneratorOptions {
     fn default() -> Self {
         Self {
             strict_type_path: true,
+            allow_import_common_types: false,
         }
     }
 }
@@ -115,6 +121,16 @@ impl CodeGeneratorOptions {
         } else {
             quote! { #ident }
         })?)
+    }
+    pub fn imports(&self) -> Result<Vec<ItemUse>> {
+        if self.allow_import_common_types {
+            Ok(vec![
+                parse2(quote! { #[allow(unused)] use ::std::ops::Deref; })?,
+                parse2(quote! { #[allow(unused)] use ::std::ops::DerefMut; })?,
+            ])
+        } else {
+            Ok(vec![])
+        }
     }
     pub fn clone_trait(&self) -> Result<Path> {
         Ok(parse2(if self.strict_type_path {
@@ -150,11 +166,13 @@ impl CodeGeneratorOptions {
         })?)
     }
     pub fn deref_mut_trait(&self, target: &Type) -> Result<Path> {
-        Ok(parse2(if self.strict_type_path {
-            quote! { ::std::ops::DerefMut<Target=#target> }
-        } else {
-            quote! { DerefMut<Target=#target> }
-        })?)
+        Ok(parse2(
+            if !self.strict_type_path && self.allow_import_common_types {
+                quote! { DerefMut<Target=#target> }
+            } else {
+                quote! { ::std::ops::DerefMut<Target=#target> }
+            },
+        )?)
     }
     pub fn path_in_self_module(&self, path: &Path) -> Result<Path> {
         Ok(parse2(if self.strict_type_path {
@@ -170,17 +188,20 @@ struct GeneratedFile {
     sources: BTreeSet<String>,
     submodules: BTreeSet<String>,
 
+    options: Rc<CodeGeneratorOptions>,
+
     /// The body part of the file, except:
     /// - The header comments
     /// - The submodule definitions (like "pub mod foo;")
     body: Vec<TokenStream>,
 }
 impl GeneratedFile {
-    fn new(full_path: impl Into<String>) -> Self {
+    fn new(full_path: impl Into<String>, options: Rc<CodeGeneratorOptions>) -> Self {
         Self {
             full_path: full_path.into(),
             sources: BTreeSet::new(),
             submodules: BTreeSet::new(),
+            options,
             body: Vec::new(),
         }
     }
@@ -221,6 +242,7 @@ impl TryFrom<GeneratedFile> for code_generator_response::File {
                 quote! { pub mod #id; }
             })
             .collect::<Vec<_>>();
+        let imports = from.options.imports()?;
         let puroro_root = if is_root_file {
             quote! {
                 #[allow(unused)]
@@ -245,6 +267,7 @@ impl TryFrom<GeneratedFile> for code_generator_response::File {
             #(#source_list)*
 
             #(#submodule_decls)*
+            #(#imports)*
             #puroro_root
             #(#body)*
         };
@@ -256,11 +279,13 @@ impl TryFrom<GeneratedFile> for code_generator_response::File {
 
 struct GeneratedFileSet {
     files: HashMap<String, GeneratedFile>,
+    options: Rc<CodeGeneratorOptions>,
 }
 impl GeneratedFileSet {
-    fn new() -> Self {
+    fn new(options: Rc<CodeGeneratorOptions>) -> Self {
         Self {
             files: HashMap::new(),
+            options,
         }
     }
 
@@ -274,7 +299,7 @@ impl GeneratedFileSet {
             return self
                 .files
                 .entry("mod.rs".to_string())
-                .or_insert_with(|| GeneratedFile::new("mod.rs"));
+                .or_insert_with(|| GeneratedFile::new("mod.rs", Rc::clone(&self.options)));
         }
 
         // create parent modules.
@@ -282,19 +307,21 @@ impl GeneratedFileSet {
         while let Some((parent, submodule)) = module_path.rsplit_once('/') {
             self.files
                 .entry(format!("{parent}.rs"))
-                .or_insert_with(|| GeneratedFile::new(format!("{parent}.rs")))
+                .or_insert_with(|| {
+                    GeneratedFile::new(format!("{parent}.rs"), Rc::clone(&self.options))
+                })
                 .add_submodule(submodule);
             module_path = parent;
         }
         self.files
             .entry("mod.rs".to_string())
-            .or_insert_with(|| GeneratedFile::new("mod.rs"))
+            .or_insert_with(|| GeneratedFile::new("mod.rs", Rc::clone(&self.options)))
             .add_submodule(module_path);
 
         // return the target file.
         self.files
             .entry(full_path.clone())
-            .or_insert_with(|| GeneratedFile::new(full_path))
+            .or_insert_with(|| GeneratedFile::new(full_path, Rc::clone(&self.options)))
     }
 }
 impl IntoIterator for GeneratedFileSet {
