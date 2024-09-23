@@ -14,7 +14,7 @@
 
 use crate::cases::{convert_into_case, Case};
 use crate::descriptor::{DescriptorExt, FieldDescriptorExt, FieldLabel, FieldType, FieldTypeCase};
-use crate::generator::{avoid_reserved_keywords, CodeGeneratorOptions};
+use crate::generator::{avoid_reserved_keywords, to_ident, CodeGeneratorOptions};
 use crate::proto_path::{ProtoPath, ProtoPathBuf};
 use crate::Result;
 use ::itertools::Itertools;
@@ -244,7 +244,7 @@ impl Field {
 
     fn gen_get_method_name(&self) -> Result<Ident> {
         let lower_cased = convert_into_case(&self.original_name, Case::LowerSnakeCase);
-        Ok(parse_str(&avoid_reserved_keywords(&lower_cased))?)
+        Ok(to_ident(&lower_cased))
     }
 
     pub fn gen_get_method_signature(&self) -> Result<Signature> {
@@ -315,10 +315,7 @@ impl Field {
 
     fn gen_mut_method_name(&self) -> Result<Ident> {
         let lower_cased = convert_into_case(&self.original_name, Case::LowerSnakeCase);
-        Ok(parse_str(&format!(
-            "{}_mut",
-            avoid_reserved_keywords(&lower_cased)
-        ))?)
+        Ok(to_ident(&format!("{}_mut", &lower_cased)))
     }
 
     pub fn gen_mutable_methods_signatures(&self, allocator: &Type) -> Result<Vec<Signature>> {

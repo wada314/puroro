@@ -356,3 +356,10 @@ pub fn avoid_reserved_keywords(s: &str) -> Cow<str> {
     }
     return Cow::Borrowed(s);
 }
+
+pub fn to_ident(s: &str) -> Ident {
+    format_ident!("{}", avoid_reserved_keywords(s))
+}
+pub fn to_ident_without_keyword_check(s: &str) -> Ident {
+    format_ident!("{}", s)
+}

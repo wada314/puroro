@@ -13,14 +13,14 @@
 // limitations under the License.
 
 use crate::cases::{convert_into_case, Case};
-use crate::generator::{avoid_reserved_keywords, CodeGeneratorOptions};
+use crate::generator::{avoid_reserved_keywords, to_ident, CodeGeneratorOptions};
 use crate::Result;
 use ::itertools::Itertools;
 use ::quote::{format_ident, quote};
 use ::std::borrow::Borrow;
 use ::std::fmt::Display;
 use ::std::ops::Deref;
-use ::syn::{parse2, parse_str, Path, PathSegment};
+use ::syn::{parse2, Path, PathSegment};
 
 #[derive(Debug, Eq, Ord, Hash)]
 pub struct ProtoPath(str);
@@ -113,10 +113,7 @@ impl ProtoPath {
 
     pub fn to_rust_path(&self, options: &CodeGeneratorOptions) -> Result<Path> {
         self.to_rust_path_with(options, |item| {
-            Ok(parse_str(&avoid_reserved_keywords(&convert_into_case(
-                item,
-                Case::CamelCase,
-            )))?)
+            Ok(to_ident(&convert_into_case(item, Case::CamelCase)).into())
         })
     }
     pub fn to_rust_path_with(
@@ -133,13 +130,8 @@ impl ProtoPath {
             self.last_component(),
         ) {
             let modules = components_iter
-                .map(|s| {
-                    Ok(parse_str(&avoid_reserved_keywords(&convert_into_case(
-                        s,
-                        Case::LowerSnakeCase,
-                    )))?)
-                })
-                .collect::<Result<Vec<PathSegment>>>()?;
+                .map(|s| to_ident(&convert_into_case(s, Case::LowerSnakeCase)).into())
+                .collect::<Vec<PathSegment>>();
             let item = last_item_naming(item)?;
             let path_from_self = parse2(quote! { #(#first_component ::)* #(#modules::)* #item})?;
             Ok(options.path_in_self_module(&path_from_self)?)
