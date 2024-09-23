@@ -90,7 +90,7 @@ impl Field {
     }
 
     fn gen_getter(&self) -> Result<Item> {
-        let signature = self.trait_field.gen_getter_signature()?;
+        let signature = self.trait_field.gen_get_method_signature()?;
         let number = self.number;
         let body = self.gen_getter_body(&parse_str("f_opt")?)?;
         Ok(parse2(quote! {

@@ -96,7 +96,7 @@ impl GenTrait {
         let getters = self
             .fields
             .iter()
-            .map(Field::gen_getter_signature)
+            .map(Field::gen_get_method_signature)
             .collect::<Result<Vec<_>>>()?;
         Ok(parse2(quote! {
             pub trait #trait_name {
@@ -116,7 +116,7 @@ impl GenTrait {
         let methods = self
             .fields
             .iter()
-            .map(|f| f.gen_appendale_signatures(&allocator))
+            .map(|f| f.gen_appendale_methods_signatures(&allocator))
             .flatten_ok()
             .collect::<Result<Vec<_>>>()?;
         Ok(parse2(quote! {
@@ -160,12 +160,12 @@ impl GenTrait {
         let getter_signatures = self
             .fields
             .iter()
-            .map(Field::gen_getter_signature)
+            .map(Field::gen_get_method_signature)
             .collect::<Result<Vec<_>>>()?;
         let getter_bodies = self
             .fields
             .iter()
-            .map(|f| f.gen_blanket_ref_getter_body(&blanket_type, &trait_path))
+            .map(|f| f.gen_blanket_ref_get_method_body(&blanket_type, &trait_path))
             .collect::<Result<Vec<_>>>()?;
         Ok(vec![
             parse2(quote! {
@@ -196,12 +196,12 @@ impl GenTrait {
         let getter_signatures = self
             .fields
             .iter()
-            .map(Field::gen_getter_signature)
+            .map(Field::gen_get_method_signature)
             .collect::<Result<Vec<_>>>()?;
         let getter_bodies = self
             .fields
             .iter()
-            .map(|f| f.gen_blanket_option_getter_body(&blanket_type_ident, &trait_path))
+            .map(|f| f.gen_blanket_option_get_method_body(&blanket_type_ident, &trait_path))
             .collect::<Result<Vec<_>>>()?;
         Ok(parse2(quote! {
             impl<T: #trait_path> #trait_path for #blanket_opt_type {
@@ -242,13 +242,13 @@ impl Field {
 
     // Getters
 
-    fn gen_getter_name(&self) -> Result<Ident> {
+    fn gen_get_method_name(&self) -> Result<Ident> {
         let lower_cased = convert_into_case(&self.original_name, Case::LowerSnakeCase);
         Ok(parse_str(&avoid_reserved_keywords(&lower_cased))?)
     }
 
-    pub fn gen_getter_signature(&self) -> Result<Signature> {
-        let getter_name = self.gen_getter_name()?;
+    pub fn gen_get_method_signature(&self) -> Result<Signature> {
+        let getter_name = self.gen_get_method_name()?;
         let lifetime: Option<Lifetime> = None;
         let getter_type = match self.wrapper {
             FieldWrapper::Vec => self.scalar_type.gen_repeated_getter_type(
@@ -270,19 +270,23 @@ impl Field {
         })?)
     }
 
-    fn gen_blanket_ref_getter_body(&self, blanket_type: &Ident, trait_path: &Path) -> Result<Expr> {
-        let getter_name = self.gen_getter_name()?;
+    fn gen_blanket_ref_get_method_body(
+        &self,
+        blanket_type: &Ident,
+        trait_path: &Path,
+    ) -> Result<Expr> {
+        let getter_name = self.gen_get_method_name()?;
         Ok(parse2(quote! {
             <#blanket_type as #trait_path>::#getter_name(self)
         })?)
     }
 
-    fn gen_blanket_option_getter_body(
+    fn gen_blanket_option_get_method_body(
         &self,
         blanket_type_ident: &Ident,
         trait_path: &Path,
     ) -> Result<Expr> {
-        let getter_name = self.gen_getter_name()?;
+        let getter_name = self.gen_get_method_name()?;
         Ok(parse2(match self.wrapper {
             FieldWrapper::Vec => quote! {
                 self.as_ref().map(<#blanket_type_ident as #trait_path>::#getter_name).into_iter().flatten()
@@ -298,13 +302,18 @@ impl Field {
 
     // Appendables
 
-    pub fn gen_appendale_signatures(&self, allocator: &Type) -> Result<Vec<Signature>> {
-        Ok(vec![]) // todo!()
+    pub fn gen_appendale_methods_signatures(&self, allocator: &Type) -> Result<Vec<Signature>> {
+        Ok(match self.wrapper {
+            FieldWrapper::Bare => {
+                vec![self.gen_mut_method_signature(allocator)?]
+            }
+            _ => vec![],
+        })
     }
 
     // Mutators
 
-    fn gen_mutator_name(&self) -> Result<Ident> {
+    fn gen_mut_method_name(&self) -> Result<Ident> {
         let lower_cased = convert_into_case(&self.original_name, Case::LowerSnakeCase);
         Ok(parse_str(&format!(
             "{}_mut",
@@ -313,7 +322,14 @@ impl Field {
     }
 
     pub fn gen_mutable_methods_signatures(&self, allocator: &Type) -> Result<Vec<Signature>> {
-        let mutator_name = self.gen_mutator_name()?;
+        Ok(match self.wrapper {
+            FieldWrapper::Bare => vec![],
+            _ => vec![self.gen_mut_method_signature(allocator)?],
+        })
+    }
+
+    pub fn gen_mut_method_signature(&self, allocator: &Type) -> Result<Signature> {
+        let mutator_name = self.gen_mut_method_name()?;
         let mutator_type = match self.wrapper {
             FieldWrapper::Vec => self.scalar_type.gen_repeated_mutator_type(
                 &self.current_path,
@@ -326,9 +342,9 @@ impl Field {
                 &self.options,
             )?,
         };
-        Ok(vec![parse2(quote! {
+        Ok(parse2(quote! {
             fn #mutator_name(&mut self) -> #mutator_type
-        })?])
+        })?)
     }
 
     // Others
