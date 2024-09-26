@@ -443,7 +443,7 @@ impl FieldType<ProtoPathBuf, ProtoPathBuf> {
         })?)
     }
 
-    fn gen_bare_mutator_type(
+    fn gen_mutator_deref_target_type(
         &self,
         current_path: &ProtoPath,
         allocator: &Type,
@@ -490,7 +490,7 @@ impl FieldType<ProtoPathBuf, ProtoPathBuf> {
         allocator: &Type,
         options: &CodeGeneratorOptions,
     ) -> Result<Type> {
-        let bare_type = self.gen_bare_mutator_type(current_path, allocator, options)?;
+        let bare_type = self.gen_mutator_deref_target_type(current_path, allocator, options)?;
         let deref_mut_trait = options.deref_mut_trait(&bare_type)?;
         Ok(parse2(quote! {
             impl #deref_mut_trait
@@ -502,7 +502,7 @@ impl FieldType<ProtoPathBuf, ProtoPathBuf> {
         allocator: &Type,
         options: &CodeGeneratorOptions,
     ) -> Result<Type> {
-        let bare_type = self.gen_bare_mutator_type(current_path, allocator, options)?;
+        let bare_type = self.gen_mutator_deref_target_type(current_path, allocator, options)?;
         let vec_type = options.vec_type(&bare_type, Some(allocator))?;
         let deref_mut_trait = options.deref_mut_trait(&vec_type)?;
         Ok(parse2(quote! {
