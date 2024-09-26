@@ -240,6 +240,10 @@ impl Field {
         self.scalar_type.as_deref()
     }
 
+    pub fn wrapper(&self) -> FieldWrapper {
+        self.wrapper
+    }
+
     // Getters
 
     fn gen_get_method_name(&self) -> Result<Ident> {
@@ -345,10 +349,6 @@ impl Field {
     }
 
     // Others
-
-    pub fn wrapper(&self) -> FieldWrapper {
-        self.wrapper
-    }
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
