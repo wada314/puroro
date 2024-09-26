@@ -309,10 +309,39 @@ impl Field {
     pub fn gen_appendale_methods_signatures(&self, allocator: &Type) -> Result<Vec<Signature>> {
         Ok(match self.wrapper {
             FieldWrapper::Bare => {
-                vec![self.gen_mut_method_signature(allocator)?]
+                vec![
+                    self.gen_mut_method_signature(allocator)?,
+                    self.gen_append_method_signature(allocator)?,
+                ]
             }
-            _ => vec![],
+            _ => vec![self.gen_append_method_signature(allocator)?],
         })
+    }
+    pub fn gen_append_method_signature(&self, allocator: &Type) -> Result<Signature> {
+        let append_method_name = match self.wrapper() {
+            FieldWrapper::Bare => self.gen_mut_method_name()?,
+            _ => self.gen_append_method_name()?,
+        };
+        let return_type = match self.wrapper {
+            FieldWrapper::Bare => Some(self.scalar_type.gen_non_repeated_mutator_type(
+                &self.current_path,
+                allocator,
+                &self.options,
+            )?),
+            _ => None,
+        }
+        .into_iter();
+        let arguments = match self.wrapper {
+            FieldWrapper::Bare => vec![],
+            _ => vec![quote! { value: ()/* TODO */ }],
+        };
+        Ok(parse2(quote! {
+            fn #append_method_name(&mut self #(, #arguments)*) -> #(-> #return_type)*
+        })?)
+    }
+    fn gen_append_method_name(&self) -> Result<Ident> {
+        let lower_cased = convert_into_case(&self.original_name, Case::LowerSnakeCase);
+        Ok(to_ident(&format!("append_{}", &lower_cased)))
     }
 
     // Mutators
@@ -323,10 +352,7 @@ impl Field {
     }
 
     pub fn gen_mutable_methods_signatures(&self, allocator: &Type) -> Result<Vec<Signature>> {
-        Ok(match self.wrapper {
-            FieldWrapper::Bare => vec![],
-            _ => vec![self.gen_mut_method_signature(allocator)?],
-        })
+        Ok(vec![self.gen_mut_method_signature(allocator)?])
     }
 
     pub fn gen_mut_method_signature(&self, allocator: &Type) -> Result<Signature> {

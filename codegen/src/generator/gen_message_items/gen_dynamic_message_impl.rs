@@ -259,4 +259,22 @@ impl Field {
             }
         })?)
     }
+
+    fn gen_append(&self, allocator: &Type) -> Result<Item> {
+        let signature = self.trait_field.gen_append_method_signature(allocator)?;
+        let number = self.number;
+        let body = quote! { todo!()};
+        Ok(parse2(quote! {
+            #signature {
+                let f = self.field_mut(#number);
+                #body
+            }
+        })?)
+    }
+    fn gen_append_method_signature(&self, allocator: &Type) -> Result<Item> {
+        let signature = self.trait_field.gen_append_method_signature(allocator)?;
+        Ok(parse2(quote! {
+            #signature;
+        })?)
+    }
 }
