@@ -307,22 +307,22 @@ impl Field {
     // Appendables
 
     pub fn gen_appendale_methods_signatures(&self, allocator: &Type) -> Result<Vec<Signature>> {
+        // Bare fields => fn i32_mut(&mut self) -> DerefMut<Target=NonZero<i32>>
+        // Optional fields => fn i32_mut(&mut self) -> DerefMut<Target=i32>
+        // Vec fields => fn i32_mut(&mut self) -> DerefMut<Target=impl Extend<i32>>
         let mut signatures = vec![self.gen_append_method_signature(allocator)?];
-        if matches!(self.wrapper, FieldWrapper::Bare) {
-            signatures.push(self.gen_mut_method_signature(allocator)?);
-        }
         Ok(signatures)
     }
     pub fn gen_append_method_signature(&self, allocator: &Type) -> Result<Signature> {
         let append_method_name = self.gen_append_method_name()?;
-        let arguments = vec![quote! { todo: ()/* TODO */ }];
+        let return_type: Type = todo!();
         Ok(parse2(quote! {
-            fn #append_method_name(&mut self #(, #arguments)*)
+            fn #append_method_name(&mut self) -> #return_type
         })?)
     }
     fn gen_append_method_name(&self) -> Result<Ident> {
         let lower_cased = convert_into_case(&self.original_name, Case::LowerSnakeCase);
-        Ok(to_ident(&format!("append_{}", &lower_cased)))
+        Ok(to_ident(&format!("{}_mut", &lower_cased)))
     }
 
     // Mutators
