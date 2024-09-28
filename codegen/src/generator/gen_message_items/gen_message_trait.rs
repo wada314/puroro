@@ -336,7 +336,7 @@ impl Field {
             _ => vec![quote! { value: ()/* TODO */ }],
         };
         Ok(parse2(quote! {
-            fn #append_method_name(&mut self #(, #arguments)*) -> #(-> #return_type)*
+            fn #append_method_name(&mut self #(, #arguments)*) #(-> #return_type)*
         })?)
     }
     fn gen_append_method_name(&self) -> Result<Ident> {
