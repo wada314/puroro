@@ -307,36 +307,17 @@ impl Field {
     // Appendables
 
     pub fn gen_appendale_methods_signatures(&self, allocator: &Type) -> Result<Vec<Signature>> {
-        Ok(match self.wrapper {
-            FieldWrapper::Bare => {
-                vec![
-                    self.gen_mut_method_signature(allocator)?,
-                    self.gen_append_method_signature(allocator)?,
-                ]
-            }
-            _ => vec![self.gen_append_method_signature(allocator)?],
-        })
+        let mut signatures = vec![self.gen_append_method_signature(allocator)?];
+        if matches!(self.wrapper, FieldWrapper::Bare) {
+            signatures.push(self.gen_mut_method_signature(allocator)?);
+        }
+        Ok(signatures)
     }
     pub fn gen_append_method_signature(&self, allocator: &Type) -> Result<Signature> {
-        let append_method_name = match self.wrapper() {
-            FieldWrapper::Bare => self.gen_mut_method_name()?,
-            _ => self.gen_append_method_name()?,
-        };
-        let return_type = match self.wrapper {
-            FieldWrapper::Bare => Some(self.scalar_type.gen_non_repeated_mutator_type(
-                &self.current_path,
-                allocator,
-                &self.options,
-            )?),
-            _ => None,
-        }
-        .into_iter();
-        let arguments = match self.wrapper {
-            FieldWrapper::Bare => vec![],
-            _ => vec![quote! { value: ()/* TODO */ }],
-        };
+        let append_method_name = self.gen_append_method_name()?;
+        let arguments = vec![quote! { todo: ()/* TODO */ }];
         Ok(parse2(quote! {
-            fn #append_method_name(&mut self #(, #arguments)*) #(-> #return_type)*
+            fn #append_method_name(&mut self #(, #arguments)*)
         })?)
     }
     fn gen_append_method_name(&self) -> Result<Ident> {
