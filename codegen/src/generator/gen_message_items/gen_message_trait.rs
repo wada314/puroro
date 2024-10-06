@@ -328,6 +328,24 @@ impl Field {
                 let deref_mut_trait = self.options.deref_mut_trait(&target_type)?;
                 parse2(quote! { impl #deref_mut_trait })?
             }
+            FieldWrapper::Optional => {
+                let scalar_type = self.scalar_type.gen_mutator_deref_target_type(
+                    &self.current_path,
+                    allocator,
+                    &self.options,
+                )?;
+                let deref_mut_trait = self.options.deref_mut_trait(&scalar_type)?;
+                parse2(quote! { impl #deref_mut_trait })?
+            }
+            FieldWrapper::Bare => {
+                let scalar_type = self.scalar_type.gen_nonzero_mutator_type(
+                    &self.current_path,
+                    allocator,
+                    &self.options,
+                )?;
+                let deref_mut_trait = self.options.deref_mut_trait(&scalar_type)?;
+                parse2(quote! { impl #deref_mut_trait })?
+            }
             _ =>
             /* todo */
             {
@@ -466,6 +484,49 @@ impl FieldType<ProtoPathBuf, ProtoPathBuf> {
         Ok(parse2(quote! {
             impl #iter_trait
         })?)
+    }
+
+    fn gen_nonzero_mutator_type(
+        &self,
+        current_path: &ProtoPath,
+        allocator: &Type,
+        options: &CodeGeneratorOptions,
+    ) -> Result<Type> {
+        Ok(match self {
+            FieldType::Int32 => parse_str("::std::num::NonZero<i32>")?,
+            FieldType::Int64 => parse_str("::std::num::NonZero<i64>")?,
+            FieldType::UInt32 => parse_str("::std::num::NonZero<u32>")?,
+            FieldType::UInt64 => parse_str("::std::num::NonZero<u64>")?,
+            FieldType::SInt32 => parse_str("::std::num::NonZero<i32>")?,
+            FieldType::SInt64 => parse_str("::std::num::NonZero<i64>")?,
+            FieldType::Fixed32 => parse_str("::std::num::NonZero<u32>")?,
+            FieldType::Fixed64 => parse_str("::std::num::NonZero<u64>")?,
+            FieldType::SFixed32 => parse_str("::std::num::NonZero<i32>")?,
+            FieldType::SFixed64 => parse_str("::std::num::NonZero<i64>")?,
+            // TODO: following items
+            FieldType::Float => options.primitive_type("f32")?,
+            FieldType::Double => options.primitive_type("f64")?,
+            FieldType::Bool => options.primitive_type("bool")?,
+            FieldType::String => parse2(quote! { ::puroro::string::String<#allocator> })?,
+            FieldType::Bytes => {
+                let u8_type = options.primitive_type("u8")?;
+                options.vec_type(&u8_type, Some(allocator))?
+            }
+            FieldType::Group => Err(format!("Group field is not supported"))?,
+            FieldType::Message(path) => {
+                let path = path.to_relative_path(current_path).unwrap_or(path);
+                let path = path.to_rust_path_with(options, |name| {
+                    let ident = GenTrait::rust_mut_name_from_message_name(name)?;
+                    Ok(parse2(quote! { #ident })?)
+                })?;
+                parse2(quote! { impl #path<#allocator> })?
+            }
+            FieldType::Enum(path) => {
+                let path = path.to_relative_path(current_path).unwrap_or(path);
+                let path = path.to_rust_path(options)?;
+                parse2(quote! { #path })?
+            }
+        })
     }
 
     fn gen_mutator_deref_target_type(
