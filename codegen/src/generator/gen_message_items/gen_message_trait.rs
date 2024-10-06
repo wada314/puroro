@@ -310,7 +310,7 @@ impl Field {
         // Bare fields => fn i32_mut(&mut self) -> DerefMut<Target=NonZero<i32>>
         // Optional fields => fn i32_mut(&mut self) -> DerefMut<Target=i32>
         // Vec fields => fn i32_mut(&mut self) -> DerefMut<Target=impl Extend<i32>>
-        let mut signatures = vec![self.gen_append_method_signature(allocator)?];
+        let signatures = vec![self.gen_append_method_signature(allocator)?];
         Ok(signatures)
     }
     pub fn gen_append_method_signature(&self, allocator: &Type) -> Result<Signature> {
