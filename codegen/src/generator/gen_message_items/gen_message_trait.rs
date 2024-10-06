@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use crate::cases::{convert_into_case, Case};
-use crate::descriptor::{DescriptorExt, FieldDescriptorExt, FieldLabel, FieldType, FieldTypeCase};
+use crate::descriptor::{DescriptorExt, FieldDescriptorExt, FieldLabel, FieldType};
 use crate::generator::{to_ident, CodeGeneratorOptions};
 use crate::proto_path::{ProtoPath, ProtoPathBuf};
 use crate::Result;
@@ -215,7 +215,7 @@ impl GenTrait {
 
 pub struct Field {
     original_name: String,
-    wrapper: FieldWrapper,
+    wrapper: FieldPresense,
     current_path: Rc<ProtoPathBuf>,
     scalar_type: FieldType<ProtoPathBuf, ProtoPathBuf>,
     options: Rc<CodeGeneratorOptions>,
@@ -229,7 +229,7 @@ impl Field {
     ) -> Result<Self> {
         Ok(Self {
             original_name: desc.name().to_string(),
-            wrapper: FieldWrapper::from_field_desc(desc),
+            wrapper: FieldPresense::from_field_desc(desc),
             current_path,
             scalar_type: desc.type_with_full_path()?,
             options,
@@ -240,7 +240,7 @@ impl Field {
         self.scalar_type.as_deref()
     }
 
-    pub fn wrapper(&self) -> FieldWrapper {
+    pub fn wrapper(&self) -> FieldPresense {
         self.wrapper
     }
 
@@ -255,15 +255,17 @@ impl Field {
         let getter_name = self.gen_get_method_name()?;
         let lifetime: Option<Lifetime> = None;
         let getter_type = match self.wrapper {
-            FieldWrapper::Vec => self.scalar_type.gen_repeated_getter_type(
+            FieldPresense::Repeated => self.scalar_type.gen_repeated_getter_type(
                 &self.current_path,
                 lifetime.as_ref(),
                 &self.options,
             )?,
-            FieldWrapper::Optional | FieldWrapper::OptionalBoxed => self
-                .scalar_type
-                .gen_optional_getter_type(&self.current_path, lifetime.as_ref(), &self.options)?,
-            FieldWrapper::Bare => self.scalar_type.gen_bare_getter_type(
+            FieldPresense::Explicit => self.scalar_type.gen_optional_getter_type(
+                &self.current_path,
+                lifetime.as_ref(),
+                &self.options,
+            )?,
+            FieldPresense::Implicit => self.scalar_type.gen_bare_getter_type(
                 &self.current_path,
                 lifetime.as_ref(),
                 &self.options,
@@ -292,13 +294,13 @@ impl Field {
     ) -> Result<Expr> {
         let getter_name = self.gen_get_method_name()?;
         Ok(parse2(match self.wrapper {
-            FieldWrapper::Vec => quote! {
+            FieldPresense::Repeated => quote! {
                 self.as_ref().map(<#blanket_type_ident as #trait_path>::#getter_name).into_iter().flatten()
             },
-            FieldWrapper::Optional | FieldWrapper::OptionalBoxed => quote! {
+            FieldPresense::Explicit => quote! {
                 self.as_ref().and_then(<#blanket_type_ident as #trait_path>::#getter_name)
             },
-            FieldWrapper::Bare => quote! {
+            FieldPresense::Implicit => quote! {
                 self.as_ref().map(<#blanket_type_ident as #trait_path>::#getter_name).unwrap_or_default()
             },
         })?)
@@ -316,7 +318,7 @@ impl Field {
     pub fn gen_append_method_signature(&self, allocator: &Type) -> Result<Signature> {
         let append_method_name = self.gen_append_method_name()?;
         let return_type: Type = match self.wrapper {
-            FieldWrapper::Vec => {
+            FieldPresense::Repeated => {
                 let scalar_type = self.scalar_type.gen_mutator_deref_target_type(
                     &self.current_path,
                     allocator,
@@ -328,7 +330,7 @@ impl Field {
                 let deref_mut_trait = self.options.deref_mut_trait(&target_type)?;
                 parse2(quote! { impl #deref_mut_trait })?
             }
-            FieldWrapper::Optional => {
+            FieldPresense::Explicit => {
                 let scalar_type = self.scalar_type.gen_mutator_deref_target_type(
                     &self.current_path,
                     allocator,
@@ -337,7 +339,7 @@ impl Field {
                 let deref_mut_trait = self.options.deref_mut_trait(&scalar_type)?;
                 parse2(quote! { impl #deref_mut_trait })?
             }
-            FieldWrapper::Bare => {
+            FieldPresense::Implicit => {
                 let scalar_type = self.scalar_type.gen_nonzero_mutator_type(
                     &self.current_path,
                     allocator,
@@ -345,11 +347,6 @@ impl Field {
                 )?;
                 let deref_mut_trait = self.options.deref_mut_trait(&scalar_type)?;
                 parse2(quote! { impl #deref_mut_trait })?
-            }
-            _ =>
-            /* todo */
-            {
-                parse_str("()")?
             }
         };
         Ok(parse2(quote! {
@@ -375,7 +372,7 @@ impl Field {
     pub fn gen_mut_method_signature(&self, allocator: &Type) -> Result<Signature> {
         let mutator_name = self.gen_mut_method_name()?;
         let mutator_type = match self.wrapper {
-            FieldWrapper::Vec => self.scalar_type.gen_repeated_mutator_type(
+            FieldPresense::Repeated => self.scalar_type.gen_repeated_mutator_type(
                 &self.current_path,
                 allocator,
                 &self.options,
@@ -395,25 +392,20 @@ impl Field {
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub enum FieldWrapper {
-    Bare,
-    Optional,
-    OptionalBoxed,
-    Vec,
+pub enum FieldPresense {
+    Implicit,
+    Explicit,
+    Repeated,
 }
 
-impl FieldWrapper {
+impl FieldPresense {
     fn from_field_desc<'a>(field: &'a FieldDescriptorExt<'a>) -> Self {
         if field.has_presence() {
-            if field.type_case() == Some(FieldTypeCase::Message) {
-                FieldWrapper::OptionalBoxed
-            } else {
-                FieldWrapper::Optional
-            }
+            FieldPresense::Explicit
         } else if field.label() == Some(FieldLabel::Repeated) {
-            FieldWrapper::Vec
+            FieldPresense::Repeated
         } else {
-            FieldWrapper::Bare
+            FieldPresense::Implicit
         }
     }
 }

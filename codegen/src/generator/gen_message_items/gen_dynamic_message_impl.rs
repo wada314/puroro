@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::gen_message_trait::{Field as TraitField, FieldWrapper, GenTrait};
+use super::gen_message_trait::{Field as TraitField, FieldPresense, GenTrait};
 use crate::descriptor::{
     DescriptorExt, FieldDescriptorExt, I32Type, I64Type, LenType, VariantType, WireType,
 };
@@ -105,7 +105,7 @@ impl Field {
         let wire_type: WireType<_, _, _, _> = self.trait_field.scalar_type().into();
         let field_expr: Expr = parse_str("f")?;
         Ok(match self.trait_field.wrapper() {
-            FieldWrapper::Vec => {
+            FieldPresense::Repeated => {
                 let body = match wire_type {
                     WireType::Variant(t) => {
                         self.gen_repeated_variant_getter_body(&field_expr, t)?
@@ -119,7 +119,7 @@ impl Field {
                     (#field_opt_expr).into_iter().flat_map(|f| #body)
                 })?
             }
-            FieldWrapper::Bare | FieldWrapper::Optional | FieldWrapper::OptionalBoxed => {
+            FieldPresense::Implicit | FieldPresense::Explicit => {
                 let body = match wire_type {
                     WireType::Variant(t) => {
                         self.gen_non_repeated_varint_getter_body(&field_expr, t)?
@@ -130,7 +130,7 @@ impl Field {
                     _ => todo!(), // Start / end group
                 };
                 let maybe_unwrap = match self.trait_field.wrapper() {
-                    FieldWrapper::Bare => quote! { .unwrap_or_default() },
+                    FieldPresense::Implicit => quote! { .unwrap_or_default() },
                     _ => quote! {},
                 };
                 parse2(quote! {
