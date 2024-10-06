@@ -22,15 +22,10 @@ pub trait RepeatedView<'a> {
 }
 
 pub trait RepeatedViewMut<'a>:
-    IntoIterator<Item = Self::RefMut> + Extend<<Self as RepeatedViewMut<'a>>::Item>
+    RepeatedView<'a> + Extend<<Self as RepeatedViewMut<'a>>::Item>
 {
-    type RefMut: 'a + DerefMut<Target = <Self as RepeatedViewMut<'a>>::Item>;
     type Item;
-    fn len(&self) -> usize;
-    fn is_empty(&self) -> bool {
-        self.len() == 0
-    }
-    fn iter(&self) -> impl Iterator<Item = Self::RefMut>;
+    fn iter_mut(&self) -> impl Iterator<Item = impl DerefMut<Target = Self::Item>>;
 
     fn push(&mut self, value: <Self as RepeatedViewMut<'a>>::Item);
     fn clear(&mut self);
