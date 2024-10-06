@@ -14,14 +14,11 @@
 
 use ::std::ops::{Deref, DerefMut};
 
-pub trait RepeatedView<'a>: IntoIterator<Item = Self::Ref> {
-    type Ref: 'a + Deref<Target = <Self as RepeatedView<'a>>::Item>;
-    type Item;
+pub trait RepeatedView<'a> {
     fn len(&self) -> usize;
     fn is_empty(&self) -> bool {
         self.len() == 0
     }
-    fn iter(&self) -> impl Iterator<Item = Self::Ref>;
 }
 
 pub trait RepeatedViewMut<'a>:
@@ -37,4 +34,11 @@ pub trait RepeatedViewMut<'a>:
 
     fn push(&mut self, value: <Self as RepeatedViewMut<'a>>::Item);
     fn clear(&mut self);
+}
+
+pub trait RepeatedViewApp<'a>:
+    RepeatedView<'a> + Extend<<Self as RepeatedViewApp<'a>>::Item>
+{
+    type Item;
+    fn push(&mut self, value: <Self as RepeatedViewApp<'a>>::Item);
 }

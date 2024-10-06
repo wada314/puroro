@@ -20,7 +20,7 @@ use crate::Result;
 use ::itertools::Itertools;
 use ::quote::{format_ident, quote};
 use ::std::rc::Rc;
-use ::syn::{parse2, parse_str, Expr, Ident, Item, Path, Type};
+use ::syn::{parse2, parse_str, Expr, Ident, Item, Path, Type, TypePath};
 use ::syn::{Lifetime, Signature};
 
 pub struct GenTrait {
@@ -315,7 +315,25 @@ impl Field {
     }
     pub fn gen_append_method_signature(&self, allocator: &Type) -> Result<Signature> {
         let append_method_name = self.gen_append_method_name()?;
-        let return_type: Type = todo!();
+        let return_type: Type = match self.wrapper {
+            FieldWrapper::Vec => {
+                let scalar_type = self.scalar_type.gen_mutator_deref_target_type(
+                    &self.current_path,
+                    allocator,
+                    &self.options,
+                )?;
+                let target_type: Type = parse2(quote! {
+                    impl ::puroro::repeated::RepeatedViewApp<Item = #scalar_type>
+                })?;
+                let deref_mut_trait = self.options.deref_mut_trait(&target_type)?;
+                parse2(quote! { impl #deref_mut_trait })?
+            }
+            _ =>
+            /* todo */
+            {
+                parse_str("()")?
+            }
+        };
         Ok(parse2(quote! {
             fn #append_method_name(&mut self) -> #return_type
         })?)
