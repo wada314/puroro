@@ -14,13 +14,13 @@
 
 use crate::cases::{convert_into_case, Case};
 use crate::descriptor::{DescriptorExt, FieldDescriptorExt, FieldLabel, FieldType, FieldTypeCase};
-use crate::generator::{avoid_reserved_keywords, to_ident, CodeGeneratorOptions};
+use crate::generator::{to_ident, CodeGeneratorOptions};
 use crate::proto_path::{ProtoPath, ProtoPathBuf};
 use crate::Result;
 use ::itertools::Itertools;
 use ::quote::{format_ident, quote};
 use ::std::rc::Rc;
-use ::syn::{parse2, parse_str, Expr, Ident, Item, Path, Type, TypePath};
+use ::syn::{parse2, parse_str, Expr, Ident, Item, Path, Type};
 use ::syn::{Lifetime, Signature};
 
 pub struct GenTrait {
