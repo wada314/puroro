@@ -253,23 +253,15 @@ impl Field {
 
     pub fn gen_get_method_signature(&self) -> Result<Signature> {
         let getter_name = self.gen_get_method_name()?;
-        let lifetime: Option<Lifetime> = None;
+        let scalar_ref_type =
+            self.scalar_type
+                .gen_scalar_maybe_ref_type(&self.current_path, None, &self.options)?;
         let getter_type = match self.wrapper {
-            FieldPresense::Repeated => self.scalar_type.gen_repeated_getter_type(
-                &self.current_path,
-                lifetime.as_ref(),
-                &self.options,
-            )?,
-            FieldPresense::Explicit => self.scalar_type.gen_optional_getter_type(
-                &self.current_path,
-                lifetime.as_ref(),
-                &self.options,
-            )?,
-            FieldPresense::Implicit => self.scalar_type.gen_bare_getter_type(
-                &self.current_path,
-                lifetime.as_ref(),
-                &self.options,
-            )?,
+            FieldPresense::Repeated => parse2(quote! {
+                impl ::puroro::repeated::RepeatedView<Item = #scalar_ref_type>
+            })?,
+            FieldPresense::Explicit => self.options.option_type(&scalar_ref_type)?,
+            FieldPresense::Implicit => scalar_ref_type,
         };
         Ok(parse2(quote! {
             fn #getter_name(&self) -> #getter_type
@@ -295,7 +287,7 @@ impl Field {
         let getter_name = self.gen_get_method_name()?;
         Ok(parse2(match self.wrapper {
             FieldPresense::Repeated => quote! {
-                self.as_ref().map(<#blanket_type_ident as #trait_path>::#getter_name).into_iter().flatten()
+                self.as_ref().map(<#blanket_type_ident as #trait_path>::#getter_name)
             },
             FieldPresense::Explicit => quote! {
                 self.as_ref().and_then(<#blanket_type_ident as #trait_path>::#getter_name)
@@ -319,19 +311,17 @@ impl Field {
         let append_method_name = self.gen_append_method_name()?;
         let return_type: Type = match self.wrapper {
             FieldPresense::Repeated => {
-                let scalar_type = self.scalar_type.gen_mutator_deref_target_type(
+                let scalar_type = self.scalar_type.gen_scalar_owned_type(
                     &self.current_path,
                     allocator,
                     &self.options,
                 )?;
-                let target_type: Type = parse2(quote! {
+                parse2(quote! {
                     impl ::puroro::repeated::RepeatedViewApp<Item = #scalar_type>
-                })?;
-                let deref_mut_trait = self.options.deref_mut_trait(&target_type)?;
-                parse2(quote! { impl #deref_mut_trait })?
+                })?
             }
             FieldPresense::Explicit => {
-                let scalar_type = self.scalar_type.gen_mutator_deref_target_type(
+                let scalar_type = self.scalar_type.gen_scalar_owned_type(
                     &self.current_path,
                     allocator,
                     &self.options,
@@ -340,7 +330,7 @@ impl Field {
                 parse2(quote! { impl #deref_mut_trait })?
             }
             FieldPresense::Implicit => {
-                let scalar_type = self.scalar_type.gen_nonzero_mutator_type(
+                let scalar_type = self.scalar_type.gen_scalar_nonzero_type(
                     &self.current_path,
                     allocator,
                     &self.options,
@@ -375,6 +365,7 @@ impl Field {
             FieldPresense::Repeated => self.scalar_type.gen_repeated_mutator_type(
                 &self.current_path,
                 allocator,
+                None,
                 &self.options,
             )?,
             _ => self.scalar_type.gen_non_repeated_mutator_type(
@@ -411,7 +402,7 @@ impl FieldPresense {
 }
 
 impl FieldType<ProtoPathBuf, ProtoPathBuf> {
-    fn gen_bare_getter_type(
+    fn gen_scalar_maybe_ref_type(
         &self,
         current_path: &ProtoPath,
         lifetime: Option<&Lifetime>,
@@ -456,29 +447,49 @@ impl FieldType<ProtoPathBuf, ProtoPathBuf> {
             FieldType::Group => Err(format!("Group field is not supported"))?,
         })
     }
-    fn gen_optional_getter_type(
+    fn gen_scalar_owned_type(
         &self,
         current_path: &ProtoPath,
-        lifetime: Option<&Lifetime>,
+        allocator: &Type,
         options: &CodeGeneratorOptions,
     ) -> Result<Type> {
-        let bare_type = self.gen_bare_getter_type(current_path, lifetime, options)?;
-        options.option_type(&bare_type)
-    }
-    fn gen_repeated_getter_type(
-        &self,
-        current_path: &ProtoPath,
-        lifetime: Option<&Lifetime>,
-        options: &CodeGeneratorOptions,
-    ) -> Result<Type> {
-        let bare_type = self.gen_bare_getter_type(current_path, lifetime, options)?;
-        let iter_trait = options.iter_trait(&bare_type)?;
-        Ok(parse2(quote! {
-            impl #iter_trait
-        })?)
+        Ok(match self {
+            FieldType::Message(path) => {
+                let path = path.to_relative_path(current_path).unwrap_or(path);
+                let path = path.to_rust_path_with(options, |name| {
+                    let ident = GenTrait::rust_mut_name_from_message_name(name)?;
+                    Ok(parse2(quote! { #ident })?)
+                })?;
+                parse2(quote! { impl #path<#allocator> })?
+            }
+            FieldType::Enum(path) => {
+                let path = path.to_relative_path(current_path).unwrap_or(path);
+                let path = path.to_rust_path(options)?;
+                parse2(quote! { #path })?
+            }
+            FieldType::Int32 => options.primitive_type("i32")?,
+            FieldType::Int64 => options.primitive_type("i64")?,
+            FieldType::UInt32 => options.primitive_type("u32")?,
+            FieldType::UInt64 => options.primitive_type("u64")?,
+            FieldType::SInt32 => options.primitive_type("i32")?,
+            FieldType::SInt64 => options.primitive_type("i64")?,
+            FieldType::Fixed32 => options.primitive_type("u32")?,
+            FieldType::Fixed64 => options.primitive_type("u64")?,
+            FieldType::SFixed32 => options.primitive_type("i32")?,
+            FieldType::SFixed64 => options.primitive_type("i64")?,
+            FieldType::Float => options.primitive_type("f32")?,
+            FieldType::Double => options.primitive_type("f64")?,
+            FieldType::Bool => options.primitive_type("bool")?,
+            FieldType::String => parse2(quote! { ::puroro::string::String<#allocator> })?,
+            FieldType::Bytes => {
+                let u8_type = options.primitive_type("u8")?;
+                options.vec_type(&u8_type, Some(allocator))?
+            }
+            FieldType::Group => Err(format!("Group field is not supported"))?,
+        })
     }
 
-    fn gen_nonzero_mutator_type(
+    fn gen_scalar_nonzero_type(
         &self,
         current_path: &ProtoPath,
         allocator: &Type,
@@ -520,55 +531,13 @@ impl FieldType<ProtoPathBuf, ProtoPathBuf> {
             }
         })
     }
-
-    fn gen_mutator_deref_target_type(
-        &self,
-        current_path: &ProtoPath,
-        allocator: &Type,
-        options: &CodeGeneratorOptions,
-    ) -> Result<Type> {
-        Ok(match self {
-            FieldType::Message(path) => {
-                let path = path.to_relative_path(current_path).unwrap_or(path);
-                let path = path.to_rust_path_with(options, |name| {
-                    let ident = GenTrait::rust_mut_name_from_message_name(name)?;
-                    Ok(parse2(quote! { #ident })?)
-                })?;
-                parse2(quote! { impl #path<#allocator> })?
-            }
-            FieldType::Enum(path) => {
-                let path = path.to_relative_path(current_path).unwrap_or(path);
-                let path = path.to_rust_path(options)?;
-                parse2(quote! { #path })?
-            }
-            FieldType::Int32 => options.primitive_type("i32")?,
-            FieldType::Int64 => options.primitive_type("i64")?,
-            FieldType::UInt32 => options.primitive_type("u32")?,
-            FieldType::UInt64 => options.primitive_type("u64")?,
-            FieldType::SInt32 => options.primitive_type("i32")?,
-            FieldType::SInt64 => options.primitive_type("i64")?,
-            FieldType::Fixed32 => options.primitive_type("u32")?,
-            FieldType::Fixed64 => options.primitive_type("u64")?,
-            FieldType::SFixed32 => options.primitive_type("i32")?,
-            FieldType::SFixed64 => options.primitive_type("i64")?,
-            FieldType::Float => options.primitive_type("f32")?,
-            FieldType::Double => options.primitive_type("f64")?,
-            FieldType::Bool => options.primitive_type("bool")?,
-            FieldType::String => parse2(quote! { ::puroro::string::String<#allocator> })?,
-            FieldType::Bytes => {
-                let u8_type = options.primitive_type("u8")?;
-                options.vec_type(&u8_type, Some(allocator))?
-            }
-            FieldType::Group => Err(format!("Group field is not supported"))?,
-        })
-    }
     fn gen_non_repeated_mutator_type(
         &self,
         current_path: &ProtoPath,
         allocator: &Type,
         options: &CodeGeneratorOptions,
     ) -> Result<Type> {
-        let bare_type = self.gen_mutator_deref_target_type(current_path, allocator, options)?;
+        let bare_type = self.gen_scalar_owned_type(current_path, allocator, options)?;
         let deref_mut_trait = options.deref_mut_trait(&bare_type)?;
         Ok(parse2(quote! {
             impl #deref_mut_trait
@@ -578,13 +547,12 @@ impl FieldType<ProtoPathBuf, ProtoPathBuf> {
         &self,
         current_path: &ProtoPath,
         allocator: &Type,
+        lifetime: Option<&Lifetime>,
         options: &CodeGeneratorOptions,
     ) -> Result<Type> {
-        let bare_type = self.gen_mutator_deref_target_type(current_path, allocator, options)?;
-        let vec_type = options.vec_type(&bare_type, Some(allocator))?;
-        let deref_mut_trait = options.deref_mut_trait(&vec_type)?;
+        let lifetime = lifetime.into_iter();
         Ok(parse2(quote! {
-            impl #deref_mut_trait
+            impl ::puroro::repeated::RepeatedViewMut<#(#lifetime, )* Item = (), Value = ()>
         })?)
     }
 }
