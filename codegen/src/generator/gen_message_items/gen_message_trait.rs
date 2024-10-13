@@ -215,7 +215,7 @@ impl GenTrait {
 
 pub struct Field {
     original_name: String,
-    wrapper: FieldPresense,
+    presense: FieldPresense,
     current_path: Rc<ProtoPathBuf>,
     scalar_type: FieldType<ProtoPathBuf, ProtoPathBuf>,
     options: Rc<CodeGeneratorOptions>,
@@ -229,7 +229,7 @@ impl Field {
     ) -> Result<Self> {
         Ok(Self {
             original_name: desc.name().to_string(),
-            wrapper: FieldPresense::from_field_desc(desc),
+            presense: FieldPresense::from_field_desc(desc),
             current_path,
             scalar_type: desc.type_with_full_path()?,
             options,
@@ -241,7 +241,7 @@ impl Field {
     }
 
     pub fn wrapper(&self) -> FieldPresense {
-        self.wrapper
+        self.presense
     }
 
     // Getters
@@ -256,7 +256,7 @@ impl Field {
         let scalar_ref_type =
             self.scalar_type
                 .gen_scalar_maybe_ref_type(&self.current_path, None, &self.options)?;
-        let getter_type = match self.wrapper {
+        let getter_type = match self.presense {
             FieldPresense::Repeated => parse2(quote! {
                 impl ::puroro::repeated::RepeatedView<Item = #scalar_ref_type>
             })?,
@@ -285,7 +285,7 @@ impl Field {
         trait_path: &Path,
     ) -> Result<Expr> {
         let getter_name = self.gen_get_method_name()?;
-        Ok(parse2(match self.wrapper {
+        Ok(parse2(match self.presense {
             FieldPresense::Repeated => quote! {
                 self.as_ref().map(<#blanket_type_ident as #trait_path>::#getter_name).into_iter().flatten()
             },
@@ -300,6 +300,11 @@ impl Field {
 
     // Appendables
 
+    fn gen_append_method_name(&self) -> Result<Ident> {
+        let lower_cased = convert_into_case(&self.original_name, Case::LowerSnakeCase);
+        Ok(to_ident(&format!("{}_mut", &lower_cased)))
+    }
+
     pub fn gen_appendale_methods_signatures(&self, allocator: &Type) -> Result<Vec<Signature>> {
         // Bare fields => fn i32_mut(&mut self) -> DerefMut<Target=NonZero<i32>>
         // Optional fields => fn i32_mut(&mut self) -> DerefMut<Target=i32>
@@ -307,9 +312,10 @@ impl Field {
         let signatures = vec![self.gen_append_method_signature(allocator)?];
         Ok(signatures)
     }
+
     pub fn gen_append_method_signature(&self, allocator: &Type) -> Result<Signature> {
         let append_method_name = self.gen_append_method_name()?;
-        let return_type: Type = match self.wrapper {
+        let return_type: Type = match self.presense {
             FieldPresense::Repeated => {
                 let scalar_type = self.scalar_type.gen_scalar_owned_type(
                     &self.current_path,
@@ -343,25 +349,25 @@ impl Field {
             fn #append_method_name(&mut self) -> #return_type
         })?)
     }
-    fn gen_append_method_name(&self) -> Result<Ident> {
-        let lower_cased = convert_into_case(&self.original_name, Case::LowerSnakeCase);
-        Ok(to_ident(&format!("{}_mut", &lower_cased)))
-    }
 
     // Mutators
+
+    pub fn gen_mutable_methods_signatures(&self, allocator: &Type) -> Result<Vec<Signature>> {
+        let mut result = vec![self.gen_mut_method_signature(allocator)?];
+        if self.presense == FieldPresense::Explicit {
+            result.push(self.gen_clear_method_signature()?);
+        }
+        Ok(result)
+    }
 
     fn gen_mut_method_name(&self) -> Result<Ident> {
         let lower_cased = convert_into_case(&self.original_name, Case::LowerSnakeCase);
         Ok(to_ident(&format!("{}_mut", &lower_cased)))
     }
 
-    pub fn gen_mutable_methods_signatures(&self, allocator: &Type) -> Result<Vec<Signature>> {
-        Ok(vec![self.gen_mut_method_signature(allocator)?])
-    }
-
     pub fn gen_mut_method_signature(&self, allocator: &Type) -> Result<Signature> {
         let mutator_name = self.gen_mut_method_name()?;
-        let mutator_type: Type = match self.wrapper {
+        let mutator_type: Type = match self.presense {
             FieldPresense::Repeated => {
                 // A type returned from the iterator. e.g. i32, &str, &impl MessageTrait
                 let item_type = self.scalar_type.gen_scalar_maybe_ref_type(
@@ -393,6 +399,18 @@ impl Field {
         };
         Ok(parse2(quote! {
             fn #mutator_name(&mut self) -> #mutator_type
+        })?)
+    }
+
+    fn gen_clear_method_name(&self) -> Result<Ident> {
+        let lower_cased = convert_into_case(&self.original_name, Case::LowerSnakeCase);
+        Ok(to_ident(&format!("clear_{}", &lower_cased)))
+    }
+
+    fn gen_clear_method_signature(&self) -> Result<Signature> {
+        let clear_method_name = self.gen_clear_method_name()?;
+        Ok(parse2(quote! {
+            fn #clear_method_name(&mut self)
         })?)
     }
 
