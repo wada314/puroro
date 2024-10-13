@@ -287,7 +287,7 @@ impl Field {
         let getter_name = self.gen_get_method_name()?;
         Ok(parse2(match self.wrapper {
             FieldPresense::Repeated => quote! {
-                self.as_ref().map(<#blanket_type_ident as #trait_path>::#getter_name)
+                self.as_ref().map(<#blanket_type_ident as #trait_path>::#getter_name).into_iter().flatten()
             },
             FieldPresense::Explicit => quote! {
                 self.as_ref().and_then(<#blanket_type_ident as #trait_path>::#getter_name)

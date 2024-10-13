@@ -12,12 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-pub trait RepeatedView<'a>: IntoIterator {
-    fn len(&self) -> usize;
-    fn is_empty(&self) -> bool {
-        self.len() == 0
-    }
-}
+pub trait RepeatedView<'a>: IntoIterator {}
 
 pub trait RepeatedViewMut<'a>:
     RepeatedViewApp<'a> + Extend<<Self as RepeatedViewApp<'a>>::Value>
@@ -32,11 +27,4 @@ pub trait RepeatedViewApp<'a>:
     fn push(&mut self, value: <Self as RepeatedViewApp<'a>>::Value);
 }
 
-impl<'a, T: RepeatedView<'a>> RepeatedView<'a> for Option<T> {
-    fn len(&self) -> usize {
-        match self {
-            Some(v) => v.len(),
-            None => 0,
-        }
-    }
-}
+impl<'a, T: IntoIterator> RepeatedView<'a> for T {}
