@@ -444,7 +444,10 @@ impl FieldType<ProtoPathBuf, ProtoPathBuf> {
         options: &CodeGeneratorOptions,
     ) -> Result<Type> {
         let lifetime = lifetime.iter();
-        match self.as_ref().maybe_into_primitive(current_path, options)? {
+        match self
+            .as_ref()
+            .maybe_into_primitive_type(current_path, options)?
+        {
             Ok(primitive_type) => Ok(primitive_type),
             Err(len_type) => match len_type {
                 LenType::Message(path) => {
@@ -473,7 +476,10 @@ impl FieldType<ProtoPathBuf, ProtoPathBuf> {
         allocator: &Type,
         options: &CodeGeneratorOptions,
     ) -> Result<Type> {
-        match self.as_ref().maybe_into_primitive(current_path, options)? {
+        match self
+            .as_ref()
+            .maybe_into_primitive_type(current_path, options)?
+        {
             Ok(primitive_type) => Ok(primitive_type),
             Err(len_type) => match len_type {
                 LenType::Message(path) => {
