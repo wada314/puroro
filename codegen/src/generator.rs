@@ -12,87 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+pub mod compile;
 pub mod gen_enum_items;
 pub mod gen_message_items;
 pub mod module;
 
-use crate::descriptor::RootContext;
-use crate::{ErrorKind, Result};
-use ::prettyplease::unparse;
-use ::proc_macro2::TokenStream;
-use ::puroro::google::protobuf::compiler::code_generator_response::{self, Feature};
-use ::puroro::google::protobuf::compiler::{CodeGeneratorRequest, CodeGeneratorResponse};
+use crate::descriptor::{FieldType, I32Type, I64Type, LenType, VariantType, WireType};
+use crate::proto_path::ProtoPath;
+use crate::Result;
 use ::quote::{format_ident, quote};
 use ::std::borrow::Cow;
 use ::std::cell::LazyCell;
 use ::std::collections::HashSet;
-use ::std::collections::{BTreeSet, HashMap};
-use ::std::rc::Rc;
-use ::syn::{parse2, parse_str, Ident, ItemUse, Path, Type};
+use ::syn::{parse2, parse_str, Ident, ItemUse, Path, Type, TypePath};
 
-pub fn compile(request: &CodeGeneratorRequest) -> Result<CodeGeneratorResponse> {
-    let mut response = CodeGeneratorResponse::default();
-    response.set_supported_features(Into::<i32>::into(Feature::FeatureProto3Optional) as u64)?;
-
-    let options = Rc::new({
-        let mut options = CodeGeneratorOptions::default();
-        options.strict_type_path = false;
-        options.allow_import_common_types = true;
-        options
-    });
-
-    let root_context: RootContext = request.proto_file().cloned().into();
-    let mut out_files = GeneratedFileSet::new(Rc::clone(&options));
-
-    let messages = root_context
-        .files()
-        .flat_map(|fd| fd.all_messages())
-        .collect::<Vec<_>>();
-    for message in &messages {
-        let file_path = if let Some(package) = message.full_path().parent() {
-            package.to_rust_file_path()
-        } else {
-            "mod.rs".to_string()
-        };
-        let file = out_files.file_mut(file_path);
-        file.add_source(message.file().name());
-
-        let trait_items =
-            gen_message_items::gen_message_trait::GenTrait::try_new(message, Rc::clone(&options))?
-                .gen_items()?;
-        file.append(quote! { #(#trait_items)* });
-        let untyped_message_impl =
-            gen_message_items::gen_dynamic_message_impl::GenDynamicMessageImpls::try_new(
-                message,
-                Rc::clone(&options),
-            )?
-            .gen_impl_message_trait()?;
-        file.append(quote! { #untyped_message_impl });
-    }
-
-    let enums = root_context
-        .files()
-        .flat_map(|fd| fd.all_enums())
-        .collect::<Vec<_>>();
-    for e in &enums {
-        let file_path = if let Some(package) = e.full_path().parent() {
-            package.to_rust_file_path()
-        } else {
-            "mod.rs".to_string()
-        };
-        let file = out_files.file_mut(file_path);
-        file.add_source(e.file().name());
-
-        let enum_ = gen_enum_items::GenEnumItems::try_new(e, Rc::clone(&options))?.rust_items()?;
-        file.append(quote! { #(#enum_)* });
-    }
-
-    for file in out_files {
-        response.push_file(file.try_into()?)?;
-    }
-
-    Ok(response)
-}
+pub use compile::*;
 
 #[derive(Clone)]
 pub struct CodeGeneratorOptions {
@@ -183,156 +117,6 @@ impl CodeGeneratorOptions {
     }
 }
 
-struct GeneratedFile {
-    full_path: String,
-    sources: BTreeSet<String>,
-    submodules: BTreeSet<String>,
-
-    options: Rc<CodeGeneratorOptions>,
-
-    /// The body part of the file, except:
-    /// - The header comments
-    /// - The submodule definitions (like "pub mod foo;")
-    body: Vec<TokenStream>,
-}
-impl GeneratedFile {
-    fn new(full_path: impl Into<String>, options: Rc<CodeGeneratorOptions>) -> Self {
-        Self {
-            full_path: full_path.into(),
-            sources: BTreeSet::new(),
-            submodules: BTreeSet::new(),
-            options,
-            body: Vec::new(),
-        }
-    }
-    fn full_path(&self) -> &str {
-        &self.full_path
-    }
-    fn append(&mut self, source: TokenStream) {
-        self.body.push(source);
-    }
-    fn add_source(&mut self, source: impl Into<String>) {
-        self.sources.insert(source.into());
-    }
-    fn add_submodule(&mut self, submodule: impl Into<String>) {
-        self.submodules.insert(submodule.into());
-    }
-}
-impl TryFrom<GeneratedFile> for code_generator_response::File {
-    type Error = ErrorKind;
-    fn try_from(from: GeneratedFile) -> Result<Self> {
-        let is_root_file = from.full_path() == "mod.rs";
-        let mut file = code_generator_response::File::default();
-        file.set_name(from.full_path())?;
-        let source_list = from
-            .sources
-            .iter()
-            .map(|s| {
-                let doc = format!("   {s}");
-                quote! {
-                    #![doc=#doc]
-                }
-            })
-            .collect::<Vec<_>>();
-        let submodule_decls = from
-            .submodules
-            .iter()
-            .map(|s| {
-                let id = format_ident!("{}", s);
-                quote! { pub mod #id; }
-            })
-            .collect::<Vec<_>>();
-        let imports = from.options.imports()?;
-        let puroro_root = if is_root_file {
-            quote! {
-                #[allow(unused)]
-                pub(crate) mod _puroro_root {
-                    #[allow(unused)]
-                    pub(crate) use super::*;
-                }
-            }
-        } else {
-            quote! {
-                #[allow(unused)]
-                pub(crate) mod _puroro_root {
-                    #[allow(unused)]
-                    pub(crate) use super::super::_puroro_root::*;
-                }
-            }
-        };
-        let body = from.body;
-        let content = quote! {
-            #![doc=" THIS FILE IS A GENERATED FILE! DO NOT EDIT!"]
-            #![doc=" Source(s):"]
-            #(#source_list)*
-
-            #(#submodule_decls)*
-            #(#imports)*
-            #puroro_root
-            #(#body)*
-        };
-        let syn_file: ::syn::File = syn::parse2(content)?;
-        file.set_content(&unparse(&syn_file))?;
-        Ok(file)
-    }
-}
-
-struct GeneratedFileSet {
-    files: HashMap<String, GeneratedFile>,
-    options: Rc<CodeGeneratorOptions>,
-}
-impl GeneratedFileSet {
-    fn new(options: Rc<CodeGeneratorOptions>) -> Self {
-        Self {
-            files: HashMap::new(),
-            options,
-        }
-    }
-
-    // Get file by full path.
-    // Also make sure that the parent modules are created.
-    fn file_mut(&mut self, full_path: impl Into<String>) -> &mut GeneratedFile {
-        let full_path: String = full_path.into();
-
-        // if the input file path is "mod.rs", then we skip the parent module creation.
-        if full_path == "mod.rs" {
-            return self
-                .files
-                .entry("mod.rs".to_string())
-                .or_insert_with(|| GeneratedFile::new("mod.rs", Rc::clone(&self.options)));
-        }
-
-        // create parent modules.
-        let mut module_path = full_path.trim_end_matches(".rs");
-        while let Some((parent, submodule)) = module_path.rsplit_once('/') {
-            self.files
-                .entry(format!("{parent}.rs"))
-                .or_insert_with(|| {
-                    GeneratedFile::new(format!("{parent}.rs"), Rc::clone(&self.options))
-                })
-                .add_submodule(submodule);
-            module_path = parent;
-        }
-        self.files
-            .entry("mod.rs".to_string())
-            .or_insert_with(|| GeneratedFile::new("mod.rs", Rc::clone(&self.options)))
-            .add_submodule(module_path);
-
-        // return the target file.
-        self.files
-            .entry(full_path.clone())
-            .or_insert_with(|| GeneratedFile::new(full_path, Rc::clone(&self.options)))
-    }
-}
-impl IntoIterator for GeneratedFileSet {
-    type Item = GeneratedFile;
-    type IntoIter = ::std::collections::hash_map::IntoValues<String, GeneratedFile>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        self.files.into_values()
-    }
-}
-
 // List of the Rust "strict" and "reserved" keywords except not-"r#" prefixed ones.
 const KEYWORDS_LIST: &[&str] = &[
     "abstract", "alignof", "as", "become", "box", "break", "const", "continue",
@@ -362,4 +146,46 @@ pub fn to_ident(s: &str) -> Ident {
 }
 pub fn to_ident_without_keyword_check(s: &str) -> Ident {
     format_ident!("{}", s)
+}
+
+impl<M, E: AsRef<ProtoPath>> FieldType<M, E> {
+    fn maybe_into_primitive(
+        self,
+        current_path: impl AsRef<ProtoPath>,
+        options: &CodeGeneratorOptions,
+    ) -> Result<::std::result::Result<Type, LenType<M>>> {
+        let wire_type: WireType<_, _, _, _> = self.into();
+        Ok(match wire_type {
+            WireType::Variant(v) => match v {
+                VariantType::Int32 => Ok(options.primitive_type("i32")?),
+                VariantType::Int64 => Ok(options.primitive_type("i64")?),
+                VariantType::UInt32 => Ok(options.primitive_type("u32")?),
+                VariantType::UInt64 => Ok(options.primitive_type("u64")?),
+                VariantType::SInt32 => Ok(options.primitive_type("i32")?),
+                VariantType::SInt64 => Ok(options.primitive_type("i64")?),
+                VariantType::Bool => Ok(options.primitive_type("bool")?),
+                VariantType::Enum(path) => {
+                    let path = path
+                        .as_ref()
+                        .to_relative_path(current_path.as_ref())
+                        .unwrap_or(path.as_ref());
+
+                    let path = path.to_rust_path(options)?;
+                    Ok(TypePath { qself: None, path }.into())
+                }
+            },
+            WireType::I32(i) => Ok(options.primitive_type(match i {
+                I32Type::Fixed32 => "u32",
+                I32Type::SFixed32 => "i32",
+                I32Type::Float => "f32",
+            })?),
+            WireType::I64(i) => Ok(options.primitive_type(match i {
+                I64Type::Fixed64 => "u64",
+                I64Type::SFixed64 => "i64",
+                I64Type::Double => "f64",
+            })?),
+            WireType::Len(l) => Err(l),
+            _ => Err(format!("Group field is not supported"))?,
+        })
+    }
 }

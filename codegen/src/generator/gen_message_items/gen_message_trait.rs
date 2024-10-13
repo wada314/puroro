@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use crate::cases::{convert_into_case, Case};
-use crate::descriptor::{DescriptorExt, FieldDescriptorExt, FieldLabel, FieldType};
+use crate::descriptor::{DescriptorExt, FieldDescriptorExt, FieldLabel, FieldType, LenType};
 use crate::generator::{to_ident, CodeGeneratorOptions};
 use crate::proto_path::{ProtoPath, ProtoPathBuf};
 use crate::Result;
@@ -408,85 +408,54 @@ impl FieldType<ProtoPathBuf, ProtoPathBuf> {
         lifetime: Option<&Lifetime>,
         options: &CodeGeneratorOptions,
     ) -> Result<Type> {
-        let lifetime_iter = lifetime.iter();
-        Ok(match self {
-            FieldType::Message(path) => {
-                let path = path.to_relative_path(current_path).unwrap_or(path);
-                let path = path.to_rust_path_with(options, |name| {
-                    let ident = GenTrait::rust_name_from_message_name(name)?;
-                    Ok(parse2(quote! { #ident })?)
-                })?;
-                parse2(quote! { impl #(#lifetime_iter +)* #path })?
-            }
-            FieldType::Enum(path) => {
-                let path = path.to_relative_path(current_path).unwrap_or(path);
-                let path = path.to_rust_path(options)?;
-                parse2(quote! { #path })?
-            }
-            FieldType::Int32 => options.primitive_type("i32")?,
-            FieldType::Int64 => options.primitive_type("i64")?,
-            FieldType::UInt32 => options.primitive_type("u32")?,
-            FieldType::UInt64 => options.primitive_type("u64")?,
-            FieldType::SInt32 => options.primitive_type("i32")?,
-            FieldType::SInt64 => options.primitive_type("i64")?,
-            FieldType::Fixed32 => options.primitive_type("u32")?,
-            FieldType::Fixed64 => options.primitive_type("u64")?,
-            FieldType::SFixed32 => options.primitive_type("i32")?,
-            FieldType::SFixed64 => options.primitive_type("i64")?,
-            FieldType::Float => options.primitive_type("f32")?,
-            FieldType::Double => options.primitive_type("f64")?,
-            FieldType::Bool => options.primitive_type("bool")?,
-            FieldType::String => {
-                let str_type = options.primitive_type("str")?;
-                parse2(quote! { & #lifetime #str_type })?
-            }
-            FieldType::Bytes => {
-                let u8_type = options.primitive_type("u8")?;
-                parse2(quote! { & #lifetime [#u8_type] })?
-            }
-            FieldType::Group => Err(format!("Group field is not supported"))?,
-        })
+        let lifetime = lifetime.iter();
+        match self.as_ref().maybe_into_primitive(current_path, options)? {
+            Ok(primitive_type) => Ok(primitive_type),
+            Err(len_type) => match len_type {
+                LenType::Message(path) => {
+                    let path = path.to_relative_path(current_path).unwrap_or(path.as_ref());
+                    let path = path.to_rust_path_with(options, |name| {
+                        let ident = GenTrait::rust_name_from_message_name(name)?;
+                        Ok(parse2(quote! { #ident })?)
+                    })?;
+                    Ok(parse2(quote! { impl #(#lifetime +)* #path })?)
+                }
+                LenType::String => {
+                    let str_type = options.primitive_type("str")?;
+                    Ok(parse2(quote! { & #(#lifetime)* #str_type })?)
+                }
+                LenType::Bytes => {
+                    let u8_type = options.primitive_type("u8")?;
+                    Ok(parse2(quote! { & #(#lifetime)* [#u8_type] })?)
+                }
+            },
+        }
     }
+
     fn gen_scalar_owned_type(
         &self,
         current_path: &ProtoPath,
         allocator: &Type,
         options: &CodeGeneratorOptions,
     ) -> Result<Type> {
-        Ok(match self {
-            FieldType::Message(path) => {
-                let path = path.to_relative_path(current_path).unwrap_or(path);
-                let path = path.to_rust_path_with(options, |name| {
-                    let ident = GenTrait::rust_mut_name_from_message_name(name)?;
-                    Ok(parse2(quote! { #ident })?)
-                })?;
-                parse2(quote! { impl #path<#allocator> })?
-            }
-            FieldType::Enum(path) => {
-                let path = path.to_relative_path(current_path).unwrap_or(path);
-                let path = path.to_rust_path(options)?;
-                parse2(quote! { #path })?
-            }
-            FieldType::Int32 => options.primitive_type("i32")?,
-            FieldType::Int64 => options.primitive_type("i64")?,
-            FieldType::UInt32 => options.primitive_type("u32")?,
-            FieldType::UInt64 => options.primitive_type("u64")?,
-            FieldType::SInt32 => options.primitive_type("i32")?,
-            FieldType::SInt64 => options.primitive_type("i64")?,
-            FieldType::Fixed32 => options.primitive_type("u32")?,
-            FieldType::Fixed64 => options.primitive_type("u64")?,
-            FieldType::SFixed32 => options.primitive_type("i32")?,
-            FieldType::SFixed64 => options.primitive_type("i64")?,
-            FieldType::Float => options.primitive_type("f32")?,
-            FieldType::Double => options.primitive_type("f64")?,
-            FieldType::Bool => options.primitive_type("bool")?,
-            FieldType::String => parse2(quote! { ::puroro::string::String<#allocator> })?,
-            FieldType::Bytes => {
-                let u8_type = options.primitive_type("u8")?;
-                options.vec_type(&u8_type, Some(allocator))?
-            }
-            FieldType::Group => Err(format!("Group field is not supported"))?,
-        })
+        match self.as_ref().maybe_into_primitive(current_path, options)? {
+            Ok(primitive_type) => Ok(primitive_type),
+            Err(len_type) => match len_type {
+                LenType::Message(path) => {
+                    let path = path.to_relative_path(current_path).unwrap_or(path.as_ref());
+                    let path = path.to_rust_path_with(options, |name| {
+                        let ident = GenTrait::rust_mut_name_from_message_name(name)?;
+                        Ok(parse2(quote! { #ident })?)
+                    })?;
+                    Ok(parse2(quote! { impl #path<#allocator> })?)
+                }
+                LenType::String => Ok(parse2(quote! { ::puroro::string::String<#allocator> })?),
+                LenType::Bytes => {
+                    let u8_type = options.primitive_type("u8")?;
+                    Ok(options.vec_type(&u8_type, Some(allocator))?)
+                }
+            },
+        }
     }
 
     fn gen_scalar_nonzero_type(
@@ -531,6 +500,7 @@ impl FieldType<ProtoPathBuf, ProtoPathBuf> {
             }
         })
     }
+
     fn gen_non_repeated_mutator_type(
         &self,
         current_path: &ProtoPath,
