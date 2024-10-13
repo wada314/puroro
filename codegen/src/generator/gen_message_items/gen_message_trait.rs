@@ -361,18 +361,35 @@ impl Field {
 
     pub fn gen_mut_method_signature(&self, allocator: &Type) -> Result<Signature> {
         let mutator_name = self.gen_mut_method_name()?;
-        let mutator_type = match self.wrapper {
-            FieldPresense::Repeated => self.scalar_type.gen_repeated_mutator_type(
-                &self.current_path,
-                allocator,
-                None,
-                &self.options,
-            )?,
-            _ => self.scalar_type.gen_non_repeated_mutator_type(
-                &self.current_path,
-                allocator,
-                &self.options,
-            )?,
+        let mutator_type: Type = match self.wrapper {
+            FieldPresense::Repeated => {
+                // A type returned from the iterator. e.g. i32, &str, &impl MessageTrait
+                let item_type = self.scalar_type.gen_scalar_maybe_ref_type(
+                    &self.current_path,
+                    None,
+                    &self.options,
+                )?;
+                // A type used by setter. e.g. i32, String, impl MessageTrait
+                let value_type = self.scalar_type.gen_scalar_owned_type(
+                    &self.current_path,
+                    allocator,
+                    &self.options,
+                )?;
+                parse2(quote! {
+                    impl ::puroro::repeated::RepeatedViewMut<Item = #item_type, Value = #value_type>
+                })?
+            }
+            _ => {
+                let bare_type = self.scalar_type.gen_scalar_owned_type(
+                    &self.current_path,
+                    allocator,
+                    &self.options,
+                )?;
+                let deref_mut_trait = self.options.deref_mut_trait(&bare_type)?;
+                parse2(quote! {
+                    impl #deref_mut_trait
+                })?
+            }
         };
         Ok(parse2(quote! {
             fn #mutator_name(&mut self) -> #mutator_type
@@ -499,30 +516,5 @@ impl FieldType<ProtoPathBuf, ProtoPathBuf> {
                 parse2(quote! { #path })?
             }
         })
-    }
-
-    fn gen_non_repeated_mutator_type(
-        &self,
-        current_path: &ProtoPath,
-        allocator: &Type,
-        options: &CodeGeneratorOptions,
-    ) -> Result<Type> {
-        let bare_type = self.gen_scalar_owned_type(current_path, allocator, options)?;
-        let deref_mut_trait = options.deref_mut_trait(&bare_type)?;
-        Ok(parse2(quote! {
-            impl #deref_mut_trait
-        })?)
-    }
-    fn gen_repeated_mutator_type(
-        &self,
-        current_path: &ProtoPath,
-        allocator: &Type,
-        lifetime: Option<&Lifetime>,
-        options: &CodeGeneratorOptions,
-    ) -> Result<Type> {
-        let lifetime = lifetime.into_iter();
-        Ok(parse2(quote! {
-            impl ::puroro::repeated::RepeatedViewMut<#(#lifetime, )* Item = (), Value = ()>
-        })?)
     }
 }
