@@ -26,6 +26,7 @@ use ::syn::{Expr, Type};
 
 pub struct GenDynamicMessageImpls {
     rust_trait_name: Ident,
+    rust_app_trait_name: Ident,
     fields: Vec<Field>,
     #[allow(unused)]
     options: Rc<CodeGeneratorOptions>,
@@ -39,6 +40,7 @@ impl GenDynamicMessageImpls {
         let current_path = Rc::new(desc.current_path().to_owned());
         Ok(Self {
             rust_trait_name: GenTrait::rust_name_from_message_name(desc.name())?,
+            rust_app_trait_name: GenTrait::rust_app_name_from_message_name(desc.name())?,
             fields: desc
                 .non_oneof_fields()?
                 .into_iter()
@@ -63,6 +65,25 @@ impl GenDynamicMessageImpls {
             impl<A: ::std::alloc::Allocator + #clone_trait> #trait_path
             for ::puroro::generic_message::DynamicMessage<A> {
                 #(#getters)*
+            }
+        })?)
+    }
+
+    pub fn gen_impl_message_app_trait(&self) -> Result<Item> {
+        let trait_name = &self.rust_app_trait_name;
+        let appenders = self
+            .fields
+            .iter()
+            .map(|f| f.gen_append(&parse_str("A")?))
+            .collect::<Result<Vec<_>>>()?;
+        let clone_trait = self.options.clone_trait()?;
+        let trait_path = self
+            .options
+            .path_in_self_module(&trait_name.clone().into())?;
+        Ok(parse2(quote! {
+            impl<A: ::std::alloc::Allocator + #clone_trait> #trait_path <A>
+            for ::puroro::generic_message::DynamicMessage<A> {
+                #(#appenders)*
             }
         })?)
     }
@@ -263,10 +284,7 @@ impl Field {
             }
         })?)
     }
-    fn gen_append_method_signature(&self, allocator: &Type) -> Result<Item> {
-        let signature = self.trait_field.gen_append_method_signature(allocator)?;
-        Ok(parse2(quote! {
-            #signature;
-        })?)
+    fn gen_append_body(&self, _allocator: &Type) -> Result<Item> {
+        Ok(parse2(quote! { todo!() })?)
     }
 }

@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use super::gen_message_items::GenMessageItems;
 use super::{gen_enum_items, gen_message_items, CodeGeneratorOptions};
 use crate::descriptor::RootContext;
 use crate::{ErrorKind, Result};
@@ -50,17 +51,8 @@ pub fn compile(request: &CodeGeneratorRequest) -> Result<CodeGeneratorResponse> 
         let file = out_files.file_mut(file_path);
         file.add_source(message.file().name());
 
-        let trait_items =
-            gen_message_items::gen_message_trait::GenTrait::try_new(message, Rc::clone(&options))?
-                .gen_items()?;
-        file.append(quote! { #(#trait_items)* });
-        let untyped_message_impl =
-            gen_message_items::gen_dynamic_message_impl::GenDynamicMessageImpls::try_new(
-                message,
-                Rc::clone(&options),
-            )?
-            .gen_impl_message_trait()?;
-        file.append(quote! { #untyped_message_impl });
+        let message_items = GenMessageItems::try_new(message, Rc::clone(&options))?.gen_items()?;
+        file.append(quote! { #(#message_items)* });
     }
 
     let enums = root_context

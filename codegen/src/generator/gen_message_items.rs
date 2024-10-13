@@ -43,11 +43,10 @@ impl GenMessageItems {
     }
 
     pub fn gen_items(&self) -> Result<Vec<Item>> {
-        let trait_items = self.gen_trait.gen_items()?;
-        let impl_items = self.gen_gm_impls.gen_impl_message_trait()?;
-        Ok(trait_items
-            .into_iter()
-            .chain(::std::iter::once(impl_items))
-            .collect())
+        let mut items = Vec::new();
+        items.extend(self.gen_trait.gen_items()?);
+        items.push(self.gen_gm_impls.gen_impl_message_trait()?);
+        items.push(self.gen_gm_impls.gen_impl_message_app_trait()?);
+        Ok(items)
     }
 }
