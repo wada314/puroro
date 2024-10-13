@@ -353,10 +353,10 @@ impl Field {
     // Mutators
 
     pub fn gen_mutable_methods_signatures(&self, allocator: &Type) -> Result<Vec<Signature>> {
-        let mut result = vec![self.gen_mut_method_signature(allocator)?];
-        if self.presense == FieldPresense::Explicit {
-            result.push(self.gen_clear_method_signature()?);
-        }
+        let result = vec![
+            self.gen_mut_method_signature(allocator)?,
+            self.gen_clear_method_signature()?,
+        ];
         Ok(result)
     }
 
