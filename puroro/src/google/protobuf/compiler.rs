@@ -15,7 +15,7 @@
 use ::std::alloc::{Allocator, Global};
 
 use super::{DynamicMessageExt, FileDescriptorProtoTrait};
-use crate::generic_message::DynamicMessage;
+use crate::dynamic_message::DynamicMessage;
 use crate::google::protobuf::FileDescriptorProto;
 use crate::internal::{
     impl_message_mut_trait_for_trivial_types, impl_message_trait_for_trivial_types,

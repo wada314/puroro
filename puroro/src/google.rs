@@ -14,7 +14,7 @@
 
 pub mod protobuf;
 
-use crate::generic_message::DynamicMessage;
+use crate::dynamic_message::DynamicMessage;
 use crate::variant::variant_types;
 use ::ref_cast::RefCast;
 use ::std::alloc::Allocator;

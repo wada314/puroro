@@ -15,7 +15,7 @@
 pub mod compiler;
 
 use super::DynamicMessageExt;
-use crate::generic_message::DynamicMessage;
+use crate::dynamic_message::DynamicMessage;
 use crate::internal::impl_message_trait_for_trivial_types;
 use ::derive_more::{Deref, DerefMut, From, Into, TryFrom};
 use ::ref_cast::RefCast;
