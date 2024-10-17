@@ -39,6 +39,12 @@ impl<A: Allocator> String<A> {
     pub fn push_str(&mut self, s: &str) {
         self.vec.extend_from_slice(s.as_bytes());
     }
+    pub fn len(&self) -> usize {
+        self.vec.len()
+    }
+    pub fn is_empty(&self) -> bool {
+        self.vec.is_empty()
+    }
 }
 impl String<Global> {
     pub fn new() -> Self {

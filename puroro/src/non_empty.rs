@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use ::std::alloc::Allocator;
+
 use ::derive_more::{Debug, Deref, DerefMut, Display};
 
 pub trait IsEmpty {
@@ -33,7 +35,21 @@ impl_is_empty_for_primitives!(u64, 0);
 impl_is_empty_for_primitives!(f32, 0.0);
 impl_is_empty_for_primitives!(f64, 0.0);
 impl_is_empty_for_primitives!(bool, false);
-// TODO: str, vec<u8>, message
+impl IsEmpty for ::std::string::String {
+    fn is_empty(&self) -> bool {
+        self.is_empty()
+    }
+}
+impl<A: Allocator> IsEmpty for crate::string::String<A> {
+    fn is_empty(&self) -> bool {
+        self.is_empty()
+    }
+}
+impl<A: Allocator> IsEmpty for ::std::vec::Vec<u8, A> {
+    fn is_empty(&self) -> bool {
+        self.is_empty()
+    }
+}
 
 #[repr(transparent)]
 #[derive(Debug, Display, Deref, DerefMut, PartialEq, Eq, PartialOrd, Ord)]
