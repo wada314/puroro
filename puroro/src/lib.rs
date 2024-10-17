@@ -25,10 +25,13 @@ pub mod editions;
 pub mod google;
 pub mod internal;
 pub mod message;
+pub mod non_empty;
 pub mod once_list;
 pub mod repeated;
 pub mod string;
 pub mod variant;
+
+pub use self::non_empty::NonEmpty;
 
 use ::thiserror::Error;
 
