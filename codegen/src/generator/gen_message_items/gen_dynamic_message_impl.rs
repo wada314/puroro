@@ -82,7 +82,7 @@ impl GenDynamicMessageImpls {
             .path_in_self_module(&trait_name.clone().into())?;
         Ok(parse2(quote! {
             impl<A: ::std::alloc::Allocator + #clone_trait> #trait_path <A>
-            for ::puroro::generic_message::DynamicMessage<A> {
+            for ::puroro::dynamic_message::DynamicMessage<A> {
                 #(#appenders)*
             }
         })?)
