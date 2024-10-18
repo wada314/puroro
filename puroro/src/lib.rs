@@ -31,7 +31,7 @@ pub mod repeated;
 pub mod string;
 pub mod variant;
 
-pub use self::non_empty::NonEmpty;
+pub use self::non_empty::{IsEmpty, NonEmpty};
 
 use ::thiserror::Error;
 

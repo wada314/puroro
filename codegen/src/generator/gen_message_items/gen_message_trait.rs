@@ -306,7 +306,7 @@ impl Field {
     }
 
     pub fn gen_appendale_methods_signatures(&self, allocator: &Type) -> Result<Vec<Signature>> {
-        // Bare fields => fn i32_mut(&mut self) -> DerefMut<Target=NonZero<i32>>
+        // Bare fields => fn i32_mut(&mut self) -> DerefMut<Target=NonEmpty<i32>>
         // Optional fields => fn i32_mut(&mut self) -> DerefMut<Target=i32>
         // Vec fields => fn i32_mut(&mut self) -> DerefMut<Target=impl Extend<i32>>
         let signatures = vec![self.gen_append_method_signature(allocator)?];
@@ -505,40 +505,11 @@ impl FieldType<ProtoPathBuf, ProtoPathBuf> {
         allocator: &Type,
         options: &CodeGeneratorOptions,
     ) -> Result<Type> {
-        Ok(match self {
-            FieldType::Int32 => parse_str("::std::num::NonZero<i32>")?,
-            FieldType::Int64 => parse_str("::std::num::NonZero<i64>")?,
-            FieldType::UInt32 => parse_str("::std::num::NonZero<u32>")?,
-            FieldType::UInt64 => parse_str("::std::num::NonZero<u64>")?,
-            FieldType::SInt32 => parse_str("::std::num::NonZero<i32>")?,
-            FieldType::SInt64 => parse_str("::std::num::NonZero<i64>")?,
-            FieldType::Fixed32 => parse_str("::std::num::NonZero<u32>")?,
-            FieldType::Fixed64 => parse_str("::std::num::NonZero<u64>")?,
-            FieldType::SFixed32 => parse_str("::std::num::NonZero<i32>")?,
-            FieldType::SFixed64 => parse_str("::std::num::NonZero<i64>")?,
-            // TODO: following items
-            FieldType::Float => options.primitive_type("f32")?,
-            FieldType::Double => options.primitive_type("f64")?,
-            FieldType::Bool => options.primitive_type("bool")?,
-            FieldType::String => parse2(quote! { ::puroro::string::String<#allocator> })?,
-            FieldType::Bytes => {
-                let u8_type = options.primitive_type("u8")?;
-                options.vec_type(&u8_type, Some(allocator))?
-            }
-            FieldType::Group => Err(format!("Group field is not supported"))?,
-            FieldType::Message(path) => {
-                let path = path.to_relative_path(current_path).unwrap_or(path);
-                let path = path.to_rust_path_with(options, |name| {
-                    let ident = GenTrait::rust_mut_name_from_message_name(name)?;
-                    Ok(parse2(quote! { #ident })?)
-                })?;
-                parse2(quote! { impl #path<#allocator> })?
-            }
-            FieldType::Enum(path) => {
-                let path = path.to_relative_path(current_path).unwrap_or(path);
-                let path = path.to_rust_path(options)?;
-                parse2(quote! { #path })?
-            }
-        })
+        let scalar_owned_type = self.gen_scalar_owned_type(current_path, allocator, options)?;
+        if matches!(self, FieldType::Message(_)) {
+            Ok(scalar_owned_type)
+        } else {
+            Ok(parse2(quote! { ::puroro::NonEmpty<#scalar_owned_type> })?)
+        }
     }
 }
