@@ -60,3 +60,8 @@ impl<T: IsEmpty> NonEmpty<T> {
         (!value.is_empty()).then(|| NonEmpty(value))
     }
 }
+impl<T> NonEmpty<T> {
+    pub fn into_inner(self) -> T {
+        self.0
+    }
+}
