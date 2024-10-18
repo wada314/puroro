@@ -123,7 +123,7 @@ impl Field {
     }
 
     fn gen_getter_body(&self, field_opt_expr: &Expr) -> Result<Expr> {
-        let wire_type: WireType<_, _, _, _> = self.trait_field.scalar_type().into();
+        let wire_type: WireType<_, _> = self.trait_field.scalar_type().into();
         let field_expr: Expr = parse_str("f")?;
         Ok(match self.trait_field.wrapper() {
             FieldPresense::Repeated => {
@@ -242,7 +242,11 @@ impl Field {
     fn gen_append(&self, allocator: &Type) -> Result<Item> {
         let signature = self.trait_field.gen_append_method_signature(allocator)?;
         let number = self.number;
-        let body = self.gen_append_body(allocator)?;
+        let body = match self.trait_field.wrapper() {
+            FieldPresense::Repeated => self.gen_append_body_repeated(allocator)?,
+            FieldPresense::Explicit => self.gen_append_body_explicit(allocator)?,
+            FieldPresense::Implicit => self.gen_append_body_implicit(allocator)?,
+        };
         Ok(parse2(quote! {
             #signature {
                 let f = self.field_mut(#number);
@@ -250,8 +254,30 @@ impl Field {
             }
         })?)
     }
-    fn gen_append_body(&self, _allocator: &Type) -> Result<Expr> {
-        Ok(parse2(quote! { todo!() })?)
+    fn gen_append_body_repeated(&self, _allocator: &Type) -> Result<Expr> {
+        Ok(parse_str("todo!()")?)
+    }
+    fn gen_append_body_explicit(&self, _allocator: &Type) -> Result<Expr> {
+        let (default_value, f_write_back) = match self.trait_field.scalar_type().into_wire_type() {
+            WireType::Variant(v) => {
+                let vt_type: Type =
+                    v.to_variant_integer_type(self.current_path.as_ref(), &self.options)?;
+                let default_value: Expr = parse2(quote! {
+                    ::std::default::Default::default()
+                })?;
+                let f_write_back: Expr = parse2(quote! {
+                    |v| f.push_variant_from::<#vt_type>(v)
+                })?;
+                (default_value, f_write_back)
+            }
+            _ => (parse_str("todo!()")?, parse_str("todo!()")?),
+        };
+        Ok(parse2(quote! {
+            ::puroro::internal::deser::DeserWrapper::new(#default_value, #f_write_back)
+        })?)
+    }
+    fn gen_append_body_implicit(&self, _allocator: &Type) -> Result<Expr> {
+        Ok(parse_str("todo!()")?)
     }
 }
 

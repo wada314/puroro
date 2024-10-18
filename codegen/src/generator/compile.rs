@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use super::gen_message_items::GenMessageItems;
-use super::{gen_enum_items, gen_message_items, CodeGeneratorOptions};
+use super::{gen_enum_items, CodeGeneratorOptions};
 use crate::descriptor::RootContext;
 use crate::{ErrorKind, Result};
 use ::prettyplease::unparse;

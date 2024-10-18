@@ -436,8 +436,8 @@ impl FieldPresense {
     }
 }
 
-impl FieldType<ProtoPathBuf, ProtoPathBuf> {
-    fn gen_scalar_maybe_ref_type(
+impl<M: AsRef<ProtoPath>, E: AsRef<ProtoPath>> FieldType<M, E> {
+    pub fn gen_scalar_maybe_ref_type(
         &self,
         current_path: &ProtoPath,
         lifetime: Option<&Lifetime>,
@@ -451,7 +451,10 @@ impl FieldType<ProtoPathBuf, ProtoPathBuf> {
             Ok(primitive_type) => Ok(primitive_type),
             Err(len_type) => match len_type {
                 LenType::Message(path) => {
-                    let path = path.to_relative_path(current_path).unwrap_or(path.as_ref());
+                    let path = path
+                        .as_ref()
+                        .to_relative_path(current_path)
+                        .unwrap_or(path.as_ref());
                     let path = path.to_rust_path_with(options, |name| {
                         let ident = GenTrait::rust_name_from_message_name(name)?;
                         Ok(parse2(quote! { #ident })?)
@@ -470,7 +473,7 @@ impl FieldType<ProtoPathBuf, ProtoPathBuf> {
         }
     }
 
-    fn gen_scalar_owned_type(
+    pub fn gen_scalar_owned_type(
         &self,
         current_path: &ProtoPath,
         allocator: &Type,
@@ -483,7 +486,10 @@ impl FieldType<ProtoPathBuf, ProtoPathBuf> {
             Ok(primitive_type) => Ok(primitive_type),
             Err(len_type) => match len_type {
                 LenType::Message(path) => {
-                    let path = path.to_relative_path(current_path).unwrap_or(path.as_ref());
+                    let path = path
+                        .as_ref()
+                        .to_relative_path(current_path)
+                        .unwrap_or(path.as_ref());
                     let path = path.to_rust_path_with(options, |name| {
                         let ident = GenTrait::rust_mut_name_from_message_name(name)?;
                         Ok(parse2(quote! { #ident })?)
@@ -499,7 +505,7 @@ impl FieldType<ProtoPathBuf, ProtoPathBuf> {
         }
     }
 
-    fn gen_scalar_nonzero_type(
+    pub fn gen_scalar_nonzero_type(
         &self,
         current_path: &ProtoPath,
         allocator: &Type,

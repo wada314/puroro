@@ -154,7 +154,7 @@ impl<M, E: AsRef<ProtoPath>> FieldType<M, E> {
         current_path: impl AsRef<ProtoPath>,
         options: &CodeGeneratorOptions,
     ) -> Result<::std::result::Result<Type, LenType<M>>> {
-        let wire_type: WireType<_, _, _, _> = self.into();
+        let wire_type = self.into_wire_type();
         Ok(match wire_type {
             WireType::Variant(v) => Ok(v.to_primitive_type(current_path, options)?),
             WireType::I32(i) => Ok(i.to_primitive_type(options)?),

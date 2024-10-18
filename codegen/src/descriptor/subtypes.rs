@@ -193,6 +193,10 @@ impl<M, E> FieldType<M, E> {
             FieldType::UInt64 => FieldType::UInt64,
         }
     }
+
+    pub fn into_wire_type(self) -> WireType<M, E> {
+        self.into()
+    }
 }
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Default)]
@@ -284,16 +288,16 @@ impl FieldTypeCase {
 }
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
-pub enum WireType<V, I32, I64, L> {
-    Variant(V),
-    I64(I64),
-    Len(L),
+pub enum WireType<M, E> {
+    Variant(VariantType<E>),
+    I64(I64Type),
+    Len(LenType<M>),
     StartGroup,
     EndGroup,
-    I32(I32),
+    I32(I32Type),
 }
 
-impl<M, E> From<FieldType<M, E>> for WireType<VariantType<E>, I32Type, I64Type, LenType<M>> {
+impl<M, E> From<FieldType<M, E>> for WireType<M, E> {
     fn from(field_type: FieldType<M, E>) -> Self {
         match field_type {
             FieldType::Int32 => WireType::Variant(VariantType::Int32),
@@ -314,31 +318,6 @@ impl<M, E> From<FieldType<M, E>> for WireType<VariantType<E>, I32Type, I64Type, 
             FieldType::String => WireType::Len(LenType::String),
             FieldType::Message(m) => WireType::Len(LenType::Message(m)),
             FieldType::Group => WireType::StartGroup,
-        }
-    }
-}
-
-impl From<FieldTypeCase> for WireType<VariantTypeCase, I32TypeCase, I64TypeCase, LenTypeCase> {
-    fn from(field_type: FieldTypeCase) -> Self {
-        match field_type {
-            FieldTypeCase::Int32 => WireType::Variant(VariantTypeCase::Int32),
-            FieldTypeCase::UInt32 => WireType::Variant(VariantTypeCase::UInt32),
-            FieldTypeCase::SInt32 => WireType::Variant(VariantTypeCase::SInt32),
-            FieldTypeCase::Int64 => WireType::Variant(VariantTypeCase::Int64),
-            FieldTypeCase::UInt64 => WireType::Variant(VariantTypeCase::UInt64),
-            FieldTypeCase::SInt64 => WireType::Variant(VariantTypeCase::SInt64),
-            FieldTypeCase::Bool => WireType::Variant(VariantTypeCase::Bool),
-            FieldTypeCase::Enum => WireType::Variant(VariantTypeCase::Enum),
-            FieldTypeCase::Float => WireType::I32(I32TypeCase::Float),
-            FieldTypeCase::Fixed32 => WireType::I32(I32TypeCase::Fixed32),
-            FieldTypeCase::SFixed32 => WireType::I32(I32TypeCase::SFixed32),
-            FieldTypeCase::Double => WireType::I64(I64TypeCase::Double),
-            FieldTypeCase::Fixed64 => WireType::I64(I64TypeCase::Fixed64),
-            FieldTypeCase::SFixed64 => WireType::I64(I64TypeCase::SFixed64),
-            FieldTypeCase::Bytes => WireType::Len(LenTypeCase::Bytes),
-            FieldTypeCase::String => WireType::Len(LenTypeCase::String),
-            FieldTypeCase::Message => WireType::Len(LenTypeCase::Message),
-            FieldTypeCase::Group => WireType::StartGroup,
         }
     }
 }
