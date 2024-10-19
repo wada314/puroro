@@ -314,17 +314,21 @@ impl Field {
             <#blanket_type_ident_2 as #trait_path>::#getter_name(&self.1)
         })?;
         match (self.presense, self.scalar_type()) {
+            (FieldPresense::Repeated, FieldType::Message(_)) => Ok(parse2(quote! {
+                #value_1.into_iter().map(::puroro::Either::Left).chain(
+                    #value_2.into_iter().map(::puroro::Either::Right)
+                )
+            })?),
             (FieldPresense::Repeated, _) => Ok(parse2(quote! {
                 #value_1.into_iter().chain(#value_2.into_iter())
             })?),
             (_, FieldType::Message(_)) => Ok(parse2(quote! {
                 {
                     use ::std::option::Option::{Some, None};
-                    use ::puroro::EitherOrBoth;
                     match (#value_1, #value_2) {
-                        (Some(v1), Some(v2)) => Some(EitherOrBoth::Both(v1, v2)),
-                        (Some(v1), None) => Some(EitherOrBoth::Left(v1)),
-                        (None, Some(v2)) => Some(EitherOrBoth::Right(v2)),
+                        (Some(v1), Some(v2)) => Some(::puroro::EitherOrBoth::Both(v1, v2)),
+                        (Some(v1), None) => Some(::puroro::EitherOrBoth::Left(v1)),
+                        (None, Some(v2)) => Some(::puroro::EitherOrBoth::Right(v2)),
                         (None, None) => None,
                     }
                 }
