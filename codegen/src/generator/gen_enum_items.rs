@@ -65,6 +65,7 @@ impl GenEnumItems {
             self.rust_item_enum()?,
             self.rust_item_try_from_i32()?,
             self.rust_item_into_i32()?,
+            self.rust_item_is_empty()?,
         ])
     }
     fn rust_item_enum(&self) -> Result<Item> {
@@ -114,6 +115,16 @@ impl GenEnumItems {
                     match value {
                         #( self::#name::#var_names => #var_numbers, )*
                     }
+                }
+            }
+        })?)
+    }
+    fn rust_item_is_empty(&self) -> Result<Item> {
+        let name = &self.name;
+        Ok(parse2(quote! {
+            impl ::puroro::IsEmpty for self::#name {
+                fn is_empty(&self) -> bool {
+                    Self::default() == self
                 }
             }
         })?)

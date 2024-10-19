@@ -56,6 +56,16 @@ impl<A: Allocator> IsEmpty for ::std::vec::Vec<u8, A> {
         self.is_empty()
     }
 }
+impl IsEmpty for &[u8] {
+    fn is_empty(&self) -> bool {
+        <[u8]>::is_empty(self)
+    }
+}
+impl IsEmpty for &str {
+    fn is_empty(&self) -> bool {
+        <str>::is_empty(self)
+    }
+}
 
 #[repr(transparent)]
 #[derive(Debug, Display, Deref, DerefMut, PartialEq, Eq, PartialOrd, Ord)]
