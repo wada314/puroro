@@ -46,7 +46,6 @@ impl GenMessageItems {
         let mut items = Vec::new();
         items.extend(self.gen_trait.gen_items()?);
         items.push(self.gen_gm_impls.gen_impl_message_trait()?);
-        items.push(self.gen_gm_impls.gen_impl_message_app_trait()?);
         Ok(items)
     }
 }

@@ -80,12 +80,11 @@ impl GenTrait {
 
     pub fn gen_items(&self) -> Result<Vec<Item>> {
         let trait_def = self.gen_message_trait()?;
-        let trait_app_def = self.gen_message_app_trait()?;
         let trait_mut_def = self.gen_message_mut_trait()?;
         let mut blanket_impls = Vec::new();
         blanket_impls.append(&mut self.gen_blanket_ref_impls()?);
         blanket_impls.push(self.gen_blanket_option_impl()?);
-        Ok([trait_def, trait_app_def, trait_mut_def]
+        Ok([trait_def, trait_mut_def]
             .into_iter()
             .chain(blanket_impls)
             .collect())
@@ -101,29 +100,6 @@ impl GenTrait {
         Ok(parse2(quote! {
             pub trait #trait_name {
                 #(#getters;)*
-            }
-        })?)
-    }
-
-    fn gen_message_app_trait(&self) -> Result<Item> {
-        let trait_name = &self.rust_app_name;
-        let base_trait_name = &self.rust_name;
-        let base_trait_path = self
-            .options
-            .path_in_self_module(&base_trait_name.clone().into())?;
-        let allocator_ident: Ident = parse_str("A")?;
-        let allocator: Type = parse2(quote! { #allocator_ident})?;
-        let methods = self
-            .fields
-            .iter()
-            .map(|f| f.gen_appendale_methods_signatures(&allocator))
-            .flatten_ok()
-            .collect::<Result<Vec<_>>>()?;
-        Ok(parse2(quote! {
-            pub trait #trait_name < #allocator_ident: ::std::alloc::Allocator >
-                : #base_trait_path
-            {
-                #(#methods;)*
             }
         })?)
     }
@@ -295,58 +271,6 @@ impl Field {
             FieldPresense::Implicit => quote! {
                 self.as_ref().map(<#blanket_type_ident as #trait_path>::#getter_name).unwrap_or_default()
             },
-        })?)
-    }
-
-    // Appendables
-
-    fn gen_append_method_name(&self) -> Result<Ident> {
-        let lower_cased = convert_into_case(&self.original_name, Case::LowerSnakeCase);
-        Ok(to_ident(&format!("{}_mut", &lower_cased)))
-    }
-
-    pub fn gen_appendale_methods_signatures(&self, allocator: &Type) -> Result<Vec<Signature>> {
-        // Bare fields => fn i32_mut(&mut self) -> DerefMut<Target=NonEmpty<i32>>
-        // Optional fields => fn i32_mut(&mut self) -> DerefMut<Target=i32>
-        // Vec fields => fn i32_mut(&mut self) -> DerefMut<Target=impl Extend<i32>>
-        let signatures = vec![self.gen_append_method_signature(allocator)?];
-        Ok(signatures)
-    }
-
-    pub fn gen_append_method_signature(&self, allocator: &Type) -> Result<Signature> {
-        let append_method_name = self.gen_append_method_name()?;
-        let return_type: Type = match self.presense {
-            FieldPresense::Repeated => {
-                let scalar_type = self.scalar_type.gen_scalar_owned_type(
-                    &self.current_path,
-                    allocator,
-                    &self.options,
-                )?;
-                parse2(quote! {
-                    impl ::puroro::repeated::RepeatedViewApp<Item = #scalar_type>
-                })?
-            }
-            FieldPresense::Explicit => {
-                let scalar_type = self.scalar_type.gen_scalar_owned_type(
-                    &self.current_path,
-                    allocator,
-                    &self.options,
-                )?;
-                let deref_mut_trait = self.options.deref_mut_trait(&scalar_type)?;
-                parse2(quote! { impl #deref_mut_trait })?
-            }
-            FieldPresense::Implicit => {
-                let scalar_type = self.scalar_type.gen_scalar_nonzero_type(
-                    &self.current_path,
-                    allocator,
-                    &self.options,
-                )?;
-                let deref_mut_trait = self.options.deref_mut_trait(&scalar_type)?;
-                parse2(quote! { impl #deref_mut_trait })?
-            }
-        };
-        Ok(parse2(quote! {
-            fn #append_method_name(&mut self) -> #return_type
         })?)
     }
 

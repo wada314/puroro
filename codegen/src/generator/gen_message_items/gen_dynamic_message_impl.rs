@@ -68,25 +68,6 @@ impl GenDynamicMessageImpls {
             }
         })?)
     }
-
-    pub fn gen_impl_message_app_trait(&self) -> Result<Item> {
-        let trait_name = &self.rust_app_trait_name;
-        let appenders = self
-            .fields
-            .iter()
-            .map(|f| f.gen_append(&parse_str("A")?))
-            .collect::<Result<Vec<_>>>()?;
-        let clone_trait = self.options.clone_trait()?;
-        let trait_path = self
-            .options
-            .path_in_self_module(&trait_name.clone().into())?;
-        Ok(parse2(quote! {
-            impl<A: ::std::alloc::Allocator + #clone_trait> #trait_path <A>
-            for ::puroro::dynamic_message::DynamicMessage<A> {
-                #(#appenders)*
-            }
-        })?)
-    }
 }
 
 pub struct Field {
@@ -237,47 +218,6 @@ impl Field {
                 quote! { (#field_expr).as_repeated_message() }
             }
         })?)
-    }
-
-    fn gen_append(&self, allocator: &Type) -> Result<Item> {
-        let signature = self.trait_field.gen_append_method_signature(allocator)?;
-        let number = self.number;
-        let body = match self.trait_field.wrapper() {
-            FieldPresense::Repeated => self.gen_append_body_repeated(allocator)?,
-            FieldPresense::Explicit => self.gen_append_body_explicit(allocator)?,
-            FieldPresense::Implicit => self.gen_append_body_implicit(allocator)?,
-        };
-        Ok(parse2(quote! {
-            #signature {
-                let f = self.field_mut(#number);
-                #body
-            }
-        })?)
-    }
-    fn gen_append_body_repeated(&self, _allocator: &Type) -> Result<Expr> {
-        Ok(parse_str("todo!()")?)
-    }
-    fn gen_append_body_explicit(&self, _allocator: &Type) -> Result<Expr> {
-        let (default_value, f_write_back) = match self.trait_field.scalar_type().into_wire_type() {
-            WireType::Variant(v) => {
-                let vt_type: Type =
-                    v.to_variant_integer_type(self.current_path.as_ref(), &self.options)?;
-                let default_value: Expr = parse2(quote! {
-                    ::std::default::Default::default()
-                })?;
-                let f_write_back: Expr = parse2(quote! {
-                    |v| f.push_variant_from::<#vt_type>(v)
-                })?;
-                (default_value, f_write_back)
-            }
-            _ => (parse_str("todo!()")?, parse_str("todo!()")?),
-        };
-        Ok(parse2(quote! {
-            ::puroro::internal::deser::DeserWrapper::new(#default_value, #f_write_back)
-        })?)
-    }
-    fn gen_append_body_implicit(&self, _allocator: &Type) -> Result<Expr> {
-        Ok(parse_str("todo!()")?)
     }
 }
 
