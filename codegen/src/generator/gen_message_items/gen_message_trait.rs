@@ -19,6 +19,7 @@ use crate::proto_path::{ProtoPath, ProtoPathBuf};
 use crate::Result;
 use ::itertools::Itertools;
 use ::quote::{format_ident, quote};
+use ::std::cell::OnceCell;
 use ::std::rc::Rc;
 use ::syn::{parse2, parse_str, Expr, Ident, Item, Path, Type};
 use ::syn::{Lifetime, Signature};
@@ -28,6 +29,7 @@ pub struct GenTrait {
     rust_mut_name: Ident,
     fields: Vec<Field>,
     options: Rc<CodeGeneratorOptions>,
+    getter_signatures: OnceCell<Vec<Signature>>,
 }
 
 impl GenTrait {
@@ -45,6 +47,7 @@ impl GenTrait {
                 .map(|f| Field::try_new(f, Rc::clone(&current_path), Rc::clone(&options)))
                 .collect::<Result<Vec<_>>>()?,
             options,
+            getter_signatures: OnceCell::new(),
         })
     }
 
@@ -76,6 +79,7 @@ impl GenTrait {
         blanket_impls.append(&mut self.gen_blanket_ref_impls()?);
         blanket_impls.push(self.gen_blanket_option_impl()?);
         blanket_impls.push(self.gen_blanket_tuple_impl()?);
+        blanket_impls.push(self.gen_blanket_either_impl()?);
         Ok([trait_def, trait_mut_def]
             .into_iter()
             .chain(blanket_impls)
@@ -94,6 +98,17 @@ impl GenTrait {
                 #(#getters;)*
             }
         })?)
+    }
+
+    fn gen_getter_signatures(&self) -> Result<&[Signature]> {
+        self.getter_signatures
+            .get_or_try_init(|| {
+                self.fields
+                    .iter()
+                    .map(Field::gen_get_method_signature)
+                    .collect::<Result<Vec<_>>>()
+            })
+            .map(Vec::as_slice)
     }
 
     fn gen_message_mut_trait(&self) -> Result<Item> {
@@ -125,11 +140,7 @@ impl GenTrait {
             .options
             .path_in_self_module(&trait_name.clone().into())?;
         let blanket_type: Ident = parse_str("T")?;
-        let getter_signatures = self
-            .fields
-            .iter()
-            .map(Field::gen_get_method_signature)
-            .collect::<Result<Vec<_>>>()?;
+        let getter_signatures = self.gen_getter_signatures()?;
         let getter_bodies = self
             .fields
             .iter()
@@ -161,11 +172,7 @@ impl GenTrait {
         let blanket_type_ident: Ident = parse_str("T")?;
         let blanket_type = parse2(quote! { #blanket_type_ident })?;
         let blanket_opt_type = self.options.option_type(&blanket_type)?;
-        let getter_signatures = self
-            .fields
-            .iter()
-            .map(Field::gen_get_method_signature)
-            .collect::<Result<Vec<_>>>()?;
+        let getter_signatures = self.gen_getter_signatures()?;
         let getter_bodies = self
             .fields
             .iter()
@@ -185,27 +192,41 @@ impl GenTrait {
         let trait_path = self
             .options
             .path_in_self_module(&trait_name.clone().into())?;
-        let blanket_type_ident_1: Ident = parse_str("T")?;
-        let blanket_type_ident_2: Ident = parse_str("U")?;
-        let getter_signatures = self
-            .fields
-            .iter()
-            .map(Field::gen_get_method_signature)
-            .collect::<Result<Vec<_>>>()?;
+        let t1: Ident = parse_str("T")?;
+        let t2: Ident = parse_str("U")?;
+        let getter_signatures = self.gen_getter_signatures()?;
         let getter_bodies = self
             .fields
             .iter()
-            .map(|f| {
-                f.gen_blanket_tuple_get_method_body(
-                    &blanket_type_ident_1,
-                    &blanket_type_ident_2,
-                    &trait_path,
-                )
-            })
+            .map(|f| f.gen_blanket_tuple_get_method_body(&t1, &t2, &trait_path))
             .collect::<Result<Vec<_>>>()?;
         Ok(parse2(quote! {
-            impl<#blanket_type_ident_1: #trait_path, #blanket_type_ident_2: #trait_path>
-            #trait_path for (#blanket_type_ident_1, #blanket_type_ident_2)
+            impl<#t1: #trait_path, #t2: #trait_path>
+            #trait_path for (#t1, #t2)
+            {
+                #(#getter_signatures {
+                    #getter_bodies
+                })*
+            }
+        })?)
+    }
+
+    fn gen_blanket_either_impl(&self) -> Result<Item> {
+        let trait_name = &self.rust_name;
+        let trait_path = self
+            .options
+            .path_in_self_module(&trait_name.clone().into())?;
+        let t1: Ident = parse_str("T")?;
+        let t2: Ident = parse_str("U")?;
+        let getter_signatures = self.gen_getter_signatures()?;
+        let getter_bodies = self
+            .fields
+            .iter()
+            .map(|f| f.gen_blanket_either_get_method_body(&t1, &t2, &trait_path))
+            .collect::<Result<Vec<_>>>()?;
+        Ok(parse2(quote! {
+            impl<#t1: #trait_path, #t2: #trait_path>
+            #trait_path for ::puroro::Either<#t1, #t2>
             {
                 #(#getter_signatures {
                     #getter_bodies
@@ -302,16 +323,16 @@ impl Field {
 
     fn gen_blanket_tuple_get_method_body(
         &self,
-        blanket_type_ident_1: &Ident,
-        blanket_type_ident_2: &Ident,
+        t1: &Ident,
+        t2: &Ident,
         trait_path: &Path,
     ) -> Result<Expr> {
         let getter_name = self.gen_get_method_name()?;
         let value_1: Expr = parse2(quote! {
-            <#blanket_type_ident_1 as #trait_path>::#getter_name(&self.0)
+            <#t1 as #trait_path>::#getter_name(&self.0)
         })?;
         let value_2: Expr = parse2(quote! {
-            <#blanket_type_ident_2 as #trait_path>::#getter_name(&self.1)
+            <#t2 as #trait_path>::#getter_name(&self.1)
         })?;
         match (self.presense, self.scalar_type()) {
             (FieldPresense::Repeated, FieldType::Message(_)) => Ok(parse2(quote! {
@@ -341,6 +362,26 @@ impl Field {
                     use ::puroro::IsEmpty;
                     #value_2.into_option().unwrap_or_else(|| #value_1)
                 }
+            })?),
+        }
+    }
+
+    fn gen_blanket_either_get_method_body(
+        &self,
+        t1: &Ident,
+        t2: &Ident,
+        trait_path: &Path,
+    ) -> Result<Expr> {
+        let getter_name = self.gen_get_method_name()?;
+        match (self.presense, self.scalar_type()) {
+            (FieldPresense::Repeated, _) | (_, FieldType::Message(_)) => Ok(parse2(quote! {
+                self.as_ref().map_left(|v| <#t1 as #trait_path>::#getter_name(v))
+                    .map_right(|v| <#t2 as #trait_path>::#getter_name(v))
+            })?),
+            _ => Ok(parse2(quote! {
+                self.as_ref().map_left(|v| <#t1 as #trait_path>::#getter_name(v))
+                    .map_right(|v| <#t2 as #trait_path>::#getter_name(v))
+                    .into_inner()
             })?),
         }
     }
