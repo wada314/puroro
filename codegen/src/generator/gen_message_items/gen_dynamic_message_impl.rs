@@ -26,7 +26,6 @@ use ::syn::{Expr, Type};
 
 pub struct GenDynamicMessageImpls {
     rust_trait_name: Ident,
-    rust_app_trait_name: Ident,
     fields: Vec<Field>,
     #[allow(unused)]
     options: Rc<CodeGeneratorOptions>,
@@ -40,7 +39,6 @@ impl GenDynamicMessageImpls {
         let current_path = Rc::new(desc.current_path().to_owned());
         Ok(Self {
             rust_trait_name: GenTrait::rust_name_from_message_name(desc.name())?,
-            rust_app_trait_name: GenTrait::rust_app_name_from_message_name(desc.name())?,
             fields: desc
                 .non_oneof_fields()?
                 .into_iter()

@@ -26,7 +26,6 @@ use ::syn::{Lifetime, Signature};
 pub struct GenTrait {
     rust_name: Ident,
     rust_mut_name: Ident,
-    rust_app_name: Ident,
     fields: Vec<Field>,
     options: Rc<CodeGeneratorOptions>,
 }
@@ -40,7 +39,6 @@ impl GenTrait {
         Ok(Self {
             rust_name: Self::rust_name_from_message_name(desc.name())?,
             rust_mut_name: Self::rust_mut_name_from_message_name(desc.name())?,
-            rust_app_name: Self::rust_app_name_from_message_name(desc.name())?,
             fields: desc
                 .non_oneof_fields()?
                 .into_iter()
@@ -53,13 +51,6 @@ impl GenTrait {
     pub fn rust_name_from_message_name(name: &str) -> Result<Ident> {
         Ok(format_ident!(
             "{}Trait",
-            convert_into_case(name, Case::CamelCase)
-        ))
-    }
-
-    pub fn rust_app_name_from_message_name(name: &str) -> Result<Ident> {
-        Ok(format_ident!(
-            "{}AppTrait",
             convert_into_case(name, Case::CamelCase)
         ))
     }
@@ -106,7 +97,7 @@ impl GenTrait {
 
     fn gen_message_mut_trait(&self) -> Result<Item> {
         let trait_name = &self.rust_mut_name;
-        let base_trait_name = &self.rust_app_name;
+        let base_trait_name = &self.rust_name;
         let base_trait_path = self
             .options
             .path_in_self_module(&base_trait_name.clone().into())?;
