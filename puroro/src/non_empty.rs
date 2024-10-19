@@ -18,6 +18,12 @@ use ::derive_more::{Debug, Deref, DerefMut, Display};
 
 pub trait IsEmpty {
     fn is_empty(&self) -> bool;
+    fn into_option(self) -> Option<Self>
+    where
+        Self: Sized,
+    {
+        self.is_empty().then(|| self)
+    }
 }
 macro_rules! impl_is_empty_for_primitives {
     ($t:ty, $v:expr) => {

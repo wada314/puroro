@@ -32,6 +32,7 @@ pub mod string;
 pub mod variant;
 
 pub use self::non_empty::{IsEmpty, NonEmpty};
+pub use ::itertools::{Either, EitherOrBoth};
 
 use ::thiserror::Error;
 

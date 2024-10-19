@@ -75,6 +75,7 @@ impl GenTrait {
         let mut blanket_impls = Vec::new();
         blanket_impls.append(&mut self.gen_blanket_ref_impls()?);
         blanket_impls.push(self.gen_blanket_option_impl()?);
+        blanket_impls.push(self.gen_blanket_tuple_impl()?);
         Ok([trait_def, trait_mut_def]
             .into_iter()
             .chain(blanket_impls)
@@ -111,7 +112,7 @@ impl GenTrait {
             .collect::<Result<Vec<_>>>()?;
         Ok(parse2(quote! {
             pub trait #trait_name < #allocator_ident: ::std::alloc::Allocator >
-                : #base_trait_path < #allocator_ident >
+                : #base_trait_path
             {
                 #(#methods;)*
             }
@@ -172,6 +173,40 @@ impl GenTrait {
             .collect::<Result<Vec<_>>>()?;
         Ok(parse2(quote! {
             impl<T: #trait_path> #trait_path for #blanket_opt_type {
+                #(#getter_signatures {
+                    #getter_bodies
+                })*
+            }
+        })?)
+    }
+
+    fn gen_blanket_tuple_impl(&self) -> Result<Item> {
+        let trait_name = &self.rust_name;
+        let trait_path = self
+            .options
+            .path_in_self_module(&trait_name.clone().into())?;
+        let blanket_type_ident_1: Ident = parse_str("T")?;
+        let blanket_type_ident_2: Ident = parse_str("U")?;
+        let getter_signatures = self
+            .fields
+            .iter()
+            .map(Field::gen_get_method_signature)
+            .collect::<Result<Vec<_>>>()?;
+        let getter_bodies = self
+            .fields
+            .iter()
+            .map(|f| {
+                f.gen_blanket_tuple_get_method_body(
+                    &blanket_type_ident_1,
+                    &blanket_type_ident_2,
+                    &trait_path,
+                )
+            })
+            .collect::<Result<Vec<_>>>()?;
+        Ok(parse2(quote! {
+            impl<#blanket_type_ident_1: #trait_path, #blanket_type_ident_2: #trait_path>
+            #trait_path for (#blanket_type_ident_1, #blanket_type_ident_2)
+            {
                 #(#getter_signatures {
                     #getter_bodies
                 })*
@@ -263,6 +298,47 @@ impl Field {
                 self.as_ref().map(<#blanket_type_ident as #trait_path>::#getter_name).unwrap_or_default()
             },
         })?)
+    }
+
+    fn gen_blanket_tuple_get_method_body(
+        &self,
+        blanket_type_ident_1: &Ident,
+        blanket_type_ident_2: &Ident,
+        trait_path: &Path,
+    ) -> Result<Expr> {
+        let getter_name = self.gen_get_method_name()?;
+        let value_1: Expr = parse2(quote! {
+            <#blanket_type_ident_1 as #trait_path>::#getter_name(&self.0)
+        })?;
+        let value_2: Expr = parse2(quote! {
+            <#blanket_type_ident_2 as #trait_path>::#getter_name(&self.1)
+        })?;
+        match (self.presense, self.scalar_type()) {
+            (FieldPresense::Repeated, _) => Ok(parse2(quote! {
+                #value_1.into_iter().chain(#value_2.into_iter())
+            })?),
+            (_, FieldType::Message(_)) => Ok(parse2(quote! {
+                {
+                    use ::std::option::Option::{Some, None};
+                    use ::puroro::EitherOrBoth;
+                    match (#value_1, #value_2) {
+                        (Some(v1), Some(v2)) => Some(EitherOrBoth::Both(v1, v2)),
+                        (Some(v1), None) => Some(EitherOrBoth::Left(v1)),
+                        (None, Some(v2)) => Some(EitherOrBoth::Right(v2)),
+                        (None, None) => None,
+                    }
+                }
+            })?),
+            (FieldPresense::Explicit, _) => Ok(parse2(quote! {
+                #value_2.or(#value_1)
+            })?),
+            (FieldPresense::Implicit, _) => Ok(parse2(quote! {
+                {
+                    use ::puroro::IsEmpty;
+                    #value_2.into_option().unwrap_or_else(|| #value_1)
+                }
+            })?),
+        }
     }
 
     // Mutators
