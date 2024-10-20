@@ -21,7 +21,7 @@ use ::itertools::Itertools;
 use ::quote::{format_ident, quote};
 use ::std::cell::OnceCell;
 use ::std::rc::Rc;
-use ::syn::{parse2, parse_str, Expr, Ident, Item, Path, Type};
+use ::syn::{parse2, parse_str, Block, Expr, Ident, Item, Path, Type};
 use ::syn::{Lifetime, Signature};
 
 pub struct GenTrait {
@@ -205,9 +205,9 @@ impl GenTrait {
             impl<#t1: #trait_path, #t2: #trait_path>
             #trait_path for (#t1, #t2)
             {
-                #(#getter_signatures {
+                #(#getter_signatures
                     #getter_bodies
-                })*
+                )*
             }
         })?)
     }
@@ -351,7 +351,7 @@ impl Field {
         t1: &Ident,
         t2: &Ident,
         trait_path: &Path,
-    ) -> Result<Expr> {
+    ) -> Result<Block> {
         let getter_name = self.gen_get_method_name()?;
         let value_1: Expr = parse2(quote! {
             <#t1 as #trait_path>::#getter_name(&self.0)
@@ -359,36 +359,29 @@ impl Field {
         let value_2: Expr = parse2(quote! {
             <#t2 as #trait_path>::#getter_name(&self.1)
         })?;
-        match (self.presense, self.scalar_type()) {
-            (FieldPresense::Repeated, FieldType::Message(_)) => Ok(parse2(quote! {
-                #value_1.into_iter().map(::puroro::Either::Left).chain(
-                    #value_2.into_iter().map(::puroro::Either::Right)
-                )
-            })?),
-            (FieldPresense::Repeated, _) => Ok(parse2(quote! {
+        let stmts = match (self.presense, self.scalar_type()) {
+            (FieldPresense::Repeated, FieldType::Message(_)) => quote! {
+                use ::puroro::BothExt;
+                (#value_1, #value_2).factor_into_iter()
+            },
+            (FieldPresense::Repeated, _) => quote! {
                 #value_1.into_iter().chain(#value_2.into_iter())
-            })?),
-            (_, FieldType::Message(_)) => Ok(parse2(quote! {
-                {
-                    use ::std::option::Option::{Some, None};
-                    match (#value_1, #value_2) {
-                        (Some(v1), Some(v2)) => Some(::puroro::EitherOrBoth::Both(v1, v2)),
-                        (Some(v1), None) => Some(::puroro::EitherOrBoth::Left(v1)),
-                        (None, Some(v2)) => Some(::puroro::EitherOrBoth::Right(v2)),
-                        (None, None) => None,
-                    }
-                }
-            })?),
-            (FieldPresense::Explicit, _) => Ok(parse2(quote! {
-                #value_2.or(#value_1)
-            })?),
-            (FieldPresense::Implicit, _) => Ok(parse2(quote! {
-                {
-                    use ::puroro::IsEmpty;
-                    #value_2.into_option().unwrap_or_else(|| #value_1)
-                }
-            })?),
-        }
+            },
+            (_, FieldType::Message(_)) => quote! {
+                use ::puroro::BothExt;
+                (#value_1, #value_2).into_either_or_both_opt()
+            },
+            (FieldPresense::Explicit, _) => quote! {
+                #value_2.or_else(|| #value_1)
+            },
+            (FieldPresense::Implicit, _) => quote! {
+                use ::puroro::IsEmpty;
+                #value_2.into_option().unwrap_or_else(|| #value_1)
+            },
+        };
+        Ok(parse2(quote! {
+            { #stmts }
+        })?)
     }
 
     fn gen_blanket_either_get_method_body(

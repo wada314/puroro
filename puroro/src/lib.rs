@@ -22,6 +22,7 @@
 
 pub mod dynamic_message;
 pub mod editions;
+pub mod either_ext;
 pub mod google;
 pub mod internal;
 pub mod message;
@@ -31,6 +32,7 @@ pub mod repeated;
 pub mod string;
 pub mod variant;
 
+pub use self::either_ext::{BothExt, EitherExt, EitherOrBothExt};
 pub use self::non_empty::{IsEmpty, NonEmpty};
 pub use ::itertools::{Either, EitherOrBoth};
 
