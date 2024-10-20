@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use crate::IsEmpty;
 use ::itertools::{Either, EitherOrBoth};
 
 pub trait EitherExt {}
@@ -24,6 +25,7 @@ pub trait BothExt {
     type T;
     type U;
     fn into_tuple(self) -> (Self::T, Self::U);
+
     fn into_either_or_both_opt<T2, U2>(self) -> Option<EitherOrBoth<T2, U2>>
     where
         Self: Sized + BothExt<T = Option<T2>, U = Option<U2>>,
@@ -35,6 +37,7 @@ pub trait BothExt {
             (None, None) => None,
         }
     }
+
     fn into_iter(self) -> impl Iterator<Item = <Self::T as IntoIterator>::Item>
     where
         Self: Sized,
@@ -44,6 +47,7 @@ pub trait BothExt {
         let (t, u) = self.into_tuple();
         t.into_iter().chain(u.into_iter())
     }
+
     fn factor_into_iter(
         self,
     ) -> impl Iterator<Item = Either<<Self::T as IntoIterator>::Item, <Self::U as IntoIterator>::Item>>
