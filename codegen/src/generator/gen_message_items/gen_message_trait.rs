@@ -80,6 +80,7 @@ impl GenTrait {
         blanket_impls.push(self.gen_blanket_option_impl()?);
         blanket_impls.push(self.gen_blanket_tuple_impl()?);
         blanket_impls.push(self.gen_blanket_either_impl()?);
+        blanket_impls.push(self.gen_blanket_either_or_both_impl()?);
         Ok([trait_def, trait_mut_def]
             .into_iter()
             .chain(blanket_impls)
@@ -227,6 +228,30 @@ impl GenTrait {
         Ok(parse2(quote! {
             impl<#t1: #trait_path, #t2: #trait_path>
             #trait_path for ::puroro::Either<#t1, #t2>
+            {
+                #(#getter_signatures {
+                    #getter_bodies
+                })*
+            }
+        })?)
+    }
+
+    fn gen_blanket_either_or_both_impl(&self) -> Result<Item> {
+        let trait_name = &self.rust_name;
+        let trait_path = self
+            .options
+            .path_in_self_module(&trait_name.clone().into())?;
+        let t1: Ident = parse_str("T")?;
+        let t2: Ident = parse_str("U")?;
+        let getter_signatures = self.gen_getter_signatures()?;
+        let getter_bodies = self
+            .fields
+            .iter()
+            .map(|f| f.gen_blanket_either_or_both_get_method_body(&t1, &t2, &trait_path))
+            .collect::<Result<Vec<_>>>()?;
+        Ok(parse2(quote! {
+            impl<#t1: #trait_path, #t2: #trait_path>
+            #trait_path for ::puroro::EitherOrBoth<#t1, #t2>
             {
                 #(#getter_signatures {
                     #getter_bodies
@@ -382,11 +407,54 @@ impl Field {
             (_, FieldType::Message(_)) => Ok(parse2(quote! {
                 self.as_ref().map_left(|v| <#t1 as #trait_path>::#getter_name(v))
                     .map_right(|v| <#t2 as #trait_path>::#getter_name(v))
+                    .factor_none()
             })?),
             _ => Ok(parse2(quote! {
                 self.as_ref().map_left(|v| <#t1 as #trait_path>::#getter_name(v))
                     .map_right(|v| <#t2 as #trait_path>::#getter_name(v))
                     .into_inner()
+            })?),
+        }
+    }
+
+    fn gen_blanket_either_or_both_get_method_body(
+        &self,
+        t1: &Ident,
+        t2: &Ident,
+        trait_path: &Path,
+    ) -> Result<Expr> {
+        let getter_name = self.gen_get_method_name()?;
+        match (self.presense, self.scalar_type()) {
+            (FieldPresense::Repeated, _) => Ok(parse2(quote! {
+                {
+                    let (l, r) = self.as_ref().map_left(|v| <#t1 as #trait_path>::#getter_name(v))
+                        .map_right(|v| <#t2 as #trait_path>::#getter_name(v))
+                        .both();
+                    l.into_iter().chain(r.into_iter())
+                }
+            })?),
+            (_, FieldType::Message(_)) => Ok(parse2(quote! {
+                self.as_ref().map_left(|v| <#t1 as #trait_path>::#getter_name(v))
+                    .map_right(|v| <#t2 as #trait_path>::#getter_name(v))
+                    .both()
+            })?),
+            _ => Ok(parse2(quote! {
+                {
+                    use ::std::option::Option::{Some, None};
+                    use ::puroro::IsEmpty;
+                    use ::puroro::EitherOrBoth::{Both, Left, Right};
+                    match self.as_ref() {
+                        Left(l) => <#t1 as #trait_path>::#getter_name(l),
+                        Right(r) => <#t2 as #trait_path>::#getter_name(r),
+                        Both(l, r) => {
+                            if let Some(r) = <#t2 as #trait_path>::#getter_name(r).into_option() {
+                                r
+                            } else {
+                                <#t1 as #trait_path>::#getter_name(l)
+                            }
+                        }
+                    }
+                }
             })?),
         }
     }

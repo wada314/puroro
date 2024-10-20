@@ -66,6 +66,11 @@ impl IsEmpty for &str {
         <str>::is_empty(self)
     }
 }
+impl<T> IsEmpty for Option<T> {
+    fn is_empty(&self) -> bool {
+        self.is_none()
+    }
+}
 
 #[repr(transparent)]
 #[derive(Debug, Display, Deref, DerefMut, PartialEq, Eq, PartialOrd, Ord)]
