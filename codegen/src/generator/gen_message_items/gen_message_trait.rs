@@ -399,6 +399,11 @@ impl Field {
     ) -> Result<Expr> {
         let getter_name = self.gen_get_method_name()?;
         match (self.presense, self.scalar_type()) {
+            (FieldPresense::Repeated, FieldType::Message(_)) => Ok(parse2(quote! {
+                self.as_ref().map_left(|v| <#t1 as #trait_path>::#getter_name(v))
+                    .map_right(|v| <#t2 as #trait_path>::#getter_name(v))
+                    .factor_into_iter()
+            })?),
             (FieldPresense::Repeated, _) => Ok(parse2(quote! {
                 self.as_ref().map_left(|v| <#t1 as #trait_path>::#getter_name(v))
                     .map_right(|v| <#t2 as #trait_path>::#getter_name(v))
@@ -429,18 +434,18 @@ impl Field {
                 {
                     let (l, r) = self.as_ref().map_left(|v| <#t1 as #trait_path>::#getter_name(v))
                         .map_right(|v| <#t2 as #trait_path>::#getter_name(v))
-                        .both();
-                    l.into_iter().chain(r.into_iter())
+                        .left_and_right();
+                    l.into_iter().flatten().chain(r.into_iter().flatten())
                 }
             })?),
             (_, FieldType::Message(_)) => Ok(parse2(quote! {
                 self.as_ref().map_left(|v| <#t1 as #trait_path>::#getter_name(v))
                     .map_right(|v| <#t2 as #trait_path>::#getter_name(v))
-                    .both()
+                    .left_and_right()
             })?),
             _ => Ok(parse2(quote! {
                 {
-                    use ::std::option::Option::{Some, None};
+                    use ::std::option::Option::Some;
                     use ::puroro::IsEmpty;
                     use ::puroro::EitherOrBoth::{Both, Left, Right};
                     match self.as_ref() {
