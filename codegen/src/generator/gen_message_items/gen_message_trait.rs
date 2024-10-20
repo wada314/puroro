@@ -374,7 +374,12 @@ impl Field {
     ) -> Result<Expr> {
         let getter_name = self.gen_get_method_name()?;
         match (self.presense, self.scalar_type()) {
-            (FieldPresense::Repeated, _) | (_, FieldType::Message(_)) => Ok(parse2(quote! {
+            (FieldPresense::Repeated, _) => Ok(parse2(quote! {
+                self.as_ref().map_left(|v| <#t1 as #trait_path>::#getter_name(v))
+                    .map_right(|v| <#t2 as #trait_path>::#getter_name(v))
+                    .into_iter()
+            })?),
+            (_, FieldType::Message(_)) => Ok(parse2(quote! {
                 self.as_ref().map_left(|v| <#t1 as #trait_path>::#getter_name(v))
                     .map_right(|v| <#t2 as #trait_path>::#getter_name(v))
             })?),
