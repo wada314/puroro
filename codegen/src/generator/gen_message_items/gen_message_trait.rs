@@ -181,9 +181,7 @@ impl GenTrait {
             .collect::<Result<Vec<_>>>()?;
         Ok(parse2(quote! {
             impl<T: #trait_path> #trait_path for #blanket_opt_type {
-                #(#getter_signatures {
-                    #getter_bodies
-                })*
+                #(#getter_signatures #getter_bodies)*
             }
         })?)
     }
@@ -205,9 +203,7 @@ impl GenTrait {
             impl<#t1: #trait_path, #t2: #trait_path>
             #trait_path for (#t1, #t2)
             {
-                #(#getter_signatures
-                    #getter_bodies
-                )*
+                #(#getter_signatures #getter_bodies)*
             }
         })?)
     }
@@ -229,9 +225,7 @@ impl GenTrait {
             impl<#t1: #trait_path, #t2: #trait_path>
             #trait_path for ::puroro::Either<#t1, #t2>
             {
-                #(#getter_signatures {
-                    #getter_bodies
-                })*
+                #(#getter_signatures #getter_bodies)*
             }
         })?)
     }
@@ -253,9 +247,7 @@ impl GenTrait {
             impl<#t1: #trait_path, #t2: #trait_path>
             #trait_path for ::puroro::EitherOrBoth<#t1, #t2>
             {
-                #(#getter_signatures {
-                    #getter_bodies
-                })*
+                #(#getter_signatures #getter_bodies)*
             }
         })?)
     }
@@ -331,9 +323,9 @@ impl Field {
         &self,
         blanket_type_ident: &Ident,
         trait_path: &Path,
-    ) -> Result<Expr> {
+    ) -> Result<Block> {
         let getter_name = self.gen_get_method_name()?;
-        Ok(parse2(match self.presense {
+        let stmts = match self.presense {
             FieldPresense::Repeated => quote! {
                 self.as_ref().map(<#blanket_type_ident as #trait_path>::#getter_name).into_iter().flatten()
             },
@@ -343,6 +335,9 @@ impl Field {
             FieldPresense::Implicit => quote! {
                 self.as_ref().map(<#blanket_type_ident as #trait_path>::#getter_name).unwrap_or_default()
             },
+        };
+        Ok(parse2(quote! {
+            { #stmts }
         })?)
     }
 
@@ -391,8 +386,8 @@ impl Field {
         let getter_name = self.gen_get_method_name()?;
         let mapped_either: Expr = parse2(quote! {
             self.as_ref().map_either(
-                |v| <#t1 as #trait_path>::#getter_name(v),
-                |v| <#t2 as #trait_path>::#getter_name(v))
+                #trait_path::#getter_name,
+                #trait_path::#getter_name)
         })?;
         let stmts = match (self.presense, self.scalar_type()) {
             (FieldPresense::Repeated, FieldType::Message(_)) => quote! {
@@ -422,32 +417,25 @@ impl Field {
         let getter_name = self.gen_get_method_name()?;
         let mapped_either: Expr = parse2(quote! {
             self.as_ref().map_any(
-                |v| <#t1 as #trait_path>::#getter_name(v),
-                |v| <#t2 as #trait_path>::#getter_name(v))
+                #trait_path::#getter_name,
+                #trait_path::#getter_name)
         })?;
         let stmts = match (self.presense, self.scalar_type()) {
+            (FieldPresense::Repeated, FieldType::Message(_)) => quote! {
+                ::puroro::EitherOrBothExt::factor_into_iter(#mapped_either)
+            },
             (FieldPresense::Repeated, _) => quote! {
-                let (l, r) = #mapped_either.left_and_right();
-                l.into_iter().flatten().chain(r.into_iter().flatten())
+                ::puroro::EitherOrBothExt::into_iter(#mapped_either)
             },
             (_, FieldType::Message(_)) => quote! {
-                #mapped_either.left_and_right()
+                ::puroro::EitherOrBothExt::flatten_opt(#mapped_either)
             },
             _ => quote! {
-                use ::std::option::Option::Some;
-                use ::puroro::IsEmpty;
-                use ::puroro::EitherOrBoth::{Both, Left, Right};
-                match self.as_ref() {
-                    Left(l) => <#t1 as #trait_path>::#getter_name(l),
-                    Right(r) => <#t2 as #trait_path>::#getter_name(r),
-                    Both(l, r) => {
-                        if let Some(r) = <#t2 as #trait_path>::#getter_name(r).into_option() {
-                            r
-                        } else {
-                            <#t1 as #trait_path>::#getter_name(l)
-                        }
-                    }
-                }
+                ::puroro::EitherOrBothExt::non_empty_right_or_left(
+                    self.as_ref(),
+                    #trait_path::#getter_name,
+                    #trait_path::#getter_name
+                )
             },
         };
         Ok(parse2(quote! {

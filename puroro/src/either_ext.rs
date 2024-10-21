@@ -22,6 +22,65 @@ pub trait EitherOrBothExt {
     type T;
     type U;
     fn into_either_or_both(self) -> EitherOrBoth<Self::T, Self::U>;
+    fn into_iter(self) -> impl IntoIterator<Item = <Self::T as IntoIterator>::Item>
+    where
+        Self: Sized,
+        Self::T: IntoIterator,
+        Self::U: IntoIterator<Item = <Self::T as IntoIterator>::Item>,
+    {
+        let (t_opt, u_opt) = self.into_either_or_both().left_and_right();
+        t_opt
+            .into_iter()
+            .flatten()
+            .chain(u_opt.into_iter().flatten())
+    }
+    fn factor_into_iter(
+        self,
+    ) -> impl IntoIterator<Item = Either<<Self::T as IntoIterator>::Item, <Self::U as IntoIterator>::Item>>
+    where
+        Self: Sized,
+        Self::T: IntoIterator,
+        Self::U: IntoIterator,
+    {
+        let (t_opt, u_opt) = self.into_either_or_both().left_and_right();
+        t_opt
+            .into_iter()
+            .flatten()
+            .map(Either::Left)
+            .chain(u_opt.into_iter().flatten().map(Either::Right))
+    }
+    fn flatten_opt<T2, U2>(self) -> Option<EitherOrBoth<T2, U2>>
+    where
+        Self: Sized + EitherOrBothExt<T = Option<T2>, U = Option<U2>>,
+    {
+        let (t, u) = self.into_either_or_both().left_and_right();
+        match (t.flatten(), u.flatten()) {
+            (Some(t), Some(u)) => Some(EitherOrBoth::Both(t, u)),
+            (Some(t), None) => Some(EitherOrBoth::Left(t)),
+            (None, Some(u)) => Some(EitherOrBoth::Right(u)),
+            (None, None) => None,
+        }
+    }
+    fn non_empty_right_or_left<F, G, M>(self, f: F, g: G) -> M
+    where
+        Self: Sized,
+        F: FnOnce(Self::T) -> M,
+        G: FnOnce(Self::U) -> M,
+        M: IsEmpty,
+    {
+        match self.into_either_or_both() {
+            EitherOrBoth::Both(t, u) => {
+                let m = f(t);
+                if m.is_empty() {
+                    g(u)
+                } else {
+                    m
+                }
+            }
+            EitherOrBoth::Left(t) => f(t),
+            EitherOrBoth::Right(u) => g(u),
+        }
+    }
 }
 impl<T, U> EitherOrBothExt for EitherOrBoth<T, U> {
     type T = T;

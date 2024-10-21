@@ -124,7 +124,7 @@ impl GenEnumItems {
         Ok(parse2(quote! {
             impl ::puroro::IsEmpty for self::#name {
                 fn is_empty(&self) -> bool {
-                    Self::default() == self
+                    Self::default() == Self::clone(self)
                 }
             }
         })?)
