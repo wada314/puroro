@@ -389,26 +389,23 @@ impl Field {
         trait_path: &Path,
     ) -> Result<Block> {
         let getter_name = self.gen_get_method_name()?;
+        let mapped_either: Expr = parse2(quote! {
+            self.as_ref().map_either(
+                |v| <#t1 as #trait_path>::#getter_name(v),
+                |v| <#t2 as #trait_path>::#getter_name(v))
+        })?;
         let stmts = match (self.presense, self.scalar_type()) {
             (FieldPresense::Repeated, FieldType::Message(_)) => quote! {
-                self.as_ref().map_left(|v| <#t1 as #trait_path>::#getter_name(v))
-                    .map_right(|v| <#t2 as #trait_path>::#getter_name(v))
-                    .factor_into_iter()
+                #mapped_either.factor_into_iter()
             },
             (FieldPresense::Repeated, _) => quote! {
-                self.as_ref().map_left(|v| <#t1 as #trait_path>::#getter_name(v))
-                    .map_right(|v| <#t2 as #trait_path>::#getter_name(v))
-                    .into_iter()
+                #mapped_either.into_iter()
             },
             (_, FieldType::Message(_)) => quote! {
-                self.as_ref().map_left(|v| <#t1 as #trait_path>::#getter_name(v))
-                    .map_right(|v| <#t2 as #trait_path>::#getter_name(v))
-                    .factor_none()
+                #mapped_either.factor_none()
             },
             _ => quote! {
-                self.as_ref().map_left(|v| <#t1 as #trait_path>::#getter_name(v))
-                    .map_right(|v| <#t2 as #trait_path>::#getter_name(v))
-                    .into_inner()
+                #mapped_either.into_inner()
             },
         };
         Ok(parse2(quote! {
@@ -425,15 +422,11 @@ impl Field {
         let getter_name = self.gen_get_method_name()?;
         let stmts = match (self.presense, self.scalar_type()) {
             (FieldPresense::Repeated, _) => quote! {
-                let (l, r) = self.as_ref().map_left(|v| <#t1 as #trait_path>::#getter_name(v))
-                    .map_right(|v| <#t2 as #trait_path>::#getter_name(v))
-                    .left_and_right();
+                let (l, r) = #mapped_either.left_and_right();
                 l.into_iter().flatten().chain(r.into_iter().flatten())
             },
             (_, FieldType::Message(_)) => quote! {
-                self.as_ref().map_left(|v| <#t1 as #trait_path>::#getter_name(v))
-                    .map_right(|v| <#t2 as #trait_path>::#getter_name(v))
-                    .left_and_right()
+                #mapped_either.left_and_right()
             },
             _ => quote! {
                 use ::std::option::Option::Some;
