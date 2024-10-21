@@ -18,8 +18,18 @@ use ::itertools::{Either, EitherOrBoth};
 pub trait EitherExt {}
 impl<T, U> EitherExt for Either<T, U> {}
 
-pub trait EitherOrBothExt {}
-impl<T, U> EitherOrBothExt for EitherOrBoth<T, U> {}
+pub trait EitherOrBothExt {
+    type T;
+    type U;
+    fn into_either_or_both(self) -> EitherOrBoth<Self::T, Self::U>;
+}
+impl<T, U> EitherOrBothExt for EitherOrBoth<T, U> {
+    type T = T;
+    type U = U;
+    fn into_either_or_both(self) -> EitherOrBoth<Self::T, Self::U> {
+        self
+    }
+}
 
 pub trait BothExt {
     type T;

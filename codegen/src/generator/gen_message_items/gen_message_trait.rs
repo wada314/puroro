@@ -420,6 +420,11 @@ impl Field {
         trait_path: &Path,
     ) -> Result<Block> {
         let getter_name = self.gen_get_method_name()?;
+        let mapped_either: Expr = parse2(quote! {
+            self.as_ref().map_any(
+                |v| <#t1 as #trait_path>::#getter_name(v),
+                |v| <#t2 as #trait_path>::#getter_name(v))
+        })?;
         let stmts = match (self.presense, self.scalar_type()) {
             (FieldPresense::Repeated, _) => quote! {
                 let (l, r) = #mapped_either.left_and_right();
