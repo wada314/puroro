@@ -379,8 +379,8 @@ impl Field {
 
     fn gen_blanket_either_get_method_body(
         &self,
-        t1: &Ident,
-        t2: &Ident,
+        _t1: &Ident,
+        _t2: &Ident,
         trait_path: &Path,
     ) -> Result<Block> {
         let getter_name = self.gen_get_method_name()?;
@@ -410,8 +410,8 @@ impl Field {
 
     fn gen_blanket_either_or_both_get_method_body(
         &self,
-        t1: &Ident,
-        t2: &Ident,
+        _t1: &Ident,
+        _t2: &Ident,
         trait_path: &Path,
     ) -> Result<Block> {
         let getter_name = self.gen_get_method_name()?;
