@@ -23,7 +23,7 @@ pub mod proto_path;
 
 pub use crate::generator::compile;
 use ::puroro::google::protobuf::compiler::CodeGeneratorRequest;
-use ::puroro::message::MessageLite;
+use ::puroro::message::Message;
 use ::std::backtrace::Backtrace;
 use ::thiserror::Error;
 

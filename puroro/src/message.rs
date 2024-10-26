@@ -18,7 +18,7 @@ use ::std::io::{BufRead, BufReader, Read, Write};
 use ::std::ops::{Deref, DerefMut};
 
 /// Protobuf message, which can be serialized, deserialized, and field accessible.
-pub trait MessageLite {
+pub trait Message {
     fn merge_from_read<R: Read>(&mut self, read: R) -> Result<()> {
         self.merge_from_bufread(BufReader::new(read))
     }
@@ -42,10 +42,10 @@ pub trait MessageLite {
     fn write<W: Write>(&self, write: W) -> Result<usize>;
 }
 
-impl<T> MessageLite for T
+impl<T> Message for T
 where
     T: Deref + DerefMut,
-    <T as Deref>::Target: MessageLite,
+    <T as Deref>::Target: Message,
 {
     fn merge_from_read<R: Read>(&mut self, read: R) -> Result<()> {
         DerefMut::deref_mut(self).merge_from_read(read)
@@ -56,17 +56,4 @@ where
     fn write<W: Write>(&self, mut write: W) -> Result<usize> {
         Deref::deref(self).write(&mut write)
     }
-}
-
-/// [`MessageLite`] + descriptors and reflections.
-pub trait Message: MessageLite {}
-pub trait ReadableMessage: MessageLite {}
-pub trait AppendableMessage: MessageLite {}
-pub trait MutableMessage: AppendableMessage {}
-pub trait AsyncReadableMessage: ReadableMessage {}
-pub trait AsyncDeserializableMessage: ReadableMessage {
-    fn async_deser(&mut self, read: impl AsyncRead) -> impl '_ + AsyncReadableMessage;
-}
-pub trait AsyncSerializableMessage {
-    fn async_ser(&self, write: impl AsyncWrite) -> impl '_ + AppendableMessage;
 }

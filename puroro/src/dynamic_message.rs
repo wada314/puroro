@@ -17,7 +17,7 @@ use crate::internal::deser::{
 };
 use crate::internal::utils::{BaseAndDerived, Derived, EnumOfDeriveds, EnumVariant};
 use crate::internal::WireType;
-use crate::message::MessageLite;
+use crate::message::Message;
 use crate::variant::variant_types::Int32;
 use crate::variant::{
     variant_types::UInt32, ReadExtVariant, Variant, VariantIntegerType, WriteExtVariant,
@@ -258,7 +258,7 @@ impl<A: Allocator + Clone> Derived<Vec<WireTypeAndPayload<A>, A>>
     }
 }
 
-impl<A: Allocator + Clone> MessageLite for DynamicMessage<A> {
+impl<A: Allocator + Clone> Message for DynamicMessage<A> {
     fn merge_from_bufread<R: BufRead>(&mut self, read: R) -> Result<()> {
         deser_from_bufread(read, self)
     }
