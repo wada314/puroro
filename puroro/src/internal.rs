@@ -20,7 +20,7 @@ pub mod utils;
 use crate::{ErrorKind, Result};
 
 #[derive(Debug)]
-pub(crate) enum WireType {
+pub enum WireType {
     Variant = 0,
     I64 = 1,
     Len = 2,

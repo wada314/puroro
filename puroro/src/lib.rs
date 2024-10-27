@@ -36,6 +36,7 @@ pub mod variant;
 pub use self::either_ext::{BothExt, EitherExt, EitherOrBothExt};
 pub use self::non_empty::{IsEmpty, NonEmpty};
 pub use ::itertools::{Either, EitherOrBoth};
+use internal::WireType;
 
 use ::thiserror::Error;
 
@@ -79,8 +80,8 @@ pub type Result<T> = ::std::result::Result<T, ErrorKind>;
 pub enum UnknownFieldErrorKind {
     #[error("This (partial) protobuf object cannot handle the field number: {0}")]
     FieldNumberIsNotAcceptable(i32),
-    #[error("The wire type given is not acceptable for the field number: {0}")]
-    WireTypeMismatch,
+    #[error("The wire type given is not acceptable for the field number: {0:?}")]
+    WireTypeMismatch(WireType),
     #[error("The string field is not a valid UTF-8 string.")]
     InvalidUtf8String,
     #[error("The field is not a valid enum value.")]
