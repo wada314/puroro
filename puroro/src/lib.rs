@@ -20,6 +20,7 @@
 #![feature(trait_upcasting)]
 #![feature(downcast_unchecked)]
 
+pub mod default_in;
 pub mod dynamic_message;
 pub mod editions;
 pub mod either_ext;
