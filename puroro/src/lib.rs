@@ -36,8 +36,8 @@ pub mod variant;
 pub use self::either_ext::{BothExt, EitherExt, EitherOrBothExt};
 pub use self::non_empty::{IsEmpty, NonEmpty};
 pub use ::itertools::{Either, EitherOrBoth};
-use internal::WireType;
 
+use self::internal::WireType;
 use ::thiserror::Error;
 
 #[derive(Error, Debug)]
@@ -86,4 +86,8 @@ pub enum UnknownFieldErrorKind {
     InvalidUtf8String,
     #[error("The field is not a valid enum value.")]
     InvalidEnumValue,
+}
+
+pub trait PartialMessageMut {
+    fn try_merge_field(&mut self, )
 }
