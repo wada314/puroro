@@ -63,8 +63,6 @@ pub enum ErrorKind {
     UnknownWireType,
     #[error("Unexpected EOF detected while deserializing")]
     DeserUnexpectedEof,
-    #[error("The field type and wire type are not matching")]
-    UnmatchingWireAndFieldType,
     #[error("Error when matching the DynamicMessage type's field type.")]
     DynamicMessageFieldTypeError,
     #[error("Error when converting an int32 to an (closed) enum value: {0}")]
@@ -76,3 +74,15 @@ impl From<String> for ErrorKind {
     }
 }
 pub type Result<T> = ::std::result::Result<T, ErrorKind>;
+
+#[derive(Error, Debug)]
+pub enum UnknownFieldErrorKind {
+    #[error("This (partial) protobuf object cannot handle the field number: {0}")]
+    FieldNumberIsNotAcceptable(i32),
+    #[error("The wire type given is not acceptable for the field number: {0}")]
+    WireTypeMismatch,
+    #[error("The string field is not a valid UTF-8 string.")]
+    InvalidUtf8String,
+    #[error("The field is not a valid enum value.")]
+    InvalidEnumValue,
+}
