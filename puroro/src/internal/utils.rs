@@ -109,6 +109,15 @@ where
         self.try_take_base().unwrap()
     }
 
+    pub fn take_derived<D>(self) -> D
+    where
+        D: Derived<T, ToBaseError = E::ToBaseError, FromBaseError = E::FromBaseError>
+            + EnumVariant<E>,
+        E: EnumOfDeriveds<T, Error = Infallible>,
+    {
+        self.try_take_derived::<D>().unwrap()
+    }
+
     pub fn try_take_base(self) -> Result<T, E::ToBaseError> {
         match self {
             BaseAndDerived::StartFromBase { base, .. } => Ok(base),
@@ -120,6 +129,44 @@ where
                 Some(base) => base,
                 None => derived.as_ref().to_base()?,
             }),
+        }
+    }
+
+    pub fn try_take_derived<D>(self) -> Result<D, E::Error>
+    where
+        D: Derived<T, ToBaseError = E::ToBaseError, FromBaseError = E::FromBaseError>
+            + EnumVariant<E>,
+    {
+        match self {
+            BaseAndDerived::StartFromBase {
+                base,
+                derived_cells,
+            } => Ok(derived_cells
+                .into_iter()
+                .find_map(|d| D::from_enum(d).ok())
+                .map(Ok)
+                .unwrap_or_else(|| D::from_base(&base))?),
+            BaseAndDerived::StartFromDerived {
+                mut base_cell,
+                derived,
+                derived_cells,
+            } => {
+                let derived = match D::from_enum(derived) {
+                    Ok(d) => return Ok(d),
+                    Err(derived) => derived,
+                };
+                Ok(derived_cells
+                    .into_iter()
+                    .find_map(|d| D::from_enum(d).ok())
+                    .map(Result::<_, E::Error>::Ok)
+                    .unwrap_or_else(|| {
+                        let base = match base_cell.take() {
+                            Some(base) => base,
+                            None => derived.as_ref().to_base()?,
+                        };
+                        Ok(D::from_base(&base)?)
+                    })?)
+            }
         }
     }
 }
@@ -150,15 +197,6 @@ where
         E: EnumOfDeriveds<T, Error = Infallible>,
     {
         self.try_as_derived_mut::<D>().unwrap()
-    }
-
-    pub fn take_derived<D>(self) -> D
-    where
-        D: Derived<T, ToBaseError = E::ToBaseError, FromBaseError = E::FromBaseError>
-            + EnumVariant<E>,
-        E: EnumOfDeriveds<T, Error = Infallible>,
-    {
-        self.try_take_derived::<D>().unwrap()
     }
 
     pub fn try_as_derived<D>(&self) -> Result<&D, E::Error>
@@ -285,44 +323,6 @@ where
                 base_cell.take();
                 derived_cells.clear();
                 Ok(D::from_enum_mut(derived).unwrap())
-            }
-        }
-    }
-
-    pub fn try_take_derived<D>(self) -> Result<D, E::Error>
-    where
-        D: Derived<T, ToBaseError = E::ToBaseError, FromBaseError = E::FromBaseError>
-            + EnumVariant<E>,
-    {
-        match self {
-            BaseAndDerived::StartFromBase {
-                base,
-                derived_cells,
-            } => Ok(derived_cells
-                .into_iter()
-                .find_map(|d| D::from_enum(d).ok())
-                .map(Ok)
-                .unwrap_or_else(|| D::from_base(&base))?),
-            BaseAndDerived::StartFromDerived {
-                mut base_cell,
-                derived,
-                derived_cells,
-            } => {
-                let derived = match D::from_enum(derived) {
-                    Ok(d) => return Ok(d),
-                    Err(derived) => derived,
-                };
-                Ok(derived_cells
-                    .into_iter()
-                    .find_map(|d| D::from_enum(d).ok())
-                    .map(Result::<_, E::Error>::Ok)
-                    .unwrap_or_else(|| {
-                        let base = match base_cell.take() {
-                            Some(base) => base,
-                            None => derived.as_ref().to_base()?,
-                        };
-                        Ok(D::from_base(&base)?)
-                    })?)
             }
         }
     }
