@@ -13,14 +13,28 @@
 // limitations under the License.
 
 use crate::default_in::DefaultIn;
+use crate::repeated::RepeatedView;
+use crate::variant::Variant;
 use crate::Result;
+use ::derive_more::Debug;
 use ::std::alloc::Allocator;
 use ::std::io::{BufRead, BufReader, Read, Write};
 use ::std::ops::{Deref, DerefMut};
+use ::thiserror::Error;
+
+#[derive(Error, Debug)]
+pub enum GetFieldErrorKind {}
+pub type GFResult<T> = ::std::result::Result<T, GetFieldErrorKind>;
 
 /// Protobuf message, which can be serialized and field accessible.
 pub trait Message {
     fn write<W: Write>(&self, write: W) -> Result<usize>;
+    fn field(&self, number: i32) -> impl Field;
+}
+pub trait Field<'a> {
+    fn has_field(&self) -> GFResult<bool>;
+    fn as_scalar_variant(&self) -> GFResult<Variant>;
+    fn as_repeated_variant(&self) -> GFResult<impl RepeatedView<Item = Variant>>;
 }
 
 /// Mutable protobuf message

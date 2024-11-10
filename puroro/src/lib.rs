@@ -75,19 +75,3 @@ impl From<String> for ErrorKind {
     }
 }
 pub type Result<T> = ::std::result::Result<T, ErrorKind>;
-
-#[derive(Error, Debug)]
-pub enum UnknownFieldErrorKind {
-    #[error("This (partial) protobuf object cannot handle the field number: {0}")]
-    FieldNumberIsNotAcceptable(i32),
-    #[error("The wire type given is not acceptable for the field number: {0:?}")]
-    WireTypeMismatch(WireType),
-    #[error("The string field is not a valid UTF-8 string.")]
-    InvalidUtf8String,
-    #[error("The field is not a valid enum value.")]
-    InvalidEnumValue,
-}
-
-pub trait PartialMessageMut {
-    fn try_merge_field(&mut self, )
-}

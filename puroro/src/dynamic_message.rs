@@ -17,7 +17,8 @@ use crate::internal::deser::{
 };
 use crate::internal::utils::{BaseAndDerived, Derived, EnumOfDeriveds, EnumVariant};
 use crate::internal::WireType;
-use crate::message::{Message, MessageMut};
+use crate::message::{Field, GFResult, Message, MessageMut};
+use crate::repeated::RepeatedView;
 use crate::variant::variant_types::Int32;
 use crate::variant::{
     variant_types::UInt32, ReadExtVariant, Variant, VariantIntegerType, WriteExtVariant,
@@ -144,6 +145,12 @@ impl DynamicMessage<Global> {
         }
     }
 }
+impl<A: Allocator> DynamicMessage<A> {
+    pub fn field(&self, number: i32) -> Option<&DynamicField<A>> {
+        let field_base = self.fields.get(&number)?;
+        Some(DynamicField::ref_cast(field_base))
+    }
+}
 impl<A: Allocator + Clone> DynamicMessage<A> {
     pub fn new_in(alloc: A) -> Self {
         Self {
@@ -151,21 +158,17 @@ impl<A: Allocator + Clone> DynamicMessage<A> {
             alloc: alloc.clone(),
         }
     }
-    pub fn field(&self, number: i32) -> Option<&Field<A>> {
-        let field_base = self.fields.get(&number)?;
-        Some(Field::ref_cast(field_base))
-    }
-    pub fn field_mut(&mut self, number: i32) -> &mut Field<A> {
+
+    pub fn field_mut(&mut self, number: i32) -> &mut DynamicField<A> {
         let field_base = self.fields.entry(number).or_insert_with(|| {
             BaseAndDerived::<_, _, A>::from_base(
                 Vec::new_in(self.alloc.clone()),
                 self.alloc.clone(),
             )
         });
-        Field::ref_cast_mut(field_base)
+        DynamicField::ref_cast_mut(field_base)
     }
-}
-impl<A: Allocator + Clone> DynamicMessage<A> {
+
     pub fn merge(&mut self, other: Self) {
         for (number, other_field_base) in other.fields {
             let other_payloads = other_field_base.take_base();
@@ -258,7 +261,7 @@ impl<A: Allocator + Clone> Derived<Vec<WireTypeAndPayload<A>, A>>
     }
 }
 
-impl<A: Allocator + Clone> Message for DynamicMessage<A> {
+impl<A: Allocator> Message for DynamicMessage<A> {
     fn write<W: Write>(&self, mut write: W) -> Result<usize> {
         let mut total_bytes = 0;
         for (number, field_base) in &self.fields {
@@ -269,11 +272,11 @@ impl<A: Allocator + Clone> Message for DynamicMessage<A> {
                 total_bytes += match wire_and_payload {
                     WireTypeAndPayload::Variant(variant) => write.write_variant(variant.clone())?,
                     WireTypeAndPayload::I64(buf) => {
-                        write.write_all(buf)?;
+                        write.write_all(&buf)?;
                         4usize
                     }
                     WireTypeAndPayload::I32(buf) => {
-                        write.write_all(buf)?;
+                        write.write_all(&buf)?;
                         8usize
                     }
                     WireTypeAndPayload::Len(bytes_or_msg) => {
@@ -287,6 +290,10 @@ impl<A: Allocator + Clone> Message for DynamicMessage<A> {
             }
         }
         Ok(total_bytes)
+    }
+
+    fn field(&self, number: i32) -> impl Field {
+        <DynamicMessage<_>>::field(self, number)
     }
 }
 impl<A: Allocator + Clone> MessageMut<A> for DynamicMessage<A> {
@@ -339,17 +346,17 @@ impl<A: Allocator + Clone, R: Read> DeserMessageHandlerForRead<R> for DynamicMes
 
 #[repr(transparent)]
 #[derive(RefCast)]
-pub struct Field<A: Allocator = Global>(
+pub struct DynamicField<A: Allocator = Global>(
     BaseAndDerived<Vec<WireTypeAndPayload<A>, A>, FieldCustomView<A>, A>,
 );
 
-impl<A: Allocator> Field<A> {
+impl<A: Allocator> DynamicField<A> {
     fn allocator(&self) -> &A {
         self.0.allocator()
     }
 }
 
-impl<A: Allocator + Clone> Field<A> {
+impl<A: Allocator + Clone> DynamicField<A> {
     pub fn as_scalar_variant<T: VariantIntegerType>(&self, allow_packed: bool) -> T::RustType {
         self.as_repeated_variant::<T>(allow_packed)
             .last()
@@ -532,5 +539,17 @@ impl<A: Allocator + Clone> Field<A> {
             .push(WireTypeAndPayload::Len(BaseAndDerived::from_derived(
                 val, alloc,
             )));
+    }
+}
+
+impl<'a, A: Allocator> Field<'a> for Option<&'a DynamicField<A>> {
+    fn has_field(&self) -> GFResult<bool> {
+        todo!()
+    }
+    fn as_scalar_variant(&self) -> GFResult<Variant> {
+        todo!()
+    }
+    fn as_repeated_variant(&self) -> GFResult<impl RepeatedView<Item = Variant>> {
+        Ok(::std::iter::empty())
     }
 }

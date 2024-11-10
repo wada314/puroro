@@ -83,7 +83,7 @@ impl<T, E, A: Allocator + Clone> BaseAndDerived<T, E, A> {
     }
 }
 
-impl<T, E, A: Allocator + Clone> BaseAndDerived<T, E, A>
+impl<T, E, A: Allocator> BaseAndDerived<T, E, A>
 where
     E: EnumOfDeriveds<T>,
 {
@@ -93,7 +93,40 @@ where
     {
         self.try_as_base().unwrap()
     }
+    pub fn try_as_base(&self) -> Result<&T, E::ToBaseError> {
+        match self {
+            BaseAndDerived::StartFromBase { base, .. } => Ok(base),
+            BaseAndDerived::StartFromDerived {
+                base_cell, derived, ..
+            } => base_cell.get_or_try_init(|| derived.as_ref().to_base()),
+        }
+    }
 
+    pub fn take_base(self) -> T
+    where
+        E: EnumOfDeriveds<T, ToBaseError = Infallible>,
+    {
+        self.try_take_base().unwrap()
+    }
+
+    pub fn try_take_base(self) -> Result<T, E::ToBaseError> {
+        match self {
+            BaseAndDerived::StartFromBase { base, .. } => Ok(base),
+            BaseAndDerived::StartFromDerived {
+                mut base_cell,
+                derived,
+                ..
+            } => Ok(match base_cell.take() {
+                Some(base) => base,
+                None => derived.as_ref().to_base()?,
+            }),
+        }
+    }
+}
+impl<T, E, A: Allocator + Clone> BaseAndDerived<T, E, A>
+where
+    E: EnumOfDeriveds<T>,
+{
     pub fn as_derived<D>(&self) -> &D
     where
         D: Derived<T, ToBaseError = E::ToBaseError, FromBaseError = E::FromBaseError>
@@ -119,13 +152,6 @@ where
         self.try_as_derived_mut::<D>().unwrap()
     }
 
-    pub fn take_base(self) -> T
-    where
-        E: EnumOfDeriveds<T, ToBaseError = Infallible>,
-    {
-        self.try_take_base().unwrap()
-    }
-
     pub fn take_derived<D>(self) -> D
     where
         D: Derived<T, ToBaseError = E::ToBaseError, FromBaseError = E::FromBaseError>
@@ -133,15 +159,6 @@ where
         E: EnumOfDeriveds<T, Error = Infallible>,
     {
         self.try_take_derived::<D>().unwrap()
-    }
-
-    pub fn try_as_base(&self) -> Result<&T, E::ToBaseError> {
-        match self {
-            BaseAndDerived::StartFromBase { base, .. } => Ok(base),
-            BaseAndDerived::StartFromDerived {
-                base_cell, derived, ..
-            } => base_cell.get_or_try_init(|| derived.as_ref().to_base()),
-        }
     }
 
     pub fn try_as_derived<D>(&self) -> Result<&D, E::Error>
@@ -269,20 +286,6 @@ where
                 derived_cells.clear();
                 Ok(D::from_enum_mut(derived).unwrap())
             }
-        }
-    }
-
-    pub fn try_take_base(self) -> Result<T, E::ToBaseError> {
-        match self {
-            BaseAndDerived::StartFromBase { base, .. } => Ok(base),
-            BaseAndDerived::StartFromDerived {
-                mut base_cell,
-                derived,
-                ..
-            } => Ok(match base_cell.take() {
-                Some(base) => base,
-                None => derived.as_ref().to_base()?,
-            }),
         }
     }
 
