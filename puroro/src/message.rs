@@ -19,7 +19,6 @@ use crate::Result;
 use ::allocator_api2::alloc::Allocator;
 use ::derive_more::Debug;
 use ::std::io::{BufRead, BufReader, Read, Write};
-use ::std::ops::{Deref, DerefMut};
 use ::thiserror::Error;
 
 #[derive(Error, Debug)]
