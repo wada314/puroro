@@ -111,11 +111,15 @@ impl<A: Allocator + Clone> DynamicMessage<A> {
     }
 
     pub fn merge(&mut self, other: Self) {
+        let alloc = &self.alloc;
         for (number, other_field) in other.fields {
             match self.fields.entry(number) {
                 Entry::Occupied(mut entry) => {
-                    todo!()
-                }
+                    let payloads = entry
+                    .get_mut()
+                    .left_mut_with(|f_list| f_list.first().to_field(alloc));
+                    payloads.extend(other_field.left_with(|f_list| f_list.first().to_field(alloc)));
+                },
                 Entry::Vacant(entry) => {
                     todo!()
                 }
@@ -442,7 +446,7 @@ impl<T: ::std::fmt::Debug, A: Allocator> ::std::fmt::Debug for OnceList1<T, A> {
 }
 
 impl<A: Allocator + Clone> FieldCustomView<A> {
-    fn try_to_field(&self, alloc: &A) -> Result<Vec<WireTypeAndPayload<A>, A>> {
+    fn to_field(&self, alloc: &A) -> Vec<WireTypeAndPayload<A>, A> {
         let encoded_bytes = match self {
             FieldCustomView::ScalarMessage(Some(msg)) => {
                 let mut buf = Vec::new_in(A::clone(alloc));
@@ -453,7 +457,7 @@ impl<A: Allocator + Clone> FieldCustomView<A> {
         };
         let mut payload_vec = Vec::with_capacity_in(1, A::clone(alloc));
         payload_vec.push(WireTypeAndPayload::Len(encoded_bytes.into()));
-        Ok(payload_vec)
+        payload_vec
     }
 }
 
