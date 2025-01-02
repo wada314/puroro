@@ -133,33 +133,34 @@ impl<A: Allocator + Clone> DynamicMessage<A> {
 impl<A: Allocator> Debug for DynamicMessage<A> {
     fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
         let mut ds = f.debug_struct("DynamicMessage");
-        for (number, field_base) in &self.fields {
-            ds.field(&format!("field{}", number), field_base);
+        for (number, field) in &self.fields {
+            ds.field(&format!("field{}", number), field);
         }
         ds.finish()
     }
 }
 
-impl<A: Allocator> Message for DynamicMessage<A> {
+impl<A: Allocator + Clone> Message for DynamicMessage<A> {
     fn write<W: Write>(&self, mut write: W) -> Result<usize> {
         let mut total_bytes = 0;
-        for (number, field_base) in &self.fields {
-            for wire_and_payload in field_base.as_base() {
+        let alloc = &self.alloc;
+        for (number, field) in &self.fields {
+            for wire_and_payload in field.as_payloads(alloc) {
                 let tag = (TryInto::<u32>::try_into(*number)? << 3)
                     | Into::<u32>::into(wire_and_payload.wire_type());
                 total_bytes += write.write_variant(UInt32::into_variant(tag))?;
                 total_bytes += match wire_and_payload {
                     WireTypeAndPayload::Variant(variant) => write.write_variant(variant.clone())?,
                     WireTypeAndPayload::I64(buf) => {
-                        write.write_all(&buf)?;
+                        write.write_all(buf)?;
                         4usize
                     }
                     WireTypeAndPayload::I32(buf) => {
-                        write.write_all(&buf)?;
+                        write.write_all(buf)?;
                         8usize
                     }
-                    WireTypeAndPayload::Len(bytes_or_msg) => {
-                        let bytes = bytes_or_msg.as_base();
+                    WireTypeAndPayload::Len(len_payload) => {
+                        let bytes = len_payload.as_buf(alloc);
                         let len = bytes.len();
                         write.write_variant(Variant::from::<Int32>(len.try_into()?))?;
                         write.write_all(bytes)?;
@@ -304,7 +305,7 @@ impl<A: Allocator + Clone> DynamicField<A> {
                     Either::Left(Some(Ok(variant.clone())).into_iter())
                 }
                 (true, WireTypeAndPayload::Len(bytes_or_msg)) => {
-                    Either::Right(bytes_or_msg.as_base().into_variant_iter())
+                    Either::Right(bytes_or_msg.as_buf().into_variant_iter())
                 }
                 _ => Either::Left(Some(Err(ErrorKind::DynamicMessageFieldTypeError)).into_iter()),
             })
@@ -334,7 +335,7 @@ impl<A: Allocator + Clone> DynamicField<A> {
     pub fn try_as_repeated_string(&self) -> Result<impl '_ + Iterator<Item = Result<&str>>> {
         Ok(self.0.as_base().iter().map(|record| match record {
             WireTypeAndPayload::Len(bytes_or_msg) => {
-                Ok(::std::str::from_utf8(bytes_or_msg.as_base())?)
+                Ok(::std::str::from_utf8(bytes_or_msg.as_buf())?)
             }
             _ => Err(ErrorKind::DynamicMessageFieldTypeError),
         }))
@@ -344,7 +345,7 @@ impl<A: Allocator + Clone> DynamicField<A> {
     }
     pub fn try_as_repeated_bytes(&self) -> Result<impl '_ + Iterator<Item = Result<&[u8]>>> {
         Ok(self.0.as_base().iter().map(|record| match record {
-            WireTypeAndPayload::Len(bytes_or_msg) => Ok(bytes_or_msg.as_base().as_slice()),
+            WireTypeAndPayload::Len(bytes_or_msg) => Ok(bytes_or_msg.as_buf().as_slice()),
             _ => Err(ErrorKind::DynamicMessageFieldTypeError),
         }))
     }
@@ -468,6 +469,27 @@ impl<A: Allocator + Clone> FieldCustomView<A> {
         let mut payload_vec = Vec::with_capacity_in(1, A::clone(alloc));
         payload_vec.push(WireTypeAndPayload::Len(encoded_bytes.into()));
         payload_vec
+    }
+}
+
+impl<A: Allocator + Clone> DynamicLenPayload<A> {
+    fn as_buf(&self, alloc: &A) -> &Vec<u8, A> {
+        self.0.left_with(|p_list| p_list.first().to_buf(alloc))
+    }
+    fn as_buf_mut(&mut self, alloc: &A) -> &mut Vec<u8, A> {
+        self.0.left_mut_with(|p_list| p_list.first().to_buf(alloc))
+    }
+}
+
+impl<A: Allocator + Clone> LenCustomPayloadView<A> {
+    fn to_buf(&self, alloc: &A) -> Vec<u8, A> {
+        match self {
+            LenCustomPayloadView::Message(msg) => {
+                let mut buf = Vec::new_in(A::clone(alloc));
+                msg.write_to_vec(&mut buf);
+                buf
+            }
+        }
     }
 }
 
