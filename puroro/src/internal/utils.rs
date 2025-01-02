@@ -12,13 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::once_list::OnceList;
+use ::allocator_api2::alloc::{Allocator, Global};
 use ::derive_more::Debug;
 use ::replace_with::replace_with_or_abort_and_return;
-use ::std::alloc::Allocator;
-use ::std::alloc::Global;
 use ::std::cell::OnceCell;
 use ::std::convert::Infallible;
+use once_list2::OnceList;
 
 pub trait EnumOfDeriveds<T> {
     type FromBaseError;

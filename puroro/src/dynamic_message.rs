@@ -24,12 +24,13 @@ use crate::variant::{
     variant_types::UInt32, ReadExtVariant, Variant, VariantIntegerType, WriteExtVariant,
 };
 use crate::{ErrorKind, Result};
+use ::allocator_api2::alloc::{Allocator, Global};
+use ::allocator_api2::vec::Vec;
 use ::derive_more::{Debug, TryUnwrap};
 use ::hashbrown::hash_map::{DefaultHashBuilder, Entry};
 use ::hashbrown::HashMap;
 use ::itertools::Either;
 use ::ref_cast::RefCast;
-use ::std::alloc::{Allocator, Global};
 use ::std::convert::Infallible;
 use ::std::io::{BufRead, Read, Write};
 
