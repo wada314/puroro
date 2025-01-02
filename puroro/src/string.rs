@@ -19,6 +19,8 @@ use ::allocator_api2::vec::Vec;
 use ::std::borrow::{Borrow, BorrowMut};
 use ::std::fmt::{Debug, Display, Formatter, Result as FmtResult};
 use ::std::ops::{Deref, DerefMut};
+use ::std::string::String as StdString;
+use ::std::vec::Vec as StdVec;
 
 #[derive(PartialEq, PartialOrd, Eq, Ord)]
 pub struct String<A: Allocator = Global> {
@@ -100,16 +102,26 @@ impl<A: Allocator> Debug for String<A> {
     }
 }
 
-impl From<::std::string::String> for String<Global> {
-    fn from(s: ::std::string::String) -> Self {
-        let (ptr, len, cap) = s.into_raw_parts();
-        let vec = unsafe { Vec::from_raw_parts(ptr, len, cap) };
-        Self { vec }
+impl From<StdString> for String<Global> {
+    fn from(s: StdString) -> Self {
+        let len = s.len();
+        let cap = s.capacity();
+        let ptr: *mut str = s.leak();
+        String {
+            vec: unsafe { Vec::from_raw_parts(ptr as *mut u8, len, cap) },
+        }
     }
 }
-impl From<String<Global>> for ::std::string::String {
+impl From<String<Global>> for StdString {
     fn from(s: String<Global>) -> Self {
-        unsafe { ::std::string::String::from_utf8_unchecked(s.vec) }
+        let (ptr, len, cap) = s.vec.into_raw_parts();
+        unsafe { StdString::from_utf8_unchecked(StdVec::from_raw_parts(ptr, len, cap)) }
+    }
+}
+
+impl<A: Allocator> From<String<A>> for Vec<u8, A> {
+    fn from(s: String<A>) -> Self {
+        s.vec
     }
 }
 
@@ -119,7 +131,8 @@ pub trait StrExt {
 
 impl StrExt for str {
     fn to_string_in<A: Allocator>(&self, alloc: A) -> String<A> {
-        let vec = self.as_bytes().to_vec_in(alloc);
+        let mut vec = Vec::new_in(alloc);
+        vec.extend_from_slice(self.as_bytes());
         String { vec }
     }
 }
