@@ -115,10 +115,10 @@ impl<A: Allocator + Clone> DynamicMessage<A> {
             match self.fields.entry(number) {
                 Entry::Occupied(mut entry) => {
                     let payloads = entry.get_mut().as_payloads_mut(alloc);
-                    payloads.extend(other_field.as_payloads(alloc).iter());
+                    payloads.extend(other_field.into_payloads(alloc).into_iter());
                 }
                 Entry::Vacant(entry) => {
-                    todo!()
+                    entry.insert(other_field);
                 }
             }
         }
@@ -450,7 +450,8 @@ impl<A: Allocator + Clone> DynamicField<A> {
         self.left_mut_with(|f_list| f_list.first().to_field(alloc))
     }
     fn into_payloads(self, alloc: &A) -> Vec<WireTypeAndPayload<A>, A> {
-        self.into_left_with(|f_list| f_list.first().to_field(alloc))
+        self.0
+            .into_left_with(|f_list| f_list.first().to_field(alloc))
     }
 }
 
