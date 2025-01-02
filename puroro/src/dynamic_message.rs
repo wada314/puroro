@@ -33,7 +33,6 @@ use ::itertools::Either;
 use ::once_list2::OnceList;
 use ::ref_cast::RefCast;
 use ::std::io::{BufRead, Read, Write};
-use ::std::sync::Once;
 
 #[derive(Default, Clone)]
 pub struct DynamicMessage<A: Allocator = Global> {
@@ -115,11 +114,9 @@ impl<A: Allocator + Clone> DynamicMessage<A> {
         for (number, other_field) in other.fields {
             match self.fields.entry(number) {
                 Entry::Occupied(mut entry) => {
-                    let payloads = entry
-                    .get_mut()
-                    .left_mut_with(|f_list| f_list.first().to_field(alloc));
-                    payloads.extend(other_field.left_with(|f_list| f_list.first().to_field(alloc)));
-                },
+                    let payloads = entry.get_mut().as_payloads_mut(alloc);
+                    payloads.extend(other_field.as_payloads(alloc).iter());
+                }
                 Entry::Vacant(entry) => {
                     todo!()
                 }
@@ -442,6 +439,18 @@ impl<T: ::std::fmt::Debug, A: Allocator> ::std::fmt::Debug for OnceList1<T, A> {
             .entry(&self.0)
             .entries(self.1.iter())
             .finish()
+    }
+}
+
+impl<A: Allocator + Clone> DynamicField<A> {
+    fn as_payloads(&self, alloc: &A) -> &Vec<WireTypeAndPayload<A>, A> {
+        self.left_with(|f_list| f_list.first().to_field(alloc))
+    }
+    fn as_payloads_mut(&mut self, alloc: &A) -> &mut Vec<WireTypeAndPayload<A>, A> {
+        self.left_mut_with(|f_list| f_list.first().to_field(alloc))
+    }
+    fn into_payloads(self, alloc: &A) -> Vec<WireTypeAndPayload<A>, A> {
+        self.into_left_with(|f_list| f_list.first().to_field(alloc))
     }
 }
 
