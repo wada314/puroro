@@ -22,7 +22,7 @@ once-list2 = { version = "0.3.0" }
 cached-pair = "0.1.0"
 derive_more = { version = "1.0.0", features = ["full"] }
 futures = "0.3.30"
-hashbrown = { version = "0.14.5", features = ["nightly"] }
+hashbrown = { version = "0.14.5", features = [] }
 itertools = "0.12.1"
 once_cell = "1.19.0"
 ref-cast = "1.0.23"
