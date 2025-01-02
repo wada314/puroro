@@ -209,17 +209,18 @@ impl<A: Allocator + Clone> DeserMessageHandlerBase for DynamicMessage<A> {
 }
 impl<A: Allocator + Clone, R: Read> DeserMessageHandlerForRead<R> for DynamicMessage<A> {
     fn parse_len(&mut self, num: i32, read: &mut R) -> Result<usize> {
-        let alloc = self.alloc.clone();
+        let alloc = A::clone(&self.alloc);
         // Facepalm
-        let mut buf = Vec::new();
-        let len = read.read_to_end(&mut buf)?;
+        let (buf, len) = {
+            let mut std_buf = ::std::vec::Vec::new();
+            let len = read.read_to_end(&mut std_buf)?;
+            let mut buf = Vec::with_capacity_in(len, A::clone(&alloc));
+            buf.extend_from_slice(&std_buf);
+            (buf, len)
+        };
         self.field_mut(num)
-            .0
-            .as_base_mut()
-            .push(WireTypeAndPayload::Len(BaseAndDerived::from_base(
-                buf.as_slice().to_vec_in(alloc.clone()),
-                alloc,
-            )));
+            .as_payloads_mut(&alloc)
+            .push(WireTypeAndPayload::Len(DynamicLenPayload::from_buf(buf)));
         Ok(len)
     }
 }
@@ -473,6 +474,9 @@ impl<A: Allocator + Clone> FieldCustomView<A> {
 }
 
 impl<A: Allocator + Clone> DynamicLenPayload<A> {
+    fn from_buf(buf: Vec<u8, A>) -> Self {
+        Self(Pair::from_left(buf))
+    }
     fn as_buf(&self, alloc: &A) -> &Vec<u8, A> {
         self.0.left_with(|p_list| p_list.first().to_buf(alloc))
     }
