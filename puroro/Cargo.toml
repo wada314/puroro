@@ -18,7 +18,9 @@ name = "variant"
 harness = false
 
 [dependencies]
-derive_more = { version = "1.0.0", features = ["full"]}
+once-list2 = { version = "0.3.0" }
+cached-pair = "0.1.0"
+derive_more = { version = "1.0.0", features = ["full"] }
 futures = "0.3.30"
 hashbrown = { version = "0.14.5", features = ["nightly"] }
 itertools = "0.12.1"
@@ -31,7 +33,7 @@ thiserror = "1.0"
 rand = "0.8.3"
 rand_pcg = "0.3.1"
 rand_distr = "0.4.3"
-criterion = {version = "0.5.1", features = ["html_reports"]}
+criterion = { version = "0.5.1", features = ["html_reports"] }
 
 [features]
 default = []
