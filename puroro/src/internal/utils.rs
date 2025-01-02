@@ -208,7 +208,7 @@ where
                 base,
                 derived_cells,
             } => {
-                if let Some(d) = derived_cells.find_map(|d| D::from_enum_ref(d)) {
+                if let Some(d) = derived_cells.iter().find_map(|d| D::from_enum_ref(d)) {
                     return Ok(d);
                 }
                 Ok(self.push_and_get(base)?)
@@ -221,7 +221,7 @@ where
                 if let Some(d) = D::from_enum_ref(derived) {
                     return Ok(d);
                 }
-                if let Some(d) = derived_cells.find_map(D::from_enum_ref) {
+                if let Some(d) = derived_cells.iter().find_map(D::from_enum_ref) {
                     return Ok(d);
                 }
                 let base = base_cell.get_or_try_init(|| derived.as_ref().to_base())?;
@@ -282,7 +282,8 @@ where
                 derived_cells,
             } => {
                 let new_derived = derived_cells
-                    .remove_map(|d| D::from_enum(d))
+                    .remove(|d| D::from_enum_ref(d).is_some())
+                    .map(|d| unsafe { D::from_enum(d).unwrap_unchecked() })
                     .map(Result::<_, E::Error>::Ok)
                     .unwrap_or_else(|| Ok(D::from_base(base)?))?;
                 *self = BaseAndDerived::StartFromDerived {
