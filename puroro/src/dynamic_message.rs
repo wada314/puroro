@@ -15,7 +15,6 @@
 use crate::internal::deser::{
     deser_from_bufread, DeserMessageHandlerBase, DeserMessageHandlerForRead,
 };
-use crate::internal::utils::{BaseAndDerived, Derived, EnumOfDeriveds, EnumVariant};
 use crate::internal::WireType;
 use crate::message::{Field, GFResult, Message, MessageMut};
 use crate::repeated::RepeatedView;
@@ -26,31 +25,40 @@ use crate::variant::{
 use crate::{ErrorKind, Result};
 use ::allocator_api2::alloc::{Allocator, Global};
 use ::allocator_api2::vec::Vec;
-use ::derive_more::{Debug, TryUnwrap};
+use ::cached_pair::Pair;
+use ::derive_more::{Debug, Deref, DerefMut, TryUnwrap};
 use ::hashbrown::hash_map::{DefaultHashBuilder, Entry};
 use ::hashbrown::HashMap;
 use ::itertools::Either;
+use ::once_list2::OnceList;
 use ::ref_cast::RefCast;
-use ::std::convert::Infallible;
 use ::std::io::{BufRead, Read, Write};
+use ::std::sync::Once;
 
 #[derive(Default, Clone)]
 pub struct DynamicMessage<A: Allocator = Global> {
-    fields: HashMap<
-        i32,
-        BaseAndDerived<Vec<WireTypeAndPayload<A>, A>, FieldCustomView<A>, A>,
-        DefaultHashBuilder,
-        A,
-    >,
+    fields: HashMap<i32, DynamicField<A>, DefaultHashBuilder, A>,
     alloc: A,
 }
+
+#[repr(transparent)]
+#[derive(RefCast, Clone, Debug, Deref, DerefMut)]
+pub struct DynamicField<A: Allocator = Global>(
+    Pair<Vec<WireTypeAndPayload<A>, A>, OnceList1<FieldCustomView<A>, A>>,
+);
+
+#[repr(transparent)]
+#[derive(RefCast, Clone, Debug, Deref, DerefMut)]
+struct DynamicLenPayload<A: Allocator = Global>(
+    Pair<Vec<u8, A>, OnceList1<LenCustomPayloadView<A>, A>>,
+);
 
 #[derive(Clone, Debug)]
 pub enum WireTypeAndPayload<A: Allocator = Global> {
     Variant(Variant),
     I64([u8; 8]),
     I32([u8; 4]),
-    Len(BaseAndDerived<Vec<u8, A>, LenCustomPayloadView<A>, A>),
+    Len(DynamicLenPayload<A>),
 }
 impl<A: Allocator> WireTypeAndPayload<A> {
     pub(crate) fn wire_type(&self) -> WireType {
@@ -68,74 +76,11 @@ impl<A: Allocator> WireTypeAndPayload<A> {
 pub enum LenCustomPayloadView<A: Allocator = Global> {
     Message(DynamicMessage<A>),
 }
-impl<A: Allocator + Clone> EnumOfDeriveds<Vec<u8, A>> for LenCustomPayloadView<A> {
-    type ToBaseError = Infallible;
-    type FromBaseError = ErrorKind;
-    type Error = ErrorKind;
-    fn as_ref(
-        &self,
-    ) -> &dyn Derived<
-        Vec<u8, A>,
-        ToBaseError = Self::ToBaseError,
-        FromBaseError = Self::FromBaseError,
-    > {
-        match self {
-            Self::Message(msg) => msg,
-        }
-    }
-}
-impl<A: Allocator> EnumVariant<LenCustomPayloadView<A>> for DynamicMessage<A> {
-    fn from_enum(
-        e: LenCustomPayloadView<A>,
-    ) -> ::std::result::Result<Self, LenCustomPayloadView<A>> {
-        e.try_unwrap_message().map_err(|e| e.input)
-    }
-    fn into_enum(self) -> LenCustomPayloadView<A> {
-        LenCustomPayloadView::Message(self)
-    }
-    fn from_enum_ref(e: &LenCustomPayloadView<A>) -> Option<&Self> {
-        e.try_unwrap_message_ref().ok()
-    }
-    fn from_enum_mut(e: &mut LenCustomPayloadView<A>) -> Option<&mut Self> {
-        e.try_unwrap_message_mut().ok()
-    }
-}
-
 #[derive(Clone, Debug, TryUnwrap)]
 #[try_unwrap(ref, ref_mut)]
 pub enum FieldCustomView<A: Allocator = Global> {
-    #[debug("{:?}", _0.0)] // Ignore allocator
-    ScalarMessage((Option<DynamicMessage<A>>, A)),
-}
-impl<A: Allocator + Clone> EnumOfDeriveds<Vec<WireTypeAndPayload<A>, A>> for FieldCustomView<A> {
-    type ToBaseError = Infallible;
-    type FromBaseError = ErrorKind;
-    type Error = ErrorKind;
-    fn as_ref(
-        &self,
-    ) -> &dyn Derived<
-        Vec<WireTypeAndPayload<A>, A>,
-        ToBaseError = Self::ToBaseError,
-        FromBaseError = Self::FromBaseError,
-    > {
-        match self {
-            Self::ScalarMessage(msg) => msg,
-        }
-    }
-}
-impl<A: Allocator> EnumVariant<FieldCustomView<A>> for (Option<DynamicMessage<A>>, A) {
-    fn from_enum(e: FieldCustomView<A>) -> ::std::result::Result<Self, FieldCustomView<A>> {
-        e.try_unwrap_scalar_message().map_err(|e| e.input)
-    }
-    fn into_enum(self) -> FieldCustomView<A> {
-        FieldCustomView::ScalarMessage(self)
-    }
-    fn from_enum_ref(e: &FieldCustomView<A>) -> Option<&Self> {
-        e.try_unwrap_scalar_message_ref().ok()
-    }
-    fn from_enum_mut(e: &mut FieldCustomView<A>) -> Option<&mut Self> {
-        e.try_unwrap_scalar_message_mut().ok()
-    }
+    #[debug("{:?}", _0)] // Ignore allocator
+    ScalarMessage(Option<DynamicMessage<A>>),
 }
 
 impl DynamicMessage<Global> {
@@ -148,8 +93,7 @@ impl DynamicMessage<Global> {
 }
 impl<A: Allocator> DynamicMessage<A> {
     pub fn field(&self, number: i32) -> Option<&DynamicField<A>> {
-        let field_base = self.fields.get(&number)?;
-        Some(DynamicField::ref_cast(field_base))
+        self.fields.get(&number)
     }
 }
 impl<A: Allocator + Clone> DynamicMessage<A> {
@@ -161,27 +105,19 @@ impl<A: Allocator + Clone> DynamicMessage<A> {
     }
 
     pub fn field_mut(&mut self, number: i32) -> &mut DynamicField<A> {
-        let field_base = self.fields.entry(number).or_insert_with(|| {
-            BaseAndDerived::<_, _, A>::from_base(
-                Vec::new_in(self.alloc.clone()),
-                self.alloc.clone(),
-            )
-        });
-        DynamicField::ref_cast_mut(field_base)
+        self.fields
+            .entry(number)
+            .or_insert_with(|| DynamicField::default_in(self.alloc.clone()))
     }
 
     pub fn merge(&mut self, other: Self) {
-        for (number, other_field_base) in other.fields {
-            let other_payloads = other_field_base.take_base();
+        for (number, other_field) in other.fields {
             match self.fields.entry(number) {
                 Entry::Occupied(mut entry) => {
-                    entry.get_mut().as_base_mut().extend(other_payloads);
+                    todo!()
                 }
                 Entry::Vacant(entry) => {
-                    entry.insert(BaseAndDerived::from_base(
-                        other_payloads,
-                        self.alloc.clone(),
-                    ));
+                    todo!()
                 }
             }
         }
@@ -200,65 +136,6 @@ impl<A: Allocator> Debug for DynamicMessage<A> {
             ds.field(&format!("field{}", number), field_base);
         }
         ds.finish()
-    }
-}
-
-// Corresponds to a repeated message field.
-impl<A: Allocator + Clone> Derived<Vec<u8, A>> for DynamicMessage<A> {
-    type FromBaseError = ErrorKind;
-    type ToBaseError = Infallible;
-    fn from_base(base: &Vec<u8, A>) -> Result<Self>
-    where
-        Self: Sized,
-    {
-        let mut msg = DynamicMessage::new_in(base.allocator().clone());
-        msg.merge_from_bufread(base.as_slice())?;
-        Ok(msg)
-    }
-
-    fn to_base(&self) -> ::std::result::Result<Vec<u8, A>, Infallible> {
-        let mut buf = Vec::new_in(self.alloc.clone());
-        self.write_to_vec(&mut buf);
-        Ok(buf)
-    }
-}
-
-// Corresponds to a scalar message field -- A message can be consist of multiple LEN payloads.
-impl<A: Allocator + Clone> Derived<Vec<WireTypeAndPayload<A>, A>>
-    for (Option<DynamicMessage<A>>, A)
-{
-    type FromBaseError = ErrorKind;
-    type ToBaseError = Infallible;
-    fn from_base(base: &Vec<WireTypeAndPayload<A>, A>) -> Result<Self>
-    where
-        Self: Sized,
-    {
-        let mut msg_opt = None;
-        let allocator = base.allocator().clone();
-        for wire_and_payload in base {
-            let WireTypeAndPayload::Len(bytes_or_msg) = wire_and_payload else {
-                // found a non-message field. What is the expected behavior here?
-                return Err(ErrorKind::DynamicMessageFieldTypeError)?;
-            };
-            let msg = msg_opt.get_or_insert_with(|| DynamicMessage::new_in(allocator.clone()));
-            msg.merge_from_bufread(bytes_or_msg.as_base().as_slice())?;
-        }
-        Ok((msg_opt, allocator))
-    }
-
-    fn to_base(&self) -> ::std::result::Result<Vec<WireTypeAndPayload<A>, A>, Infallible> {
-        match self {
-            (Some(msg), alloc) => {
-                let mut buf = Vec::new_in(alloc.clone());
-                msg.write_to_vec(&mut buf);
-                let payload =
-                    WireTypeAndPayload::Len(BaseAndDerived::from_base(buf, alloc.clone()));
-                let mut vec = Vec::with_capacity_in(1, alloc.clone());
-                vec.push(payload);
-                Ok(vec)
-            }
-            (None, alloc) => Ok(Vec::new_in(alloc.clone())),
-        }
     }
 }
 
@@ -342,18 +219,6 @@ impl<A: Allocator + Clone, R: Read> DeserMessageHandlerForRead<R> for DynamicMes
                 alloc,
             )));
         Ok(len)
-    }
-}
-
-#[repr(transparent)]
-#[derive(RefCast)]
-pub struct DynamicField<A: Allocator = Global>(
-    BaseAndDerived<Vec<WireTypeAndPayload<A>, A>, FieldCustomView<A>, A>,
-);
-
-impl<A: Allocator> DynamicField<A> {
-    fn allocator(&self) -> &A {
-        self.0.allocator()
     }
 }
 
@@ -541,6 +406,10 @@ impl<A: Allocator + Clone> DynamicField<A> {
                 val, alloc,
             )));
     }
+
+    fn default_in(alloc: A) -> Self {
+        Self(Pair::from_left(Vec::new_in(alloc)))
+    }
 }
 
 impl<'a, A: Allocator> Field<'a> for Option<&'a DynamicField<A>> {
@@ -552,5 +421,44 @@ impl<'a, A: Allocator> Field<'a> for Option<&'a DynamicField<A>> {
     }
     fn as_repeated_variant(&self) -> GFResult<impl RepeatedView<Item = Variant>> {
         Ok(::std::iter::empty())
+    }
+}
+
+#[derive(Clone)]
+struct OnceList1<T, A: Allocator>(T, OnceList<T, A>);
+impl<T, A: Allocator> OnceList1<T, A> {
+    fn first(&self) -> &T {
+        &self.0
+    }
+}
+
+impl<T: ::std::fmt::Debug, A: Allocator> ::std::fmt::Debug for OnceList1<T, A> {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        f.debug_list()
+            .entry(&self.0)
+            .entries(self.1.iter())
+            .finish()
+    }
+}
+
+impl<A: Allocator + Clone> FieldCustomView<A> {
+    fn try_to_field(&self, alloc: &A) -> Result<Vec<WireTypeAndPayload<A>, A>> {
+        let encoded_bytes = match self {
+            FieldCustomView::ScalarMessage(Some(msg)) => {
+                let mut buf = Vec::new_in(A::clone(alloc));
+                msg.write_to_vec(&mut buf);
+                buf
+            }
+            FieldCustomView::ScalarMessage(None) => Vec::new_in(A::clone(alloc)),
+        };
+        let mut payload_vec = Vec::with_capacity_in(1, A::clone(alloc));
+        payload_vec.push(WireTypeAndPayload::Len(encoded_bytes.into()));
+        Ok(payload_vec)
+    }
+}
+
+impl<A: Allocator> From<Vec<u8, A>> for DynamicLenPayload<A> {
+    fn from(value: Vec<u8, A>) -> Self {
+        Self(Pair::from_left(value))
     }
 }
