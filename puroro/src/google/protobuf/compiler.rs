@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use ::std::alloc::{Allocator, Global};
+use ::allocator_api2::alloc::{Allocator, Global};
 
 use super::{DynamicMessageExt, FileDescriptorProtoTrait};
 use crate::dynamic_message::DynamicMessage;

@@ -14,7 +14,8 @@
 
 //! A [::std::string::String] replacement which supports an allocator.
 
-use ::std::alloc::{Allocator, Global};
+use ::allocator_api2::alloc::{Allocator, Global};
+use ::allocator_api2::vec::Vec;
 use ::std::borrow::{Borrow, BorrowMut};
 use ::std::fmt::{Debug, Display, Formatter, Result as FmtResult};
 use ::std::ops::{Deref, DerefMut};
@@ -101,9 +102,9 @@ impl<A: Allocator> Debug for String<A> {
 
 impl From<::std::string::String> for String<Global> {
     fn from(s: ::std::string::String) -> Self {
-        Self {
-            vec: s.into_bytes(),
-        }
+        let (ptr, len, cap) = s.into_raw_parts();
+        let vec = unsafe { Vec::from_raw_parts(ptr, len, cap) };
+        Self { vec }
     }
 }
 impl From<String<Global>> for ::std::string::String {

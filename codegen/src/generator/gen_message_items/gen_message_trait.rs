@@ -127,7 +127,7 @@ impl GenTrait {
             .flatten_ok()
             .collect::<Result<Vec<_>>>()?;
         Ok(parse2(quote! {
-            pub trait #trait_name < #allocator_ident: ::std::alloc::Allocator >
+            pub trait #trait_name < #allocator_ident: ::allocator_api2::alloc::Allocator >
                 : #base_trait_path
             {
                 #(#methods;)*
