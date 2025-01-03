@@ -298,8 +298,7 @@ impl<A: Allocator + Clone> DynamicField<A> {
         allow_packed: bool,
     ) -> Result<impl '_ + Iterator<Item = Result<T::RustType>>> {
         Ok(self
-            .0
-            .as_base()
+            .as_payloads()
             .iter()
             .flat_map(move |record| match (allow_packed, record) {
                 (_, WireTypeAndPayload::Variant(variant)) => {
@@ -433,6 +432,9 @@ impl<T, A: Allocator> OnceList1<T, A> {
     fn first(&self) -> &T {
         &self.0
     }
+    fn allocator(&self) -> &A {
+        self.1.allocator()
+    }
 }
 
 impl<T: ::std::fmt::Debug, A: Allocator> ::std::fmt::Debug for OnceList1<T, A> {
@@ -445,15 +447,26 @@ impl<T: ::std::fmt::Debug, A: Allocator> ::std::fmt::Debug for OnceList1<T, A> {
 }
 
 impl<A: Allocator + Clone> DynamicField<A> {
-    fn as_payloads(&self, alloc: &A) -> &Vec<WireTypeAndPayload<A>, A> {
-        self.left_with(|f_list| f_list.first().to_field(alloc))
+    fn as_payloads(&self) -> &Vec<WireTypeAndPayload<A>, A> {
+        self.left_with(|f_list| f_list.first().to_field(self.allocator()))
     }
-    fn as_payloads_mut(&mut self, alloc: &A) -> &mut Vec<WireTypeAndPayload<A>, A> {
-        self.left_mut_with(|f_list| f_list.first().to_field(alloc))
+    fn as_payloads_mut(&mut self) -> &mut Vec<WireTypeAndPayload<A>, A> {
+        let alloc = A::clone(self.allocator());
+        self.left_mut_with(|f_list| f_list.first().to_field(&alloc))
     }
-    fn into_payloads(self, alloc: &A) -> Vec<WireTypeAndPayload<A>, A> {
+    fn into_payloads(self) -> Vec<WireTypeAndPayload<A>, A> {
+        let alloc = A::clone(self.allocator());
         self.0
-            .into_left_with(|f_list| f_list.first().to_field(alloc))
+            .into_left_with(|f_list| f_list.first().to_field(&alloc))
+    }
+}
+impl<A: Allocator> DynamicField<A> {
+    fn allocator(&self) -> &A {
+        let as_ref = self.0.as_ref();
+        match as_ref {
+            EitherOrBoth::Left(vec) | EitherOrBoth::Both(vec, _) => vec.allocator(),
+            EitherOrBoth::Right(list) => list.allocator(),
+        }
     }
 }
 
