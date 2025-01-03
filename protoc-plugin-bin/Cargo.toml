@@ -6,8 +6,8 @@ description = "An internal crate for protoc-plugin-by-closure crate."
 license = "Apache-2.0"
 
 [dependencies]
-anyhow = "1.0.83"
-ipc-channel = "0.18.0"
+anyhow = "1.0.95"
+ipc-channel = "0.18.3"
 
 [[bin]]
 name = "protoc-plugin-bin"

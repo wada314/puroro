@@ -4,13 +4,13 @@ version = "0.15.0"
 edition = "2021"
 
 [dependencies]
-ipc-channel = "0.18.0"
+ipc-channel = "0.18.3"
 itertools = "0.12.1"
-prettyplease = "0.2.19"
-proc-macro2 = "1.0.81"
+prettyplease = "0.2.25"
+proc-macro2 = "1.0.92"
 puroro = { path = "../puroro" }
-quote = "1.0.36"
-syn = "2.0.60"
-thiserror = "1.0.60"
+quote = "1.0.38"
+syn = "2.0.94"
+thiserror = "1.0.69"
 
 [lib]

@@ -18,20 +18,20 @@ name = "variant"
 harness = false
 
 [dependencies]
-once-list2 = "0.3.0"
+once-list2 = "0.3.1"
 cached-pair = "0.6.0"
 derive_more = { version = "1.0.0", features = ["full"] }
-futures = "0.3.30"
+futures = "0.3.31"
 hashbrown = { version = "0.14.5", features = [] }
 itertools = "0.12.1"
-once_cell = "1.19.0"
+once_cell = "1.20.2"
 ref-cast = "1.0.23"
 replace_with = "0.1.7"
 thiserror = "1.0"
 allocator-api2 = "0.2.21"
 
 [dev-dependencies]
-rand = "0.8.3"
+rand = "0.8.5"
 rand_pcg = "0.3.1"
 rand_distr = "0.4.3"
 criterion = { version = "0.5.1", features = ["html_reports"] }

@@ -7,7 +7,7 @@ edition = "2021"
 
 
 [build-dependencies]
-anyhow = "1.0.85"
+anyhow = "1.0.95"
 itertools = "0.12.1"
 protoc-plugin-by-closure = { path = "../protoc-plugin-by-closure" }
 puroro-codegen = { path = "../codegen" }
