@@ -15,6 +15,7 @@
 use crate::internal::deser::{
     deser_from_bufread, DeserMessageHandlerBase, DeserMessageHandlerForRead,
 };
+use crate::internal::utils::{OnceList1, PairWithOnceList1Ext};
 use crate::internal::WireType;
 use crate::message::{Field, GFResult, Message, MessageMut};
 use crate::repeated::RepeatedView;
@@ -30,10 +31,8 @@ use ::derive_more::{Debug, Deref, DerefMut, TryUnwrap};
 use ::hashbrown::hash_map::{DefaultHashBuilder, Entry};
 use ::hashbrown::HashMap;
 use ::itertools::Either;
-use ::once_list2::OnceList;
 use ::ref_cast::RefCast;
 use ::std::io::{BufRead, Read, Write};
-use ::std::iter;
 
 #[derive(Default, Clone)]
 pub struct DynamicMessage<A: Allocator = Global> {
@@ -425,37 +424,6 @@ impl<'a, A: Allocator> Field<'a> for Option<&'a DynamicField<A>> {
     }
 }
 
-#[derive(Clone)]
-struct OnceList1<T, A: Allocator>(T, OnceList<T, A>);
-impl<T, A: Allocator> OnceList1<T, A> {
-    fn new_in(first: T, alloc: A) -> Self {
-        Self(first, OnceList::new_in(alloc))
-    }
-    fn first(&self) -> &T {
-        &self.0
-    }
-    fn iter(&self) -> impl Iterator<Item = &T> {
-        iter::once(&self.0).chain(self.1.iter())
-    }
-    fn allocator(&self) -> &A {
-        self.1.allocator()
-    }
-}
-impl<T, A: Allocator + Clone> OnceList1<T, A> {
-    fn push(&self, value: T) -> &T {
-        self.1.push(value)
-    }
-}
-
-impl<T: ::std::fmt::Debug, A: Allocator> ::std::fmt::Debug for OnceList1<T, A> {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        f.debug_list()
-            .entry(&self.0)
-            .entries(self.1.iter())
-            .finish()
-    }
-}
-
 impl<A: Allocator + Clone> DynamicField<A> {
     fn as_payloads(&self) -> &Vec<WireTypeAndPayload<A>, A> {
         self.left_with(|f_list| f_list.first().to_field(self.allocator()))
@@ -468,21 +436,6 @@ impl<A: Allocator + Clone> DynamicField<A> {
         let alloc = A::clone(self.allocator());
         self.0
             .into_left_with(|f_list| f_list.first().to_field(&alloc))
-    }
-
-    fn as_scalar_message(&self) -> &Option<DynamicMessage<A>> {
-        // Search for a cached scalar message view.
-        if let Some(custom_views) = self.right_opt() {
-            if let Some(view) = custom_views
-                .iter()
-                .find_map(|e| e.try_unwrap_scalar_message_ref().ok())
-            {
-                return view;
-            }
-        }
-        // No cached scalar message view found.
-
-        todo!()
     }
 }
 impl<A: Allocator> DynamicField<A> {
@@ -546,31 +499,18 @@ impl<A: Allocator + Clone> DynamicLenPayload<A> {
     }
 
     fn try_as_message(&self) -> Result<&DynamicMessage<A>> {
-        // Search for a cached message view.
-        if let Some(custom_views) = self.right_opt() {
-            if let Some(view) = custom_views
-                .iter()
-                .find_map(|e| e.try_unwrap_message_ref().ok())
-            {
-                return Ok(view);
-            }
-        }
-        // No cached message view found.
-        let mut message = DynamicMessage::new_in(self.allocator().clone());
-        message.merge_from_read(self.as_buf().as_slice())?;
-        let mut message_opt = Some(message);
-        let custom_payloads = self.right_with(|_| {
-            OnceList1::new_in(
-                LenCustomPayloadView::Message(message_opt.take().unwrap()),
-                self.allocator().clone(),
-            )
-        });
-        let custom_payload = if let Some(message) = message_opt {
-            custom_payloads.push(LenCustomPayloadView::Message(message))
-        } else {
-            custom_payloads.first()
-        };
-        Ok(custom_payload.try_unwrap_message_ref().unwrap())
+        Ok(self
+            .try_get_or_insert_into_right(
+                |lcpv| lcpv.try_unwrap_message_ref().is_ok(),
+                || {
+                    let mut message = DynamicMessage::new_in(self.allocator().clone());
+                    message.merge_from_read(self.as_buf().as_slice())?;
+                    LenCustomPayloadView::Message(message)
+                },
+                self.allocator(),
+            )?
+            .try_unwrap_message_ref()
+            .unwrap())
     }
 }
 impl<A: Allocator> DynamicLenPayload<A> {
