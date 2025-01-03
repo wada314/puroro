@@ -25,7 +25,7 @@ use crate::variant::{
 use crate::{ErrorKind, Result};
 use ::allocator_api2::alloc::{Allocator, Global};
 use ::allocator_api2::vec::Vec;
-use ::cached_pair::Pair;
+use ::cached_pair::{EitherOrBoth, Pair};
 use ::derive_more::{Debug, Deref, DerefMut, TryUnwrap};
 use ::hashbrown::hash_map::{DefaultHashBuilder, Entry};
 use ::hashbrown::HashMap;
@@ -110,12 +110,11 @@ impl<A: Allocator + Clone> DynamicMessage<A> {
     }
 
     pub fn merge(&mut self, other: Self) {
-        let alloc = &self.alloc;
         for (number, other_field) in other.fields {
             match self.fields.entry(number) {
                 Entry::Occupied(mut entry) => {
-                    let payloads = entry.get_mut().as_payloads_mut(alloc);
-                    payloads.extend(other_field.into_payloads(alloc).into_iter());
+                    let payloads = entry.get_mut().as_payloads_mut();
+                    payloads.extend(other_field.into_payloads().into_iter());
                 }
                 Entry::Vacant(entry) => {
                     entry.insert(other_field);
@@ -143,9 +142,8 @@ impl<A: Allocator> Debug for DynamicMessage<A> {
 impl<A: Allocator + Clone> Message for DynamicMessage<A> {
     fn write<W: Write>(&self, mut write: W) -> Result<usize> {
         let mut total_bytes = 0;
-        let alloc = &self.alloc;
         for (number, field) in &self.fields {
-            for wire_and_payload in field.as_payloads(alloc) {
+            for wire_and_payload in field.as_payloads() {
                 let tag = (TryInto::<u32>::try_into(*number)? << 3)
                     | Into::<u32>::into(wire_and_payload.wire_type());
                 total_bytes += write.write_variant(UInt32::into_variant(tag))?;
@@ -160,7 +158,7 @@ impl<A: Allocator + Clone> Message for DynamicMessage<A> {
                         8usize
                     }
                     WireTypeAndPayload::Len(len_payload) => {
-                        let bytes = len_payload.as_buf(alloc);
+                        let bytes = len_payload.as_buf();
                         let len = bytes.len();
                         write.write_variant(Variant::from::<Int32>(len.try_into()?))?;
                         write.write_all(bytes)?;
@@ -219,7 +217,7 @@ impl<A: Allocator + Clone, R: Read> DeserMessageHandlerForRead<R> for DynamicMes
             (buf, len)
         };
         self.field_mut(num)
-            .as_payloads_mut(&alloc)
+            .as_payloads_mut()
             .push(WireTypeAndPayload::Len(DynamicLenPayload::from_buf(buf)));
         Ok(len)
     }
@@ -304,8 +302,8 @@ impl<A: Allocator + Clone> DynamicField<A> {
                 (_, WireTypeAndPayload::Variant(variant)) => {
                     Either::Left(Some(Ok(variant.clone())).into_iter())
                 }
-                (true, WireTypeAndPayload::Len(bytes_or_msg)) => {
-                    Either::Right(bytes_or_msg.as_buf().into_variant_iter())
+                (true, WireTypeAndPayload::Len(dyn_len_payload)) => {
+                    Either::Right(dyn_len_payload.as_buf().into_variant_iter())
                 }
                 _ => Either::Left(Some(Err(ErrorKind::DynamicMessageFieldTypeError)).into_iter()),
             })
@@ -315,7 +313,7 @@ impl<A: Allocator + Clone> DynamicField<A> {
         self.try_as_repeated_i32()?.last().transpose()
     }
     pub fn try_as_repeated_i32(&self) -> Result<impl '_ + Iterator<Item = Result<[u8; 4]>>> {
-        Ok(self.0.as_base().iter().map(|record| match record {
+        Ok(self.as_payloads().iter().map(|record| match record {
             WireTypeAndPayload::I32(buf) => Ok(*buf),
             _ => Err(ErrorKind::DynamicMessageFieldTypeError),
         }))
@@ -324,7 +322,7 @@ impl<A: Allocator + Clone> DynamicField<A> {
         self.try_as_repeated_i64()?.last().transpose()
     }
     pub fn try_as_repeated_i64(&self) -> Result<impl '_ + Iterator<Item = Result<[u8; 8]>>> {
-        Ok(self.0.as_base().iter().map(|record| match record {
+        Ok(self.as_payloads().iter().map(|record| match record {
             WireTypeAndPayload::I64(buf) => Ok(*buf),
             _ => Err(ErrorKind::DynamicMessageFieldTypeError),
         }))
@@ -333,7 +331,7 @@ impl<A: Allocator + Clone> DynamicField<A> {
         self.try_as_repeated_string()?.last().transpose()
     }
     pub fn try_as_repeated_string(&self) -> Result<impl '_ + Iterator<Item = Result<&str>>> {
-        Ok(self.0.as_base().iter().map(|record| match record {
+        Ok(self.as_payloads().iter().map(|record| match record {
             WireTypeAndPayload::Len(bytes_or_msg) => {
                 Ok(::std::str::from_utf8(bytes_or_msg.as_buf())?)
             }
@@ -344,7 +342,7 @@ impl<A: Allocator + Clone> DynamicField<A> {
         self.try_as_repeated_bytes()?.last().transpose()
     }
     pub fn try_as_repeated_bytes(&self) -> Result<impl '_ + Iterator<Item = Result<&[u8]>>> {
-        Ok(self.0.as_base().iter().map(|record| match record {
+        Ok(self.as_payloads().iter().map(|record| match record {
             WireTypeAndPayload::Len(bytes_or_msg) => Ok(bytes_or_msg.as_buf().as_slice()),
             _ => Err(ErrorKind::DynamicMessageFieldTypeError),
         }))
@@ -356,7 +354,7 @@ impl<A: Allocator + Clone> DynamicField<A> {
     pub fn try_as_repeated_message(
         &self,
     ) -> Result<impl Iterator<Item = Result<&DynamicMessage<A>>>> {
-        Ok(self.0.as_base().iter().map(|wire_and_payload| {
+        Ok(self.as_payloads().iter().map(|wire_and_payload| {
             let WireTypeAndPayload::Len(bytes_or_msg) = wire_and_payload else {
                 Err(ErrorKind::DynamicMessageFieldTypeError)?
             };
@@ -490,11 +488,21 @@ impl<A: Allocator + Clone> DynamicLenPayload<A> {
     fn from_buf(buf: Vec<u8, A>) -> Self {
         Self(Pair::from_left(buf))
     }
-    fn as_buf(&self, alloc: &A) -> &Vec<u8, A> {
+    fn as_buf(&self) -> &Vec<u8, A> {
+        let alloc = self.allocator();
         self.0.left_with(|p_list| p_list.first().to_buf(alloc))
     }
     fn as_buf_mut(&mut self, alloc: &A) -> &mut Vec<u8, A> {
-        self.0.left_mut_with(|p_list| p_list.first().to_buf(alloc))
+        let alloc = A::clone(alloc);
+        self.0.left_mut_with(|p_list| p_list.first().to_buf(&alloc))
+    }
+}
+impl<A: Allocator> DynamicLenPayload<A> {
+    fn allocator(&self) -> &A {
+        match self.0.as_ref() {
+            EitherOrBoth::Left(vec) | EitherOrBoth::Both(vec, _) => vec.allocator(),
+            EitherOrBoth::Right(list) => list.allocator(),
+        }
     }
 }
 
