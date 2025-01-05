@@ -348,8 +348,15 @@ impl<A: Allocator + Clone> DynamicField<A> {
         }))
     }
     pub fn try_as_scalar_message(&self) -> Result<Option<&DynamicMessage<A>>> {
-        let (opt_msg, _) = self.0.try_as_derived::<(Option<DynamicMessage<A>>, A)>()?;
-        Ok(opt_msg.as_ref())
+        let field_custom_view = self.0.try_get_or_insert_into_right(
+            |v| v.try_unwrap_scalar_message_ref().is_ok(),
+            || FieldCustomView::try_scalar_message_from_payloads(self.as_payloads().into_iter()),
+            self.allocator(),
+        )?;
+        Ok(field_custom_view
+            .try_unwrap_scalar_message_ref()
+            .unwrap()
+            .as_ref())
     }
     pub fn try_as_repeated_message(
         &self,
@@ -471,15 +478,12 @@ impl<A: Allocator + Clone> FieldCustomView<A> {
     {
         let mut msg = None;
         while let Some(payload) = iter.next() {
-            match payload {
-                WireTypeAndPayload::Len(dyn_payload) => {
-                    let msg_mut = msg.get_or_insert_with(|| {
-                        DynamicMessage::new_in(dyn_payload.allocator().clone())
-                    });
-                    msg_mut.merge(dyn_payload.try_as_message()?.clone());
-                }
-                _ => panic!(),
-            }
+            let WireTypeAndPayload::Len(dyn_payload) = payload else {
+                return Err(ErrorKind::DynamicMessageFieldTypeError);
+            };
+            let msg_mut =
+                msg.get_or_insert_with(|| DynamicMessage::new_in(dyn_payload.allocator().clone()));
+            msg_mut.merge(dyn_payload.try_as_message()?.clone());
         }
         Ok(FieldCustomView::ScalarMessage(msg))
     }
