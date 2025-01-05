@@ -404,8 +404,8 @@ impl<A: Allocator + Clone> DynamicField<A> {
     pub fn push_message(&mut self, val: DynamicMessage<A>) {
         let alloc = self.allocator().clone();
         self.as_payloads_mut()
-            .push(WireTypeAndPayload::Len(BaseAndDerived::from_derived(
-                val, alloc,
+            .push(WireTypeAndPayload::Len(DynamicLenPayload::from_message(
+                val, &alloc,
             )));
     }
 
@@ -488,6 +488,13 @@ impl<A: Allocator + Clone> DynamicLenPayload<A> {
     fn from_buf(buf: Vec<u8, A>) -> Self {
         Self(Pair::from_left(buf))
     }
+    fn from_message(msg: DynamicMessage<A>, alloc: &A) -> Self {
+        Self(Pair::from_right(OnceList1::new_in(
+            LenCustomPayloadView::Message(msg),
+            alloc.clone(),
+        )))
+    }
+
     fn as_buf(&self) -> &Vec<u8, A> {
         let alloc = self.allocator();
         self.0.left_with(|p_list| p_list.first().to_buf(alloc))
