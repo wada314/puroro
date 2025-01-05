@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use ::allocator_api2::alloc::Allocator;
-
+use ::allocator_api2::vec::Vec;
 use ::derive_more::{Debug, Deref, DerefMut, Display};
 
 pub trait IsEmpty {
@@ -51,7 +51,7 @@ impl<A: Allocator> IsEmpty for crate::string::String<A> {
         self.is_empty()
     }
 }
-impl<A: Allocator> IsEmpty for ::std::vec::Vec<u8, A> {
+impl<A: Allocator> IsEmpty for Vec<u8, A> {
     fn is_empty(&self) -> bool {
         self.is_empty()
     }
