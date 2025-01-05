@@ -505,7 +505,7 @@ impl<A: Allocator + Clone> DynamicLenPayload<A> {
                 || {
                     let mut message = DynamicMessage::new_in(self.allocator().clone());
                     message.merge_from_read(self.as_buf().as_slice())?;
-                    LenCustomPayloadView::Message(message)
+                    Ok(LenCustomPayloadView::Message(message))
                 },
                 self.allocator(),
             )?

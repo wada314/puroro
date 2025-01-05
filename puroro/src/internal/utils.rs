@@ -50,7 +50,7 @@ impl<T: ::std::fmt::Debug, A: Allocator> ::std::fmt::Debug for OnceList1<T, A> {
 }
 
 pub trait PairWithOnceList1Ext<L, T, A> {
-    fn try_get_or_insert_into_right<F: Fn(&T) -> bool, G: FnOnce() -> T>(
+    fn try_get_or_insert_into_right<F: Fn(&T) -> bool, G: FnOnce() -> Result<T>>(
         &self,
         pred: F,
         default: G,
@@ -58,7 +58,7 @@ pub trait PairWithOnceList1Ext<L, T, A> {
     ) -> Result<&T>;
 }
 impl<L, T, A: Allocator + Clone> PairWithOnceList1Ext<L, T, A> for Pair<L, OnceList1<T, A>> {
-    fn try_get_or_insert_into_right<F: Fn(&T) -> bool, G: FnOnce() -> T>(
+    fn try_get_or_insert_into_right<F: Fn(&T) -> bool, G: FnOnce() -> Result<T>>(
         &self,
         pred: F,
         default: G,
@@ -71,7 +71,7 @@ impl<L, T, A: Allocator + Clone> PairWithOnceList1Ext<L, T, A> for Pair<L, OnceL
             }
         }
         // No cached value found. We need to create a new value.
-        let mut value_opt = Some(default());
+        let mut value_opt = Some(default()?);
         let list_ref =
             self.right_with(|_| OnceList1::new_in(value_opt.take().unwrap(), A::clone(&alloc)));
         Ok(if let Some(value) = value_opt {
