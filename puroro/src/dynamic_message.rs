@@ -109,8 +109,8 @@ impl<A: Allocator + Clone> DynamicMessage<A> {
             .or_insert_with(|| DynamicField::default_in(self.alloc.clone()))
     }
 
-    pub fn merge(&mut self, other: Self) {
-        for (number, other_field) in other.fields {
+    pub fn merge(&mut self, other: DynamicMessage<A>) {
+        for (number, other_field) in other.to_owned().fields {
             match self.fields.entry(number) {
                 Entry::Occupied(mut entry) => {
                     let payloads = entry.get_mut().as_payloads_mut();
@@ -463,9 +463,9 @@ impl<A: Allocator + Clone> FieldCustomView<A> {
         payload_vec
     }
 
-    fn scalar_message_from_payloads<'a>(
+    fn try_scalar_message_from_payloads<'a>(
         mut iter: impl Iterator<Item = &'a WireTypeAndPayload<A>>,
-    ) -> Self
+    ) -> Result<Self>
     where
         A: 'a,
     {
@@ -474,14 +474,14 @@ impl<A: Allocator + Clone> FieldCustomView<A> {
             match payload {
                 WireTypeAndPayload::Len(dyn_payload) => {
                     let msg_mut = msg.get_or_insert_with(|| {
-                        DynamicMessage::new_in(A::clone(dyn_payload.allocator()))
+                        DynamicMessage::new_in(dyn_payload.allocator().clone())
                     });
-                    msg_mut.merge(todo!());
+                    msg_mut.merge(dyn_payload.try_as_message()?);
                 }
                 _ => panic!(),
             }
         }
-        FieldCustomView::ScalarMessage(msg)
+        Ok(FieldCustomView::ScalarMessage(msg))
     }
 }
 
