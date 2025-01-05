@@ -362,53 +362,48 @@ impl<A: Allocator + Clone> DynamicField<A> {
         &self,
     ) -> Result<impl Iterator<Item = Result<&DynamicMessage<A>>>> {
         Ok(self.as_payloads().iter().map(|wire_and_payload| {
-            let WireTypeAndPayload::Len(bytes_or_msg) = wire_and_payload else {
+            let WireTypeAndPayload::Len(dyn_len_payload) = wire_and_payload else {
                 Err(ErrorKind::DynamicMessageFieldTypeError)?
             };
-            Ok(bytes_or_msg.try_as_derived()?)
+            Ok(dyn_len_payload.try_as_message()?)
         }))
     }
 
     pub fn clear(&mut self) {
-        self.0.as_base_mut().clear();
+        self.as_payloads_mut().clear();
     }
 
     pub fn push_variant(&mut self, val: Variant) {
-        self.0.as_base_mut().push(WireTypeAndPayload::Variant(val));
+        self.as_payloads_mut()
+            .push(WireTypeAndPayload::Variant(val));
     }
     pub fn push_variant_from<T: VariantIntegerType>(&mut self, val: T::RustType) {
-        self.0
-            .as_base_mut()
+        self.as_payloads_mut()
             .push(WireTypeAndPayload::Variant(Variant::from::<T>(val)));
     }
     pub fn push_i32(&mut self, val: [u8; 4]) {
-        self.0.as_base_mut().push(WireTypeAndPayload::I32(val));
+        self.as_payloads_mut().push(WireTypeAndPayload::I32(val));
     }
     pub fn push_i64(&mut self, val: [u8; 8]) {
-        self.0.as_base_mut().push(WireTypeAndPayload::I64(val));
+        self.as_payloads_mut().push(WireTypeAndPayload::I64(val));
     }
     pub fn push_string(&mut self, val: &str) {
         let alloc = self.allocator().clone();
-        self.0
-            .as_base_mut()
-            .push(WireTypeAndPayload::Len(BaseAndDerived::from_base(
-                val.as_bytes().to_vec_in(alloc.clone()),
-                alloc.clone(),
-            )));
+        let mut buf = Vec::with_capacity_in(val.len(), alloc);
+        buf.extend_from_slice(val.as_bytes());
+        self.as_payloads_mut()
+            .push(WireTypeAndPayload::Len(DynamicLenPayload::from_buf(buf)));
     }
     pub fn push_bytes(&mut self, val: &[u8]) {
         let alloc = self.allocator().clone();
-        self.0
-            .as_base_mut()
-            .push(WireTypeAndPayload::Len(BaseAndDerived::from_base(
-                val.to_vec_in(alloc.clone()),
-                alloc.clone(),
-            )));
+        let mut buf = Vec::with_capacity_in(val.len(), alloc);
+        buf.extend_from_slice(val);
+        self.as_payloads_mut()
+            .push(WireTypeAndPayload::Len(DynamicLenPayload::from_buf(buf)));
     }
     pub fn push_message(&mut self, val: DynamicMessage<A>) {
         let alloc = self.allocator().clone();
-        self.0
-            .as_base_mut()
+        self.as_payloads_mut()
             .push(WireTypeAndPayload::Len(BaseAndDerived::from_derived(
                 val, alloc,
             )));
