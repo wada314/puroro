@@ -110,7 +110,7 @@ impl<A: Allocator + Clone> DynamicMessage<A> {
     }
 
     pub fn merge(&mut self, other: DynamicMessage<A>) {
-        for (number, other_field) in other.to_owned().fields {
+        for (number, other_field) in other.fields {
             match self.fields.entry(number) {
                 Entry::Occupied(mut entry) => {
                     let payloads = entry.get_mut().as_payloads_mut();
@@ -476,7 +476,7 @@ impl<A: Allocator + Clone> FieldCustomView<A> {
                     let msg_mut = msg.get_or_insert_with(|| {
                         DynamicMessage::new_in(dyn_payload.allocator().clone())
                     });
-                    msg_mut.merge(dyn_payload.try_as_message()?);
+                    msg_mut.merge(dyn_payload.try_as_message()?.clone());
                 }
                 _ => panic!(),
             }
