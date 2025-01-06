@@ -9,8 +9,8 @@ license = "Apache-2.0"
 doctest = false
 
 [dependencies]
-ipc-channel = "0.18.3"
-thiserror = "1.0.69"
+ipc-channel = "0.19.0"
+thiserror = "2.0.9"
 protoc-plugin-bin = { path = "../protoc-plugin-bin", version = "0.1.0", artifact = "bin:protoc-plugin-bin" }
 wait-timeout = "0.2.0"
 tempfile = { version = "3.15.0", optional = true }

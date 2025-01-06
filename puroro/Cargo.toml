@@ -22,12 +22,12 @@ once-list2 = "0.3.1"
 cached-pair = "0.6.0"
 derive_more = { version = "1.0.0", features = ["full"] }
 futures = "0.3.31"
-hashbrown = { version = "0.14.5", features = [] }
-itertools = "0.12.1"
+hashbrown = { version = "0.15.2", features = [] }
+itertools = "0.14.0"
 once_cell = "1.20.2"
 ref-cast = "1.0.23"
 replace_with = "0.1.7"
-thiserror = "1.0"
+thiserror = "2.0"
 allocator-api2 = "0.2.21"
 
 [dev-dependencies]

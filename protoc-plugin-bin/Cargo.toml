@@ -7,7 +7,7 @@ license = "Apache-2.0"
 
 [dependencies]
 anyhow = "1.0.95"
-ipc-channel = "0.18.3"
+ipc-channel = "0.19.0"
 
 [[bin]]
 name = "protoc-plugin-bin"
