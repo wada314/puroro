@@ -28,7 +28,7 @@ pub type GFResult<T> = ::std::result::Result<T, GetFieldErrorKind>;
 /// Protobuf message, which can be serialized and field accessible.
 pub trait Message {
     fn write<W: Write>(&self, write: W) -> Result<usize>;
-    fn field(&self, number: i32) -> impl Field;
+    // fn field(&self, number: i32) -> impl Field;
 }
 pub trait Field<'a> {
     fn has_field(&self) -> GFResult<bool>;

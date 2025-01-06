@@ -48,7 +48,7 @@ pub struct DynamicField<A: Allocator = Global>(
 
 #[repr(transparent)]
 #[derive(RefCast, Clone, Debug, Deref, DerefMut)]
-struct DynamicLenPayload<A: Allocator = Global>(
+pub struct DynamicLenPayload<A: Allocator = Global>(
     Pair<Vec<u8, A>, OnceList1<LenCustomPayloadView<A>, A>>,
 );
 
@@ -170,9 +170,9 @@ impl<A: Allocator + Clone> Message for DynamicMessage<A> {
         Ok(total_bytes)
     }
 
-    fn field(&self, number: i32) -> impl Field {
-        <DynamicMessage<_>>::field(self, number)
-    }
+    // fn field(&self, number: i32) -> impl Field {
+    //     <DynamicMessage<_>>::field(self, number)
+    // }
 }
 impl<A: Allocator + Clone> MessageMut<A> for DynamicMessage<A> {
     fn merge_from_bufread<R: BufRead>(&mut self, read: R) -> Result<()> {
