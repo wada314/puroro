@@ -1,9 +1,15 @@
 [package]
 name = "tests"
-version = "0.1.0"
-edition = "2021"
+version = "0.14.1"
+authors = ["Shohei Wada <pc@wada314.jp>"]
+edition = "2018"
+publish = false
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+puroro = { path = "../puroro" }
+itertools = "0.14"
 
 
 [build-dependencies]
@@ -11,6 +17,7 @@ anyhow = "1.0.95"
 itertools = "0.14.0"
 protoc-plugin-by-closure = { path = "../protoc-plugin-by-closure" }
 puroro-codegen = { path = "../codegen" }
+protoc-bin-vendored = "3.1.0"
 
 [dev-dependencies]
 puroro = { path = "../puroro" }

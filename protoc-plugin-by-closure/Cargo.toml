@@ -1,9 +1,10 @@
 [package]
 name = "protoc-plugin-by-closure"
-version = "0.1.2"
+version = "0.1.4"
 edition = "2021"
 description = "Use Google Protocol Buffer compiler (`protoc`) with your closure code."
 license = "Apache-2.0"
+repository = "https://github.com/wada314/puroro"
 
 [lib]
 doctest = false
@@ -11,7 +12,7 @@ doctest = false
 [dependencies]
 ipc-channel = "0.19.0"
 thiserror = "2.0.9"
-protoc-plugin-bin = { path = "../protoc-plugin-bin", version = "0.1.0", artifact = "bin:protoc-plugin-bin" }
+protoc-plugin-bin = { path = "../protoc-plugin-bin", version = "0.1.1", artifact = "bin:protoc-plugin-bin" }
 wait-timeout = "0.2.0"
 tempfile = { version = "3.15.0", optional = true }
 
@@ -22,3 +23,6 @@ puroro = "0.14.0"
 [features]
 default = ["on-memory"]
 on-memory = ["tempfile"]
+
+[package.metadata.docs.rs]
+cargo-args = ["-Z", "build-std", "-Z", "bindeps"]
