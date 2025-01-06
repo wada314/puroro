@@ -9,14 +9,14 @@ publish = false
 
 [dependencies]
 puroro = { path = "../puroro" }
-itertools = "0.10"
+itertools = "0.14"
 
 [dev-dependencies]
 puroro-inline = { path = "../inline" }
 
 [build-dependencies]
 puroro-codegen = { path = "../codegen" }
-protoc-bin-vendored = "3.0.0"
+protoc-bin-vendored = "3.1.0"
 
 [features]
 default = []

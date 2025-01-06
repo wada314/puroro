@@ -11,11 +11,11 @@ proc-macro = true
 
 [dependencies]
 puroro-codegen = { path = "../codegen" }
-litrs = "0.3.0"
+litrs = "0.4.1"
 quote = "1.0"
 proc-macro2 = { version = "1.0", features = ["span-locations"] }
 tempdir = "0.3"
-protoc-bin-vendored = "3.0.0"
+protoc-bin-vendored = "3.1.0"
 
 [features]
 default = []
