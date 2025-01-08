@@ -1,6 +1,6 @@
 [package]
 name = "protoc-plugin-by-closure"
-version = "0.1.4"
+version = "0.1.5"
 edition = "2021"
 description = "Use Google Protocol Buffer compiler (`protoc`) with your closure code."
 license = "Apache-2.0"
@@ -25,4 +25,4 @@ default = ["on-memory"]
 on-memory = ["tempfile"]
 
 [package.metadata.docs.rs]
-cargo-args = ["-Z", "build-std", "-Z", "bindeps"]
+cargo-args = ["-Z", "bindeps"]
