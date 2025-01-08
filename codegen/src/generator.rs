@@ -61,6 +61,7 @@ impl CodeGeneratorOptions {
             Ok(vec![
                 parse2(quote! { #[allow(unused)] use ::std::ops::Deref; })?,
                 parse2(quote! { #[allow(unused)] use ::std::ops::DerefMut; })?,
+                parse2(quote! { #[allow(unused)] use ::allocator_api2::vec::Vec; })?,
             ])
         } else {
             Ok(vec![])
@@ -79,11 +80,13 @@ impl CodeGeneratorOptions {
         } else {
             quote! { #elem_type }
         };
-        Ok(parse2(if self.strict_type_path {
-            quote! { ::std::vec::Vec<#generic_params> }
-        } else {
-            quote! { Vec<#generic_params> }
-        })?)
+        Ok(parse2(
+            if self.allow_import_common_types && !self.strict_type_path {
+                quote! { Vec<#generic_params> }
+            } else {
+                quote! { ::allocator_api2::vec::Vec<#generic_params> }
+            },
+        )?)
     }
     pub fn option_type(&self, elem_type: &Type) -> Result<Type> {
         Ok(parse2(if self.strict_type_path {

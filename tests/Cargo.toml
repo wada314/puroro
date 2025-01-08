@@ -10,6 +10,7 @@ publish = false
 [dependencies]
 puroro = { path = "../puroro" }
 itertools = "0.14"
+allocator-api2 = "0.2.21"
 
 
 [build-dependencies]

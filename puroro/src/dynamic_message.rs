@@ -73,14 +73,14 @@ impl<A: Allocator> WireTypeAndPayload<A> {
 
 #[derive(Clone, Debug, TryUnwrap)]
 #[try_unwrap(ref, ref_mut)]
-pub enum LenCustomPayloadView<A: Allocator = Global> {
-    Message(DynamicMessage<A>),
+pub enum FieldCustomView<A: Allocator = Global> {
+    ScalarMessage(Option<DynamicMessage<A>>),
 }
+
 #[derive(Clone, Debug, TryUnwrap)]
 #[try_unwrap(ref, ref_mut)]
-pub enum FieldCustomView<A: Allocator = Global> {
-    #[debug("{:?}", _0)] // Ignore allocator
-    ScalarMessage(Option<DynamicMessage<A>>),
+pub enum LenCustomPayloadView<A: Allocator = Global> {
+    Message(DynamicMessage<A>),
 }
 
 impl DynamicMessage<Global> {
