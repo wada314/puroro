@@ -32,7 +32,6 @@ use ::hashbrown::hash_map::Entry;
 use ::hashbrown::DefaultHashBuilder;
 use ::hashbrown::HashMap;
 use ::itertools::Either;
-use ::ref_cast::RefCast;
 use ::std::io::{BufRead, Read, Write};
 
 #[derive(Default, Clone)]
@@ -41,17 +40,15 @@ pub struct DynamicMessage<A: Allocator = Global> {
     alloc: A,
 }
 
-#[repr(transparent)]
-#[derive(RefCast, Clone, Debug, Deref, DerefMut)]
-pub struct DynamicField<A: Allocator = Global>(
-    Pair<Vec<WireTypeAndPayload<A>, A>, OnceList1<FieldCustomView<A>, A>>,
-);
+#[derive(Clone, Debug, Deref, DerefMut)]
+pub struct DynamicField<A: Allocator = Global> {
+    payloads: Pair<Vec<WireTypeAndPayload<A>, A>, OnceList1<FieldCustomView<A>, A>>,
+}
 
-#[repr(transparent)]
-#[derive(RefCast, Clone, Debug, Deref, DerefMut)]
-pub struct DynamicLenPayload<A: Allocator = Global>(
-    Pair<Vec<u8, A>, OnceList1<LenCustomPayloadView<A>, A>>,
-);
+#[derive(Clone, Debug, Deref, DerefMut)]
+pub struct DynamicLenPayload<A: Allocator = Global> {
+    payload: Pair<Vec<u8, A>, OnceList1<LenCustomPayloadView<A>, A>>,
+}
 
 #[derive(Clone, Debug)]
 pub enum WireTypeAndPayload<A: Allocator = Global> {
@@ -349,7 +346,7 @@ impl<A: Allocator + Clone> DynamicField<A> {
         }))
     }
     pub fn try_as_scalar_message(&self) -> Result<Option<&DynamicMessage<A>>> {
-        let field_custom_view = self.0.try_get_or_insert_into_right(
+        let field_custom_view = self.payloads.try_get_or_insert_into_right(
             |v| v.try_unwrap_scalar_message_ref().is_ok(),
             || FieldCustomView::try_scalar_message_from_payloads(self.as_payloads().into_iter()),
             self.allocator(),
@@ -411,7 +408,9 @@ impl<A: Allocator + Clone> DynamicField<A> {
     }
 
     fn default_in(alloc: A) -> Self {
-        Self(Pair::from_left(Vec::new_in(alloc)))
+        Self {
+            payloads: Pair::from_left(Vec::new_in(alloc)),
+        }
     }
 }
 
@@ -437,13 +436,13 @@ impl<A: Allocator + Clone> DynamicField<A> {
     }
     fn into_payloads(self) -> Vec<WireTypeAndPayload<A>, A> {
         let alloc = A::clone(self.allocator());
-        self.0
+        self.payloads
             .into_left_with(|f_list| f_list.first().to_field(&alloc))
     }
 }
 impl<A: Allocator> DynamicField<A> {
     fn allocator(&self) -> &A {
-        let as_ref = self.0.as_ref();
+        let as_ref = self.payloads.as_ref();
         match as_ref {
             EitherOrBoth::Left(vec) | EitherOrBoth::Both(vec, _) => vec.allocator(),
             EitherOrBoth::Right(list) => list.allocator(),
@@ -487,22 +486,28 @@ impl<A: Allocator + Clone> FieldCustomView<A> {
 
 impl<A: Allocator + Clone> DynamicLenPayload<A> {
     fn from_buf(buf: Vec<u8, A>) -> Self {
-        Self(Pair::from_left(buf))
+        Self {
+            payload: Pair::from_left(buf),
+        }
     }
     fn from_message(msg: DynamicMessage<A>, alloc: &A) -> Self {
-        Self(Pair::from_right(OnceList1::new_in(
-            LenCustomPayloadView::Message(msg),
-            alloc.clone(),
-        )))
+        Self {
+            payload: Pair::from_right(OnceList1::new_in(
+                LenCustomPayloadView::Message(msg),
+                alloc.clone(),
+            )),
+        }
     }
 
     fn as_buf(&self) -> &Vec<u8, A> {
         let alloc = self.allocator();
-        self.0.left_with(|p_list| p_list.first().to_buf(alloc))
+        self.payload
+            .left_with(|p_list| p_list.first().to_buf(alloc))
     }
     fn as_buf_mut(&mut self, alloc: &A) -> &mut Vec<u8, A> {
         let alloc = A::clone(alloc);
-        self.0.left_mut_with(|p_list| p_list.first().to_buf(&alloc))
+        self.payload
+            .left_mut_with(|p_list| p_list.first().to_buf(&alloc))
     }
 
     fn try_as_message(&self) -> Result<&DynamicMessage<A>> {
@@ -522,7 +527,7 @@ impl<A: Allocator + Clone> DynamicLenPayload<A> {
 }
 impl<A: Allocator> DynamicLenPayload<A> {
     fn allocator(&self) -> &A {
-        match self.0.as_ref() {
+        match self.payload.as_ref() {
             EitherOrBoth::Left(vec) | EitherOrBoth::Both(vec, _) => vec.allocator(),
             EitherOrBoth::Right(list) => list.allocator(),
         }
@@ -543,6 +548,8 @@ impl<A: Allocator + Clone> LenCustomPayloadView<A> {
 
 impl<A: Allocator> From<Vec<u8, A>> for DynamicLenPayload<A> {
     fn from(value: Vec<u8, A>) -> Self {
-        Self(Pair::from_left(value))
+        Self {
+            payload: Pair::from_left(value),
+        }
     }
 }
