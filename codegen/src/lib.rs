@@ -22,8 +22,9 @@ pub mod generator;
 pub mod proto_path;
 
 pub use crate::generator::compile;
+use ::puroro::dynamic_message::DynamicMessage;
 use ::puroro::google::protobuf::compiler::CodeGeneratorRequest;
-use ::puroro::message::Message;
+use ::puroro::message::{Message, MessageMut};
 use ::std::backtrace::Backtrace;
 use ::thiserror::Error;
 
@@ -46,7 +47,9 @@ impl From<String> for ErrorKind {
 pub type Result<T> = ::std::result::Result<T, ErrorKind>;
 
 pub fn compile_binary(input: impl AsRef<[u8]>) -> Result<Vec<u8>> {
-    let request = CodeGeneratorRequest::deser_from_read(input.as_ref()).unwrap();
+    let request: CodeGeneratorRequest = DynamicMessage::deser_from_read(input.as_ref())
+        .unwrap()
+        .into();
     let response = compile(&request).unwrap();
     let mut output_buffer = Vec::new();
     response.write(&mut output_buffer).unwrap();
