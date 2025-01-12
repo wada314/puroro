@@ -16,7 +16,7 @@ use crate::default_in::DefaultIn;
 use crate::repeated::RepeatedView;
 use crate::variant::Variant;
 use crate::Result;
-use ::allocator_api2::alloc::Allocator;
+use ::std::alloc::Allocator;
 use ::derive_more::Debug;
 use ::std::io::{BufRead, BufReader, Read, Write};
 use ::thiserror::Error;

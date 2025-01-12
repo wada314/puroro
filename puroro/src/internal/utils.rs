@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use crate::Result;
-use ::allocator_api2::alloc::Allocator;
+use ::std::alloc::Allocator;
 use ::cached_pair::Pair;
 use ::once_list2::OnceList;
 use ::std::iter;

@@ -16,7 +16,7 @@ pub mod protobuf;
 
 use crate::dynamic_message::DynamicMessage;
 use crate::variant::variant_types;
-use ::allocator_api2::alloc::Allocator;
+use ::std::alloc::Allocator;
 use ::ref_cast::RefCast;
 
 trait DynamicMessageExt {

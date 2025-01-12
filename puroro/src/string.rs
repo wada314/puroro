@@ -14,12 +14,12 @@
 
 //! A [::std::string::String] replacement which supports an allocator.
 
-use ::allocator_api2::alloc::{Allocator, Global};
-use ::allocator_api2::vec::Vec;
+use ::std::alloc::{Allocator, Global};
 use ::std::borrow::{Borrow, BorrowMut};
 use ::std::fmt::{Debug, Display, Formatter, Result as FmtResult};
 use ::std::ops::{Deref, DerefMut};
 use ::std::string::String as StdString;
+use ::std::vec::Vec;
 use ::std::vec::Vec as StdVec;
 
 #[derive(PartialEq, PartialOrd, Eq, Ord)]

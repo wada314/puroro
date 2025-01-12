@@ -24,15 +24,15 @@ use crate::variant::{
     variant_types::UInt32, ReadExtVariant, Variant, VariantIntegerType, WriteExtVariant,
 };
 use crate::{ErrorKind, Result};
-use ::allocator_api2::alloc::{Allocator, Global};
-use ::allocator_api2::vec::Vec;
 use ::cached_pair::{EitherOrBoth, Pair};
 use ::derive_more::{Debug, Deref, DerefMut, TryUnwrap};
 use ::hashbrown::hash_map::Entry;
 use ::hashbrown::DefaultHashBuilder;
 use ::hashbrown::HashMap;
 use ::itertools::Either;
+use ::std::alloc::{Allocator, Global};
 use ::std::io::{BufRead, Read, Write};
+use ::std::vec::Vec;
 
 #[derive(Default, Clone)]
 pub struct DynamicMessage<A: Allocator = Global> {

@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use ::allocator_api2::alloc::Allocator;
-use ::allocator_api2::vec::Vec;
+use ::std::alloc::Allocator;
+use ::std::vec::Vec;
 use ::derive_more::{Debug, Deref, DerefMut, Display};
 
 pub trait IsEmpty {

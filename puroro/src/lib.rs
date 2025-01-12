@@ -19,6 +19,7 @@
 #![feature(once_cell_try_insert)]
 #![feature(trait_upcasting)]
 #![feature(downcast_unchecked)]
+#![feature(vec_into_raw_parts)]
 
 pub mod default_in;
 pub mod dynamic_message;

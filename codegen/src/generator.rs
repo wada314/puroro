@@ -61,7 +61,7 @@ impl CodeGeneratorOptions {
             Ok(vec![
                 parse2(quote! { #[allow(unused)] use ::std::ops::Deref; })?,
                 parse2(quote! { #[allow(unused)] use ::std::ops::DerefMut; })?,
-                parse2(quote! { #[allow(unused)] use ::allocator_api2::vec::Vec; })?,
+                parse2(quote! { #[allow(unused)] use ::std::vec::Vec; })?,
             ])
         } else {
             Ok(vec![])
@@ -84,7 +84,7 @@ impl CodeGeneratorOptions {
             if self.allow_import_common_types && !self.strict_type_path {
                 quote! { Vec<#generic_params> }
             } else {
-                quote! { ::allocator_api2::vec::Vec<#generic_params> }
+                quote! { ::std::vec::Vec<#generic_params> }
             },
         )?)
     }

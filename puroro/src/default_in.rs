@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use ::allocator_api2::alloc::Allocator;
+use ::std::alloc::Allocator;
 
 pub trait DefaultIn<A: Allocator> {
     fn default_in(alloc: A) -> Self;
