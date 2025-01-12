@@ -17,8 +17,7 @@ use crate::internal::deser::{
 };
 use crate::internal::utils::{OnceList1, PairWithOnceList1Ext};
 use crate::internal::WireType;
-use crate::message::{Field, GFResult, Message, MessageMut};
-use crate::repeated::RepeatedView;
+use crate::message::{Message, MessageMut};
 use crate::variant::variant_types::Int32;
 use crate::variant::{
     variant_types::UInt32, ReadExtVariant, Variant, VariantIntegerType, WriteExtVariant,
@@ -167,10 +166,6 @@ impl<A: Allocator + Clone> Message for DynamicMessage<A> {
         }
         Ok(total_bytes)
     }
-
-    // fn field(&self, number: i32) -> impl Field {
-    //     <DynamicMessage<_>>::field(self, number)
-    // }
 }
 impl<A: Allocator + Clone> MessageMut<A> for DynamicMessage<A> {
     fn merge_from_bufread<R: BufRead>(&mut self, read: R) -> Result<()> {
@@ -411,18 +406,6 @@ impl<A: Allocator + Clone> DynamicField<A> {
         Self {
             payloads: Pair::from_left(Vec::new_in(alloc)),
         }
-    }
-}
-
-impl<'a, A: Allocator> Field<'a> for Option<&'a DynamicField<A>> {
-    fn has_field(&self) -> GFResult<bool> {
-        todo!()
-    }
-    fn as_scalar_variant(&self) -> GFResult<Variant> {
-        todo!()
-    }
-    fn as_repeated_variant(&self) -> GFResult<impl RepeatedView<Item = Variant>> {
-        Ok(::std::iter::empty())
     }
 }
 
