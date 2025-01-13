@@ -217,74 +217,15 @@ impl<A: Allocator + Clone, R: Read> DeserMessageHandlerForRead<R> for DynamicMes
 }
 
 impl<A: Allocator + Clone> DynamicField<A> {
-    pub fn as_scalar_variant<T: VariantIntegerType>(&self, allow_packed: bool) -> T::RustType {
-        self.as_repeated_variant::<T>(allow_packed)
-            .last()
-            .unwrap_or_default()
-    }
-    pub fn as_repeated_variant<T: VariantIntegerType>(
-        &self,
-        allow_packed: bool,
-    ) -> impl '_ + Iterator<Item = T::RustType> {
-        self.try_as_repeated_variant::<T>(allow_packed)
-            .into_iter()
-            .flatten()
-            .filter_map(Result::ok)
-    }
-    pub fn as_scalar_i32(&self) -> [u8; 4] {
-        self.as_repeated_i32().last().unwrap_or_default()
-    }
-    pub fn as_repeated_i32(&self) -> impl '_ + Iterator<Item = [u8; 4]> {
-        self.try_as_repeated_i32()
-            .into_iter()
-            .flatten()
-            .filter_map(Result::ok)
-    }
-    pub fn as_scalar_i64(&self) -> [u8; 8] {
-        self.as_repeated_i64().last().unwrap_or_default()
-    }
-    pub fn as_repeated_i64(&self) -> impl '_ + Iterator<Item = [u8; 8]> {
-        self.try_as_repeated_i64()
-            .into_iter()
-            .flatten()
-            .filter_map(Result::ok)
-    }
-    pub fn as_scalar_string(&self) -> &str {
-        self.as_repeated_string().last().unwrap_or_default()
-    }
-    pub fn as_repeated_string(&self) -> impl '_ + Iterator<Item = &str> {
-        self.try_as_repeated_string()
-            .into_iter()
-            .flatten()
-            .filter_map(Result::ok)
-    }
-    pub fn as_scalar_bytes(&self) -> &[u8] {
-        self.as_repeated_bytes().last().unwrap_or_default()
-    }
-    pub fn as_repeated_bytes(&self) -> impl '_ + Iterator<Item = &[u8]> {
-        self.try_as_repeated_bytes()
-            .into_iter()
-            .flatten()
-            .filter_map(Result::ok)
-    }
-    pub fn as_scalar_message(&self) -> Option<&DynamicMessage<A>> {
-        self.try_as_scalar_message().ok().flatten()
-    }
-    pub fn as_repeated_message(&self) -> impl '_ + Iterator<Item = &DynamicMessage<A>> {
-        self.try_as_repeated_message()
-            .into_iter()
-            .flatten()
-            .filter_map(Result::ok)
-    }
-    pub fn try_as_scalar_variant_opt<T: VariantIntegerType>(
+    pub fn as_scalar_variant_opt<T: VariantIntegerType>(
         &self,
         allow_packed: bool,
     ) -> Result<Option<T::RustType>> {
-        self.try_as_repeated_variant::<T>(allow_packed)?
+        self.as_repeated_variant::<T>(allow_packed)?
             .last()
             .transpose()
     }
-    pub fn try_as_repeated_variant<T: VariantIntegerType>(
+    pub fn as_repeated_variant<T: VariantIntegerType>(
         &self,
         allow_packed: bool,
     ) -> Result<impl '_ + Iterator<Item = Result<T::RustType>>> {
@@ -302,28 +243,28 @@ impl<A: Allocator + Clone> DynamicField<A> {
             })
             .map(|rv| rv.and_then(T::try_from_variant)))
     }
-    pub fn try_as_scalar_i32_opt(&self) -> Result<Option<[u8; 4]>> {
-        self.try_as_repeated_i32()?.last().transpose()
+    pub fn as_scalar_i32_opt(&self) -> Result<Option<[u8; 4]>> {
+        self.as_repeated_i32()?.last().transpose()
     }
-    pub fn try_as_repeated_i32(&self) -> Result<impl '_ + Iterator<Item = Result<[u8; 4]>>> {
+    pub fn as_repeated_i32(&self) -> Result<impl '_ + Iterator<Item = Result<[u8; 4]>>> {
         Ok(self.as_payloads().iter().map(|record| match record {
             WireTypeAndPayload::I32(buf) => Ok(*buf),
             _ => Err(ErrorKind::DynamicMessageFieldTypeError),
         }))
     }
-    pub fn try_as_scalar_i64_opt(&self) -> Result<Option<[u8; 8]>> {
-        self.try_as_repeated_i64()?.last().transpose()
+    pub fn as_scalar_i64_opt(&self) -> Result<Option<[u8; 8]>> {
+        self.as_repeated_i64()?.last().transpose()
     }
-    pub fn try_as_repeated_i64(&self) -> Result<impl '_ + Iterator<Item = Result<[u8; 8]>>> {
+    pub fn as_repeated_i64(&self) -> Result<impl '_ + Iterator<Item = Result<[u8; 8]>>> {
         Ok(self.as_payloads().iter().map(|record| match record {
             WireTypeAndPayload::I64(buf) => Ok(*buf),
             _ => Err(ErrorKind::DynamicMessageFieldTypeError),
         }))
     }
-    pub fn try_as_scalar_string_opt(&self) -> Result<Option<&str>> {
-        self.try_as_repeated_string()?.last().transpose()
+    pub fn as_scalar_string_opt(&self) -> Result<Option<&str>> {
+        self.as_repeated_string()?.last().transpose()
     }
-    pub fn try_as_repeated_string(&self) -> Result<impl '_ + Iterator<Item = Result<&str>>> {
+    pub fn as_repeated_string(&self) -> Result<impl '_ + Iterator<Item = Result<&str>>> {
         Ok(self.as_payloads().iter().map(|record| match record {
             WireTypeAndPayload::Len(bytes_or_msg) => {
                 Ok(::std::str::from_utf8(bytes_or_msg.as_buf())?)
@@ -331,16 +272,16 @@ impl<A: Allocator + Clone> DynamicField<A> {
             _ => Err(ErrorKind::DynamicMessageFieldTypeError),
         }))
     }
-    pub fn try_as_scalar_bytes_opt(&self) -> Result<Option<&[u8]>> {
-        self.try_as_repeated_bytes()?.last().transpose()
+    pub fn as_scalar_bytes_opt(&self) -> Result<Option<&[u8]>> {
+        self.as_repeated_bytes()?.last().transpose()
     }
-    pub fn try_as_repeated_bytes(&self) -> Result<impl '_ + Iterator<Item = Result<&[u8]>>> {
+    pub fn as_repeated_bytes(&self) -> Result<impl '_ + Iterator<Item = Result<&[u8]>>> {
         Ok(self.as_payloads().iter().map(|record| match record {
             WireTypeAndPayload::Len(bytes_or_msg) => Ok(bytes_or_msg.as_buf().as_slice()),
             _ => Err(ErrorKind::DynamicMessageFieldTypeError),
         }))
     }
-    pub fn try_as_scalar_message(&self) -> Result<Option<&DynamicMessage<A>>> {
+    pub fn as_scalar_message(&self) -> Result<Option<&DynamicMessage<A>>> {
         let field_custom_view = self.payloads.try_get_or_insert_into_right(
             |v| v.try_unwrap_scalar_message_ref().is_ok(),
             || FieldCustomView::try_scalar_message_from_payloads(self.as_payloads().into_iter()),
@@ -351,14 +292,12 @@ impl<A: Allocator + Clone> DynamicField<A> {
             .unwrap()
             .as_ref())
     }
-    pub fn try_as_repeated_message(
-        &self,
-    ) -> Result<impl Iterator<Item = Result<&DynamicMessage<A>>>> {
+    pub fn as_repeated_message(&self) -> Result<impl Iterator<Item = Result<&DynamicMessage<A>>>> {
         Ok(self.as_payloads().iter().map(|wire_and_payload| {
             let WireTypeAndPayload::Len(dyn_len_payload) = wire_and_payload else {
                 Err(ErrorKind::DynamicMessageFieldTypeError)?
             };
-            Ok(dyn_len_payload.try_as_message()?)
+            Ok(dyn_len_payload.as_message()?)
         }))
     }
 
@@ -461,7 +400,7 @@ impl<A: Allocator + Clone> FieldCustomView<A> {
             };
             let msg_mut =
                 msg.get_or_insert_with(|| DynamicMessage::new_in(dyn_payload.allocator().clone()));
-            msg_mut.merge(dyn_payload.try_as_message()?.clone());
+            msg_mut.merge(dyn_payload.as_message()?.clone());
         }
         Ok(FieldCustomView::ScalarMessage(msg))
     }
@@ -493,7 +432,7 @@ impl<A: Allocator + Clone> DynamicLenPayload<A> {
             .left_mut_with(|p_list| p_list.first().to_buf(&alloc))
     }
 
-    fn try_as_message(&self) -> Result<&DynamicMessage<A>> {
+    fn as_message(&self) -> Result<&DynamicMessage<A>> {
         Ok(self
             .try_get_or_insert_into_right(
                 |lcpv| lcpv.try_unwrap_message_ref().is_ok(),
