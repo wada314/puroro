@@ -14,10 +14,10 @@
 
 pub mod protobuf;
 
-use crate::dynamic_message::DynamicMessage;
+use crate::dynamic_message::{DynamicMessage, FieldReducingErrorStrategy};
 use crate::variant::variant_types;
-use ::std::alloc::Allocator;
 use ::ref_cast::RefCast;
+use ::std::alloc::Allocator;
 
 trait DynamicMessageExt {
     type Alloc: Allocator;
@@ -45,21 +45,31 @@ impl<A: Allocator + Clone> DynamicMessageExt for DynamicMessage<A> {
     type Alloc = A;
 
     fn as_scalar_int32(&self, number: i32) -> Option<i32> {
-        self.field(number)
-            .map(|f| f.as_scalar_variant::<variant_types::Int32>(false))
+        self.field(number).and_then(|f| {
+            f.as_scalar_variant::<variant_types::Int32>(false, FieldReducingErrorStrategy::Skip)
+                .unwrap()
+        })
     }
     fn as_repeated_int32(&self, number: i32) -> impl Iterator<Item = i32> {
         self.field(number)
             .into_iter()
-            .flat_map(|f| f.as_repeated_variant::<variant_types::Int32>(false))
+            .flat_map(|f| {
+                f.as_repeated_variant::<variant_types::Int32>(false)
+                    .ok()
+                    .into_iter()
+            })
+            .flatten()
+            .filter_map(|v| v.ok())
     }
     fn as_scalar_enum<E>(&self, number: i32) -> Option<E>
     where
         E: 'static + TryFrom<i32> + Default,
         i32: From<E>,
     {
-        self.field(number)
-            .map(|f| f.as_scalar_variant::<variant_types::Enum<E>>(false))
+        self.field(number).and_then(|f| {
+            f.as_scalar_variant::<variant_types::Enum<E>>(false, FieldReducingErrorStrategy::Skip)
+                .unwrap()
+        })
     }
     fn as_repeated_enum<E>(&self, number: i32) -> impl Iterator<Item = E>
     where
@@ -68,15 +78,26 @@ impl<A: Allocator + Clone> DynamicMessageExt for DynamicMessage<A> {
     {
         self.field(number)
             .into_iter()
-            .flat_map(|f| f.as_repeated_variant::<variant_types::Enum<E>>(false))
+            .flat_map(|f| {
+                f.as_repeated_variant::<variant_types::Enum<E>>(false)
+                    .ok()
+                    .into_iter()
+            })
+            .flatten()
+            .filter_map(|v| v.ok())
     }
     fn as_scalar_string(&self, number: i32) -> Option<&str> {
-        self.field(number).map(|f| f.as_scalar_string())
+        self.field(number).and_then(|f| {
+            f.as_scalar_string(FieldReducingErrorStrategy::Skip)
+                .unwrap()
+        })
     }
     fn as_repeated_string(&self, number: i32) -> impl Iterator<Item = &str> {
         self.field(number)
             .into_iter()
-            .flat_map(|f| f.as_repeated_string())
+            .flat_map(|f| f.as_repeated_string().ok().into_iter())
+            .flatten()
+            .filter_map(|v| v.ok())
     }
 
     fn as_scalar_message<T>(&self, number: i32) -> Option<&T>
@@ -85,14 +106,20 @@ impl<A: Allocator + Clone> DynamicMessageExt for DynamicMessage<A> {
     {
         self.field(number)?
             .as_scalar_message()
+            .ok()
+            .flatten()
             .map(RefCast::ref_cast)
     }
     fn as_repeated_message<'a, T>(&'a self, number: i32) -> impl Iterator<Item = &'a T>
     where
         T: 'a + RefCast<From = DynamicMessage<Self::Alloc>>,
     {
-        self.field(number)
-            .into_iter()
-            .flat_map(|f| f.as_repeated_message().map(RefCast::ref_cast))
+        self.field(number).into_iter().flat_map(|f| {
+            f.as_repeated_message()
+                .ok()
+                .into_iter()
+                .flatten()
+                .filter_map(|v| v.ok().map(RefCast::ref_cast))
+        })
     }
 }

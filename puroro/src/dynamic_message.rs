@@ -79,6 +79,13 @@ pub enum LenCustomPayloadView<A: Allocator = Global> {
     Message(DynamicMessage<A>),
 }
 
+#[derive(Clone, Copy, Debug)]
+pub enum FieldReducingErrorStrategy {
+    Abort,
+    Skip,
+    AsDefault,
+}
+
 impl DynamicMessage<Global> {
     pub fn new() -> Self {
         Self {
@@ -217,13 +224,12 @@ impl<A: Allocator + Clone, R: Read> DeserMessageHandlerForRead<R> for DynamicMes
 }
 
 impl<A: Allocator + Clone> DynamicField<A> {
-    pub fn as_scalar_variant_opt<T: VariantIntegerType>(
+    pub fn as_scalar_variant<T: VariantIntegerType>(
         &self,
         allow_packed: bool,
+        error_strategy: FieldReducingErrorStrategy,
     ) -> Result<Option<T::RustType>> {
-        self.as_repeated_variant::<T>(allow_packed)?
-            .last()
-            .transpose()
+        reduce_iter(self.as_repeated_variant::<T>(allow_packed)?, error_strategy)
     }
     pub fn as_repeated_variant<T: VariantIntegerType>(
         &self,
@@ -243,8 +249,11 @@ impl<A: Allocator + Clone> DynamicField<A> {
             })
             .map(|rv| rv.and_then(T::try_from_variant)))
     }
-    pub fn as_scalar_i32_opt(&self) -> Result<Option<[u8; 4]>> {
-        self.as_repeated_i32()?.last().transpose()
+    pub fn as_scalar_i32(
+        &self,
+        error_strategy: FieldReducingErrorStrategy,
+    ) -> Result<Option<[u8; 4]>> {
+        reduce_iter(self.as_repeated_i32()?, error_strategy)
     }
     pub fn as_repeated_i32(&self) -> Result<impl '_ + Iterator<Item = Result<[u8; 4]>>> {
         Ok(self.as_payloads().iter().map(|record| match record {
@@ -252,8 +261,11 @@ impl<A: Allocator + Clone> DynamicField<A> {
             _ => Err(ErrorKind::DynamicMessageFieldTypeError),
         }))
     }
-    pub fn as_scalar_i64_opt(&self) -> Result<Option<[u8; 8]>> {
-        self.as_repeated_i64()?.last().transpose()
+    pub fn as_scalar_i64(
+        &self,
+        error_strategy: FieldReducingErrorStrategy,
+    ) -> Result<Option<[u8; 8]>> {
+        reduce_iter(self.as_repeated_i64()?, error_strategy)
     }
     pub fn as_repeated_i64(&self) -> Result<impl '_ + Iterator<Item = Result<[u8; 8]>>> {
         Ok(self.as_payloads().iter().map(|record| match record {
@@ -261,8 +273,11 @@ impl<A: Allocator + Clone> DynamicField<A> {
             _ => Err(ErrorKind::DynamicMessageFieldTypeError),
         }))
     }
-    pub fn as_scalar_string_opt(&self) -> Result<Option<&str>> {
-        self.as_repeated_string()?.last().transpose()
+    pub fn as_scalar_string(
+        &self,
+        error_strategy: FieldReducingErrorStrategy,
+    ) -> Result<Option<&str>> {
+        reduce_iter(self.as_repeated_string()?, error_strategy)
     }
     pub fn as_repeated_string(&self) -> Result<impl '_ + Iterator<Item = Result<&str>>> {
         Ok(self.as_payloads().iter().map(|record| match record {
@@ -272,8 +287,11 @@ impl<A: Allocator + Clone> DynamicField<A> {
             _ => Err(ErrorKind::DynamicMessageFieldTypeError),
         }))
     }
-    pub fn as_scalar_bytes_opt(&self) -> Result<Option<&[u8]>> {
-        self.as_repeated_bytes()?.last().transpose()
+    pub fn as_scalar_bytes(
+        &self,
+        error_strategy: FieldReducingErrorStrategy,
+    ) -> Result<Option<&[u8]>> {
+        reduce_iter(self.as_repeated_bytes()?, error_strategy)
     }
     pub fn as_repeated_bytes(&self) -> Result<impl '_ + Iterator<Item = Result<&[u8]>>> {
         Ok(self.as_payloads().iter().map(|record| match record {
@@ -474,4 +492,26 @@ impl<A: Allocator> From<Vec<u8, A>> for DynamicLenPayload<A> {
             payload: Pair::from_left(value),
         }
     }
+}
+
+fn reduce_iter<T: Default>(
+    iter: impl Iterator<Item = Result<T>>,
+    strategy: FieldReducingErrorStrategy,
+) -> Result<Option<T>> {
+    let mut last = None;
+    for item in iter {
+        match item {
+            Ok(value) => {
+                last = Some(value);
+            }
+            Err(e) => match strategy {
+                FieldReducingErrorStrategy::Abort => return Err(e),
+                FieldReducingErrorStrategy::Skip => continue,
+                FieldReducingErrorStrategy::AsDefault => {
+                    last = Some(T::default());
+                }
+            },
+        }
+    }
+    Ok(last)
 }

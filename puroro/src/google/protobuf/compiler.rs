@@ -15,7 +15,7 @@
 use ::std::alloc::{Allocator, Global};
 
 use super::{DynamicMessageExt, FileDescriptorProtoTrait};
-use crate::dynamic_message::DynamicMessage;
+use crate::dynamic_message::{DynamicMessage, FieldReducingErrorStrategy};
 use crate::google::protobuf::FileDescriptorProto;
 use crate::internal::{
     impl_message_mut_trait_for_trivial_types, impl_message_trait_for_trivial_types,
@@ -178,7 +178,10 @@ impl<A: Allocator + Clone> CodeGeneratorResponse<A> {
     pub fn supported_features(&self) -> u64 {
         self.0
             .field(Self::SUPPORTED_FEATURES_FIELD_NUMBER)
-            .map(|f| f.as_scalar_variant::<UInt64>(false))
+            .and_then(|f| {
+                f.as_scalar_variant::<UInt64>(false, FieldReducingErrorStrategy::Skip)
+                    .unwrap()
+            })
             .unwrap_or_default()
     }
     pub fn minimum_edition(&self) -> Option<i32> {
