@@ -12,8 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::PairWithOnceList1Ext;
-use crate::internal::utils::OnceList1;
+use crate::internal::utils::{OnceList1, PairWithOnceList1Ext};
 use crate::internal::WireType;
 use crate::message::MessageMut;
 use crate::variant::Variant;
