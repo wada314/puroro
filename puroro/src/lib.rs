@@ -37,7 +37,6 @@ pub use self::either_ext::{BothExt, EitherExt, EitherOrBothExt};
 pub use self::non_empty::{IsEmpty, NonEmpty};
 pub use ::itertools::{Either, EitherOrBoth};
 
-use self::internal::WireType;
 use ::thiserror::Error;
 
 #[derive(Error, Debug)]
