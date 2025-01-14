@@ -15,7 +15,7 @@
 use crate::dynamic::payload::{DynamicLenPayload, WireTypeAndPayload};
 use crate::dynamic::DynamicMessage;
 use crate::internal::utils::{OnceList1, PairWithOnceList1Ext};
-use crate::variant::{ReadExtVariant, Variant, VariantIntegerType};
+use crate::variant::{ReadExtVariant, Variant, VariantIntegerType, WriteExtVariant};
 use crate::{ErrorKind, Result};
 use ::cached_pair::{EitherOrBoth, Pair};
 use ::derive_more::{Debug, Deref, DerefMut, TryUnwrap};
@@ -214,6 +214,26 @@ impl<A: Allocator + Clone> DynamicField<A> {
         let alloc = A::clone(self.allocator());
         self.payloads
             .into_left_with(|f_list| f_list.first().to_field(&alloc))
+    }
+
+    pub fn extend_variants<T, I>(&mut self, iter: I, allow_packed: bool)
+    where
+        T: VariantIntegerType,
+        I: IntoIterator<Item = T::RustType>,
+    {
+        if allow_packed {
+            let alloc = self.allocator().clone();
+            let mut buf = Vec::new_in(alloc);
+            for val in iter {
+                buf.write_variant(Variant::from::<T>(val)).unwrap();
+            }
+            if !buf.is_empty() {
+                self.as_payloads_mut()
+                    .push(WireTypeAndPayload::Len(DynamicLenPayload::from_buf(buf)));
+            }
+        } else {
+            self.extend(iter.into_iter().map(|v| Variant::from::<T>(v)));
+        }
     }
 }
 
