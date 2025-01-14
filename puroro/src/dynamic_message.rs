@@ -33,10 +33,16 @@ use ::std::alloc::{Allocator, Global};
 use ::std::io::{BufRead, Read, Write};
 use ::std::vec::Vec;
 
+/// A Message implementation which is expected to be used in the situation where
+/// the protocol buffer schema is not known at compile time.
+///
+/// This implementation's interface is designed to be wrapped by a higher-level
+/// interface which knows about the schema, so it misses some of the common methods:
+/// - No "Unknown field"s. By definition, unknown fields requires the schema.
+/// - TBD
 #[derive(Default, Clone)]
 pub struct DynamicMessage<A: Allocator = Global> {
     fields: HashMap<i32, DynamicField<A>, DefaultHashBuilder, A>,
-    alloc: A,
 }
 
 #[derive(Clone, Debug, Deref, DerefMut)]
@@ -90,27 +96,30 @@ impl DynamicMessage<Global> {
     pub fn new() -> Self {
         Self {
             fields: HashMap::new(),
-            alloc: Global,
         }
     }
 }
 impl<A: Allocator> DynamicMessage<A> {
-    pub fn field(&self, number: i32) -> Option<&DynamicField<A>> {
-        self.fields.get(&number)
-    }
-}
-impl<A: Allocator + Clone> DynamicMessage<A> {
     pub fn new_in(alloc: A) -> Self {
         Self {
-            fields: HashMap::new_in(alloc.clone()),
-            alloc: alloc.clone(),
+            fields: HashMap::new_in(alloc),
         }
     }
 
+    pub fn field(&self, number: i32) -> Option<&DynamicField<A>> {
+        self.fields.get(&number)
+    }
+
+    pub fn allocator(&self) -> &A {
+        self.fields.allocator()
+    }
+}
+impl<A: Allocator + Clone> DynamicMessage<A> {
     pub fn field_mut(&mut self, number: i32) -> &mut DynamicField<A> {
+        let alloc = self.allocator().clone();
         self.fields
             .entry(number)
-            .or_insert_with(|| DynamicField::default_in(self.alloc.clone()))
+            .or_insert_with(|| DynamicField::default_in(alloc))
     }
 
     pub fn merge(&mut self, other: DynamicMessage<A>) {
@@ -207,7 +216,7 @@ impl<A: Allocator + Clone> DeserMessageHandlerBase for DynamicMessage<A> {
 }
 impl<A: Allocator + Clone, R: Read> DeserMessageHandlerForRead<R> for DynamicMessage<A> {
     fn parse_len(&mut self, num: i32, read: &mut R) -> Result<usize> {
-        let alloc = A::clone(&self.alloc);
+        let alloc = self.allocator().clone();
         // Facepalm
         let (buf, len) = {
             let mut std_buf = ::std::vec::Vec::new();
