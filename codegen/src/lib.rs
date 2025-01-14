@@ -22,7 +22,7 @@ pub mod generator;
 pub mod proto_path;
 
 pub use crate::generator::compile;
-use ::puroro::dynamic_message::DynamicMessage;
+use ::puroro::dynamic::DynamicMessage;
 use ::puroro::google::protobuf::compiler::CodeGeneratorRequest;
 use ::puroro::message::{Message, MessageMut};
 use ::std::backtrace::Backtrace;

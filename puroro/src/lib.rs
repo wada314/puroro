@@ -22,7 +22,7 @@
 #![feature(vec_into_raw_parts)]
 
 pub mod default_in;
-pub mod dynamic_message;
+pub mod dynamic;
 pub mod editions;
 pub mod either_ext;
 pub mod google;

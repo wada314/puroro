@@ -15,11 +15,11 @@
 pub mod compiler;
 
 use super::DynamicMessageExt;
-use crate::dynamic_message::DynamicMessage;
+use crate::dynamic::DynamicMessage;
 use crate::internal::impl_message_trait_for_trivial_types;
-use ::std::alloc::{Allocator, Global};
 use ::derive_more::{Deref, DerefMut, From, Into, TryFrom};
 use ::ref_cast::RefCast;
+use ::std::alloc::{Allocator, Global};
 
 #[derive(Deref, DerefMut, From, Into, Default, Debug, RefCast, Clone)]
 #[repr(transparent)]
