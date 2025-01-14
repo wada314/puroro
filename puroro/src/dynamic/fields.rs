@@ -315,14 +315,12 @@ impl<A: Allocator + Clone> Extend<String> for DynamicField<A> {
     }
 }
 
-impl<A: Allocator + Clone> Extend<Vec<u8>> for DynamicField<A> {
-    fn extend<T: IntoIterator<Item = Vec<u8>>>(&mut self, iter: T) {
-        let alloc = self.allocator().clone();
-        self.as_payloads_mut().extend(iter.into_iter().map(|val| {
-            let mut buf = Vec::with_capacity_in(val.len(), alloc.clone());
-            buf.extend_from_slice(&val);
-            WireTypeAndPayload::Len(DynamicLenPayload::from_buf(buf))
-        }));
+impl<A: Allocator + Clone> Extend<Vec<u8, A>> for DynamicField<A> {
+    fn extend<T: IntoIterator<Item = Vec<u8, A>>>(&mut self, iter: T) {
+        self.as_payloads_mut().extend(
+            iter.into_iter()
+                .map(|val| WireTypeAndPayload::Len(DynamicLenPayload::from_buf(val))),
+        );
     }
 }
 
