@@ -282,3 +282,56 @@ fn reduce_iter<T: Default>(
     }
     Ok(last)
 }
+
+impl<A: Allocator + Clone> Extend<Variant> for DynamicField<A> {
+    fn extend<T: IntoIterator<Item = Variant>>(&mut self, iter: T) {
+        self.as_payloads_mut()
+            .extend(iter.into_iter().map(WireTypeAndPayload::Variant));
+    }
+}
+
+impl<A: Allocator + Clone> Extend<[u8; 4]> for DynamicField<A> {
+    fn extend<T: IntoIterator<Item = [u8; 4]>>(&mut self, iter: T) {
+        self.as_payloads_mut()
+            .extend(iter.into_iter().map(WireTypeAndPayload::I32));
+    }
+}
+
+impl<A: Allocator + Clone> Extend<[u8; 8]> for DynamicField<A> {
+    fn extend<T: IntoIterator<Item = [u8; 8]>>(&mut self, iter: T) {
+        self.as_payloads_mut()
+            .extend(iter.into_iter().map(WireTypeAndPayload::I64));
+    }
+}
+
+impl<A: Allocator + Clone> Extend<String> for DynamicField<A> {
+    fn extend<T: IntoIterator<Item = String>>(&mut self, iter: T) {
+        let alloc = self.allocator().clone();
+        self.as_payloads_mut().extend(iter.into_iter().map(|val| {
+            let mut buf = Vec::with_capacity_in(val.len(), alloc.clone());
+            buf.extend_from_slice(val.as_bytes());
+            WireTypeAndPayload::Len(DynamicLenPayload::from_buf(buf))
+        }));
+    }
+}
+
+impl<A: Allocator + Clone> Extend<Vec<u8>> for DynamicField<A> {
+    fn extend<T: IntoIterator<Item = Vec<u8>>>(&mut self, iter: T) {
+        let alloc = self.allocator().clone();
+        self.as_payloads_mut().extend(iter.into_iter().map(|val| {
+            let mut buf = Vec::with_capacity_in(val.len(), alloc.clone());
+            buf.extend_from_slice(&val);
+            WireTypeAndPayload::Len(DynamicLenPayload::from_buf(buf))
+        }));
+    }
+}
+
+impl<A: Allocator + Clone> Extend<DynamicMessage<A>> for DynamicField<A> {
+    fn extend<T: IntoIterator<Item = DynamicMessage<A>>>(&mut self, iter: T) {
+        let alloc = self.allocator().clone();
+        self.as_payloads_mut().extend(
+            iter.into_iter()
+                .map(|val| WireTypeAndPayload::Len(DynamicLenPayload::from_message(val, &alloc))),
+        );
+    }
+}
