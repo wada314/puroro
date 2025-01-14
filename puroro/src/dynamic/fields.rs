@@ -200,16 +200,6 @@ impl<A: Allocator + Clone> DynamicField<A> {
             payloads: Pair::from_left(Vec::new_in(alloc)),
         }
     }
-
-    /// フィールドの要素数を返します
-    pub fn len(&self) -> usize {
-        self.as_payloads().len()
-    }
-
-    /// フィールドが空かどうかを返します
-    pub fn is_empty(&self) -> bool {
-        self.as_payloads().is_empty()
-    }
 }
 
 impl<A: Allocator + Clone> DynamicField<A> {
