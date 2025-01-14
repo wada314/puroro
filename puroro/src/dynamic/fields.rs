@@ -200,9 +200,7 @@ impl<A: Allocator + Clone> DynamicField<A> {
             payloads: Pair::from_left(Vec::new_in(alloc)),
         }
     }
-}
 
-impl<A: Allocator + Clone> DynamicField<A> {
     pub(crate) fn as_payloads(&self) -> &Vec<WireTypeAndPayload<A>, A> {
         self.left_with(|f_list| f_list.first().to_field(self.allocator()))
     }
