@@ -160,7 +160,7 @@ impl<A: Allocator + Clone> DynamicLenPayload<A> {
             .set(LenCustomPayloadViewCase::Message);
         let LenCustomPayloadView::Message(msg) =
             self.payload.try_get_or_insert_into_right(|view| {
-                matches!(view, LenCustomPayloadView::Message(msg))
+                matches!(view, LenCustomPayloadView::Message(_))
             })?
         else {
             unreachable!()
