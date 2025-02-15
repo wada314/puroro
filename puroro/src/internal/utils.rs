@@ -140,6 +140,15 @@ impl<C, A> ConverterForOnceList1<C, A> {
     pub(crate) fn new_in(converter: C, alloc: A) -> Self {
         Self(converter, alloc)
     }
+    pub(crate) fn inner(&self) -> &C {
+        &self.0
+    }
+    pub(crate) fn inner_mut(&mut self) -> &mut C {
+        &mut self.0
+    }
+    pub(crate) fn allocator(&self) -> &A {
+        &self.1
+    }
 }
 impl<L, R, A, C> Converter<L, OnceList1<R, A>> for ConverterForOnceList1<C, A>
 where
