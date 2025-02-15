@@ -116,7 +116,8 @@ impl<L, R, A, C> PairWithOnceList1Ext<L, R, A, C>
     for Pair<L, OnceList1<R, A>, ConverterForOnceList1<C, A>>
 where
     A: Allocator + Clone,
-    for<'a> C: Converter<L, R, ToLeftError<'a> = ErrorKind, ToRightError<'a> = ErrorKind>,
+    for<'a> C: Converter<L, R>,
+    for<'a> ErrorKind: From<C::ToLeftError<'a>> + From<C::ToRightError<'a>>,
     for<'a> R: 'a,
     for<'a> L: 'a,
 {
