@@ -16,6 +16,7 @@ use crate::{ErrorKind, Result};
 use ::cached_pair::{Converter, Pair, StdConverter};
 use ::once_list2::OnceList;
 use ::std::alloc::Allocator;
+use ::std::fmt::Debug;
 use ::std::iter;
 
 #[derive(Clone)]
@@ -54,7 +55,7 @@ impl<T, A: Allocator + Clone> OnceList1<T, A> {
     }
 }
 
-impl<T: ::std::fmt::Debug, A: Allocator> ::std::fmt::Debug for OnceList1<T, A> {
+impl<T: Debug, A: Allocator> Debug for OnceList1<T, A> {
     fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
         f.debug_list()
             .entry(&self.0)
@@ -65,10 +66,16 @@ impl<T: ::std::fmt::Debug, A: Allocator> ::std::fmt::Debug for OnceList1<T, A> {
 
 pub(crate) struct WithAllocator<T, A>(pub(crate) T, pub(crate) A);
 
-pub(crate) type PairWithOnceList1<L, R, A, C = StdConverter<L, R>> =
+pub(crate) type PairWithOnceList1<L, R, A, C = StdConverter> =
     Pair<L, OnceList1<R, A>, ConverterForOnceList1<C, A>>;
 
+#[derive(Clone)]
 pub(crate) struct ConverterForOnceList1<C, A>(C, A);
+impl<C, A> ConverterForOnceList1<C, A> {
+    pub(crate) fn new_in(converter: C, alloc: A) -> Self {
+        Self(converter, alloc)
+    }
+}
 impl<L, R, A, C> Converter<L, OnceList1<R, A>> for ConverterForOnceList1<C, A>
 where
     C: Converter<L, R>,

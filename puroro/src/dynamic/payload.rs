@@ -12,16 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::internal::utils::{OnceList1, PairWithOnceList1, PairWithOnceList1Ext, WithAllocator};
+use super::DynamicMessage;
+use crate::internal::utils::{
+    ConverterForOnceList1, OnceList1, PairWithOnceList1, PairWithOnceList1Ext, WithAllocator,
+};
 use crate::internal::WireType;
 use crate::message::MessageMut;
 use crate::variant::{ReadExtVariant, Variant, WriteExtVariant};
 use crate::Result;
-use ::cached_pair::{EitherOrBoth, Pair};
+use ::cached_pair::{EitherOrBoth, Pair, StdConverter};
 use ::derive_more::{Debug, Deref, DerefMut, TryUnwrap};
 use ::std::alloc::{Allocator, Global};
-
-use super::DynamicMessage;
 
 #[derive(Clone, Debug, Deref, DerefMut)]
 pub struct DynamicLenPayload<A: Allocator = Global> {
@@ -76,17 +77,18 @@ impl<A: Allocator + Clone> LenCustomPayloadView<A> {
 
 impl<A: Allocator + Clone> DynamicLenPayload<A> {
     pub(crate) fn from_buf(buf: Vec<u8, A>) -> Self {
+        let alloc = buf.allocator().clone();
         Self {
-            payload: Pair::from_left(buf),
+            payload: Pair::from_left_conv(buf, ConverterForOnceList1::new_in(StdConverter, alloc)),
         }
     }
 
     pub(crate) fn from_message(msg: DynamicMessage<A>, alloc: &A) -> Self {
         Self {
-            payload: Pair::from_right(OnceList1::new_in(
-                LenCustomPayloadView::Message(msg),
-                alloc.clone(),
-            )),
+            payload: Pair::from_right_conv(
+                OnceList1::new_in(LenCustomPayloadView::Message(msg), alloc.clone()),
+                ConverterForOnceList1::new_in(StdConverter, alloc.clone()),
+            ),
         }
     }
 
@@ -94,10 +96,10 @@ impl<A: Allocator + Clone> DynamicLenPayload<A> {
         let mut vec = Vec::new_in(alloc.clone());
         vec.push(variant);
         Self {
-            payload: Pair::from_right(OnceList1::new_in(
-                LenCustomPayloadView::PackedVariants(vec),
-                alloc.clone(),
-            )),
+            payload: Pair::from_right_conv(
+                OnceList1::new_in(LenCustomPayloadView::PackedVariants(vec), alloc.clone()),
+                ConverterForOnceList1::new_in(StdConverter, alloc.clone()),
+            ),
         }
     }
 

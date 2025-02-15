@@ -19,7 +19,7 @@ harness = false
 
 [dependencies]
 once-list2 = { version = "0.3.1", features = ["nightly"] }
-cached-pair = "0.11.0"
+cached-pair = "0.12.0"
 derive_more = { version = "1.0.0", features = ["full"] }
 futures = "0.3.31"
 hashbrown = { version = "0.15.2", features = ["nightly"] }
