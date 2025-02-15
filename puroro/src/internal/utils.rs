@@ -18,6 +18,7 @@ use ::once_list2::OnceList;
 use ::std::alloc::Allocator;
 use ::std::fmt::Debug;
 use ::std::iter;
+use ::std::rc::Rc;
 
 #[derive(Clone)]
 pub struct OnceList1<T, A: Allocator>(T, OnceList<T, A>);
@@ -68,6 +69,70 @@ pub(crate) struct WithAllocator<T, A>(pub(crate) T, pub(crate) A);
 
 pub(crate) type PairWithOnceList1<L, R, A, C = StdConverter> =
     Pair<L, OnceList1<R, A>, ConverterForOnceList1<C, A>>;
+
+pub(crate) struct BoxedFnConverterWithContext<C, L, R, EL, ER> {
+    to_left: Rc<dyn Fn(&R, &C) -> ::std::result::Result<L, EL>>,
+    to_right: Rc<dyn Fn(&L, &C) -> ::std::result::Result<R, ER>>,
+    context: C,
+}
+pub(crate) fn boxed_fn_converter_with_context<C, L, R, EL, ER>(
+    context: C,
+    to_left: impl Fn(&R, &C) -> ::std::result::Result<L, EL> + 'static,
+    to_right: impl Fn(&L, &C) -> ::std::result::Result<R, ER> + 'static,
+) -> BoxedFnConverterWithContext<C, L, R, EL, ER> {
+    BoxedFnConverterWithContext {
+        to_left: Rc::new(to_left),
+        to_right: Rc::new(to_right),
+        context,
+    }
+}
+impl<C, L, R, EL, ER> Converter<L, R> for BoxedFnConverterWithContext<C, L, R, EL, ER> {
+    type ToLeftError<'a>
+        = EL
+    where
+        R: 'a;
+    type ToRightError<'a>
+        = ER
+    where
+        L: 'a;
+
+    fn convert_to_left<'a>(&self, right: &'a R) -> ::std::result::Result<L, Self::ToLeftError<'a>> {
+        (self.to_left)(right, &self.context)
+    }
+
+    fn convert_to_right<'a>(
+        &self,
+        left: &'a L,
+    ) -> ::std::result::Result<R, Self::ToRightError<'a>> {
+        (self.to_right)(left, &self.context)
+    }
+}
+impl<C, L, R, EL, ER> BoxedFnConverterWithContext<C, L, R, EL, ER> {
+    pub(crate) fn context(&self) -> &C {
+        &self.context
+    }
+    pub(crate) fn context_mut(&mut self) -> &mut C {
+        &mut self.context
+    }
+}
+impl<C: Clone, L, R, EL, ER> Clone for BoxedFnConverterWithContext<C, L, R, EL, ER> {
+    fn clone(&self) -> Self {
+        Self {
+            to_left: self.to_left.clone(),
+            to_right: self.to_right.clone(),
+            context: self.context.clone(),
+        }
+    }
+}
+impl<C: Debug, L, R, EL, ER> Debug for BoxedFnConverterWithContext<C, L, R, EL, ER> {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        f.debug_struct("BoxedFnConverterWithContext")
+            .field("to_left", &"<closure>")
+            .field("to_right", &"<closure>")
+            .field("context", &self.context)
+            .finish()
+    }
+}
 
 #[derive(Clone)]
 pub(crate) struct ConverterForOnceList1<C, A>(C, A);
