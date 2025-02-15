@@ -15,13 +15,13 @@
 use super::DynamicMessage;
 use crate::internal::utils::{
     boxed_fn_converter_with_context, BoxedFnConverterWithContext, ConverterForOnceList1, OnceList1,
-    PairWithOnceList1, PairWithOnceList1Ext, WithAllocator,
+    PairWithOnceList1, PairWithOnceList1Ext,
 };
 use crate::internal::WireType;
 use crate::message::MessageMut;
 use crate::variant::{ReadExtVariant, Variant, WriteExtVariant};
 use crate::{ErrorKind, Result};
-use ::cached_pair::{EitherOrBoth, Pair, StdConverter};
+use ::cached_pair::{EitherOrBoth, Pair};
 use ::derive_more::{Debug, Deref, DerefMut, TryUnwrap};
 use ::std::alloc::{Allocator, Global};
 use ::std::cell::Cell;
@@ -153,11 +153,7 @@ impl<A: Allocator + Clone> DynamicLenPayload<A> {
     }
 
     pub(crate) fn as_message(&self) -> Result<&DynamicMessage<A>> {
-        self.payload
-            .converter()
-            .inner()
-            .context()
-            .set(LenCustomPayloadViewCase::Message);
+        self.set_context(LenCustomPayloadViewCase::Message);
         let LenCustomPayloadView::Message(msg) =
             self.payload.try_get_or_insert_into_right(|view| {
                 matches!(view, LenCustomPayloadView::Message(_))
@@ -169,11 +165,7 @@ impl<A: Allocator + Clone> DynamicLenPayload<A> {
     }
 
     pub(crate) fn as_packed_variants(&self) -> Result<&Vec<Variant, A>> {
-        self.payload
-            .converter()
-            .inner()
-            .context()
-            .set(LenCustomPayloadViewCase::PackedVariants);
+        self.set_context(LenCustomPayloadViewCase::PackedVariants);
         let LenCustomPayloadView::PackedVariants(variants) =
             self.payload.try_get_or_insert_into_right(|view| {
                 matches!(view, LenCustomPayloadView::PackedVariants(_))
@@ -182,6 +174,10 @@ impl<A: Allocator + Clone> DynamicLenPayload<A> {
             unreachable!()
         };
         Ok(variants)
+    }
+
+    fn set_context(&self, case: LenCustomPayloadViewCase) {
+        self.payload.converter().inner().context().set(case);
     }
 }
 

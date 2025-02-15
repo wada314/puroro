@@ -87,23 +87,14 @@ pub(crate) fn boxed_fn_converter_with_context<C, L, R, EL, ER>(
     }
 }
 impl<C, L, R, EL, ER> Converter<L, R> for BoxedFnConverterWithContext<C, L, R, EL, ER> {
-    type ToLeftError<'a>
-        = EL
-    where
-        R: 'a;
-    type ToRightError<'a>
-        = ER
-    where
-        L: 'a;
+    type ToLeftError = EL;
+    type ToRightError = ER;
 
-    fn convert_to_left<'a>(&self, right: &'a R) -> ::std::result::Result<L, Self::ToLeftError<'a>> {
+    fn convert_to_left(&self, right: &R) -> ::std::result::Result<L, Self::ToLeftError> {
         (self.to_left)(right, &self.context)
     }
 
-    fn convert_to_right<'a>(
-        &self,
-        left: &'a L,
-    ) -> ::std::result::Result<R, Self::ToRightError<'a>> {
+    fn convert_to_right(&self, left: &L) -> ::std::result::Result<R, Self::ToRightError> {
         (self.to_right)(left, &self.context)
     }
 }
@@ -155,26 +146,20 @@ where
     C: Converter<L, R>,
     A: Allocator + Clone,
 {
-    type ToLeftError<'a>
-        = C::ToLeftError<'a>
-    where
-        OnceList1<R, A>: 'a;
-    type ToRightError<'a>
-        = C::ToRightError<'a>
-    where
-        L: 'a;
+    type ToLeftError = C::ToLeftError;
+    type ToRightError = C::ToRightError;
 
-    fn convert_to_left<'a>(
+    fn convert_to_left(
         &self,
-        right: &'a OnceList1<R, A>,
-    ) -> ::std::result::Result<L, Self::ToLeftError<'a>> {
+        right: &OnceList1<R, A>,
+    ) -> ::std::result::Result<L, Self::ToLeftError> {
         self.0.convert_to_left(right.first())
     }
 
-    fn convert_to_right<'a>(
+    fn convert_to_right(
         &self,
-        left: &'a L,
-    ) -> ::std::result::Result<OnceList1<R, A>, Self::ToRightError<'a>> {
+        left: &L,
+    ) -> ::std::result::Result<OnceList1<R, A>, Self::ToRightError> {
         Ok(OnceList1::new_in(
             self.0.convert_to_right(left)?,
             self.1.clone(),
@@ -190,10 +175,8 @@ impl<L, R, A, C> PairWithOnceList1Ext<L, R, A, C>
     for Pair<L, OnceList1<R, A>, ConverterForOnceList1<C, A>>
 where
     A: Allocator + Clone,
-    for<'a> C: Converter<L, R>,
-    for<'a> ErrorKind: From<C::ToLeftError<'a>> + From<C::ToRightError<'a>>,
-    for<'a> R: 'a,
-    for<'a> L: 'a,
+    C: Converter<L, R>,
+    ErrorKind: From<C::ToLeftError> + From<C::ToRightError>,
 {
     fn try_get_or_insert_into_right(&self, pred: impl Fn(&R) -> bool) -> Result<&R> {
         // First try to find in existing list if available
@@ -224,11 +207,11 @@ mod tests {
         Array([u8; 4]),
     }
 
-    impl TryFrom<WithAllocator<&Int32Compatible, Global>> for i32 {
+    impl TryFrom<&Int32Compatible> for i32 {
         type Error = ErrorKind;
 
-        fn try_from(value: WithAllocator<&Int32Compatible, Global>) -> Result<Self> {
-            match value.0 {
+        fn try_from(value: &Int32Compatible) -> Result<Self> {
+            match value {
                 Int32Compatible::String(s) => s
                     .parse()
                     .map_err(|_| "Invalid number format".to_string().into()),
@@ -246,23 +229,22 @@ mod tests {
     #[derive(Default)]
     struct TestConverter;
 
-    impl Converter<i32, OnceList1<Int32Compatible, Global>> for TestConverter {
-        type ToLeftError<'a> = ErrorKind;
-        type ToRightError<'a> = ErrorKind;
+    impl Converter<i32, Int32Compatible> for TestConverter {
+        type ToLeftError = ErrorKind;
+        type ToRightError = ErrorKind;
 
         fn convert_to_left(
             &self,
-            right: &OnceList1<Int32Compatible, Global>,
-        ) -> ::std::result::Result<i32, Self::ToLeftError<'_>> {
-            WithAllocator(right.first(), Global).try_into()
+            right: &Int32Compatible,
+        ) -> ::std::result::Result<i32, Self::ToLeftError> {
+            right.try_into()
         }
 
         fn convert_to_right(
             &self,
             left: &i32,
-        ) -> ::std::result::Result<OnceList1<Int32Compatible, Global>, Self::ToRightError<'_>>
-        {
-            Ok(OnceList1::new_in((*left).into(), Global))
+        ) -> ::std::result::Result<Int32Compatible, Self::ToRightError> {
+            Ok((*left).into())
         }
     }
 
@@ -297,18 +279,25 @@ mod tests {
     fn test_pair_with_once_list1_ext_find_existing() -> Result<()> {
         let list = OnceList1::new_in(Int32Compatible::String("42".to_string()), Global);
         list.push(Int32Compatible::Array(123i32.to_le_bytes()));
-        let pair: Pair<i32, _, TestConverter> = Pair::from_right(list);
+        let pair =
+            Pair::from_right_conv(list, ConverterForOnceList1::new_in(TestConverter, Global));
 
-        let result: &String = pair.try_get_or_insert_into_right(|n| Ok(n.to_string()), Global)?;
+        let result: &String = pair
+            .try_get_or_insert_into_right(|n| TryInto::<&String>::try_into(n).is_ok())?
+            .try_into()
+            .unwrap();
         assert_eq!(*result, "42".to_string());
         Ok(())
     }
 
     #[test]
     fn test_pair_with_once_list1_ext_create_list_from_left() -> Result<()> {
-        let pair: Pair<i32, _, TestConverter> = Pair::from_left(42);
+        let pair = Pair::from_left_conv(42, ConverterForOnceList1::new_in(TestConverter, Global));
 
-        let result: &String = pair.try_get_or_insert_into_right(|n| Ok(n.to_string()), Global)?;
+        let result: &String = pair
+            .try_get_or_insert_into_right(|n| TryInto::<&String>::try_into(n).is_ok())?
+            .try_into()
+            .unwrap();
         assert_eq!(*result, "42".to_string());
         Ok(())
     }
@@ -316,9 +305,13 @@ mod tests {
     #[test]
     fn test_pair_with_once_list1_ext_push_new_value() -> Result<()> {
         let list = OnceList1::new_in(Int32Compatible::Array(42i32.to_le_bytes()), Global);
-        let pair: Pair<i32, _, TestConverter> = Pair::from_right(list);
+        let pair =
+            Pair::from_right_conv(list, ConverterForOnceList1::new_in(TestConverter, Global));
 
-        let result: &String = pair.try_get_or_insert_into_right(|n| Ok(n.to_string()), Global)?;
+        let result: &String = pair
+            .try_get_or_insert_into_right(|n| TryInto::<&String>::try_into(n).is_ok())?
+            .try_into()
+            .unwrap();
         assert_eq!(*result, "42".to_string());
         Ok(())
     }
@@ -326,10 +319,14 @@ mod tests {
     #[test]
     fn test_pair_with_once_list1_ext_both_sides_present_but_no_string() -> Result<()> {
         let list = OnceList1::new_in(Int32Compatible::Array(42i32.to_le_bytes()), Global);
-        let pair: Pair<i32, _, TestConverter> = Pair::from_right(list);
-        let _ = unsafe { pair.left_with(|_| 42) };
+        let pair =
+            Pair::from_right_conv(list, ConverterForOnceList1::new_in(TestConverter, Global));
+        let _ = pair.try_left();
 
-        let result: &String = pair.try_get_or_insert_into_right(|n| Ok(n.to_string()), Global)?;
+        let result: &String = pair
+            .try_get_or_insert_into_right(|n| TryInto::<&String>::try_into(n).is_ok())?
+            .try_into()
+            .unwrap();
         assert_eq!(*result, "42".to_string());
         Ok(())
     }
