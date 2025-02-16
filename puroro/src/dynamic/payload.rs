@@ -22,12 +22,12 @@ use crate::message::MessageMut;
 use crate::variant::{ReadExtVariant, Variant, WriteExtVariant};
 use crate::{ErrorKind, Result};
 use ::cached_pair::{EitherOrBoth, Pair};
-use ::derive_more::{Debug, Deref, DerefMut, TryUnwrap};
+use ::derive_more::{Debug, TryUnwrap};
 use ::std::alloc::{Allocator, Global};
 use ::std::cell::Cell;
 use ::std::convert::Infallible;
 
-#[derive(Clone, Debug, Deref, DerefMut)]
+#[derive(Clone, Debug)]
 pub struct DynamicLenPayload<A: Allocator = Global> {
     payload:
         PairWithOnceList1<Vec<u8, A>, LenCustomPayloadView<A>, A, DynamicLenPayloadConverter<A>>,
