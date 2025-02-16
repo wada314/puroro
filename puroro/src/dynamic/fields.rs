@@ -49,15 +49,7 @@ type FieldCustomViewConverter<A> = BoxedFnConverterWithContext<
 fn field_custom_view_converter<A: Allocator + Clone>(alloc: A) -> FieldCustomViewConverter<A> {
     boxed_fn_converter_with_context(
         (Cell::new(FieldCustomViewCase::ScalarMessage), alloc),
-        |view: &FieldCustomView<A>, (_, alloc)| {
-            let mut vec = Vec::new_in(alloc.clone());
-            if let FieldCustomView::ScalarMessage(Some(msg)) = view {
-                let mut buf = Vec::new_in(alloc.clone());
-                msg.write_to_vec(&mut buf);
-                vec.push(WireTypeAndPayload::Len(DynamicLenPayload::from_buf(buf)));
-            }
-            Ok(vec)
-        },
+        |view: &FieldCustomView<A>, (_, alloc)| Ok(view.to_field(alloc)),
         |payloads: &Vec<WireTypeAndPayload<A>, A>, (case, _)| match case.get() {
             FieldCustomViewCase::ScalarMessage => Ok(FieldCustomView::ScalarMessage(
                 FieldCustomView::try_scalar_message_from_payloads(payloads.iter())?,
@@ -316,7 +308,7 @@ impl<A: Allocator + Clone> FieldCustomView<A> {
             }
             FieldCustomView::ScalarMessage(None) => Vec::new_in(alloc.clone()),
         };
-        let mut payload_vec = Vec::with_capacity_in(1, encoded_bytes.allocator().clone());
+        let mut payload_vec = Vec::with_capacity_in(1, alloc.clone());
         payload_vec.push(WireTypeAndPayload::Len(DynamicLenPayload::from_buf(
             encoded_bytes,
         )));
