@@ -12,168 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+mod converter;
+mod once_list1;
+
 use crate::{ErrorKind, Result};
 use ::cached_pair::{Converter, Pair, StdConverter};
-use ::once_list2::OnceList;
 use ::std::alloc::Allocator;
-use ::std::fmt::Debug;
-use ::std::iter;
-use ::std::rc::Rc;
 
-#[derive(Clone)]
-pub struct OnceList1<T, A: Allocator>(T, OnceList<T, A>);
-impl<T, A: Allocator> OnceList1<T, A> {
-    pub fn new_in(first: T, alloc: A) -> Self {
-        Self(first, OnceList::new_in(alloc))
-    }
-    pub fn first(&self) -> &T {
-        &self.0
-    }
-    pub fn last(&self) -> &T {
-        match self.1.last() {
-            Some(last) => last,
-            None => self.first(),
-        }
-    }
-    pub fn iter(&self) -> impl Iterator<Item = &T> {
-        iter::once(&self.0).chain(self.1.iter())
-    }
-    pub fn into_iter(self) -> impl Iterator<Item = T> {
-        iter::once(self.0).chain(self.1.into_iter())
-    }
-    pub fn allocator(&self) -> &A {
-        self.1.allocator()
-    }
-}
-impl<T, A: Allocator + Clone> OnceList1<T, A> {
-    pub fn extend(&self, other: impl IntoIterator<Item = T>) {
-        self.1.extend(other);
-    }
-}
-impl<T, A: Allocator + Clone> OnceList1<T, A> {
-    pub fn push(&self, value: T) -> &T {
-        self.1.push(value)
-    }
-    pub fn take_some(mut self, pred: impl Fn(&T) -> bool) -> Option<T> {
-        if pred(&self.0) {
-            Some(self.0)
-        } else {
-            self.1.remove(pred)
-        }
-    }
-}
-
-impl<T: Debug, A: Allocator> Debug for OnceList1<T, A> {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        f.debug_list()
-            .entry(&self.0)
-            .entries(self.1.iter())
-            .finish()
-    }
-}
+pub(crate) use converter::{
+    boxed_fn_converter_with_context, BoxedFnConverterWithContext, ConverterForOnceList1,
+};
+pub(crate) use once_list1::OnceList1;
 
 pub(crate) type PairWithOnceList1<L, R, A, C = StdConverter> =
     Pair<L, OnceList1<R, A>, ConverterForOnceList1<C, A>>;
-
-pub(crate) struct BoxedFnConverterWithContext<C, L, R, EL, ER> {
-    to_left: Rc<dyn Fn(&R, &C) -> ::std::result::Result<L, EL>>,
-    to_right: Rc<dyn Fn(&L, &C) -> ::std::result::Result<R, ER>>,
-    context: C,
-}
-pub(crate) fn boxed_fn_converter_with_context<C, L, R, EL, ER>(
-    context: C,
-    to_left: impl Fn(&R, &C) -> ::std::result::Result<L, EL> + 'static,
-    to_right: impl Fn(&L, &C) -> ::std::result::Result<R, ER> + 'static,
-) -> BoxedFnConverterWithContext<C, L, R, EL, ER> {
-    BoxedFnConverterWithContext {
-        to_left: Rc::new(to_left),
-        to_right: Rc::new(to_right),
-        context,
-    }
-}
-impl<C, L, R, EL, ER> Converter<L, R> for BoxedFnConverterWithContext<C, L, R, EL, ER> {
-    type ToLeftError = EL;
-    type ToRightError = ER;
-
-    fn convert_to_left(&self, right: &R) -> ::std::result::Result<L, Self::ToLeftError> {
-        (self.to_left)(right, &self.context)
-    }
-
-    fn convert_to_right(&self, left: &L) -> ::std::result::Result<R, Self::ToRightError> {
-        (self.to_right)(left, &self.context)
-    }
-}
-impl<C, L, R, EL, ER> BoxedFnConverterWithContext<C, L, R, EL, ER> {
-    pub(crate) fn context(&self) -> &C {
-        &self.context
-    }
-    #[allow(unused)]
-    pub(crate) fn context_mut(&mut self) -> &mut C {
-        &mut self.context
-    }
-}
-impl<C: Clone, L, R, EL, ER> Clone for BoxedFnConverterWithContext<C, L, R, EL, ER> {
-    fn clone(&self) -> Self {
-        Self {
-            to_left: self.to_left.clone(),
-            to_right: self.to_right.clone(),
-            context: self.context.clone(),
-        }
-    }
-}
-impl<C: Debug, L, R, EL, ER> Debug for BoxedFnConverterWithContext<C, L, R, EL, ER> {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        f.debug_struct("BoxedFnConverterWithContext")
-            .field("to_left", &"<closure>")
-            .field("to_right", &"<closure>")
-            .field("context", &self.context)
-            .finish()
-    }
-}
-
-#[derive(Clone)]
-pub(crate) struct ConverterForOnceList1<C, A>(C, A);
-impl<C, A> ConverterForOnceList1<C, A> {
-    pub(crate) fn new_in(converter: C, alloc: A) -> Self {
-        Self(converter, alloc)
-    }
-    pub(crate) fn inner(&self) -> &C {
-        &self.0
-    }
-    #[allow(unused)]
-    pub(crate) fn inner_mut(&mut self) -> &mut C {
-        &mut self.0
-    }
-    #[allow(unused)]
-    pub(crate) fn allocator(&self) -> &A {
-        &self.1
-    }
-}
-impl<L, R, A, C> Converter<L, OnceList1<R, A>> for ConverterForOnceList1<C, A>
-where
-    C: Converter<L, R>,
-    A: Allocator + Clone,
-{
-    type ToLeftError = C::ToLeftError;
-    type ToRightError = C::ToRightError;
-
-    fn convert_to_left(
-        &self,
-        right: &OnceList1<R, A>,
-    ) -> ::std::result::Result<L, Self::ToLeftError> {
-        self.0.convert_to_left(right.first())
-    }
-
-    fn convert_to_right(
-        &self,
-        left: &L,
-    ) -> ::std::result::Result<OnceList1<R, A>, Self::ToRightError> {
-        Ok(OnceList1::new_in(
-            self.0.convert_to_right(left)?,
-            self.1.clone(),
-        ))
-    }
-}
 
 pub(crate) trait PairWithOnceList1Ext<L, R, A, C> {
     fn try_get_or_insert_into_right(&self, pred: impl Fn(&R) -> bool) -> Result<&R>;
@@ -274,33 +126,6 @@ mod tests {
         ) -> ::std::result::Result<Int32Compatible, Self::ToRightError> {
             Ok((*left).into())
         }
-    }
-
-    #[test]
-    fn test_once_list1_basic() {
-        let list = OnceList1::new_in(1, Global);
-        assert_eq!(*list.first(), 1);
-
-        let items: Vec<_> = list.iter().copied().collect();
-        assert_eq!(items, vec![1]);
-    }
-
-    #[test]
-    fn test_once_list1_push() {
-        let list = OnceList1::new_in(1, Global);
-        list.push(2);
-        list.push(3);
-
-        let items: Vec<_> = list.iter().copied().collect();
-        assert_eq!(items, vec![1, 2, 3]);
-    }
-
-    #[test]
-    fn test_once_list1_debug() {
-        let list = OnceList1::new_in(1, Global);
-        list.push(2);
-
-        assert_eq!(format!("{:?}", list), "[1, 2]");
     }
 
     #[test]
