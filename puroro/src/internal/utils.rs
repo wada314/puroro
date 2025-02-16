@@ -13,16 +13,16 @@
 // limitations under the License.
 
 mod converter;
+mod multi_pair;
 mod once_list1;
 
 use crate::{ErrorKind, Result};
 use ::cached_pair::{Converter, Pair, StdConverter};
 use ::std::alloc::Allocator;
 
-pub(crate) use converter::{
-    boxed_fn_converter_with_context, BoxedFnConverterWithContext, ConverterForOnceList1,
-};
-pub(crate) use once_list1::OnceList1;
+pub(crate) use self::converter::{boxed_fn_converter_with_context, BoxedFnConverterWithContext};
+pub(crate) use self::multi_pair::{ConverterForOnceList1, MultiPair};
+pub(crate) use self::once_list1::OnceList1;
 
 pub(crate) type PairWithOnceList1<L, R, A, C = StdConverter> =
     Pair<L, OnceList1<R, A>, ConverterForOnceList1<C, A>>;
