@@ -54,6 +54,13 @@ impl<T, A: Allocator + Clone> OnceList1<T, A> {
     pub fn push(&self, value: T) -> &T {
         self.1.push(value)
     }
+    pub fn take_some(mut self, pred: impl Fn(&T) -> bool) -> Option<T> {
+        if pred(&self.0) {
+            Some(self.0)
+        } else {
+            self.1.remove(pred)
+        }
+    }
 }
 
 impl<T: Debug, A: Allocator> Debug for OnceList1<T, A> {
@@ -170,6 +177,7 @@ where
 
 pub(crate) trait PairWithOnceList1Ext<L, R, A, C> {
     fn try_get_or_insert_into_right(&self, pred: impl Fn(&R) -> bool) -> Result<&R>;
+    fn try_get_or_insert_into_right_mut(&mut self, pred: impl Fn(&R) -> bool) -> Result<&mut R>;
 }
 
 impl<L, R, A, C> PairWithOnceList1Ext<L, R, A, C>
@@ -193,6 +201,25 @@ where
             // No need to do anything, because the list will be generated in the next step.
         }
         Ok(self.try_right()?.last())
+    }
+
+    fn try_get_or_insert_into_right_mut(&mut self, pred: impl Fn(&R) -> bool) -> Result<&mut R> {
+        'unify_or_clear_list: {
+            if let Some(list1) = self.right_opt_mut() {
+                if pred(&list1.0) {
+                    list1.1.clear();
+                    break 'unify_or_clear_list;
+                } else if let Some(item) = list1.1.remove(pred) {
+                    *list1 = OnceList1::new_in(item, list1.1.allocator().clone());
+                    break 'unify_or_clear_list;
+                }
+            }
+            let _ = self.try_extract_right()?;
+        }
+        // The right side is either empty or contains only the target value.
+        // In both cases, try_extract_left() will work.
+        let _ = self.try_extract_left()?;
+        Ok(&mut self.try_right_mut()?.0)
     }
 }
 
