@@ -261,26 +261,15 @@ impl<A: Allocator + Clone> DynamicField<A> {
     }
 
     pub(crate) fn as_payloads(&self) -> &Vec<WireTypeAndPayload<A>, A> {
-        unsafe {
-            self.payloads
-                .left_with(|f_list| f_list.first().to_field(&self.allocator()))
-        }
+        self.payloads.left()
     }
 
     pub(crate) fn as_payloads_mut(&mut self) -> &mut Vec<WireTypeAndPayload<A>, A> {
-        let alloc = self.allocator().clone();
-        unsafe {
-            self.payloads
-                .left_mut_with(|f_list| f_list.first().to_field(&alloc))
-        }
+        self.payloads.left_mut()
     }
 
     pub(crate) fn into_payloads(self) -> Vec<WireTypeAndPayload<A>, A> {
-        let alloc = self.allocator().clone();
-        unsafe {
-            self.payloads
-                .into_left_with(|f_list| f_list.first().to_field(&alloc))
-        }
+        self.payloads.into_left()
     }
 
     pub fn extend_variants<T, I>(&mut self, iter: I, allow_packed: bool)
