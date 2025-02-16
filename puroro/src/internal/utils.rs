@@ -65,8 +65,6 @@ impl<T: Debug, A: Allocator> Debug for OnceList1<T, A> {
     }
 }
 
-pub(crate) struct WithAllocator<T, A>(pub(crate) T, pub(crate) A);
-
 pub(crate) type PairWithOnceList1<L, R, A, C = StdConverter> =
     Pair<L, OnceList1<R, A>, ConverterForOnceList1<C, A>>;
 
@@ -102,6 +100,7 @@ impl<C, L, R, EL, ER> BoxedFnConverterWithContext<C, L, R, EL, ER> {
     pub(crate) fn context(&self) -> &C {
         &self.context
     }
+    #[allow(unused)]
     pub(crate) fn context_mut(&mut self) -> &mut C {
         &mut self.context
     }
@@ -134,9 +133,11 @@ impl<C, A> ConverterForOnceList1<C, A> {
     pub(crate) fn inner(&self) -> &C {
         &self.0
     }
+    #[allow(unused)]
     pub(crate) fn inner_mut(&mut self) -> &mut C {
         &mut self.0
     }
+    #[allow(unused)]
     pub(crate) fn allocator(&self) -> &A {
         &self.1
     }
