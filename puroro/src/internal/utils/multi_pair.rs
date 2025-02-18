@@ -20,6 +20,24 @@ pub(crate) struct MultiPair<L, R, A: Allocator, C> {
     pair: Pair<L, OnceList1<R, A>, ConverterForOnceList1<C, A>>,
 }
 
+pub(crate) trait MultiConverter<L, R, X> {
+    type ToLeftError;
+    type ToRightError;
+    fn convert_to_left(&self, right: &R) -> Result<L, Self::ToLeftError>;
+    fn convert_to_right(&self, left: &L, context: &X) -> Result<R, Self::ToRightError>;
+    fn matches_context(&self, right: &R, context: &X) -> bool;
+    fn reduce_right<'a>(&self, first: &'a R, #[allow(unused)] second: &'a R) -> &'a R {
+        first
+    }
+}
+
+pub(crate) struct BoxedFnMultiConverter<L, R, X, EL, ER> {
+    convert_to_left: Box<dyn Fn(&R) -> Result<L, EL>>,
+    convert_to_right: Box<dyn Fn(&L, &X) -> Result<R, ER>>,
+    matches_context: Box<dyn Fn(&R, &X) -> bool>,
+    reduce_right: Box<dyn for<'a> Fn(&'a R, &'a R) -> &'a R>,
+}
+
 #[derive(Clone)]
 pub(crate) struct ConverterForOnceList1<C, A>(pub(crate) C, pub(crate) A);
 
