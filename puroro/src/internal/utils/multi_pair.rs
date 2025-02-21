@@ -93,16 +93,16 @@ where
         self.pair.try_left_mut()
     }
 
-    pub fn try_right_mut(&mut self) -> Result<&mut OnceList1<R, A>, C::ToRightError> {
-        self.pair.try_right_mut()
+    pub fn try_right_mut<E>(&mut self) -> Result<&mut R, E> {
+        todo!()
     }
 
     pub fn try_into_left(self) -> Result<L, C::ToLeftError> {
         self.pair.try_into_left()
     }
 
-    pub fn try_into_right(self) -> Result<OnceList1<R, A>, C::ToRightError> {
-        self.pair.try_into_right()
+    pub fn try_into_right<E>(self) -> Result<R, E> {
+        todo!()
     }
 
     pub fn converter(&self) -> &C {
