@@ -17,17 +17,43 @@ use ::cached_pair::{Converter, Pair};
 use ::std::{alloc::Allocator, cell::Cell};
 
 pub(crate) struct MultiPair<L, R, A: Allocator, X, C> {
-    pair: Pair<L, OnceList1<R, A>, MultiConverterAdapter<X, C>>,
+    pair: Pair<L, OnceList1<R, A>, MultiConverterAdapter<X, C, A>>,
     allocator: A,
 }
 
-impl<L, R, A: Allocator + Clone, X, C: Default> MultiPair<L, R, A, X, C> {
+impl<L, R, A, X, C> MultiPair<L, R, A, X, C>
+where
+    A: Allocator + Clone,
+    X: Default + Copy,
+    C: Default,
+{
     pub fn from_left(left: L, allocator: A) -> Self {
         Self::from_left_conv(left, C::default(), allocator)
     }
-
     pub fn from_right(right: R, allocator: A) -> Self {
         Self::from_right_conv(right, C::default(), allocator)
+    }
+}
+
+impl<L, R, A, X, C> MultiPair<L, R, A, X, C>
+where
+    A: Allocator + Clone,
+    X: Default + Copy,
+{
+    pub fn from_left_conv(left: L, converter: C, allocator: A) -> Self {
+        Self {
+            pair: Pair::from_left_conv(
+                left,
+                MultiConverterAdapter::new(converter, X::default(), allocator.clone()),
+            ),
+            allocator,
+        }
+    }
+    pub fn from_right_conv(right: R, converter: C, allocator: A) -> Self {
+        Self {
+            pair: Pair::from_right_conv(OnceList1::new_in(right, allocator.clone()), converter),
+            allocator,
+        }
     }
 }
 
@@ -37,20 +63,6 @@ where
     X: Copy + Default,
     C: MultiConverter<L, R, X>,
 {
-    pub fn from_left_conv(left: L, converter: C, allocator: A) -> Self {
-        Self {
-            pair: Pair::from_left_conv(left, MultiConverterAdapter::new(converter, X::default())),
-            allocator,
-        }
-    }
-
-    pub fn from_right_conv(right: R, converter: C, allocator: A) -> Self {
-        Self {
-            pair: Pair::from_right_conv(OnceList1::new_in(right, allocator.clone()), converter),
-            allocator,
-        }
-    }
-
     pub fn try_left(&self) -> Result<&L, C::ToLeftError> {
         self.pair.try_left()
     }
