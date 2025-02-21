@@ -102,7 +102,7 @@ where
     }
 
     pub fn try_into_right<E>(self) -> Result<R, E> {
-        todo!()
+        todo!()myu
     }
 
     pub fn converter(&self) -> &C {

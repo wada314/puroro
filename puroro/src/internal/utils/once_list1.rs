@@ -33,6 +33,15 @@ impl<T, A: Allocator> OnceList1<T, A> {
             None => self.first(),
         }
     }
+    pub fn first_mut(&mut self) -> &mut T {
+        &mut self.0
+    }
+    pub fn last_mut(&mut self) -> &mut T {
+        match self.1.last_mut() {
+            Some(last) => last,
+            None => &mut self.0,
+        }
+    }
     pub fn iter(&self) -> impl Iterator<Item = &T> {
         iter::once(&self.0).chain(self.1.iter())
     }
