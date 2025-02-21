@@ -39,6 +39,13 @@ impl<T, A: Allocator> OnceList1<T, A> {
     pub fn into_iter(self) -> impl Iterator<Item = T> {
         iter::once(self.0).chain(self.1.into_iter())
     }
+    pub fn reduce<'a, F: FnMut(&'a T, &'a T) -> &'a T>(&'a self, mut f: F) -> &'a T {
+        let mut result = &self.0;
+        for item in self.1.iter() {
+            result = f(result, item);
+        }
+        result
+    }
     pub fn allocator(&self) -> &A {
         self.1.allocator()
     }

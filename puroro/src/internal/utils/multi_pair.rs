@@ -14,10 +14,72 @@
 
 use super::OnceList1;
 use ::cached_pair::{Converter, Pair};
-use ::std::alloc::Allocator;
+use ::std::{alloc::Allocator, cell::Cell};
 
-pub(crate) struct MultiPair<L, R, A: Allocator, C> {
-    pair: Pair<L, OnceList1<R, A>, ConverterForOnceList1<C, A>>,
+pub(crate) struct MultiPair<L, R, A: Allocator, X, C> {
+    pair: Pair<L, OnceList1<R, A>, MultiConverterAdapter<X, C>>,
+    allocator: A,
+}
+
+impl<L, R, A: Allocator + Clone, X, C: Default> MultiPair<L, R, A, X, C> {
+    pub fn from_left(left: L, allocator: A) -> Self {
+        Self::from_left_conv(left, C::default(), allocator)
+    }
+
+    pub fn from_right(right: R, allocator: A) -> Self {
+        Self::from_right_conv(right, C::default(), allocator)
+    }
+}
+
+impl<L, R, A, X, C> MultiPair<L, R, A, X, C>
+where
+    A: Allocator + Clone,
+    X: Copy + Default,
+    C: MultiConverter<L, R, X>,
+{
+    pub fn from_left_conv(left: L, converter: C, allocator: A) -> Self {
+        Self {
+            pair: Pair::from_left_conv(left, MultiConverterAdapter::new(converter, X::default())),
+            allocator,
+        }
+    }
+
+    pub fn from_right_conv(right: R, converter: C, allocator: A) -> Self {
+        Self {
+            pair: Pair::from_right_conv(OnceList1::new_in(right, allocator.clone()), converter),
+            allocator,
+        }
+    }
+
+    pub fn try_left(&self) -> Result<&L, C::ToLeftError> {
+        self.pair.try_left()
+    }
+
+    pub fn right(&self) -> &OnceList1<R, A> {
+        self.pair.right()
+    }
+
+    pub fn left_mut(&mut self) -> &mut L {
+        self.pair.left_mut()
+    }
+
+    pub fn right_mut(&mut self) -> &mut OnceList1<R, A> {
+        self.pair.right_mut()
+    }
+
+    pub fn into_left(self) -> L {
+        self.pair.into_left()
+    }
+
+    pub fn into_right(self) -> OnceList1<R, A> {
+        self.pair.into_right()
+    }
+    pub fn converter(&self) -> &C {
+        self.pair.converter().inner()
+    }
+    pub fn allocator(&self) -> &A {
+        &self.allocator
+    }
 }
 
 pub(crate) trait MultiConverter<L, R, X> {
@@ -38,48 +100,61 @@ pub(crate) struct BoxedFnMultiConverter<L, R, X, EL, ER> {
     reduce_right: Box<dyn for<'a> Fn(&'a R, &'a R) -> &'a R>,
 }
 
-#[derive(Clone)]
-pub(crate) struct ConverterForOnceList1<C, A>(pub(crate) C, pub(crate) A);
-
-impl<C, A> ConverterForOnceList1<C, A> {
-    pub(crate) fn new_in(converter: C, alloc: A) -> Self {
-        Self(converter, alloc)
+impl<L, R, X, EL, ER> MultiConverter<L, R, X> for BoxedFnMultiConverter<L, R, X, EL, ER> {
+    type ToLeftError = EL;
+    type ToRightError = ER;
+    fn convert_to_left(&self, right: &R) -> Result<L, Self::ToLeftError> {
+        (self.convert_to_left)(right)
     }
-    pub(crate) fn inner(&self) -> &C {
-        &self.0
+    fn convert_to_right(&self, left: &L, context: &X) -> Result<R, Self::ToRightError> {
+        (self.convert_to_right)(left, context)
     }
-    #[allow(unused)]
-    pub(crate) fn inner_mut(&mut self) -> &mut C {
-        &mut self.0
+    fn matches_context(&self, right: &R, context: &X) -> bool {
+        (self.matches_context)(right, context)
     }
-    #[allow(unused)]
-    pub(crate) fn allocator(&self) -> &A {
-        &self.1
+    fn reduce_right<'a>(&self, first: &'a R, second: &'a R) -> &'a R {
+        (self.reduce_right)(first, second)
     }
 }
 
-impl<L, R, A, C> Converter<L, OnceList1<R, A>> for ConverterForOnceList1<C, A>
+struct MultiConverterAdapter<X, C, A> {
+    converter: C,
+    context: Cell<X>,
+    allocator: A,
+}
+
+impl<L, R, X, A, C> Converter<L, OnceList1<R, A>> for MultiConverterAdapter<X, C, A>
 where
-    C: Converter<L, R>,
+    C: MultiConverter<L, R, X>,
+    X: Copy,
     A: Allocator + Clone,
 {
     type ToLeftError = C::ToLeftError;
     type ToRightError = C::ToRightError;
-
-    fn convert_to_left(
-        &self,
-        right: &OnceList1<R, A>,
-    ) -> ::std::result::Result<L, Self::ToLeftError> {
-        self.0.convert_to_left(right.first())
+    fn convert_to_left(&self, right: &OnceList1<R, A>) -> Result<L, Self::ToLeftError> {
+        let reduced = right.reduce(|first, second| self.converter.reduce_right(first, second));
+        self.converter.convert_to_left(reduced)
     }
-
-    fn convert_to_right(
-        &self,
-        left: &L,
-    ) -> ::std::result::Result<OnceList1<R, A>, Self::ToRightError> {
-        Ok(OnceList1::new_in(
-            self.0.convert_to_right(left)?,
-            self.1.clone(),
-        ))
+    fn convert_to_right(&self, left: &L) -> Result<OnceList1<R, A>, Self::ToRightError> {
+        let scalar = self.converter.convert_to_right(left, &self.context.get())?;
+        Ok(OnceList1::new_in(scalar, self.allocator.clone()))
+    }
+}
+impl<X, C, A> MultiConverterAdapter<X, C, A>
+where
+    X: Copy,
+{
+    pub(crate) fn new(converter: C, context: X, allocator: A) -> Self {
+        Self {
+            converter,
+            context: Cell::new(context),
+            allocator,
+        }
+    }
+    pub(crate) fn set_context(&self, context: X) {
+        self.context.set(context);
+    }
+    pub(crate) fn inner(&self) -> &C {
+        &self.converter
     }
 }
