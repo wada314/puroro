@@ -93,16 +93,31 @@ where
         self.pair.try_left_mut()
     }
 
-    pub fn try_right_mut<E>(&mut self) -> Result<&mut R, E> {
-        todo!()
+    pub fn try_right_mut<E>(&mut self, context: X) -> Result<&mut R, E>
+    where
+        E: From<C::ToLeftError> + From<C::ToRightError>,
+    {
+        if let Some(right) = self.pair.right_opt_mut() {
+            if let Some(right_item) = right
+                .iter_mut()
+                .find(|item| self.converter().matches_context(item, &context))
+            {
+                return Ok(right_item);
+            }
+            right.push(
+                self.converter()
+                    .convert_to_right(self.try_left()?, &context)?,
+            );
+        }
+        Ok(self.pair.try_right_mut()?.last_mut())
     }
 
     pub fn try_into_left(self) -> Result<L, C::ToLeftError> {
         self.pair.try_into_left()
     }
 
-    pub fn try_into_right<E>(self) -> Result<R, E> {
-        todo!()myu
+    pub fn try_into_right<E>(self, context: X) -> Result<R, E> {
+        todo!()
     }
 
     pub fn converter(&self) -> &C {

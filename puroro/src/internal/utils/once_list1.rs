@@ -45,6 +45,9 @@ impl<T, A: Allocator> OnceList1<T, A> {
     pub fn iter(&self) -> impl Iterator<Item = &T> {
         iter::once(&self.0).chain(self.1.iter())
     }
+    pub fn iter_mut(&mut self) -> impl Iterator<Item = &mut T> {
+        iter::once(&mut self.0).chain(self.1.iter_mut())
+    }
     pub fn into_iter(self) -> impl Iterator<Item = T> {
         iter::once(self.0).chain(self.1.into_iter())
     }
