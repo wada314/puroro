@@ -51,7 +51,10 @@ where
     }
     pub fn from_right_conv(right: R, converter: C, allocator: A) -> Self {
         Self {
-            pair: Pair::from_right_conv(OnceList1::new_in(right, allocator.clone()), converter),
+            pair: Pair::from_right_conv(
+                OnceList1::new_in(right, allocator.clone()),
+                MultiConverterAdapter::new(converter, X::default(), allocator.clone()),
+            ),
             allocator,
         }
     }
@@ -67,28 +70,30 @@ where
         self.pair.try_left()
     }
 
-    pub fn right(&self) -> &OnceList1<R, A> {
-        self.pair.right()
+    pub fn try_right(&self) -> Result<&OnceList1<R, A>, C::ToRightError> {
+        self.pair.try_right()
     }
 
-    pub fn left_mut(&mut self) -> &mut L {
-        self.pair.left_mut()
+    pub fn try_left_mut(&mut self) -> Result<&mut L, C::ToLeftError> {
+        self.pair.try_left_mut()
     }
 
-    pub fn right_mut(&mut self) -> &mut OnceList1<R, A> {
-        self.pair.right_mut()
+    pub fn try_right_mut(&mut self) -> Result<&mut OnceList1<R, A>, C::ToRightError> {
+        self.pair.try_right_mut()
     }
 
-    pub fn into_left(self) -> L {
-        self.pair.into_left()
+    pub fn try_into_left(self) -> Result<L, C::ToLeftError> {
+        self.pair.try_into_left()
     }
 
-    pub fn into_right(self) -> OnceList1<R, A> {
-        self.pair.into_right()
+    pub fn try_into_right(self) -> Result<OnceList1<R, A>, C::ToRightError> {
+        self.pair.try_into_right()
     }
+
     pub fn converter(&self) -> &C {
         self.pair.converter().inner()
     }
+
     pub fn allocator(&self) -> &A {
         &self.allocator
     }
