@@ -70,8 +70,23 @@ where
         self.pair.try_left()
     }
 
-    pub fn try_right(&self) -> Result<&OnceList1<R, A>, C::ToRightError> {
-        self.pair.try_right()
+    pub fn try_right<E>(&self, context: X) -> Result<&R, E>
+    where
+        E: From<C::ToLeftError> + From<C::ToRightError>,
+    {
+        if let Some(right) = self.pair.right_opt() {
+            if let Some(right_item) = right
+                .iter()
+                .find(|item| self.converter().matches_context(item, &context))
+            {
+                return Ok(right_item);
+            }
+            right.push(
+                self.converter()
+                    .convert_to_right(self.try_left()?, &context)?,
+            );
+        }
+        Ok(self.pair.try_right()?.last())
     }
 
     pub fn try_left_mut(&mut self) -> Result<&mut L, C::ToLeftError> {
