@@ -14,22 +14,16 @@
 
 use crate::dynamic::payload::{DynamicLenPayload, WireTypeAndPayload};
 use crate::dynamic::DynamicMessage;
-use crate::internal::utils::{
-    boxed_fn_converter_with_context, BoxedFnConverterWithContext, MultiConverter, MultiPair,
-    PairWithOnceList1, PairWithOnceList1Ext,
-};
+use crate::internal::utils::{MultiConverter, MultiPair};
 use crate::variant::{ReadExtVariant, Variant, VariantIntegerType, WriteExtVariant};
 use crate::{ErrorKind, Result};
-use ::cached_pair::{EitherOrBoth, Pair};
 use ::derive_more::{Debug, TryUnwrap};
 use ::itertools::Either;
 use ::std::alloc::{Allocator, Global};
-use ::std::cell::Cell;
-use ::std::convert::Infallible;
 use ::std::str;
 use ::std::vec::Vec;
 
-#[derive(Clone, Debug)]
+#[derive(Clone)]
 pub struct DynamicField<A: Allocator = Global> {
     payloads: MultiPair<
         Vec<WireTypeAndPayload<A>, A>,
@@ -40,9 +34,14 @@ pub struct DynamicField<A: Allocator = Global> {
     >,
 }
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy)]
 struct FieldCustomViewConverter<A> {
     allocator: A,
+}
+impl<A: Allocator> Debug for FieldCustomViewConverter<A> {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        f.debug_struct("FieldCustomViewConverter").finish()
+    }
 }
 
 impl<A: Allocator + Clone>
@@ -74,6 +73,14 @@ impl<A: Allocator + Clone>
             (FieldCustomView::ScalarMessage(_), FieldCustomViewCase::ScalarMessage) => true,
             _ => false,
         }
+    }
+}
+
+impl<A: Allocator> Debug for DynamicField<A> {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        f.debug_struct("DynamicField")
+            .field("payloads", &self.payloads)
+            .finish()
     }
 }
 

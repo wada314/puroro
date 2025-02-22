@@ -13,18 +13,13 @@
 // limitations under the License.
 
 use super::DynamicMessage;
-use crate::internal::utils::{
-    MultiConverter, MultiPair, OnceList1, PairWithOnceList1, PairWithOnceList1Ext,
-};
+use crate::internal::utils::{MultiConverter, MultiPair};
 use crate::internal::WireType;
 use crate::message::MessageMut;
 use crate::variant::{ReadExtVariant, Variant, WriteExtVariant};
 use crate::{ErrorKind, Result};
-use ::cached_pair::{EitherOrBoth, Pair};
 use ::derive_more::{Debug, TryUnwrap};
 use ::std::alloc::{Allocator, Global};
-use ::std::cell::Cell;
-use ::std::convert::Infallible;
 
 #[derive(Clone, Debug)]
 pub struct DynamicLenPayload<A: Allocator = Global> {
