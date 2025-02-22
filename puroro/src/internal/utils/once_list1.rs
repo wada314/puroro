@@ -61,6 +61,12 @@ impl<T, A: Allocator> OnceList1<T, A> {
     pub fn allocator(&self) -> &A {
         self.1.allocator()
     }
+}
+
+impl<T, A: Allocator + Clone> OnceList1<T, A> {
+    pub fn extend(&self, other: impl IntoIterator<Item = T>) {
+        self.1.extend(other);
+    }
 
     /// Removes an element that matches the given predicate.
     /// If an element matches, returns Ok with the removed element and the remaining elements as OnceList.
@@ -74,7 +80,7 @@ impl<T, A: Allocator> OnceList1<T, A> {
             let OnceList1(first, mut rest) = self;
             match rest.remove(&f) {
                 Some(removed) => {
-                    let mut new_rest = OnceList::new_in(rest.allocator().clone());
+                    let new_rest = OnceList::new_in(rest.allocator().clone());
                     new_rest.push(first);
                     new_rest.extend(rest.into_iter());
                     Ok((removed, new_rest))
@@ -82,12 +88,6 @@ impl<T, A: Allocator> OnceList1<T, A> {
                 None => Err(OnceList1(first, rest)),
             }
         }
-    }
-}
-
-impl<T, A: Allocator + Clone> OnceList1<T, A> {
-    pub fn extend(&self, other: impl IntoIterator<Item = T>) {
-        self.1.extend(other);
     }
 }
 
