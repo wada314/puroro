@@ -41,9 +41,11 @@ where
     X: Default + Copy,
     C: Default,
 {
+    #[allow(unused)]
     pub fn from_left(left: L, allocator: A) -> Self {
         Self::from_left_conv(left, C::default(), allocator)
     }
+    #[allow(unused)]
     pub fn from_right(right: R, allocator: A) -> Self {
         Self::from_right_conv(right, C::default(), allocator)
     }
@@ -142,6 +144,7 @@ where
         self.pair.try_into_left()
     }
 
+    #[allow(unused)]
     pub fn try_into_right<E>(self, context: X) -> Result<R, E>
     where
         E: From<C::ToLeftError> + From<C::ToRightError>,
@@ -266,6 +269,7 @@ impl<X, C, A> MultiConverterAdapter<X, C, A> {
             allocator,
         }
     }
+    #[allow(unused)]
     pub(crate) fn set_context(&self, context: X) {
         self.context.set(context);
     }

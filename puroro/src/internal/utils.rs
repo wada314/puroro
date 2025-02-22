@@ -12,10 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-mod converter;
 mod multi_pair;
 mod once_list1;
 
-pub(crate) use self::converter::{boxed_fn_converter_with_context, BoxedFnConverterWithContext};
 pub(crate) use self::multi_pair::{MultiConverter, MultiPair};
 pub(crate) use self::once_list1::OnceList1;

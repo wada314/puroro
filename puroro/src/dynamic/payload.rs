@@ -157,6 +157,7 @@ impl<A: Allocator + Clone> DynamicLenPayload<A> {
         }
     }
 
+    #[allow(unused)]
     pub(crate) fn from_variant(variant: Variant, alloc: &A) -> Self {
         let mut vec = Vec::new_in(alloc.clone());
         vec.push(variant);
@@ -173,6 +174,7 @@ impl<A: Allocator + Clone> DynamicLenPayload<A> {
         self.payload.left()
     }
 
+    #[allow(unused)]
     pub(crate) fn as_buf_mut(&mut self) -> &mut Vec<u8, A> {
         self.payload.left_mut()
     }
@@ -187,10 +189,21 @@ impl<A: Allocator + Clone> DynamicLenPayload<A> {
         Ok(msg)
     }
 
+    #[allow(unused)]
     pub(crate) fn as_packed_variants(&self) -> Result<&Vec<Variant, A>> {
         let LenCustomPayloadView::PackedVariants(variants) = self
             .payload
             .try_right::<ErrorKind>(LenCustomPayloadViewCase::PackedVariants)?
+        else {
+            unreachable!()
+        };
+        Ok(variants)
+    }
+
+    pub(crate) fn as_packed_variants_mut(&mut self) -> Result<&mut Vec<Variant, A>> {
+        let LenCustomPayloadView::PackedVariants(variants) = self
+            .payload
+            .try_right_mut::<ErrorKind>(LenCustomPayloadViewCase::PackedVariants)?
         else {
             unreachable!()
         };

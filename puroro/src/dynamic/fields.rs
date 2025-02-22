@@ -69,6 +69,7 @@ impl<A: Allocator + Clone>
         }
     }
     fn matches_context(&self, right: &FieldCustomView<A>, context: &FieldCustomViewCase) -> bool {
+        #[allow(unreachable_patterns)]
         match (right, context) {
             (FieldCustomView::ScalarMessage(_), FieldCustomViewCase::ScalarMessage) => true,
             _ => false,
@@ -218,8 +219,8 @@ impl<A: Allocator + Clone> DynamicField<A> {
         let payloads = self.as_payloads_mut();
         if allow_packed {
             if let Some(WireTypeAndPayload::Len(dyn_len_payload)) = payloads.last_mut() {
-                if let Ok(packed_variants) = dyn_len_payload.as_packed_variants() {
-                    todo!(); // packed_variants.push(val);
+                if let Ok(packed_variants) = dyn_len_payload.as_packed_variants_mut() {
+                    packed_variants.push(val);
                     return;
                 }
             }
@@ -416,7 +417,6 @@ impl<A: Allocator + Clone> Extend<Vec<u8, A>> for DynamicField<A> {
 
 impl<A: Allocator + Clone> Extend<DynamicMessage<A>> for DynamicField<A> {
     fn extend<T: IntoIterator<Item = DynamicMessage<A>>>(&mut self, iter: T) {
-        let alloc = self.allocator().clone();
         self.as_payloads_mut().extend(
             iter.into_iter()
                 .map(|val| WireTypeAndPayload::Len(DynamicLenPayload::from_message(val))),

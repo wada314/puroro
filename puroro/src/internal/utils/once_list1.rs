@@ -33,6 +33,7 @@ impl<T, A: Allocator> OnceList1<T, A> {
             None => self.first(),
         }
     }
+    #[allow(unused)]
     pub fn first_mut(&mut self) -> &mut T {
         &mut self.0
     }
@@ -48,6 +49,7 @@ impl<T, A: Allocator> OnceList1<T, A> {
     pub fn iter_mut(&mut self) -> impl Iterator<Item = &mut T> {
         iter::once(&mut self.0).chain(self.1.iter_mut())
     }
+    #[allow(unused)]
     pub fn into_iter(self) -> impl Iterator<Item = T> {
         iter::once(self.0).chain(self.1.into_iter())
     }
@@ -58,12 +60,14 @@ impl<T, A: Allocator> OnceList1<T, A> {
         }
         result
     }
+    #[allow(unused)]
     pub fn allocator(&self) -> &A {
         self.1.allocator()
     }
 }
 
 impl<T, A: Allocator + Clone> OnceList1<T, A> {
+    #[allow(unused)]
     pub fn extend(&self, other: impl IntoIterator<Item = T>) {
         self.1.extend(other);
     }
@@ -95,6 +99,7 @@ impl<T, A: Allocator + Clone> OnceList1<T, A> {
     pub fn push(&self, value: T) -> &T {
         self.1.push(value)
     }
+    #[allow(unused)]
     pub fn take_some(mut self, pred: impl Fn(&T) -> bool) -> Option<T> {
         if pred(&self.0) {
             Some(self.0)
