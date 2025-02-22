@@ -14,11 +14,15 @@
 
 use super::OnceList1;
 use ::cached_pair::{Converter, Pair};
-use ::std::{alloc::Allocator, cell::Cell};
+use ::polonius_the_crab::{polonius, polonius_return, polonius_try};
+use ::std::alloc::Allocator;
+use ::std::cell::Cell;
+use ::std::rc::Rc;
 
 pub(crate) struct MultiPair<L, R, A: Allocator, X, C> {
     pair: Pair<L, OnceList1<R, A>, MultiConverterAdapter<X, C, A>>,
     allocator: A,
+    converter: Rc<C>,
 }
 
 impl<L, R, A, X, C> MultiPair<L, R, A, X, C>
@@ -41,21 +45,25 @@ where
     X: Default + Copy,
 {
     pub fn from_left_conv(left: L, converter: C, allocator: A) -> Self {
+        let converter = Rc::new(converter);
         Self {
             pair: Pair::from_left_conv(
                 left,
-                MultiConverterAdapter::new(converter, X::default(), allocator.clone()),
+                MultiConverterAdapter::new(converter.clone(), X::default(), allocator.clone()),
             ),
             allocator,
+            converter,
         }
     }
     pub fn from_right_conv(right: R, converter: C, allocator: A) -> Self {
+        let converter = Rc::new(converter);
         Self {
             pair: Pair::from_right_conv(
                 OnceList1::new_in(right, allocator.clone()),
-                MultiConverterAdapter::new(converter, X::default(), allocator.clone()),
+                MultiConverterAdapter::new(converter.clone(), X::default(), allocator.clone()),
             ),
             allocator,
+            converter,
         }
     }
 }
@@ -97,19 +105,27 @@ where
     where
         E: From<C::ToLeftError> + From<C::ToRightError>,
     {
-        if let Some(right) = self.pair.right_opt_mut() {
-            if let Some(right_item) = right
-                .iter_mut()
-                .find(|item| self.converter().matches_context(item, &context))
-            {
-                return Ok(right_item);
+        let mut this = self;
+        polonius!(|this| -> Result<&'polonius mut R, E> {
+            if let Some(right) = this.pair.right_opt_mut() {
+                if let Some(right_item) = right
+                    .iter_mut()
+                    .find(|item| this.converter.matches_context(item, &context))
+                {
+                    polonius_return!(Ok(right_item));
+                }
             }
-            right.push(
-                self.converter()
-                    .convert_to_right(self.try_left()?, &context)?,
-            );
-        }
-        Ok(self.pair.try_right_mut()?.last_mut())
+        });
+
+        polonius!(|this| -> Result<&'polonius mut R, E> {
+            if let Some(right) = this.pair.right_opt() {
+                right.push(polonius_try!(this
+                    .converter
+                    .convert_to_right(polonius_try!(this.try_left()), &context)));
+            }
+        });
+
+        Ok(this.pair.try_right_mut()?.last_mut())
     }
 
     pub fn try_into_left(self) -> Result<L, C::ToLeftError> {
@@ -165,7 +181,7 @@ impl<L, R, X, EL, ER> MultiConverter<L, R, X> for BoxedFnMultiConverter<L, R, X,
 }
 
 struct MultiConverterAdapter<X, C, A> {
-    converter: C,
+    converter: Rc<C>,
     context: Cell<X>,
     allocator: A,
 }
@@ -191,7 +207,7 @@ impl<X, C, A> MultiConverterAdapter<X, C, A>
 where
     X: Copy,
 {
-    pub(crate) fn new(converter: C, context: X, allocator: A) -> Self {
+    pub(crate) fn new(converter: Rc<C>, context: X, allocator: A) -> Self {
         Self {
             converter,
             context: Cell::new(context),
