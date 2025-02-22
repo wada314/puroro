@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use super::OnceList1;
-use ::cached_pair::{Converter, Pair};
+use ::cached_pair::{Converter, EitherOrBoth, Pair};
 use ::polonius_the_crab::{polonius, polonius_return, polonius_try};
 use ::std::alloc::Allocator;
 use ::std::cell::Cell;
@@ -132,8 +132,36 @@ where
         self.pair.try_into_left()
     }
 
-    pub fn try_into_right<E>(self, context: X) -> Result<R, E> {
-        todo!()
+    pub fn try_into_right<E>(self, context: X) -> Result<R, E>
+    where
+        E: From<C::ToLeftError> + From<C::ToRightError>,
+    {
+        let either = self.pair.into();
+        let converter = self.converter;
+        let left = match either {
+            EitherOrBoth::Left(left) => left,
+            EitherOrBoth::Right(right) => {
+                match right.remove(|item| converter.matches_context(item, &context)) {
+                    Ok((removed, _)) => {
+                        return Ok(removed);
+                    }
+                    Err(right) => {
+                        let reduced =
+                            right.reduce(|first, second| converter.reduce_right(first, second));
+                        converter.convert_to_left(reduced)?
+                    }
+                }
+            }
+            EitherOrBoth::Both(left, right) => {
+                match right.remove(|item| converter.matches_context(item, &context)) {
+                    Ok((removed, _)) => {
+                        return Ok(removed);
+                    }
+                    Err(_) => left,
+                }
+            }
+        };
+        Ok(converter.convert_to_right(&left, &context)?)
     }
 
     pub fn converter(&self) -> &C {

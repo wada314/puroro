@@ -61,6 +61,28 @@ impl<T, A: Allocator> OnceList1<T, A> {
     pub fn allocator(&self) -> &A {
         self.1.allocator()
     }
+
+    /// Removes an element that matches the given predicate.
+    /// If an element matches, returns Ok with the removed element and the remaining elements as OnceList.
+    /// If no elements match, returns Err with the original list.
+    pub fn remove<F: Fn(&T) -> bool>(self, f: F) -> Result<(T, OnceList<T, A>), OnceList1<T, A>> {
+        if f(&self.0) {
+            let OnceList1(first, rest) = self;
+            Ok((first, rest))
+        } else {
+            // Try to remove from rest of list
+            let OnceList1(first, mut rest) = self;
+            match rest.remove(&f) {
+                Some(removed) => {
+                    let mut new_rest = OnceList::new_in(rest.allocator().clone());
+                    new_rest.push(first);
+                    new_rest.extend(rest.into_iter());
+                    Ok((removed, new_rest))
+                }
+                None => Err(OnceList1(first, rest)),
+            }
+        }
+    }
 }
 
 impl<T, A: Allocator + Clone> OnceList1<T, A> {
