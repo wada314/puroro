@@ -14,8 +14,7 @@
 
 use super::DynamicMessage;
 use crate::internal::utils::{
-    boxed_fn_converter_with_context, BoxedFnConverterWithContext, ConverterForOnceList1, OnceList1,
-    PairWithOnceList1, PairWithOnceList1Ext,
+    MultiConverter, MultiPair, OnceList1, PairWithOnceList1, PairWithOnceList1Ext,
 };
 use crate::internal::WireType;
 use crate::message::MessageMut;
@@ -29,8 +28,13 @@ use ::std::convert::Infallible;
 
 #[derive(Clone, Debug)]
 pub struct DynamicLenPayload<A: Allocator = Global> {
-    payload:
-        PairWithOnceList1<Vec<u8, A>, LenCustomPayloadView<A>, A, DynamicLenPayloadConverter<A>>,
+    payload: MultiPair<
+        Vec<u8, A>,
+        LenCustomPayloadView<A>,
+        A,
+        LenCustomPayloadViewCase,
+        DynamicLenPayloadConverter,
+    >,
 }
 
 #[derive(Clone, Debug)]
@@ -60,38 +64,64 @@ pub enum LenCustomPayloadView<A: Allocator = Global> {
     PackedVariants(Vec<Variant, A>),
 }
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, Default)]
 enum LenCustomPayloadViewCase {
+    #[default]
     Message,
     PackedVariants,
 }
 
-type DynamicLenPayloadConverter<A> = BoxedFnConverterWithContext<
-    Cell<LenCustomPayloadViewCase>,
-    Vec<u8, A>,
-    LenCustomPayloadView<A>,
-    Infallible,
-    ErrorKind,
->;
-fn dynamic_len_payload_converter<A: Allocator + Clone>() -> DynamicLenPayloadConverter<A> {
-    boxed_fn_converter_with_context(
-        Cell::new(LenCustomPayloadViewCase::Message),
-        |view: &LenCustomPayloadView<A>, _| Ok(view.to_buf()),
-        |buf: &Vec<u8, A>, case| match case.get() {
+#[derive(Clone, Copy, Debug)]
+struct DynamicLenPayloadConverter;
+
+impl<A: Allocator + Clone>
+    MultiConverter<Vec<u8, A>, LenCustomPayloadView<A>, LenCustomPayloadViewCase>
+    for DynamicLenPayloadConverter
+{
+    type ToLeftError = !;
+    type ToRightError = ErrorKind;
+
+    fn convert_to_left(
+        &self,
+        right: &LenCustomPayloadView<A>,
+    ) -> ::std::result::Result<Vec<u8, A>, Self::ToLeftError> {
+        Ok(right.to_buf())
+    }
+
+    fn convert_to_right(
+        &self,
+        left: &Vec<u8, A>,
+        context: &LenCustomPayloadViewCase,
+    ) -> ::std::result::Result<LenCustomPayloadView<A>, Self::ToRightError> {
+        match context {
             LenCustomPayloadViewCase::Message => Ok(LenCustomPayloadView::Message({
-                let mut msg = DynamicMessage::new_in(buf.allocator().clone());
-                msg.merge_from_read(buf.as_slice())?;
+                let mut msg = DynamicMessage::new_in(left.allocator().clone());
+                msg.merge_from_read(left.as_slice())?;
                 msg
             })),
             LenCustomPayloadViewCase::PackedVariants => Ok(LenCustomPayloadView::PackedVariants({
-                let mut variants = Vec::new_in(buf.allocator().clone());
-                for v in buf.into_variant_iter() {
+                let mut variants = Vec::new_in(left.allocator().clone());
+                for v in left.into_variant_iter() {
                     variants.push(v?);
                 }
                 variants
             })),
-        },
-    )
+        }
+    }
+
+    fn matches_context(
+        &self,
+        right: &LenCustomPayloadView<A>,
+        context: &LenCustomPayloadViewCase,
+    ) -> bool {
+        match (right, context) {
+            (LenCustomPayloadView::Message(_), LenCustomPayloadViewCase::Message) => true,
+            (LenCustomPayloadView::PackedVariants(_), LenCustomPayloadViewCase::PackedVariants) => {
+                true
+            }
+            _ => false,
+        }
+    }
 }
 
 impl<A: Allocator + Clone> LenCustomPayloadView<A> {
@@ -117,18 +147,17 @@ impl<A: Allocator + Clone> DynamicLenPayload<A> {
     pub(crate) fn from_buf(buf: Vec<u8, A>) -> Self {
         let alloc = buf.allocator().clone();
         Self {
-            payload: Pair::from_left_conv(
-                buf,
-                ConverterForOnceList1::new_in(dynamic_len_payload_converter::<A>(), alloc),
-            ),
+            payload: MultiPair::from_left_conv(buf, DynamicLenPayloadConverter, alloc),
         }
     }
 
-    pub(crate) fn from_message(msg: DynamicMessage<A>, alloc: &A) -> Self {
+    pub(crate) fn from_message(msg: DynamicMessage<A>) -> Self {
+        let alloc = msg.allocator().clone();
         Self {
-            payload: Pair::from_right_conv(
-                OnceList1::new_in(LenCustomPayloadView::Message(msg), alloc.clone()),
-                ConverterForOnceList1::new_in(dynamic_len_payload_converter::<A>(), alloc.clone()),
+            payload: MultiPair::from_right_conv(
+                LenCustomPayloadView::Message(msg),
+                DynamicLenPayloadConverter,
+                alloc,
             ),
         }
     }
@@ -137,27 +166,26 @@ impl<A: Allocator + Clone> DynamicLenPayload<A> {
         let mut vec = Vec::new_in(alloc.clone());
         vec.push(variant);
         Self {
-            payload: Pair::from_right_conv(
-                OnceList1::new_in(LenCustomPayloadView::PackedVariants(vec), alloc.clone()),
-                ConverterForOnceList1::new_in(dynamic_len_payload_converter::<A>(), alloc.clone()),
+            payload: MultiPair::from_right_conv(
+                LenCustomPayloadView::PackedVariants(vec),
+                DynamicLenPayloadConverter,
+                alloc.clone(),
             ),
         }
     }
 
     pub(crate) fn as_buf(&self) -> &Vec<u8, A> {
-        unsafe { self.payload.left_with(|list| list.first().to_buf()) }
+        self.payload.left()
     }
 
     pub(crate) fn as_buf_mut(&mut self) -> &mut Vec<u8, A> {
-        unsafe { self.payload.left_mut_with(|list| list.first().to_buf()) }
+        self.payload.left_mut()
     }
 
     pub(crate) fn as_message(&self) -> Result<&DynamicMessage<A>> {
-        self.set_context(LenCustomPayloadViewCase::Message);
-        let LenCustomPayloadView::Message(msg) =
-            self.payload.try_get_or_insert_into_right(|view| {
-                matches!(view, LenCustomPayloadView::Message(_))
-            })?
+        let LenCustomPayloadView::Message(msg) = self
+            .payload
+            .try_right::<ErrorKind>(LenCustomPayloadViewCase::Message)?
         else {
             unreachable!()
         };
@@ -165,27 +193,18 @@ impl<A: Allocator + Clone> DynamicLenPayload<A> {
     }
 
     pub(crate) fn as_packed_variants(&self) -> Result<&Vec<Variant, A>> {
-        self.set_context(LenCustomPayloadViewCase::PackedVariants);
-        let LenCustomPayloadView::PackedVariants(variants) =
-            self.payload.try_get_or_insert_into_right(|view| {
-                matches!(view, LenCustomPayloadView::PackedVariants(_))
-            })?
+        let LenCustomPayloadView::PackedVariants(variants) = self
+            .payload
+            .try_right::<ErrorKind>(LenCustomPayloadViewCase::PackedVariants)?
         else {
             unreachable!()
         };
         Ok(variants)
     }
-
-    fn set_context(&self, case: LenCustomPayloadViewCase) {
-        self.payload.converter().inner().context().set(case);
-    }
 }
 
 impl<A: Allocator> DynamicLenPayload<A> {
     pub(crate) fn allocator(&self) -> &A {
-        match self.payload.as_ref() {
-            EitherOrBoth::Left(vec) | EitherOrBoth::Both(vec, _) => vec.allocator(),
-            EitherOrBoth::Right(list) => list.allocator(),
-        }
+        self.payload.allocator()
     }
 }

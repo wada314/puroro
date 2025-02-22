@@ -17,7 +17,8 @@
 #![feature(assert_matches)]
 #![feature(once_cell_try)]
 #![feature(once_cell_try_insert)]
-#![feature(trait_upcasting)]
+#![feature(never_type)]
+#![feature(unwrap_infallible)]
 #![feature(downcast_unchecked)]
 #![feature(vec_into_raw_parts)]
 
@@ -69,6 +70,11 @@ pub enum ErrorKind {
     TryFromIntIntoEnumError(i32),
     #[error("No left value available for generating default value")]
     NoLeftValueForDefault,
+}
+impl From<!> for ErrorKind {
+    fn from(value: !) -> Self {
+        match value {}
+    }
 }
 impl From<String> for ErrorKind {
     fn from(s: String) -> Self {

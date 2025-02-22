@@ -17,12 +17,22 @@ use ::cached_pair::{Converter, EitherOrBoth, Pair};
 use ::polonius_the_crab::{polonius, polonius_return, polonius_try};
 use ::std::alloc::Allocator;
 use ::std::cell::Cell;
+use ::std::fmt::Debug;
 use ::std::rc::Rc;
 
 pub(crate) struct MultiPair<L, R, A: Allocator, X, C> {
     pair: Pair<L, OnceList1<R, A>, MultiConverterAdapter<X, C, A>>,
     allocator: A,
     converter: Rc<C>,
+}
+
+impl<L, R, A: Allocator, X, C> MultiPair<L, R, A, X, C> {
+    pub fn converter(&self) -> &C {
+        self.pair.converter().inner()
+    }
+    pub fn allocator(&self) -> &A {
+        &self.allocator
+    }
 }
 
 impl<L, R, A, X, C> MultiPair<L, R, A, X, C>
@@ -163,13 +173,51 @@ where
         };
         Ok(converter.convert_to_right(&left, &context)?)
     }
+}
 
-    pub fn converter(&self) -> &C {
-        self.pair.converter().inner()
+impl<L, R, A, X, C> MultiPair<L, R, A, X, C>
+where
+    A: Allocator + Clone,
+    X: Copy + Default,
+    C: MultiConverter<L, R, X, ToLeftError = !>,
+{
+    pub fn left(&self) -> &L {
+        self.try_left().into_ok()
     }
+    pub fn left_mut(&mut self) -> &mut L {
+        self.try_left_mut().into_ok()
+    }
+}
 
-    pub fn allocator(&self) -> &A {
-        &self.allocator
+impl<L, R, A, X, C> Clone for MultiPair<L, R, A, X, C>
+where
+    A: Allocator + Clone,
+    X: Copy,
+    C: Clone,
+    L: Clone,
+    R: Clone,
+{
+    fn clone(&self) -> Self {
+        Self {
+            pair: self.pair.clone(),
+            allocator: self.allocator.clone(),
+            converter: self.converter.clone(),
+        }
+    }
+}
+
+impl<L, R, A, X, C> Debug for MultiPair<L, R, A, X, C>
+where
+    X: Debug,
+    C: Debug,
+    A: Allocator,
+    L: Debug,
+    R: Debug,
+{
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        f.debug_struct("MultiPair")
+            .field("pair", &self.pair)
+            .finish()
     }
 }
 
@@ -181,30 +229,6 @@ pub(crate) trait MultiConverter<L, R, X> {
     fn matches_context(&self, right: &R, context: &X) -> bool;
     fn reduce_right<'a>(&self, first: &'a R, #[allow(unused)] second: &'a R) -> &'a R {
         first
-    }
-}
-
-pub(crate) struct BoxedFnMultiConverter<L, R, X, EL, ER> {
-    convert_to_left: Box<dyn Fn(&R) -> Result<L, EL>>,
-    convert_to_right: Box<dyn Fn(&L, &X) -> Result<R, ER>>,
-    matches_context: Box<dyn Fn(&R, &X) -> bool>,
-    reduce_right: Box<dyn for<'a> Fn(&'a R, &'a R) -> &'a R>,
-}
-
-impl<L, R, X, EL, ER> MultiConverter<L, R, X> for BoxedFnMultiConverter<L, R, X, EL, ER> {
-    type ToLeftError = EL;
-    type ToRightError = ER;
-    fn convert_to_left(&self, right: &R) -> Result<L, Self::ToLeftError> {
-        (self.convert_to_left)(right)
-    }
-    fn convert_to_right(&self, left: &L, context: &X) -> Result<R, Self::ToRightError> {
-        (self.convert_to_right)(left, context)
-    }
-    fn matches_context(&self, right: &R, context: &X) -> bool {
-        (self.matches_context)(right, context)
-    }
-    fn reduce_right<'a>(&self, first: &'a R, second: &'a R) -> &'a R {
-        (self.reduce_right)(first, second)
     }
 }
 
@@ -231,10 +255,7 @@ where
         Ok(OnceList1::new_in(scalar, self.allocator.clone()))
     }
 }
-impl<X, C, A> MultiConverterAdapter<X, C, A>
-where
-    X: Copy,
-{
+impl<X, C, A> MultiConverterAdapter<X, C, A> {
     pub(crate) fn new(converter: Rc<C>, context: X, allocator: A) -> Self {
         Self {
             converter,
@@ -247,5 +268,30 @@ where
     }
     pub(crate) fn inner(&self) -> &C {
         &self.converter
+    }
+}
+impl<X, C, A> Clone for MultiConverterAdapter<X, C, A>
+where
+    X: Copy,
+    A: Clone,
+{
+    fn clone(&self) -> Self {
+        Self {
+            converter: self.converter.clone(),
+            context: self.context.clone(),
+            allocator: self.allocator.clone(),
+        }
+    }
+}
+impl<X, C, A> Debug for MultiConverterAdapter<X, C, A>
+where
+    X: Copy + Debug,
+    C: Debug,
+{
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        f.debug_struct("MultiConverterAdapter")
+            .field("converter", &self.converter)
+            .field("context", &self.context.get())
+            .finish()
     }
 }
