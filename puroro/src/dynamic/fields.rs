@@ -15,7 +15,7 @@
 use crate::dynamic::payload::{DynamicLenPayload, WireTypeAndPayload};
 use crate::dynamic::DynamicMessage;
 use crate::internal::utils::{
-    boxed_fn_converter_with_context, BoxedFnConverterWithContext, ConverterForOnceList1,
+    boxed_fn_converter_with_context, BoxedFnConverterWithContext, MultiConverter, MultiPair,
     PairWithOnceList1, PairWithOnceList1Ext,
 };
 use crate::variant::{ReadExtVariant, Variant, VariantIntegerType, WriteExtVariant};
@@ -31,31 +31,50 @@ use ::std::vec::Vec;
 
 #[derive(Clone, Debug)]
 pub struct DynamicField<A: Allocator = Global> {
-    payloads: PairWithOnceList1<
+    payloads: MultiPair<
         Vec<WireTypeAndPayload<A>, A>,
         FieldCustomView<A>,
         A,
+        FieldCustomViewCase,
         FieldCustomViewConverter<A>,
     >,
 }
 
-type FieldCustomViewConverter<A> = BoxedFnConverterWithContext<
-    (Cell<FieldCustomViewCase>, A),
-    Vec<WireTypeAndPayload<A>, A>,
-    FieldCustomView<A>,
-    Infallible,
-    ErrorKind,
->;
-fn field_custom_view_converter<A: Allocator + Clone>(alloc: A) -> FieldCustomViewConverter<A> {
-    boxed_fn_converter_with_context(
-        (Cell::new(FieldCustomViewCase::ScalarMessage), alloc),
-        |view: &FieldCustomView<A>, (_, alloc)| Ok(view.to_field(alloc)),
-        |payloads: &Vec<WireTypeAndPayload<A>, A>, (case, _)| match case.get() {
+#[derive(Clone, Copy, Debug)]
+struct FieldCustomViewConverter<A> {
+    allocator: A,
+}
+
+impl<A: Allocator + Clone>
+    MultiConverter<Vec<WireTypeAndPayload<A>, A>, FieldCustomView<A>, FieldCustomViewCase>
+    for FieldCustomViewConverter<A>
+{
+    type ToLeftError = !;
+    type ToRightError = ErrorKind;
+
+    fn convert_to_left(
+        &self,
+        right: &FieldCustomView<A>,
+    ) -> ::std::result::Result<Vec<WireTypeAndPayload<A>, A>, Self::ToLeftError> {
+        Ok(right.to_field(&self.allocator))
+    }
+    fn convert_to_right(
+        &self,
+        left: &Vec<WireTypeAndPayload<A>, A>,
+        context: &FieldCustomViewCase,
+    ) -> ::std::result::Result<FieldCustomView<A>, Self::ToRightError> {
+        match context {
             FieldCustomViewCase::ScalarMessage => Ok(FieldCustomView::ScalarMessage(
-                FieldCustomView::try_scalar_message_from_payloads(payloads.iter())?,
+                FieldCustomView::try_scalar_message_from_payloads(left.iter())?,
             )),
-        },
-    )
+        }
+    }
+    fn matches_context(&self, right: &FieldCustomView<A>, context: &FieldCustomViewCase) -> bool {
+        match (right, context) {
+            (FieldCustomView::ScalarMessage(_), FieldCustomViewCase::ScalarMessage) => true,
+            _ => false,
+        }
+    }
 }
 
 #[derive(Clone, Debug, TryUnwrap, ::derive_more::TryInto, ::derive_more::From)]
@@ -65,8 +84,9 @@ pub enum FieldCustomView<A: Allocator = Global> {
     ScalarMessage(Option<DynamicMessage<A>>),
 }
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, Default)]
 enum FieldCustomViewCase {
+    #[default]
     ScalarMessage,
 }
 
@@ -164,12 +184,10 @@ impl<A: Allocator + Clone> DynamicField<A> {
     }
 
     pub fn as_scalar_message(&self) -> Result<Option<&DynamicMessage<A>>> {
-        self.set_context(FieldCustomViewCase::ScalarMessage);
         #[allow(irrefutable_let_patterns)]
-        let FieldCustomView::ScalarMessage(scalar_message_ref) =
-            self.payloads.try_get_or_insert_into_right(|view| {
-                TryInto::<&Option<DynamicMessage<A>>>::try_into(view).is_ok()
-            })?
+        let FieldCustomView::ScalarMessage(scalar_message_ref) = self
+            .payloads
+            .try_right::<ErrorKind>(FieldCustomViewCase::ScalarMessage)?
         else {
             unreachable!()
         };
@@ -233,21 +251,20 @@ impl<A: Allocator + Clone> DynamicField<A> {
     }
 
     pub fn push_message(&mut self, val: DynamicMessage<A>) {
-        let alloc = self.allocator().clone();
         self.as_payloads_mut()
             .push(WireTypeAndPayload::Len(DynamicLenPayload::from_message(
-                val, &alloc,
+                val,
             )));
     }
 
     pub(crate) fn default_in(alloc: A) -> Self {
         Self {
-            payloads: Pair::from_left_conv(
+            payloads: MultiPair::from_left_conv(
                 Vec::new_in(alloc.clone()),
-                ConverterForOnceList1::new_in(
-                    field_custom_view_converter::<A>(alloc.clone()),
-                    alloc.clone(),
-                ),
+                FieldCustomViewConverter {
+                    allocator: alloc.clone(),
+                },
+                alloc.clone(),
             ),
         }
     }
@@ -287,14 +304,7 @@ impl<A: Allocator + Clone> DynamicField<A> {
 
 impl<A: Allocator> DynamicField<A> {
     fn allocator(&self) -> &A {
-        let as_ref = self.payloads.as_ref();
-        match as_ref {
-            EitherOrBoth::Left(vec) | EitherOrBoth::Both(vec, _) => vec.allocator(),
-            EitherOrBoth::Right(list) => list.allocator(),
-        }
-    }
-    fn set_context(&self, case: FieldCustomViewCase) {
-        self.payloads.converter().inner().context().0.set(case);
+        self.payloads.allocator()
     }
 }
 
@@ -402,7 +412,7 @@ impl<A: Allocator + Clone> Extend<DynamicMessage<A>> for DynamicField<A> {
         let alloc = self.allocator().clone();
         self.as_payloads_mut().extend(
             iter.into_iter()
-                .map(|val| WireTypeAndPayload::Len(DynamicLenPayload::from_message(val, &alloc))),
+                .map(|val| WireTypeAndPayload::Len(DynamicLenPayload::from_message(val))),
         );
     }
 }

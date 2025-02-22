@@ -187,6 +187,9 @@ where
     pub fn left_mut(&mut self) -> &mut L {
         self.try_left_mut().into_ok()
     }
+    pub fn into_left(self) -> L {
+        self.try_into_left().into_ok()
+    }
 }
 
 impl<L, R, A, X, C> Clone for MultiPair<L, R, A, X, C>
