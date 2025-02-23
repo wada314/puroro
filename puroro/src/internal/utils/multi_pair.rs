@@ -23,7 +23,7 @@ use ::std::rc::Rc;
 pub(crate) struct MultiPair<L, R, A: Allocator, X, C> {
     pair: Pair<L, OnceList1<R, A>, MultiConverterAdapter<X, C, A>>,
     allocator: A,
-    converter: Rc<C>,
+    converter: Rc<C, A>,
 }
 
 impl<L, R, A: Allocator, X, C> MultiPair<L, R, A, X, C> {
@@ -57,7 +57,7 @@ where
     X: Default + Copy,
 {
     pub fn from_left_conv(left: L, converter: C, allocator: A) -> Self {
-        let converter = Rc::new(converter);
+        let converter = Rc::new_in(converter, allocator.clone());
         Self {
             pair: Pair::from_left_conv(
                 left,
@@ -68,7 +68,7 @@ where
         }
     }
     pub fn from_right_conv(right: R, converter: C, allocator: A) -> Self {
-        let converter = Rc::new(converter);
+        let converter = Rc::new_in(converter, allocator.clone());
         Self {
             pair: Pair::from_right_conv(
                 OnceList1::new_in(right, allocator.clone()),
@@ -238,8 +238,8 @@ pub(crate) trait MultiConverter<L, R, X> {
     }
 }
 
-struct MultiConverterAdapter<X, C, A> {
-    converter: Rc<C>,
+struct MultiConverterAdapter<X, C, A: Allocator> {
+    converter: Rc<C, A>,
     context: Cell<X>,
     allocator: A,
 }
@@ -261,8 +261,8 @@ where
         Ok(OnceList1::new_in(scalar, self.allocator.clone()))
     }
 }
-impl<X, C, A> MultiConverterAdapter<X, C, A> {
-    pub(crate) fn new(converter: Rc<C>, context: X, allocator: A) -> Self {
+impl<X, C, A: Allocator> MultiConverterAdapter<X, C, A> {
+    pub(crate) fn new(converter: Rc<C, A>, context: X, allocator: A) -> Self {
         Self {
             converter,
             context: Cell::new(context),
@@ -280,7 +280,7 @@ impl<X, C, A> MultiConverterAdapter<X, C, A> {
 impl<X, C, A> Clone for MultiConverterAdapter<X, C, A>
 where
     X: Copy,
-    A: Clone,
+    A: Allocator + Clone,
 {
     fn clone(&self) -> Self {
         Self {
@@ -294,6 +294,7 @@ impl<X, C, A> Debug for MultiConverterAdapter<X, C, A>
 where
     X: Copy + Debug,
     C: Debug,
+    A: Allocator,
 {
     fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
         f.debug_struct("MultiConverterAdapter")
