@@ -17,16 +17,18 @@ use ::cached_pair::{Converter, EitherOrBoth, Pair};
 use ::polonius_the_crab::{polonius, polonius_return, polonius_try};
 use ::std::alloc::Allocator;
 use ::std::cell::Cell;
-use ::std::fmt::Debug;
 use ::std::rc::Rc;
 
-pub(crate) struct MultiPair<L, R, A: Allocator, X, C> {
+#[derive(::derive_more::Debug, Clone)]
+pub(crate) struct MultiPair<L, R, A: Allocator, X: Copy, C> {
     pair: Pair<L, OnceList1<R, A>, MultiConverterAdapter<X, C, A>>,
+    #[debug(skip)]
     allocator: A,
+    #[debug(skip)]
     converter: Rc<C, A>,
 }
 
-impl<L, R, A: Allocator, X, C> MultiPair<L, R, A, X, C> {
+impl<L, R, A: Allocator, X: Copy, C> MultiPair<L, R, A, X, C> {
     pub fn converter(&self) -> &C {
         self.pair.converter().inner()
     }
@@ -106,6 +108,7 @@ where
                     .convert_to_right(self.try_left()?, &context)?,
             );
         }
+        self.pair.converter().set_context(context);
         Ok(self.pair.try_right()?.last())
     }
 
@@ -137,6 +140,7 @@ where
             }
         });
 
+        this.pair.converter().set_context(context);
         Ok(this.pair.try_right_mut()?.last_mut())
     }
 
@@ -195,38 +199,6 @@ where
     }
 }
 
-impl<L, R, A, X, C> Clone for MultiPair<L, R, A, X, C>
-where
-    A: Allocator + Clone,
-    X: Copy,
-    C: Clone,
-    L: Clone,
-    R: Clone,
-{
-    fn clone(&self) -> Self {
-        Self {
-            pair: self.pair.clone(),
-            allocator: self.allocator.clone(),
-            converter: self.converter.clone(),
-        }
-    }
-}
-
-impl<L, R, A, X, C> Debug for MultiPair<L, R, A, X, C>
-where
-    X: Debug,
-    C: Debug,
-    A: Allocator,
-    L: Debug,
-    R: Debug,
-{
-    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        f.debug_struct("MultiPair")
-            .field("pair", &self.pair)
-            .finish()
-    }
-}
-
 pub(crate) trait MultiConverter<L, R, X> {
     type ToLeftError;
     type ToRightError;
@@ -238,9 +210,11 @@ pub(crate) trait MultiConverter<L, R, X> {
     }
 }
 
-struct MultiConverterAdapter<X, C, A: Allocator> {
+#[derive(Clone, ::derive_more::Debug)]
+struct MultiConverterAdapter<X: Copy, C, A: Allocator> {
     converter: Rc<C, A>,
     context: Cell<X>,
+    #[debug(skip)]
     allocator: A,
 }
 
@@ -261,7 +235,7 @@ where
         Ok(OnceList1::new_in(scalar, self.allocator.clone()))
     }
 }
-impl<X, C, A: Allocator> MultiConverterAdapter<X, C, A> {
+impl<X: Copy, C, A: Allocator> MultiConverterAdapter<X, C, A> {
     pub(crate) fn new(converter: Rc<C, A>, context: X, allocator: A) -> Self {
         Self {
             converter,
@@ -269,37 +243,10 @@ impl<X, C, A: Allocator> MultiConverterAdapter<X, C, A> {
             allocator,
         }
     }
-    #[allow(unused)]
     pub(crate) fn set_context(&self, context: X) {
         self.context.set(context);
     }
     pub(crate) fn inner(&self) -> &C {
         &self.converter
-    }
-}
-impl<X, C, A> Clone for MultiConverterAdapter<X, C, A>
-where
-    X: Copy,
-    A: Allocator + Clone,
-{
-    fn clone(&self) -> Self {
-        Self {
-            converter: self.converter.clone(),
-            context: self.context.clone(),
-            allocator: self.allocator.clone(),
-        }
-    }
-}
-impl<X, C, A> Debug for MultiConverterAdapter<X, C, A>
-where
-    X: Copy + Debug,
-    C: Debug,
-    A: Allocator,
-{
-    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        f.debug_struct("MultiConverterAdapter")
-            .field("converter", &self.converter)
-            .field("context", &self.context.get())
-            .finish()
     }
 }
