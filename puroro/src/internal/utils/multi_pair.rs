@@ -126,6 +126,7 @@ where
                     .iter_mut()
                     .find(|item| this.converter.matches_context(item, &context))
                 {
+                    // TODO: Need to delete other items!!
                     polonius_return!(Ok(right_item));
                 }
             }
