@@ -24,7 +24,6 @@ pub(crate) struct MultiPair<L, R, A: Allocator, X: Copy, C> {
     pair: Pair<L, OnceList1<R, A>, MultiConverterAdapter<X, C, A>>,
     #[debug(skip)]
     allocator: A,
-    #[debug(skip)]
     converter: Rc<C, A>,
 }
 
