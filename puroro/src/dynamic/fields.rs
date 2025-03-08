@@ -14,12 +14,14 @@
 
 use crate::dynamic::payload::{DynamicLenPayload, WireTypeAndPayload};
 use crate::dynamic::DynamicMessage;
-use crate::internal::utils::{MultiConverter, MultiPair};
 use crate::variant::{ReadExtVariant, Variant, VariantIntegerType, WriteExtVariant};
 use crate::{ErrorKind, Result};
+use ::cached_pair::multi_pair::collections::std::VecCollection;
+use ::cached_pair::multi_pair::{Case, MultiPair, MultiPairConverter};
 use ::derive_more::{Debug, TryUnwrap};
 use ::itertools::Either;
 use ::std::alloc::{Allocator, Global};
+use ::std::convert::Infallible;
 use ::std::str;
 use ::std::vec::Vec;
 
@@ -28,9 +30,9 @@ pub struct DynamicField<A: Allocator = Global> {
     payloads: MultiPair<
         Vec<WireTypeAndPayload<A>, A>,
         FieldCustomView<A>,
-        A,
-        FieldCustomViewCase,
+        VecCollection<FieldCustomView<A>, A>,
         FieldCustomViewConverter<A>,
+        A,
     >,
 }
 
@@ -45,36 +47,58 @@ impl<A: Allocator> Debug for FieldCustomViewConverter<A> {
 }
 
 impl<A: Allocator + Clone>
-    MultiConverter<Vec<WireTypeAndPayload<A>, A>, FieldCustomView<A>, FieldCustomViewCase>
-    for FieldCustomViewConverter<A>
+    MultiPairConverter<
+        Vec<WireTypeAndPayload<A>, A>,
+        FieldCustomView<A>,
+        VecCollection<FieldCustomView<A>, A>,
+    > for FieldCustomViewConverter<A>
 {
-    type ToLeftError = !;
+    type ToLeftError = Infallible;
     type ToRightError = ErrorKind;
+    type Case = FieldCustomViewCase;
 
-    fn convert_to_left(
+    fn rights_to_left<'a>(
         &self,
-        right: &FieldCustomView<A>,
-    ) -> ::std::result::Result<Vec<WireTypeAndPayload<A>, A>, Self::ToLeftError> {
-        Ok(right.to_field(&self.allocator))
+        rights: impl IntoIterator<Item = &'a FieldCustomView<A>>,
+    ) -> std::result::Result<Vec<WireTypeAndPayload<A>, A>, Self::ToLeftError>
+    where
+        FieldCustomView<A>: 'a,
+    {
+        todo!()
     }
-    fn convert_to_right(
+
+    fn left_to_right(
         &self,
         left: &Vec<WireTypeAndPayload<A>, A>,
-        context: &FieldCustomViewCase,
-    ) -> ::std::result::Result<FieldCustomView<A>, Self::ToRightError> {
-        match context {
-            FieldCustomViewCase::ScalarMessage => Ok(FieldCustomView::ScalarMessage(
-                FieldCustomView::try_scalar_message_from_payloads(left.iter())?,
-            )),
-        }
+        case: &Self::Case,
+    ) -> std::result::Result<FieldCustomView<A>, Self::ToRightError> {
+        todo!()
     }
-    fn matches_context(&self, right: &FieldCustomView<A>, context: &FieldCustomViewCase) -> bool {
-        #[allow(unreachable_patterns)]
-        match (right, context) {
-            (FieldCustomView::ScalarMessage(_), FieldCustomViewCase::ScalarMessage) => true,
-            _ => false,
-        }
-    }
+
+    // fn convert_to_left(
+    //     &self,
+    //     right: &FieldCustomView<A>,
+    // ) -> ::std::result::Result<Vec<WireTypeAndPayload<A>, A>, Self::ToLeftError> {
+    //     Ok(right.to_field(&self.allocator))
+    // }
+    // fn convert_to_right(
+    //     &self,
+    //     left: &Vec<WireTypeAndPayload<A>, A>,
+    //     context: &FieldCustomViewCase,
+    // ) -> ::std::result::Result<FieldCustomView<A>, Self::ToRightError> {
+    //     match context {
+    //         FieldCustomViewCase::ScalarMessage => Ok(FieldCustomView::ScalarMessage(
+    //             FieldCustomView::try_scalar_message_from_payloads(left.iter())?,
+    //         )),
+    //     }
+    // }
+    // fn matches_context(&self, right: &FieldCustomView<A>, context: &FieldCustomViewCase) -> bool {
+    //     #[allow(unreachable_patterns)]
+    //     match (right, context) {
+    //         (FieldCustomView::ScalarMessage(_), FieldCustomViewCase::ScalarMessage) => true,
+    //         _ => false,
+    //     }
+    // }
 }
 
 impl<A: Allocator> Debug for DynamicField<A> {
@@ -195,7 +219,7 @@ impl<A: Allocator + Clone> DynamicField<A> {
         #[allow(irrefutable_let_patterns)]
         let FieldCustomView::ScalarMessage(scalar_message_ref) = self
             .payloads
-            .try_right::<ErrorKind>(FieldCustomViewCase::ScalarMessage)?
+            .try_right::<ErrorKind>(&FieldCustomViewCase::ScalarMessage)?
         else {
             unreachable!()
         };
@@ -267,7 +291,7 @@ impl<A: Allocator + Clone> DynamicField<A> {
 
     pub(crate) fn default_in(alloc: A) -> Self {
         Self {
-            payloads: MultiPair::from_left_conv(
+            payloads: MultiPair::from_left_conv_in(
                 Vec::new_in(alloc.clone()),
                 FieldCustomViewConverter {
                     allocator: alloc.clone(),
@@ -421,5 +445,15 @@ impl<A: Allocator + Clone> Extend<DynamicMessage<A>> for DynamicField<A> {
             iter.into_iter()
                 .map(|val| WireTypeAndPayload::Len(DynamicLenPayload::from_message(val))),
         );
+    }
+}
+
+impl<A: Allocator> Case<FieldCustomView<A>> for FieldCustomViewCase {
+    fn matches(&self, right: &FieldCustomView<A>) -> bool {
+        #[allow(unreachable_patterns)]
+        match (self, right) {
+            (FieldCustomViewCase::ScalarMessage, FieldCustomView::ScalarMessage(_)) => true,
+            _ => false,
+        }
     }
 }
