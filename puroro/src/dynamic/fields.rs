@@ -25,26 +25,10 @@ use ::std::convert::Infallible;
 use ::std::str;
 use ::std::vec::Vec;
 
-#[derive(Clone)]
-pub struct DynamicField<A: Allocator = Global> {
-    payloads: MultiPair<
-        Vec<WireTypeAndPayload<A>, A>,
-        FieldCustomView<A>,
-        VecCollection<FieldCustomView<A>, A>,
-        FieldCustomViewConverter<A>,
-        A,
-    >,
-}
-
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 struct FieldCustomViewConverter<A> {
+    #[debug(skip)]
     allocator: A,
-}
-
-impl<A: Allocator> Debug for FieldCustomViewConverter<A> {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        f.debug_struct("FieldCustomViewConverter").finish()
-    }
 }
 
 impl<A: Allocator + Clone>
@@ -82,12 +66,15 @@ impl<A: Allocator + Clone>
     }
 }
 
-impl<A: Allocator> Debug for DynamicField<A> {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        f.debug_struct("DynamicField")
-            .field("payloads", &self.payloads)
-            .finish()
-    }
+#[derive(Clone, Debug)]
+pub struct DynamicField<A: Allocator = Global> {
+    payloads: MultiPair<
+        Vec<WireTypeAndPayload<A>, A>,
+        FieldCustomView<A>,
+        VecCollection<FieldCustomView<A>, A>,
+        FieldCustomViewConverter<A>,
+        A,
+    >,
 }
 
 #[derive(Clone, Debug, TryUnwrap, ::derive_more::TryInto, ::derive_more::From)]
