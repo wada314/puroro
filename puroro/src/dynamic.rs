@@ -119,11 +119,11 @@ impl<A: Allocator + Clone> Message for DynamicMessage<A> {
                 total_bytes += match wire_and_payload {
                     WireTypeAndPayload::Variant(variant) => write.write_variant(variant.clone())?,
                     WireTypeAndPayload::I64(buf) => {
-                        write.write_all(buf)?;
+                        write.write_all(buf.as_slice())?;
                         4usize
                     }
                     WireTypeAndPayload::I32(buf) => {
-                        write.write_all(buf)?;
+                        write.write_all(buf.as_slice())?;
                         8usize
                     }
                     WireTypeAndPayload::Len(len_payload) => {
