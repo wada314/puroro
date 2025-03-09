@@ -5,6 +5,9 @@
         },
         {
             "path": "../protobuf"
+        },
+        {
+            "path": "../cached_pair"
         }
     ]
 }

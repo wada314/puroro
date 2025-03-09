@@ -64,7 +64,8 @@ impl<A: Allocator + Clone>
     where
         FieldCustomView<A>: 'a,
     {
-        todo!()
+        let first = rights.into_iter().next().unwrap();
+        Ok(first.to_field(&self.allocator))
     }
 
     fn left_to_right(
@@ -72,33 +73,12 @@ impl<A: Allocator + Clone>
         left: &Vec<WireTypeAndPayload<A>, A>,
         case: &Self::Case,
     ) -> std::result::Result<FieldCustomView<A>, Self::ToRightError> {
-        todo!()
+        match case {
+            FieldCustomViewCase::ScalarMessage => Ok(FieldCustomView::ScalarMessage(
+                FieldCustomView::try_scalar_message_from_payloads(left.iter())?,
+            )),
+        }
     }
-
-    // fn convert_to_left(
-    //     &self,
-    //     right: &FieldCustomView<A>,
-    // ) -> ::std::result::Result<Vec<WireTypeAndPayload<A>, A>, Self::ToLeftError> {
-    //     Ok(right.to_field(&self.allocator))
-    // }
-    // fn convert_to_right(
-    //     &self,
-    //     left: &Vec<WireTypeAndPayload<A>, A>,
-    //     context: &FieldCustomViewCase,
-    // ) -> ::std::result::Result<FieldCustomView<A>, Self::ToRightError> {
-    //     match context {
-    //         FieldCustomViewCase::ScalarMessage => Ok(FieldCustomView::ScalarMessage(
-    //             FieldCustomView::try_scalar_message_from_payloads(left.iter())?,
-    //         )),
-    //     }
-    // }
-    // fn matches_context(&self, right: &FieldCustomView<A>, context: &FieldCustomViewCase) -> bool {
-    //     #[allow(unreachable_patterns)]
-    //     match (right, context) {
-    //         (FieldCustomView::ScalarMessage(_), FieldCustomViewCase::ScalarMessage) => true,
-    //         _ => false,
-    //     }
-    // }
 }
 
 impl<A: Allocator> Debug for DynamicField<A> {
