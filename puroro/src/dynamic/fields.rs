@@ -40,6 +40,7 @@ pub struct DynamicField<A: Allocator = Global> {
 struct FieldCustomViewConverter<A> {
     allocator: A,
 }
+
 impl<A: Allocator> Debug for FieldCustomViewConverter<A> {
     fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
         f.debug_struct("FieldCustomViewConverter").finish()
