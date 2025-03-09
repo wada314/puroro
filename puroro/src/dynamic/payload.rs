@@ -70,6 +70,7 @@ enum LenCustomPayloadViewCase {
 
 #[derive(Clone, Copy, Debug)]
 struct DynamicLenPayloadConverter<A> {
+    #[debug(skip)]
     allocator: A,
 }
 
