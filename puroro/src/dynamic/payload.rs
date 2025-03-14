@@ -87,13 +87,13 @@ impl<A: Allocator + Clone>
 
     fn rights_to_left<'a>(
         &self,
-        rights: impl IntoIterator<Item = &'a LenCustomPayloadView<A>>,
+        first: &'a LenCustomPayloadView<A>,
+        _rest: impl IntoIterator<Item = &'a LenCustomPayloadView<A>>,
     ) -> ::std::result::Result<Vec<u8, A>, Self::ToLeftError>
     where
         LenCustomPayloadView<A>: 'a,
     {
-        let right = rights.into_iter().next().unwrap();
-        Ok(right.to_buf())
+        Ok(first.to_buf())
     }
 
     fn left_to_right(

@@ -44,12 +44,12 @@ impl<A: Allocator + Clone>
 
     fn rights_to_left<'a>(
         &self,
-        rights: impl IntoIterator<Item = &'a FieldCustomView<A>>,
+        first: &'a FieldCustomView<A>,
+        _rest: impl IntoIterator<Item = &'a FieldCustomView<A>>,
     ) -> std::result::Result<Vec<WireTypeAndPayload<A>, A>, Self::ToLeftError>
     where
         FieldCustomView<A>: 'a,
     {
-        let first = rights.into_iter().next().unwrap();
         Ok(first.to_field(&self.allocator))
     }
 
