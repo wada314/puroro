@@ -66,6 +66,14 @@ impl<A: Allocator + Clone>
     }
 }
 
+/// A field of a dynamic message.
+///
+/// Technically, a message is key-value pairs of field numbers and values.
+/// This struct is the value part.
+///
+/// Typically, a field is a sequence of payloads like variants, i32s, strings, etc.
+/// But if the field is defined as a scalar message in the protobuf schema,
+/// then the field's all payloads are merged into a single message.
 #[derive(Clone, Debug)]
 pub struct DynamicField<A: Allocator = Global> {
     payloads: MultiPair<
@@ -344,6 +352,21 @@ impl<A: Allocator + Clone> FieldCustomView<A> {
     }
 }
 
+/// For a scalar field, reduce the sequence of payloads into a single value.
+///
+/// Per protobuf's specification, even if a field is defined as a scalar type,
+/// the field may contain a sequence of payloads. In that case, the field's scalar value is
+/// overridden every time a new payload appears, so the final value is the last payload.
+///
+/// But this definition is little unclear if the field type can contain an errornous value.
+/// For example, proto2 style enums (a.k.a. closed enum) can contain an errornous value,
+/// and then there are 3 ways to handle such value in a repeated payloads:
+///
+/// 1. Abort: Return an error immediately if an errornous value is found.
+/// 2. Skip: Skip the errornous value and continue to process the next payload.
+/// 3. AsDefault: Use the default value for the errornous payload value instead.
+///
+/// This function provides a way to handle such errornous values.
 fn reduce_iter<T: Default>(
     iter: impl Iterator<Item = Result<T>>,
     strategy: FieldReducingErrorStrategy,
