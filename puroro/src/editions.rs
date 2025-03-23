@@ -12,13 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-pub struct Edition {
-    pub enum_type: EnumType,
-    pub field_presence: FieldPresence,
-    pub json_format: JsonFormat,
-    pub message_encoding: MessageEncoding,
-    pub repeated_field_encoding: RepeatedFieldEncoding,
-    pub utf8_validation: Utf8Validation,
+pub trait Edition {
+    fn enum_type(&self) -> EnumType;
+    fn field_presence(&self) -> FieldPresence;
+    fn json_format(&self) -> JsonFormat;
+    fn message_encoding(&self) -> MessageEncoding;
+    fn repeated_field_encoding(&self) -> RepeatedFieldEncoding;
+    fn utf8_validation(&self) -> Utf8Validation;
 }
 
 pub enum EnumType {
@@ -52,20 +52,50 @@ pub enum Utf8Validation {
     None,
 }
 
-pub const PROTO2_EDITION: Edition = Edition {
-    enum_type: EnumType::Closed,
-    field_presence: FieldPresence::Explicit,
-    json_format: JsonFormat::LegacyBestEffort,
-    message_encoding: MessageEncoding::LengthPrefixed,
-    repeated_field_encoding: RepeatedFieldEncoding::Expanded,
-    utf8_validation: Utf8Validation::None,
-};
+pub struct Proto2Edition;
+pub struct Proto3Edition;
 
-pub const PROTO3_EDITION: Edition = Edition {
-    enum_type: EnumType::Open,
-    field_presence: FieldPresence::Implicit,
-    json_format: JsonFormat::Allow,
-    message_encoding: MessageEncoding::LengthPrefixed,
-    repeated_field_encoding: RepeatedFieldEncoding::Packed,
-    utf8_validation: Utf8Validation::Verify,
-};
+impl Edition for Proto2Edition {
+    fn enum_type(&self) -> EnumType {
+        EnumType::Closed
+    }
+    fn field_presence(&self) -> FieldPresence {
+        FieldPresence::Explicit
+    }
+    fn json_format(&self) -> JsonFormat {
+        JsonFormat::LegacyBestEffort
+    }
+    fn message_encoding(&self) -> MessageEncoding {
+        MessageEncoding::LengthPrefixed
+    }
+    fn repeated_field_encoding(&self) -> RepeatedFieldEncoding {
+        RepeatedFieldEncoding::Expanded
+    }
+    fn utf8_validation(&self) -> Utf8Validation {
+        Utf8Validation::None
+    }
+}
+
+impl Edition for Proto3Edition {
+    fn enum_type(&self) -> EnumType {
+        EnumType::Open
+    }
+    fn field_presence(&self) -> FieldPresence {
+        FieldPresence::Implicit
+    }
+    fn json_format(&self) -> JsonFormat {
+        JsonFormat::Allow
+    }
+    fn message_encoding(&self) -> MessageEncoding {
+        MessageEncoding::LengthPrefixed
+    }
+    fn repeated_field_encoding(&self) -> RepeatedFieldEncoding {
+        RepeatedFieldEncoding::Packed
+    }
+    fn utf8_validation(&self) -> Utf8Validation {
+        Utf8Validation::Verify
+    }
+}
+
+pub const PROTO2_EDITION: Proto2Edition = Proto2Edition;
+pub const PROTO3_EDITION: Proto3Edition = Proto3Edition;
