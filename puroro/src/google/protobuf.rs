@@ -71,11 +71,13 @@ impl<A: Allocator> FileDescriptorProto<A> {
     pub const EDITION_FIELD_NUMBER: i32 = 14;
 }
 impl<A: Allocator + Clone> FileDescriptorProto<A> {
-    pub fn name(&self) -> Option<&str> {
+    pub fn name(&self) -> &str {
         self.as_scalar_string(Self::NAME_FIELD_NUMBER)
+            .unwrap_or_default()
     }
-    pub fn package(&self) -> Option<&str> {
+    pub fn package(&self) -> &str {
         self.as_scalar_string(Self::PACKAGE_FIELD_NUMBER)
+            .unwrap_or_default()
     }
     pub fn dependency(&self) -> impl '_ + Iterator<Item = &str> {
         self.as_repeated_string(Self::DEPENDENCY_FIELD_NUMBER)
@@ -95,8 +97,9 @@ impl<A: Allocator + Clone> FileDescriptorProto<A> {
     pub fn options(&self) -> Option<&FileOptions<A>> {
         self.as_scalar_message(Self::OPTIONS_FIELD_NUMBER)
     }
-    pub fn syntax(&self) -> Option<&str> {
+    pub fn syntax(&self) -> &str {
         self.as_scalar_string(Self::SYNTAX_FIELD_NUMBER)
+            .unwrap_or_default()
     }
     pub fn edition(&self) -> Edition {
         self.as_scalar_enum(Self::EDITION_FIELD_NUMBER)
@@ -117,8 +120,9 @@ impl<A: Allocator> DescriptorProto<A> {
     pub const OPTIONS_FIELD_NUMBER: i32 = 7;
 }
 impl<A: Allocator + Clone> DescriptorProto<A> {
-    pub fn name(&self) -> Option<&str> {
+    pub fn name(&self) -> &str {
         self.as_scalar_string(Self::NAME_FIELD_NUMBER)
+            .unwrap_or_default()
     }
     pub fn field(&self) -> impl '_ + Iterator<Item = &FieldDescriptorProto<A>> {
         self.as_repeated_message(Self::FIELD_FIELD_NUMBER)
@@ -157,39 +161,53 @@ impl<A: Allocator> FieldDescriptorProto<A> {
     pub const PROTO3_OPTIONAL_FIELD_NUMBER: i32 = 17;
 }
 impl<A: Allocator + Clone> FieldDescriptorProto<A> {
-    pub fn name(&self) -> Option<&str> {
+    pub fn name(&self) -> &str {
         self.as_scalar_string(Self::NAME_FIELD_NUMBER)
+            .unwrap_or_default()
     }
-    pub fn number(&self) -> Option<i32> {
+    pub fn number(&self) -> i32 {
         self.as_scalar_int32(Self::NUMBER_FIELD_NUMBER)
+            .unwrap_or_default()
     }
-    pub fn label(&self) -> Option<field_descriptor_proto::Label> {
+    pub fn label(&self) -> field_descriptor_proto::Label {
         self.as_scalar_enum(Self::LABEL_FIELD_NUMBER)
+            .unwrap_or_default()
     }
-    pub fn r#type(&self) -> Option<field_descriptor_proto::Type> {
+    pub fn r#type(&self) -> field_descriptor_proto::Type {
         self.as_scalar_enum(Self::TYPE_FIELD_NUMBER)
+            .unwrap_or_default()
     }
-    pub fn type_name(&self) -> Option<&str> {
+    pub fn type_name(&self) -> &str {
         self.as_scalar_string(Self::TYPE_NAME_FIELD_NUMBER)
+            .unwrap_or_default()
     }
-    pub fn extendee(&self) -> Option<&str> {
+    pub fn extendee(&self) -> &str {
         self.as_scalar_string(Self::EXTENDEE_FIELD_NUMBER)
+            .unwrap_or_default()
     }
-    pub fn default_value(&self) -> Option<&str> {
+    pub fn default_value(&self) -> &str {
         self.as_scalar_string(Self::DEFAULT_VALUE_FIELD_NUMBER)
+            .unwrap_or_default()
     }
-    pub fn oneof_index(&self) -> Option<i32> {
+    pub fn oneof_index(&self) -> i32 {
         self.as_scalar_int32(Self::ONEOF_INDEX_FIELD_NUMBER)
+            .unwrap_or_default()
     }
-    pub fn json_name(&self) -> Option<&str> {
+    pub fn has_oneof_index(&self) -> bool {
+        self.as_scalar_int32(Self::ONEOF_INDEX_FIELD_NUMBER)
+            .is_some()
+    }
+    pub fn json_name(&self) -> &str {
         self.as_scalar_string(Self::JSON_NAME_FIELD_NUMBER)
+            .unwrap_or_default()
     }
     pub fn options(&self) -> Option<&FieldOptions<A>> {
         self.as_scalar_message(Self::OPTIONS_FIELD_NUMBER)
     }
-    pub fn proto3_optional(&self) -> Option<bool> {
+    pub fn proto3_optional(&self) -> bool {
         self.as_scalar_int32(Self::PROTO3_OPTIONAL_FIELD_NUMBER)
             .map(|v| v != 0)
+            .unwrap_or_default()
     }
 }
 
@@ -252,8 +270,9 @@ impl<A: Allocator> OneofDescriptorProto<A> {
     pub const OPTIONS_FIELD_NUMBER: i32 = 2;
 }
 impl<A: Allocator + Clone> OneofDescriptorProto<A> {
-    pub fn name(&self) -> Option<&str> {
+    pub fn name(&self) -> &str {
         self.as_scalar_string(Self::NAME_FIELD_NUMBER)
+            .unwrap_or_default()
     }
     pub fn options(&self) -> Option<&OneofOptions<A>> {
         self.as_scalar_message(Self::OPTIONS_FIELD_NUMBER)
@@ -269,8 +288,9 @@ impl<A: Allocator> EnumDescriptorProto<A> {
     pub const OPTIONS_FIELD_NUMBER: i32 = 3;
 }
 impl<A: Allocator + Clone> EnumDescriptorProto<A> {
-    pub fn name(&self) -> Option<&str> {
+    pub fn name(&self) -> &str {
         self.as_scalar_string(Self::NAME_FIELD_NUMBER)
+            .unwrap_or_default()
     }
     pub fn value(&self) -> impl Iterator<Item = &EnumValueDescriptorProto<A>> {
         self.as_repeated_message(Self::VALUE_FIELD_NUMBER)
@@ -289,11 +309,13 @@ impl<A: Allocator> EnumValueDescriptorProto<A> {
     pub const OPTIONS_FIELD_NUMBER: i32 = 3;
 }
 impl<A: Allocator + Clone> EnumValueDescriptorProto<A> {
-    pub fn name(&self) -> Option<&str> {
+    pub fn name(&self) -> &str {
         self.as_scalar_string(Self::NAME_FIELD_NUMBER)
+            .unwrap_or_default()
     }
-    pub fn number(&self) -> Option<i32> {
+    pub fn number(&self) -> i32 {
         self.as_scalar_int32(Self::NUMBER_FIELD_NUMBER)
+            .unwrap_or_default()
     }
     pub fn options(&self) -> Option<&EnumValueOptions<A>> {
         self.as_scalar_message(Self::OPTIONS_FIELD_NUMBER)
@@ -320,9 +342,10 @@ impl<A: Allocator> MessageOptions<A> {
     pub const FEATURES_FIELD_NUMBER: i32 = 12;
 }
 impl<A: Allocator + Clone> MessageOptions<A> {
-    pub fn map_entry(&self) -> Option<bool> {
+    pub fn map_entry(&self) -> bool {
         self.as_scalar_int32(Self::MAP_ENTRY_FIELD_NUMBER)
             .map(|v| v != 0)
+            .unwrap_or_default()
     }
     pub fn features(&self) -> Option<&FeatureSet<A>> {
         self.as_scalar_message(Self::FEATURES_FIELD_NUMBER)
@@ -339,17 +362,20 @@ impl<A: Allocator> FieldOptions<A> {
     pub const FEATURES_FIELD_NUMBER: i32 = 21;
 }
 impl<A: Allocator + Clone> FieldOptions<A> {
-    pub fn packed(&self) -> Option<bool> {
+    pub fn packed(&self) -> bool {
         self.as_scalar_int32(Self::PACKED_FIELD_NUMBER)
             .map(|v| v != 0)
+            .unwrap_or_default()
     }
-    pub fn lazy(&self) -> Option<bool> {
+    pub fn lazy(&self) -> bool {
         self.as_scalar_int32(Self::LAZY_FIELD_NUMBER)
             .map(|v| v != 0)
+            .unwrap_or_default()
     }
-    pub fn unverified_lazy(&self) -> Option<bool> {
+    pub fn unverified_lazy(&self) -> bool {
         self.as_scalar_int32(Self::UNVERIFIED_LAZY_FIELD_NUMBER)
             .map(|v| v != 0)
+            .unwrap_or_default()
     }
     pub fn features(&self) -> Option<&FeatureSet<A>> {
         self.as_scalar_message(Self::FEATURES_FIELD_NUMBER)
@@ -376,9 +402,10 @@ impl<A: Allocator> EnumOptions<A> {
     pub const FEATURES_FIELD_NUMBER: i32 = 7;
 }
 impl<A: Allocator + Clone> EnumOptions<A> {
-    pub fn allow_alias(&self) -> Option<bool> {
+    pub fn allow_alias(&self) -> bool {
         self.as_scalar_int32(Self::ALLOW_ALIAS_FIELD_NUMBER)
             .map(|v| v != 0)
+            .unwrap_or_default()
     }
     pub fn features(&self) -> Option<&FeatureSet<A>> {
         self.as_scalar_message(Self::FEATURES_FIELD_NUMBER)
@@ -530,19 +557,19 @@ impl_message_trait_for_trivial_types! {
     }
 
     pub trait FileDescriptorProtoTrait {
-        fn name(&self) -> Option<&str>;
-        fn package(&self) -> Option<&str>;
+        fn name(&self) -> &str;
+        fn package(&self) -> &str;
         fn dependency(&self) -> impl Iterator<Item = &str>;
         fn public_dependency(&self) -> impl Iterator<Item = i32>;
         fn weak_dependency(&self) -> impl Iterator<Item = i32>;
         fn message_type(&self) -> impl Iterator<Item = impl DescriptorProtoTrait>;
         fn enum_type(&self) -> impl Iterator<Item = impl EnumDescriptorProtoTrait>;
-        fn syntax(&self) -> Option<&str>;
+        fn syntax(&self) -> &str;
         fn edition(&self) -> Edition;
     }
 
     pub trait DescriptorProtoTrait {
-        fn name(&self) -> Option<&str>;
+        fn name(&self) -> &str;
         fn field(&self) -> impl Iterator<Item = impl FieldDescriptorProtoTrait>;
         fn extension(&self) -> impl Iterator<Item = impl FieldDescriptorProtoTrait>;
         fn nested_type(&self) -> impl Iterator<Item = impl DescriptorProtoTrait>;
@@ -551,29 +578,29 @@ impl_message_trait_for_trivial_types! {
     }
 
     pub trait FieldDescriptorProtoTrait {
-        fn name(&self) -> Option<&str>;
-        fn number(&self) -> Option<i32>;
+        fn name(&self) -> &str;
+        fn number(&self) -> i32;
         fn label(&self) -> field_descriptor_proto::Label;
         fn r#type(&self) -> field_descriptor_proto::Type;
-        fn type_name(&self) -> Option<&str>;
-        fn extendee(&self) -> Option<&str>;
-        fn default_value(&self) -> Option<&str>;
-        fn oneof_index(&self) -> Option<i32>;
-        fn json_name(&self) -> Option<&str>;
+        fn type_name(&self) -> &str;
+        fn extendee(&self) -> &str;
+        fn default_value(&self) -> &str;
+        fn oneof_index(&self) -> i32;
+        fn json_name(&self) -> &str;
         fn proto3_optional(&self) -> bool;
     }
 
     pub trait OneofDescriptorProtoTrait {
-        fn name(&self) -> Option<&str>;
+        fn name(&self) -> &str;
     }
 
     pub trait EnumDescriptorProtoTrait {
-        fn name(&self) -> Option<&str>;
+        fn name(&self) -> &str;
         fn value(&self) -> impl Iterator<Item = impl EnumValueDescriptorProtoTrait>;
     }
 
     pub trait EnumValueDescriptorProtoTrait {
-        fn name(&self) -> Option<&str>;
-        fn number(&self) -> Option<i32>;
+        fn name(&self) -> &str;
+        fn number(&self) -> i32;
     }
 }

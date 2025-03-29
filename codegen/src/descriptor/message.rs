@@ -59,8 +59,7 @@ impl<'a> DescriptorExt<'a> {
         self.file().root()
     }
     pub fn name(&self) -> &str {
-        debug_assert!(self.base.name().is_some() && !self.base.name().unwrap().is_empty());
-        self.base.name().unwrap_or_default()
+        self.base.name()
     }
     pub fn current_path(&self) -> &ProtoPath {
         if let Some(nested) = self.maybe_containing {
@@ -77,7 +76,7 @@ impl<'a> DescriptorExt<'a> {
                 self.file.absolute_package().to_owned()
             };
             // todo!("absl path check?");
-            full_path.push(&self.base.name().unwrap_or_default());
+            full_path.push(&self.base.name());
             full_path
         })
     }
@@ -112,12 +111,12 @@ impl<'a> DescriptorExt<'a> {
     pub fn non_oneof_fields(&'a self) -> Result<impl Iterator<Item = &'a FieldDescriptorExt<'a>>> {
         Ok(self
             .all_fields()
-            .filter(|f| f.oneof_index().is_none() || f.is_proto3_optional()))
+            .filter(|f| !f.has_oneof_index() || f.is_proto3_optional()))
     }
     pub fn real_oneof_fields(&'a self) -> Result<impl Iterator<Item = &'a FieldDescriptorExt<'a>>> {
         Ok(self
             .all_fields()
-            .filter(|f| f.oneof_index().is_some() && !f.is_proto3_optional()))
+            .filter(|f| f.has_oneof_index() && !f.is_proto3_optional()))
     }
     pub fn real_oneofs(&'a self) -> Result<impl Iterator<Item = &'a OneofDescriptorExt<'a>>> {
         Ok(self

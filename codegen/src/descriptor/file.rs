@@ -34,7 +34,7 @@ pub struct FileDescriptorCache<'a> {
     dependencies: OnceCell<Vec<&'a FileDescriptorExt<'a>>>,
     messages: OnceCell<Vec<DescriptorExt<'a>>>,
     enums: OnceCell<Vec<EnumDescriptorExt<'a>>>,
-    package: OnceCell<Option<ProtoPathBuf>>,
+    package: OnceCell<ProtoPathBuf>,
     absolute_package: OnceCell<ProtoPathBuf>,
 
     field_presence: OnceCell<Option<protobuf::feature_set::FieldPresence>>,
@@ -52,20 +52,16 @@ impl<'a> FileDescriptorExt<'a> {
         self.root
     }
     pub fn name(&self) -> &str {
-        debug_assert!(self.base.name().is_some() && !self.base.name().unwrap().is_empty());
-        self.base.name().unwrap_or_default()
+        self.base.name()
     }
-    pub fn package(&self) -> Option<&ProtoPath> {
+    pub fn package(&self) -> &ProtoPath {
         self.cache
             .package
-            .get_or_init(|| self.base.package().map(Into::into))
-            .as_deref()
+            .get_or_init(|| self.base.package().into())
     }
     pub fn absolute_package(&self) -> &ProtoPath {
         self.cache.absolute_package.get_or_init(|| {
-            let mut package = self
-                .package()
-                .map_or_else(ProtoPathBuf::new, |p| p.to_owned());
+            let mut package = self.package().to_owned();
             if package.is_relative() {
                 let mut new_package = Into::<ProtoPathBuf>::into(".");
                 new_package.push(&package);
@@ -158,8 +154,8 @@ impl<'a> FileDescriptorExt<'a> {
                     _ => (),
                 }
                 match self.base.syntax() {
-                    Some("proto2") => Some(FieldPresence::Explicit),
-                    Some("proto3") => Some(FieldPresence::Implicit),
+                    "proto2" => Some(FieldPresence::Explicit),
+                    "proto3" => Some(FieldPresence::Implicit),
                     _ => None,
                 }
             })

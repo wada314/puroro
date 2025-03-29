@@ -521,7 +521,7 @@ impl FieldPresense {
     fn from_field_desc<'a>(field: &'a FieldDescriptorExt<'a>) -> Self {
         if field.has_presence() {
             FieldPresense::Explicit
-        } else if field.label() == Some(FieldLabel::Repeated) {
+        } else if field.label() == FieldLabel::Repeated {
             FieldPresense::Repeated
         } else {
             FieldPresense::Implicit

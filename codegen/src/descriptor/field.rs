@@ -43,27 +43,28 @@ impl<'a> FieldDescriptorExt<'a> {
         }
     }
     pub fn name(&self) -> &str {
-        debug_assert!(self.base.name().is_some() && !self.base.name().unwrap().is_empty());
-        self.base.name().unwrap_or_default()
+        self.base.name()
     }
     pub fn number(&self) -> i32 {
-        debug_assert!(self.base.number().is_some() && self.base.number().unwrap() > 0);
-        self.base.number().unwrap_or_default()
+        self.base.number()
     }
-    pub fn type_case(&self) -> Option<FieldTypeCase> {
-        self.base.r#type().map(Into::into)
+    pub fn type_case(&self) -> FieldTypeCase {
+        self.base.r#type().into()
     }
-    pub fn type_name(&self) -> Option<&str> {
+    pub fn type_name(&self) -> &str {
         self.base.type_name()
     }
-    pub fn label(&self) -> Option<FieldLabel> {
-        self.base.label().map(Into::into)
+    pub fn label(&self) -> FieldLabel {
+        self.base.label().into()
     }
-    pub fn oneof_index(&self) -> Option<i32> {
+    pub fn oneof_index(&self) -> i32 {
         self.base.oneof_index()
     }
+    pub fn has_oneof_index(&self) -> bool {
+        self.base.has_oneof_index()
+    }
     pub fn is_proto3_optional(&self) -> bool {
-        self.base.proto3_optional().unwrap_or_default()
+        self.base.proto3_optional()
     }
     pub fn full_name(&self) -> &str {
         self.cache
@@ -79,8 +80,8 @@ impl<'a> FieldDescriptorExt<'a> {
         self.cache
             .r#type
             .get_or_try_init(|| {
-                self.type_case().unwrap_or_default().with_type_ref(
-                    self.type_name().unwrap_or_default(),
+                self.type_case().with_type_ref(
+                    self.type_name(),
                     |name| {
                         Ok(self
                             .message
@@ -127,13 +128,13 @@ impl<'a> FieldDescriptorExt<'a> {
         None
     }
     pub fn has_presence(&'a self) -> bool {
-        if self.label() == Some(FieldLabel::Repeated) {
+        if self.label() == FieldLabel::Repeated {
             false
-        } else if self.oneof_index().is_some() {
+        } else if self.oneof_index() != 0 {
             true
         } else if self.is_proto3_optional() {
             true
-        } else if self.type_case() == Some(FieldTypeCase::Message) {
+        } else if self.type_case() == FieldTypeCase::Message {
             true
         } else if self.field_presence() == Some(protobuf::feature_set::FieldPresence::Implicit) {
             false
@@ -166,8 +167,7 @@ impl<'a> OneofDescriptorExt<'a> {
         }
     }
     pub fn name(&self) -> &str {
-        debug_assert!(self.base.name().is_some() && !self.base.name().unwrap().is_empty());
-        self.base.name().unwrap_or_default()
+        self.base.name()
     }
 
     pub fn is_synthetic(&'a self) -> Result<bool> {
@@ -178,7 +178,7 @@ impl<'a> OneofDescriptorExt<'a> {
                 let fields = self
                     .message
                     .all_fields()
-                    .filter(|f| f.oneof_index() == Some(index))
+                    .filter(|f| f.oneof_index() == index)
                     .collect::<Vec<_>>();
                 if let Some(first) = fields.first() {
                     if fields.len() == 1 && first.is_proto3_optional() {

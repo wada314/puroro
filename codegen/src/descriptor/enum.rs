@@ -47,8 +47,7 @@ impl<'a> EnumDescriptorExt<'a> {
         }
     }
     pub fn name(&self) -> &str {
-        debug_assert!(self.base.name().is_some() && !self.base.name().unwrap().is_empty());
-        self.base.name().unwrap_or_default()
+        self.base.name()
     }
     pub fn full_path(&self) -> &ProtoPath {
         self.cache.full_path.get_or_init(|| {
@@ -96,8 +95,7 @@ impl<'a> EnumValueDescriptor<'a> {
         }
     }
     pub fn name(&self) -> &str {
-        debug_assert!(self.base.name().is_some() && !self.base.name().unwrap().is_empty());
-        self.base.name().unwrap_or_default()
+        self.base.name()
     }
     pub fn full_name(&self) -> &ProtoPath {
         self.cache.full_name.get_or_init(|| {
@@ -105,16 +103,13 @@ impl<'a> EnumValueDescriptor<'a> {
             let mut full_name = if let Some(m) = self.enum_.maybe_containing {
                 m.full_path().to_owned()
             } else {
-                self.enum_
-                    .file
-                    .package()
-                    .map_or_else(ProtoPathBuf::new, |p| p.to_owned())
+                self.enum_.file.package().to_owned()
             };
             full_name.push(ProtoPath::new(&self.enum_.name()));
             full_name
         })
     }
     pub fn number(&self) -> i32 {
-        self.base.number().unwrap_or_default()
+        self.base.number()
     }
 }
