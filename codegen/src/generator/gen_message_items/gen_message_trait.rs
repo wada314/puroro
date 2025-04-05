@@ -30,6 +30,7 @@ pub struct GenTrait {
     fields: Vec<Field>,
     options: Rc<CodeGeneratorOptions>,
     getter_signatures: OnceCell<Vec<Signature>>,
+    try_getter_signatures: OnceCell<Vec<Signature>>,
 }
 
 impl GenTrait {
@@ -48,6 +49,7 @@ impl GenTrait {
                 .collect::<Result<Vec<_>>>()?,
             options,
             getter_signatures: OnceCell::new(),
+            try_getter_signatures: OnceCell::new(),
         })
     }
 
@@ -112,6 +114,17 @@ impl GenTrait {
             .map(Vec::as_slice)
     }
 
+    fn gen_try_getter_signatures(&self) -> Result<&[Signature]> {
+        self.try_getter_signatures
+            .get_or_try_init(|| {
+                self.fields
+                    .iter()
+                    .map(Field::gen_try_get_method_signature)
+                    .collect::<Result<Vec<_>>>()
+            })
+            .map(Vec::as_slice)
+    }
+
     fn gen_message_mut_trait(&self) -> Result<Item> {
         let trait_name = &self.rust_mut_name;
         let base_trait_name = &self.rust_name;
@@ -141,24 +154,24 @@ impl GenTrait {
             .options
             .path_in_self_module(&trait_name.clone().into())?;
         let blanket_type: Ident = parse_str("T")?;
-        let getter_signatures = self.gen_getter_signatures()?;
-        let getter_bodies = self
+        let try_getter_signatures = self.gen_try_getter_signatures()?;
+        let try_getter_bodies = self
             .fields
             .iter()
-            .map(|f| f.gen_blanket_ref_get_method_body(&blanket_type, &trait_path))
+            .map(|f| f.gen_blanket_ref_try_get_method_body(&blanket_type, &trait_path))
             .collect::<Result<Vec<_>>>()?;
         Ok(vec![
             parse2(quote! {
                 impl<T: #trait_path> #trait_path for &T {
-                    #(#getter_signatures {
-                        #getter_bodies
+                    #(#try_getter_signatures {
+                        #try_getter_bodies
                     })*
                 }
             })?,
             parse2(quote! {
                 impl<T: self::#trait_name> #trait_path for &mut T {
-                    #(#getter_signatures {
-                        #getter_bodies
+                    #(#try_getter_signatures {
+                        #try_getter_bodies
                     })*
                 }
             })?,
@@ -173,15 +186,15 @@ impl GenTrait {
         let blanket_type_ident: Ident = parse_str("T")?;
         let blanket_type = parse2(quote! { #blanket_type_ident })?;
         let blanket_opt_type = self.options.option_type(&blanket_type)?;
-        let getter_signatures = self.gen_getter_signatures()?;
-        let getter_bodies = self
+        let try_getter_signatures = self.gen_try_getter_signatures()?;
+        let try_getter_bodies = self
             .fields
             .iter()
-            .map(|f| f.gen_blanket_option_get_method_body(&blanket_type_ident, &trait_path))
+            .map(|f| f.gen_blanket_option_try_get_method_body(&blanket_type_ident, &trait_path))
             .collect::<Result<Vec<_>>>()?;
         Ok(parse2(quote! {
             impl<T: #trait_path> #trait_path for #blanket_opt_type {
-                #(#getter_signatures #getter_bodies)*
+                #(#try_getter_signatures #try_getter_bodies)*
             }
         })?)
     }
@@ -193,17 +206,17 @@ impl GenTrait {
             .path_in_self_module(&trait_name.clone().into())?;
         let t1: Ident = parse_str("T")?;
         let t2: Ident = parse_str("U")?;
-        let getter_signatures = self.gen_getter_signatures()?;
-        let getter_bodies = self
+        let try_getter_signatures = self.gen_try_getter_signatures()?;
+        let try_getter_bodies = self
             .fields
             .iter()
-            .map(|f| f.gen_blanket_tuple_get_method_body(&t1, &t2, &trait_path))
+            .map(|f| f.gen_blanket_tuple_try_get_method_body(&t1, &t2, &trait_path))
             .collect::<Result<Vec<_>>>()?;
         Ok(parse2(quote! {
             impl<#t1: #trait_path, #t2: #trait_path>
             #trait_path for (#t1, #t2)
             {
-                #(#getter_signatures #getter_bodies)*
+                #(#try_getter_signatures #try_getter_bodies)*
             }
         })?)
     }
@@ -215,17 +228,17 @@ impl GenTrait {
             .path_in_self_module(&trait_name.clone().into())?;
         let t1: Ident = parse_str("T")?;
         let t2: Ident = parse_str("U")?;
-        let getter_signatures = self.gen_getter_signatures()?;
-        let getter_bodies = self
+        let try_getter_signatures = self.gen_try_getter_signatures()?;
+        let try_getter_bodies = self
             .fields
             .iter()
-            .map(|f| f.gen_blanket_either_get_method_body(&t1, &t2, &trait_path))
+            .map(|f| f.gen_blanket_either_try_get_method_body(&t1, &t2, &trait_path))
             .collect::<Result<Vec<_>>>()?;
         Ok(parse2(quote! {
             impl<#t1: #trait_path, #t2: #trait_path>
             #trait_path for ::puroro::Either<#t1, #t2>
             {
-                #(#getter_signatures #getter_bodies)*
+                #(#try_getter_signatures #try_getter_bodies)*
             }
         })?)
     }
@@ -237,17 +250,17 @@ impl GenTrait {
             .path_in_self_module(&trait_name.clone().into())?;
         let t1: Ident = parse_str("T")?;
         let t2: Ident = parse_str("U")?;
-        let getter_signatures = self.gen_getter_signatures()?;
-        let getter_bodies = self
+        let try_getter_signatures = self.gen_try_getter_signatures()?;
+        let try_getter_bodies = self
             .fields
             .iter()
-            .map(|f| f.gen_blanket_either_or_both_get_method_body(&t1, &t2, &trait_path))
+            .map(|f| f.gen_blanket_either_or_both_try_get_method_body(&t1, &t2, &trait_path))
             .collect::<Result<Vec<_>>>()?;
         Ok(parse2(quote! {
             impl<#t1: #trait_path, #t2: #trait_path>
             #trait_path for ::puroro::EitherOrBoth<#t1, #t2>
             {
-                #(#getter_signatures #getter_bodies)*
+                #(#try_getter_signatures #try_getter_bodies)*
             }
         })?)
     }
@@ -323,37 +336,52 @@ impl Field {
             })?,
             FieldPresense::Explicit | FieldPresense::Implicit => scalar_ref_type,
         };
+        let result_type = self.options.result_type(&getter_type)?;
         Ok(parse2(quote! {
-            fn #try_getter_name(&self) -> Result<#getter_type>
+            fn #try_getter_name(&self) -> #result_type
         })?)
     }
 
-    fn gen_blanket_ref_get_method_body(
+    fn gen_try_has_method_name(&self) -> Result<Ident> {
+        let lower_cased = convert_into_case(&self.original_name, Case::LowerSnakeCase);
+        Ok(to_ident(&format!("try_has_{}", &lower_cased)))
+    }
+
+    pub fn gen_try_has_method_signature(&self) -> Result<Signature> {
+        let try_has_name = self.gen_try_has_method_name()?;
+        let result_type = self
+            .options
+            .result_type(&self.options.primitive_type("bool")?)?;
+        Ok(parse2(quote! {
+            fn #try_has_name(&self) -> #result_type
+        })?)
+    }
+
+    fn gen_blanket_ref_try_get_method_body(
         &self,
         blanket_type: &Ident,
         trait_path: &Path,
     ) -> Result<Expr> {
-        let getter_name = self.gen_get_method_name()?;
+        let try_getter_name = self.gen_try_get_method_name()?;
         Ok(parse2(quote! {
-            <#blanket_type as #trait_path>::#getter_name(self)
+            <#blanket_type as #trait_path>::#try_getter_name(self)
         })?)
     }
 
-    fn gen_blanket_option_get_method_body(
+    fn gen_blanket_option_try_get_method_body(
         &self,
         blanket_type_ident: &Ident,
         trait_path: &Path,
     ) -> Result<Block> {
-        let getter_name = self.gen_get_method_name()?;
+        let try_getter_name = self.gen_try_get_method_name()?;
         let stmts = match self.presense {
             FieldPresense::Repeated => quote! {
-                self.as_ref().map(<#blanket_type_ident as #trait_path>::#getter_name).into_iter().flatten()
+                self.as_ref().map(<#blanket_type_ident as #trait_path>::#try_getter_name).into_iter().flatten()
             },
-            FieldPresense::Explicit => quote! {
-                self.as_ref().and_then(<#blanket_type_ident as #trait_path>::#getter_name)
-            },
-            FieldPresense::Implicit => quote! {
-                self.as_ref().map(<#blanket_type_ident as #trait_path>::#getter_name).unwrap_or_default()
+            FieldPresense::Explicit | FieldPresense::Implicit => quote! {
+                self.as_ref().map(<#blanket_type_ident as #trait_path>::#try_getter_name).transpose().map(
+                    |opt| opt.unwrap_or_default()
+                )
             },
         };
         Ok(parse2(quote! {
@@ -361,53 +389,55 @@ impl Field {
         })?)
     }
 
-    fn gen_blanket_tuple_get_method_body(
+    fn gen_blanket_tuple_try_get_method_body(
         &self,
         t1: &Ident,
         t2: &Ident,
         trait_path: &Path,
     ) -> Result<Block> {
-        let getter_name = self.gen_get_method_name()?;
+        let try_getter_name = self.gen_try_get_method_name()?;
+        let try_has_name = self.gen_try_has_method_name()?;
         let value_1: Expr = parse2(quote! {
-            <#t1 as #trait_path>::#getter_name(&self.0)
+            <#t1 as #trait_path>::#try_getter_name(&self.0)
         })?;
         let value_2: Expr = parse2(quote! {
-            <#t2 as #trait_path>::#getter_name(&self.1)
+            <#t2 as #trait_path>::#try_getter_name(&self.1)
         })?;
         let stmts = match (self.presense, self.scalar_type()) {
             (FieldPresense::Repeated, FieldType::Message(_)) => quote! {
-                ::puroro::BothExt::factor_into_iter((#value_1, #value_2))
+                ::puroro::BothExt::factor_into_iter((#value_1?, #value_2?))
             },
             (FieldPresense::Repeated, _) => quote! {
-                ::puroro::BothExt::into_iter((#value_1, #value_2))
+                ::puroro::BothExt::into_iter((#value_1?, #value_2?))
             },
             (_, FieldType::Message(_)) => quote! {
-                ::puroro::BothExt::into_either_or_both_opt((#value_1, #value_2))
+                ::puroro::BothExt::into_either_or_both_opt((#value_1?, #value_2?))
             },
-            (FieldPresense::Explicit, _) => quote! {
-                #value_2.or_else(|| #value_1)
-            },
-            (FieldPresense::Implicit, _) => quote! {
-                use ::puroro::IsEmpty;
-                #value_2.into_option().unwrap_or_else(|| #value_1)
+            (_, _) => quote! {
+                if <#t2 as #trait_path>::#try_has_name(&self.1)? {
+                    #value_2?
+                } else {
+                    #value_1?
+                }
             },
         };
         Ok(parse2(quote! {
-            { #stmts }
+            { Ok(#stmts) }
         })?)
     }
 
-    fn gen_blanket_either_get_method_body(
+    fn gen_blanket_either_try_get_method_body(
         &self,
         _t1: &Ident,
         _t2: &Ident,
         trait_path: &Path,
     ) -> Result<Block> {
-        let getter_name = self.gen_get_method_name()?;
+        let try_getter_name = self.gen_try_get_method_name()?;
         let mapped_either: Expr = parse2(quote! {
             self.as_ref().map_either(
-                #trait_path::#getter_name,
-                #trait_path::#getter_name)
+                #trait_path::#try_getter_name,
+                #trait_path::#try_getter_name)
+                .factor_err()?
         })?;
         let stmts = match (self.presense, self.scalar_type()) {
             (FieldPresense::Repeated, FieldType::Message(_)) => quote! {
@@ -424,21 +454,22 @@ impl Field {
             },
         };
         Ok(parse2(quote! {
-            { #stmts }
+            { Ok(#stmts) }
         })?)
     }
 
-    fn gen_blanket_either_or_both_get_method_body(
+    fn gen_blanket_either_or_both_try_get_method_body(
         &self,
         _t1: &Ident,
         _t2: &Ident,
         trait_path: &Path,
     ) -> Result<Block> {
-        let getter_name = self.gen_get_method_name()?;
+        let try_getter_name = self.gen_try_get_method_name()?;
         let mapped_either: Expr = parse2(quote! {
             self.as_ref().map_any(
-                #trait_path::#getter_name,
-                #trait_path::#getter_name)
+                #trait_path::#try_getter_name,
+                #trait_path::#try_getter_name)
+                .factor_err()?
         })?;
         let stmts = match (self.presense, self.scalar_type()) {
             (FieldPresense::Repeated, FieldType::Message(_)) => quote! {
@@ -451,15 +482,16 @@ impl Field {
                 ::puroro::EitherOrBothExt::flatten_opt(#mapped_either)
             },
             _ => quote! {
-                ::puroro::EitherOrBothExt::non_empty_right_or_left(
-                    self.as_ref(),
-                    #trait_path::#getter_name,
-                    #trait_path::#getter_name
-                )
+                todo!()
+                // ::puroro::EitherOrBothExt::non_empty_right_or_left(
+                //     self.as_ref(),
+                //     #trait_path::#try_getter_name,
+                //     #trait_path::#try_getter_name
+                // )
             },
         };
         Ok(parse2(quote! {
-            { #stmts }
+            { Ok(#stmts) }
         })?)
     }
 

@@ -101,6 +101,13 @@ impl CodeGeneratorOptions {
             quote! { Option<#elem_type> }
         })?)
     }
+    pub fn result_type(&self, elem_type: &Type) -> Result<Type> {
+        Ok(parse2(if self.strict_type_path {
+            quote! { ::std::result::Result<#elem_type, ::puroro::ErrorKind> }
+        } else {
+            quote! { Result<#elem_type, ::puroro::ErrorKind> }
+        })?)
+    }
     pub fn iter_trait(&self, elem_type: &Type) -> Result<Path> {
         Ok(parse2(if self.strict_type_path {
             quote! { ::std::iter::Iterator<Item=#elem_type> }
