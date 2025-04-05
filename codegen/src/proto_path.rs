@@ -227,6 +227,9 @@ impl ProtoPath {
         }
     }
 
+    /// Convert the proto path to a rust path.
+    /// The path items are converted to rust modules,
+    /// and the last item is converted to a struct or enum name (i.e. CamelCase).
     pub fn to_rust_path(&self, options: &CodeGeneratorOptions) -> Result<Path> {
         self.to_rust_path_with(options, |item| {
             Ok(to_ident(&convert_into_case(item, Case::CamelCase)).into())
@@ -251,7 +254,6 @@ impl ProtoPath {
     /// }).unwrap();
     /// assert_eq!(rust_path, parse_str("self::foo::bar::Baz").unwrap());
     /// ```
-
     pub fn to_rust_path_with(
         &self,
         options: &CodeGeneratorOptions,
