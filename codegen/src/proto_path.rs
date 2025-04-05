@@ -66,6 +66,18 @@ impl ProtoPath {
             .into_iter()
             .flatten()
     }
+
+    /// Returns an iterator over the ancestor paths of the current path.
+    ///
+    /// Example:
+    /// ```
+    /// use puroro_codegen::proto_path::ProtoPath;
+    /// let path = ProtoPath::new("a.b.c");
+    /// assert_eq!(
+    ///     path.ancestors().map(|p| p.as_str()).collect::<Vec<_>>(),
+    ///     vec!["a.b.c", "a.b", "a", ""]
+    /// );
+    /// ```
     pub fn ancestors(&self) -> impl Iterator<Item = &Self> {
         ::std::iter::successors(Some(self), |path| path.parent())
     }
