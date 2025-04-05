@@ -12,6 +12,34 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+//! Types for working with protocol buffer paths.
+//!
+//! This module provides types for handling protocol buffer paths in a way similar to how
+//! [`std::path`] handles filesystem paths. The main types are:
+//!
+//! - [`ProtoPath`]: A borrowed path (analogous to [`std::path::Path`])
+//! - [`ProtoPathBuf`]: An owned path (analogous to [`std::path::PathBuf`])
+//!
+//! Protocol buffer paths are dot-separated strings that represent packages, messages, or fields
+//! in protocol buffer definitions. They can be either relative (e.g., `foo.bar`) or
+//! absolute (e.g., `.foo.bar`).
+//!
+//! # Examples
+//!
+//! ```
+//! use puroro_codegen::proto_path::{ProtoPath, ProtoPathBuf};
+//!
+//! // Creating paths
+//! let path = ProtoPath::new("google.protobuf.FileDescriptorSet");
+//! let mut buf = ProtoPathBuf::new();
+//! buf.push("google");
+//! buf.push("protobuf");
+//!
+//! // Path operations
+//! assert_eq!(path.parent().unwrap().as_str(), "google.protobuf");
+//! assert_eq!(path.last_component().unwrap(), "FileDescriptorSet");
+//! ```
+
 use crate::cases::{convert_into_case, Case};
 use crate::generator::{avoid_reserved_keywords, to_ident, CodeGeneratorOptions};
 use crate::Result;
@@ -22,8 +50,35 @@ use ::std::fmt::Display;
 use ::std::ops::Deref;
 use ::syn::{parse2, Path, PathSegment};
 
+/// A borrowed view into a protocol buffer path.
+///
+/// A protocol buffer path is a dot-separated path that represents a package, message, or field
+/// in protocol buffer definitions. For example:
+///
+/// - Package path: `google.protobuf`
+/// - Message path: `google.protobuf.FileDescriptorSet`
+/// - Absolute path: `.google.protobuf.FileDescriptorSet`
+///
+/// This type is similar to `std::path::Path` but specialized for protocol buffer paths.
+/// It provides methods for path manipulation and conversion to Rust paths.
 #[derive(Debug, Eq, Ord, Hash)]
 pub struct ProtoPath(str);
+
+/// An owned protocol buffer path.
+///
+/// This type is similar to `std::path::PathBuf` but specialized for protocol buffer paths.
+/// It provides methods for path manipulation and can be converted to and from `ProtoPath`.
+///
+/// # Examples
+///
+/// ```
+/// use puroro_codegen::proto_path::ProtoPathBuf;
+///
+/// let mut path = ProtoPathBuf::new();
+/// path.push("google");
+/// path.push("protobuf");
+/// assert_eq!(path.as_str(), "google.protobuf");
+/// ```
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Clone, Default)]
 pub struct ProtoPathBuf(String);
 
@@ -315,10 +370,10 @@ impl ProtoPathBuf {
     /// let mut path = ProtoPathBuf::new();
     /// path.push("foo");
     /// path.push("bar");
-    /// assert_eq!(path.as_str(), ".foo.bar");
+    /// assert_eq!(path.as_str(), "foo.bar");
     /// ```
     pub fn push(&mut self, path: impl AsRef<ProtoPath>) {
-        if !self.0.ends_with('.') {
+        if !self.0.is_empty() && !self.0.ends_with('.') {
             self.0.push('.');
         }
         self.0.push_str(&path.as_ref().0);
