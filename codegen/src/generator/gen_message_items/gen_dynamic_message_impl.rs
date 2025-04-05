@@ -50,10 +50,10 @@ impl GenDynamicMessageImpls {
 
     pub fn gen_impl_message_trait(&self) -> Result<Item> {
         let trait_name = &self.rust_trait_name;
-        let getters = self
+        let try_getters = self
             .fields
             .iter()
-            .map(Field::gen_getter)
+            .map(Field::gen_try_getter)
             .collect::<Result<Vec<_>>>()?;
         let clone_trait = self.options.clone_trait()?;
         let trait_path = self
@@ -62,7 +62,7 @@ impl GenDynamicMessageImpls {
         Ok(parse2(quote! {
             impl<A: ::std::alloc::Allocator + #clone_trait> #trait_path
             for ::puroro::dynamic::DynamicMessage<A> {
-                #(#getters)*
+                #(#try_getters)*
             }
         })?)
     }
@@ -89,19 +89,19 @@ impl Field {
         })
     }
 
-    fn gen_getter(&self) -> Result<Item> {
-        let signature = self.trait_field.gen_get_method_signature()?;
+    fn gen_try_getter(&self) -> Result<Item> {
+        let signature = self.trait_field.gen_try_get_method_signature()?;
         let number = self.number;
-        let body = self.gen_getter_body(&parse_str("f_opt")?)?;
+        let body = self.gen_try_getter_body(&parse_str("f_opt")?)?;
         Ok(parse2(quote! {
             #signature {
                 let f_opt = self.field(#number);
-                #body
+                Ok(#body)
             }
         })?)
     }
 
-    fn gen_getter_body(&self, field_opt_expr: &Expr) -> Result<Expr> {
+    fn gen_try_getter_body(&self, field_opt_expr: &Expr) -> Result<Expr> {
         let wire_type: WireType<_, _> = self.trait_field.scalar_type().into();
         let field_expr: Expr = parse_str("f")?;
         Ok(match self.trait_field.wrapper() {
@@ -122,32 +122,31 @@ impl Field {
             FieldPresense::Implicit | FieldPresense::Explicit => {
                 let body = match wire_type {
                     WireType::Variant(t) => {
-                        self.gen_non_repeated_varint_getter_body(&field_expr, t)?
+                        self.gen_try_non_repeated_varint_getter_body(&field_expr, t)?
                     }
                     WireType::I32(t) => self.gen_non_repeated_i32_getter_body(&field_expr, t)?,
                     WireType::I64(t) => self.gen_non_repeated_i64_getter_body(&field_expr, t)?,
                     WireType::Len(t) => self.gen_non_repeated_len_getter_body(&field_expr, t)?,
                     _ => todo!(), // Start / end group
                 };
-                let maybe_unwrap = match self.trait_field.wrapper() {
-                    FieldPresense::Implicit => quote! { .unwrap_or_default() },
-                    _ => quote! {},
-                };
                 parse2(quote! {
-                    (#field_opt_expr).map(|f| #body) #maybe_unwrap
+                    (#field_opt_expr).map(|f| #body).flatten()
                 })?
             }
         })
     }
 
-    fn gen_non_repeated_varint_getter_body(
+    fn gen_try_non_repeated_varint_getter_body(
         &self,
         field_expr: &Expr,
         t: VariantType<&ProtoPath>,
     ) -> Result<Expr> {
         let vt_type: Type = t.to_variant_integer_type(self.current_path.as_ref(), &self.options)?;
         Ok(parse2(quote! {
-            (#field_expr).as_scalar_variant::<#vt_type>(true /* TODO: packed check */)
+            (#field_expr).as_scalar_variant::<#vt_type>(
+                true /* TODO: packed check */,
+                ::puroro::dynamic::FieldReducingErrorStrategy::Skip /* TODO: needs confirmation */,
+            )?
         })?)
     }
     fn gen_non_repeated_i32_getter_body(&self, field_expr: &Expr, t: I32Type) -> Result<Expr> {

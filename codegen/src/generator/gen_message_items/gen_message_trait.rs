@@ -89,14 +89,14 @@ impl GenTrait {
 
     fn gen_message_trait(&self) -> Result<Item> {
         let trait_name = &self.rust_name;
-        let getters = self
+        let try_getters = self
             .fields
             .iter()
-            .map(Field::gen_get_method_signature)
+            .map(Field::gen_try_get_method_signature)
             .collect::<Result<Vec<_>>>()?;
         Ok(parse2(quote! {
             pub trait #trait_name {
-                #(#getters;)*
+                #(#try_getters;)*
             }
         })?)
     }
@@ -300,11 +300,31 @@ impl Field {
             FieldPresense::Repeated => parse2(quote! {
                 impl ::puroro::repeated::RepeatedView<Item = #scalar_ref_type>
             })?,
-            FieldPresense::Explicit => self.options.option_type(&scalar_ref_type)?,
-            FieldPresense::Implicit => scalar_ref_type,
+            FieldPresense::Explicit | FieldPresense::Implicit => scalar_ref_type,
         };
         Ok(parse2(quote! {
             fn #getter_name(&self) -> #getter_type
+        })?)
+    }
+
+    fn gen_try_get_method_name(&self) -> Result<Ident> {
+        let lower_cased = convert_into_case(&self.original_name, Case::LowerSnakeCase);
+        Ok(to_ident(&format!("try_{}", &lower_cased)))
+    }
+
+    pub fn gen_try_get_method_signature(&self) -> Result<Signature> {
+        let try_getter_name = self.gen_try_get_method_name()?;
+        let scalar_ref_type =
+            self.scalar_type
+                .gen_scalar_maybe_ref_type(&self.current_path, None, &self.options)?;
+        let getter_type = match self.presense {
+            FieldPresense::Repeated => parse2(quote! {
+                impl ::puroro::repeated::RepeatedView<Item = #scalar_ref_type>
+            })?,
+            FieldPresense::Explicit | FieldPresense::Implicit => scalar_ref_type,
+        };
+        Ok(parse2(quote! {
+            fn #try_getter_name(&self) -> Result<#getter_type>
         })?)
     }
 
