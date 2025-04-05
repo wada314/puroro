@@ -10,7 +10,7 @@ prettyplease = "0.2.27"
 proc-macro2 = "1.0.92"
 puroro = { path = "../puroro" }
 quote = "1.0.38"
-syn = "2.0.95"
+syn = { version = "2.0.95", features = ["extra-traits"] }
 thiserror = "2.0.9"
 
 [lib]

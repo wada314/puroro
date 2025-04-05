@@ -28,16 +28,56 @@ pub struct ProtoPath(str);
 pub struct ProtoPathBuf(String);
 
 impl ProtoPath {
+    /// Creates a new `ProtoPath` from a string slice.
+    /// The path is not validated.
     pub fn new<S: AsRef<str> + ?Sized>(path: &S) -> &Self {
         unsafe { &*(path.as_ref() as *const str as *const ProtoPath) }
     }
 
+    /// Returns `true` if the path is absolute (starts with a dot).
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use puroro_codegen::proto_path::ProtoPath;
+    /// assert!(ProtoPath::new(".foo.bar").is_absolute());
+    /// assert!(!ProtoPath::new("foo.bar").is_absolute());
+    /// ```
     pub fn is_absolute(&self) -> bool {
         self.0.starts_with('.')
     }
+
+    /// Returns `true` if the path is relative (does not start with a dot).
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use puroro_codegen::proto_path::ProtoPath;
+    /// assert!(ProtoPath::new("foo.bar").is_relative());
+    /// assert!(!ProtoPath::new(".foo.bar").is_relative());
+    /// ```
     pub fn is_relative(&self) -> bool {
         !self.is_absolute()
     }
+
+    /// Returns the parent path, or `None` if this path has no parent.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use puroro_codegen::proto_path::ProtoPath;
+    /// let path = ProtoPath::new("foo.bar.baz");
+    /// assert_eq!(path.parent().unwrap().as_str(), "foo.bar");
+    ///
+    /// let path = ProtoPath::new("foo");
+    /// assert_eq!(path.parent().unwrap().as_str(), "");
+    ///
+    /// let path = ProtoPath::new(".foo");
+    /// assert_eq!(path.parent().unwrap().as_str(), ".");
+    ///
+    /// let path = ProtoPath::new(".");
+    /// assert_eq!(path.parent(), None);
+    /// ```
     pub fn parent(&self) -> Option<&Self> {
         match self.0.rsplit_once('.') {
             None if self.0.is_empty() => None,
@@ -50,6 +90,22 @@ impl ProtoPath {
             Some((parent, _)) => Some(ProtoPath::new(parent)),
         }
     }
+
+    /// Returns the last component of the path, or `None` if the path is empty.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use puroro_codegen::proto_path::ProtoPath;
+    /// let path = ProtoPath::new("foo.bar.baz");
+    /// assert_eq!(path.last_component().unwrap(), "baz");
+    ///
+    /// let path = ProtoPath::new("foo");
+    /// assert_eq!(path.last_component().unwrap(), "foo");
+    ///
+    /// let path = ProtoPath::new(".");
+    /// assert_eq!(path.last_component(), None);
+    /// ```
     pub fn last_component(&self) -> Option<&str> {
         match self.0.rsplit_once('.') {
             None if self.0.is_empty() => None,
@@ -59,6 +115,17 @@ impl ProtoPath {
             Some((_, last)) => Some(last),
         }
     }
+
+    /// Returns an iterator over the components of the path.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use puroro_codegen::proto_path::ProtoPath;
+    /// let path = ProtoPath::new("foo.bar.baz");
+    /// let components: Vec<_> = path.components().collect();
+    /// assert_eq!(components, vec!["foo", "bar", "baz"]);
+    /// ```
     pub fn components(&self) -> impl Iterator<Item = &str> {
         let relative = self.0.strip_prefix('.').unwrap_or(&self.0);
         (!relative.is_empty())
@@ -69,9 +136,10 @@ impl ProtoPath {
 
     /// Returns an iterator over the ancestor paths of the current path.
     ///
-    /// Example:
+    /// # Examples
+    ///
     /// ```
-    /// use puroro_codegen::proto_path::ProtoPath;
+    /// # use puroro_codegen::proto_path::ProtoPath;
     /// let path = ProtoPath::new("a.b.c");
     /// assert_eq!(
     ///     path.ancestors().map(|p| p.as_str()).collect::<Vec<_>>(),
@@ -81,6 +149,17 @@ impl ProtoPath {
     pub fn ancestors(&self) -> impl Iterator<Item = &Self> {
         ::std::iter::successors(Some(self), |path| path.parent())
     }
+
+    /// Strips the specified prefix from this path, returning `None` if the prefix does not match.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use puroro_codegen::proto_path::ProtoPath;
+    /// let path = ProtoPath::new("foo.bar.baz");
+    /// let prefix = ProtoPath::new("foo.bar");
+    /// assert_eq!(path.strip_prefix(prefix).unwrap().as_str(), "baz");
+    /// ```
     pub fn strip_prefix(&self, prefix: &Self) -> Option<&Self> {
         if prefix.0.ends_with('.') {
             if self.0.starts_with(&prefix.0) {
@@ -96,6 +175,18 @@ impl ProtoPath {
             }
         }
     }
+
+    /// Converts this path to a relative path using the specified base path.
+    /// Returns `None` if the conversion is not possible.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use puroro_codegen::proto_path::ProtoPath;
+    /// let path = ProtoPath::new(".foo.bar.baz");
+    /// let base = ProtoPath::new(".foo.bar");
+    /// assert_eq!(path.to_relative_path(base).unwrap().as_str(), "baz");
+    /// ```
     pub fn to_relative_path(&self, base: &Self) -> Option<&Self> {
         if self.is_absolute() && base.is_absolute() {
             for ancestors in base.ancestors() {
@@ -107,6 +198,19 @@ impl ProtoPath {
         None
     }
 
+    /// Consider the path is a proto package path or a proto message path,
+    /// and convert it to a rust file path.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use puroro_codegen::proto_path::ProtoPath;
+    /// let path = ProtoPath::new("foo.bar.baz");
+    /// assert_eq!(path.to_rust_file_path(), "foo/bar/baz.rs");
+    ///
+    /// let path = ProtoPath::new(".");
+    /// assert_eq!(path.to_rust_file_path(), "mod.rs");
+    /// ```
     pub fn to_rust_file_path(&self) -> String {
         let mut result = self
             .0
@@ -128,6 +232,26 @@ impl ProtoPath {
             Ok(to_ident(&convert_into_case(item, Case::CamelCase)).into())
         })
     }
+
+    /// Convert the proto path to a rust path.
+    /// The path items except the last one are converted to rust modules,
+    /// and the user can specify the naming of the last item using the `last_item_naming` closure.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use puroro_codegen::proto_path::ProtoPath;
+    /// use syn::parse_str;
+    /// let path = ProtoPath::new("foo.bar.baz");
+    /// let rust_path = path.to_rust_path_with(&Default::default(), |item| {
+    ///     let capitalized = item.chars().enumerate().map(|(i, c)| {
+    ///         if i == 0 { c.to_ascii_uppercase() } else { c }
+    ///     }).collect::<String>();
+    ///     Ok(parse_str(&capitalized)?)
+    /// }).unwrap();
+    /// assert_eq!(rust_path, parse_str("self::foo::bar::Baz").unwrap());
+    /// ```
+
     pub fn to_rust_path_with(
         &self,
         options: &CodeGeneratorOptions,
@@ -155,18 +279,42 @@ impl ProtoPath {
         }
     }
 
+    /// Returns a string slice of the underlying path.
     pub fn as_str(&self) -> &str {
         &self.0
     }
+
+    /// Returns an owned string of the underlying path.
     pub fn to_string(&self) -> String {
         self.0.to_string()
     }
 }
 
 impl ProtoPathBuf {
+    /// Creates a new empty `ProtoPathBuf`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use puroro_codegen::proto_path::ProtoPathBuf;
+    /// let path = ProtoPathBuf::new();
+    /// assert_eq!(path.as_str(), "");
+    /// ```
     pub fn new() -> Self {
         Self("".to_string())
     }
+
+    /// Pushes a path component onto this path.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use puroro_codegen::proto_path::ProtoPathBuf;
+    /// let mut path = ProtoPathBuf::new();
+    /// path.push("foo");
+    /// path.push("bar");
+    /// assert_eq!(path.as_str(), ".foo.bar");
+    /// ```
     pub fn push(&mut self, path: impl AsRef<ProtoPath>) {
         if !self.0.ends_with('.') {
             self.0.push('.');
