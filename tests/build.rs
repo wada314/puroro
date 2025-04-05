@@ -21,8 +21,8 @@ use ::std::path::Path;
 use ::std::time::Duration;
 
 fn main() -> Result<(), Error> {
-    print!("cargo::rerun-if-changed=tests/protos");
-    print!("cargo::rerun-if-changed=../codegen/src");
+    println!("cargo::rerun-if-changed=tests/protos");
+    println!("cargo::rerun-if-changed=../codegen/src");
 
     let _ = fs::remove_dir_all("tests/generated"); // Allow error: directory may not exist
     fs::create_dir("tests/generated").unwrap();

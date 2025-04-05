@@ -32,11 +32,17 @@ pub use compile::*;
 pub struct CodeGeneratorOptions {
     /// Should the generated code's type name be fully-qualified type name?
     /// e.g. should we just use `i32` or `::std::primitive::i32` ?
-    /// Default to true.
+    ///
+    /// Default to true. If false, there's a chance that the generated code
+    /// will not compile.
     pub strict_type_path: bool,
 
     /// If true, in the generated code modules, we `use` the common types which
     /// are not included in the prelude: e.g. `::std::ops::Deref`.
+    /// Instead, the generated code will be shorter and more readable.
+    ///
+    /// Default to false. If true, there's a chance that the generated code
+    /// will not compile.
     pub allow_import_common_types: bool,
 }
 impl Default for CodeGeneratorOptions {
