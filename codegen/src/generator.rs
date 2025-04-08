@@ -24,7 +24,7 @@ use ::quote::{format_ident, quote};
 use ::std::borrow::Cow;
 use ::std::cell::LazyCell;
 use ::std::collections::HashSet;
-use ::syn::{parse2, parse_str, Ident, ItemUse, Path, Type, TypePath};
+use ::syn::{parse2, parse_str, Expr, Ident, ItemUse, Path, Type, TypePath};
 
 pub use compile::*;
 
@@ -106,6 +106,13 @@ impl CodeGeneratorOptions {
             quote! { ::std::result::Result<#elem_type, ::puroro::ErrorKind> }
         } else {
             quote! { Result<#elem_type, ::puroro::ErrorKind> }
+        })?)
+    }
+    pub fn ok_value(&self, value: &Expr) -> Result<Expr> {
+        Ok(parse2(if self.strict_type_path {
+            quote! { ::std::result::Result::Ok(#value) }
+        } else {
+            quote! { Ok(#value) }
         })?)
     }
     pub fn iter_trait(&self, elem_type: &Type) -> Result<Path> {

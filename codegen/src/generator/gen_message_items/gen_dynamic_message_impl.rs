@@ -124,9 +124,15 @@ impl Field {
                     WireType::Variant(t) => {
                         self.gen_try_non_repeated_varint_getter_body(&field_expr, t)?
                     }
-                    WireType::I32(t) => self.gen_non_repeated_i32_getter_body(&field_expr, t)?,
-                    WireType::I64(t) => self.gen_non_repeated_i64_getter_body(&field_expr, t)?,
-                    WireType::Len(t) => self.gen_non_repeated_len_getter_body(&field_expr, t)?,
+                    WireType::I32(t) => {
+                        self.gen_try_non_repeated_i32_getter_body(&field_expr, t)?
+                    }
+                    WireType::I64(t) => {
+                        self.gen_try_non_repeated_i64_getter_body(&field_expr, t)?
+                    }
+                    WireType::Len(t) => {
+                        self.gen_try_non_repeated_len_getter_body(&field_expr, t)?
+                    }
                     _ => todo!(), // Start / end group
                 };
                 parse2(quote! {
@@ -149,26 +155,24 @@ impl Field {
             )?
         })?)
     }
-    fn gen_non_repeated_i32_getter_body(&self, field_expr: &Expr, t: I32Type) -> Result<Expr> {
+    fn gen_try_non_repeated_i32_getter_body(&self, field_expr: &Expr, t: I32Type) -> Result<Expr> {
         let bytes_expr: Expr = parse2(quote! { (#field_expr).as_scalar_i32() })?;
         let primitive_type = t.to_primitive_type(&self.options)?;
-        Ok(parse2(
-            quote! { #primitive_type::from_le_bytes(#bytes_expr) },
-        )?)
+        self.options
+            .ok_value(&(parse2(quote! { #primitive_type::from_le_bytes(#bytes_expr) })?))
     }
-    fn gen_non_repeated_i64_getter_body(&self, field_expr: &Expr, t: I64Type) -> Result<Expr> {
+    fn gen_try_non_repeated_i64_getter_body(&self, field_expr: &Expr, t: I64Type) -> Result<Expr> {
         let bytes_expr: Expr = parse2(quote! { (#field_expr).as_scalar_i64() })?;
         let primitive_type = t.to_primitive_type(&self.options)?;
-        Ok(parse2(
-            quote! { #primitive_type::from_le_bytes(#bytes_expr) },
-        )?)
+        self.options
+            .ok_value(&(parse2(quote! { #primitive_type::from_le_bytes(#bytes_expr) })?))
     }
-    fn gen_non_repeated_len_getter_body(
+    fn gen_try_non_repeated_len_getter_body(
         &self,
         field_expr: &Expr,
         t: LenType<&ProtoPath>,
     ) -> Result<Expr> {
-        Ok(parse2(match t {
+        self.options.ok_value(&parse2(match t {
             LenType::String => {
                 quote! { (#field_expr).as_scalar_string() }
             }
