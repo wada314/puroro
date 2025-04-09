@@ -55,6 +55,11 @@ impl GenDynamicMessageImpls {
             .iter()
             .map(Field::gen_try_getter)
             .collect::<Result<Vec<_>>>()?;
+        let try_has_methods = self
+            .fields
+            .iter()
+            .filter_map(|f| f.maybe_gen_try_has_method().transpose())
+            .collect::<Result<Vec<_>>>()?;
         let clone_trait = self.options.clone_trait()?;
         let trait_path = self
             .options
@@ -63,6 +68,7 @@ impl GenDynamicMessageImpls {
             impl<A: ::std::alloc::Allocator + #clone_trait> #trait_path
             for ::puroro::dynamic::DynamicMessage<A> {
                 #(#try_getters)*
+                #(#try_has_methods)*
             }
         })?)
     }
@@ -106,7 +112,7 @@ impl Field {
     fn gen_try_getter_body(&self, field_opt_expr: &Expr) -> Result<Expr> {
         let wire_type: WireType<_, _> = self.trait_field.scalar_type().into();
         let field_expr: Expr = parse_str("f")?;
-        Ok(match self.trait_field.wrapper() {
+        Ok(match self.trait_field.presense() {
             FieldPresense::Repeated => {
                 let body = match wire_type {
                     WireType::Variant(t) => {
@@ -236,6 +242,18 @@ impl Field {
                 quote! { (#field_expr).as_repeated_message() }
             }
         })?)
+    }
+
+    fn maybe_gen_try_has_method(&self) -> Result<Option<Item>> {
+        if self.trait_field.presense() == FieldPresense::Repeated {
+            return Ok(None);
+        }
+        let signature = self.trait_field.gen_try_has_method_signature()?;
+        Ok(Some(parse2(quote! {
+            #signature {
+                todo!()
+            }
+        })?))
     }
 }
 

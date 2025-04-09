@@ -31,6 +31,7 @@ pub struct GenTrait {
     options: Rc<CodeGeneratorOptions>,
     getter_signatures: OnceCell<Vec<Signature>>,
     try_getter_signatures: OnceCell<Vec<Signature>>,
+    try_has_method_signatures: OnceCell<Vec<Signature>>,
 }
 
 impl GenTrait {
@@ -50,6 +51,7 @@ impl GenTrait {
             options,
             getter_signatures: OnceCell::new(),
             try_getter_signatures: OnceCell::new(),
+            try_has_method_signatures: OnceCell::new(),
         })
     }
 
@@ -91,14 +93,12 @@ impl GenTrait {
 
     fn gen_message_trait(&self) -> Result<Item> {
         let trait_name = &self.rust_name;
-        let try_getters = self
-            .fields
-            .iter()
-            .map(Field::gen_try_get_method_signature)
-            .collect::<Result<Vec<_>>>()?;
+        let try_getters = self.gen_try_getter_signatures()?;
+        let try_has_methods = self.gen_try_has_method_signatures()?;
         Ok(parse2(quote! {
             pub trait #trait_name {
                 #(#try_getters;)*
+                #(#try_has_methods;)*
             }
         })?)
     }
@@ -120,6 +120,17 @@ impl GenTrait {
                 self.fields
                     .iter()
                     .map(Field::gen_try_get_method_signature)
+                    .collect::<Result<Vec<_>>>()
+            })
+            .map(Vec::as_slice)
+    }
+
+    fn gen_try_has_method_signatures(&self) -> Result<&[Signature]> {
+        self.try_has_method_signatures
+            .get_or_try_init(|| {
+                self.fields
+                    .iter()
+                    .filter_map(|f| f.maybe_gen_try_has_method_signature().transpose())
                     .collect::<Result<Vec<_>>>()
             })
             .map(Vec::as_slice)
@@ -160,11 +171,15 @@ impl GenTrait {
             .iter()
             .map(|f| f.gen_blanket_ref_try_get_method_body(&blanket_type, &trait_path))
             .collect::<Result<Vec<_>>>()?;
+        let try_has_method_signatures = self.gen_try_has_method_signatures()?;
         Ok(vec![
             parse2(quote! {
                 impl<T: #trait_path> #trait_path for &T {
                     #(#try_getter_signatures {
                         #try_getter_bodies
+                    })*
+                    #(#try_has_method_signatures {
+                        todo!()
                     })*
                 }
             })?,
@@ -172,6 +187,9 @@ impl GenTrait {
                 impl<T: self::#trait_name> #trait_path for &mut T {
                     #(#try_getter_signatures {
                         #try_getter_bodies
+                    })*
+                    #(#try_has_method_signatures {
+                        todo!()
                     })*
                 }
             })?,
@@ -192,9 +210,11 @@ impl GenTrait {
             .iter()
             .map(|f| f.gen_blanket_option_try_get_method_body(&blanket_type_ident, &trait_path))
             .collect::<Result<Vec<_>>>()?;
+        let try_has_method_signatures = self.gen_try_has_method_signatures()?;
         Ok(parse2(quote! {
             impl<T: #trait_path> #trait_path for #blanket_opt_type {
                 #(#try_getter_signatures #try_getter_bodies)*
+                #(#try_has_method_signatures { todo!() })*
             }
         })?)
     }
@@ -212,11 +232,13 @@ impl GenTrait {
             .iter()
             .map(|f| f.gen_blanket_tuple_try_get_method_body(&t1, &t2, &trait_path))
             .collect::<Result<Vec<_>>>()?;
+        let try_has_method_signatures = self.gen_try_has_method_signatures()?;
         Ok(parse2(quote! {
             impl<#t1: #trait_path, #t2: #trait_path>
             #trait_path for (#t1, #t2)
             {
                 #(#try_getter_signatures #try_getter_bodies)*
+                #(#try_has_method_signatures { todo!() })*
             }
         })?)
     }
@@ -234,11 +256,13 @@ impl GenTrait {
             .iter()
             .map(|f| f.gen_blanket_either_try_get_method_body(&t1, &t2, &trait_path))
             .collect::<Result<Vec<_>>>()?;
+        let try_has_method_signatures = self.gen_try_has_method_signatures()?;
         Ok(parse2(quote! {
             impl<#t1: #trait_path, #t2: #trait_path>
             #trait_path for ::puroro::Either<#t1, #t2>
             {
                 #(#try_getter_signatures #try_getter_bodies)*
+                #(#try_has_method_signatures { todo!() })*
             }
         })?)
     }
@@ -256,11 +280,13 @@ impl GenTrait {
             .iter()
             .map(|f| f.gen_blanket_either_or_both_try_get_method_body(&t1, &t2, &trait_path))
             .collect::<Result<Vec<_>>>()?;
+        let try_has_method_signatures = self.gen_try_has_method_signatures()?;
         Ok(parse2(quote! {
             impl<#t1: #trait_path, #t2: #trait_path>
             #trait_path for ::puroro::EitherOrBoth<#t1, #t2>
             {
                 #(#try_getter_signatures #try_getter_bodies)*
+                #(#try_has_method_signatures { todo!() })*
             }
         })?)
     }
@@ -293,7 +319,7 @@ impl Field {
         self.scalar_type.as_deref()
     }
 
-    pub fn wrapper(&self) -> FieldPresense {
+    pub fn presense(&self) -> FieldPresense {
         self.presense
     }
 
@@ -349,6 +375,20 @@ impl Field {
         Ok(parse2(quote! {
             fn #try_getter_name(&self) -> #result_type
         })?)
+    }
+
+    fn maybe_gen_try_has_method_signature(&self) -> Result<Option<Signature>> {
+        if self.presense == FieldPresense::Repeated {
+            Ok(None)
+        } else {
+            let try_has_name = self.gen_try_has_method_name()?;
+            let result_type = self
+                .options
+                .result_type(&self.options.primitive_type("bool")?)?;
+            Ok(Some(parse2(quote! {
+                fn #try_has_name(&self) -> #result_type
+            })?))
+        }
     }
 
     fn gen_try_has_method_name(&self) -> Result<Ident> {
