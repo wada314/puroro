@@ -180,12 +180,14 @@ impl Field {
         field_expr: &Expr,
         t: LenType<&ProtoPath>,
     ) -> Result<Expr> {
-        self.options.ok_value(&parse2(match t {
+        Ok(parse2(match t {
             LenType::String => {
-                quote! { (#field_expr).as_scalar_string() }
+                quote! { (#field_expr).as_scalar_string(
+                ::puroro::dynamic::FieldReducingErrorStrategy::Skip /* TODO: needs confirmation */,) }
             }
             LenType::Bytes => {
-                quote! { (#field_expr).as_scalar_bytes() }
+                quote! { (#field_expr).as_scalar_bytes(
+                ::puroro::dynamic::FieldReducingErrorStrategy::Skip /* TODO: needs confirmation */,) }
             }
             LenType::Message(_) => {
                 quote! { (#field_expr).as_scalar_message() }
@@ -206,13 +208,13 @@ impl Field {
     fn gen_repeated_i32_getter_body(&self, field_expr: &Expr, t: I32Type) -> Result<Expr> {
         let primitive_type = t.to_primitive_type(&self.options)?;
         Ok(parse2(quote! {
-            (#field_expr).as_repeated_i32().map(#primitive_type::from_le_bytes)
+            (#field_expr).as_repeated_i32().map(|iter| iter.map(|v_res| v_res.map(#primitive_type::from_le_bytes)))
         })?)
     }
     fn gen_repeated_i64_getter_body(&self, field_expr: &Expr, t: I64Type) -> Result<Expr> {
         let primitive_type = t.to_primitive_type(&self.options)?;
         Ok(parse2(quote! {
-            (#field_expr).as_repeated_i64().map(#primitive_type::from_le_bytes)
+            (#field_expr).as_repeated_i64().map(|iter| iter.map(|v_res| v_res.map(#primitive_type::from_le_bytes)))
         })?)
     }
     fn gen_repeated_len_getter_body(
