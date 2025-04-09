@@ -313,7 +313,10 @@ impl Field {
             FieldPresense::Repeated => parse2(quote! {
                 impl ::puroro::repeated::RepeatedView<Item = #scalar_ref_type>
             })?,
-            FieldPresense::Explicit | FieldPresense::Implicit => scalar_ref_type,
+            FieldPresense::Explicit | FieldPresense::Implicit => match self.scalar_type() {
+                FieldType::Message(_) => self.options.option_type(&scalar_ref_type)?,
+                _ => scalar_ref_type,
+            },
         };
         Ok(parse2(quote! {
             fn #getter_name(&self) -> #getter_type
@@ -337,7 +340,10 @@ impl Field {
                     impl ::puroro::repeated::RepeatedView<Item = #item_type>
                 })?
             }
-            FieldPresense::Explicit | FieldPresense::Implicit => scalar_ref_type,
+            FieldPresense::Explicit | FieldPresense::Implicit => match self.scalar_type() {
+                FieldType::Message(_) => self.options.option_type(&scalar_ref_type)?,
+                _ => scalar_ref_type,
+            },
         };
         let result_type = self.options.result_type(&getter_type)?;
         Ok(parse2(quote! {

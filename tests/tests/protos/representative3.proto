@@ -1,0 +1,42 @@
+syntax = "proto3";
+package exhaustive.representative3;
+
+// Important (representative) types
+message Representative {
+    int32 i32_bare = 1;
+    optional int32 i32_opt = 2;
+    repeated int32 i32_rep = 3;
+
+    float float_bare = 4;
+    optional float float_opt = 5;
+    repeated float float_rep = 6;
+
+    double double_bare = 7;
+    optional double double_opt = 8;
+    repeated double double_rep = 9;
+
+    enum MyEnum {
+        Zero = 0;
+        One = 1;
+        FourtyTwo = 42;
+    }
+    MyEnum enum_bare = 10;
+    optional MyEnum enum_opt = 11;
+    repeated MyEnum enum_rep = 12;
+
+    string string_bare = 13;
+    optional string string_opt = 14;
+    repeated string string_rep = 15;
+
+    bytes bytes_bare = 16;
+    optional bytes bytes_opt = 17;
+    repeated bytes bytes_rep = 18;
+
+    message MyMessage {
+        int32 id = 1;
+        string name = 2;
+    }
+    MyMessage message_bare = 19;
+    optional MyMessage message_opt = 20;
+    repeated MyMessage message_rep = 21;
+}
