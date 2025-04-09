@@ -158,16 +158,22 @@ impl Field {
         })?)
     }
     fn gen_try_non_repeated_i32_getter_body(&self, field_expr: &Expr, t: I32Type) -> Result<Expr> {
-        let bytes_expr: Expr = parse2(quote! { (#field_expr).as_scalar_i32() })?;
+        let bytes_expr: Expr = parse2(quote! { (#field_expr).as_scalar_i32(
+            ::puroro::dynamic::FieldReducingErrorStrategy::Skip /* TODO: needs confirmation */,
+        ) })?;
         let primitive_type = t.to_primitive_type(&self.options)?;
-        self.options
-            .ok_value(&(parse2(quote! { #primitive_type::from_le_bytes(#bytes_expr) })?))
+        Ok(parse2(
+            quote! { (#bytes_expr).map(|v_opt| v_opt.map(#primitive_type::from_le_bytes)) },
+        )?)
     }
     fn gen_try_non_repeated_i64_getter_body(&self, field_expr: &Expr, t: I64Type) -> Result<Expr> {
-        let bytes_expr: Expr = parse2(quote! { (#field_expr).as_scalar_i64() })?;
+        let bytes_expr: Expr = parse2(quote! { (#field_expr).as_scalar_i64(
+            ::puroro::dynamic::FieldReducingErrorStrategy::Skip /* TODO: needs confirmation */,
+        ) })?;
         let primitive_type = t.to_primitive_type(&self.options)?;
-        self.options
-            .ok_value(&(parse2(quote! { #primitive_type::from_le_bytes(#bytes_expr) })?))
+        Ok(parse2(
+            quote! { (#bytes_expr).map(|v_opt| v_opt.map(#primitive_type::from_le_bytes)) },
+        )?)
     }
     fn gen_try_non_repeated_len_getter_body(
         &self,
