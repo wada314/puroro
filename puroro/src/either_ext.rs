@@ -130,6 +130,14 @@ pub trait BothExt {
             .map(Either::Left)
             .chain(u.into_iter().map(Either::Right))
     }
+
+    fn factor_result<T2, U2, E>(self) -> Result<(T2, U2), E>
+    where
+        Self: Sized + BothExt<T = Result<T2, E>, U = Result<U2, E>>,
+    {
+        let (t, u) = self.into_tuple();
+        Ok((t?, u?))
+    }
 }
 impl<T, U> BothExt for (T, U) {
     type T = T;
