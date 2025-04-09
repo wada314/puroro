@@ -137,8 +137,15 @@ impl Field {
                     }
                     _ => todo!(), // Start / end group
                 };
+                let unwrap_option = (!matches!(wire_type, WireType::Len(LenType::Message(_))))
+                    .then(|| {
+                        quote! {
+                            .unwrap_or_default() // TODO: default value
+                        }
+                    })
+                    .into_iter();
                 parse2(quote! {
-                    (#field_opt_expr).map(|f| #body).transpose()?.flatten().unwrap_or_default() // TODO: default value
+                    (#field_opt_expr).map(|f| #body).transpose()?.flatten() #(#unwrap_option)*
                 })?
             }
         })
