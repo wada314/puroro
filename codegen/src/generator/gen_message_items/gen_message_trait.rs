@@ -331,9 +331,12 @@ impl Field {
             self.scalar_type
                 .gen_scalar_maybe_ref_type(&self.current_path, None, &self.options)?;
         let getter_type = match self.presense {
-            FieldPresense::Repeated => parse2(quote! {
-                impl ::puroro::repeated::RepeatedView<Item = #scalar_ref_type>
-            })?,
+            FieldPresense::Repeated => {
+                let item_type = self.options.result_type(&scalar_ref_type)?;
+                parse2(quote! {
+                    impl ::puroro::repeated::RepeatedView<Item = #item_type>
+                })?
+            }
             FieldPresense::Explicit | FieldPresense::Implicit => scalar_ref_type,
         };
         let result_type = self.options.result_type(&getter_type)?;

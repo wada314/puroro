@@ -118,7 +118,7 @@ impl Field {
                     _ => todo!(), // Start / end group
                 };
                 parse2(quote! {
-                    (#field_opt_expr).into_iter().flat_map(|f| #body)
+                    (#field_opt_expr).map(|f| #body).transpose()?.into_iter().flatten()
                 })?
             }
             FieldPresense::Implicit | FieldPresense::Explicit => {
@@ -138,7 +138,7 @@ impl Field {
                     _ => todo!(), // Start / end group
                 };
                 parse2(quote! {
-                    (#field_opt_expr).map(|f| #body).flatten().unwrap_or_default() // TODO: default value
+                    (#field_opt_expr).map(|f| #body).transpose()?.flatten().unwrap_or_default() // TODO: default value
                 })?
             }
         })
@@ -154,7 +154,7 @@ impl Field {
             (#field_expr).as_scalar_variant::<#vt_type>(
                 true /* TODO: packed check */,
                 ::puroro::dynamic::FieldReducingErrorStrategy::Skip /* TODO: needs confirmation */,
-            )?
+            )
         })?)
     }
     fn gen_try_non_repeated_i32_getter_body(&self, field_expr: &Expr, t: I32Type) -> Result<Expr> {
