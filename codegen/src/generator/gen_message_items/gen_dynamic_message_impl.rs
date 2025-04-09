@@ -92,11 +92,13 @@ impl Field {
     fn gen_try_getter(&self) -> Result<Item> {
         let signature = self.trait_field.gen_try_get_method_signature()?;
         let number = self.number;
-        let body = self.gen_try_getter_body(&parse_str("f_opt")?)?;
+        let body = self
+            .options
+            .ok_value(&self.gen_try_getter_body(&parse_str("f_opt")?)?)?;
         Ok(parse2(quote! {
             #signature {
                 let f_opt = self.field(#number);
-                Ok(#body)
+                #body
             }
         })?)
     }
@@ -136,7 +138,7 @@ impl Field {
                     _ => todo!(), // Start / end group
                 };
                 parse2(quote! {
-                    (#field_opt_expr).map(|f| #body).flatten()
+                    (#field_opt_expr).map(|f| #body).flatten().unwrap_or_default() // TODO: default value
                 })?
             }
         })
