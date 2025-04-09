@@ -379,7 +379,8 @@ impl Field {
         let try_getter_name = self.gen_try_get_method_name()?;
         let stmts = match self.presense {
             FieldPresense::Repeated => quote! {
-                self.as_ref().map(<#blanket_type_ident as #trait_path>::#try_getter_name).into_iter().flatten()
+                self.as_ref().map(<#blanket_type_ident as #trait_path>::#try_getter_name).transpose()
+                .map(|iter_opt| iter_opt.into_iter().flatten())
             },
             FieldPresense::Explicit | FieldPresense::Implicit => quote! {
                 self.as_ref().map(<#blanket_type_ident as #trait_path>::#try_getter_name).transpose().map(
