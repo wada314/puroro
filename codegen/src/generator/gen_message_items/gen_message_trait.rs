@@ -456,6 +456,7 @@ impl Field {
         let stmts = match (self.presense, self.scalar_type()) {
             (FieldPresense::Repeated, FieldType::Message(_)) => quote! {
                 ::puroro::BothExt::factor_into_iter((#value_1?, #value_2?))
+                    .map(|either_res| either_res.factor_err())
             },
             (FieldPresense::Repeated, _) => quote! {
                 ::puroro::BothExt::into_iter((#value_1?, #value_2?))
