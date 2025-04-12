@@ -492,7 +492,7 @@ impl Field {
         })?;
         let stmts = match (self.presense, self.scalar_type()) {
             (FieldPresense::Repeated, FieldType::Message(_)) => quote! {
-                #mapped_either.factor_into_iter()
+                #mapped_either.factor_into_iter().map(|either_res| either_res.factor_err())
             },
             (FieldPresense::Repeated, _) => quote! {
                 #mapped_either.into_iter()
