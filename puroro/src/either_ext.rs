@@ -22,7 +22,19 @@ pub trait EitherOrBothExt {
     type T;
     type U;
     fn into_either_or_both(self) -> EitherOrBoth<Self::T, Self::U>;
-    fn into_iter(self) -> impl IntoIterator<Item = <Self::T as IntoIterator>::Item>
+
+    fn factor_err<T2, U2, E>(self) -> Result<EitherOrBoth<T2, U2>, E>
+    where
+        Self: Sized + EitherOrBothExt<T = Result<T2, E>, U = Result<U2, E>>,
+    {
+        match self.into_either_or_both() {
+            EitherOrBoth::Both(t, u) => Ok(EitherOrBoth::Both(t?, u?)),
+            EitherOrBoth::Left(t) => Ok(EitherOrBoth::Left(t?)),
+            EitherOrBoth::Right(u) => Ok(EitherOrBoth::Right(u?)),
+        }
+    }
+
+    fn into_iter(self) -> impl Iterator<Item = <Self::T as IntoIterator>::Item>
     where
         Self: Sized,
         Self::T: IntoIterator,
@@ -34,9 +46,10 @@ pub trait EitherOrBothExt {
             .flatten()
             .chain(u_opt.into_iter().flatten())
     }
+
     fn factor_into_iter(
         self,
-    ) -> impl IntoIterator<Item = Either<<Self::T as IntoIterator>::Item, <Self::U as IntoIterator>::Item>>
+    ) -> impl Iterator<Item = Either<<Self::T as IntoIterator>::Item, <Self::U as IntoIterator>::Item>>
     where
         Self: Sized,
         Self::T: IntoIterator,
@@ -49,6 +62,7 @@ pub trait EitherOrBothExt {
             .map(Either::Left)
             .chain(u_opt.into_iter().flatten().map(Either::Right))
     }
+
     fn flatten_opt<T2, U2>(self) -> Option<EitherOrBoth<T2, U2>>
     where
         Self: Sized + EitherOrBothExt<T = Option<T2>, U = Option<U2>>,

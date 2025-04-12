@@ -524,13 +524,13 @@ impl Field {
         })?;
         let stmts = match (self.presense, self.scalar_type()) {
             (FieldPresense::Repeated, FieldType::Message(_)) => quote! {
-                ::puroro::EitherOrBothExt::factor_into_iter(#mapped_either)
+                #mapped_either.factor_into_iter().map(|either_res| either_res.factor_err())
             },
             (FieldPresense::Repeated, _) => quote! {
-                ::puroro::EitherOrBothExt::into_iter(#mapped_either)
+                #mapped_either.into_iter()
             },
             (_, FieldType::Message(_)) => quote! {
-                ::puroro::EitherOrBothExt::flatten_opt(#mapped_either)
+                #mapped_either.flatten_opt()
             },
             _ => quote! {
                 todo!()
@@ -542,7 +542,10 @@ impl Field {
             },
         };
         Ok(parse2(quote! {
-            { Ok(#stmts) }
+            {
+                use ::puroro::EitherOrBothExt;
+                Ok(#stmts)
+            }
         })?)
     }
 
