@@ -219,10 +219,20 @@ impl GenTrait {
             .map(|f| f.gen_blanket_option_try_get_method_body(&blanket_type_ident, &trait_path))
             .collect::<Result<Vec<_>>>()?;
         let try_has_method_signatures = self.gen_try_has_method_signatures()?;
+        let try_has_method_bodies = self
+            .fields
+            .iter()
+            .filter_map(|f| {
+                f.gen_blanket_option_try_has_method_body(&blanket_type_ident, &trait_path)
+                    .transpose()
+            })
+            .collect::<Result<Vec<_>>>()?;
         Ok(parse2(quote! {
             impl<T: #trait_path> #trait_path for #blanket_opt_type {
                 #(#try_getter_signatures #try_getter_bodies)*
-                #(#try_has_method_signatures { todo!() })*
+                #(#try_has_method_signatures {
+                    #try_has_method_bodies
+                })*
             }
         })?)
     }
@@ -435,6 +445,24 @@ impl Field {
         Ok(parse2(quote! {
             { #stmts }
         })?)
+    }
+
+    fn gen_blanket_option_try_has_method_body(
+        &self,
+        blanket_type_ident: &Ident,
+        trait_path: &Path,
+    ) -> Result<Option<Block>> {
+        if self.presense == FieldPresense::Repeated {
+            return Ok(None);
+        }
+        let try_has_name = self.gen_try_has_method_name()?;
+        Ok(Some(parse2(quote! {
+            {
+                Ok(self.as_ref().map(<#blanket_type_ident as #trait_path>::#try_has_name)
+                    .transpose()?
+                    .unwrap_or(false))
+            }
+        })?))
     }
 
     fn gen_blanket_tuple_try_get_method_body(
