@@ -639,10 +639,10 @@ impl Field {
         let try_has_name = self.gen_try_has_method_name()?;
         Ok(Some(parse2(quote! {
             {
-                self.as_ref().map_either(
+                Ok(self.as_ref().map_either(
                     |t1| <#t1 as #trait_path>::#try_has_name(t1),
                     |t2| <#t2 as #trait_path>::#try_has_name(t2)
-                ).factor_err()?
+                ).factor_err()?.into_inner())
             }
         })?))
     }
