@@ -172,6 +172,14 @@ impl GenTrait {
             .map(|f| f.gen_blanket_ref_try_get_method_body(&blanket_type, &trait_path))
             .collect::<Result<Vec<_>>>()?;
         let try_has_method_signatures = self.gen_try_has_method_signatures()?;
+        let try_has_method_bodies = self
+            .fields
+            .iter()
+            .filter_map(|f| {
+                f.gen_blanket_ref_try_has_method_body(&blanket_type, &trait_path)
+                    .transpose()
+            })
+            .collect::<Result<Vec<_>>>()?;
         Ok(vec![
             parse2(quote! {
                 impl<T: #trait_path> #trait_path for &T {
@@ -179,7 +187,7 @@ impl GenTrait {
                         #try_getter_bodies
                     })*
                     #(#try_has_method_signatures {
-                        todo!()
+                        #try_has_method_bodies
                     })*
                 }
             })?,
@@ -189,7 +197,7 @@ impl GenTrait {
                         #try_getter_bodies
                     })*
                     #(#try_has_method_signatures {
-                        todo!()
+                        #try_has_method_bodies
                     })*
                 }
             })?,
@@ -537,6 +545,20 @@ impl Field {
                 Ok(#stmts)
             }
         })?)
+    }
+
+    fn gen_blanket_ref_try_has_method_body(
+        &self,
+        blanket_type: &Ident,
+        trait_path: &Path,
+    ) -> Result<Option<Expr>> {
+        if self.presense == FieldPresense::Repeated {
+            return Ok(None);
+        }
+        let try_has_name = self.gen_try_has_method_name()?;
+        Ok(Some(parse2(quote! {
+            <#blanket_type as #trait_path>::#try_has_name(self)
+        })?))
     }
 
     // Mutators

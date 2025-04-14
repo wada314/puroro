@@ -248,7 +248,9 @@ impl Field {
         if self.trait_field.presense() == FieldPresense::Repeated {
             return Ok(None);
         }
-        let signature = self.trait_field.gen_try_has_method_signature()?;
+        let Some(signature) = self.trait_field.maybe_gen_try_has_method_signature()? else {
+            return Ok(None);
+        };
         Ok(Some(parse2(quote! {
             #signature {
                 todo!()
