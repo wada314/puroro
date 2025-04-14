@@ -469,23 +469,6 @@ impl Field {
         })?)
     }
 
-    fn gen_blanket_option_try_has_method_body(
-        &self,
-        blanket_type_ident: &Ident,
-        trait_path: &Path,
-    ) -> Result<Option<Block>> {
-        if self.presense == FieldPresense::Repeated {
-            return Ok(None);
-        }
-        let try_has_name = self.gen_try_has_method_name()?;
-        Ok(Some(parse2(quote! {
-            {
-                self.as_ref().map(<#blanket_type_ident as #trait_path>::#try_has_name)
-                    .unwrap_or(Ok(false))
-            }
-        })?))
-    }
-
     fn gen_blanket_tuple_try_get_method_body(
         &self,
         t1: &Ident,
@@ -607,6 +590,23 @@ impl Field {
         let try_has_name = self.gen_try_has_method_name()?;
         Ok(Some(parse2(quote! {
             <#blanket_type as #trait_path>::#try_has_name(self)
+        })?))
+    }
+
+    fn gen_blanket_option_try_has_method_body(
+        &self,
+        blanket_type_ident: &Ident,
+        trait_path: &Path,
+    ) -> Result<Option<Block>> {
+        if self.presense == FieldPresense::Repeated {
+            return Ok(None);
+        }
+        let try_has_name = self.gen_try_has_method_name()?;
+        Ok(Some(parse2(quote! {
+            {
+                self.as_ref().map(<#blanket_type_ident as #trait_path>::#try_has_name)
+                    .unwrap_or(Ok(false))
+            }
         })?))
     }
 
