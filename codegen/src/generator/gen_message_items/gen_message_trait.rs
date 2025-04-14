@@ -377,7 +377,7 @@ impl Field {
         })?)
     }
 
-    fn maybe_gen_try_has_method_signature(&self) -> Result<Option<Signature>> {
+    pub fn maybe_gen_try_has_method_signature(&self) -> Result<Option<Signature>> {
         if self.presense == FieldPresense::Repeated {
             Ok(None)
         } else {
@@ -394,16 +394,6 @@ impl Field {
     fn gen_try_has_method_name(&self) -> Result<Ident> {
         let lower_cased = convert_into_case(&self.original_name, Case::LowerSnakeCase);
         Ok(to_ident(&format!("try_has_{}", &lower_cased)))
-    }
-
-    pub fn gen_try_has_method_signature(&self) -> Result<Signature> {
-        let try_has_name = self.gen_try_has_method_name()?;
-        let result_type = self
-            .options
-            .result_type(&self.options.primitive_type("bool")?)?;
-        Ok(parse2(quote! {
-            fn #try_has_name(&self) -> #result_type
-        })?)
     }
 
     fn gen_blanket_ref_try_get_method_body(
