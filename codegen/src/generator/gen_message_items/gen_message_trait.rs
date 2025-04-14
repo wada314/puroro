@@ -230,9 +230,7 @@ impl GenTrait {
         Ok(parse2(quote! {
             impl<T: #trait_path> #trait_path for #blanket_opt_type {
                 #(#try_getter_signatures #try_getter_bodies)*
-                #(#try_has_method_signatures {
-                    #try_has_method_bodies
-                })*
+                #(#try_has_method_signatures #try_has_method_bodies)*
             }
         })?)
     }
@@ -251,12 +249,20 @@ impl GenTrait {
             .map(|f| f.gen_blanket_tuple_try_get_method_body(&t1, &t2, &trait_path))
             .collect::<Result<Vec<_>>>()?;
         let try_has_method_signatures = self.gen_try_has_method_signatures()?;
+        let try_has_method_bodies = self
+            .fields
+            .iter()
+            .filter_map(|f| {
+                f.gen_blanket_tuple_try_has_method_body(&t1, &t2, &trait_path)
+                    .transpose()
+            })
+            .collect::<Result<Vec<_>>>()?;
         Ok(parse2(quote! {
             impl<#t1: #trait_path, #t2: #trait_path>
             #trait_path for (#t1, #t2)
             {
                 #(#try_getter_signatures #try_getter_bodies)*
-                #(#try_has_method_signatures { todo!() })*
+                #(#try_has_method_signatures #try_has_method_bodies)*
             }
         })?)
     }
@@ -586,6 +592,23 @@ impl Field {
         let try_has_name = self.gen_try_has_method_name()?;
         Ok(Some(parse2(quote! {
             <#blanket_type as #trait_path>::#try_has_name(self)
+        })?))
+    }
+
+    fn gen_blanket_tuple_try_has_method_body(
+        &self,
+        t1: &Ident,
+        t2: &Ident,
+        trait_path: &Path,
+    ) -> Result<Option<Block>> {
+        if self.presense == FieldPresense::Repeated {
+            return Ok(None);
+        }
+        let try_has_name = self.gen_try_has_method_name()?;
+        Ok(Some(parse2(quote! {
+            {
+                Ok(<#t2 as #trait_path>::#try_has_name(&self.1)? || <#t1 as #trait_path>::#try_has_name(&self.0)?)
+            }
         })?))
     }
 
