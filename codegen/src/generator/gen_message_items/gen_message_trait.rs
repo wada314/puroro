@@ -483,27 +483,29 @@ impl Field {
         let value_2: Expr = parse2(quote! {
             <#t2 as #trait_path>::#try_getter_name(&self.1)
         })?;
-        let stmts = match (self.presense, self.scalar_type()) {
-            (FieldPresense::Repeated, FieldType::Message(_)) => quote! {
-                ::puroro::BothExt::factor_into_iter((#value_1?, #value_2?))
-                    .map(|either_res| either_res.factor_err())
+        let expr = self.options.ok_value(&parse2::<Expr>(
+            match (self.presense, self.scalar_type()) {
+                (FieldPresense::Repeated, FieldType::Message(_)) => quote! {
+                    ::puroro::BothExt::factor_into_iter((#value_1?, #value_2?))
+                        .map(|either_res| either_res.factor_err())
+                },
+                (FieldPresense::Repeated, _) => quote! {
+                    ::puroro::BothExt::into_iter((#value_1?, #value_2?))
+                },
+                (_, FieldType::Message(_)) => quote! {
+                    ::puroro::BothExt::into_either_or_both_opt((#value_1?, #value_2?))
+                },
+                (_, _) => quote! {
+                    if <#t2 as #trait_path>::#try_has_name(&self.1)? {
+                        #value_2?
+                    } else {
+                        #value_1?
+                    }
+                },
             },
-            (FieldPresense::Repeated, _) => quote! {
-                ::puroro::BothExt::into_iter((#value_1?, #value_2?))
-            },
-            (_, FieldType::Message(_)) => quote! {
-                ::puroro::BothExt::into_either_or_both_opt((#value_1?, #value_2?))
-            },
-            (_, _) => quote! {
-                if <#t2 as #trait_path>::#try_has_name(&self.1)? {
-                    #value_2?
-                } else {
-                    #value_1?
-                }
-            },
-        };
+        )?)?;
         Ok(parse2(quote! {
-            { Ok(#stmts) }
+            { #expr }
         })?)
     }
 
@@ -520,22 +522,24 @@ impl Field {
                 #trait_path::#try_getter_name)
                 .factor_err()?
         })?;
-        let stmts = match (self.presense, self.scalar_type()) {
-            (FieldPresense::Repeated, FieldType::Message(_)) => quote! {
-                #mapped_either.factor_into_iter().map(|either_res| either_res.factor_err())
+        let expr = self.options.ok_value(&parse2::<Expr>(
+            match (self.presense, self.scalar_type()) {
+                (FieldPresense::Repeated, FieldType::Message(_)) => quote! {
+                    #mapped_either.factor_into_iter().map(|either_res| either_res.factor_err())
+                },
+                (FieldPresense::Repeated, _) => quote! {
+                    #mapped_either.into_iter()
+                },
+                (_, FieldType::Message(_)) => quote! {
+                    #mapped_either.factor_none()
+                },
+                _ => quote! {
+                    #mapped_either.into_inner()
+                },
             },
-            (FieldPresense::Repeated, _) => quote! {
-                #mapped_either.into_iter()
-            },
-            (_, FieldType::Message(_)) => quote! {
-                #mapped_either.factor_none()
-            },
-            _ => quote! {
-                #mapped_either.into_inner()
-            },
-        };
+        )?)?;
         Ok(parse2(quote! {
-            { Ok(#stmts) }
+            { #expr }
         })?)
     }
 
@@ -552,29 +556,31 @@ impl Field {
                 #trait_path::#try_getter_name)
                 .factor_err()?
         })?;
-        let stmts = match (self.presense, self.scalar_type()) {
-            (FieldPresense::Repeated, FieldType::Message(_)) => quote! {
-                #mapped_either.factor_into_iter().map(|either_res| either_res.factor_err())
+        let expr = self.options.ok_value(&parse2::<Expr>(
+            match (self.presense, self.scalar_type()) {
+                (FieldPresense::Repeated, FieldType::Message(_)) => quote! {
+                    #mapped_either.factor_into_iter().map(|either_res| either_res.factor_err())
+                },
+                (FieldPresense::Repeated, _) => quote! {
+                    #mapped_either.into_iter()
+                },
+                (_, FieldType::Message(_)) => quote! {
+                    #mapped_either.flatten_opt()
+                },
+                _ => quote! {
+                    todo!()
+                    // ::puroro::EitherOrBothExt::non_empty_right_or_left(
+                    //     self.as_ref(),
+                    //     #trait_path::#try_getter_name,
+                    //     #trait_path::#try_getter_name
+                    // )
+                },
             },
-            (FieldPresense::Repeated, _) => quote! {
-                #mapped_either.into_iter()
-            },
-            (_, FieldType::Message(_)) => quote! {
-                #mapped_either.flatten_opt()
-            },
-            _ => quote! {
-                todo!()
-                // ::puroro::EitherOrBothExt::non_empty_right_or_left(
-                //     self.as_ref(),
-                //     #trait_path::#try_getter_name,
-                //     #trait_path::#try_getter_name
-                // )
-            },
-        };
+        )?)?;
         Ok(parse2(quote! {
             {
                 use ::puroro::EitherOrBothExt;
-                Ok(#stmts)
+                #expr
             }
         })?)
     }
@@ -620,10 +626,11 @@ impl Field {
             return Ok(None);
         }
         let try_has_name = self.gen_try_has_method_name()?;
+        let expr = self.options.ok_value(&parse2::<Expr>(quote! {
+            <#t2 as #trait_path>::#try_has_name(&self.1)? || <#t1 as #trait_path>::#try_has_name(&self.0)?
+        })?)?;
         Ok(Some(parse2(quote! {
-            {
-                Ok(<#t2 as #trait_path>::#try_has_name(&self.1)? || <#t1 as #trait_path>::#try_has_name(&self.0)?)
-            }
+            { #expr }
         })?))
     }
 
@@ -637,13 +644,14 @@ impl Field {
             return Ok(None);
         }
         let try_has_name = self.gen_try_has_method_name()?;
+        let expr = self.options.ok_value(&parse2::<Expr>(quote! {
+            self.as_ref().map_either(
+                |t1| <#t1 as #trait_path>::#try_has_name(t1),
+                |t2| <#t2 as #trait_path>::#try_has_name(t2)
+            ).factor_err()?.into_inner()
+        })?)?;
         Ok(Some(parse2(quote! {
-            {
-                Ok(self.as_ref().map_either(
-                    |t1| <#t1 as #trait_path>::#try_has_name(t1),
-                    |t2| <#t2 as #trait_path>::#try_has_name(t2)
-                ).factor_err()?.into_inner())
-            }
+            { #expr }
         })?))
     }
 
@@ -657,16 +665,16 @@ impl Field {
             return Ok(None);
         }
         let try_has_name = self.gen_try_has_method_name()?;
-        // TODO(optimization): This implementation eagerly evaluates both has_methods
-        // when both values exist. For better performance, we should evaluate the second
-        // has_method only if the first one returns false.
+        let expr = self.options.ok_value(&parse2::<Expr>(quote! {
+            self.as_ref().map_any(
+                |t1| <#t1 as #trait_path>::#try_has_name(t1),
+                |t2| <#t2 as #trait_path>::#try_has_name(t2)
+            ).factor_err()?.reduce(|a, b| a || b)
+        })?)?;
         Ok(Some(parse2(quote! {
             {
                 use ::puroro::EitherOrBothExt;
-                Ok(self.as_ref().map_any(
-                    |t1| <#t1 as #trait_path>::#try_has_name(t1),
-                    |t2| <#t2 as #trait_path>::#try_has_name(t2)
-                ).factor_err()?.reduce(|a, b| a || b))
+                #expr
             }
         })?))
     }
