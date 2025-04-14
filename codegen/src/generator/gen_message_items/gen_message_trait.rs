@@ -281,12 +281,20 @@ impl GenTrait {
             .map(|f| f.gen_blanket_either_try_get_method_body(&t1, &t2, &trait_path))
             .collect::<Result<Vec<_>>>()?;
         let try_has_method_signatures = self.gen_try_has_method_signatures()?;
+        let try_has_method_bodies = self
+            .fields
+            .iter()
+            .filter_map(|f| {
+                f.gen_blanket_either_try_has_method_body(&t1, &t2, &trait_path)
+                    .transpose()
+            })
+            .collect::<Result<Vec<_>>>()?;
         Ok(parse2(quote! {
             impl<#t1: #trait_path, #t2: #trait_path>
             #trait_path for ::puroro::Either<#t1, #t2>
             {
                 #(#try_getter_signatures #try_getter_bodies)*
-                #(#try_has_method_signatures { todo!() })*
+                #(#try_has_method_signatures #try_has_method_bodies)*
             }
         })?)
     }
@@ -305,12 +313,20 @@ impl GenTrait {
             .map(|f| f.gen_blanket_either_or_both_try_get_method_body(&t1, &t2, &trait_path))
             .collect::<Result<Vec<_>>>()?;
         let try_has_method_signatures = self.gen_try_has_method_signatures()?;
+        let try_has_method_bodies = self
+            .fields
+            .iter()
+            .filter_map(|f| {
+                f.gen_blanket_either_or_both_try_has_method_body(&t1, &t2, &trait_path)
+                    .transpose()
+            })
+            .collect::<Result<Vec<_>>>()?;
         Ok(parse2(quote! {
             impl<#t1: #trait_path, #t2: #trait_path>
             #trait_path for ::puroro::EitherOrBoth<#t1, #t2>
             {
                 #(#try_getter_signatures #try_getter_bodies)*
-                #(#try_has_method_signatures { todo!() })*
+                #(#try_has_method_signatures #try_has_method_bodies)*
             }
         })?)
     }
@@ -464,9 +480,8 @@ impl Field {
         let try_has_name = self.gen_try_has_method_name()?;
         Ok(Some(parse2(quote! {
             {
-                Ok(self.as_ref().map(<#blanket_type_ident as #trait_path>::#try_has_name)
-                    .transpose()?
-                    .unwrap_or(false))
+                self.as_ref().map(<#blanket_type_ident as #trait_path>::#try_has_name)
+                    .unwrap_or(Ok(false))
             }
         })?))
     }
@@ -608,6 +623,50 @@ impl Field {
         Ok(Some(parse2(quote! {
             {
                 Ok(<#t2 as #trait_path>::#try_has_name(&self.1)? || <#t1 as #trait_path>::#try_has_name(&self.0)?)
+            }
+        })?))
+    }
+
+    fn gen_blanket_either_try_has_method_body(
+        &self,
+        t1: &Ident,
+        t2: &Ident,
+        trait_path: &Path,
+    ) -> Result<Option<Block>> {
+        if self.presense == FieldPresense::Repeated {
+            return Ok(None);
+        }
+        let try_has_name = self.gen_try_has_method_name()?;
+        Ok(Some(parse2(quote! {
+            {
+                self.as_ref().map_either(
+                    |t1| <#t1 as #trait_path>::#try_has_name(t1),
+                    |t2| <#t2 as #trait_path>::#try_has_name(t2)
+                ).factor_err()?
+            }
+        })?))
+    }
+
+    fn gen_blanket_either_or_both_try_has_method_body(
+        &self,
+        t1: &Ident,
+        t2: &Ident,
+        trait_path: &Path,
+    ) -> Result<Option<Block>> {
+        if self.presense == FieldPresense::Repeated {
+            return Ok(None);
+        }
+        let try_has_name = self.gen_try_has_method_name()?;
+        // TODO(optimization): This implementation eagerly evaluates both has_methods
+        // when both values exist. For better performance, we should evaluate the second
+        // has_method only if the first one returns false.
+        Ok(Some(parse2(quote! {
+            {
+                use ::puroro::EitherOrBothExt;
+                Ok(self.as_ref().map_any(
+                    |t1| <#t1 as #trait_path>::#try_has_name(t1),
+                    |t2| <#t2 as #trait_path>::#try_has_name(t2)
+                ).factor_err()?.reduce(|a, b| a || b))
             }
         })?))
     }
