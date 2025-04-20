@@ -15,14 +15,30 @@
 use crate::IsEmpty;
 use ::itertools::{Either, EitherOrBoth};
 
+/// Extension trait for `Either` type.
 pub trait EitherExt {}
 impl<T, U> EitherExt for Either<T, U> {}
 
+/// Extension trait providing additional functionality for `EitherOrBoth` type.
+/// This trait adds methods for transforming and combining values in an `EitherOrBoth` context.
 pub trait EitherOrBothExt {
     type T;
     type U;
+
+    /// Converts self into an `EitherOrBoth` value.
+    /// This method is used by the extension's method default implementations.
     fn into_either_or_both(self) -> EitherOrBoth<Self::T, Self::U>;
 
+    /// Factors out a `Result` from an `EitherOrBoth` containing `Result`s.
+    ///
+    /// If any of the contained `Result`s is an `Err`, returns that error.
+    /// Otherwise, returns an `EitherOrBoth` containing the `Ok` values.
+    ///
+    /// # Example
+    /// ```ignore
+    /// let both: EitherOrBoth<Result<i32, Error>, Result<String, Error>> = EitherOrBoth::Both(Ok(1), Ok("hello".to_string()));
+    /// let result: Result<EitherOrBoth<i32, String>, Error> = both.factor_err();
+    /// ```
     fn factor_err<T2, U2, E>(self) -> Result<EitherOrBoth<T2, U2>, E>
     where
         Self: Sized + EitherOrBothExt<T = Result<T2, E>, U = Result<U2, E>>,
@@ -34,6 +50,16 @@ pub trait EitherOrBothExt {
         }
     }
 
+    /// Converts an `EitherOrBoth` of iterables into a single iterator.
+    ///
+    /// The resulting iterator will yield all items from both sides in sequence,
+    /// first from the left side, then from the right side.
+    ///
+    /// # Example
+    /// ```ignore
+    /// let both = EitherOrBoth::Both(vec![1, 2], vec![3, 4]);
+    /// let items: Vec<i32> = both.into_iter().collect(); // [1, 2, 3, 4]
+    /// ```
     fn into_iter(self) -> impl Iterator<Item = <Self::T as IntoIterator>::Item>
     where
         Self: Sized,
@@ -47,6 +73,17 @@ pub trait EitherOrBothExt {
             .chain(u_opt.into_iter().flatten())
     }
 
+    /// Converts an `EitherOrBoth` of iterables into an iterator of `Either`s.
+    ///
+    /// The resulting iterator will yield `Either::Left` for items from the left side
+    /// and `Either::Right` for items from the right side.
+    ///
+    /// # Example
+    /// ```ignore
+    /// let both = EitherOrBoth::Both(vec![1, 2], vec![3, 4]);
+    /// let items: Vec<Either<i32, i32>> = both.factor_into_iter().collect();
+    /// // [Left(1), Left(2), Right(3), Right(4)]
+    /// ```
     fn factor_into_iter(
         self,
     ) -> impl Iterator<Item = Either<<Self::T as IntoIterator>::Item, <Self::U as IntoIterator>::Item>>
@@ -63,6 +100,19 @@ pub trait EitherOrBothExt {
             .chain(u_opt.into_iter().flatten().map(Either::Right))
     }
 
+    /// Flattens an `EitherOrBoth` of `Option`s into an `Option` of `EitherOrBoth`.
+    ///
+    /// Returns `None` if both sides are `None`, otherwise combines the values
+    /// according to which sides contain `Some` values.
+    ///
+    /// # Example
+    /// ```ignore
+    /// let both = EitherOrBoth::Both(Some(1), Some("hello"));
+    /// let result = both.flatten_opt(); // Some(EitherOrBoth::Both(1, "hello"))
+    ///
+    /// let left = EitherOrBoth::Left(Some(1));
+    /// let result = left.flatten_opt(); // Some(EitherOrBoth::Left(1))
+    /// ```
     fn flatten_opt<T2, U2>(self) -> Option<EitherOrBoth<T2, U2>>
     where
         Self: Sized + EitherOrBothExt<T = Option<T2>, U = Option<U2>>,
@@ -75,6 +125,20 @@ pub trait EitherOrBothExt {
             (None, None) => None,
         }
     }
+
+    /// Selects between left and right values based on emptiness.
+    ///
+    /// If both values are present, first tries the left value. If it's empty,
+    /// then uses the right value. This is useful for implementing fallback behavior.
+    ///
+    /// # Example
+    /// ```ignore
+    /// let both = EitherOrBoth::Both(vec![], vec![1, 2]);
+    /// let result = both.non_empty_right_or_left(
+    ///     |left| left,
+    ///     |right| right
+    /// ); // Returns vec![1, 2] since left is empty
+    /// ```
     fn non_empty_right_or_left<F, G, M>(self, f: F, g: G) -> M
     where
         Self: Sized,
@@ -104,11 +168,23 @@ impl<T, U> EitherOrBothExt for EitherOrBoth<T, U> {
     }
 }
 
+/// Extension trait for tuple types (T, U), providing methods for working with pairs of values.
 pub trait BothExt {
     type T;
     type U;
+
+    /// Converts self into a tuple of (T, U).
     fn into_tuple(self) -> (Self::T, Self::U);
 
+    /// Converts a tuple of `Option`s into an `Option` of `EitherOrBoth`.
+    ///
+    /// Similar to `EitherOrBothExt::flatten_opt`, but works with tuples instead.
+    ///
+    /// # Example
+    /// ```ignore
+    /// let tuple = (Some(1), Some("hello"));
+    /// let result = tuple.into_either_or_both_opt(); // Some(EitherOrBoth::Both(1, "hello"))
+    /// ```
     fn into_either_or_both_opt<T2, U2>(self) -> Option<EitherOrBoth<T2, U2>>
     where
         Self: Sized + BothExt<T = Option<T2>, U = Option<U2>>,
@@ -121,6 +197,15 @@ pub trait BothExt {
         }
     }
 
+    /// Converts a tuple of iterables into a single iterator.
+    ///
+    /// The resulting iterator will yield all items from both sides in sequence.
+    ///
+    /// # Example
+    /// ```ignore
+    /// let tuple = (vec![1, 2], vec![3, 4]);
+    /// let items: Vec<i32> = tuple.into_iter().collect(); // [1, 2, 3, 4]
+    /// ```
     fn into_iter(self) -> impl Iterator<Item = <Self::T as IntoIterator>::Item>
     where
         Self: Sized,
@@ -131,6 +216,16 @@ pub trait BothExt {
         t.into_iter().chain(u.into_iter())
     }
 
+    /// Converts a tuple of iterables into an iterator of `Either`s.
+    ///
+    /// Similar to `EitherOrBothExt::factor_into_iter`, but works with tuples.
+    ///
+    /// # Example
+    /// ```ignore
+    /// let tuple = (vec![1, 2], vec![3, 4]);
+    /// let items: Vec<Either<i32, i32>> = tuple.factor_into_iter().collect();
+    /// // [Left(1), Left(2), Right(3), Right(4)]
+    /// ```
     fn factor_into_iter(
         self,
     ) -> impl Iterator<Item = Either<<Self::T as IntoIterator>::Item, <Self::U as IntoIterator>::Item>>
@@ -145,6 +240,16 @@ pub trait BothExt {
             .chain(u.into_iter().map(Either::Right))
     }
 
+    /// Factors out a `Result` from a tuple of `Result`s.
+    ///
+    /// If either `Result` is an `Err`, returns that error.
+    /// Otherwise, returns a tuple of the `Ok` values.
+    ///
+    /// # Example
+    /// ```ignore
+    /// let tuple: (Result<i32, Error>, Result<String, Error>) = (Ok(1), Ok("hello".to_string()));
+    /// let result: Result<(i32, String), Error> = tuple.factor_result();
+    /// ```
     fn factor_result<T2, U2, E>(self) -> Result<(T2, U2), E>
     where
         Self: Sized + BothExt<T = Result<T2, E>, U = Result<U2, E>>,
@@ -153,6 +258,7 @@ pub trait BothExt {
         Ok((t?, u?))
     }
 }
+
 impl<T, U> BothExt for (T, U) {
     type T = T;
     type U = U;
