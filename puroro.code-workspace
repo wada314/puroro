@@ -8,6 +8,9 @@
         },
         {
             "path": "../cached_pair"
+        },
+        {
+            "path": "../enb"
         }
     ]
 }
