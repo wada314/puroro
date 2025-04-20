@@ -31,18 +31,6 @@ pub trait EitherOrBothExt {
 
     /// Returns the left value if present, otherwise the right value.
     /// Only available when both sides have exactly the same type.
-    ///
-    /// # Example
-    /// ```ignore
-    /// let both = EitherOrBoth::Both(1, 1);
-    /// assert_eq!(both.prefer_left(), 1);
-    ///
-    /// let left = EitherOrBoth::Left(1);
-    /// assert_eq!(left.prefer_left(), 1);
-    ///
-    /// let right = EitherOrBoth::Right(1);
-    /// assert_eq!(right.prefer_left(), 1);
-    /// ```
     fn prefer_left<A>(self) -> A
     where
         Self: Sized + EitherOrBothExt<T = A, U = A>,
@@ -56,18 +44,6 @@ pub trait EitherOrBothExt {
 
     /// Returns the right value if present, otherwise the left value.
     /// Only available when both sides have exactly the same type.
-    ///
-    /// # Example
-    /// ```ignore
-    /// let both = EitherOrBoth::Both(1, 1);
-    /// assert_eq!(both.prefer_right(), 1);
-    ///
-    /// let left = EitherOrBoth::Left(1);
-    /// assert_eq!(left.prefer_right(), 1);
-    ///
-    /// let right = EitherOrBoth::Right(1);
-    /// assert_eq!(right.prefer_right(), 1);
-    /// ```
     fn prefer_right<A>(self) -> A
     where
         Self: Sized + EitherOrBothExt<T = A, U = A>,
@@ -228,12 +204,6 @@ pub trait BothExt {
 
     /// Returns the left value of the tuple.
     /// Only available when both sides have exactly the same type.
-    ///
-    /// # Example
-    /// ```ignore
-    /// let tuple = (1, 1);
-    /// assert_eq!(tuple.prefer_left(), 1);
-    /// ```
     fn prefer_left<A>(self) -> A
     where
         Self: Sized + BothExt<T = A, U = A>,
@@ -244,12 +214,6 @@ pub trait BothExt {
 
     /// Returns the right value of the tuple.
     /// Only available when both sides have exactly the same type.
-    ///
-    /// # Example
-    /// ```ignore
-    /// let tuple = (1, 1);
-    /// assert_eq!(tuple.prefer_right(), 1);
-    /// ```
     fn prefer_right<A>(self) -> A
     where
         Self: Sized + BothExt<T = A, U = A>,
