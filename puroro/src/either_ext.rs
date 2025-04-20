@@ -29,6 +29,56 @@ pub trait EitherOrBothExt {
     /// This method is used by the extension's method default implementations.
     fn into_either_or_both(self) -> EitherOrBoth<Self::T, Self::U>;
 
+    /// Returns the left value if present, otherwise the right value.
+    /// Only available when both sides have exactly the same type.
+    ///
+    /// # Example
+    /// ```ignore
+    /// let both = EitherOrBoth::Both(1, 1);
+    /// assert_eq!(both.prefer_left(), 1);
+    ///
+    /// let left = EitherOrBoth::Left(1);
+    /// assert_eq!(left.prefer_left(), 1);
+    ///
+    /// let right = EitherOrBoth::Right(1);
+    /// assert_eq!(right.prefer_left(), 1);
+    /// ```
+    fn prefer_left<A>(self) -> A
+    where
+        Self: Sized + EitherOrBothExt<T = A, U = A>,
+    {
+        match self.into_either_or_both() {
+            EitherOrBoth::Both(l, _) => l,
+            EitherOrBoth::Left(l) => l,
+            EitherOrBoth::Right(r) => r,
+        }
+    }
+
+    /// Returns the right value if present, otherwise the left value.
+    /// Only available when both sides have exactly the same type.
+    ///
+    /// # Example
+    /// ```ignore
+    /// let both = EitherOrBoth::Both(1, 1);
+    /// assert_eq!(both.prefer_right(), 1);
+    ///
+    /// let left = EitherOrBoth::Left(1);
+    /// assert_eq!(left.prefer_right(), 1);
+    ///
+    /// let right = EitherOrBoth::Right(1);
+    /// assert_eq!(right.prefer_right(), 1);
+    /// ```
+    fn prefer_right<A>(self) -> A
+    where
+        Self: Sized + EitherOrBothExt<T = A, U = A>,
+    {
+        match self.into_either_or_both() {
+            EitherOrBoth::Both(_, r) => r,
+            EitherOrBoth::Left(l) => l,
+            EitherOrBoth::Right(r) => r,
+        }
+    }
+
     /// Factors out a `Result` from an `EitherOrBoth` containing `Result`s.
     ///
     /// If any of the contained `Result`s is an `Err`, returns that error.
@@ -175,6 +225,38 @@ pub trait BothExt {
 
     /// Converts self into a tuple of (T, U).
     fn into_tuple(self) -> (Self::T, Self::U);
+
+    /// Returns the left value of the tuple.
+    /// Only available when both sides have exactly the same type.
+    ///
+    /// # Example
+    /// ```ignore
+    /// let tuple = (1, 1);
+    /// assert_eq!(tuple.prefer_left(), 1);
+    /// ```
+    fn prefer_left<A>(self) -> A
+    where
+        Self: Sized + BothExt<T = A, U = A>,
+    {
+        let (l, _) = self.into_tuple();
+        l
+    }
+
+    /// Returns the right value of the tuple.
+    /// Only available when both sides have exactly the same type.
+    ///
+    /// # Example
+    /// ```ignore
+    /// let tuple = (1, 1);
+    /// assert_eq!(tuple.prefer_right(), 1);
+    /// ```
+    fn prefer_right<A>(self) -> A
+    where
+        Self: Sized + BothExt<T = A, U = A>,
+    {
+        let (_, r) = self.into_tuple();
+        r
+    }
 
     /// Converts a tuple of `Option`s into an `Option` of `EitherOrBoth`.
     ///
