@@ -19,7 +19,7 @@ use crate::{ErrorKind, Result};
 use ::cached_pair::multi_pair::collections::std::VecCollection;
 use ::cached_pair::multi_pair::{Case, MultiPair, MultiPairConverter};
 use ::derive_more::{Debug, TryUnwrap};
-use ::itertools::Either;
+use ::quither::Either;
 use ::std::alloc::{Allocator, Global};
 use ::std::convert::Infallible;
 use ::std::str;

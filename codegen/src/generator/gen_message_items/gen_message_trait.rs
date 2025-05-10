@@ -246,20 +246,20 @@ impl GenTrait {
         let try_getter_bodies = self
             .fields
             .iter()
-            .map(|f| f.gen_blanket_tuple_try_get_method_body(&t1, &t2, &trait_path))
+            .map(|f| f.gen_blanket_both_try_get_method_body(&t1, &t2, &trait_path))
             .collect::<Result<Vec<_>>>()?;
         let try_has_method_signatures = self.gen_try_has_method_signatures()?;
         let try_has_method_bodies = self
             .fields
             .iter()
             .filter_map(|f| {
-                f.gen_blanket_tuple_try_has_method_body(&t1, &t2, &trait_path)
+                f.gen_blanket_both_try_has_method_body(&t1, &t2, &trait_path)
                     .transpose()
             })
             .collect::<Result<Vec<_>>>()?;
         Ok(parse2(quote! {
             impl<#t1: #trait_path, #t2: #trait_path>
-            #trait_path for (#t1, #t2)
+            #trait_path for ::puroro::Both<#t1, #t2>
             {
                 #(#try_getter_signatures #try_getter_bodies)*
                 #(#try_has_method_signatures #try_has_method_bodies)*
@@ -469,7 +469,7 @@ impl Field {
         })?)
     }
 
-    fn gen_blanket_tuple_try_get_method_body(
+    fn gen_blanket_both_try_get_method_body(
         &self,
         t1: &Ident,
         t2: &Ident,
@@ -485,8 +485,9 @@ impl Field {
         })?;
         let expr = self.options.ok_value(&parse2::<Expr>(
             match (self.presense, self.scalar_type()) {
+                /// FIXING HERE!!!
                 (FieldPresense::Repeated, FieldType::Message(_)) => quote! {
-                    ::puroro::BothExt::factor_into_iter((#value_1?, #value_2?))
+                    self.factor_into_iter((#value_1?, #value_2?))
                         .map(|either_res| either_res.factor_err())
                 },
                 (FieldPresense::Repeated, _) => quote! {
@@ -616,7 +617,7 @@ impl Field {
         })?))
     }
 
-    fn gen_blanket_tuple_try_has_method_body(
+    fn gen_blanket_both_try_has_method_body(
         &self,
         t1: &Ident,
         t2: &Ident,

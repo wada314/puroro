@@ -34,9 +34,8 @@ pub mod repeated;
 pub mod string;
 pub mod variant;
 
-pub use self::either_ext::{BothExt, EitherExt, EitherOrBothExt};
 pub use self::non_empty::{IsEmpty, NonEmpty};
-pub use ::itertools::{Either, EitherOrBoth};
+pub use ::quither::{Both, Either, EitherOrBoth};
 
 use ::thiserror::Error;
 
