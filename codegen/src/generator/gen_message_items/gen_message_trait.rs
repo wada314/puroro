@@ -477,28 +477,40 @@ impl Field {
     ) -> Result<Block> {
         let try_getter_name = self.gen_try_get_method_name()?;
         let try_has_name = self.gen_try_has_method_name()?;
-        let value_1: Expr = parse2(quote! {
-            <#t1 as #trait_path>::#try_getter_name(&self.0)
-        })?;
-        let value_2: Expr = parse2(quote! {
-            <#t2 as #trait_path>::#try_getter_name(&self.1)
-        })?;
         let expr = self.options.ok_value(&parse2::<Expr>(
             match (self.presense, self.scalar_type()) {
-                (FieldPresense::Repeated, _) => quote! {
+                (FieldPresense::Repeated, FieldType::Message(_)) => quote! {{
+                    // Because the item types of both left and right can be different,
+                    // We need to use `Either` to represent the item type of the resulting iterator.
                     let ::puroro::Both::Both(left, right) = self;
-                    let left_iter = <#t1 as #trait_path>::#try_getter_name(left)?;
-                    let right_iter = <#t2 as #trait_path>::#try_getter_name(right)?;
+                    let left_iter = <#t1 as #trait_path>::#try_getter_name(left)?
+                        .into_iter()
+                        .map(|res_item| res_item.map(::puroro::Either::Left));
+                    let right_iter = <#t2 as #trait_path>::#try_getter_name(right)?
+                        .into_iter()
+                        .map(|res_item| res_item.map(::puroro::Either::Right));
                     ::std::iter::Iterator::chain(left_iter, right_iter)
-                },
-                (_, FieldType::Message(_)) => quote! {},
-                (_, _) => quote! {
-                    if <#t2 as #trait_path>::#try_has_name(&self.1)? {
-                        #value_2?
+                }},
+                (FieldPresense::Repeated, _) => quote! {{
+                    let ::puroro::Both::Both(left, right) = self;
+                    let left_iter = <#t1 as #trait_path>::#try_getter_name(left)?.into_iter();
+                    let right_iter = <#t2 as #trait_path>::#try_getter_name(right)?.into_iter();
+                    ::std::iter::Iterator::chain(left_iter, right_iter)
+                }},
+                (_, FieldType::Message(_)) => quote! {{
+                    self.as_ref().try_map2(
+                        <#t1 as #trait_path>::#try_getter_name,
+                        <#t2 as #trait_path>::#try_getter_name,
+                    )?.factor_none()
+                }},
+                (_, _) => quote! {{
+                    let ::puroro::Both::Both(left, right) = self;
+                    if <#t2 as #trait_path>::#try_has_name(&right)? {
+                        <#t2 as #trait_path>::#try_getter_name(&right)?
                     } else {
-                        #value_1?
+                        <#t1 as #trait_path>::#try_getter_name(&left)?
                     }
-                },
+                }},
             },
         )?)?;
         Ok(parse2(quote! {
