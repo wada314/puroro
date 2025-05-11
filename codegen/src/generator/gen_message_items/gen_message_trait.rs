@@ -635,9 +635,10 @@ impl Field {
             return Ok(None);
         }
         let try_has_name = self.gen_try_has_method_name()?;
-        let expr = self.options.ok_value(&parse2::<Expr>(quote! {
-            <#t2 as #trait_path>::#try_has_name(&self.1)? || <#t1 as #trait_path>::#try_has_name(&self.0)?
-        })?)?;
+        let expr = self.options.ok_value(&parse2::<Expr>(quote! {{
+            let ::puroro::Both::Both(left, right) = self;
+            <#t2 as #trait_path>::#try_has_name(&right)? || <#t1 as #trait_path>::#try_has_name(&left)?
+        }})?)?;
         Ok(Some(parse2(quote! {
             { #expr }
         })?))
