@@ -520,15 +520,15 @@ impl Field {
 
     fn gen_blanket_either_try_get_method_body(
         &self,
-        _t1: &Ident,
-        _t2: &Ident,
+        t1: &Ident,
+        t2: &Ident,
         trait_path: &Path,
     ) -> Result<Block> {
         let try_getter_name = self.gen_try_get_method_name()?;
         let mapped_either: Expr = parse2(quote! {
             self.as_ref().try_map2(
-                #trait_path::#try_getter_name,
-                #trait_path::#try_getter_name)?
+                <#t1 as #trait_path>::#try_getter_name,
+                <#t2 as #trait_path>::#try_getter_name)?
         })?;
         let expr = self.options.ok_value(&parse2::<Expr>(
             match (self.presense, self.scalar_type()) {
@@ -553,44 +553,55 @@ impl Field {
 
     fn gen_blanket_either_or_both_try_get_method_body(
         &self,
-        _t1: &Ident,
-        _t2: &Ident,
+        t1: &Ident,
+        t2: &Ident,
         trait_path: &Path,
     ) -> Result<Block> {
         let try_getter_name = self.gen_try_get_method_name()?;
+        let try_has_name = self.gen_try_has_method_name()?;
         let mapped_either: Expr = parse2(quote! {
-            self.as_ref().map_any(
-                #trait_path::#try_getter_name,
-                #trait_path::#try_getter_name)
-                .factor_err()?
+            self.as_ref().try_map2(
+                <#t1 as #trait_path>::#try_getter_name,
+                <#t2 as #trait_path>::#try_getter_name)?
         })?;
         let expr = self.options.ok_value(&parse2::<Expr>(
             match (self.presense, self.scalar_type()) {
-                (FieldPresense::Repeated, FieldType::Message(_)) => quote! {
-                    #mapped_either.factor_into_iter().map(|either_res| either_res.factor_err())
-                },
-                (FieldPresense::Repeated, _) => quote! {
-                    #mapped_either.into_iter()
-                },
+                (FieldPresense::Repeated, FieldType::Message(_)) => quote! {{
+                    let mapped_either = #mapped_either;
+                    let left_iter = mapped_either.left().transpose()?.
+                        into_iter().flatten().map(|res_item| res_item.map(::puroro::Either::Left));
+                    let right_iter = mapped_either.right().transpose()?.
+                        into_iter().flatten().map(|res_item| res_item.map(::puroro::Either::Right));
+                    ::std::iter::Iterator::chain(left_iter, right_iter)
+                }},
+                (FieldPresense::Repeated, _) => quote! {{
+                    let mapped_either = #mapped_either;
+                    let left_iter = mapped_either.left().transpose()?.into_iter().flatten();
+                    let right_iter = mapped_either.right().transpose()?.into_iter().flatten();
+                    ::std::iter::Iterator::chain(left_iter, right_iter)
+                }},
                 (_, FieldType::Message(_)) => quote! {
-                    #mapped_either.flatten_opt()
+                    #mapped_either.factor_none()
                 },
-                _ => quote! {
-                    todo!()
-                    // ::puroro::EitherOrBothExt::non_empty_right_or_left(
-                    //     self.as_ref(),
-                    //     #trait_path::#try_getter_name,
-                    //     #trait_path::#try_getter_name
-                    // )
-                },
+                _ => quote! {{
+                    let (left_opt, right_opt) = self.as_ref().left_and_right();
+                    if let Some(right) = right_opt {
+                        if <#t2 as #trait_path>::#try_has_name(right)? {
+                            return <#t2 as #trait_path>::#try_getter_name(right);
+                        }
+                    }
+                    if let Some(left) = left_opt {
+                        if <#t1 as #trait_path>::#try_has_name(left)? {
+                            return <#t1 as #trait_path>::#try_getter_name(left);
+                        }
+                    }
+                    ::std::default::Default::default()
+                }},
             },
         )?)?;
-        Ok(parse2(quote! {
-            {
-                use ::puroro::EitherOrBothExt;
+        Ok(parse2(quote! {{
                 #expr
-            }
-        })?)
+        }})?)
     }
 
     fn gen_blanket_ref_try_has_method_body(
