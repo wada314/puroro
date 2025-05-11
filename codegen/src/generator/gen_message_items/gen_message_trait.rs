@@ -485,17 +485,13 @@ impl Field {
         })?;
         let expr = self.options.ok_value(&parse2::<Expr>(
             match (self.presense, self.scalar_type()) {
-                /// FIXING HERE!!!
-                (FieldPresense::Repeated, FieldType::Message(_)) => quote! {
-                    self.factor_into_iter((#value_1?, #value_2?))
-                        .map(|either_res| either_res.factor_err())
-                },
                 (FieldPresense::Repeated, _) => quote! {
-                    ::puroro::BothExt::into_iter((#value_1?, #value_2?))
+                    let ::puroro::Both::Both(left, right) = self;
+                    let left_iter = <#t1 as #trait_path>::#try_getter_name(left)?;
+                    let right_iter = <#t2 as #trait_path>::#try_getter_name(right)?;
+                    ::std::iter::Iterator::chain(left_iter, right_iter)
                 },
-                (_, FieldType::Message(_)) => quote! {
-                    ::puroro::BothExt::into_either_or_both_opt((#value_1?, #value_2?))
-                },
+                (_, FieldType::Message(_)) => quote! {},
                 (_, _) => quote! {
                     if <#t2 as #trait_path>::#try_has_name(&self.1)? {
                         #value_2?
