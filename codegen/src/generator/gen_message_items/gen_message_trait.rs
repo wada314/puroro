@@ -526,10 +526,9 @@ impl Field {
     ) -> Result<Block> {
         let try_getter_name = self.gen_try_get_method_name()?;
         let mapped_either: Expr = parse2(quote! {
-            self.as_ref().map_either(
+            self.as_ref().try_map2(
                 #trait_path::#try_getter_name,
-                #trait_path::#try_getter_name)
-                .factor_err()?
+                #trait_path::#try_getter_name)?
         })?;
         let expr = self.options.ok_value(&parse2::<Expr>(
             match (self.presense, self.scalar_type()) {
@@ -655,10 +654,10 @@ impl Field {
         }
         let try_has_name = self.gen_try_has_method_name()?;
         let expr = self.options.ok_value(&parse2::<Expr>(quote! {
-            self.as_ref().map_either(
+            self.as_ref().try_map2(
                 |t1| <#t1 as #trait_path>::#try_has_name(t1),
                 |t2| <#t2 as #trait_path>::#try_has_name(t2)
-            ).factor_err()?.into_inner()
+            )?.into_inner()
         })?)?;
         Ok(Some(parse2(quote! {
             { #expr }
