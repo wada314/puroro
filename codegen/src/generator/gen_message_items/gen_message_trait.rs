@@ -482,20 +482,17 @@ impl Field {
                 (FieldPresense::Repeated, FieldType::Message(_)) => quote! {{
                     // Because the item types of both left and right can be different,
                     // We need to use `Either` to represent the item type of the resulting iterator.
-                    let ::puroro::Both::Both(left, right) = self;
-                    let left_iter = <#t1 as #trait_path>::#try_getter_name(left)?
-                        .into_iter()
-                        .map(|res_item| res_item.map(::puroro::Either::Left));
-                    let right_iter = <#t2 as #trait_path>::#try_getter_name(right)?
-                        .into_iter()
-                        .map(|res_item| res_item.map(::puroro::Either::Right));
-                    ::std::iter::Iterator::chain(left_iter, right_iter)
+                    self.as_ref().try_map2(
+                        <#t1 as #trait_path>::#try_getter_name,
+                        <#t2 as #trait_path>::#try_getter_name,
+                    )?.into_iter_either()
+                    .map(|either_res| either_res.factor_err())
                 }},
                 (FieldPresense::Repeated, _) => quote! {{
-                    let ::puroro::Both::Both(left, right) = self;
-                    let left_iter = <#t1 as #trait_path>::#try_getter_name(left)?.into_iter();
-                    let right_iter = <#t2 as #trait_path>::#try_getter_name(right)?.into_iter();
-                    ::std::iter::Iterator::chain(left_iter, right_iter)
+                    self.as_ref().try_map2(
+                        <#t1 as #trait_path>::#try_getter_name,
+                        <#t2 as #trait_path>::#try_getter_name,
+                    )?.into_iter_chained()
                 }},
                 (_, FieldType::Message(_)) => quote! {{
                     self.as_ref().try_map2(
@@ -533,10 +530,10 @@ impl Field {
         let expr = self.options.ok_value(&parse2::<Expr>(
             match (self.presense, self.scalar_type()) {
                 (FieldPresense::Repeated, FieldType::Message(_)) => quote! {
-                    #mapped_either.factor_into_iter().map(|either_res| either_res.factor_err())
+                    #mapped_either.into_iter_either().map(|either_res| either_res.factor_err())
                 },
                 (FieldPresense::Repeated, _) => quote! {
-                    #mapped_either.into_iter()
+                    #mapped_either.into_iter_chained()
                 },
                 (_, FieldType::Message(_)) => quote! {
                     #mapped_either.factor_none()
@@ -567,18 +564,10 @@ impl Field {
         let expr = self.options.ok_value(&parse2::<Expr>(
             match (self.presense, self.scalar_type()) {
                 (FieldPresense::Repeated, FieldType::Message(_)) => quote! {{
-                    let mapped_either = #mapped_either;
-                    let left_iter = mapped_either.left().transpose()?.
-                        into_iter().flatten().map(|res_item| res_item.map(::puroro::Either::Left));
-                    let right_iter = mapped_either.right().transpose()?.
-                        into_iter().flatten().map(|res_item| res_item.map(::puroro::Either::Right));
-                    ::std::iter::Iterator::chain(left_iter, right_iter)
+                    #mapped_either.into_iter_either().map(|either_res| either_res.factor_err())
                 }},
                 (FieldPresense::Repeated, _) => quote! {{
-                    let mapped_either = #mapped_either;
-                    let left_iter = mapped_either.left().transpose()?.into_iter().flatten();
-                    let right_iter = mapped_either.right().transpose()?.into_iter().flatten();
-                    ::std::iter::Iterator::chain(left_iter, right_iter)
+                    #mapped_either.into_iter_chained()
                 }},
                 (_, FieldType::Message(_)) => quote! {
                     #mapped_either.factor_none()
