@@ -675,14 +675,13 @@ impl Field {
         }
         let try_has_name = self.gen_try_has_method_name()?;
         let expr = self.options.ok_value(&parse2::<Expr>(quote! {
-            self.as_ref().map_any(
-                |t1| <#t1 as #trait_path>::#try_has_name(t1),
-                |t2| <#t2 as #trait_path>::#try_has_name(t2)
-            ).factor_err()?.reduce(|a, b| a || b)
+            self.as_ref().right().map(<#t2 as #trait_path>::#try_has_name)
+                .transpose()?.unwrap_or(false)
+            || self.as_ref().left().map(<#t1 as #trait_path>::#try_has_name)
+                .transpose()?.unwrap_or(false)
         })?)?;
         Ok(Some(parse2(quote! {
             {
-                use ::puroro::EitherOrBothExt;
                 #expr
             }
         })?))
