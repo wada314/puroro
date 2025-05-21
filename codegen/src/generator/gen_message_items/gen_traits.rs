@@ -136,7 +136,7 @@ pub enum FieldPresense {
 }
 
 impl FieldPresense {
-    fn from_field_desc<'a>(field: &'a FieldDescriptorExt<'a>) -> Self {
+    fn from_field_desc(field: &FieldDescriptorExt) -> Self {
         if field.has_presence() {
             FieldPresense::Explicit
         } else if field.label() == FieldLabel::Repeated {
@@ -198,54 +198,44 @@ pub struct Field {
     pub scalar_proto_type: FieldType<ProtoPathBuf, ProtoPathBuf>,
 }
 
-impl Field {
-    pub fn try_new<'a>(
-        desc: &'a FieldDescriptorExt<'a>,
+struct FieldFactory {
+    current_proto_path: Rc<ProtoPathBuf>,
+    options: Rc<CodeGeneratorOptions>,
+    lower_cased: String,
+    presense: FieldPresense,
+    scalar_proto_type: FieldType<ProtoPathBuf, ProtoPathBuf>,
+}
+
+impl FieldFactory {
+    pub fn new(
+        desc: &FieldDescriptorExt,
         current_proto_path: Rc<ProtoPathBuf>,
         options: Rc<CodeGeneratorOptions>,
     ) -> Result<Self> {
         let lower_cased = convert_into_case(&desc.name(), Case::LowerSnakeCase);
         let presense = FieldPresense::from_field_desc(desc);
         let scalar_proto_type = desc.type_with_full_path()?;
-
-        let getter_name = todo!();
-        let getter_signature = todo!();
-        let has_method_name = todo!();
-        let has_method_signature = todo!();
-
-        let try_getter_name = to_ident(&format!("try_{}", &lower_cased));
-        let try_has_method_name = if let FieldPresense::Repeated = presense {
-            None
-        } else {
-            Some(to_ident(&format!("try_has_{}", &lower_cased)))
-        };
-
-        let scalar_ref_type =
-            scalar_proto_type.gen_scalar_maybe_ref_type(&current_proto_path, None, &options)?;
-        let getter_type = match presense {
-            FieldPresense::Repeated => {
-                let item_type = options.result_type(&scalar_ref_type)?;
-                parse2(quote! {
-                    impl ::puroro::repeated::RepeatedView<Item = #item_type>
-                })?
-            }
-            FieldPresense::Explicit | FieldPresense::Implicit => match scalar_proto_type {
-                FieldType::Message(_) => options.option_type(&scalar_ref_type)?,
-                _ => scalar_ref_type,
-            },
-        };
-        let getter_result_type = options.result_type(&getter_type)?;
-        let try_getter_signature: Signature = parse2(quote! {
-            fn #try_getter_name(&self) -> #getter_result_type
-        })?;
-        let has_result_type = options.result_type(&options.primitive_type("bool")?)?;
-        let try_has_method_signature: Option<Signature> = match presense {
-            FieldPresense::Repeated => None,
-            FieldPresense::Explicit | FieldPresense::Implicit => Some(parse2(
-                quote! { fn #try_has_method_name(&self) -> #has_result_type },
-            )?),
-        };
         Ok(Self {
+            current_proto_path,
+            options,
+            lower_cased,
+            presense,
+            scalar_proto_type,
+        })
+    }
+
+    pub fn build(self) -> Result<Field> {
+        let (getter_name, getter_signature) = self.make_getter()?;
+        let (has_method_name, has_method_signature) = self
+            .make_has_method()?
+            .map(|(n, s)| (Some(n), Some(s)))
+            .unwrap_or((None, None));
+        let (try_getter_name, try_getter_signature) = self.make_try_getter()?;
+        let (try_has_method_name, try_has_method_signature) = self
+            .make_try_has_method()?
+            .map(|(n, s)| (Some(n), Some(s)))
+            .unwrap_or((None, None));
+        Ok(Field {
             getter_name,
             getter_signature,
             has_method_name,
@@ -254,8 +244,100 @@ impl Field {
             try_getter_signature,
             try_has_method_name,
             try_has_method_signature,
-            presense,
-            scalar_proto_type,
+            presense: self.presense,
+            scalar_proto_type: self.scalar_proto_type,
         })
+    }
+
+    fn make_getter(&self) -> Result<(Ident, Signature)> {
+        let name = to_ident(&format!("{}", &self.lower_cased));
+        let scalar_ref_type = self.scalar_proto_type.gen_scalar_maybe_ref_type(
+            &self.current_proto_path,
+            None,
+            &self.options,
+        )?;
+        let getter_type = match self.presense {
+            FieldPresense::Repeated => {
+                let item_type = self.options.result_type(&scalar_ref_type)?;
+                parse2(quote! {
+                    impl ::puroro::repeated::RepeatedView<Item = #item_type>
+                })?
+            }
+            FieldPresense::Explicit | FieldPresense::Implicit => match self.scalar_proto_type {
+                FieldType::Message(_) => self.options.option_type(&scalar_ref_type)?,
+                _ => scalar_ref_type,
+            },
+        };
+        let getter_result_type = self.options.result_type(&getter_type)?;
+        let sig: Signature = parse2(quote! {
+            fn #name(&self) -> #getter_result_type
+        })?;
+        Ok((name, sig))
+    }
+
+    fn make_has_method(&self) -> Result<Option<(Ident, Signature)>> {
+        if let FieldPresense::Repeated = self.presense {
+            Ok(None)
+        } else {
+            let name = to_ident(&format!("has_{}", &self.lower_cased));
+            let has_result_type = self
+                .options
+                .result_type(&self.options.primitive_type("bool")?)?;
+            let sig: Signature = parse2(quote! {
+                fn #name(&self) -> #has_result_type
+            })?;
+            Ok(Some((name, sig)))
+        }
+    }
+
+    fn make_try_getter(&self) -> Result<(Ident, Signature)> {
+        let name = to_ident(&format!("try_{}", &self.lower_cased));
+        let scalar_ref_type = self.scalar_proto_type.gen_scalar_maybe_ref_type(
+            &self.current_proto_path,
+            None,
+            &self.options,
+        )?;
+        let getter_type = match self.presense {
+            FieldPresense::Repeated => {
+                let item_type = self.options.result_type(&scalar_ref_type)?;
+                parse2(quote! {
+                    impl ::puroro::repeated::RepeatedView<Item = #item_type>
+                })?
+            }
+            FieldPresense::Explicit | FieldPresense::Implicit => match self.scalar_proto_type {
+                FieldType::Message(_) => self.options.option_type(&scalar_ref_type)?,
+                _ => scalar_ref_type,
+            },
+        };
+        let getter_result_type = self.options.result_type(&getter_type)?;
+        let sig: Signature = parse2(quote! {
+            fn #name(&self) -> #getter_result_type
+        })?;
+        Ok((name, sig))
+    }
+
+    fn make_try_has_method(&self) -> Result<Option<(Ident, Signature)>> {
+        if let FieldPresense::Repeated = self.presense {
+            Ok(None)
+        } else {
+            let name = to_ident(&format!("try_has_{}", &self.lower_cased));
+            let has_result_type = self
+                .options
+                .result_type(&self.options.primitive_type("bool")?)?;
+            let sig: Signature = parse2(quote! {
+                fn #name(&self) -> #has_result_type
+            })?;
+            Ok(Some((name, sig)))
+        }
+    }
+}
+
+impl Field {
+    pub fn try_new<'a>(
+        desc: &'a FieldDescriptorExt<'a>,
+        current_proto_path: Rc<ProtoPathBuf>,
+        options: Rc<CodeGeneratorOptions>,
+    ) -> Result<Self> {
+        FieldFactory::new(desc, current_proto_path, options)?.build()
     }
 }

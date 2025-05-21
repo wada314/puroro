@@ -108,13 +108,13 @@ impl<'a> FieldDescriptorExt<'a> {
             |e| Ok(e.full_path().to_owned()),
         )?)
     }
-    pub fn message(&'a self) -> &'a DescriptorExt<'a> {
+    pub fn message(&self) -> &'a DescriptorExt<'a> {
         self.message
     }
-    pub fn file(&'a self) -> &'a FileDescriptorExt<'a> {
+    pub fn file(&self) -> &'a FileDescriptorExt<'a> {
         self.cache.file.get_or_init(|| self.message.file())
     }
-    pub fn field_presence(&'a self) -> Option<protobuf::feature_set::FieldPresence> {
+    pub fn field_presence(&self) -> Option<protobuf::feature_set::FieldPresence> {
         if let Some(options) = self.base.options() {
             if let Some(features) = options.features() {
                 if let Some(presence) = features.field_presence() {
@@ -127,7 +127,7 @@ impl<'a> FieldDescriptorExt<'a> {
         }
         None
     }
-    pub fn has_presence(&'a self) -> bool {
+    pub fn has_presence(&self) -> bool {
         if self.label() == FieldLabel::Repeated {
             false
         } else if self.oneof_index() != 0 {
