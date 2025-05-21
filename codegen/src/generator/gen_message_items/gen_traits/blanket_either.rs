@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::{BlanketImplsGenerator, Field2, FieldPresense};
+use super::{BlanketImplsGenerator, Field, FieldPresense};
 use crate::descriptor::FieldType;
 use crate::generator::CodeGeneratorOptions;
 use crate::Result;
@@ -30,7 +30,7 @@ impl BlanketImplsGenerator for GenBlanketEitherImpls {
     fn generate<'a>(
         &self,
         trait_path: &Path,
-        fields: Box<dyn 'a + Iterator<Item = &'a Field2>>,
+        fields: Box<dyn 'a + Iterator<Item = &'a Field>>,
     ) -> Result<Vec<Item>> {
         let t1: Ident = parse_str("T")?;
         let t2: Ident = parse_str("U")?;
@@ -75,7 +75,7 @@ impl GenBlanketEitherImpls {
 
     fn gen_try_get_method_body(
         &self,
-        field: &Field2,
+        field: &Field,
         t1: &Ident,
         t2: &Ident,
         trait_path: &Path,
@@ -109,7 +109,7 @@ impl GenBlanketEitherImpls {
 
     fn gen_try_has_method_body(
         &self,
-        field: &Field2,
+        field: &Field,
         t1: &Ident,
         t2: &Ident,
         trait_path: &Path,

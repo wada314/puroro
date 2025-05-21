@@ -39,9 +39,7 @@ use blanket_ref::GenBlanketRefImpls;
 
 pub struct GenTraits {
     rust_name: Ident,
-    rust_mut_name: Ident,
     fields: Vec<Field>,
-    fields2: Vec<Field2>,
     options: Rc<CodeGeneratorOptions>,
     try_getter_signatures: OnceCell<Vec<Signature>>,
     try_has_method_signatures: OnceCell<Vec<Signature>>,
@@ -51,7 +49,7 @@ pub trait BlanketImplsGenerator {
     fn generate<'a>(
         &self,
         trait_path: &Path,
-        fields: Box<dyn 'a + Iterator<Item = &'a Field2>>,
+        fields: Box<dyn 'a + Iterator<Item = &'a Field>>,
     ) -> Result<Vec<Item>>;
 }
 
@@ -63,16 +61,10 @@ impl GenTraits {
         let current_path = Rc::new(desc.current_path().to_owned());
         Ok(Self {
             rust_name: Self::rust_name_from_message_name(desc.name())?,
-            rust_mut_name: Self::rust_mut_name_from_message_name(desc.name())?,
             fields: desc
                 .non_oneof_fields()?
                 .into_iter()
                 .map(|f| Field::try_new(f, Rc::clone(&current_path), Rc::clone(&options)))
-                .collect::<Result<Vec<_>>>()?,
-            fields2: desc
-                .non_oneof_fields()?
-                .into_iter()
-                .map(|f| Field2::try_new(f, Rc::clone(&current_path), Rc::clone(&options)))
                 .collect::<Result<Vec<_>>>()?,
             options,
             try_getter_signatures: OnceCell::new(),
@@ -87,13 +79,6 @@ impl GenTraits {
         ))
     }
 
-    pub fn rust_mut_name_from_message_name(name: &str) -> Result<Ident> {
-        Ok(format_ident!(
-            "{}MutTrait",
-            convert_into_case(name, Case::CamelCase)
-        ))
-    }
-
     pub fn rust_path_from_proto_path(self, path: &ProtoPath) -> Result<Path> {
         path.to_rust_path_with(&self.options, |s| {
             let ident = Self::rust_name_from_message_name(s)?;
@@ -103,7 +88,6 @@ impl GenTraits {
 
     pub fn gen_items(&self) -> Result<Vec<Item>> {
         let trait_def = self.gen_message_trait()?;
-        let trait_mut_def = self.gen_message_mut_trait()?;
         let try_trait_name = &self.rust_name;
         let trait_path: Path = parse2(quote! { self::#try_trait_name })?;
 
@@ -116,7 +100,7 @@ impl GenTraits {
         ];
         let blanket_impls = blanket_impl_generators
             .iter()
-            .map(|g| g.generate(&trait_path, Box::new(self.fields2.iter())))
+            .map(|g| g.generate(&trait_path, Box::new(self.fields.iter())))
             .map(|r| match r {
                 Ok(vec) => Either::Left(vec.into_iter().map(Ok)),
                 Err(e) => Either::Right(once(Err(e))),
@@ -124,16 +108,21 @@ impl GenTraits {
             .flatten()
             .collect::<Result<Vec<_>>>()?;
 
-        Ok([trait_def, trait_mut_def]
-            .into_iter()
-            .chain(blanket_impls)
-            .collect())
+        Ok(once(trait_def).chain(blanket_impls).collect())
     }
 
     fn gen_message_trait(&self) -> Result<Item> {
         let trait_name = &self.rust_name;
-        let try_getters = self.gen_try_getter_signatures()?;
-        let try_has_methods = self.gen_try_has_method_signatures()?;
+        let try_getters = self
+            .fields
+            .iter()
+            .map(|f| &f.try_getter_signature)
+            .collect::<Vec<_>>();
+        let try_has_methods = self
+            .fields
+            .iter()
+            .filter_map(|f| f.try_has_method_signature.as_ref())
+            .collect::<Vec<_>>();
         Ok(parse2(quote! {
             pub trait #trait_name {
                 #(#try_getters;)*
@@ -141,645 +130,6 @@ impl GenTraits {
             }
         })?)
     }
-
-    fn gen_try_getter_signatures(&self) -> Result<&[Signature]> {
-        self.try_getter_signatures
-            .get_or_try_init(|| {
-                self.fields
-                    .iter()
-                    .map(Field::gen_try_get_method_signature)
-                    .collect::<Result<Vec<_>>>()
-            })
-            .map(Vec::as_slice)
-    }
-
-    fn gen_try_has_method_signatures(&self) -> Result<&[Signature]> {
-        self.try_has_method_signatures
-            .get_or_try_init(|| {
-                self.fields
-                    .iter()
-                    .filter_map(|f| f.maybe_gen_try_has_method_signature().transpose())
-                    .collect::<Result<Vec<_>>>()
-            })
-            .map(Vec::as_slice)
-    }
-
-    fn gen_message_mut_trait(&self) -> Result<Item> {
-        let trait_name = &self.rust_mut_name;
-        let base_trait_name = &self.rust_name;
-        let base_trait_path = self
-            .options
-            .path_in_self_module(&base_trait_name.clone().into())?;
-        let allocator_ident: Ident = parse_str("A")?;
-        let allocator: Type = parse2(quote! { #allocator_ident})?;
-        let methods = self
-            .fields
-            .iter()
-            .map(|f| f.gen_mutable_methods_signatures(&allocator))
-            .flatten_ok()
-            .collect::<Result<Vec<_>>>()?;
-        Ok(parse2(quote! {
-            pub trait #trait_name < #allocator_ident: ::std::alloc::Allocator >
-                : #base_trait_path
-            {
-                #(#methods;)*
-            }
-        })?)
-    }
-
-    fn gen_blanket_ref_impls(&self) -> Result<Vec<Item>> {
-        let trait_name = &self.rust_name;
-        let trait_path: Path = self
-            .options
-            .path_in_self_module(&trait_name.clone().into())?;
-        let blanket_type: Ident = parse_str("T")?;
-        let try_getter_signatures = self.gen_try_getter_signatures()?;
-        let try_getter_bodies = self
-            .fields
-            .iter()
-            .map(|f| f.gen_blanket_ref_try_get_method_body(&blanket_type, &trait_path))
-            .collect::<Result<Vec<_>>>()?;
-        let try_has_method_signatures = self.gen_try_has_method_signatures()?;
-        let try_has_method_bodies = self
-            .fields
-            .iter()
-            .filter_map(|f| {
-                f.gen_blanket_ref_try_has_method_body(&blanket_type, &trait_path)
-                    .transpose()
-            })
-            .collect::<Result<Vec<_>>>()?;
-        Ok(vec![
-            parse2(quote! {
-                impl<T: #trait_path> #trait_path for &T {
-                    #(#try_getter_signatures {
-                        #try_getter_bodies
-                    })*
-                    #(#try_has_method_signatures {
-                        #try_has_method_bodies
-                    })*
-                }
-            })?,
-            parse2(quote! {
-                impl<T: self::#trait_name> #trait_path for &mut T {
-                    #(#try_getter_signatures {
-                        #try_getter_bodies
-                    })*
-                    #(#try_has_method_signatures {
-                        #try_has_method_bodies
-                    })*
-                }
-            })?,
-        ])
-    }
-
-    fn gen_blanket_option_impl(&self) -> Result<Item> {
-        let trait_name = &self.rust_name;
-        let trait_path = self
-            .options
-            .path_in_self_module(&trait_name.clone().into())?;
-        let blanket_type_ident: Ident = parse_str("T")?;
-        let blanket_type = parse2(quote! { #blanket_type_ident })?;
-        let blanket_opt_type = self.options.option_type(&blanket_type)?;
-        let try_getter_signatures = self.gen_try_getter_signatures()?;
-        let try_getter_bodies = self
-            .fields
-            .iter()
-            .map(|f| f.gen_blanket_option_try_get_method_body(&blanket_type_ident, &trait_path))
-            .collect::<Result<Vec<_>>>()?;
-        let try_has_method_signatures = self.gen_try_has_method_signatures()?;
-        let try_has_method_bodies = self
-            .fields
-            .iter()
-            .filter_map(|f| {
-                f.gen_blanket_option_try_has_method_body(&blanket_type_ident, &trait_path)
-                    .transpose()
-            })
-            .collect::<Result<Vec<_>>>()?;
-        Ok(parse2(quote! {
-            impl<T: #trait_path> #trait_path for #blanket_opt_type {
-                #(#try_getter_signatures #try_getter_bodies)*
-                #(#try_has_method_signatures #try_has_method_bodies)*
-            }
-        })?)
-    }
-
-    fn gen_blanket_tuple_impl(&self) -> Result<Item> {
-        let trait_name = &self.rust_name;
-        let trait_path = self
-            .options
-            .path_in_self_module(&trait_name.clone().into())?;
-        let t1: Ident = parse_str("T")?;
-        let t2: Ident = parse_str("U")?;
-        let try_getter_signatures = self.gen_try_getter_signatures()?;
-        let try_getter_bodies = self
-            .fields
-            .iter()
-            .map(|f| f.gen_blanket_both_try_get_method_body(&t1, &t2, &trait_path))
-            .collect::<Result<Vec<_>>>()?;
-        let try_has_method_signatures = self.gen_try_has_method_signatures()?;
-        let try_has_method_bodies = self
-            .fields
-            .iter()
-            .filter_map(|f| {
-                f.gen_blanket_both_try_has_method_body(&t1, &t2, &trait_path)
-                    .transpose()
-            })
-            .collect::<Result<Vec<_>>>()?;
-        Ok(parse2(quote! {
-            impl<#t1: #trait_path, #t2: #trait_path>
-            #trait_path for ::puroro::Both<#t1, #t2>
-            {
-                #(#try_getter_signatures #try_getter_bodies)*
-                #(#try_has_method_signatures #try_has_method_bodies)*
-            }
-        })?)
-    }
-
-    fn gen_blanket_either_impl(&self) -> Result<Item> {
-        let trait_name = &self.rust_name;
-        let trait_path = self
-            .options
-            .path_in_self_module(&trait_name.clone().into())?;
-        let t1: Ident = parse_str("T")?;
-        let t2: Ident = parse_str("U")?;
-        let try_getter_signatures = self.gen_try_getter_signatures()?;
-        let try_getter_bodies = self
-            .fields
-            .iter()
-            .map(|f| f.gen_blanket_either_try_get_method_body(&t1, &t2, &trait_path))
-            .collect::<Result<Vec<_>>>()?;
-        let try_has_method_signatures = self.gen_try_has_method_signatures()?;
-        let try_has_method_bodies = self
-            .fields
-            .iter()
-            .filter_map(|f| {
-                f.gen_blanket_either_try_has_method_body(&t1, &t2, &trait_path)
-                    .transpose()
-            })
-            .collect::<Result<Vec<_>>>()?;
-        Ok(parse2(quote! {
-            impl<#t1: #trait_path, #t2: #trait_path>
-            #trait_path for ::puroro::Either<#t1, #t2>
-            {
-                #(#try_getter_signatures #try_getter_bodies)*
-                #(#try_has_method_signatures #try_has_method_bodies)*
-            }
-        })?)
-    }
-
-    fn gen_blanket_either_or_both_impl(&self) -> Result<Item> {
-        let trait_name = &self.rust_name;
-        let trait_path = self
-            .options
-            .path_in_self_module(&trait_name.clone().into())?;
-        let t1: Ident = parse_str("T")?;
-        let t2: Ident = parse_str("U")?;
-        let try_getter_signatures = self.gen_try_getter_signatures()?;
-        let try_getter_bodies = self
-            .fields
-            .iter()
-            .map(|f| f.gen_blanket_either_or_both_try_get_method_body(&t1, &t2, &trait_path))
-            .collect::<Result<Vec<_>>>()?;
-        let try_has_method_signatures = self.gen_try_has_method_signatures()?;
-        let try_has_method_bodies = self
-            .fields
-            .iter()
-            .filter_map(|f| {
-                f.gen_blanket_either_or_both_try_has_method_body(&t1, &t2, &trait_path)
-                    .transpose()
-            })
-            .collect::<Result<Vec<_>>>()?;
-        Ok(parse2(quote! {
-            impl<#t1: #trait_path, #t2: #trait_path>
-            #trait_path for ::puroro::EitherOrBoth<#t1, #t2>
-            {
-                #(#try_getter_signatures #try_getter_bodies)*
-                #(#try_has_method_signatures #try_has_method_bodies)*
-            }
-        })?)
-    }
-}
-
-pub struct Field {
-    original_name: String,
-    presense: FieldPresense,
-    current_path: Rc<ProtoPathBuf>,
-    scalar_type: FieldType<ProtoPathBuf, ProtoPathBuf>,
-    options: Rc<CodeGeneratorOptions>,
-}
-
-impl Field {
-    pub fn try_new<'a>(
-        desc: &'a FieldDescriptorExt<'a>,
-        current_path: Rc<ProtoPathBuf>,
-        options: Rc<CodeGeneratorOptions>,
-    ) -> Result<Self> {
-        Ok(Self {
-            original_name: desc.name().to_string(),
-            presense: FieldPresense::from_field_desc(desc),
-            current_path,
-            scalar_type: desc.type_with_full_path()?,
-            options,
-        })
-    }
-
-    pub fn scalar_type(&self) -> FieldType<&ProtoPath, &ProtoPath> {
-        self.scalar_type.as_deref()
-    }
-
-    pub fn presense(&self) -> FieldPresense {
-        self.presense
-    }
-
-    // Getters
-
-    fn gen_get_method_name(&self) -> Result<Ident> {
-        let lower_cased = convert_into_case(&self.original_name, Case::LowerSnakeCase);
-        Ok(to_ident(&lower_cased))
-    }
-
-    pub fn gen_get_method_signature(&self) -> Result<Signature> {
-        let getter_name = self.gen_get_method_name()?;
-        let scalar_ref_type =
-            self.scalar_type
-                .gen_scalar_maybe_ref_type(&self.current_path, None, &self.options)?;
-        let getter_type = match self.presense {
-            FieldPresense::Repeated => parse2(quote! {
-                impl ::puroro::repeated::RepeatedView<Item = #scalar_ref_type>
-            })?,
-            FieldPresense::Explicit | FieldPresense::Implicit => match self.scalar_type() {
-                FieldType::Message(_) => self.options.option_type(&scalar_ref_type)?,
-                _ => scalar_ref_type,
-            },
-        };
-        Ok(parse2(quote! {
-            fn #getter_name(&self) -> #getter_type
-        })?)
-    }
-
-    fn gen_try_get_method_name(&self) -> Result<Ident> {
-        let lower_cased = convert_into_case(&self.original_name, Case::LowerSnakeCase);
-        Ok(to_ident(&format!("try_{}", &lower_cased)))
-    }
-
-    pub fn gen_try_get_method_signature(&self) -> Result<Signature> {
-        let try_getter_name = self.gen_try_get_method_name()?;
-        let scalar_ref_type =
-            self.scalar_type
-                .gen_scalar_maybe_ref_type(&self.current_path, None, &self.options)?;
-        let getter_type = match self.presense {
-            FieldPresense::Repeated => {
-                let item_type = self.options.result_type(&scalar_ref_type)?;
-                parse2(quote! {
-                    impl ::puroro::repeated::RepeatedView<Item = #item_type>
-                })?
-            }
-            FieldPresense::Explicit | FieldPresense::Implicit => match self.scalar_type() {
-                FieldType::Message(_) => self.options.option_type(&scalar_ref_type)?,
-                _ => scalar_ref_type,
-            },
-        };
-        let result_type = self.options.result_type(&getter_type)?;
-        Ok(parse2(quote! {
-            fn #try_getter_name(&self) -> #result_type
-        })?)
-    }
-
-    pub fn maybe_gen_try_has_method_signature(&self) -> Result<Option<Signature>> {
-        if self.presense == FieldPresense::Repeated {
-            Ok(None)
-        } else {
-            let try_has_name = self.gen_try_has_method_name()?;
-            let result_type = self
-                .options
-                .result_type(&self.options.primitive_type("bool")?)?;
-            Ok(Some(parse2(quote! {
-                fn #try_has_name(&self) -> #result_type
-            })?))
-        }
-    }
-
-    fn gen_try_has_method_name(&self) -> Result<Ident> {
-        let lower_cased = convert_into_case(&self.original_name, Case::LowerSnakeCase);
-        Ok(to_ident(&format!("try_has_{}", &lower_cased)))
-    }
-
-    fn gen_blanket_ref_try_get_method_body(
-        &self,
-        blanket_type: &Ident,
-        trait_path: &Path,
-    ) -> Result<Expr> {
-        let try_getter_name = self.gen_try_get_method_name()?;
-        Ok(parse2(quote! {
-            <#blanket_type as #trait_path>::#try_getter_name(self)
-        })?)
-    }
-
-    fn gen_blanket_option_try_get_method_body(
-        &self,
-        blanket_type_ident: &Ident,
-        trait_path: &Path,
-    ) -> Result<Block> {
-        let try_getter_name = self.gen_try_get_method_name()?;
-        let stmts = match self.presense {
-            FieldPresense::Repeated => quote! {
-                self.as_ref().map(<#blanket_type_ident as #trait_path>::#try_getter_name).transpose()
-                .map(|iter_opt| iter_opt.into_iter().flatten())
-            },
-            FieldPresense::Explicit | FieldPresense::Implicit => quote! {
-                self.as_ref().map(<#blanket_type_ident as #trait_path>::#try_getter_name).transpose().map(
-                    |opt| opt.unwrap_or_default()
-                )
-            },
-        };
-        Ok(parse2(quote! {
-            { #stmts }
-        })?)
-    }
-
-    fn gen_blanket_both_try_get_method_body(
-        &self,
-        t1: &Ident,
-        t2: &Ident,
-        trait_path: &Path,
-    ) -> Result<Block> {
-        let try_getter_name = self.gen_try_get_method_name()?;
-        let try_has_name = self.gen_try_has_method_name()?;
-        let expr = self.options.ok_value(&parse2::<Expr>(
-            match (self.presense, self.scalar_type()) {
-                (FieldPresense::Repeated, FieldType::Message(_)) => quote! {{
-                    // Because the item types of both left and right can be different,
-                    // We need to use `Either` to represent the item type of the resulting iterator.
-                    self.as_ref().try_map2(
-                        <#t1 as #trait_path>::#try_getter_name,
-                        <#t2 as #trait_path>::#try_getter_name,
-                    )?.into_iter_either()
-                    .map(|either_res| either_res.factor_err())
-                }},
-                (FieldPresense::Repeated, _) => quote! {{
-                    self.as_ref().try_map2(
-                        <#t1 as #trait_path>::#try_getter_name,
-                        <#t2 as #trait_path>::#try_getter_name,
-                    )?.into_iter_chained()
-                }},
-                (_, FieldType::Message(_)) => quote! {{
-                    self.as_ref().try_map2(
-                        <#t1 as #trait_path>::#try_getter_name,
-                        <#t2 as #trait_path>::#try_getter_name,
-                    )?.factor_none()
-                }},
-                (_, _) => quote! {{
-                    let ::puroro::Both::Both(left, right) = self;
-                    if <#t2 as #trait_path>::#try_has_name(&right)? {
-                        <#t2 as #trait_path>::#try_getter_name(&right)?
-                    } else {
-                        <#t1 as #trait_path>::#try_getter_name(&left)?
-                    }
-                }},
-            },
-        )?)?;
-        Ok(parse2(quote! {
-            { #expr }
-        })?)
-    }
-
-    fn gen_blanket_either_try_get_method_body(
-        &self,
-        t1: &Ident,
-        t2: &Ident,
-        trait_path: &Path,
-    ) -> Result<Block> {
-        let try_getter_name = self.gen_try_get_method_name()?;
-        let mapped_either: Expr = parse2(quote! {
-            self.as_ref().try_map2(
-                <#t1 as #trait_path>::#try_getter_name,
-                <#t2 as #trait_path>::#try_getter_name)?
-        })?;
-        let expr = self.options.ok_value(&parse2::<Expr>(
-            match (self.presense, self.scalar_type()) {
-                (FieldPresense::Repeated, FieldType::Message(_)) => quote! {
-                    #mapped_either.into_iter_either().map(|either_res| either_res.factor_err())
-                },
-                (FieldPresense::Repeated, _) => quote! {
-                    #mapped_either.into_iter_chained()
-                },
-                (_, FieldType::Message(_)) => quote! {
-                    #mapped_either.factor_none()
-                },
-                _ => quote! {
-                    #mapped_either.into_inner()
-                },
-            },
-        )?)?;
-        Ok(parse2(quote! {
-            { #expr }
-        })?)
-    }
-
-    fn gen_blanket_either_or_both_try_get_method_body(
-        &self,
-        t1: &Ident,
-        t2: &Ident,
-        trait_path: &Path,
-    ) -> Result<Block> {
-        let try_getter_name = self.gen_try_get_method_name()?;
-        let try_has_name = self.gen_try_has_method_name()?;
-        let mapped_either: Expr = parse2(quote! {
-            self.as_ref().try_map2(
-                <#t1 as #trait_path>::#try_getter_name,
-                <#t2 as #trait_path>::#try_getter_name)?
-        })?;
-        let expr = self.options.ok_value(&parse2::<Expr>(
-            match (self.presense, self.scalar_type()) {
-                (FieldPresense::Repeated, FieldType::Message(_)) => quote! {{
-                    #mapped_either.into_iter_either().map(|either_res| either_res.factor_err())
-                }},
-                (FieldPresense::Repeated, _) => quote! {{
-                    #mapped_either.into_iter_chained()
-                }},
-                (_, FieldType::Message(_)) => quote! {
-                    #mapped_either.factor_none()
-                },
-                _ => quote! {{
-                    let (left_opt, right_opt) = self.as_ref().left_and_right();
-                    if let Some(right) = right_opt {
-                        if <#t2 as #trait_path>::#try_has_name(right)? {
-                            return <#t2 as #trait_path>::#try_getter_name(right);
-                        }
-                    }
-                    if let Some(left) = left_opt {
-                        if <#t1 as #trait_path>::#try_has_name(left)? {
-                            return <#t1 as #trait_path>::#try_getter_name(left);
-                        }
-                    }
-                    ::std::default::Default::default()
-                }},
-            },
-        )?)?;
-        Ok(parse2(quote! {{
-                #expr
-        }})?)
-    }
-
-    fn gen_blanket_ref_try_has_method_body(
-        &self,
-        blanket_type: &Ident,
-        trait_path: &Path,
-    ) -> Result<Option<Expr>> {
-        if self.presense == FieldPresense::Repeated {
-            return Ok(None);
-        }
-        let try_has_name = self.gen_try_has_method_name()?;
-        Ok(Some(parse2(quote! {
-            <#blanket_type as #trait_path>::#try_has_name(self)
-        })?))
-    }
-
-    fn gen_blanket_option_try_has_method_body(
-        &self,
-        blanket_type_ident: &Ident,
-        trait_path: &Path,
-    ) -> Result<Option<Block>> {
-        if self.presense == FieldPresense::Repeated {
-            return Ok(None);
-        }
-        let try_has_name = self.gen_try_has_method_name()?;
-        Ok(Some(parse2(quote! {
-            {
-                self.as_ref().map(<#blanket_type_ident as #trait_path>::#try_has_name)
-                    .unwrap_or(Ok(false))
-            }
-        })?))
-    }
-
-    fn gen_blanket_both_try_has_method_body(
-        &self,
-        t1: &Ident,
-        t2: &Ident,
-        trait_path: &Path,
-    ) -> Result<Option<Block>> {
-        if self.presense == FieldPresense::Repeated {
-            return Ok(None);
-        }
-        let try_has_name = self.gen_try_has_method_name()?;
-        let expr = self.options.ok_value(&parse2::<Expr>(quote! {{
-            let ::puroro::Both::Both(left, right) = self;
-            <#t2 as #trait_path>::#try_has_name(&right)? || <#t1 as #trait_path>::#try_has_name(&left)?
-        }})?)?;
-        Ok(Some(parse2(quote! {
-            { #expr }
-        })?))
-    }
-
-    fn gen_blanket_either_try_has_method_body(
-        &self,
-        t1: &Ident,
-        t2: &Ident,
-        trait_path: &Path,
-    ) -> Result<Option<Block>> {
-        if self.presense == FieldPresense::Repeated {
-            return Ok(None);
-        }
-        let try_has_name = self.gen_try_has_method_name()?;
-        let expr = self.options.ok_value(&parse2::<Expr>(quote! {
-            self.as_ref().try_map2(
-                |t1| <#t1 as #trait_path>::#try_has_name(t1),
-                |t2| <#t2 as #trait_path>::#try_has_name(t2)
-            )?.into_inner()
-        })?)?;
-        Ok(Some(parse2(quote! {
-            { #expr }
-        })?))
-    }
-
-    fn gen_blanket_either_or_both_try_has_method_body(
-        &self,
-        t1: &Ident,
-        t2: &Ident,
-        trait_path: &Path,
-    ) -> Result<Option<Block>> {
-        if self.presense == FieldPresense::Repeated {
-            return Ok(None);
-        }
-        let try_has_name = self.gen_try_has_method_name()?;
-        let expr = self.options.ok_value(&parse2::<Expr>(quote! {
-            self.as_ref().right().map(<#t2 as #trait_path>::#try_has_name)
-                .transpose()?.unwrap_or(false)
-            || self.as_ref().left().map(<#t1 as #trait_path>::#try_has_name)
-                .transpose()?.unwrap_or(false)
-        })?)?;
-        Ok(Some(parse2(quote! {
-            {
-                #expr
-            }
-        })?))
-    }
-
-    // Mutators
-
-    pub fn gen_mutable_methods_signatures(&self, allocator: &Type) -> Result<Vec<Signature>> {
-        let result = vec![
-            self.gen_mut_method_signature(allocator)?,
-            self.gen_clear_method_signature()?,
-        ];
-        Ok(result)
-    }
-
-    fn gen_mut_method_name(&self) -> Result<Ident> {
-        let lower_cased = convert_into_case(&self.original_name, Case::LowerSnakeCase);
-        Ok(to_ident(&format!("{}_mut", &lower_cased)))
-    }
-
-    pub fn gen_mut_method_signature(&self, allocator: &Type) -> Result<Signature> {
-        let mutator_name = self.gen_mut_method_name()?;
-        let mutator_type: Type = match self.presense {
-            FieldPresense::Repeated => {
-                // A type returned from the iterator. e.g. i32, &str, &impl MessageTrait
-                let item_type = self.scalar_type.gen_scalar_maybe_ref_type(
-                    &self.current_path,
-                    None,
-                    &self.options,
-                )?;
-                // A type used by setter. e.g. i32, String, impl MessageTrait
-                let value_type = self.scalar_type.gen_scalar_owned_type(
-                    &self.current_path,
-                    allocator,
-                    &self.options,
-                )?;
-                parse2(quote! {
-                    impl ::puroro::repeated::RepeatedViewMut<Item = #item_type, Value = #value_type>
-                })?
-            }
-            _ => {
-                let bare_type = self.scalar_type.gen_scalar_owned_type(
-                    &self.current_path,
-                    allocator,
-                    &self.options,
-                )?;
-                let deref_mut_trait = self.options.deref_mut_trait(&bare_type)?;
-                parse2(quote! {
-                    impl #deref_mut_trait
-                })?
-            }
-        };
-        Ok(parse2(quote! {
-            fn #mutator_name(&mut self) -> #mutator_type
-        })?)
-    }
-
-    fn gen_clear_method_name(&self) -> Result<Ident> {
-        let lower_cased = convert_into_case(&self.original_name, Case::LowerSnakeCase);
-        Ok(to_ident(&format!("clear_{}", &lower_cased)))
-    }
-
-    fn gen_clear_method_signature(&self) -> Result<Signature> {
-        let clear_method_name = self.gen_clear_method_name()?;
-        Ok(parse2(quote! {
-            fn #clear_method_name(&mut self)
-        })?)
-    }
-
-    // Others
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -885,7 +235,7 @@ impl<M: AsRef<ProtoPath>, E: AsRef<ProtoPath>> FieldType<M, E> {
     }
 }
 
-pub struct Field2 {
+pub struct Field {
     try_getter_name: Ident,
     try_has_method_name: Option<Ident>,
     try_getter_signature: Signature,
@@ -894,7 +244,7 @@ pub struct Field2 {
     scalar_proto_type: FieldType<ProtoPathBuf, ProtoPathBuf>,
 }
 
-impl Field2 {
+impl Field {
     pub fn try_new<'a>(
         desc: &'a FieldDescriptorExt<'a>,
         current_proto_path: Rc<ProtoPathBuf>,

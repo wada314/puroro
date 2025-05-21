@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::{BlanketImplsGenerator, Field2};
+use super::{BlanketImplsGenerator, Field};
 use crate::generator::CodeGeneratorOptions;
 use crate::Result;
 use ::puroro::Either;
@@ -30,7 +30,7 @@ impl BlanketImplsGenerator for GenBlanketRefImpls {
     fn generate<'a>(
         &self,
         trait_path: &Path,
-        fields: Box<dyn 'a + Iterator<Item = &'a Field2>>,
+        fields: Box<dyn 'a + Iterator<Item = &'a Field>>,
     ) -> Result<Vec<Item>> {
         let t: Ident = parse_str("T")?;
         let methods = fields

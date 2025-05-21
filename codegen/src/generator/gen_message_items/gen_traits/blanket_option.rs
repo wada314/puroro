@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::{BlanketImplsGenerator, Field2, FieldPresense};
+use super::{BlanketImplsGenerator, Field, FieldPresense};
 use crate::generator::CodeGeneratorOptions;
 use crate::Result;
 use ::puroro::Either;
@@ -29,7 +29,7 @@ impl BlanketImplsGenerator for GenBlanketOptionImpls {
     fn generate<'a>(
         &self,
         trait_path: &Path,
-        fields: Box<dyn 'a + Iterator<Item = &'a Field2>>,
+        fields: Box<dyn 'a + Iterator<Item = &'a Field>>,
     ) -> Result<Vec<Item>> {
         let t: Ident = parse_str("T")?;
         let t_opt = self.options.option_type(
@@ -80,7 +80,7 @@ impl GenBlanketOptionImpls {
 
     fn gen_try_get_method_body(
         &self,
-        field: &Field2,
+        field: &Field,
         blanket_type_ident: &Ident,
         trait_path: &Path,
     ) -> Result<Block> {
@@ -102,7 +102,7 @@ impl GenBlanketOptionImpls {
 
     fn gen_try_has_method_body(
         &self,
-        field: &Field2,
+        field: &Field,
         blanket_type_ident: &Ident,
         trait_path: &Path,
     ) -> Result<Option<Block>> {
