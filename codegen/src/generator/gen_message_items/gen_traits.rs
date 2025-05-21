@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+mod blanket_both;
 mod blanket_either;
 mod blanket_either_or_both;
 mod blanket_option;
