@@ -36,6 +36,7 @@ use blanket_option::GenBlanketOptionImpls;
 use blanket_ref::GenBlanketRefImpls;
 
 pub struct GenTraits {
+    view_trait_name: Ident,
     try_view_trait_name: Ident,
     fields: Vec<Field>,
     options: Rc<CodeGeneratorOptions>,
@@ -56,6 +57,7 @@ impl GenTraits {
     ) -> Result<Self> {
         let current_path = Rc::new(desc.current_path().to_owned());
         Ok(Self {
+            view_trait_name: Self::view_trait_name(desc.name())?,
             try_view_trait_name: Self::try_view_trait_name(desc.name())?,
             fields: desc
                 .non_oneof_fields()?
@@ -66,6 +68,13 @@ impl GenTraits {
         })
     }
 
+    pub fn view_trait_name(message_name: &str) -> Result<Ident> {
+        Ok(format_ident!(
+            "{}View",
+            convert_into_case(message_name, Case::CamelCase)
+        ))
+    }
+
     pub fn try_view_trait_name(message_name: &str) -> Result<Ident> {
         Ok(format_ident!(
             "Try{}View",
@@ -74,9 +83,9 @@ impl GenTraits {
     }
 
     pub fn gen_items(&self) -> Result<Vec<Item>> {
-        let trait_def = self.gen_try_view_trait()?;
+        let try_trait_def = self.gen_try_view_trait()?;
         let try_trait_name = &self.try_view_trait_name;
-        let trait_path: Path = parse2(quote! { self::#try_trait_name })?;
+        let try_trait_path: Path = parse2(quote! { self::#try_trait_name })?;
 
         let blanket_impl_generators: Vec<Rc<dyn BlanketImplsGenerator>> = vec![
             Rc::new(GenBlanketRefImpls::new(Rc::clone(&self.options))),
@@ -87,7 +96,7 @@ impl GenTraits {
         ];
         let blanket_impls = blanket_impl_generators
             .iter()
-            .map(|g| g.generate(&trait_path, Box::new(self.fields.iter())))
+            .map(|g| g.generate(&try_trait_path, Box::new(self.fields.iter())))
             .map(|r| match r {
                 Ok(vec) => Either::Left(vec.into_iter().map(Ok)),
                 Err(e) => Either::Right(once(Err(e))),
@@ -95,7 +104,7 @@ impl GenTraits {
             .flatten()
             .collect::<Result<Vec<_>>>()?;
 
-        Ok(once(trait_def).chain(blanket_impls).collect())
+        Ok(once(try_trait_def).chain(blanket_impls).collect())
     }
 
     fn gen_try_view_trait(&self) -> Result<Item> {
@@ -177,9 +186,13 @@ impl<M: AsRef<ProtoPath>, E: AsRef<ProtoPath>> FieldType<M, E> {
 }
 
 pub struct Field {
+    pub getter_name: Ident,
+    pub getter_signature: Signature,
+    pub has_method_name: Option<Ident>,
+    pub has_method_signature: Option<Signature>,
     pub try_getter_name: Ident,
-    pub try_has_method_name: Option<Ident>,
     pub try_getter_signature: Signature,
+    pub try_has_method_name: Option<Ident>,
     pub try_has_method_signature: Option<Signature>,
     pub presense: FieldPresense,
     pub scalar_proto_type: FieldType<ProtoPathBuf, ProtoPathBuf>,
@@ -194,6 +207,11 @@ impl Field {
         let lower_cased = convert_into_case(&desc.name(), Case::LowerSnakeCase);
         let presense = FieldPresense::from_field_desc(desc);
         let scalar_proto_type = desc.type_with_full_path()?;
+
+        let getter_name = todo!();
+        let getter_signature = todo!();
+        let has_method_name = todo!();
+        let has_method_signature = todo!();
 
         let try_getter_name = to_ident(&format!("try_{}", &lower_cased));
         let try_has_method_name = if let FieldPresense::Repeated = presense {
@@ -228,9 +246,13 @@ impl Field {
             )?),
         };
         Ok(Self {
+            getter_name,
+            getter_signature,
+            has_method_name,
+            has_method_signature,
             try_getter_name,
-            try_has_method_name,
             try_getter_signature,
+            try_has_method_name,
             try_has_method_signature,
             presense,
             scalar_proto_type,
