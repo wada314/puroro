@@ -15,12 +15,10 @@
 use super::{blanket_impls_helper, BlanketImplsGenerator, Field};
 use crate::descriptor::FieldType;
 use crate::generator::CodeGeneratorOptions;
-use crate::{Result, ResultExt};
-use ::puroro::Either;
+use crate::Result;
 use ::quote::quote;
-use ::std::iter::once;
 use ::std::rc::Rc;
-use ::syn::{parse2, parse_str, Block, Expr, Ident, ImplItemFn, Item, Path};
+use ::syn::{parse2, parse_str, Block, Expr, Ident, Item, Path};
 
 pub struct GenBlanketEitherOrBothImpls {
     options: Rc<CodeGeneratorOptions>,

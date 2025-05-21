@@ -14,12 +14,10 @@
 
 use super::{blanket_impls_helper, BlanketImplsGenerator, Field};
 use crate::generator::CodeGeneratorOptions;
-use crate::{Result, ResultExt};
-use ::puroro::Either;
+use crate::Result;
 use ::quote::quote;
-use ::std::iter::once;
 use ::std::rc::Rc;
-use ::syn::{parse2, parse_str, Block, Ident, ImplItemFn, Item, Path, TypePath};
+use ::syn::{parse2, parse_str, Block, Ident, Item, Path, TypePath};
 
 pub struct GenBlanketOptionImpls {
     options: Rc<CodeGeneratorOptions>,
