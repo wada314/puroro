@@ -38,7 +38,7 @@ impl GenDynamicMessageImpls {
     ) -> Result<Self> {
         let current_path = Rc::new(desc.current_path().to_owned());
         Ok(Self {
-            rust_trait_name: GenTraits::rust_name_from_message_name(desc.name())?,
+            rust_trait_name: GenTraits::try_view_trait_name(desc.name())?,
             fields: desc
                 .non_oneof_fields()?
                 .into_iter()

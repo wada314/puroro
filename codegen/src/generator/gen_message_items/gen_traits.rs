@@ -23,13 +23,11 @@ use crate::descriptor::{DescriptorExt, FieldDescriptorExt, FieldLabel, FieldType
 use crate::generator::{to_ident, CodeGeneratorOptions};
 use crate::proto_path::{ProtoPath, ProtoPathBuf};
 use crate::Result;
-use ::itertools::Itertools;
 use ::puroro::Either;
 use ::quote::{format_ident, quote};
-use ::std::cell::OnceCell;
 use ::std::iter::once;
 use ::std::rc::Rc;
-use ::syn::{parse2, Block, Expr, Ident, Item, Path, Type};
+use ::syn::{parse2, Ident, Item, Path, Type};
 use ::syn::{Lifetime, Signature};
 use blanket_both::GenBlanketBothImpls;
 use blanket_either::GenBlanketEitherImpls;
@@ -58,7 +56,7 @@ impl GenTraits {
     ) -> Result<Self> {
         let current_path = Rc::new(desc.current_path().to_owned());
         Ok(Self {
-            rust_name: Self::rust_name_from_message_name(desc.name())?,
+            rust_name: Self::try_view_trait_name(desc.name())?,
             fields: desc
                 .non_oneof_fields()?
                 .into_iter()
@@ -68,22 +66,15 @@ impl GenTraits {
         })
     }
 
-    pub fn rust_name_from_message_name(name: &str) -> Result<Ident> {
+    pub fn try_view_trait_name(message_name: &str) -> Result<Ident> {
         Ok(format_ident!(
-            "{}Trait",
-            convert_into_case(name, Case::CamelCase)
+            "Try{}View",
+            convert_into_case(message_name, Case::CamelCase)
         ))
     }
 
-    pub fn rust_path_from_proto_path(self, path: &ProtoPath) -> Result<Path> {
-        path.to_rust_path_with(&self.options, |s| {
-            let ident = Self::rust_name_from_message_name(s)?;
-            Ok(parse2(quote! { #ident })?)
-        })
-    }
-
     pub fn gen_items(&self) -> Result<Vec<Item>> {
-        let trait_def = self.gen_message_trait()?;
+        let trait_def = self.gen_try_view_trait()?;
         let try_trait_name = &self.rust_name;
         let trait_path: Path = parse2(quote! { self::#try_trait_name })?;
 
@@ -107,7 +98,7 @@ impl GenTraits {
         Ok(once(trait_def).chain(blanket_impls).collect())
     }
 
-    fn gen_message_trait(&self) -> Result<Item> {
+    fn gen_try_view_trait(&self) -> Result<Item> {
         let trait_name = &self.rust_name;
         let try_getters = self
             .fields
@@ -167,7 +158,7 @@ impl<M: AsRef<ProtoPath>, E: AsRef<ProtoPath>> FieldType<M, E> {
                         .to_relative_path(current_path)
                         .unwrap_or(path.as_ref());
                     let path = path.to_rust_path_with(options, |name| {
-                        let ident = GenTraits::rust_name_from_message_name(name)?;
+                        let ident = GenTraits::try_view_trait_name(name)?;
                         Ok(parse2(quote! { #ident })?)
                     })?;
                     Ok(parse2(quote! { impl #(#lifetime +)* #path })?)
