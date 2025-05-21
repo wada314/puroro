@@ -36,7 +36,7 @@ use blanket_option::GenBlanketOptionImpls;
 use blanket_ref::GenBlanketRefImpls;
 
 pub struct GenTraits {
-    rust_name: Ident,
+    try_view_trait_name: Ident,
     fields: Vec<Field>,
     options: Rc<CodeGeneratorOptions>,
 }
@@ -56,7 +56,7 @@ impl GenTraits {
     ) -> Result<Self> {
         let current_path = Rc::new(desc.current_path().to_owned());
         Ok(Self {
-            rust_name: Self::try_view_trait_name(desc.name())?,
+            try_view_trait_name: Self::try_view_trait_name(desc.name())?,
             fields: desc
                 .non_oneof_fields()?
                 .into_iter()
@@ -75,7 +75,7 @@ impl GenTraits {
 
     pub fn gen_items(&self) -> Result<Vec<Item>> {
         let trait_def = self.gen_try_view_trait()?;
-        let try_trait_name = &self.rust_name;
+        let try_trait_name = &self.try_view_trait_name;
         let trait_path: Path = parse2(quote! { self::#try_trait_name })?;
 
         let blanket_impl_generators: Vec<Rc<dyn BlanketImplsGenerator>> = vec![
@@ -99,7 +99,7 @@ impl GenTraits {
     }
 
     fn gen_try_view_trait(&self) -> Result<Item> {
-        let trait_name = &self.rust_name;
+        let trait_name = &self.try_view_trait_name;
         let try_getters = self
             .fields
             .iter()
