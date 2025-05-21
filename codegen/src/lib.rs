@@ -25,7 +25,9 @@ pub use crate::generator::compile;
 use ::puroro::dynamic::DynamicMessage;
 use ::puroro::google::protobuf::compiler::CodeGeneratorRequest;
 use ::puroro::message::{Message, MessageMut};
+use ::quither::Either;
 use ::std::backtrace::Backtrace;
+use ::std::iter::once;
 use ::thiserror::Error;
 
 #[derive(Error, Debug)]
@@ -45,6 +47,24 @@ impl From<String> for ErrorKind {
     }
 }
 pub type Result<T> = ::std::result::Result<T, ErrorKind>;
+
+trait ResultExt<T> {
+    fn transpose_iter(self) -> impl Iterator<Item = Result<T::Item>>
+    where
+        T: IntoIterator;
+}
+
+impl<T> ResultExt<T> for Result<T> {
+    fn transpose_iter(self) -> impl Iterator<Item = Result<T::Item>>
+    where
+        T: IntoIterator,
+    {
+        match self {
+            Ok(it) => Either::Left(it.into_iter().map(Ok)),
+            Err(e) => Either::Right(once(Err(e))),
+        }
+    }
+}
 
 pub fn compile_binary(input: impl AsRef<[u8]>) -> Result<Vec<u8>> {
     let request: CodeGeneratorRequest = DynamicMessage::deser_from_read(input.as_ref())

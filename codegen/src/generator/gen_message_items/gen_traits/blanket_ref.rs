@@ -14,7 +14,7 @@
 
 use super::{BlanketImplsGenerator, Field};
 use crate::generator::CodeGeneratorOptions;
-use crate::Result;
+use crate::{Result, ResultExt};
 use ::puroro::Either;
 use ::quote::quote;
 use ::std::iter::once;
@@ -58,11 +58,7 @@ impl BlanketImplsGenerator for GenBlanketRefImpls {
                 };
                 Ok(once(try_getter).chain(try_has_method.into_iter()))
             })
-            .map(|r| match r {
-                Ok(it) => Either::Left(it.map(Ok)),
-                Err(e) => Either::Right(once(Err(e))),
-            })
-            .flatten()
+            .flat_map(ResultExt::transpose_iter)
             .collect::<Result<Vec<_>>>()?;
 
         Ok(vec![
