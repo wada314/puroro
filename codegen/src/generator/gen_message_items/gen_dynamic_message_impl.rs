@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::gen_traits::{Field as TraitField, FieldPresense, GenTraits};
+use super::gen_traits::{Field as TraitField, GenTraits};
 use crate::descriptor::{
     DescriptorExt, FieldDescriptorExt, I32Type, I64Type, LenType, VariantType, WireType,
 };
@@ -96,7 +96,7 @@ impl Field {
     }
 
     fn gen_try_getter(&self) -> Result<Item> {
-        let signature = &self.trait_field.try_getter_signature;
+        let (_, signature) = self.trait_field.try_getter_name_and_signature();
         let number = self.number;
         let body = self
             .options
@@ -110,10 +110,20 @@ impl Field {
     }
 
     fn gen_try_getter_body(&self, field_opt_expr: &Expr) -> Result<Expr> {
-        let wire_type: WireType<_, _> = self.trait_field.scalar_proto_type.as_ref().into();
+        let wire_type: WireType<_, _> = match &self.trait_field {
+            TraitField::Repeated {
+                scalar_proto_type, ..
+            }
+            | TraitField::Implicit {
+                scalar_proto_type, ..
+            }
+            | TraitField::Explicit {
+                scalar_proto_type, ..
+            } => scalar_proto_type.as_ref().into(),
+        };
         let field_expr: Expr = parse_str("f")?;
-        Ok(match self.trait_field.presense {
-            FieldPresense::Repeated => {
+        Ok(match &self.trait_field {
+            TraitField::Repeated { .. } => {
                 let body = match wire_type {
                     WireType::Variant(t) => {
                         self.gen_repeated_variant_getter_body(&field_expr, t)?
@@ -127,7 +137,7 @@ impl Field {
                     (#field_opt_expr).map(|f| #body).transpose()?.into_iter().flatten()
                 })?
             }
-            FieldPresense::Implicit | FieldPresense::Explicit => {
+            TraitField::Implicit { .. } | TraitField::Explicit { .. } => {
                 let body = match wire_type {
                     WireType::Variant(t) => {
                         self.gen_try_non_repeated_varint_getter_body(&field_expr, t)?
@@ -245,10 +255,10 @@ impl Field {
     }
 
     fn maybe_gen_try_has_method(&self) -> Result<Option<Item>> {
-        if self.trait_field.presense == FieldPresense::Repeated {
-            return Ok(None);
-        }
-        let Some(signature) = self.trait_field.try_has_method_signature.as_ref() else {
+        let Some((_, signature)) = self
+            .trait_field
+            .try_has_method_name_and_signature_if_non_repeated()
+        else {
             return Ok(None);
         };
         Ok(Some(parse2(quote! {

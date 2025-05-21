@@ -36,21 +36,20 @@ impl BlanketImplsGenerator for GenBlanketRefImpls {
         let methods = fields
             .map(|f| {
                 let try_getter: ImplItemFn = {
-                    let signature = &f.try_getter_signature;
-                    let try_getter_name = &f.try_getter_name;
+                    let (signature, name) = f.try_getter_name_and_signature();
                     parse2(quote! {
                         #signature {
-                            <#t as #trait_path>::#try_getter_name(self)
+                            <#t as #trait_path>::#name(self)
                         }
                     })?
                 };
                 let try_has_method: Option<ImplItemFn> = {
-                    let signature = &f.try_has_method_signature;
-                    let try_has_name = f.try_has_method_name.as_ref();
-                    if let (Some(signature), Some(try_has_name)) = (signature, try_has_name) {
+                    if let Some((signature, name)) =
+                        f.try_has_method_name_and_signature_if_non_repeated()
+                    {
                         Some(parse2(quote! {
                             #signature {
-                                <#t as #trait_path>::#try_has_name(self)
+                                <#t as #trait_path>::#name(self)
                             }
                         })?)
                     } else {

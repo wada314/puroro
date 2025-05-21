@@ -112,12 +112,13 @@ impl GenTraits {
         let try_getters = self
             .fields
             .iter()
-            .map(|f| &f.try_getter_signature)
+            .map(|f| f.try_getter_name_and_signature().1)
             .collect::<Vec<_>>();
         let try_has_methods = self
             .fields
             .iter()
-            .filter_map(|f| f.try_has_method_signature.as_ref())
+            .filter_map(|f| f.try_has_method_name_and_signature_if_non_repeated())
+            .map(|(_, signature)| signature)
             .collect::<Vec<_>>();
         Ok(parse2(quote! {
             pub trait #trait_name {
@@ -185,17 +186,112 @@ impl<M: AsRef<ProtoPath>, E: AsRef<ProtoPath>> FieldType<M, E> {
     }
 }
 
-pub struct Field {
-    pub getter_name: Ident,
-    pub getter_signature: Signature,
-    pub has_method_name: Option<Ident>,
-    pub has_method_signature: Option<Signature>,
-    pub try_getter_name: Ident,
-    pub try_getter_signature: Signature,
-    pub try_has_method_name: Option<Ident>,
-    pub try_has_method_signature: Option<Signature>,
-    pub presense: FieldPresense,
-    pub scalar_proto_type: FieldType<ProtoPathBuf, ProtoPathBuf>,
+pub enum Field {
+    Repeated {
+        getter_name: Ident,
+        getter_signature: Signature,
+        try_getter_name: Ident,
+        try_getter_signature: Signature,
+        scalar_proto_type: FieldType<ProtoPathBuf, ProtoPathBuf>,
+    },
+    Explicit {
+        getter_name: Ident,
+        getter_signature: Signature,
+        has_method_name: Ident,
+        has_method_signature: Signature,
+        try_getter_name: Ident,
+        try_getter_signature: Signature,
+        try_has_method_name: Ident,
+        try_has_method_signature: Signature,
+        scalar_proto_type: FieldType<ProtoPathBuf, ProtoPathBuf>,
+    },
+    Implicit {
+        getter_name: Ident,
+        getter_signature: Signature,
+        has_method_name: Ident,
+        has_method_signature: Signature,
+        try_getter_name: Ident,
+        try_getter_signature: Signature,
+        try_has_method_name: Ident,
+        try_has_method_signature: Signature,
+        scalar_proto_type: FieldType<ProtoPathBuf, ProtoPathBuf>,
+    },
+}
+
+impl Field {
+    pub fn getter_name_and_signature(&self) -> (&Ident, &Signature) {
+        match self {
+            Field::Implicit {
+                getter_name,
+                getter_signature,
+                ..
+            }
+            | Field::Explicit {
+                getter_name,
+                getter_signature,
+                ..
+            }
+            | Field::Repeated {
+                getter_name,
+                getter_signature,
+                ..
+            } => (getter_name, getter_signature),
+        }
+    }
+
+    pub fn try_getter_name_and_signature(&self) -> (&Ident, &Signature) {
+        match self {
+            Field::Implicit {
+                try_getter_name,
+                try_getter_signature,
+                ..
+            }
+            | Field::Explicit {
+                try_getter_name,
+                try_getter_signature,
+                ..
+            }
+            | Field::Repeated {
+                try_getter_name,
+                try_getter_signature,
+                ..
+            } => (try_getter_name, try_getter_signature),
+        }
+    }
+
+    pub fn has_method_name_and_signature_if_non_repeated(&self) -> Option<(&Ident, &Signature)> {
+        match self {
+            Field::Implicit {
+                has_method_name,
+                has_method_signature,
+                ..
+            }
+            | Field::Explicit {
+                has_method_name,
+                has_method_signature,
+                ..
+            } => Some((has_method_name, has_method_signature)),
+            _ => None,
+        }
+    }
+
+    pub fn try_has_method_name_and_signature_if_non_repeated(
+        &self,
+    ) -> Option<(&Ident, &Signature)> {
+        match self {
+            Field::Implicit {
+                try_has_method_name,
+                try_has_method_signature,
+                ..
+            }
+            | Field::Explicit {
+                try_has_method_name,
+                try_has_method_signature,
+                ..
+            } => Some((try_has_method_name, try_has_method_signature)),
+            _ => None,
+        }
+    }
 }
 
 struct FieldFactory {
@@ -226,27 +322,47 @@ impl FieldFactory {
 
     pub fn build(self) -> Result<Field> {
         let (getter_name, getter_signature) = self.make_getter()?;
-        let (has_method_name, has_method_signature) = self
-            .make_has_method()?
-            .map(|(n, s)| (Some(n), Some(s)))
-            .unwrap_or((None, None));
         let (try_getter_name, try_getter_signature) = self.make_try_getter()?;
-        let (try_has_method_name, try_has_method_signature) = self
-            .make_try_has_method()?
-            .map(|(n, s)| (Some(n), Some(s)))
-            .unwrap_or((None, None));
-        Ok(Field {
-            getter_name,
-            getter_signature,
-            has_method_name,
-            has_method_signature,
-            try_getter_name,
-            try_getter_signature,
-            try_has_method_name,
-            try_has_method_signature,
-            presense: self.presense,
-            scalar_proto_type: self.scalar_proto_type,
-        })
+        let scalar_proto_type = self.scalar_proto_type.clone();
+        match &self.presense {
+            FieldPresense::Implicit => {
+                let (has_method_name, has_method_signature) = self.make_has_method()?;
+                let (try_has_method_name, try_has_method_signature) = self.make_try_has_method()?;
+                Ok(Field::Implicit {
+                    getter_name,
+                    getter_signature,
+                    has_method_name,
+                    has_method_signature,
+                    try_getter_name,
+                    try_getter_signature,
+                    try_has_method_name,
+                    try_has_method_signature,
+                    scalar_proto_type,
+                })
+            }
+            FieldPresense::Explicit => {
+                let (has_method_name, has_method_signature) = self.make_has_method()?;
+                let (try_has_method_name, try_has_method_signature) = self.make_try_has_method()?;
+                Ok(Field::Explicit {
+                    getter_name,
+                    getter_signature,
+                    has_method_name,
+                    has_method_signature,
+                    try_getter_name,
+                    try_getter_signature,
+                    try_has_method_name,
+                    try_has_method_signature,
+                    scalar_proto_type,
+                })
+            }
+            FieldPresense::Repeated => Ok(Field::Repeated {
+                getter_name,
+                getter_signature,
+                try_getter_name,
+                try_getter_signature,
+                scalar_proto_type,
+            }),
+        }
     }
 
     fn make_getter(&self) -> Result<(Ident, Signature)> {
@@ -275,19 +391,18 @@ impl FieldFactory {
         Ok((name, sig))
     }
 
-    fn make_has_method(&self) -> Result<Option<(Ident, Signature)>> {
+    fn make_has_method(&self) -> Result<(Ident, Signature)> {
         if let FieldPresense::Repeated = self.presense {
-            Ok(None)
-        } else {
-            let name = to_ident(&format!("has_{}", &self.lower_cased));
-            let has_result_type = self
-                .options
-                .result_type(&self.options.primitive_type("bool")?)?;
-            let sig: Signature = parse2(quote! {
-                fn #name(&self) -> #has_result_type
-            })?;
-            Ok(Some((name, sig)))
+            Err("has method is not allowed for repeated fields".to_string())?
         }
+        let name = to_ident(&format!("has_{}", &self.lower_cased));
+        let has_result_type = self
+            .options
+            .result_type(&self.options.primitive_type("bool")?)?;
+        let sig: Signature = parse2(quote! {
+            fn #name(&self) -> #has_result_type
+        })?;
+        Ok((name, sig))
     }
 
     fn make_try_getter(&self) -> Result<(Ident, Signature)> {
@@ -316,19 +431,18 @@ impl FieldFactory {
         Ok((name, sig))
     }
 
-    fn make_try_has_method(&self) -> Result<Option<(Ident, Signature)>> {
+    fn make_try_has_method(&self) -> Result<(Ident, Signature)> {
         if let FieldPresense::Repeated = self.presense {
-            Ok(None)
-        } else {
-            let name = to_ident(&format!("try_has_{}", &self.lower_cased));
-            let has_result_type = self
-                .options
-                .result_type(&self.options.primitive_type("bool")?)?;
-            let sig: Signature = parse2(quote! {
-                fn #name(&self) -> #has_result_type
-            })?;
-            Ok(Some((name, sig)))
+            Err("try_has method is not allowed for repeated fields".to_string())?
         }
+        let name = to_ident(&format!("try_has_{}", &self.lower_cased));
+        let has_result_type = self
+            .options
+            .result_type(&self.options.primitive_type("bool")?)?;
+        let sig: Signature = parse2(quote! {
+            fn #name(&self) -> #has_result_type
+        })?;
+        Ok((name, sig))
     }
 }
 
