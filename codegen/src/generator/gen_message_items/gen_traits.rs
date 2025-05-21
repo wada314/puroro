@@ -41,9 +41,7 @@ pub struct GenTraits {
 pub trait BlanketImplsGenerator {
     fn generate<'a>(
         &self,
-        trait_name: &Ident,
         trait_path: &Path,
-        options: Rc<CodeGeneratorOptions>,
         fields: impl Iterator<Item = &'a Field2>,
     ) -> Result<Vec<Item>>;
 }
@@ -870,6 +868,7 @@ pub struct Field2 {
     try_getter_signature: Signature,
     try_has_method_signature: Option<Signature>,
     presense: FieldPresense,
+    scalar_proto_type: FieldType<ProtoPathBuf, ProtoPathBuf>,
 }
 
 impl Field2 {
@@ -919,6 +918,7 @@ impl Field2 {
             try_getter_signature,
             try_has_method_signature,
             presense,
+            scalar_proto_type,
         })
     }
 }

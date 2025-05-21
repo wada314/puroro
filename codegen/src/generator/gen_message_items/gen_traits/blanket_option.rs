@@ -19,32 +19,37 @@ use ::puroro::Either;
 use ::quote::quote;
 use ::std::iter::once;
 use ::std::rc::Rc;
-use ::syn::{parse2, parse_str, Block, Ident, ImplItemFn, Item, Path};
+use ::syn::{parse2, parse_str, Block, Ident, ImplItemFn, Item, Path, TypePath};
 
-pub struct GenBlanketOptionImpls;
+pub struct GenBlanketOptionImpls {
+    options: Rc<CodeGeneratorOptions>,
+}
 
 impl BlanketImplsGenerator for GenBlanketOptionImpls {
     fn generate<'a>(
         &self,
-        _trait_name: &Ident,
         trait_path: &Path,
-        options: Rc<CodeGeneratorOptions>,
         fields: impl Iterator<Item = &'a Field2>,
     ) -> Result<Vec<Item>> {
-        let blanket_type_ident: Ident = parse_str("T")?;
-        let blanket_type = parse2(quote! { #blanket_type_ident })?;
-        let blanket_opt_type = options.option_type(&blanket_type)?;
+        let t: Ident = parse_str("T")?;
+        let t_opt = self.options.option_type(
+            &(TypePath {
+                qself: None,
+                path: t.clone().into(),
+            }
+            .into()),
+        )?;
 
         let methods = fields
             .map(|f| {
                 let try_getter: ImplItemFn = {
                     let signature = &f.try_getter_signature;
-                    let body = self.gen_try_get_method_body(f, &blanket_type_ident, &trait_path)?;
+                    let body = self.gen_try_get_method_body(f, &t, &trait_path)?;
                     parse2(quote! { #signature #body })?
                 };
                 let try_has_method: Option<ImplItemFn> = {
                     let signature = &f.try_has_method_signature;
-                    let body = self.gen_try_has_method_body(f, &blanket_type_ident, &trait_path)?;
+                    let body = self.gen_try_has_method_body(f, &t, &trait_path)?;
                     if let (Some(signature), Some(body)) = (signature, body) {
                         Some(parse2(quote! { #signature #body })?)
                     } else {
@@ -61,7 +66,7 @@ impl BlanketImplsGenerator for GenBlanketOptionImpls {
             .collect::<Result<Vec<_>>>()?;
 
         Ok(vec![parse2(quote! {
-            impl<T: #trait_path> #trait_path for #blanket_opt_type {
+            impl<#t: #trait_path> #trait_path for #t_opt {
                 #(#methods)*
             }
         })?])
@@ -69,6 +74,10 @@ impl BlanketImplsGenerator for GenBlanketOptionImpls {
 }
 
 impl GenBlanketOptionImpls {
+    pub fn new(options: Rc<CodeGeneratorOptions>) -> Self {
+        Self { options }
+    }
+
     fn gen_try_get_method_body(
         &self,
         field: &Field2,
@@ -82,9 +91,8 @@ impl GenBlanketOptionImpls {
                 .map(|iter_opt| iter_opt.into_iter().flatten())
             },
             FieldPresense::Explicit | FieldPresense::Implicit => quote! {
-                self.as_ref().map(<#blanket_type_ident as #trait_path>::#try_getter_name).transpose().map(
-                    |opt| opt.unwrap_or_default()
-                )
+                self.as_ref().map(<#blanket_type_ident as #trait_path>::#try_getter_name).transpose()
+                .map(|opt| opt.unwrap_or_default())
             },
         };
         Ok(parse2(quote! {

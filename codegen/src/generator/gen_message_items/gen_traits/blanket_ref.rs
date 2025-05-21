@@ -12,26 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::{BlanketImplsGenerator, Field2, FieldPresense};
+use super::{BlanketImplsGenerator, Field2};
 use crate::generator::CodeGeneratorOptions;
 use crate::Result;
 use ::puroro::Either;
 use ::quote::quote;
 use ::std::iter::once;
 use ::std::rc::Rc;
-use ::syn::{parse2, parse_str, Block, Ident, ImplItemFn, Item, Path, Signature};
+use ::syn::{parse2, parse_str, Ident, ImplItemFn, Item, Path};
 
-pub struct GenBlanketRefImpls;
+pub struct GenBlanketRefImpls {
+    #[allow(unused)]
+    options: Rc<CodeGeneratorOptions>,
+}
 
 impl BlanketImplsGenerator for GenBlanketRefImpls {
     fn generate<'a>(
         &self,
-        trait_name: &Ident,
-        _trait_path: &Path,
-        _options: Rc<CodeGeneratorOptions>,
+        trait_path: &Path,
         fields: impl Iterator<Item = &'a Field2>,
     ) -> Result<Vec<Item>> {
-        let blanket_type: Ident = parse_str("T")?;
+        let t: Ident = parse_str("T")?;
         let methods = fields
             .map(|f| {
                 let try_getter: ImplItemFn = {
@@ -39,7 +40,7 @@ impl BlanketImplsGenerator for GenBlanketRefImpls {
                     let try_getter_name = &f.try_getter_name;
                     parse2(quote! {
                         #signature {
-                            <#blanket_type as self::#trait_name>::#try_getter_name(self)
+                            <#t as #trait_path>::#try_getter_name(self)
                         }
                     })?
                 };
@@ -49,7 +50,7 @@ impl BlanketImplsGenerator for GenBlanketRefImpls {
                     if let (Some(signature), Some(try_has_name)) = (signature, try_has_name) {
                         Some(parse2(quote! {
                             #signature {
-                                <#blanket_type as self::#trait_name>::#try_has_name(self)
+                                <#t as #trait_path>::#try_has_name(self)
                             }
                         })?)
                     } else {
@@ -67,15 +68,21 @@ impl BlanketImplsGenerator for GenBlanketRefImpls {
 
         Ok(vec![
             parse2(quote! {
-                impl<T: self::#trait_name> self::#trait_name for &T {
+                impl<#t: #trait_path> #trait_path for &#t {
                     #(#methods)*
                 }
             })?,
             parse2(quote! {
-                impl<T: self::#trait_name> self::#trait_name for &mut T {
+                impl<#t: #trait_path> #trait_path for &mut #t {
                     #(#methods)*
                 }
             })?,
         ])
+    }
+}
+
+impl GenBlanketRefImpls {
+    pub fn new(options: Rc<CodeGeneratorOptions>) -> Self {
+        Self { options }
     }
 }
