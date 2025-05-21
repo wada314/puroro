@@ -96,7 +96,7 @@ impl Field {
     }
 
     fn gen_try_getter(&self) -> Result<Item> {
-        let signature = self.trait_field.gen_try_get_method_signature()?;
+        let signature = &self.trait_field.try_getter_signature;
         let number = self.number;
         let body = self
             .options
@@ -110,9 +110,9 @@ impl Field {
     }
 
     fn gen_try_getter_body(&self, field_opt_expr: &Expr) -> Result<Expr> {
-        let wire_type: WireType<_, _> = self.trait_field.scalar_type().into();
+        let wire_type: WireType<_, _> = self.trait_field.scalar_proto_type.as_ref().into();
         let field_expr: Expr = parse_str("f")?;
-        Ok(match self.trait_field.presense() {
+        Ok(match self.trait_field.presense {
             FieldPresense::Repeated => {
                 let body = match wire_type {
                     WireType::Variant(t) => {
@@ -160,7 +160,7 @@ impl Field {
     fn gen_try_non_repeated_varint_getter_body(
         &self,
         field_expr: &Expr,
-        t: VariantType<&ProtoPath>,
+        t: VariantType<impl AsRef<ProtoPath>>,
     ) -> Result<Expr> {
         let vt_type: Type = t.to_variant_integer_type(self.current_path.as_ref(), &self.options)?;
         Ok(parse2(quote! {
@@ -191,7 +191,7 @@ impl Field {
     fn gen_try_non_repeated_len_getter_body(
         &self,
         field_expr: &Expr,
-        t: LenType<&ProtoPath>,
+        t: LenType<impl AsRef<ProtoPath>>,
     ) -> Result<Expr> {
         Ok(parse2(match t {
             LenType::String => {
@@ -211,7 +211,7 @@ impl Field {
     fn gen_repeated_variant_getter_body(
         &self,
         field_expr: &Expr,
-        t: VariantType<&ProtoPath>,
+        t: VariantType<impl AsRef<ProtoPath>>,
     ) -> Result<Expr> {
         let vt_type: Type = t.to_variant_integer_type(self.current_path.as_ref(), &self.options)?;
         Ok(parse2(quote! {
@@ -233,7 +233,7 @@ impl Field {
     fn gen_repeated_len_getter_body(
         &self,
         field_expr: &Expr,
-        t: LenType<&ProtoPath>,
+        t: LenType<impl AsRef<ProtoPath>>,
     ) -> Result<Expr> {
         Ok(parse2(match t {
             LenType::String => quote! { (#field_expr).as_repeated_string() },
@@ -245,10 +245,10 @@ impl Field {
     }
 
     fn maybe_gen_try_has_method(&self) -> Result<Option<Item>> {
-        if self.trait_field.presense() == FieldPresense::Repeated {
+        if self.trait_field.presense == FieldPresense::Repeated {
             return Ok(None);
         }
-        let Some(signature) = self.trait_field.maybe_gen_try_has_method_signature()? else {
+        let Some(signature) = self.trait_field.try_has_method_signature.as_ref() else {
             return Ok(None);
         };
         Ok(Some(parse2(quote! {

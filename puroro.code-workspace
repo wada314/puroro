@@ -12,5 +12,6 @@
         {
             "path": "../quither"
         }
-    ]
+    ],
+    "settings": {}
 }

@@ -29,7 +29,7 @@ use ::quote::{format_ident, quote};
 use ::std::cell::OnceCell;
 use ::std::iter::once;
 use ::std::rc::Rc;
-use ::syn::{parse2, parse_str, Block, Expr, Ident, Item, Path, Type};
+use ::syn::{parse2, Block, Expr, Ident, Item, Path, Type};
 use ::syn::{Lifetime, Signature};
 use blanket_both::GenBlanketBothImpls;
 use blanket_either::GenBlanketEitherImpls;
@@ -41,8 +41,6 @@ pub struct GenTraits {
     rust_name: Ident,
     fields: Vec<Field>,
     options: Rc<CodeGeneratorOptions>,
-    try_getter_signatures: OnceCell<Vec<Signature>>,
-    try_has_method_signatures: OnceCell<Vec<Signature>>,
 }
 
 pub trait BlanketImplsGenerator {
@@ -67,8 +65,6 @@ impl GenTraits {
                 .map(|f| Field::try_new(f, Rc::clone(&current_path), Rc::clone(&options)))
                 .collect::<Result<Vec<_>>>()?,
             options,
-            try_getter_signatures: OnceCell::new(),
-            try_has_method_signatures: OnceCell::new(),
         })
     }
 
@@ -187,61 +183,15 @@ impl<M: AsRef<ProtoPath>, E: AsRef<ProtoPath>> FieldType<M, E> {
             },
         }
     }
-
-    pub fn gen_scalar_owned_type(
-        &self,
-        current_path: &ProtoPath,
-        allocator: &Type,
-        options: &CodeGeneratorOptions,
-    ) -> Result<Type> {
-        match self
-            .as_ref()
-            .maybe_into_primitive_type(current_path, options)?
-        {
-            Ok(primitive_type) => Ok(primitive_type),
-            Err(len_type) => match len_type {
-                LenType::Message(path) => {
-                    let path = path
-                        .as_ref()
-                        .to_relative_path(current_path)
-                        .unwrap_or(path.as_ref());
-                    let path = path.to_rust_path_with(options, |name| {
-                        let ident = GenTraits::rust_mut_name_from_message_name(name)?;
-                        Ok(parse2(quote! { #ident })?)
-                    })?;
-                    Ok(parse2(quote! { impl #path<#allocator> })?)
-                }
-                LenType::String => Ok(parse2(quote! { ::puroro::string::String<#allocator> })?),
-                LenType::Bytes => {
-                    let u8_type = options.primitive_type("u8")?;
-                    Ok(options.vec_type(&u8_type, Some(allocator))?)
-                }
-            },
-        }
-    }
-
-    pub fn gen_scalar_nonzero_type(
-        &self,
-        current_path: &ProtoPath,
-        allocator: &Type,
-        options: &CodeGeneratorOptions,
-    ) -> Result<Type> {
-        let scalar_owned_type = self.gen_scalar_owned_type(current_path, allocator, options)?;
-        if matches!(self, FieldType::Message(_)) {
-            Ok(scalar_owned_type)
-        } else {
-            Ok(parse2(quote! { ::puroro::NonEmpty<#scalar_owned_type> })?)
-        }
-    }
 }
 
 pub struct Field {
-    try_getter_name: Ident,
-    try_has_method_name: Option<Ident>,
-    try_getter_signature: Signature,
-    try_has_method_signature: Option<Signature>,
-    presense: FieldPresense,
-    scalar_proto_type: FieldType<ProtoPathBuf, ProtoPathBuf>,
+    pub try_getter_name: Ident,
+    pub try_has_method_name: Option<Ident>,
+    pub try_getter_signature: Signature,
+    pub try_has_method_signature: Option<Signature>,
+    pub presense: FieldPresense,
+    pub scalar_proto_type: FieldType<ProtoPathBuf, ProtoPathBuf>,
 }
 
 impl Field {
