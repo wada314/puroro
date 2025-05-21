@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+mod blanket_option;
+
 use crate::cases::{convert_into_case, Case};
 use crate::descriptor::{DescriptorExt, FieldDescriptorExt, FieldLabel, FieldType, LenType};
 use crate::generator::{to_ident, CodeGeneratorOptions};
@@ -28,9 +30,20 @@ pub struct GenTraits {
     rust_name: Ident,
     rust_mut_name: Ident,
     fields: Vec<Field>,
+    fields2: Vec<Field2>,
     options: Rc<CodeGeneratorOptions>,
     try_getter_signatures: OnceCell<Vec<Signature>>,
     try_has_method_signatures: OnceCell<Vec<Signature>>,
+}
+
+pub trait BlanketImplsGenerator {
+    fn generate<'a>(
+        &self,
+        trait_name: &Ident,
+        trait_path: &Path,
+        options: Rc<CodeGeneratorOptions>,
+        fields: impl Iterator<Item = &'a Field2>,
+    ) -> Result<Vec<Item>>;
 }
 
 impl GenTraits {
@@ -46,6 +59,11 @@ impl GenTraits {
                 .non_oneof_fields()?
                 .into_iter()
                 .map(|f| Field::try_new(f, Rc::clone(&current_path), Rc::clone(&options)))
+                .collect::<Result<Vec<_>>>()?,
+            fields2: desc
+                .non_oneof_fields()?
+                .into_iter()
+                .map(|f| Field2::try_new(f, Rc::clone(&current_path), Rc::clone(&options)))
                 .collect::<Result<Vec<_>>>()?,
             options,
             try_getter_signatures: OnceCell::new(),
@@ -841,5 +859,64 @@ impl<M: AsRef<ProtoPath>, E: AsRef<ProtoPath>> FieldType<M, E> {
         } else {
             Ok(parse2(quote! { ::puroro::NonEmpty<#scalar_owned_type> })?)
         }
+    }
+}
+
+pub struct Field2 {
+    try_getter_name: Ident,
+    try_has_method_name: Option<Ident>,
+    try_getter_signature: Signature,
+    try_has_method_signature: Option<Signature>,
+    presense: FieldPresense,
+}
+
+impl Field2 {
+    pub fn try_new<'a>(
+        desc: &'a FieldDescriptorExt<'a>,
+        current_proto_path: Rc<ProtoPathBuf>,
+        options: Rc<CodeGeneratorOptions>,
+    ) -> Result<Self> {
+        let lower_cased = convert_into_case(&desc.name(), Case::LowerSnakeCase);
+        let presense = FieldPresense::from_field_desc(desc);
+        let scalar_proto_type = desc.type_with_full_path()?;
+
+        let try_getter_name = to_ident(&format!("try_{}", &lower_cased));
+        let try_has_method_name = if let FieldPresense::Repeated = presense {
+            None
+        } else {
+            Some(to_ident(&format!("try_has_{}", &lower_cased)))
+        };
+
+        let scalar_ref_type =
+            scalar_proto_type.gen_scalar_maybe_ref_type(&current_proto_path, None, &options)?;
+        let getter_type = match presense {
+            FieldPresense::Repeated => {
+                let item_type = options.result_type(&scalar_ref_type)?;
+                parse2(quote! {
+                    impl ::puroro::repeated::RepeatedView<Item = #item_type>
+                })?
+            }
+            FieldPresense::Explicit | FieldPresense::Implicit => match scalar_proto_type {
+                FieldType::Message(_) => options.option_type(&scalar_ref_type)?,
+                _ => scalar_ref_type,
+            },
+        };
+        let result_type = options.result_type(&getter_type)?;
+        let try_getter_signature: Signature = parse2(quote! {
+            fn #try_getter_name(&self) -> #result_type
+        })?;
+        let try_has_method_signature: Option<Signature> = match presense {
+            FieldPresense::Repeated => None,
+            FieldPresense::Explicit | FieldPresense::Implicit => {
+                Some(parse2(quote! { fn #try_has_method_name(&self) -> bool })?)
+            }
+        };
+        Ok(Self {
+            try_getter_name,
+            try_has_method_name,
+            try_getter_signature,
+            try_has_method_signature,
+            presense,
+        })
     }
 }
