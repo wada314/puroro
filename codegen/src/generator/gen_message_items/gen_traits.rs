@@ -13,6 +13,7 @@
 // limitations under the License.
 
 mod blanket_option;
+mod blanket_ref;
 
 use crate::cases::{convert_into_case, Case};
 use crate::descriptor::{DescriptorExt, FieldDescriptorExt, FieldLabel, FieldType, LenType};
