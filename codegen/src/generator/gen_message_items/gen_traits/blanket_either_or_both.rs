@@ -30,7 +30,7 @@ impl BlanketImplsGenerator for GenBlanketEitherOrBothImpls {
     fn generate<'a>(
         &self,
         trait_path: &Path,
-        fields: impl Iterator<Item = &'a Field2>,
+        fields: Box<dyn 'a + Iterator<Item = &'a Field2>>,
     ) -> Result<Vec<Item>> {
         let t1: Ident = parse_str("T")?;
         let t2: Ident = parse_str("U")?;
@@ -98,24 +98,24 @@ impl GenBlanketEitherOrBothImpls {
                 (_, FieldType::Message(_)) => quote! {
                     #mapped_either.factor_none()
                 },
-                _ => quote! {{
-                    let (left_opt, right_opt) = self.as_ref().left_and_right();
-                    if let Some(right) = right_opt {
-                        if let Some(try_has_name) = #try_has_name {
+                _ => {
+                    // This must be Some because the field presense is not repeated.
+                    let try_has_name = try_has_name.unwrap();
+                    quote! {{
+                        let (left_opt, right_opt) = self.as_ref().left_and_right();
+                        if let Some(right) = right_opt {
                             if <#t2 as #trait_path>::#try_has_name(right)? {
                                 return <#t2 as #trait_path>::#try_getter_name(right);
                             }
                         }
-                    }
-                    if let Some(left) = left_opt {
-                        if let Some(try_has_name) = #try_has_name {
+                        if let Some(left) = left_opt {
                             if <#t1 as #trait_path>::#try_has_name(left)? {
                                 return <#t1 as #trait_path>::#try_getter_name(left);
                             }
                         }
-                    }
-                    ::std::default::Default::default()
-                }},
+                        ::std::default::Default::default()
+                    }}
+                }
             },
         )?)?;
         Ok(parse2(quote! {
@@ -136,13 +136,15 @@ impl GenBlanketEitherOrBothImpls {
         let Some(try_has_name) = &field.try_has_method_name else {
             return Ok(None);
         };
-        Ok(Some(parse2(quote! {
-            {
-                self.as_ref().right().map(<#t2 as #trait_path>::#try_has_name)
+        let expr: Expr = parse2(quote! {
+            self.as_ref().right().map(<#t2 as #trait_path>::#try_has_name)
                     .transpose()?.unwrap_or(false)
                 || self.as_ref().left().map(<#t1 as #trait_path>::#try_has_name)
                     .transpose()?.unwrap_or(false)
-            }
+        })?;
+        let result_expr = self.options.ok_value(&expr)?;
+        Ok(Some(parse2(quote! {
+            { #result_expr }
         })?))
     }
 }

@@ -29,7 +29,7 @@ impl BlanketImplsGenerator for GenBlanketOptionImpls {
     fn generate<'a>(
         &self,
         trait_path: &Path,
-        fields: impl Iterator<Item = &'a Field2>,
+        fields: Box<dyn 'a + Iterator<Item = &'a Field2>>,
     ) -> Result<Vec<Item>> {
         let t: Ident = parse_str("T")?;
         let t_opt = self.options.option_type(
@@ -112,11 +112,11 @@ impl GenBlanketOptionImpls {
         let Some(try_has_name) = &field.try_has_method_name else {
             return Ok(None);
         };
-        Ok(Some(parse2(quote! {
-            {
-                self.as_ref().map(<#blanket_type_ident as #trait_path>::#try_has_name)
-                    .unwrap_or(Ok(false))
-            }
-        })?))
+        let ok_false = self.options.ok_value(&parse2(quote! { false })?)?;
+        Ok(Some(parse2(quote! { {
+            self.as_ref()
+                .map(<#blanket_type_ident as #trait_path>::#try_has_name)
+                .unwrap_or(#ok_false)
+        } })?))
     }
 }

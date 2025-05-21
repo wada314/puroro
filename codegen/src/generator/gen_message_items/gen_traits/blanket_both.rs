@@ -30,7 +30,7 @@ impl BlanketImplsGenerator for GenBlanketBothImpls {
     fn generate<'a>(
         &self,
         trait_path: &Path,
-        fields: impl Iterator<Item = &'a Field2>,
+        fields: Box<dyn 'a + Iterator<Item = &'a Field2>>,
     ) -> Result<Vec<Item>> {
         let t1: Ident = parse_str("T")?;
         let t2: Ident = parse_str("U")?;
@@ -103,18 +103,20 @@ impl GenBlanketBothImpls {
                         <#t2 as #trait_path>::#try_getter_name,
                     )?.factor_none()
                 }},
-                _ => quote! {{
-                    let ::puroro::Both::Both(left, right) = self;
-                    if let Some(try_has_name) = #try_has_name {
+                _ => {
+                    // This must be Some because the field presense is not repeated.
+                    let try_has_name = try_has_name.unwrap();
+                    quote! {{
+                        let ::puroro::Both::Both(left, right) = self;
                         if <#t2 as #trait_path>::#try_has_name(&right)? {
                             return <#t2 as #trait_path>::#try_getter_name(&right);
                         }
                         if <#t1 as #trait_path>::#try_has_name(&left)? {
                             return <#t1 as #trait_path>::#try_getter_name(&left);
                         }
-                    }
-                    ::std::default::Default::default()
-                }},
+                        ::std::default::Default::default()
+                    }}
+                }
             },
         )?)?;
         Ok(parse2(quote! {
@@ -135,12 +137,11 @@ impl GenBlanketBothImpls {
         let Some(try_has_name) = &field.try_has_method_name else {
             return Ok(None);
         };
-        let expr = self.options.ok_value(&parse2::<Expr>(quote! {{
+        let expr: Expr = parse2(quote! { {
             let ::puroro::Both::Both(left, right) = self;
             <#t2 as #trait_path>::#try_has_name(&right)? || <#t1 as #trait_path>::#try_has_name(&left)?
-        }})?)?;
-        Ok(Some(parse2(quote! {
-            { #expr }
-        })?))
+        } })?;
+        let result_expr = self.options.ok_value(&expr)?;
+        Ok(Some(parse2(quote! { { #result_expr } })?))
     }
 }

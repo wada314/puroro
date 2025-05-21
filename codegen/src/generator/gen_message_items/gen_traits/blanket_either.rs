@@ -30,7 +30,7 @@ impl BlanketImplsGenerator for GenBlanketEitherImpls {
     fn generate<'a>(
         &self,
         trait_path: &Path,
-        fields: impl Iterator<Item = &'a Field2>,
+        fields: Box<dyn 'a + Iterator<Item = &'a Field2>>,
     ) -> Result<Vec<Item>> {
         let t1: Ident = parse_str("T")?;
         let t2: Ident = parse_str("U")?;
@@ -120,13 +120,13 @@ impl GenBlanketEitherImpls {
         let Some(try_has_name) = &field.try_has_method_name else {
             return Ok(None);
         };
-        Ok(Some(parse2(quote! {
-            {
-                self.as_ref().try_map2(
-                    |t1| <#t1 as #trait_path>::#try_has_name(t1),
-                    |t2| <#t2 as #trait_path>::#try_has_name(t2)
-                )?.into_inner()
-            }
-        })?))
+        let expr: Expr = parse2(quote! {
+            self.as_ref().try_map2(
+                |t1| <#t1 as #trait_path>::#try_has_name(t1),
+                |t2| <#t2 as #trait_path>::#try_has_name(t2)
+            )?.into_inner()
+        })?;
+        let result_expr = self.options.ok_value(&expr)?;
+        Ok(Some(parse2(quote! { { #result_expr } })?))
     }
 }

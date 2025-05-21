@@ -24,11 +24,18 @@ use crate::generator::{to_ident, CodeGeneratorOptions};
 use crate::proto_path::{ProtoPath, ProtoPathBuf};
 use crate::Result;
 use ::itertools::Itertools;
+use ::puroro::Either;
 use ::quote::{format_ident, quote};
 use ::std::cell::OnceCell;
+use ::std::iter::once;
 use ::std::rc::Rc;
 use ::syn::{parse2, parse_str, Block, Expr, Ident, Item, Path, Type};
 use ::syn::{Lifetime, Signature};
+use blanket_both::GenBlanketBothImpls;
+use blanket_either::GenBlanketEitherImpls;
+use blanket_either_or_both::GenBlanketEitherOrBothImpls;
+use blanket_option::GenBlanketOptionImpls;
+use blanket_ref::GenBlanketRefImpls;
 
 pub struct GenTraits {
     rust_name: Ident,
@@ -44,7 +51,7 @@ pub trait BlanketImplsGenerator {
     fn generate<'a>(
         &self,
         trait_path: &Path,
-        fields: impl Iterator<Item = &'a Field2>,
+        fields: Box<dyn 'a + Iterator<Item = &'a Field2>>,
     ) -> Result<Vec<Item>>;
 }
 
@@ -97,12 +104,26 @@ impl GenTraits {
     pub fn gen_items(&self) -> Result<Vec<Item>> {
         let trait_def = self.gen_message_trait()?;
         let trait_mut_def = self.gen_message_mut_trait()?;
-        let mut blanket_impls = Vec::new();
-        blanket_impls.append(&mut self.gen_blanket_ref_impls()?);
-        blanket_impls.push(self.gen_blanket_option_impl()?);
-        blanket_impls.push(self.gen_blanket_tuple_impl()?);
-        blanket_impls.push(self.gen_blanket_either_impl()?);
-        blanket_impls.push(self.gen_blanket_either_or_both_impl()?);
+        let try_trait_name = &self.rust_name;
+        let trait_path: Path = parse2(quote! { self::#try_trait_name })?;
+
+        let blanket_impl_generators: Vec<Rc<dyn BlanketImplsGenerator>> = vec![
+            Rc::new(GenBlanketRefImpls::new(Rc::clone(&self.options))),
+            Rc::new(GenBlanketOptionImpls::new(Rc::clone(&self.options))),
+            Rc::new(GenBlanketBothImpls::new(Rc::clone(&self.options))),
+            Rc::new(GenBlanketEitherImpls::new(Rc::clone(&self.options))),
+            Rc::new(GenBlanketEitherOrBothImpls::new(Rc::clone(&self.options))),
+        ];
+        let blanket_impls = blanket_impl_generators
+            .iter()
+            .map(|g| g.generate(&trait_path, Box::new(self.fields2.iter())))
+            .map(|r| match r {
+                Ok(vec) => Either::Left(vec.into_iter().map(Ok)),
+                Err(e) => Either::Right(once(Err(e))),
+            })
+            .flatten()
+            .collect::<Result<Vec<_>>>()?;
+
         Ok([trait_def, trait_mut_def]
             .into_iter()
             .chain(blanket_impls)
@@ -904,15 +925,16 @@ impl Field2 {
                 _ => scalar_ref_type,
             },
         };
-        let result_type = options.result_type(&getter_type)?;
+        let getter_result_type = options.result_type(&getter_type)?;
         let try_getter_signature: Signature = parse2(quote! {
-            fn #try_getter_name(&self) -> #result_type
+            fn #try_getter_name(&self) -> #getter_result_type
         })?;
+        let has_result_type = options.result_type(&options.primitive_type("bool")?)?;
         let try_has_method_signature: Option<Signature> = match presense {
             FieldPresense::Repeated => None,
-            FieldPresense::Explicit | FieldPresense::Implicit => {
-                Some(parse2(quote! { fn #try_has_method_name(&self) -> bool })?)
-            }
+            FieldPresense::Explicit | FieldPresense::Implicit => Some(parse2(
+                quote! { fn #try_has_method_name(&self) -> #has_result_type },
+            )?),
         };
         Ok(Self {
             try_getter_name,

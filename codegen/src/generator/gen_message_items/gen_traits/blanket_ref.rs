@@ -30,7 +30,7 @@ impl BlanketImplsGenerator for GenBlanketRefImpls {
     fn generate<'a>(
         &self,
         trait_path: &Path,
-        fields: impl Iterator<Item = &'a Field2>,
+        fields: Box<dyn 'a + Iterator<Item = &'a Field2>>,
     ) -> Result<Vec<Item>> {
         let t: Ident = parse_str("T")?;
         let methods = fields
