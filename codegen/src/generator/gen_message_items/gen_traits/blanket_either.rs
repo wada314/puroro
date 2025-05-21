@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::{BlanketImplsGenerator, Field};
+use super::{blanket_impls_helper, BlanketImplsGenerator, Field};
 use crate::descriptor::FieldType;
 use crate::generator::CodeGeneratorOptions;
 use crate::{Result, ResultExt};
@@ -35,27 +35,11 @@ impl BlanketImplsGenerator for GenBlanketEitherImpls {
         let t1: Ident = parse_str("T")?;
         let t2: Ident = parse_str("U")?;
 
-        let methods = fields
-            .map(|f| {
-                let try_getter: ImplItemFn = {
-                    let (_, signature) = f.try_getter_name_and_signature();
-                    let body = self.gen_try_get_method_body(f, &t1, &t2, &trait_path)?;
-                    parse2(quote! { #signature #body })?
-                };
-                let try_has_method: Option<ImplItemFn> = {
-                    if let Some((_, signature)) =
-                        f.try_has_method_name_and_signature_if_non_repeated()
-                    {
-                        let body = self.gen_try_has_method_body(f, &t1, &t2, &trait_path)?;
-                        Some(parse2(quote! { #signature #body })?)
-                    } else {
-                        None
-                    }
-                };
-                Ok(once(try_getter).chain(try_has_method.into_iter()))
-            })
-            .flat_map(ResultExt::transpose_iter)
-            .collect::<Result<Vec<_>>>()?;
+        let methods = blanket_impls_helper(
+            fields,
+            |f| self.gen_try_get_method_body(f, &t1, &t2, &trait_path),
+            |f| self.gen_try_has_method_body(f, &t1, &t2, &trait_path),
+        )?;
 
         Ok(vec![parse2(quote! {
             impl<#t1: #trait_path, #t2: #trait_path> #trait_path for ::puroro::Either<#t1, #t2> {

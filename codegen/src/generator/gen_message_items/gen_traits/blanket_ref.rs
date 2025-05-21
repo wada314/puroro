@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::{BlanketImplsGenerator, Field};
+use super::{blanket_impls_helper, BlanketImplsGenerator, Field};
 use crate::generator::CodeGeneratorOptions;
 use crate::{Result, ResultExt};
 use ::puroro::Either;
@@ -33,33 +33,31 @@ impl BlanketImplsGenerator for GenBlanketRefImpls {
         fields: Box<dyn 'a + Iterator<Item = &'a Field>>,
     ) -> Result<Vec<Item>> {
         let t: Ident = parse_str("T")?;
-        let methods = fields
-            .map(|f| {
-                let try_getter: ImplItemFn = {
-                    let (signature, name) = f.try_getter_name_and_signature();
-                    parse2(quote! {
+
+        let methods = blanket_impls_helper(
+            fields,
+            |f| {
+                let (signature, name) = f.try_getter_name_and_signature();
+                Ok(parse2(quote! {
+                    #signature {
+                        <#t as #trait_path>::#name(self)
+                    }
+                })?)
+            },
+            |f| {
+                if let Some((name, signature)) =
+                    f.try_has_method_name_and_signature_if_non_repeated()
+                {
+                    Ok(parse2(quote! {
                         #signature {
                             <#t as #trait_path>::#name(self)
                         }
-                    })?
-                };
-                let try_has_method: Option<ImplItemFn> = {
-                    if let Some((signature, name)) =
-                        f.try_has_method_name_and_signature_if_non_repeated()
-                    {
-                        Some(parse2(quote! {
-                            #signature {
-                                <#t as #trait_path>::#name(self)
-                            }
-                        })?)
-                    } else {
-                        None
-                    }
-                };
-                Ok(once(try_getter).chain(try_has_method.into_iter()))
-            })
-            .flat_map(ResultExt::transpose_iter)
-            .collect::<Result<Vec<_>>>()?;
+                    })?)
+                } else {
+                    Err("this method is not supported for repeated fields".to_string())?
+                }
+            },
+        )?;
 
         Ok(vec![
             parse2(quote! {

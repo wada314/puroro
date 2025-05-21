@@ -22,12 +22,12 @@ use crate::cases::{convert_into_case, Case};
 use crate::descriptor::{DescriptorExt, FieldDescriptorExt, FieldLabel, FieldType, LenType};
 use crate::generator::{to_ident, CodeGeneratorOptions};
 use crate::proto_path::{ProtoPath, ProtoPathBuf};
-use crate::Result;
+use crate::{Result, ResultExt};
 use ::puroro::Either;
 use ::quote::{format_ident, quote};
 use ::std::iter::once;
 use ::std::rc::Rc;
-use ::syn::{parse2, Ident, Item, Path, Type};
+use ::syn::{parse2, Block, Ident, ImplItemFn, Item, Path, Type};
 use ::syn::{Lifetime, Signature};
 use blanket_both::GenBlanketBothImpls;
 use blanket_either::GenBlanketEitherImpls;
@@ -48,6 +48,40 @@ pub trait BlanketImplsGenerator {
         trait_path: &Path,
         fields: Box<dyn 'a + Iterator<Item = &'a Field>>,
     ) -> Result<Vec<Item>>;
+}
+
+fn blanket_impls_helper<'a, F, G>(
+    fields: Box<dyn 'a + Iterator<Item = &'a Field>>,
+    gen_try_getter: F,
+    gen_try_has_method: G,
+) -> Result<Vec<ImplItemFn>>
+where
+    F: Fn(&Field) -> Result<Block>,
+    G: Fn(&Field) -> Result<Block>,
+{
+    fields
+        .map(|f| {
+            let try_getter: ImplItemFn = {
+                let (_, signature) = f.try_getter_name_and_signature();
+                let body = gen_try_getter(f)?;
+                parse2(quote! {
+                    #signature #body
+                })?
+            };
+            let try_has_method: Option<ImplItemFn> = {
+                if let Some((_, signature)) = f.has_method_name_and_signature_if_non_repeated() {
+                    let body = gen_try_has_method(f)?;
+                    Some(parse2(quote! {
+                        #signature #body
+                    })?)
+                } else {
+                    None
+                }
+            };
+            Ok(once(try_getter).chain(try_has_method.into_iter()))
+        })
+        .flat_map(ResultExt::transpose_iter)
+        .collect::<Result<Vec<_>>>()
 }
 
 impl GenTraits {

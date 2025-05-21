@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::{BlanketImplsGenerator, Field};
+use super::{blanket_impls_helper, BlanketImplsGenerator, Field};
 use crate::generator::CodeGeneratorOptions;
 use crate::{Result, ResultExt};
 use ::puroro::Either;
@@ -40,27 +40,11 @@ impl BlanketImplsGenerator for GenBlanketOptionImpls {
             .into()),
         )?;
 
-        let methods = fields
-            .map(|f| {
-                let try_getter: ImplItemFn = {
-                    let signature = f.try_getter_name_and_signature().1;
-                    let body = self.gen_try_get_method_body(f, &t, &trait_path)?;
-                    parse2(quote! { #signature #body })?
-                };
-                let try_has_method: Option<ImplItemFn> = {
-                    if let Some((_, signature)) =
-                        f.try_has_method_name_and_signature_if_non_repeated()
-                    {
-                        let body = self.gen_try_has_method_body(f, &t, &trait_path)?;
-                        Some(parse2(quote! { #signature #body })?)
-                    } else {
-                        None
-                    }
-                };
-                Ok(once(try_getter).chain(try_has_method.into_iter()))
-            })
-            .flat_map(ResultExt::transpose_iter)
-            .collect::<Result<Vec<_>>>()?;
+        let methods = blanket_impls_helper(
+            fields,
+            |f| self.gen_try_get_method_body(f, &t, &trait_path),
+            |f| self.gen_try_has_method_body(f, &t, &trait_path),
+        )?;
 
         Ok(vec![parse2(quote! {
             impl<#t: #trait_path> #trait_path for #t_opt {
@@ -78,17 +62,17 @@ impl GenBlanketOptionImpls {
     fn gen_try_get_method_body(
         &self,
         field: &Field,
-        blanket_type_ident: &Ident,
+        t: &Ident,
         trait_path: &Path,
     ) -> Result<Block> {
         let (try_getter_name, _) = field.try_getter_name_and_signature();
         let stmts = match field {
             Field::Repeated { .. } => quote! {
-                self.as_ref().map(<#blanket_type_ident as #trait_path>::#try_getter_name).transpose()
+                self.as_ref().map(<#t as #trait_path>::#try_getter_name).transpose()
                 .map(|iter_opt| iter_opt.into_iter().flatten())
             },
             Field::Explicit { .. } | Field::Implicit { .. } => quote! {
-                self.as_ref().map(<#blanket_type_ident as #trait_path>::#try_getter_name).transpose()
+                self.as_ref().map(<#t as #trait_path>::#try_getter_name).transpose()
                 .map(|opt| opt.unwrap_or_default())
             },
         };
@@ -100,7 +84,7 @@ impl GenBlanketOptionImpls {
     fn gen_try_has_method_body(
         &self,
         field: &Field,
-        blanket_type_ident: &Ident,
+        t: &Ident,
         trait_path: &Path,
     ) -> Result<Block> {
         let Some((try_has_name, _)) = field.try_has_method_name_and_signature_if_non_repeated()
@@ -110,7 +94,7 @@ impl GenBlanketOptionImpls {
         let ok_false = self.options.ok_value(&parse2(quote! { false })?)?;
         Ok(parse2(quote! { {
             self.as_ref()
-                .map(<#blanket_type_ident as #trait_path>::#try_has_name)
+                .map(<#t as #trait_path>::#try_has_name)
                 .unwrap_or(#ok_false)
         } })?)
     }
