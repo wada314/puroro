@@ -24,17 +24,16 @@ use ::std::rc::Rc;
 use ::syn::{parse2, parse_str, Block, Expr, Ident, Item, Path, Type};
 use ::syn::{Lifetime, Signature};
 
-pub struct GenTrait {
+pub struct GenTraits {
     rust_name: Ident,
     rust_mut_name: Ident,
     fields: Vec<Field>,
     options: Rc<CodeGeneratorOptions>,
-    getter_signatures: OnceCell<Vec<Signature>>,
     try_getter_signatures: OnceCell<Vec<Signature>>,
     try_has_method_signatures: OnceCell<Vec<Signature>>,
 }
 
-impl GenTrait {
+impl GenTraits {
     pub fn try_new<'a>(
         desc: &'a DescriptorExt<'a>,
         options: Rc<CodeGeneratorOptions>,
@@ -49,7 +48,6 @@ impl GenTrait {
                 .map(|f| Field::try_new(f, Rc::clone(&current_path), Rc::clone(&options)))
                 .collect::<Result<Vec<_>>>()?,
             options,
-            getter_signatures: OnceCell::new(),
             try_getter_signatures: OnceCell::new(),
             try_has_method_signatures: OnceCell::new(),
         })
@@ -101,17 +99,6 @@ impl GenTrait {
                 #(#try_has_methods;)*
             }
         })?)
-    }
-
-    fn gen_getter_signatures(&self) -> Result<&[Signature]> {
-        self.getter_signatures
-            .get_or_try_init(|| {
-                self.fields
-                    .iter()
-                    .map(Field::gen_get_method_signature)
-                    .collect::<Result<Vec<_>>>()
-            })
-            .map(Vec::as_slice)
     }
 
     fn gen_try_getter_signatures(&self) -> Result<&[Signature]> {
@@ -793,7 +780,7 @@ impl<M: AsRef<ProtoPath>, E: AsRef<ProtoPath>> FieldType<M, E> {
                         .to_relative_path(current_path)
                         .unwrap_or(path.as_ref());
                     let path = path.to_rust_path_with(options, |name| {
-                        let ident = GenTrait::rust_name_from_message_name(name)?;
+                        let ident = GenTraits::rust_name_from_message_name(name)?;
                         Ok(parse2(quote! { #ident })?)
                     })?;
                     Ok(parse2(quote! { impl #(#lifetime +)* #path })?)
@@ -828,7 +815,7 @@ impl<M: AsRef<ProtoPath>, E: AsRef<ProtoPath>> FieldType<M, E> {
                         .to_relative_path(current_path)
                         .unwrap_or(path.as_ref());
                     let path = path.to_rust_path_with(options, |name| {
-                        let ident = GenTrait::rust_mut_name_from_message_name(name)?;
+                        let ident = GenTraits::rust_mut_name_from_message_name(name)?;
                         Ok(parse2(quote! { #ident })?)
                     })?;
                     Ok(parse2(quote! { impl #path<#allocator> })?)

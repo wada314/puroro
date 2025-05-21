@@ -13,7 +13,6 @@
 // limitations under the License.
 
 #![feature(allocator_api)]
-#![feature(slice_as_chunks)]
 #![feature(assert_matches)]
 #![feature(once_cell_try)]
 #![feature(once_cell_try_insert)]

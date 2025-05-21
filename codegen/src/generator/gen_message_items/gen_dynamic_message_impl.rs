@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::gen_message_trait::{Field as TraitField, FieldPresense, GenTrait};
+use super::gen_traits::{Field as TraitField, FieldPresense, GenTraits};
 use crate::descriptor::{
     DescriptorExt, FieldDescriptorExt, I32Type, I64Type, LenType, VariantType, WireType,
 };
@@ -38,7 +38,7 @@ impl GenDynamicMessageImpls {
     ) -> Result<Self> {
         let current_path = Rc::new(desc.current_path().to_owned());
         Ok(Self {
-            rust_trait_name: GenTrait::rust_name_from_message_name(desc.name())?,
+            rust_trait_name: GenTraits::rust_name_from_message_name(desc.name())?,
             fields: desc
                 .non_oneof_fields()?
                 .into_iter()

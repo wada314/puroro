@@ -13,10 +13,10 @@
 // limitations under the License.
 
 pub mod gen_dynamic_message_impl;
-pub mod gen_message_trait;
+pub mod gen_traits;
 
 use self::gen_dynamic_message_impl::GenDynamicMessageImpls;
-use self::gen_message_trait::GenTrait;
+use self::gen_traits::GenTraits;
 use super::CodeGeneratorOptions;
 use crate::descriptor::DescriptorExt;
 use crate::Result;
@@ -24,7 +24,7 @@ use ::std::rc::Rc;
 use ::syn::Item;
 
 pub struct GenMessageItems {
-    gen_trait: GenTrait,
+    gen_trait: GenTraits,
     gen_gm_impls: GenDynamicMessageImpls,
     #[allow(unused)]
     options: Rc<CodeGeneratorOptions>,
@@ -36,7 +36,7 @@ impl GenMessageItems {
         options: Rc<CodeGeneratorOptions>,
     ) -> Result<Self> {
         Ok(Self {
-            gen_trait: GenTrait::try_new(desc, Rc::clone(&options))?,
+            gen_trait: GenTraits::try_new(desc, Rc::clone(&options))?,
             gen_gm_impls: GenDynamicMessageImpls::try_new(desc, Rc::clone(&options))?,
             options,
         })
