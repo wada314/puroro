@@ -59,7 +59,8 @@ impl GenBlanketBothImpls {
         t2: &Ident,
         trait_path: &Path,
     ) -> Result<Block> {
-        let (try_getter_name, _) = field.try_getter_name_and_signature();
+        let signature = field.try_getter_signature();
+        let try_getter_name = &signature.ident;
         let expr = self.options.ok_value(&parse2::<Expr>(match field {
             Field::Repeated {
                 scalar_proto_type: FieldType::Message(_),
@@ -91,13 +92,14 @@ impl GenBlanketBothImpls {
                 )?.factor_none()
             }},
             Field::Explicit {
-                try_has_method_name,
+                try_has_method_signature,
                 ..
             }
             | Field::Implicit {
-                try_has_method_name,
+                try_has_method_signature,
                 ..
             } => {
+                let try_has_method_name = &try_has_method_signature.ident;
                 quote! {{
                     let ::puroro::Both::Both(left, right) = self;
                     if <#t2 as #trait_path>::#try_has_method_name(&right)? {
@@ -122,10 +124,10 @@ impl GenBlanketBothImpls {
         t2: &Ident,
         trait_path: &Path,
     ) -> Result<Block> {
-        let Some((try_has_name, _)) = field.try_has_method_name_and_signature_if_non_repeated()
-        else {
+        let Some(signature) = field.try_has_method_signature_if_non_repeated() else {
             Err("this method is not supported for repeated fields".to_string())?
         };
+        let try_has_name = &signature.ident;
         let expr: Expr = parse2(quote! { {
             let ::puroro::Both::Both(left, right) = self;
             <#t2 as #trait_path>::#try_has_name(&right)? || <#t1 as #trait_path>::#try_has_name(&left)?

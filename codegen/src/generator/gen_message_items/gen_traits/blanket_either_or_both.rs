@@ -59,7 +59,8 @@ impl GenBlanketEitherOrBothImpls {
         t2: &Ident,
         trait_path: &Path,
     ) -> Result<Block> {
-        let (try_getter_name, _) = field.try_getter_name_and_signature();
+        let signature = field.try_getter_signature();
+        let try_getter_name = &signature.ident;
         let mapped_either: Expr = parse2(quote! {
             self.as_ref().try_map2(
                 <#t1 as #trait_path>::#try_getter_name,
@@ -86,13 +87,14 @@ impl GenBlanketEitherOrBothImpls {
                 #mapped_either.factor_none()
             },
             Field::Explicit {
-                try_has_method_name,
+                try_has_method_signature,
                 ..
             }
             | Field::Implicit {
-                try_has_method_name,
+                try_has_method_signature,
                 ..
             } => {
+                let try_has_method_name = &try_has_method_signature.ident;
                 quote! {{
                     let (left_opt, right_opt) = self.as_ref().left_and_right();
                     if let Some(right) = right_opt {
@@ -121,10 +123,10 @@ impl GenBlanketEitherOrBothImpls {
         t2: &Ident,
         trait_path: &Path,
     ) -> Result<Block> {
-        let Some((try_has_name, _)) = field.try_has_method_name_and_signature_if_non_repeated()
-        else {
+        let Some(signature) = field.try_has_method_signature_if_non_repeated() else {
             Err("this method is not supported for repeated fields".to_string())?
         };
+        let try_has_name = &signature.ident;
         let expr: Expr = parse2(quote! {
             self.as_ref().right().map(<#t2 as #trait_path>::#try_has_name)
                     .transpose()?.unwrap_or(false)

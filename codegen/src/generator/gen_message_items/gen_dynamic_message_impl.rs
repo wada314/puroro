@@ -96,7 +96,7 @@ impl Field {
     }
 
     fn gen_try_getter(&self) -> Result<Item> {
-        let (_, signature) = self.trait_field.try_getter_name_and_signature();
+        let signature = self.trait_field.try_getter_signature();
         let number = self.number;
         let body = self
             .options
@@ -255,10 +255,7 @@ impl Field {
     }
 
     fn maybe_gen_try_has_method(&self) -> Result<Option<Item>> {
-        let Some((_, signature)) = self
-            .trait_field
-            .try_has_method_name_and_signature_if_non_repeated()
-        else {
+        let Some(signature) = self.trait_field.try_has_method_signature_if_non_repeated() else {
             return Ok(None);
         };
         Ok(Some(parse2(quote! {

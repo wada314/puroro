@@ -35,22 +35,13 @@ impl BlanketImplsGenerator for GenBlanketRefImpls {
         let methods = blanket_impls_helper(
             fields,
             |f| {
-                let (signature, name) = f.try_getter_name_and_signature();
-                Ok(parse2(quote! {
-                    #signature {
-                        <#t as #trait_path>::#name(self)
-                    }
-                })?)
+                let name = &f.try_getter_signature().ident;
+                Ok(parse2(quote! { { <#t as #trait_path>::#name(self) } })?)
             },
             |f| {
-                if let Some((name, signature)) =
-                    f.try_has_method_name_and_signature_if_non_repeated()
-                {
-                    Ok(parse2(quote! {
-                        #signature {
-                            <#t as #trait_path>::#name(self)
-                        }
-                    })?)
+                if let Some(signature) = f.try_has_method_signature_if_non_repeated() {
+                    let name = &signature.ident;
+                    Ok(parse2(quote! { { <#t as #trait_path>::#name(self) } })?)
                 } else {
                     Err("this method is not supported for repeated fields".to_string())?
                 }

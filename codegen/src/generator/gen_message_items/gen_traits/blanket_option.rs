@@ -63,7 +63,8 @@ impl GenBlanketOptionImpls {
         t: &Ident,
         trait_path: &Path,
     ) -> Result<Block> {
-        let (try_getter_name, _) = field.try_getter_name_and_signature();
+        let signature = field.try_getter_signature();
+        let try_getter_name = &signature.ident;
         let stmts = match field {
             Field::Repeated { .. } => quote! {
                 self.as_ref().map(<#t as #trait_path>::#try_getter_name).transpose()
@@ -85,10 +86,10 @@ impl GenBlanketOptionImpls {
         t: &Ident,
         trait_path: &Path,
     ) -> Result<Block> {
-        let Some((try_has_name, _)) = field.try_has_method_name_and_signature_if_non_repeated()
-        else {
+        let Some(signature) = field.try_has_method_signature_if_non_repeated() else {
             Err("this method is not supported for repeated fields".to_string())?
         };
+        let try_has_name = &signature.ident;
         let ok_false = self.options.ok_value(&parse2(quote! { false })?)?;
         Ok(parse2(quote! { {
             self.as_ref()
