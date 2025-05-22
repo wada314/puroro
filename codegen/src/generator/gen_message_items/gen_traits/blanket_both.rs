@@ -27,29 +27,110 @@ pub struct GenBlanketBothImpls {
 impl BlanketImplsGenerator for GenBlanketBothImpls {
     fn generate<'a>(
         &self,
-        trait_path: &Path,
+        view_trait_path: &Path,
+        try_view_trait_path: &Path,
         fields: Box<dyn 'a + Iterator<Item = &'a Field>>,
     ) -> Result<Vec<Item>> {
         let t1: Ident = parse_str("T")?;
         let t2: Ident = parse_str("U")?;
+        let fields: Vec<_> = fields.collect();
 
-        let methods = blanket_impls_helper(
-            fields,
-            |f| self.gen_try_get_method_body(f, &t1, &t2, &trait_path),
-            |f| self.gen_try_has_method_body(f, &t1, &t2, &trait_path),
+        let view_methods = blanket_impls_helper(
+            fields.iter().copied(),
+            |f| self.gen_get_method_body(f, &t1, &t2, &view_trait_path),
+            |f| self.gen_has_method_body(f, &t1, &t2, &view_trait_path),
+            false,
         )?;
 
-        Ok(vec![parse2(quote! {
-            impl<#t1: #trait_path, #t2: #trait_path> #trait_path for ::puroro::Both<#t1, #t2> {
-                #(#methods)*
-            }
-        })?])
+        let try_methods = blanket_impls_helper(
+            fields.iter().copied(),
+            |f| self.gen_try_get_method_body(f, &t1, &t2, &try_view_trait_path),
+            |f| self.gen_try_has_method_body(f, &t1, &t2, &try_view_trait_path),
+            true,
+        )?;
+
+        Ok(vec![
+            parse2(quote! {
+                impl<#t1: #view_trait_path, #t2: #view_trait_path> #view_trait_path for ::puroro::Both<#t1, #t2> {
+                    #(#view_methods)*
+                }
+            })?,
+            parse2(quote! {
+                impl<#t1: #try_view_trait_path, #t2: #try_view_trait_path> #try_view_trait_path for ::puroro::Both<#t1, #t2> {
+                    #(#try_methods)*
+                }
+            })?,
+        ])
     }
 }
 
 impl GenBlanketBothImpls {
     pub fn new(options: Rc<CodeGeneratorOptions>) -> Self {
         Self { options }
+    }
+
+    fn gen_get_method_body(
+        &self,
+        field: &Field,
+        t1: &Ident,
+        t2: &Ident,
+        trait_path: &Path,
+    ) -> Result<Block> {
+        let signature = field.getter_signature();
+        let getter_name = &signature.ident;
+        let expr = &parse2::<Expr>(match field {
+            Field::Repeated {
+                scalar_proto_type: FieldType::Message(_),
+                ..
+            } => quote! {{
+                self.as_ref().map2(
+                    <#t1 as #trait_path>::#getter_name,
+                    <#t2 as #trait_path>::#getter_name,
+                ).into_iter_either()
+            }},
+            Field::Repeated { .. } => quote! {{
+                self.as_ref().map2(
+                    <#t1 as #trait_path>::#getter_name,
+                    <#t2 as #trait_path>::#getter_name,
+                ).into_iter_chained()
+            }},
+            Field::Explicit {
+                scalar_proto_type: FieldType::Message(_),
+                ..
+            }
+            | Field::Implicit {
+                scalar_proto_type: FieldType::Message(_),
+                ..
+            } => quote! {{
+                self.as_ref().map2(
+                    <#t1 as #trait_path>::#getter_name,
+                    <#t2 as #trait_path>::#getter_name,
+                ).factor_none()
+            }},
+            Field::Explicit {
+                has_method_signature,
+                ..
+            }
+            | Field::Implicit {
+                has_method_signature,
+                ..
+            } => {
+                let has_method_name = &has_method_signature.ident;
+                quote! {{
+                    let ::puroro::Both::Both(left, right) = self;
+                    if <#t2 as #trait_path>::#has_method_name(&right) {
+                        return <#t2 as #trait_path>::#getter_name(&right);
+                    }
+                    if <#t1 as #trait_path>::#has_method_name(&left) {
+                        return <#t1 as #trait_path>::#getter_name(&left);
+                    }
+                    ::std::default::Default::default()
+                }}
+            }
+        })?;
+        Ok(parse2(quote! {
+            { #expr }
+        })?)
     }
 
     fn gen_try_get_method_body(
@@ -115,6 +196,24 @@ impl GenBlanketBothImpls {
         Ok(parse2(quote! {
             { #expr }
         })?)
+    }
+
+    fn gen_has_method_body(
+        &self,
+        field: &Field,
+        t1: &Ident,
+        t2: &Ident,
+        trait_path: &Path,
+    ) -> Result<Block> {
+        let Some(signature) = field.has_method_signature_if_non_repeated() else {
+            Err("this method is not supported for repeated fields".to_string())?
+        };
+        let has_name = &signature.ident;
+        let expr: Expr = parse2(quote! { {
+            let ::puroro::Both::Both(left, right) = self;
+            <#t2 as #trait_path>::#has_name(&right) || <#t1 as #trait_path>::#has_name(&left)
+        } })?;
+        Ok(parse2(quote! { { #expr } })?)
     }
 
     fn gen_try_has_method_body(

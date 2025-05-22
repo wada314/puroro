@@ -27,7 +27,8 @@ pub struct GenBlanketRefImpls {
 impl BlanketImplsGenerator for GenBlanketRefImpls {
     fn generate<'a>(
         &self,
-        trait_path: &Path,
+        view_trait_path: &Path,
+        try_view_trait_path: &Path,
         fields: Box<dyn 'a + Iterator<Item = &'a Field>>,
     ) -> Result<Vec<Item>> {
         let t: Ident = parse_str("T")?;
@@ -36,26 +37,31 @@ impl BlanketImplsGenerator for GenBlanketRefImpls {
             fields,
             |f| {
                 let name = &f.try_getter_signature().ident;
-                Ok(parse2(quote! { { <#t as #trait_path>::#name(self) } })?)
+                Ok(parse2(
+                    quote! { { <#t as #try_view_trait_path>::#name(self) } },
+                )?)
             },
             |f| {
                 if let Some(signature) = f.try_has_method_signature_if_non_repeated() {
                     let name = &signature.ident;
-                    Ok(parse2(quote! { { <#t as #trait_path>::#name(self) } })?)
+                    Ok(parse2(
+                        quote! { { <#t as #try_view_trait_path>::#name(self) } },
+                    )?)
                 } else {
                     Err("this method is not supported for repeated fields".to_string())?
                 }
             },
+            true,
         )?;
 
         Ok(vec![
             parse2(quote! {
-                impl<#t: #trait_path> #trait_path for &#t {
+                impl<#t: #try_view_trait_path> #try_view_trait_path for &#t {
                     #(#methods)*
                 }
             })?,
             parse2(quote! {
-                impl<#t: #trait_path> #trait_path for &mut #t {
+                impl<#t: #try_view_trait_path> #try_view_trait_path for &mut #t {
                     #(#methods)*
                 }
             })?,

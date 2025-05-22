@@ -27,7 +27,8 @@ pub struct GenBlanketEitherOrBothImpls {
 impl BlanketImplsGenerator for GenBlanketEitherOrBothImpls {
     fn generate<'a>(
         &self,
-        trait_path: &Path,
+        view_trait_path: &Path,
+        try_view_trait_path: &Path,
         fields: Box<dyn 'a + Iterator<Item = &'a Field>>,
     ) -> Result<Vec<Item>> {
         let t1: Ident = parse_str("T")?;
@@ -35,12 +36,13 @@ impl BlanketImplsGenerator for GenBlanketEitherOrBothImpls {
 
         let methods = blanket_impls_helper(
             fields,
-            |f| self.gen_try_get_method_body(f, &t1, &t2, &trait_path),
-            |f| self.gen_try_has_method_body(f, &t1, &t2, &trait_path),
+            |f| self.gen_try_get_method_body(f, &t1, &t2, &try_view_trait_path),
+            |f| self.gen_try_has_method_body(f, &t1, &t2, &try_view_trait_path),
+            true,
         )?;
 
         Ok(vec![parse2(quote! {
-            impl<#t1: #trait_path, #t2: #trait_path> #trait_path for ::puroro::EitherOrBoth<#t1, #t2> {
+            impl<#t1: #try_view_trait_path, #t2: #try_view_trait_path> #try_view_trait_path for ::puroro::EitherOrBoth<#t1, #t2> {
                 #(#methods)*
             }
         })?])

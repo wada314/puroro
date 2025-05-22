@@ -45,15 +45,17 @@ pub struct GenTraits {
 pub trait BlanketImplsGenerator {
     fn generate<'a>(
         &self,
-        trait_path: &Path,
+        view_trait_path: &Path,
+        try_view_trait_path: &Path,
         fields: Box<dyn 'a + Iterator<Item = &'a Field>>,
     ) -> Result<Vec<Item>>;
 }
 
 fn blanket_impls_helper<'a, F, G>(
-    fields: Box<dyn 'a + Iterator<Item = &'a Field>>,
-    gen_try_getter: F,
-    gen_try_has_method: G,
+    fields: impl Iterator<Item = &'a Field>,
+    gen_getter: F,
+    gen_has_method: G,
+    is_try_trait: bool,
 ) -> Result<Vec<ImplItemFn>>
 where
     F: Fn(&Field) -> Result<Block>,
@@ -62,15 +64,23 @@ where
     fields
         .map(|f| {
             let try_getter: ImplItemFn = {
-                let signature = f.try_getter_signature();
-                let body = gen_try_getter(f)?;
+                let signature = if is_try_trait {
+                    f.try_getter_signature()
+                } else {
+                    f.getter_signature()
+                };
+                let body = gen_getter(f)?;
                 parse2(quote! {
                     #signature #body
                 })?
             };
             let try_has_method: Option<ImplItemFn> = {
-                if let Some(signature) = f.try_has_method_signature_if_non_repeated() {
-                    let body = gen_try_has_method(f)?;
+                if let Some(signature) = if is_try_trait {
+                    f.try_has_method_signature_if_non_repeated()
+                } else {
+                    f.has_method_signature_if_non_repeated()
+                } {
+                    let body = gen_has_method(f)?;
                     Some(parse2(quote! {
                         #signature #body
                     })?)
@@ -118,6 +128,8 @@ impl GenTraits {
 
     pub fn gen_items(&self) -> Result<Vec<Item>> {
         let view_trait_def = self.gen_view_trait()?;
+        let view_trait_name = &self.view_trait_name;
+        let view_trait_path: Path = parse2(quote! { self::#view_trait_name })?;
         let try_trait_def = self.gen_try_view_trait()?;
         let try_trait_name = &self.try_view_trait_name;
         let try_trait_path: Path = parse2(quote! { self::#try_trait_name })?;
@@ -131,7 +143,13 @@ impl GenTraits {
         ];
         let blanket_impls = blanket_impl_generators
             .iter()
-            .map(|g| g.generate(&try_trait_path, Box::new(self.fields.iter())))
+            .map(|g| {
+                g.generate(
+                    &view_trait_path,
+                    &try_trait_path,
+                    Box::new(self.fields.iter()),
+                )
+            })
             .map(|r| match r {
                 Ok(vec) => Either::Left(vec.into_iter().map(Ok)),
                 Err(e) => Either::Right(once(Err(e))),

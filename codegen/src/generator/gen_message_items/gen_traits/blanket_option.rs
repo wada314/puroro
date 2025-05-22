@@ -26,7 +26,8 @@ pub struct GenBlanketOptionImpls {
 impl BlanketImplsGenerator for GenBlanketOptionImpls {
     fn generate<'a>(
         &self,
-        trait_path: &Path,
+        view_trait_path: &Path,
+        try_view_trait_path: &Path,
         fields: Box<dyn 'a + Iterator<Item = &'a Field>>,
     ) -> Result<Vec<Item>> {
         let t: Ident = parse_str("T")?;
@@ -40,12 +41,13 @@ impl BlanketImplsGenerator for GenBlanketOptionImpls {
 
         let methods = blanket_impls_helper(
             fields,
-            |f| self.gen_try_get_method_body(f, &t, &trait_path),
-            |f| self.gen_try_has_method_body(f, &t, &trait_path),
+            |f| self.gen_try_get_method_body(f, &t, &try_view_trait_path),
+            |f| self.gen_try_has_method_body(f, &t, &try_view_trait_path),
+            true,
         )?;
 
         Ok(vec![parse2(quote! {
-            impl<#t: #trait_path> #trait_path for #t_opt {
+            impl<#t: #try_view_trait_path> #try_view_trait_path for #t_opt {
                 #(#methods)*
             }
         })?])
