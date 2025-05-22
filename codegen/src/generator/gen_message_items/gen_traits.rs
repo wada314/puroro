@@ -117,6 +117,7 @@ impl GenTraits {
     }
 
     pub fn gen_items(&self) -> Result<Vec<Item>> {
+        let view_trait_def = self.gen_view_trait()?;
         let try_trait_def = self.gen_try_view_trait()?;
         let try_trait_name = &self.try_view_trait_name;
         let try_trait_path: Path = parse2(quote! { self::#try_trait_name })?;
@@ -138,7 +139,31 @@ impl GenTraits {
             .flatten()
             .collect::<Result<Vec<_>>>()?;
 
-        Ok(once(try_trait_def).chain(blanket_impls).collect())
+        Ok([view_trait_def, try_trait_def]
+            .into_iter()
+            .chain(blanket_impls)
+            .collect())
+    }
+
+    fn gen_view_trait(&self) -> Result<Item> {
+        let trait_name = &self.view_trait_name;
+        let try_trait_name = &self.try_view_trait_name;
+        let getters = self
+            .fields
+            .iter()
+            .map(|f| f.getter_signature())
+            .collect::<Vec<_>>();
+        let has_methods = self
+            .fields
+            .iter()
+            .filter_map(|f| f.has_method_signature_if_non_repeated())
+            .collect::<Vec<_>>();
+        Ok(parse2(quote! {
+            pub trait #trait_name: self::#try_trait_name {
+                #(#getters;)*
+                #(#has_methods;)*
+            }
+        })?)
     }
 
     fn gen_try_view_trait(&self) -> Result<Item> {
@@ -371,20 +396,16 @@ impl FieldFactory {
             &self.options,
         )?;
         let getter_type = match self.presense {
-            FieldPresense::Repeated => {
-                let item_type = self.options.result_type(&scalar_ref_type)?;
-                parse2(quote! {
-                    impl ::puroro::repeated::RepeatedView<Item = #item_type>
-                })?
-            }
+            FieldPresense::Repeated => parse2(quote! {
+                impl ::puroro::repeated::RepeatedView<Item = #scalar_ref_type>
+            })?,
             FieldPresense::Explicit | FieldPresense::Implicit => match self.scalar_proto_type {
                 FieldType::Message(_) => self.options.option_type(&scalar_ref_type)?,
                 _ => scalar_ref_type,
             },
         };
-        let getter_result_type = self.options.result_type(&getter_type)?;
         let sig: Signature = parse2(quote! {
-            fn #name(&self) -> #getter_result_type
+            fn #name(&self) -> #getter_type
         })?;
         Ok(sig)
     }
@@ -394,11 +415,9 @@ impl FieldFactory {
             Err("has method is not allowed for repeated fields".to_string())?
         }
         let name = to_ident(&format!("has_{}", &self.lower_cased));
-        let has_result_type = self
-            .options
-            .result_type(&self.options.primitive_type("bool")?)?;
+        let bool_type = self.options.primitive_type("bool")?;
         let sig: Signature = parse2(quote! {
-            fn #name(&self) -> #has_result_type
+            fn #name(&self) -> #bool_type
         })?;
         Ok(sig)
     }
