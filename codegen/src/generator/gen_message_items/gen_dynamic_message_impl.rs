@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::gen_traits::{Field as TraitField, GenTraits, ImplsGenerator};
+use super::gen_traits::{Field, GenTraits, ImplsGenerator};
 use crate::descriptor::{
     DescriptorExt, FieldDescriptorExt, I32Type, I64Type, LenType, VariantType, WireType,
 };
@@ -26,90 +26,20 @@ use ::syn::{Expr, Type};
 
 // Implementation generator for DynamicMessage type using ImplsGenerator trait
 pub struct DynamicMessageImplsGenerator {
-    rust_trait_name: Ident,
-    fields: Vec<Field>,
-    #[allow(unused)]
     options: Rc<CodeGeneratorOptions>,
 }
 
 impl DynamicMessageImplsGenerator {
-    pub fn try_new<'a>(
-        desc: &'a DescriptorExt<'a>,
-        options: Rc<CodeGeneratorOptions>,
-    ) -> Result<Self> {
-        let current_path = Rc::new(desc.current_path().to_owned());
-        Ok(Self {
-            rust_trait_name: GenTraits::try_view_trait_name(desc.name())?,
-            fields: desc
-                .non_oneof_fields()?
-                .into_iter()
-                .map(|f| Field::try_new(f, Rc::clone(&current_path), Rc::clone(&options)))
-                .collect::<Result<Vec<_>>>()?,
-            options,
-        })
-    }
-}
-
-impl ImplsGenerator for DynamicMessageImplsGenerator {
-    fn generate<'a>(
-        &self,
-        _view_trait_path: &::syn::Path,
-        try_trait_path: &::syn::Path,
-        _fields: Box<dyn 'a + Iterator<Item = &'a TraitField>>,
-    ) -> Result<Vec<Item>> {
-        let trait_name = &self.rust_trait_name;
-        let try_getters = self
-            .fields
-            .iter()
-            .map(Field::gen_try_getter)
-            .collect::<Result<Vec<_>>>()?;
-        let try_has_methods = self
-            .fields
-            .iter()
-            .filter_map(|f| f.maybe_gen_try_has_method().transpose())
-            .collect::<Result<Vec<_>>>()?;
-        let clone_trait = self.options.clone_trait()?;
-        let trait_path = self
-            .options
-            .path_in_self_module(&trait_name.clone().into())?;
-        Ok(vec![parse2(quote! {
-            impl<A: ::std::alloc::Allocator + #clone_trait> #trait_path
-            for ::puroro::dynamic::DynamicMessage<A> {
-                #(#try_getters)*
-                #(#try_has_methods)*
-            }
-        })?])
-    }
-}
-
-// Private struct for representing a field in DynamicMessage
-struct Field {
-    trait_field: TraitField,
-    options: Rc<CodeGeneratorOptions>,
-}
-
-impl Field {
-    fn try_new<'a>(
-        desc: &'a FieldDescriptorExt<'a>,
-        current_path: Rc<ProtoPathBuf>,
-        options: Rc<CodeGeneratorOptions>,
-    ) -> Result<Self> {
-        Ok(Self {
-            trait_field: TraitField::try_new(desc, Rc::clone(&current_path), Rc::clone(&options))?,
-            options,
-        })
+    pub fn new(options: Rc<CodeGeneratorOptions>) -> Self {
+        Self { options }
     }
 
-    fn gen_try_getter(&self) -> Result<Item> {
-        let signature = self.trait_field.try_getter_signature();
-        let number = match &self.trait_field {
-            TraitField::Repeated { number, .. }
-            | TraitField::Implicit { number, .. }
-            | TraitField::Explicit { number, .. } => *number,
-        };
+    pub fn gen_try_getter(&self, field: &Field) -> Result<Item> {
+        let signature = field.try_getter_signature();
+        let number = field.number();
         let body = self
             .options
-            .ok_value(&self.gen_try_getter_body(&parse_str("f_opt")?)?)?;
+            .ok_value(&self.gen_try_getter_body(field, &parse_str("f_opt")?)?)?;
         Ok(parse2(quote! {
             #signature {
                 let f_opt = self.field(#number);
@@ -118,43 +48,43 @@ impl Field {
         })?)
     }
 
-    fn gen_try_getter_body(&self, field_opt_expr: &Expr) -> Result<Expr> {
-        let wire_type: WireType<_, _> = match &self.trait_field {
-            TraitField::Repeated { scalar_proto_type, .. }
-            | TraitField::Implicit { scalar_proto_type, .. }
-            | TraitField::Explicit { scalar_proto_type, .. } => scalar_proto_type.as_ref().into(),
+    pub fn gen_try_getter_body(&self, field: &Field, field_opt_expr: &Expr) -> Result<Expr> {
+        let wire_type: WireType<_, _> = match field {
+            Field::Repeated { scalar_proto_type, .. }
+            | Field::Implicit { scalar_proto_type, .. }
+            | Field::Explicit { scalar_proto_type, .. } => scalar_proto_type.as_ref().into(),
         };
         let field_expr: Expr = parse_str("f")?;
-        Ok(match &self.trait_field {
-            TraitField::Repeated { .. } => {
+        Ok(match field {
+            Field::Repeated { .. } => {
                 let body = match wire_type {
                     WireType::Variant(t) => {
-                        self.gen_repeated_variant_getter_body(&field_expr, t)?
+                        self.gen_repeated_variant_getter_body(field, &field_expr, t)?
                     }
-                    WireType::I32(t) => self.gen_repeated_i32_getter_body(&field_expr, t)?,
-                    WireType::I64(t) => self.gen_repeated_i64_getter_body(&field_expr, t)?,
-                    WireType::Len(t) => self.gen_repeated_len_getter_body(&field_expr, t)?,
-                    _ => todo!(), // Start / end group
+                    WireType::I32(t) => self.gen_repeated_i32_getter_body(field, &field_expr, t)?,
+                    WireType::I64(t) => self.gen_repeated_i64_getter_body(field, &field_expr, t)?,
+                    WireType::Len(t) => self.gen_repeated_len_getter_body(field, &field_expr, t)?,
+                    _ => todo!(),
                 };
                 parse2(quote! {
                     (#field_opt_expr).map(|f| #body).transpose()?.into_iter().flatten()
                 })?
             }
-            TraitField::Implicit { .. } | TraitField::Explicit { .. } => {
+            Field::Implicit { .. } | Field::Explicit { .. } => {
                 let body = match wire_type {
                     WireType::Variant(t) => {
-                        self.gen_try_non_repeated_varint_getter_body(&field_expr, t)?
+                        self.gen_try_non_repeated_varint_getter_body(field, &field_expr, t)?
                     }
                     WireType::I32(t) => {
-                        self.gen_try_non_repeated_i32_getter_body(&field_expr, t)?
+                        self.gen_try_non_repeated_i32_getter_body(field, &field_expr, t)?
                     }
                     WireType::I64(t) => {
-                        self.gen_try_non_repeated_i64_getter_body(&field_expr, t)?
+                        self.gen_try_non_repeated_i64_getter_body(field, &field_expr, t)?
                     }
                     WireType::Len(t) => {
-                        self.gen_try_non_repeated_len_getter_body(&field_expr, t)?
+                        self.gen_try_non_repeated_len_getter_body(field, &field_expr, t)?
                     }
-                    _ => todo!(), // Start / end group
+                    _ => todo!(),
                 };
                 let unwrap_option = (!matches!(wire_type, WireType::Len(LenType::Message(_))))
                     .then(|| {
@@ -170,13 +100,14 @@ impl Field {
         })
     }
 
-    fn gen_try_non_repeated_varint_getter_body(
+    pub fn gen_try_non_repeated_varint_getter_body(
         &self,
+        field: &Field,
         field_expr: &Expr,
         t: VariantType<impl AsRef<ProtoPath>>,
     ) -> Result<Expr> {
         let vt_type: Type =
-            t.to_variant_integer_type(self.trait_field.base_proto_path.as_ref(), &self.options)?;
+            t.to_variant_integer_type(field.base_proto_path().as_ref(), &self.options)?;
         Ok(parse2(quote! {
             (#field_expr).as_scalar_variant::<#vt_type>(
                 true /* TODO: packed check */,
@@ -184,7 +115,12 @@ impl Field {
             )
         })?)
     }
-    fn gen_try_non_repeated_i32_getter_body(&self, field_expr: &Expr, t: I32Type) -> Result<Expr> {
+    pub fn gen_try_non_repeated_i32_getter_body(
+        &self,
+        _field: &Field,
+        field_expr: &Expr,
+        t: I32Type,
+    ) -> Result<Expr> {
         let bytes_expr: Expr = parse2(quote! { (#field_expr).as_scalar_i32(
             ::puroro::dynamic::FieldReducingErrorStrategy::Skip /* TODO: needs confirmation */,
         ) })?;
@@ -193,7 +129,12 @@ impl Field {
             quote! { (#bytes_expr).map(|v_opt| v_opt.map(#primitive_type::from_le_bytes)) },
         )?)
     }
-    fn gen_try_non_repeated_i64_getter_body(&self, field_expr: &Expr, t: I64Type) -> Result<Expr> {
+    pub fn gen_try_non_repeated_i64_getter_body(
+        &self,
+        _field: &Field,
+        field_expr: &Expr,
+        t: I64Type,
+    ) -> Result<Expr> {
         let bytes_expr: Expr = parse2(quote! { (#field_expr).as_scalar_i64(
             ::puroro::dynamic::FieldReducingErrorStrategy::Skip /* TODO: needs confirmation */,
         ) })?;
@@ -202,8 +143,9 @@ impl Field {
             quote! { (#bytes_expr).map(|v_opt| v_opt.map(#primitive_type::from_le_bytes)) },
         )?)
     }
-    fn gen_try_non_repeated_len_getter_body(
+    pub fn gen_try_non_repeated_len_getter_body(
         &self,
+        _field: &Field,
         field_expr: &Expr,
         t: LenType<impl AsRef<ProtoPath>>,
     ) -> Result<Expr> {
@@ -222,31 +164,43 @@ impl Field {
         })?)
     }
 
-    fn gen_repeated_variant_getter_body(
+    pub fn gen_repeated_variant_getter_body(
         &self,
+        field: &Field,
         field_expr: &Expr,
         t: VariantType<impl AsRef<ProtoPath>>,
     ) -> Result<Expr> {
         let vt_type: Type =
-            t.to_variant_integer_type(self.trait_field.base_proto_path.as_ref(), &self.options)?;
+            t.to_variant_integer_type(field.base_proto_path().as_ref(), &self.options)?;
         Ok(parse2(quote! {
             (#field_expr).as_repeated_variant::<#vt_type>(true /* TODO: packed check */)
         })?)
     }
-    fn gen_repeated_i32_getter_body(&self, field_expr: &Expr, t: I32Type) -> Result<Expr> {
+    pub fn gen_repeated_i32_getter_body(
+        &self,
+        _field: &Field,
+        field_expr: &Expr,
+        t: I32Type,
+    ) -> Result<Expr> {
         let primitive_type = t.to_primitive_type(&self.options)?;
         Ok(parse2(quote! {
             (#field_expr).as_repeated_i32().map(|iter| iter.map(|v_res| v_res.map(#primitive_type::from_le_bytes)))
         })?)
     }
-    fn gen_repeated_i64_getter_body(&self, field_expr: &Expr, t: I64Type) -> Result<Expr> {
+    pub fn gen_repeated_i64_getter_body(
+        &self,
+        _field: &Field,
+        field_expr: &Expr,
+        t: I64Type,
+    ) -> Result<Expr> {
         let primitive_type = t.to_primitive_type(&self.options)?;
         Ok(parse2(quote! {
             (#field_expr).as_repeated_i64().map(|iter| iter.map(|v_res| v_res.map(#primitive_type::from_le_bytes)))
         })?)
     }
-    fn gen_repeated_len_getter_body(
+    pub fn gen_repeated_len_getter_body(
         &self,
+        _field: &Field,
         field_expr: &Expr,
         t: LenType<impl AsRef<ProtoPath>>,
     ) -> Result<Expr> {
@@ -259,8 +213,8 @@ impl Field {
         })?)
     }
 
-    fn maybe_gen_try_has_method(&self) -> Result<Option<Item>> {
-        let Some(signature) = self.trait_field.try_has_method_signature_if_non_repeated() else {
+    pub fn maybe_gen_try_has_method(&self, field: &Field) -> Result<Option<Item>> {
+        let Some(signature) = field.try_has_method_signature_if_non_repeated() else {
             return Ok(None);
         };
         Ok(Some(parse2(quote! {

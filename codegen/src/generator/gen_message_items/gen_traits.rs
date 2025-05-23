@@ -335,6 +335,22 @@ impl Field {
             _ => None,
         }
     }
+
+    pub fn number(&self) -> i32 {
+        match self {
+            Field::Repeated { number, .. }
+            | Field::Explicit { number, .. }
+            | Field::Implicit { number, .. } => *number,
+        }
+    }
+
+    pub fn base_proto_path(&self) -> &Rc<ProtoPathBuf> {
+        match self {
+            Field::Repeated { base_proto_path, .. }
+            | Field::Explicit { base_proto_path, .. }
+            | Field::Implicit { base_proto_path, .. } => base_proto_path,
+        }
+    }
 }
 
 struct FieldFactory {
