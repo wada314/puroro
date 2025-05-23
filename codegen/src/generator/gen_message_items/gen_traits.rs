@@ -287,59 +287,32 @@ pub enum Field {
 impl Field {
     pub fn getter_signature(&self) -> &Signature {
         match self {
-            Field::Implicit {
-                getter_signature, ..
-            }
-            | Field::Explicit {
-                getter_signature, ..
-            }
-            | Field::Repeated {
-                getter_signature, ..
-            } => getter_signature,
+            Field::Implicit { getter_signature, .. }
+            | Field::Explicit { getter_signature, .. }
+            | Field::Repeated { getter_signature, .. } => getter_signature,
         }
     }
 
     pub fn try_getter_signature(&self) -> &Signature {
         match self {
-            Field::Implicit {
-                try_getter_signature,
-                ..
-            }
-            | Field::Explicit {
-                try_getter_signature,
-                ..
-            }
-            | Field::Repeated {
-                try_getter_signature,
-                ..
-            } => try_getter_signature,
+            Field::Implicit { try_getter_signature, .. }
+            | Field::Explicit { try_getter_signature, .. }
+            | Field::Repeated { try_getter_signature, .. } => try_getter_signature,
         }
     }
 
     pub fn has_method_signature_if_non_repeated(&self) -> Option<&Signature> {
         match self {
-            Field::Implicit {
-                has_method_signature,
-                ..
-            }
-            | Field::Explicit {
-                has_method_signature,
-                ..
-            } => Some(has_method_signature),
+            Field::Implicit { has_method_signature, .. }
+            | Field::Explicit { has_method_signature, .. } => Some(has_method_signature),
             _ => None,
         }
     }
 
     pub fn try_has_method_signature_if_non_repeated(&self) -> Option<&Signature> {
         match self {
-            Field::Implicit {
-                try_has_method_signature,
-                ..
-            }
-            | Field::Explicit {
-                try_has_method_signature,
-                ..
-            } => Some(try_has_method_signature),
+            Field::Implicit { try_has_method_signature, .. }
+            | Field::Explicit { try_has_method_signature, .. } => Some(try_has_method_signature),
             _ => None,
         }
     }
@@ -398,11 +371,9 @@ impl FieldFactory {
                     scalar_proto_type,
                 })
             }
-            FieldPresense::Repeated => Ok(Field::Repeated {
-                getter_signature,
-                try_getter_signature,
-                scalar_proto_type,
-            }),
+            FieldPresense::Repeated => {
+                Ok(Field::Repeated { getter_signature, try_getter_signature, scalar_proto_type })
+            }
         }
     }
 

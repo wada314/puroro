@@ -81,33 +81,18 @@ impl GenBlanketBothImpls {
         let t1_getter: Path = parse2(quote! { <#t1 as #trait_path>::#getter_name })?;
         let t2_getter: Path = parse2(quote! { <#t2 as #trait_path>::#getter_name })?;
         let expr = &parse2::<Expr>(match field {
-            Field::Repeated {
-                scalar_proto_type: FieldType::Message(_),
-                ..
-            } => quote! {{
+            Field::Repeated { scalar_proto_type: FieldType::Message(_), .. } => quote! {{
                 self.as_ref().map2(#t1_getter, #t2_getter).into_iter_either()
             }},
             Field::Repeated { .. } => quote! {{
                 self.as_ref().map2(#t1_getter, #t2_getter).into_iter_chained()
             }},
-            Field::Explicit {
-                scalar_proto_type: FieldType::Message(_),
-                ..
-            }
-            | Field::Implicit {
-                scalar_proto_type: FieldType::Message(_),
-                ..
-            } => quote! {{
+            Field::Explicit { scalar_proto_type: FieldType::Message(_), .. }
+            | Field::Implicit { scalar_proto_type: FieldType::Message(_), .. } => quote! {{
                 self.as_ref().map2(#t1_getter, #t2_getter).factor_none()
             }},
-            Field::Explicit {
-                has_method_signature,
-                ..
-            }
-            | Field::Implicit {
-                has_method_signature,
-                ..
-            } => {
+            Field::Explicit { has_method_signature, .. }
+            | Field::Implicit { has_method_signature, .. } => {
                 let has_method_name = &has_method_signature.ident;
                 quote! {{
                     let ::puroro::Both::Both(left, right) = self;
@@ -138,34 +123,19 @@ impl GenBlanketBothImpls {
         let t1_try_getter: Path = parse2(quote! { <#t1 as #trait_path>::#try_getter_name })?;
         let t2_try_getter: Path = parse2(quote! { <#t2 as #trait_path>::#try_getter_name })?;
         let expr = self.options.ok_value(&parse2::<Expr>(match field {
-            Field::Repeated {
-                scalar_proto_type: FieldType::Message(_),
-                ..
-            } => quote! {{
+            Field::Repeated { scalar_proto_type: FieldType::Message(_), .. } => quote! {{
                 self.as_ref().try_map2(#t1_try_getter, #t2_try_getter)?.into_iter_either()
                     .map(|either_res| either_res.factor_err())
             }},
             Field::Repeated { .. } => quote! {{
                 self.as_ref().try_map2(#t1_try_getter, #t2_try_getter)?.into_iter_chained()
             }},
-            Field::Explicit {
-                scalar_proto_type: FieldType::Message(_),
-                ..
-            }
-            | Field::Implicit {
-                scalar_proto_type: FieldType::Message(_),
-                ..
-            } => quote! {{
+            Field::Explicit { scalar_proto_type: FieldType::Message(_), .. }
+            | Field::Implicit { scalar_proto_type: FieldType::Message(_), .. } => quote! {{
                 self.as_ref().try_map2(#t1_try_getter, #t2_try_getter)?.factor_none()
             }},
-            Field::Explicit {
-                try_has_method_signature,
-                ..
-            }
-            | Field::Implicit {
-                try_has_method_signature,
-                ..
-            } => {
+            Field::Explicit { try_has_method_signature, .. }
+            | Field::Implicit { try_has_method_signature, .. } => {
                 let try_has_method_name = &try_has_method_signature.ident;
                 quote! {{
                     let ::puroro::Both::Both(left, right) = self;

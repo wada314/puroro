@@ -69,23 +69,14 @@ impl GenBlanketEitherImpls {
                 <#t2 as #trait_path>::#try_getter_name)?
         })?;
         let expr = self.options.ok_value(&parse2::<Expr>(match field {
-            Field::Repeated {
-                scalar_proto_type: FieldType::Message(_),
-                ..
-            } => quote! {
+            Field::Repeated { scalar_proto_type: FieldType::Message(_), .. } => quote! {
                 #mapped_either.into_iter_either().map(|either_res| either_res.factor_err())
             },
             Field::Repeated { .. } => quote! {
                 #mapped_either.into_iter_chained()
             },
-            Field::Explicit {
-                scalar_proto_type: FieldType::Message(_),
-                ..
-            }
-            | Field::Implicit {
-                scalar_proto_type: FieldType::Message(_),
-                ..
-            } => quote! {
+            Field::Explicit { scalar_proto_type: FieldType::Message(_), .. }
+            | Field::Implicit { scalar_proto_type: FieldType::Message(_), .. } => quote! {
                 #mapped_either.factor_none()
             },
             _ => quote! {

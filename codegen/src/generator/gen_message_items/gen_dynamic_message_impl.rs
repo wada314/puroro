@@ -111,15 +111,9 @@ impl Field {
 
     fn gen_try_getter_body(&self, field_opt_expr: &Expr) -> Result<Expr> {
         let wire_type: WireType<_, _> = match &self.trait_field {
-            TraitField::Repeated {
-                scalar_proto_type, ..
-            }
-            | TraitField::Implicit {
-                scalar_proto_type, ..
-            }
-            | TraitField::Explicit {
-                scalar_proto_type, ..
-            } => scalar_proto_type.as_ref().into(),
+            TraitField::Repeated { scalar_proto_type, .. }
+            | TraitField::Implicit { scalar_proto_type, .. }
+            | TraitField::Explicit { scalar_proto_type, .. } => scalar_proto_type.as_ref().into(),
         };
         let field_expr: Expr = parse_str("f")?;
         Ok(match &self.trait_field {

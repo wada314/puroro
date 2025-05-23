@@ -31,13 +31,9 @@ impl BlanketImplsGenerator for GenBlanketOptionImpls {
         fields: Box<dyn 'a + Iterator<Item = &'a Field>>,
     ) -> Result<Vec<Item>> {
         let t: Ident = parse_str("T")?;
-        let t_opt = self.options.option_type(
-            &(TypePath {
-                qself: None,
-                path: t.clone().into(),
-            }
-            .into()),
-        )?;
+        let t_opt = self
+            .options
+            .option_type(&(TypePath { qself: None, path: t.clone().into() }.into()))?;
 
         let methods = blanket_impls_helper(
             fields,
