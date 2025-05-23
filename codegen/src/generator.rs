@@ -109,10 +109,14 @@ impl CodeGeneratorOptions {
         })?)
     }
     pub fn ok_value(&self, value: &Expr) -> Result<Expr> {
+        let path = self.ok_path()?;
+        Ok(parse2(quote! { #path(#value) })?)
+    }
+    pub fn ok_path(&self) -> Result<Path> {
         Ok(parse2(if self.strict_type_path {
-            quote! { ::std::result::Result::Ok(#value) }
+            quote! { ::std::result::Result::Ok }
         } else {
-            quote! { Ok(#value) }
+            quote! { Ok }
         })?)
     }
     pub fn iter_trait(&self, elem_type: &Type) -> Result<Path> {

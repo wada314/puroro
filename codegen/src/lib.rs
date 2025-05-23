@@ -70,8 +70,8 @@ pub fn compile_binary(input: impl AsRef<[u8]>) -> Result<Vec<u8>> {
     let request: CodeGeneratorRequest = DynamicMessage::deser_from_read(input.as_ref())
         .unwrap()
         .into();
-    let response = compile(&request).unwrap();
+    let response = compile(&request)?;
     let mut output_buffer = Vec::new();
-    response.write(&mut output_buffer).unwrap();
+    response.write(&mut output_buffer)?;
     Ok(output_buffer)
 }

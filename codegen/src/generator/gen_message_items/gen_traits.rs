@@ -262,6 +262,7 @@ impl<M: AsRef<ProtoPath>, E: AsRef<ProtoPath>> FieldType<M, E> {
     }
 }
 
+#[derive(Debug)]
 pub enum Field {
     Repeated {
         getter_signature: Signature,
