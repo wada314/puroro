@@ -76,19 +76,17 @@ where
                     #signature #body
                 })?
             };
-            let has_method: Option<ImplItemFn> = {
-                if let Some(signature) = if is_try_trait {
-                    f.try_has_method_signature_if_non_repeated()
-                } else {
-                    f.has_method_signature_if_non_repeated()
-                } {
+            let has_method: Option<ImplItemFn> = match (is_try_trait, f) {
+                (false, Field::Explicit { has_method_signature: signature, .. })
+                | (false, Field::Implicit { has_method_signature: signature, .. })
+                | (true, Field::Explicit { try_has_method_signature: signature, .. })
+                | (true, Field::Implicit { try_has_method_signature: signature, .. }) => {
                     let body = gen_has_method(f)?;
                     Some(parse2(quote! {
                         #signature #body
                     })?)
-                } else {
-                    None
                 }
+                _ => None,
             };
             Ok(once(get_method).chain(has_method.into_iter()))
         })
@@ -323,22 +321,6 @@ impl Field {
         }
     }
 
-    pub fn has_method_signature_if_non_repeated(&self) -> Option<&Signature> {
-        match self {
-            Field::Implicit { has_method_signature, .. }
-            | Field::Explicit { has_method_signature, .. } => Some(has_method_signature),
-            _ => None,
-        }
-    }
-
-    pub fn try_has_method_signature_if_non_repeated(&self) -> Option<&Signature> {
-        match self {
-            Field::Implicit { try_has_method_signature, .. }
-            | Field::Explicit { try_has_method_signature, .. } => Some(try_has_method_signature),
-            _ => None,
-        }
-    }
-
     pub fn number(&self) -> i32 {
         match self {
             Field::Repeated { number, .. }
@@ -352,6 +334,14 @@ impl Field {
             Field::Repeated { base_proto_path, .. }
             | Field::Explicit { base_proto_path, .. }
             | Field::Implicit { base_proto_path, .. } => base_proto_path,
+        }
+    }
+
+    pub fn scalar_proto_type(&self) -> &FieldType<ProtoPathBuf, ProtoPathBuf> {
+        match self {
+            Field::Repeated { scalar_proto_type, .. }
+            | Field::Explicit { scalar_proto_type, .. }
+            | Field::Implicit { scalar_proto_type, .. } => scalar_proto_type,
         }
     }
 }

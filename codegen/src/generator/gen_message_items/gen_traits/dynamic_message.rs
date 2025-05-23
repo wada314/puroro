@@ -13,9 +13,7 @@
 // limitations under the License.
 
 use super::{impls_helper, Field, ImplsGenerator};
-use crate::descriptor::{
-    I32Type, I64Type, LenType, VariantType, WireType,
-};
+use crate::descriptor::{I32Type, I64Type, LenType, VariantType, WireType};
 use crate::generator::CodeGeneratorOptions;
 use crate::proto_path::ProtoPath;
 use crate::Result;
@@ -235,7 +233,7 @@ impl DynamicMessageImplsGenerator {
         })?)
     }
 
-    pub fn gen_try_has_method(&self, field: &Field) -> Result<Block> {
+    pub fn gen_try_has_method(&self, _field: &Field) -> Result<Block> {
         Ok(parse2(quote! {
             {
                 todo!()
