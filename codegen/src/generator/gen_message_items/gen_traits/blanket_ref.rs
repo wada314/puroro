@@ -87,10 +87,12 @@ impl GenBlanketRefImpls {
     }
 
     fn gen_has_method_body(&self, field: &Field, t: &Ident, trait_path: &Path) -> Result<Block> {
-        let Some(signature) = field.has_method_signature_if_non_repeated() else {
+        let (Field::Implicit { has_method_signature, .. }
+        | Field::Explicit { has_method_signature, .. }) = field
+        else {
             Err("this method is not supported for repeated fields".to_string())?
         };
-        let has_name = &signature.ident;
+        let has_name = &has_method_signature.ident;
         Ok(parse2(quote! {{ <#t as #trait_path>::#has_name(self) }})?)
     }
 
@@ -113,10 +115,12 @@ impl GenBlanketRefImpls {
         t: &Ident,
         trait_path: &Path,
     ) -> Result<Block> {
-        let Some(signature) = field.try_has_method_signature_if_non_repeated() else {
+        let (Field::Implicit { try_has_method_signature, .. }
+        | Field::Explicit { try_has_method_signature, .. }) = field
+        else {
             Err("this method is not supported for repeated fields".to_string())?
         };
-        let try_has_name = &signature.ident;
+        let try_has_name = &try_has_method_signature.ident;
         Ok(parse2(
             quote! {{ <#t as #trait_path>::#try_has_name(self) }},
         )?)

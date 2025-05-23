@@ -174,7 +174,11 @@ impl GenTraits {
         let has_methods = self
             .fields
             .iter()
-            .filter_map(|f| f.has_method_signature_if_non_repeated())
+            .filter_map(|f| match f {
+                Field::Implicit { has_method_signature, .. }
+                | Field::Explicit { has_method_signature, .. } => Some(has_method_signature),
+                _ => None,
+            })
             .collect::<Vec<_>>();
         Ok(parse2(quote! {
             pub trait #trait_name: self::#try_trait_name {
@@ -194,7 +198,13 @@ impl GenTraits {
         let try_has_methods = self
             .fields
             .iter()
-            .filter_map(|f| f.try_has_method_signature_if_non_repeated())
+            .filter_map(|f| match f {
+                Field::Implicit { try_has_method_signature, .. }
+                | Field::Explicit { try_has_method_signature, .. } => {
+                    Some(try_has_method_signature)
+                }
+                _ => None,
+            })
             .collect::<Vec<_>>();
         Ok(parse2(quote! {
             pub trait #trait_name {
