@@ -34,25 +34,70 @@ impl BlanketImplsGenerator for GenBlanketOptionImpls {
         let t_opt = self
             .options
             .option_type(&(TypePath { qself: None, path: t.clone().into() }.into()))?;
+        let fields = fields.collect::<Vec<_>>();
 
-        let methods = blanket_impls_helper(
-            fields,
+        let view_methods = blanket_impls_helper(
+            fields.iter().copied(),
+            |f| self.gen_get_method_body(f, &t, &view_trait_path),
+            |f| self.gen_has_method_body(f, &t, &view_trait_path),
+            false,
+        )?;
+
+        let try_methods = blanket_impls_helper(
+            fields.iter().copied(),
             |f| self.gen_try_get_method_body(f, &t, &try_view_trait_path),
             |f| self.gen_try_has_method_body(f, &t, &try_view_trait_path),
             true,
         )?;
 
-        Ok(vec![parse2(quote! {
-            impl<#t: #try_view_trait_path> #try_view_trait_path for #t_opt {
-                #(#methods)*
-            }
-        })?])
+        Ok(vec![
+            parse2(quote! {
+                impl<#t: #view_trait_path> #view_trait_path for #t_opt {
+                    #(#view_methods)*
+                }
+            })?,
+            parse2(quote! {
+                impl<#t: #try_view_trait_path> #try_view_trait_path for #t_opt {
+                    #(#try_methods)*
+                }
+            })?,
+        ])
     }
 }
 
 impl GenBlanketOptionImpls {
     pub fn new(options: Rc<CodeGeneratorOptions>) -> Self {
         Self { options }
+    }
+
+    fn gen_get_method_body(&self, field: &Field, t: &Ident, trait_path: &Path) -> Result<Block> {
+        let signature = field.getter_signature();
+        let getter_name = &signature.ident;
+        let stmts = match field {
+            Field::Repeated { .. } => quote! {
+                self.as_ref().map(<#t as #trait_path>::#getter_name)
+                    .into_iter().flatten()
+            },
+            Field::Explicit { .. } | Field::Implicit { .. } => quote! {
+                self.as_ref().map(<#t as #trait_path>::#getter_name)
+                    .unwrap_or_default()
+            },
+        };
+        Ok(parse2(quote! {
+            { #stmts }
+        })?)
+    }
+
+    fn gen_has_method_body(&self, field: &Field, t: &Ident, trait_path: &Path) -> Result<Block> {
+        let Some(signature) = field.has_method_signature_if_non_repeated() else {
+            Err("this method is not supported for repeated fields".to_string())?
+        };
+        let has_name = &signature.ident;
+        Ok(parse2(quote! {{
+            self.as_ref()
+                .map(<#t as #trait_path>::#has_name)
+                .unwrap_or(false)
+        }})?)
     }
 
     fn gen_try_get_method_body(
