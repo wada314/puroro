@@ -69,11 +69,7 @@ impl DynamicMessageImplsGenerator {
     }
 
     pub fn gen_try_getter_body(&self, field: &Field, field_opt_expr: &Expr) -> Result<Expr> {
-        let wire_type: WireType<_, _> = match field {
-            Field::Repeated { scalar_proto_type, .. }
-            | Field::Implicit { scalar_proto_type, .. }
-            | Field::Explicit { scalar_proto_type, .. } => scalar_proto_type.as_ref().into(),
-        };
+        let wire_type: WireType<_, _> = field.scalar_proto_type().as_ref().into();
         let field_expr: Expr = parse_str("f")?;
         Ok(match field {
             Field::Repeated { .. } => {
