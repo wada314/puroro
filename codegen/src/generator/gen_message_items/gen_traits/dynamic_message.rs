@@ -12,16 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::{impls_helper, Field, GenTraits, ImplsGenerator};
+use super::{impls_helper, Field, ImplsGenerator};
 use crate::descriptor::{
-    DescriptorExt, FieldDescriptorExt, I32Type, I64Type, LenType, VariantType, WireType,
+    I32Type, I64Type, LenType, VariantType, WireType,
 };
 use crate::generator::CodeGeneratorOptions;
-use crate::proto_path::{ProtoPath, ProtoPathBuf};
+use crate::proto_path::ProtoPath;
 use crate::Result;
 use ::quote::quote;
 use ::std::rc::Rc;
-use ::syn::{parse2, parse_str, Block, Ident, Item, Path};
+use ::syn::{parse2, parse_str, Block, Item, Path};
 use ::syn::{Expr, Type};
 
 // Implementation generator for DynamicMessage type using ImplsGenerator trait
