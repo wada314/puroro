@@ -18,7 +18,7 @@ use crate::generator::CodeGeneratorOptions;
 use crate::Result;
 use ::quote::quote;
 use ::std::rc::Rc;
-use ::syn::{parse2, parse_str, Block, Expr, ExprPath, Ident, Item, Path};
+use ::syn::{parse2, parse_str, Block, Expr, Ident, Item, Path};
 
 pub struct GenBlanketEitherImpls {
     options: Rc<CodeGeneratorOptions>,
