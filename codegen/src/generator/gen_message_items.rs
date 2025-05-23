@@ -12,10 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-pub mod gen_dynamic_message_impl;
 pub mod gen_traits;
 
-use self::gen_dynamic_message_impl::DynamicMessageImplsGenerator;
 use self::gen_traits::GenTraits;
 use super::CodeGeneratorOptions;
 use crate::descriptor::DescriptorExt;

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::gen_traits::{Field, GenTraits, ImplsGenerator};
+use super::{impls_helper, Field, GenTraits, ImplsGenerator};
 use crate::descriptor::{
     DescriptorExt, FieldDescriptorExt, I32Type, I64Type, LenType, VariantType, WireType,
 };
@@ -21,7 +21,7 @@ use crate::proto_path::{ProtoPath, ProtoPathBuf};
 use crate::Result;
 use ::quote::quote;
 use ::std::rc::Rc;
-use ::syn::{parse2, parse_str, Ident, Item};
+use ::syn::{parse2, parse_str, Block, Ident, Item, Path};
 use ::syn::{Expr, Type};
 
 // Implementation generator for DynamicMessage type using ImplsGenerator trait
@@ -29,19 +29,41 @@ pub struct DynamicMessageImplsGenerator {
     options: Rc<CodeGeneratorOptions>,
 }
 
+impl ImplsGenerator for DynamicMessageImplsGenerator {
+    fn generate<'a>(
+        &self,
+        _view_trait_path: &Path,
+        try_view_trait_path: &Path,
+        fields: Box<dyn 'a + Iterator<Item = &'a Field>>,
+    ) -> Result<Vec<Item>> {
+        let methods = impls_helper(
+            fields,
+            |f| self.gen_try_getter(f),
+            |f| self.gen_try_has_method(f),
+            true,
+        )?;
+        Ok(vec![parse2(quote! {
+            impl<A: ::std::alloc::Allocator> #try_view_trait_path
+            for ::puroro::dynamic::DynamicMessage<A>
+            {
+                #(#methods)*
+            }
+        })?])
+    }
+}
+
 impl DynamicMessageImplsGenerator {
     pub fn new(options: Rc<CodeGeneratorOptions>) -> Self {
         Self { options }
     }
 
-    pub fn gen_try_getter(&self, field: &Field) -> Result<Item> {
-        let signature = field.try_getter_signature();
+    pub fn gen_try_getter(&self, field: &Field) -> Result<Block> {
         let number = field.number();
         let body = self
             .options
             .ok_value(&self.gen_try_getter_body(field, &parse_str("f_opt")?)?)?;
         Ok(parse2(quote! {
-            #signature {
+            {
                 let f_opt = self.field(#number);
                 #body
             }
@@ -213,15 +235,12 @@ impl DynamicMessageImplsGenerator {
         })?)
     }
 
-    pub fn maybe_gen_try_has_method(&self, field: &Field) -> Result<Option<Item>> {
-        let Some(signature) = field.try_has_method_signature_if_non_repeated() else {
-            return Ok(None);
-        };
-        Ok(Some(parse2(quote! {
-            #signature {
+    pub fn gen_try_has_method(&self, field: &Field) -> Result<Block> {
+        Ok(parse2(quote! {
+            {
                 todo!()
             }
-        })?))
+        })?)
     }
 }
 

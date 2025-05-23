@@ -17,6 +17,7 @@ mod blanket_either;
 mod blanket_either_or_both;
 mod blanket_option;
 mod blanket_ref;
+mod dynamic_message;
 
 use crate::cases::{convert_into_case, Case};
 use crate::descriptor::{DescriptorExt, FieldDescriptorExt, FieldLabel, FieldType, LenType};
@@ -34,6 +35,7 @@ use blanket_either::GenBlanketEitherImpls;
 use blanket_either_or_both::GenBlanketEitherOrBothImpls;
 use blanket_option::GenBlanketOptionImpls;
 use blanket_ref::GenBlanketRefImpls;
+use dynamic_message::DynamicMessageImplsGenerator;
 
 pub struct GenTraits {
     view_trait_name: Ident,
@@ -140,6 +142,7 @@ impl GenTraits {
             Rc::new(GenBlanketBothImpls::new(Rc::clone(&self.options))),
             Rc::new(GenBlanketEitherImpls::new(Rc::clone(&self.options))),
             Rc::new(GenBlanketEitherOrBothImpls::new(Rc::clone(&self.options))),
+            Rc::new(DynamicMessageImplsGenerator::new(Rc::clone(&self.options))),
         ];
         let blanket_impls = blanket_impl_generators
             .iter()
