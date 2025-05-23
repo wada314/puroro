@@ -42,7 +42,7 @@ pub struct GenTraits {
     options: Rc<CodeGeneratorOptions>,
 }
 
-pub trait BlanketImplsGenerator {
+pub trait ImplsGenerator {
     fn generate<'a>(
         &self,
         view_trait_path: &Path,
@@ -51,7 +51,7 @@ pub trait BlanketImplsGenerator {
     ) -> Result<Vec<Item>>;
 }
 
-fn blanket_impls_helper<'a, F, G>(
+fn impls_helper<'a, F, G>(
     fields: impl Iterator<Item = &'a Field>,
     gen_getter: F,
     gen_has_method: G,
@@ -134,7 +134,7 @@ impl GenTraits {
         let try_trait_name = &self.try_view_trait_name;
         let try_trait_path: Path = parse2(quote! { self::#try_trait_name })?;
 
-        let blanket_impl_generators: Vec<Rc<dyn BlanketImplsGenerator>> = vec![
+        let blanket_impl_generators: Vec<Rc<dyn ImplsGenerator>> = vec![
             Rc::new(GenBlanketRefImpls::new(Rc::clone(&self.options))),
             Rc::new(GenBlanketOptionImpls::new(Rc::clone(&self.options))),
             Rc::new(GenBlanketBothImpls::new(Rc::clone(&self.options))),

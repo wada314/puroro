@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::gen_traits::{Field as TraitField, GenTraits};
+use super::gen_traits::{Field as TraitField, GenTraits, ImplsGenerator};
 use crate::descriptor::{
     DescriptorExt, FieldDescriptorExt, I32Type, I64Type, LenType, VariantType, WireType,
 };
@@ -24,14 +24,15 @@ use ::std::rc::Rc;
 use ::syn::{parse2, parse_str, Ident, Item};
 use ::syn::{Expr, Type};
 
-pub struct GenDynamicMessageImpls {
+// Implementation generator for DynamicMessage type using ImplsGenerator trait
+pub struct DynamicMessageImplsGenerator {
     rust_trait_name: Ident,
     fields: Vec<Field>,
     #[allow(unused)]
     options: Rc<CodeGeneratorOptions>,
 }
 
-impl GenDynamicMessageImpls {
+impl DynamicMessageImplsGenerator {
     pub fn try_new<'a>(
         desc: &'a DescriptorExt<'a>,
         options: Rc<CodeGeneratorOptions>,
@@ -47,8 +48,15 @@ impl GenDynamicMessageImpls {
             options,
         })
     }
+}
 
-    pub fn gen_impl_message_trait(&self) -> Result<Item> {
+impl ImplsGenerator for DynamicMessageImplsGenerator {
+    fn generate<'a>(
+        &self,
+        _view_trait_path: &::syn::Path,
+        try_trait_path: &::syn::Path,
+        _fields: Box<dyn 'a + Iterator<Item = &'a TraitField>>,
+    ) -> Result<Vec<Item>> {
         let trait_name = &self.rust_trait_name;
         let try_getters = self
             .fields
@@ -64,17 +72,18 @@ impl GenDynamicMessageImpls {
         let trait_path = self
             .options
             .path_in_self_module(&trait_name.clone().into())?;
-        Ok(parse2(quote! {
+        Ok(vec![parse2(quote! {
             impl<A: ::std::alloc::Allocator + #clone_trait> #trait_path
             for ::puroro::dynamic::DynamicMessage<A> {
                 #(#try_getters)*
                 #(#try_has_methods)*
             }
-        })?)
+        })?])
     }
 }
 
-pub struct Field {
+// Private struct for representing a field in DynamicMessage
+struct Field {
     number: i32,
     trait_field: TraitField,
     current_path: Rc<ProtoPathBuf>,

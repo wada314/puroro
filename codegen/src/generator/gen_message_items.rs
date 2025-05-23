@@ -15,17 +15,17 @@
 pub mod gen_dynamic_message_impl;
 pub mod gen_traits;
 
-use self::gen_dynamic_message_impl::GenDynamicMessageImpls;
+use self::gen_dynamic_message_impl::DynamicMessageImplsGenerator;
 use self::gen_traits::GenTraits;
 use super::CodeGeneratorOptions;
 use crate::descriptor::DescriptorExt;
 use crate::Result;
 use ::std::rc::Rc;
 use ::syn::Item;
+use gen_traits::ImplsGenerator;
 
 pub struct GenMessageItems {
     gen_trait: GenTraits,
-    gen_gm_impls: GenDynamicMessageImpls,
     #[allow(unused)]
     options: Rc<CodeGeneratorOptions>,
 }
@@ -37,7 +37,6 @@ impl GenMessageItems {
     ) -> Result<Self> {
         Ok(Self {
             gen_trait: GenTraits::try_new(desc, Rc::clone(&options))?,
-            gen_gm_impls: GenDynamicMessageImpls::try_new(desc, Rc::clone(&options))?,
             options,
         })
     }
@@ -45,7 +44,6 @@ impl GenMessageItems {
     pub fn gen_items(&self) -> Result<Vec<Item>> {
         let mut items = Vec::new();
         items.extend(self.gen_trait.gen_items()?);
-        items.push(self.gen_gm_impls.gen_impl_message_trait()?);
         Ok(items)
     }
 }

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::{blanket_impls_helper, BlanketImplsGenerator, Field};
+use super::{impls_helper, Field, ImplsGenerator};
 use crate::generator::CodeGeneratorOptions;
 use crate::Result;
 use ::quote::quote;
@@ -23,7 +23,7 @@ pub struct GenBlanketOptionImpls {
     options: Rc<CodeGeneratorOptions>,
 }
 
-impl BlanketImplsGenerator for GenBlanketOptionImpls {
+impl ImplsGenerator for GenBlanketOptionImpls {
     fn generate<'a>(
         &self,
         view_trait_path: &Path,
@@ -36,14 +36,14 @@ impl BlanketImplsGenerator for GenBlanketOptionImpls {
             .option_type(&(TypePath { qself: None, path: t.clone().into() }.into()))?;
         let fields = fields.collect::<Vec<_>>();
 
-        let view_methods = blanket_impls_helper(
+        let view_methods = impls_helper(
             fields.iter().copied(),
             |f| self.gen_get_method_body(f, &t, &view_trait_path),
             |f| self.gen_has_method_body(f, &t, &view_trait_path),
             false,
         )?;
 
-        let try_methods = blanket_impls_helper(
+        let try_methods = impls_helper(
             fields.iter().copied(),
             |f| self.gen_try_get_method_body(f, &t, &try_view_trait_path),
             |f| self.gen_try_has_method_body(f, &t, &try_view_trait_path),
