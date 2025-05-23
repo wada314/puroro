@@ -63,7 +63,7 @@ where
 {
     fields
         .map(|f| {
-            let try_getter: ImplItemFn = {
+            let get_method: ImplItemFn = {
                 let signature = if is_try_trait {
                     f.try_getter_signature()
                 } else {
@@ -74,7 +74,7 @@ where
                     #signature #body
                 })?
             };
-            let try_has_method: Option<ImplItemFn> = {
+            let has_method: Option<ImplItemFn> = {
                 if let Some(signature) = if is_try_trait {
                     f.try_has_method_signature_if_non_repeated()
                 } else {
@@ -88,7 +88,7 @@ where
                     None
                 }
             };
-            Ok(once(try_getter).chain(try_has_method.into_iter()))
+            Ok(once(get_method).chain(has_method.into_iter()))
         })
         .flat_map(ResultExt::transpose_iter)
         .collect::<Result<Vec<_>>>()
