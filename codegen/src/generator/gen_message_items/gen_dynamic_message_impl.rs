@@ -84,9 +84,7 @@ impl ImplsGenerator for DynamicMessageImplsGenerator {
 
 // Private struct for representing a field in DynamicMessage
 struct Field {
-    number: i32,
     trait_field: TraitField,
-    current_path: Rc<ProtoPathBuf>,
     options: Rc<CodeGeneratorOptions>,
 }
 
@@ -97,16 +95,18 @@ impl Field {
         options: Rc<CodeGeneratorOptions>,
     ) -> Result<Self> {
         Ok(Self {
-            number: desc.number(),
             trait_field: TraitField::try_new(desc, Rc::clone(&current_path), Rc::clone(&options))?,
-            current_path,
             options,
         })
     }
 
     fn gen_try_getter(&self) -> Result<Item> {
         let signature = self.trait_field.try_getter_signature();
-        let number = self.number;
+        let number = match &self.trait_field {
+            TraitField::Repeated { number, .. }
+            | TraitField::Implicit { number, .. }
+            | TraitField::Explicit { number, .. } => *number,
+        };
         let body = self
             .options
             .ok_value(&self.gen_try_getter_body(&parse_str("f_opt")?)?)?;
@@ -175,7 +175,8 @@ impl Field {
         field_expr: &Expr,
         t: VariantType<impl AsRef<ProtoPath>>,
     ) -> Result<Expr> {
-        let vt_type: Type = t.to_variant_integer_type(self.current_path.as_ref(), &self.options)?;
+        let vt_type: Type =
+            t.to_variant_integer_type(self.trait_field.base_proto_path.as_ref(), &self.options)?;
         Ok(parse2(quote! {
             (#field_expr).as_scalar_variant::<#vt_type>(
                 true /* TODO: packed check */,
@@ -226,7 +227,8 @@ impl Field {
         field_expr: &Expr,
         t: VariantType<impl AsRef<ProtoPath>>,
     ) -> Result<Expr> {
-        let vt_type: Type = t.to_variant_integer_type(self.current_path.as_ref(), &self.options)?;
+        let vt_type: Type =
+            t.to_variant_integer_type(self.trait_field.base_proto_path.as_ref(), &self.options)?;
         Ok(parse2(quote! {
             (#field_expr).as_repeated_variant::<#vt_type>(true /* TODO: packed check */)
         })?)
