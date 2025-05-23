@@ -275,11 +275,13 @@ impl<M: AsRef<ProtoPath>, E: AsRef<ProtoPath>> FieldType<M, E> {
 #[derive(Debug)]
 pub enum Field {
     Repeated {
+        number: i32,
         getter_signature: Signature,
         try_getter_signature: Signature,
         scalar_proto_type: FieldType<ProtoPathBuf, ProtoPathBuf>,
     },
     Explicit {
+        number: i32,
         getter_signature: Signature,
         has_method_signature: Signature,
         try_getter_signature: Signature,
@@ -287,6 +289,7 @@ pub enum Field {
         scalar_proto_type: FieldType<ProtoPathBuf, ProtoPathBuf>,
     },
     Implicit {
+        number: i32,
         getter_signature: Signature,
         has_method_signature: Signature,
         try_getter_signature: Signature,
@@ -330,6 +333,7 @@ impl Field {
 }
 
 struct FieldFactory {
+    number: i32,
     current_proto_path: Rc<ProtoPathBuf>,
     options: Rc<CodeGeneratorOptions>,
     lower_cased: String,
@@ -346,7 +350,9 @@ impl FieldFactory {
         let lower_cased = convert_into_case(&desc.name(), Case::LowerSnakeCase);
         let presense = FieldPresense::from_field_desc(desc);
         let scalar_proto_type = desc.type_with_full_path()?;
+        let number = desc.number();
         Ok(Self {
+            number,
             current_proto_path,
             options,
             lower_cased,
@@ -359,11 +365,13 @@ impl FieldFactory {
         let getter_signature = self.make_getter()?;
         let try_getter_signature = self.make_try_getter()?;
         let scalar_proto_type = self.scalar_proto_type.clone();
+        let number = self.number;
         match &self.presense {
             FieldPresense::Implicit => {
                 let has_method_signature = self.make_has_method()?;
                 let try_has_method_signature = self.make_try_has_method()?;
                 Ok(Field::Implicit {
+                    number,
                     getter_signature,
                     has_method_signature,
                     try_getter_signature,
@@ -375,6 +383,7 @@ impl FieldFactory {
                 let has_method_signature = self.make_has_method()?;
                 let try_has_method_signature = self.make_try_has_method()?;
                 Ok(Field::Explicit {
+                    number,
                     getter_signature,
                     has_method_signature,
                     try_getter_signature,
@@ -382,9 +391,12 @@ impl FieldFactory {
                     scalar_proto_type,
                 })
             }
-            FieldPresense::Repeated => {
-                Ok(Field::Repeated { getter_signature, try_getter_signature, scalar_proto_type })
-            }
+            FieldPresense::Repeated => Ok(Field::Repeated {
+                number,
+                getter_signature,
+                try_getter_signature,
+                scalar_proto_type,
+            }),
         }
     }
 
