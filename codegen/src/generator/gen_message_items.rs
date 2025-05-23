@@ -20,7 +20,6 @@ use crate::descriptor::DescriptorExt;
 use crate::Result;
 use ::std::rc::Rc;
 use ::syn::Item;
-use gen_traits::ImplsGenerator;
 
 pub struct GenMessageItems {
     gen_trait: GenTraits,

@@ -43,7 +43,7 @@ impl ImplsGenerator for DynamicMessageImplsGenerator {
             true,
         )?;
         Ok(vec![parse2(quote! {
-            impl<A: ::std::alloc::Allocator> #try_view_trait_path
+            impl<A: ::std::alloc::Allocator + ::std::clone::Clone> #try_view_trait_path
             for ::puroro::dynamic::DynamicMessage<A>
             {
                 #(#methods)*
