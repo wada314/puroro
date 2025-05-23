@@ -18,7 +18,7 @@ use crate::generator::CodeGeneratorOptions;
 use crate::Result;
 use ::quote::quote;
 use ::std::rc::Rc;
-use ::syn::{parse2, parse_str, Block, Expr, Ident, Item, Path};
+use ::syn::{parse2, parse_str, Block, Expr, ExprPath, Ident, Item, Path};
 
 pub struct GenBlanketEitherImpls {
     options: Rc<CodeGeneratorOptions>,
@@ -33,25 +33,90 @@ impl BlanketImplsGenerator for GenBlanketEitherImpls {
     ) -> Result<Vec<Item>> {
         let t1: Ident = parse_str("T")?;
         let t2: Ident = parse_str("U")?;
+        let fields: Vec<_> = fields.collect();
 
-        let methods = blanket_impls_helper(
-            fields,
+        let view_methods = blanket_impls_helper(
+            fields.iter().copied(),
+            |f| self.gen_get_method_body(f, &t1, &t2, &view_trait_path),
+            |f| self.gen_has_method_body(f, &t1, &t2, &view_trait_path),
+            false,
+        )?;
+
+        let try_methods = blanket_impls_helper(
+            fields.iter().copied(),
             |f| self.gen_try_get_method_body(f, &t1, &t2, &try_view_trait_path),
             |f| self.gen_try_has_method_body(f, &t1, &t2, &try_view_trait_path),
             true,
         )?;
 
-        Ok(vec![parse2(quote! {
-            impl<#t1: #try_view_trait_path, #t2: #try_view_trait_path> #try_view_trait_path for ::puroro::Either<#t1, #t2> {
-                #(#methods)*
-            }
-        })?])
+        Ok(vec![
+            parse2(quote! {
+                impl<#t1: #view_trait_path, #t2: #view_trait_path> #view_trait_path for ::puroro::Either<#t1, #t2> {
+                    #(#view_methods)*
+                }
+            })?,
+            parse2(quote! {
+                impl<#t1: #try_view_trait_path, #t2: #try_view_trait_path> #try_view_trait_path for ::puroro::Either<#t1, #t2> {
+                    #(#try_methods)*
+                }
+            })?,
+        ])
     }
 }
 
 impl GenBlanketEitherImpls {
     pub fn new(options: Rc<CodeGeneratorOptions>) -> Self {
         Self { options }
+    }
+
+    fn gen_get_method_body(
+        &self,
+        field: &Field,
+        t1: &Ident,
+        t2: &Ident,
+        trait_path: &Path,
+    ) -> crate::Result<Block> {
+        let signature = field.getter_signature();
+        let getter_name = &signature.ident;
+        let map2_expr = quote! {
+            self.as_ref().map2(
+                <#t1 as #trait_path>::#getter_name,
+                <#t2 as #trait_path>::#getter_name
+            )
+        };
+        let expr = match field {
+            Field::Repeated { scalar_proto_type: FieldType::Message(_), .. } => {
+                quote! { #map2_expr.into_iter_either() }
+            }
+            Field::Repeated { .. } => quote! { #map2_expr.into_iter_chained() },
+            Field::Explicit { scalar_proto_type: FieldType::Message(_), .. }
+            | Field::Implicit { scalar_proto_type: FieldType::Message(_), .. } => {
+                quote! { #map2_expr.factor_none() }
+            }
+            _ => quote! { #map2_expr.into_inner() },
+        };
+        let block = parse2(quote! {{ #expr }})?;
+        Ok(block)
+    }
+
+    fn gen_has_method_body(
+        &self,
+        field: &Field,
+        t1: &Ident,
+        t2: &Ident,
+        trait_path: &Path,
+    ) -> crate::Result<Block> {
+        let Some(signature) = field.has_method_signature_if_non_repeated() else {
+            Err("this method is not supported for repeated fields".to_string())?
+        };
+        let has_name = &signature.ident;
+        let block = parse2(quote! {{
+            self.as_ref().map2(
+                <#t1 as #trait_path>::#has_name,
+                <#t2 as #trait_path>::#has_name
+            ).into_inner()
+        }})?;
+        Ok(block)
     }
 
     fn gen_try_get_method_body(
@@ -101,8 +166,8 @@ impl GenBlanketEitherImpls {
         let try_has_name = &signature.ident;
         let expr: Expr = parse2(quote! {
             self.as_ref().try_map2(
-                |t1| <#t1 as #trait_path>::#try_has_name(t1),
-                |t2| <#t2 as #trait_path>::#try_has_name(t2)
+                <#t1 as #trait_path>::#try_has_name,
+                <#t2 as #trait_path>::#try_has_name
             )?.into_inner()
         })?;
         let result_expr = self.options.ok_value(&expr)?;
