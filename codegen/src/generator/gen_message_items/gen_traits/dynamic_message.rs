@@ -36,8 +36,8 @@ impl ImplsGenerator for DynamicMessageImplsGenerator {
     ) -> Result<Vec<Item>> {
         let methods = impls_helper(
             fields,
-            |f| self.gen_try_getter(f),
-            |f| self.gen_try_has_method(f),
+            |f| self.gen_try_getter_block(f),
+            |f| self.gen_try_has_method_block(f),
             true,
         )?;
         Ok(vec![parse2(quote! {
@@ -55,7 +55,7 @@ impl DynamicMessageImplsGenerator {
         Self { options }
     }
 
-    pub fn gen_try_getter(&self, field: &Field) -> Result<Block> {
+    pub fn gen_try_getter_block(&self, field: &Field) -> Result<Block> {
         let number = field.number();
         let body = self.gen_try_getter_body(field, &parse_str("f_opt")?)?;
         let ok = self.options.ok_path()?;
@@ -229,10 +229,55 @@ impl DynamicMessageImplsGenerator {
         })?)
     }
 
-    pub fn gen_try_has_method(&self, _field: &Field) -> Result<Block> {
+    pub fn gen_try_has_method_block(&self, field: &Field) -> Result<Block> {
+        let (Field::Explicit { scalar_proto_type, .. } | Field::Implicit { scalar_proto_type, .. }) =
+            field
+        else {
+            Err("try_has method is not supported for repeated fields")?
+        };
+        let wire_type: WireType<_, _> = scalar_proto_type.as_ref().into();
+        let field_opt: Expr = parse2(quote! { self.field(#number) })?;
+        let body = parse2(match wire_type {
+            WireType::Variant(variant) => {
+                let vt_type: Type = variant
+                    .to_variant_integer_type(field.base_proto_path().as_ref(), &self.options)?;
+                quote! {
+                    #field_opt.and_then(|f| f.as_scalar_variant::<#vt_type>(
+                        true, /* TODO: pack check */
+                        ::puroro::dynamic::FieldReducingErrorStrategy::Skip /* TODO: needs confirmation */
+                    )).is_some()
+                }
+            }
+            WireType::I32(_) => {
+                quote! {
+                    #field_opt.and_then(|f| f.as_scalar_i32(
+                        ::puroro::dynamic::FieldReducingErrorStrategy::Skip /* TODO: needs confirmation */
+                    )).is_some()
+                }
+            }
+            WireType::I64(_) => {
+                quote! {
+                    #field_opt.and_then(|f| f.as_scalar_i64(
+                        ::puroro::dynamic::FieldReducingErrorStrategy::Skip /* TODO: needs confirmation */
+                    )).is_some()
+                }
+            }
+            WireType::Len(LenType::String) => {
+                quote! {
+                    #field_opt.and_then(|f| f.as_scalar_string(
+                        ::puroro::dynamic::FieldReducingErrorStrategy::Skip /* TODO: needs confirmation */
+                    )).is_some()
+                }
+            }
+            
+            _ => todo!(),
+        })?;
+
         Ok(parse2(quote! {
             {
-                todo!()
+                let f_opt = self.field(#number);
+                let result = #body;
+                #ok(result)
             }
         })?)
     }
