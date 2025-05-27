@@ -161,17 +161,17 @@ impl GenBlanketEitherOrBothImpls {
                 <#t2 as #trait_path>::#try_getter_name)?
         })?;
         let ok = self.options.ok_path()?;
-        let expr = match field {
-            Field::Repeated { scalar_proto_type: FieldType::Message(_), .. } => quote! {
+        let block = parse2(match field {
+            Field::Repeated { scalar_proto_type: FieldType::Message(_), .. } => quote! {{
                 #ok(#mapped_either.into_iter_either().map(|either_res| either_res.factor_err()))
-            },
-            Field::Repeated { .. } => quote! {
+            }},
+            Field::Repeated { .. } => quote! {{
                 #ok(#mapped_either.into_iter_chained())
-            },
+            }},
             Field::Explicit { scalar_proto_type: FieldType::Message(_), .. }
-            | Field::Implicit { scalar_proto_type: FieldType::Message(_), .. } => quote! {
+            | Field::Implicit { scalar_proto_type: FieldType::Message(_), .. } => quote! {{
                 #ok(#mapped_either.factor_none())
-            },
+            }},
             Field::Explicit { try_has_method_signature, .. }
             | Field::Implicit { try_has_method_signature, .. } => {
                 let try_has_method_name = &try_has_method_signature.ident;
@@ -190,8 +190,7 @@ impl GenBlanketEitherOrBothImpls {
                     #ok(::std::default::Default::default())
                 }}
             }
-        };
-        let block = parse2(quote! {{ #expr }})?;
+        })?;
         Ok(block)
     }
 
@@ -214,9 +213,12 @@ impl GenBlanketEitherOrBothImpls {
                 || self.as_ref().left().map(<#t1 as #trait_path>::#try_has_name)
                     .transpose()?.unwrap_or(false)
         })?;
-        let result_expr = self.options.ok_value(&expr)?;
+        let ok = self.options.ok_path()?;
         Ok(parse2(quote! {
-            { #result_expr }
+            {
+                let result = #expr;
+                #ok(result)
+            }
         })?)
     }
 }
