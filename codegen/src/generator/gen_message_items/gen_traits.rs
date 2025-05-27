@@ -35,6 +35,7 @@ use blanket_either::GenBlanketEitherImpls;
 use blanket_either_or_both::GenBlanketEitherOrBothImpls;
 use blanket_option::GenBlanketOptionImpls;
 use blanket_ref::GenBlanketRefImpls;
+use blanket_result::GenBlanketResultImpls;
 use dynamic_message::DynamicMessageImplsGenerator;
 
 pub struct GenTraits {
