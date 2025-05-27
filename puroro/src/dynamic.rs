@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-pub mod fields;
+pub mod field;
 pub mod payload;
 
-pub use self::fields::FieldReducingErrorStrategy;
+pub use self::field::FieldReducingErrorStrategy;
 
-use self::fields::DynamicField;
+use self::field::DynamicField;
 use self::payload::{DynamicLenPayload, WireTypeAndPayload};
 use crate::internal::deser::{
     deser_from_bufread, DeserMessageHandlerBase, DeserMessageHandlerForRead,
