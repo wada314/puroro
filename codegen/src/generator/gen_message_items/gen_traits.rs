@@ -17,7 +17,6 @@ mod blanket_either;
 mod blanket_either_or_both;
 mod blanket_option;
 mod blanket_ref;
-mod blanket_result;
 mod dynamic_message;
 
 use crate::cases::{convert_into_case, Case};
@@ -36,7 +35,6 @@ use blanket_either::GenBlanketEitherImpls;
 use blanket_either_or_both::GenBlanketEitherOrBothImpls;
 use blanket_option::GenBlanketOptionImpls;
 use blanket_ref::GenBlanketRefImpls;
-use blanket_result::GenBlanketResultImpls;
 use dynamic_message::DynamicMessageImplsGenerator;
 
 pub struct GenTraits {
@@ -139,7 +137,6 @@ impl GenTraits {
         let blanket_impl_generators: Vec<Rc<dyn ImplsGenerator>> = vec![
             Rc::new(GenBlanketRefImpls::new(Rc::clone(&self.options))),
             Rc::new(GenBlanketOptionImpls::new(Rc::clone(&self.options))),
-            Rc::new(GenBlanketResultImpls::new(Rc::clone(&self.options))),
             Rc::new(GenBlanketBothImpls::new(Rc::clone(&self.options))),
             Rc::new(GenBlanketEitherImpls::new(Rc::clone(&self.options))),
             Rc::new(GenBlanketEitherOrBothImpls::new(Rc::clone(&self.options))),
