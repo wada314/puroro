@@ -12,11 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use super::impls_helper;
 use crate::generator::gen_message_items::gen_traits::{Field, ImplsGenerator};
 use crate::generator::CodeGeneratorOptions;
 use crate::Result;
-use ::quote::{format_ident, quote};
-use ::syn::{parse2, Item, Path};
+use ::quote::quote;
+use ::syn::{parse2, parse_str, Block, Ident, Item, Path};
 use std::rc::Rc;
 
 pub struct GenBlanketResultImpls {
@@ -32,7 +33,13 @@ impl ImplsGenerator for GenBlanketResultImpls {
     ) -> Result<Vec<Item>> {
         let t: Ident = parse_str("T")?;
         let t_expr = parse2(quote! { #t })?;
-        let result_type = self.options.result_type(&t_expr);
+        let result_type = self.options.result_type(&t_expr)?;
+        let methods = impls_helper(
+            fields,
+            |f| self.gen_try_get_method_body(f, &t, try_view_trait_path),
+            |f| self.gen_try_has_method_body(f, &t, try_view_trait_path),
+            true,
+        )?;
 
         Ok(vec![parse2(quote! {
             impl<T: #try_view_trait_path> #try_view_trait_path for #result_type {
@@ -57,12 +64,10 @@ impl GenBlanketResultImpls {
         let try_getter_name = &signature.ident;
         let stmts = match field {
             Field::Repeated { .. } => quote! {
-                self.as_ref().map(<#t as #trait_path>::#try_getter_name).transpose()
-                .map(|iter_opt| iter_opt.into_iter().flatten())
+                self.as_ref().and_then(<#t as #trait_path>::#try_getter_name)
             },
             Field::Explicit { .. } | Field::Implicit { .. } => quote! {
-                self.as_ref().map(<#t as #trait_path>::#try_getter_name).transpose()
-                .map(|opt| opt.unwrap_or_default())
+                self.as_ref().and_then(<#t as #trait_path>::#try_getter_name)
             },
         };
         Ok(parse2(quote! {
@@ -85,7 +90,7 @@ impl GenBlanketResultImpls {
         let ok_false = self.options.ok_value(&parse2(quote! { false })?)?;
         Ok(parse2(quote! { {
             self.as_ref()
-                .map(<#t as #trait_path>::#try_has_name)
+                .and_then(<#t as #trait_path>::#try_has_name)
                 .unwrap_or(#ok_false)
         } })?)
     }
