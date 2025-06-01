@@ -62,8 +62,7 @@
                 "clear": true
             },
             "env": {
-                "RUST_BACKTRACE": "1",
-                "CARGO_PROFILE_TEST_BUILD_OVERRIDE_DEBUG": "true"
+                "RUST_BACKTRACE": "1"
             },
             "group": "test",
             "label": "rust: cargo test -p tests"

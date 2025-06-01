@@ -34,7 +34,6 @@ pub mod string;
 pub mod variant;
 
 pub use self::non_empty::{IsEmpty, NonEmpty};
-pub use ::culpa::throws;
 pub use ::quither::{Both, Either, EitherOrBoth};
 
 use ::thiserror::Error;
@@ -87,6 +86,11 @@ impl From<&'static str> for ErrorKind {
 }
 pub type Result<T> = ::std::result::Result<T, ErrorKind>;
 
+// A type corresponding to the `Person` message, which is something like this:
+//
+// message Person {
+//     string name = 1;
+// }
 pub struct Person<T = PersonInner>(T);
 pub struct PersonInner {
     name: String,
