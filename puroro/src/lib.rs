@@ -85,3 +85,39 @@ impl From<&'static str> for ErrorKind {
     }
 }
 pub type Result<T> = ::std::result::Result<T, ErrorKind>;
+
+pub struct Person<T = PersonInner>(T);
+struct PersonInner {
+    name: String,
+}
+pub trait PersonView {
+    fn name(&self) -> &str;
+}
+pub trait PersonTryView {
+    fn try_name(&self) -> Result<&str>;
+}
+
+impl<T: PersonView> Person<T> {
+    pub fn name(&self) -> &str {
+        self.0.name()
+    }
+}
+
+impl<T: PersonTryView> Person<T> {
+    pub fn try_name(&self) -> Result<&str> {
+        self.0.try_name()
+    }
+}
+
+impl PersonView for PersonInner {
+    fn name(&self) -> &str {
+        &self.name
+    }
+}
+
+impl PersonTryView for self::dynamic::DynamicMessage {
+    fn try_name(&self) -> Result<&str> {
+        let name = self.get_field_as_string("name")?;
+        Ok(name)
+    }
+}
