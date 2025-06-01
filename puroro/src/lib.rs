@@ -117,7 +117,12 @@ impl PersonView for PersonInner {
 
 impl PersonTryView for self::dynamic::DynamicMessage {
     fn try_name(&self) -> Result<&str> {
-        let name = self.get_field_as_string("name")?;
+        let name = self
+            .field(1)
+            .map(|f| f.as_scalar_string(dynamic::FieldReducingErrorStrategy::Skip))
+            .transpose()?
+            .flatten()
+            .unwrap_or_default();
         Ok(name)
     }
 }
