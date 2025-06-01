@@ -77,12 +77,41 @@ where
                 })?
             };
             let has_method: Option<ImplItemFn> = match (is_try_trait, f) {
-                (false, Field::Explicit { has_method_signature: signature, .. })
-                | (false, Field::Implicit { has_method_signature: signature, .. })
-                | (true, Field::Explicit { try_has_method_signature: signature, .. })
-                | (true, Field::Implicit { try_has_method_signature: signature, .. }) => {
+                (
+                    false,
+                    Field::Explicit {
+                        has_method_signature: signature,
+                        has_method_attributes: attrs,
+                        ..
+                    },
+                )
+                | (
+                    false,
+                    Field::Implicit {
+                        has_method_signature: signature,
+                        has_method_attributes: attrs,
+                        ..
+                    },
+                )
+                | (
+                    true,
+                    Field::Explicit {
+                        try_has_method_signature: signature,
+                        try_has_method_attributes: attrs,
+                        ..
+                    },
+                )
+                | (
+                    true,
+                    Field::Implicit {
+                        try_has_method_signature: signature,
+                        try_has_method_attributes: attrs,
+                        ..
+                    },
+                ) => {
                     let body = gen_has_method(f)?;
                     Some(parse2(quote! {
+                        #(#attrs)*
                         #signature #body
                     })?)
                 }

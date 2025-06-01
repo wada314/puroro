@@ -58,12 +58,10 @@ impl DynamicMessageImplsGenerator {
     pub fn gen_try_getter_block(&self, field: &Field) -> Result<Block> {
         let number = field.number();
         let body = self.gen_try_getter_body(field, &parse_str("f_opt")?)?;
-        let ok = self.options.ok_path()?;
         Ok(parse2(quote! {
             {
                 let f_opt = self.field(#number);
-                let result = #body;
-                #ok(result)
+                #body
             }
         })?)
     }

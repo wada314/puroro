@@ -34,7 +34,7 @@ pub mod string;
 pub mod variant;
 
 pub use self::non_empty::{IsEmpty, NonEmpty};
-pub use ::fehler::throws;
+pub use ::culpa::throws;
 pub use ::quither::{Both, Either, EitherOrBoth};
 
 use ::thiserror::Error;
