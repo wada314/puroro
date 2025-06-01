@@ -28,8 +28,8 @@ use ::puroro::Either;
 use ::quote::{format_ident, quote};
 use ::std::iter::once;
 use ::std::rc::Rc;
-use ::syn::{parse2, Block, Ident, ImplItemFn, Item, Path, Type};
-use ::syn::{Lifetime, Signature};
+use ::syn::parse::Parser;
+use ::syn::{parse2, Attribute, Block, Ident, ImplItemFn, Item, Lifetime, Path, Signature, Type};
 use blanket_both::GenBlanketBothImpls;
 use blanket_either::GenBlanketEitherImpls;
 use blanket_either_or_both::GenBlanketEitherOrBothImpls;
@@ -281,25 +281,35 @@ pub enum Field {
         /// used as the base for generating relative paths to other items.
         base_proto_path: Rc<ProtoPathBuf>,
         getter_signature: Signature,
+        getter_attributes: Vec<Attribute>,
         try_getter_signature: Signature,
+        try_getter_attributes: Vec<Attribute>,
         scalar_proto_type: FieldType<ProtoPathBuf, ProtoPathBuf>,
     },
     Explicit {
         number: i32,
         base_proto_path: Rc<ProtoPathBuf>,
         getter_signature: Signature,
+        getter_attributes: Vec<Attribute>,
         has_method_signature: Signature,
+        has_method_attributes: Vec<Attribute>,
         try_getter_signature: Signature,
+        try_getter_attributes: Vec<Attribute>,
         try_has_method_signature: Signature,
+        try_has_method_attributes: Vec<Attribute>,
         scalar_proto_type: FieldType<ProtoPathBuf, ProtoPathBuf>,
     },
     Implicit {
         number: i32,
         base_proto_path: Rc<ProtoPathBuf>,
         getter_signature: Signature,
+        getter_attributes: Vec<Attribute>,
         has_method_signature: Signature,
+        has_method_attributes: Vec<Attribute>,
         try_getter_signature: Signature,
+        try_getter_attributes: Vec<Attribute>,
         try_has_method_signature: Signature,
+        try_has_method_attributes: Vec<Attribute>,
         scalar_proto_type: FieldType<ProtoPathBuf, ProtoPathBuf>,
     },
 }
@@ -384,6 +394,12 @@ impl FieldFactory {
         let scalar_proto_type = self.scalar_proto_type.clone();
         let number = self.number;
         let base_proto_path = Rc::clone(&self.base_proto_path);
+        let getter_attributes = vec![];
+        let try_getter_attributes =
+            (Attribute::parse_outer).parse_str("#[::puroro::throws(::puroro::ErrorKind)]")?;
+        let has_method_attributes = vec![];
+        let try_has_method_attributes =
+            (Attribute::parse_outer).parse_str("#[::puroro::throws(::puroro::ErrorKind)]")?;
         match &self.presense {
             FieldPresense::Implicit => {
                 let has_method_signature = self.make_has_method()?;
@@ -392,9 +408,13 @@ impl FieldFactory {
                     number,
                     base_proto_path,
                     getter_signature,
+                    getter_attributes,
                     has_method_signature,
+                    has_method_attributes,
                     try_getter_signature,
+                    try_getter_attributes,
                     try_has_method_signature,
+                    try_has_method_attributes,
                     scalar_proto_type,
                 })
             }
@@ -405,9 +425,13 @@ impl FieldFactory {
                     number,
                     base_proto_path,
                     getter_signature,
+                    getter_attributes,
                     has_method_signature,
+                    has_method_attributes,
                     try_getter_signature,
+                    try_getter_attributes,
                     try_has_method_signature,
+                    try_has_method_attributes,
                     scalar_proto_type,
                 })
             }
@@ -415,7 +439,9 @@ impl FieldFactory {
                 number,
                 base_proto_path,
                 getter_signature,
+                getter_attributes,
                 try_getter_signature,
+                try_getter_attributes,
                 scalar_proto_type,
             }),
         }
@@ -474,9 +500,10 @@ impl FieldFactory {
                 _ => scalar_ref_type,
             },
         };
-        let getter_result_type = self.options.result_type(&getter_type)?;
+        // Note, this signature will have `#[::puroro::throws(::puroro::ErrorKind)]`,
+        // so the return type is an unwrapped `Result`.
         let sig: Signature = parse2(quote! {
-            fn #name(&self) -> #getter_result_type
+            fn #name(&self) -> #getter_type
         })?;
         Ok(sig)
     }
@@ -486,11 +513,11 @@ impl FieldFactory {
             Err("try_has method is not allowed for repeated fields".to_string())?
         }
         let name = to_ident(&format!("try_has_{}", &self.lower_cased));
-        let has_result_type = self
-            .options
-            .result_type(&self.options.primitive_type("bool")?)?;
+        let bool_type = self.options.primitive_type("bool")?;
+        // Note, this signature will have `#[::puroro::throws(::puroro::ErrorKind)]`,
+        // so the return type is an unwrapped `Result`.
         let sig: Signature = parse2(quote! {
-            fn #name(&self) -> #has_result_type
+            fn #name(&self) -> #bool_type
         })?;
         Ok(sig)
     }
