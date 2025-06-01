@@ -17,6 +17,7 @@
         "rust-analyzer.check.extraArgs": [
             "--exclude",
             "tests"
-        ]
+        ],
+        "rust-analyzer.cargo.buildScripts.enable": false
     }
 }
