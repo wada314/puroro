@@ -389,17 +389,22 @@ impl FieldFactory {
     }
 
     pub fn build(self) -> Result<Field> {
+        thread_local! {
+            static ATTR_THROWS: Attribute = (Attribute::parse_outer)
+                .parse_str("#[::puroro::throws(::puroro::ErrorKind)]")
+                .unwrap()
+                .remove(0);
+        }
+
         let getter_signature = self.make_getter()?;
         let try_getter_signature = self.make_try_getter()?;
         let scalar_proto_type = self.scalar_proto_type.clone();
         let number = self.number;
         let base_proto_path = Rc::clone(&self.base_proto_path);
         let getter_attributes = vec![];
-        let try_getter_attributes =
-            (Attribute::parse_outer).parse_str("#[::puroro::throws(::puroro::ErrorKind)]")?;
+        let try_getter_attributes = vec![ATTR_THROWS.with(Clone::clone)];
         let has_method_attributes = vec![];
-        let try_has_method_attributes =
-            (Attribute::parse_outer).parse_str("#[::puroro::throws(::puroro::ErrorKind)]")?;
+        let try_has_method_attributes = vec![ATTR_THROWS.with(Clone::clone)];
         match &self.presense {
             FieldPresense::Implicit => {
                 let has_method_signature = self.make_has_method()?;
