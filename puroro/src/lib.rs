@@ -87,7 +87,7 @@ impl From<&'static str> for ErrorKind {
 pub type Result<T> = ::std::result::Result<T, ErrorKind>;
 
 pub struct Person<T = PersonInner>(T);
-struct PersonInner {
+pub struct PersonInner {
     name: String,
 }
 pub trait PersonView {
