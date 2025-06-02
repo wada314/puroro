@@ -22,9 +22,3 @@ protoc-bin-vendored = "3.1.0"
 
 [dev-dependencies]
 puroro = { path = "../puroro" }
-
-[profile.test]
-debug = true
-
-[profile.dev]
-debug = true
