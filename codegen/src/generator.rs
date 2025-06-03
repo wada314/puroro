@@ -204,15 +204,15 @@ impl<M, E: AsRef<ProtoPath>> FieldType<M, E> {
         self,
         current_path: impl AsRef<ProtoPath>,
         options: &CodeGeneratorOptions,
-    ) -> Result<::std::result::Result<Type, LenType<M>>> {
+    ) -> ::std::result::Result<Type, LenType<M>> {
         let wire_type = self.into_wire_type();
-        Ok(match wire_type {
-            WireType::Variant(v) => Ok(v.to_primitive_type(current_path, options)?),
-            WireType::I32(i) => Ok(i.to_primitive_type(options)?),
-            WireType::I64(i) => Ok(i.to_primitive_type(options)?),
+        match wire_type {
+            WireType::Variant(v) => Ok(v.to_primitive_type(current_path, options)),
+            WireType::I32(i) => Ok(i.to_primitive_type(options)),
+            WireType::I64(i) => Ok(i.to_primitive_type(options)),
             WireType::Len(l) => Err(l),
-            _ => Err(format!("Group field is not supported"))?,
-        })
+            _ => panic!("Group field is not supported"),
+        }
     }
 }
 impl<E: AsRef<ProtoPath>> VariantType<E> {
@@ -220,8 +220,8 @@ impl<E: AsRef<ProtoPath>> VariantType<E> {
         self,
         current_path: impl AsRef<ProtoPath>,
         options: &CodeGeneratorOptions,
-    ) -> Result<Type> {
-        Ok(match self {
+    ) -> Type {
+        match self {
             VariantType::Int32 => options.primitive_type("i32"),
             VariantType::Int64 => options.primitive_type("i64"),
             VariantType::UInt32 => options.primitive_type("u32"),
@@ -240,24 +240,24 @@ impl<E: AsRef<ProtoPath>> VariantType<E> {
                     .unwrap_or_else(|e| panic!("to_rust_path failed: {}", e));
                 TypePath { qself: None, path }.into()
             }
-        })
+        }
     }
 }
 impl I32Type {
-    pub fn to_primitive_type(self, options: &CodeGeneratorOptions) -> Result<Type> {
-        Ok(options.primitive_type(match self {
+    pub fn to_primitive_type(self, options: &CodeGeneratorOptions) -> Type {
+        options.primitive_type(match self {
             I32Type::Fixed32 => "u32",
             I32Type::SFixed32 => "i32",
             I32Type::Float => "f32",
-        }))
+        })
     }
 }
 impl I64Type {
-    pub fn to_primitive_type(self, options: &CodeGeneratorOptions) -> Result<Type> {
-        Ok(options.primitive_type(match self {
+    pub fn to_primitive_type(self, options: &CodeGeneratorOptions) -> Type {
+        options.primitive_type(match self {
             I64Type::Fixed64 => "u64",
             I64Type::SFixed64 => "i64",
             I64Type::Double => "f64",
-        }))
+        })
     }
 }

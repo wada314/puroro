@@ -140,7 +140,7 @@ impl DynamicMessageImplsGenerator {
         let bytes_expr: Expr = parse2(quote! { (#field_expr).as_scalar_i32(
             ::puroro::dynamic::FieldReducingErrorStrategy::Skip /* TODO: needs confirmation */,
         ) })?;
-        let primitive_type = t.to_primitive_type(&self.options)?;
+        let primitive_type = t.to_primitive_type(&self.options);
         Ok(parse2(
             quote! { (#bytes_expr).map(|v_opt| v_opt.map(#primitive_type::from_le_bytes)) },
         )?)
@@ -154,7 +154,7 @@ impl DynamicMessageImplsGenerator {
         let bytes_expr: Expr = parse2(quote! { (#field_expr).as_scalar_i64(
             ::puroro::dynamic::FieldReducingErrorStrategy::Skip /* TODO: needs confirmation */,
         ) })?;
-        let primitive_type = t.to_primitive_type(&self.options)?;
+        let primitive_type = t.to_primitive_type(&self.options);
         Ok(parse2(
             quote! { (#bytes_expr).map(|v_opt| v_opt.map(#primitive_type::from_le_bytes)) },
         )?)
@@ -198,7 +198,7 @@ impl DynamicMessageImplsGenerator {
         field_expr: &Expr,
         t: I32Type,
     ) -> Result<Expr> {
-        let primitive_type = t.to_primitive_type(&self.options)?;
+        let primitive_type = t.to_primitive_type(&self.options);
         Ok(parse2(quote! {
             (#field_expr).as_repeated_i32().map(|iter| iter.map(|v_res| v_res.map(#primitive_type::from_le_bytes)))
         })?)
@@ -209,7 +209,7 @@ impl DynamicMessageImplsGenerator {
         field_expr: &Expr,
         t: I64Type,
     ) -> Result<Expr> {
-        let primitive_type = t.to_primitive_type(&self.options)?;
+        let primitive_type = t.to_primitive_type(&self.options);
         Ok(parse2(quote! {
             (#field_expr).as_repeated_i64().map(|iter| iter.map(|v_res| v_res.map(#primitive_type::from_le_bytes)))
         })?)
