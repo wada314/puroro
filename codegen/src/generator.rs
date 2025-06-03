@@ -19,11 +19,12 @@ pub mod module;
 
 use crate::descriptor::{FieldType, I32Type, I64Type, LenType, VariantType, WireType};
 use crate::proto_path::ProtoPath;
-use ::quote::{format_ident, quote};
+use ::quote::format_ident;
 use ::std::borrow::Cow;
 use ::std::cell::LazyCell;
 use ::std::cell::OnceCell;
 use ::std::collections::HashSet;
+use ::std::iter::once;
 use ::syn::{parse_quote, parse_str, Expr, Ident, ItemUse, Path, Type, TypePath};
 
 pub use compile::*;
@@ -38,6 +39,8 @@ pub struct CodeGeneratorOptions {
 #[derive(Default, Clone)]
 struct Cache {
     imports: OnceCell<Vec<ItemUse>>,
+    clone_trait: OnceCell<Path>,
+    ok_path: OnceCell<Path>,
 }
 
 #[derive(Default)]
@@ -91,23 +94,21 @@ impl CodeGeneratorOptions {
             }
         })
     }
-    pub fn clone_trait(&self) -> Path {
-        if self.strict_type_path {
-            parse_quote! { ::std::clone::Clone }
-        } else {
-            parse_quote! { Clone }
-        }
+    pub fn clone_trait(&self) -> &Path {
+        self.cache.clone_trait.get_or_init(|| {
+            if self.strict_type_path {
+                parse_quote! { ::std::clone::Clone }
+            } else {
+                parse_quote! { Clone }
+            }
+        })
     }
     pub fn vec_type(&self, elem_type: &Type, alloc: Option<&Type>) -> Type {
-        let generic_params = if let Some(alloc) = alloc {
-            quote! { #elem_type, #alloc }
-        } else {
-            quote! { #elem_type }
-        };
+        let generic_params = once(elem_type).chain(alloc.into_iter());
         if self.allow_import_common_types && !self.strict_type_path {
-            parse_quote! { Vec<#generic_params> }
+            parse_quote! { Vec<#(#generic_params),*> }
         } else {
-            parse_quote! { ::std::vec::Vec<#generic_params> }
+            parse_quote! { ::std::vec::Vec<#(#generic_params),*> }
         }
     }
     pub fn option_type(&self, elem_type: &Type) -> Type {
@@ -137,12 +138,14 @@ impl CodeGeneratorOptions {
         let path = self.ok_path();
         parse_quote! { #path(#value) }
     }
-    pub fn ok_path(&self) -> Path {
-        if self.strict_type_path {
-            parse_quote! { ::std::result::Result::Ok }
-        } else {
-            parse_quote! { Ok }
-        }
+    pub fn ok_path(&self) -> &Path {
+        self.cache.ok_path.get_or_init(|| {
+            if self.strict_type_path {
+                parse_quote! { ::std::result::Result::Ok }
+            } else {
+                parse_quote! { Ok }
+            }
+        })
     }
     pub fn iter_trait(&self, elem_type: &Type) -> Path {
         if self.strict_type_path {
