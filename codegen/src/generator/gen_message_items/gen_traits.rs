@@ -261,11 +261,11 @@ impl<M: AsRef<ProtoPath>, E: AsRef<ProtoPath>> FieldType<M, E> {
                     Ok(parse2(quote! { impl #(#lifetime +)* #path })?)
                 }
                 LenType::String => {
-                    let str_type = options.primitive_type("str")?;
+                    let str_type = options.primitive_type("str");
                     Ok(parse2(quote! { & #(#lifetime)* #str_type })?)
                 }
                 LenType::Bytes => {
-                    let u8_type = options.primitive_type("u8")?;
+                    let u8_type = options.primitive_type("u8");
                     Ok(parse2(quote! { & #(#lifetime)* [#u8_type] })?)
                 }
             },
@@ -428,13 +428,13 @@ impl FieldFactory {
             None,
             &self.options,
         )?;
-        let repeated_view_trait = self.options.puroro_repeated_view_trait(&scalar_ref_type)?;
+        let repeated_view_trait = self.options.puroro_repeated_view_trait(&scalar_ref_type);
         let getter_type = match self.presense {
             FieldPresense::Repeated => parse2(quote! {
                 impl #repeated_view_trait
             })?,
             FieldPresense::Explicit | FieldPresense::Implicit => match self.scalar_proto_type {
-                FieldType::Message(_) => self.options.option_type(&scalar_ref_type)?,
+                FieldType::Message(_) => self.options.option_type(&scalar_ref_type),
                 _ => scalar_ref_type,
             },
         };
@@ -449,7 +449,7 @@ impl FieldFactory {
             Err("has method is not allowed for repeated fields".to_string())?
         }
         let name = to_ident(&format!("has_{}", &self.lower_cased));
-        let bool_type = self.options.primitive_type("bool")?;
+        let bool_type = self.options.primitive_type("bool");
         let sig: Signature = parse2(quote! {
             fn #name(&self) -> #bool_type
         })?;
@@ -465,17 +465,17 @@ impl FieldFactory {
         )?;
         let getter_type = match self.presense {
             FieldPresense::Repeated => {
-                let item_type = self.options.puroro_result_type(&scalar_ref_type)?;
+                let item_type = self.options.puroro_result_type(&scalar_ref_type);
                 parse2(quote! {
                     impl ::puroro::repeated::RepeatedView<Item = #item_type>
                 })?
             }
             FieldPresense::Explicit | FieldPresense::Implicit => match self.scalar_proto_type {
-                FieldType::Message(_) => self.options.option_type(&scalar_ref_type)?,
+                FieldType::Message(_) => self.options.option_type(&scalar_ref_type),
                 _ => scalar_ref_type,
             },
         };
-        let getter_result_type = self.options.puroro_result_type(&getter_type)?;
+        let getter_result_type = self.options.puroro_result_type(&getter_type);
         let sig: Signature = parse2(quote! {
             fn #name(&self) -> #getter_result_type
         })?;
@@ -489,7 +489,7 @@ impl FieldFactory {
         let name = to_ident(&format!("try_has_{}", &self.lower_cased));
         let has_result_type = self
             .options
-            .puroro_result_type(&self.options.primitive_type("bool")?)?;
+            .puroro_result_type(&self.options.primitive_type("bool"));
         let sig: Signature = parse2(quote! {
             fn #name(&self) -> #has_result_type
         })?;

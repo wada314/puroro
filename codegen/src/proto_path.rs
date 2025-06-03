@@ -327,7 +327,7 @@ impl ProtoPath {
                 .collect::<Vec<PathSegment>>();
             let item = last_item_naming(item)?;
             let path_from_self = parse2(quote! { #(#first_component ::)* #(#modules::)* #item})?;
-            Ok(options.path_in_self_module(&path_from_self)?)
+            Ok(options.path_in_self_module(&path_from_self))
         } else {
             Err(format!(
                 "The proto path {} cannot be converted to a rust path.",

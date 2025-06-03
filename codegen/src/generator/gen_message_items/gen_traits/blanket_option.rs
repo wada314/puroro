@@ -33,7 +33,7 @@ impl ImplsGenerator for GenBlanketOptionImpls {
         let t: Ident = parse_str("T")?;
         let t_opt = self
             .options
-            .option_type(&(TypePath { qself: None, path: t.clone().into() }.into()))?;
+            .option_type(&(TypePath { qself: None, path: t.clone().into() }.into()));
         let fields = fields.collect::<Vec<_>>();
 
         let view_methods = impls_helper(
@@ -137,7 +137,9 @@ impl GenBlanketOptionImpls {
             Err("this method is not supported for repeated fields".to_string())?
         };
         let try_has_name = &try_has_method_signature.ident;
-        let ok_false = self.options.ok_value(&parse2(quote! { false })?)?;
+        let ok_false = self
+            .options
+            .ok_value(&parse2(quote! { false }).unwrap_or_else(|e| panic!("parse2 failed: {}", e)));
         Ok(parse2(quote! { {
             self.as_ref()
                 .map(<#t as #trait_path>::#try_has_name)

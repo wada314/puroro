@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::{impls_helper, ImplsGenerator, Field};
+use super::{impls_helper, Field, ImplsGenerator};
 use crate::descriptor::FieldType;
 use crate::generator::CodeGeneratorOptions;
 use crate::Result;
@@ -120,7 +120,7 @@ impl GenBlanketBothImpls {
         let try_getter_name = &signature.ident;
         let t1_try_getter: ExprPath = parse2(quote! { <#t1 as #trait_path>::#try_getter_name })?;
         let t2_try_getter: ExprPath = parse2(quote! { <#t2 as #trait_path>::#try_getter_name })?;
-        let ok = self.options.ok_path()?;
+        let ok = self.options.ok_path();
         let block = parse2::<Block>(match field {
             Field::Repeated { scalar_proto_type: FieldType::Message(_), .. } => quote! {{
                 #ok(self.as_ref().try_map2(#t1_try_getter, #t2_try_getter)?.into_iter_either()
@@ -185,7 +185,7 @@ impl GenBlanketBothImpls {
             Err("this method is not supported for repeated fields".to_string())?
         };
         let try_has_name = &try_has_method_signature.ident;
-        let ok = self.options.ok_path()?;
+        let ok = self.options.ok_path();
         let block = parse2(quote! { {
             let ::puroro::Both::Both(left, right) = self;
             #ok(<#t2 as #trait_path>::#try_has_name(&right)?

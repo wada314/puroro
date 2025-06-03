@@ -160,7 +160,7 @@ impl GenBlanketEitherOrBothImpls {
                 <#t1 as #trait_path>::#try_getter_name,
                 <#t2 as #trait_path>::#try_getter_name)?
         })?;
-        let ok = self.options.ok_path()?;
+        let ok = self.options.ok_path();
         let block = parse2(match field {
             Field::Repeated { scalar_proto_type: FieldType::Message(_), .. } => quote! {{
                 #ok(#mapped_either.into_iter_either().map(|either_res| either_res.factor_err()))
@@ -213,7 +213,7 @@ impl GenBlanketEitherOrBothImpls {
                 || self.as_ref().left().map(<#t1 as #trait_path>::#try_has_name)
                     .transpose()?.unwrap_or(false)
         })?;
-        let ok = self.options.ok_path()?;
+        let ok = self.options.ok_path();
         Ok(parse2(quote! {
             {
                 let result = #expr;

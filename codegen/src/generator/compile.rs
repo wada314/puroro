@@ -139,7 +139,7 @@ impl TryFrom<GeneratedFile> for code_generator_response::File {
                 quote! { pub mod #id; }
             })
             .collect::<Vec<_>>();
-        let imports = from.options.imports()?;
+        let imports = from.options.imports();
         let puroro_root = if is_root_file {
             quote! {
                 #[allow(unused)]

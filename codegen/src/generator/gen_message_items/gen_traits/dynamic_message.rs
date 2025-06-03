@@ -58,7 +58,7 @@ impl DynamicMessageImplsGenerator {
     pub fn gen_try_getter_block(&self, field: &Field) -> Result<Block> {
         let number = field.number();
         let body = self.gen_try_getter_body(field, &parse_str("f_opt")?)?;
-        let ok = self.options.ok_path()?;
+        let ok = self.options.ok_path();
         Ok(parse2(quote! {
             {
                 let f_opt = self.field(#number);
@@ -239,7 +239,7 @@ impl DynamicMessageImplsGenerator {
         let wire_type: WireType<_, _> = scalar_proto_type.as_ref().into();
         let field_opt: Expr = parse2(quote! { self.field(#number) })?;
         let field_ident: Ident = parse_str("f")?;
-        let ok = self.options.ok_path()?;
+        let ok = self.options.ok_path();
         // body: Should be an expression that takes an `&DynamicField` as `#field_ident`
         // and returns a `Result<Option<the field value>>`.
         let body: Expr = parse2(match wire_type {

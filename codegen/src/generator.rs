@@ -69,16 +69,17 @@ impl CodeGeneratorOptionsBuilder {
 }
 
 impl CodeGeneratorOptions {
-    pub fn primitive_type(&self, ty: &str) -> Result<Type> {
-        let ident: Ident = parse_str(ty)?;
-        Ok(parse2(if self.strict_type_path {
+    pub fn primitive_type(&self, ty: &str) -> Type {
+        let ident: Ident = parse_str(ty).unwrap_or_else(|e| panic!("parse_str failed: {}", e));
+        parse2(if self.strict_type_path {
             quote! { ::std::primitive::#ident }
         } else {
             quote! { #ident }
-        })?)
+        })
+        .unwrap_or_else(|e| panic!("parse2 failed: {}", e))
     }
-    pub fn imports(&self) -> Result<&[ItemUse]> {
-        Ok(self.cache.imports.get_or_init(|| {
+    pub fn imports(&self) -> &[ItemUse] {
+        self.cache.imports.get_or_init(|| {
             if self.allow_import_common_types {
                 vec![
                     parse_quote! { #[allow(unused)] use ::std::ops::Deref; },
@@ -90,85 +91,94 @@ impl CodeGeneratorOptions {
             } else {
                 vec![]
             }
-        }))
+        })
     }
-    pub fn clone_trait(&self) -> Result<Path> {
-        Ok(parse2(if self.strict_type_path {
+    pub fn clone_trait(&self) -> Path {
+        parse2(if self.strict_type_path {
             quote! { ::std::clone::Clone }
         } else {
             quote! { Clone }
-        })?)
+        })
+        .unwrap_or_else(|e| panic!("parse2 failed: {}", e))
     }
-    pub fn vec_type(&self, elem_type: &Type, alloc: Option<&Type>) -> Result<Type> {
+    pub fn vec_type(&self, elem_type: &Type, alloc: Option<&Type>) -> Type {
         let generic_params = if let Some(alloc) = alloc {
             quote! { #elem_type, #alloc }
         } else {
             quote! { #elem_type }
         };
-        Ok(parse2(
+        parse2(
             if self.allow_import_common_types && !self.strict_type_path {
                 quote! { Vec<#generic_params> }
             } else {
                 quote! { ::std::vec::Vec<#generic_params> }
             },
-        )?)
+        )
+        .unwrap_or_else(|e| panic!("parse2 failed: {}", e))
     }
-    pub fn option_type(&self, elem_type: &Type) -> Result<Type> {
-        Ok(parse2(if self.strict_type_path {
+    pub fn option_type(&self, elem_type: &Type) -> Type {
+        parse2(if self.strict_type_path {
             quote! { ::std::option::Option<#elem_type> }
         } else {
             quote! { Option<#elem_type> }
-        })?)
+        })
+        .unwrap_or_else(|e| panic!("parse2 failed: {}", e))
     }
-    pub fn puroro_result_type(&self, elem_type: &Type) -> Result<Type> {
-        Ok(parse2(if self.strict_type_path {
+    pub fn puroro_result_type(&self, elem_type: &Type) -> Type {
+        parse2(if self.strict_type_path {
             quote! { ::std::result::Result<#elem_type, ::puroro::ErrorKind> }
         } else if self.allow_import_common_types {
             quote! { Result<#elem_type> }
         } else {
             quote! { Result<#elem_type, ::puroro::ErrorKind> }
-        })?)
+        })
+        .unwrap_or_else(|e| panic!("parse2 failed: {}", e))
     }
-    pub fn puroro_repeated_view_trait(&self, elem_type: &Type) -> Result<Path> {
-        Ok(parse2(if self.strict_type_path {
+    pub fn puroro_repeated_view_trait(&self, elem_type: &Type) -> Path {
+        parse2(if self.strict_type_path {
             quote! { ::puroro::repeated::RepeatedView<Item=#elem_type> }
         } else {
             quote! { RepeatedView<Item=#elem_type> }
-        })?)
+        })
+        .unwrap_or_else(|e| panic!("parse2 failed: {}", e))
     }
-    pub fn ok_value(&self, value: &Expr) -> Result<Expr> {
-        let path = self.ok_path()?;
-        Ok(parse2(quote! { #path(#value) })?)
+    pub fn ok_value(&self, value: &Expr) -> Expr {
+        let path = self.ok_path();
+        parse2(quote! { #path(#value) }).unwrap_or_else(|e| panic!("parse2 failed: {}", e))
     }
-    pub fn ok_path(&self) -> Result<Path> {
-        Ok(parse2(if self.strict_type_path {
+    pub fn ok_path(&self) -> Path {
+        parse2(if self.strict_type_path {
             quote! { ::std::result::Result::Ok }
         } else {
             quote! { Ok }
-        })?)
+        })
+        .unwrap_or_else(|e| panic!("parse2 failed: {}", e))
     }
-    pub fn iter_trait(&self, elem_type: &Type) -> Result<Path> {
-        Ok(parse2(if self.strict_type_path {
+    pub fn iter_trait(&self, elem_type: &Type) -> Path {
+        parse2(if self.strict_type_path {
             quote! { ::std::iter::Iterator<Item=#elem_type> }
         } else {
             quote! { Iterator<Item=#elem_type> }
-        })?)
+        })
+        .unwrap_or_else(|e| panic!("parse2 failed: {}", e))
     }
-    pub fn deref_mut_trait(&self, target: &Type) -> Result<Path> {
-        Ok(parse2(
+    pub fn deref_mut_trait(&self, target: &Type) -> Path {
+        parse2(
             if !self.strict_type_path && self.allow_import_common_types {
                 quote! { DerefMut<Target=#target> }
             } else {
                 quote! { ::std::ops::DerefMut<Target=#target> }
             },
-        )?)
+        )
+        .unwrap_or_else(|e| panic!("parse2 failed: {}", e))
     }
-    pub fn path_in_self_module(&self, path: &Path) -> Result<Path> {
-        Ok(parse2(if self.strict_type_path {
+    pub fn path_in_self_module(&self, path: &Path) -> Path {
+        parse2(if self.strict_type_path {
             quote! { self::#path }
         } else {
             quote! { #path }
-        })?)
+        })
+        .unwrap_or_else(|e| panic!("parse2 failed: {}", e))
     }
 }
 
@@ -226,20 +236,22 @@ impl<E: AsRef<ProtoPath>> VariantType<E> {
         options: &CodeGeneratorOptions,
     ) -> Result<Type> {
         Ok(match self {
-            VariantType::Int32 => options.primitive_type("i32")?,
-            VariantType::Int64 => options.primitive_type("i64")?,
-            VariantType::UInt32 => options.primitive_type("u32")?,
-            VariantType::UInt64 => options.primitive_type("u64")?,
-            VariantType::SInt32 => options.primitive_type("i32")?,
-            VariantType::SInt64 => options.primitive_type("i64")?,
-            VariantType::Bool => options.primitive_type("bool")?,
+            VariantType::Int32 => options.primitive_type("i32"),
+            VariantType::Int64 => options.primitive_type("i64"),
+            VariantType::UInt32 => options.primitive_type("u32"),
+            VariantType::UInt64 => options.primitive_type("u64"),
+            VariantType::SInt32 => options.primitive_type("i32"),
+            VariantType::SInt64 => options.primitive_type("i64"),
+            VariantType::Bool => options.primitive_type("bool"),
             VariantType::Enum(path) => {
                 let path = path
                     .as_ref()
                     .to_relative_path(current_path.as_ref())
                     .unwrap_or(path.as_ref());
 
-                let path = path.to_rust_path(options)?;
+                let path = path
+                    .to_rust_path(options)
+                    .unwrap_or_else(|e| panic!("to_rust_path failed: {}", e));
                 TypePath { qself: None, path }.into()
             }
         })
@@ -251,7 +263,7 @@ impl I32Type {
             I32Type::Fixed32 => "u32",
             I32Type::SFixed32 => "i32",
             I32Type::Float => "f32",
-        })?)
+        }))
     }
 }
 impl I64Type {
@@ -260,6 +272,6 @@ impl I64Type {
             I64Type::Fixed64 => "u64",
             I64Type::SFixed64 => "i64",
             I64Type::Double => "f64",
-        })?)
+        }))
     }
 }
