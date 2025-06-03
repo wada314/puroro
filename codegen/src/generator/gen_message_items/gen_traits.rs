@@ -245,7 +245,7 @@ impl<M: AsRef<ProtoPath>, E: AsRef<ProtoPath>> FieldType<M, E> {
         let lifetime = lifetime.iter();
         match self
             .as_ref()
-            .maybe_into_primitive_type(current_path, options)?
+            .maybe_into_primitive_type(current_path, options)
         {
             Ok(primitive_type) => Ok(primitive_type),
             Err(len_type) => match len_type {

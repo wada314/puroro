@@ -19,7 +19,6 @@ pub mod module;
 
 use crate::descriptor::{FieldType, I32Type, I64Type, LenType, VariantType, WireType};
 use crate::proto_path::ProtoPath;
-use crate::Result;
 use ::quote::{format_ident, quote};
 use ::std::borrow::Cow;
 use ::std::cell::LazyCell;
