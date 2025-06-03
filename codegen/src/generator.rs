@@ -23,13 +23,26 @@ use crate::Result;
 use ::quote::{format_ident, quote};
 use ::std::borrow::Cow;
 use ::std::cell::LazyCell;
+use ::std::cell::OnceCell;
 use ::std::collections::HashSet;
-use ::syn::{parse2, parse_str, Expr, Ident, ItemUse, Path, Type, TypePath};
+use ::syn::{parse2, parse_quote, parse_str, Expr, Ident, ItemUse, Path, Type, TypePath};
 
 pub use compile::*;
 
 #[derive(Clone)]
 pub struct CodeGeneratorOptions {
+    strict_type_path: bool,
+    allow_import_common_types: bool,
+    cache: Cache,
+}
+
+#[derive(Default, Clone)]
+struct Cache {
+    imports: OnceCell<Vec<ItemUse>>,
+}
+
+#[derive(Default)]
+pub struct CodeGeneratorOptionsBuilder {
     /// Should the generated code's type name be fully-qualified type name?
     /// e.g. should we just use `i32` or `::std::primitive::i32` ?
     ///
@@ -45,14 +58,16 @@ pub struct CodeGeneratorOptions {
     /// will not compile.
     pub allow_import_common_types: bool,
 }
-impl Default for CodeGeneratorOptions {
-    fn default() -> Self {
-        Self {
-            strict_type_path: true,
-            allow_import_common_types: false,
+impl CodeGeneratorOptionsBuilder {
+    pub fn build(self) -> CodeGeneratorOptions {
+        CodeGeneratorOptions {
+            strict_type_path: self.strict_type_path,
+            allow_import_common_types: self.allow_import_common_types,
+            cache: Cache::default(),
         }
     }
 }
+
 impl CodeGeneratorOptions {
     pub fn primitive_type(&self, ty: &str) -> Result<Type> {
         let ident: Ident = parse_str(ty)?;
@@ -62,16 +77,20 @@ impl CodeGeneratorOptions {
             quote! { #ident }
         })?)
     }
-    pub fn imports(&self) -> Result<Vec<ItemUse>> {
-        if self.allow_import_common_types {
-            Ok(vec![
-                parse2(quote! { #[allow(unused)] use ::std::ops::Deref; })?,
-                parse2(quote! { #[allow(unused)] use ::std::ops::DerefMut; })?,
-                parse2(quote! { #[allow(unused)] use ::std::vec::Vec; })?,
-            ])
-        } else {
-            Ok(vec![])
-        }
+    pub fn imports(&self) -> Result<&[ItemUse]> {
+        Ok(self.cache.imports.get_or_init(|| {
+            if self.allow_import_common_types {
+                vec![
+                    parse_quote! { #[allow(unused)] use ::std::ops::Deref; },
+                    parse_quote! { #[allow(unused)] use ::std::ops::DerefMut; },
+                    parse_quote! { #[allow(unused)] use ::std::vec::Vec; },
+                    parse_quote! { #[allow(unused)] use ::puroro::Result; },
+                    parse_quote! { #[allow(unused)] use ::puroro::repeated::RepeatedView; },
+                ]
+            } else {
+                vec![]
+            }
+        }))
     }
     pub fn clone_trait(&self) -> Result<Path> {
         Ok(parse2(if self.strict_type_path {
@@ -101,11 +120,20 @@ impl CodeGeneratorOptions {
             quote! { Option<#elem_type> }
         })?)
     }
-    pub fn result_type(&self, elem_type: &Type) -> Result<Type> {
+    pub fn puroro_result_type(&self, elem_type: &Type) -> Result<Type> {
         Ok(parse2(if self.strict_type_path {
             quote! { ::std::result::Result<#elem_type, ::puroro::ErrorKind> }
+        } else if self.allow_import_common_types {
+            quote! { Result<#elem_type> }
         } else {
             quote! { Result<#elem_type, ::puroro::ErrorKind> }
+        })?)
+    }
+    pub fn puroro_repeated_view_trait(&self, elem_type: &Type) -> Result<Path> {
+        Ok(parse2(if self.strict_type_path {
+            quote! { ::puroro::repeated::RepeatedView<Item=#elem_type> }
+        } else {
+            quote! { RepeatedView<Item=#elem_type> }
         })?)
     }
     pub fn ok_value(&self, value: &Expr) -> Result<Expr> {

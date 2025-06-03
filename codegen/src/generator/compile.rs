@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use super::gen_message_items::GenMessageItems;
-use super::{gen_enum_items, CodeGeneratorOptions};
+use super::{gen_enum_items, CodeGeneratorOptions, CodeGeneratorOptionsBuilder};
 use crate::descriptor::RootContext;
 use crate::{ErrorKind, Result};
 use ::prettyplease::unparse;
@@ -28,12 +28,13 @@ pub fn compile(request: &CodeGeneratorRequest) -> Result<CodeGeneratorResponse> 
     let mut response = CodeGeneratorResponse::default();
     response.set_supported_features(Into::<i32>::into(Feature::FeatureProto3Optional) as u64)?;
 
-    let options = Rc::new({
-        let mut options = CodeGeneratorOptions::default();
-        options.strict_type_path = false;
-        options.allow_import_common_types = true;
-        options
-    });
+    let options = Rc::new(
+        CodeGeneratorOptionsBuilder {
+            strict_type_path: false,
+            allow_import_common_types: true,
+        }
+        .build(),
+    );
 
     let root_context: RootContext = request.proto_file().cloned().into();
     let mut out_files = GeneratedFileSet::new(Rc::clone(&options));
