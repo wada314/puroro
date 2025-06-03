@@ -25,7 +25,7 @@ use ::std::borrow::Cow;
 use ::std::cell::LazyCell;
 use ::std::cell::OnceCell;
 use ::std::collections::HashSet;
-use ::syn::{parse2, parse_quote, parse_str, Expr, Ident, ItemUse, Path, Type, TypePath};
+use ::syn::{parse_quote, parse_str, Expr, Ident, ItemUse, Path, Type, TypePath};
 
 pub use compile::*;
 
@@ -71,12 +71,11 @@ impl CodeGeneratorOptionsBuilder {
 impl CodeGeneratorOptions {
     pub fn primitive_type(&self, ty: &str) -> Type {
         let ident: Ident = parse_str(ty).unwrap_or_else(|e| panic!("parse_str failed: {}", e));
-        parse2(if self.strict_type_path {
-            quote! { ::std::primitive::#ident }
+        if self.strict_type_path {
+            parse_quote! { ::std::primitive::#ident }
         } else {
-            quote! { #ident }
-        })
-        .unwrap_or_else(|e| panic!("parse2 failed: {}", e))
+            parse_quote! { #ident }
+        }
     }
     pub fn imports(&self) -> &[ItemUse] {
         self.cache.imports.get_or_init(|| {
@@ -94,12 +93,11 @@ impl CodeGeneratorOptions {
         })
     }
     pub fn clone_trait(&self) -> Path {
-        parse2(if self.strict_type_path {
-            quote! { ::std::clone::Clone }
+        if self.strict_type_path {
+            parse_quote! { ::std::clone::Clone }
         } else {
-            quote! { Clone }
-        })
-        .unwrap_or_else(|e| panic!("parse2 failed: {}", e))
+            parse_quote! { Clone }
+        }
     }
     pub fn vec_type(&self, elem_type: &Type, alloc: Option<&Type>) -> Type {
         let generic_params = if let Some(alloc) = alloc {
@@ -107,78 +105,66 @@ impl CodeGeneratorOptions {
         } else {
             quote! { #elem_type }
         };
-        parse2(
-            if self.allow_import_common_types && !self.strict_type_path {
-                quote! { Vec<#generic_params> }
-            } else {
-                quote! { ::std::vec::Vec<#generic_params> }
-            },
-        )
-        .unwrap_or_else(|e| panic!("parse2 failed: {}", e))
+        if self.allow_import_common_types && !self.strict_type_path {
+            parse_quote! { Vec<#generic_params> }
+        } else {
+            parse_quote! { ::std::vec::Vec<#generic_params> }
+        }
     }
     pub fn option_type(&self, elem_type: &Type) -> Type {
-        parse2(if self.strict_type_path {
-            quote! { ::std::option::Option<#elem_type> }
+        if self.strict_type_path {
+            parse_quote! { ::std::option::Option<#elem_type> }
         } else {
-            quote! { Option<#elem_type> }
-        })
-        .unwrap_or_else(|e| panic!("parse2 failed: {}", e))
+            parse_quote! { Option<#elem_type> }
+        }
     }
     pub fn puroro_result_type(&self, elem_type: &Type) -> Type {
-        parse2(if self.strict_type_path {
-            quote! { ::std::result::Result<#elem_type, ::puroro::ErrorKind> }
+        if self.strict_type_path {
+            parse_quote! { ::std::result::Result<#elem_type, ::puroro::ErrorKind> }
         } else if self.allow_import_common_types {
-            quote! { Result<#elem_type> }
+            parse_quote! { Result<#elem_type> }
         } else {
-            quote! { Result<#elem_type, ::puroro::ErrorKind> }
-        })
-        .unwrap_or_else(|e| panic!("parse2 failed: {}", e))
+            parse_quote! { Result<#elem_type, ::puroro::ErrorKind> }
+        }
     }
     pub fn puroro_repeated_view_trait(&self, elem_type: &Type) -> Path {
-        parse2(if self.strict_type_path {
-            quote! { ::puroro::repeated::RepeatedView<Item=#elem_type> }
+        if self.strict_type_path {
+            parse_quote! { ::puroro::repeated::RepeatedView<Item=#elem_type> }
         } else {
-            quote! { RepeatedView<Item=#elem_type> }
-        })
-        .unwrap_or_else(|e| panic!("parse2 failed: {}", e))
+            parse_quote! { RepeatedView<Item=#elem_type> }
+        }
     }
     pub fn ok_value(&self, value: &Expr) -> Expr {
         let path = self.ok_path();
-        parse2(quote! { #path(#value) }).unwrap_or_else(|e| panic!("parse2 failed: {}", e))
+        parse_quote! { #path(#value) }
     }
     pub fn ok_path(&self) -> Path {
-        parse2(if self.strict_type_path {
-            quote! { ::std::result::Result::Ok }
+        if self.strict_type_path {
+            parse_quote! { ::std::result::Result::Ok }
         } else {
-            quote! { Ok }
-        })
-        .unwrap_or_else(|e| panic!("parse2 failed: {}", e))
+            parse_quote! { Ok }
+        }
     }
     pub fn iter_trait(&self, elem_type: &Type) -> Path {
-        parse2(if self.strict_type_path {
-            quote! { ::std::iter::Iterator<Item=#elem_type> }
+        if self.strict_type_path {
+            parse_quote! { ::std::iter::Iterator<Item=#elem_type> }
         } else {
-            quote! { Iterator<Item=#elem_type> }
-        })
-        .unwrap_or_else(|e| panic!("parse2 failed: {}", e))
+            parse_quote! { Iterator<Item=#elem_type> }
+        }
     }
     pub fn deref_mut_trait(&self, target: &Type) -> Path {
-        parse2(
-            if !self.strict_type_path && self.allow_import_common_types {
-                quote! { DerefMut<Target=#target> }
-            } else {
-                quote! { ::std::ops::DerefMut<Target=#target> }
-            },
-        )
-        .unwrap_or_else(|e| panic!("parse2 failed: {}", e))
+        if !self.strict_type_path && self.allow_import_common_types {
+            parse_quote! { DerefMut<Target=#target> }
+        } else {
+            parse_quote! { ::std::ops::DerefMut<Target=#target> }
+        }
     }
     pub fn path_in_self_module(&self, path: &Path) -> Path {
-        parse2(if self.strict_type_path {
-            quote! { self::#path }
+        if self.strict_type_path {
+            parse_quote! { self::#path }
         } else {
-            quote! { #path }
-        })
-        .unwrap_or_else(|e| panic!("parse2 failed: {}", e))
+            parse_quote! { #path }
+        }
     }
 }
 
