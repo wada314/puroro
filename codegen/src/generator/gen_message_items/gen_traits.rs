@@ -20,8 +20,8 @@ mod blanket_ref;
 mod dynamic_message;
 
 use crate::cases::{convert_into_case, Case};
-use crate::descriptor::{DescriptorExt, FieldDescriptorExt, FieldLabel, FieldType, LenType};
-use crate::generator::{to_ident, CodeGeneratorOptions};
+use crate::descriptor::{DescriptorExt, FieldDescriptorExt, FieldType, LenType};
+use crate::generator::{to_ident, CodeGeneratorOptions, FieldPresense};
 use crate::proto_path::{ProtoPath, ProtoPathBuf};
 use crate::{Result, ResultExt};
 use ::culpa::throws;
@@ -221,60 +221,44 @@ impl GenTraits {
     }
 }
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub enum FieldPresense {
-    Implicit,
-    Explicit,
-    Repeated,
-}
-
-impl FieldPresense {
-    fn from_field_desc(field: &FieldDescriptorExt) -> Self {
-        if field.has_presence() {
-            FieldPresense::Explicit
-        } else if field.label() == FieldLabel::Repeated {
-            FieldPresense::Repeated
-        } else {
-            FieldPresense::Implicit
-        }
-    }
-}
-
-impl<M: AsRef<ProtoPath>, E: AsRef<ProtoPath>> FieldType<M, E> {
-    pub fn gen_scalar_maybe_ref_type(
-        &self,
-        current_path: &ProtoPath,
-        lifetime: Option<&Lifetime>,
-        options: &CodeGeneratorOptions,
-    ) -> Result<Type> {
-        let lifetime = lifetime.iter();
-        match self
-            .as_ref()
-            .maybe_into_primitive_type(current_path, options)
-        {
-            Ok(primitive_type) => Ok(primitive_type),
-            Err(len_type) => match len_type {
-                LenType::Message(path) => {
-                    let path = path
-                        .as_ref()
-                        .to_relative_path(current_path)
-                        .unwrap_or(path.as_ref());
-                    let path = path.to_rust_path_with(options, |name| {
-                        let ident = GenTraits::try_view_trait_name(name)?;
-                        Ok(parse2(quote! { #ident })?)
-                    })?;
-                    Ok(parse2(quote! { impl #(#lifetime +)* #path })?)
-                }
-                LenType::String => {
-                    let str_type = options.primitive_type("str");
-                    Ok(parse2(quote! { & #(#lifetime)* #str_type })?)
-                }
-                LenType::Bytes => {
-                    let u8_type = options.primitive_type("u8");
-                    Ok(parse2(quote! { & #(#lifetime)* [#u8_type] })?)
-                }
-            },
-        }
+#[throws]
+fn gen_scalar_maybe_ref_type<M, E>(
+    field_type: &FieldType<M, E>,
+    current_path: &ProtoPath,
+    lifetime: Option<&Lifetime>,
+    options: &CodeGeneratorOptions,
+) -> Type
+where
+    M: AsRef<ProtoPath>,
+    E: AsRef<ProtoPath>,
+{
+    let lifetime = lifetime.iter();
+    match field_type
+        .as_ref()
+        .maybe_into_primitive_type(current_path, options)
+    {
+        Ok(primitive_type) => primitive_type,
+        Err(len_type) => match len_type {
+            LenType::Message(path) => {
+                let path = path
+                    .as_ref()
+                    .to_relative_path(current_path)
+                    .unwrap_or(path.as_ref());
+                let view_trait_path = path.to_rust_path_with(options, |name| {
+                    let ident = GenTraits::try_view_trait_name(name)?;
+                    Ok(parse2(quote! { #ident })?)
+                })?;
+                parse2(quote! { impl #(#lifetime +)* #view_trait_path })?
+            }
+            LenType::String => {
+                let str_type = options.primitive_type("str");
+                parse2(quote! { & #(#lifetime)* #str_type })?
+            }
+            LenType::Bytes => {
+                let u8_type = options.primitive_type("u8");
+                parse2(quote! { & #(#lifetime)* [#u8_type] })?
+            }
+        },
     }
 }
 
@@ -431,7 +415,8 @@ impl FieldFactory {
     #[throws]
     fn make_getter(&self) -> Signature {
         let name = to_ident(&format!("{}", &self.lower_cased));
-        let scalar_ref_type = self.scalar_proto_type.gen_scalar_maybe_ref_type(
+        let scalar_ref_type = gen_scalar_maybe_ref_type(
+            &self.scalar_proto_type,
             &self.current_proto_path,
             None,
             &self.options,
@@ -466,7 +451,8 @@ impl FieldFactory {
     #[throws]
     fn make_try_getter(&self) -> Signature {
         let name = to_ident(&format!("try_{}", &self.lower_cased));
-        let scalar_ref_type = self.scalar_proto_type.gen_scalar_maybe_ref_type(
+        let scalar_ref_type = gen_scalar_maybe_ref_type(
+            &self.scalar_proto_type,
             &self.current_proto_path,
             None,
             &self.options,

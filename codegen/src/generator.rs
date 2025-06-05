@@ -17,7 +17,9 @@ pub mod gen_enum_items;
 pub mod gen_message_items;
 pub mod module;
 
-use crate::descriptor::{FieldType, I32Type, I64Type, LenType, VariantType, WireType};
+use crate::descriptor::{
+    FieldDescriptorExt, FieldLabel, FieldType, I32Type, I64Type, LenType, VariantType, WireType,
+};
 use crate::proto_path::ProtoPath;
 use ::quote::format_ident;
 use ::std::borrow::Cow;
@@ -261,5 +263,24 @@ impl I64Type {
             I64Type::SFixed64 => "i64",
             I64Type::Double => "f64",
         })
+    }
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum FieldPresense {
+    Implicit,
+    Explicit,
+    Repeated,
+}
+
+impl FieldPresense {
+    fn from_field_desc(field: &FieldDescriptorExt) -> Self {
+        if field.has_presence() {
+            FieldPresense::Explicit
+        } else if field.label() == FieldLabel::Repeated {
+            FieldPresense::Repeated
+        } else {
+            FieldPresense::Implicit
+        }
     }
 }
