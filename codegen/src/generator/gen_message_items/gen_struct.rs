@@ -85,12 +85,16 @@ impl GenStruct {
             .iter()
             .map(|field| field.getter_signature())
             .collect::<Vec<_>>();
+        let getter_names = getter_signatures
+            .iter()
+            .map(|signature| &signature.ident)
+            .collect::<Vec<_>>();
         parse2(quote! {
             impl<#t> #struct_name<#t>
             where #t: #trait_name
             {
                 #(#getter_signatures {
-                    todo!()
+                    <#t as #trait_name>::#getter_names(&self.0)
                 })*
             }
         })?
