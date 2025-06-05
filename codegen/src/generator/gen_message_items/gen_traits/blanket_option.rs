@@ -15,21 +15,25 @@
 use super::{impls_helper, Field, ImplsGenerator};
 use crate::generator::CodeGeneratorOptions;
 use crate::Result;
+use ::culpa::throws;
 use ::quote::quote;
 use ::std::rc::Rc;
 use ::syn::{parse2, parse_str, Block, Ident, Item, Path, TypePath};
+
+type Error = crate::ErrorKind;
 
 pub struct GenBlanketOptionImpls {
     options: Rc<CodeGeneratorOptions>,
 }
 
 impl ImplsGenerator for GenBlanketOptionImpls {
+    #[throws]
     fn generate<'a>(
         &self,
         view_trait_path: &Path,
         try_view_trait_path: &Path,
         fields: Box<dyn 'a + Iterator<Item = &'a Field>>,
-    ) -> Result<Vec<Item>> {
+    ) -> Vec<Item> {
         let t: Ident = parse_str("T")?;
         let t_opt = self
             .options
@@ -50,7 +54,7 @@ impl ImplsGenerator for GenBlanketOptionImpls {
             true,
         )?;
 
-        Ok(vec![
+        vec![
             parse2(quote! {
                 impl<#t: #view_trait_path> #view_trait_path for #t_opt {
                     #(#view_methods)*
@@ -61,7 +65,7 @@ impl ImplsGenerator for GenBlanketOptionImpls {
                     #(#try_methods)*
                 }
             })?,
-        ])
+        ]
     }
 }
 
@@ -70,7 +74,8 @@ impl GenBlanketOptionImpls {
         Self { options }
     }
 
-    fn gen_get_method_body(&self, field: &Field, t: &Ident, trait_path: &Path) -> Result<Block> {
+    #[throws]
+    fn gen_get_method_body(&self, field: &Field, t: &Ident, trait_path: &Path) -> Block {
         let signature = field.getter_signature();
         let getter_name = &signature.ident;
         let stmts = match field {
@@ -83,31 +88,28 @@ impl GenBlanketOptionImpls {
                     .unwrap_or_default()
             },
         };
-        Ok(parse2(quote! {
+        parse2(quote! {
             { #stmts }
-        })?)
+        })?
     }
 
-    fn gen_has_method_body(&self, field: &Field, t: &Ident, trait_path: &Path) -> Result<Block> {
+    #[throws]
+    fn gen_has_method_body(&self, field: &Field, t: &Ident, trait_path: &Path) -> Block {
         let (Field::Implicit { has_method_signature, .. }
         | Field::Explicit { has_method_signature, .. }) = field
         else {
             Err("this method is not supported for repeated fields".to_string())?
         };
         let has_name = &has_method_signature.ident;
-        Ok(parse2(quote! {{
+        parse2(quote! {{
             self.as_ref()
                 .map(<#t as #trait_path>::#has_name)
                 .unwrap_or(false)
-        }})?)
+        }})?
     }
 
-    fn gen_try_get_method_body(
-        &self,
-        field: &Field,
-        t: &Ident,
-        trait_path: &Path,
-    ) -> Result<Block> {
+    #[throws]
+    fn gen_try_get_method_body(&self, field: &Field, t: &Ident, trait_path: &Path) -> Block {
         let signature = field.try_getter_signature();
         let try_getter_name = &signature.ident;
         let stmts = match field {
@@ -120,17 +122,13 @@ impl GenBlanketOptionImpls {
                 .map(|opt| opt.unwrap_or_default())
             },
         };
-        Ok(parse2(quote! {
+        parse2(quote! {
             { #stmts }
-        })?)
+        })?
     }
 
-    fn gen_try_has_method_body(
-        &self,
-        field: &Field,
-        t: &Ident,
-        trait_path: &Path,
-    ) -> Result<Block> {
+    #[throws]
+    fn gen_try_has_method_body(&self, field: &Field, t: &Ident, trait_path: &Path) -> Block {
         let (Field::Implicit { try_has_method_signature, .. }
         | Field::Explicit { try_has_method_signature, .. }) = field
         else {
@@ -140,10 +138,10 @@ impl GenBlanketOptionImpls {
         let ok_false = self
             .options
             .ok_value(&parse2(quote! { false }).unwrap_or_else(|e| panic!("parse2 failed: {}", e)));
-        Ok(parse2(quote! { {
+        parse2(quote! { {
             self.as_ref()
                 .map(<#t as #trait_path>::#try_has_name)
                 .unwrap_or(#ok_false)
-        } })?)
+        } })?
     }
 }

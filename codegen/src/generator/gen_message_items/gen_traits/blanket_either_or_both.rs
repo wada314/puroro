@@ -16,21 +16,25 @@ use super::{impls_helper, Field, ImplsGenerator};
 use crate::descriptor::FieldType;
 use crate::generator::CodeGeneratorOptions;
 use crate::Result;
+use ::culpa::throws;
 use ::quote::quote;
 use ::std::rc::Rc;
 use ::syn::{parse2, parse_str, Block, Expr, Ident, Item, Path};
+
+type Error = crate::ErrorKind;
 
 pub struct GenBlanketEitherOrBothImpls {
     options: Rc<CodeGeneratorOptions>,
 }
 
 impl ImplsGenerator for GenBlanketEitherOrBothImpls {
+    #[throws]
     fn generate<'a>(
         &self,
         view_trait_path: &Path,
         try_view_trait_path: &Path,
         fields: Box<dyn 'a + Iterator<Item = &'a Field>>,
-    ) -> Result<Vec<Item>> {
+    ) -> Vec<Item> {
         let t1: Ident = parse_str("T")?;
         let t2: Ident = parse_str("U")?;
         let fields: Vec<_> = fields.collect();
@@ -49,7 +53,7 @@ impl ImplsGenerator for GenBlanketEitherOrBothImpls {
             true,
         )?;
 
-        Ok(vec![
+        vec![
             parse2(quote! {
                 impl<#t1: #view_trait_path, #t2: #view_trait_path> #view_trait_path for ::puroro::EitherOrBoth<#t1, #t2> {
                     #(#view_methods)*
@@ -60,7 +64,7 @@ impl ImplsGenerator for GenBlanketEitherOrBothImpls {
                     #(#try_methods)*
                 }
             })?,
-        ])
+        ]
     }
 }
 
@@ -69,13 +73,14 @@ impl GenBlanketEitherOrBothImpls {
         Self { options }
     }
 
+    #[throws]
     fn gen_get_method_body(
         &self,
         field: &Field,
         t1: &Ident,
         t2: &Ident,
         trait_path: &Path,
-    ) -> Result<Block> {
+    ) -> Block {
         let signature = field.getter_signature();
         let getter_name = &signature.ident;
         let map2_expr = quote! {
@@ -112,24 +117,24 @@ impl GenBlanketEitherOrBothImpls {
                 }
             }
         };
-        let block = parse2(quote! {{ #expr }})?;
-        Ok(block)
+        parse2(quote! {{ #expr }})?
     }
 
+    #[throws]
     fn gen_has_method_body(
         &self,
         field: &Field,
         t1: &Ident,
         t2: &Ident,
         trait_path: &Path,
-    ) -> Result<Block> {
+    ) -> Block {
         let (Field::Implicit { has_method_signature, .. }
         | Field::Explicit { has_method_signature, .. }) = field
         else {
             Err("this method is not supported for repeated fields".to_string())?
         };
         let has_name = &has_method_signature.ident;
-        let block = parse2(quote! {{
+        parse2(quote! {{
             let (left_opt, right_opt) = self.as_ref().left_and_right();
             if let Some(right) = right_opt {
                 if <#t2 as #trait_path>::#has_name(right) {
@@ -142,17 +147,17 @@ impl GenBlanketEitherOrBothImpls {
                 }
             }
             false
-        }})?;
-        Ok(block)
+        }})?
     }
 
+    #[throws]
     fn gen_try_get_method_body(
         &self,
         field: &Field,
         t1: &Ident,
         t2: &Ident,
         trait_path: &Path,
-    ) -> Result<Block> {
+    ) -> Block {
         let signature = field.try_getter_signature();
         let try_getter_name = &signature.ident;
         let mapped_either: Expr = parse2(quote! {
@@ -161,7 +166,7 @@ impl GenBlanketEitherOrBothImpls {
                 <#t2 as #trait_path>::#try_getter_name)?
         })?;
         let ok = self.options.ok_path();
-        let block = parse2(match field {
+        parse2(match field {
             Field::Repeated { scalar_proto_type: FieldType::Message(_), .. } => quote! {{
                 #ok(#mapped_either.into_iter_either().map(|either_res| either_res.factor_err()))
             }},
@@ -190,17 +195,17 @@ impl GenBlanketEitherOrBothImpls {
                     #ok(::std::default::Default::default())
                 }}
             }
-        })?;
-        Ok(block)
+        })?
     }
 
+    #[throws]
     fn gen_try_has_method_body(
         &self,
         field: &Field,
         t1: &Ident,
         t2: &Ident,
         trait_path: &Path,
-    ) -> Result<Block> {
+    ) -> Block {
         let (Field::Implicit { try_has_method_signature, .. }
         | Field::Explicit { try_has_method_signature, .. }) = field
         else {
@@ -214,11 +219,11 @@ impl GenBlanketEitherOrBothImpls {
                     .transpose()?.unwrap_or(false)
         })?;
         let ok = self.options.ok_path();
-        Ok(parse2(quote! {
+        parse2(quote! {
             {
                 let result = #expr;
                 #ok(result)
             }
-        })?)
+        })?
     }
 }

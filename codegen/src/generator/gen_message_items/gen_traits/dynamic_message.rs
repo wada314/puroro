@@ -17,10 +17,13 @@ use crate::descriptor::{I32Type, I64Type, LenType, VariantType, WireType};
 use crate::generator::CodeGeneratorOptions;
 use crate::proto_path::ProtoPath;
 use crate::Result;
+use ::culpa::throws;
 use ::quote::quote;
 use ::std::rc::Rc;
 use ::syn::{parse2, parse_str, Block, Ident, Item, Path};
 use ::syn::{Expr, Type};
+
+type Error = crate::ErrorKind;
 
 // Implementation generator for DynamicMessage type using ImplsGenerator trait
 pub struct DynamicMessageImplsGenerator {
@@ -28,25 +31,26 @@ pub struct DynamicMessageImplsGenerator {
 }
 
 impl ImplsGenerator for DynamicMessageImplsGenerator {
+    #[throws]
     fn generate<'a>(
         &self,
         _view_trait_path: &Path,
         try_view_trait_path: &Path,
         fields: Box<dyn 'a + Iterator<Item = &'a Field>>,
-    ) -> Result<Vec<Item>> {
+    ) -> Vec<Item> {
         let methods = impls_helper(
             fields,
             |f| self.gen_try_getter_block(f),
             |f| self.gen_try_has_method_block(f),
             true,
         )?;
-        Ok(vec![parse2(quote! {
+        vec![parse2(quote! {
             impl<A: ::std::alloc::Allocator + ::std::clone::Clone> #try_view_trait_path
             for ::puroro::dynamic::DynamicMessage<A>
             {
                 #(#methods)*
             }
-        })?])
+        })?]
     }
 }
 
@@ -55,23 +59,25 @@ impl DynamicMessageImplsGenerator {
         Self { options }
     }
 
-    pub fn gen_try_getter_block(&self, field: &Field) -> Result<Block> {
+    #[throws]
+    pub fn gen_try_getter_block(&self, field: &Field) -> Block {
         let number = field.number();
         let body = self.gen_try_getter_body(field, &parse_str("f_opt")?)?;
         let ok = self.options.ok_path();
-        Ok(parse2(quote! {
+        parse2(quote! {
             {
                 let f_opt = self.field(#number);
                 let result = #body;
                 #ok(result)
             }
-        })?)
+        })?
     }
 
-    pub fn gen_try_getter_body(&self, field: &Field, field_opt_expr: &Expr) -> Result<Expr> {
+    #[throws]
+    pub fn gen_try_getter_body(&self, field: &Field, field_opt_expr: &Expr) -> Expr {
         let wire_type: WireType<_, _> = field.scalar_proto_type().as_ref().into();
         let field_expr: Expr = parse_str("f")?;
-        Ok(match field {
+        match field {
             Field::Repeated { .. } => {
                 let body = match wire_type {
                     WireType::Variant(t) => {
@@ -113,59 +119,62 @@ impl DynamicMessageImplsGenerator {
                     (#field_opt_expr).map(|f| #body).transpose()?.flatten() #(#unwrap_option)*
                 })?
             }
-        })
+        }
     }
 
+    #[throws]
     pub fn gen_try_non_repeated_varint_getter_body(
         &self,
         field: &Field,
         field_expr: &Expr,
         t: VariantType<impl AsRef<ProtoPath>>,
-    ) -> Result<Expr> {
+    ) -> Expr {
         let vt_type: Type =
             t.to_variant_integer_type(field.base_proto_path().as_ref(), &self.options)?;
-        Ok(parse2(quote! {
+        parse2(quote! {
             (#field_expr).as_scalar_variant::<#vt_type>(
                 true /* TODO: packed check */,
                 ::puroro::dynamic::FieldReducingErrorStrategy::Skip /* TODO: needs confirmation */,
             )
-        })?)
+        })?
     }
+
+    #[throws]
     pub fn gen_try_non_repeated_i32_getter_body(
         &self,
         _field: &Field,
         field_expr: &Expr,
         t: I32Type,
-    ) -> Result<Expr> {
+    ) -> Expr {
         let bytes_expr: Expr = parse2(quote! { (#field_expr).as_scalar_i32(
             ::puroro::dynamic::FieldReducingErrorStrategy::Skip /* TODO: needs confirmation */,
         ) })?;
         let primitive_type = t.to_primitive_type(&self.options);
-        Ok(parse2(
-            quote! { (#bytes_expr).map(|v_opt| v_opt.map(#primitive_type::from_le_bytes)) },
-        )?)
+        parse2(quote! { (#bytes_expr).map(|v_opt| v_opt.map(#primitive_type::from_le_bytes)) })?
     }
+
+    #[throws]
     pub fn gen_try_non_repeated_i64_getter_body(
         &self,
         _field: &Field,
         field_expr: &Expr,
         t: I64Type,
-    ) -> Result<Expr> {
+    ) -> Expr {
         let bytes_expr: Expr = parse2(quote! { (#field_expr).as_scalar_i64(
             ::puroro::dynamic::FieldReducingErrorStrategy::Skip /* TODO: needs confirmation */,
         ) })?;
         let primitive_type = t.to_primitive_type(&self.options);
-        Ok(parse2(
-            quote! { (#bytes_expr).map(|v_opt| v_opt.map(#primitive_type::from_le_bytes)) },
-        )?)
+        parse2(quote! { (#bytes_expr).map(|v_opt| v_opt.map(#primitive_type::from_le_bytes)) })?
     }
+
+    #[throws]
     pub fn gen_try_non_repeated_len_getter_body(
         &self,
         _field: &Field,
         field_expr: &Expr,
         t: LenType<impl AsRef<ProtoPath>>,
-    ) -> Result<Expr> {
-        Ok(parse2(match t {
+    ) -> Expr {
+        parse2(match t {
             LenType::String => {
                 quote! { (#field_expr).as_scalar_string(
                 ::puroro::dynamic::FieldReducingErrorStrategy::Skip /* TODO: needs confirmation */,) }
@@ -177,59 +186,67 @@ impl DynamicMessageImplsGenerator {
             LenType::Message(_) => {
                 quote! { (#field_expr).as_scalar_message() }
             }
-        })?)
+        })?
     }
 
+    #[throws]
     pub fn gen_repeated_variant_getter_body(
         &self,
         field: &Field,
         field_expr: &Expr,
         t: VariantType<impl AsRef<ProtoPath>>,
-    ) -> Result<Expr> {
+    ) -> Expr {
         let vt_type: Type =
             t.to_variant_integer_type(field.base_proto_path().as_ref(), &self.options)?;
-        Ok(parse2(quote! {
+        parse2(quote! {
             (#field_expr).as_repeated_variant::<#vt_type>(true /* TODO: packed check */)
-        })?)
+        })?
     }
+
+    #[throws]
     pub fn gen_repeated_i32_getter_body(
         &self,
         _field: &Field,
         field_expr: &Expr,
         t: I32Type,
-    ) -> Result<Expr> {
+    ) -> Expr {
         let primitive_type = t.to_primitive_type(&self.options);
-        Ok(parse2(quote! {
+        parse2(quote! {
             (#field_expr).as_repeated_i32().map(|iter| iter.map(|v_res| v_res.map(#primitive_type::from_le_bytes)))
-        })?)
+        })?
     }
+
+    #[throws]
     pub fn gen_repeated_i64_getter_body(
         &self,
         _field: &Field,
         field_expr: &Expr,
         t: I64Type,
-    ) -> Result<Expr> {
+    ) -> Expr {
         let primitive_type = t.to_primitive_type(&self.options);
-        Ok(parse2(quote! {
+        parse2(quote! {
             (#field_expr).as_repeated_i64().map(|iter| iter.map(|v_res| v_res.map(#primitive_type::from_le_bytes)))
-        })?)
+        })?
     }
+
+    #[throws]
     pub fn gen_repeated_len_getter_body(
         &self,
         _field: &Field,
         field_expr: &Expr,
         t: LenType<impl AsRef<ProtoPath>>,
-    ) -> Result<Expr> {
-        Ok(parse2(match t {
+    ) -> Expr {
+        parse2(match t {
             LenType::String => quote! { (#field_expr).as_repeated_string() },
             LenType::Bytes => quote! { (#field_expr).as_repeated_bytes() },
             LenType::Message(_) => {
                 quote! { (#field_expr).as_repeated_message() }
             }
-        })?)
+        })?
     }
 
-    pub fn gen_try_has_method_block(&self, field: &Field) -> Result<Block> {
+    #[throws]
+    pub fn gen_try_has_method_block(&self, field: &Field) -> Block {
         let (Field::Explicit { scalar_proto_type, .. } | Field::Implicit { scalar_proto_type, .. }) =
             field
         else {
@@ -248,57 +265,42 @@ impl DynamicMessageImplsGenerator {
                     .to_variant_integer_type(field.base_proto_path().as_ref(), &self.options)?;
                 quote! {
                     #field_ident.as_scalar_variant::<#vt_type>(
-                        true, /* TODO: pack check */
-                        ::puroro::dynamic::FieldReducingErrorStrategy::Skip /* TODO: needs confirmation */
+                        true /* TODO: packed check */,
+                        ::puroro::dynamic::FieldReducingErrorStrategy::Skip /* TODO: needs confirmation */,
                     )
                 }
             }
-            WireType::I32(_) => {
-                quote! {
-                    #field_ident.as_scalar_i32(
-                        ::puroro::dynamic::FieldReducingErrorStrategy::Skip /* TODO: needs confirmation */
-                    )
-                }
-            }
-            WireType::I64(_) => {
-                quote! {
-                    #field_ident.as_scalar_i64(
-                        ::puroro::dynamic::FieldReducingErrorStrategy::Skip /* TODO: needs confirmation */
-                    )
-                }
-            }
-            WireType::Len(LenType::String) => {
-                quote! {
-                    #field_ident.as_scalar_string(
-                        ::puroro::dynamic::FieldReducingErrorStrategy::Skip /* TODO: needs confirmation */
-                    )
-                }
-            }
-            WireType::Len(LenType::Bytes) => {
-                quote! {
-                    #field_ident.as_scalar_bytes(
-                        ::puroro::dynamic::FieldReducingErrorStrategy::Skip /* TODO: needs confirmation */
-                    )
-                }
-            }
-            WireType::Len(LenType::Message(_)) => {
-                quote! {
-                    #field_ident.as_scalar_message()
-                }
-            }
-            WireType::StartGroup | WireType::EndGroup => todo!(),
+            WireType::I32(_) => quote! {
+                #field_ident.as_scalar_i32(
+                    ::puroro::dynamic::FieldReducingErrorStrategy::Skip /* TODO: needs confirmation */,
+                )
+            },
+            WireType::I64(_) => quote! {
+                #field_ident.as_scalar_i64(
+                    ::puroro::dynamic::FieldReducingErrorStrategy::Skip /* TODO: needs confirmation */,
+                )
+            },
+            WireType::Len(LenType::String) => quote! {
+                #field_ident.as_scalar_string(
+                    ::puroro::dynamic::FieldReducingErrorStrategy::Skip /* TODO: needs confirmation */,
+                )
+            },
+            WireType::Len(LenType::Bytes) => quote! {
+                #field_ident.as_scalar_bytes(
+                    ::puroro::dynamic::FieldReducingErrorStrategy::Skip /* TODO: needs confirmation */,
+                )
+            },
+            WireType::Len(LenType::Message(_)) => quote! {
+                #field_ident.as_scalar_message()
+            },
+            _ => todo!(),
         })?;
-
-        Ok(parse2(quote! {
+        parse2(quote! {
             {
-                let result = #field_opt.map(|#field_ident| #body)
-                    // `Option<Result<Option<T>>> here`
-                    .transpose()?
-                    .flatten()
-                    .is_some();
+                let result = (#field_opt).map(|#field_ident| #body).transpose()?.is_some();
                 #ok(result)
             }
-        })?)
+        })?
     }
 }
 

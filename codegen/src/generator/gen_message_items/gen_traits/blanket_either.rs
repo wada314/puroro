@@ -16,21 +16,25 @@ use super::{impls_helper, Field, ImplsGenerator};
 use crate::descriptor::FieldType;
 use crate::generator::CodeGeneratorOptions;
 use crate::Result;
+use ::culpa::throws;
 use ::quote::quote;
 use ::std::rc::Rc;
 use ::syn::{parse2, parse_str, Block, Expr, Ident, Item, Path};
+
+type Error = crate::ErrorKind;
 
 pub struct GenBlanketEitherImpls {
     options: Rc<CodeGeneratorOptions>,
 }
 
 impl ImplsGenerator for GenBlanketEitherImpls {
+    #[throws]
     fn generate<'a>(
         &self,
         view_trait_path: &Path,
         try_view_trait_path: &Path,
         fields: Box<dyn 'a + Iterator<Item = &'a Field>>,
-    ) -> Result<Vec<Item>> {
+    ) -> Vec<Item> {
         let t1: Ident = parse_str("T")?;
         let t2: Ident = parse_str("U")?;
         let fields: Vec<_> = fields.collect();
@@ -49,7 +53,7 @@ impl ImplsGenerator for GenBlanketEitherImpls {
             true,
         )?;
 
-        Ok(vec![
+        vec![
             parse2(quote! {
                 impl<#t1: #view_trait_path, #t2: #view_trait_path> #view_trait_path for ::puroro::Either<#t1, #t2> {
                     #(#view_methods)*
@@ -60,7 +64,7 @@ impl ImplsGenerator for GenBlanketEitherImpls {
                     #(#try_methods)*
                 }
             })?,
-        ])
+        ]
     }
 }
 
@@ -69,13 +73,14 @@ impl GenBlanketEitherImpls {
         Self { options }
     }
 
+    #[throws]
     fn gen_get_method_body(
         &self,
         field: &Field,
         t1: &Ident,
         t2: &Ident,
         trait_path: &Path,
-    ) -> crate::Result<Block> {
+    ) -> Block {
         let signature = field.getter_signature();
         let getter_name = &signature.ident;
         let map2_expr = quote! {
@@ -95,39 +100,39 @@ impl GenBlanketEitherImpls {
             }
             _ => quote! { #map2_expr.into_inner() },
         };
-        let block = parse2(quote! {{ #expr }})?;
-        Ok(block)
+        parse2(quote! {{ #expr }})?
     }
 
+    #[throws]
     fn gen_has_method_body(
         &self,
         field: &Field,
         t1: &Ident,
         t2: &Ident,
         trait_path: &Path,
-    ) -> crate::Result<Block> {
+    ) -> Block {
         let (Field::Implicit { has_method_signature, .. }
         | Field::Explicit { has_method_signature, .. }) = field
         else {
             Err("this method is not supported for repeated fields".to_string())?
         };
         let has_name = &has_method_signature.ident;
-        let block = parse2(quote! {{
+        parse2(quote! {{
             self.as_ref().map2(
                 <#t1 as #trait_path>::#has_name,
                 <#t2 as #trait_path>::#has_name
             ).into_inner()
-        }})?;
-        Ok(block)
+        }})?
     }
 
+    #[throws]
     fn gen_try_get_method_body(
         &self,
         field: &Field,
         t1: &Ident,
         t2: &Ident,
         trait_path: &Path,
-    ) -> crate::Result<Block> {
+    ) -> Block {
         let signature = field.try_getter_signature();
         let try_getter_name = &signature.ident;
         let mapped_either: Expr = parse2(quote! {
@@ -153,18 +158,19 @@ impl GenBlanketEitherImpls {
             })
             .unwrap_or_else(|e| panic!("parse2 failed: {}", e)),
         );
-        Ok(parse2(quote! {
+        parse2(quote! {
             { #expr }
-        })?)
+        })?
     }
 
+    #[throws]
     fn gen_try_has_method_body(
         &self,
         field: &Field,
         t1: &Ident,
         t2: &Ident,
         trait_path: &Path,
-    ) -> crate::Result<Block> {
+    ) -> Block {
         let (Field::Implicit { try_has_method_signature, .. }
         | Field::Explicit { try_has_method_signature, .. }) = field
         else {
@@ -178,6 +184,6 @@ impl GenBlanketEitherImpls {
             )?.into_inner()
         })?;
         let result_expr = self.options.ok_value(&expr);
-        Ok(parse2(quote! { { #result_expr } })?)
+        parse2(quote! { { #result_expr } })?
     }
 }
