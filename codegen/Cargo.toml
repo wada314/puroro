@@ -4,6 +4,7 @@ version = "0.15.0"
 edition = "2021"
 
 [dependencies]
+culpa = "1.0.2"
 ipc-channel = "0.19.0"
 itertools = "0.14.0"
 prettyplease = "0.2.27"

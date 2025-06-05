@@ -41,6 +41,7 @@ pub enum ErrorKind {
     #[error("::syn error: {0}\n{1}")]
     SynParseError(#[from] ::syn::Error, Backtrace),
 }
+
 impl From<String> for ErrorKind {
     fn from(s: String) -> Self {
         ErrorKind::CompileError(s, Backtrace::capture())

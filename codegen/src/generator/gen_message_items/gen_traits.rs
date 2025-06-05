@@ -24,6 +24,7 @@ use crate::descriptor::{DescriptorExt, FieldDescriptorExt, FieldLabel, FieldType
 use crate::generator::{to_ident, CodeGeneratorOptions};
 use crate::proto_path::{ProtoPath, ProtoPathBuf};
 use crate::{Result, ResultExt};
+use ::culpa::throws;
 use ::puroro::Either;
 use ::quote::{format_ident, quote};
 use ::std::iter::once;
@@ -37,6 +38,8 @@ use blanket_option::GenBlanketOptionImpls;
 use blanket_ref::GenBlanketRefImpls;
 use dynamic_message::DynamicMessageImplsGenerator;
 
+type Error = crate::ErrorKind;
+
 pub struct GenTraits {
     view_trait_name: Ident,
     try_view_trait_name: Ident,
@@ -45,20 +48,22 @@ pub struct GenTraits {
 }
 
 pub trait ImplsGenerator {
+    #[throws]
     fn generate<'a>(
         &self,
         view_trait_path: &Path,
         try_view_trait_path: &Path,
         fields: Box<dyn 'a + Iterator<Item = &'a Field>>,
-    ) -> Result<Vec<Item>>;
+    ) -> Vec<Item>;
 }
 
+#[throws]
 fn impls_helper<'a, F, G>(
     fields: impl Iterator<Item = &'a Field>,
     gen_getter: F,
     gen_has_method: G,
     is_try_trait: bool,
-) -> Result<Vec<ImplItemFn>>
+) -> Vec<ImplItemFn>
 where
     F: Fn(&Field) -> Result<Block>,
     G: Fn(&Field) -> Result<Block>,
@@ -91,16 +96,14 @@ where
             Ok(once(get_method).chain(has_method.into_iter()))
         })
         .flat_map(ResultExt::transpose_iter)
-        .collect::<Result<Vec<_>>>()
+        .collect::<Result<Vec<_>>>()?
 }
 
 impl GenTraits {
-    pub fn try_new<'a>(
-        desc: &'a DescriptorExt<'a>,
-        options: Rc<CodeGeneratorOptions>,
-    ) -> Result<Self> {
+    #[throws]
+    pub fn try_new<'a>(desc: &'a DescriptorExt<'a>, options: Rc<CodeGeneratorOptions>) -> Self {
         let current_path = Rc::new(desc.current_path().to_owned());
-        Ok(Self {
+        Self {
             view_trait_name: Self::view_trait_name(desc.name())?,
             try_view_trait_name: Self::try_view_trait_name(desc.name())?,
             fields: desc
@@ -109,24 +112,24 @@ impl GenTraits {
                 .map(|f| Field::try_new(f, Rc::clone(&current_path), Rc::clone(&options)))
                 .collect::<Result<Vec<_>>>()?,
             options,
-        })
+        }
     }
 
-    pub fn view_trait_name(message_name: &str) -> Result<Ident> {
-        Ok(format_ident!(
-            "{}View",
-            convert_into_case(message_name, Case::CamelCase)
-        ))
+    #[throws]
+    pub fn view_trait_name(message_name: &str) -> Ident {
+        format_ident!("{}View", convert_into_case(message_name, Case::CamelCase))
     }
 
-    pub fn try_view_trait_name(message_name: &str) -> Result<Ident> {
-        Ok(format_ident!(
+    #[throws]
+    pub fn try_view_trait_name(message_name: &str) -> Ident {
+        format_ident!(
             "Try{}View",
             convert_into_case(message_name, Case::CamelCase)
-        ))
+        )
     }
 
-    pub fn gen_items(&self) -> Result<Vec<Item>> {
+    #[throws]
+    pub fn gen_items(&self) -> Vec<Item> {
         let view_trait_def = self.gen_view_trait()?;
         let view_trait_name = &self.view_trait_name;
         let view_trait_path: Path = parse2(quote! { self::#view_trait_name })?;
@@ -158,13 +161,14 @@ impl GenTraits {
             .flatten()
             .collect::<Result<Vec<_>>>()?;
 
-        Ok([view_trait_def, try_trait_def]
+        [view_trait_def, try_trait_def]
             .into_iter()
             .chain(blanket_impls)
-            .collect())
+            .collect()
     }
 
-    fn gen_view_trait(&self) -> Result<Item> {
+    #[throws]
+    fn gen_view_trait(&self) -> Item {
         let trait_name = &self.view_trait_name;
         let try_trait_name = &self.try_view_trait_name;
         let getters = self
@@ -181,15 +185,16 @@ impl GenTraits {
                 _ => None,
             })
             .collect::<Vec<_>>();
-        Ok(parse2(quote! {
+        parse2(quote! {
             pub trait #trait_name: self::#try_trait_name {
                 #(#getters;)*
                 #(#has_methods;)*
             }
-        })?)
+        })?
     }
 
-    fn gen_try_view_trait(&self) -> Result<Item> {
+    #[throws]
+    fn gen_try_view_trait(&self) -> Item {
         let trait_name = &self.try_view_trait_name;
         let try_getters = self
             .fields
@@ -207,12 +212,12 @@ impl GenTraits {
                 _ => None,
             })
             .collect::<Vec<_>>();
-        Ok(parse2(quote! {
+        parse2(quote! {
             pub trait #trait_name {
                 #(#try_getters;)*
                 #(#try_has_methods;)*
             }
-        })?)
+        })?
     }
 }
 
@@ -357,17 +362,18 @@ struct FieldFactory {
 }
 
 impl FieldFactory {
+    #[throws]
     pub fn new(
         desc: &FieldDescriptorExt,
         current_proto_path: Rc<ProtoPathBuf>,
         options: Rc<CodeGeneratorOptions>,
-    ) -> Result<Self> {
+    ) -> Self {
         let lower_cased = convert_into_case(&desc.name(), Case::LowerSnakeCase);
         let presense = FieldPresense::from_field_desc(desc);
         let scalar_proto_type = desc.type_with_full_path()?;
         let number = desc.number();
         let base_proto_path = Rc::clone(&current_proto_path);
-        Ok(Self {
+        Self {
             number,
             base_proto_path,
             current_proto_path,
@@ -375,10 +381,11 @@ impl FieldFactory {
             lower_cased,
             presense,
             scalar_proto_type,
-        })
+        }
     }
 
-    pub fn build(self) -> Result<Field> {
+    #[throws]
+    pub fn build(self) -> Field {
         let getter_signature = self.make_getter()?;
         let try_getter_signature = self.make_try_getter()?;
         let scalar_proto_type = self.scalar_proto_type.clone();
@@ -388,7 +395,7 @@ impl FieldFactory {
             FieldPresense::Implicit => {
                 let has_method_signature = self.make_has_method()?;
                 let try_has_method_signature = self.make_try_has_method()?;
-                Ok(Field::Implicit {
+                Field::Implicit {
                     number,
                     base_proto_path,
                     getter_signature,
@@ -396,12 +403,12 @@ impl FieldFactory {
                     try_getter_signature,
                     try_has_method_signature,
                     scalar_proto_type,
-                })
+                }
             }
             FieldPresense::Explicit => {
                 let has_method_signature = self.make_has_method()?;
                 let try_has_method_signature = self.make_try_has_method()?;
-                Ok(Field::Explicit {
+                Field::Explicit {
                     number,
                     base_proto_path,
                     getter_signature,
@@ -409,19 +416,20 @@ impl FieldFactory {
                     try_getter_signature,
                     try_has_method_signature,
                     scalar_proto_type,
-                })
+                }
             }
-            FieldPresense::Repeated => Ok(Field::Repeated {
+            FieldPresense::Repeated => Field::Repeated {
                 number,
                 base_proto_path,
                 getter_signature,
                 try_getter_signature,
                 scalar_proto_type,
-            }),
+            },
         }
     }
 
-    fn make_getter(&self) -> Result<Signature> {
+    #[throws]
+    fn make_getter(&self) -> Signature {
         let name = to_ident(&format!("{}", &self.lower_cased));
         let scalar_ref_type = self.scalar_proto_type.gen_scalar_maybe_ref_type(
             &self.current_proto_path,
@@ -438,25 +446,25 @@ impl FieldFactory {
                 _ => scalar_ref_type,
             },
         };
-        let sig: Signature = parse2(quote! {
+        parse2(quote! {
             fn #name(&self) -> #getter_type
-        })?;
-        Ok(sig)
+        })?
     }
 
-    fn make_has_method(&self) -> Result<Signature> {
+    #[throws]
+    fn make_has_method(&self) -> Signature {
         if let FieldPresense::Repeated = self.presense {
             Err("has method is not allowed for repeated fields".to_string())?
         }
         let name = to_ident(&format!("has_{}", &self.lower_cased));
         let bool_type = self.options.primitive_type("bool");
-        let sig: Signature = parse2(quote! {
+        parse2(quote! {
             fn #name(&self) -> #bool_type
-        })?;
-        Ok(sig)
+        })?
     }
 
-    fn make_try_getter(&self) -> Result<Signature> {
+    #[throws]
+    fn make_try_getter(&self) -> Signature {
         let name = to_ident(&format!("try_{}", &self.lower_cased));
         let scalar_ref_type = self.scalar_proto_type.gen_scalar_maybe_ref_type(
             &self.current_proto_path,
@@ -476,13 +484,13 @@ impl FieldFactory {
             },
         };
         let getter_result_type = self.options.puroro_result_type(&getter_type);
-        let sig: Signature = parse2(quote! {
+        parse2(quote! {
             fn #name(&self) -> #getter_result_type
-        })?;
-        Ok(sig)
+        })?
     }
 
-    fn make_try_has_method(&self) -> Result<Signature> {
+    #[throws]
+    fn make_try_has_method(&self) -> Signature {
         if let FieldPresense::Repeated = self.presense {
             Err("try_has method is not allowed for repeated fields".to_string())?
         }
@@ -490,19 +498,19 @@ impl FieldFactory {
         let has_result_type = self
             .options
             .puroro_result_type(&self.options.primitive_type("bool"));
-        let sig: Signature = parse2(quote! {
+        parse2(quote! {
             fn #name(&self) -> #has_result_type
-        })?;
-        Ok(sig)
+        })?
     }
 }
 
 impl Field {
+    #[throws]
     pub fn try_new<'a>(
         desc: &'a FieldDescriptorExt<'a>,
         current_proto_path: Rc<ProtoPathBuf>,
         options: Rc<CodeGeneratorOptions>,
-    ) -> Result<Self> {
-        FieldFactory::new(desc, current_proto_path, options)?.build()
+    ) -> Self {
+        FieldFactory::new(desc, current_proto_path, options)?.build()?
     }
 }
