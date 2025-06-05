@@ -104,8 +104,8 @@ impl GenTraits {
     pub fn try_new<'a>(desc: &'a DescriptorExt<'a>, options: Rc<CodeGeneratorOptions>) -> Self {
         let current_path = Rc::new(desc.current_path().to_owned());
         Self {
-            view_trait_name: Self::view_trait_name(desc.name())?,
-            try_view_trait_name: Self::try_view_trait_name(desc.name())?,
+            view_trait_name: Self::gen_view_trait_name(desc.name())?,
+            try_view_trait_name: Self::gen_try_view_trait_name(desc.name())?,
             fields: desc
                 .non_oneof_fields()?
                 .into_iter()
@@ -115,13 +115,21 @@ impl GenTraits {
         }
     }
 
+    pub fn view_trait_name(&self) -> &Ident {
+        &self.view_trait_name
+    }
+
+    pub fn try_view_trait_name(&self) -> &Ident {
+        &self.try_view_trait_name
+    }
+
     #[throws]
-    pub fn view_trait_name(message_name: &str) -> Ident {
+    pub fn gen_view_trait_name(message_name: &str) -> Ident {
         format_ident!("{}View", convert_into_case(message_name, Case::CamelCase))
     }
 
     #[throws]
-    pub fn try_view_trait_name(message_name: &str) -> Ident {
+    fn gen_try_view_trait_name(message_name: &str) -> Ident {
         format_ident!(
             "Try{}View",
             convert_into_case(message_name, Case::CamelCase)
@@ -245,7 +253,7 @@ where
                     .to_relative_path(current_path)
                     .unwrap_or(path.as_ref());
                 let view_trait_path = path.to_rust_path_with(options, |name| {
-                    let ident = GenTraits::try_view_trait_name(name)?;
+                    let ident = GenTraits::gen_try_view_trait_name(name)?;
                     Ok(parse2(quote! { #ident })?)
                 })?;
                 parse2(quote! { impl #(#lifetime +)* #view_trait_path })?

@@ -57,7 +57,7 @@ impl GenStruct {
 
     #[throws]
     pub fn gen_items(&self) -> Vec<Item> {
-        vec![self.gen_struct()?]
+        vec![self.gen_struct()?, self.gen_view_wrapping_impl()?]
     }
 
     #[throws]
@@ -72,6 +72,27 @@ impl GenStruct {
         let default_type: Type = parse2(quote! { ::puroro::dynamic::DynamicMessage })?;
         parse2(quote! {
             pub struct #struct_name<#t = #default_type>(#t);
+        })?
+    }
+
+    #[throws]
+    fn gen_view_wrapping_impl(&self) -> Item {
+        let struct_name = &self.struct_name;
+        let t = format_ident!("T");
+        let trait_name = self.gen_traits.view_trait_name();
+        let getter_signatures = self
+            .fields
+            .iter()
+            .map(|field| field.getter_signature())
+            .collect::<Vec<_>>();
+        parse2(quote! {
+            impl<#t> #struct_name<#t>
+            where #t: #trait_name
+            {
+                #(#getter_signatures {
+                    todo!()
+                })*
+            }
         })?
     }
 }
@@ -91,6 +112,14 @@ impl Field {
         options: Rc<CodeGeneratorOptions>,
     ) -> Self {
         FieldFactory::new(desc, current_proto_path, options)?.build()?
+    }
+
+    fn getter_signature(&self) -> &Signature {
+        match self {
+            Field::Explicit { getter_signature, .. }
+            | Field::Implicit { getter_signature, .. }
+            | Field::Repeated { getter_signature, .. } => getter_signature,
+        }
     }
 }
 
@@ -186,7 +215,7 @@ where
                     .to_relative_path(current_path)
                     .unwrap_or(path.as_ref());
                 let view_trait_path = path.to_rust_path_with(options, |name| {
-                    let ident = GenTraits::try_view_trait_name(name)?;
+                    let ident = GenTraits::gen_view_trait_name(name)?;
                     Ok(parse2(quote! { #ident })?)
                 })?;
                 let struct_path = path.to_rust_path_with(options, |name| {
