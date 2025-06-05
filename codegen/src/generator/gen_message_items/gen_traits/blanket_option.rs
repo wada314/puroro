@@ -14,7 +14,6 @@
 
 use super::{impls_helper, Field, ImplsGenerator};
 use crate::generator::CodeGeneratorOptions;
-use crate::Result;
 use ::culpa::throws;
 use ::quote::quote;
 use ::std::rc::Rc;
