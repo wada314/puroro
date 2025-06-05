@@ -134,13 +134,12 @@ impl GenBlanketOptionImpls {
             Err("this method is not supported for repeated fields".to_string())?
         };
         let try_has_name = &try_has_method_signature.ident;
-        let ok_false = self
-            .options
-            .ok_value(&parse2(quote! { false }).unwrap_or_else(|e| panic!("parse2 failed: {}", e)));
+        let ok = self.options.ok_path();
         parse2(quote! { {
-            self.as_ref()
+            #ok(self.as_ref()
                 .map(<#t as #trait_path>::#try_has_name)
-                .unwrap_or(#ok_false)
+                .transpose()?
+                .unwrap_or_default())
         } })?
     }
 }
