@@ -15,17 +15,18 @@
 use ::std::rc::Rc;
 
 use super::gen_traits::GenTraits;
-use crate::cases::{convert_into_case, Case};
-use crate::descriptor::{DescriptorExt, FieldDescriptorExt, FieldType, LenType};
-use crate::generator::{to_ident, CodeGeneratorOptions, FieldPresense};
-use crate::proto_path::{ProtoPath, ProtoPathBuf};
 use crate::ErrorKind;
 use crate::Result;
+use crate::cases::{Case, convert_into_case};
+use crate::descriptor::{DescriptorExt, FieldDescriptorExt, FieldType, LenType};
+use crate::generator::{CodeGeneratorOptions, FieldPresense, to_ident};
+use crate::proto_path::{ProtoPath, ProtoPathBuf};
 use ::culpa::throws;
 use ::quote::{format_ident, quote};
 use ::syn::parse::Parser;
 use ::syn::{
-    parse2, Block, Ident, Item, Lifetime, PathArguments, PathSegment, Signature, Stmt, Type,
+    Block, Expr, ExprPath, GenericArgument, GenericParam, Ident, Item, Lifetime, PathArguments,
+    PathSegment, Signature, Stmt, Type, TypePath, parse2,
 };
 
 type Error = ErrorKind;
@@ -249,7 +250,7 @@ impl FieldFactory {
 
     #[throws]
     pub fn build(self) -> Field {
-        let getter_signature = self.make_getter()?;
+        let getter_signature = self.gen_getter_signature()?;
         let scalar_proto_type = self.scalar_proto_type;
         let current_proto_path = self.current_proto_path;
         match &self.presense {
@@ -266,12 +267,16 @@ impl FieldFactory {
     }
 
     #[throws]
-    fn make_getter(&self) -> Signature {
+    fn gen_getter_signature<'a>(
+        &self,
+        outer_generic_params: impl Iterator<Item = &'a GenericParam>,
+    ) -> Signature {
         let name = to_ident(&format!("{}", &self.lower_cased));
         let scalar_ref_type = gen_scalar_maybe_ref_type(
             &self.scalar_proto_type,
             &self.current_proto_path,
             None,
+            outer_generic_params,
             &self.options,
         )?;
         let repeated_view_trait = self.options.puroro_repeated_view_trait(&scalar_ref_type);
@@ -291,10 +296,11 @@ impl FieldFactory {
 }
 
 #[throws]
-fn gen_scalar_maybe_ref_type<M, E>(
+fn gen_scalar_maybe_ref_type<'a, M, E>(
     field_type: &FieldType<M, E>,
     current_path: &ProtoPath,
     lifetime: Option<&Lifetime>,
+    outer_generic_params: impl Iterator<Item = &'a GenericParam>,
     options: &CodeGeneratorOptions,
 ) -> Type
 where
@@ -307,30 +313,52 @@ where
         .maybe_into_primitive_type(current_path, options)
     {
         Ok(primitive_type) => primitive_type,
-        Err(len_type) => match len_type {
-            LenType::Message(path) => {
-                let path = path
-                    .as_ref()
-                    .to_relative_path(current_path)
-                    .unwrap_or(path.as_ref());
-                let view_trait_path = path.to_rust_path_with(options, |name| {
-                    let ident = GenTraits::gen_view_trait_name(name)?;
-                    Ok(parse2(quote! { #ident })?)
-                })?;
-                let struct_path = path.to_rust_path_with(options, |name| {
+        Err(len_type) => {
+            match len_type {
+                LenType::Message(path) => {
+                    let path = path
+                        .as_ref()
+                        .to_relative_path(current_path)
+                        .unwrap_or(path.as_ref());
+                    let view_trait_path = path.to_rust_path_with(options, |name| {
+                        let ident = GenTraits::gen_view_trait_name(name)?;
+                        Ok(parse2(quote! { #ident })?)
+                    })?;
+                    let use_bound_params = outer_generic_params
+                        .map(|param| match param {
+                            GenericParam::Type(type_param) => {
+                                GenericArgument::Type(Type::Path(TypePath {
+                                    qself: None,
+                                    path: type_param.ident.clone().into(),
+                                }))
+                            }
+                            GenericParam::Lifetime(lt_param) => {
+                                GenericArgument::Lifetime(lt_param.lifetime.clone())
+                            }
+                            GenericParam::Const(const_param) => {
+                                GenericArgument::Const(Expr::Path(ExprPath {
+                                    attrs: vec![],
+                                    qself: None,
+                                    path: const_param.ident.clone().into(),
+                                }))
+                            }
+                        })
+                        .collect::<Vec<_>>();
+                    let struct_path = path.to_rust_path_with(options, |name| {
                     let ident = GenStruct::struct_name(name)?;
-                    Ok(parse2(quote! { #ident :: <impl #view_trait_path> })?)
+                    Ok(parse2(quote! { #ident :: <impl #view_trait_path + use<#(#use_bound_params)*>> })?)
                 })?;
-                parse2(quote! { #struct_path })?
+                    parse2(quote! { #struct_path })?
+                }
+                LenType::String => {
+                    let str_type = options.primitive_type("str");
+                    parse2(quote! { & #(#lifetime)* #str_type })?
+                }
+                LenType::Bytes => {
+                    let u8_type = options.primitive_type("u8");
+                    parse2(quote! { & #(#lifetime)* [#u8_type] })?
+                }
             }
-            LenType::String => {
-                let str_type = options.primitive_type("str");
-                parse2(quote! { & #(#lifetime)* #str_type })?
-            }
-            LenType::Bytes => {
-                let u8_type = options.primitive_type("u8");
-                parse2(quote! { & #(#lifetime)* [#u8_type] })?
-            }
-        },
+        }
     }
 }
