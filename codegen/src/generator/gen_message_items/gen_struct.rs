@@ -23,7 +23,10 @@ use crate::ErrorKind;
 use crate::Result;
 use ::culpa::throws;
 use ::quote::{format_ident, quote};
-use ::syn::{parse2, Ident, Item, Lifetime, Signature, Type};
+use ::syn::parse::Parser;
+use ::syn::{
+    parse2, Block, Ident, Item, Lifetime, PathArguments, PathSegment, Signature, Stmt, Type,
+};
 
 type Error = ErrorKind;
 
@@ -71,7 +74,8 @@ impl GenStruct {
         let t = format_ident!("T");
         let default_type: Type = parse2(quote! { ::puroro::dynamic::DynamicMessage })?;
         parse2(quote! {
-            pub struct #struct_name<#t = #default_type>(#t);
+            #[repr(transparent)]
+            pub struct #struct_name<#t = #default_type>(pub #t);
         })?
     }
 
@@ -85,27 +89,94 @@ impl GenStruct {
             .iter()
             .map(|field| field.getter_signature())
             .collect::<Vec<_>>();
-        let getter_names = getter_signatures
+        let body_stmts = self
+            .fields
             .iter()
-            .map(|signature| &signature.ident)
-            .collect::<Vec<_>>();
+            .map(|field| self.gen_view_wrapping_method_body(field, &t, trait_name, &self.options))
+            .collect::<Result<Vec<_>>>()?;
         parse2(quote! {
             impl<#t> #struct_name<#t>
             where #t: #trait_name
             {
                 #(#getter_signatures {
-                    <#t as #trait_name>::#getter_names(&self.0)
+                    #(#body_stmts)*
                 })*
             }
         })?
+    }
+
+    #[throws]
+    fn gen_view_wrapping_method_body(
+        &self,
+        field: &Field,
+        t: &Ident,
+        trait_name: &Ident,
+        options: &CodeGeneratorOptions,
+    ) -> Vec<Stmt> {
+        let parser = Block::parse_within;
+        let getter_name = &field.getter_signature().ident;
+        let body_tokens = match field {
+            Field::Repeated { scalar_proto_type: FieldType::Message(m), .. } => {
+                let wrapper_type = m
+                    .to_relative_path(&field.current_proto_path())
+                    .unwrap_or(m.as_ref())
+                    .to_rust_path_with(options, |name| {
+                        Ok(PathSegment {
+                            ident: GenStruct::struct_name(name)?,
+                            arguments: PathArguments::None,
+                        })
+                    })?;
+                // Repeated message field. Need to map the iterator values by the wrapper type.
+                quote! {
+                    <#t as #trait_name>::#getter_name(&self.0)
+                        .into_iter()
+                        .map(|value| #wrapper_type(value))
+                }
+            }
+            Field::Explicit { scalar_proto_type: FieldType::Message(m), .. }
+            | Field::Implicit { scalar_proto_type: FieldType::Message(m), .. } => {
+                let wrapper_type = m
+                    .to_relative_path(&field.current_proto_path())
+                    .unwrap_or(m.as_ref())
+                    .to_rust_path_with(options, |name| {
+                        Ok(PathSegment {
+                            ident: GenStruct::struct_name(name)?,
+                            arguments: PathArguments::None,
+                        })
+                    })?;
+                // Scalar message field. Need to map the Option inner value by the wrapper type.
+                quote! {
+                    <#t as #trait_name>::#getter_name(&self.0)
+                        .map(|value| #wrapper_type(value))
+                }
+            }
+            _ => {
+                quote! {
+                    <#t as #trait_name>::#getter_name(&self.0)
+                }
+            }
+        };
+        parser.parse2(body_tokens)?
     }
 }
 
 #[derive(Debug)]
 enum Field {
-    Explicit { getter_signature: Signature },
-    Implicit { getter_signature: Signature },
-    Repeated { getter_signature: Signature },
+    Explicit {
+        current_proto_path: Rc<ProtoPathBuf>,
+        getter_signature: Signature,
+        scalar_proto_type: FieldType<ProtoPathBuf, ProtoPathBuf>,
+    },
+    Implicit {
+        current_proto_path: Rc<ProtoPathBuf>,
+        getter_signature: Signature,
+        scalar_proto_type: FieldType<ProtoPathBuf, ProtoPathBuf>,
+    },
+    Repeated {
+        current_proto_path: Rc<ProtoPathBuf>,
+        getter_signature: Signature,
+        scalar_proto_type: FieldType<ProtoPathBuf, ProtoPathBuf>,
+    },
 }
 
 impl Field {
@@ -118,11 +189,27 @@ impl Field {
         FieldFactory::new(desc, current_proto_path, options)?.build()?
     }
 
+    fn current_proto_path(&self) -> &ProtoPathBuf {
+        match self {
+            Field::Explicit { current_proto_path, .. }
+            | Field::Implicit { current_proto_path, .. }
+            | Field::Repeated { current_proto_path, .. } => current_proto_path,
+        }
+    }
+
     fn getter_signature(&self) -> &Signature {
         match self {
             Field::Explicit { getter_signature, .. }
             | Field::Implicit { getter_signature, .. }
             | Field::Repeated { getter_signature, .. } => getter_signature,
+        }
+    }
+
+    fn scalar_proto_type(&self) -> &FieldType<ProtoPathBuf, ProtoPathBuf> {
+        match self {
+            Field::Explicit { scalar_proto_type, .. }
+            | Field::Implicit { scalar_proto_type, .. }
+            | Field::Repeated { scalar_proto_type, .. } => scalar_proto_type,
         }
     }
 }
@@ -163,10 +250,18 @@ impl FieldFactory {
     #[throws]
     pub fn build(self) -> Field {
         let getter_signature = self.make_getter()?;
+        let scalar_proto_type = self.scalar_proto_type;
+        let current_proto_path = self.current_proto_path;
         match &self.presense {
-            FieldPresense::Explicit => Field::Explicit { getter_signature },
-            FieldPresense::Implicit => Field::Implicit { getter_signature },
-            FieldPresense::Repeated => Field::Repeated { getter_signature },
+            FieldPresense::Explicit => {
+                Field::Explicit { current_proto_path, getter_signature, scalar_proto_type }
+            }
+            FieldPresense::Implicit => {
+                Field::Implicit { current_proto_path, getter_signature, scalar_proto_type }
+            }
+            FieldPresense::Repeated => {
+                Field::Repeated { current_proto_path, getter_signature, scalar_proto_type }
+            }
         }
     }
 

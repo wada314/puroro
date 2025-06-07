@@ -232,6 +232,7 @@ impl GenTraits {
 #[throws]
 fn gen_scalar_maybe_ref_type<M, E>(
     field_type: &FieldType<M, E>,
+    is_fallible: bool,
     current_path: &ProtoPath,
     lifetime: Option<&Lifetime>,
     options: &CodeGeneratorOptions,
@@ -253,7 +254,11 @@ where
                     .to_relative_path(current_path)
                     .unwrap_or(path.as_ref());
                 let view_trait_path = path.to_rust_path_with(options, |name| {
-                    let ident = GenTraits::gen_try_view_trait_name(name)?;
+                    let ident = if is_fallible {
+                        GenTraits::gen_try_view_trait_name(name)?
+                    } else {
+                        GenTraits::gen_view_trait_name(name)?
+                    };
                     Ok(parse2(quote! { #ident })?)
                 })?;
                 parse2(quote! { impl #(#lifetime +)* #view_trait_path })?
@@ -425,6 +430,7 @@ impl FieldFactory {
         let name = to_ident(&format!("{}", &self.lower_cased));
         let scalar_ref_type = gen_scalar_maybe_ref_type(
             &self.scalar_proto_type,
+            false,
             &self.current_proto_path,
             None,
             &self.options,
@@ -432,7 +438,7 @@ impl FieldFactory {
         let repeated_view_trait = self.options.puroro_repeated_view_trait(&scalar_ref_type);
         let getter_type = match self.presense {
             FieldPresense::Repeated => parse2(quote! {
-                impl #repeated_view_trait
+                impl #repeated_view_trait + use<'_>
             })?,
             FieldPresense::Explicit | FieldPresense::Implicit => match self.scalar_proto_type {
                 FieldType::Message(_) => self.options.option_type(&scalar_ref_type),
@@ -461,6 +467,7 @@ impl FieldFactory {
         let name = to_ident(&format!("try_{}", &self.lower_cased));
         let scalar_ref_type = gen_scalar_maybe_ref_type(
             &self.scalar_proto_type,
+            true,
             &self.current_proto_path,
             None,
             &self.options,
