@@ -438,7 +438,7 @@ impl FieldFactory {
         let repeated_view_trait = self.options.puroro_repeated_view_trait(&scalar_ref_type);
         let getter_type = match self.presense {
             FieldPresense::Repeated => parse2(quote! {
-                impl #repeated_view_trait + use<'_>
+                impl #repeated_view_trait
             })?,
             FieldPresense::Explicit | FieldPresense::Implicit => match self.scalar_proto_type {
                 FieldType::Message(_) => self.options.option_type(&scalar_ref_type),

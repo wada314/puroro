@@ -76,3 +76,23 @@ pub fn compile_binary(input: impl AsRef<[u8]>) -> Result<Vec<u8>> {
     response.write(&mut output_buffer)?;
     Ok(output_buffer)
 }
+
+trait R {
+    fn r(&self) -> Option<impl R>;
+}
+impl<T: R> R for &T {
+    fn r(&self) -> Option<impl R> {
+        Some(self)
+    }
+}
+impl<T: R> R for Option<T> {
+    fn r(&self) -> Option<impl R> {
+        self.as_ref()
+    }
+}
+struct S<T: R>(T);
+impl<T: R> S<T> {
+    fn r(&self) -> Option<S<impl R + use<'_, T>>> {
+        self.0.r().map(S)
+    }
+}
