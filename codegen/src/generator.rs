@@ -27,18 +27,18 @@ use ::std::cell::LazyCell;
 use ::std::cell::OnceCell;
 use ::std::collections::HashSet;
 use ::std::iter::once;
-use ::syn::{parse_quote, parse_str, Expr, Ident, ItemUse, Path, Type, TypePath};
+use ::syn::{Expr, Ident, ItemUse, Path, Type, TypePath, parse_quote, parse_str};
 
 pub use compile::*;
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct CodeGeneratorOptions {
     strict_type_path: bool,
     allow_import_common_types: bool,
     cache: Cache,
 }
 
-#[derive(Default, Clone)]
+#[derive(Default, Debug, Clone)]
 struct Cache {
     imports: OnceCell<Vec<ItemUse>>,
     clone_trait: OnceCell<Path>,

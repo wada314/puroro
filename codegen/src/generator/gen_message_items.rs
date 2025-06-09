@@ -14,6 +14,7 @@
 
 pub mod gen_struct;
 pub mod gen_traits;
+pub mod field;
 
 use self::gen_struct::GenStruct;
 use self::gen_traits::GenTraits;
