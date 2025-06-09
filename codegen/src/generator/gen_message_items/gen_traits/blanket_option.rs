@@ -12,12 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::{impls_helper, Field, ImplsGenerator};
+use super::super::field::{Field, ScalarField};
+use super::{ImplsGenerator, impls_helper};
 use crate::generator::CodeGeneratorOptions;
 use ::culpa::throws;
 use ::quote::quote;
 use ::std::rc::Rc;
-use ::syn::{parse2, parse_str, Block, Ident, Item, Path, TypePath};
+use ::syn::{Block, Ident, Item, Path, TypePath, parse_str, parse2};
 
 type Error = crate::ErrorKind;
 
@@ -75,7 +76,7 @@ impl GenBlanketOptionImpls {
 
     #[throws]
     fn gen_get_method_body(&self, field: &Field, t: &Ident, trait_path: &Path) -> Block {
-        let signature = field.getter_signature();
+        let signature = field.getter_signatures().trait_getter.clone();
         let getter_name = &signature.ident;
         let stmts = match field {
             Field::Repeated { .. } => quote! {
@@ -94,12 +95,12 @@ impl GenBlanketOptionImpls {
 
     #[throws]
     fn gen_has_method_body(&self, field: &Field, t: &Ident, trait_path: &Path) -> Block {
-        let (Field::Implicit { has_method_signature, .. }
-        | Field::Explicit { has_method_signature, .. }) = field
+        let (Field::Implicit(ScalarField { has_method_signatures, .. })
+        | Field::Explicit(ScalarField { has_method_signatures, .. })) = field
         else {
             Err("this method is not supported for repeated fields".to_string())?
         };
-        let has_name = &has_method_signature.ident;
+        let has_name = &has_method_signatures.has_method.ident;
         parse2(quote! {{
             self.as_ref()
                 .map(<#t as #trait_path>::#has_name)
@@ -109,7 +110,7 @@ impl GenBlanketOptionImpls {
 
     #[throws]
     fn gen_try_get_method_body(&self, field: &Field, t: &Ident, trait_path: &Path) -> Block {
-        let signature = field.try_getter_signature();
+        let signature = field.getter_signatures().trait_try_getter.clone();
         let try_getter_name = &signature.ident;
         let stmts = match field {
             Field::Repeated { .. } => quote! {
@@ -128,12 +129,13 @@ impl GenBlanketOptionImpls {
 
     #[throws]
     fn gen_try_has_method_body(&self, field: &Field, t: &Ident, trait_path: &Path) -> Block {
-        let (Field::Implicit { try_has_method_signature, .. }
-        | Field::Explicit { try_has_method_signature, .. }) = field
-        else {
-            Err("this method is not supported for repeated fields".to_string())?
+        let try_has_name = match field {
+            Field::Implicit(ScalarField { has_method_signatures, .. })
+            | Field::Explicit(ScalarField { has_method_signatures, .. }) => {
+                &has_method_signatures.try_has_method.ident
+            }
+            _ => Err("this method is not supported for repeated fields".to_string())?,
         };
-        let try_has_name = &try_has_method_signature.ident;
         let ok = self.options.ok_path();
         parse2(quote! { {
             #ok(self.as_ref()

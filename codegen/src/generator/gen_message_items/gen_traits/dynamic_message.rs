@@ -12,15 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::{impls_helper, Field, ImplsGenerator};
+use super::super::field::Field;
+use super::{ImplsGenerator, impls_helper};
+use crate::Result;
 use crate::descriptor::{I32Type, I64Type, LenType, VariantType, WireType};
 use crate::generator::CodeGeneratorOptions;
 use crate::proto_path::ProtoPath;
-use crate::Result;
 use ::culpa::throws;
 use ::quote::quote;
 use ::std::rc::Rc;
-use ::syn::{parse2, parse_str, Block, Ident, Item, Path};
+use ::syn::{Block, Ident, Item, Path, parse_str, parse2};
 use ::syn::{Expr, Type};
 
 type Error = crate::ErrorKind;
@@ -247,11 +248,7 @@ impl DynamicMessageImplsGenerator {
 
     #[throws]
     pub fn gen_try_has_method_block(&self, field: &Field) -> Block {
-        let (Field::Explicit { scalar_proto_type, .. } | Field::Implicit { scalar_proto_type, .. }) =
-            field
-        else {
-            Err("try_has method is not supported for repeated fields".to_string())?
-        };
+        let scalar_proto_type = field.scalar_proto_type();
         let number = field.number();
         let wire_type: WireType<_, _> = scalar_proto_type.as_ref().into();
         let field_opt: Expr = parse2(quote! { self.field(#number) })?;

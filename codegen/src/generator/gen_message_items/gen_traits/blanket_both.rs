@@ -12,13 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::{impls_helper, Field, ImplsGenerator};
+use super::super::field::{Field, RepeatedField, ScalarField};
+use super::{ImplsGenerator, impls_helper};
 use crate::descriptor::FieldType;
 use crate::generator::CodeGeneratorOptions;
 use ::culpa::throws;
 use ::quote::quote;
 use ::std::rc::Rc;
-use ::syn::{parse2, parse_str, Block, ExprPath, Ident, Item, Path};
+use ::syn::{Block, ExprPath, Ident, Item, Path, parse_str, parse2};
 
 type Error = crate::ErrorKind;
 
@@ -80,24 +81,28 @@ impl GenBlanketBothImpls {
         t2: &Ident,
         trait_path: &Path,
     ) -> Block {
-        let signature = field.getter_signature();
+        let signature = field.getter_signatures().trait_getter.clone();
         let getter_name = &signature.ident;
         let t1_getter: ExprPath = parse2(quote! { <#t1 as #trait_path>::#getter_name })?;
         let t2_getter: ExprPath = parse2(quote! { <#t2 as #trait_path>::#getter_name })?;
         parse2::<Block>(match field {
-            Field::Repeated { scalar_proto_type: FieldType::Message(_), .. } => quote! {{
-                self.as_ref().map2(#t1_getter, #t2_getter).into_iter_either()
-            }},
-            Field::Repeated { .. } => quote! {{
+            Field::Repeated(RepeatedField { scalar_proto_type: FieldType::Message(_), .. }) => {
+                quote! {{
+                    self.as_ref().map2(#t1_getter, #t2_getter).into_iter_either()
+                }}
+            }
+            Field::Repeated(RepeatedField { .. }) => quote! {{
                 self.as_ref().map2(#t1_getter, #t2_getter).into_iter_chained()
             }},
-            Field::Explicit { scalar_proto_type: FieldType::Message(_), .. }
-            | Field::Implicit { scalar_proto_type: FieldType::Message(_), .. } => quote! {{
-                self.as_ref().map2(#t1_getter, #t2_getter).factor_none()
-            }},
-            Field::Explicit { has_method_signature, .. }
-            | Field::Implicit { has_method_signature, .. } => {
-                let has_method_name = &has_method_signature.ident;
+            Field::Explicit(ScalarField { scalar_proto_type: FieldType::Message(_), .. })
+            | Field::Implicit(ScalarField { scalar_proto_type: FieldType::Message(_), .. }) => {
+                quote! {{
+                    self.as_ref().map2(#t1_getter, #t2_getter).factor_none()
+                }}
+            }
+            Field::Explicit(ScalarField { has_method_signatures, .. })
+            | Field::Implicit(ScalarField { has_method_signatures, .. }) => {
+                let has_method_name = &has_method_signatures.has_method.ident;
                 quote! {{
                     let ::puroro::Both::Both(left, right) = self;
                     if <#t2 as #trait_path>::#has_method_name(&right) {
@@ -120,26 +125,30 @@ impl GenBlanketBothImpls {
         t2: &Ident,
         trait_path: &Path,
     ) -> Block {
-        let signature = field.try_getter_signature();
+        let signature = field.getter_signatures().trait_try_getter.clone();
         let try_getter_name = &signature.ident;
         let t1_try_getter: ExprPath = parse2(quote! { <#t1 as #trait_path>::#try_getter_name })?;
         let t2_try_getter: ExprPath = parse2(quote! { <#t2 as #trait_path>::#try_getter_name })?;
         let ok = self.options.ok_path();
         parse2::<Block>(match field {
-            Field::Repeated { scalar_proto_type: FieldType::Message(_), .. } => quote! {{
-                #ok(self.as_ref().try_map2(#t1_try_getter, #t2_try_getter)?.into_iter_either()
-                    .map(|either_res| either_res.factor_err()))
-            }},
-            Field::Repeated { .. } => quote! {{
+            Field::Repeated(RepeatedField { scalar_proto_type: FieldType::Message(_), .. }) => {
+                quote! {{
+                    #ok(self.as_ref().try_map2(#t1_try_getter, #t2_try_getter)?.into_iter_either()
+                        .map(|either_res| either_res.factor_err()))
+                }}
+            }
+            Field::Repeated(RepeatedField { .. }) => quote! {{
                 #ok(self.as_ref().try_map2(#t1_try_getter, #t2_try_getter)?.into_iter_chained())
             }},
-            Field::Explicit { scalar_proto_type: FieldType::Message(_), .. }
-            | Field::Implicit { scalar_proto_type: FieldType::Message(_), .. } => quote! {{
-                #ok(self.as_ref().try_map2(#t1_try_getter, #t2_try_getter)?.factor_none())
-            }},
-            Field::Explicit { try_has_method_signature, .. }
-            | Field::Implicit { try_has_method_signature, .. } => {
-                let try_has_method_name = &try_has_method_signature.ident;
+            Field::Explicit(ScalarField { scalar_proto_type: FieldType::Message(_), .. })
+            | Field::Implicit(ScalarField { scalar_proto_type: FieldType::Message(_), .. }) => {
+                quote! {{
+                    #ok(self.as_ref().try_map2(#t1_try_getter, #t2_try_getter)?.factor_none())
+                }}
+            }
+            Field::Explicit(ScalarField { has_method_signatures, .. })
+            | Field::Implicit(ScalarField { has_method_signatures, .. }) => {
+                let try_has_method_name = &has_method_signatures.try_has_method.ident;
                 quote! {{
                     let ::puroro::Both::Both(left, right) = self;
                     if <#t2 as #trait_path>::#try_has_method_name(&right)? {
@@ -162,13 +171,13 @@ impl GenBlanketBothImpls {
         t2: &Ident,
         trait_path: &Path,
     ) -> Block {
-        let (Field::Implicit { has_method_signature, .. }
-        | Field::Explicit { has_method_signature, .. }) = field
-        else {
-            Err("this method is not supported for repeated fields".to_string())?
+        let has_name = match field {
+            Field::Implicit(ScalarField { has_method_signatures, .. })
+            | Field::Explicit(ScalarField { has_method_signatures, .. }) => {
+                &has_method_signatures.has_method.ident
+            }
+            _ => Err("this method is not supported for repeated fields".to_string())?,
         };
-
-        let has_name = &has_method_signature.ident;
         parse2(quote! { {
             let ::puroro::Both::Both(left, right) = self;
             <#t2 as #trait_path>::#has_name(&right) || <#t1 as #trait_path>::#has_name(&left)
@@ -183,12 +192,13 @@ impl GenBlanketBothImpls {
         t2: &Ident,
         trait_path: &Path,
     ) -> Block {
-        let (Field::Implicit { try_has_method_signature, .. }
-        | Field::Explicit { try_has_method_signature, .. }) = field
-        else {
-            Err("this method is not supported for repeated fields".to_string())?
+        let try_has_name = match field {
+            Field::Implicit(ScalarField { has_method_signatures, .. })
+            | Field::Explicit(ScalarField { has_method_signatures, .. }) => {
+                &has_method_signatures.try_has_method.ident
+            }
+            _ => Err("this method is not supported for repeated fields".to_string())?,
         };
-        let try_has_name = &try_has_method_signature.ident;
         let ok = self.options.ok_path();
         parse2(quote! { {
             let ::puroro::Both::Both(left, right) = self;

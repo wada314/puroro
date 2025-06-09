@@ -216,15 +216,28 @@ impl FieldFactory {
         );
         let return_type: Type = match self.presense {
             FieldPresense::Repeated => {
-                let repeated_view_trait = self.options.puroro_repeated_view_trait(&scalar_ref_type);
+                let item_type = if is_try {
+                    self.options.puroro_result_type(&scalar_ref_type)
+                } else {
+                    scalar_ref_type
+                };
+                let repeated_view_trait = self.options.puroro_repeated_view_trait(&item_type);
                 parse_quote! {
                     impl #repeated_view_trait
                 }
             }
-            FieldPresense::Explicit | FieldPresense::Implicit => match self.scalar_proto_type {
-                FieldType::Message(_) => self.options.option_type(&scalar_ref_type),
-                _ => scalar_ref_type,
-            },
+            FieldPresense::Explicit | FieldPresense::Implicit => {
+                let result_inner_type = match self.scalar_proto_type {
+                    FieldType::Message(_) => self.options.option_type(&scalar_ref_type),
+                    _ => scalar_ref_type,
+                };
+                let result_type = if is_try {
+                    self.options.puroro_result_type(&result_inner_type)
+                } else {
+                    result_inner_type
+                };
+                result_type
+            }
         };
         parse_quote! {
             fn #name(&self) -> #return_type
