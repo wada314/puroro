@@ -222,8 +222,16 @@ impl FieldFactory {
                     scalar_ref_type
                 };
                 let repeated_view_trait = self.options.puroro_repeated_view_trait(&item_type);
-                parse_quote! {
+                let result_inner_type = parse_quote! {
                     impl #repeated_view_trait
+                };
+                // Do we really need to wrap the repeated view trait in a result type?
+                // We have already wrapped the item type in a result type, and we can easily convert
+                // the `Result<Iterator<Result<T>>>` to `Result<Iterator<T>>` by using `quither` crate.
+                if is_try {
+                    self.options.puroro_result_type(&result_inner_type)
+                } else {
+                    result_inner_type
                 }
             }
             FieldPresense::Explicit | FieldPresense::Implicit => {
