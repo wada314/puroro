@@ -12,15 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::Result;
 use crate::cases::{Case, convert_into_case};
 use crate::descriptor::{FieldDescriptorExt, FieldType, LenType};
-use crate::generator::{CodeGeneratorOptions, FieldPresense, avoid_reserved_keywords, to_ident};
+use crate::generator::{CodeGeneratorOptions, FieldPresense, to_ident};
 use crate::proto_path::{ProtoPath, ProtoPathBuf};
 use ::culpa::throws;
-use ::quote::quote;
 use ::std::rc::Rc;
-use ::syn::{Ident, Lifetime, Signature, Type, parse_quote, parse2};
+use ::syn::{Ident, Signature, Type, parse_quote};
 
 type Error = crate::ErrorKind;
 

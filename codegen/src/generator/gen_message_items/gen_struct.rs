@@ -19,16 +19,15 @@ use super::gen_traits::GenTraits;
 use crate::ErrorKind;
 use crate::Result;
 use crate::cases::{Case, convert_into_case};
-use crate::descriptor::{DescriptorExt, FieldDescriptorExt, FieldType, LenType};
+use crate::descriptor::{DescriptorExt, FieldType};
 use crate::generator::gen_message_items::field::RepeatedField;
 use crate::generator::gen_message_items::field::ScalarField;
-use crate::generator::{CodeGeneratorOptions, FieldPresense, to_ident};
-use crate::proto_path::{ProtoPath, ProtoPathBuf};
+use crate::generator::{CodeGeneratorOptions, to_ident};
 use ::culpa::throws;
 use ::quote::{format_ident, quote};
 use ::syn::parse::Parser;
 use ::syn::{
-    Block, Ident, Item, Lifetime, PathArguments, PathSegment, Signature, Stmt, Type, parse2,
+    Block, Ident, Item, PathArguments, PathSegment, Stmt, Type, parse2,
 };
 
 type Error = ErrorKind;
