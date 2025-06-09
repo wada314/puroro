@@ -157,18 +157,14 @@ impl TryFrom<GeneratedFile> for code_generator_response::File {
                 }
             }
         };
-        let check_edition_2024 = if is_root_file {
-            quote! {
-                macro_rules! check_edition_2024 {
-                    ($e:expr) => {};
-                    (_) => {
-                        compile_error!("edition 2024 is required");
-                    }
+        let check_edition_2024 = quote! {
+            macro_rules! check_edition_2024 {
+                ($e:expr) => {};
+                (_) => {
+                    compile_error!("edition 2024 is required");
                 }
-                check_edition_2024!(_);
             }
-        } else {
-            quote! {}
+            check_edition_2024!(_);
         };
         let body = from.body;
         let content = quote! {

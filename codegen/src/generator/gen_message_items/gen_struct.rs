@@ -98,7 +98,7 @@ impl GenStruct {
             impl<#t> #struct_name<#t>
             where #t: #trait_name
             {
-                #(#getter_signatures {
+                #(pub #getter_signatures {
                     #(#body_stmts)*
                 })*
             }

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use ::criterion::{black_box, criterion_group, criterion_main, Criterion};
+use ::criterion::{Criterion, black_box, criterion_group, criterion_main};
 use ::puroro::variant::variant_types::UInt64;
 use ::puroro::variant::{BufReadExtVariant, ReadExtVariant, Variant, WriteExtVariant};
 use ::rand::prelude::*;
@@ -24,7 +24,7 @@ use ::std::iter;
 fn test_cases_random<const SIZE: usize>() -> Box<[u8]> {
     let mut rand = Pcg32::seed_from_u64(1234567890u64);
     let mut output = Vec::with_capacity(10 * SIZE);
-    for item_u64 in iter::repeat_with(|| rand.gen::<u64>()).take(SIZE) {
+    for item_u64 in iter::repeat_with(|| rand.r#gen::<u64>()).take(SIZE) {
         let item_var = Variant::from::<UInt64>(item_u64);
         WriteExtVariant::write_variant(&mut output, item_var).unwrap();
     }
