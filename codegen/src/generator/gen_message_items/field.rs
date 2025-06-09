@@ -67,8 +67,8 @@ pub struct GetterSignatures {
 
 #[derive(Debug)]
 pub struct HasMethodSignatures {
-    pub trait_has_method: Signature,
-    pub struct_has_method: Signature,
+    pub has_method: Signature,
+    pub try_has_method: Signature,
 }
 
 impl Field {
@@ -102,6 +102,14 @@ impl Field {
             Field::Repeated(RepeatedField { scalar_proto_type, .. })
             | Field::Explicit(ScalarField { scalar_proto_type, .. })
             | Field::Implicit(ScalarField { scalar_proto_type, .. }) => scalar_proto_type,
+        }
+    }
+
+    pub fn getter_signatures(&self) -> &GetterSignatures {
+        match self {
+            Field::Repeated(RepeatedField { getter_signatures, .. })
+            | Field::Explicit(ScalarField { getter_signatures, .. })
+            | Field::Implicit(ScalarField { getter_signatures, .. }) => getter_signatures,
         }
     }
 }
@@ -256,8 +264,8 @@ impl FieldFactory {
     #[throws]
     fn gen_has_method_signatures(&self) -> HasMethodSignatures {
         HasMethodSignatures {
-            trait_has_method: self.gen_has_method_signature(false),
-            struct_has_method: self.gen_has_method_signature(false),
+            has_method: self.gen_has_method_signature(false),
+            try_has_method: self.gen_has_method_signature(true),
         }
     }
 }

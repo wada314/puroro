@@ -23,6 +23,7 @@ use super::field::Field;
 use crate::cases::{Case, convert_into_case};
 use crate::descriptor::DescriptorExt;
 use crate::generator::CodeGeneratorOptions;
+use crate::generator::gen_message_items::field::ScalarField;
 use crate::{Result, ResultExt};
 use ::culpa::throws;
 use ::puroro::Either;
@@ -71,20 +72,23 @@ where
         .map(|f| {
             let get_method: ImplItemFn = {
                 let signature = if is_try_trait {
-                    f.try_getter_signature()
+                    f.getter_signatures().trait_try_getter.clone()
                 } else {
-                    f.getter_signature()
+                    f.getter_signatures().trait_getter.clone()
                 };
                 let body = gen_getter(f)?;
                 parse2(quote! {
                     #signature #body
                 })?
             };
-            let has_method: Option<ImplItemFn> = match (is_try_trait, f) {
-                (false, Field::Explicit { has_method_signature: signature, .. })
-                | (false, Field::Implicit { has_method_signature: signature, .. })
-                | (true, Field::Explicit { try_has_method_signature: signature, .. })
-                | (true, Field::Implicit { try_has_method_signature: signature, .. }) => {
+            let has_method: Option<ImplItemFn> = match f {
+                Field::Explicit(ScalarField { has_method_signatures, .. })
+                | Field::Implicit(ScalarField { has_method_signatures, .. }) => {
+                    let signature = if is_try_trait {
+                        has_method_signatures.try_has_method.clone()
+                    } else {
+                        has_method_signatures.has_method.clone()
+                    };
                     let body = gen_has_method(f)?;
                     Some(parse2(quote! {
                         #signature #body
@@ -181,14 +185,16 @@ impl GenTraits {
         let getters = self
             .fields
             .iter()
-            .map(|f| f.getter_signature())
+            .map(|f| f.getter_signatures().trait_getter.clone())
             .collect::<Vec<_>>();
         let has_methods = self
             .fields
             .iter()
             .filter_map(|f| match f {
-                Field::Implicit { has_method_signature, .. }
-                | Field::Explicit { has_method_signature, .. } => Some(has_method_signature),
+                Field::Implicit(ScalarField { has_method_signatures, .. })
+                | Field::Explicit(ScalarField { has_method_signatures, .. }) => {
+                    Some(has_method_signatures.has_method.clone())
+                }
                 _ => None,
             })
             .collect::<Vec<_>>();
@@ -206,15 +212,15 @@ impl GenTraits {
         let try_getters = self
             .fields
             .iter()
-            .map(|f| f.try_getter_signature())
+            .map(|f| f.getter_signatures().trait_try_getter.clone())
             .collect::<Vec<_>>();
         let try_has_methods = self
             .fields
             .iter()
             .filter_map(|f| match f {
-                Field::Implicit { try_has_method_signature, .. }
-                | Field::Explicit { try_has_method_signature, .. } => {
-                    Some(try_has_method_signature)
+                Field::Implicit(ScalarField { has_method_signatures, .. })
+                | Field::Explicit(ScalarField { has_method_signatures, .. }) => {
+                    Some(has_method_signatures.try_has_method.clone())
                 }
                 _ => None,
             })
