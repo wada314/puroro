@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use super::gen_message_items::GenMessageItems;
-use super::{gen_enum_items, CodeGeneratorOptions, CodeGeneratorOptionsBuilder};
+use super::{CodeGeneratorOptions, CodeGeneratorOptionsBuilder, gen_enum_items};
 use crate::descriptor::RootContext;
 use crate::{ErrorKind, Result};
 use ::prettyplease::unparse;
@@ -157,6 +157,19 @@ impl TryFrom<GeneratedFile> for code_generator_response::File {
                 }
             }
         };
+        let check_edition_2024 = if is_root_file {
+            quote! {
+                macro_rules! check_edition_2024 {
+                    ($e:expr) => {};
+                    (_) => {
+                        compile_error!("edition 2024 is required");
+                    }
+                }
+                check_edition_2024!(_);
+            }
+        } else {
+            quote! {}
+        };
         let body = from.body;
         let content = quote! {
             #![doc=" THIS FILE IS A GENERATED FILE! DO NOT EDIT!"]
@@ -166,6 +179,7 @@ impl TryFrom<GeneratedFile> for code_generator_response::File {
             #(#submodule_decls)*
             #(#imports)*
             #puroro_root
+            #check_edition_2024
             #(#body)*
         };
         let syn_file: ::syn::File = syn::parse2(content)?;

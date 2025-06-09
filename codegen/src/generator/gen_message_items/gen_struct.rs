@@ -25,8 +25,7 @@ use ::culpa::throws;
 use ::quote::{format_ident, quote};
 use ::syn::parse::Parser;
 use ::syn::{
-    Block, Expr, ExprPath, GenericArgument, GenericParam, Ident, Item, Lifetime, PathArguments,
-    PathSegment, Signature, Stmt, Type, TypePath, parse2,
+    Block, Ident, Item, Lifetime, PathArguments, PathSegment, Signature, Stmt, Type, parse2,
 };
 
 type Error = ErrorKind;
@@ -267,16 +266,12 @@ impl FieldFactory {
     }
 
     #[throws]
-    fn gen_getter_signature<'a>(
-        &self,
-        outer_generic_params: impl Iterator<Item = &'a GenericParam>,
-    ) -> Signature {
+    fn gen_getter_signature<'a>(&self) -> Signature {
         let name = to_ident(&format!("{}", &self.lower_cased));
         let scalar_ref_type = gen_scalar_maybe_ref_type(
             &self.scalar_proto_type,
             &self.current_proto_path,
             None,
-            outer_generic_params,
             &self.options,
         )?;
         let repeated_view_trait = self.options.puroro_repeated_view_trait(&scalar_ref_type);
@@ -300,7 +295,6 @@ fn gen_scalar_maybe_ref_type<'a, M, E>(
     field_type: &FieldType<M, E>,
     current_path: &ProtoPath,
     lifetime: Option<&Lifetime>,
-    outer_generic_params: impl Iterator<Item = &'a GenericParam>,
     options: &CodeGeneratorOptions,
 ) -> Type
 where
@@ -313,52 +307,30 @@ where
         .maybe_into_primitive_type(current_path, options)
     {
         Ok(primitive_type) => primitive_type,
-        Err(len_type) => {
-            match len_type {
-                LenType::Message(path) => {
-                    let path = path
-                        .as_ref()
-                        .to_relative_path(current_path)
-                        .unwrap_or(path.as_ref());
-                    let view_trait_path = path.to_rust_path_with(options, |name| {
-                        let ident = GenTraits::gen_view_trait_name(name)?;
-                        Ok(parse2(quote! { #ident })?)
-                    })?;
-                    let use_bound_params = outer_generic_params
-                        .map(|param| match param {
-                            GenericParam::Type(type_param) => {
-                                GenericArgument::Type(Type::Path(TypePath {
-                                    qself: None,
-                                    path: type_param.ident.clone().into(),
-                                }))
-                            }
-                            GenericParam::Lifetime(lt_param) => {
-                                GenericArgument::Lifetime(lt_param.lifetime.clone())
-                            }
-                            GenericParam::Const(const_param) => {
-                                GenericArgument::Const(Expr::Path(ExprPath {
-                                    attrs: vec![],
-                                    qself: None,
-                                    path: const_param.ident.clone().into(),
-                                }))
-                            }
-                        })
-                        .collect::<Vec<_>>();
-                    let struct_path = path.to_rust_path_with(options, |name| {
-                    let ident = GenStruct::struct_name(name)?;
-                    Ok(parse2(quote! { #ident :: <impl #view_trait_path + use<#(#use_bound_params)*>> })?)
+        Err(len_type) => match len_type {
+            LenType::Message(path) => {
+                let path = path
+                    .as_ref()
+                    .to_relative_path(current_path)
+                    .unwrap_or(path.as_ref());
+                let view_trait_path = path.to_rust_path_with(options, |name| {
+                    let ident = GenTraits::gen_view_trait_name(name)?;
+                    Ok(parse2(quote! { #ident })?)
                 })?;
-                    parse2(quote! { #struct_path })?
-                }
-                LenType::String => {
-                    let str_type = options.primitive_type("str");
-                    parse2(quote! { & #(#lifetime)* #str_type })?
-                }
-                LenType::Bytes => {
-                    let u8_type = options.primitive_type("u8");
-                    parse2(quote! { & #(#lifetime)* [#u8_type] })?
-                }
+                let struct_path = path.to_rust_path_with(options, |name| {
+                    let ident = GenStruct::struct_name(name)?;
+                    Ok(parse2(quote! { #ident :: <impl #view_trait_path> })?)
+                })?;
+                parse2(quote! { #struct_path })?
             }
-        }
+            LenType::String => {
+                let str_type = options.primitive_type("str");
+                parse2(quote! { & #(#lifetime)* #str_type })?
+            }
+            LenType::Bytes => {
+                let u8_type = options.primitive_type("u8");
+                parse2(quote! { & #(#lifetime)* [#u8_type] })?
+            }
+        },
     }
 }
