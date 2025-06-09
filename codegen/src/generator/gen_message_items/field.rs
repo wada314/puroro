@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use crate::Result;
 use crate::cases::{Case, convert_into_case};
 use crate::descriptor::{FieldDescriptorExt, FieldType, LenType};
 use crate::generator::{CodeGeneratorOptions, FieldPresense, avoid_reserved_keywords, to_ident};
@@ -43,8 +44,7 @@ pub struct RepeatedField {
     /// used as the base for generating relative paths to other items.
     pub base_proto_path: Rc<ProtoPathBuf>,
     pub scalar_proto_type: FieldType<ProtoPathBuf, ProtoPathBuf>,
-    pub getter_name: Ident,
-    pub try_getter_name: Ident,
+    pub getter_signatures: GetterSignatures,
 }
 
 #[derive(Debug)]
@@ -53,10 +53,22 @@ pub struct ScalarField {
     pub options: Rc<CodeGeneratorOptions>,
     pub base_proto_path: Rc<ProtoPathBuf>,
     pub scalar_proto_type: FieldType<ProtoPathBuf, ProtoPathBuf>,
-    pub getter_name: Ident,
-    pub has_method_name: Ident,
-    pub try_getter_name: Ident,
-    pub try_has_method_name: Ident,
+    pub getter_signatures: GetterSignatures,
+    pub has_method_signatures: HasMethodSignatures,
+}
+
+#[derive(Debug)]
+pub struct GetterSignatures {
+    pub trait_getter: Signature,
+    pub struct_getter: Signature,
+    pub trait_try_getter: Signature,
+    pub struct_try_getter: Signature,
+}
+
+#[derive(Debug)]
+pub struct HasMethodSignatures {
+    pub trait_has_method: Signature,
+    pub struct_has_method: Signature,
 }
 
 impl Field {
@@ -67,30 +79,6 @@ impl Field {
         options: Rc<CodeGeneratorOptions>,
     ) -> Self {
         FieldFactory::new(desc, current_proto_path, options)?.build()?
-    }
-
-    pub fn options(&self) -> &Rc<CodeGeneratorOptions> {
-        match self {
-            Field::Repeated(RepeatedField { options, .. })
-            | Field::Explicit(ScalarField { options, .. })
-            | Field::Implicit(ScalarField { options, .. }) => options,
-        }
-    }
-
-    pub fn getter_name(&self) -> &Ident {
-        match self {
-            Field::Repeated(RepeatedField { getter_name, .. })
-            | Field::Explicit(ScalarField { getter_name, .. })
-            | Field::Implicit(ScalarField { getter_name, .. }) => getter_name,
-        }
-    }
-
-    pub fn try_getter_name(&self) -> &Ident {
-        match self {
-            Field::Repeated(RepeatedField { try_getter_name, .. })
-            | Field::Explicit(ScalarField { try_getter_name, .. })
-            | Field::Implicit(ScalarField { try_getter_name, .. }) => try_getter_name,
-        }
     }
 
     pub fn number(&self) -> i32 {
@@ -115,50 +103,6 @@ impl Field {
             | Field::Explicit(ScalarField { scalar_proto_type, .. })
             | Field::Implicit(ScalarField { scalar_proto_type, .. }) => scalar_proto_type,
         }
-    }
-
-    #[throws]
-    pub fn getter_signature(&self, context: FieldContext) -> Signature {
-        let name = self.getter_name();
-        let scalar_ref_type = gen_scalar_maybe_ref_type(
-            self.scalar_proto_type(),
-            self.base_proto_path(),
-            None,
-            self.options(),
-            |path| match context {
-                FieldContext::Trait => {
-                    let view_trait_path = path.to_rust_path_with(self.options(), |name| {
-                        Ok(gen_view_trait_name(name).into())
-                    })?;
-                    Ok(parse_quote! { impl #view_trait_path })
-                }
-                FieldContext::Struct => {
-                    let view_trait_path = path.to_rust_path_with(self.options(), |name| {
-                        Ok(gen_view_trait_name(name).into())
-                    })?;
-                    let struct_path = path.to_rust_path_with(self.options(), |name| {
-                        Ok(gen_struct_name(name).into())
-                    })?;
-                    Ok(parse_quote! { #struct_path :: <impl #view_trait_path> })
-                }
-            },
-        )?;
-        let return_type = match self {
-            Field::Repeated(_) => {
-                let repeated_view_trait =
-                    self.options().puroro_repeated_view_trait(&scalar_ref_type);
-                parse2(quote! {
-                    impl #repeated_view_trait
-                })?
-            }
-            Field::Explicit(_) | Field::Implicit(_) => match self.scalar_proto_type() {
-                FieldType::Message(_) => self.options().option_type(&scalar_ref_type),
-                _ => scalar_ref_type,
-            },
-        };
-        parse2(quote! {
-            fn #name(&self) -> #return_type
-        })?
     }
 }
 
@@ -198,11 +142,6 @@ impl FieldFactory {
 
     #[throws]
     pub fn build(self) -> Field {
-        let getter_name = to_ident(&format!("{}", &self.lower_cased));
-        let has_method_name = to_ident(&format!("has_{}", &self.lower_cased));
-        let try_getter_name = to_ident(&format!("try_{}", &self.lower_cased));
-        let try_has_method_name = to_ident(&format!("try_has_{}", &self.lower_cased));
-
         let scalar_proto_type = self.scalar_proto_type.clone();
         let number = self.number;
         let base_proto_path = Rc::clone(&self.base_proto_path);
@@ -213,59 +152,62 @@ impl FieldFactory {
                 options,
                 base_proto_path,
                 scalar_proto_type,
-                getter_name,
-                has_method_name,
-                try_getter_name,
-                try_has_method_name,
+                getter_signatures: self.gen_getter_signatures()?,
+                has_method_signatures: self.gen_has_method_signatures()?,
             }),
             FieldPresense::Explicit => Field::Explicit(ScalarField {
                 number,
                 options,
                 base_proto_path,
                 scalar_proto_type,
-                getter_name,
-                has_method_name,
-                try_getter_name,
-                try_has_method_name,
+                getter_signatures: self.gen_getter_signatures()?,
+                has_method_signatures: self.gen_has_method_signatures()?,
             }),
             FieldPresense::Repeated => Field::Repeated(RepeatedField {
                 number,
                 options,
                 base_proto_path,
                 scalar_proto_type,
-                getter_name,
-                try_getter_name,
+                getter_signatures: self.gen_getter_signatures()?,
             }),
         }
     }
 
     #[throws]
-    fn make_has_method(&self) -> Signature {
-        if let FieldPresense::Repeated = self.presense {
-            Err("has method is not allowed for repeated fields".to_string())?
-        }
-        let name = to_ident(&format!("has_{}", &self.lower_cased));
-        let bool_type = self.options.primitive_type("bool");
-        parse2(quote! {
-            fn #name(&self) -> #bool_type
-        })?
-    }
-
-    #[throws]
-    fn make_try_getter(&self) -> Signature {
-        let name = to_ident(&format!("try_{}", &self.lower_cased));
+    fn gen_getter_signature(&self, context: FieldContext, is_try: bool) -> Signature {
+        let name = if is_try {
+            to_ident(&format!("try_{}", &self.lower_cased))
+        } else {
+            to_ident(&format!("{}", &self.lower_cased))
+        };
         let scalar_ref_type = gen_scalar_maybe_ref_type(
             &self.scalar_proto_type,
-            true,
-            &self.current_proto_path,
-            None,
+            &self.base_proto_path,
             &self.options,
+            |path| {
+                let view_trait_path = path.to_rust_path_with(&self.options, |name| {
+                    if is_try {
+                        Ok(gen_try_view_trait_name(name).into())
+                    } else {
+                        Ok(gen_view_trait_name(name).into())
+                    }
+                })?;
+                match context {
+                    FieldContext::Trait => Ok(parse_quote! { impl #view_trait_path }),
+                    FieldContext::Struct => {
+                        let struct_path = path.to_rust_path_with(&self.options, |name| {
+                            Ok(gen_struct_name(name).into())
+                        })?;
+                        Ok(parse_quote! { #struct_path :: <impl #view_trait_path> })
+                    }
+                }
+            },
         )?;
-        let getter_type = match self.presense {
+        let return_type = match self.presense {
             FieldPresense::Repeated => {
-                let item_type = self.options.puroro_result_type(&scalar_ref_type);
+                let repeated_view_trait = self.options.puroro_repeated_view_trait(&scalar_ref_type);
                 parse2(quote! {
-                    impl ::puroro::repeated::RepeatedView<Item = #item_type>
+                    impl #repeated_view_trait
                 })?
             }
             FieldPresense::Explicit | FieldPresense::Implicit => match self.scalar_proto_type {
@@ -273,24 +215,48 @@ impl FieldFactory {
                 _ => scalar_ref_type,
             },
         };
-        let getter_result_type = self.options.puroro_result_type(&getter_type);
         parse2(quote! {
-            fn #name(&self) -> #getter_result_type
+            fn #name(&self) -> #return_type
         })?
     }
 
     #[throws]
-    fn make_try_has_method(&self) -> Signature {
-        if let FieldPresense::Repeated = self.presense {
-            Err("try_has method is not allowed for repeated fields".to_string())?
+    fn gen_getter_signatures(&self) -> GetterSignatures {
+        GetterSignatures {
+            trait_getter: self.gen_getter_signature(FieldContext::Trait, false)?,
+            struct_getter: self.gen_getter_signature(FieldContext::Struct, false)?,
+            trait_try_getter: self.gen_getter_signature(FieldContext::Trait, true)?,
+            struct_try_getter: self.gen_getter_signature(FieldContext::Struct, true)?,
         }
-        let name = to_ident(&format!("try_has_{}", &self.lower_cased));
-        let has_result_type = self
-            .options
-            .puroro_result_type(&self.options.primitive_type("bool"));
+    }
+
+    #[throws]
+    fn gen_has_method_signature(&self, is_try: bool) -> Signature {
+        if let FieldPresense::Repeated = self.presense {
+            Err("has method is not allowed for repeated fields".to_string())?
+        }
+        let name = if is_try {
+            to_ident(&format!("try_has_{}", &self.lower_cased))
+        } else {
+            to_ident(&format!("has_{}", &self.lower_cased))
+        };
+        let bool_type = self.options.primitive_type("bool");
+        let return_type = if is_try {
+            self.options.puroro_result_type(&bool_type)
+        } else {
+            bool_type
+        };
         parse2(quote! {
-            fn #name(&self) -> #has_result_type
+            fn #name(&self) -> #return_type
         })?
+    }
+
+    #[throws]
+    fn gen_has_method_signatures(&self) -> HasMethodSignatures {
+        HasMethodSignatures {
+            trait_has_method: self.gen_has_method_signature(false)?,
+            struct_has_method: self.gen_has_method_signature(false)?,
+        }
     }
 }
 
@@ -298,7 +264,6 @@ impl FieldFactory {
 fn gen_scalar_maybe_ref_type<M, E, F>(
     field_type: &FieldType<M, E>,
     current_path: &ProtoPath,
-    lifetime: Option<&Lifetime>,
     options: &CodeGeneratorOptions,
     gen_message_type: F,
 ) -> Type
@@ -307,7 +272,6 @@ where
     E: AsRef<ProtoPath>,
     F: FnOnce(&ProtoPath) -> Result<Type>,
 {
-    let lifetime = lifetime.iter();
     match field_type
         .as_ref()
         .maybe_into_primitive_type(current_path, options)
@@ -323,11 +287,11 @@ where
             }
             LenType::String => {
                 let str_type = options.primitive_type("str");
-                parse2(quote! { & #(#lifetime)* #str_type })?
+                parse2(quote! { &#str_type })?
             }
             LenType::Bytes => {
                 let u8_type = options.primitive_type("u8");
-                parse2(quote! { & #(#lifetime)* [#u8_type] })?
+                parse2(quote! { &[#u8_type] })?
             }
         },
     }
