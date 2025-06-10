@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::super::field::Field;
+use super::field::Field;
 use super::{ImplsGenerator, impls_helper};
 use crate::Result;
 use crate::descriptor::{I32Type, I64Type, LenType, VariantType, WireType};

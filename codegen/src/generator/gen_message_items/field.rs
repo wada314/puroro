@@ -12,13 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use super::{gen_struct_name, gen_try_view_trait_name, gen_view_trait_name};
 use crate::cases::{Case, convert_into_case};
 use crate::descriptor::{FieldDescriptorExt, FieldType, LenType};
 use crate::generator::{CodeGeneratorOptions, FieldPresense, to_ident};
 use crate::proto_path::{ProtoPath, ProtoPathBuf};
 use ::culpa::throws;
 use ::std::rc::Rc;
-use ::syn::{Ident, Signature, Type, parse_quote};
+use ::syn::{Signature, Type, parse_quote};
 
 type Error = crate::ErrorKind;
 
@@ -323,22 +324,4 @@ where
             }
         },
     }
-}
-
-fn gen_view_trait_name(message_name: &str) -> Ident {
-    to_ident(&format!(
-        "{}View",
-        convert_into_case(message_name, Case::CamelCase)
-    ))
-}
-
-fn gen_try_view_trait_name(message_name: &str) -> Ident {
-    to_ident(&format!(
-        "Try{}View",
-        convert_into_case(message_name, Case::CamelCase)
-    ))
-}
-
-fn gen_struct_name(message_name: &str) -> Ident {
-    to_ident(&convert_into_case(message_name, Case::CamelCase))
 }

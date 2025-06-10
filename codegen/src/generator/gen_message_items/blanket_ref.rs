@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::super::field::{Field, ScalarField};
+use super::field::{Field, ScalarField};
 use super::{ImplsGenerator, impls_helper};
 use crate::generator::CodeGeneratorOptions;
 use ::culpa::throws;
