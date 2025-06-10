@@ -15,7 +15,7 @@
 use super::{gen_struct_name, gen_try_view_trait_name, gen_view_trait_name};
 use crate::cases::{Case, convert_into_case};
 use crate::descriptor::{FieldDescriptorExt, FieldType, LenType};
-use crate::generator::{CodeGeneratorOptions, FieldPresense, to_ident};
+use crate::generator::{CodeGeneratorOptions, FieldPresence, to_ident};
 use crate::proto_path::{ProtoPath, ProtoPathBuf};
 use ::culpa::throws;
 use ::std::rc::Rc;
@@ -119,7 +119,7 @@ struct FieldFactory {
     current_proto_path: Rc<ProtoPathBuf>,
     options: Rc<CodeGeneratorOptions>,
     lower_cased: String,
-    presense: FieldPresense,
+    presense: FieldPresence,
     scalar_proto_type: FieldType<ProtoPathBuf, ProtoPathBuf>,
 }
 
@@ -132,7 +132,7 @@ impl FieldFactory {
     ) -> Self {
         let lower_cased = convert_into_case(&desc.name(), Case::LowerSnakeCase);
 
-        let presense = FieldPresense::from_field_desc(desc);
+        let presense = FieldPresence::from_field_desc(desc);
         let scalar_proto_type = desc.type_with_full_path()?;
         let number = desc.number();
         let base_proto_path = Rc::clone(&current_proto_path);
@@ -154,7 +154,7 @@ impl FieldFactory {
         let base_proto_path = Rc::clone(&self.base_proto_path);
         let options = Rc::clone(&self.options);
         match &self.presense {
-            FieldPresense::Implicit => Field::Implicit(ScalarField {
+            FieldPresence::Implicit => Field::Implicit(ScalarField {
                 number,
                 options,
                 base_proto_path,
@@ -162,7 +162,7 @@ impl FieldFactory {
                 getter_signatures: self.gen_getter_signatures()?,
                 has_method_signatures: self.gen_has_method_signatures()?,
             }),
-            FieldPresense::Explicit => Field::Explicit(ScalarField {
+            FieldPresence::Explicit => Field::Explicit(ScalarField {
                 number,
                 options,
                 base_proto_path,
@@ -170,7 +170,7 @@ impl FieldFactory {
                 getter_signatures: self.gen_getter_signatures()?,
                 has_method_signatures: self.gen_has_method_signatures()?,
             }),
-            FieldPresense::Repeated => Field::Repeated(RepeatedField {
+            FieldPresence::Repeated => Field::Repeated(RepeatedField {
                 number,
                 options,
                 base_proto_path,
@@ -214,7 +214,7 @@ impl FieldFactory {
             },
         );
         let return_type: Type = match self.presense {
-            FieldPresense::Repeated => {
+            FieldPresence::Repeated => {
                 let item_type = if is_try {
                     self.options.puroro_result_type(&scalar_ref_type)
                 } else {
@@ -233,7 +233,7 @@ impl FieldFactory {
                     result_inner_type
                 }
             }
-            FieldPresense::Explicit | FieldPresense::Implicit => {
+            FieldPresence::Explicit | FieldPresence::Implicit => {
                 let result_inner_type = match self.scalar_proto_type {
                     FieldType::Message(_) => self.options.option_type(&scalar_ref_type),
                     _ => scalar_ref_type,
@@ -262,7 +262,7 @@ impl FieldFactory {
     }
 
     fn gen_has_method_signature(&self, is_try: bool) -> Signature {
-        if let FieldPresense::Repeated = self.presense {
+        if let FieldPresence::Repeated = self.presense {
             panic!("has method is not allowed for repeated fields");
         }
         let name = if is_try {

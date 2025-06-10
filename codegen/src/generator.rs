@@ -267,20 +267,20 @@ impl I64Type {
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub enum FieldPresense {
+pub enum FieldPresence {
     Implicit,
     Explicit,
     Repeated,
 }
 
-impl FieldPresense {
+impl FieldPresence {
     fn from_field_desc(field: &FieldDescriptorExt) -> Self {
         if field.has_presence() {
-            FieldPresense::Explicit
+            FieldPresence::Explicit
         } else if field.label() == FieldLabel::Repeated {
-            FieldPresense::Repeated
+            FieldPresence::Repeated
         } else {
-            FieldPresense::Implicit
+            FieldPresence::Implicit
         }
     }
 }
