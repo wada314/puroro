@@ -79,6 +79,7 @@ impl GenMessageItems {
         let struct_def = self.gen_struct()?;
 
         let view_wrapping_struct_impl = self.gen_view_wrapping_struct_impl()?;
+        let try_view_wrapping_struct_impl = self.gen_try_view_wrapping_struct_impl()?;
 
         let view_trait_name = &self.view_trait_name;
         let view_trait_path: Path = parse2(quote! { self::#view_trait_name })?;
@@ -114,6 +115,7 @@ impl GenMessageItems {
             view_trait_def,
             try_view_trait_def,
             view_wrapping_struct_impl,
+            try_view_wrapping_struct_impl,
         ]);
         items.extend(blanket_impls);
 
@@ -272,6 +274,98 @@ impl GenMessageItems {
                 quote! {
                     <#t as #trait_name>::#getter_name(&self.0)
                         .map(|value| #wrapper_type(value))
+                }
+            }
+            _ => {
+                quote! {
+                    <#t as #trait_name>::#getter_name(&self.0)
+                }
+            }
+        };
+        parser.parse2(body_tokens)?
+    }
+
+    #[throws]
+    fn gen_try_view_wrapping_struct_impl(&self) -> Item {
+        let struct_name = &self.struct_name;
+        let t = format_ident!("T");
+        let trait_name = &self.try_view_trait_name;
+        let getter_signatures = self
+            .fields
+            .iter()
+            .map(|field| field.getter_signatures().struct_try_getter.clone())
+            .collect::<Vec<_>>();
+        let body_stmts = self
+            .fields
+            .iter()
+            .map(|field| {
+                self.gen_try_view_wrapping_method_body(field, &t, trait_name, &self.options)
+            })
+            .collect::<Result<Vec<_>>>()?;
+        parse2(quote! {
+            impl<#t> #struct_name<#t>
+            where #t: #trait_name
+            {
+                #(pub #getter_signatures {
+                    #(#body_stmts)*
+                })*
+            }
+        })?
+    }
+
+    #[throws]
+    fn gen_try_view_wrapping_method_body(
+        &self,
+        field: &Field,
+        t: &Ident,
+        trait_name: &Ident,
+        options: &CodeGeneratorOptions,
+    ) -> Vec<Stmt> {
+        let parser = Block::parse_within;
+        let getter_name = &field.getter_signatures().struct_try_getter.ident;
+        let body_tokens = match field {
+            Field::Repeated(RepeatedField {
+                scalar_proto_type: FieldType::Message(m),
+                ..
+            }) => {
+                let wrapper_type = m
+                    .to_relative_path(&field.base_proto_path())
+                    .unwrap_or(m.as_ref())
+                    .to_rust_path_with(options, |name| {
+                        Ok(PathSegment {
+                            ident: gen_struct_name(name),
+                            arguments: PathArguments::None,
+                        })
+                    })?;
+                // Repeated message field. Need to map the iterator values by the wrapper type.
+                quote! {
+                    <#t as #trait_name>::#getter_name(&self.0)
+                        .map(|rep| rep
+                            .into_iter()
+                            .map(|res| res.map(|value| #wrapper_type(value))))
+                }
+            }
+            Field::Explicit(ScalarField {
+                scalar_proto_type: FieldType::Message(m),
+                ..
+            })
+            | Field::Implicit(ScalarField {
+                scalar_proto_type: FieldType::Message(m),
+                ..
+            }) => {
+                let wrapper_type = m
+                    .to_relative_path(&field.base_proto_path())
+                    .unwrap_or(m.as_ref())
+                    .to_rust_path_with(options, |name| {
+                        Ok(PathSegment {
+                            ident: gen_struct_name(name),
+                            arguments: PathArguments::None,
+                        })
+                    })?;
+                // Scalar message field. Need to map the Option inner value by the wrapper type.
+                quote! {
+                    <#t as #trait_name>::#getter_name(&self.0)
+                        .map(|opt| opt.map(|value| #wrapper_type(value)))
                 }
             }
             _ => {
