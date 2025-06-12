@@ -24,7 +24,7 @@ mod dynamic_message;
 use super::CodeGeneratorOptions;
 use crate::cases::{Case, convert_into_case};
 use crate::descriptor::{DescriptorExt, FieldType};
-use crate::generator::to_ident;
+use crate::generator::{TrySwitch, to_ident};
 use crate::proto_path::ProtoPathBuf;
 use crate::{Result, ResultExt};
 use ::culpa::throws;
@@ -47,8 +47,7 @@ type Error = crate::ErrorKind;
 
 pub struct GenMessageItems {
     struct_name: Ident,
-    view_trait_name: Ident,
-    try_view_trait_name: Ident,
+    trait_names: TrySwitch<Ident>,
     fields: Vec<Field>,
     options: Rc<CodeGeneratorOptions>,
 }
@@ -61,8 +60,10 @@ impl GenMessageItems {
         let current_proto_path = Rc::new(desc.current_path().to_owned());
         Ok(Self {
             struct_name: gen_struct_name(desc.name()),
-            view_trait_name: gen_view_trait_name(desc.name()),
-            try_view_trait_name: gen_try_view_trait_name(desc.name()),
+            trait_names: TrySwitch::new(
+                gen_view_trait_name(desc.name()),
+                gen_try_view_trait_name(desc.name()),
+            ),
             fields: desc
                 .non_oneof_fields()?
                 .into_iter()
@@ -101,9 +102,9 @@ impl GenMessageItems {
     }
 
     fn gen_blanket_impls(&self) -> Result<Vec<Item>> {
-        let view_trait_name = &self.view_trait_name;
+        let view_trait_name = &self.trait_names[false];
         let view_trait_path: Path = parse2(quote! { self::#view_trait_name })?;
-        let try_trait_name = &self.try_view_trait_name;
+        let try_trait_name = &self.trait_names[true];
         let try_trait_path: Path = parse2(quote! { self::#try_trait_name })?;
 
         let blanket_impl_generators = self.create_blanket_impl_generators();
@@ -150,11 +151,7 @@ impl GenMessageItems {
 
     #[throws]
     fn gen_view_trait(&self, is_try: bool) -> Item {
-        let trait_name = if is_try {
-            &self.try_view_trait_name
-        } else {
-            &self.view_trait_name
-        };
+        let trait_name = &self.trait_names[is_try];
         let getters = self
             .fields
             .iter()
@@ -184,7 +181,7 @@ impl GenMessageItems {
                 }
             })?
         } else {
-            let try_trait_name = &self.try_view_trait_name;
+            let try_trait_name = &self.trait_names[true];
             parse2(quote! {
                 pub trait #trait_name: self::#try_trait_name {
                     #(#getters;)*
@@ -198,11 +195,7 @@ impl GenMessageItems {
     fn gen_wrapping_struct_impl(&self, is_try: bool) -> Item {
         let struct_name = &self.struct_name;
         let t = format_ident!("T");
-        let trait_name = if is_try {
-            &self.try_view_trait_name
-        } else {
-            &self.view_trait_name
-        };
+        let trait_name = &self.trait_names[is_try];
         let getter_signatures = self
             .fields
             .iter()
