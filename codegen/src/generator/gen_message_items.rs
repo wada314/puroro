@@ -25,6 +25,7 @@ use super::CodeGeneratorOptions;
 use crate::cases::{Case, convert_into_case};
 use crate::descriptor::{DescriptorExt, FieldType};
 use crate::generator::to_ident;
+use crate::proto_path::ProtoPathBuf;
 use crate::{Result, ResultExt};
 use ::culpa::throws;
 use ::quither::Either;
@@ -74,26 +75,38 @@ impl GenMessageItems {
     pub fn gen_items(&self) -> Result<Vec<Item>> {
         let mut items = Vec::new();
 
+        // Generate basic items
+        items.extend(self.gen_basic_items()?);
+
+        // Generate blanket implementations
+        items.extend(self.gen_blanket_impls()?);
+
+        Ok(items)
+    }
+
+    fn gen_basic_items(&self) -> Result<Vec<Item>> {
         let view_trait_def = self.gen_view_trait()?;
         let try_view_trait_def = self.gen_try_view_trait()?;
         let struct_def = self.gen_struct()?;
-
         let view_wrapping_struct_impl = self.gen_wrapping_struct_impl(false)?;
         let try_view_wrapping_struct_impl = self.gen_wrapping_struct_impl(true)?;
 
+        Ok(vec![
+            struct_def,
+            view_trait_def,
+            try_view_trait_def,
+            view_wrapping_struct_impl,
+            try_view_wrapping_struct_impl,
+        ])
+    }
+
+    fn gen_blanket_impls(&self) -> Result<Vec<Item>> {
         let view_trait_name = &self.view_trait_name;
         let view_trait_path: Path = parse2(quote! { self::#view_trait_name })?;
         let try_trait_name = &self.try_view_trait_name;
         let try_trait_path: Path = parse2(quote! { self::#try_trait_name })?;
 
-        let blanket_impl_generators: Vec<Rc<dyn ImplsGenerator>> = vec![
-            Rc::new(GenBlanketRefImpls::new(Rc::clone(&self.options))),
-            Rc::new(GenBlanketOptionImpls::new(Rc::clone(&self.options))),
-            Rc::new(GenBlanketBothImpls::new(Rc::clone(&self.options))),
-            Rc::new(GenBlanketEitherImpls::new(Rc::clone(&self.options))),
-            Rc::new(GenBlanketEitherOrBothImpls::new(Rc::clone(&self.options))),
-            Rc::new(DynamicMessageImplsGenerator::new(Rc::clone(&self.options))),
-        ];
+        let blanket_impl_generators = self.create_blanket_impl_generators();
         let blanket_impls = blanket_impl_generators
             .iter()
             .map(|g| {
@@ -110,16 +123,18 @@ impl GenMessageItems {
             .flatten()
             .collect::<Result<Vec<_>>>()?;
 
-        items.extend([
-            struct_def,
-            view_trait_def,
-            try_view_trait_def,
-            view_wrapping_struct_impl,
-            try_view_wrapping_struct_impl,
-        ]);
-        items.extend(blanket_impls);
+        Ok(blanket_impls)
+    }
 
-        Ok(items)
+    fn create_blanket_impl_generators(&self) -> Vec<Rc<dyn ImplsGenerator>> {
+        vec![
+            Rc::new(GenBlanketRefImpls::new(Rc::clone(&self.options))),
+            Rc::new(GenBlanketOptionImpls::new(Rc::clone(&self.options))),
+            Rc::new(GenBlanketBothImpls::new(Rc::clone(&self.options))),
+            Rc::new(GenBlanketEitherImpls::new(Rc::clone(&self.options))),
+            Rc::new(GenBlanketEitherOrBothImpls::new(Rc::clone(&self.options))),
+            Rc::new(DynamicMessageImplsGenerator::new(Rc::clone(&self.options))),
+        ]
     }
 
     #[throws]
@@ -249,37 +264,33 @@ impl GenMessageItems {
         } else {
             &field.getter_signatures().struct_getter.ident
         };
-        let body_tokens = match field {
+        let body_tokens =
+            self.gen_field_body(field, t, trait_name, getter_name, options, is_try)?;
+        parser.parse2(body_tokens)?
+    }
+
+    fn gen_field_body(
+        &self,
+        field: &Field,
+        t: &Ident,
+        trait_name: &Ident,
+        getter_name: &Ident,
+        options: &CodeGeneratorOptions,
+        is_try: bool,
+    ) -> Result<proc_macro2::TokenStream> {
+        match field {
             Field::Repeated(RepeatedField {
                 scalar_proto_type: FieldType::Message(m),
                 ..
-            }) => {
-                let wrapper_type = m
-                    .to_relative_path(&field.base_proto_path())
-                    .unwrap_or(m.as_ref())
-                    .to_rust_path_with(options, |name| {
-                        Ok(PathSegment {
-                            ident: gen_struct_name(name),
-                            arguments: PathArguments::None,
-                        })
-                    })?;
-                if is_try {
-                    // Repeated message field with try semantics
-                    quote! {
-                        <#t as #trait_name>::#getter_name(&self.0)
-                            .map(|rep| rep
-                                .into_iter()
-                                .map(|res| res.map(|value| #wrapper_type(value))))
-                    }
-                } else {
-                    // Repeated message field without try semantics
-                    quote! {
-                        <#t as #trait_name>::#getter_name(&self.0)
-                            .into_iter()
-                            .map(|value| #wrapper_type(value))
-                    }
-                }
-            }
+            }) => self.gen_repeated_message_getter_body(
+                &FieldType::Message(m.clone()),
+                t,
+                trait_name,
+                getter_name,
+                options,
+                is_try,
+                field,
+            ),
             Field::Explicit(ScalarField {
                 scalar_proto_type: FieldType::Message(m),
                 ..
@@ -287,37 +298,104 @@ impl GenMessageItems {
             | Field::Implicit(ScalarField {
                 scalar_proto_type: FieldType::Message(m),
                 ..
-            }) => {
-                let wrapper_type = m
-                    .to_relative_path(&field.base_proto_path())
-                    .unwrap_or(m.as_ref())
-                    .to_rust_path_with(options, |name| {
-                        Ok(PathSegment {
-                            ident: gen_struct_name(name),
-                            arguments: PathArguments::None,
-                        })
-                    })?;
-                if is_try {
-                    // Scalar message field with try semantics
-                    quote! {
-                        <#t as #trait_name>::#getter_name(&self.0)
-                            .map(|opt| opt.map(|value| #wrapper_type(value)))
-                    }
-                } else {
-                    // Scalar message field without try semantics
-                    quote! {
-                        <#t as #trait_name>::#getter_name(&self.0)
-                            .map(|value| #wrapper_type(value))
-                    }
-                }
+            }) => self.gen_scalar_message_getter_body(
+                &FieldType::Message(m.clone()),
+                t,
+                trait_name,
+                getter_name,
+                options,
+                is_try,
+                field,
+            ),
+            _ => self.gen_simple_field_getter_body(t, trait_name, getter_name),
+        }
+    }
+
+    fn gen_repeated_message_getter_body(
+        &self,
+        message_type: &FieldType<ProtoPathBuf, ProtoPathBuf>,
+        t: &Ident,
+        trait_name: &Ident,
+        getter_name: &Ident,
+        options: &CodeGeneratorOptions,
+        is_try: bool,
+        field: &Field,
+    ) -> Result<proc_macro2::TokenStream> {
+        let wrapper_type = self.generate_wrapper_type(message_type, field, options)?;
+        Ok(if is_try {
+            // Repeated message field with try semantics
+            quote! {
+                <#t as #trait_name>::#getter_name(&self.0)
+                    .map(|rep| rep
+                        .into_iter()
+                        .map(|res| res.map(|value| #wrapper_type(value))))
             }
-            _ => {
-                quote! {
-                    <#t as #trait_name>::#getter_name(&self.0)
-                }
+        } else {
+            // Repeated message field without try semantics
+            quote! {
+                <#t as #trait_name>::#getter_name(&self.0)
+                    .into_iter()
+                    .map(|value| #wrapper_type(value))
             }
+        })
+    }
+
+    fn gen_scalar_message_getter_body(
+        &self,
+        message_type: &FieldType<ProtoPathBuf, ProtoPathBuf>,
+        t: &Ident,
+        trait_name: &Ident,
+        getter_name: &Ident,
+        options: &CodeGeneratorOptions,
+        is_try: bool,
+        field: &Field,
+    ) -> Result<proc_macro2::TokenStream> {
+        let wrapper_type = self.generate_wrapper_type(message_type, field, options)?;
+        Ok(if is_try {
+            // Scalar message field with try semantics
+            quote! {
+                <#t as #trait_name>::#getter_name(&self.0)
+                    .map(|opt| opt.map(|value| #wrapper_type(value)))
+            }
+        } else {
+            // Scalar message field without try semantics
+            quote! {
+                <#t as #trait_name>::#getter_name(&self.0)
+                    .map(|value| #wrapper_type(value))
+            }
+        })
+    }
+
+    fn gen_simple_field_getter_body(
+        &self,
+        t: &Ident,
+        trait_name: &Ident,
+        getter_name: &Ident,
+    ) -> Result<proc_macro2::TokenStream> {
+        Ok(quote! {
+            <#t as #trait_name>::#getter_name(&self.0)
+        })
+    }
+
+    fn generate_wrapper_type(
+        &self,
+        message_type: &FieldType<ProtoPathBuf, ProtoPathBuf>,
+        field: &Field,
+        options: &CodeGeneratorOptions,
+    ) -> Result<Path> {
+        let message_type = match message_type {
+            FieldType::Message(m) => m,
+            _ => unreachable!(),
         };
-        parser.parse2(body_tokens)?
+        Ok(message_type
+            .to_relative_path(&field.base_proto_path())
+            .unwrap_or(message_type.as_ref())
+            .to_rust_path_with(options, |name| {
+                Ok(PathSegment {
+                    ident: gen_struct_name(name),
+                    arguments: PathArguments::None,
+                })
+            })?)
     }
 }
 
