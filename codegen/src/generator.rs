@@ -288,8 +288,8 @@ impl FieldPresence {
 
 #[derive(Debug, Clone)]
 pub struct TrySwitch<T> {
-    pub for_non_try: T,
-    pub for_try: T,
+    for_non_try: T,
+    for_try: T,
 }
 
 impl<T> TrySwitch<T> {
