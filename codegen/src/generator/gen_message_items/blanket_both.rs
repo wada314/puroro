@@ -19,7 +19,7 @@ use crate::generator::{CodeGeneratorOptions, TrySwitch};
 use ::culpa::throws;
 use ::quote::quote;
 use ::std::rc::Rc;
-use ::syn::{Block, ExprPath, Ident, Item, Path, parse_str, parse2};
+use ::syn::{Block, Expr, Ident, Item, Path, parse_str, parse2};
 
 type Error = crate::ErrorKind;
 
@@ -127,7 +127,7 @@ impl GenBlanketBothImpls {
     ) -> Block {
         let signature = field.trait_getter_signatures()[true].clone();
         let try_getter_name = &signature.ident;
-        let mapped_either: ExprPath = parse2(quote! {
+        let mapped_either: Expr = parse2(quote! {
             self.as_ref().try_map_both(
                 <#t1 as #trait_path>::#try_getter_name,
                 <#t2 as #trait_path>::#try_getter_name
