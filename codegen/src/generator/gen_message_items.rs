@@ -155,7 +155,7 @@ impl GenMessageItems {
         let getters = self
             .fields
             .iter()
-            .map(|f| f.getter_signatures().trait_getter[false].clone())
+            .map(|f| f.trait_getter_signatures()[false].clone())
             .collect::<Vec<_>>();
         let has_methods = self
             .fields
@@ -168,7 +168,7 @@ impl GenMessageItems {
                 | Field::Explicit(ScalarField {
                     has_method_signatures,
                     ..
-                }) => Some(has_method_signatures.has_method[false].clone()),
+                }) => Some(has_method_signatures[false].clone()),
                 _ => None,
             })
             .collect::<Vec<_>>();
@@ -186,7 +186,7 @@ impl GenMessageItems {
         let try_getters = self
             .fields
             .iter()
-            .map(|f| f.getter_signatures().trait_getter[true].clone())
+            .map(|f| f.trait_getter_signatures()[true].clone())
             .collect::<Vec<_>>();
         let try_has_methods = self
             .fields
@@ -199,7 +199,7 @@ impl GenMessageItems {
                 | Field::Explicit(ScalarField {
                     has_method_signatures,
                     ..
-                }) => Some(has_method_signatures.has_method[true].clone()),
+                }) => Some(has_method_signatures[true].clone()),
                 _ => None,
             })
             .collect::<Vec<_>>();
@@ -223,7 +223,7 @@ impl GenMessageItems {
         let getter_signatures = self
             .fields
             .iter()
-            .map(|field| field.getter_signatures().struct_getter[is_try].clone())
+            .map(|field| field.struct_getter_signatures()[is_try].clone())
             .collect::<Vec<_>>();
         let body_stmts = self
             .fields
@@ -253,7 +253,7 @@ impl GenMessageItems {
         is_try: bool,
     ) -> Vec<Stmt> {
         let parser = Block::parse_within;
-        let getter_name = &field.getter_signatures().struct_getter[is_try].ident;
+        let getter_name = &field.struct_getter_signatures()[is_try].ident;
         let body_tokens =
             self.gen_field_body(field, t, trait_name, getter_name, options, is_try)?;
         parser.parse2(body_tokens)?
@@ -431,7 +431,7 @@ where
     fields
         .map(|f| {
             let get_method: ImplItemFn = {
-                let signature = f.getter_signatures().trait_getter[is_try_trait].clone();
+                let signature = f.trait_getter_signatures()[is_try_trait].clone();
                 let body = gen_getter(f)?;
                 parse2(quote! {
                     #signature #body
@@ -446,7 +446,7 @@ where
                     has_method_signatures,
                     ..
                 }) => {
-                    let signature = has_method_signatures.has_method[is_try_trait].clone();
+                    let signature = has_method_signatures[is_try_trait].clone();
                     let body = gen_has_method(f)?;
                     Some(parse2(quote! {
                         #signature #body

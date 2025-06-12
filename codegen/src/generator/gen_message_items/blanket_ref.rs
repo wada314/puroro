@@ -85,7 +85,7 @@ impl GenBlanketRefImpls {
 
     #[throws]
     fn gen_getter_body(&self, field: &Field, t: &Ident, trait_path: &Path) -> Block {
-        let signature = field.getter_signatures().trait_getter[false].clone();
+        let signature = field.trait_getter_signatures()[false].clone();
         let getter_name = &signature.ident;
         let map_expr = quote! {
             self.as_ref().map(<#t as #trait_path>::#getter_name)
@@ -101,7 +101,7 @@ impl GenBlanketRefImpls {
             }
             Field::Explicit(ScalarField { has_method_signatures, .. })
             | Field::Implicit(ScalarField { has_method_signatures, .. }) => {
-                let has_method_name = &has_method_signatures.has_method[false].ident;
+                let has_method_name = &has_method_signatures[false].ident;
                 quote! {
                     if <#t as #trait_path>::#has_method_name(self.as_ref()) {
                         <#t as #trait_path>::#getter_name(self.as_ref())
@@ -121,13 +121,13 @@ impl GenBlanketRefImpls {
         else {
             Err("this method is not supported for repeated fields".to_string())?
         };
-        let has_name = &has_method_signatures.has_method[false].ident;
+        let has_name = &has_method_signatures[false].ident;
         parse2(quote! {{ <#t as #trait_path>::#has_name(self.as_ref()) }})?
     }
 
     #[throws]
     fn gen_try_getter_body(&self, field: &Field, t: &Ident, trait_path: &Path) -> Block {
-        let signature = field.getter_signatures().trait_getter[true].clone();
+        let signature = field.trait_getter_signatures()[true].clone();
         let try_getter_name = &signature.ident;
         let mapped_either: Expr = parse2(quote! {
             self.as_ref().try_map(<#t as #trait_path>::#try_getter_name)?
@@ -150,7 +150,7 @@ impl GenBlanketRefImpls {
             }
             Field::Explicit(ScalarField { has_method_signatures, .. })
             | Field::Implicit(ScalarField { has_method_signatures, .. }) => {
-                let try_has_method_name = &has_method_signatures.has_method[true].ident;
+                let try_has_method_name = &has_method_signatures[true].ident;
                 quote! {{
                     if <#t as #trait_path>::#try_has_method_name(self.as_ref())? {
                         <#t as #trait_path>::#try_getter_name(self.as_ref())
@@ -167,7 +167,7 @@ impl GenBlanketRefImpls {
         let try_has_name = match field {
             Field::Implicit(ScalarField { has_method_signatures, .. })
             | Field::Explicit(ScalarField { has_method_signatures, .. }) => {
-                &has_method_signatures.has_method[true].ident
+                &has_method_signatures[true].ident
             }
             _ => Err("this method is not supported for repeated fields".to_string())?,
         };

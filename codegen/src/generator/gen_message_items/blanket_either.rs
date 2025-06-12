@@ -75,7 +75,7 @@ impl GenBlanketEitherImpls {
 
     #[throws]
     fn gen_getter_body(&self, field: &Field, t1: &Ident, t2: &Ident, trait_path: &Path) -> Block {
-        let signature = field.getter_signatures().trait_getter[false].clone();
+        let signature = field.trait_getter_signatures()[false].clone();
         let getter_name = &signature.ident;
         let map_expr = quote! {
             self.as_ref().map_either(
@@ -94,7 +94,7 @@ impl GenBlanketEitherImpls {
             }
             Field::Explicit(ScalarField { has_method_signatures, .. })
             | Field::Implicit(ScalarField { has_method_signatures, .. }) => {
-                let has_method_name = &has_method_signatures.has_method[false].ident;
+                let has_method_name = &has_method_signatures[false].ident;
                 quote! {
                     match self.as_ref() {
                         Either::Left(left) => {
@@ -129,7 +129,7 @@ impl GenBlanketEitherImpls {
         let has_name = match field {
             Field::Implicit(ScalarField { has_method_signatures, .. })
             | Field::Explicit(ScalarField { has_method_signatures, .. }) => {
-                &has_method_signatures.has_method[false].ident
+                &has_method_signatures[false].ident
             }
             _ => Err("this method is not supported for repeated fields".to_string())?,
         };
@@ -149,7 +149,7 @@ impl GenBlanketEitherImpls {
         t2: &Ident,
         trait_path: &Path,
     ) -> Block {
-        let signature = field.getter_signatures().trait_getter[true].clone();
+        let signature = field.trait_getter_signatures()[true].clone();
         let try_getter_name = &signature.ident;
         let mapped_either: Expr = parse2(quote! {
             self.as_ref().try_map_either(
@@ -175,7 +175,7 @@ impl GenBlanketEitherImpls {
             }
             Field::Explicit(ScalarField { has_method_signatures, .. })
             | Field::Implicit(ScalarField { has_method_signatures, .. }) => {
-                let try_has_method_name = &has_method_signatures.has_method[true].ident;
+                let try_has_method_name = &has_method_signatures[true].ident;
                 quote! {{
                     match self.as_ref() {
                         Either::Left(left) => {
@@ -209,7 +209,7 @@ impl GenBlanketEitherImpls {
         let try_has_name = match field {
             Field::Implicit(ScalarField { has_method_signatures, .. })
             | Field::Explicit(ScalarField { has_method_signatures, .. }) => {
-                &has_method_signatures.has_method[true].ident
+                &has_method_signatures[true].ident
             }
             _ => Err("this method is not supported for repeated fields".to_string())?,
         };
