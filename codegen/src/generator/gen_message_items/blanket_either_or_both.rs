@@ -100,7 +100,7 @@ impl GenBlanketEitherOrBothImpls {
             }
             Field::Explicit(ScalarField { has_method_signatures, .. })
             | Field::Implicit(ScalarField { has_method_signatures, .. }) => {
-                let has_method_name = &has_method_signatures.has_method.ident;
+                let has_method_name = &has_method_signatures[false].ident;
                 quote! {
                     let (left_opt, right_opt) = self.as_ref().left_and_right();
                     if let Some(right) = right_opt {
@@ -131,7 +131,7 @@ impl GenBlanketEitherOrBothImpls {
         let has_name = match field {
             Field::Implicit(ScalarField { has_method_signatures, .. })
             | Field::Explicit(ScalarField { has_method_signatures, .. }) => {
-                &has_method_signatures.has_method.ident
+                &has_method_signatures[false].ident
             }
             _ => Err("this method is not supported for repeated fields".to_string())?,
         };
@@ -184,7 +184,7 @@ impl GenBlanketEitherOrBothImpls {
             }
             Field::Explicit(ScalarField { has_method_signatures, .. })
             | Field::Implicit(ScalarField { has_method_signatures, .. }) => {
-                let try_has_method_name = &has_method_signatures.try_has_method.ident;
+                let try_has_method_name = &has_method_signatures[true].ident;
                 quote! {{
                     let (left_opt, right_opt) = self.as_ref().left_and_right();
                     if let Some(right) = right_opt {
@@ -214,7 +214,7 @@ impl GenBlanketEitherOrBothImpls {
         let try_has_name = match field {
             Field::Implicit(ScalarField { has_method_signatures, .. })
             | Field::Explicit(ScalarField { has_method_signatures, .. }) => {
-                &has_method_signatures.try_has_method.ident
+                &has_method_signatures[true].ident
             }
             _ => Err("this method is not supported for repeated fields".to_string())?,
         };

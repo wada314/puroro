@@ -96,7 +96,7 @@ impl GenBlanketRefImpls {
         else {
             Err("this method is not supported for repeated fields".to_string())?
         };
-        let has_name = &has_method_signatures.has_method.ident;
+        let has_name = &has_method_signatures[false].ident;
         parse2(quote! {{ <#t as #trait_path>::#has_name(self) }})?
     }
 
@@ -112,7 +112,7 @@ impl GenBlanketRefImpls {
         let try_has_name = match field {
             Field::Implicit(ScalarField { has_method_signatures, .. })
             | Field::Explicit(ScalarField { has_method_signatures, .. }) => {
-                &has_method_signatures.try_has_method.ident
+                &has_method_signatures[true].ident
             }
             _ => Err("this method is not supported for repeated fields".to_string())?,
         };
