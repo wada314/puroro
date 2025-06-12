@@ -12,14 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::field::{Field, RepeatedField, ScalarField};
+use super::field::{Field, ScalarField};
 use super::{ImplsGenerator, impls_helper};
-use crate::descriptor::FieldType;
-use crate::generator::{CodeGeneratorOptions, TrySwitch};
+use crate::generator::CodeGeneratorOptions;
 use ::culpa::throws;
 use ::quote::quote;
 use ::std::rc::Rc;
-use ::syn::{Block, Expr, Ident, Item, Path, parse_str, parse2};
+use ::syn::{Block, Ident, Item, Path, TypePath, parse_str, parse2};
 
 type Error = crate::ErrorKind;
 
@@ -31,36 +30,38 @@ impl ImplsGenerator for GenBlanketOptionImpls {
     #[throws]
     fn generate<'a>(
         &self,
-        trait_paths: &TrySwitch<Path>,
+        view_trait_path: &Path,
+        try_view_trait_path: &Path,
         fields: Box<dyn 'a + Iterator<Item = &'a Field>>,
     ) -> Vec<Item> {
         let t: Ident = parse_str("T")?;
-        let fields: Vec<_> = fields.collect();
-        let view_trait_path = &trait_paths[false];
-        let try_trait_path = &trait_paths[true];
+        let t_opt = self
+            .options
+            .option_type(&(TypePath { qself: None, path: t.clone().into() }.into()));
+        let fields = fields.collect::<Vec<_>>();
 
         let view_methods = impls_helper(
             fields.iter().copied(),
-            |f| self.gen_getter_body(f, &t, view_trait_path),
-            |f| self.gen_has_method_body(f, &t, view_trait_path),
+            |f| self.gen_get_method_body(f, &t, &view_trait_path),
+            |f| self.gen_has_method_body(f, &t, &view_trait_path),
             false,
         )?;
 
         let try_methods = impls_helper(
             fields.iter().copied(),
-            |f| self.gen_try_getter_body(f, &t, try_trait_path),
-            |f| self.gen_try_has_method_body(f, &t, try_trait_path),
+            |f| self.gen_try_get_method_body(f, &t, &try_view_trait_path),
+            |f| self.gen_try_has_method_body(f, &t, &try_view_trait_path),
             true,
         )?;
 
         vec![
             parse2(quote! {
-                impl<#t: #view_trait_path> #view_trait_path for ::std::option::Option<#t> {
+                impl<#t: #view_trait_path> #view_trait_path for #t_opt {
                     #(#view_methods)*
                 }
             })?,
             parse2(quote! {
-                impl<#t: #try_trait_path> #try_trait_path for ::std::option::Option<#t> {
+                impl<#t: #try_view_trait_path> #try_view_trait_path for #t_opt {
                     #(#try_methods)*
                 }
             })?,
@@ -74,38 +75,22 @@ impl GenBlanketOptionImpls {
     }
 
     #[throws]
-    fn gen_getter_body(&self, field: &Field, t: &Ident, trait_path: &Path) -> Block {
-        let signature = field.trait_getter_signatures()[false].clone();
+    fn gen_get_method_body(&self, field: &Field, t: &Ident, trait_path: &Path) -> Block {
+        let signature = field.getter_signatures().trait_getter.clone();
         let getter_name = &signature.ident;
-        let map_expr = quote! {
-            self.as_ref().map(<#t as #trait_path>::#getter_name)
+        let stmts = match field {
+            Field::Repeated { .. } => quote! {
+                self.as_ref().map(<#t as #trait_path>::#getter_name)
+                    .into_iter().flatten()
+            },
+            Field::Explicit { .. } | Field::Implicit { .. } => quote! {
+                self.as_ref().map(<#t as #trait_path>::#getter_name)
+                    .unwrap_or_default()
+            },
         };
-        let expr = match field {
-            Field::Repeated(RepeatedField { scalar_proto_type: FieldType::Message(_), .. }) => {
-                quote! { #map_expr.into_iter_either() }
-            }
-            Field::Repeated(RepeatedField { .. }) => quote! { #map_expr.into_iter_chained() },
-            Field::Explicit(ScalarField { scalar_proto_type: FieldType::Message(_), .. })
-            | Field::Implicit(ScalarField { scalar_proto_type: FieldType::Message(_), .. }) => {
-                quote! { #map_expr.factor_none() }
-            }
-            Field::Explicit(ScalarField { has_method_signatures, .. })
-            | Field::Implicit(ScalarField { has_method_signatures, .. }) => {
-                let has_method_name = &has_method_signatures[false].ident;
-                quote! {
-                    if let Some(inner) = self.as_ref() {
-                        if <#t as #trait_path>::#has_method_name(inner) {
-                            <#t as #trait_path>::#getter_name(inner)
-                        } else {
-                            ::std::default::Default::default()
-                        }
-                    } else {
-                        ::std::default::Default::default()
-                    }
-                }
-            }
-        };
-        parse2(quote! {{ #expr }})?
+        parse2(quote! {
+            { #stmts }
+        })?
     }
 
     #[throws]
@@ -115,7 +100,7 @@ impl GenBlanketOptionImpls {
         else {
             Err("this method is not supported for repeated fields".to_string())?
         };
-        let has_name = &has_method_signatures[false].ident;
+        let has_name = &has_method_signatures.has_method.ident;
         parse2(quote! {{
             self.as_ref()
                 .map(<#t as #trait_path>::#has_name)
@@ -124,43 +109,21 @@ impl GenBlanketOptionImpls {
     }
 
     #[throws]
-    fn gen_try_getter_body(&self, field: &Field, t: &Ident, trait_path: &Path) -> Block {
-        let signature = field.trait_getter_signatures()[true].clone();
+    fn gen_try_get_method_body(&self, field: &Field, t: &Ident, trait_path: &Path) -> Block {
+        let signature = field.getter_signatures().trait_try_getter.clone();
         let try_getter_name = &signature.ident;
-        let mapped_either: Expr = parse2(quote! {
-            self.as_ref().try_map(<#t as #trait_path>::#try_getter_name)?
-        })?;
-        let ok = self.options.ok_path();
-        parse2(match field {
-            Field::Repeated(RepeatedField { scalar_proto_type: FieldType::Message(_), .. }) => {
-                quote! {{
-                    #ok(#mapped_either.into_iter_either().map(|either_res| either_res.factor_err()))
-                }}
-            }
-            Field::Repeated(RepeatedField { .. }) => quote! {{
-                #ok(#mapped_either.into_iter_chained())
-            }},
-            Field::Explicit(ScalarField { scalar_proto_type: FieldType::Message(_), .. })
-            | Field::Implicit(ScalarField { scalar_proto_type: FieldType::Message(_), .. }) => {
-                quote! {{
-                    #ok(#mapped_either.factor_none())
-                }}
-            }
-            Field::Explicit(ScalarField { has_method_signatures, .. })
-            | Field::Implicit(ScalarField { has_method_signatures, .. }) => {
-                let try_has_method_name = &has_method_signatures[true].ident;
-                quote! {{
-                    if let Some(inner) = self.as_ref() {
-                        if <#t as #trait_path>::#try_has_method_name(inner)? {
-                            <#t as #trait_path>::#try_getter_name(inner)
-                        } else {
-                            #ok(::std::default::Default::default())
-                        }
-                    } else {
-                        #ok(::std::default::Default::default())
-                    }
-                }}
-            }
+        let stmts = match field {
+            Field::Repeated { .. } => quote! {
+                self.as_ref().map(<#t as #trait_path>::#try_getter_name).transpose()
+                .map(|iter_opt| iter_opt.into_iter().flatten())
+            },
+            Field::Explicit { .. } | Field::Implicit { .. } => quote! {
+                self.as_ref().map(<#t as #trait_path>::#try_getter_name).transpose()
+                .map(|opt| opt.unwrap_or_default())
+            },
+        };
+        parse2(quote! {
+            { #stmts }
         })?
     }
 
@@ -169,7 +132,7 @@ impl GenBlanketOptionImpls {
         let try_has_name = match field {
             Field::Implicit(ScalarField { has_method_signatures, .. })
             | Field::Explicit(ScalarField { has_method_signatures, .. }) => {
-                &has_method_signatures[true].ident
+                &has_method_signatures.try_has_method.ident
             }
             _ => Err("this method is not supported for repeated fields".to_string())?,
         };

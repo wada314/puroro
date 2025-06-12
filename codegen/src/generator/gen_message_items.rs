@@ -24,7 +24,7 @@ mod dynamic_message;
 use super::CodeGeneratorOptions;
 use crate::cases::{Case, convert_into_case};
 use crate::descriptor::{DescriptorExt, FieldType};
-use crate::generator::{TrySwitch, to_ident};
+use crate::generator::to_ident;
 use crate::proto_path::ProtoPathBuf;
 use crate::{Result, ResultExt};
 use ::culpa::throws;
@@ -47,7 +47,8 @@ type Error = crate::ErrorKind;
 
 pub struct GenMessageItems {
     struct_name: Ident,
-    trait_names: TrySwitch<Ident>,
+    view_trait_name: Ident,
+    try_view_trait_name: Ident,
     fields: Vec<Field>,
     options: Rc<CodeGeneratorOptions>,
 }
@@ -60,10 +61,8 @@ impl GenMessageItems {
         let current_proto_path = Rc::new(desc.current_path().to_owned());
         Ok(Self {
             struct_name: gen_struct_name(desc.name()),
-            trait_names: TrySwitch::new(
-                gen_view_trait_name(desc.name()),
-                gen_try_view_trait_name(desc.name()),
-            ),
+            view_trait_name: gen_view_trait_name(desc.name()),
+            try_view_trait_name: gen_try_view_trait_name(desc.name()),
             fields: desc
                 .non_oneof_fields()?
                 .into_iter()
@@ -86,8 +85,8 @@ impl GenMessageItems {
     }
 
     fn gen_basic_items(&self) -> Result<Vec<Item>> {
-        let view_trait_def = self.gen_view_trait(false)?;
-        let try_view_trait_def = self.gen_view_trait(true)?;
+        let view_trait_def = self.gen_view_trait()?;
+        let try_view_trait_def = self.gen_try_view_trait()?;
         let struct_def = self.gen_struct()?;
         let view_wrapping_struct_impl = self.gen_wrapping_struct_impl(false)?;
         let try_view_wrapping_struct_impl = self.gen_wrapping_struct_impl(true)?;
@@ -102,16 +101,21 @@ impl GenMessageItems {
     }
 
     fn gen_blanket_impls(&self) -> Result<Vec<Item>> {
-        let view_trait_name = &self.trait_names[false];
-        let try_trait_name = &self.trait_names[true];
-        let view_trait_path = parse2(quote! { self::#view_trait_name })?;
-        let try_trait_path = parse2(quote! { self::#try_trait_name })?;
-        let trait_paths = TrySwitch::new(view_trait_path, try_trait_path);
+        let view_trait_name = &self.view_trait_name;
+        let view_trait_path: Path = parse2(quote! { self::#view_trait_name })?;
+        let try_trait_name = &self.try_view_trait_name;
+        let try_trait_path: Path = parse2(quote! { self::#try_trait_name })?;
 
         let blanket_impl_generators = self.create_blanket_impl_generators();
         let blanket_impls = blanket_impl_generators
             .iter()
-            .map(|g| g.generate(&trait_paths, Box::new(self.fields.iter())))
+            .map(|g| {
+                g.generate(
+                    &view_trait_path,
+                    &try_trait_path,
+                    Box::new(self.fields.iter()),
+                )
+            })
             .map(|r| match r {
                 Ok(vec) => Either::Left(vec.into_iter().map(Ok)),
                 Err(e) => Either::Right(once(Err(e))),
@@ -145,12 +149,13 @@ impl GenMessageItems {
     }
 
     #[throws]
-    fn gen_view_trait(&self, is_try: bool) -> Item {
-        let trait_name = &self.trait_names[is_try];
+    fn gen_view_trait(&self) -> Item {
+        let trait_name = &self.view_trait_name;
+        let try_trait_name = &self.try_view_trait_name;
         let getters = self
             .fields
             .iter()
-            .map(|f| f.trait_getter_signatures()[is_try].clone())
+            .map(|f| f.getter_signatures().trait_getter.clone())
             .collect::<Vec<_>>();
         let has_methods = self
             .fields
@@ -163,39 +168,68 @@ impl GenMessageItems {
                 | Field::Explicit(ScalarField {
                     has_method_signatures,
                     ..
-                }) => Some(has_method_signatures[is_try].clone()),
+                }) => Some(has_method_signatures.has_method.clone()),
                 _ => None,
             })
             .collect::<Vec<_>>();
+        parse2(quote! {
+            pub trait #trait_name: self::#try_trait_name {
+                #(#getters;)*
+                #(#has_methods;)*
+            }
+        })?
+    }
 
-        if is_try {
-            parse2(quote! {
-                pub trait #trait_name {
-                    #(#getters;)*
-                    #(#has_methods;)*
-                }
-            })?
-        } else {
-            let try_trait_name = &self.trait_names[true];
-            let try_trait_path: Path = parse2(quote! { self::#try_trait_name })?;
-            parse2(quote! {
-                pub trait #trait_name: #try_trait_path {
-                    #(#getters;)*
-                    #(#has_methods;)*
-                }
-            })?
-        }
+    #[throws]
+    fn gen_try_view_trait(&self) -> Item {
+        let trait_name = &self.try_view_trait_name;
+        let try_getters = self
+            .fields
+            .iter()
+            .map(|f| f.getter_signatures().trait_try_getter.clone())
+            .collect::<Vec<_>>();
+        let try_has_methods = self
+            .fields
+            .iter()
+            .filter_map(|f| match f {
+                Field::Implicit(ScalarField {
+                    has_method_signatures,
+                    ..
+                })
+                | Field::Explicit(ScalarField {
+                    has_method_signatures,
+                    ..
+                }) => Some(has_method_signatures.try_has_method.clone()),
+                _ => None,
+            })
+            .collect::<Vec<_>>();
+        parse2(quote! {
+            pub trait #trait_name {
+                #(#try_getters;)*
+                #(#try_has_methods;)*
+            }
+        })?
     }
 
     #[throws]
     fn gen_wrapping_struct_impl(&self, is_try: bool) -> Item {
         let struct_name = &self.struct_name;
         let t = format_ident!("T");
-        let trait_name = &self.trait_names[is_try];
+        let trait_name = if is_try {
+            &self.try_view_trait_name
+        } else {
+            &self.view_trait_name
+        };
         let getter_signatures = self
             .fields
             .iter()
-            .map(|field| field.struct_getter_signatures()[is_try].clone())
+            .map(|field| {
+                if is_try {
+                    field.getter_signatures().struct_try_getter.clone()
+                } else {
+                    field.getter_signatures().struct_getter.clone()
+                }
+            })
             .collect::<Vec<_>>();
         let body_stmts = self
             .fields
@@ -225,7 +259,11 @@ impl GenMessageItems {
         is_try: bool,
     ) -> Vec<Stmt> {
         let parser = Block::parse_within;
-        let getter_name = &field.struct_getter_signatures()[is_try].ident;
+        let getter_name = if is_try {
+            &field.getter_signatures().struct_try_getter.ident
+        } else {
+            &field.getter_signatures().struct_getter.ident
+        };
         let body_tokens =
             self.gen_field_body(field, t, trait_name, getter_name, options, is_try)?;
         parser.parse2(body_tokens)?
@@ -383,7 +421,8 @@ trait ImplsGenerator {
     #[throws]
     fn generate<'a>(
         &self,
-        trait_paths: &TrySwitch<Path>,
+        view_trait_path: &Path,
+        try_view_trait_path: &Path,
         fields: Box<dyn 'a + Iterator<Item = &'a Field>>,
     ) -> Vec<Item>;
 }
@@ -402,7 +441,11 @@ where
     fields
         .map(|f| {
             let get_method: ImplItemFn = {
-                let signature = f.trait_getter_signatures()[is_try_trait].clone();
+                let signature = if is_try_trait {
+                    f.getter_signatures().trait_try_getter.clone()
+                } else {
+                    f.getter_signatures().trait_getter.clone()
+                };
                 let body = gen_getter(f)?;
                 parse2(quote! {
                     #signature #body
@@ -417,7 +460,11 @@ where
                     has_method_signatures,
                     ..
                 }) => {
-                    let signature = has_method_signatures[is_try_trait].clone();
+                    let signature = if is_try_trait {
+                        has_method_signatures.try_has_method.clone()
+                    } else {
+                        has_method_signatures.has_method.clone()
+                    };
                     let body = gen_has_method(f)?;
                     Some(parse2(quote! {
                         #signature #body

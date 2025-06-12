@@ -15,7 +15,7 @@
 use super::field::{Field, RepeatedField, ScalarField};
 use super::{ImplsGenerator, impls_helper};
 use crate::descriptor::FieldType;
-use crate::generator::{CodeGeneratorOptions, TrySwitch};
+use crate::generator::CodeGeneratorOptions;
 use ::culpa::throws;
 use ::quote::quote;
 use ::std::rc::Rc;
@@ -31,26 +31,25 @@ impl ImplsGenerator for GenBlanketEitherOrBothImpls {
     #[throws]
     fn generate<'a>(
         &self,
-        trait_paths: &TrySwitch<Path>,
+        view_trait_path: &Path,
+        try_view_trait_path: &Path,
         fields: Box<dyn 'a + Iterator<Item = &'a Field>>,
     ) -> Vec<Item> {
         let t1: Ident = parse_str("T")?;
         let t2: Ident = parse_str("U")?;
         let fields: Vec<_> = fields.collect();
-        let view_trait_path = &trait_paths[false];
-        let try_trait_path = &trait_paths[true];
 
         let view_methods = impls_helper(
             fields.iter().copied(),
-            |f| self.gen_getter_body(f, &t1, &t2, view_trait_path),
-            |f| self.gen_has_method_body(f, &t1, &t2, view_trait_path),
+            |f| self.gen_get_method_body(f, &t1, &t2, &view_trait_path),
+            |f| self.gen_has_method_body(f, &t1, &t2, &view_trait_path),
             false,
         )?;
 
         let try_methods = impls_helper(
             fields.iter().copied(),
-            |f| self.gen_try_getter_body(f, &t1, &t2, try_trait_path),
-            |f| self.gen_try_has_method_body(f, &t1, &t2, try_trait_path),
+            |f| self.gen_try_get_method_body(f, &t1, &t2, &try_view_trait_path),
+            |f| self.gen_try_has_method_body(f, &t1, &t2, &try_view_trait_path),
             true,
         )?;
 
@@ -61,7 +60,7 @@ impl ImplsGenerator for GenBlanketEitherOrBothImpls {
                 }
             })?,
             parse2(quote! {
-                impl<#t1: #try_trait_path, #t2: #try_trait_path> #try_trait_path for ::puroro::EitherOrBoth<#t1, #t2> {
+                impl<#t1: #try_view_trait_path, #t2: #try_view_trait_path> #try_view_trait_path for ::puroro::EitherOrBoth<#t1, #t2> {
                     #(#try_methods)*
                 }
             })?,
@@ -75,8 +74,14 @@ impl GenBlanketEitherOrBothImpls {
     }
 
     #[throws]
-    fn gen_getter_body(&self, field: &Field, t1: &Ident, t2: &Ident, trait_path: &Path) -> Block {
-        let signature = field.trait_getter_signatures()[false].clone();
+    fn gen_get_method_body(
+        &self,
+        field: &Field,
+        t1: &Ident,
+        t2: &Ident,
+        trait_path: &Path,
+    ) -> Block {
+        let signature = field.getter_signatures().trait_getter.clone();
         let getter_name = &signature.ident;
         let map2_expr = quote! {
             self.as_ref().map2(
@@ -95,7 +100,7 @@ impl GenBlanketEitherOrBothImpls {
             }
             Field::Explicit(ScalarField { has_method_signatures, .. })
             | Field::Implicit(ScalarField { has_method_signatures, .. }) => {
-                let has_method_name = &has_method_signatures[false].ident;
+                let has_method_name = &has_method_signatures.has_method.ident;
                 quote! {
                     let (left_opt, right_opt) = self.as_ref().left_and_right();
                     if let Some(right) = right_opt {
@@ -126,7 +131,7 @@ impl GenBlanketEitherOrBothImpls {
         let has_name = match field {
             Field::Implicit(ScalarField { has_method_signatures, .. })
             | Field::Explicit(ScalarField { has_method_signatures, .. }) => {
-                &has_method_signatures[false].ident
+                &has_method_signatures.has_method.ident
             }
             _ => Err("this method is not supported for repeated fields".to_string())?,
         };
@@ -147,14 +152,14 @@ impl GenBlanketEitherOrBothImpls {
     }
 
     #[throws]
-    fn gen_try_getter_body(
+    fn gen_try_get_method_body(
         &self,
         field: &Field,
         t1: &Ident,
         t2: &Ident,
         trait_path: &Path,
     ) -> Block {
-        let signature = field.trait_getter_signatures()[true].clone();
+        let signature = field.getter_signatures().trait_try_getter.clone();
         let try_getter_name = &signature.ident;
         let mapped_either: Expr = parse2(quote! {
             self.as_ref().try_map2(
@@ -179,7 +184,7 @@ impl GenBlanketEitherOrBothImpls {
             }
             Field::Explicit(ScalarField { has_method_signatures, .. })
             | Field::Implicit(ScalarField { has_method_signatures, .. }) => {
-                let try_has_method_name = &has_method_signatures[true].ident;
+                let try_has_method_name = &has_method_signatures.try_has_method.ident;
                 quote! {{
                     let (left_opt, right_opt) = self.as_ref().left_and_right();
                     if let Some(right) = right_opt {
@@ -209,7 +214,7 @@ impl GenBlanketEitherOrBothImpls {
         let try_has_name = match field {
             Field::Implicit(ScalarField { has_method_signatures, .. })
             | Field::Explicit(ScalarField { has_method_signatures, .. }) => {
-                &has_method_signatures[true].ident
+                &has_method_signatures.try_has_method.ident
             }
             _ => Err("this method is not supported for repeated fields".to_string())?,
         };

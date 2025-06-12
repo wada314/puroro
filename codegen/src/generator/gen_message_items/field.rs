@@ -15,7 +15,7 @@
 use super::{gen_struct_name, gen_try_view_trait_name, gen_view_trait_name};
 use crate::cases::{Case, convert_into_case};
 use crate::descriptor::{FieldDescriptorExt, FieldType, LenType};
-use crate::generator::{CodeGeneratorOptions, FieldPresence, TrySwitch, to_ident};
+use crate::generator::{CodeGeneratorOptions, FieldPresence, to_ident};
 use crate::proto_path::{ProtoPath, ProtoPathBuf};
 use ::culpa::throws;
 use ::std::rc::Rc;
@@ -43,8 +43,7 @@ pub struct RepeatedField {
     /// used as the base for generating relative paths to other items.
     pub base_proto_path: Rc<ProtoPathBuf>,
     pub scalar_proto_type: FieldType<ProtoPathBuf, ProtoPathBuf>,
-    pub trait_getter_signatures: TrySwitch<Signature>,
-    pub struct_getter_signatures: TrySwitch<Signature>,
+    pub getter_signatures: GetterSignatures,
 }
 
 #[derive(Debug)]
@@ -53,9 +52,22 @@ pub struct ScalarField {
     pub options: Rc<CodeGeneratorOptions>,
     pub base_proto_path: Rc<ProtoPathBuf>,
     pub scalar_proto_type: FieldType<ProtoPathBuf, ProtoPathBuf>,
-    pub trait_getter_signatures: TrySwitch<Signature>,
-    pub struct_getter_signatures: TrySwitch<Signature>,
-    pub has_method_signatures: TrySwitch<Signature>,
+    pub getter_signatures: GetterSignatures,
+    pub has_method_signatures: HasMethodSignatures,
+}
+
+#[derive(Debug)]
+pub struct GetterSignatures {
+    pub trait_getter: Signature,
+    pub struct_getter: Signature,
+    pub trait_try_getter: Signature,
+    pub struct_try_getter: Signature,
+}
+
+#[derive(Debug)]
+pub struct HasMethodSignatures {
+    pub has_method: Signature,
+    pub try_has_method: Signature,
 }
 
 impl Field {
@@ -92,33 +104,11 @@ impl Field {
         }
     }
 
-    pub fn trait_getter_signatures(&self) -> &TrySwitch<Signature> {
+    pub fn getter_signatures(&self) -> &GetterSignatures {
         match self {
-            Field::Repeated(RepeatedField { trait_getter_signatures, .. })
-            | Field::Explicit(ScalarField { trait_getter_signatures, .. })
-            | Field::Implicit(ScalarField { trait_getter_signatures, .. }) => {
-                trait_getter_signatures
-            }
-        }
-    }
-
-    pub fn struct_getter_signatures(&self) -> &TrySwitch<Signature> {
-        match self {
-            Field::Repeated(RepeatedField { struct_getter_signatures, .. })
-            | Field::Explicit(ScalarField { struct_getter_signatures, .. })
-            | Field::Implicit(ScalarField { struct_getter_signatures, .. }) => {
-                struct_getter_signatures
-            }
-        }
-    }
-
-    pub fn has_method_signatures(&self) -> Option<&TrySwitch<Signature>> {
-        match self {
-            Field::Repeated(_) => None,
-            Field::Explicit(ScalarField { has_method_signatures, .. })
-            | Field::Implicit(ScalarField { has_method_signatures, .. }) => {
-                Some(has_method_signatures)
-            }
+            Field::Repeated(RepeatedField { getter_signatures, .. })
+            | Field::Explicit(ScalarField { getter_signatures, .. })
+            | Field::Implicit(ScalarField { getter_signatures, .. }) => getter_signatures,
         }
     }
 }
@@ -163,15 +153,13 @@ impl FieldFactory {
         let number = self.number;
         let base_proto_path = Rc::clone(&self.base_proto_path);
         let options = Rc::clone(&self.options);
-        let (trait_getter_signatures, struct_getter_signatures) = self.gen_getter_signatures()?;
         match &self.presense {
             FieldPresence::Implicit => Field::Implicit(ScalarField {
                 number,
                 options,
                 base_proto_path,
                 scalar_proto_type,
-                trait_getter_signatures,
-                struct_getter_signatures,
+                getter_signatures: self.gen_getter_signatures()?,
                 has_method_signatures: self.gen_has_method_signatures()?,
             }),
             FieldPresence::Explicit => Field::Explicit(ScalarField {
@@ -179,8 +167,7 @@ impl FieldFactory {
                 options,
                 base_proto_path,
                 scalar_proto_type,
-                trait_getter_signatures,
-                struct_getter_signatures,
+                getter_signatures: self.gen_getter_signatures()?,
                 has_method_signatures: self.gen_has_method_signatures()?,
             }),
             FieldPresence::Repeated => Field::Repeated(RepeatedField {
@@ -188,8 +175,7 @@ impl FieldFactory {
                 options,
                 base_proto_path,
                 scalar_proto_type,
-                trait_getter_signatures,
-                struct_getter_signatures,
+                getter_signatures: self.gen_getter_signatures()?,
             }),
         }
     }
@@ -266,17 +252,13 @@ impl FieldFactory {
     }
 
     #[throws]
-    fn gen_getter_signatures(&self) -> (TrySwitch<Signature>, TrySwitch<Signature>) {
-        (
-            TrySwitch::new(
-                self.gen_getter_signature(FieldContext::Trait, false),
-                self.gen_getter_signature(FieldContext::Trait, true),
-            ),
-            TrySwitch::new(
-                self.gen_getter_signature(FieldContext::Struct, false),
-                self.gen_getter_signature(FieldContext::Struct, true),
-            ),
-        )
+    fn gen_getter_signatures(&self) -> GetterSignatures {
+        GetterSignatures {
+            trait_getter: self.gen_getter_signature(FieldContext::Trait, false),
+            struct_getter: self.gen_getter_signature(FieldContext::Struct, false),
+            trait_try_getter: self.gen_getter_signature(FieldContext::Trait, true),
+            struct_try_getter: self.gen_getter_signature(FieldContext::Struct, true),
+        }
     }
 
     fn gen_has_method_signature(&self, is_try: bool) -> Signature {
@@ -300,11 +282,11 @@ impl FieldFactory {
     }
 
     #[throws]
-    fn gen_has_method_signatures(&self) -> TrySwitch<Signature> {
-        TrySwitch::new(
-            self.gen_has_method_signature(false),
-            self.gen_has_method_signature(true),
-        )
+    fn gen_has_method_signatures(&self) -> HasMethodSignatures {
+        HasMethodSignatures {
+            has_method: self.gen_has_method_signature(false),
+            try_has_method: self.gen_has_method_signature(true),
+        }
     }
 }
 

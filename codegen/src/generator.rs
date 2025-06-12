@@ -27,7 +27,6 @@ use ::std::cell::LazyCell;
 use ::std::cell::OnceCell;
 use ::std::collections::HashSet;
 use ::std::iter::once;
-use ::std::ops::Index;
 use ::syn::{Expr, Ident, ItemUse, Path, Type, TypePath, parse_quote, parse_str};
 
 pub use compile::*;
@@ -282,33 +281,6 @@ impl FieldPresence {
             FieldPresence::Repeated
         } else {
             FieldPresence::Implicit
-        }
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct TrySwitch<T> {
-    for_non_try: T,
-    for_try: T,
-}
-
-impl<T> TrySwitch<T> {
-    pub fn new(for_non_try: T, for_try: T) -> Self {
-        Self {
-            for_non_try,
-            for_try,
-        }
-    }
-}
-
-impl<T> Index<bool> for TrySwitch<T> {
-    type Output = T;
-
-    fn index(&self, is_try: bool) -> &Self::Output {
-        if is_try {
-            &self.for_try
-        } else {
-            &self.for_non_try
         }
     }
 }
