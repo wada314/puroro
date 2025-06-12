@@ -84,7 +84,7 @@ impl GenBlanketRefImpls {
 
     #[throws]
     fn gen_get_method_body(&self, field: &Field, t: &Ident, trait_path: &Path) -> Block {
-        let signature = field.getter_signatures().trait_getter.clone();
+        let signature = field.trait_getter_signatures()[false].clone();
         let getter_name = &signature.ident;
         parse2(quote! {{ <#t as #trait_path>::#getter_name(self) }})?
     }
@@ -102,7 +102,7 @@ impl GenBlanketRefImpls {
 
     #[throws]
     fn gen_try_get_method_body(&self, field: &Field, t: &Ident, trait_path: &Path) -> Block {
-        let signature = field.getter_signatures().trait_try_getter.clone();
+        let signature = field.trait_getter_signatures()[true].clone();
         let try_getter_name = &signature.ident;
         parse2(quote! {{ <#t as #trait_path>::#try_getter_name(self) }})?
     }

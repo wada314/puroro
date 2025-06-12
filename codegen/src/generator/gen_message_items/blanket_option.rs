@@ -76,7 +76,7 @@ impl GenBlanketOptionImpls {
 
     #[throws]
     fn gen_get_method_body(&self, field: &Field, t: &Ident, trait_path: &Path) -> Block {
-        let signature = field.getter_signatures().trait_getter.clone();
+        let signature = field.trait_getter_signatures()[false].clone();
         let getter_name = &signature.ident;
         let stmts = match field {
             Field::Repeated { .. } => quote! {
@@ -110,7 +110,7 @@ impl GenBlanketOptionImpls {
 
     #[throws]
     fn gen_try_get_method_body(&self, field: &Field, t: &Ident, trait_path: &Path) -> Block {
-        let signature = field.getter_signatures().trait_try_getter.clone();
+        let signature = field.trait_getter_signatures()[true].clone();
         let try_getter_name = &signature.ident;
         let stmts = match field {
             Field::Repeated { .. } => quote! {

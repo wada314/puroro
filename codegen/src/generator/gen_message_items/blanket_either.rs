@@ -81,7 +81,7 @@ impl GenBlanketEitherImpls {
         t2: &Ident,
         trait_path: &Path,
     ) -> Block {
-        let signature = field.getter_signatures().trait_getter.clone();
+        let signature = field.trait_getter_signatures()[false].clone();
         let getter_name = &signature.ident;
         let map2_expr = quote! {
             self.as_ref().map2(
@@ -134,7 +134,7 @@ impl GenBlanketEitherImpls {
         t2: &Ident,
         trait_path: &Path,
     ) -> Block {
-        let signature = field.getter_signatures().trait_try_getter.clone();
+        let signature = field.trait_getter_signatures()[true].clone();
         let try_getter_name = &signature.ident;
         let mapped_either: Expr = parse2(quote! {
             self.as_ref().try_map2(
