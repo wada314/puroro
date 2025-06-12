@@ -14,7 +14,7 @@
 
 use super::field::{Field, ScalarField};
 use super::{ImplsGenerator, impls_helper};
-use crate::generator::CodeGeneratorOptions;
+use crate::generator::{CodeGeneratorOptions, TrySwitch};
 use ::culpa::throws;
 use ::quote::quote;
 use ::std::rc::Rc;
@@ -31,24 +31,25 @@ impl ImplsGenerator for GenBlanketRefImpls {
     #[throws]
     fn generate<'a>(
         &self,
-        view_trait_path: &Path,
-        try_view_trait_path: &Path,
+        trait_paths: TrySwitch<&Path>,
         fields: Box<dyn 'a + Iterator<Item = &'a Field>>,
     ) -> Vec<Item> {
         let t: Ident = parse_str("T")?;
         let fields = fields.collect::<Vec<_>>();
+        let view_trait_path = trait_paths[false];
+        let try_trait_path = trait_paths[true];
 
         let view_methods = impls_helper(
             fields.iter().copied(),
-            |f| self.gen_get_method_body(f, &t, &view_trait_path),
-            |f| self.gen_has_method_body(f, &t, &view_trait_path),
+            |f| self.gen_get_method_body(f, &t, view_trait_path),
+            |f| self.gen_has_method_body(f, &t, view_trait_path),
             false,
         )?;
 
         let try_methods = impls_helper(
             fields.iter().copied(),
-            |f| self.gen_try_get_method_body(f, &t, &try_view_trait_path),
-            |f| self.gen_try_has_method_body(f, &t, &try_view_trait_path),
+            |f| self.gen_try_get_method_body(f, &t, try_trait_path),
+            |f| self.gen_try_has_method_body(f, &t, try_trait_path),
             true,
         )?;
 
@@ -64,12 +65,12 @@ impl ImplsGenerator for GenBlanketRefImpls {
                 }
             })?,
             parse2(quote! {
-                impl<#t: #try_view_trait_path> #try_view_trait_path for &#t {
+                impl<#t: #try_trait_path> #try_trait_path for &#t {
                     #(#try_methods)*
                 }
             })?,
             parse2(quote! {
-                impl<#t: #try_view_trait_path> #try_view_trait_path for &mut #t {
+                impl<#t: #try_trait_path> #try_trait_path for &mut #t {
                     #(#try_methods)*
                 }
             })?,

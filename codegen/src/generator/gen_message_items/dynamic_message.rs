@@ -16,7 +16,7 @@ use super::field::Field;
 use super::{ImplsGenerator, impls_helper};
 use crate::Result;
 use crate::descriptor::{I32Type, I64Type, LenType, VariantType, WireType};
-use crate::generator::CodeGeneratorOptions;
+use crate::generator::{CodeGeneratorOptions, TrySwitch};
 use crate::proto_path::ProtoPath;
 use ::culpa::throws;
 use ::quote::quote;
@@ -35,10 +35,10 @@ impl ImplsGenerator for DynamicMessageImplsGenerator {
     #[throws]
     fn generate<'a>(
         &self,
-        _view_trait_path: &Path,
-        try_view_trait_path: &Path,
+        trait_paths: TrySwitch<&Path>,
         fields: Box<dyn 'a + Iterator<Item = &'a Field>>,
     ) -> Vec<Item> {
+        let try_trait_path = trait_paths[true];
         let methods = impls_helper(
             fields,
             |f| self.gen_try_getter_block(f),
@@ -46,7 +46,7 @@ impl ImplsGenerator for DynamicMessageImplsGenerator {
             true,
         )?;
         vec![parse2(quote! {
-            impl<A: ::std::alloc::Allocator + ::std::clone::Clone> #try_view_trait_path
+            impl<A: ::std::alloc::Allocator + ::std::clone::Clone> #try_trait_path
             for ::puroro::dynamic::DynamicMessage<A>
             {
                 #(#methods)*

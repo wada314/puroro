@@ -15,7 +15,7 @@
 use super::field::{Field, RepeatedField, ScalarField};
 use super::{ImplsGenerator, impls_helper};
 use crate::descriptor::FieldType;
-use crate::generator::CodeGeneratorOptions;
+use crate::generator::{CodeGeneratorOptions, TrySwitch};
 use ::culpa::throws;
 use ::quote::quote;
 use ::std::rc::Rc;
@@ -31,25 +31,26 @@ impl ImplsGenerator for GenBlanketEitherImpls {
     #[throws]
     fn generate<'a>(
         &self,
-        view_trait_path: &Path,
-        try_view_trait_path: &Path,
+        trait_paths: TrySwitch<&Path>,
         fields: Box<dyn 'a + Iterator<Item = &'a Field>>,
     ) -> Vec<Item> {
         let t1: Ident = parse_str("T")?;
         let t2: Ident = parse_str("U")?;
         let fields: Vec<_> = fields.collect();
+        let view_trait_path = trait_paths[false];
+        let try_trait_path = trait_paths[true];
 
         let view_methods = impls_helper(
             fields.iter().copied(),
-            |f| self.gen_get_method_body(f, &t1, &t2, &view_trait_path),
-            |f| self.gen_has_method_body(f, &t1, &t2, &view_trait_path),
+            |f| self.gen_get_method_body(f, &t1, &t2, view_trait_path),
+            |f| self.gen_has_method_body(f, &t1, &t2, view_trait_path),
             false,
         )?;
 
         let try_methods = impls_helper(
             fields.iter().copied(),
-            |f| self.gen_try_get_method_body(f, &t1, &t2, &try_view_trait_path),
-            |f| self.gen_try_has_method_body(f, &t1, &t2, &try_view_trait_path),
+            |f| self.gen_try_get_method_body(f, &t1, &t2, try_trait_path),
+            |f| self.gen_try_has_method_body(f, &t1, &t2, try_trait_path),
             true,
         )?;
 
@@ -60,7 +61,7 @@ impl ImplsGenerator for GenBlanketEitherImpls {
                 }
             })?,
             parse2(quote! {
-                impl<#t1: #try_view_trait_path, #t2: #try_view_trait_path> #try_view_trait_path for ::puroro::Either<#t1, #t2> {
+                impl<#t1: #try_trait_path, #t2: #try_trait_path> #try_trait_path for ::puroro::Either<#t1, #t2> {
                     #(#try_methods)*
                 }
             })?,

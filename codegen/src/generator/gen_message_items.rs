@@ -108,15 +108,10 @@ impl GenMessageItems {
         let try_trait_path: Path = parse2(quote! { self::#try_trait_name })?;
 
         let blanket_impl_generators = self.create_blanket_impl_generators();
+        let trait_paths = TrySwitch::new(&view_trait_path, &try_trait_path);
         let blanket_impls = blanket_impl_generators
             .iter()
-            .map(|g| {
-                g.generate(
-                    &view_trait_path,
-                    &try_trait_path,
-                    Box::new(self.fields.iter()),
-                )
-            })
+            .map(|g| g.generate(trait_paths.clone(), Box::new(self.fields.iter())))
             .map(|r| match r {
                 Ok(vec) => Either::Left(vec.into_iter().map(Ok)),
                 Err(e) => Either::Right(once(Err(e))),
@@ -408,8 +403,7 @@ trait ImplsGenerator {
     #[throws]
     fn generate<'a>(
         &self,
-        view_trait_path: &Path,
-        try_view_trait_path: &Path,
+        trait_paths: TrySwitch<&Path>,
         fields: Box<dyn 'a + Iterator<Item = &'a Field>>,
     ) -> Vec<Item>;
 }
