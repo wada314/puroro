@@ -1,0 +1,21 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+## Rust quote! Macro Interpolation Restriction
+When using Rust's quote! macro, the `#` interpolation only accepts direct local variable references. When you need to pass an expression (e.g., `trait_paths[true]`), first assign it to a local variable and then reference that variable inside `quote!`.
+
+Example:
+```rust
+// ❌ Wrong: Direct expression interpolation
+quote! {
+    impl<#t: #(&trait_paths[false])> #(&trait_paths[false]) for T { }
+}
+
+// ✅ Correct: Assign to local variable first
+let view_trait_path = &trait_paths[false];
+quote! {
+    impl<#t: #view_trait_path> #view_trait_path for T { }
+}
+```
