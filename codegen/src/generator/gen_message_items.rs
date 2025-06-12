@@ -85,8 +85,8 @@ impl GenMessageItems {
     }
 
     fn gen_basic_items(&self) -> Result<Vec<Item>> {
-        let view_trait_def = self.gen_view_trait()?;
-        let try_view_trait_def = self.gen_try_view_trait()?;
+        let view_trait_def = self.gen_view_trait(false)?;
+        let try_view_trait_def = self.gen_view_trait(true)?;
         let struct_def = self.gen_struct()?;
         let view_wrapping_struct_impl = self.gen_wrapping_struct_impl(false)?;
         let try_view_wrapping_struct_impl = self.gen_wrapping_struct_impl(true)?;
@@ -149,13 +149,16 @@ impl GenMessageItems {
     }
 
     #[throws]
-    fn gen_view_trait(&self) -> Item {
-        let trait_name = &self.view_trait_name;
-        let try_trait_name = &self.try_view_trait_name;
+    fn gen_view_trait(&self, is_try: bool) -> Item {
+        let trait_name = if is_try {
+            &self.try_view_trait_name
+        } else {
+            &self.view_trait_name
+        };
         let getters = self
             .fields
             .iter()
-            .map(|f| f.trait_getter_signatures()[false].clone())
+            .map(|f| f.trait_getter_signatures()[is_try].clone())
             .collect::<Vec<_>>();
         let has_methods = self
             .fields
@@ -168,47 +171,27 @@ impl GenMessageItems {
                 | Field::Explicit(ScalarField {
                     has_method_signatures,
                     ..
-                }) => Some(has_method_signatures[false].clone()),
+                }) => Some(has_method_signatures[is_try].clone()),
                 _ => None,
             })
             .collect::<Vec<_>>();
-        parse2(quote! {
-            pub trait #trait_name: self::#try_trait_name {
-                #(#getters;)*
-                #(#has_methods;)*
-            }
-        })?
-    }
 
-    #[throws]
-    fn gen_try_view_trait(&self) -> Item {
-        let trait_name = &self.try_view_trait_name;
-        let try_getters = self
-            .fields
-            .iter()
-            .map(|f| f.trait_getter_signatures()[true].clone())
-            .collect::<Vec<_>>();
-        let try_has_methods = self
-            .fields
-            .iter()
-            .filter_map(|f| match f {
-                Field::Implicit(ScalarField {
-                    has_method_signatures,
-                    ..
-                })
-                | Field::Explicit(ScalarField {
-                    has_method_signatures,
-                    ..
-                }) => Some(has_method_signatures[true].clone()),
-                _ => None,
-            })
-            .collect::<Vec<_>>();
-        parse2(quote! {
-            pub trait #trait_name {
-                #(#try_getters;)*
-                #(#try_has_methods;)*
-            }
-        })?
+        if is_try {
+            parse2(quote! {
+                pub trait #trait_name {
+                    #(#getters;)*
+                    #(#has_methods;)*
+                }
+            })?
+        } else {
+            let try_trait_name = &self.try_view_trait_name;
+            parse2(quote! {
+                pub trait #trait_name: self::#try_trait_name {
+                    #(#getters;)*
+                    #(#has_methods;)*
+                }
+            })?
+        }
     }
 
     #[throws]
