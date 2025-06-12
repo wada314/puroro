@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use super::field::{Field, ScalarField};
-use super::{ImplsGenerator, impls_helper};
+use super::{ImplsGenerator, view_trait_blanket_impl_helper};
 use crate::generator::{CodeGeneratorOptions, TrySwitch};
 use ::culpa::throws;
 use ::quote::quote;
@@ -39,14 +39,14 @@ impl ImplsGenerator for GenBlanketRefImpls {
         let view_trait_path = &trait_paths[false];
         let try_trait_path = &trait_paths[true];
 
-        let view_methods = impls_helper(
+        let view_methods = view_trait_blanket_impl_helper(
             fields.iter().copied(),
             |f| self.gen_get_method_body(f, &t, view_trait_path),
             |f| self.gen_has_method_body(f, &t, view_trait_path),
             false,
         )?;
 
-        let try_methods = impls_helper(
+        let try_methods = view_trait_blanket_impl_helper(
             fields.iter().copied(),
             |f| self.gen_try_get_method_body(f, &t, try_trait_path),
             |f| self.gen_try_has_method_body(f, &t, try_trait_path),

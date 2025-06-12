@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use super::field::Field;
-use super::{ImplsGenerator, impls_helper};
+use super::{ImplsGenerator, view_trait_blanket_impl_helper};
 use crate::Result;
 use crate::descriptor::{I32Type, I64Type, LenType, VariantType, WireType};
 use crate::generator::{CodeGeneratorOptions, TrySwitch};
@@ -39,7 +39,7 @@ impl ImplsGenerator for DynamicMessageImplsGenerator {
         fields: Box<dyn 'a + Iterator<Item = &'a Field>>,
     ) -> Vec<Item> {
         let try_trait_path = &trait_paths[true];
-        let methods = impls_helper(
+        let methods = view_trait_blanket_impl_helper(
             fields,
             |f| self.gen_try_getter_block(f),
             |f| self.gen_try_has_method_block(f),

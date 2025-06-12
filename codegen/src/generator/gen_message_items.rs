@@ -409,7 +409,7 @@ trait ImplsGenerator {
 }
 
 #[throws]
-fn impls_helper<'a, F, G>(
+fn view_trait_blanket_impl_helper<'a, F, G>(
     fields: impl Iterator<Item = &'a Field>,
     gen_getter: F,
     gen_has_method: G,
