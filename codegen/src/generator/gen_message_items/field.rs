@@ -15,7 +15,7 @@
 use super::{gen_struct_name, gen_try_view_trait_name, gen_view_trait_name};
 use crate::cases::{Case, convert_into_case};
 use crate::descriptor::{FieldDescriptorExt, FieldType, LenType};
-use crate::generator::{CodeGeneratorOptions, FieldPresence, to_ident};
+use crate::generator::{CodeGeneratorOptions, FieldPresence, TrySwitch, to_ident};
 use crate::proto_path::{ProtoPath, ProtoPathBuf};
 use ::culpa::throws;
 use ::std::rc::Rc;
@@ -58,16 +58,13 @@ pub struct ScalarField {
 
 #[derive(Debug)]
 pub struct GetterSignatures {
-    pub trait_getter: Signature,
-    pub struct_getter: Signature,
-    pub trait_try_getter: Signature,
-    pub struct_try_getter: Signature,
+    pub trait_getter: TrySwitch<Signature>,
+    pub struct_getter: TrySwitch<Signature>,
 }
 
 #[derive(Debug)]
 pub struct HasMethodSignatures {
-    pub has_method: Signature,
-    pub try_has_method: Signature,
+    pub has_method: TrySwitch<Signature>,
 }
 
 impl Field {
@@ -254,10 +251,14 @@ impl FieldFactory {
     #[throws]
     fn gen_getter_signatures(&self) -> GetterSignatures {
         GetterSignatures {
-            trait_getter: self.gen_getter_signature(FieldContext::Trait, false),
-            struct_getter: self.gen_getter_signature(FieldContext::Struct, false),
-            trait_try_getter: self.gen_getter_signature(FieldContext::Trait, true),
-            struct_try_getter: self.gen_getter_signature(FieldContext::Struct, true),
+            trait_getter: TrySwitch::new(
+                self.gen_getter_signature(FieldContext::Trait, false),
+                self.gen_getter_signature(FieldContext::Trait, true),
+            ),
+            struct_getter: TrySwitch::new(
+                self.gen_getter_signature(FieldContext::Struct, false),
+                self.gen_getter_signature(FieldContext::Struct, true),
+            ),
         }
     }
 
@@ -284,8 +285,10 @@ impl FieldFactory {
     #[throws]
     fn gen_has_method_signatures(&self) -> HasMethodSignatures {
         HasMethodSignatures {
-            has_method: self.gen_has_method_signature(false),
-            try_has_method: self.gen_has_method_signature(true),
+            has_method: TrySwitch::new(
+                self.gen_has_method_signature(false),
+                self.gen_has_method_signature(true),
+            ),
         }
     }
 }

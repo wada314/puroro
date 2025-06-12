@@ -155,7 +155,7 @@ impl GenMessageItems {
         let getters = self
             .fields
             .iter()
-            .map(|f| f.getter_signatures().trait_getter.clone())
+            .map(|f| f.getter_signatures().trait_getter[false].clone())
             .collect::<Vec<_>>();
         let has_methods = self
             .fields
@@ -168,7 +168,7 @@ impl GenMessageItems {
                 | Field::Explicit(ScalarField {
                     has_method_signatures,
                     ..
-                }) => Some(has_method_signatures.has_method.clone()),
+                }) => Some(has_method_signatures.has_method[false].clone()),
                 _ => None,
             })
             .collect::<Vec<_>>();
@@ -186,7 +186,7 @@ impl GenMessageItems {
         let try_getters = self
             .fields
             .iter()
-            .map(|f| f.getter_signatures().trait_try_getter.clone())
+            .map(|f| f.getter_signatures().trait_getter[true].clone())
             .collect::<Vec<_>>();
         let try_has_methods = self
             .fields
@@ -199,7 +199,7 @@ impl GenMessageItems {
                 | Field::Explicit(ScalarField {
                     has_method_signatures,
                     ..
-                }) => Some(has_method_signatures.try_has_method.clone()),
+                }) => Some(has_method_signatures.has_method[true].clone()),
                 _ => None,
             })
             .collect::<Vec<_>>();
@@ -223,13 +223,7 @@ impl GenMessageItems {
         let getter_signatures = self
             .fields
             .iter()
-            .map(|field| {
-                if is_try {
-                    field.getter_signatures().struct_try_getter.clone()
-                } else {
-                    field.getter_signatures().struct_getter.clone()
-                }
-            })
+            .map(|field| field.getter_signatures().struct_getter[is_try].clone())
             .collect::<Vec<_>>();
         let body_stmts = self
             .fields
@@ -259,11 +253,7 @@ impl GenMessageItems {
         is_try: bool,
     ) -> Vec<Stmt> {
         let parser = Block::parse_within;
-        let getter_name = if is_try {
-            &field.getter_signatures().struct_try_getter.ident
-        } else {
-            &field.getter_signatures().struct_getter.ident
-        };
+        let getter_name = &field.getter_signatures().struct_getter[is_try].ident;
         let body_tokens =
             self.gen_field_body(field, t, trait_name, getter_name, options, is_try)?;
         parser.parse2(body_tokens)?
@@ -441,11 +431,7 @@ where
     fields
         .map(|f| {
             let get_method: ImplItemFn = {
-                let signature = if is_try_trait {
-                    f.getter_signatures().trait_try_getter.clone()
-                } else {
-                    f.getter_signatures().trait_getter.clone()
-                };
+                let signature = f.getter_signatures().trait_getter[is_try_trait].clone();
                 let body = gen_getter(f)?;
                 parse2(quote! {
                     #signature #body
@@ -460,11 +446,7 @@ where
                     has_method_signatures,
                     ..
                 }) => {
-                    let signature = if is_try_trait {
-                        has_method_signatures.try_has_method.clone()
-                    } else {
-                        has_method_signatures.has_method.clone()
-                    };
+                    let signature = has_method_signatures.has_method[is_try_trait].clone();
                     let body = gen_has_method(f)?;
                     Some(parse2(quote! {
                         #signature #body
