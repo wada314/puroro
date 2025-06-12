@@ -27,6 +27,7 @@ use ::std::cell::LazyCell;
 use ::std::cell::OnceCell;
 use ::std::collections::HashSet;
 use ::std::iter::once;
+use ::std::ops::Index;
 use ::syn::{Expr, Ident, ItemUse, Path, Type, TypePath, parse_quote, parse_str};
 
 pub use compile::*;
@@ -281,6 +282,30 @@ impl FieldPresence {
             FieldPresence::Repeated
         } else {
             FieldPresence::Implicit
+        }
+    }
+}
+
+// A type used to switch the code generation based on the `is_try` flag.
+#[derive(Clone, Debug)]
+pub struct TrySwitch<T> {
+    if_not_try: T,
+    if_try: T,
+}
+
+impl<T> TrySwitch<T> {
+    pub fn new(if_not_try: T, if_try: T) -> Self {
+        Self { if_not_try, if_try }
+    }
+}
+
+impl<T> Index<bool> for TrySwitch<T> {
+    type Output = T;
+    fn index(&self, index: bool) -> &Self::Output {
+        if index {
+            &self.if_try
+        } else {
+            &self.if_not_try
         }
     }
 }
