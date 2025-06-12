@@ -31,14 +31,14 @@ impl ImplsGenerator for GenBlanketEitherImpls {
     #[throws]
     fn generate<'a>(
         &self,
-        trait_paths: TrySwitch<&Path>,
+        trait_paths: &TrySwitch<Path>,
         fields: Box<dyn 'a + Iterator<Item = &'a Field>>,
     ) -> Vec<Item> {
         let t1: Ident = parse_str("T")?;
         let t2: Ident = parse_str("U")?;
         let fields: Vec<_> = fields.collect();
-        let view_trait_path = trait_paths[false];
-        let try_trait_path = trait_paths[true];
+        let view_trait_path = &trait_paths[false];
+        let try_trait_path = &trait_paths[true];
 
         let view_methods = impls_helper(
             fields.iter().copied(),

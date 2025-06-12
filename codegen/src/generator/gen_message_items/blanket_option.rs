@@ -30,7 +30,7 @@ impl ImplsGenerator for GenBlanketOptionImpls {
     #[throws]
     fn generate<'a>(
         &self,
-        trait_paths: TrySwitch<&Path>,
+        trait_paths: &TrySwitch<Path>,
         fields: Box<dyn 'a + Iterator<Item = &'a Field>>,
     ) -> Vec<Item> {
         let t: Ident = parse_str("T")?;
@@ -38,8 +38,8 @@ impl ImplsGenerator for GenBlanketOptionImpls {
             .options
             .option_type(&(TypePath { qself: None, path: t.clone().into() }.into()));
         let fields = fields.collect::<Vec<_>>();
-        let view_trait_path = trait_paths[false];
-        let try_trait_path = trait_paths[true];
+        let view_trait_path = &trait_paths[false];
+        let try_trait_path = &trait_paths[true];
 
         let view_methods = impls_helper(
             fields.iter().copied(),

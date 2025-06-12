@@ -35,10 +35,10 @@ impl ImplsGenerator for DynamicMessageImplsGenerator {
     #[throws]
     fn generate<'a>(
         &self,
-        trait_paths: TrySwitch<&Path>,
+        trait_paths: &TrySwitch<Path>,
         fields: Box<dyn 'a + Iterator<Item = &'a Field>>,
     ) -> Vec<Item> {
-        let try_trait_path = trait_paths[true];
+        let try_trait_path = &trait_paths[true];
         let methods = impls_helper(
             fields,
             |f| self.gen_try_getter_block(f),
