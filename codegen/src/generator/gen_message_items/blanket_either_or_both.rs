@@ -15,7 +15,7 @@
 use super::field::{Field, RepeatedField, ScalarField};
 use super::{ImplsGenerator, impls_helper};
 use crate::descriptor::FieldType;
-use crate::generator::CodeGeneratorOptions;
+use crate::generator::{CodeGeneratorOptions, TrySwitch};
 use ::culpa::throws;
 use ::quote::quote;
 use ::std::rc::Rc;
@@ -31,8 +31,7 @@ impl ImplsGenerator for GenBlanketEitherOrBothImpls {
     #[throws]
     fn generate<'a>(
         &self,
-        view_trait_path: &Path,
-        try_view_trait_path: &Path,
+        trait_paths: &TrySwitch<Path>,
         fields: Box<dyn 'a + Iterator<Item = &'a Field>>,
     ) -> Vec<Item> {
         let t1: Ident = parse_str("T")?;
@@ -41,26 +40,26 @@ impl ImplsGenerator for GenBlanketEitherOrBothImpls {
 
         let view_methods = impls_helper(
             fields.iter().copied(),
-            |f| self.gen_get_method_body(f, &t1, &t2, &view_trait_path),
-            |f| self.gen_has_method_body(f, &t1, &t2, &view_trait_path),
+            |f| self.gen_getter_body(f, &t1, &t2, &trait_paths[false]),
+            |f| self.gen_has_method_body(f, &t1, &t2, &trait_paths[false]),
             false,
         )?;
 
         let try_methods = impls_helper(
             fields.iter().copied(),
-            |f| self.gen_try_get_method_body(f, &t1, &t2, &try_view_trait_path),
-            |f| self.gen_try_has_method_body(f, &t1, &t2, &try_view_trait_path),
+            |f| self.gen_try_getter_body(f, &t1, &t2, &trait_paths[true]),
+            |f| self.gen_try_has_method_body(f, &t1, &t2, &trait_paths[true]),
             true,
         )?;
 
         vec![
             parse2(quote! {
-                impl<#t1: #view_trait_path, #t2: #view_trait_path> #view_trait_path for ::puroro::EitherOrBoth<#t1, #t2> {
+                impl<#t1: #(&trait_paths[false]), #t2: #(&trait_paths[false])> #(&trait_paths[false]) for ::puroro::EitherOrBoth<#t1, #t2> {
                     #(#view_methods)*
                 }
             })?,
             parse2(quote! {
-                impl<#t1: #try_view_trait_path, #t2: #try_view_trait_path> #try_view_trait_path for ::puroro::EitherOrBoth<#t1, #t2> {
+                impl<#t1: #(&trait_paths[true]), #t2: #(&trait_paths[true])> #(&trait_paths[true]) for ::puroro::EitherOrBoth<#t1, #t2> {
                     #(#try_methods)*
                 }
             })?,
@@ -74,13 +73,7 @@ impl GenBlanketEitherOrBothImpls {
     }
 
     #[throws]
-    fn gen_get_method_body(
-        &self,
-        field: &Field,
-        t1: &Ident,
-        t2: &Ident,
-        trait_path: &Path,
-    ) -> Block {
+    fn gen_getter_body(&self, field: &Field, t1: &Ident, t2: &Ident, trait_path: &Path) -> Block {
         let signature = field.trait_getter_signatures()[false].clone();
         let getter_name = &signature.ident;
         let map2_expr = quote! {
@@ -152,7 +145,7 @@ impl GenBlanketEitherOrBothImpls {
     }
 
     #[throws]
-    fn gen_try_get_method_body(
+    fn gen_try_getter_body(
         &self,
         field: &Field,
         t1: &Ident,

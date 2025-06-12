@@ -15,11 +15,11 @@
 use super::field::{Field, RepeatedField, ScalarField};
 use super::{ImplsGenerator, impls_helper};
 use crate::descriptor::FieldType;
-use crate::generator::CodeGeneratorOptions;
+use crate::generator::{CodeGeneratorOptions, TrySwitch};
 use ::culpa::throws;
 use ::quote::quote;
 use ::std::rc::Rc;
-use ::syn::{Block, Expr, Ident, Item, Path, TypePath, parse_str, parse2};
+use ::syn::{Block, Expr, Ident, Item, Path, parse_str, parse2};
 
 type Error = crate::ErrorKind;
 
@@ -31,38 +31,34 @@ impl ImplsGenerator for GenBlanketOptionImpls {
     #[throws]
     fn generate<'a>(
         &self,
-        view_trait_path: &Path,
-        try_view_trait_path: &Path,
+        trait_paths: &TrySwitch<Path>,
         fields: Box<dyn 'a + Iterator<Item = &'a Field>>,
     ) -> Vec<Item> {
         let t: Ident = parse_str("T")?;
-        let t_opt = self
-            .options
-            .option_type(&(TypePath { qself: None, path: t.clone().into() }.into()));
-        let fields = fields.collect::<Vec<_>>();
+        let fields: Vec<_> = fields.collect();
 
         let view_methods = impls_helper(
             fields.iter().copied(),
-            |f| self.gen_getter_body(f, &t, &view_trait_path),
-            |f| self.gen_has_method_body(f, &t, &view_trait_path),
+            |f| self.gen_getter_body(f, &t, &trait_paths[false]),
+            |f| self.gen_has_method_body(f, &t, &trait_paths[false]),
             false,
         )?;
 
         let try_methods = impls_helper(
             fields.iter().copied(),
-            |f| self.gen_try_getter_body(f, &t, &try_view_trait_path),
-            |f| self.gen_try_has_method_body(f, &t, &try_view_trait_path),
+            |f| self.gen_try_getter_body(f, &t, &trait_paths[true]),
+            |f| self.gen_try_has_method_body(f, &t, &trait_paths[true]),
             true,
         )?;
 
         vec![
             parse2(quote! {
-                impl<#t: #view_trait_path> #view_trait_path for #t_opt {
+                impl<#t: #(&trait_paths[false])> #(&trait_paths[false]) for ::std::option::Option<#t> {
                     #(#view_methods)*
                 }
             })?,
             parse2(quote! {
-                impl<#t: #try_view_trait_path> #try_view_trait_path for #t_opt {
+                impl<#t: #(&trait_paths[true])> #(&trait_paths[true]) for ::std::option::Option<#t> {
                     #(#try_methods)*
                 }
             })?,
