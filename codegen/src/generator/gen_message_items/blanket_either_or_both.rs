@@ -37,29 +37,31 @@ impl ImplsGenerator for GenBlanketEitherOrBothImpls {
         let t1: Ident = parse_str("T")?;
         let t2: Ident = parse_str("U")?;
         let fields: Vec<_> = fields.collect();
+        let view_trait_path = &trait_paths[false];
+        let try_trait_path = &trait_paths[true];
 
         let view_methods = impls_helper(
             fields.iter().copied(),
-            |f| self.gen_getter_body(f, &t1, &t2, &trait_paths[false]),
-            |f| self.gen_has_method_body(f, &t1, &t2, &trait_paths[false]),
+            |f| self.gen_getter_body(f, &t1, &t2, view_trait_path),
+            |f| self.gen_has_method_body(f, &t1, &t2, view_trait_path),
             false,
         )?;
 
         let try_methods = impls_helper(
             fields.iter().copied(),
-            |f| self.gen_try_getter_body(f, &t1, &t2, &trait_paths[true]),
-            |f| self.gen_try_has_method_body(f, &t1, &t2, &trait_paths[true]),
+            |f| self.gen_try_getter_body(f, &t1, &t2, try_trait_path),
+            |f| self.gen_try_has_method_body(f, &t1, &t2, try_trait_path),
             true,
         )?;
 
         vec![
             parse2(quote! {
-                impl<#t1: #(&trait_paths[false]), #t2: #(&trait_paths[false])> #(&trait_paths[false]) for ::puroro::EitherOrBoth<#t1, #t2> {
+                impl<#t1: #view_trait_path, #t2: #view_trait_path> #view_trait_path for ::puroro::EitherOrBoth<#t1, #t2> {
                     #(#view_methods)*
                 }
             })?,
             parse2(quote! {
-                impl<#t1: #(&trait_paths[true]), #t2: #(&trait_paths[true])> #(&trait_paths[true]) for ::puroro::EitherOrBoth<#t1, #t2> {
+                impl<#t1: #try_trait_path, #t2: #try_trait_path> #try_trait_path for ::puroro::EitherOrBoth<#t1, #t2> {
                     #(#try_methods)*
                 }
             })?,

@@ -36,29 +36,31 @@ impl ImplsGenerator for GenBlanketOptionImpls {
     ) -> Vec<Item> {
         let t: Ident = parse_str("T")?;
         let fields: Vec<_> = fields.collect();
+        let view_trait_path = &trait_paths[false];
+        let try_trait_path = &trait_paths[true];
 
         let view_methods = impls_helper(
             fields.iter().copied(),
-            |f| self.gen_getter_body(f, &t, &trait_paths[false]),
-            |f| self.gen_has_method_body(f, &t, &trait_paths[false]),
+            |f| self.gen_getter_body(f, &t, view_trait_path),
+            |f| self.gen_has_method_body(f, &t, view_trait_path),
             false,
         )?;
 
         let try_methods = impls_helper(
             fields.iter().copied(),
-            |f| self.gen_try_getter_body(f, &t, &trait_paths[true]),
-            |f| self.gen_try_has_method_body(f, &t, &trait_paths[true]),
+            |f| self.gen_try_getter_body(f, &t, try_trait_path),
+            |f| self.gen_try_has_method_body(f, &t, try_trait_path),
             true,
         )?;
 
         vec![
             parse2(quote! {
-                impl<#t: #(&trait_paths[false])> #(&trait_paths[false]) for ::std::option::Option<#t> {
+                impl<#t: #view_trait_path> #view_trait_path for ::std::option::Option<#t> {
                     #(#view_methods)*
                 }
             })?,
             parse2(quote! {
-                impl<#t: #(&trait_paths[true])> #(&trait_paths[true]) for ::std::option::Option<#t> {
+                impl<#t: #try_trait_path> #try_trait_path for ::std::option::Option<#t> {
                     #(#try_methods)*
                 }
             })?,
