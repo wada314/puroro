@@ -102,10 +102,35 @@ impl GenMessageItems {
     }
 
     fn gen_blanket_impls(&self) -> Result<Vec<Item>> {
-        let trait_paths = TrySwitch::new(
-            parse2(quote! { self::#(&self.trait_names[false]) })?,
-            parse2(quote! { self::#(&self.trait_names[true]) })?,
-        );
+        let view_trait_name = &self.trait_names[false];
+        let try_trait_name = &self.trait_names[true];
+        let view_trait_path = Path {
+            leading_colon: None,
+            segments: vec![
+                PathSegment {
+                    ident: format_ident!("self"),
+                    arguments: PathArguments::None,
+                },
+                PathSegment {
+                    ident: view_trait_name.clone(),
+                    arguments: PathArguments::None,
+                },
+            ],
+        };
+        let try_trait_path = Path {
+            leading_colon: None,
+            segments: vec![
+                PathSegment {
+                    ident: format_ident!("self"),
+                    arguments: PathArguments::None,
+                },
+                PathSegment {
+                    ident: try_trait_name.clone(),
+                    arguments: PathArguments::None,
+                },
+            ],
+        };
+        let trait_paths = TrySwitch::new(view_trait_path, try_trait_path);
 
         let blanket_impl_generators = self.create_blanket_impl_generators();
         let blanket_impls = blanket_impl_generators
@@ -176,8 +201,21 @@ impl GenMessageItems {
             })?
         } else {
             let try_trait_name = &self.trait_names[true];
+            let try_trait_path = Path {
+                leading_colon: None,
+                segments: vec![
+                    PathSegment {
+                        ident: format_ident!("self"),
+                        arguments: PathArguments::None,
+                    },
+                    PathSegment {
+                        ident: try_trait_name.clone(),
+                        arguments: PathArguments::None,
+                    },
+                ],
+            };
             parse2(quote! {
-                pub trait #trait_name: self::#try_trait_name {
+                pub trait #trait_name: #try_trait_path {
                     #(#getters;)*
                     #(#has_methods;)*
                 }
