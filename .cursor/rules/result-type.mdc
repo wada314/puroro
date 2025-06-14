@@ -1,6 +1,6 @@
 ---
-description: The `Result` type in puroro project
+description: The `Result` type in the project
 globs: 
+alwaysApply: false
 ---
-Mostly, the project in `puroro` project are defining the own `ErrorKind` type and the `Result` type in its root module.
-Make sure to use THAT `Result`, not the standard library's `Result` unless you think you really need to.
+When you see the `Result` type in the project, double check if that's the standard library's `std::result::Result<T, E>` or the project's local overridden definition `type Result<T> =  std::result::Result<T, SomeErrorType>`.

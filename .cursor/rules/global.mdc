@@ -1,6 +1,6 @@
 ---
-description:
-globs:
+description: Note for Rust quote! macro
+globs: 
 alwaysApply: false
 ---
 ## Rust quote! Macro Interpolation Restriction
