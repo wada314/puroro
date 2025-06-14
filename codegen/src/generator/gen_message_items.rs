@@ -22,11 +22,11 @@ mod blanket_ref;
 mod dynamic_message;
 
 use super::CodeGeneratorOptions;
+use crate::Result;
 use crate::cases::{Case, convert_into_case};
 use crate::descriptor::{DescriptorExt, FieldType};
 use crate::generator::{TrySwitch, to_ident};
 use crate::proto_path::ProtoPathBuf;
-use crate::{Result, ResultExt};
 use ::culpa::throws;
 use ::itertools::Itertools;
 use ::quither::Either;
@@ -374,7 +374,7 @@ impl GenMessageItems {
             _ => unreachable!(),
         };
         Ok(message_type
-            .to_relative_path(&field.base_proto_path())
+            .to_relative_path(&field.scope_path())
             .unwrap_or(message_type.as_ref())
             .to_rust_path_with(options, |name| {
                 Ok(PathSegment {

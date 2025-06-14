@@ -153,7 +153,7 @@ impl DynamicMessageImplsGenerator {
         t: VariantType<impl AsRef<ProtoPath>>,
     ) -> Expr {
         let vt_type: Type =
-            t.to_variant_integer_type(field.base_proto_path().as_ref(), &self.options)?;
+            t.to_variant_integer_type(field.scope_path().as_ref(), &self.options)?;
         parse2(quote! {
             (#field_expr).as_scalar_variant::<#vt_type>(
                 true /* TODO: packed check */,
@@ -220,7 +220,7 @@ impl DynamicMessageImplsGenerator {
         t: VariantType<impl AsRef<ProtoPath>>,
     ) -> Expr {
         let vt_type: Type =
-            t.to_variant_integer_type(field.base_proto_path().as_ref(), &self.options)?;
+            t.to_variant_integer_type(field.scope_path().as_ref(), &self.options)?;
         parse2(quote! {
             (#field_expr).as_repeated_variant::<#vt_type>(true /* TODO: packed check */)
         })?
@@ -280,8 +280,8 @@ impl DynamicMessageImplsGenerator {
         // and returns a `Result<Option<the field value>>`.
         let body: Expr = parse2(match wire_type {
             WireType::Variant(variant) => {
-                let vt_type: Type = variant
-                    .to_variant_integer_type(field.base_proto_path().as_ref(), &self.options)?;
+                let vt_type: Type =
+                    variant.to_variant_integer_type(field.scope_path().as_ref(), &self.options)?;
                 quote! {
                     #field_ident.as_scalar_variant::<#vt_type>(
                         true /* TODO: packed check */,

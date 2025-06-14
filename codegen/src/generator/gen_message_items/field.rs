@@ -38,10 +38,9 @@ pub enum Field {
 #[derive(Debug)]
 pub struct RepeatedField {
     pub number: i32,
-    pub options: Rc<CodeGeneratorOptions>,
     /// The protobuf-style absolute path of the parent scope (package or enclosing message),
     /// used as the base for generating relative paths to other items.
-    pub base_proto_path: Rc<ProtoPathBuf>,
+    pub scope_path: Rc<ProtoPathBuf>,
     pub scalar_proto_type: FieldType<ProtoPathBuf, ProtoPathBuf>,
     pub trait_getter_signatures: TrySwitch<Signature>,
     pub struct_getter_signatures: TrySwitch<Signature>,
@@ -50,8 +49,7 @@ pub struct RepeatedField {
 #[derive(Debug)]
 pub struct ScalarField {
     pub number: i32,
-    pub options: Rc<CodeGeneratorOptions>,
-    pub base_proto_path: Rc<ProtoPathBuf>,
+    pub scope_path: Rc<ProtoPathBuf>,
     pub scalar_proto_type: FieldType<ProtoPathBuf, ProtoPathBuf>,
     pub trait_getter_signatures: TrySwitch<Signature>,
     pub struct_getter_signatures: TrySwitch<Signature>,
@@ -62,10 +60,10 @@ impl Field {
     #[throws]
     pub fn try_new<'a>(
         desc: &'a FieldDescriptorExt<'a>,
-        current_proto_path: Rc<ProtoPathBuf>,
+        scope_path: Rc<ProtoPathBuf>,
         options: Rc<CodeGeneratorOptions>,
     ) -> Self {
-        FieldFactory::new(desc, current_proto_path, options)?.build()?
+        FieldFactory::new(desc, scope_path, options)?.build()?
     }
 
     pub fn number(&self) -> i32 {
@@ -76,11 +74,11 @@ impl Field {
         }
     }
 
-    pub fn base_proto_path(&self) -> &Rc<ProtoPathBuf> {
+    pub fn scope_path(&self) -> &Rc<ProtoPathBuf> {
         match self {
-            Field::Repeated(RepeatedField { base_proto_path, .. })
-            | Field::Explicit(ScalarField { base_proto_path, .. })
-            | Field::Implicit(ScalarField { base_proto_path, .. }) => base_proto_path,
+            Field::Repeated(RepeatedField { scope_path, .. })
+            | Field::Explicit(ScalarField { scope_path, .. })
+            | Field::Implicit(ScalarField { scope_path, .. }) => scope_path,
         }
     }
 
@@ -115,8 +113,7 @@ impl Field {
 
 struct FieldFactory {
     number: i32,
-    base_proto_path: Rc<ProtoPathBuf>,
-    current_proto_path: Rc<ProtoPathBuf>,
+    scope_path: Rc<ProtoPathBuf>,
     options: Rc<CodeGeneratorOptions>,
     lower_cased: String,
     presense: FieldPresence,
@@ -127,7 +124,7 @@ impl FieldFactory {
     #[throws]
     pub fn new(
         desc: &FieldDescriptorExt,
-        current_proto_path: Rc<ProtoPathBuf>,
+        scope_path: Rc<ProtoPathBuf>,
         options: Rc<CodeGeneratorOptions>,
     ) -> Self {
         let lower_cased = convert_into_case(&desc.name(), Case::LowerSnakeCase);
@@ -135,11 +132,10 @@ impl FieldFactory {
         let presense = FieldPresence::from_field_desc(desc);
         let scalar_proto_type = desc.type_with_full_path()?;
         let number = desc.number();
-        let base_proto_path = Rc::clone(&current_proto_path);
+        let scope_path = Rc::clone(&scope_path);
         Self {
             number,
-            base_proto_path,
-            current_proto_path,
+            scope_path,
             options,
             lower_cased,
             presense,
@@ -151,8 +147,7 @@ impl FieldFactory {
     pub fn build(self) -> Field {
         let scalar_proto_type = self.scalar_proto_type.clone();
         let number = self.number;
-        let base_proto_path = Rc::clone(&self.base_proto_path);
-        let options = Rc::clone(&self.options);
+        let scope_path = Rc::clone(&self.scope_path);
         let trait_getter_signatures = TrySwitch::new(
             self.gen_getter_signature(FieldContext::Trait, false),
             self.gen_getter_signature(FieldContext::Trait, true),
@@ -164,8 +159,7 @@ impl FieldFactory {
         match &self.presense {
             FieldPresence::Implicit => Field::Implicit(ScalarField {
                 number,
-                options,
-                base_proto_path,
+                scope_path,
                 scalar_proto_type,
                 trait_getter_signatures,
                 struct_getter_signatures,
@@ -176,8 +170,7 @@ impl FieldFactory {
             }),
             FieldPresence::Explicit => Field::Explicit(ScalarField {
                 number,
-                options,
-                base_proto_path,
+                scope_path,
                 scalar_proto_type,
                 trait_getter_signatures,
                 struct_getter_signatures,
@@ -188,8 +181,7 @@ impl FieldFactory {
             }),
             FieldPresence::Repeated => Field::Repeated(RepeatedField {
                 number,
-                options,
-                base_proto_path,
+                scope_path,
                 scalar_proto_type,
                 trait_getter_signatures,
                 struct_getter_signatures,
@@ -205,7 +197,7 @@ impl FieldFactory {
         };
         let scalar_ref_type: Type = gen_scalar_maybe_ref_type(
             &self.scalar_proto_type,
-            &self.base_proto_path,
+            &self.scope_path,
             &self.options,
             |path| {
                 let view_trait_path = path
