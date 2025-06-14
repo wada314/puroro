@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use super::field::{Field, ScalarField};
-use super::{ImplsGenerator, view_trait_blanket_impl_helper};
+use super::{ImplsGenerator, view_trait_blanket_impl_helper2};
 use crate::generator::{CodeGeneratorOptions, TrySwitch};
 use ::culpa::throws;
 use ::quote::quote;
@@ -41,19 +41,14 @@ impl ImplsGenerator for GenBlanketOptionImpls {
         let view_trait_path = &trait_paths[false];
         let try_trait_path = &trait_paths[true];
 
-        let view_methods = view_trait_blanket_impl_helper(
+        let methods = view_trait_blanket_impl_helper2(
             fields.iter().copied(),
-            |f| self.gen_get_method_body(f, &t, view_trait_path),
-            |f| self.gen_has_method_body(f, &t, view_trait_path),
-            false,
+            |f, is_try| self.gen_get_method_body(f, &t, &trait_paths[is_try], is_try),
+            |f, is_try| self.gen_has_method_body(f, &t, &trait_paths[is_try], is_try),
         )?;
 
-        let try_methods = view_trait_blanket_impl_helper(
-            fields.iter().copied(),
-            |f| self.gen_try_get_method_body(f, &t, try_trait_path),
-            |f| self.gen_try_has_method_body(f, &t, try_trait_path),
-            true,
-        )?;
+        let view_methods = &methods[false];
+        let try_methods = &methods[true];
 
         vec![
             parse2(quote! {
@@ -76,18 +71,42 @@ impl GenBlanketOptionImpls {
     }
 
     #[throws]
-    fn gen_get_method_body(&self, field: &Field, t: &Ident, trait_path: &Path) -> Block {
-        let signature = field.trait_getter_signatures()[false].clone();
+    fn gen_get_method_body(
+        &self,
+        field: &Field,
+        t: &Ident,
+        trait_path: &Path,
+        is_try: bool,
+    ) -> Block {
+        let signature = field.trait_getter_signatures()[is_try].clone();
         let getter_name = &signature.ident;
         let stmts = match field {
-            Field::Repeated { .. } => quote! {
-                self.as_ref().map(<#t as #trait_path>::#getter_name)
-                    .into_iter().flatten()
-            },
-            Field::Explicit { .. } | Field::Implicit { .. } => quote! {
-                self.as_ref().map(<#t as #trait_path>::#getter_name)
-                    .unwrap_or_default()
-            },
+            Field::Repeated { .. } => {
+                if is_try {
+                    quote! {
+                        self.as_ref().map(<#t as #trait_path>::#getter_name).transpose()
+                        .map(|iter_opt| iter_opt.into_iter().flatten())
+                    }
+                } else {
+                    quote! {
+                        self.as_ref().map(<#t as #trait_path>::#getter_name)
+                            .into_iter().flatten()
+                    }
+                }
+            }
+            Field::Explicit { .. } | Field::Implicit { .. } => {
+                if is_try {
+                    quote! {
+                        self.as_ref().map(<#t as #trait_path>::#getter_name).transpose()
+                        .map(|opt| opt.unwrap_or_default())
+                    }
+                } else {
+                    quote! {
+                        self.as_ref().map(<#t as #trait_path>::#getter_name)
+                            .unwrap_or_default()
+                    }
+                }
+            }
         };
         parse2(quote! {
             { #stmts }
@@ -95,54 +114,33 @@ impl GenBlanketOptionImpls {
     }
 
     #[throws]
-    fn gen_has_method_body(&self, field: &Field, t: &Ident, trait_path: &Path) -> Block {
+    fn gen_has_method_body(
+        &self,
+        field: &Field,
+        t: &Ident,
+        trait_path: &Path,
+        is_try: bool,
+    ) -> Block {
         let (Field::Implicit(ScalarField { has_method_signatures, .. })
         | Field::Explicit(ScalarField { has_method_signatures, .. })) = field
         else {
             Err("this method is not supported for repeated fields".to_string())?
         };
-        let has_name = &has_method_signatures[false].ident;
-        parse2(quote! {{
-            self.as_ref()
-                .map(<#t as #trait_path>::#has_name)
-                .unwrap_or(false)
-        }})?
-    }
-
-    #[throws]
-    fn gen_try_get_method_body(&self, field: &Field, t: &Ident, trait_path: &Path) -> Block {
-        let signature = field.trait_getter_signatures()[true].clone();
-        let try_getter_name = &signature.ident;
-        let stmts = match field {
-            Field::Repeated { .. } => quote! {
-                self.as_ref().map(<#t as #trait_path>::#try_getter_name).transpose()
-                .map(|iter_opt| iter_opt.into_iter().flatten())
-            },
-            Field::Explicit { .. } | Field::Implicit { .. } => quote! {
-                self.as_ref().map(<#t as #trait_path>::#try_getter_name).transpose()
-                .map(|opt| opt.unwrap_or_default())
-            },
-        };
-        parse2(quote! {
-            { #stmts }
-        })?
-    }
-
-    #[throws]
-    fn gen_try_has_method_body(&self, field: &Field, t: &Ident, trait_path: &Path) -> Block {
-        let try_has_name = match field {
-            Field::Implicit(ScalarField { has_method_signatures, .. })
-            | Field::Explicit(ScalarField { has_method_signatures, .. }) => {
-                &has_method_signatures[true].ident
-            }
-            _ => Err("this method is not supported for repeated fields".to_string())?,
-        };
-        let ok = self.options.ok_path();
-        parse2(quote! { {
-            #ok(self.as_ref()
-                .map(<#t as #trait_path>::#try_has_name)
-                .transpose()?
-                .unwrap_or_default())
-        } })?
+        let has_name = &has_method_signatures[is_try].ident;
+        if is_try {
+            let ok = self.options.ok_path();
+            parse2(quote! { {
+                #ok(self.as_ref()
+                    .map(<#t as #trait_path>::#has_name)
+                    .transpose()?
+                    .unwrap_or_default())
+            } })?
+        } else {
+            parse2(quote! {{
+                self.as_ref()
+                    .map(<#t as #trait_path>::#has_name)
+                    .unwrap_or(false)
+            }})?
+        }
     }
 }
