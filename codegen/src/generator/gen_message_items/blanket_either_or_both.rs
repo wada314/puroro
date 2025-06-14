@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use super::field::{Field, RepeatedField, ScalarField};
-use super::{ImplsGenerator, view_trait_blanket_impl_helper2};
+use super::{ImplsGenerator, view_trait_blanket_impl_helper};
 use crate::descriptor::FieldType;
 use crate::generator::{CodeGeneratorOptions, TrySwitch};
 use ::culpa::throws;
@@ -40,7 +40,7 @@ impl ImplsGenerator for GenBlanketEitherOrBothImpls {
         let view_trait_path = &trait_paths[false];
         let try_trait_path = &trait_paths[true];
 
-        let methods = view_trait_blanket_impl_helper2(
+        let methods = view_trait_blanket_impl_helper(
             fields.iter().copied(),
             |f, is_try| self.gen_get_method_body(f, &t1, &t2, &trait_paths[is_try], is_try),
             |f, is_try| self.gen_has_method_body(f, &t1, &t2, &trait_paths[is_try], is_try),

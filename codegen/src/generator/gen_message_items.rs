@@ -412,65 +412,6 @@ trait ImplsGenerator {
     ) -> Vec<Item>;
 }
 
-/// A helper function to generate blanket impls for view traits.
-///
-/// Essentially, this function takes a generator for the function body,
-/// then invokes it for each field, and appends the function signatures for each.
-///
-/// # Arguments
-///
-/// * `fields` - The field data structs to generate the blanket impls for.
-/// * `gen_getter` - A function to generate the getter method body block.
-/// * `gen_has_method` - A function to generate the has method body block.
-/// * `is_try_trait` - Whether the trait is a `TryView` trait or not (View trait otherwise).
-///
-/// # Returns
-///
-/// A vector of ImplItemFn; i.e. the methods in the impl block.
-
-#[throws]
-fn view_trait_blanket_impl_helper<'a, F, G>(
-    fields: impl Iterator<Item = &'a Field>,
-    gen_getter: F,
-    gen_has_method: G,
-    is_try_trait: bool,
-) -> Vec<ImplItemFn>
-where
-    F: Fn(&Field) -> Result<Block>,
-    G: Fn(&Field) -> Result<Block>,
-{
-    fields
-        .map(|f| {
-            let get_method: ImplItemFn = {
-                let signature = f.trait_getter_signatures()[is_try_trait].clone();
-                let body = gen_getter(f)?;
-                parse2(quote! {
-                    #signature #body
-                })?
-            };
-            let has_method: Option<ImplItemFn> = match f {
-                Field::Explicit(ScalarField {
-                    has_method_signatures,
-                    ..
-                })
-                | Field::Implicit(ScalarField {
-                    has_method_signatures,
-                    ..
-                }) => {
-                    let signature = has_method_signatures[is_try_trait].clone();
-                    let body = gen_has_method(f)?;
-                    Some(parse2(quote! {
-                        #signature #body
-                    })?)
-                }
-                _ => None,
-            };
-            Ok(once(get_method).chain(has_method.into_iter()))
-        })
-        .flat_map(ResultExt::transpose_iter)
-        .collect::<Result<Vec<_>>>()?
-}
-
 /// Generates blanket implementations for both View and TryView traits.
 ///
 /// This function takes generators for the function bodies and creates implementations
@@ -488,7 +429,7 @@ where
 ///
 /// A TrySwitch containing vectors of ImplItemFn for both View and TryView traits.
 #[throws]
-fn view_trait_blanket_impl_helper2<'a, F, G>(
+fn view_trait_blanket_impl_helper<'a, F, G>(
     fields: impl Iterator<Item = &'a Field>,
     gen_getter: F,
     gen_has_method: G,
