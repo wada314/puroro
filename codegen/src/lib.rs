@@ -137,35 +137,23 @@ pub trait PersonTrait: ScalarStringField<1> + ScalarU32Field<2> + RepeatedMessag
     fn age(&self) -> u32 {
         <Self as ScalarU32Field<2>>::get(self)
     }
-    fn children(&self) -> impl Iterator<Item = &<Self as RepeatedMessageField<3>>::Message> {
+    fn children(&self) -> impl Iterator<Item = impl PersonTrait>;
+}
+
+impl PersonTrait for PersonInner {
+    fn children(&self) -> impl Iterator<Item = impl PersonTrait> {
         <Self as RepeatedMessageField<3>>::get(self)
     }
 }
-impl<T> PersonTrait for T
-where
-    T: ScalarStringField<1>,
-    T: ScalarU32Field<2>,
-    T: RepeatedMessageField<3>,
-{
-}
-
-pub trait PersonTrait2: PersonTrait {
-    fn children2(&self) -> impl Iterator<Item = &impl PersonTrait2>;
-}
-impl PersonTrait2 for PersonInner {
-    fn children2(&self) -> impl Iterator<Item = &impl PersonTrait2> {
-        <Self as PersonTrait>::children(self)
-    }
-}
-impl<T: PersonTrait2> PersonTrait2 for &T {
-    fn children2(&self) -> impl Iterator<Item = &impl PersonTrait2> {
-        <T as PersonTrait2>::children2(self)
+impl<T: PersonTrait> PersonTrait for &T {
+    fn children(&self) -> impl Iterator<Item = impl PersonTrait> {
+        <T as PersonTrait>::children(self)
     }
 }
 
 impl<T> Person<T>
 where
-    T: PersonTrait2,
+    T: PersonTrait,
 {
     pub fn name(&self) -> &str {
         self.0.name()
@@ -173,12 +161,12 @@ where
     pub fn age(&self) -> u32 {
         self.0.age()
     }
-    pub fn children(&self) -> impl Iterator<Item = Person<impl PersonTrait2>> {
-        self.0.children2().map(|x| Person(x))
+    pub fn children(&self) -> impl Iterator<Item = Person<impl PersonTrait>> {
+        self.0.children().map(|x| Person(x))
     }
 }
 
-fn foo<T: PersonTrait2>(p: Person<T>) {
+fn foo<T: PersonTrait>(p: Person<T>) {
     println!("{}", p.name());
     println!("{}", p.age());
     for child in p.children() {
