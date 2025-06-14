@@ -309,3 +309,23 @@ impl<T> Index<bool> for TrySwitch<T> {
         }
     }
 }
+
+impl<T> TrySwitch<T> {
+    /// Maps the values in both branches of the TrySwitch using the provided function.
+    /// The function receives a boolean indicating whether this is the try branch (true) or not (false),
+    /// and the value in that branch.
+    ///
+    /// # Arguments
+    ///
+    /// * `f` - A function that takes a boolean and a value, and returns a new value
+    ///
+    /// # Returns
+    ///
+    /// A new TrySwitch with the mapped values
+    pub fn map<U, F>(self, f: F) -> TrySwitch<U>
+    where
+        F: Fn(bool, T) -> U,
+    {
+        TrySwitch::new(f(false, self.if_not_try), f(true, self.if_try))
+    }
+}
