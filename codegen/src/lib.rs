@@ -25,9 +25,7 @@ pub use crate::generator::compile;
 use ::puroro::dynamic::DynamicMessage;
 use ::puroro::google::protobuf::compiler::CodeGeneratorRequest;
 use ::puroro::message::{Message, MessageMut};
-use ::quither::Either;
 use ::std::backtrace::Backtrace;
-use ::std::iter::once;
 use ::thiserror::Error;
 
 #[derive(Error, Debug)]
