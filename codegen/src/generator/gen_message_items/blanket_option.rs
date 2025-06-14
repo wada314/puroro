@@ -18,7 +18,7 @@ use crate::generator::{CodeGeneratorOptions, TrySwitch};
 use ::culpa::throws;
 use ::quote::quote;
 use ::std::rc::Rc;
-use ::syn::{Block, Ident, Item, Path, TypePath, parse_str, parse2};
+use ::syn::{Block, Ident, Item, Path, Stmt, TypePath, parse::Parser, parse_str, parse2};
 
 type Error = crate::ErrorKind;
 
@@ -80,37 +80,25 @@ impl GenBlanketOptionImpls {
     ) -> Block {
         let signature = field.trait_getter_signatures()[is_try].clone();
         let getter_name = &signature.ident;
-        let stmts = match field {
-            Field::Repeated { .. } => {
-                if is_try {
-                    quote! {
-                        self.as_ref().map(<#t as #trait_path>::#getter_name).transpose()
-                        .map(|iter_opt| iter_opt.into_iter().flatten())
-                    }
-                } else {
-                    quote! {
-                        self.as_ref().map(<#t as #trait_path>::#getter_name)
-                            .into_iter().flatten()
-                    }
-                }
-            }
-            Field::Explicit { .. } | Field::Implicit { .. } => {
-                if is_try {
-                    quote! {
-                        self.as_ref().map(<#t as #trait_path>::#getter_name).transpose()
-                        .map(|opt| opt.unwrap_or_default())
-                    }
-                } else {
-                    quote! {
-                        self.as_ref().map(<#t as #trait_path>::#getter_name)
-                            .unwrap_or_default()
-                    }
-                }
-            }
-        };
-        parse2(quote! {
-            { #stmts }
-        })?
+        let stmts = Block::parse_within.parse2(match (field, is_try) {
+            (Field::Repeated { .. }, true) => quote! {
+                self.as_ref().map(<#t as #trait_path>::#getter_name).transpose()
+                .map(|iter_opt| iter_opt.into_iter().flatten())
+            },
+            (Field::Repeated { .. }, false) => quote! {
+                self.as_ref().map(<#t as #trait_path>::#getter_name)
+                    .into_iter().flatten()
+            },
+            (Field::Explicit { .. } | Field::Implicit { .. }, true) => quote! {
+                self.as_ref().map(<#t as #trait_path>::#getter_name).transpose()
+                .map(|opt| opt.unwrap_or_default())
+            },
+            (Field::Explicit { .. } | Field::Implicit { .. }, false) => quote! {
+                self.as_ref().map(<#t as #trait_path>::#getter_name)
+                    .unwrap_or_default()
+            },
+        })?;
+        Block { stmts, brace_token: Default::default() }
     }
 
     #[throws]
@@ -127,20 +115,21 @@ impl GenBlanketOptionImpls {
             Err("this method is not supported for repeated fields".to_string())?
         };
         let has_name = &has_method_signatures[is_try].ident;
-        if is_try {
+        let stmts = Block::parse_within.parse2(if is_try {
             let ok = self.options.ok_path();
-            parse2(quote! { {
+            quote! {
                 #ok(self.as_ref()
                     .map(<#t as #trait_path>::#has_name)
                     .transpose()?
                     .unwrap_or_default())
-            } })?
+            }
         } else {
-            parse2(quote! {{
+            quote! {
                 self.as_ref()
                     .map(<#t as #trait_path>::#has_name)
                     .unwrap_or(false)
-            }})?
-        }
+            }
+        })?;
+        Block { stmts, brace_token: Default::default() }
     }
 }
