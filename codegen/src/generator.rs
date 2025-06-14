@@ -297,20 +297,7 @@ impl<T> TrySwitch<T> {
     pub fn new(if_not_try: T, if_try: T) -> Self {
         Self { if_not_try, if_try }
     }
-}
 
-impl<T> Index<bool> for TrySwitch<T> {
-    type Output = T;
-    fn index(&self, index: bool) -> &Self::Output {
-        if index {
-            &self.if_try
-        } else {
-            &self.if_not_try
-        }
-    }
-}
-
-impl<T> TrySwitch<T> {
     /// Maps the values in both branches of the TrySwitch using the provided function.
     /// The function receives a boolean indicating whether this is the try branch (true) or not (false),
     /// and the value in that branch.
@@ -327,5 +314,34 @@ impl<T> TrySwitch<T> {
         F: Fn(bool, T) -> U,
     {
         TrySwitch::new(f(false, self.if_not_try), f(true, self.if_try))
+    }
+
+    /// Creates a new TrySwitch with references to the values in this TrySwitch.
+    ///
+    /// # Returns
+    ///
+    /// A new TrySwitch containing references to the values in this TrySwitch
+    pub fn as_ref(&self) -> TrySwitch<&T> {
+        TrySwitch::new(&self.if_not_try, &self.if_try)
+    }
+
+    /// Takes ownership of the inner values.
+    ///
+    /// # Returns
+    ///
+    /// A tuple containing the inner values in the order (if_not_try, if_try)
+    pub fn into_inner(self) -> (T, T) {
+        (self.if_not_try, self.if_try)
+    }
+}
+
+impl<T> Index<bool> for TrySwitch<T> {
+    type Output = T;
+    fn index(&self, index: bool) -> &Self::Output {
+        if index {
+            &self.if_try
+        } else {
+            &self.if_not_try
+        }
     }
 }

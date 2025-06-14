@@ -26,7 +26,7 @@ use crate::cases::{Case, convert_into_case};
 use crate::descriptor::{DescriptorExt, FieldType};
 use crate::generator::{TrySwitch, to_ident};
 use crate::proto_path::ProtoPathBuf;
-use crate::{Result, ResultExt};
+use crate::{ErrorKind, Result, ResultExt};
 use ::culpa::throws;
 use ::quither::Either;
 use ::quote::{format_ident, quote};
@@ -493,59 +493,42 @@ fn view_trait_blanket_impl_helper2<'a>(
     let mut try_view_impls = Vec::new();
 
     for f in fields {
-        // Generate View trait implementations
-        let view_get_method: ImplItemFn = {
-            let signature = f.trait_getter_signatures()[false].clone();
-            let body = gen_getter[false](f, false)?;
-            parse2(quote! {
-                #signature #body
-            })?
-        };
-        let view_has_method: Option<ImplItemFn> = match f {
-            Field::Explicit(ScalarField {
-                has_method_signatures,
-                ..
-            })
-            | Field::Implicit(ScalarField {
-                has_method_signatures,
-                ..
-            }) => {
-                let signature = has_method_signatures[false].clone();
-                let body = gen_has_method[false](f, false)?;
-                Some(parse2(quote! {
-                    #signature #body
-                })?)
-            }
-            _ => None,
-        };
-        view_impls.extend(once(view_get_method).chain(view_has_method.into_iter()));
-
-        // Generate TryView trait implementations
-        let try_view_get_method: ImplItemFn = {
-            let signature = f.trait_getter_signatures()[true].clone();
-            let body = gen_getter[true](f, true)?;
-            parse2(quote! {
-                #signature #body
-            })?
-        };
-        let try_view_has_method: Option<ImplItemFn> = match f {
-            Field::Explicit(ScalarField {
-                has_method_signatures,
-                ..
-            })
-            | Field::Implicit(ScalarField {
-                has_method_signatures,
-                ..
-            }) => {
-                let signature = has_method_signatures[true].clone();
-                let body = gen_has_method[true](f, true)?;
-                Some(parse2(quote! {
-                    #signature #body
-                })?)
-            }
-            _ => None,
-        };
-        try_view_impls.extend(once(try_view_get_method).chain(try_view_has_method.into_iter()));
+        let methods: TrySwitch<
+            Result<
+                std::iter::Chain<std::iter::Once<ImplItemFn>, std::option::IntoIter<ImplItemFn>>,
+            >,
+        > = f
+            .trait_getter_signatures()
+            .as_ref()
+            .map(|is_try, signature| {
+                let get_method: ImplItemFn = {
+                    let body = gen_getter[is_try](f, is_try)?;
+                    parse2(quote! {
+                        #signature #body
+                    })?
+                };
+                let has_method: Option<ImplItemFn> = match f {
+                    Field::Explicit(ScalarField {
+                        has_method_signatures,
+                        ..
+                    })
+                    | Field::Implicit(ScalarField {
+                        has_method_signatures,
+                        ..
+                    }) => {
+                        let signature = has_method_signatures[is_try].clone();
+                        let body = gen_has_method[is_try](f, is_try)?;
+                        Some(parse2(quote! {
+                            #signature #body
+                        })?)
+                    }
+                    _ => None,
+                };
+                Ok(once(get_method).chain(has_method.into_iter()))
+            });
+        let (view_methods, try_view_methods) = methods.into_inner();
+        view_impls.extend(view_methods?);
+        try_view_impls.extend(try_view_methods?);
     }
 
     TrySwitch::new(view_impls, try_view_impls)
