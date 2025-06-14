@@ -29,7 +29,7 @@ use ::std::cell::LazyCell;
 use ::std::cell::OnceCell;
 use ::std::collections::HashSet;
 use ::std::iter::once;
-use ::std::ops::Index;
+use ::std::ops::{Index, IndexMut};
 use ::syn::{Expr, Ident, ItemUse, Path, Type, TypePath, parse_quote, parse_str};
 
 pub use compile::*;
@@ -371,5 +371,30 @@ impl<T> Index<bool> for TrySwitch<T> {
         } else {
             &self.if_not_try
         }
+    }
+}
+
+impl<T> IndexMut<bool> for TrySwitch<T> {
+    fn index_mut(&mut self, index: bool) -> &mut Self::Output {
+        if index {
+            &mut self.if_try
+        } else {
+            &mut self.if_not_try
+        }
+    }
+}
+
+impl<V, A> FromIterator<TrySwitch<A>> for TrySwitch<V>
+where
+    V: Default + Extend<A>,
+{
+    fn from_iter<T: IntoIterator<Item = TrySwitch<A>>>(iter: T) -> Self {
+        let mut sw = TrySwitch::new(V::default(), V::default());
+        for item in iter {
+            sw.apply(item, |v, a, _| {
+                v.extend(once(a));
+            });
+        }
+        sw
     }
 }

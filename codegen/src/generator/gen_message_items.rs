@@ -533,13 +533,5 @@ fn view_trait_blanket_impl_helper2<'a>(
             Ok(once(get_methods).chain(has_methods.into_iter()))
         })
         .flatten_ok()
-        .fold_ok(
-            TrySwitch::new(Vec::new(), Vec::new()),
-            |mut impls, methods| {
-                impls.apply(methods, |impls, method, _| {
-                    impls.push(method);
-                });
-                impls
-            },
-        )?
+        .collect::<Result<TrySwitch<Vec<_>>>>()?
 }
