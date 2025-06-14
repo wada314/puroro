@@ -21,6 +21,8 @@ use crate::descriptor::{
     FieldDescriptorExt, FieldLabel, FieldType, I32Type, I64Type, LenType, VariantType, WireType,
 };
 use crate::proto_path::ProtoPath;
+use crate::{ErrorKind, Result};
+use ::culpa::throws;
 use ::quote::format_ident;
 use ::std::borrow::Cow;
 use ::std::cell::LazyCell;
@@ -31,6 +33,8 @@ use ::std::ops::Index;
 use ::syn::{Expr, Ident, ItemUse, Path, Type, TypePath, parse_quote, parse_str};
 
 pub use compile::*;
+
+type Error = ErrorKind;
 
 #[derive(Clone, Debug)]
 pub struct CodeGeneratorOptions {
@@ -316,6 +320,14 @@ impl<T> TrySwitch<T> {
         TrySwitch::new(f(false, self.if_not_try), f(true, self.if_try))
     }
 
+    #[throws]
+    pub fn try_map<U, F>(self, f: F) -> TrySwitch<U>
+    where
+        F: Fn(bool, T) -> Result<U>,
+    {
+        TrySwitch::new(f(false, self.if_not_try)?, f(true, self.if_try)?)
+    }
+
     /// Creates a new TrySwitch with references to the values in this TrySwitch.
     ///
     /// # Returns
@@ -325,13 +337,19 @@ impl<T> TrySwitch<T> {
         TrySwitch::new(&self.if_not_try, &self.if_try)
     }
 
-    /// Takes ownership of the inner values.
+    /// Applies a function to both branches of the TrySwitch.
     ///
-    /// # Returns
+    /// # Arguments
     ///
-    /// A tuple containing the inner values in the order (if_not_try, if_try)
-    pub fn into_inner(self) -> (T, T) {
-        (self.if_not_try, self.if_try)
+    /// * `args` - A TrySwitch containing the arguments to pass to the function
+    /// * `f` - A function that takes a mutable reference to the value in this branch and the argument
+    ///
+    pub fn apply<F, A>(&mut self, args: TrySwitch<A>, f: F)
+    where
+        F: Fn(&mut T, A, bool),
+    {
+        f(&mut self.if_not_try, args.if_not_try, false);
+        f(&mut self.if_try, args.if_try, true);
     }
 }
 

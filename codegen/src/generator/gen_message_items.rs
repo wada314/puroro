@@ -489,18 +489,13 @@ fn view_trait_blanket_impl_helper2<'a>(
     gen_getter: TrySwitch<Box<dyn Fn(&Field, bool) -> Result<Block>>>,
     gen_has_method: TrySwitch<Box<dyn Fn(&Field, bool) -> Result<Block>>>,
 ) -> TrySwitch<Vec<ImplItemFn>> {
-    let mut view_impls = Vec::new();
-    let mut try_view_impls = Vec::new();
+    let mut impls = TrySwitch::new(Vec::new(), Vec::new());
 
     for f in fields {
-        let methods: TrySwitch<
-            Result<
-                std::iter::Chain<std::iter::Once<ImplItemFn>, std::option::IntoIter<ImplItemFn>>,
-            >,
-        > = f
+        let methods = f
             .trait_getter_signatures()
             .as_ref()
-            .map(|is_try, signature| {
+            .try_map(|is_try, signature| {
                 let get_method: ImplItemFn = {
                     let body = gen_getter[is_try](f, is_try)?;
                     parse2(quote! {
@@ -525,11 +520,11 @@ fn view_trait_blanket_impl_helper2<'a>(
                     _ => None,
                 };
                 Ok(once(get_method).chain(has_method.into_iter()))
-            });
-        let (view_methods, try_view_methods) = methods.into_inner();
-        view_impls.extend(view_methods?);
-        try_view_impls.extend(try_view_methods?);
+            })?;
+        impls.apply(methods, |impls, methods, _| {
+            impls.extend(methods);
+        });
     }
 
-    TrySwitch::new(view_impls, try_view_impls)
+    impls
 }
