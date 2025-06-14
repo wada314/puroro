@@ -12,17 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::field::Field;
-use super::{ImplsGenerator, view_trait_blanket_impl_helper};
+use super::ImplsGenerator;
+use super::field::{Field, ScalarField};
 use crate::Result;
 use crate::descriptor::{I32Type, I64Type, LenType, VariantType, WireType};
 use crate::generator::{CodeGeneratorOptions, TrySwitch};
 use crate::proto_path::ProtoPath;
 use ::culpa::throws;
 use ::quote::quote;
-use ::std::rc::Rc;
-use ::syn::{Block, Ident, Item, Path, parse_str, parse2};
-use ::syn::{Expr, Type};
+use ::std::{default::Default, rc::Rc};
+use ::syn::{Block, Ident, Item, Path, parse::Parser, parse_str, parse2};
+use ::syn::{Expr, ImplItemFn, Type, Visibility};
 
 type Error = crate::ErrorKind;
 
@@ -39,17 +39,40 @@ impl ImplsGenerator for DynamicMessageImplsGenerator {
         fields: Box<dyn 'a + Iterator<Item = &'a Field>>,
     ) -> Vec<Item> {
         let try_trait_path = &trait_paths[true];
-        let methods = view_trait_blanket_impl_helper(
-            fields,
-            |f| self.gen_try_getter_block(f),
-            |f| self.gen_try_has_method_block(f),
-            true,
-        )?;
+        let mut try_methods = Vec::new();
+
+        for field in fields {
+            // getter methods
+            let getter_signatures = field.trait_getter_signatures();
+            let try_getter = ImplItemFn {
+                vis: Visibility::Inherited,
+                sig: getter_signatures[true].clone(),
+                block: self.gen_try_getter_block(field)?,
+                defaultness: None,
+                attrs: vec![],
+            };
+            try_methods.push(try_getter);
+
+            // has methods
+            if let Field::Explicit(ScalarField { has_method_signatures, .. })
+            | Field::Implicit(ScalarField { has_method_signatures, .. }) = field
+            {
+                let try_has = ImplItemFn {
+                    vis: Visibility::Inherited,
+                    sig: has_method_signatures[true].clone(),
+                    block: self.gen_try_has_method_block(field)?,
+                    defaultness: None,
+                    attrs: vec![],
+                };
+                try_methods.push(try_has);
+            }
+        }
+
         vec![parse2(quote! {
             impl<A: ::std::alloc::Allocator + ::std::clone::Clone> #try_trait_path
             for ::puroro::dynamic::DynamicMessage<A>
             {
-                #(#methods)*
+                #(#try_methods)*
             }
         })?]
     }
@@ -65,13 +88,12 @@ impl DynamicMessageImplsGenerator {
         let number = field.number();
         let body = self.gen_try_getter_body(field, &parse_str("f_opt")?)?;
         let ok = self.options.ok_path();
-        parse2(quote! {
-            {
-                let f_opt = self.field(#number);
-                let result = #body;
-                #ok(result)
-            }
-        })?
+        let stmts = Block::parse_within.parse2(quote! {
+            let f_opt = self.field(#number);
+            let result = #body;
+            #ok(result)
+        })?;
+        Block { stmts, brace_token: Default::default() }
     }
 
     #[throws]
@@ -292,12 +314,11 @@ impl DynamicMessageImplsGenerator {
             },
             _ => todo!(),
         })?;
-        parse2(quote! {
-            {
-                let result = (#field_opt).map(|#field_ident| #body).transpose()?.is_some();
-                #ok(result)
-            }
-        })?
+        let stmts = Block::parse_within.parse2(quote! {
+            let result = (#field_opt).map(|#field_ident| #body).transpose()?.is_some();
+            #ok(result)
+        })?;
+        Block { stmts, brace_token: Default::default() }
     }
 }
 
