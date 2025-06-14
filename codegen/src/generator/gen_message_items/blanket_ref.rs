@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use super::field::{Field, ScalarField};
-use super::{ImplsGenerator, view_trait_blanket_impl_helper};
+use super::{ImplsGenerator, view_trait_blanket_impl_helper2};
 use crate::generator::{CodeGeneratorOptions, TrySwitch};
 use ::culpa::throws;
 use ::quote::quote;
@@ -22,6 +22,7 @@ use ::syn::{Block, Ident, Item, Path, parse_str, parse2};
 
 type Error = crate::ErrorKind;
 
+#[derive(Clone)]
 pub struct GenBlanketRefImpls {
     #[allow(unused)]
     options: Rc<CodeGeneratorOptions>,
@@ -39,19 +40,20 @@ impl ImplsGenerator for GenBlanketRefImpls {
         let view_trait_path = &trait_paths[false];
         let try_trait_path = &trait_paths[true];
 
-        let view_methods = view_trait_blanket_impl_helper(
+        let methods = view_trait_blanket_impl_helper2(
             fields.iter().copied(),
-            |f| self.gen_get_method_body(f, &t, view_trait_path, false),
-            |f| self.gen_has_method_body(f, &t, view_trait_path, false),
-            false,
+            TrySwitch::new(
+                Box::new(|f, is_try| self.gen_get_method_body(f, &t, view_trait_path, is_try)),
+                Box::new(|f, is_try| self.gen_get_method_body(f, &t, try_trait_path, is_try)),
+            ),
+            TrySwitch::new(
+                Box::new(|f, is_try| self.gen_has_method_body(f, &t, view_trait_path, is_try)),
+                Box::new(|f, is_try| self.gen_has_method_body(f, &t, try_trait_path, is_try)),
+            ),
         )?;
 
-        let try_methods = view_trait_blanket_impl_helper(
-            fields.iter().copied(),
-            |f| self.gen_get_method_body(f, &t, try_trait_path, true),
-            |f| self.gen_has_method_body(f, &t, try_trait_path, true),
-            true,
-        )?;
+        let view_methods = &methods[false];
+        let try_methods = &methods[true];
 
         vec![
             parse2(quote! {

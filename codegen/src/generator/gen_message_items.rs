@@ -490,8 +490,8 @@ where
 #[throws]
 fn view_trait_blanket_impl_helper2<'a>(
     fields: impl Iterator<Item = &'a Field>,
-    gen_getter: TrySwitch<Box<dyn Fn(&Field, bool) -> Result<Block>>>,
-    gen_has_method: TrySwitch<Box<dyn Fn(&Field, bool) -> Result<Block>>>,
+    gen_getter: TrySwitch<Box<dyn Fn(&Field, bool) -> Result<Block> + 'a>>,
+    gen_has_method: TrySwitch<Box<dyn Fn(&Field, bool) -> Result<Block> + 'a>>,
 ) -> TrySwitch<Vec<ImplItemFn>> {
     fields
         .map(|f| -> Result<_> {
