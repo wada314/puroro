@@ -490,8 +490,8 @@ where
 #[throws]
 fn view_trait_blanket_impl_helper2<'a>(
     fields: impl Iterator<Item = &'a Field>,
-    gen_getter: TrySwitch<Box<dyn Fn(&Field, bool) -> Result<Block> + 'a>>,
-    gen_has_method: TrySwitch<Box<dyn Fn(&Field, bool) -> Result<Block> + 'a>>,
+    gen_getter: Box<dyn Fn(&Field, bool) -> Result<Block> + 'a>,
+    gen_has_method: Box<dyn Fn(&Field, bool) -> Result<Block> + 'a>,
 ) -> TrySwitch<Vec<ImplItemFn>> {
     fields
         .map(|f| -> Result<_> {
@@ -502,7 +502,7 @@ fn view_trait_blanket_impl_helper2<'a>(
                         Ok(ImplItemFn {
                             vis: Visibility::Inherited,
                             sig: signature.clone(),
-                            block: gen_getter[is_try](f, is_try)?,
+                            block: gen_getter(f, is_try)?,
                             defaultness: None,
                             attrs: vec![],
                         })
@@ -522,7 +522,7 @@ fn view_trait_blanket_impl_helper2<'a>(
                             Ok(ImplItemFn {
                                 vis: Visibility::Inherited,
                                 sig: signature.clone(),
-                                block: gen_has_method[is_try](f, is_try)?,
+                                block: gen_has_method(f, is_try)?,
                                 defaultness: None,
                                 attrs: vec![],
                             })

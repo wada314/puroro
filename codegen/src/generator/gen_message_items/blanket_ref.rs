@@ -42,14 +42,22 @@ impl ImplsGenerator for GenBlanketRefImpls {
 
         let methods = view_trait_blanket_impl_helper2(
             fields.iter().copied(),
-            TrySwitch::new(
-                Box::new(|f, is_try| self.gen_get_method_body(f, &t, view_trait_path, is_try)),
-                Box::new(|f, is_try| self.gen_get_method_body(f, &t, try_trait_path, is_try)),
-            ),
-            TrySwitch::new(
-                Box::new(|f, is_try| self.gen_has_method_body(f, &t, view_trait_path, is_try)),
-                Box::new(|f, is_try| self.gen_has_method_body(f, &t, try_trait_path, is_try)),
-            ),
+            Box::new(|f, is_try| {
+                let trait_path = if is_try {
+                    try_trait_path
+                } else {
+                    view_trait_path
+                };
+                self.gen_get_method_body(f, &t, trait_path, is_try)
+            }),
+            Box::new(|f, is_try| {
+                let trait_path = if is_try {
+                    try_trait_path
+                } else {
+                    view_trait_path
+                };
+                self.gen_has_method_body(f, &t, trait_path, is_try)
+            }),
         )?;
 
         let view_methods = &methods[false];
