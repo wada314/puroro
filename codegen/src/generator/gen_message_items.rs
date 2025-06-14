@@ -496,7 +496,7 @@ fn view_trait_blanket_impl_helper2<'a>(
         // Generate View trait implementations
         let view_get_method: ImplItemFn = {
             let signature = f.trait_getter_signatures()[false].clone();
-            let body = gen_getter(f, false)?;
+            let body = gen_getter[false](f, false)?;
             parse2(quote! {
                 #signature #body
             })?
@@ -511,7 +511,7 @@ fn view_trait_blanket_impl_helper2<'a>(
                 ..
             }) => {
                 let signature = has_method_signatures[false].clone();
-                let body = gen_has_method(f, false)?;
+                let body = gen_has_method[false](f, false)?;
                 Some(parse2(quote! {
                     #signature #body
                 })?)
@@ -523,7 +523,7 @@ fn view_trait_blanket_impl_helper2<'a>(
         // Generate TryView trait implementations
         let try_view_get_method: ImplItemFn = {
             let signature = f.trait_getter_signatures()[true].clone();
-            let body = gen_getter(f, true)?;
+            let body = gen_getter[true](f, true)?;
             parse2(quote! {
                 #signature #body
             })?
@@ -538,7 +538,7 @@ fn view_trait_blanket_impl_helper2<'a>(
                 ..
             }) => {
                 let signature = has_method_signatures[true].clone();
-                let body = gen_has_method(f, true)?;
+                let body = gen_has_method[true](f, true)?;
                 Some(parse2(quote! {
                     #signature #body
                 })?)
