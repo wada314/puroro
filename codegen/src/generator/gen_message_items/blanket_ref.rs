@@ -41,15 +41,15 @@ impl ImplsGenerator for GenBlanketRefImpls {
 
         let view_methods = view_trait_blanket_impl_helper(
             fields.iter().copied(),
-            |f| self.gen_get_method_body(f, &t, view_trait_path),
-            |f| self.gen_has_method_body(f, &t, view_trait_path),
+            |f| self.gen_get_method_body(f, &t, view_trait_path, false),
+            |f| self.gen_has_method_body(f, &t, view_trait_path, false),
             false,
         )?;
 
         let try_methods = view_trait_blanket_impl_helper(
             fields.iter().copied(),
-            |f| self.gen_try_get_method_body(f, &t, try_trait_path),
-            |f| self.gen_try_has_method_body(f, &t, try_trait_path),
+            |f| self.gen_get_method_body(f, &t, try_trait_path, true),
+            |f| self.gen_has_method_body(f, &t, try_trait_path, true),
             true,
         )?;
 
@@ -84,39 +84,32 @@ impl GenBlanketRefImpls {
     }
 
     #[throws]
-    fn gen_get_method_body(&self, field: &Field, t: &Ident, trait_path: &Path) -> Block {
-        let signature = field.trait_getter_signatures()[false].clone();
+    fn gen_get_method_body(
+        &self,
+        field: &Field,
+        t: &Ident,
+        trait_path: &Path,
+        is_try: bool,
+    ) -> Block {
+        let signature = field.trait_getter_signatures()[is_try].clone();
         let getter_name = &signature.ident;
         parse2(quote! {{ <#t as #trait_path>::#getter_name(self) }})?
     }
 
     #[throws]
-    fn gen_has_method_body(&self, field: &Field, t: &Ident, trait_path: &Path) -> Block {
+    fn gen_has_method_body(
+        &self,
+        field: &Field,
+        t: &Ident,
+        trait_path: &Path,
+        is_try: bool,
+    ) -> Block {
         let (Field::Implicit(ScalarField { has_method_signatures, .. })
         | Field::Explicit(ScalarField { has_method_signatures, .. })) = field
         else {
             Err("this method is not supported for repeated fields".to_string())?
         };
-        let has_name = &has_method_signatures[false].ident;
+        let has_name = &has_method_signatures[is_try].ident;
         parse2(quote! {{ <#t as #trait_path>::#has_name(self) }})?
-    }
-
-    #[throws]
-    fn gen_try_get_method_body(&self, field: &Field, t: &Ident, trait_path: &Path) -> Block {
-        let signature = field.trait_getter_signatures()[true].clone();
-        let try_getter_name = &signature.ident;
-        parse2(quote! {{ <#t as #trait_path>::#try_getter_name(self) }})?
-    }
-
-    #[throws]
-    fn gen_try_has_method_body(&self, field: &Field, t: &Ident, trait_path: &Path) -> Block {
-        let try_has_name = match field {
-            Field::Implicit(ScalarField { has_method_signatures, .. })
-            | Field::Explicit(ScalarField { has_method_signatures, .. }) => {
-                &has_method_signatures[true].ident
-            }
-            _ => Err("this method is not supported for repeated fields".to_string())?,
-        };
-        parse2(quote! {{ <#t as #trait_path>::#try_has_name(self) }})?
     }
 }
