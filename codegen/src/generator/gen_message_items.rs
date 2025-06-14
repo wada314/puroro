@@ -34,7 +34,10 @@ use ::quote::{format_ident, quote};
 use ::std::iter::once;
 use ::std::rc::Rc;
 use ::syn::parse::Parser;
-use ::syn::{Block, Ident, ImplItemFn, Item, Path, PathArguments, PathSegment, Stmt, Type, parse2};
+use ::syn::{
+    Block, Ident, ImplItemFn, Item, Path, PathArguments, PathSegment, Stmt, Type, Visibility,
+    parse2,
+};
 use field::{Field, RepeatedField, ScalarField};
 
 use blanket_both::GenBlanketBothImpls;
@@ -496,10 +499,13 @@ fn view_trait_blanket_impl_helper2<'a>(
                 f.trait_getter_signatures()
                     .as_ref()
                     .try_map(|is_try, signature| {
-                        let body = gen_getter[is_try](f, is_try)?;
-                        Ok(parse2::<ImplItemFn>(quote! {
-                            #signature #body
-                        })?)
+                        Ok(ImplItemFn {
+                            vis: Visibility::Inherited,
+                            sig: signature.clone(),
+                            block: gen_getter[is_try](f, is_try)?,
+                            defaultness: None,
+                            attrs: vec![],
+                        })
                     })?;
             let has_methods = match f {
                 Field::Explicit(ScalarField {
@@ -513,10 +519,13 @@ fn view_trait_blanket_impl_helper2<'a>(
                     has_method_signatures
                         .as_ref()
                         .try_map(|is_try, signature| {
-                            let body = gen_has_method[is_try](f, is_try)?;
-                            Ok(parse2::<ImplItemFn>(quote! {
-                                #signature #body
-                            })?)
+                            Ok(ImplItemFn {
+                                vis: Visibility::Inherited,
+                                sig: signature.clone(),
+                                block: gen_has_method[is_try](f, is_try)?,
+                                defaultness: None,
+                                attrs: vec![],
+                            })
                         })?,
                 ),
                 _ => None,
