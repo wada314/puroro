@@ -351,6 +351,16 @@ impl<T> TrySwitch<T> {
         f(&mut self.if_not_try, args.if_not_try, false);
         f(&mut self.if_try, args.if_try, true);
     }
+
+    pub fn zip_with<F, U, V>(self, rhs: TrySwitch<U>, f: F) -> TrySwitch<V>
+    where
+        F: Fn(T, U) -> V,
+    {
+        TrySwitch::new(
+            f(self.if_not_try, rhs.if_not_try),
+            f(self.if_try, rhs.if_try),
+        )
+    }
 }
 
 impl<T> Index<bool> for TrySwitch<T> {

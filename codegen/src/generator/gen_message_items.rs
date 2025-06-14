@@ -26,8 +26,9 @@ use crate::cases::{Case, convert_into_case};
 use crate::descriptor::{DescriptorExt, FieldType};
 use crate::generator::{TrySwitch, to_ident};
 use crate::proto_path::ProtoPathBuf;
-use crate::{ErrorKind, Result, ResultExt};
+use crate::{Result, ResultExt};
 use ::culpa::throws;
+use ::itertools::Itertools;
 use ::quither::Either;
 use ::quote::{format_ident, quote};
 use ::std::iter::once;
@@ -489,42 +490,47 @@ fn view_trait_blanket_impl_helper2<'a>(
     gen_getter: TrySwitch<Box<dyn Fn(&Field, bool) -> Result<Block>>>,
     gen_has_method: TrySwitch<Box<dyn Fn(&Field, bool) -> Result<Block>>>,
 ) -> TrySwitch<Vec<ImplItemFn>> {
-    let mut impls = TrySwitch::new(Vec::new(), Vec::new());
-
-    for f in fields {
-        let methods = f
-            .trait_getter_signatures()
-            .as_ref()
-            .try_map(|is_try, signature| {
-                let get_method: ImplItemFn = {
-                    let body = gen_getter[is_try](f, is_try)?;
-                    parse2(quote! {
-                        #signature #body
-                    })?
-                };
-                let has_method: Option<ImplItemFn> = match f {
-                    Field::Explicit(ScalarField {
-                        has_method_signatures,
-                        ..
-                    })
-                    | Field::Implicit(ScalarField {
-                        has_method_signatures,
-                        ..
-                    }) => {
-                        let signature = has_method_signatures[is_try].clone();
-                        let body = gen_has_method[is_try](f, is_try)?;
-                        Some(parse2(quote! {
+    fields
+        .map(|f| -> Result<_> {
+            let get_methods =
+                f.trait_getter_signatures()
+                    .as_ref()
+                    .try_map(|is_try, signature| {
+                        let body = gen_getter[is_try](f, is_try)?;
+                        Ok(parse2::<ImplItemFn>(quote! {
                             #signature #body
                         })?)
-                    }
-                    _ => None,
-                };
-                Ok(once(get_method).chain(has_method.into_iter()))
-            })?;
-        impls.apply(methods, |impls, methods, _| {
-            impls.extend(methods);
-        });
-    }
-
-    impls
+                    })?;
+            let has_methods = match f {
+                Field::Explicit(ScalarField {
+                    has_method_signatures,
+                    ..
+                })
+                | Field::Implicit(ScalarField {
+                    has_method_signatures,
+                    ..
+                }) => Some(
+                    has_method_signatures
+                        .as_ref()
+                        .try_map(|is_try, signature| {
+                            let body = gen_has_method[is_try](f, is_try)?;
+                            Ok(parse2::<ImplItemFn>(quote! {
+                                #signature #body
+                            })?)
+                        })?,
+                ),
+                _ => None,
+            };
+            Ok(once(get_methods).chain(has_methods.into_iter()))
+        })
+        .flatten_ok()
+        .fold_ok(
+            TrySwitch::new(Vec::new(), Vec::new()),
+            |mut impls, methods| {
+                impls.apply(methods, |impls, method, _| {
+                    impls.push(method);
+                });
+                impls
+            },
+        )?
 }
