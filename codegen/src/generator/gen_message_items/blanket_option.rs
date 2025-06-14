@@ -18,7 +18,7 @@ use crate::generator::{CodeGeneratorOptions, TrySwitch};
 use ::culpa::throws;
 use ::quote::quote;
 use ::std::rc::Rc;
-use ::syn::{Block, Ident, Item, Path, Stmt, TypePath, parse::Parser, parse_str, parse2};
+use ::syn::{Block, Ident, Item, Path, TypePath, parse::Parser, parse_str, parse2};
 
 type Error = crate::ErrorKind;
 
