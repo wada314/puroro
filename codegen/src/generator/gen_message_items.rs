@@ -466,3 +466,87 @@ where
         .flat_map(ResultExt::transpose_iter)
         .collect::<Result<Vec<_>>>()?
 }
+
+/// Generates blanket implementations for both View and TryView traits.
+///
+/// This function takes generators for the function bodies and creates implementations
+/// for both View and TryView traits simultaneously. For each field, it generates
+/// getter methods and optional has-methods, maintaining the distinction between
+/// View and TryView semantics.
+///
+/// # Arguments
+///
+/// * `fields` - The field data structs to generate the blanket impls for.
+/// * `gen_getter` - A function to generate the getter method body block.
+/// * `gen_has_method` - A function to generate the has method body block.
+///
+/// # Returns
+///
+/// A TrySwitch containing vectors of ImplItemFn for both View and TryView traits.
+#[throws]
+fn view_trait_blanket_impl_helper2<'a>(
+    fields: impl Iterator<Item = &'a Field>,
+    gen_getter: Box<dyn Fn(&Field, bool) -> Result<Block>>,
+    gen_has_method: Box<dyn Fn(&Field, bool) -> Result<Block>>,
+) -> TrySwitch<Vec<ImplItemFn>> {
+    let mut view_impls = Vec::new();
+    let mut try_view_impls = Vec::new();
+
+    for f in fields {
+        // Generate View trait implementations
+        let view_get_method: ImplItemFn = {
+            let signature = f.trait_getter_signatures()[false].clone();
+            let body = gen_getter(f, false)?;
+            parse2(quote! {
+                #signature #body
+            })?
+        };
+        let view_has_method: Option<ImplItemFn> = match f {
+            Field::Explicit(ScalarField {
+                has_method_signatures,
+                ..
+            })
+            | Field::Implicit(ScalarField {
+                has_method_signatures,
+                ..
+            }) => {
+                let signature = has_method_signatures[false].clone();
+                let body = gen_has_method(f, false)?;
+                Some(parse2(quote! {
+                    #signature #body
+                })?)
+            }
+            _ => None,
+        };
+        view_impls.extend(once(view_get_method).chain(view_has_method.into_iter()));
+
+        // Generate TryView trait implementations
+        let try_view_get_method: ImplItemFn = {
+            let signature = f.trait_getter_signatures()[true].clone();
+            let body = gen_getter(f, true)?;
+            parse2(quote! {
+                #signature #body
+            })?
+        };
+        let try_view_has_method: Option<ImplItemFn> = match f {
+            Field::Explicit(ScalarField {
+                has_method_signatures,
+                ..
+            })
+            | Field::Implicit(ScalarField {
+                has_method_signatures,
+                ..
+            }) => {
+                let signature = has_method_signatures[true].clone();
+                let body = gen_has_method(f, true)?;
+                Some(parse2(quote! {
+                    #signature #body
+                })?)
+            }
+            _ => None,
+        };
+        try_view_impls.extend(once(try_view_get_method).chain(try_view_has_method.into_iter()));
+    }
+
+    TrySwitch::new(view_impls, try_view_impls)
+}
