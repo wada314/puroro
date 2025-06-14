@@ -486,8 +486,8 @@ where
 #[throws]
 fn view_trait_blanket_impl_helper2<'a>(
     fields: impl Iterator<Item = &'a Field>,
-    gen_getter: Box<dyn Fn(&Field, bool) -> Result<Block>>,
-    gen_has_method: Box<dyn Fn(&Field, bool) -> Result<Block>>,
+    gen_getter: TrySwitch<Box<dyn Fn(&Field, bool) -> Result<Block>>>,
+    gen_has_method: TrySwitch<Box<dyn Fn(&Field, bool) -> Result<Block>>>,
 ) -> TrySwitch<Vec<ImplItemFn>> {
     let mut view_impls = Vec::new();
     let mut try_view_impls = Vec::new();
