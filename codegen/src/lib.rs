@@ -56,3 +56,135 @@ pub fn compile_binary(input: impl AsRef<[u8]>) -> Result<Vec<u8>> {
     response.write(&mut output_buffer)?;
     Ok(output_buffer)
 }
+
+// ```protobuf
+// message Person {
+//     string name = 1;
+//     uint32 age = 2;
+//     repeated Person children = 3;
+// }
+// ```
+
+#[repr(transparent)]
+pub struct Person<T = PersonInner>(T);
+pub struct PersonInner {
+    name: String,
+    age: u32,
+    children: Vec<PersonInner>,
+}
+pub struct Field<T>(T, i32);
+
+pub trait ScalarStringField<const N: i32> {
+    fn get(&self) -> &str;
+}
+pub trait ScalarU32Field<const N: i32> {
+    fn get(&self) -> u32;
+}
+pub trait RepeatedMessageField<const N: i32> {
+    type Message;
+    fn get(&self) -> impl Iterator<Item = &Self::Message>;
+}
+
+impl ScalarStringField<1> for PersonInner {
+    fn get(&self) -> &str {
+        &self.name
+    }
+}
+impl ScalarU32Field<2> for PersonInner {
+    fn get(&self) -> u32 {
+        self.age
+    }
+}
+impl RepeatedMessageField<3> for PersonInner {
+    type Message = PersonInner;
+    fn get(&self) -> impl Iterator<Item = &Self::Message> {
+        self.children.iter()
+    }
+}
+
+impl<T, const N: i32> ScalarStringField<N> for &T
+where
+    T: ScalarStringField<N>,
+{
+    fn get(&self) -> &str {
+        <T as ScalarStringField<N>>::get(self)
+    }
+}
+
+impl<T, const N: i32> ScalarU32Field<N> for &T
+where
+    T: ScalarU32Field<N>,
+{
+    fn get(&self) -> u32 {
+        <T as ScalarU32Field<N>>::get(self)
+    }
+}
+
+impl<T, const N: i32> RepeatedMessageField<N> for &T
+where
+    T: RepeatedMessageField<N>,
+{
+    type Message = <T as RepeatedMessageField<N>>::Message;
+    fn get(&self) -> impl Iterator<Item = &Self::Message> {
+        <T as RepeatedMessageField<N>>::get(self)
+    }
+}
+
+pub trait PersonTrait: ScalarStringField<1> + ScalarU32Field<2> + RepeatedMessageField<3> {
+    fn name(&self) -> &str {
+        <Self as ScalarStringField<1>>::get(self)
+    }
+    fn age(&self) -> u32 {
+        <Self as ScalarU32Field<2>>::get(self)
+    }
+    fn children(&self) -> impl Iterator<Item = &<Self as RepeatedMessageField<3>>::Message> {
+        <Self as RepeatedMessageField<3>>::get(self)
+    }
+}
+impl<T> PersonTrait for T
+where
+    T: ScalarStringField<1>,
+    T: ScalarU32Field<2>,
+    T: RepeatedMessageField<3>,
+{
+}
+
+pub trait PersonTrait2: PersonTrait {
+    fn children2(&self) -> impl Iterator<Item = &impl PersonTrait2>;
+}
+impl PersonTrait2 for PersonInner {
+    fn children2(&self) -> impl Iterator<Item = &impl PersonTrait2> {
+        <Self as PersonTrait>::children(self)
+    }
+}
+impl<T: PersonTrait2> PersonTrait2 for &T {
+    fn children2(&self) -> impl Iterator<Item = &impl PersonTrait2> {
+        <T as PersonTrait2>::children2(self)
+    }
+}
+
+impl<T> Person<T>
+where
+    T: PersonTrait2,
+{
+    pub fn name(&self) -> &str {
+        self.0.name()
+    }
+    pub fn age(&self) -> u32 {
+        self.0.age()
+    }
+    pub fn children(&self) -> impl Iterator<Item = Person<impl PersonTrait2>> {
+        self.0.children2().map(|x| Person(x))
+    }
+}
+
+fn foo<T: PersonTrait2>(p: Person<T>) {
+    println!("{}", p.name());
+    println!("{}", p.age());
+    for child in p.children() {
+        println!("{}", child.name());
+        for grandchild in child.children() {
+            println!("{}", grandchild.name());
+        }
+    }
+}
