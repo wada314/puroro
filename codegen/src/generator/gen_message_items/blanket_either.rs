@@ -13,13 +13,13 @@
 // limitations under the License.
 
 use super::field::{Field, RepeatedField, ScalarField};
-use super::{ImplsGenerator, view_trait_blanket_impl_helper};
+use super::{ImplsGenerator, view_trait_blanket_impl_helper2};
 use crate::descriptor::FieldType;
 use crate::generator::{CodeGeneratorOptions, TrySwitch};
 use ::culpa::throws;
 use ::quote::quote;
 use ::std::rc::Rc;
-use ::syn::{Block, Expr, Ident, Item, Path, parse_str, parse2};
+use ::syn::{Block, Ident, Item, Path, parse::Parser, parse_str, parse2};
 
 type Error = crate::ErrorKind;
 
@@ -40,19 +40,14 @@ impl ImplsGenerator for GenBlanketEitherImpls {
         let view_trait_path = &trait_paths[false];
         let try_trait_path = &trait_paths[true];
 
-        let view_methods = view_trait_blanket_impl_helper(
+        let methods = view_trait_blanket_impl_helper2(
             fields.iter().copied(),
-            |f| self.gen_get_method_body(f, &t1, &t2, view_trait_path),
-            |f| self.gen_has_method_body(f, &t1, &t2, view_trait_path),
-            false,
+            |f, is_try| self.gen_get_method_body(f, &t1, &t2, &trait_paths[is_try], is_try),
+            |f, is_try| self.gen_has_method_body(f, &t1, &t2, &trait_paths[is_try], is_try),
         )?;
 
-        let try_methods = view_trait_blanket_impl_helper(
-            fields.iter().copied(),
-            |f| self.gen_try_get_method_body(f, &t1, &t2, try_trait_path),
-            |f| self.gen_try_has_method_body(f, &t1, &t2, try_trait_path),
-            true,
-        )?;
+        let view_methods = &methods[false];
+        let try_methods = &methods[true];
 
         vec![
             parse2(quote! {
@@ -81,27 +76,99 @@ impl GenBlanketEitherImpls {
         t1: &Ident,
         t2: &Ident,
         trait_path: &Path,
+        is_try: bool,
     ) -> Block {
-        let signature = field.trait_getter_signatures()[false].clone();
+        let signature = field.trait_getter_signatures()[is_try].clone();
         let getter_name = &signature.ident;
-        let map2_expr = quote! {
-            self.as_ref().map2(
-                <#t1 as #trait_path>::#getter_name,
-                <#t2 as #trait_path>::#getter_name
-            )
-        };
-        let expr = match field {
-            Field::Repeated(RepeatedField { scalar_proto_type: FieldType::Message(_), .. }) => {
-                quote! { #map2_expr.into_iter_either() }
+        let stmts = Block::parse_within.parse2(match (field, is_try) {
+            // Message repeated field with try
+            (
+                Field::Repeated(RepeatedField { scalar_proto_type: FieldType::Message(_), .. }),
+                true,
+            ) => {
+                let ok = self.options.ok_path();
+                quote! {
+                    #ok(self.as_ref().try_map2(
+                        <#t1 as #trait_path>::#getter_name,
+                        <#t2 as #trait_path>::#getter_name
+                    )?.into_iter_either().map(|either_res| either_res.factor_err()))
+                }
             }
-            Field::Repeated(RepeatedField { .. }) => quote! { #map2_expr.into_iter_chained() },
-            Field::Explicit(ScalarField { scalar_proto_type: FieldType::Message(_), .. })
-            | Field::Implicit(ScalarField { scalar_proto_type: FieldType::Message(_), .. }) => {
-                quote! { #map2_expr.factor_none() }
+            // Message repeated field without try
+            (
+                Field::Repeated(RepeatedField { scalar_proto_type: FieldType::Message(_), .. }),
+                false,
+            ) => {
+                quote! {
+                    self.as_ref().map2(
+                        <#t1 as #trait_path>::#getter_name,
+                        <#t2 as #trait_path>::#getter_name
+                    ).into_iter_either()
+                }
             }
-            _ => quote! { #map2_expr.into_inner() },
-        };
-        parse2(quote! {{ #expr }})?
+            // Non-message repeated field with try
+            (Field::Repeated(RepeatedField { .. }), true) => {
+                let ok = self.options.ok_path();
+                quote! {
+                    #ok(self.as_ref().try_map2(
+                        <#t1 as #trait_path>::#getter_name,
+                        <#t2 as #trait_path>::#getter_name
+                    )?.into_iter_chained())
+                }
+            }
+            // Non-message repeated field without try
+            (Field::Repeated(RepeatedField { .. }), false) => quote! {
+                self.as_ref().map2(
+                    <#t1 as #trait_path>::#getter_name,
+                    <#t2 as #trait_path>::#getter_name
+                ).into_iter_chained()
+            },
+            // Message scalar field with try
+            (
+                Field::Explicit(ScalarField { scalar_proto_type: FieldType::Message(_), .. })
+                | Field::Implicit(ScalarField { scalar_proto_type: FieldType::Message(_), .. }),
+                true,
+            ) => {
+                let ok = self.options.ok_path();
+                quote! {
+                    #ok(self.as_ref().try_map2(
+                        <#t1 as #trait_path>::#getter_name,
+                        <#t2 as #trait_path>::#getter_name
+                    )?.factor_none())
+                }
+            }
+            // Message scalar field without try
+            (
+                Field::Explicit(ScalarField { scalar_proto_type: FieldType::Message(_), .. })
+                | Field::Implicit(ScalarField { scalar_proto_type: FieldType::Message(_), .. }),
+                false,
+            ) => {
+                quote! {
+                    self.as_ref().map2(
+                        <#t1 as #trait_path>::#getter_name,
+                        <#t2 as #trait_path>::#getter_name
+                    ).factor_none()
+                }
+            }
+            // Non-message scalar field with try
+            (_, true) => {
+                let ok = self.options.ok_path();
+                quote! {
+                    #ok(self.as_ref().try_map2(
+                        <#t1 as #trait_path>::#getter_name,
+                        <#t2 as #trait_path>::#getter_name
+                    )?.into_inner())
+                }
+            }
+            // Non-message scalar field without try
+            (_, false) => quote! {
+                self.as_ref().map2(
+                    <#t1 as #trait_path>::#getter_name,
+                    <#t2 as #trait_path>::#getter_name
+                ).into_inner()
+            },
+        })?;
+        Block { stmts, brace_token: Default::default() }
     }
 
     #[throws]
@@ -111,88 +178,30 @@ impl GenBlanketEitherImpls {
         t1: &Ident,
         t2: &Ident,
         trait_path: &Path,
+        is_try: bool,
     ) -> Block {
-        let has_name = match field {
-            Field::Implicit(ScalarField { has_method_signatures, .. })
-            | Field::Explicit(ScalarField { has_method_signatures, .. }) => {
-                &has_method_signatures[false].ident
-            }
-            _ => Err("this method is not supported for repeated fields".to_string())?,
+        let (Field::Implicit(ScalarField { has_method_signatures, .. })
+        | Field::Explicit(ScalarField { has_method_signatures, .. })) = field
+        else {
+            Err("this method is not supported for repeated fields".to_string())?
         };
-        parse2(quote! {{
-            self.as_ref().map2(
-                <#t1 as #trait_path>::#has_name,
-                <#t2 as #trait_path>::#has_name
-            ).into_inner()
-        }})?
-    }
-
-    #[throws]
-    fn gen_try_get_method_body(
-        &self,
-        field: &Field,
-        t1: &Ident,
-        t2: &Ident,
-        trait_path: &Path,
-    ) -> Block {
-        let signature = field.trait_getter_signatures()[true].clone();
-        let try_getter_name = &signature.ident;
-        let mapped_either: Expr = parse2(quote! {
-            self.as_ref().try_map2(
-                <#t1 as #trait_path>::#try_getter_name,
-                <#t2 as #trait_path>::#try_getter_name)?
-        })?;
-        let expr = self.options.ok_value(
-            &parse2::<Expr>(match field {
-                Field::Repeated(RepeatedField {
-                    scalar_proto_type: FieldType::Message(_), ..
-                }) => quote! {
-                    #mapped_either.into_iter_either().map(|either_res| either_res.factor_err())
-                },
-                Field::Repeated(RepeatedField { .. }) => quote! {
-                    #mapped_either.into_iter_chained()
-                },
-                Field::Explicit(ScalarField {
-                    scalar_proto_type: FieldType::Message(_), ..
-                })
-                | Field::Implicit(ScalarField {
-                    scalar_proto_type: FieldType::Message(_), ..
-                }) => quote! {
-                    #mapped_either.factor_none()
-                },
-                _ => quote! {
-                    #mapped_either.into_inner()
-                },
-            })
-            .unwrap_or_else(|e| panic!("parse2 failed: {}", e)),
-        );
-        parse2(quote! {
-            { #expr }
-        })?
-    }
-
-    #[throws]
-    fn gen_try_has_method_body(
-        &self,
-        field: &Field,
-        t1: &Ident,
-        t2: &Ident,
-        trait_path: &Path,
-    ) -> Block {
-        let try_has_name = match field {
-            Field::Implicit(ScalarField { has_method_signatures, .. })
-            | Field::Explicit(ScalarField { has_method_signatures, .. }) => {
-                &has_method_signatures[true].ident
+        let has_name = &has_method_signatures[is_try].ident;
+        let stmts = Block::parse_within.parse2(if is_try {
+            let ok = self.options.ok_path();
+            quote! {
+                #ok(self.as_ref().try_map2(
+                    <#t1 as #trait_path>::#has_name,
+                    <#t2 as #trait_path>::#has_name
+                )?.into_inner())
             }
-            _ => Err("this method is not supported for repeated fields".to_string())?,
-        };
-        let expr: Expr = parse2(quote! {
-            self.as_ref().try_map2(
-                <#t1 as #trait_path>::#try_has_name,
-                <#t2 as #trait_path>::#try_has_name
-            )?.into_inner()
+        } else {
+            quote! {
+                self.as_ref().map2(
+                    <#t1 as #trait_path>::#has_name,
+                    <#t2 as #trait_path>::#has_name
+                ).into_inner()
+            }
         })?;
-        let result_expr = self.options.ok_value(&expr);
-        parse2(quote! { { #result_expr } })?
+        Block { stmts, brace_token: Default::default() }
     }
 }
