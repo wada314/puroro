@@ -488,11 +488,15 @@ where
 ///
 /// A TrySwitch containing vectors of ImplItemFn for both View and TryView traits.
 #[throws]
-fn view_trait_blanket_impl_helper2<'a>(
+fn view_trait_blanket_impl_helper2<'a, F, G>(
     fields: impl Iterator<Item = &'a Field>,
-    gen_getter: Box<dyn Fn(&Field, bool) -> Result<Block> + 'a>,
-    gen_has_method: Box<dyn Fn(&Field, bool) -> Result<Block> + 'a>,
-) -> TrySwitch<Vec<ImplItemFn>> {
+    gen_getter: F,
+    gen_has_method: G,
+) -> TrySwitch<Vec<ImplItemFn>>
+where
+    F: Fn(&Field, bool) -> Result<Block>,
+    G: Fn(&Field, bool) -> Result<Block>,
+{
     fields
         .map(|f| -> Result<_> {
             let get_methods =
