@@ -408,6 +408,22 @@ trait ImplsGenerator {
     ) -> Vec<Item>;
 }
 
+/// A helper function to generate blanket impls for view traits.
+///
+/// Essentially, this function takes a generator for the function body,
+/// then invokes it for each field, and appends the function signatures for each.
+///
+/// # Arguments
+///
+/// * `fields` - The field data structs to generate the blanket impls for.
+/// * `gen_getter` - A function to generate the getter method body block.
+/// * `gen_has_method` - A function to generate the has method body block.
+/// * `is_try_trait` - Whether the trait is a `TryView` trait or not (View trait otherwise).
+///
+/// # Returns
+///
+/// A vector of ImplItemFn; i.e. the methods in the impl block.
+
 #[throws]
 fn view_trait_blanket_impl_helper<'a, F, G>(
     fields: impl Iterator<Item = &'a Field>,
