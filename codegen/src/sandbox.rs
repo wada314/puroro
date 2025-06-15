@@ -82,16 +82,26 @@
 //!
 //! ## Solution: `MessageViewRegistry`
 //!
-//! To solve the recursive trait implementation problem, we introduce the `MessageViewRegistry` trait.
-//! The `MessageViewRegistry` trait acts as a type-level registry that maps each message type to its corresponding
-//! implementation of the `View` trait. This allows us to break the circular dependency by:
+//! To solve the recursive trait implementation problem, we introduce a hierarchy of registry traits.
+//! These traits act as type-level registries that map message types to their corresponding
+//! implementations of the `View` trait. This allows us to break the circular dependency by:
 //!
-//! 1. Having each message type implement `DescendantViewRegistry` to specify which `MessageViewRegistry` it belongs to.
-//!    The `DescendantViewRegistry` trait only needs to specify the view implementations for message types
-//!    that can appear as its descendants. For example, message `B`'s descendants are `B`, `C`, and `D`,
-//!    so its implementation only needs to know about these types, not about `A`.
-//! 2. Using the `MessageViewRegistry` to look up the correct implementation type for each field
-//! 3. Implementing the `View` traits using blanket implementations that reference the `MessageViewRegistry`
+//! 1. Having each message type implement `DescendantViewRegistry` to specify which registry it belongs to.
+//!    The `DescendantViewRegistry` trait only needs to specify the registry type, without any bounds.
+//!    The actual bounds for the registry type are specified at the point of use in each `View` trait
+//!    implementation. This allows for more granular control over which registry traits are required
+//!    for each message type.
+//!
+//! 2. Using a hierarchy of registry traits to minimize the knowledge each message type needs:
+//!    * `DViewRegistry`: Contains only the `D` type's view implementation
+//!    * `BCDViewRegistry`: Contains `B`, `C`, and `D` type's view implementations, inheriting from `DViewRegistry`
+//!    * `MessageViewRegistry`: Contains all view implementations, inheriting from `BCDViewRegistry`
+//!
+//! 3. Implementing the `View` traits using blanket implementations that reference the appropriate
+//!    registry trait based on the message type's needs. For example:
+//!    * `DView` implementation only requires `DViewRegistry`
+//!    * `CView` implementation requires both `BCDViewRegistry` and `DViewRegistry`
+//!    * `BView` and `AView` implementations require `BCDViewRegistry`
 //!
 //! This approach has several benefits:
 //! * It allows us to have multiple implementations of the same message type (e.g., `A` and `A2`)
@@ -99,28 +109,39 @@
 //! * It avoids the need for explicit trait bounds in the generated code
 //! * It provides a clear way to handle recursive message types
 //! * It minimizes the knowledge each message type needs about other message types in the system
+//! * It allows for more precise control over which registry traits are required for each message type
 //!
-//! The `MessageViewRegistry` pattern is particularly useful for protobuf code generation because:
+//! The registry trait hierarchy is particularly useful for protobuf code generation because:
 //! * It allows us to generate code that works with both concrete and generic message types
 //! * It provides a way to handle message inheritance and extension fields
 //! * It makes it easier to implement features like lazy loading and dynamic message types
+//! * It enables more efficient code generation by only including necessary view implementations
 //!
 
+#[derive(Default, Debug)]
 pub struct A {
     pub b: Box<B>,
 }
+#[derive(Default, Debug)]
 pub struct B {
     pub c: Box<C>,
 }
+#[derive(Default, Debug)]
 pub struct C {
-    pub b: Box<B>,
+    pub b: Option<Box<B>>,
     pub d: Box<D>,
 }
+#[derive(Default, Debug)]
 pub struct D {
-    pub d: Box<D>,
+    pub d: Option<Box<D>>,
 }
+#[derive(Default, Debug)]
 pub struct A2 {
     pub b: Box<B>,
+}
+#[derive(Default, Debug)]
+pub struct D2 {
+    pub d: Option<Box<D2>>,
 }
 
 pub trait AView {
@@ -157,7 +178,7 @@ impl MsgFieldGetter<1> for B {
 impl MsgFieldGetter<1> for C {
     type Message = B;
     fn get(&self) -> &B {
-        &self.b
+        self.b.as_ref().unwrap()
     }
 }
 impl MsgFieldGetter<2> for C {
@@ -169,7 +190,7 @@ impl MsgFieldGetter<2> for C {
 impl MsgFieldGetter<1> for D {
     type Message = D;
     fn get(&self) -> &D {
-        &self.d
+        self.d.as_ref().unwrap()
     }
 }
 
@@ -180,9 +201,28 @@ impl MsgFieldGetter<1> for A2 {
     }
 }
 
-fn foo(a: A, b: B, c: C, d: D, a2: A2) {
+impl MsgFieldGetter<1> for D2 {
+    type Message = D2;
+    fn get(&self) -> &D2 {
+        self.d.as_ref().unwrap()
+    }
+}
+
+#[test]
+fn foo() {
+    let a = A::default();
+    let b = B::default();
+    let c = C::default();
+    let d = D::default();
+    let a2 = A2::default();
+    let d2 = D2::default();
+
     let _ = <B as BView>::c(&b);
-    let _ = <D as DView>::d(&d);
+    let b2 = <A2 as AView>::b(&a2);
+    let c2 = BView::c(b2);
+    let d2_from_a2 = CView::d(c2);
+    use ::std::any::type_name_of_val;
+    assert_ne!(type_name_of_val(&d2_from_a2), type_name_of_val(&d2));
 }
 
 pub trait DViewRegistry {
@@ -216,7 +256,7 @@ impl MessageViewRegistry for SomeImplSet {
 pub struct SomeImpl2;
 
 impl DViewRegistry for SomeImpl2 {
-    type D = D;
+    type D = D2;
 }
 
 impl BCDViewRegistry for SomeImpl2 {
@@ -249,6 +289,10 @@ impl DescendantViewRegistry for D {
 }
 
 impl DescendantViewRegistry for A2 {
+    type Set = SomeImpl2;
+}
+
+impl DescendantViewRegistry for D2 {
     type Set = SomeImpl2;
 }
 
