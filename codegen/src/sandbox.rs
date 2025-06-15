@@ -246,6 +246,12 @@ impl MessageViewRegistry for SomeImplSet {
     type A = A;
 }
 
+pub struct SomeImplSet2;
+
+impl DViewRegistry for SomeImplSet2 {
+    type D = D2;
+}
+
 trait RegistryComparer {
     type Combined;
 }
@@ -284,6 +290,10 @@ impl Message for C {
 
 impl Message for D {
     type Registry = SomeImplSet;
+}
+
+impl Message for D2 {
+    type Registry = SomeImplSet2;
 }
 
 impl<T> AView for T
