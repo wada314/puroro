@@ -145,66 +145,66 @@ pub struct D2 {
 }
 
 pub trait AView {
-    fn b(&self) -> &impl BView;
+    fn b(&self) -> Option<&impl BView>;
 }
 pub trait BView {
-    fn c(&self) -> &impl CView;
+    fn c(&self) -> Option<&impl CView>;
 }
 pub trait CView {
-    fn b(&self) -> &impl BView;
-    fn d(&self) -> &impl DView;
+    fn b(&self) -> Option<&impl BView>;
+    fn d(&self) -> Option<&impl DView>;
 }
 pub trait DView {
-    fn d(&self) -> &impl DView;
+    fn d(&self) -> Option<&impl DView>;
 }
 
 pub trait MsgFieldGetter<const N: i32> {
     type Message;
-    fn get(&self) -> &Self::Message;
+    fn get(&self) -> Option<&Self::Message>;
 }
 
 impl MsgFieldGetter<1> for A {
     type Message = B;
-    fn get(&self) -> &B {
-        &self.b
+    fn get(&self) -> Option<&B> {
+        Some(&self.b)
     }
 }
 impl MsgFieldGetter<1> for B {
     type Message = C;
-    fn get(&self) -> &C {
-        &self.c
+    fn get(&self) -> Option<&C> {
+        Some(&self.c)
     }
 }
 impl MsgFieldGetter<1> for C {
     type Message = B;
-    fn get(&self) -> &B {
-        self.b.as_ref().unwrap()
+    fn get(&self) -> Option<&B> {
+        self.b.as_deref()
     }
 }
 impl MsgFieldGetter<2> for C {
     type Message = D;
-    fn get(&self) -> &D {
-        &self.d
+    fn get(&self) -> Option<&D> {
+        Some(&self.d)
     }
 }
 impl MsgFieldGetter<1> for D {
     type Message = D;
-    fn get(&self) -> &D {
-        self.d.as_ref().unwrap()
+    fn get(&self) -> Option<&D> {
+        self.d.as_deref()
     }
 }
 
 impl MsgFieldGetter<1> for A2 {
     type Message = B;
-    fn get(&self) -> &B {
-        &self.b
+    fn get(&self) -> Option<&B> {
+        Some(&self.b)
     }
 }
 
 impl MsgFieldGetter<1> for D2 {
     type Message = D2;
-    fn get(&self) -> &D2 {
-        self.d.as_ref().unwrap()
+    fn get(&self) -> Option<&D2> {
+        self.d.as_deref()
     }
 }
 
@@ -218,9 +218,9 @@ fn foo() {
     let d2 = D2::default();
 
     let _ = <B as BView>::c(&b);
-    let b2 = <A2 as AView>::b(&a2);
-    let c2 = BView::c(b2);
-    let d2_from_a2 = CView::d(c2);
+    let b2 = <A2 as AView>::b(&a2).unwrap();
+    let c2 = BView::c(b2).unwrap();
+    let d2_from_a2 = CView::d(c2).unwrap();
     use ::std::any::type_name_of_val;
     assert_ne!(type_name_of_val(&d2_from_a2), type_name_of_val(&d2));
 }
@@ -302,7 +302,7 @@ where
     T: MsgFieldGetter<1, Message = <<T as DescendantViewRegistry>::Set as BCDViewRegistry>::B>,
     <T as DescendantViewRegistry>::Set: BCDViewRegistry,
 {
-    fn b(&self) -> &impl BView {
+    fn b(&self) -> Option<&impl BView> {
         self.get()
     }
 }
@@ -313,7 +313,7 @@ where
     T: MsgFieldGetter<1, Message = <<T as DescendantViewRegistry>::Set as BCDViewRegistry>::C>,
     <T as DescendantViewRegistry>::Set: BCDViewRegistry,
 {
-    fn c(&self) -> &impl CView {
+    fn c(&self) -> Option<&impl CView> {
         self.get()
     }
 }
@@ -325,10 +325,10 @@ where
     T: MsgFieldGetter<2, Message = <<T as DescendantViewRegistry>::Set as DViewRegistry>::D>,
     <T as DescendantViewRegistry>::Set: BCDViewRegistry + DViewRegistry,
 {
-    fn b(&self) -> &impl BView {
+    fn b(&self) -> Option<&impl BView> {
         <T as MsgFieldGetter<1>>::get(self)
     }
-    fn d(&self) -> &impl DView {
+    fn d(&self) -> Option<&impl DView> {
         <T as MsgFieldGetter<2>>::get(self)
     }
 }
@@ -339,7 +339,7 @@ where
     T: MsgFieldGetter<1, Message = <<T as DescendantViewRegistry>::Set as DViewRegistry>::D>,
     <T as DescendantViewRegistry>::Set: DViewRegistry,
 {
-    fn d(&self) -> &impl DView {
+    fn d(&self) -> Option<&impl DView> {
         <T as MsgFieldGetter<1>>::get(self)
     }
 }
