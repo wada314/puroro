@@ -226,16 +226,16 @@ fn foo() {
 }
 
 pub trait DViewRegistry {
-    type D: DView;
+    type D: Message + DView;
 }
 
 pub trait BCDViewRegistry: DViewRegistry {
-    type B: BView;
-    type C: CView;
+    type B: Message + BView;
+    type C: Message + CView;
 }
 
 pub trait MessageViewRegistry: BCDViewRegistry {
-    type A: AView;
+    type A: Message + AView;
 }
 
 pub struct SomeImplSet;
@@ -305,9 +305,6 @@ where
             B = <<T as Message>::Registry as BCDViewRegistry>::B,
             C = <<T as Message>::Registry as BCDViewRegistry>::C,
         > + DViewRegistry<D = <<T as Message>::Registry as DViewRegistry>::D>,
-    <<T as Message>::Registry as BCDViewRegistry>::B: Message,
-    <<T as Message>::Registry as BCDViewRegistry>::C: Message,
-    <<T as Message>::Registry as DViewRegistry>::D: Message,
 {
     fn b(&self) -> Option<&impl BView> {
         self.get()
@@ -323,9 +320,6 @@ where
             B = <<T as Message>::Registry as BCDViewRegistry>::B,
             C = <<T as Message>::Registry as BCDViewRegistry>::C,
         > + DViewRegistry<D = <<T as Message>::Registry as DViewRegistry>::D>,
-    <<T as Message>::Registry as BCDViewRegistry>::B: Message,
-    <<T as Message>::Registry as BCDViewRegistry>::C: Message,
-    <<T as Message>::Registry as DViewRegistry>::D: Message,
 {
     fn c(&self) -> Option<&impl CView> {
         self.get()
@@ -342,9 +336,6 @@ where
             B = <<T as Message>::Registry as BCDViewRegistry>::B,
             C = <<T as Message>::Registry as BCDViewRegistry>::C,
         > + DViewRegistry<D = <<T as Message>::Registry as DViewRegistry>::D>,
-    <<T as Message>::Registry as BCDViewRegistry>::B: Message,
-    <<T as Message>::Registry as BCDViewRegistry>::C: Message,
-    <<T as Message>::Registry as DViewRegistry>::D: Message,
 {
     fn b(&self) -> Option<&impl BView> {
         <T as MsgFieldGetter<1>>::get(self)
@@ -361,7 +352,6 @@ where
     <T as Message>::Registry: DViewRegistry,
     <<T as MsgFieldGetter<1>>::Message as Message>::Registry:
         DViewRegistry<D = <<T as Message>::Registry as DViewRegistry>::D>,
-    <<T as Message>::Registry as DViewRegistry>::D: Message,
 {
     fn d(&self) -> Option<&impl DView> {
         <T as MsgFieldGetter<1>>::get(self)
