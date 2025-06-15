@@ -131,6 +131,9 @@ pub struct C {
 pub struct D {
     pub d: Box<D>,
 }
+pub struct A2 {
+    pub b: Box<B>,
+}
 
 pub trait AView {
     fn b(&self) -> &impl BView;
@@ -182,10 +185,75 @@ impl MsgFieldGetter<1> for D {
     }
 }
 
+impl MsgFieldGetter<1> for A2 {
+    type Message = B;
+    fn get(&self) -> &B {
+        &self.b
+    }
+}
+
+fn foo(a: A, b: B, c: C, d: D, a2: A2) {
+    let _ = <B as BView>::c(&b);
+    let _ = <D as DView>::d(&d);
+}
+
+pub trait EquivA: EquivBC {
+    type A: AView;
+}
+pub trait EquivBC: EquivD {
+    type B: BView;
+    type C: CView;
+}
+pub trait EquivD {
+    type D: DView;
+}
+
+pub struct SomeImpl;
+
+impl EquivA for SomeImpl {
+    type A = A;
+}
+impl EquivBC for SomeImpl {
+    type B = B;
+    type C = C;
+}
+impl EquivD for SomeImpl {
+    type D = D;
+}
+
+pub struct SomeImpl2;
+impl EquivA for SomeImpl2 {
+    type A = A2;
+}
+impl EquivBC for SomeImpl2 {
+    type B = B;
+    type C = C;
+}
+impl EquivD for SomeImpl2 {
+    type D = D;
+}
+
+pub trait Equiv {
+    type Equiv;
+}
+impl Equiv for A {
+    type Equiv = SomeImpl;
+}
+impl Equiv for B {
+    type Equiv = SomeImpl;
+}
+impl Equiv for C {
+    type Equiv = SomeImpl;
+}
+impl Equiv for D {
+    type Equiv = SomeImpl;
+}
+
 impl<T> AView for T
 where
-    T: MsgFieldGetter<1>,
-    <T as MsgFieldGetter<1>>::Message: BView,
+    T: Equiv,
+    <T as Equiv>::Equiv: EquivBC,
+    T: MsgFieldGetter<1, Message = <<T as Equiv>::Equiv as EquivBC>::B>,
 {
     fn b(&self) -> &impl BView {
         self.get()
@@ -193,8 +261,9 @@ where
 }
 impl<T> BView for T
 where
-    T: MsgFieldGetter<1>,
-    <T as MsgFieldGetter<1>>::Message: CView,
+    T: Equiv,
+    <T as Equiv>::Equiv: EquivBC,
+    T: MsgFieldGetter<1, Message = <<T as Equiv>::Equiv as EquivBC>::C>,
 {
     fn c(&self) -> &impl CView {
         self.get()
@@ -202,10 +271,10 @@ where
 }
 impl<T> CView for T
 where
-    T: MsgFieldGetter<1>,
-    <T as MsgFieldGetter<1>>::Message: BView,
-    T: MsgFieldGetter<2>,
-    <T as MsgFieldGetter<2>>::Message: DView,
+    T: Equiv,
+    <T as Equiv>::Equiv: EquivBC + EquivD,
+    T: MsgFieldGetter<1, Message = <<T as Equiv>::Equiv as EquivBC>::B>,
+    T: MsgFieldGetter<2, Message = <<T as Equiv>::Equiv as EquivD>::D>,
 {
     fn b(&self) -> &impl BView {
         <T as MsgFieldGetter<1>>::get(self)
@@ -216,14 +285,53 @@ where
 }
 impl<T> DView for T
 where
-    T: MsgFieldGetter<1>,
-    <T as MsgFieldGetter<1>>::Message: DView,
+    T: Equiv,
+    <T as Equiv>::Equiv: EquivD,
+    T: MsgFieldGetter<1, Message = <<T as Equiv>::Equiv as EquivD>::D>,
 {
     fn d(&self) -> &impl DView {
-        self.get()
+        <T as MsgFieldGetter<1>>::get(self)
     }
 }
 
-fn foo(a: A, b: B, c: C, d: D) {
-    let _ = <B as BView>::c(&b);
-}
+// impl<T> AView for T
+// where
+//     T: MsgFieldGetter<1>,
+//     <T as MsgFieldGetter<1>>::Message: BView,
+// {
+//     fn b(&self) -> &impl BView {
+//         self.get()
+//     }
+// }
+// impl<T> BView for T
+// where
+//     T: MsgFieldGetter<1>,
+//     <T as MsgFieldGetter<1>>::Message: CView,
+// {
+//     fn c(&self) -> &impl CView {
+//         self.get()
+//     }
+// }
+// impl<T> CView for T
+// where
+//     T: MsgFieldGetter<1>,
+//     <T as MsgFieldGetter<1>>::Message: BView,
+//     T: MsgFieldGetter<2>,
+//     <T as MsgFieldGetter<2>>::Message: DView,
+// {
+//     fn b(&self) -> &impl BView {
+//         <T as MsgFieldGetter<1>>::get(self)
+//     }
+//     fn d(&self) -> &impl DView {
+//         <T as MsgFieldGetter<2>>::get(self)
+//     }
+// }
+// impl<T> DView for T
+// where
+//     T: MsgFieldGetter<1>,
+//     <T as MsgFieldGetter<1>>::Message: DView,
+// {
+//     fn d(&self) -> &impl DView {
+//         self.get()
+//     }
+// }
