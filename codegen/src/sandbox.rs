@@ -256,7 +256,7 @@ impl MessageViewRegistry for SomeImplSet {
 pub struct SomeImpl2;
 
 impl DViewRegistry for SomeImpl2 {
-    type D = D2;
+    type D = D;
 }
 
 impl BCDViewRegistry for SomeImpl2 {
