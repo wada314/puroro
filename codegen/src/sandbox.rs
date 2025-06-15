@@ -117,6 +117,25 @@
 //! * It makes it easier to implement features like lazy loading and dynamic message types
 //! * It enables more efficient code generation by only including necessary view implementations
 //!
+//! ## Registry Type Consistency
+//!
+//! To ensure type safety across the registry hierarchy, we introduce the `RegistryComparer` trait
+//! and its implementations. This mechanism allows us to verify that related message types use
+//! consistent registry implementations at compile time.
+//!
+//! The `RegistryComparer` trait hierarchy:
+//! * `DRegistryComparer`: Compares registry types for `D` message types
+//! * `BCDRegistryComparer`: Compares registry types for `B`, `C`, and `D` message types
+//! * `MessageRegistryComparer`: Compares registry types for all message types
+//!
+//! This comparison mechanism ensures that:
+//! * Parent and child message types use the same registry implementation
+//! * Inconsistent registry types are detected at compile time
+//! * Type safety is maintained across the entire message hierarchy
+//!
+//! For example, if a message type `A` uses `SomeImplSet` as its registry, all its child message types
+//! (`B`, `C`, `D`) must also use `SomeImplSet`. The `RegistryComparer` trait implementations
+//! enforce this constraint at compile time.
 
 #[derive(Default, Debug)]
 pub struct A {
