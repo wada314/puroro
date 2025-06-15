@@ -301,6 +301,13 @@ where
     T: DescendantViewRegistry,
     T: MsgFieldGetter<1, Message = <<T as DescendantViewRegistry>::Set as BCDViewRegistry>::B>,
     <T as DescendantViewRegistry>::Set: BCDViewRegistry,
+    <<T as MsgFieldGetter<1>>::Message as DescendantViewRegistry>::Set: BCDViewRegistry<
+            B = <<T as DescendantViewRegistry>::Set as BCDViewRegistry>::B,
+            C = <<T as DescendantViewRegistry>::Set as BCDViewRegistry>::C,
+        > + DViewRegistry<D = <<T as DescendantViewRegistry>::Set as DViewRegistry>::D>,
+    <<T as DescendantViewRegistry>::Set as BCDViewRegistry>::B: DescendantViewRegistry,
+    <<T as DescendantViewRegistry>::Set as BCDViewRegistry>::C: DescendantViewRegistry,
+    <<T as DescendantViewRegistry>::Set as DViewRegistry>::D: DescendantViewRegistry,
 {
     fn b(&self) -> Option<&impl BView> {
         self.get()
@@ -312,6 +319,13 @@ where
     T: DescendantViewRegistry,
     T: MsgFieldGetter<1, Message = <<T as DescendantViewRegistry>::Set as BCDViewRegistry>::C>,
     <T as DescendantViewRegistry>::Set: BCDViewRegistry,
+    <<T as MsgFieldGetter<1>>::Message as DescendantViewRegistry>::Set: BCDViewRegistry<
+            B = <<T as DescendantViewRegistry>::Set as BCDViewRegistry>::B,
+            C = <<T as DescendantViewRegistry>::Set as BCDViewRegistry>::C,
+        > + DViewRegistry<D = <<T as DescendantViewRegistry>::Set as DViewRegistry>::D>,
+    <<T as DescendantViewRegistry>::Set as BCDViewRegistry>::B: DescendantViewRegistry,
+    <<T as DescendantViewRegistry>::Set as BCDViewRegistry>::C: DescendantViewRegistry,
+    <<T as DescendantViewRegistry>::Set as DViewRegistry>::D: DescendantViewRegistry,
 {
     fn c(&self) -> Option<&impl CView> {
         self.get()
@@ -324,6 +338,13 @@ where
     T: MsgFieldGetter<1, Message = <<T as DescendantViewRegistry>::Set as BCDViewRegistry>::B>,
     T: MsgFieldGetter<2, Message = <<T as DescendantViewRegistry>::Set as DViewRegistry>::D>,
     <T as DescendantViewRegistry>::Set: BCDViewRegistry + DViewRegistry,
+    <<T as MsgFieldGetter<1>>::Message as DescendantViewRegistry>::Set: BCDViewRegistry<
+            B = <<T as DescendantViewRegistry>::Set as BCDViewRegistry>::B,
+            C = <<T as DescendantViewRegistry>::Set as BCDViewRegistry>::C,
+        > + DViewRegistry<D = <<T as DescendantViewRegistry>::Set as DViewRegistry>::D>,
+    <<T as DescendantViewRegistry>::Set as BCDViewRegistry>::B: DescendantViewRegistry,
+    <<T as DescendantViewRegistry>::Set as BCDViewRegistry>::C: DescendantViewRegistry,
+    <<T as DescendantViewRegistry>::Set as DViewRegistry>::D: DescendantViewRegistry,
 {
     fn b(&self) -> Option<&impl BView> {
         <T as MsgFieldGetter<1>>::get(self)
@@ -338,6 +359,9 @@ where
     T: DescendantViewRegistry,
     T: MsgFieldGetter<1, Message = <<T as DescendantViewRegistry>::Set as DViewRegistry>::D>,
     <T as DescendantViewRegistry>::Set: DViewRegistry,
+    <<T as MsgFieldGetter<1>>::Message as DescendantViewRegistry>::Set:
+        DViewRegistry<D = <<T as DescendantViewRegistry>::Set as DViewRegistry>::D>,
+    <<T as DescendantViewRegistry>::Set as DViewRegistry>::D: DescendantViewRegistry,
 {
     fn d(&self) -> Option<&impl DView> {
         <T as MsgFieldGetter<1>>::get(self)
