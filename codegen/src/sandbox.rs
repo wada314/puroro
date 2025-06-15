@@ -80,18 +80,18 @@
 //! Thus, we need the `Person` rust type to implement the`PersonView` trait
 //! to make the `Person` type to implement the `PersonView` trait!
 //!
-//! ## Solution: `ImplSet`
+//! ## Solution: `MessageViewRegistry`
 //!
-//! To solve the recursive trait implementation problem, we introduce the `ImplSet` trait.
-//! The `ImplSet` trait acts as a type-level registry that maps each message type to its corresponding
+//! To solve the recursive trait implementation problem, we introduce the `MessageViewRegistry` trait.
+//! The `MessageViewRegistry` trait acts as a type-level registry that maps each message type to its corresponding
 //! implementation of the `View` trait. This allows us to break the circular dependency by:
 //!
-//! 1. Having each message type implement `DescendImplSet` to specify which `ImplSet` it belongs to.
-//!    The `DescendImplSet` trait only needs to specify the view implementations for message types
+//! 1. Having each message type implement `DescendantViewRegistry` to specify which `MessageViewRegistry` it belongs to.
+//!    The `DescendantViewRegistry` trait only needs to specify the view implementations for message types
 //!    that can appear as its descendants. For example, message `B`'s descendants are `B`, `C`, and `D`,
 //!    so its implementation only needs to know about these types, not about `A`.
-//! 2. Using the `ImplSet` to look up the correct implementation type for each field
-//! 3. Implementing the `View` traits using blanket implementations that reference the `ImplSet`
+//! 2. Using the `MessageViewRegistry` to look up the correct implementation type for each field
+//! 3. Implementing the `View` traits using blanket implementations that reference the `MessageViewRegistry`
 //!
 //! This approach has several benefits:
 //! * It allows us to have multiple implementations of the same message type (e.g., `A` and `A2`)
@@ -100,7 +100,7 @@
 //! * It provides a clear way to handle recursive message types
 //! * It minimizes the knowledge each message type needs about other message types in the system
 //!
-//! The `ImplSet` pattern is particularly useful for protobuf code generation because:
+//! The `MessageViewRegistry` pattern is particularly useful for protobuf code generation because:
 //! * It allows us to generate code that works with both concrete and generic message types
 //! * It provides a way to handle message inheritance and extension fields
 //! * It makes it easier to implement features like lazy loading and dynamic message types
@@ -185,7 +185,7 @@ fn foo(a: A, b: B, c: C, d: D, a2: A2) {
     let _ = <D as DView>::d(&d);
 }
 
-pub trait ImplSet {
+pub trait MessageViewRegistry {
     type A: AView;
     type B: BView;
     type C: CView;
@@ -194,7 +194,7 @@ pub trait ImplSet {
 
 pub struct SomeImplSet;
 
-impl ImplSet for SomeImplSet {
+impl MessageViewRegistry for SomeImplSet {
     type A = A;
     type B = B;
     type C = C;
@@ -202,36 +202,36 @@ impl ImplSet for SomeImplSet {
 }
 
 pub struct SomeImpl2;
-impl ImplSet for SomeImpl2 {
+impl MessageViewRegistry for SomeImpl2 {
     type A = A2;
     type B = B;
     type C = C;
     type D = D;
 }
 
-pub trait DescendImplSet {
-    type Set: ImplSet;
+pub trait DescendantViewRegistry {
+    type Set: MessageViewRegistry;
 }
-impl DescendImplSet for A {
+impl DescendantViewRegistry for A {
     type Set = SomeImplSet;
 }
-impl DescendImplSet for B {
+impl DescendantViewRegistry for B {
     type Set = SomeImplSet;
 }
-impl DescendImplSet for C {
+impl DescendantViewRegistry for C {
     type Set = SomeImplSet;
 }
-impl DescendImplSet for D {
+impl DescendantViewRegistry for D {
     type Set = SomeImplSet;
 }
-impl DescendImplSet for A2 {
+impl DescendantViewRegistry for A2 {
     type Set = SomeImpl2;
 }
 
 impl<T> AView for T
 where
-    T: DescendImplSet,
-    T: MsgFieldGetter<1, Message = <<T as DescendImplSet>::Set as ImplSet>::B>,
+    T: DescendantViewRegistry,
+    T: MsgFieldGetter<1, Message = <<T as DescendantViewRegistry>::Set as MessageViewRegistry>::B>,
 {
     fn b(&self) -> &impl BView {
         self.get()
@@ -239,8 +239,8 @@ where
 }
 impl<T> BView for T
 where
-    T: DescendImplSet,
-    T: MsgFieldGetter<1, Message = <<T as DescendImplSet>::Set as ImplSet>::C>,
+    T: DescendantViewRegistry,
+    T: MsgFieldGetter<1, Message = <<T as DescendantViewRegistry>::Set as MessageViewRegistry>::C>,
 {
     fn c(&self) -> &impl CView {
         self.get()
@@ -248,9 +248,9 @@ where
 }
 impl<T> CView for T
 where
-    T: DescendImplSet,
-    T: MsgFieldGetter<1, Message = <<T as DescendImplSet>::Set as ImplSet>::B>,
-    T: MsgFieldGetter<2, Message = <<T as DescendImplSet>::Set as ImplSet>::D>,
+    T: DescendantViewRegistry,
+    T: MsgFieldGetter<1, Message = <<T as DescendantViewRegistry>::Set as MessageViewRegistry>::B>,
+    T: MsgFieldGetter<2, Message = <<T as DescendantViewRegistry>::Set as MessageViewRegistry>::D>,
 {
     fn b(&self) -> &impl BView {
         <T as MsgFieldGetter<1>>::get(self)
@@ -261,8 +261,8 @@ where
 }
 impl<T> DView for T
 where
-    T: DescendImplSet,
-    T: MsgFieldGetter<1, Message = <<T as DescendImplSet>::Set as ImplSet>::D>,
+    T: DescendantViewRegistry,
+    T: MsgFieldGetter<1, Message = <<T as DescendantViewRegistry>::Set as MessageViewRegistry>::D>,
 {
     fn d(&self) -> &impl DView {
         <T as MsgFieldGetter<1>>::get(self)
