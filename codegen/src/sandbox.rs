@@ -80,42 +80,30 @@
 //! Thus, we need the `Person` rust type to implement the`PersonView` trait
 //! to make the `Person` type to implement the `PersonView` trait!
 //!
-//! ### An `同値類` of the message type
+//! ## Solution: `ImplSet`
 //!
-//! To solve the recursive definition problem, we use the idea of the `同値類`.
-//! ある一群のproto message typeが与えられたとき、それらの間の同値 (operator ~)・subset・superset関係を次のように定義する：
+//! To solve the recursive trait implementation problem, we introduce the `ImplSet` trait.
+//! The `ImplSet` trait acts as a type-level registry that maps each message type to its corresponding
+//! implementation of the `View` trait. This allows us to break the circular dependency by:
 //!
-//! For a pair of proto message `A` and `B`,
-//!   * if `A` and `B` can be a (maybe indirect) child message of each other,
-//!     then we say that `A` and `B` are equivalent.
-//!   * if `A` can be a child message of `B`, but `B` can not be a child message of `A`,
-//!     then we say that `A` is a superset of `B`, and `B` is a subset of `A`.
+//! 1. Having each message type implement `DescendImplSet` to specify which `ImplSet` it belongs to.
+//!    The `DescendImplSet` trait only needs to specify the view implementations for message types
+//!    that can appear as its descendants. For example, message `B`'s descendants are `B`, `C`, and `D`,
+//!    so its implementation only needs to know about these types, not about `A`.
+//! 2. Using the `ImplSet` to look up the correct implementation type for each field
+//! 3. Implementing the `View` traits using blanket implementations that reference the `ImplSet`
 //!
-//! この同値関係を用いて、商集合 _S/~_ と、その要素である同値類 _Si_ を定義できる。
-//! つまり、_Si_ は proto message typeの集合でもある。
+//! This approach has several benefits:
+//! * It allows us to have multiple implementations of the same message type (e.g., `A` and `A2`)
+//! * It makes the trait implementations more modular and easier to maintain
+//! * It avoids the need for explicit trait bounds in the generated code
+//! * It provides a clear way to handle recursive message types
+//! * It minimizes the knowledge each message type needs about other message types in the system
 //!
-//! 例として、次のようなprotobuf messagesがあるとする。
-//!
-//! ```protobuf
-//! message A {
-//!   B b = 1;
-//! }
-//! mesasge B {
-//!   C c = 1;
-//! }
-//! message C {
-//!   B b = 1;
-//!   D d = 2;
-//! }
-//! message D {
-//!   D d = 1;
-//! }
-//! ```
-//!
-//!
-//! このとき、BとCは互いが互いの子であるから、同値である。 つまり、BとCは同じ同値類に属する。
-//! 最終的に、このケースでは3つの同値類、{A}, {B, C}, {D} が定義される。
-//!
+//! The `ImplSet` pattern is particularly useful for protobuf code generation because:
+//! * It allows us to generate code that works with both concrete and generic message types
+//! * It provides a way to handle message inheritance and extension fields
+//! * It makes it easier to implement features like lazy loading and dynamic message types
 //!
 
 pub struct A {
@@ -197,63 +185,53 @@ fn foo(a: A, b: B, c: C, d: D, a2: A2) {
     let _ = <D as DView>::d(&d);
 }
 
-pub trait EquivA: EquivBC {
+pub trait ImplSet {
     type A: AView;
-}
-pub trait EquivBC: EquivD {
     type B: BView;
     type C: CView;
-}
-pub trait EquivD {
     type D: DView;
 }
 
-pub struct SomeImpl;
+pub struct SomeImplSet;
 
-impl EquivA for SomeImpl {
+impl ImplSet for SomeImplSet {
     type A = A;
-}
-impl EquivBC for SomeImpl {
     type B = B;
     type C = C;
-}
-impl EquivD for SomeImpl {
     type D = D;
 }
 
 pub struct SomeImpl2;
-impl EquivA for SomeImpl2 {
+impl ImplSet for SomeImpl2 {
     type A = A2;
-}
-impl EquivBC for SomeImpl2 {
     type B = B;
     type C = C;
-}
-impl EquivD for SomeImpl2 {
     type D = D;
 }
 
-pub trait Equiv {
-    type Equiv;
+pub trait DescendImplSet {
+    type Set: ImplSet;
 }
-impl Equiv for A {
-    type Equiv = SomeImpl;
+impl DescendImplSet for A {
+    type Set = SomeImplSet;
 }
-impl Equiv for B {
-    type Equiv = SomeImpl;
+impl DescendImplSet for B {
+    type Set = SomeImplSet;
 }
-impl Equiv for C {
-    type Equiv = SomeImpl;
+impl DescendImplSet for C {
+    type Set = SomeImplSet;
 }
-impl Equiv for D {
-    type Equiv = SomeImpl;
+impl DescendImplSet for D {
+    type Set = SomeImplSet;
+}
+impl DescendImplSet for A2 {
+    type Set = SomeImpl2;
 }
 
 impl<T> AView for T
 where
-    T: Equiv,
-    <T as Equiv>::Equiv: EquivBC,
-    T: MsgFieldGetter<1, Message = <<T as Equiv>::Equiv as EquivBC>::B>,
+    T: DescendImplSet,
+    T: MsgFieldGetter<1, Message = <<T as DescendImplSet>::Set as ImplSet>::B>,
 {
     fn b(&self) -> &impl BView {
         self.get()
@@ -261,9 +239,8 @@ where
 }
 impl<T> BView for T
 where
-    T: Equiv,
-    <T as Equiv>::Equiv: EquivBC,
-    T: MsgFieldGetter<1, Message = <<T as Equiv>::Equiv as EquivBC>::C>,
+    T: DescendImplSet,
+    T: MsgFieldGetter<1, Message = <<T as DescendImplSet>::Set as ImplSet>::C>,
 {
     fn c(&self) -> &impl CView {
         self.get()
@@ -271,10 +248,9 @@ where
 }
 impl<T> CView for T
 where
-    T: Equiv,
-    <T as Equiv>::Equiv: EquivBC + EquivD,
-    T: MsgFieldGetter<1, Message = <<T as Equiv>::Equiv as EquivBC>::B>,
-    T: MsgFieldGetter<2, Message = <<T as Equiv>::Equiv as EquivD>::D>,
+    T: DescendImplSet,
+    T: MsgFieldGetter<1, Message = <<T as DescendImplSet>::Set as ImplSet>::B>,
+    T: MsgFieldGetter<2, Message = <<T as DescendImplSet>::Set as ImplSet>::D>,
 {
     fn b(&self) -> &impl BView {
         <T as MsgFieldGetter<1>>::get(self)
@@ -285,53 +261,10 @@ where
 }
 impl<T> DView for T
 where
-    T: Equiv,
-    <T as Equiv>::Equiv: EquivD,
-    T: MsgFieldGetter<1, Message = <<T as Equiv>::Equiv as EquivD>::D>,
+    T: DescendImplSet,
+    T: MsgFieldGetter<1, Message = <<T as DescendImplSet>::Set as ImplSet>::D>,
 {
     fn d(&self) -> &impl DView {
         <T as MsgFieldGetter<1>>::get(self)
     }
 }
-
-// impl<T> AView for T
-// where
-//     T: MsgFieldGetter<1>,
-//     <T as MsgFieldGetter<1>>::Message: BView,
-// {
-//     fn b(&self) -> &impl BView {
-//         self.get()
-//     }
-// }
-// impl<T> BView for T
-// where
-//     T: MsgFieldGetter<1>,
-//     <T as MsgFieldGetter<1>>::Message: CView,
-// {
-//     fn c(&self) -> &impl CView {
-//         self.get()
-//     }
-// }
-// impl<T> CView for T
-// where
-//     T: MsgFieldGetter<1>,
-//     <T as MsgFieldGetter<1>>::Message: BView,
-//     T: MsgFieldGetter<2>,
-//     <T as MsgFieldGetter<2>>::Message: DView,
-// {
-//     fn b(&self) -> &impl BView {
-//         <T as MsgFieldGetter<1>>::get(self)
-//     }
-//     fn d(&self) -> &impl DView {
-//         <T as MsgFieldGetter<2>>::get(self)
-//     }
-// }
-// impl<T> DView for T
-// where
-//     T: MsgFieldGetter<1>,
-//     <T as MsgFieldGetter<1>>::Message: DView,
-// {
-//     fn d(&self) -> &impl DView {
-//         self.get()
-//     }
-// }
