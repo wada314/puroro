@@ -80,125 +80,150 @@
 //! Thus, we need the `Person` rust type to implement the`PersonView` trait
 //! to make the `Person` type to implement the `PersonView` trait!
 //!
-//! ### An `商集合` of the message type
+//! ### An `同値類` of the message type
 //!
-//! To solve the recursive definition problem, we define an `商集合` idea.
-//! An `商集合` is a group of the proto message types. Technically,
+//! To solve the recursive definition problem, we use the idea of the `同値類`.
+//! ある一群のproto message typeが与えられたとき、それらの間の同値 (operator ~)・subset・superset関係を次のように定義する：
 //!
 //! For a pair of proto message `A` and `B`,
 //!   * if `A` and `B` can be a (maybe indirect) child message of each other,
-//!     then we say that `A` and `B` are in the same `商集合`.
+//!     then we say that `A` and `B` are equivalent.
 //!   * if `A` can be a child message of `B`, but `B` can not be a child message of `A`,
 //!     then we say that `A` is a superset of `B`, and `B` is a subset of `A`.
 //!
+//! この同値関係を用いて、商集合 _S/~_ と、その要素である同値類 _Si_ を定義できる。
+//! つまり、_Si_ は proto message typeの集合でもある。
+//!
+//! 例として、次のようなprotobuf messagesがあるとする。
+//!
+//! ```protobuf
+//! message A {
+//!   B b = 1;
+//! }
+//! mesasge B {
+//!   C c = 1;
+//! }
+//! message C {
+//!   B b = 1;
+//!   D d = 2;
+//! }
+//! message D {
+//!   D d = 1;
+//! }
+//! ```
+//!
+//!
+//! このとき、BとCは互いが互いの子であるから、同値である。 つまり、BとCは同じ同値類に属する。
+//! 最終的に、このケースでは3つの同値類、{A}, {B, C}, {D} が定義される。
+//!
+//!
 
-#[repr(transparent)]
-pub struct Person<T = PersonInner>(T);
-pub struct PersonInner {
-    name: String,
-    age: u32,
-    children: Vec<PersonInner>,
+pub struct A {
+    pub b: Box<B>,
+}
+pub struct B {
+    pub c: Box<C>,
+}
+pub struct C {
+    pub b: Box<B>,
+    pub d: Box<D>,
+}
+pub struct D {
+    pub d: Box<D>,
 }
 
-pub trait ScalarStringField<const N: i32> {
-    fn get(&self) -> &str;
+pub trait AView {
+    fn b(&self) -> &impl BView;
 }
-pub trait ScalarU32Field<const N: i32> {
-    fn get(&self) -> u32;
+pub trait BView {
+    fn c(&self) -> &impl CView;
 }
-pub trait RepeatedMessageField<const N: i32> {
+pub trait CView {
+    fn b(&self) -> &impl BView;
+    fn d(&self) -> &impl DView;
+}
+pub trait DView {
+    fn d(&self) -> &impl DView;
+}
+
+pub trait MsgFieldGetter<const N: i32> {
     type Message;
-    fn get(&self) -> impl Iterator<Item = &Self::Message>;
+    fn get(&self) -> &Self::Message;
 }
 
-impl ScalarStringField<1> for PersonInner {
-    fn get(&self) -> &str {
-        &self.name
+impl MsgFieldGetter<1> for A {
+    type Message = B;
+    fn get(&self) -> &B {
+        &self.b
     }
 }
-impl ScalarU32Field<2> for PersonInner {
-    fn get(&self) -> u32 {
-        self.age
+impl MsgFieldGetter<1> for B {
+    type Message = C;
+    fn get(&self) -> &C {
+        &self.c
     }
 }
-impl RepeatedMessageField<3> for PersonInner {
-    type Message = PersonInner;
-    fn get(&self) -> impl Iterator<Item = &Self::Message> {
-        self.children.iter()
+impl MsgFieldGetter<1> for C {
+    type Message = B;
+    fn get(&self) -> &B {
+        &self.b
+    }
+}
+impl MsgFieldGetter<2> for C {
+    type Message = D;
+    fn get(&self) -> &D {
+        &self.d
+    }
+}
+impl MsgFieldGetter<1> for D {
+    type Message = D;
+    fn get(&self) -> &D {
+        &self.d
     }
 }
 
-impl<T, const N: i32> ScalarStringField<N> for &T
+impl<T> AView for T
 where
-    T: ScalarStringField<N>,
+    T: MsgFieldGetter<1>,
+    <T as MsgFieldGetter<1>>::Message: BView,
 {
-    fn get(&self) -> &str {
-        <T as ScalarStringField<N>>::get(self)
+    fn b(&self) -> &impl BView {
+        self.get()
     }
 }
-
-impl<T, const N: i32> ScalarU32Field<N> for &T
+impl<T> BView for T
 where
-    T: ScalarU32Field<N>,
+    T: MsgFieldGetter<1>,
+    <T as MsgFieldGetter<1>>::Message: CView,
 {
-    fn get(&self) -> u32 {
-        <T as ScalarU32Field<N>>::get(self)
+    fn c(&self) -> &impl CView {
+        self.get()
     }
 }
-
-impl<T, const N: i32> RepeatedMessageField<N> for &T
+impl<T> CView for T
 where
-    T: RepeatedMessageField<N>,
+    T: MsgFieldGetter<1>,
+    <T as MsgFieldGetter<1>>::Message: BView,
+    T: MsgFieldGetter<2>,
+    <T as MsgFieldGetter<2>>::Message: DView,
 {
-    type Message = <T as RepeatedMessageField<N>>::Message;
-    fn get(&self) -> impl Iterator<Item = &Self::Message> {
-        <T as RepeatedMessageField<N>>::get(self)
+    fn b(&self) -> &impl BView {
+        <T as MsgFieldGetter<1>>::get(self)
+    }
+    fn d(&self) -> &impl DView {
+        <T as MsgFieldGetter<2>>::get(self)
     }
 }
-
-pub trait PersonTrait: ScalarStringField<1> + ScalarU32Field<2> + RepeatedMessageField<3> {
-    fn name(&self) -> &str {
-        <Self as ScalarStringField<1>>::get(self)
-    }
-    fn age(&self) -> u32 {
-        <Self as ScalarU32Field<2>>::get(self)
-    }
-    fn children(&self) -> impl Iterator<Item = impl PersonTrait>;
-}
-
-impl PersonTrait for PersonInner {
-    fn children(&self) -> impl Iterator<Item = impl PersonTrait> {
-        <Self as RepeatedMessageField<3>>::get(self)
-    }
-}
-impl<T: PersonTrait> PersonTrait for &T {
-    fn children(&self) -> impl Iterator<Item = impl PersonTrait> {
-        <T as PersonTrait>::children(self)
-    }
-}
-
-impl<T> Person<T>
+impl<T> DView for T
 where
-    T: PersonTrait,
+    T: MsgFieldGetter<1>,
+    <T as MsgFieldGetter<1>>::Message: DView,
 {
-    pub fn name(&self) -> &str {
-        self.0.name()
-    }
-    pub fn age(&self) -> u32 {
-        self.0.age()
-    }
-    pub fn children(&self) -> impl Iterator<Item = Person<impl PersonTrait>> {
-        self.0.children().map(|x| Person(x))
+    fn d(&self) -> &impl DView {
+        self.get()
     }
 }
 
-fn foo<T: PersonTrait>(p: Person<T>) {
-    println!("{}", p.name());
-    println!("{}", p.age());
-    for child in p.children() {
-        println!("{}", child.name());
-        for grandchild in child.children() {
-            println!("{}", grandchild.name());
-        }
-    }
+fn foo(a: A, b: B, c: C, d: D) {
+    let _ = <B as BView>::c(&b);
 }
