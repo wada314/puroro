@@ -268,6 +268,26 @@ impl MessageViewRegistry for SomeImpl2 {
     type A = A2;
 }
 
+trait RegistryComparer {
+    type Combined;
+}
+pub struct DRegistryComparer<R: DViewRegistry>(::std::marker::PhantomData<R>);
+impl<R: DViewRegistry> RegistryComparer for DRegistryComparer<R> {
+    type Combined = (R::D,);
+}
+pub struct BCDRegistryComparer<R: BCDViewRegistry>(::std::marker::PhantomData<R>);
+impl<R: BCDViewRegistry> RegistryComparer for BCDRegistryComparer<R> {
+    type Combined = (
+        R::B,
+        R::C,
+        <DRegistryComparer<R> as RegistryComparer>::Combined,
+    );
+}
+pub struct MessageRegistryComparer<R: MessageViewRegistry>(::std::marker::PhantomData<R>);
+impl<R: MessageViewRegistry> RegistryComparer for MessageRegistryComparer<R> {
+    type Combined = (R::A, <BCDRegistryComparer<R> as RegistryComparer>::Combined);
+}
+
 pub trait Message {
     type Registry;
 }
@@ -301,10 +321,13 @@ where
     T: Message,
     T: MsgFieldGetter<1, Message = <<T as Message>::Registry as BCDViewRegistry>::B>,
     <T as Message>::Registry: BCDViewRegistry,
-    <<T as MsgFieldGetter<1>>::Message as Message>::Registry: BCDViewRegistry<
-            B = <<T as Message>::Registry as BCDViewRegistry>::B,
-            C = <<T as Message>::Registry as BCDViewRegistry>::C,
-        > + DViewRegistry<D = <<T as Message>::Registry as DViewRegistry>::D>,
+    <<T as MsgFieldGetter<1>>::Message as Message>::Registry: BCDViewRegistry,
+    BCDRegistryComparer<<T as Message>::Registry>:
+        RegistryComparer<
+            Combined = <BCDRegistryComparer<
+                <<T as MsgFieldGetter<1>>::Message as Message>::Registry,
+            > as RegistryComparer>::Combined,
+        >,
 {
     fn b(&self) -> Option<&impl BView> {
         self.get()
@@ -316,10 +339,13 @@ where
     T: Message,
     T: MsgFieldGetter<1, Message = <<T as Message>::Registry as BCDViewRegistry>::C>,
     <T as Message>::Registry: BCDViewRegistry,
-    <<T as MsgFieldGetter<1>>::Message as Message>::Registry: BCDViewRegistry<
-            B = <<T as Message>::Registry as BCDViewRegistry>::B,
-            C = <<T as Message>::Registry as BCDViewRegistry>::C,
-        > + DViewRegistry<D = <<T as Message>::Registry as DViewRegistry>::D>,
+    <<T as MsgFieldGetter<1>>::Message as Message>::Registry: BCDViewRegistry,
+    BCDRegistryComparer<<T as Message>::Registry>:
+        RegistryComparer<
+            Combined = <BCDRegistryComparer<
+                <<T as MsgFieldGetter<1>>::Message as Message>::Registry,
+            > as RegistryComparer>::Combined,
+        >,
 {
     fn c(&self) -> Option<&impl CView> {
         self.get()
@@ -332,10 +358,14 @@ where
     T: MsgFieldGetter<1, Message = <<T as Message>::Registry as BCDViewRegistry>::B>,
     T: MsgFieldGetter<2, Message = <<T as Message>::Registry as DViewRegistry>::D>,
     <T as Message>::Registry: BCDViewRegistry + DViewRegistry,
-    <<T as MsgFieldGetter<1>>::Message as Message>::Registry: BCDViewRegistry<
-            B = <<T as Message>::Registry as BCDViewRegistry>::B,
-            C = <<T as Message>::Registry as BCDViewRegistry>::C,
-        > + DViewRegistry<D = <<T as Message>::Registry as DViewRegistry>::D>,
+    <<T as MsgFieldGetter<1>>::Message as Message>::Registry: BCDViewRegistry,
+    <<T as MsgFieldGetter<2>>::Message as Message>::Registry: DViewRegistry,
+    BCDRegistryComparer<<T as Message>::Registry>: RegistryComparer<
+        Combined = <BCDRegistryComparer<<<T as MsgFieldGetter<1>>::Message as Message>::Registry> as RegistryComparer>::Combined,
+    >,
+    DRegistryComparer<<T as Message>::Registry>: RegistryComparer<
+        Combined = <DRegistryComparer<<<T as MsgFieldGetter<2>>::Message as Message>::Registry> as RegistryComparer>::Combined,
+    >,
 {
     fn b(&self) -> Option<&impl BView> {
         <T as MsgFieldGetter<1>>::get(self)
@@ -350,8 +380,10 @@ where
     T: Message,
     T: MsgFieldGetter<1, Message = <<T as Message>::Registry as DViewRegistry>::D>,
     <T as Message>::Registry: DViewRegistry,
-    <<T as MsgFieldGetter<1>>::Message as Message>::Registry:
-        DViewRegistry<D = <<T as Message>::Registry as DViewRegistry>::D>,
+    <<T as MsgFieldGetter<1>>::Message as Message>::Registry: DViewRegistry,
+    DRegistryComparer<<T as Message>::Registry>: RegistryComparer<
+        Combined = <DRegistryComparer<<<T as MsgFieldGetter<1>>::Message as Message>::Registry> as RegistryComparer>::Combined,
+    >,
 {
     fn d(&self) -> Option<&impl DView> {
         <T as MsgFieldGetter<1>>::get(self)
