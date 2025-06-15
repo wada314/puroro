@@ -268,46 +268,46 @@ impl MessageViewRegistry for SomeImpl2 {
     type A = A2;
 }
 
-pub trait DescendantViewRegistry {
-    type Set;
+pub trait Message {
+    type Registry;
 }
 
-impl DescendantViewRegistry for A {
-    type Set = SomeImplSet;
+impl Message for A {
+    type Registry = SomeImplSet;
 }
 
-impl DescendantViewRegistry for B {
-    type Set = SomeImplSet;
+impl Message for B {
+    type Registry = SomeImplSet;
 }
 
-impl DescendantViewRegistry for C {
-    type Set = SomeImplSet;
+impl Message for C {
+    type Registry = SomeImplSet;
 }
 
-impl DescendantViewRegistry for D {
-    type Set = SomeImplSet;
+impl Message for D {
+    type Registry = SomeImplSet;
 }
 
-impl DescendantViewRegistry for A2 {
-    type Set = SomeImpl2;
+impl Message for A2 {
+    type Registry = SomeImpl2;
 }
 
-impl DescendantViewRegistry for D2 {
-    type Set = SomeImpl2;
+impl Message for D2 {
+    type Registry = SomeImpl2;
 }
 
 impl<T> AView for T
 where
-    T: DescendantViewRegistry,
-    T: MsgFieldGetter<1, Message = <<T as DescendantViewRegistry>::Set as BCDViewRegistry>::B>,
-    <T as DescendantViewRegistry>::Set: BCDViewRegistry,
-    <<T as MsgFieldGetter<1>>::Message as DescendantViewRegistry>::Set: BCDViewRegistry<
-            B = <<T as DescendantViewRegistry>::Set as BCDViewRegistry>::B,
-            C = <<T as DescendantViewRegistry>::Set as BCDViewRegistry>::C,
-        > + DViewRegistry<D = <<T as DescendantViewRegistry>::Set as DViewRegistry>::D>,
-    <<T as DescendantViewRegistry>::Set as BCDViewRegistry>::B: DescendantViewRegistry,
-    <<T as DescendantViewRegistry>::Set as BCDViewRegistry>::C: DescendantViewRegistry,
-    <<T as DescendantViewRegistry>::Set as DViewRegistry>::D: DescendantViewRegistry,
+    T: Message,
+    T: MsgFieldGetter<1, Message = <<T as Message>::Registry as BCDViewRegistry>::B>,
+    <T as Message>::Registry: BCDViewRegistry,
+    <<T as MsgFieldGetter<1>>::Message as Message>::Registry: BCDViewRegistry<
+            B = <<T as Message>::Registry as BCDViewRegistry>::B,
+            C = <<T as Message>::Registry as BCDViewRegistry>::C,
+        > + DViewRegistry<D = <<T as Message>::Registry as DViewRegistry>::D>,
+    <<T as Message>::Registry as BCDViewRegistry>::B: Message,
+    <<T as Message>::Registry as BCDViewRegistry>::C: Message,
+    <<T as Message>::Registry as DViewRegistry>::D: Message,
 {
     fn b(&self) -> Option<&impl BView> {
         self.get()
@@ -316,16 +316,16 @@ where
 
 impl<T> BView for T
 where
-    T: DescendantViewRegistry,
-    T: MsgFieldGetter<1, Message = <<T as DescendantViewRegistry>::Set as BCDViewRegistry>::C>,
-    <T as DescendantViewRegistry>::Set: BCDViewRegistry,
-    <<T as MsgFieldGetter<1>>::Message as DescendantViewRegistry>::Set: BCDViewRegistry<
-            B = <<T as DescendantViewRegistry>::Set as BCDViewRegistry>::B,
-            C = <<T as DescendantViewRegistry>::Set as BCDViewRegistry>::C,
-        > + DViewRegistry<D = <<T as DescendantViewRegistry>::Set as DViewRegistry>::D>,
-    <<T as DescendantViewRegistry>::Set as BCDViewRegistry>::B: DescendantViewRegistry,
-    <<T as DescendantViewRegistry>::Set as BCDViewRegistry>::C: DescendantViewRegistry,
-    <<T as DescendantViewRegistry>::Set as DViewRegistry>::D: DescendantViewRegistry,
+    T: Message,
+    T: MsgFieldGetter<1, Message = <<T as Message>::Registry as BCDViewRegistry>::C>,
+    <T as Message>::Registry: BCDViewRegistry,
+    <<T as MsgFieldGetter<1>>::Message as Message>::Registry: BCDViewRegistry<
+            B = <<T as Message>::Registry as BCDViewRegistry>::B,
+            C = <<T as Message>::Registry as BCDViewRegistry>::C,
+        > + DViewRegistry<D = <<T as Message>::Registry as DViewRegistry>::D>,
+    <<T as Message>::Registry as BCDViewRegistry>::B: Message,
+    <<T as Message>::Registry as BCDViewRegistry>::C: Message,
+    <<T as Message>::Registry as DViewRegistry>::D: Message,
 {
     fn c(&self) -> Option<&impl CView> {
         self.get()
@@ -334,17 +334,17 @@ where
 
 impl<T> CView for T
 where
-    T: DescendantViewRegistry,
-    T: MsgFieldGetter<1, Message = <<T as DescendantViewRegistry>::Set as BCDViewRegistry>::B>,
-    T: MsgFieldGetter<2, Message = <<T as DescendantViewRegistry>::Set as DViewRegistry>::D>,
-    <T as DescendantViewRegistry>::Set: BCDViewRegistry + DViewRegistry,
-    <<T as MsgFieldGetter<1>>::Message as DescendantViewRegistry>::Set: BCDViewRegistry<
-            B = <<T as DescendantViewRegistry>::Set as BCDViewRegistry>::B,
-            C = <<T as DescendantViewRegistry>::Set as BCDViewRegistry>::C,
-        > + DViewRegistry<D = <<T as DescendantViewRegistry>::Set as DViewRegistry>::D>,
-    <<T as DescendantViewRegistry>::Set as BCDViewRegistry>::B: DescendantViewRegistry,
-    <<T as DescendantViewRegistry>::Set as BCDViewRegistry>::C: DescendantViewRegistry,
-    <<T as DescendantViewRegistry>::Set as DViewRegistry>::D: DescendantViewRegistry,
+    T: Message,
+    T: MsgFieldGetter<1, Message = <<T as Message>::Registry as BCDViewRegistry>::B>,
+    T: MsgFieldGetter<2, Message = <<T as Message>::Registry as DViewRegistry>::D>,
+    <T as Message>::Registry: BCDViewRegistry + DViewRegistry,
+    <<T as MsgFieldGetter<1>>::Message as Message>::Registry: BCDViewRegistry<
+            B = <<T as Message>::Registry as BCDViewRegistry>::B,
+            C = <<T as Message>::Registry as BCDViewRegistry>::C,
+        > + DViewRegistry<D = <<T as Message>::Registry as DViewRegistry>::D>,
+    <<T as Message>::Registry as BCDViewRegistry>::B: Message,
+    <<T as Message>::Registry as BCDViewRegistry>::C: Message,
+    <<T as Message>::Registry as DViewRegistry>::D: Message,
 {
     fn b(&self) -> Option<&impl BView> {
         <T as MsgFieldGetter<1>>::get(self)
@@ -356,12 +356,12 @@ where
 
 impl<T> DView for T
 where
-    T: DescendantViewRegistry,
-    T: MsgFieldGetter<1, Message = <<T as DescendantViewRegistry>::Set as DViewRegistry>::D>,
-    <T as DescendantViewRegistry>::Set: DViewRegistry,
-    <<T as MsgFieldGetter<1>>::Message as DescendantViewRegistry>::Set:
-        DViewRegistry<D = <<T as DescendantViewRegistry>::Set as DViewRegistry>::D>,
-    <<T as DescendantViewRegistry>::Set as DViewRegistry>::D: DescendantViewRegistry,
+    T: Message,
+    T: MsgFieldGetter<1, Message = <<T as Message>::Registry as DViewRegistry>::D>,
+    <T as Message>::Registry: DViewRegistry,
+    <<T as MsgFieldGetter<1>>::Message as Message>::Registry:
+        DViewRegistry<D = <<T as Message>::Registry as DViewRegistry>::D>,
+    <<T as Message>::Registry as DViewRegistry>::D: Message,
 {
     fn d(&self) -> Option<&impl DView> {
         <T as MsgFieldGetter<1>>::get(self)
