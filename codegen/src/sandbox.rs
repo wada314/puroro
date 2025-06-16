@@ -139,30 +139,105 @@
 //!
 //! ## Message Type Grouping
 //!
-//! The registry traits are organized based on the cyclic reference patterns in the message types.
-//! This grouping is determined by the following rules:
+//! Assuming the following message ownership graph (parent ──► child):
 //!
-//! 1. **Equivalence Class Definition**
-//!    - Two message types belong to the same equivalence class if:
-//!      * They are part of the same cyclic reference (e.g., `B` ↔ `C` or `E` → `F` → `G` → `E`)
-//!      * A self-referential type (like `D`) can join another cyclic reference group if it's part of that cycle
-//!    - Message types that are not part of any cyclic reference form their own single-item equivalence classes
+//! ```ascii
+//! [A] ────► [B] ────► [C] ────► [D] ────┐
+//!            ▲         │         ▲      │
+//!            │         │         │      │
+//!            └─────────┘         └──────┘
 //!
-//! 2. **Quotient Set Construction**
-//!    - The set of message types is partitioned into equivalence classes
-//!    - Each equivalence class corresponds to a registry trait
-//!    - Examples:
-//!      * `{A}` → A single registry (not part of any cyclic reference)
-//!      * `{B, C}` → `BCDViewRegistry` (cyclic reference group)
-//!      * `{D}` → `DViewRegistry` (self-referential, not part of other cycles)
-//!      * `{E, F, G}` → A new registry (cyclic reference group)
-//!      * `{H}` → A single registry (not part of any cyclic reference)
+//! [E] ────► [F] ────► [G] ────┐
+//!  ▲                          │
+//!  └──────────────────────────┘
+//! ```
+//!
+//! The registry traits are organized based on the message type dependencies. This organization
+//! is determined by the following rules:
+//!
+//! 1. **Message Type Dependencies**
+//!    - Due to our implementation design, when implementing a message type, we need to know the
+//!      concrete types of all message types that are reachable from it through any chain of references.
+//!    - Let's call this list of the message concrete types as a registry.
+//!    - Each message type can have only one implementation in a single registry.
+//!    - For example:
+//!      * To implement `A`, we need to know the concrete types of `B`, `C`, and `D`
+//!        (because `A → B → C → D`)
+//!      * To implement `B`, we need to know the concrete types of `B`, `C`, and `D`
+//!        (because `B → C → D`)
+//!      * To implement `D`, we only need to know the concrete type of `D`
+//!        (because it only references itself)
+//!
+//!    - This dependency affects how we can organize registries into subgroups:
+//!      * Case 1: We can share registry subgroups
+//!        ```
+//!        Complete Registry Type: {A, B, C, D}
+//!        Registry Instance 1: {A1, B1, C1, D1}
+//!        Registry Instance 2: {A2, B1, C1, D1}
+//!        ```
+//!        Here, we can share the registry subgroup instances because they have the same implementation types
+//!        for all message types in their respective registry types. For example, we can cut out `B`, `C`, and `D`
+//!        as a separate subgroup instance `{B1, C1, D1}` because they all have the same implementation types.
+//!        This `BCD` subgroup can be shared between registry instances since they share the same implementations.
+//!
+//!      * Case 2: We cannot share registry subgroups
+//!        ```
+//!        Complete Registry Type: {A, B, C, D}
+//!        Registry Instance 1: {A1, B1, C1, D1}
+//!        Registry Instance 2: {A2, B1, C1, D2}
+//!        ```
+//!        Here, we cannot share the registry subgroup instances because they have different implementation types
+//!        for some message types in their respective registry types. For example, we cannot cut out `B`, `C`, and `D`
+//!        as a separate subgroup instance because they have different `D` implementations (`D1` vs `D2`).
+//!        We also cannot cut out just `B` and `C` as a separate subgroup because `C` references `D`, so we need to know
+//!        which specific `D` implementation (`D1` or `D2`) is being used.
+//!
+//!    - To optimize this, we can create registry subgroups that contain only the necessary message types:
+//!      * A registry subgroup is a subset of a complete registry that contains only the message types needed
+//!        for a specific group of messages
+//!      * For example:
+//!        ```
+//!        Complete Registry Type: {A, B, C, D, E, F, G}
+//!        BCD Subgroup Type: {B, C, D}
+//!        EFG Subgroup Type: {E, F, G}
+//!        D Subgroup Type: {D}
+//!
+//!        Complete Registry Instance: {A1, B1, C1, D1, E1, F1, G1}
+//!        BCD Subgroup Instance: {B1, C1, D1}
+//!        EFG Subgroup Instance: {E1, F1, G1}
+//!        D Subgroup Instance: {D1}
+//!        ```
+//!      * These subgroups can be shared between different complete registries.
+//!      * This allows for more efficient registry organization while maintaining type safety.
+//!
+//! 2. **Formalization through Equivalence Classes**
+//!    - The equivalence classes define the granularity of registry subgroups:
+//!      * Two message types belong to the same equivalence class if they must be in the same registry subgroup
+//!      * This is determined by:
+//!        - Direct references between message types
+//!        - Cyclic references between message types
+//!        - Reachability through reference chains
+//!    - Each equivalence class becomes a registry subgroup in the trait hierarchy
+//!    - The ordering relationship between registry subgroups is determined by the reference relationships:
+//!      * If a message type in subgroup S1 can reach a message type in subgroup S2 through references,
+//!        then S1 must be a superset of S2
+//!      * For example, in our message graph:
+//!        - `BC` subgroup must be a superset of `D` subgroup because `B` and `C` can reach `D`
+//!        - The full registry must be a superset of `BC` subgroup because `A` can reach `B` and `C`
+//!    - This ordering relationship forms the registry trait hierarchy through trait inheritance
+//!
+//! 3. **Implementation through Trait Inheritance**
+//!    - The registry hierarchy is implemented using trait inheritance (supertraits)
+//!    - Each registry trait defines the view implementations for its message types
+//!    - A registry trait inherits all view implementations from its supertraits
+//!    - This ensures type safety across all message type relationships
 //!
 //! This grouping mechanism ensures that:
-//! * Related message types are grouped together
+//! * Related message types are grouped together based on their reference relationships
 //! * Each message type belongs to exactly one equivalence class
-//! * The registry hierarchy reflects the natural structure of the message types
+//! * Type consistency is enforced through the registry trait hierarchy
 //! * Type safety is maintained across cyclic references
+//! * The hierarchy is determined by the natural structure of message references
 
 #[derive(Default, Debug)]
 pub struct A {
@@ -338,13 +413,13 @@ impl Message for D2 {
     type Registry = SomeImplSet2;
 }
 
-impl<T> AView for T
+impl<A> AView for A
 where
-    T: Message,
-    T: MsgFieldGetter<1, Message = B>,
-    <T as Message>::Registry: BCDViewRegistry<B = B>,
+    A: Message,
+    A: MsgFieldGetter<1, Message = B>,
+    <A as Message>::Registry: BCDViewRegistry<B = B>,
     <B as Message>::Registry: BCDViewRegistry,
-    BCDRegistryEq<<T as Message>::Registry>:
+    BCDRegistryEq<<A as Message>::Registry>:
         RegistryEq<Combined = <BCDRegistryEq<<B as Message>::Registry> as RegistryEq>::Combined>,
 {
     fn b(&self) -> Option<&impl BView> {
@@ -352,13 +427,13 @@ where
     }
 }
 
-impl<T> BView for T
+impl<B> BView for B
 where
-    T: Message,
-    T: MsgFieldGetter<1, Message = C>,
-    <T as Message>::Registry: BCDViewRegistry<C = C>,
+    B: Message,
+    B: MsgFieldGetter<1, Message = C>,
+    <B as Message>::Registry: BCDViewRegistry<C = C>,
     <C as Message>::Registry: BCDViewRegistry,
-    BCDRegistryEq<<T as Message>::Registry>:
+    BCDRegistryEq<<B as Message>::Registry>:
         RegistryEq<Combined = <BCDRegistryEq<<C as Message>::Registry> as RegistryEq>::Combined>,
 {
     fn c(&self) -> Option<&impl CView> {
@@ -366,34 +441,34 @@ where
     }
 }
 
-impl<T> CView for T
+impl<C> CView for C
 where
-    T: Message,
-    T: MsgFieldGetter<1, Message = B>,
-    T: MsgFieldGetter<2, Message = D>,
-    <T as Message>::Registry: BCDViewRegistry<B = B> + DViewRegistry<D = D>,
+    C: Message,
+    C: MsgFieldGetter<1, Message = B>,
+    C: MsgFieldGetter<2, Message = D>,
+    <C as Message>::Registry: BCDViewRegistry<B = B> + DViewRegistry<D = D>,
     <B as Message>::Registry: BCDViewRegistry,
     <D as Message>::Registry: DViewRegistry,
-    BCDRegistryEq<<T as Message>::Registry>:
+    BCDRegistryEq<<C as Message>::Registry>:
         RegistryEq<Combined = <BCDRegistryEq<<B as Message>::Registry> as RegistryEq>::Combined>,
-    DRegistryEq<<T as Message>::Registry>:
+    DRegistryEq<<C as Message>::Registry>:
         RegistryEq<Combined = <DRegistryEq<<D as Message>::Registry> as RegistryEq>::Combined>,
 {
     fn b(&self) -> Option<&impl BView> {
-        <T as MsgFieldGetter<1>>::get(self)
+        <C as MsgFieldGetter<1>>::get(self)
     }
     fn d(&self) -> Option<&impl DView> {
-        <T as MsgFieldGetter<2>>::get(self)
+        <C as MsgFieldGetter<2>>::get(self)
     }
 }
 
-impl<T> DView for T
+impl<D> DView for D
 where
-    T: Message,
-    T: MsgFieldGetter<1, Message = T>,
-    <T as Message>::Registry: DViewRegistry<D = T>,
+    D: Message,
+    D: MsgFieldGetter<1, Message = D>,
+    <D as Message>::Registry: DViewRegistry<D = D>,
 {
     fn d(&self) -> Option<&impl DView> {
-        <T as MsgFieldGetter<1>>::get(self)
+        <D as MsgFieldGetter<1>>::get(self)
     }
 }
