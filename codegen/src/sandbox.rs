@@ -119,14 +119,14 @@
 //!
 //! ## Registry Type Consistency
 //!
-//! To ensure type safety across the registry hierarchy, we introduce the `RegistryComparer` trait
+//! To ensure type safety across the registry hierarchy, we introduce the `RegistryEq` trait
 //! and its implementations. This mechanism allows us to verify that related message types use
 //! consistent registry implementations at compile time.
 //!
-//! The `RegistryComparer` trait hierarchy:
-//! * `DRegistryComparer`: Compares registry types for `D` message types
-//! * `BCDRegistryComparer`: Compares registry types for `B`, `C`, and `D` message types
-//! * `MessageRegistryComparer`: Compares registry types for all message types
+//! The `RegistryEq` trait hierarchy:
+//! * `DRegistryEq`: Compares registry types for `D` message types
+//! * `BCDRegistryEq`: Compares registry types for `B`, `C`, and `D` message types
+//! * `MessageRegistryEq`: Compares registry types for all message types
 //!
 //! This comparison mechanism ensures that:
 //! * Parent and child message types use the same registry implementation
@@ -134,8 +134,35 @@
 //! * Type safety is maintained across the entire message hierarchy
 //!
 //! For example, if a message type `A` uses `SomeImplSet` as its registry, all its child message types
-//! (`B`, `C`, `D`) must also use `SomeImplSet`. The `RegistryComparer` trait implementations
+//! (`B`, `C`, `D`) must also use `SomeImplSet`. The `RegistryEq` trait implementations
 //! enforce this constraint at compile time.
+//!
+//! ## Message Type Grouping
+//!
+//! The registry traits are organized based on the cyclic reference patterns in the message types.
+//! This grouping is determined by the following rules:
+//!
+//! 1. **Equivalence Class Definition**
+//!    - Two message types belong to the same equivalence class if:
+//!      * They are part of the same cyclic reference (e.g., `B` ↔ `C` or `E` → `F` → `G` → `E`)
+//!      * A self-referential type (like `D`) can join another cyclic reference group if it's part of that cycle
+//!    - Message types that are not part of any cyclic reference form their own single-item equivalence classes
+//!
+//! 2. **Quotient Set Construction**
+//!    - The set of message types is partitioned into equivalence classes
+//!    - Each equivalence class corresponds to a registry trait
+//!    - Examples:
+//!      * `{A}` → A single registry (not part of any cyclic reference)
+//!      * `{B, C}` → `BCDViewRegistry` (cyclic reference group)
+//!      * `{D}` → `DViewRegistry` (self-referential, not part of other cycles)
+//!      * `{E, F, G}` → A new registry (cyclic reference group)
+//!      * `{H}` → A single registry (not part of any cyclic reference)
+//!
+//! This grouping mechanism ensures that:
+//! * Related message types are grouped together
+//! * Each message type belongs to exactly one equivalence class
+//! * The registry hierarchy reflects the natural structure of the message types
+//! * Type safety is maintained across cyclic references
 
 #[derive(Default, Debug)]
 pub struct A {
