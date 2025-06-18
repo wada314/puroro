@@ -287,6 +287,20 @@ pub trait NonMsgFieldGetter<const N: i32, T> {
     fn get(&self) -> T;
 }
 
+impl<T: MsgFieldGetter<N>, const N: i32> MsgFieldGetter<N> for &T {
+    type Message = T::Message;
+    fn get(&self) -> Option<&Self::Message> {
+        T::get(self)
+    }
+}
+
+impl<T: MsgFieldGetter<N>, const N: i32> MsgFieldGetter<N> for Option<T> {
+    type Message = T::Message;
+    fn get(&self) -> Option<&Self::Message> {
+        self.as_ref().and_then(|x| x.get())
+    }
+}
+
 impl MsgFieldGetter<1> for A1 {
     type Message = B1;
     fn get(&self) -> Option<&B1> {
