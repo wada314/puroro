@@ -357,10 +357,10 @@ fn foo() {
     let d_data = D1::default();
 
     // Use the user-facing types with default implementations
-    let a = A::new(a_data);
-    let b = B::new(b_data);
-    let c = C::new(c_data);
-    let d = D::new(d_data);
+    let a = AMain::new(a_data);
+    let b = BMain::new(b_data);
+    let c = CMain::new(c_data);
+    let d = DMain::new(d_data);
 
     // Test that the methods work through the user-facing types
     // Users don't need to know about View traits
@@ -374,16 +374,16 @@ fn foo() {
 }
 
 pub trait DViewRegistry {
-    type D: Message;
+    type D: Message + DView;
 }
 
 pub trait BCDViewRegistry: DViewRegistry {
-    type B: Message;
-    type C: Message;
+    type B: Message + BView;
+    type C: Message + CView;
 }
 
 pub trait MessageViewRegistry: BCDViewRegistry {
-    type A: Message;
+    type A: Message + AView;
 }
 
 pub struct SomeImplSet;
@@ -471,7 +471,7 @@ where
     fn b(&self) -> Option<&impl BView> {
         self.0
             .get()
-            .map(|x| unsafe { ::std::mem::transmute::<_, &MessageView<B1>>(x) })
+            .map(|x| unsafe { ::std::mem::transmute::<_, &MessageView<B>>(x) })
     }
 }
 
@@ -488,7 +488,7 @@ where
     fn c(&self) -> Option<&impl CView> {
         self.0
             .get()
-            .map(|x| unsafe { ::std::mem::transmute::<_, &MessageView<C1>>(x) })
+            .map(|x| unsafe { ::std::mem::transmute::<_, &MessageView<C>>(x) })
     }
 }
 
@@ -509,11 +509,11 @@ where
 {
     fn b(&self) -> Option<&impl BView> {
         <C as MsgFieldGetter<1>>::get(&self.0)
-            .map(|x| unsafe { ::std::mem::transmute::<_, &MessageView<B1>>(x) })
+            .map(|x| unsafe { ::std::mem::transmute::<_, &MessageView<B>>(x) })
     }
     fn d(&self) -> Option<&impl DView> {
         <C as MsgFieldGetter<2>>::get(&self.0)
-            .map(|x| unsafe { ::std::mem::transmute::<_, &MessageView<D1>>(x) })
+            .map(|x| unsafe { ::std::mem::transmute::<_, &MessageView<D>>(x) })
     }
 }
 
@@ -527,20 +527,20 @@ where
 {
     fn d(&self) -> Option<&impl DView> {
         <D as MsgFieldGetter<1>>::get(&self.0)
-            .map(|x| unsafe { ::std::mem::transmute::<_, &MessageView<D1>>(x) })
+            .map(|x| unsafe { ::std::mem::transmute::<_, &MessageView<D>>(x) })
     }
 }
 
 // User-facing message types with default implementations
 // These are the main types that users will interact with
-pub struct A<T = MessageView<A1>>(pub T);
-pub struct B<T = MessageView<B1>>(pub T);
-pub struct C<T = MessageView<C1>>(pub T);
-pub struct D<T = MessageView<D1>>(pub T);
+pub struct AMain<T = MessageView<A1>>(pub T);
+pub struct BMain<T = MessageView<B1>>(pub T);
+pub struct CMain<T = MessageView<C1>>(pub T);
+pub struct DMain<T = MessageView<D1>>(pub T);
 
 // Implement methods directly without relying on View traits
 // Users should not need to know about View traits
-impl<T> A<T>
+impl<T> AMain<T>
 where
     T: AView,
 {
@@ -549,7 +549,7 @@ where
     }
 }
 
-impl<T> B<T>
+impl<T> BMain<T>
 where
     T: BView,
 {
@@ -558,7 +558,7 @@ where
     }
 }
 
-impl<T> C<T>
+impl<T> CMain<T>
 where
     T: CView,
 {
@@ -570,7 +570,7 @@ where
     }
 }
 
-impl<T> D<T>
+impl<T> DMain<T>
 where
     T: DView,
 {
@@ -580,26 +580,26 @@ where
 }
 
 // Convenience constructors for the default implementations
-impl A {
+impl AMain {
     pub fn new(inner: A1) -> Self {
-        A(MessageView(inner))
+        AMain(MessageView(inner))
     }
 }
 
-impl B {
+impl BMain {
     pub fn new(inner: B1) -> Self {
-        B(MessageView(inner))
+        BMain(MessageView(inner))
     }
 }
 
-impl C {
+impl CMain {
     pub fn new(inner: C1) -> Self {
-        C(MessageView(inner))
+        CMain(MessageView(inner))
     }
 }
 
-impl D {
+impl DMain {
     pub fn new(inner: D1) -> Self {
-        D(MessageView(inner))
+        DMain(MessageView(inner))
     }
 }
