@@ -456,14 +456,14 @@ impl<T: Message> Message for Option<T> {
 #[repr(transparent)]
 pub struct MessageView<T>(pub T);
 
-impl<A> AView for MessageView<A>
+impl<A, B> AView for MessageView<A>
 where
     A: Message,
-    A: MsgFieldGetter<1, Message = B1>,
-    <A as Message>::Registry: BCDViewRegistry<B = B1>,
-    <B1 as Message>::Registry: BCDViewRegistry,
+    A: MsgFieldGetter<1, Message = B>,
+    <A as Message>::Registry: BCDViewRegistry<B = B>,
+    <B as Message>::Registry: BCDViewRegistry,
     BCDRegistryEq<<A as Message>::Registry>:
-        RegistryEq<Combined = <BCDRegistryEq<<B1 as Message>::Registry> as RegistryEq>::Combined>,
+        RegistryEq<Combined = <BCDRegistryEq<<B as Message>::Registry> as RegistryEq>::Combined>,
 {
     fn b(&self) -> Option<&impl BView> {
         self.0
@@ -472,14 +472,14 @@ where
     }
 }
 
-impl<B> BView for MessageView<B>
+impl<B, C> BView for MessageView<B>
 where
     B: Message,
-    B: MsgFieldGetter<1, Message = C1>,
-    <B as Message>::Registry: BCDViewRegistry<C = C1>,
-    <C1 as Message>::Registry: BCDViewRegistry,
+    B: MsgFieldGetter<1, Message = C>,
+    <B as Message>::Registry: BCDViewRegistry<C = C>,
+    <C as Message>::Registry: BCDViewRegistry,
     BCDRegistryEq<<B as Message>::Registry>:
-        RegistryEq<Combined = <BCDRegistryEq<<C1 as Message>::Registry> as RegistryEq>::Combined>,
+        RegistryEq<Combined = <BCDRegistryEq<<C as Message>::Registry> as RegistryEq>::Combined>,
 {
     fn c(&self) -> Option<&impl CView> {
         self.0
@@ -488,18 +488,18 @@ where
     }
 }
 
-impl<C> CView for MessageView<C>
+impl<C, B, D> CView for MessageView<C>
 where
     C: Message,
-    C: MsgFieldGetter<1, Message = B1>,
-    C: MsgFieldGetter<2, Message = D1>,
-    <C as Message>::Registry: BCDViewRegistry<B = B1> + DViewRegistry<D = D1>,
-    <B1 as Message>::Registry: BCDViewRegistry,
-    <D1 as Message>::Registry: DViewRegistry,
+    C: MsgFieldGetter<1, Message = B>,
+    C: MsgFieldGetter<2, Message = D>,
+    <C as Message>::Registry: BCDViewRegistry<B = B> + DViewRegistry<D = D>,
+    <B as Message>::Registry: BCDViewRegistry,
+    <D as Message>::Registry: DViewRegistry,
     BCDRegistryEq<<C as Message>::Registry>:
-        RegistryEq<Combined = <BCDRegistryEq<<B1 as Message>::Registry> as RegistryEq>::Combined>,
+        RegistryEq<Combined = <BCDRegistryEq<<B as Message>::Registry> as RegistryEq>::Combined>,
     DRegistryEq<<C as Message>::Registry>:
-        RegistryEq<Combined = <DRegistryEq<<D1 as Message>::Registry> as RegistryEq>::Combined>,
+        RegistryEq<Combined = <DRegistryEq<<D as Message>::Registry> as RegistryEq>::Combined>,
 {
     fn b(&self) -> Option<&impl BView> {
         <C as MsgFieldGetter<1>>::get(&self.0)
