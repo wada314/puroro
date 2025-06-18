@@ -336,7 +336,11 @@ fn foo() {
     let c = C::default();
     let d = D::default();
 
-    let _ = <B as BView>::c(&b);
+    // Use the wrapper to access view traits
+    let a_view = MessageView(a);
+    let b_view = MessageView(b);
+    let c_view = MessageView(c);
+    let d_view = MessageView(d);
 }
 
 pub trait DViewRegistry {
@@ -413,7 +417,10 @@ impl Message for D2 {
     type Registry = SomeImplSet2;
 }
 
-impl<A> AView for A
+// Wrapper struct for the `NView` trait blanket implementation
+pub struct MessageView<T>(pub T);
+
+impl<A> AView for MessageView<A>
 where
     A: Message,
     A: MsgFieldGetter<1, Message = B>,
@@ -423,11 +430,11 @@ where
         RegistryEq<Combined = <BCDRegistryEq<<B as Message>::Registry> as RegistryEq>::Combined>,
 {
     fn b(&self) -> Option<&impl BView> {
-        self.get()
+        self.0.get()
     }
 }
 
-impl<B> BView for B
+impl<B> BView for MessageView<B>
 where
     B: Message,
     B: MsgFieldGetter<1, Message = C>,
@@ -437,11 +444,11 @@ where
         RegistryEq<Combined = <BCDRegistryEq<<C as Message>::Registry> as RegistryEq>::Combined>,
 {
     fn c(&self) -> Option<&impl CView> {
-        self.get()
+        self.0.get()
     }
 }
 
-impl<C> CView for C
+impl<C> CView for MessageView<C>
 where
     C: Message,
     C: MsgFieldGetter<1, Message = B>,
@@ -455,20 +462,20 @@ where
         RegistryEq<Combined = <DRegistryEq<<D as Message>::Registry> as RegistryEq>::Combined>,
 {
     fn b(&self) -> Option<&impl BView> {
-        <C as MsgFieldGetter<1>>::get(self)
+        <C as MsgFieldGetter<1>>::get(&self.0)
     }
     fn d(&self) -> Option<&impl DView> {
-        <C as MsgFieldGetter<2>>::get(self)
+        <C as MsgFieldGetter<2>>::get(&self.0)
     }
 }
 
-impl<D> DView for D
+impl<D> DView for MessageView<D>
 where
     D: Message,
     D: MsgFieldGetter<1, Message = D>,
     <D as Message>::Registry: DViewRegistry<D = D>,
 {
     fn d(&self) -> Option<&impl DView> {
-        <D as MsgFieldGetter<1>>::get(self)
+        <D as MsgFieldGetter<1>>::get(&self.0)
     }
 }
