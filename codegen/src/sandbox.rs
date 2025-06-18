@@ -240,25 +240,25 @@
 //! * The hierarchy is determined by the natural structure of message references
 
 #[derive(Default, Debug)]
-pub struct A {
-    pub b: Box<B>,
+pub struct A1 {
+    pub b: Box<B1>,
 }
 #[derive(Default, Debug)]
-pub struct B {
-    pub c: Box<C>,
+pub struct B1 {
+    pub c: Box<C1>,
 }
 #[derive(Default, Debug)]
-pub struct C {
-    pub b: Option<Box<B>>,
-    pub d: Box<D>,
+pub struct C1 {
+    pub b: Option<Box<B1>>,
+    pub d: Box<D1>,
 }
 #[derive(Default, Debug)]
-pub struct D {
-    pub d: Option<Box<D>>,
+pub struct D1 {
+    pub d: Option<Box<D1>>,
 }
 #[derive(Default, Debug)]
 pub struct A2 {
-    pub b: Box<B>,
+    pub b: Box<B1>,
 }
 #[derive(Default, Debug)]
 pub struct D2 {
@@ -284,40 +284,40 @@ pub trait MsgFieldGetter<const N: i32> {
     fn get(&self) -> Option<&Self::Message>;
 }
 
-impl MsgFieldGetter<1> for A {
-    type Message = B;
-    fn get(&self) -> Option<&B> {
+impl MsgFieldGetter<1> for A1 {
+    type Message = B1;
+    fn get(&self) -> Option<&B1> {
         Some(&self.b)
     }
 }
-impl MsgFieldGetter<1> for B {
-    type Message = C;
-    fn get(&self) -> Option<&C> {
+impl MsgFieldGetter<1> for B1 {
+    type Message = C1;
+    fn get(&self) -> Option<&C1> {
         Some(&self.c)
     }
 }
-impl MsgFieldGetter<1> for C {
-    type Message = B;
-    fn get(&self) -> Option<&B> {
+impl MsgFieldGetter<1> for C1 {
+    type Message = B1;
+    fn get(&self) -> Option<&B1> {
         self.b.as_deref()
     }
 }
-impl MsgFieldGetter<2> for C {
-    type Message = D;
-    fn get(&self) -> Option<&D> {
+impl MsgFieldGetter<2> for C1 {
+    type Message = D1;
+    fn get(&self) -> Option<&D1> {
         Some(&self.d)
     }
 }
-impl MsgFieldGetter<1> for D {
-    type Message = D;
-    fn get(&self) -> Option<&D> {
+impl MsgFieldGetter<1> for D1 {
+    type Message = D1;
+    fn get(&self) -> Option<&D1> {
         self.d.as_deref()
     }
 }
 
 impl MsgFieldGetter<1> for A2 {
-    type Message = B;
-    fn get(&self) -> Option<&B> {
+    type Message = B1;
+    fn get(&self) -> Option<&B1> {
         Some(&self.b)
     }
 }
@@ -331,16 +331,24 @@ impl MsgFieldGetter<1> for D2 {
 
 #[test]
 fn foo() {
-    let a = A::default();
-    let b = B::default();
-    let c = C::default();
-    let d = D::default();
+    let a_data = A1::default();
+    let b_data = B1::default();
+    let c_data = C1::default();
+    let d_data = D1::default();
 
-    // Use the wrapper to access view traits
-    let a_view = MessageView(a);
-    let b_view = MessageView(b);
-    let c_view = MessageView(c);
-    let d_view = MessageView(d);
+    // Use the user-facing types with default implementations
+    let a = A::new(a_data);
+    let b = B::new(b_data);
+    let c = C::new(c_data);
+    let d = D::new(d_data);
+
+    // Test that the methods work through the user-facing types
+    // Users don't need to know about View traits
+    let _ = a.b();
+    let _ = b.c();
+    let _ = c.b();
+    let _ = c.d();
+    let _ = d.d();
 }
 
 pub trait DViewRegistry {
@@ -359,16 +367,16 @@ pub trait MessageViewRegistry: BCDViewRegistry {
 pub struct SomeImplSet;
 
 impl DViewRegistry for SomeImplSet {
-    type D = D;
+    type D = D1;
 }
 
 impl BCDViewRegistry for SomeImplSet {
-    type B = B;
-    type C = C;
+    type B = B1;
+    type C = C1;
 }
 
 impl MessageViewRegistry for SomeImplSet {
-    type A = A;
+    type A = A1;
 }
 
 pub struct SomeImplSet2;
@@ -397,19 +405,19 @@ pub trait Message {
     type Registry;
 }
 
-impl Message for A {
+impl Message for A1 {
     type Registry = SomeImplSet;
 }
 
-impl Message for B {
+impl Message for B1 {
     type Registry = SomeImplSet;
 }
 
-impl Message for C {
+impl Message for C1 {
     type Registry = SomeImplSet;
 }
 
-impl Message for D {
+impl Message for D1 {
     type Registry = SomeImplSet;
 }
 
@@ -423,11 +431,11 @@ pub struct MessageView<T>(pub T);
 impl<A> AView for MessageView<A>
 where
     A: Message,
-    A: MsgFieldGetter<1, Message = B>,
-    <A as Message>::Registry: BCDViewRegistry<B = B>,
-    <B as Message>::Registry: BCDViewRegistry,
+    A: MsgFieldGetter<1, Message = B1>,
+    <A as Message>::Registry: BCDViewRegistry<B = B1>,
+    <B1 as Message>::Registry: BCDViewRegistry,
     BCDRegistryEq<<A as Message>::Registry>:
-        RegistryEq<Combined = <BCDRegistryEq<<B as Message>::Registry> as RegistryEq>::Combined>,
+        RegistryEq<Combined = <BCDRegistryEq<<B1 as Message>::Registry> as RegistryEq>::Combined>,
 {
     fn b(&self) -> Option<&impl BView> {
         self.0.get()
@@ -437,11 +445,11 @@ where
 impl<B> BView for MessageView<B>
 where
     B: Message,
-    B: MsgFieldGetter<1, Message = C>,
-    <B as Message>::Registry: BCDViewRegistry<C = C>,
-    <C as Message>::Registry: BCDViewRegistry,
+    B: MsgFieldGetter<1, Message = C1>,
+    <B as Message>::Registry: BCDViewRegistry<C = C1>,
+    <C1 as Message>::Registry: BCDViewRegistry,
     BCDRegistryEq<<B as Message>::Registry>:
-        RegistryEq<Combined = <BCDRegistryEq<<C as Message>::Registry> as RegistryEq>::Combined>,
+        RegistryEq<Combined = <BCDRegistryEq<<C1 as Message>::Registry> as RegistryEq>::Combined>,
 {
     fn c(&self) -> Option<&impl CView> {
         self.0.get()
@@ -451,15 +459,15 @@ where
 impl<C> CView for MessageView<C>
 where
     C: Message,
-    C: MsgFieldGetter<1, Message = B>,
-    C: MsgFieldGetter<2, Message = D>,
-    <C as Message>::Registry: BCDViewRegistry<B = B> + DViewRegistry<D = D>,
-    <B as Message>::Registry: BCDViewRegistry,
-    <D as Message>::Registry: DViewRegistry,
+    C: MsgFieldGetter<1, Message = B1>,
+    C: MsgFieldGetter<2, Message = D1>,
+    <C as Message>::Registry: BCDViewRegistry<B = B1> + DViewRegistry<D = D1>,
+    <B1 as Message>::Registry: BCDViewRegistry,
+    <D1 as Message>::Registry: DViewRegistry,
     BCDRegistryEq<<C as Message>::Registry>:
-        RegistryEq<Combined = <BCDRegistryEq<<B as Message>::Registry> as RegistryEq>::Combined>,
+        RegistryEq<Combined = <BCDRegistryEq<<B1 as Message>::Registry> as RegistryEq>::Combined>,
     DRegistryEq<<C as Message>::Registry>:
-        RegistryEq<Combined = <DRegistryEq<<D as Message>::Registry> as RegistryEq>::Combined>,
+        RegistryEq<Combined = <DRegistryEq<<D1 as Message>::Registry> as RegistryEq>::Combined>,
 {
     fn b(&self) -> Option<&impl BView> {
         <C as MsgFieldGetter<1>>::get(&self.0)
@@ -479,3 +487,92 @@ where
         <D as MsgFieldGetter<1>>::get(&self.0)
     }
 }
+
+// User-facing message types with default implementations
+// These are the main types that users will interact with
+pub struct A<T = MessageView<A1>>(pub T);
+pub struct B<T = MessageView<B1>>(pub T);
+pub struct C<T = MessageView<C1>>(pub T);
+pub struct D<T = MessageView<D1>>(pub T);
+
+// Implement methods directly without relying on View traits
+// Users should not need to know about View traits
+impl<T> A<T>
+where
+    T: AView,
+{
+    pub fn b(&self) -> Option<&impl BView> {
+        self.0.b()
+    }
+}
+
+impl<T> B<T>
+where
+    T: BView,
+{
+    pub fn c(&self) -> Option<&impl CView> {
+        self.0.c()
+    }
+}
+
+impl<T> C<T>
+where
+    T: CView,
+{
+    pub fn b(&self) -> Option<&impl BView> {
+        self.0.b()
+    }
+    pub fn d(&self) -> Option<&impl DView> {
+        self.0.d()
+    }
+}
+
+impl<T> D<T>
+where
+    T: DView,
+{
+    pub fn d(&self) -> Option<&impl DView> {
+        self.0.d()
+    }
+}
+
+// Convenience constructors for the default implementations
+impl A {
+    pub fn new(inner: A1) -> Self {
+        A(MessageView(inner))
+    }
+}
+
+impl B {
+    pub fn new(inner: B1) -> Self {
+        B(MessageView(inner))
+    }
+}
+
+impl C {
+    pub fn new(inner: C1) -> Self {
+        C(MessageView(inner))
+    }
+}
+
+impl D {
+    pub fn new(inner: D1) -> Self {
+        D(MessageView(inner))
+    }
+}
+
+// Example of how users can implement custom views
+pub struct CustomAView<T>(T);
+
+impl<T> AView for CustomAView<T>
+where
+    T: MsgFieldGetter<1, Message = B1>,
+{
+    fn b(&self) -> Option<&impl BView> {
+        // Custom implementation - could add logging, validation, etc.
+        self.0.get()
+    }
+}
+
+// Users can use custom implementations like this:
+// let custom_a = A(CustomAView(a_data));
