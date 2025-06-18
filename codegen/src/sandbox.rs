@@ -365,7 +365,9 @@ fn foo() {
     // Test that the methods work through the user-facing types
     // Users don't need to know about View traits
     let _ = a.b();
+    let _ = a.b().unwrap().c();
     let _ = b.c();
+    let _ = b.c().unwrap().d();
     let _ = c.b();
     let _ = c.d();
     let _ = d.d();
@@ -462,7 +464,7 @@ where
     B: Message,
     A: MsgFieldGetter<1, Message = B>,
     <A as Message>::Registry: BCDViewRegistry<B = B>,
-    <B as Message>::Registry: BCDViewRegistry,
+    // <B as Message>::Registry: BCDViewRegistry,
     // BCDRegistryEq<<A as Message>::Registry>:
     //     RegistryEq<Combined = <BCDRegistryEq<<B as Message>::Registry> as RegistryEq>::Combined>,
 {
@@ -479,7 +481,7 @@ where
     C: Message,
     B: MsgFieldGetter<1, Message = C>,
     <B as Message>::Registry: BCDViewRegistry<C = C>,
-    <C as Message>::Registry: BCDViewRegistry,
+    // <C as Message>::Registry: BCDViewRegistry,
     // BCDRegistryEq<<B as Message>::Registry>:
     //     RegistryEq<Combined = <BCDRegistryEq<<C as Message>::Registry> as RegistryEq>::Combined>,
 {
@@ -498,8 +500,8 @@ where
     C: MsgFieldGetter<1, Message = B>,
     C: MsgFieldGetter<2, Message = D>,
     <C as Message>::Registry: BCDViewRegistry<B = B> + DViewRegistry<D = D>,
-    <B as Message>::Registry: BCDViewRegistry,
-    <D as Message>::Registry: DViewRegistry,
+    // <B as Message>::Registry: BCDViewRegistry,
+    // <D as Message>::Registry: DViewRegistry,
     // BCDRegistryEq<<C as Message>::Registry>:
     //     RegistryEq<Combined = <BCDRegistryEq<<B as Message>::Registry> as RegistryEq>::Combined>,
     // DRegistryEq<<C as Message>::Registry>:
