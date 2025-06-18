@@ -516,6 +516,8 @@ where
     D: Message,
     D: MsgFieldGetter<1, Message = D>,
     <D as Message>::Registry: DViewRegistry<D = D>,
+    DRegistryEq<<D as Message>::Registry>:
+        RegistryEq<Combined = <DRegistryEq<<D as Message>::Registry> as RegistryEq>::Combined>,
 {
     fn d(&self) -> Option<&impl DView> {
         <D as MsgFieldGetter<1>>::get(&self.0)
