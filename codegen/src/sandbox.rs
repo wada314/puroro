@@ -428,6 +428,13 @@ impl Message for D2 {
     type Registry = SomeImplSet2;
 }
 
+impl<T: Message> Message for &T {
+    type Registry = T::Registry;
+}
+impl<T: Message> Message for Option<T> {
+    type Registry = T::Registry;
+}
+
 // Wrapper struct for the `NView` trait blanket implementation
 #[repr(transparent)]
 pub struct MessageView<T>(pub T);
