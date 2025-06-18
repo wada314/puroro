@@ -355,16 +355,16 @@ fn foo() {
 }
 
 pub trait DViewRegistry {
-    type D: Message + DView;
+    type D: Message;
 }
 
 pub trait BCDViewRegistry: DViewRegistry {
-    type B: Message + BView;
-    type C: Message + CView;
+    type B: Message;
+    type C: Message;
 }
 
 pub trait MessageViewRegistry: BCDViewRegistry {
-    type A: Message + AView;
+    type A: Message;
 }
 
 pub struct SomeImplSet;
@@ -429,6 +429,7 @@ impl Message for D2 {
 }
 
 // Wrapper struct for the `NView` trait blanket implementation
+#[repr(transparent)]
 pub struct MessageView<T>(pub T);
 
 impl<A> AView for MessageView<A>
@@ -441,7 +442,9 @@ where
         RegistryEq<Combined = <BCDRegistryEq<<B1 as Message>::Registry> as RegistryEq>::Combined>,
 {
     fn b(&self) -> Option<&impl BView> {
-        self.0.get()
+        self.0
+            .get()
+            .map(|x| unsafe { ::std::mem::transmute::<_, &MessageView<B1>>(x) })
     }
 }
 
@@ -455,7 +458,9 @@ where
         RegistryEq<Combined = <BCDRegistryEq<<C1 as Message>::Registry> as RegistryEq>::Combined>,
 {
     fn c(&self) -> Option<&impl CView> {
-        self.0.get()
+        self.0
+            .get()
+            .map(|x| unsafe { ::std::mem::transmute::<_, &MessageView<C1>>(x) })
     }
 }
 
@@ -474,9 +479,11 @@ where
 {
     fn b(&self) -> Option<&impl BView> {
         <C as MsgFieldGetter<1>>::get(&self.0)
+            .map(|x| unsafe { ::std::mem::transmute::<_, &MessageView<B1>>(x) })
     }
     fn d(&self) -> Option<&impl DView> {
         <C as MsgFieldGetter<2>>::get(&self.0)
+            .map(|x| unsafe { ::std::mem::transmute::<_, &MessageView<D1>>(x) })
     }
 }
 
@@ -488,6 +495,7 @@ where
 {
     fn d(&self) -> Option<&impl DView> {
         <D as MsgFieldGetter<1>>::get(&self.0)
+            .map(|x| unsafe { ::std::mem::transmute::<_, &MessageView<D1>>(x) })
     }
 }
 
@@ -563,19 +571,3 @@ impl D {
         D(MessageView(inner))
     }
 }
-
-// Example of how users can implement custom views
-pub struct CustomAView<T>(T);
-
-impl<T> AView for CustomAView<T>
-where
-    T: MsgFieldGetter<1, Message = B1>,
-{
-    fn b(&self) -> Option<&impl BView> {
-        // Custom implementation - could add logging, validation, etc.
-        self.0.get()
-    }
-}
-
-// Users can use custom implementations like this:
-// let custom_a = A(CustomAView(a_data));
