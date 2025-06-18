@@ -283,6 +283,9 @@ pub trait MsgFieldGetter<const N: i32> {
     type Message;
     fn get(&self) -> Option<&Self::Message>;
 }
+pub trait NonMsgFieldGetter<const N: i32, T> {
+    fn get(&self) -> T;
+}
 
 impl MsgFieldGetter<1> for A1 {
     type Message = B1;
