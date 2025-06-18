@@ -374,16 +374,16 @@ fn foo() {
 }
 
 pub trait DViewRegistry {
-    type D: Message + DView;
+    type D: Message;
 }
 
 pub trait BCDViewRegistry: DViewRegistry {
-    type B: Message + BView;
-    type C: Message + CView;
+    type B: Message;
+    type C: Message;
 }
 
 pub trait MessageViewRegistry: BCDViewRegistry {
-    type A: Message + AView;
+    type A: Message;
 }
 
 pub struct SomeImplSet;
@@ -464,6 +464,7 @@ where
     B: Message,
     A: MsgFieldGetter<1, Message = B>,
     <A as Message>::Registry: BCDViewRegistry<B = B>,
+    MessageView<B>: BView,
     // <B as Message>::Registry: BCDViewRegistry,
     // BCDRegistryEq<<A as Message>::Registry>:
     //     RegistryEq<Combined = <BCDRegistryEq<<B as Message>::Registry> as RegistryEq>::Combined>,
@@ -481,6 +482,7 @@ where
     C: Message,
     B: MsgFieldGetter<1, Message = C>,
     <B as Message>::Registry: BCDViewRegistry<C = C>,
+    MessageView<C>: CView,
     // <C as Message>::Registry: BCDViewRegistry,
     // BCDRegistryEq<<B as Message>::Registry>:
     //     RegistryEq<Combined = <BCDRegistryEq<<C as Message>::Registry> as RegistryEq>::Combined>,
@@ -500,6 +502,8 @@ where
     C: MsgFieldGetter<1, Message = B>,
     C: MsgFieldGetter<2, Message = D>,
     <C as Message>::Registry: BCDViewRegistry<B = B> + DViewRegistry<D = D>,
+    MessageView<B>: BView,
+    MessageView<D>: DView,
     // <B as Message>::Registry: BCDViewRegistry,
     // <D as Message>::Registry: DViewRegistry,
     // BCDRegistryEq<<C as Message>::Registry>:
@@ -522,6 +526,7 @@ where
     D: Message,
     D: MsgFieldGetter<1, Message = D>,
     <D as Message>::Registry: DViewRegistry<D = D>,
+    MessageView<D>: DView,
     // DRegistryEq<<D as Message>::Registry>:
     //     RegistryEq<Combined = <DRegistryEq<<D as Message>::Registry> as RegistryEq>::Combined>,
 {
