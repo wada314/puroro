@@ -94,21 +94,6 @@ pub struct D2 {
     pub d: Option<Box<D2>>,
 }
 
-pub trait AView {
-    fn b(&self) -> Option<&impl BView>;
-}
-pub trait BView {
-    fn c(&self) -> Option<&impl CView>;
-}
-pub trait CView {
-    fn b(&self) -> Option<&impl BView>;
-    fn d(&self) -> Option<&impl DView>;
-}
-pub trait DView {
-    type Registry: Registry;
-    fn d(&self) -> Option<<Self::Registry as Registry>::D<'_>>;
-}
-
 pub trait MsgFieldGetter<const N: i32> {
     type Message<'a>
     where
@@ -179,30 +164,6 @@ impl MsgFieldGetter<1> for D1 {
     }
 }
 
-#[test]
-fn foo() {
-    // let a_data = A1::default();
-    // let b_data = B1::default();
-    // let c_data = C1::default();
-    let d_data = D1::default();
-
-    // Use the user-facing types with default implementations
-    // let a = AMain::new(a_data);
-    // let b = BMain::new(b_data);
-    // let c = CMain::new(c_data);
-    let d = DMain::new(d_data);
-
-    // Test that the methods work through the user-facing types
-    // Users don't need to know about View traits
-    // let _ = a.b();
-    // let _ = a.b().unwrap().c();
-    // let _ = b.c();
-    // let _ = b.c().unwrap().d();
-    // let _ = c.b();
-    // let _ = c.d();
-    let _ = d.d();
-}
-
 pub trait Registry {
     // type A<'a>: AView
     // where
@@ -213,7 +174,7 @@ pub trait Registry {
     // type C<'a>: CView
     // where
     //     Self: 'a;
-    type D<'a>: DView
+    type D<'a>
     where
         Self: 'a;
 }
@@ -224,6 +185,35 @@ impl Registry for SomeImplSet {
     // type B<'a> = &'a B1;
     // type C<'a> = &'a C1;
     type D<'a> = MessageView<&'a D1>;
+}
+
+pub trait AView {
+    fn b(&self) -> Option<&impl BView>;
+}
+pub trait BView {
+    fn c(&self) -> Option<&impl CView>;
+}
+pub trait CView {
+    fn b(&self) -> Option<&impl BView>;
+    fn d(&self) -> Option<&impl DView>;
+}
+pub trait DView {
+    type Registry: Registry;
+    fn d(&self) -> Option<<Self::Registry as Registry>::D<'_>>;
+}
+
+// Wrapper struct for the `NView` trait blanket implementation
+#[repr(transparent)]
+pub struct MessageView<T>(pub T);
+
+impl<T> DView for MessageView<T>
+where
+    for<'a> T: MsgFieldGetter<1, Message<'a> = <Self::Registry as Registry>::D<'a>>,
+{
+    type Registry = SomeImplSet;
+    fn d(&self) -> Option<<Self::Registry as Registry>::D<'_>> {
+        <T as MsgFieldGetter<1>>::get(&self.0).map(MessageView)
+    }
 }
 
 pub trait Message {
@@ -253,36 +243,26 @@ impl<T: Message> Message for Option<T> {
     type Registry = T::Registry;
 }
 
-// Wrapper struct for the `NView` trait blanket implementation
-#[repr(transparent)]
-pub struct MessageView<T>(pub T);
+#[test]
+fn foo() {
+    // let a_data = A1::default();
+    // let b_data = B1::default();
+    // let c_data = C1::default();
+    let d_data = D1::default();
 
-impl<T> DView for MessageView<T>
-where
-    for<'a> T: MsgFieldGetter<1, Message<'a> = <Self::Registry as Registry>::D<'a>>,
-{
-    type Registry = SomeImplSet;
-    fn d(&self) -> Option<<Self::Registry as Registry>::D<'_>> {
-        <T as MsgFieldGetter<1>>::get(&self.0).map(MessageView)
-    }
-}
+    // Use the user-facing types with default implementations
+    // let a = AMain::new(a_data);
+    // let b = BMain::new(b_data);
+    // let c = CMain::new(c_data);
+    let d = MessageView(d_data);
 
-// User-facing message types with default implementations
-// These are the main types that users will interact with
-
-pub struct DMain<T = MessageView<D1>>(pub T);
-
-impl<T> DMain<T>
-where
-    T: DView,
-{
-    pub fn d(&self) -> Option<&impl DView> {
-        self.0.d()
-    }
-}
-
-impl DMain {
-    pub fn new(inner: D1) -> Self {
-        DMain(MessageView(inner))
-    }
+    // Test that the methods work through the user-facing types
+    // Users don't need to know about View traits
+    // let _ = a.b();
+    // let _ = a.b().unwrap().c();
+    // let _ = b.c();
+    // let _ = b.c().unwrap().d();
+    // let _ = c.b();
+    // let _ = c.d();
+    let _ = d.d();
 }
