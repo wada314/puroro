@@ -216,33 +216,6 @@ where
     }
 }
 
-pub trait Message {
-    type Registry: Registry;
-}
-
-impl Message for A1 {
-    type Registry = SomeImplSet;
-}
-
-impl Message for B1 {
-    type Registry = SomeImplSet;
-}
-
-impl Message for C1 {
-    type Registry = SomeImplSet;
-}
-
-impl Message for D1 {
-    type Registry = SomeImplSet;
-}
-
-impl<T: Message> Message for &T {
-    type Registry = T::Registry;
-}
-impl<T: Message> Message for Option<T> {
-    type Registry = T::Registry;
-}
-
 #[test]
 fn foo() {
     // let a_data = A1::default();
