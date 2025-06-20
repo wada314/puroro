@@ -220,6 +220,9 @@ pub trait GetRegistry {
 impl GetRegistry for MessageView<D1> {
     type Registry = SomeImplSet;
 }
+impl<'a> GetRegistry for MessageView<&'a D1> {
+    type Registry = SomeImplSet;
+}
 
 #[test]
 fn foo() {
@@ -243,4 +246,10 @@ fn foo() {
     // let _ = c.b();
     // let _ = c.d();
     let _ = d.d();
+    let _ = d.d().unwrap().d();
+}
+
+fn bar<T: DView>(d: T) {
+    let _ = d.d();
+    let _ = d.d().unwrap().d();
 }
