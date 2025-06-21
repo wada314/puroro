@@ -162,15 +162,9 @@ impl MsgFieldGetter<1> for D1 {
 }
 
 pub trait Registry {
-    // type A<'a>: AView
-    // where
-    //     Self: 'a;
-    // type B<'a>: BView
-    // where
-    //     Self: 'a;
-    // type C<'a>: CView
-    // where
-    //     Self: 'a;
+    // type A<'a>: AView;
+    // type B<'a>: BView;
+    // type C<'a>: CView;
     type D<'a>: DView;
 }
 
@@ -202,12 +196,19 @@ where
 }
 
 impl DView for D1 {}
+impl<T: DView> DView for &T {}
 
 pub trait GetRegistry {
     type Registry: Registry;
 }
 impl GetRegistry for D1 {
     type Registry = SomeImplSet;
+}
+impl<T: GetRegistry> GetRegistry for &T {
+    type Registry = T::Registry;
+}
+impl<T: GetRegistry> GetRegistry for Option<T> {
+    type Registry = T::Registry;
 }
 
 pub struct DMain<T>(T);
