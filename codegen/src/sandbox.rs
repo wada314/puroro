@@ -155,10 +155,7 @@ impl MsgFieldGetter<2> for C1 {
     }
 }
 impl MsgFieldGetter<1> for D1 {
-    type Message<'a>
-        = &'a D1
-    where
-        Self: 'a;
+    type Message<'a> = &'a D1;
     fn get(&self) -> Option<Self::Message<'_>> {
         self.d.as_deref()
     }
@@ -174,7 +171,7 @@ pub trait Registry {
     // type C<'a>: CView
     // where
     //     Self: 'a;
-    type D<'a>;
+    type D<'a>: DView;
 }
 
 pub struct SomeImplSet;
@@ -182,46 +179,42 @@ impl Registry for SomeImplSet {
     // type A<'a> = &'a A1;
     // type B<'a> = &'a B1;
     // type C<'a> = &'a C1;
-    type D<'a> = MessageView<&'a D1>;
+    type D<'a> = &'a D1;
 }
 
-pub trait AView {
-    fn b(&self) -> Option<&impl BView>;
-}
-pub trait BView {
-    fn c(&self) -> Option<&impl CView>;
-}
-pub trait CView {
-    fn b(&self) -> Option<&impl BView>;
-    fn d(&self) -> Option<&impl DView>;
-}
-pub trait DView: GetRegistry {
-    fn d(&self) -> Option<<Self::Registry as Registry>::D<'_>>;
-}
-
-// Wrapper struct for the `NView` trait blanket implementation
-#[repr(transparent)]
-pub struct MessageView<T>(pub T);
-
-impl<T> DView for MessageView<T>
+// pub trait AView {
+//     fn b(&self) -> Option<&impl BView>;
+// }
+// pub trait BView {
+//     fn c(&self) -> Option<&impl CView>;
+// }
+// pub trait CView {
+//     fn b(&self) -> Option<&impl BView>;
+//     fn d(&self) -> Option<&impl DView>;
+// }
+pub trait DView: GetRegistry + MsgFieldGetter<1>
 where
-    T: MsgFieldGetter<1>,
-    Self: GetRegistry,
-    for<'a> Self::Registry: Registry<D<'a> = MessageView<<T as MsgFieldGetter<1>>::Message<'a>>>,
+    for<'a> Self: MsgFieldGetter<1, Message<'a> = <Self::Registry as Registry>::D<'a>>,
 {
-    fn d(&self) -> Option<<Self::Registry as Registry>::D<'_>> {
-        <T as MsgFieldGetter<1>>::get(&self.0).map(MessageView)
+    fn d(&self) -> Option<impl DView> {
+        <Self as MsgFieldGetter<1>>::get(self)
     }
 }
+
+impl DView for D1 {}
 
 pub trait GetRegistry {
     type Registry: Registry;
 }
-impl GetRegistry for MessageView<D1> {
+impl GetRegistry for D1 {
     type Registry = SomeImplSet;
 }
-impl<'a> GetRegistry for MessageView<&'a D1> {
-    type Registry = SomeImplSet;
+
+pub struct DMain<T>(T);
+impl<T: DView> DMain<T> {
+    fn d(&self) -> Option<DMain<impl DView>> {
+        <T as DView>::d(&self.0).map(DMain)
+    }
 }
 
 #[test]
@@ -235,7 +228,7 @@ fn foo() {
     // let a = AMain::new(a_data);
     // let b = BMain::new(b_data);
     // let c = CMain::new(c_data);
-    let d = MessageView(d_data);
+    let d = DMain(d_data);
 
     // Test that the methods work through the user-facing types
     // Users don't need to know about View traits
@@ -249,7 +242,7 @@ fn foo() {
     let _ = d.d().unwrap().d();
 }
 
-fn bar<T: DView>(d: T) {
+fn bar<T: DView>(d: DMain<T>) {
     let _ = d.d();
     let _ = d.d().unwrap().d();
 }
