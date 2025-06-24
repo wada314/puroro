@@ -165,7 +165,9 @@ pub trait Registry {
     // type A<'a>: AView;
     // type B<'a>: BView;
     // type C<'a>: CView;
-    type D<'a>: DView;
+    type D<'a>: DView
+    where
+        Self: 'a;
 }
 
 pub struct SomeImplSet;
@@ -173,7 +175,10 @@ impl Registry for SomeImplSet {
     // type A<'a> = &'a A1;
     // type B<'a> = &'a B1;
     // type C<'a> = &'a C1;
-    type D<'a> = &'a D1;
+    type D<'a>
+        = &'a D1
+    where
+        Self: 'a;
 }
 
 // pub trait AView {
@@ -186,17 +191,18 @@ impl Registry for SomeImplSet {
 //     fn b(&self) -> Option<&impl BView>;
 //     fn d(&self) -> Option<&impl DView>;
 // }
-pub trait DView: GetRegistry + MsgFieldGetter<1>
+pub trait DView: GetRegistry {
+    fn d(&self) -> Option<<Self::Registry as Registry>::D<'_>>;
+}
+impl<T> DView for T
 where
-    for<'a> Self: MsgFieldGetter<1, Message<'a> = <Self::Registry as Registry>::D<'a>>,
+    T: GetRegistry,
+    for<'a> T: 'a + MsgFieldGetter<1, Message<'a> = <T::Registry as Registry>::D<'a>>,
 {
-    fn d(&self) -> Option<impl DView> {
+    fn d(&self) -> Option<<Self::Registry as Registry>::D<'_>> {
         <Self as MsgFieldGetter<1>>::get(self)
     }
 }
-
-impl DView for D1 {}
-impl<T: DView> DView for &T {}
 
 pub trait GetRegistry {
     type Registry: Registry;
