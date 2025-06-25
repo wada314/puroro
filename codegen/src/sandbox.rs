@@ -155,30 +155,10 @@ impl MsgFieldGetter<2> for C1 {
     }
 }
 impl MsgFieldGetter<1> for D1 {
-    type Message<'a> = &'a D1;
+    type Message<'a> = &'a dyn DView;
     fn get(&self) -> Option<Self::Message<'_>> {
-        self.d.as_deref()
+        self.d.as_deref().map(|x| x as &dyn DView)
     }
-}
-
-pub trait Registry {
-    // type A<'a>: AView;
-    // type B<'a>: BView;
-    // type C<'a>: CView;
-    type D<'a>: DView
-    where
-        Self: 'a;
-}
-
-pub struct SomeImplSet;
-impl Registry for SomeImplSet {
-    // type A<'a> = &'a A1;
-    // type B<'a> = &'a B1;
-    // type C<'a> = &'a C1;
-    type D<'a>
-        = &'a D1
-    where
-        Self: 'a;
 }
 
 // pub trait AView {
@@ -191,36 +171,15 @@ impl Registry for SomeImplSet {
 //     fn b(&self) -> Option<&impl BView>;
 //     fn d(&self) -> Option<&impl DView>;
 // }
-pub trait DView: GetRegistry {
-    fn d(&self) -> Option<<Self::Registry as Registry>::D<'_>>;
+pub trait DView {
+    fn d(&self) -> Option<&dyn DView>;
 }
 impl<T> DView for T
 where
-    T: GetRegistry,
-    for<'a> T: 'a + MsgFieldGetter<1, Message<'a> = <T::Registry as Registry>::D<'a>>,
+    for<'a> T: 'a + MsgFieldGetter<1, Message<'a> = &'a dyn DView>,
 {
-    fn d(&self) -> Option<<Self::Registry as Registry>::D<'_>> {
+    fn d(&self) -> Option<&dyn DView> {
         <Self as MsgFieldGetter<1>>::get(self)
-    }
-}
-
-pub trait GetRegistry {
-    type Registry: Registry;
-}
-impl GetRegistry for D1 {
-    type Registry = SomeImplSet;
-}
-impl<T: GetRegistry> GetRegistry for &T {
-    type Registry = T::Registry;
-}
-impl<T: GetRegistry> GetRegistry for Option<T> {
-    type Registry = T::Registry;
-}
-
-pub struct DMain<T>(T);
-impl<T: DView> DMain<T> {
-    fn d(&self) -> Option<DMain<impl DView>> {
-        <T as DView>::d(&self.0).map(DMain)
     }
 }
 
@@ -229,13 +188,13 @@ fn foo() {
     // let a_data = A1::default();
     // let b_data = B1::default();
     // let c_data = C1::default();
-    let d_data = D1::default();
+    let d = D1::default();
 
     // Use the user-facing types with default implementations
     // let a = AMain::new(a_data);
     // let b = BMain::new(b_data);
     // let c = CMain::new(c_data);
-    let d = DMain(d_data);
+    // let d = DMain(d_data);
 
     // Test that the methods work through the user-facing types
     // Users don't need to know about View traits
@@ -249,7 +208,7 @@ fn foo() {
     let _ = d.d().unwrap().d();
 }
 
-fn bar<T: DView>(d: DMain<T>) {
+fn bar(d: &dyn DView) {
     let _ = d.d();
     let _ = d.d().unwrap().d();
 }
