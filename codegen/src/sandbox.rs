@@ -68,6 +68,8 @@
 //!
 //! ### The `View` trait recursive definition problem
 
+use ::puroro::Either;
+
 #[derive(Default, Debug)]
 pub struct A1 {
     pub b: Box<B1>,
@@ -127,32 +129,45 @@ impl<T: MsgFieldGetter<N>, const N: i32> MsgFieldGetter<N> for Option<T> {
     }
 }
 
-impl MsgFieldGetter<1> for A1 {
+impl<T: MsgFieldGetter<N>, U: MsgFieldGetter<N>, const N: i32> MsgFieldGetter<N> for Either<T, U> {
     type Message<'a>
-        = &'a B1
+        = Either<T::Message<'a>, U::Message<'a>>
     where
         Self: 'a;
     fn get(&self) -> Option<Self::Message<'_>> {
-        Some(&self.b)
+        match self {
+            Either::Left(x) => x.get().map(Either::Left),
+            Either::Right(x) => x.get().map(Either::Right),
+        }
+    }
+}
+
+impl MsgFieldGetter<1> for A1 {
+    type Message<'a>
+        = &'a dyn BView
+    where
+        Self: 'a;
+    fn get(&self) -> Option<Self::Message<'_>> {
+        Some(self.b.as_ref() as &dyn BView)
     }
 }
 
 impl MsgFieldGetter<1> for B1 {
     type Message<'a>
-        = &'a C1
+        = &'a dyn CView
     where
         Self: 'a;
     fn get(&self) -> Option<Self::Message<'_>> {
-        Some(&self.c)
+        Some(self.c.as_ref() as &dyn CView)
     }
 }
 impl MsgFieldGetter<1> for C1 {
     type Message<'a>
-        = &'a B1
+        = &'a dyn BView
     where
         Self: 'a;
     fn get(&self) -> Option<Self::Message<'_>> {
-        self.b.as_deref()
+        self.b.as_deref().map(|x| x as &dyn BView)
     }
 }
 impl MsgFieldGetter<2> for C1 {
@@ -238,13 +253,13 @@ fn foo() {
     // Test that the methods work through the user-facing types
     // Users don't need to know about View traits
     let _ = a.b();
-    let _ = a.b().unwrap().c();
+    let _ = a.b().unwrap_or_else(|| &B1::default() as &dyn BView).c();
     let _ = b.c();
-    let _ = b.c().unwrap().d();
+    let _ = b.c().unwrap_or_else(|| &C1::default() as &dyn CView).d();
     let _ = c.b();
     let _ = c.d();
     let _ = d.d();
-    let _ = d.d().unwrap().d();
+    let _ = d.d().unwrap_or_else(|| &D1::default() as &dyn DView).d();
 }
 
 fn bar(d: &dyn DView) {
