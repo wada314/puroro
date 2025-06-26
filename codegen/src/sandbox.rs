@@ -243,23 +243,55 @@ where
     }
 }
 
+pub struct AMain<'a>(&'a dyn AView);
+pub struct BMain<'a>(&'a dyn BView);
+pub struct CMain<'a>(&'a dyn CView);
+pub struct DMain<'a>(&'a dyn DView);
+
+impl<'a> AMain<'a> {
+    pub fn b(&self) -> Option<BMain<'a>> {
+        self.0.b().map(BMain)
+    }
+}
+
+impl<'a> BMain<'a> {
+    pub fn c(&self) -> Option<CMain<'a>> {
+        self.0.c().map(CMain)
+    }
+}
+
+impl<'a> CMain<'a> {
+    pub fn b(&self) -> Option<BMain<'a>> {
+        self.0.b().map(BMain)
+    }
+    pub fn d(&self) -> Option<DMain<'a>> {
+        self.0.d().map(DMain)
+    }
+}
+
+impl<'a> DMain<'a> {
+    pub fn d(&self) -> Option<DMain<'a>> {
+        self.0.d().map(DMain)
+    }
+}
+
 #[test]
 fn foo() {
-    let a = A1::default();
-    let b = B1::default();
-    let c = C1::default();
-    let d = D1::default();
+    let a = AMain(&A1::default());
+    let b = BMain(&B1::default());
+    let c = CMain(&C1::default());
+    let d = DMain(&D1::default());
 
     // Test that the methods work through the user-facing types
     // Users don't need to know about View traits
     let _ = a.b();
-    let _ = a.b().unwrap_or_else(|| &B1::default() as &dyn BView).c();
+    let _ = a.b().map(|x| x.c());
     let _ = b.c();
-    let _ = b.c().unwrap_or_else(|| &C1::default() as &dyn CView).d();
+    let _ = b.c().map(|x| x.d());
     let _ = c.b();
     let _ = c.d();
     let _ = d.d();
-    let _ = d.d().unwrap_or_else(|| &D1::default() as &dyn DView).d();
+    let _ = d.d().map(|x| x.d());
 }
 
 fn bar(d: &dyn DView) {
