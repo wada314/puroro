@@ -68,7 +68,7 @@
 //!
 //! ### The `View` trait recursive definition problem
 
-use ::puroro::Either;
+use ::puroro::{Both, Either, EitherOrBoth};
 
 #[derive(Default, Debug)]
 pub struct A1 {
@@ -136,9 +136,31 @@ impl<T: MsgFieldGetter<N>, U: MsgFieldGetter<N>, const N: i32> MsgFieldGetter<N>
         Self: 'a;
     fn get(&self) -> Option<Self::Message<'_>> {
         match self {
-            Either::Left(x) => x.get().map(Either::Left),
-            Either::Right(x) => x.get().map(Either::Right),
+            Either::Left(left) => left.get().map(Either::Left),
+            Either::Right(right) => right.get().map(Either::Right),
         }
+    }
+}
+
+impl<T: MsgFieldGetter<N>, U: MsgFieldGetter<N>, const N: i32> MsgFieldGetter<N>
+    for EitherOrBoth<T, U>
+{
+    type Message<'a>
+        = EitherOrBoth<T::Message<'a>, U::Message<'a>>
+    where
+        Self: 'a;
+    fn get(&self) -> Option<Self::Message<'_>> {
+        self.as_ref().map2(T::get, U::get).factor_none()
+    }
+}
+
+impl<T: MsgFieldGetter<N>, U: MsgFieldGetter<N>, const N: i32> MsgFieldGetter<N> for Both<T, U> {
+    type Message<'a>
+        = EitherOrBoth<T::Message<'a>, U::Message<'a>>
+    where
+        Self: 'a;
+    fn get(&self) -> Option<Self::Message<'_>> {
+        self.as_ref().map2(T::get, U::get).factor_none()
     }
 }
 
