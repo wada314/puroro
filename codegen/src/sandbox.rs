@@ -127,6 +127,16 @@ impl<T: MsgFieldGetter<N>, const N: i32> MsgFieldGetter<N> for Option<T> {
     }
 }
 
+impl MsgFieldGetter<1> for A1 {
+    type Message<'a>
+        = &'a B1
+    where
+        Self: 'a;
+    fn get(&self) -> Option<Self::Message<'_>> {
+        Some(&self.b)
+    }
+}
+
 impl MsgFieldGetter<1> for B1 {
     type Message<'a>
         = &'a C1
@@ -147,33 +157,68 @@ impl MsgFieldGetter<1> for C1 {
 }
 impl MsgFieldGetter<2> for C1 {
     type Message<'a>
-        = &'a D1
+        = &'a dyn DView
     where
         Self: 'a;
     fn get(&self) -> Option<Self::Message<'_>> {
-        Some(&self.d)
+        Some(self.d.as_ref() as &dyn DView)
     }
 }
 impl MsgFieldGetter<1> for D1 {
-    type Message<'a> = &'a dyn DView;
+    type Message<'a>
+        = &'a dyn DView
+    where
+        Self: 'a;
     fn get(&self) -> Option<Self::Message<'_>> {
         self.d.as_deref().map(|x| x as &dyn DView)
     }
 }
 
-// pub trait AView {
-//     fn b(&self) -> Option<&impl BView>;
-// }
-// pub trait BView {
-//     fn c(&self) -> Option<&impl CView>;
-// }
-// pub trait CView {
-//     fn b(&self) -> Option<&impl BView>;
-//     fn d(&self) -> Option<&impl DView>;
-// }
+pub trait AView {
+    fn b(&self) -> Option<&dyn BView>;
+}
+pub trait BView {
+    fn c(&self) -> Option<&dyn CView>;
+}
+pub trait CView {
+    fn b(&self) -> Option<&dyn BView>;
+    fn d(&self) -> Option<&dyn DView>;
+}
 pub trait DView {
     fn d(&self) -> Option<&dyn DView>;
 }
+
+impl<T> AView for T
+where
+    for<'a> T: 'a + MsgFieldGetter<1, Message<'a> = &'a dyn BView>,
+{
+    fn b(&self) -> Option<&dyn BView> {
+        <Self as MsgFieldGetter<1>>::get(self)
+    }
+}
+
+impl<T> BView for T
+where
+    for<'a> T: 'a + MsgFieldGetter<1, Message<'a> = &'a dyn CView>,
+{
+    fn c(&self) -> Option<&dyn CView> {
+        <Self as MsgFieldGetter<1>>::get(self)
+    }
+}
+
+impl<T> CView for T
+where
+    for<'a> T: 'a + MsgFieldGetter<1, Message<'a> = &'a dyn BView>,
+    for<'a> T: 'a + MsgFieldGetter<2, Message<'a> = &'a dyn DView>,
+{
+    fn b(&self) -> Option<&dyn BView> {
+        <Self as MsgFieldGetter<1>>::get(self)
+    }
+    fn d(&self) -> Option<&dyn DView> {
+        <Self as MsgFieldGetter<2>>::get(self)
+    }
+}
+
 impl<T> DView for T
 where
     for<'a> T: 'a + MsgFieldGetter<1, Message<'a> = &'a dyn DView>,
@@ -185,25 +230,19 @@ where
 
 #[test]
 fn foo() {
-    // let a_data = A1::default();
-    // let b_data = B1::default();
-    // let c_data = C1::default();
+    let a = A1::default();
+    let b = B1::default();
+    let c = C1::default();
     let d = D1::default();
-
-    // Use the user-facing types with default implementations
-    // let a = AMain::new(a_data);
-    // let b = BMain::new(b_data);
-    // let c = CMain::new(c_data);
-    // let d = DMain(d_data);
 
     // Test that the methods work through the user-facing types
     // Users don't need to know about View traits
-    // let _ = a.b();
-    // let _ = a.b().unwrap().c();
-    // let _ = b.c();
-    // let _ = b.c().unwrap().d();
-    // let _ = c.b();
-    // let _ = c.d();
+    let _ = a.b();
+    let _ = a.b().unwrap().c();
+    let _ = b.c();
+    let _ = b.c().unwrap().d();
+    let _ = c.b();
+    let _ = c.d();
     let _ = d.d();
     let _ = d.d().unwrap().d();
 }
