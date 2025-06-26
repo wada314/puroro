@@ -96,7 +96,7 @@ pub struct D2 {
     pub d: Option<Box<D2>>,
 }
 
-pub trait MsgFieldGetter<const N: i32> {
+pub trait ScalarMsgFieldGetter<const N: i32> {
     type Message<'a>
     where
         Self: 'a;
@@ -109,7 +109,7 @@ pub trait NonMsgFieldGetter<const N: i32> {
     fn get(&self) -> Self::Value<'_>;
 }
 
-impl<T: MsgFieldGetter<N>, const N: i32> MsgFieldGetter<N> for &T {
+impl<T: ScalarMsgFieldGetter<N>, const N: i32> ScalarMsgFieldGetter<N> for &T {
     type Message<'a>
         = T::Message<'a>
     where
@@ -119,7 +119,7 @@ impl<T: MsgFieldGetter<N>, const N: i32> MsgFieldGetter<N> for &T {
     }
 }
 
-impl<T: MsgFieldGetter<N>, const N: i32> MsgFieldGetter<N> for Option<T> {
+impl<T: ScalarMsgFieldGetter<N>, const N: i32> ScalarMsgFieldGetter<N> for Option<T> {
     type Message<'a>
         = T::Message<'a>
     where
@@ -129,7 +129,9 @@ impl<T: MsgFieldGetter<N>, const N: i32> MsgFieldGetter<N> for Option<T> {
     }
 }
 
-impl<T: MsgFieldGetter<N>, U: MsgFieldGetter<N>, const N: i32> MsgFieldGetter<N> for Either<T, U> {
+impl<T: ScalarMsgFieldGetter<N>, U: ScalarMsgFieldGetter<N>, const N: i32> ScalarMsgFieldGetter<N>
+    for Either<T, U>
+{
     type Message<'a>
         = Either<T::Message<'a>, U::Message<'a>>
     where
@@ -142,7 +144,7 @@ impl<T: MsgFieldGetter<N>, U: MsgFieldGetter<N>, const N: i32> MsgFieldGetter<N>
     }
 }
 
-impl<T: MsgFieldGetter<N>, U: MsgFieldGetter<N>, const N: i32> MsgFieldGetter<N>
+impl<T: ScalarMsgFieldGetter<N>, U: ScalarMsgFieldGetter<N>, const N: i32> ScalarMsgFieldGetter<N>
     for EitherOrBoth<T, U>
 {
     type Message<'a>
@@ -154,7 +156,9 @@ impl<T: MsgFieldGetter<N>, U: MsgFieldGetter<N>, const N: i32> MsgFieldGetter<N>
     }
 }
 
-impl<T: MsgFieldGetter<N>, U: MsgFieldGetter<N>, const N: i32> MsgFieldGetter<N> for Both<T, U> {
+impl<T: ScalarMsgFieldGetter<N>, U: ScalarMsgFieldGetter<N>, const N: i32> ScalarMsgFieldGetter<N>
+    for Both<T, U>
+{
     type Message<'a>
         = EitherOrBoth<T::Message<'a>, U::Message<'a>>
     where
@@ -164,7 +168,7 @@ impl<T: MsgFieldGetter<N>, U: MsgFieldGetter<N>, const N: i32> MsgFieldGetter<N>
     }
 }
 
-impl MsgFieldGetter<1> for A1 {
+impl ScalarMsgFieldGetter<1> for A1 {
     type Message<'a>
         = &'a dyn BView
     where
@@ -174,7 +178,7 @@ impl MsgFieldGetter<1> for A1 {
     }
 }
 
-impl MsgFieldGetter<1> for B1 {
+impl ScalarMsgFieldGetter<1> for B1 {
     type Message<'a>
         = &'a dyn CView
     where
@@ -183,7 +187,7 @@ impl MsgFieldGetter<1> for B1 {
         Some(self.c.as_ref() as &dyn CView)
     }
 }
-impl MsgFieldGetter<1> for C1 {
+impl ScalarMsgFieldGetter<1> for C1 {
     type Message<'a>
         = &'a dyn BView
     where
@@ -192,7 +196,7 @@ impl MsgFieldGetter<1> for C1 {
         self.b.as_deref().map(|x| x as &dyn BView)
     }
 }
-impl MsgFieldGetter<2> for C1 {
+impl ScalarMsgFieldGetter<2> for C1 {
     type Message<'a>
         = &'a dyn DView
     where
@@ -201,7 +205,7 @@ impl MsgFieldGetter<2> for C1 {
         Some(self.d.as_ref() as &dyn DView)
     }
 }
-impl MsgFieldGetter<1> for D1 {
+impl ScalarMsgFieldGetter<1> for D1 {
     type Message<'a>
         = &'a dyn DView
     where
@@ -227,41 +231,41 @@ pub trait DView {
 
 impl<T> AView for T
 where
-    for<'a> T: 'a + MsgFieldGetter<1, Message<'a> = &'a dyn BView>,
+    for<'a> T: 'a + ScalarMsgFieldGetter<1, Message<'a> = &'a dyn BView>,
 {
     fn b(&self) -> Option<&dyn BView> {
-        <Self as MsgFieldGetter<1>>::get(self)
+        <Self as ScalarMsgFieldGetter<1>>::get(self)
     }
 }
 
 impl<T> BView for T
 where
-    for<'a> T: 'a + MsgFieldGetter<1, Message<'a> = &'a dyn CView>,
+    for<'a> T: 'a + ScalarMsgFieldGetter<1, Message<'a> = &'a dyn CView>,
 {
     fn c(&self) -> Option<&dyn CView> {
-        <Self as MsgFieldGetter<1>>::get(self)
+        <Self as ScalarMsgFieldGetter<1>>::get(self)
     }
 }
 
 impl<T> CView for T
 where
-    for<'a> T: 'a + MsgFieldGetter<1, Message<'a> = &'a dyn BView>,
-    for<'a> T: 'a + MsgFieldGetter<2, Message<'a> = &'a dyn DView>,
+    for<'a> T: 'a + ScalarMsgFieldGetter<1, Message<'a> = &'a dyn BView>,
+    for<'a> T: 'a + ScalarMsgFieldGetter<2, Message<'a> = &'a dyn DView>,
 {
     fn b(&self) -> Option<&dyn BView> {
-        <Self as MsgFieldGetter<1>>::get(self)
+        <Self as ScalarMsgFieldGetter<1>>::get(self)
     }
     fn d(&self) -> Option<&dyn DView> {
-        <Self as MsgFieldGetter<2>>::get(self)
+        <Self as ScalarMsgFieldGetter<2>>::get(self)
     }
 }
 
 impl<T> DView for T
 where
-    for<'a> T: 'a + MsgFieldGetter<1, Message<'a> = &'a dyn DView>,
+    for<'a> T: 'a + ScalarMsgFieldGetter<1, Message<'a> = &'a dyn DView>,
 {
     fn d(&self) -> Option<&dyn DView> {
-        <Self as MsgFieldGetter<1>>::get(self)
+        <Self as ScalarMsgFieldGetter<1>>::get(self)
     }
 }
 
