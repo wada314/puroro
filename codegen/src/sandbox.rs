@@ -45,7 +45,6 @@
 //!     * Implements the `TryView` trait.
 //! * It's great if we can minimize the size of the generated code, but not a first priority.
 //!   * But at most O(N) length please...
-//! * We do not rely on the `dyn` trait, at least for the default implementation.
 //! * For the `View` and `TryView` traits, we provide the blanket implementations for:
 //!   * The `&T` and `&mut T` types,
 //!   * The `Option<T>` type,
