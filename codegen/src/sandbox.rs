@@ -102,6 +102,12 @@ pub trait ScalarMsgFieldGetter<const N: i32> {
         Self: 'a;
     fn get(&self) -> Option<Self::Message<'_>>;
 }
+pub trait RepeatedMsgFieldGetter<const N: i32> {
+    type Message<'a>
+    where
+        Self: 'a;
+    fn get(&self) -> impl Iterator<Item = Self::Message<'_>>;
+}
 pub trait NonMsgFieldGetter<const N: i32> {
     type Value<'a>
     where
@@ -165,6 +171,62 @@ impl<T: ScalarMsgFieldGetter<N>, U: ScalarMsgFieldGetter<N>, const N: i32> Scala
         Self: 'a;
     fn get(&self) -> Option<Self::Message<'_>> {
         self.as_ref().map2(T::get, U::get).factor_none()
+    }
+}
+
+impl<T: RepeatedMsgFieldGetter<N>, const N: i32> RepeatedMsgFieldGetter<N> for &T {
+    type Message<'a>
+        = T::Message<'a>
+    where
+        Self: 'a;
+    fn get(&self) -> impl Iterator<Item = Self::Message<'_>> {
+        T::get(self)
+    }
+}
+
+impl<T: RepeatedMsgFieldGetter<N>, const N: i32> RepeatedMsgFieldGetter<N> for Option<T> {
+    type Message<'a>
+        = T::Message<'a>
+    where
+        Self: 'a;
+    fn get(&self) -> impl Iterator<Item = Self::Message<'_>> {
+        self.as_ref().map(T::get).into_iter().flatten()
+    }
+}
+
+impl<T: RepeatedMsgFieldGetter<N>, U: RepeatedMsgFieldGetter<N>, const N: i32>
+    RepeatedMsgFieldGetter<N> for Either<T, U>
+{
+    type Message<'a>
+        = Either<T::Message<'a>, U::Message<'a>>
+    where
+        Self: 'a;
+    fn get(&self) -> impl Iterator<Item = Self::Message<'_>> {
+        self.as_ref().map2(T::get, U::get).into_iter_either()
+    }
+}
+
+impl<T: RepeatedMsgFieldGetter<N>, U: RepeatedMsgFieldGetter<N>, const N: i32>
+    RepeatedMsgFieldGetter<N> for EitherOrBoth<T, U>
+{
+    type Message<'a>
+        = Either<T::Message<'a>, U::Message<'a>>
+    where
+        Self: 'a;
+    fn get(&self) -> impl Iterator<Item = Self::Message<'_>> {
+        self.as_ref().map2(T::get, U::get).into_iter_either()
+    }
+}
+
+impl<T: RepeatedMsgFieldGetter<N>, U: RepeatedMsgFieldGetter<N>, const N: i32>
+    RepeatedMsgFieldGetter<N> for Both<T, U>
+{
+    type Message<'a>
+        = Either<T::Message<'a>, U::Message<'a>>
+    where
+        Self: 'a;
+    fn get(&self) -> impl Iterator<Item = Self::Message<'_>> {
+        self.as_ref().map2(T::get, U::get).into_iter_either()
     }
 }
 
