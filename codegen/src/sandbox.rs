@@ -379,7 +379,7 @@ impl<T: ?Sized + CView> CView for &T {
 
 impl<T> DView for MsgStruct<T>
 where
-    for<'a> Self: ScalarMsgFieldGetter<1, Message<'a> = <Self::Registry as Registry>::DView<'a>>,
+    for<'a> Self: ScalarMsgFieldGetter<1, Message<'a> = &'a dyn DView<Registry = RegistryImpl>>,
 {
     type Registry = RegistryImpl;
     fn d(&self) -> Option<<Self::Registry as Registry>::DView<'_>> {
