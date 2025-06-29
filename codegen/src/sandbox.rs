@@ -67,32 +67,35 @@
 //!
 //! ### The `View` trait recursive definition problem
 
-use ::puroro::{Both, Either, EitherOrBoth};
+use puroro::{Both, Either, EitherOrBoth};
+
+#[derive(Default, Debug)]
+pub struct MsgStruct<T>(T);
 
 #[derive(Default, Debug)]
 pub struct A1 {
-    pub b: Box<B1>,
+    pub b: Box<MsgStruct<B1>>,
 }
 #[derive(Default, Debug)]
 pub struct B1 {
-    pub c: Box<C1>,
+    pub c: Box<MsgStruct<C1>>,
 }
 #[derive(Default, Debug)]
 pub struct C1 {
-    pub b: Option<Box<B1>>,
-    pub d: Box<D1>,
+    pub b: Option<Box<MsgStruct<B1>>>,
+    pub d: Box<MsgStruct<D1>>,
 }
 #[derive(Default, Debug)]
 pub struct D1 {
-    pub d: Option<Box<D1>>,
+    pub d: Option<Box<MsgStruct<D1>>>,
 }
 #[derive(Default, Debug)]
 pub struct A2 {
-    pub b: Box<B1>,
+    pub b: Box<MsgStruct<B1>>,
 }
 #[derive(Default, Debug)]
 pub struct D2 {
-    pub d: Option<Box<D2>>,
+    pub d: Option<Box<MsgStruct<D2>>>,
 }
 
 pub trait ScalarMsgFieldGetter<const N: i32> {
@@ -229,9 +232,9 @@ impl<T: RepeatedMsgFieldGetter<N>, U: RepeatedMsgFieldGetter<N>, const N: i32>
     }
 }
 
-impl ScalarMsgFieldGetter<1> for A1 {
+impl ScalarMsgFieldGetter<1> for MsgStruct<A1> {
     type Message<'a>
-        = &'a dyn BView
+        = &'a dyn BView<Registry = RegistryImpl>
     where
         Self: 'a;
     fn get(&self) -> Option<Self::Message<'_>> {
@@ -239,36 +242,36 @@ impl ScalarMsgFieldGetter<1> for A1 {
     }
 }
 
-impl ScalarMsgFieldGetter<1> for B1 {
+impl ScalarMsgFieldGetter<1> for MsgStruct<B1> {
     type Message<'a>
-        = &'a dyn CView
+        = &'a dyn CView<Registry = RegistryImpl>
     where
         Self: 'a;
     fn get(&self) -> Option<Self::Message<'_>> {
         Some(self.c.as_ref() as &dyn CView)
     }
 }
-impl ScalarMsgFieldGetter<1> for C1 {
+impl ScalarMsgFieldGetter<1> for MsgStruct<C1> {
     type Message<'a>
-        = &'a dyn BView
+        = &'a dyn BView<Registry = RegistryImpl>
     where
         Self: 'a;
     fn get(&self) -> Option<Self::Message<'_>> {
         self.b.as_deref().map(|x| x as &dyn BView)
     }
 }
-impl ScalarMsgFieldGetter<2> for C1 {
+impl ScalarMsgFieldGetter<2> for MsgStruct<C1> {
     type Message<'a>
-        = &'a dyn DView
+        = &'a dyn DView<Registry = RegistryImpl>
     where
         Self: 'a;
     fn get(&self) -> Option<Self::Message<'_>> {
         Some(self.d.as_ref() as &dyn DView)
     }
 }
-impl ScalarMsgFieldGetter<1> for D1 {
+impl ScalarMsgFieldGetter<1> for MsgStruct<D1> {
     type Message<'a>
-        = &'a dyn DView
+        = &'a dyn DView<Registry = RegistryImpl>
     where
         Self: 'a;
     fn get(&self) -> Option<Self::Message<'_>> {
@@ -276,88 +279,149 @@ impl ScalarMsgFieldGetter<1> for D1 {
     }
 }
 
+pub trait Registry {
+    type AView<'a>: AView
+    where
+        Self: 'a;
+    type BView<'a>: BView
+    where
+        Self: 'a;
+    type CView<'a>: CView
+    where
+        Self: 'a;
+    type DView<'a>: DView
+    where
+        Self: 'a;
+}
+pub struct RegistryImpl;
+impl Registry for RegistryImpl {
+    type AView<'a> = &'a dyn AView<Registry = RegistryImpl>;
+    type BView<'a> = &'a dyn BView<Registry = RegistryImpl>;
+    type CView<'a> = &'a dyn CView<Registry = RegistryImpl>;
+    type DView<'a> = &'a dyn DView<Registry = RegistryImpl>;
+}
+
 pub trait AView {
-    fn b(&self) -> Option<&dyn BView>;
+    type Registry: Registry;
+    fn b(&self) -> Option<<Self::Registry as Registry>::BView<'_>>;
 }
 pub trait BView {
-    fn c(&self) -> Option<&dyn CView>;
+    type Registry: Registry;
+    fn c(&self) -> Option<<Self::Registry as Registry>::CView<'_>>;
 }
 pub trait CView {
-    fn b(&self) -> Option<&dyn BView>;
-    fn d(&self) -> Option<&dyn DView>;
+    type Registry: Registry;
+    fn b(&self) -> Option<<Self::Registry as Registry>::BView<'_>>;
+    fn d(&self) -> Option<<Self::Registry as Registry>::DView<'_>>;
 }
 pub trait DView {
-    fn d(&self) -> Option<&dyn DView>;
+    type Registry: Registry;
+    fn d(&self) -> Option<<Self::Registry as Registry>::DView<'_>>;
 }
 
-impl<T> AView for T
+impl<T> AView for MsgStruct<T>
 where
-    for<'a> T: 'a + ScalarMsgFieldGetter<1, Message<'a> = &'a dyn BView>,
+    for<'a> Self: ScalarMsgFieldGetter<1, Message<'a> = <Self::Registry as Registry>::BView<'a>>,
 {
-    fn b(&self) -> Option<&dyn BView> {
+    type Registry = RegistryImpl;
+    fn b(&self) -> Option<<Self::Registry as Registry>::BView<'_>> {
         <Self as ScalarMsgFieldGetter<1>>::get(self)
     }
 }
 
-impl<T> BView for T
-where
-    for<'a> T: 'a + ScalarMsgFieldGetter<1, Message<'a> = &'a dyn CView>,
-{
-    fn c(&self) -> Option<&dyn CView> {
+impl<T: ?Sized + AView> AView for &T {
+    type Registry = RegistryImpl;
+    fn b(&self) -> Option<<Self::Registry as Registry>::BView<'_>> {
         <Self as ScalarMsgFieldGetter<1>>::get(self)
     }
 }
 
-impl<T> CView for T
+impl<T> BView for MsgStruct<T>
 where
-    for<'a> T: 'a + ScalarMsgFieldGetter<1, Message<'a> = &'a dyn BView>,
-    for<'a> T: 'a + ScalarMsgFieldGetter<2, Message<'a> = &'a dyn DView>,
+    for<'a> Self: ScalarMsgFieldGetter<1, Message<'a> = <Self::Registry as Registry>::CView<'a>>,
 {
-    fn b(&self) -> Option<&dyn BView> {
+    type Registry = RegistryImpl;
+    fn c(&self) -> Option<<Self::Registry as Registry>::CView<'_>> {
         <Self as ScalarMsgFieldGetter<1>>::get(self)
     }
-    fn d(&self) -> Option<&dyn DView> {
+}
+
+impl<T: ?Sized + BView> BView for &T {
+    type Registry = RegistryImpl;
+    fn c(&self) -> Option<<Self::Registry as Registry>::CView<'_>> {
+        <Self as ScalarMsgFieldGetter<1>>::get(self)
+    }
+}
+
+impl<T> CView for MsgStruct<T>
+where
+    for<'a> Self: ScalarMsgFieldGetter<1, Message<'a> = <Self::Registry as Registry>::BView<'a>>,
+    for<'a> Self: ScalarMsgFieldGetter<2, Message<'a> = <Self::Registry as Registry>::DView<'a>>,
+{
+    type Registry = RegistryImpl;
+    fn b(&self) -> Option<<Self::Registry as Registry>::BView<'_>> {
+        <Self as ScalarMsgFieldGetter<1>>::get(self)
+    }
+    fn d(&self) -> Option<<Self::Registry as Registry>::DView<'_>> {
         <Self as ScalarMsgFieldGetter<2>>::get(self)
     }
 }
 
-impl<T> DView for T
+impl<T: ?Sized + CView> CView for &T {
+    type Registry = RegistryImpl;
+    fn b(&self) -> Option<<Self::Registry as Registry>::BView<'_>> {
+        <Self as ScalarMsgFieldGetter<1>>::get(self)
+    }
+    fn d(&self) -> Option<<Self::Registry as Registry>::DView<'_>> {
+        <Self as ScalarMsgFieldGetter<2>>::get(self)
+    }
+}
+
+impl<T> DView for MsgStruct<T>
 where
-    for<'a> T: 'a + ScalarMsgFieldGetter<1, Message<'a> = &'a dyn DView>,
+    for<'a> Self: ScalarMsgFieldGetter<1, Message<'a> = <Self::Registry as Registry>::DView<'a>>,
 {
-    fn d(&self) -> Option<&dyn DView> {
+    type Registry = RegistryImpl;
+    fn d(&self) -> Option<<Self::Registry as Registry>::DView<'_>> {
         <Self as ScalarMsgFieldGetter<1>>::get(self)
     }
 }
 
-pub struct AMain<'a>(&'a dyn AView);
-pub struct BMain<'a>(&'a dyn BView);
-pub struct CMain<'a>(&'a dyn CView);
-pub struct DMain<'a>(&'a dyn DView);
+impl<T: ?Sized + DView> DView for &T {
+    type Registry = RegistryImpl;
+    fn d(&self) -> Option<<Self::Registry as Registry>::DView<'_>> {
+        <Self as ScalarMsgFieldGetter<1>>::get(self)
+    }
+}
 
-impl<'a> AMain<'a> {
-    pub fn b(&self) -> Option<BMain<'a>> {
+pub struct AMain<T: AView>(T);
+pub struct BMain<T: BView>(T);
+pub struct CMain<T: CView>(T);
+pub struct DMain<T: DView>(T);
+
+impl<T: AView> AMain<T> {
+    pub fn b(&self) -> Option<BMain<impl BView>> {
         self.0.b().map(BMain)
     }
 }
 
-impl<'a> BMain<'a> {
-    pub fn c(&self) -> Option<CMain<'a>> {
+impl<T: BView> BMain<T> {
+    pub fn c(&self) -> Option<CMain<impl CView>> {
         self.0.c().map(CMain)
     }
 }
 
-impl<'a> CMain<'a> {
-    pub fn b(&self) -> Option<BMain<'a>> {
+impl<T: CView> CMain<T> {
+    pub fn b(&self) -> Option<BMain<impl BView>> {
         self.0.b().map(BMain)
     }
-    pub fn d(&self) -> Option<DMain<'a>> {
+    pub fn d(&self) -> Option<DMain<impl DView>> {
         self.0.d().map(DMain)
     }
 }
 
-impl<'a> DMain<'a> {
-    pub fn d(&self) -> Option<DMain<'a>> {
+impl<T: DView> DMain<T> {
+    pub fn d(&self) -> Option<DMain<impl DView>> {
         self.0.d().map(DMain)
     }
 }
