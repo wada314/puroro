@@ -319,9 +319,9 @@ pub trait DView {
     fn d(&self) -> Option<<Self::Registry as Registry>::DView<'_>>;
 }
 
-impl<T> AView for MsgStruct<T>
+impl<'a, T: 'a> AView for MsgStruct<T>
 where
-    for<'a> Self: ScalarMsgFieldGetter<1, Message<'a> = <Self::Registry as Registry>::BView<'a>>,
+    Self: ScalarMsgFieldGetter<1, Message<'a> = &'a dyn BView<Registry = RegistryImpl>>,
 {
     type Registry = RegistryImpl;
     fn b(&self) -> Option<<Self::Registry as Registry>::BView<'_>> {
@@ -336,9 +336,9 @@ impl<T: ?Sized + AView> AView for &T {
     }
 }
 
-impl<T> BView for MsgStruct<T>
+impl<'a, T: 'a> BView for MsgStruct<T>
 where
-    for<'a> Self: ScalarMsgFieldGetter<1, Message<'a> = <Self::Registry as Registry>::CView<'a>>,
+    Self: ScalarMsgFieldGetter<1, Message<'a> = &'a dyn CView<Registry = RegistryImpl>>,
 {
     type Registry = RegistryImpl;
     fn c(&self) -> Option<<Self::Registry as Registry>::CView<'_>> {
@@ -353,10 +353,10 @@ impl<T: ?Sized + BView> BView for &T {
     }
 }
 
-impl<T> CView for MsgStruct<T>
+impl<'a, T: 'a> CView for MsgStruct<T>
 where
-    for<'a> Self: ScalarMsgFieldGetter<1, Message<'a> = <Self::Registry as Registry>::BView<'a>>,
-    for<'a> Self: ScalarMsgFieldGetter<2, Message<'a> = <Self::Registry as Registry>::DView<'a>>,
+    Self: ScalarMsgFieldGetter<1, Message<'a> = &'a dyn BView<Registry = RegistryImpl>>,
+    Self: ScalarMsgFieldGetter<2, Message<'a> = &'a dyn DView<Registry = RegistryImpl>>,
 {
     type Registry = RegistryImpl;
     fn b(&self) -> Option<<Self::Registry as Registry>::BView<'_>> {
@@ -377,9 +377,9 @@ impl<T: ?Sized + CView> CView for &T {
     }
 }
 
-impl<T> DView for MsgStruct<T>
+impl<'a, T: 'a> DView for MsgStruct<T>
 where
-    for<'a> Self: ScalarMsgFieldGetter<1, Message<'a> = &'a dyn DView<Registry = RegistryImpl>>,
+    Self: ScalarMsgFieldGetter<1, Message<'a> = &'a dyn DView<Registry = RegistryImpl>>,
 {
     type Registry = RegistryImpl;
     fn d(&self) -> Option<<Self::Registry as Registry>::DView<'_>> {
@@ -445,7 +445,7 @@ fn foo() {
     let _ = d.d().map(|x| x.d());
 }
 
-fn bar(d: &dyn DView) {
+fn bar(d: &dyn DView<Registry = RegistryImpl>) {
     let _ = d.d();
     let _ = d.d().unwrap().d();
 }
