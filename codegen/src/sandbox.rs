@@ -379,9 +379,9 @@ pub trait DView {
     fn d(&self) -> Option<<Self::Registry as Registry>::DView<'_>>;
 }
 
-impl<T> AView for MsgStruct<T>
+impl<'a, T: 'a> AView for MsgStruct<T>
 where
-    for<'a> Self: ScalarMsgFieldGetter<1, Message<'a> = &'a dyn BView<Registry = RegistryImpl>>,
+    Self: ScalarMsgFieldGetter<1, Message<'a> = &'a dyn BView<Registry = RegistryImpl>>,
 {
     type Registry = RegistryImpl;
     fn b(&self) -> Option<<Self::Registry as Registry>::BView<'_>> {
