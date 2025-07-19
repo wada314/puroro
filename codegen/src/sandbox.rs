@@ -95,9 +95,14 @@
 //!         Self: 'a;
 //!     fn address(&self) -> Self::Address<'_>;
 //! }
+//!
+//! // with the following blanket implementation to consider the `&T` type can also be a `AddressView` type
+//! // if `T` implements the `AddressView` trait.
+//! impl<T: AddressView> AddressView for &T { /* ... */ }
 //! ```
 //!
-//! This design provides the flexibility to return a by-value type, or a reference type.
+//! This design provides the flexibility to return a by-value type,
+//! or a reference type (via the `&T` type's blanket implementation).
 //!
 //! ## GAT field getter details
 //!
