@@ -279,7 +279,7 @@ impl ScalarMsgFieldGetter<1> for MsgStruct<A1> {
     where
         Self: 'a;
     fn get(&self) -> Option<Self::Message<'_>> {
-        Some(self.b.as_ref() as &dyn BView)
+        Some(self.0.b.as_ref() as &dyn BView<Registry = RegistryImpl>)
     }
 }
 
@@ -289,7 +289,7 @@ impl ScalarMsgFieldGetter<1> for MsgStruct<B1> {
     where
         Self: 'a;
     fn get(&self) -> Option<Self::Message<'_>> {
-        Some(self.c.as_ref() as &dyn CView)
+        Some(self.0.c.as_ref() as &dyn CView<Registry = RegistryImpl>)
     }
 }
 impl ScalarMsgFieldGetter<1> for MsgStruct<C1> {
@@ -298,7 +298,10 @@ impl ScalarMsgFieldGetter<1> for MsgStruct<C1> {
     where
         Self: 'a;
     fn get(&self) -> Option<Self::Message<'_>> {
-        self.b.as_deref().map(|x| x as &dyn BView)
+        self.0
+            .b
+            .as_deref()
+            .map(|x| x as &dyn BView<Registry = RegistryImpl>)
     }
 }
 impl ScalarMsgFieldGetter<2> for MsgStruct<C1> {
@@ -307,7 +310,7 @@ impl ScalarMsgFieldGetter<2> for MsgStruct<C1> {
     where
         Self: 'a;
     fn get(&self) -> Option<Self::Message<'_>> {
-        Some(self.d.as_ref() as &dyn DView)
+        Some(self.0.d.as_ref() as &dyn DView<Registry = RegistryImpl>)
     }
 }
 impl ScalarMsgFieldGetter<1> for MsgStruct<D1> {
@@ -316,7 +319,23 @@ impl ScalarMsgFieldGetter<1> for MsgStruct<D1> {
     where
         Self: 'a;
     fn get(&self) -> Option<Self::Message<'_>> {
-        self.d.as_deref().map(|x| x as &dyn DView)
+        self.0
+            .d
+            .as_deref()
+            .map(|x| x as &dyn DView<Registry = RegistryImpl>)
+    }
+}
+
+pub trait RecursiveErrorSampleView {
+    type Message<'a>: RecursiveErrorSampleView
+    where
+        Self: 'a;
+    fn message(&self) -> Self::Message<'_>;
+}
+impl RecursiveErrorSampleView for () {
+    type Message<'a> = ();
+    fn message(&self) -> Self::Message<'_> {
+        ()
     }
 }
 
