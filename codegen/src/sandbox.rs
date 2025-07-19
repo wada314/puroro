@@ -488,10 +488,10 @@ impl<T: DView> DMain<T> {
 
 #[test]
 fn foo() {
-    let a = AMain(&A1::default());
-    let b = BMain(&B1::default());
-    let c = CMain(&C1::default());
-    let d = DMain(&D1::default());
+    let a = AMain(MsgStruct(A1::default()));
+    let b = BMain(MsgStruct(B1::default()));
+    let c = CMain(MsgStruct(C1::default()));
+    let d = DMain(MsgStruct(D1::default()));
 
     // Test that the methods work through the user-facing types
     // Users don't need to know about View traits
