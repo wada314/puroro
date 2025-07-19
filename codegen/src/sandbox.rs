@@ -389,10 +389,10 @@ where
     }
 }
 
-impl<T: ?Sized + AView> AView for &T {
+impl<T: ?Sized + AView<Registry = RegistryImpl>> AView for &T {
     type Registry = RegistryImpl;
     fn b(&self) -> Option<<Self::Registry as Registry>::BView<'_>> {
-        <Self as ScalarMsgFieldGetter<1>>::get(self)
+        <T as AView>::b(self)
     }
 }
 
@@ -406,10 +406,10 @@ where
     }
 }
 
-impl<T: ?Sized + BView> BView for &T {
+impl<T: ?Sized + BView<Registry = RegistryImpl>> BView for &T {
     type Registry = RegistryImpl;
     fn c(&self) -> Option<<Self::Registry as Registry>::CView<'_>> {
-        <Self as ScalarMsgFieldGetter<1>>::get(self)
+        <T as BView>::c(self)
     }
 }
 
@@ -427,13 +427,13 @@ where
     }
 }
 
-impl<T: ?Sized + CView> CView for &T {
+impl<T: ?Sized + CView<Registry = RegistryImpl>> CView for &T {
     type Registry = RegistryImpl;
     fn b(&self) -> Option<<Self::Registry as Registry>::BView<'_>> {
-        <Self as ScalarMsgFieldGetter<1>>::get(self)
+        <T as CView>::b(self)
     }
     fn d(&self) -> Option<<Self::Registry as Registry>::DView<'_>> {
-        <Self as ScalarMsgFieldGetter<2>>::get(self)
+        <T as CView>::d(self)
     }
 }
 
@@ -447,10 +447,10 @@ where
     }
 }
 
-impl<T: ?Sized + DView> DView for &T {
+impl<T: ?Sized + DView<Registry = RegistryImpl>> DView for &T {
     type Registry = RegistryImpl;
     fn d(&self) -> Option<<Self::Registry as Registry>::DView<'_>> {
-        <Self as ScalarMsgFieldGetter<1>>::get(self)
+        <T as DView>::d(self)
     }
 }
 
