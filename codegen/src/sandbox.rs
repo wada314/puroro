@@ -65,7 +65,36 @@
 //!   In perspective of this getter, protobuf's `int32` and `sfixed32` fields are the same.
 //! * For the message type field, the return type would be (an option or an iterator of) `impl PersonView`.
 //!
-//! ### The `View` trait recursive definition problem
+//! ## The Message Type Field Getter Problem
+//!
+//! When implementing field getters for message type fields in protobuf, we need to define what the getter
+//! methods in the `View` trait should return. For example, consider a simple field getter for a scalar
+//! message field of `Person` message type. What should the trait's getter method return type be?
+//!
+//! The typical approaches would be:
+//!
+//! - `Option<&dyn PersonView>`
+//! - `Option<&impl PersonView>`
+//! - `Option<Rc<dyn PersonView>>`
+//!
+//! Each has some pros and cons. But every these approach have a same issue that
+//! it can not return a by-value type.
+//! Actually this is quite a problem for certain use cases.
+//! For example, a tuple type like `(T, U)` where `T` and `U` are both `PersonView` type
+//! will need to return a tuple of `(T.person(), U.person())` by value, but the all examples above
+//! can not do this.
+//!
+//! To solve this problem, we propose a Generic Associated Type (GAT) field getter approach:
+//!
+//! ```rust
+//! pub trait ScalarMsgFieldGetter<const N: i32> {
+//!     type Message<'a> where Self: 'a;
+//!     fn get(&self) -> Option<Self::Message<'_>>;
+//! }
+//! ```
+//!
+//! This design provides the flexibility to return a by-value type, or a reference type.
+//!
 
 use puroro::{Both, Either, EitherOrBoth};
 
