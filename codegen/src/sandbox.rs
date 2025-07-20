@@ -186,32 +186,20 @@ impl<const N: i32, T: ScalarMsgFieldGetter<N>> ScalarMsgFieldGetter<N> for Optio
 }
 
 // High-level, named `View` traits.
-// They require the low-level getter trait as a supertrait.
-// The methods do NOT have a default implementation to avoid recursive trait bounds.
-pub trait AView: ScalarMsgFieldGetter<1>
-where
-    for<'a> <Self as ScalarMsgFieldGetter<1>>::Message<'a>: BView,
-{
+// They require the low-level getter trait as a supertrait, but crucially,
+// they do NOT contain `where` clauses about the return types.
+// This avoids recursive trait bound evaluation in the compiler.
+pub trait AView: ScalarMsgFieldGetter<1> {
     fn b(&self) -> Option<<Self as ScalarMsgFieldGetter<1>>::Message<'_>>;
 }
-pub trait BView: ScalarMsgFieldGetter<1>
-where
-    for<'a> <Self as ScalarMsgFieldGetter<1>>::Message<'a>: CView,
-{
+pub trait BView: ScalarMsgFieldGetter<1> {
     fn c(&self) -> Option<<Self as ScalarMsgFieldGetter<1>>::Message<'_>>;
 }
-pub trait CView: ScalarMsgFieldGetter<1> + ScalarMsgFieldGetter<2>
-where
-    for<'a> <Self as ScalarMsgFieldGetter<1>>::Message<'a>: BView,
-    for<'a> <Self as ScalarMsgFieldGetter<2>>::Message<'a>: DView,
-{
+pub trait CView: ScalarMsgFieldGetter<1> + ScalarMsgFieldGetter<2> {
     fn b(&self) -> Option<<Self as ScalarMsgFieldGetter<1>>::Message<'_>>;
     fn d(&self) -> Option<<Self as ScalarMsgFieldGetter<2>>::Message<'_>>;
 }
-pub trait DView: ScalarMsgFieldGetter<1>
-where
-    for<'a> <Self as ScalarMsgFieldGetter<1>>::Message<'a>: DView,
-{
+pub trait DView: ScalarMsgFieldGetter<1> {
     fn d(&self) -> Option<<Self as ScalarMsgFieldGetter<1>>::Message<'_>>;
 }
 
@@ -288,24 +276,45 @@ impl<T: DView> DView for Option<T> {
     }
 }
 
-pub struct AMain<T: AView>(T);
-pub struct BMain<T: BView>(T);
-pub struct CMain<T: CView>(T);
-pub struct DMain<T: DView>(T);
+// The user-facing wrapper structs now carry the `where` clauses.
+// This is where we tell the compiler that a field of a `View` is another `View`.
+pub struct AMain<T: AView>(T)
+where
+    for<'a> <T as ScalarMsgFieldGetter<1>>::Message<'a>: BView;
+pub struct BMain<T: BView>(T)
+where
+    for<'a> <T as ScalarMsgFieldGetter<1>>::Message<'a>: CView;
+pub struct CMain<T: CView>(T)
+where
+    for<'a> <T as ScalarMsgFieldGetter<1>>::Message<'a>: BView,
+    for<'a> <T as ScalarMsgFieldGetter<2>>::Message<'a>: DView;
+pub struct DMain<T: DView>(T)
+where
+    for<'a> <T as ScalarMsgFieldGetter<1>>::Message<'a>: DView;
 
-impl<T: AView> AMain<T> {
+impl<T: AView> AMain<T>
+where
+    for<'a> <T as ScalarMsgFieldGetter<1>>::Message<'a>: BView,
+{
     pub fn b(&self) -> Option<BMain<<T as ScalarMsgFieldGetter<1>>::Message<'_>>> {
         self.0.b().map(BMain)
     }
 }
 
-impl<T: BView> BMain<T> {
+impl<T: BView> BMain<T>
+where
+    for<'a> <T as ScalarMsgFieldGetter<1>>::Message<'a>: CView,
+{
     pub fn c(&self) -> Option<CMain<<T as ScalarMsgFieldGetter<1>>::Message<'_>>> {
         self.0.c().map(CMain)
     }
 }
 
-impl<T: CView> CMain<T> {
+impl<T: CView> CMain<T>
+where
+    for<'a> <T as ScalarMsgFieldGetter<1>>::Message<'a>: BView,
+    for<'a> <T as ScalarMsgFieldGetter<2>>::Message<'a>: DView,
+{
     pub fn b(&self) -> Option<BMain<<T as ScalarMsgFieldGetter<1>>::Message<'_>>> {
         self.0.b().map(BMain)
     }
@@ -314,7 +323,10 @@ impl<T: CView> CMain<T> {
     }
 }
 
-impl<T: DView> DMain<T> {
+impl<T: DView> DMain<T>
+where
+    for<'a> <T as ScalarMsgFieldGetter<1>>::Message<'a>: DView,
+{
     pub fn d(&self) -> Option<DMain<<T as ScalarMsgFieldGetter<1>>::Message<'_>>> {
         self.0.d().map(DMain)
     }
