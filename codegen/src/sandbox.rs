@@ -132,37 +132,7 @@ pub struct D1 {
     pub d: Option<Box<D1>>,
 }
 
-pub trait AView {
-    type B<'a>: BView
-    where
-        Self: 'a;
-    fn b(&self) -> Option<Self::B<'_>>;
-}
-pub trait BView {
-    type C<'a>: CView
-    where
-        Self: 'a;
-    fn c(&self) -> Option<Self::C<'_>>;
-}
-pub trait CView {
-    type B<'a>: BView
-    where
-        Self: 'a;
-    type D<'a>: DView
-    where
-        Self: 'a;
-    fn b(&self) -> Option<Self::B<'_>>;
-    fn d(&self) -> Option<Self::D<'_>>;
-}
-pub trait DView {
-    type D<'a>: DView
-    where
-        Self: 'a;
-    fn d(&self) -> Option<Self::D<'_>>;
-}
-
-// The code generator would produce implementations for the `ScalarMsgFieldGetter` traits first.
-// This provides a low-level, generic way to access fields by number.
+// Low-level field getter implementations, produced by a code generator.
 impl ScalarMsgFieldGetter<1> for A1 {
     type Message<'a> = &'a B1;
     fn get(&self) -> Option<Self::Message<'_>> {
@@ -176,9 +146,9 @@ impl ScalarMsgFieldGetter<1> for B1 {
     }
 }
 impl ScalarMsgFieldGetter<1> for C1 {
-    type Message<'a> = &'a B1;
+    type Message<'a> = Option<&'a B1>;
     fn get(&self) -> Option<Self::Message<'_>> {
-        self.b.as_deref()
+        Some(self.b.as_deref())
     }
 }
 impl ScalarMsgFieldGetter<2> for C1 {
@@ -188,29 +158,60 @@ impl ScalarMsgFieldGetter<2> for C1 {
     }
 }
 impl ScalarMsgFieldGetter<1> for D1 {
-    type Message<'a> = &'a D1;
+    type Message<'a> = Option<&'a D1>;
     fn get(&self) -> Option<Self::Message<'_>> {
-        self.d.as_deref()
+        Some(self.d.as_deref())
     }
 }
 
-// Then, the generator implements the high-level, named `View` traits
-// by delegating to the `ScalarMsgFieldGetter` implementations.
-impl AView for A1 {
-    type B<'a> = <Self as ScalarMsgFieldGetter<1>>::Message<'a>;
+// Blanket implementations for low-level getters on wrapper types.
+// These would be part of the puroro library.
+impl<'s, const N: i32, T: ?Sized + ScalarMsgFieldGetter<N>> ScalarMsgFieldGetter<N> for &'s T {
+    type Message<'a>
+        = T::Message<'a>
+    where
+        Self: 'a;
+    fn get(&self) -> Option<Self::Message<'_>> {
+        T::get(self)
+    }
+}
+impl<const N: i32, T: ScalarMsgFieldGetter<N>> ScalarMsgFieldGetter<N> for Option<T> {
+    type Message<'a>
+        = T::Message<'a>
+    where
+        Self: 'a;
+    fn get(&self) -> Option<Self::Message<'_>> {
+        self.as_ref().and_then(|v| v.get())
+    }
+}
+
+// High-level, named `View` traits with default method implementations.
+pub trait AView: ScalarMsgFieldGetter<1, Message<'a> = <Self as AView>::B<'a>> {
+    type B<'a>: BView
+    where
+        Self: 'a;
     fn b(&self) -> Option<Self::B<'_>> {
         <Self as ScalarMsgFieldGetter<1>>::get(self)
     }
 }
-impl BView for B1 {
-    type C<'a> = <Self as ScalarMsgFieldGetter<1>>::Message<'a>;
+pub trait BView: ScalarMsgFieldGetter<1, Message<'a> = <Self as BView>::C<'a>> {
+    type C<'a>: CView
+    where
+        Self: 'a;
     fn c(&self) -> Option<Self::C<'_>> {
         <Self as ScalarMsgFieldGetter<1>>::get(self)
     }
 }
-impl CView for C1 {
-    type B<'a> = <Self as ScalarMsgFieldGetter<1>>::Message<'a>;
-    type D<'a> = <Self as ScalarMsgFieldGetter<2>>::Message<'a>;
+pub trait CView:
+    ScalarMsgFieldGetter<1, Message<'a> = <Self as CView>::B<'a>>
+    + ScalarMsgFieldGetter<2, Message<'a> = <Self as CView>::D<'a>>
+{
+    type B<'a>: BView
+    where
+        Self: 'a;
+    type D<'a>: DView
+    where
+        Self: 'a;
     fn b(&self) -> Option<Self::B<'_>> {
         <Self as ScalarMsgFieldGetter<1>>::get(self)
     }
@@ -218,31 +219,55 @@ impl CView for C1 {
         <Self as ScalarMsgFieldGetter<2>>::get(self)
     }
 }
-impl DView for D1 {
-    type D<'a> = <Self as ScalarMsgFieldGetter<1>>::Message<'a>;
+pub trait DView: ScalarMsgFieldGetter<1, Message<'a> = <Self as DView>::D<'a>> {
+    type D<'a>: DView
+    where
+        Self: 'a;
     fn d(&self) -> Option<Self::D<'_>> {
         <Self as ScalarMsgFieldGetter<1>>::get(self)
     }
 }
 
-// Blanket implementations for wrappers like `&T` provide flexibility.
+// The code generator now only needs to output these trivial impls.
+impl AView for A1 {
+    type B<'a> = &'a B1;
+}
+impl BView for B1 {
+    type C<'a> = &'a C1;
+}
+impl CView for C1 {
+    type B<'a> = Option<&'a B1>;
+    type D<'a> = &'a D1;
+}
+impl DView for D1 {
+    type D<'a> = Option<&'a D1>;
+}
+
+// Blanket implementations for high-level views on wrapper types.
+// These are also trivial thanks to the default methods.
 impl<'s, T: ?Sized + AView> AView for &'s T {
     type B<'a>
         = T::B<'a>
     where
         Self: 'a;
-    fn b(&self) -> Option<Self::B<'_>> {
-        (*self).b()
-    }
+}
+impl<T: AView> AView for Option<T> {
+    type B<'a>
+        = T::B<'a>
+    where
+        Self: 'a;
 }
 impl<'s, T: ?Sized + BView> BView for &'s T {
     type C<'a>
         = T::C<'a>
     where
         Self: 'a;
-    fn c(&self) -> Option<Self::C<'_>> {
-        (*self).c()
-    }
+}
+impl<T: BView> BView for Option<T> {
+    type C<'a>
+        = T::C<'a>
+    where
+        Self: 'a;
 }
 impl<'s, T: ?Sized + CView> CView for &'s T {
     type B<'a>
@@ -253,21 +278,28 @@ impl<'s, T: ?Sized + CView> CView for &'s T {
         = T::D<'a>
     where
         Self: 'a;
-    fn b(&self) -> Option<Self::B<'_>> {
-        (*self).b()
-    }
-    fn d(&self) -> Option<Self::D<'_>> {
-        (*self).d()
-    }
+}
+impl<T: CView> CView for Option<T> {
+    type B<'a>
+        = T::B<'a>
+    where
+        Self: 'a;
+    type D<'a>
+        = T::D<'a>
+    where
+        Self: 'a;
 }
 impl<'s, T: ?Sized + DView> DView for &'s T {
     type D<'a>
         = T::D<'a>
     where
         Self: 'a;
-    fn d(&self) -> Option<Self::D<'_>> {
-        (*self).d()
-    }
+}
+impl<T: DView> DView for Option<T> {
+    type D<'a>
+        = T::D<'a>
+    where
+        Self: 'a;
 }
 
 pub struct AMain<T: AView>(T);
@@ -276,28 +308,28 @@ pub struct CMain<T: CView>(T);
 pub struct DMain<T: DView>(T);
 
 impl<T: AView> AMain<T> {
-    pub fn b(&self) -> Option<BMain<impl BView + '_>> {
+    pub fn b(&self) -> Option<BMain<T::B<'_>>> {
         self.0.b().map(BMain)
     }
 }
 
 impl<T: BView> BMain<T> {
-    pub fn c(&self) -> Option<CMain<impl CView + '_>> {
+    pub fn c(&self) -> Option<CMain<T::C<'_>>> {
         self.0.c().map(CMain)
     }
 }
 
 impl<T: CView> CMain<T> {
-    pub fn b(&self) -> Option<BMain<impl BView + '_>> {
+    pub fn b(&self) -> Option<BMain<T::B<'_>>> {
         self.0.b().map(BMain)
     }
-    pub fn d(&self) -> Option<DMain<impl DView + '_>> {
+    pub fn d(&self) -> Option<DMain<T::D<'_>>> {
         self.0.d().map(DMain)
     }
 }
 
 impl<T: DView> DMain<T> {
-    pub fn d(&self) -> Option<DMain<impl DView + '_>> {
+    pub fn d(&self) -> Option<DMain<T::D<'_>>> {
         self.0.d().map(DMain)
     }
 }
@@ -312,16 +344,18 @@ fn foo() {
     // Test that the methods work through the user-facing types
     // Users don't need to know about View traits
     let _ = a.b();
-    let c_from_a = a.b().and_then(|x| x.c());
+    let c_from_a = a.b().and_then(|b_impl| b_impl.c());
     let _ = b.c();
-    let d_from_b = b.c().and_then(|x| x.d());
+    let d_from_b = b.c().and_then(|c_impl| c_impl.d());
     let _ = c.b();
     let _ = c.d();
     let _ = d.d();
-    let d_from_d = d.d().and_then(|x| x.d());
+    let d_from_d = d.d().and_then(|d_impl| d_impl.d());
+
+    // Test blanket impl for Option<T>
+    let a_opt = AMain(Some(A1::default()));
+    let c_from_a_opt = a_opt.b().and_then(|b_impl| b_impl.c());
 }
 
-// The GAT-based traits are not object-safe by default.
-// To use them as `dyn` traits, you'd need to use a crate like `async_trait`
-// or avoid using GATs in the methods directly, which is a more advanced topic.
-// For now, we remove the `bar` function that uses `dyn DView`.
+// The GAT-based traits are not object-safe by default so `dyn View` cannot be used.
+// We've removed the `bar` function which relied on this.
