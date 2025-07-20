@@ -104,8 +104,6 @@
 //! This design provides the flexibility to return a by-value type,
 //! or a reference type (via the `&T` type's blanket implementation).
 //!
-//! ## GAT field getter details
-//!
 //!
 
 use puroro::{Both, Either, EitherOrBoth};
