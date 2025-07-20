@@ -186,30 +186,47 @@ impl<const N: i32, T: ScalarMsgFieldGetter<N>> ScalarMsgFieldGetter<N> for Optio
 }
 
 // High-level, named `View` traits.
-// They require the low-level getter trait as a supertrait and use a `where`
-// clause to ensure the getter's return type implements the correct child `View`.
-// The method implementations are provided by default.
+// They require the low-level getter trait as a supertrait.
+// The methods do NOT have a default implementation to avoid recursive trait bounds.
 pub trait AView: ScalarMsgFieldGetter<1>
 where
     for<'a> <Self as ScalarMsgFieldGetter<1>>::Message<'a>: BView,
 {
-    fn b(&self) -> Option<<Self as ScalarMsgFieldGetter<1>>::Message<'_>> {
-        <Self as ScalarMsgFieldGetter<1>>::get(self)
-    }
+    fn b(&self) -> Option<<Self as ScalarMsgFieldGetter<1>>::Message<'_>>;
 }
 pub trait BView: ScalarMsgFieldGetter<1>
 where
     for<'a> <Self as ScalarMsgFieldGetter<1>>::Message<'a>: CView,
 {
-    fn c(&self) -> Option<<Self as ScalarMsgFieldGetter<1>>::Message<'_>> {
-        <Self as ScalarMsgFieldGetter<1>>::get(self)
-    }
+    fn c(&self) -> Option<<Self as ScalarMsgFieldGetter<1>>::Message<'_>>;
 }
 pub trait CView: ScalarMsgFieldGetter<1> + ScalarMsgFieldGetter<2>
 where
     for<'a> <Self as ScalarMsgFieldGetter<1>>::Message<'a>: BView,
     for<'a> <Self as ScalarMsgFieldGetter<2>>::Message<'a>: DView,
 {
+    fn b(&self) -> Option<<Self as ScalarMsgFieldGetter<1>>::Message<'_>>;
+    fn d(&self) -> Option<<Self as ScalarMsgFieldGetter<2>>::Message<'_>>;
+}
+pub trait DView: ScalarMsgFieldGetter<1>
+where
+    for<'a> <Self as ScalarMsgFieldGetter<1>>::Message<'a>: DView,
+{
+    fn d(&self) -> Option<<Self as ScalarMsgFieldGetter<1>>::Message<'_>>;
+}
+
+// The code generator now needs to output the simple delegation methods.
+impl AView for A1 {
+    fn b(&self) -> Option<<Self as ScalarMsgFieldGetter<1>>::Message<'_>> {
+        <Self as ScalarMsgFieldGetter<1>>::get(self)
+    }
+}
+impl BView for B1 {
+    fn c(&self) -> Option<<Self as ScalarMsgFieldGetter<1>>::Message<'_>> {
+        <Self as ScalarMsgFieldGetter<1>>::get(self)
+    }
+}
+impl CView for C1 {
     fn b(&self) -> Option<<Self as ScalarMsgFieldGetter<1>>::Message<'_>> {
         <Self as ScalarMsgFieldGetter<1>>::get(self)
     }
@@ -217,30 +234,59 @@ where
         <Self as ScalarMsgFieldGetter<2>>::get(self)
     }
 }
-pub trait DView: ScalarMsgFieldGetter<1>
-where
-    for<'a> <Self as ScalarMsgFieldGetter<1>>::Message<'a>: DView,
-{
+impl DView for D1 {
     fn d(&self) -> Option<<Self as ScalarMsgFieldGetter<1>>::Message<'_>> {
         <Self as ScalarMsgFieldGetter<1>>::get(self)
     }
 }
 
-// The code generator now only needs to output these empty marker impls!
-impl AView for A1 {}
-impl BView for B1 {}
-impl CView for C1 {}
-impl DView for D1 {}
-
-// Blanket implementations for high-level views on wrapper types are also empty.
-impl<'s, T: ?Sized + AView> AView for &'s T {}
-impl<T: AView> AView for Option<T> {}
-impl<'s, T: ?Sized + BView> BView for &'s T {}
-impl<T: BView> BView for Option<T> {}
-impl<'s, T: ?Sized + CView> CView for &'s T {}
-impl<T: CView> CView for Option<T> {}
-impl<'s, T: ?Sized + DView> DView for &'s T {}
-impl<T: DView> DView for Option<T> {}
+// Blanket implementations for high-level views must also provide the method bodies.
+impl<'s, T: ?Sized + AView> AView for &'s T {
+    fn b(&self) -> Option<<Self as ScalarMsgFieldGetter<1>>::Message<'_>> {
+        <Self as ScalarMsgFieldGetter<1>>::get(self)
+    }
+}
+impl<T: AView> AView for Option<T> {
+    fn b(&self) -> Option<<Self as ScalarMsgFieldGetter<1>>::Message<'_>> {
+        <Self as ScalarMsgFieldGetter<1>>::get(self)
+    }
+}
+impl<'s, T: ?Sized + BView> BView for &'s T {
+    fn c(&self) -> Option<<Self as ScalarMsgFieldGetter<1>>::Message<'_>> {
+        <Self as ScalarMsgFieldGetter<1>>::get(self)
+    }
+}
+impl<T: BView> BView for Option<T> {
+    fn c(&self) -> Option<<Self as ScalarMsgFieldGetter<1>>::Message<'_>> {
+        <Self as ScalarMsgFieldGetter<1>>::get(self)
+    }
+}
+impl<'s, T: ?Sized + CView> CView for &'s T {
+    fn b(&self) -> Option<<Self as ScalarMsgFieldGetter<1>>::Message<'_>> {
+        <Self as ScalarMsgFieldGetter<1>>::get(self)
+    }
+    fn d(&self) -> Option<<Self as ScalarMsgFieldGetter<2>>::Message<'_>> {
+        <Self as ScalarMsgFieldGetter<2>>::get(self)
+    }
+}
+impl<T: CView> CView for Option<T> {
+    fn b(&self) -> Option<<Self as ScalarMsgFieldGetter<1>>::Message<'_>> {
+        <Self as ScalarMsgFieldGetter<1>>::get(self)
+    }
+    fn d(&self) -> Option<<Self as ScalarMsgFieldGetter<2>>::Message<'_>> {
+        <Self as ScalarMsgFieldGetter<2>>::get(self)
+    }
+}
+impl<'s, T: ?Sized + DView> DView for &'s T {
+    fn d(&self) -> Option<<Self as ScalarMsgFieldGetter<1>>::Message<'_>> {
+        <Self as ScalarMsgFieldGetter<1>>::get(self)
+    }
+}
+impl<T: DView> DView for Option<T> {
+    fn d(&self) -> Option<<Self as ScalarMsgFieldGetter<1>>::Message<'_>> {
+        <Self as ScalarMsgFieldGetter<1>>::get(self)
+    }
+}
 
 pub struct AMain<T: AView>(T);
 pub struct BMain<T: BView>(T);
