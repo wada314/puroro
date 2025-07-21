@@ -293,30 +293,25 @@ pub struct CMain<T: CView>(T);
 pub struct DMain<T: DView>(T);
 
 impl<T: AView> AMain<T> {
-    pub fn b(&self) -> Option<BMain<T::Registry>> {
-        // This part is still tricky. How to get the view type from the registry?
-        // We need to pass the result of `self.0.b()` to `BMain`.
-        // The result of `b()` is `Option<<T::Registry as Registry>::B<'_>>`.
-        // The type parameter for `BMain` is `T: BView`.
-        // So, `BMain` can be constructed with the returned view.
+    pub fn b(&self) -> Option<BMain<<T::Registry as Registry>::B<'_>>> {
         self.0.b().map(BMain)
     }
 }
 impl<T: BView> BMain<T> {
-    pub fn c(&self) -> Option<CMain<T::Registry>> {
+    pub fn c(&self) -> Option<CMain<<T::Registry as Registry>::C<'_>>> {
         self.0.c().map(CMain)
     }
 }
 impl<T: CView> CMain<T> {
-    pub fn b(&self) -> Option<BMain<T::Registry>> {
+    pub fn b(&self) -> Option<BMain<<T::Registry as Registry>::B<'_>>> {
         self.0.b().map(BMain)
     }
-    pub fn d(&self) -> Option<DMain<T::Registry>> {
+    pub fn d(&self) -> Option<DMain<<T::Registry as Registry>::D<'_>>> {
         self.0.d().map(DMain)
     }
 }
 impl<T: DView> DMain<T> {
-    pub fn d(&self) -> Option<DMain<T::Registry>> {
+    pub fn d(&self) -> Option<DMain<<T::Registry as Registry>::D<'_>>> {
         self.0.d().map(DMain)
     }
 }
