@@ -188,9 +188,9 @@ impl ScalarMsgFieldGetter<1> for B1 {
     }
 }
 impl ScalarMsgFieldGetter<1> for C1 {
-    type Message<'a> = &'a B1;
+    type Message<'a> = Option<&'a B1>;
     fn get(&self) -> Option<Self::Message<'_>> {
-        self.b.as_deref()
+        Some(self.b.as_deref())
     }
 }
 impl ScalarMsgFieldGetter<2> for C1 {
@@ -200,9 +200,9 @@ impl ScalarMsgFieldGetter<2> for C1 {
     }
 }
 impl ScalarMsgFieldGetter<1> for D1 {
-    type Message<'a> = &'a D1;
+    type Message<'a> = Option<&'a D1>;
     fn get(&self) -> Option<Self::Message<'_>> {
-        self.d.as_deref()
+        Some(self.d.as_deref())
     }
 }
 
@@ -232,7 +232,9 @@ impl BView for B1 {
 impl CView for C1 {
     type Registry = MyFamily;
     fn b(&self) -> Option<<Self::Registry as Registry>::B<'_>> {
-        ScalarMsgFieldGetter::<1>::get(self).map(|v| v as _)
+        ScalarMsgFieldGetter::<1>::get(self)
+            .flatten()
+            .map(|v| v as _)
     }
     fn d(&self) -> Option<<Self::Registry as Registry>::D<'_>> {
         ScalarMsgFieldGetter::<2>::get(self).map(|v| v as _)
@@ -241,7 +243,9 @@ impl CView for C1 {
 impl DView for D1 {
     type Registry = MyFamily;
     fn d(&self) -> Option<<Self::Registry as Registry>::D<'_>> {
-        ScalarMsgFieldGetter::<1>::get(self).map(|v| v as _)
+        ScalarMsgFieldGetter::<1>::get(self)
+            .flatten()
+            .map(|v| v as _)
     }
 }
 
@@ -249,18 +253,18 @@ impl DView for D1 {
 // First, for the low-level getter
 impl<'s, const N: i32, T: ?Sized + ScalarMsgFieldGetter<N>> ScalarMsgFieldGetter<N> for &'s T {
     type Message<'a>
-        = T::Message<'a>
     where
-        Self: 'a;
+        Self: 'a,
+    = T::Message<'a>;
     fn get(&self) -> Option<Self::Message<'_>> {
         T::get(self)
     }
 }
 impl<const N: i32, T: ScalarMsgFieldGetter<N>> ScalarMsgFieldGetter<N> for Option<T> {
     type Message<'a>
-        = T::Message<'a>
     where
-        Self: 'a;
+        Self: 'a,
+    = T::Message<'a>;
     fn get(&self) -> Option<Self::Message<'_>> {
         self.as_ref().and_then(|v| v.get())
     }
@@ -382,13 +386,18 @@ fn foo() {
     // We wrap the concrete type in the user-facing struct.
     let a = AMain(A1::default());
 
-    // The type of `a.b()` is `Option<BMain<&B1>>`.
-    let b_main = a.b();
-    // The type of `b_main.c()` is `Option<CMain<&C1>>`.
-    let c_main = b_main.and_then(|b| b.c());
+    // Chain the calls correctly to avoid lifetime issues with closures.
+    if let Some(b_main) = a.b() {
+        if let Some(c_main) = b_main.c() {
+            let _ = c_main.d();
+        }
+    }
 
     // We can also test the wrappers directly.
     let a_opt = AMain(Some(A1::default()));
-    let c_from_a_opt = a_opt.b().and_then(|b| b.c());
-    let _ = c_from_a_opt.unwrap().d();
+    if let Some(b_main) = a_opt.b() {
+        if let Some(c_main) = b_main.c() {
+            let _ = c_main.d();
+        }
+    }
 }
