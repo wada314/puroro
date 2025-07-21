@@ -112,16 +112,16 @@ use std::ops::Deref;
 // This is the central piece that connects all message families.
 // It defines what concrete types correspond to the views.
 pub trait Registry {
-    type A<'a>: AView<Registry = Self>
+    type A<'a>: AView
     where
         Self: 'a;
-    type B<'a>: BView<Registry = Self>
+    type B<'a>: BView
     where
         Self: 'a;
-    type C<'a>: CView<Registry = Self>
+    type C<'a>: CView
     where
         Self: 'a;
-    type D<'a>: DView<Registry = Self>
+    type D<'a>: DView
     where
         Self: 'a;
 }
