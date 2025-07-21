@@ -106,254 +106,233 @@
 //!
 
 use puroro::{Both, Either, EitherOrBoth};
+use std::ops::Deref;
 
-pub trait ScalarMsgFieldGetter<const N: i32> {
-    type Message<'a>
+// 1. The Registry Trait with GATs
+// This is the central piece that connects all message families.
+// It defines what concrete types correspond to the views.
+pub trait Registry {
+    type A<'a>: AView<Registry = Self>
     where
         Self: 'a;
-    fn get(&self) -> Option<Self::Message<'_>>;
+    type B<'a>: BView<Registry = Self>
+    where
+        Self: 'a;
+    type C<'a>: CView<Registry = Self>
+    where
+        Self: 'a;
+    type D<'a>: DView<Registry = Self>
+    where
+        Self: 'a;
 }
 
-#[derive(Default, Debug)]
+// 2. The View Traits, Generic over the Registry
+// They are generic over a `Registry` type. This breaks the cycle.
+// `AView` does not know about `BView` directly, only through `R::B`.
+pub trait AView: Sized {
+    type Registry: Registry;
+    fn b(&self) -> Option<<Self::Registry as Registry>::B<'_>>;
+}
+pub trait BView: Sized {
+    type Registry: Registry;
+    fn c(&self) -> Option<<Self::Registry as Registry>::C<'_>>;
+}
+pub trait CView: Sized {
+    type Registry: Registry;
+    fn b(&self) -> Option<<Self::Registry as Registry>::B<'_>>;
+    fn d(&self) -> Option<<Self::Registry as Registry>::D<'_>>;
+}
+pub trait DView: Sized {
+    type Registry: Registry;
+    fn d(&self) -> Option<<Self::Registry as Registry>::D<'_>>;
+}
+
+// 3. Define Concrete Message Structs
+#[derive(Default, Debug, Clone)]
 pub struct A1 {
     pub b: Box<B1>,
 }
-#[derive(Default, Debug)]
+#[derive(Default, Debug, Clone)]
 pub struct B1 {
     pub c: Box<C1>,
 }
-#[derive(Default, Debug)]
+#[derive(Default, Debug, Clone)]
 pub struct C1 {
     pub b: Option<Box<B1>>,
     pub d: Box<D1>,
 }
-#[derive(Default, Debug)]
+#[derive(Default, Debug, Clone)]
 pub struct D1 {
     pub d: Option<Box<D1>>,
 }
 
-// Low-level field getter implementations, produced by a code generator.
-impl ScalarMsgFieldGetter<1> for A1 {
-    type Message<'a> = &'a B1;
-    fn get(&self) -> Option<Self::Message<'_>> {
-        Some(self.b.as_ref())
-    }
-}
-impl ScalarMsgFieldGetter<1> for B1 {
-    type Message<'a> = &'a C1;
-    fn get(&self) -> Option<Self::Message<'_>> {
-        Some(self.c.as_ref())
-    }
-}
-impl ScalarMsgFieldGetter<1> for C1 {
-    type Message<'a> = Option<&'a B1>;
-    fn get(&self) -> Option<Self::Message<'_>> {
-        Some(self.b.as_deref())
-    }
-}
-impl ScalarMsgFieldGetter<2> for C1 {
-    type Message<'a> = &'a D1;
-    fn get(&self) -> Option<Self::Message<'_>> {
-        Some(self.d.as_ref())
-    }
-}
-impl ScalarMsgFieldGetter<1> for D1 {
-    type Message<'a> = Option<&'a D1>;
-    fn get(&self) -> Option<Self::Message<'_>> {
-        Some(self.d.as_deref())
-    }
+// 4. Define a Concrete Registry for this family of structs
+pub enum MyFamily {}
+impl Registry for MyFamily {
+    type A<'a> = &'a A1;
+    type B<'a> = &'a B1;
+    type C<'a> = &'a C1;
+    type D<'a> = &'a D1;
 }
 
-// Blanket implementations for low-level getters on wrapper types.
-// These would be part of the puroro library.
-impl<'s, const N: i32, T: ?Sized + ScalarMsgFieldGetter<N>> ScalarMsgFieldGetter<N> for &'s T {
-    type Message<'a>
-        = T::Message<'a>
-    where
-        Self: 'a;
-    fn get(&self) -> Option<Self::Message<'_>> {
-        T::get(self)
-    }
-}
-impl<const N: i32, T: ScalarMsgFieldGetter<N>> ScalarMsgFieldGetter<N> for Option<T> {
-    type Message<'a>
-        = T::Message<'a>
-    where
-        Self: 'a;
-    fn get(&self) -> Option<Self::Message<'_>> {
-        self.as_ref().and_then(|v| v.get())
-    }
-}
-
-// High-level, named `View` traits.
-// They require the low-level getter trait as a supertrait, but crucially,
-// they do NOT contain `where` clauses about the return types.
-// This avoids recursive trait bound evaluation in the compiler.
-pub trait AView: ScalarMsgFieldGetter<1> {
-    fn b(&self) -> Option<<Self as ScalarMsgFieldGetter<1>>::Message<'_>>;
-}
-pub trait BView: ScalarMsgFieldGetter<1> {
-    fn c(&self) -> Option<<Self as ScalarMsgFieldGetter<1>>::Message<'_>>;
-}
-pub trait CView: ScalarMsgFieldGetter<1> + ScalarMsgFieldGetter<2> {
-    fn b(&self) -> Option<<Self as ScalarMsgFieldGetter<1>>::Message<'_>>;
-    fn d(&self) -> Option<<Self as ScalarMsgFieldGetter<2>>::Message<'_>>;
-}
-pub trait DView: ScalarMsgFieldGetter<1> {
-    fn d(&self) -> Option<<Self as ScalarMsgFieldGetter<1>>::Message<'_>>;
-}
-
-// The code generator now needs to output the simple delegation methods.
+// 5. Implement the View traits for the concrete structs
 impl AView for A1 {
-    fn b(&self) -> Option<<Self as ScalarMsgFieldGetter<1>>::Message<'_>> {
-        <Self as ScalarMsgFieldGetter<1>>::get(self)
+    type Registry = MyFamily;
+    fn b(&self) -> Option<<Self::Registry as Registry>::B<'_>> {
+        Some(&self.b)
     }
 }
 impl BView for B1 {
-    fn c(&self) -> Option<<Self as ScalarMsgFieldGetter<1>>::Message<'_>> {
-        <Self as ScalarMsgFieldGetter<1>>::get(self)
+    type Registry = MyFamily;
+    fn c(&self) -> Option<<Self::Registry as Registry>::C<'_>> {
+        Some(&self.c)
     }
 }
 impl CView for C1 {
-    fn b(&self) -> Option<<Self as ScalarMsgFieldGetter<1>>::Message<'_>> {
-        <Self as ScalarMsgFieldGetter<1>>::get(self)
+    type Registry = MyFamily;
+    fn b(&self) -> Option<<Self::Registry as Registry>::B<'_>> {
+        self.b.as_deref()
     }
-    fn d(&self) -> Option<<Self as ScalarMsgFieldGetter<2>>::Message<'_>> {
-        <Self as ScalarMsgFieldGetter<2>>::get(self)
+    fn d(&self) -> Option<<Self::Registry as Registry>::D<'_>> {
+        Some(&self.d)
     }
 }
 impl DView for D1 {
-    fn d(&self) -> Option<<Self as ScalarMsgFieldGetter<1>>::Message<'_>> {
-        <Self as ScalarMsgFieldGetter<1>>::get(self)
+    type Registry = MyFamily;
+    fn d(&self) -> Option<<Self::Registry as Registry>::D<'_>> {
+        self.d.as_deref()
     }
 }
 
-// Blanket implementations for high-level views must also provide the method bodies.
-impl<'s, T: ?Sized + AView> AView for &'s T {
-    fn b(&self) -> Option<<Self as ScalarMsgFieldGetter<1>>::Message<'_>> {
-        <Self as ScalarMsgFieldGetter<1>>::get(self)
-    }
-}
-impl<T: AView> AView for Option<T> {
-    fn b(&self) -> Option<<Self as ScalarMsgFieldGetter<1>>::Message<'_>> {
-        <Self as ScalarMsgFieldGetter<1>>::get(self)
-    }
-}
-impl<'s, T: ?Sized + BView> BView for &'s T {
-    fn c(&self) -> Option<<Self as ScalarMsgFieldGetter<1>>::Message<'_>> {
-        <Self as ScalarMsgFieldGetter<1>>::get(self)
-    }
-}
-impl<T: BView> BView for Option<T> {
-    fn c(&self) -> Option<<Self as ScalarMsgFieldGetter<1>>::Message<'_>> {
-        <Self as ScalarMsgFieldGetter<1>>::get(self)
-    }
-}
-impl<'s, T: ?Sized + CView> CView for &'s T {
-    fn b(&self) -> Option<<Self as ScalarMsgFieldGetter<1>>::Message<'_>> {
-        <Self as ScalarMsgFieldGetter<1>>::get(self)
-    }
-    fn d(&self) -> Option<<Self as ScalarMsgFieldGetter<2>>::Message<'_>> {
-        <Self as ScalarMsgFieldGetter<2>>::get(self)
-    }
-}
-impl<T: CView> CView for Option<T> {
-    fn b(&self) -> Option<<Self as ScalarMsgFieldGetter<1>>::Message<'_>> {
-        <Self as ScalarMsgFieldGetter<1>>::get(self)
-    }
-    fn d(&self) -> Option<<Self as ScalarMsgFieldGetter<2>>::Message<'_>> {
-        <Self as ScalarMsgFieldGetter<2>>::get(self)
-    }
-}
-impl<'s, T: ?Sized + DView> DView for &'s T {
-    fn d(&self) -> Option<<Self as ScalarMsgFieldGetter<1>>::Message<'_>> {
-        <Self as ScalarMsgFieldGetter<1>>::get(self)
-    }
-}
-impl<T: DView> DView for Option<T> {
-    fn d(&self) -> Option<<Self as ScalarMsgFieldGetter<1>>::Message<'_>> {
-        <Self as ScalarMsgFieldGetter<1>>::get(self)
-    }
-}
-
-// The user-facing wrapper structs now carry the `where` clauses.
-// This is where we tell the compiler that a field of a `View` is another `View`.
-pub struct AMain<T: AView>(T)
+// 6. Blanket implementations for wrappers
+impl<'s, T> AView for &'s T
 where
-    for<'a> <T as ScalarMsgFieldGetter<1>>::Message<'a>: BView;
-pub struct BMain<T: BView>(T)
-where
-    for<'a> <T as ScalarMsgFieldGetter<1>>::Message<'a>: CView;
-pub struct CMain<T: CView>(T)
-where
-    for<'a> <T as ScalarMsgFieldGetter<1>>::Message<'a>: BView,
-    for<'a> <T as ScalarMsgFieldGetter<2>>::Message<'a>: DView;
-pub struct DMain<T: DView>(T)
-where
-    for<'a> <T as ScalarMsgFieldGetter<1>>::Message<'a>: DView;
-
-impl<T: AView> AMain<T>
-where
-    for<'a> <T as ScalarMsgFieldGetter<1>>::Message<'a>: BView,
+    T: ?Sized + AView,
 {
-    pub fn b(&self) -> Option<BMain<<T as ScalarMsgFieldGetter<1>>::Message<'_>>> {
+    type Registry = T::Registry;
+    fn b(&self) -> Option<<Self::Registry as Registry>::B<'_>> {
+        T::b(self)
+    }
+}
+impl<T> AView for Option<T>
+where
+    T: AView,
+{
+    type Registry = T::Registry;
+    fn b(&self) -> Option<<Self::Registry as Registry>::B<'_>> {
+        self.as_ref().and_then(|v| v.b())
+    }
+}
+// ...and so on for BView, CView, DView...
+impl<'s, T> BView for &'s T
+where
+    T: ?Sized + BView,
+{
+    type Registry = T::Registry;
+    fn c(&self) -> Option<<Self::Registry as Registry>::C<'_>> {
+        T::c(self)
+    }
+}
+impl<T> BView for Option<T>
+where
+    T: BView,
+{
+    type Registry = T::Registry;
+    fn c(&self) -> Option<<Self::Registry as Registry>::C<'_>> {
+        self.as_ref().and_then(|v| v.c())
+    }
+}
+impl<'s, T> CView for &'s T
+where
+    T: ?Sized + CView,
+{
+    type Registry = T::Registry;
+    fn b(&self) -> Option<<Self::Registry as Registry>::B<'_>> {
+        T::b(self)
+    }
+    fn d(&self) -> Option<<Self::Registry as Registry>::D<'_>> {
+        T::d(self)
+    }
+}
+impl<T> CView for Option<T>
+where
+    T: CView,
+{
+    type Registry = T::Registry;
+    fn b(&self) -> Option<<Self::Registry as Registry>::B<'_>> {
+        self.as_ref().and_then(|v| v.b())
+    }
+    fn d(&self) -> Option<<Self::Registry as Registry>::D<'_>> {
+        self.as_ref().and_then(|v| v.d())
+    }
+}
+impl<'s, T> DView for &'s T
+where
+    T: ?Sized + DView,
+{
+    type Registry = T::Registry;
+    fn d(&self) -> Option<<Self::Registry as Registry>::D<'_>> {
+        T::d(self)
+    }
+}
+impl<T> DView for Option<T>
+where
+    T: DView,
+{
+    type Registry = T::Registry;
+    fn d(&self) -> Option<<Self::Registry as Registry>::D<'_>> {
+        self.as_ref().and_then(|v| v.d())
+    }
+}
+
+// User-facing wrappers now are much simpler.
+// They are generic over a concrete view type.
+pub struct AMain<T: AView>(T);
+pub struct BMain<T: BView>(T);
+pub struct CMain<T: CView>(T);
+pub struct DMain<T: DView>(T);
+
+impl<T: AView> AMain<T> {
+    pub fn b(&self) -> Option<BMain<T::Registry>> {
+        // This part is still tricky. How to get the view type from the registry?
+        // We need to pass the result of `self.0.b()` to `BMain`.
+        // The result of `b()` is `Option<<T::Registry as Registry>::B<'_>>`.
+        // The type parameter for `BMain` is `T: BView`.
+        // So, `BMain` can be constructed with the returned view.
         self.0.b().map(BMain)
     }
 }
-
-impl<T: BView> BMain<T>
-where
-    for<'a> <T as ScalarMsgFieldGetter<1>>::Message<'a>: CView,
-{
-    pub fn c(&self) -> Option<CMain<<T as ScalarMsgFieldGetter<1>>::Message<'_>>> {
+impl<T: BView> BMain<T> {
+    pub fn c(&self) -> Option<CMain<T::Registry>> {
         self.0.c().map(CMain)
     }
 }
-
-impl<T: CView> CMain<T>
-where
-    for<'a> <T as ScalarMsgFieldGetter<1>>::Message<'a>: BView,
-    for<'a> <T as ScalarMsgFieldGetter<2>>::Message<'a>: DView,
-{
-    pub fn b(&self) -> Option<BMain<<T as ScalarMsgFieldGetter<1>>::Message<'_>>> {
+impl<T: CView> CMain<T> {
+    pub fn b(&self) -> Option<BMain<T::Registry>> {
         self.0.b().map(BMain)
     }
-    pub fn d(&self) -> Option<DMain<<T as ScalarMsgFieldGetter<2>>::Message<'_>>> {
+    pub fn d(&self) -> Option<DMain<T::Registry>> {
         self.0.d().map(DMain)
     }
 }
-
-impl<T: DView> DMain<T>
-where
-    for<'a> <T as ScalarMsgFieldGetter<1>>::Message<'a>: DView,
-{
-    pub fn d(&self) -> Option<DMain<<T as ScalarMsgFieldGetter<1>>::Message<'_>>> {
+impl<T: DView> DMain<T> {
+    pub fn d(&self) -> Option<DMain<T::Registry>> {
         self.0.d().map(DMain)
     }
 }
 
 #[test]
 fn foo() {
+    // We wrap the concrete type in the user-facing struct.
     let a = AMain(A1::default());
-    let b = BMain(B1::default());
-    let c = CMain(C1::default());
-    let d = DMain(D1::default());
 
-    // Test that the methods work through the user-facing types
-    // Users don't need to know about View traits
-    let _ = a.b();
-    let c_from_a = a.b().and_then(|b_impl| b_impl.c());
-    let _ = b.c();
-    let d_from_b = b.c().and_then(|c_impl| c_impl.d());
-    let _ = c.b();
-    let _ = c.d();
-    let _ = d.d();
-    let d_from_d = d.d().and_then(|d_impl| d_impl.d());
+    // The type of `a.b()` is `Option<BMain<&B1>>`.
+    let b_main = a.b();
+    // The type of `b_main.c()` is `Option<CMain<&C1>>`.
+    let c_main = b_main.and_then(|b| b.c());
 
-    // Test blanket impl for Option<T>
+    // We can also test the wrappers directly.
     let a_opt = AMain(Some(A1::default()));
-    let c_from_a_opt = a_opt.b().and_then(|b_impl| b_impl.c());
+    let c_from_a_opt = a_opt.b().and_then(|b| b.c());
+    let _ = c_from_a_opt.unwrap().d();
 }
-
-// The GAT-based traits are not object-safe by default so `dyn View` cannot be used.
-// We've removed the `bar` function which relied on this.
