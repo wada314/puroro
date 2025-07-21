@@ -108,20 +108,28 @@
 use puroro::{Both, Either, EitherOrBoth};
 use std::ops::Deref;
 
+// The low-level, number-based getter trait.
+pub trait ScalarMsgFieldGetter<const N: i32> {
+    type Message<'a>
+    where
+        Self: 'a;
+    fn get(&self) -> Option<Self::Message<'_>>;
+}
+
 // 1. The Registry Trait with GATs
 // This is the central piece that connects all message families.
 // It defines what concrete types correspond to the views.
 pub trait Registry {
-    type A<'a>: AView
+    type A<'a>: AView<Registry = Self>
     where
         Self: 'a;
-    type B<'a>: BView
+    type B<'a>: BView<Registry = Self>
     where
         Self: 'a;
-    type C<'a>: CView
+    type C<'a>: CView<Registry = Self>
     where
         Self: 'a;
-    type D<'a>: DView
+    type D<'a>: DView<Registry = Self>
     where
         Self: 'a;
 }
@@ -166,7 +174,39 @@ pub struct D1 {
     pub d: Option<Box<D1>>,
 }
 
-// 4. Define a Concrete Registry for this family of structs
+// 4. Implement the low-level getters for concrete structs (codegen output)
+impl ScalarMsgFieldGetter<1> for A1 {
+    type Message<'a> = &'a B1;
+    fn get(&self) -> Option<Self::Message<'_>> {
+        Some(&self.b)
+    }
+}
+impl ScalarMsgFieldGetter<1> for B1 {
+    type Message<'a> = &'a C1;
+    fn get(&self) -> Option<Self::Message<'_>> {
+        Some(&self.c)
+    }
+}
+impl ScalarMsgFieldGetter<1> for C1 {
+    type Message<'a> = Option<&'a B1>;
+    fn get(&self) -> Option<Self::Message<'_>> {
+        Some(self.b.as_deref())
+    }
+}
+impl ScalarMsgFieldGetter<2> for C1 {
+    type Message<'a> = &'a D1;
+    fn get(&self) -> Option<Self::Message<'_>> {
+        Some(&self.d)
+    }
+}
+impl ScalarMsgFieldGetter<1> for D1 {
+    type Message<'a> = Option<&'a D1>;
+    fn get(&self) -> Option<Self::Message<'_>> {
+        Some(self.d.as_deref())
+    }
+}
+
+// 5. Define a Concrete Registry for this family of structs
 pub enum MyFamily {}
 impl Registry for MyFamily {
     type A<'a> = &'a A1;
@@ -175,36 +215,61 @@ impl Registry for MyFamily {
     type D<'a> = &'a D1;
 }
 
-// 5. Implement the View traits for the concrete structs
+// 6. Implement the View traits by delegating to the low-level getters (codegen output)
 impl AView for A1 {
     type Registry = MyFamily;
     fn b(&self) -> Option<<Self::Registry as Registry>::B<'_>> {
-        Some(&self.b)
+        // The cast `as _` is needed to satisfy the GAT lifetime from the Registry
+        ScalarMsgFieldGetter::<1>::get(self).map(|v| v as _)
     }
 }
 impl BView for B1 {
     type Registry = MyFamily;
     fn c(&self) -> Option<<Self::Registry as Registry>::C<'_>> {
-        Some(&self.c)
+        ScalarMsgFieldGetter::<1>::get(self).map(|v| v as _)
     }
 }
 impl CView for C1 {
     type Registry = MyFamily;
     fn b(&self) -> Option<<Self::Registry as Registry>::B<'_>> {
-        self.b.as_deref()
+        ScalarMsgFieldGetter::<1>::get(self)
+            .flatten()
+            .map(|v| v as _)
     }
     fn d(&self) -> Option<<Self::Registry as Registry>::D<'_>> {
-        Some(&self.d)
+        ScalarMsgFieldGetter::<2>::get(self).map(|v| v as _)
     }
 }
 impl DView for D1 {
     type Registry = MyFamily;
     fn d(&self) -> Option<<Self::Registry as Registry>::D<'_>> {
-        self.d.as_deref()
+        ScalarMsgFieldGetter::<1>::get(self)
+            .flatten()
+            .map(|v| v as _)
     }
 }
 
-// 6. Blanket implementations for wrappers
+// 7. Blanket implementations for wrappers
+// First, for the low-level getter
+impl<'s, const N: i32, T: ?Sized + ScalarMsgFieldGetter<N>> ScalarMsgFieldGetter<N> for &'s T {
+    type Message<'a>
+        = T::Message<'a>
+    where
+        Self: 'a;
+    fn get(&self) -> Option<Self::Message<'_>> {
+        T::get(self)
+    }
+}
+impl<const N: i32, T: ScalarMsgFieldGetter<N>> ScalarMsgFieldGetter<N> for Option<T> {
+    type Message<'a>
+        = T::Message<'a>
+    where
+        Self: 'a;
+    fn get(&self) -> Option<Self::Message<'_>> {
+        self.as_ref().and_then(|v| v.get())
+    }
+}
+// Then, for the high-level views
 impl<'s, T> AView for &'s T
 where
     T: ?Sized + AView,
