@@ -232,9 +232,7 @@ impl BView for B1 {
 impl CView for C1 {
     type Registry = MyFamily;
     fn b(&self) -> Option<<Self::Registry as Registry>::B<'_>> {
-        ScalarMsgFieldGetter::<1>::get(self)
-            .flatten()
-            .map(|v| v as _)
+        ScalarMsgFieldGetter::<1>::get(self).map(|v| v as _)
     }
     fn d(&self) -> Option<<Self::Registry as Registry>::D<'_>> {
         ScalarMsgFieldGetter::<2>::get(self).map(|v| v as _)
@@ -243,9 +241,7 @@ impl CView for C1 {
 impl DView for D1 {
     type Registry = MyFamily;
     fn d(&self) -> Option<<Self::Registry as Registry>::D<'_>> {
-        ScalarMsgFieldGetter::<1>::get(self)
-            .flatten()
-            .map(|v| v as _)
+        ScalarMsgFieldGetter::<1>::get(self).map(|v| v as _)
     }
 }
 
