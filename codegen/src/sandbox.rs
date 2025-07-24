@@ -219,29 +219,28 @@ impl Registry for MyFamily {
 impl AView for A1 {
     type Registry = MyFamily;
     fn b(&self) -> Option<<Self::Registry as Registry>::B<'_>> {
-        // The cast `as _` is needed to satisfy the GAT lifetime from the Registry
-        ScalarMsgFieldGetter::<1>::get(self).map(|v| v as _)
+        ScalarMsgFieldGetter::<1>::get(self)
     }
 }
 impl BView for B1 {
     type Registry = MyFamily;
     fn c(&self) -> Option<<Self::Registry as Registry>::C<'_>> {
-        ScalarMsgFieldGetter::<1>::get(self).map(|v| v as _)
+        ScalarMsgFieldGetter::<1>::get(self)
     }
 }
 impl CView for C1 {
     type Registry = MyFamily;
     fn b(&self) -> Option<<Self::Registry as Registry>::B<'_>> {
-        ScalarMsgFieldGetter::<1>::get(self).map(|v| v as _)
+        ScalarMsgFieldGetter::<1>::get(self)
     }
     fn d(&self) -> Option<<Self::Registry as Registry>::D<'_>> {
-        ScalarMsgFieldGetter::<2>::get(self).map(|v| v as _)
+        ScalarMsgFieldGetter::<2>::get(self)
     }
 }
 impl DView for D1 {
     type Registry = MyFamily;
     fn d(&self) -> Option<<Self::Registry as Registry>::D<'_>> {
-        ScalarMsgFieldGetter::<1>::get(self).map(|v| v as _)
+        ScalarMsgFieldGetter::<1>::get(self)
     }
 }
 
@@ -249,18 +248,18 @@ impl DView for D1 {
 // First, for the low-level getter
 impl<'s, const N: i32, T: ?Sized + ScalarMsgFieldGetter<N>> ScalarMsgFieldGetter<N> for &'s T {
     type Message<'a>
+        = T::Message<'a>
     where
-        Self: 'a,
-    = T::Message<'a>;
+        Self: 'a;
     fn get(&self) -> Option<Self::Message<'_>> {
         T::get(self)
     }
 }
 impl<const N: i32, T: ScalarMsgFieldGetter<N>> ScalarMsgFieldGetter<N> for Option<T> {
     type Message<'a>
+        = T::Message<'a>
     where
-        Self: 'a,
-    = T::Message<'a>;
+        Self: 'a;
     fn get(&self) -> Option<Self::Message<'_>> {
         self.as_ref().and_then(|v| v.get())
     }
