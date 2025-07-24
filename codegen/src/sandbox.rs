@@ -188,9 +188,9 @@ impl ScalarMsgFieldGetter<1> for B1 {
     }
 }
 impl ScalarMsgFieldGetter<1> for C1 {
-    type Message<'a> = Option<&'a B1>;
+    type Message<'a> = &'a B1;
     fn get(&self) -> Option<Self::Message<'_>> {
-        Some(self.b.as_deref())
+        self.b.as_deref()
     }
 }
 impl ScalarMsgFieldGetter<2> for C1 {
@@ -200,9 +200,9 @@ impl ScalarMsgFieldGetter<2> for C1 {
     }
 }
 impl ScalarMsgFieldGetter<1> for D1 {
-    type Message<'a> = Option<&'a D1>;
+    type Message<'a> = &'a D1;
     fn get(&self) -> Option<Self::Message<'_>> {
-        Some(self.d.as_deref())
+        self.d.as_deref()
     }
 }
 
