@@ -116,19 +116,15 @@ person.age = 30;
 ```
 
 **Pros:**
-- ✅ **Simpler, more idiomatic Rust**: Direct field access is the Rust way
+- ✅ **Simpler syntax**: Direct field access is concise
 - ✅ **Less generated code**: No need to generate getter/setter methods
-- ✅ **Better performance**: No function call overhead
+- ✅ **Better performance**: No function call overhead (though getters/setters likely inline)
 - ✅ **Pattern matching**: Can use struct patterns in `match`, `if let`, etc.
 - ✅ **Struct update syntax**: Can use `Person { name: "Bob".into(), ..person }`
-- ✅ **Cleaner API**: No `get_name()`, `set_name()`, `mut_name()` noise
-- ✅ **Zero-cost abstraction**: Direct memory access
 
 **Cons:**
 - ❌ **No validation**: Can't validate field values on write
 - ❌ **No hooks**: Can't add side effects when fields change
-- ❌ **Breaking changes**: Changing field types requires breaking API changes
-- ❌ **Less compatible with C++ API**: Different from official protobuf libraries
 - ❌ **No lazy initialization**: Can't defer expensive field computation
 - ❌ **Cannot hide internal implementation**: Exposed fields must match internal representation exactly
 - ❌ **Inefficient optional fields**: Optional fields would be `Option<T>`, which is memory inefficient
@@ -168,21 +164,27 @@ person.set_age(30);
 - ✅ **Validation opportunity**: Can validate values in setters
 - ✅ **Hook opportunity**: Can add side effects (dirty flags, observers, etc.)
 - ✅ **Future flexibility**: Can change internal representation without breaking API
-- ✅ **Compatible with C++ style**: Similar to official protobuf libraries
 - ✅ **Lazy initialization**: Can defer expensive computations
 - ✅ **Efficient memory layout**: Can use optimized internal representations
   - Example: Use bitflags for optional field presence tracking instead of `Option<T>`
   - Can pack multiple boolean fields into a single byte
   - Internal representation can be optimized independently of public API
+- ✅ **Trait-based design enables multiple implementations**:
+  - Can define a trait for each message type with getter/setter methods
+  - Multiple concrete implementations with different trade-offs:
+    - **Standard**: Fully deserialized, fast access
+    - **Lazy**: Deserialize fields on-demand, lower memory footprint
+    - **Zero-copy**: Reference original bytes when possible
+    - **Compact**: Optimized for code size over speed
+    - **Arena-allocated**: Custom allocator support
+  - Users can choose implementation based on their requirements
+  - Example: `Box<dyn PersonTrait>` or `impl PersonTrait`
 
 **Cons:**
 - ❌ **More verbose**: Requires more generated code (getter/setter for each field)
-- ❌ **Less idiomatic Rust**: Not the Rust way for simple data structures
-- ❌ **Performance overhead**: Function call overhead (though likely inlined)
+- ❌ **More verbose usage**: `person.set_name(...)` vs `person.name = ...`
 - ❌ **No pattern matching**: Can't use struct patterns
 - ❌ **No struct update syntax**: Can't use `..` spread operator
-- ❌ **Cluttered API**: Many methods (`get_*`, `set_*`, `mut_*`, `has_*`, `clear_*`)
-- ❌ **Not zero-cost**: Extra abstraction layer
 
 #### Option 3: Hybrid Approach
 
