@@ -1,5 +1,5 @@
 [workspace]
-members = ["puroro", "puroro-codegen"]
+members = ["puroro", "puroro-codegen", "sandbox"]
 resolver = "2"
 
 [workspace.package]

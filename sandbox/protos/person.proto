@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package example;
+
+// A simple person message for testing basic protobuf features
+message Person {
+  string name = 1;
+  int32 age = 2;
+  string email = 3;
+}
+

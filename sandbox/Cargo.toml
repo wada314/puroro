@@ -1,0 +1,9 @@
+[package]
+name = "sandbox"
+version.workspace = true
+authors.workspace = true
+edition.workspace = true
+publish = false
+
+[dependencies]
+puroro = { path = "../puroro" }
