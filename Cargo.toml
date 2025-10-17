@@ -1,0 +1,18 @@
+[workspace]
+members = ["puroro", "puroro-codegen"]
+resolver = "2"
+
+[workspace.package]
+version = "0.1.0"
+authors = ["Shohei Wada <pc@wada314.jp>"]
+edition = "2021"
+license = "Apache-2.0"
+repository = "https://github.com/wada314/puroro"
+
+[workspace.dependencies]
+# External utility crates
+protobuf-core = "0.1"
+protoc-plugin-by-closure = "0.2"
+
+# Common dependencies
+thiserror = "2.0"

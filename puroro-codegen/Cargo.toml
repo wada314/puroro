@@ -1,0 +1,28 @@
+[package]
+name = "puroro-codegen"
+version.workspace = true
+authors.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Code generator (protoc plugin) for Puroro"
+documentation = "https://docs.rs/puroro/"
+
+[dependencies]
+protobuf-core.workspace = true
+# protoc-plugin-by-closure.workspace = true  # TODO: Add back when needed
+thiserror.workspace = true
+
+# Code generation dependencies
+syn = { version = "2.0", features = ["full"] }
+quote = "1.0"
+proc-macro2 = "1.0"
+prettyplease = "0.2"
+
+[lib]
+name = "puroro_codegen"
+path = "src/lib.rs"
+
+[[bin]]
+name = "protoc-gen-puroro"
+path = "src/main.rs"

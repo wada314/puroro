@@ -46,11 +46,43 @@ inline/           - Inline macro related
 tests/            - Test suite
 ```
 
-### Next Steps
-1. Understand the utility crates (`protobuf-core` and `protoc-plugin-by-closure`)
-2. Define the basic architecture and design principles
-3. Decide what to keep/delete from the existing code
-4. Start implementing from the foundation
+### Design Principles (Decided)
+
+1. **Precise Protobuf Spec Support**: Implement Protocol Buffers specification accurately and completely
+2. **Rust-idiomatic Interface**: Design APIs that feel natural in Rust, not restricted by C/C++ interfaces like the official implementation
+   - Leverage Rust's type system
+   - Use Rust idioms (Result, Option, iterators, etc.)
+   - Modern Rust patterns (builder pattern, trait-based design)
+   - Memory safety without sacrificing performance
+
+### Crate Structure (Decided)
+
+```
+puroro/              - Runtime library (used by generated code)
+puroro-codegen/      - Code generator (protoc plugin)
+```
+
+**Minimum viable crates**: These two are the essential building blocks.
+
+### Progress Log
+
+#### 2025-10-17: Initial Setup Complete ✓
+
+1. **Cleaned up**: Removed all existing code to start fresh
+2. **Created basic structure**:
+   - Workspace with `puroro` and `puroro-codegen` crates
+   - Basic `Message` trait in runtime library
+   - Error types for both crates
+   - Skeleton for protoc plugin binary
+3. **Dependencies configured**:
+   - `protobuf-core` 0.1 for wire format I/O
+   - Note: `protoc-plugin-by-closure` temporarily disabled due to build issues, will add when needed
+4. **Build status**: ✓ Compiles successfully
+
+**Next steps**: 
+- Design the core runtime API (Message trait methods, field types)
+- Implement basic serialization/deserialization
+- Design code generator architecture
 
 ---
 
