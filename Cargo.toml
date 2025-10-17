@@ -12,7 +12,7 @@ repository = "https://github.com/wada314/puroro"
 [workspace.dependencies]
 # External utility crates
 protobuf-core = "0.1"
-protoc-plugin-by-closure = { path = "../protoc-plugin-by-closure/lib" }
+protoc-plugin-by-closure = { git = "https://github.com/wada314/protoc-plugin-by-closure" }
 
 # Common dependencies
 thiserror = "2.0"

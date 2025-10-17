@@ -75,10 +75,17 @@ puroro-codegen/      - Code generator (protoc plugin)
    - Error types for both crates
    - Skeleton for protoc plugin binary
 3. **Dependencies configured**:
-   - `protobuf-core` 0.1 for wire format I/O
+   - `protobuf-core` 0.1 for wire format I/O (from crates.io)
+   - `protoc-plugin-by-closure` (from git repository)
    - `.cargo/config.toml` created with bindeps enabled
-   - Note: `protoc-plugin-by-closure` 0.2.0 has bindeps issues, temporarily disabled
 4. **Build status**: ✓ Compiles successfully
+
+**Important discovery about bindeps**:
+- ✅ Bindeps work with local path dependencies
+- ✅ Bindeps work with git dependencies
+- ❌ Bindeps appear NOT to work with crates.io dependencies
+- This may be related to [Cargo Issue #12555](https://github.com/rust-lang/cargo/issues/12555), which tracks crates.io support for bindeps
+- Current workaround: Use git or local path dependencies for crates that require bindeps
 
 **Next steps**: 
 - Design the core runtime API (Message trait methods, field types)
