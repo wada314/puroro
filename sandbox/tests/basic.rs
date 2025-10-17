@@ -1,6 +1,6 @@
 //! Basic integration tests for our API design.
 
-use sandbox::generated::person::{Person, PersonImpl, PersonMut};
+use sandbox::generated::person::{Person, PersonImpl, PersonMut, PersonTry, PersonTryMut};
 
 #[test]
 fn test_person_creation() {
@@ -129,4 +129,44 @@ fn test_person_into_string() {
 
     person.set_name("Frank"); // &str should also work
     assert_eq!(person.name(), "Frank");
+}
+
+#[test]
+fn test_person_try_trait() {
+    // Test that we can use PersonTry for fallible operations
+    let mut person = PersonImpl::new();
+    person.set_name("Iris");
+    person.set_age(45);
+
+    // PersonImpl's fallible operations always succeed
+    assert_eq!(person.try_name().unwrap(), "Iris");
+    assert_eq!(person.try_age().unwrap(), 45);
+    assert_eq!(person.try_email().unwrap(), "");
+}
+
+#[test]
+fn test_person_try_mut_trait() {
+    // Test that we can use PersonTryMut for fallible mutations
+    let mut person = PersonImpl::new();
+
+    // PersonImpl's fallible operations always succeed
+    person.try_set_name("Jack").unwrap();
+    person.try_set_age(55).unwrap();
+
+    assert_eq!(person.try_name().unwrap(), "Jack");
+    assert_eq!(person.try_age().unwrap(), 55);
+}
+
+#[test]
+fn test_fallible_generic_code() {
+    // Test that we can write generic code using fallible traits
+    fn get_person_summary(p: &impl PersonTry) -> Result<String, puroro::error::Error> {
+        Ok(format!("{} (age: {})", p.try_name()?, p.try_age()?))
+    }
+
+    let mut person = PersonImpl::new();
+    person.set_name("Kate");
+    person.set_age(33);
+
+    assert_eq!(get_person_summary(&person).unwrap(), "Kate (age: 33)");
 }

@@ -249,6 +249,75 @@ This decision aligns with our "Rust-idiomatic" principle by leveraging Rust's tr
 
 ---
 
+### Trait Design: Fallible vs Infallible
+
+#### Design Decision (2025-10-17)
+
+We will provide **four traits per message**:
+1. `Person` - Immutable, infallible
+2. `PersonMut` - Mutable, infallible
+3. `PersonTry` - Immutable, fallible
+4. `PersonTryMut` - Mutable, fallible
+
+**Fallible traits enable implementations that may fail during field access**, such as:
+- Lazy deserialization (deserialize on field access)
+- Validation implementations
+- Zero-copy views over potentially corrupted data
+
+#### Method Naming: `try_` Prefix Decision
+
+After discussion, we decided to use **`try_` prefix for fallible trait methods**.
+
+**Discussion Summary**:
+
+**Option A: Same method names** (e.g., both `name()`)
+- Pros:
+  - Conceptually consistent
+  - Users typically import only one trait, not both
+  - Cleaner when used individually
+- Cons:
+  - Collision when both traits are imported (requires fully qualified syntax)
+  - Return types differ anyway (`&str` vs `Result<&str, Error>`)
+
+**Option B: `try_` prefix for fallible** (e.g., `name()` vs `try_name()`)
+- Pros:
+  - Follows Rust conventions (`try_into`, `try_reserve`, etc.)
+  - Clear at call site which operations may fail
+  - No collision even when both traits imported
+  - Return type difference is reflected in name
+- Cons:
+  - Slightly more verbose
+
+**Key insight**: Even with same method names, users cannot freely switch between fallible and infallible because **return types differ**. Calling code must change anyway:
+```rust
+// Infallible
+let name = person.name();  // &str
+
+// Fallible (same name)
+let name = person.name()?; // Result<&str, Error>
+```
+
+Since the calling code must change regardless, having different names (`try_name()`) makes the distinction clearer.
+
+**Decision: Use `try_` prefix for fallible trait methods.**
+
+Example:
+```rust
+// Infallible traits
+trait Person {
+    fn name(&self) -> &str;
+    fn age(&self) -> i32;
+}
+
+// Fallible traits
+trait PersonTry {
+    fn try_name(&self) -> Result<&str, Error>;
+    fn try_age(&self) -> Result<i32, Error>;
+}
+```
+
+---
+
 ## Discussion Topics
 
 ### Topic: Understanding Utility Crates
