@@ -24,7 +24,7 @@ fn test_person_mutation() {
     person.name = "Alice".to_string();
     person.age = 30;
     person.email = "alice@example.com".to_string();
-    
+
     assert_eq!(person.name, "Alice");
     assert_eq!(person.age, 30);
     assert_eq!(person.email, "alice@example.com");
@@ -34,8 +34,7 @@ fn test_person_mutation() {
 fn test_person_clone() {
     let mut person = Person::new();
     person.name = "Bob".to_string();
-    
+
     let cloned = person.clone();
     assert_eq!(person, cloned);
 }
-

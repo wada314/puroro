@@ -2,7 +2,7 @@
 //!
 //! This represents our ideal API for the generated code.
 
-use puroro::{Message, error::Error};
+use puroro::{error::Error, Message};
 
 /// A simple person message for testing basic protobuf features
 #[derive(Debug, Clone, PartialEq)]
@@ -34,15 +34,14 @@ impl Message for Person {
         // TODO: Implement actual parsing
         todo!("Parsing not yet implemented")
     }
-    
+
     fn write_to_bytes(&self) -> Result<Vec<u8>, Error> {
         // TODO: Implement actual serialization
         todo!("Serialization not yet implemented")
     }
-    
+
     fn compute_size(&self) -> usize {
         // TODO: Implement actual size computation
         todo!("Size computation not yet implemented")
     }
 }
-
