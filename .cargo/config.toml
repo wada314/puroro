@@ -1,5 +1,5 @@
+# Enable binary dependencies (bindeps) feature
+# Required for protoc-plugin-by-closure crate
+
 [unstable]
 bindeps = true
-
-[net]
-git-fetch-with-cli = true

@@ -10,7 +10,7 @@ documentation = "https://docs.rs/puroro/"
 
 [dependencies]
 protobuf-core.workspace = true
-# protoc-plugin-by-closure.workspace = true  # TODO: Add back when needed
+protoc-plugin-by-closure.workspace = true
 thiserror.workspace = true
 
 # Code generation dependencies

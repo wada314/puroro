@@ -76,7 +76,8 @@ puroro-codegen/      - Code generator (protoc plugin)
    - Skeleton for protoc plugin binary
 3. **Dependencies configured**:
    - `protobuf-core` 0.1 for wire format I/O
-   - Note: `protoc-plugin-by-closure` temporarily disabled due to build issues, will add when needed
+   - `.cargo/config.toml` created with bindeps enabled
+   - Note: `protoc-plugin-by-closure` 0.2.0 has bindeps issues, temporarily disabled
 4. **Build status**: ✓ Compiles successfully
 
 **Next steps**: 
