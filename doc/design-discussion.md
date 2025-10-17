@@ -193,9 +193,59 @@ Could also consider:
 - Methods for complex operations (repeated fields, oneofs, etc.)
 - Builder pattern for construction
 
-#### Decision: TBD
+#### Future Possibility: Best of Both Worlds
 
-**TODO**: Discuss and decide which approach aligns best with our "Rust-idiomatic" design principle.
+**Note**: Some advantages of open structs are very attractive, particularly:
+- Pattern matching capabilities
+- Struct update syntax
+
+In the future, we could potentially provide **both** as alternative implementations of the same trait:
+
+```rust
+// Trait-based interface
+pub trait Person {
+    fn name(&self) -> &str;
+    fn set_name(&mut self, v: String);
+    // ...
+}
+
+// Standard implementation (closed, memory-efficient)
+pub struct PersonStandard {
+    _has_bits: u32,
+    name: String,
+    age: i32,
+    // ...
+}
+
+// Open implementation (for pattern matching, struct updates)
+#[derive(Debug, Clone)]
+pub struct PersonOpen {
+    pub name: String,
+    pub age: i32,
+    // Note: Less memory efficient for optional fields
+}
+
+// Both implement the same trait
+impl Person for PersonStandard { /* ... */ }
+impl Person for PersonOpen { /* ... */ }
+```
+
+This would allow users to choose based on their needs:
+- Use `PersonStandard` for memory efficiency and flexibility
+- Use `PersonOpen` when pattern matching or struct updates are critical
+- Both are interoperable through the `Person` trait
+
+#### Decision: **Closed Struct (Getter/Setter) Approach**
+
+Based on the analysis above, we choose the **Closed Struct approach** for the following reasons:
+
+1. **Memory efficiency** is critical for Protocol Buffers (optional fields)
+2. **Multiple implementations** enable various optimization strategies
+3. **Internal representation hiding** allows future optimizations
+4. The verbosity trade-off is acceptable for these benefits
+5. We can potentially add open struct variants in the future if needed
+
+This decision aligns with our "Rust-idiomatic" principle by leveraging Rust's trait system and zero-cost abstractions, while maintaining the practical requirements of a Protocol Buffers implementation.
 
 ---
 
