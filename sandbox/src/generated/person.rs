@@ -4,25 +4,31 @@
 
 use puroro::{error::Error, Message};
 
-/// Trait representing the Person message interface.
+/// Immutable trait for Person message.
 ///
-/// This trait defines the public API for accessing Person fields.
-/// Multiple implementations can provide different trade-offs (standard, lazy, zero-copy, etc.)
+/// This trait provides read-only access to Person fields.
+/// Implementations can be optimized for immutable access patterns (e.g., zero-copy views).
 pub trait Person {
     // Getters
     fn name(&self) -> &str;
     fn age(&self) -> i32;
     fn email(&self) -> &str;
 
-    // Setters
-    fn set_name(&mut self, v: impl Into<String>);
-    fn set_age(&mut self, v: i32);
-    fn set_email(&mut self, v: impl Into<String>);
-
     // Presence checks (for Proto3 optional semantics)
     fn has_name(&self) -> bool;
     fn has_age(&self) -> bool;
     fn has_email(&self) -> bool;
+}
+
+/// Mutable trait for Person message.
+///
+/// This trait extends Person with mutation capabilities.
+/// Use this when you need to modify message fields.
+pub trait PersonMut: Person {
+    // Setters
+    fn set_name(&mut self, v: impl Into<String>);
+    fn set_age(&mut self, v: i32);
+    fn set_email(&mut self, v: impl Into<String>);
 
     // Clear methods
     fn clear_name(&mut self);
@@ -82,6 +88,20 @@ impl Person for PersonImpl {
         &self.email
     }
 
+    fn has_name(&self) -> bool {
+        (self._has_bits & HAS_NAME) != 0
+    }
+
+    fn has_age(&self) -> bool {
+        (self._has_bits & HAS_AGE) != 0
+    }
+
+    fn has_email(&self) -> bool {
+        (self._has_bits & HAS_EMAIL) != 0
+    }
+}
+
+impl PersonMut for PersonImpl {
     fn set_name(&mut self, v: impl Into<String>) {
         self.name = v.into();
         self._has_bits |= HAS_NAME;
@@ -95,18 +115,6 @@ impl Person for PersonImpl {
     fn set_email(&mut self, v: impl Into<String>) {
         self.email = v.into();
         self._has_bits |= HAS_EMAIL;
-    }
-
-    fn has_name(&self) -> bool {
-        (self._has_bits & HAS_NAME) != 0
-    }
-
-    fn has_age(&self) -> bool {
-        (self._has_bits & HAS_AGE) != 0
-    }
-
-    fn has_email(&self) -> bool {
-        (self._has_bits & HAS_EMAIL) != 0
     }
 
     fn clear_name(&mut self) {

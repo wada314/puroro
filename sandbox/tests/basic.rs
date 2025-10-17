@@ -1,6 +1,6 @@
 //! Basic integration tests for our API design.
 
-use sandbox::generated::person::{Person, PersonImpl};
+use sandbox::generated::person::{Person, PersonImpl, PersonMut};
 
 #[test]
 fn test_person_creation() {
@@ -75,15 +75,48 @@ fn test_person_clone() {
 
 #[test]
 fn test_person_trait_usage() {
-    // Test that we can use the Person trait for generic code
-    fn print_person_name(p: &impl Person) -> String {
-        p.name().to_string()
+    // Test that we can use the Person trait for immutable access
+    fn print_person_info(p: &impl Person) -> String {
+        format!("{} (age: {})", p.name(), p.age())
     }
 
     let mut person = PersonImpl::new();
     person.set_name("Dave");
+    person.set_age(40);
 
-    assert_eq!(print_person_name(&person), "Dave");
+    assert_eq!(print_person_info(&person), "Dave (age: 40)");
+}
+
+#[test]
+fn test_person_mut_trait_usage() {
+    // Test that we can use PersonMut trait for mutable operations
+    fn initialize_person(p: &mut impl PersonMut, name: &str, age: i32) {
+        p.set_name(name);
+        p.set_age(age);
+    }
+
+    let mut person = PersonImpl::new();
+    initialize_person(&mut person, "Grace", 28);
+
+    assert_eq!(person.name(), "Grace");
+    assert_eq!(person.age(), 28);
+    assert!(person.has_name());
+    assert!(person.has_age());
+}
+
+#[test]
+fn test_immutable_reference() {
+    // Test that immutable references only allow Person trait operations
+    let mut person = PersonImpl::new();
+    person.set_name("Henry");
+    person.set_age(50);
+
+    // Take an immutable reference - can only use Person trait methods
+    let person_ref: &dyn Person = &person;
+    assert_eq!(person_ref.name(), "Henry");
+    assert_eq!(person_ref.age(), 50);
+    assert!(person_ref.has_name());
+    // person_ref.set_name("test"); // This would not compile - good!
 }
 
 #[test]
