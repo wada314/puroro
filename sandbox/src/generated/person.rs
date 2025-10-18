@@ -40,32 +40,34 @@ pub trait PersonMut: Person {
 ///
 /// This trait provides read-only access to Person fields with error handling.
 /// Use this for implementations that may fail during field access (e.g., lazy deserialization, validation).
+/// All methods in this trait are fallible for consistency.
 pub trait PersonTry {
     // Getters (fallible) - using try_ prefix following Rust conventions
     fn try_name(&self) -> Result<&str, Error>;
     fn try_age(&self) -> Result<i32, Error>;
     fn try_email(&self) -> Result<&str, Error>;
 
-    // Presence checks (infallible - just checks metadata)
-    fn has_name(&self) -> bool;
-    fn has_age(&self) -> bool;
-    fn has_email(&self) -> bool;
+    // Presence checks (fallible) - may fail when reading metadata
+    fn try_has_name(&self) -> Result<bool, Error>;
+    fn try_has_age(&self) -> Result<bool, Error>;
+    fn try_has_email(&self) -> Result<bool, Error>;
 }
 
 /// Fallible mutable trait for Person message.
 ///
 /// This trait extends PersonTry with mutation capabilities that may fail.
 /// Use this for lazy or validated implementations that need mutation support.
+/// All methods in this trait are fallible for consistency.
 pub trait PersonTryMut: PersonTry {
-    // Setters (fallible - validation may fail) - using try_ prefix
+    // Setters (fallible) - using try_ prefix
     fn try_set_name(&mut self, v: impl Into<String>) -> Result<(), Error>;
     fn try_set_age(&mut self, v: i32) -> Result<(), Error>;
     fn try_set_email(&mut self, v: impl Into<String>) -> Result<(), Error>;
 
-    // Clear methods (infallible)
-    fn clear_name(&mut self);
-    fn clear_age(&mut self);
-    fn clear_email(&mut self);
+    // Clear methods (fallible) - may fail in validated or persistent implementations
+    fn try_clear_name(&mut self) -> Result<(), Error>;
+    fn try_clear_age(&mut self) -> Result<(), Error>;
+    fn try_clear_email(&mut self) -> Result<(), Error>;
 }
 
 /// Standard implementation of Person message.
@@ -180,16 +182,16 @@ impl PersonTry for PersonImpl {
         Ok(&self.email)
     }
 
-    fn has_name(&self) -> bool {
-        Person::has_name(self)
+    fn try_has_name(&self) -> Result<bool, Error> {
+        Ok(Person::has_name(self))
     }
 
-    fn has_age(&self) -> bool {
-        Person::has_age(self)
+    fn try_has_age(&self) -> Result<bool, Error> {
+        Ok(Person::has_age(self))
     }
 
-    fn has_email(&self) -> bool {
-        Person::has_email(self)
+    fn try_has_email(&self) -> Result<bool, Error> {
+        Ok(Person::has_email(self))
     }
 }
 
@@ -209,16 +211,19 @@ impl PersonTryMut for PersonImpl {
         Ok(())
     }
 
-    fn clear_name(&mut self) {
+    fn try_clear_name(&mut self) -> Result<(), Error> {
         PersonMut::clear_name(self);
+        Ok(())
     }
 
-    fn clear_age(&mut self) {
+    fn try_clear_age(&mut self) -> Result<(), Error> {
         PersonMut::clear_age(self);
+        Ok(())
     }
 
-    fn clear_email(&mut self) {
+    fn try_clear_email(&mut self) -> Result<(), Error> {
         PersonMut::clear_email(self);
+        Ok(())
     }
 }
 
