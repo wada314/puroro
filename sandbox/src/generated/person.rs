@@ -20,17 +20,24 @@ pub trait Person {
     fn has_email(&self) -> bool;
 }
 
-/// Infallible mutable trait for Person message.
+/// Infallible append-only trait for Person message.
 ///
-/// This trait extends Person with mutation capabilities without error handling.
-/// Use this when you need to modify message fields in fully deserialized messages.
-pub trait PersonMut: Person {
-    // Setters
+/// This trait extends Person with append operations (set/add/insert) but no destructive operations.
+/// Use this for most common use cases where you only need to add data, not clear it.
+/// This provides type-level safety against accidental data loss.
+pub trait PersonAppend: Person {
+    // Setters - append new values
     fn set_name(&mut self, v: impl Into<String>);
     fn set_age(&mut self, v: i32);
     fn set_email(&mut self, v: impl Into<String>);
+}
 
-    // Clear methods
+/// Infallible fully mutable trait for Person message.
+///
+/// This trait extends PersonAppend with destructive operations (clear).
+/// Use this only when you need to delete or clear data.
+pub trait PersonMut: PersonAppend {
+    // Clear methods - destructive operations
     fn clear_name(&mut self);
     fn clear_age(&mut self);
     fn clear_email(&mut self);
@@ -53,17 +60,24 @@ pub trait PersonTry {
     fn try_has_email(&self) -> Result<bool, Error>;
 }
 
-/// Fallible mutable trait for Person message.
+/// Fallible append-only trait for Person message.
 ///
-/// This trait extends PersonTry with mutation capabilities that may fail.
-/// Use this for lazy or validated implementations that need mutation support.
+/// This trait extends PersonTry with append operations that may fail.
+/// Use this for implementations that validate data on write but don't need destructive operations.
 /// All methods in this trait are fallible for consistency.
-pub trait PersonTryMut: PersonTry {
+pub trait PersonAppendTry: PersonTry {
     // Setters (fallible) - using try_ prefix
     fn try_set_name(&mut self, v: impl Into<String>) -> Result<(), Error>;
     fn try_set_age(&mut self, v: i32) -> Result<(), Error>;
     fn try_set_email(&mut self, v: impl Into<String>) -> Result<(), Error>;
+}
 
+/// Fallible fully mutable trait for Person message.
+///
+/// This trait extends PersonAppendTry with destructive operations that may fail.
+/// Use this for lazy or validated implementations that need full mutation support.
+/// All methods in this trait are fallible for consistency.
+pub trait PersonTryMut: PersonAppendTry {
     // Clear methods (fallible) - may fail in validated or persistent implementations
     fn try_clear_name(&mut self) -> Result<(), Error>;
     fn try_clear_age(&mut self) -> Result<(), Error>;
@@ -135,7 +149,7 @@ impl Person for PersonImpl {
     }
 }
 
-impl PersonMut for PersonImpl {
+impl PersonAppend for PersonImpl {
     fn set_name(&mut self, v: impl Into<String>) {
         self.name = v.into();
         self._has_bits |= HAS_NAME;
@@ -150,7 +164,9 @@ impl PersonMut for PersonImpl {
         self.email = v.into();
         self._has_bits |= HAS_EMAIL;
     }
+}
 
+impl PersonMut for PersonImpl {
     fn clear_name(&mut self) {
         self.name.clear();
         self._has_bits &= !HAS_NAME;
@@ -195,22 +211,24 @@ impl PersonTry for PersonImpl {
     }
 }
 
-impl PersonTryMut for PersonImpl {
+impl PersonAppendTry for PersonImpl {
     fn try_set_name(&mut self, v: impl Into<String>) -> Result<(), Error> {
-        PersonMut::set_name(self, v);
+        PersonAppend::set_name(self, v);
         Ok(())
     }
 
     fn try_set_age(&mut self, v: i32) -> Result<(), Error> {
-        PersonMut::set_age(self, v);
+        PersonAppend::set_age(self, v);
         Ok(())
     }
 
     fn try_set_email(&mut self, v: impl Into<String>) -> Result<(), Error> {
-        PersonMut::set_email(self, v);
+        PersonAppend::set_email(self, v);
         Ok(())
     }
+}
 
+impl PersonTryMut for PersonImpl {
     fn try_clear_name(&mut self) -> Result<(), Error> {
         PersonMut::clear_name(self);
         Ok(())

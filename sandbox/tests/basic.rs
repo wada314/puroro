@@ -1,6 +1,8 @@
 //! Basic integration tests for our API design.
 
-use sandbox::generated::person::{Person, PersonImpl, PersonMut, PersonTry, PersonTryMut};
+use sandbox::generated::person::{
+    Person, PersonAppend, PersonAppendTry, PersonImpl, PersonMut, PersonTry,
+};
 
 #[test]
 fn test_person_creation() {
@@ -88,20 +90,40 @@ fn test_person_trait_usage() {
 }
 
 #[test]
-fn test_person_mut_trait_usage() {
-    // Test that we can use PersonMut trait for mutable operations
-    fn initialize_person(p: &mut impl PersonMut, name: &str, age: i32) {
+fn test_person_append_trait_usage() {
+    // Test that we can use PersonAppend trait for append-only operations
+    fn populate_person(p: &mut impl PersonAppend, name: &str, age: i32) {
         p.set_name(name);
         p.set_age(age);
+        // p.clear_name(); // ❌ Would not compile - safe!
     }
 
     let mut person = PersonImpl::new();
-    initialize_person(&mut person, "Grace", 28);
+    populate_person(&mut person, "Grace", 28);
 
     assert_eq!(person.name(), "Grace");
     assert_eq!(person.age(), 28);
     assert!(person.has_name());
     assert!(person.has_age());
+}
+
+#[test]
+fn test_person_mut_trait_usage() {
+    // Test that we can use PersonMut trait for full mutable operations
+    fn reset_person(p: &mut impl PersonMut) {
+        p.set_name("Default");
+        p.clear_age(); // Only PersonMut can clear
+    }
+
+    let mut person = PersonImpl::new();
+    person.set_name("Alice");
+    person.set_age(30);
+
+    reset_person(&mut person);
+
+    assert_eq!(person.name(), "Default");
+    assert_eq!(person.age(), 0);
+    assert!(!person.has_age()); // Cleared
 }
 
 #[test]
@@ -155,6 +177,26 @@ fn test_person_try_mut_trait() {
 
     assert_eq!(person.try_name().unwrap(), "Jack");
     assert_eq!(person.try_age().unwrap(), 55);
+}
+
+#[test]
+fn test_person_append_try_trait() {
+    // Test that we can use PersonAppendTry for fallible append operations
+    fn try_populate_person(
+        p: &mut impl PersonAppendTry,
+        name: &str,
+        age: i32,
+    ) -> Result<(), puroro::error::Error> {
+        p.try_set_name(name)?;
+        p.try_set_age(age)?;
+        Ok(())
+    }
+
+    let mut person = PersonImpl::new();
+    try_populate_person(&mut person, "Laura", 40).unwrap();
+
+    assert_eq!(person.try_name().unwrap(), "Laura");
+    assert_eq!(person.try_age().unwrap(), 40);
 }
 
 #[test]

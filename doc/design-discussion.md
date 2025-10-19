@@ -318,6 +318,299 @@ trait PersonTry {
 
 ---
 
+### Optional Getters for Fields
+
+#### Design Decision (2025-10-17)
+
+**Decision: Provide `_opt()` getters ONLY for fields with zero-value defaults (no custom default value).**
+
+#### Background
+
+Protocol Buffers supports custom default values (Proto2, Editions):
+```proto
+message Msg {
+  int32 age = 1 [default = 72];  // custom default
+  string name = 2;                // zero-value default ("")
+}
+```
+
+The [official documentation](https://protobuf.dev/design-decisions/nullable-getters-setters/) explains why nullable getters are problematic: they lose default value information.
+
+**Example of the problem**:
+```rust
+// With nullable getters
+person.age_opt()  // Returns None, but default is 72 (not 0!)
+                  // Information about default = 72 is lost
+```
+
+#### Considered Options
+
+**Option A: No `_opt()` getters at all**
+- ✅ Simple and consistent
+- ✅ Users use `has_*()` + getter explicitly
+- ❌ No idiomatic Rust `Option<T>` usage
+
+**Option B: `_opt()` for all fields**
+- ✅ Consistent API
+- ❌ Confusing for non-zero defaults (what does `None` mean?)
+- ❌ Users may incorrectly assume zero defaults
+
+**Option C: `_opt()` only for zero-value default fields (CHOSEN)**
+- ✅ Clear semantics: `None` = not set = zero value
+- ✅ Natural integration with Rust ecosystem (Serde, etc.)
+- ✅ Type system prevents misuse with non-zero defaults
+- ⚠️ API inconsistency (some fields have `_opt()`, others don't)
+
+**Option D: Custom `FieldValue<T>` type for all fields**
+- ✅ Preserves default value information
+- ❌ Complex, high learning curve
+- ❌ Not standard `Option<T>`
+
+#### Why Option C is Good Design
+
+**Key insight**: API inconsistency becomes a **feature, not a bug**.
+
+The presence/absence of `_opt()` **encodes information at the type level**:
+
+```rust
+// This compiles - age has zero-value default
+let age: Option<i32> = person.age_opt();
+
+// This fails to compile - score has custom default
+let score: Option<i32> = person.score_opt();
+//                        ^^^^^^^^^^^^^^^^^ method not found
+// help: field `score` has a non-zero default value (72)
+// help: use `score()` and `has_score()` instead
+```
+
+**Benefits**:
+
+1. **Compile-time bug prevention**: Users cannot accidentally ignore non-zero defaults
+2. **Type-driven correctness**: API guides users to correct usage
+3. **Proto changes detected**: Adding `[default = X]` causes compile errors, forcing code review
+4. **Self-documenting**: `_opt()` presence indicates zero-value default
+
+**Use cases where `_opt()` is valuable (zero-value defaults)**:
+
+```rust
+// 1. Integration with Option-based APIs
+save_to_db(person.name_opt(), person.age_opt());
+
+// 2. Serde serialization (skip if not set)
+#[derive(Serialize)]
+struct PersonJson {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    age: Option<i32>,
+}
+
+// 3. Option combinators
+let retirement = person.age_opt()
+    .map(|age| 2024 + (65 - age))
+    .filter(|year| year > &2024);
+
+// 4. Distinguishing zero from unset
+match person.age_opt() {
+    Some(0) => println!("Explicitly set to 0"),
+    Some(n) => println!("Set to {}", n),
+    None => println!("Not set (zero)"),
+}
+```
+
+**For non-zero defaults, users must be explicit**:
+
+```proto
+message Msg {
+  int32 score = 1 [default = 72];
+}
+```
+
+```rust
+// Users know score has default 72, so they write:
+if person.has_score() {
+    Some(person.score())
+} else {
+    Some(72)  // Explicit about default
+}
+```
+
+#### API Design
+
+```rust
+trait Person {
+    // Always available
+    fn name(&self) -> &str;
+    fn has_name(&self) -> bool;
+    
+    // Only available if zero-value default
+    fn name_opt(&self) -> Option<String>;  // Generated conditionally
+}
+```
+
+#### Future Flexibility
+
+This design doesn't preclude adding other options later:
+- Could add `name_with_default(&self) -> (&str, bool)` if needed
+- Could add `FieldValue<T>` type in the future
+- Can remove `_opt()` easily before 1.0 release if needed
+
+**Decision: Proceed with conditional `_opt()` generation. This aligns with Rust's philosophy of "make illegal states unrepresentable."**
+
+---
+
+### Append-Only Trait for Safe Construction
+
+#### Design Decision (2025-10-17)
+
+**Decision: Add `PersonAppend` trait between `Person` and `PersonMut` for append-only operations.**
+
+#### Motivation
+
+Analysis of typical Protocol Buffers usage patterns reveals that **most code only appends data** (sets fields, adds to repeated fields) and **rarely clears or deletes** data.
+
+```rust
+// Typical usage - only appending
+let mut person = Person::new();
+person.set_name("Alice");      // append
+person.set_age(30);             // append
+person.add_hobby("reading");    // append
+
+// Clear is rare
+person.clear_name();            // ← Rarely needed
+```
+
+**Key insight**: Protocol Buffers' wire format is optimized for appending. Providing an append-only trait:
+1. Matches actual usage patterns
+2. Improves safety (prevents accidental data loss)
+3. Enables better API contracts (functions that only add data)
+
+#### Trait Hierarchy
+
+```
+Person (read-only)
+  ↓ extends
+PersonAppend (read + append operations)
+  ↓ extends
+PersonMut (read + append + destructive operations)
+```
+
+**Total: 6 traits**
+- Infallible: `Person`, `PersonAppend`, `PersonMut`
+- Fallible: `PersonTry`, `PersonAppendTry`, `PersonTryMut`
+
+#### API Design
+
+```rust
+/// Read-only access
+pub trait Person {
+    fn name(&self) -> &str;
+    fn age(&self) -> i32;
+    fn has_name(&self) -> bool;
+}
+
+/// Append-only access (most common use case)
+pub trait PersonAppend: Person {
+    // Scalar fields - set values
+    fn set_name(&mut self, v: impl Into<String>);
+    fn set_age(&mut self, v: i32);
+    
+    // Repeated fields - append items
+    fn add_hobby(&mut self, hobby: String);
+    
+    // Map fields - insert pairs
+    fn insert_score(&mut self, subject: String, score: i32);
+}
+
+/// Full mutable access (destructive operations)
+pub trait PersonMut: PersonAppend {
+    // Clear operations
+    fn clear_name(&mut self);
+    fn clear_hobbies(&mut self);
+    fn clear_scores(&mut self);
+    
+    // Mutable access (allows arbitrary modifications)
+    fn hobbies_mut(&mut self) -> &mut Vec<String>;
+    fn scores_mut(&mut self) -> &mut HashMap<String, i32>;
+}
+```
+
+#### Benefits
+
+**1. Type-level safety**
+```rust
+// Function only adds data, cannot delete
+fn populate_user_profile(user: &mut impl PersonAppend) {
+    user.set_name("Alice");
+    user.add_hobby("reading");
+    // user.clear_name(); // ❌ Compile error - safe!
+}
+
+// Function needs full control
+fn reset_user_data(user: &mut impl PersonMut) {
+    user.clear_name();
+    user.clear_hobbies();
+}
+```
+
+**2. Audit/logging scenarios**
+```rust
+// Audit logs should only append, never delete
+fn log_event(log: &mut impl AuditLogAppend) {
+    log.set_timestamp(now());
+    log.set_action("user_login");
+    // Cannot accidentally clear previous entries
+}
+```
+
+**3. Concurrent access patterns**
+```rust
+// Append-only operations have less contention
+fn worker(shared: Arc<Mutex<impl MetricsAppend>>) {
+    shared.lock().unwrap().add_metric("processed");
+    // No risk of clearing other workers' data
+}
+```
+
+**4. API clarity**
+```rust
+// Clear intent: "I only add data"
+fn Builder::add_tags(&mut self, tags: &mut impl TagsAppend) -> &mut Self;
+
+// Clear intent: "I need full control"
+fn Editor::modify_tags(&mut self, tags: &mut impl TagsMut) -> &mut Self;
+```
+
+#### Relationship with Builder Pattern
+
+`PersonAppend` is **complementary** to builder pattern, not competing:
+
+```rust
+// Builder: Immutable, one-shot construction
+let person = Person::builder()
+    .name("Alice")
+    .age(30)
+    .build();  // Done, immutable
+
+// Append: Mutable, incremental construction
+let mut person = Person::new();
+person.set_name("Alice");
+// ... can add more later
+person.set_age(30);
+```
+
+Both patterns can coexist and serve different use cases.
+
+#### Fallible Variants
+
+```rust
+pub trait PersonTry { /* try_name(), try_has_name() */ }
+pub trait PersonAppendTry: PersonTry { /* try_set_name(), try_add_hobby() */ }
+pub trait PersonTryMut: PersonAppendTry { /* try_clear_name() */ }
+```
+
+**Decision: Implement 6-trait hierarchy with Append as the primary mutable interface, matching Protocol Buffers' append-heavy usage patterns.**
+
+---
+
 ## Discussion Topics
 
 ### Topic: Understanding Utility Crates
