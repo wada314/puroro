@@ -2,6 +2,57 @@
 
 This document records the design discussions and decisions for the Puroro project - a Rust implementation of Google Protocol Buffers.
 
+## Quick Reference: Design Decisions
+
+**Last Updated**: 2025-10-17
+
+### Core Decisions
+
+| Decision | Choice | Rationale |
+|----------|--------|-----------|
+| **Struct Style** | Closed Struct (private fields + getters/setters) | Memory efficiency, multiple implementations, hide internal representation |
+| **Trait Count** | 6 traits per message | Person, PersonAppend, PersonMut, PersonTry, PersonAppendTry, PersonTryMut |
+| **Mutable Operations** | Three levels: Read, Append, Full-Mut | Match Protocol Buffers usage patterns (append-heavy) |
+| **Fallible Methods** | `try_` prefix | Follow Rust conventions, clear distinction |
+| **Optional Getters** | Conditional `_opt()` for zero-default fields only | Type-safe, prevents misuse with custom defaults |
+| **Memory Layout** | Bitflags for presence tracking | Avoid `Option<T>` overhead |
+
+### Trait Hierarchy
+
+```
+        Person (immutable)        PersonTry (fallible immutable)
+            ↓                              ↓
+    PersonAppend (+ setters)      PersonAppendTry (+ fallible setters)
+            ↓                              ↓
+  PersonMut (+ clear, mut_*)    PersonTryMut (+ fallible clear)
+```
+
+### API Example
+
+```rust
+// Read-only
+trait Person {
+    fn name(&self) -> &str;
+    fn age(&self) -> i32;
+    fn has_age(&self) -> bool;
+    fn age_opt(&self) -> Option<i32>;  // Only if zero-default
+}
+
+// Append-only (most common)
+trait PersonAppend: Person {
+    fn set_name(&mut self, v: impl Into<String>);
+    fn set_age(&mut self, v: i32);
+}
+
+// Full mutation (rare)
+trait PersonMut: PersonAppend {
+    fn clear_name(&mut self);
+    fn clear_age(&mut self);
+}
+```
+
+---
+
 ## 2025-10-17: Project Restart from Scratch
 
 ### Background
