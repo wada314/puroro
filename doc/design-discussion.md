@@ -993,14 +993,21 @@ pub struct SharedFields<const BYTES: usize> {
 }
 ```
 
-**Key insight:** Use BYTES (not BITS) as generic parameter:
+**Key insight #1:** Use BYTES (not BITS) as generic parameter:
 - ✅ `BitArray<[u8; BYTES]>` works directly (no const expressions)
 - ✅ Works on stable Rust (no `#![feature(generic_const_exprs)]`)
 - ✅ Code generator calculates: `bytes = (field_count + 7) / 8`
 
+**Key insight #2:** Allocator is stored INSIDE SharedFields (not passed as parameter):
+- ✅ Field operation functions always receive just `(&mut SharedFields, index, &mut field, value)`
+- ✅ Adding allocator/bool_bits doesn't change function signatures
+- ✅ Generated code never needs to change when extending SharedFields
+- ✅ Allocator is part of the message instance, accessible via `shared.allocator`
+
 **Benefits:**
 - Clean separation of shared vs exclusive fields
 - Easy to extend (add bool_bits, allocator, etc.)
+- **Function signatures remain stable** when adding shared fields
 - Same memory efficiency as direct BitArray usage (56 bytes for Person)
 - Type-safe (compiler enforces correct byte count)
 
@@ -1010,6 +1017,31 @@ pub struct MessageImpl {
     _shared: SharedFields<BYTES>,  // ⌈fields/8⌉ bytes
     // ... exclusive fields (name, age, etc.)
 }
+
+// Simple one-line operations
+impl MessageAppend for MessageImpl {
+    fn set_name(&mut self, v: &str) {
+        field::set_string(&mut self._shared, IDX_NAME, &mut self.name, v);
+    }
+}
+```
+
+**Future extension example:**
+```rust
+// SharedFields with allocator
+pub struct SharedFields<const BYTES: usize, A: Allocator = Global> {
+    has_bits: BitArray<[u8; BYTES]>,
+    allocator: A,  // Stored in message
+}
+
+// Function signature adapts automatically
+pub fn set_string<const BYTES: usize, A: Allocator>(
+    shared: &mut SharedFields<BYTES, A>,  // Generic param auto-inferred
+    // ... rest unchanged
+) { ... }
+
+// Generated code stays the same!
+field::set_string(&mut self._shared, IDX_NAME, &mut self.name, v);
 ```
 
 #### Open Questions

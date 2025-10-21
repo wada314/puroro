@@ -85,30 +85,34 @@ impl PersonAppend for PersonImpl {
 
 ## Extensibility Maintained
 
-When we add new shared fields (e.g., `bool_bits`):
+When we add new shared fields (e.g., `bool_bits`, `allocator`):
 
 ```rust
-// SharedFields definition
-pub struct SharedFields<const BYTES: usize, const BOOL_BYTES: usize> {
+// SharedFields definition - just add fields/generic params
+pub struct SharedFields<const BYTES: usize, const BOOL_BYTES: usize, A: Allocator = Global> {
     has_bits: BitArray<[u8; BYTES]>,
     bool_bits: BitArray<[u8; BOOL_BYTES]>,  // Added
+    allocator: A,                            // Added
 }
 
-// Library function - signature stays stable
-pub fn set_string<const BYTES: usize, const BOOL_BYTES: usize>(
-    shared: &mut SharedFields<BYTES, BOOL_BYTES>,  // Just add generic param
+// Library function signature doesn't change!
+pub fn set_string<const BYTES: usize, const BOOL_BYTES: usize, A: Allocator>(
+    shared: &mut SharedFields<BYTES, BOOL_BYTES, A>,
     bit_index: usize,
-    storage: &mut String,
+    storage: &mut String,  // Or allocator-aware string
     value: &str,
 ) {
-    // Implementation can use shared.bool_bits if needed
+    // Can access shared.bool_bits, shared.allocator internally
     value.clone_into(storage);
     shared.has_bits_mut().set(bit_index, true);
 }
 
-// Generated code doesn't change!
+// Generated code doesn't change at all!
 field::set_string(&mut self._shared, IDX_NAME, &mut self.name, v);
 ```
+
+**Key advantage:** Allocator is **inside** SharedFields, so function parameters don't grow.
+Field operation functions always receive just `(&mut shared, index, &mut field, value)`.
 
 Still extensible, but simpler!
 

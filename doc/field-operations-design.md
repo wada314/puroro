@@ -158,27 +158,70 @@ pub fn set_bool_packed(
 
 ## Future Extensions
 
-### Allocator Support
+### Critical Design Principle: Shared State Lives Inside SharedFields
+
+**All** shared state is stored **inside** `SharedFields`, not passed as function parameters.
+
+This means:
+- ✅ Allocator is stored IN the message
+- ✅ Bool_bits is IN SharedFields
+- ✅ Unknown_fields is IN SharedFields
+- ✅ Function signatures remain stable
+
+### Allocator Support (Future)
 
 ```rust
-pub struct FieldContext<'a, A: Allocator = Global> {
-    pub has_bits: &'a mut u32,
-    pub has_bit_mask: u32,
-    pub allocator: &'a A,  // Added
+// Add allocator to SharedFields
+pub struct SharedFields<const BYTES: usize, A: Allocator = Global> {
+    has_bits: BitArray<[u8; BYTES]>,
+    allocator: A,  // Stored in message!
 }
 
-// Usage in generated code stays almost the same
-let ctx = FieldContext::new(&mut self._has_bits, HAS_NAME, &self.allocator);
-field::set_string(ctx, &mut self.name, v);
+// Function signature automatically adapts
+pub fn set_string<const BYTES: usize, A: Allocator>(
+    shared: &mut SharedFields<BYTES, A>,  // Compiler infers A
+    bit_index: usize,
+    storage: &mut String,  // Or allocator-aware String
+    value: &str,
+) {
+    // Can use shared.allocator internally
+    value.clone_into(storage);
+    shared.has_bits_mut().set(bit_index, true);
+}
+
+// Generated code doesn't change!
+field::set_string(&mut self._shared, IDX_NAME, &mut self.name, v);
 ```
 
-### Unknown Fields
+**Key advantage:** No need to thread allocator through every function call.
+
+### Boolean Packing (Future)
 
 ```rust
-pub struct FieldContext<'a> {
-    pub has_bits: &'a mut u32,
-    pub has_bit_mask: u32,
-    pub unknown_fields: &'a mut Vec<u8>,  // Added
+// Add bool_bits to SharedFields
+pub struct SharedFields<const BYTES: usize, const BOOL_BYTES: usize> {
+    has_bits: BitArray<[u8; BYTES]>,
+    bool_bits: BitArray<[u8; BOOL_BYTES]>,  // Added
+}
+
+// New function for boolean fields
+pub fn set_bool<const BYTES: usize, const BOOL_BYTES: usize>(
+    shared: &mut SharedFields<BYTES, BOOL_BYTES>,
+    bit_index: usize,
+    value: bool,
+) {
+    shared.has_bits_mut().set(bit_index, true);
+    shared.bool_bits_mut().set(bit_index, value);
+}
+```
+
+### Unknown Fields (Future)
+
+```rust
+pub struct SharedFields<const BYTES: usize, A: Allocator = Global> {
+    has_bits: BitArray<[u8; BYTES]>,
+    allocator: A,
+    unknown_fields: Vec<u8, A>,  // Using the same allocator
 }
 ```
 

@@ -28,10 +28,15 @@ pub struct SharedFields<const BYTES: usize> {
     /// Presence tracking bits
     /// Uses BitArray with fixed-size array for stack allocation
     has_bits: BitArray<[u8; BYTES]>,
-    // Future fields to be added:
+    // Future fields to be added here (not as function parameters):
     // bool_bits: BitArray<[u8; BOOL_BYTES]>,  // Packed boolean values
-    // allocator: A,                            // Custom allocator
+    // allocator: A,                            // Custom allocator (stored IN message)
     // _unknown_fields: Vec<u8, A>,            // Unknown fields from newer protos
+    //
+    // Key design: All shared state is INSIDE this struct.
+    // This means field operation functions (set_*, clear_*, etc.) don't need
+    // to change their signatures when we add new shared fields.
+    // They always receive (&mut SharedFields, index, &mut field, value).
 }
 
 impl<const BYTES: usize> SharedFields<BYTES> {
