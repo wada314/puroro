@@ -26,6 +26,11 @@ pub use protobuf_core;
 /// (has_bits, bool_bits, etc.) from "exclusive" field storage.
 pub mod field;
 
+/// Shared fields for message implementations.
+///
+/// Provides a wrapper type for fields shared across all message fields.
+pub mod shared;
+
 /// Core message trait that all generated Protocol Buffer messages implement.
 pub trait Message: Sized {
     /// Parses a message from the given byte slice.

@@ -261,23 +261,29 @@ We use `bitvec`'s `BitArr!` for **all** messages, with field count known at comp
 ### Implementation
 
 ```rust
-use bitvec::prelude::*;
-use puroro::field::{self, FieldContext};
+use puroro::{
+    field::{self, FieldContext},
+    shared::SharedFields,
+};
 
 pub struct PersonImpl {
-    _has_bits: BitArr!(for 3, in u8),  // Fixed size, stack-allocated
+    // Shared fields wrapper: For 3 fields, ⌈3/8⌉ = 1 byte
+    _shared: SharedFields<1>,
+    // Exclusive fields
     name: String,
     age: i32,
 }
 
 impl PersonAppend for PersonImpl {
     fn set_name(&mut self, v: &str) {
-        // Convert to BitSlice for field operations
-        let ctx = FieldContext::new(self._has_bits.as_mut_bitslice(), 0);
+        // Get mutable BitSlice from shared fields wrapper
+        let ctx = FieldContext::new(self._shared.has_bits_mut(), 0);
         field::set_string(ctx, &mut self.name, v);
     }
 }
 ```
+
+**Key insight:** The generic const parameter is **BYTES** (not bits), so we can use `BitArray<[u8; BYTES]>` directly without const expressions like `(N + 7) / 8`.
 
 ### Memory Impact
 

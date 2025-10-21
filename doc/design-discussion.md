@@ -15,7 +15,7 @@ This document records the design discussions and decisions for the Puroro projec
 | **Mutable Operations** | Three levels: Read, Append, Full-Mut | Match Protocol Buffers usage patterns (append-heavy) |
 | **Fallible Methods** | `try_` prefix | Follow Rust conventions, clear distinction |
 | **Optional Getters** | Conditional `_opt()` for zero-default fields only | Type-safe, prevents misuse with custom defaults |
-| **Memory Layout** | BitArr for presence tracking | Avoid `Option<T>` overhead; stack-allocated; supports unlimited fields; same efficiency as u32 |
+| **Memory Layout** | BitArr for presence tracking (via SharedFields wrapper) | Avoid `Option<T>` overhead; stack-allocated; supports unlimited fields; same efficiency as u32 |
 | **Dyn Compatibility** | All traits must be dyn-compatible | Enables dynamic dispatch, trait objects (Box<dyn Person>), heterogeneous collections. Not deeply discussed yet - may change. |
 | **Field Ordering** | Size-descending order | Optimize memory alignment, no layout compatibility needed |
 | **Inline Attributes** | All getters/setters get `#[inline]` | Maximize runtime performance |
@@ -979,12 +979,44 @@ scores: HashMap<String, i32, RandomState, A>,  // Using allocator-api2
 - May consider `IndexMap` if insertion order preservation is needed
 - `BTreeMap` for smaller maps (profiling-driven decision)
 
+#### SharedFields Wrapper Design
+
+**Decision (2025-10-21): Wrap shared state in `SharedFields<const BYTES: usize>` struct.**
+
+All shared fields (presence bits, bool bits, allocator, etc.) are grouped into a single wrapper type:
+
+```rust
+// In puroro/src/shared.rs
+pub struct SharedFields<const BYTES: usize> {
+    has_bits: BitArray<[u8; BYTES]>,
+    // Future: bool_bits, allocator, _unknown_fields
+}
+```
+
+**Key insight:** Use BYTES (not BITS) as generic parameter:
+- ✅ `BitArray<[u8; BYTES]>` works directly (no const expressions)
+- ✅ Works on stable Rust (no `#![feature(generic_const_exprs)]`)
+- ✅ Code generator calculates: `bytes = (field_count + 7) / 8`
+
+**Benefits:**
+- Clean separation of shared vs exclusive fields
+- Easy to extend (add bool_bits, allocator, etc.)
+- Same memory efficiency as direct BitArray usage (56 bytes for Person)
+- Type-safe (compiler enforces correct byte count)
+
+**Generated code pattern:**
+```rust
+pub struct MessageImpl {
+    _shared: SharedFields<BYTES>,  // ⌈fields/8⌉ bytes
+    // ... exclusive fields (name, age, etc.)
+}
+```
+
 #### Open Questions
 
 - Should we use `#[inline]` or `#[inline(always)]` for hot paths? (Decide after profiling)
 - How to handle allocator API for String? (Wrapper type vs. `Vec<u8>` representation)
 - Should unknown fields be optional via feature flag? (Always include for now)
-- Optimal bitflags size for large messages (>32 fields)? (Use `u64` or multiple `u32`)
 
 ---
 

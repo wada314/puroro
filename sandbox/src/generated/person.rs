@@ -2,12 +2,12 @@
 //!
 //! This represents our ideal API for the generated code using the Closed Struct approach.
 //!
-//! Uses `bitvec` for presence tracking, supporting any number of optional fields.
+//! Uses `SharedFields` wrapper for presence tracking, supporting any number of optional fields.
 
-use bitvec::prelude::*;
 use puroro::{
     error::Error,
     field::{self, FieldContext},
+    shared::SharedFields,
     Message,
 };
 
@@ -93,7 +93,7 @@ pub trait PersonTryMut: PersonAppendTry {
 
 /// Standard implementation of Person message.
 ///
-/// Uses BitArr for efficient optional field tracking (stack-allocated).
+/// Uses SharedFields for efficient optional field tracking (stack-allocated).
 /// Fields are ordered by size (descending) to minimize padding.
 /// Memory layout optimized for performance.
 #[derive(Debug, Clone, PartialEq)]
@@ -103,11 +103,11 @@ pub struct PersonImpl {
     name: String,
     email: String,
 
-    // BitArr for tracking which fields have been explicitly set
-    // Fixed size, stack-allocated (no heap overhead)
-    _has_bits: BitArr!(for 3, in u8),
+    // Shared fields: presence tracking, etc.
+    // For 3 fields: ⌈3/8⌉ = 1 byte (stack-allocated)
+    _shared: SharedFields<1>,
 
-    // Scalar fields
+    // Scalar exclusive fields
     age: i32,
 }
 
@@ -122,7 +122,7 @@ impl PersonImpl {
         Self {
             name: String::new(),
             email: String::new(),
-            _has_bits: bitarr![u8, Lsb0; 0; 3], // 3 fields, stack-allocated
+            _shared: SharedFields::new(),
             age: 0,
         }
     }
@@ -155,45 +155,44 @@ impl Person for PersonImpl {
 
     #[inline]
     fn has_name(&self) -> bool {
-        // Shared field: self._has_bits
-        // Direct bit access for read-only
-        self._has_bits.as_bitslice()[IDX_NAME]
+        // Access shared field through wrapper
+        self._shared.has_bits()[IDX_NAME]
     }
 
     #[inline]
     fn has_age(&self) -> bool {
-        // Shared field: self._has_bits
-        self._has_bits.as_bitslice()[IDX_AGE]
+        // Access shared field through wrapper
+        self._shared.has_bits()[IDX_AGE]
     }
 
     #[inline]
     fn has_email(&self) -> bool {
-        // Shared field: self._has_bits
-        self._has_bits.as_bitslice()[IDX_EMAIL]
+        // Access shared field through wrapper
+        self._shared.has_bits()[IDX_EMAIL]
     }
 }
 
 impl PersonAppend for PersonImpl {
     #[inline]
     fn set_name(&mut self, v: &str) {
-        // Create context from shared field (_has_bits) using bit index
-        let ctx = FieldContext::new(self._has_bits.as_mut_bitslice(), IDX_NAME);
+        // Create context from shared field wrapper
+        let ctx = FieldContext::new(self._shared.has_bits_mut(), IDX_NAME);
         // Pass context + exclusive field (self.name) to library function
         field::set_string(ctx, &mut self.name, v);
     }
 
     #[inline]
     fn set_age(&mut self, v: i32) {
-        // Create context from shared field (_has_bits) using bit index
-        let ctx = FieldContext::new(self._has_bits.as_mut_bitslice(), IDX_AGE);
+        // Create context from shared field wrapper
+        let ctx = FieldContext::new(self._shared.has_bits_mut(), IDX_AGE);
         // Pass context + exclusive field (self.age) to library function
         field::set_scalar(ctx, &mut self.age, v);
     }
 
     #[inline]
     fn set_email(&mut self, v: &str) {
-        // Create context from shared field (_has_bits) using bit index
-        let ctx = FieldContext::new(self._has_bits.as_mut_bitslice(), IDX_EMAIL);
+        // Create context from shared field wrapper
+        let ctx = FieldContext::new(self._shared.has_bits_mut(), IDX_EMAIL);
         // Pass context + exclusive field (self.email) to library function
         field::set_string(ctx, &mut self.email, v);
     }
@@ -202,24 +201,24 @@ impl PersonAppend for PersonImpl {
 impl PersonMut for PersonImpl {
     #[inline]
     fn clear_name(&mut self) {
-        // Create context from shared field (_has_bits) using bit index
-        let ctx = FieldContext::new(self._has_bits.as_mut_bitslice(), IDX_NAME);
+        // Create context from shared field wrapper
+        let ctx = FieldContext::new(self._shared.has_bits_mut(), IDX_NAME);
         // Pass context + exclusive field to library function
         field::clear_string(ctx, &mut self.name);
     }
 
     #[inline]
     fn clear_age(&mut self) {
-        // Create context from shared field (_has_bits) using bit index
-        let ctx = FieldContext::new(self._has_bits.as_mut_bitslice(), IDX_AGE);
+        // Create context from shared field wrapper
+        let ctx = FieldContext::new(self._shared.has_bits_mut(), IDX_AGE);
         // Pass context + exclusive field to library function
         field::clear_scalar(ctx, &mut self.age);
     }
 
     #[inline]
     fn clear_email(&mut self) {
-        // Create context from shared field (_has_bits) using bit index
-        let ctx = FieldContext::new(self._has_bits.as_mut_bitslice(), IDX_EMAIL);
+        // Create context from shared field wrapper
+        let ctx = FieldContext::new(self._shared.has_bits_mut(), IDX_EMAIL);
         // Pass context + exclusive field to library function
         field::clear_string(ctx, &mut self.email);
     }
