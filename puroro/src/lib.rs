@@ -20,6 +20,12 @@
 // Re-export protobuf-core for use by generated code
 pub use protobuf_core;
 
+/// Field operation utilities for generated code.
+///
+/// This module provides reusable functions that separate "shared" state
+/// (has_bits, bool_bits, etc.) from "exclusive" field storage.
+pub mod field;
+
 /// Core message trait that all generated Protocol Buffer messages implement.
 pub trait Message: Sized {
     /// Parses a message from the given byte slice.

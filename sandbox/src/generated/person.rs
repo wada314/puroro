@@ -2,7 +2,11 @@
 //!
 //! This represents our ideal API for the generated code using the Closed Struct approach.
 
-use puroro::{error::Error, Message};
+use puroro::{
+    error::Error,
+    field::{self, FieldContext},
+    Message,
+};
 
 /// Infallible immutable trait for Person message.
 ///
@@ -127,31 +131,38 @@ impl Default for PersonImpl {
 impl Person for PersonImpl {
     #[inline]
     fn name(&self) -> &str {
-        &self.name
+        // Exclusive field: self.name
+        field::get_string(&self.name)
     }
 
     #[inline]
     fn age(&self) -> i32 {
-        self.age
+        // Exclusive field: self.age
+        field::get_scalar(&self.age)
     }
 
     #[inline]
     fn email(&self) -> &str {
-        &self.email
+        // Exclusive field: self.email
+        field::get_string(&self.email)
     }
 
     #[inline]
     fn has_name(&self) -> bool {
+        // Shared field: self._has_bits
+        // For read-only access, direct bit check is clearer than using FieldContext
         (self._has_bits & HAS_NAME) != 0
     }
 
     #[inline]
     fn has_age(&self) -> bool {
+        // Shared field: self._has_bits (direct access for read-only)
         (self._has_bits & HAS_AGE) != 0
     }
 
     #[inline]
     fn has_email(&self) -> bool {
+        // Shared field: self._has_bits (direct access for read-only)
         (self._has_bits & HAS_EMAIL) != 0
     }
 }
@@ -159,40 +170,52 @@ impl Person for PersonImpl {
 impl PersonAppend for PersonImpl {
     #[inline]
     fn set_name(&mut self, v: &str) {
-        v.clone_into(&mut self.name); // Reuse allocation
-        self._has_bits |= HAS_NAME;
+        // Create context from shared field (_has_bits)
+        let ctx = FieldContext::new(&mut self._has_bits, HAS_NAME);
+        // Pass context + exclusive field (self.name) to library function
+        field::set_string(ctx, &mut self.name, v);
     }
 
     #[inline]
     fn set_age(&mut self, v: i32) {
-        self.age = v;
-        self._has_bits |= HAS_AGE;
+        // Create context from shared field (_has_bits)
+        let ctx = FieldContext::new(&mut self._has_bits, HAS_AGE);
+        // Pass context + exclusive field (self.age) to library function
+        field::set_scalar(ctx, &mut self.age, v);
     }
 
     #[inline]
     fn set_email(&mut self, v: &str) {
-        v.clone_into(&mut self.email); // Reuse allocation
-        self._has_bits |= HAS_EMAIL;
+        // Create context from shared field (_has_bits)
+        let ctx = FieldContext::new(&mut self._has_bits, HAS_EMAIL);
+        // Pass context + exclusive field (self.email) to library function
+        field::set_string(ctx, &mut self.email, v);
     }
 }
 
 impl PersonMut for PersonImpl {
     #[inline]
     fn clear_name(&mut self) {
-        self.name.clear();
-        self._has_bits &= !HAS_NAME;
+        // Create context from shared field (_has_bits)
+        let ctx = FieldContext::new(&mut self._has_bits, HAS_NAME);
+        // Pass context + exclusive field to library function
+        field::clear_string(ctx, &mut self.name);
     }
 
     #[inline]
     fn clear_age(&mut self) {
-        self.age = 0;
-        self._has_bits &= !HAS_AGE;
+        // Create context from shared field (_has_bits)
+        let ctx = FieldContext::new(&mut self._has_bits, HAS_AGE);
+        // Pass context + exclusive field to library function
+        field::clear_scalar(ctx, &mut self.age);
     }
 
     #[inline]
     fn clear_email(&mut self) {
-        self.email.clear();
-        self._has_bits &= !HAS_EMAIL;
+        // Create context from shared field (_has_bits)
+        let ctx = FieldContext::new(&mut self._has_bits, HAS_EMAIL);
+        // Pass context + exclusive field to library function
+        field::clear_string(ctx, &mut self.email);
     }
 }
 
