@@ -15,7 +15,7 @@ This document records the design discussions and decisions for the Puroro projec
 | **Mutable Operations** | Three levels: Read, Append, Full-Mut | Match Protocol Buffers usage patterns (append-heavy) |
 | **Fallible Methods** | `try_` prefix | Follow Rust conventions, clear distinction |
 | **Optional Getters** | Conditional `_opt()` for zero-default fields only | Type-safe, prevents misuse with custom defaults |
-| **Memory Layout** | Bitflags for presence tracking | Avoid `Option<T>` overhead |
+| **Memory Layout** | BitArr for presence tracking | Avoid `Option<T>` overhead; stack-allocated; supports unlimited fields; same efficiency as u32 |
 | **Dyn Compatibility** | All traits must be dyn-compatible | Enables dynamic dispatch, trait objects (Box<dyn Person>), heterogeneous collections. Not deeply discussed yet - may change. |
 | **Field Ordering** | Size-descending order | Optimize memory alignment, no layout compatibility needed |
 | **Inline Attributes** | All getters/setters get `#[inline]` | Maximize runtime performance |

@@ -7,3 +7,4 @@ publish = false
 
 [dependencies]
 puroro = { path = "../puroro" }
+bitvec.workspace = true

@@ -1,7 +1,10 @@
 //! Hand-written code for Person message.
 //!
 //! This represents our ideal API for the generated code using the Closed Struct approach.
+//!
+//! Uses `bitvec` for presence tracking, supporting any number of optional fields.
 
+use bitvec::prelude::*;
 use puroro::{
     error::Error,
     field::{self, FieldContext},
@@ -90,7 +93,7 @@ pub trait PersonTryMut: PersonAppendTry {
 
 /// Standard implementation of Person message.
 ///
-/// Uses bitflags for efficient optional field tracking.
+/// Uses BitArr for efficient optional field tracking (stack-allocated).
 /// Fields are ordered by size (descending) to minimize padding.
 /// Memory layout optimized for performance.
 #[derive(Debug, Clone, PartialEq)]
@@ -100,15 +103,18 @@ pub struct PersonImpl {
     name: String,
     email: String,
 
-    // Smaller fields: 4 bytes each
-    _has_bits: u32, // Bitflags for tracking which fields have been explicitly set
+    // BitArr for tracking which fields have been explicitly set
+    // Fixed size, stack-allocated (no heap overhead)
+    _has_bits: BitArr!(for 3, in u8),
+
+    // Scalar fields
     age: i32,
 }
 
-// Bit positions for each field
-const HAS_NAME: u32 = 1 << 0;
-const HAS_AGE: u32 = 1 << 1;
-const HAS_EMAIL: u32 = 1 << 2;
+// Bit indices for each field
+const IDX_NAME: usize = 0;
+const IDX_AGE: usize = 1;
+const IDX_EMAIL: usize = 2;
 
 impl PersonImpl {
     /// Creates a new Person with default values.
@@ -116,7 +122,7 @@ impl PersonImpl {
         Self {
             name: String::new(),
             email: String::new(),
-            _has_bits: 0,
+            _has_bits: bitarr![u8, Lsb0; 0; 3], // 3 fields, stack-allocated
             age: 0,
         }
     }
@@ -150,44 +156,44 @@ impl Person for PersonImpl {
     #[inline]
     fn has_name(&self) -> bool {
         // Shared field: self._has_bits
-        // For read-only access, direct bit check is clearer than using FieldContext
-        (self._has_bits & HAS_NAME) != 0
+        // Direct bit access for read-only
+        self._has_bits.as_bitslice()[IDX_NAME]
     }
 
     #[inline]
     fn has_age(&self) -> bool {
-        // Shared field: self._has_bits (direct access for read-only)
-        (self._has_bits & HAS_AGE) != 0
+        // Shared field: self._has_bits
+        self._has_bits.as_bitslice()[IDX_AGE]
     }
 
     #[inline]
     fn has_email(&self) -> bool {
-        // Shared field: self._has_bits (direct access for read-only)
-        (self._has_bits & HAS_EMAIL) != 0
+        // Shared field: self._has_bits
+        self._has_bits.as_bitslice()[IDX_EMAIL]
     }
 }
 
 impl PersonAppend for PersonImpl {
     #[inline]
     fn set_name(&mut self, v: &str) {
-        // Create context from shared field (_has_bits)
-        let ctx = FieldContext::new(&mut self._has_bits, HAS_NAME);
+        // Create context from shared field (_has_bits) using bit index
+        let ctx = FieldContext::new(self._has_bits.as_mut_bitslice(), IDX_NAME);
         // Pass context + exclusive field (self.name) to library function
         field::set_string(ctx, &mut self.name, v);
     }
 
     #[inline]
     fn set_age(&mut self, v: i32) {
-        // Create context from shared field (_has_bits)
-        let ctx = FieldContext::new(&mut self._has_bits, HAS_AGE);
+        // Create context from shared field (_has_bits) using bit index
+        let ctx = FieldContext::new(self._has_bits.as_mut_bitslice(), IDX_AGE);
         // Pass context + exclusive field (self.age) to library function
         field::set_scalar(ctx, &mut self.age, v);
     }
 
     #[inline]
     fn set_email(&mut self, v: &str) {
-        // Create context from shared field (_has_bits)
-        let ctx = FieldContext::new(&mut self._has_bits, HAS_EMAIL);
+        // Create context from shared field (_has_bits) using bit index
+        let ctx = FieldContext::new(self._has_bits.as_mut_bitslice(), IDX_EMAIL);
         // Pass context + exclusive field (self.email) to library function
         field::set_string(ctx, &mut self.email, v);
     }
@@ -196,24 +202,24 @@ impl PersonAppend for PersonImpl {
 impl PersonMut for PersonImpl {
     #[inline]
     fn clear_name(&mut self) {
-        // Create context from shared field (_has_bits)
-        let ctx = FieldContext::new(&mut self._has_bits, HAS_NAME);
+        // Create context from shared field (_has_bits) using bit index
+        let ctx = FieldContext::new(self._has_bits.as_mut_bitslice(), IDX_NAME);
         // Pass context + exclusive field to library function
         field::clear_string(ctx, &mut self.name);
     }
 
     #[inline]
     fn clear_age(&mut self) {
-        // Create context from shared field (_has_bits)
-        let ctx = FieldContext::new(&mut self._has_bits, HAS_AGE);
+        // Create context from shared field (_has_bits) using bit index
+        let ctx = FieldContext::new(self._has_bits.as_mut_bitslice(), IDX_AGE);
         // Pass context + exclusive field to library function
         field::clear_scalar(ctx, &mut self.age);
     }
 
     #[inline]
     fn clear_email(&mut self) {
-        // Create context from shared field (_has_bits)
-        let ctx = FieldContext::new(&mut self._has_bits, HAS_EMAIL);
+        // Create context from shared field (_has_bits) using bit index
+        let ctx = FieldContext::new(self._has_bits.as_mut_bitslice(), IDX_EMAIL);
         // Pass context + exclusive field to library function
         field::clear_string(ctx, &mut self.email);
     }

@@ -14,6 +14,7 @@ repository = "https://github.com/wada314/puroro"
 protobuf-core = "0.1"
 protoc-plugin-by-closure = { git = "https://github.com/wada314/protoc-plugin-by-closure" }
 allocator-api2 = "0.2"
+bitvec = "1.0"
 
 # Common dependencies
 thiserror = "2.0"

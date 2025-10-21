@@ -225,20 +225,21 @@ fn test_memory_layout_optimized() {
     // Expected sizes on 64-bit:
     // - String: 24 bytes (3 words: ptr, len, cap)
     // - String: 24 bytes
-    // - u32: 4 bytes (_has_bits)
+    // - BitArr!(for 3, in u8): 1 byte (fixed-size, stack-allocated)
+    // - padding: 3 bytes (to align i32)
     // - i32: 4 bytes (age)
-    // Total: 56 bytes (no padding needed with size-descending order)
+    // Total: 56 bytes (same as u32 approach!)
 
     println!("PersonImpl size: {} bytes", total_size);
     println!("PersonImpl alignment: {} bytes", align_of::<PersonImpl>());
 
-    // On 64-bit systems, should be 56 bytes (with optimal ordering)
-    // With bad ordering (e.g., u32, String, i32, String), could be 64 bytes
+    // On 64-bit systems, should be 56 bytes with BitArr
+    // (BitArr is stack-allocated, same efficiency as u32, but supports unlimited fields)
     #[cfg(target_pointer_width = "64")]
     {
         assert_eq!(
             total_size, 56,
-            "PersonImpl should be 56 bytes on 64-bit with size-descending field order"
+            "PersonImpl should be 56 bytes on 64-bit with BitArr for presence tracking"
         );
     }
 
