@@ -142,14 +142,16 @@ fn test_immutable_reference() {
 }
 
 #[test]
-fn test_person_into_string() {
+fn test_person_string_coercion() {
     let mut person = PersonImpl::new();
 
-    // Test that Into<String> works for set_name
-    person.set_name("Eve".to_string());
+    // Test that String can be coerced to &str
+    let name_string = "Eve".to_string();
+    person.set_name(&name_string);
     assert_eq!(person.name(), "Eve");
 
-    person.set_name("Frank"); // &str should also work
+    // &str literal should also work
+    person.set_name("Frank");
     assert_eq!(person.name(), "Frank");
 }
 

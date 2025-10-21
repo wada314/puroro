@@ -27,9 +27,9 @@ pub trait Person {
 /// This provides type-level safety against accidental data loss.
 pub trait PersonAppend: Person {
     // Setters - append new values
-    fn set_name(&mut self, v: impl Into<String>);
+    fn set_name(&mut self, v: &str);
     fn set_age(&mut self, v: i32);
-    fn set_email(&mut self, v: impl Into<String>);
+    fn set_email(&mut self, v: &str);
 }
 
 /// Infallible fully mutable trait for Person message.
@@ -67,9 +67,9 @@ pub trait PersonTry {
 /// All methods in this trait are fallible for consistency.
 pub trait PersonAppendTry: PersonTry {
     // Setters (fallible) - using try_ prefix
-    fn try_set_name(&mut self, v: impl Into<String>) -> Result<(), Error>;
+    fn try_set_name(&mut self, v: &str) -> Result<(), Error>;
     fn try_set_age(&mut self, v: i32) -> Result<(), Error>;
-    fn try_set_email(&mut self, v: impl Into<String>) -> Result<(), Error>;
+    fn try_set_email(&mut self, v: &str) -> Result<(), Error>;
 }
 
 /// Fallible fully mutable trait for Person message.
@@ -150,7 +150,7 @@ impl Person for PersonImpl {
 }
 
 impl PersonAppend for PersonImpl {
-    fn set_name(&mut self, v: impl Into<String>) {
+    fn set_name(&mut self, v: &str) {
         self.name = v.into();
         self._has_bits |= HAS_NAME;
     }
@@ -160,7 +160,7 @@ impl PersonAppend for PersonImpl {
         self._has_bits |= HAS_AGE;
     }
 
-    fn set_email(&mut self, v: impl Into<String>) {
+    fn set_email(&mut self, v: &str) {
         self.email = v.into();
         self._has_bits |= HAS_EMAIL;
     }
@@ -212,7 +212,7 @@ impl PersonTry for PersonImpl {
 }
 
 impl PersonAppendTry for PersonImpl {
-    fn try_set_name(&mut self, v: impl Into<String>) -> Result<(), Error> {
+    fn try_set_name(&mut self, v: &str) -> Result<(), Error> {
         PersonAppend::set_name(self, v);
         Ok(())
     }
@@ -222,7 +222,7 @@ impl PersonAppendTry for PersonImpl {
         Ok(())
     }
 
-    fn try_set_email(&mut self, v: impl Into<String>) -> Result<(), Error> {
+    fn try_set_email(&mut self, v: &str) -> Result<(), Error> {
         PersonAppend::set_email(self, v);
         Ok(())
     }
