@@ -2,9 +2,14 @@
 //!
 //! This represents our ideal API for the generated code using the Closed Struct approach.
 //!
-//! Uses `SharedFields` wrapper for presence tracking, supporting any number of optional fields.
+//! Uses trait-based field operations for type-safe, scalable code generation.
 
-use puroro::{error::Error, field, shared::SharedFields, Message};
+use puroro::{
+    error::Error,
+    field_ops::{Field, FieldClear, FieldGet, FieldSet, Singular},
+    shared::SharedFields,
+    Message,
+};
 
 /// Infallible immutable trait for Person message.
 ///
@@ -86,30 +91,49 @@ pub trait PersonTryMut: PersonAppendTry {
     fn try_clear_email(&mut self) -> Result<(), Error>;
 }
 
-/// Standard implementation of Person message.
-///
-/// Uses SharedFields for efficient optional field tracking (stack-allocated).
-/// Fields are ordered by size (descending) to minimize padding.
-/// Memory layout optimized for performance.
-#[derive(Debug, Clone, PartialEq)]
-pub struct PersonImpl {
-    // Fields ordered by size (descending) for optimal memory layout
-    // String: 24 bytes (3 words on 64-bit)
-    name: String,
-    email: String,
+// ============================================================================
+// Field Type Aliases
+// ============================================================================
 
-    // Shared fields: presence tracking, etc.
-    // For 3 fields: ⌈3/8⌉ = 1 byte (stack-allocated)
-    _shared: SharedFields<1>,
+/// Type descriptor for the 'name' field
+type NameField = Field<String, Singular>;
 
-    // Scalar exclusive fields
-    age: i32,
-}
+/// Type descriptor for the 'age' field
+type AgeField = Field<i32, Singular>;
+
+/// Type descriptor for the 'email' field
+type EmailField = Field<String, Singular>;
 
 // Bit indices for each field
 const IDX_NAME: usize = 0;
 const IDX_AGE: usize = 1;
 const IDX_EMAIL: usize = 2;
+
+// ============================================================================
+// PersonImpl Structure
+// ============================================================================
+
+/// Standard implementation of Person message.
+///
+/// Uses trait-based field operations for type-safe code generation.
+/// Fields are ordered by size (descending) to minimize padding.
+/// Memory layout optimized for performance.
+#[derive(Debug, Clone, PartialEq)]
+pub struct PersonImpl {
+    // Shared fields: presence tracking, etc.
+    // For 3 fields: ⌈3/8⌉ = 1 byte (stack-allocated)
+    _shared: SharedFields<1>,
+
+    // Exclusive fields ordered by size (descending)
+    // String: 24 bytes (3 words on 64-bit)
+    // Type aliases (NameField, EmailField) document the field type
+    name: String,
+    email: String,
+
+    // Scalar fields: 4 bytes
+    // Type alias (AgeField) documents the field type
+    age: i32,
+}
 
 impl PersonImpl {
     /// Creates a new Person with default values.
@@ -132,37 +156,31 @@ impl Default for PersonImpl {
 impl Person for PersonImpl {
     #[inline]
     fn name(&self) -> &str {
-        // Exclusive field: self.name
-        field::get_string(&self.name)
+        NameField::get(&self.name)
     }
 
     #[inline]
     fn age(&self) -> i32 {
-        // Exclusive field: self.age
-        field::get_scalar(&self.age)
+        AgeField::get(&self.age)
     }
 
     #[inline]
     fn email(&self) -> &str {
-        // Exclusive field: self.email
-        field::get_string(&self.email)
+        EmailField::get(&self.email)
     }
 
     #[inline]
     fn has_name(&self) -> bool {
-        // Access shared field through wrapper
         self._shared.has_bits()[IDX_NAME]
     }
 
     #[inline]
     fn has_age(&self) -> bool {
-        // Access shared field through wrapper
         self._shared.has_bits()[IDX_AGE]
     }
 
     #[inline]
     fn has_email(&self) -> bool {
-        // Access shared field through wrapper
         self._shared.has_bits()[IDX_EMAIL]
     }
 }
@@ -170,40 +188,34 @@ impl Person for PersonImpl {
 impl PersonAppend for PersonImpl {
     #[inline]
     fn set_name(&mut self, v: &str) {
-        // Pass shared fields + bit index + exclusive field to library function
-        field::set_string(&mut self._shared, IDX_NAME, &mut self.name, v);
+        NameField::set(&mut self._shared, IDX_NAME, &mut self.name, v);
     }
 
     #[inline]
     fn set_age(&mut self, v: i32) {
-        // Pass shared fields + bit index + exclusive field to library function
-        field::set_scalar(&mut self._shared, IDX_AGE, &mut self.age, v);
+        AgeField::set(&mut self._shared, IDX_AGE, &mut self.age, v);
     }
 
     #[inline]
     fn set_email(&mut self, v: &str) {
-        // Pass shared fields + bit index + exclusive field to library function
-        field::set_string(&mut self._shared, IDX_EMAIL, &mut self.email, v);
+        EmailField::set(&mut self._shared, IDX_EMAIL, &mut self.email, v);
     }
 }
 
 impl PersonMut for PersonImpl {
     #[inline]
     fn clear_name(&mut self) {
-        // Pass shared fields + bit index + exclusive field to library function
-        field::clear_string(&mut self._shared, IDX_NAME, &mut self.name);
+        NameField::clear(&mut self._shared, IDX_NAME, &mut self.name);
     }
 
     #[inline]
     fn clear_age(&mut self) {
-        // Pass shared fields + bit index + exclusive field to library function
-        field::clear_scalar(&mut self._shared, IDX_AGE, &mut self.age);
+        AgeField::clear(&mut self._shared, IDX_AGE, &mut self.age);
     }
 
     #[inline]
     fn clear_email(&mut self) {
-        // Pass shared fields + bit index + exclusive field to library function
-        field::clear_string(&mut self._shared, IDX_EMAIL, &mut self.email);
+        EmailField::clear(&mut self._shared, IDX_EMAIL, &mut self.email);
     }
 }
 

@@ -26,6 +26,11 @@ pub use protobuf_core;
 /// (has_bits, bool_bits, etc.) from "exclusive" field storage.
 pub mod field;
 
+/// Generic field operations using trait-based dispatch.
+///
+/// This module provides a unified interface for all field types.
+pub mod field_ops;
+
 /// Shared fields for message implementations.
 ///
 /// Provides a wrapper type for fields shared across all message fields.
