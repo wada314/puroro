@@ -4,7 +4,7 @@ This document records the design discussions and decisions for the Puroro projec
 
 ## Quick Reference: Design Decisions
 
-**Last Updated**: 2025-10-17
+**Last Updated**: 2025-10-21
 
 ### Core Decisions
 
@@ -16,6 +16,7 @@ This document records the design discussions and decisions for the Puroro projec
 | **Fallible Methods** | `try_` prefix | Follow Rust conventions, clear distinction |
 | **Optional Getters** | Conditional `_opt()` for zero-default fields only | Type-safe, prevents misuse with custom defaults |
 | **Memory Layout** | Bitflags for presence tracking | Avoid `Option<T>` overhead |
+| **Dyn Compatibility** | All traits must be dyn-compatible | Enables dynamic dispatch, trait objects (Box<dyn Person>), heterogeneous collections. Not deeply discussed yet - may change. |
 
 ### Trait Hierarchy
 
@@ -40,7 +41,7 @@ trait Person {
 
 // Append-only (most common)
 trait PersonAppend: Person {
-    fn set_name(&mut self, v: impl Into<String>);
+    fn set_name(&mut self, v: &str);  // &str for dyn compatibility
     fn set_age(&mut self, v: i32);
 }
 
@@ -194,20 +195,20 @@ pub struct Person {
 
 impl Person {
     pub fn name(&self) -> &str { &self.name }
-    pub fn set_name(&mut self, v: String) { self.name = v; }
+    pub fn set_name(&mut self, v: &str) { self.name = v.into(); }
     pub fn mut_name(&mut self) -> &mut String { &mut self.name }
     
     pub fn age(&self) -> i32 { self.age }
     pub fn set_age(&mut self, v: i32) { self.age = v; }
     
     pub fn email(&self) -> &str { &self.email }
-    pub fn set_email(&mut self, v: String) { self.email = v; }
+    pub fn set_email(&mut self, v: &str) { self.email = v.into(); }
     pub fn mut_email(&mut self) -> &mut String { &mut self.email }
 }
 
 // Usage
 let mut person = Person::new();
-person.set_name("Alice".to_string());
+person.set_name("Alice");
 person.set_age(30);
 ```
 
@@ -256,7 +257,7 @@ In the future, we could potentially provide **both** as alternative implementati
 // Trait-based interface
 pub trait Person {
     fn name(&self) -> &str;
-    fn set_name(&mut self, v: String);
+    fn set_name(&mut self, v: &str);
     // ...
 }
 
@@ -561,14 +562,14 @@ pub trait Person {
 /// Append-only access (most common use case)
 pub trait PersonAppend: Person {
     // Scalar fields - set values
-    fn set_name(&mut self, v: impl Into<String>);
+    fn set_name(&mut self, v: &str);
     fn set_age(&mut self, v: i32);
     
     // Repeated fields - append items
-    fn add_hobby(&mut self, hobby: String);
+    fn add_hobby(&mut self, hobby: &str);
     
     // Map fields - insert pairs
-    fn insert_score(&mut self, subject: String, score: i32);
+    fn insert_score(&mut self, subject: &str, score: i32);
 }
 
 /// Full mutable access (destructive operations)
@@ -659,6 +660,88 @@ pub trait PersonTryMut: PersonAppendTry { /* try_clear_name() */ }
 ```
 
 **Decision: Implement 6-trait hierarchy with Append as the primary mutable interface, matching Protocol Buffers' append-heavy usage patterns.**
+
+---
+
+### Trait Object Compatibility (Dyn Safety)
+
+#### Design Decision (2025-10-21)
+
+**Decision: All generated traits must be dyn-compatible (object-safe).**
+
+⚠️ **Status**: Preliminary decision. Not deeply discussed yet - subject to change in future discussions.
+
+#### Implementation
+
+To ensure dyn compatibility, all trait methods must avoid:
+- Generic type parameters (except lifetime parameters)
+- `Self: Sized` bounds
+- Associated non-object-safe items
+
+**Key change made**:
+```rust
+// ❌ Not dyn-compatible (generic parameter)
+fn set_name(&mut self, v: impl Into<String>);
+
+// ✅ Dyn-compatible
+fn set_name(&mut self, v: &str);
+```
+
+#### Rationale
+
+Using `&str` instead of `impl Into<String>` provides several benefits:
+
+1. **Dyn compatibility**: Enables use as trait objects
+   ```rust
+   let person: Box<dyn Person> = Box::new(PersonImpl::new());
+   let persons: Vec<&dyn PersonAppend> = vec![&person1, &person2];
+   ```
+
+2. **Implementation flexibility**: Internal storage can be `String`, `Box<str>`, `Cow<'static, str>`, or custom types
+   - The trait doesn't assume internal representation
+   - Implementations can choose optimal storage
+
+3. **Caller flexibility**: Both `String` and `&str` can be passed
+   ```rust
+   person.set_name("Alice");        // &str literal
+   let s = String::from("Bob");
+   person.set_name(&s);             // &String (auto-deref to &str)
+   ```
+
+#### Use Cases for Dyn Traits
+
+**Heterogeneous collections**:
+```rust
+let persons: Vec<Box<dyn Person>> = vec![
+    Box::new(PersonImpl::new()),
+    Box::new(PersonLazy::new()),
+];
+```
+
+**Dynamic dispatch**:
+```rust
+fn print_info(p: &dyn Person) {
+    println!("{} (age: {})", p.name(), p.age());
+}
+```
+
+**Plugin systems**: Different implementations loaded at runtime
+
+#### Open Questions
+
+- Do we need dyn compatibility for all traits, or only immutable ones (`Person`, `PersonTry`)?
+- Should we provide both dyn-compatible and generic variants?
+- Are there performance implications we should benchmark?
+- What are the actual use cases where users need trait objects?
+
+#### Future Considerations
+
+If dyn compatibility proves unnecessary or too restrictive, we could:
+- Revert to `impl Into<String>` for better ergonomics
+- Provide separate dyn-compatible trait variants (e.g., `PersonDyn`)
+- Use conditional compilation to offer both options
+
+This decision should be revisited after gathering real-world usage feedback.
 
 ---
 
