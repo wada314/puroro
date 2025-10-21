@@ -38,9 +38,9 @@ Fields that correspond 1:1 to proto message fields:
 
 Note: Boolean proto fields will NOT create exclusive fields - they'll be packed into `_bool_bits`.
 
-## Implementation Pattern
+## API Design Evolution
 
-### Generated Code (Before - Direct Implementation)
+### Version 1: Direct Implementation (Initial)
 
 ```rust
 impl PersonAppend for PersonImpl {
@@ -63,51 +63,55 @@ impl PersonAppend for PersonImpl {
 - Hard to add features (allocator, validation, etc.)
 - Code size grows linearly with field count
 
-### Generated Code (After - Field Context Pattern)
+### Version 2: SharedFields Pattern (Current)
 
 ```rust
 impl PersonAppend for PersonImpl {
     #[inline]
     fn set_name(&mut self, v: &str) {
-        // Pair: shared state + exclusive field
-        let ctx = FieldContext::new(&mut self._has_bits, HAS_NAME);
-        field::set_string(ctx, &mut self.name, v);
+        // Pass shared + bit index + exclusive field directly
+        field::set_string(&mut self._shared, IDX_NAME, &mut self.name, v);
     }
     
     #[inline]
     fn set_age(&mut self, v: i32) {
-        // Pair: shared state + exclusive field  
-        let ctx = FieldContext::new(&mut self._has_bits, HAS_AGE);
-        field::set_scalar(ctx, &mut self.age, v);
+        // Single line - clean and direct
+        field::set_scalar(&mut self._shared, IDX_AGE, &mut self.age, v);
     }
 }
 ```
 
 **Benefits:**
 - Logic centralized in `puroro::field`
-- Easy to read: "create context + call library function"
-- Adding allocator support: just update `FieldContext` and library functions
+- **Single line per operation** (simplest possible)
+- No intermediate wrapper types needed
+- Adding features to `SharedFields`: just update the struct and library functions
 
 ### Library Code (puroro crate)
 
 ```rust
 // puroro/src/field.rs
 
-pub struct FieldContext<'a> {
-    pub has_bits: &'a mut u32,
-    pub has_bit_mask: u32,
-}
-
 #[inline]
-pub fn set_string(mut ctx: FieldContext, storage: &mut String, value: &str) {
+pub fn set_string<const BYTES: usize>(
+    shared: &mut SharedFields<BYTES>,
+    bit_index: usize,
+    storage: &mut String,
+    value: &str,
+) {
     value.clone_into(storage);  // Reuse allocation
-    ctx.mark_set();
+    shared.has_bits_mut().set(bit_index, true);
 }
 
 #[inline]
-pub fn set_scalar<T: Copy>(mut ctx: FieldContext, storage: &mut T, value: T) {
+pub fn set_scalar<const BYTES: usize, T: Copy>(
+    shared: &mut SharedFields<BYTES>,
+    bit_index: usize,
+    storage: &mut T,
+    value: T,
+) {
     *storage = value;
-    ctx.mark_set();
+    shared.has_bits_mut().set(bit_index, true);
 }
 ```
 
@@ -307,15 +311,16 @@ impl PersonAppend for PersonImpl {
 
 ## Summary
 
-The Field Context pattern with BitArr:
+The Field Operations pattern with SharedFields:
 - ✅ Separates shared state from exclusive storage
 - ✅ Centralizes logic in library code  
-- ✅ Improves generated code readability
+- ✅ **Single-line operations** (simplest possible generated code)
 - ✅ Reduces code size significantly
 - ✅ Enables future optimizations (allocators, bool packing, etc.)
 - ✅ Maintains full inlining for performance
 - ✅ **No field count limitations** (BitArr supports unlimited fields)
 - ✅ **Zero heap overhead** (stack-allocated, fixed size)
 - ✅ **Best of both worlds** (u32 efficiency + unlimited fields)
-- ✅ **Simple implementation** (one pattern, not two)
+- ✅ **No wrapper types** (SharedFields passed directly)
+- ✅ **Simple implementation** (one pattern for all message sizes)
 

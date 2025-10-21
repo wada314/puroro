@@ -4,12 +4,7 @@
 //!
 //! Uses `SharedFields` wrapper for presence tracking, supporting any number of optional fields.
 
-use puroro::{
-    error::Error,
-    field::{self, FieldContext},
-    shared::SharedFields,
-    Message,
-};
+use puroro::{error::Error, field, shared::SharedFields, Message};
 
 /// Infallible immutable trait for Person message.
 ///
@@ -175,52 +170,40 @@ impl Person for PersonImpl {
 impl PersonAppend for PersonImpl {
     #[inline]
     fn set_name(&mut self, v: &str) {
-        // Create context from shared field wrapper
-        let ctx = FieldContext::new(self._shared.has_bits_mut(), IDX_NAME);
-        // Pass context + exclusive field (self.name) to library function
-        field::set_string(ctx, &mut self.name, v);
+        // Pass shared fields + bit index + exclusive field to library function
+        field::set_string(&mut self._shared, IDX_NAME, &mut self.name, v);
     }
 
     #[inline]
     fn set_age(&mut self, v: i32) {
-        // Create context from shared field wrapper
-        let ctx = FieldContext::new(self._shared.has_bits_mut(), IDX_AGE);
-        // Pass context + exclusive field (self.age) to library function
-        field::set_scalar(ctx, &mut self.age, v);
+        // Pass shared fields + bit index + exclusive field to library function
+        field::set_scalar(&mut self._shared, IDX_AGE, &mut self.age, v);
     }
 
     #[inline]
     fn set_email(&mut self, v: &str) {
-        // Create context from shared field wrapper
-        let ctx = FieldContext::new(self._shared.has_bits_mut(), IDX_EMAIL);
-        // Pass context + exclusive field (self.email) to library function
-        field::set_string(ctx, &mut self.email, v);
+        // Pass shared fields + bit index + exclusive field to library function
+        field::set_string(&mut self._shared, IDX_EMAIL, &mut self.email, v);
     }
 }
 
 impl PersonMut for PersonImpl {
     #[inline]
     fn clear_name(&mut self) {
-        // Create context from shared field wrapper
-        let ctx = FieldContext::new(self._shared.has_bits_mut(), IDX_NAME);
-        // Pass context + exclusive field to library function
-        field::clear_string(ctx, &mut self.name);
+        // Pass shared fields + bit index + exclusive field to library function
+        field::clear_string(&mut self._shared, IDX_NAME, &mut self.name);
     }
 
     #[inline]
     fn clear_age(&mut self) {
-        // Create context from shared field wrapper
-        let ctx = FieldContext::new(self._shared.has_bits_mut(), IDX_AGE);
-        // Pass context + exclusive field to library function
-        field::clear_scalar(ctx, &mut self.age);
+        // Pass shared fields + bit index + exclusive field to library function
+        field::clear_scalar(&mut self._shared, IDX_AGE, &mut self.age);
     }
 
     #[inline]
     fn clear_email(&mut self) {
-        // Create context from shared field wrapper
-        let ctx = FieldContext::new(self._shared.has_bits_mut(), IDX_EMAIL);
-        // Pass context + exclusive field to library function
-        field::clear_string(ctx, &mut self.email);
+        // Pass shared fields + bit index + exclusive field to library function
+        field::clear_string(&mut self._shared, IDX_EMAIL, &mut self.email);
     }
 }
 
