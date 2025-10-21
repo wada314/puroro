@@ -17,6 +17,10 @@ This document records the design discussions and decisions for the Puroro projec
 | **Optional Getters** | Conditional `_opt()` for zero-default fields only | Type-safe, prevents misuse with custom defaults |
 | **Memory Layout** | Bitflags for presence tracking | Avoid `Option<T>` overhead |
 | **Dyn Compatibility** | All traits must be dyn-compatible | Enables dynamic dispatch, trait objects (Box<dyn Person>), heterogeneous collections. Not deeply discussed yet - may change. |
+| **Field Ordering** | Size-descending order | Optimize memory alignment, no layout compatibility needed |
+| **Inline Attributes** | All getters/setters get `#[inline]` | Maximize runtime performance |
+| **Allocator Support** | Use `allocator-api2` for all heap types | Custom allocators for String, Vec, HashMap, Bytes on stable Rust |
+| **Unknown Fields** | Support preservation | Forward compatibility with newer proto versions (implement later) |
 
 ### Trait Hierarchy
 
@@ -742,6 +746,245 @@ If dyn compatibility proves unnecessary or too restrictive, we could:
 - Use conditional compilation to offer both options
 
 This decision should be revisited after gathering real-world usage feedback.
+
+---
+
+### Implementation Strategy for `PersonImpl`
+
+#### Design Decision (2025-10-21)
+
+**Decision: Single all-in-one implementation supporting all Proto3 features with maximum runtime performance.**
+
+#### Design Principles
+
+1. **All-in-one Implementation**: Every possible Proto3 feature must be supported in the generated `PersonImpl` struct
+2. **Runtime Performance Priority**: Performance is the top priority
+3. **Generated Code Readability**: Second priority to performance
+
+#### Memory Layout Optimization
+
+**Field Ordering: Size-Descending**
+
+Fields are reordered by size (descending) to optimize memory alignment, regardless of proto declaration order.
+
+```rust
+// Proto definition
+message Person {
+  string name = 1;    // 24 bytes (3 words on 64-bit)
+  int32 age = 2;      // 4 bytes
+  string email = 3;   // 24 bytes
+}
+
+// Generated struct (size-descending order)
+pub struct PersonImpl {
+    // Largest fields first
+    name: String,       // 24 bytes
+    email: String,      // 24 bytes
+    
+    // Smaller fields
+    _has_bits: u32,     // 4 bytes
+    age: i32,           // 4 bytes
+    // Padding minimized by ordering
+}
+```
+
+**Rationale**:
+- No need for binary layout compatibility (proto wire format handles serialization)
+- Size-descending ordering minimizes padding in most cases
+- Better cache locality for commonly-accessed fields (if large fields are accessed together)
+
+**Note**: Exact optimal ordering depends on all field types. Generator should:
+1. Calculate size for each field type
+2. Sort fields by size (descending)
+3. Group bitflags at appropriate position
+
+#### Allocator Support
+
+**Use `allocator-api2` for Custom Allocators**
+
+All heap-allocated types support custom allocators via the `allocator-api2` crate.
+
+```rust
+use allocator_api2::vec::Vec;
+use allocator_api2::alloc::Allocator;
+
+pub struct PersonImpl<A: Allocator = Global> {
+    name: String,           // Or allocator-aware string type
+    hobbies: Vec<String, A>,
+    scores: HashMap<String, i32, RandomState, A>,
+    _unknown_fields: Vec<u8, A>,
+}
+```
+
+**Supported via allocator**:
+- `String` / bytes (`Vec<u8>`)
+- Repeated fields (`Vec<T>`)
+- Map fields (`HashMap<K, V>`)
+- Unknown fields (`Vec<u8>`)
+
+**Benefits**:
+- Arena allocation for message trees
+- Custom memory pools
+- Embedded systems with specialized allocators
+- Works on stable Rust (via `allocator-api2`)
+
+**Import strategy**:
+```rust
+// In generated code or via puroro crate
+use allocator_api2::vec::Vec;
+use allocator_api2::boxed::Box;
+// ... etc
+```
+
+#### Performance Optimizations
+
+**1. Inline Attributes**
+
+All getters and setters get `#[inline]` or `#[inline(always)]` attributes.
+
+```rust
+impl Person for PersonImpl {
+    #[inline]
+    fn name(&self) -> &str {
+        &self.name
+    }
+    
+    #[inline]
+    fn age(&self) -> i32 {
+        self.age
+    }
+    
+    #[inline]
+    fn has_name(&self) -> bool {
+        (self._has_bits & HAS_NAME) != 0
+    }
+}
+
+impl PersonAppend for PersonImpl {
+    #[inline]  // or #[inline(always)] for hot paths
+    fn set_name(&mut self, v: &str) {
+        v.clone_into(&mut self.name);  // Reuse allocation
+        self._has_bits |= HAS_NAME;
+    }
+}
+```
+
+**Guidelines**:
+- All getters: `#[inline]`
+- All setters: `#[inline]`
+- Presence checks (`has_*`): `#[inline]`
+- Clear methods: `#[inline]`
+- Hot paths may use `#[inline(always)]` if profiling shows benefit
+
+**2. String Assignment Optimization**
+
+Use `clone_into()` instead of `v.into()` to reuse existing allocations:
+
+```rust
+// ❌ Slower: Always allocates
+fn set_name(&mut self, v: &str) {
+    self.name = v.into();  // Drops old String, allocates new
+}
+
+// ✅ Faster: Reuses allocation when possible
+fn set_name(&mut self, v: &str) {
+    v.clone_into(&mut self.name);  // Reuses capacity if available
+}
+```
+
+**3. Bitflags for Presence Tracking**
+
+Use bitflags instead of `Option<T>` to save memory:
+
+```rust
+// ✅ Current design: 4 bytes for up to 32 fields
+_has_bits: u32,
+age: i32,
+
+// ❌ Alternative: 8 bytes per optional field
+age: Option<i32>,  // 4 bytes value + 4 bytes discriminant
+```
+
+For messages with >32 fields, use multiple bitflag words or `u64`:
+```rust
+_has_bits_0: u64,  // Fields 0-63
+_has_bits_1: u64,  // Fields 64-127
+```
+
+#### Unknown Fields Support
+
+**Preserve unknown fields for forward compatibility.**
+
+```rust
+pub struct PersonImpl {
+    // ... known fields ...
+    
+    // Unknown fields from newer proto versions
+    _unknown_fields: Vec<u8>,  // Raw wire format bytes
+}
+```
+
+**Implementation plan**:
+- ✅ Reserve `_unknown_fields` field in struct
+- ⏸️ Parser implementation: Later
+- ⏸️ Serializer implementation: Later
+
+**Rationale**:
+- Forward compatibility: Old code can parse new messages
+- Round-trip preservation: Deserialize → modify → serialize preserves unknown data
+- Not needed initially, but struct layout should include it
+
+#### Implementation Phases
+
+**Phase 1: Core Scalar Fields** (Current focus)
+- [x] Scalar fields (int32, int64, uint32, uint64, sint32, sint64, fixed32, fixed64, sfixed32, sfixed64, float, double, bool, string, bytes)
+- [x] Optional field tracking (bitflags)
+- [x] All 6 traits implementation
+- [ ] Basic serialization/deserialization
+- [x] Inline attributes
+- [x] `clone_into()` optimization
+- [x] Size-descending field ordering
+
+**Phase 2: Collections**
+- [ ] Repeated fields (`Vec<T, A>`)
+- [ ] Map fields (`HashMap<K, V, S, A>`)
+- [ ] Allocator support integration
+
+**Phase 3: Advanced Features**
+- [ ] Nested messages
+- [ ] Enums
+- [ ] Oneof fields
+- [ ] Unknown fields preservation (parsing/serialization)
+
+**Phase 4: Optimizations & Polish**
+- [ ] Benchmark-driven inlining decisions
+- [ ] Memory layout profiling
+- [ ] Generated code documentation
+- [ ] Error handling refinement
+
+#### Collection Type Choices
+
+**Repeated Fields**: `Vec<T, A>`
+```rust
+hobbies: Vec<String, A>,  // Using allocator-api2
+```
+- Standard `Vec` with custom allocator
+- May explore `SmallVec` optimization later if profiling shows benefit
+
+**Map Fields**: `HashMap<K, V, S, A>`
+```rust
+scores: HashMap<String, i32, RandomState, A>,  // Using allocator-api2
+```
+- Standard `HashMap` with custom allocator
+- May consider `IndexMap` if insertion order preservation is needed
+- `BTreeMap` for smaller maps (profiling-driven decision)
+
+#### Open Questions
+
+- Should we use `#[inline]` or `#[inline(always)]` for hot paths? (Decide after profiling)
+- How to handle allocator API for String? (Wrapper type vs. `Vec<u8>` representation)
+- Should unknown fields be optional via feature flag? (Always include for now)
+- Optimal bitflags size for large messages (>32 fields)? (Use `u64` or multiple `u32`)
 
 ---
 

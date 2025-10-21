@@ -10,4 +10,5 @@ readme = "../README.md"
 
 [dependencies]
 protobuf-core.workspace = true
+allocator-api2.workspace = true
 thiserror.workspace = true

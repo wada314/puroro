@@ -13,6 +13,7 @@ repository = "https://github.com/wada314/puroro"
 # External utility crates
 protobuf-core = "0.1"
 protoc-plugin-by-closure = { git = "https://github.com/wada314/protoc-plugin-by-closure" }
+allocator-api2 = "0.2"
 
 # Common dependencies
 thiserror = "2.0"

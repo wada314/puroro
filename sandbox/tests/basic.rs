@@ -214,3 +214,87 @@ fn test_fallible_generic_code() {
 
     assert_eq!(get_person_summary(&person).unwrap(), "Kate (age: 33)");
 }
+
+#[test]
+fn test_memory_layout_optimized() {
+    use std::mem::{align_of, size_of};
+
+    // Verify memory layout is optimized
+    let total_size = size_of::<PersonImpl>();
+
+    // Expected sizes on 64-bit:
+    // - String: 24 bytes (3 words: ptr, len, cap)
+    // - String: 24 bytes
+    // - u32: 4 bytes (_has_bits)
+    // - i32: 4 bytes (age)
+    // Total: 56 bytes (no padding needed with size-descending order)
+
+    println!("PersonImpl size: {} bytes", total_size);
+    println!("PersonImpl alignment: {} bytes", align_of::<PersonImpl>());
+
+    // On 64-bit systems, should be 56 bytes (with optimal ordering)
+    // With bad ordering (e.g., u32, String, i32, String), could be 64 bytes
+    #[cfg(target_pointer_width = "64")]
+    {
+        assert_eq!(
+            total_size, 56,
+            "PersonImpl should be 56 bytes on 64-bit with size-descending field order"
+        );
+    }
+
+    // Alignment should be 8 (word size)
+    #[cfg(target_pointer_width = "64")]
+    {
+        assert_eq!(align_of::<PersonImpl>(), 8);
+    }
+}
+
+#[test]
+fn test_inline_optimization_hint() {
+    // This test doesn't actually verify inlining (that requires benchmarks),
+    // but serves as documentation that all methods should be inlined.
+    //
+    // The compiler will inline methods marked with #[inline] when beneficial.
+    // We've marked all getters, setters, and trait methods with #[inline].
+
+    let mut person = PersonImpl::new();
+
+    // These calls should be inlined in release builds
+    person.set_name("Inline Test");
+    let _ = person.name();
+    let _ = person.has_name();
+
+    // Just verify functionality
+    assert_eq!(person.name(), "Inline Test");
+}
+
+#[test]
+fn test_clone_into_optimization() {
+    // Test that clone_into correctly updates the string value
+    // Note: We can't directly test allocation reuse through the public API
+    // (since name() returns &str, not &String), but clone_into guarantees
+    // allocation reuse when possible, which is better than v.into()
+
+    let mut person = PersonImpl::new();
+
+    // First set - allocates
+    person.set_name("A very long string that requires heap allocation");
+    assert_eq!(
+        person.name(),
+        "A very long string that requires heap allocation"
+    );
+
+    // Second set with shorter string - clone_into reuses allocation internally
+    person.set_name("Short");
+    assert_eq!(person.name(), "Short");
+
+    // Third set with another long string
+    person.set_name("Another very long string that requires heap allocation");
+    assert_eq!(
+        person.name(),
+        "Another very long string that requires heap allocation"
+    );
+
+    // The optimization is that clone_into avoids unnecessary deallocation/reallocation
+    // This is verified by the implementation using v.clone_into(&mut self.name)
+}

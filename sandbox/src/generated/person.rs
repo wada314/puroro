@@ -87,17 +87,18 @@ pub trait PersonTryMut: PersonAppendTry {
 /// Standard implementation of Person message.
 ///
 /// Uses bitflags for efficient optional field tracking.
-/// Memory layout: 4 bytes (bitflags) + fields without Option<T> overhead.
+/// Fields are ordered by size (descending) to minimize padding.
+/// Memory layout optimized for performance.
 #[derive(Debug, Clone, PartialEq)]
 pub struct PersonImpl {
-    // Bitflags for tracking which fields have been explicitly set
-    // Using u32 allows up to 32 fields per message
-    _has_bits: u32,
-
-    // Fields stored directly (no Option<T> wrapper)
+    // Fields ordered by size (descending) for optimal memory layout
+    // String: 24 bytes (3 words on 64-bit)
     name: String,
-    age: i32,
     email: String,
+
+    // Smaller fields: 4 bytes each
+    _has_bits: u32, // Bitflags for tracking which fields have been explicitly set
+    age: i32,
 }
 
 // Bit positions for each field
@@ -109,10 +110,10 @@ impl PersonImpl {
     /// Creates a new Person with default values.
     pub fn new() -> Self {
         Self {
-            _has_bits: 0,
             name: String::new(),
-            age: 0,
             email: String::new(),
+            _has_bits: 0,
+            age: 0,
         }
     }
 }
@@ -124,59 +125,71 @@ impl Default for PersonImpl {
 }
 
 impl Person for PersonImpl {
+    #[inline]
     fn name(&self) -> &str {
         &self.name
     }
 
+    #[inline]
     fn age(&self) -> i32 {
         self.age
     }
 
+    #[inline]
     fn email(&self) -> &str {
         &self.email
     }
 
+    #[inline]
     fn has_name(&self) -> bool {
         (self._has_bits & HAS_NAME) != 0
     }
 
+    #[inline]
     fn has_age(&self) -> bool {
         (self._has_bits & HAS_AGE) != 0
     }
 
+    #[inline]
     fn has_email(&self) -> bool {
         (self._has_bits & HAS_EMAIL) != 0
     }
 }
 
 impl PersonAppend for PersonImpl {
+    #[inline]
     fn set_name(&mut self, v: &str) {
-        self.name = v.into();
+        v.clone_into(&mut self.name); // Reuse allocation
         self._has_bits |= HAS_NAME;
     }
 
+    #[inline]
     fn set_age(&mut self, v: i32) {
         self.age = v;
         self._has_bits |= HAS_AGE;
     }
 
+    #[inline]
     fn set_email(&mut self, v: &str) {
-        self.email = v.into();
+        v.clone_into(&mut self.email); // Reuse allocation
         self._has_bits |= HAS_EMAIL;
     }
 }
 
 impl PersonMut for PersonImpl {
+    #[inline]
     fn clear_name(&mut self) {
         self.name.clear();
         self._has_bits &= !HAS_NAME;
     }
 
+    #[inline]
     fn clear_age(&mut self) {
         self.age = 0;
         self._has_bits &= !HAS_AGE;
     }
 
+    #[inline]
     fn clear_email(&mut self) {
         self.email.clear();
         self._has_bits &= !HAS_EMAIL;
@@ -186,42 +199,51 @@ impl PersonMut for PersonImpl {
 // Standard implementation also implements fallible traits
 // (infallible operations always succeed, so they can be wrapped in Ok())
 impl PersonTry for PersonImpl {
+    #[inline]
     fn try_name(&self) -> Result<&str, Error> {
         Ok(&self.name)
     }
 
+    #[inline]
     fn try_age(&self) -> Result<i32, Error> {
         Ok(self.age)
     }
 
+    #[inline]
     fn try_email(&self) -> Result<&str, Error> {
         Ok(&self.email)
     }
 
+    #[inline]
     fn try_has_name(&self) -> Result<bool, Error> {
         Ok(Person::has_name(self))
     }
 
+    #[inline]
     fn try_has_age(&self) -> Result<bool, Error> {
         Ok(Person::has_age(self))
     }
 
+    #[inline]
     fn try_has_email(&self) -> Result<bool, Error> {
         Ok(Person::has_email(self))
     }
 }
 
 impl PersonAppendTry for PersonImpl {
+    #[inline]
     fn try_set_name(&mut self, v: &str) -> Result<(), Error> {
         PersonAppend::set_name(self, v);
         Ok(())
     }
 
+    #[inline]
     fn try_set_age(&mut self, v: i32) -> Result<(), Error> {
         PersonAppend::set_age(self, v);
         Ok(())
     }
 
+    #[inline]
     fn try_set_email(&mut self, v: &str) -> Result<(), Error> {
         PersonAppend::set_email(self, v);
         Ok(())
@@ -229,16 +251,19 @@ impl PersonAppendTry for PersonImpl {
 }
 
 impl PersonTryMut for PersonImpl {
+    #[inline]
     fn try_clear_name(&mut self) -> Result<(), Error> {
         PersonMut::clear_name(self);
         Ok(())
     }
 
+    #[inline]
     fn try_clear_age(&mut self) -> Result<(), Error> {
         PersonMut::clear_age(self);
         Ok(())
     }
 
+    #[inline]
     fn try_clear_email(&mut self) -> Result<(), Error> {
         PersonMut::clear_email(self);
         Ok(())
