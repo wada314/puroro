@@ -5,6 +5,9 @@
 This document explains the field operations pattern used in Puroro's generated code,
 separating shared state from exclusive field storage.
 
+**Current Implementation:** Trait-based approach in `puroro/src/field_ops.rs`  
+**See also:** `doc/field-ops-genericization.md` for detailed trait design discussion
+
 ## Motivation
 
 Generated protobuf code contains repetitive logic for:

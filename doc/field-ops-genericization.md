@@ -366,7 +366,13 @@ pub fn set<T>(...) { ... }  // Generic with specialized impls
 
 But for now, explicit functions are the pragmatic choice.
 
-## Recommendation
+## Decision (2025-10-21)
+
+**DECIDED: Use trait-based approach with Field<T, K> type descriptors.**
+
+Implemented in `puroro/src/field_ops.rs`.
+
+## Recommendation (Original - Now Superseded)
 
 **For now: Keep separate, well-named functions (Approach 6).**
 

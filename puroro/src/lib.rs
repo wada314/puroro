@@ -20,15 +20,10 @@
 // Re-export protobuf-core for use by generated code
 pub use protobuf_core;
 
-/// Field operation utilities for generated code.
-///
-/// This module provides reusable functions that separate "shared" state
-/// (has_bits, bool_bits, etc.) from "exclusive" field storage.
-pub mod field;
-
 /// Generic field operations using trait-based dispatch.
 ///
-/// This module provides a unified interface for all field types.
+/// This module provides a unified interface for all field types,
+/// using generic type parameters to encode field attributes.
 pub mod field_ops;
 
 /// Shared fields for message implementations.
