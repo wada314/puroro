@@ -118,8 +118,9 @@ pub struct ImplicitOptional;
 /// Marker for explicit optional fields (Proto3 `optional` keyword).
 ///
 /// These fields track presence explicitly and return `Option<T>`.
+/// The presence bit index is encoded at the type level for type safety.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct ExplicitOptional;
+pub struct ExplicitOptional<const PRESENCE_BIT_INDEX: usize>;
 
 /// Marker for repeated fields.
 ///
@@ -134,14 +135,14 @@ pub struct Repeated;
 pub struct Map;
 
 impl FieldLabel for ImplicitOptional {}
-impl FieldLabel for ExplicitOptional {}
+impl<const PRESENCE_BIT_INDEX: usize> FieldLabel for ExplicitOptional<PRESENCE_BIT_INDEX> {}
 impl FieldLabel for Repeated {}
 impl FieldLabel for Map {}
 
 mod private {
     pub trait Sealed {}
     impl Sealed for super::ImplicitOptional {}
-    impl Sealed for super::ExplicitOptional {}
+    impl<const PRESENCE_BIT_INDEX: usize> Sealed for super::ExplicitOptional<PRESENCE_BIT_INDEX> {}
     impl Sealed for super::Repeated {}
     impl Sealed for super::Map {}
 }
@@ -168,30 +169,28 @@ impl ScalarType for bool {}
 /// Type-level descriptor for a protobuf field that holds actual data.
 ///
 /// Encodes both the value type (T) and field label (L), and stores the actual field data.
+/// For ExplicitOptional fields, the presence bit index is encoded in the field label type.
 ///
 /// # Type Parameters
 /// - `T`: The value type (i32, String, etc.)
-/// - `L`: The field label (ImplicitOptional, ExplicitOptional, Repeated, Map)
+/// - `L`: The field label (ImplicitOptional, ExplicitOptional<BIT_INDEX>, Repeated, Map)
 /// - `const FIELD_NUMBER`: The protobuf field number
-/// - `const PRESENCE_BIT_INDEX`: The bit index for explicit presence tracking
 ///
 /// # Examples
 /// ```ignore
-/// type NameField = FieldType<String, ImplicitOptional, 1, 0>;  // implicit presence
-/// type EmailField = FieldType<String, ExplicitOptional, 3, 2>; // explicit presence
-/// type HobbiesField = FieldType<String, Repeated, 4, 3>;
-/// type ScoresField = FieldType<(String, i32), Map, 5, 4>;
+/// type NameField = FieldType<String, ImplicitOptional, 1>;           // implicit presence
+/// type EmailField = FieldType<String, ExplicitOptional<2>, 3>;        // explicit presence, bit 2
+/// type HobbiesField = FieldType<String, Repeated, 4>;                 // repeated field
+/// type ScoresField = FieldType<(String, i32), Map, 5>;               // map field
 /// ```
 #[derive(Debug, Clone, PartialEq)]
-pub struct FieldType<T, L: FieldLabel, const FIELD_NUMBER: u32, const PRESENCE_BIT_INDEX: usize> {
+pub struct FieldType<T, L: FieldLabel, const FIELD_NUMBER: u32> {
     /// The actual field data
     pub data: T,
     _phantom: PhantomData<L>,
 }
 
-impl<T, L: FieldLabel, const FIELD_NUMBER: u32, const PRESENCE_BIT_INDEX: usize>
-    FieldType<T, L, FIELD_NUMBER, PRESENCE_BIT_INDEX>
-{
+impl<T, L: FieldLabel, const FIELD_NUMBER: u32> FieldType<T, L, FIELD_NUMBER> {
     /// Creates a new FieldType with the given data
     pub fn new(data: T) -> Self {
         Self {
@@ -218,9 +217,7 @@ impl<T, L: FieldLabel, const FIELD_NUMBER: u32, const PRESENCE_BIT_INDEX: usize>
 ///
 /// For now, this implementation works well with standard library types
 /// that have their own Default implementations.
-impl<T: Default, L: FieldLabel, const FIELD_NUMBER: u32, const PRESENCE_BIT_INDEX: usize> Default
-    for FieldType<T, L, FIELD_NUMBER, PRESENCE_BIT_INDEX>
-{
+impl<T: Default, L: FieldLabel, const FIELD_NUMBER: u32> Default for FieldType<T, L, FIELD_NUMBER> {
     fn default() -> Self {
         Self {
             data: T::default(),
@@ -261,16 +258,15 @@ pub struct FieldDescriptor<T, L: FieldLabel, const FIELD_NUMBER: u32, const BIT_
 ///
 /// This trait provides metadata and operations for field handling:
 /// - Field number (for serialization)
-/// - Presence bit index (for explicit presence tracking)
+/// - Presence bit index (for explicit presence tracking, only for ExplicitOptional fields)
 /// - Protobuf field type (for wire format)
 /// - Get/Set/Clear operations
 ///
 /// # Type Parameters
 /// - `T`: The value type (i32, String, etc.)
-/// - `L`: The field label (ImplicitOptional, ExplicitOptional, Repeated, Map)
+/// - `L`: The field label (ImplicitOptional, ExplicitOptional<BIT_INDEX>, Repeated, Map)
 /// - `const FIELD_NUMBER`: The protobuf field number
-/// - `const PRESENCE_BIT_INDEX`: The bit index for explicit presence tracking
-pub trait Field<T, L: FieldLabel, const FIELD_NUMBER: u32, const PRESENCE_BIT_INDEX: usize> {
+pub trait Field<T, L: FieldLabel, const FIELD_NUMBER: u32> {
     /// The value type for this field (what users pass in)
     type Value<'a>;
 
@@ -284,9 +280,6 @@ pub trait Field<T, L: FieldLabel, const FIELD_NUMBER: u32, const PRESENCE_BIT_IN
 
     /// The protobuf field number
     const FIELD_NUMBER: u32 = FIELD_NUMBER;
-
-    /// The bit index for explicit presence tracking in SharedFields
-    const PRESENCE_BIT_INDEX: usize = PRESENCE_BIT_INDEX;
 
     /// Sets the field value
     fn set<const BYTES: usize>(&mut self, shared: &mut SharedFields<BYTES>, value: Self::Value<'_>);
@@ -306,11 +299,6 @@ pub trait Field<T, L: FieldLabel, const FIELD_NUMBER: u32, const PRESENCE_BIT_IN
         FIELD_NUMBER
     }
 
-    /// Gets the presence bit index
-    fn presence_bit_index() -> usize {
-        PRESENCE_BIT_INDEX
-    }
-
     /// Gets the protobuf field type
     fn field_type() -> ProtobufFieldType {
         Self::FIELD_TYPE
@@ -322,9 +310,8 @@ pub trait Field<T, L: FieldLabel, const FIELD_NUMBER: u32, const PRESENCE_BIT_IN
 // ============================================================================
 
 /// Implementation for String fields with ImplicitOptional
-impl<const FIELD_NUMBER: u32, const PRESENCE_BIT_INDEX: usize>
-    Field<String, ImplicitOptional, FIELD_NUMBER, PRESENCE_BIT_INDEX>
-    for FieldType<String, ImplicitOptional, FIELD_NUMBER, PRESENCE_BIT_INDEX>
+impl<const FIELD_NUMBER: u32> Field<String, ImplicitOptional, FIELD_NUMBER>
+    for FieldType<String, ImplicitOptional, FIELD_NUMBER>
 {
     type Value<'a> = &'a str; // Accept any &str
     type GetValue<'a> = &'a str;
@@ -359,8 +346,8 @@ impl<const FIELD_NUMBER: u32, const PRESENCE_BIT_INDEX: usize>
 
 /// Implementation for String fields with ExplicitOptional
 impl<const FIELD_NUMBER: u32, const PRESENCE_BIT_INDEX: usize>
-    Field<String, ExplicitOptional, FIELD_NUMBER, PRESENCE_BIT_INDEX>
-    for FieldType<String, ExplicitOptional, FIELD_NUMBER, PRESENCE_BIT_INDEX>
+    Field<String, ExplicitOptional<PRESENCE_BIT_INDEX>, FIELD_NUMBER>
+    for FieldType<String, ExplicitOptional<PRESENCE_BIT_INDEX>, FIELD_NUMBER>
 {
     type Value<'a> = &'a str; // Accept any &str
     type GetValue<'a> = Option<&'a str>;
@@ -398,9 +385,8 @@ impl<const FIELD_NUMBER: u32, const PRESENCE_BIT_INDEX: usize>
 }
 
 /// Implementation for scalar types with ImplicitOptional
-impl<T: ScalarType, const FIELD_NUMBER: u32, const PRESENCE_BIT_INDEX: usize>
-    Field<T, ImplicitOptional, FIELD_NUMBER, PRESENCE_BIT_INDEX>
-    for FieldType<T, ImplicitOptional, FIELD_NUMBER, PRESENCE_BIT_INDEX>
+impl<T: ScalarType, const FIELD_NUMBER: u32> Field<T, ImplicitOptional, FIELD_NUMBER>
+    for FieldType<T, ImplicitOptional, FIELD_NUMBER>
 {
     type Value<'a> = T;
     type GetValue<'a>
@@ -438,8 +424,8 @@ impl<T: ScalarType, const FIELD_NUMBER: u32, const PRESENCE_BIT_INDEX: usize>
 
 /// Implementation for scalar types with ExplicitOptional
 impl<T: ScalarType, const FIELD_NUMBER: u32, const PRESENCE_BIT_INDEX: usize>
-    Field<T, ExplicitOptional, FIELD_NUMBER, PRESENCE_BIT_INDEX>
-    for FieldType<T, ExplicitOptional, FIELD_NUMBER, PRESENCE_BIT_INDEX>
+    Field<T, ExplicitOptional<PRESENCE_BIT_INDEX>, FIELD_NUMBER>
+    for FieldType<T, ExplicitOptional<PRESENCE_BIT_INDEX>, FIELD_NUMBER>
 {
     type Value<'a> = T;
     type GetValue<'a>

@@ -117,13 +117,13 @@ pub struct PersonImpl {
     // Exclusive fields ordered by size (descending)
     // String: 24 bytes (3 words on 64-bit)
     // Direct field types with explicit parameters for clarity
-    // Format: FieldType<T, L, FIELD_NUMBER, PRESENCE_BIT_INDEX>
-    name: FieldType<String, ImplicitOptional, 1, 0>, // Field 1, presence bit 0
-    email: FieldType<String, ExplicitOptional, 3, 2>, // Field 3, presence bit 2
+    // Format: FieldType<T, L, FIELD_NUMBER>
+    name: FieldType<String, ImplicitOptional, 1>, // Field 1, implicit presence
+    email: FieldType<String, ExplicitOptional<2>, 3>, // Field 3, explicit presence, bit 2
 
     // Scalar fields: 4 bytes
-    age: FieldType<i32, ImplicitOptional, 2, 1>, // Field 2, presence bit 1
-    score: FieldType<i32, ExplicitOptional, 5, 3>, // Field 5, presence bit 3
+    age: FieldType<i32, ImplicitOptional, 2>, // Field 2, implicit presence
+    score: FieldType<i32, ExplicitOptional<3>, 5>, // Field 5, explicit presence, bit 3
 }
 
 impl PersonImpl {
