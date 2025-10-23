@@ -9,12 +9,12 @@ fn test_person_creation() {
     let person = PersonImpl::new();
     assert_eq!(person.name(), "");
     assert_eq!(person.age(), 0);
-    assert_eq!(person.email(), "");
+    assert_eq!(person.email(), None);
 
     // ImplicitOptional fields are always considered "present"
     assert!(person.has_name());
     assert!(person.has_age());
-    assert!(person.has_email());
+    assert!(!person.has_email()); // ExplicitOptional field is not set initially
 }
 
 #[test]
@@ -22,7 +22,7 @@ fn test_person_default() {
     let person = PersonImpl::default();
     assert_eq!(person.name(), "");
     assert_eq!(person.age(), 0);
-    assert_eq!(person.email(), "");
+    assert_eq!(person.email(), None);
 }
 
 #[test]
@@ -35,7 +35,7 @@ fn test_person_setters() {
 
     assert_eq!(person.name(), "Alice");
     assert_eq!(person.age(), 30);
-    assert_eq!(person.email(), "alice@example.com");
+    assert_eq!(person.email(), Some("alice@example.com"));
 
     // After setting, fields should be marked as "set"
     assert!(person.has_name());
@@ -167,7 +167,7 @@ fn test_person_try_trait() {
     // PersonImpl's fallible operations always succeed
     assert_eq!(person.try_name().unwrap(), "Iris");
     assert_eq!(person.try_age().unwrap(), 45);
-    assert_eq!(person.try_email().unwrap(), "");
+    assert_eq!(person.try_email().unwrap(), None);
 }
 
 #[test]

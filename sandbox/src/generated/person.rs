@@ -6,7 +6,7 @@
 
 use puroro::{
     error::Error,
-    field_ops::{Field, FieldClear, FieldGet, FieldSet, ImplicitOptional},
+    field_ops::{ExplicitOptional, Field, FieldDescriptor, FieldGet, ImplicitOptional},
     shared::SharedFields,
     Message,
 };
@@ -19,7 +19,7 @@ pub trait Person {
     // Getters
     fn name(&self) -> &str;
     fn age(&self) -> i32;
-    fn email(&self) -> &str;
+    fn email(&self) -> Option<&str>;
 
     // Presence checks (for Proto3 optional semantics)
     fn has_name(&self) -> bool;
@@ -59,7 +59,7 @@ pub trait PersonTry {
     // Getters (fallible) - using try_ prefix following Rust conventions
     fn try_name(&self) -> Result<&str, Error>;
     fn try_age(&self) -> Result<i32, Error>;
-    fn try_email(&self) -> Result<&str, Error>;
+    fn try_email(&self) -> Result<Option<&str>, Error>;
 
     // Presence checks (fallible) - may fail when reading metadata
     fn try_has_name(&self) -> Result<bool, Error>;
@@ -101,8 +101,8 @@ type NameField = Field<String, ImplicitOptional>;
 /// Type descriptor for the 'age' field (implicit presence)
 type AgeField = Field<i32, ImplicitOptional>;
 
-/// Type descriptor for the 'email' field (implicit presence)
-type EmailField = Field<String, ImplicitOptional>;
+/// Type descriptor for the 'email' field (explicit presence)
+type EmailField = Field<String, ExplicitOptional>;
 
 // Bit indices for each field
 const IDX_NAME: usize = 0;
@@ -156,17 +156,20 @@ impl Default for PersonImpl {
 impl Person for PersonImpl {
     #[inline]
     fn name(&self) -> &str {
-        NameField::get(&self.name)
+        <NameField as FieldGet>::get(&self.name)
     }
 
     #[inline]
     fn age(&self) -> i32 {
-        AgeField::get(&self.age)
+        <AgeField as FieldDescriptor<i32, ImplicitOptional, 2, IDX_AGE>>::get(
+            &self._shared,
+            &self.age,
+        )
     }
 
     #[inline]
-    fn email(&self) -> &str {
-        EmailField::get(&self.email)
+    fn email(&self) -> Option<&str> {
+        EmailField::get(&self._shared, IDX_EMAIL, &self.email)
     }
 
     #[inline]
@@ -183,8 +186,8 @@ impl Person for PersonImpl {
 
     #[inline]
     fn has_email(&self) -> bool {
-        // ImplicitOptional fields are always considered "present"
-        true
+        // ExplicitOptional fields check presence via has_bits
+        self._shared.has_bits()[IDX_EMAIL]
     }
 }
 
@@ -196,7 +199,11 @@ impl PersonAppend for PersonImpl {
 
     #[inline]
     fn set_age(&mut self, v: i32) {
-        AgeField::set(&mut self._shared, IDX_AGE, &mut self.age, v);
+        <AgeField as FieldDescriptor<i32, ImplicitOptional, 2, IDX_AGE>>::set(
+            &mut self._shared,
+            &mut self.age,
+            v,
+        );
     }
 
     #[inline]
@@ -213,7 +220,10 @@ impl PersonMut for PersonImpl {
 
     #[inline]
     fn clear_age(&mut self) {
-        AgeField::clear(&mut self._shared, IDX_AGE, &mut self.age);
+        <AgeField as FieldDescriptor<i32, ImplicitOptional, 2, IDX_AGE>>::clear(
+            &mut self._shared,
+            &mut self.age,
+        );
     }
 
     #[inline]
@@ -227,17 +237,22 @@ impl PersonMut for PersonImpl {
 impl PersonTry for PersonImpl {
     #[inline]
     fn try_name(&self) -> Result<&str, Error> {
-        Ok(&self.name)
+        Ok(<NameField as FieldGet>::get(&self.name))
     }
 
     #[inline]
     fn try_age(&self) -> Result<i32, Error> {
-        Ok(self.age)
+        Ok(<AgeField as FieldDescriptor<
+            i32,
+            ImplicitOptional,
+            2,
+            IDX_AGE,
+        >>::get(&self._shared, &self.age))
     }
 
     #[inline]
-    fn try_email(&self) -> Result<&str, Error> {
-        Ok(&self.email)
+    fn try_email(&self) -> Result<Option<&str>, Error> {
+        Ok(EmailField::get(&self._shared, IDX_EMAIL, &self.email))
     }
 
     #[inline]

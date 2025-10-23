@@ -349,6 +349,49 @@ impl<T: ScalarType, const FIELD_NUMBER: u32, const BIT_INDEX: usize>
     }
 }
 
+/// Implementation for String fields with ExplicitOptional
+impl<const FIELD_NUMBER: u32, const BIT_INDEX: usize>
+    FieldDescriptor<String, ExplicitOptional, FIELD_NUMBER, BIT_INDEX>
+    for Field<String, ExplicitOptional>
+{
+    type Storage = String;
+    type Value = String; // For FieldDescriptor compatibility
+    type GetValue<'a> = Option<&'a str>;
+
+    fn default_value() -> Self::Storage {
+        String::new()
+    }
+
+    fn set<const BYTES: usize>(
+        shared: &mut SharedFields<BYTES>,
+        storage: &mut Self::Storage,
+        value: Self::Value,
+    ) {
+        *storage = value;
+        shared.has_bits_mut().set(BIT_INDEX, true);
+    }
+
+    fn get<'a, const BYTES: usize>(
+        shared: &'a SharedFields<BYTES>,
+        storage: &'a Self::Storage,
+    ) -> Self::GetValue<'a> {
+        if shared.has_bits()[BIT_INDEX] {
+            Some(storage.as_str())
+        } else {
+            None
+        }
+    }
+
+    fn clear<const BYTES: usize>(shared: &mut SharedFields<BYTES>, storage: &mut Self::Storage) {
+        storage.clear();
+        shared.has_bits_mut().set(BIT_INDEX, false);
+    }
+
+    fn is_present<const BYTES: usize>(shared: &SharedFields<BYTES>) -> bool {
+        shared.has_bits()[BIT_INDEX]
+    }
+}
+
 /// Implementation for repeated scalar types
 impl<T: ScalarType, const FIELD_NUMBER: u32, const BIT_INDEX: usize>
     FieldDescriptor<T, Repeated, FIELD_NUMBER, BIT_INDEX> for Field<T, Repeated>
@@ -424,6 +467,16 @@ impl Field<String, ImplicitOptional> {
     }
 }
 
+impl FieldGet for Field<String, ImplicitOptional> {
+    type Storage = String;
+    type Value<'a> = &'a str;
+
+    #[inline]
+    fn get<'a>(storage: &'a Self::Storage) -> Self::Value<'a> {
+        storage.as_str()
+    }
+}
+
 impl Field<String, ExplicitOptional> {
     /// Sets a string field value (explicit presence).
     #[inline]
@@ -447,32 +500,20 @@ impl Field<String, ExplicitOptional> {
         storage.clear();
         shared.has_bits_mut().set(bit_index, false);
     }
-}
 
-impl FieldGet for Field<String, ImplicitOptional> {
-    type Storage = String;
-    type Value<'a> = &'a str;
-
-    #[inline]
-    fn get<'a>(storage: &'a Self::Storage) -> Self::Value<'a> {
-        storage.as_str()
-    }
-}
-
-impl Field<String, ExplicitOptional> {
     /// Gets the field value, checking presence first.
     ///
-    /// Returns an empty string if the field is not present.
+    /// Returns None if the field is not present, Some(&str) if present.
     #[inline]
     pub fn get<'a, const BYTES: usize>(
         shared: &'a SharedFields<BYTES>,
         bit_index: usize,
         storage: &'a String,
-    ) -> &'a str {
+    ) -> Option<&'a str> {
         if shared.has_bits()[bit_index] {
-            storage.as_str()
+            Some(storage.as_str())
         } else {
-            ""
+            None
         }
     }
 }
