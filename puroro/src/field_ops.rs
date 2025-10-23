@@ -2,37 +2,66 @@
 //!
 //! This module provides a unified interface for all field types,
 //! using generic type parameters to encode field attributes
-//! (singular, repeated, map, etc.).
+//! (labels and presence semantics).
+//!
+//! # Protobuf Field Labels
+//!
+//! Protobuf defines three field labels:
+//! - **Optional**: Field may or may not be present (proto3 implicit presence)
+//! - **Explicit Optional**: Field may or may not be present (proto3 explicit presence)
+//! - **Repeated**: Field may appear zero or more times
+//! - **Map**: Key-value pairs (syntactic sugar for repeated fields)
+//!
+//! # Presence Semantics
+//!
+//! - **Implicit Presence (proto3 default)**: Field is always considered "present" with default value
+//! - **Explicit Presence (proto3 optional)**: Field has explicit presence tracking
 
 use crate::shared::SharedFields;
 use std::marker::PhantomData;
 
 // ============================================================================
-// Field Kind Markers (Zero-Sized Types)
+// Field Label Markers (Zero-Sized Types)
 // ============================================================================
 
-/// Marker trait for field kinds.
+/// Marker trait for protobuf field labels.
 ///
 /// This is a sealed trait - users cannot implement it.
-pub trait FieldKind: private::Sealed {}
+/// Represents the protobuf field label (optional, repeated, map).
+pub trait FieldLabel: private::Sealed {}
 
-/// Marker for singular (non-repeated) fields.
-pub struct Singular;
+/// Marker for optional fields with implicit presence (proto3 default).
+///
+/// These fields are always considered "present" with their default value.
+/// No presence tracking is needed.
+pub struct Optional;
+
+/// Marker for optional fields with explicit presence (proto3 optional).
+///
+/// These fields have explicit presence tracking via has_bits.
+/// The field may be absent (not set) or present (set to a value).
+pub struct ExplicitOptional;
 
 /// Marker for repeated fields.
+///
+/// These fields may appear zero or more times.
 pub struct Repeated;
 
 /// Marker for map fields.
+///
+/// These are syntactic sugar for repeated fields with key-value pairs.
 pub struct Map;
 
-impl FieldKind for Singular {}
-impl FieldKind for Repeated {}
-impl FieldKind for Map {}
+impl FieldLabel for Optional {}
+impl FieldLabel for ExplicitOptional {}
+impl FieldLabel for Repeated {}
+impl FieldLabel for Map {}
 
 // Sealed trait pattern
 mod private {
     pub trait Sealed {}
-    impl Sealed for super::Singular {}
+    impl Sealed for super::Optional {}
+    impl Sealed for super::ExplicitOptional {}
     impl Sealed for super::Repeated {}
     impl Sealed for super::Map {}
 }
@@ -43,20 +72,21 @@ mod private {
 
 /// Type-level descriptor for a protobuf field.
 ///
-/// Encodes both the value type (T) and field kind (K).
+/// Encodes both the value type (T) and field label (L).
 ///
 /// # Type Parameters
 /// - `T`: The value type (i32, String, etc.)
-/// - `K`: The field kind (Singular, Repeated, Map)
+/// - `L`: The field label (Optional, ExplicitOptional, Repeated, Map)
 ///
 /// # Examples
 /// ```ignore
-/// type NameField = Field<String, Singular>;
+/// type NameField = Field<String, Optional>;         // proto3 implicit presence
+/// type EmailField = Field<String, ExplicitOptional>; // proto3 explicit presence
 /// type HobbiesField = Field<String, Repeated>;
 /// type ScoresField = Field<(String, i32), Map>;
 /// ```
-pub struct Field<T, K: FieldKind> {
-    _phantom: PhantomData<(T, K)>,
+pub struct Field<T, L: FieldLabel> {
+    _phantom: PhantomData<(T, L)>,
 }
 
 // ============================================================================
@@ -145,13 +175,41 @@ pub trait FieldClear {
 }
 
 // ============================================================================
-// Implementations for Field<String, Singular>
+// Implementations for Field<String, Optional> and Field<String, ExplicitOptional>
 // ============================================================================
 
 // Note: We can't use `type Value = &str` directly because of lifetime issues.
 // Instead, we make the set() method generic over the value type.
-impl Field<String, Singular> {
-    /// Sets a string field value.
+impl Field<String, Optional> {
+    /// Sets a string field value (proto3 implicit presence).
+    #[inline]
+    pub fn set<const BYTES: usize>(
+        shared: &mut SharedFields<BYTES>,
+        bit_index: usize,
+        storage: &mut String,
+        value: &str, // Can accept any &str!
+    ) {
+        value.clone_into(storage);
+        // Note: Optional fields don't strictly need presence tracking in proto3
+        // (they're always considered "present" with default value)
+        // But we still track for consistency with explicit optional fields
+        shared.has_bits_mut().set(bit_index, true);
+    }
+
+    /// Clears a string field (proto3 implicit presence).
+    #[inline]
+    pub fn clear<const BYTES: usize>(
+        shared: &mut SharedFields<BYTES>,
+        bit_index: usize,
+        storage: &mut String,
+    ) {
+        storage.clear();
+        shared.has_bits_mut().set(bit_index, false);
+    }
+}
+
+impl Field<String, ExplicitOptional> {
+    /// Sets a string field value (proto3 explicit presence).
     #[inline]
     pub fn set<const BYTES: usize>(
         shared: &mut SharedFields<BYTES>,
@@ -162,9 +220,20 @@ impl Field<String, Singular> {
         value.clone_into(storage);
         shared.has_bits_mut().set(bit_index, true);
     }
+
+    /// Clears a string field (proto3 explicit presence).
+    #[inline]
+    pub fn clear<const BYTES: usize>(
+        shared: &mut SharedFields<BYTES>,
+        bit_index: usize,
+        storage: &mut String,
+    ) {
+        storage.clear();
+        shared.has_bits_mut().set(bit_index, false);
+    }
 }
 
-impl FieldGet for Field<String, Singular> {
+impl FieldGet for Field<String, Optional> {
     type Storage = String;
     type Value<'a> = &'a str;
 
@@ -174,16 +243,13 @@ impl FieldGet for Field<String, Singular> {
     }
 }
 
-impl Field<String, Singular> {
-    /// Clears a string field.
+impl FieldGet for Field<String, ExplicitOptional> {
+    type Storage = String;
+    type Value<'a> = &'a str;
+
     #[inline]
-    pub fn clear<const BYTES: usize>(
-        shared: &mut SharedFields<BYTES>,
-        bit_index: usize,
-        storage: &mut String,
-    ) {
-        storage.clear();
-        shared.has_bits_mut().set(bit_index, false);
+    fn get<'a>(storage: &'a Self::Storage) -> Self::Value<'a> {
+        storage.as_str()
     }
 }
 
@@ -202,7 +268,26 @@ impl ScalarType for f64 {}
 impl ScalarType for bool {}
 // Add more as needed
 
-impl<T: ScalarType> FieldSet for Field<T, Singular> {
+impl<T: ScalarType> FieldSet for Field<T, Optional> {
+    type Storage = T;
+    type Value = T;
+
+    #[inline]
+    fn set<const BYTES: usize>(
+        shared: &mut SharedFields<BYTES>,
+        bit_index: usize,
+        storage: &mut Self::Storage,
+        value: Self::Value,
+    ) {
+        *storage = value;
+        // Note: Optional fields don't need presence tracking in proto3
+        // (they're always considered "present" with default value)
+        // But we still track for consistency with explicit optional fields
+        shared.has_bits_mut().set(bit_index, true);
+    }
+}
+
+impl<T: ScalarType> FieldSet for Field<T, ExplicitOptional> {
     type Storage = T;
     type Value = T;
 
@@ -218,7 +303,7 @@ impl<T: ScalarType> FieldSet for Field<T, Singular> {
     }
 }
 
-impl<T: ScalarType> FieldGet for Field<T, Singular> {
+impl<T: ScalarType> FieldGet for Field<T, Optional> {
     type Storage = T;
     type Value<'a>
         = T
@@ -231,7 +316,34 @@ impl<T: ScalarType> FieldGet for Field<T, Singular> {
     }
 }
 
-impl<T: ScalarType> FieldClear for Field<T, Singular> {
+impl<T: ScalarType> FieldGet for Field<T, ExplicitOptional> {
+    type Storage = T;
+    type Value<'a>
+        = T
+    where
+        T: 'a;
+
+    #[inline]
+    fn get<'a>(storage: &'a Self::Storage) -> Self::Value<'a> {
+        *storage
+    }
+}
+
+impl<T: ScalarType> FieldClear for Field<T, Optional> {
+    type Storage = T;
+
+    #[inline]
+    fn clear<const BYTES: usize>(
+        shared: &mut SharedFields<BYTES>,
+        bit_index: usize,
+        storage: &mut Self::Storage,
+    ) {
+        *storage = T::default();
+        shared.has_bits_mut().set(bit_index, false);
+    }
+}
+
+impl<T: ScalarType> FieldClear for Field<T, ExplicitOptional> {
     type Storage = T;
 
     #[inline]
@@ -339,8 +451,9 @@ impl FieldGet for Field<String, Repeated> {
 
 /*
 // Type aliases for clarity
-type NameField = Field<String, Singular>;
-type AgeField = Field<i32, Singular>;
+type NameField = Field<String, Optional>;         // proto3 implicit presence
+type AgeField = Field<i32, Optional>;             // proto3 implicit presence
+type EmailField = Field<String, ExplicitOptional>; // proto3 explicit presence
 type HobbiesField = Field<String, Repeated>;
 
 impl PersonAppend for PersonImpl {
@@ -369,8 +482,8 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_singular_i32() {
-        type AgeField = Field<i32, Singular>;
+    fn test_optional_i32() {
+        type AgeField = Field<i32, Optional>;
 
         let mut shared = SharedFields::<1>::new();
         let mut storage: i32 = 0;
@@ -388,8 +501,8 @@ mod tests {
     }
 
     #[test]
-    fn test_singular_string() {
-        type NameField = Field<String, Singular>;
+    fn test_optional_string() {
+        type NameField = Field<String, Optional>;
 
         let mut shared = SharedFields::<1>::new();
         let mut storage = String::new();
@@ -448,9 +561,9 @@ mod tests {
 
     #[test]
     fn test_multiple_scalar_types() {
-        type I64Field = Field<i64, Singular>;
-        type F32Field = Field<f32, Singular>;
-        type BoolField = Field<bool, Singular>;
+        type I64Field = Field<i64, Optional>;
+        type F32Field = Field<f32, Optional>;
+        type BoolField = Field<bool, Optional>;
 
         let mut shared = SharedFields::<1>::new();
 
@@ -465,5 +578,43 @@ mod tests {
         let mut bool_val: bool = false;
         BoolField::set(&mut shared, 0, &mut bool_val, true);
         assert_eq!(BoolField::get(&bool_val), true);
+    }
+
+    #[test]
+    fn test_explicit_optional_i32() {
+        type AgeField = Field<i32, ExplicitOptional>;
+
+        let mut shared = SharedFields::<1>::new();
+        let mut storage: i32 = 0;
+
+        AgeField::set(&mut shared, 0, &mut storage, 42);
+
+        assert_eq!(storage, 42);
+        assert!(shared.has_bits()[0]);
+
+        assert_eq!(AgeField::get(&storage), 42);
+
+        AgeField::clear(&mut shared, 0, &mut storage);
+        assert_eq!(storage, 0);
+        assert!(!shared.has_bits()[0]);
+    }
+
+    #[test]
+    fn test_explicit_optional_string() {
+        type NameField = Field<String, ExplicitOptional>;
+
+        let mut shared = SharedFields::<1>::new();
+        let mut storage = String::new();
+
+        NameField::set(&mut shared, 0, &mut storage, "Bob");
+
+        assert_eq!(storage, "Bob");
+        assert!(shared.has_bits()[0]);
+
+        assert_eq!(NameField::get(&storage), "Bob");
+
+        NameField::clear(&mut shared, 0, &mut storage);
+        assert_eq!(storage, "");
+        assert!(!shared.has_bits()[0]);
     }
 }
