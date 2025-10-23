@@ -282,25 +282,25 @@ impl PersonTry for PersonImpl {
 impl PersonAppendTry for PersonImpl {
     #[inline]
     fn try_set_name(&mut self, v: &str) -> Result<(), Error> {
-        PersonAppend::set_name(self, v);
+        self.set_name(v);
         Ok(())
     }
 
     #[inline]
     fn try_set_age(&mut self, v: i32) -> Result<(), Error> {
-        PersonAppend::set_age(self, v);
+        self.set_age(v);
         Ok(())
     }
 
     #[inline]
     fn try_set_email(&mut self, v: &str) -> Result<(), Error> {
-        PersonAppend::set_email(self, v);
+        self.set_email(v);
         Ok(())
     }
 
     #[inline]
     fn try_set_score(&mut self, v: i32) -> Result<(), Error> {
-        PersonAppend::set_score(self, v);
+        self.set_score(v);
         Ok(())
     }
 }
@@ -308,25 +308,25 @@ impl PersonAppendTry for PersonImpl {
 impl PersonTryMut for PersonImpl {
     #[inline]
     fn try_clear_name(&mut self) -> Result<(), Error> {
-        PersonMut::clear_name(self);
+        self.clear_name();
         Ok(())
     }
 
     #[inline]
     fn try_clear_age(&mut self) -> Result<(), Error> {
-        PersonMut::clear_age(self);
+        self.clear_age();
         Ok(())
     }
 
     #[inline]
     fn try_clear_email(&mut self) -> Result<(), Error> {
-        PersonMut::clear_email(self);
+        self.clear_email();
         Ok(())
     }
 
     #[inline]
     fn try_clear_score(&mut self) -> Result<(), Error> {
-        PersonMut::clear_score(self);
+        self.clear_score();
         Ok(())
     }
 }
