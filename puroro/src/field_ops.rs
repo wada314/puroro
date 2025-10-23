@@ -100,40 +100,6 @@ pub struct Field<T, L: FieldLabel> {
 }
 
 // ============================================================================
-// Field Operations Trait
-// ============================================================================
-
-/// Generic operations for protobuf fields.
-///
-/// This trait defines the core operations (set, get, clear) for all field types.
-/// The behavior is determined by the implementing type.
-pub trait FieldOps {
-    /// The storage type for this field (how it's stored in the struct)
-    type Storage;
-
-    /// The value type for this field (what users pass in)
-    type Value;
-
-    /// Sets the field value.
-    fn set<const BYTES: usize>(
-        shared: &mut SharedFields<BYTES>,
-        bit_index: usize,
-        storage: &mut Self::Storage,
-        value: Self::Value,
-    );
-
-    /// Gets the field value.
-    fn get(storage: &Self::Storage) -> Self::Value;
-
-    /// Clears the field value.
-    fn clear<const BYTES: usize>(
-        shared: &mut SharedFields<BYTES>,
-        bit_index: usize,
-        storage: &mut Self::Storage,
-    );
-}
-
-// ============================================================================
 // Split Set/Get/Clear Traits (Solution to Lifetime Issues)
 // ============================================================================
 
@@ -168,6 +134,9 @@ pub trait FieldGet {
         Self: 'a;
 
     /// Gets the field value.
+    ///
+    /// For ExplicitOptional fields, this method should check presence
+    /// and return default value if not present.
     fn get<'a>(storage: &'a Self::Storage) -> Self::Value<'a>;
 }
 
@@ -252,13 +221,21 @@ impl FieldGet for Field<String, ImplicitOptional> {
     }
 }
 
-impl FieldGet for Field<String, ExplicitOptional> {
-    type Storage = String;
-    type Value<'a> = &'a str;
-
+impl Field<String, ExplicitOptional> {
+    /// Gets the field value, checking presence first.
+    ///
+    /// Returns an empty string if the field is not present.
     #[inline]
-    fn get<'a>(storage: &'a Self::Storage) -> Self::Value<'a> {
-        storage.as_str()
+    pub fn get<'a, const BYTES: usize>(
+        shared: &'a SharedFields<BYTES>,
+        bit_index: usize,
+        storage: &'a String,
+    ) -> &'a str {
+        if shared.has_bits()[bit_index] {
+            storage.as_str()
+        } else {
+            ""
+        }
     }
 }
 
@@ -323,16 +300,21 @@ impl<T: ScalarType> FieldGet for Field<T, ImplicitOptional> {
     }
 }
 
-impl<T: ScalarType> FieldGet for Field<T, ExplicitOptional> {
-    type Storage = T;
-    type Value<'a>
-        = T
-    where
-        T: 'a;
-
+impl<T: ScalarType> Field<T, ExplicitOptional> {
+    /// Gets the field value, checking presence first.
+    ///
+    /// Returns the default value if the field is not present.
     #[inline]
-    fn get<'a>(storage: &'a Self::Storage) -> Self::Value<'a> {
-        *storage
+    pub fn get<const BYTES: usize>(
+        shared: &SharedFields<BYTES>,
+        bit_index: usize,
+        storage: &T,
+    ) -> T {
+        if shared.has_bits()[bit_index] {
+            *storage
+        } else {
+            T::default()
+        }
     }
 }
 
@@ -603,16 +585,24 @@ mod tests {
         let mut shared = SharedFields::<1>::new();
         let mut storage: i32 = 0;
 
+        // Initially not set - should return default value
+        assert_eq!(AgeField::get(&shared, 0, &storage), 0);
+        assert!(!shared.has_bits()[0]);
+
         AgeField::set(&mut shared, 0, &mut storage, 42);
 
         assert_eq!(storage, 42);
         assert!(shared.has_bits()[0]);
 
-        assert_eq!(AgeField::get(&storage), 42);
+        // Now set - should return actual value
+        assert_eq!(AgeField::get(&shared, 0, &storage), 42);
 
         AgeField::clear(&mut shared, 0, &mut storage);
         assert_eq!(storage, 0);
         assert!(!shared.has_bits()[0]);
+
+        // After clear - should return default value again
+        assert_eq!(AgeField::get(&shared, 0, &storage), 0);
     }
 
     #[test]
@@ -622,15 +612,23 @@ mod tests {
         let mut shared = SharedFields::<1>::new();
         let mut storage = String::new();
 
+        // Initially not set - should return empty string
+        assert_eq!(NameField::get(&shared, 0, &storage), "");
+        assert!(!shared.has_bits()[0]);
+
         NameField::set(&mut shared, 0, &mut storage, "Bob");
 
         assert_eq!(storage, "Bob");
         assert!(shared.has_bits()[0]);
 
-        assert_eq!(NameField::get(&storage), "Bob");
+        // Now set - should return actual value
+        assert_eq!(NameField::get(&shared, 0, &storage), "Bob");
 
         NameField::clear(&mut shared, 0, &mut storage);
         assert_eq!(storage, "");
         assert!(!shared.has_bits()[0]);
+
+        // After clear - should return empty string again
+        assert_eq!(NameField::get(&shared, 0, &storage), "");
     }
 }

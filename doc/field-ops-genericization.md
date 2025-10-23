@@ -45,83 +45,125 @@ Define a single generic type that encodes:
 
 Then use trait implementations or type-level dispatch to select the right behavior.
 
-## Approach 1: Trait-Based with Sealed Trait
+## Approach 1: Trait-Based with Sealed Trait (DEPRECATED)
+
+**Note**: This approach was initially implemented but later replaced with separate traits due to lifetime issues.
 
 ```rust
-// Core trait for field operations
+// Core trait for field operations (REMOVED - had lifetime issues)
 pub trait FieldOps: private::Sealed {
-    type Value;
+    type Value;  // ← Cannot express lifetimes like &str
     type Storage;
     
-    fn set<const BYTES: usize>(
-        shared: &mut SharedFields<BYTES>,
-        bit_index: usize,
-        storage: &mut Self::Storage,
-        value: Self::Value,
-    );
-    
-    fn get(storage: &Self::Storage) -> Self::Value;
-    
-    fn clear<const BYTES: usize>(
-        shared: &mut SharedFields<BYTES>,
-        bit_index: usize,
-        storage: &mut Self::Storage,
-    );
+    fn set<const BYTES: usize>(...);
+    fn get(storage: &Self::Storage) -> Self::Value;  // ← Cannot return &str
+    fn clear<const BYTES: usize>(...);
+}
+```
+
+**Problem**: Cannot express lifetime relationships (e.g., `&str` from `&String`).
+
+**Solution**: Split into separate traits with GATs (Generic Associated Types).
+
+## Current Implementation: Split Traits with GATs
+
+**Final Design**: Separate traits for each operation to handle lifetime issues.
+
+```rust
+// Separate traits for each operation
+pub trait FieldSet {
+    type Storage;
+    type Value;
+    fn set<const BYTES: usize>(...);
 }
 
-// Implementations for different field types
-impl FieldOps for I32Field {
-    type Value = i32;
-    type Storage = i32;
-    
-    fn set<const BYTES: usize>(...) {
-        *storage = value;
-        shared.has_bits_mut().set(bit_index, true);
-    }
+pub trait FieldGet {
+    type Storage;
+    type Value<'a> where Self: 'a;  // ← GAT for lifetime support
+    fn get<'a>(storage: &'a Self::Storage) -> Self::Value<'a>;
 }
 
-impl FieldOps for StringField {
-    type Value = &str;  // or String?
+pub trait FieldClear {
+    type Storage;
+    fn clear<const BYTES: usize>(...);
+}
+
+// Implementation for String fields with lifetime support
+impl FieldGet for Field<String, ImplicitOptional> {
     type Storage = String;
+    type Value<'a> = &'a str;  // ← Can return &str with proper lifetime
     
-    fn set<const BYTES: usize>(...) {
-        value.clone_into(storage);
-        shared.has_bits_mut().set(bit_index, true);
-    }
-}
-
-impl<T: FieldOps> FieldOps for RepeatedField<T> {
-    type Value = T::Value;
-    type Storage = Vec<T::Storage>;
-    
-    fn set<const BYTES: usize>(...) {
-        // For repeated, "set" means "add"
-        storage.push(value);
-        shared.has_bits_mut().set(bit_index, true);
-    }
-}
-
-// Usage in generated code
-impl PersonAppend for PersonImpl {
-    fn set_name(&mut self, v: &str) {
-        <StringField as FieldOps>::set(&mut self._shared, IDX_NAME, &mut self.name, v);
-    }
-    
-    fn add_hobby(&mut self, v: &str) {
-        <RepeatedField<StringField> as FieldOps>::set(&mut self._shared, IDX_HOBBIES, &mut self.hobbies, v);
+    fn get<'a>(storage: &'a Self::Storage) -> Self::Value<'a> {
+        storage.as_str()  // ← Returns &str
     }
 }
 ```
 
-**Pros:**
-- ✅ Single unified trait
-- ✅ Type-safe dispatch
-- ✅ Composable (RepeatedField<T>, MapField<K,V>)
+## Decision
 
-**Cons:**
-- ⚠️ Complex type system
-- ⚠️ Verbose generated code (`<Type as Trait>::method`)
-- ⚠️ Associated types might be tricky for some cases
+**Chosen**: Split Traits with GATs (Current Implementation)
+
+**Reasons**:
+1. ✅ **Lifetime Support**: Can return `&str` from `&String`
+2. ✅ **Type Safety**: Compiler enforces correct usage
+3. ✅ **Extensibility**: Easy to add new field types
+4. ✅ **Generic**: Works with any field type combination
+5. ✅ **Stable Rust**: Uses stable GAT feature
+
+**Trade-offs**:
+- ⚠️ More complex than single trait approach
+- ⚠️ Requires understanding of GATs
+- ⚠️ Generated code is more verbose
+
+## Implementation Status
+
+- ✅ Core trait definitions (FieldSet, FieldGet, FieldClear)
+- ✅ Scalar types (i32, i64, u32, u64, f32, f64, bool)
+- ✅ String fields with lifetime support
+- ✅ Repeated fields
+- ✅ ImplicitOptional and ExplicitOptional presence semantics
+- ⏸️ Map fields
+- ⏸️ Oneof fields
+- ⏸️ Nested messages
+- ⏸️ Enum fields
+
+## Generated Code Example
+
+```rust
+// Type aliases for field descriptors
+type NameField = Field<String, ImplicitOptional>;
+type AgeField = Field<i32, ImplicitOptional>;
+type HobbiesField = Field<String, Repeated>;
+
+// Generated struct
+pub struct PersonImpl {
+    _shared: SharedFields<1>,
+    name: String,    // <NameField as FieldSet>::Storage
+    age: i32,        // <AgeField as FieldSet>::Storage
+    hobbies: Vec<String>, // <HobbiesField as FieldSet>::Storage
+}
+
+// Generated implementation
+impl PersonAppend for PersonImpl {
+    fn set_name(&mut self, v: &str) {
+        NameField::set(&mut self._shared, IDX_NAME, &mut self.name, v);
+    }
+    
+    fn set_age(&mut self, v: i32) {
+        AgeField::set(&mut self._shared, IDX_AGE, &mut self.age, v);
+    }
+}
+
+impl Person for PersonImpl {
+    fn name(&self) -> &str {
+        NameField::get(&self.name)  // Returns &str
+    }
+    
+    fn age(&self) -> i32 {
+        AgeField::get(&self.age)  // Returns i32
+    }
+}
+```
 
 ## Approach 2: Generic Functions with Type Markers
 
