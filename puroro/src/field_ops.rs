@@ -34,7 +34,7 @@ pub trait FieldLabel: private::Sealed {}
 ///
 /// These fields are always considered "present" with their default value.
 /// No presence tracking is needed.
-pub struct Optional;
+pub struct ImplicitOptional;
 
 /// Marker for optional fields with explicit presence (proto3 optional).
 ///
@@ -52,7 +52,7 @@ pub struct Repeated;
 /// These are syntactic sugar for repeated fields with key-value pairs.
 pub struct Map;
 
-impl FieldLabel for Optional {}
+impl FieldLabel for ImplicitOptional {}
 impl FieldLabel for ExplicitOptional {}
 impl FieldLabel for Repeated {}
 impl FieldLabel for Map {}
@@ -60,7 +60,7 @@ impl FieldLabel for Map {}
 // Sealed trait pattern
 mod private {
     pub trait Sealed {}
-    impl Sealed for super::Optional {}
+    impl Sealed for super::ImplicitOptional {}
     impl Sealed for super::ExplicitOptional {}
     impl Sealed for super::Repeated {}
     impl Sealed for super::Map {}
@@ -76,11 +76,11 @@ mod private {
 ///
 /// # Type Parameters
 /// - `T`: The value type (i32, String, etc.)
-/// - `L`: The field label (Optional, ExplicitOptional, Repeated, Map)
+/// - `L`: The field label (ImplicitOptional, ExplicitOptional, Repeated, Map)
 ///
 /// # Examples
 /// ```ignore
-/// type NameField = Field<String, Optional>;         // proto3 implicit presence
+/// type NameField = Field<String, ImplicitOptional>;  // proto3 implicit presence
 /// type EmailField = Field<String, ExplicitOptional>; // proto3 explicit presence
 /// type HobbiesField = Field<String, Repeated>;
 /// type ScoresField = Field<(String, i32), Map>;
@@ -175,12 +175,12 @@ pub trait FieldClear {
 }
 
 // ============================================================================
-// Implementations for Field<String, Optional> and Field<String, ExplicitOptional>
+// Implementations for Field<String, ImplicitOptional> and Field<String, ExplicitOptional>
 // ============================================================================
 
 // Note: We can't use `type Value = &str` directly because of lifetime issues.
 // Instead, we make the set() method generic over the value type.
-impl Field<String, Optional> {
+impl Field<String, ImplicitOptional> {
     /// Sets a string field value (proto3 implicit presence).
     #[inline]
     pub fn set<const BYTES: usize>(
@@ -190,7 +190,7 @@ impl Field<String, Optional> {
         value: &str, // Can accept any &str!
     ) {
         value.clone_into(storage);
-        // Note: Optional fields don't strictly need presence tracking in proto3
+        // Note: ImplicitOptional fields don't strictly need presence tracking in proto3
         // (they're always considered "present" with default value)
         // But we still track for consistency with explicit optional fields
         shared.has_bits_mut().set(bit_index, true);
@@ -233,7 +233,7 @@ impl Field<String, ExplicitOptional> {
     }
 }
 
-impl FieldGet for Field<String, Optional> {
+impl FieldGet for Field<String, ImplicitOptional> {
     type Storage = String;
     type Value<'a> = &'a str;
 
@@ -268,7 +268,7 @@ impl ScalarType for f64 {}
 impl ScalarType for bool {}
 // Add more as needed
 
-impl<T: ScalarType> FieldSet for Field<T, Optional> {
+impl<T: ScalarType> FieldSet for Field<T, ImplicitOptional> {
     type Storage = T;
     type Value = T;
 
@@ -280,7 +280,7 @@ impl<T: ScalarType> FieldSet for Field<T, Optional> {
         value: Self::Value,
     ) {
         *storage = value;
-        // Note: Optional fields don't need presence tracking in proto3
+        // Note: ImplicitOptional fields don't strictly need presence tracking in proto3
         // (they're always considered "present" with default value)
         // But we still track for consistency with explicit optional fields
         shared.has_bits_mut().set(bit_index, true);
@@ -303,7 +303,7 @@ impl<T: ScalarType> FieldSet for Field<T, ExplicitOptional> {
     }
 }
 
-impl<T: ScalarType> FieldGet for Field<T, Optional> {
+impl<T: ScalarType> FieldGet for Field<T, ImplicitOptional> {
     type Storage = T;
     type Value<'a>
         = T
@@ -329,7 +329,7 @@ impl<T: ScalarType> FieldGet for Field<T, ExplicitOptional> {
     }
 }
 
-impl<T: ScalarType> FieldClear for Field<T, Optional> {
+impl<T: ScalarType> FieldClear for Field<T, ImplicitOptional> {
     type Storage = T;
 
     #[inline]
@@ -451,8 +451,8 @@ impl FieldGet for Field<String, Repeated> {
 
 /*
 // Type aliases for clarity
-type NameField = Field<String, Optional>;         // proto3 implicit presence
-type AgeField = Field<i32, Optional>;             // proto3 implicit presence
+type NameField = Field<String, ImplicitOptional>;  // proto3 implicit presence
+type AgeField = Field<i32, ImplicitOptional>;     // proto3 implicit presence
 type EmailField = Field<String, ExplicitOptional>; // proto3 explicit presence
 type HobbiesField = Field<String, Repeated>;
 
@@ -482,8 +482,8 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_optional_i32() {
-        type AgeField = Field<i32, Optional>;
+    fn test_implicit_optional_i32() {
+        type AgeField = Field<i32, ImplicitOptional>;
 
         let mut shared = SharedFields::<1>::new();
         let mut storage: i32 = 0;
@@ -501,8 +501,8 @@ mod tests {
     }
 
     #[test]
-    fn test_optional_string() {
-        type NameField = Field<String, Optional>;
+    fn test_implicit_optional_string() {
+        type NameField = Field<String, ImplicitOptional>;
 
         let mut shared = SharedFields::<1>::new();
         let mut storage = String::new();
@@ -561,9 +561,9 @@ mod tests {
 
     #[test]
     fn test_multiple_scalar_types() {
-        type I64Field = Field<i64, Optional>;
-        type F32Field = Field<f32, Optional>;
-        type BoolField = Field<bool, Optional>;
+        type I64Field = Field<i64, ImplicitOptional>;
+        type F32Field = Field<f32, ImplicitOptional>;
+        type BoolField = Field<bool, ImplicitOptional>;
 
         let mut shared = SharedFields::<1>::new();
 

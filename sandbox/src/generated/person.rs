@@ -6,7 +6,7 @@
 
 use puroro::{
     error::Error,
-    field_ops::{Field, FieldClear, FieldGet, FieldSet, Optional},
+    field_ops::{Field, FieldClear, FieldGet, FieldSet, ImplicitOptional},
     shared::SharedFields,
     Message,
 };
@@ -96,13 +96,13 @@ pub trait PersonTryMut: PersonAppendTry {
 // ============================================================================
 
 /// Type descriptor for the 'name' field (proto3 implicit presence)
-type NameField = Field<String, Optional>;
+type NameField = Field<String, ImplicitOptional>;
 
 /// Type descriptor for the 'age' field (proto3 implicit presence)
-type AgeField = Field<i32, Optional>;
+type AgeField = Field<i32, ImplicitOptional>;
 
 /// Type descriptor for the 'email' field (proto3 implicit presence)
-type EmailField = Field<String, Optional>;
+type EmailField = Field<String, ImplicitOptional>;
 
 // Bit indices for each field
 const IDX_NAME: usize = 0;
