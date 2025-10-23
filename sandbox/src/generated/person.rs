@@ -138,10 +138,10 @@ impl PersonImpl {
     /// Creates a new Person with default values.
     pub fn new() -> Self {
         Self {
-            name: NameField::new(String::new()),
-            email: EmailField::new(String::new()),
+            name: Default::default(),
+            email: Default::default(),
             _shared: SharedFields::new(),
-            age: AgeField::new(0),
+            age: Default::default(),
         }
     }
 }

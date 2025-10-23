@@ -201,6 +201,34 @@ impl<T, L: FieldLabel, const FIELD_NUMBER: u32, const BIT_INDEX: usize>
     }
 }
 
+/// Default implementation for FieldType
+///
+/// This implementation allows FieldType to be used with Default::default(),
+/// making it easier to initialize PersonImpl and other message structures.
+///
+/// # Allocator Considerations
+///
+/// When allocators are introduced, this Default implementation may become
+/// problematic for types that require custom allocators (e.g., String with
+/// a specific allocator). In such cases, we may need to:
+/// - Use a different initialization pattern
+/// - Provide allocator-aware constructors
+/// - Use lazy initialization
+/// - Require explicit initialization in the message constructor
+///
+/// For now, this implementation works well with standard library types
+/// that have their own Default implementations.
+impl<T: Default, L: FieldLabel, const FIELD_NUMBER: u32, const BIT_INDEX: usize> Default
+    for FieldType<T, L, FIELD_NUMBER, BIT_INDEX>
+{
+    fn default() -> Self {
+        Self {
+            data: T::default(),
+            _phantom: PhantomData,
+        }
+    }
+}
+
 /// Comprehensive field descriptor containing all protobuf field information.
 ///
 /// This type encodes all field metadata including:
