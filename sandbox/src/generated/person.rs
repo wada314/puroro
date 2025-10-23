@@ -6,7 +6,7 @@
 
 use puroro::{
     error::Error,
-    field_ops::{ExplicitOptional, Field, FieldDescriptor, FieldType, ImplicitOptional},
+    field_ops::{ExplicitOptional, Field, FieldType, ImplicitOptional},
     shared::SharedFields,
     Message,
 };
@@ -96,13 +96,13 @@ pub trait PersonTryMut: PersonAppendTry {
 // ============================================================================
 
 /// Type descriptor for the 'name' field (implicit presence)
-type NameField = FieldDescriptor<String, ImplicitOptional, 1, 0>;
+type NameField = FieldType<String, ImplicitOptional, 1, 0>;
 
 /// Type descriptor for the 'age' field (implicit presence)
-type AgeField = FieldDescriptor<i32, ImplicitOptional, 2, 1>;
+type AgeField = FieldType<i32, ImplicitOptional, 2, 1>;
 
 /// Type descriptor for the 'email' field (explicit presence)
-type EmailField = FieldDescriptor<String, ExplicitOptional, 3, 2>;
+type EmailField = FieldType<String, ExplicitOptional, 3, 2>;
 
 // Bit indices for each field
 const IDX_NAME: usize = 0;
@@ -127,21 +127,21 @@ pub struct PersonImpl {
     // Exclusive fields ordered by size (descending)
     // String: 24 bytes (3 words on 64-bit)
     // Direct field types for cleaner API
-    name: <NameField as Field<String, ImplicitOptional, 1, 0>>::Storage,
-    email: <EmailField as Field<String, ExplicitOptional, 3, 2>>::Storage,
+    name: NameField,
+    email: EmailField,
 
     // Scalar fields: 4 bytes
-    age: <AgeField as Field<i32, ImplicitOptional, 2, 1>>::Storage,
+    age: AgeField,
 }
 
 impl PersonImpl {
     /// Creates a new Person with default values.
     pub fn new() -> Self {
         Self {
-            name: NameField::default_value(),
-            email: EmailField::default_value(),
+            name: NameField::new(String::new()),
+            email: EmailField::new(String::new()),
             _shared: SharedFields::new(),
-            age: AgeField::default_value(),
+            age: AgeField::new(0),
         }
     }
 }
@@ -155,17 +155,17 @@ impl Default for PersonImpl {
 impl Person for PersonImpl {
     #[inline]
     fn name(&self) -> &str {
-        FieldType::<String, ImplicitOptional>::get(&self._shared, IDX_NAME, &self.name)
+        NameField::get(&self._shared, IDX_NAME, &self.name.data)
     }
 
     #[inline]
     fn age(&self) -> i32 {
-        AgeField::get(&self._shared, &self.age)
+        AgeField::get(&self._shared, &self.age.data)
     }
 
     #[inline]
     fn email(&self) -> Option<&str> {
-        FieldType::<String, ExplicitOptional>::get(&self._shared, IDX_EMAIL, &self.email)
+        EmailField::get(&self._shared, IDX_EMAIL, &self.email.data)
     }
 
     #[inline]
@@ -190,39 +190,34 @@ impl Person for PersonImpl {
 impl PersonAppend for PersonImpl {
     #[inline]
     fn set_name(&mut self, v: &str) {
-        FieldType::<String, ImplicitOptional>::set(&mut self._shared, IDX_NAME, &mut self.name, v);
+        NameField::set(&mut self._shared, IDX_NAME, &mut self.name.data, v);
     }
 
     #[inline]
     fn set_age(&mut self, v: i32) {
-        AgeField::set(&mut self._shared, &mut self.age, v);
+        AgeField::set(&mut self._shared, &mut self.age.data, v);
     }
 
     #[inline]
     fn set_email(&mut self, v: &str) {
-        FieldType::<String, ExplicitOptional>::set(
-            &mut self._shared,
-            IDX_EMAIL,
-            &mut self.email,
-            v,
-        );
+        EmailField::set(&mut self._shared, IDX_EMAIL, &mut self.email.data, v);
     }
 }
 
 impl PersonMut for PersonImpl {
     #[inline]
     fn clear_name(&mut self) {
-        FieldType::<String, ImplicitOptional>::clear(&mut self._shared, IDX_NAME, &mut self.name);
+        NameField::clear(&mut self._shared, IDX_NAME, &mut self.name.data);
     }
 
     #[inline]
     fn clear_age(&mut self) {
-        AgeField::clear(&mut self._shared, &mut self.age);
+        AgeField::clear(&mut self._shared, &mut self.age.data);
     }
 
     #[inline]
     fn clear_email(&mut self) {
-        FieldType::<String, ExplicitOptional>::clear(&mut self._shared, IDX_EMAIL, &mut self.email);
+        EmailField::clear(&mut self._shared, IDX_EMAIL, &mut self.email.data);
     }
 }
 
@@ -231,25 +226,17 @@ impl PersonMut for PersonImpl {
 impl PersonTry for PersonImpl {
     #[inline]
     fn try_name(&self) -> Result<&str, Error> {
-        Ok(FieldType::<String, ImplicitOptional>::get(
-            &self._shared,
-            IDX_NAME,
-            &self.name,
-        ))
+        Ok(NameField::get(&self._shared, IDX_NAME, &self.name.data))
     }
 
     #[inline]
     fn try_age(&self) -> Result<i32, Error> {
-        Ok(AgeField::get(&self._shared, &self.age))
+        Ok(AgeField::get(&self._shared, &self.age.data))
     }
 
     #[inline]
     fn try_email(&self) -> Result<Option<&str>, Error> {
-        Ok(FieldType::<String, ExplicitOptional>::get(
-            &self._shared,
-            IDX_EMAIL,
-            &self.email,
-        ))
+        Ok(EmailField::get(&self._shared, IDX_EMAIL, &self.email.data))
     }
 
     #[inline]
