@@ -175,12 +175,12 @@ impl ScalarType for bool {}
 ///
 /// # Examples
 /// ```ignore
-/// type NameField = Field<String, ImplicitOptional>;  // implicit presence
-/// type EmailField = Field<String, ExplicitOptional>; // explicit presence
-/// type HobbiesField = Field<String, Repeated>;
-/// type ScoresField = Field<(String, i32), Map>;
+/// type NameField = FieldType<String, ImplicitOptional>;  // implicit presence
+/// type EmailField = FieldType<String, ExplicitOptional>; // explicit presence
+/// type HobbiesField = FieldType<String, Repeated>;
+/// type ScoresField = FieldType<(String, i32), Map>;
 /// ```
-pub struct Field<T, L: FieldLabel> {
+pub struct FieldType<T, L: FieldLabel> {
     _phantom: PhantomData<(T, L)>,
 }
 
@@ -209,10 +209,10 @@ pub struct FieldDescriptor<T, L: FieldLabel, const FIELD_NUMBER: u32, const BIT_
 }
 
 // ============================================================================
-// Field Operations Trait (Unified Approach)
+// Field Trait (Unified Approach)
 // ============================================================================
 
-/// Comprehensive field operations trait containing all protobuf field information.
+/// Comprehensive field trait containing all protobuf field information.
 ///
 /// This trait provides metadata and operations for field handling:
 /// - Field number (for serialization)
@@ -226,7 +226,7 @@ pub struct FieldDescriptor<T, L: FieldLabel, const FIELD_NUMBER: u32, const BIT_
 /// - `L`: The field label (ImplicitOptional, ExplicitOptional, Repeated, Map)
 /// - `const FIELD_NUMBER`: The protobuf field number
 /// - `const BIT_INDEX`: The bit index for presence tracking
-pub trait FieldOps<T, L: FieldLabel, const FIELD_NUMBER: u32, const BIT_INDEX: usize> {
+pub trait Field<T, L: FieldLabel, const FIELD_NUMBER: u32, const BIT_INDEX: usize> {
     /// The storage type for this field (how it's stored in the struct)
     type Storage;
 
@@ -296,7 +296,7 @@ pub trait FieldOps<T, L: FieldLabel, const FIELD_NUMBER: u32, const BIT_INDEX: u
 
 /// Specialized implementation for String fields with ImplicitOptional
 impl<const FIELD_NUMBER: u32, const BIT_INDEX: usize>
-    FieldOps<String, ImplicitOptional, FIELD_NUMBER, BIT_INDEX>
+    Field<String, ImplicitOptional, FIELD_NUMBER, BIT_INDEX>
     for FieldDescriptor<String, ImplicitOptional, FIELD_NUMBER, BIT_INDEX>
 {
     type Storage = String;
@@ -337,7 +337,7 @@ impl<const FIELD_NUMBER: u32, const BIT_INDEX: usize>
 
 /// Specialized implementation for String fields with ExplicitOptional
 impl<const FIELD_NUMBER: u32, const BIT_INDEX: usize>
-    FieldOps<String, ExplicitOptional, FIELD_NUMBER, BIT_INDEX>
+    Field<String, ExplicitOptional, FIELD_NUMBER, BIT_INDEX>
     for FieldDescriptor<String, ExplicitOptional, FIELD_NUMBER, BIT_INDEX>
 {
     type Storage = String;
@@ -382,7 +382,7 @@ impl<const FIELD_NUMBER: u32, const BIT_INDEX: usize>
 
 /// Specialized implementation for scalar types with ImplicitOptional
 impl<T: ScalarType, const FIELD_NUMBER: u32, const BIT_INDEX: usize>
-    FieldOps<T, ImplicitOptional, FIELD_NUMBER, BIT_INDEX>
+    Field<T, ImplicitOptional, FIELD_NUMBER, BIT_INDEX>
     for FieldDescriptor<T, ImplicitOptional, FIELD_NUMBER, BIT_INDEX>
 {
     type Storage = T;
@@ -426,7 +426,7 @@ impl<T: ScalarType, const FIELD_NUMBER: u32, const BIT_INDEX: usize>
 
 /// Specialized implementation for scalar types with ExplicitOptional
 impl<T: ScalarType, const FIELD_NUMBER: u32, const BIT_INDEX: usize>
-    FieldOps<T, ExplicitOptional, FIELD_NUMBER, BIT_INDEX>
+    Field<T, ExplicitOptional, FIELD_NUMBER, BIT_INDEX>
     for FieldDescriptor<T, ExplicitOptional, FIELD_NUMBER, BIT_INDEX>
 {
     type Storage = T;
@@ -477,7 +477,7 @@ impl<T: ScalarType, const FIELD_NUMBER: u32, const BIT_INDEX: usize>
 // ============================================================================
 
 /// Convenience methods for String fields with ImplicitOptional
-impl Field<String, ImplicitOptional> {
+impl FieldType<String, ImplicitOptional> {
     /// Sets a string field from a string slice
     #[inline]
     pub fn set<const BYTES: usize>(
@@ -513,7 +513,7 @@ impl Field<String, ImplicitOptional> {
 }
 
 /// Convenience methods for String fields with ExplicitOptional
-impl Field<String, ExplicitOptional> {
+impl FieldType<String, ExplicitOptional> {
     /// Sets a string field from a string slice
     #[inline]
     pub fn set<const BYTES: usize>(
@@ -587,7 +587,7 @@ mod tests {
     }
 
     #[test]
-    fn test_field_ops_methods() {
+    fn test_field_methods() {
         type NameField = FieldDescriptor<String, ImplicitOptional, 1, 0>;
         type EmailField = FieldDescriptor<String, ExplicitOptional, 3, 2>;
 
