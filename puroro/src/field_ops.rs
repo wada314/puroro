@@ -100,6 +100,70 @@ pub struct Field<T, L: FieldLabel> {
 }
 
 // ============================================================================
+// Comprehensive Field Descriptor (Unified Approach)
+// ============================================================================
+
+/// Comprehensive field descriptor containing all protobuf field information.
+///
+/// This trait provides metadata for field operations:
+/// - Field number (for serialization)
+/// - Bit index (for presence tracking)
+/// - Default value (for initialization)
+///
+/// # Type Parameters
+/// - `T`: The value type (i32, String, etc.)
+/// - `L`: The field label (ImplicitOptional, ExplicitOptional, Repeated, Map)
+/// - `const FIELD_NUMBER`: The protobuf field number
+/// - `const BIT_INDEX`: The bit index for presence tracking
+pub trait FieldDescriptor<T, L: FieldLabel, const FIELD_NUMBER: u32, const BIT_INDEX: usize> {
+    /// The storage type for this field (how it's stored in the struct)
+    type Storage;
+
+    /// The value type for this field (what users pass in)
+    type Value;
+
+    /// The return type for get operations (may borrow from storage)
+    type GetValue<'a>
+    where
+        Self: 'a;
+
+    /// The protobuf field number
+    const FIELD_NUMBER: u32 = FIELD_NUMBER;
+
+    /// The bit index for presence tracking in SharedFields
+    const BIT_INDEX: usize = BIT_INDEX;
+
+    /// Creates the default value for this field
+    fn default_value() -> Self::Storage;
+
+    /// Sets the field value
+    fn set<const BYTES: usize>(
+        shared: &mut SharedFields<BYTES>,
+        storage: &mut Self::Storage,
+        value: Self::Value,
+    );
+
+    /// Gets the field value
+    fn get<'a>(storage: &'a Self::Storage) -> Self::GetValue<'a>;
+
+    /// Clears the field value
+    fn clear<const BYTES: usize>(shared: &mut SharedFields<BYTES>, storage: &mut Self::Storage);
+
+    /// Checks if the field is present (for ExplicitOptional fields)
+    fn is_present<const BYTES: usize>(shared: &SharedFields<BYTES>) -> bool;
+
+    /// Gets the field number
+    fn field_number() -> u32 {
+        FIELD_NUMBER
+    }
+
+    /// Gets the bit index
+    fn bit_index() -> usize {
+        BIT_INDEX
+    }
+}
+
+// ============================================================================
 // Split Set/Get/Clear Traits (Solution to Lifetime Issues)
 // ============================================================================
 
@@ -151,6 +215,161 @@ pub trait FieldClear {
         bit_index: usize,
         storage: &mut Self::Storage,
     );
+}
+
+// ============================================================================
+// FieldDescriptor Implementations
+// ============================================================================
+
+/// Implementation for String fields with ImplicitOptional
+impl<const FIELD_NUMBER: u32, const BIT_INDEX: usize>
+    FieldDescriptor<String, ImplicitOptional, FIELD_NUMBER, BIT_INDEX>
+    for Field<String, ImplicitOptional>
+{
+    type Storage = String;
+    type Value = &'static str; // Can accept any &str
+    type GetValue<'a> = &'a str;
+
+    fn default_value() -> Self::Storage {
+        String::new()
+    }
+
+    fn set<const BYTES: usize>(
+        _shared: &mut SharedFields<BYTES>,
+        storage: &mut Self::Storage,
+        value: Self::Value,
+    ) {
+        value.clone_into(storage);
+        // ImplicitOptional fields don't need presence tracking
+    }
+
+    fn get<'a>(storage: &'a Self::Storage) -> Self::GetValue<'a> {
+        storage.as_str()
+    }
+
+    fn clear<const BYTES: usize>(_shared: &mut SharedFields<BYTES>, storage: &mut Self::Storage) {
+        storage.clear();
+        // ImplicitOptional fields don't need presence tracking
+    }
+
+    fn is_present<const BYTES: usize>(_shared: &SharedFields<BYTES>) -> bool {
+        true // ImplicitOptional fields are always present
+    }
+}
+
+/// Implementation for scalar types with ImplicitOptional
+impl<T: ScalarType, const FIELD_NUMBER: u32, const BIT_INDEX: usize>
+    FieldDescriptor<T, ImplicitOptional, FIELD_NUMBER, BIT_INDEX> for Field<T, ImplicitOptional>
+{
+    type Storage = T;
+    type Value = T;
+    type GetValue<'a>
+        = T
+    where
+        T: 'a;
+
+    fn default_value() -> Self::Storage {
+        T::default()
+    }
+
+    fn set<const BYTES: usize>(
+        _shared: &mut SharedFields<BYTES>,
+        storage: &mut Self::Storage,
+        value: Self::Value,
+    ) {
+        *storage = value;
+        // ImplicitOptional fields don't need presence tracking
+    }
+
+    fn get<'a>(storage: &'a Self::Storage) -> Self::GetValue<'a> {
+        *storage
+    }
+
+    fn clear<const BYTES: usize>(_shared: &mut SharedFields<BYTES>, storage: &mut Self::Storage) {
+        *storage = T::default();
+        // ImplicitOptional fields don't need presence tracking
+    }
+
+    fn is_present<const BYTES: usize>(_shared: &SharedFields<BYTES>) -> bool {
+        true // ImplicitOptional fields are always present
+    }
+}
+
+/// Implementation for scalar types with ExplicitOptional
+impl<T: ScalarType, const FIELD_NUMBER: u32, const BIT_INDEX: usize>
+    FieldDescriptor<T, ExplicitOptional, FIELD_NUMBER, BIT_INDEX> for Field<T, ExplicitOptional>
+{
+    type Storage = T;
+    type Value = T;
+    type GetValue<'a>
+        = T
+    where
+        T: 'a;
+
+    fn default_value() -> Self::Storage {
+        T::default()
+    }
+
+    fn set<const BYTES: usize>(
+        shared: &mut SharedFields<BYTES>,
+        storage: &mut Self::Storage,
+        value: Self::Value,
+    ) {
+        *storage = value;
+        shared.has_bits_mut().set(BIT_INDEX, true);
+    }
+
+    fn get<'a>(storage: &'a Self::Storage) -> Self::GetValue<'a> {
+        *storage
+    }
+
+    fn clear<const BYTES: usize>(shared: &mut SharedFields<BYTES>, storage: &mut Self::Storage) {
+        *storage = T::default();
+        shared.has_bits_mut().set(BIT_INDEX, false);
+    }
+
+    fn is_present<const BYTES: usize>(shared: &SharedFields<BYTES>) -> bool {
+        shared.has_bits()[BIT_INDEX]
+    }
+}
+
+/// Implementation for repeated scalar types
+impl<T: ScalarType, const FIELD_NUMBER: u32, const BIT_INDEX: usize>
+    FieldDescriptor<T, Repeated, FIELD_NUMBER, BIT_INDEX> for Field<T, Repeated>
+{
+    type Storage = Vec<T>;
+    type Value = T;
+    type GetValue<'a>
+        = &'a [T]
+    where
+        T: 'a;
+
+    fn default_value() -> Self::Storage {
+        Vec::new()
+    }
+
+    fn set<const BYTES: usize>(
+        _shared: &mut SharedFields<BYTES>,
+        storage: &mut Self::Storage,
+        value: Self::Value,
+    ) {
+        // For repeated fields, "set" means "add"
+        storage.push(value);
+        // Repeated fields don't need presence tracking
+    }
+
+    fn get<'a>(storage: &'a Self::Storage) -> Self::GetValue<'a> {
+        storage.as_slice()
+    }
+
+    fn clear<const BYTES: usize>(_shared: &mut SharedFields<BYTES>, storage: &mut Self::Storage) {
+        storage.clear();
+        // Repeated fields don't need presence tracking
+    }
+
+    fn is_present<const BYTES: usize>(_shared: &SharedFields<BYTES>) -> bool {
+        true // Repeated fields are always considered "present", even when empty
+    }
 }
 
 // ============================================================================
@@ -482,15 +701,15 @@ mod tests {
         let mut shared = SharedFields::<1>::new();
         let mut storage: i32 = 0;
 
-        AgeField::set(&mut shared, 0, &mut storage, 42);
+        <AgeField as FieldSet>::set(&mut shared, 0, &mut storage, 42);
 
         assert_eq!(storage, 42);
         // ImplicitOptional fields don't track presence in has_bits
         // (they're always considered "present")
 
-        assert_eq!(AgeField::get(&storage), 42);
+        assert_eq!(<AgeField as FieldGet>::get(&storage), 42);
 
-        AgeField::clear(&mut shared, 0, &mut storage);
+        <AgeField as FieldClear>::clear(&mut shared, 0, &mut storage);
         assert_eq!(storage, 0);
         // ImplicitOptional fields don't track presence in has_bits
     }
@@ -508,7 +727,7 @@ mod tests {
         // ImplicitOptional fields don't track presence in has_bits
         // (they're always considered "present")
 
-        assert_eq!(NameField::get(&storage), "Alice");
+        assert_eq!(<NameField as FieldGet>::get(&storage), "Alice");
 
         NameField::clear(&mut shared, 0, &mut storage);
         assert_eq!(storage, "");
@@ -522,17 +741,17 @@ mod tests {
         let mut shared = SharedFields::<1>::new();
         let mut storage = Vec::new();
 
-        ScoresField::set(&mut shared, 0, &mut storage, 10);
-        ScoresField::set(&mut shared, 0, &mut storage, 20);
-        ScoresField::set(&mut shared, 0, &mut storage, 30);
+        <ScoresField as FieldSet>::set(&mut shared, 0, &mut storage, 10);
+        <ScoresField as FieldSet>::set(&mut shared, 0, &mut storage, 20);
+        <ScoresField as FieldSet>::set(&mut shared, 0, &mut storage, 30);
 
         assert_eq!(storage, vec![10, 20, 30]);
         // Repeated fields don't track presence in has_bits
         // (they're always considered "present", even when empty)
 
-        assert_eq!(ScoresField::get(&storage), &[10, 20, 30]);
+        assert_eq!(<ScoresField as FieldGet>::get(&storage), &[10, 20, 30]);
 
-        ScoresField::clear(&mut shared, 0, &mut storage);
+        <ScoresField as FieldClear>::clear(&mut shared, 0, &mut storage);
         assert_eq!(storage.len(), 0);
         // Repeated fields don't track presence in has_bits
     }
@@ -553,7 +772,7 @@ mod tests {
         // Repeated fields don't track presence in has_bits
         // (they're always considered "present", even when empty)
 
-        let hobbies = HobbiesField::get(&storage);
+        let hobbies = <HobbiesField as FieldGet>::get(&storage);
         assert_eq!(hobbies.len(), 2);
     }
 
@@ -566,16 +785,16 @@ mod tests {
         let mut shared = SharedFields::<1>::new();
 
         let mut i64_val: i64 = 0;
-        I64Field::set(&mut shared, 0, &mut i64_val, 12345);
-        assert_eq!(I64Field::get(&i64_val), 12345);
+        <I64Field as FieldSet>::set(&mut shared, 0, &mut i64_val, 12345);
+        assert_eq!(<I64Field as FieldGet>::get(&i64_val), 12345);
 
         let mut f32_val: f32 = 0.0;
-        F32Field::set(&mut shared, 0, &mut f32_val, 3.14);
-        assert_eq!(F32Field::get(&f32_val), 3.14);
+        <F32Field as FieldSet>::set(&mut shared, 0, &mut f32_val, 3.14);
+        assert_eq!(<F32Field as FieldGet>::get(&f32_val), 3.14);
 
         let mut bool_val: bool = false;
-        BoolField::set(&mut shared, 0, &mut bool_val, true);
-        assert_eq!(BoolField::get(&bool_val), true);
+        <BoolField as FieldSet>::set(&mut shared, 0, &mut bool_val, true);
+        assert_eq!(<BoolField as FieldGet>::get(&bool_val), true);
     }
 
     #[test]
@@ -589,7 +808,7 @@ mod tests {
         assert_eq!(AgeField::get(&shared, 0, &storage), 0);
         assert!(!shared.has_bits()[0]);
 
-        AgeField::set(&mut shared, 0, &mut storage, 42);
+        <AgeField as FieldSet>::set(&mut shared, 0, &mut storage, 42);
 
         assert_eq!(storage, 42);
         assert!(shared.has_bits()[0]);
@@ -597,7 +816,7 @@ mod tests {
         // Now set - should return actual value
         assert_eq!(AgeField::get(&shared, 0, &storage), 42);
 
-        AgeField::clear(&mut shared, 0, &mut storage);
+        <AgeField as FieldClear>::clear(&mut shared, 0, &mut storage);
         assert_eq!(storage, 0);
         assert!(!shared.has_bits()[0]);
 
@@ -606,29 +825,139 @@ mod tests {
     }
 
     #[test]
-    fn test_explicit_optional_string() {
-        type NameField = Field<String, ExplicitOptional>;
+    fn test_field_descriptor_metadata() {
+        type NameField = Field<String, ImplicitOptional>;
+        type AgeField = Field<i32, ImplicitOptional>;
+        type ScoresField = Field<i32, Repeated>;
+
+        // Test field number and bit index constants
+        assert_eq!(
+            <NameField as FieldDescriptor<String, ImplicitOptional, 1, 0>>::FIELD_NUMBER,
+            1
+        );
+        assert_eq!(
+            <NameField as FieldDescriptor<String, ImplicitOptional, 1, 0>>::BIT_INDEX,
+            0
+        );
+
+        assert_eq!(
+            <AgeField as FieldDescriptor<i32, ImplicitOptional, 2, 1>>::FIELD_NUMBER,
+            2
+        );
+        assert_eq!(
+            <AgeField as FieldDescriptor<i32, ImplicitOptional, 2, 1>>::BIT_INDEX,
+            1
+        );
+
+        assert_eq!(
+            <ScoresField as FieldDescriptor<i32, Repeated, 3, 2>>::FIELD_NUMBER,
+            3
+        );
+        assert_eq!(
+            <ScoresField as FieldDescriptor<i32, Repeated, 3, 2>>::BIT_INDEX,
+            2
+        );
+
+        // Test field number and bit index methods
+        assert_eq!(
+            <NameField as FieldDescriptor<String, ImplicitOptional, 1, 0>>::field_number(),
+            1
+        );
+        assert_eq!(
+            <NameField as FieldDescriptor<String, ImplicitOptional, 1, 0>>::bit_index(),
+            0
+        );
+
+        assert_eq!(
+            <AgeField as FieldDescriptor<i32, ImplicitOptional, 2, 1>>::field_number(),
+            2
+        );
+        assert_eq!(
+            <AgeField as FieldDescriptor<i32, ImplicitOptional, 2, 1>>::bit_index(),
+            1
+        );
+
+        assert_eq!(
+            <ScoresField as FieldDescriptor<i32, Repeated, 3, 2>>::field_number(),
+            3
+        );
+        assert_eq!(
+            <ScoresField as FieldDescriptor<i32, Repeated, 3, 2>>::bit_index(),
+            2
+        );
+    }
+
+    #[test]
+    fn test_field_descriptor_default_values() {
+        type NameField = Field<String, ImplicitOptional>;
+        type AgeField = Field<i32, ImplicitOptional>;
+        type ScoresField = Field<i32, Repeated>;
+
+        // Test default values
+        assert_eq!(
+            <NameField as FieldDescriptor<String, ImplicitOptional, 1, 0>>::default_value(),
+            ""
+        );
+        assert_eq!(
+            <AgeField as FieldDescriptor<i32, ImplicitOptional, 2, 1>>::default_value(),
+            0
+        );
+        assert_eq!(
+            <ScoresField as FieldDescriptor<i32, Repeated, 3, 2>>::default_value(),
+            Vec::<i32>::new()
+        );
+    }
+
+    #[test]
+    fn test_field_descriptor_operations() {
+        type NameField = Field<String, ImplicitOptional>;
+        type AgeField = Field<i32, ImplicitOptional>;
 
         let mut shared = SharedFields::<1>::new();
-        let mut storage = String::new();
+        let mut name_storage =
+            <NameField as FieldDescriptor<String, ImplicitOptional, 1, 0>>::default_value();
+        let mut age_storage =
+            <AgeField as FieldDescriptor<i32, ImplicitOptional, 2, 1>>::default_value();
 
-        // Initially not set - should return empty string
-        assert_eq!(NameField::get(&shared, 0, &storage), "");
-        assert!(!shared.has_bits()[0]);
+        // Test set operations
+        <NameField as FieldDescriptor<String, ImplicitOptional, 1, 0>>::set(
+            &mut shared,
+            &mut name_storage,
+            "Alice",
+        );
+        <AgeField as FieldDescriptor<i32, ImplicitOptional, 2, 1>>::set(
+            &mut shared,
+            &mut age_storage,
+            30,
+        );
 
-        NameField::set(&mut shared, 0, &mut storage, "Bob");
+        // Test get operations
+        assert_eq!(
+            <NameField as FieldDescriptor<String, ImplicitOptional, 1, 0>>::get(&name_storage),
+            "Alice"
+        );
+        assert_eq!(
+            <AgeField as FieldDescriptor<i32, ImplicitOptional, 2, 1>>::get(&age_storage),
+            30
+        );
 
-        assert_eq!(storage, "Bob");
-        assert!(shared.has_bits()[0]);
+        // Test clear operations
+        <NameField as FieldDescriptor<String, ImplicitOptional, 1, 0>>::clear(
+            &mut shared,
+            &mut name_storage,
+        );
+        <AgeField as FieldDescriptor<i32, ImplicitOptional, 2, 1>>::clear(
+            &mut shared,
+            &mut age_storage,
+        );
 
-        // Now set - should return actual value
-        assert_eq!(NameField::get(&shared, 0, &storage), "Bob");
-
-        NameField::clear(&mut shared, 0, &mut storage);
-        assert_eq!(storage, "");
-        assert!(!shared.has_bits()[0]);
-
-        // After clear - should return empty string again
-        assert_eq!(NameField::get(&shared, 0, &storage), "");
+        assert_eq!(
+            <NameField as FieldDescriptor<String, ImplicitOptional, 1, 0>>::get(&name_storage),
+            ""
+        );
+        assert_eq!(
+            <AgeField as FieldDescriptor<i32, ImplicitOptional, 2, 1>>::get(&age_storage),
+            0
+        );
     }
 }

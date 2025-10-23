@@ -24,6 +24,12 @@ pub use protobuf_core;
 ///
 /// This module provides a unified interface for all field types,
 /// using generic type parameters to encode field attributes.
+///
+/// # Key Components
+///
+/// - `FieldDescriptor`: Comprehensive trait containing all field information
+/// - `Field`: Type-level descriptor for protobuf fields
+/// - `FieldSet`, `FieldGet`, `FieldClear`: Split traits for field operations
 pub mod field_ops;
 
 /// Shared fields for message implementations.
