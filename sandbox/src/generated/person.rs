@@ -111,7 +111,7 @@ pub trait PersonTryMut: PersonAppendTry {
 #[derive(Debug, Clone, PartialEq)]
 pub struct PersonImpl {
     // Shared fields: presence tracking, etc.
-    // For 4 fields: ⌈4/8⌉ = 1 byte (stack-allocated)
+    // For 2 explicit optional fields: ⌈2/8⌉ = 1 byte (stack-allocated)
     _shared: SharedFields<1>,
 
     // Exclusive fields ordered by size (descending)
@@ -119,11 +119,11 @@ pub struct PersonImpl {
     // Direct field types with explicit parameters for clarity
     // Format: FieldType<T, L, FIELD_NUMBER>
     name: FieldType<String, ImplicitOptional, 1>, // Field 1, implicit presence
-    email: FieldType<String, ExplicitOptional<2>, 3>, // Field 3, explicit presence, bit 2
+    email: FieldType<String, ExplicitOptional<0>, 3>, // Field 3, explicit presence, bit 0
 
     // Scalar fields: 4 bytes
     age: FieldType<i32, ImplicitOptional, 2>, // Field 2, implicit presence
-    score: FieldType<i32, ExplicitOptional<3>, 5>, // Field 5, explicit presence, bit 3
+    score: FieldType<i32, ExplicitOptional<1>, 5>, // Field 5, explicit presence, bit 1
 }
 
 impl PersonImpl {
@@ -181,15 +181,15 @@ impl Person for PersonImpl {
     #[inline]
     fn has_email(&self) -> bool {
         // ExplicitOptional fields check presence via SharedFields API
-        // Field number: 3, Bit index: 2
-        self._shared.is_field_present(2)
+        // Field number: 3, Bit index: 0
+        self._shared.is_field_present(0)
     }
 
     #[inline]
     fn has_score(&self) -> bool {
         // ExplicitOptional fields check presence via SharedFields API
-        // Field number: 5, Bit index: 3
-        self._shared.is_field_present(3)
+        // Field number: 5, Bit index: 1
+        self._shared.is_field_present(1)
     }
 }
 
