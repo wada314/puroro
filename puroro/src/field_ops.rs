@@ -244,13 +244,10 @@ pub struct FieldDescriptor<T, L: FieldLabel, const FIELD_NUMBER: u32, const BIT_
 /// - `const FIELD_NUMBER`: The protobuf field number
 /// - `const BIT_INDEX`: The bit index for presence tracking
 pub trait Field<T, L: FieldLabel, const FIELD_NUMBER: u32, const BIT_INDEX: usize> {
-    /// The storage type for this field (how it's stored in the struct)
-    type Storage;
-
     /// The value type for this field (what users pass in)
-    type Value;
+    type Value<'a>;
 
-    /// The return type for get operations (may borrow from storage)
+    /// The return type for get operations (may borrow from self)
     type GetValue<'a>
     where
         Self: 'a;
@@ -264,27 +261,18 @@ pub trait Field<T, L: FieldLabel, const FIELD_NUMBER: u32, const BIT_INDEX: usiz
     /// The bit index for presence tracking in SharedFields
     const BIT_INDEX: usize = BIT_INDEX;
 
-    /// Creates the default value for this field
-    fn default_value() -> Self::Storage;
-
     /// Sets the field value
-    fn set<const BYTES: usize>(
-        shared: &mut SharedFields<BYTES>,
-        storage: &mut Self::Storage,
-        value: Self::Value,
-    );
+    fn set<const BYTES: usize>(&mut self, shared: &mut SharedFields<BYTES>, value: Self::Value<'_>);
 
     /// Gets the field value
-    fn get<'a, const BYTES: usize>(
-        shared: &'a SharedFields<BYTES>,
-        storage: &'a Self::Storage,
-    ) -> Self::GetValue<'a>;
+    fn get<'a, const BYTES: usize>(&'a self, shared: &'a SharedFields<BYTES>)
+        -> Self::GetValue<'a>;
 
     /// Clears the field value
-    fn clear<const BYTES: usize>(shared: &mut SharedFields<BYTES>, storage: &mut Self::Storage);
+    fn clear<const BYTES: usize>(&mut self, shared: &mut SharedFields<BYTES>);
 
     /// Checks if the field is present (for ExplicitOptional fields)
-    fn is_present<const BYTES: usize>(shared: &SharedFields<BYTES>) -> bool;
+    fn is_present<const BYTES: usize>(&self, shared: &SharedFields<BYTES>) -> bool;
 
     /// Gets the field number
     fn field_number() -> u32 {
@@ -316,38 +304,33 @@ impl<const FIELD_NUMBER: u32, const BIT_INDEX: usize>
     Field<String, ImplicitOptional, FIELD_NUMBER, BIT_INDEX>
     for FieldType<String, ImplicitOptional, FIELD_NUMBER, BIT_INDEX>
 {
-    type Storage = String;
-    type Value = &'static str; // Can accept any &str
+    type Value<'a> = &'a str; // Accept any &str
     type GetValue<'a> = &'a str;
 
     const FIELD_TYPE: ProtobufFieldType = ProtobufFieldType::String;
 
-    fn default_value() -> Self::Storage {
-        String::new()
-    }
-
     fn set<const BYTES: usize>(
+        &mut self,
         _shared: &mut SharedFields<BYTES>,
-        storage: &mut Self::Storage,
-        value: Self::Value,
+        value: Self::Value<'_>,
     ) {
-        value.clone_into(storage);
+        value.clone_into(&mut self.data);
         // ImplicitOptional fields don't need presence tracking
     }
 
     fn get<'a, const BYTES: usize>(
+        &'a self,
         _shared: &'a SharedFields<BYTES>,
-        storage: &'a Self::Storage,
     ) -> Self::GetValue<'a> {
-        storage.as_str()
+        self.data.as_str()
     }
 
-    fn clear<const BYTES: usize>(_shared: &mut SharedFields<BYTES>, storage: &mut Self::Storage) {
-        storage.clear();
+    fn clear<const BYTES: usize>(&mut self, _shared: &mut SharedFields<BYTES>) {
+        self.data.clear();
         // ImplicitOptional fields don't need presence tracking
     }
 
-    fn is_present<const BYTES: usize>(_shared: &SharedFields<BYTES>) -> bool {
+    fn is_present<const BYTES: usize>(&self, _shared: &SharedFields<BYTES>) -> bool {
         true // ImplicitOptional fields are always present
     }
 }
@@ -357,42 +340,37 @@ impl<const FIELD_NUMBER: u32, const BIT_INDEX: usize>
     Field<String, ExplicitOptional, FIELD_NUMBER, BIT_INDEX>
     for FieldType<String, ExplicitOptional, FIELD_NUMBER, BIT_INDEX>
 {
-    type Storage = String;
-    type Value = String; // For FieldDescriptor compatibility
+    type Value<'a> = &'a str; // Accept any &str
     type GetValue<'a> = Option<&'a str>;
 
     const FIELD_TYPE: ProtobufFieldType = ProtobufFieldType::String;
 
-    fn default_value() -> Self::Storage {
-        String::new()
-    }
-
     fn set<const BYTES: usize>(
+        &mut self,
         shared: &mut SharedFields<BYTES>,
-        storage: &mut Self::Storage,
-        value: Self::Value,
+        value: Self::Value<'_>,
     ) {
-        *storage = value;
+        value.clone_into(&mut self.data);
         shared.has_bits_mut().set(BIT_INDEX, true);
     }
 
     fn get<'a, const BYTES: usize>(
+        &'a self,
         shared: &'a SharedFields<BYTES>,
-        storage: &'a Self::Storage,
     ) -> Self::GetValue<'a> {
         if shared.has_bits()[BIT_INDEX] {
-            Some(storage.as_str())
+            Some(self.data.as_str())
         } else {
             None
         }
     }
 
-    fn clear<const BYTES: usize>(shared: &mut SharedFields<BYTES>, storage: &mut Self::Storage) {
-        storage.clear();
+    fn clear<const BYTES: usize>(&mut self, shared: &mut SharedFields<BYTES>) {
+        self.data.clear();
         shared.has_bits_mut().set(BIT_INDEX, false);
     }
 
-    fn is_present<const BYTES: usize>(shared: &SharedFields<BYTES>) -> bool {
+    fn is_present<const BYTES: usize>(&self, shared: &SharedFields<BYTES>) -> bool {
         shared.has_bits()[BIT_INDEX]
     }
 }
@@ -402,8 +380,7 @@ impl<T: ScalarType, const FIELD_NUMBER: u32, const BIT_INDEX: usize>
     Field<T, ImplicitOptional, FIELD_NUMBER, BIT_INDEX>
     for FieldType<T, ImplicitOptional, FIELD_NUMBER, BIT_INDEX>
 {
-    type Storage = T;
-    type Value = T;
+    type Value<'a> = T;
     type GetValue<'a>
         = T
     where
@@ -411,32 +388,28 @@ impl<T: ScalarType, const FIELD_NUMBER: u32, const BIT_INDEX: usize>
 
     const FIELD_TYPE: ProtobufFieldType = ProtobufFieldType::Int32; // Default to Int32
 
-    fn default_value() -> Self::Storage {
-        T::default()
-    }
-
     fn set<const BYTES: usize>(
+        &mut self,
         _shared: &mut SharedFields<BYTES>,
-        storage: &mut Self::Storage,
-        value: Self::Value,
+        value: Self::Value<'_>,
     ) {
-        *storage = value;
+        self.data = value;
         // ImplicitOptional fields don't need presence tracking
     }
 
     fn get<'a, const BYTES: usize>(
+        &'a self,
         _shared: &'a SharedFields<BYTES>,
-        storage: &'a Self::Storage,
     ) -> Self::GetValue<'a> {
-        *storage
+        self.data
     }
 
-    fn clear<const BYTES: usize>(_shared: &mut SharedFields<BYTES>, storage: &mut Self::Storage) {
-        *storage = T::default();
+    fn clear<const BYTES: usize>(&mut self, _shared: &mut SharedFields<BYTES>) {
+        self.data = T::default();
         // ImplicitOptional fields don't need presence tracking
     }
 
-    fn is_present<const BYTES: usize>(_shared: &SharedFields<BYTES>) -> bool {
+    fn is_present<const BYTES: usize>(&self, _shared: &SharedFields<BYTES>) -> bool {
         true // ImplicitOptional fields are always present
     }
 }
@@ -446,8 +419,7 @@ impl<T: ScalarType, const FIELD_NUMBER: u32, const BIT_INDEX: usize>
     Field<T, ExplicitOptional, FIELD_NUMBER, BIT_INDEX>
     for FieldType<T, ExplicitOptional, FIELD_NUMBER, BIT_INDEX>
 {
-    type Storage = T;
-    type Value = T;
+    type Value<'a> = T;
     type GetValue<'a>
         = Option<T>
     where
@@ -455,121 +427,33 @@ impl<T: ScalarType, const FIELD_NUMBER: u32, const BIT_INDEX: usize>
 
     const FIELD_TYPE: ProtobufFieldType = ProtobufFieldType::Int32; // Default to Int32
 
-    fn default_value() -> Self::Storage {
-        T::default()
-    }
-
     fn set<const BYTES: usize>(
+        &mut self,
         shared: &mut SharedFields<BYTES>,
-        storage: &mut Self::Storage,
-        value: Self::Value,
+        value: Self::Value<'_>,
     ) {
-        *storage = value;
+        self.data = value;
         shared.has_bits_mut().set(BIT_INDEX, true);
     }
 
     fn get<'a, const BYTES: usize>(
+        &'a self,
         shared: &'a SharedFields<BYTES>,
-        storage: &'a Self::Storage,
     ) -> Self::GetValue<'a> {
         if shared.has_bits()[BIT_INDEX] {
-            Some(*storage)
+            Some(self.data)
         } else {
             None
         }
     }
 
-    fn clear<const BYTES: usize>(shared: &mut SharedFields<BYTES>, storage: &mut Self::Storage) {
-        *storage = T::default();
+    fn clear<const BYTES: usize>(&mut self, shared: &mut SharedFields<BYTES>) {
+        self.data = T::default();
         shared.has_bits_mut().set(BIT_INDEX, false);
     }
 
-    fn is_present<const BYTES: usize>(shared: &SharedFields<BYTES>) -> bool {
+    fn is_present<const BYTES: usize>(&self, shared: &SharedFields<BYTES>) -> bool {
         shared.has_bits()[BIT_INDEX]
-    }
-}
-
-// ============================================================================
-// Convenience Methods for String Fields
-// ============================================================================
-
-/// Convenience methods for String fields with ImplicitOptional
-impl<const FIELD_NUMBER: u32, const BIT_INDEX: usize>
-    FieldType<String, ImplicitOptional, FIELD_NUMBER, BIT_INDEX>
-{
-    /// Sets a string field from a string slice
-    #[inline]
-    pub fn set<const BYTES: usize>(
-        _shared: &mut SharedFields<BYTES>,
-        _bit_index: usize,
-        storage: &mut String,
-        value: &str,
-    ) {
-        value.clone_into(storage);
-        // ImplicitOptional fields don't need presence tracking
-    }
-
-    /// Clears a string field
-    #[inline]
-    pub fn clear<const BYTES: usize>(
-        _shared: &mut SharedFields<BYTES>,
-        _bit_index: usize,
-        storage: &mut String,
-    ) {
-        storage.clear();
-        // ImplicitOptional fields don't need presence tracking
-    }
-
-    /// Gets a string field value
-    #[inline]
-    pub fn get<'a, const BYTES: usize>(
-        _shared: &'a SharedFields<BYTES>,
-        _bit_index: usize,
-        storage: &'a String,
-    ) -> &'a str {
-        storage.as_str()
-    }
-}
-
-/// Convenience methods for String fields with ExplicitOptional
-impl<const FIELD_NUMBER: u32, const BIT_INDEX: usize>
-    FieldType<String, ExplicitOptional, FIELD_NUMBER, BIT_INDEX>
-{
-    /// Sets a string field from a string slice
-    #[inline]
-    pub fn set<const BYTES: usize>(
-        shared: &mut SharedFields<BYTES>,
-        bit_index: usize,
-        storage: &mut String,
-        value: &str,
-    ) {
-        value.clone_into(storage);
-        shared.has_bits_mut().set(bit_index, true);
-    }
-
-    /// Clears a string field
-    #[inline]
-    pub fn clear<const BYTES: usize>(
-        shared: &mut SharedFields<BYTES>,
-        bit_index: usize,
-        storage: &mut String,
-    ) {
-        storage.clear();
-        shared.has_bits_mut().set(bit_index, false);
-    }
-
-    /// Gets a string field value
-    #[inline]
-    pub fn get<'a, const BYTES: usize>(
-        shared: &'a SharedFields<BYTES>,
-        bit_index: usize,
-        storage: &'a String,
-    ) -> Option<&'a str> {
-        if shared.has_bits()[bit_index] {
-            Some(storage.as_str())
-        } else {
-            None
-        }
     }
 }
 

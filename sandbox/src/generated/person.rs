@@ -155,17 +155,17 @@ impl Default for PersonImpl {
 impl Person for PersonImpl {
     #[inline]
     fn name(&self) -> &str {
-        NameField::get(&self._shared, IDX_NAME, &self.name.data)
+        self.name.get(&self._shared)
     }
 
     #[inline]
     fn age(&self) -> i32 {
-        AgeField::get(&self._shared, &self.age.data)
+        self.age.get(&self._shared)
     }
 
     #[inline]
     fn email(&self) -> Option<&str> {
-        EmailField::get(&self._shared, IDX_EMAIL, &self.email.data)
+        self.email.get(&self._shared)
     }
 
     #[inline]
@@ -190,34 +190,34 @@ impl Person for PersonImpl {
 impl PersonAppend for PersonImpl {
     #[inline]
     fn set_name(&mut self, v: &str) {
-        NameField::set(&mut self._shared, IDX_NAME, &mut self.name.data, v);
+        self.name.set(&mut self._shared, v);
     }
 
     #[inline]
     fn set_age(&mut self, v: i32) {
-        AgeField::set(&mut self._shared, &mut self.age.data, v);
+        self.age.set(&mut self._shared, v);
     }
 
     #[inline]
     fn set_email(&mut self, v: &str) {
-        EmailField::set(&mut self._shared, IDX_EMAIL, &mut self.email.data, v);
+        self.email.set(&mut self._shared, v);
     }
 }
 
 impl PersonMut for PersonImpl {
     #[inline]
     fn clear_name(&mut self) {
-        NameField::clear(&mut self._shared, IDX_NAME, &mut self.name.data);
+        self.name.clear(&mut self._shared);
     }
 
     #[inline]
     fn clear_age(&mut self) {
-        AgeField::clear(&mut self._shared, &mut self.age.data);
+        self.age.clear(&mut self._shared);
     }
 
     #[inline]
     fn clear_email(&mut self) {
-        EmailField::clear(&mut self._shared, IDX_EMAIL, &mut self.email.data);
+        self.email.clear(&mut self._shared);
     }
 }
 
@@ -226,17 +226,17 @@ impl PersonMut for PersonImpl {
 impl PersonTry for PersonImpl {
     #[inline]
     fn try_name(&self) -> Result<&str, Error> {
-        Ok(NameField::get(&self._shared, IDX_NAME, &self.name.data))
+        Ok(self.name.get(&self._shared))
     }
 
     #[inline]
     fn try_age(&self) -> Result<i32, Error> {
-        Ok(AgeField::get(&self._shared, &self.age.data))
+        Ok(self.age.get(&self._shared))
     }
 
     #[inline]
     fn try_email(&self) -> Result<Option<&str>, Error> {
-        Ok(EmailField::get(&self._shared, IDX_EMAIL, &self.email.data))
+        Ok(self.email.get(&self._shared))
     }
 
     #[inline]
