@@ -173,7 +173,7 @@ impl ScalarType for bool {}
 /// - `T`: The value type (i32, String, etc.)
 /// - `L`: The field label (ImplicitOptional, ExplicitOptional, Repeated, Map)
 /// - `const FIELD_NUMBER`: The protobuf field number
-/// - `const BIT_INDEX`: The bit index for presence tracking
+/// - `const PRESENCE_BIT_INDEX`: The bit index for explicit presence tracking
 ///
 /// # Examples
 /// ```ignore
@@ -183,14 +183,14 @@ impl ScalarType for bool {}
 /// type ScoresField = FieldType<(String, i32), Map, 5, 4>;
 /// ```
 #[derive(Debug, Clone, PartialEq)]
-pub struct FieldType<T, L: FieldLabel, const FIELD_NUMBER: u32, const BIT_INDEX: usize> {
+pub struct FieldType<T, L: FieldLabel, const FIELD_NUMBER: u32, const PRESENCE_BIT_INDEX: usize> {
     /// The actual field data
     pub data: T,
     _phantom: PhantomData<L>,
 }
 
-impl<T, L: FieldLabel, const FIELD_NUMBER: u32, const BIT_INDEX: usize>
-    FieldType<T, L, FIELD_NUMBER, BIT_INDEX>
+impl<T, L: FieldLabel, const FIELD_NUMBER: u32, const PRESENCE_BIT_INDEX: usize>
+    FieldType<T, L, FIELD_NUMBER, PRESENCE_BIT_INDEX>
 {
     /// Creates a new FieldType with the given data
     pub fn new(data: T) -> Self {
@@ -218,8 +218,8 @@ impl<T, L: FieldLabel, const FIELD_NUMBER: u32, const BIT_INDEX: usize>
 ///
 /// For now, this implementation works well with standard library types
 /// that have their own Default implementations.
-impl<T: Default, L: FieldLabel, const FIELD_NUMBER: u32, const BIT_INDEX: usize> Default
-    for FieldType<T, L, FIELD_NUMBER, BIT_INDEX>
+impl<T: Default, L: FieldLabel, const FIELD_NUMBER: u32, const PRESENCE_BIT_INDEX: usize> Default
+    for FieldType<T, L, FIELD_NUMBER, PRESENCE_BIT_INDEX>
 {
     fn default() -> Self {
         Self {
@@ -261,17 +261,16 @@ pub struct FieldDescriptor<T, L: FieldLabel, const FIELD_NUMBER: u32, const BIT_
 ///
 /// This trait provides metadata and operations for field handling:
 /// - Field number (for serialization)
-/// - Bit index (for presence tracking)
+/// - Presence bit index (for explicit presence tracking)
 /// - Protobuf field type (for wire format)
-/// - Default value (for initialization)
 /// - Get/Set/Clear operations
 ///
 /// # Type Parameters
 /// - `T`: The value type (i32, String, etc.)
 /// - `L`: The field label (ImplicitOptional, ExplicitOptional, Repeated, Map)
 /// - `const FIELD_NUMBER`: The protobuf field number
-/// - `const BIT_INDEX`: The bit index for presence tracking
-pub trait Field<T, L: FieldLabel, const FIELD_NUMBER: u32, const BIT_INDEX: usize> {
+/// - `const PRESENCE_BIT_INDEX`: The bit index for explicit presence tracking
+pub trait Field<T, L: FieldLabel, const FIELD_NUMBER: u32, const PRESENCE_BIT_INDEX: usize> {
     /// The value type for this field (what users pass in)
     type Value<'a>;
 
@@ -286,8 +285,8 @@ pub trait Field<T, L: FieldLabel, const FIELD_NUMBER: u32, const BIT_INDEX: usiz
     /// The protobuf field number
     const FIELD_NUMBER: u32 = FIELD_NUMBER;
 
-    /// The bit index for presence tracking in SharedFields
-    const BIT_INDEX: usize = BIT_INDEX;
+    /// The bit index for explicit presence tracking in SharedFields
+    const PRESENCE_BIT_INDEX: usize = PRESENCE_BIT_INDEX;
 
     /// Sets the field value
     fn set<const BYTES: usize>(&mut self, shared: &mut SharedFields<BYTES>, value: Self::Value<'_>);
@@ -307,19 +306,14 @@ pub trait Field<T, L: FieldLabel, const FIELD_NUMBER: u32, const BIT_INDEX: usiz
         FIELD_NUMBER
     }
 
-    /// Gets the bit index
-    fn bit_index() -> usize {
-        BIT_INDEX
+    /// Gets the presence bit index
+    fn presence_bit_index() -> usize {
+        PRESENCE_BIT_INDEX
     }
 
     /// Gets the protobuf field type
     fn field_type() -> ProtobufFieldType {
         Self::FIELD_TYPE
-    }
-
-    /// Gets the wire type for this field
-    fn wire_type() -> u8 {
-        Self::FIELD_TYPE.wire_type()
     }
 }
 
@@ -328,9 +322,9 @@ pub trait Field<T, L: FieldLabel, const FIELD_NUMBER: u32, const BIT_INDEX: usiz
 // ============================================================================
 
 /// Implementation for String fields with ImplicitOptional
-impl<const FIELD_NUMBER: u32, const BIT_INDEX: usize>
-    Field<String, ImplicitOptional, FIELD_NUMBER, BIT_INDEX>
-    for FieldType<String, ImplicitOptional, FIELD_NUMBER, BIT_INDEX>
+impl<const FIELD_NUMBER: u32, const PRESENCE_BIT_INDEX: usize>
+    Field<String, ImplicitOptional, FIELD_NUMBER, PRESENCE_BIT_INDEX>
+    for FieldType<String, ImplicitOptional, FIELD_NUMBER, PRESENCE_BIT_INDEX>
 {
     type Value<'a> = &'a str; // Accept any &str
     type GetValue<'a> = &'a str;
@@ -364,9 +358,9 @@ impl<const FIELD_NUMBER: u32, const BIT_INDEX: usize>
 }
 
 /// Implementation for String fields with ExplicitOptional
-impl<const FIELD_NUMBER: u32, const BIT_INDEX: usize>
-    Field<String, ExplicitOptional, FIELD_NUMBER, BIT_INDEX>
-    for FieldType<String, ExplicitOptional, FIELD_NUMBER, BIT_INDEX>
+impl<const FIELD_NUMBER: u32, const PRESENCE_BIT_INDEX: usize>
+    Field<String, ExplicitOptional, FIELD_NUMBER, PRESENCE_BIT_INDEX>
+    for FieldType<String, ExplicitOptional, FIELD_NUMBER, PRESENCE_BIT_INDEX>
 {
     type Value<'a> = &'a str; // Accept any &str
     type GetValue<'a> = Option<&'a str>;
@@ -379,14 +373,14 @@ impl<const FIELD_NUMBER: u32, const BIT_INDEX: usize>
         value: Self::Value<'_>,
     ) {
         value.clone_into(&mut self.data);
-        shared.has_bits_mut().set(BIT_INDEX, true);
+        shared.has_bits_mut().set(PRESENCE_BIT_INDEX, true);
     }
 
     fn get<'a, const BYTES: usize>(
         &'a self,
         shared: &'a SharedFields<BYTES>,
     ) -> Self::GetValue<'a> {
-        if shared.is_field_present(BIT_INDEX) {
+        if shared.is_field_present(PRESENCE_BIT_INDEX) {
             Some(self.data.as_str())
         } else {
             None
@@ -395,18 +389,18 @@ impl<const FIELD_NUMBER: u32, const BIT_INDEX: usize>
 
     fn clear<const BYTES: usize>(&mut self, shared: &mut SharedFields<BYTES>) {
         self.data.clear();
-        shared.has_bits_mut().set(BIT_INDEX, false);
+        shared.has_bits_mut().set(PRESENCE_BIT_INDEX, false);
     }
 
     fn is_present<const BYTES: usize>(&self, shared: &SharedFields<BYTES>) -> bool {
-        shared.is_field_present(BIT_INDEX)
+        shared.is_field_present(PRESENCE_BIT_INDEX)
     }
 }
 
 /// Implementation for scalar types with ImplicitOptional
-impl<T: ScalarType, const FIELD_NUMBER: u32, const BIT_INDEX: usize>
-    Field<T, ImplicitOptional, FIELD_NUMBER, BIT_INDEX>
-    for FieldType<T, ImplicitOptional, FIELD_NUMBER, BIT_INDEX>
+impl<T: ScalarType, const FIELD_NUMBER: u32, const PRESENCE_BIT_INDEX: usize>
+    Field<T, ImplicitOptional, FIELD_NUMBER, PRESENCE_BIT_INDEX>
+    for FieldType<T, ImplicitOptional, FIELD_NUMBER, PRESENCE_BIT_INDEX>
 {
     type Value<'a> = T;
     type GetValue<'a>
@@ -443,9 +437,9 @@ impl<T: ScalarType, const FIELD_NUMBER: u32, const BIT_INDEX: usize>
 }
 
 /// Implementation for scalar types with ExplicitOptional
-impl<T: ScalarType, const FIELD_NUMBER: u32, const BIT_INDEX: usize>
-    Field<T, ExplicitOptional, FIELD_NUMBER, BIT_INDEX>
-    for FieldType<T, ExplicitOptional, FIELD_NUMBER, BIT_INDEX>
+impl<T: ScalarType, const FIELD_NUMBER: u32, const PRESENCE_BIT_INDEX: usize>
+    Field<T, ExplicitOptional, FIELD_NUMBER, PRESENCE_BIT_INDEX>
+    for FieldType<T, ExplicitOptional, FIELD_NUMBER, PRESENCE_BIT_INDEX>
 {
     type Value<'a> = T;
     type GetValue<'a>
@@ -461,14 +455,14 @@ impl<T: ScalarType, const FIELD_NUMBER: u32, const BIT_INDEX: usize>
         value: Self::Value<'_>,
     ) {
         self.data = value;
-        shared.has_bits_mut().set(BIT_INDEX, true);
+        shared.has_bits_mut().set(PRESENCE_BIT_INDEX, true);
     }
 
     fn get<'a, const BYTES: usize>(
         &'a self,
         shared: &'a SharedFields<BYTES>,
     ) -> Self::GetValue<'a> {
-        if shared.is_field_present(BIT_INDEX) {
+        if shared.is_field_present(PRESENCE_BIT_INDEX) {
             Some(self.data)
         } else {
             None
@@ -477,11 +471,11 @@ impl<T: ScalarType, const FIELD_NUMBER: u32, const BIT_INDEX: usize>
 
     fn clear<const BYTES: usize>(&mut self, shared: &mut SharedFields<BYTES>) {
         self.data = T::default();
-        shared.has_bits_mut().set(BIT_INDEX, false);
+        shared.has_bits_mut().set(PRESENCE_BIT_INDEX, false);
     }
 
     fn is_present<const BYTES: usize>(&self, shared: &SharedFields<BYTES>) -> bool {
-        shared.is_field_present(BIT_INDEX)
+        shared.is_field_present(PRESENCE_BIT_INDEX)
     }
 }
 

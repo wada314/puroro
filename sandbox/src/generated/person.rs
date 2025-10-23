@@ -111,18 +111,19 @@ pub trait PersonTryMut: PersonAppendTry {
 #[derive(Debug, Clone, PartialEq)]
 pub struct PersonImpl {
     // Shared fields: presence tracking, etc.
-    // For 3 fields: ⌈3/8⌉ = 1 byte (stack-allocated)
+    // For 4 fields: ⌈4/8⌉ = 1 byte (stack-allocated)
     _shared: SharedFields<1>,
 
     // Exclusive fields ordered by size (descending)
     // String: 24 bytes (3 words on 64-bit)
     // Direct field types with explicit parameters for clarity
-    name: FieldType<String, ImplicitOptional, 1, 0>,
-    email: FieldType<String, ExplicitOptional, 3, 2>,
+    // Format: FieldType<T, L, FIELD_NUMBER, PRESENCE_BIT_INDEX>
+    name: FieldType<String, ImplicitOptional, 1, 0>, // Field 1, presence bit 0
+    email: FieldType<String, ExplicitOptional, 3, 2>, // Field 3, presence bit 2
 
     // Scalar fields: 4 bytes
-    age: FieldType<i32, ImplicitOptional, 2, 1>,
-    score: FieldType<i32, ExplicitOptional, 5, 3>,
+    age: FieldType<i32, ImplicitOptional, 2, 1>, // Field 2, presence bit 1
+    score: FieldType<i32, ExplicitOptional, 5, 3>, // Field 5, presence bit 3
 }
 
 impl PersonImpl {
