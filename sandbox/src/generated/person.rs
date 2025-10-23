@@ -182,8 +182,8 @@ impl Person for PersonImpl {
 
     #[inline]
     fn has_email(&self) -> bool {
-        // ExplicitOptional fields check presence via has_bits
-        self._shared.has_bits()[IDX_EMAIL]
+        // ExplicitOptional fields check presence via SharedFields API
+        self._shared.is_field_present(IDX_EMAIL)
     }
 }
 

@@ -386,7 +386,7 @@ impl<const FIELD_NUMBER: u32, const BIT_INDEX: usize>
         &'a self,
         shared: &'a SharedFields<BYTES>,
     ) -> Self::GetValue<'a> {
-        if shared.has_bits()[BIT_INDEX] {
+        if shared.is_field_present(BIT_INDEX) {
             Some(self.data.as_str())
         } else {
             None
@@ -399,7 +399,7 @@ impl<const FIELD_NUMBER: u32, const BIT_INDEX: usize>
     }
 
     fn is_present<const BYTES: usize>(&self, shared: &SharedFields<BYTES>) -> bool {
-        shared.has_bits()[BIT_INDEX]
+        shared.is_field_present(BIT_INDEX)
     }
 }
 
@@ -468,7 +468,7 @@ impl<T: ScalarType, const FIELD_NUMBER: u32, const BIT_INDEX: usize>
         &'a self,
         shared: &'a SharedFields<BYTES>,
     ) -> Self::GetValue<'a> {
-        if shared.has_bits()[BIT_INDEX] {
+        if shared.is_field_present(BIT_INDEX) {
             Some(self.data)
         } else {
             None
@@ -481,7 +481,7 @@ impl<T: ScalarType, const FIELD_NUMBER: u32, const BIT_INDEX: usize>
     }
 
     fn is_present<const BYTES: usize>(&self, shared: &SharedFields<BYTES>) -> bool {
-        shared.has_bits()[BIT_INDEX]
+        shared.is_field_present(BIT_INDEX)
     }
 }
 

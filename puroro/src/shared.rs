@@ -49,15 +49,27 @@ impl<const BYTES: usize> SharedFields<BYTES> {
     }
 
     /// Gets a mutable reference to the presence tracking bits.
+    ///
+    /// This method is internal to the puroro crate and should not be used
+    /// by generated code. Use the Field trait methods instead.
     #[inline]
-    pub fn has_bits_mut(&mut self) -> &mut BitSlice<u8, Lsb0> {
+    pub(crate) fn has_bits_mut(&mut self) -> &mut BitSlice<u8, Lsb0> {
         self.has_bits.as_mut_bitslice()
     }
 
     /// Gets a reference to the presence tracking bits.
+    ///
+    /// This method is internal to the puroro crate and should not be used
+    /// by generated code. Use `is_field_present()` instead.
     #[inline]
-    pub fn has_bits(&self) -> &BitSlice<u8, Lsb0> {
+    pub(crate) fn has_bits(&self) -> &BitSlice<u8, Lsb0> {
         self.has_bits.as_bitslice()
+    }
+
+    /// Checks if a specific field is present (for explicit optional fields).
+    #[inline]
+    pub fn is_field_present(&self, bit_index: usize) -> bool {
+        self.has_bits()[bit_index]
     }
 }
 
