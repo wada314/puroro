@@ -92,24 +92,6 @@ pub trait PersonTryMut: PersonAppendTry {
 }
 
 // ============================================================================
-// Field Type Aliases
-// ============================================================================
-
-/// Type descriptor for the 'name' field (implicit presence)
-type NameField = FieldType<String, ImplicitOptional, 1, 0>;
-
-/// Type descriptor for the 'age' field (implicit presence)
-type AgeField = FieldType<i32, ImplicitOptional, 2, 1>;
-
-/// Type descriptor for the 'email' field (explicit presence)
-type EmailField = FieldType<String, ExplicitOptional, 3, 2>;
-
-// Bit indices for each field
-const IDX_NAME: usize = 0;
-const IDX_AGE: usize = 1;
-const IDX_EMAIL: usize = 2;
-
-// ============================================================================
 // PersonImpl Structure
 // ============================================================================
 
@@ -126,12 +108,12 @@ pub struct PersonImpl {
 
     // Exclusive fields ordered by size (descending)
     // String: 24 bytes (3 words on 64-bit)
-    // Direct field types for cleaner API
-    name: NameField,
-    email: EmailField,
+    // Direct field types with explicit parameters for clarity
+    name: FieldType<String, ImplicitOptional, 1, 0>,
+    email: FieldType<String, ExplicitOptional, 3, 2>,
 
     // Scalar fields: 4 bytes
-    age: AgeField,
+    age: FieldType<i32, ImplicitOptional, 2, 1>,
 }
 
 impl PersonImpl {
@@ -183,7 +165,8 @@ impl Person for PersonImpl {
     #[inline]
     fn has_email(&self) -> bool {
         // ExplicitOptional fields check presence via SharedFields API
-        self._shared.is_field_present(IDX_EMAIL)
+        // Field number: 3, Bit index: 2
+        self._shared.is_field_present(2)
     }
 }
 
