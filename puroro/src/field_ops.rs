@@ -6,16 +6,17 @@
 //!
 //! # Protobuf Field Labels
 //!
-//! Protobuf defines three field labels:
-//! - **Optional**: Field may or may not be present (proto3 implicit presence)
-//! - **Explicit Optional**: Field may or may not be present (proto3 explicit presence)
+//! Protobuf defines field labels that vary by version:
+//! - **ImplicitOptional**: Field with implicit presence (always "present" with default value)
+//! - **ExplicitOptional**: Field with explicit presence tracking (may be absent or present)
 //! - **Repeated**: Field may appear zero or more times
 //! - **Map**: Key-value pairs (syntactic sugar for repeated fields)
 //!
-//! # Presence Semantics
+//! # Presence Semantics by Protobuf Version
 //!
-//! - **Implicit Presence (proto3 default)**: Field is always considered "present" with default value
-//! - **Explicit Presence (proto3 optional)**: Field has explicit presence tracking
+//! - **Proto2**: All fields use explicit presence (`optional` keyword required)
+//! - **Proto3**: Default fields use implicit presence, `optional` fields use explicit presence
+//! - **Editions**: Presence semantics configurable via edition settings
 
 use crate::shared::SharedFields;
 use std::marker::PhantomData;
@@ -30,16 +31,25 @@ use std::marker::PhantomData;
 /// Represents the protobuf field label (optional, repeated, map).
 pub trait FieldLabel: private::Sealed {}
 
-/// Marker for optional fields with implicit presence (proto3 default).
+/// Marker for optional fields with implicit presence.
 ///
 /// These fields are always considered "present" with their default value.
 /// No presence tracking is needed.
+///
+/// Used for:
+/// - Proto3 default fields (e.g., `string name = 1;`)
+/// - Proto2 fields (e.g., `optional string name = 1;`)
+/// - Editions with implicit presence semantics
 pub struct ImplicitOptional;
 
-/// Marker for optional fields with explicit presence (proto3 optional).
+/// Marker for optional fields with explicit presence.
 ///
 /// These fields have explicit presence tracking via has_bits.
 /// The field may be absent (not set) or present (set to a value).
+///
+/// Used for:
+/// - Proto3 explicit optional fields (e.g., `optional string name = 1;`)
+/// - Editions with explicit presence semantics
 pub struct ExplicitOptional;
 
 /// Marker for repeated fields.
@@ -80,8 +90,8 @@ mod private {
 ///
 /// # Examples
 /// ```ignore
-/// type NameField = Field<String, ImplicitOptional>;  // proto3 implicit presence
-/// type EmailField = Field<String, ExplicitOptional>; // proto3 explicit presence
+/// type NameField = Field<String, ImplicitOptional>;  // implicit presence
+/// type EmailField = Field<String, ExplicitOptional>; // explicit presence
 /// type HobbiesField = Field<String, Repeated>;
 /// type ScoresField = Field<(String, i32), Map>;
 /// ```
@@ -181,7 +191,7 @@ pub trait FieldClear {
 // Note: We can't use `type Value = &str` directly because of lifetime issues.
 // Instead, we make the set() method generic over the value type.
 impl Field<String, ImplicitOptional> {
-    /// Sets a string field value (proto3 implicit presence).
+    /// Sets a string field value (implicit presence).
     #[inline]
     pub fn set<const BYTES: usize>(
         shared: &mut SharedFields<BYTES>,
@@ -190,13 +200,11 @@ impl Field<String, ImplicitOptional> {
         value: &str, // Can accept any &str!
     ) {
         value.clone_into(storage);
-        // Note: ImplicitOptional fields don't strictly need presence tracking in proto3
+        // Note: ImplicitOptional fields don't need presence tracking
         // (they're always considered "present" with default value)
-        // But we still track for consistency with explicit optional fields
-        shared.has_bits_mut().set(bit_index, true);
     }
 
-    /// Clears a string field (proto3 implicit presence).
+    /// Clears a string field (implicit presence).
     #[inline]
     pub fn clear<const BYTES: usize>(
         shared: &mut SharedFields<BYTES>,
@@ -204,12 +212,13 @@ impl Field<String, ImplicitOptional> {
         storage: &mut String,
     ) {
         storage.clear();
-        shared.has_bits_mut().set(bit_index, false);
+        // Note: ImplicitOptional fields don't need presence tracking
+        // (they're always considered "present" with default value)
     }
 }
 
 impl Field<String, ExplicitOptional> {
-    /// Sets a string field value (proto3 explicit presence).
+    /// Sets a string field value (explicit presence).
     #[inline]
     pub fn set<const BYTES: usize>(
         shared: &mut SharedFields<BYTES>,
@@ -221,7 +230,7 @@ impl Field<String, ExplicitOptional> {
         shared.has_bits_mut().set(bit_index, true);
     }
 
-    /// Clears a string field (proto3 explicit presence).
+    /// Clears a string field (explicit presence).
     #[inline]
     pub fn clear<const BYTES: usize>(
         shared: &mut SharedFields<BYTES>,
@@ -280,10 +289,8 @@ impl<T: ScalarType> FieldSet for Field<T, ImplicitOptional> {
         value: Self::Value,
     ) {
         *storage = value;
-        // Note: ImplicitOptional fields don't strictly need presence tracking in proto3
+        // Note: ImplicitOptional fields don't need presence tracking
         // (they're always considered "present" with default value)
-        // But we still track for consistency with explicit optional fields
-        shared.has_bits_mut().set(bit_index, true);
     }
 }
 
@@ -339,7 +346,8 @@ impl<T: ScalarType> FieldClear for Field<T, ImplicitOptional> {
         storage: &mut Self::Storage,
     ) {
         *storage = T::default();
-        shared.has_bits_mut().set(bit_index, false);
+        // Note: ImplicitOptional fields don't need presence tracking
+        // (they're always considered "present" with default value)
     }
 }
 
@@ -375,7 +383,8 @@ impl<T: ScalarType> FieldSet for Field<T, Repeated> {
     ) {
         // For repeated fields, "set" means "add"
         storage.push(value);
-        shared.has_bits_mut().set(bit_index, true);
+        // Note: Repeated fields don't need presence tracking
+        // (they're always considered "present", even when empty)
     }
 }
 
@@ -402,7 +411,8 @@ impl<T: ScalarType> FieldClear for Field<T, Repeated> {
         storage: &mut Self::Storage,
     ) {
         storage.clear();
-        shared.has_bits_mut().set(bit_index, false);
+        // Note: Repeated fields don't need presence tracking
+        // (they're always considered "present", even when empty)
     }
 }
 
@@ -417,7 +427,8 @@ impl Field<String, Repeated> {
         value: &str, // Can accept any &str
     ) {
         storage.push(value.to_string());
-        shared.has_bits_mut().set(bit_index, true);
+        // Note: Repeated fields don't need presence tracking
+        // (they're always considered "present", even when empty)
     }
 
     /// Clears a repeated string field.
@@ -428,7 +439,8 @@ impl Field<String, Repeated> {
         storage: &mut Vec<String>,
     ) {
         storage.clear();
-        shared.has_bits_mut().set(bit_index, false);
+        // Note: Repeated fields don't need presence tracking
+        // (they're always considered "present", even when empty)
     }
 }
 
@@ -451,9 +463,9 @@ impl FieldGet for Field<String, Repeated> {
 
 /*
 // Type aliases for clarity
-type NameField = Field<String, ImplicitOptional>;  // proto3 implicit presence
-type AgeField = Field<i32, ImplicitOptional>;     // proto3 implicit presence
-type EmailField = Field<String, ExplicitOptional>; // proto3 explicit presence
+type NameField = Field<String, ImplicitOptional>;  // implicit presence
+type AgeField = Field<i32, ImplicitOptional>;     // implicit presence
+type EmailField = Field<String, ExplicitOptional>; // explicit presence
 type HobbiesField = Field<String, Repeated>;
 
 impl PersonAppend for PersonImpl {
@@ -491,13 +503,14 @@ mod tests {
         AgeField::set(&mut shared, 0, &mut storage, 42);
 
         assert_eq!(storage, 42);
-        assert!(shared.has_bits()[0]);
+        // ImplicitOptional fields don't track presence in has_bits
+        // (they're always considered "present")
 
         assert_eq!(AgeField::get(&storage), 42);
 
         AgeField::clear(&mut shared, 0, &mut storage);
         assert_eq!(storage, 0);
-        assert!(!shared.has_bits()[0]);
+        // ImplicitOptional fields don't track presence in has_bits
     }
 
     #[test]
@@ -510,13 +523,14 @@ mod tests {
         NameField::set(&mut shared, 0, &mut storage, "Alice");
 
         assert_eq!(storage, "Alice");
-        assert!(shared.has_bits()[0]);
+        // ImplicitOptional fields don't track presence in has_bits
+        // (they're always considered "present")
 
         assert_eq!(NameField::get(&storage), "Alice");
 
         NameField::clear(&mut shared, 0, &mut storage);
         assert_eq!(storage, "");
-        assert!(!shared.has_bits()[0]);
+        // ImplicitOptional fields don't track presence in has_bits
     }
 
     #[test]
@@ -531,13 +545,14 @@ mod tests {
         ScoresField::set(&mut shared, 0, &mut storage, 30);
 
         assert_eq!(storage, vec![10, 20, 30]);
-        assert!(shared.has_bits()[0]);
+        // Repeated fields don't track presence in has_bits
+        // (they're always considered "present", even when empty)
 
         assert_eq!(ScoresField::get(&storage), &[10, 20, 30]);
 
         ScoresField::clear(&mut shared, 0, &mut storage);
         assert_eq!(storage.len(), 0);
-        assert!(!shared.has_bits()[0]);
+        // Repeated fields don't track presence in has_bits
     }
 
     #[test]
@@ -553,7 +568,8 @@ mod tests {
         assert_eq!(storage.len(), 2);
         assert_eq!(storage[0], "reading");
         assert_eq!(storage[1], "coding");
-        assert!(shared.has_bits()[0]);
+        // Repeated fields don't track presence in has_bits
+        // (they're always considered "present", even when empty)
 
         let hobbies = HobbiesField::get(&storage);
         assert_eq!(hobbies.len(), 2);

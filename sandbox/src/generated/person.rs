@@ -95,13 +95,13 @@ pub trait PersonTryMut: PersonAppendTry {
 // Field Type Aliases
 // ============================================================================
 
-/// Type descriptor for the 'name' field (proto3 implicit presence)
+/// Type descriptor for the 'name' field (implicit presence)
 type NameField = Field<String, ImplicitOptional>;
 
-/// Type descriptor for the 'age' field (proto3 implicit presence)
+/// Type descriptor for the 'age' field (implicit presence)
 type AgeField = Field<i32, ImplicitOptional>;
 
-/// Type descriptor for the 'email' field (proto3 implicit presence)
+/// Type descriptor for the 'email' field (implicit presence)
 type EmailField = Field<String, ImplicitOptional>;
 
 // Bit indices for each field
@@ -171,17 +171,20 @@ impl Person for PersonImpl {
 
     #[inline]
     fn has_name(&self) -> bool {
-        self._shared.has_bits()[IDX_NAME]
+        // ImplicitOptional fields are always considered "present"
+        true
     }
 
     #[inline]
     fn has_age(&self) -> bool {
-        self._shared.has_bits()[IDX_AGE]
+        // ImplicitOptional fields are always considered "present"
+        true
     }
 
     #[inline]
     fn has_email(&self) -> bool {
-        self._shared.has_bits()[IDX_EMAIL]
+        // ImplicitOptional fields are always considered "present"
+        true
     }
 }
 
