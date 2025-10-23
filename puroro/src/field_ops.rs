@@ -175,22 +175,25 @@ impl ScalarType for bool {}
 /// - `T`: The value type (i32, String, etc.)
 /// - `L`: The field label (ImplicitOptional, ExplicitOptional<BIT_INDEX>, Repeated, Map)
 /// - `const FIELD_NUMBER`: The protobuf field number
+/// - `const SHARED_BYTES_LEN`: The number of bytes for SharedFields storage
 ///
 /// # Examples
 /// ```ignore
-/// type NameField = FieldType<String, ImplicitOptional, 1>;           // implicit presence
-/// type EmailField = FieldType<String, ExplicitOptional<2>, 3>;        // explicit presence, bit 2
-/// type HobbiesField = FieldType<String, Repeated, 4>;                 // repeated field
-/// type ScoresField = FieldType<(String, i32), Map, 5>;               // map field
+/// type NameField = FieldType<String, ImplicitOptional, 1, 1>;           // implicit presence, 1 byte shared
+/// type EmailField = FieldType<String, ExplicitOptional<2>, 3, 1>;        // explicit presence, bit 2, 1 byte shared
+/// type HobbiesField = FieldType<String, Repeated, 4, 2>;                 // repeated field, 2 bytes shared
+/// type ScoresField = FieldType<(String, i32), Map, 5, 1>;               // map field, 1 byte shared
 /// ```
 #[derive(Debug, Clone, PartialEq)]
-pub struct FieldType<T, L: FieldLabel, const FIELD_NUMBER: u32> {
+pub struct FieldType<T, L: FieldLabel, const FIELD_NUMBER: u32, const SHARED_BYTES_LEN: usize> {
     /// The actual field data
     pub data: T,
     _phantom: PhantomData<L>,
 }
 
-impl<T, L: FieldLabel, const FIELD_NUMBER: u32> FieldType<T, L, FIELD_NUMBER> {
+impl<T, L: FieldLabel, const FIELD_NUMBER: u32, const SHARED_BYTES_LEN: usize>
+    FieldType<T, L, FIELD_NUMBER, SHARED_BYTES_LEN>
+{
     /// Creates a new FieldType with the given data
     pub fn new(data: T) -> Self {
         Self {
@@ -217,7 +220,9 @@ impl<T, L: FieldLabel, const FIELD_NUMBER: u32> FieldType<T, L, FIELD_NUMBER> {
 ///
 /// For now, this implementation works well with standard library types
 /// that have their own Default implementations.
-impl<T: Default, L: FieldLabel, const FIELD_NUMBER: u32> Default for FieldType<T, L, FIELD_NUMBER> {
+impl<T: Default, L: FieldLabel, const FIELD_NUMBER: u32, const SHARED_BYTES_LEN: usize> Default
+    for FieldType<T, L, FIELD_NUMBER, SHARED_BYTES_LEN>
+{
     fn default() -> Self {
         Self {
             data: T::default(),
@@ -242,7 +247,8 @@ impl<T: Default, L: FieldLabel, const FIELD_NUMBER: u32> Default for FieldType<T
 /// - `T`: The value type (i32, String, etc.)
 /// - `L`: The field label (ImplicitOptional, ExplicitOptional<BIT_INDEX>, Repeated, Map)
 /// - `const FIELD_NUMBER`: The protobuf field number
-pub trait Field<T, L: FieldLabel, const FIELD_NUMBER: u32> {
+/// - `const SHARED_BYTES_LEN`: The number of bytes for SharedFields storage
+pub trait Field<T, L: FieldLabel, const FIELD_NUMBER: u32, const SHARED_BYTES_LEN: usize> {
     /// The value type for this field (what users pass in)
     type Value<'a>;
 
@@ -257,18 +263,20 @@ pub trait Field<T, L: FieldLabel, const FIELD_NUMBER: u32> {
     /// The protobuf field number
     const FIELD_NUMBER: u32 = FIELD_NUMBER;
 
+    /// Type alias for SharedFields to avoid repeating const generic parameters
+    type SharedFields;
+
     /// Sets the field value
-    fn set<const BYTES: usize>(&mut self, shared: &mut SharedFields<BYTES>, value: Self::Value<'_>);
+    fn set(&mut self, shared: &mut Self::SharedFields, value: Self::Value<'_>);
 
     /// Gets the field value
-    fn get<'a, const BYTES: usize>(&'a self, shared: &'a SharedFields<BYTES>)
-        -> Self::GetValue<'a>;
+    fn get<'a>(&'a self, shared: &'a Self::SharedFields) -> Self::GetValue<'a>;
 
     /// Clears the field value
-    fn clear<const BYTES: usize>(&mut self, shared: &mut SharedFields<BYTES>);
+    fn clear(&mut self, shared: &mut Self::SharedFields);
 
     /// Checks if the field is present (for ExplicitOptional fields)
-    fn is_present<const BYTES: usize>(&self, shared: &SharedFields<BYTES>) -> bool;
+    fn is_present(&self, shared: &Self::SharedFields) -> bool;
 
     /// Gets the field number
     fn field_number() -> u32 {
@@ -286,64 +294,53 @@ pub trait Field<T, L: FieldLabel, const FIELD_NUMBER: u32> {
 // ============================================================================
 
 /// Implementation for String fields with ImplicitOptional
-impl<const FIELD_NUMBER: u32> Field<String, ImplicitOptional, FIELD_NUMBER>
-    for FieldType<String, ImplicitOptional, FIELD_NUMBER>
+impl<const FIELD_NUMBER: u32, const SHARED_BYTES_LEN: usize>
+    Field<String, ImplicitOptional, FIELD_NUMBER, SHARED_BYTES_LEN>
+    for FieldType<String, ImplicitOptional, FIELD_NUMBER, SHARED_BYTES_LEN>
 {
     type Value<'a> = &'a str; // Accept any &str
     type GetValue<'a> = &'a str;
+    type SharedFields = SharedFields<SHARED_BYTES_LEN>;
 
     const FIELD_TYPE: ProtobufFieldType = ProtobufFieldType::String;
 
-    fn set<const BYTES: usize>(
-        &mut self,
-        _shared: &mut SharedFields<BYTES>,
-        value: Self::Value<'_>,
-    ) {
+    fn set(&mut self, _shared: &mut Self::SharedFields, value: Self::Value<'_>) {
         value.clone_into(&mut self.data);
         // ImplicitOptional fields don't need presence tracking
     }
 
-    fn get<'a, const BYTES: usize>(
-        &'a self,
-        _shared: &'a SharedFields<BYTES>,
-    ) -> Self::GetValue<'a> {
+    fn get<'a>(&'a self, _shared: &'a Self::SharedFields) -> Self::GetValue<'a> {
         self.data.as_str()
     }
 
-    fn clear<const BYTES: usize>(&mut self, _shared: &mut SharedFields<BYTES>) {
+    fn clear(&mut self, _shared: &mut Self::SharedFields) {
         self.data.clear();
         // ImplicitOptional fields don't need presence tracking
     }
 
-    fn is_present<const BYTES: usize>(&self, _shared: &SharedFields<BYTES>) -> bool {
+    fn is_present(&self, _shared: &Self::SharedFields) -> bool {
         // ImplicitOptional fields are present only if not equal to default value (empty string)
         !self.data.is_empty()
     }
 }
 
 /// Implementation for String fields with ExplicitOptional
-impl<const FIELD_NUMBER: u32, const PRESENCE_BIT_INDEX: usize>
-    Field<String, ExplicitOptional<PRESENCE_BIT_INDEX>, FIELD_NUMBER>
-    for FieldType<String, ExplicitOptional<PRESENCE_BIT_INDEX>, FIELD_NUMBER>
+impl<const FIELD_NUMBER: u32, const PRESENCE_BIT_INDEX: usize, const SHARED_BYTES_LEN: usize>
+    Field<String, ExplicitOptional<PRESENCE_BIT_INDEX>, FIELD_NUMBER, SHARED_BYTES_LEN>
+    for FieldType<String, ExplicitOptional<PRESENCE_BIT_INDEX>, FIELD_NUMBER, SHARED_BYTES_LEN>
 {
     type Value<'a> = &'a str; // Accept any &str
     type GetValue<'a> = Option<&'a str>;
+    type SharedFields = SharedFields<SHARED_BYTES_LEN>;
 
     const FIELD_TYPE: ProtobufFieldType = ProtobufFieldType::String;
 
-    fn set<const BYTES: usize>(
-        &mut self,
-        shared: &mut SharedFields<BYTES>,
-        value: Self::Value<'_>,
-    ) {
+    fn set(&mut self, shared: &mut Self::SharedFields, value: Self::Value<'_>) {
         value.clone_into(&mut self.data);
         shared.has_bits_mut().set(PRESENCE_BIT_INDEX, true);
     }
 
-    fn get<'a, const BYTES: usize>(
-        &'a self,
-        shared: &'a SharedFields<BYTES>,
-    ) -> Self::GetValue<'a> {
+    fn get<'a>(&'a self, shared: &'a Self::SharedFields) -> Self::GetValue<'a> {
         if shared.is_field_present(PRESENCE_BIT_INDEX) {
             Some(self.data.as_str())
         } else {
@@ -351,81 +348,74 @@ impl<const FIELD_NUMBER: u32, const PRESENCE_BIT_INDEX: usize>
         }
     }
 
-    fn clear<const BYTES: usize>(&mut self, shared: &mut SharedFields<BYTES>) {
+    fn clear(&mut self, shared: &mut Self::SharedFields) {
         self.data.clear();
         shared.has_bits_mut().set(PRESENCE_BIT_INDEX, false);
     }
 
-    fn is_present<const BYTES: usize>(&self, shared: &SharedFields<BYTES>) -> bool {
+    fn is_present(&self, shared: &Self::SharedFields) -> bool {
         shared.is_field_present(PRESENCE_BIT_INDEX)
     }
 }
 
 /// Implementation for scalar types with ImplicitOptional
-impl<T: ScalarType, const FIELD_NUMBER: u32> Field<T, ImplicitOptional, FIELD_NUMBER>
-    for FieldType<T, ImplicitOptional, FIELD_NUMBER>
+impl<T: ScalarType, const FIELD_NUMBER: u32, const SHARED_BYTES_LEN: usize>
+    Field<T, ImplicitOptional, FIELD_NUMBER, SHARED_BYTES_LEN>
+    for FieldType<T, ImplicitOptional, FIELD_NUMBER, SHARED_BYTES_LEN>
 {
     type Value<'a> = T;
     type GetValue<'a>
         = T
     where
         T: 'a;
+    type SharedFields = SharedFields<SHARED_BYTES_LEN>;
 
     const FIELD_TYPE: ProtobufFieldType = ProtobufFieldType::Int32; // Default to Int32
 
-    fn set<const BYTES: usize>(
-        &mut self,
-        _shared: &mut SharedFields<BYTES>,
-        value: Self::Value<'_>,
-    ) {
+    fn set(&mut self, _shared: &mut Self::SharedFields, value: Self::Value<'_>) {
         self.data = value;
         // ImplicitOptional fields don't need presence tracking
     }
 
-    fn get<'a, const BYTES: usize>(
-        &'a self,
-        _shared: &'a SharedFields<BYTES>,
-    ) -> Self::GetValue<'a> {
+    fn get<'a>(&'a self, _shared: &'a Self::SharedFields) -> Self::GetValue<'a> {
         self.data
     }
 
-    fn clear<const BYTES: usize>(&mut self, _shared: &mut SharedFields<BYTES>) {
+    fn clear(&mut self, _shared: &mut Self::SharedFields) {
         self.data = T::default();
         // ImplicitOptional fields don't need presence tracking
     }
 
-    fn is_present<const BYTES: usize>(&self, _shared: &SharedFields<BYTES>) -> bool {
+    fn is_present(&self, _shared: &Self::SharedFields) -> bool {
         // ImplicitOptional fields are present only if not equal to default value
         self.data != T::default()
     }
 }
 
 /// Implementation for scalar types with ExplicitOptional
-impl<T: ScalarType, const FIELD_NUMBER: u32, const PRESENCE_BIT_INDEX: usize>
-    Field<T, ExplicitOptional<PRESENCE_BIT_INDEX>, FIELD_NUMBER>
-    for FieldType<T, ExplicitOptional<PRESENCE_BIT_INDEX>, FIELD_NUMBER>
+impl<
+        T: ScalarType,
+        const FIELD_NUMBER: u32,
+        const PRESENCE_BIT_INDEX: usize,
+        const SHARED_BYTES_LEN: usize,
+    > Field<T, ExplicitOptional<PRESENCE_BIT_INDEX>, FIELD_NUMBER, SHARED_BYTES_LEN>
+    for FieldType<T, ExplicitOptional<PRESENCE_BIT_INDEX>, FIELD_NUMBER, SHARED_BYTES_LEN>
 {
     type Value<'a> = T;
     type GetValue<'a>
         = Option<T>
     where
         T: 'a;
+    type SharedFields = SharedFields<SHARED_BYTES_LEN>;
 
     const FIELD_TYPE: ProtobufFieldType = ProtobufFieldType::Int32; // Default to Int32
 
-    fn set<const BYTES: usize>(
-        &mut self,
-        shared: &mut SharedFields<BYTES>,
-        value: Self::Value<'_>,
-    ) {
+    fn set(&mut self, shared: &mut Self::SharedFields, value: Self::Value<'_>) {
         self.data = value;
         shared.has_bits_mut().set(PRESENCE_BIT_INDEX, true);
     }
 
-    fn get<'a, const BYTES: usize>(
-        &'a self,
-        shared: &'a SharedFields<BYTES>,
-    ) -> Self::GetValue<'a> {
+    fn get<'a>(&'a self, shared: &'a Self::SharedFields) -> Self::GetValue<'a> {
         if shared.is_field_present(PRESENCE_BIT_INDEX) {
             Some(self.data)
         } else {
@@ -433,12 +423,12 @@ impl<T: ScalarType, const FIELD_NUMBER: u32, const PRESENCE_BIT_INDEX: usize>
         }
     }
 
-    fn clear<const BYTES: usize>(&mut self, shared: &mut SharedFields<BYTES>) {
+    fn clear(&mut self, shared: &mut Self::SharedFields) {
         self.data = T::default();
         shared.has_bits_mut().set(PRESENCE_BIT_INDEX, false);
     }
 
-    fn is_present<const BYTES: usize>(&self, shared: &SharedFields<BYTES>) -> bool {
+    fn is_present(&self, shared: &Self::SharedFields) -> bool {
         shared.is_field_present(PRESENCE_BIT_INDEX)
     }
 }
@@ -460,9 +450,9 @@ mod tests {
 
     #[test]
     fn test_field_type_constants() {
-        type NameField = FieldType<String, ImplicitOptional, 1>;
-        type AgeField = FieldType<i32, ImplicitOptional, 2>;
-        type EmailField = FieldType<String, ExplicitOptional<0>, 3>;
+        type NameField = FieldType<String, ImplicitOptional, 1, 1>;
+        type AgeField = FieldType<i32, ImplicitOptional, 2, 1>;
+        type EmailField = FieldType<String, ExplicitOptional<0>, 3, 1>;
 
         assert_eq!(NameField::FIELD_NUMBER, 1);
         assert_eq!(NameField::FIELD_TYPE, ProtobufFieldType::String);
@@ -476,8 +466,8 @@ mod tests {
 
     #[test]
     fn test_field_methods() {
-        type NameField = FieldType<String, ImplicitOptional, 1>;
-        type EmailField = FieldType<String, ExplicitOptional<0>, 3>;
+        type NameField = FieldType<String, ImplicitOptional, 1, 1>;
+        type EmailField = FieldType<String, ExplicitOptional<0>, 3, 1>;
 
         assert_eq!(NameField::field_number(), 1);
         assert_eq!(NameField::field_type(), ProtobufFieldType::String);
