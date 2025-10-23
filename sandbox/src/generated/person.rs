@@ -20,11 +20,13 @@ pub trait Person {
     fn name(&self) -> &str;
     fn age(&self) -> i32;
     fn email(&self) -> Option<&str>;
+    fn score(&self) -> Option<i32>;
 
     // Presence checks (for Proto3 optional semantics)
     fn has_name(&self) -> bool;
     fn has_age(&self) -> bool;
     fn has_email(&self) -> bool;
+    fn has_score(&self) -> bool;
 }
 
 /// Infallible append-only trait for Person message.
@@ -37,6 +39,7 @@ pub trait PersonAppend: Person {
     fn set_name(&mut self, v: &str);
     fn set_age(&mut self, v: i32);
     fn set_email(&mut self, v: &str);
+    fn set_score(&mut self, v: i32);
 }
 
 /// Infallible fully mutable trait for Person message.
@@ -48,6 +51,7 @@ pub trait PersonMut: PersonAppend {
     fn clear_name(&mut self);
     fn clear_age(&mut self);
     fn clear_email(&mut self);
+    fn clear_score(&mut self);
 }
 
 /// Fallible immutable trait for Person message.
@@ -60,11 +64,13 @@ pub trait PersonTry {
     fn try_name(&self) -> Result<&str, Error>;
     fn try_age(&self) -> Result<i32, Error>;
     fn try_email(&self) -> Result<Option<&str>, Error>;
+    fn try_score(&self) -> Result<Option<i32>, Error>;
 
     // Presence checks (fallible) - may fail when reading metadata
     fn try_has_name(&self) -> Result<bool, Error>;
     fn try_has_age(&self) -> Result<bool, Error>;
     fn try_has_email(&self) -> Result<bool, Error>;
+    fn try_has_score(&self) -> Result<bool, Error>;
 }
 
 /// Fallible append-only trait for Person message.
@@ -77,6 +83,7 @@ pub trait PersonAppendTry: PersonTry {
     fn try_set_name(&mut self, v: &str) -> Result<(), Error>;
     fn try_set_age(&mut self, v: i32) -> Result<(), Error>;
     fn try_set_email(&mut self, v: &str) -> Result<(), Error>;
+    fn try_set_score(&mut self, v: i32) -> Result<(), Error>;
 }
 
 /// Fallible fully mutable trait for Person message.
@@ -89,6 +96,7 @@ pub trait PersonTryMut: PersonAppendTry {
     fn try_clear_name(&mut self) -> Result<(), Error>;
     fn try_clear_age(&mut self) -> Result<(), Error>;
     fn try_clear_email(&mut self) -> Result<(), Error>;
+    fn try_clear_score(&mut self) -> Result<(), Error>;
 }
 
 // ============================================================================
@@ -114,6 +122,7 @@ pub struct PersonImpl {
 
     // Scalar fields: 4 bytes
     age: FieldType<i32, ImplicitOptional, 2, 1>,
+    score: FieldType<i32, ExplicitOptional, 5, 3>,
 }
 
 impl PersonImpl {
@@ -124,6 +133,7 @@ impl PersonImpl {
             email: Default::default(),
             _shared: SharedFields::new(),
             age: Default::default(),
+            score: Default::default(),
         }
     }
 }
@@ -151,6 +161,11 @@ impl Person for PersonImpl {
     }
 
     #[inline]
+    fn score(&self) -> Option<i32> {
+        self.score.get(&self._shared)
+    }
+
+    #[inline]
     fn has_name(&self) -> bool {
         // ImplicitOptional fields are always considered "present"
         true
@@ -167,6 +182,13 @@ impl Person for PersonImpl {
         // ExplicitOptional fields check presence via SharedFields API
         // Field number: 3, Bit index: 2
         self._shared.is_field_present(2)
+    }
+
+    #[inline]
+    fn has_score(&self) -> bool {
+        // ExplicitOptional fields check presence via SharedFields API
+        // Field number: 5, Bit index: 3
+        self._shared.is_field_present(3)
     }
 }
 
@@ -185,6 +207,11 @@ impl PersonAppend for PersonImpl {
     fn set_email(&mut self, v: &str) {
         self.email.set(&mut self._shared, v);
     }
+
+    #[inline]
+    fn set_score(&mut self, v: i32) {
+        self.score.set(&mut self._shared, v);
+    }
 }
 
 impl PersonMut for PersonImpl {
@@ -201,6 +228,11 @@ impl PersonMut for PersonImpl {
     #[inline]
     fn clear_email(&mut self) {
         self.email.clear(&mut self._shared);
+    }
+
+    #[inline]
+    fn clear_score(&mut self) {
+        self.score.clear(&mut self._shared);
     }
 }
 
@@ -223,6 +255,11 @@ impl PersonTry for PersonImpl {
     }
 
     #[inline]
+    fn try_score(&self) -> Result<Option<i32>, Error> {
+        Ok(self.score.get(&self._shared))
+    }
+
+    #[inline]
     fn try_has_name(&self) -> Result<bool, Error> {
         Ok(Person::has_name(self))
     }
@@ -235,6 +272,11 @@ impl PersonTry for PersonImpl {
     #[inline]
     fn try_has_email(&self) -> Result<bool, Error> {
         Ok(Person::has_email(self))
+    }
+
+    #[inline]
+    fn try_has_score(&self) -> Result<bool, Error> {
+        Ok(Person::has_score(self))
     }
 }
 
@@ -256,6 +298,12 @@ impl PersonAppendTry for PersonImpl {
         PersonAppend::set_email(self, v);
         Ok(())
     }
+
+    #[inline]
+    fn try_set_score(&mut self, v: i32) -> Result<(), Error> {
+        PersonAppend::set_score(self, v);
+        Ok(())
+    }
 }
 
 impl PersonTryMut for PersonImpl {
@@ -274,6 +322,12 @@ impl PersonTryMut for PersonImpl {
     #[inline]
     fn try_clear_email(&mut self) -> Result<(), Error> {
         PersonMut::clear_email(self);
+        Ok(())
+    }
+
+    #[inline]
+    fn try_clear_score(&mut self) -> Result<(), Error> {
+        PersonMut::clear_score(self);
         Ok(())
     }
 }

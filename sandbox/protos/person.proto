@@ -4,8 +4,23 @@ package example;
 
 // A simple person message for testing basic protobuf features
 message Person {
-  string name = 1;
-  int32 age = 2;
-  string email = 3;
+  string name = 1;                    // implicit presence string field
+  int32 age = 2;                      // implicit presence varint field
+  optional string email = 3;          // explicit presence string field
+  optional int32 score = 5;           // explicit presence scalar field
+  
+  // TODO: Implement repeated field support
+  // repeated string hobbies = 4;        // repeated string field
+  
+  // TODO: Implement message field support
+  // Address address = 6;               // message field
 }
+
+// TODO: Implement message field support
+// A nested message for testing message fields
+// message Address {
+//   string street = 1;
+//   string city = 2;
+//   int32 zip_code = 3;
+// }
 
