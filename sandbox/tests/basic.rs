@@ -11,9 +11,9 @@ fn test_person_creation() {
     assert_eq!(person.age(), 0);
     assert_eq!(person.email(), None);
 
-    // ImplicitOptional fields are always considered "present"
-    assert!(person.has_name());
-    assert!(person.has_age());
+    // ImplicitOptional fields are present only if not equal to default value
+    assert!(!person.has_name()); // Empty string is default value
+    assert!(!person.has_age()); // 0 is default value
     assert!(!person.has_email()); // ExplicitOptional field is not set initially
 }
 
@@ -57,9 +57,9 @@ fn test_person_clear() {
 
     assert_eq!(person.name(), "");
     assert_eq!(person.age(), 0);
-    // ImplicitOptional fields are always considered "present" even after clear
-    assert!(person.has_name());
-    assert!(person.has_age());
+    // ImplicitOptional fields are present only if not equal to default value
+    assert!(!person.has_name()); // Empty string is default value
+    assert!(!person.has_age()); // 0 is default value
 }
 
 #[test]
@@ -124,8 +124,8 @@ fn test_person_mut_trait_usage() {
 
     assert_eq!(person.name(), "Default");
     assert_eq!(person.age(), 0);
-    // ImplicitOptional fields are always considered "present" even after clear
-    assert!(person.has_age());
+    // ImplicitOptional fields are present only if not equal to default value
+    assert!(!person.has_age()); // 0 is default value
 }
 
 #[test]

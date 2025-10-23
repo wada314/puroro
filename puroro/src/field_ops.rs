@@ -340,7 +340,8 @@ impl<const FIELD_NUMBER: u32> Field<String, ImplicitOptional, FIELD_NUMBER>
     }
 
     fn is_present<const BYTES: usize>(&self, _shared: &SharedFields<BYTES>) -> bool {
-        true // ImplicitOptional fields are always present
+        // ImplicitOptional fields are present only if not equal to default value (empty string)
+        !self.data.is_empty()
     }
 }
 
@@ -418,7 +419,8 @@ impl<T: ScalarType, const FIELD_NUMBER: u32> Field<T, ImplicitOptional, FIELD_NU
     }
 
     fn is_present<const BYTES: usize>(&self, _shared: &SharedFields<BYTES>) -> bool {
-        true // ImplicitOptional fields are always present
+        // ImplicitOptional fields are present only if not equal to default value
+        self.data != T::default()
     }
 }
 
@@ -481,37 +483,32 @@ mod tests {
     }
 
     #[test]
-    fn test_field_descriptor_constants() {
-        type NameField = FieldDescriptor<String, ImplicitOptional, 1, 0>;
-        type AgeField = FieldDescriptor<i32, ImplicitOptional, 2, 1>;
-        type EmailField = FieldDescriptor<String, ExplicitOptional, 3, 2>;
+    fn test_field_type_constants() {
+        type NameField = FieldType<String, ImplicitOptional, 1>;
+        type AgeField = FieldType<i32, ImplicitOptional, 2>;
+        type EmailField = FieldType<String, ExplicitOptional<0>, 3>;
 
         assert_eq!(NameField::FIELD_NUMBER, 1);
-        assert_eq!(NameField::BIT_INDEX, 0);
         assert_eq!(NameField::FIELD_TYPE, ProtobufFieldType::String);
 
         assert_eq!(AgeField::FIELD_NUMBER, 2);
-        assert_eq!(AgeField::BIT_INDEX, 1);
         assert_eq!(AgeField::FIELD_TYPE, ProtobufFieldType::Int32);
 
         assert_eq!(EmailField::FIELD_NUMBER, 3);
-        assert_eq!(EmailField::BIT_INDEX, 2);
         assert_eq!(EmailField::FIELD_TYPE, ProtobufFieldType::String);
     }
 
     #[test]
     fn test_field_methods() {
-        type NameField = FieldDescriptor<String, ImplicitOptional, 1, 0>;
-        type EmailField = FieldDescriptor<String, ExplicitOptional, 3, 2>;
+        type NameField = FieldType<String, ImplicitOptional, 1>;
+        type EmailField = FieldType<String, ExplicitOptional<0>, 3>;
 
         assert_eq!(NameField::field_number(), 1);
-        assert_eq!(NameField::bit_index(), 0);
         assert_eq!(NameField::field_type(), ProtobufFieldType::String);
-        assert_eq!(NameField::wire_type(), 2);
+        assert_eq!(NameField::field_type().wire_type(), 2);
 
         assert_eq!(EmailField::field_number(), 3);
-        assert_eq!(EmailField::bit_index(), 2);
         assert_eq!(EmailField::field_type(), ProtobufFieldType::String);
-        assert_eq!(EmailField::wire_type(), 2);
+        assert_eq!(EmailField::field_type().wire_type(), 2);
     }
 }

@@ -168,28 +168,26 @@ impl Person for PersonImpl {
 
     #[inline]
     fn has_name(&self) -> bool {
-        // ImplicitOptional fields are always considered "present"
-        true
+        // ImplicitOptional fields check if value is not equal to default
+        self.name.is_present(&self._shared)
     }
 
     #[inline]
     fn has_age(&self) -> bool {
-        // ImplicitOptional fields are always considered "present"
-        true
+        // ImplicitOptional fields check if value is not equal to default
+        self.age.is_present(&self._shared)
     }
 
     #[inline]
     fn has_email(&self) -> bool {
-        // ExplicitOptional fields check presence via SharedFields API
-        // Field number: 3, Bit index: 0
-        self._shared.is_field_present(0)
+        // ExplicitOptional fields check presence via Field trait
+        self.email.is_present(&self._shared)
     }
 
     #[inline]
     fn has_score(&self) -> bool {
-        // ExplicitOptional fields check presence via SharedFields API
-        // Field number: 5, Bit index: 1
-        self._shared.is_field_present(1)
+        // ExplicitOptional fields check presence via Field trait
+        self.score.is_present(&self._shared)
     }
 }
 
@@ -262,22 +260,22 @@ impl PersonTry for PersonImpl {
 
     #[inline]
     fn try_has_name(&self) -> Result<bool, Error> {
-        Ok(Person::has_name(self))
+        Ok(self.name.is_present(&self._shared))
     }
 
     #[inline]
     fn try_has_age(&self) -> Result<bool, Error> {
-        Ok(Person::has_age(self))
+        Ok(self.age.is_present(&self._shared))
     }
 
     #[inline]
     fn try_has_email(&self) -> Result<bool, Error> {
-        Ok(Person::has_email(self))
+        Ok(self.email.is_present(&self._shared))
     }
 
     #[inline]
     fn try_has_score(&self) -> Result<bool, Error> {
-        Ok(Person::has_score(self))
+        Ok(self.score.is_present(&self._shared))
     }
 }
 
