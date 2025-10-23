@@ -27,8 +27,8 @@ pub use protobuf_core;
 ///
 /// # Key Components
 ///
-/// - `FieldDescriptor`: Comprehensive trait containing all field information
 /// - `Field`: Type-level descriptor for protobuf fields
+/// - `FieldType`: Concrete field implementation with data storage
 /// - `FieldSet`, `FieldGet`, `FieldClear`: Split traits for field operations
 pub mod field_ops;
 

@@ -226,30 +226,6 @@ impl<T: Default, L: FieldLabel, const FIELD_NUMBER: u32> Default for FieldType<T
     }
 }
 
-/// Comprehensive field descriptor containing all protobuf field information.
-///
-/// This type encodes all field metadata including:
-/// - Value type (T)
-/// - Field label (L)
-/// - Field number
-/// - Bit index for presence tracking
-///
-/// # Type Parameters
-/// - `T`: The value type (i32, String, etc.)
-/// - `L`: The field label (ImplicitOptional, ExplicitOptional, Repeated, Map)
-/// - `const FIELD_NUMBER`: The protobuf field number
-/// - `const BIT_INDEX`: The bit index for presence tracking
-///
-/// # Examples
-/// ```ignore
-/// type NameField = FieldDescriptor<String, ImplicitOptional, 1, 0>;
-/// type AgeField = FieldDescriptor<i32, ImplicitOptional, 2, 1>;
-/// type EmailField = FieldDescriptor<String, ExplicitOptional, 3, 2>;
-/// ```
-pub struct FieldDescriptor<T, L: FieldLabel, const FIELD_NUMBER: u32, const BIT_INDEX: usize> {
-    _phantom: PhantomData<(T, L)>,
-}
-
 // ============================================================================
 // Field Trait (Unified Approach)
 // ============================================================================
