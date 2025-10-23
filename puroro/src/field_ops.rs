@@ -144,7 +144,10 @@ pub trait FieldDescriptor<T, L: FieldLabel, const FIELD_NUMBER: u32, const BIT_I
     );
 
     /// Gets the field value
-    fn get<'a>(storage: &'a Self::Storage) -> Self::GetValue<'a>;
+    fn get<'a, const BYTES: usize>(
+        shared: &'a SharedFields<BYTES>,
+        storage: &'a Self::Storage,
+    ) -> Self::GetValue<'a>;
 
     /// Clears the field value
     fn clear<const BYTES: usize>(shared: &mut SharedFields<BYTES>, storage: &mut Self::Storage);
@@ -243,7 +246,10 @@ impl<const FIELD_NUMBER: u32, const BIT_INDEX: usize>
         // ImplicitOptional fields don't need presence tracking
     }
 
-    fn get<'a>(storage: &'a Self::Storage) -> Self::GetValue<'a> {
+    fn get<'a, const BYTES: usize>(
+        _shared: &'a SharedFields<BYTES>,
+        storage: &'a Self::Storage,
+    ) -> Self::GetValue<'a> {
         storage.as_str()
     }
 
@@ -281,7 +287,10 @@ impl<T: ScalarType, const FIELD_NUMBER: u32, const BIT_INDEX: usize>
         // ImplicitOptional fields don't need presence tracking
     }
 
-    fn get<'a>(storage: &'a Self::Storage) -> Self::GetValue<'a> {
+    fn get<'a, const BYTES: usize>(
+        _shared: &'a SharedFields<BYTES>,
+        storage: &'a Self::Storage,
+    ) -> Self::GetValue<'a> {
         *storage
     }
 
@@ -302,7 +311,7 @@ impl<T: ScalarType, const FIELD_NUMBER: u32, const BIT_INDEX: usize>
     type Storage = T;
     type Value = T;
     type GetValue<'a>
-        = T
+        = Option<T>
     where
         T: 'a;
 
@@ -319,8 +328,15 @@ impl<T: ScalarType, const FIELD_NUMBER: u32, const BIT_INDEX: usize>
         shared.has_bits_mut().set(BIT_INDEX, true);
     }
 
-    fn get<'a>(storage: &'a Self::Storage) -> Self::GetValue<'a> {
-        *storage
+    fn get<'a, const BYTES: usize>(
+        shared: &'a SharedFields<BYTES>,
+        storage: &'a Self::Storage,
+    ) -> Self::GetValue<'a> {
+        if shared.has_bits()[BIT_INDEX] {
+            Some(*storage)
+        } else {
+            None
+        }
     }
 
     fn clear<const BYTES: usize>(shared: &mut SharedFields<BYTES>, storage: &mut Self::Storage) {
@@ -358,7 +374,10 @@ impl<T: ScalarType, const FIELD_NUMBER: u32, const BIT_INDEX: usize>
         // Repeated fields don't need presence tracking
     }
 
-    fn get<'a>(storage: &'a Self::Storage) -> Self::GetValue<'a> {
+    fn get<'a, const BYTES: usize>(
+        _shared: &'a SharedFields<BYTES>,
+        storage: &'a Self::Storage,
+    ) -> Self::GetValue<'a> {
         storage.as_slice()
     }
 
@@ -382,8 +401,8 @@ impl Field<String, ImplicitOptional> {
     /// Sets a string field value (implicit presence).
     #[inline]
     pub fn set<const BYTES: usize>(
-        shared: &mut SharedFields<BYTES>,
-        bit_index: usize,
+        _shared: &mut SharedFields<BYTES>,
+        _bit_index: usize,
         storage: &mut String,
         value: &str, // Can accept any &str!
     ) {
@@ -395,8 +414,8 @@ impl Field<String, ImplicitOptional> {
     /// Clears a string field (implicit presence).
     #[inline]
     pub fn clear<const BYTES: usize>(
-        shared: &mut SharedFields<BYTES>,
-        bit_index: usize,
+        _shared: &mut SharedFields<BYTES>,
+        _bit_index: usize,
         storage: &mut String,
     ) {
         storage.clear();
@@ -479,8 +498,8 @@ impl<T: ScalarType> FieldSet for Field<T, ImplicitOptional> {
 
     #[inline]
     fn set<const BYTES: usize>(
-        shared: &mut SharedFields<BYTES>,
-        bit_index: usize,
+        _shared: &mut SharedFields<BYTES>,
+        _bit_index: usize,
         storage: &mut Self::Storage,
         value: Self::Value,
     ) {
@@ -542,8 +561,8 @@ impl<T: ScalarType> FieldClear for Field<T, ImplicitOptional> {
 
     #[inline]
     fn clear<const BYTES: usize>(
-        shared: &mut SharedFields<BYTES>,
-        bit_index: usize,
+        _shared: &mut SharedFields<BYTES>,
+        _bit_index: usize,
         storage: &mut Self::Storage,
     ) {
         *storage = T::default();
@@ -577,8 +596,8 @@ impl<T: ScalarType> FieldSet for Field<T, Repeated> {
 
     #[inline]
     fn set<const BYTES: usize>(
-        shared: &mut SharedFields<BYTES>,
-        bit_index: usize,
+        _shared: &mut SharedFields<BYTES>,
+        _bit_index: usize,
         storage: &mut Self::Storage,
         value: Self::Value,
     ) {
@@ -607,8 +626,8 @@ impl<T: ScalarType> FieldClear for Field<T, Repeated> {
 
     #[inline]
     fn clear<const BYTES: usize>(
-        shared: &mut SharedFields<BYTES>,
-        bit_index: usize,
+        _shared: &mut SharedFields<BYTES>,
+        _bit_index: usize,
         storage: &mut Self::Storage,
     ) {
         storage.clear();
@@ -622,8 +641,8 @@ impl Field<String, Repeated> {
     /// Adds a string value to a repeated field.
     #[inline]
     pub fn set<const BYTES: usize>(
-        shared: &mut SharedFields<BYTES>,
-        bit_index: usize,
+        _shared: &mut SharedFields<BYTES>,
+        _bit_index: usize,
         storage: &mut Vec<String>,
         value: &str, // Can accept any &str
     ) {
@@ -635,8 +654,8 @@ impl Field<String, Repeated> {
     /// Clears a repeated string field.
     #[inline]
     pub fn clear<const BYTES: usize>(
-        shared: &mut SharedFields<BYTES>,
-        bit_index: usize,
+        _shared: &mut SharedFields<BYTES>,
+        _bit_index: usize,
         storage: &mut Vec<String>,
     ) {
         storage.clear();
@@ -933,11 +952,14 @@ mod tests {
 
         // Test get operations
         assert_eq!(
-            <NameField as FieldDescriptor<String, ImplicitOptional, 1, 0>>::get(&name_storage),
+            <NameField as FieldDescriptor<String, ImplicitOptional, 1, 0>>::get(
+                &shared,
+                &name_storage
+            ),
             "Alice"
         );
         assert_eq!(
-            <AgeField as FieldDescriptor<i32, ImplicitOptional, 2, 1>>::get(&age_storage),
+            <AgeField as FieldDescriptor<i32, ImplicitOptional, 2, 1>>::get(&shared, &age_storage),
             30
         );
 
@@ -952,11 +974,14 @@ mod tests {
         );
 
         assert_eq!(
-            <NameField as FieldDescriptor<String, ImplicitOptional, 1, 0>>::get(&name_storage),
+            <NameField as FieldDescriptor<String, ImplicitOptional, 1, 0>>::get(
+                &shared,
+                &name_storage
+            ),
             ""
         );
         assert_eq!(
-            <AgeField as FieldDescriptor<i32, ImplicitOptional, 2, 1>>::get(&age_storage),
+            <AgeField as FieldDescriptor<i32, ImplicitOptional, 2, 1>>::get(&shared, &age_storage),
             0
         );
     }
