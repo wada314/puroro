@@ -308,8 +308,8 @@ impl<T: Default, L: FieldLabel, const FIELD_NUMBER: u32, const SHARED_BYTES_LEN:
 /// - `const SHARED_BYTES_LEN`: The number of bytes for SharedFields storage
 pub trait FieldOperations<T, L: FieldLabel, const FIELD_NUMBER: u32, const SHARED_BYTES_LEN: usize>
 {
-    /// The value type for this field (what users pass in)
-    type Value<'a>;
+    /// The value type for this field (what users pass in when setting)
+    type SetValue<'a>;
 
     /// The return type for get operations (may borrow from self)
     type GetValue<'a>
@@ -326,7 +326,7 @@ pub trait FieldOperations<T, L: FieldLabel, const FIELD_NUMBER: u32, const SHARE
     type SharedFields;
 
     /// Sets the field value
-    fn set(&mut self, shared: &mut Self::SharedFields, value: Self::Value<'_>);
+    fn set(&mut self, shared: &mut Self::SharedFields, value: Self::SetValue<'_>);
 
     /// Gets the field value
     fn get<'a>(&'a self, shared: &'a Self::SharedFields) -> Self::GetValue<'a>;
@@ -357,7 +357,7 @@ impl<T: ScalarType, const FIELD_NUMBER: u32, const SHARED_BYTES_LEN: usize>
     FieldOperations<T, ImplicitOptional, FIELD_NUMBER, SHARED_BYTES_LEN>
     for FieldStorage<T, ImplicitOptional, FIELD_NUMBER, SHARED_BYTES_LEN>
 {
-    type Value<'a> = T;
+    type SetValue<'a> = T;
     type GetValue<'a>
         = T
     where
@@ -366,7 +366,7 @@ impl<T: ScalarType, const FIELD_NUMBER: u32, const SHARED_BYTES_LEN: usize>
 
     const FIELD_TYPE: ProtobufFieldType = ProtobufFieldType::Int32; // Default to Int32
 
-    fn set(&mut self, _shared: &mut Self::SharedFields, value: Self::Value<'_>) {
+    fn set(&mut self, _shared: &mut Self::SharedFields, value: Self::SetValue<'_>) {
         self.data = value;
         // ImplicitOptional fields don't need presence tracking
     }
@@ -395,7 +395,7 @@ impl<
     > FieldOperations<T, ExplicitOptional<PRESENCE_BIT_INDEX>, FIELD_NUMBER, SHARED_BYTES_LEN>
     for FieldStorage<T, ExplicitOptional<PRESENCE_BIT_INDEX>, FIELD_NUMBER, SHARED_BYTES_LEN>
 {
-    type Value<'a> = T;
+    type SetValue<'a> = T;
     type GetValue<'a>
         = Option<T>
     where
@@ -404,7 +404,7 @@ impl<
 
     const FIELD_TYPE: ProtobufFieldType = ProtobufFieldType::Int32; // Default to Int32
 
-    fn set(&mut self, shared: &mut Self::SharedFields, value: Self::Value<'_>) {
+    fn set(&mut self, shared: &mut Self::SharedFields, value: Self::SetValue<'_>) {
         self.data = value;
         shared.has_bits_mut().set(PRESENCE_BIT_INDEX, true);
     }
@@ -436,13 +436,13 @@ impl<const FIELD_NUMBER: u32, const SHARED_BYTES_LEN: usize>
     FieldOperations<StringFieldWrapper, ImplicitOptional, FIELD_NUMBER, SHARED_BYTES_LEN>
     for FieldStorage<StringFieldWrapper, ImplicitOptional, FIELD_NUMBER, SHARED_BYTES_LEN>
 {
-    type Value<'a> = &'a str;
+    type SetValue<'a> = &'a str;
     type GetValue<'a> = &'a str;
     type SharedFields = SharedFields<SHARED_BYTES_LEN>;
 
     const FIELD_TYPE: ProtobufFieldType = ProtobufFieldType::String;
 
-    fn set(&mut self, _shared: &mut Self::SharedFields, value: Self::Value<'_>) {
+    fn set(&mut self, _shared: &mut Self::SharedFields, value: Self::SetValue<'_>) {
         value.clone_into(&mut self.data.0);
         // ImplicitOptional fields don't need presence tracking
     }
@@ -477,13 +477,13 @@ impl<const FIELD_NUMBER: u32, const PRESENCE_BIT_INDEX: usize, const SHARED_BYTE
         SHARED_BYTES_LEN,
     >
 {
-    type Value<'a> = &'a str;
+    type SetValue<'a> = &'a str;
     type GetValue<'a> = Option<&'a str>;
     type SharedFields = SharedFields<SHARED_BYTES_LEN>;
 
     const FIELD_TYPE: ProtobufFieldType = ProtobufFieldType::String;
 
-    fn set(&mut self, shared: &mut Self::SharedFields, value: Self::Value<'_>) {
+    fn set(&mut self, shared: &mut Self::SharedFields, value: Self::SetValue<'_>) {
         value.clone_into(&mut self.data.0);
         shared.has_bits_mut().set(PRESENCE_BIT_INDEX, true);
     }
@@ -514,13 +514,13 @@ impl<M: crate::Message + 'static, const FIELD_NUMBER: u32, const SHARED_BYTES_LE
     FieldOperations<MessageFieldWrapper<M>, ImplicitOptional, FIELD_NUMBER, SHARED_BYTES_LEN>
     for FieldStorage<MessageFieldWrapper<M>, ImplicitOptional, FIELD_NUMBER, SHARED_BYTES_LEN>
 {
-    type Value<'a> = &'a M;
+    type SetValue<'a> = &'a M;
     type GetValue<'a> = Option<&'a M>; // Message fields always return Option
     type SharedFields = SharedFields<SHARED_BYTES_LEN>;
 
     const FIELD_TYPE: ProtobufFieldType = ProtobufFieldType::Message;
 
-    fn set(&mut self, _shared: &mut Self::SharedFields, value: Self::Value<'_>) {
+    fn set(&mut self, _shared: &mut Self::SharedFields, value: Self::SetValue<'_>) {
         self.data.0 = Some(Box::new(value.clone()));
         // No presence bit needed - Option<Box<M>> handles presence
     }
@@ -564,13 +564,13 @@ impl<
         SHARED_BYTES_LEN,
     >
 {
-    type Value<'a> = &'a M;
+    type SetValue<'a> = &'a M;
     type GetValue<'a> = Option<&'a M>;
     type SharedFields = SharedFields<SHARED_BYTES_LEN>;
 
     const FIELD_TYPE: ProtobufFieldType = ProtobufFieldType::Message;
 
-    fn set(&mut self, _shared: &mut Self::SharedFields, value: Self::Value<'_>) {
+    fn set(&mut self, _shared: &mut Self::SharedFields, value: Self::SetValue<'_>) {
         self.data.0 = Some(Box::new(value.clone()));
         // No presence bit needed - Option<Box<M>> handles presence
     }
