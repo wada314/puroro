@@ -1,5 +1,8 @@
 # SharedFields Extensibility Design
 
+**Status**: Historical exploration document - superseded by trait-based approach  
+**Current Implementation**: See `doc/comprehensive-field-descriptor-design.md` and `doc/field-operations-design.md`
+
 ## Critical Design Principle
 
 **All shared state lives INSIDE `SharedFields`, not as function parameters.**

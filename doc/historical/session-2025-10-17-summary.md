@@ -1,5 +1,7 @@
 # Session Summary: 2025-10-17
 
+**Status**: Historical session summary - see `doc/design-discussion.md` for current design decisions
+
 ## Overview
 
 Productive design session establishing the foundational API design for Puroro, a Rust-idiomatic Protocol Buffers implementation.

@@ -1,5 +1,8 @@
 # FieldContext: Do We Really Need It?
 
+**Status**: Historical exploration document - superseded by trait-based approach  
+**Current Implementation**: See `doc/comprehensive-field-descriptor-design.md` and `doc/field-operations-design.md`
+
 ## Current Implementation (with FieldContext)
 
 ```rust

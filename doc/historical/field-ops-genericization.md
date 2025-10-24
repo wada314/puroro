@@ -1,5 +1,8 @@
 # Field Operations Genericization
 
+**Status**: Historical exploration document - superseded by trait-based approach  
+**Current Implementation**: See `doc/comprehensive-field-descriptor-design.md` and `doc/field-operations-design.md`
+
 ## Problem
 
 As we add more protobuf features, `field.rs` will have function explosion:

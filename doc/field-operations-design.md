@@ -1,372 +1,271 @@
 # Field Operations Design
 
+**Last Updated**: 2025-10-21  
+**Status**: Implemented in `puroro/src/field_ops.rs`
+
 ## Overview
 
 This document explains the field operations pattern used in Puroro's generated code,
-separating shared state from exclusive field storage.
+separating shared state from exclusive field storage using a trait-based approach.
 
-**Current Implementation:** Trait-based approach in `puroro/src/field_ops.rs`  
-**See also:** `doc/field-ops-genericization.md` for detailed trait design discussion
+**See also:** `doc/field-context-design.md` for detailed implementation patterns
 
-## Motivation
+## Current Implementation: Trait-Based Field Operations
 
-Generated protobuf code contains repetitive logic for:
-- Setting field values
-- Tracking presence (has_bits)
-- Clearing fields
-- Future: Boolean value packing, allocator handling, etc.
+The current implementation uses a trait-based approach where field operations are
+handled through the `Field` trait, providing type-safe operations with compile-time
+metadata encoding.
 
-By separating **shared state** from **exclusive field storage**, we can:
-1. **Improve generated code readability** - Logic moves to library code
-2. **Reduce code size** - Common logic in one place
-3. **Improve maintainability** - Bug fixes in one place
-4. **Enable future optimizations** - Easy to add allocator support, bool packing, etc.
+### Key Components
 
-## Terminology
+**FieldType Struct**: Holds actual field data with type-level metadata
+```rust
+pub struct FieldType<T, L: FieldLabel, const FIELD_NUMBER: u32, const SHARED_BYTES_LEN: usize> {
+    pub data: T,
+    _phantom: PhantomData<L>,
+}
+```
 
-### Shared Fields
+**Field Trait**: Provides operations for field handling
+```rust
+pub trait Field<T, L: FieldLabel, const FIELD_NUMBER: u32, const SHARED_BYTES_LEN: usize> {
+    type Value<'a>;
+    type GetValue<'a> where Self: 'a;
+    type SharedFields;
+    
+    const FIELD_TYPE: ProtobufFieldType;
+    const FIELD_NUMBER: u32 = FIELD_NUMBER;
+    
+    fn set(&mut self, shared: &mut Self::SharedFields, value: Self::Value<'_>);
+    fn get<'a>(&'a self, shared: &'a Self::SharedFields) -> Self::GetValue<'a>;
+    fn clear(&mut self, shared: &mut Self::SharedFields);
+    fn is_present(&self, shared: &Self::SharedFields) -> bool;
+    fn field_number() -> u32;
+    fn field_type() -> ProtobufFieldType;
+}
+```
 
-Fields that are shared across all message fields:
-- `_has_bits: u32` - Presence tracking
-- `_bool_bits: u32` - Packed boolean values (future)
-- Allocator reference (future)
-- Unknown fields storage (future)
+**SharedFields**: Wrapper for shared state
+```rust
+pub struct SharedFields<const BYTES: usize> {
+    has_bits: BitArray<[u8; BYTES]>,
+}
+```
 
-### Exclusive Fields
+## Field Operation Types
 
-Fields that correspond 1:1 to proto message fields:
-- `name: String` - For proto `string name = 1`
-- `age: i32` - For proto `int32 age = 2`
-- `email: String` - For proto `string email = 3`
+### ImplicitOptional Fields
 
-Note: Boolean proto fields will NOT create exclusive fields - they'll be packed into `_bool_bits`.
-
-## API Design Evolution
-
-### Version 1: Direct Implementation (Initial)
+Fields with implicit presence (Proto3 default behavior):
 
 ```rust
-impl PersonAppend for PersonImpl {
-    #[inline]
-    fn set_name(&mut self, v: &str) {
-        v.clone_into(&mut self.name);  // Reuse allocation
-        self._has_bits |= HAS_NAME;
+impl<const FIELD_NUMBER: u32, const SHARED_BYTES_LEN: usize>
+    Field<String, ImplicitOptional, FIELD_NUMBER, SHARED_BYTES_LEN>
+    for FieldType<String, ImplicitOptional, FIELD_NUMBER, SHARED_BYTES_LEN>
+{
+    type Value<'a> = &'a str;
+    type GetValue<'a> = &'a str;
+    type SharedFields = SharedFields<SHARED_BYTES_LEN>;
+    
+    const FIELD_TYPE: ProtobufFieldType = ProtobufFieldType::String;
+    
+    fn set(&mut self, _shared: &mut Self::SharedFields, value: Self::Value<'_>) {
+        value.clone_into(&mut self.data);
+        // No presence tracking needed
     }
     
-    #[inline]
-    fn set_age(&mut self, v: i32) {
-        self.age = v;
-        self._has_bits |= HAS_AGE;
-    }
-}
-```
-
-**Issues:**
-- Logic repeated for each field
-- Hard to add features (allocator, validation, etc.)
-- Code size grows linearly with field count
-
-### Version 2: SharedFields Pattern (Current)
-
-```rust
-impl PersonAppend for PersonImpl {
-    #[inline]
-    fn set_name(&mut self, v: &str) {
-        // Pass shared + bit index + exclusive field directly
-        field::set_string(&mut self._shared, IDX_NAME, &mut self.name, v);
+    fn get<'a>(&'a self, _shared: &'a Self::SharedFields) -> Self::GetValue<'a> {
+        self.data.as_str()
     }
     
-    #[inline]
-    fn set_age(&mut self, v: i32) {
-        // Single line - clean and direct
-        field::set_scalar(&mut self._shared, IDX_AGE, &mut self.age, v);
+    fn clear(&mut self, _shared: &mut Self::SharedFields) {
+        self.data.clear();
+    }
+    
+    fn is_present(&self, _shared: &Self::SharedFields) -> bool {
+        !self.data.is_empty()  // Present if not default value
     }
 }
 ```
 
-**Benefits:**
-- Logic centralized in `puroro::field`
-- **Single line per operation** (simplest possible)
-- No intermediate wrapper types needed
-- Adding features to `SharedFields`: just update the struct and library functions
+### ExplicitOptional Fields
 
-### Library Code (puroro crate)
+Fields with explicit presence tracking (Proto3 `optional` keyword):
 
 ```rust
-// puroro/src/field.rs
-
-#[inline]
-pub fn set_string<const BYTES: usize>(
-    shared: &mut SharedFields<BYTES>,
-    bit_index: usize,
-    storage: &mut String,
-    value: &str,
-) {
-    value.clone_into(storage);  // Reuse allocation
-    shared.has_bits_mut().set(bit_index, true);
-}
-
-#[inline]
-pub fn set_scalar<const BYTES: usize, T: Copy>(
-    shared: &mut SharedFields<BYTES>,
-    bit_index: usize,
-    storage: &mut T,
-    value: T,
-) {
-    *storage = value;
-    shared.has_bits_mut().set(bit_index, true);
-}
-```
-
-## Boolean Field Optimization
-
-Boolean fields are memory-inefficient as struct fields:
-
-```rust
-// ❌ Without optimization: 1 byte + 3 padding = 4 bytes per bool
-struct Message {
-    is_active: bool,    // 4 bytes (with padding)
-    is_verified: bool,  // 4 bytes (with padding)
-    is_admin: bool,     // 4 bytes (with padding)
-    // Total: 12 bytes for 3 bools
-}
-```
-
-Instead, we pack them into a bit array:
-
-```rust
-// ✅ With optimization: 4 bytes for up to 32 bools
-struct Message {
-    _bool_bits: u32,  // 4 bytes for ALL boolean values!
-    // No exclusive fields for booleans
-}
-
-// Library functions
-#[inline]
-pub fn set_bool_packed(
-    has_bits: &mut u32,
-    bool_bits: &mut u32, 
-    has_mask: u32,
-    bool_mask: u32,
-    value: bool,
-) {
-    *has_bits |= has_mask;  // Mark as set
-    if value {
-        *bool_bits |= bool_mask;
-    } else {
-        *bool_bits &= !bool_mask;
+impl<const FIELD_NUMBER: u32, const PRESENCE_BIT_INDEX: usize, const SHARED_BYTES_LEN: usize>
+    Field<String, ExplicitOptional<PRESENCE_BIT_INDEX>, FIELD_NUMBER, SHARED_BYTES_LEN>
+    for FieldType<String, ExplicitOptional<PRESENCE_BIT_INDEX>, FIELD_NUMBER, SHARED_BYTES_LEN>
+{
+    type Value<'a> = &'a str;
+    type GetValue<'a> = Option<&'a str>;
+    type SharedFields = SharedFields<SHARED_BYTES_LEN>;
+    
+    const FIELD_TYPE: ProtobufFieldType = ProtobufFieldType::String;
+    
+    fn set(&mut self, shared: &mut Self::SharedFields, value: Self::Value<'_>) {
+        value.clone_into(&mut self.data);
+        shared.has_bits_mut().set(PRESENCE_BIT_INDEX, true);
+    }
+    
+    fn get<'a>(&'a self, shared: &'a Self::SharedFields) -> Self::GetValue<'a> {
+        if shared.is_field_present(PRESENCE_BIT_INDEX) {
+            Some(self.data.as_str())
+        } else {
+            None
+        }
+    }
+    
+    fn clear(&mut self, shared: &mut Self::SharedFields) {
+        self.data.clear();
+        shared.has_bits_mut().set(PRESENCE_BIT_INDEX, false);
+    }
+    
+    fn is_present(&self, shared: &Self::SharedFields) -> bool {
+        shared.is_field_present(PRESENCE_BIT_INDEX)
     }
 }
 ```
 
-## Future Extensions
+## Field Label Types
 
-### Critical Design Principle: Shared State Lives Inside SharedFields
-
-**All** shared state is stored **inside** `SharedFields`, not passed as function parameters.
-
-This means:
-- ✅ Allocator is stored IN the message
-- ✅ Bool_bits is IN SharedFields
-- ✅ Unknown_fields is IN SharedFields
-- ✅ Function signatures remain stable
-
-### Allocator Support (Future)
+Protobuf field labels are represented as zero-sized marker types:
 
 ```rust
-// Add allocator to SharedFields
-pub struct SharedFields<const BYTES: usize, A: Allocator = Global> {
-    has_bits: BitArray<[u8; BYTES]>,
-    allocator: A,  // Stored in message!
-}
+/// Marker trait for protobuf field labels
+pub trait FieldLabel: private::Sealed {}
 
-// Function signature automatically adapts
-pub fn set_string<const BYTES: usize, A: Allocator>(
-    shared: &mut SharedFields<BYTES, A>,  // Compiler infers A
-    bit_index: usize,
-    storage: &mut String,  // Or allocator-aware String
-    value: &str,
-) {
-    // Can use shared.allocator internally
-    value.clone_into(storage);
-    shared.has_bits_mut().set(bit_index, true);
-}
+/// Marker for implicit optional fields (Proto3 default)
+pub struct ImplicitOptional;
 
-// Generated code doesn't change!
-field::set_string(&mut self._shared, IDX_NAME, &mut self.name, v);
+/// Marker for explicit optional fields (Proto3 `optional` keyword)
+pub struct ExplicitOptional<const PRESENCE_BIT_INDEX: usize>;
+
+/// Marker for repeated fields
+pub struct Repeated;
+
+/// Marker for map fields
+pub struct Map;
 ```
 
-**Key advantage:** No need to thread allocator through every function call.
+## Protobuf Field Types
 
-### Boolean Packing (Future)
+The `ProtobufFieldType` enum represents all supported protobuf field types:
 
 ```rust
-// Add bool_bits to SharedFields
-pub struct SharedFields<const BYTES: usize, const BOOL_BYTES: usize> {
-    has_bits: BitArray<[u8; BYTES]>,
-    bool_bits: BitArray<[u8; BOOL_BYTES]>,  // Added
-}
-
-// New function for boolean fields
-pub fn set_bool<const BYTES: usize, const BOOL_BYTES: usize>(
-    shared: &mut SharedFields<BYTES, BOOL_BYTES>,
-    bit_index: usize,
-    value: bool,
-) {
-    shared.has_bits_mut().set(bit_index, true);
-    shared.bool_bits_mut().set(bit_index, value);
+pub enum ProtobufFieldType {
+    // Scalar types
+    Int32, Int64, UInt32, UInt64,
+    SInt32, SInt64, Fixed32, Fixed64,
+    SFixed32, SFixed64, Float, Double, Bool,
+    
+    // String types
+    String, Bytes,
+    
+    // Message types
+    Message, Enum, Group,
 }
 ```
 
-### Unknown Fields (Future)
+Each field type knows its wire type for serialization:
 
 ```rust
-pub struct SharedFields<const BYTES: usize, A: Allocator = Global> {
-    has_bits: BitArray<[u8; BYTES]>,
-    allocator: A,
-    unknown_fields: Vec<u8, A>,  // Using the same allocator
+impl ProtobufFieldType {
+    pub const fn wire_type(self) -> u8 {
+        match self {
+            Self::Int32 | Self::Int64 | Self::UInt32 | Self::UInt64 |
+            Self::SInt32 | Self::SInt64 | Self::Bool => 0, // Varint
+            
+            Self::Fixed64 | Self::SFixed64 | Self::Double => 1, // 64-bit
+            
+            Self::String | Self::Bytes | Self::Message | Self::Enum => 2, // Length-delimited
+            
+            Self::Fixed32 | Self::SFixed32 | Self::Float => 5, // 32-bit
+            
+            Self::Group => 3, // Start group (deprecated)
+        }
+    }
 }
 ```
 
-## Design Decisions
+## Implementation Status
 
-### Why not a mega-generic function?
+### ✅ Completed Field Types
 
-We could create one ultra-generic function:
+**String Fields**:
+- ✅ ImplicitOptional (Proto3 default)
+- ✅ ExplicitOptional (Proto3 `optional` keyword)
+
+**Scalar Fields**:
+- ✅ i32, i64, u32, u64 (ImplicitOptional and ExplicitOptional)
+- ✅ f32, f64 (ImplicitOptional and ExplicitOptional)
+- ✅ bool (ImplicitOptional and ExplicitOptional)
+
+### 🚧 In Progress
+
+**Complex Field Types**:
+- 🚧 Repeated fields (Vec<T>)
+- 🚧 Map fields (HashMap<K, V>)
+- 🚧 Message fields (nested messages)
+- 🚧 Enum fields
+
+### 📋 Future
+
+**Advanced Features**:
+- 📋 Boolean field packing optimization
+- 📋 Allocator support integration
+- 📋 Unknown fields preservation
+- 📋 Oneof field support
+
+## Design Benefits
+
+### Type Safety
+
+The trait-based approach provides compile-time guarantees:
 
 ```rust
-pub fn set_field<T, const IS_STRING: bool, const IS_REPEATED: bool, ...>(
-    ctx: FieldContext,
-    storage: &mut T,
-    value: impl Into<T>,
-) { ... }
+// Field number is encoded at type level
+type NameField = FieldType<String, ImplicitOptional, 1, 1>;
+type EmailField = FieldType<String, ExplicitOptional<0>, 3, 1>;
+
+// Compiler enforces correct usage
+assert_eq!(NameField::FIELD_NUMBER, 1);
+assert_eq!(EmailField::FIELD_NUMBER, 3);
 ```
 
-**Decision: Start simple, add generics only when patterns emerge**
+### Memory Efficiency
 
-Current approach:
-- `set_scalar<T>` - For Copy types
-- `set_string` - For string fields
-- `set_bytes` - For bytes fields  
-- `set_bool_packed` - For boolean fields
-- (Future) `add_repeated<T>` - For repeated fields
-- (Future) `set_message<T>` - For nested messages
+- **Stack allocation**: SharedFields uses BitArray for presence tracking
+- **No Option<T> overhead**: ExplicitOptional fields use bit flags instead
+- **Scalable**: Supports unlimited fields with minimal memory overhead
 
-### Why direct access for read-only?
+### Code Generation
 
-For `has_*()` methods:
+The trait-based approach simplifies code generation:
 
 ```rust
-// Option A: Use FieldContext (complex)
-fn has_name(&self) -> bool {
-    let ctx = FieldContext { has_bits: ???, ... };  // Can't create &mut from &self
-    field::has_string(&ctx)
-}
-
-// Option B: Direct access (chosen)
-fn has_name(&self) -> bool {
-    (self._has_bits & HAS_NAME) != 0
-}
-```
-
-**Decision: Direct access for read-only operations**
-
-Creating `FieldContext` requires `&mut`, which we don't have in `&self` methods. Direct bit checking is clearer and more efficient.
-
-### Naming: Why "Context"?
-
-Alternatives considered:
-- `FieldMetadata` - Not accurate (allocator isn't metadata)
-- `FieldState` - Not accurate (allocator isn't state)
-- `FieldShared` - Accurate but less idiomatic
-- `FieldContext` - **Chosen** - Provides "context" for field operations
-
-## Code Size Impact
-
-Example with 100 fields:
-
-**Before (direct implementation):**
-```
-100 fields × ~50 lines each = 5000 lines of repetitive code
-```
-
-**After (field context):**
-```
-100 fields × ~3 lines each = 300 lines
-+ Library code in puroro crate = ~200 lines
-Total: 500 lines (10x reduction)
-```
-
-## BitArr for All Messages
-
-### Design Decision: Use BitArr (Fixed-Size, Stack-Allocated)
-
-We use `bitvec`'s `BitArr!` for **all** messages, with field count known at compile time.
-
-**Rationale:**
-- **Zero heap overhead**: Stack-allocated, same efficiency as u32
-- **No artificial limits**: Supports any number of fields
-- **Simplicity**: One implementation pattern
-- **Best of both worlds**: u32 performance + unlimited fields
-
-### Implementation
-
-```rust
-use puroro::{
-    field,
-    shared::SharedFields,
-};
-
-pub struct PersonImpl {
-    // Shared fields wrapper: For 3 fields, ⌈3/8⌉ = 1 byte
-    _shared: SharedFields<1>,
-    // Exclusive fields
-    name: String,
-    age: i32,
-}
-
+// Generated code is simple and consistent
 impl PersonAppend for PersonImpl {
     fn set_name(&mut self, v: &str) {
-        // Pass shared fields + bit index + exclusive field directly
-        field::set_string(&mut self._shared, 0, &mut self.name, v);
+        self.name.set(&mut self._shared, v);
+    }
+    
+    fn set_email(&mut self, v: &str) {
+        self.email.set(&mut self._shared, v);
     }
 }
 ```
-
-**Key insights:**
-1. Generic const parameter is **BYTES** (not bits), so we can use `BitArray<[u8; BYTES]>` directly
-2. No `FieldContext` needed - pass `SharedFields` directly for simplicity
-
-### Memory Impact
-
-**Small message (3 fields):**
-- Old u32 approach: 56 bytes (u32: 4 bytes)
-- **BitArr approach: 56 bytes** (BitArr!(for 3, in u8): 1 byte) ✅
-- **No overhead!**
-
-**Large message (100 fields):**
-- Hypothetical u64 array: 8-16 bytes
-- **BitArr approach: 13 bytes** (BitArr!(for 100, in u8): 13 bytes) ✅
-- **Still efficient!**
-
-**Perfect solution:**
-- ✅ Same memory efficiency as u32 for small messages
-- ✅ No field count limitations
-- ✅ Stack-allocated (no heap overhead)
-- ✅ Scales efficiently for large messages
 
 ## Summary
 
-The Field Operations pattern with SharedFields:
-- ✅ Separates shared state from exclusive storage
-- ✅ Centralizes logic in library code  
-- ✅ **Single-line operations** (simplest possible generated code)
-- ✅ Reduces code size significantly
-- ✅ Enables future optimizations (allocators, bool packing, etc.)
-- ✅ Maintains full inlining for performance
-- ✅ **No field count limitations** (BitArr supports unlimited fields)
-- ✅ **Zero heap overhead** (stack-allocated, fixed size)
-- ✅ **Best of both worlds** (u32 efficiency + unlimited fields)
-- ✅ **No wrapper types** (SharedFields passed directly)
-- ✅ **Simple implementation** (one pattern for all message sizes)
+The trait-based field operations approach provides:
+
+- ✅ **Type Safety**: Compile-time validation of field operations
+- ✅ **Memory Efficiency**: Stack-allocated SharedFields with BitArray
+- ✅ **Code Simplicity**: Single-line operations in generated code
+- ✅ **Extensibility**: Easy to add new field types and features
+- ✅ **Performance**: Zero runtime overhead for field operations
+- ✅ **Scalability**: Supports unlimited fields with minimal overhead
+
+This design forms the foundation for Puroro's efficient and type-safe protobuf implementation.
 

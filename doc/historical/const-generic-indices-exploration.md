@@ -1,5 +1,8 @@
 # Const Generic Indices Exploration
 
+**Status**: Historical exploration document - superseded by trait-based approach  
+**Current Implementation**: See `doc/comprehensive-field-descriptor-design.md` and `doc/field-operations-design.md`
+
 ## Idea
 
 Pass field-specific information (bit indices) as const generic parameters instead of runtime parameters.

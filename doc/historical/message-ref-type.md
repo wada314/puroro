@@ -1,5 +1,8 @@
 # Design discussion: Message ref type
 
+**Status**: Historical exploration document - superseded by trait-based approach  
+**Current Implementation**: See `doc/comprehensive-field-descriptor-design.md` and `doc/field-operations-design.md`
+
 ## Example
 
 For the following proto3 message:
