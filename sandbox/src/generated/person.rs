@@ -6,7 +6,7 @@
 
 use puroro::{
     error::Error,
-    field_ops::{ExplicitOptional, Field, FieldType, ImplicitOptional},
+    field_ops::{ExplicitOptional, Field, FieldType, ImplicitOptional, MessageField, StringField},
     shared::SharedFields,
     Message,
 };
@@ -22,11 +22,17 @@ pub trait Person {
     fn email(&self) -> Option<&str>;
     fn score(&self) -> Option<i32>;
 
+    // Message field getters
+    fn address(&self) -> Option<&Address>; // Message fields always return Option, even for ImplicitOptional
+    fn profile(&self) -> Option<&Profile>;
+
     // Presence checks (for Proto3 optional semantics)
     fn has_name(&self) -> bool;
     fn has_age(&self) -> bool;
     fn has_email(&self) -> bool;
     fn has_score(&self) -> bool;
+    fn has_address(&self) -> bool;
+    fn has_profile(&self) -> bool;
 }
 
 /// Infallible append-only trait for Person message.
@@ -40,6 +46,14 @@ pub trait PersonAppend: Person {
     fn set_age(&mut self, v: i32);
     fn set_email(&mut self, v: &str);
     fn set_score(&mut self, v: i32);
+
+    // Message field setters
+    fn set_address(&mut self, v: &Address);
+    fn set_profile(&mut self, v: &Profile);
+
+    // Builder-style methods for nested message construction
+    fn address_mut(&mut self) -> &mut Address;
+    fn profile_mut(&mut self) -> &mut Profile;
 }
 
 /// Infallible fully mutable trait for Person message.
@@ -52,6 +66,10 @@ pub trait PersonMut: PersonAppend {
     fn clear_age(&mut self);
     fn clear_email(&mut self);
     fn clear_score(&mut self);
+
+    // Message field clearers
+    fn clear_address(&mut self);
+    fn clear_profile(&mut self);
 }
 
 /// Fallible immutable trait for Person message.
@@ -100,6 +118,142 @@ pub trait PersonTryMut: PersonAppendTry {
 }
 
 // ============================================================================
+// Address Message
+// ============================================================================
+
+/// Address message implementation
+#[derive(Debug, Clone, PartialEq)]
+pub struct Address {
+    street: FieldType<StringField, ImplicitOptional, 1, 1>,
+    city: FieldType<StringField, ImplicitOptional, 2, 1>,
+    zip_code: FieldType<i32, ImplicitOptional, 3, 1>,
+    _shared: SharedFields<1>,
+}
+
+impl Address {
+    pub fn new() -> Self {
+        Self {
+            street: Default::default(),
+            city: Default::default(),
+            zip_code: Default::default(),
+            _shared: SharedFields::new(),
+        }
+    }
+
+    pub fn street(&self) -> &str {
+        self.street.get(&self._shared)
+    }
+
+    pub fn city(&self) -> &str {
+        self.city.get(&self._shared)
+    }
+
+    pub fn zip_code(&self) -> i32 {
+        self.zip_code.get(&self._shared)
+    }
+
+    pub fn set_street(&mut self, v: &str) {
+        self.street.set(&mut self._shared, v);
+    }
+
+    pub fn set_city(&mut self, v: &str) {
+        self.city.set(&mut self._shared, v);
+    }
+
+    pub fn set_zip_code(&mut self, v: i32) {
+        self.zip_code.set(&mut self._shared, v);
+    }
+}
+
+impl Default for Address {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl Message for Address {
+    fn parse_from_bytes(_bytes: &[u8]) -> Result<Self, Error> {
+        todo!("Parsing not yet implemented")
+    }
+
+    fn write_to_bytes(&self) -> Result<Vec<u8>, Error> {
+        todo!("Serialization not yet implemented")
+    }
+
+    fn compute_size(&self) -> usize {
+        todo!("Size computation not yet implemented")
+    }
+}
+
+// ============================================================================
+// Profile Message
+// ============================================================================
+
+/// Profile message implementation
+#[derive(Debug, Clone, PartialEq)]
+pub struct Profile {
+    bio: FieldType<StringField, ImplicitOptional, 1, 1>,
+    website: FieldType<StringField, ExplicitOptional<0>, 2, 1>,
+    reputation: FieldType<i32, ImplicitOptional, 3, 1>,
+    _shared: SharedFields<1>,
+}
+
+impl Profile {
+    pub fn new() -> Self {
+        Self {
+            bio: Default::default(),
+            website: Default::default(),
+            reputation: Default::default(),
+            _shared: SharedFields::new(),
+        }
+    }
+
+    pub fn bio(&self) -> &str {
+        self.bio.get(&self._shared)
+    }
+
+    pub fn website(&self) -> Option<&str> {
+        self.website.get(&self._shared)
+    }
+
+    pub fn reputation(&self) -> i32 {
+        self.reputation.get(&self._shared)
+    }
+
+    pub fn set_bio(&mut self, v: &str) {
+        self.bio.set(&mut self._shared, v);
+    }
+
+    pub fn set_website(&mut self, v: &str) {
+        self.website.set(&mut self._shared, v);
+    }
+
+    pub fn set_reputation(&mut self, v: i32) {
+        self.reputation.set(&mut self._shared, v);
+    }
+}
+
+impl Default for Profile {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl Message for Profile {
+    fn parse_from_bytes(_bytes: &[u8]) -> Result<Self, Error> {
+        todo!("Parsing not yet implemented")
+    }
+
+    fn write_to_bytes(&self) -> Result<Vec<u8>, Error> {
+        todo!("Serialization not yet implemented")
+    }
+
+    fn compute_size(&self) -> usize {
+        todo!("Size computation not yet implemented")
+    }
+}
+
+// ============================================================================
 // PersonImpl Structure
 // ============================================================================
 
@@ -111,15 +265,21 @@ pub trait PersonTryMut: PersonAppendTry {
 #[derive(Debug, Clone, PartialEq)]
 pub struct PersonImpl {
     // Shared fields: presence tracking, etc.
-    // For 2 explicit optional fields: ⌈2/8⌉ = 1 byte (stack-allocated)
+    // For 2 explicit optional fields (email, score): ⌈2/8⌉ = 1 byte (stack-allocated)
+    // Message fields use heap allocation with Option<Box<M>> for presence tracking
     _shared: SharedFields<1>,
 
     // Exclusive fields ordered by size (descending)
     // String: 24 bytes (3 words on 64-bit)
     // Direct field types with explicit parameters for clarity
     // Format: FieldType<T, L, FIELD_NUMBER, SHARED_BYTES_LEN>
-    name: FieldType<String, ImplicitOptional, 1, 1>, // Field 1, implicit presence, 1 byte shared
-    email: FieldType<String, ExplicitOptional<0>, 3, 1>, // Field 3, explicit presence, bit 0, 1 byte shared
+    name: FieldType<StringField, ImplicitOptional, 1, 1>, // Field 1, implicit presence, 1 byte shared
+    email: FieldType<StringField, ExplicitOptional<0>, 3, 1>, // Field 3, explicit presence, bit 0, 1 byte shared
+
+    // Message fields: use heap allocation with Option<Box<M>> for presence tracking
+    // No presence bits needed - Option<Box<M>> handles presence directly
+    address: FieldType<MessageField<Address>, ImplicitOptional, 6, 1>, // Field 6, heap-allocated presence
+    profile: FieldType<MessageField<Profile>, ImplicitOptional, 7, 1>, // Field 7, heap-allocated presence
 
     // Scalar fields: 4 bytes
     age: FieldType<i32, ImplicitOptional, 2, 1>, // Field 2, implicit presence, 1 byte shared
@@ -132,6 +292,8 @@ impl PersonImpl {
         Self {
             name: Default::default(),
             email: Default::default(),
+            address: Default::default(),
+            profile: Default::default(),
             _shared: SharedFields::new(),
             age: Default::default(),
             score: Default::default(),
@@ -167,6 +329,16 @@ impl Person for PersonImpl {
     }
 
     #[inline]
+    fn address(&self) -> Option<&Address> {
+        self.address.get(&self._shared)
+    }
+
+    #[inline]
+    fn profile(&self) -> Option<&Profile> {
+        self.profile.get(&self._shared)
+    }
+
+    #[inline]
     fn has_name(&self) -> bool {
         // ImplicitOptional fields check if value is not equal to default
         self.name.is_present(&self._shared)
@@ -188,6 +360,18 @@ impl Person for PersonImpl {
     fn has_score(&self) -> bool {
         // ExplicitOptional fields check presence via Field trait
         self.score.is_present(&self._shared)
+    }
+
+    #[inline]
+    fn has_address(&self) -> bool {
+        // ImplicitOptional fields check if value is not equal to default
+        self.address.is_present(&self._shared)
+    }
+
+    #[inline]
+    fn has_profile(&self) -> bool {
+        // ExplicitOptional fields check presence via Field trait
+        self.profile.is_present(&self._shared)
     }
 }
 
@@ -211,6 +395,34 @@ impl PersonAppend for PersonImpl {
     fn set_score(&mut self, v: i32) {
         self.score.set(&mut self._shared, v);
     }
+
+    #[inline]
+    fn set_address(&mut self, v: &Address) {
+        self.address.set(&mut self._shared, v);
+    }
+
+    #[inline]
+    fn set_profile(&mut self, v: &Profile) {
+        self.profile.set(&mut self._shared, v);
+    }
+
+    #[inline]
+    fn address_mut(&mut self) -> &mut Address {
+        // Ensure field is allocated and marked as present
+        if self.address.data.0.is_none() {
+            self.address.data.0 = Some(Box::new(Address::default()));
+        }
+        self.address.data.0.as_mut().unwrap().as_mut()
+    }
+
+    #[inline]
+    fn profile_mut(&mut self) -> &mut Profile {
+        // Ensure field is allocated and marked as present
+        if self.profile.data.0.is_none() {
+            self.profile.data.0 = Some(Box::new(Profile::default()));
+        }
+        self.profile.data.0.as_mut().unwrap().as_mut()
+    }
 }
 
 impl PersonMut for PersonImpl {
@@ -232,6 +444,16 @@ impl PersonMut for PersonImpl {
     #[inline]
     fn clear_score(&mut self) {
         self.score.clear(&mut self._shared);
+    }
+
+    #[inline]
+    fn clear_address(&mut self) {
+        self.address.clear(&mut self._shared);
+    }
+
+    #[inline]
+    fn clear_profile(&mut self) {
+        self.profile.clear(&mut self._shared);
     }
 }
 
@@ -345,6 +567,72 @@ impl Message for PersonImpl {
     fn compute_size(&self) -> usize {
         // TODO: Implement actual size computation
         todo!("Size computation not yet implemented")
+    }
+}
+
+// ============================================================================
+// Tests
+// ============================================================================
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_message_fields() {
+        let mut person = PersonImpl::new();
+
+        // Test setting message fields
+        let mut address = Address::new();
+        address.set_street("123 Main St");
+        address.set_city("Anytown");
+        address.set_zip_code(12345);
+
+        person.set_address(&address);
+
+        // Test getting message fields
+        let retrieved_address = person.address().unwrap();
+        assert_eq!(retrieved_address.street(), "123 Main St");
+        assert_eq!(retrieved_address.city(), "Anytown");
+        assert_eq!(retrieved_address.zip_code(), 12345);
+
+        // Test presence checking
+        assert!(person.has_address());
+
+        // Test builder pattern
+        person.address_mut().set_street("456 Oak Ave");
+        assert_eq!(person.address().unwrap().street(), "456 Oak Ave");
+
+        // Test optional message field
+        let mut profile = Profile::new();
+        profile.set_bio("Software developer");
+        profile.set_reputation(100);
+
+        person.set_profile(&profile);
+
+        let retrieved_profile = person.profile().unwrap();
+        assert_eq!(retrieved_profile.bio(), "Software developer");
+        assert_eq!(retrieved_profile.reputation(), 100);
+        assert!(person.has_profile());
+
+        // Test clearing message fields
+        person.clear_address();
+        assert!(!person.has_address());
+
+        person.clear_profile();
+        assert!(!person.has_profile());
+    }
+
+    #[test]
+    fn test_wrapper_types() {
+        // Test StringField wrapper
+        let string_field = StringField("Hello".to_string());
+        assert_eq!(string_field.0, "Hello");
+
+        // Test MessageField wrapper
+        let address = Address::new();
+        let message_field = MessageField(Some(Box::new(address)));
+        assert_eq!(message_field.0.as_ref().unwrap().street(), "");
     }
 }
 

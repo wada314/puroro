@@ -12,15 +12,22 @@ message Person {
   // TODO: Implement repeated field support
   // repeated string hobbies = 4;        // repeated string field
   
-  // TODO: Implement message field support
-  // Address address = 6;               // message field
+  // Message field support - now implemented!
+  Address address = 6;               // message field (implicit presence)
+  optional Profile profile = 7;     // message field (explicit presence)
 }
 
-// TODO: Implement message field support
 // A nested message for testing message fields
-// message Address {
-//   string street = 1;
-//   string city = 2;
-//   int32 zip_code = 3;
-// }
+message Address {
+  string street = 1;
+  string city = 2;
+  int32 zip_code = 3;
+}
+
+// Another nested message for testing explicit optional message fields
+message Profile {
+  string bio = 1;
+  optional string website = 2;
+  int32 reputation = 3;
+}
 

@@ -163,6 +163,64 @@ impl ScalarType for f64 {}
 impl ScalarType for bool {}
 
 // ============================================================================
+// Wrapper Types for Complex Protobuf Field Types
+// ============================================================================
+
+/// Wrapper type for String protobuf fields.
+///
+/// This wrapper is needed to distinguish String fields from scalar types
+/// in the Field trait implementations, avoiding trait conflicts.
+#[derive(Debug, Clone, PartialEq)]
+pub struct StringField(pub String);
+
+/// Wrapper type for Bytes protobuf fields.
+///
+/// This wrapper is needed to distinguish Bytes fields from scalar types
+/// in the Field trait implementations, avoiding trait conflicts.
+#[derive(Debug, Clone, PartialEq)]
+pub struct BytesField(pub Vec<u8>);
+
+/// Wrapper type for Message protobuf fields.
+///
+/// This wrapper is needed to distinguish Message fields from scalar types
+/// in the Field trait implementations, avoiding trait conflicts.
+/// Uses heap allocation with pointer null checks for presence tracking.
+#[derive(Debug, Clone, PartialEq)]
+pub struct MessageField<M: crate::Message>(pub Option<Box<M>>);
+
+/// Wrapper type for Enum protobuf fields.
+///
+/// This wrapper is needed to distinguish Enum fields from scalar types
+/// in the Field trait implementations, avoiding trait conflicts.
+#[derive(Debug, Clone, PartialEq)]
+pub struct EnumField<E>(pub E);
+
+// Default implementations for wrapper types
+impl Default for StringField {
+    fn default() -> Self {
+        Self(String::new())
+    }
+}
+
+impl Default for BytesField {
+    fn default() -> Self {
+        Self(Vec::new())
+    }
+}
+
+impl<M: crate::Message> Default for MessageField<M> {
+    fn default() -> Self {
+        Self(None)
+    }
+}
+
+impl<E: Default> Default for EnumField<E> {
+    fn default() -> Self {
+        Self(E::default())
+    }
+}
+
+// ============================================================================
 // Field Descriptor Type
 // ============================================================================
 
@@ -293,71 +351,6 @@ pub trait Field<T, L: FieldLabel, const FIELD_NUMBER: u32, const SHARED_BYTES_LE
 // FieldType Implementations
 // ============================================================================
 
-/// Implementation for String fields with ImplicitOptional
-impl<const FIELD_NUMBER: u32, const SHARED_BYTES_LEN: usize>
-    Field<String, ImplicitOptional, FIELD_NUMBER, SHARED_BYTES_LEN>
-    for FieldType<String, ImplicitOptional, FIELD_NUMBER, SHARED_BYTES_LEN>
-{
-    type Value<'a> = &'a str; // Accept any &str
-    type GetValue<'a> = &'a str;
-    type SharedFields = SharedFields<SHARED_BYTES_LEN>;
-
-    const FIELD_TYPE: ProtobufFieldType = ProtobufFieldType::String;
-
-    fn set(&mut self, _shared: &mut Self::SharedFields, value: Self::Value<'_>) {
-        value.clone_into(&mut self.data);
-        // ImplicitOptional fields don't need presence tracking
-    }
-
-    fn get<'a>(&'a self, _shared: &'a Self::SharedFields) -> Self::GetValue<'a> {
-        self.data.as_str()
-    }
-
-    fn clear(&mut self, _shared: &mut Self::SharedFields) {
-        self.data.clear();
-        // ImplicitOptional fields don't need presence tracking
-    }
-
-    fn is_present(&self, _shared: &Self::SharedFields) -> bool {
-        // ImplicitOptional fields are present only if not equal to default value (empty string)
-        !self.data.is_empty()
-    }
-}
-
-/// Implementation for String fields with ExplicitOptional
-impl<const FIELD_NUMBER: u32, const PRESENCE_BIT_INDEX: usize, const SHARED_BYTES_LEN: usize>
-    Field<String, ExplicitOptional<PRESENCE_BIT_INDEX>, FIELD_NUMBER, SHARED_BYTES_LEN>
-    for FieldType<String, ExplicitOptional<PRESENCE_BIT_INDEX>, FIELD_NUMBER, SHARED_BYTES_LEN>
-{
-    type Value<'a> = &'a str; // Accept any &str
-    type GetValue<'a> = Option<&'a str>;
-    type SharedFields = SharedFields<SHARED_BYTES_LEN>;
-
-    const FIELD_TYPE: ProtobufFieldType = ProtobufFieldType::String;
-
-    fn set(&mut self, shared: &mut Self::SharedFields, value: Self::Value<'_>) {
-        value.clone_into(&mut self.data);
-        shared.has_bits_mut().set(PRESENCE_BIT_INDEX, true);
-    }
-
-    fn get<'a>(&'a self, shared: &'a Self::SharedFields) -> Self::GetValue<'a> {
-        if shared.is_field_present(PRESENCE_BIT_INDEX) {
-            Some(self.data.as_str())
-        } else {
-            None
-        }
-    }
-
-    fn clear(&mut self, shared: &mut Self::SharedFields) {
-        self.data.clear();
-        shared.has_bits_mut().set(PRESENCE_BIT_INDEX, false);
-    }
-
-    fn is_present(&self, shared: &Self::SharedFields) -> bool {
-        shared.is_field_present(PRESENCE_BIT_INDEX)
-    }
-}
-
 /// Implementation for scalar types with ImplicitOptional
 impl<T: ScalarType, const FIELD_NUMBER: u32, const SHARED_BYTES_LEN: usize>
     Field<T, ImplicitOptional, FIELD_NUMBER, SHARED_BYTES_LEN>
@@ -434,6 +427,154 @@ impl<
 }
 
 // ============================================================================
+// Wrapper Type Field Implementations
+// ============================================================================
+
+/// Implementation for StringField with ImplicitOptional
+impl<const FIELD_NUMBER: u32, const SHARED_BYTES_LEN: usize>
+    Field<StringField, ImplicitOptional, FIELD_NUMBER, SHARED_BYTES_LEN>
+    for FieldType<StringField, ImplicitOptional, FIELD_NUMBER, SHARED_BYTES_LEN>
+{
+    type Value<'a> = &'a str;
+    type GetValue<'a> = &'a str;
+    type SharedFields = SharedFields<SHARED_BYTES_LEN>;
+
+    const FIELD_TYPE: ProtobufFieldType = ProtobufFieldType::String;
+
+    fn set(&mut self, _shared: &mut Self::SharedFields, value: Self::Value<'_>) {
+        value.clone_into(&mut self.data.0);
+        // ImplicitOptional fields don't need presence tracking
+    }
+
+    fn get<'a>(&'a self, _shared: &'a Self::SharedFields) -> Self::GetValue<'a> {
+        self.data.0.as_str()
+    }
+
+    fn clear(&mut self, _shared: &mut Self::SharedFields) {
+        self.data.0.clear();
+        // ImplicitOptional fields don't need presence tracking
+    }
+
+    fn is_present(&self, _shared: &Self::SharedFields) -> bool {
+        // ImplicitOptional fields are present only if not equal to default value (empty string)
+        !self.data.0.is_empty()
+    }
+}
+
+/// Implementation for StringField with ExplicitOptional
+impl<const FIELD_NUMBER: u32, const PRESENCE_BIT_INDEX: usize, const SHARED_BYTES_LEN: usize>
+    Field<StringField, ExplicitOptional<PRESENCE_BIT_INDEX>, FIELD_NUMBER, SHARED_BYTES_LEN>
+    for FieldType<StringField, ExplicitOptional<PRESENCE_BIT_INDEX>, FIELD_NUMBER, SHARED_BYTES_LEN>
+{
+    type Value<'a> = &'a str;
+    type GetValue<'a> = Option<&'a str>;
+    type SharedFields = SharedFields<SHARED_BYTES_LEN>;
+
+    const FIELD_TYPE: ProtobufFieldType = ProtobufFieldType::String;
+
+    fn set(&mut self, shared: &mut Self::SharedFields, value: Self::Value<'_>) {
+        value.clone_into(&mut self.data.0);
+        shared.has_bits_mut().set(PRESENCE_BIT_INDEX, true);
+    }
+
+    fn get<'a>(&'a self, shared: &'a Self::SharedFields) -> Self::GetValue<'a> {
+        if shared.is_field_present(PRESENCE_BIT_INDEX) {
+            Some(self.data.0.as_str())
+        } else {
+            None
+        }
+    }
+
+    fn clear(&mut self, shared: &mut Self::SharedFields) {
+        self.data.0.clear();
+        shared.has_bits_mut().set(PRESENCE_BIT_INDEX, false);
+    }
+
+    fn is_present(&self, shared: &Self::SharedFields) -> bool {
+        shared.is_field_present(PRESENCE_BIT_INDEX)
+    }
+}
+
+/// Implementation for MessageField with ImplicitOptional
+///
+/// Uses heap allocation with pointer null checks for presence tracking.
+/// No need for presence bits - the Option<Box<M>> handles presence directly.
+impl<M: crate::Message + 'static, const FIELD_NUMBER: u32, const SHARED_BYTES_LEN: usize>
+    Field<MessageField<M>, ImplicitOptional, FIELD_NUMBER, SHARED_BYTES_LEN>
+    for FieldType<MessageField<M>, ImplicitOptional, FIELD_NUMBER, SHARED_BYTES_LEN>
+{
+    type Value<'a> = &'a M;
+    type GetValue<'a> = Option<&'a M>; // Message fields always return Option
+    type SharedFields = SharedFields<SHARED_BYTES_LEN>;
+
+    const FIELD_TYPE: ProtobufFieldType = ProtobufFieldType::Message;
+
+    fn set(&mut self, _shared: &mut Self::SharedFields, value: Self::Value<'_>) {
+        self.data.0 = Some(Box::new(value.clone()));
+        // No presence bit needed - Option<Box<M>> handles presence
+    }
+
+    fn get<'a>(&'a self, _shared: &'a Self::SharedFields) -> Self::GetValue<'a> {
+        // Use Option<Box<M>> for presence checking
+        self.data.0.as_ref().map(|boxed| boxed.as_ref())
+    }
+
+    fn clear(&mut self, _shared: &mut Self::SharedFields) {
+        self.data.0 = None;
+        // No presence bit needed - Option<Box<M>> handles presence
+    }
+
+    fn is_present(&self, _shared: &Self::SharedFields) -> bool {
+        // Use Option<Box<M>> for presence checking
+        self.data.0.is_some()
+    }
+}
+
+/// Implementation for MessageField with ExplicitOptional
+///
+/// Uses heap allocation with pointer null checks for presence tracking.
+/// No need for presence bits - the Option<Box<M>> handles presence directly.
+impl<
+        M: crate::Message + 'static,
+        const FIELD_NUMBER: u32,
+        const PRESENCE_BIT_INDEX: usize,
+        const SHARED_BYTES_LEN: usize,
+    > Field<MessageField<M>, ExplicitOptional<PRESENCE_BIT_INDEX>, FIELD_NUMBER, SHARED_BYTES_LEN>
+    for FieldType<
+        MessageField<M>,
+        ExplicitOptional<PRESENCE_BIT_INDEX>,
+        FIELD_NUMBER,
+        SHARED_BYTES_LEN,
+    >
+{
+    type Value<'a> = &'a M;
+    type GetValue<'a> = Option<&'a M>;
+    type SharedFields = SharedFields<SHARED_BYTES_LEN>;
+
+    const FIELD_TYPE: ProtobufFieldType = ProtobufFieldType::Message;
+
+    fn set(&mut self, _shared: &mut Self::SharedFields, value: Self::Value<'_>) {
+        self.data.0 = Some(Box::new(value.clone()));
+        // No presence bit needed - Option<Box<M>> handles presence
+    }
+
+    fn get<'a>(&'a self, _shared: &'a Self::SharedFields) -> Self::GetValue<'a> {
+        // Use Option<Box<M>> for presence checking
+        self.data.0.as_ref().map(|boxed| boxed.as_ref())
+    }
+
+    fn clear(&mut self, _shared: &mut Self::SharedFields) {
+        self.data.0 = None;
+        // No presence bit needed - Option<Box<M>> handles presence
+    }
+
+    fn is_present(&self, _shared: &Self::SharedFields) -> bool {
+        // Use Option<Box<M>> for presence checking
+        self.data.0.is_some()
+    }
+}
+
+// ============================================================================
 // Tests
 // ============================================================================
 
@@ -450,9 +591,9 @@ mod tests {
 
     #[test]
     fn test_field_type_constants() {
-        type NameField = FieldType<String, ImplicitOptional, 1, 1>;
+        type NameField = FieldType<StringField, ImplicitOptional, 1, 1>;
         type AgeField = FieldType<i32, ImplicitOptional, 2, 1>;
-        type EmailField = FieldType<String, ExplicitOptional<0>, 3, 1>;
+        type EmailField = FieldType<StringField, ExplicitOptional<0>, 3, 1>;
 
         assert_eq!(NameField::FIELD_NUMBER, 1);
         assert_eq!(NameField::FIELD_TYPE, ProtobufFieldType::String);
@@ -466,8 +607,8 @@ mod tests {
 
     #[test]
     fn test_field_methods() {
-        type NameField = FieldType<String, ImplicitOptional, 1, 1>;
-        type EmailField = FieldType<String, ExplicitOptional<0>, 3, 1>;
+        type NameField = FieldType<StringField, ImplicitOptional, 1, 1>;
+        type EmailField = FieldType<StringField, ExplicitOptional<0>, 3, 1>;
 
         assert_eq!(NameField::field_number(), 1);
         assert_eq!(NameField::field_type(), ProtobufFieldType::String);
