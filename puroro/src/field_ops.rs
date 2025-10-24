@@ -169,52 +169,52 @@ impl ScalarType for bool {}
 /// Wrapper type for String protobuf fields.
 ///
 /// This wrapper is needed to distinguish String fields from scalar types
-/// in the Field trait implementations, avoiding trait conflicts.
+/// in the FieldOperations trait implementations, avoiding trait conflicts.
 #[derive(Debug, Clone, PartialEq)]
-pub struct StringField(pub String);
+pub struct StringFieldWrapper(pub String);
 
 /// Wrapper type for Bytes protobuf fields.
 ///
 /// This wrapper is needed to distinguish Bytes fields from scalar types
-/// in the Field trait implementations, avoiding trait conflicts.
+/// in the FieldOperations trait implementations, avoiding trait conflicts.
 #[derive(Debug, Clone, PartialEq)]
-pub struct BytesField(pub Vec<u8>);
+pub struct BytesFieldWrapper(pub Vec<u8>);
 
 /// Wrapper type for Message protobuf fields.
 ///
 /// This wrapper is needed to distinguish Message fields from scalar types
-/// in the Field trait implementations, avoiding trait conflicts.
+/// in the FieldOperations trait implementations, avoiding trait conflicts.
 /// Uses heap allocation with pointer null checks for presence tracking.
 #[derive(Debug, Clone, PartialEq)]
-pub struct MessageField<M: crate::Message>(pub Option<Box<M>>);
+pub struct MessageFieldWrapper<M: crate::Message>(pub Option<Box<M>>);
 
 /// Wrapper type for Enum protobuf fields.
 ///
 /// This wrapper is needed to distinguish Enum fields from scalar types
-/// in the Field trait implementations, avoiding trait conflicts.
+/// in the FieldOperations trait implementations, avoiding trait conflicts.
 #[derive(Debug, Clone, PartialEq)]
-pub struct EnumField<E>(pub E);
+pub struct EnumFieldWrapper<E>(pub E);
 
 // Default implementations for wrapper types
-impl Default for StringField {
+impl Default for StringFieldWrapper {
     fn default() -> Self {
         Self(String::new())
     }
 }
 
-impl Default for BytesField {
+impl Default for BytesFieldWrapper {
     fn default() -> Self {
         Self(Vec::new())
     }
 }
 
-impl<M: crate::Message> Default for MessageField<M> {
+impl<M: crate::Message> Default for MessageFieldWrapper<M> {
     fn default() -> Self {
         Self(None)
     }
 }
 
-impl<E: Default> Default for EnumField<E> {
+impl<E: Default> Default for EnumFieldWrapper<E> {
     fn default() -> Self {
         Self(E::default())
     }
@@ -230,29 +230,29 @@ impl<E: Default> Default for EnumField<E> {
 /// For ExplicitOptional fields, the presence bit index is encoded in the field label type.
 ///
 /// # Type Parameters
-/// - `T`: The value type (i32, String, etc.)
+/// - `T`: The value type (i32, StringFieldWrapper, etc.)
 /// - `L`: The field label (ImplicitOptional, ExplicitOptional<BIT_INDEX>, Repeated, Map)
 /// - `const FIELD_NUMBER`: The protobuf field number
 /// - `const SHARED_BYTES_LEN`: The number of bytes for SharedFields storage
 ///
 /// # Examples
 /// ```ignore
-/// type NameField = FieldType<String, ImplicitOptional, 1, 1>;           // implicit presence, 1 byte shared
-/// type EmailField = FieldType<String, ExplicitOptional<2>, 3, 1>;        // explicit presence, bit 2, 1 byte shared
-/// type HobbiesField = FieldType<String, Repeated, 4, 2>;                 // repeated field, 2 bytes shared
-/// type ScoresField = FieldType<(String, i32), Map, 5, 1>;               // map field, 1 byte shared
+/// type NameField = FieldStorage<StringFieldWrapper, ImplicitOptional, 1, 1>;           // implicit presence, 1 byte shared
+/// type EmailField = FieldStorage<StringFieldWrapper, ExplicitOptional<2>, 3, 1>;        // explicit presence, bit 2, 1 byte shared
+/// type HobbiesField = FieldStorage<StringFieldWrapper, Repeated, 4, 2>;                 // repeated field, 2 bytes shared
+/// type ScoresField = FieldStorage<(StringFieldWrapper, i32), Map, 5, 1>;               // map field, 1 byte shared
 /// ```
 #[derive(Debug, Clone, PartialEq)]
-pub struct FieldType<T, L: FieldLabel, const FIELD_NUMBER: u32, const SHARED_BYTES_LEN: usize> {
+pub struct FieldStorage<T, L: FieldLabel, const FIELD_NUMBER: u32, const SHARED_BYTES_LEN: usize> {
     /// The actual field data
     pub data: T,
     _phantom: PhantomData<L>,
 }
 
 impl<T, L: FieldLabel, const FIELD_NUMBER: u32, const SHARED_BYTES_LEN: usize>
-    FieldType<T, L, FIELD_NUMBER, SHARED_BYTES_LEN>
+    FieldStorage<T, L, FIELD_NUMBER, SHARED_BYTES_LEN>
 {
-    /// Creates a new FieldType with the given data
+    /// Creates a new FieldStorage with the given data
     pub fn new(data: T) -> Self {
         Self {
             data,
@@ -261,9 +261,9 @@ impl<T, L: FieldLabel, const FIELD_NUMBER: u32, const SHARED_BYTES_LEN: usize>
     }
 }
 
-/// Default implementation for FieldType
+/// Default implementation for FieldStorage
 ///
-/// This implementation allows FieldType to be used with Default::default(),
+/// This implementation allows FieldStorage to be used with Default::default(),
 /// making it easier to initialize PersonImpl and other message structures.
 ///
 /// # Allocator Considerations
@@ -279,7 +279,7 @@ impl<T, L: FieldLabel, const FIELD_NUMBER: u32, const SHARED_BYTES_LEN: usize>
 /// For now, this implementation works well with standard library types
 /// that have their own Default implementations.
 impl<T: Default, L: FieldLabel, const FIELD_NUMBER: u32, const SHARED_BYTES_LEN: usize> Default
-    for FieldType<T, L, FIELD_NUMBER, SHARED_BYTES_LEN>
+    for FieldStorage<T, L, FIELD_NUMBER, SHARED_BYTES_LEN>
 {
     fn default() -> Self {
         Self {
@@ -293,7 +293,7 @@ impl<T: Default, L: FieldLabel, const FIELD_NUMBER: u32, const SHARED_BYTES_LEN:
 // Field Trait (Unified Approach)
 // ============================================================================
 
-/// Comprehensive field trait containing all protobuf field information.
+/// Comprehensive field operations trait containing all protobuf field information.
 ///
 /// This trait provides metadata and operations for field handling:
 /// - Field number (for serialization)
@@ -302,11 +302,12 @@ impl<T: Default, L: FieldLabel, const FIELD_NUMBER: u32, const SHARED_BYTES_LEN:
 /// - Get/Set/Clear operations
 ///
 /// # Type Parameters
-/// - `T`: The value type (i32, String, etc.)
+/// - `T`: The value type (i32, StringFieldWrapper, etc.)
 /// - `L`: The field label (ImplicitOptional, ExplicitOptional<BIT_INDEX>, Repeated, Map)
 /// - `const FIELD_NUMBER`: The protobuf field number
 /// - `const SHARED_BYTES_LEN`: The number of bytes for SharedFields storage
-pub trait Field<T, L: FieldLabel, const FIELD_NUMBER: u32, const SHARED_BYTES_LEN: usize> {
+pub trait FieldOperations<T, L: FieldLabel, const FIELD_NUMBER: u32, const SHARED_BYTES_LEN: usize>
+{
     /// The value type for this field (what users pass in)
     type Value<'a>;
 
@@ -353,8 +354,8 @@ pub trait Field<T, L: FieldLabel, const FIELD_NUMBER: u32, const SHARED_BYTES_LE
 
 /// Implementation for scalar types with ImplicitOptional
 impl<T: ScalarType, const FIELD_NUMBER: u32, const SHARED_BYTES_LEN: usize>
-    Field<T, ImplicitOptional, FIELD_NUMBER, SHARED_BYTES_LEN>
-    for FieldType<T, ImplicitOptional, FIELD_NUMBER, SHARED_BYTES_LEN>
+    FieldOperations<T, ImplicitOptional, FIELD_NUMBER, SHARED_BYTES_LEN>
+    for FieldStorage<T, ImplicitOptional, FIELD_NUMBER, SHARED_BYTES_LEN>
 {
     type Value<'a> = T;
     type GetValue<'a>
@@ -391,8 +392,8 @@ impl<
         const FIELD_NUMBER: u32,
         const PRESENCE_BIT_INDEX: usize,
         const SHARED_BYTES_LEN: usize,
-    > Field<T, ExplicitOptional<PRESENCE_BIT_INDEX>, FIELD_NUMBER, SHARED_BYTES_LEN>
-    for FieldType<T, ExplicitOptional<PRESENCE_BIT_INDEX>, FIELD_NUMBER, SHARED_BYTES_LEN>
+    > FieldOperations<T, ExplicitOptional<PRESENCE_BIT_INDEX>, FIELD_NUMBER, SHARED_BYTES_LEN>
+    for FieldStorage<T, ExplicitOptional<PRESENCE_BIT_INDEX>, FIELD_NUMBER, SHARED_BYTES_LEN>
 {
     type Value<'a> = T;
     type GetValue<'a>
@@ -430,10 +431,10 @@ impl<
 // Wrapper Type Field Implementations
 // ============================================================================
 
-/// Implementation for StringField with ImplicitOptional
+/// Implementation for StringFieldWrapper with ImplicitOptional
 impl<const FIELD_NUMBER: u32, const SHARED_BYTES_LEN: usize>
-    Field<StringField, ImplicitOptional, FIELD_NUMBER, SHARED_BYTES_LEN>
-    for FieldType<StringField, ImplicitOptional, FIELD_NUMBER, SHARED_BYTES_LEN>
+    FieldOperations<StringFieldWrapper, ImplicitOptional, FIELD_NUMBER, SHARED_BYTES_LEN>
+    for FieldStorage<StringFieldWrapper, ImplicitOptional, FIELD_NUMBER, SHARED_BYTES_LEN>
 {
     type Value<'a> = &'a str;
     type GetValue<'a> = &'a str;
@@ -461,10 +462,20 @@ impl<const FIELD_NUMBER: u32, const SHARED_BYTES_LEN: usize>
     }
 }
 
-/// Implementation for StringField with ExplicitOptional
+/// Implementation for StringFieldWrapper with ExplicitOptional
 impl<const FIELD_NUMBER: u32, const PRESENCE_BIT_INDEX: usize, const SHARED_BYTES_LEN: usize>
-    Field<StringField, ExplicitOptional<PRESENCE_BIT_INDEX>, FIELD_NUMBER, SHARED_BYTES_LEN>
-    for FieldType<StringField, ExplicitOptional<PRESENCE_BIT_INDEX>, FIELD_NUMBER, SHARED_BYTES_LEN>
+    FieldOperations<
+        StringFieldWrapper,
+        ExplicitOptional<PRESENCE_BIT_INDEX>,
+        FIELD_NUMBER,
+        SHARED_BYTES_LEN,
+    >
+    for FieldStorage<
+        StringFieldWrapper,
+        ExplicitOptional<PRESENCE_BIT_INDEX>,
+        FIELD_NUMBER,
+        SHARED_BYTES_LEN,
+    >
 {
     type Value<'a> = &'a str;
     type GetValue<'a> = Option<&'a str>;
@@ -495,13 +506,13 @@ impl<const FIELD_NUMBER: u32, const PRESENCE_BIT_INDEX: usize, const SHARED_BYTE
     }
 }
 
-/// Implementation for MessageField with ImplicitOptional
+/// Implementation for MessageFieldWrapper with ImplicitOptional
 ///
 /// Uses heap allocation with pointer null checks for presence tracking.
 /// No need for presence bits - the Option<Box<M>> handles presence directly.
 impl<M: crate::Message + 'static, const FIELD_NUMBER: u32, const SHARED_BYTES_LEN: usize>
-    Field<MessageField<M>, ImplicitOptional, FIELD_NUMBER, SHARED_BYTES_LEN>
-    for FieldType<MessageField<M>, ImplicitOptional, FIELD_NUMBER, SHARED_BYTES_LEN>
+    FieldOperations<MessageFieldWrapper<M>, ImplicitOptional, FIELD_NUMBER, SHARED_BYTES_LEN>
+    for FieldStorage<MessageFieldWrapper<M>, ImplicitOptional, FIELD_NUMBER, SHARED_BYTES_LEN>
 {
     type Value<'a> = &'a M;
     type GetValue<'a> = Option<&'a M>; // Message fields always return Option
@@ -530,7 +541,7 @@ impl<M: crate::Message + 'static, const FIELD_NUMBER: u32, const SHARED_BYTES_LE
     }
 }
 
-/// Implementation for MessageField with ExplicitOptional
+/// Implementation for MessageFieldWrapper with ExplicitOptional
 ///
 /// Uses heap allocation with pointer null checks for presence tracking.
 /// No need for presence bits - the Option<Box<M>> handles presence directly.
@@ -539,9 +550,15 @@ impl<
         const FIELD_NUMBER: u32,
         const PRESENCE_BIT_INDEX: usize,
         const SHARED_BYTES_LEN: usize,
-    > Field<MessageField<M>, ExplicitOptional<PRESENCE_BIT_INDEX>, FIELD_NUMBER, SHARED_BYTES_LEN>
-    for FieldType<
-        MessageField<M>,
+    >
+    FieldOperations<
+        MessageFieldWrapper<M>,
+        ExplicitOptional<PRESENCE_BIT_INDEX>,
+        FIELD_NUMBER,
+        SHARED_BYTES_LEN,
+    >
+    for FieldStorage<
+        MessageFieldWrapper<M>,
         ExplicitOptional<PRESENCE_BIT_INDEX>,
         FIELD_NUMBER,
         SHARED_BYTES_LEN,
@@ -591,9 +608,9 @@ mod tests {
 
     #[test]
     fn test_field_type_constants() {
-        type NameField = FieldType<StringField, ImplicitOptional, 1, 1>;
-        type AgeField = FieldType<i32, ImplicitOptional, 2, 1>;
-        type EmailField = FieldType<StringField, ExplicitOptional<0>, 3, 1>;
+        type NameField = FieldStorage<StringFieldWrapper, ImplicitOptional, 1, 1>;
+        type AgeField = FieldStorage<i32, ImplicitOptional, 2, 1>;
+        type EmailField = FieldStorage<StringFieldWrapper, ExplicitOptional<0>, 3, 1>;
 
         assert_eq!(NameField::FIELD_NUMBER, 1);
         assert_eq!(NameField::FIELD_TYPE, ProtobufFieldType::String);
@@ -607,8 +624,8 @@ mod tests {
 
     #[test]
     fn test_field_methods() {
-        type NameField = FieldType<StringField, ImplicitOptional, 1, 1>;
-        type EmailField = FieldType<StringField, ExplicitOptional<0>, 3, 1>;
+        type NameField = FieldStorage<StringFieldWrapper, ImplicitOptional, 1, 1>;
+        type EmailField = FieldStorage<StringFieldWrapper, ExplicitOptional<0>, 3, 1>;
 
         assert_eq!(NameField::field_number(), 1);
         assert_eq!(NameField::field_type(), ProtobufFieldType::String);

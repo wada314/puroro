@@ -6,7 +6,10 @@
 
 use puroro::{
     error::Error,
-    field_ops::{ExplicitOptional, Field, FieldType, ImplicitOptional, MessageField, StringField},
+    field_ops::{
+        ExplicitOptional, FieldOperations, FieldStorage, ImplicitOptional, MessageFieldWrapper,
+        StringFieldWrapper,
+    },
     shared::SharedFields,
     Message,
 };
@@ -124,9 +127,9 @@ pub trait PersonTryMut: PersonAppendTry {
 /// Address message implementation
 #[derive(Debug, Clone, PartialEq)]
 pub struct Address {
-    street: FieldType<StringField, ImplicitOptional, 1, 1>,
-    city: FieldType<StringField, ImplicitOptional, 2, 1>,
-    zip_code: FieldType<i32, ImplicitOptional, 3, 1>,
+    street: FieldStorage<StringFieldWrapper, ImplicitOptional, 1, 1>,
+    city: FieldStorage<StringFieldWrapper, ImplicitOptional, 2, 1>,
+    zip_code: FieldStorage<i32, ImplicitOptional, 3, 1>,
     _shared: SharedFields<1>,
 }
 
@@ -192,9 +195,9 @@ impl Message for Address {
 /// Profile message implementation
 #[derive(Debug, Clone, PartialEq)]
 pub struct Profile {
-    bio: FieldType<StringField, ImplicitOptional, 1, 1>,
-    website: FieldType<StringField, ExplicitOptional<0>, 2, 1>,
-    reputation: FieldType<i32, ImplicitOptional, 3, 1>,
+    bio: FieldStorage<StringFieldWrapper, ImplicitOptional, 1, 1>,
+    website: FieldStorage<StringFieldWrapper, ExplicitOptional<0>, 2, 1>,
+    reputation: FieldStorage<i32, ImplicitOptional, 3, 1>,
     _shared: SharedFields<1>,
 }
 
@@ -272,18 +275,18 @@ pub struct PersonImpl {
     // Exclusive fields ordered by size (descending)
     // String: 24 bytes (3 words on 64-bit)
     // Direct field types with explicit parameters for clarity
-    // Format: FieldType<T, L, FIELD_NUMBER, SHARED_BYTES_LEN>
-    name: FieldType<StringField, ImplicitOptional, 1, 1>, // Field 1, implicit presence, 1 byte shared
-    email: FieldType<StringField, ExplicitOptional<0>, 3, 1>, // Field 3, explicit presence, bit 0, 1 byte shared
+    // Format: FieldStorage<T, L, FIELD_NUMBER, SHARED_BYTES_LEN>
+    name: FieldStorage<StringFieldWrapper, ImplicitOptional, 1, 1>, // Field 1, implicit presence, 1 byte shared
+    email: FieldStorage<StringFieldWrapper, ExplicitOptional<0>, 3, 1>, // Field 3, explicit presence, bit 0, 1 byte shared
 
     // Message fields: use heap allocation with Option<Box<M>> for presence tracking
     // No presence bits needed - Option<Box<M>> handles presence directly
-    address: FieldType<MessageField<Address>, ImplicitOptional, 6, 1>, // Field 6, heap-allocated presence
-    profile: FieldType<MessageField<Profile>, ImplicitOptional, 7, 1>, // Field 7, heap-allocated presence
+    address: FieldStorage<MessageFieldWrapper<Address>, ImplicitOptional, 6, 1>, // Field 6, heap-allocated presence
+    profile: FieldStorage<MessageFieldWrapper<Profile>, ImplicitOptional, 7, 1>, // Field 7, heap-allocated presence
 
     // Scalar fields: 4 bytes
-    age: FieldType<i32, ImplicitOptional, 2, 1>, // Field 2, implicit presence, 1 byte shared
-    score: FieldType<i32, ExplicitOptional<1>, 5, 1>, // Field 5, explicit presence, bit 1, 1 byte shared
+    age: FieldStorage<i32, ImplicitOptional, 2, 1>, // Field 2, implicit presence, 1 byte shared
+    score: FieldStorage<i32, ExplicitOptional<1>, 5, 1>, // Field 5, explicit presence, bit 1, 1 byte shared
 }
 
 impl PersonImpl {
@@ -625,13 +628,13 @@ mod tests {
 
     #[test]
     fn test_wrapper_types() {
-        // Test StringField wrapper
-        let string_field = StringField("Hello".to_string());
+        // Test StringFieldWrapper wrapper
+        let string_field = StringFieldWrapper("Hello".to_string());
         assert_eq!(string_field.0, "Hello");
 
-        // Test MessageField wrapper
+        // Test MessageFieldWrapper wrapper
         let address = Address::new();
-        let message_field = MessageField(Some(Box::new(address)));
+        let message_field = MessageFieldWrapper(Some(Box::new(address)));
         assert_eq!(message_field.0.as_ref().unwrap().street(), "");
     }
 }
