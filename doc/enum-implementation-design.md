@@ -243,22 +243,17 @@ pub struct MyMessage {
 }
 
 impl MyMessage {
-    // Set with known enum value
+    // Set with known enum value (type-safe)
     pub fn set_enum_field(&mut self, value: MyEnum) {
         self.enum_field = value.to_wire();
     }
     
-    // Set with i32 value
-    pub fn set_enum_field_from_i32(&mut self, value: i32) {
-        self.enum_field = value;
-    }
-    
-    // Get as Result<MyEnum, i32>
+    // Get as Result<MyEnum, i32> (handles unknown values)
     pub fn enum_field(&self) -> Result<MyEnum, i32> {
         MyEnum::from_wire(self.enum_field)
     }
     
-    // Get as i32
+    // Get as i32 (raw value access)
     pub fn enum_field_as_i32(&self) -> i32 {
         self.enum_field
     }
@@ -274,20 +269,17 @@ pub struct MyProto2Message {
 }
 
 impl MyProto2Message {
+    // Type-safe setter
     pub fn set_enum_field(&mut self, value: MyProto2Enum) {
         self.enum_field = value.to_wire();
     }
     
+    // Getter handles unknown values
     pub fn enum_field(&self) -> Result<MyProto2Enum, i32> {
         MyProto2Enum::from_wire(self.enum_field)
     }
     
-    // Set with i32 value
-    pub fn set_enum_field_from_i32(&mut self, value: i32) {
-        self.enum_field = value;
-    }
-    
-    // Get as i32 value
+    // Raw i32 access
     pub fn enum_field_as_i32(&self) -> i32 {
         self.enum_field
     }
@@ -301,20 +293,17 @@ pub struct MyProto3Message {
 }
 
 impl MyProto3Message {
+    // Type-safe setter (only accepts defined enum values)
     pub fn set_enum_field(&mut self, value: MyProto3Enum) {
         self.enum_field = value.to_wire();
     }
     
+    // Getter handles unknown values (proto3 open enum requirement)
     pub fn enum_field(&self) -> Result<MyProto3Enum, i32> {
         MyProto3Enum::from_wire(self.enum_field)
     }
     
-    // Set with i32 value (accepts any value)
-    pub fn set_enum_field_from_i32(&mut self, value: i32) {
-        self.enum_field = value;
-    }
-    
-    // Get as i32 value
+    // Raw i32 access
     pub fn enum_field_as_i32(&self) -> i32 {
         self.enum_field
     }
@@ -323,25 +312,25 @@ impl MyProto3Message {
 
 ## Implementation Benefits
 
-### 1. Consistency
+### 1. Type Safety
+- Setters only accept defined enum values (prevents invalid assignments)
+- Getters handle unknown values gracefully with `Result<Enum, i32>`
+- Compile-time type checking for enum assignments
+
+### 2. Consistency
 - All enum fields stored as `i32`
 - Same pattern for getter/setter methods
 - Unified API across all cases
 
-### 2. Simplicity
+### 3. Simplicity
 - Simple field type (`i32`)
 - No complex type conversions
 - Memory efficient
 
-### 3. Flexibility
+### 4. Flexibility
 - Handles both known and unknown values appropriately
-- Users can directly manipulate `i32` values
+- Users can access raw `i32` values when needed
 - Simple serialization
-
-### 4. Type Safety
-- Known values handled as enum types
-- Unknown values handled as `i32` types
-- Appropriate type conversions provided
 
 ### 5. `allow_alias` Support
 - Integer values stored internally
@@ -393,8 +382,26 @@ The unified integer storage strategy provides the best balance of:
 
 This design ensures that Puroro's enum implementation is both robust and user-friendly while maintaining compatibility with existing protobuf implementations.
 
+## C++ Official Implementation Compatibility
+
+This design aligns with the [C++ official implementation](https://protobuf.dev/reference/cpp/cpp-generated/#enum_field):
+
+- **Setters**: Only accept defined enum values (type-safe)
+- **Getters**: Handle unknown values gracefully (proto3 open enum requirement)  
+- **Storage**: Always store as `i32` internally
+
+The C++ implementation aborts in debug builds when trying to set unknown enum values, which validates our approach of only providing type-safe setters.
+
+### Key Design Decisions
+
+1. **Type Safety**: Setters only accept `Status` enum values, preventing invalid assignments
+2. **Proto3 Compatibility**: Getters return `Result<Status, i32>` to handle unknown values
+3. **Storage Efficiency**: Always store as `i32` for optimal memory usage
+4. **Forward Compatibility**: `#[non_exhaustive]` ensures new enum values can be added
+
 ## References
 
 - [Protobuf Enum Documentation](https://protobuf.dev/programming-guides/enum/)
+- [C++ Generated Code Guide - Enum Fields](https://protobuf.dev/reference/cpp/cpp-generated/#enum_field)
 - [Buf Technologies: Dangers of Enum Aliases](https://buf.build/blog/totw-6-dangers-of-enum-aliases)
 - [Protobuf Editions Features](https://protobuf.dev/editions/features/)
