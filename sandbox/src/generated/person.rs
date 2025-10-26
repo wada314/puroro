@@ -25,6 +25,10 @@ pub trait Person {
     fn email(&self) -> Option<&str>;
     fn score(&self) -> Option<i32>;
 
+    // Enum field getters
+    fn status(&self) -> Result<Status, i32>;
+    fn secondary_status(&self) -> Result<Option<Status>, i32>;
+
     // Message field getters
     fn address(&self) -> Option<&Address>; // Message fields always return Option, even for ImplicitOptional
     fn profile(&self) -> Option<&Profile>;
@@ -34,6 +38,8 @@ pub trait Person {
     fn has_age(&self) -> bool;
     fn has_email(&self) -> bool;
     fn has_score(&self) -> bool;
+    fn has_status(&self) -> bool;
+    fn has_secondary_status(&self) -> bool;
     fn has_address(&self) -> bool;
     fn has_profile(&self) -> bool;
 }
@@ -49,6 +55,10 @@ pub trait PersonAppend: Person {
     fn set_age(&mut self, v: i32);
     fn set_email(&mut self, v: &str);
     fn set_score(&mut self, v: i32);
+
+    // Enum field setters
+    fn set_status(&mut self, v: Status);
+    fn set_secondary_status(&mut self, v: Status);
 
     // Message field setters
     fn set_address(&mut self, v: &Address);
@@ -70,6 +80,10 @@ pub trait PersonMut: PersonAppend {
     fn clear_email(&mut self);
     fn clear_score(&mut self);
 
+    // Enum field clearers
+    fn clear_status(&mut self);
+    fn clear_secondary_status(&mut self);
+
     // Message field clearers
     fn clear_address(&mut self);
     fn clear_profile(&mut self);
@@ -87,11 +101,17 @@ pub trait PersonTry {
     fn try_email(&self) -> Result<Option<&str>, Error>;
     fn try_score(&self) -> Result<Option<i32>, Error>;
 
+    // Enum field getters (fallible)
+    fn try_status(&self) -> Result<Result<Status, i32>, Error>;
+    fn try_secondary_status(&self) -> Result<Result<Option<Status>, i32>, Error>;
+
     // Presence checks (fallible) - may fail when reading metadata
     fn try_has_name(&self) -> Result<bool, Error>;
     fn try_has_age(&self) -> Result<bool, Error>;
     fn try_has_email(&self) -> Result<bool, Error>;
     fn try_has_score(&self) -> Result<bool, Error>;
+    fn try_has_status(&self) -> Result<bool, Error>;
+    fn try_has_secondary_status(&self) -> Result<bool, Error>;
 }
 
 /// Fallible append-only trait for Person message.
@@ -105,6 +125,10 @@ pub trait PersonAppendTry: PersonTry {
     fn try_set_age(&mut self, v: i32) -> Result<(), Error>;
     fn try_set_email(&mut self, v: &str) -> Result<(), Error>;
     fn try_set_score(&mut self, v: i32) -> Result<(), Error>;
+
+    // Enum field setters (fallible)
+    fn try_set_status(&mut self, v: Status) -> Result<(), Error>;
+    fn try_set_secondary_status(&mut self, v: Status) -> Result<(), Error>;
 }
 
 /// Fallible fully mutable trait for Person message.
@@ -118,6 +142,51 @@ pub trait PersonTryMut: PersonAppendTry {
     fn try_clear_age(&mut self) -> Result<(), Error>;
     fn try_clear_email(&mut self) -> Result<(), Error>;
     fn try_clear_score(&mut self) -> Result<(), Error>;
+
+    // Enum field clearers (fallible)
+    fn try_clear_status(&mut self) -> Result<(), Error>;
+    fn try_clear_secondary_status(&mut self) -> Result<(), Error>;
+}
+
+// ============================================================================
+// Status Enum
+// ============================================================================
+
+/// Status enum implementation (proto3 + allow_alias = false)
+#[non_exhaustive]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+#[repr(i32)]
+pub enum Status {
+    /// Default value (must be 0)
+    Unspecified = 0,
+    Active = 1,
+    Inactive = 2,
+    Pending = 3,
+}
+
+impl Status {
+    /// Convert from wire format (i32) - known values only
+    pub fn from_wire(value: i32) -> Result<Self, i32> {
+        match value {
+            0 => Ok(Self::Unspecified),
+            1 => Ok(Self::Active),
+            2 => Ok(Self::Inactive),
+            3 => Ok(Self::Pending),
+            unknown => Err(unknown), // Unknown values are errors
+        }
+    }
+
+    /// Convert to wire format (i32)
+    pub fn to_wire(self) -> i32 {
+        self as i32
+    }
+}
+
+impl TryFrom<i32> for Status {
+    type Error = i32;
+    fn try_from(value: i32) -> Result<Self, Self::Error> {
+        Self::from_wire(value)
+    }
 }
 
 // ============================================================================
@@ -268,7 +337,7 @@ impl Message for Profile {
 #[derive(Debug, Clone, PartialEq)]
 pub struct PersonImpl {
     // Shared fields: presence tracking, etc.
-    // For 2 explicit optional fields (email, score): ⌈2/8⌉ = 1 byte (stack-allocated)
+    // For 3 explicit optional fields (email, score, secondary_status): ⌈3/8⌉ = 1 byte (stack-allocated)
     // Message fields use heap allocation with Option<Box<M>> for presence tracking
     _shared: SharedFields<1>,
 
@@ -284,6 +353,10 @@ pub struct PersonImpl {
     address: FieldStorage<MessageFieldWrapper<Address>, ImplicitOptional, 6, 1>, // Field 6, heap-allocated presence
     profile: FieldStorage<MessageFieldWrapper<Profile>, ImplicitOptional, 7, 1>, // Field 7, heap-allocated presence
 
+    // Enum fields: stored as i32
+    status: FieldStorage<i32, ImplicitOptional, 4, 1>, // Field 4, implicit presence, 1 byte shared
+    secondary_status: FieldStorage<i32, ExplicitOptional<2>, 8, 1>, // Field 8, explicit presence, bit 2, 1 byte shared
+
     // Scalar fields: 4 bytes
     age: FieldStorage<i32, ImplicitOptional, 2, 1>, // Field 2, implicit presence, 1 byte shared
     score: FieldStorage<i32, ExplicitOptional<1>, 5, 1>, // Field 5, explicit presence, bit 1, 1 byte shared
@@ -297,6 +370,8 @@ impl PersonImpl {
             email: Default::default(),
             address: Default::default(),
             profile: Default::default(),
+            status: Default::default(),
+            secondary_status: Default::default(),
             _shared: SharedFields::new(),
             age: Default::default(),
             score: Default::default(),
@@ -329,6 +404,23 @@ impl Person for PersonImpl {
     #[inline]
     fn score(&self) -> Option<i32> {
         self.score.get(&self._shared)
+    }
+
+    #[inline]
+    fn status(&self) -> Result<Status, i32> {
+        Status::from_wire(self.status.get(&self._shared))
+    }
+
+    #[inline]
+    fn secondary_status(&self) -> Result<Option<Status>, i32> {
+        if self.secondary_status.is_present(&self._shared) {
+            match Status::from_wire(self.secondary_status.get(&self._shared).unwrap_or(0)) {
+                Ok(status) => Ok(Some(status)),
+                Err(unknown) => Err(unknown),
+            }
+        } else {
+            Ok(None)
+        }
     }
 
     #[inline]
@@ -366,6 +458,18 @@ impl Person for PersonImpl {
     }
 
     #[inline]
+    fn has_status(&self) -> bool {
+        // ImplicitOptional fields check if value is not equal to default
+        self.status.is_present(&self._shared)
+    }
+
+    #[inline]
+    fn has_secondary_status(&self) -> bool {
+        // ExplicitOptional fields check presence via Field trait
+        self.secondary_status.is_present(&self._shared)
+    }
+
+    #[inline]
     fn has_address(&self) -> bool {
         // ImplicitOptional fields check if value is not equal to default
         self.address.is_present(&self._shared)
@@ -397,6 +501,16 @@ impl PersonAppend for PersonImpl {
     #[inline]
     fn set_score(&mut self, v: i32) {
         self.score.set(&mut self._shared, v);
+    }
+
+    #[inline]
+    fn set_status(&mut self, v: Status) {
+        self.status.set(&mut self._shared, v.to_wire());
+    }
+
+    #[inline]
+    fn set_secondary_status(&mut self, v: Status) {
+        self.secondary_status.set(&mut self._shared, v.to_wire());
     }
 
     #[inline]
@@ -450,6 +564,16 @@ impl PersonMut for PersonImpl {
     }
 
     #[inline]
+    fn clear_status(&mut self) {
+        self.status.clear(&mut self._shared);
+    }
+
+    #[inline]
+    fn clear_secondary_status(&mut self) {
+        self.secondary_status.clear(&mut self._shared);
+    }
+
+    #[inline]
     fn clear_address(&mut self) {
         self.address.clear(&mut self._shared);
     }
@@ -484,6 +608,23 @@ impl PersonTry for PersonImpl {
     }
 
     #[inline]
+    fn try_status(&self) -> Result<Result<Status, i32>, Error> {
+        Ok(Status::from_wire(self.status.get(&self._shared)))
+    }
+
+    #[inline]
+    fn try_secondary_status(&self) -> Result<Result<Option<Status>, i32>, Error> {
+        Ok(if self.secondary_status.is_present(&self._shared) {
+            match Status::from_wire(self.secondary_status.get(&self._shared).unwrap_or(0)) {
+                Ok(status) => Ok(Some(status)),
+                Err(unknown) => Err(unknown),
+            }
+        } else {
+            Ok(None)
+        })
+    }
+
+    #[inline]
     fn try_has_name(&self) -> Result<bool, Error> {
         Ok(self.name.is_present(&self._shared))
     }
@@ -501,6 +642,16 @@ impl PersonTry for PersonImpl {
     #[inline]
     fn try_has_score(&self) -> Result<bool, Error> {
         Ok(self.score.is_present(&self._shared))
+    }
+
+    #[inline]
+    fn try_has_status(&self) -> Result<bool, Error> {
+        Ok(self.status.is_present(&self._shared))
+    }
+
+    #[inline]
+    fn try_has_secondary_status(&self) -> Result<bool, Error> {
+        Ok(self.secondary_status.is_present(&self._shared))
     }
 }
 
@@ -528,6 +679,18 @@ impl PersonAppendTry for PersonImpl {
         self.set_score(v);
         Ok(())
     }
+
+    #[inline]
+    fn try_set_status(&mut self, v: Status) -> Result<(), Error> {
+        self.set_status(v);
+        Ok(())
+    }
+
+    #[inline]
+    fn try_set_secondary_status(&mut self, v: Status) -> Result<(), Error> {
+        self.set_secondary_status(v);
+        Ok(())
+    }
 }
 
 impl PersonTryMut for PersonImpl {
@@ -552,6 +715,18 @@ impl PersonTryMut for PersonImpl {
     #[inline]
     fn try_clear_score(&mut self) -> Result<(), Error> {
         self.clear_score();
+        Ok(())
+    }
+
+    #[inline]
+    fn try_clear_status(&mut self) -> Result<(), Error> {
+        self.clear_status();
+        Ok(())
+    }
+
+    #[inline]
+    fn try_clear_secondary_status(&mut self) -> Result<(), Error> {
+        self.clear_secondary_status();
         Ok(())
     }
 }
@@ -624,6 +799,40 @@ mod tests {
 
         person.clear_profile();
         assert!(!person.has_profile());
+    }
+
+    #[test]
+    fn test_enum_fields() {
+        let mut person = PersonImpl::new();
+
+        // Test setting enum fields
+        person.set_status(Status::Active);
+        person.set_secondary_status(Status::Pending);
+
+        // Test getting enum fields
+        match person.status() {
+            Ok(Status::Active) => println!("Status is Active"),
+            Ok(status) => println!("Status is {:?}", status),
+            Err(unknown) => println!("Unknown status: {}", unknown),
+        }
+
+        match person.secondary_status() {
+            Ok(Some(Status::Pending)) => println!("Secondary status is Pending"),
+            Ok(Some(status)) => println!("Secondary status is {:?}", status),
+            Ok(None) => println!("No secondary status"),
+            Err(unknown) => println!("Unknown secondary status: {}", unknown),
+        }
+
+        // Test presence checking
+        assert!(person.has_status());
+        assert!(person.has_secondary_status());
+
+        // Test clearing enum fields
+        person.clear_status();
+        assert!(!person.has_status());
+
+        person.clear_secondary_status();
+        assert!(!person.has_secondary_status());
     }
 
     #[test]

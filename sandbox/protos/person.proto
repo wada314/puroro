@@ -2,12 +2,24 @@ syntax = "proto3";
 
 package example;
 
+// Enum for testing enum field support
+enum Status {
+  STATUS_UNSPECIFIED = 0;
+  STATUS_ACTIVE = 1;
+  STATUS_INACTIVE = 2;
+  STATUS_PENDING = 3;
+}
+
 // A simple person message for testing basic protobuf features
 message Person {
   string name = 1;                    // implicit presence string field
   int32 age = 2;                      // implicit presence varint field
   optional string email = 3;          // explicit presence string field
   optional int32 score = 5;           // explicit presence scalar field
+  
+  // Enum field support - now implemented!
+  Status status = 4;                  // enum field (implicit presence)
+  optional Status secondary_status = 8; // enum field (explicit presence)
   
   // TODO: Implement repeated field support
   // repeated string hobbies = 4;        // repeated string field

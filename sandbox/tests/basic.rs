@@ -241,8 +241,8 @@ fn test_memory_layout_optimized() {
     #[cfg(target_pointer_width = "64")]
     {
         assert_eq!(
-            total_size, 64,
-            "PersonImpl should be 64 bytes on 64-bit with BitArr for presence tracking (4 fields)"
+            total_size, 88,
+            "PersonImpl should be 88 bytes on 64-bit with BitArr for presence tracking (6 fields: 2 strings + 2 messages + 2 enums + 2 scalars + shared fields)"
         );
     }
 
