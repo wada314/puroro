@@ -7,6 +7,7 @@ This directory contains the current documentation for Puroro, a Rust-idiomatic P
 ### Design Documents
 - **`comprehensive-field-descriptor-design.md`** - Current field descriptor design using trait-based approach
 - **`design-discussion.md`** - Current design decisions, implementation status, and discussion history
+- **`enum-implementation-design.md`** - Comprehensive design decisions for protobuf enum implementation
 - **`field-context-design.md`** - Current field operations design with SharedFields approach
 - **`field-operations-design.md`** - Current field operations implementation details
 
@@ -39,4 +40,5 @@ This directory contains the current documentation for Puroro, a Rust-idiomatic P
 For the most up-to-date information, start with:
 1. `design-discussion.md` - Overview of current design decisions
 2. `comprehensive-field-descriptor-design.md` - Detailed field descriptor design
-3. `next-steps.md` - Current development priorities
+3. `enum-implementation-design.md` - Protobuf enum implementation design decisions
+4. `next-steps.md` - Current development priorities
