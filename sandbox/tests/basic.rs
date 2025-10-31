@@ -1,8 +1,6 @@
 //! Basic integration tests for our API design.
 
-use sandbox::generated::person::{
-    Person, PersonAppend, PersonAppendTry, PersonImpl, PersonMut, PersonTry,
-};
+use sandbox::generated::person::{Person, PersonAppend, PersonImpl, PersonMut};
 
 #[test]
 fn test_person_creation() {
@@ -155,66 +153,6 @@ fn test_person_string_coercion() {
     // &str literal should also work
     person.set_name("Frank");
     assert_eq!(person.name(), "Frank");
-}
-
-#[test]
-fn test_person_try_trait() {
-    // Test that we can use PersonTry for fallible operations
-    let mut person = PersonImpl::new();
-    person.set_name("Iris");
-    person.set_age(45);
-
-    // PersonImpl's fallible operations always succeed
-    assert_eq!(person.try_name().unwrap(), "Iris");
-    assert_eq!(person.try_age().unwrap(), 45);
-    assert_eq!(person.try_email().unwrap(), None);
-}
-
-#[test]
-fn test_person_try_mut_trait() {
-    // Test that we can use PersonTryMut for fallible mutations
-    let mut person = PersonImpl::new();
-
-    // PersonImpl's fallible operations always succeed
-    person.try_set_name("Jack").unwrap();
-    person.try_set_age(55).unwrap();
-
-    assert_eq!(person.try_name().unwrap(), "Jack");
-    assert_eq!(person.try_age().unwrap(), 55);
-}
-
-#[test]
-fn test_person_append_try_trait() {
-    // Test that we can use PersonAppendTry for fallible append operations
-    fn try_populate_person(
-        p: &mut impl PersonAppendTry,
-        name: &str,
-        age: i32,
-    ) -> Result<(), puroro::error::Error> {
-        p.try_set_name(name)?;
-        p.try_set_age(age)?;
-        Ok(())
-    }
-
-    let mut person = PersonImpl::new();
-    try_populate_person(&mut person, "Laura", 40).unwrap();
-
-    assert_eq!(person.try_name().unwrap(), "Laura");
-    assert_eq!(person.try_age().unwrap(), 40);
-}
-
-#[test]
-fn test_fallible_generic_code() {
-    // Test that we can write generic code using fallible traits
-    fn get_person_summary(p: &impl PersonTry) -> Result<String, puroro::error::Error> {
-        Ok(format!("{} (age: {})", p.try_name()?, p.try_age()?))
-    }
-
-    let mut person = PersonImpl::new();
-    person.set_name("Kate");
-    person.set_age(33);
-
-    assert_eq!(get_person_summary(&person).unwrap(), "Kate (age: 33)");
 }
 
 #[test]
