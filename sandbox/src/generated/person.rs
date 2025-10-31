@@ -31,7 +31,6 @@ pub trait Person {
 
     // Message field getters
     fn address(&self) -> Option<&Address>; // Message fields always return Option, even for ImplicitOptional
-    fn profile(&self) -> Option<&Profile>;
 
     // Presence checks (for optional semantics)
     fn has_name(&self) -> bool;
@@ -41,7 +40,6 @@ pub trait Person {
     fn has_status(&self) -> bool;
     fn has_secondary_status(&self) -> bool;
     fn has_address(&self) -> bool;
-    fn has_profile(&self) -> bool;
 }
 
 /// Infallible append-only trait for Person message.
@@ -62,11 +60,9 @@ pub trait PersonAppend: Person {
 
     // Message field setters
     fn set_address(&mut self, v: &Address);
-    fn set_profile(&mut self, v: &Profile);
 
     // Builder-style methods for nested message construction
     fn address_mut(&mut self) -> &mut Address;
-    fn profile_mut(&mut self) -> &mut Profile;
 }
 
 /// Infallible fully mutable trait for Person message.
@@ -86,7 +82,6 @@ pub trait PersonMut: PersonAppend {
 
     // Message field clearers
     fn clear_address(&mut self);
-    fn clear_profile(&mut self);
 }
 
 // ============================================================================
@@ -370,11 +365,6 @@ impl Person for PersonImpl {
     }
 
     #[inline]
-    fn profile(&self) -> Option<&Profile> {
-        self.profile.get(&self._shared)
-    }
-
-    #[inline]
     fn has_name(&self) -> bool {
         // ImplicitOptional fields check if value is not equal to default
         self.name.is_present(&self._shared)
@@ -415,12 +405,6 @@ impl Person for PersonImpl {
         // ImplicitOptional fields check if value is not equal to default
         self.address.is_present(&self._shared)
     }
-
-    #[inline]
-    fn has_profile(&self) -> bool {
-        // ExplicitOptional fields check presence via Field trait
-        self.profile.is_present(&self._shared)
-    }
 }
 
 impl PersonAppend for PersonImpl {
@@ -460,26 +444,12 @@ impl PersonAppend for PersonImpl {
     }
 
     #[inline]
-    fn set_profile(&mut self, v: &Profile) {
-        self.profile.set(&mut self._shared, v);
-    }
-
-    #[inline]
     fn address_mut(&mut self) -> &mut Address {
         // Ensure field is allocated and marked as present
         if self.address.data.0.is_none() {
             self.address.data.0 = Some(Box::new(Address::default()));
         }
         self.address.data.0.as_mut().unwrap().as_mut()
-    }
-
-    #[inline]
-    fn profile_mut(&mut self) -> &mut Profile {
-        // Ensure field is allocated and marked as present
-        if self.profile.data.0.is_none() {
-            self.profile.data.0 = Some(Box::new(Profile::default()));
-        }
-        self.profile.data.0.as_mut().unwrap().as_mut()
     }
 }
 
@@ -517,11 +487,6 @@ impl PersonMut for PersonImpl {
     #[inline]
     fn clear_address(&mut self) {
         self.address.clear(&mut self._shared);
-    }
-
-    #[inline]
-    fn clear_profile(&mut self) {
-        self.profile.clear(&mut self._shared);
     }
 }
 
