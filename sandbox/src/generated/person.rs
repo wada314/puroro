@@ -77,9 +77,6 @@ pub trait PersonMut: PersonAppend {
     // Message field clearers
     fn clear_address(&mut self);
 
-    // Message field setters
-    fn set_address(&mut self, v: &AddressImpl);
-
     // Builder-style methods for nested message construction
     fn address_mut(&mut self) -> &mut dyn AddressMut;
 }
@@ -447,11 +444,6 @@ impl PersonMut for PersonImpl {
     }
 
     #[inline]
-    fn set_address(&mut self, v: &AddressImpl) {
-        self.address.set(&mut self._shared, v);
-    }
-
-    #[inline]
     fn address_mut(&mut self) -> &mut dyn AddressMut {
         if self.address.data.0.is_none() {
             self.address.data.0 = Some(Box::new(AddressImpl::default()));
@@ -489,13 +481,13 @@ mod tests {
     fn test_message_fields() {
         let mut person = PersonImpl::new();
 
-        // Test setting message fields
-        let mut address = AddressImpl::new();
-        address.set_street("123 Main St");
-        address.set_city("Anytown");
-        address.set_zip_code(12345);
-
-        person.set_address(&address);
+        // Test setting message fields via mutable builder
+        {
+            let address = person.address_mut();
+            address.set_street("123 Main St");
+            address.set_city("Anytown");
+            address.set_zip_code(12345);
+        }
 
         // Test getting message fields
         let retrieved_address = person.address().unwrap();
@@ -507,7 +499,10 @@ mod tests {
         assert!(person.has_address());
 
         // Test builder pattern
-        person.address_mut().set_street("456 Oak Ave");
+        {
+            let address = person.address_mut();
+            address.set_street("456 Oak Ave");
+        }
         assert_eq!(person.address().unwrap().street(), "456 Oak Ave");
 
         // Test clearing message fields

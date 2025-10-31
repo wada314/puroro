@@ -451,6 +451,16 @@ trait PersonTry {
 }
 ```
 
+#### Design Decision (2025-10-31): Message Field Mutation API
+
+- Removed the dedicated `set_<message>()` methods from the generated message traits.
+- `*_mut()` builders (e.g. `address_mut()`) are now the preferred way to mutate nested messages via `dyn` dispatch.
+- Rationale:
+  - Protocol Buffer decoding merges nested messages instead of replacing them wholesale.
+  - Avoids forcing every nested message view trait to expose cloning/boxing hooks just to support setters.
+  - Keeps the core trait surface minimal while still allowing helper utilities to offer higher-level setters if needed.
+- Documentation and samples should encourage the builder pattern when updating nested messages.
+
 ---
 
 ### Optional Getters for Fields
