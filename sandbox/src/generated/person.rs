@@ -57,12 +57,6 @@ pub trait PersonAppend: Person {
     // Enum field setters
     fn set_status(&mut self, v: Status);
     fn set_secondary_status(&mut self, v: Status);
-
-    // Message field setters
-    fn set_address(&mut self, v: &AddressImpl);
-
-    // Builder-style methods for nested message construction
-    fn address_mut(&mut self) -> &mut dyn AddressMut;
 }
 
 /// Infallible fully mutable trait for Person message.
@@ -82,6 +76,12 @@ pub trait PersonMut: PersonAppend {
 
     // Message field clearers
     fn clear_address(&mut self);
+
+    // Message field setters
+    fn set_address(&mut self, v: &AddressImpl);
+
+    // Builder-style methods for nested message construction
+    fn address_mut(&mut self) -> &mut dyn AddressMut;
 }
 
 // ============================================================================
@@ -408,20 +408,6 @@ impl PersonAppend for PersonImpl {
     fn set_secondary_status(&mut self, v: Status) {
         self.secondary_status.set(&mut self._shared, v.to_wire());
     }
-
-    #[inline]
-    fn set_address(&mut self, v: &AddressImpl) {
-        self.address.set(&mut self._shared, v);
-    }
-
-    #[inline]
-    fn address_mut(&mut self) -> &mut dyn AddressMut {
-        // Ensure field is allocated and marked as present
-        if self.address.data.0.is_none() {
-            self.address.data.0 = Some(Box::new(AddressImpl::default()));
-        }
-        self.address.data.0.as_mut().unwrap().as_mut()
-    }
 }
 
 impl PersonMut for PersonImpl {
@@ -458,6 +444,19 @@ impl PersonMut for PersonImpl {
     #[inline]
     fn clear_address(&mut self) {
         self.address.clear(&mut self._shared);
+    }
+
+    #[inline]
+    fn set_address(&mut self, v: &AddressImpl) {
+        self.address.set(&mut self._shared, v);
+    }
+
+    #[inline]
+    fn address_mut(&mut self) -> &mut dyn AddressMut {
+        if self.address.data.0.is_none() {
+            self.address.data.0 = Some(Box::new(AddressImpl::default()));
+        }
+        self.address.data.0.as_mut().unwrap().as_mut()
     }
 }
 
