@@ -461,6 +461,17 @@ trait PersonTry {
   - Keeps the core trait surface minimal while still allowing helper utilities to offer higher-level setters if needed.
 - Documentation and samples should encourage the builder pattern when updating nested messages.
 
+#### Discussion (2025-10-31): Flexible View vs Dyn Trait Compatibility
+
+- Proposal: introduce two layers of traits:
+  - `Person`: flexible view API (may return tuples or stack-allocated structs via GAT/associated types).
+  - `DynPerson`: dyn-compatible API that returns fixed-size wrappers (enum/Cow style) exposing `dyn Address` views.
+- Potential approach for `DynPerson::address()`: return `DynAddressView<'a>` with variants such as `Borrowed(&'a dyn Address)` or `Owned(Box<dyn Address + 'a>)`.
+- Motivation:
+  - Flexible views could expose richer context without committing to a single reference type.
+  - Dyn-compatible wrappers need stable size; an enum avoids forced heap allocation while still allowing owned values when necessary.
+- Notes: the adapter from `Person` → `DynPerson` would move stack-allocated views into the `Owned` variant when needed; `Borrowed` could be used for zero-cost cases. This idea is still under evaluation.
+
 ---
 
 ### Optional Getters for Fields
