@@ -62,7 +62,7 @@ pub trait PersonAppend: Person {
     fn set_address(&mut self, v: &AddressImpl);
 
     // Builder-style methods for nested message construction
-    fn address_mut(&mut self) -> &mut AddressImpl;
+    fn address_mut(&mut self) -> &mut dyn AddressMut;
 }
 
 /// Infallible fully mutable trait for Person message.
@@ -415,7 +415,7 @@ impl PersonAppend for PersonImpl {
     }
 
     #[inline]
-    fn address_mut(&mut self) -> &mut AddressImpl {
+    fn address_mut(&mut self) -> &mut dyn AddressMut {
         // Ensure field is allocated and marked as present
         if self.address.data.0.is_none() {
             self.address.data.0 = Some(Box::new(AddressImpl::default()));
