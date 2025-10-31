@@ -30,7 +30,7 @@ pub trait Person {
     fn secondary_status(&self) -> Result<Option<Status>, i32>;
 
     // Message field getters
-    fn address(&self) -> Option<&Address>; // Message fields always return Option, even for ImplicitOptional
+    fn address(&self) -> Option<&dyn Address>; // Message fields always return Option, even for ImplicitOptional
 
     // Presence checks (for optional semantics)
     fn has_name(&self) -> bool;
@@ -59,10 +59,10 @@ pub trait PersonAppend: Person {
     fn set_secondary_status(&mut self, v: Status);
 
     // Message field setters
-    fn set_address(&mut self, v: &Address);
+    fn set_address(&mut self, v: &AddressImpl);
 
     // Builder-style methods for nested message construction
-    fn address_mut(&mut self) -> &mut Address;
+    fn address_mut(&mut self) -> &mut AddressImpl;
 }
 
 /// Infallible fully mutable trait for Person message.
@@ -126,19 +126,40 @@ impl TryFrom<i32> for Status {
 }
 
 // ============================================================================
-// Address Message
+// Address Traits and Implementation
 // ============================================================================
+
+/// Immutable trait for Address message.
+pub trait Address {
+    fn street(&self) -> &str;
+    fn city(&self) -> &str;
+    fn zip_code(&self) -> i32;
+}
+
+/// Append-only trait for Address message.
+pub trait AddressAppend: Address {
+    fn set_street(&mut self, v: &str);
+    fn set_city(&mut self, v: &str);
+    fn set_zip_code(&mut self, v: i32);
+}
+
+/// Fully mutable trait for Address message.
+pub trait AddressMut: AddressAppend {
+    fn clear_street(&mut self);
+    fn clear_city(&mut self);
+    fn clear_zip_code(&mut self);
+}
 
 /// Address message implementation
 #[derive(Debug, Clone, PartialEq)]
-pub struct Address {
+pub struct AddressImpl {
     street: FieldStorage<StringFieldWrapper, ImplicitOptional, 1, 1>,
     city: FieldStorage<StringFieldWrapper, ImplicitOptional, 2, 1>,
     zip_code: FieldStorage<i32, ImplicitOptional, 3, 1>,
     _shared: SharedFields<1>,
 }
 
-impl Address {
+impl AddressImpl {
     pub fn new() -> Self {
         Self {
             street: Default::default(),
@@ -147,107 +168,57 @@ impl Address {
             _shared: SharedFields::new(),
         }
     }
+}
 
-    pub fn street(&self) -> &str {
+impl Default for AddressImpl {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl Address for AddressImpl {
+    fn street(&self) -> &str {
         self.street.get(&self._shared)
     }
 
-    pub fn city(&self) -> &str {
+    fn city(&self) -> &str {
         self.city.get(&self._shared)
     }
 
-    pub fn zip_code(&self) -> i32 {
+    fn zip_code(&self) -> i32 {
         self.zip_code.get(&self._shared)
     }
+}
 
-    pub fn set_street(&mut self, v: &str) {
+impl AddressAppend for AddressImpl {
+    fn set_street(&mut self, v: &str) {
         self.street.set(&mut self._shared, v);
     }
 
-    pub fn set_city(&mut self, v: &str) {
+    fn set_city(&mut self, v: &str) {
         self.city.set(&mut self._shared, v);
     }
 
-    pub fn set_zip_code(&mut self, v: i32) {
+    fn set_zip_code(&mut self, v: i32) {
         self.zip_code.set(&mut self._shared, v);
     }
 }
 
-impl Default for Address {
-    fn default() -> Self {
-        Self::new()
+impl AddressMut for AddressImpl {
+    fn clear_street(&mut self) {
+        self.street.clear(&mut self._shared);
+    }
+
+    fn clear_city(&mut self) {
+        self.city.clear(&mut self._shared);
+    }
+
+    fn clear_zip_code(&mut self) {
+        self.zip_code.clear(&mut self._shared);
     }
 }
 
-impl Message for Address {
-    fn parse_from_bytes(_bytes: &[u8]) -> Result<Self, Error> {
-        todo!("Parsing not yet implemented")
-    }
-
-    fn write_to_bytes(&self) -> Result<Vec<u8>, Error> {
-        todo!("Serialization not yet implemented")
-    }
-
-    fn compute_size(&self) -> usize {
-        todo!("Size computation not yet implemented")
-    }
-}
-
-// ============================================================================
-// Profile Message
-// ============================================================================
-
-/// Profile message implementation
-#[derive(Debug, Clone, PartialEq)]
-pub struct Profile {
-    bio: FieldStorage<StringFieldWrapper, ImplicitOptional, 1, 1>,
-    website: FieldStorage<StringFieldWrapper, ExplicitOptional<0>, 2, 1>,
-    reputation: FieldStorage<i32, ImplicitOptional, 3, 1>,
-    _shared: SharedFields<1>,
-}
-
-impl Profile {
-    pub fn new() -> Self {
-        Self {
-            bio: Default::default(),
-            website: Default::default(),
-            reputation: Default::default(),
-            _shared: SharedFields::new(),
-        }
-    }
-
-    pub fn bio(&self) -> &str {
-        self.bio.get(&self._shared)
-    }
-
-    pub fn website(&self) -> Option<&str> {
-        self.website.get(&self._shared)
-    }
-
-    pub fn reputation(&self) -> i32 {
-        self.reputation.get(&self._shared)
-    }
-
-    pub fn set_bio(&mut self, v: &str) {
-        self.bio.set(&mut self._shared, v);
-    }
-
-    pub fn set_website(&mut self, v: &str) {
-        self.website.set(&mut self._shared, v);
-    }
-
-    pub fn set_reputation(&mut self, v: i32) {
-        self.reputation.set(&mut self._shared, v);
-    }
-}
-
-impl Default for Profile {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-impl Message for Profile {
+impl Message for AddressImpl {
     fn parse_from_bytes(_bytes: &[u8]) -> Result<Self, Error> {
         todo!("Parsing not yet implemented")
     }
@@ -286,8 +257,7 @@ pub struct PersonImpl {
 
     // Message fields: use heap allocation with Option<Box<M>> for presence tracking
     // No presence bits needed - Option<Box<M>> handles presence directly
-    address: FieldStorage<MessageFieldWrapper<Address>, ImplicitOptional, 6, 1>, // Field 6, heap-allocated presence
-    profile: FieldStorage<MessageFieldWrapper<Profile>, ImplicitOptional, 7, 1>, // Field 7, heap-allocated presence
+    address: FieldStorage<MessageFieldWrapper<AddressImpl>, ImplicitOptional, 6, 1>, // Field 6, heap-allocated presence
 
     // Enum fields: stored as i32
     status: FieldStorage<i32, ImplicitOptional, 4, 1>, // Field 4, implicit presence, 1 byte shared
@@ -305,7 +275,6 @@ impl PersonImpl {
             name: Default::default(),
             email: Default::default(),
             address: Default::default(),
-            profile: Default::default(),
             status: Default::default(),
             secondary_status: Default::default(),
             _shared: SharedFields::new(),
@@ -360,8 +329,10 @@ impl Person for PersonImpl {
     }
 
     #[inline]
-    fn address(&self) -> Option<&Address> {
-        self.address.get(&self._shared)
+    fn address(&self) -> Option<&dyn Address> {
+        self.address
+            .get(&self._shared)
+            .map(|address| address as &dyn Address)
     }
 
     #[inline]
@@ -439,15 +410,15 @@ impl PersonAppend for PersonImpl {
     }
 
     #[inline]
-    fn set_address(&mut self, v: &Address) {
+    fn set_address(&mut self, v: &AddressImpl) {
         self.address.set(&mut self._shared, v);
     }
 
     #[inline]
-    fn address_mut(&mut self) -> &mut Address {
+    fn address_mut(&mut self) -> &mut AddressImpl {
         // Ensure field is allocated and marked as present
         if self.address.data.0.is_none() {
-            self.address.data.0 = Some(Box::new(Address::default()));
+            self.address.data.0 = Some(Box::new(AddressImpl::default()));
         }
         self.address.data.0.as_mut().unwrap().as_mut()
     }
@@ -520,7 +491,7 @@ mod tests {
         let mut person = PersonImpl::new();
 
         // Test setting message fields
-        let mut address = Address::new();
+        let mut address = AddressImpl::new();
         address.set_street("123 Main St");
         address.set_city("Anytown");
         address.set_zip_code(12345);
@@ -540,24 +511,9 @@ mod tests {
         person.address_mut().set_street("456 Oak Ave");
         assert_eq!(person.address().unwrap().street(), "456 Oak Ave");
 
-        // Test optional message field
-        let mut profile = Profile::new();
-        profile.set_bio("Software developer");
-        profile.set_reputation(100);
-
-        person.set_profile(&profile);
-
-        let retrieved_profile = person.profile().unwrap();
-        assert_eq!(retrieved_profile.bio(), "Software developer");
-        assert_eq!(retrieved_profile.reputation(), 100);
-        assert!(person.has_profile());
-
         // Test clearing message fields
         person.clear_address();
         assert!(!person.has_address());
-
-        person.clear_profile();
-        assert!(!person.has_profile());
     }
 
     #[test]
@@ -601,7 +557,7 @@ mod tests {
         assert_eq!(string_field.0, "Hello");
 
         // Test MessageFieldWrapper wrapper
-        let address = Address::new();
+        let address = AddressImpl::new();
         let message_field = MessageFieldWrapper(Some(Box::new(address)));
         assert_eq!(message_field.0.as_ref().unwrap().street(), "");
     }

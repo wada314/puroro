@@ -163,24 +163,27 @@ fn test_memory_layout_optimized() {
     let total_size = size_of::<PersonImpl>();
 
     // Expected sizes on 64-bit:
-    // - String: 24 bytes (3 words: ptr, len, cap)
-    // - String: 24 bytes
-    // - BitArr!(for 4, in u8): 1 byte (fixed-size, stack-allocated)
-    // - padding: 3 bytes (to align i32)
+    // - StringFieldWrapper: 24 bytes (String)
+    // - StringFieldWrapper: 24 bytes (String)
+    // - MessageFieldWrapper: 8 bytes (Option<Box<_>>)
+    // - SharedFields<1>: 1 byte (BitArr storage)
+    // - padding: 7 bytes (alignment for i32 fields)
     // - i32: 4 bytes (age)
     // - i32: 4 bytes (score)
-    // Total: 64 bytes (4 fields: 2 strings + 2 i32s + 1 byte BitArr)
+    // - i32: 4 bytes (status)
+    // - i32: 4 bytes (secondary_status)
+    // Total: 80 bytes
 
     println!("PersonImpl size: {} bytes", total_size);
     println!("PersonImpl alignment: {} bytes", align_of::<PersonImpl>());
 
-    // On 64-bit systems, should be 64 bytes with BitArr
+    // On 64-bit systems, should be 80 bytes with BitArr
     // (BitArr is stack-allocated, same efficiency as u32, but supports unlimited fields)
     #[cfg(target_pointer_width = "64")]
     {
         assert_eq!(
-            total_size, 88,
-            "PersonImpl should be 88 bytes on 64-bit with BitArr for presence tracking (6 fields: 2 strings + 2 messages + 2 enums + 2 scalars + shared fields)"
+            total_size, 80,
+            "PersonImpl should be 80 bytes on 64-bit with BitArr for presence tracking (2 strings + 1 message + 2 enums + 2 scalars + shared fields)"
         );
     }
 
