@@ -18,20 +18,10 @@ use puroro::{
 /// Flexible view trait for Person message (not dyn-compatible).
 ///
 /// This trait allows implementers to return flexible views (tuples, stack-allocated structs, etc.)
-/// for message fields using GATs or associated types. Extends DynPerson for dyn compatibility.
+/// for message fields using return-position impl trait. Extends DynPerson for dyn compatibility.
 pub trait Person: DynPerson {
-    /// Associated type for the address field view.
-    /// Implementers can return flexible types like tuples or stack-allocated structs here.
-    /// The view should be convertible to a DynAddress reference via `as_dyn_address()`.
-    type AddressView<'a>
-    where
-        Self: 'a;
-
-    /// Converts the address view to a DynAddress reference.
-    fn as_dyn_address<'a>(view: &'a Self::AddressView<'a>) -> &'a dyn DynAddress;
-
     /// Returns the address field with a flexible view type.
-    fn address_flex(&self) -> Option<Self::AddressView<'_>>;
+    fn address_flex(&self) -> Option<impl Address + use<'_, Self>>;
 }
 
 /// Dyn-compatible immutable trait for Person message.
@@ -153,11 +143,29 @@ impl TryFrom<i32> for Status {
 /// Extends DynAddress for dyn compatibility.
 pub trait Address: DynAddress {}
 
+// Blanket implementation for references
+impl<T: Address> Address for &T {}
+
 /// Dyn-compatible immutable trait for Address message.
 pub trait DynAddress {
     fn street(&self) -> &str;
     fn city(&self) -> &str;
     fn zip_code(&self) -> i32;
+}
+
+// Blanket implementation for references
+impl<T: DynAddress> DynAddress for &T {
+    fn street(&self) -> &str {
+        (*self).street()
+    }
+
+    fn city(&self) -> &str {
+        (*self).city()
+    }
+
+    fn zip_code(&self) -> i32 {
+        (*self).zip_code()
+    }
 }
 
 /// Dyn-compatible append-only trait for Address message.
@@ -317,13 +325,7 @@ impl Default for PersonImpl {
 }
 
 impl Person for PersonImpl {
-    type AddressView<'a> = &'a AddressImpl;
-
-    fn as_dyn_address<'a>(view: &'a Self::AddressView<'a>) -> &'a dyn DynAddress {
-        *view as &dyn DynAddress
-    }
-
-    fn address_flex(&self) -> Option<Self::AddressView<'_>> {
+    fn address_flex(&self) -> Option<impl Address + use<'_>> {
         self.address.get(&self._shared)
     }
 }
@@ -368,9 +370,9 @@ impl DynPerson for PersonImpl {
 
     #[inline]
     fn address(&self) -> Option<ViewCow<'_, dyn DynAddress>> {
-        self.address.get(&self._shared).map(|address| {
-            ViewCow::Borrowed(address as &dyn DynAddress)
-        })
+        self.address
+            .get(&self._shared)
+            .map(|address| ViewCow::Borrowed(address as &dyn DynAddress))
     }
 
     #[inline]
