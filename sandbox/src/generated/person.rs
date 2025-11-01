@@ -19,9 +19,95 @@ use puroro::{
 ///
 /// This trait allows implementers to return flexible views (tuples, stack-allocated structs, etc.)
 /// for message fields using return-position impl trait. Extends DynPerson for dyn compatibility.
+/// All DynPerson methods are re-exported with default implementations that delegate to DynPerson.
 pub trait Person: DynPerson {
     /// Returns the address field with a flexible view type.
     fn address_flex(&self) -> Option<impl Address + use<'_, Self>>;
+
+    // Re-export DynPerson methods with default implementations
+    /// Gets the name field.
+    #[inline]
+    fn name(&self) -> &str {
+        DynPerson::name(self)
+    }
+
+    /// Gets the age field.
+    #[inline]
+    fn age(&self) -> i32 {
+        DynPerson::age(self)
+    }
+
+    /// Gets the email field.
+    #[inline]
+    fn email(&self) -> Option<&str> {
+        DynPerson::email(self)
+    }
+
+    /// Gets the score field.
+    #[inline]
+    fn score(&self) -> Option<i32> {
+        DynPerson::score(self)
+    }
+
+    /// Gets the status field.
+    #[inline]
+    fn status(&self) -> Result<Status, i32> {
+        DynPerson::status(self)
+    }
+
+    /// Gets the secondary_status field.
+    #[inline]
+    fn secondary_status(&self) -> Result<Option<Status>, i32> {
+        DynPerson::secondary_status(self)
+    }
+
+    /// Gets the address field.
+    #[inline]
+    fn address(&self) -> Option<ViewCow<'_, dyn DynAddress>> {
+        DynPerson::address(self)
+    }
+
+    /// Checks if the name field is present.
+    #[inline]
+    fn has_name(&self) -> bool {
+        DynPerson::has_name(self)
+    }
+
+    /// Checks if the age field is present.
+    #[inline]
+    fn has_age(&self) -> bool {
+        DynPerson::has_age(self)
+    }
+
+    /// Checks if the email field is present.
+    #[inline]
+    fn has_email(&self) -> bool {
+        DynPerson::has_email(self)
+    }
+
+    /// Checks if the score field is present.
+    #[inline]
+    fn has_score(&self) -> bool {
+        DynPerson::has_score(self)
+    }
+
+    /// Checks if the status field is present.
+    #[inline]
+    fn has_status(&self) -> bool {
+        DynPerson::has_status(self)
+    }
+
+    /// Checks if the secondary_status field is present.
+    #[inline]
+    fn has_secondary_status(&self) -> bool {
+        DynPerson::has_secondary_status(self)
+    }
+
+    /// Checks if the address field is present.
+    #[inline]
+    fn has_address(&self) -> bool {
+        DynPerson::has_address(self)
+    }
 }
 
 /// Dyn-compatible immutable trait for Person message.
@@ -53,6 +139,49 @@ pub trait DynPerson {
     fn has_address(&self) -> bool;
 }
 
+/// Flexible view append-only trait for Person message (not dyn-compatible).
+///
+/// This trait extends Person with append operations. All DynPersonAppend methods are re-exported
+/// with default implementations, so importing PersonAppend alone is sufficient.
+pub trait PersonAppend: Person + DynPersonAppend {
+    // Re-export DynPersonAppend methods with default implementations
+    /// Sets the name field.
+    #[inline]
+    fn set_name(&mut self, v: &str) {
+        DynPersonAppend::set_name(self, v)
+    }
+
+    /// Sets the age field.
+    #[inline]
+    fn set_age(&mut self, v: i32) {
+        DynPersonAppend::set_age(self, v)
+    }
+
+    /// Sets the email field.
+    #[inline]
+    fn set_email(&mut self, v: &str) {
+        DynPersonAppend::set_email(self, v)
+    }
+
+    /// Sets the score field.
+    #[inline]
+    fn set_score(&mut self, v: i32) {
+        DynPersonAppend::set_score(self, v)
+    }
+
+    /// Sets the status field.
+    #[inline]
+    fn set_status(&mut self, v: Status) {
+        DynPersonAppend::set_status(self, v)
+    }
+
+    /// Sets the secondary_status field.
+    #[inline]
+    fn set_secondary_status(&mut self, v: Status) {
+        DynPersonAppend::set_secondary_status(self, v)
+    }
+}
+
 /// Dyn-compatible append-only trait for Person message.
 ///
 /// This trait extends DynPerson with append operations (set/add/insert) but no destructive operations.
@@ -68,6 +197,61 @@ pub trait DynPersonAppend: DynPerson {
     // Enum field setters
     fn set_status(&mut self, v: Status);
     fn set_secondary_status(&mut self, v: Status);
+}
+
+/// Flexible view fully mutable trait for Person message (not dyn-compatible).
+///
+/// This trait extends PersonAppend with destructive operations. All DynPersonMut methods are
+/// re-exported with default implementations, so importing PersonMut alone is sufficient.
+pub trait PersonMut: PersonAppend + DynPersonMut {
+    // Re-export DynPersonMut methods with default implementations
+    /// Clears the name field.
+    #[inline]
+    fn clear_name(&mut self) {
+        DynPersonMut::clear_name(self)
+    }
+
+    /// Clears the age field.
+    #[inline]
+    fn clear_age(&mut self) {
+        DynPersonMut::clear_age(self)
+    }
+
+    /// Clears the email field.
+    #[inline]
+    fn clear_email(&mut self) {
+        DynPersonMut::clear_email(self)
+    }
+
+    /// Clears the score field.
+    #[inline]
+    fn clear_score(&mut self) {
+        DynPersonMut::clear_score(self)
+    }
+
+    /// Clears the status field.
+    #[inline]
+    fn clear_status(&mut self) {
+        DynPersonMut::clear_status(self)
+    }
+
+    /// Clears the secondary_status field.
+    #[inline]
+    fn clear_secondary_status(&mut self) {
+        DynPersonMut::clear_secondary_status(self)
+    }
+
+    /// Clears the address field.
+    #[inline]
+    fn clear_address(&mut self) {
+        DynPersonMut::clear_address(self)
+    }
+
+    /// Gets a mutable reference to the address field for builder-style construction.
+    #[inline]
+    fn address_mut(&mut self) -> &mut dyn DynAddressMut {
+        DynPersonMut::address_mut(self)
+    }
 }
 
 /// Dyn-compatible fully mutable trait for Person message.
@@ -328,6 +512,15 @@ impl Person for PersonImpl {
     fn address_flex(&self) -> Option<impl Address + use<'_>> {
         self.address.get(&self._shared)
     }
+    // All other methods use default implementations from the trait definition
+}
+
+impl PersonAppend for PersonImpl {
+    // All methods use default implementations from the trait definition
+}
+
+impl PersonMut for PersonImpl {
+    // All methods use default implementations from the trait definition
 }
 
 impl DynPerson for PersonImpl {
@@ -518,7 +711,10 @@ impl Message for PersonImpl {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use super::{
+        AddressImpl, DynAddress, MessageFieldWrapper, Person, PersonAppend, PersonImpl, PersonMut,
+        Status, StringFieldWrapper,
+    };
 
     #[test]
     fn test_message_fields() {

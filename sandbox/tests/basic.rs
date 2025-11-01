@@ -1,144 +1,147 @@
 //! Basic integration tests for our API design.
 
-use sandbox::generated::person::{DynPerson, DynPersonAppend, PersonImpl, DynPersonMut};
+use sandbox::generated::person::{Person, PersonAppend, PersonImpl, PersonMut};
 
 #[test]
 fn test_person_creation() {
     let person = PersonImpl::new();
-    assert_eq!(person.name(), "");
-    assert_eq!(person.age(), 0);
-    assert_eq!(person.email(), None);
+    assert_eq!(Person::name(&person), "");
+    assert_eq!(Person::age(&person), 0);
+    assert_eq!(Person::email(&person), None);
 
     // ImplicitOptional fields are present only if not equal to default value
-    assert!(!person.has_name()); // Empty string is default value
-    assert!(!person.has_age()); // 0 is default value
-    assert!(!person.has_email()); // ExplicitOptional field is not set initially
+    assert!(!Person::has_name(&person)); // Empty string is default value
+    assert!(!Person::has_age(&person)); // 0 is default value
+    assert!(!Person::has_email(&person)); // ExplicitOptional field is not set initially
 }
 
 #[test]
 fn test_person_default() {
     let person = PersonImpl::default();
-    assert_eq!(person.name(), "");
-    assert_eq!(person.age(), 0);
-    assert_eq!(person.email(), None);
+    assert_eq!(Person::name(&person), "");
+    assert_eq!(Person::age(&person), 0);
+    assert_eq!(Person::email(&person), None);
 }
 
 #[test]
 fn test_person_setters() {
     let mut person = PersonImpl::new();
 
-    person.set_name("Alice");
-    person.set_age(30);
-    person.set_email("alice@example.com");
+    PersonAppend::set_name(&mut person, "Alice");
+    PersonAppend::set_age(&mut person, 30);
+    PersonAppend::set_email(&mut person, "alice@example.com");
 
-    assert_eq!(person.name(), "Alice");
-    assert_eq!(person.age(), 30);
-    assert_eq!(person.email(), Some("alice@example.com"));
+    assert_eq!(Person::name(&person), "Alice");
+    assert_eq!(Person::age(&person), 30);
+    assert_eq!(Person::email(&person), Some("alice@example.com"));
 
     // After setting, fields should be marked as "set"
-    assert!(person.has_name());
-    assert!(person.has_age());
-    assert!(person.has_email());
+    assert!(Person::has_name(&person));
+    assert!(Person::has_age(&person));
+    assert!(Person::has_email(&person));
 }
 
 #[test]
 fn test_person_clear() {
     let mut person = PersonImpl::new();
 
-    person.set_name("Bob");
-    person.set_age(25);
-    assert!(person.has_name());
-    assert!(person.has_age());
+    PersonAppend::set_name(&mut person, "Bob");
+    PersonAppend::set_age(&mut person, 25);
+    assert!(Person::has_name(&person));
+    assert!(Person::has_age(&person));
 
-    person.clear_name();
-    person.clear_age();
+    PersonMut::clear_name(&mut person);
+    PersonMut::clear_age(&mut person);
 
-    assert_eq!(person.name(), "");
-    assert_eq!(person.age(), 0);
+    assert_eq!(Person::name(&person), "");
+    assert_eq!(Person::age(&person), 0);
     // ImplicitOptional fields are present only if not equal to default value
-    assert!(!person.has_name()); // Empty string is default value
-    assert!(!person.has_age()); // 0 is default value
+    assert!(!Person::has_name(&person)); // Empty string is default value
+    assert!(!Person::has_age(&person)); // 0 is default value
 }
 
 #[test]
 fn test_person_clone() {
     let mut person = PersonImpl::new();
-    person.set_name("Charlie");
-    person.set_age(35);
+    PersonAppend::set_name(&mut person, "Charlie");
+    PersonAppend::set_age(&mut person, 35);
 
     let cloned = person.clone();
     assert_eq!(person, cloned);
-    assert_eq!(cloned.name(), "Charlie");
-    assert_eq!(cloned.age(), 35);
-    assert!(cloned.has_name());
-    assert!(cloned.has_age());
+    assert_eq!(Person::name(&cloned), "Charlie");
+    assert_eq!(Person::age(&cloned), 35);
+    assert!(Person::has_name(&cloned));
+    assert!(Person::has_age(&cloned));
 }
 
 #[test]
 fn test_person_trait_usage() {
-    // Test that we can use the DynPerson trait for immutable access
-    fn print_person_info(p: &impl DynPerson) -> String {
-        format!("{} (age: {})", p.name(), p.age())
+    // Test that we can use the Person trait for immutable access
+    fn print_person_info(p: &impl Person) -> String {
+        format!("{} (age: {})", Person::name(p), Person::age(p))
     }
 
     let mut person = PersonImpl::new();
-    person.set_name("Dave");
-    person.set_age(40);
+    PersonAppend::set_name(&mut person, "Dave");
+    PersonAppend::set_age(&mut person, 40);
 
     assert_eq!(print_person_info(&person), "Dave (age: 40)");
 }
 
 #[test]
 fn test_person_append_trait_usage() {
-    // Test that we can use DynPersonAppend trait for append-only operations
-    fn populate_person(p: &mut impl DynPersonAppend, name: &str, age: i32) {
-        p.set_name(name);
-        p.set_age(age);
+    // Test that we can use PersonAppend trait for append-only operations
+    fn populate_person(p: &mut impl PersonAppend, name: &str, age: i32) {
+        PersonAppend::set_name(p, name);
+        PersonAppend::set_age(p, age);
         // p.clear_name(); // ❌ Would not compile - safe!
     }
 
     let mut person = PersonImpl::new();
     populate_person(&mut person, "Grace", 28);
 
-    assert_eq!(person.name(), "Grace");
-    assert_eq!(person.age(), 28);
-    assert!(person.has_name());
-    assert!(person.has_age());
+    assert_eq!(Person::name(&person), "Grace");
+    assert_eq!(Person::age(&person), 28);
+    assert!(Person::has_name(&person));
+    assert!(Person::has_age(&person));
 }
 
 #[test]
 fn test_person_mut_trait_usage() {
-    // Test that we can use DynPersonMut trait for full mutable operations
-    fn reset_person(p: &mut impl DynPersonMut) {
-        p.set_name("Default");
-        p.clear_age(); // Only PersonMut can clear
+    // Test that we can use PersonMut trait for full mutable operations
+    fn reset_person(p: &mut impl PersonMut) {
+        PersonAppend::set_name(p, "Default");
+        PersonMut::clear_age(p); // Only PersonMut can clear
     }
 
     let mut person = PersonImpl::new();
-    person.set_name("Alice");
-    person.set_age(30);
+    PersonAppend::set_name(&mut person, "Alice");
+    PersonAppend::set_age(&mut person, 30);
 
     reset_person(&mut person);
 
-    assert_eq!(person.name(), "Default");
-    assert_eq!(person.age(), 0);
+    assert_eq!(Person::name(&person), "Default");
+    assert_eq!(Person::age(&person), 0);
     // ImplicitOptional fields are present only if not equal to default value
-    assert!(!person.has_age()); // 0 is default value
+    assert!(!Person::has_age(&person)); // 0 is default value
 }
 
 #[test]
 fn test_immutable_reference() {
     // Test that immutable references only allow Person trait operations
     let mut person = PersonImpl::new();
-    person.set_name("Henry");
-    person.set_age(50);
+    PersonAppend::set_name(&mut person, "Henry");
+    PersonAppend::set_age(&mut person, 50);
 
-    // Take an immutable reference - can only use DynPerson trait methods
-    let person_ref: &dyn DynPerson = &person;
-    assert_eq!(person_ref.name(), "Henry");
-    assert_eq!(person_ref.age(), 50);
-    assert!(person_ref.has_name());
-    // person_ref.set_name("test"); // This would not compile - good!
+    // Take an immutable reference - can only use Person trait methods
+    // Note: Person is not dyn-compatible, so we use impl Person
+    fn use_person_ref(p: &impl Person) {
+        assert_eq!(Person::name(p), "Henry");
+        assert_eq!(Person::age(p), 50);
+        assert!(Person::has_name(p));
+        // p.set_name("test"); // This would not compile - good!
+    }
+    use_person_ref(&person);
 }
 
 #[test]
@@ -147,12 +150,12 @@ fn test_person_string_coercion() {
 
     // Test that String can be coerced to &str
     let name_string = "Eve".to_string();
-    person.set_name(&name_string);
-    assert_eq!(person.name(), "Eve");
+    PersonAppend::set_name(&mut person, &name_string);
+    assert_eq!(Person::name(&person), "Eve");
 
     // &str literal should also work
-    person.set_name("Frank");
-    assert_eq!(person.name(), "Frank");
+    PersonAppend::set_name(&mut person, "Frank");
+    assert_eq!(Person::name(&person), "Frank");
 }
 
 #[test]
@@ -205,12 +208,12 @@ fn test_inline_optimization_hint() {
     let mut person = PersonImpl::new();
 
     // These calls should be inlined in release builds
-    person.set_name("Inline Test");
-    let _ = person.name();
-    let _ = person.has_name();
+    PersonAppend::set_name(&mut person, "Inline Test");
+    let _ = Person::name(&person);
+    let _ = Person::has_name(&person);
 
     // Just verify functionality
-    assert_eq!(person.name(), "Inline Test");
+    assert_eq!(Person::name(&person), "Inline Test");
 }
 
 #[test]
@@ -223,20 +226,20 @@ fn test_clone_into_optimization() {
     let mut person = PersonImpl::new();
 
     // First set - allocates
-    person.set_name("A very long string that requires heap allocation");
+    PersonAppend::set_name(&mut person, "A very long string that requires heap allocation");
     assert_eq!(
-        person.name(),
+        Person::name(&person),
         "A very long string that requires heap allocation"
     );
 
     // Second set with shorter string - clone_into reuses allocation internally
-    person.set_name("Short");
-    assert_eq!(person.name(), "Short");
+    PersonAppend::set_name(&mut person, "Short");
+    assert_eq!(Person::name(&person), "Short");
 
     // Third set with another long string
-    person.set_name("Another very long string that requires heap allocation");
+    PersonAppend::set_name(&mut person, "Another very long string that requires heap allocation");
     assert_eq!(
-        person.name(),
+        Person::name(&person),
         "Another very long string that requires heap allocation"
     );
 
