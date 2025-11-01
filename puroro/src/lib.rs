@@ -37,6 +37,12 @@ pub mod field_ops;
 /// Provides a wrapper type for fields shared across all message fields.
 pub mod shared;
 
+/// View types for Protocol Buffer message fields.
+///
+/// Provides types for returning flexible views of message fields
+/// that support both borrowed references and owned values.
+pub mod view;
+
 /// Core message trait that all generated Protocol Buffer messages implement.
 pub trait Message: Sized + Default + Clone + PartialEq {
     /// Parses a message from the given byte slice.

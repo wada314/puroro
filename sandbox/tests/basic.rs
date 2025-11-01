@@ -1,6 +1,6 @@
 //! Basic integration tests for our API design.
 
-use sandbox::generated::person::{Person, PersonAppend, PersonImpl, PersonMut};
+use sandbox::generated::person::{DynPerson, DynPersonAppend, PersonImpl, DynPersonMut};
 
 #[test]
 fn test_person_creation() {
@@ -76,8 +76,8 @@ fn test_person_clone() {
 
 #[test]
 fn test_person_trait_usage() {
-    // Test that we can use the Person trait for immutable access
-    fn print_person_info(p: &impl Person) -> String {
+    // Test that we can use the DynPerson trait for immutable access
+    fn print_person_info(p: &impl DynPerson) -> String {
         format!("{} (age: {})", p.name(), p.age())
     }
 
@@ -90,8 +90,8 @@ fn test_person_trait_usage() {
 
 #[test]
 fn test_person_append_trait_usage() {
-    // Test that we can use PersonAppend trait for append-only operations
-    fn populate_person(p: &mut impl PersonAppend, name: &str, age: i32) {
+    // Test that we can use DynPersonAppend trait for append-only operations
+    fn populate_person(p: &mut impl DynPersonAppend, name: &str, age: i32) {
         p.set_name(name);
         p.set_age(age);
         // p.clear_name(); // ❌ Would not compile - safe!
@@ -108,8 +108,8 @@ fn test_person_append_trait_usage() {
 
 #[test]
 fn test_person_mut_trait_usage() {
-    // Test that we can use PersonMut trait for full mutable operations
-    fn reset_person(p: &mut impl PersonMut) {
+    // Test that we can use DynPersonMut trait for full mutable operations
+    fn reset_person(p: &mut impl DynPersonMut) {
         p.set_name("Default");
         p.clear_age(); // Only PersonMut can clear
     }
@@ -133,8 +133,8 @@ fn test_immutable_reference() {
     person.set_name("Henry");
     person.set_age(50);
 
-    // Take an immutable reference - can only use Person trait methods
-    let person_ref: &dyn Person = &person;
+    // Take an immutable reference - can only use DynPerson trait methods
+    let person_ref: &dyn DynPerson = &person;
     assert_eq!(person_ref.name(), "Henry");
     assert_eq!(person_ref.age(), 50);
     assert!(person_ref.has_name());

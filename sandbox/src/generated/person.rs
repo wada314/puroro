@@ -11,14 +11,35 @@ use puroro::{
         StringFieldWrapper,
     },
     shared::SharedFields,
+    view::ViewCow,
     Message,
 };
 
-/// Infallible immutable trait for Person message.
+/// Flexible view trait for Person message (not dyn-compatible).
+///
+/// This trait allows implementers to return flexible views (tuples, stack-allocated structs, etc.)
+/// for message fields using GATs or associated types. Extends DynPerson for dyn compatibility.
+pub trait Person: DynPerson {
+    /// Associated type for the address field view.
+    /// Implementers can return flexible types like tuples or stack-allocated structs here.
+    /// The view should be convertible to a DynAddress reference via `as_dyn_address()`.
+    type AddressView<'a>
+    where
+        Self: 'a;
+
+    /// Converts the address view to a DynAddress reference.
+    fn as_dyn_address<'a>(view: &'a Self::AddressView<'a>) -> &'a dyn DynAddress;
+
+    /// Returns the address field with a flexible view type.
+    fn address_flex(&self) -> Option<Self::AddressView<'_>>;
+}
+
+/// Dyn-compatible immutable trait for Person message.
 ///
 /// This trait provides read-only access to Person fields without error handling.
 /// Use this for implementations that guarantee valid data (e.g., fully deserialized messages).
-pub trait Person {
+/// This trait is designed to be dyn-compatible, returning ViewCow for message fields.
+pub trait DynPerson {
     // Getters
     fn name(&self) -> &str;
     fn age(&self) -> i32;
@@ -30,7 +51,7 @@ pub trait Person {
     fn secondary_status(&self) -> Result<Option<Status>, i32>;
 
     // Message field getters
-    fn address(&self) -> Option<&dyn Address>; // Message fields always return Option, even for ImplicitOptional
+    fn address(&self) -> Option<ViewCow<'_, dyn DynAddress>>; // Message fields always return Option, even for ImplicitOptional
 
     // Presence checks (for optional semantics)
     fn has_name(&self) -> bool;
@@ -42,12 +63,12 @@ pub trait Person {
     fn has_address(&self) -> bool;
 }
 
-/// Infallible append-only trait for Person message.
+/// Dyn-compatible append-only trait for Person message.
 ///
-/// This trait extends Person with append operations (set/add/insert) but no destructive operations.
+/// This trait extends DynPerson with append operations (set/add/insert) but no destructive operations.
 /// Use this for most common use cases where you only need to add data, not clear it.
 /// This provides type-level safety against accidental data loss.
-pub trait PersonAppend: Person {
+pub trait DynPersonAppend: DynPerson {
     // Setters - append new values
     fn set_name(&mut self, v: &str);
     fn set_age(&mut self, v: i32);
@@ -59,11 +80,11 @@ pub trait PersonAppend: Person {
     fn set_secondary_status(&mut self, v: Status);
 }
 
-/// Infallible fully mutable trait for Person message.
+/// Dyn-compatible fully mutable trait for Person message.
 ///
-/// This trait extends PersonAppend with destructive operations (clear).
+/// This trait extends DynPersonAppend with destructive operations (clear).
 /// Use this only when you need to delete or clear data.
-pub trait PersonMut: PersonAppend {
+pub trait DynPersonMut: DynPersonAppend {
     // Clear methods - destructive operations
     fn clear_name(&mut self);
     fn clear_age(&mut self);
@@ -78,7 +99,7 @@ pub trait PersonMut: PersonAppend {
     fn clear_address(&mut self);
 
     // Builder-style methods for nested message construction
-    fn address_mut(&mut self) -> &mut dyn AddressMut;
+    fn address_mut(&mut self) -> &mut dyn DynAddressMut;
 }
 
 // ============================================================================
@@ -126,22 +147,28 @@ impl TryFrom<i32> for Status {
 // Address Traits and Implementation
 // ============================================================================
 
-/// Immutable trait for Address message.
-pub trait Address {
+/// Flexible view trait for Address message (not dyn-compatible).
+///
+/// This trait allows implementers to return flexible views for address fields.
+/// Extends DynAddress for dyn compatibility.
+pub trait Address: DynAddress {}
+
+/// Dyn-compatible immutable trait for Address message.
+pub trait DynAddress {
     fn street(&self) -> &str;
     fn city(&self) -> &str;
     fn zip_code(&self) -> i32;
 }
 
-/// Append-only trait for Address message.
-pub trait AddressAppend: Address {
+/// Dyn-compatible append-only trait for Address message.
+pub trait DynAddressAppend: DynAddress {
     fn set_street(&mut self, v: &str);
     fn set_city(&mut self, v: &str);
     fn set_zip_code(&mut self, v: i32);
 }
 
-/// Fully mutable trait for Address message.
-pub trait AddressMut: AddressAppend {
+/// Dyn-compatible fully mutable trait for Address message.
+pub trait DynAddressMut: DynAddressAppend {
     fn clear_street(&mut self);
     fn clear_city(&mut self);
     fn clear_zip_code(&mut self);
@@ -173,7 +200,9 @@ impl Default for AddressImpl {
     }
 }
 
-impl Address for AddressImpl {
+impl Address for AddressImpl {}
+
+impl DynAddress for AddressImpl {
     fn street(&self) -> &str {
         self.street.get(&self._shared)
     }
@@ -187,7 +216,7 @@ impl Address for AddressImpl {
     }
 }
 
-impl AddressAppend for AddressImpl {
+impl DynAddressAppend for AddressImpl {
     fn set_street(&mut self, v: &str) {
         self.street.set(&mut self._shared, v);
     }
@@ -201,7 +230,7 @@ impl AddressAppend for AddressImpl {
     }
 }
 
-impl AddressMut for AddressImpl {
+impl DynAddressMut for AddressImpl {
     fn clear_street(&mut self) {
         self.street.clear(&mut self._shared);
     }
@@ -288,6 +317,18 @@ impl Default for PersonImpl {
 }
 
 impl Person for PersonImpl {
+    type AddressView<'a> = &'a AddressImpl;
+
+    fn as_dyn_address<'a>(view: &'a Self::AddressView<'a>) -> &'a dyn DynAddress {
+        *view as &dyn DynAddress
+    }
+
+    fn address_flex(&self) -> Option<Self::AddressView<'_>> {
+        self.address.get(&self._shared)
+    }
+}
+
+impl DynPerson for PersonImpl {
     #[inline]
     fn name(&self) -> &str {
         self.name.get(&self._shared)
@@ -326,10 +367,10 @@ impl Person for PersonImpl {
     }
 
     #[inline]
-    fn address(&self) -> Option<&dyn Address> {
-        self.address
-            .get(&self._shared)
-            .map(|address| address as &dyn Address)
+    fn address(&self) -> Option<ViewCow<'_, dyn DynAddress>> {
+        self.address.get(&self._shared).map(|address| {
+            ViewCow::Borrowed(address as &dyn DynAddress)
+        })
     }
 
     #[inline]
@@ -375,7 +416,7 @@ impl Person for PersonImpl {
     }
 }
 
-impl PersonAppend for PersonImpl {
+impl DynPersonAppend for PersonImpl {
     #[inline]
     fn set_name(&mut self, v: &str) {
         self.name.set(&mut self._shared, v);
@@ -407,7 +448,7 @@ impl PersonAppend for PersonImpl {
     }
 }
 
-impl PersonMut for PersonImpl {
+impl DynPersonMut for PersonImpl {
     #[inline]
     fn clear_name(&mut self) {
         self.name.clear(&mut self._shared);
@@ -444,7 +485,7 @@ impl PersonMut for PersonImpl {
     }
 
     #[inline]
-    fn address_mut(&mut self) -> &mut dyn AddressMut {
+    fn address_mut(&mut self) -> &mut dyn DynAddressMut {
         if self.address.data.0.is_none() {
             self.address.data.0 = Some(Box::new(AddressImpl::default()));
         }
@@ -490,10 +531,12 @@ mod tests {
         }
 
         // Test getting message fields
-        let retrieved_address = person.address().unwrap();
-        assert_eq!(retrieved_address.street(), "123 Main St");
-        assert_eq!(retrieved_address.city(), "Anytown");
-        assert_eq!(retrieved_address.zip_code(), 12345);
+        {
+            let retrieved_address = person.address().unwrap();
+            assert_eq!(retrieved_address.as_ref().street(), "123 Main St");
+            assert_eq!(retrieved_address.as_ref().city(), "Anytown");
+            assert_eq!(retrieved_address.as_ref().zip_code(), 12345);
+        }
 
         // Test presence checking
         assert!(person.has_address());
@@ -503,7 +546,10 @@ mod tests {
             let address = person.address_mut();
             address.set_street("456 Oak Ave");
         }
-        assert_eq!(person.address().unwrap().street(), "456 Oak Ave");
+        {
+            let retrieved_address = person.address().unwrap();
+            assert_eq!(retrieved_address.as_ref().street(), "456 Oak Ave");
+        }
 
         // Test clearing message fields
         person.clear_address();
