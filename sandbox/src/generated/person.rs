@@ -21,6 +21,7 @@ use puroro::{
 /// for message fields using return-position impl trait. Extends DynPerson for dyn compatibility.
 /// All DynPerson methods are re-exported with default implementations that delegate to DynPerson.
 pub trait Person: DynPerson {
+    // Methods that delegate to DynPerson (default implementations)
     #[inline]
     fn name(&self) -> &str {
         DynPerson::name(self)
@@ -45,8 +46,6 @@ pub trait Person: DynPerson {
     fn secondary_status(&self) -> Result<Option<Status>, i32> {
         DynPerson::secondary_status(self)
     }
-    /// Returns the address field with a flexible view type.
-    fn address(&self) -> Option<impl Address + use<'_, Self>>;
     #[inline]
     fn has_name(&self) -> bool {
         DynPerson::has_name(self)
@@ -75,6 +74,10 @@ pub trait Person: DynPerson {
     fn has_address(&self) -> bool {
         DynPerson::has_address(self)
     }
+
+    // Methods with custom implementations (must be implemented)
+    /// Returns the address field with a flexible view type.
+    fn address(&self) -> Option<impl Address + use<'_, Self>>;
 }
 
 /// Dyn-compatible immutable trait for Person message.
