@@ -114,6 +114,7 @@ pub trait DynPerson {
 /// This trait extends Person with append operations. All DynPersonAppend methods are re-exported
 /// with default implementations, so importing PersonAppend alone is sufficient.
 pub trait PersonAppend: Person + DynPersonAppend {
+    // Methods that delegate to DynPersonAppend (default implementations)
     #[inline]
     fn set_name(&mut self, v: &str) {
         DynPersonAppend::set_name(self, v)
@@ -138,6 +139,10 @@ pub trait PersonAppend: Person + DynPersonAppend {
     fn set_secondary_status(&mut self, v: Status) {
         DynPersonAppend::set_secondary_status(self, v)
     }
+
+    // Methods with custom implementations (must be implemented)
+    /// Returns a mutable reference to the address field with a flexible view type.
+    fn address_mut(&mut self) -> &mut (impl AddressAppend + use<'_, Self>);
 }
 
 /// Dyn-compatible append-only trait for Person message.
@@ -162,6 +167,7 @@ pub trait DynPersonAppend: DynPerson {
 /// This trait extends PersonAppend with destructive operations. All DynPersonMut methods are
 /// re-exported with default implementations, so importing PersonMut alone is sufficient.
 pub trait PersonMut: PersonAppend + DynPersonMut {
+    // Methods that delegate to DynPersonMut (default implementations)
     #[inline]
     fn clear_name(&mut self) {
         DynPersonMut::clear_name(self)
@@ -190,10 +196,10 @@ pub trait PersonMut: PersonAppend + DynPersonMut {
     fn clear_address(&mut self) {
         DynPersonMut::clear_address(self)
     }
-    #[inline]
-    fn address_mut(&mut self) -> &mut dyn DynAddressMut {
-        DynPersonMut::address_mut(self)
-    }
+
+    // Methods with custom implementations (must be implemented)
+    /// Returns a mutable reference to the address field with a flexible view type.
+    fn address_mut(&mut self) -> &mut (impl AddressMut + use<'_, Self>);
 }
 
 /// Dyn-compatible fully mutable trait for Person message.
@@ -271,6 +277,18 @@ pub trait Address: DynAddress {}
 
 // Blanket implementation for references
 impl<T: Address> Address for &T {}
+
+/// Flexible view append-only trait for Address message (not dyn-compatible).
+///
+/// This trait allows implementers to return flexible views for address fields.
+/// Extends DynAddressAppend for dyn compatibility.
+pub trait AddressAppend: Address + DynAddressAppend {}
+
+/// Flexible view fully mutable trait for Address message (not dyn-compatible).
+///
+/// This trait allows implementers to return flexible views for address fields.
+/// Extends DynAddressMut for dyn compatibility.
+pub trait AddressMut: AddressAppend + DynAddressMut {}
 
 /// Dyn-compatible immutable trait for Address message.
 pub trait DynAddress {
@@ -350,6 +368,8 @@ impl DynAddress for AddressImpl {
     }
 }
 
+impl AddressAppend for AddressImpl {}
+
 impl DynAddressAppend for AddressImpl {
     fn set_street(&mut self, v: &str) {
         self.street.set(&mut self._shared, v);
@@ -363,6 +383,8 @@ impl DynAddressAppend for AddressImpl {
         self.zip_code.set(&mut self._shared, v);
     }
 }
+
+impl AddressMut for AddressImpl {}
 
 impl DynAddressMut for AddressImpl {
     fn clear_street(&mut self) {
@@ -458,11 +480,23 @@ impl Person for PersonImpl {
 }
 
 impl PersonAppend for PersonImpl {
-    // All methods use default implementations from the trait definition
+    fn address_mut(&mut self) -> &mut (impl AddressAppend + use<'_>) {
+        if self.address.data.0.is_none() {
+            self.address.data.0 = Some(Box::new(AddressImpl::default()));
+        }
+        self.address.data.0.as_mut().unwrap().as_mut()
+    }
+    // All other methods use default implementations from the trait definition
 }
 
 impl PersonMut for PersonImpl {
-    // All methods use default implementations from the trait definition
+    fn address_mut(&mut self) -> &mut (impl AddressMut + use<'_>) {
+        if self.address.data.0.is_none() {
+            self.address.data.0 = Some(Box::new(AddressImpl::default()));
+        }
+        self.address.data.0.as_mut().unwrap().as_mut()
+    }
+    // All other methods use default implementations from the trait definition
 }
 
 impl DynPerson for PersonImpl {
@@ -654,8 +688,8 @@ impl Message for PersonImpl {
 #[cfg(test)]
 mod tests {
     use super::{
-        AddressImpl, DynAddress, MessageFieldWrapper, Person, PersonAppend, PersonImpl, PersonMut,
-        Status, StringFieldWrapper,
+        AddressImpl, AddressMut, DynAddress, DynAddressAppend, MessageFieldWrapper, Person,
+        PersonAppend, PersonImpl, PersonMut, Status, StringFieldWrapper,
     };
 
     #[test]
@@ -664,7 +698,7 @@ mod tests {
 
         // Test setting message fields via mutable builder
         {
-            let address = person.address_mut();
+            let address = PersonMut::address_mut(&mut person);
             address.set_street("123 Main St");
             address.set_city("Anytown");
             address.set_zip_code(12345);
@@ -683,7 +717,7 @@ mod tests {
 
         // Test builder pattern
         {
-            let address = person.address_mut();
+            let address = PersonMut::address_mut(&mut person);
             address.set_street("456 Oak Ave");
         }
         {
