@@ -17,9 +17,8 @@ use puroro::{
 
 /// Flexible view trait for Person message (not dyn-compatible).
 ///
-/// This trait allows implementers to return flexible views (tuples, stack-allocated structs, etc.)
-/// for message fields using return-position impl trait. Extends DynPerson for dyn compatibility.
-/// All DynPerson methods are re-exported with default implementations that delegate to DynPerson.
+/// Code generation note: This trait MUST NOT reference any implementation struct names (e.g., PersonImpl, AddressImpl).
+/// Use only trait names and `impl Trait` syntax to maintain abstraction.
 pub trait Person: DynPerson {
     // Methods that delegate to DynPerson (default implementations)
     #[inline]
@@ -76,15 +75,14 @@ pub trait Person: DynPerson {
     }
 
     // Methods with custom implementations (must be implemented)
-    /// Returns the address field with a flexible view type.
+    // NOTE: Must return `impl Address`, not a concrete struct type like `AddressImpl`
     fn address(&self) -> Option<impl Address + use<'_, Self>>;
 }
 
 /// Dyn-compatible immutable trait for Person message.
 ///
-/// This trait provides read-only access to Person fields without error handling.
-/// Use this for implementations that guarantee valid data (e.g., fully deserialized messages).
-/// This trait is designed to be dyn-compatible, returning ViewCow for message fields.
+/// Code generation note: This trait MUST be dyn-compatible. Do not use `impl Trait` here;
+/// use `ViewCow` or other dyn-compatible return types for message fields.
 pub trait DynPerson {
     // Getters
     fn name(&self) -> &str;
@@ -111,8 +109,7 @@ pub trait DynPerson {
 
 /// Flexible view append-only trait for Person message (not dyn-compatible).
 ///
-/// This trait extends Person with append operations. All DynPersonAppend methods are re-exported
-/// with default implementations, so importing PersonAppend alone is sufficient.
+/// Code generation note: MUST NOT reference implementation struct names. All methods must use trait types only.
 pub trait PersonAppend: Person + DynPersonAppend {
     // Methods that delegate to DynPersonAppend (default implementations)
     #[inline]
@@ -141,16 +138,13 @@ pub trait PersonAppend: Person + DynPersonAppend {
     }
 
     // Methods with custom implementations (must be implemented)
-    /// Returns a mutable reference to the address field with a flexible view type.
-    /// Returns `None` if the field is not set. The caller cannot set the field if it's `None`.
+    // NOTE: Must return `impl AddressAppend`, not a concrete struct type
     fn address_mut(&mut self) -> Option<&mut (impl AddressAppend + use<'_, Self>)>;
 }
 
 /// Dyn-compatible append-only trait for Person message.
 ///
-/// This trait extends DynPerson with append operations (set/add/insert) but no destructive operations.
-/// Use this for most common use cases where you only need to add data, not clear it.
-/// This provides type-level safety against accidental data loss.
+/// Code generation note: This trait MUST be dyn-compatible. Do not use `impl Trait` here.
 pub trait DynPersonAppend: DynPerson {
     // Setters - append new values
     fn set_name(&mut self, v: &str);
@@ -165,8 +159,7 @@ pub trait DynPersonAppend: DynPerson {
 
 /// Flexible view fully mutable trait for Person message (not dyn-compatible).
 ///
-/// This trait extends PersonAppend with destructive operations. All DynPersonMut methods are
-/// re-exported with default implementations, so importing PersonMut alone is sufficient.
+/// Code generation note: MUST NOT reference implementation struct names. All methods must use trait types only.
 pub trait PersonMut: PersonAppend + DynPersonMut {
     // Methods that delegate to DynPersonMut (default implementations)
     #[inline]
@@ -199,15 +192,13 @@ pub trait PersonMut: PersonAppend + DynPersonMut {
     }
 
     // Methods with custom implementations (must be implemented)
-    /// Returns a mutable reference to the address field with a flexible view type.
-    /// Returns `None` if the field is not set. The caller cannot set the field if it's `None`.
+    // NOTE: Must return `impl AddressMut`, not a concrete struct type
     fn address_mut(&mut self) -> Option<&mut (impl AddressMut + use<'_, Self>)>;
 }
 
 /// Dyn-compatible fully mutable trait for Person message.
 ///
-/// This trait extends DynPersonAppend with destructive operations (clear).
-/// Use this only when you need to delete or clear data.
+/// Code generation note: This trait MUST be dyn-compatible. Do not use `impl Trait` here.
 pub trait DynPersonMut: DynPersonAppend {
     // Clear methods - destructive operations
     fn clear_name(&mut self);
@@ -230,7 +221,7 @@ pub trait DynPersonMut: DynPersonAppend {
 // Status Enum
 // ============================================================================
 
-/// Status enum implementation (proto3 + allow_alias = false)
+/// Status enum implementation
 #[non_exhaustive]
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 #[repr(i32)]
@@ -273,8 +264,7 @@ impl TryFrom<i32> for Status {
 
 /// Flexible view trait for Address message (not dyn-compatible).
 ///
-/// This trait allows implementers to return flexible views for address fields.
-/// Extends DynAddress for dyn compatibility.
+/// Code generation note: MUST NOT reference implementation struct names. Trait-only abstraction.
 pub trait Address: DynAddress {}
 
 // Blanket implementation for references
@@ -308,17 +298,17 @@ impl<T: AddressMut> AddressMut for Option<T> {}
 
 /// Flexible view append-only trait for Address message (not dyn-compatible).
 ///
-/// This trait allows implementers to return flexible views for address fields.
-/// Extends DynAddressAppend for dyn compatibility.
+/// Code generation note: MUST NOT reference implementation struct names. Trait-only abstraction.
 pub trait AddressAppend: Address + DynAddressAppend {}
 
 /// Flexible view fully mutable trait for Address message (not dyn-compatible).
 ///
-/// This trait allows implementers to return flexible views for address fields.
-/// Extends DynAddressMut for dyn compatibility.
+/// Code generation note: MUST NOT reference implementation struct names. Trait-only abstraction.
 pub trait AddressMut: AddressAppend + DynAddressMut {}
 
 /// Dyn-compatible immutable trait for Address message.
+///
+/// Code generation note: This trait MUST be dyn-compatible. Do not use `impl Trait` here.
 pub trait DynAddress {
     fn street(&self) -> &str;
     fn city(&self) -> &str;
@@ -356,6 +346,8 @@ impl<T: DynAddress> DynAddress for Box<T> {
 }
 
 /// Dyn-compatible append-only trait for Address message.
+///
+/// Code generation note: This trait MUST be dyn-compatible. Do not use `impl Trait` here.
 pub trait DynAddressAppend: DynAddress {
     fn set_street(&mut self, v: &str);
     fn set_city(&mut self, v: &str);
@@ -399,6 +391,8 @@ impl<T: DynAddressAppend> DynAddressAppend for Option<T> {
 }
 
 /// Dyn-compatible fully mutable trait for Address message.
+///
+/// Code generation note: This trait MUST be dyn-compatible. Do not use `impl Trait` here.
 pub trait DynAddressMut: DynAddressAppend {
     fn clear_street(&mut self);
     fn clear_city(&mut self);
