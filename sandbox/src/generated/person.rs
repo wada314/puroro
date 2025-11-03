@@ -457,11 +457,9 @@ impl DynAddress for AddressImpl {
     fn street(&self) -> &str {
         self.street.get(&self._shared)
     }
-
     fn city(&self) -> &str {
         self.city.get(&self._shared)
     }
-
     fn zip_code(&self) -> i32 {
         self.zip_code.get(&self._shared)
     }
@@ -471,15 +469,13 @@ impl AddressAppend for AddressImpl {}
 
 impl DynAddressAppend for AddressImpl {
     fn set_street(&mut self, v: &str) {
-        self.street.set(&mut self._shared, v);
+        self.street.set(&mut self._shared, v)
     }
-
     fn set_city(&mut self, v: &str) {
-        self.city.set(&mut self._shared, v);
+        self.city.set(&mut self._shared, v)
     }
-
     fn set_zip_code(&mut self, v: i32) {
-        self.zip_code.set(&mut self._shared, v);
+        self.zip_code.set(&mut self._shared, v)
     }
 }
 
@@ -487,15 +483,13 @@ impl AddressMut for AddressImpl {}
 
 impl DynAddressMut for AddressImpl {
     fn clear_street(&mut self) {
-        self.street.clear(&mut self._shared);
+        self.street.clear(&mut self._shared)
     }
-
     fn clear_city(&mut self) {
-        self.city.clear(&mut self._shared);
+        self.city.clear(&mut self._shared)
     }
-
     fn clear_zip_code(&mut self) {
-        self.zip_code.clear(&mut self._shared);
+        self.zip_code.clear(&mut self._shared)
     }
 }
 
@@ -593,32 +587,22 @@ impl PersonMut for PersonImpl {
 }
 
 impl DynPerson for PersonImpl {
-    #[inline]
     fn name(&self) -> &str {
         self.name.get(&self._shared)
     }
-
-    #[inline]
     fn age(&self) -> i32 {
         self.age.get(&self._shared)
     }
-
-    #[inline]
     fn email(&self) -> Option<&str> {
         self.email.get(&self._shared)
     }
-
-    #[inline]
     fn score(&self) -> Option<i32> {
         self.score.get(&self._shared)
     }
-
-    #[inline]
     fn status(&self) -> Result<Status, i32> {
         Status::from_wire(self.status.get(&self._shared))
     }
 
-    #[inline]
     fn secondary_status(&self) -> Result<Option<Status>, i32> {
         if self.secondary_status.is_present(&self._shared) {
             match Status::from_wire(self.secondary_status.get(&self._shared).unwrap_or(0)) {
@@ -630,14 +614,13 @@ impl DynPerson for PersonImpl {
         }
     }
 
-    #[inline]
     fn address(&self) -> Option<ViewCow<'_, dyn DynAddress>> {
         self.address
             .get(&self._shared)
             .map(|address| ViewCow::Borrowed(address as &dyn DynAddress))
     }
 
-    // has_* methods - trivial implementations using is_present()
+    // has_* methods - trivial implementations
     fn has_name(&self) -> bool {
         self.name.is_present(&self._shared)
     }
@@ -662,39 +645,27 @@ impl DynPerson for PersonImpl {
 }
 
 impl DynPersonAppend for PersonImpl {
-    #[inline]
     fn set_name(&mut self, v: &str) {
-        self.name.set(&mut self._shared, v);
+        self.name.set(&mut self._shared, v)
     }
-
-    #[inline]
     fn set_age(&mut self, v: i32) {
-        self.age.set(&mut self._shared, v);
+        self.age.set(&mut self._shared, v)
     }
-
-    #[inline]
     fn set_email(&mut self, v: &str) {
-        self.email.set(&mut self._shared, v);
+        self.email.set(&mut self._shared, v)
     }
-
-    #[inline]
     fn set_score(&mut self, v: i32) {
-        self.score.set(&mut self._shared, v);
+        self.score.set(&mut self._shared, v)
     }
-
-    #[inline]
     fn set_status(&mut self, v: Status) {
-        self.status.set(&mut self._shared, v.to_wire());
+        self.status.set(&mut self._shared, v.to_wire())
     }
-
-    #[inline]
     fn set_secondary_status(&mut self, v: Status) {
-        self.secondary_status.set(&mut self._shared, v.to_wire());
+        self.secondary_status.set(&mut self._shared, v.to_wire())
     }
 }
 
 impl DynPersonMut for PersonImpl {
-    // clear_* methods - trivial implementations using clear()
     fn clear_name(&mut self) {
         self.name.clear(&mut self._shared)
     }
@@ -717,7 +688,6 @@ impl DynPersonMut for PersonImpl {
         self.address.clear(&mut self._shared)
     }
 
-    #[inline]
     fn address_mut(&mut self) -> &mut dyn DynAddressMut {
         if self.address.data.0.is_none() {
             self.address.data.0 = Some(Box::new(AddressImpl::default()));
