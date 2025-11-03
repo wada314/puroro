@@ -47,6 +47,12 @@ pub trait Person: DynPerson {
         DynPerson::secondary_status(self)
     }
 
+    // Presence checks (delegating to DynPerson)
+    #[inline]
+    fn has_name(&self) -> bool {
+        DynPerson::has_name(self)
+    }
+
     // Methods with custom implementations (must be implemented)
     // NOTE: Must return `impl Address`, not a concrete struct type
     fn address(&self) -> impl Address + use<'_, Self>;
@@ -101,6 +107,12 @@ pub trait DynPersonAppend: DynPerson {
 ///
 /// Code generation note: MUST NOT reference implementation struct names. All methods must use trait types only.
 pub trait PersonMut: PersonAppend + DynPersonMut {
+    // Clear methods (delegating to DynPersonMut)
+    #[inline]
+    fn clear_name(&mut self) {
+        DynPersonMut::clear_name(self)
+    }
+
     // Methods with custom implementations (must be implemented)
     // NOTE: Must return `impl AddressMut`, not a concrete struct type
     fn address_mut(&mut self) -> impl AddressMut + use<'_, Self>;
@@ -621,11 +633,11 @@ mod tests {
         }
 
         // Test presence checking (sample: only has_name is available in DynPerson)
-        assert!(person.has_name());
+        assert!(Person::has_name(&person));
 
         // Test clearing enum fields (sample: only clear_name is available in DynPersonMut)
-        DynPersonMut::clear_name(&mut person);
-        assert!(!person.has_name());
+        PersonMut::clear_name(&mut person);
+        assert!(!Person::has_name(&person));
     }
 
     #[test]

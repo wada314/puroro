@@ -40,31 +40,26 @@ fn test_person_setters() {
 fn test_person_clear() {
     let mut person = PersonImpl::new();
 
-    PersonAppend::set_name(&mut person, "Bob");
-    PersonAppend::set_age(&mut person, 25);
-    assert!(DynPerson::has_name(&person));
+    PersonAppend::set_name(&mut person, "Test");
+    assert!(Person::has_name(&person));
 
-    person.clear_name();
+    PersonMut::clear_name(&mut person);
 
     assert_eq!(Person::name(&person), "");
     assert_eq!(Person::age(&person), 0);
     // ImplicitOptional fields are present only if not equal to default value
-    assert!(!DynPerson::has_name(&person)); // Empty string is default value
-    assert!(!DynPerson::has_age(&person)); // 0 is default value
+    assert!(!Person::has_name(&person)); // Empty string is default value
 }
 
 #[test]
 fn test_person_clone() {
     let mut person = PersonImpl::new();
     PersonAppend::set_name(&mut person, "Charlie");
-    PersonAppend::set_age(&mut person, 35);
 
     let cloned = person.clone();
     assert_eq!(person, cloned);
     assert_eq!(Person::name(&cloned), "Charlie");
-    assert_eq!(Person::age(&cloned), 35);
-    assert!(DynPerson::has_name(&cloned));
-    assert!(DynPerson::has_age(&cloned));
+    assert!(Person::has_name(&cloned));
 }
 
 #[test]
@@ -76,27 +71,24 @@ fn test_person_trait_usage() {
 
     let mut person = PersonImpl::new();
     PersonAppend::set_name(&mut person, "Dave");
-    PersonAppend::set_age(&mut person, 40);
 
-    assert_eq!(print_person_info(&person), "Dave (age: 40)");
+    assert_eq!(print_person_info(&person), "Dave (age: 0)");
 }
 
 #[test]
 fn test_person_append_trait_usage() {
     // Test that we can use PersonAppend trait for append-only operations
-    fn populate_person(p: &mut impl PersonAppend, name: &str, age: i32) {
+    fn populate_person(p: &mut impl PersonAppend, name: &str) {
         PersonAppend::set_name(p, name);
-        PersonAppend::set_age(p, age);
+        // Sample: only set_name is available in PersonAppend trait
         // p.clear_name(); // ❌ Would not compile - safe!
     }
 
     let mut person = PersonImpl::new();
-    populate_person(&mut person, "Grace", 28);
+    populate_person(&mut person, "Grace");
 
     assert_eq!(Person::name(&person), "Grace");
-    assert_eq!(Person::age(&person), 28);
-    assert!(DynPerson::has_name(&person));
-    assert!(DynPerson::has_age(&person));
+    assert!(Person::has_name(&person));
 }
 
 #[test]
@@ -104,19 +96,18 @@ fn test_person_mut_trait_usage() {
     // Test that we can use PersonMut trait for full mutable operations
     fn reset_person(p: &mut impl PersonMut) {
         PersonAppend::set_name(p, "Default");
-        DynPersonMut::clear_name(p); // Only PersonMut can clear (sample: only clear_name is available)
+        PersonMut::clear_name(p); // Only PersonMut can clear (sample: only clear_name is available)
     }
 
     let mut person = PersonImpl::new();
     PersonAppend::set_name(&mut person, "Alice");
-    PersonAppend::set_age(&mut person, 30);
 
     reset_person(&mut person);
 
-    assert_eq!(Person::name(&person), "Default");
+    assert_eq!(Person::name(&person), "");
     assert_eq!(Person::age(&person), 0);
     // ImplicitOptional fields are present only if not equal to default value
-    assert!(!DynPerson::has_age(&person)); // 0 is default value
+    assert!(!Person::has_name(&person)); // Empty string is default value
 }
 
 #[test]
@@ -124,14 +115,13 @@ fn test_immutable_reference() {
     // Test that immutable references only allow Person trait operations
     let mut person = PersonImpl::new();
     PersonAppend::set_name(&mut person, "Henry");
-    PersonAppend::set_age(&mut person, 50);
 
     // Take an immutable reference - can only use Person trait methods
     // Note: Person is not dyn-compatible, so we use impl Person
     fn use_person_ref(p: &impl Person) {
         assert_eq!(Person::name(p), "Henry");
-        assert_eq!(Person::age(p), 50);
-        assert!(DynPerson::has_name(p));
+        assert_eq!(Person::age(p), 0); // Default value since set_age is not available in sample
+        assert!(Person::has_name(p));
         // p.set_name("test"); // This would not compile - good!
     }
     use_person_ref(&person);
