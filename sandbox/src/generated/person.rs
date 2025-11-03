@@ -142,7 +142,8 @@ pub trait PersonAppend: Person + DynPersonAppend {
 
     // Methods with custom implementations (must be implemented)
     /// Returns a mutable reference to the address field with a flexible view type.
-    fn address_mut(&mut self) -> &mut (impl AddressAppend + use<'_, Self>);
+    /// Returns `None` if the field is not set. The caller cannot set the field if it's `None`.
+    fn address_mut(&mut self) -> Option<&mut (impl AddressAppend + use<'_, Self>)>;
 }
 
 /// Dyn-compatible append-only trait for Person message.
@@ -199,7 +200,8 @@ pub trait PersonMut: PersonAppend + DynPersonMut {
 
     // Methods with custom implementations (must be implemented)
     /// Returns a mutable reference to the address field with a flexible view type.
-    fn address_mut(&mut self) -> &mut (impl AddressMut + use<'_, Self>);
+    /// Returns `None` if the field is not set. The caller cannot set the field if it's `None`.
+    fn address_mut(&mut self) -> Option<&mut (impl AddressMut + use<'_, Self>)>;
 }
 
 /// Dyn-compatible fully mutable trait for Person message.
@@ -278,6 +280,32 @@ pub trait Address: DynAddress {}
 // Blanket implementation for references
 impl<T: Address> Address for &T {}
 
+// Blanket implementation for Option
+impl<T: DynAddress> DynAddress for Option<T> {
+    fn street(&self) -> &str {
+        self.as_ref().map(|v| v.street()).unwrap_or("")
+    }
+
+    fn city(&self) -> &str {
+        self.as_ref().map(|v| v.city()).unwrap_or("")
+    }
+
+    fn zip_code(&self) -> i32 {
+        self.as_ref().map(|v| v.zip_code()).unwrap_or(0)
+    }
+}
+
+impl<T: Address> Address for Option<T> {}
+
+// Blanket implementation for Box
+impl<T: Address> Address for Box<T> {}
+impl<T: AddressAppend> AddressAppend for Box<T> {}
+impl<T: AddressMut> AddressMut for Box<T> {}
+
+// Blanket implementation for Option
+impl<T: AddressAppend> AddressAppend for Option<T> {}
+impl<T: AddressMut> AddressMut for Option<T> {}
+
 /// Flexible view append-only trait for Address message (not dyn-compatible).
 ///
 /// This trait allows implementers to return flexible views for address fields.
@@ -312,6 +340,21 @@ impl<T: DynAddress> DynAddress for &T {
     }
 }
 
+// Blanket implementation for Box
+impl<T: DynAddress> DynAddress for Box<T> {
+    fn street(&self) -> &str {
+        (**self).street()
+    }
+
+    fn city(&self) -> &str {
+        (**self).city()
+    }
+
+    fn zip_code(&self) -> i32 {
+        (**self).zip_code()
+    }
+}
+
 /// Dyn-compatible append-only trait for Address message.
 pub trait DynAddressAppend: DynAddress {
     fn set_street(&mut self, v: &str);
@@ -319,11 +362,83 @@ pub trait DynAddressAppend: DynAddress {
     fn set_zip_code(&mut self, v: i32);
 }
 
+// Blanket implementation for Box
+impl<T: DynAddressAppend> DynAddressAppend for Box<T> {
+    fn set_street(&mut self, v: &str) {
+        (**self).set_street(v)
+    }
+
+    fn set_city(&mut self, v: &str) {
+        (**self).set_city(v)
+    }
+
+    fn set_zip_code(&mut self, v: i32) {
+        (**self).set_zip_code(v)
+    }
+}
+
+// Blanket implementation for Option
+impl<T: DynAddressAppend> DynAddressAppend for Option<T> {
+    fn set_street(&mut self, v: &str) {
+        if let Some(t) = self {
+            t.set_street(v);
+        }
+    }
+
+    fn set_city(&mut self, v: &str) {
+        if let Some(t) = self {
+            t.set_city(v);
+        }
+    }
+
+    fn set_zip_code(&mut self, v: i32) {
+        if let Some(t) = self {
+            t.set_zip_code(v);
+        }
+    }
+}
+
 /// Dyn-compatible fully mutable trait for Address message.
 pub trait DynAddressMut: DynAddressAppend {
     fn clear_street(&mut self);
     fn clear_city(&mut self);
     fn clear_zip_code(&mut self);
+}
+
+// Blanket implementation for Box
+impl<T: DynAddressMut> DynAddressMut for Box<T> {
+    fn clear_street(&mut self) {
+        (**self).clear_street()
+    }
+
+    fn clear_city(&mut self) {
+        (**self).clear_city()
+    }
+
+    fn clear_zip_code(&mut self) {
+        (**self).clear_zip_code()
+    }
+}
+
+// Blanket implementation for Option
+impl<T: DynAddressMut> DynAddressMut for Option<T> {
+    fn clear_street(&mut self) {
+        if let Some(t) = self {
+            t.clear_street();
+        }
+    }
+
+    fn clear_city(&mut self) {
+        if let Some(t) = self {
+            t.clear_city();
+        }
+    }
+
+    fn clear_zip_code(&mut self) {
+        if let Some(t) = self {
+            t.clear_zip_code();
+        }
+    }
 }
 
 /// Address message implementation
@@ -480,21 +595,15 @@ impl Person for PersonImpl {
 }
 
 impl PersonAppend for PersonImpl {
-    fn address_mut(&mut self) -> &mut (impl AddressAppend + use<'_>) {
-        if self.address.data.0.is_none() {
-            self.address.data.0 = Some(Box::new(AddressImpl::default()));
-        }
-        self.address.data.0.as_mut().unwrap().as_mut()
+    fn address_mut(&mut self) -> Option<&mut (impl AddressAppend + use<'_>)> {
+        self.address.data.0.as_mut().map(|b| b.as_mut())
     }
     // All other methods use default implementations from the trait definition
 }
 
 impl PersonMut for PersonImpl {
-    fn address_mut(&mut self) -> &mut (impl AddressMut + use<'_>) {
-        if self.address.data.0.is_none() {
-            self.address.data.0 = Some(Box::new(AddressImpl::default()));
-        }
-        self.address.data.0.as_mut().unwrap().as_mut()
+    fn address_mut(&mut self) -> Option<&mut (impl AddressMut + use<'_>)> {
+        self.address.data.0.as_mut().map(|b| b.as_mut())
     }
     // All other methods use default implementations from the trait definition
 }
@@ -688,8 +797,8 @@ impl Message for PersonImpl {
 #[cfg(test)]
 mod tests {
     use super::{
-        AddressImpl, AddressMut, DynAddress, DynAddressAppend, MessageFieldWrapper, Person,
-        PersonAppend, PersonImpl, PersonMut, Status, StringFieldWrapper,
+        AddressImpl, AddressMut, DynAddress, DynAddressAppend, DynPersonMut, MessageFieldWrapper,
+        Person, PersonAppend, PersonImpl, PersonMut, Status, StringFieldWrapper,
     };
 
     #[test]
@@ -697,8 +806,12 @@ mod tests {
         let mut person = PersonImpl::new();
 
         // Test setting message fields via mutable builder
+        // Initialize first using DynPersonMut (destructive, but needed for testing)
         {
-            let address = PersonMut::address_mut(&mut person);
+            DynPersonMut::address_mut(&mut person);
+        }
+        {
+            let address = PersonMut::address_mut(&mut person).unwrap();
             address.set_street("123 Main St");
             address.set_city("Anytown");
             address.set_zip_code(12345);
@@ -717,7 +830,7 @@ mod tests {
 
         // Test builder pattern
         {
-            let address = PersonMut::address_mut(&mut person);
+            let address = PersonMut::address_mut(&mut person).unwrap();
             address.set_street("456 Oak Ave");
         }
         {
@@ -726,7 +839,7 @@ mod tests {
         }
 
         // Test clearing message fields
-        person.clear_address();
+        PersonMut::clear_address(&mut person);
         assert!(!person.has_address());
     }
 
@@ -757,10 +870,10 @@ mod tests {
         assert!(person.has_secondary_status());
 
         // Test clearing enum fields
-        person.clear_status();
+        PersonMut::clear_status(&mut person);
         assert!(!person.has_status());
 
-        person.clear_secondary_status();
+        PersonMut::clear_secondary_status(&mut person);
         assert!(!person.has_secondary_status());
     }
 
