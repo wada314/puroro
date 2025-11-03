@@ -11,8 +11,7 @@ fn test_person_creation() {
 
     // ImplicitOptional fields are present only if not equal to default value
     assert!(!DynPerson::has_name(&person)); // Empty string is default value
-    assert!(!DynPerson::has_age(&person)); // 0 is default value
-    assert!(!DynPerson::has_email(&person)); // ExplicitOptional field is not set initially
+    // Sample: only has_name is available in DynPerson trait
 }
 
 #[test]
@@ -28,17 +27,13 @@ fn test_person_setters() {
     let mut person = PersonImpl::new();
 
     PersonAppend::set_name(&mut person, "Alice");
-    PersonAppend::set_age(&mut person, 30);
-    PersonAppend::set_email(&mut person, "alice@example.com");
+    // Sample: only set_name is available in DynPersonAppend trait
 
     assert_eq!(Person::name(&person), "Alice");
-    assert_eq!(Person::age(&person), 30);
-    assert_eq!(Person::email(&person), Some("alice@example.com"));
 
     // After setting, fields should be marked as "set"
     assert!(DynPerson::has_name(&person));
-    assert!(DynPerson::has_age(&person));
-    assert!(DynPerson::has_email(&person));
+    // Sample: only has_name is available in DynPerson trait
 }
 
 #[test]
@@ -48,10 +43,8 @@ fn test_person_clear() {
     PersonAppend::set_name(&mut person, "Bob");
     PersonAppend::set_age(&mut person, 25);
     assert!(DynPerson::has_name(&person));
-    assert!(DynPerson::has_age(&person));
 
     person.clear_name();
-    person.clear_age();
 
     assert_eq!(Person::name(&person), "");
     assert_eq!(Person::age(&person), 0);
@@ -111,7 +104,7 @@ fn test_person_mut_trait_usage() {
     // Test that we can use PersonMut trait for full mutable operations
     fn reset_person(p: &mut impl PersonMut) {
         PersonAppend::set_name(p, "Default");
-        p.clear_age(); // Only PersonMut can clear
+        DynPersonMut::clear_name(p); // Only PersonMut can clear (sample: only clear_name is available)
     }
 
     let mut person = PersonImpl::new();

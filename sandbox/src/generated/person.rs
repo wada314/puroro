@@ -70,14 +70,8 @@ pub trait DynPerson {
     // Message field getters
     fn address(&self) -> Option<ViewCow<'_, dyn DynAddress>>; // Message fields always return Option, even for ImplicitOptional
 
-    // Presence checks (for optional semantics)
+    // Presence checks (for optional semantics) - sample: has_name (others follow same pattern)
     fn has_name(&self) -> bool;
-    fn has_age(&self) -> bool;
-    fn has_email(&self) -> bool;
-    fn has_score(&self) -> bool;
-    fn has_status(&self) -> bool;
-    fn has_secondary_status(&self) -> bool;
-    fn has_address(&self) -> bool;
 }
 
 /// Flexible view append-only trait for Person message (not dyn-compatible).
@@ -89,26 +83,6 @@ pub trait PersonAppend: Person + DynPersonAppend {
     fn set_name(&mut self, v: &str) {
         DynPersonAppend::set_name(self, v)
     }
-    #[inline]
-    fn set_age(&mut self, v: i32) {
-        DynPersonAppend::set_age(self, v)
-    }
-    #[inline]
-    fn set_email(&mut self, v: &str) {
-        DynPersonAppend::set_email(self, v)
-    }
-    #[inline]
-    fn set_score(&mut self, v: i32) {
-        DynPersonAppend::set_score(self, v)
-    }
-    #[inline]
-    fn set_status(&mut self, v: Status) {
-        DynPersonAppend::set_status(self, v)
-    }
-    #[inline]
-    fn set_secondary_status(&mut self, v: Status) {
-        DynPersonAppend::set_secondary_status(self, v)
-    }
 
     // Methods with custom implementations (must be implemented)
     // NOTE: Must return `impl AddressAppend`, not a concrete struct type
@@ -119,15 +93,8 @@ pub trait PersonAppend: Person + DynPersonAppend {
 ///
 /// Code generation note: This trait MUST be dyn-compatible. Do not use `impl Trait` here.
 pub trait DynPersonAppend: DynPerson {
-    // Setters - append new values
+    // Setters - sample: set_name (others follow same pattern: field.set(&mut self._shared, v) or field.set(&mut self._shared, v.to_wire()))
     fn set_name(&mut self, v: &str);
-    fn set_age(&mut self, v: i32);
-    fn set_email(&mut self, v: &str);
-    fn set_score(&mut self, v: i32);
-
-    // Enum field setters
-    fn set_status(&mut self, v: Status);
-    fn set_secondary_status(&mut self, v: Status);
 }
 
 /// Flexible view fully mutable trait for Person message (not dyn-compatible).
@@ -143,18 +110,8 @@ pub trait PersonMut: PersonAppend + DynPersonMut {
 ///
 /// Code generation note: This trait MUST be dyn-compatible. Do not use `impl Trait` here.
 pub trait DynPersonMut: DynPersonAppend {
-    // Clear methods - destructive operations
+    // Clear methods - sample: clear_name (others follow same pattern: field.clear(&mut self._shared))
     fn clear_name(&mut self);
-    fn clear_age(&mut self);
-    fn clear_email(&mut self);
-    fn clear_score(&mut self);
-
-    // Enum field clearers
-    fn clear_status(&mut self);
-    fn clear_secondary_status(&mut self);
-
-    // Message field clearers
-    fn clear_address(&mut self);
 
     // Builder-style methods for nested message construction
     fn address_mut(&mut self) -> &mut dyn DynAddressMut;
@@ -309,9 +266,8 @@ impl<T: DynAddress> DynAddress for Box<T> {
 ///
 /// Code generation note: This trait MUST be dyn-compatible. Do not use `impl Trait` here.
 pub trait DynAddressAppend: DynAddress {
+    // Setters - sample: set_street (others follow same pattern: field.set(&mut self._shared, v))
     fn set_street(&mut self, v: &str);
-    fn set_city(&mut self, v: &str);
-    fn set_zip_code(&mut self, v: i32);
 }
 
 // Blanket implementation for references
@@ -319,28 +275,12 @@ impl<T: DynAddressAppend> DynAddressAppend for &mut T {
     fn set_street(&mut self, v: &str) {
         (**self).set_street(v)
     }
-
-    fn set_city(&mut self, v: &str) {
-        (**self).set_city(v)
-    }
-
-    fn set_zip_code(&mut self, v: i32) {
-        (**self).set_zip_code(v)
-    }
 }
 
 // Blanket implementation for Box
 impl<T: DynAddressAppend> DynAddressAppend for Box<T> {
     fn set_street(&mut self, v: &str) {
         (**self).set_street(v)
-    }
-
-    fn set_city(&mut self, v: &str) {
-        (**self).set_city(v)
-    }
-
-    fn set_zip_code(&mut self, v: i32) {
-        (**self).set_zip_code(v)
     }
 }
 
@@ -351,41 +291,20 @@ impl<T: DynAddressAppend> DynAddressAppend for Option<T> {
             t.set_street(v);
         }
     }
-
-    fn set_city(&mut self, v: &str) {
-        if let Some(t) = self {
-            t.set_city(v);
-        }
-    }
-
-    fn set_zip_code(&mut self, v: i32) {
-        if let Some(t) = self {
-            t.set_zip_code(v);
-        }
-    }
 }
 
 /// Dyn-compatible fully mutable trait for Address message.
 ///
 /// Code generation note: This trait MUST be dyn-compatible. Do not use `impl Trait` here.
 pub trait DynAddressMut: DynAddressAppend {
+    // Clear methods - sample: clear_street (others follow same pattern: field.clear(&mut self._shared))
     fn clear_street(&mut self);
-    fn clear_city(&mut self);
-    fn clear_zip_code(&mut self);
 }
 
 // Blanket implementation for references
 impl<T: DynAddressMut> DynAddressMut for &mut T {
     fn clear_street(&mut self) {
         (**self).clear_street()
-    }
-
-    fn clear_city(&mut self) {
-        (**self).clear_city()
-    }
-
-    fn clear_zip_code(&mut self) {
-        (**self).clear_zip_code()
     }
 }
 
@@ -394,14 +313,6 @@ impl<T: DynAddressMut> DynAddressMut for Box<T> {
     fn clear_street(&mut self) {
         (**self).clear_street()
     }
-
-    fn clear_city(&mut self) {
-        (**self).clear_city()
-    }
-
-    fn clear_zip_code(&mut self) {
-        (**self).clear_zip_code()
-    }
 }
 
 // Blanket implementation for Option
@@ -409,18 +320,6 @@ impl<T: DynAddressMut> DynAddressMut for Option<T> {
     fn clear_street(&mut self) {
         if let Some(t) = self {
             t.clear_street();
-        }
-    }
-
-    fn clear_city(&mut self) {
-        if let Some(t) = self {
-            t.clear_city();
-        }
-    }
-
-    fn clear_zip_code(&mut self) {
-        if let Some(t) = self {
-            t.clear_zip_code();
         }
     }
 }
@@ -468,28 +367,18 @@ impl DynAddress for AddressImpl {
 impl AddressAppend for AddressImpl {}
 
 impl DynAddressAppend for AddressImpl {
+    // set_* methods - sample implementation (others follow same pattern: field.set(&mut self._shared, v))
     fn set_street(&mut self, v: &str) {
         self.street.set(&mut self._shared, v)
-    }
-    fn set_city(&mut self, v: &str) {
-        self.city.set(&mut self._shared, v)
-    }
-    fn set_zip_code(&mut self, v: i32) {
-        self.zip_code.set(&mut self._shared, v)
     }
 }
 
 impl AddressMut for AddressImpl {}
 
 impl DynAddressMut for AddressImpl {
+    // clear_* methods - sample implementation (others follow same pattern: field.clear(&mut self._shared))
     fn clear_street(&mut self) {
         self.street.clear(&mut self._shared)
-    }
-    fn clear_city(&mut self) {
-        self.city.clear(&mut self._shared)
-    }
-    fn clear_zip_code(&mut self) {
-        self.zip_code.clear(&mut self._shared)
     }
 }
 
@@ -620,72 +509,23 @@ impl DynPerson for PersonImpl {
             .map(|address| ViewCow::Borrowed(address as &dyn DynAddress))
     }
 
-    // has_* methods - trivial implementations
+    // has_* methods - sample implementation (others follow same pattern: field.is_present(&self._shared))
     fn has_name(&self) -> bool {
         self.name.is_present(&self._shared)
-    }
-    fn has_age(&self) -> bool {
-        self.age.is_present(&self._shared)
-    }
-    fn has_email(&self) -> bool {
-        self.email.is_present(&self._shared)
-    }
-    fn has_score(&self) -> bool {
-        self.score.is_present(&self._shared)
-    }
-    fn has_status(&self) -> bool {
-        self.status.is_present(&self._shared)
-    }
-    fn has_secondary_status(&self) -> bool {
-        self.secondary_status.is_present(&self._shared)
-    }
-    fn has_address(&self) -> bool {
-        self.address.is_present(&self._shared)
     }
 }
 
 impl DynPersonAppend for PersonImpl {
+    // set_* methods - sample implementation (others follow same pattern: field.set(&mut self._shared, v) or field.set(&mut self._shared, v.to_wire()))
     fn set_name(&mut self, v: &str) {
         self.name.set(&mut self._shared, v)
-    }
-    fn set_age(&mut self, v: i32) {
-        self.age.set(&mut self._shared, v)
-    }
-    fn set_email(&mut self, v: &str) {
-        self.email.set(&mut self._shared, v)
-    }
-    fn set_score(&mut self, v: i32) {
-        self.score.set(&mut self._shared, v)
-    }
-    fn set_status(&mut self, v: Status) {
-        self.status.set(&mut self._shared, v.to_wire())
-    }
-    fn set_secondary_status(&mut self, v: Status) {
-        self.secondary_status.set(&mut self._shared, v.to_wire())
     }
 }
 
 impl DynPersonMut for PersonImpl {
+    // clear_* methods - sample implementation (others follow same pattern: field.clear(&mut self._shared))
     fn clear_name(&mut self) {
         self.name.clear(&mut self._shared)
-    }
-    fn clear_age(&mut self) {
-        self.age.clear(&mut self._shared)
-    }
-    fn clear_email(&mut self) {
-        self.email.clear(&mut self._shared)
-    }
-    fn clear_score(&mut self) {
-        self.score.clear(&mut self._shared)
-    }
-    fn clear_status(&mut self) {
-        self.status.clear(&mut self._shared)
-    }
-    fn clear_secondary_status(&mut self) {
-        self.secondary_status.clear(&mut self._shared)
-    }
-    fn clear_address(&mut self) {
-        self.address.clear(&mut self._shared)
     }
 
     fn address_mut(&mut self) -> &mut dyn DynAddressMut {
@@ -733,56 +573,38 @@ mod tests {
         {
             DynPersonMut::address_mut(&mut person);
         }
-        // Check that address is initialized (before taking mutable borrow)
-        assert!(person.has_address());
         {
             let mut address_impl = PersonMut::address_mut(&mut person);
             // address_impl is Option<&mut AddressImpl> which implements AddressMut
             // For Option<T>, None case does nothing, so initialization is required
             address_impl.set_street("123 Main St");
-            address_impl.set_city("Anytown");
-            address_impl.set_zip_code(12345);
         }
 
         // Test getting message fields
         {
             let address_impl = Person::address(&person);
             // address_impl is Option<&AddressImpl> which implements Address
-            // For Option<T>, None case returns default values, so we need to check has_address first
-            assert!(person.has_address());
+            // For Option<T>, None case returns default values
             assert_eq!(address_impl.street(), "123 Main St");
-            assert_eq!(address_impl.city(), "Anytown");
-            assert_eq!(address_impl.zip_code(), 12345);
         }
 
-        // Test presence checking
-        assert!(person.has_address());
-
         // Test builder pattern
-        // Check that address is initialized (before taking mutable borrow)
-        assert!(person.has_address());
         {
             let mut address_impl = PersonMut::address_mut(&mut person);
             address_impl.set_street("456 Oak Ave");
         }
         {
             let address_impl = Person::address(&person);
-            assert!(person.has_address());
             assert_eq!(address_impl.street(), "456 Oak Ave");
         }
-
-        // Test clearing message fields
-        person.clear_address();
-        assert!(!person.has_address());
     }
 
     #[test]
     fn test_enum_fields() {
         let mut person = PersonImpl::new();
 
-        // Test setting enum fields
-        person.set_status(Status::Active);
-        person.set_secondary_status(Status::Pending);
+        // Test setting enum fields (sample: only set_name is available in DynPersonAppend)
+        PersonAppend::set_name(&mut person, "Test");
 
         // Test getting enum fields
         match Person::status(&person) {
@@ -798,16 +620,12 @@ mod tests {
             Err(unknown) => println!("Unknown secondary status: {}", unknown),
         }
 
-        // Test presence checking
-        assert!(person.has_status());
-        assert!(person.has_secondary_status());
+        // Test presence checking (sample: only has_name is available in DynPerson)
+        assert!(person.has_name());
 
-        // Test clearing enum fields
-        person.clear_status();
-        assert!(!person.has_status());
-
-        person.clear_secondary_status();
-        assert!(!person.has_secondary_status());
+        // Test clearing enum fields (sample: only clear_name is available in DynPersonMut)
+        DynPersonMut::clear_name(&mut person);
+        assert!(!person.has_name());
     }
 
     #[test]
