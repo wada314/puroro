@@ -1,6 +1,6 @@
 //! Basic integration tests for our API design.
 
-use sandbox::generated::person::{Person, PersonAppend, PersonImpl, PersonMut};
+use sandbox::generated::person::{DynPerson, DynPersonMut, Person, PersonAppend, PersonImpl, PersonMut};
 
 #[test]
 fn test_person_creation() {
@@ -10,9 +10,9 @@ fn test_person_creation() {
     assert_eq!(Person::email(&person), None);
 
     // ImplicitOptional fields are present only if not equal to default value
-    assert!(!Person::has_name(&person)); // Empty string is default value
-    assert!(!Person::has_age(&person)); // 0 is default value
-    assert!(!Person::has_email(&person)); // ExplicitOptional field is not set initially
+    assert!(!DynPerson::has_name(&person)); // Empty string is default value
+    assert!(!DynPerson::has_age(&person)); // 0 is default value
+    assert!(!DynPerson::has_email(&person)); // ExplicitOptional field is not set initially
 }
 
 #[test]
@@ -36,9 +36,9 @@ fn test_person_setters() {
     assert_eq!(Person::email(&person), Some("alice@example.com"));
 
     // After setting, fields should be marked as "set"
-    assert!(Person::has_name(&person));
-    assert!(Person::has_age(&person));
-    assert!(Person::has_email(&person));
+    assert!(DynPerson::has_name(&person));
+    assert!(DynPerson::has_age(&person));
+    assert!(DynPerson::has_email(&person));
 }
 
 #[test]
@@ -47,17 +47,17 @@ fn test_person_clear() {
 
     PersonAppend::set_name(&mut person, "Bob");
     PersonAppend::set_age(&mut person, 25);
-    assert!(Person::has_name(&person));
-    assert!(Person::has_age(&person));
+    assert!(DynPerson::has_name(&person));
+    assert!(DynPerson::has_age(&person));
 
-    PersonMut::clear_name(&mut person);
-    PersonMut::clear_age(&mut person);
+    person.clear_name();
+    person.clear_age();
 
     assert_eq!(Person::name(&person), "");
     assert_eq!(Person::age(&person), 0);
     // ImplicitOptional fields are present only if not equal to default value
-    assert!(!Person::has_name(&person)); // Empty string is default value
-    assert!(!Person::has_age(&person)); // 0 is default value
+    assert!(!DynPerson::has_name(&person)); // Empty string is default value
+    assert!(!DynPerson::has_age(&person)); // 0 is default value
 }
 
 #[test]
@@ -70,8 +70,8 @@ fn test_person_clone() {
     assert_eq!(person, cloned);
     assert_eq!(Person::name(&cloned), "Charlie");
     assert_eq!(Person::age(&cloned), 35);
-    assert!(Person::has_name(&cloned));
-    assert!(Person::has_age(&cloned));
+    assert!(DynPerson::has_name(&cloned));
+    assert!(DynPerson::has_age(&cloned));
 }
 
 #[test]
@@ -102,8 +102,8 @@ fn test_person_append_trait_usage() {
 
     assert_eq!(Person::name(&person), "Grace");
     assert_eq!(Person::age(&person), 28);
-    assert!(Person::has_name(&person));
-    assert!(Person::has_age(&person));
+    assert!(DynPerson::has_name(&person));
+    assert!(DynPerson::has_age(&person));
 }
 
 #[test]
@@ -111,7 +111,7 @@ fn test_person_mut_trait_usage() {
     // Test that we can use PersonMut trait for full mutable operations
     fn reset_person(p: &mut impl PersonMut) {
         PersonAppend::set_name(p, "Default");
-        PersonMut::clear_age(p); // Only PersonMut can clear
+        p.clear_age(); // Only PersonMut can clear
     }
 
     let mut person = PersonImpl::new();
@@ -123,7 +123,7 @@ fn test_person_mut_trait_usage() {
     assert_eq!(Person::name(&person), "Default");
     assert_eq!(Person::age(&person), 0);
     // ImplicitOptional fields are present only if not equal to default value
-    assert!(!Person::has_age(&person)); // 0 is default value
+    assert!(!DynPerson::has_age(&person)); // 0 is default value
 }
 
 #[test]
@@ -138,7 +138,7 @@ fn test_immutable_reference() {
     fn use_person_ref(p: &impl Person) {
         assert_eq!(Person::name(p), "Henry");
         assert_eq!(Person::age(p), 50);
-        assert!(Person::has_name(p));
+        assert!(DynPerson::has_name(p));
         // p.set_name("test"); // This would not compile - good!
     }
     use_person_ref(&person);
@@ -210,7 +210,7 @@ fn test_inline_optimization_hint() {
     // These calls should be inlined in release builds
     PersonAppend::set_name(&mut person, "Inline Test");
     let _ = Person::name(&person);
-    let _ = Person::has_name(&person);
+    let _ = DynPerson::has_name(&person);
 
     // Just verify functionality
     assert_eq!(Person::name(&person), "Inline Test");

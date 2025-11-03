@@ -46,34 +46,6 @@ pub trait Person: DynPerson {
     fn secondary_status(&self) -> Result<Option<Status>, i32> {
         DynPerson::secondary_status(self)
     }
-    #[inline]
-    fn has_name(&self) -> bool {
-        DynPerson::has_name(self)
-    }
-    #[inline]
-    fn has_age(&self) -> bool {
-        DynPerson::has_age(self)
-    }
-    #[inline]
-    fn has_email(&self) -> bool {
-        DynPerson::has_email(self)
-    }
-    #[inline]
-    fn has_score(&self) -> bool {
-        DynPerson::has_score(self)
-    }
-    #[inline]
-    fn has_status(&self) -> bool {
-        DynPerson::has_status(self)
-    }
-    #[inline]
-    fn has_secondary_status(&self) -> bool {
-        DynPerson::has_secondary_status(self)
-    }
-    #[inline]
-    fn has_address(&self) -> bool {
-        DynPerson::has_address(self)
-    }
 
     // Methods with custom implementations (must be implemented)
     // NOTE: Must return `impl Address`, not a concrete struct type
@@ -162,36 +134,6 @@ pub trait DynPersonAppend: DynPerson {
 ///
 /// Code generation note: MUST NOT reference implementation struct names. All methods must use trait types only.
 pub trait PersonMut: PersonAppend + DynPersonMut {
-    // Methods that delegate to DynPersonMut (default implementations)
-    #[inline]
-    fn clear_name(&mut self) {
-        DynPersonMut::clear_name(self)
-    }
-    #[inline]
-    fn clear_age(&mut self) {
-        DynPersonMut::clear_age(self)
-    }
-    #[inline]
-    fn clear_email(&mut self) {
-        DynPersonMut::clear_email(self)
-    }
-    #[inline]
-    fn clear_score(&mut self) {
-        DynPersonMut::clear_score(self)
-    }
-    #[inline]
-    fn clear_status(&mut self) {
-        DynPersonMut::clear_status(self)
-    }
-    #[inline]
-    fn clear_secondary_status(&mut self) {
-        DynPersonMut::clear_secondary_status(self)
-    }
-    #[inline]
-    fn clear_address(&mut self) {
-        DynPersonMut::clear_address(self)
-    }
-
     // Methods with custom implementations (must be implemented)
     // NOTE: Must return `impl AddressMut`, not a concrete struct type
     fn address_mut(&mut self) -> impl AddressMut + use<'_, Self>;
@@ -695,45 +637,26 @@ impl DynPerson for PersonImpl {
             .map(|address| ViewCow::Borrowed(address as &dyn DynAddress))
     }
 
-    #[inline]
+    // has_* methods - trivial implementations using is_present()
     fn has_name(&self) -> bool {
-        // ImplicitOptional fields check if value is not equal to default
         self.name.is_present(&self._shared)
     }
-
-    #[inline]
     fn has_age(&self) -> bool {
-        // ImplicitOptional fields check if value is not equal to default
         self.age.is_present(&self._shared)
     }
-
-    #[inline]
     fn has_email(&self) -> bool {
-        // ExplicitOptional fields check presence via Field trait
         self.email.is_present(&self._shared)
     }
-
-    #[inline]
     fn has_score(&self) -> bool {
-        // ExplicitOptional fields check presence via Field trait
         self.score.is_present(&self._shared)
     }
-
-    #[inline]
     fn has_status(&self) -> bool {
-        // ImplicitOptional fields check if value is not equal to default
         self.status.is_present(&self._shared)
     }
-
-    #[inline]
     fn has_secondary_status(&self) -> bool {
-        // ExplicitOptional fields check presence via Field trait
         self.secondary_status.is_present(&self._shared)
     }
-
-    #[inline]
     fn has_address(&self) -> bool {
-        // ImplicitOptional fields check if value is not equal to default
         self.address.is_present(&self._shared)
     }
 }
@@ -771,39 +694,27 @@ impl DynPersonAppend for PersonImpl {
 }
 
 impl DynPersonMut for PersonImpl {
-    #[inline]
+    // clear_* methods - trivial implementations using clear()
     fn clear_name(&mut self) {
-        self.name.clear(&mut self._shared);
+        self.name.clear(&mut self._shared)
     }
-
-    #[inline]
     fn clear_age(&mut self) {
-        self.age.clear(&mut self._shared);
+        self.age.clear(&mut self._shared)
     }
-
-    #[inline]
     fn clear_email(&mut self) {
-        self.email.clear(&mut self._shared);
+        self.email.clear(&mut self._shared)
     }
-
-    #[inline]
     fn clear_score(&mut self) {
-        self.score.clear(&mut self._shared);
+        self.score.clear(&mut self._shared)
     }
-
-    #[inline]
     fn clear_status(&mut self) {
-        self.status.clear(&mut self._shared);
+        self.status.clear(&mut self._shared)
     }
-
-    #[inline]
     fn clear_secondary_status(&mut self) {
-        self.secondary_status.clear(&mut self._shared);
+        self.secondary_status.clear(&mut self._shared)
     }
-
-    #[inline]
     fn clear_address(&mut self) {
-        self.address.clear(&mut self._shared);
+        self.address.clear(&mut self._shared)
     }
 
     #[inline]
@@ -839,8 +750,8 @@ impl Message for PersonImpl {
 #[cfg(test)]
 mod tests {
     use super::{
-        AddressImpl, DynAddress, DynAddressAppend, DynPersonMut, MessageFieldWrapper, Person,
-        PersonAppend, PersonImpl, PersonMut, Status, StringFieldWrapper,
+        AddressImpl, DynAddress, DynAddressAppend, DynPerson, DynPersonMut, MessageFieldWrapper,
+        Person, PersonAppend, PersonImpl, PersonMut, Status, StringFieldWrapper,
     };
 
     #[test]
@@ -891,7 +802,7 @@ mod tests {
         }
 
         // Test clearing message fields
-        PersonMut::clear_address(&mut person);
+        person.clear_address();
         assert!(!person.has_address());
     }
 
@@ -904,13 +815,13 @@ mod tests {
         person.set_secondary_status(Status::Pending);
 
         // Test getting enum fields
-        match person.status() {
+        match Person::status(&person) {
             Ok(Status::Active) => println!("Status is Active"),
             Ok(status) => println!("Status is {:?}", status),
             Err(unknown) => println!("Unknown status: {}", unknown),
         }
 
-        match person.secondary_status() {
+        match Person::secondary_status(&person) {
             Ok(Some(Status::Pending)) => println!("Secondary status is Pending"),
             Ok(Some(status)) => println!("Secondary status is {:?}", status),
             Ok(None) => println!("No secondary status"),
@@ -922,10 +833,10 @@ mod tests {
         assert!(person.has_secondary_status());
 
         // Test clearing enum fields
-        PersonMut::clear_status(&mut person);
+        person.clear_status();
         assert!(!person.has_status());
 
-        PersonMut::clear_secondary_status(&mut person);
+        person.clear_secondary_status();
         assert!(!person.has_secondary_status());
     }
 
