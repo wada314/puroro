@@ -19,6 +19,9 @@
 //! - **Editions**: Presence semantics configurable via edition settings
 
 use crate::shared::SharedFields;
+use allocator_api2::boxed::Box;
+use allocator_api2::vec::Vec;
+use allocator_extras::{Allocator, Global, String as AllocString};
 use std::marker::PhantomData;
 
 // ============================================================================
@@ -170,23 +173,35 @@ impl ScalarType for bool {}
 ///
 /// This wrapper is needed to distinguish String fields from scalar types
 /// in the FieldOperations trait implementations, avoiding trait conflicts.
-#[derive(Debug, Clone, PartialEq)]
-pub struct StringFieldWrapper(pub String);
+#[derive(Debug)]
+pub struct StringFieldWrapper<A: Allocator = Global>(pub AllocString<A>);
 
 /// Wrapper type for Bytes protobuf fields.
 ///
 /// This wrapper is needed to distinguish Bytes fields from scalar types
 /// in the FieldOperations trait implementations, avoiding trait conflicts.
-#[derive(Debug, Clone, PartialEq)]
-pub struct BytesFieldWrapper(pub Vec<u8>);
+#[derive(Debug)]
+pub struct BytesFieldWrapper<A: Allocator = Global>(pub Vec<u8, A>);
 
 /// Wrapper type for Message protobuf fields.
 ///
 /// This wrapper is needed to distinguish Message fields from scalar types
 /// in the FieldOperations trait implementations, avoiding trait conflicts.
 /// Uses heap allocation with pointer null checks for presence tracking.
-#[derive(Debug, Clone, PartialEq)]
-pub struct MessageFieldWrapper<M: crate::Message>(pub Option<Box<M>>);
+#[derive(Debug)]
+pub struct MessageFieldWrapper<M, A: Allocator = Global> {
+    value: Option<Box<M, A>>,
+    allocator: A,
+}
+
+/// Convenience alias for `StringFieldWrapper` with the global allocator.
+pub type StringFieldWrapperGlobal = StringFieldWrapper<Global>;
+
+/// Convenience alias for `BytesFieldWrapper` with the global allocator.
+pub type BytesFieldWrapperGlobal = BytesFieldWrapper<Global>;
+
+/// Convenience alias for `MessageFieldWrapper` with the global allocator.
+pub type MessageFieldWrapperGlobal<M> = MessageFieldWrapper<M, Global>;
 
 /// Wrapper type for Enum protobuf fields.
 ///
@@ -196,23 +211,193 @@ pub struct MessageFieldWrapper<M: crate::Message>(pub Option<Box<M>>);
 pub struct EnumFieldWrapper<E>(pub E);
 
 // Default implementations for wrapper types
-impl Default for StringFieldWrapper {
+impl<A: Allocator + Default> Default for StringFieldWrapper<A> {
     fn default() -> Self {
-        Self(String::new())
+        Self(AllocString::new_in(A::default()))
     }
 }
 
-impl Default for BytesFieldWrapper {
+impl<A: Allocator + Default> Default for BytesFieldWrapper<A> {
     fn default() -> Self {
-        Self(Vec::new())
+        Self(Vec::new_in(A::default()))
     }
 }
 
-impl<M: crate::Message> Default for MessageFieldWrapper<M> {
+impl<M, A> Default for MessageFieldWrapper<M, A>
+where
+    A: Allocator + Default,
+{
     fn default() -> Self {
-        Self(None)
+        Self {
+            value: None,
+            allocator: A::default(),
+        }
     }
 }
+
+impl<A: Allocator> StringFieldWrapper<A> {
+    /// Creates a new string wrapper using the provided allocator.
+    pub fn new_in(alloc: A) -> Self {
+        Self(AllocString::new_in(alloc))
+    }
+
+    /// Consumes the wrapper and returns the underlying allocator-aware string.
+    pub fn into_inner(self) -> AllocString<A> {
+        self.0
+    }
+
+    /// Returns an immutable reference to the underlying string.
+    pub fn as_str(&self) -> &str {
+        self.0.as_str()
+    }
+
+    /// Returns a mutable reference to the underlying string.
+    pub fn as_mut_string(&mut self) -> &mut AllocString<A> {
+        &mut self.0
+    }
+}
+
+impl BytesFieldWrapper<Global> {
+    /// Creates a new wrapper using the global allocator.
+    pub fn new() -> Self {
+        Self::default()
+    }
+}
+
+impl StringFieldWrapper<Global> {
+    /// Creates a new wrapper using the global allocator.
+    pub fn new() -> Self {
+        Self::default()
+    }
+}
+
+impl<A: Allocator> BytesFieldWrapper<A> {
+    /// Creates a new bytes wrapper using the provided allocator.
+    pub fn new_in(alloc: A) -> Self {
+        Self(Vec::new_in(alloc))
+    }
+
+    /// Consumes the wrapper and returns the underlying byte buffer.
+    pub fn into_inner(self) -> Vec<u8, A> {
+        self.0
+    }
+
+    /// Returns a reference to the underlying slice.
+    pub fn as_slice(&self) -> &[u8] {
+        self.0.as_slice()
+    }
+}
+
+impl<M, A> MessageFieldWrapper<M, A>
+where
+    A: Allocator,
+{
+    /// Creates a new wrapper with the provided allocator.
+    pub fn new_in(alloc: A) -> Self {
+        Self {
+            value: None,
+            allocator: alloc,
+        }
+    }
+
+    /// Returns a reference to the allocator used by this wrapper.
+    pub fn allocator(&self) -> &A {
+        &self.allocator
+    }
+
+    /// Replaces the allocator used for subsequent allocations.
+    pub fn set_allocator(&mut self, allocator: A) {
+        self.allocator = allocator;
+    }
+
+    /// Consumes the wrapper and returns the owned message if present.
+    pub fn into_inner(self) -> Option<Box<M, A>> {
+        self.value
+    }
+
+    /// Returns an immutable reference to the wrapped message if present.
+    pub fn as_ref(&self) -> Option<&M> {
+        self.value.as_ref().map(|boxed| boxed.as_ref())
+    }
+
+    /// Returns a mutable reference to the wrapped message if present.
+    pub fn as_mut(&mut self) -> Option<&mut M> {
+        self.value.as_mut().map(|boxed| boxed.as_mut())
+    }
+
+    /// Ensures the wrapper contains a value, creating one with the provided initializer.
+    pub fn get_or_insert_with<F>(&mut self, init: F) -> &mut M
+    where
+        F: FnOnce() -> M,
+        A: Clone,
+    {
+        if self.value.is_none() {
+            let allocator = self.allocator.clone();
+            self.value = Some(Box::new_in(init(), allocator));
+        }
+        self.value
+            .as_mut()
+            .map(|boxed| boxed.as_mut())
+            .expect("initialized above")
+    }
+
+    /// Returns whether the wrapper currently holds a value.
+    pub fn is_none(&self) -> bool {
+        self.value.is_none()
+    }
+}
+
+impl<M> MessageFieldWrapper<M, Global> {
+    /// Creates a new wrapper using the global allocator.
+    pub fn new() -> Self {
+        Self::default()
+    }
+}
+
+impl<A: Allocator + Clone> Clone for StringFieldWrapper<A> {
+    fn clone(&self) -> Self {
+        Self(self.0.clone())
+    }
+}
+
+impl<A: Allocator> PartialEq for StringFieldWrapper<A> {
+    fn eq(&self, other: &Self) -> bool {
+        self.0.as_str() == other.0.as_str()
+    }
+}
+
+impl<A: Allocator> Eq for StringFieldWrapper<A> {}
+
+impl<A: Allocator + Clone> Clone for BytesFieldWrapper<A> {
+    fn clone(&self) -> Self {
+        Self(self.0.clone())
+    }
+}
+
+impl<A: Allocator> PartialEq for BytesFieldWrapper<A> {
+    fn eq(&self, other: &Self) -> bool {
+        self.0.as_slice() == other.0.as_slice()
+    }
+}
+
+impl<A: Allocator> Eq for BytesFieldWrapper<A> {}
+
+impl<M: Clone, A: Allocator + Clone> Clone for MessageFieldWrapper<M, A> {
+    fn clone(&self) -> Self {
+        Self {
+            value: self.value.clone(),
+            allocator: self.allocator.clone(),
+        }
+    }
+}
+
+impl<M: PartialEq, A: Allocator> PartialEq for MessageFieldWrapper<M, A> {
+    fn eq(&self, other: &Self) -> bool {
+        self.value == other.value
+    }
+}
+
+impl<M: Eq, A: Allocator> Eq for MessageFieldWrapper<M, A> {}
 
 impl<E: Default> Default for EnumFieldWrapper<E> {
     fn default() -> Self {
@@ -432,9 +617,9 @@ impl<
 // ============================================================================
 
 /// Implementation for StringFieldWrapper with ImplicitOptional
-impl<const FIELD_NUMBER: u32, const SHARED_BYTES_LEN: usize>
-    FieldOperations<StringFieldWrapper, ImplicitOptional, FIELD_NUMBER, SHARED_BYTES_LEN>
-    for FieldStorage<StringFieldWrapper, ImplicitOptional, FIELD_NUMBER, SHARED_BYTES_LEN>
+impl<A: Allocator + 'static, const FIELD_NUMBER: u32, const SHARED_BYTES_LEN: usize>
+    FieldOperations<StringFieldWrapper<A>, ImplicitOptional, FIELD_NUMBER, SHARED_BYTES_LEN>
+    for FieldStorage<StringFieldWrapper<A>, ImplicitOptional, FIELD_NUMBER, SHARED_BYTES_LEN>
 {
     type SetValue<'a> = &'a str;
     type GetValue<'a> = &'a str;
@@ -443,7 +628,8 @@ impl<const FIELD_NUMBER: u32, const SHARED_BYTES_LEN: usize>
     const FIELD_TYPE: ProtobufFieldType = ProtobufFieldType::String;
 
     fn set(&mut self, _shared: &mut Self::SharedFields, value: Self::SetValue<'_>) {
-        value.clone_into(&mut self.data.0);
+        self.data.0.clear();
+        self.data.0.push_str(value);
         // ImplicitOptional fields don't need presence tracking
     }
 
@@ -463,15 +649,20 @@ impl<const FIELD_NUMBER: u32, const SHARED_BYTES_LEN: usize>
 }
 
 /// Implementation for StringFieldWrapper with ExplicitOptional
-impl<const FIELD_NUMBER: u32, const PRESENCE_BIT_INDEX: usize, const SHARED_BYTES_LEN: usize>
+impl<
+    A: Allocator + 'static,
+    const FIELD_NUMBER: u32,
+    const PRESENCE_BIT_INDEX: usize,
+    const SHARED_BYTES_LEN: usize,
+>
     FieldOperations<
-        StringFieldWrapper,
+        StringFieldWrapper<A>,
         ExplicitOptional<PRESENCE_BIT_INDEX>,
         FIELD_NUMBER,
         SHARED_BYTES_LEN,
     >
     for FieldStorage<
-        StringFieldWrapper,
+        StringFieldWrapper<A>,
         ExplicitOptional<PRESENCE_BIT_INDEX>,
         FIELD_NUMBER,
         SHARED_BYTES_LEN,
@@ -484,7 +675,8 @@ impl<const FIELD_NUMBER: u32, const PRESENCE_BIT_INDEX: usize, const SHARED_BYTE
     const FIELD_TYPE: ProtobufFieldType = ProtobufFieldType::String;
 
     fn set(&mut self, shared: &mut Self::SharedFields, value: Self::SetValue<'_>) {
-        value.clone_into(&mut self.data.0);
+        self.data.0.clear();
+        self.data.0.push_str(value);
         shared.has_bits_mut().set(PRESENCE_BIT_INDEX, true);
     }
 
@@ -510,9 +702,13 @@ impl<const FIELD_NUMBER: u32, const PRESENCE_BIT_INDEX: usize, const SHARED_BYTE
 ///
 /// Uses heap allocation with pointer null checks for presence tracking.
 /// No need for presence bits - the Option<Box<M>> handles presence directly.
-impl<M: crate::Message + 'static, const FIELD_NUMBER: u32, const SHARED_BYTES_LEN: usize>
-    FieldOperations<MessageFieldWrapper<M>, ImplicitOptional, FIELD_NUMBER, SHARED_BYTES_LEN>
-    for FieldStorage<MessageFieldWrapper<M>, ImplicitOptional, FIELD_NUMBER, SHARED_BYTES_LEN>
+impl<
+    M: crate::Message + 'static,
+    A: Allocator + Clone + 'static,
+    const FIELD_NUMBER: u32,
+    const SHARED_BYTES_LEN: usize,
+> FieldOperations<MessageFieldWrapper<M, A>, ImplicitOptional, FIELD_NUMBER, SHARED_BYTES_LEN>
+    for FieldStorage<MessageFieldWrapper<M, A>, ImplicitOptional, FIELD_NUMBER, SHARED_BYTES_LEN>
 {
     type SetValue<'a> = &'a M;
     type GetValue<'a> = Option<&'a M>; // Message fields always return Option
@@ -521,23 +717,24 @@ impl<M: crate::Message + 'static, const FIELD_NUMBER: u32, const SHARED_BYTES_LE
     const FIELD_TYPE: ProtobufFieldType = ProtobufFieldType::Message;
 
     fn set(&mut self, _shared: &mut Self::SharedFields, value: Self::SetValue<'_>) {
-        self.data.0 = Some(Box::new(value.clone()));
+        let allocator = self.data.allocator.clone();
+        self.data.value = Some(Box::new_in(value.clone(), allocator));
         // No presence bit needed - Option<Box<M>> handles presence
     }
 
     fn get<'a>(&'a self, _shared: &'a Self::SharedFields) -> Self::GetValue<'a> {
         // Use Option<Box<M>> for presence checking
-        self.data.0.as_ref().map(|boxed| boxed.as_ref())
+        self.data.value.as_ref().map(|boxed| boxed.as_ref())
     }
 
     fn clear(&mut self, _shared: &mut Self::SharedFields) {
-        self.data.0 = None;
+        self.data.value = None;
         // No presence bit needed - Option<Box<M>> handles presence
     }
 
     fn is_present(&self, _shared: &Self::SharedFields) -> bool {
         // Use Option<Box<M>> for presence checking
-        self.data.0.is_some()
+        self.data.value.is_some()
     }
 }
 
@@ -547,18 +744,19 @@ impl<M: crate::Message + 'static, const FIELD_NUMBER: u32, const SHARED_BYTES_LE
 /// No need for presence bits - the Option<Box<M>> handles presence directly.
 impl<
     M: crate::Message + 'static,
+    A: Allocator + Clone + 'static,
     const FIELD_NUMBER: u32,
     const PRESENCE_BIT_INDEX: usize,
     const SHARED_BYTES_LEN: usize,
 >
     FieldOperations<
-        MessageFieldWrapper<M>,
+        MessageFieldWrapper<M, A>,
         ExplicitOptional<PRESENCE_BIT_INDEX>,
         FIELD_NUMBER,
         SHARED_BYTES_LEN,
     >
     for FieldStorage<
-        MessageFieldWrapper<M>,
+        MessageFieldWrapper<M, A>,
         ExplicitOptional<PRESENCE_BIT_INDEX>,
         FIELD_NUMBER,
         SHARED_BYTES_LEN,
@@ -571,23 +769,24 @@ impl<
     const FIELD_TYPE: ProtobufFieldType = ProtobufFieldType::Message;
 
     fn set(&mut self, _shared: &mut Self::SharedFields, value: Self::SetValue<'_>) {
-        self.data.0 = Some(Box::new(value.clone()));
+        let allocator = self.data.allocator.clone();
+        self.data.value = Some(Box::new_in(value.clone(), allocator));
         // No presence bit needed - Option<Box<M>> handles presence
     }
 
     fn get<'a>(&'a self, _shared: &'a Self::SharedFields) -> Self::GetValue<'a> {
         // Use Option<Box<M>> for presence checking
-        self.data.0.as_ref().map(|boxed| boxed.as_ref())
+        self.data.value.as_ref().map(|boxed| boxed.as_ref())
     }
 
     fn clear(&mut self, _shared: &mut Self::SharedFields) {
-        self.data.0 = None;
+        self.data.value = None;
         // No presence bit needed - Option<Box<M>> handles presence
     }
 
     fn is_present(&self, _shared: &Self::SharedFields) -> bool {
         // Use Option<Box<M>> for presence checking
-        self.data.0.is_some()
+        self.data.value.is_some()
     }
 }
 

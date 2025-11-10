@@ -1,8 +1,6 @@
 //! Basic integration tests for our API design.
 
-use sandbox::generated::person::{
-    DynPerson, DynPersonMut, Person, PersonAppend, PersonImpl, PersonMut,
-};
+use sandbox::generated::person::{DynPerson, Person, PersonAppend, PersonImpl, PersonMut};
 
 #[test]
 fn test_person_creation() {

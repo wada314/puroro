@@ -4,6 +4,9 @@
 //! that support both borrowed references and owned values, with future
 //! allocator support in mind.
 
+use allocator_api2::boxed::Box;
+use allocator_extras::{Allocator, Global};
+
 /// A clone-on-write smart pointer for Protocol Buffer message views.
 ///
 /// This is similar to `std::borrow::Cow` but designed specifically for
@@ -14,35 +17,34 @@
 /// # Examples
 ///
 /// ```rust
+/// # use allocator_api2::boxed::Box;
+/// # use allocator_extras::Global;
 /// # use puroro::view::ViewCow;
-/// # trait Address {}
-/// # impl Address for () {}
 /// // Borrowed reference (zero-cost)
-/// let borrowed: ViewCow<'_, dyn Address> = ViewCow::Borrowed(&());
+/// let borrowed: ViewCow<'_, ()> = ViewCow::Borrowed(&());
 ///
 /// // Owned value (heap-allocated)
-/// let owned: ViewCow<'_, dyn Address> = ViewCow::Owned(Box::new(()));
+/// let owned: ViewCow<'_, ()> = ViewCow::Owned(Box::new_in((), Global));
 /// ```
-#[derive(Debug, Clone)]
-pub enum ViewCow<'a, T: ?Sized + 'a> {
+#[derive(Debug)]
+pub enum ViewCow<'a, T: ?Sized + 'a, A: Allocator = Global> {
     /// Borrowed reference to the underlying value.
     Borrowed(&'a T),
     /// Owned value stored on the heap.
     ///
     /// TODO: Replace `Box` with a generic allocator parameter when allocator support is added.
-    Owned(Box<T>),
+    Owned(Box<T, A>),
 }
 
-impl<'a, T: ?Sized + 'a> ViewCow<'a, T> {
+impl<'a, T: ?Sized + 'a, A: Allocator> ViewCow<'a, T, A> {
     /// Returns a reference to the underlying value.
     ///
     /// # Examples
     ///
     /// ```rust
+    /// # use allocator_extras::Global;
     /// # use puroro::view::ViewCow;
-    /// # trait Address {}
-    /// # impl Address for () {}
-    /// let cow = ViewCow::Borrowed(&());
+    /// let cow: ViewCow<'_, (), Global> = ViewCow::Borrowed(&());
     /// assert!(std::ptr::eq(cow.as_ref(), &()));
     /// ```
     pub fn as_ref(&self) -> &T {
@@ -58,16 +60,18 @@ impl<'a, T: ?Sized + 'a> ViewCow<'a, T> {
     ///
     /// ```rust
     /// # use puroro::view::ViewCow;
+    /// # use allocator_api2::boxed::Box;
+    /// # use allocator_extras::Global;
     /// let borrowed = ViewCow::Borrowed(&42);
-    /// let owned: Box<i32> = borrowed.into_owned();
+    /// let owned: Box<i32, Global> = borrowed.into_owned_in(Global);
     /// assert_eq!(*owned, 42);
     /// ```
-    pub fn into_owned(self) -> Box<T>
+    pub fn into_owned_in(self, alloc: A) -> Box<T, A>
     where
         T: Clone,
     {
         match self {
-            ViewCow::Borrowed(r) => Box::new(r.clone()),
+            ViewCow::Borrowed(r) => Box::new_in(r.clone(), alloc),
             ViewCow::Owned(boxed) => boxed,
         }
     }
@@ -77,10 +81,11 @@ impl<'a, T: ?Sized + 'a> ViewCow<'a, T> {
     /// # Examples
     ///
     /// ```rust
+    /// # use allocator_extras::Global;
     /// # use puroro::view::ViewCow;
     /// # trait Address {}
     /// # impl Address for () {}
-    /// let borrowed = ViewCow::Borrowed(&());
+    /// let borrowed: ViewCow<'_, (), Global> = ViewCow::Borrowed(&());
     /// assert!(borrowed.is_borrowed());
     /// ```
     pub fn is_borrowed(&self) -> bool {
@@ -92,10 +97,10 @@ impl<'a, T: ?Sized + 'a> ViewCow<'a, T> {
     /// # Examples
     ///
     /// ```rust
+    /// # use allocator_api2::boxed::Box;
+    /// # use allocator_extras::Global;
     /// # use puroro::view::ViewCow;
-    /// # trait Address {}
-    /// # impl Address for () {}
-    /// let owned = ViewCow::Owned(Box::new(()));
+    /// let owned: ViewCow<'_, ()> = ViewCow::Owned(Box::new_in((), Global));
     /// assert!(owned.is_owned());
     /// ```
     pub fn is_owned(&self) -> bool {
@@ -103,10 +108,36 @@ impl<'a, T: ?Sized + 'a> ViewCow<'a, T> {
     }
 }
 
-impl<'a, T: ?Sized + 'a> std::ops::Deref for ViewCow<'a, T> {
+impl<'a, T: ?Sized + 'a, A: Allocator> std::ops::Deref for ViewCow<'a, T, A> {
     type Target = T;
 
     fn deref(&self) -> &Self::Target {
         self.as_ref()
+    }
+}
+
+impl<'a, T, A> Clone for ViewCow<'a, T, A>
+where
+    T: ?Sized + 'a + Clone,
+    A: Allocator + Clone,
+{
+    fn clone(&self) -> Self {
+        match self {
+            ViewCow::Borrowed(r) => ViewCow::Borrowed(r),
+            ViewCow::Owned(boxed) => ViewCow::Owned(boxed.clone()),
+        }
+    }
+}
+
+impl<'a, T> ViewCow<'a, T, Global>
+where
+    T: ?Sized + 'a,
+{
+    /// Convenience wrapper that mirrors the historical API for global allocations.
+    pub fn into_owned(self) -> Box<T, Global>
+    where
+        T: Clone,
+    {
+        self.into_owned_in(Global)
     }
 }

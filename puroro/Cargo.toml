@@ -8,13 +8,9 @@ repository.workspace = true
 description = "A Rust-idiomatic implementation of Google Protocol Buffers"
 readme = "../README.md"
 
-[features]
-default = []
-allocator-extras = ["allocator_extras"]
-
 [dependencies]
 protobuf-core.workspace = true
 allocator-api2.workspace = true
 bitvec.workspace = true
 thiserror.workspace = true
-allocator_extras = { workspace = true, optional = true }
+allocator_extras.workspace = true

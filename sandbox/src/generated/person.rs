@@ -14,7 +14,6 @@ use puroro::{
     shared::SharedFields,
     view::ViewCow,
 };
-use std::ops::{Deref, DerefMut};
 
 /// Flexible view trait for Person message (not dyn-compatible).
 ///
@@ -475,14 +474,14 @@ impl Person for PersonImpl {
 
 impl PersonAppend for PersonImpl {
     fn address_mut(&mut self) -> impl AddressAppend + use<'_> {
-        self.address.data.0.as_mut().map(|b| b.as_mut())
+        self.address.data.as_mut()
     }
     // All other methods use default implementations from the trait definition
 }
 
 impl PersonMut for PersonImpl {
     fn address_mut(&mut self) -> impl AddressMut + use<'_> {
-        self.address.data.0.as_mut().map(|b| b.as_mut())
+        self.address.data.as_mut()
     }
     // All other methods use default implementations from the trait definition
 }
@@ -541,10 +540,7 @@ impl DynPersonMut for PersonImpl {
     }
 
     fn address_mut(&mut self) -> &mut dyn DynAddressMut {
-        if self.address.data.0.is_none() {
-            self.address.data.0 = Some(Box::new(AddressImpl::default()));
-        }
-        self.address.data.0.as_mut().unwrap().as_mut()
+        self.address.data.get_or_insert_with(AddressImpl::default) as &mut dyn DynAddressMut
     }
 }
 
@@ -572,8 +568,8 @@ impl Message for PersonImpl {
 #[cfg(test)]
 mod tests {
     use super::{
-        AddressImpl, DynAddress, DynAddressAppend, DynPerson, DynPersonMut, MessageFieldWrapper,
-        Person, PersonAppend, PersonImpl, PersonMut, Status, StringFieldWrapper,
+        AddressImpl, DynAddress, DynAddressAppend, DynPersonMut, MessageFieldWrapper, Person,
+        PersonAppend, PersonImpl, PersonMut, Status, StringFieldWrapper,
     };
 
     #[test]
@@ -643,13 +639,14 @@ mod tests {
     #[test]
     fn test_wrapper_types() {
         // Test StringFieldWrapper wrapper
-        let string_field = StringFieldWrapper("Hello".to_string());
-        assert_eq!(string_field.0, "Hello");
+        let mut string_field = StringFieldWrapper::new();
+        string_field.as_mut_string().push_str("Hello");
+        assert_eq!(string_field.as_str(), "Hello");
 
         // Test MessageFieldWrapper wrapper
-        let address = AddressImpl::new();
-        let message_field = MessageFieldWrapper(Some(Box::new(address)));
-        assert_eq!(message_field.0.as_ref().unwrap().street(), "");
+        let mut message_field = MessageFieldWrapper::new();
+        let address = message_field.get_or_insert_with(AddressImpl::default);
+        assert_eq!(address.street(), "");
     }
 }
 

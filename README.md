@@ -90,7 +90,7 @@ See [Design Discussion](doc/design-discussion.md) for detailed design decisions 
 
 - Nightly-only experimental crate `allocator_extras` hosts allocator-aware utilities such as `String<A>`
 - Activate the experiment with `cargo +nightly test -p allocator_extras`
-- Feature flag `allocator-extras` on `puroro` pulls the allocator-aware types into the main crate for further experiments
+- `puroro` always links those allocator-aware types; consumers can choose allocators per API
 
 ## Documentation
 
