@@ -1,0 +1,17 @@
+[package]
+name = "allocator_extras"
+version.workspace = true
+authors.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Experimental allocator-aware utilities for puroro"
+publish = false
+
+[features]
+default = ["std"]
+std = []
+alloc = []
+
+[dependencies]
+allocator-api2.workspace = true

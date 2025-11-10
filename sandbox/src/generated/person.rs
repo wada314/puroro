@@ -5,6 +5,7 @@
 //! Uses trait-based field operations for type-safe, scalable code generation.
 
 use puroro::{
+    Message,
     error::Error,
     field_ops::{
         ExplicitOptional, FieldOperations, FieldStorage, ImplicitOptional, MessageFieldWrapper,
@@ -12,7 +13,6 @@ use puroro::{
     },
     shared::SharedFields,
     view::ViewCow,
-    Message,
 };
 use std::ops::{Deref, DerefMut};
 

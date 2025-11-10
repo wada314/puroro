@@ -86,6 +86,12 @@ let score: Option<i32> = person.score_opt();  // ❌ Compile error
 
 See [Design Discussion](doc/design-discussion.md) for detailed design decisions and rationale.
 
+## Experimental Allocator Support
+
+- Nightly-only experimental crate `allocator_extras` hosts allocator-aware utilities such as `OwnedString<A>`
+- Activate the experiment with `cargo +nightly test -p allocator_extras`
+- Feature flag `allocator-extras` on `puroro` pulls the allocator-aware types into the main crate for further experiments
+
 ## Documentation
 
 - [Design Discussion History](doc/design-discussion.md) - Complete record of design decisions

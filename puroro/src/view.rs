@@ -110,4 +110,3 @@ impl<'a, T: ?Sized + 'a> std::ops::Deref for ViewCow<'a, T> {
         self.as_ref()
     }
 }
-

@@ -1,5 +1,5 @@
 [workspace]
-members = ["puroro", "puroro-codegen", "sandbox"]
+members = ["allocator_extras","puroro", "puroro-codegen", "sandbox"]
 resolver = "2"
 
 [workspace.package]
@@ -18,3 +18,4 @@ bitvec = "1.0"
 
 # Common dependencies
 thiserror = "2.0"
+allocator_extras = { path = "allocator_extras" }

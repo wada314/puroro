@@ -1,6 +1,8 @@
 //! Basic integration tests for our API design.
 
-use sandbox::generated::person::{DynPerson, DynPersonMut, Person, PersonAppend, PersonImpl, PersonMut};
+use sandbox::generated::person::{
+    DynPerson, DynPersonMut, Person, PersonAppend, PersonImpl, PersonMut,
+};
 
 #[test]
 fn test_person_creation() {
@@ -209,7 +211,10 @@ fn test_clone_into_optimization() {
     let mut person = PersonImpl::new();
 
     // First set - allocates
-    PersonAppend::set_name(&mut person, "A very long string that requires heap allocation");
+    PersonAppend::set_name(
+        &mut person,
+        "A very long string that requires heap allocation",
+    );
     assert_eq!(
         Person::name(&person),
         "A very long string that requires heap allocation"
@@ -220,7 +225,10 @@ fn test_clone_into_optimization() {
     assert_eq!(Person::name(&person), "Short");
 
     // Third set with another long string
-    PersonAppend::set_name(&mut person, "Another very long string that requires heap allocation");
+    PersonAppend::set_name(
+        &mut person,
+        "Another very long string that requires heap allocation",
+    );
     assert_eq!(
         Person::name(&person),
         "Another very long string that requires heap allocation"

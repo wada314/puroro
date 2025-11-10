@@ -388,11 +388,11 @@ impl<T: ScalarType, const FIELD_NUMBER: u32, const SHARED_BYTES_LEN: usize>
 
 /// Implementation for scalar types with ExplicitOptional
 impl<
-        T: ScalarType,
-        const FIELD_NUMBER: u32,
-        const PRESENCE_BIT_INDEX: usize,
-        const SHARED_BYTES_LEN: usize,
-    > FieldOperations<T, ExplicitOptional<PRESENCE_BIT_INDEX>, FIELD_NUMBER, SHARED_BYTES_LEN>
+    T: ScalarType,
+    const FIELD_NUMBER: u32,
+    const PRESENCE_BIT_INDEX: usize,
+    const SHARED_BYTES_LEN: usize,
+> FieldOperations<T, ExplicitOptional<PRESENCE_BIT_INDEX>, FIELD_NUMBER, SHARED_BYTES_LEN>
     for FieldStorage<T, ExplicitOptional<PRESENCE_BIT_INDEX>, FIELD_NUMBER, SHARED_BYTES_LEN>
 {
     type SetValue<'a> = T;
@@ -546,11 +546,11 @@ impl<M: crate::Message + 'static, const FIELD_NUMBER: u32, const SHARED_BYTES_LE
 /// Uses heap allocation with pointer null checks for presence tracking.
 /// No need for presence bits - the Option<Box<M>> handles presence directly.
 impl<
-        M: crate::Message + 'static,
-        const FIELD_NUMBER: u32,
-        const PRESENCE_BIT_INDEX: usize,
-        const SHARED_BYTES_LEN: usize,
-    >
+    M: crate::Message + 'static,
+    const FIELD_NUMBER: u32,
+    const PRESENCE_BIT_INDEX: usize,
+    const SHARED_BYTES_LEN: usize,
+>
     FieldOperations<
         MessageFieldWrapper<M>,
         ExplicitOptional<PRESENCE_BIT_INDEX>,
