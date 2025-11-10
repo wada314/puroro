@@ -1,6 +1,5 @@
-`allocator_extras` は `puroro` 向けの実験的クレートであり、nightly Rust におけるアロケータ対応型とユーティリティを提供します。
+`allocator_extras` is an experimental crate for `puroro` that offers allocator-aware types and utilities targeting nightly Rust.
 
-- `allocator_api2` クレートに依存し、`Allocator` を受け取る型の最小実装を検証します。
-- 標準ライブラリ型の完全互換を目指さず、設計検証に必要な最小機能のみを備えます。
-- 現状は内部利用のみを想定しており、`publish = false` として非公開です。
-
+- Depends on the `allocator_api2` crate to prototype minimal implementations of `Allocator`-friendly types.
+- Focuses on the smallest feature set necessary to validate design ideas rather than full drop-in replacements for standard library types.
+- Intended for internal experimentation only (`publish = false`) and may change without notice.
