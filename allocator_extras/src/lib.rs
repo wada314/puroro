@@ -6,6 +6,6 @@ pub mod string;
 pub mod traits;
 pub mod util;
 
-pub use crate::string::{FromUtf8Error, OwnedString, OwnedStringGlobal};
+pub use crate::string::{FromUtf8Error, String, StringGlobal};
 pub use crate::traits::{CloneIn, DefaultIn, ToOwnedIn};
 pub use ::allocator_api2::alloc::{AllocError, Allocator, Global, Layout};

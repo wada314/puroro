@@ -9,12 +9,12 @@ use core::ops::{Deref, DerefMut};
 use core::str;
 
 /// A UTF-8 string that stores data inside an allocator-aware `Vec<u8, A>`.
-pub struct OwnedString<A: Allocator> {
+pub struct String<A: Allocator> {
     bytes: Vec<u8, A>,
 }
 
-impl<A: Allocator> OwnedString<A> {
-    /// Creates an empty `OwnedString` using the provided allocator.
+impl<A: Allocator> String<A> {
+    /// Creates an empty `String` using the provided allocator.
     #[inline]
     pub fn new_in(alloc: A) -> Self {
         Self {
@@ -22,7 +22,7 @@ impl<A: Allocator> OwnedString<A> {
         }
     }
 
-    /// Creates an `OwnedString` with the specified capacity in bytes.
+    /// Creates a `String` with the specified capacity in bytes.
     #[inline]
     pub fn with_capacity_in(capacity: usize, alloc: A) -> Self {
         Self {
@@ -30,7 +30,7 @@ impl<A: Allocator> OwnedString<A> {
         }
     }
 
-    /// Converts the given UTF-8 byte buffer into an `OwnedString`.
+    /// Converts the given UTF-8 byte buffer into a `String`.
     pub fn from_utf8_in(bytes: Vec<u8, A>) -> Result<Self, FromUtf8Error<A>> {
         match str::from_utf8(&bytes) {
             Ok(_) => Ok(Self { bytes }),
@@ -38,7 +38,7 @@ impl<A: Allocator> OwnedString<A> {
         }
     }
 
-    /// Copies the given `&str` into a newly allocated `OwnedString`.
+    /// Copies the given `&str` into a newly allocated `String`.
     pub fn from_str_in(source: &str, alloc: A) -> Self {
         let mut bytes = Vec::with_capacity_in(source.len(), alloc);
         bytes.extend_from_slice(source.as_bytes());
@@ -54,7 +54,7 @@ impl<A: Allocator> OwnedString<A> {
     /// Borrows the string slice.
     #[inline]
     pub fn as_str(&self) -> &str {
-        // Safety: `OwnedString` maintains the UTF-8 invariant for `bytes`.
+        // Safety: `String` maintains the UTF-8 invariant for `bytes`.
         unsafe { str::from_utf8_unchecked(&self.bytes) }
     }
 
@@ -67,7 +67,7 @@ impl<A: Allocator> OwnedString<A> {
     /// Mutable access to the string slice.
     #[inline]
     pub fn as_mut_str(&mut self) -> &mut str {
-        // Safety: `OwnedString` maintains the UTF-8 invariant for `bytes`.
+        // Safety: `String` maintains the UTF-8 invariant for `bytes`.
         unsafe { str::from_utf8_unchecked_mut(&mut self.bytes) }
     }
 
@@ -107,13 +107,13 @@ impl<A: Allocator> OwnedString<A> {
         self.bytes.clear();
     }
 
-    /// Appends a string slice to the end of this `OwnedString`.
+    /// Appends a string slice to the end of this `String`.
     #[inline]
     pub fn push_str(&mut self, suffix: &str) {
         self.bytes.extend_from_slice(suffix.as_bytes());
     }
 
-    /// Appends a single UTF-8 scalar value to the end of this `OwnedString`.
+    /// Appends a single UTF-8 scalar value to the end of this `String`.
     pub fn push(&mut self, ch: char) {
         let mut buffer = [0u8; 4];
         let encoded = ch.encode_utf8(&mut buffer);
@@ -121,21 +121,21 @@ impl<A: Allocator> OwnedString<A> {
     }
 }
 
-impl OwnedString<Global> {
-    /// Creates an empty `OwnedString` using the global allocator.
+impl String<Global> {
+    /// Creates an empty `String` using the global allocator.
     #[inline]
     pub fn new() -> Self {
         Self::new_in(Global)
     }
 
-    /// Creates a global `OwnedString` with the specified capacity.
+    /// Creates a global `String` with the specified capacity.
     #[inline]
     pub fn with_capacity(capacity: usize) -> Self {
         Self::with_capacity_in(capacity, Global)
     }
 }
 
-impl<A: Allocator> Deref for OwnedString<A> {
+impl<A: Allocator> Deref for String<A> {
     type Target = str;
 
     #[inline]
@@ -144,70 +144,70 @@ impl<A: Allocator> Deref for OwnedString<A> {
     }
 }
 
-impl<A: Allocator> DerefMut for OwnedString<A> {
+impl<A: Allocator> DerefMut for String<A> {
     #[inline]
     fn deref_mut(&mut self) -> &mut Self::Target {
         self.as_mut_str()
     }
 }
 
-impl<A: Allocator> Borrow<str> for OwnedString<A> {
+impl<A: Allocator> Borrow<str> for String<A> {
     #[inline]
     fn borrow(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<A: Allocator> AsRef<str> for OwnedString<A> {
+impl<A: Allocator> AsRef<str> for String<A> {
     #[inline]
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<A: Allocator> fmt::Debug for OwnedString<A> {
+impl<A: Allocator> fmt::Debug for String<A> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         fmt::Debug::fmt(self.as_str(), f)
     }
 }
 
-impl<A: Allocator> fmt::Display for OwnedString<A> {
+impl<A: Allocator> fmt::Display for String<A> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         fmt::Display::fmt(self.as_str(), f)
     }
 }
 
-impl<A: Allocator, B: Allocator> PartialEq<OwnedString<B>> for OwnedString<A> {
+impl<A: Allocator, B: Allocator> PartialEq<String<B>> for String<A> {
     #[inline]
-    fn eq(&self, other: &OwnedString<B>) -> bool {
+    fn eq(&self, other: &String<B>) -> bool {
         self.as_bytes() == other.as_bytes()
     }
 }
 
-impl<A: Allocator> PartialEq<str> for OwnedString<A> {
+impl<A: Allocator> PartialEq<str> for String<A> {
     #[inline]
     fn eq(&self, other: &str) -> bool {
         self.as_str() == other
     }
 }
 
-impl<A: Allocator> PartialEq<&str> for OwnedString<A> {
+impl<A: Allocator> PartialEq<&str> for String<A> {
     #[inline]
     fn eq(&self, other: &&str) -> bool {
         self.as_str() == *other
     }
 }
 
-impl<A: Allocator> Eq for OwnedString<A> {}
+impl<A: Allocator> Eq for String<A> {}
 
-impl<A: Allocator> DefaultIn<A> for OwnedString<A> {
+impl<A: Allocator> DefaultIn<A> for String<A> {
     #[inline]
     fn default_in(alloc: A) -> Self {
         Self::new_in(alloc)
     }
 }
 
-impl<A: Allocator> CloneIn<A> for OwnedString<A> {
+impl<A: Allocator> CloneIn<A> for String<A> {
     fn clone_in(&self, alloc: A) -> Self {
         let mut bytes = Vec::with_capacity_in(self.len(), alloc);
         bytes.extend_from_slice(self.as_bytes());
@@ -215,14 +215,14 @@ impl<A: Allocator> CloneIn<A> for OwnedString<A> {
     }
 }
 
-impl<A: Allocator + Default> Default for OwnedString<A> {
+impl<A: Allocator + Default> Default for String<A> {
     #[inline]
     fn default() -> Self {
         Self::new_in(A::default())
     }
 }
 
-impl<A: Allocator + Clone> Clone for OwnedString<A> {
+impl<A: Allocator + Clone> Clone for String<A> {
     fn clone(&self) -> Self {
         let allocator = self.bytes.allocator().clone();
         let mut bytes = Vec::with_capacity_in(self.len(), allocator);
@@ -232,18 +232,18 @@ impl<A: Allocator + Clone> Clone for OwnedString<A> {
 }
 
 impl<'a, A: Allocator> ToOwnedIn<A> for str {
-    type Owned = OwnedString<A>;
+    type Owned = String<A>;
 
     #[inline]
     fn to_owned_in(&self, alloc: A) -> Self::Owned {
-        OwnedString::from_str_in(self, alloc)
+        String::from_str_in(self, alloc)
     }
 }
 
-impl From<&str> for OwnedStringGlobal {
+impl From<&str> for StringGlobal {
     #[inline]
     fn from(source: &str) -> Self {
-        OwnedString::from_str_in(source, Global)
+        String::from_str_in(source, Global)
     }
 }
 
@@ -280,7 +280,7 @@ impl<A: Allocator> fmt::Debug for FromUtf8Error<A> {
 }
 
 /// Convenience alias for the global allocator variant.
-pub type OwnedStringGlobal = OwnedString<Global>;
+pub type StringGlobal = String<Global>;
 
 #[cfg(test)]
 mod tests {
@@ -290,34 +290,34 @@ mod tests {
 
     #[test]
     fn new_in_produces_empty_string() {
-        let string = OwnedString::new_in(Global);
+        let string = String::new_in(Global);
         assert!(string.is_empty());
     }
 
     #[test]
     fn from_str_in_copies_utf8() {
         let text = "hello";
-        let string = OwnedString::from_str_in(text, Global);
+        let string = String::from_str_in(text, Global);
         assert_eq!(string.as_str(), text);
     }
 
     #[test]
     fn push_str_appends_content() {
-        let mut string = OwnedString::from_str_in("foo", Global);
+        let mut string = String::from_str_in("foo", Global);
         string.push_str("bar");
         assert_eq!(string.as_str(), "foobar");
     }
 
     #[test]
     fn clone_in_reallocates() {
-        let original = OwnedString::from_str_in("value", Global);
+        let original = String::from_str_in("value", Global);
         let cloned = original.clone_in(Global);
         assert_eq!(cloned, original);
     }
 
     #[test]
     fn clone_uses_same_allocator_when_available() {
-        let original = OwnedString::from_str_in("abc", Global);
+        let original = String::from_str_in("abc", Global);
         let cloned = original.clone();
         assert_eq!(original, cloned);
     }
@@ -332,7 +332,7 @@ mod tests {
     #[test]
     fn invalid_utf8_is_detected() {
         let bytes = util::vec_from_slice_in(&[0xf0, 0x28, 0x8c, 0xbc], Global);
-        let result = OwnedString::from_utf8_in(bytes);
+        let result = String::from_utf8_in(bytes);
         assert!(result.is_err());
     }
 }
