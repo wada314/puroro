@@ -1,5 +1,6 @@
 //! Basic integration tests for our API design.
 
+use ::allocator_extras::Global;
 use sandbox::generated::person::{DynPerson, Person, PersonAppend, PersonImpl, PersonMut};
 
 #[test]
@@ -16,7 +17,7 @@ fn test_person_creation() {
 
 #[test]
 fn test_person_default() {
-    let person = PersonImpl::default();
+    let person: PersonImpl<Global> = Default::default();
     assert_eq!(Person::name(&person), "");
     assert_eq!(Person::age(&person), 0);
     assert_eq!(Person::email(&person), None);
@@ -148,28 +149,22 @@ fn test_memory_layout_optimized() {
     // Verify memory layout is optimized
     let total_size = size_of::<PersonImpl>();
 
-    // Expected sizes on 64-bit:
-    // - StringFieldWrapper: 24 bytes (String)
-    // - StringFieldWrapper: 24 bytes (String)
-    // - MessageFieldWrapper: 8 bytes (Option<Box<_>>)
-    // - SharedFields<1>: 1 byte (BitArr storage)
-    // - padding: 7 bytes (alignment for i32 fields)
-    // - i32: 4 bytes (age)
-    // - i32: 4 bytes (score)
-    // - i32: 4 bytes (status)
-    // - i32: 4 bytes (secondary_status)
-    // Total: 80 bytes
+    // Expected sizes on 64-bit (allocator-aware layout):
+    // - StringFieldWrapper<A>: 24 bytes each
+    // - MessageFieldWrapper<_, A>: 16 bytes (Option<Box<_, A>> plus allocator)
+    // - SharedFields<1, A>: 32 bytes (presence bits + unknown buffer + allocator)
+    // - Scalars and enums: 16 bytes total
+    // Total: 104 bytes
 
     println!("PersonImpl size: {} bytes", total_size);
     println!("PersonImpl alignment: {} bytes", align_of::<PersonImpl>());
 
-    // On 64-bit systems, should be 80 bytes with BitArr
-    // (BitArr is stack-allocated, same efficiency as u32, but supports unlimited fields)
+    // On 64-bit systems, the allocator-aware form is 104 bytes.
     #[cfg(target_pointer_width = "64")]
     {
         assert_eq!(
-            total_size, 80,
-            "PersonImpl should be 80 bytes on 64-bit with BitArr for presence tracking (2 strings + 1 message + 2 enums + 2 scalars + shared fields)"
+            total_size, 104,
+            "PersonImpl should be 104 bytes on 64-bit with allocator-aware wrappers and shared state"
         );
     }
 

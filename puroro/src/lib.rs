@@ -20,6 +20,9 @@
 // Re-export protobuf-core for use by generated code
 pub use protobuf_core;
 
+use ::allocator_api2::vec::Vec as AllocVec;
+use ::allocator_extras::{Allocator, Global};
+
 /// Generic field operations using trait-based dispatch.
 ///
 /// This module provides a unified interface for all field types,
@@ -46,10 +49,25 @@ pub mod view;
 /// Core message trait that all generated Protocol Buffer messages implement.
 pub trait Message: Sized + Default + Clone + PartialEq {
     /// Parses a message from the given byte slice.
-    fn parse_from_bytes(bytes: &[u8]) -> Result<Self, crate::error::Error>;
+    fn parse_from_bytes(bytes: &[u8]) -> Result<Self, crate::error::Error> {
+        Self::parse_from_bytes_in(bytes, Global)
+    }
 
     /// Serializes this message to a byte vector.
-    fn write_to_bytes(&self) -> Result<Vec<u8>, crate::error::Error>;
+    fn write_to_bytes(&self) -> Result<Vec<u8>, crate::error::Error> {
+        let buffer = self.write_to_bytes_in(Global)?;
+        Ok(buffer.into_iter().collect())
+    }
+
+    /// Parses a message using the provided allocator.
+    fn parse_from_bytes_in<A>(bytes: &[u8], alloc: A) -> Result<Self, crate::error::Error>
+    where
+        A: Allocator + Clone + Default + 'static;
+
+    /// Serializes this message using the provided allocator.
+    fn write_to_bytes_in<A>(&self, alloc: A) -> Result<AllocVec<u8, A>, crate::error::Error>
+    where
+        A: Allocator + Clone + Default + 'static;
 
     /// Computes the serialized size of this message in bytes.
     fn compute_size(&self) -> usize;

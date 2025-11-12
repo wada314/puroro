@@ -1,50 +1,54 @@
 //! Shared fields for message implementations.
 //!
 //! This module provides a wrapper type for fields that are shared across
-//! all message fields (presence tracking, boolean values, etc.).
+//! all message fields (presence tracking, boolean values, allocator state, etc.).
 
+use ::allocator_api2::alloc::{Allocator, Global};
+use ::allocator_api2::vec::Vec;
 use bitvec::prelude::*;
 
 /// Shared fields for a message implementation.
 ///
 /// This struct contains all fields that are shared across the message,
-/// such as presence tracking bits, boolean value bits, etc.
+/// such as presence tracking bits, unknown-field storage, and allocator state.
 ///
 /// # Type Parameters
 /// - `BYTES`: Number of bytes needed for presence tracking (⌈fields/8⌉)
+/// - `A`: Allocator used for unknown fields and derived structures
 ///
 /// # Example
 /// ```ignore
 /// // For 3 fields: ⌈3/8⌉ = 1 byte
-/// pub struct PersonImpl {
-///     _shared: SharedFields<1>,
-///     name: String,
+/// pub struct PersonImpl<A: Allocator = Global> {
+///     _shared: SharedFields<1, A>,
+///     name: StringFieldWrapper<A>,
 ///     age: i32,
-///     email: String,
+///     email: StringFieldWrapper<A>,
 /// }
 /// ```
-#[derive(Debug, Clone, PartialEq)]
-pub struct SharedFields<const BYTES: usize> {
+#[derive(Debug)]
+pub struct SharedFields<const BYTES: usize, A: Allocator = Global> {
     /// Presence tracking bits
     /// Uses BitArray with fixed-size array for stack allocation
     has_bits: BitArray<[u8; BYTES]>,
-    // Future fields to be added here (not as function parameters):
-    // bool_bits: BitArray<[u8; BOOL_BYTES]>,  // Packed boolean values
-    // allocator: A,                            // Custom allocator (stored IN message)
-    // _unknown_fields: Vec<u8, A>,            // Unknown fields from newer protos
-    //
-    // Key design: All shared state is INSIDE this struct.
-    // This means field operation functions (set_*, clear_*, etc.) don't need
-    // to change their signatures when we add new shared fields.
-    // They always receive (&mut SharedFields, index, &mut field, value).
+    /// Unknown-field storage preserved during parsing
+    unknown_fields: Vec<u8, A>,
+    /// Allocator used for derived allocations
+    allocator: A,
 }
 
-impl<const BYTES: usize> SharedFields<BYTES> {
-    /// Creates new shared fields with all bits unset.
+impl<const BYTES: usize, A> SharedFields<BYTES, A>
+where
+    A: Allocator + Clone,
+{
+    /// Creates new shared fields with all bits unset using the provided allocator.
     #[inline]
-    pub fn new() -> Self {
+    pub fn new_in(alloc: A) -> Self {
+        let unknown_fields = Vec::new_in(alloc.clone());
         Self {
             has_bits: BitArray::ZERO,
+            unknown_fields,
+            allocator: alloc,
         }
     }
 
@@ -71,11 +75,76 @@ impl<const BYTES: usize> SharedFields<BYTES> {
     pub fn is_field_present(&self, bit_index: usize) -> bool {
         self.has_bits()[bit_index]
     }
+
+    /// Returns the allocator associated with these shared fields.
+    #[inline]
+    pub fn allocator(&self) -> &A {
+        &self.allocator
+    }
+
+    /// Returns a mutable reference to the allocator associated with these shared fields.
+    #[inline]
+    pub fn allocator_mut(&mut self) -> &mut A {
+        &mut self.allocator
+    }
+
+    /// Returns a slice of the unknown-field buffer.
+    #[inline]
+    pub fn unknown_fields(&self) -> &[u8] {
+        self.unknown_fields.as_slice()
+    }
+
+    /// Returns a mutable reference to the unknown-field buffer.
+    #[inline]
+    pub fn unknown_fields_mut(&mut self) -> &mut Vec<u8, A> {
+        &mut self.unknown_fields
+    }
+
+    /// Consumes the shared fields, returning the stored allocator.
+    #[inline]
+    pub fn into_allocator(self) -> A {
+        self.allocator
+    }
 }
 
-impl<const BYTES: usize> Default for SharedFields<BYTES> {
+impl<const BYTES: usize> SharedFields<BYTES, Global> {
+    /// Creates new shared fields with all bits unset using the global allocator.
+    #[inline]
+    pub fn new() -> Self {
+        Self::new_in(Global)
+    }
+}
+
+impl<const BYTES: usize, A> Clone for SharedFields<BYTES, A>
+where
+    A: Allocator + Clone,
+{
+    fn clone(&self) -> Self {
+        Self {
+            has_bits: self.has_bits,
+            unknown_fields: self.unknown_fields.clone(),
+            allocator: self.allocator.clone(),
+        }
+    }
+}
+
+impl<const BYTES: usize, A> PartialEq for SharedFields<BYTES, A>
+where
+    A: Allocator,
+{
+    fn eq(&self, other: &Self) -> bool {
+        self.has_bits == other.has_bits && self.unknown_fields == other.unknown_fields
+    }
+}
+
+impl<const BYTES: usize, A> Eq for SharedFields<BYTES, A> where A: Allocator {}
+
+impl<const BYTES: usize, A> Default for SharedFields<BYTES, A>
+where
+    A: Allocator + Default + Clone,
+{
     fn default() -> Self {
-        Self::new()
+        Self::new_in(A::default())
     }
 }
 
@@ -114,13 +183,15 @@ mod tests {
     fn test_memory_size() {
         use std::mem::size_of;
 
-        // 1 byte for ≤8 fields
-        assert_eq!(size_of::<SharedFields<1>>(), 1);
+        // Layout now includes allocator state and unknown fields buffer handles.
+        assert!(size_of::<SharedFields<1>>() >= size_of::<Vec<u8>>());
+        assert!(size_of::<SharedFields<2>>() >= size_of::<Vec<u8>>());
+        assert!(size_of::<SharedFields<13>>() >= size_of::<Vec<u8>>());
+    }
 
-        // 2 bytes for 9-16 fields
-        assert_eq!(size_of::<SharedFields<2>>(), 2);
-
-        // 13 bytes for 97-104 fields
-        assert_eq!(size_of::<SharedFields<13>>(), 13);
+    #[test]
+    fn test_unknown_fields_default() {
+        let shared = SharedFields::<5>::new();
+        assert!(shared.unknown_fields().is_empty());
     }
 }

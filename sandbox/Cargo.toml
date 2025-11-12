@@ -8,3 +8,5 @@ publish = false
 [dependencies]
 puroro = { path = "../puroro" }
 bitvec.workspace = true
+allocator_extras.workspace = true
+allocator-api2.workspace = true

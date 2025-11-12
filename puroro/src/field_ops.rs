@@ -19,10 +19,10 @@
 //! - **Editions**: Presence semantics configurable via edition settings
 
 use crate::shared::SharedFields;
-use allocator_api2::boxed::Box;
-use allocator_api2::vec::Vec;
-use allocator_extras::{Allocator, Global, String as AllocString};
-use std::marker::PhantomData;
+use ::allocator_api2::boxed::Box;
+use ::allocator_api2::vec::Vec;
+use ::allocator_extras::{Allocator, DefaultIn, Global, String as AllocString};
+use ::std::marker::PhantomData;
 
 // ============================================================================
 // Protobuf Field Types
@@ -354,6 +354,27 @@ impl<M> MessageFieldWrapper<M, Global> {
     }
 }
 
+impl<A: Allocator> DefaultIn<A> for StringFieldWrapper<A> {
+    fn default_in(alloc: A) -> Self {
+        Self::new_in(alloc)
+    }
+}
+
+impl<A: Allocator> DefaultIn<A> for BytesFieldWrapper<A> {
+    fn default_in(alloc: A) -> Self {
+        Self::new_in(alloc)
+    }
+}
+
+impl<M, A> DefaultIn<A> for MessageFieldWrapper<M, A>
+where
+    A: Allocator,
+{
+    fn default_in(alloc: A) -> Self {
+        Self::new_in(alloc)
+    }
+}
+
 impl<A: Allocator + Clone> Clone for StringFieldWrapper<A> {
     fn clone(&self) -> Self {
         Self(self.0.clone())
@@ -427,15 +448,21 @@ impl<E: Default> Default for EnumFieldWrapper<E> {
 /// type HobbiesField = FieldStorage<StringFieldWrapper, Repeated, 4, 2>;                 // repeated field, 2 bytes shared
 /// type ScoresField = FieldStorage<(StringFieldWrapper, i32), Map, 5, 1>;               // map field, 1 byte shared
 /// ```
-#[derive(Debug, Clone, PartialEq)]
-pub struct FieldStorage<T, L: FieldLabel, const FIELD_NUMBER: u32, const SHARED_BYTES_LEN: usize> {
+#[derive(Debug, Clone)]
+pub struct FieldStorage<
+    T,
+    L: FieldLabel,
+    const FIELD_NUMBER: u32,
+    const SHARED_BYTES_LEN: usize,
+    A: Allocator = Global,
+> {
     /// The actual field data
     pub data: T,
-    _phantom: PhantomData<L>,
+    _phantom: PhantomData<(L, A)>,
 }
 
-impl<T, L: FieldLabel, const FIELD_NUMBER: u32, const SHARED_BYTES_LEN: usize>
-    FieldStorage<T, L, FIELD_NUMBER, SHARED_BYTES_LEN>
+impl<T, L: FieldLabel, const FIELD_NUMBER: u32, const SHARED_BYTES_LEN: usize, A: Allocator>
+    FieldStorage<T, L, FIELD_NUMBER, SHARED_BYTES_LEN, A>
 {
     /// Creates a new FieldStorage with the given data
     pub fn new(data: T) -> Self {
@@ -443,6 +470,32 @@ impl<T, L: FieldLabel, const FIELD_NUMBER: u32, const SHARED_BYTES_LEN: usize>
             data,
             _phantom: PhantomData,
         }
+    }
+
+    /// Creates a new FieldStorage whose data is constructed using the provided allocator.
+    pub fn new_in<F>(alloc: A, init: F) -> Self
+    where
+        F: FnOnce(A) -> T,
+    {
+        Self::new(init(alloc))
+    }
+
+    /// Creates a new FieldStorage with data obtained from the `DefaultIn` trait.
+    pub fn default_in(alloc: A) -> Self
+    where
+        T: DefaultIn<A>,
+    {
+        Self::new(T::default_in(alloc))
+    }
+
+    /// Consumes the storage, returning the inner data.
+    pub fn into_inner(self) -> T {
+        self.data
+    }
+
+    /// Returns a mutable reference to the stored data.
+    pub fn data_mut(&mut self) -> &mut T {
+        &mut self.data
     }
 }
 
@@ -463,8 +516,13 @@ impl<T, L: FieldLabel, const FIELD_NUMBER: u32, const SHARED_BYTES_LEN: usize>
 ///
 /// For now, this implementation works well with standard library types
 /// that have their own Default implementations.
-impl<T: Default, L: FieldLabel, const FIELD_NUMBER: u32, const SHARED_BYTES_LEN: usize> Default
-    for FieldStorage<T, L, FIELD_NUMBER, SHARED_BYTES_LEN>
+impl<
+    T: Default,
+    L: FieldLabel,
+    const FIELD_NUMBER: u32,
+    const SHARED_BYTES_LEN: usize,
+    A: Allocator,
+> Default for FieldStorage<T, L, FIELD_NUMBER, SHARED_BYTES_LEN, A>
 {
     fn default() -> Self {
         Self {
@@ -472,6 +530,24 @@ impl<T: Default, L: FieldLabel, const FIELD_NUMBER: u32, const SHARED_BYTES_LEN:
             _phantom: PhantomData,
         }
     }
+}
+
+impl<
+    T: PartialEq,
+    L: FieldLabel,
+    const FIELD_NUMBER: u32,
+    const SHARED_BYTES_LEN: usize,
+    A: Allocator,
+> PartialEq for FieldStorage<T, L, FIELD_NUMBER, SHARED_BYTES_LEN, A>
+{
+    fn eq(&self, other: &Self) -> bool {
+        self.data == other.data
+    }
+}
+
+impl<T: Eq, L: FieldLabel, const FIELD_NUMBER: u32, const SHARED_BYTES_LEN: usize, A: Allocator> Eq
+    for FieldStorage<T, L, FIELD_NUMBER, SHARED_BYTES_LEN, A>
+{
 }
 
 // ============================================================================
@@ -538,16 +614,17 @@ pub trait FieldOperations<T, L: FieldLabel, const FIELD_NUMBER: u32, const SHARE
 // ============================================================================
 
 /// Implementation for scalar types with ImplicitOptional
-impl<T: ScalarType, const FIELD_NUMBER: u32, const SHARED_BYTES_LEN: usize>
+impl<T: ScalarType, A: Allocator + Clone, const FIELD_NUMBER: u32, const SHARED_BYTES_LEN: usize>
     FieldOperations<T, ImplicitOptional, FIELD_NUMBER, SHARED_BYTES_LEN>
-    for FieldStorage<T, ImplicitOptional, FIELD_NUMBER, SHARED_BYTES_LEN>
+    for FieldStorage<T, ImplicitOptional, FIELD_NUMBER, SHARED_BYTES_LEN, A>
 {
     type SetValue<'a> = T;
     type GetValue<'a>
         = T
     where
-        T: 'a;
-    type SharedFields = SharedFields<SHARED_BYTES_LEN>;
+        T: 'a,
+        A: 'a;
+    type SharedFields = SharedFields<SHARED_BYTES_LEN, A>;
 
     const FIELD_TYPE: ProtobufFieldType = ProtobufFieldType::Int32; // Default to Int32
 
@@ -574,18 +651,20 @@ impl<T: ScalarType, const FIELD_NUMBER: u32, const SHARED_BYTES_LEN: usize>
 /// Implementation for scalar types with ExplicitOptional
 impl<
     T: ScalarType,
+    A: Allocator + Clone,
     const FIELD_NUMBER: u32,
     const PRESENCE_BIT_INDEX: usize,
     const SHARED_BYTES_LEN: usize,
 > FieldOperations<T, ExplicitOptional<PRESENCE_BIT_INDEX>, FIELD_NUMBER, SHARED_BYTES_LEN>
-    for FieldStorage<T, ExplicitOptional<PRESENCE_BIT_INDEX>, FIELD_NUMBER, SHARED_BYTES_LEN>
+    for FieldStorage<T, ExplicitOptional<PRESENCE_BIT_INDEX>, FIELD_NUMBER, SHARED_BYTES_LEN, A>
 {
     type SetValue<'a> = T;
     type GetValue<'a>
         = Option<T>
     where
-        T: 'a;
-    type SharedFields = SharedFields<SHARED_BYTES_LEN>;
+        T: 'a,
+        A: 'a;
+    type SharedFields = SharedFields<SHARED_BYTES_LEN, A>;
 
     const FIELD_TYPE: ProtobufFieldType = ProtobufFieldType::Int32; // Default to Int32
 
@@ -617,13 +696,16 @@ impl<
 // ============================================================================
 
 /// Implementation for StringFieldWrapper with ImplicitOptional
-impl<A: Allocator + 'static, const FIELD_NUMBER: u32, const SHARED_BYTES_LEN: usize>
+impl<A: Allocator + Clone, const FIELD_NUMBER: u32, const SHARED_BYTES_LEN: usize>
     FieldOperations<StringFieldWrapper<A>, ImplicitOptional, FIELD_NUMBER, SHARED_BYTES_LEN>
-    for FieldStorage<StringFieldWrapper<A>, ImplicitOptional, FIELD_NUMBER, SHARED_BYTES_LEN>
+    for FieldStorage<StringFieldWrapper<A>, ImplicitOptional, FIELD_NUMBER, SHARED_BYTES_LEN, A>
 {
     type SetValue<'a> = &'a str;
-    type GetValue<'a> = &'a str;
-    type SharedFields = SharedFields<SHARED_BYTES_LEN>;
+    type GetValue<'a>
+        = &'a str
+    where
+        A: 'a;
+    type SharedFields = SharedFields<SHARED_BYTES_LEN, A>;
 
     const FIELD_TYPE: ProtobufFieldType = ProtobufFieldType::String;
 
@@ -650,7 +732,7 @@ impl<A: Allocator + 'static, const FIELD_NUMBER: u32, const SHARED_BYTES_LEN: us
 
 /// Implementation for StringFieldWrapper with ExplicitOptional
 impl<
-    A: Allocator + 'static,
+    A: Allocator + Clone,
     const FIELD_NUMBER: u32,
     const PRESENCE_BIT_INDEX: usize,
     const SHARED_BYTES_LEN: usize,
@@ -666,11 +748,15 @@ impl<
         ExplicitOptional<PRESENCE_BIT_INDEX>,
         FIELD_NUMBER,
         SHARED_BYTES_LEN,
+        A,
     >
 {
     type SetValue<'a> = &'a str;
-    type GetValue<'a> = Option<&'a str>;
-    type SharedFields = SharedFields<SHARED_BYTES_LEN>;
+    type GetValue<'a>
+        = Option<&'a str>
+    where
+        A: 'a;
+    type SharedFields = SharedFields<SHARED_BYTES_LEN, A>;
 
     const FIELD_TYPE: ProtobufFieldType = ProtobufFieldType::String;
 
@@ -704,15 +790,18 @@ impl<
 /// No need for presence bits - the Option<Box<M>> handles presence directly.
 impl<
     M: crate::Message + 'static,
-    A: Allocator + Clone + 'static,
+    A: Allocator + Clone,
     const FIELD_NUMBER: u32,
     const SHARED_BYTES_LEN: usize,
 > FieldOperations<MessageFieldWrapper<M, A>, ImplicitOptional, FIELD_NUMBER, SHARED_BYTES_LEN>
-    for FieldStorage<MessageFieldWrapper<M, A>, ImplicitOptional, FIELD_NUMBER, SHARED_BYTES_LEN>
+    for FieldStorage<MessageFieldWrapper<M, A>, ImplicitOptional, FIELD_NUMBER, SHARED_BYTES_LEN, A>
 {
     type SetValue<'a> = &'a M;
-    type GetValue<'a> = Option<&'a M>; // Message fields always return Option
-    type SharedFields = SharedFields<SHARED_BYTES_LEN>;
+    type GetValue<'a>
+        = Option<&'a M>
+    where
+        A: 'a;
+    type SharedFields = SharedFields<SHARED_BYTES_LEN, A>;
 
     const FIELD_TYPE: ProtobufFieldType = ProtobufFieldType::Message;
 
@@ -744,7 +833,7 @@ impl<
 /// No need for presence bits - the Option<Box<M>> handles presence directly.
 impl<
     M: crate::Message + 'static,
-    A: Allocator + Clone + 'static,
+    A: Allocator + Clone,
     const FIELD_NUMBER: u32,
     const PRESENCE_BIT_INDEX: usize,
     const SHARED_BYTES_LEN: usize,
@@ -760,11 +849,15 @@ impl<
         ExplicitOptional<PRESENCE_BIT_INDEX>,
         FIELD_NUMBER,
         SHARED_BYTES_LEN,
+        A,
     >
 {
     type SetValue<'a> = &'a M;
-    type GetValue<'a> = Option<&'a M>;
-    type SharedFields = SharedFields<SHARED_BYTES_LEN>;
+    type GetValue<'a>
+        = Option<&'a M>
+    where
+        A: 'a;
+    type SharedFields = SharedFields<SHARED_BYTES_LEN, A>;
 
     const FIELD_TYPE: ProtobufFieldType = ProtobufFieldType::Message;
 
