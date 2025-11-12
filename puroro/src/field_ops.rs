@@ -789,18 +789,22 @@ impl<
 /// Uses heap allocation with pointer null checks for presence tracking.
 /// No need for presence bits - the Option<Box<M>> handles presence directly.
 impl<
-    M: crate::Message + 'static,
+    M: crate::Message,
     A: Allocator + Clone,
     const FIELD_NUMBER: u32,
     const SHARED_BYTES_LEN: usize,
 > FieldOperations<MessageFieldWrapper<M, A>, ImplicitOptional, FIELD_NUMBER, SHARED_BYTES_LEN>
     for FieldStorage<MessageFieldWrapper<M, A>, ImplicitOptional, FIELD_NUMBER, SHARED_BYTES_LEN, A>
 {
-    type SetValue<'a> = &'a M;
+    type SetValue<'a>
+        = &'a M
+    where
+        M: 'a;
     type GetValue<'a>
         = Option<&'a M>
     where
-        A: 'a;
+        A: 'a,
+        M: 'a;
     type SharedFields = SharedFields<SHARED_BYTES_LEN, A>;
 
     const FIELD_TYPE: ProtobufFieldType = ProtobufFieldType::Message;
@@ -832,7 +836,7 @@ impl<
 /// Uses heap allocation with pointer null checks for presence tracking.
 /// No need for presence bits - the Option<Box<M>> handles presence directly.
 impl<
-    M: crate::Message + 'static,
+    M: crate::Message,
     A: Allocator + Clone,
     const FIELD_NUMBER: u32,
     const PRESENCE_BIT_INDEX: usize,
@@ -856,7 +860,8 @@ impl<
     type GetValue<'a>
         = Option<&'a M>
     where
-        A: 'a;
+        A: 'a,
+        M: 'a;
     type SharedFields = SharedFields<SHARED_BYTES_LEN, A>;
 
     const FIELD_TYPE: ProtobufFieldType = ProtobufFieldType::Message;
