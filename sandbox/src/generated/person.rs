@@ -483,13 +483,14 @@ where
 {
     /// Creates a new Person with default values using the provided allocator.
     pub fn new_in(alloc: A) -> Self {
+        let shared = SharedFields::new_in(alloc.clone());
         Self {
-            name: FieldStorage::new(StringFieldWrapper::new_in(alloc.clone())),
-            email: FieldStorage::new(StringFieldWrapper::new_in(alloc.clone())),
-            address: FieldStorage::new(MessageFieldWrapper::new_in(alloc.clone())),
+            name: FieldStorage::default_in(alloc.clone()),
+            email: FieldStorage::default_in(alloc.clone()),
+            address: FieldStorage::default_in(alloc.clone()),
             status: Default::default(),
             secondary_status: Default::default(),
-            _shared: SharedFields::new_in(alloc),
+            _shared: shared,
             age: Default::default(),
             score: Default::default(),
         }
