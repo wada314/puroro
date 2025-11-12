@@ -11,7 +11,7 @@ use puroro::{
     error::Error,
     field_ops::{
         ExplicitOptional, FieldOperations, FieldStorage, ImplicitOptional, MessageFieldWrapper,
-        StringFieldWrapper,
+        SingularMessage, StringFieldWrapper,
     },
     shared::SharedFields,
     view::ViewCow,
@@ -466,7 +466,7 @@ pub struct PersonImpl<A: Allocator = Global> {
 
     // Message fields: use heap allocation with Option<Box<M>> for presence tracking
     // No presence bits needed - Option<Box<M>> handles presence directly
-    address: FieldStorage<MessageFieldWrapper<AddressImpl<A>, A>, ImplicitOptional, 6, 1, A>, // Field 6, heap-allocated presence
+    address: FieldStorage<MessageFieldWrapper<AddressImpl<A>, A>, SingularMessage, 6, 1, A>, // Field 6, heap-allocated presence
 
     // Enum fields: stored as i32
     status: FieldStorage<i32, ImplicitOptional, 4, 1, A>, // Field 4, implicit presence, 1 byte shared

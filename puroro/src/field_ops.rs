@@ -115,6 +115,11 @@ pub trait FieldLabel: private::Sealed {}
 ///
 /// These fields are always considered "present" and return default values
 /// when not explicitly set.
+///
+/// **Note**: For message fields, use `SingularMessage` instead of `ImplicitOptional`.
+/// Message fields use `Option<Box<M>>` for presence tracking, so they don't need
+/// presence bits. `ImplicitOptional` is designed for scalar types that use presence
+/// bits or default value checks.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct ImplicitOptional;
 
@@ -122,6 +127,11 @@ pub struct ImplicitOptional;
 ///
 /// These fields track presence explicitly and return `Option<T>`.
 /// The presence bit index is encoded at the type level for type safety.
+///
+/// **Note**: For message fields, use `SingularMessage` instead of `ExplicitOptional`.
+/// Message fields use `Option<Box<M>>` for presence tracking, so they don't need
+/// presence bits. `ExplicitOptional` is designed for scalar types that require
+/// explicit presence bit tracking.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct ExplicitOptional<const PRESENCE_BIT_INDEX: usize>;
 
@@ -137,10 +147,20 @@ pub struct Repeated;
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Map;
 
+/// Marker for singular (non-repeated) message fields.
+///
+/// Singular message fields use `Option<Box<M>>` for presence tracking,
+/// so they don't need presence bits. This label is used for both
+/// implicit and explicit optional message fields.
+/// Repeated message fields use the `Repeated` label instead.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct SingularMessage;
+
 impl FieldLabel for ImplicitOptional {}
 impl<const PRESENCE_BIT_INDEX: usize> FieldLabel for ExplicitOptional<PRESENCE_BIT_INDEX> {}
 impl FieldLabel for Repeated {}
 impl FieldLabel for Map {}
+impl FieldLabel for SingularMessage {}
 
 mod private {
     pub trait Sealed {}
@@ -148,6 +168,7 @@ mod private {
     impl<const PRESENCE_BIT_INDEX: usize> Sealed for super::ExplicitOptional<PRESENCE_BIT_INDEX> {}
     impl Sealed for super::Repeated {}
     impl Sealed for super::Map {}
+    impl Sealed for super::SingularMessage {}
 }
 
 // ============================================================================
@@ -784,73 +805,19 @@ impl<
     }
 }
 
-/// Implementation for MessageFieldWrapper with ImplicitOptional
+/// Implementation for MessageFieldWrapper with SingularMessage label
 ///
 /// Uses heap allocation with pointer null checks for presence tracking.
 /// No need for presence bits - the Option<Box<M>> handles presence directly.
+/// This implementation is used for both implicit and explicit optional message fields.
+/// Repeated message fields use the `Repeated` label instead.
 impl<
     M: crate::Message,
     A: Allocator + Clone,
     const FIELD_NUMBER: u32,
     const SHARED_BYTES_LEN: usize,
-> FieldOperations<MessageFieldWrapper<M, A>, ImplicitOptional, FIELD_NUMBER, SHARED_BYTES_LEN>
-    for FieldStorage<MessageFieldWrapper<M, A>, ImplicitOptional, FIELD_NUMBER, SHARED_BYTES_LEN, A>
-{
-    type SetValue<'a> = ();
-    type GetValue<'a>
-        = Option<&'a M>
-    where
-        A: 'a,
-        M: 'a;
-    type SharedFields = SharedFields<SHARED_BYTES_LEN, A>;
-
-    const FIELD_TYPE: ProtobufFieldType = ProtobufFieldType::Message;
-
-    fn set(&mut self, _shared: &mut Self::SharedFields, _value: Self::SetValue<'_>) {
-        // TODO: Implement message field setter when needed
-        // Message fields are typically set via mutable accessors (e.g., address_mut())
-    }
-
-    fn get<'a>(&'a self, _shared: &'a Self::SharedFields) -> Self::GetValue<'a> {
-        // Use Option<Box<M>> for presence checking
-        self.data.value.as_ref().map(|boxed| boxed.as_ref())
-    }
-
-    fn clear(&mut self, _shared: &mut Self::SharedFields) {
-        self.data.value = None;
-        // No presence bit needed - Option<Box<M>> handles presence
-    }
-
-    fn is_present(&self, _shared: &Self::SharedFields) -> bool {
-        // Use Option<Box<M>> for presence checking
-        self.data.value.is_some()
-    }
-}
-
-/// Implementation for MessageFieldWrapper with ExplicitOptional
-///
-/// Uses heap allocation with pointer null checks for presence tracking.
-/// No need for presence bits - the Option<Box<M>> handles presence directly.
-impl<
-    M: crate::Message,
-    A: Allocator + Clone,
-    const FIELD_NUMBER: u32,
-    const PRESENCE_BIT_INDEX: usize,
-    const SHARED_BYTES_LEN: usize,
->
-    FieldOperations<
-        MessageFieldWrapper<M, A>,
-        ExplicitOptional<PRESENCE_BIT_INDEX>,
-        FIELD_NUMBER,
-        SHARED_BYTES_LEN,
-    >
-    for FieldStorage<
-        MessageFieldWrapper<M, A>,
-        ExplicitOptional<PRESENCE_BIT_INDEX>,
-        FIELD_NUMBER,
-        SHARED_BYTES_LEN,
-        A,
-    >
+> FieldOperations<MessageFieldWrapper<M, A>, SingularMessage, FIELD_NUMBER, SHARED_BYTES_LEN>
+    for FieldStorage<MessageFieldWrapper<M, A>, SingularMessage, FIELD_NUMBER, SHARED_BYTES_LEN, A>
 {
     type SetValue<'a> = ();
     type GetValue<'a>
