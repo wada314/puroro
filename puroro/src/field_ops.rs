@@ -796,10 +796,7 @@ impl<
 > FieldOperations<MessageFieldWrapper<M, A>, ImplicitOptional, FIELD_NUMBER, SHARED_BYTES_LEN>
     for FieldStorage<MessageFieldWrapper<M, A>, ImplicitOptional, FIELD_NUMBER, SHARED_BYTES_LEN, A>
 {
-    type SetValue<'a>
-        = &'a M
-    where
-        M: 'a;
+    type SetValue<'a> = ();
     type GetValue<'a>
         = Option<&'a M>
     where
@@ -809,10 +806,9 @@ impl<
 
     const FIELD_TYPE: ProtobufFieldType = ProtobufFieldType::Message;
 
-    fn set(&mut self, _shared: &mut Self::SharedFields, value: Self::SetValue<'_>) {
-        let allocator = self.data.allocator.clone();
-        self.data.value = Some(Box::new_in(value.clone(), allocator));
-        // No presence bit needed - Option<Box<M>> handles presence
+    fn set(&mut self, _shared: &mut Self::SharedFields, _value: Self::SetValue<'_>) {
+        // TODO: Implement message field setter when needed
+        // Message fields are typically set via mutable accessors (e.g., address_mut())
     }
 
     fn get<'a>(&'a self, _shared: &'a Self::SharedFields) -> Self::GetValue<'a> {
@@ -856,7 +852,7 @@ impl<
         A,
     >
 {
-    type SetValue<'a> = &'a M;
+    type SetValue<'a> = ();
     type GetValue<'a>
         = Option<&'a M>
     where
@@ -866,10 +862,9 @@ impl<
 
     const FIELD_TYPE: ProtobufFieldType = ProtobufFieldType::Message;
 
-    fn set(&mut self, _shared: &mut Self::SharedFields, value: Self::SetValue<'_>) {
-        let allocator = self.data.allocator.clone();
-        self.data.value = Some(Box::new_in(value.clone(), allocator));
-        // No presence bit needed - Option<Box<M>> handles presence
+    fn set(&mut self, _shared: &mut Self::SharedFields, _value: Self::SetValue<'_>) {
+        // TODO: Implement message field setter when needed
+        // Message fields are typically set via mutable accessors (e.g., address_mut())
     }
 
     fn get<'a>(&'a self, _shared: &'a Self::SharedFields) -> Self::GetValue<'a> {
