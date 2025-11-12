@@ -531,28 +531,28 @@ where
 
 impl<A> Eq for PersonImpl<A> where A: Allocator {}
 
-impl<A: Allocator + Clone + Default + 'static> Person for PersonImpl<A> {
+impl<A: Allocator + Clone + 'static> Person for PersonImpl<A> {
     fn address(&self) -> impl Address + use<'_, A> {
         self.address.get(&self._shared)
     }
     // All other methods use default implementations from the trait definition
 }
 
-impl<A: Allocator + Clone + Default + 'static> PersonAppend for PersonImpl<A> {
+impl<A: Allocator + Clone + 'static> PersonAppend for PersonImpl<A> {
     fn address_mut(&mut self) -> impl AddressAppend + use<'_, A> {
         self.address.data.as_mut()
     }
     // All other methods use default implementations from the trait definition
 }
 
-impl<A: Allocator + Clone + Default + 'static> PersonMut for PersonImpl<A> {
+impl<A: Allocator + Clone + 'static> PersonMut for PersonImpl<A> {
     fn address_mut(&mut self) -> impl AddressMut + use<'_, A> {
         self.address.data.as_mut()
     }
     // All other methods use default implementations from the trait definition
 }
 
-impl<A: Allocator + Clone + Default + 'static> DynPerson for PersonImpl<A> {
+impl<A: Allocator + Clone + 'static> DynPerson for PersonImpl<A> {
     fn name(&self) -> &str {
         self.name.get(&self._shared)
     }
@@ -592,14 +592,14 @@ impl<A: Allocator + Clone + Default + 'static> DynPerson for PersonImpl<A> {
     }
 }
 
-impl<A: Allocator + Clone + Default + 'static> DynPersonAppend for PersonImpl<A> {
+impl<A: Allocator + Clone + 'static> DynPersonAppend for PersonImpl<A> {
     // set_* methods - sample implementation (others follow same pattern: field.set(&mut self._shared, v) or field.set(&mut self._shared, v.to_wire()))
     fn set_name(&mut self, v: &str) {
         self.name.set(&mut self._shared, v)
     }
 }
 
-impl<A: Allocator + Clone + Default + 'static> DynPersonMut for PersonImpl<A> {
+impl<A: Allocator + Clone + 'static> DynPersonMut for PersonImpl<A> {
     // clear_* methods - sample implementation (others follow same pattern: field.clear(&mut self._shared))
     fn clear_name(&mut self) {
         self.name.clear(&mut self._shared)
