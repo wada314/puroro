@@ -175,7 +175,10 @@ mod private {
 // Scalar Type Trait
 // ============================================================================
 
-/// Trait for scalar protobuf field types.
+/// Trait for Rust types that correspond to protobuf numerical field types.
+///
+/// This trait is implemented for Rust primitive types (i32, i64, u32, u64, f32, f64, bool)
+/// that map to protobuf's scalar/numerical field types.
 pub trait ScalarType: Default + Copy + Clone + PartialEq {}
 
 impl ScalarType for i32 {}
