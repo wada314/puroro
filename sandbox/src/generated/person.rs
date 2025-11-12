@@ -421,7 +421,7 @@ impl<A: Allocator + Clone> DynAddressMut for AddressImpl<A> {
     }
 }
 
-impl<A: Allocator + Clone + Default> Message for AddressImpl<A> {
+impl<A: Allocator + Clone> Message for AddressImpl<A> {
     fn parse_from_bytes_in<B>(_bytes: &[u8], _alloc: B) -> Result<Self, Error>
     where
         B: Allocator + Clone,
@@ -531,28 +531,28 @@ where
 
 impl<A> Eq for PersonImpl<A> where A: Allocator {}
 
-impl<A: Allocator + Clone + Default> Person for PersonImpl<A> {
+impl<A: Allocator + Clone> Person for PersonImpl<A> {
     fn address(&self) -> impl Address + use<'_, A> {
         self.address.get(&self._shared)
     }
     // All other methods use default implementations from the trait definition
 }
 
-impl<A: Allocator + Clone + Default> PersonAppend for PersonImpl<A> {
+impl<A: Allocator + Clone> PersonAppend for PersonImpl<A> {
     fn address_mut(&mut self) -> impl AddressAppend + use<'_, A> {
         self.address.data.as_mut()
     }
     // All other methods use default implementations from the trait definition
 }
 
-impl<A: Allocator + Clone + Default> PersonMut for PersonImpl<A> {
+impl<A: Allocator + Clone> PersonMut for PersonImpl<A> {
     fn address_mut(&mut self) -> impl AddressMut + use<'_, A> {
         self.address.data.as_mut()
     }
     // All other methods use default implementations from the trait definition
 }
 
-impl<A: Allocator + Clone + Default> DynPerson for PersonImpl<A> {
+impl<A: Allocator + Clone> DynPerson for PersonImpl<A> {
     fn name(&self) -> &str {
         self.name.get(&self._shared)
     }
@@ -592,14 +592,14 @@ impl<A: Allocator + Clone + Default> DynPerson for PersonImpl<A> {
     }
 }
 
-impl<A: Allocator + Clone + Default> DynPersonAppend for PersonImpl<A> {
+impl<A: Allocator + Clone> DynPersonAppend for PersonImpl<A> {
     // set_* methods - sample implementation (others follow same pattern: field.set(&mut self._shared, v) or field.set(&mut self._shared, v.to_wire()))
     fn set_name(&mut self, v: &str) {
         self.name.set(&mut self._shared, v)
     }
 }
 
-impl<A: Allocator + Clone + Default> DynPersonMut for PersonImpl<A> {
+impl<A: Allocator + Clone> DynPersonMut for PersonImpl<A> {
     // clear_* methods - sample implementation (others follow same pattern: field.clear(&mut self._shared))
     fn clear_name(&mut self) {
         self.name.clear(&mut self._shared)
@@ -613,7 +613,7 @@ impl<A: Allocator + Clone + Default> DynPersonMut for PersonImpl<A> {
     }
 }
 
-impl<A: Allocator + Clone + Default> Message for PersonImpl<A> {
+impl<A: Allocator + Clone> Message for PersonImpl<A> {
     fn parse_from_bytes_in<B>(_bytes: &[u8], _alloc: B) -> Result<Self, Error>
     where
         B: Allocator + Clone,

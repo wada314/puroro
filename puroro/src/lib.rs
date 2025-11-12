@@ -47,7 +47,7 @@ pub mod shared;
 pub mod view;
 
 /// Core message trait that all generated Protocol Buffer messages implement.
-pub trait Message: Sized + Default + Clone + PartialEq {
+pub trait Message: Sized + Clone + PartialEq {
     /// Parses a message from the given byte slice.
     fn parse_from_bytes(bytes: &[u8]) -> Result<Self, crate::error::Error> {
         Self::parse_from_bytes_in(bytes, Global)
