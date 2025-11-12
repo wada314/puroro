@@ -62,12 +62,12 @@ pub trait Message: Sized + Default + Clone + PartialEq {
     /// Parses a message using the provided allocator.
     fn parse_from_bytes_in<A>(bytes: &[u8], alloc: A) -> Result<Self, crate::error::Error>
     where
-        A: Allocator + Clone + Default + 'static;
+        A: Allocator + Clone + 'static;
 
     /// Serializes this message using the provided allocator.
     fn write_to_bytes_in<A>(&self, alloc: A) -> Result<AllocVec<u8, A>, crate::error::Error>
     where
-        A: Allocator + Clone + Default + 'static;
+        A: Allocator + Clone + 'static;
 
     /// Computes the serialized size of this message in bytes.
     fn compute_size(&self) -> usize;

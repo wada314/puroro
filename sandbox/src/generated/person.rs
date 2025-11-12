@@ -389,9 +389,9 @@ where
 
 impl<A> Eq for AddressImpl<A> where A: Allocator {}
 
-impl<A: Allocator + Clone + Default + 'static> Address for AddressImpl<A> {}
+impl<A: Allocator + Clone + 'static> Address for AddressImpl<A> {}
 
-impl<A: Allocator + Clone + Default + 'static> DynAddress for AddressImpl<A> {
+impl<A: Allocator + Clone + 'static> DynAddress for AddressImpl<A> {
     fn street(&self) -> &str {
         self.street.get(&self._shared)
     }
@@ -403,18 +403,18 @@ impl<A: Allocator + Clone + Default + 'static> DynAddress for AddressImpl<A> {
     }
 }
 
-impl<A: Allocator + Clone + Default + 'static> AddressAppend for AddressImpl<A> {}
+impl<A: Allocator + Clone + 'static> AddressAppend for AddressImpl<A> {}
 
-impl<A: Allocator + Clone + Default + 'static> DynAddressAppend for AddressImpl<A> {
+impl<A: Allocator + Clone + 'static> DynAddressAppend for AddressImpl<A> {
     // set_* methods - sample implementation (others follow same pattern: field.set(&mut self._shared, v))
     fn set_street(&mut self, v: &str) {
         self.street.set(&mut self._shared, v)
     }
 }
 
-impl<A: Allocator + Clone + Default + 'static> AddressMut for AddressImpl<A> {}
+impl<A: Allocator + Clone + 'static> AddressMut for AddressImpl<A> {}
 
-impl<A: Allocator + Clone + Default + 'static> DynAddressMut for AddressImpl<A> {
+impl<A: Allocator + Clone + 'static> DynAddressMut for AddressImpl<A> {
     // clear_* methods - sample implementation (others follow same pattern: field.clear(&mut self._shared))
     fn clear_street(&mut self) {
         self.street.clear(&mut self._shared)
@@ -424,14 +424,14 @@ impl<A: Allocator + Clone + Default + 'static> DynAddressMut for AddressImpl<A> 
 impl<A: Allocator + Clone + Default + 'static> Message for AddressImpl<A> {
     fn parse_from_bytes_in<B>(_bytes: &[u8], _alloc: B) -> Result<Self, Error>
     where
-        B: Allocator + Clone + Default + 'static,
+        B: Allocator + Clone + 'static,
     {
         todo!("Parsing not yet implemented")
     }
 
     fn write_to_bytes_in<B>(&self, _alloc: B) -> Result<AllocVec<u8, B>, Error>
     where
-        B: Allocator + Clone + Default + 'static,
+        B: Allocator + Clone + 'static,
     {
         todo!("Serialization not yet implemented")
     }
@@ -616,7 +616,7 @@ impl<A: Allocator + Clone + Default + 'static> DynPersonMut for PersonImpl<A> {
 impl<A: Allocator + Clone + Default + 'static> Message for PersonImpl<A> {
     fn parse_from_bytes_in<B>(_bytes: &[u8], _alloc: B) -> Result<Self, Error>
     where
-        B: Allocator + Clone + Default + 'static,
+        B: Allocator + Clone + 'static,
     {
         // TODO: Implement actual parsing
         todo!("Parsing not yet implemented")
@@ -624,7 +624,7 @@ impl<A: Allocator + Clone + Default + 'static> Message for PersonImpl<A> {
 
     fn write_to_bytes_in<B>(&self, _alloc: B) -> Result<AllocVec<u8, B>, Error>
     where
-        B: Allocator + Clone + Default + 'static,
+        B: Allocator + Clone + 'static,
     {
         // TODO: Implement actual serialization
         todo!("Serialization not yet implemented")
