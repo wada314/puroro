@@ -13,6 +13,22 @@ pub trait Repeated<T> {
     fn iter_box(&self) -> Box<dyn Iterator<Item = T> + '_>;
 }
 
+// Repeated implementation for slices of Copy scalars (e.g., i32)
+impl<'a, T: Copy + 'a> Repeated<T> for [T] {
+    fn len(&self) -> usize {
+        <[T]>::len(self)
+    }
+    fn is_empty(&self) -> bool {
+        <[T]>::is_empty(self)
+    }
+    fn get(&self, index: usize) -> Option<T> {
+        <[T]>::get(self, index).copied()
+    }
+    fn iter_box(&self) -> Box<dyn Iterator<Item = T> + '_> {
+        Box::new(self.iter().copied())
+    }
+}
+
 /// Adapter over an allocator-aware Vec for Copy items (e.g., i32).
 pub struct VecRepeated<'a, T: Copy, A: Allocator> {
     vec: &'a Vec<T, A>,

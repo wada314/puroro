@@ -6,7 +6,6 @@
 
 use ::allocator_api2::vec::Vec as AllocVec;
 use ::allocator_extras::{Allocator, Global};
-use ::allocator_api2::unsize_box;
 use puroro::{
     Message,
     error::Error,
@@ -462,6 +461,26 @@ impl<A: Allocator + Clone> DynAddressMut for AddressImpl<A> {
     }
 }
 
+// Implement Repeated for slices of AddressImpl to avoid allocation in addresses().
+impl<'a, A> Repeated<ViewCow<'a, dyn DynAddress>> for [AddressImpl<A>]
+where
+    A: Allocator + Clone + 'a,
+{
+    fn len(&self) -> usize {
+        <[AddressImpl<A>]>::len(self)
+    }
+    fn is_empty(&self) -> bool {
+        <[AddressImpl<A>]>::is_empty(self)
+    }
+    fn get(&self, index: usize) -> Option<ViewCow<'a, dyn DynAddress>> {
+        self.get(index)
+            .map(|m| ViewCow::Borrowed(m as &dyn DynAddress))
+    }
+    fn iter_box(&self) -> Box<dyn Iterator<Item = ViewCow<'a, dyn DynAddress>> + '_> {
+        Box::new(self.iter().map(|m| ViewCow::Borrowed(m as &dyn DynAddress)))
+    }
+}
+
 impl<A: Allocator + Clone> Message for AddressImpl<A> {
     fn parse_from_bytes_in<B>(_bytes: &[u8], _alloc: B) -> Result<Self, Error>
     where
@@ -634,45 +653,18 @@ impl<A: Allocator + Clone> DynPerson for PersonImpl<A> {
     }
 
     fn scores(&self) -> ViewCow<'_, dyn Repeated<i32>> {
-        let boxed = ::allocator_api2::boxed::Box::new_in(
-            VecRepeated::new(&self.scores.data),
-            Global,
-        );
-        let boxed_dyn: ::allocator_api2::boxed::Box<dyn Repeated<i32>> = unsize_box!(boxed);
-        ViewCow::Owned(boxed_dyn)
+        // Borrowed trait object over the slice; no allocation.
+        let slice: &[i32] = &self.scores.data;
+        let rep: &dyn Repeated<i32> = slice;
+        ViewCow::Borrowed(rep)
     }
 
     fn addresses(&self) -> ViewCow<'_, dyn Repeated<ViewCow<'_, dyn DynAddress>>> {
-        struct AddressesRepeated<'a, A: Allocator> {
-            vec: &'a AllocVec<AddressImpl<A>, A>,
-        }
-        impl<'a, A: Allocator + Clone + 'a> Repeated<ViewCow<'a, dyn DynAddress>> for AddressesRepeated<'a, A> {
-            fn len(&self) -> usize {
-                self.vec.len()
-            }
-            fn is_empty(&self) -> bool {
-                self.vec.is_empty()
-            }
-            fn get(&self, index: usize) -> Option<ViewCow<'a, dyn DynAddress>> {
-                self.vec
-                    .get(index)
-                    .map(|m| ViewCow::Borrowed(m as &dyn DynAddress))
-            }
-            fn iter_box(&self) -> Box<dyn Iterator<Item = ViewCow<'a, dyn DynAddress>> + '_> {
-                Box::new(
-                    self.vec
-                        .iter()
-                        .map(|m| ViewCow::Borrowed(m as &dyn DynAddress)),
-                )
-            }
-        }
-        let boxed = ::allocator_api2::boxed::Box::new_in(
-            AddressesRepeated { vec: &self.addresses.data },
-            Global,
-        );
-        let boxed_dyn: ::allocator_api2::boxed::Box<dyn Repeated<ViewCow<'_, dyn DynAddress>>> =
-            unsize_box!(boxed);
-        ViewCow::Owned(boxed_dyn)
+        // Borrowed trait object over the slice; no adapter struct or allocation needed.
+        let slice: &[AddressImpl<A>] = &self.addresses.data;
+        // SAFETY: We implement Repeated<ViewCow<dyn DynAddress>> for the slice type below.
+        let rep: &dyn Repeated<ViewCow<'_, dyn DynAddress>> = slice as &[AddressImpl<A>];
+        ViewCow::Borrowed(rep)
     }
 
     // has_* methods - sample implementation (others follow same pattern: field.is_present(&self._shared))
@@ -752,7 +744,7 @@ impl<A: Allocator + Clone> Message for PersonImpl<A> {
 #[cfg(test)]
 mod tests {
     use super::{
-        AddressImpl, DynAddress, DynAddressAppend, DynPersonMut, MessageFieldWrapper, Person,
+        AddressImpl, DynAddress, DynAddressAppend, DynPerson, DynPersonMut, MessageFieldWrapper, Person,
         PersonAppend, PersonImpl, PersonMut, Status, StringFieldWrapper,
     };
 
