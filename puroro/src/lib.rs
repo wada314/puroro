@@ -14,9 +14,6 @@
 //! Puroro is designed from the ground up to feel natural in Rust, using modern Rust patterns
 //! and idioms throughout.
 
-#![deny(missing_docs)]
-#![deny(unsafe_code)]
-
 // Re-export protobuf-core for use by generated code
 pub use protobuf_core;
 

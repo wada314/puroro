@@ -13,7 +13,7 @@ use puroro::{
         ExplicitOptional, FieldOperations, FieldStorage, ImplicitOptional, MessageFieldWrapper,
         SingularMessage, StringFieldWrapper,
     },
-    repeated::{Repeated, VecRepeated, VecRepeatedMap},
+    repeated::{Repeated, VecRepeated},
     shared::SharedFields,
     view::ViewCow,
 };
@@ -517,8 +517,8 @@ pub struct PersonImpl<A: Allocator = Global> {
     score: FieldStorage<i32, ExplicitOptional<1>, 5, 1, A>, // Field 5, explicit presence, bit 1, 1 byte shared
 
     // Repeated fields
-    scores: FieldStorage<AllocVec<i32, A>, Repeated, 10, 1, A>,
-    addresses: FieldStorage<AllocVec<AddressImpl<A>, A>, Repeated, 9, 1, A>,
+    scores: FieldStorage<AllocVec<i32, A>, puroro::field_ops::Repeated, 10, 1, A>,
+    addresses: FieldStorage<AllocVec<AddressImpl<A>, A>, puroro::field_ops::Repeated, 9, 1, A>,
 }
 
 impl<A> PersonImpl<A>
@@ -637,7 +637,24 @@ impl<A: Allocator + Clone> DynPerson for PersonImpl<A> {
     }
 
     fn addresses(&self) -> Box<dyn Repeated<&dyn DynAddress> + '_> {
-        Box::new(VecRepeatedMap::new(&self.addresses.data, |m| m as &dyn DynAddress))
+        struct AddressesRepeated<'a, A: Allocator> {
+            vec: &'a AllocVec<AddressImpl<A>, A>,
+        }
+        impl<'a, A: Allocator + Clone + 'a> Repeated<&'a dyn DynAddress> for AddressesRepeated<'a, A> {
+            fn len(&self) -> usize {
+                self.vec.len()
+            }
+            fn is_empty(&self) -> bool {
+                self.vec.is_empty()
+            }
+            fn get(&self, index: usize) -> Option<&'a dyn DynAddress> {
+                self.vec.get(index).map(|m| m as &dyn DynAddress)
+            }
+            fn iter_box(&self) -> Box<dyn Iterator<Item = &'a dyn DynAddress> + '_> {
+                Box::new(self.vec.iter().map(|m| m as &dyn DynAddress))
+            }
+        }
+        Box::new(AddressesRepeated { vec: &self.addresses.data })
     }
 
     // has_* methods - sample implementation (others follow same pattern: field.is_present(&self._shared))
