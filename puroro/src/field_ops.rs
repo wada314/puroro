@@ -575,8 +575,9 @@ impl<T: Eq, L: FieldLabel, const FIELD_NUMBER: u32, const SHARED_BYTES_LEN: usiz
 }
 
 // ============================================================================
-// Repeated Scalar Implementations
+// Repeated Fields
 // ============================================================================
+// Sample implementation for i32 (varint). Extend similarly for other types.
 
 /// Implementation for repeated i32 using allocator-aware Vec<i32, A>
 impl<
