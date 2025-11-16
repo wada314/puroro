@@ -65,7 +65,7 @@ pub trait Person: DynPerson {
         DynPerson::scores(self)
     }
     #[inline]
-    fn addresses(&self) -> Box<dyn Repeated<Box<dyn DynAddress>> + '_> {
+    fn addresses(&self) -> Box<dyn Repeated<&dyn DynAddress> + '_> {
         DynPerson::addresses(self)
     }
 }
@@ -90,7 +90,7 @@ pub trait DynPerson {
 
     // Repeated field getters
     fn scores(&self) -> Box<dyn Repeated<i32> + '_>;
-    fn addresses(&self) -> Box<dyn Repeated<Box<dyn DynAddress>> + '_>;
+    fn addresses(&self) -> Box<dyn Repeated<&dyn DynAddress> + '_>;
 
     // Presence checks (for optional semantics) - sample: has_name (others follow same pattern)
     fn has_name(&self) -> bool;
@@ -636,10 +636,8 @@ impl<A: Allocator + Clone> DynPerson for PersonImpl<A> {
         Box::new(VecRepeated::new(&self.scores.data))
     }
 
-    fn addresses(&self) -> Box<dyn Repeated<Box<dyn DynAddress>> + '_> {
-        Box::new(VecRepeatedMap::new(&self.addresses.data, |m| {
-            Box::new(m.clone()) as Box<dyn DynAddress>
-        }))
+    fn addresses(&self) -> Box<dyn Repeated<&dyn DynAddress> + '_> {
+        Box::new(VecRepeatedMap::new(&self.addresses.data, |m| m as &dyn DynAddress))
     }
 
     // has_* methods - sample implementation (others follow same pattern: field.is_present(&self._shared))
