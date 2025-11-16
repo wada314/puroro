@@ -46,6 +46,9 @@ pub mod shared;
 /// that support both borrowed references and owned values.
 pub mod view;
 
+/// Repeated field runtime trait and adapters.
+pub mod repeated;
+
 /// Core message trait that all generated Protocol Buffer messages implement.
 pub trait Message: Sized + Clone + PartialEq {
     /// Parses a message from the given byte slice.

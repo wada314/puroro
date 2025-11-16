@@ -13,6 +13,7 @@ use puroro::{
         ExplicitOptional, FieldOperations, FieldStorage, ImplicitOptional, MessageFieldWrapper,
         SingularMessage, StringFieldWrapper,
     },
+    repeated::{Repeated, VecRepeated, VecRepeatedMap},
     shared::SharedFields,
     view::ViewCow,
 };
@@ -57,6 +58,16 @@ pub trait Person: DynPerson {
     // Methods with custom implementations (must be implemented)
     // NOTE: Must return `impl Address`, not a concrete struct type
     fn address(&self) -> impl Address + use<'_, Self>;
+
+    // Repeated fields (delegating to DynPerson)
+    #[inline]
+    fn scores(&self) -> Box<dyn Repeated<i32> + '_> {
+        DynPerson::scores(self)
+    }
+    #[inline]
+    fn addresses(&self) -> Box<dyn Repeated<Box<dyn DynAddress>> + '_> {
+        DynPerson::addresses(self)
+    }
 }
 
 /// Dyn-compatible immutable trait for Person message.
@@ -77,6 +88,10 @@ pub trait DynPerson {
     // Message field getters
     fn address(&self) -> Option<ViewCow<'_, dyn DynAddress>>; // Message fields always return Option, even for ImplicitOptional
 
+    // Repeated field getters
+    fn scores(&self) -> Box<dyn Repeated<i32> + '_>;
+    fn addresses(&self) -> Box<dyn Repeated<Box<dyn DynAddress>> + '_>;
+
     // Presence checks (for optional semantics) - sample: has_name (others follow same pattern)
     fn has_name(&self) -> bool;
 }
@@ -94,6 +109,24 @@ pub trait PersonAppend: Person + DynPersonAppend {
     // Methods with custom implementations (must be implemented)
     // NOTE: Must return `impl AddressAppend`, not a concrete struct type
     fn address_mut(&mut self) -> impl AddressAppend + use<'_, Self>;
+
+    // Repeated mutators (delegating to DynPersonAppend)
+    #[inline]
+    fn push_score(&mut self, v: i32) {
+        DynPersonAppend::push_score(self, v)
+    }
+    #[inline]
+    fn clear_scores(&mut self) {
+        DynPersonAppend::clear_scores(self)
+    }
+    #[inline]
+    fn push_address(&mut self) -> &mut dyn DynAddressMut {
+        DynPersonAppend::push_address(self)
+    }
+    #[inline]
+    fn clear_addresses(&mut self) {
+        DynPersonAppend::clear_addresses(self)
+    }
 }
 
 /// Dyn-compatible append-only trait for Person message.
@@ -102,6 +135,13 @@ pub trait PersonAppend: Person + DynPersonAppend {
 pub trait DynPersonAppend: DynPerson {
     // Setters - sample: set_name (others follow same pattern: field.set(&mut self._shared, v) or field.set(&mut self._shared, v.to_wire()))
     fn set_name(&mut self, v: &str);
+
+    // Repeated mutators
+    fn push_score(&mut self, v: i32);
+    fn clear_scores(&mut self);
+    /// Appends a new default address and returns a mutable dyn view to build it.
+    fn push_address(&mut self) -> &mut dyn DynAddressMut;
+    fn clear_addresses(&mut self);
 }
 
 /// Flexible view fully mutable trait for Person message (not dyn-compatible).
@@ -475,6 +515,10 @@ pub struct PersonImpl<A: Allocator = Global> {
     // Scalar fields: 4 bytes
     age: FieldStorage<i32, ImplicitOptional, 2, 1, A>, // Field 2, implicit presence, 1 byte shared
     score: FieldStorage<i32, ExplicitOptional<1>, 5, 1, A>, // Field 5, explicit presence, bit 1, 1 byte shared
+
+    // Repeated fields
+    scores: FieldStorage<AllocVec<i32, A>, Repeated, 10, 1, A>,
+    addresses: FieldStorage<AllocVec<AddressImpl<A>, A>, Repeated, 9, 1, A>,
 }
 
 impl<A> PersonImpl<A>
@@ -493,6 +537,8 @@ where
             _shared: shared,
             age: Default::default(),
             score: Default::default(),
+            scores: FieldStorage::new_in(alloc.clone(), AllocVec::new_in),
+            addresses: FieldStorage::new_in(alloc.clone(), AllocVec::new_in),
         }
     }
 }
@@ -586,6 +632,16 @@ impl<A: Allocator + Clone> DynPerson for PersonImpl<A> {
             .map(|address| ViewCow::Borrowed(address as &dyn DynAddress))
     }
 
+    fn scores(&self) -> Box<dyn Repeated<i32> + '_> {
+        Box::new(VecRepeated::new(&self.scores.data))
+    }
+
+    fn addresses(&self) -> Box<dyn Repeated<Box<dyn DynAddress>> + '_> {
+        Box::new(VecRepeatedMap::new(&self.addresses.data, |m| {
+            Box::new(m.clone()) as Box<dyn DynAddress>
+        }))
+    }
+
     // has_* methods - sample implementation (others follow same pattern: field.is_present(&self._shared))
     fn has_name(&self) -> bool {
         self.name.is_present(&self._shared)
@@ -596,6 +652,26 @@ impl<A: Allocator + Clone> DynPersonAppend for PersonImpl<A> {
     // set_* methods - sample implementation (others follow same pattern: field.set(&mut self._shared, v) or field.set(&mut self._shared, v.to_wire()))
     fn set_name(&mut self, v: &str) {
         self.name.set(&mut self._shared, v)
+    }
+
+    fn push_score(&mut self, v: i32) {
+        self.scores.data.push(v)
+    }
+
+    fn clear_scores(&mut self) {
+        self.scores.data.clear()
+    }
+
+    fn push_address(&mut self) -> &mut dyn DynAddressMut {
+        let alloc = self._shared.allocator().clone();
+        self.addresses.data.push(AddressImpl::new_in(alloc));
+        // Safe to unwrap: just pushed one
+        let last_index = self.addresses.data.len() - 1;
+        &mut self.addresses.data[last_index] as &mut dyn DynAddressMut
+    }
+
+    fn clear_addresses(&mut self) {
+        self.addresses.data.clear()
     }
 }
 
@@ -722,6 +798,46 @@ mod tests {
         let mut message_field = MessageFieldWrapper::new();
         let address = message_field.get_or_insert_with(AddressImpl::new);
         assert_eq!(address.street(), "");
+    }
+
+    #[test]
+    fn test_repeated_scalars_and_messages() {
+        let mut person = PersonImpl::new();
+
+        // push and read scores
+        PersonAppend::push_score(&mut person, 10);
+        PersonAppend::push_score(&mut person, 20);
+        {
+            let rep = Person::scores(&person);
+            assert_eq!(rep.len(), 2);
+            let collected: Vec<i32> = rep.iter_box().collect();
+            assert_eq!(collected, vec![10, 20]);
+            assert_eq!(rep.get(1), Some(20));
+        }
+        PersonAppend::clear_scores(&mut person);
+        assert!(Person::scores(&person).is_empty());
+
+        // push and read addresses
+        {
+            let addr_mut = PersonAppend::push_address(&mut person);
+            addr_mut.set_street("First St");
+        }
+        {
+            let addr_mut = PersonAppend::push_address(&mut person);
+            addr_mut.set_street("Second Ave");
+        }
+        {
+            let rep = Person::addresses(&person);
+            assert_eq!(rep.len(), 2);
+            let streets: Vec<String> = rep.iter_box().map(|m| m.street().to_string()).collect();
+            assert_eq!(
+                streets,
+                vec!["First St".to_string(), "Second Ave".to_string()]
+            );
+            assert!(rep.get(0).is_some());
+        }
+        PersonAppend::clear_addresses(&mut person);
+        assert!(Person::addresses(&person).is_empty());
     }
 }
 

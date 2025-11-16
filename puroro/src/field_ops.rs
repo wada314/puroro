@@ -575,6 +575,45 @@ impl<T: Eq, L: FieldLabel, const FIELD_NUMBER: u32, const SHARED_BYTES_LEN: usiz
 }
 
 // ============================================================================
+// Repeated Scalar Implementations
+// ============================================================================
+
+/// Implementation for repeated i32 using allocator-aware Vec<i32, A>
+impl<
+        A: Allocator,
+        const FIELD_NUMBER: u32,
+        const SHARED_BYTES_LEN: usize,
+    > FieldOperations<Vec<i32, A>, Repeated, FIELD_NUMBER, SHARED_BYTES_LEN>
+    for FieldStorage<Vec<i32, A>, Repeated, FIELD_NUMBER, SHARED_BYTES_LEN, A>
+{
+    type SetValue<'a> = &'a [i32];
+    type GetValue<'a>
+        = &'a [i32]
+    where
+        A: 'a;
+    type SharedFields = SharedFields<SHARED_BYTES_LEN, A>;
+
+    const FIELD_TYPE: ProtobufFieldType = ProtobufFieldType::Int32;
+
+    fn set(&mut self, _shared: &mut Self::SharedFields, value: Self::SetValue<'_>) {
+        self.data.clear();
+        self.data.extend_from_slice(value);
+    }
+
+    fn get<'a>(&'a self, _shared: &'a Self::SharedFields) -> Self::GetValue<'a> {
+        self.data.as_slice()
+    }
+
+    fn clear(&mut self, _shared: &mut Self::SharedFields) {
+        self.data.clear();
+    }
+
+    fn is_present(&self, _shared: &Self::SharedFields) -> bool {
+        !self.data.is_empty()
+    }
+}
+
+// ============================================================================
 // Field Trait (Unified Approach)
 // ============================================================================
 
