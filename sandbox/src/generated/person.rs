@@ -6,7 +6,6 @@
 
 use ::allocator_api2::vec::Vec as AllocVec;
 use ::allocator_extras::{Allocator, Global};
-use ::allocator_api2::unsize_box;
 use puroro::{
     Message,
     error::Error,
@@ -14,7 +13,7 @@ use puroro::{
         ExplicitOptional, FieldOperations, FieldStorage, ImplicitOptional, MessageFieldWrapper,
         SingularMessage, StringFieldWrapper,
     },
-    repeated::{repeated_from_slice, repeated_map_from_slice, Repeated},
+    repeated::{repeated_from_slice, Repeated},
     shared::SharedFields,
     view::ViewCow,
 };
