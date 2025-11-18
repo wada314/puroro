@@ -14,7 +14,7 @@ use puroro::{
         ExplicitOptional, FieldOperations, FieldStorage, ImplicitOptional, MessageFieldWrapper,
         SingularMessage, StringFieldWrapper,
     },
-    repeated::{Repeated, VecRepeated},
+    repeated::{repeated_from_slice, repeated_map_from_slice, Repeated},
     shared::SharedFields,
     view::ViewCow,
 };
@@ -62,11 +62,11 @@ pub trait Person: DynPerson {
 
     // Repeated fields (delegating to DynPerson)
     #[inline]
-    fn scores(&self) -> ViewCow<'_, dyn Repeated<i32>> {
+    fn scores(&self) -> ViewCow<'_, dyn Repeated<'_, i32>> {
         DynPerson::scores(self)
     }
     #[inline]
-    fn addresses(&self) -> ViewCow<'_, dyn Repeated<ViewCow<'_, dyn DynAddress>>> {
+    fn addresses(&self) -> ViewCow<'_, dyn Repeated<'_, ViewCow<'_, dyn DynAddress>>> {
         DynPerson::addresses(self)
     }
 }
@@ -90,8 +90,8 @@ pub trait DynPerson {
     fn address(&self) -> Option<ViewCow<'_, dyn DynAddress>>; // Message fields always return Option, even for ImplicitOptional
 
     // Repeated field getters
-    fn scores(&self) -> ViewCow<'_, dyn Repeated<i32>>;
-    fn addresses(&self) -> ViewCow<'_, dyn Repeated<ViewCow<'_, dyn DynAddress>>>;
+    fn scores(&self) -> ViewCow<'_, dyn Repeated<'_, i32>>;
+    fn addresses(&self) -> ViewCow<'_, dyn Repeated<'_, ViewCow<'_, dyn DynAddress>>>;
 
     // Presence checks (for optional semantics) - sample: has_name (others follow same pattern)
     fn has_name(&self) -> bool;
@@ -633,47 +633,34 @@ impl<A: Allocator + Clone> DynPerson for PersonImpl<A> {
             .map(|address| ViewCow::Borrowed(address as &dyn DynAddress))
     }
 
-    fn scores(&self) -> ViewCow<'_, dyn Repeated<i32>> {
-        // Use adapter and box to trait object to satisfy current signatures portably.
-        let boxed = ::allocator_api2::boxed::Box::new_in(
-            VecRepeated::new(&self.scores.data),
-            Global,
-        );
-        let boxed_dyn: ::allocator_api2::boxed::Box<dyn Repeated<i32>> = unsize_box!(boxed);
-        ViewCow::Owned(boxed_dyn)
+    fn scores(&self) -> ViewCow<'_, dyn Repeated<'_, i32>> {
+        let rep = repeated_from_slice(self.scores.data.as_slice());
+        ViewCow::Owned(rep)
     }
 
-    fn addresses(&self) -> ViewCow<'_, dyn Repeated<ViewCow<'_, dyn DynAddress>>> {
-        // Use a lightweight local adapter and box it as a trait object via unsize_box!.
+    fn addresses(&self) -> ViewCow<'_, dyn Repeated<'_, ViewCow<'_, dyn DynAddress>>> {
         struct AddressesRepeated<'a, A: Allocator> {
             vec: &'a AllocVec<AddressImpl<A>, A>,
         }
-        impl<'a, A: Allocator + Clone + 'a> Repeated<ViewCow<'a, dyn DynAddress>> for AddressesRepeated<'a, A> {
-            fn len(&self) -> usize {
-                self.vec.len()
-            }
-            fn is_empty(&self) -> bool {
-                self.vec.is_empty()
-            }
+        impl<'a, A: Allocator + Clone + 'a> Repeated<'a, ViewCow<'a, dyn DynAddress>> for AddressesRepeated<'a, A> {
+            fn len(&self) -> usize { self.vec.len() }
+            fn is_empty(&self) -> bool { self.vec.is_empty() }
             fn get(&self, index: usize) -> Option<ViewCow<'a, dyn DynAddress>> {
-                self.vec
-                    .get(index)
-                    .map(|m| ViewCow::Borrowed(m as &dyn DynAddress))
+                self.vec.get(index).map(|m| ViewCow::Borrowed(m as &dyn DynAddress))
             }
-            fn iter_box(&self) -> Box<dyn Iterator<Item = ViewCow<'a, dyn DynAddress>> + '_> {
-                Box::new(
-                    self.vec
-                        .iter()
-                        .map(|m| ViewCow::Borrowed(m as &dyn DynAddress)),
-                )
+            fn iter_box(&self) -> ::allocator_api2::boxed::Box<dyn Iterator<Item = ViewCow<'a, dyn DynAddress>> + 'a> {
+                let owned: std::vec::Vec<ViewCow<'a, dyn DynAddress>> =
+                    self.vec.iter().map(|m| ViewCow::Borrowed(m as &dyn DynAddress)).collect();
+                let it = owned.into_iter();
+                let boxed = ::allocator_api2::boxed::Box::new(it);
+                let boxed_dyn: ::allocator_api2::boxed::Box<dyn Iterator<Item = ViewCow<'a, dyn DynAddress>> + 'a> =
+                    ::allocator_api2::unsize_box!(boxed);
+                boxed_dyn
             }
         }
-        let boxed = ::allocator_api2::boxed::Box::new_in(
-            AddressesRepeated { vec: &self.addresses.data },
-            Global,
-        );
-        let boxed_dyn: ::allocator_api2::boxed::Box<dyn Repeated<ViewCow<'_, dyn DynAddress>>> =
-            unsize_box!(boxed);
+        let boxed = ::allocator_api2::boxed::Box::new_in(AddressesRepeated { vec: &self.addresses.data }, Global);
+        let boxed_dyn: ::allocator_api2::boxed::Box<dyn Repeated<'_, ViewCow<'_, dyn DynAddress>>> =
+            ::allocator_api2::unsize_box!(boxed);
         ViewCow::Owned(boxed_dyn)
     }
 
