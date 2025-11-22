@@ -50,6 +50,51 @@ impl<'a, T: Copy + 'a, A: Allocator + 'a> Repeated<'a, T> for RefVec<'a, T, A> {
     }
 }
 
+/// Adapter over a reference to an allocator-aware Vec with a mapping function.
+///
+/// This is similar to `RefVec` but supports non-Copy items by applying a mapping function.
+pub struct RefVecMap<'a, S, T, A: Allocator, F>
+where
+    F: Fn(&S) -> T,
+{
+    vec: &'a Vec<S, A>,
+    map: F,
+}
+
+impl<'a, S, T, A: Allocator, F> RefVecMap<'a, S, T, A, F>
+where
+    F: Fn(&S) -> T,
+{
+    /// Creates a repeated adapter over a reference to an allocator-aware Vec with a mapping function.
+    #[inline]
+    pub fn new(vec: &'a Vec<S, A>, map: F) -> Self {
+        Self { vec, map }
+    }
+}
+
+#[allow(missing_docs)]
+impl<'a, S: 'a, T: 'a, A: Allocator + 'a, F> Repeated<'a, T> for RefVecMap<'a, S, T, A, F>
+where
+    F: Fn(&S) -> T + 'a,
+{
+    fn len(&self) -> usize {
+        self.vec.len()
+    }
+    fn is_empty(&self) -> bool {
+        self.vec.is_empty()
+    }
+    fn get(&self, index: usize) -> Option<T> {
+        self.vec.get(index).map(&self.map)
+    }
+    fn iter_box(&self) -> Box<dyn Iterator<Item = T> + 'a> {
+        let owned: std::vec::Vec<T> = self.vec.iter().map(&self.map).collect();
+        let it = owned.into_iter();
+        let boxed = Box::new(it);
+        let boxed_dyn: Box<dyn Iterator<Item = T> + 'a> = unsize_box!(boxed);
+        boxed_dyn
+    }
+}
+
 /// Builds a `Box<dyn Repeated<'a, T>>` from a borrowed slice of Copy items.
 ///
 /// This avoids allocation for elements and exposes iteration/indexing via the `Repeated` trait.
@@ -57,9 +102,15 @@ impl<'a, T: Copy + 'a, A: Allocator + 'a> Repeated<'a, T> for RefVec<'a, T, A> {
 pub fn repeated_from_slice<'a, T: Copy + 'a>(slice: &'a [T]) -> Box<dyn Repeated<'a, T> + 'a> {
     struct SliceRepeated<'b, U: Copy>(&'b [U]);
     impl<'b, U: Copy + 'b> Repeated<'b, U> for SliceRepeated<'b, U> {
-        fn len(&self) -> usize { self.0.len() }
-        fn is_empty(&self) -> bool { self.0.is_empty() }
-        fn get(&self, index: usize) -> Option<U> { self.0.get(index).copied() }
+        fn len(&self) -> usize {
+            self.0.len()
+        }
+        fn is_empty(&self) -> bool {
+            self.0.is_empty()
+        }
+        fn get(&self, index: usize) -> Option<U> {
+            self.0.get(index).copied()
+        }
         fn iter_box(&self) -> Box<dyn Iterator<Item = U> + 'b> {
             let owned: std::vec::Vec<U> = self.0.iter().copied().collect();
             let it = owned.into_iter();
@@ -94,9 +145,15 @@ where
     where
         G: Fn(&X) -> Y + 'b,
     {
-        fn len(&self) -> usize { self.slice.len() }
-        fn is_empty(&self) -> bool { self.slice.is_empty() }
-        fn get(&self, index: usize) -> Option<Y> { self.slice.get(index).map(&self.map) }
+        fn len(&self) -> usize {
+            self.slice.len()
+        }
+        fn is_empty(&self) -> bool {
+            self.slice.is_empty()
+        }
+        fn get(&self, index: usize) -> Option<Y> {
+            self.slice.get(index).map(&self.map)
+        }
         fn iter_box(&self) -> Box<dyn Iterator<Item = Y> + 'b> {
             let owned: std::vec::Vec<Y> = self.slice.iter().map(&self.map).collect();
             let it = owned.into_iter();
@@ -110,3 +167,18 @@ where
     boxed_dyn
 }
 
+/// Builds a `Box<dyn Repeated<'a, T>>` from a reference to an allocator-aware Vec and a mapping function.
+///
+/// This is similar to `repeated_map_from_slice` but works with `Vec<S, A>` instead of slices.
+pub fn repeated_map_from_vec<'a, S: 'a, T: 'a, A: Allocator + 'a, F>(
+    vec: &'a Vec<S, A>,
+    f: F,
+) -> Box<dyn Repeated<'a, T> + 'a>
+where
+    F: Fn(&S) -> T + 'a,
+{
+    let adapter = RefVecMap::new(vec, f);
+    let boxed = Box::new(adapter);
+    let boxed_dyn: Box<dyn Repeated<'a, T> + 'a> = unsize_box!(boxed);
+    boxed_dyn
+}
