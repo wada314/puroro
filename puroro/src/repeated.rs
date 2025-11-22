@@ -73,3 +73,40 @@ pub fn repeated_from_slice<'a, T: Copy + 'a>(slice: &'a [T]) -> Box<dyn Repeated
     boxed_dyn
 }
 
+/// Builds a `Box<dyn Repeated<'a, T>>` from a borrowed slice and a mapping function.
+///
+/// The function `f` is applied lazily on get/iterate; only immutable access is supported.
+pub fn repeated_map_from_slice<'a, S: 'a, T: 'a, F>(
+    slice: &'a [S],
+    f: F,
+) -> Box<dyn Repeated<'a, T> + 'a>
+where
+    F: Fn(&S) -> T + 'a,
+{
+    struct SliceRepeatedMap<'b, X, Y, G>
+    where
+        G: Fn(&X) -> Y,
+    {
+        slice: &'b [X],
+        map: G,
+    }
+    impl<'b, X: 'b, Y: 'b, G> Repeated<'b, Y> for SliceRepeatedMap<'b, X, Y, G>
+    where
+        G: Fn(&X) -> Y + 'b,
+    {
+        fn len(&self) -> usize { self.slice.len() }
+        fn is_empty(&self) -> bool { self.slice.is_empty() }
+        fn get(&self, index: usize) -> Option<Y> { self.slice.get(index).map(&self.map) }
+        fn iter_box(&self) -> Box<dyn Iterator<Item = Y> + 'b> {
+            let owned: std::vec::Vec<Y> = self.slice.iter().map(&self.map).collect();
+            let it = owned.into_iter();
+            let boxed = Box::new(it);
+            let boxed_dyn: Box<dyn Iterator<Item = Y> + 'b> = unsize_box!(boxed);
+            boxed_dyn
+        }
+    }
+    let boxed = Box::new(SliceRepeatedMap { slice, map: f });
+    let boxed_dyn: Box<dyn Repeated<'a, T> + 'a> = unsize_box!(boxed);
+    boxed_dyn
+}
+

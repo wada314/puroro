@@ -13,7 +13,7 @@ use puroro::{
         ExplicitOptional, FieldOperations, FieldStorage, ImplicitOptional, MessageFieldWrapper,
         SingularMessage, StringFieldWrapper,
     },
-    repeated::{repeated_from_slice, Repeated},
+    repeated::{Repeated, repeated_from_slice},
     shared::SharedFields,
     view::ViewCow,
 };
@@ -65,7 +65,7 @@ pub trait Person: DynPerson {
         DynPerson::scores(self)
     }
     #[inline]
-    fn addresses(&self) -> ViewCow<'_, dyn Repeated<'_, ViewCow<'_, dyn DynAddress>>> {
+    fn addresses<'a>(&'a self) -> ViewCow<'a, dyn Repeated<'a, ViewCow<'a, dyn DynAddress>>> {
         DynPerson::addresses(self)
     }
 }
@@ -90,7 +90,7 @@ pub trait DynPerson {
 
     // Repeated field getters
     fn scores(&self) -> ViewCow<'_, dyn Repeated<'_, i32>>;
-    fn addresses(&self) -> ViewCow<'_, dyn Repeated<'_, ViewCow<'_, dyn DynAddress>>>;
+    fn addresses<'a>(&'a self) -> ViewCow<'a, dyn Repeated<'a, ViewCow<'a, dyn DynAddress>>>;
 
     // Presence checks (for optional semantics) - sample: has_name (others follow same pattern)
     fn has_name(&self) -> bool;
@@ -637,29 +637,51 @@ impl<A: Allocator + Clone> DynPerson for PersonImpl<A> {
         ViewCow::Owned(rep)
     }
 
-    fn addresses(&self) -> ViewCow<'_, dyn Repeated<'_, ViewCow<'_, dyn DynAddress>>> {
-        struct AddressesRepeated<'a, A: Allocator> {
-            vec: &'a AllocVec<AddressImpl<A>, A>,
+    fn addresses<'a>(&'a self) -> ViewCow<'a, dyn Repeated<'a, ViewCow<'a, dyn DynAddress>> + 'a> {
+        struct AddressesRepeated<'b, A: Allocator> {
+            vec: &'b AllocVec<AddressImpl<A>, A>,
         }
-        impl<'a, A: Allocator + Clone + 'a> Repeated<'a, ViewCow<'a, dyn DynAddress>> for AddressesRepeated<'a, A> {
-            fn len(&self) -> usize { self.vec.len() }
-            fn is_empty(&self) -> bool { self.vec.is_empty() }
-            fn get(&self, index: usize) -> Option<ViewCow<'a, dyn DynAddress>> {
-                self.vec.get(index).map(|m| ViewCow::Borrowed(m as &dyn DynAddress))
+        impl<'b, A: Allocator + Clone + 'b> Repeated<'b, ViewCow<'b, dyn DynAddress + 'b>>
+            for AddressesRepeated<'b, A>
+        {
+            fn len(&self) -> usize {
+                self.vec.len()
             }
-            fn iter_box(&self) -> ::allocator_api2::boxed::Box<dyn Iterator<Item = ViewCow<'a, dyn DynAddress>> + 'a> {
-                let owned: std::vec::Vec<ViewCow<'a, dyn DynAddress>> =
-                    self.vec.iter().map(|m| ViewCow::Borrowed(m as &dyn DynAddress)).collect();
+            fn is_empty(&self) -> bool {
+                self.vec.is_empty()
+            }
+            fn get(&self, index: usize) -> Option<ViewCow<'b, dyn DynAddress + 'b>> {
+                self.vec
+                    .get(index)
+                    .map(|m| ViewCow::Borrowed(m as &(dyn DynAddress + 'b)))
+            }
+            fn iter_box(
+                &self,
+            ) -> ::allocator_api2::boxed::Box<
+                dyn Iterator<Item = ViewCow<'b, dyn DynAddress + 'b>> + 'b,
+            > {
+                let owned: std::vec::Vec<ViewCow<'b, dyn DynAddress + 'b>> = self
+                    .vec
+                    .iter()
+                    .map(|m| ViewCow::Borrowed(m as &(dyn DynAddress + 'b)))
+                    .collect();
                 let it = owned.into_iter();
                 let boxed = ::allocator_api2::boxed::Box::new(it);
-                let boxed_dyn: ::allocator_api2::boxed::Box<dyn Iterator<Item = ViewCow<'a, dyn DynAddress>> + 'a> =
-                    ::allocator_api2::unsize_box!(boxed);
+                let boxed_dyn: ::allocator_api2::boxed::Box<
+                    dyn Iterator<Item = ViewCow<'b, dyn DynAddress + 'b>> + 'b,
+                > = ::allocator_api2::unsize_box!(boxed);
                 boxed_dyn
             }
         }
-        let boxed = ::allocator_api2::boxed::Box::new_in(AddressesRepeated { vec: &self.addresses.data }, Global);
-        let boxed_dyn: ::allocator_api2::boxed::Box<dyn Repeated<'_, ViewCow<'_, dyn DynAddress>>> =
-            ::allocator_api2::unsize_box!(boxed);
+        let boxed = ::allocator_api2::boxed::Box::new_in(
+            AddressesRepeated {
+                vec: &self.addresses.data,
+            },
+            Global,
+        );
+        let boxed_dyn: ::allocator_api2::boxed::Box<
+            dyn Repeated<'a, ViewCow<'a, dyn DynAddress + 'a>> + 'a,
+        > = ::allocator_api2::unsize_box!(boxed);
         ViewCow::Owned(boxed_dyn)
     }
 
@@ -740,8 +762,8 @@ impl<A: Allocator + Clone> Message for PersonImpl<A> {
 #[cfg(test)]
 mod tests {
     use super::{
-        AddressImpl, DynAddress, DynAddressAppend, DynPerson, DynPersonMut, MessageFieldWrapper, Person,
-        PersonAppend, PersonImpl, PersonMut, Status, StringFieldWrapper,
+        AddressImpl, DynAddress, DynAddressAppend, DynPerson, DynPersonMut, MessageFieldWrapper,
+        Person, PersonAppend, PersonImpl, PersonMut, Status, StringFieldWrapper,
     };
 
     #[test]
@@ -889,4 +911,3 @@ impl PersonTry for PersonLazy {
     // ... etc
 }
 */
-
