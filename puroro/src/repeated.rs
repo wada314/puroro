@@ -55,7 +55,7 @@ impl<'a, T: Copy + 'a, A: Allocator + 'a> Repeated<'a, T> for RefVec<'a, T, A> {
 /// This is similar to `RefVec` but supports non-Copy items by applying a mapping function.
 pub struct RefVecMap<'a, S, T, A: Allocator, F>
 where
-    F: Fn(&S) -> T,
+    F: Fn(&'a S) -> T,
 {
     vec: &'a Vec<S, A>,
     map: F,
@@ -63,7 +63,7 @@ where
 
 impl<'a, S, T, A: Allocator, F> RefVecMap<'a, S, T, A, F>
 where
-    F: Fn(&S) -> T,
+    F: Fn(&'a S) -> T,
 {
     /// Creates a repeated adapter over a reference to an allocator-aware Vec with a mapping function.
     #[inline]
@@ -73,9 +73,10 @@ where
 }
 
 #[allow(missing_docs)]
-impl<'a, S: 'a, T: 'a, A: Allocator + 'a, F> Repeated<'a, T> for RefVecMap<'a, S, T, A, F>
+impl<'a, S: 'a, T, A: Allocator + 'a, F> Repeated<'a, T> for RefVecMap<'a, S, T, A, F>
 where
-    F: Fn(&S) -> T + 'a,
+    F: Fn(&'a S) -> T + 'a,
+    T: 'a,
 {
     fn len(&self) -> usize {
         self.vec.len()

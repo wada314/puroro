@@ -13,7 +13,7 @@ use puroro::{
         ExplicitOptional, FieldOperations, FieldStorage, ImplicitOptional, MessageFieldWrapper,
         SingularMessage, StringFieldWrapper,
     },
-    repeated::{RefVecMap, Repeated, repeated_from_slice},
+    repeated::{Repeated, repeated_from_slice, RefVecMap},
     shared::SharedFields,
     view::ViewCow,
 };
@@ -65,7 +65,9 @@ pub trait Person: DynPerson {
         DynPerson::scores(self)
     }
     #[inline]
-    fn addresses<'a>(&'a self) -> ViewCow<'a, dyn Repeated<'a, ViewCow<'a, dyn DynAddress>> + 'a> {
+    fn addresses<'a: 'b, 'b>(
+        &'a self,
+    ) -> ViewCow<'a, dyn Repeated<'a, ViewCow<'b, dyn DynAddress>> + 'b> {
         DynPerson::addresses(self)
     }
 }
@@ -90,7 +92,7 @@ pub trait DynPerson {
 
     // Repeated field getters
     fn scores(&self) -> ViewCow<'_, dyn Repeated<'_, i32>>;
-    fn addresses<'a>(&'a self) -> ViewCow<'a, dyn Repeated<'a, ViewCow<'a, dyn DynAddress>> + 'a>;
+    fn addresses<'a: 'b, 'b>(&'a self) -> ViewCow<'a, dyn Repeated<'a, ViewCow<'b, dyn DynAddress>> + 'b>;
 
     // Presence checks (for optional semantics) - sample: has_name (others follow same pattern)
     fn has_name(&self) -> bool;
@@ -637,15 +639,15 @@ impl<A: Allocator + Clone> DynPerson for PersonImpl<A> {
         ViewCow::Owned(rep)
     }
 
-    fn addresses<'a>(
+    fn addresses<'a: 'b, 'b>(
         &'a self,
-    ) -> ViewCow<'a, dyn Repeated<'a, ViewCow<'a, dyn DynAddress + 'a>> + 'a> {
+    ) -> ViewCow<'a, dyn Repeated<'a, ViewCow<'b, dyn DynAddress>> + 'b> {
         let adapter = RefVecMap::new(&self.addresses.data, |addr: &AddressImpl<A>| {
             ViewCow::Borrowed(addr as &dyn DynAddress)
         });
         let boxed = ::allocator_api2::boxed::Box::new_in(adapter, Global);
         let boxed_dyn: ::allocator_api2::boxed::Box<
-            dyn Repeated<'a, ViewCow<'a, dyn DynAddress + 'a>> + 'a,
+            dyn Repeated<'a, ViewCow<'b, dyn DynAddress>> + 'b,
         > = ::allocator_api2::unsize_box!(boxed);
         ViewCow::Owned(boxed_dyn)
     }
