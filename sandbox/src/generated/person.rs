@@ -122,10 +122,6 @@ pub trait PersonAppend: Person + DynPersonAppend {
     fn push_score(&mut self, v: i32) {
         DynPersonAppend::push_score(self, v)
     }
-    #[inline]
-    fn push_address(&mut self) -> &mut dyn DynAddressMut {
-        DynPersonAppend::push_address(self)
-    }
 }
 
 /// Dyn-compatible append-only trait for Person message.
@@ -137,8 +133,6 @@ pub trait DynPersonAppend: DynPerson {
 
     // Repeated mutators
     fn push_score(&mut self, v: i32);
-    /// Appends a new default address and returns a mutable dyn view to build it.
-    fn push_address(&mut self) -> &mut dyn DynAddressMut;
 }
 
 /// Flexible view fully mutable trait for Person message (not dyn-compatible).
@@ -162,6 +156,12 @@ pub trait PersonMut: PersonAppend + DynPersonMut {
     // Methods with custom implementations (must be implemented)
     // NOTE: Must return `impl AddressMut`, not a concrete struct type
     fn address_mut(&mut self) -> impl AddressMut + use<'_, Self>;
+
+    // Repeated mutators that return mutable references (requires full mutation ability)
+    #[inline]
+    fn push_address(&mut self) -> &mut dyn DynAddressMut {
+        DynPersonMut::push_address(self)
+    }
 }
 
 /// Dyn-compatible fully mutable trait for Person message.
@@ -175,6 +175,11 @@ pub trait DynPersonMut: DynPersonAppend {
 
     // Builder-style methods for nested message construction
     fn address_mut(&mut self) -> &mut dyn DynAddressMut;
+
+    /// Appends a new default address and returns a mutable dyn view to build it.
+    /// Note: This method requires full mutation ability, so it's only available in DynPersonMut.
+    /// Ideally, under append-only restrictions, we should take a pre-defined message value as a parameter.
+    fn push_address(&mut self) -> &mut dyn DynAddressMut;
 }
 
 // ============================================================================
@@ -410,14 +415,6 @@ impl<A: Allocator + Clone> DynPersonAppend for PersonImpl<A> {
     fn push_score(&mut self, v: i32) {
         self.scores.data.push(v)
     }
-
-    fn push_address(&mut self) -> &mut dyn DynAddressMut {
-        let alloc = self._shared.allocator().clone();
-        self.addresses.data.push(AddressImpl::new_in(alloc));
-        // Safe to unwrap: just pushed one
-        let last_index = self.addresses.data.len() - 1;
-        &mut self.addresses.data[last_index] as &mut dyn DynAddressMut
-    }
 }
 
 impl<A: Allocator + Clone> DynPersonMut for PersonImpl<A> {
@@ -439,6 +436,14 @@ impl<A: Allocator + Clone> DynPersonMut for PersonImpl<A> {
         self.address
             .data
             .get_or_insert_with(|| AddressImpl::new_in(alloc)) as &mut dyn DynAddressMut
+    }
+
+    fn push_address(&mut self) -> &mut dyn DynAddressMut {
+        let alloc = self._shared.allocator().clone();
+        self.addresses.data.push(AddressImpl::new_in(alloc));
+        // Safe to unwrap: just pushed one
+        let last_index = self.addresses.data.len() - 1;
+        &mut self.addresses.data[last_index] as &mut dyn DynAddressMut
     }
 }
 
@@ -572,11 +577,11 @@ mod tests {
 
         // push and read addresses
         {
-            let addr_mut = PersonAppend::push_address(&mut person);
+            let addr_mut = PersonMut::push_address(&mut person);
             addr_mut.set_street("First St");
         }
         {
-            let addr_mut = PersonAppend::push_address(&mut person);
+            let addr_mut = PersonMut::push_address(&mut person);
             addr_mut.set_street("Second Ave");
         }
         {
