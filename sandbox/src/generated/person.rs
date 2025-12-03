@@ -158,10 +158,8 @@ pub trait PersonMut: PersonAppend + DynPersonMut {
     fn address_mut(&mut self) -> impl AddressMut + use<'_, Self>;
 
     // Repeated mutators that return mutable references (requires full mutation ability)
-    #[inline]
-    fn push_address(&mut self) -> &mut dyn DynAddressMut {
-        DynPersonMut::push_address(self)
-    }
+    // NOTE: Must return `impl AddressMut`, not a concrete struct type
+    fn push_address(&mut self) -> impl AddressMut + use<'_, Self>;
 }
 
 /// Dyn-compatible fully mutable trait for Person message.
@@ -345,7 +343,14 @@ impl<A: Allocator + Clone> PersonMut for PersonImpl<A> {
     fn address_mut(&mut self) -> impl AddressMut + use<'_, A> {
         self.address.data.as_mut()
     }
-    // All other methods use default implementations from the trait definition
+
+    fn push_address(&mut self) -> impl AddressMut + use<'_, A> {
+        let alloc = self._shared.allocator().clone();
+        self.addresses.data.push(AddressImpl::new_in(alloc));
+        // Safe to unwrap: just pushed one
+        let last_index = self.addresses.data.len() - 1;
+        &mut self.addresses.data[last_index]
+    }
 }
 
 impl<A: Allocator + Clone> DynPerson for PersonImpl<A> {
