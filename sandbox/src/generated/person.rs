@@ -13,7 +13,7 @@ use puroro::{
         ExplicitOptional, FieldOperations, FieldStorage, ImplicitOptional, MessageFieldWrapper,
         SingularMessage, StringFieldWrapper,
     },
-    repeated::{RefVecMap, Repeated, repeated_from_slice},
+    repeated::{RefVec, RefVecMap, Repeated, repeated_from_slice},
     shared::SharedFields,
     view::ViewCow,
 };
@@ -58,6 +58,10 @@ pub trait Person: DynPerson {
     // Methods with custom implementations (must be implemented)
     // NOTE: Must return `impl Address`, not a concrete struct type
     fn address(&self) -> impl Address + use<'_, Self>;
+
+    // Repeated field getters (must be implemented)
+    // NOTE: Must return `impl Repeated<'_, i32>`, not a dyn type
+    fn scores(&self) -> impl Repeated<'_, i32> + use<'_, Self>;
 }
 
 /// Dyn-compatible immutable trait for Person message.
@@ -572,6 +576,10 @@ impl<A> Eq for PersonImpl<A> where A: Allocator {}
 impl<A: Allocator + Clone> Person for PersonImpl<A> {
     fn address(&self) -> impl Address + use<'_, A> {
         self.address.get(&self._shared)
+    }
+
+    fn scores(&self) -> impl Repeated<'_, i32> + use<'_, A> {
+        RefVec::new(&self.scores.data)
     }
     // All other methods use default implementations from the trait definition
 }
