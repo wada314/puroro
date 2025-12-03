@@ -67,8 +67,12 @@ pub trait Person: DynPerson {
     fn address(&self) -> impl Address + use<'_, Self>;
 
     // Repeated field getters (must be implemented)
-    // NOTE: Must return `impl Repeated<'_, i32>`, not a dyn type
-    fn scores(&self) -> impl Repeated<'_, i32> + use<'_, Self>;
+    // NOTE: Must return `impl Repeated<'_>`, not a dyn type
+    fn scores(&self) -> impl Repeated<'_, Item = i32> + use<'_, Self>;
+
+    // NOTE: Must return `impl Repeated<'_>`, not a dyn type
+    // The returned type is RefVecMap which yields &AddressImpl, and AddressImpl implements Address
+    fn addresses(&self) -> impl Repeated<'_, Item = impl Address + '_> + use<'_, Self>;
 }
 
 /// Dyn-compatible immutable trait for Person message.
@@ -90,10 +94,10 @@ pub trait DynPerson {
     fn address(&self) -> Option<ViewCow<'_, dyn DynAddress>>; // Message fields always return Option, even for ImplicitOptional
 
     // Repeated field getters
-    fn scores(&self) -> ViewCow<'_, dyn Repeated<'_, i32>>;
+    fn scores(&self) -> ViewCow<'_, dyn Repeated<'_, Item = i32>>;
     fn addresses<'a: 'b, 'b>(
         &'a self,
-    ) -> ViewCow<'a, dyn Repeated<'a, ViewCow<'b, dyn DynAddress>> + 'b>;
+    ) -> ViewCow<'a, dyn Repeated<'a, Item = ViewCow<'b, dyn DynAddress>> + 'b>;
 
     // Presence checks (for optional semantics) - sample: has_name (others follow same pattern)
     fn has_name(&self) -> bool;
@@ -315,8 +319,12 @@ impl<A: Allocator + Clone> Person for PersonImpl<A> {
         self.address.get(&self._shared)
     }
 
-    fn scores(&self) -> impl Repeated<'_, i32> + use<'_, A> {
+    fn scores(&self) -> impl Repeated<'_, Item = i32> + use<'_, A> {
         RefVec::new(&self.scores.data)
+    }
+
+    fn addresses(&self) -> impl Repeated<'_, Item = impl Address + '_> + use<'_, A> {
+        RefVecMap::new(&self.addresses.data, |addr: &AddressImpl<A>| addr)
     }
     // All other methods use default implementations from the trait definition
 }
@@ -369,20 +377,20 @@ impl<A: Allocator + Clone> DynPerson for PersonImpl<A> {
             .map(|address| ViewCow::Borrowed(address as &dyn DynAddress))
     }
 
-    fn scores(&self) -> ViewCow<'_, dyn Repeated<'_, i32>> {
+    fn scores(&self) -> ViewCow<'_, dyn Repeated<'_, Item = i32>> {
         let rep = repeated_from_slice(self.scores.data.as_slice());
         ViewCow::Owned(rep)
     }
 
     fn addresses<'a: 'b, 'b>(
         &'a self,
-    ) -> ViewCow<'a, dyn Repeated<'a, ViewCow<'b, dyn DynAddress>> + 'b> {
+    ) -> ViewCow<'a, dyn Repeated<'a, Item = ViewCow<'b, dyn DynAddress>> + 'b> {
         let adapter = RefVecMap::new(&self.addresses.data, |addr: &AddressImpl<A>| {
             ViewCow::Borrowed(addr as &dyn DynAddress)
         });
         let boxed = ::allocator_api2::boxed::Box::new_in(adapter, Global);
         let boxed_dyn: ::allocator_api2::boxed::Box<
-            dyn Repeated<'a, ViewCow<'b, dyn DynAddress>> + 'b,
+            dyn Repeated<'a, Item = ViewCow<'b, dyn DynAddress>> + 'b,
         > = ::allocator_api2::unsize_box!(boxed);
         ViewCow::Owned(boxed_dyn)
     }
