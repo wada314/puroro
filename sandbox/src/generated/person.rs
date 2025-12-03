@@ -123,16 +123,8 @@ pub trait PersonAppend: Person + DynPersonAppend {
         DynPersonAppend::push_score(self, v)
     }
     #[inline]
-    fn clear_scores(&mut self) {
-        DynPersonAppend::clear_scores(self)
-    }
-    #[inline]
     fn push_address(&mut self) -> &mut dyn DynAddressMut {
         DynPersonAppend::push_address(self)
-    }
-    #[inline]
-    fn clear_addresses(&mut self) {
-        DynPersonAppend::clear_addresses(self)
     }
 }
 
@@ -145,10 +137,8 @@ pub trait DynPersonAppend: DynPerson {
 
     // Repeated mutators
     fn push_score(&mut self, v: i32);
-    fn clear_scores(&mut self);
     /// Appends a new default address and returns a mutable dyn view to build it.
     fn push_address(&mut self) -> &mut dyn DynAddressMut;
-    fn clear_addresses(&mut self);
 }
 
 /// Flexible view fully mutable trait for Person message (not dyn-compatible).
@@ -159,6 +149,14 @@ pub trait PersonMut: PersonAppend + DynPersonMut {
     #[inline]
     fn clear_name(&mut self) {
         DynPersonMut::clear_name(self)
+    }
+    #[inline]
+    fn clear_scores(&mut self) {
+        DynPersonMut::clear_scores(self)
+    }
+    #[inline]
+    fn clear_addresses(&mut self) {
+        DynPersonMut::clear_addresses(self)
     }
 
     // Methods with custom implementations (must be implemented)
@@ -172,6 +170,8 @@ pub trait PersonMut: PersonAppend + DynPersonMut {
 pub trait DynPersonMut: DynPersonAppend {
     // Clear methods - sample: clear_name (others follow same pattern: field.clear(&mut self._shared))
     fn clear_name(&mut self);
+    fn clear_scores(&mut self);
+    fn clear_addresses(&mut self);
 
     // Builder-style methods for nested message construction
     fn address_mut(&mut self) -> &mut dyn DynAddressMut;
@@ -411,10 +411,6 @@ impl<A: Allocator + Clone> DynPersonAppend for PersonImpl<A> {
         self.scores.data.push(v)
     }
 
-    fn clear_scores(&mut self) {
-        self.scores.data.clear()
-    }
-
     fn push_address(&mut self) -> &mut dyn DynAddressMut {
         let alloc = self._shared.allocator().clone();
         self.addresses.data.push(AddressImpl::new_in(alloc));
@@ -422,16 +418,20 @@ impl<A: Allocator + Clone> DynPersonAppend for PersonImpl<A> {
         let last_index = self.addresses.data.len() - 1;
         &mut self.addresses.data[last_index] as &mut dyn DynAddressMut
     }
-
-    fn clear_addresses(&mut self) {
-        self.addresses.data.clear()
-    }
 }
 
 impl<A: Allocator + Clone> DynPersonMut for PersonImpl<A> {
     // clear_* methods - sample implementation (others follow same pattern: field.clear(&mut self._shared))
     fn clear_name(&mut self) {
         self.name.clear(&mut self._shared)
+    }
+
+    fn clear_scores(&mut self) {
+        self.scores.data.clear()
+    }
+
+    fn clear_addresses(&mut self) {
+        self.addresses.data.clear()
     }
 
     fn address_mut(&mut self) -> &mut dyn DynAddressMut {
@@ -567,7 +567,7 @@ mod tests {
             assert_eq!(collected, vec![10, 20]);
             assert_eq!(rep.get(1), Some(20));
         }
-        PersonAppend::clear_scores(&mut person);
+        PersonMut::clear_scores(&mut person);
         assert!(DynPerson::scores(&person).is_empty());
 
         // push and read addresses
@@ -589,7 +589,7 @@ mod tests {
             );
             assert!(rep.get(0).is_some());
         }
-        PersonAppend::clear_addresses(&mut person);
+        PersonMut::clear_addresses(&mut person);
         assert!(DynPerson::addresses(&person).is_empty());
     }
 }
