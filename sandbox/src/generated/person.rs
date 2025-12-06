@@ -484,13 +484,13 @@ pub struct PersonLazyImpl<'a, A: Allocator = Global> {
     /// Field 5: score (explicit presence scalar field)
     score: OnceCell<i32>,
     /// Field 6: address (message field)
-    address: OnceCell<AddressImpl<A>>,
+    address: OnceCell<AddressLazyImpl<'a, A>>,
     /// Field 8: secondary_status (explicit presence enum field, stored as i32)
     secondary_status: OnceCell<i32>,
     /// Field 10: scores (repeated scalar field)
     scores: OnceList<i32, A>,
     /// Field 9: addresses (repeated message field)
-    addresses: OnceList<AddressImpl<A>, A>,
+    addresses: OnceList<AddressLazyImpl<'a, A>, A>,
 }
 
 impl<'a, A> PersonLazyImpl<'a, A>
@@ -565,7 +565,7 @@ where
     }
 
     /// Deserialize field 6 (address) from raw_bytes
-    fn deserialize_field_6_address(&self) -> AddressImpl<A> {
+    fn deserialize_field_6_address(&self) -> AddressLazyImpl<'a, A> {
         todo!("Deserialize field 6 (address) from self.raw_bytes")
     }
 
@@ -610,7 +610,7 @@ impl<'a, A: Allocator + Clone> Person for PersonLazyImpl<'a, A> {
             self.deserialize_field_9_addresses();
         }
         // Create adapter for OnceList iterator
-        OnceListRepeatedMap::new(&self.addresses, |addr: &AddressImpl<A>| addr)
+        OnceListRepeatedMap::new(&self.addresses, |addr: &AddressLazyImpl<'a, A>| addr)
     }
 }
 
@@ -688,7 +688,7 @@ impl<'a, A: Allocator + Clone> DynPerson for PersonLazyImpl<'a, A> {
             self.deserialize_field_9_addresses();
         }
         // Create adapter for OnceList iterator
-        let adapter = OnceListRepeatedMap::new(&self.addresses, |addr: &AddressImpl<A>| {
+        let adapter = OnceListRepeatedMap::new(&self.addresses, |addr: &AddressLazyImpl<'a, A>| {
             ViewCow::Borrowed(addr as &dyn DynAddress)
         });
         let boxed = AllocBox::new_in(adapter, Global);
@@ -713,9 +713,12 @@ impl<'a, A: Allocator + Clone> DynPerson for PersonLazyImpl<'a, A> {
 #[cfg(test)]
 mod tests {
     use super::{
-        AddressImpl, DynAddress, DynAddressMut, DynPerson, DynPersonMut, MessageFieldWrapper,
-        Person, PersonImpl, PersonMut, Status, StringFieldWrapper,
+        Address, AddressImpl, AddressLazyImpl, DynAddress, DynAddressMut, DynPerson, DynPersonMut,
+        MessageFieldWrapper, Person, PersonImpl, PersonLazyImpl, PersonMut, Status,
+        StringFieldWrapper,
     };
+    use ::allocator_extras::Global;
+    use std::borrow::Cow;
 
     #[test]
     fn test_message_fields() {
@@ -832,5 +835,235 @@ mod tests {
         }
         PersonMut::clear_addresses(&mut person);
         assert!(DynPerson::addresses(&person).is_empty());
+    }
+
+    // ========================================================================
+    // Lazy Implementation Tests
+    // ========================================================================
+
+    #[test]
+    fn test_person_lazy_constructors() {
+        let bytes = b"test bytes";
+
+        // Test new with borrowed slice
+        let _person_lazy = PersonLazyImpl::new(bytes, Global);
+
+        // Test new_owned with owned Vec
+        let bytes_owned = b"owned bytes".to_vec();
+        let _person_lazy_owned = PersonLazyImpl::new_owned(bytes_owned.clone(), Global);
+
+        // Test new_in with Cow::Borrowed
+        let _person_lazy_borrowed = PersonLazyImpl::new_in(Cow::Borrowed(bytes), Global);
+
+        // Test new_in with Cow::Owned
+        let bytes_cow = b"cow bytes".to_vec();
+        let _person_lazy_cow = PersonLazyImpl::new_in(Cow::Owned(bytes_cow.clone()), Global);
+
+        // Test new_global
+        let _person_lazy_global = PersonLazyImpl::new_global(bytes);
+    }
+
+    #[test]
+    #[should_panic(expected = "Deserialize field 1 (name) from self.raw_bytes")]
+    fn test_person_lazy_name_access() {
+        let bytes = b"test";
+        let person_lazy = PersonLazyImpl::new_global(bytes);
+        // This will panic because deserialization is not implemented yet
+        let _name = DynPerson::name(&person_lazy);
+    }
+
+    #[test]
+    #[should_panic(expected = "Deserialize field 2 (age) from self.raw_bytes")]
+    fn test_person_lazy_age_access() {
+        let bytes = b"test";
+        let person_lazy = PersonLazyImpl::new_global(bytes);
+        // This will panic because deserialization is not implemented yet
+        let _age = DynPerson::age(&person_lazy);
+    }
+
+    #[test]
+    #[should_panic(expected = "Deserialize field 3 (email) from self.raw_bytes")]
+    fn test_person_lazy_email_access() {
+        let bytes = b"test";
+        let person_lazy = PersonLazyImpl::new_global(bytes);
+        // This will panic because deserialization is not implemented yet
+        let _email = DynPerson::email(&person_lazy);
+    }
+
+    #[test]
+    #[should_panic(expected = "Deserialize field 4 (status) from self.raw_bytes")]
+    fn test_person_lazy_status_access() {
+        let bytes = b"test";
+        let person_lazy = PersonLazyImpl::new_global(bytes);
+        // This will panic because deserialization is not implemented yet
+        let _status = DynPerson::status(&person_lazy);
+    }
+
+    #[test]
+    #[should_panic(expected = "Deserialize field 5 (score) from self.raw_bytes")]
+    fn test_person_lazy_score_access() {
+        let bytes = b"test";
+        let person_lazy = PersonLazyImpl::new_global(bytes);
+        // This will panic because deserialization is not implemented yet
+        let _score = DynPerson::score(&person_lazy);
+    }
+
+    #[test]
+    #[should_panic(expected = "Deserialize field 8 (secondary_status) from self.raw_bytes")]
+    fn test_person_lazy_secondary_status_access() {
+        let bytes = b"test";
+        let person_lazy = PersonLazyImpl::new_global(bytes);
+        // This will panic because deserialization is not implemented yet
+        let _secondary_status = DynPerson::secondary_status(&person_lazy);
+    }
+
+    #[test]
+    #[should_panic(expected = "Deserialize field 6 (address) from self.raw_bytes")]
+    fn test_person_lazy_address_access() {
+        let bytes = b"test";
+        let person_lazy = PersonLazyImpl::new_global(bytes);
+        // This will panic because deserialization is not implemented yet
+        let _address = Person::address(&person_lazy);
+    }
+
+    #[test]
+    #[should_panic(expected = "Deserialize field 6 (address) from self.raw_bytes")]
+    fn test_person_lazy_address_dyn_access() {
+        let bytes = b"test";
+        let person_lazy = PersonLazyImpl::new_global(bytes);
+        // This will panic because deserialization is not implemented yet
+        let _address = DynPerson::address(&person_lazy);
+    }
+
+    #[test]
+    #[should_panic(expected = "Deserialize field 10 (scores)")]
+    fn test_person_lazy_scores_access() {
+        let bytes = b"test";
+        let person_lazy = PersonLazyImpl::new_global(bytes);
+        // This will panic because deserialization is not implemented yet
+        let _scores = Person::scores(&person_lazy);
+    }
+
+    #[test]
+    #[should_panic(expected = "Deserialize field 10 (scores)")]
+    fn test_person_lazy_scores_dyn_access() {
+        let bytes = b"test";
+        let person_lazy = PersonLazyImpl::new_global(bytes);
+        // This will panic because deserialization is not implemented yet
+        let _scores = DynPerson::scores(&person_lazy);
+    }
+
+    #[test]
+    #[should_panic(expected = "Deserialize field 9 (addresses)")]
+    fn test_person_lazy_addresses_access() {
+        let bytes = b"test";
+        let person_lazy = PersonLazyImpl::new_global(bytes);
+        // This will panic because deserialization is not implemented yet
+        let _addresses = Person::addresses(&person_lazy);
+    }
+
+    #[test]
+    #[should_panic(expected = "Deserialize field 9 (addresses)")]
+    fn test_person_lazy_addresses_dyn_access() {
+        let bytes = b"test";
+        let person_lazy = PersonLazyImpl::new_global(bytes);
+        // This will panic because deserialization is not implemented yet
+        let _addresses = DynPerson::addresses(&person_lazy);
+    }
+
+    #[test]
+    fn test_address_lazy_constructors() {
+        let bytes = b"test address bytes";
+
+        // Test new with borrowed slice
+        let _address_lazy = AddressLazyImpl::new(bytes, Global);
+
+        // Test new_owned with owned Vec
+        let bytes_owned = b"owned address bytes".to_vec();
+        let _address_lazy_owned = AddressLazyImpl::new_owned(bytes_owned.clone(), Global);
+
+        // Test new_in with Cow::Borrowed
+        let _address_lazy_borrowed = AddressLazyImpl::new_in(Cow::Borrowed(bytes), Global);
+
+        // Test new_in with Cow::Owned
+        let bytes_cow = b"cow address bytes".to_vec();
+        let _address_lazy_cow = AddressLazyImpl::new_in(Cow::Owned(bytes_cow.clone()), Global);
+
+        // Test new_global
+        let _address_lazy_global = AddressLazyImpl::new_global(bytes);
+    }
+
+    #[test]
+    #[should_panic(expected = "Deserialize field 1 (street) from self.raw_bytes")]
+    fn test_address_lazy_street_access() {
+        let bytes = b"test";
+        let address_lazy = AddressLazyImpl::new_global(bytes);
+        // This will panic because deserialization is not implemented yet
+        let _street = DynAddress::street(&address_lazy);
+    }
+
+    #[test]
+    #[should_panic(expected = "Deserialize field 2 (city) from self.raw_bytes")]
+    fn test_address_lazy_city_access() {
+        let bytes = b"test";
+        let address_lazy = AddressLazyImpl::new_global(bytes);
+        // This will panic because deserialization is not implemented yet
+        let _city = DynAddress::city(&address_lazy);
+    }
+
+    #[test]
+    #[should_panic(expected = "Deserialize field 3 (zip_code) from self.raw_bytes")]
+    fn test_address_lazy_zip_code_access() {
+        let bytes = b"test";
+        let address_lazy = AddressLazyImpl::new_global(bytes);
+        // This will panic because deserialization is not implemented yet
+        let _zip_code = DynAddress::zip_code(&address_lazy);
+    }
+
+    #[test]
+    fn test_person_lazy_implements_person_trait() {
+        let bytes = b"test";
+        let person_lazy = PersonLazyImpl::new_global(bytes);
+        // Verify that PersonLazyImpl implements Person trait
+        // Person trait is not dyn-compatible, but we can use it directly
+        // This is a compile-time check - if this compiles, the trait is implemented
+        fn _check_person_impl<T: Person>(_: &T) {}
+        _check_person_impl(&person_lazy);
+    }
+
+    #[test]
+    fn test_person_lazy_implements_dyn_person_trait() {
+        let bytes = b"test";
+        let person_lazy = PersonLazyImpl::new_global(bytes);
+        // Verify that PersonLazyImpl implements DynPerson trait
+        // This is a compile-time check, so if this compiles, the trait is implemented
+        let _: &dyn DynPerson = &person_lazy as &dyn DynPerson;
+    }
+
+    #[test]
+    fn test_address_lazy_implements_address_trait() {
+        let bytes = b"test";
+        let address_lazy = AddressLazyImpl::new_global(bytes);
+        // Verify that AddressLazyImpl implements Address trait
+        // This is a compile-time check, so if this compiles, the trait is implemented
+        let _: &dyn Address = &address_lazy as &dyn Address;
+    }
+
+    #[test]
+    fn test_address_lazy_implements_dyn_address_trait() {
+        let bytes = b"test";
+        let address_lazy = AddressLazyImpl::new_global(bytes);
+        // Verify that AddressLazyImpl implements DynAddress trait
+        // This is a compile-time check, so if this compiles, the trait is implemented
+        let _: &dyn DynAddress = &address_lazy as &dyn DynAddress;
+    }
+
+    #[test]
+    #[should_panic(expected = "Deserialize field 1 (name) from self.raw_bytes")]
+    fn test_person_lazy_has_name_check() {
+        let bytes = b"test";
+        let person_lazy = PersonLazyImpl::new_global(bytes);
+        // This will panic because deserialization is not implemented yet
+        let _has_name = DynPerson::has_name(&person_lazy);
     }
 }

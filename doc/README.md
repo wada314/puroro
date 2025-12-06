@@ -10,6 +10,7 @@ This directory contains the current documentation for Puroro, a Rust-idiomatic P
 - **`enum-implementation-design.md`** - Comprehensive design decisions for protobuf enum implementation
 - **`field-context-design.md`** - Current field operations design with SharedFields approach
 - **`field-operations-design.md`** - Current field operations implementation details
+- **`lazy-implementation-notes.md`** - Critical properties for lazy deserialization: field overwriting behavior and parsing strategies
 
 ### Development Planning
 - **`next-steps.md`** - Current development priorities and milestones
