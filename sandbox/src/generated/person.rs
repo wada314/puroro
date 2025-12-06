@@ -564,9 +564,13 @@ where
         todo!("Deserialize field 5 (score) from self.raw_bytes")
     }
 
-    /// Deserialize field 6 (address) from raw_bytes
+    /// Deserialize field 6 (address) from raw_bytes.
+    /// Collects all occurrences of field 6 and creates AddressLazyImpl with the slices.
+    /// This avoids allocating a merged buffer - slices are stored directly.
     fn deserialize_field_6_address(&self) -> AddressLazyImpl<'a, A> {
-        todo!("Deserialize field 6 (address) from self.raw_bytes")
+        todo!(
+            "Collect all occurrences of field 6 from self.raw_bytes and create AddressLazyImpl::new_from_slices with those slices"
+        )
     }
 
     /// Deserialize field 8 (secondary_status) from raw_bytes
@@ -581,10 +585,11 @@ where
         )
     }
 
-    /// Deserialize field 9 (addresses) from raw_bytes and populate OnceList
+    /// Deserialize field 9 (addresses) from raw_bytes and populate OnceList.
+    /// Each address occurrence creates an AddressLazyImpl from its slice (no merging needed for repeated fields).
     fn deserialize_field_9_addresses(&self) {
         todo!(
-            "Deserialize field 9 (addresses) from self.raw_bytes and push each address to self.addresses"
+            "Deserialize field 9 (addresses) from self.raw_bytes, create AddressLazyImpl::new(slice) for each occurrence, and push to self.addresses"
         )
     }
 }
@@ -978,23 +983,22 @@ mod tests {
         // Test new with borrowed slice
         let _address_lazy = AddressLazyImpl::new(bytes, Global);
 
-        // Test new_owned with owned Vec
-        let bytes_owned = b"owned address bytes".to_vec();
-        let _address_lazy_owned = AddressLazyImpl::new_owned(bytes_owned.clone(), Global);
-
-        // Test new_in with Cow::Borrowed
-        let _address_lazy_borrowed = AddressLazyImpl::new_in(Cow::Borrowed(bytes), Global);
-
-        // Test new_in with Cow::Owned
-        let bytes_cow = b"cow address bytes".to_vec();
-        let _address_lazy_cow = AddressLazyImpl::new_in(Cow::Owned(bytes_cow.clone()), Global);
+        // Test new_from_slices with multiple slices (for scalar message fields)
+        let slice1 = b"first slice";
+        let slice2 = b"second slice";
+        let _address_lazy_slices =
+            AddressLazyImpl::new_from_slices([slice1, slice2].into_iter(), Global);
 
         // Test new_global
         let _address_lazy_global = AddressLazyImpl::new_global(bytes);
+
+        // Test new_from_slices_global
+        let _address_lazy_slices_global =
+            AddressLazyImpl::new_from_slices_global([slice1, slice2].into_iter());
     }
 
     #[test]
-    #[should_panic(expected = "Deserialize field 1 (street) from self.raw_bytes")]
+    #[should_panic(expected = "Deserialize field 1 (street)")]
     fn test_address_lazy_street_access() {
         let bytes = b"test";
         let address_lazy = AddressLazyImpl::new_global(bytes);
@@ -1003,7 +1007,7 @@ mod tests {
     }
 
     #[test]
-    #[should_panic(expected = "Deserialize field 2 (city) from self.raw_bytes")]
+    #[should_panic(expected = "Deserialize field 2 (city)")]
     fn test_address_lazy_city_access() {
         let bytes = b"test";
         let address_lazy = AddressLazyImpl::new_global(bytes);
@@ -1012,7 +1016,7 @@ mod tests {
     }
 
     #[test]
-    #[should_panic(expected = "Deserialize field 3 (zip_code) from self.raw_bytes")]
+    #[should_panic(expected = "Deserialize field 3 (zip_code)")]
     fn test_address_lazy_zip_code_access() {
         let bytes = b"test";
         let address_lazy = AddressLazyImpl::new_global(bytes);

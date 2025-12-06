@@ -7,7 +7,7 @@
 
 use ::allocator_api2::vec::Vec as AllocVec;
 use ::allocator_extras::{Allocator, Global};
-use std::borrow::Cow;
+use once_list2::OnceList;
 use std::cell::OnceCell;
 use puroro::{
     Message,
@@ -266,14 +266,17 @@ impl<A: Allocator + Clone> Message for AddressImpl<A> {
 
 /// Lazy implementation of Address message that deserializes fields on-demand.
 ///
-/// This struct holds a maybe-owned byte slice (`Cow<'a, [u8]>`) and deserializes
-/// fields only when they are accessed, caching the results for subsequent accesses.
+/// This struct holds a list of slices representing all occurrences of the field
+/// (for scalar message fields, all occurrences must be collected to merge them).
+/// Fields are deserialized only when they are accessed, with results cached for subsequent accesses.
 /// Unlike `AddressImpl`, this struct is immutable and does not implement mutable traits.
 #[derive(Debug)]
-#[allow(dead_code)] // raw_bytes and allocator are used in deserialization functions (stubs)
+#[allow(dead_code)] // field_slices and allocator are used in deserialization functions (stubs)
 pub struct AddressLazyImpl<'a, A: Allocator = Global> {
-    /// Raw protobuf byte data (maybe-owned)
-    raw_bytes: Cow<'a, [u8]>,
+    /// List of slices, each representing one occurrence of this message field in the wire format.
+    /// For scalar message fields, all occurrences must be collected (merged) when parsing.
+    /// Each slice points to the raw protobuf bytes for one occurrence.
+    field_slices: OnceList<&'a [u8], A>,
     /// Allocator for future use
     allocator: A,
     
@@ -290,20 +293,31 @@ impl<'a, A> AddressLazyImpl<'a, A>
 where
     A: Allocator + Clone,
 {
-    /// Creates a new AddressLazyImpl from a borrowed byte slice.
-    pub fn new(bytes: &'a [u8], alloc: A) -> Self {
-        Self::new_in(Cow::Borrowed(bytes), alloc)
-    }
-
-    /// Creates a new AddressLazyImpl from an owned Vec.
-    pub fn new_owned(bytes: Vec<u8>, alloc: A) -> Self {
-        Self::new_in(Cow::Owned(bytes), alloc)
-    }
-
-    /// Generic constructor that accepts a Cow<'a, [u8]>.
-    pub fn new_in(bytes: Cow<'a, [u8]>, alloc: A) -> Self {
+    /// Creates a new AddressLazyImpl from a single slice.
+    /// For scalar message fields, use `new_from_slices` to provide all occurrences.
+    pub fn new(slice: &'a [u8], alloc: A) -> Self {
+        let alloc_clone = alloc.clone();
+        let field_slices = OnceList::new_in(alloc_clone);
+        field_slices.push(slice);
         Self {
-            raw_bytes: bytes,
+            field_slices,
+            allocator: alloc,
+            street: OnceCell::new(),
+            city: OnceCell::new(),
+            zip_code: OnceCell::new(),
+        }
+    }
+
+    /// Creates a new AddressLazyImpl from multiple slices (for scalar message fields
+    /// that need to collect all occurrences).
+    pub fn new_from_slices(slices: impl Iterator<Item = &'a [u8]>, alloc: A) -> Self {
+        let alloc_clone = alloc.clone();
+        let field_slices = OnceList::new_in(alloc_clone);
+        for slice in slices {
+            field_slices.push(slice);
+        }
+        Self {
+            field_slices,
             allocator: alloc,
             street: OnceCell::new(),
             city: OnceCell::new(),
@@ -314,8 +328,13 @@ where
 
 impl<'a> AddressLazyImpl<'a, Global> {
     /// Creates a new AddressLazyImpl using the global allocator.
-    pub fn new_global(bytes: &'a [u8]) -> Self {
-        Self::new(bytes, Global)
+    pub fn new_global(slice: &'a [u8]) -> Self {
+        Self::new(slice, Global)
+    }
+
+    /// Creates a new AddressLazyImpl from multiple slices using the global allocator.
+    pub fn new_from_slices_global(slices: impl Iterator<Item = &'a [u8]>) -> Self {
+        Self::new_from_slices(slices, Global)
     }
 }
 
@@ -325,19 +344,22 @@ where
 {
     // Deserialization helper functions (stub implementations)
     
-    /// Deserialize field 1 (street) from raw_bytes
+    /// Deserialize field 1 (street) from field_slices.
+    /// Must iterate over all slices to find the last occurrence (scalar fields can be overwritten).
     fn deserialize_field_1_street(&self) -> String {
-        todo!("Deserialize field 1 (street) from self.raw_bytes")
+        todo!("Deserialize field 1 (street) by iterating over self.field_slices to find last occurrence")
     }
 
-    /// Deserialize field 2 (city) from raw_bytes
+    /// Deserialize field 2 (city) from field_slices.
+    /// Must iterate over all slices to find the last occurrence (scalar fields can be overwritten).
     fn deserialize_field_2_city(&self) -> String {
-        todo!("Deserialize field 2 (city) from self.raw_bytes")
+        todo!("Deserialize field 2 (city) by iterating over self.field_slices to find last occurrence")
     }
 
-    /// Deserialize field 3 (zip_code) from raw_bytes
+    /// Deserialize field 3 (zip_code) from field_slices.
+    /// Must iterate over all slices to find the last occurrence (scalar fields can be overwritten).
     fn deserialize_field_3_zip_code(&self) -> i32 {
-        todo!("Deserialize field 3 (zip_code) from self.raw_bytes")
+        todo!("Deserialize field 3 (zip_code) by iterating over self.field_slices to find last occurrence")
     }
 }
 
