@@ -46,6 +46,8 @@ pub mod view;
 /// Repeated field runtime trait and adapters.
 pub mod repeated;
 
+pub use repeated::OnceListRepeatedMap;
+
 /// Core message trait that all generated Protocol Buffer messages implement.
 pub trait Message: Sized + Clone + PartialEq {
     /// Parses a message from the given byte slice.

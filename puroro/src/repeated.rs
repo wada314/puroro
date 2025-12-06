@@ -2,6 +2,7 @@ use ::allocator_api2::alloc::Allocator;
 use ::allocator_api2::boxed::Box;
 use ::allocator_api2::unsize_box;
 use ::allocator_api2::vec::Vec;
+use once_list2::OnceList;
 
 /// Object-safe trait representing a repeated field using an associated type.
 ///
@@ -198,4 +199,84 @@ where
     let boxed = Box::new(adapter);
     let boxed_dyn: Box<dyn Repeated<'a, Item = T> + 'a> = unsize_box!(boxed);
     boxed_dyn
+}
+
+/// Adapter over a reference to a OnceList with a mapping function.
+///
+/// This allows OnceList to be used with the Repeated trait when items need to be mapped.
+pub struct OnceListRepeatedMap<'a, S, T, A: Allocator, F>
+where
+    F: Fn(&'a S) -> T,
+{
+    once_list: &'a OnceList<S, A>,
+    map: F,
+    _phantom: std::marker::PhantomData<T>,
+}
+
+impl<'a, S, T, A: Allocator, F> OnceListRepeatedMap<'a, S, T, A, F>
+where
+    F: Fn(&'a S) -> T,
+{
+    /// Creates a repeated adapter over a reference to a OnceList with a mapping function.
+    #[inline]
+    pub fn new(once_list: &'a OnceList<S, A>, map: F) -> Self {
+        Self {
+            once_list,
+            map,
+            _phantom: std::marker::PhantomData,
+        }
+    }
+}
+
+#[allow(missing_docs)]
+impl<'a, S: 'a, T: 'a, A: Allocator + 'a, F> Repeated<'a> for OnceListRepeatedMap<'a, S, T, A, F>
+where
+    F: Fn(&'a S) -> T + 'a,
+{
+    type Item = T;
+
+    fn len(&self) -> usize {
+        self.once_list.iter().count()
+    }
+
+    fn is_empty(&self) -> bool {
+        self.once_list.iter().next().is_none()
+    }
+
+    fn get(&self, index: usize) -> Option<Self::Item> {
+        self.once_list.iter().nth(index).map(&self.map)
+    }
+
+    fn iter_box(&self) -> Box<dyn Iterator<Item = Self::Item> + 'a> {
+        let owned: std::vec::Vec<T> = self.once_list.iter().map(&self.map).collect();
+        let it = owned.into_iter();
+        let boxed = Box::new(it);
+        let boxed_dyn: Box<dyn Iterator<Item = T> + 'a> = unsize_box!(boxed);
+        boxed_dyn
+    }
+}
+
+#[allow(missing_docs)]
+impl<'a, T: Copy + 'a, A: Allocator + 'a> Repeated<'a> for &'a OnceList<T, A> {
+    type Item = T;
+
+    fn len(&self) -> usize {
+        self.iter().count()
+    }
+
+    fn is_empty(&self) -> bool {
+        self.iter().next().is_none()
+    }
+
+    fn get(&self, index: usize) -> Option<Self::Item> {
+        self.iter().nth(index).copied()
+    }
+
+    fn iter_box(&self) -> Box<dyn Iterator<Item = Self::Item> + 'a> {
+        let owned: std::vec::Vec<T> = self.iter().copied().collect();
+        let it = owned.into_iter();
+        let boxed = Box::new(it);
+        let boxed_dyn: Box<dyn Iterator<Item = T> + 'a> = unsize_box!(boxed);
+        boxed_dyn
+    }
 }

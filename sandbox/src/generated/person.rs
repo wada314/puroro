@@ -18,7 +18,7 @@ use puroro::{
         ExplicitOptional, FieldOperations, FieldStorage, ImplicitOptional, MessageFieldWrapper,
         SingularMessage, StringFieldWrapper,
     },
-    repeated::{RefVec, RefVecMap, Repeated, repeated_from_slice},
+    repeated::{OnceListRepeatedMap, RefVec, RefVecMap, Repeated, repeated_from_slice},
     shared::SharedFields,
     view::ViewCow,
 };
@@ -533,91 +533,6 @@ impl<'a> PersonLazyImpl<'a, Global> {
     }
 }
 
-// Adapter to implement Repeated trait for OnceList
-struct OnceListRepeated<'a, T, A: Allocator> {
-    once_list: &'a OnceList<T, A>,
-}
-
-impl<'a, T, A: Allocator> OnceListRepeated<'a, T, A> {
-    fn new(once_list: &'a OnceList<T, A>) -> Self {
-        Self { once_list }
-    }
-}
-
-impl<'a, T: Copy + 'a, A: Allocator + 'a> Repeated<'a> for OnceListRepeated<'a, T, A> {
-    type Item = T;
-
-    fn len(&self) -> usize {
-        self.once_list.iter().count()
-    }
-
-    fn is_empty(&self) -> bool {
-        self.once_list.iter().next().is_none()
-    }
-
-    fn get(&self, index: usize) -> Option<Self::Item> {
-        self.once_list.iter().nth(index).copied()
-    }
-
-    fn iter_box(&self) -> AllocBox<dyn Iterator<Item = Self::Item> + 'a, Global> {
-        let owned: std::vec::Vec<T> = self.once_list.iter().copied().collect();
-        let it = owned.into_iter();
-        let boxed = AllocBox::new_in(it, Global);
-        let boxed_dyn: AllocBox<dyn Iterator<Item = T> + 'a, Global> = unsize_box!(boxed);
-        boxed_dyn
-    }
-}
-
-// Adapter to implement Repeated trait for OnceList with mapping
-struct OnceListRepeatedMap<'a, S, T, A: Allocator, F>
-where
-    F: Fn(&'a S) -> T,
-{
-    once_list: &'a OnceList<S, A>,
-    map: F,
-    _phantom: std::marker::PhantomData<T>,
-}
-
-impl<'a, S, T, A: Allocator, F> OnceListRepeatedMap<'a, S, T, A, F>
-where
-    F: Fn(&'a S) -> T,
-{
-    fn new(once_list: &'a OnceList<S, A>, map: F) -> Self {
-        Self {
-            once_list,
-            map,
-            _phantom: std::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, S: 'a, T: 'a, A: Allocator + 'a, F> Repeated<'a> for OnceListRepeatedMap<'a, S, T, A, F>
-where
-    F: Fn(&'a S) -> T + 'a,
-{
-    type Item = T;
-
-    fn len(&self) -> usize {
-        self.once_list.iter().count()
-    }
-
-    fn is_empty(&self) -> bool {
-        self.once_list.iter().next().is_none()
-    }
-
-    fn get(&self, index: usize) -> Option<Self::Item> {
-        self.once_list.iter().nth(index).map(&self.map)
-    }
-
-    fn iter_box(&self) -> AllocBox<dyn Iterator<Item = Self::Item> + 'a, Global> {
-        let owned: std::vec::Vec<T> = self.once_list.iter().map(&self.map).collect();
-        let it = owned.into_iter();
-        let boxed = AllocBox::new_in(it, Global);
-        let boxed_dyn: AllocBox<dyn Iterator<Item = T> + 'a, Global> = unsize_box!(boxed);
-        boxed_dyn
-    }
-}
-
 impl<'a, A> PersonLazyImpl<'a, A>
 where
     A: Allocator + Clone,
@@ -685,8 +600,8 @@ impl<'a, A: Allocator + Clone> Person for PersonLazyImpl<'a, A> {
         if self.scores.iter().next().is_none() {
             self.deserialize_field_10_scores();
         }
-        // Create adapter for OnceList iterator
-        OnceListRepeated::new(&self.scores)
+        // OnceList implements Repeated directly
+        &self.scores
     }
 
     fn addresses(&self) -> impl Repeated<'_, Item = impl Address + '_> + use<'a, '_, A> {
@@ -759,9 +674,8 @@ impl<'a, A: Allocator + Clone> DynPerson for PersonLazyImpl<'a, A> {
         if self.scores.iter().next().is_none() {
             self.deserialize_field_10_scores();
         }
-        // Create adapter for OnceList iterator
-        let adapter = OnceListRepeated::new(&self.scores);
-        let boxed = AllocBox::new_in(adapter, Global);
+        // OnceList implements Repeated directly
+        let boxed = AllocBox::new_in(&self.scores, Global);
         let boxed_dyn: AllocBox<dyn Repeated<'_, Item = i32> + '_, Global> = unsize_box!(boxed);
         ViewCow::Owned(boxed_dyn)
     }
