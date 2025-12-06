@@ -21,9 +21,7 @@ use puroro::{
 };
 
 // Import Address-related types from the separate module
-pub use super::address::{
-    Address, AddressAppend, AddressImpl, AddressMut, DynAddress, DynAddressAppend, DynAddressMut,
-};
+pub use super::address::{Address, AddressImpl, AddressMut, DynAddress, DynAddressMut};
 
 /// Flexible view trait for Person message (not dyn-compatible).
 ///
@@ -103,42 +101,16 @@ pub trait DynPerson {
     fn has_name(&self) -> bool;
 }
 
-/// Flexible view append-only trait for Person message (not dyn-compatible).
-///
-/// Code generation note: MUST NOT reference implementation struct names. All methods must use trait types only.
-pub trait PersonAppend: Person + DynPersonAppend {
-    // Methods that delegate to DynPersonAppend (default implementations)
-    #[inline]
-    fn set_name(&mut self, v: &str) {
-        DynPersonAppend::set_name(self, v)
-    }
-
-    // Methods with custom implementations (must be implemented)
-    // NOTE: Must return `impl AddressAppend`, not a concrete struct type
-    fn address_mut(&mut self) -> impl AddressAppend + use<'_, Self>;
-
-    // Repeated mutators (delegating to DynPersonAppend)
-    #[inline]
-    fn push_score(&mut self, v: i32) {
-        DynPersonAppend::push_score(self, v)
-    }
-}
-
-/// Dyn-compatible append-only trait for Person message.
-///
-/// Code generation note: This trait MUST be dyn-compatible. Do not use `impl Trait` here.
-pub trait DynPersonAppend: DynPerson {
-    // Setters - sample: set_name (others follow same pattern: field.set(&mut self._shared, v) or field.set(&mut self._shared, v.to_wire()))
-    fn set_name(&mut self, v: &str);
-
-    // Repeated mutators
-    fn push_score(&mut self, v: i32);
-}
-
 /// Flexible view fully mutable trait for Person message (not dyn-compatible).
 ///
 /// Code generation note: MUST NOT reference implementation struct names. All methods must use trait types only.
-pub trait PersonMut: PersonAppend + DynPersonMut {
+pub trait PersonMut: Person + DynPersonMut {
+    // Setters (delegating to DynPersonMut)
+    #[inline]
+    fn set_name(&mut self, v: &str) {
+        DynPersonMut::set_name(self, v)
+    }
+
     // Clear methods (delegating to DynPersonMut)
     #[inline]
     fn clear_name(&mut self) {
@@ -153,6 +125,12 @@ pub trait PersonMut: PersonAppend + DynPersonMut {
         DynPersonMut::clear_addresses(self)
     }
 
+    // Repeated mutators (delegating to DynPersonMut)
+    #[inline]
+    fn push_score(&mut self, v: i32) {
+        DynPersonMut::push_score(self, v)
+    }
+
     // Methods with custom implementations (must be implemented)
     // NOTE: Must return `impl AddressMut`, not a concrete struct type
     fn address_mut(&mut self) -> impl AddressMut + use<'_, Self>;
@@ -165,18 +143,23 @@ pub trait PersonMut: PersonAppend + DynPersonMut {
 /// Dyn-compatible fully mutable trait for Person message.
 ///
 /// Code generation note: This trait MUST be dyn-compatible. Do not use `impl Trait` here.
-pub trait DynPersonMut: DynPersonAppend {
+pub trait DynPersonMut: DynPerson {
+    // Setters - sample: set_name (others follow same pattern: field.set(&mut self._shared, v) or field.set(&mut self._shared, v.to_wire()))
+    fn set_name(&mut self, v: &str);
+
     // Clear methods - sample: clear_name (others follow same pattern: field.clear(&mut self._shared))
     fn clear_name(&mut self);
     fn clear_scores(&mut self);
     fn clear_addresses(&mut self);
+
+    // Repeated mutators
+    fn push_score(&mut self, v: i32);
 
     // Builder-style methods for nested message construction
     fn address_mut(&mut self) -> &mut dyn DynAddressMut;
 
     /// Appends a new default address and returns a mutable dyn view to build it.
     /// Note: This method requires full mutation ability, so it's only available in DynPersonMut.
-    /// Ideally, under append-only restrictions, we should take a pre-defined message value as a parameter.
     fn push_address(&mut self) -> &mut dyn DynAddressMut;
 }
 
@@ -332,13 +315,6 @@ impl<A: Allocator + Clone> Person for PersonImpl<A> {
     // All other methods use default implementations from the trait definition
 }
 
-impl<A: Allocator + Clone> PersonAppend for PersonImpl<A> {
-    fn address_mut(&mut self) -> impl AddressAppend + use<'_, A> {
-        self.address.data.as_mut()
-    }
-    // All other methods use default implementations from the trait definition
-}
-
 impl<A: Allocator + Clone> PersonMut for PersonImpl<A> {
     fn address_mut(&mut self) -> impl AddressMut + use<'_, A> {
         self.address.data.as_mut()
@@ -411,7 +387,7 @@ impl<A: Allocator + Clone> DynPerson for PersonImpl<A> {
     }
 }
 
-impl<A: Allocator + Clone> DynPersonAppend for PersonImpl<A> {
+impl<A: Allocator + Clone> DynPersonMut for PersonImpl<A> {
     // set_* methods - sample implementation (others follow same pattern: field.set(&mut self._shared, v) or field.set(&mut self._shared, v.to_wire()))
     fn set_name(&mut self, v: &str) {
         self.name.set(&mut self._shared, v)
@@ -420,9 +396,6 @@ impl<A: Allocator + Clone> DynPersonAppend for PersonImpl<A> {
     fn push_score(&mut self, v: i32) {
         self.scores.data.push(v)
     }
-}
-
-impl<A: Allocator + Clone> DynPersonMut for PersonImpl<A> {
     // clear_* methods - sample implementation (others follow same pattern: field.clear(&mut self._shared))
     fn clear_name(&mut self) {
         self.name.clear(&mut self._shared)
@@ -482,8 +455,8 @@ impl<A: Allocator + Clone> Message for PersonImpl<A> {
 #[cfg(test)]
 mod tests {
     use super::{
-        AddressImpl, DynAddress, DynAddressAppend, DynPerson, DynPersonMut, MessageFieldWrapper,
-        Person, PersonAppend, PersonImpl, PersonMut, Status, StringFieldWrapper,
+        AddressImpl, DynAddress, DynAddressMut, DynPerson, DynPersonMut, MessageFieldWrapper,
+        Person, PersonImpl, PersonMut, Status, StringFieldWrapper,
     };
 
     #[test]
@@ -525,8 +498,8 @@ mod tests {
     fn test_enum_fields() {
         let mut person = PersonImpl::new();
 
-        // Test setting enum fields (sample: only set_name is available in DynPersonAppend)
-        PersonAppend::set_name(&mut person, "Test");
+        // Test setting enum fields
+        PersonMut::set_name(&mut person, "Test");
 
         // Test getting enum fields
         match Person::status(&person) {
@@ -568,8 +541,8 @@ mod tests {
         let mut person = PersonImpl::new();
 
         // push and read scores
-        PersonAppend::push_score(&mut person, 10);
-        PersonAppend::push_score(&mut person, 20);
+        PersonMut::push_score(&mut person, 10);
+        PersonMut::push_score(&mut person, 20);
         {
             let rep = DynPerson::scores(&person);
             assert_eq!(rep.len(), 2);
@@ -582,11 +555,11 @@ mod tests {
 
         // push and read addresses
         {
-            let addr_mut = PersonMut::push_address(&mut person);
+            let mut addr_mut = PersonMut::push_address(&mut person);
             addr_mut.set_street("First St");
         }
         {
-            let addr_mut = PersonMut::push_address(&mut person);
+            let mut addr_mut = PersonMut::push_address(&mut person);
             addr_mut.set_street("Second Ave");
         }
         {

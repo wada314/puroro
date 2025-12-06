@@ -29,7 +29,6 @@ pub trait Address: DynAddress {}
 // Blanket implementation for references
 impl<T: Address> Address for &T {}
 impl<T: Address> Address for &mut T {}
-impl<T: AddressAppend> AddressAppend for &mut T {}
 impl<T: AddressMut> AddressMut for &mut T {}
 
 // Blanket implementation for Option
@@ -51,22 +50,15 @@ impl<T: Address> Address for Option<T> {}
 
 // Blanket implementation for Box
 impl<T: Address> Address for Box<T> {}
-impl<T: AddressAppend> AddressAppend for Box<T> {}
 impl<T: AddressMut> AddressMut for Box<T> {}
 
 // Blanket implementation for Option
-impl<T: AddressAppend> AddressAppend for Option<T> {}
 impl<T: AddressMut> AddressMut for Option<T> {}
-
-/// Flexible view append-only trait for Address message (not dyn-compatible).
-///
-/// Code generation note: MUST NOT reference implementation struct names. Trait-only abstraction.
-pub trait AddressAppend: Address + DynAddressAppend {}
 
 /// Flexible view fully mutable trait for Address message (not dyn-compatible).
 ///
 /// Code generation note: MUST NOT reference implementation struct names. Trait-only abstraction.
-pub trait AddressMut: AddressAppend + DynAddressMut {}
+pub trait AddressMut: Address + DynAddressMut {}
 
 /// Dyn-compatible immutable trait for Address message.
 ///
@@ -121,47 +113,22 @@ impl<T: DynAddress> DynAddress for Box<T> {
     }
 }
 
-/// Dyn-compatible append-only trait for Address message.
-///
-/// Code generation note: This trait MUST be dyn-compatible. Do not use `impl Trait` here.
-pub trait DynAddressAppend: DynAddress {
-    // Setters - sample: set_street (others follow same pattern: field.set(&mut self._shared, v))
-    fn set_street(&mut self, v: &str);
-}
-
-// Blanket implementation for references
-impl<T: DynAddressAppend> DynAddressAppend for &mut T {
-    fn set_street(&mut self, v: &str) {
-        (**self).set_street(v)
-    }
-}
-
-// Blanket implementation for Box
-impl<T: DynAddressAppend> DynAddressAppend for Box<T> {
-    fn set_street(&mut self, v: &str) {
-        (**self).set_street(v)
-    }
-}
-
-// Blanket implementation for Option
-impl<T: DynAddressAppend> DynAddressAppend for Option<T> {
-    fn set_street(&mut self, v: &str) {
-        if let Some(t) = self {
-            t.set_street(v);
-        }
-    }
-}
-
 /// Dyn-compatible fully mutable trait for Address message.
 ///
 /// Code generation note: This trait MUST be dyn-compatible. Do not use `impl Trait` here.
-pub trait DynAddressMut: DynAddressAppend {
+pub trait DynAddressMut: DynAddress {
+    // Setters - sample: set_street (others follow same pattern: field.set(&mut self._shared, v))
+    fn set_street(&mut self, v: &str);
+
     // Clear methods - sample: clear_street (others follow same pattern: field.clear(&mut self._shared))
     fn clear_street(&mut self);
 }
 
 // Blanket implementation for references
 impl<T: DynAddressMut> DynAddressMut for &mut T {
+    fn set_street(&mut self, v: &str) {
+        (**self).set_street(v)
+    }
     fn clear_street(&mut self) {
         (**self).clear_street()
     }
@@ -169,6 +136,9 @@ impl<T: DynAddressMut> DynAddressMut for &mut T {
 
 // Blanket implementation for Box
 impl<T: DynAddressMut> DynAddressMut for Box<T> {
+    fn set_street(&mut self, v: &str) {
+        (**self).set_street(v)
+    }
     fn clear_street(&mut self) {
         (**self).clear_street()
     }
@@ -176,6 +146,11 @@ impl<T: DynAddressMut> DynAddressMut for Box<T> {
 
 // Blanket implementation for Option
 impl<T: DynAddressMut> DynAddressMut for Option<T> {
+    fn set_street(&mut self, v: &str) {
+        if let Some(t) = self {
+            t.set_street(v);
+        }
+    }
     fn clear_street(&mut self) {
         if let Some(t) = self {
             t.clear_street();
@@ -249,18 +224,14 @@ impl<A: Allocator + Clone> DynAddress for AddressImpl<A> {
     }
 }
 
-impl<A: Allocator + Clone> AddressAppend for AddressImpl<A> {}
+impl<A: Allocator + Clone> AddressMut for AddressImpl<A> {}
 
-impl<A: Allocator + Clone> DynAddressAppend for AddressImpl<A> {
+impl<A: Allocator + Clone> DynAddressMut for AddressImpl<A> {
     // set_* methods - sample implementation (others follow same pattern: field.set(&mut self._shared, v))
     fn set_street(&mut self, v: &str) {
         self.street.set(&mut self._shared, v)
     }
-}
 
-impl<A: Allocator + Clone> AddressMut for AddressImpl<A> {}
-
-impl<A: Allocator + Clone> DynAddressMut for AddressImpl<A> {
     // clear_* methods - sample implementation (others follow same pattern: field.clear(&mut self._shared))
     fn clear_street(&mut self) {
         self.street.clear(&mut self._shared)

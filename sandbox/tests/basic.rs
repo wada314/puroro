@@ -1,7 +1,7 @@
 //! Basic integration tests for our API design.
 
 use ::allocator_extras::Global;
-use sandbox::generated::person::{DynPerson, Person, PersonAppend, PersonImpl, PersonMut};
+use sandbox::generated::person::{DynPerson, Person, PersonImpl, PersonMut};
 
 #[test]
 fn test_person_creation() {
@@ -27,8 +27,7 @@ fn test_person_default() {
 fn test_person_setters() {
     let mut person = PersonImpl::new();
 
-    PersonAppend::set_name(&mut person, "Alice");
-    // Sample: only set_name is available in DynPersonAppend trait
+    PersonMut::set_name(&mut person, "Alice");
 
     assert_eq!(Person::name(&person), "Alice");
 
@@ -41,7 +40,7 @@ fn test_person_setters() {
 fn test_person_clear() {
     let mut person = PersonImpl::new();
 
-    PersonAppend::set_name(&mut person, "Test");
+    PersonMut::set_name(&mut person, "Test");
     assert!(Person::has_name(&person));
 
     PersonMut::clear_name(&mut person);
@@ -55,7 +54,7 @@ fn test_person_clear() {
 #[test]
 fn test_person_clone() {
     let mut person = PersonImpl::new();
-    PersonAppend::set_name(&mut person, "Charlie");
+    PersonMut::set_name(&mut person, "Charlie");
 
     let cloned = person.clone();
     assert_eq!(person, cloned);
@@ -71,18 +70,16 @@ fn test_person_trait_usage() {
     }
 
     let mut person = PersonImpl::new();
-    PersonAppend::set_name(&mut person, "Dave");
+    PersonMut::set_name(&mut person, "Dave");
 
     assert_eq!(print_person_info(&person), "Dave (age: 0)");
 }
 
 #[test]
-fn test_person_append_trait_usage() {
-    // Test that we can use PersonAppend trait for append-only operations
-    fn populate_person(p: &mut impl PersonAppend, name: &str) {
-        PersonAppend::set_name(p, name);
-        // Sample: only set_name is available in PersonAppend trait
-        // p.clear_name(); // ❌ Would not compile - safe!
+fn test_person_mut_trait_setters() {
+    // Test that we can use PersonMut trait for setters
+    fn populate_person(p: &mut impl PersonMut, name: &str) {
+        PersonMut::set_name(p, name);
     }
 
     let mut person = PersonImpl::new();
@@ -96,12 +93,12 @@ fn test_person_append_trait_usage() {
 fn test_person_mut_trait_usage() {
     // Test that we can use PersonMut trait for full mutable operations
     fn reset_person(p: &mut impl PersonMut) {
-        PersonAppend::set_name(p, "Default");
+        PersonMut::set_name(p, "Default");
         PersonMut::clear_name(p); // Only PersonMut can clear (sample: only clear_name is available)
     }
 
     let mut person = PersonImpl::new();
-    PersonAppend::set_name(&mut person, "Alice");
+    PersonMut::set_name(&mut person, "Alice");
 
     reset_person(&mut person);
 
@@ -115,7 +112,7 @@ fn test_person_mut_trait_usage() {
 fn test_immutable_reference() {
     // Test that immutable references only allow Person trait operations
     let mut person = PersonImpl::new();
-    PersonAppend::set_name(&mut person, "Henry");
+    PersonMut::set_name(&mut person, "Henry");
 
     // Take an immutable reference - can only use Person trait methods
     // Note: Person is not dyn-compatible, so we use impl Person
@@ -134,11 +131,11 @@ fn test_person_string_coercion() {
 
     // Test that String can be coerced to &str
     let name_string = "Eve".to_string();
-    PersonAppend::set_name(&mut person, &name_string);
+    PersonMut::set_name(&mut person, &name_string);
     assert_eq!(Person::name(&person), "Eve");
 
     // &str literal should also work
-    PersonAppend::set_name(&mut person, "Frank");
+    PersonMut::set_name(&mut person, "Frank");
     assert_eq!(Person::name(&person), "Frank");
 }
 
@@ -187,7 +184,7 @@ fn test_inline_optimization_hint() {
     let mut person = PersonImpl::new();
 
     // These calls should be inlined in release builds
-    PersonAppend::set_name(&mut person, "Inline Test");
+    PersonMut::set_name(&mut person, "Inline Test");
     let _ = Person::name(&person);
     let _ = DynPerson::has_name(&person);
 
@@ -205,7 +202,7 @@ fn test_clone_into_optimization() {
     let mut person = PersonImpl::new();
 
     // First set - allocates
-    PersonAppend::set_name(
+    PersonMut::set_name(
         &mut person,
         "A very long string that requires heap allocation",
     );
@@ -215,11 +212,11 @@ fn test_clone_into_optimization() {
     );
 
     // Second set with shorter string - clone_into reuses allocation internally
-    PersonAppend::set_name(&mut person, "Short");
+    PersonMut::set_name(&mut person, "Short");
     assert_eq!(Person::name(&person), "Short");
 
     // Third set with another long string
-    PersonAppend::set_name(
+    PersonMut::set_name(
         &mut person,
         "Another very long string that requires heap allocation",
     );
