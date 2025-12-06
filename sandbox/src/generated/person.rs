@@ -6,8 +6,11 @@
 //!
 //! This code is (supposed to be) generated from `sandbox/protos/person.proto`.
 
+use ::allocator_api2::boxed::Box as AllocBox;
+use ::allocator_api2::unsize_box;
 use ::allocator_api2::vec::Vec as AllocVec;
 use ::allocator_extras::{Allocator, Global};
+use once_list2::OnceList;
 use puroro::{
     Message,
     error::Error,
@@ -19,9 +22,13 @@ use puroro::{
     shared::SharedFields,
     view::ViewCow,
 };
+use std::borrow::Cow;
+use std::cell::OnceCell;
 
 // Import Address-related types from the separate module
-pub use super::address::{Address, AddressImpl, AddressMut, DynAddress, DynAddressMut};
+pub use super::address::{
+    Address, AddressImpl, AddressLazyImpl, AddressMut, DynAddress, DynAddressMut,
+};
 
 /// Flexible view trait for Person message (not dyn-compatible).
 ///
@@ -449,6 +456,343 @@ impl<A: Allocator + Clone> Message for PersonImpl<A> {
 }
 
 // ============================================================================
+// PersonLazyImpl Structure
+// ============================================================================
+
+/// Lazy implementation of Person message that deserializes fields on-demand.
+///
+/// This struct holds a maybe-owned byte slice (`Cow<'a, [u8]>`) and deserializes
+/// fields only when they are accessed, caching the results for subsequent accesses.
+/// Unlike `PersonImpl`, this struct is immutable and does not implement mutable traits.
+#[derive(Debug)]
+#[allow(dead_code)] // raw_bytes and allocator are used in deserialization functions (stubs)
+pub struct PersonLazyImpl<'a, A: Allocator = Global> {
+    /// Raw protobuf byte data (maybe-owned)
+    raw_bytes: Cow<'a, [u8]>,
+    /// Allocator for future use
+    allocator: A,
+
+    // Cache fields (no `cached_` prefix as per design)
+    /// Field 1: name (implicit presence string field)
+    name: OnceCell<String>,
+    /// Field 2: age (implicit presence varint field)
+    age: OnceCell<i32>,
+    /// Field 3: email (explicit presence string field)
+    email: OnceCell<String>,
+    /// Field 4: status (enum field, stored as i32)
+    status: OnceCell<i32>,
+    /// Field 5: score (explicit presence scalar field)
+    score: OnceCell<i32>,
+    /// Field 6: address (message field)
+    address: OnceCell<AddressImpl<A>>,
+    /// Field 8: secondary_status (explicit presence enum field, stored as i32)
+    secondary_status: OnceCell<i32>,
+    /// Field 10: scores (repeated scalar field)
+    scores: OnceList<i32, A>,
+    /// Field 9: addresses (repeated message field)
+    addresses: OnceList<AddressImpl<A>, A>,
+}
+
+impl<'a, A> PersonLazyImpl<'a, A>
+where
+    A: Allocator + Clone,
+{
+    /// Creates a new PersonLazyImpl from a borrowed byte slice.
+    pub fn new(bytes: &'a [u8], alloc: A) -> Self {
+        Self::new_in(Cow::Borrowed(bytes), alloc)
+    }
+
+    /// Creates a new PersonLazyImpl from an owned Vec.
+    pub fn new_owned(bytes: Vec<u8>, alloc: A) -> Self {
+        Self::new_in(Cow::Owned(bytes), alloc)
+    }
+
+    /// Generic constructor that accepts a Cow<'a, [u8]>.
+    pub fn new_in(bytes: Cow<'a, [u8]>, alloc: A) -> Self {
+        let alloc_clone = alloc.clone();
+        Self {
+            raw_bytes: bytes,
+            allocator: alloc,
+            name: OnceCell::new(),
+            age: OnceCell::new(),
+            email: OnceCell::new(),
+            status: OnceCell::new(),
+            score: OnceCell::new(),
+            address: OnceCell::new(),
+            secondary_status: OnceCell::new(),
+            scores: OnceList::new_in(alloc_clone.clone()),
+            addresses: OnceList::new_in(alloc_clone),
+        }
+    }
+}
+
+impl<'a> PersonLazyImpl<'a, Global> {
+    /// Creates a new PersonLazyImpl using the global allocator.
+    pub fn new_global(bytes: &'a [u8]) -> Self {
+        Self::new(bytes, Global)
+    }
+}
+
+// Adapter to implement Repeated trait for OnceList
+struct OnceListRepeated<'a, T, A: Allocator> {
+    once_list: &'a OnceList<T, A>,
+}
+
+impl<'a, T, A: Allocator> OnceListRepeated<'a, T, A> {
+    fn new(once_list: &'a OnceList<T, A>) -> Self {
+        Self { once_list }
+    }
+}
+
+impl<'a, T: Copy + 'a, A: Allocator + 'a> Repeated<'a> for OnceListRepeated<'a, T, A> {
+    type Item = T;
+
+    fn len(&self) -> usize {
+        self.once_list.iter().count()
+    }
+
+    fn is_empty(&self) -> bool {
+        self.once_list.iter().next().is_none()
+    }
+
+    fn get(&self, index: usize) -> Option<Self::Item> {
+        self.once_list.iter().nth(index).copied()
+    }
+
+    fn iter_box(&self) -> AllocBox<dyn Iterator<Item = Self::Item> + 'a, Global> {
+        let owned: std::vec::Vec<T> = self.once_list.iter().copied().collect();
+        let it = owned.into_iter();
+        let boxed = AllocBox::new_in(it, Global);
+        let boxed_dyn: AllocBox<dyn Iterator<Item = T> + 'a, Global> = unsize_box!(boxed);
+        boxed_dyn
+    }
+}
+
+// Adapter to implement Repeated trait for OnceList with mapping
+struct OnceListRepeatedMap<'a, S, T, A: Allocator, F>
+where
+    F: Fn(&'a S) -> T,
+{
+    once_list: &'a OnceList<S, A>,
+    map: F,
+    _phantom: std::marker::PhantomData<T>,
+}
+
+impl<'a, S, T, A: Allocator, F> OnceListRepeatedMap<'a, S, T, A, F>
+where
+    F: Fn(&'a S) -> T,
+{
+    fn new(once_list: &'a OnceList<S, A>, map: F) -> Self {
+        Self {
+            once_list,
+            map,
+            _phantom: std::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: 'a, T: 'a, A: Allocator + 'a, F> Repeated<'a> for OnceListRepeatedMap<'a, S, T, A, F>
+where
+    F: Fn(&'a S) -> T + 'a,
+{
+    type Item = T;
+
+    fn len(&self) -> usize {
+        self.once_list.iter().count()
+    }
+
+    fn is_empty(&self) -> bool {
+        self.once_list.iter().next().is_none()
+    }
+
+    fn get(&self, index: usize) -> Option<Self::Item> {
+        self.once_list.iter().nth(index).map(&self.map)
+    }
+
+    fn iter_box(&self) -> AllocBox<dyn Iterator<Item = Self::Item> + 'a, Global> {
+        let owned: std::vec::Vec<T> = self.once_list.iter().map(&self.map).collect();
+        let it = owned.into_iter();
+        let boxed = AllocBox::new_in(it, Global);
+        let boxed_dyn: AllocBox<dyn Iterator<Item = T> + 'a, Global> = unsize_box!(boxed);
+        boxed_dyn
+    }
+}
+
+impl<'a, A> PersonLazyImpl<'a, A>
+where
+    A: Allocator + Clone,
+{
+    // Deserialization helper functions (stub implementations)
+
+    /// Deserialize field 1 (name) from raw_bytes
+    fn deserialize_field_1_name(&self) -> String {
+        todo!("Deserialize field 1 (name) from self.raw_bytes")
+    }
+
+    /// Deserialize field 2 (age) from raw_bytes
+    fn deserialize_field_2_age(&self) -> i32 {
+        todo!("Deserialize field 2 (age) from self.raw_bytes")
+    }
+
+    /// Deserialize field 3 (email) from raw_bytes
+    fn deserialize_field_3_email(&self) -> String {
+        todo!("Deserialize field 3 (email) from self.raw_bytes")
+    }
+
+    /// Deserialize field 4 (status) from raw_bytes
+    fn deserialize_field_4_status(&self) -> i32 {
+        todo!("Deserialize field 4 (status) from self.raw_bytes")
+    }
+
+    /// Deserialize field 5 (score) from raw_bytes
+    fn deserialize_field_5_score(&self) -> i32 {
+        todo!("Deserialize field 5 (score) from self.raw_bytes")
+    }
+
+    /// Deserialize field 6 (address) from raw_bytes
+    fn deserialize_field_6_address(&self) -> AddressImpl<A> {
+        todo!("Deserialize field 6 (address) from self.raw_bytes")
+    }
+
+    /// Deserialize field 8 (secondary_status) from raw_bytes
+    fn deserialize_field_8_secondary_status(&self) -> i32 {
+        todo!("Deserialize field 8 (secondary_status) from self.raw_bytes")
+    }
+
+    /// Deserialize field 10 (scores) from raw_bytes and populate OnceList
+    fn deserialize_field_10_scores(&self) {
+        todo!(
+            "Deserialize field 10 (scores) from self.raw_bytes and push each score to self.scores"
+        )
+    }
+
+    /// Deserialize field 9 (addresses) from raw_bytes and populate OnceList
+    fn deserialize_field_9_addresses(&self) {
+        todo!(
+            "Deserialize field 9 (addresses) from self.raw_bytes and push each address to self.addresses"
+        )
+    }
+}
+
+impl<'a, A: Allocator + Clone> Person for PersonLazyImpl<'a, A> {
+    fn address(&self) -> impl Address + use<'a, '_, A> {
+        self.address
+            .get_or_init(|| self.deserialize_field_6_address())
+    }
+
+    fn scores(&self) -> impl Repeated<'_, Item = i32> + use<'a, '_, A> {
+        // Ensure scores are deserialized on first access
+        if self.scores.iter().next().is_none() {
+            self.deserialize_field_10_scores();
+        }
+        // Create adapter for OnceList iterator
+        OnceListRepeated::new(&self.scores)
+    }
+
+    fn addresses(&self) -> impl Repeated<'_, Item = impl Address + '_> + use<'a, '_, A> {
+        // Ensure addresses are deserialized on first access
+        if self.addresses.iter().next().is_none() {
+            self.deserialize_field_9_addresses();
+        }
+        // Create adapter for OnceList iterator
+        OnceListRepeatedMap::new(&self.addresses, |addr: &AddressImpl<A>| addr)
+    }
+}
+
+impl<'a, A: Allocator + Clone> DynPerson for PersonLazyImpl<'a, A> {
+    fn name(&self) -> &str {
+        self.name.get_or_init(|| self.deserialize_field_1_name())
+    }
+
+    fn age(&self) -> i32 {
+        *self.age.get_or_init(|| self.deserialize_field_2_age())
+    }
+
+    fn email(&self) -> Option<&str> {
+        // For explicit optional fields, we need to check presence
+        // For now, return Some if the field is not empty after deserialization
+        let email_str = self.email.get_or_init(|| self.deserialize_field_3_email());
+        if email_str.is_empty() {
+            None
+        } else {
+            Some(email_str.as_str())
+        }
+    }
+
+    fn score(&self) -> Option<i32> {
+        // For explicit optional fields, check presence
+        // For now, always return Some (presence check needs proper implementation)
+        Some(*self.score.get_or_init(|| self.deserialize_field_5_score()))
+    }
+
+    fn status(&self) -> Result<Status, i32> {
+        let wire_value = *self
+            .status
+            .get_or_init(|| self.deserialize_field_4_status());
+        Status::from_wire(wire_value)
+    }
+
+    fn secondary_status(&self) -> Result<Option<Status>, i32> {
+        let wire_value = *self
+            .secondary_status
+            .get_or_init(|| self.deserialize_field_8_secondary_status());
+        // For now, assume presence if value is not 0 (needs proper implementation)
+        if wire_value != 0 {
+            match Status::from_wire(wire_value) {
+                Ok(status) => Ok(Some(status)),
+                Err(unknown) => Err(unknown),
+            }
+        } else {
+            Ok(None)
+        }
+    }
+
+    fn address(&self) -> Option<ViewCow<'_, dyn DynAddress>> {
+        let addr = self
+            .address
+            .get_or_init(|| self.deserialize_field_6_address());
+        Some(ViewCow::Borrowed(addr as &dyn DynAddress))
+    }
+
+    fn scores(&self) -> ViewCow<'_, dyn Repeated<'_, Item = i32>> {
+        // Ensure scores are deserialized on first access
+        if self.scores.iter().next().is_none() {
+            self.deserialize_field_10_scores();
+        }
+        // Create adapter for OnceList iterator
+        let adapter = OnceListRepeated::new(&self.scores);
+        let boxed = AllocBox::new_in(adapter, Global);
+        let boxed_dyn: AllocBox<dyn Repeated<'_, Item = i32> + '_, Global> = unsize_box!(boxed);
+        ViewCow::Owned(boxed_dyn)
+    }
+
+    fn addresses<'a2: 'b, 'b>(
+        &'a2 self,
+    ) -> ViewCow<'a2, dyn Repeated<'a2, Item = ViewCow<'b, dyn DynAddress>> + 'b> {
+        // Ensure addresses are deserialized on first access
+        if self.addresses.iter().next().is_none() {
+            self.deserialize_field_9_addresses();
+        }
+        // Create adapter for OnceList iterator
+        let adapter = OnceListRepeatedMap::new(&self.addresses, |addr: &AddressImpl<A>| {
+            ViewCow::Borrowed(addr as &dyn DynAddress)
+        });
+        let boxed = AllocBox::new_in(adapter, Global);
+        let boxed_dyn: AllocBox<
+            dyn Repeated<'a2, Item = ViewCow<'b, dyn DynAddress>> + 'b,
+            Global,
+        > = unsize_box!(boxed);
+        ViewCow::Owned(boxed_dyn)
+    }
+
+    fn has_name(&self) -> bool {
+        // Check if name field is present (non-empty string indicates presence for implicit optional)
+        let name = self.name.get_or_init(|| self.deserialize_field_1_name());
+        !name.is_empty()
+    }
+}
+
+// ============================================================================
 // Tests
 // ============================================================================
 
@@ -576,31 +920,3 @@ mod tests {
         assert!(DynPerson::addresses(&person).is_empty());
     }
 }
-
-// Example: Future lazy deserialization implementation
-// This would deserialize fields on-demand when accessed
-/*
-pub struct PersonLazy {
-    raw_bytes: Vec<u8>,
-    // Cache for already-deserialized fields
-    cached_name: Option<String>,
-    cached_age: Option<i32>,
-    cached_email: Option<String>,
-}
-
-impl PersonTry for PersonLazy {
-    fn try_name(&self) -> Result<&str, Error> {
-        // Deserialize on first access, then cache
-        // May fail if raw_bytes are corrupted
-        todo!("Lazy deserialization")
-    }
-
-    fn try_age(&self) -> Result<i32, Error> {
-        // Deserialize on first access
-        // May fail if raw_bytes are corrupted
-        todo!("Lazy deserialization")
-    }
-
-    // ... etc
-}
-*/

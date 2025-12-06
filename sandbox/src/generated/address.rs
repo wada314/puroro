@@ -7,6 +7,8 @@
 
 use ::allocator_api2::vec::Vec as AllocVec;
 use ::allocator_extras::{Allocator, Global};
+use std::borrow::Cow;
+use std::cell::OnceCell;
 use puroro::{
     Message,
     error::Error,
@@ -255,6 +257,106 @@ impl<A: Allocator + Clone> Message for AddressImpl<A> {
 
     fn compute_size(&self) -> usize {
         todo!("Size computation not yet implemented")
+    }
+}
+
+// ============================================================================
+// AddressLazyImpl Structure
+// ============================================================================
+
+/// Lazy implementation of Address message that deserializes fields on-demand.
+///
+/// This struct holds a maybe-owned byte slice (`Cow<'a, [u8]>`) and deserializes
+/// fields only when they are accessed, caching the results for subsequent accesses.
+/// Unlike `AddressImpl`, this struct is immutable and does not implement mutable traits.
+#[derive(Debug)]
+#[allow(dead_code)] // raw_bytes and allocator are used in deserialization functions (stubs)
+pub struct AddressLazyImpl<'a, A: Allocator = Global> {
+    /// Raw protobuf byte data (maybe-owned)
+    raw_bytes: Cow<'a, [u8]>,
+    /// Allocator for future use
+    allocator: A,
+    
+    // Cache fields (no `cached_` prefix as per design)
+    /// Field 1: street (implicit presence string field)
+    street: OnceCell<String>,
+    /// Field 2: city (implicit presence string field)
+    city: OnceCell<String>,
+    /// Field 3: zip_code (implicit presence scalar field)
+    zip_code: OnceCell<i32>,
+}
+
+impl<'a, A> AddressLazyImpl<'a, A>
+where
+    A: Allocator + Clone,
+{
+    /// Creates a new AddressLazyImpl from a borrowed byte slice.
+    pub fn new(bytes: &'a [u8], alloc: A) -> Self {
+        Self::new_in(Cow::Borrowed(bytes), alloc)
+    }
+
+    /// Creates a new AddressLazyImpl from an owned Vec.
+    pub fn new_owned(bytes: Vec<u8>, alloc: A) -> Self {
+        Self::new_in(Cow::Owned(bytes), alloc)
+    }
+
+    /// Generic constructor that accepts a Cow<'a, [u8]>.
+    pub fn new_in(bytes: Cow<'a, [u8]>, alloc: A) -> Self {
+        Self {
+            raw_bytes: bytes,
+            allocator: alloc,
+            street: OnceCell::new(),
+            city: OnceCell::new(),
+            zip_code: OnceCell::new(),
+        }
+    }
+}
+
+impl<'a> AddressLazyImpl<'a, Global> {
+    /// Creates a new AddressLazyImpl using the global allocator.
+    pub fn new_global(bytes: &'a [u8]) -> Self {
+        Self::new(bytes, Global)
+    }
+}
+
+impl<'a, A> AddressLazyImpl<'a, A>
+where
+    A: Allocator + Clone,
+{
+    // Deserialization helper functions (stub implementations)
+    
+    /// Deserialize field 1 (street) from raw_bytes
+    fn deserialize_field_1_street(&self) -> String {
+        todo!("Deserialize field 1 (street) from self.raw_bytes")
+    }
+
+    /// Deserialize field 2 (city) from raw_bytes
+    fn deserialize_field_2_city(&self) -> String {
+        todo!("Deserialize field 2 (city) from self.raw_bytes")
+    }
+
+    /// Deserialize field 3 (zip_code) from raw_bytes
+    fn deserialize_field_3_zip_code(&self) -> i32 {
+        todo!("Deserialize field 3 (zip_code) from self.raw_bytes")
+    }
+}
+
+impl<'a, A: Allocator + Clone> Address for AddressLazyImpl<'a, A> {}
+
+impl<'a, A: Allocator + Clone> DynAddress for AddressLazyImpl<'a, A> {
+    fn street(&self) -> &str {
+        self.street
+            .get_or_init(|| self.deserialize_field_1_street())
+    }
+
+    fn city(&self) -> &str {
+        self.city
+            .get_or_init(|| self.deserialize_field_2_city())
+    }
+
+    fn zip_code(&self) -> i32 {
+        *self.zip_code
+            .get_or_init(|| self.deserialize_field_3_zip_code())
     }
 }
 
