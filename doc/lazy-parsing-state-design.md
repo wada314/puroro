@@ -1109,59 +1109,302 @@ pub enum PersonLazyImpl<'a, A: Allocator = Global> {
 
 ### API Design
 
-**1. Getter Methods (Available regardless of internal state):**
+**Helper Methods for Common Access Patterns:**
+
+Since both enum variants have the same memory layout (same field types, only const generic differs), we can use unsafe transmutation to convert between them. However, `bytemuck` cannot be used because it requires types to implement `Pod`, `NoUninit`, or `AnyBitPattern` traits, which `PersonLazyImplInner` cannot satisfy due to its complex field types.
+
+**Why `bytemuck` Cannot Be Used:**
+
+According to the `bytemuck` documentation:
+- `Pod` requires `NoUninit` + `AnyBitPattern` (most restrictive)
+- `NoUninit` means the type has no uninitialized bytes
+- `AnyBitPattern` means any bit pattern is valid for the type
+- `cast_ref` requires `NoUninit` + `AnyBitPattern`
+
+Since `PersonLazyImplInner` contains heap-allocated types (`String`, `OnceList`, etc.), it cannot implement these traits:
+
+```rust
+// This won't work - PersonLazyImplInner contains non-Pod types
+use bytemuck::{Pod, cast_ref};
+
+unsafe impl<'a, const IS_PARSING: bool, A: Allocator> Pod for PersonLazyImplInner<'a, IS_PARSING, A>
+where
+    A: Pod,  // Allocator must be Pod
+    // All field types must be Pod...
+{
+    // This is NOT possible because:
+    // - String is not Pod (contains heap-allocated data, has drop semantics)
+    // - Option<String> is not Pod
+    // - OnceList is not Pod (contains heap-allocated data)
+    // - FieldIterator is not Pod
+}
+```
+
+`bytemuck` is designed for "plain old data" types (integers, arrays, simple structs), not for types containing heap-allocated data or complex ownership semantics.
+
+**Using `bytemuck::TransparentWrapper` (Not Applicable):**
+
+`TransparentWrapper` is designed for types that are "transparent wrappers" around another type - typically used with `#[repr(transparent)]` for single-field structs. However, `PersonLazyImplInner` has multiple fields, so it cannot use `TransparentWrapper`:
+
+```rust
+// This won't work - TransparentWrapper requires #[repr(transparent)] and single field
+use bytemuck::TransparentWrapper;
+
+#[repr(transparent)]
+struct Wrapper<T>(T);
+
+unsafe impl<T> TransparentWrapper<T> for Wrapper<T> {}
+
+// But PersonLazyImplInner has multiple fields:
+pub struct PersonLazyImplInner<'a, const IS_PARSING: bool, A: Allocator> {
+    field_slices: OnceList<&'a [u8], A>,
+    allocator: A,
+    field_iter: Option<FieldIterator<'a, A>>,
+    name: String,
+    age: i32,
+    // ... many more fields
+}
+// Cannot use #[repr(transparent)] with multiple fields!
+```
+
+According to the `bytemuck` documentation, `TransparentWrapper`:
+- Requires `#[repr(transparent)]` which only works for single-field structs
+- Is designed for newtype patterns (wrapping a single value)
+- Does not directly support conversions between different const generic parameter values
+
+Therefore, `TransparentWrapper` cannot be used for this use case.
+
+**Solution - Using `std::mem::transmute`:**
+
+Since both types have the same memory layout (same field types, only const generic differs), we can use unsafe transmutation to convert between them:
 
 ```rust
 impl<'a, A: Allocator + Clone> PersonLazyImpl<'a, A> {
+    /// Helper to access inner struct from both variants
+    /// Uses unsafe transmute because both types have identical memory layout
+    /// SAFETY: PersonLazyImplInner<'a, true, A> and PersonLazyImplInner<'a, false, A>
+    /// have the same memory layout (same field types, only const generic differs).
+    /// Const generic parameters are erased at runtime and don't affect memory layout.
+    fn with_inner_ref<F, R>(&self, f: F) -> R
+    where
+        F: FnOnce(&PersonLazyImplInner<'a, true, A>) -> R,
+    {
+        match self {
+            PersonLazyImpl::Parsing(inner) => {
+                let inner_ref = inner.borrow();
+                f(&inner_ref)
+            }
+            PersonLazyImpl::Finalized(inner) => {
+                // SAFETY: Same memory layout, const generic is erased at runtime
+                let inner_ref: &PersonLazyImplInner<'a, false, A> = inner;
+                let inner_ref_transmuted: &PersonLazyImplInner<'a, true, A> = unsafe {
+                    std::mem::transmute(inner_ref)
+                };
+                f(inner_ref_transmuted)
+            }
+        }
+    }
+    
+    /// Helper for Copy fields
+    fn with_inner_copy<F, R>(&self, f: F) -> R
+    where
+        F: FnOnce(&PersonLazyImplInner<'a, true, A>) -> R,
+        R: Copy,
+    {
+        match self {
+            PersonLazyImpl::Parsing(inner) => {
+                let inner_ref = inner.borrow();
+                f(&inner_ref)
+            }
+            PersonLazyImpl::Finalized(inner) => {
+                let inner_ref: &PersonLazyImplInner<'a, false, A> = inner;
+                let inner_ref_transmuted: &PersonLazyImplInner<'a, true, A> = unsafe {
+                    std::mem::transmute(inner_ref)
+                };
+                f(inner_ref_transmuted)
+            }
+        }
+    }
+}
+```
+
+**Considerations for Using Transmute:**
+
+1. **Memory Layout Guarantee**: Const generic parameters are erased at runtime and don't affect memory layout. Since we use the same field types for both states, the memory layout is identical.
+
+2. **Safety Documentation**: The unsafe block must be carefully documented with the safety invariants.
+
+3. **Testing**: Extensive testing should verify that the transmute is safe and doesn't cause issues.
+
+4. **Alternative - Explicit Match**: If transmute is too risky, using explicit enum matching is safer and more explicit.
+
+**Recommendation:**
+
+While `transmute` could work and would eliminate code duplication, the explicit enum matching approach is:
+- **Type-safe**: No unsafe code needed
+- **Clear**: The intent is obvious
+- **Maintainable**: Easy to understand and modify
+- **Minimal overhead**: The match statement is a simple branch
+
+For code generation, a macro can reduce source-level duplication while keeping the generated code explicit and safe.
+
+**Better Approach - Separate Helpers for Each State:**
+
+```rust
+impl<'a, A: Allocator + Clone> PersonLazyImpl<'a, A> {
+    /// Helper to access inner struct in Parsing state
+    fn with_parsing_inner<F, R>(&self, f: F) -> Option<R>
+    where
+        F: FnOnce(&PersonLazyImplInner<'a, true, A>) -> R,
+    {
+        match self {
+            PersonLazyImpl::Parsing(inner) => Some(f(&inner.borrow())),
+            PersonLazyImpl::Finalized(_) => None,
+        }
+    }
+    
+    /// Helper to access inner struct in Finalized state
+    fn with_finalized_inner<F, R>(&self, f: F) -> Option<R>
+    where
+        F: FnOnce(&PersonLazyImplInner<'a, false, A>) -> R,
+    {
+        match self {
+            PersonLazyImpl::Parsing(_) => None,
+            PersonLazyImpl::Finalized(inner) => Some(f(inner)),
+        }
+    }
+    
+    /// Helper to access inner struct from either state
+    /// Uses a trait to unify access patterns
+    fn with_inner_unified<F, R>(&self, f: F) -> R
+    where
+        F: FnOnce(&str) -> R,  // This won't work either - we need a different approach
+    {
+        // Actually, we can use a macro or trait object approach
+    }
+}
+```
+
+**Simplest Approach - Direct Field Access Helper:**
+
+Since both states have the same field types, we can create a helper that abstracts the enum matching:
+
+```rust
+impl<'a, A: Allocator + Clone> PersonLazyImpl<'a, A> {
+    /// Helper to get a reference to a field that exists in both states
+    /// This works because field types are the same for both IS_PARSING values
+    fn get_field_ref<T>(&self, getter: impl Fn(&PersonLazyImplInner<'a, true, A>) -> T) -> T
+    where
+        T: ?Sized,
+    {
+        match self {
+            PersonLazyImpl::Parsing(inner) => getter(&inner.borrow()),
+            PersonLazyImpl::Finalized(inner) => {
+                // We need to convert &PersonLazyImplInner<'a, false, A> to &PersonLazyImplInner<'a, true, A>
+                // This is safe because field types are identical, but Rust's type system won't allow it
+                // We need a different approach...
+            }
+        }
+    }
+}
+```
+
+**Practical Approach - Macro for Code Generation:**
+
+For code generation, we can use a macro to reduce duplication:
+
+```rust
+macro_rules! get_field {
+    ($self:expr, $field:ident) => {
+        match $self {
+            PersonLazyImpl::Parsing(inner) => &inner.borrow().$field,
+            PersonLazyImpl::Finalized(inner) => &inner.$field,
+        }
+    };
+}
+
+impl<'a, A: Allocator + Clone> PersonLazyImpl<'a, A> {
+    pub fn name(&self) -> &String {
+        get_field!(self, name)
+    }
+    
+    pub fn age(&self) -> i32 {
+        match self {
+            PersonLazyImpl::Parsing(inner) => inner.borrow().age,
+            PersonLazyImpl::Finalized(inner) => inner.age,
+        }
+    }
+}
+```
+
+**Best Approach - Helper Method with Closure:**
+
+The most practical approach is to use a helper method that takes a closure:
+
+```rust
+impl<'a, A: Allocator + Clone> PersonLazyImpl<'a, A> {
+    /// Helper method to access a field that returns a reference
+    /// Works for both Parsing and Finalized states
+    fn get_field_ref<F, T>(&self, f: F) -> T
+    where
+        F: for<'b> FnOnce(
+            &'b PersonLazyImplInner<'a, true, A>,
+            &'b PersonLazyImplInner<'a, false, A>,
+        ) -> T,
+    {
+        match self {
+            PersonLazyImpl::Parsing(inner) => {
+                let inner_ref = inner.borrow();
+                // We need to pass the same reference twice, but with different types
+                // This requires unsafe or a different design
+            }
+            PersonLazyImpl::Finalized(inner) => {
+                // Similar issue
+            }
+        }
+    }
+}
+```
+
+**Recommended Approach - Simple Helper for Common Pattern:**
+
+The simplest and most practical approach is to extract the enum matching into a helper that returns a trait object or uses a macro. However, for clarity and simplicity, we can use a helper method pattern:
+
+```rust
+impl<'a, A: Allocator + Clone> PersonLazyImpl<'a, A> {
+    /// Helper to access inner struct - returns a trait object or uses unsafe cast
+    /// For now, we'll use a simpler approach with explicit matching
+    /// In generated code, we can use macros to reduce duplication
+    
     // Implicit presence field - always returns a value (default if not parsed)
     pub fn name(&self) -> &String {
         match self {
-            PersonLazyImpl::Parsing(inner) => {
-                let inner = inner.borrow();
-                &inner.name  // Direct access - always available (defaults to "")
-            }
-            PersonLazyImpl::Finalized(inner) => {
-                &inner.name  // Direct access - no RefCell!
-            }
+            PersonLazyImpl::Parsing(inner) => &inner.borrow().name,
+            PersonLazyImpl::Finalized(inner) => &inner.name,
         }
     }
     
     // Implicit presence field - always returns a value (default if not parsed)
     pub fn age(&self) -> i32 {
         match self {
-            PersonLazyImpl::Parsing(inner) => {
-                let inner = inner.borrow();
-                inner.age  // Direct access - always available (defaults to 0)
-            }
-            PersonLazyImpl::Finalized(inner) => {
-                inner.age  // Direct access - no RefCell!
-            }
+            PersonLazyImpl::Parsing(inner) => inner.borrow().age,
+            PersonLazyImpl::Finalized(inner) => inner.age,
         }
     }
     
     // Explicit optional field - returns Option
     pub fn email(&self) -> Option<&String> {
         match self {
-            PersonLazyImpl::Parsing(inner) => {
-                let inner = inner.borrow();
-                inner.email.as_ref()  // None if not set
-            }
-            PersonLazyImpl::Finalized(inner) => {
-                inner.email.as_ref()  // Direct access - no RefCell!
-            }
+            PersonLazyImpl::Parsing(inner) => inner.borrow().email.as_ref(),
+            PersonLazyImpl::Finalized(inner) => inner.email.as_ref(),
         }
     }
     
     // Scalar message field - returns Option
     pub fn address(&self) -> Option<&AddressLazyImpl<'a, A>> {
         match self {
-            PersonLazyImpl::Parsing(inner) => {
-                let inner = inner.borrow();
-                inner.address.as_ref()  // None if not set
-            }
-            PersonLazyImpl::Finalized(inner) => {
-                inner.address.as_ref()  // Direct access - no RefCell!
-            }
+            PersonLazyImpl::Parsing(inner) => inner.borrow().address.as_ref(),
+            PersonLazyImpl::Finalized(inner) => inner.address.as_ref(),
         }
     }
 }
