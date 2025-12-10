@@ -699,6 +699,107 @@ let location = address.location();
 // Each level has its own iterator, tracking progress through its own slices
 ```
 
+## Slice Ownership Design: Child vs Parent
+
+There are two possible designs for where scalar message field slices are stored:
+
+### Option 1: Child Owns Slices (Current Design)
+
+```rust
+pub struct AddressLazyImpl<'a, A: Allocator = Global> {
+    parent: &'a PersonLazyImpl<'a, A>,
+    parent_field_num: u32,
+    /// Child owns its own slices
+    field_slices: RefCell<OnceList<&'a [u8], A>>,
+    // ... other fields
+}
+
+impl PersonLazyImpl {
+    fn update_field(&self, field_num: u32, wire_type: u32, value_slice: &'a [u8]) {
+        if field_num == 6 { // address
+            if let Some(addr) = self.address.get() {
+                addr.push_slice(value_slice); // Push to child's field_slices
+            } else {
+                let addr = AddressLazyImpl::new_from_first_slice(...);
+                self.address.set(addr).ok();
+            }
+        }
+    }
+}
+```
+
+**Pros:**
+- ✅ **Self-contained**: Child message is independent - owns its own data
+- ✅ **Cleaner parent**: Parent doesn't need to track slices for each child field
+- ✅ **Direct access**: Child can directly access `field_slices` without going through parent
+- ✅ **Simpler iterator**: Child's `FieldIterator` can directly reference its own `field_slices`
+- ✅ **Better encapsulation**: Each message manages its own parsing state
+
+**Cons:**
+- ❌ **Cross-struct mutation**: Parent's `update_field` mutates child's `field_slices` via `RefCell`
+  - Note: Child needs parent reference anyway for lazy parsing, so this isn't a unique disadvantage
+
+### Option 2: Parent Owns Slices
+
+```rust
+pub struct PersonLazyImpl<'a, A: Allocator = Global> {
+    field_slices: OnceList<&'a [u8], A>,
+    // ... other fields
+    /// Parent owns slices for scalar message fields
+    address_slices: RefCell<OnceList<&'a [u8], A>>,
+    address: OnceCell<AddressLazyImpl<'a, A>>,
+}
+
+pub struct AddressLazyImpl<'a, A: Allocator = Global> {
+    parent: &'a PersonLazyImpl<'a, A>,
+    parent_field_num: u32,
+    /// Child holds reference to parent's slices
+    // No field_slices field - accesses parent.address_slices instead
+    // ... other fields
+}
+
+impl PersonLazyImpl {
+    fn update_field(&self, field_num: u32, wire_type: u32, value_slice: &'a [u8]) {
+        if field_num == 6 { // address
+            self.address_slices.borrow_mut().push(value_slice);
+            if self.address.get().is_none() {
+                let addr = AddressLazyImpl::new(self, 6, ...);
+                self.address.set(addr).ok();
+            }
+        }
+    }
+}
+
+impl AddressLazyImpl {
+    fn get_field_slices(&self) -> &OnceList<&'a [u8], A> {
+        &*self.parent.address_slices.borrow() // Access parent's slices
+    }
+}
+```
+
+**Pros:**
+- ✅ **Centralized ownership**: Parent owns all data - clearer ownership model
+- ✅ **No RefCell in child**: Child doesn't need `RefCell` for `field_slices`
+- ✅ **Parent controls collection**: Parent directly manages slice collection
+
+**Cons:**
+- ❌ **Parent complexity**: Parent must have a `RefCell<OnceList<...>>` field for each scalar message field
+- ❌ **Indirect access**: Child must go through parent to access slices (more indirection)
+- ❌ **Iterator complexity**: Child's `FieldIterator` needs to reference parent's slices
+- ❌ **Less encapsulation**: Child depends on parent's internal structure
+- ❌ **Code generation complexity**: Must generate slice storage fields in parent for each scalar message field
+
+### Recommendation: Option 1 (Child Owns Slices) ✓
+
+**Reasoning:**
+1. **Better Encapsulation**: Each message is self-contained and manages its own parsing state
+2. **Simpler Code Generation**: No need to generate slice storage fields in parent for each scalar message field
+3. **Cleaner API**: Child can directly access its `field_slices` without indirection
+4. **More Flexible**: Child's iterator can directly reference its own `field_slices`
+5. **Consistent Pattern**: All messages (top-level and nested) follow the same pattern - they all own their `field_slices`
+
+**Note**: Both designs require the child to hold a parent reference for lazy parsing, so that's not a differentiating factor. The key difference is where the slices are stored and accessed.
+
 ## Open Questions
 
 1. **Parent Field Updates**: How should parent update its fields when parsing for child?
@@ -711,3 +812,7 @@ let location = address.location();
    - Child holds `&'a Parent` - lifetime tied to parent (current design)
    - Parent must outlive child (natural with Rust lifetimes)
    - Works correctly for arbitrary nesting depth
+
+3. **Slice Ownership**: Should child or parent own scalar message field slices?
+   - **Option 1 (Child owns)**: Better encapsulation, simpler code generation, cleaner API ✓ (adopted)
+   - **Option 2 (Parent owns)**: Centralized ownership, but more complex parent structure
