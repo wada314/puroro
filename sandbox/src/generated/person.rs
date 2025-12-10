@@ -22,7 +22,6 @@ use puroro::{
     shared::SharedFields,
     view::ViewCow,
 };
-use std::borrow::Cow;
 use std::cell::OnceCell;
 
 // Import Address-related types from the separate module
@@ -461,14 +460,19 @@ impl<A: Allocator + Clone> Message for PersonImpl<A> {
 
 /// Lazy implementation of Person message that deserializes fields on-demand.
 ///
-/// This struct holds a maybe-owned byte slice (`Cow<'a, [u8]>`) and deserializes
-/// fields only when they are accessed, caching the results for subsequent accesses.
+/// This struct holds a list of slices representing all occurrences of the field
+/// (for top-level messages, typically just one slice; for nested scalar message fields,
+/// all occurrences must be collected to merge them).
+/// Fields are deserialized only when they are accessed, with results cached for subsequent accesses.
 /// Unlike `PersonImpl`, this struct is immutable and does not implement mutable traits.
 #[derive(Debug)]
-#[allow(dead_code)] // raw_bytes and allocator are used in deserialization functions (stubs)
+#[allow(dead_code)] // field_slices and allocator are used in deserialization functions (stubs)
 pub struct PersonLazyImpl<'a, A: Allocator = Global> {
-    /// Raw protobuf byte data (maybe-owned)
-    raw_bytes: Cow<'a, [u8]>,
+    /// List of slices, each representing one occurrence of this message field in the wire format.
+    /// For top-level messages, typically contains a single slice.
+    /// For scalar message fields, all occurrences must be collected (merged) when parsing.
+    /// Each slice points to the raw protobuf bytes for one occurrence.
+    field_slices: OnceList<&'a [u8], A>,
     /// Allocator for future use
     allocator: A,
 
@@ -497,21 +501,37 @@ impl<'a, A> PersonLazyImpl<'a, A>
 where
     A: Allocator + Clone,
 {
-    /// Creates a new PersonLazyImpl from a borrowed byte slice.
-    pub fn new(bytes: &'a [u8], alloc: A) -> Self {
-        Self::new_in(Cow::Borrowed(bytes), alloc)
-    }
-
-    /// Creates a new PersonLazyImpl from an owned Vec.
-    pub fn new_owned(bytes: Vec<u8>, alloc: A) -> Self {
-        Self::new_in(Cow::Owned(bytes), alloc)
-    }
-
-    /// Generic constructor that accepts a Cow<'a, [u8]>.
-    pub fn new_in(bytes: Cow<'a, [u8]>, alloc: A) -> Self {
+    /// Creates a new PersonLazyImpl from a single slice.
+    /// For top-level messages, this is the typical case.
+    pub fn new(slice: &'a [u8], alloc: A) -> Self {
         let alloc_clone = alloc.clone();
+        let field_slices = OnceList::new_in(alloc_clone.clone());
+        field_slices.push(slice);
         Self {
-            raw_bytes: bytes,
+            field_slices,
+            allocator: alloc,
+            name: OnceCell::new(),
+            age: OnceCell::new(),
+            email: OnceCell::new(),
+            status: OnceCell::new(),
+            score: OnceCell::new(),
+            address: OnceCell::new(),
+            secondary_status: OnceCell::new(),
+            scores: OnceList::new_in(alloc_clone.clone()),
+            addresses: OnceList::new_in(alloc_clone),
+        }
+    }
+
+    /// Creates a new PersonLazyImpl from multiple slices.
+    /// For scalar message fields that need to collect all occurrences.
+    pub fn new_from_slices(slices: impl Iterator<Item = &'a [u8]>, alloc: A) -> Self {
+        let alloc_clone = alloc.clone();
+        let field_slices = OnceList::new_in(alloc_clone.clone());
+        for slice in slices {
+            field_slices.push(slice);
+        }
+        Self {
+            field_slices,
             allocator: alloc,
             name: OnceCell::new(),
             age: OnceCell::new(),
@@ -528,8 +548,13 @@ where
 
 impl<'a> PersonLazyImpl<'a, Global> {
     /// Creates a new PersonLazyImpl using the global allocator.
-    pub fn new_global(bytes: &'a [u8]) -> Self {
-        Self::new(bytes, Global)
+    pub fn new_global(slice: &'a [u8]) -> Self {
+        Self::new(slice, Global)
+    }
+
+    /// Creates a new PersonLazyImpl from multiple slices using the global allocator.
+    pub fn new_from_slices_global(slices: impl Iterator<Item = &'a [u8]>) -> Self {
+        Self::new_from_slices(slices, Global)
     }
 }
 
@@ -539,57 +564,76 @@ where
 {
     // Deserialization helper functions (stub implementations)
 
-    /// Deserialize field 1 (name) from raw_bytes
+    /// Deserialize field 1 (name) from field_slices.
+    /// Must iterate over all slices to find the last occurrence (scalar fields can be overwritten).
     fn deserialize_field_1_name(&self) -> String {
-        todo!("Deserialize field 1 (name) from self.raw_bytes")
+        todo!(
+            "Deserialize field 1 (name) by iterating over self.field_slices to find last occurrence"
+        )
     }
 
-    /// Deserialize field 2 (age) from raw_bytes
+    /// Deserialize field 2 (age) from field_slices.
+    /// Must iterate over all slices to find the last occurrence (scalar fields can be overwritten).
     fn deserialize_field_2_age(&self) -> i32 {
-        todo!("Deserialize field 2 (age) from self.raw_bytes")
+        todo!(
+            "Deserialize field 2 (age) by iterating over self.field_slices to find last occurrence"
+        )
     }
 
-    /// Deserialize field 3 (email) from raw_bytes
+    /// Deserialize field 3 (email) from field_slices.
+    /// Must iterate over all slices to find the last occurrence (scalar fields can be overwritten).
     fn deserialize_field_3_email(&self) -> String {
-        todo!("Deserialize field 3 (email) from self.raw_bytes")
+        todo!(
+            "Deserialize field 3 (email) by iterating over self.field_slices to find last occurrence"
+        )
     }
 
-    /// Deserialize field 4 (status) from raw_bytes
+    /// Deserialize field 4 (status) from field_slices.
+    /// Must iterate over all slices to find the last occurrence (scalar fields can be overwritten).
     fn deserialize_field_4_status(&self) -> i32 {
-        todo!("Deserialize field 4 (status) from self.raw_bytes")
+        todo!(
+            "Deserialize field 4 (status) by iterating over self.field_slices to find last occurrence"
+        )
     }
 
-    /// Deserialize field 5 (score) from raw_bytes
+    /// Deserialize field 5 (score) from field_slices.
+    /// Must iterate over all slices to find the last occurrence (scalar fields can be overwritten).
     fn deserialize_field_5_score(&self) -> i32 {
-        todo!("Deserialize field 5 (score) from self.raw_bytes")
+        todo!(
+            "Deserialize field 5 (score) by iterating over self.field_slices to find last occurrence"
+        )
     }
 
-    /// Deserialize field 6 (address) from raw_bytes.
+    /// Deserialize field 6 (address) from field_slices.
     /// Collects all occurrences of field 6 and creates AddressLazyImpl with the slices.
     /// This avoids allocating a merged buffer - slices are stored directly.
     fn deserialize_field_6_address(&self) -> AddressLazyImpl<'a, A> {
         todo!(
-            "Collect all occurrences of field 6 from self.raw_bytes and create AddressLazyImpl::new_from_slices with those slices"
+            "Collect all occurrences of field 6 by iterating over self.field_slices and create AddressLazyImpl::new_from_slices with those slices"
         )
     }
 
-    /// Deserialize field 8 (secondary_status) from raw_bytes
+    /// Deserialize field 8 (secondary_status) from field_slices.
+    /// Must iterate over all slices to find the last occurrence (scalar fields can be overwritten).
     fn deserialize_field_8_secondary_status(&self) -> i32 {
-        todo!("Deserialize field 8 (secondary_status) from self.raw_bytes")
+        todo!(
+            "Deserialize field 8 (secondary_status) by iterating over self.field_slices to find last occurrence"
+        )
     }
 
-    /// Deserialize field 10 (scores) from raw_bytes and populate OnceList
+    /// Deserialize field 10 (scores) from field_slices and populate OnceList.
+    /// Can stop after finding the required number of items (lazy parsing for repeated fields).
     fn deserialize_field_10_scores(&self) {
         todo!(
-            "Deserialize field 10 (scores) from self.raw_bytes and push each score to self.scores"
+            "Deserialize field 10 (scores) by iterating over self.field_slices and push each score to self.scores"
         )
     }
 
-    /// Deserialize field 9 (addresses) from raw_bytes and populate OnceList.
+    /// Deserialize field 9 (addresses) from field_slices and populate OnceList.
     /// Each address occurrence creates an AddressLazyImpl from its slice (no merging needed for repeated fields).
     fn deserialize_field_9_addresses(&self) {
         todo!(
-            "Deserialize field 9 (addresses) from self.raw_bytes, create AddressLazyImpl::new(slice) for each occurrence, and push to self.addresses"
+            "Deserialize field 9 (addresses) by iterating over self.field_slices, create AddressLazyImpl::new(slice) for each occurrence, and push to self.addresses"
         )
     }
 }
@@ -723,7 +767,6 @@ mod tests {
         StringFieldWrapper,
     };
     use ::allocator_extras::Global;
-    use std::borrow::Cow;
 
     #[test]
     fn test_message_fields() {
@@ -853,23 +896,22 @@ mod tests {
         // Test new with borrowed slice
         let _person_lazy = PersonLazyImpl::new(bytes, Global);
 
-        // Test new_owned with owned Vec
-        let bytes_owned = b"owned bytes".to_vec();
-        let _person_lazy_owned = PersonLazyImpl::new_owned(bytes_owned.clone(), Global);
-
-        // Test new_in with Cow::Borrowed
-        let _person_lazy_borrowed = PersonLazyImpl::new_in(Cow::Borrowed(bytes), Global);
-
-        // Test new_in with Cow::Owned
-        let bytes_cow = b"cow bytes".to_vec();
-        let _person_lazy_cow = PersonLazyImpl::new_in(Cow::Owned(bytes_cow.clone()), Global);
+        // Test new_from_slices with multiple slices
+        let slice1 = b"first slice";
+        let slice2 = b"second slice";
+        let _person_lazy_slices =
+            PersonLazyImpl::new_from_slices([slice1, slice2].into_iter(), Global);
 
         // Test new_global
         let _person_lazy_global = PersonLazyImpl::new_global(bytes);
+
+        // Test new_from_slices_global
+        let _person_lazy_slices_global =
+            PersonLazyImpl::new_from_slices_global([slice1, slice2].into_iter());
     }
 
     #[test]
-    #[should_panic(expected = "Deserialize field 1 (name) from self.raw_bytes")]
+    #[should_panic(expected = "Deserialize field 1 (name)")]
     fn test_person_lazy_name_access() {
         let bytes = b"test";
         let person_lazy = PersonLazyImpl::new_global(bytes);
@@ -878,7 +920,7 @@ mod tests {
     }
 
     #[test]
-    #[should_panic(expected = "Deserialize field 2 (age) from self.raw_bytes")]
+    #[should_panic(expected = "Deserialize field 2 (age)")]
     fn test_person_lazy_age_access() {
         let bytes = b"test";
         let person_lazy = PersonLazyImpl::new_global(bytes);
@@ -887,7 +929,7 @@ mod tests {
     }
 
     #[test]
-    #[should_panic(expected = "Deserialize field 3 (email) from self.raw_bytes")]
+    #[should_panic(expected = "Deserialize field 3 (email)")]
     fn test_person_lazy_email_access() {
         let bytes = b"test";
         let person_lazy = PersonLazyImpl::new_global(bytes);
@@ -896,7 +938,7 @@ mod tests {
     }
 
     #[test]
-    #[should_panic(expected = "Deserialize field 4 (status) from self.raw_bytes")]
+    #[should_panic(expected = "Deserialize field 4 (status)")]
     fn test_person_lazy_status_access() {
         let bytes = b"test";
         let person_lazy = PersonLazyImpl::new_global(bytes);
@@ -905,7 +947,7 @@ mod tests {
     }
 
     #[test]
-    #[should_panic(expected = "Deserialize field 5 (score) from self.raw_bytes")]
+    #[should_panic(expected = "Deserialize field 5 (score)")]
     fn test_person_lazy_score_access() {
         let bytes = b"test";
         let person_lazy = PersonLazyImpl::new_global(bytes);
@@ -914,7 +956,7 @@ mod tests {
     }
 
     #[test]
-    #[should_panic(expected = "Deserialize field 8 (secondary_status) from self.raw_bytes")]
+    #[should_panic(expected = "Deserialize field 8 (secondary_status)")]
     fn test_person_lazy_secondary_status_access() {
         let bytes = b"test";
         let person_lazy = PersonLazyImpl::new_global(bytes);
@@ -923,7 +965,7 @@ mod tests {
     }
 
     #[test]
-    #[should_panic(expected = "Deserialize field 6 (address) from self.raw_bytes")]
+    #[should_panic(expected = "Deserialize field 6 (address)")]
     fn test_person_lazy_address_access() {
         let bytes = b"test";
         let person_lazy = PersonLazyImpl::new_global(bytes);
@@ -932,7 +974,7 @@ mod tests {
     }
 
     #[test]
-    #[should_panic(expected = "Deserialize field 6 (address) from self.raw_bytes")]
+    #[should_panic(expected = "Deserialize field 6 (address)")]
     fn test_person_lazy_address_dyn_access() {
         let bytes = b"test";
         let person_lazy = PersonLazyImpl::new_global(bytes);
@@ -1063,7 +1105,7 @@ mod tests {
     }
 
     #[test]
-    #[should_panic(expected = "Deserialize field 1 (name) from self.raw_bytes")]
+    #[should_panic(expected = "Deserialize field 1 (name)")]
     fn test_person_lazy_has_name_check() {
         let bytes = b"test";
         let person_lazy = PersonLazyImpl::new_global(bytes);
