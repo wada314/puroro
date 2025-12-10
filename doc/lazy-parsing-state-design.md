@@ -287,8 +287,8 @@ pub struct AddressLazyImpl<'a, A: Allocator = Global> {
     /// Field number in parent (6 for address)
     parent_field_num: u32,
     /// Slices collected so far
-    /// Wrapped in RefCell to allow pushing slices from &self (via update_field)
-    field_slices: RefCell<OnceList<&'a [u8], A>>,
+    /// OnceList already supports push() via &self, so no RefCell needed
+    field_slices: OnceList<&'a [u8], A>,
     allocator: A,
     
     /// Field iterator - can be paused and resumed
@@ -314,7 +314,7 @@ impl<'a, A> AddressLazyImpl<'a, A> {
         Self {
             parent,
             parent_field_num,
-            field_slices: RefCell::new(field_slices),
+            field_slices, // OnceList already supports push() via &self
             allocator: alloc,
             field_iter: RefCell::new(None),
             street: OnceCell::new(),
@@ -325,8 +325,9 @@ impl<'a, A> AddressLazyImpl<'a, A> {
     
     /// Push a slice to field_slices (called from parent's update_field)
     /// This is needed because the iterator has already passed the slice
+    /// OnceList supports push() via &self, so no RefCell needed
     fn push_slice(&self, slice: &'a [u8]) {
-        self.field_slices.borrow_mut().push(slice);
+        self.field_slices.push(slice);
     }
 }
 ```
@@ -603,16 +604,122 @@ fn parse_field_tag(bytes: &[u8]) -> Result<(u32, u32, usize), Error> {
 }
 ```
 
-### Interior Mutability
+### Interior Mutability Requirements
 
-Since we're updating fields during parsing (which happens through `&self`), we need interior mutability:
-- `RefCell<Option<FieldIterator>>` for iterator (Iterator::next() requires &mut self)
-- `OnceCell<T>` for scalar fields (set once)
-- `OnceList<T, A>` for repeated fields (push multiple times)
+Since we're updating fields during parsing (which happens through `&self`), we need interior mutability. Here's a breakdown of what mutability is needed for each operation:
+
+#### Field Types and Mutability
+
+| Field Type | Storage Type | Mutability Needed | Why |
+|------------|--------------|-------------------|-----|
+| **Top-level `field_slices`** | `OnceList<&'a [u8], A>` | Immutable after construction | Set once during `new()`/`new_from_slices()` |
+| **Child `field_slices`** (scalar message) | `OnceList<&'a [u8], A>` | Built-in interior mutability | `OnceList::push()` works via `&self` |
+| **Field iterator** | `RefCell<Option<FieldIterator>>` | Mutable via `RefCell` | `Iterator::next()` requires `&mut self` |
+| **Scalar fields** (name, age, etc.) | `OnceCell<T>` | Set once | Last value overwrites previous (parse entire message) |
+| **Repeated scalar fields** (scores) | `OnceList<T, A>` | Push multiple times | Can add items incrementally |
+| **Repeated message fields** (addresses) | `OnceList<T, A>` | Push multiple times | Can add items incrementally |
+| **Scalar message fields** (address) | `OnceCell<AddressLazyImpl>` | Set once | Created on first occurrence |
+
+#### Operations and Their Mutability Requirements
+
+**1. Iterator Management**
+```rust
+fn get_or_init_iterator(&self) -> FieldIterator<'a, A> {
+    // Needs: RefCell::borrow_mut() on field_iter
+    // Reason: Iterator::next() requires &mut self, so we need &mut FieldIterator
+    self.field_iter.borrow_mut().take().unwrap_or_else(|| {
+        FieldIterator::new(&self.field_slices)
+    })
+}
+
+fn save_iterator(&self, iter: FieldIterator<'a, A>) {
+    // Needs: RefCell::borrow_mut() on field_iter
+    // Reason: Storing iterator state back
+    *self.field_iter.borrow_mut() = Some(iter);
+}
+```
+
+**2. Scalar Field Updates**
+```rust
+fn update_field(&self, field_num: u32, ...) {
+    match field_num {
+        1 => { // name
+            // Needs: OnceCell::set() (interior mutability built-in)
+            // Reason: Set once, last value wins
+            self.name.set(name).ok();
+        }
+    }
+}
+```
+
+**3. Repeated Field Updates**
+```rust
+fn update_field(&self, field_num: u32, ...) {
+    match field_num {
+        10 => { // scores
+            // Needs: OnceList::push() (interior mutability built-in)
+            // Reason: Can push multiple times incrementally
+            self.scores.push(score);
+        }
+    }
+}
+```
+
+**4. Scalar Message Field Updates (Complex!)**
+```rust
+fn update_field(&self, field_num: u32, ...) {
+    match field_num {
+        6 => { // address
+            if let Some(addr) = self.address.get() {
+                // Needs: OnceList::push() (built-in interior mutability)
+                // Reason: Parent (via &self) pushes to child's field_slices
+                // OnceList supports push() via &self, so no RefCell needed
+                addr.push_slice(value_slice);
+            } else {
+                // Needs: OnceCell::set() on self.address
+                // Reason: Create child on first occurrence
+                let addr = AddressLazyImpl::new_from_first_slice(...);
+                self.address.set(addr).ok();
+            }
+        }
+    }
+}
+```
+
+**5. Child Message Slice Collection**
+```rust
+impl AddressLazyImpl {
+    fn push_slice(&self, slice: &'a [u8]) {
+        // Needs: OnceList::push() (built-in interior mutability)
+        // Reason: Called from parent's update_field (via &self)
+        // OnceList supports push() via &self, so no RefCell needed
+        // This allows cross-struct mutation: parent pushes to child's field_slices
+        self.field_slices.push(slice);
+    }
+}
+```
+
+#### Mutability Complexity Summary
+
+**Simple Cases (Built-in Interior Mutability):**
+- ✅ `OnceCell::set()` - Thread-safe, one-time set
+- ✅ `OnceList::push()` - Thread-safe, multiple pushes
+
+**Complex Cases (Require RefCell):**
+- ⚠️ `RefCell<Option<FieldIterator>>` - Needed because `Iterator::next()` requires `&mut self`
+
+**Cross-Struct Mutation (Simplified!):**
+The cross-struct mutation where parent's `update_field` (via `&self`) pushes to child's `field_slices` is actually simpler than it looks:
+- Parent holds `address: OnceCell<AddressLazyImpl>`
+- Child holds `field_slices: OnceList<&'a [u8], A>` (no RefCell needed!)
+- Parent's `update_field` (via `&self`) calls `child.push_slice()` which does `self.field_slices.push()`
+- `OnceList::push()` works via `&self` thanks to built-in interior mutability
+- This allows parent to push to child's state through immutable references, but no `RefCell` is needed
 
 **Why RefCell instead of Cell?**
 - `Iterator::next()` requires `&mut self`, so we can't use `Cell` (which only provides `get()`/`set()` for `Copy` types)
 - `RefCell` allows us to get `&mut FieldIterator` through `borrow_mut()`
+- `RefCell` also allows cross-struct mutation (parent mutating child's `field_slices`)
 
 ### Parent Parser Access (Option 2)
 
@@ -651,7 +758,7 @@ impl<'a, A: Allocator + Clone> AddressLazyImpl<'a, A> {
         Self {
             parent,
             parent_field_num,
-            field_slices: RefCell::new(field_slices),
+            field_slices, // OnceList already supports push() via &self
             allocator: alloc,
             field_iter: RefCell::new(None),  // Iterator created lazily on first use
             street: OnceCell::new(),
@@ -710,7 +817,8 @@ pub struct AddressLazyImpl<'a, A: Allocator = Global> {
     parent: &'a PersonLazyImpl<'a, A>,
     parent_field_num: u32,
     /// Child owns its own slices
-    field_slices: RefCell<OnceList<&'a [u8], A>>,
+    /// OnceList supports push() via &self, so no RefCell needed
+    field_slices: OnceList<&'a [u8], A>,
     // ... other fields
 }
 
@@ -736,8 +844,9 @@ impl PersonLazyImpl {
 - ✅ **Better encapsulation**: Each message manages its own parsing state
 
 **Cons:**
-- ❌ **Cross-struct mutation**: Parent's `update_field` mutates child's `field_slices` via `RefCell`
-  - Note: Child needs parent reference anyway for lazy parsing, so this isn't a unique disadvantage
+- ❌ **Cross-struct mutation**: Parent's `update_field` pushes to child's `field_slices`
+  - Note: `OnceList::push()` works via `&self`, so no `RefCell` needed
+  - Child needs parent reference anyway for lazy parsing, so this isn't a unique disadvantage
 
 ### Option 2: Parent Owns Slices
 
@@ -746,7 +855,8 @@ pub struct PersonLazyImpl<'a, A: Allocator = Global> {
     field_slices: OnceList<&'a [u8], A>,
     // ... other fields
     /// Parent owns slices for scalar message fields
-    address_slices: RefCell<OnceList<&'a [u8], A>>,
+    /// OnceList supports push() via &self, so no RefCell needed
+    address_slices: OnceList<&'a [u8], A>,
     address: OnceCell<AddressLazyImpl<'a, A>>,
 }
 
@@ -761,7 +871,8 @@ pub struct AddressLazyImpl<'a, A: Allocator = Global> {
 impl PersonLazyImpl {
     fn update_field(&self, field_num: u32, wire_type: u32, value_slice: &'a [u8]) {
         if field_num == 6 { // address
-            self.address_slices.borrow_mut().push(value_slice);
+            // OnceList supports push() via &self, so no RefCell needed
+            self.address_slices.push(value_slice);
             if self.address.get().is_none() {
                 let addr = AddressLazyImpl::new(self, 6, ...);
                 self.address.set(addr).ok();
@@ -772,18 +883,18 @@ impl PersonLazyImpl {
 
 impl AddressLazyImpl {
     fn get_field_slices(&self) -> &OnceList<&'a [u8], A> {
-        &*self.parent.address_slices.borrow() // Access parent's slices
+        &self.parent.address_slices // Access parent's slices directly
     }
 }
 ```
 
 **Pros:**
 - ✅ **Centralized ownership**: Parent owns all data - clearer ownership model
-- ✅ **No RefCell in child**: Child doesn't need `RefCell` for `field_slices`
+- ✅ **No RefCell needed**: `OnceList` supports `push()` via `&self`
 - ✅ **Parent controls collection**: Parent directly manages slice collection
 
 **Cons:**
-- ❌ **Parent complexity**: Parent must have a `RefCell<OnceList<...>>` field for each scalar message field
+- ❌ **Parent complexity**: Parent must have a `OnceList<...>` field for each scalar message field
 - ❌ **Indirect access**: Child must go through parent to access slices (more indirection)
 - ❌ **Iterator complexity**: Child's `FieldIterator` needs to reference parent's slices
 - ❌ **Less encapsulation**: Child depends on parent's internal structure
