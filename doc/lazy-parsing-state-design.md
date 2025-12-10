@@ -1658,3 +1658,183 @@ The key insight is that **the public type should not have `IS_PARSING` as a para
 - **Runtime checks via enum match**: Prevent invalid operations (setters only work in `Parsing` variant)
 - **Simpler API**: Users don't need to specify `IS_PARSING` parameter
 - **Explicit state tracking**: The enum explicitly tracks whether we're in parsing or finalized mode, making the state clear and meaningful
+
+## Alternative: Generic Enum State (Without Const Generic)
+
+An alternative approach that avoids const generic parameters entirely is to use a generic enum type:
+
+### Pattern Overview
+
+Instead of using const generic `IS_PARSING`, we create a generic enum that wraps the inner struct:
+
+```rust
+// Generic enum for state management (private)
+enum PersonLazyImplState<T> {
+    Builder(RefCell<T>),      // Mutable state - wrapped in RefCell
+    Finalized(T),              // Immutable state - direct ownership
+}
+
+// Inner struct - no const generic needed!
+pub struct PersonLazyImplInner<'a, A: Allocator = Global> {
+    field_slices: OnceList<&'a [u8], A>,
+    allocator: A,
+    field_iter: Option<FieldIterator<'a, A>>,
+    
+    // Same field types as const generic approach
+    name: String,
+    age: i32,
+    email: Option<String>,
+    status: i32,
+    score: Option<i32>,
+    address: Option<AddressLazyImpl<'a, A>>,
+    secondary_status: Option<i32>,
+    scores: OnceList<i32, A>,
+    addresses: OnceList<AddressLazyImpl<'a, A>, A>,
+}
+
+// Public API - wrapper struct with private state enum
+pub struct PersonLazyImpl<'a, A: Allocator = Global> {
+    state: PersonLazyImplState<PersonLazyImplInner<'a, A>>,  // Private enum
+}
+```
+
+### API Design
+
+The public API provides methods to access the inner struct:
+
+```rust
+impl<'a, A: Allocator + Clone> PersonLazyImpl<'a, A> {
+    /// Get immutable reference to inner struct (works for both states)
+    fn inner(&self) -> &PersonLazyImplInner<'a, A> {
+        match &self.state {
+            PersonLazyImplState::Builder(inner) => inner.borrow(),
+            PersonLazyImplState::Finalized(inner) => inner,
+        }
+    }
+    
+    /// Get mutable reference to inner struct (only for Builder state)
+    /// Returns None if already finalized
+    fn inner_mut(&self) -> Option<std::cell::RefMut<'_, PersonLazyImplInner<'a, A>>> {
+        match &self.state {
+            PersonLazyImplState::Builder(inner) => Some(inner.borrow_mut()),
+            PersonLazyImplState::Finalized(_) => None,
+        }
+    }
+    
+    /// Finalize - move from Builder to Finalized state
+    pub fn finalize(self) -> Self {
+        match self.state {
+            PersonLazyImplState::Builder(inner) => {
+                let inner = inner.into_inner();  // Extract from RefCell
+                PersonLazyImpl {
+                    state: PersonLazyImplState::Finalized(inner),
+                }
+            }
+            PersonLazyImplState::Finalized(_) => self,  // Already finalized
+        }
+    }
+    
+    /// Check if finalized
+    pub fn is_finalized(&self) -> bool {
+        matches!(self.state, PersonLazyImplState::Finalized(_))
+    }
+    
+    // Getter methods
+    pub fn name(&self) -> &String {
+        &self.inner().name
+    }
+    
+    pub fn age(&self) -> i32 {
+        self.inner().age
+    }
+    
+    pub fn email(&self) -> Option<&String> {
+        self.inner().email.as_ref()
+    }
+    
+    // Setter methods (only work in Builder state)
+    pub fn set_name(&self, name: String) {
+        if let Some(mut inner) = self.inner_mut() {
+            inner.name = name;
+        } else {
+            panic!("Cannot set field after finalization");
+        }
+    }
+    
+    pub fn set_age(&self, age: i32) {
+        if let Some(mut inner) = self.inner_mut() {
+            inner.age = age;
+        } else {
+            panic!("Cannot set field after finalization");
+        }
+    }
+}
+```
+
+### Comparison with Const Generic Approach
+
+| Aspect | Const Generic Approach | Generic Enum Approach |
+|--------|----------------------|----------------------|
+| **Type Complexity** | Higher (const generic parameter) | Lower (simple generic enum) |
+| **Code Generation** | More complex (const generic handling) | Simpler (no const generic) |
+| **Type Safety** | Runtime (enum match) | Runtime (enum match) |
+| **Memory Layout** | Same for both states | Same for both states |
+| **Conversion** | Trivial (move struct) | Trivial (move struct) |
+| **Helper Methods** | Need transmute for unified access | Direct access via `inner()` |
+| **API Clarity** | Enum variant is public | State enum is private, wrapper struct is public |
+| **Unsafe Code** | May need `transmute` for helpers | No unsafe code needed |
+
+### Benefits of Generic Enum Approach
+
+1. **Simpler Type System**: No const generic parameters - easier to understand and implement
+2. **No Unsafe Code**: Direct access via `inner()` and `inner_mut()` - no transmute needed
+3. **Cleaner API**: Wrapper struct hides implementation details (enum is private)
+4. **Easier Code Generation**: No need to handle const generic parameters in generated code
+5. **Same Performance**: Both approaches have identical runtime behavior
+6. **Same Memory Layout**: Both approaches use the same field types for both states
+
+### Drawbacks of Generic Enum Approach
+
+1. **Wrapper Struct Overhead**: Extra indirection through wrapper struct (minimal)
+2. **Less Type-Level Expressiveness**: Const generic provides compile-time guarantees (though we use runtime checks anyway)
+3. **Slightly More Verbose**: Need to call `inner()` or `inner_mut()` in every method
+
+### Existing Libraries
+
+**Standard Library**: Rust's standard library does not provide a generic enum type for this pattern. However, it provides the building blocks (`RefCell`, `Option`, `Result`) that we use.
+
+**Third-Party Crates**: After searching, there are no well-known crates that provide exactly this pattern (a generic enum with `Builder(RefCell<T>)` and `Finalized(T)` variants). This is a custom pattern that we would implement ourselves.
+
+**Similar Patterns**: 
+- `Option<T>` and `Result<T, E>` use similar enum patterns but for different purposes
+- Builder pattern crates (like `derive_builder`) use separate types for builder and final product, not a single enum
+- State machine crates typically use different approaches (trait objects, type state pattern with const generics, etc.)
+
+**Conclusion**: This enum type would be a **custom implementation** specific to our use case. It's a simple enum definition that doesn't require external dependencies.
+
+### Recommendation
+
+The **Generic Enum Approach** is **preferred** for the following reasons:
+
+1. **Simplicity**: No const generic parameters makes the code easier to understand and generate
+2. **No Unsafe Code**: Direct access methods eliminate the need for `transmute`
+3. **Better Encapsulation**: Private enum with public wrapper struct provides cleaner API
+4. **Easier Code Generation**: Simpler to generate code without const generic handling
+5. **Same Benefits**: Achieves the same goals (zero RefCell overhead after finalization) with simpler implementation
+6. **No External Dependencies**: The enum is simple enough to implement ourselves without adding crate dependencies
+
+The const generic approach is more "modern Rust" but adds complexity without significant benefits in this case, since we're using runtime checks anyway.
+
+### Implementation Note
+
+Since this enum type doesn't exist in standard library or common crates, we would implement it ourselves. The implementation is straightforward:
+
+```rust
+// In puroro crate (or generated code)
+enum PersonLazyImplState<T> {
+    Builder(RefCell<T>),
+    Finalized(T),
+}
+```
+
+This is a simple, self-contained enum that doesn't require any external dependencies beyond `std::cell::RefCell`, which is already in the standard library.
