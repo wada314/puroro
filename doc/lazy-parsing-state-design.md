@@ -1050,3 +1050,373 @@ If we want to optimize for the "parse entire message" case, we could introduce a
 - `PersonLazyFinal`: After `parse_entire_message()`, convert to this type with `OnceCell<T>` fields
 
 This would be similar to how some builders have both a mutable builder and an immutable final product.
+
+## Const Generic Parameter Pattern for Parsing State
+
+A more elegant approach inspired by modern Rust Builder patterns is to use a **const generic parameter** to distinguish between parsing and finalized states at the type level:
+
+### Pattern Overview
+
+With const generic pattern, we don't need to wrap each field in `RefCell` or `OnceCell`. Instead, we wrap the entire struct in `RefCell` to allow interior mutability when needed. **Crucially, we use the same field types for both parsing and finalized states**, making the conversion trivial.
+
+**Important**: The public `PersonLazyImpl` type does **NOT** take `IS_PARSING` as a parameter. Instead, it uses an enum to hold either parsing or finalized state internally:
+
+```rust
+// The actual struct - fields are directly stored (no RefCell/OnceCell per field)
+// Same field types for both IS_PARSING = true and false!
+pub struct PersonLazyImplInner<'a, const IS_PARSING: bool, A: Allocator = Global> {
+    field_slices: OnceList<&'a [u8], A>,
+    allocator: A,
+    field_iter: Option<FieldIterator<'a, A>>,  // No RefCell needed!
+    
+    // Fields use the same types regardless of IS_PARSING value
+    // - T for implicit presence fields (use default value: "" for String, 0 for i32, etc.)
+    // - Option<T> ONLY for explicit optional fields and scalar message fields
+    name: String,  // Implicit presence - default to ""
+    age: i32,  // Implicit presence - default to 0
+    email: Option<String>,  // Explicit optional field
+    status: i32,  // Implicit presence enum (stored as i32) - default to 0
+    score: Option<i32>,  // Explicit optional field
+    address: Option<AddressLazyImpl<'a, A>>,  // Scalar message field (no IS_PARSING param)
+    secondary_status: Option<i32>,  // Explicit optional field
+    scores: OnceList<i32, A>,  // Repeated field
+    addresses: OnceList<AddressLazyImpl<'a, A>, A>,  // Repeated message field
+}
+
+// Enum to hold EITHER parsing or finalized state
+pub enum PersonLazyImplState<'a, A: Allocator> {
+    Parsing(RefCell<PersonLazyImplInner<'a, true, A>>),  // RefCell needed for mutability
+    Finalized(PersonLazyImplInner<'a, false, A>),  // No RefCell needed - immutable!
+}
+
+// Public API - can hold EITHER parsing or finalized state
+pub struct PersonLazyImpl<'a, A: Allocator = Global> {
+    state: PersonLazyImplState<'a, A>,
+}
+```
+
+**Why Enum is Required**: 
+- We need to explicitly track whether we're in parsing or finalized state
+- A single `inner` field with `IS_PARSING = true` **cannot represent the finalized state**
+- The enum variant **IS the boolean state** that makes the pattern meaningful
+- This allows us to hold both states and convert between them
+
+**Key Insight**: 
+- **Public type has no `IS_PARSING` parameter**: Can hold either state
+- **Enum variant IS the boolean state**: The enum explicitly tracks whether we're in parsing or finalized mode
+- **Same field types for both states**: No need for `FieldStorage` helper type!
+- **`Option` only for explicit optional and scalar message fields**: Implicit presence fields use default values
+- **Trivial conversion**: Conversion from parsing to finalized is trivial - just move the inner struct and change the enum variant!
+- Access fields via `&mut` during parsing (through `RefCell::borrow_mut()`)
+- Access fields via `&` after finalization (through `RefCell::borrow()`)
+- No need for per-field interior mutability wrappers!
+- No need to track "not yet parsed" state for implicit presence fields - use protobuf defaults!
+
+### API Design
+
+**1. Getter Methods (Available regardless of internal state):**
+
+```rust
+impl<'a, A: Allocator + Clone> PersonLazyImpl<'a, A> {
+    // Implicit presence field - always returns a value (default if not parsed)
+    pub fn name(&self) -> &String {
+        match &self.state {
+            PersonLazyImplState::Parsing(inner) => {
+                let inner = inner.borrow();
+                &inner.name  // Direct access - always available (defaults to "")
+            }
+            PersonLazyImplState::Finalized(inner) => {
+                &inner.name  // Direct access - no RefCell!
+            }
+        }
+    }
+    
+    // Implicit presence field - always returns a value (default if not parsed)
+    pub fn age(&self) -> i32 {
+        match &self.state {
+            PersonLazyImplState::Parsing(inner) => {
+                let inner = inner.borrow();
+                inner.age  // Direct access - always available (defaults to 0)
+            }
+            PersonLazyImplState::Finalized(inner) => {
+                inner.age  // Direct access - no RefCell!
+            }
+        }
+    }
+    
+    // Explicit optional field - returns Option
+    pub fn email(&self) -> Option<&String> {
+        match &self.state {
+            PersonLazyImplState::Parsing(inner) => {
+                let inner = inner.borrow();
+                inner.email.as_ref()  // None if not set
+            }
+            PersonLazyImplState::Finalized(inner) => {
+                inner.email.as_ref()  // Direct access - no RefCell!
+            }
+        }
+    }
+    
+    // Scalar message field - returns Option
+    pub fn address(&self) -> Option<&AddressLazyImpl<'a, A>> {
+        match &self.state {
+            PersonLazyImplState::Parsing(inner) => {
+                let inner = inner.borrow();
+                inner.address.as_ref()  // None if not set
+            }
+            PersonLazyImplState::Finalized(inner) => {
+                inner.address.as_ref()  // Direct access - no RefCell!
+            }
+        }
+    }
+}
+```
+
+**Note**: 
+- Implicit presence fields return `T` directly (use default values if not parsed)
+- Explicit optional and scalar message fields return `Option<T>`
+- Getter implementations are identical for both states (can be extracted to helper method)
+
+**2. Setter Methods (Only available when state is `Parsing`):**
+
+```rust
+impl<'a, A: Allocator + Clone> PersonLazyImpl<'a, A> {
+    /// Update name during parsing (implicit presence field)
+    /// Only works when state is Parsing - panics if already finalized
+    pub fn set_name(&self, name: String) {
+        match &self.state {
+            PersonLazyImplState::Parsing(inner) => {
+                inner.borrow_mut().name = name;  // Direct assignment, no Option
+            }
+            PersonLazyImplState::Finalized(_) => {
+                panic!("Cannot set field after finalization");
+            }
+        }
+    }
+    
+    /// Update age during parsing (implicit presence field)
+    pub fn set_age(&self, age: i32) {
+        match &self.state {
+            PersonLazyImplState::Parsing(inner) => {
+                inner.borrow_mut().age = age;  // Direct assignment
+            }
+            PersonLazyImplState::Finalized(_) => {
+                panic!("Cannot set field after finalization");
+            }
+        }
+    }
+    
+    /// Update email during parsing (explicit optional field)
+    pub fn set_email(&self, email: String) {
+        match &self.state {
+            PersonLazyImplState::Parsing(inner) => {
+                inner.borrow_mut().email = Some(email);  // Option wrapper
+            }
+            PersonLazyImplState::Finalized(_) => {
+                panic!("Cannot set field after finalization");
+            }
+        }
+    }
+    
+    /// Internal method to update fields during parsing
+    fn update_field(&self, field_num: u32, wire_type: u32, value_slice: &'a [u8]) -> Result<(), Error> {
+        match &self.state {
+            PersonLazyImplState::Parsing(inner) => {
+                let mut inner = inner.borrow_mut();
+                match field_num {
+                    1 => { // name - implicit presence
+                        let name = parse_string(value_slice)?;
+                        inner.name = name;  // Direct assignment
+                    }
+                    2 => { // age - implicit presence
+                        let age = parse_varint(value_slice)?;
+                        inner.age = age;  // Direct assignment
+                    }
+                    3 => { // email - explicit optional
+                        let email = parse_string(value_slice)?;
+                        inner.email = Some(email);  // Option wrapper
+                    }
+                    6 => { // address - scalar message field
+                        // Create child message on first occurrence
+                        if inner.address.is_none() {
+                            let addr = AddressLazyImpl::new_from_first_slice(
+                                value_slice,
+                                self,
+                                6,
+                                inner.allocator.clone(),
+                            );
+                            inner.address = Some(addr);
+                        } else {
+                            // Push additional slice to existing child
+                            inner.address.as_ref().unwrap().push_slice(value_slice);
+                        }
+                    }
+                    // ... other fields
+                    _ => {}
+                }
+                Ok(())
+            }
+            PersonLazyImplState::Finalized(_) => {
+                // Should not happen - finalization happens after parsing is complete
+                Err(Error::InvalidState)
+            }
+        }
+    }
+    
+    /// Get mutable access to iterator (for parsing)
+    fn get_iterator_mut(&self) -> Option<&mut Option<FieldIterator<'a, A>>> {
+        match &self.state {
+            PersonLazyImplState::Parsing(inner) => {
+                Some(&mut inner.borrow_mut().field_iter)
+            }
+            PersonLazyImplState::Finalized(_) => None,
+        }
+    }
+}
+```
+
+**3. Finalization Method:**
+
+```rust
+impl<'a, A: Allocator + Clone> PersonLazyImpl<'a, A> {
+    /// Finalize parsing - converts from Parsing state to Finalized state
+    pub fn finalize(self) -> Self {
+        match self.state {
+            PersonLazyImplState::Parsing(inner) => {
+                // Extract the inner struct
+                let inner = inner.into_inner();
+                
+                // Trivial conversion! Just move the struct directly (no RefCell needed)
+                // Field types are identical, so no conversion needed
+                Self {
+                    state: PersonLazyImplState::Finalized(inner),
+                }
+            }
+            PersonLazyImplState::Finalized(_) => {
+                // Already finalized, return as-is
+                self
+            }
+        }
+    }
+    
+    /// Check if parsing is finalized
+    pub fn is_finalized(&self) -> bool {
+        matches!(self.state, PersonLazyImplState::Finalized(_))
+    }
+}
+```
+
+**Key Benefit**: Since field types are the same for both states, the conversion is **trivial** - just move the inner struct directly (no `RefCell` needed for finalized state)!
+
+**Note**: 
+- **Parsing state**: Uses `RefCell` for interior mutability (fields can be updated)
+- **Finalized state**: No `RefCell` needed - fields are immutable, direct access via `&self`
+- The enum variant prevents setter methods from being available (runtime check via match)
+- This eliminates `RefCell` overhead completely after finalization!
+
+### Usage Example
+
+```rust
+// Start with parsing state
+let person: PersonLazyImpl<'_, true, _> = PersonLazyImpl::new(field_slices, alloc);
+
+// Parse incrementally
+person.parse_until_field(10);  // Updates fields as it encounters them
+person.parse_until_field(9);   // Updates fields again if encountered
+
+// Finalize parsing
+let person = person.finalize();  // Converts internal state from Parsing to Finalized
+
+// After finalization:
+// - No more setter methods available (runtime check via enum match)
+// - Fields are directly stored (same types as during parsing)
+// - No RefCell wrapper at all (zero overhead!)
+// - Better performance (no per-field RefCell/OnceCell overhead, no RefCell wrapper)
+// - Implicit presence fields use default values if not parsed
+// - Explicit optional fields remain as Option<T>
+```
+
+### Benefits of This Approach
+
+1. **Type Safety**: Runtime check via enum match prevents setters after finalization
+2. **Zero Runtime Overhead for Const Generic**: Const generic is erased at compile time
+3. **Zero RefCell Overhead After Finalization**: No `RefCell` wrapper needed for finalized state - direct field access!
+4. **Single Struct Definition**: No need for separate `PersonLazyImpl` and `PersonLazyFinal` types
+5. **Clear API**: Type signature makes parsing state explicit
+6. **Efficient Storage**: Same field types for both states
+   - Implicit presence fields: `T` (direct values with defaults)
+   - Explicit optional fields: `Option<T>`
+   - Scalar message fields: `Option<MessageLazyImpl>`
+7. **Simpler Field Access**: Direct field access via `&mut` during parsing, `&` after finalization
+8. **Trivial Conversion**: `From` implementation is just moving the inner struct - no field conversion needed!
+9. **No Helper Types**: No need for `FieldStorage` or similar type-level helpers
+10. **Protobuf Semantics**: Matches protobuf field semantics exactly - implicit presence uses defaults, explicit optional uses `Option`
+
+### Implementation Challenges
+
+1. **Method Implementation**: Methods need to match on enum variant to handle both states
+2. **Trait Bounds**: May need trait bounds that work with both enum variants
+3. **Code Generation**: Code generator needs to handle both states, but field types are the same
+4. **Field Type Selection**: Need to distinguish between:
+   - Implicit presence fields → `T` (with default value)
+   - Explicit optional fields → `Option<T>`
+   - Scalar message fields → `Option<MessageLazyImpl>`
+   - Repeated fields → `OnceList<T, A>`
+5. **Enum Variant Matching**: All methods that access fields need to match on enum variant
+
+### Comparison with Current Design
+
+| Aspect | Current Design | Const Generic Design |
+|--------|---------------|---------------------|
+| **Type Safety** | Runtime (RefCell per field) | Runtime (enum match) - can be improved with const generic on methods |
+| **Performance** | RefCell/OnceCell overhead per field | RefCell only during parsing, zero overhead after finalization |
+| **API Clarity** | All methods always available | Setters only when `IS_PARSING = true` |
+| **Complexity** | Simpler implementation | More complex type system usage |
+| **Flexibility** | Can update fields anytime | Must finalize to get immutable version |
+| **Field Storage** | `RefCell<Option<T>>` or `Cell<T>` per field | Direct `Option<T>` or `T` (wrapped struct in RefCell) |
+| **Memory Overhead** | Multiple RefCell/OnceCell wrappers | RefCell only during parsing, zero overhead after finalization |
+| **Conversion Complexity** | Complex (convert each field type) | Trivial (just move the struct) |
+| **Helper Types** | Not needed | Not needed (same field types) |
+
+### Recommendation
+
+The const generic pattern is **highly recommended** for the following reasons:
+
+1. **Type Safety**: Enum variant prevents accidental field updates after finalization (runtime check via match)
+2. **Performance**: Completely eliminates `RefCell` overhead after finalization (no wrapper at all!)
+3. **API Clarity**: Makes parsing state explicit in the type signature
+4. **Modern Rust**: Uses advanced type system features effectively
+
+However, it does add complexity to code generation. The trade-off is worth it for the benefits it provides.
+
+### Alternative: Const Generic on Methods Instead of Type
+
+We could also use const generic on methods to provide compile-time safety:
+
+```rust
+pub struct PersonLazyImpl<'a, A: Allocator = Global> {
+    state: PersonLazyImplState<'a, A>,
+}
+
+impl<'a, A: Allocator + Clone> PersonLazyImpl<'a, A> {
+    /// Setter method - only compiles when called with const generic true
+    pub fn set_name<const IS_PARSING: bool>(&self, name: String)
+    where
+        (): std::marker::ConstParamTy<{ IS_PARSING }>,
+    {
+        // This would only compile if IS_PARSING = true
+        // But this is complex and may not be worth it
+    }
+}
+```
+
+However, this approach is complex and the enum-based runtime check is simpler and more practical.
+
+### Summary
+
+The key insight is that **the public type should not have `IS_PARSING` as a parameter**. Instead:
+- **Use an enum to hold either parsing or finalized state internally**: The enum variant IS the boolean state that makes the pattern meaningful
+- **Same field types for both states**: Trivial conversion - just move the struct and change the enum variant
+- **Runtime checks via enum match**: Prevent invalid operations (setters only work in `Parsing` variant)
+- **Simpler API**: Users don't need to specify `IS_PARSING` parameter
+- **Explicit state tracking**: The enum explicitly tracks whether we're in parsing or finalized mode, making the state clear and meaningful
