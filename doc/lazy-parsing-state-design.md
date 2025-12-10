@@ -962,3 +962,91 @@ impl AddressLazyImpl {
 3. **Slice Ownership**: Should child or parent own scalar message field slices?
    - **Option 1 (Child owns)**: Better encapsulation, simpler code generation, cleaner API ✓ (adopted)
    - **Option 2 (Parent owns)**: Centralized ownership, but more complex parent structure
+
+## Similarity to Builder Pattern
+
+The current lazy parsing implementation shares interesting similarities with the **Builder Pattern**:
+
+### Builder Pattern Analogy
+
+**Traditional Builder Pattern:**
+```rust
+let mut builder = PersonBuilder::new();
+builder.set_name("Alice");
+builder.set_age(30);
+let person = builder.build(); // Finalize - builder is consumed, person is immutable
+```
+
+**Lazy Parsing Pattern:**
+```rust
+let person = PersonLazyImpl::new(field_slices, alloc);
+// Parsing in progress - fields can be updated multiple times
+person.parse_until_field(10); // Updates name, age, etc. as it encounters them
+person.parse_until_field(9);  // Updates name, age again if encountered
+// ...
+person.parse_entire_message(); // Finalize - all fields are now final
+// After this point, fields won't be updated anymore
+```
+
+### Key Similarities
+
+1. **Mutable During Construction**: 
+   - Builder: Fields can be set multiple times before `build()`
+   - Lazy Parser: Fields can be updated multiple times during partial parsing
+
+2. **Finalization Point**:
+   - Builder: `build()` consumes the builder and returns an immutable object
+   - Lazy Parser: `parse_entire_message()` marks the end of parsing - fields are now final
+
+3. **State Transition**:
+   - Builder: `Builder` → `build()` → `Person` (immutable)
+   - Lazy Parser: `Parsing in progress` → `parse_entire_message()` → `Parsing complete` (fields final)
+
+### Design Implications
+
+This similarity suggests potential optimizations:
+
+1. **Type-Level Finalization**: After `parse_entire_message()` completes, we could convert `RefCell<Option<T>>` to `OnceCell<T>` to:
+   - Reduce runtime overhead (no more `RefCell` borrows)
+   - Make immutability explicit at the type level
+   - Prevent accidental updates after finalization
+
+2. **Explicit Finalization State**: We could track whether parsing is complete:
+   ```rust
+   pub struct PersonLazyImpl<'a, A: Allocator = Global> {
+       // ... fields ...
+       is_finalized: Cell<bool>, // Track if parsing is complete
+   }
+   ```
+
+3. **Builder-Like API**: We could provide a method that finalizes and returns a more efficient representation:
+   ```rust
+   impl PersonLazyImpl {
+       /// Finalize parsing and return an optimized immutable representation
+       fn finalize(self) -> PersonLazyFinal<'a, A> {
+           // Convert RefCell<Option<T>> to OnceCell<T>
+           // Convert Cell<T> to T (for Copy types)
+           // This consumes self, ensuring no further updates
+       }
+   }
+   ```
+
+### Current Design Choice
+
+For simplicity, the current design keeps `RefCell<Option<T>>` and `Cell<T>` throughout the lifetime of the message, even after parsing is complete. This:
+- ✅ Simplifies the implementation
+- ✅ Avoids complex state transitions
+- ✅ Allows lazy parsing to remain truly lazy (no forced finalization)
+
+However, the Builder pattern analogy suggests that **explicit finalization** could be a valuable optimization for cases where:
+- The entire message will be parsed anyway
+- Performance is critical
+- Type-level immutability guarantees are desired
+
+### Future Consideration
+
+If we want to optimize for the "parse entire message" case, we could introduce a separate type:
+- `PersonLazyImpl`: Current design - allows incremental parsing, fields can be updated
+- `PersonLazyFinal`: After `parse_entire_message()`, convert to this type with `OnceCell<T>` fields
+
+This would be similar to how some builders have both a mutable builder and an immutable final product.
