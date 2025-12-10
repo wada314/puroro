@@ -115,13 +115,15 @@ pub struct PersonLazyImpl<'a, A: Allocator = Global> {
     field_iter: RefCell<Option<FieldIterator<'a, A>>>,
     
     // Cached parsed values (updated incrementally as we parse)
-    name: OnceCell<String>,
-    age: OnceCell<i32>,
-    email: OnceCell<String>,
-    status: OnceCell<i32>,
-    score: OnceCell<i32>,
-    address: OnceCell<AddressLazyImpl<'a, A>>,
-    secondary_status: OnceCell<i32>,
+    // Scalar fields: Use RefCell<Option<T>> for non-Copy types, Cell<T> for Copy types
+    // This allows multiple updates during partial parsing
+    name: RefCell<Option<String>>,
+    age: Cell<i32>,  // Copy type, can use Cell
+    email: RefCell<Option<String>>,
+    status: Cell<i32>,  // Copy type (enum stored as i32)
+    score: RefCell<Option<i32>>,  // Optional field, use RefCell<Option<T>>
+    address: OnceCell<AddressLazyImpl<'a, A>>,  // Message field, set once on first occurrence
+    secondary_status: RefCell<Option<i32>>,  // Optional field
     scores: OnceList<i32, A>,
     addresses: OnceList<AddressLazyImpl<'a, A>, A>,
 }
@@ -203,11 +205,13 @@ fn ensure_scores_parsed(&self) {
         match field_num {
             1 => { // name
                 let name = parse_string(value_slice)?;
-                self.name.set(name).ok();
+                // Can be updated multiple times during partial parsing
+                *self.name.borrow_mut() = Some(name);
             }
             2 => { // age
                 let age = parse_varint(value_slice)?;
-                self.age.set(age).ok();
+                // Copy type, can use Cell::set()
+                self.age.set(age);
             }
             10 => { // scores - TARGET FIELD
                 let score = parse_varint(value_slice)?;
@@ -296,9 +300,10 @@ pub struct AddressLazyImpl<'a, A: Allocator = Global> {
     field_iter: RefCell<Option<FieldIterator<'a, A>>>,
     
     // Cache fields
-    street: OnceCell<String>,
-    city: OnceCell<String>,
-    zip_code: OnceCell<i32>,
+    // Scalar fields: Use RefCell<Option<T>> for non-Copy types, Cell<T> for Copy types
+    street: RefCell<Option<String>>,
+    city: RefCell<Option<String>>,
+    zip_code: Cell<i32>,  // Copy type
 }
 
 impl<'a, A> AddressLazyImpl<'a, A> {
@@ -419,23 +424,28 @@ impl<'a, A: Allocator + Clone> PersonLazyImpl<'a, A> {
         match field_num {
             1 => { // name
                 let name = parse_string(value_slice)?;
-                self.name.set(name).ok();
+                // Can be updated multiple times during partial parsing
+                *self.name.borrow_mut() = Some(name);
             }
             2 => { // age
                 let age = parse_varint(value_slice)?;
-                self.age.set(age).ok();
+                // Copy type, can use Cell::set()
+                self.age.set(age);
             }
             3 => { // email
                 let email = parse_string(value_slice)?;
-                self.email.set(email).ok();
+                // Can be updated multiple times during partial parsing
+                *self.email.borrow_mut() = Some(email);
             }
             4 => { // status
                 let status = parse_varint(value_slice)?;
-                self.status.set(status).ok();
+                // Copy type, can use Cell::set()
+                self.status.set(status);
             }
             5 => { // score
                 let score = parse_varint(value_slice)?;
-                self.score.set(score).ok();
+                // Optional field, can be updated multiple times
+                *self.score.borrow_mut() = Some(score);
             }
             6 => { // address - scalar message field
                 // CRITICAL: We must push this slice NOW because the iterator has already passed it.
@@ -456,7 +466,8 @@ impl<'a, A: Allocator + Clone> PersonLazyImpl<'a, A> {
             }
             8 => { // secondary_status
                 let status = parse_varint(value_slice)?;
-                self.secondary_status.set(status).ok();
+                // Optional field, can be updated multiple times
+                *self.secondary_status.borrow_mut() = Some(status);
             }
             9 => { // addresses - repeated message field
                 // First occurrence: create child message and add to list
@@ -544,7 +555,8 @@ impl<'a, A: Allocator + Clone> PersonLazyImpl<'a, A> {
     // Scalar non-message field
     fn deserialize_field_1_name(&self) -> String {
         self.parse_entire_message().unwrap();
-        self.name.get().unwrap().clone()
+        // After parsing entire message, value is final
+        self.name.borrow().as_ref().unwrap().clone()
     }
     
     // Repeated field
@@ -615,7 +627,7 @@ Since we're updating fields during parsing (which happens through `&self`), we n
 | **Top-level `field_slices`** | `OnceList<&'a [u8], A>` | Immutable after construction | Set once during `new()`/`new_from_slices()` |
 | **Child `field_slices`** (scalar message) | `OnceList<&'a [u8], A>` | Built-in interior mutability | `OnceList::push()` works via `&self` |
 | **Field iterator** | `RefCell<Option<FieldIterator>>` | Mutable via `RefCell` | `Iterator::next()` requires `&mut self` |
-| **Scalar fields** (name, age, etc.) | `OnceCell<T>` | Set once | Last value overwrites previous (parse entire message) |
+| **Scalar fields** (name, age, etc.) | `RefCell<Option<T>>` or `Cell<T>` (if `Copy`) | Update multiple times | Can be updated multiple times during partial parsing, but final after message end |
 | **Repeated scalar fields** (scores) | `OnceList<T, A>` | Push multiple times | Can add items incrementally |
 | **Repeated message fields** (addresses) | `OnceList<T, A>` | Push multiple times | Can add items incrementally |
 | **Scalar message fields** (address) | `OnceCell<AddressLazyImpl>` | Set once | Created on first occurrence |
@@ -644,9 +656,12 @@ fn save_iterator(&self, iter: FieldIterator<'a, A>) {
 fn update_field(&self, field_num: u32, ...) {
     match field_num {
         1 => { // name
-            // Needs: OnceCell::set() (interior mutability built-in)
-            // Reason: Set once, last value wins
-            self.name.set(name).ok();
+            // Needs: RefCell::borrow_mut() or Cell::set() (if Copy)
+            // Reason: Can be updated multiple times during partial parsing
+            // For String (non-Copy): use RefCell<Option<String>>
+            *self.name.borrow_mut() = Some(name);
+            // For i32 (Copy): use Cell<i32> (simpler, no Option needed)
+            self.age.set(age);
         }
     }
 }
@@ -702,11 +717,12 @@ impl AddressLazyImpl {
 #### Mutability Complexity Summary
 
 **Simple Cases (Built-in Interior Mutability):**
-- ✅ `OnceCell::set()` - Thread-safe, one-time set
 - ✅ `OnceList::push()` - Thread-safe, multiple pushes
+- ✅ `Cell<T>::set()` - For `Copy` types (e.g., `i32`), simple and efficient
 
 **Complex Cases (Require RefCell):**
 - ⚠️ `RefCell<Option<FieldIterator>>` - Needed because `Iterator::next()` requires `&mut self`
+- ⚠️ `RefCell<Option<T>>` - For non-`Copy` types (e.g., `String`), allows multiple updates
 
 **Cross-Struct Mutation (Simplified!):**
 The cross-struct mutation where parent's `update_field` (via `&self`) pushes to child's `field_slices` is actually simpler than it looks:
@@ -716,10 +732,23 @@ The cross-struct mutation where parent's `update_field` (via `&self`) pushes to 
 - `OnceList::push()` works via `&self` thanks to built-in interior mutability
 - This allows parent to push to child's state through immutable references, but no `RefCell` is needed
 
+**Scalar Field Mutability Requirements:**
+- **Problem**: Scalar fields can be updated multiple times during partial parsing
+  - Example: `parse_until_field(10)` is called multiple times, each time updating `name` field
+  - `OnceCell` only allows one-time set, so subsequent updates fail silently (`.ok()` ignores the error)
+- **Solution**: Use `RefCell<Option<T>>` for non-`Copy` types, `Cell<T>` for `Copy` types
+  - `RefCell<Option<String>>` for `name`, `email` (String fields)
+  - `Cell<i32>` for `age`, `status` (Copy types)
+  - `RefCell<Option<i32>>` for optional fields like `score`, `secondary_status`
+- **Optimization Opportunity**: Once message parsing reaches the end, the value is final and won't be updated anymore
+  - This can be used for optimization (e.g., convert `RefCell<Option<T>>` to `OnceCell<T>` after parsing completes)
+  - But for simplicity, we can keep `RefCell<Option<T>>` throughout
+  - The `Option` wrapper allows us to distinguish "not yet parsed" (`None`) from "parsed but empty" (`Some("")`)
+
 **Why RefCell instead of Cell?**
 - `Iterator::next()` requires `&mut self`, so we can't use `Cell` (which only provides `get()`/`set()` for `Copy` types)
 - `RefCell` allows us to get `&mut FieldIterator` through `borrow_mut()`
-- `RefCell` also allows cross-struct mutation (parent mutating child's `field_slices`)
+- For non-`Copy` types like `String`, we need `RefCell` to allow multiple updates
 
 ### Parent Parser Access (Option 2)
 
@@ -739,8 +768,13 @@ impl<'a, A: Allocator + Clone> PersonLazyImpl<'a, A> {
             field_slices,
             allocator: alloc,
             field_iter: RefCell::new(None),  // Iterator created lazily on first use
-            name: OnceCell::new(),
-            age: OnceCell::new(),
+            name: RefCell::new(None),
+            age: Cell::new(0),  // Default value for Copy type
+            email: RefCell::new(None),
+            status: Cell::new(0),
+            score: RefCell::new(None),
+            address: OnceCell::new(),
+            secondary_status: RefCell::new(None),
             // ... initialize all fields
         }
     }
@@ -761,15 +795,16 @@ impl<'a, A: Allocator + Clone> AddressLazyImpl<'a, A> {
             field_slices, // OnceList already supports push() via &self
             allocator: alloc,
             field_iter: RefCell::new(None),  // Iterator created lazily on first use
-            street: OnceCell::new(),
-            city: OnceCell::new(),
-            zip_code: OnceCell::new(),
+            street: RefCell::new(None),
+            city: RefCell::new(None),
+            zip_code: Cell::new(0),  // Copy type
         }
     }
     
     /// Push a slice to field_slices (called from parent's update_field)
+    /// OnceList supports push() via &self, so no RefCell needed
     fn push_slice(&self, slice: &'a [u8]) {
-        self.field_slices.borrow_mut().push(slice);
+        self.field_slices.push(slice);
     }
 }
 ```
