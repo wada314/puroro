@@ -1083,15 +1083,10 @@ pub struct PersonLazyImplInner<'a, const IS_PARSING: bool, A: Allocator = Global
     addresses: OnceList<AddressLazyImpl<'a, A>, A>,  // Repeated message field
 }
 
-// Enum to hold EITHER parsing or finalized state
-pub enum PersonLazyImplState<'a, A: Allocator> {
+// Public API - enum to hold EITHER parsing or finalized state
+pub enum PersonLazyImpl<'a, A: Allocator = Global> {
     Parsing(RefCell<PersonLazyImplInner<'a, true, A>>),  // RefCell needed for mutability
     Finalized(PersonLazyImplInner<'a, false, A>),  // No RefCell needed - immutable!
-}
-
-// Public API - can hold EITHER parsing or finalized state
-pub struct PersonLazyImpl<'a, A: Allocator = Global> {
-    state: PersonLazyImplState<'a, A>,
 }
 ```
 
@@ -1102,13 +1097,13 @@ pub struct PersonLazyImpl<'a, A: Allocator = Global> {
 - This allows us to hold both states and convert between them
 
 **Key Insight**: 
-- **Public type has no `IS_PARSING` parameter**: Can hold either state
+- **Public type IS the enum**: No wrapper struct needed - `PersonLazyImpl` itself is the enum
 - **Enum variant IS the boolean state**: The enum explicitly tracks whether we're in parsing or finalized mode
 - **Same field types for both states**: No need for `FieldStorage` helper type!
 - **`Option` only for explicit optional and scalar message fields**: Implicit presence fields use default values
 - **Trivial conversion**: Conversion from parsing to finalized is trivial - just move the inner struct and change the enum variant!
 - Access fields via `&mut` during parsing (through `RefCell::borrow_mut()`)
-- Access fields via `&` after finalization (through `RefCell::borrow()`)
+- Access fields via `&` after finalization (direct access - no `RefCell`!)
 - No need for per-field interior mutability wrappers!
 - No need to track "not yet parsed" state for implicit presence fields - use protobuf defaults!
 
@@ -1120,12 +1115,12 @@ pub struct PersonLazyImpl<'a, A: Allocator = Global> {
 impl<'a, A: Allocator + Clone> PersonLazyImpl<'a, A> {
     // Implicit presence field - always returns a value (default if not parsed)
     pub fn name(&self) -> &String {
-        match &self.state {
-            PersonLazyImplState::Parsing(inner) => {
+        match self {
+            PersonLazyImpl::Parsing(inner) => {
                 let inner = inner.borrow();
                 &inner.name  // Direct access - always available (defaults to "")
             }
-            PersonLazyImplState::Finalized(inner) => {
+            PersonLazyImpl::Finalized(inner) => {
                 &inner.name  // Direct access - no RefCell!
             }
         }
@@ -1133,12 +1128,12 @@ impl<'a, A: Allocator + Clone> PersonLazyImpl<'a, A> {
     
     // Implicit presence field - always returns a value (default if not parsed)
     pub fn age(&self) -> i32 {
-        match &self.state {
-            PersonLazyImplState::Parsing(inner) => {
+        match self {
+            PersonLazyImpl::Parsing(inner) => {
                 let inner = inner.borrow();
                 inner.age  // Direct access - always available (defaults to 0)
             }
-            PersonLazyImplState::Finalized(inner) => {
+            PersonLazyImpl::Finalized(inner) => {
                 inner.age  // Direct access - no RefCell!
             }
         }
@@ -1146,12 +1141,12 @@ impl<'a, A: Allocator + Clone> PersonLazyImpl<'a, A> {
     
     // Explicit optional field - returns Option
     pub fn email(&self) -> Option<&String> {
-        match &self.state {
-            PersonLazyImplState::Parsing(inner) => {
+        match self {
+            PersonLazyImpl::Parsing(inner) => {
                 let inner = inner.borrow();
                 inner.email.as_ref()  // None if not set
             }
-            PersonLazyImplState::Finalized(inner) => {
+            PersonLazyImpl::Finalized(inner) => {
                 inner.email.as_ref()  // Direct access - no RefCell!
             }
         }
@@ -1159,12 +1154,12 @@ impl<'a, A: Allocator + Clone> PersonLazyImpl<'a, A> {
     
     // Scalar message field - returns Option
     pub fn address(&self) -> Option<&AddressLazyImpl<'a, A>> {
-        match &self.state {
-            PersonLazyImplState::Parsing(inner) => {
+        match self {
+            PersonLazyImpl::Parsing(inner) => {
                 let inner = inner.borrow();
                 inner.address.as_ref()  // None if not set
             }
-            PersonLazyImplState::Finalized(inner) => {
+            PersonLazyImpl::Finalized(inner) => {
                 inner.address.as_ref()  // Direct access - no RefCell!
             }
         }
@@ -1184,11 +1179,11 @@ impl<'a, A: Allocator + Clone> PersonLazyImpl<'a, A> {
     /// Update name during parsing (implicit presence field)
     /// Only works when state is Parsing - panics if already finalized
     pub fn set_name(&self, name: String) {
-        match &self.state {
-            PersonLazyImplState::Parsing(inner) => {
+        match self {
+            PersonLazyImpl::Parsing(inner) => {
                 inner.borrow_mut().name = name;  // Direct assignment, no Option
             }
-            PersonLazyImplState::Finalized(_) => {
+            PersonLazyImpl::Finalized(_) => {
                 panic!("Cannot set field after finalization");
             }
         }
@@ -1196,11 +1191,11 @@ impl<'a, A: Allocator + Clone> PersonLazyImpl<'a, A> {
     
     /// Update age during parsing (implicit presence field)
     pub fn set_age(&self, age: i32) {
-        match &self.state {
-            PersonLazyImplState::Parsing(inner) => {
+        match self {
+            PersonLazyImpl::Parsing(inner) => {
                 inner.borrow_mut().age = age;  // Direct assignment
             }
-            PersonLazyImplState::Finalized(_) => {
+            PersonLazyImpl::Finalized(_) => {
                 panic!("Cannot set field after finalization");
             }
         }
@@ -1208,11 +1203,11 @@ impl<'a, A: Allocator + Clone> PersonLazyImpl<'a, A> {
     
     /// Update email during parsing (explicit optional field)
     pub fn set_email(&self, email: String) {
-        match &self.state {
-            PersonLazyImplState::Parsing(inner) => {
+        match self {
+            PersonLazyImpl::Parsing(inner) => {
                 inner.borrow_mut().email = Some(email);  // Option wrapper
             }
-            PersonLazyImplState::Finalized(_) => {
+            PersonLazyImpl::Finalized(_) => {
                 panic!("Cannot set field after finalization");
             }
         }
@@ -1220,8 +1215,8 @@ impl<'a, A: Allocator + Clone> PersonLazyImpl<'a, A> {
     
     /// Internal method to update fields during parsing
     fn update_field(&self, field_num: u32, wire_type: u32, value_slice: &'a [u8]) -> Result<(), Error> {
-        match &self.state {
-            PersonLazyImplState::Parsing(inner) => {
+        match self {
+            PersonLazyImpl::Parsing(inner) => {
                 let mut inner = inner.borrow_mut();
                 match field_num {
                     1 => { // name - implicit presence
@@ -1256,7 +1251,7 @@ impl<'a, A: Allocator + Clone> PersonLazyImpl<'a, A> {
                 }
                 Ok(())
             }
-            PersonLazyImplState::Finalized(_) => {
+            PersonLazyImpl::Finalized(_) => {
                 // Should not happen - finalization happens after parsing is complete
                 Err(Error::InvalidState)
             }
@@ -1265,11 +1260,11 @@ impl<'a, A: Allocator + Clone> PersonLazyImpl<'a, A> {
     
     /// Get mutable access to iterator (for parsing)
     fn get_iterator_mut(&self) -> Option<&mut Option<FieldIterator<'a, A>>> {
-        match &self.state {
-            PersonLazyImplState::Parsing(inner) => {
+        match self {
+            PersonLazyImpl::Parsing(inner) => {
                 Some(&mut inner.borrow_mut().field_iter)
             }
-            PersonLazyImplState::Finalized(_) => None,
+            PersonLazyImpl::Finalized(_) => None,
         }
     }
 }
@@ -1281,18 +1276,16 @@ impl<'a, A: Allocator + Clone> PersonLazyImpl<'a, A> {
 impl<'a, A: Allocator + Clone> PersonLazyImpl<'a, A> {
     /// Finalize parsing - converts from Parsing state to Finalized state
     pub fn finalize(self) -> Self {
-        match self.state {
-            PersonLazyImplState::Parsing(inner) => {
+        match self {
+            PersonLazyImpl::Parsing(inner) => {
                 // Extract the inner struct
                 let inner = inner.into_inner();
                 
                 // Trivial conversion! Just move the struct directly (no RefCell needed)
                 // Field types are identical, so no conversion needed
-                Self {
-                    state: PersonLazyImplState::Finalized(inner),
-                }
+                PersonLazyImpl::Finalized(inner)
             }
-            PersonLazyImplState::Finalized(_) => {
+            PersonLazyImpl::Finalized(_) => {
                 // Already finalized, return as-is
                 self
             }
@@ -1301,7 +1294,7 @@ impl<'a, A: Allocator + Clone> PersonLazyImpl<'a, A> {
     
     /// Check if parsing is finalized
     pub fn is_finalized(&self) -> bool {
-        matches!(self.state, PersonLazyImplState::Finalized(_))
+        matches!(self, PersonLazyImpl::Finalized(_))
     }
 }
 ```
@@ -1318,7 +1311,7 @@ impl<'a, A: Allocator + Clone> PersonLazyImpl<'a, A> {
 
 ```rust
 // Start with parsing state
-let person: PersonLazyImpl<'_, true, _> = PersonLazyImpl::new(field_slices, alloc);
+let person = PersonLazyImpl::new(field_slices, alloc);  // Returns PersonLazyImpl::Parsing(...)
 
 // Parse incrementally
 person.parse_until_field(10);  // Updates fields as it encounters them
@@ -1394,9 +1387,11 @@ However, it does add complexity to code generation. The trade-off is worth it fo
 We could also use const generic on methods to provide compile-time safety:
 
 ```rust
-pub struct PersonLazyImpl<'a, A: Allocator = Global> {
-    state: PersonLazyImplState<'a, A>,
-}
+// This alternative approach is not recommended - enum-based design is simpler
+// pub enum PersonLazyImpl<'a, A: Allocator = Global> {
+//     Parsing(RefCell<PersonLazyImplInner<'a, true, A>>),
+//     Finalized(PersonLazyImplInner<'a, false, A>),
+// }
 
 impl<'a, A: Allocator + Clone> PersonLazyImpl<'a, A> {
     /// Setter method - only compiles when called with const generic true
