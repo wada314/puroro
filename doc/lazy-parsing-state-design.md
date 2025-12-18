@@ -28,6 +28,11 @@ This means we can use:
 
 ### Implementation
 
+**Note**: In the sample code below, `Box<T, A>` and `String<A>` are used for brevity. In the actual implementation:
+- `Box<T, A>` should be `allocator_api2::boxed::Box<T, A>` (allocator-aware Box)
+- `String<A>` should be `allocator_extras::String<A>` (allocator-aware String)
+- All allocations should use the provided allocator `A`
+
 ```rust
 // In puroro crate (shared across all message types)
 pub enum LazyImplState<T> {
@@ -100,16 +105,16 @@ impl<'a, A: Allocator> std::ops::Deref for PersonLazyImpl<'a, A> {
 // Inner struct with fields
 pub struct PersonLazyImplInner<'a, A: Allocator = Global> {
     allocator: A,
-    /// FieldIterator is created at initialization time from field_slices
-    /// Once created, it maintains its own state and doesn't need field_slices reference
-    field_iter: Option<FieldIterator<'a, A>>,
+    /// FieldIterator is created at initialization time from the input iterator
+    /// Once created, it maintains its own state
+    field_iter: Option<FieldIterator<'a, Box<dyn Iterator<Item = &'a [u8]> + 'a, A>>>,
     
     // Field types (same for both states):
     // - T for implicit presence fields (default values)
     // - Option<T> ONLY for explicit optional fields and scalar message fields
-    name: String,  // Implicit presence - default to ""
+    name: String<A>,  // Implicit presence - default to ""
     age: i32,  // Implicit presence - default to 0
-    email: Option<String>,  // Explicit optional field
+    email: Option<String<A>>,  // Explicit optional field
     status: i32,  // Implicit presence enum - default to 0
     score: Option<i32>,  // Explicit optional field
     address: Option<AddressLazyImpl<'a, A>>,  // Scalar message field
@@ -120,19 +125,19 @@ pub struct PersonLazyImplInner<'a, A: Allocator = Global> {
 
 // Methods on inner struct (accessed via Deref)
 impl<'a, A: Allocator + Clone> PersonLazyImplInner<'a, A> {
-    pub fn name(&self) -> &String { &self.name }
+    pub fn name(&self) -> &String<A> { &self.name }
     pub fn age(&self) -> i32 { self.age }
-    pub fn email(&self) -> Option<&String> { self.email.as_ref() }
+    pub fn email(&self) -> Option<&String<A>> { self.email.as_ref() }
     // ... other field accessors
     
     // Parsing methods - use &mut self to avoid take() and keep state consistent
     // FieldIterator is created at initialization time, so we just use the existing one
-    pub fn deserialize_field_1_name(&mut self) -> String {
+    pub fn deserialize_field_1_name(&mut self) -> String<A> {
         // Get iterator - it should already exist (created at initialization)
         let iter = self.field_iter.as_mut().expect("FieldIterator should be initialized");
         
         // Parse entire message, updating all fields as we go
-        let mut last_name = String::new();
+        let mut last_name = String::new_in(self.allocator.clone());
         
         while let Some(result) = iter.next() {
             let (field_num, wire_type, value_slice) = result?;
@@ -159,19 +164,62 @@ impl<'a, A: Allocator + Clone> PersonLazyImplInner<'a, A> {
 
 // Wrapper methods that forward to inner (use state.inner_mut() for mutation)
 impl<'a, A: Allocator + Clone> PersonLazyImpl<'a, A> {
-    /// Create a new PersonLazyImpl from field_slices
-    pub fn new(field_slices: OnceList<&'a [u8], A>, allocator: A) -> Self {
+    /// Create a new PersonLazyImpl from a single slice (for top-level messages)
+    /// Called by:
+    /// - User code when deserializing top-level messages
+    /// - Tests
+    pub fn new(slice: &'a [u8], alloc: A) -> Self {
+        let alloc_clone = alloc.clone();
+        
         let inner = PersonLazyImplInner {
-            allocator,
-            field_iter: Some(FieldIterator::new(&field_slices)),
-            // ... initialize other fields with default values
+            allocator: alloc.clone(),
+            field_iter: Some(FieldIterator::new(
+                Box::new_in(std::iter::once(slice), alloc)
+            )),
+            // Initialize fields with default values
+            name: String::new_in(alloc.clone()),
+            age: 0,
+            email: None,
+            status: 0,
+            score: None,
+            address: None,
+            secondary_status: None,
+            scores: OnceList::new_in(alloc_clone.clone()),
+            addresses: OnceList::new_in(alloc_clone),
         };
         Self {
             state: LazyImplState::Builder(RefCell::new(inner)),
         }
     }
     
-    pub fn deserialize_field_1_name(&self) -> String {
+    /// Create a new PersonLazyImpl from multiple slices (for scalar message fields)
+    /// Called by:
+    /// - Parent message's parsing code when collecting all occurrences of a scalar message field
+    pub fn new_from_slices(slices: impl Iterator<Item = &'a [u8]> + 'a, alloc: A) -> Self {
+        let alloc_clone = alloc.clone();
+        
+        let inner = PersonLazyImplInner {
+            allocator: alloc.clone(),
+            field_iter: Some(FieldIterator::new(
+                Box::new_in(slices, alloc)
+            )),
+            // Initialize fields with default values
+            name: String::new_in(alloc.clone()),
+            age: 0,
+            email: None,
+            status: 0,
+            score: None,
+            address: None,
+            secondary_status: None,
+            scores: OnceList::new_in(alloc_clone.clone()),
+            addresses: OnceList::new_in(alloc_clone),
+        };
+        Self {
+            state: LazyImplState::Builder(RefCell::new(inner)),
+        }
+    }
+    
+    pub fn deserialize_field_1_name(&self) -> String<A> {
         // Get RefMut and call method on inner with &mut self
         let mut inner = self.state.inner_mut().unwrap();
         inner.deserialize_field_1_name()
@@ -211,32 +259,31 @@ person.finalize();         // Wrapper method
 ```rust
 use std::cell::{Cell, RefCell};
 
-/// Iterator over protobuf fields in field_slices
+/// Iterator over protobuf fields in slices
 /// Can be paused and resumed, making it easy to parse incrementally
-pub struct FieldIterator<'a, A: Allocator> {
-    /// Iterator over the field_slices (uses OnceList's efficient iterator)
-    /// OnceList provides iter() which returns an iterator over slices
-    /// This iterator maintains its own state and doesn't need the original field_slices reference
-    slice_iter: <&'a OnceList<&'a [u8], A> as IntoIterator>::IntoIter,
+pub struct FieldIterator<'a, I: Iterator<Item = &'a [u8]>> {
+    /// Iterator over the slices
+    /// This iterator maintains its own state
+    slice_iter: I,
     /// Current slice being parsed
     current_slice: Option<&'a [u8]>,
     /// Current position within the current slice
     position: usize,
 }
 
-impl<'a, A: Allocator> FieldIterator<'a, A> {
-    /// Create a new FieldIterator from a reference to field_slices
+impl<'a, I: Iterator<Item = &'a [u8]>> FieldIterator<'a, I> {
+    /// Create a new FieldIterator from any iterator over slices
     /// The iterator is created once and maintains its state - no need to recreate it
-    pub fn new(field_slices: &'a OnceList<&'a [u8], A>) -> Self {
+    pub fn new(slice_iter: I) -> Self {
         Self {
-            slice_iter: field_slices.iter(),
+            slice_iter,
             current_slice: None,
             position: 0,
         }
     }
 }
 
-impl<'a, A: Allocator> Iterator for FieldIterator<'a, A> {
+impl<'a, I: Iterator<Item = &'a [u8]>> Iterator for FieldIterator<'a, I> {
     type Item = Result<(u32, u32, &'a [u8]), Error>; // field_num, wire_type, value_slice
     
     fn next(&mut self) -> Option<Self::Item> {
@@ -265,12 +312,14 @@ impl<'a, A: Allocator> Iterator for FieldIterator<'a, A> {
 ```
 
 **Key Points**:
-- `FieldIterator` uses `OnceList`'s efficient iterator (no index access needed)
+- `FieldIterator` accepts any `Iterator<Item = &'a [u8]>` - no need to convert to `OnceList` first
+- For single slice: use `std::iter::once(slice)` wrapped in `Box::new_in(..., allocator)` (returns `Box<..., A>`)
+- For multiple slices: pass the iterator directly, wrapped in `Box::new_in(..., allocator)` (returns `Box<..., A>`)
 - Encapsulates cursor logic - tracks current slice and position within slice
 - Iterator can be paused (stored) and resumed - once created, it maintains its state
-- No need to store `field_slices` reference - the iterator itself maintains the necessary state
 - Uses `RefCell<Option<FieldIterator>>` because `Iterator::next()` requires `&mut self`
 - Much simpler parsing code - just iterate and match on field numbers
+- No need to store `field_slices` in `PersonLazyImpl` - the iterator owns its state
 
 ## Parsing Strategy
 
@@ -372,6 +421,8 @@ Following Protobuf semantics:
 - **Explicit optional fields**: Use `Option<T>` (e.g., `Option<String>`, `Option<i32>`)
 - **Scalar message fields**: Use `Option<MessageLazyImpl>` (may be absent)
 - **Repeated fields**: Use `OnceList<T, A>` (can add items incrementally)
+
+**Note**: In the sample code, `String<A>` is used for brevity. In the actual implementation, this should be `allocator_extras::String<A>` (allocator-aware String) with `String::new_in(allocator)` for initialization.
 
 The same field types are used for both `Builder` and `Finalized` states, making conversion trivial (just move the struct).
 
