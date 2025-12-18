@@ -12,6 +12,160 @@ Each message struct has its **own cursor** that tracks parsing progress through 
 - When the child needs all slices, it asks the parent to continue parsing from the parent's cursor
 - The parent continues parsing and collects all occurrences of the child's field number
 
+## Final Recommended Design
+
+### Core Pattern: Shared Enum with Thin Wrapper and Deref
+
+**Key Insight**: We only need mutable access **from inside the struct during parsing**, not from outside!
+
+- **External access**: Always `&self` (immutable reference)
+- **Internal mutation**: Uses `RefCell::borrow_mut()` inside parsing methods
+- **No external `&mut self`**: Users never need `&mut self` access
+
+This means we can use:
+- ✅ `Deref` for automatic method forwarding (perfect fit)
+- ❌ `DerefMut` not needed (no external `&mut self` access)
+
+### Implementation
+
+```rust
+// In puroro crate (shared across all message types)
+pub enum LazyImplState<T> {
+    /// Builder state - wrapped in RefCell for interior mutability during parsing
+    Builder(RefCell<T>),
+    /// Finalized state - direct ownership, no RefCell overhead
+    Finalized(T),
+}
+
+impl<T> LazyImplState<T> {
+    /// Get immutable reference to inner value (works for both states)
+    pub fn inner(&self) -> &T {
+        match self {
+            LazyImplState::Builder(inner) => inner.borrow(),
+            LazyImplState::Finalized(inner) => inner,
+        }
+    }
+    
+    /// Get mutable reference to inner value (only for Builder state, internal use only)
+    /// 
+    /// This explicitly calls `RefCell::borrow_mut()` to get `RefMut<'_, T>` which provides
+    /// `&mut T`-like access. Returns `None` if already finalized (no mutation allowed).
+    pub(crate) fn inner_mut(&self) -> Option<std::cell::RefMut<'_, T>> {
+        match self {
+            LazyImplState::Builder(inner) => {
+                // Explicitly call borrow_mut() to get mutable access through RefCell
+                Some(inner.borrow_mut())
+            },
+            LazyImplState::Finalized(_) => None,
+        }
+    }
+    
+    /// Finalize - move from Builder to Finalized state
+    pub fn finalize(self) -> Self {
+        match self {
+            LazyImplState::Builder(inner) => {
+                LazyImplState::Finalized(inner.into_inner())
+            }
+            LazyImplState::Finalized(_) => self,
+        }
+    }
+    
+    /// Check if finalized
+    pub fn is_finalized(&self) -> bool {
+        matches!(self, LazyImplState::Finalized(_))
+    }
+}
+
+// Implement Deref for automatic method forwarding
+impl<T> std::ops::Deref for LazyImplState<T> {
+    type Target = T;
+    fn deref(&self) -> &Self::Target {
+        self.inner()
+    }
+}
+
+// Generated code for each message type
+pub struct PersonLazyImpl<'a, A: Allocator = Global> {
+    state: LazyImplState<PersonLazyImplInner<'a, A>>,
+}
+
+// Implement Deref to forward to inner struct
+impl<'a, A: Allocator> std::ops::Deref for PersonLazyImpl<'a, A> {
+    type Target = PersonLazyImplInner<'a, A>;
+    fn deref(&self) -> &Self::Target {
+        &*self.state  // Deref on LazyImplState forwards to inner
+    }
+}
+
+// Inner struct with fields
+pub struct PersonLazyImplInner<'a, A: Allocator = Global> {
+    field_slices: OnceList<&'a [u8], A>,
+    allocator: A,
+    field_iter: Option<FieldIterator<'a, A>>,
+    
+    // Field types (same for both states):
+    // - T for implicit presence fields (default values)
+    // - Option<T> ONLY for explicit optional fields and scalar message fields
+    name: String,  // Implicit presence - default to ""
+    age: i32,  // Implicit presence - default to 0
+    email: Option<String>,  // Explicit optional field
+    status: i32,  // Implicit presence enum - default to 0
+    score: Option<i32>,  // Explicit optional field
+    address: Option<AddressLazyImpl<'a, A>>,  // Scalar message field
+    secondary_status: Option<i32>,  // Explicit optional field
+    scores: OnceList<i32, A>,  // Repeated field
+    addresses: OnceList<AddressLazyImpl<'a, A>, A>,  // Repeated message field
+}
+
+// Methods on inner struct (accessed via Deref)
+impl<'a, A: Allocator + Clone> PersonLazyImplInner<'a, A> {
+    pub fn name(&self) -> &String { &self.name }
+    pub fn age(&self) -> i32 { self.age }
+    pub fn email(&self) -> Option<&String> { self.email.as_ref() }
+    // ... other field accessors
+}
+
+// Internal parsing methods (use state.inner_mut() for mutation)
+impl<'a, A: Allocator + Clone> PersonLazyImpl<'a, A> {
+    fn update_field(&self, field_num: u32, value_slice: &'a [u8]) {
+        if let Some(mut inner) = self.state.inner_mut() {
+            match field_num {
+                1 => inner.name = parse_string(value_slice)?,
+                2 => inner.age = parse_varint(value_slice)?,
+                // ...
+            }
+        }
+    }
+    
+    // Wrapper methods for state management
+    pub fn finalize(self) -> Self {
+        Self { state: self.state.finalize() }
+    }
+    
+    pub fn is_finalized(&self) -> bool {
+        self.state.is_finalized()
+    }
+}
+
+// Usage
+let person = PersonLazyImpl { state: ... };
+let name = person.name();  // Works via Deref!
+let age = person.age();    // Works via Deref!
+person.finalize();         // Wrapper method
+```
+
+### Benefits
+
+1. **Automatic Method Forwarding**: `Deref` automatically forwards method calls to the inner struct
+2. **Message-Specific Methods**: Can implement field accessors on `PersonLazyImplInner`
+3. **Trait Implementation**: Can implement traits for `PersonLazyImpl` wrapper
+4. **Clean API**: `person.name()` works directly via `Deref`
+5. **Minimal Overhead**: Just one field indirection
+6. **Interior Mutability**: Method signatures use `&self`, but internally get `&mut` access via `RefCell::borrow_mut()` - this is the interior mutability pattern
+7. **No `DerefMut` Needed**: We don't need external mutable access (methods use `&self`, not `&mut self`)
+8. **Shared Enum**: Single `LazyImplState<T>` type for all message types
+9. **Zero RefCell Overhead After Finalization**: No `RefCell` wrapper in `Finalized` state
+
 ## Core Data Structure
 
 ```rust
@@ -30,102 +184,13 @@ pub struct FieldIterator<'a, A: Allocator> {
     current_slice: Option<&'a [u8]>,
 }
 
-impl<'a, A: Allocator> FieldIterator<'a, A> {
-    pub fn new(field_slices: &'a OnceList<&'a [u8], A>) -> Self {
-        Self {
-            field_slices,
-            slice_index: 0,
-            position: 0,
-            current_slice: None,
-        }
-    }
-    
-    /// Resume from a saved position
-    pub fn resume_from(slice_index: usize, position: usize, field_slices: &'a OnceList<&'a [u8], A>) -> Self {
-        Self {
-            field_slices,
-            slice_index,
-            position,
-            current_slice: None,
-        }
-    }
-    
-    /// Get current position (for saving/resuming)
-    pub fn position(&self) -> (usize, usize) {
-        (self.slice_index, self.position)
-    }
-}
-
 impl<'a, A: Allocator> Iterator for FieldIterator<'a, A> {
     type Item = Result<(u32, u32, &'a [u8]), Error>; // field_num, wire_type, value_slice
     
     fn next(&mut self) -> Option<Self::Item> {
-        loop {
-            // Get current slice if we don't have one cached
-            if self.current_slice.is_none() {
-                // Find the slice at slice_index
-                let mut iter = self.field_slices.iter();
-                for _ in 0..self.slice_index {
-                    iter.next()?;
-                }
-                self.current_slice = iter.next();
-            }
-            
-            let slice = self.current_slice?;
-            
-            // Check if we've exhausted this slice
-            if self.position >= slice.len() {
-                // Move to next slice
-                self.slice_index += 1;
-                self.position = 0;
-                self.current_slice = None;
-                continue;
-            }
-            
-            // Parse field tag
-            let remaining = &slice[self.position..];
-            let (field_num, wire_type, field_len) = match parse_field_tag(remaining) {
-                Ok(tag) => tag,
-                Err(e) => return Some(Err(e)),
-            };
-            
-            let tag_len = /* calculate tag length */;
-            self.position += tag_len;
-            
-            // Parse field value
-            if self.position + field_len > slice.len() {
-                return Some(Err(Error::InvalidWireFormat("Field extends beyond slice".into())));
-            }
-            
-            let value_slice = &slice[self.position..self.position + field_len];
-            self.position += field_len;
-            
-            return Some(Ok((field_num, wire_type, value_slice)));
-        }
+        // Parse field tag and return field number, wire type, and value slice
+        // ...
     }
-}
-
-pub struct PersonLazyImpl<'a, A: Allocator = Global> {
-    /// Raw input buffer slices (for this message level)
-    field_slices: OnceList<&'a [u8], A>,
-    allocator: A,
-    
-    /// Field iterator - can be paused and resumed
-    /// Uses RefCell because Iterator requires &mut self
-    field_iter: RefCell<Option<FieldIterator<'a, A>>>,
-    
-    // Cached parsed values (updated incrementally as we parse)
-    // Scalar fields: Use RefCell<Option<T>> for non-Copy types, Cell<T> for Copy types
-    // This allows multiple updates during partial parsing
-    name: RefCell<Option<String>>,
-    age: Cell<i32>,  // Copy type, can use Cell
-    email: RefCell<Option<String>>,
-    status: Cell<i32>,  // Copy type (enum stored as i32)
-    score: RefCell<Option<i32>>,  // Optional field, use RefCell<Option<T>>
-    address: OnceCell<AddressLazyImpl<'a, A>>,  // Message field, set once on first occurrence
-    secondary_status: RefCell<Option<i32>>,  // Optional field
-    scores: OnceList<i32, A>,
-    addresses: OnceList<AddressLazyImpl<'a, A>, A>,
 }
 ```
 
@@ -143,39 +208,34 @@ pub struct PersonLazyImpl<'a, A: Allocator = Global> {
 
 ```rust
 fn deserialize_field_1_name(&self) -> String {
-    // Get or initialize iterator
-    let mut iter = self.field_iter.borrow_mut().take().unwrap_or_else(|| {
-        FieldIterator::new(&self.field_slices)
-    });
+    // Explicitly call inner_mut() to get RefMut (which calls borrow_mut() internally)
+    // This gives us mutable access to the inner struct through RefCell
+    let mut iter = {
+        let mut inner = self.state.inner_mut().unwrap();  // borrow_mut() called here
+        inner.field_iter.take()
+            .unwrap_or_else(|| FieldIterator::new(&inner.field_slices))
+    };
     
     // Parse entire message, updating all fields as we go
     let mut last_name = String::new();
     
-    // Simply iterate through fields - much cleaner!
     while let Some(result) = iter.next() {
         let (field_num, wire_type, value_slice) = result?;
         
         // Update ALL fields we encounter
-        match field_num {
-            1 => { // name
-                last_name = parse_string(value_slice)?;
-                self.name.set(last_name.clone()).ok();
-            }
-            2 => { // age
-                let age = parse_varint(value_slice)?;
-                self.age.set(age).ok();
-            }
-            10 => { // scores
-                let score = parse_varint(value_slice)?;
-                self.scores.push(score);
-            }
-            // ... update other fields
-            _ => {} // unknown field, skip
+        self.update_field(field_num, wire_type, value_slice)?;
+        
+        if field_num == 1 {
+            last_name = parse_string(value_slice)?;
         }
     }
     
-    // Save iterator state (exhausted, but save position for consistency)
-    *self.field_iter.borrow_mut() = Some(iter);
+    // Save iterator state - explicitly call inner_mut() again to get RefMut
+    {
+        let mut inner = self.state.inner_mut().unwrap();  // borrow_mut() called here
+        inner.field_iter = Some(iter);
+    }
+    // RefMut is dropped here, releasing the borrow
     
     last_name
 }
@@ -192,1352 +252,118 @@ fn ensure_scores_parsed(&self) {
         return; // Already parsed first item
     }
     
-    // Get or initialize iterator
-    let mut iter = self.field_iter.borrow_mut().take().unwrap_or_else(|| {
-        FieldIterator::new(&self.field_slices)
-    });
+    // Explicitly call inner_mut() to get RefMut (calls borrow_mut() internally)
+    let mut iter = {
+        let mut inner = self.state.inner_mut().unwrap();  // borrow_mut() called here
+        inner.field_iter.take()
+            .unwrap_or_else(|| FieldIterator::new(&inner.field_slices))
+    };
     
     // Parse until we find first occurrence of field 10 (scores)
     while let Some(result) = iter.next() {
         let (field_num, wire_type, value_slice) = result?;
         
-        // Update ALL fields we encounter (not just target)
-        match field_num {
-            1 => { // name
-                let name = parse_string(value_slice)?;
-                // Can be updated multiple times during partial parsing
-                *self.name.borrow_mut() = Some(name);
+        // Update ALL fields we encounter
+        self.update_field(field_num, wire_type, value_slice)?;
+        
+        if field_num == 10 {
+            // Found target field! Stop here
+            // Explicitly call inner_mut() again to save iterator state
+            {
+                let mut inner = self.state.inner_mut().unwrap();  // borrow_mut() called here
+                inner.field_iter = Some(iter);
             }
-            2 => { // age
-                let age = parse_varint(value_slice)?;
-                // Copy type, can use Cell::set()
-                self.age.set(age);
-            }
-            10 => { // scores - TARGET FIELD
-                let score = parse_varint(value_slice)?;
-                self.scores.push(score);
-                // Found first occurrence! Stop here and save iterator state
-                *self.field_iter.borrow_mut() = Some(iter);
-                return;
-            }
-            // ... update other fields
-            _ => {}
+            return;
         }
     }
     
-    // Iterator exhausted, save it anyway
-    *self.field_iter.borrow_mut() = Some(iter);
+    // Iterator exhausted - save iterator state
+    {
+        let mut inner = self.state.inner_mut().unwrap();  // borrow_mut() called here
+        inner.field_iter = Some(iter);
+    }
 }
 ```
 
 ### 3. Scalar Message Fields (e.g., `address`)
 
-**Critical Issue**: Scalar message fields need all occurrences, but we don't know all slices upfront. When we first encounter field 6 (address), we only see the first occurrence. We need to collect all occurrences to create the child message.
-
-**Two Design Options**:
-
-#### Option 1: Parse Entire Parent Message (Simpler)
-
-When accessing a scalar message field, parse the entire parent message first:
+**Requirement**: Must collect all occurrences of the field number at the same nesting level
 
 ```rust
 fn deserialize_field_6_address(&self) -> AddressLazyImpl<'a, A> {
-    // Get or initialize iterator
-    let mut iter = self.field_iter.borrow_mut().take().unwrap_or_else(|| {
-        FieldIterator::new(&self.field_slices)
-    });
+    // Parse entire message - update_field will automatically collect all field 6 slices
+    // to the child's field_slices as it encounters them
+    self.parse_entire_message().unwrap();
     
-    // Collect all slices for field 6 (address)
-    let mut address_slices = OnceList::new_in(self.allocator.clone());
-    
-    // Parse entire message, updating all fields and collecting field 6 slices
-    while let Some(result) = iter.next() {
-        let (field_num, wire_type, value_slice) = result?;
-        
-        // Update ALL fields we encounter
+    // Return the child (now with all slices collected)
+    self.address.get().unwrap().clone()
+}
+
+fn update_field(&self, field_num: u32, wire_type: u32, value_slice: &'a [u8]) {
+    if let Some(mut inner) = self.state.inner_mut() {
         match field_num {
-            1 => { /* update name */ }
-            2 => { /* update age */ }
-            6 => { // address - TARGET FIELD
-                // Collect this slice for AddressLazyImpl
-                address_slices.push(value_slice);
-            }
-            10 => { /* update scores */ }
-            // ... update other fields
-            _ => {}
-        }
-    }
-    
-    // Save iterator state (exhausted)
-    *self.field_iter.borrow_mut() = Some(iter);
-    
-    // Create AddressLazyImpl with all collected slices
-    AddressLazyImpl::new_from_slices(address_slices, self.allocator.clone())
-}
-```
-
-**Pros**: Simple, all slices available when creating child message
-**Cons**: Must parse entire parent message even if we only need first occurrence
-
-#### Option 2: Child Message Holds Reference to Parent Parser (More Lazy)
-
-The child message holds a reference to the parent's parsing state and fetches slices on-demand:
-
-```rust
-pub struct AddressLazyImpl<'a, A: Allocator = Global> {
-    /// Reference to parent message
-    /// Needed to collect all slices when field_slices is incomplete
-    parent: &'a PersonLazyImpl<'a, A>,
-    /// Field number in parent (6 for address)
-    parent_field_num: u32,
-    /// Slices collected so far
-    /// OnceList already supports push() via &self, so no RefCell needed
-    field_slices: OnceList<&'a [u8], A>,
-    allocator: A,
-    
-    /// Field iterator - can be paused and resumed
-    /// Uses RefCell because Iterator requires &mut self
-    field_iter: RefCell<Option<FieldIterator<'a, A>>>,
-    
-    // Cache fields
-    // Scalar fields: Use RefCell<Option<T>> for non-Copy types, Cell<T> for Copy types
-    street: RefCell<Option<String>>,
-    city: RefCell<Option<String>>,
-    zip_code: Cell<i32>,  // Copy type
-}
-
-impl<'a, A> AddressLazyImpl<'a, A> {
-    /// Create from first occurrence, with reference to parent
-    pub fn new_from_first_slice(
-        first_slice: &'a [u8],
-        parent: &'a PersonLazyImpl<'a, A>,
-        parent_field_num: u32,
-        alloc: A,
-    ) -> Self {
-        let field_slices = OnceList::new_in(alloc.clone());
-        field_slices.push(first_slice);
-        Self {
-            parent,
-            parent_field_num,
-            field_slices, // OnceList already supports push() via &self
-            allocator: alloc,
-            field_iter: RefCell::new(None),
-            street: OnceCell::new(),
-            city: OnceCell::new(),
-            zip_code: OnceCell::new(),
-        }
-    }
-    
-    /// Push a slice to field_slices (called from parent's update_field)
-    /// This is needed because the iterator has already passed the slice
-    /// OnceList supports push() via &self, so no RefCell needed
-    fn push_slice(&self, slice: &'a [u8]) {
-        self.field_slices.push(slice);
-    }
-}
-```
-
-**Pros**: Can be lazy - only collect all slices when needed
-**Cons**: More complex, child needs reference to parent (lifetime complexity), parent needs interior mutability for field updates
-
-**Current Recommendation**: Option 2 (more lazy, but requires careful design of parent access)
-
-## Example Flow
-
-```
-Initial state: cursor = None, all fields empty
-
-User requests scores (repeated field):
-  cursor = None → initialize to (slice: 0, pos: 0)
-  Parse Field 1 (name) → update name field
-  Parse Field 2 (age) → update age field  
-  Parse Field 10 (scores = 10) → update scores, STOP HERE
-  cursor = (slice: 0, pos: after field 10)
-
-User requests addresses (repeated field):
-  cursor = (slice: 0, pos: after field 10)
-  Parse Field 6 (address) → update address field (collect first slice, create AddressLazyImpl with parent ref)
-  Parse Field 10 (scores = 20) → update scores field (append)
-  Parse Field 9 (addresses = {...}) → update addresses, STOP HERE
-  cursor = (slice: 0, pos: after field 9)
-
-User requests address.street (nested field access):
-  AddressLazyImpl needs to parse its fields
-  deserialize_field_6_address() called
-    → Parent parses entire message via parse_entire_message()
-    → update_field automatically collects all field 6 slices to AddressLazyImpl's field_slices
-    → Parent updates its own fields as we go (via interior mutability)
-  Then parse AddressLazyImpl's field_slices for street field
-    → Use AddressLazyImpl's own iterator to parse through its field_slices
-  
-  If Location is nested in Address:
-    LocationLazyImpl has reference to Address (its parent)
-    When Location is accessed, Address parses entire message
-    update_field automatically collects all Location slices to LocationLazyImpl's field_slices
-
-User requests name (scalar non-message):
-  cursor = (slice: 0, pos: after field 9)
-  Must parse entire remaining message
-  Parse all remaining fields, updating all as we go
-  cursor = (slice: 0, pos: end of message)
-```
-
-## Benefits of Iterator-Based Approach
-
-1. **Simpler Code**: No manual `slice_index`/`position` tracking - iterator handles it
-2. **Cleaner Parsing Logic**: Just iterate and match on field numbers - much more readable
-3. **Memory Efficient**: One iterator per message instead of one per field
-4. **Incremental Updates**: Fields get updated as we parse, even if not the target
-5. **Cache-Friendly**: Sequential parsing through buffer
-6. **Natural Progression**: Iterator moves forward, never backward
-7. **Easy to Pause/Resume**: Store iterator state, recreate from position when needed
-
-## Internal Methods for Message Parsing
-
-Based on the four behaviors needed, we can extract common operations into internal methods:
-
-### 1. Iterator Management
-
-```rust
-impl<'a, A: Allocator + Clone> PersonLazyImpl<'a, A> {
-    /// Get or initialize the field iterator
-    fn get_or_init_iterator(&self) -> FieldIterator<'a, A> {
-        self.field_iter.borrow_mut().take().unwrap_or_else(|| {
-            FieldIterator::new(&self.field_slices)
-        })
-    }
-    
-    /// Save the iterator state back
-    fn save_iterator(&self, iter: FieldIterator<'a, A>) {
-        *self.field_iter.borrow_mut() = Some(iter);
-    }
-}
-```
-
-### 2. Field Update Callback
-
-```rust
-impl<'a, A: Allocator + Clone> PersonLazyImpl<'a, A> {
-    /// Update a field based on its field number
-    /// This is called for every field encountered during parsing
-    fn update_field(&self, field_num: u32, wire_type: u32, value_slice: &'a [u8]) -> Result<(), Error> {
-        match field_num {
-            1 => { // name
-                let name = parse_string(value_slice)?;
-                // Can be updated multiple times during partial parsing
-                *self.name.borrow_mut() = Some(name);
-            }
-            2 => { // age
-                let age = parse_varint(value_slice)?;
-                // Copy type, can use Cell::set()
-                self.age.set(age);
-            }
-            3 => { // email
-                let email = parse_string(value_slice)?;
-                // Can be updated multiple times during partial parsing
-                *self.email.borrow_mut() = Some(email);
-            }
-            4 => { // status
-                let status = parse_varint(value_slice)?;
-                // Copy type, can use Cell::set()
-                self.status.set(status);
-            }
-            5 => { // score
-                let score = parse_varint(value_slice)?;
-                // Optional field, can be updated multiple times
-                *self.score.borrow_mut() = Some(score);
-            }
             6 => { // address - scalar message field
-                // CRITICAL: We must push this slice NOW because the iterator has already passed it.
-                if let Some(addr) = self.address.get() {
-                    // Additional occurrence: push to existing child's field_slices
-                    addr.push_slice(value_slice);
-                } else {
-                    // First occurrence: create child message and push the slice
+                if inner.address.is_none() {
                     let addr = AddressLazyImpl::new_from_first_slice(
                         value_slice,
                         self,
                         6,
-                        self.allocator.clone(),
+                        inner.allocator.clone(),
                     );
-                    // new_from_first_slice already pushes first_slice to addr.field_slices
-                    self.address.set(addr).ok();
+                    inner.address = Some(addr);
+                } else {
+                    // Push additional slice to existing child
+                    inner.address.as_ref().unwrap().push_slice(value_slice);
                 }
             }
-            8 => { // secondary_status
-                let status = parse_varint(value_slice)?;
-                // Optional field, can be updated multiple times
-                *self.secondary_status.borrow_mut() = Some(status);
-            }
-            9 => { // addresses - repeated message field
-                // First occurrence: create child message and add to list
-                let addr = AddressLazyImpl::new_from_first_slice(
-                    value_slice,
-                    self,
-                    9,
-                    self.allocator.clone(),
-                );
-                self.addresses.push(addr);
-            }
-            10 => { // scores - repeated scalar field
-                let score = parse_varint(value_slice)?;
-                self.scores.push(score);
-            }
-            _ => {} // unknown field, skip
+            // ... other fields
         }
-        Ok(())
     }
 }
 ```
 
-### 3. Parse Until Target Field (for Repeated Fields)
+## Interior Mutability Requirements
 
-```rust
-impl<'a, A: Allocator + Clone> PersonLazyImpl<'a, A> {
-    /// Parse until we find the first occurrence of target_field_num
-    /// Updates all fields encountered along the way
-    /// Returns true if target field was found, false if iterator exhausted
-    fn parse_until_field(&self, target_field_num: u32) -> Result<bool, Error> {
-        let mut iter = self.get_or_init_iterator();
-        
-        while let Some(result) = iter.next() {
-            let (field_num, wire_type, value_slice) = result?;
-            
-            // Update ALL fields we encounter
-            self.update_field(field_num, wire_type, value_slice)?;
-            
-            if field_num == target_field_num {
-                // Found target field! Stop here
-                self.save_iterator(iter);
-                return Ok(true);
-            }
-        }
-        
-        // Iterator exhausted
-        self.save_iterator(iter);
-        Ok(false)
-    }
-}
-```
-
-### 4. Parse Entire Message (with Optional Slice Collection)
-
-```rust
-impl<'a, A: Allocator + Clone> PersonLazyImpl<'a, A> {
-    /// Parse entire message, updating all fields
-    /// Used for scalar non-message fields that need the last value
-    /// 
-    /// **Note**: For scalar message fields, all occurrences are automatically collected
-    /// in `update_field` when they are encountered, so no separate collection step is needed.
-    fn parse_entire_message(&self) -> Result<(), Error> {
-        let mut iter = self.get_or_init_iterator();
-        
-        while let Some(result) = iter.next() {
-            let (field_num, wire_type, value_slice) = result?;
-            
-            // Update ALL fields we encounter
-            // For scalar message fields, update_field automatically pushes slices to child's field_slices
-            self.update_field(field_num, wire_type, value_slice)?;
-        }
-        
-        self.save_iterator(iter);
-        Ok(())
-    }
-}
-```
-
-### Usage in Field Accessors
-
-Now the field accessors become much simpler:
-
-```rust
-impl<'a, A: Allocator + Clone> PersonLazyImpl<'a, A> {
-    // Scalar non-message field
-    fn deserialize_field_1_name(&self) -> String {
-        self.parse_entire_message().unwrap();
-        // After parsing entire message, value is final
-        self.name.borrow().as_ref().unwrap().clone()
-    }
-    
-    // Repeated field
-    fn ensure_scores_parsed(&self) {
-        if self.scores.iter().next().is_some() {
-            return; // Already parsed first item
-        }
-        self.parse_until_field(10).unwrap(); // Parse until field 10 (scores)
-    }
-    
-    // Scalar message field
-    fn deserialize_field_6_address(&self) -> AddressLazyImpl<'a, A> {
-        // Parse entire message - update_field will automatically collect all field 6 slices
-        // to the child's field_slices as it encounters them
-        self.parse_entire_message().unwrap();
-        
-        // Return the child (now with all slices collected)
-        self.address.get().unwrap().clone() // or return reference, depending on API design
-    }
-}
-```
-
-### Summary of Internal Methods
-
-1. **`get_or_init_iterator()`**: Get or create the field iterator
-2. **`save_iterator(iter)`**: Save iterator state back
-3. **`update_field(field_num, wire_type, value_slice)`**: Update a field based on field number
-   - For scalar message fields, automatically pushes slices to child's `field_slices` as they are encountered
-4. **`parse_until_field(target_field_num)`**: Parse until first occurrence of target field
-5. **`parse_entire_message()`**: Parse entire message, updating all fields
-   - For scalar message fields, all occurrences are automatically collected via `update_field`
-
-**Key Insight**: `update_field` handles slice collection for scalar message fields automatically.
-When `parse_entire_message` is called, all scalar message field occurrences are collected
-as the iterator encounters them - no separate collection step is needed.
-
-These methods provide a clean separation of concerns:
-- Iterator management is centralized
-- Field updates are handled in one place
-- Parsing strategies (parse until vs. parse entire) are clearly separated
-- Child message slice collection is handled separately
-
-## Implementation Notes
-
-### Field Tag Parsing
-
-To skip fields we're not interested in, we need to parse the field tag to get:
-- Field number (to identify the field)
-- Wire type (to know how to skip the value)
-- Value length (for length-delimited fields)
-
-```rust
-fn parse_field_tag(bytes: &[u8]) -> Result<(u32, u32, usize), Error> {
-    // Parse varint for field number and wire type
-    // Wire type determines how to skip the value
-    // For length-delimited (wire type 2), read length prefix
-}
-```
-
-### Interior Mutability Requirements
-
-Since we're updating fields during parsing (which happens through `&self`), we need interior mutability. Here's a breakdown of what mutability is needed for each operation:
-
-#### Field Types and Mutability
+Since we're updating fields during parsing (which happens through `&self`), we need interior mutability:
 
 | Field Type | Storage Type | Mutability Needed | Why |
 |------------|--------------|-------------------|-----|
-| **Top-level `field_slices`** | `OnceList<&'a [u8], A>` | Immutable after construction | Set once during `new()`/`new_from_slices()` |
-| **Child `field_slices`** (scalar message) | `OnceList<&'a [u8], A>` | Built-in interior mutability | `OnceList::push()` works via `&self` |
-| **Field iterator** | `RefCell<Option<FieldIterator>>` | Mutable via `RefCell` | `Iterator::next()` requires `&mut self` |
-| **Scalar fields** (name, age, etc.) | `RefCell<Option<T>>` or `Cell<T>` (if `Copy`) | Update multiple times | Can be updated multiple times during partial parsing, but final after message end |
-| **Repeated scalar fields** (scores) | `OnceList<T, A>` | Push multiple times | Can add items incrementally |
-| **Repeated message fields** (addresses) | `OnceList<T, A>` | Push multiple times | Can add items incrementally |
-| **Scalar message fields** (address) | `OnceCell<AddressLazyImpl>` | Set once | Created on first occurrence |
-
-#### Operations and Their Mutability Requirements
-
-**1. Iterator Management**
-```rust
-fn get_or_init_iterator(&self) -> FieldIterator<'a, A> {
-    // Needs: RefCell::borrow_mut() on field_iter
-    // Reason: Iterator::next() requires &mut self, so we need &mut FieldIterator
-    self.field_iter.borrow_mut().take().unwrap_or_else(|| {
-        FieldIterator::new(&self.field_slices)
-    })
-}
-
-fn save_iterator(&self, iter: FieldIterator<'a, A>) {
-    // Needs: RefCell::borrow_mut() on field_iter
-    // Reason: Storing iterator state back
-    *self.field_iter.borrow_mut() = Some(iter);
-}
-```
-
-**2. Scalar Field Updates**
-```rust
-fn update_field(&self, field_num: u32, ...) {
-    match field_num {
-        1 => { // name
-            // Needs: RefCell::borrow_mut() or Cell::set() (if Copy)
-            // Reason: Can be updated multiple times during partial parsing
-            // For String (non-Copy): use RefCell<Option<String>>
-            *self.name.borrow_mut() = Some(name);
-            // For i32 (Copy): use Cell<i32> (simpler, no Option needed)
-            self.age.set(age);
-        }
-    }
-}
-```
-
-**3. Repeated Field Updates**
-```rust
-fn update_field(&self, field_num: u32, ...) {
-    match field_num {
-        10 => { // scores
-            // Needs: OnceList::push() (interior mutability built-in)
-            // Reason: Can push multiple times incrementally
-            self.scores.push(score);
-        }
-    }
-}
-```
-
-**4. Scalar Message Field Updates (Complex!)**
-```rust
-fn update_field(&self, field_num: u32, ...) {
-    match field_num {
-        6 => { // address
-            if let Some(addr) = self.address.get() {
-                // Needs: OnceList::push() (built-in interior mutability)
-                // Reason: Parent (via &self) pushes to child's field_slices
-                // OnceList supports push() via &self, so no RefCell needed
-                addr.push_slice(value_slice);
-            } else {
-                // Needs: OnceCell::set() on self.address
-                // Reason: Create child on first occurrence
-                let addr = AddressLazyImpl::new_from_first_slice(...);
-                self.address.set(addr).ok();
-            }
-        }
-    }
-}
-```
-
-**5. Child Message Slice Collection**
-```rust
-impl AddressLazyImpl {
-    fn push_slice(&self, slice: &'a [u8]) {
-        // Needs: OnceList::push() (built-in interior mutability)
-        // Reason: Called from parent's update_field (via &self)
-        // OnceList supports push() via &self, so no RefCell needed
-        // This allows cross-struct mutation: parent pushes to child's field_slices
-        self.field_slices.push(slice);
-    }
-}
-```
-
-#### Mutability Complexity Summary
-
-**Simple Cases (Built-in Interior Mutability):**
-- ✅ `OnceList::push()` - Thread-safe, multiple pushes
-- ✅ `Cell<T>::set()` - For `Copy` types (e.g., `i32`), simple and efficient
-
-**Complex Cases (Require RefCell):**
-- ⚠️ `RefCell<Option<FieldIterator>>` - Needed because `Iterator::next()` requires `&mut self`
-- ⚠️ `RefCell<Option<T>>` - For non-`Copy` types (e.g., `String`), allows multiple updates
-
-**Cross-Struct Mutation (Simplified!):**
-The cross-struct mutation where parent's `update_field` (via `&self`) pushes to child's `field_slices` is actually simpler than it looks:
-- Parent holds `address: OnceCell<AddressLazyImpl>`
-- Child holds `field_slices: OnceList<&'a [u8], A>` (no RefCell needed!)
-- Parent's `update_field` (via `&self`) calls `child.push_slice()` which does `self.field_slices.push()`
-- `OnceList::push()` works via `&self` thanks to built-in interior mutability
-- This allows parent to push to child's state through immutable references, but no `RefCell` is needed
-
-**Scalar Field Mutability Requirements:**
-- **Problem**: Scalar fields can be updated multiple times during partial parsing
-  - Example: `parse_until_field(10)` is called multiple times, each time updating `name` field
-  - `OnceCell` only allows one-time set, so subsequent updates fail silently (`.ok()` ignores the error)
-- **Solution**: Use `RefCell<Option<T>>` for non-`Copy` types, `Cell<T>` for `Copy` types
-  - `RefCell<Option<String>>` for `name`, `email` (String fields)
-  - `Cell<i32>` for `age`, `status` (Copy types)
-  - `RefCell<Option<i32>>` for optional fields like `score`, `secondary_status`
-- **Optimization Opportunity**: Once message parsing reaches the end, the value is final and won't be updated anymore
-  - This can be used for optimization (e.g., convert `RefCell<Option<T>>` to `OnceCell<T>` after parsing completes)
-  - But for simplicity, we can keep `RefCell<Option<T>>` throughout
-  - The `Option` wrapper allows us to distinguish "not yet parsed" (`None`) from "parsed but empty" (`Some("")`)
-
-**Why RefCell instead of Cell?**
-- `Iterator::next()` requires `&mut self`, so we can't use `Cell` (which only provides `get()`/`set()` for `Copy` types)
-- `RefCell` allows us to get `&mut FieldIterator` through `borrow_mut()`
-- For non-`Copy` types like `String`, we need `RefCell` to allow multiple updates
-
-### Parent Parser Access (Option 2)
-
-If using Option 2, the child message needs to update parent fields. This requires:
-- Parent fields to use interior mutability (`Cell`, `OnceCell`, `OnceList`)
-- Or a way to get mutable access to parent (complex with lifetimes)
-- Or a trait-based approach where parent provides update methods
-
-## Implementation Notes
-
-### Creating Messages
-
-```rust
-impl<'a, A: Allocator + Clone> PersonLazyImpl<'a, A> {
-    pub fn new(field_slices: OnceList<&'a [u8], A>, alloc: A) -> Self {
-        Self {
-            field_slices,
-            allocator: alloc,
-            field_iter: RefCell::new(None),  // Iterator created lazily on first use
-            name: RefCell::new(None),
-            age: Cell::new(0),  // Default value for Copy type
-            email: RefCell::new(None),
-            status: Cell::new(0),
-            score: RefCell::new(None),
-            address: OnceCell::new(),
-            secondary_status: RefCell::new(None),
-            // ... initialize all fields
-        }
-    }
-}
-
-impl<'a, A: Allocator + Clone> AddressLazyImpl<'a, A> {
-    pub fn new_from_first_slice(
-        first_slice: &'a [u8],
-        parent: &'a PersonLazyImpl<'a, A>,
-        parent_field_num: u32,
-        alloc: A,
-    ) -> Self {
-        let field_slices = OnceList::new_in(alloc.clone());
-        field_slices.push(first_slice);
-        Self {
-            parent,
-            parent_field_num,
-            field_slices, // OnceList already supports push() via &self
-            allocator: alloc,
-            field_iter: RefCell::new(None),  // Iterator created lazily on first use
-            street: RefCell::new(None),
-            city: RefCell::new(None),
-            zip_code: Cell::new(0),  // Copy type
-        }
-    }
-    
-    /// Push a slice to field_slices (called from parent's update_field)
-    /// OnceList supports push() via &self, so no RefCell needed
-    fn push_slice(&self, slice: &'a [u8]) {
-        self.field_slices.push(slice);
-    }
-}
-```
-
-### Parent Field Updates
-
-When parsing for a child message field, we encounter parent fields. To update them:
-- Parent fields use interior mutability (`OnceCell`, `OnceList`) - already required
-- Parent's `parse_entire_message` method updates parent's fields as it parses
-- For scalar message fields, `update_field` automatically pushes slices to child's `field_slices`
-- Child doesn't need mutable access to parent - parent updates itself via interior mutability
-
-### Nested Message Example
-
-```rust
-// Wire format: Person { address: Address { location: Location { ... } } }
-let person = PersonLazyImpl::new(field_slices, alloc);
-// person has its own cursor and field_slices
-
-// Access address (scalar message field)
-let address = person.address(); 
-// Triggers: parent.parse_entire_message()
-// Parent parses entire message, update_field automatically collects all field 6 slices
-// to address.field_slices as they are encountered
-// address has its own iterator and field_slices (now complete)
-
-// Access location (nested scalar message field in Address)
-let location = address.location();
-// Triggers: address.parse_entire_message()
-// Address parses entire message, update_field automatically collects all field 1 slices
-// to location.field_slices as they are encountered
-// location has its own iterator and field_slices (now complete)
-
-// Each level has its own iterator, tracking progress through its own slices
-```
-
-## Slice Ownership Design: Child vs Parent
-
-There are two possible designs for where scalar message field slices are stored:
-
-### Option 1: Child Owns Slices (Current Design)
-
-```rust
-pub struct AddressLazyImpl<'a, A: Allocator = Global> {
-    parent: &'a PersonLazyImpl<'a, A>,
-    parent_field_num: u32,
-    /// Child owns its own slices
-    /// OnceList supports push() via &self, so no RefCell needed
-    field_slices: OnceList<&'a [u8], A>,
-    // ... other fields
-}
-
-impl PersonLazyImpl {
-    fn update_field(&self, field_num: u32, wire_type: u32, value_slice: &'a [u8]) {
-        if field_num == 6 { // address
-            if let Some(addr) = self.address.get() {
-                addr.push_slice(value_slice); // Push to child's field_slices
-            } else {
-                let addr = AddressLazyImpl::new_from_first_slice(...);
-                self.address.set(addr).ok();
-            }
-        }
-    }
-}
-```
-
-**Pros:**
-- ✅ **Self-contained**: Child message is independent - owns its own data
-- ✅ **Cleaner parent**: Parent doesn't need to track slices for each child field
-- ✅ **Direct access**: Child can directly access `field_slices` without going through parent
-- ✅ **Simpler iterator**: Child's `FieldIterator` can directly reference its own `field_slices`
-- ✅ **Better encapsulation**: Each message manages its own parsing state
-
-**Cons:**
-- ❌ **Cross-struct mutation**: Parent's `update_field` pushes to child's `field_slices`
-  - Note: `OnceList::push()` works via `&self`, so no `RefCell` needed
-  - Child needs parent reference anyway for lazy parsing, so this isn't a unique disadvantage
-
-### Option 2: Parent Owns Slices
-
-```rust
-pub struct PersonLazyImpl<'a, A: Allocator = Global> {
-    field_slices: OnceList<&'a [u8], A>,
-    // ... other fields
-    /// Parent owns slices for scalar message fields
-    /// OnceList supports push() via &self, so no RefCell needed
-    address_slices: OnceList<&'a [u8], A>,
-    address: OnceCell<AddressLazyImpl<'a, A>>,
-}
-
-pub struct AddressLazyImpl<'a, A: Allocator = Global> {
-    parent: &'a PersonLazyImpl<'a, A>,
-    parent_field_num: u32,
-    /// Child holds reference to parent's slices
-    // No field_slices field - accesses parent.address_slices instead
-    // ... other fields
-}
-
-impl PersonLazyImpl {
-    fn update_field(&self, field_num: u32, wire_type: u32, value_slice: &'a [u8]) {
-        if field_num == 6 { // address
-            // OnceList supports push() via &self, so no RefCell needed
-            self.address_slices.push(value_slice);
-            if self.address.get().is_none() {
-                let addr = AddressLazyImpl::new(self, 6, ...);
-                self.address.set(addr).ok();
-            }
-        }
-    }
-}
-
-impl AddressLazyImpl {
-    fn get_field_slices(&self) -> &OnceList<&'a [u8], A> {
-        &self.parent.address_slices // Access parent's slices directly
-    }
-}
-```
-
-**Pros:**
-- ✅ **Centralized ownership**: Parent owns all data - clearer ownership model
-- ✅ **No RefCell needed**: `OnceList` supports `push()` via `&self`
-- ✅ **Parent controls collection**: Parent directly manages slice collection
-
-**Cons:**
-- ❌ **Parent complexity**: Parent must have a `OnceList<...>` field for each scalar message field
-- ❌ **Indirect access**: Child must go through parent to access slices (more indirection)
-- ❌ **Iterator complexity**: Child's `FieldIterator` needs to reference parent's slices
-- ❌ **Less encapsulation**: Child depends on parent's internal structure
-- ❌ **Code generation complexity**: Must generate slice storage fields in parent for each scalar message field
-
-### Recommendation: Option 1 (Child Owns Slices) ✓
-
-**Reasoning:**
-1. **Better Encapsulation**: Each message is self-contained and manages its own parsing state
-2. **Simpler Code Generation**: No need to generate slice storage fields in parent for each scalar message field
-3. **Cleaner API**: Child can directly access its `field_slices` without indirection
-4. **More Flexible**: Child's iterator can directly reference its own `field_slices`
-5. **Consistent Pattern**: All messages (top-level and nested) follow the same pattern - they all own their `field_slices`
-
-**Note**: Both designs require the child to hold a parent reference for lazy parsing, so that's not a differentiating factor. The key difference is where the slices are stored and accessed.
-
-## Open Questions
-
-1. **Parent Field Updates**: How should parent update its fields when parsing for child?
-   - Interior mutability in parent (already needed) - simplest ✓
-   - Parent's `parse_entire_message` method updates parent fields directly
-   - `update_field` automatically handles slice collection for scalar message fields
-   - No need for child to have mutable access to parent
-
-2. **Parent Reference Lifetime**: How to manage the lifetime of parent reference?
-   - Child holds `&'a Parent` - lifetime tied to parent (current design)
-   - Parent must outlive child (natural with Rust lifetimes)
-   - Works correctly for arbitrary nesting depth
-
-3. **Slice Ownership**: Should child or parent own scalar message field slices?
-   - **Option 1 (Child owns)**: Better encapsulation, simpler code generation, cleaner API ✓ (adopted)
-   - **Option 2 (Parent owns)**: Centralized ownership, but more complex parent structure
-
-## Similarity to Builder Pattern
-
-The current lazy parsing implementation shares interesting similarities with the **Builder Pattern**:
-
-### Builder Pattern Analogy
-
-**Traditional Builder Pattern:**
-```rust
-let mut builder = PersonBuilder::new();
-builder.set_name("Alice");
-builder.set_age(30);
-let person = builder.build(); // Finalize - builder is consumed, person is immutable
-```
-
-**Lazy Parsing Pattern:**
-```rust
-let person = PersonLazyImpl::new(field_slices, alloc);
-// Parsing in progress - fields can be updated multiple times
-person.parse_until_field(10); // Updates name, age, etc. as it encounters them
-person.parse_until_field(9);  // Updates name, age again if encountered
-// ...
-person.parse_entire_message(); // Finalize - all fields are now final
-// After this point, fields won't be updated anymore
-```
-
-### Key Similarities
-
-1. **Mutable During Construction**: 
-   - Builder: Fields can be set multiple times before `build()`
-   - Lazy Parser: Fields can be updated multiple times during partial parsing
-
-2. **Finalization Point**:
-   - Builder: `build()` consumes the builder and returns an immutable object
-   - Lazy Parser: `parse_entire_message()` marks the end of parsing - fields are now final
-
-3. **State Transition**:
-   - Builder: `Builder` → `build()` → `Person` (immutable)
-   - Lazy Parser: `Parsing in progress` → `parse_entire_message()` → `Parsing complete` (fields final)
-
-### Design Implications
-
-This similarity suggests potential optimizations:
-
-1. **Type-Level Finalization**: After `parse_entire_message()` completes, we could convert `RefCell<Option<T>>` to `OnceCell<T>` to:
-   - Reduce runtime overhead (no more `RefCell` borrows)
-   - Make immutability explicit at the type level
-   - Prevent accidental updates after finalization
-
-2. **Explicit Finalization State**: We could track whether parsing is complete:
-   ```rust
-   pub struct PersonLazyImpl<'a, A: Allocator = Global> {
-       // ... fields ...
-       is_finalized: Cell<bool>, // Track if parsing is complete
-   }
-   ```
-
-3. **Builder-Like API**: We could provide a method that finalizes and returns a more efficient representation:
-   ```rust
-   impl PersonLazyImpl {
-       /// Finalize parsing and return an optimized immutable representation
-       fn finalize(self) -> PersonLazyFinal<'a, A> {
-           // Convert RefCell<Option<T>> to OnceCell<T>
-           // Convert Cell<T> to T (for Copy types)
-           // This consumes self, ensuring no further updates
-       }
-   }
-   ```
-
-### Current Design Choice
-
-For simplicity, the current design keeps `RefCell<Option<T>>` and `Cell<T>` throughout the lifetime of the message, even after parsing is complete. This:
-- ✅ Simplifies the implementation
-- ✅ Avoids complex state transitions
-- ✅ Allows lazy parsing to remain truly lazy (no forced finalization)
-
-However, the Builder pattern analogy suggests that **explicit finalization** could be a valuable optimization for cases where:
-- The entire message will be parsed anyway
-- Performance is critical
-- Type-level immutability guarantees are desired
-
-### Future Consideration
-
-If we want to optimize for the "parse entire message" case, we could introduce a separate type:
-- `PersonLazyImpl`: Current design - allows incremental parsing, fields can be updated
-- `PersonLazyFinal`: After `parse_entire_message()`, convert to this type with `OnceCell<T>` fields
-
-This would be similar to how some builders have both a mutable builder and an immutable final product.
-
-## Const Generic Parameter Pattern for Parsing State
-
-A more elegant approach inspired by modern Rust Builder patterns is to use a **const generic parameter** to distinguish between parsing and finalized states at the type level:
-
-### Pattern Overview
-
-With const generic pattern, we don't need to wrap each field in `RefCell` or `OnceCell`. Instead, we wrap the entire struct in `RefCell` to allow interior mutability when needed. **Crucially, we use the same field types for both parsing and finalized states**, making the conversion trivial.
-
-**Important**: The public `PersonLazyImpl` type does **NOT** take `IS_PARSING` as a parameter. Instead, it uses an enum to hold either parsing or finalized state internally:
-
-```rust
-// The actual struct - fields are directly stored (no RefCell/OnceCell per field)
-// Same field types for both IS_PARSING = true and false!
-pub struct PersonLazyImplInner<'a, const IS_PARSING: bool, A: Allocator = Global> {
-    field_slices: OnceList<&'a [u8], A>,
-    allocator: A,
-    field_iter: Option<FieldIterator<'a, A>>,  // No RefCell needed!
-    
-    // Fields use the same types regardless of IS_PARSING value
-    // - T for implicit presence fields (use default value: "" for String, 0 for i32, etc.)
-    // - Option<T> ONLY for explicit optional fields and scalar message fields
-    name: String,  // Implicit presence - default to ""
-    age: i32,  // Implicit presence - default to 0
-    email: Option<String>,  // Explicit optional field
-    status: i32,  // Implicit presence enum (stored as i32) - default to 0
-    score: Option<i32>,  // Explicit optional field
-    address: Option<AddressLazyImpl<'a, A>>,  // Scalar message field (no IS_PARSING param)
-    secondary_status: Option<i32>,  // Explicit optional field
-    scores: OnceList<i32, A>,  // Repeated field
-    addresses: OnceList<AddressLazyImpl<'a, A>, A>,  // Repeated message field
-}
-
-// Public API - enum to hold EITHER parsing or finalized state
-pub enum PersonLazyImpl<'a, A: Allocator = Global> {
-    Parsing(RefCell<PersonLazyImplInner<'a, true, A>>),  // RefCell needed for mutability
-    Finalized(PersonLazyImplInner<'a, false, A>),  // No RefCell needed - immutable!
-}
-```
-
-**Why Enum is Required**: 
-- We need to explicitly track whether we're in parsing or finalized state
-- A single `inner` field with `IS_PARSING = true` **cannot represent the finalized state**
-- The enum variant **IS the boolean state** that makes the pattern meaningful
-- This allows us to hold both states and convert between them
+| **Field iterator** | `Option<FieldIterator>` (wrapped in `RefCell` via enum) | Mutable via `RefCell` | `Iterator::next()` requires `&mut self` |
+| **Scalar fields** | Direct fields in inner struct | Update via `RefCell::borrow_mut()` | Can be updated multiple times during partial parsing |
+| **Repeated fields** | `OnceList<T, A>` | Push multiple times | Built-in interior mutability via `&self` |
+| **Scalar message fields** | `Option<AddressLazyImpl>` | Set once, then push slices | Child's `field_slices` has built-in interior mutability |
 
 **Key Insight**: 
-- **Public type IS the enum**: No wrapper struct needed - `PersonLazyImpl` itself is the enum
-- **Enum variant IS the boolean state**: The enum explicitly tracks whether we're in parsing or finalized mode
-- **Same field types for both states**: No need for `FieldStorage` helper type!
-- **`Option` only for explicit optional and scalar message fields**: Implicit presence fields use default values
-- **Trivial conversion**: Conversion from parsing to finalized is trivial - just move the inner struct and change the enum variant!
-- Access fields via `&mut` during parsing (through `RefCell::borrow_mut()`)
-- Access fields via `&` after finalization (direct access - no `RefCell`!)
-- No need for per-field interior mutability wrappers!
-- No need to track "not yet parsed" state for implicit presence fields - use protobuf defaults!
+- Method signatures use `&self` (immutable reference) - external code doesn't need `&mut self`
+- Internally, methods use `RefCell::borrow_mut()` to get `&mut` access - this is interior mutability
+- The `RefMut<'_, T>` returned by `borrow_mut()` provides `&mut T`-like access, allowing field mutations
+- This pattern allows mutation through an immutable reference (`&self`)
 
-### API Design
+## Field Type Semantics
 
-**Helper Methods for Common Access Patterns:**
+Following Protobuf semantics:
 
-Since both enum variants have the same memory layout (same field types, only const generic differs), we can use unsafe transmutation to convert between them. However, `bytemuck` cannot be used because it requires types to implement `Pod`, `NoUninit`, or `AnyBitPattern` traits, which `PersonLazyImplInner` cannot satisfy due to its complex field types.
+- **Implicit presence fields**: Use `T` directly (e.g., `String`, `i32`) with default values (`""`, `0`)
+- **Explicit optional fields**: Use `Option<T>` (e.g., `Option<String>`, `Option<i32>`)
+- **Scalar message fields**: Use `Option<MessageLazyImpl>` (may be absent)
+- **Repeated fields**: Use `OnceList<T, A>` (can add items incrementally)
 
-**Why `bytemuck` Cannot Be Used:**
+The same field types are used for both `Builder` and `Finalized` states, making conversion trivial (just move the struct).
 
-According to the `bytemuck` documentation:
-- `Pod` requires `NoUninit` + `AnyBitPattern` (most restrictive)
-- `NoUninit` means the type has no uninitialized bytes
-- `AnyBitPattern` means any bit pattern is valid for the type
-- `cast_ref` requires `NoUninit` + `AnyBitPattern`
-
-Since `PersonLazyImplInner` contains heap-allocated types (`String`, `OnceList`, etc.), it cannot implement these traits:
-
-```rust
-// This won't work - PersonLazyImplInner contains non-Pod types
-use bytemuck::{Pod, cast_ref};
-
-unsafe impl<'a, const IS_PARSING: bool, A: Allocator> Pod for PersonLazyImplInner<'a, IS_PARSING, A>
-where
-    A: Pod,  // Allocator must be Pod
-    // All field types must be Pod...
-{
-    // This is NOT possible because:
-    // - String is not Pod (contains heap-allocated data, has drop semantics)
-    // - Option<String> is not Pod
-    // - OnceList is not Pod (contains heap-allocated data)
-    // - FieldIterator is not Pod
-}
-```
-
-`bytemuck` is designed for "plain old data" types (integers, arrays, simple structs), not for types containing heap-allocated data or complex ownership semantics.
-
-**Using `bytemuck::TransparentWrapper` (Not Applicable):**
-
-`TransparentWrapper` is designed for types that are "transparent wrappers" around another type - typically used with `#[repr(transparent)]` for single-field structs. However, `PersonLazyImplInner` has multiple fields, so it cannot use `TransparentWrapper`:
-
-```rust
-// This won't work - TransparentWrapper requires #[repr(transparent)] and single field
-use bytemuck::TransparentWrapper;
-
-#[repr(transparent)]
-struct Wrapper<T>(T);
-
-unsafe impl<T> TransparentWrapper<T> for Wrapper<T> {}
-
-// But PersonLazyImplInner has multiple fields:
-pub struct PersonLazyImplInner<'a, const IS_PARSING: bool, A: Allocator> {
-    field_slices: OnceList<&'a [u8], A>,
-    allocator: A,
-    field_iter: Option<FieldIterator<'a, A>>,
-    name: String,
-    age: i32,
-    // ... many more fields
-}
-// Cannot use #[repr(transparent)] with multiple fields!
-```
-
-According to the `bytemuck` documentation, `TransparentWrapper`:
-- Requires `#[repr(transparent)]` which only works for single-field structs
-- Is designed for newtype patterns (wrapping a single value)
-- Does not directly support conversions between different const generic parameter values
-
-Therefore, `TransparentWrapper` cannot be used for this use case.
-
-**Solution - Using `std::mem::transmute`:**
-
-Since both types have the same memory layout (same field types, only const generic differs), we can use unsafe transmutation to convert between them:
+## State Transition
 
 ```rust
 impl<'a, A: Allocator + Clone> PersonLazyImpl<'a, A> {
-    /// Helper to access inner struct from both variants
-    /// Uses unsafe transmute because both types have identical memory layout
-    /// SAFETY: PersonLazyImplInner<'a, true, A> and PersonLazyImplInner<'a, false, A>
-    /// have the same memory layout (same field types, only const generic differs).
-    /// Const generic parameters are erased at runtime and don't affect memory layout.
-    fn with_inner_ref<F, R>(&self, f: F) -> R
-    where
-        F: FnOnce(&PersonLazyImplInner<'a, true, A>) -> R,
-    {
-        match self {
-            PersonLazyImpl::Parsing(inner) => {
-                let inner_ref = inner.borrow();
-                f(&inner_ref)
-            }
-            PersonLazyImpl::Finalized(inner) => {
-                // SAFETY: Same memory layout, const generic is erased at runtime
-                let inner_ref: &PersonLazyImplInner<'a, false, A> = inner;
-                let inner_ref_transmuted: &PersonLazyImplInner<'a, true, A> = unsafe {
-                    std::mem::transmute(inner_ref)
-                };
-                f(inner_ref_transmuted)
-            }
-        }
-    }
-    
-    /// Helper for Copy fields
-    fn with_inner_copy<F, R>(&self, f: F) -> R
-    where
-        F: FnOnce(&PersonLazyImplInner<'a, true, A>) -> R,
-        R: Copy,
-    {
-        match self {
-            PersonLazyImpl::Parsing(inner) => {
-                let inner_ref = inner.borrow();
-                f(&inner_ref)
-            }
-            PersonLazyImpl::Finalized(inner) => {
-                let inner_ref: &PersonLazyImplInner<'a, false, A> = inner;
-                let inner_ref_transmuted: &PersonLazyImplInner<'a, true, A> = unsafe {
-                    std::mem::transmute(inner_ref)
-                };
-                f(inner_ref_transmuted)
-            }
-        }
-    }
-}
-```
-
-**Considerations for Using Transmute:**
-
-1. **Memory Layout Guarantee**: Const generic parameters are erased at runtime and don't affect memory layout. Since we use the same field types for both states, the memory layout is identical.
-
-2. **Safety Documentation**: The unsafe block must be carefully documented with the safety invariants.
-
-3. **Testing**: Extensive testing should verify that the transmute is safe and doesn't cause issues.
-
-4. **Alternative - Explicit Match**: If transmute is too risky, using explicit enum matching is safer and more explicit.
-
-**Recommendation:**
-
-While `transmute` could work and would eliminate code duplication, the explicit enum matching approach is:
-- **Type-safe**: No unsafe code needed
-- **Clear**: The intent is obvious
-- **Maintainable**: Easy to understand and modify
-- **Minimal overhead**: The match statement is a simple branch
-
-For code generation, a macro can reduce source-level duplication while keeping the generated code explicit and safe.
-
-**Better Approach - Separate Helpers for Each State:**
-
-```rust
-impl<'a, A: Allocator + Clone> PersonLazyImpl<'a, A> {
-    /// Helper to access inner struct in Parsing state
-    fn with_parsing_inner<F, R>(&self, f: F) -> Option<R>
-    where
-        F: FnOnce(&PersonLazyImplInner<'a, true, A>) -> R,
-    {
-        match self {
-            PersonLazyImpl::Parsing(inner) => Some(f(&inner.borrow())),
-            PersonLazyImpl::Finalized(_) => None,
-        }
-    }
-    
-    /// Helper to access inner struct in Finalized state
-    fn with_finalized_inner<F, R>(&self, f: F) -> Option<R>
-    where
-        F: FnOnce(&PersonLazyImplInner<'a, false, A>) -> R,
-    {
-        match self {
-            PersonLazyImpl::Parsing(_) => None,
-            PersonLazyImpl::Finalized(inner) => Some(f(inner)),
-        }
-    }
-    
-    /// Helper to access inner struct from either state
-    /// Uses a trait to unify access patterns
-    fn with_inner_unified<F, R>(&self, f: F) -> R
-    where
-        F: FnOnce(&str) -> R,  // This won't work either - we need a different approach
-    {
-        // Actually, we can use a macro or trait object approach
-    }
-}
-```
-
-**Simplest Approach - Direct Field Access Helper:**
-
-Since both states have the same field types, we can create a helper that abstracts the enum matching:
-
-```rust
-impl<'a, A: Allocator + Clone> PersonLazyImpl<'a, A> {
-    /// Helper to get a reference to a field that exists in both states
-    /// This works because field types are the same for both IS_PARSING values
-    fn get_field_ref<T>(&self, getter: impl Fn(&PersonLazyImplInner<'a, true, A>) -> T) -> T
-    where
-        T: ?Sized,
-    {
-        match self {
-            PersonLazyImpl::Parsing(inner) => getter(&inner.borrow()),
-            PersonLazyImpl::Finalized(inner) => {
-                // We need to convert &PersonLazyImplInner<'a, false, A> to &PersonLazyImplInner<'a, true, A>
-                // This is safe because field types are identical, but Rust's type system won't allow it
-                // We need a different approach...
-            }
-        }
-    }
-}
-```
-
-**Practical Approach - Macro for Code Generation:**
-
-For code generation, we can use a macro to reduce duplication:
-
-```rust
-macro_rules! get_field {
-    ($self:expr, $field:ident) => {
-        match $self {
-            PersonLazyImpl::Parsing(inner) => &inner.borrow().$field,
-            PersonLazyImpl::Finalized(inner) => &inner.$field,
-        }
-    };
-}
-
-impl<'a, A: Allocator + Clone> PersonLazyImpl<'a, A> {
-    pub fn name(&self) -> &String {
-        get_field!(self, name)
-    }
-    
-    pub fn age(&self) -> i32 {
-        match self {
-            PersonLazyImpl::Parsing(inner) => inner.borrow().age,
-            PersonLazyImpl::Finalized(inner) => inner.age,
-        }
-    }
-}
-```
-
-**Best Approach - Helper Method with Closure:**
-
-The most practical approach is to use a helper method that takes a closure:
-
-```rust
-impl<'a, A: Allocator + Clone> PersonLazyImpl<'a, A> {
-    /// Helper method to access a field that returns a reference
-    /// Works for both Parsing and Finalized states
-    fn get_field_ref<F, T>(&self, f: F) -> T
-    where
-        F: for<'b> FnOnce(
-            &'b PersonLazyImplInner<'a, true, A>,
-            &'b PersonLazyImplInner<'a, false, A>,
-        ) -> T,
-    {
-        match self {
-            PersonLazyImpl::Parsing(inner) => {
-                let inner_ref = inner.borrow();
-                // We need to pass the same reference twice, but with different types
-                // This requires unsafe or a different design
-            }
-            PersonLazyImpl::Finalized(inner) => {
-                // Similar issue
-            }
-        }
-    }
-}
-```
-
-**Recommended Approach - Simple Helper for Common Pattern:**
-
-The simplest and most practical approach is to extract the enum matching into a helper that returns a trait object or uses a macro. However, for clarity and simplicity, we can use a helper method pattern:
-
-```rust
-impl<'a, A: Allocator + Clone> PersonLazyImpl<'a, A> {
-    /// Helper to access inner struct - returns a trait object or uses unsafe cast
-    /// For now, we'll use a simpler approach with explicit matching
-    /// In generated code, we can use macros to reduce duplication
-    
-    // Implicit presence field - always returns a value (default if not parsed)
-    pub fn name(&self) -> &String {
-        match self {
-            PersonLazyImpl::Parsing(inner) => &inner.borrow().name,
-            PersonLazyImpl::Finalized(inner) => &inner.name,
-        }
-    }
-    
-    // Implicit presence field - always returns a value (default if not parsed)
-    pub fn age(&self) -> i32 {
-        match self {
-            PersonLazyImpl::Parsing(inner) => inner.borrow().age,
-            PersonLazyImpl::Finalized(inner) => inner.age,
-        }
-    }
-    
-    // Explicit optional field - returns Option
-    pub fn email(&self) -> Option<&String> {
-        match self {
-            PersonLazyImpl::Parsing(inner) => inner.borrow().email.as_ref(),
-            PersonLazyImpl::Finalized(inner) => inner.email.as_ref(),
-        }
-    }
-    
-    // Scalar message field - returns Option
-    pub fn address(&self) -> Option<&AddressLazyImpl<'a, A>> {
-        match self {
-            PersonLazyImpl::Parsing(inner) => inner.borrow().address.as_ref(),
-            PersonLazyImpl::Finalized(inner) => inner.address.as_ref(),
-        }
-    }
-}
-```
-
-**Note**: 
-- Implicit presence fields return `T` directly (use default values if not parsed)
-- Explicit optional and scalar message fields return `Option<T>`
-- Getter implementations are identical for both states (can be extracted to helper method)
-
-**2. Setter Methods (Only available when state is `Parsing`):**
-
-```rust
-impl<'a, A: Allocator + Clone> PersonLazyImpl<'a, A> {
-    /// Update name during parsing (implicit presence field)
-    /// Only works when state is Parsing - panics if already finalized
-    pub fn set_name(&self, name: String) {
-        match self {
-            PersonLazyImpl::Parsing(inner) => {
-                inner.borrow_mut().name = name;  // Direct assignment, no Option
-            }
-            PersonLazyImpl::Finalized(_) => {
-                panic!("Cannot set field after finalization");
-            }
-        }
-    }
-    
-    /// Update age during parsing (implicit presence field)
-    pub fn set_age(&self, age: i32) {
-        match self {
-            PersonLazyImpl::Parsing(inner) => {
-                inner.borrow_mut().age = age;  // Direct assignment
-            }
-            PersonLazyImpl::Finalized(_) => {
-                panic!("Cannot set field after finalization");
-            }
-        }
-    }
-    
-    /// Update email during parsing (explicit optional field)
-    pub fn set_email(&self, email: String) {
-        match self {
-            PersonLazyImpl::Parsing(inner) => {
-                inner.borrow_mut().email = Some(email);  // Option wrapper
-            }
-            PersonLazyImpl::Finalized(_) => {
-                panic!("Cannot set field after finalization");
-            }
-        }
-    }
-    
-    /// Internal method to update fields during parsing
-    fn update_field(&self, field_num: u32, wire_type: u32, value_slice: &'a [u8]) -> Result<(), Error> {
-        match self {
-            PersonLazyImpl::Parsing(inner) => {
-                let mut inner = inner.borrow_mut();
-                match field_num {
-                    1 => { // name - implicit presence
-                        let name = parse_string(value_slice)?;
-                        inner.name = name;  // Direct assignment
-                    }
-                    2 => { // age - implicit presence
-                        let age = parse_varint(value_slice)?;
-                        inner.age = age;  // Direct assignment
-                    }
-                    3 => { // email - explicit optional
-                        let email = parse_string(value_slice)?;
-                        inner.email = Some(email);  // Option wrapper
-                    }
-                    6 => { // address - scalar message field
-                        // Create child message on first occurrence
-                        if inner.address.is_none() {
-                            let addr = AddressLazyImpl::new_from_first_slice(
-                                value_slice,
-                                self,
-                                6,
-                                inner.allocator.clone(),
-                            );
-                            inner.address = Some(addr);
-                        } else {
-                            // Push additional slice to existing child
-                            inner.address.as_ref().unwrap().push_slice(value_slice);
-                        }
-                    }
-                    // ... other fields
-                    _ => {}
-                }
-                Ok(())
-            }
-            PersonLazyImpl::Finalized(_) => {
-                // Should not happen - finalization happens after parsing is complete
-                Err(Error::InvalidState)
-            }
-        }
-    }
-    
-    /// Get mutable access to iterator (for parsing)
-    fn get_iterator_mut(&self) -> Option<&mut Option<FieldIterator<'a, A>>> {
-        match self {
-            PersonLazyImpl::Parsing(inner) => {
-                Some(&mut inner.borrow_mut().field_iter)
-            }
-            PersonLazyImpl::Finalized(_) => None,
-        }
-    }
-}
-```
-
-**3. Finalization Method:**
-
-```rust
-impl<'a, A: Allocator + Clone> PersonLazyImpl<'a, A> {
-    /// Finalize parsing - converts from Parsing state to Finalized state
+    /// Finalize parsing - converts from Builder to Finalized state
     pub fn finalize(self) -> Self {
-        match self {
-            PersonLazyImpl::Parsing(inner) => {
-                // Extract the inner struct
-                let inner = inner.into_inner();
-                
-                // Trivial conversion! Just move the struct directly (no RefCell needed)
-                // Field types are identical, so no conversion needed
-                PersonLazyImpl::Finalized(inner)
-            }
-            PersonLazyImpl::Finalized(_) => {
-                // Already finalized, return as-is
-                self
-            }
+        Self {
+            state: self.state.finalize(),
         }
     }
     
-    /// Check if parsing is finalized
+    /// Check if finalized
     pub fn is_finalized(&self) -> bool {
-        matches!(self, PersonLazyImpl::Finalized(_))
+        self.state.is_finalized()
     }
 }
 ```
@@ -1545,296 +371,93 @@ impl<'a, A: Allocator + Clone> PersonLazyImpl<'a, A> {
 **Key Benefit**: Since field types are the same for both states, the conversion is **trivial** - just move the inner struct directly (no `RefCell` needed for finalized state)!
 
 **Note**: 
-- **Parsing state**: Uses `RefCell` for interior mutability (fields can be updated)
+- **Builder state**: Uses `RefCell` for interior mutability (fields can be updated)
 - **Finalized state**: No `RefCell` needed - fields are immutable, direct access via `&self`
 - The enum variant prevents setter methods from being available (runtime check via match)
 - This eliminates `RefCell` overhead completely after finalization!
 
-### Usage Example
+## Alternative Approaches (Not Recommended)
+
+### Const Generic Approach
+
+Using `const IS_PARSING: bool` as a generic parameter was considered but rejected because:
+- More complex type system
+- Still need runtime enum matching anyway
+- No significant benefits over simple enum approach
+
+### Typestate with Different Inner Types
+
+Using `PersonLazyImplInner<'a, BuilderState, A>` and `PersonLazyImplInner<'a, FinalizedState, A>` was considered but rejected because:
+- Requires `unsafe` code for type conversion
+- Complicates unified access methods
+- Doesn't provide significant benefits over runtime enum matching
+- Makes code generation more complex
+
+### Type Alias Approach
+
+Using `pub type PersonLazyImpl = LazyImplState<PersonLazyImplInner>` was considered but rejected because:
+- Cannot implement message-specific methods
+- Cannot implement traits for the alias
+- Less type distinction
+
+**Conclusion**: The thin wrapper with `Deref` approach provides the best balance of simplicity, type safety, and API ergonomics.
+
+## Related Patterns: Rust Builder Pattern
+
+Our design shares similarities with the Builder pattern in Rust:
+
+### Standard Builder Pattern
 
 ```rust
-// Start with parsing state
-let person = PersonLazyImpl::new(field_slices, alloc);  // Returns PersonLazyImpl::Parsing(...)
-
-// Parse incrementally
-person.parse_until_field(10);  // Updates fields as it encounters them
-person.parse_until_field(9);   // Updates fields again if encountered
-
-// Finalize parsing
-let person = person.finalize();  // Converts internal state from Parsing to Finalized
-
-// After finalization:
-// - No more setter methods available (runtime check via enum match)
-// - Fields are directly stored (same types as during parsing)
-// - No RefCell wrapper at all (zero overhead!)
-// - Better performance (no per-field RefCell/OnceCell overhead, no RefCell wrapper)
-// - Implicit presence fields use default values if not parsed
-// - Explicit optional fields remain as Option<T>
-```
-
-### Benefits of This Approach
-
-1. **Type Safety**: Runtime check via enum match prevents setters after finalization
-2. **Zero Runtime Overhead for Const Generic**: Const generic is erased at compile time
-3. **Zero RefCell Overhead After Finalization**: No `RefCell` wrapper needed for finalized state - direct field access!
-4. **Single Struct Definition**: No need for separate `PersonLazyImpl` and `PersonLazyFinal` types
-5. **Clear API**: Type signature makes parsing state explicit
-6. **Efficient Storage**: Same field types for both states
-   - Implicit presence fields: `T` (direct values with defaults)
-   - Explicit optional fields: `Option<T>`
-   - Scalar message fields: `Option<MessageLazyImpl>`
-7. **Simpler Field Access**: Direct field access via `&mut` during parsing, `&` after finalization
-8. **Trivial Conversion**: `From` implementation is just moving the inner struct - no field conversion needed!
-9. **No Helper Types**: No need for `FieldStorage` or similar type-level helpers
-10. **Protobuf Semantics**: Matches protobuf field semantics exactly - implicit presence uses defaults, explicit optional uses `Option`
-
-### Implementation Challenges
-
-1. **Method Implementation**: Methods need to match on enum variant to handle both states
-2. **Trait Bounds**: May need trait bounds that work with both enum variants
-3. **Code Generation**: Code generator needs to handle both states, but field types are the same
-4. **Field Type Selection**: Need to distinguish between:
-   - Implicit presence fields → `T` (with default value)
-   - Explicit optional fields → `Option<T>`
-   - Scalar message fields → `Option<MessageLazyImpl>`
-   - Repeated fields → `OnceList<T, A>`
-5. **Enum Variant Matching**: All methods that access fields need to match on enum variant
-
-### Comparison with Current Design
-
-| Aspect | Current Design | Const Generic Design |
-|--------|---------------|---------------------|
-| **Type Safety** | Runtime (RefCell per field) | Runtime (enum match) - can be improved with const generic on methods |
-| **Performance** | RefCell/OnceCell overhead per field | RefCell only during parsing, zero overhead after finalization |
-| **API Clarity** | All methods always available | Setters only when `IS_PARSING = true` |
-| **Complexity** | Simpler implementation | More complex type system usage |
-| **Flexibility** | Can update fields anytime | Must finalize to get immutable version |
-| **Field Storage** | `RefCell<Option<T>>` or `Cell<T>` per field | Direct `Option<T>` or `T` (wrapped struct in RefCell) |
-| **Memory Overhead** | Multiple RefCell/OnceCell wrappers | RefCell only during parsing, zero overhead after finalization |
-| **Conversion Complexity** | Complex (convert each field type) | Trivial (just move the struct) |
-| **Helper Types** | Not needed | Not needed (same field types) |
-
-### Recommendation
-
-The const generic pattern is **highly recommended** for the following reasons:
-
-1. **Type Safety**: Enum variant prevents accidental field updates after finalization (runtime check via match)
-2. **Performance**: Completely eliminates `RefCell` overhead after finalization (no wrapper at all!)
-3. **API Clarity**: Makes parsing state explicit in the type signature
-4. **Modern Rust**: Uses advanced type system features effectively
-
-However, it does add complexity to code generation. The trade-off is worth it for the benefits it provides.
-
-### Alternative: Const Generic on Methods Instead of Type
-
-We could also use const generic on methods to provide compile-time safety:
-
-```rust
-// This alternative approach is not recommended - enum-based design is simpler
-// pub enum PersonLazyImpl<'a, A: Allocator = Global> {
-//     Parsing(RefCell<PersonLazyImplInner<'a, true, A>>),
-//     Finalized(PersonLazyImplInner<'a, false, A>),
-// }
-
-impl<'a, A: Allocator + Clone> PersonLazyImpl<'a, A> {
-    /// Setter method - only compiles when called with const generic true
-    pub fn set_name<const IS_PARSING: bool>(&self, name: String)
-    where
-        (): std::marker::ConstParamTy<{ IS_PARSING }>,
-    {
-        // This would only compile if IS_PARSING = true
-        // But this is complex and may not be worth it
-    }
-}
-```
-
-However, this approach is complex and the enum-based runtime check is simpler and more practical.
-
-### Summary
-
-The key insight is that **the public type should not have `IS_PARSING` as a parameter**. Instead:
-- **Use an enum to hold either parsing or finalized state internally**: The enum variant IS the boolean state that makes the pattern meaningful
-- **Same field types for both states**: Trivial conversion - just move the struct and change the enum variant
-- **Runtime checks via enum match**: Prevent invalid operations (setters only work in `Parsing` variant)
-- **Simpler API**: Users don't need to specify `IS_PARSING` parameter
-- **Explicit state tracking**: The enum explicitly tracks whether we're in parsing or finalized mode, making the state clear and meaningful
-
-## Alternative: Generic Enum State (Without Const Generic)
-
-An alternative approach that avoids const generic parameters entirely is to use a generic enum type:
-
-### Pattern Overview
-
-Instead of using const generic `IS_PARSING`, we create a generic enum that wraps the inner struct:
-
-```rust
-// Generic enum for state management (private)
-enum PersonLazyImplState<T> {
-    Builder(RefCell<T>),      // Mutable state - wrapped in RefCell
-    Finalized(T),              // Immutable state - direct ownership
+struct PersonBuilder {
+    name: Option<String>,
+    age: Option<i32>,
 }
 
-// Inner struct - no const generic needed!
-pub struct PersonLazyImplInner<'a, A: Allocator = Global> {
-    field_slices: OnceList<&'a [u8], A>,
-    allocator: A,
-    field_iter: Option<FieldIterator<'a, A>>,
-    
-    // Same field types as const generic approach
-    name: String,
-    age: i32,
-    email: Option<String>,
-    status: i32,
-    score: Option<i32>,
-    address: Option<AddressLazyImpl<'a, A>>,
-    secondary_status: Option<i32>,
-    scores: OnceList<i32, A>,
-    addresses: OnceList<AddressLazyImpl<'a, A>, A>,
-}
-
-// Public API - wrapper struct with private state enum
-pub struct PersonLazyImpl<'a, A: Allocator = Global> {
-    state: PersonLazyImplState<PersonLazyImplInner<'a, A>>,  // Private enum
-}
-```
-
-### API Design
-
-The public API provides methods to access the inner struct:
-
-```rust
-impl<'a, A: Allocator + Clone> PersonLazyImpl<'a, A> {
-    /// Get immutable reference to inner struct (works for both states)
-    fn inner(&self) -> &PersonLazyImplInner<'a, A> {
-        match &self.state {
-            PersonLazyImplState::Builder(inner) => inner.borrow(),
-            PersonLazyImplState::Finalized(inner) => inner,
-        }
-    }
-    
-    /// Get mutable reference to inner struct (only for Builder state)
-    /// Returns None if already finalized
-    fn inner_mut(&self) -> Option<std::cell::RefMut<'_, PersonLazyImplInner<'a, A>>> {
-        match &self.state {
-            PersonLazyImplState::Builder(inner) => Some(inner.borrow_mut()),
-            PersonLazyImplState::Finalized(_) => None,
-        }
-    }
-    
-    /// Finalize - move from Builder to Finalized state
-    pub fn finalize(self) -> Self {
-        match self.state {
-            PersonLazyImplState::Builder(inner) => {
-                let inner = inner.into_inner();  // Extract from RefCell
-                PersonLazyImpl {
-                    state: PersonLazyImplState::Finalized(inner),
-                }
-            }
-            PersonLazyImplState::Finalized(_) => self,  // Already finalized
-        }
-    }
-    
-    /// Check if finalized
-    pub fn is_finalized(&self) -> bool {
-        matches!(self.state, PersonLazyImplState::Finalized(_))
-    }
-    
-    // Getter methods
-    pub fn name(&self) -> &String {
-        &self.inner().name
-    }
-    
-    pub fn age(&self) -> i32 {
-        self.inner().age
-    }
-    
-    pub fn email(&self) -> Option<&String> {
-        self.inner().email.as_ref()
-    }
-    
-    // Setter methods (only work in Builder state)
-    pub fn set_name(&self, name: String) {
-        if let Some(mut inner) = self.inner_mut() {
-            inner.name = name;
-        } else {
-            panic!("Cannot set field after finalization");
-        }
-    }
-    
-    pub fn set_age(&self, age: i32) {
-        if let Some(mut inner) = self.inner_mut() {
-            inner.age = age;
-        } else {
-            panic!("Cannot set field after finalization");
+impl PersonBuilder {
+    fn build(self) -> Person {
+        Person {
+            name: self.name.unwrap(),
+            age: self.age.unwrap(),
         }
     }
 }
 ```
 
-### Comparison with Const Generic Approach
+**Key Differences from Our Design:**
+- **Standard Builder**: Uses separate types (`PersonBuilder` vs `Person`) - builder is consumed and cannot be reused
+- **Our Design**: Uses a single enum type that can hold either state - allows state transition without consuming the original type
+- **Standard Builder**: Builder and final product are completely separate types
+- **Our Design**: Same inner struct types for both states, only the wrapper (enum) differs
 
-| Aspect | Const Generic Approach | Generic Enum Approach |
-|--------|----------------------|----------------------|
-| **Type Complexity** | Higher (const generic parameter) | Lower (simple generic enum) |
-| **Code Generation** | More complex (const generic handling) | Simpler (no const generic) |
-| **Type Safety** | Runtime (enum match) | Runtime (enum match) |
-| **Memory Layout** | Same for both states | Same for both states |
-| **Conversion** | Trivial (move struct) | Trivial (move struct) |
-| **Helper Methods** | Need transmute for unified access | Direct access via `inner()` |
-| **API Clarity** | Enum variant is public | State enum is private, wrapper struct is public |
-| **Unsafe Code** | May need `transmute` for helpers | No unsafe code needed |
+### Why Our Design is Different
 
-### Benefits of Generic Enum Approach
+Our design differs from standard Builder patterns because:
 
-1. **Simpler Type System**: No const generic parameters - easier to understand and implement
-2. **No Unsafe Code**: Direct access via `inner()` and `inner_mut()` - no transmute needed
-3. **Cleaner API**: Wrapper struct hides implementation details (enum is private)
-4. **Easier Code Generation**: No need to handle const generic parameters in generated code
-5. **Same Performance**: Both approaches have identical runtime behavior
-6. **Same Memory Layout**: Both approaches use the same field types for both states
+1. **Lazy Parsing Requirements**: We need to parse incrementally while providing `&self` access to already-parsed fields
+2. **Single Type API**: Users shouldn't need to know about builder vs finalized types - the same `PersonLazyImpl` type works for both
+3. **Runtime State**: We can't use compile-time type states because parsing state is determined at runtime (we don't know when parsing is "complete" until we've parsed the entire message)
+4. **Interior Mutability During Parsing**: We need `RefCell` during parsing because `Iterator::next()` requires `&mut self`, but we want to provide `&self` access to other fields
 
-### Drawbacks of Generic Enum Approach
+Our enum-based approach is a hybrid that combines:
+- **Builder pattern's state management** (mutable during construction, immutable after)
+- **Runtime state tracking** (enum variant tracks state)
+- **Single type API** (same type for both states, unlike standard Builder)
+- **Interior mutability** (RefCell only during parsing, eliminated after finalization)
 
-1. **Wrapper Struct Overhead**: Extra indirection through wrapper struct (minimal)
-2. **Less Type-Level Expressiveness**: Const generic provides compile-time guarantees (though we use runtime checks anyway)
-3. **Slightly More Verbose**: Need to call `inner()` or `inner_mut()` in every method
+### Relevant Resources
 
-### Existing Libraries
+1. **Rust Design Patterns - Builder Pattern**
+   - URL: https://rust-unofficial.github.io/patterns/patterns/creational/builder.html
 
-**Standard Library**: Rust's standard library does not provide a generic enum type for this pattern. However, it provides the building blocks (`RefCell`, `Option`, `Result`) that we use.
+2. **The Typestate Builder Pattern: A Case Study in Rust's Compile-Time Safety**
+   - URL: https://mxncmr.com/blog/the-typestate-builder-pattern-a-case-study-in-rusts-compile-time-safety/
 
-**Third-Party Crates**: After searching, there are no well-known crates that provide exactly this pattern (a generic enum with `Builder(RefCell<T>)` and `Finalized(T)` variants). This is a custom pattern that we would implement ourselves.
+3. **Software Design Patterns in Rust - Chapter 6: Builder**
+   - URL: https://sdpr.rantai.dev/docs/part-i/chapter-6/
 
-**Similar Patterns**: 
-- `Option<T>` and `Result<T, E>` use similar enum patterns but for different purposes
-- Builder pattern crates (like `derive_builder`) use separate types for builder and final product, not a single enum
-- State machine crates typically use different approaches (trait objects, type state pattern with const generics, etc.)
+4. **Builders in Rust | Shuttle**
+   - URL: https://www.shuttle.dev/blog/2022/06/09/the-builder-pattern
 
-**Conclusion**: This enum type would be a **custom implementation** specific to our use case. It's a simple enum definition that doesn't require external dependencies.
-
-### Recommendation
-
-The **Generic Enum Approach** is **preferred** for the following reasons:
-
-1. **Simplicity**: No const generic parameters makes the code easier to understand and generate
-2. **No Unsafe Code**: Direct access methods eliminate the need for `transmute`
-3. **Better Encapsulation**: Private enum with public wrapper struct provides cleaner API
-4. **Easier Code Generation**: Simpler to generate code without const generic handling
-5. **Same Benefits**: Achieves the same goals (zero RefCell overhead after finalization) with simpler implementation
-6. **No External Dependencies**: The enum is simple enough to implement ourselves without adding crate dependencies
-
-The const generic approach is more "modern Rust" but adds complexity without significant benefits in this case, since we're using runtime checks anyway.
-
-### Implementation Note
-
-Since this enum type doesn't exist in standard library or common crates, we would implement it ourselves. The implementation is straightforward:
-
-```rust
-// In puroro crate (or generated code)
-enum PersonLazyImplState<T> {
-    Builder(RefCell<T>),
-    Finalized(T),
-}
-```
-
-This is a simple, self-contained enum that doesn't require any external dependencies beyond `std::cell::RefCell`, which is already in the standard library.
+5. **Rust builder pattern with types - DEV Community**
+   - URL: https://dev.to/mindflavor/rust-builder-pattern-with-types-3chf
