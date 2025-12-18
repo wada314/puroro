@@ -99,8 +99,9 @@ impl<'a, A: Allocator> std::ops::Deref for PersonLazyImpl<'a, A> {
 
 // Inner struct with fields
 pub struct PersonLazyImplInner<'a, A: Allocator = Global> {
-    field_slices: OnceList<&'a [u8], A>,
     allocator: A,
+    /// FieldIterator is created at initialization time from field_slices
+    /// Once created, it maintains its own state and doesn't need field_slices reference
     field_iter: Option<FieldIterator<'a, A>>,
     
     // Field types (same for both states):
@@ -123,18 +124,57 @@ impl<'a, A: Allocator + Clone> PersonLazyImplInner<'a, A> {
     pub fn age(&self) -> i32 { self.age }
     pub fn email(&self) -> Option<&String> { self.email.as_ref() }
     // ... other field accessors
-}
-
-// Internal parsing methods (use state.inner_mut() for mutation)
-impl<'a, A: Allocator + Clone> PersonLazyImpl<'a, A> {
-    fn update_field(&self, field_num: u32, value_slice: &'a [u8]) {
-        if let Some(mut inner) = self.state.inner_mut() {
-            match field_num {
-                1 => inner.name = parse_string(value_slice)?,
-                2 => inner.age = parse_varint(value_slice)?,
-                // ...
+    
+    // Parsing methods - use &mut self to avoid take() and keep state consistent
+    // FieldIterator is created at initialization time, so we just use the existing one
+    pub fn deserialize_field_1_name(&mut self) -> String {
+        // Get iterator - it should already exist (created at initialization)
+        let iter = self.field_iter.as_mut().expect("FieldIterator should be initialized");
+        
+        // Parse entire message, updating all fields as we go
+        let mut last_name = String::new();
+        
+        while let Some(result) = iter.next() {
+            let (field_num, wire_type, value_slice) = result?;
+            
+            // Update ALL fields we encounter
+            self.update_field(field_num, wire_type, value_slice)?;
+            
+            if field_num == 1 {
+                last_name = parse_string(value_slice)?;
             }
         }
+        
+        last_name
+    }
+    
+    fn update_field(&mut self, field_num: u32, wire_type: u32, value_slice: &'a [u8]) {
+        match field_num {
+            1 => self.name = parse_string(value_slice)?,
+            2 => self.age = parse_varint(value_slice)?,
+            // ...
+        }
+    }
+}
+
+// Wrapper methods that forward to inner (use state.inner_mut() for mutation)
+impl<'a, A: Allocator + Clone> PersonLazyImpl<'a, A> {
+    /// Create a new PersonLazyImpl from field_slices
+    pub fn new(field_slices: OnceList<&'a [u8], A>, allocator: A) -> Self {
+        let inner = PersonLazyImplInner {
+            allocator,
+            field_iter: Some(FieldIterator::new(&field_slices)),
+            // ... initialize other fields with default values
+        };
+        Self {
+            state: LazyImplState::Builder(RefCell::new(inner)),
+        }
+    }
+    
+    pub fn deserialize_field_1_name(&self) -> String {
+        // Get RefMut and call method on inner with &mut self
+        let mut inner = self.state.inner_mut().unwrap();
+        inner.deserialize_field_1_name()
     }
     
     // Wrapper methods for state management
@@ -174,29 +214,61 @@ use std::cell::{Cell, RefCell};
 /// Iterator over protobuf fields in field_slices
 /// Can be paused and resumed, making it easy to parse incrementally
 pub struct FieldIterator<'a, A: Allocator> {
-    /// Reference to the field_slices we're iterating over
-    field_slices: &'a OnceList<&'a [u8], A>,
-    /// Current slice index
-    slice_index: usize,
+    /// Iterator over the field_slices (uses OnceList's efficient iterator)
+    /// OnceList provides iter() which returns an iterator over slices
+    /// This iterator maintains its own state and doesn't need the original field_slices reference
+    slice_iter: <&'a OnceList<&'a [u8], A> as IntoIterator>::IntoIter,
+    /// Current slice being parsed
+    current_slice: Option<&'a [u8]>,
     /// Current position within the current slice
     position: usize,
-    /// Current slice being parsed (cached for efficiency)
-    current_slice: Option<&'a [u8]>,
+}
+
+impl<'a, A: Allocator> FieldIterator<'a, A> {
+    /// Create a new FieldIterator from a reference to field_slices
+    /// The iterator is created once and maintains its state - no need to recreate it
+    pub fn new(field_slices: &'a OnceList<&'a [u8], A>) -> Self {
+        Self {
+            slice_iter: field_slices.iter(),
+            current_slice: None,
+            position: 0,
+        }
+    }
 }
 
 impl<'a, A: Allocator> Iterator for FieldIterator<'a, A> {
     type Item = Result<(u32, u32, &'a [u8]), Error>; // field_num, wire_type, value_slice
     
     fn next(&mut self) -> Option<Self::Item> {
-        // Parse field tag and return field number, wire type, and value slice
-        // ...
+        loop {
+            // Get current slice or advance to next slice
+            if let Some(slice) = self.current_slice {
+                if self.position < slice.len() {
+                    // Parse field tag and return field number, wire type, and value slice
+                    // ... parsing logic ...
+                    // After parsing, update self.position
+                    return Some(Ok((field_num, wire_type, value_slice)));
+                }
+            }
+            
+            // Current slice exhausted, move to next slice using iterator
+            self.current_slice = self.slice_iter.next();
+            self.position = 0;
+            
+            if self.current_slice.is_none() {
+                // All slices exhausted
+                return None;
+            }
+        }
     }
 }
 ```
 
 **Key Points**:
-- `FieldIterator` encapsulates the cursor logic - no manual `slice_index`/`position` tracking
-- Iterator can be paused (stored) and resumed (recreated from position)
+- `FieldIterator` uses `OnceList`'s efficient iterator (no index access needed)
+- Encapsulates cursor logic - tracks current slice and position within slice
+- Iterator can be paused (stored) and resumed - once created, it maintains its state
+- No need to store `field_slices` reference - the iterator itself maintains the necessary state
 - Uses `RefCell<Option<FieldIterator>>` because `Iterator::next()` requires `&mut self`
 - Much simpler parsing code - just iterate and match on field numbers
 
@@ -207,38 +279,8 @@ impl<'a, A: Allocator> Iterator for FieldIterator<'a, A> {
 **Requirement**: Must parse entire message (to get last value, since later fields overwrite)
 
 ```rust
-fn deserialize_field_1_name(&self) -> String {
-    // Explicitly call inner_mut() to get RefMut (which calls borrow_mut() internally)
-    // This gives us mutable access to the inner struct through RefCell
-    let mut iter = {
-        let mut inner = self.state.inner_mut().unwrap();  // borrow_mut() called here
-        inner.field_iter.take()
-            .unwrap_or_else(|| FieldIterator::new(&inner.field_slices))
-    };
-    
-    // Parse entire message, updating all fields as we go
-    let mut last_name = String::new();
-    
-    while let Some(result) = iter.next() {
-        let (field_num, wire_type, value_slice) = result?;
-        
-        // Update ALL fields we encounter
-        self.update_field(field_num, wire_type, value_slice)?;
-        
-        if field_num == 1 {
-            last_name = parse_string(value_slice)?;
-        }
-    }
-    
-    // Save iterator state - explicitly call inner_mut() again to get RefMut
-    {
-        let mut inner = self.state.inner_mut().unwrap();  // borrow_mut() called here
-        inner.field_iter = Some(iter);
-    }
-    // RefMut is dropped here, releasing the borrow
-    
-    last_name
-}
+// This method is now implemented on PersonLazyImplInner with &mut self
+// See implementation above in PersonLazyImplInner
 ```
 
 ### 2. Repeated Fields (e.g., `scores`, `addresses`)
@@ -246,43 +288,28 @@ fn deserialize_field_1_name(&self) -> String {
 **Requirement**: Parse only until first occurrence of target field, but still update other fields
 
 ```rust
-fn ensure_scores_parsed(&self) {
-    // Check if already have first item
-    if self.scores.iter().next().is_some() {
-        return; // Already parsed first item
-    }
-    
-    // Explicitly call inner_mut() to get RefMut (calls borrow_mut() internally)
-    let mut iter = {
-        let mut inner = self.state.inner_mut().unwrap();  // borrow_mut() called here
-        inner.field_iter.take()
-            .unwrap_or_else(|| FieldIterator::new(&inner.field_slices))
-    };
-    
-    // Parse until we find first occurrence of field 10 (scores)
-    while let Some(result) = iter.next() {
-        let (field_num, wire_type, value_slice) = result?;
+    pub fn ensure_scores_parsed(&mut self) {
+        // Check if already have first item
+        if self.scores.iter().next().is_some() {
+            return; // Already parsed first item
+        }
         
-        // Update ALL fields we encounter
-        self.update_field(field_num, wire_type, value_slice)?;
+        // Get iterator - it should already exist (created at initialization)
+        let iter = self.field_iter.as_mut().expect("FieldIterator should be initialized");
         
-        if field_num == 10 {
-            // Found target field! Stop here
-            // Explicitly call inner_mut() again to save iterator state
-            {
-                let mut inner = self.state.inner_mut().unwrap();  // borrow_mut() called here
-                inner.field_iter = Some(iter);
+        // Parse until we find first occurrence of field 10 (scores)
+        while let Some(result) = iter.next() {
+            let (field_num, wire_type, value_slice) = result?;
+            
+            // Update ALL fields we encounter
+            self.update_field(field_num, wire_type, value_slice)?;
+            
+            if field_num == 10 {
+                // Found target field! Stop here
+                return;
             }
-            return;
         }
     }
-    
-    // Iterator exhausted - save iterator state
-    {
-        let mut inner = self.state.inner_mut().unwrap();  // borrow_mut() called here
-        inner.field_iter = Some(iter);
-    }
-}
 ```
 
 ### 3. Scalar Message Fields (e.g., `address`)
@@ -299,27 +326,25 @@ fn deserialize_field_6_address(&self) -> AddressLazyImpl<'a, A> {
     self.address.get().unwrap().clone()
 }
 
-fn update_field(&self, field_num: u32, wire_type: u32, value_slice: &'a [u8]) {
-    if let Some(mut inner) = self.state.inner_mut() {
+    fn update_field(&mut self, field_num: u32, wire_type: u32, value_slice: &'a [u8]) {
         match field_num {
             6 => { // address - scalar message field
-                if inner.address.is_none() {
+                if self.address.is_none() {
                     let addr = AddressLazyImpl::new_from_first_slice(
                         value_slice,
-                        self,
+                        // Note: Need parent reference - this may require additional design
                         6,
-                        inner.allocator.clone(),
+                        self.allocator.clone(),
                     );
-                    inner.address = Some(addr);
+                    self.address = Some(addr);
                 } else {
                     // Push additional slice to existing child
-                    inner.address.as_ref().unwrap().push_slice(value_slice);
+                    self.address.as_ref().unwrap().push_slice(value_slice);
                 }
             }
             // ... other fields
         }
     }
-}
 ```
 
 ## Interior Mutability Requirements
