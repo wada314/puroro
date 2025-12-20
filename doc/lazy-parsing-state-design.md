@@ -43,12 +43,12 @@ pub struct PersonLazyImpl<'a, A: Allocator = Global> {
     field_iter: RefCell<Option<FieldIterator<'a, Box<dyn Iterator<Item = &'a [u8]> + 'a, A>>>>,
     
     // Scalar fields that can be updated multiple times during parsing
-    name: RefCell<String<A>>,  // Scalar - needs RefCell for updates via &self
+    name: RefCell<String<A>>,  // Non-Copy type - needs RefCell
     age: Cell<i32>,  // Copy type - Cell is sufficient
-    email: RefCell<Option<String<A>>>,
+    email: RefCell<Option<String<A>>>,  // Option<Non-Copy> - needs RefCell
     status: Cell<i32>,  // Copy type - Cell is sufficient
-    score: RefCell<Option<i32>>,
-    secondary_status: RefCell<Option<i32>>,
+    score: Cell<Option<i32>>,  // Option<Copy> - Cell is sufficient
+    secondary_status: Cell<Option<i32>>,  // Option<Copy> - Cell is sufficient
     
     // Scalar message field
     address: RefCell<Option<AddressLazyImpl<'a, A>>>,
@@ -60,13 +60,13 @@ pub struct PersonLazyImpl<'a, A: Allocator = Global> {
 
 // Methods on the struct
 impl<'a, A: Allocator + Clone> PersonLazyImpl<'a, A> {
-    // Field accessors for scalar fields wrapped in RefCell
+    // Field accessors for scalar fields
     pub fn name(&self) -> std::cell::Ref<'_, String<A>> {
-        self.name.borrow()
+        self.name.borrow()  // RefCell - returns Ref
     }
     
     pub fn age(&self) -> i32 {
-        self.age.get()
+        self.age.get()  // Cell - returns Copy value
     }
     
     pub fn email(&self) -> Option<std::cell::Ref<'_, String<A>>> {
@@ -75,6 +75,14 @@ impl<'a, A: Allocator + Clone> PersonLazyImpl<'a, A> {
         } else {
             None
         }
+    }
+    
+    pub fn score(&self) -> Option<i32> {
+        self.score.get()  // Cell<Option<i32>> - returns Copy value
+    }
+    
+    pub fn secondary_status(&self) -> Option<i32> {
+        self.secondary_status.get()  // Cell<Option<i32>> - returns Copy value
     }
     
     // Field accessors for repeated fields - direct access, no RefCell!
@@ -112,6 +120,21 @@ impl<'a, A: Allocator + Clone> PersonLazyImpl<'a, A> {
         match field_num {
             1 => *self.name.borrow_mut() = parse_string(value_slice)?,
             2 => self.age.set(parse_varint(value_slice)?),
+            4 => {
+                // Optional field with non-Copy type - use RefCell
+                let email = parse_string(value_slice)?;
+                *self.email.borrow_mut() = Some(email);
+            },
+            5 => {
+                // Optional field with Copy type - use Cell
+                let score = parse_varint(value_slice)?;
+                self.score.set(Some(score));
+            },
+            7 => {
+                // Optional field with Copy type - use Cell
+                let status = parse_varint(value_slice)?;
+                self.secondary_status.set(Some(status));
+            },
             9 => {
                 // Repeated field - use OnceList's built-in interior mutability
                 let addr = parse_address(value_slice)?;
@@ -142,9 +165,9 @@ impl<'a, A: Allocator + Clone> PersonLazyImpl<'a, A> {
             age: Cell::new(0),
             email: RefCell::new(None),
             status: Cell::new(0),
-            score: RefCell::new(None),
+            score: Cell::new(None),
             address: RefCell::new(None),
-            secondary_status: RefCell::new(None),
+            secondary_status: Cell::new(None),
             scores: OnceList::new_in(alloc_clone.clone()),
             addresses: OnceList::new_in(alloc_clone),
         }
@@ -164,9 +187,9 @@ impl<'a, A: Allocator + Clone> PersonLazyImpl<'a, A> {
             age: Cell::new(0),
             email: RefCell::new(None),
             status: Cell::new(0),
-            score: RefCell::new(None),
+            score: Cell::new(None),
             address: RefCell::new(None),
-            secondary_status: RefCell::new(None),
+            secondary_status: Cell::new(None),
             scores: OnceList::new_in(alloc_clone.clone()),
             addresses: OnceList::new_in(alloc_clone),
         }
@@ -383,8 +406,10 @@ Since we're updating fields during parsing (which happens through `&self`), we n
 | **Field iterator** | `RefCell<Option<FieldIterator>>` | Mutable via `RefCell` | `Iterator::next()` requires `&mut self` |
 | **Scalar fields** (non-Copy) | `RefCell<T>` | Update via `RefCell::borrow_mut()` | Can be updated multiple times during partial parsing |
 | **Scalar fields** (Copy) | `Cell<T>` | Update via `Cell::set()` | Can be updated multiple times, `Cell` is sufficient for `Copy` types |
+| **Optional fields** (`Option<Copy>`) | `Cell<Option<T>>` | Update via `Cell::set()` | `Option<Copy>` is `Copy`, so `Cell` is sufficient |
+| **Optional fields** (`Option<non-Copy>`) | `RefCell<Option<T>>` | Update via `RefCell::borrow_mut()` | `Option<non-Copy>` is not `Copy`, so `RefCell` is needed |
 | **Repeated fields** | `OnceList<T, A>` | Push via `OnceList::push(&self)` | **Built-in interior mutability** - no `RefCell` needed! |
-| **Scalar message fields** | `RefCell<Option<MessageLazyImpl>>` | Set once, then push slices | Child's `field_slices` has built-in interior mutability |
+| **Scalar message fields** | `RefCell<Option<MessageLazyImpl>>` | Set once, then push slices | Child's `field_slices` has built-in interior mutability, but `Option<MessageLazyImpl>` is not `Copy` |
 
 **Key Insights**: 
 - `OnceList` already provides interior mutability via `push(&self)`, so it doesn't need `RefCell` wrapping
@@ -396,8 +421,10 @@ Since we're updating fields during parsing (which happens through `&self`), we n
 
 Following Protobuf semantics:
 
-- **Implicit presence fields**: Use `RefCell<T>` for non-`Copy` types or `Cell<T>` for `Copy` types (e.g., `RefCell<String>`, `Cell<i32>`) with default values (`""`, `0`)
-- **Explicit optional fields**: Use `RefCell<Option<T>>` (e.g., `RefCell<Option<String>>`, `RefCell<Option<i32>>`)
+- **Implicit presence fields**: Use `RefCell<T>` for non-`Copy` types or `Cell<T>` for `Copy` types (e.g., `RefCell<String<A>>`, `Cell<i32>`) with default values (`""`, `0`)
+- **Explicit optional fields**: 
+  - Use `Cell<Option<T>>` for `Option<Copy>` types (e.g., `Cell<Option<i32>>`)
+  - Use `RefCell<Option<T>>` for `Option<non-Copy>` types (e.g., `RefCell<Option<String<A>>>`)
 - **Scalar message fields**: Use `RefCell<Option<MessageLazyImpl>>` (may be absent)
 - **Repeated fields**: Use `OnceList<T, A>` directly (can add items incrementally via `push(&self)`)
 
