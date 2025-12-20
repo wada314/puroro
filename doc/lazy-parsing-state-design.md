@@ -14,17 +14,16 @@ Each message struct has its **own cursor** that tracks parsing progress through 
 
 ## Final Recommended Design
 
-### Core Pattern: Shared Enum with Thin Wrapper and Deref
+### Core Pattern: Field-Level Interior Mutability
 
-**Key Insight**: We only need mutable access **from inside the struct during parsing**, not from outside!
+**Key Insight**: We should **not wrap the entire struct in `RefCell`**. Instead, we should use field-level interior mutability where needed:
+- `OnceList` already has interior mutability (`push()` takes `&self`), so it doesn't need `RefCell` wrapping
+- Scalar fields that need updates during parsing use `RefCell` or `Cell` at the field level
+- This provides fine-grained protection and avoids borrow conflicts
 
 - **External access**: Always `&self` (immutable reference)
-- **Internal mutation**: Uses `RefCell::borrow_mut()` inside parsing methods
+- **Internal mutation**: Uses field-level `RefCell`/`Cell` or `OnceList`'s built-in interior mutability
 - **No external `&mut self`**: Users never need `&mut self` access
-
-This means we can use:
-- ✅ `Deref` for automatic method forwarding (perfect fit)
-- ❌ `DerefMut` not needed (no external `&mut self` access)
 
 ### Implementation
 
@@ -34,109 +33,65 @@ This means we can use:
 - All allocations should use the provided allocator `A`
 
 ```rust
-// In puroro crate (shared across all message types)
-pub enum LazyImplState<T> {
-    /// Builder state - wrapped in RefCell for interior mutability during parsing
-    Builder(RefCell<T>),
-    /// Finalized state - direct ownership, no RefCell overhead
-    Finalized(T),
-}
-
-impl<T> LazyImplState<T> {
-    /// Get immutable reference to inner value (works for both states)
-    pub fn inner(&self) -> &T {
-        match self {
-            LazyImplState::Builder(inner) => inner.borrow(),
-            LazyImplState::Finalized(inner) => inner,
-        }
-    }
-    
-    /// Get mutable reference to inner value (only for Builder state, internal use only)
-    /// 
-    /// This explicitly calls `RefCell::borrow_mut()` to get `RefMut<'_, T>` which provides
-    /// `&mut T`-like access. Returns `None` if already finalized (no mutation allowed).
-    pub(crate) fn inner_mut(&self) -> Option<std::cell::RefMut<'_, T>> {
-        match self {
-            LazyImplState::Builder(inner) => {
-                // Explicitly call borrow_mut() to get mutable access through RefCell
-                Some(inner.borrow_mut())
-            },
-            LazyImplState::Finalized(_) => None,
-        }
-    }
-    
-    /// Finalize - move from Builder to Finalized state
-    pub fn finalize(self) -> Self {
-        match self {
-            LazyImplState::Builder(inner) => {
-                LazyImplState::Finalized(inner.into_inner())
-            }
-            LazyImplState::Finalized(_) => self,
-        }
-    }
-    
-    /// Check if finalized
-    pub fn is_finalized(&self) -> bool {
-        matches!(self, LazyImplState::Finalized(_))
-    }
-}
-
-// Implement Deref for automatic method forwarding
-impl<T> std::ops::Deref for LazyImplState<T> {
-    type Target = T;
-    fn deref(&self) -> &Self::Target {
-        self.inner()
-    }
-}
+use std::cell::{Cell, RefCell};
 
 // Generated code for each message type
+// No wrapper struct needed - PersonLazyImpl directly contains all fields
 pub struct PersonLazyImpl<'a, A: Allocator = Global> {
-    state: LazyImplState<PersonLazyImplInner<'a, A>>,
-}
-
-// Implement Deref to forward to inner struct
-impl<'a, A: Allocator> std::ops::Deref for PersonLazyImpl<'a, A> {
-    type Target = PersonLazyImplInner<'a, A>;
-    fn deref(&self) -> &Self::Target {
-        &*self.state  // Deref on LazyImplState forwards to inner
-    }
-}
-
-// Inner struct with fields
-pub struct PersonLazyImplInner<'a, A: Allocator = Global> {
     allocator: A,
-    /// FieldIterator is created at initialization time from the input iterator
-    /// Once created, it maintains its own state
-    field_iter: Option<FieldIterator<'a, Box<dyn Iterator<Item = &'a [u8]> + 'a, A>>>,
+    /// FieldIterator needs RefCell because Iterator::next() requires &mut self
+    field_iter: RefCell<Option<FieldIterator<'a, Box<dyn Iterator<Item = &'a [u8]> + 'a, A>>>>,
     
-    // Field types (same for both states):
-    // - T for implicit presence fields (default values)
-    // - Option<T> ONLY for explicit optional fields and scalar message fields
-    name: String<A>,  // Implicit presence - default to ""
-    age: i32,  // Implicit presence - default to 0
-    email: Option<String<A>>,  // Explicit optional field
-    status: i32,  // Implicit presence enum - default to 0
-    score: Option<i32>,  // Explicit optional field
-    address: Option<AddressLazyImpl<'a, A>>,  // Scalar message field
-    secondary_status: Option<i32>,  // Explicit optional field
-    scores: OnceList<i32, A>,  // Repeated field
-    addresses: OnceList<AddressLazyImpl<'a, A>, A>,  // Repeated message field
+    // Scalar fields that can be updated multiple times during parsing
+    name: RefCell<String<A>>,  // Scalar - needs RefCell for updates via &self
+    age: Cell<i32>,  // Copy type - Cell is sufficient
+    email: RefCell<Option<String<A>>>,
+    status: Cell<i32>,  // Copy type - Cell is sufficient
+    score: RefCell<Option<i32>>,
+    secondary_status: RefCell<Option<i32>>,
+    
+    // Scalar message field
+    address: RefCell<Option<AddressLazyImpl<'a, A>>>,
+    
+    // Repeated fields - NO RefCell needed! OnceList already has interior mutability
+    scores: OnceList<i32, A>,
+    addresses: OnceList<AddressLazyImpl<'a, A>, A>,
 }
 
-// Methods on inner struct (accessed via Deref)
-impl<'a, A: Allocator + Clone> PersonLazyImplInner<'a, A> {
-    pub fn name(&self) -> &String<A> { &self.name }
-    pub fn age(&self) -> i32 { self.age }
-    pub fn email(&self) -> Option<&String<A>> { self.email.as_ref() }
-    // ... other field accessors
+// Methods on the struct
+impl<'a, A: Allocator + Clone> PersonLazyImpl<'a, A> {
+    // Field accessors for scalar fields wrapped in RefCell
+    pub fn name(&self) -> std::cell::Ref<'_, String<A>> {
+        self.name.borrow()
+    }
     
-    // Parsing methods - use &mut self to avoid take() and keep state consistent
-    // FieldIterator is created at initialization time, so we just use the existing one
-    pub fn deserialize_field_1_name(&mut self) -> String<A> {
-        // Get iterator - it should already exist (created at initialization)
-        let iter = self.field_iter.as_mut().expect("FieldIterator should be initialized");
+    pub fn age(&self) -> i32 {
+        self.age.get()
+    }
+    
+    pub fn email(&self) -> Option<std::cell::Ref<'_, String<A>>> {
+        if self.email.borrow().is_some() {
+            Some(std::cell::Ref::map(self.email.borrow(), |opt| opt.as_ref().unwrap()))
+        } else {
+            None
+        }
+    }
+    
+    // Field accessors for repeated fields - direct access, no RefCell!
+    pub fn addresses(&self) -> &OnceList<AddressLazyImpl<'a, A>, A> {
+        &self.addresses
+    }
+    
+    pub fn scores(&self) -> &OnceList<i32, A> {
+        &self.scores
+    }
+    
+    // Parsing methods
+    pub fn deserialize_field_1_name(&self) -> String<A> {
+        // Get field iterator via RefCell
+        let mut field_iter = self.field_iter.borrow_mut();
+        let iter = field_iter.as_mut().expect("FieldIterator should be initialized");
         
-        // Parse entire message, updating all fields as we go
         let mut last_name = String::new_in(self.allocator.clone());
         
         while let Some(result) = iter.next() {
@@ -153,106 +108,87 @@ impl<'a, A: Allocator + Clone> PersonLazyImplInner<'a, A> {
         last_name
     }
     
-    fn update_field(&mut self, field_num: u32, wire_type: u32, value_slice: &'a [u8]) {
+    fn update_field(&self, field_num: u32, wire_type: u32, value_slice: &'a [u8]) {
         match field_num {
-            1 => self.name = parse_string(value_slice)?,
-            2 => self.age = parse_varint(value_slice)?,
-            // ...
+            1 => *self.name.borrow_mut() = parse_string(value_slice)?,
+            2 => self.age.set(parse_varint(value_slice)?),
+            9 => {
+                // Repeated field - use OnceList's built-in interior mutability
+                let addr = parse_address(value_slice)?;
+                self.addresses.push(addr);  // push() takes &self
+            },
+            10 => {
+                // Repeated field - use OnceList's built-in interior mutability
+                let score = parse_varint(value_slice)?;
+                self.scores.push(score);  // push() takes &self
+            },
+            // ... other fields
         }
     }
 }
 
-// Wrapper methods that forward to inner (use state.inner_mut() for mutation)
 impl<'a, A: Allocator + Clone> PersonLazyImpl<'a, A> {
     /// Create a new PersonLazyImpl from a single slice (for top-level messages)
-    /// Called by:
-    /// - User code when deserializing top-level messages
-    /// - Tests
     pub fn new(slice: &'a [u8], alloc: A) -> Self {
         let alloc_clone = alloc.clone();
         
-        let inner = PersonLazyImplInner {
+        Self {
             allocator: alloc.clone(),
-            field_iter: Some(FieldIterator::new(
+            field_iter: RefCell::new(Some(FieldIterator::new(
                 Box::new_in(std::iter::once(slice), alloc)
-            )),
+            ))),
             // Initialize fields with default values
-            name: String::new_in(alloc.clone()),
-            age: 0,
-            email: None,
-            status: 0,
-            score: None,
-            address: None,
-            secondary_status: None,
+            name: RefCell::new(String::new_in(alloc.clone())),
+            age: Cell::new(0),
+            email: RefCell::new(None),
+            status: Cell::new(0),
+            score: RefCell::new(None),
+            address: RefCell::new(None),
+            secondary_status: RefCell::new(None),
             scores: OnceList::new_in(alloc_clone.clone()),
             addresses: OnceList::new_in(alloc_clone),
-        };
-        Self {
-            state: LazyImplState::Builder(RefCell::new(inner)),
         }
     }
     
     /// Create a new PersonLazyImpl from multiple slices (for scalar message fields)
-    /// Called by:
-    /// - Parent message's parsing code when collecting all occurrences of a scalar message field
     pub fn new_from_slices(slices: impl Iterator<Item = &'a [u8]> + 'a, alloc: A) -> Self {
         let alloc_clone = alloc.clone();
         
-        let inner = PersonLazyImplInner {
+        Self {
             allocator: alloc.clone(),
-            field_iter: Some(FieldIterator::new(
+            field_iter: RefCell::new(Some(FieldIterator::new(
                 Box::new_in(slices, alloc)
-            )),
+            ))),
             // Initialize fields with default values
-            name: String::new_in(alloc.clone()),
-            age: 0,
-            email: None,
-            status: 0,
-            score: None,
-            address: None,
-            secondary_status: None,
+            name: RefCell::new(String::new_in(alloc.clone())),
+            age: Cell::new(0),
+            email: RefCell::new(None),
+            status: Cell::new(0),
+            score: RefCell::new(None),
+            address: RefCell::new(None),
+            secondary_status: RefCell::new(None),
             scores: OnceList::new_in(alloc_clone.clone()),
             addresses: OnceList::new_in(alloc_clone),
-        };
-        Self {
-            state: LazyImplState::Builder(RefCell::new(inner)),
         }
-    }
-    
-    pub fn deserialize_field_1_name(&self) -> String<A> {
-        // Get RefMut and call method on inner with &mut self
-        let mut inner = self.state.inner_mut().unwrap();
-        inner.deserialize_field_1_name()
-    }
-    
-    // Wrapper methods for state management
-    pub fn finalize(self) -> Self {
-        Self { state: self.state.finalize() }
-    }
-    
-    pub fn is_finalized(&self) -> bool {
-        self.state.is_finalized()
     }
 }
 
 // Usage
-let person = PersonLazyImpl { state: ... };
-let name = person.name();  // Works via Deref!
-let age = person.age();    // Works via Deref!
-person.finalize();         // Wrapper method
+let person = PersonLazyImpl::new(bytes, alloc);
+let name = person.name();  // Returns Ref<'_, String<A>>
+let addresses = person.addresses();  // Returns &OnceList<...>
+addresses.push(addr);  // Uses OnceList's built-in interior mutability
 ```
 
 ### Benefits
 
-1. **Automatic Method Forwarding**: `Deref` automatically forwards method calls to the inner struct
-2. **Message-Specific Methods**: Can implement field accessors on `PersonLazyImplInner`
-3. **Trait Implementation**: Can implement traits for `PersonLazyImpl` wrapper
-4. **Clean API**: `person.name()` works directly via `Deref`
-5. **Minimal Overhead**: Just one field indirection
-6. **Interior Mutability**: Method signatures use `&self`, but internally get `&mut` access via `RefCell::borrow_mut()` - this is the interior mutability pattern
-7. **No `DerefMut` Needed**: We don't need external mutable access (methods use `&self`, not `&mut self`)
-8. **Shared Enum**: Single `LazyImplState<T>` type for all message types
-9. **Zero RefCell Overhead After Finalization**: No `RefCell` wrapper in `Finalized` state
+1. **Simple Structure**: No wrapper struct needed - direct use of the struct
+2. **Message-Specific Methods**: Can implement field accessors directly on `PersonLazyImpl`
+3. **Trait Implementation**: Can implement traits directly on `PersonLazyImpl`
+4. **Fine-Grained Protection**: Each field is protected independently - no struct-level `RefCell`
+5. **OnceList's Built-in Interior Mutability**: `OnceList` doesn't need `RefCell` wrapping - it already has `push(&self)`
+6. **No Borrow Conflicts**: Reading from `OnceList` and calling `push()` both use `&self`, so no conflicts
+7. **Clean API**: Direct access to repeated fields, `Ref`/`Cell::get()` for scalar fields
 
 ## Core Data Structure
 
@@ -317,9 +253,7 @@ impl<'a, I: Iterator<Item = &'a [u8]>> Iterator for FieldIterator<'a, I> {
 - For multiple slices: pass the iterator directly, wrapped in `Box::new_in(..., allocator)` (returns `Box<..., A>`)
 - Encapsulates cursor logic - tracks current slice and position within slice
 - Iterator can be paused (stored) and resumed - once created, it maintains its state
-- Uses `RefCell<Option<FieldIterator>>` because `Iterator::next()` requires `&mut self`
-- Much simpler parsing code - just iterate and match on field numbers
-- No need to store `field_slices` in `PersonLazyImpl` - the iterator owns its state
+- Stored in `RefCell<Option<FieldIterator>>` because `Iterator::next()` requires `&mut self`
 
 ## Parsing Strategy
 
@@ -328,8 +262,36 @@ impl<'a, I: Iterator<Item = &'a [u8]>> Iterator for FieldIterator<'a, I> {
 **Requirement**: Must parse entire message (to get last value, since later fields overwrite)
 
 ```rust
-// This method is now implemented on PersonLazyImplInner with &mut self
-// See implementation above in PersonLazyImplInner
+impl<'a, A: Allocator + Clone> PersonLazyImpl<'a, A> {
+    pub fn deserialize_field_1_name(&self) -> String<A> {
+        // Get field iterator via RefCell
+        let mut field_iter = self.field_iter.borrow_mut();
+        let iter = field_iter.as_mut().expect("FieldIterator should be initialized");
+        
+        let mut last_name = String::new_in(self.allocator.clone());
+        
+        while let Some(result) = iter.next() {
+            let (field_num, wire_type, value_slice) = result?;
+            
+            // Update ALL fields we encounter
+            self.update_field(field_num, wire_type, value_slice)?;
+            
+            if field_num == 1 {
+                last_name = parse_string(value_slice)?;
+            }
+        }
+        
+        last_name
+    }
+    
+    fn update_field(&self, field_num: u32, wire_type: u32, value_slice: &'a [u8]) {
+        match field_num {
+            1 => *self.name.borrow_mut() = parse_string(value_slice)?,
+            2 => self.age.set(parse_varint(value_slice)?),
+            // ...
+        }
+    }
+}
 ```
 
 ### 2. Repeated Fields (e.g., `scores`, `addresses`)
@@ -337,14 +299,16 @@ impl<'a, I: Iterator<Item = &'a [u8]>> Iterator for FieldIterator<'a, I> {
 **Requirement**: Parse only until first occurrence of target field, but still update other fields
 
 ```rust
-    pub fn ensure_scores_parsed(&mut self) {
+impl<'a, A: Allocator + Clone> PersonLazyImpl<'a, A> {
+    pub fn ensure_scores_parsed(&self) {
         // Check if already have first item
         if self.scores.iter().next().is_some() {
             return; // Already parsed first item
         }
         
-        // Get iterator - it should already exist (created at initialization)
-        let iter = self.field_iter.as_mut().expect("FieldIterator should be initialized");
+        // Get iterator via RefCell
+        let mut field_iter = self.field_iter.borrow_mut();
+        let iter = field_iter.as_mut().expect("FieldIterator should be initialized");
         
         // Parse until we find first occurrence of field 10 (scores)
         while let Some(result) = iter.next() {
@@ -359,6 +323,18 @@ impl<'a, I: Iterator<Item = &'a [u8]>> Iterator for FieldIterator<'a, I> {
             }
         }
     }
+    
+    fn update_field(&self, field_num: u32, wire_type: u32, value_slice: &'a [u8]) {
+        match field_num {
+            10 => {
+                // Use OnceList's built-in interior mutability
+                let score = parse_varint(value_slice)?;
+                self.scores.push(score);  // push() takes &self
+            },
+            // ... other fields
+        }
+    }
+}
 ```
 
 ### 3. Scalar Message Fields (e.g., `address`)
@@ -366,34 +342,36 @@ impl<'a, I: Iterator<Item = &'a [u8]>> Iterator for FieldIterator<'a, I> {
 **Requirement**: Must collect all occurrences of the field number at the same nesting level
 
 ```rust
-fn deserialize_field_6_address(&self) -> AddressLazyImpl<'a, A> {
-    // Parse entire message - update_field will automatically collect all field 6 slices
-    // to the child's field_slices as it encounters them
-    self.parse_entire_message().unwrap();
+impl<'a, A: Allocator + Clone> PersonLazyImpl<'a, A> {
+    fn deserialize_field_6_address(&self) -> AddressLazyImpl<'a, A> {
+        // Parse entire message - update_field will automatically collect all field 6 slices
+        // to the child's field_slices as it encounters them
+        // ... parsing logic ...
+        
+        // Return the child (now with all slices collected)
+        self.address.borrow().as_ref().unwrap().clone()
+    }
     
-    // Return the child (now with all slices collected)
-    self.address.get().unwrap().clone()
-}
-
-    fn update_field(&mut self, field_num: u32, wire_type: u32, value_slice: &'a [u8]) {
+    fn update_field(&self, field_num: u32, wire_type: u32, value_slice: &'a [u8]) {
         match field_num {
             6 => { // address - scalar message field
-                if self.address.is_none() {
+                let mut address = self.address.borrow_mut();
+                if address.is_none() {
                     let addr = AddressLazyImpl::new_from_first_slice(
                         value_slice,
-                        // Note: Need parent reference - this may require additional design
                         6,
                         self.allocator.clone(),
                     );
-                    self.address = Some(addr);
+                    *address = Some(addr);
                 } else {
                     // Push additional slice to existing child
-                    self.address.as_ref().unwrap().push_slice(value_slice);
+                    address.as_mut().unwrap().push_slice(value_slice);
                 }
             }
             // ... other fields
         }
     }
+}
 ```
 
 ## Interior Mutability Requirements
@@ -402,124 +380,78 @@ Since we're updating fields during parsing (which happens through `&self`), we n
 
 | Field Type | Storage Type | Mutability Needed | Why |
 |------------|--------------|-------------------|-----|
-| **Field iterator** | `Option<FieldIterator>` (wrapped in `RefCell` via enum) | Mutable via `RefCell` | `Iterator::next()` requires `&mut self` |
-| **Scalar fields** | Direct fields in inner struct | Update via `RefCell::borrow_mut()` | Can be updated multiple times during partial parsing |
-| **Repeated fields** | `OnceList<T, A>` | Push multiple times | Built-in interior mutability via `&self` |
-| **Scalar message fields** | `Option<AddressLazyImpl>` | Set once, then push slices | Child's `field_slices` has built-in interior mutability |
+| **Field iterator** | `RefCell<Option<FieldIterator>>` | Mutable via `RefCell` | `Iterator::next()` requires `&mut self` |
+| **Scalar fields** (non-Copy) | `RefCell<T>` | Update via `RefCell::borrow_mut()` | Can be updated multiple times during partial parsing |
+| **Scalar fields** (Copy) | `Cell<T>` | Update via `Cell::set()` | Can be updated multiple times, `Cell` is sufficient for `Copy` types |
+| **Repeated fields** | `OnceList<T, A>` | Push via `OnceList::push(&self)` | **Built-in interior mutability** - no `RefCell` needed! |
+| **Scalar message fields** | `RefCell<Option<MessageLazyImpl>>` | Set once, then push slices | Child's `field_slices` has built-in interior mutability |
 
-**Key Insight**: 
-- Method signatures use `&self` (immutable reference) - external code doesn't need `&mut self`
-- Internally, methods use `RefCell::borrow_mut()` to get `&mut` access - this is interior mutability
-- The `RefMut<'_, T>` returned by `borrow_mut()` provides `&mut T`-like access, allowing field mutations
-- This pattern allows mutation through an immutable reference (`&self`)
+**Key Insights**: 
+- `OnceList` already provides interior mutability via `push(&self)`, so it doesn't need `RefCell` wrapping
+- Field-level `RefCell`/`Cell` provides fine-grained protection - each field is independent
+- No struct-level `RefCell` means no coarse-grained protection issues
+- Reading from `OnceList` and calling `push()` both use `&self`, so no borrow conflicts
 
 ## Field Type Semantics
 
 Following Protobuf semantics:
 
-- **Implicit presence fields**: Use `T` directly (e.g., `String`, `i32`) with default values (`""`, `0`)
-- **Explicit optional fields**: Use `Option<T>` (e.g., `Option<String>`, `Option<i32>`)
-- **Scalar message fields**: Use `Option<MessageLazyImpl>` (may be absent)
-- **Repeated fields**: Use `OnceList<T, A>` (can add items incrementally)
+- **Implicit presence fields**: Use `RefCell<T>` for non-`Copy` types or `Cell<T>` for `Copy` types (e.g., `RefCell<String>`, `Cell<i32>`) with default values (`""`, `0`)
+- **Explicit optional fields**: Use `RefCell<Option<T>>` (e.g., `RefCell<Option<String>>`, `RefCell<Option<i32>>`)
+- **Scalar message fields**: Use `RefCell<Option<MessageLazyImpl>>` (may be absent)
+- **Repeated fields**: Use `OnceList<T, A>` directly (can add items incrementally via `push(&self)`)
 
 **Note**: In the sample code, `String<A>` is used for brevity. In the actual implementation, this should be `allocator_extras::String<A>` (allocator-aware String) with `String::new_in(allocator)` for initialization.
 
-The same field types are used for both `Builder` and `Finalized` states, making conversion trivial (just move the struct).
+The same field types are used for both parsing and finalized states - no state transition needed.
 
-## State Transition
+## Why This Design Works
 
-```rust
-impl<'a, A: Allocator + Clone> PersonLazyImpl<'a, A> {
-    /// Finalize parsing - converts from Builder to Finalized state
-    pub fn finalize(self) -> Self {
-        Self {
-            state: self.state.finalize(),
-        }
-    }
-    
-    /// Check if finalized
-    pub fn is_finalized(&self) -> bool {
-        self.state.is_finalized()
-    }
-}
-```
+### No Struct-Level RefCell
 
-**Key Benefit**: Since field types are the same for both states, the conversion is **trivial** - just move the inner struct directly (no `RefCell` needed for finalized state)!
+The key insight is that **we don't need to wrap the entire struct in `RefCell`**:
+- `OnceList` already has interior mutability (`push()` takes `&self`)
+- We can use field-level `RefCell`/`Cell` for scalar fields that need updates
+- This avoids the coarse-grained protection issues that occur when wrapping the entire struct
 
-**Note**: 
-- **Builder state**: Uses `RefCell` for interior mutability (fields can be updated)
-- **Finalized state**: No `RefCell` needed - fields are immutable, direct access via `&self`
-- The enum variant prevents setter methods from being available (runtime check via match)
-- This eliminates `RefCell` overhead completely after finalization!
+### OnceList's Built-in Interior Mutability
+
+`OnceList` provides interior mutability through its `push(&self)` method:
+- Reading existing items: `&self.addresses` → `&OnceList`, then `.iter().next()` directly
+- Adding new items: `self.addresses.push(...)` → uses `OnceList::push(&self)` which takes `&self`
+- No `RefCell` needed - both operations use `&self`
+
+### Fine-Grained Protection
+
+Each field is protected independently:
+- Scalar fields wrapped in `RefCell` or `Cell` can be updated independently
+- Repeated fields (`OnceList`) can be read and modified independently
+- No conflicts between reading one field and updating another
 
 ## Alternative Approaches (Not Recommended)
 
-### Const Generic Approach
+### Struct-Level RefCell Approach
 
-Using `const IS_PARSING: bool` as a generic parameter was considered but rejected because:
-- More complex type system
-- Still need runtime enum matching anyway
-- No significant benefits over simple enum approach
+Wrapping the entire struct in `RefCell` was considered but rejected because:
+- **Coarse-grained protection**: Protects entire struct as single unit
+- **Borrow conflicts**: Reading from `OnceList` (via `Ref`) conflicts with parsing (via `RefMut`)
+- **Unnecessary**: `OnceList` already has interior mutability, so struct-level `RefCell` is redundant
 
-### Typestate with Different Inner Types
+### Enum-Based State Management
 
-Using `PersonLazyImplInner<'a, BuilderState, A>` and `PersonLazyImplInner<'a, FinalizedState, A>` was considered but rejected because:
-- Requires `unsafe` code for type conversion
-- Complicates unified access methods
-- Doesn't provide significant benefits over runtime enum matching
-- Makes code generation more complex
-
-### Type Alias Approach
-
-Using `pub type PersonLazyImpl = LazyImplState<PersonLazyImplInner>` was considered but rejected because:
-- Cannot implement message-specific methods
-- Cannot implement traits for the alias
-- Less type distinction
-
-**Conclusion**: The thin wrapper with `Deref` approach provides the best balance of simplicity, type safety, and API ergonomics.
+Using an enum to distinguish between Builder and Finalized states was considered but rejected because:
+- Adds complexity without solving the core problem
+- Still requires struct-level `RefCell` for Builder state
+- Doesn't address the borrow conflict issue with `OnceList`
 
 ## Related Patterns: Rust Builder Pattern
 
-Our design shares similarities with the Builder pattern in Rust:
-
-### Standard Builder Pattern
-
-```rust
-struct PersonBuilder {
-    name: Option<String>,
-    age: Option<i32>,
-}
-
-impl PersonBuilder {
-    fn build(self) -> Person {
-        Person {
-            name: self.name.unwrap(),
-            age: self.age.unwrap(),
-        }
-    }
-}
-```
-
-**Key Differences from Our Design:**
-- **Standard Builder**: Uses separate types (`PersonBuilder` vs `Person`) - builder is consumed and cannot be reused
-- **Our Design**: Uses a single enum type that can hold either state - allows state transition without consuming the original type
-- **Standard Builder**: Builder and final product are completely separate types
-- **Our Design**: Same inner struct types for both states, only the wrapper (enum) differs
-
-### Why Our Design is Different
-
-Our design differs from standard Builder patterns because:
+Our design shares similarities with the Builder pattern in Rust, but with important differences:
 
 1. **Lazy Parsing Requirements**: We need to parse incrementally while providing `&self` access to already-parsed fields
-2. **Single Type API**: Users shouldn't need to know about builder vs finalized types - the same `PersonLazyImpl` type works for both
-3. **Runtime State**: We can't use compile-time type states because parsing state is determined at runtime (we don't know when parsing is "complete" until we've parsed the entire message)
-4. **Interior Mutability During Parsing**: We need `RefCell` during parsing because `Iterator::next()` requires `&mut self`, but we want to provide `&self` access to other fields
-
-Our enum-based approach is a hybrid that combines:
-- **Builder pattern's state management** (mutable during construction, immutable after)
-- **Runtime state tracking** (enum variant tracks state)
-- **Single type API** (same type for both states, unlike standard Builder)
-- **Interior mutability** (RefCell only during parsing, eliminated after finalization)
+2. **Field-Level Interior Mutability**: We use `RefCell`/`Cell` at the field level, not struct level
+3. **Built-in Interior Mutability**: We leverage `OnceList`'s built-in interior mutability rather than wrapping it
+4. **Runtime State**: We don't need separate builder and finalized types - parsing state is managed through the field iterator
 
 ### Relevant Resources
 
