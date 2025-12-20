@@ -359,40 +359,241 @@ impl<'a, A: Allocator + Clone> PersonLazyImpl<'a, A> {
 
 ### 3. Scalar Message Fields (e.g., `address`)
 
-**Requirement**: Must collect all occurrences of the field number at the same nesting level
+**Requirement**: 
+- Must collect all occurrences of the field number at the same nesting level
+- Initial access should parse until first occurrence, return `Some(child)` or `None`
+- When child needs all slices, it must request parent to continue parsing
+
+**Challenge**: Child messages need to:
+1. Hold a reference to the parent (to request continued parsing)
+2. Collect additional field slices from parent as they are found
+3. Update their own iterator with these slices
+
+**Design**:
 
 ```rust
+// Parent message (PersonLazyImpl)
 impl<'a, A: Allocator + Clone> PersonLazyImpl<'a, A> {
-    fn deserialize_field_6_address(&self) -> AddressLazyImpl<'a, A> {
-        // Parse entire message - update_field will automatically collect all field 6 slices
-        // to the child's field_slices as it encounters them
-        // ... parsing logic ...
+    /// Getter for scalar message field
+    /// Returns Some if field is found, None otherwise
+    /// Parses until first occurrence
+    pub fn address(&self) -> Option<std::cell::Ref<'_, AddressLazyImpl<'a, A>>> {
+        // Ensure we've parsed until first occurrence of field 6
+        self.ensure_field_6_first_occurrence()?;
         
-        // Return the child (now with all slices collected)
-        self.address.borrow().as_ref().unwrap().clone()
+        // Return reference to child (may not have all slices yet)
+        Some(std::cell::Ref::map(self.address.borrow(), |opt| opt.as_ref().unwrap()))
     }
     
-    fn update_field(&self, field_num: u32, wire_type: u32, value_slice: &'a [u8]) {
+    /// Parse until first occurrence of field 6, create child if found
+    fn ensure_field_6_first_occurrence(&self) -> Option<()> {
+        // Check if already created
+        if self.address.borrow().is_some() {
+            return Some(());
+        }
+        
+        // Get iterator (may be None if already exhausted)
+        let mut field_iter = match self.field_iter.borrow_mut().take() {
+            Some(iter) => iter,
+            None => return None,  // Already exhausted, field not found
+        };
+        
+        // Parse until we find first occurrence of field 6
+        loop {
+            match field_iter.next() {
+                Some(Ok((field_num, wire_type, value_slice))) => {
+                    // Update all fields we encounter
+                    self.update_field(field_num, wire_type, value_slice)?;
+                    
+                    if field_num == 6 {
+                        // Found field 6! Create child with first slice and parent reference
+                        let mut address = self.address.borrow_mut();
+                        if address.is_none() {
+                        *address = Some(AddressLazyImpl::new_from_parent(
+                            value_slice,
+                            self as *const PersonLazyImpl<'a, A>,  // Raw pointer to parent
+                            self.allocator.clone(),
+                        ));
+                        }
+                        // Store iterator back (may have more fields)
+                        *self.field_iter.borrow_mut() = Some(field_iter);
+                        return Some(());
+                    }
+                },
+                Some(Err(e)) => return Err(e),
+                None => {
+                    // Iterator exhausted, field not found
+                    *self.field_iter.borrow_mut() = None;
+                    return None;
+                }
+            }
+        }
+    }
+    
+    /// Continue parsing from current position, collecting all occurrences of field_num
+    /// Called by child when it needs all slices
+    pub(crate) fn continue_parsing_for_field(&self, field_num: u32) -> Result<(), Error> {
+        let mut field_iter = match self.field_iter.borrow_mut().take() {
+            Some(iter) => iter,
+            None => return Ok(()),  // Already exhausted
+        };
+        
+        // Parse until iterator is exhausted, collecting all occurrences of field_num
+        loop {
+            match field_iter.next() {
+                Some(Ok((fnum, wire_type, value_slice))) => {
+                    // Update all fields we encounter
+                    self.update_field(fnum, wire_type, value_slice)?;
+                    
+                    // If this is our target field, add slice to child
+                    if fnum == field_num {
+                        let mut address = self.address.borrow_mut();
+                        if let Some(ref mut addr) = *address {
+                            addr.add_slice(value_slice)?;
+                        }
+                    }
+                },
+                Some(Err(e)) => {
+                    *self.field_iter.borrow_mut() = Some(field_iter);
+                    return Err(e);
+                },
+                None => {
+                    // Iterator exhausted
+                    *self.field_iter.borrow_mut() = None;
+                    return Ok(());
+                }
+            }
+        }
+    }
+    
+    fn update_field(&self, field_num: u32, wire_type: u32, value_slice: &'a [u8]) -> Result<(), Error> {
         match field_num {
-            6 => { // address - scalar message field
+            6 => {
+                // address - scalar message field
                 let mut address = self.address.borrow_mut();
                 if address.is_none() {
-                    let addr = AddressLazyImpl::new_from_first_slice(
+                    // This should have been handled in ensure_field_6_first_occurrence
+                    // But handle it here too for safety
+                    *address = Some(AddressLazyImpl::new_from_parent(
                         value_slice,
-                        6,
+                        self,
                         self.allocator.clone(),
-                    );
-                    *address = Some(addr);
+                    ));
                 } else {
-                    // Push additional slice to existing child
-                    address.as_mut().unwrap().push_slice(value_slice);
+                    // Additional slice - add to existing child
+                    address.as_mut().unwrap().add_slice(value_slice)?;
                 }
             }
             // ... other fields
+            _ => {}
         }
+        Ok(())
+    }
+}
+
+// Child message (AddressLazyImpl)
+pub struct AddressLazyImpl<'a, A: Allocator = Global> {
+    allocator: A,
+    field_iter: RefCell<Option<FieldIterator<'a, Box<dyn Iterator<Item = &'a [u8]> + 'a, A>>>>,
+    
+    // Parent reference - needed to request continued parsing
+    // Using raw pointer to avoid Clone requirement (safe because parent outlives child via 'a)
+    parent: *const PersonLazyImpl<'a, A>,
+    
+    // Field slices collected so far
+    field_slices: OnceList<&'a [u8], A>,
+    
+    // Address fields...
+    street: RefCell<String<A>>,
+    city: RefCell<String<A>>,
+    // ...
+}
+
+impl<'a, A: Allocator + Clone> AddressLazyImpl<'a, A> {
+    /// Create from first slice, with parent reference
+    /// Note: Parent reference is stored as a raw pointer to avoid Clone requirement
+    /// Safety: Parent must outlive child (guaranteed by lifetime 'a)
+    pub(crate) fn new_from_parent(
+        first_slice: &'a [u8],
+        parent: *const PersonLazyImpl<'a, A>,  // Raw pointer to avoid Clone
+        alloc: A,
+    ) -> Self {
+        let field_slices = OnceList::new_in(alloc.clone());
+        field_slices.push(first_slice);
+        
+        Self {
+            allocator: alloc.clone(),
+            field_iter: RefCell::new(Some(FieldIterator::new(
+                Box::new_in(field_slices.iter().cloned(), alloc)
+            ))),
+            parent,  // Store raw pointer
+            field_slices,
+            street: RefCell::new(String::new_in(alloc.clone())),
+            city: RefCell::new(String::new_in(alloc.clone())),
+            // ...
+        }
+    }
+    
+    /// Add additional slice from parent
+    pub(crate) fn add_slice(&self, slice: &'a [u8]) -> Result<(), Error> {
+        self.field_slices.push(slice);
+        // Note: field_iter needs to be recreated or updated with new slices
+        // This is complex because we need to preserve iterator state
+        Ok(())
+    }
+    
+    /// Ensure all fields are parsed
+    /// This will request parent to continue parsing if needed
+    fn ensure_all_fields_parsed(&self) -> Result<(), Error> {
+        // First, request parent to continue parsing and collect all slices
+        // Safety: parent pointer is valid because parent outlives child via 'a
+        unsafe {
+            (&*self.parent).continue_parsing_for_field(6)?;
+        }
+        
+        // Now parse our own fields from all collected slices
+        // Recreate iterator with all slices
+        let mut field_iter = match self.field_iter.borrow_mut().take() {
+            Some(_) => {
+                // Recreate with all slices (previous iterator may be stale)
+                FieldIterator::new(
+                    Box::new_in(self.field_slices.iter().cloned(), self.allocator.clone())
+                )
+            },
+            None => return Ok(()),  // Already parsed
+        };
+        
+        // Parse until exhausted
+        while let Some(result) = field_iter.next() {
+            let (field_num, wire_type, value_slice) = result?;
+            self.update_field(field_num, wire_type, value_slice)?;
+        }
+        
+        *self.field_iter.borrow_mut() = None;
     }
 }
 ```
+
+**Key Design Challenges**:
+
+1. **Parent Reference**: Child needs to hold reference to parent. Options:
+   - `Rc<PersonLazyImpl>`: Requires `PersonLazyImpl: Clone` (may not be feasible)
+   - `&'a PersonLazyImpl`: Lifetime constraint, child must not outlive parent (reasonable)
+   - Raw pointer: Unsafe, not recommended
+
+2. **Iterator State Management**: When parent adds slices to child, child's iterator needs to see them. Options:
+   - Recreate iterator from `field_slices` each time (simple but may re-parse)
+   - Use a more sophisticated iterator that can accept new slices dynamically
+
+3. **Circular Reference Prevention**: Parent holds `RefCell<Option<AddressLazyImpl>>`, child holds reference to parent. This is safe because:
+   - Child's reference to parent is immutable (`&'a PersonLazyImpl`)
+   - Parent's reference to child is interior mutable (`RefCell`)
+   - No actual circular ownership (child doesn't own parent)
+
+**Recommended Approach**:
+- Use `&'a PersonLazyImpl` for parent reference (simplest, safe)
+- Store slices in `OnceList` and recreate iterator when needed
+- Child's `ensure_all_fields_parsed()` requests parent parsing first
 
 ## Interior Mutability Requirements
 
