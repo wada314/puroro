@@ -576,24 +576,244 @@ impl<'a, A: Allocator + Clone> AddressLazyImpl<'a, A> {
 
 **Key Design Challenges**:
 
-1. **Parent Reference**: Child needs to hold reference to parent. Options:
-   - `Rc<PersonLazyImpl>`: Requires `PersonLazyImpl: Clone` (may not be feasible)
-   - `&'a PersonLazyImpl`: Lifetime constraint, child must not outlive parent (reasonable)
-   - Raw pointer: Unsafe, not recommended
+1. **Parent Reference**: Child needs to hold reference to parent. This is a classic Rust problem. Common solutions include:
+
+   **Option 1: Lifetime-based reference (`&'a Parent`)**
+   - **Pros**: Type-safe, no runtime overhead, compiler guarantees validity
+   - **Cons**: Requires parent to be stored with lifetime `'a`, which must outlive child. In our case, child is stored in parent's `RefCell<Option<Child>>`, so we'd need parent itself to be in a container that provides the lifetime
+   - **Applicability**: Works if parent is stored in an arena or similar structure, but in our case parent is directly owned, making this challenging
+
+   **Option 2: `Rc<RefCell<Parent>>` + `Weak<RefCell<Parent>>`**
+   - **Pros**: Avoids circular references (Weak breaks the cycle), type-safe, parent can be dropped while child exists
+   - **Cons**: Requires wrapping both parent and child in `Rc<RefCell<>>`, significant runtime overhead (reference counting), allocation overhead
+   - **Applicability**: Overkill for our use case since parent always outlives child via lifetime `'a`
+
+   **Option 3: Arena/ID-based approach**
+   - **Pros**: All nodes in single arena with same lifetime, no reference cycles, can use indices
+   - **Cons**: Requires restructuring to store all messages in an arena, complex to integrate with existing design
+   - **Applicability**: Possible but requires major architectural changes
+
+   **Option 4: Raw pointer (`*const Parent`)**
+   - **Pros**: No runtime overhead, flexible, can work with existing ownership model
+   - **Cons**: Unsafe, requires manual safety guarantees (parent must outlive child, no mutation via pointer)
+   - **Applicability**: Works well in our case because `'a` lifetime guarantees parent outlives child, but requires `unsafe` blocks
+
+   **Option 5: No parent reference (callback/closure approach)**
+   - **Pros**: No reference issues, type-safe
+   - **Cons**: Child can't directly request parent to continue parsing, requires passing parent reference to methods
+   - **Applicability**: Could work but less ergonomic API
+
+   **Option 6: Trait-based approach**
+   - **Pros**: Abstraction, can use different implementations
+   - **Cons**: Dynamic dispatch overhead, still needs to solve the reference problem (trait object still needs a reference to parent)
+   - **Applicability**: Doesn't solve the core problem
 
 2. **Iterator State Management**: When parent adds slices to child, child's iterator needs to see them. Options:
    - Recreate iterator from `field_slices` each time (simple but may re-parse)
    - Use a more sophisticated iterator that can accept new slices dynamically
 
 3. **Circular Reference Prevention**: Parent holds `RefCell<Option<AddressLazyImpl>>`, child holds reference to parent. This is safe because:
-   - Child's reference to parent is immutable (`&'a PersonLazyImpl`)
+   - Child's reference to parent is immutable (no mutation through it)
    - Parent's reference to child is interior mutable (`RefCell`)
-   - No actual circular ownership (child doesn't own parent)
+   - No actual circular ownership (child doesn't own parent, just references it)
 
-**Recommended Approach**:
-- Use `&'a PersonLazyImpl` for parent reference (simplest, safe)
-- Store slices in `OnceList` and recreate iterator when needed
-- Child's `ensure_all_fields_parsed()` requests parent parsing first
+**Re-evaluating the Need for Parent Reference**:
+
+The only reason the child needs a parent reference is:
+- When `ensure_all_fields_parsed()` is called, it needs to request the parent to continue parsing to collect all field slices
+
+**Why Closure/Callback Doesn't Solve the Problem**:
+
+Using a closure/callback might seem like a solution, but it doesn't actually help:
+```rust
+// Child holds a closure that can request parent to continue parsing
+continue_parsing: Box<dyn Fn() -> Result<(), Error>>
+```
+
+However, the closure still needs to capture a reference to the parent:
+```rust
+let continue_parsing = || {
+    parent.continue_parsing_for_field(6)  // Still needs parent reference!
+};
+```
+
+So we're back to the same problem - the closure needs to hold a reference to the parent, which has the same lifetime/ownership constraints.
+
+**Why We Must Preserve Lazy Parsing**:
+
+**Critical Requirement**: We must preserve true lazy parsing. If the user only needs `address.street` (the first field of the address message), we should NOT parse the entire `address` message. The parent's getter collecting all slices upfront would violate this requirement.
+
+**The Realistic Solution: Raw Pointer with Safety Guarantees**:
+
+Given that:
+1. We need true lazy parsing (child decides when to request additional slices)
+2. Lifetime `'a` guarantees parent outlives child
+3. Closure/callback doesn't solve the reference problem
+4. Other approaches (Rc/Weak, Arena) have significant overhead or require major restructuring
+
+The **raw pointer approach is the most practical solution**:
+- Minimal overhead (just a pointer)
+- Preserves lazy parsing semantics
+- Safe because `'a` lifetime guarantees validity
+- Well-documented safety invariants
+- `unsafe` is limited to the dereference point
+
+**Conclusion**: 
+- Closure/callback doesn't solve the problem (still needs parent reference)
+- Premature slice collection violates lazy parsing requirement
+- Raw pointer with `'a` lifetime guarantee is the most practical solution
+
+**Alternative: Arena Approach with `Rc` and `Rc::new_cyclic_in`**:
+
+Instead of using raw pointers with lifetime parameters, we can use an Arena approach with `Rc<T, A>`:
+
+```rust
+struct MessageArena<A: Allocator = Global> {
+    // Arena holds all messages as Rc
+    messages: Vec<Rc<dyn MessageTrait, A>>,
+}
+
+struct PersonLazyImpl<A: Allocator = Global> {
+    allocator: A,
+    // Reference to arena (Weak to avoid cycle)
+    arena: Weak<MessageArena<A>>,
+    // Child message - using Rc
+    address: RefCell<Option<Rc<AddressLazyImpl<A>, A>>>,
+    // ...
+}
+
+struct AddressLazyImpl<A: Allocator = Global> {
+    allocator: A,
+    // Reference to arena (Weak to avoid cycle)
+    arena: Weak<MessageArena<A>>,
+    // Parent message - using Rc (cloned from parent's Rc)
+    parent: Rc<PersonLazyImpl<A>, A>,  // Normal Rc clone
+    // ...
+}
+```
+
+Construction using `Rc::new_cyclic_in`:
+
+```rust
+impl<A: Allocator + Clone> MessageArena<A> {
+    fn new(data: &[u8], alloc: A) -> Rc<Self, A> {
+        // Create arena using Rc::new_cyclic_in
+        // This allows messages to reference the arena during construction
+        Rc::new_cyclic_in(|arena_weak| {
+            // Create Person message
+            let person = Rc::new_in(PersonLazyImpl {
+                allocator: alloc.clone(),
+                arena: arena_weak.clone(),  // Weak reference to arena
+                address: RefCell::new(None),
+                // ...
+            }, alloc.clone());
+            
+            // Create Address message with reference to parent
+            let address = Rc::new_in(AddressLazyImpl {
+                allocator: alloc.clone(),
+                arena: arena_weak.clone(),
+                parent: person.clone(),  // Normal Rc clone (strong reference)
+                // ...
+            }, alloc.clone());
+            
+            // Set child in parent
+            *person.address.borrow_mut() = Some(address);
+            
+            MessageArena {
+                messages: vec![person, address],
+            }
+        }, alloc)
+    }
+}
+```
+
+Usage - no lifetime parameters needed:
+
+```rust
+impl<A: Allocator + Clone> AddressLazyImpl<A> {
+    fn ensure_all_fields_parsed(&self) -> Result<(), Error> {
+        // Access parent via Rc - no unsafe needed!
+        let parent = &*self.parent;  // Dereference Rc to get &PersonLazyImpl
+        parent.continue_parsing_for_field(6)?;
+        Ok(())
+    }
+}
+```
+
+**Key Benefits of Arena + Rc Approach**:
+
+1. **No lifetime parameters needed**:
+   - `PersonLazyImpl<A>` instead of `PersonLazyImpl<'a, A>`
+   - `AddressLazyImpl<A>` instead of `AddressLazyImpl<'a, A>`
+   - Simpler type signatures
+
+2. **Type-safe parent-child relationships**:
+   - `Rc` provides automatic lifetime management
+   - No `unsafe` blocks needed for parent access
+   - `Weak` for arena avoids cycles (Arena → Messages → Arena)
+   - Strong `Rc` for parent-child is fine (no cycle: Parent → Child → Parent, but not Parent → Child → Arena → Messages → Parent)
+
+3. **Flexible user references**:
+   - User can clone `Rc` and "discard" original arena reference
+   - Messages can outlive arena reference (until last `Rc` is dropped)
+   - More flexible than raw pointer approach
+
+4. **Natural message relationships**:
+   - Parent → Child: Strong `Rc` (parent owns child semantically)
+   - Child → Parent: Strong `Rc` (child needs parent)
+   - Messages → Arena: `Weak` (arena owns messages, avoid cycle)
+
+**Trade-offs of Arena + Rc Approach**:
+
+✅ Pros:
+- No lifetime parameters (simpler API)
+- Flexible reference management for users
+- Type-safe (no `unsafe` for parent access)
+- Messages can outlive arena reference
+
+❌ Cons:
+- Reference counting overhead (`Rc` operations)
+- Allocation overhead (`Rc` itself is heap-allocated)
+- More complex construction (need `Rc::new_cyclic_in`)
+- `Weak` references add some complexity
+
+**Comparison with Other Rust Patterns**:
+
+| Pattern | Safety | Overhead | Complexity | Our Applicability |
+|---------|--------|----------|------------|-------------------|
+| `&'a Parent` | ✅ Safe | None | Low | ⚠️ Requires arena/restructuring |
+| `Rc<RefCell<Parent>>` + `Weak` | ✅ Safe | Reference counting | Medium | ❌ Overkill, unnecessary |
+| Arena/ID | ✅ Safe | Index lookup | High | ⚠️ Major restructuring |
+| Raw pointer | ⚠️ Unsafe (but safe with invariants) | None | Low | ✅ Works well |
+| **Arena + `Rc` (with `Rc::new_cyclic_in`)** | ✅ **Safe** | **Reference counting** | **Medium** | ✅ **Good alternative** |
+| No reference (callbacks) | ✅ Safe | Function pointer | Medium | ⚠️ Less ergonomic |
+| Trait object | ✅ Safe | Dynamic dispatch | Medium | ❌ Doesn't solve problem |
+
+**Final Recommendation**:
+
+We have two viable approaches:
+
+1. **Raw pointer approach** (current design):
+   - ✅ Zero overhead (just a pointer)
+   - ✅ Simple construction
+   - ✅ Minimal memory footprint
+   - ❌ Requires lifetime parameters (`'a`)
+   - ❌ Requires `unsafe` blocks (but safe with `'a` guarantee)
+   - ❌ User cannot "discard" parent reference while using child
+   - **Best for**: Performance-critical code, minimal memory footprint
+
+2. **Arena + `Rc` approach** (alternative design):
+   - ✅ No lifetime parameters (simpler API)
+   - ✅ Type-safe (no `unsafe` for parent access)
+   - ✅ Flexible user references (can clone/drop independently)
+   - ❌ Reference counting overhead
+   - ❌ Allocation overhead (each message wrapped in `Rc`)
+   - ❌ More complex construction (`Rc::new_cyclic_in`)
+   - **Best for**: API simplicity, flexibility, when overhead is acceptable
+
+**Recommendation**: 
+- For immediate implementation: Use raw pointer with well-documented safety invariants (parent outlives child via `'a`)
+- If API simplicity and user flexibility are more important than performance: Consider Arena + `Rc` approach
 
 ## Interior Mutability Requirements
 
