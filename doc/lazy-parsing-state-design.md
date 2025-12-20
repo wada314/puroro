@@ -62,15 +62,20 @@ pub struct PersonLazyImpl<'a, A: Allocator = Global> {
 // Methods on the struct
 impl<'a, A: Allocator + Clone> PersonLazyImpl<'a, A> {
     // Field accessors for scalar fields
+    // For RefCell fields: ensure parsing is complete before returning Ref
+    // This guarantees: 1) no RefMut is active (borrow safety), 2) value is final and confirmed
     pub fn name(&self) -> std::cell::Ref<'_, String<A>> {
-        self.name.borrow()  // RefCell - returns Ref
+        self.ensure_all_fields_parsed();  // Ensure parsing is complete for confirmed values
+        self.name.borrow()  // RefCell - returns Ref with final confirmed value
     }
     
     pub fn age(&self) -> i32 {
-        self.age.get()  // Cell - returns Copy value
+        self.ensure_all_fields_parsed();  // Ensure parsing is complete for confirmed values
+        self.age.get()  // Cell - returns Copy value (final confirmed)
     }
     
     pub fn email(&self) -> Option<std::cell::Ref<'_, String<A>>> {
+        self.ensure_all_fields_parsed();  // Ensure parsing is complete for confirmed values
         if self.email.borrow().is_some() {
             Some(std::cell::Ref::map(self.email.borrow(), |opt| opt.as_ref().unwrap()))
         } else {
@@ -79,11 +84,13 @@ impl<'a, A: Allocator + Clone> PersonLazyImpl<'a, A> {
     }
     
     pub fn score(&self) -> Option<i32> {
-        self.score.get()  // Cell<Option<i32>> - returns Copy value
+        self.ensure_all_fields_parsed();  // Ensure parsing is complete for confirmed values
+        self.score.get()  // Cell<Option<i32>> - returns Copy value (final confirmed)
     }
     
     pub fn secondary_status(&self) -> Option<i32> {
-        self.secondary_status.get()  // Cell<Option<i32>> - returns Copy value
+        self.ensure_all_fields_parsed();  // Ensure parsing is complete for confirmed values
+        self.secondary_status.get()  // Cell<Option<i32>> - returns Copy value (final confirmed)
     }
     
     // Field accessors for repeated fields - direct access, no RefCell!
@@ -95,26 +102,15 @@ impl<'a, A: Allocator + Clone> PersonLazyImpl<'a, A> {
         &self.scores
     }
     
-    // Parsing methods
+    // Parsing methods (if needed for specific use cases)
+    // Note: Normal field accessors (e.g., name()) automatically call ensure_all_fields_parsed()
+    // These methods are only needed if you want to parse and return a specific field value directly
     pub fn deserialize_field_1_name(&self) -> String<A> {
-        // Get field iterator via RefCell
-        let mut field_iter = self.field_iter.borrow_mut();
-        let iter = field_iter.as_mut().expect("FieldIterator should be initialized");
+        // Ensure all fields are parsed first
+        self.ensure_all_fields_parsed();
         
-        let mut last_name = String::new_in(self.allocator.clone());
-        
-        while let Some(result) = iter.next() {
-            let (field_num, wire_type, value_slice) = result?;
-            
-            // Update ALL fields we encounter
-            self.update_field(field_num, wire_type, value_slice)?;
-            
-            if field_num == 1 {
-                last_name = parse_string(value_slice)?;
-            }
-        }
-        
-        last_name
+        // Now return the final confirmed value
+        self.name.borrow().clone()
     }
     
     fn update_field(&self, field_num: u32, wire_type: u32, value_slice: &'a [u8]) {
