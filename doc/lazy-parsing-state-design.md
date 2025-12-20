@@ -861,6 +861,95 @@ fn example() {
 - Allocation overhead (`Rc` itself is heap-allocated)
 - More complex construction (need `Rc::new_cyclic_in`)
 - `Weak` references add some complexity
+- **User can drop arena while messages still exist** - messages will still be valid, but if they try to access arena via `Weak::upgrade()`, it will return `None`. This is safe but may be unexpected behavior.
+
+**Important Caveat: Arena Lifetime vs Message Lifetime**:
+
+With the Arena + `Rc` approach, there's a subtle issue:
+
+```rust
+fn example() {
+    let arena = MessageArena::new(data, alloc);
+    let person_rc = arena.get_person();  // Rc<PersonLazyImpl>
+    
+    drop(arena);  // ✅ This is allowed by the compiler!
+    
+    // person_rc still valid, but...
+    // If PersonLazyImpl tries to access arena via self.arena.upgrade(),
+    // it will return None because arena was dropped
+}
+```
+
+**Why this happens**:
+- Messages hold `Weak<MessageArena>` to avoid cycles
+- User can drop `Rc<MessageArena>` (the arena)
+- Messages (held via `Rc`) will still be valid
+- But `Weak::upgrade()` on the dropped arena returns `None`
+
+**Is this a problem?**:
+- ✅ **Safe**: No memory safety issues - `Weak` handles this correctly
+- ⚠️ **Behavioral**: If messages try to use arena (e.g., to store themselves), `upgrade()` will fail
+- ⚠️ **User expectation**: User might expect arena and messages to live together
+
+**Solutions**:
+
+1. **Use lifetime parameters** (restricts flexibility but enforces safety):
+
+```rust
+struct MessageArena<'arena, A: Allocator = Global> {
+    messages: RefCell<Vec<Rc<dyn MessageTrait + 'arena, A>>>,
+    // Arena has lifetime 'arena
+}
+
+struct PersonLazyImpl<'arena, A: Allocator = Global> {
+    arena: Weak<MessageArena<'arena, A>>,  // Must live for 'arena
+    // ...
+}
+
+// User code:
+fn example() {
+    let arena = MessageArena::new(data, alloc);  // 'arena starts here
+    let person_rc = arena.get_person();  // person_rc has lifetime tied to arena
+    
+    // ❌ This won't compile - arena lifetime is tied to person_rc
+    drop(arena);  // Compile error! person_rc borrows from arena
+    
+    // ✅ This works - arena outlives person_rc
+    drop(person_rc);
+    drop(arena);
+}
+```
+
+However, this has limitations:
+- ❌ Loses the flexibility benefit (messages can't outlive arena)
+- ❌ Still requires lifetime parameters (one of the main goals was to avoid them)
+- ⚠️ `Rc` and `Weak` with lifetimes are more complex to work with
+
+2. **Return tuple with lifetime relationship**:
+
+```rust
+impl<A: Allocator> MessageArena<A> {
+    fn new(data: &[u8], alloc: A) -> (Rc<Self, A>, Rc<PersonLazyImpl<A>, A>) {
+        // Return both arena and top-level message
+        // User must hold both, making it harder to drop arena prematurely
+    }
+}
+
+// User code:
+fn example() {
+    let (arena, person_rc) = MessageArena::new(data, alloc);
+    // User holds both - harder to accidentally drop arena
+}
+```
+
+This helps but doesn't fully prevent the issue - user can still drop arena.
+
+3. **Don't use arena from messages**: Design messages to not need arena access (use parent `Rc` instead)
+   - Best solution if we can avoid arena access from messages
+   - Messages only need parent, not arena
+
+4. **Document the behavior**: Make it clear that messages can outlive arena, but arena-specific operations may fail
+   - Practical solution: accept the limitation and document it
 
 **Comparison with Other Rust Patterns**:
 
