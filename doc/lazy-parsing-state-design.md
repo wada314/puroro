@@ -665,20 +665,23 @@ The **raw pointer approach is the most practical solution**:
 
 **Alternative: Arena Approach with `Rc` and `Rc::new_cyclic_in`**:
 
-Instead of using raw pointers with lifetime parameters, we can use an Arena approach with `Rc<T, A>`:
+Instead of using raw pointers with lifetime parameters, we can use an Arena approach with `Rc<T, A>`. **Important**: Messages must be created on-demand (lazy), not all at arena creation time.
 
 ```rust
 struct MessageArena<A: Allocator = Global> {
     // Arena holds all messages as Rc
-    messages: Vec<Rc<dyn MessageTrait, A>>,
+    // Messages are added on-demand as they are parsed
+    messages: RefCell<Vec<Rc<dyn MessageTrait, A>>>,
 }
 
 struct PersonLazyImpl<A: Allocator = Global> {
     allocator: A,
     // Reference to arena (Weak to avoid cycle)
     arena: Weak<MessageArena<A>>,
-    // Child message - using Rc
+    // Child message - created on-demand, using Rc
     address: RefCell<Option<Rc<AddressLazyImpl<A>, A>>>,
+    // Field iterator for lazy parsing
+    field_iter: RefCell<Option<FieldIterator<...>>>,
     // ...
 }
 
@@ -688,11 +691,13 @@ struct AddressLazyImpl<A: Allocator = Global> {
     arena: Weak<MessageArena<A>>,
     // Parent message - using Rc (cloned from parent's Rc)
     parent: Rc<PersonLazyImpl<A>, A>,  // Normal Rc clone
+    // Field iterator for lazy parsing
+    field_iter: RefCell<Option<FieldIterator<...>>>,
     // ...
 }
 ```
 
-Construction using `Rc::new_cyclic_in`:
+Construction - only top-level message created initially:
 
 ```rust
 impl<A: Allocator + Clone> MessageArena<A> {
@@ -700,45 +705,125 @@ impl<A: Allocator + Clone> MessageArena<A> {
         // Create arena using Rc::new_cyclic_in
         // This allows messages to reference the arena during construction
         Rc::new_cyclic_in(|arena_weak| {
-            // Create Person message
+            // Create only the top-level message initially
             let person = Rc::new_in(PersonLazyImpl {
                 allocator: alloc.clone(),
                 arena: arena_weak.clone(),  // Weak reference to arena
-                address: RefCell::new(None),
+                address: RefCell::new(None),  // Child will be created on-demand
+                field_iter: RefCell::new(Some(FieldIterator::new(...))),
                 // ...
             }, alloc.clone());
             
-            // Create Address message with reference to parent
-            let address = Rc::new_in(AddressLazyImpl {
-                allocator: alloc.clone(),
-                arena: arena_weak.clone(),
-                parent: person.clone(),  // Normal Rc clone (strong reference)
-                // ...
-            }, alloc.clone());
+            // Add top-level message to arena
+            let arena = MessageArena {
+                messages: RefCell::new(vec![person.clone() as Rc<dyn MessageTrait, A>]),
+            };
             
-            // Set child in parent
-            *person.address.borrow_mut() = Some(address);
-            
-            MessageArena {
-                messages: vec![person, address],
-            }
+            arena
         }, alloc)
     }
 }
 ```
 
-Usage - no lifetime parameters needed:
+Child message created on-demand when parent's getter is called:
+
+**Key Design Decision**: All methods use `self: &Rc<Self>` instead of `&self`. This allows methods to clone `Rc<Self>` when needed to create child messages.
 
 ```rust
-impl<A: Allocator + Clone> AddressLazyImpl<A> {
-    fn ensure_all_fields_parsed(&self) -> Result<(), Error> {
-        // Access parent via Rc - no unsafe needed!
-        let parent = &*self.parent;  // Dereference Rc to get &PersonLazyImpl
-        parent.continue_parsing_for_field(6)?;
-        Ok(())
+impl<A: Allocator + Clone> PersonLazyImpl<A> {
+    // Note: &self is changed to self: &Rc<Self>
+    pub fn address(self: &Rc<Self>) -> Option<Rc<AddressLazyImpl<A>, A>> {
+        // Check if already created
+        if let Some(ref addr) = *self.address.borrow() {
+            return Some(addr.clone());
+        }
+        
+        // Parse until first occurrence of field 6
+        self.ensure_field_6_first_occurrence()?;
+        
+        // Get the created child (should exist now)
+        self.address.borrow().clone()
+    }
+    
+    fn ensure_field_6_first_occurrence(self: &Rc<Self>) -> Option<()> {
+        // Parse until we find first occurrence of field 6
+        let mut field_iter = self.field_iter.borrow_mut().take()?;
+        
+        loop {
+            match field_iter.next() {
+                Some(Ok((field_num, wire_type, value_slice))) => {
+                    self.update_field(field_num, wire_type, value_slice)?;
+                    
+                    if field_num == 6 {
+                        // Found field 6! Create child on-demand
+                        // Key: self.clone() gives us Rc<Self> because method signature is self: &Rc<Self>
+                        let address = Rc::new_in(AddressLazyImpl {
+                            allocator: self.allocator.clone(),
+                            arena: self.arena.clone(),
+                            parent: self.clone(),  // Clone parent's Rc - now easy!
+                            field_iter: RefCell::new(Some(FieldIterator::new(...))),
+                            // ...
+                        }, self.allocator.clone());
+                        
+                        // Store in parent
+                        *self.address.borrow_mut() = Some(address.clone());
+                        
+                        // Optionally add to arena (if needed)
+                        if let Some(arena) = self.arena.upgrade() {
+                            arena.messages.borrow_mut().push(address.clone() as Rc<dyn MessageTrait, A>);
+                        }
+                        
+                        // Store iterator back
+                        *self.field_iter.borrow_mut() = Some(field_iter);
+                        return Some(());
+                    }
+                },
+                None => return None,
+            }
+        }
+    }
+    
+    fn update_field(self: &Rc<Self>, field_num: u32, wire_type: u32, value_slice: &[u8]) -> Result<(), Error> {
+        // ... field update logic ...
     }
 }
 ```
+
+Usage - no lifetime parameters needed, but users must use `Rc`:
+
+```rust
+impl<A: Allocator + Clone> AddressLazyImpl<A> {
+    fn ensure_all_fields_parsed(self: &Rc<Self>) -> Result<(), Error> {
+        // Access parent via Rc - no unsafe needed!
+        let parent = &*self.parent;  // Dereference Rc to get &PersonLazyImpl
+        // Note: parent methods also take &Rc<Self>, so we need to pass &self.parent
+        self.parent.continue_parsing_for_field(6)?;
+        Ok(())
+    }
+}
+
+// User code:
+fn example() {
+    let arena = MessageArena::new(data, alloc);
+    let person_rc = &arena.messages[0];  // Rc<PersonLazyImpl>
+    
+    // All methods require &Rc<Self>
+    let address_rc = person_rc.address();  // Returns Option<Rc<AddressLazyImpl>>
+    
+    // Child can access parent
+    address_rc.unwrap().ensure_all_fields_parsed();
+}
+```
+
+**Benefits of using `self: &Rc<Self>`**:
+- ✅ Easy to clone `Rc` inside methods (`self.clone()`)
+- ✅ Simplifies child creation (can pass `self.clone()` as parent)
+- ✅ Consistent API (all methods use same pattern)
+- ✅ No need for complex mechanisms to get `Rc<Self>` from `&self`
+
+**Trade-off**:
+- ❌ Users must always work with `Rc` (cannot use bare `PersonLazyImpl`)
+- ❌ All method calls require dereferencing `Rc` first (but this is automatic with method calls)
 
 **Key Benefits of Arena + Rc Approach**:
 
