@@ -24,6 +24,7 @@ Each message struct has its **own cursor** that tracks parsing progress through 
 - **External access**: Always `&self` (immutable reference)
 - **Internal mutation**: Uses field-level `RefCell`/`Cell` or `OnceList`'s built-in interior mutability
 - **No external `&mut self`**: Users never need `&mut self` access
+- **RefCell safety**: Field getters that return `Ref` automatically ensure the entire input iterator is parsed before returning the `Ref`, preventing conflicts with `RefMut` used during parsing
 
 ### Implementation
 
@@ -454,6 +455,80 @@ Each field is protected independently:
 - Scalar fields wrapped in `RefCell` or `Cell` can be updated independently
 - Repeated fields (`OnceList`) can be read and modified independently
 - No conflicts between reading one field and updating another
+
+### Critical: RefCell Borrow Safety and Field Value Semantics
+
+**Important**: When using `RefCell`, we must ensure that immutable references (`Ref`) and mutable references (`RefMut`) are not active simultaneously. Additionally, we must distinguish between **unconfirmed intermediate values** (during parsing) and **confirmed final values** (after parsing is complete).
+
+**The Problem**:
+1. **Borrow conflict**: Field getters that return `Ref<'_, T>` (e.g., `name()`, `email()`) call `RefCell::borrow()`, but during parsing, `update_field()` calls `borrow_mut()` to update fields, causing a conflict.
+2. **Value semantics**: Fields can have intermediate unconfirmed values during parsing (which may be overwritten by later fields), or final confirmed values after parsing is complete. We must ensure users only access confirmed values.
+
+**The Solution (Best Approach)**:
+- **When getting from a `RefCell` field, ensure the entire input iterator is parsed first**
+- Field getters that return `Ref` should internally ensure that parsing is complete before returning the `Ref`
+- This guarantees:
+  1. No `RefMut` is active when we return `Ref` from field getters (borrow safety)
+  2. The returned value is the **final confirmed field value**, not an intermediate unconfirmed value
+
+**Field Value States**:
+- **Intermediate unconfirmed value**: A value found during partial parsing that may be overwritten by later fields with the same field number. Accessing this value is unsafe because it's not the final value.
+- **Final confirmed field value**: The value after parsing is complete (iterator exhausted). This is the correct, final value that won't change.
+
+**Implementation Strategy**:
+```rust
+impl<'a, A: Allocator + Clone> PersonLazyImpl<'a, A> {
+    pub fn name(&self) -> std::cell::Ref<'_, String<A>> {
+        // Ensure entire iterator is parsed before returning Ref
+        // This guarantees:
+        // 1. No RefMut is active (borrow safety)
+        // 2. The value is final and confirmed (not intermediate)
+        self.ensure_all_fields_parsed();
+        self.name.borrow()  // Safe: no RefMut can be active, value is confirmed
+    }
+    
+    fn ensure_all_fields_parsed(&self) {
+        // Check if iterator still exists (not yet consumed/parsed)
+        let mut field_iter = match self.field_iter.borrow_mut().take() {
+            Some(iter) => iter,
+            None => return,  // Already parsed completely - values are confirmed
+        };
+        
+        // Parse until iterator is exhausted
+        // During this process, fields may be updated multiple times (intermediate values)
+        while let Some(result) = field_iter.next() {
+            let (field_num, wire_type, value_slice) = result?;
+            self.update_field(field_num, wire_type, value_slice)?;
+        }
+        
+        // Iterator is now exhausted - store None to indicate parsing is complete
+        // All field values are now final and confirmed
+        *self.field_iter.borrow_mut() = None;
+    }
+    
+    fn update_field(&self, field_num: u32, wire_type: u32, value_slice: &'a [u8]) {
+        // This may update fields multiple times during parsing
+        // Values updated here are intermediate until parsing is complete
+        match field_num {
+            1 => *self.name.borrow_mut() = parse_string(value_slice)?,
+            // ... other fields
+        }
+    }
+}
+```
+
+**Benefits**:
+- **Automatic safety**: Field getters automatically ensure parsing is complete before returning `Ref`
+- **Value correctness**: Users always get the final confirmed value, never intermediate unconfirmed values
+- **No user responsibility**: Users don't need to manually ensure parsing is complete or worry about value semantics
+- **Runtime safety**: `RefCell` will panic if there's still a conflict, but this design prevents it
+- **Lazy by default, eager when needed**: Fields are parsed lazily, but become eager when accessed via getters
+
+**Alternative Approaches (not recommended)**:
+- Manual completion: Requiring users to call parsing methods before accessing fields (error-prone, users might access intermediate values)
+- Returning intermediate values: Users might get incorrect values if parsing is not complete
+- Returning owned values: `clone()` is expensive for large strings
+- `try_borrow()` with `Option<Ref>`: Adds API complexity and forces users to handle `None` cases
 
 ## Alternative Approaches (Not Recommended)
 
