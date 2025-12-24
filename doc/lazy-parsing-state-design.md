@@ -438,8 +438,61 @@ impl<'a, A: Allocator + Clone> PersonParserState<'a, A> {
         self.field_update_callback = Some(Box::new(callback));
     }
     
+    /// Collect all slices for a specific field number
+    /// Called by child when it needs all slices - works even if parent Message Body is dropped
+    /// 
+    /// This method directly collects slices from the parser state without requiring
+    /// the parent Message Body to be alive. This allows child messages to continue
+    /// parsing even after the parent Message Body is dropped.
+    /// 
+    /// Returns a vector of slices for the target field number.
+    pub fn collect_field_slices(&mut self, field_num: u32) -> Result<Vec<&'a [u8]>, Error> {
+        let mut field_iter = match self.field_iter.take() {
+            Some(iter) => iter,
+            None => return Ok(Vec::new()),  // Already exhausted
+        };
+        
+        let mut collected_slices = Vec::new();
+        let mut callback = self.field_update_callback.take();
+        
+        // Parse until iterator is exhausted, collecting all occurrences of field_num
+        loop {
+            match field_iter.next() {
+                Some(Ok((fnum, wire_type, value_slice))) => {
+                    // If this is the target field, collect the slice
+                    if fnum == field_num {
+                        collected_slices.push(value_slice);
+                    }
+                    
+                    // Also call registered callback if it exists (for parent Message Body updates)
+                    // This is optional - if parent Message Body is dropped, callback will be None
+                    if let Some(ref mut cb) = callback {
+                        let _ = cb(fnum, wire_type, value_slice);
+                        // Ignore errors from callback - parent might be dropped
+                    }
+                },
+                Some(Err(e)) => {
+                    // Restore callback and iterator before returning error
+                    self.field_update_callback = callback;
+                    self.field_iter = Some(field_iter);
+                    return Err(e);
+                },
+                None => {
+                    // Iterator exhausted
+                    // Restore callback before returning
+                    self.field_update_callback = callback;
+                    self.field_iter = None;
+                    return Ok(collected_slices);
+                }
+            }
+        }
+    }
+    
     /// Continue parsing from current position, collecting all occurrences of field_num
-    /// Called by child when it needs all slices
+    /// Called by child when it needs all slices (legacy method - uses callback)
+    /// 
+    /// **Note**: This method requires the parent Message Body to be alive.
+    /// For better resilience, use `collect_field_slices` instead.
     /// 
     /// Uses the registered callback to update Message Body fields during parsing.
     /// The callback is called for each field encountered:
@@ -739,16 +792,22 @@ impl<'a, A: Allocator + Clone> AddressLazyImpl<'a, A> {
     
     /// Ensure all fields are parsed
     /// This will request parent's parser state to continue parsing if needed
+    /// 
+    /// **Key Design**: Uses `collect_field_slices` instead of callback-based approach.
+    /// This allows child messages to continue parsing even if parent Message Body is dropped.
+    /// The parent's Parser State is kept alive by the child's strong Rc reference.
     fn ensure_all_fields_parsed(self: &Rc<Self>) -> Result<(), Error> {
-        // Request parent's parser state to continue parsing
-        // The parser state will use its registered callback (registered by parent's Message Body)
-        // to update parent's Message Body fields and add slices to this child
-        // 
-        // The callback was registered during parent's Message Body construction,
-        // so it has access to parent's Message Body and can:
-        // 1. Update parent's fields for all fields encountered
-        // 2. Add slices to this child (field 6) when the target field is found
-        self.parent_parser_state.borrow_mut().continue_parsing_for_field(6)?;
+        // Request parent's parser state to collect all slices for field 6
+        // This works even if parent Message Body is dropped, because:
+        // 1. Child holds strong Rc reference to parent's Parser State
+        // 2. collect_field_slices doesn't require parent Message Body to be alive
+        // 3. It directly collects slices from the parser state
+        let additional_slices = self.parent_parser_state.borrow_mut().collect_field_slices(6)?;
+        
+        // Add collected slices to our own field_slices
+        for slice in additional_slices {
+            self.parser_state.borrow_mut().field_slices.push(slice);
+        }
         
         // Now parse our own fields from all collected slices
         // Recreate iterator with all slices
