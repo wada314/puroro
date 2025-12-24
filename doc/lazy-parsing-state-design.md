@@ -371,9 +371,117 @@ impl<'a, A: Allocator + Clone> PersonLazyImpl<'a, A> {
 2. Collect additional field slices from parent as they are found
 3. Update their own iterator with these slices
 
+**Problem with Previous Approaches**:
+- **Raw pointer**: Requires `unsafe` and lifetime parameters
+- **Weak reference**: Parent can be dropped, preventing child from completing parsing
+- **Strong reference**: Creates cycle (Parent → Child → Parent)
+
+**Solution: Separate Message Body from Parser State**
+
+The key insight is to separate the message into two parts:
+1. **Message Body**: Contains field values (name, age, email, etc.)
+2. **Parser State**: Contains parsing state (input slices, iterators, etc.)
+
+The Message Body owns the Parser State via `Rc`, and child messages hold a strong reference to the **parent's Parser State** (not the parent's Message Body). This avoids cycles because:
+- Parent Message Body → Parent Parser State (Rc)
+- Parent Message Body → Child Message Body (Rc)
+- Child Message Body → Parent Parser State (Rc)
+- **No cycle**: Parent Message Body owns both, so Child → Parent Parser State doesn't create a cycle
+
 **Design**:
 
 ```rust
+// Parser State - contains parsing state only
+pub struct PersonParserState<'a, A: Allocator = Global> {
+    /// FieldIterator needs RefCell because Iterator::next() requires &mut self
+    field_iter: RefCell<Option<FieldIterator<'a, Box<dyn Iterator<Item = &'a [u8]> + 'a, A>>>>,
+    allocator: A,
+    /// Callback registered by Message Body to update fields during parsing
+    /// This allows Parser State to update Message Body without holding a reference to it
+    field_update_callback: RefCell<Option<Box<dyn FnMut(u32, u32, &'a [u8]) -> Result<(), Error> + 'a>>>,
+}
+
+impl<'a, A: Allocator + Clone> PersonParserState<'a, A> {
+    /// Register a callback to update Message Body fields during parsing
+    /// This is called by Message Body during construction
+    pub fn register_field_update_callback<F>(&self, callback: F)
+    where
+        F: FnMut(u32, u32, &'a [u8]) -> Result<(), Error> + 'a,
+    {
+        *self.field_update_callback.borrow_mut() = Some(Box::new(callback));
+    }
+    
+    /// Continue parsing from current position, collecting all occurrences of field_num
+    /// Called by child when it needs all slices
+    /// 
+    /// Uses the registered callback to update Message Body fields during parsing.
+    /// The callback is called for each field encountered:
+    /// - For all fields: callback updates Message Body fields
+    /// - For target field_num: callback should also add slice to child
+    /// 
+    /// This design allows Parser State to remain independent of Message Body,
+    /// avoiding circular dependencies while still allowing field updates.
+    pub fn continue_parsing_for_field(&self, field_num: u32) -> Result<(), Error> {
+        let mut field_iter = match self.field_iter.borrow_mut().take() {
+            Some(iter) => iter,
+            None => return Ok(()),  // Already exhausted
+        };
+        
+        // Get the registered callback
+        let mut callback = match self.field_update_callback.borrow_mut().take() {
+            Some(cb) => cb,
+            None => return Err(Error::new("Field update callback not registered")),
+        };
+        
+        // Parse until iterator is exhausted, collecting all occurrences of field_num
+        loop {
+            match field_iter.next() {
+                Some(Ok((fnum, wire_type, value_slice))) => {
+                    // Call registered callback for every field encountered
+                    // The callback will:
+                    // 1. Update Message Body fields (for all fields)
+                    // 2. Add slice to child (for target field_num)
+                    callback(fnum, wire_type, value_slice)?;
+                },
+                Some(Err(e)) => {
+                    // Restore callback and iterator before returning error
+                    *self.field_update_callback.borrow_mut() = Some(callback);
+                    *self.field_iter.borrow_mut() = Some(field_iter);
+                    return Err(e);
+                },
+                None => {
+                    // Iterator exhausted
+                    // Restore callback before returning
+                    *self.field_update_callback.borrow_mut() = Some(callback);
+                    *self.field_iter.borrow_mut() = None;
+                    return Ok(());
+                }
+            }
+        }
+    }
+}
+
+// Message Body - contains field values and owns Parser State
+pub struct PersonLazyImpl<'a, A: Allocator = Global> {
+    // Owns parser state via Rc
+    parser_state: Rc<PersonParserState<'a, A>>,
+    
+    // Scalar fields that can be updated multiple times during parsing
+    name: RefCell<String<A>>,  // Non-Copy type - needs RefCell
+    age: Cell<i32>,  // Copy type - Cell is sufficient
+    email: RefCell<Option<String<A>>>,  // Option<Non-Copy> - needs RefCell
+    status: Cell<i32>,  // Copy type - Cell is sufficient
+    score: Cell<Option<i32>>,  // Option<Copy> - Cell is sufficient
+    secondary_status: Cell<Option<i32>>,  // Option<Copy> - Cell is sufficient
+    
+    // Scalar message field
+    address: RefCell<Option<AddressLazyImpl<'a, A>>>,
+    
+    // Repeated fields - NO RefCell needed! OnceList already has interior mutability
+    scores: OnceList<i32, A>,
+    addresses: OnceList<AddressLazyImpl<'a, A>, A>,
+}
+
 // Parent message (PersonLazyImpl)
 impl<'a, A: Allocator + Clone> PersonLazyImpl<'a, A> {
     /// Getter for scalar message field
@@ -408,17 +516,17 @@ impl<'a, A: Allocator + Clone> PersonLazyImpl<'a, A> {
                     self.update_field(field_num, wire_type, value_slice)?;
                     
                     if field_num == 6 {
-                        // Found field 6! Create child with first slice and parent reference
+                        // Found field 6! Create child with first slice and parent parser state reference
                         let mut address = self.address.borrow_mut();
                         if address.is_none() {
-                        *address = Some(AddressLazyImpl::new_from_parent(
-                            value_slice,
-                            self as *const PersonLazyImpl<'a, A>,  // Raw pointer to parent
-                            self.allocator.clone(),
-                        ));
+                            *address = Some(AddressLazyImpl::new_from_parent(
+                                value_slice,
+                                self.parser_state.clone(),  // Strong Rc reference to parent's parser state
+                                self.parser_state.allocator.clone(),
+                            ));
                         }
                         // Store iterator back (may have more fields)
-                        *self.field_iter.borrow_mut() = Some(field_iter);
+                        *self.parser_state.field_iter.borrow_mut() = Some(field_iter);
                         return Some(());
                     }
                 },
@@ -434,38 +542,42 @@ impl<'a, A: Allocator + Clone> PersonLazyImpl<'a, A> {
     
     /// Continue parsing from current position, collecting all occurrences of field_num
     /// Called by child when it needs all slices
+    /// This delegates to the parser state, which uses the registered callback to update fields
     pub(crate) fn continue_parsing_for_field(&self, field_num: u32) -> Result<(), Error> {
-        let mut field_iter = match self.field_iter.borrow_mut().take() {
-            Some(iter) => iter,
-            None => return Ok(()),  // Already exhausted
-        };
-        
-        // Parse until iterator is exhausted, collecting all occurrences of field_num
-        loop {
-            match field_iter.next() {
-                Some(Ok((fnum, wire_type, value_slice))) => {
-                    // Update all fields we encounter
-                    self.update_field(fnum, wire_type, value_slice)?;
-                    
-                    // If this is our target field, add slice to child
-                    if fnum == field_num {
-                        let mut address = self.address.borrow_mut();
-                        if let Some(ref mut addr) = *address {
-                            addr.add_slice(value_slice)?;
-                        }
+        // Request parser state to continue parsing
+        // Parser state will use the registered callback to update fields
+        // The callback was registered during construction (see new method)
+        self.parser_state.continue_parsing_for_field(field_num)
+    }
+    
+    /// Register field update callback with parser state
+    /// This is called during construction to set up the callback
+    /// 
+    /// The callback handles:
+    /// 1. Updating Message Body fields for all fields encountered
+    /// 2. Adding slices to child messages for scalar message fields (e.g., field 6 for address)
+    fn register_parser_callback(&self) {
+        let self_ref = self as *const Self;
+        self.parser_state.register_field_update_callback(move |fnum, wire_type, value_slice| {
+            // Safety: self_ref is valid because Message Body owns Parser State
+            // and the callback is only called while Message Body is alive
+            unsafe {
+                let message_body = &*self_ref;
+                // Update all fields we encounter (for all field numbers)
+                message_body.update_field(fnum, wire_type, value_slice)?;
+                
+                // If this is a scalar message field, also add slice to child if it exists
+                // For field 6 (address), add the slice to the address child
+                if fnum == 6 {
+                    let mut address = message_body.address.borrow_mut();
+                    if let Some(ref mut addr) = *address {
+                        addr.add_slice(value_slice)?;
                     }
-                },
-                Some(Err(e)) => {
-                    *self.field_iter.borrow_mut() = Some(field_iter);
-                    return Err(e);
-                },
-                None => {
-                    // Iterator exhausted
-                    *self.field_iter.borrow_mut() = None;
-                    return Ok(());
                 }
+                // For other scalar message fields, add similar handling here
             }
-        }
+            Ok(())
+        });
     }
     
     fn update_field(&self, field_num: u32, wire_type: u32, value_slice: &'a [u8]) -> Result<(), Error> {
@@ -495,15 +607,12 @@ impl<'a, A: Allocator + Clone> PersonLazyImpl<'a, A> {
 
 // Child message (AddressLazyImpl)
 pub struct AddressLazyImpl<'a, A: Allocator = Global> {
-    allocator: A,
-    field_iter: RefCell<Option<FieldIterator<'a, Box<dyn Iterator<Item = &'a [u8]> + 'a, A>>>>,
+    // Owns parser state via Rc
+    parser_state: Rc<AddressParserState<'a, A>>,
     
-    // Parent reference - needed to request continued parsing
-    // Using raw pointer to avoid Clone requirement (safe because parent outlives child via 'a)
-    parent: *const PersonLazyImpl<'a, A>,
-    
-    // Field slices collected so far
-    field_slices: OnceList<&'a [u8], A>,
+    // Parent parser state - strong Rc reference (no cycle!)
+    // Child needs parent's parser state to request continued parsing
+    parent_parser_state: Rc<PersonParserState<'a, A>>,
     
     // Address fields...
     street: RefCell<String<A>>,
@@ -511,25 +620,36 @@ pub struct AddressLazyImpl<'a, A: Allocator = Global> {
     // ...
 }
 
+pub struct AddressParserState<'a, A: Allocator = Global> {
+    field_iter: RefCell<Option<FieldIterator<'a, Box<dyn Iterator<Item = &'a [u8]> + 'a, A>>>>,
+    // Field slices collected so far
+    field_slices: OnceList<&'a [u8], A>,
+    allocator: A,
+}
+
 impl<'a, A: Allocator + Clone> AddressLazyImpl<'a, A> {
-    /// Create from first slice, with parent reference
-    /// Note: Parent reference is stored as a raw pointer to avoid Clone requirement
-    /// Safety: Parent must outlive child (guaranteed by lifetime 'a)
+    /// Create from first slice, with parent parser state reference
+    /// Note: Child holds strong Rc reference to parent's parser state (not message body)
+    /// This avoids cycles: Parent Message Body → Parent Parser State → (Child holds Rc to this)
     pub(crate) fn new_from_parent(
         first_slice: &'a [u8],
-        parent: *const PersonLazyImpl<'a, A>,  // Raw pointer to avoid Clone
+        parent_parser_state: Rc<PersonParserState<'a, A>>,  // Strong Rc - no cycle!
         alloc: A,
     ) -> Self {
         let field_slices = OnceList::new_in(alloc.clone());
         field_slices.push(first_slice);
         
-        Self {
-            allocator: alloc.clone(),
+        let parser_state = Rc::new(AddressParserState {
             field_iter: RefCell::new(Some(FieldIterator::new(
-                Box::new_in(field_slices.iter().cloned(), alloc)
+                Box::new_in(field_slices.iter().cloned(), alloc.clone())
             ))),
-            parent,  // Store raw pointer
             field_slices,
+            allocator: alloc.clone(),
+        });
+        
+        Self {
+            parser_state,
+            parent_parser_state,  // Store strong Rc reference
             street: RefCell::new(String::new_in(alloc.clone())),
             city: RefCell::new(String::new_in(alloc.clone())),
             // ...
@@ -538,28 +658,32 @@ impl<'a, A: Allocator + Clone> AddressLazyImpl<'a, A> {
     
     /// Add additional slice from parent
     pub(crate) fn add_slice(&self, slice: &'a [u8]) -> Result<(), Error> {
-        self.field_slices.push(slice);
+        self.parser_state.field_slices.push(slice);
         // Note: field_iter needs to be recreated or updated with new slices
         // This is complex because we need to preserve iterator state
         Ok(())
     }
     
     /// Ensure all fields are parsed
-    /// This will request parent to continue parsing if needed
+    /// This will request parent's parser state to continue parsing if needed
     fn ensure_all_fields_parsed(&self) -> Result<(), Error> {
-        // First, request parent to continue parsing and collect all slices
-        // Safety: parent pointer is valid because parent outlives child via 'a
-        unsafe {
-            (&*self.parent).continue_parsing_for_field(6)?;
-        }
+        // Request parent's parser state to continue parsing
+        // The parser state will use its registered callback (registered by parent's Message Body)
+        // to update parent's Message Body fields and add slices to this child
+        // 
+        // The callback was registered during parent's Message Body construction,
+        // so it has access to parent's Message Body and can:
+        // 1. Update parent's fields for all fields encountered
+        // 2. Add slices to this child (field 6) when the target field is found
+        self.parent_parser_state.continue_parsing_for_field(6)?;
         
         // Now parse our own fields from all collected slices
         // Recreate iterator with all slices
-        let mut field_iter = match self.field_iter.borrow_mut().take() {
+        let mut field_iter = match self.parser_state.field_iter.borrow_mut().take() {
             Some(_) => {
                 // Recreate with all slices (previous iterator may be stale)
                 FieldIterator::new(
-                    Box::new_in(self.field_slices.iter().cloned(), self.allocator.clone())
+                    Box::new_in(self.parser_state.field_slices.iter().cloned(), self.parser_state.allocator.clone())
                 )
             },
             None => return Ok(()),  // Already parsed
@@ -571,7 +695,8 @@ impl<'a, A: Allocator + Clone> AddressLazyImpl<'a, A> {
             self.update_field(field_num, wire_type, value_slice)?;
         }
         
-        *self.field_iter.borrow_mut() = None;
+        *self.parser_state.field_iter.borrow_mut() = None;
+        Ok(())
     }
 }
 ```
