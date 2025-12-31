@@ -6,11 +6,9 @@
 //!
 //! This code is (supposed to be) generated from `sandbox/protos/person.proto`.
 
-use ::allocator_api2::boxed::Box as AllocBox;
-use ::allocator_api2::unsize_box;
+use super::lazy_parser::{FieldIterator, MessageParserState, parse_varint};
 use ::allocator_api2::vec::Vec as AllocVec;
 use ::allocator_extras::{Allocator, Global};
-use once_list2::OnceList;
 use puroro::{
     Message,
     error::Error,
@@ -18,16 +16,15 @@ use puroro::{
         ExplicitOptional, FieldOperations, FieldStorage, ImplicitOptional, MessageFieldWrapper,
         SingularMessage, StringFieldWrapper,
     },
-    repeated::{OnceListRepeatedMap, RefVec, RefVecMap, Repeated, repeated_from_slice},
+    repeated::{RefVec, RefVecMap, Repeated, repeated_from_slice},
     shared::SharedFields,
     view::ViewCow,
 };
-use std::cell::OnceCell;
+use std::cell::{Cell, RefCell};
+use std::rc::{Rc, Weak};
 
 // Import Address-related types from the separate module
-pub use super::address::{
-    Address, AddressImpl, AddressLazyImpl, AddressMut, DynAddress, DynAddressMut,
-};
+pub use super::address::{Address, AddressImpl, AddressMut, DynAddress, DynAddressMut};
 
 /// Flexible view trait for Person message (not dyn-compatible).
 ///
@@ -455,305 +452,132 @@ impl<A: Allocator + Clone> Message for PersonImpl<A> {
 }
 
 // ============================================================================
-// PersonLazyImpl Structure
+// PersonLazyImpl Structure (Lazy Implementation - Phase 1: age field only)
 // ============================================================================
 
 /// Lazy implementation of Person message that deserializes fields on-demand.
 ///
-/// This struct holds a list of slices representing all occurrences of the field
-/// (for top-level messages, typically just one slice; for nested scalar message fields,
-/// all occurrences must be collected to merge them).
-/// Fields are deserialized only when they are accessed, with results cached for subsequent accesses.
-/// Unlike `PersonImpl`, this struct is immutable and does not implement mutable traits.
-#[derive(Debug)]
-#[allow(dead_code)] // field_slices and allocator are used in deserialization functions (stubs)
+/// Phase 1: Only age field (field 2) is implemented.
+/// Other fields will be added in subsequent phases.
 pub struct PersonLazyImpl<'a, A: Allocator = Global> {
-    /// List of slices, each representing one occurrence of this message field in the wire format.
-    /// For top-level messages, typically contains a single slice.
-    /// For scalar message fields, all occurrences must be collected (merged) when parsing.
-    /// Each slice points to the raw protobuf bytes for one occurrence.
-    field_slices: OnceList<&'a [u8], A>,
-    /// Allocator for future use
-    allocator: A,
+    /// Owns parser state via Rc<RefCell<...>> - State itself is mutable
+    parser_state: Rc<RefCell<MessageParserState<'a, A>>>,
 
-    // Cache fields (no `cached_` prefix as per design)
-    /// Field 1: name (implicit presence string field)
-    name: OnceCell<String>,
     /// Field 2: age (implicit presence varint field)
-    age: OnceCell<i32>,
-    /// Field 3: email (explicit presence string field)
-    email: OnceCell<String>,
-    /// Field 4: status (enum field, stored as i32)
-    status: OnceCell<i32>,
-    /// Field 5: score (explicit presence scalar field)
-    score: OnceCell<i32>,
-    /// Field 6: address (message field)
-    address: OnceCell<AddressLazyImpl<'a, A>>,
-    /// Field 8: secondary_status (explicit presence enum field, stored as i32)
-    secondary_status: OnceCell<i32>,
-    /// Field 10: scores (repeated scalar field)
-    scores: OnceList<i32, A>,
-    /// Field 9: addresses (repeated message field)
-    addresses: OnceList<AddressLazyImpl<'a, A>, A>,
+    /// Copy type - Cell is sufficient
+    age: Cell<i32>,
 }
 
-impl<'a, A> PersonLazyImpl<'a, A>
-where
-    A: Allocator + Clone,
-{
-    /// Creates a new PersonLazyImpl from a single slice.
-    /// For top-level messages, this is the typical case.
-    pub fn new(slice: &'a [u8], alloc: A) -> Self {
+impl<'a, A: Allocator + Clone + 'a> PersonLazyImpl<'a, A> {
+    /// Create a new PersonLazyImpl from a single slice (for top-level messages)
+    /// Returns Rc<Self> - all methods use self: &Rc<Self>
+    pub fn new(slice: &'a [u8], alloc: A) -> Rc<Self> {
+        // Clone alloc before moving into closure
         let alloc_clone = alloc.clone();
-        let field_slices = OnceList::new_in(alloc_clone.clone());
-        field_slices.push(slice);
-        Self {
-            field_slices,
-            allocator: alloc,
-            name: OnceCell::new(),
-            age: OnceCell::new(),
-            email: OnceCell::new(),
-            status: OnceCell::new(),
-            score: OnceCell::new(),
-            address: OnceCell::new(),
-            secondary_status: OnceCell::new(),
-            scores: OnceList::new_in(alloc_clone.clone()),
-            addresses: OnceList::new_in(alloc_clone),
-        }
-    }
+        // Use Rc::new_cyclic to create PersonLazyImpl with MessageParserState that has callback
+        Rc::new_cyclic(move |weak: &Weak<Self>| {
+            let message_body_weak = weak.clone();
 
-    /// Creates a new PersonLazyImpl from multiple slices.
-    /// For scalar message fields that need to collect all occurrences.
-    pub fn new_from_slices(slices: impl Iterator<Item = &'a [u8]>, alloc: A) -> Self {
-        let alloc_clone = alloc.clone();
-        let field_slices = OnceList::new_in(alloc_clone.clone());
-        for slice in slices {
-            field_slices.push(slice);
-        }
-        Self {
-            field_slices,
-            allocator: alloc,
-            name: OnceCell::new(),
-            age: OnceCell::new(),
-            email: OnceCell::new(),
-            status: OnceCell::new(),
-            score: OnceCell::new(),
-            address: OnceCell::new(),
-            secondary_status: OnceCell::new(),
-            scores: OnceList::new_in(alloc_clone.clone()),
-            addresses: OnceList::new_in(alloc_clone),
-        }
-    }
-}
+            // Create initial callback that only handles Message Body (when it's alive)
+            // This callback will be replaced in Drop::drop with one that handles child messages
+            let callback: std::boxed::Box<dyn FnMut(u32, u32, &'a [u8]) -> Result<(), Error> + 'a> =
+                std::boxed::Box::new(
+                    move |fnum: u32, wire_type: u32, value_slice: &'a [u8]| -> Result<(), Error> {
+                        // Update via Message Body (should always succeed when this callback is active)
+                        if let Some(message_body) = message_body_weak.upgrade() {
+                            let _ = message_body.update_field(fnum, wire_type, value_slice);
+                        }
+                        Ok(())
+                    },
+                );
 
-impl<'a> PersonLazyImpl<'a, Global> {
-    /// Creates a new PersonLazyImpl using the global allocator.
-    pub fn new_global(slice: &'a [u8]) -> Self {
-        Self::new(slice, Global)
-    }
+            // Create parser state with initial callback
+            // Use std::boxed::Box to match FieldIterator's expected type
+            let field_iter: std::boxed::Box<dyn Iterator<Item = &'a [u8]> + 'a> =
+                std::boxed::Box::new(std::iter::once(slice));
+            let parser_state = Rc::new(RefCell::new(MessageParserState {
+                field_iter: Some(FieldIterator::new(field_iter)),
+                allocator: alloc_clone.clone(),
+                field_update_callback: Some(callback),
+            }));
 
-    /// Creates a new PersonLazyImpl from multiple slices using the global allocator.
-    pub fn new_from_slices_global(slices: impl Iterator<Item = &'a [u8]>) -> Self {
-        Self::new_from_slices(slices, Global)
-    }
-}
-
-impl<'a, A> PersonLazyImpl<'a, A>
-where
-    A: Allocator + Clone,
-{
-    // Deserialization helper functions (stub implementations)
-
-    /// Deserialize field 1 (name) from field_slices.
-    /// Must iterate over all slices to find the last occurrence (scalar fields can be overwritten).
-    fn deserialize_field_1_name(&self) -> String {
-        todo!(
-            "Deserialize field 1 (name) by iterating over self.field_slices to find last occurrence"
-        )
-    }
-
-    /// Deserialize field 2 (age) from field_slices.
-    /// Must iterate over all slices to find the last occurrence (scalar fields can be overwritten).
-    fn deserialize_field_2_age(&self) -> i32 {
-        todo!(
-            "Deserialize field 2 (age) by iterating over self.field_slices to find last occurrence"
-        )
-    }
-
-    /// Deserialize field 3 (email) from field_slices.
-    /// Must iterate over all slices to find the last occurrence (scalar fields can be overwritten).
-    fn deserialize_field_3_email(&self) -> String {
-        todo!(
-            "Deserialize field 3 (email) by iterating over self.field_slices to find last occurrence"
-        )
-    }
-
-    /// Deserialize field 4 (status) from field_slices.
-    /// Must iterate over all slices to find the last occurrence (scalar fields can be overwritten).
-    fn deserialize_field_4_status(&self) -> i32 {
-        todo!(
-            "Deserialize field 4 (status) by iterating over self.field_slices to find last occurrence"
-        )
-    }
-
-    /// Deserialize field 5 (score) from field_slices.
-    /// Must iterate over all slices to find the last occurrence (scalar fields can be overwritten).
-    fn deserialize_field_5_score(&self) -> i32 {
-        todo!(
-            "Deserialize field 5 (score) by iterating over self.field_slices to find last occurrence"
-        )
-    }
-
-    /// Deserialize field 6 (address) from field_slices.
-    /// Collects all occurrences of field 6 and creates AddressLazyImpl with the slices.
-    /// This avoids allocating a merged buffer - slices are stored directly.
-    fn deserialize_field_6_address(&self) -> AddressLazyImpl<'a, A> {
-        todo!(
-            "Collect all occurrences of field 6 by iterating over self.field_slices and create AddressLazyImpl::new_from_slices with those slices"
-        )
-    }
-
-    /// Deserialize field 8 (secondary_status) from field_slices.
-    /// Must iterate over all slices to find the last occurrence (scalar fields can be overwritten).
-    fn deserialize_field_8_secondary_status(&self) -> i32 {
-        todo!(
-            "Deserialize field 8 (secondary_status) by iterating over self.field_slices to find last occurrence"
-        )
-    }
-
-    /// Deserialize field 10 (scores) from field_slices and populate OnceList.
-    /// Can stop after finding the required number of items (lazy parsing for repeated fields).
-    fn deserialize_field_10_scores(&self) {
-        todo!(
-            "Deserialize field 10 (scores) by iterating over self.field_slices and push each score to self.scores"
-        )
-    }
-
-    /// Deserialize field 9 (addresses) from field_slices and populate OnceList.
-    /// Each address occurrence creates an AddressLazyImpl from its slice (no merging needed for repeated fields).
-    fn deserialize_field_9_addresses(&self) {
-        todo!(
-            "Deserialize field 9 (addresses) by iterating over self.field_slices, create AddressLazyImpl::new(slice) for each occurrence, and push to self.addresses"
-        )
-    }
-}
-
-impl<'a, A: Allocator + Clone> Person for PersonLazyImpl<'a, A> {
-    fn address(&self) -> impl Address + use<'a, '_, A> {
-        self.address
-            .get_or_init(|| self.deserialize_field_6_address())
-    }
-
-    fn scores(&self) -> impl Repeated<'_, Item = i32> + use<'a, '_, A> {
-        // Ensure scores are deserialized on first access
-        if self.scores.iter().next().is_none() {
-            self.deserialize_field_10_scores();
-        }
-        // OnceList implements Repeated directly
-        &self.scores
-    }
-
-    fn addresses(&self) -> impl Repeated<'_, Item = impl Address + '_> + use<'a, '_, A> {
-        // Ensure addresses are deserialized on first access
-        if self.addresses.iter().next().is_none() {
-            self.deserialize_field_9_addresses();
-        }
-        // Create adapter for OnceList iterator
-        OnceListRepeatedMap::new(&self.addresses, |addr: &AddressLazyImpl<'a, A>| addr)
-    }
-}
-
-impl<'a, A: Allocator + Clone> DynPerson for PersonLazyImpl<'a, A> {
-    fn name(&self) -> &str {
-        self.name.get_or_init(|| self.deserialize_field_1_name())
-    }
-
-    fn age(&self) -> i32 {
-        *self.age.get_or_init(|| self.deserialize_field_2_age())
-    }
-
-    fn email(&self) -> Option<&str> {
-        // For explicit optional fields, we need to check presence
-        // For now, return Some if the field is not empty after deserialization
-        let email_str = self.email.get_or_init(|| self.deserialize_field_3_email());
-        if email_str.is_empty() {
-            None
-        } else {
-            Some(email_str.as_str())
-        }
-    }
-
-    fn score(&self) -> Option<i32> {
-        // For explicit optional fields, check presence
-        // For now, always return Some (presence check needs proper implementation)
-        Some(*self.score.get_or_init(|| self.deserialize_field_5_score()))
-    }
-
-    fn status(&self) -> Result<Status, i32> {
-        let wire_value = *self
-            .status
-            .get_or_init(|| self.deserialize_field_4_status());
-        Status::from_wire(wire_value)
-    }
-
-    fn secondary_status(&self) -> Result<Option<Status>, i32> {
-        let wire_value = *self
-            .secondary_status
-            .get_or_init(|| self.deserialize_field_8_secondary_status());
-        // For now, assume presence if value is not 0 (needs proper implementation)
-        if wire_value != 0 {
-            match Status::from_wire(wire_value) {
-                Ok(status) => Ok(Some(status)),
-                Err(unknown) => Err(unknown),
+            // Create message body
+            Self {
+                parser_state: parser_state.clone(),
+                // Initialize fields with default values
+                age: Cell::new(0),
             }
-        } else {
-            Ok(None)
+        })
+    }
+
+    /// Getter for age field
+    /// Returns the final confirmed value after parsing is complete
+    pub fn age(self: &Rc<Self>) -> i32 {
+        // Ensure all fields are parsed before returning value
+        let _ = self.ensure_all_fields_parsed();
+        self.age.get() // Cell - returns Copy value (final confirmed)
+    }
+
+    /// Ensure all fields are parsed
+    /// Parses until iterator is exhausted, updating all fields
+    fn ensure_all_fields_parsed(self: &Rc<Self>) -> Result<(), Error> {
+        // Check if iterator still exists (not yet consumed/parsed)
+        let mut parser_state = self.parser_state.borrow_mut();
+        let mut field_iter = match parser_state.field_iter.take() {
+            Some(iter) => iter,
+            None => return Ok(()), // Already parsed completely - values are confirmed
+        };
+
+        // Parse until iterator is exhausted
+        // During this process, fields may be updated multiple times (intermediate values)
+        loop {
+            match field_iter.next() {
+                Some(Ok((field_num, wire_type, value_slice))) => {
+                    drop(parser_state); // Release borrow before calling update_field
+                    self.update_field(field_num, wire_type, value_slice)?;
+                    parser_state = self.parser_state.borrow_mut(); // Re-borrow for next iteration
+                }
+                Some(Err(e)) => {
+                    // Store iterator back before returning error
+                    parser_state.field_iter = Some(field_iter);
+                    return Err(e);
+                }
+                None => {
+                    // Iterator exhausted - store None to indicate parsing is complete
+                    // All field values are now final and confirmed
+                    parser_state.field_iter = None;
+                    return Ok(());
+                }
+            }
         }
     }
 
-    fn address(&self) -> Option<ViewCow<'_, dyn DynAddress>> {
-        let addr = self
-            .address
-            .get_or_init(|| self.deserialize_field_6_address());
-        Some(ViewCow::Borrowed(addr as &dyn DynAddress))
-    }
-
-    fn scores(&self) -> ViewCow<'_, dyn Repeated<'_, Item = i32>> {
-        // Ensure scores are deserialized on first access
-        if self.scores.iter().next().is_none() {
-            self.deserialize_field_10_scores();
+    /// Update a field with parsed value
+    /// Called during parsing to update field values
+    fn update_field(
+        self: &Rc<Self>,
+        field_num: u32,
+        _wire_type: u32,
+        value_slice: &'a [u8],
+    ) -> Result<(), Error> {
+        match field_num {
+            2 => {
+                // age field - varint
+                let age_value = parse_varint(value_slice)?;
+                self.age.set(age_value);
+            }
+            // Other fields will be added in subsequent phases
+            _ => {
+                // Unknown field - ignore
+            }
         }
-        // OnceList implements Repeated directly
-        let boxed = AllocBox::new_in(&self.scores, Global);
-        let boxed_dyn: AllocBox<dyn Repeated<'_, Item = i32> + '_, Global> = unsize_box!(boxed);
-        ViewCow::Owned(boxed_dyn)
-    }
-
-    fn addresses<'a2: 'b, 'b>(
-        &'a2 self,
-    ) -> ViewCow<'a2, dyn Repeated<'a2, Item = ViewCow<'b, dyn DynAddress>> + 'b> {
-        // Ensure addresses are deserialized on first access
-        if self.addresses.iter().next().is_none() {
-            self.deserialize_field_9_addresses();
-        }
-        // Create adapter for OnceList iterator
-        let adapter = OnceListRepeatedMap::new(&self.addresses, |addr: &AddressLazyImpl<'a, A>| {
-            ViewCow::Borrowed(addr as &dyn DynAddress)
-        });
-        let boxed = AllocBox::new_in(adapter, Global);
-        let boxed_dyn: AllocBox<
-            dyn Repeated<'a2, Item = ViewCow<'b, dyn DynAddress>> + 'b,
-            Global,
-        > = unsize_box!(boxed);
-        ViewCow::Owned(boxed_dyn)
-    }
-
-    fn has_name(&self) -> bool {
-        // Check if name field is present (non-empty string indicates presence for implicit optional)
-        let name = self.name.get_or_init(|| self.deserialize_field_1_name());
-        !name.is_empty()
+        Ok(())
     }
 }
+
+// ============================================================================
+// Tests
+// ============================================================================
 
 // ============================================================================
 // Tests
@@ -762,11 +586,9 @@ impl<'a, A: Allocator + Clone> DynPerson for PersonLazyImpl<'a, A> {
 #[cfg(test)]
 mod tests {
     use super::{
-        Address, AddressImpl, AddressLazyImpl, DynAddress, DynAddressMut, DynPerson, DynPersonMut,
-        MessageFieldWrapper, Person, PersonImpl, PersonLazyImpl, PersonMut, Status,
-        StringFieldWrapper,
+        AddressImpl, DynAddress, DynAddressMut, DynPerson, DynPersonMut, MessageFieldWrapper,
+        Person, PersonImpl, PersonMut, Status, StringFieldWrapper,
     };
-    use ::allocator_extras::Global;
 
     #[test]
     fn test_message_fields() {
@@ -883,233 +705,5 @@ mod tests {
         }
         PersonMut::clear_addresses(&mut person);
         assert!(DynPerson::addresses(&person).is_empty());
-    }
-
-    // ========================================================================
-    // Lazy Implementation Tests
-    // ========================================================================
-
-    #[test]
-    fn test_person_lazy_constructors() {
-        let bytes = b"test bytes";
-
-        // Test new with borrowed slice
-        let _person_lazy = PersonLazyImpl::new(bytes, Global);
-
-        // Test new_from_slices with multiple slices
-        let slice1 = b"first slice";
-        let slice2 = b"second slice";
-        let _person_lazy_slices =
-            PersonLazyImpl::new_from_slices([slice1, slice2].into_iter(), Global);
-
-        // Test new_global
-        let _person_lazy_global = PersonLazyImpl::new_global(bytes);
-
-        // Test new_from_slices_global
-        let _person_lazy_slices_global =
-            PersonLazyImpl::new_from_slices_global([slice1, slice2].into_iter());
-    }
-
-    #[test]
-    #[should_panic(expected = "Deserialize field 1 (name)")]
-    fn test_person_lazy_name_access() {
-        let bytes = b"test";
-        let person_lazy = PersonLazyImpl::new_global(bytes);
-        // This will panic because deserialization is not implemented yet
-        let _name = DynPerson::name(&person_lazy);
-    }
-
-    #[test]
-    #[should_panic(expected = "Deserialize field 2 (age)")]
-    fn test_person_lazy_age_access() {
-        let bytes = b"test";
-        let person_lazy = PersonLazyImpl::new_global(bytes);
-        // This will panic because deserialization is not implemented yet
-        let _age = DynPerson::age(&person_lazy);
-    }
-
-    #[test]
-    #[should_panic(expected = "Deserialize field 3 (email)")]
-    fn test_person_lazy_email_access() {
-        let bytes = b"test";
-        let person_lazy = PersonLazyImpl::new_global(bytes);
-        // This will panic because deserialization is not implemented yet
-        let _email = DynPerson::email(&person_lazy);
-    }
-
-    #[test]
-    #[should_panic(expected = "Deserialize field 4 (status)")]
-    fn test_person_lazy_status_access() {
-        let bytes = b"test";
-        let person_lazy = PersonLazyImpl::new_global(bytes);
-        // This will panic because deserialization is not implemented yet
-        let _status = DynPerson::status(&person_lazy);
-    }
-
-    #[test]
-    #[should_panic(expected = "Deserialize field 5 (score)")]
-    fn test_person_lazy_score_access() {
-        let bytes = b"test";
-        let person_lazy = PersonLazyImpl::new_global(bytes);
-        // This will panic because deserialization is not implemented yet
-        let _score = DynPerson::score(&person_lazy);
-    }
-
-    #[test]
-    #[should_panic(expected = "Deserialize field 8 (secondary_status)")]
-    fn test_person_lazy_secondary_status_access() {
-        let bytes = b"test";
-        let person_lazy = PersonLazyImpl::new_global(bytes);
-        // This will panic because deserialization is not implemented yet
-        let _secondary_status = DynPerson::secondary_status(&person_lazy);
-    }
-
-    #[test]
-    #[should_panic(expected = "Deserialize field 6 (address)")]
-    fn test_person_lazy_address_access() {
-        let bytes = b"test";
-        let person_lazy = PersonLazyImpl::new_global(bytes);
-        // This will panic because deserialization is not implemented yet
-        let _address = Person::address(&person_lazy);
-    }
-
-    #[test]
-    #[should_panic(expected = "Deserialize field 6 (address)")]
-    fn test_person_lazy_address_dyn_access() {
-        let bytes = b"test";
-        let person_lazy = PersonLazyImpl::new_global(bytes);
-        // This will panic because deserialization is not implemented yet
-        let _address = DynPerson::address(&person_lazy);
-    }
-
-    #[test]
-    #[should_panic(expected = "Deserialize field 10 (scores)")]
-    fn test_person_lazy_scores_access() {
-        let bytes = b"test";
-        let person_lazy = PersonLazyImpl::new_global(bytes);
-        // This will panic because deserialization is not implemented yet
-        let _scores = Person::scores(&person_lazy);
-    }
-
-    #[test]
-    #[should_panic(expected = "Deserialize field 10 (scores)")]
-    fn test_person_lazy_scores_dyn_access() {
-        let bytes = b"test";
-        let person_lazy = PersonLazyImpl::new_global(bytes);
-        // This will panic because deserialization is not implemented yet
-        let _scores = DynPerson::scores(&person_lazy);
-    }
-
-    #[test]
-    #[should_panic(expected = "Deserialize field 9 (addresses)")]
-    fn test_person_lazy_addresses_access() {
-        let bytes = b"test";
-        let person_lazy = PersonLazyImpl::new_global(bytes);
-        // This will panic because deserialization is not implemented yet
-        let _addresses = Person::addresses(&person_lazy);
-    }
-
-    #[test]
-    #[should_panic(expected = "Deserialize field 9 (addresses)")]
-    fn test_person_lazy_addresses_dyn_access() {
-        let bytes = b"test";
-        let person_lazy = PersonLazyImpl::new_global(bytes);
-        // This will panic because deserialization is not implemented yet
-        let _addresses = DynPerson::addresses(&person_lazy);
-    }
-
-    #[test]
-    fn test_address_lazy_constructors() {
-        let bytes = b"test address bytes";
-
-        // Test new with borrowed slice
-        let _address_lazy = AddressLazyImpl::new(bytes, Global);
-
-        // Test new_from_slices with multiple slices (for scalar message fields)
-        let slice1 = b"first slice";
-        let slice2 = b"second slice";
-        let _address_lazy_slices =
-            AddressLazyImpl::new_from_slices([slice1, slice2].into_iter(), Global);
-
-        // Test new_global
-        let _address_lazy_global = AddressLazyImpl::new_global(bytes);
-
-        // Test new_from_slices_global
-        let _address_lazy_slices_global =
-            AddressLazyImpl::new_from_slices_global([slice1, slice2].into_iter());
-    }
-
-    #[test]
-    #[should_panic(expected = "Deserialize field 1 (street)")]
-    fn test_address_lazy_street_access() {
-        let bytes = b"test";
-        let address_lazy = AddressLazyImpl::new_global(bytes);
-        // This will panic because deserialization is not implemented yet
-        let _street = DynAddress::street(&address_lazy);
-    }
-
-    #[test]
-    #[should_panic(expected = "Deserialize field 2 (city)")]
-    fn test_address_lazy_city_access() {
-        let bytes = b"test";
-        let address_lazy = AddressLazyImpl::new_global(bytes);
-        // This will panic because deserialization is not implemented yet
-        let _city = DynAddress::city(&address_lazy);
-    }
-
-    #[test]
-    #[should_panic(expected = "Deserialize field 3 (zip_code)")]
-    fn test_address_lazy_zip_code_access() {
-        let bytes = b"test";
-        let address_lazy = AddressLazyImpl::new_global(bytes);
-        // This will panic because deserialization is not implemented yet
-        let _zip_code = DynAddress::zip_code(&address_lazy);
-    }
-
-    #[test]
-    fn test_person_lazy_implements_person_trait() {
-        let bytes = b"test";
-        let person_lazy = PersonLazyImpl::new_global(bytes);
-        // Verify that PersonLazyImpl implements Person trait
-        // Person trait is not dyn-compatible, but we can use it directly
-        // This is a compile-time check - if this compiles, the trait is implemented
-        fn _check_person_impl<T: Person>(_: &T) {}
-        _check_person_impl(&person_lazy);
-    }
-
-    #[test]
-    fn test_person_lazy_implements_dyn_person_trait() {
-        let bytes = b"test";
-        let person_lazy = PersonLazyImpl::new_global(bytes);
-        // Verify that PersonLazyImpl implements DynPerson trait
-        // This is a compile-time check, so if this compiles, the trait is implemented
-        let _: &dyn DynPerson = &person_lazy as &dyn DynPerson;
-    }
-
-    #[test]
-    fn test_address_lazy_implements_address_trait() {
-        let bytes = b"test";
-        let address_lazy = AddressLazyImpl::new_global(bytes);
-        // Verify that AddressLazyImpl implements Address trait
-        // This is a compile-time check, so if this compiles, the trait is implemented
-        let _: &dyn Address = &address_lazy as &dyn Address;
-    }
-
-    #[test]
-    fn test_address_lazy_implements_dyn_address_trait() {
-        let bytes = b"test";
-        let address_lazy = AddressLazyImpl::new_global(bytes);
-        // Verify that AddressLazyImpl implements DynAddress trait
-        // This is a compile-time check, so if this compiles, the trait is implemented
-        let _: &dyn DynAddress = &address_lazy as &dyn DynAddress;
-    }
-
-    #[test]
-    #[should_panic(expected = "Deserialize field 1 (name)")]
-    fn test_person_lazy_has_name_check() {
-        let bytes = b"test";
-        let person_lazy = PersonLazyImpl::new_global(bytes);
-        // This will panic because deserialization is not implemented yet
-        let _has_name = DynPerson::has_name(&person_lazy);
     }
 }
