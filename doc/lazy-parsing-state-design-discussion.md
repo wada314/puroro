@@ -134,6 +134,209 @@ Instead of using raw pointers with lifetime parameters, we can use an Arena appr
 - Child → Parent: `Weak` (breaks cycle: Parent → Child → Parent would be a cycle)
 - Messages → Arena: Strong `Rc` (messages keep arena alive, no cycle because Arena doesn't hold messages)
 
+### Detailed Arena Approach Implementation
+
+**Design**: Messages hold strong references to Arena, Arena only owns the allocator.
+
+```rust
+struct MessageArena<A: Allocator = Global> {
+    // Arena only owns the allocator
+    // Messages are NOT stored in arena (no circular dependency)
+    allocator: A,
+}
+
+struct PersonLazyImpl<A: Allocator = Global> {
+    allocator: A,
+    // Strong reference to arena (no Weak needed - no cycle!)
+    arena: Rc<MessageArena<A>>,
+    // Child message - created on-demand, using Rc
+    address: RefCell<Option<Rc<AddressLazyImpl<A>, A>>>,
+    // Field iterator for lazy parsing
+    field_iter: RefCell<Option<FieldIterator<...>>>,
+    // ...
+}
+
+struct AddressLazyImpl<A: Allocator = Global> {
+    allocator: A,
+    // Strong reference to arena (no Weak needed - no cycle!)
+    arena: Rc<MessageArena<A>>,
+    // Parent message - using Weak to avoid cycle (Parent → Child → Parent)
+    parent: Weak<PersonLazyImpl<A>, A>,  // Weak to break cycle
+    // Field iterator for lazy parsing
+    field_iter: RefCell<Option<FieldIterator<...>>>,
+    // ...
+}
+```
+
+Construction - Arena created first, then top-level message:
+
+```rust
+impl<A: Allocator + Clone> MessageArena<A> {
+    fn new(data: &[u8], alloc: A) -> (Rc<Self, A>, Rc<PersonLazyImpl<A>, A>) {
+        // Create arena first (no Rc::new_cyclic_in needed!)
+        let arena = Rc::new_in(MessageArena {
+            allocator: alloc.clone(),
+        }, alloc.clone());
+        
+        // Create top-level message with arena reference
+        let person = Rc::new_in(PersonLazyImpl {
+            allocator: alloc.clone(),
+            arena: arena.clone(),  // Strong reference - no cycle!
+            address: RefCell::new(None),  // Child will be created on-demand
+            field_iter: RefCell::new(Some(FieldIterator::new(...))),
+            // ...
+        }, alloc.clone());
+        
+        (arena, person)
+    }
+}
+```
+
+Child message created on-demand when parent's getter is called:
+
+**Key Design Decision**: All methods use `self: &Rc<Self>` instead of `&self`. This allows methods to clone `Rc<Self>` when needed to create child messages.
+
+```rust
+impl<A: Allocator + Clone> PersonLazyImpl<A> {
+    // Note: &self is changed to self: &Rc<Self>
+    pub fn address(self: &Rc<Self>) -> Option<Rc<AddressLazyImpl<A>, A>> {
+        // Check if already created
+        if let Some(ref addr) = *self.address.borrow() {
+            return Some(addr.clone());
+        }
+        
+        // Parse until first occurrence of field 6
+        self.ensure_field_6_first_occurrence()?;
+        
+        // Get the created child (should exist now)
+        self.address.borrow().clone()
+    }
+    
+    fn ensure_field_6_first_occurrence(self: &Rc<Self>) -> Option<()> {
+        // Parse until we find first occurrence of field 6
+        let mut field_iter = self.field_iter.borrow_mut().take()?;
+        
+        loop {
+            match field_iter.next() {
+                Some(Ok((field_num, wire_type, value_slice))) => {
+                    self.update_field(field_num, wire_type, value_slice)?;
+                    
+                    if field_num == 6 {
+                        // Found field 6! Create child on-demand
+                        // Use Weak to avoid cycle: Parent → Child → Parent
+                        let address = Rc::new_in(AddressLazyImpl {
+                            allocator: self.allocator.clone(),
+                            arena: self.arena.clone(),  // Clone arena reference
+                            parent: Rc::downgrade(self),  // Weak reference to avoid cycle
+                            field_iter: RefCell::new(Some(FieldIterator::new(...))),
+                            // ...
+                        }, self.allocator.clone());
+                        
+                        // Store in parent
+                        *self.address.borrow_mut() = Some(address.clone());
+                        
+                        // Store iterator back
+                        *self.field_iter.borrow_mut() = Some(field_iter);
+                        return Some(());
+                    }
+                },
+                None => return None,
+            }
+        }
+    }
+    
+    fn update_field(self: &Rc<Self>, field_num: u32, wire_type: u32, value_slice: &[u8]) -> Result<(), Error> {
+        // ... field update logic ...
+    }
+}
+```
+
+Usage - no lifetime parameters needed, but users must use `Rc`:
+
+```rust
+impl<A: Allocator + Clone> AddressLazyImpl<A> {
+    fn ensure_all_fields_parsed(self: &Rc<Self>) -> Result<(), Error> {
+        // Access parent via Weak - upgrade to Rc when needed
+        // Note: parent methods take &Rc<Self>, so we need to upgrade Weak to Rc
+        if let Some(parent_rc) = self.parent.upgrade() {
+            parent_rc.continue_parsing_for_field(6)?;
+        }
+        // If parent was dropped, we can't continue parsing - this is expected behavior
+        Ok(())
+    }
+}
+
+// User code:
+fn example() {
+    let (arena, person_rc) = MessageArena::new(data, alloc);
+    
+    // All methods require &Rc<Self>
+    let address_rc = person_rc.address();  // Returns Option<Rc<AddressLazyImpl>>
+    
+    // Child can access parent
+    address_rc.unwrap().ensure_all_fields_parsed();
+    
+    // Arena is kept alive by messages (via Rc)
+    // If user drops arena, messages still keep it alive
+    // Arena is only dropped when all messages are dropped
+}
+```
+
+**Benefits of using `self: &Rc<Self>`**:
+- ✅ Easy to create `Weak` from `Rc` inside methods (`Rc::downgrade(self)`)
+- ✅ Simplifies child creation (can pass `Rc::downgrade(self)` as parent to avoid cycle)
+- ✅ Consistent API (all methods use same pattern)
+- ✅ No need for complex mechanisms to get `Rc<Self>` from `&self`
+
+**Trade-off**:
+- ❌ Users must always work with `Rc` (cannot use bare `PersonLazyImpl`)
+- ❌ All method calls require dereferencing `Rc` first (but this is automatic with method calls)
+
+**Key Benefits of Arena + Rc Approach**:
+
+1. **No lifetime parameters needed**:
+   - `PersonLazyImpl<A>` instead of `PersonLazyImpl<'a, A>`
+   - `AddressLazyImpl<A>` instead of `AddressLazyImpl<'a, A>`
+   - Simpler type signatures
+
+2. **Type-safe parent-child relationships**:
+   - `Rc` provides automatic lifetime management
+   - No `unsafe` blocks needed for parent access
+   - No circular dependency (Arena doesn't hold messages)
+   - Parent → Child: Strong `Rc` (parent owns child)
+   - Child → Parent: `Weak` (breaks cycle: Parent → Child → Parent would be a cycle)
+   - Strong `Rc` for messages → Arena is fine (no cycle: Messages → Arena, but Arena doesn't hold Messages)
+
+3. **Flexible user references**:
+   - User can clone `Rc` and "discard" original arena reference
+   - Messages keep arena alive via `Rc` (arena is only dropped when all messages are dropped)
+   - More flexible than raw pointer approach
+
+4. **Natural message relationships**:
+   - Parent → Child: Strong `Rc` (parent owns child semantically)
+   - Child → Parent: `Weak` (child needs parent, but uses `Weak` to avoid cycle)
+   - Messages → Arena: Strong `Rc` (messages keep arena alive, no cycle because Arena doesn't hold messages)
+
+5. **Simple construction**:
+   - No `Rc::new_cyclic_in` needed (Arena created first, then messages)
+   - `Weak` used only for child → parent (breaks parent-child cycle)
+
+**Trade-offs of Arena + Rc Approach**:
+
+✅ Pros:
+- No lifetime parameters (simpler API)
+- Flexible reference management for users
+- Type-safe (no `unsafe` for parent access)
+- Simple construction (no `Rc::new_cyclic_in`)
+- `Weak` used only for child → parent (breaks parent-child cycle)
+- Arena lifetime is clear (kept alive by messages)
+
+❌ Cons:
+- Reference counting overhead (`Rc` operations)
+- Allocation overhead (`Rc` itself is heap-allocated)
+- Arena cannot enumerate messages (but this might not be needed)
+- Messages must hold arena reference (but they might need allocator access anyway)
+
 ## Comparison with Other Rust Patterns
 
 | Pattern | Safety | Overhead | Complexity | Our Applicability |
