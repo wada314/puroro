@@ -155,35 +155,33 @@ impl<'a, A: Allocator + Clone> PersonLazyImpl<'a, A> {
     pub fn new(slice: &'a [u8], alloc: A) -> Rc<Self, A> {
         let alloc_clone = alloc.clone();
         
-        // Create parser state first
-        let parser_state = Rc::new_in(RefCell::new(PersonParserState {
-            field_iter: Some(FieldIterator::new(
-                Box::new_in(std::iter::once(slice), alloc.clone())
-            )),
-            allocator: alloc.clone(),
-            message_body_weak: None,  // Will be set by register_parser_callback
-            child_weak_refs: std::collections::HashMap::new(),
-        }), alloc.clone());
-        
-        // Create message body wrapped in Rc
-        let message_body = Rc::new_in(Self {
-            parser_state: parser_state.clone(),
-            // Initialize fields with default values
-            name: RefCell::new(String::new_in(alloc.clone())),
-            age: Cell::new(0),
-            email: RefCell::new(None),
-            status: Cell::new(0),
-            score: Cell::new(None),
-            address: RefCell::new(None),
-            secondary_status: Cell::new(None),
-            scores: OnceList::new_in(alloc_clone.clone()),
-            addresses: OnceList::new_in(alloc_clone),
-        }, alloc.clone());
-        
-        // Register callback with parser state
-        message_body.register_parser_callback();
-        
-        message_body
+        // Use Rc::new_cyclic_in to create PersonLazyImpl with PersonParserState that has Weak reference
+        Rc::new_cyclic_in(|weak| {
+            // Create parser state with Weak reference to Message Body
+            let parser_state = Rc::new_in(RefCell::new(PersonParserState {
+                field_iter: Some(FieldIterator::new(
+                    Box::new_in(std::iter::once(slice), alloc.clone())
+                )),
+                allocator: alloc.clone(),
+                message_body_weak: weak.clone(),
+                child_weak_refs: std::collections::HashMap::new(),
+            }), alloc.clone());
+            
+            // Create message body
+            Self {
+                parser_state: parser_state.clone(),
+                // Initialize fields with default values
+                name: RefCell::new(String::new_in(alloc.clone())),
+                age: Cell::new(0),
+                email: RefCell::new(None),
+                status: Cell::new(0),
+                score: Cell::new(None),
+                address: RefCell::new(None),
+                secondary_status: Cell::new(None),
+                scores: OnceList::new_in(alloc_clone.clone()),
+                addresses: OnceList::new_in(alloc_clone),
+            }
+        }, alloc)
     }
     
     /// Create a new PersonLazyImpl from multiple slices (for scalar message fields)
@@ -191,35 +189,33 @@ impl<'a, A: Allocator + Clone> PersonLazyImpl<'a, A> {
     pub fn new_from_slices(slices: impl Iterator<Item = &'a [u8]> + 'a, alloc: A) -> Rc<Self, A> {
         let alloc_clone = alloc.clone();
         
-        // Create parser state first
-        let parser_state = Rc::new_in(RefCell::new(PersonParserState {
-            field_iter: Some(FieldIterator::new(
-                Box::new_in(slices, alloc.clone())
-            )),
-            allocator: alloc.clone(),
-            message_body_weak: None,  // Will be set by register_parser_callback
-            child_weak_refs: std::collections::HashMap::new(),
-        }), alloc.clone());
-        
-        // Create message body wrapped in Rc
-        let message_body = Rc::new_in(Self {
-            parser_state: parser_state.clone(),
-            // Initialize fields with default values
-            name: RefCell::new(String::new_in(alloc.clone())),
-            age: Cell::new(0),
-            email: RefCell::new(None),
-            status: Cell::new(0),
-            score: Cell::new(None),
-            address: RefCell::new(None),
-            secondary_status: Cell::new(None),
-            scores: OnceList::new_in(alloc_clone.clone()),
-            addresses: OnceList::new_in(alloc_clone),
-        }, alloc.clone());
-        
-        // Register callback with parser state
-        message_body.register_parser_callback();
-        
-        message_body
+        // Use Rc::new_cyclic_in to create PersonLazyImpl with PersonParserState that has Weak reference
+        Rc::new_cyclic_in(|weak| {
+            // Create parser state with Weak reference to Message Body
+            let parser_state = Rc::new_in(RefCell::new(PersonParserState {
+                field_iter: Some(FieldIterator::new(
+                    Box::new_in(slices, alloc.clone())
+                )),
+                allocator: alloc.clone(),
+                message_body_weak: weak.clone(),
+                child_weak_refs: std::collections::HashMap::new(),
+            }), alloc.clone());
+            
+            // Create message body
+            Self {
+                parser_state: parser_state.clone(),
+                // Initialize fields with default values
+                name: RefCell::new(String::new_in(alloc.clone())),
+                age: Cell::new(0),
+                email: RefCell::new(None),
+                status: Cell::new(0),
+                score: Cell::new(None),
+                address: RefCell::new(None),
+                secondary_status: Cell::new(None),
+                scores: OnceList::new_in(alloc_clone.clone()),
+                addresses: OnceList::new_in(alloc_clone),
+            }
+        }, alloc)
     }
 }
 
@@ -416,7 +412,8 @@ pub struct PersonParserState<'a, A: Allocator = Global> {
     field_iter: Option<FieldIterator<'a, Box<dyn Iterator<Item = &'a [u8]> + 'a, A>>>,
     allocator: A,
     /// Weak reference to Message Body - used to update fields when Message Body is still alive
-    message_body_weak: Option<Weak<PersonLazyImpl<'a, A>, A>>,
+    /// Set during PersonLazyImpl construction using Rc::new_cyclic_in
+    message_body_weak: Weak<PersonLazyImpl<'a, A>, A>,
     /// Weak references to child message fields (scalar message fields)
     /// Key: field number, Value: Weak reference to child message
     /// Holds Weak references to child messages, so works even after Message Body is dropped
@@ -430,12 +427,6 @@ pub struct PersonParserState<'a, A: Allocator = Global> {
 }
 
 impl<'a, A: Allocator + Clone> PersonParserState<'a, A> {
-    /// Set weak reference to Message Body
-    /// This is called by Message Body during construction
-    pub fn set_message_body_weak(&mut self, weak: Weak<PersonLazyImpl<'a, A>, A>) {
-        self.message_body_weak = Some(weak);
-    }
-    
     /// Register a weak reference to a child message field (scalar message fields)
     /// This is called when a child message is created
     pub fn register_child_weak(&mut self, field_num: u32, child_weak: Weak<AddressLazyImpl<'a, A>, A>) {
@@ -464,12 +455,10 @@ impl<'a, A: Allocator + Clone> PersonParserState<'a, A> {
             match field_iter.next() {
                 Some(Ok((fnum, wire_type, value_slice))) => {
                     // Try to update via Message Body first (if still alive)
-                    if let Some(ref message_body_weak) = self.message_body_weak {
-                        if let Some(message_body) = message_body_weak.upgrade() {
-                            // Message Body is still alive - update ALL fields via update_field
-                            let _ = message_body.update_field(fnum, wire_type, value_slice);
-                            continue;  // Successfully updated via Message Body
-                        }
+                    if let Some(message_body) = self.message_body_weak.upgrade() {
+                        // Message Body is still alive - update ALL fields via update_field
+                        let _ = message_body.update_field(fnum, wire_type, value_slice);
+                        continue;  // Successfully updated via Message Body
                     }
                     
                     // Message Body is dropped, but we can still update child messages via Weak references
@@ -592,16 +581,6 @@ impl<'a, A: Allocator + Clone> PersonLazyImpl<'a, A> {
                 }
             }
         }
-    }
-    
-    /// Register weak reference to Message Body with parser state
-    /// This is called during construction
-    /// 
-    /// Since field types are known at compile time, we don't need callbacks.
-    /// We just store a Weak reference and call update_field directly in continue_parsing_for_children.
-    fn register_parser_callback(self: &Rc<Self>) {
-        let self_weak = Rc::downgrade(self);
-        self.parser_state.borrow_mut().set_message_body_weak(self_weak);
     }
     
     /// Register weak reference to child message for a specific field number
