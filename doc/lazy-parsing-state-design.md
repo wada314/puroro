@@ -159,32 +159,17 @@ impl<'a, A: Allocator + Clone> PersonLazyImpl<'a, A> {
         Rc::new_cyclic_in(|weak| {
             let message_body_weak = weak.clone();
             
-            // Create HashMap to store child Weak references (wrapped in RefCell for interior mutability)
-            let child_weak_refs: RefCell<std::collections::HashMap<u32, Weak<AddressLazyImpl<'a, A>, A>>> = 
-                RefCell::new(std::collections::HashMap::new());
-            
-            // Create callback closure that captures Weak reference to Message Body and RefCell<HashMap> of child Weak refs
+            // Create initial callback that only handles Message Body (when it's alive)
+            // This callback will be replaced in Drop::drop with one that handles child messages
             let callback = Box::new(move |fnum: u32, wire_type: u32, value_slice: &'a [u8]| -> Result<(), Error> {
-                // Try to update via Message Body first (if still alive)
+                // Update via Message Body (should always succeed when this callback is active)
                 if let Some(message_body) = message_body_weak.upgrade() {
-                    // Message Body is still alive - update ALL fields via update_field
                     let _ = message_body.update_field(fnum, wire_type, value_slice);
-                    return Ok(());
-                }
-                
-                // Message Body is dropped, but we can still update child messages via Weak references
-                // Update child message field if it exists in the HashMap
-                if let Some(child_weak) = child_weak_refs.borrow().get(&fnum) {
-                    if let Some(child) = child_weak.upgrade() {
-                        // Child still exists - add slice to it
-                        let _ = child.add_slice(value_slice);
-                        // Ignore errors - child might be dropped
-                    }
                 }
                 Ok(())
             });
             
-            // Create parser state with callback
+            // Create parser state with initial callback
             let parser_state = Rc::new_in(RefCell::new(MessageParserState {
                 field_iter: Some(FieldIterator::new(
                     Box::new_in(std::iter::once(slice), alloc.clone())
@@ -193,10 +178,9 @@ impl<'a, A: Allocator + Clone> PersonLazyImpl<'a, A> {
                 field_update_callback: Some(callback),
             }), alloc.clone());
             
-            // Create message body with child_weak_refs
+            // Create message body
             Self {
                 parser_state: parser_state.clone(),
-                child_weak_refs,
                 // Initialize fields with default values
                 name: RefCell::new(String::new_in(alloc.clone())),
                 age: Cell::new(0),
@@ -211,6 +195,7 @@ impl<'a, A: Allocator + Clone> PersonLazyImpl<'a, A> {
         }, alloc)
     }
     
+    
     /// Create a new PersonLazyImpl from multiple slices (for scalar message fields)
     /// Returns Rc<Self> - all methods use self: &Rc<Self>
     pub fn new_from_slices(slices: impl Iterator<Item = &'a [u8]> + 'a, alloc: A) -> Rc<Self, A> {
@@ -220,32 +205,17 @@ impl<'a, A: Allocator + Clone> PersonLazyImpl<'a, A> {
         Rc::new_cyclic_in(|weak| {
             let message_body_weak = weak.clone();
             
-            // Create HashMap to store child Weak references (wrapped in RefCell for interior mutability)
-            let child_weak_refs: RefCell<std::collections::HashMap<u32, Weak<AddressLazyImpl<'a, A>, A>>> = 
-                RefCell::new(std::collections::HashMap::new());
-            
-            // Create callback closure that captures Weak reference to Message Body and RefCell<HashMap> of child Weak refs
+            // Create initial callback that only handles Message Body (when it's alive)
+            // This callback will be replaced in Drop::drop with one that handles child messages
             let callback = Box::new(move |fnum: u32, wire_type: u32, value_slice: &'a [u8]| -> Result<(), Error> {
-                // Try to update via Message Body first (if still alive)
+                // Update via Message Body (should always succeed when this callback is active)
                 if let Some(message_body) = message_body_weak.upgrade() {
-                    // Message Body is still alive - update ALL fields via update_field
                     let _ = message_body.update_field(fnum, wire_type, value_slice);
-                    return Ok(());
-                }
-                
-                // Message Body is dropped, but we can still update child messages via Weak references
-                // Update child message field if it exists in the HashMap
-                if let Some(child_weak) = child_weak_refs.borrow().get(&fnum) {
-                    if let Some(child) = child_weak.upgrade() {
-                        // Child still exists - add slice to it
-                        let _ = child.add_slice(value_slice);
-                        // Ignore errors - child might be dropped
-                    }
                 }
                 Ok(())
             });
             
-            // Create parser state with callback
+            // Create parser state with initial callback
             let parser_state = Rc::new_in(RefCell::new(MessageParserState {
                 field_iter: Some(FieldIterator::new(
                     Box::new_in(slices, alloc.clone())
@@ -254,10 +224,9 @@ impl<'a, A: Allocator + Clone> PersonLazyImpl<'a, A> {
                 field_update_callback: Some(callback),
             }), alloc.clone());
             
-            // Create message body with child_weak_refs
+            // Create message body
             Self {
                 parser_state: parser_state.clone(),
-                child_weak_refs,
                 // Initialize fields with default values
                 name: RefCell::new(String::new_in(alloc.clone())),
                 age: Cell::new(0),
@@ -466,15 +435,13 @@ pub struct MessageParserState<'a, A: Allocator = Global> {
     /// FieldIterator - needs &mut self for Iterator::next()
     field_iter: Option<FieldIterator<'a, Box<dyn Iterator<Item = &'a [u8]> + 'a, A>>>,
     allocator: A,
-    /// Field update callback - handles field updates for both Message Body and child messages
+    /// Field update callback - handles field updates
     /// 
     /// This callback is responsible for updating fields when iterating over field_iter.
-    /// It captures:
-    /// - Weak reference to Message Body (for when Message Body is alive)
-    /// - RefCell<HashMap> of Weak references to child messages (for when Message Body is dropped)
     /// 
-    /// When Message Body is alive: The callback upgrades the Weak reference and calls update_field.
-    /// When Message Body is dropped: The callback accesses the HashMap and updates child messages directly.
+    /// Initially, the callback captures a Weak reference to Message Body and calls update_field.
+    /// When Message Body is dropped, Drop::drop updates this callback to one that captures
+    /// child message Weak references and uses static match-case to update them directly.
     /// 
     /// This design allows MessageParserState to be generic across all message types,
     /// as it doesn't need to know the specific message type at compile time.
@@ -485,9 +452,9 @@ impl<'a, A: Allocator + Clone> MessageParserState<'a, A> {
     /// Continue parsing and update all registered fields via the callback
     /// Called by child when it needs all slices - works even if parent Message Body is dropped
     /// 
-    /// **Key Design**: Uses a single callback mechanism that handles both cases:
-    /// - When Message Body is alive: Updates all fields via callback (which calls Message Body's update_field)
-    /// - When Message Body is dropped: Updates child message fields via Weak references stored in the callback's captured HashMap
+    /// **Key Design**: Uses a single callback mechanism that is updated when Message Body is dropped:
+    /// - Initially: Callback captures Weak reference to Message Body and calls update_field
+    /// - After Drop: Callback is replaced with one that captures child Weak references and uses static match-case
     /// 
     /// **Important**: When Message Body is dropped, the callback updates ALL registered child message fields.
     /// This ensures that multiple scalar message child fields can all receive their slices when
@@ -529,10 +496,6 @@ pub struct PersonLazyImpl<'a, A: Allocator = Global> {
     // Owns parser state via Rc<RefCell<...>> - State itself is mutable
     // Note: Uses generic MessageParserState, not PersonParserState
     parser_state: Rc<RefCell<MessageParserState<'a, A>>>,
-    
-    // Child Weak references - stored here so update_field can register them
-    // The callback captures a RefCell reference to this HashMap
-    child_weak_refs: RefCell<std::collections::HashMap<u32, Weak<AddressLazyImpl<'a, A>, A>>>,
     
     // Scalar fields that can be updated multiple times during parsing
     name: RefCell<String<A>>,  // Non-Copy type - needs RefCell
@@ -623,18 +586,6 @@ impl<'a, A: Allocator + Clone> PersonLazyImpl<'a, A> {
         }
     }
     
-    /// Register weak reference to child message for a specific field number
-    /// This is called when a child message is created in update_field
-    /// 
-    /// The Weak reference is stored in self.child_weak_refs and captured by the callback,
-    /// so it can be used by continue_parsing_for_children when Message Body is dropped.
-    fn register_child_weak_for_field(
-        self: &Rc<Self>,
-        field_num: u32,
-        child_weak: Weak<AddressLazyImpl<'a, A>, A>,
-    ) {
-        self.child_weak_refs.borrow_mut().insert(field_num, child_weak);
-    }
     
     fn update_field(self: &Rc<Self>, field_num: u32, wire_type: u32, value_slice: &'a [u8]) -> Result<(), Error> {
         match field_num {
@@ -662,11 +613,8 @@ impl<'a, A: Allocator + Clone> PersonLazyImpl<'a, A> {
                     let allocator = self.parser_state.borrow().allocator.clone();
                     let parent_parser_state = self.parser_state.clone();
                     let child = AddressLazyImpl::new_from_parent(value_slice, parent_parser_state, allocator);
-                    let child_weak = Rc::downgrade(&child);
                     *address = Some(child);
-                    
-                    // Register child weak reference so it works even after Message Body is dropped
-                    self.register_child_weak_for_field(6, child_weak);
+                    // Note: Weak reference will be extracted in Drop::drop to update callback
                 }
             },
             7 => {
@@ -688,6 +636,38 @@ impl<'a, A: Allocator + Clone> PersonLazyImpl<'a, A> {
             _ => {}
         }
         Ok(())
+    }
+}
+
+impl<'a, A: Allocator + Clone> Drop for PersonLazyImpl<'a, A> {
+    fn drop(&mut self) {
+        // When Message Body is dropped, update callback to handle child messages
+        // Extract child Weak references from fields
+        let address_weak = self.address.borrow().as_ref().map(|addr| Rc::downgrade(addr));
+        
+        // Create new callback that captures child Weak references and uses static match-case
+        let new_callback: Box<dyn FnMut(u32, u32, &'a [u8]) -> Result<(), Error> + 'a> = 
+            Box::new(move |fnum: u32, _wire_type: u32, value_slice: &'a [u8]| -> Result<(), Error> {
+                // Static match-case for each child message field
+                match fnum {
+                    6 => {
+                        // address field
+                        if let Some(ref addr_weak) = address_weak {
+                            if let Some(addr) = addr_weak.upgrade() {
+                                let _ = addr.add_slice(value_slice);
+                            }
+                        }
+                    },
+                    // Add other child message fields here as needed
+                    _ => {
+                        // Not a child message field - ignore
+                    }
+                }
+                Ok(())
+            });
+        
+        // Update callback in parser state
+        self.parser_state.borrow_mut().field_update_callback = Some(new_callback);
     }
 }
 
