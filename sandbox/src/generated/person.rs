@@ -6,6 +6,7 @@
 //!
 //! This code is (supposed to be) generated from `sandbox/protos/person.proto`.
 
+use super::address::AddressLazyImpl;
 use super::lazy_parser::{FieldIterator, MessageParserState, parse_varint};
 use ::allocator_api2::vec::Vec as AllocVec;
 use ::allocator_extras::{Allocator, Global};
@@ -458,9 +459,9 @@ impl<A: Allocator + Clone> Message for PersonImpl<A> {
 
 /// Lazy implementation of Person message that deserializes fields on-demand.
 ///
-/// Phase 2: age field (field 2) and scores field (field 10) are implemented.
+/// Phase 3: age field (field 2), scores field (field 10), and address field (field 6) are implemented.
 /// Other fields will be added in subsequent phases.
-pub struct PersonLazyImpl<'a, A: Allocator = Global> {
+pub struct PersonLazyImpl<'a, A: Allocator + Clone + 'a = Global> {
     /// Owns parser state via Rc<RefCell<...>> - State itself is mutable
     parser_state: Rc<RefCell<MessageParserState<'a, A>>>,
 
@@ -471,6 +472,10 @@ pub struct PersonLazyImpl<'a, A: Allocator = Global> {
     /// Field 10: scores (repeated varint field)
     /// OnceList has built-in interior mutability - no RefCell needed
     scores: OnceList<i32, A>,
+
+    /// Field 6: address (scalar message field)
+    /// RefCell needed because Option<AddressLazyImpl> is not Copy
+    address: RefCell<Option<Rc<AddressLazyImpl<'a, A>>>>,
 }
 
 impl<'a, A: Allocator + Clone + 'a> PersonLazyImpl<'a, A> {
@@ -512,6 +517,7 @@ impl<'a, A: Allocator + Clone + 'a> PersonLazyImpl<'a, A> {
                 // Initialize fields with default values
                 age: Cell::new(0),
                 scores: OnceList::new_in(alloc_clone.clone()),
+                address: RefCell::new(None),
             }
         })
     }
@@ -531,6 +537,17 @@ impl<'a, A: Allocator + Clone + 'a> PersonLazyImpl<'a, A> {
         // Ensure all fields are parsed before returning reference
         let _ = self.ensure_all_fields_parsed();
         &self.scores
+    }
+
+    /// Getter for address field
+    /// Returns a reference to the AddressLazyImpl if present, None otherwise
+    pub fn address(self: &Rc<Self>) -> Option<Rc<AddressLazyImpl<'a, A>>> {
+        // Parse until first occurrence of address field to create child if needed
+        // Note: This only parses until first occurrence, not all occurrences
+        // The child will request continued parsing when it needs all slices
+        // For now, we parse all fields to ensure child is created
+        let _ = self.ensure_all_fields_parsed();
+        self.address.borrow().clone()
     }
 
     /// Ensure all fields are parsed
@@ -572,7 +589,7 @@ impl<'a, A: Allocator + Clone + 'a> PersonLazyImpl<'a, A> {
     fn update_field(
         self: &Rc<Self>,
         field_num: u32,
-        _wire_type: u32,
+        wire_type: u32,
         value_slice: &'a [u8],
     ) -> Result<(), Error> {
         match field_num {
@@ -580,6 +597,29 @@ impl<'a, A: Allocator + Clone + 'a> PersonLazyImpl<'a, A> {
                 // age field - varint
                 let age_value = parse_varint(value_slice)?;
                 self.age.set(age_value);
+            }
+            6 => {
+                // address field - scalar message field (length-delimited, wire type 2)
+                if wire_type != 2 {
+                    return Err(Error::InvalidWireFormat(
+                        "Address field must be length-delimited".to_string(),
+                    ));
+                }
+                let mut address = self.address.borrow_mut();
+                if let Some(ref addr) = *address {
+                    // Child already exists - add slice to it
+                    addr.add_slice(value_slice)?;
+                } else {
+                    // First occurrence - create child with first slice
+                    let allocator = self.parser_state.borrow().allocator.clone();
+                    let parent_parser_state = self.parser_state.clone();
+                    let child = AddressLazyImpl::new_from_parent(
+                        value_slice,
+                        parent_parser_state,
+                        allocator,
+                    );
+                    *address = Some(child);
+                }
             }
             10 => {
                 // scores field - repeated varint
@@ -593,6 +633,44 @@ impl<'a, A: Allocator + Clone + 'a> PersonLazyImpl<'a, A> {
             }
         }
         Ok(())
+    }
+}
+
+impl<'a, A: Allocator + Clone + 'a> Drop for PersonLazyImpl<'a, A> {
+    fn drop(&mut self) {
+        // When Message Body is dropped, update callback to handle child messages
+        // Extract child Weak references from fields
+        let address_weak = self
+            .address
+            .borrow()
+            .as_ref()
+            .map(|addr| Rc::downgrade(addr));
+
+        // Create new callback that captures child Weak references and uses static match-case
+        let new_callback: std::boxed::Box<dyn FnMut(u32, u32, &'a [u8]) -> Result<(), Error> + 'a> =
+            std::boxed::Box::new(
+                move |fnum: u32, _wire_type: u32, value_slice: &'a [u8]| -> Result<(), Error> {
+                    // Static match-case for each child message field
+                    match fnum {
+                        6 => {
+                            // address field
+                            if let Some(ref addr_weak) = address_weak {
+                                if let Some(addr) = addr_weak.upgrade() {
+                                    let _ = addr.add_slice(value_slice);
+                                }
+                            }
+                        }
+                        // Add other child message fields here as needed (e.g., profile field 7)
+                        _ => {
+                            // Not a child message field - ignore
+                        }
+                    }
+                    Ok(())
+                },
+            );
+
+        // Update callback in parser state
+        self.parser_state.borrow_mut().field_update_callback = Some(new_callback);
     }
 }
 

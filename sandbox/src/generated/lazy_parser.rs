@@ -6,6 +6,7 @@
 //! - Helper functions for wire format parsing (varint decoding, field tag parsing)
 
 use ::allocator_extras::{Allocator, Global};
+use once_list2::OnceList;
 use puroro::error::Error;
 
 /// Decode a varint-encoded value from a byte slice.
@@ -63,6 +64,14 @@ pub fn parse_varint(bytes: &[u8]) -> Result<i32, Error> {
     // Cast u64 to i32 (varint encoding uses zigzag encoding for signed integers,
     // but for simplicity in Phase 1, we just cast)
     Ok(value as i32)
+}
+
+/// Parse a UTF-8 string from a length-delimited field value slice.
+///
+/// The value_slice is the actual value bytes (without the length prefix).
+/// This function validates UTF-8 and returns a String.
+pub fn parse_string(bytes: &[u8]) -> Result<String, Error> {
+    String::from_utf8(bytes.to_vec()).map_err(|e| Error::InvalidUtf8(e))
 }
 
 /// Iterator over protobuf fields in slices.

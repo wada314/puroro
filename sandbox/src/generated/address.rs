@@ -7,6 +7,7 @@
 
 use ::allocator_api2::vec::Vec as AllocVec;
 use ::allocator_extras::{Allocator, Global};
+use once_list2::OnceList;
 use puroro::{
     Message,
     error::Error,
@@ -255,5 +256,194 @@ impl<A: Allocator + Clone> Message for AddressImpl<A> {
     }
 }
 
-// AddressLazyImpl will be re-implemented in Phase 3
-// Old implementation removed - will be replaced with new design based on MessageParserState
+// ============================================================================
+// AddressLazyImpl Structure (Lazy Implementation - Phase 3)
+// ============================================================================
+
+use super::lazy_parser::{FieldIterator, MessageParserState, parse_string, parse_varint};
+use std::cell::{Cell, RefCell};
+use std::rc::Rc;
+
+/// Parser state for AddressLazyImpl.
+///
+/// Child messages have their own parser state that collects field slices.
+/// This allows child messages to collect all slices from the parent before parsing.
+struct AddressParserState<'a, A: Allocator = Global> {
+    /// FieldIterator - needs &mut self for Iterator::next()
+    field_iter: Option<FieldIterator<'a>>,
+    /// Field slices collected so far (from parent)
+    /// These are length-delimited value slices (not including field tags)
+    field_slices: OnceList<&'a [u8], A>,
+    allocator: A,
+}
+
+/// Lazy implementation of Address message that deserializes fields on-demand.
+///
+/// Phase 3: Basic implementation with street, city, zip_code fields.
+pub struct AddressLazyImpl<'a, A: Allocator = Global> {
+    /// Owns parser state via Rc<RefCell<...>>
+    parser_state: Rc<RefCell<AddressParserState<'a, A>>>,
+
+    /// Parent parser state - strong Rc<RefCell<...>> reference (no cycle!)
+    /// Child needs parent's parser state to request continued parsing
+    parent_parser_state: Rc<RefCell<MessageParserState<'a, A>>>,
+
+    /// Field 1: street (implicit presence string field)
+    street: RefCell<String>,
+
+    /// Field 2: city (implicit presence string field)
+    city: RefCell<String>,
+
+    /// Field 3: zip_code (implicit presence varint field)
+    zip_code: Cell<i32>,
+}
+
+impl<'a, A: Allocator + Clone + 'a> AddressLazyImpl<'a, A> {
+    /// Create from first slice, with parent parser state reference
+    ///
+    /// Note: Child holds strong Rc reference to parent's parser state (not message body)
+    /// This avoids cycles: Parent Message Body → Parent Parser State → (Child holds Rc to this)
+    /// Returns Rc<Self> - all methods use self: &Rc<Self>
+    pub(crate) fn new_from_parent(
+        first_slice: &'a [u8],
+        parent_parser_state: Rc<RefCell<MessageParserState<'a, A>>>,
+        alloc: A,
+    ) -> Rc<Self> {
+        let field_slices = OnceList::new_in(alloc.clone());
+        field_slices.push(first_slice);
+
+        let alloc_clone = alloc.clone();
+        let parser_state = Rc::new(RefCell::new(AddressParserState {
+            field_iter: None, // Will be created in ensure_all_fields_parsed
+            field_slices,
+            allocator: alloc_clone.clone(),
+        }));
+
+        Rc::new(Self {
+            parser_state,
+            parent_parser_state,
+            street: RefCell::new(String::new()),
+            city: RefCell::new(String::new()),
+            zip_code: Cell::new(0),
+        })
+    }
+
+    /// Add additional slice from parent
+    pub(crate) fn add_slice(self: &Rc<Self>, slice: &'a [u8]) -> Result<(), Error> {
+        self.parser_state.borrow_mut().field_slices.push(slice);
+        // Note: field_iter needs to be recreated when parsing
+        Ok(())
+    }
+
+    /// Getter for street field
+    pub fn street(self: &Rc<Self>) -> std::cell::Ref<'_, String> {
+        let _ = self.ensure_all_fields_parsed();
+        self.street.borrow()
+    }
+
+    /// Getter for city field
+    pub fn city(self: &Rc<Self>) -> std::cell::Ref<'_, String> {
+        let _ = self.ensure_all_fields_parsed();
+        self.city.borrow()
+    }
+
+    /// Getter for zip_code field
+    pub fn zip_code(self: &Rc<Self>) -> i32 {
+        let _ = self.ensure_all_fields_parsed();
+        self.zip_code.get()
+    }
+
+    /// Ensure all fields are parsed
+    ///
+    /// This will request parent's parser state to continue parsing if needed.
+    /// Then parses all collected slices to extract Address fields.
+    fn ensure_all_fields_parsed(self: &Rc<Self>) -> Result<(), Error> {
+        // Request parent's parser state to continue parsing
+        // This works even if parent Message Body is dropped, because:
+        // 1. Child holds strong Rc reference to parent's Parser State
+        // 2. continue_parsing_for_children doesn't require parent Message Body to be alive
+        // 3. Callbacks (field_update_callback) already add slices to child messages via add_slice
+        self.parent_parser_state
+            .borrow_mut()
+            .continue_parsing_for_children()?;
+
+        // Check if we've already parsed (field_iter is None and we've parsed before)
+        // We check if field_iter was previously Some (now None) vs never created (was None)
+        // For simplicity, we always recreate the iterator from field_slices
+        // This ensures we parse all slices even if field_iter state is lost
+
+        // Now parse our own fields from all collected slices
+        // Collect all slices into a Vec to avoid lifetime issues
+        let slices_vec: Vec<&'a [u8]> = {
+            let parser_state = self.parser_state.borrow();
+            parser_state.field_slices.iter().copied().collect()
+        };
+
+        // Recreate iterator with all slices (each slice is an Address message)
+        {
+            let mut parser_state = self.parser_state.borrow_mut();
+            // Always recreate iterator to ensure we parse all slices
+            parser_state.field_iter = Some(FieldIterator::new(std::boxed::Box::new(
+                slices_vec.into_iter(),
+            )));
+        }
+
+        // Parse until exhausted
+        loop {
+            let mut parser_state = self.parser_state.borrow_mut();
+            let mut field_iter = match parser_state.field_iter.take() {
+                Some(iter) => iter,
+                None => break, // Already parsed
+            };
+
+            match field_iter.next() {
+                Some(Ok((field_num, wire_type, value_slice))) => {
+                    // Store iterator back before calling update_field
+                    parser_state.field_iter = Some(field_iter);
+                    drop(parser_state);
+                    self.update_field(field_num, wire_type, value_slice)?;
+                }
+                Some(Err(e)) => {
+                    parser_state.field_iter = Some(field_iter);
+                    return Err(e);
+                }
+                None => {
+                    parser_state.field_iter = None;
+                    break;
+                }
+            }
+        }
+
+        Ok(())
+    }
+
+    /// Update a field with parsed value
+    fn update_field(
+        self: &Rc<Self>,
+        field_num: u32,
+        _wire_type: u32,
+        value_slice: &'a [u8],
+    ) -> Result<(), Error> {
+        match field_num {
+            1 => {
+                // street field - string
+                let street_value = parse_string(value_slice)?;
+                *self.street.borrow_mut() = street_value;
+            }
+            2 => {
+                // city field - string
+                let city_value = parse_string(value_slice)?;
+                *self.city.borrow_mut() = city_value;
+            }
+            3 => {
+                // zip_code field - varint
+                let zip_code_value = parse_varint(value_slice)?;
+                self.zip_code.set(zip_code_value);
+            }
+            _ => {
+                // Unknown field - ignore
+            }
+        }
+        Ok(())
+    }
+}
