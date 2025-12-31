@@ -60,16 +60,23 @@ fn encode_string_field(field_number: u32, value: &str) -> Vec<u8> {
 
 /// Encode an Address message
 /// Returns the encoded Address message bytes (not wrapped in a Person.address field)
+/// Only encodes non-empty/non-zero fields
 fn encode_address_message(street: &str, city: &str, zip_code: i32) -> Vec<u8> {
     let mut bytes = Vec::new();
-    // Field 1: street (string)
-    bytes.extend_from_slice(&encode_string_field(1, street));
-    // Field 2: city (string)
-    bytes.extend_from_slice(&encode_string_field(2, city));
-    // Field 3: zip_code (varint)
-    let mut zip_bytes = encode_field_tag(3, 0); // field 3, wire type 0 (varint)
-    zip_bytes.extend_from_slice(&encode_varint(zip_code as u64));
-    bytes.extend_from_slice(&zip_bytes);
+    // Field 1: street (string) - only encode if non-empty
+    if !street.is_empty() {
+        bytes.extend_from_slice(&encode_string_field(1, street));
+    }
+    // Field 2: city (string) - only encode if non-empty
+    if !city.is_empty() {
+        bytes.extend_from_slice(&encode_string_field(2, city));
+    }
+    // Field 3: zip_code (varint) - only encode if non-zero
+    if zip_code != 0 {
+        let mut zip_bytes = encode_field_tag(3, 0); // field 3, wire type 0 (varint)
+        zip_bytes.extend_from_slice(&encode_varint(zip_code as u64));
+        bytes.extend_from_slice(&zip_bytes);
+    }
     bytes
 }
 
