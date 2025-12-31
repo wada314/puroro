@@ -10,10 +10,7 @@ use ::allocator_extras::{Allocator, Global};
 use puroro::{
     Message,
     error::Error,
-    field_ops::{
-        FieldOperations, FieldStorage, ImplicitOptional,
-        StringFieldWrapper,
-    },
+    field_ops::{FieldOperations, FieldStorage, ImplicitOptional, StringFieldWrapper},
     shared::SharedFields,
 };
 

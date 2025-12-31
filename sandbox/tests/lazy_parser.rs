@@ -1,4 +1,6 @@
-//! Tests for lazy parser implementation (Phase 1: age field only)
+//! Tests for lazy parser implementation
+//! Phase 1: age field (scalar integer)
+//! Phase 2: scores field (repeated integer)
 
 use sandbox::generated::lazy_parser::{decode_varint, parse_varint};
 use sandbox::generated::person::PersonLazyImpl;
@@ -31,6 +33,13 @@ fn encode_field_tag(field_number: u32, wire_type: u32) -> Vec<u8> {
 fn encode_age_field(age: i32) -> Vec<u8> {
     let mut bytes = encode_field_tag(2, 0); // field 2, wire type 0 (varint)
     bytes.extend_from_slice(&encode_varint(age as u64));
+    bytes
+}
+
+/// Encode a repeated varint field (field number 10) for testing
+fn encode_score_field(score: i32) -> Vec<u8> {
+    let mut bytes = encode_field_tag(10, 0); // field 10, wire type 0 (varint)
+    bytes.extend_from_slice(&encode_varint(score as u64));
     bytes
 }
 
@@ -110,5 +119,67 @@ fn test_person_lazy_age_field_default() {
     let person_rc = PersonLazyImpl::new(&empty_message, Global);
     let age = person_rc.age();
     assert_eq!(age, 0); // Default value for i32
+}
+
+// ============================================================================
+// Phase 2 Tests: Repeated Integer Field (scores)
+// ============================================================================
+
+#[test]
+fn test_person_lazy_scores_field_single() {
+    // Test message with a single score = 85
+    let encoded = encode_score_field(85);
+    
+    let person_rc = PersonLazyImpl::new(&encoded, Global);
+    let scores = person_rc.scores();
+    
+    // Check that we have one score
+    assert_eq!(scores.iter().count(), 1);
+    assert_eq!(scores.iter().next().copied().unwrap(), 85);
+}
+
+#[test]
+fn test_person_lazy_scores_field_multiple() {
+    // Test message with multiple scores: 10, 20, 30
+    let mut encoded = Vec::new();
+    encoded.extend_from_slice(&encode_score_field(10));
+    encoded.extend_from_slice(&encode_score_field(20));
+    encoded.extend_from_slice(&encode_score_field(30));
+    
+    let person_rc = PersonLazyImpl::new(&encoded, Global);
+    let scores = person_rc.scores();
+    
+    // Check that we have three scores in order
+    let scores_vec: Vec<i32> = scores.iter().copied().collect();
+    assert_eq!(scores_vec, vec![10, 20, 30]);
+}
+
+#[test]
+fn test_person_lazy_scores_field_empty() {
+    // Test message with no scores field - should return empty list
+    let empty_message = vec![];
+    let person_rc = PersonLazyImpl::new(&empty_message, Global);
+    let scores = person_rc.scores();
+    
+    assert!(scores.iter().next().is_none());
+}
+
+#[test]
+fn test_person_lazy_scores_and_age_together() {
+    // Test message with both age and scores fields
+    let mut encoded = Vec::new();
+    encoded.extend_from_slice(&encode_age_field(30));
+    encoded.extend_from_slice(&encode_score_field(85));
+    encoded.extend_from_slice(&encode_score_field(90));
+    
+    let person_rc = PersonLazyImpl::new(&encoded, Global);
+    
+    // Check age
+    assert_eq!(person_rc.age(), 30);
+    
+    // Check scores
+    let scores = person_rc.scores();
+    let scores_vec: Vec<i32> = scores.iter().copied().collect();
+    assert_eq!(scores_vec, vec![85, 90]);
 }
 

@@ -9,6 +9,7 @@
 use super::lazy_parser::{FieldIterator, MessageParserState, parse_varint};
 use ::allocator_api2::vec::Vec as AllocVec;
 use ::allocator_extras::{Allocator, Global};
+use once_list2::OnceList;
 use puroro::{
     Message,
     error::Error,
@@ -457,7 +458,7 @@ impl<A: Allocator + Clone> Message for PersonImpl<A> {
 
 /// Lazy implementation of Person message that deserializes fields on-demand.
 ///
-/// Phase 1: Only age field (field 2) is implemented.
+/// Phase 2: age field (field 2) and scores field (field 10) are implemented.
 /// Other fields will be added in subsequent phases.
 pub struct PersonLazyImpl<'a, A: Allocator = Global> {
     /// Owns parser state via Rc<RefCell<...>> - State itself is mutable
@@ -466,6 +467,10 @@ pub struct PersonLazyImpl<'a, A: Allocator = Global> {
     /// Field 2: age (implicit presence varint field)
     /// Copy type - Cell is sufficient
     age: Cell<i32>,
+
+    /// Field 10: scores (repeated varint field)
+    /// OnceList has built-in interior mutability - no RefCell needed
+    scores: OnceList<i32, A>,
 }
 
 impl<'a, A: Allocator + Clone + 'a> PersonLazyImpl<'a, A> {
@@ -506,6 +511,7 @@ impl<'a, A: Allocator + Clone + 'a> PersonLazyImpl<'a, A> {
                 parser_state: parser_state.clone(),
                 // Initialize fields with default values
                 age: Cell::new(0),
+                scores: OnceList::new_in(alloc_clone.clone()),
             }
         })
     }
@@ -516,6 +522,15 @@ impl<'a, A: Allocator + Clone + 'a> PersonLazyImpl<'a, A> {
         // Ensure all fields are parsed before returning value
         let _ = self.ensure_all_fields_parsed();
         self.age.get() // Cell - returns Copy value (final confirmed)
+    }
+
+    /// Getter for scores field
+    /// Returns a reference to the OnceList (which implements Repeated trait)
+    /// Note: OnceList has built-in interior mutability, so no RefCell is needed
+    pub fn scores(self: &Rc<Self>) -> &OnceList<i32, A> {
+        // Ensure all fields are parsed before returning reference
+        let _ = self.ensure_all_fields_parsed();
+        &self.scores
     }
 
     /// Ensure all fields are parsed
@@ -565,6 +580,12 @@ impl<'a, A: Allocator + Clone + 'a> PersonLazyImpl<'a, A> {
                 // age field - varint
                 let age_value = parse_varint(value_slice)?;
                 self.age.set(age_value);
+            }
+            10 => {
+                // scores field - repeated varint
+                // Use OnceList's built-in interior mutability
+                let score_value = parse_varint(value_slice)?;
+                self.scores.push(score_value); // push() takes &self
             }
             // Other fields will be added in subsequent phases
             _ => {
