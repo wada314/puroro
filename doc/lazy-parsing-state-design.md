@@ -346,33 +346,26 @@ impl<'a, A: Allocator + Clone> PersonLazyImpl<'a, A> {
 
 **Requirement**: Parse only until first occurrence of target field, but still update other fields
 
+**Note**: This uses the generic `ensure_field_first_occurrence` method, which works for any field type.
+
 ```rust
 impl<'a, A: Allocator + Clone> PersonLazyImpl<'a, A> {
-    pub fn ensure_scores_parsed(self: &Rc<Self>) {
+    pub fn ensure_scores_parsed(self: &Rc<Self>) -> Result<(), Error> {
         // Check if already have first item
         if self.scores.iter().next().is_some() {
-            return; // Already parsed first item
+            return Ok(()); // Already parsed first item
         }
         
-        // Get parser state via RefCell
-        let mut parser_state = self.parser_state.borrow_mut();
-        let field_iter = parser_state.field_iter.as_mut().expect("FieldIterator should be initialized");
-        
-        // Parse until we find first occurrence of field 10 (scores)
-        while let Some(result) = field_iter.next() {
-            let (field_num, wire_type, value_slice) = result?;
-            
-            // Update ALL fields we encounter
-            self.update_field(field_num, wire_type, value_slice)?;
-            
-            if field_num == 10 {
-                // Found target field! Stop here
-                return;
-            }
-        }
+        // Use generic method to parse until first occurrence of field 10
+        // update_field already handles adding the value to scores, so callback does nothing
+        self.ensure_field_first_occurrence(10, |_fnum, _wire_type, _value_slice| {
+            // update_field already handled it (pushed to scores), nothing to do here
+            Ok(None::<()>)
+        })
+        .map(|_| ())  // Convert Ok(Some(_)) or Ok(None) to Ok(())
     }
     
-    fn update_field(&self, field_num: u32, wire_type: u32, value_slice: &'a [u8]) {
+    fn update_field(&self, field_num: u32, wire_type: u32, value_slice: &'a [u8]) -> Result<(), Error> {
         match field_num {
             10 => {
                 // Use OnceList's built-in interior mutability
@@ -381,6 +374,7 @@ impl<'a, A: Allocator + Clone> PersonLazyImpl<'a, A> {
             },
             // ... other fields
         }
+        Ok(())
     }
 }
 ```
@@ -575,52 +569,76 @@ impl<'a, A: Allocator + Clone> PersonLazyImpl<'a, A> {
             return Some(addr.clone());
         }
         
-        // Ensure we've parsed until first occurrence of field 6
-        self.ensure_field_6_first_occurrence()?;
-        
-        // Return cloned Rc to child (may not have all slices yet)
-        self.address.borrow().clone()
+        // Ensure we've parsed until first occurrence of field 6, create child if found
+        match self.ensure_scalar_message_field_first_occurrence(
+            6,
+            |slice, parent_parser_state, alloc| {
+                AddressLazyImpl::new_from_parent(slice, parent_parser_state, alloc)
+            },
+        ) {
+            Ok(Some(child)) => {
+                // Store created child
+                *self.address.borrow_mut() = Some(child.clone());
+                Some(child)
+            },
+            Ok(None) => None,  // Field not found
+            Err(_) => None,  // Error during parsing - treat as field not found
+        }
     }
     
-    /// Parse until first occurrence of field 6, create child if found
-    fn ensure_field_6_first_occurrence(self: &Rc<Self>) -> Option<()> {
-        // Check if already created
-        if self.address.borrow().is_some() {
-            return Some(());
-        }
-        
+    /// Parse until first occurrence of the specified field number, create child if found
+    /// Returns Ok(Some(child)) if field is found and child is created, Ok(None) if field not found, Err if parsing error
+    /// This uses the generic ensure_field_first_occurrence method with a callback that creates a child message
+    fn ensure_scalar_message_field_first_occurrence<Child>(
+        self: &Rc<Self>,
+        field_num: u32,
+        create_child: impl FnOnce(&'a [u8], Rc<RefCell<PersonParserState<'a, A>>>, A) -> Rc<Child, A>,
+    ) -> Result<Option<Rc<Child, A>>, Error> {
+        self.ensure_field_first_occurrence(field_num, |_fnum, _wire_type, value_slice| {
+            // Found target field! Create child with first slice and parent parser state reference
+            let allocator = self.parser_state.borrow().allocator.clone();
+            let parent_parser_state = self.parser_state.clone();
+            let child = create_child(value_slice, parent_parser_state, allocator);
+            Ok(Some(child))
+        })
+    }
+    
+    /// Generic method to parse until first occurrence of a field
+    /// This works for any field type (scalar, repeated, scalar message)
+    /// The `on_found` callback is called when the target field is found and can return a value
+    /// Returns Ok(Some(value)) if field is found and callback returns Some, Ok(None) if field not found, Err if parsing error
+    fn ensure_field_first_occurrence<T>(
+        self: &Rc<Self>,
+        field_num: u32,
+        on_found: impl FnOnce(u32, u32, &'a [u8]) -> Result<Option<T>, Error>,
+    ) -> Result<Option<T>, Error> {
         // Get parser state via RefCell
         let mut parser_state = self.parser_state.borrow_mut();
         
         // Get iterator (may be None if already exhausted)
         let mut field_iter = match parser_state.field_iter.take() {
             Some(iter) => iter,
-            None => return None,  // Already exhausted, field not found
+            None => return Ok(None),  // Already exhausted
         };
         
-        // Parse until we find first occurrence of field 6
+        // Parse until we find first occurrence of the target field
         loop {
             match field_iter.next() {
-                Some(Ok((field_num, wire_type, value_slice))) => {
+                Some(Ok((fnum, wire_type, value_slice))) => {
                     // Update all fields we encounter
                     // Note: We need to drop parser_state borrow before calling update_field
-                    // because update_field might need to borrow address, which could conflict
+                    // because update_field might need to borrow fields, which could conflict
                     drop(parser_state);
-                    self.update_field(field_num, wire_type, value_slice)?;
+                    self.update_field(fnum, wire_type, value_slice)?;
                     
-                    if field_num == 6 {
-                        // Found field 6! Create child with first slice and parent parser state reference
-                        let mut address = self.address.borrow_mut();
-                        if address.is_none() {
-                            *address = Some(AddressLazyImpl::new_from_parent(
-                                value_slice,
-                                self.parser_state.clone(),  // Strong Rc<RefCell<...>> reference to parent's parser state
-                                self.parser_state.borrow().allocator.clone(),
-                            ));
-                        }
+                    if fnum == field_num {
+                        // Found target field! Call the callback
+                        let result = on_found(fnum, wire_type, value_slice)?;
+                        
                         // Store iterator back (may have more fields)
+                        parser_state = self.parser_state.borrow_mut();
                         parser_state.field_iter = Some(field_iter);
-                        return Some(());
+                        return Ok(result);
                     }
                     
                     // Re-borrow parser_state for next iteration
@@ -634,7 +652,7 @@ impl<'a, A: Allocator + Clone> PersonLazyImpl<'a, A> {
                 None => {
                     // Iterator exhausted, field not found
                     parser_state.field_iter = None;
-                    return None;
+                    return Ok(None);
                 }
             }
         }
@@ -698,14 +716,14 @@ impl<'a, A: Allocator + Clone> PersonLazyImpl<'a, A> {
             },
             6 => {
                 // address - scalar message field
-                // Note: Child creation is handled in ensure_field_6_first_occurrence
+                // Note: Child creation is handled in ensure_scalar_message_field_first_occurrence
                 // This is only called for additional slices after child is created
                 let mut address = self.address.borrow_mut();
                 if let Some(ref mut addr) = *address {
                     // Additional slice - add to existing child
                     addr.add_slice(value_slice)?;
                 }
-                // If address is None here, it means ensure_field_6_first_occurrence wasn't called first
+                // If address is None here, it means ensure_scalar_message_field_first_occurrence wasn't called first
                 // This shouldn't happen, but we'll handle it gracefully
             },
             7 => {
