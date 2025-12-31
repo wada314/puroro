@@ -162,6 +162,7 @@ impl<'a, A: Allocator + Clone> PersonLazyImpl<'a, A> {
             )),
             allocator: alloc.clone(),
             field_update_callback: None,
+            child_update_callbacks: std::collections::HashMap::new(),
         }), alloc.clone());
         
         // Create message body wrapped in Rc
@@ -197,6 +198,7 @@ impl<'a, A: Allocator + Clone> PersonLazyImpl<'a, A> {
             )),
             allocator: alloc.clone(),
             field_update_callback: None,
+            child_update_callbacks: std::collections::HashMap::new(),
         }), alloc.clone());
         
         // Create message body wrapped in Rc
@@ -415,7 +417,13 @@ pub struct PersonParserState<'a, A: Allocator = Global> {
     allocator: A,
     /// Callback registered by Message Body to update fields during parsing
     /// This allows Parser State to update Message Body without holding a reference to it
+    /// Used when Message Body is still alive - updates ALL fields
     field_update_callback: Option<Box<dyn FnMut(u32, u32, &'a [u8]) -> Result<(), Error> + 'a>>,
+    /// Callbacks registered for child message fields (scalar message fields)
+    /// Key: field number, Value: callback that updates that child message
+    /// Holds Weak references to child messages, so works even after Message Body is dropped
+    /// Used when Message Body is dropped - only updates child message fields
+    child_update_callbacks: std::collections::HashMap<u32, Box<dyn FnMut(u32, u32, &'a [u8]) -> Result<(), Error> + 'a>>,
 }
 
 impl<'a, A: Allocator + Clone> PersonParserState<'a, A> {
@@ -428,12 +436,30 @@ impl<'a, A: Allocator + Clone> PersonParserState<'a, A> {
         self.field_update_callback = Some(Box::new(callback));
     }
     
+    /// Register a callback for a specific child message field (scalar message fields)
+    /// This callback holds Weak references to child messages, so it works even after Message Body is dropped
+    /// Used by collect_field_slices to update child messages when Message Body is dropped
+    pub fn register_child_update_callback<F>(&mut self, field_num: u32, callback: F)
+    where
+        F: FnMut(u32, u32, &'a [u8]) -> Result<(), Error> + 'a,
+    {
+        self.child_update_callbacks.insert(field_num, Box::new(callback));
+    }
+    
     /// Collect all slices for a specific field number
     /// Called by child when it needs all slices - works even if parent Message Body is dropped
     /// 
     /// This method directly collects slices from the parser state without requiring
     /// the parent Message Body to be alive. This allows child messages to continue
     /// parsing even after the parent Message Body is dropped.
+    /// 
+    /// **Key Design**: Uses two callbacks:
+    /// 1. `field_update_callback`: Updates all fields when Message Body is alive
+    /// 2. `child_update_callbacks`: Updates child message fields when Message Body is dropped
+    /// 
+    /// **Important**: When Message Body is dropped, this method updates ALL registered child message fields,
+    /// not just the target field. This ensures that multiple scalar message child fields can all
+    /// receive their slices when any one of them calls this method.
     /// 
     /// Returns a vector of slices for the target field number.
     pub fn collect_field_slices(&mut self, field_num: u32) -> Result<Vec<&'a [u8]>, Error> {
@@ -443,9 +469,11 @@ impl<'a, A: Allocator + Clone> PersonParserState<'a, A> {
         };
         
         let mut collected_slices = Vec::new();
-        let mut callback = self.field_update_callback.take();
+        let mut field_callback = self.field_update_callback.take();
+        let mut child_callbacks = std::mem::take(&mut self.child_update_callbacks);
         
         // Parse until iterator is exhausted, collecting all occurrences of field_num
+        // and updating ALL registered child message fields (when Message Body is dropped)
         loop {
             match field_iter.next() {
                 Some(Ok((fnum, wire_type, value_slice))) => {
@@ -454,23 +482,36 @@ impl<'a, A: Allocator + Clone> PersonParserState<'a, A> {
                         collected_slices.push(value_slice);
                     }
                     
-                    // Also call registered callback if it exists (for parent Message Body updates)
-                    // This is optional - if parent Message Body is dropped, callback will be None
-                    if let Some(ref mut cb) = callback {
+                    // Update fields for ALL field numbers encountered (not just the target field)
+                    // This ensures that other fields are not dropped/ignored
+                    if let Some(ref mut cb) = field_callback {
+                        // Message Body is still alive - update ALL fields (scalar, repeated, scalar message)
                         let _ = cb(fnum, wire_type, value_slice);
-                        // Ignore errors from callback - parent might be dropped
+                        // If callback succeeds, Message Body is alive - all fields are updated
+                        // If callback fails or returns error, Message Body might be dropped
+                    } else {
+                        // Message Body is dropped, but we can still update child messages via Weak references
+                        // Update ALL registered child message fields (not just the target field_num)
+                        // This ensures that when one child calls collect_field_slices, all other children
+                        // also receive their slices, even if they haven't called collect_field_slices yet
+                        if let Some(ref mut child_cb) = child_callbacks.get_mut(&fnum) {
+                            let _ = child_cb(fnum, wire_type, value_slice);
+                            // Ignore errors - child might be dropped
+                        }
                     }
                 },
                 Some(Err(e)) => {
-                    // Restore callback and iterator before returning error
-                    self.field_update_callback = callback;
+                    // Restore callbacks and iterator before returning error
+                    self.field_update_callback = field_callback;
+                    self.child_update_callbacks = child_callbacks;
                     self.field_iter = Some(field_iter);
                     return Err(e);
                 },
                 None => {
                     // Iterator exhausted
-                    // Restore callback before returning
-                    self.field_update_callback = callback;
+                    // Restore callbacks before returning
+                    self.field_update_callback = field_callback;
+                    self.child_update_callbacks = child_callbacks;
                     self.field_iter = None;
                     return Ok(collected_slices);
                 }
@@ -589,18 +630,30 @@ impl<'a, A: Allocator + Clone> PersonLazyImpl<'a, A> {
             if let Some(message_body) = self_weak.upgrade() {
                 // Update all fields we encounter (for all field numbers)
                 message_body.update_field(fnum, wire_type, value_slice)?;
-                
-                // If this is a scalar message field, also add slice to child if it exists
-                // For field 6 (address), add the slice to the address child
-                if fnum == 6 {
-                    let mut address = message_body.address.borrow_mut();
-                    if let Some(ref mut addr) = *address {
-                        addr.add_slice(value_slice)?;
-                    }
-                }
-                // For other scalar message fields, add similar handling here
             }
             // If message body was dropped, we can't update - this is expected behavior
+            Ok(())
+        });
+    }
+    
+    /// Register child update callback for a specific field number
+    /// This is called when a child message is created, to register a callback that works
+    /// even after the parent Message Body is dropped
+    /// 
+    /// The callback holds a Weak reference to the child message, so it can still update
+    /// the child even if the parent Message Body is dropped
+    fn register_child_update_callback_for_field(
+        self: &Rc<Self>,
+        field_num: u32,
+        child_weak: Weak<AddressLazyImpl<'a, A>, A>,
+    ) {
+        self.parser_state.borrow_mut().register_child_update_callback(field_num, move |_fnum, _wire_type, value_slice| {
+            // Try to upgrade Weak to Rc
+            if let Some(child) = child_weak.upgrade() {
+                // Child still exists - add slice to it
+                child.add_slice(value_slice)?;
+            }
+            // If child was dropped, we can't update - this is expected behavior
             Ok(())
         });
     }
@@ -631,7 +684,11 @@ impl<'a, A: Allocator + Clone> PersonLazyImpl<'a, A> {
                     let allocator = self.parser_state.borrow().allocator.clone();
                     let parent_parser_state = self.parser_state.clone();
                     let child = AddressLazyImpl::new_from_parent(value_slice, parent_parser_state, allocator);
+                    let child_weak = Rc::downgrade(&child);
                     *address = Some(child);
+                    
+                    // Register child update callback so it works even after Message Body is dropped
+                    self.register_child_update_callback_for_field(6, child_weak);
                 }
             },
             7 => {
