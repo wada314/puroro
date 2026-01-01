@@ -94,16 +94,87 @@ where
 
     /// Return an iterator over the elements in the repeated field.
     ///
-    /// This triggers parsing of at least one element (if available) before returning the iterator.
-    /// The iterator will iterate over already-parsed elements; use `get()` to trigger parsing
-    /// for specific indices.
-    pub fn iter(&self) -> impl Iterator<Item = T> + '_
+    /// The iterator's `next()` method triggers parsing on-demand when needed.
+    pub fn iter(&self) -> LazyRepeatedIter<'_, 'a, 'b, T, A>
     where
         T: 'b,
     {
-        // Trigger parsing of at least one element (if available) before returning iterator
-        let _ = self.ensure_at_least(1);
-        self.list.iter().cloned()
+        LazyRepeatedIter::new(self)
+    }
+}
+
+/// Iterator over `LazyRepeated` that triggers parsing on-demand in `next()`.
+pub struct LazyRepeatedIter<'iter, 'a, 'b, T, A>
+where
+    T: Clone + 'b,
+    A: Allocator + Clone + 'a,
+{
+    lazy_repeated: &'iter LazyRepeated<'a, 'b, T, A>,
+    inner_iter: ::std::boxed::Box<dyn Iterator<Item = T> + 'iter>,
+}
+
+impl<'iter, 'a, 'b, T, A> LazyRepeatedIter<'iter, 'a, 'b, T, A>
+where
+    T: Clone + 'b,
+    A: Allocator + Clone + 'a,
+{
+    fn new(lazy_repeated: &'iter LazyRepeated<'a, 'b, T, A>) -> Self {
+        let iter = lazy_repeated.list.iter().cloned();
+        Self {
+            lazy_repeated,
+            inner_iter: ::std::boxed::Box::new(iter),
+        }
+    }
+}
+
+impl<'iter, 'a, 'b, T, A> Iterator for LazyRepeatedIter<'iter, 'a, 'b, T, A>
+where
+    T: Clone + 'b,
+    A: Allocator + Clone + 'a,
+{
+    type Item = T;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        // Try to get next element from the current iterator
+        if let Some(item) = self.inner_iter.next() {
+            return Some(item);
+        }
+
+        // Current iterator exhausted - check if we need to parse more
+        let parser_exhausted = self
+            .lazy_repeated
+            .parent_parser_state
+            .borrow()
+            .field_iter
+            .is_none();
+        if parser_exhausted {
+            // No more elements will be available
+            return None;
+        }
+
+        // Trigger parsing to get more elements
+        let current_total = self.lazy_repeated.list.iter().count();
+        let _ = self.lazy_repeated.ensure_at_least(current_total + 1);
+
+        // Check if we got new elements after parsing
+        let new_total = self.lazy_repeated.list.iter().count();
+        if new_total <= current_total {
+            // No progress made - parser exhausted or no more elements
+            return None;
+        }
+
+        // Recreate the iterator to include newly parsed elements
+        // The new iterator will iterate over all elements, but we've already consumed
+        // all elements from the old iterator, so we just get the new ones
+        let iter = self.lazy_repeated.list.iter().cloned();
+        self.inner_iter = ::std::boxed::Box::new(iter);
+        // Skip the elements we've already seen (all current_total of them)
+        for _ in 0..current_total {
+            self.inner_iter.next();
+        }
+
+        // Now get the next element (which should be newly parsed)
+        self.inner_iter.next()
     }
 }
 
@@ -143,5 +214,3 @@ where
         boxed_dyn
     }
 }
-
-
