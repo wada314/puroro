@@ -2,6 +2,13 @@
 //! Phase 1: age field (scalar integer)
 //! Phase 2: scores field (repeated integer)
 //! Phase 3: address field (scalar message field)
+//! Phase 4: addresses field (repeated message field)
+//!
+//! Note on repeated field lazy parsing:
+//! Currently, the getters (scores(), addresses()) parse all fields before returning.
+//! True lazy parsing (parsing elements on-demand when accessed via iterator) is deferred
+//! and needs further design discussion. For now, we test correctness of the parsing results
+//! but note that true laziness is not yet implemented.
 
 use ::allocator_extras::Global;
 use sandbox::generated::lazy_parser::{decode_varint, parse_varint};

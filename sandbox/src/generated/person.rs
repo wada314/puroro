@@ -459,7 +459,7 @@ impl<A: Allocator + Clone> Message for PersonImpl<A> {
 
 /// Lazy implementation of Person message that deserializes fields on-demand.
 ///
-/// Phase 3: age field (field 2), scores field (field 10), and address field (field 6) are implemented.
+/// Phase 4: age field (field 2), scores field (field 10), address field (field 6), and addresses field (field 9) are implemented.
 /// Other fields will be added in subsequent phases.
 pub struct PersonLazyImpl<'a, A: Allocator + Clone + 'a = Global> {
     /// Owns parser state via Rc<RefCell<...>> - State itself is mutable
@@ -476,6 +476,11 @@ pub struct PersonLazyImpl<'a, A: Allocator + Clone + 'a = Global> {
     /// Field 6: address (scalar message field)
     /// RefCell needed because Option<AddressLazyImpl> is not Copy
     address: RefCell<Option<Rc<AddressLazyImpl<'a, A>>>>,
+
+    /// Field 9: addresses (repeated message field)
+    /// OnceList has built-in interior mutability - no RefCell needed
+    /// Use Rc because OnceList requires Copy, and AddressLazyImpl is not Copy
+    addresses: OnceList<Rc<AddressLazyImpl<'a, A>>, A>,
 }
 
 impl<'a, A: Allocator + Clone + 'a> PersonLazyImpl<'a, A> {
@@ -518,6 +523,7 @@ impl<'a, A: Allocator + Clone + 'a> PersonLazyImpl<'a, A> {
                 age: Cell::new(0),
                 scores: OnceList::new_in(alloc_clone.clone()),
                 address: RefCell::new(None),
+                addresses: OnceList::new_in(alloc_clone.clone()),
             }
         })
     }
@@ -533,8 +539,12 @@ impl<'a, A: Allocator + Clone + 'a> PersonLazyImpl<'a, A> {
     /// Getter for scores field
     /// Returns a reference to the OnceList (which implements Repeated trait)
     /// Note: OnceList has built-in interior mutability, so no RefCell is needed
+    ///
+    /// TODO: Implement true lazy parsing - currently parses all fields before returning.
+    /// True lazy parsing would require parsing elements on-demand when they are accessed
+    /// via the iterator. This needs further design discussion.
     pub fn scores(self: &Rc<Self>) -> &OnceList<i32, A> {
-        // Ensure all fields are parsed before returning reference
+        // Parse all fields before returning - true lazy parsing implementation is deferred
         let _ = self.ensure_all_fields_parsed();
         &self.scores
     }
@@ -548,6 +558,79 @@ impl<'a, A: Allocator + Clone + 'a> PersonLazyImpl<'a, A> {
         // For now, we parse all fields to ensure child is created
         let _ = self.ensure_all_fields_parsed();
         self.address.borrow().clone()
+    }
+
+    /// Getter for addresses field
+    /// Returns a reference to the OnceList (which implements Repeated trait)
+    /// Note: OnceList has built-in interior mutability, so no RefCell is needed
+    ///
+    /// TODO: Implement true lazy parsing - currently parses all fields before returning.
+    /// True lazy parsing would require parsing elements on-demand when they are accessed
+    /// via the iterator. This needs further design discussion.
+    pub fn addresses(self: &Rc<Self>) -> &OnceList<Rc<AddressLazyImpl<'a, A>>, A> {
+        // Parse all fields before returning - true lazy parsing implementation is deferred
+        let _ = self.ensure_all_fields_parsed();
+        &self.addresses
+    }
+
+    /// Ensure a specific repeated field has at least `count` elements parsed
+    /// Parses fields until we have at least `count` elements in the specified field
+    ///
+    /// This is a helper method for future true lazy parsing implementation.
+    /// Currently unused - reserved for when we implement on-demand parsing for repeated fields.
+    #[allow(dead_code)]
+    fn ensure_repeated_field_parsed_until(
+        self: &Rc<Self>,
+        field_num: u32,
+        count: usize,
+        current_count: usize,
+    ) -> Result<(), Error> {
+        // If we already have enough elements, no need to parse
+        if current_count >= count {
+            return Ok(());
+        }
+
+        // Check if iterator still exists
+        let mut parser_state = self.parser_state.borrow_mut();
+        let mut field_iter = match parser_state.field_iter.take() {
+            Some(iter) => iter,
+            None => return Ok(()), // Already parsed completely
+        };
+
+        // Parse until we have enough elements for this field
+        loop {
+            match field_iter.next() {
+                Some(Ok((fnum, wire_type, value_slice))) => {
+                    drop(parser_state); // Release borrow before calling update_field
+                    self.update_field(fnum, wire_type, value_slice)?;
+                    parser_state = self.parser_state.borrow_mut(); // Re-borrow for next iteration
+
+                    // Check if we've parsed enough elements for this field
+                    if fnum == field_num {
+                        let new_count = match field_num {
+                            10 => self.scores.iter().count(),   // scores field
+                            9 => self.addresses.iter().count(), // addresses field
+                            _ => current_count,
+                        };
+                        if new_count >= count {
+                            // Store iterator back (not exhausted, just got enough elements)
+                            parser_state.field_iter = Some(field_iter);
+                            return Ok(());
+                        }
+                    }
+                }
+                Some(Err(e)) => {
+                    // Store iterator back before returning error
+                    parser_state.field_iter = Some(field_iter);
+                    return Err(e);
+                }
+                None => {
+                    // Iterator exhausted - store None to indicate parsing is complete
+                    parser_state.field_iter = None;
+                    return Ok(());
+                }
+            }
+        }
     }
 
     /// Ensure all fields are parsed
@@ -620,6 +703,22 @@ impl<'a, A: Allocator + Clone + 'a> PersonLazyImpl<'a, A> {
                     );
                     *address = Some(child);
                 }
+            }
+            9 => {
+                // addresses field - repeated message field (length-delimited, wire type 2)
+                if wire_type != 2 {
+                    return Err(Error::InvalidWireFormat(
+                        "Addresses field must be length-delimited".to_string(),
+                    ));
+                }
+                // For repeated message fields, each occurrence is a separate message
+                // Create a new AddressLazyImpl for this occurrence
+                let allocator = self.parser_state.borrow().allocator.clone();
+                let parent_parser_state = self.parser_state.clone();
+                let child =
+                    AddressLazyImpl::new_from_parent(value_slice, parent_parser_state, allocator);
+                // Use OnceList's built-in interior mutability
+                self.addresses.push(child); // push() takes &self
             }
             10 => {
                 // scores field - repeated varint
