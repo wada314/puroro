@@ -185,7 +185,7 @@ fn test_person_lazy_scores_field_single() {
 
     // Check that we have one score
     assert_eq!(scores.iter().count(), 1);
-    assert_eq!(scores.iter().next().copied().unwrap(), 85);
+    assert_eq!(scores.iter().next().unwrap(), 85);
 }
 
 #[test]
@@ -200,7 +200,7 @@ fn test_person_lazy_scores_field_multiple() {
     let scores = person_rc.scores();
 
     // Check that we have three scores in order
-    let scores_vec: Vec<i32> = scores.iter().copied().collect();
+    let scores_vec: Vec<i32> = scores.iter().collect();
     assert_eq!(scores_vec, vec![10, 20, 30]);
 }
 
@@ -229,7 +229,7 @@ fn test_person_lazy_scores_and_age_together() {
 
     // Check scores
     let scores = person_rc.scores();
-    let scores_vec: Vec<i32> = scores.iter().copied().collect();
+    let scores_vec: Vec<i32> = scores.iter().collect();
     assert_eq!(scores_vec, vec![85, 90]);
 }
 

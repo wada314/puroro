@@ -5,4 +5,5 @@
 
 pub mod address;
 pub mod lazy_parser;
+pub mod repeated_lazy;
 pub mod person;

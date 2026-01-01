@@ -8,6 +8,7 @@
 
 use super::address::AddressLazyImpl;
 use super::lazy_parser::{FieldIterator, MessageParserState, parse_varint};
+use super::repeated_lazy::LazyRepeated;
 use ::allocator_api2::vec::Vec as AllocVec;
 use ::allocator_extras::{Allocator, Global};
 use once_list2::OnceList;
@@ -537,16 +538,9 @@ impl<'a, A: Allocator + Clone + 'a> PersonLazyImpl<'a, A> {
     }
 
     /// Getter for scores field
-    /// Returns a reference to the OnceList (which implements Repeated trait)
-    /// Note: OnceList has built-in interior mutability, so no RefCell is needed
-    ///
-    /// TODO: Implement true lazy parsing - currently parses all fields before returning.
-    /// True lazy parsing would require parsing elements on-demand when they are accessed
-    /// via the iterator. This needs further design discussion.
-    pub fn scores(self: &Rc<Self>) -> &OnceList<i32, A> {
-        // Parse all fields before returning - true lazy parsing implementation is deferred
-        let _ = self.ensure_all_fields_parsed();
-        &self.scores
+    /// Returns a LazyRepeated adapter that enables on-demand parsing
+    pub fn scores(self: &Rc<Self>) -> LazyRepeated<'a, '_, i32, A> {
+        LazyRepeated::new(self.parser_state.clone(), 10, &self.scores)
     }
 
     /// Getter for address field
@@ -561,16 +555,9 @@ impl<'a, A: Allocator + Clone + 'a> PersonLazyImpl<'a, A> {
     }
 
     /// Getter for addresses field
-    /// Returns a reference to the OnceList (which implements Repeated trait)
-    /// Note: OnceList has built-in interior mutability, so no RefCell is needed
-    ///
-    /// TODO: Implement true lazy parsing - currently parses all fields before returning.
-    /// True lazy parsing would require parsing elements on-demand when they are accessed
-    /// via the iterator. This needs further design discussion.
-    pub fn addresses(self: &Rc<Self>) -> &OnceList<Rc<AddressLazyImpl<'a, A>>, A> {
-        // Parse all fields before returning - true lazy parsing implementation is deferred
-        let _ = self.ensure_all_fields_parsed();
-        &self.addresses
+    /// Returns a LazyRepeated adapter that enables on-demand parsing
+    pub fn addresses(self: &Rc<Self>) -> LazyRepeated<'a, '_, Rc<AddressLazyImpl<'a, A>>, A> {
+        LazyRepeated::new(self.parser_state.clone(), 9, &self.addresses)
     }
 
     /// Ensure a specific repeated field has at least `count` elements parsed
