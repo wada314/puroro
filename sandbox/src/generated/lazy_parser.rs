@@ -8,10 +8,8 @@
 use ::allocator_extras::{Allocator, Global};
 use once_list2::OnceList;
 use puroro::error::Error;
+use puroro::protobuf_core::field::read_slice::parse_field_from_slice;
 use puroro::protobuf_core::field::{Field, FieldValue};
-use puroro::protobuf_core::tag::read_tag;
-use puroro::protobuf_core::varint::IteratorExtVarint;
-use puroro::protobuf_core::wire_format::WireType;
 
 /// Decode a varint-encoded value from a byte slice.
 ///
@@ -103,7 +101,7 @@ impl<'a> FieldIterator<'a> {
 }
 
 impl<'a> Iterator for FieldIterator<'a> {
-    type Item = Result<Field<'a>, Error>; // Changed: Return Field type with lifetime
+    type Item = Result<Field<&'a [u8]>, Error>;
 
     fn next(&mut self) -> Option<Self::Item> {
         loop {
@@ -112,83 +110,20 @@ impl<'a> Iterator for FieldIterator<'a> {
                 if self.position < slice.len() {
                     let remaining = &slice[self.position..];
 
-                    // Read tag using protobuf-core
-                    let mut iter = remaining.iter().copied();
-                    let tag = match read_tag(&mut iter) {
-                        Ok(Some(tag)) => tag,
+                    // Use protobuf-core's parse_field_from_slice function
+                    match parse_field_from_slice(remaining) {
+                        Ok(Some((field, consumed))) => {
+                            self.position += consumed;
+                            return Some(Ok(field));
+                        }
                         Ok(None) => {
-                            return Some(Err(Error::InvalidWireFormat(
-                                "Incomplete tag".to_string(),
-                            )));
+                            // Slice is empty, move to next slice
+                            self.current_slice = self.slice_iter.next();
+                            self.position = 0;
+                            continue;
                         }
                         Err(e) => return Some(Err(e.into())),
-                    };
-
-                    // Calculate tag bytes for position tracking
-                    let tag_bytes = tag.to_encoded().varint_size();
-                    let value_start = self.position + tag_bytes;
-
-                    // Build FieldValue based on wire type
-                    let field_value = match tag.wire_type {
-                        WireType::Varint => {
-                            let varint_iter = remaining[tag_bytes..].iter().copied();
-                            let varint = match varint_iter.try_collect_varint() {
-                                Ok(Some(v)) => v,
-                                Ok(None) => {
-                                    return Some(Err(Error::InvalidWireFormat(
-                                        "Incomplete varint".to_string(),
-                                    )));
-                                }
-                                Err(e) => return Some(Err(e.into())),
-                            };
-                            FieldValue::Varint(varint)
-                        }
-                        WireType::Len => {
-                            // Read length prefix (varint)
-                            let length_iter = remaining[tag_bytes..].iter().copied();
-                            let length_varint = match length_iter.try_collect_varint() {
-                                Ok(Some(v)) => v,
-                                Ok(None) => {
-                                    return Some(Err(Error::InvalidWireFormat(
-                                        "Incomplete length".to_string(),
-                                    )));
-                                }
-                                Err(e) => return Some(Err(e.into())),
-                            };
-                            let length = match length_varint.try_to_uint32() {
-                                Ok(v) => v as usize,
-                                Err(e) => return Some(Err(e.into())),
-                            };
-                            let length_bytes = length_varint.varint_size();
-                            let value_start_with_length = value_start + length_bytes;
-                            let value_end = value_start_with_length + length;
-                            if value_end > slice.len() {
-                                return Some(Err(Error::InvalidWireFormat(
-                                    "Length-delimited field extends beyond slice".to_string(),
-                                )));
-                            }
-                            FieldValue::Len(std::borrow::Cow::Borrowed(
-                                &slice[value_start_with_length..value_end],
-                            ))
-                        }
-                        _ => {
-                            return Some(Err(Error::InvalidWireFormat(format!(
-                                "Unsupported wire type: {:?}",
-                                tag.wire_type
-                            ))));
-                        }
-                    };
-
-                    // Build Field
-                    let field = Field {
-                        field_number: tag.field_number,
-                        value: field_value,
-                    };
-
-                    // Update position using Field::encoded_size()
-                    self.position += field.encoded_size();
-
-                    return Some(Ok(field));
+                    }
                 }
             }
 
@@ -225,7 +160,7 @@ pub struct MessageParserState<'a, A: Allocator = Global> {
     /// as it doesn't need to know the specific message type at compile time.
     /// Use std::boxed::Box (not allocator_api2::Box) for consistency
     pub field_update_callback:
-        Option<std::boxed::Box<dyn FnMut(Field<'a>) -> Result<(), Error> + 'a>>,
+        Option<std::boxed::Box<dyn FnMut(Field<&'a [u8]>) -> Result<(), Error> + 'a>>,
 }
 
 impl<'a, A: Allocator + Clone> MessageParserState<'a, A> {

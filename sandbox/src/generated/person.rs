@@ -497,8 +497,8 @@ impl<'a, A: Allocator + Clone + 'a> PersonLazyImpl<'a, A> {
 
             // Create initial callback that only handles Message Body (when it's alive)
             // This callback will be replaced in Drop::drop with one that handles child messages
-            let callback: std::boxed::Box<dyn FnMut(Field<'a>) -> Result<(), Error> + 'a> =
-                std::boxed::Box::new(move |field: Field<'a>| -> Result<(), Error> {
+            let callback: std::boxed::Box<dyn FnMut(Field<&'a [u8]>) -> Result<(), Error> + 'a> =
+                std::boxed::Box::new(move |field: Field<&'a [u8]>| -> Result<(), Error> {
                     // Update via Message Body (should always succeed when this callback is active)
                     if let Some(message_body) = message_body_weak.upgrade() {
                         let _ = message_body.update_field(field);
@@ -656,7 +656,7 @@ impl<'a, A: Allocator + Clone + 'a> PersonLazyImpl<'a, A> {
 
     /// Update a field with parsed value
     /// Called during parsing to update field values
-    fn update_field(self: &Rc<Self>, field: Field<'a>) -> Result<(), Error> {
+    fn update_field(self: &Rc<Self>, field: Field<&'a [u8]>) -> Result<(), Error> {
         let field_num = field.field_number.as_u32();
         match field_num {
             2 => {
@@ -669,20 +669,16 @@ impl<'a, A: Allocator + Clone + 'a> PersonLazyImpl<'a, A> {
             6 => {
                 // address field - scalar message field (length-delimited)
                 if let FieldValue::Len(data) = field.value {
-                    let data_slice = data.as_ref();
                     let mut address = self.address.borrow_mut();
                     if let Some(ref addr) = *address {
                         // Child already exists - add slice to it
-                        addr.add_slice(data_slice)?;
+                        addr.add_slice(data)?;
                     } else {
                         // First occurrence - create child with first slice
                         let allocator = self.parser_state.borrow().allocator.clone();
                         let parent_parser_state = self.parser_state.clone();
-                        let child = AddressLazyImpl::new_from_parent(
-                            data_slice,
-                            parent_parser_state,
-                            allocator,
-                        );
+                        let child =
+                            AddressLazyImpl::new_from_parent(data, parent_parser_state, allocator);
                         *address = Some(child);
                     }
                 }
@@ -732,8 +728,8 @@ impl<'a, A: Allocator + Clone + 'a> Drop for PersonLazyImpl<'a, A> {
             .map(|addr| Rc::downgrade(addr));
 
         // Create new callback that captures child Weak references and uses static match-case
-        let new_callback: std::boxed::Box<dyn FnMut(Field<'a>) -> Result<(), Error> + 'a> =
-            std::boxed::Box::new(move |field: Field<'a>| -> Result<(), Error> {
+        let new_callback: std::boxed::Box<dyn FnMut(Field<&'a [u8]>) -> Result<(), Error> + 'a> =
+            std::boxed::Box::new(move |field: Field<&'a [u8]>| -> Result<(), Error> {
                 // Static match-case for each child message field
                 let field_num = field.field_number.as_u32();
                 match field_num {
@@ -742,7 +738,7 @@ impl<'a, A: Allocator + Clone + 'a> Drop for PersonLazyImpl<'a, A> {
                         if let FieldValue::Len(data) = field.value {
                             if let Some(ref addr_weak) = address_weak {
                                 if let Some(addr) = addr_weak.upgrade() {
-                                    let _ = addr.add_slice(data.as_ref());
+                                    let _ = addr.add_slice(data);
                                 }
                             }
                         }

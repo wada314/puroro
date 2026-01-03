@@ -421,21 +421,21 @@ impl<'a, A: Allocator + Clone + 'a> AddressLazyImpl<'a, A> {
     /// Update a field with parsed value
     fn update_field(
         self: &Rc<Self>,
-        field: Field<'a>,
+        field: Field<&'a [u8]>,
     ) -> Result<(), Error> {
         let field_num = field.field_number.as_u32();
         match field_num {
             1 => {
                 // street field - string
                 if let FieldValue::Len(data) = field.value {
-                    let street_value = String::from_utf8(data.into_owned()).map_err(|e| Error::InvalidUtf8(e))?;
+                    let street_value = String::from_utf8(data.to_vec()).map_err(|e| Error::InvalidUtf8(e))?;
                     *self.street.borrow_mut() = street_value;
                 }
             }
             2 => {
                 // city field - string
                 if let FieldValue::Len(data) = field.value {
-                    let city_value = String::from_utf8(data.into_owned()).map_err(|e| Error::InvalidUtf8(e))?;
+                    let city_value = String::from_utf8(data.to_vec()).map_err(|e| Error::InvalidUtf8(e))?;
                     *self.city.borrow_mut() = city_value;
                 }
             }
