@@ -11,7 +11,7 @@ repository = "https://github.com/wada314/puroro"
 
 [workspace.dependencies]
 # External utility crates
-protobuf-core = "0.1"
+protobuf-core = { path = "../protobuf-core" }
 protoc-plugin-by-closure = { git = "https://github.com/wada314/protoc-plugin-by-closure" }
 allocator-api2 = "0.2"
 bitvec = "1.0"

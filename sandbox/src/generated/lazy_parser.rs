@@ -8,6 +8,10 @@
 use ::allocator_extras::{Allocator, Global};
 use once_list2::OnceList;
 use puroro::error::Error;
+use puroro::protobuf_core::field::{Field, FieldValue};
+use puroro::protobuf_core::tag::read_tag;
+use puroro::protobuf_core::varint::IteratorExtVarint;
+use puroro::protobuf_core::wire_format::WireType;
 
 /// Decode a varint-encoded value from a byte slice.
 ///
@@ -28,9 +32,7 @@ pub fn decode_varint(bytes: &[u8]) -> Result<(u64, usize), Error> {
 
         shift += 7;
         if shift >= 64 {
-            return Err(Error::InvalidWireFormat(
-                "Varint too long".to_string(),
-            ));
+            return Err(Error::InvalidWireFormat("Varint too long".to_string()));
         }
     }
 
@@ -101,81 +103,92 @@ impl<'a> FieldIterator<'a> {
 }
 
 impl<'a> Iterator for FieldIterator<'a> {
-    type Item = Result<(u32, u32, &'a [u8]), Error>; // field_num, wire_type, value_slice
+    type Item = Result<Field<'a>, Error>; // Changed: Return Field type with lifetime
 
     fn next(&mut self) -> Option<Self::Item> {
         loop {
             // Get current slice or advance to next slice
             if let Some(slice) = self.current_slice {
                 if self.position < slice.len() {
-                    // Parse field tag
                     let remaining = &slice[self.position..];
-                    let (field_num, wire_type, tag_bytes) = match decode_field_tag(remaining) {
-                        Ok(tag) => tag,
-                        Err(e) => return Some(Err(e)),
+
+                    // Read tag using protobuf-core
+                    let mut iter = remaining.iter().copied();
+                    let tag = match read_tag(&mut iter) {
+                        Ok(Some(tag)) => tag,
+                        Ok(None) => {
+                            return Some(Err(Error::InvalidWireFormat(
+                                "Incomplete tag".to_string(),
+                            )));
+                        }
+                        Err(e) => return Some(Err(e.into())),
                     };
 
+                    // Calculate tag bytes for position tracking
+                    let tag_bytes = tag.to_encoded().varint_size();
                     let value_start = self.position + tag_bytes;
 
-                    // Extract value slice based on wire type
-                    let value_slice = match wire_type {
-                        0 => {
-                            // Varint - read varint to find its length
-                            let (_, varint_bytes) = match decode_varint(&remaining[tag_bytes..]) {
-                                Ok(v) => v,
-                                Err(e) => return Some(Err(e)),
+                    // Build FieldValue based on wire type
+                    let field_value = match tag.wire_type {
+                        WireType::Varint => {
+                            let varint_iter = remaining[tag_bytes..].iter().copied();
+                            let varint = match varint_iter.try_collect_varint() {
+                                Ok(Some(v)) => v,
+                                Ok(None) => {
+                                    return Some(Err(Error::InvalidWireFormat(
+                                        "Incomplete varint".to_string(),
+                                    )));
+                                }
+                                Err(e) => return Some(Err(e.into())),
                             };
-                            let value_end = value_start + varint_bytes;
+                            FieldValue::Varint(varint)
+                        }
+                        WireType::Len => {
+                            // Read length prefix (varint)
+                            let length_iter = remaining[tag_bytes..].iter().copied();
+                            let length_varint = match length_iter.try_collect_varint() {
+                                Ok(Some(v)) => v,
+                                Ok(None) => {
+                                    return Some(Err(Error::InvalidWireFormat(
+                                        "Incomplete length".to_string(),
+                                    )));
+                                }
+                                Err(e) => return Some(Err(e.into())),
+                            };
+                            let length = match length_varint.try_to_uint32() {
+                                Ok(v) => v as usize,
+                                Err(e) => return Some(Err(e.into())),
+                            };
+                            let length_bytes = length_varint.varint_size();
+                            let value_start_with_length = value_start + length_bytes;
+                            let value_end = value_start_with_length + length;
                             if value_end > slice.len() {
                                 return Some(Err(Error::InvalidWireFormat(
-                                    "Varint extends beyond slice".to_string(),
+                                    "Length-delimited field extends beyond slice".to_string(),
                                 )));
                             }
-                            &slice[value_start..value_end]
-                        }
-                        2 => {
-                            // Length-delimited - read length prefix (varint)
-                            let (length, length_bytes) =
-                                match decode_varint(&remaining[tag_bytes..]) {
-                                    Ok(v) => v,
-                                    Err(e) => return Some(Err(e)),
-                                };
-                            let value_start_with_length = value_start + length_bytes;
-                            let value_end = value_start_with_length + length as usize;
-                            if value_end > slice.len() {
-                                // Value might span multiple slices - we'll handle this later
-                                // For now, return the available portion
-                                &slice[value_start_with_length..]
-                            } else {
-                                &slice[value_start_with_length..value_end]
-                            }
+                            FieldValue::Len(std::borrow::Cow::Borrowed(
+                                &slice[value_start_with_length..value_end],
+                            ))
                         }
                         _ => {
                             return Some(Err(Error::InvalidWireFormat(format!(
-                                "Unsupported wire type: {}",
-                                wire_type
+                                "Unsupported wire type: {:?}",
+                                tag.wire_type
                             ))));
                         }
                     };
 
-                    // Update position
-                    // For wire type 2 (length-delimited), we already computed length_bytes above
-                    // value_slice is just the value part (without length prefix)
-                    // So we need to account for: tag_bytes + length_bytes + value_length
-                    if wire_type == 2 {
-                        // For length-delimited, we already computed length_bytes above (in the match arm)
-                        // Re-decode to get length_bytes for position calculation
-                        let (_, length_bytes) = match decode_varint(&remaining[tag_bytes..]) {
-                            Ok(v) => v,
-                            Err(e) => return Some(Err(e)),
-                        };
-                        self.position += tag_bytes + length_bytes + value_slice.len();
-                    } else {
-                        // For varint, value_slice contains the entire varint
-                        self.position += tag_bytes + value_slice.len();
-                    }
+                    // Build Field
+                    let field = Field {
+                        field_number: tag.field_number,
+                        value: field_value,
+                    };
 
-                    return Some(Ok((field_num, wire_type, value_slice)));
+                    // Update position using Field::encoded_size()
+                    self.position += field.encoded_size();
+
+                    return Some(Ok(field));
                 }
             }
 
@@ -211,7 +224,8 @@ pub struct MessageParserState<'a, A: Allocator = Global> {
     /// This design allows MessageParserState to be generic across all message types,
     /// as it doesn't need to know the specific message type at compile time.
     /// Use std::boxed::Box (not allocator_api2::Box) for consistency
-    pub field_update_callback: Option<std::boxed::Box<dyn FnMut(u32, u32, &'a [u8]) -> Result<(), Error> + 'a>>,
+    pub field_update_callback:
+        Option<std::boxed::Box<dyn FnMut(Field<'a>) -> Result<(), Error> + 'a>>,
 }
 
 impl<'a, A: Allocator + Clone> MessageParserState<'a, A> {
@@ -234,10 +248,10 @@ impl<'a, A: Allocator + Clone> MessageParserState<'a, A> {
         // Parse until iterator is exhausted, updating ALL fields via callback
         loop {
             match field_iter.next() {
-                Some(Ok((fnum, wire_type, value_slice))) => {
+                Some(Ok(field)) => {
                     // Update field via callback (handles both Message Body and child messages)
                     if let Some(ref mut callback) = self.field_update_callback {
-                        let _ = callback(fnum, wire_type, value_slice);
+                        let _ = callback(field);
                         // Ignore errors - Message Body or child might be dropped
                     }
                 }
@@ -255,4 +269,3 @@ impl<'a, A: Allocator + Clone> MessageParserState<'a, A> {
         }
     }
 }
-

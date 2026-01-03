@@ -98,4 +98,30 @@ pub mod error {
         #[error("Invalid UTF-8: {0}")]
         InvalidUtf8(#[from] std::string::FromUtf8Error),
     }
+
+    impl From<protobuf_core::ProtobufError> for Error {
+        fn from(err: protobuf_core::ProtobufError) -> Self {
+            match err {
+                protobuf_core::ProtobufError::FieldNumberOutOfRange { value } => {
+                    Error::InvalidWireFormat(format!("Field number out of range: {}", value))
+                }
+                protobuf_core::ProtobufError::InvalidWireType { value } => {
+                    Error::InvalidWireFormat(format!("Invalid wire type: {}", value))
+                }
+                protobuf_core::ProtobufError::VarintDowncastOutOfRange { value, target_type } => {
+                    Error::InvalidWireFormat(format!("Varint value {} out of range for {}", value, target_type))
+                }
+                protobuf_core::ProtobufError::MalformedTag { field_number, wire_type } => {
+                    Error::InvalidWireFormat(format!("Malformed tag: field_number={}, wire_type={}", field_number, wire_type))
+                }
+                protobuf_core::ProtobufError::UnexpectedEof => {
+                    Error::InvalidWireFormat("Unexpected EOF while parsing field".to_string())
+                }
+                protobuf_core::ProtobufError::IoError(e) => Error::Io(e),
+                protobuf_core::ProtobufError::FieldTypeDowncastError { expected_type } => {
+                    Error::InvalidWireFormat(format!("Field type downcast error: {}", expected_type))
+                }
+            }
+        }
+    }
 }

@@ -89,25 +89,18 @@ See `PersonLazyImpl::age()` in `sandbox/src/generated/person.rs`.
 
 **Note**: This uses the generic `ensure_field_first_occurrence` method, which works for any field type.
 
-**Current Implementation Status (as of Phase 4)**:
-- The getters (`scores()`, `addresses()`) currently call `ensure_all_fields_parsed()` before returning `&OnceList`.
-- True lazy parsing (parsing elements on-demand when accessed via iterator) is **not yet implemented**.
-- This is a **future enhancement** that needs further design discussion.
+**Status**: ✅ **Implemented** (2025-01)
 
-**Design Challenge**:
-The challenge is that `OnceList`'s `iter()` method only returns already-parsed elements. To implement true lazy parsing, we need a way to trigger parsing when elements are accessed via the iterator. However:
-- `OnceList` is from an external crate (`once-list2`), so we can't modify its iterator behavior
-- The `Repeated` trait implementation for `&OnceList` is also in an external crate (`puroro`)
-- We need to parse elements on-demand when `get()`, `len()`, or `iter()` is called
+The getters (`scores()`, `addresses()`) return `LazyRepeated` wrapper that implements true lazy parsing:
+- Elements are parsed on-demand when accessed via `iter()`, `get()`, `len()`, etc.
+- Parsing stops when the required number of elements is found (incremental parsing)
+- All fields encountered during parsing are still updated (protobuf semantics)
 
-**Possible Approaches for Future Implementation**:
-1. **Custom wrapper type**: Create a wrapper around `OnceList` that implements `Repeated` trait and triggers parsing in `get()`, `len()`, and `iter_box()` methods
-2. **Custom iterator wrapper**: Wrap `OnceList::iter()` with a custom iterator that parses on-demand during iteration
-3. **Modify Repeated trait implementation**: Move the `Repeated` trait implementation from external crate to allow custom parsing logic (significant architectural change)
+See the actual implementation in:
+- `sandbox/src/generated/repeated_lazy.rs` - `LazyRepeated` and `LazyRepeatedIter` implementation
+- `sandbox/src/generated/person.rs` - `PersonLazyImpl::scores()` and `addresses()` getters
 
-**Current Implementation**: The getters (`scores()`, `addresses()`) call `ensure_all_fields_parsed()` before returning `&OnceList`. See `PersonLazyImpl::scores()` and `PersonLazyImpl::addresses()` in `sandbox/src/generated/person.rs`.
-
-For future true lazy parsing implementation examples, see `historical/lazy-parsing-implementation-samples.md`.
+For detailed implementation details and known limitations, see the "Implementation: True Lazy Parsing for Repeated Fields" section below.
 
 ### 3. Scalar Message Fields (e.g., `address`)
 
@@ -292,107 +285,74 @@ Our design shares similarities with the Builder pattern in Rust, but with import
 
 ---
 
-## Problem Statement: True Lazy Parsing for Repeated Fields
+## Implementation: True Lazy Parsing for Repeated Fields
 
-### Current Situation
+### Status: ✅ Implemented
 
-**Implemented (Phase 4)**: Repeated fields (`scores`, `addresses`) are stored in `OnceList` and their getters return `&OnceList`, which implements the `Repeated` trait. However, **the current implementation is not truly lazy**.
+**Implementation Complete (2025-01)**: Repeated fields (`scores`, `addresses`) now support true lazy parsing via the `LazyRepeated` wrapper type.
 
-**Current Behavior**:
-- When `scores()` or `addresses()` is called, the getter calls `ensure_all_fields_parsed()` before returning `&OnceList`
-- This means **all fields in the entire message are parsed**, not just the repeated field elements
-- Once `&OnceList` is returned, iteration over it only returns already-parsed elements
+**Current Implementation**:
+- `PersonLazyImpl::scores()` and `addresses()` return `LazyRepeated` wrapper (not `&OnceList`)
+- `LazyRepeated` implements the `Repeated` trait, maintaining API compatibility
+- Elements are parsed on-demand when accessed via `iter()`, `get()`, `len()`, etc.
+- Parsing stops when the required number of elements is found (incremental parsing)
 
 **Code Example** (from `sandbox/src/generated/person.rs`):
 ```rust
-pub fn scores(self: &Rc<Self>) -> &OnceList<i32, A> {
-    // Parse all fields before returning - true lazy parsing implementation is deferred
-    let _ = self.ensure_all_fields_parsed();
-    &self.scores
+pub fn scores(self: &Rc<Self>) -> LazyRepeated<'a, '_, i32, A> {
+    LazyRepeated::new(self.parser_state.clone(), 10, &self.scores)
 }
 ```
 
-### The Problem
+### Implementation Details
 
-**Desired Behavior**:
-We want true lazy parsing for repeated fields, where:
-1. **No parsing on getter call**: Calling `scores()` or `addresses()` should return immediately without parsing
-2. **On-demand parsing**: Elements are parsed only when accessed via iterator (`iter()`, `get()`, `len()`, etc.)
-3. **Incremental parsing**: Parse only until we have enough elements (e.g., if user calls `scores().get(0)`, parse only until the first score element is found)
-4. **All fields updated**: While parsing for one repeated field, we still update other fields we encounter (as per protobuf semantics)
+**LazyRepeated Wrapper**:
+- Holds a reference to the parent's `MessageParserState`
+- Holds a reference to the underlying `OnceList`
+- Implements the `Repeated` trait by delegating to `OnceList` but triggering parsing when needed
 
-**Current Limitations**:
+**Key Methods**:
+1. **`ensure_at_least(needed: usize)`**: Parses until at least `needed` elements are available
+2. **`ensure_fully_parsed()`**: Parses all remaining fields (used for `len()` and `iter_box()`)
+3. **`iter()`**: Returns `LazyRepeatedIter` that triggers parsing on-demand in `next()`
 
-1. **OnceList's Iterator Behavior**:
-   - `OnceList::iter()` only returns elements that have already been added via `push()`
-   - It does not provide a mechanism to trigger parsing when iteration starts
-   - `OnceList` is from external crate `once-list2`, so we cannot modify its behavior
+**Repeated Trait Implementation**:
+- `get(index)`: Calls `ensure_at_least(index + 1)` then delegates to `OnceList::get()`
+- `len()`: Calls `ensure_fully_parsed()` then delegates to `OnceList::len()`
+- `is_empty()`: Calls `ensure_at_least(1)` then checks if any elements exist
+- `iter()`: Returns `LazyRepeatedIter` wrapper
+- `iter_box()`: Calls `ensure_fully_parsed()` then collects all elements into a boxed iterator
 
-2. **Repeated Trait Implementation**:
-   - The `Repeated` trait is implemented for `&OnceList` in an external crate (`puroro`)
-   - Methods like `get()`, `len()`, `iter_box()` delegate to `OnceList`'s methods
-   - We cannot intercept these calls to trigger parsing
+**LazyRepeatedIter Iterator**:
+- Wraps the underlying `OnceList::iter()` iterator
+- When iterator is exhausted, checks if parent parser has more fields
+- If yes, triggers parsing via `ensure_at_least()` and recreates iterator with newly parsed elements
+- Provides seamless on-demand parsing during iteration
 
-3. **Return Type Constraint**:
-   - The getter must return `&OnceList` (or something that implements `Repeated`)
-   - We cannot change the return type without breaking API compatibility
-   - The `Repeated` trait requires specific method signatures
+### How It Works
 
-### Specific Challenges
+**Pattern**: Same as scalar child message fields - object triggers parent's parse until condition is met.
 
-**Challenge 1: Iterator Access**
-- User code: `person.scores().iter().next()`
-- Flow: `scores()` → returns `&OnceList` → `iter()` → `next()`
-- Problem: `OnceList::iter()` returns an iterator over already-parsed elements. There's no hook to parse more elements when `next()` is called.
+1. **Getter Call**: `person.scores()` returns `LazyRepeated` immediately (no parsing)
+2. **Element Access**: When `scores().get(5)` is called:
+   - `LazyRepeated::get()` calls `ensure_at_least(6)` (need 6 elements for index 5)
+   - `ensure_at_least()` calls `parent_parser_state.continue_parsing_for_children()`
+   - Parent parser continues parsing, updating all fields via callback
+   - Target field (`scores`) gets new elements added to `OnceList` via `push()`
+   - Loop continues until 6 elements are available or parser is exhausted
+3. **Iterator Access**: When `scores().iter().next()` is called:
+   - `LazyRepeatedIter::next()` checks if inner iterator has more elements
+   - If exhausted, calls `ensure_at_least(current_count + 1)` to get one more element
+   - Recreates iterator and skips already-seen elements
+   - Returns the next newly-parsed element
 
-**Challenge 2: Indexed Access**
-- User code: `person.scores().get(5)`
-- Flow: `scores()` → returns `&OnceList` → `get(5)` → checks if index 5 exists
-- Problem: `OnceList::get()` only checks existing elements. No way to parse more if index doesn't exist yet.
+### Known Limitations and Future Optimizations
 
-**Challenge 3: Length Query**
-- User code: `person.scores().len()`
-- Flow: `scores()` → returns `&OnceList` → `len()` → returns current count
-- Problem: `OnceList::len()` only counts already-parsed elements. Cannot parse more to get true length.
+1. **Efficiency**: `continue_parsing_for_children()` parses all remaining fields, not just until the target field has enough elements. This works correctly but could be optimized further.
 
-**Challenge 4: Multiple Fields**
-- When parsing for one repeated field (e.g., `scores`), we encounter other fields (e.g., `addresses`, `age`)
-- We need to update all fields we encounter, not just the target field
-- Current `update_field()` handles this, but we need to integrate it with on-demand parsing
+2. **Unused Field**: `LazyRepeated` stores `_field_number` but doesn't currently use it. This could be used for future field-specific optimizations.
 
-### Use Case Examples
-
-**Example 1: Early Exit**
-```rust
-let scores = person.scores();
-// Don't parse yet - should return immediately
-let first_score = scores.iter().next();
-// Now parse only until first score is found
-```
-
-**Example 2: Partial Parsing**
-```rust
-let scores = person.scores();
-// Parse only first 10 scores, even if there are 1000 in the message
-let first_ten: Vec<_> = scores.iter().take(10).collect();
-```
-
-**Example 3: Indexed Access**
-```rust
-let scores = person.scores();
-// Parse only until 5th score is found (if it exists)
-let fifth = scores.get(5);
-```
-
-### Requirements Summary
-
-To implement true lazy parsing for repeated fields, we need:
-
-1. **Parse on Access**: Trigger parsing when elements are accessed, not when getter is called
-2. **Incremental Parsing**: Parse only until required number of elements is found
-3. **Field Updates**: Still update all fields encountered during parsing
-4. **API Compatibility**: Maintain compatibility with `Repeated` trait interface
-5. **External Crate Constraints**: Work within limitations of `OnceList` and `Repeated` trait (both external crates)
+See `doc/lazy-parsing-next-steps.md` for detailed next steps and optimization opportunities.
 
 ### Key Insight: Parallel with Scalar Child Message Fields
 
@@ -407,12 +367,13 @@ To implement true lazy parsing for repeated fields, we need:
 - **Key**: Fields are parsed ON-DEMAND when accessed, not when the child object is created
 - **Important**: The child message requests parent to continue parsing based on the child's field access pattern. There are many patterns (e.g., scalar fields that need the last value require all occurrences, but other patterns may require different amounts). The current implementation collects all occurrences for simplicity, but in principle it could be optimized based on the specific field access pattern.
 
-**Repeated Field Pattern (Proposed)**:
-- The repeated field should have its own "object" (wrapper) that holds a reference to the parent's parser state
+**Repeated Field Pattern (Implemented)**:
+- The repeated field has its own "object" (`LazyRepeated` wrapper) that holds a reference to the parent's parser state
 - When the repeated field object needs more elements (e.g., `iter().next()`, `get(5)`, `len()`), it triggers the parent to continue parsing
 - The parent's parser state continues parsing and collects occurrences of the repeated field's field number
 - Each occurrence is added to the underlying `OnceList` via `push()`
 - **Key**: Elements are parsed ON-DEMAND when accessed, not when the getter is called
+- **Implementation**: See `sandbox/src/generated/repeated_lazy.rs` for the actual implementation
 
 **Key Similarity**:
 - Both cases need an "object" that can **trigger the owner message's parse until a condition is met**
@@ -423,17 +384,24 @@ To implement true lazy parsing for repeated fields, we need:
 **Key Insight - They Are The Same Pattern**:
 Both patterns are fundamentally the same: **trigger the parent's parse until a condition is met**.
 - Scalar child message: When a field getter is accessed (e.g., `address().street()` calls `ensure_all_fields_parsed()` which collects all slices from parent), the child requests parent to continue parsing until all occurrences are collected. The condition depends on the field type and access pattern (scalar fields need all occurrences to get the last value, but there are many other patterns).
-- Repeated field: When an element accessor is called (e.g., `scores().get(5)`), the repeated field wrapper should request parent to continue parsing until the required number of elements is found
+- Repeated field: When an element accessor is called (e.g., `scores().get(5)`), the `LazyRepeated` wrapper requests parent to continue parsing until the required number of elements is found (implemented)
 
 The difference is only in **what condition triggers the collection**:
 - Scalar child message: Condition depends on the child message's field access pattern (e.g., "all occurrences needed" for scalar fields that need the last value, but there are many other patterns depending on which fields are accessed)
 - Repeated field: Condition is "N elements needed" (where N depends on the access pattern: `get(5)` → need 6 elements, `len()` → need all elements, `iter().next()` → need 1 element)
 
-This insight suggests that we should create a **wrapper type** for repeated fields that:
+This insight led to the implementation of the **`LazyRepeated` wrapper type** for repeated fields:
 1. Holds a reference to the parent's parser state (similar to `AddressLazyImpl` holding `parent_parser_state`)
 2. Holds a reference to the underlying `OnceList`
 3. Implements the `Repeated` trait by delegating to `OnceList` but triggering parsing when needed
 
-### Next Steps
+**Implementation**: See `sandbox/src/generated/repeated_lazy.rs` for the complete implementation.
 
-This problem requires further design discussion to determine the best approach. The parallel with scalar child message fields provides a promising direction for implementation.
+### Implementation Summary
+
+The implementation follows the same pattern as scalar child message fields:
+- Both use an object (wrapper) that holds a reference to the parent's parser state
+- Both trigger parent's parsing when needed (field access or element access)
+- The key difference is the condition: scalar child messages need all occurrences, repeated fields need N elements
+
+The `LazyRepeated` wrapper successfully implements true lazy parsing for repeated fields, maintaining API compatibility through the `Repeated` trait implementation.

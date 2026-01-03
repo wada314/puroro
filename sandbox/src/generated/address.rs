@@ -260,9 +260,10 @@ impl<A: Allocator + Clone> Message for AddressImpl<A> {
 // AddressLazyImpl Structure (Lazy Implementation - Phase 3)
 // ============================================================================
 
-use super::lazy_parser::{FieldIterator, MessageParserState, parse_string, parse_varint};
+use super::lazy_parser::{FieldIterator, MessageParserState};
 use std::cell::{Cell, RefCell};
 use std::rc::Rc;
+use puroro::protobuf_core::field::{Field, FieldValue};
 
 /// Parser state for AddressLazyImpl.
 ///
@@ -273,6 +274,7 @@ struct AddressParserState<'a, A: Allocator = Global> {
     field_iter: Option<FieldIterator<'a>>,
     /// Field slices collected so far (from parent)
     /// These are length-delimited value slices (not including field tags)
+    /// Using &'a [u8] to support Field type which returns Cow<'a, [u8]> for Len values
     field_slices: OnceList<&'a [u8], A>,
     allocator: A,
 }
@@ -373,20 +375,19 @@ impl<'a, A: Allocator + Clone + 'a> AddressLazyImpl<'a, A> {
         // This ensures we parse all slices even if field_iter state is lost
 
         // Now parse our own fields from all collected slices
-        // Collect all slices into a Vec to avoid lifetime issues
-        let slices_vec: Vec<&'a [u8]> = {
-            let parser_state = self.parser_state.borrow();
-            parser_state.field_slices.iter().copied().collect()
-        };
-
-        // Recreate iterator with all slices (each slice is an Address message)
-        {
-            let mut parser_state = self.parser_state.borrow_mut();
-            // Always recreate iterator to ensure we parse all slices
-            parser_state.field_iter = Some(FieldIterator::new(std::boxed::Box::new(
-                slices_vec.into_iter(),
-            )));
-        }
+        // Since field_slices stores &'a [u8], we can use them directly
+        let mut parser_state = self.parser_state.borrow_mut();
+        
+        // Create slice iterator from field_slices
+        // The slices are already &'a [u8], so we can use them directly
+        let slices: Vec<&'a [u8]> = parser_state.field_slices.iter().copied().collect();
+        
+        // Always recreate iterator to ensure we parse all slices
+        parser_state.field_iter = Some(FieldIterator::new(std::boxed::Box::new(
+            slices.into_iter(),
+        )));
+        
+        drop(parser_state);
 
         // Parse until exhausted
         loop {
@@ -397,11 +398,11 @@ impl<'a, A: Allocator + Clone + 'a> AddressLazyImpl<'a, A> {
             };
 
             match field_iter.next() {
-                Some(Ok((field_num, wire_type, value_slice))) => {
+                Some(Ok(field)) => {
                     // Store iterator back before calling update_field
                     parser_state.field_iter = Some(field_iter);
                     drop(parser_state);
-                    self.update_field(field_num, wire_type, value_slice)?;
+                    self.update_field(field)?;
                 }
                 Some(Err(e)) => {
                     parser_state.field_iter = Some(field_iter);
@@ -420,25 +421,30 @@ impl<'a, A: Allocator + Clone + 'a> AddressLazyImpl<'a, A> {
     /// Update a field with parsed value
     fn update_field(
         self: &Rc<Self>,
-        field_num: u32,
-        _wire_type: u32,
-        value_slice: &'a [u8],
+        field: Field<'a>,
     ) -> Result<(), Error> {
+        let field_num = field.field_number.as_u32();
         match field_num {
             1 => {
                 // street field - string
-                let street_value = parse_string(value_slice)?;
-                *self.street.borrow_mut() = street_value;
+                if let FieldValue::Len(data) = field.value {
+                    let street_value = String::from_utf8(data.into_owned()).map_err(|e| Error::InvalidUtf8(e))?;
+                    *self.street.borrow_mut() = street_value;
+                }
             }
             2 => {
                 // city field - string
-                let city_value = parse_string(value_slice)?;
-                *self.city.borrow_mut() = city_value;
+                if let FieldValue::Len(data) = field.value {
+                    let city_value = String::from_utf8(data.into_owned()).map_err(|e| Error::InvalidUtf8(e))?;
+                    *self.city.borrow_mut() = city_value;
+                }
             }
             3 => {
                 // zip_code field - varint
-                let zip_code_value = parse_varint(value_slice)?;
-                self.zip_code.set(zip_code_value);
+                if let FieldValue::Varint(varint) = field.value {
+                    let zip_code_value = varint.try_to_int32()?;
+                    self.zip_code.set(zip_code_value);
+                }
             }
             _ => {
                 // Unknown field - ignore

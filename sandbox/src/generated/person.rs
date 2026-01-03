@@ -7,11 +7,12 @@
 //! This code is (supposed to be) generated from `sandbox/protos/person.proto`.
 
 use super::address::AddressLazyImpl;
-use super::lazy_parser::{FieldIterator, MessageParserState, parse_varint};
+use super::lazy_parser::{FieldIterator, MessageParserState};
 use super::repeated_lazy::LazyRepeated;
 use ::allocator_api2::vec::Vec as AllocVec;
 use ::allocator_extras::{Allocator, Global};
 use once_list2::OnceList;
+use puroro::protobuf_core::field::{Field, FieldValue};
 use puroro::{
     Message,
     error::Error,
@@ -496,16 +497,14 @@ impl<'a, A: Allocator + Clone + 'a> PersonLazyImpl<'a, A> {
 
             // Create initial callback that only handles Message Body (when it's alive)
             // This callback will be replaced in Drop::drop with one that handles child messages
-            let callback: std::boxed::Box<dyn FnMut(u32, u32, &'a [u8]) -> Result<(), Error> + 'a> =
-                std::boxed::Box::new(
-                    move |fnum: u32, wire_type: u32, value_slice: &'a [u8]| -> Result<(), Error> {
-                        // Update via Message Body (should always succeed when this callback is active)
-                        if let Some(message_body) = message_body_weak.upgrade() {
-                            let _ = message_body.update_field(fnum, wire_type, value_slice);
-                        }
-                        Ok(())
-                    },
-                );
+            let callback: std::boxed::Box<dyn FnMut(Field<'a>) -> Result<(), Error> + 'a> =
+                std::boxed::Box::new(move |field: Field<'a>| -> Result<(), Error> {
+                    // Update via Message Body (should always succeed when this callback is active)
+                    if let Some(message_body) = message_body_weak.upgrade() {
+                        let _ = message_body.update_field(field);
+                    }
+                    Ok(())
+                });
 
             // Create parser state with initial callback
             // Use std::boxed::Box to match FieldIterator's expected type
@@ -587,9 +586,10 @@ impl<'a, A: Allocator + Clone + 'a> PersonLazyImpl<'a, A> {
         // Parse until we have enough elements for this field
         loop {
             match field_iter.next() {
-                Some(Ok((fnum, wire_type, value_slice))) => {
+                Some(Ok(field)) => {
+                    let fnum = field.field_number.as_u32();
                     drop(parser_state); // Release borrow before calling update_field
-                    self.update_field(fnum, wire_type, value_slice)?;
+                    self.update_field(field)?;
                     parser_state = self.parser_state.borrow_mut(); // Re-borrow for next iteration
 
                     // Check if we've parsed enough elements for this field
@@ -634,9 +634,9 @@ impl<'a, A: Allocator + Clone + 'a> PersonLazyImpl<'a, A> {
         // During this process, fields may be updated multiple times (intermediate values)
         loop {
             match field_iter.next() {
-                Some(Ok((field_num, wire_type, value_slice))) => {
+                Some(Ok(field)) => {
                     drop(parser_state); // Release borrow before calling update_field
-                    self.update_field(field_num, wire_type, value_slice)?;
+                    self.update_field(field)?;
                     parser_state = self.parser_state.borrow_mut(); // Re-borrow for next iteration
                 }
                 Some(Err(e)) => {
@@ -656,62 +656,61 @@ impl<'a, A: Allocator + Clone + 'a> PersonLazyImpl<'a, A> {
 
     /// Update a field with parsed value
     /// Called during parsing to update field values
-    fn update_field(
-        self: &Rc<Self>,
-        field_num: u32,
-        wire_type: u32,
-        value_slice: &'a [u8],
-    ) -> Result<(), Error> {
+    fn update_field(self: &Rc<Self>, field: Field<'a>) -> Result<(), Error> {
+        let field_num = field.field_number.as_u32();
         match field_num {
             2 => {
                 // age field - varint
-                let age_value = parse_varint(value_slice)?;
-                self.age.set(age_value);
+                if let FieldValue::Varint(varint) = field.value {
+                    let age_value = varint.try_to_int32()?;
+                    self.age.set(age_value);
+                }
             }
             6 => {
-                // address field - scalar message field (length-delimited, wire type 2)
-                if wire_type != 2 {
-                    return Err(Error::InvalidWireFormat(
-                        "Address field must be length-delimited".to_string(),
-                    ));
-                }
-                let mut address = self.address.borrow_mut();
-                if let Some(ref addr) = *address {
-                    // Child already exists - add slice to it
-                    addr.add_slice(value_slice)?;
-                } else {
-                    // First occurrence - create child with first slice
-                    let allocator = self.parser_state.borrow().allocator.clone();
-                    let parent_parser_state = self.parser_state.clone();
-                    let child = AddressLazyImpl::new_from_parent(
-                        value_slice,
-                        parent_parser_state,
-                        allocator,
-                    );
-                    *address = Some(child);
+                // address field - scalar message field (length-delimited)
+                if let FieldValue::Len(data) = field.value {
+                    let data_slice = data.as_ref();
+                    let mut address = self.address.borrow_mut();
+                    if let Some(ref addr) = *address {
+                        // Child already exists - add slice to it
+                        addr.add_slice(data_slice)?;
+                    } else {
+                        // First occurrence - create child with first slice
+                        let allocator = self.parser_state.borrow().allocator.clone();
+                        let parent_parser_state = self.parser_state.clone();
+                        let child = AddressLazyImpl::new_from_parent(
+                            data_slice,
+                            parent_parser_state,
+                            allocator,
+                        );
+                        *address = Some(child);
+                    }
                 }
             }
             9 => {
-                // addresses field - repeated message field (length-delimited, wire type 2)
-                if wire_type != 2 {
-                    return Err(Error::InvalidWireFormat(
-                        "Addresses field must be length-delimited".to_string(),
-                    ));
+                // addresses field - repeated message field (length-delimited)
+                if let FieldValue::Len(data) = field.value {
+                    // For repeated message fields, each occurrence is a separate message
+                    // Create a new AddressLazyImpl for this occurrence
+                    let data_slice = data.as_ref();
+                    let allocator = self.parser_state.borrow().allocator.clone();
+                    let parent_parser_state = self.parser_state.clone();
+                    let child = AddressLazyImpl::new_from_parent(
+                        data_slice,
+                        parent_parser_state,
+                        allocator,
+                    );
+                    // Use OnceList's built-in interior mutability
+                    self.addresses.push(child); // push() takes &self
                 }
-                // For repeated message fields, each occurrence is a separate message
-                // Create a new AddressLazyImpl for this occurrence
-                let allocator = self.parser_state.borrow().allocator.clone();
-                let parent_parser_state = self.parser_state.clone();
-                let child =
-                    AddressLazyImpl::new_from_parent(value_slice, parent_parser_state, allocator);
-                // Use OnceList's built-in interior mutability
-                self.addresses.push(child); // push() takes &self
             }
             10 => {
                 // scores field - repeated varint
-                // Use OnceList's built-in interior mutability
-                let score_value = parse_varint(value_slice)?;
-                self.scores.push(score_value); // push() takes &self
+                if let FieldValue::Varint(varint) = field.value {
+                    // Use OnceList's built-in interior mutability
+                    let score_value = varint.try_to_int32()?;
+                    self.scores.push(score_value); // push() takes &self
+                }
             }
             // Other fields will be added in subsequent phases
             _ => {
@@ -733,27 +732,28 @@ impl<'a, A: Allocator + Clone + 'a> Drop for PersonLazyImpl<'a, A> {
             .map(|addr| Rc::downgrade(addr));
 
         // Create new callback that captures child Weak references and uses static match-case
-        let new_callback: std::boxed::Box<dyn FnMut(u32, u32, &'a [u8]) -> Result<(), Error> + 'a> =
-            std::boxed::Box::new(
-                move |fnum: u32, _wire_type: u32, value_slice: &'a [u8]| -> Result<(), Error> {
-                    // Static match-case for each child message field
-                    match fnum {
-                        6 => {
-                            // address field
+        let new_callback: std::boxed::Box<dyn FnMut(Field<'a>) -> Result<(), Error> + 'a> =
+            std::boxed::Box::new(move |field: Field<'a>| -> Result<(), Error> {
+                // Static match-case for each child message field
+                let field_num = field.field_number.as_u32();
+                match field_num {
+                    6 => {
+                        // address field
+                        if let FieldValue::Len(data) = field.value {
                             if let Some(ref addr_weak) = address_weak {
                                 if let Some(addr) = addr_weak.upgrade() {
-                                    let _ = addr.add_slice(value_slice);
+                                    let _ = addr.add_slice(data.as_ref());
                                 }
                             }
                         }
-                        // Add other child message fields here as needed (e.g., profile field 7)
-                        _ => {
-                            // Not a child message field - ignore
-                        }
                     }
-                    Ok(())
-                },
-            );
+                    // Add other child message fields here as needed (e.g., profile field 7)
+                    _ => {
+                        // Not a child message field - ignore
+                    }
+                }
+                Ok(())
+            });
 
         // Update callback in parser state
         self.parser_state.borrow_mut().field_update_callback = Some(new_callback);
