@@ -261,9 +261,9 @@ impl<A: Allocator + Clone> Message for AddressImpl<A> {
 // ============================================================================
 
 use super::lazy_parser::{FieldIterator, MessageParserState};
+use puroro::protobuf_core::field::{Field, FieldValue};
 use std::cell::{Cell, RefCell};
 use std::rc::Rc;
-use puroro::protobuf_core::field::{Field, FieldValue};
 
 /// Parser state for AddressLazyImpl.
 ///
@@ -377,16 +377,15 @@ impl<'a, A: Allocator + Clone + 'a> AddressLazyImpl<'a, A> {
         // Now parse our own fields from all collected slices
         // Since field_slices stores &'a [u8], we can use them directly
         let mut parser_state = self.parser_state.borrow_mut();
-        
+
         // Create slice iterator from field_slices
         // The slices are already &'a [u8], so we can use them directly
         let slices: Vec<&'a [u8]> = parser_state.field_slices.iter().copied().collect();
-        
+
         // Always recreate iterator to ensure we parse all slices
-        parser_state.field_iter = Some(FieldIterator::new(std::boxed::Box::new(
-            slices.into_iter(),
-        )));
-        
+        parser_state.field_iter =
+            Some(FieldIterator::new(std::boxed::Box::new(slices.into_iter())));
+
         drop(parser_state);
 
         // Parse until exhausted
@@ -419,23 +418,22 @@ impl<'a, A: Allocator + Clone + 'a> AddressLazyImpl<'a, A> {
     }
 
     /// Update a field with parsed value
-    fn update_field(
-        self: &Rc<Self>,
-        field: Field<&'a [u8]>,
-    ) -> Result<(), Error> {
+    fn update_field(self: &Rc<Self>, field: Field<&'a [u8]>) -> Result<(), Error> {
         let field_num = field.field_number.as_u32();
         match field_num {
             1 => {
                 // street field - string
                 if let FieldValue::Len(data) = field.value {
-                    let street_value = String::from_utf8(data.to_vec()).map_err(|e| Error::InvalidUtf8(e))?;
+                    let street_value =
+                        String::from_utf8(data.to_vec()).map_err(|e| Error::InvalidUtf8(e))?;
                     *self.street.borrow_mut() = street_value;
                 }
             }
             2 => {
                 // city field - string
                 if let FieldValue::Len(data) = field.value {
-                    let city_value = String::from_utf8(data.to_vec()).map_err(|e| Error::InvalidUtf8(e))?;
+                    let city_value =
+                        String::from_utf8(data.to_vec()).map_err(|e| Error::InvalidUtf8(e))?;
                     *self.city.borrow_mut() = city_value;
                 }
             }
