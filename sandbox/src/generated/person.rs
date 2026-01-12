@@ -507,11 +507,8 @@ impl<'a, A: Allocator + Clone + 'a> PersonLazyImpl<'a, A> {
                 });
 
             // Create parser state with initial callback
-            // Use std::boxed::Box to match FieldIterator's expected type
-            let field_iter: std::boxed::Box<dyn Iterator<Item = &'a [u8]> + 'a> =
-                std::boxed::Box::new(std::iter::once(slice));
             let parser_state = Rc::new(RefCell::new(MessageParserState {
-                field_iter: Some(FieldIterator::new(field_iter)),
+                field_iter: Some(FieldIterator::new(std::iter::once(slice))),
                 allocator: alloc_clone.clone(),
                 field_update_callback: Some(callback),
             }));

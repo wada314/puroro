@@ -383,8 +383,7 @@ impl<'a, A: Allocator + Clone + 'a> AddressLazyImpl<'a, A> {
         let slices: Vec<&'a [u8]> = parser_state.field_slices.iter().copied().collect();
 
         // Always recreate iterator to ensure we parse all slices
-        parser_state.field_iter =
-            Some(FieldIterator::new(std::boxed::Box::new(slices.into_iter())));
+        parser_state.field_iter = Some(FieldIterator::new(slices.into_iter()));
 
         drop(parser_state);
 

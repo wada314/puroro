@@ -84,9 +84,13 @@ pub struct FieldIterator<'a> {
 impl<'a> FieldIterator<'a> {
     /// Create a new FieldIterator from any iterator over slices
     /// The iterator is created once and maintains its own state - no need to recreate it
-    pub fn new(slice_iter: std::boxed::Box<dyn Iterator<Item = &'a [u8]> + 'a>) -> Self {
+    pub fn new<I>(slice_iter: I) -> Self
+    where
+        I: Iterator<Item = &'a [u8]> + 'a,
+    {
         // Convert slice iterator to field iterator using flat_map
         // Each slice is converted to a ProtobufFieldSliceIterator, which is then flattened
+        // Use std::boxed::Box for type erasure to allow storing in MessageParserState
         let field_iter = slice_iter
             .flat_map(|slice| slice.read_protobuf_fields())
             .map(|result| result.map_err(|e| Error::from(e)));
