@@ -109,17 +109,30 @@ pub mod error {
                     Error::InvalidWireFormat(format!("Invalid wire type: {}", value))
                 }
                 protobuf_core::ProtobufError::VarintDowncastOutOfRange { value, target_type } => {
-                    Error::InvalidWireFormat(format!("Varint value {} out of range for {}", value, target_type))
+                    Error::InvalidWireFormat(format!(
+                        "Varint value {} out of range for {}",
+                        value, target_type
+                    ))
                 }
-                protobuf_core::ProtobufError::MalformedTag { field_number, wire_type } => {
-                    Error::InvalidWireFormat(format!("Malformed tag: field_number={}, wire_type={}", field_number, wire_type))
-                }
+                protobuf_core::ProtobufError::VarintTooLong => Error::InvalidWireFormat(
+                    "Varint exceeds maximum length of 10 bytes".to_string(),
+                ),
+                protobuf_core::ProtobufError::MalformedTag {
+                    field_number,
+                    wire_type,
+                } => Error::InvalidWireFormat(format!(
+                    "Malformed tag: field_number={}, wire_type={}",
+                    field_number, wire_type
+                )),
                 protobuf_core::ProtobufError::UnexpectedEof => {
                     Error::InvalidWireFormat("Unexpected EOF while parsing field".to_string())
                 }
                 protobuf_core::ProtobufError::IoError(e) => Error::Io(e),
                 protobuf_core::ProtobufError::FieldTypeDowncastError { expected_type } => {
-                    Error::InvalidWireFormat(format!("Field type downcast error: {}", expected_type))
+                    Error::InvalidWireFormat(format!(
+                        "Field type downcast error: {}",
+                        expected_type
+                    ))
                 }
             }
         }
