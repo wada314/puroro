@@ -6,10 +6,8 @@
 //! - Helper functions for wire format parsing (varint decoding, field tag parsing)
 
 use ::allocator_extras::{Allocator, Global};
-use once_list2::OnceList;
 use puroro::error::Error;
-use puroro::protobuf_core::field::read_slice::parse_field_from_slice;
-use puroro::protobuf_core::field::{Field, FieldValue};
+use puroro::protobuf_core::{AsRefExtProtobuf, Field};
 
 /// Decode a varint-encoded value from a byte slice.
 ///
@@ -84,18 +82,18 @@ pub struct FieldIterator<'a> {
     slice_iter: std::boxed::Box<dyn Iterator<Item = &'a [u8]> + 'a>,
     /// Current slice being parsed
     current_slice: Option<&'a [u8]>,
-    /// Current position within the current slice
-    position: usize,
+    /// Current protobuf field iterator for the remaining part of the current slice
+    current_field_iter: Option<puroro::protobuf_core::ProtobufFieldSliceIterator<'a>>,
 }
 
 impl<'a> FieldIterator<'a> {
     /// Create a new FieldIterator from any iterator over slices
-    /// The iterator is created once and maintains its state - no need to recreate it
+    /// The iterator is created once and maintains its own state - no need to recreate it
     pub fn new(slice_iter: std::boxed::Box<dyn Iterator<Item = &'a [u8]> + 'a>) -> Self {
         Self {
             slice_iter,
             current_slice: None,
-            position: 0,
+            current_field_iter: None,
         }
     }
 }
@@ -105,36 +103,32 @@ impl<'a> Iterator for FieldIterator<'a> {
 
     fn next(&mut self) -> Option<Self::Item> {
         loop {
-            // Get current slice or advance to next slice
-            if let Some(slice) = self.current_slice {
-                if self.position < slice.len() {
-                    let remaining = &slice[self.position..];
-
-                    // Use protobuf-core's parse_field_from_slice function
-                    match parse_field_from_slice(remaining) {
-                        Ok(Some((field, consumed))) => {
-                            self.position += consumed;
-                            return Some(Ok(field));
-                        }
-                        Ok(None) => {
-                            // Slice is empty, move to next slice
-                            self.current_slice = self.slice_iter.next();
-                            self.position = 0;
-                            continue;
-                        }
-                        Err(e) => return Some(Err(e.into())),
+            // Try to get the next field from the current field iterator
+            if let Some(ref mut field_iter) = self.current_field_iter {
+                match field_iter.next() {
+                    Some(Ok(field)) => return Some(Ok(field)),
+                    Some(Err(e)) => return Some(Err(e.into())),
+                    None => {
+                        // Current slice exhausted, move to next slice
+                        self.current_slice = None;
+                        self.current_field_iter = None;
+                        continue;
                     }
                 }
             }
 
-            // Current slice exhausted, move to next slice using iterator
+            // Get next slice from the slice iterator
+            // We need to store the slice first, then use it to create the iterator
             self.current_slice = self.slice_iter.next();
-            self.position = 0;
-
-            if self.current_slice.is_none() {
-                // All slices exhausted
-                return None;
+            if let Some(slice) = self.current_slice {
+                // Create iterator from the stored slice reference
+                self.current_field_iter = Some(slice.read_protobuf_fields());
+                // The next iteration will get the first field from the iterator
+                continue;
             }
+
+            // All slices exhausted
+            return None;
         }
     }
 }

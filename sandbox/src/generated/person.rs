@@ -12,7 +12,7 @@ use super::repeated_lazy::LazyRepeated;
 use ::allocator_api2::vec::Vec as AllocVec;
 use ::allocator_extras::{Allocator, Global};
 use once_list2::OnceList;
-use puroro::protobuf_core::field::{Field, FieldValue};
+use puroro::protobuf_core::{Field, FieldValue};
 use puroro::{
     Message,
     error::Error,

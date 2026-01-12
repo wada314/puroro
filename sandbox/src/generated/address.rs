@@ -261,7 +261,7 @@ impl<A: Allocator + Clone> Message for AddressImpl<A> {
 // ============================================================================
 
 use super::lazy_parser::{FieldIterator, MessageParserState};
-use puroro::protobuf_core::field::{Field, FieldValue};
+use puroro::protobuf_core::{Field, FieldValue};
 use std::cell::{Cell, RefCell};
 use std::rc::Rc;
 
