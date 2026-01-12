@@ -1,5 +1,5 @@
 [workspace]
-members = ["allocator_extras","puroro", "puroro-codegen", "sandbox"]
+members = ["allocator_extras", "puroro", "puroro-codegen", "sandbox"]
 resolver = "2"
 
 [workspace.package]
@@ -11,7 +11,7 @@ repository = "https://github.com/wada314/puroro"
 
 [workspace.dependencies]
 # External utility crates
-protobuf-core = { path = "../protobuf-core" }
+protobuf-core = "0.2"
 protoc-plugin-by-closure = { git = "https://github.com/wada314/protoc-plugin-by-closure" }
 allocator-api2 = "0.2"
 bitvec = "1.0"
