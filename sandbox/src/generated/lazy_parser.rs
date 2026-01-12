@@ -75,25 +75,23 @@ pub fn parse_string(bytes: &[u8]) -> Result<String, Error> {
 /// Iterator over protobuf fields in slices.
 ///
 /// Can be paused and resumed, making it easy to parse incrementally.
-/// Tracks the current slice and position within that slice.
+/// Uses flat_map approach to convert slice iterator to field iterator.
 pub struct FieldIterator<'a> {
-    /// Iterator over the slices
-    /// This iterator maintains its own state
-    slice_iter: std::boxed::Box<dyn Iterator<Item = &'a [u8]> + 'a>,
-    /// Current slice being parsed
-    current_slice: Option<&'a [u8]>,
-    /// Current protobuf field iterator for the remaining part of the current slice
-    current_field_iter: Option<puroro::protobuf_core::ProtobufFieldSliceIterator<'a>>,
+    /// Flattened iterator over protobuf fields from all slices
+    field_iter: std::boxed::Box<dyn Iterator<Item = Result<Field<&'a [u8]>, Error>> + 'a>,
 }
 
 impl<'a> FieldIterator<'a> {
     /// Create a new FieldIterator from any iterator over slices
     /// The iterator is created once and maintains its own state - no need to recreate it
     pub fn new(slice_iter: std::boxed::Box<dyn Iterator<Item = &'a [u8]> + 'a>) -> Self {
+        // Convert slice iterator to field iterator using flat_map
+        // Each slice is converted to a ProtobufFieldSliceIterator, which is then flattened
+        let field_iter = slice_iter
+            .flat_map(|slice| slice.read_protobuf_fields())
+            .map(|result| result.map_err(|e| Error::from(e)));
         Self {
-            slice_iter,
-            current_slice: None,
-            current_field_iter: None,
+            field_iter: std::boxed::Box::new(field_iter),
         }
     }
 }
@@ -102,34 +100,7 @@ impl<'a> Iterator for FieldIterator<'a> {
     type Item = Result<Field<&'a [u8]>, Error>;
 
     fn next(&mut self) -> Option<Self::Item> {
-        loop {
-            // Try to get the next field from the current field iterator
-            if let Some(ref mut field_iter) = self.current_field_iter {
-                match field_iter.next() {
-                    Some(Ok(field)) => return Some(Ok(field)),
-                    Some(Err(e)) => return Some(Err(e.into())),
-                    None => {
-                        // Current slice exhausted, move to next slice
-                        self.current_slice = None;
-                        self.current_field_iter = None;
-                        continue;
-                    }
-                }
-            }
-
-            // Get next slice from the slice iterator
-            // We need to store the slice first, then use it to create the iterator
-            self.current_slice = self.slice_iter.next();
-            if let Some(slice) = self.current_slice {
-                // Create iterator from the stored slice reference
-                self.current_field_iter = Some(slice.read_protobuf_fields());
-                // The next iteration will get the first field from the iterator
-                continue;
-            }
-
-            // All slices exhausted
-            return None;
-        }
+        self.field_iter.next()
     }
 }
 
