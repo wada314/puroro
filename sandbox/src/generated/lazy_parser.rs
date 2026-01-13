@@ -5,6 +5,7 @@
 //! - MessageParserState: Parser state that can be shared between message bodies and child messages
 //! - Helper functions for wire format parsing (varint decoding, field tag parsing)
 
+use ::allocator_api2::boxed::Box;
 use ::allocator_extras::{Allocator, Global};
 use puroro::error::Error;
 use puroro::protobuf_core::{AsRefExtProtobuf, Field};
@@ -127,8 +128,8 @@ pub struct MessageParserState<'a, A: Allocator = Global> {
     ///
     /// This design allows MessageParserState to be generic across all message types,
     /// as it doesn't need to know the specific message type at compile time.
-    /// Use std::boxed::Box (not allocator_api2::Box) for consistency
-    field_update_callback: std::boxed::Box<dyn FnMut(Field<&'a [u8]>) -> Result<(), Error> + 'a>,
+    /// Use allocator_api2::boxed::Box to use the allocator A for consistency with MessageParserState's allocator.
+    field_update_callback: Box<dyn FnMut(Field<&'a [u8]>) -> Result<(), Error> + 'a, A>,
 }
 
 impl<'a, A: Allocator> MessageParserState<'a, A> {
@@ -136,9 +137,7 @@ impl<'a, A: Allocator> MessageParserState<'a, A> {
     pub fn new(
         field_iter: FieldIterator<'a>,
         allocator: A,
-        field_update_callback: std::boxed::Box<
-            dyn FnMut(Field<&'a [u8]>) -> Result<(), Error> + 'a,
-        >,
+        field_update_callback: Box<dyn FnMut(Field<&'a [u8]>) -> Result<(), Error> + 'a, A>,
     ) -> Self {
         Self {
             field_iter: Some(field_iter),
@@ -170,7 +169,7 @@ impl<'a, A: Allocator> MessageParserState<'a, A> {
     /// Set the field update callback.
     pub fn set_field_update_callback(
         &mut self,
-        callback: std::boxed::Box<dyn FnMut(Field<&'a [u8]>) -> Result<(), Error> + 'a>,
+        callback: Box<dyn FnMut(Field<&'a [u8]>) -> Result<(), Error> + 'a, A>,
     ) {
         self.field_update_callback = callback;
     }

@@ -9,6 +9,7 @@
 use super::address::AddressLazyImpl;
 use super::lazy_parser::{FieldIterator, MessageParserState};
 use super::repeated_lazy::LazyRepeated;
+use ::allocator_api2::boxed::Box;
 use ::allocator_api2::vec::Vec as AllocVec;
 use ::allocator_extras::{Allocator, Global};
 use once_list2::OnceList;
@@ -381,10 +382,9 @@ impl<A: Allocator + Clone> DynPerson for PersonImpl<A> {
         let adapter = RefVecMap::new(&self.addresses.data, |addr: &AddressImpl<A>| {
             ViewCow::Borrowed(addr as &dyn DynAddress)
         });
-        let boxed = ::allocator_api2::boxed::Box::new_in(adapter, Global);
-        let boxed_dyn: ::allocator_api2::boxed::Box<
-            dyn Repeated<'a, Item = ViewCow<'b, dyn DynAddress>> + 'b,
-        > = ::allocator_api2::unsize_box!(boxed);
+        let boxed = Box::new_in(adapter, Global);
+        let boxed_dyn: Box<dyn Repeated<'a, Item = ViewCow<'b, dyn DynAddress>> + 'b> =
+            ::allocator_api2::unsize_box!(boxed);
         ViewCow::Owned(boxed_dyn)
     }
 
@@ -497,14 +497,16 @@ impl<'a, A: Allocator + Clone + 'a> PersonLazyImpl<'a, A> {
 
             // Create initial callback that only handles Message Body (when it's alive)
             // This callback will be replaced in Drop::drop with one that handles child messages
-            let callback: std::boxed::Box<dyn FnMut(Field<&'a [u8]>) -> Result<(), Error> + 'a> =
-                std::boxed::Box::new(move |field: Field<&'a [u8]>| -> Result<(), Error> {
-                    // Update via Message Body (should always succeed when this callback is active)
-                    if let Some(message_body) = message_body_weak.upgrade() {
-                        let _ = message_body.update_field(field);
-                    }
-                    Ok(())
-                });
+            let closure = move |field: Field<&'a [u8]>| -> Result<(), Error> {
+                // Update via Message Body (should always succeed when this callback is active)
+                if let Some(message_body) = message_body_weak.upgrade() {
+                    let _ = message_body.update_field(field);
+                }
+                Ok(())
+            };
+            let boxed = Box::new_in(closure, alloc_clone.clone());
+            let callback: Box<dyn FnMut(Field<&'a [u8]>) -> Result<(), Error> + 'a, A> =
+                ::allocator_api2::unsize_box!(boxed);
 
             // Create parser state with initial callback
             let parser_state = Rc::new(RefCell::new(MessageParserState::new(
@@ -725,28 +727,31 @@ impl<'a, A: Allocator + Clone + 'a> Drop for PersonLazyImpl<'a, A> {
             .map(|addr| Rc::downgrade(addr));
 
         // Create new callback that captures child Weak references and uses static match-case
-        let new_callback: std::boxed::Box<dyn FnMut(Field<&'a [u8]>) -> Result<(), Error> + 'a> =
-            std::boxed::Box::new(move |field: Field<&'a [u8]>| -> Result<(), Error> {
-                // Static match-case for each child message field
-                let field_num = field.field_number.as_u32();
-                match field_num {
-                    6 => {
-                        // address field
-                        if let FieldValue::Len(data) = field.value {
-                            if let Some(ref addr_weak) = address_weak {
-                                if let Some(addr) = addr_weak.upgrade() {
-                                    let _ = addr.add_slice(data);
-                                }
+        let allocator = self.parser_state.borrow().allocator().clone();
+        let closure = move |field: Field<&'a [u8]>| -> Result<(), Error> {
+            // Static match-case for each child message field
+            let field_num = field.field_number.as_u32();
+            match field_num {
+                6 => {
+                    // address field
+                    if let FieldValue::Len(data) = field.value {
+                        if let Some(ref addr_weak) = address_weak {
+                            if let Some(addr) = addr_weak.upgrade() {
+                                let _ = addr.add_slice(data);
                             }
                         }
                     }
-                    // Add other child message fields here as needed (e.g., profile field 7)
-                    _ => {
-                        // Not a child message field - ignore
-                    }
                 }
-                Ok(())
-            });
+                // Add other child message fields here as needed (e.g., profile field 7)
+                _ => {
+                    // Not a child message field - ignore
+                }
+            }
+            Ok(())
+        };
+        let boxed = Box::new_in(closure, allocator);
+        let new_callback: Box<dyn FnMut(Field<&'a [u8]>) -> Result<(), Error> + 'a, A> =
+            ::allocator_api2::unsize_box!(boxed);
 
         // Update callback in parser state
         self.parser_state
