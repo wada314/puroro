@@ -128,8 +128,7 @@ pub struct MessageParserState<'a, A: Allocator = Global> {
     /// This design allows MessageParserState to be generic across all message types,
     /// as it doesn't need to know the specific message type at compile time.
     /// Use std::boxed::Box (not allocator_api2::Box) for consistency
-    field_update_callback:
-        Option<std::boxed::Box<dyn FnMut(Field<&'a [u8]>) -> Result<(), Error> + 'a>>,
+    field_update_callback: std::boxed::Box<dyn FnMut(Field<&'a [u8]>) -> Result<(), Error> + 'a>,
 }
 
 impl<'a, A: Allocator> MessageParserState<'a, A> {
@@ -144,7 +143,7 @@ impl<'a, A: Allocator> MessageParserState<'a, A> {
         Self {
             field_iter: Some(field_iter),
             allocator,
-            field_update_callback: Some(field_update_callback),
+            field_update_callback,
         }
     }
 
@@ -171,7 +170,7 @@ impl<'a, A: Allocator> MessageParserState<'a, A> {
     /// Set the field update callback.
     pub fn set_field_update_callback(
         &mut self,
-        callback: Option<std::boxed::Box<dyn FnMut(Field<&'a [u8]>) -> Result<(), Error> + 'a>>,
+        callback: std::boxed::Box<dyn FnMut(Field<&'a [u8]>) -> Result<(), Error> + 'a>,
     ) {
         self.field_update_callback = callback;
     }
@@ -199,10 +198,8 @@ impl<'a, A: Allocator + Clone> MessageParserState<'a, A> {
             match field_iter.next() {
                 Some(Ok(field)) => {
                     // Update field via callback (handles both Message Body and child messages)
-                    if let Some(ref mut callback) = self.field_update_callback {
-                        let _ = callback(field);
-                        // Ignore errors - Message Body or child might be dropped
-                    }
+                    let _ = (self.field_update_callback)(field);
+                    // Ignore errors - Message Body or child might be dropped
                 }
                 Some(Err(e)) => {
                     // Restore iterator before returning error

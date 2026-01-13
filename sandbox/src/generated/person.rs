@@ -751,7 +751,7 @@ impl<'a, A: Allocator + Clone + 'a> Drop for PersonLazyImpl<'a, A> {
         // Update callback in parser state
         self.parser_state
             .borrow_mut()
-            .set_field_update_callback(Some(new_callback));
+            .set_field_update_callback(new_callback);
     }
 }
 
