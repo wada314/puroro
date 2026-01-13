@@ -73,7 +73,7 @@ where
             if after >= needed {
                 return Ok(());
             }
-            let exhausted = self.parent_parser_state.borrow().field_iter.is_none();
+            let exhausted = self.parent_parser_state.borrow().is_field_iter_exhausted();
             if exhausted {
                 return Ok(());
             }
@@ -84,7 +84,7 @@ where
     fn ensure_fully_parsed(&self) -> Result<(), Error> {
         loop {
             let mut state = self.parent_parser_state.borrow_mut();
-            if state.field_iter.is_none() {
+            if state.is_field_iter_exhausted() {
                 return Ok(());
             }
             let _ = state.continue_parsing_for_children();
@@ -145,8 +145,7 @@ where
             .lazy_repeated
             .parent_parser_state
             .borrow()
-            .field_iter
-            .is_none();
+            .is_field_iter_exhausted();
         if parser_exhausted {
             // No more elements will be available
             return None;

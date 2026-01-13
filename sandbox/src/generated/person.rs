@@ -507,11 +507,11 @@ impl<'a, A: Allocator + Clone + 'a> PersonLazyImpl<'a, A> {
                 });
 
             // Create parser state with initial callback
-            let parser_state = Rc::new(RefCell::new(MessageParserState {
-                field_iter: Some(FieldIterator::new(std::iter::once(slice))),
-                allocator: alloc_clone.clone(),
-                field_update_callback: Some(callback),
-            }));
+            let parser_state = Rc::new(RefCell::new(MessageParserState::new(
+                FieldIterator::new(std::iter::once(slice)),
+                alloc_clone.clone(),
+                callback,
+            )));
 
             // Create message body
             Self {
@@ -575,7 +575,7 @@ impl<'a, A: Allocator + Clone + 'a> PersonLazyImpl<'a, A> {
 
         // Check if iterator still exists
         let mut parser_state = self.parser_state.borrow_mut();
-        let mut field_iter = match parser_state.field_iter.take() {
+        let mut field_iter = match parser_state.take_field_iter() {
             Some(iter) => iter,
             None => return Ok(()), // Already parsed completely
         };
@@ -598,19 +598,19 @@ impl<'a, A: Allocator + Clone + 'a> PersonLazyImpl<'a, A> {
                         };
                         if new_count >= count {
                             // Store iterator back (not exhausted, just got enough elements)
-                            parser_state.field_iter = Some(field_iter);
+                            parser_state.set_field_iter(Some(field_iter));
                             return Ok(());
                         }
                     }
                 }
                 Some(Err(e)) => {
                     // Store iterator back before returning error
-                    parser_state.field_iter = Some(field_iter);
+                    parser_state.set_field_iter(Some(field_iter));
                     return Err(e);
                 }
                 None => {
                     // Iterator exhausted - store None to indicate parsing is complete
-                    parser_state.field_iter = None;
+                    parser_state.set_field_iter(None);
                     return Ok(());
                 }
             }
@@ -622,7 +622,7 @@ impl<'a, A: Allocator + Clone + 'a> PersonLazyImpl<'a, A> {
     fn ensure_all_fields_parsed(self: &Rc<Self>) -> Result<(), Error> {
         // Check if iterator still exists (not yet consumed/parsed)
         let mut parser_state = self.parser_state.borrow_mut();
-        let mut field_iter = match parser_state.field_iter.take() {
+        let mut field_iter = match parser_state.take_field_iter() {
             Some(iter) => iter,
             None => return Ok(()), // Already parsed completely - values are confirmed
         };
@@ -638,13 +638,13 @@ impl<'a, A: Allocator + Clone + 'a> PersonLazyImpl<'a, A> {
                 }
                 Some(Err(e)) => {
                     // Store iterator back before returning error
-                    parser_state.field_iter = Some(field_iter);
+                    parser_state.set_field_iter(Some(field_iter));
                     return Err(e);
                 }
                 None => {
                     // Iterator exhausted - store None to indicate parsing is complete
                     // All field values are now final and confirmed
-                    parser_state.field_iter = None;
+                    parser_state.set_field_iter(None);
                     return Ok(());
                 }
             }
@@ -672,7 +672,7 @@ impl<'a, A: Allocator + Clone + 'a> PersonLazyImpl<'a, A> {
                         addr.add_slice(data)?;
                     } else {
                         // First occurrence - create child with first slice
-                        let allocator = self.parser_state.borrow().allocator.clone();
+                        let allocator = self.parser_state.borrow().allocator().clone();
                         let parent_parser_state = self.parser_state.clone();
                         let child =
                             AddressLazyImpl::new_from_parent(data, parent_parser_state, allocator);
@@ -686,7 +686,7 @@ impl<'a, A: Allocator + Clone + 'a> PersonLazyImpl<'a, A> {
                     // For repeated message fields, each occurrence is a separate message
                     // Create a new AddressLazyImpl for this occurrence
                     let data_slice = data.as_ref();
-                    let allocator = self.parser_state.borrow().allocator.clone();
+                    let allocator = self.parser_state.borrow().allocator().clone();
                     let parent_parser_state = self.parser_state.clone();
                     let child = AddressLazyImpl::new_from_parent(
                         data_slice,
@@ -749,7 +749,9 @@ impl<'a, A: Allocator + Clone + 'a> Drop for PersonLazyImpl<'a, A> {
             });
 
         // Update callback in parser state
-        self.parser_state.borrow_mut().field_update_callback = Some(new_callback);
+        self.parser_state
+            .borrow_mut()
+            .set_field_update_callback(Some(new_callback));
     }
 }
 

@@ -115,8 +115,8 @@ impl<'a> Iterator for FieldIterator<'a> {
 pub struct MessageParserState<'a, A: Allocator = Global> {
     /// FieldIterator - needs &mut self for Iterator::next()
     /// Use std::boxed::Box (not allocator_api2::Box) since FieldIterator doesn't need allocator-aware Box
-    pub field_iter: Option<FieldIterator<'a>>,
-    pub allocator: A,
+    field_iter: Option<FieldIterator<'a>>,
+    allocator: A,
     /// Field update callback - handles field updates
     ///
     /// This callback is responsible for updating fields when iterating over field_iter.
@@ -128,8 +128,53 @@ pub struct MessageParserState<'a, A: Allocator = Global> {
     /// This design allows MessageParserState to be generic across all message types,
     /// as it doesn't need to know the specific message type at compile time.
     /// Use std::boxed::Box (not allocator_api2::Box) for consistency
-    pub field_update_callback:
+    field_update_callback:
         Option<std::boxed::Box<dyn FnMut(Field<&'a [u8]>) -> Result<(), Error> + 'a>>,
+}
+
+impl<'a, A: Allocator> MessageParserState<'a, A> {
+    /// Create a new MessageParserState with all parameters specified.
+    pub fn new(
+        field_iter: FieldIterator<'a>,
+        allocator: A,
+        field_update_callback: std::boxed::Box<
+            dyn FnMut(Field<&'a [u8]>) -> Result<(), Error> + 'a,
+        >,
+    ) -> Self {
+        Self {
+            field_iter: Some(field_iter),
+            allocator,
+            field_update_callback: Some(field_update_callback),
+        }
+    }
+
+    /// Take the field iterator, leaving None in its place.
+    pub fn take_field_iter(&mut self) -> Option<FieldIterator<'a>> {
+        self.field_iter.take()
+    }
+
+    /// Set the field iterator.
+    pub fn set_field_iter(&mut self, field_iter: Option<FieldIterator<'a>>) {
+        self.field_iter = field_iter;
+    }
+
+    /// Check if the field iterator is exhausted (None).
+    pub fn is_field_iter_exhausted(&self) -> bool {
+        self.field_iter.is_none()
+    }
+
+    /// Get a reference to the allocator.
+    pub fn allocator(&self) -> &A {
+        &self.allocator
+    }
+
+    /// Set the field update callback.
+    pub fn set_field_update_callback(
+        &mut self,
+        callback: Option<std::boxed::Box<dyn FnMut(Field<&'a [u8]>) -> Result<(), Error> + 'a>>,
+    ) {
+        self.field_update_callback = callback;
+    }
 }
 
 impl<'a, A: Allocator + Clone> MessageParserState<'a, A> {

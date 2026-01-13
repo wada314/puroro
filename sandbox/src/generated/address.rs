@@ -279,6 +279,18 @@ struct AddressParserState<'a, A: Allocator = Global> {
     allocator: A,
 }
 
+impl<'a, A: Allocator> AddressParserState<'a, A> {
+    /// Take the field iterator, leaving None in its place.
+    fn take_field_iter(&mut self) -> Option<FieldIterator<'a>> {
+        self.field_iter.take()
+    }
+
+    /// Set the field iterator.
+    fn set_field_iter(&mut self, field_iter: Option<FieldIterator<'a>>) {
+        self.field_iter = field_iter;
+    }
+}
+
 /// Lazy implementation of Address message that deserializes fields on-demand.
 ///
 /// Phase 3: Basic implementation with street, city, zip_code fields.
@@ -383,14 +395,14 @@ impl<'a, A: Allocator + Clone + 'a> AddressLazyImpl<'a, A> {
         let slices: Vec<&'a [u8]> = parser_state.field_slices.iter().copied().collect();
 
         // Always recreate iterator to ensure we parse all slices
-        parser_state.field_iter = Some(FieldIterator::new(slices.into_iter()));
+        parser_state.set_field_iter(Some(FieldIterator::new(slices.into_iter())));
 
         drop(parser_state);
 
         // Parse until exhausted
         loop {
             let mut parser_state = self.parser_state.borrow_mut();
-            let mut field_iter = match parser_state.field_iter.take() {
+            let mut field_iter = match parser_state.take_field_iter() {
                 Some(iter) => iter,
                 None => break, // Already parsed
             };
@@ -398,16 +410,16 @@ impl<'a, A: Allocator + Clone + 'a> AddressLazyImpl<'a, A> {
             match field_iter.next() {
                 Some(Ok(field)) => {
                     // Store iterator back before calling update_field
-                    parser_state.field_iter = Some(field_iter);
+                    parser_state.set_field_iter(Some(field_iter));
                     drop(parser_state);
                     self.update_field(field)?;
                 }
                 Some(Err(e)) => {
-                    parser_state.field_iter = Some(field_iter);
+                    parser_state.set_field_iter(Some(field_iter));
                     return Err(e);
                 }
                 None => {
-                    parser_state.field_iter = None;
+                    parser_state.set_field_iter(None);
                     break;
                 }
             }
