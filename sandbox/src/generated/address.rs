@@ -261,7 +261,7 @@ impl<A: Allocator + Clone> Message for AddressImpl<A> {
 // AddressLazyImpl Structure (Lazy Implementation - Phase 3)
 // ============================================================================
 
-use super::lazy_parser::{FieldIterator, MessageParserState};
+use super::lazy_parser::MessageParserState;
 use puroro::protobuf_core::{Field, FieldValue};
 use std::cell::{Cell, RefCell};
 use std::rc::Rc;
@@ -379,7 +379,7 @@ impl<'a, A: Allocator + Clone + 'a> AddressLazyImpl<'a, A> {
 
         // Always recreate iterator to ensure we parse all slices
         let mut parser_state = self.parser_state.borrow_mut();
-        parser_state.set_field_iter(Some(FieldIterator::new(slices.into_iter())));
+        parser_state.set_field_iter_from_slices(slices.into_iter());
         drop(parser_state);
 
         // Parse until exhausted

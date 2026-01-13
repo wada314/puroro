@@ -151,13 +151,23 @@ impl<'a, A: Allocator> MessageParserState<'a, A> {
         }
     }
 
+    /// Set the field iterator from a slice iterator.
+    pub(crate) fn set_field_iter_from_slices<I>(&mut self, slice_iter: I)
+    where
+        I: Iterator<Item = &'a [u8]> + 'a,
+    {
+        self.field_iter = Some(FieldIterator::new(slice_iter));
+    }
+
     /// Take the field iterator, leaving None in its place.
-    pub fn take_field_iter(&mut self) -> Option<FieldIterator<'a>> {
+    /// This is needed for RefCell borrow management when parsing fields.
+    pub(crate) fn take_field_iter(&mut self) -> Option<FieldIterator<'a>> {
         self.field_iter.take()
     }
 
     /// Set the field iterator.
-    pub fn set_field_iter(&mut self, field_iter: Option<FieldIterator<'a>>) {
+    /// This is needed for RefCell borrow management when parsing fields.
+    pub(crate) fn set_field_iter(&mut self, field_iter: Option<FieldIterator<'a>>) {
         self.field_iter = field_iter;
     }
 
