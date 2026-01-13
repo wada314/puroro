@@ -7,7 +7,7 @@
 //! This code is (supposed to be) generated from `sandbox/protos/person.proto`.
 
 use super::address::AddressLazyImpl;
-use super::lazy_parser::{FieldIterator, MessageParserState};
+use super::lazy_parser::MessageParserState;
 use super::repeated_lazy::LazyRepeated;
 use ::allocator_api2::boxed::Box;
 use ::allocator_api2::vec::Vec as AllocVec;
@@ -510,7 +510,7 @@ impl<'a, A: Allocator + Clone + 'a> PersonLazyImpl<'a, A> {
 
             // Create parser state with initial callback
             let parser_state = Rc::new(RefCell::new(MessageParserState::new(
-                FieldIterator::new(std::iter::once(slice)),
+                std::iter::once(slice),
                 alloc_clone.clone(),
                 callback,
             )));

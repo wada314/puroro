@@ -5,6 +5,7 @@
 //!
 //! This code is (supposed to be) generated from `sandbox/protos/person.proto`.
 
+use ::allocator_api2::boxed::Box;
 use ::allocator_api2::vec::Vec as AllocVec;
 use ::allocator_extras::{Allocator, Global};
 use once_list2::OnceList;
@@ -265,42 +266,21 @@ use puroro::protobuf_core::{Field, FieldValue};
 use std::cell::{Cell, RefCell};
 use std::rc::Rc;
 
-/// Parser state for AddressLazyImpl.
-///
-/// Child messages have their own parser state that collects field slices.
-/// This allows child messages to collect all slices from the parent before parsing.
-struct AddressParserState<'a, A: Allocator = Global> {
-    /// FieldIterator - needs &mut self for Iterator::next()
-    field_iter: Option<FieldIterator<'a>>,
-    /// Field slices collected so far (from parent)
-    /// These are length-delimited value slices (not including field tags)
-    /// Using &'a [u8] to support Field type which returns Cow<'a, [u8]> for Len values
-    field_slices: OnceList<&'a [u8], A>,
-    allocator: A,
-}
-
-impl<'a, A: Allocator> AddressParserState<'a, A> {
-    /// Take the field iterator, leaving None in its place.
-    fn take_field_iter(&mut self) -> Option<FieldIterator<'a>> {
-        self.field_iter.take()
-    }
-
-    /// Set the field iterator.
-    fn set_field_iter(&mut self, field_iter: Option<FieldIterator<'a>>) {
-        self.field_iter = field_iter;
-    }
-}
-
 /// Lazy implementation of Address message that deserializes fields on-demand.
 ///
 /// Phase 3: Basic implementation with street, city, zip_code fields.
 pub struct AddressLazyImpl<'a, A: Allocator = Global> {
-    /// Owns parser state via Rc<RefCell<...>>
-    parser_state: Rc<RefCell<AddressParserState<'a, A>>>,
+    /// Owns parser state via Rc<RefCell<...>> - State itself is mutable
+    parser_state: Rc<RefCell<MessageParserState<'a, A>>>,
 
     /// Parent parser state - strong Rc<RefCell<...>> reference (no cycle!)
     /// Child needs parent's parser state to request continued parsing
     parent_parser_state: Rc<RefCell<MessageParserState<'a, A>>>,
+
+    /// Field slices collected so far (from parent)
+    /// These are length-delimited value slices (not including field tags)
+    /// Using &'a [u8] to support Field type which returns Cow<'a, [u8]> for Len values
+    field_slices: OnceList<&'a [u8], A>,
 
     /// Field 1: street (implicit presence string field)
     street: RefCell<String>,
@@ -327,15 +307,22 @@ impl<'a, A: Allocator + Clone + 'a> AddressLazyImpl<'a, A> {
         field_slices.push(first_slice);
 
         let alloc_clone = alloc.clone();
-        let parser_state = Rc::new(RefCell::new(AddressParserState {
-            field_iter: None, // Will be created in ensure_all_fields_parsed
-            field_slices,
-            allocator: alloc_clone.clone(),
-        }));
+        // Create a dummy callback for child messages (not used, but required by MessageParserState)
+        let closure = move |_field: Field<&'a [u8]>| -> Result<(), Error> { Ok(()) };
+        let boxed = Box::new_in(closure, alloc_clone.clone());
+        let callback: Box<dyn FnMut(Field<&'a [u8]>) -> Result<(), Error> + 'a, A> =
+            ::allocator_api2::unsize_box!(boxed);
+
+        let parser_state = Rc::new(RefCell::new(MessageParserState::new(
+            std::iter::once(first_slice),
+            alloc_clone.clone(),
+            callback,
+        )));
 
         Rc::new(Self {
             parser_state,
             parent_parser_state,
+            field_slices,
             street: RefCell::new(String::new()),
             city: RefCell::new(String::new()),
             zip_code: Cell::new(0),
@@ -344,7 +331,7 @@ impl<'a, A: Allocator + Clone + 'a> AddressLazyImpl<'a, A> {
 
     /// Add additional slice from parent
     pub(crate) fn add_slice(self: &Rc<Self>, slice: &'a [u8]) -> Result<(), Error> {
-        self.parser_state.borrow_mut().field_slices.push(slice);
+        self.field_slices.push(slice);
         // Note: field_iter needs to be recreated when parsing
         Ok(())
     }
@@ -388,15 +375,11 @@ impl<'a, A: Allocator + Clone + 'a> AddressLazyImpl<'a, A> {
 
         // Now parse our own fields from all collected slices
         // Since field_slices stores &'a [u8], we can use them directly
-        let mut parser_state = self.parser_state.borrow_mut();
-
-        // Create slice iterator from field_slices
-        // The slices are already &'a [u8], so we can use them directly
-        let slices: Vec<&'a [u8]> = parser_state.field_slices.iter().copied().collect();
+        let slices: Vec<&'a [u8]> = self.field_slices.iter().copied().collect();
 
         // Always recreate iterator to ensure we parse all slices
+        let mut parser_state = self.parser_state.borrow_mut();
         parser_state.set_field_iter(Some(FieldIterator::new(slices.into_iter())));
-
         drop(parser_state);
 
         // Parse until exhausted

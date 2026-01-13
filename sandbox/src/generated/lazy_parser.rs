@@ -77,7 +77,7 @@ pub fn parse_string(bytes: &[u8]) -> Result<String, Error> {
 ///
 /// Can be paused and resumed, making it easy to parse incrementally.
 /// Uses flat_map approach to convert slice iterator to field iterator.
-pub struct FieldIterator<'a> {
+pub(crate) struct FieldIterator<'a> {
     /// Flattened iterator over protobuf fields from all slices
     field_iter: std::boxed::Box<dyn Iterator<Item = Result<Field<&'a [u8]>, Error>> + 'a>,
 }
@@ -85,7 +85,7 @@ pub struct FieldIterator<'a> {
 impl<'a> FieldIterator<'a> {
     /// Create a new FieldIterator from any iterator over slices
     /// The iterator is created once and maintains its own state - no need to recreate it
-    pub fn new<I>(slice_iter: I) -> Self
+    pub(crate) fn new<I>(slice_iter: I) -> Self
     where
         I: Iterator<Item = &'a [u8]> + 'a,
     {
@@ -134,13 +134,18 @@ pub struct MessageParserState<'a, A: Allocator = Global> {
 
 impl<'a, A: Allocator> MessageParserState<'a, A> {
     /// Create a new MessageParserState with all parameters specified.
-    pub fn new(
-        field_iter: FieldIterator<'a>,
+    ///
+    /// `slice_iter` is an iterator over byte slices that will be parsed as protobuf fields.
+    pub fn new<I>(
+        slice_iter: I,
         allocator: A,
         field_update_callback: Box<dyn FnMut(Field<&'a [u8]>) -> Result<(), Error> + 'a, A>,
-    ) -> Self {
+    ) -> Self
+    where
+        I: Iterator<Item = &'a [u8]> + 'a,
+    {
         Self {
-            field_iter: Some(field_iter),
+            field_iter: Some(FieldIterator::new(slice_iter)),
             allocator,
             field_update_callback,
         }
