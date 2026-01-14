@@ -431,11 +431,8 @@ where
         // This ensures we parse all slices even if field_iter state is lost
 
         // Now parse our own fields from all collected slices
-        // Since field_slices stores &'slice [u8], we can use them directly
-        // Due to RefCell's invariance, we need to collect into Vec to satisfy lifetime requirements
-        let slices: Vec<&'slice [u8]> = self.field_slices.iter().copied().collect();
         let mut parser_state = self.parser_state.borrow_mut();
-        parser_state.set_field_iter_from_slices(slices.into_iter());
+        parser_state.set_field_iter_from_slices(self.field_slices.iter().copied());
         drop(parser_state);
 
         // Parse until exhausted
