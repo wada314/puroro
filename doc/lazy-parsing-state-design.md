@@ -8,9 +8,14 @@ This document describes the finalized design for tracking "in-parsing" state in 
 
 Each message struct has its **own cursor** that tracks parsing progress through its own `field_slices`. When parsing for one field, we update ALL fields we encounter along the way. This allows us to pause parsing after finding the first occurrence of a field and resume later when needed.
 
+**Key Design Principles**:
+- **Unified interface**: All message types (top-level and child) use the same structure and methods
+- **Multiple parse support**: Input slices are stored in `field_slices`, allowing getters to be called multiple times
+- **Flexible message hierarchy**: Any message can be used as both top-level and child message
+
 **Critical Insight**: For scalar message fields (e.g., Person → Address → Location):
 - Each message has its own cursor for parsing its own `field_slices`
-- Scalar message fields hold a reference to the parent message
+- Scalar message fields hold a reference to the parent's parser state (not message body)
 - When the child needs all slices, it asks the parent to continue parsing from the parent's cursor
 - The parent continues parsing and collects all occurrences of the child's field number
 
@@ -30,7 +35,7 @@ Each message struct has its **own cursor** that tracks parsing progress through 
 
 ### Implementation
 
-**Status**: ✅ **Implemented** (Phase 1-4 complete as of 2025-01)
+**Status**: ✅ **Implemented** (Phase 1-4 complete as of 2025-01, unified interface pattern added 2025-01)
 
 The actual implementation can be found in:
 - `sandbox/src/generated/lazy_parser.rs` - Core parsing infrastructure (FieldIterator, MessageParserState)
@@ -42,6 +47,12 @@ The actual implementation can be found in:
 - Field-level interior mutability: `RefCell`/`Cell` for scalar fields, `OnceList` for repeated fields
 - All methods use `self: &Rc<Self>` to allow cloning when needed
 - Field getters ensure parsing is complete before returning values (for scalar fields)
+- **Unified interface**: All message types (`PersonLazyImpl`, `AddressLazyImpl`, etc.) have the same structure and interface
+  - All messages have `field_slices: OnceList<&'a [u8], A>` to store input slices
+  - All messages have `parent_parser_state: Option<Rc<RefCell<MessageParserState<'a, A>>>>` (None for top-level, Some(...) for child messages)
+  - All messages use the same `new(slice, alloc, parent_parser_state)` constructor pattern
+  - All messages can be used as both top-level and child messages
+- **Multiple parse support**: Getters can be called multiple times by recreating iterators from `field_slices`
 
 For detailed sample code, see `historical/lazy-parsing-implementation-samples.md`.
 
@@ -135,10 +146,15 @@ The Message Body owns the Parser State via `Rc`, and child messages hold a stron
 - `MessageParserState` contains `FieldIterator` and field update callback
 - Callback is updated in `Drop::drop` to handle child messages after parent Message Body is dropped
 - Child messages collect slices via `add_slice()` and parse them when `ensure_all_fields_parsed()` is called
+- **Unified constructor**: All message types use `new(slice, alloc, parent_parser_state)` where:
+  - `parent_parser_state: None` for top-level messages
+  - `parent_parser_state: Some(parent_parser_state)` for child messages
+- **Input slice storage**: All messages store input slices in `field_slices: OnceList<&'a [u8], A>` to enable multiple parsing passes
+- **Parser state sharing**: Child messages hold `Option<Rc<RefCell<MessageParserState>>>` to request continued parsing from parent
 
 See the actual implementation in:
-- `sandbox/src/generated/person.rs` - `PersonLazyImpl` and `Drop` implementation
-- `sandbox/src/generated/address.rs` - `AddressLazyImpl` and `AddressParserState`
+- `sandbox/src/generated/person.rs` - `PersonLazyImpl` implementation
+- `sandbox/src/generated/address.rs` - `AddressLazyImpl` implementation (same pattern as PersonLazyImpl)
 
 For detailed sample code, see `historical/lazy-parsing-implementation-samples.md`.
 
