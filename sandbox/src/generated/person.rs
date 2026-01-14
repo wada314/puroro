@@ -519,7 +519,7 @@ where
     ///
     /// Note: Child holds strong Rc reference to parent's parser state (not message body)
     /// This avoids cycles: Parent Message Body → Parent Parser State → (Child holds Rc to this)
-    /// Returns Rc<Self> - all methods use self: &Rc<Self>
+    /// Returns Rc<Self> - all methods use self: &'message Rc<Self>
     pub fn new(
         slice: &'slice [u8],
         alloc: A,
@@ -695,7 +695,7 @@ where
     ///
     /// This is a terminating operation - after this method completes, the message is marked as terminated
     /// and no additional slices can be added.
-    fn ensure_all_fields_parsed(self: &Rc<Self>) -> Result<(), Error> {
+    fn ensure_all_fields_parsed(self: &'message Rc<Self>) -> Result<(), Error> {
         // If already terminated, return early (idempotent operation)
         if self.terminated.get() {
             return Ok(());
@@ -738,7 +738,7 @@ where
                     // Store iterator back before calling update_field
                     parser_state.set_field_iter(Some(field_iter));
                     drop(parser_state);
-                    // self is &Rc<Self>, but update_field takes &'message Rc<Self>
+                    // self is &'message Rc<Self>, but update_field takes &'message Rc<Self>
                     // Cast self to &'message Rc<Self> to satisfy the lifetime requirement
                     let self_ref: &'message Rc<PersonLazyImpl<'slice, 'message, A>> =
                         unsafe { std::mem::transmute(self) };
