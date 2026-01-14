@@ -349,26 +349,40 @@ impl<'a, A: Allocator + Clone + 'a> AddressLazyImpl<'a, A> {
                 }
             })
         } else {
-            // Child message: use Rc::new with dummy callback
-            let alloc_clone = alloc.clone();
-            let closure = move |_field: Field<&'a [u8]>| -> Result<(), Error> { Ok(()) };
-            let boxed = Box::new_in(closure, alloc_clone.clone());
-            let callback: Box<dyn FnMut(Field<&'a [u8]>) -> Result<(), Error> + 'a, A> =
-                ::allocator_api2::unsize_box!(boxed);
+            // Child message: use Rc::new_cyclic with callback that handles Message Body
+            // This is needed even for child messages because they may have their own child messages
+            Rc::new_cyclic(move |weak: &Weak<Self>| {
+                let message_body_weak = weak.clone();
 
-            let parser_state = Rc::new(RefCell::new(MessageParserState::new(
-                std::iter::once(slice),
-                alloc_clone.clone(),
-                callback,
-            )));
+                // Create initial callback that only handles Message Body (when it's alive)
+                // This callback will be replaced in Drop::drop with one that handles child messages
+                let closure = move |field: Field<&'a [u8]>| -> Result<(), Error> {
+                    // Update via Message Body (should always succeed when this callback is active)
+                    if let Some(message_body) = message_body_weak.upgrade() {
+                        let _ = message_body.update_field(field);
+                    }
+                    Ok(())
+                };
+                let boxed = Box::new_in(closure, alloc_clone.clone());
+                let callback: Box<dyn FnMut(Field<&'a [u8]>) -> Result<(), Error> + 'a, A> =
+                    ::allocator_api2::unsize_box!(boxed);
 
-            Rc::new(Self {
-                parser_state,
-                parent_parser_state,
-                field_slices,
-                street: RefCell::new(String::new()),
-                city: RefCell::new(String::new()),
-                zip_code: Cell::new(0),
+                // Create parser state with initial callback
+                let parser_state = Rc::new(RefCell::new(MessageParserState::new(
+                    std::iter::once(slice),
+                    alloc_clone.clone(),
+                    callback,
+                )));
+
+                // Create message body
+                Self {
+                    parser_state: parser_state.clone(),
+                    parent_parser_state,
+                    field_slices,
+                    street: RefCell::new(String::new()),
+                    city: RefCell::new(String::new()),
+                    zip_code: Cell::new(0),
+                }
             })
         }
     }
