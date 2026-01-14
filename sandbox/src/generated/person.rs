@@ -7,13 +7,13 @@
 //! This code is (supposed to be) generated from `sandbox/protos/person.proto`.
 
 use super::address::AddressLazyImpl;
-use super::repeated_lazy::LazyRepeated;
 use ::allocator_api2::boxed::Box;
 use ::allocator_api2::vec::Vec as AllocVec;
 use ::allocator_extras::{Allocator, Global};
 use once_list2::OnceList;
 use puroro::lazy_parser::MessageParserState;
 use puroro::protobuf_core::{Field, FieldValue};
+use puroro::repeated_lazy::LazyRepeated;
 use puroro::{
     Message,
     error::Error,

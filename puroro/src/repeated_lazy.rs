@@ -5,11 +5,11 @@
 //! while coordinating with the parent's `MessageParserState` to advance parsing
 //! just enough to satisfy access patterns (indexing/peek/length).
 
+use crate::error::Error;
+use crate::lazy_parser::MessageParserState;
+use crate::repeated::Repeated;
 use ::allocator_extras::Allocator;
 use ::once_list2::OnceList;
-use ::puroro::error::Error;
-use ::puroro::lazy_parser::MessageParserState;
-use ::puroro::repeated::Repeated;
 use ::std::cell::RefCell;
 use ::std::rc::Rc;
 

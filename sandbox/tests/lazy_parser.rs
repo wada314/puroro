@@ -92,7 +92,6 @@ fn encode_address_field(street: &str, city: &str, zip_code: i32) -> Vec<u8> {
     encode_length_delimited_field(6, &address_bytes) // field 6 (address), wire type 2
 }
 
-
 #[test]
 fn test_person_lazy_age_field() {
     // Encode a simple message with age = 30

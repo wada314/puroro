@@ -5,4 +5,3 @@
 
 pub mod address;
 pub mod person;
-pub mod repeated_lazy;

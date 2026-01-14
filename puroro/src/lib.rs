@@ -56,6 +56,12 @@ pub use repeated::OnceListRepeatedMap;
 /// - Helper functions for wire format parsing (varint decoding, field tag parsing)
 pub mod lazy_parser;
 
+/// Lazy wrapper for repeated fields enabling on-demand parsing.
+///
+/// Provides `LazyRepeated` type that enables on-demand parsing of repeated fields
+/// by coordinating with the parent's `MessageParserState`.
+pub mod repeated_lazy;
+
 /// Core message trait that all generated Protocol Buffer messages implement.
 pub trait Message: Sized + Clone + PartialEq {
     /// Parses a message from the given byte slice.
