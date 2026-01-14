@@ -111,6 +111,12 @@ pub mod error {
         /// Invalid UTF-8 in string field.
         #[error("Invalid UTF-8: {0}")]
         InvalidUtf8(#[from] std::string::FromUtf8Error),
+
+        /// Attempted to add slice after message has been terminated.
+        /// This occurs when a terminating getter (e.g., scalar field getter that checks all slices)
+        /// has been called, making the message state immutable.
+        #[error("Cannot add slice: message has been terminated by a terminating getter call")]
+        MessageTerminated,
     }
 
     impl From<protobuf_core::ProtobufError> for Error {

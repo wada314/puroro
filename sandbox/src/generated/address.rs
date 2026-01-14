@@ -291,6 +291,12 @@ pub struct AddressLazyImpl<'a, A: Allocator = Global> {
 
     /// Field 3: zip_code (implicit presence varint field)
     zip_code: Cell<i32>,
+
+    /// Flag indicating whether the message has been terminated by a terminating getter.
+    /// Once terminated, no additional slices can be added to maintain consistency.
+    /// A terminating getter is one that needs to check all slices (e.g., scalar field getters
+    /// that return the last found value).
+    terminated: Cell<bool>,
 }
 
 impl<'a, A: Allocator + Clone + 'a> AddressLazyImpl<'a, A> {
@@ -344,12 +350,20 @@ impl<'a, A: Allocator + Clone + 'a> AddressLazyImpl<'a, A> {
                 street: RefCell::new(String::new()),
                 city: RefCell::new(String::new()),
                 zip_code: Cell::new(0),
+                terminated: Cell::new(false),
             }
         })
     }
 
     /// Add additional slice from parent
     pub(crate) fn add_slice(self: &Rc<Self>, slice: &'a [u8]) -> Result<(), Error> {
+        // Check if message has been terminated by a terminating getter
+        // Terminating getters (e.g., scalar field getters that check all slices) make the
+        // message state immutable to maintain consistency.
+        if self.terminated.get() {
+            return Err(Error::MessageTerminated);
+        }
+
         self.field_slices.push(slice);
         // Note: field_iter needs to be recreated when parsing
         Ok(())
@@ -377,7 +391,15 @@ impl<'a, A: Allocator + Clone + 'a> AddressLazyImpl<'a, A> {
     ///
     /// This will request parent's parser state to continue parsing if needed (for child messages).
     /// Then parses all collected slices to extract Address fields.
+    ///
+    /// This is a terminating operation - after this method completes, the message is marked as terminated
+    /// and no additional slices can be added.
     fn ensure_all_fields_parsed(self: &Rc<Self>) -> Result<(), Error> {
+        // If already terminated, return early (idempotent operation)
+        if self.terminated.get() {
+            return Ok(());
+        }
+
         // Request parent's parser state to continue parsing if this is a child message
         // This works even if parent Message Body is dropped, because:
         // 1. Child holds strong Rc reference to parent's Parser State
@@ -428,6 +450,10 @@ impl<'a, A: Allocator + Clone + 'a> AddressLazyImpl<'a, A> {
                 }
             }
         }
+
+        // Mark message as terminated after parsing all fields
+        // This prevents adding new slices which would cause inconsistent behavior
+        self.terminated.set(true);
 
         Ok(())
     }
