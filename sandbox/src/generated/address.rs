@@ -8,8 +8,8 @@
 use ::allocator_api2::boxed::Box;
 use ::allocator_api2::vec::Vec as AllocVec;
 use ::allocator_extras::{Allocator, Global};
-use once_list2::OnceList;
-use puroro::{
+use ::once_list2::OnceList;
+use ::puroro::{
     Message,
     error::Error,
     field_ops::{FieldOperations, FieldStorage, ImplicitOptional, StringFieldWrapper},
@@ -261,10 +261,10 @@ impl<A: Allocator + Clone> Message for AddressImpl<A> {
 // AddressLazyImpl Structure (Lazy Implementation - Phase 3)
 // ============================================================================
 
-use puroro::lazy_parser::MessageParserState;
-use puroro::protobuf_core::{Field, FieldValue};
-use std::cell::{Cell, RefCell};
-use std::rc::Rc;
+use ::puroro::lazy_parser::MessageParserState;
+use ::puroro::protobuf_core::{Field, FieldValue};
+use ::std::cell::{Cell, RefCell};
+use ::std::rc::Rc;
 
 /// Lazy implementation of Address message that deserializes fields on-demand.
 ///

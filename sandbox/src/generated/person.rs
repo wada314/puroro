@@ -10,11 +10,11 @@ use super::address::AddressLazyImpl;
 use ::allocator_api2::boxed::Box;
 use ::allocator_api2::vec::Vec as AllocVec;
 use ::allocator_extras::{Allocator, Global};
-use once_list2::OnceList;
-use puroro::lazy_parser::MessageParserState;
-use puroro::protobuf_core::{Field, FieldValue};
-use puroro::repeated_lazy::LazyRepeated;
-use puroro::{
+use ::once_list2::OnceList;
+use ::puroro::lazy_parser::MessageParserState;
+use ::puroro::protobuf_core::{Field, FieldValue};
+use ::puroro::repeated_lazy::LazyRepeated;
+use ::puroro::{
     Message,
     error::Error,
     field_ops::{
@@ -25,8 +25,8 @@ use puroro::{
     shared::SharedFields,
     view::ViewCow,
 };
-use std::cell::{Cell, RefCell};
-use std::rc::{Rc, Weak};
+use ::std::cell::{Cell, RefCell};
+use ::std::rc::{Rc, Weak};
 
 // Import Address-related types from the separate module
 pub use super::address::{Address, AddressImpl, AddressMut, DynAddress, DynAddressMut};
