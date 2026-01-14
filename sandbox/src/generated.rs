@@ -4,6 +4,5 @@
 //! what we want our code generator to produce.
 
 pub mod address;
-pub mod lazy_parser;
-pub mod repeated_lazy;
 pub mod person;
+pub mod repeated_lazy;

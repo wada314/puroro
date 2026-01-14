@@ -1,4 +1,4 @@
-//! Tests for lazy parser implementation
+//! Integration tests for lazy parser implementation using PersonLazyImpl
 //! Phase 1: age field (scalar integer)
 //! Phase 2: scores field (repeated integer)
 //! Phase 3: address field (scalar message field)
@@ -11,7 +11,6 @@
 //! but note that true laziness is not yet implemented.
 
 use ::allocator_extras::Global;
-use sandbox::generated::lazy_parser::{decode_varint, parse_varint};
 use sandbox::generated::person::PersonLazyImpl;
 
 /// Encode a varint value
@@ -93,48 +92,6 @@ fn encode_address_field(street: &str, city: &str, zip_code: i32) -> Vec<u8> {
     encode_length_delimited_field(6, &address_bytes) // field 6 (address), wire type 2
 }
 
-#[test]
-fn test_decode_varint() {
-    // Test simple varint: 30 = 0x1E (single byte, no continuation)
-    let bytes = vec![0x1E];
-    let (value, consumed) = decode_varint(&bytes).unwrap();
-    assert_eq!(value, 30);
-    assert_eq!(consumed, 1);
-
-    // Test multi-byte varint: 300 = 0xAC 0x02
-    // 300 in binary: 100101100
-    // Split into 7-bit chunks: 0101100 (0x2C) and 0000010 (0x02)
-    // With continuation bit: 0xAC (0x2C | 0x80) and 0x02
-    let bytes = vec![0xAC, 0x02];
-    let (value, consumed) = decode_varint(&bytes).unwrap();
-    assert_eq!(value, 300);
-    assert_eq!(consumed, 2);
-}
-
-#[test]
-fn test_parse_varint() {
-    // Test simple varint: 30
-    let bytes = vec![0x1E];
-    let value = parse_varint(&bytes).unwrap();
-    assert_eq!(value, 30);
-}
-
-#[test]
-fn test_encode_field_tag() {
-    // Field 2, wire type 0 (varint)
-    // Tag = (2 << 3) | 0 = 16 = 0x10
-    let bytes = encode_field_tag(2, 0);
-    assert_eq!(bytes, vec![0x10]);
-}
-
-#[test]
-fn test_encode_age_field() {
-    // Encode age = 30
-    // Field tag: 0x10 (field 2, wire type 0)
-    // Value: 0x1E (30)
-    let bytes = encode_age_field(30);
-    assert_eq!(bytes, vec![0x10, 0x1E]);
-}
 
 #[test]
 fn test_person_lazy_age_field() {

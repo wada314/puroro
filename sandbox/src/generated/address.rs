@@ -261,7 +261,7 @@ impl<A: Allocator + Clone> Message for AddressImpl<A> {
 // AddressLazyImpl Structure (Lazy Implementation - Phase 3)
 // ============================================================================
 
-use super::lazy_parser::MessageParserState;
+use puroro::lazy_parser::MessageParserState;
 use puroro::protobuf_core::{Field, FieldValue};
 use std::cell::{Cell, RefCell};
 use std::rc::Rc;

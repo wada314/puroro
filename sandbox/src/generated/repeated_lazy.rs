@@ -8,11 +8,10 @@
 use ::allocator_extras::Allocator;
 use ::once_list2::OnceList;
 use ::puroro::error::Error;
+use ::puroro::lazy_parser::MessageParserState;
 use ::puroro::repeated::Repeated;
 use ::std::cell::RefCell;
 use ::std::rc::Rc;
-
-use crate::generated::lazy_parser::MessageParserState;
 
 /// A lazy, on-demand parsing adapter over a repeated field.
 ///

@@ -5,10 +5,10 @@
 //! - MessageParserState: Parser state that can be shared between message bodies and child messages
 //! - Helper functions for wire format parsing (varint decoding, field tag parsing)
 
+use crate::error::Error;
 use ::allocator_api2::boxed::Box;
 use ::allocator_extras::{Allocator, Global};
-use puroro::error::Error;
-use puroro::protobuf_core::{AsRefExtProtobuf, Field};
+use protobuf_core::{AsRefExtProtobuf, Field};
 
 /// Decode a varint-encoded value from a byte slice.
 ///
@@ -77,7 +77,7 @@ pub fn parse_string(bytes: &[u8]) -> Result<String, Error> {
 ///
 /// Can be paused and resumed, making it easy to parse incrementally.
 /// Uses flat_map approach to convert slice iterator to field iterator.
-pub(crate) struct FieldIterator<'a> {
+pub struct FieldIterator<'a> {
     /// Flattened iterator over protobuf fields from all slices
     field_iter: std::boxed::Box<dyn Iterator<Item = Result<Field<&'a [u8]>, Error>> + 'a>,
 }
@@ -85,7 +85,7 @@ pub(crate) struct FieldIterator<'a> {
 impl<'a> FieldIterator<'a> {
     /// Create a new FieldIterator from any iterator over slices
     /// The iterator is created once and maintains its own state - no need to recreate it
-    pub(crate) fn new<I>(slice_iter: I) -> Self
+    pub fn new<I>(slice_iter: I) -> Self
     where
         I: Iterator<Item = &'a [u8]> + 'a,
     {
@@ -152,7 +152,7 @@ impl<'a, A: Allocator> MessageParserState<'a, A> {
     }
 
     /// Set the field iterator from a slice iterator.
-    pub(crate) fn set_field_iter_from_slices<I>(&mut self, slice_iter: I)
+    pub fn set_field_iter_from_slices<I>(&mut self, slice_iter: I)
     where
         I: Iterator<Item = &'a [u8]> + 'a,
     {
@@ -161,13 +161,13 @@ impl<'a, A: Allocator> MessageParserState<'a, A> {
 
     /// Take the field iterator, leaving None in its place.
     /// This is needed for RefCell borrow management when parsing fields.
-    pub(crate) fn take_field_iter(&mut self) -> Option<FieldIterator<'a>> {
+    pub fn take_field_iter(&mut self) -> Option<FieldIterator<'a>> {
         self.field_iter.take()
     }
 
     /// Set the field iterator.
     /// This is needed for RefCell borrow management when parsing fields.
-    pub(crate) fn set_field_iter(&mut self, field_iter: Option<FieldIterator<'a>>) {
+    pub fn set_field_iter(&mut self, field_iter: Option<FieldIterator<'a>>) {
         self.field_iter = field_iter;
     }
 

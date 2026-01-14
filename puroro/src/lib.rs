@@ -48,6 +48,14 @@ pub mod repeated;
 
 pub use repeated::OnceListRepeatedMap;
 
+/// Lazy parser infrastructure for Protocol Buffer messages.
+///
+/// Provides the core parsing infrastructure for lazy deserialization:
+/// - FieldIterator: Iterator over protobuf fields in slices
+/// - MessageParserState: Parser state that can be shared between message bodies and child messages
+/// - Helper functions for wire format parsing (varint decoding, field tag parsing)
+pub mod lazy_parser;
+
 /// Core message trait that all generated Protocol Buffer messages implement.
 pub trait Message: Sized + Clone + PartialEq {
     /// Parses a message from the given byte slice.
