@@ -337,11 +337,8 @@ where
             let closure = move |field: Field<&'slice [u8]>| -> Result<(), Error> {
                 // Update via Message Body (should always succeed when this callback is active)
                 if let Some(message_body) = message_body_weak.upgrade() {
-                    // message_body is Rc<Self>, and update_field takes &'message Rc<Self>
-                    // We can use &message_body directly since Rc implements Deref
-                    let message_body_ref: &'message Rc<AddressLazyImpl<'slice, 'message, A>> =
-                        unsafe { std::mem::transmute(&message_body) };
-                    let _ = message_body_ref.update_field(field);
+                    // Rc implements Deref, so we can call update_field directly
+                    let _ = message_body.update_field(field);
                 }
                 Ok(())
             };
@@ -469,7 +466,7 @@ where
     }
 
     /// Update a field with parsed value
-    fn update_field(self: &'message Rc<Self>, field: Field<&'slice [u8]>) -> Result<(), Error> {
+    fn update_field(&self, field: Field<&'slice [u8]>) -> Result<(), Error> {
         let field_num = field.field_number.as_u32();
         match field_num {
             1 => {
