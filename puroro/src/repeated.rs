@@ -2,7 +2,7 @@ use ::allocator_api2::alloc::Allocator;
 use ::allocator_api2::boxed::Box;
 use ::allocator_api2::unsize_box;
 use ::allocator_api2::vec::Vec;
-use once_list2::OnceList;
+use ::once_list2::OnceList;
 
 /// Object-safe trait representing a repeated field using an associated type.
 ///
@@ -113,7 +113,9 @@ where
 /// Builds a `Box<dyn Repeated<'a>>` from a borrowed slice of Copy items.
 ///
 /// This avoids allocation for elements and exposes iteration/indexing via the `Repeated` trait.
-pub fn repeated_from_slice<'a, T: Copy + 'a>(slice: &'a [T]) -> Box<dyn Repeated<'a, Item = T> + 'a> {
+pub fn repeated_from_slice<'a, T: Copy + 'a>(
+    slice: &'a [T],
+) -> Box<dyn Repeated<'a, Item = T> + 'a> {
     struct SliceRepeated<'b, U: Copy>(&'b [U]);
     impl<'b, U: Copy + 'b> Repeated<'b> for SliceRepeated<'b, U> {
         type Item = U;

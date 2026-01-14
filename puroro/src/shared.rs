@@ -5,7 +5,7 @@
 
 use ::allocator_api2::alloc::{Allocator, Global};
 use ::allocator_api2::vec::Vec;
-use bitvec::prelude::*;
+use ::bitvec::prelude::*;
 
 /// Shared fields for a message implementation.
 ///

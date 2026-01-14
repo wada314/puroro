@@ -4,8 +4,8 @@
 //! that support both borrowed references and owned values, with future
 //! allocator support in mind.
 
-use allocator_api2::boxed::Box;
-use allocator_extras::{Allocator, Global};
+use ::allocator_api2::boxed::Box;
+use ::allocator_extras::{Allocator, Global};
 
 /// A clone-on-write smart pointer for Protocol Buffer message views.
 ///

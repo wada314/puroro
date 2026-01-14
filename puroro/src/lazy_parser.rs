@@ -8,7 +8,7 @@
 use crate::error::Error;
 use ::allocator_api2::boxed::Box;
 use ::allocator_extras::{Allocator, Global};
-use protobuf_core::{AsRefExtProtobuf, Field};
+use ::protobuf_core::{AsRefExtProtobuf, Field};
 
 /// Decode a varint-encoded value from a byte slice.
 ///
