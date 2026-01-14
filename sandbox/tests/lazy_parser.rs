@@ -98,7 +98,7 @@ fn test_person_lazy_age_field() {
     let encoded = encode_age_field(30);
 
     // Create PersonLazyImpl from encoded bytes
-    let person_rc = PersonLazyImpl::new(&encoded, Global);
+    let person_rc = PersonLazyImpl::new(&encoded, Global, None);
 
     // Access age field - should parse and return 30
     let age = person_rc.age();
@@ -113,7 +113,7 @@ fn test_person_lazy_age_field_multiple_occurrences() {
     let mut encoded = encode_age_field(25);
     encoded.extend_from_slice(&encode_age_field(30));
 
-    let person_rc = PersonLazyImpl::new(&encoded, Global);
+    let person_rc = PersonLazyImpl::new(&encoded, Global, None);
     let age = person_rc.age();
     assert_eq!(age, 30); // Should be the last value
 }
@@ -122,7 +122,7 @@ fn test_person_lazy_age_field_multiple_occurrences() {
 fn test_person_lazy_age_field_default() {
     // Test message with no age field - should return default value (0)
     let empty_message = vec![];
-    let person_rc = PersonLazyImpl::new(&empty_message, Global);
+    let person_rc = PersonLazyImpl::new(&empty_message, Global, None);
     let age = person_rc.age();
     assert_eq!(age, 0); // Default value for i32
 }
@@ -136,7 +136,7 @@ fn test_person_lazy_scores_field_single() {
     // Test message with a single score = 85
     let encoded = encode_score_field(85);
 
-    let person_rc = PersonLazyImpl::new(&encoded, Global);
+    let person_rc = PersonLazyImpl::new(&encoded, Global, None);
     let scores = person_rc.scores();
 
     // Check that we have one score
@@ -152,7 +152,7 @@ fn test_person_lazy_scores_field_multiple() {
     encoded.extend_from_slice(&encode_score_field(20));
     encoded.extend_from_slice(&encode_score_field(30));
 
-    let person_rc = PersonLazyImpl::new(&encoded, Global);
+    let person_rc = PersonLazyImpl::new(&encoded, Global, None);
     let scores = person_rc.scores();
 
     // Check that we have three scores in order
@@ -164,7 +164,7 @@ fn test_person_lazy_scores_field_multiple() {
 fn test_person_lazy_scores_field_empty() {
     // Test message with no scores field - should return empty list
     let empty_message = vec![];
-    let person_rc = PersonLazyImpl::new(&empty_message, Global);
+    let person_rc = PersonLazyImpl::new(&empty_message, Global, None);
     let scores = person_rc.scores();
 
     assert!(scores.iter().next().is_none());
@@ -178,7 +178,7 @@ fn test_person_lazy_scores_and_age_together() {
     encoded.extend_from_slice(&encode_score_field(85));
     encoded.extend_from_slice(&encode_score_field(90));
 
-    let person_rc = PersonLazyImpl::new(&encoded, Global);
+    let person_rc = PersonLazyImpl::new(&encoded, Global, None);
 
     // Check age
     assert_eq!(person_rc.age(), 30);
@@ -198,7 +198,7 @@ fn test_person_lazy_address_field_simple() {
     // Test message with address field containing street="Main St", city="New York", zip_code=10001
     let encoded = encode_address_field("Main St", "New York", 10001);
 
-    let person_rc = PersonLazyImpl::new(&encoded, Global);
+    let person_rc = PersonLazyImpl::new(&encoded, Global, None);
     let address_opt = person_rc.address();
 
     // Address should be present
@@ -215,7 +215,7 @@ fn test_person_lazy_address_field_simple() {
 fn test_person_lazy_address_field_empty() {
     // Test message with no address field - should return None
     let empty_message = vec![];
-    let person_rc = PersonLazyImpl::new(&empty_message, Global);
+    let person_rc = PersonLazyImpl::new(&empty_message, Global, None);
     let address_opt = person_rc.address();
 
     assert!(address_opt.is_none());
@@ -242,7 +242,7 @@ fn test_person_lazy_address_field_multiple_slices() {
     let mut encoded = first_address_field;
     encoded.extend_from_slice(&second_address_field);
 
-    let person_rc = PersonLazyImpl::new(&encoded, Global);
+    let person_rc = PersonLazyImpl::new(&encoded, Global, None);
     let address_opt = person_rc.address();
 
     // Address should be present
@@ -262,7 +262,7 @@ fn test_person_lazy_address_and_age_together() {
     encoded.extend_from_slice(&encode_age_field(30));
     encoded.extend_from_slice(&encode_address_field("Oak Ave", "Boston", 02115));
 
-    let person_rc = PersonLazyImpl::new(&encoded, Global);
+    let person_rc = PersonLazyImpl::new(&encoded, Global, None);
 
     // Check age
     assert_eq!(person_rc.age(), 30);

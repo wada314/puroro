@@ -496,90 +496,87 @@ pub struct PersonLazyImpl<'a, A: Allocator + Clone + 'a = Global> {
 }
 
 impl<'a, A: Allocator + Clone + 'a> PersonLazyImpl<'a, A> {
-    /// Create a new PersonLazyImpl from a single slice (for top-level messages)
+    /// Create a new PersonLazyImpl from a slice.
+    ///
+    /// - For top-level messages: pass `parent_parser_state: None`
+    /// - For child messages: pass `parent_parser_state: Some(parent_parser_state)`
+    ///
+    /// Note: Child holds strong Rc reference to parent's parser state (not message body)
+    /// This avoids cycles: Parent Message Body → Parent Parser State → (Child holds Rc to this)
     /// Returns Rc<Self> - all methods use self: &Rc<Self>
-    pub fn new(slice: &'a [u8], alloc: A) -> Rc<Self> {
+    pub fn new(
+        slice: &'a [u8],
+        alloc: A,
+        parent_parser_state: Option<Rc<RefCell<MessageParserState<'a, A>>>>,
+    ) -> Rc<Self> {
         // Clone alloc before moving into closure
         let alloc_clone = alloc.clone();
         // Create field_slices and store the initial slice
         let field_slices = OnceList::new_in(alloc_clone.clone());
         field_slices.push(slice);
 
-        // Use Rc::new_cyclic to create PersonLazyImpl with MessageParserState that has callback
-        Rc::new_cyclic(move |weak: &Weak<Self>| {
-            let message_body_weak = weak.clone();
+        if parent_parser_state.is_none() {
+            // Top-level message: use Rc::new_cyclic with callback that handles Message Body
+            Rc::new_cyclic(move |weak: &Weak<Self>| {
+                let message_body_weak = weak.clone();
 
-            // Create initial callback that only handles Message Body (when it's alive)
-            // This callback will be replaced in Drop::drop with one that handles child messages
-            let closure = move |field: Field<&'a [u8]>| -> Result<(), Error> {
-                // Update via Message Body (should always succeed when this callback is active)
-                if let Some(message_body) = message_body_weak.upgrade() {
-                    let _ = message_body.update_field(field);
+                // Create initial callback that only handles Message Body (when it's alive)
+                // This callback will be replaced in Drop::drop with one that handles child messages
+                let closure = move |field: Field<&'a [u8]>| -> Result<(), Error> {
+                    // Update via Message Body (should always succeed when this callback is active)
+                    if let Some(message_body) = message_body_weak.upgrade() {
+                        let _ = message_body.update_field(field);
+                    }
+                    Ok(())
+                };
+                let boxed = Box::new_in(closure, alloc_clone.clone());
+                let callback: Box<dyn FnMut(Field<&'a [u8]>) -> Result<(), Error> + 'a, A> =
+                    ::allocator_api2::unsize_box!(boxed);
+
+                // Create parser state with initial callback
+                let parser_state = Rc::new(RefCell::new(MessageParserState::new(
+                    std::iter::once(slice),
+                    alloc_clone.clone(),
+                    callback,
+                )));
+
+                // Create message body
+                Self {
+                    parser_state: parser_state.clone(),
+                    parent_parser_state: None,
+                    field_slices,
+                    // Initialize fields with default values
+                    age: Cell::new(0),
+                    scores: OnceList::new_in(alloc_clone.clone()),
+                    address: RefCell::new(None),
+                    addresses: OnceList::new_in(alloc_clone.clone()),
                 }
-                Ok(())
-            };
+            })
+        } else {
+            // Child message: use Rc::new with dummy callback
+            let alloc_clone = alloc.clone();
+            let closure = move |_field: Field<&'a [u8]>| -> Result<(), Error> { Ok(()) };
             let boxed = Box::new_in(closure, alloc_clone.clone());
             let callback: Box<dyn FnMut(Field<&'a [u8]>) -> Result<(), Error> + 'a, A> =
                 ::allocator_api2::unsize_box!(boxed);
 
-            // Create parser state with initial callback
             let parser_state = Rc::new(RefCell::new(MessageParserState::new(
                 std::iter::once(slice),
                 alloc_clone.clone(),
                 callback,
             )));
 
-            // Create message body
-            Self {
-                parser_state: parser_state.clone(),
-                parent_parser_state: None, // Top-level message has no parent
+            Rc::new(Self {
+                parser_state,
+                parent_parser_state,
                 field_slices,
                 // Initialize fields with default values
                 age: Cell::new(0),
                 scores: OnceList::new_in(alloc_clone.clone()),
                 address: RefCell::new(None),
                 addresses: OnceList::new_in(alloc_clone.clone()),
-            }
-        })
-    }
-
-    /// Create from first slice, with parent parser state reference (for child messages)
-    ///
-    /// Note: Child holds strong Rc reference to parent's parser state (not message body)
-    /// This avoids cycles: Parent Message Body → Parent Parser State → (Child holds Rc to this)
-    /// Returns Rc<Self> - all methods use self: &Rc<Self>
-    #[allow(dead_code)] // Used when PersonLazyImpl is used as a child message
-    pub(crate) fn new_from_parent(
-        first_slice: &'a [u8],
-        parent_parser_state: Rc<RefCell<MessageParserState<'a, A>>>,
-        alloc: A,
-    ) -> Rc<Self> {
-        let field_slices = OnceList::new_in(alloc.clone());
-        field_slices.push(first_slice);
-
-        let alloc_clone = alloc.clone();
-        // Create a dummy callback for child messages (not used, but required by MessageParserState)
-        let closure = move |_field: Field<&'a [u8]>| -> Result<(), Error> { Ok(()) };
-        let boxed = Box::new_in(closure, alloc_clone.clone());
-        let callback: Box<dyn FnMut(Field<&'a [u8]>) -> Result<(), Error> + 'a, A> =
-            ::allocator_api2::unsize_box!(boxed);
-
-        let parser_state = Rc::new(RefCell::new(MessageParserState::new(
-            std::iter::once(first_slice),
-            alloc_clone.clone(),
-            callback,
-        )));
-
-        Rc::new(Self {
-            parser_state,
-            parent_parser_state: Some(parent_parser_state),
-            field_slices,
-            // Initialize fields with default values
-            age: Cell::new(0),
-            scores: OnceList::new_in(alloc_clone.clone()),
-            address: RefCell::new(None),
-            addresses: OnceList::new_in(alloc_clone.clone()),
-        })
+            })
+        }
     }
 
     /// Add additional slice from parent
@@ -765,7 +762,7 @@ impl<'a, A: Allocator + Clone + 'a> PersonLazyImpl<'a, A> {
                         let allocator = self.parser_state.borrow().allocator().clone();
                         let parent_parser_state = self.parser_state.clone();
                         let child =
-                            AddressLazyImpl::new_from_parent(data, parent_parser_state, allocator);
+                            AddressLazyImpl::new(data, allocator, Some(parent_parser_state));
                         *address = Some(child);
                     }
                 }
@@ -778,11 +775,8 @@ impl<'a, A: Allocator + Clone + 'a> PersonLazyImpl<'a, A> {
                     let data_slice = data.as_ref();
                     let allocator = self.parser_state.borrow().allocator().clone();
                     let parent_parser_state = self.parser_state.clone();
-                    let child = AddressLazyImpl::new_from_parent(
-                        data_slice,
-                        parent_parser_state,
-                        allocator,
-                    );
+                    let child =
+                        AddressLazyImpl::new(data_slice, allocator, Some(parent_parser_state));
                     // Use OnceList's built-in interior mutability
                     self.addresses.push(child); // push() takes &self
                 }
