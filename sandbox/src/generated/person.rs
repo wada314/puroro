@@ -509,10 +509,8 @@ impl<'a, A: Allocator + Clone + 'a> PersonLazyImpl<'a, A> {
         alloc: A,
         parent_parser_state: Option<Rc<RefCell<MessageParserState<'a, A>>>>,
     ) -> Rc<Self> {
-        // Clone alloc before moving into closure
-        let alloc_clone = alloc.clone();
         // Create field_slices and store the initial slice
-        let field_slices = OnceList::new_in(alloc_clone.clone());
+        let field_slices = OnceList::new_in(alloc.clone());
         field_slices.push(slice);
 
         // Use Rc::new_cyclic with callback that handles Message Body
@@ -529,14 +527,14 @@ impl<'a, A: Allocator + Clone + 'a> PersonLazyImpl<'a, A> {
                 }
                 Ok(())
             };
-            let boxed = Box::new_in(closure, alloc_clone.clone());
+            let boxed = Box::new_in(closure, alloc.clone());
             let callback: Box<dyn FnMut(Field<&'a [u8]>) -> Result<(), Error> + 'a, A> =
                 ::allocator_api2::unsize_box!(boxed);
 
             // Create parser state with initial callback
             let parser_state = Rc::new(RefCell::new(MessageParserState::new(
                 std::iter::once(slice),
-                alloc_clone.clone(),
+                alloc.clone(),
                 callback,
             )));
 
@@ -547,9 +545,9 @@ impl<'a, A: Allocator + Clone + 'a> PersonLazyImpl<'a, A> {
                 field_slices,
                 // Initialize fields with default values
                 age: Cell::new(0),
-                scores: OnceList::new_in(alloc_clone.clone()),
+                scores: OnceList::new_in(alloc.clone()),
                 address: RefCell::new(None),
-                addresses: OnceList::new_in(alloc_clone.clone()),
+                addresses: OnceList::new_in(alloc.clone()),
             }
         })
     }
