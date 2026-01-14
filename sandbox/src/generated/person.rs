@@ -467,6 +467,11 @@ pub struct PersonLazyImpl<'a, A: Allocator + Clone + 'a = Global> {
     /// Owns parser state via Rc<RefCell<...>> - State itself is mutable
     parser_state: Rc<RefCell<MessageParserState<'a, A>>>,
 
+    /// Parent parser state - strong Rc<RefCell<...>> reference (no cycle!)
+    /// Child needs parent's parser state to request continued parsing
+    /// None for top-level messages, Some(...) for child messages
+    parent_parser_state: Option<Rc<RefCell<MessageParserState<'a, A>>>>,
+
     /// Input slices collected so far
     /// These are the original input slices (not field value slices)
     /// Using &'a [u8] to support Field type which returns Cow<'a, [u8]> for Len values
@@ -527,6 +532,7 @@ impl<'a, A: Allocator + Clone + 'a> PersonLazyImpl<'a, A> {
             // Create message body
             Self {
                 parser_state: parser_state.clone(),
+                parent_parser_state: None, // Top-level message has no parent
                 field_slices,
                 // Initialize fields with default values
                 age: Cell::new(0),
@@ -535,6 +541,53 @@ impl<'a, A: Allocator + Clone + 'a> PersonLazyImpl<'a, A> {
                 addresses: OnceList::new_in(alloc_clone.clone()),
             }
         })
+    }
+
+    /// Create from first slice, with parent parser state reference (for child messages)
+    ///
+    /// Note: Child holds strong Rc reference to parent's parser state (not message body)
+    /// This avoids cycles: Parent Message Body → Parent Parser State → (Child holds Rc to this)
+    /// Returns Rc<Self> - all methods use self: &Rc<Self>
+    #[allow(dead_code)] // Used when PersonLazyImpl is used as a child message
+    pub(crate) fn new_from_parent(
+        first_slice: &'a [u8],
+        parent_parser_state: Rc<RefCell<MessageParserState<'a, A>>>,
+        alloc: A,
+    ) -> Rc<Self> {
+        let field_slices = OnceList::new_in(alloc.clone());
+        field_slices.push(first_slice);
+
+        let alloc_clone = alloc.clone();
+        // Create a dummy callback for child messages (not used, but required by MessageParserState)
+        let closure = move |_field: Field<&'a [u8]>| -> Result<(), Error> { Ok(()) };
+        let boxed = Box::new_in(closure, alloc_clone.clone());
+        let callback: Box<dyn FnMut(Field<&'a [u8]>) -> Result<(), Error> + 'a, A> =
+            ::allocator_api2::unsize_box!(boxed);
+
+        let parser_state = Rc::new(RefCell::new(MessageParserState::new(
+            std::iter::once(first_slice),
+            alloc_clone.clone(),
+            callback,
+        )));
+
+        Rc::new(Self {
+            parser_state,
+            parent_parser_state: Some(parent_parser_state),
+            field_slices,
+            // Initialize fields with default values
+            age: Cell::new(0),
+            scores: OnceList::new_in(alloc_clone.clone()),
+            address: RefCell::new(None),
+            addresses: OnceList::new_in(alloc_clone.clone()),
+        })
+    }
+
+    /// Add additional slice from parent
+    #[allow(dead_code)] // Used when PersonLazyImpl is used as a child message
+    pub(crate) fn add_slice(self: &Rc<Self>, slice: &'a [u8]) -> Result<(), Error> {
+        self.field_slices.push(slice);
+        // Note: field_iter needs to be recreated when parsing
+        Ok(())
     }
 
     /// Getter for age field
@@ -631,9 +684,20 @@ impl<'a, A: Allocator + Clone + 'a> PersonLazyImpl<'a, A> {
 
     /// Ensure all fields are parsed
     ///
-    /// Parses all collected slices to extract Person fields.
-    /// This enables multiple calls to getters by recreating the iterator from field_slices.
+    /// This will request parent's parser state to continue parsing if needed (for child messages).
+    /// Then parses all collected slices to extract Person fields.
     fn ensure_all_fields_parsed(self: &Rc<Self>) -> Result<(), Error> {
+        // Request parent's parser state to continue parsing if this is a child message
+        // This works even if parent Message Body is dropped, because:
+        // 1. Child holds strong Rc reference to parent's Parser State
+        // 2. continue_parsing_for_children doesn't require parent Message Body to be alive
+        // 3. Callbacks (field_update_callback) already add slices to child messages via add_slice
+        if let Some(ref parent_parser_state) = self.parent_parser_state {
+            parent_parser_state
+                .borrow_mut()
+                .continue_parsing_for_children()?;
+        }
+
         // Check if we've already parsed (field_iter is None and we've parsed before)
         // We check if field_iter was previously Some (now None) vs never created (was None)
         // For simplicity, we always recreate the iterator from field_slices

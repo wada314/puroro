@@ -264,7 +264,7 @@ impl<A: Allocator + Clone> Message for AddressImpl<A> {
 use ::puroro::lazy_parser::MessageParserState;
 use ::puroro::protobuf_core::{Field, FieldValue};
 use ::std::cell::{Cell, RefCell};
-use ::std::rc::Rc;
+use ::std::rc::{Rc, Weak};
 
 /// Lazy implementation of Address message that deserializes fields on-demand.
 ///
@@ -275,7 +275,8 @@ pub struct AddressLazyImpl<'a, A: Allocator = Global> {
 
     /// Parent parser state - strong Rc<RefCell<...>> reference (no cycle!)
     /// Child needs parent's parser state to request continued parsing
-    parent_parser_state: Rc<RefCell<MessageParserState<'a, A>>>,
+    /// None for top-level messages, Some(...) for child messages
+    parent_parser_state: Option<Rc<RefCell<MessageParserState<'a, A>>>>,
 
     /// Field slices collected so far (from parent)
     /// These are length-delimited value slices (not including field tags)
@@ -293,7 +294,52 @@ pub struct AddressLazyImpl<'a, A: Allocator = Global> {
 }
 
 impl<'a, A: Allocator + Clone + 'a> AddressLazyImpl<'a, A> {
-    /// Create from first slice, with parent parser state reference
+    /// Create a new AddressLazyImpl from a single slice (for top-level messages)
+    /// Returns Rc<Self> - all methods use self: &Rc<Self>
+    pub fn new(slice: &'a [u8], alloc: A) -> Rc<Self> {
+        // Clone alloc before moving into closure
+        let alloc_clone = alloc.clone();
+        // Create field_slices and store the initial slice
+        let field_slices = OnceList::new_in(alloc_clone.clone());
+        field_slices.push(slice);
+
+        // Use Rc::new_cyclic to create AddressLazyImpl with MessageParserState that has callback
+        Rc::new_cyclic(move |weak: &Weak<Self>| {
+            let message_body_weak = weak.clone();
+
+            // Create initial callback that only handles Message Body (when it's alive)
+            // This callback will be replaced in Drop::drop with one that handles child messages
+            let closure = move |field: Field<&'a [u8]>| -> Result<(), Error> {
+                // Update via Message Body (should always succeed when this callback is active)
+                if let Some(message_body) = message_body_weak.upgrade() {
+                    let _ = message_body.update_field(field);
+                }
+                Ok(())
+            };
+            let boxed = Box::new_in(closure, alloc_clone.clone());
+            let callback: Box<dyn FnMut(Field<&'a [u8]>) -> Result<(), Error> + 'a, A> =
+                ::allocator_api2::unsize_box!(boxed);
+
+            // Create parser state with initial callback
+            let parser_state = Rc::new(RefCell::new(MessageParserState::new(
+                std::iter::once(slice),
+                alloc_clone.clone(),
+                callback,
+            )));
+
+            // Create message body
+            Self {
+                parser_state: parser_state.clone(),
+                parent_parser_state: None, // Top-level message has no parent
+                field_slices,
+                street: RefCell::new(String::new()),
+                city: RefCell::new(String::new()),
+                zip_code: Cell::new(0),
+            }
+        })
+    }
+
+    /// Create from first slice, with parent parser state reference (for child messages)
     ///
     /// Note: Child holds strong Rc reference to parent's parser state (not message body)
     /// This avoids cycles: Parent Message Body → Parent Parser State → (Child holds Rc to this)
@@ -321,7 +367,7 @@ impl<'a, A: Allocator + Clone + 'a> AddressLazyImpl<'a, A> {
 
         Rc::new(Self {
             parser_state,
-            parent_parser_state,
+            parent_parser_state: Some(parent_parser_state),
             field_slices,
             street: RefCell::new(String::new()),
             city: RefCell::new(String::new()),
@@ -356,17 +402,19 @@ impl<'a, A: Allocator + Clone + 'a> AddressLazyImpl<'a, A> {
 
     /// Ensure all fields are parsed
     ///
-    /// This will request parent's parser state to continue parsing if needed.
+    /// This will request parent's parser state to continue parsing if needed (for child messages).
     /// Then parses all collected slices to extract Address fields.
     fn ensure_all_fields_parsed(self: &Rc<Self>) -> Result<(), Error> {
-        // Request parent's parser state to continue parsing
+        // Request parent's parser state to continue parsing if this is a child message
         // This works even if parent Message Body is dropped, because:
         // 1. Child holds strong Rc reference to parent's Parser State
         // 2. continue_parsing_for_children doesn't require parent Message Body to be alive
         // 3. Callbacks (field_update_callback) already add slices to child messages via add_slice
-        self.parent_parser_state
-            .borrow_mut()
-            .continue_parsing_for_children()?;
+        if let Some(ref parent_parser_state) = self.parent_parser_state {
+            parent_parser_state
+                .borrow_mut()
+                .continue_parsing_for_children()?;
+        }
 
         // Check if we've already parsed (field_iter is None and we've parsed before)
         // We check if field_iter was previously Some (now None) vs never created (was None)
