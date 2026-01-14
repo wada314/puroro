@@ -77,17 +77,28 @@ pub fn parse_string(bytes: &[u8]) -> Result<String, Error> {
 ///
 /// Can be paused and resumed, making it easy to parse incrementally.
 /// Uses flat_map approach to convert slice iterator to field iterator.
-pub struct FieldIterator<'a> {
+///
+/// - `'slice`: Lifetime of the input slices (external data)
+/// - `'message`: Lifetime of the iterator itself (tied to MessageParserState's lifetime)
+/// - `'slice: 'message`: Slices must outlive the iterator
+pub struct FieldIterator<'slice, 'message>
+where
+    'slice: 'message,
+{
     /// Flattened iterator over protobuf fields from all slices
-    field_iter: std::boxed::Box<dyn Iterator<Item = Result<Field<&'a [u8]>, Error>> + 'a>,
+    /// The iterator itself lives for 'message, but the slices it references live for 'slice
+    field_iter: std::boxed::Box<dyn Iterator<Item = Result<Field<&'slice [u8]>, Error>> + 'message>,
 }
 
-impl<'a> FieldIterator<'a> {
+impl<'slice, 'message> FieldIterator<'slice, 'message>
+where
+    'slice: 'message,
+{
     /// Create a new FieldIterator from any iterator over slices
     /// The iterator is created once and maintains its own state - no need to recreate it
     pub fn new<I>(slice_iter: I) -> Self
     where
-        I: Iterator<Item = &'a [u8]> + 'a,
+        I: Iterator<Item = &'slice [u8]> + 'message,
     {
         // Convert slice iterator to field iterator using flat_map
         // Each slice is converted to a ProtobufFieldSliceIterator, which is then flattened
@@ -101,8 +112,11 @@ impl<'a> FieldIterator<'a> {
     }
 }
 
-impl<'a> Iterator for FieldIterator<'a> {
-    type Item = Result<Field<&'a [u8]>, Error>;
+impl<'slice, 'message> Iterator for FieldIterator<'slice, 'message>
+where
+    'slice: 'message,
+{
+    type Item = Result<Field<&'slice [u8]>, Error>;
 
     fn next(&mut self) -> Option<Self::Item> {
         self.field_iter.next()
@@ -113,10 +127,17 @@ impl<'a> Iterator for FieldIterator<'a> {
 ///
 /// Generic across all message types - does not need to know the specific message type.
 /// The entire State is wrapped in RefCell (it's a state, so it should be mutable).
-pub struct MessageParserState<'a, A: Allocator = Global> {
+///
+/// - `'slice`: Lifetime of the input slices (external data)
+/// - `'message`: Lifetime of the callback and iterator (tied to MessageParserState's lifetime)
+/// - `'slice: 'message`: Slices must outlive the message parser state
+pub struct MessageParserState<'slice, 'message, A: Allocator = Global>
+where
+    'slice: 'message,
+{
     /// FieldIterator - needs &mut self for Iterator::next()
     /// Use std::boxed::Box (not allocator_api2::Box) since FieldIterator doesn't need allocator-aware Box
-    field_iter: Option<FieldIterator<'a>>,
+    field_iter: Option<FieldIterator<'slice, 'message>>,
     allocator: A,
     /// Field update callback - handles field updates
     ///
@@ -129,20 +150,27 @@ pub struct MessageParserState<'a, A: Allocator = Global> {
     /// This design allows MessageParserState to be generic across all message types,
     /// as it doesn't need to know the specific message type at compile time.
     /// Use allocator_api2::boxed::Box to use the allocator A for consistency with MessageParserState's allocator.
-    field_update_callback: Box<dyn FnMut(Field<&'a [u8]>) -> Result<(), Error> + 'a, A>,
+    /// The callback itself lives for 'message, but the slices it receives live for 'slice
+    field_update_callback: Box<dyn FnMut(Field<&'slice [u8]>) -> Result<(), Error> + 'message, A>,
 }
 
-impl<'a, A: Allocator> MessageParserState<'a, A> {
+impl<'slice, 'message, A: Allocator> MessageParserState<'slice, 'message, A>
+where
+    'slice: 'message,
+{
     /// Create a new MessageParserState with all parameters specified.
     ///
     /// `slice_iter` is an iterator over byte slices that will be parsed as protobuf fields.
     pub fn new<I>(
         slice_iter: I,
         allocator: A,
-        field_update_callback: Box<dyn FnMut(Field<&'a [u8]>) -> Result<(), Error> + 'a, A>,
+        field_update_callback: Box<
+            dyn FnMut(Field<&'slice [u8]>) -> Result<(), Error> + 'message,
+            A,
+        >,
     ) -> Self
     where
-        I: Iterator<Item = &'a [u8]> + 'a,
+        I: Iterator<Item = &'slice [u8]> + 'message,
     {
         Self {
             field_iter: Some(FieldIterator::new(slice_iter)),
@@ -154,20 +182,20 @@ impl<'a, A: Allocator> MessageParserState<'a, A> {
     /// Set the field iterator from a slice iterator.
     pub fn set_field_iter_from_slices<I>(&mut self, slice_iter: I)
     where
-        I: Iterator<Item = &'a [u8]> + 'a,
+        I: Iterator<Item = &'slice [u8]> + 'message,
     {
         self.field_iter = Some(FieldIterator::new(slice_iter));
     }
 
     /// Take the field iterator, leaving None in its place.
     /// This is needed for RefCell borrow management when parsing fields.
-    pub fn take_field_iter(&mut self) -> Option<FieldIterator<'a>> {
+    pub fn take_field_iter(&mut self) -> Option<FieldIterator<'slice, 'message>> {
         self.field_iter.take()
     }
 
     /// Set the field iterator.
     /// This is needed for RefCell borrow management when parsing fields.
-    pub fn set_field_iter(&mut self, field_iter: Option<FieldIterator<'a>>) {
+    pub fn set_field_iter(&mut self, field_iter: Option<FieldIterator<'slice, 'message>>) {
         self.field_iter = field_iter;
     }
 
@@ -184,13 +212,16 @@ impl<'a, A: Allocator> MessageParserState<'a, A> {
     /// Set the field update callback.
     pub fn set_field_update_callback(
         &mut self,
-        callback: Box<dyn FnMut(Field<&'a [u8]>) -> Result<(), Error> + 'a, A>,
+        callback: Box<dyn FnMut(Field<&'slice [u8]>) -> Result<(), Error> + 'message, A>,
     ) {
         self.field_update_callback = callback;
     }
 }
 
-impl<'a, A: Allocator + Clone> MessageParserState<'a, A> {
+impl<'slice, 'message, A: Allocator + Clone> MessageParserState<'slice, 'message, A>
+where
+    'slice: 'message,
+{
     /// Continue parsing and update all registered fields via the callback
     /// Called by child when it needs all slices - works even if parent Message Body is dropped
     ///

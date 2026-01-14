@@ -17,27 +17,30 @@ use ::std::rc::Rc;
 ///
 /// - `T`: element type contained in the repeated field (should be `Clone`).
 /// - `A`: allocator used by the underlying `OnceList`.
-/// - `'a`: lifetime of the parent's parsing input.
+/// - `'slice`: lifetime of the parent's parsing input slices.
+/// - `'message`: lifetime of the parent's parser state (callback and iterator).
 /// - `'b`: lifetime of the borrowed `OnceList` inside the parent message.
-pub struct LazyRepeated<'a, 'b, T, A>
+pub struct LazyRepeated<'slice, 'message, 'b, T, A>
 where
     T: Clone + 'b,
-    A: Allocator + Clone + 'a,
+    A: Allocator + Clone + 'slice,
+    'slice: 'message,
 {
-    parent_parser_state: Rc<RefCell<MessageParserState<'a, A>>>,
+    parent_parser_state: Rc<RefCell<MessageParserState<'slice, 'message, A>>>,
     _field_number: u32,
     list: &'b OnceList<T, A>,
 }
 
-impl<'a, 'b, T, A> LazyRepeated<'a, 'b, T, A>
+impl<'slice, 'message, 'b, T, A> LazyRepeated<'slice, 'message, 'b, T, A>
 where
     T: Clone + 'b,
-    A: Allocator + Clone + 'a,
+    A: Allocator + Clone + 'slice,
+    'slice: 'message,
 {
     /// Create a new `LazyRepeated` adapter.
     #[inline]
     pub fn new(
-        parent_parser_state: Rc<RefCell<MessageParserState<'a, A>>>,
+        parent_parser_state: Rc<RefCell<MessageParserState<'slice, 'message, A>>>,
         field_number: u32,
         list: &'b OnceList<T, A>,
     ) -> Self {
@@ -94,7 +97,7 @@ where
     /// Return an iterator over the elements in the repeated field.
     ///
     /// The iterator's `next()` method triggers parsing on-demand when needed.
-    pub fn iter(&self) -> LazyRepeatedIter<'_, 'a, 'b, T, A>
+    pub fn iter(&self) -> LazyRepeatedIter<'_, 'slice, 'message, 'b, T, A>
     where
         T: 'b,
     {
@@ -103,21 +106,23 @@ where
 }
 
 /// Iterator over `LazyRepeated` that triggers parsing on-demand in `next()`.
-pub struct LazyRepeatedIter<'iter, 'a, 'b, T, A>
+pub struct LazyRepeatedIter<'iter, 'slice, 'message, 'b, T, A>
 where
     T: Clone + 'b,
-    A: Allocator + Clone + 'a,
+    A: Allocator + Clone + 'slice,
+    'slice: 'message,
 {
-    lazy_repeated: &'iter LazyRepeated<'a, 'b, T, A>,
+    lazy_repeated: &'iter LazyRepeated<'slice, 'message, 'b, T, A>,
     inner_iter: ::std::boxed::Box<dyn Iterator<Item = T> + 'iter>,
 }
 
-impl<'iter, 'a, 'b, T, A> LazyRepeatedIter<'iter, 'a, 'b, T, A>
+impl<'iter, 'slice, 'message, 'b, T, A> LazyRepeatedIter<'iter, 'slice, 'message, 'b, T, A>
 where
     T: Clone + 'b,
-    A: Allocator + Clone + 'a,
+    A: Allocator + Clone + 'slice,
+    'slice: 'message,
 {
-    fn new(lazy_repeated: &'iter LazyRepeated<'a, 'b, T, A>) -> Self {
+    fn new(lazy_repeated: &'iter LazyRepeated<'slice, 'message, 'b, T, A>) -> Self {
         let iter = lazy_repeated.list.iter().cloned();
         Self {
             lazy_repeated,
@@ -126,10 +131,12 @@ where
     }
 }
 
-impl<'iter, 'a, 'b, T, A> Iterator for LazyRepeatedIter<'iter, 'a, 'b, T, A>
+impl<'iter, 'slice, 'message, 'b, T, A> Iterator
+    for LazyRepeatedIter<'iter, 'slice, 'message, 'b, T, A>
 where
     T: Clone + 'b,
-    A: Allocator + Clone + 'a,
+    A: Allocator + Clone + 'slice,
+    'slice: 'message,
 {
     type Item = T;
 
@@ -177,10 +184,11 @@ where
 }
 
 #[allow(missing_docs)]
-impl<'a, 'b, T, A> Repeated<'b> for LazyRepeated<'a, 'b, T, A>
+impl<'slice, 'message, 'b, T, A> Repeated<'b> for LazyRepeated<'slice, 'message, 'b, T, A>
 where
     T: Clone + 'b,
-    A: Allocator + Clone + 'a,
+    A: Allocator + Clone + 'slice,
+    'slice: 'message,
 {
     type Item = T;
 

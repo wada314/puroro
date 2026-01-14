@@ -463,19 +463,26 @@ impl<A: Allocator + Clone> Message for PersonImpl<A> {
 ///
 /// Phase 4: age field (field 2), scores field (field 10), address field (field 6), and addresses field (field 9) are implemented.
 /// Other fields will be added in subsequent phases.
-pub struct PersonLazyImpl<'a, A: Allocator + Clone + 'a = Global> {
+///
+/// - `'slice`: Lifetime of the input slices (external data)
+/// - `'message`: Lifetime of the parser state (callback and iterator)
+/// - `'slice: 'message`: Slices must outlive the message parser state
+pub struct PersonLazyImpl<'slice, 'message, A: Allocator + Clone + 'slice = Global>
+where
+    'slice: 'message,
+{
     /// Owns parser state via Rc<RefCell<...>> - State itself is mutable
-    parser_state: Rc<RefCell<MessageParserState<'a, A>>>,
+    parser_state: Rc<RefCell<MessageParserState<'slice, 'message, A>>>,
 
     /// Parent parser state - strong Rc<RefCell<...>> reference (no cycle!)
     /// Child needs parent's parser state to request continued parsing
     /// None for top-level messages, Some(...) for child messages
-    parent_parser_state: Option<Rc<RefCell<MessageParserState<'a, A>>>>,
+    parent_parser_state: Option<Rc<RefCell<MessageParserState<'slice, 'message, A>>>>,
 
     /// Input slices collected so far
     /// These are the original input slices (not field value slices)
-    /// Using &'a [u8] to support Field type which returns Cow<'a, [u8]> for Len values
-    field_slices: OnceList<&'a [u8], A>,
+    /// Using &'slice [u8] to support Field type which returns Cow<'slice, [u8]> for Len values
+    field_slices: OnceList<&'slice [u8], A>,
 
     /// Field 2: age (implicit presence varint field)
     /// Copy type - Cell is sufficient
@@ -487,12 +494,12 @@ pub struct PersonLazyImpl<'a, A: Allocator + Clone + 'a = Global> {
 
     /// Field 6: address (scalar message field)
     /// RefCell needed because Option<AddressLazyImpl> is not Copy
-    address: RefCell<Option<Rc<AddressLazyImpl<'a, A>>>>,
+    address: RefCell<Option<Rc<AddressLazyImpl<'slice, 'message, A>>>>,
 
     /// Field 9: addresses (repeated message field)
     /// OnceList has built-in interior mutability - no RefCell needed
     /// Use Rc because OnceList requires Copy, and AddressLazyImpl is not Copy
-    addresses: OnceList<Rc<AddressLazyImpl<'a, A>>, A>,
+    addresses: OnceList<Rc<AddressLazyImpl<'slice, 'message, A>>, A>,
 
     /// Flag indicating whether the message has been terminated by a terminating getter.
     /// Once terminated, no additional slices can be added to maintain consistency.
@@ -501,7 +508,10 @@ pub struct PersonLazyImpl<'a, A: Allocator + Clone + 'a = Global> {
     terminated: Cell<bool>,
 }
 
-impl<'a, A: Allocator + Clone + 'a> PersonLazyImpl<'a, A> {
+impl<'slice, 'message, A: Allocator + Clone + 'slice> PersonLazyImpl<'slice, 'message, A>
+where
+    'slice: 'message,
+{
     /// Create a new PersonLazyImpl from a slice.
     ///
     /// - For top-level messages: pass `parent_parser_state: None`
@@ -511,9 +521,9 @@ impl<'a, A: Allocator + Clone + 'a> PersonLazyImpl<'a, A> {
     /// This avoids cycles: Parent Message Body → Parent Parser State → (Child holds Rc to this)
     /// Returns Rc<Self> - all methods use self: &Rc<Self>
     pub fn new(
-        slice: &'a [u8],
+        slice: &'slice [u8],
         alloc: A,
-        parent_parser_state: Option<Rc<RefCell<MessageParserState<'a, A>>>>,
+        parent_parser_state: Option<Rc<RefCell<MessageParserState<'slice, 'message, A>>>>,
     ) -> Rc<Self> {
         // Create field_slices and store the initial slice
         let field_slices = OnceList::new_in(alloc.clone());
@@ -526,7 +536,7 @@ impl<'a, A: Allocator + Clone + 'a> PersonLazyImpl<'a, A> {
 
             // Create initial callback that only handles Message Body (when it's alive)
             // This callback will be replaced in Drop::drop with one that handles child messages
-            let closure = move |field: Field<&'a [u8]>| -> Result<(), Error> {
+            let closure = move |field: Field<&'slice [u8]>| -> Result<(), Error> {
                 // Update via Message Body (should always succeed when this callback is active)
                 if let Some(message_body) = message_body_weak.upgrade() {
                     let _ = message_body.update_field(field);
@@ -534,7 +544,7 @@ impl<'a, A: Allocator + Clone + 'a> PersonLazyImpl<'a, A> {
                 Ok(())
             };
             let boxed = Box::new_in(closure, alloc.clone());
-            let callback: Box<dyn FnMut(Field<&'a [u8]>) -> Result<(), Error> + 'a, A> =
+            let callback: Box<dyn FnMut(Field<&'slice [u8]>) -> Result<(), Error> + 'message, A> =
                 ::allocator_api2::unsize_box!(boxed);
 
             // Create parser state with initial callback
@@ -561,7 +571,7 @@ impl<'a, A: Allocator + Clone + 'a> PersonLazyImpl<'a, A> {
 
     /// Add additional slice from parent
     #[allow(dead_code)] // Used when PersonLazyImpl is used as a child message
-    pub(crate) fn add_slice(self: &Rc<Self>, slice: &'a [u8]) -> Result<(), Error> {
+    pub(crate) fn add_slice(self: &'message Rc<Self>, slice: &'slice [u8]) -> Result<(), Error> {
         // Check if message has been terminated by a terminating getter
         // Terminating getters (e.g., scalar field getters that check all slices) make the
         // message state immutable to maintain consistency.
@@ -576,7 +586,7 @@ impl<'a, A: Allocator + Clone + 'a> PersonLazyImpl<'a, A> {
 
     /// Getter for age field
     /// Returns the final confirmed value after parsing is complete
-    pub fn age(self: &Rc<Self>) -> i32 {
+    pub fn age(self: &'message Rc<Self>) -> i32 {
         // Ensure all fields are parsed before returning value
         let _ = self.ensure_all_fields_parsed();
         self.age.get() // Cell - returns Copy value (final confirmed)
@@ -584,13 +594,13 @@ impl<'a, A: Allocator + Clone + 'a> PersonLazyImpl<'a, A> {
 
     /// Getter for scores field
     /// Returns a LazyRepeated adapter that enables on-demand parsing
-    pub fn scores(self: &Rc<Self>) -> LazyRepeated<'a, '_, i32, A> {
+    pub fn scores(self: &'message Rc<Self>) -> LazyRepeated<'slice, 'message, '_, i32, A> {
         LazyRepeated::new(self.parser_state.clone(), 10, &self.scores)
     }
 
     /// Getter for address field
     /// Returns a reference to the AddressLazyImpl if present, None otherwise
-    pub fn address(self: &Rc<Self>) -> Option<Rc<AddressLazyImpl<'a, A>>> {
+    pub fn address(self: &'message Rc<Self>) -> Option<Rc<AddressLazyImpl<'slice, 'message, A>>> {
         // Parse until first occurrence of address field to create child if needed
         // Note: This only parses until first occurrence, not all occurrences
         // The child will request continued parsing when it needs all slices
@@ -601,7 +611,9 @@ impl<'a, A: Allocator + Clone + 'a> PersonLazyImpl<'a, A> {
 
     /// Getter for addresses field
     /// Returns a LazyRepeated adapter that enables on-demand parsing
-    pub fn addresses(self: &Rc<Self>) -> LazyRepeated<'a, '_, Rc<AddressLazyImpl<'a, A>>, A> {
+    pub fn addresses(
+        self: &'message Rc<Self>,
+    ) -> LazyRepeated<'slice, 'message, '_, Rc<AddressLazyImpl<'slice, 'message, A>>, A> {
         LazyRepeated::new(self.parser_state.clone(), 9, &self.addresses)
     }
 
@@ -612,7 +624,7 @@ impl<'a, A: Allocator + Clone + 'a> PersonLazyImpl<'a, A> {
     /// Currently unused - reserved for when we implement on-demand parsing for repeated fields.
     #[allow(dead_code)]
     fn ensure_repeated_field_parsed_until(
-        self: &Rc<Self>,
+        self: &'message Rc<Self>,
         field_num: u32,
         count: usize,
         current_count: usize,
@@ -696,12 +708,12 @@ impl<'a, A: Allocator + Clone + 'a> PersonLazyImpl<'a, A> {
         // This ensures we parse all slices even if field_iter state is lost
 
         // Now parse our own fields from all collected slices
-        // Since field_slices stores &'a [u8], we can use them directly
-        let slices: Vec<&'a [u8]> = self.field_slices.iter().copied().collect();
-
-        // Always recreate iterator to ensure we parse all slices
+        // Since field_slices stores &'slice [u8], we can use them directly
+        // Directly pass the iterator without collecting into Vec
+        // Store iterator in a temporary variable to help with lifetime inference
+        let slice_iter = self.field_slices.iter().copied();
         let mut parser_state = self.parser_state.borrow_mut();
-        parser_state.set_field_iter_from_slices(slices.into_iter());
+        parser_state.set_field_iter_from_slices(slice_iter);
         drop(parser_state);
 
         // Parse until exhausted
@@ -739,7 +751,7 @@ impl<'a, A: Allocator + Clone + 'a> PersonLazyImpl<'a, A> {
 
     /// Update a field with parsed value
     /// Called during parsing to update field values
-    fn update_field(self: &Rc<Self>, field: Field<&'a [u8]>) -> Result<(), Error> {
+    fn update_field(self: &'message Rc<Self>, field: Field<&'slice [u8]>) -> Result<(), Error> {
         let field_num = field.field_number.as_u32();
         match field_num {
             2 => {
@@ -797,7 +809,10 @@ impl<'a, A: Allocator + Clone + 'a> PersonLazyImpl<'a, A> {
     }
 }
 
-impl<'a, A: Allocator + Clone + 'a> Drop for PersonLazyImpl<'a, A> {
+impl<'slice, 'message, A: Allocator + Clone + 'slice> Drop for PersonLazyImpl<'slice, 'message, A>
+where
+    'slice: 'message,
+{
     fn drop(&mut self) {
         // When Message Body is dropped, update callback to handle child messages
         // Extract child Weak references from fields
@@ -809,7 +824,7 @@ impl<'a, A: Allocator + Clone + 'a> Drop for PersonLazyImpl<'a, A> {
 
         // Create new callback that captures child Weak references and uses static match-case
         let allocator = self.parser_state.borrow().allocator().clone();
-        let closure = move |field: Field<&'a [u8]>| -> Result<(), Error> {
+        let closure = move |field: Field<&'slice [u8]>| -> Result<(), Error> {
             // Static match-case for each child message field
             let field_num = field.field_number.as_u32();
             match field_num {
@@ -831,7 +846,7 @@ impl<'a, A: Allocator + Clone + 'a> Drop for PersonLazyImpl<'a, A> {
             Ok(())
         };
         let boxed = Box::new_in(closure, allocator);
-        let new_callback: Box<dyn FnMut(Field<&'a [u8]>) -> Result<(), Error> + 'a, A> =
+        let new_callback: Box<dyn FnMut(Field<&'slice [u8]>) -> Result<(), Error> + 'message, A> =
             ::allocator_api2::unsize_box!(boxed);
 
         // Update callback in parser state
