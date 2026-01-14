@@ -572,7 +572,7 @@ where
 
     /// Add additional slice from parent
     #[allow(dead_code)] // Used when PersonLazyImpl is used as a child message
-    pub(crate) fn add_slice(self: &'message Rc<Self>, slice: &'slice [u8]) -> Result<(), Error> {
+    pub(crate) fn add_slice(&self, slice: &'slice [u8]) -> Result<(), Error> {
         // Check if message has been terminated by a terminating getter
         // Terminating getters (e.g., scalar field getters that check all slices) make the
         // message state immutable to maintain consistency.
@@ -587,7 +587,7 @@ where
 
     /// Getter for age field
     /// Returns the final confirmed value after parsing is complete
-    pub fn age(self: &'message Rc<Self>) -> i32 {
+    pub fn age(&'message self) -> i32 {
         // Ensure all fields are parsed before returning value
         let _ = self.ensure_all_fields_parsed();
         self.age.get() // Cell - returns Copy value (final confirmed)
@@ -601,7 +601,7 @@ where
 
     /// Getter for address field
     /// Returns a reference to the AddressLazyImpl if present, None otherwise
-    pub fn address(self: &'message Rc<Self>) -> Option<Rc<AddressLazyImpl<'slice, 'message, A>>>
+    pub fn address(&'message self) -> Option<Rc<AddressLazyImpl<'slice, 'message, A>>>
     where
         'slice: 'message,
     {
@@ -692,7 +692,7 @@ where
     ///
     /// This is a terminating operation - after this method completes, the message is marked as terminated
     /// and no additional slices can be added.
-    fn ensure_all_fields_parsed(self: &'message Rc<Self>) -> Result<(), Error> {
+    fn ensure_all_fields_parsed(&'message self) -> Result<(), Error> {
         // If already terminated, return early (idempotent operation)
         if self.terminated.get() {
             return Ok(());

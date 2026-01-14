@@ -367,7 +367,7 @@ where
     }
 
     /// Add additional slice from parent
-    pub(crate) fn add_slice(self: &'message Rc<Self>, slice: &'slice [u8]) -> Result<(), Error> {
+    pub(crate) fn add_slice(&self, slice: &'slice [u8]) -> Result<(), Error> {
         // Check if message has been terminated by a terminating getter
         // Terminating getters (e.g., scalar field getters that check all slices) make the
         // message state immutable to maintain consistency.
@@ -393,7 +393,7 @@ where
     }
 
     /// Getter for zip_code field
-    pub fn zip_code(self: &'message Rc<Self>) -> i32 {
+    pub fn zip_code(&'message self) -> i32 {
         let _ = self.ensure_all_fields_parsed();
         self.zip_code.get()
     }
@@ -405,7 +405,7 @@ where
     ///
     /// This is a terminating operation - after this method completes, the message is marked as terminated
     /// and no additional slices can be added.
-    fn ensure_all_fields_parsed(self: &'message Rc<Self>) -> Result<(), Error> {
+    fn ensure_all_fields_parsed(&'message self) -> Result<(), Error> {
         // If already terminated, return early (idempotent operation)
         if self.terminated.get() {
             return Ok(());
