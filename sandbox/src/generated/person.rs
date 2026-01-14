@@ -467,6 +467,11 @@ pub struct PersonLazyImpl<'a, A: Allocator + Clone + 'a = Global> {
     /// Owns parser state via Rc<RefCell<...>> - State itself is mutable
     parser_state: Rc<RefCell<MessageParserState<'a, A>>>,
 
+    /// Input slices collected so far
+    /// These are the original input slices (not field value slices)
+    /// Using &'a [u8] to support Field type which returns Cow<'a, [u8]> for Len values
+    field_slices: OnceList<&'a [u8], A>,
+
     /// Field 2: age (implicit presence varint field)
     /// Copy type - Cell is sufficient
     age: Cell<i32>,
@@ -491,6 +496,10 @@ impl<'a, A: Allocator + Clone + 'a> PersonLazyImpl<'a, A> {
     pub fn new(slice: &'a [u8], alloc: A) -> Rc<Self> {
         // Clone alloc before moving into closure
         let alloc_clone = alloc.clone();
+        // Create field_slices and store the initial slice
+        let field_slices = OnceList::new_in(alloc_clone.clone());
+        field_slices.push(slice);
+
         // Use Rc::new_cyclic to create PersonLazyImpl with MessageParserState that has callback
         Rc::new_cyclic(move |weak: &Weak<Self>| {
             let message_body_weak = weak.clone();
@@ -518,6 +527,7 @@ impl<'a, A: Allocator + Clone + 'a> PersonLazyImpl<'a, A> {
             // Create message body
             Self {
                 parser_state: parser_state.clone(),
+                field_slices,
                 // Initialize fields with default values
                 age: Cell::new(0),
                 scores: OnceList::new_in(alloc_clone.clone()),
@@ -620,37 +630,51 @@ impl<'a, A: Allocator + Clone + 'a> PersonLazyImpl<'a, A> {
     }
 
     /// Ensure all fields are parsed
-    /// Parses until iterator is exhausted, updating all fields
+    ///
+    /// Parses all collected slices to extract Person fields.
+    /// This enables multiple calls to getters by recreating the iterator from field_slices.
     fn ensure_all_fields_parsed(self: &Rc<Self>) -> Result<(), Error> {
-        // Check if iterator still exists (not yet consumed/parsed)
-        let mut parser_state = self.parser_state.borrow_mut();
-        let mut field_iter = match parser_state.take_field_iter() {
-            Some(iter) => iter,
-            None => return Ok(()), // Already parsed completely - values are confirmed
-        };
+        // Check if we've already parsed (field_iter is None and we've parsed before)
+        // We check if field_iter was previously Some (now None) vs never created (was None)
+        // For simplicity, we always recreate the iterator from field_slices
+        // This ensures we parse all slices even if field_iter state is lost
 
-        // Parse until iterator is exhausted
-        // During this process, fields may be updated multiple times (intermediate values)
+        // Now parse our own fields from all collected slices
+        // Since field_slices stores &'a [u8], we can use them directly
+        let slices: Vec<&'a [u8]> = self.field_slices.iter().copied().collect();
+
+        // Always recreate iterator to ensure we parse all slices
+        let mut parser_state = self.parser_state.borrow_mut();
+        parser_state.set_field_iter_from_slices(slices.into_iter());
+        drop(parser_state);
+
+        // Parse until exhausted
         loop {
+            let mut parser_state = self.parser_state.borrow_mut();
+            let mut field_iter = match parser_state.take_field_iter() {
+                Some(iter) => iter,
+                None => break, // Already parsed
+            };
+
             match field_iter.next() {
                 Some(Ok(field)) => {
-                    drop(parser_state); // Release borrow before calling update_field
+                    // Store iterator back before calling update_field
+                    parser_state.set_field_iter(Some(field_iter));
+                    drop(parser_state);
                     self.update_field(field)?;
-                    parser_state = self.parser_state.borrow_mut(); // Re-borrow for next iteration
                 }
                 Some(Err(e)) => {
-                    // Store iterator back before returning error
                     parser_state.set_field_iter(Some(field_iter));
                     return Err(e);
                 }
                 None => {
-                    // Iterator exhausted - store None to indicate parsing is complete
-                    // All field values are now final and confirmed
                     parser_state.set_field_iter(None);
-                    return Ok(());
+                    break;
                 }
             }
         }
+
+        Ok(())
     }
 
     /// Update a field with parsed value
