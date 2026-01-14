@@ -337,7 +337,11 @@ where
             let closure = move |field: Field<&'slice [u8]>| -> Result<(), Error> {
                 // Update via Message Body (should always succeed when this callback is active)
                 if let Some(message_body) = message_body_weak.upgrade() {
-                    let _ = message_body.update_field(field);
+                    // message_body is Rc<Self>, and update_field takes &'message Rc<Self>
+                    // We can use &message_body directly since Rc implements Deref
+                    let message_body_ref: &'message Rc<AddressLazyImpl<'slice, 'message, A>> =
+                        unsafe { std::mem::transmute(&message_body) };
+                    let _ = message_body_ref.update_field(field);
                 }
                 Ok(())
             };
@@ -380,13 +384,13 @@ where
     }
 
     /// Getter for street field
-    pub fn street(self: &'message Rc<Self>) -> std::cell::Ref<'_, String> {
+    pub fn street(self: &'message Rc<Self>) -> std::cell::Ref<'message, String> {
         let _ = self.ensure_all_fields_parsed();
         self.street.borrow()
     }
 
     /// Getter for city field
-    pub fn city(self: &'message Rc<Self>) -> std::cell::Ref<'_, String> {
+    pub fn city(self: &'message Rc<Self>) -> std::cell::Ref<'message, String> {
         let _ = self.ensure_all_fields_parsed();
         self.city.borrow()
     }
@@ -428,11 +432,10 @@ where
 
         // Now parse our own fields from all collected slices
         // Since field_slices stores &'slice [u8], we can use them directly
-        // Directly pass the iterator without collecting into Vec
-        // Store iterator in a temporary variable to help with lifetime inference
-        let slice_iter = self.field_slices.iter().copied();
+        // Due to RefCell's invariance, we need to collect into Vec to satisfy lifetime requirements
+        let slices: Vec<&'slice [u8]> = self.field_slices.iter().copied().collect();
         let mut parser_state = self.parser_state.borrow_mut();
-        parser_state.set_field_iter_from_slices(slice_iter);
+        parser_state.set_field_iter_from_slices(slices.into_iter());
         drop(parser_state);
 
         // Parse until exhausted

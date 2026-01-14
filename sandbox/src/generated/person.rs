@@ -539,7 +539,11 @@ where
             let closure = move |field: Field<&'slice [u8]>| -> Result<(), Error> {
                 // Update via Message Body (should always succeed when this callback is active)
                 if let Some(message_body) = message_body_weak.upgrade() {
-                    let _ = message_body.update_field(field);
+                    // message_body is Rc<Self>, and update_field takes &'message Rc<Self>
+                    // We can use &message_body directly since Rc implements Deref
+                    let message_body_ref: &'message Rc<PersonLazyImpl<'slice, 'message, A>> =
+                        unsafe { std::mem::transmute(&message_body) };
+                    let _ = message_body_ref.update_field(field);
                 }
                 Ok(())
             };
@@ -594,13 +598,16 @@ where
 
     /// Getter for scores field
     /// Returns a LazyRepeated adapter that enables on-demand parsing
-    pub fn scores(self: &'message Rc<Self>) -> LazyRepeated<'slice, 'message, '_, i32, A> {
+    pub fn scores(self: &'message Rc<Self>) -> LazyRepeated<'slice, 'message, 'message, i32, A> {
         LazyRepeated::new(self.parser_state.clone(), 10, &self.scores)
     }
 
     /// Getter for address field
     /// Returns a reference to the AddressLazyImpl if present, None otherwise
-    pub fn address(self: &'message Rc<Self>) -> Option<Rc<AddressLazyImpl<'slice, 'message, A>>> {
+    pub fn address(self: &'message Rc<Self>) -> Option<Rc<AddressLazyImpl<'slice, 'message, A>>>
+    where
+        'slice: 'message,
+    {
         // Parse until first occurrence of address field to create child if needed
         // Note: This only parses until first occurrence, not all occurrences
         // The child will request continued parsing when it needs all slices
@@ -613,7 +620,10 @@ where
     /// Returns a LazyRepeated adapter that enables on-demand parsing
     pub fn addresses(
         self: &'message Rc<Self>,
-    ) -> LazyRepeated<'slice, 'message, '_, Rc<AddressLazyImpl<'slice, 'message, A>>, A> {
+    ) -> LazyRepeated<'slice, 'message, 'message, Rc<AddressLazyImpl<'slice, 'message, A>>, A>
+    where
+        'slice: 'message,
+    {
         LazyRepeated::new(self.parser_state.clone(), 9, &self.addresses)
     }
 
@@ -709,11 +719,10 @@ where
 
         // Now parse our own fields from all collected slices
         // Since field_slices stores &'slice [u8], we can use them directly
-        // Directly pass the iterator without collecting into Vec
-        // Store iterator in a temporary variable to help with lifetime inference
-        let slice_iter = self.field_slices.iter().copied();
+        // Due to RefCell's invariance, we need to collect into Vec to satisfy lifetime requirements
+        let slices: Vec<&'slice [u8]> = self.field_slices.iter().copied().collect();
         let mut parser_state = self.parser_state.borrow_mut();
-        parser_state.set_field_iter_from_slices(slice_iter);
+        parser_state.set_field_iter_from_slices(slices.into_iter());
         drop(parser_state);
 
         // Parse until exhausted
@@ -729,7 +738,11 @@ where
                     // Store iterator back before calling update_field
                     parser_state.set_field_iter(Some(field_iter));
                     drop(parser_state);
-                    self.update_field(field)?;
+                    // self is &Rc<Self>, but update_field takes &'message Rc<Self>
+                    // Cast self to &'message Rc<Self> to satisfy the lifetime requirement
+                    let self_ref: &'message Rc<PersonLazyImpl<'slice, 'message, A>> =
+                        unsafe { std::mem::transmute(self) };
+                    self_ref.update_field(field)?;
                 }
                 Some(Err(e)) => {
                     parser_state.set_field_iter(Some(field_iter));
@@ -767,7 +780,10 @@ where
                     let mut address = self.address.borrow_mut();
                     if let Some(ref addr) = *address {
                         // Child already exists - add slice to it
-                        addr.add_slice(data)?;
+                        // addr is &Rc<AddressLazyImpl>, but add_slice takes &'message Rc<Self>
+                        let addr_ref: &'message Rc<AddressLazyImpl<'slice, 'message, A>> =
+                            unsafe { std::mem::transmute(addr) };
+                        addr_ref.add_slice(data)?;
                     } else {
                         // First occurrence - create child with first slice
                         let allocator = self.parser_state.borrow().allocator().clone();
@@ -833,7 +849,11 @@ where
                     if let FieldValue::Len(data) = field.value {
                         if let Some(ref addr_weak) = address_weak {
                             if let Some(addr) = addr_weak.upgrade() {
-                                let _ = addr.add_slice(data);
+                                // addr is Rc<AddressLazyImpl>, and add_slice takes &'message Rc<Self>
+                                // We need to cast the lifetime to 'message to satisfy the requirement
+                                let addr_ref: &'message Rc<AddressLazyImpl<'slice, 'message, A>> =
+                                    unsafe { std::mem::transmute(&addr) };
+                                let _ = addr_ref.add_slice(data);
                             }
                         }
                     }
