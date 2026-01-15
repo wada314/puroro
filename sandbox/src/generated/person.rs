@@ -538,7 +538,7 @@ impl<'slice, A: Allocator + Clone + 'slice> PersonLazyImpl<'slice, A> {
                 Ok(())
             };
             let boxed = Box::new_in(closure, alloc.clone());
-            let callback: Box<dyn FnMut(Field<&'slice [u8]>) -> Result<(), Error> + 'slice, A> =
+            let callback: Box<dyn FnMut(Field<&'slice [u8]>) -> Result<(), Error>, A> =
                 ::allocator_api2::unsize_box!(boxed);
 
             // Create parser state with initial callback
@@ -550,7 +550,7 @@ impl<'slice, A: Allocator + Clone + 'slice> PersonLazyImpl<'slice, A> {
 
             // Create message body
             Self {
-                parser_state: parser_state.clone(),
+                parser_state,
                 parent_parser_state,
                 field_slices,
                 // Initialize fields with default values
@@ -778,7 +778,7 @@ impl<'slice, A: Allocator + Clone + 'slice> Drop for PersonLazyImpl<'slice, A> {
             Ok(())
         };
         let boxed = Box::new_in(closure, allocator);
-        let new_callback: Box<dyn FnMut(Field<&'slice [u8]>) -> Result<(), Error> + 'slice, A> =
+        let new_callback: Box<dyn FnMut(Field<&'slice [u8]>) -> Result<(), Error>, A> =
             ::allocator_api2::unsize_box!(boxed);
 
         // Update callback in parser state
