@@ -302,10 +302,7 @@ pub struct AddressLazyImpl<'slice, A: Allocator = Global> {
     terminated: Cell<bool>,
 }
 
-impl<'slice, 'message, A: Allocator + Clone + 'slice> AddressLazyImpl<'slice, A>
-where
-    'slice: 'message,
-{
+impl<'slice, A: Allocator + Clone + 'slice> AddressLazyImpl<'slice, A> {
     /// Create a new AddressLazyImpl from a slice.
     ///
     /// - For top-level messages: pass `parent_parser_state: None`
@@ -339,7 +336,7 @@ where
                 Ok(())
             };
             let boxed = Box::new_in(closure, alloc.clone());
-            let callback: Box<dyn FnMut(Field<&'slice [u8]>) -> Result<(), Error> + 'message, A> =
+            let callback: Box<dyn FnMut(Field<&'slice [u8]>) -> Result<(), Error> + 'slice, A> =
                 ::allocator_api2::unsize_box!(boxed);
 
             // Create parser state with initial callback
@@ -377,19 +374,19 @@ where
     }
 
     /// Getter for street field
-    pub fn street(self: &'message Rc<Self>) -> std::cell::Ref<'message, String> {
+    pub fn street(self: &Rc<Self>) -> std::cell::Ref<'_, String> {
         let _ = self.ensure_all_fields_parsed();
         self.street.borrow()
     }
 
     /// Getter for city field
-    pub fn city(self: &'message Rc<Self>) -> std::cell::Ref<'message, String> {
+    pub fn city(self: &Rc<Self>) -> std::cell::Ref<'_, String> {
         let _ = self.ensure_all_fields_parsed();
         self.city.borrow()
     }
 
     /// Getter for zip_code field
-    pub fn zip_code(&'message self) -> i32 {
+    pub fn zip_code(&self) -> i32 {
         let _ = self.ensure_all_fields_parsed();
         self.zip_code.get()
     }
@@ -401,7 +398,7 @@ where
     ///
     /// This is a terminating operation - after this method completes, the message is marked as terminated
     /// and no additional slices can be added.
-    fn ensure_all_fields_parsed(&'message self) -> Result<(), Error> {
+    fn ensure_all_fields_parsed(&self) -> Result<(), Error> {
         self.parser_state
             .borrow_mut()
             .ensure_all_fields_parsed(self.parent_parser_state.as_ref())
