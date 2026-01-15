@@ -97,21 +97,21 @@ impl<'slice, 'message, A: Allocator> FieldIterator<'slice, 'message, A>
 where
     'slice: 'message,
 {
-    /// Create a new FieldIterator from any iterator over slices
-    /// The iterator is created once and maintains its own state - no need to recreate it
-    pub fn new<I>(slice_iter: I) -> Self
+    /// Create a new FieldIterator from an initial slice
+    /// The slice is stored in OnceList and used to create the field iterator
+    pub fn new(initial_slice: &'slice [u8], alloc: A) -> Self
     where
-        I: Iterator<Item = &'slice [u8]> + 'message,
-        A: Default,
+        A: Allocator + Clone,
     {
-        // Convert slice iterator to field iterator using flat_map
-        // Each slice is converted to a ProtobufFieldSliceIterator, which is then flattened
-        // Use std::boxed::Box for type erasure to allow storing in MessageParserState
-        let field_iter = slice_iter
-            .flat_map(|slice| slice.read_protobuf_fields())
+        let field_slices = OnceList::new_in(alloc.clone());
+        field_slices.push(initial_slice);
+        // Create field iterator from the initial slice
+        // This will be updated later to recreate from field_slices
+        let field_iter = initial_slice
+            .read_protobuf_fields()
             .map(|result| result.map_err(|e| Error::from(e)));
         Self {
-            field_slices: OnceList::new_in(A::default()),
+            field_slices,
             field_iter: std::boxed::Box::new(field_iter),
         }
     }
