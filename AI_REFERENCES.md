@@ -94,8 +94,25 @@ pub fn new(
 3. **Multiple Parse Support**: Added `field_slices` to all messages for multiple parse passes
 4. **Code Simplification**: Removed unnecessary allocator cloning, unified `Rc::new_cyclic` pattern
 
-### Open Questions for Next Discussion
+### Design Discussion: Lifetime Parameters and Rc
 
+**Issue**: The combination of `'message` lifetime parameter (static lifetime checking) and `Rc` (shared ownership with dynamic lifetime) creates a design tension.
+
+**Observation**: 
+- `MessageParserState` requires `'message` lifetime for callbacks and iterators
+- Lazy message implementations use `Rc<Self>` for shared ownership
+- Methods need `self: &'message Rc<Self>` for methods returning `Ref<'message, T>`
+- This creates a "self-referential struct" pattern
+
+**Key Insight**: 
+- Callback closures capture `Weak<Self>` by value, so they could potentially use `'static` lifetime instead of `'message`
+- However, `FieldIterator` also requires `'message` lifetime for the iterator itself
+- The `'message` lifetime is tied to the `MessageParserState`'s lifetime, not the message body's lifetime
+
+**Open Questions for Next Discussion**
+
+- Can callback use `'static` instead of `'message` since it captures `Weak` by value?
+- Why does `FieldIterator` need `'message` lifetime?
 - Performance optimizations for `continue_parsing_for_children()`
 - `_field_number` field usage in `LazyRepeated`
 - Additional testing and edge cases
