@@ -472,12 +472,12 @@ where
     'slice: 'message,
 {
     /// Owns parser state via Rc<RefCell<...>> - State itself is mutable
-    parser_state: Rc<RefCell<MessageParserState<'slice, 'message, A>>>,
+    parser_state: Rc<RefCell<MessageParserState<'slice, A>>>,
 
     /// Parent parser state - strong Rc<RefCell<...>> reference (no cycle!)
     /// Child needs parent's parser state to request continued parsing
     /// None for top-level messages, Some(...) for child messages
-    parent_parser_state: Option<Rc<RefCell<MessageParserState<'slice, 'message, A>>>>,
+    parent_parser_state: Option<Rc<RefCell<MessageParserState<'slice, A>>>>,
 
     /// Input slices collected so far
     /// These are the original input slices (not field value slices)
@@ -523,7 +523,7 @@ where
     pub fn new(
         slice: &'slice [u8],
         alloc: A,
-        parent_parser_state: Option<Rc<RefCell<MessageParserState<'slice, 'message, A>>>>,
+        parent_parser_state: Option<Rc<RefCell<MessageParserState<'slice, A>>>>,
     ) -> Rc<Self> {
         // Create field_slices and store the initial slice
         let field_slices = OnceList::new_in(alloc.clone());
@@ -550,7 +550,7 @@ where
 
             // Create parser state with initial callback
             let parser_state = Rc::new(RefCell::new(MessageParserState::new(
-                std::iter::once(slice),
+                slice,
                 alloc.clone(),
                 callback,
             )));
@@ -595,7 +595,7 @@ where
 
     /// Getter for scores field
     /// Returns a LazyRepeated adapter that enables on-demand parsing
-    pub fn scores(self: &'message Rc<Self>) -> LazyRepeated<'slice, 'message, 'message, i32, A> {
+    pub fn scores(self: &'message Rc<Self>) -> LazyRepeated<'slice, 'message, i32, A> {
         LazyRepeated::new(self.parser_state.clone(), 10, &self.scores)
     }
 
@@ -617,7 +617,7 @@ where
     /// Returns a LazyRepeated adapter that enables on-demand parsing
     pub fn addresses(
         self: &'message Rc<Self>,
-    ) -> LazyRepeated<'slice, 'message, 'message, Rc<AddressLazyImpl<'slice, 'message, A>>, A>
+    ) -> LazyRepeated<'slice, 'message, Rc<AddressLazyImpl<'slice, 'message, A>>, A>
     where
         'slice: 'message,
     {

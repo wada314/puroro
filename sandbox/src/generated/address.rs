@@ -278,12 +278,12 @@ where
     'slice: 'message,
 {
     /// Owns parser state via Rc<RefCell<...>> - State itself is mutable
-    parser_state: Rc<RefCell<MessageParserState<'slice, 'message, A>>>,
+    parser_state: Rc<RefCell<MessageParserState<'slice, A>>>,
 
     /// Parent parser state - strong Rc<RefCell<...>> reference (no cycle!)
     /// Child needs parent's parser state to request continued parsing
     /// None for top-level messages, Some(...) for child messages
-    parent_parser_state: Option<Rc<RefCell<MessageParserState<'slice, 'message, A>>>>,
+    parent_parser_state: Option<Rc<RefCell<MessageParserState<'slice, A>>>>,
 
     /// Field slices collected so far (from parent)
     /// These are length-delimited value slices (not including field tags)
@@ -321,7 +321,7 @@ where
     pub fn new(
         slice: &'slice [u8],
         alloc: A,
-        parent_parser_state: Option<Rc<RefCell<MessageParserState<'slice, 'message, A>>>>,
+        parent_parser_state: Option<Rc<RefCell<MessageParserState<'slice, A>>>>,
     ) -> Rc<Self> {
         // Create field_slices and store the initial slice
         let field_slices = OnceList::new_in(alloc.clone());
@@ -348,7 +348,7 @@ where
 
             // Create parser state with initial callback
             let parser_state = Rc::new(RefCell::new(MessageParserState::new(
-                std::iter::once(slice),
+                slice,
                 alloc.clone(),
                 callback,
             )));
