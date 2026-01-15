@@ -591,7 +591,7 @@ where
 
     /// Getter for scores field
     /// Returns a LazyRepeated adapter that enables on-demand parsing
-    pub fn scores(self: &'message Rc<Self>) -> LazyRepeated<'slice, 'message, i32, A> {
+    pub fn scores(self: &'message Rc<Self>) -> LazyRepeated<'slice, i32, A> {
         LazyRepeated::new(self.parser_state.clone(), 10, &self.scores)
     }
 
@@ -613,7 +613,7 @@ where
     /// Returns a LazyRepeated adapter that enables on-demand parsing
     pub fn addresses(
         self: &'message Rc<Self>,
-    ) -> LazyRepeated<'slice, 'message, Rc<AddressLazyImpl<'slice, A>>, A>
+    ) -> LazyRepeated<'slice, Rc<AddressLazyImpl<'slice, A>>, A>
     where
         'slice: 'message,
     {

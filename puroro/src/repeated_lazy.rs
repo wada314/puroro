@@ -17,29 +17,28 @@ use ::std::rc::Rc;
 ///
 /// - `T`: element type contained in the repeated field (should be `Clone`).
 /// - `A`: allocator used by the underlying `OnceList`.
-/// - `'slice`: lifetime of the parent's parsing input slices.
-/// - `'b`: lifetime of the borrowed `OnceList` inside the parent message.
-pub struct LazyRepeated<'slice, 'b, T, A>
+/// - `'a`: lifetime of both the parent's parsing input slices and the borrowed `OnceList`.
+pub struct LazyRepeated<'a, T, A>
 where
-    T: Clone + 'b,
-    A: Allocator + Clone + 'slice,
+    T: Clone + 'a,
+    A: Allocator + Clone + 'a,
 {
-    parent_parser_state: Rc<RefCell<MessageParserState<'slice, A>>>,
+    parent_parser_state: Rc<RefCell<MessageParserState<'a, A>>>,
     _field_number: u32,
-    list: &'b OnceList<T, A>,
+    list: &'a OnceList<T, A>,
 }
 
-impl<'slice, 'b, T, A> LazyRepeated<'slice, 'b, T, A>
+impl<'a, T, A> LazyRepeated<'a, T, A>
 where
-    T: Clone + 'b,
-    A: Allocator + Clone + 'slice,
+    T: Clone + 'a,
+    A: Allocator + Clone + 'a,
 {
     /// Create a new `LazyRepeated` adapter.
     #[inline]
     pub fn new(
-        parent_parser_state: Rc<RefCell<MessageParserState<'slice, A>>>,
+        parent_parser_state: Rc<RefCell<MessageParserState<'a, A>>>,
         field_number: u32,
-        list: &'b OnceList<T, A>,
+        list: &'a OnceList<T, A>,
     ) -> Self {
         Self {
             parent_parser_state,
@@ -94,30 +93,30 @@ where
     /// Return an iterator over the elements in the repeated field.
     ///
     /// The iterator's `next()` method triggers parsing on-demand when needed.
-    pub fn iter(&self) -> LazyRepeatedIter<'_, 'slice, 'b, T, A>
+    pub fn iter(&self) -> LazyRepeatedIter<'_, 'a, T, A>
     where
-        T: 'b,
+        T: 'a,
     {
         LazyRepeatedIter::new(self)
     }
 }
 
 /// Iterator over `LazyRepeated` that triggers parsing on-demand in `next()`.
-pub struct LazyRepeatedIter<'iter, 'slice, 'b, T, A>
+pub struct LazyRepeatedIter<'iter, 'a, T, A>
 where
-    T: Clone + 'b,
-    A: Allocator + Clone + 'slice,
+    T: Clone + 'a,
+    A: Allocator + Clone + 'a,
 {
-    lazy_repeated: &'iter LazyRepeated<'slice, 'b, T, A>,
+    lazy_repeated: &'iter LazyRepeated<'a, T, A>,
     inner_iter: ::std::boxed::Box<dyn Iterator<Item = T> + 'iter>,
 }
 
-impl<'iter, 'slice, 'b, T, A> LazyRepeatedIter<'iter, 'slice, 'b, T, A>
+impl<'iter, 'a, T, A> LazyRepeatedIter<'iter, 'a, T, A>
 where
-    T: Clone + 'b,
-    A: Allocator + Clone + 'slice,
+    T: Clone + 'a,
+    A: Allocator + Clone + 'a,
 {
-    fn new(lazy_repeated: &'iter LazyRepeated<'slice, 'b, T, A>) -> Self {
+    fn new(lazy_repeated: &'iter LazyRepeated<'a, T, A>) -> Self {
         let iter = lazy_repeated.list.iter().cloned();
         Self {
             lazy_repeated,
@@ -126,10 +125,10 @@ where
     }
 }
 
-impl<'iter, 'slice, 'b, T, A> Iterator for LazyRepeatedIter<'iter, 'slice, 'b, T, A>
+impl<'iter, 'a, T, A> Iterator for LazyRepeatedIter<'iter, 'a, T, A>
 where
-    T: Clone + 'b,
-    A: Allocator + Clone + 'slice,
+    T: Clone + 'a,
+    A: Allocator + Clone + 'a,
 {
     type Item = T;
 
@@ -177,10 +176,10 @@ where
 }
 
 #[allow(missing_docs)]
-impl<'slice, 'b, T, A> Repeated<'b> for LazyRepeated<'slice, 'b, T, A>
+impl<'a, T, A> Repeated<'a> for LazyRepeated<'a, T, A>
 where
-    T: Clone + 'b,
-    A: Allocator + Clone + 'slice,
+    T: Clone + 'a,
+    A: Allocator + Clone + 'a,
 {
     type Item = T;
 
@@ -201,13 +200,13 @@ where
         self.list.iter().nth(index).cloned()
     }
 
-    fn iter_box(&self) -> ::allocator_api2::boxed::Box<dyn Iterator<Item = Self::Item> + 'b> {
+    fn iter_box(&self) -> ::allocator_api2::boxed::Box<dyn Iterator<Item = Self::Item> + 'a> {
         // For the initial boilerplate, materialize by fully parsing and collecting.
         let _ = self.ensure_fully_parsed();
         let owned: ::std::vec::Vec<T> = self.list.iter().cloned().collect();
         let it = owned.into_iter();
         let boxed = ::allocator_api2::boxed::Box::new(it);
-        let boxed_dyn: ::allocator_api2::boxed::Box<dyn Iterator<Item = T> + 'b> =
+        let boxed_dyn: ::allocator_api2::boxed::Box<dyn Iterator<Item = T> + 'a> =
             ::allocator_api2::unsize_box!(boxed);
         boxed_dyn
     }
