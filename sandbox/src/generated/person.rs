@@ -504,10 +504,7 @@ pub struct PersonLazyImpl<'slice, A: Allocator + Clone + 'slice = Global> {
     terminated: Cell<bool>,
 }
 
-impl<'slice, 'message, A: Allocator + Clone + 'slice> PersonLazyImpl<'slice, A>
-where
-    'slice: 'message,
-{
+impl<'slice, A: Allocator + Clone + 'slice> PersonLazyImpl<'slice, A> {
     /// Create a new PersonLazyImpl from a slice.
     ///
     /// - For top-level messages: pass `parent_parser_state: None`
@@ -541,7 +538,7 @@ where
                 Ok(())
             };
             let boxed = Box::new_in(closure, alloc.clone());
-            let callback: Box<dyn FnMut(Field<&'slice [u8]>) -> Result<(), Error> + 'message, A> =
+            let callback: Box<dyn FnMut(Field<&'slice [u8]>) -> Result<(), Error> + 'slice, A> =
                 ::allocator_api2::unsize_box!(boxed);
 
             // Create parser state with initial callback
@@ -583,7 +580,7 @@ where
 
     /// Getter for age field
     /// Returns the final confirmed value after parsing is complete
-    pub fn age(&'message self) -> i32 {
+    pub fn age(&self) -> i32 {
         // Ensure all fields are parsed before returning value
         let _ = self.ensure_all_fields_parsed();
         self.age.get() // Cell - returns Copy value (final confirmed)
@@ -591,16 +588,13 @@ where
 
     /// Getter for scores field
     /// Returns a LazyRepeated adapter that enables on-demand parsing
-    pub fn scores(self: &'message Rc<Self>) -> LazyRepeated<'slice, i32, A> {
+    pub fn scores(self: &Rc<Self>) -> LazyRepeated<'slice, i32, A> {
         LazyRepeated::new(self.parser_state.clone(), 10, &self.scores)
     }
 
     /// Getter for address field
     /// Returns a reference to the AddressLazyImpl if present, None otherwise
-    pub fn address(&'message self) -> Option<Rc<AddressLazyImpl<'slice, A>>>
-    where
-        'slice: 'message,
-    {
+    pub fn address(&self) -> Option<Rc<AddressLazyImpl<'slice, A>>> {
         // Parse until first occurrence of address field to create child if needed
         // Note: This only parses until first occurrence, not all occurrences
         // The child will request continued parsing when it needs all slices
@@ -611,12 +605,7 @@ where
 
     /// Getter for addresses field
     /// Returns a LazyRepeated adapter that enables on-demand parsing
-    pub fn addresses(
-        self: &'message Rc<Self>,
-    ) -> LazyRepeated<'slice, Rc<AddressLazyImpl<'slice, A>>, A>
-    where
-        'slice: 'message,
-    {
+    pub fn addresses(self: &Rc<Self>) -> LazyRepeated<'slice, Rc<AddressLazyImpl<'slice, A>>, A> {
         LazyRepeated::new(self.parser_state.clone(), 9, &self.addresses)
     }
 
@@ -627,7 +616,7 @@ where
     /// Currently unused - reserved for when we implement on-demand parsing for repeated fields.
     #[allow(dead_code)]
     fn ensure_repeated_field_parsed_until(
-        self: &'message Rc<Self>,
+        self: &Rc<Self>,
         field_num: u32,
         count: usize,
         current_count: usize,
@@ -688,7 +677,7 @@ where
     ///
     /// This is a terminating operation - after this method completes, the message is marked as terminated
     /// and no additional slices can be added.
-    fn ensure_all_fields_parsed(&'message self) -> Result<(), Error> {
+    fn ensure_all_fields_parsed(&self) -> Result<(), Error> {
         self.parser_state
             .borrow_mut()
             .ensure_all_fields_parsed(self.parent_parser_state.as_ref())
@@ -754,10 +743,7 @@ where
     }
 }
 
-impl<'slice, 'message, A: Allocator + Clone + 'slice> Drop for PersonLazyImpl<'slice, A>
-where
-    'slice: 'message,
-{
+impl<'slice, A: Allocator + Clone + 'slice> Drop for PersonLazyImpl<'slice, A> {
     fn drop(&mut self) {
         // When Message Body is dropped, update callback to handle child messages
         // Extract child Weak references from fields
@@ -792,7 +778,7 @@ where
             Ok(())
         };
         let boxed = Box::new_in(closure, allocator);
-        let new_callback: Box<dyn FnMut(Field<&'slice [u8]>) -> Result<(), Error> + 'message, A> =
+        let new_callback: Box<dyn FnMut(Field<&'slice [u8]>) -> Result<(), Error> + 'slice, A> =
             ::allocator_api2::unsize_box!(boxed);
 
         // Update callback in parser state
