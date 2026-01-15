@@ -8,6 +8,7 @@
 use crate::error::Error;
 use ::allocator_api2::boxed::Box;
 use ::allocator_extras::{Allocator, Global};
+use ::once_list2::OnceList;
 use ::protobuf_core::{AsRefExtProtobuf, Field};
 
 /// Decode a varint-encoded value from a byte slice.
@@ -81,16 +82,18 @@ pub fn parse_string(bytes: &[u8]) -> Result<String, Error> {
 /// - `'slice`: Lifetime of the input slices (external data)
 /// - `'message`: Lifetime of the iterator itself (tied to MessageParserState's lifetime)
 /// - `'slice: 'message`: Slices must outlive the iterator
-pub struct FieldIterator<'slice, 'message>
+pub struct FieldIterator<'slice, 'message, A: Allocator = Global>
 where
     'slice: 'message,
 {
+    /// Field slices container
+    field_slices: OnceList<&'slice [u8], A>,
     /// Flattened iterator over protobuf fields from all slices
     /// The iterator itself lives for 'message, but the slices it references live for 'slice
     field_iter: std::boxed::Box<dyn Iterator<Item = Result<Field<&'slice [u8]>, Error>> + 'message>,
 }
 
-impl<'slice, 'message> FieldIterator<'slice, 'message>
+impl<'slice, 'message, A: Allocator> FieldIterator<'slice, 'message, A>
 where
     'slice: 'message,
 {
@@ -99,6 +102,7 @@ where
     pub fn new<I>(slice_iter: I) -> Self
     where
         I: Iterator<Item = &'slice [u8]> + 'message,
+        A: Default,
     {
         // Convert slice iterator to field iterator using flat_map
         // Each slice is converted to a ProtobufFieldSliceIterator, which is then flattened
@@ -107,12 +111,13 @@ where
             .flat_map(|slice| slice.read_protobuf_fields())
             .map(|result| result.map_err(|e| Error::from(e)));
         Self {
+            field_slices: OnceList::new_in(A::default()),
             field_iter: std::boxed::Box::new(field_iter),
         }
     }
 }
 
-impl<'slice, 'message> Iterator for FieldIterator<'slice, 'message>
+impl<'slice, 'message, A: Allocator> Iterator for FieldIterator<'slice, 'message, A>
 where
     'slice: 'message,
 {
