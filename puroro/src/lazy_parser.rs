@@ -269,31 +269,28 @@ impl<'slice, A: Allocator + Clone> MessageParserState<'slice, A> {
     /// This ensures that multiple scalar message child fields can all receive their slices when
     /// any one of them calls this method.
     pub fn continue_parsing_for_children(&mut self) -> Result<(), Error> {
-        let mut field_iter = match self.field_iter.take() {
-            Some(iter) => iter,
-            None => return Ok(()), // Already exhausted
-        };
-
-        // Parse until iterator is exhausted, updating ALL fields via callback
-        loop {
-            match field_iter.next() {
-                Some(Ok(field)) => {
-                    // Update field via callback (handles both Message Body and child messages)
-                    let _ = (self.field_update_callback)(field);
-                    // Ignore errors - Message Body or child might be dropped
-                }
-                Some(Err(e)) => {
-                    // Restore iterator before returning error
-                    self.field_iter = Some(field_iter);
-                    return Err(e);
-                }
-                None => {
-                    // Iterator exhausted
-                    self.field_iter = None;
-                    return Ok(());
+        // Parse using the existing field iterator
+        // If field_iter is None (already exhausted), we're done
+        if let Some(ref mut field_iter) = self.field_iter {
+            loop {
+                match field_iter.next() {
+                    Some(Ok(field)) => {
+                        // Update field via callback (handles both Message Body and child messages)
+                        let _ = (self.field_update_callback)(field);
+                        // Ignore errors - Message Body or child might be dropped
+                    }
+                    Some(Err(e)) => {
+                        return Err(e);
+                    }
+                    None => {
+                        // Iterator exhausted, mark it as None
+                        self.field_iter = None;
+                        return Ok(());
+                    }
                 }
             }
         }
+        Ok(())
     }
 
     /// Ensure all fields are parsed
@@ -327,29 +324,24 @@ impl<'slice, A: Allocator + Clone> MessageParserState<'slice, A> {
             parent_state.borrow_mut().continue_parsing_for_children()?;
         }
 
-        // Get the existing field iterator or create a new one
+        // Parse using the existing field iterator
         // If field_iter is None (already exhausted or never created), we're done
         // Otherwise, we'll parse until exhausted
-        loop {
-            let mut field_iter = match self.take_field_iter() {
-                Some(iter) => iter,
-                None => break, // Already parsed or no slices
-            };
-
-            match field_iter.next() {
-                Some(Ok(field)) => {
-                    // Store iterator back before calling update callback
-                    self.set_field_iter(Some(field_iter));
-                    // Update field via callback
-                    (self.field_update_callback)(field)?;
-                }
-                Some(Err(e)) => {
-                    self.set_field_iter(Some(field_iter));
-                    return Err(e);
-                }
-                None => {
-                    self.set_field_iter(None);
-                    break;
+        if let Some(ref mut field_iter) = self.field_iter {
+            loop {
+                match field_iter.next() {
+                    Some(Ok(field)) => {
+                        // Update field via callback
+                        (self.field_update_callback)(field)?;
+                    }
+                    Some(Err(e)) => {
+                        return Err(e);
+                    }
+                    None => {
+                        // Iterator exhausted, mark it as None
+                        self.field_iter = None;
+                        break;
+                    }
                 }
             }
         }
