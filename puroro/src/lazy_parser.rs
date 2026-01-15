@@ -10,6 +10,7 @@ use ::allocator_api2::boxed::Box;
 use ::allocator_extras::{Allocator, Global};
 use ::once_list2::OnceList;
 use ::protobuf_core::{AsRefExtProtobuf, Field};
+use ::std::cell::Cell;
 
 /// Decode a varint-encoded value from a byte slice.
 ///
@@ -80,22 +81,17 @@ pub fn parse_string(bytes: &[u8]) -> Result<String, Error> {
 /// Uses flat_map approach to convert slice iterator to field iterator.
 ///
 /// - `'slice`: Lifetime of the input slices (external data)
-/// - `'message`: Lifetime of the iterator itself (tied to MessageParserState's lifetime)
-/// - `'slice: 'message`: Slices must outlive the iterator
-pub struct FieldIterator<'slice, 'message, A: Allocator = Global>
-where
-    'slice: 'message,
-{
+pub struct FieldIterator<'slice, A: Allocator = Global> {
     /// Field slices container
     field_slices: OnceList<&'slice [u8], A>,
     /// Flattened iterator over protobuf fields from all slices
-    /// The iterator itself lives for 'message, but the slices it references live for 'slice
-    field_iter: std::boxed::Box<dyn Iterator<Item = Result<Field<&'slice [u8]>, Error>> + 'message>,
+    /// The slices it references live for 'slice
+    field_iter: std::boxed::Box<dyn Iterator<Item = Result<Field<&'slice [u8]>, Error>> + 'slice>,
 }
 
-impl<'slice, 'message, A: Allocator> FieldIterator<'slice, 'message, A>
+impl<'slice, A: Allocator> FieldIterator<'slice, A>
 where
-    'slice: 'message,
+    A: Allocator + Clone,
 {
     /// Create a new FieldIterator from an initial slice
     /// The slice is stored in OnceList and used to create the field iterator
@@ -115,12 +111,17 @@ where
             field_iter: std::boxed::Box::new(field_iter),
         }
     }
+
+    /// Add a slice to the field slices container
+    pub fn add_slice(&self, slice: &'slice [u8])
+    where
+        A: Allocator + Clone,
+    {
+        self.field_slices.push(slice);
+    }
 }
 
-impl<'slice, 'message, A: Allocator> Iterator for FieldIterator<'slice, 'message, A>
-where
-    'slice: 'message,
-{
+impl<'slice, A: Allocator> Iterator for FieldIterator<'slice, A> {
     type Item = Result<Field<&'slice [u8]>, Error>;
 
     fn next(&mut self) -> Option<Self::Item> {
@@ -134,16 +135,13 @@ where
 /// The entire State is wrapped in RefCell (it's a state, so it should be mutable).
 ///
 /// - `'slice`: Lifetime of the input slices (external data)
-/// - `'message`: Lifetime of the callback and iterator (tied to MessageParserState's lifetime)
-/// - `'slice: 'message`: Slices must outlive the message parser state
-pub struct MessageParserState<'slice, 'message, A: Allocator = Global>
-where
-    'slice: 'message,
-{
+pub struct MessageParserState<'slice, A: Allocator = Global> {
     /// FieldIterator - needs &mut self for Iterator::next()
     /// Use std::boxed::Box (not allocator_api2::Box) since FieldIterator doesn't need allocator-aware Box
-    field_iter: Option<FieldIterator<'slice, 'message>>,
+    field_iter: Option<FieldIterator<'slice, A>>,
     allocator: A,
+    /// Flag indicating whether the message has been terminated by a terminating getter.
+    terminated: Cell<bool>,
     /// Field update callback - handles field updates
     ///
     /// This callback is responsible for updating fields when iterating over field_iter.
@@ -155,31 +153,26 @@ where
     /// This design allows MessageParserState to be generic across all message types,
     /// as it doesn't need to know the specific message type at compile time.
     /// Use allocator_api2::boxed::Box to use the allocator A for consistency with MessageParserState's allocator.
-    /// The callback itself lives for 'message, but the slices it receives live for 'slice
-    field_update_callback: Box<dyn FnMut(Field<&'slice [u8]>) -> Result<(), Error> + 'message, A>,
+    /// The callback captures Weak references by value.
+    field_update_callback: Box<dyn FnMut(Field<&'slice [u8]>) -> Result<(), Error>, A>,
 }
 
-impl<'slice, 'message, A: Allocator> MessageParserState<'slice, 'message, A>
-where
-    'slice: 'message,
-{
+impl<'slice, A: Allocator> MessageParserState<'slice, A> {
     /// Create a new MessageParserState with all parameters specified.
     ///
-    /// `slice_iter` is an iterator over byte slices that will be parsed as protobuf fields.
-    pub fn new<I>(
-        slice_iter: I,
+    /// `initial_slice` is the first byte slice that will be parsed as protobuf fields.
+    pub fn new(
+        initial_slice: &'slice [u8],
         allocator: A,
-        field_update_callback: Box<
-            dyn FnMut(Field<&'slice [u8]>) -> Result<(), Error> + 'message,
-            A,
-        >,
+        field_update_callback: Box<dyn FnMut(Field<&'slice [u8]>) -> Result<(), Error>, A>,
     ) -> Self
     where
-        I: Iterator<Item = &'slice [u8]> + 'message,
+        A: Allocator + Clone,
     {
         Self {
-            field_iter: Some(FieldIterator::new(slice_iter)),
+            field_iter: Some(FieldIterator::new(initial_slice, allocator.clone())),
             allocator,
+            terminated: Cell::new(false),
             field_update_callback,
         }
     }
@@ -187,20 +180,20 @@ where
     /// Set the field iterator from a slice iterator.
     pub fn set_field_iter_from_slices<I>(&mut self, slice_iter: I)
     where
-        I: Iterator<Item = &'slice [u8]> + 'message,
+        I: Iterator<Item = &'slice [u8]>,
     {
         self.field_iter = Some(FieldIterator::new(slice_iter));
     }
 
     /// Take the field iterator, leaving None in its place.
     /// This is needed for RefCell borrow management when parsing fields.
-    pub fn take_field_iter(&mut self) -> Option<FieldIterator<'slice, 'message>> {
+    pub fn take_field_iter(&mut self) -> Option<FieldIterator<'slice, A>> {
         self.field_iter.take()
     }
 
     /// Set the field iterator.
     /// This is needed for RefCell borrow management when parsing fields.
-    pub fn set_field_iter(&mut self, field_iter: Option<FieldIterator<'slice, 'message>>) {
+    pub fn set_field_iter(&mut self, field_iter: Option<FieldIterator<'slice, A>>) {
         self.field_iter = field_iter;
     }
 
@@ -217,16 +210,13 @@ where
     /// Set the field update callback.
     pub fn set_field_update_callback(
         &mut self,
-        callback: Box<dyn FnMut(Field<&'slice [u8]>) -> Result<(), Error> + 'message, A>,
+        callback: Box<dyn FnMut(Field<&'slice [u8]>) -> Result<(), Error>, A>,
     ) {
         self.field_update_callback = callback;
     }
 }
 
-impl<'slice, 'message, A: Allocator + Clone> MessageParserState<'slice, 'message, A>
-where
-    'slice: 'message,
-{
+impl<'slice, A: Allocator + Clone> MessageParserState<'slice, A> {
     /// Continue parsing and update all registered fields via the callback
     /// Called by child when it needs all slices - works even if parent Message Body is dropped
     ///
