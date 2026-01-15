@@ -712,10 +712,7 @@ where
                     let mut address = self.address.borrow_mut();
                     if let Some(ref addr) = *address {
                         // Child already exists - add slice to it
-                        // addr is &Rc<AddressLazyImpl>, but add_slice takes &'message Rc<Self>
-                        let addr_ref: &'message Rc<AddressLazyImpl<'slice, A>> =
-                            unsafe { std::mem::transmute(addr) };
-                        addr_ref.add_slice(data)?;
+                        addr.add_slice(data)?;
                     } else {
                         // First occurrence - create child with first slice
                         let allocator = self.parser_state.borrow().allocator().clone();
@@ -781,11 +778,8 @@ where
                     if let FieldValue::Len(data) = field.value {
                         if let Some(ref addr_weak) = address_weak {
                             if let Some(addr) = addr_weak.upgrade() {
-                                // addr is Rc<AddressLazyImpl>, and add_slice takes &'message Rc<Self>
-                                // We need to cast the lifetime to 'message to satisfy the requirement
-                                let addr_ref: &'message Rc<AddressLazyImpl<'slice, A>> =
-                                    unsafe { std::mem::transmute(&addr) };
-                                let _ = addr_ref.add_slice(data);
+                                // addr is Rc<AddressLazyImpl>, add_slice takes &self
+                                let _ = addr.add_slice(data);
                             }
                         }
                     }
