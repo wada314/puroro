@@ -271,12 +271,8 @@ use ::std::rc::{Rc, Weak};
 /// Phase 3: Basic implementation with street, city, zip_code fields.
 ///
 /// - `'slice`: Lifetime of the input slices (external data)
-/// - `'message`: Lifetime of the parser state (callback and iterator)
-/// - `'slice: 'message`: Slices must outlive the message parser state
-pub struct AddressLazyImpl<'slice, 'message, A: Allocator = Global>
-where
-    'slice: 'message,
-{
+/// - `'slice`: Lifetime of the input slices (external data)
+pub struct AddressLazyImpl<'slice, A: Allocator = Global> {
     /// Owns parser state via Rc<RefCell<...>> - State itself is mutable
     parser_state: Rc<RefCell<MessageParserState<'slice, A>>>,
 
@@ -306,7 +302,7 @@ where
     terminated: Cell<bool>,
 }
 
-impl<'slice, 'message, A: Allocator + Clone + 'slice> AddressLazyImpl<'slice, 'message, A>
+impl<'slice, 'message, A: Allocator + Clone + 'slice> AddressLazyImpl<'slice, A>
 where
     'slice: 'message,
 {

@@ -465,12 +465,8 @@ impl<A: Allocator + Clone> Message for PersonImpl<A> {
 /// Other fields will be added in subsequent phases.
 ///
 /// - `'slice`: Lifetime of the input slices (external data)
-/// - `'message`: Lifetime of the parser state (callback and iterator)
-/// - `'slice: 'message`: Slices must outlive the message parser state
-pub struct PersonLazyImpl<'slice, 'message, A: Allocator + Clone + 'slice = Global>
-where
-    'slice: 'message,
-{
+/// - `'slice`: Lifetime of the input slices (external data)
+pub struct PersonLazyImpl<'slice, A: Allocator + Clone + 'slice = Global> {
     /// Owns parser state via Rc<RefCell<...>> - State itself is mutable
     parser_state: Rc<RefCell<MessageParserState<'slice, A>>>,
 
@@ -494,12 +490,12 @@ where
 
     /// Field 6: address (scalar message field)
     /// RefCell needed because Option<AddressLazyImpl> is not Copy
-    address: RefCell<Option<Rc<AddressLazyImpl<'slice, 'message, A>>>>,
+    address: RefCell<Option<Rc<AddressLazyImpl<'slice, A>>>>,
 
     /// Field 9: addresses (repeated message field)
     /// OnceList has built-in interior mutability - no RefCell needed
     /// Use Rc because OnceList requires Copy, and AddressLazyImpl is not Copy
-    addresses: OnceList<Rc<AddressLazyImpl<'slice, 'message, A>>, A>,
+    addresses: OnceList<Rc<AddressLazyImpl<'slice, A>>, A>,
 
     /// Flag indicating whether the message has been terminated by a terminating getter.
     /// Once terminated, no additional slices can be added to maintain consistency.
@@ -508,7 +504,7 @@ where
     terminated: Cell<bool>,
 }
 
-impl<'slice, 'message, A: Allocator + Clone + 'slice> PersonLazyImpl<'slice, 'message, A>
+impl<'slice, 'message, A: Allocator + Clone + 'slice> PersonLazyImpl<'slice, A>
 where
     'slice: 'message,
 {
@@ -601,7 +597,7 @@ where
 
     /// Getter for address field
     /// Returns a reference to the AddressLazyImpl if present, None otherwise
-    pub fn address(&'message self) -> Option<Rc<AddressLazyImpl<'slice, 'message, A>>>
+    pub fn address(&'message self) -> Option<Rc<AddressLazyImpl<'slice, A>>>
     where
         'slice: 'message,
     {
@@ -617,7 +613,7 @@ where
     /// Returns a LazyRepeated adapter that enables on-demand parsing
     pub fn addresses(
         self: &'message Rc<Self>,
-    ) -> LazyRepeated<'slice, 'message, Rc<AddressLazyImpl<'slice, 'message, A>>, A>
+    ) -> LazyRepeated<'slice, 'message, Rc<AddressLazyImpl<'slice, A>>, A>
     where
         'slice: 'message,
     {
@@ -717,7 +713,7 @@ where
                     if let Some(ref addr) = *address {
                         // Child already exists - add slice to it
                         // addr is &Rc<AddressLazyImpl>, but add_slice takes &'message Rc<Self>
-                        let addr_ref: &'message Rc<AddressLazyImpl<'slice, 'message, A>> =
+                        let addr_ref: &'message Rc<AddressLazyImpl<'slice, A>> =
                             unsafe { std::mem::transmute(addr) };
                         addr_ref.add_slice(data)?;
                     } else {
@@ -761,7 +757,7 @@ where
     }
 }
 
-impl<'slice, 'message, A: Allocator + Clone + 'slice> Drop for PersonLazyImpl<'slice, 'message, A>
+impl<'slice, 'message, A: Allocator + Clone + 'slice> Drop for PersonLazyImpl<'slice, A>
 where
     'slice: 'message,
 {
@@ -787,7 +783,7 @@ where
                             if let Some(addr) = addr_weak.upgrade() {
                                 // addr is Rc<AddressLazyImpl>, and add_slice takes &'message Rc<Self>
                                 // We need to cast the lifetime to 'message to satisfy the requirement
-                                let addr_ref: &'message Rc<AddressLazyImpl<'slice, 'message, A>> =
+                                let addr_ref: &'message Rc<AddressLazyImpl<'slice, A>> =
                                     unsafe { std::mem::transmute(&addr) };
                                 let _ = addr_ref.add_slice(data);
                             }
