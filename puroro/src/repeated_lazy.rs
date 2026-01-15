@@ -17,28 +17,29 @@ use ::std::rc::Rc;
 ///
 /// - `T`: element type contained in the repeated field (should be `Clone`).
 /// - `A`: allocator used by the underlying `OnceList`.
-/// - `'a`: lifetime of both the parent's parsing input slices and the borrowed `OnceList`.
-pub struct LazyRepeated<'a, T, A>
+/// - `'slice`: lifetime of the parent's parsing input slices.
+/// - `'message`: lifetime of the borrowed `OnceList` inside the parent message.
+pub struct LazyRepeated<'slice, 'message, T, A>
 where
-    T: Clone + 'a,
-    A: Allocator + Clone + 'a,
+    T: Clone + 'message,
+    A: Allocator + Clone + 'slice,
 {
-    parent_parser_state: Rc<RefCell<MessageParserState<'a, A>>>,
+    parent_parser_state: Rc<RefCell<MessageParserState<'slice, A>>>,
     _field_number: u32,
-    list: &'a OnceList<T, A>,
+    list: &'message OnceList<T, A>,
 }
 
-impl<'a, T, A> LazyRepeated<'a, T, A>
+impl<'slice, 'message, T, A> LazyRepeated<'slice, 'message, T, A>
 where
-    T: Clone + 'a,
-    A: Allocator + Clone + 'a,
+    T: Clone + 'message,
+    A: Allocator + Clone + 'slice,
 {
     /// Create a new `LazyRepeated` adapter.
     #[inline]
     pub fn new(
-        parent_parser_state: Rc<RefCell<MessageParserState<'a, A>>>,
+        parent_parser_state: Rc<RefCell<MessageParserState<'slice, A>>>,
         field_number: u32,
-        list: &'a OnceList<T, A>,
+        list: &'message OnceList<T, A>,
     ) -> Self {
         Self {
             parent_parser_state,
@@ -93,30 +94,30 @@ where
     /// Return an iterator over the elements in the repeated field.
     ///
     /// The iterator's `next()` method triggers parsing on-demand when needed.
-    pub fn iter(&self) -> LazyRepeatedIter<'_, 'a, T, A>
+    pub fn iter(&self) -> LazyRepeatedIter<'_, 'slice, 'message, T, A>
     where
-        T: 'a,
+        T: 'message,
     {
         LazyRepeatedIter::new(self)
     }
 }
 
 /// Iterator over `LazyRepeated` that triggers parsing on-demand in `next()`.
-pub struct LazyRepeatedIter<'iter, 'a, T, A>
+pub struct LazyRepeatedIter<'iter, 'slice, 'message, T, A>
 where
-    T: Clone + 'a,
-    A: Allocator + Clone + 'a,
+    T: Clone + 'message,
+    A: Allocator + Clone + 'slice,
 {
-    lazy_repeated: &'iter LazyRepeated<'a, T, A>,
+    lazy_repeated: &'iter LazyRepeated<'slice, 'message, T, A>,
     inner_iter: ::std::boxed::Box<dyn Iterator<Item = T> + 'iter>,
 }
 
-impl<'iter, 'a, T, A> LazyRepeatedIter<'iter, 'a, T, A>
+impl<'iter, 'slice, 'message, T, A> LazyRepeatedIter<'iter, 'slice, 'message, T, A>
 where
-    T: Clone + 'a,
-    A: Allocator + Clone + 'a,
+    T: Clone + 'message,
+    A: Allocator + Clone + 'slice,
 {
-    fn new(lazy_repeated: &'iter LazyRepeated<'a, T, A>) -> Self {
+    fn new(lazy_repeated: &'iter LazyRepeated<'slice, 'message, T, A>) -> Self {
         let iter = lazy_repeated.list.iter().cloned();
         Self {
             lazy_repeated,
@@ -125,10 +126,10 @@ where
     }
 }
 
-impl<'iter, 'a, T, A> Iterator for LazyRepeatedIter<'iter, 'a, T, A>
+impl<'iter, 'slice, 'message, T, A> Iterator for LazyRepeatedIter<'iter, 'slice, 'message, T, A>
 where
-    T: Clone + 'a,
-    A: Allocator + Clone + 'a,
+    T: Clone + 'message,
+    A: Allocator + Clone + 'slice,
 {
     type Item = T;
 
@@ -176,10 +177,10 @@ where
 }
 
 #[allow(missing_docs)]
-impl<'a, T, A> Repeated<'a> for LazyRepeated<'a, T, A>
+impl<'slice, 'message, T, A> Repeated<'message> for LazyRepeated<'slice, 'message, T, A>
 where
-    T: Clone + 'a,
-    A: Allocator + Clone + 'a,
+    T: Clone + 'message,
+    A: Allocator + Clone + 'slice,
 {
     type Item = T;
 
@@ -200,13 +201,13 @@ where
         self.list.iter().nth(index).cloned()
     }
 
-    fn iter_box(&self) -> ::allocator_api2::boxed::Box<dyn Iterator<Item = Self::Item> + 'a> {
+    fn iter_box(&self) -> ::allocator_api2::boxed::Box<dyn Iterator<Item = Self::Item> + 'message> {
         // For the initial boilerplate, materialize by fully parsing and collecting.
         let _ = self.ensure_fully_parsed();
         let owned: ::std::vec::Vec<T> = self.list.iter().cloned().collect();
         let it = owned.into_iter();
         let boxed = ::allocator_api2::boxed::Box::new(it);
-        let boxed_dyn: ::allocator_api2::boxed::Box<dyn Iterator<Item = T> + 'a> =
+        let boxed_dyn: ::allocator_api2::boxed::Box<dyn Iterator<Item = T> + 'message> =
             ::allocator_api2::unsize_box!(boxed);
         boxed_dyn
     }
