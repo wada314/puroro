@@ -11,6 +11,8 @@ use ::allocator_extras::{Allocator, Global};
 use ::once_list2::OnceList;
 use ::protobuf_core::{AsRefExtProtobuf, Field};
 use ::std::cell::Cell;
+use ::std::cell::RefCell;
+use ::std::rc::Rc;
 
 /// Decode a varint-encoded value from a byte slice.
 ///
@@ -112,6 +114,41 @@ where
         }
     }
 
+    /// Create a new FieldIterator from an iterator of slices
+    /// All slices are stored in OnceList and used to create the field iterator
+    pub fn from_slices<I>(slice_iter: I, alloc: A) -> Self
+    where
+        I: Iterator<Item = &'slice [u8]>,
+        A: Allocator + Clone,
+    {
+        let field_slices = OnceList::new_in(alloc.clone());
+        // Collect slices into OnceList first
+        for slice in slice_iter {
+            field_slices.push(slice);
+        }
+
+        // Create field iterator from all slices using flat_map
+        // We need to collect slices into a Vec to avoid lifetime issues
+        // Note: This is a temporary solution - ideally we'd iterate directly from OnceList
+        let slices_vec: Vec<&'slice [u8]> = field_slices.iter().copied().collect();
+        let field_iter: std::boxed::Box<
+            dyn Iterator<Item = Result<Field<&'slice [u8]>, Error>> + 'slice,
+        > = if slices_vec.is_empty() {
+            std::boxed::Box::new(std::iter::empty())
+        } else {
+            let iter = slices_vec.into_iter().flat_map(|slice| {
+                slice
+                    .read_protobuf_fields()
+                    .map(|result| result.map_err(|e| Error::from(e)))
+            });
+            std::boxed::Box::new(iter)
+        };
+        Self {
+            field_slices,
+            field_iter,
+        }
+    }
+
     /// Add a slice to the field slices container
     pub fn add_slice(&self, slice: &'slice [u8])
     where
@@ -181,8 +218,12 @@ impl<'slice, A: Allocator> MessageParserState<'slice, A> {
     pub fn set_field_iter_from_slices<I>(&mut self, slice_iter: I)
     where
         I: Iterator<Item = &'slice [u8]>,
+        A: Clone,
     {
-        self.field_iter = Some(FieldIterator::new(slice_iter));
+        self.field_iter = Some(FieldIterator::from_slices(
+            slice_iter,
+            self.allocator.clone(),
+        ));
     }
 
     /// Take the field iterator, leaving None in its place.
@@ -253,5 +294,70 @@ impl<'slice, A: Allocator + Clone> MessageParserState<'slice, A> {
                 }
             }
         }
+    }
+
+    /// Ensure all fields are parsed
+    ///
+    /// This will request parent's parser state to continue parsing if needed (for child messages).
+    /// Then parses all collected slices to extract message fields.
+    ///
+    /// This is a terminating operation - after this method completes, the message is marked as terminated
+    /// and no additional slices can be added.
+    ///
+    /// # Parameters
+    /// - `parent_parser_state`: Optional reference to parent's parser state (for child messages)
+    pub fn ensure_all_fields_parsed(
+        &mut self,
+        parent_parser_state: Option<&Rc<RefCell<MessageParserState<'slice, A>>>>,
+    ) -> Result<(), Error>
+    where
+        A: Clone,
+    {
+        // If already terminated, return early (idempotent operation)
+        if self.terminated.get() {
+            return Ok(());
+        }
+
+        // Request parent's parser state to continue parsing if this is a child message
+        // This works even if parent Message Body is dropped, because:
+        // 1. Child holds strong Rc reference to parent's Parser State
+        // 2. continue_parsing_for_children doesn't require parent Message Body to be alive
+        // 3. Callbacks (field_update_callback) already add slices to child messages via add_slice
+        if let Some(parent_state) = parent_parser_state {
+            parent_state.borrow_mut().continue_parsing_for_children()?;
+        }
+
+        // Get the existing field iterator or create a new one
+        // If field_iter is None (already exhausted or never created), we're done
+        // Otherwise, we'll parse until exhausted
+        loop {
+            let mut field_iter = match self.take_field_iter() {
+                Some(iter) => iter,
+                None => break, // Already parsed or no slices
+            };
+
+            match field_iter.next() {
+                Some(Ok(field)) => {
+                    // Store iterator back before calling update callback
+                    self.set_field_iter(Some(field_iter));
+                    // Update field via callback
+                    (self.field_update_callback)(field)?;
+                }
+                Some(Err(e)) => {
+                    self.set_field_iter(Some(field_iter));
+                    return Err(e);
+                }
+                None => {
+                    self.set_field_iter(None);
+                    break;
+                }
+            }
+        }
+
+        // Mark message as terminated after parsing all fields
+        // This prevents adding new slices which would cause inconsistent behavior
+        self.terminated.set(true);
+
+        Ok(())
     }
 }

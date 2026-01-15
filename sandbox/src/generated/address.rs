@@ -406,63 +406,9 @@ where
     /// This is a terminating operation - after this method completes, the message is marked as terminated
     /// and no additional slices can be added.
     fn ensure_all_fields_parsed(&'message self) -> Result<(), Error> {
-        // If already terminated, return early (idempotent operation)
-        if self.terminated.get() {
-            return Ok(());
-        }
-
-        // Request parent's parser state to continue parsing if this is a child message
-        // This works even if parent Message Body is dropped, because:
-        // 1. Child holds strong Rc reference to parent's Parser State
-        // 2. continue_parsing_for_children doesn't require parent Message Body to be alive
-        // 3. Callbacks (field_update_callback) already add slices to child messages via add_slice
-        if let Some(ref parent_parser_state) = self.parent_parser_state {
-            parent_parser_state
-                .borrow_mut()
-                .continue_parsing_for_children()?;
-        }
-
-        // Check if we've already parsed (field_iter is None and we've parsed before)
-        // We check if field_iter was previously Some (now None) vs never created (was None)
-        // For simplicity, we always recreate the iterator from field_slices
-        // This ensures we parse all slices even if field_iter state is lost
-
-        // Now parse our own fields from all collected slices
-        let mut parser_state = self.parser_state.borrow_mut();
-        parser_state.set_field_iter_from_slices(self.field_slices.iter().copied());
-        drop(parser_state);
-
-        // Parse until exhausted
-        loop {
-            let mut parser_state = self.parser_state.borrow_mut();
-            let mut field_iter = match parser_state.take_field_iter() {
-                Some(iter) => iter,
-                None => break, // Already parsed
-            };
-
-            match field_iter.next() {
-                Some(Ok(field)) => {
-                    // Store iterator back before calling update_field
-                    parser_state.set_field_iter(Some(field_iter));
-                    drop(parser_state);
-                    self.update_field(field)?;
-                }
-                Some(Err(e)) => {
-                    parser_state.set_field_iter(Some(field_iter));
-                    return Err(e);
-                }
-                None => {
-                    parser_state.set_field_iter(None);
-                    break;
-                }
-            }
-        }
-
-        // Mark message as terminated after parsing all fields
-        // This prevents adding new slices which would cause inconsistent behavior
-        self.terminated.set(true);
-
-        Ok(())
+        self.parser_state
+            .borrow_mut()
+            .ensure_all_fields_parsed(self.parent_parser_state.as_ref())
     }
 
     /// Update a field with parsed value
