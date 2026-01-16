@@ -759,11 +759,9 @@ impl<'slice, A: Allocator + Clone + 'slice> Drop for PersonLazyImpl<'slice, A> {
                     let FieldValue::Len(data) = field.value else {
                         return Err(Error::unexpected_wire_type(field_num, "Len", &field.value));
                     };
-                    if let Some(ref addr_weak) = address_weak {
-                        if let Some(addr) = addr_weak.upgrade() {
-                            // addr is Rc<AddressLazyImpl>, add_slice takes &self
-                            let _ = addr.add_slice(data);
-                        }
+                    if let Some(addr) = address_weak.as_ref().and_then(Weak::upgrade) {
+                        // addr is Rc<AddressLazyImpl>, add_slice takes &self
+                        addr.add_slice(data)?;
                     }
                 }
                 // Add other child message fields here as needed (e.g., profile field 7)
