@@ -276,11 +276,6 @@ pub struct AddressLazyImpl<'slice, A: Allocator = Global> {
     /// Owns parser state via Rc<RefCell<...>> - State itself is mutable
     parser_state: Rc<RefCell<MessageParserState<'slice, A>>>,
 
-    /// Parent parser state - strong Rc<RefCell<...>> reference (no cycle!)
-    /// Child needs parent's parser state to request continued parsing
-    /// None for top-level messages, Some(...) for child messages
-    parent_parser_state: Option<Rc<RefCell<MessageParserState<'slice, A>>>>,
-
     /// Field slices collected so far (from parent)
     /// These are length-delimited value slices (not including field tags)
     /// Using &'slice [u8] to support Field type which returns Cow<'slice, [u8]> for Len values
@@ -339,13 +334,13 @@ impl<'slice, A: Allocator + Clone + 'slice> AddressLazyImpl<'slice, A> {
             let parser_state = Rc::new(RefCell::new(MessageParserState::new(
                 slice,
                 alloc.clone(),
+                parent_parser_state,
                 closure,
             )));
 
             // Create message body
             Self {
                 parser_state: parser_state.clone(),
-                parent_parser_state,
                 field_slices,
                 street: RefCell::new(String::new()),
                 city: RefCell::new(String::new()),
@@ -395,9 +390,7 @@ impl<'slice, A: Allocator + Clone + 'slice> AddressLazyImpl<'slice, A> {
     /// This is a terminating operation - after this method completes, the message is marked as terminated
     /// and no additional slices can be added.
     fn ensure_all_fields_parsed(&self) -> Result<(), Error> {
-        self.parser_state
-            .borrow_mut()
-            .ensure_all_fields_parsed(self.parent_parser_state.as_ref())
+        self.parser_state.borrow_mut().ensure_all_fields_parsed()
     }
 
     /// Update a field with parsed value

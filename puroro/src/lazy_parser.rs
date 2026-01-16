@@ -179,6 +179,10 @@ pub struct MessageParserState<'slice, A: Allocator = Global> {
     allocator: A,
     /// Flag indicating whether the message has been terminated by a terminating getter.
     terminated: Cell<bool>,
+    /// Parent parser state - strong Rc<RefCell<...>> reference (no cycle!)
+    /// Child needs parent's parser state to request continued parsing
+    /// None for top-level messages, Some(...) for child messages
+    parent_parser_state: Option<Rc<RefCell<MessageParserState<'slice, A>>>>,
     /// Field update callback - handles field updates
     ///
     /// This callback is responsible for updating fields when iterating over field_iter.
@@ -198,7 +202,15 @@ impl<'slice, A: Allocator> MessageParserState<'slice, A> {
     /// Create a new MessageParserState with all parameters specified.
     ///
     /// `initial_slice` is the first byte slice that will be parsed as protobuf fields.
-    pub fn new<F>(initial_slice: &'slice [u8], allocator: A, field_update_callback: F) -> Self
+    ///
+    /// - For top-level messages: pass `parent_parser_state: None`
+    /// - For child messages: pass `parent_parser_state: Some(parent_parser_state)`
+    pub fn new<F>(
+        initial_slice: &'slice [u8],
+        allocator: A,
+        parent_parser_state: Option<Rc<RefCell<MessageParserState<'slice, A>>>>,
+        field_update_callback: F,
+    ) -> Self
     where
         F: FnMut(Field<&'slice [u8]>) -> Result<(), Error> + 'slice,
         A: Allocator + Clone,
@@ -210,6 +222,7 @@ impl<'slice, A: Allocator> MessageParserState<'slice, A> {
             field_iter: Some(FieldIterator::new(initial_slice, allocator.clone())),
             allocator,
             terminated: Cell::new(false),
+            parent_parser_state,
             field_update_callback: callback,
         }
     }
@@ -304,13 +317,7 @@ impl<'slice, A: Allocator + Clone> MessageParserState<'slice, A> {
     ///
     /// This is a terminating operation - after this method completes, the message is marked as terminated
     /// and no additional slices can be added.
-    ///
-    /// # Parameters
-    /// - `parent_parser_state`: Optional reference to parent's parser state (for child messages)
-    pub fn ensure_all_fields_parsed(
-        &mut self,
-        parent_parser_state: Option<&Rc<RefCell<MessageParserState<'slice, A>>>>,
-    ) -> Result<(), Error>
+    pub fn ensure_all_fields_parsed(&mut self) -> Result<(), Error>
     where
         A: Clone,
     {
@@ -324,7 +331,7 @@ impl<'slice, A: Allocator + Clone> MessageParserState<'slice, A> {
         // 1. Child holds strong Rc reference to parent's Parser State
         // 2. continue_parsing_for_children doesn't require parent Message Body to be alive
         // 3. Callbacks (field_update_callback) already add slices to child messages via add_slice
-        if let Some(parent_state) = parent_parser_state {
+        if let Some(ref parent_state) = self.parent_parser_state {
             parent_state.borrow_mut().continue_parsing_for_children()?;
         }
 

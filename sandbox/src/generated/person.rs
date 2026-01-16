@@ -470,11 +470,6 @@ pub struct PersonLazyImpl<'slice, A: Allocator + Clone + 'slice = Global> {
     /// Owns parser state via Rc<RefCell<...>> - State itself is mutable
     parser_state: Rc<RefCell<MessageParserState<'slice, A>>>,
 
-    /// Parent parser state - strong Rc<RefCell<...>> reference (no cycle!)
-    /// Child needs parent's parser state to request continued parsing
-    /// None for top-level messages, Some(...) for child messages
-    parent_parser_state: Option<Rc<RefCell<MessageParserState<'slice, A>>>>,
-
     /// Input slices collected so far
     /// These are the original input slices (not field value slices)
     /// Using &'slice [u8] to support Field type which returns Cow<'slice, [u8]> for Len values
@@ -541,13 +536,13 @@ impl<'slice, A: Allocator + Clone + 'slice> PersonLazyImpl<'slice, A> {
             let parser_state = Rc::new(RefCell::new(MessageParserState::new(
                 slice,
                 alloc.clone(),
+                parent_parser_state,
                 closure,
             )));
 
             // Create message body
             Self {
                 parser_state,
-                parent_parser_state,
                 field_slices,
                 // Initialize fields with default values
                 age: Cell::new(0),
@@ -674,9 +669,7 @@ impl<'slice, A: Allocator + Clone + 'slice> PersonLazyImpl<'slice, A> {
     /// This is a terminating operation - after this method completes, the message is marked as terminated
     /// and no additional slices can be added.
     fn ensure_all_fields_parsed(&self) -> Result<(), Error> {
-        self.parser_state
-            .borrow_mut()
-            .ensure_all_fields_parsed(self.parent_parser_state.as_ref())
+        self.parser_state.borrow_mut().ensure_all_fields_parsed()
     }
 
     /// Update a field with parsed value
@@ -701,9 +694,8 @@ impl<'slice, A: Allocator + Clone + 'slice> PersonLazyImpl<'slice, A> {
                     } else {
                         // First occurrence - create child with first slice
                         let allocator = self.parser_state.borrow().allocator().clone();
-                        let parent_parser_state = self.parser_state.clone();
-                        let child =
-                            AddressLazyImpl::new(data, allocator, Some(parent_parser_state));
+                        let parent_parser_state = Some(self.parser_state.clone());
+                        let child = AddressLazyImpl::new(data, allocator, parent_parser_state);
                         *address = Some(child);
                     }
                 }
@@ -715,9 +707,8 @@ impl<'slice, A: Allocator + Clone + 'slice> PersonLazyImpl<'slice, A> {
                     // Create a new AddressLazyImpl for this occurrence
                     let data_slice = data.as_ref();
                     let allocator = self.parser_state.borrow().allocator().clone();
-                    let parent_parser_state = self.parser_state.clone();
-                    let child =
-                        AddressLazyImpl::new(data_slice, allocator, Some(parent_parser_state));
+                    let parent_parser_state = Some(self.parser_state.clone());
+                    let child = AddressLazyImpl::new(data_slice, allocator, parent_parser_state);
                     // Use OnceList's built-in interior mutability
                     self.addresses.push(child); // push() takes &self
                 }
