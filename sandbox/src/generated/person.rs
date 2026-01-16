@@ -537,15 +537,11 @@ impl<'slice, A: Allocator + Clone + 'slice> PersonLazyImpl<'slice, A> {
                 }
                 Ok(())
             };
-            let boxed = Box::new_in(closure, alloc.clone());
-            let callback: Box<dyn FnMut(Field<&'slice [u8]>) -> Result<(), Error> + 'slice, A> =
-                ::allocator_api2::unsize_box!(boxed);
-
             // Create parser state with initial callback
             let parser_state = Rc::new(RefCell::new(MessageParserState::new(
                 slice,
                 alloc.clone(),
-                callback,
+                closure,
             )));
 
             // Create message body
@@ -754,19 +750,19 @@ impl<'slice, A: Allocator + Clone + 'slice> Drop for PersonLazyImpl<'slice, A> {
             .map(|addr| Rc::downgrade(addr));
 
         // Create new callback that captures child Weak references and uses static match-case
-        let allocator = self.parser_state.borrow().allocator().clone();
         let closure = move |field: Field<&'slice [u8]>| -> Result<(), Error> {
             // Static match-case for each child message field
             let field_num = field.field_number.as_u32();
             match field_num {
                 6 => {
-                    // address field
-                    if let FieldValue::Len(data) = field.value {
-                        if let Some(ref addr_weak) = address_weak {
-                            if let Some(addr) = addr_weak.upgrade() {
-                                // addr is Rc<AddressLazyImpl>, add_slice takes &self
-                                let _ = addr.add_slice(data);
-                            }
+                    // address field - should always have Len wire type according to .proto definition
+                    let FieldValue::Len(data) = field.value else {
+                        return Err(Error::unexpected_wire_type(field_num, "Len", &field.value));
+                    };
+                    if let Some(ref addr_weak) = address_weak {
+                        if let Some(addr) = addr_weak.upgrade() {
+                            // addr is Rc<AddressLazyImpl>, add_slice takes &self
+                            let _ = addr.add_slice(data);
                         }
                     }
                 }
@@ -777,14 +773,11 @@ impl<'slice, A: Allocator + Clone + 'slice> Drop for PersonLazyImpl<'slice, A> {
             }
             Ok(())
         };
-        let boxed = Box::new_in(closure, allocator);
-        let new_callback: Box<dyn FnMut(Field<&'slice [u8]>) -> Result<(), Error> + 'slice, A> =
-            ::allocator_api2::unsize_box!(boxed);
 
         // Update callback in parser state
         self.parser_state
             .borrow_mut()
-            .set_field_update_callback(new_callback);
+            .set_field_update_callback(closure);
     }
 }
 

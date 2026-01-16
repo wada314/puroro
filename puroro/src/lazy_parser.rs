@@ -198,19 +198,19 @@ impl<'slice, A: Allocator> MessageParserState<'slice, A> {
     /// Create a new MessageParserState with all parameters specified.
     ///
     /// `initial_slice` is the first byte slice that will be parsed as protobuf fields.
-    pub fn new(
-        initial_slice: &'slice [u8],
-        allocator: A,
-        field_update_callback: Box<dyn FnMut(Field<&'slice [u8]>) -> Result<(), Error> + 'slice, A>,
-    ) -> Self
+    pub fn new<F>(initial_slice: &'slice [u8], allocator: A, field_update_callback: F) -> Self
     where
+        F: FnMut(Field<&'slice [u8]>) -> Result<(), Error> + 'slice,
         A: Allocator + Clone,
     {
+        let boxed = Box::new_in(field_update_callback, allocator.clone());
+        let callback: Box<dyn FnMut(Field<&'slice [u8]>) -> Result<(), Error> + 'slice, A> =
+            ::allocator_api2::unsize_box!(boxed);
         Self {
             field_iter: Some(FieldIterator::new(initial_slice, allocator.clone())),
             allocator,
             terminated: Cell::new(false),
-            field_update_callback,
+            field_update_callback: callback,
         }
     }
 
@@ -249,11 +249,15 @@ impl<'slice, A: Allocator> MessageParserState<'slice, A> {
     }
 
     /// Set the field update callback.
-    pub fn set_field_update_callback(
-        &mut self,
-        callback: Box<dyn FnMut(Field<&'slice [u8]>) -> Result<(), Error> + 'slice, A>,
-    ) {
-        self.field_update_callback = callback;
+    pub fn set_field_update_callback<F>(&mut self, callback: F)
+    where
+        F: FnMut(Field<&'slice [u8]>) -> Result<(), Error> + 'slice,
+        A: Allocator + Clone,
+    {
+        let boxed = Box::new_in(callback, self.allocator.clone());
+        let new_callback: Box<dyn FnMut(Field<&'slice [u8]>) -> Result<(), Error> + 'slice, A> =
+            ::allocator_api2::unsize_box!(boxed);
+        self.field_update_callback = new_callback;
     }
 }
 

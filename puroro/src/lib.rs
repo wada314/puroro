@@ -91,6 +91,7 @@ pub trait Message: Sized + Clone + PartialEq {
 
 /// Error types for Protocol Buffer operations.
 pub mod error {
+    use ::protobuf_core::FieldValue;
     use thiserror::Error;
 
     /// Errors that can occur during Protocol Buffer operations.
@@ -117,6 +118,26 @@ pub mod error {
         /// has been called, making the message state immutable.
         #[error("Cannot add slice: message has been terminated by a terminating getter call")]
         MessageTerminated,
+
+        /// Field has unexpected wire type.
+        /// According to the .proto file definition, this field should always have a specific wire type,
+        /// but the actual wire type in the data is different.
+        ///
+        /// Note: According to the Protocol Buffers specification, fields with unexpected wire types
+        /// could be treated as unknown fields and preserved for forward compatibility. However,
+        /// this implementation currently treats it as an error for strict validation.
+        /// Future enhancement: Consider storing such fields in unknown_fields storage instead.
+        #[error(
+            "Field {field_number}: expected wire type {expected_wire_type:?} (Len), but found {found_wire_type:?}"
+        )]
+        UnexpectedWireType {
+            /// Field number that has the unexpected wire type
+            field_number: u32,
+            /// Expected wire type according to .proto definition
+            expected_wire_type: &'static str,
+            /// Actual wire type found in the data
+            found_wire_type: &'static str,
+        },
     }
 
     impl From<protobuf_core::ProtobufError> for Error {
@@ -154,6 +175,60 @@ pub mod error {
                         expected_type
                     ))
                 }
+            }
+        }
+    }
+
+    /// Get the wire type name from a FieldValue.
+    ///
+    /// Returns a static string representation of the wire type.
+    fn wire_type_name<L>(value: &FieldValue<L>) -> &'static str {
+        match value {
+            FieldValue::Varint(_) => "Varint",
+            FieldValue::I32(_) => "Int32",
+            FieldValue::I64(_) => "Int64",
+            FieldValue::Len(_) => "Len",
+        }
+    }
+
+    impl Error {
+        /// Create an `UnexpectedWireType` error from a field and its actual value.
+        ///
+        /// This helper function extracts the wire type name from the actual `FieldValue`
+        /// and creates an appropriate error. The caller only needs to provide the field number
+        /// and the expected wire type name.
+        ///
+        /// # Behavior
+        ///
+        /// According to the Protocol Buffers specification, fields with unexpected wire types
+        /// could be treated as unknown fields and preserved for forward compatibility.
+        /// However, this implementation currently treats it as an error for strict validation.
+        /// Future enhancement: Consider storing such fields in unknown_fields storage instead.
+        ///
+        /// # Arguments
+        /// * `field_number` - The field number that has the unexpected wire type
+        /// * `expected_wire_type` - The expected wire type name (e.g., "Len")
+        /// * `actual_value` - The actual `FieldValue` that was found
+        ///
+        /// # Example
+        /// ```ignore
+        /// let FieldValue::Len(data) = field.value else {
+        ///     return Err(Error::unexpected_wire_type(
+        ///         field.field_number.as_u32(),
+        ///         "Len",
+        ///         &field.value,
+        ///     ));
+        /// };
+        /// ```
+        pub fn unexpected_wire_type<L>(
+            field_number: u32,
+            expected_wire_type: &'static str,
+            actual_value: &FieldValue<L>,
+        ) -> Self {
+            Self::UnexpectedWireType {
+                field_number,
+                expected_wire_type,
+                found_wire_type: wire_type_name(actual_value),
             }
         }
     }
