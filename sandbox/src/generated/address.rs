@@ -8,7 +8,6 @@
 use ::allocator_api2::boxed::Box;
 use ::allocator_api2::vec::Vec as AllocVec;
 use ::allocator_extras::{Allocator, Global};
-use ::once_list2::OnceList;
 use ::puroro::{
     Message,
     error::Error,
@@ -276,11 +275,6 @@ pub struct AddressLazyImpl<'slice, A: Allocator = Global> {
     /// Owns parser state via Rc<RefCell<...>> - State itself is mutable
     parser_state: Rc<RefCell<MessageParserState<'slice, A>>>,
 
-    /// Field slices collected so far (from parent)
-    /// These are length-delimited value slices (not including field tags)
-    /// Using &'slice [u8] to support Field type which returns Cow<'slice, [u8]> for Len values
-    field_slices: OnceList<&'slice [u8], A>,
-
     /// Field 1: street (implicit presence string field)
     street: RefCell<String>,
 
@@ -311,10 +305,6 @@ impl<'slice, A: Allocator + Clone + 'slice> AddressLazyImpl<'slice, A> {
         alloc: A,
         parent_parser_state: Option<Rc<RefCell<MessageParserState<'slice, A>>>>,
     ) -> Rc<Self> {
-        // Create field_slices and store the initial slice
-        let field_slices = OnceList::new_in(alloc.clone());
-        field_slices.push(slice);
-
         // Use Rc::new_cyclic with callback that handles Message Body
         // This is needed for both top-level and child messages because they may have their own child messages
         Rc::new_cyclic(move |weak: &Weak<Self>| {
@@ -341,7 +331,6 @@ impl<'slice, A: Allocator + Clone + 'slice> AddressLazyImpl<'slice, A> {
             // Create message body
             Self {
                 parser_state: parser_state.clone(),
-                field_slices,
                 street: RefCell::new(String::new()),
                 city: RefCell::new(String::new()),
                 zip_code: Cell::new(0),
@@ -359,9 +348,8 @@ impl<'slice, A: Allocator + Clone + 'slice> AddressLazyImpl<'slice, A> {
             return Err(Error::MessageTerminated);
         }
 
-        self.field_slices.push(slice);
-        // Note: field_iter needs to be recreated when parsing
-        Ok(())
+        // Add slice to the parser state's field iterator
+        self.parser_state.borrow_mut().add_slice(slice)
     }
 
     /// Getter for street field

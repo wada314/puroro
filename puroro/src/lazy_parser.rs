@@ -156,6 +156,12 @@ where
     {
         self.field_slices.push(slice);
     }
+
+    /// Get an iterator over the field slices
+    /// This is used to recreate the field iterator after adding new slices
+    pub fn field_slices_iter(&self) -> impl Iterator<Item = &'slice [u8]> {
+        self.field_slices.iter().copied()
+    }
 }
 
 impl<'slice, A: Allocator> Iterator for FieldIterator<'slice, A> {
@@ -259,6 +265,34 @@ impl<'slice, A: Allocator> MessageParserState<'slice, A> {
     /// Get a reference to the allocator.
     pub fn allocator(&self) -> &A {
         &self.allocator
+    }
+
+    /// Add a slice to the field iterator
+    /// This will add the slice to the underlying FieldIterator and recreate the field iterator
+    pub fn add_slice(&mut self, slice: &'slice [u8]) -> Result<(), Error>
+    where
+        A: Clone,
+    {
+        // If field_iter is None (already exhausted), we can't add more slices
+        // This is a design decision - once exhausted, we don't allow adding more slices
+        if self.field_iter.is_none() {
+            return Err(Error::InvalidWireFormat(
+                "Cannot add slice: field iterator is exhausted".to_string(),
+            ));
+        }
+
+        // Take the field iterator, add the slice, and recreate the iterator
+        if let Some(field_iter) = self.field_iter.take() {
+            field_iter.add_slice(slice);
+            // Recreate the field iterator from all slices
+            let slices_iter = field_iter.field_slices_iter();
+            self.field_iter = Some(FieldIterator::from_slices(
+                slices_iter,
+                self.allocator.clone(),
+            ));
+        }
+
+        Ok(())
     }
 
     /// Set the field update callback.

@@ -470,11 +470,6 @@ pub struct PersonLazyImpl<'slice, A: Allocator + Clone + 'slice = Global> {
     /// Owns parser state via Rc<RefCell<...>> - State itself is mutable
     parser_state: Rc<RefCell<MessageParserState<'slice, A>>>,
 
-    /// Input slices collected so far
-    /// These are the original input slices (not field value slices)
-    /// Using &'slice [u8] to support Field type which returns Cow<'slice, [u8]> for Len values
-    field_slices: OnceList<&'slice [u8], A>,
-
     /// Field 2: age (implicit presence varint field)
     /// Copy type - Cell is sufficient
     age: Cell<i32>,
@@ -513,10 +508,6 @@ impl<'slice, A: Allocator + Clone + 'slice> PersonLazyImpl<'slice, A> {
         alloc: A,
         parent_parser_state: Option<Rc<RefCell<MessageParserState<'slice, A>>>>,
     ) -> Rc<Self> {
-        // Create field_slices and store the initial slice
-        let field_slices = OnceList::new_in(alloc.clone());
-        field_slices.push(slice);
-
         // Use Rc::new_cyclic with callback that handles Message Body
         // This is needed for both top-level and child messages because they may have their own child messages
         Rc::new_cyclic(move |weak: &Weak<Self>| {
@@ -543,7 +534,6 @@ impl<'slice, A: Allocator + Clone + 'slice> PersonLazyImpl<'slice, A> {
             // Create message body
             Self {
                 parser_state,
-                field_slices,
                 // Initialize fields with default values
                 age: Cell::new(0),
                 scores: OnceList::new_in(alloc.clone()),
@@ -564,9 +554,8 @@ impl<'slice, A: Allocator + Clone + 'slice> PersonLazyImpl<'slice, A> {
             return Err(Error::MessageTerminated);
         }
 
-        self.field_slices.push(slice);
-        // Note: field_iter needs to be recreated when parsing
-        Ok(())
+        // Add slice to the parser state's field iterator
+        self.parser_state.borrow_mut().add_slice(slice)
     }
 
     /// Getter for age field
