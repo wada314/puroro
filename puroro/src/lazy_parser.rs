@@ -191,7 +191,7 @@ pub struct MessageParserState<'slice, A: Allocator = Global> {
     /// as it doesn't need to know the specific message type at compile time.
     /// Use allocator_api2::boxed::Box to use the allocator A for consistency with MessageParserState's allocator.
     /// The callback captures Weak references by value.
-    field_update_callback: Box<dyn FnMut(Field<&'slice [u8]>) -> Result<(), Error>, A>,
+    field_update_callback: Box<dyn FnMut(Field<&'slice [u8]>) -> Result<(), Error> + 'slice, A>,
 }
 
 impl<'slice, A: Allocator> MessageParserState<'slice, A> {
@@ -201,7 +201,7 @@ impl<'slice, A: Allocator> MessageParserState<'slice, A> {
     pub fn new(
         initial_slice: &'slice [u8],
         allocator: A,
-        field_update_callback: Box<dyn FnMut(Field<&'slice [u8]>) -> Result<(), Error>, A>,
+        field_update_callback: Box<dyn FnMut(Field<&'slice [u8]>) -> Result<(), Error> + 'slice, A>,
     ) -> Self
     where
         A: Allocator + Clone,
@@ -251,7 +251,7 @@ impl<'slice, A: Allocator> MessageParserState<'slice, A> {
     /// Set the field update callback.
     pub fn set_field_update_callback(
         &mut self,
-        callback: Box<dyn FnMut(Field<&'slice [u8]>) -> Result<(), Error>, A>,
+        callback: Box<dyn FnMut(Field<&'slice [u8]>) -> Result<(), Error> + 'slice, A>,
     ) {
         self.field_update_callback = callback;
     }

@@ -336,7 +336,7 @@ impl<'slice, A: Allocator + Clone + 'slice> AddressLazyImpl<'slice, A> {
                 Ok(())
             };
             let boxed = Box::new_in(closure, alloc.clone());
-            let callback: Box<dyn FnMut(Field<&'slice [u8]>) -> Result<(), Error>, A> =
+            let callback: Box<dyn FnMut(Field<&'slice [u8]>) -> Result<(), Error> + 'slice, A> =
                 ::allocator_api2::unsize_box!(boxed);
 
             // Create parser state with initial callback
