@@ -254,9 +254,8 @@ impl<'slice, A: Allocator> MessageParserState<'slice, A> {
     /// Get the next field from the iterator, requesting parent to parse if needed.
     ///
     /// This method tries to get the next field from `field_iter`. If the iterator is exhausted,
-    /// it checks if there are more slices available (via `has_next_slice()`) or requests the parent
-    /// parser state (if it exists) to continue parsing, which may add more slices to this state's
-    /// `field_iter`. The method stops parent parsing when new slices are added to `field_iter`.
+    /// it requests the parent parser state (if it exists) to continue parsing, which may add more
+    /// slices to this state's `field_iter`. Parent parsing stops when a new slice is added.
     ///
     /// Returns:
     /// - `Ok(Some(field))` - A field was successfully retrieved
@@ -266,48 +265,44 @@ impl<'slice, A: Allocator> MessageParserState<'slice, A> {
     where
         A: Clone,
     {
-        // Step 1: Try to get the next field from field_iter
-        if let Some(result) = self.field_iter.next() {
-            return Ok(Some(result?));
-        }
-
-        // field_iter is exhausted - check if we have more slices available from parent
-        //
-        // Note: When field_iter is exhausted (next() returns None), has_next_slice() is guaranteed
-        // to be false. So we can simply check if has_next_slice() becomes true to detect new slices.
-
-        // Check if parent exists and can provide more slices
-        let Some(ref parent_state) = self.parent_parser_state else {
-            // No parent - iterator is truly exhausted
-            // Mark as terminated since no more input will be available
-            self.terminated.set(true);
-            return Ok(None);
-        };
-
-        // Request parent to continue parsing, which may add more slices to this state
-        // Stop when field_iter gets new slices (has_next_slice() becomes true)
-        parent_state.borrow_mut().parse_until(|_field| {
-            // Check if new slices were added to our field_iter
-            // Since has_next_slice() is false when exhausted, becoming true means new slices added
-            self.field_iter.has_next_slice()
-        })?;
-
-        // After parent parsing, new iterators should have been added automatically
-        // The iterator will automatically see new items via first_mut() without recreation
-
-        // Try again to get the next field from field_iter
-        match self.field_iter.next() {
-            Some(result) => Ok(Some(result?)),
-            None => {
-                // Iterator is still exhausted - check if parent can still provide slices
-                // by checking if we have any slices available
-                if !self.field_iter.has_next_slice() {
-                    // No slices available - parent's iterator is also exhausted
-                    // Mark as terminated since no more input will be available
-                    self.terminated.set(true);
-                }
-                Ok(None)
+        loop {
+            // Step 1: Try to get the next field from field_iter
+            if let Some(result) = self.field_iter.next() {
+                return Ok(Some(result?));
             }
+
+            // field_iter is exhausted - check if we have more slices available from parent
+            //
+            // Note: When field_iter is exhausted (next() returns None), has_next_slice() is guaranteed
+            // to be false. So we can simply check if has_next_slice() becomes true to detect new slices.
+
+            // Check if parent exists and can provide more slices
+            let Some(ref parent_state) = self.parent_parser_state else {
+                // No parent - iterator is truly exhausted
+                // Mark as terminated since no more input will be available
+                self.terminated.set(true);
+                return Ok(None);
+            };
+
+            // Request parent to continue parsing, which may add more slices to this state
+            // Stop when field_iter gets new slices (has_next_slice() becomes true)
+            let mut slice_added = false;
+            parent_state.borrow_mut().parse_until(|_field| {
+                if self.field_iter.has_next_slice() {
+                    slice_added = true;
+                    return true;
+                }
+                false
+            })?;
+
+            if !slice_added {
+                // No slices were added - parent's iterator is exhausted
+                // Mark as terminated since no more input will be available
+                self.terminated.set(true);
+                return Ok(None);
+            }
+
+            // A slice was added (even if it is empty). Retry from the beginning.
         }
     }
 
