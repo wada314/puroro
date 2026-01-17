@@ -25,7 +25,7 @@ pub struct FieldIterator<'slice, A: Allocator = Global> {
     field_slices: OnceList<&'slice [u8], A>,
     /// Flattened iterator over protobuf fields from all slices
     /// The slices it references live for 'slice
-    field_iter: std::boxed::Box<dyn Iterator<Item = Result<Field<&'slice [u8]>, Error>> + 'slice>,
+    field_iter: Box<dyn Iterator<Item = Result<Field<&'slice [u8]>, Error>> + 'slice, A>,
 }
 
 impl<'slice, A: Allocator> FieldIterator<'slice, A>
@@ -45,9 +45,12 @@ where
         let field_iter = initial_slice
             .read_protobuf_fields()
             .map(|result| result.map_err(|e| Error::from(e)));
+        let boxed = Box::new_in(field_iter, alloc.clone());
+        let field_iter: Box<dyn Iterator<Item = Result<Field<&'slice [u8]>, Error>> + 'slice, A> =
+            ::allocator_api2::unsize_box!(boxed);
         Self {
             field_slices,
-            field_iter: std::boxed::Box::new(field_iter),
+            field_iter,
         }
     }
 
@@ -68,18 +71,19 @@ where
         // We need to collect slices into a Vec to avoid lifetime issues
         // Note: This is a temporary solution - ideally we'd iterate directly from OnceList
         let slices_vec: Vec<&'slice [u8]> = field_slices.iter().copied().collect();
-        let field_iter: std::boxed::Box<
-            dyn Iterator<Item = Result<Field<&'slice [u8]>, Error>> + 'slice,
-        > = if slices_vec.is_empty() {
-            std::boxed::Box::new(std::iter::empty())
-        } else {
-            let iter = slices_vec.into_iter().flat_map(|slice| {
-                slice
-                    .read_protobuf_fields()
-                    .map(|result| result.map_err(|e| Error::from(e)))
-            });
-            std::boxed::Box::new(iter)
-        };
+        let field_iter: Box<dyn Iterator<Item = Result<Field<&'slice [u8]>, Error>> + 'slice, A> =
+            if slices_vec.is_empty() {
+                let boxed = Box::new_in(std::iter::empty(), alloc.clone());
+                ::allocator_api2::unsize_box!(boxed)
+            } else {
+                let iter = slices_vec.into_iter().flat_map(|slice| {
+                    slice
+                        .read_protobuf_fields()
+                        .map(|result| result.map_err(|e| Error::from(e)))
+                });
+                let boxed = Box::new_in(iter, alloc.clone());
+                ::allocator_api2::unsize_box!(boxed)
+            };
         Self {
             field_slices,
             field_iter,
@@ -117,7 +121,6 @@ impl<'slice, A: Allocator> Iterator for FieldIterator<'slice, A> {
 /// - `'slice`: Lifetime of the input slices (external data)
 pub struct MessageParserState<'slice, A: Allocator = Global> {
     /// FieldIterator - needs &mut self for Iterator::next()
-    /// Use std::boxed::Box (not allocator_api2::Box) since FieldIterator doesn't need allocator-aware Box
     field_iter: Option<FieldIterator<'slice, A>>,
     allocator: A,
     /// Flag indicating whether the message has been terminated by a terminating getter.
