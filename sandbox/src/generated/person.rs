@@ -486,12 +486,6 @@ pub struct PersonLazyImpl<'slice, A: Allocator + Clone + 'slice = Global> {
     /// OnceList has built-in interior mutability - no RefCell needed
     /// Use Rc because OnceList requires Copy, and AddressLazyImpl is not Copy
     addresses: OnceList<Rc<AddressLazyImpl<'slice, A>>, A>,
-
-    /// Flag indicating whether the message has been terminated by a terminating getter.
-    /// Once terminated, no additional slices can be added to maintain consistency.
-    /// A terminating getter is one that needs to check all slices (e.g., scalar field getters
-    /// that return the last found value).
-    terminated: Cell<bool>,
 }
 
 impl<'slice, A: Allocator + Clone + 'slice> PersonLazyImpl<'slice, A> {
@@ -539,7 +533,6 @@ impl<'slice, A: Allocator + Clone + 'slice> PersonLazyImpl<'slice, A> {
                 scores: OnceList::new_in(alloc.clone()),
                 address: RefCell::new(None),
                 addresses: OnceList::new_in(alloc.clone()),
-                terminated: Cell::new(false),
             }
         })
     }
@@ -547,14 +540,8 @@ impl<'slice, A: Allocator + Clone + 'slice> PersonLazyImpl<'slice, A> {
     /// Add additional slice from parent
     #[allow(dead_code)] // Used when PersonLazyImpl is used as a child message
     pub(crate) fn add_slice(&self, slice: &'slice [u8]) -> Result<(), Error> {
-        // Check if message has been terminated by a terminating getter
-        // Terminating getters (e.g., scalar field getters that check all slices) make the
-        // message state immutable to maintain consistency.
-        if self.terminated.get() {
-            return Err(Error::MessageTerminated);
-        }
-
         // Add slice to the parser state's field iterator
+        // Terminated check is handled inside MessageParserState::add_slice()
         self.parser_state.borrow_mut().add_slice(slice)
     }
 

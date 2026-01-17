@@ -283,12 +283,6 @@ pub struct AddressLazyImpl<'slice, A: Allocator = Global> {
 
     /// Field 3: zip_code (implicit presence varint field)
     zip_code: Cell<i32>,
-
-    /// Flag indicating whether the message has been terminated by a terminating getter.
-    /// Once terminated, no additional slices can be added to maintain consistency.
-    /// A terminating getter is one that needs to check all slices (e.g., scalar field getters
-    /// that return the last found value).
-    terminated: Cell<bool>,
 }
 
 impl<'slice, A: Allocator + Clone + 'slice> AddressLazyImpl<'slice, A> {
@@ -334,21 +328,14 @@ impl<'slice, A: Allocator + Clone + 'slice> AddressLazyImpl<'slice, A> {
                 street: RefCell::new(String::new()),
                 city: RefCell::new(String::new()),
                 zip_code: Cell::new(0),
-                terminated: Cell::new(false),
             }
         })
     }
 
     /// Add additional slice from parent
     pub(crate) fn add_slice(&self, slice: &'slice [u8]) -> Result<(), Error> {
-        // Check if message has been terminated by a terminating getter
-        // Terminating getters (e.g., scalar field getters that check all slices) make the
-        // message state immutable to maintain consistency.
-        if self.terminated.get() {
-            return Err(Error::MessageTerminated);
-        }
-
         // Add slice to the parser state's field iterator
+        // Terminated check is handled inside MessageParserState::add_slice()
         self.parser_state.borrow_mut().add_slice(slice)
     }
 

@@ -213,6 +213,13 @@ impl<'slice, A: Allocator> MessageParserState<'slice, A> {
     where
         A: Clone,
     {
+        // Check if message has been terminated by a terminating getter
+        // Terminating getters (e.g., scalar field getters that check all slices) make the
+        // message state immutable to maintain consistency.
+        if self.terminated.get() {
+            return Err(Error::MessageTerminated);
+        }
+
         // If field_iter is None (already exhausted), we can't add more slices
         // This is a design decision - once exhausted, we don't allow adding more slices
         if self.field_iter.is_none() {
