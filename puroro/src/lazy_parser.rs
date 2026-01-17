@@ -103,6 +103,13 @@ where
     pub fn field_slices_iter(&self) -> impl Iterator<Item = &'slice [u8]> {
         self.field_slices.iter().copied()
     }
+
+    /// Get the number of slices in the field slices container.
+    ///
+    /// This can be used to detect if new slices have been added during parent parsing.
+    pub fn field_slices_count(&self) -> usize {
+        self.field_slices.iter().count()
+    }
 }
 
 impl<'slice, A: Allocator> Iterator for FieldIterator<'slice, A> {
@@ -254,6 +261,70 @@ impl<'slice, A: Allocator> MessageParserState<'slice, A> {
         self.field_update_callback = new_callback;
     }
 
+    /// Get the next field from the iterator, requesting parent to parse if needed.
+    ///
+    /// This method tries to get the next field from `field_iter`. If the iterator is exhausted,
+    /// it requests the parent parser state (if it exists) to continue parsing, which may add
+    /// more slices to this state's `field_iter`. The method stops parent parsing when new slices
+    /// are added to `field_iter` (detected by slice count increase).
+    ///
+    /// Returns:
+    /// - `Ok(Some(field))` - A field was successfully retrieved
+    /// - `Ok(None)` - No more fields available (iterator and parent are exhausted)
+    /// - `Err(error)` - An error occurred during parsing
+    fn get_next_field(&mut self) -> Result<Option<Field<&'slice [u8]>>, Error>
+    where
+        A: Clone,
+    {
+        // Step 1: Try to get the next field from field_iter
+        match self.field_iter.next() {
+            Some(result) => Ok(Some(result?)),
+            None => {
+                // field_iter is exhausted - try to get more from parent
+                if let Some(ref parent_state) = self.parent_parser_state {
+                    // Remember the number of slices before requesting parent to parse
+                    let slices_count_before = self.field_iter.field_slices_count();
+
+                    // Request parent to continue parsing, which may add more slices to this state
+                    // Stop when field_iter gets new slices (indicated by slice count increase)
+                    parent_state.borrow_mut().parse_until(|_field| {
+                        // Check if new slices were added to our field_iter
+                        // We can access self.field_iter.field_slices_count() here because
+                        // parent_state.borrow_mut() doesn't conflict with self.field_iter
+                        let slices_count_after = self.field_iter.field_slices_count();
+                        slices_count_after > slices_count_before
+                    })?;
+
+                    // After parent parsing, check if field_iter has new slices
+                    let slices_count_after = self.field_iter.field_slices_count();
+                    if slices_count_after > slices_count_before {
+                        // New slices were added - recreate the iterator to include them
+                        let slices_iter = self.field_iter.field_slices_iter();
+                        self.field_iter =
+                            FieldIterator::from_slices(slices_iter, self.allocator.clone());
+                    }
+
+                    // Try again to get the next field from field_iter
+                    match self.field_iter.next() {
+                        Some(result) => Ok(Some(result?)),
+                        None => {
+                            // Iterator is still exhausted - parent didn't add new slices
+                            // This means parent's iterator is also exhausted
+                            // Mark as terminated since no more input will be available
+                            self.terminated.set(true);
+                            Ok(None)
+                        }
+                    }
+                } else {
+                    // No parent - iterator is truly exhausted
+                    // Mark as terminated since no more input will be available
+                    self.terminated.set(true);
+                    Ok(None)
+                }
+            }
+        }
+    }
+
     /// Internal method for parsing fields with configurable behavior.
     ///
     /// This is the common implementation used by `parse_until` and `ensure_all_fields_parsed`.
@@ -272,32 +343,12 @@ impl<'slice, A: Allocator> MessageParserState<'slice, A> {
         A: Clone,
     {
         loop {
-            // Step 1: Try to get the next field from field_iter
-            let field = match self.field_iter.next() {
-                Some(result) => result?,
+            // Step 1: Get the next field (handles parent parsing if needed)
+            let field = match self.get_next_field()? {
+                Some(field) => field,
                 None => {
-                    // field_iter is exhausted - try to get more from parent
-                    if let Some(ref parent_state) = self.parent_parser_state {
-                        // Request parent to continue parsing, which may add more slices to this state
-                        parent_state.borrow_mut().parse_until(|_| false)?;
-
-                        // Try again to get the next field from field_iter
-                        match self.field_iter.next() {
-                            Some(result) => result?,
-                            None => {
-                                // Iterator is still exhausted - parent didn't add new slices
-                                // This means parent's iterator is also exhausted
-                                // Mark as terminated since no more input will be available
-                                self.terminated.set(true);
-                                return Ok(());
-                            }
-                        }
-                    } else {
-                        // No parent - iterator is truly exhausted
-                        // Mark as terminated since no more input will be available
-                        self.terminated.set(true);
-                        return Ok(());
-                    }
+                    // No more fields available - iterator and parent are exhausted
+                    return Ok(());
                 }
             };
 
