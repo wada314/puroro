@@ -123,19 +123,17 @@ pub struct MessageParserState<'slice, A: Allocator = Global> {
     /// FieldIterator - needs &mut self for Iterator::next()
     ///
     /// **State meanings:**
-    /// - `Some(iter)`: The iterator is active and can yield more fields. This does NOT mean
-    ///   that all input has been consumed - in lazy parsing, the parent message might not have
-    ///   been fully parsed yet, so more input slices could arrive later.
-    /// - `None`: The iterator has been exhausted with the currently available input slices.
+    /// - The iterator is always present and can be iterated. When `next()` returns `None`,
+    ///   it means the iterator has been exhausted with the currently available input slices.
     ///   However, this does NOT mean the message parsing is complete - the parent message
-    ///   might still have more input to provide. When `field_iter` is `None`, the caller
-    ///   should request the parent message to continue parsing (via `continue_parsing_for_children()`)
+    ///   might still have more input to provide. When `field_iter.next()` returns `None`,
+    ///   the caller should request the parent message to continue parsing (via `continue_parsing_for_children()`)
     ///   before assuming the message is fully parsed.
     ///
     /// **Important**: In lazy parsing, input slices might arrive incrementally. Therefore,
-    /// `field_iter` being `None` only means "no more fields available *right now*", not
-    /// "all fields have been parsed".
-    field_iter: Option<FieldIterator<'slice, A>>,
+    /// `field_iter.next()` returning `None` only means "no more fields available *right now*", not
+    /// "all fields have been parsed". The iterator can be extended with new slices via `add_slice()`.
+    field_iter: FieldIterator<'slice, A>,
     allocator: A,
     /// Flag indicating whether the message has been terminated by a terminating operation.
     ///
@@ -147,8 +145,8 @@ pub struct MessageParserState<'slice, A: Allocator = Global> {
     ///   state is now immutable. Attempts to call `add_slice()` will return an error.
     ///
     /// **Key distinction**: `terminated = true` means "all fields have been parsed and
-    /// no more input will be accepted", while `field_iter = None` only means "the current
-    /// iterator is exhausted, but more input might arrive from the parent message".
+    /// no more input will be accepted", while `field_iter.next()` returning `None` only means
+    /// "the current iterator is exhausted, but more input might arrive from the parent message".
     terminated: Cell<bool>,
     /// Parent parser state - strong Rc<RefCell<...>> reference (no cycle!)
     /// Child needs parent's parser state to request continued parsing
@@ -190,7 +188,7 @@ impl<'slice, A: Allocator> MessageParserState<'slice, A> {
         let callback: Box<dyn FnMut(Field<&'slice [u8]>) -> Result<(), Error> + 'slice, A> =
             ::allocator_api2::unsize_box!(boxed);
         Self {
-            field_iter: Some(FieldIterator::new(initial_slice, allocator.clone())),
+            field_iter: FieldIterator::new(initial_slice, allocator.clone()),
             allocator,
             terminated: Cell::new(false),
             parent_parser_state,
@@ -204,27 +202,7 @@ impl<'slice, A: Allocator> MessageParserState<'slice, A> {
         I: Iterator<Item = &'slice [u8]>,
         A: Clone,
     {
-        self.field_iter = Some(FieldIterator::from_slices(
-            slice_iter,
-            self.allocator.clone(),
-        ));
-    }
-
-    /// Take the field iterator, leaving None in its place.
-    /// This is needed for RefCell borrow management when parsing fields.
-    pub fn take_field_iter(&mut self) -> Option<FieldIterator<'slice, A>> {
-        self.field_iter.take()
-    }
-
-    /// Set the field iterator.
-    /// This is needed for RefCell borrow management when parsing fields.
-    pub fn set_field_iter(&mut self, field_iter: Option<FieldIterator<'slice, A>>) {
-        self.field_iter = field_iter;
-    }
-
-    /// Check if the field iterator is exhausted (None).
-    pub fn is_field_iter_exhausted(&self) -> bool {
-        self.field_iter.is_none()
+        self.field_iter = FieldIterator::from_slices(slice_iter, self.allocator.clone());
     }
 
     /// Get a reference to the allocator.
@@ -250,22 +228,11 @@ impl<'slice, A: Allocator> MessageParserState<'slice, A> {
             return Err(Error::MessageTerminated);
         }
 
-        // If field_iter is None (exhausted), we recreate it with the new slice
+        // Add the slice to the iterator and recreate from all slices
         // This allows continuing parsing when more input arrives from the parent message
-
-        // Add the slice to the iterator (recreating if necessary)
-        if let Some(field_iter) = self.field_iter.take() {
-            // Iterator exists - add slice and recreate from all slices
-            field_iter.add_slice(slice);
-            let slices_iter = field_iter.field_slices_iter();
-            self.field_iter = Some(FieldIterator::from_slices(
-                slices_iter,
-                self.allocator.clone(),
-            ));
-        } else {
-            // Iterator was None (exhausted) - create new iterator with just this slice
-            self.field_iter = Some(FieldIterator::new(slice, self.allocator.clone()));
-        }
+        self.field_iter.add_slice(slice);
+        let slices_iter = self.field_iter.field_slices_iter();
+        self.field_iter = FieldIterator::from_slices(slices_iter, self.allocator.clone());
 
         Ok(())
     }
@@ -299,15 +266,10 @@ impl<'slice, A: Allocator> MessageParserState<'slice, A> {
     where
         F: FnMut(&Field<&'slice [u8]>) -> bool,
     {
-        // Get mutable reference to iterator
-        // If None, it means the iterator is exhausted with currently available input.
-        // In lazy parsing, this is temporary - more input might arrive from the parent message.
-        let Some(field_iter) = self.field_iter.as_mut() else {
-            return Ok(()); // Iterator exhausted - caller should check parent for more input
-        };
-
         // Parse fields
-        for result in field_iter {
+        // When next() returns None, it means the iterator is exhausted with currently available input.
+        // In lazy parsing, this is temporary - more input might arrive from the parent message.
+        for result in &mut self.field_iter {
             let field = result?;
 
             // Check if condition is met
@@ -318,13 +280,13 @@ impl<'slice, A: Allocator> MessageParserState<'slice, A> {
 
             if should_stop {
                 // Condition met - stop parsing
-                // field_iter is a mutable reference, so the iterator state is preserved
+                // The iterator state is preserved, so we can continue from here later
                 return Ok(());
             }
         }
 
-        // Iterator exhausted - mark it as None
-        self.field_iter = None;
+        // Iterator exhausted - next() returned None
+        // The caller should check parent for more input if needed
         Ok(())
     }
 

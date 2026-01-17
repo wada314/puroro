@@ -50,45 +50,37 @@ where
 
     /// Ensure the repeated field has at least `needed` elements parsed.
     ///
-    /// This will repeatedly request the parent to continue parsing until either:
+    /// This will request the parent to continue parsing until either:
     /// - the required number of elements are available, or
     /// - the parent input is exhausted.
     fn ensure_at_least(&self, needed: usize) -> Result<(), Error> {
-        loop {
-            let current = self.list.iter().count();
-            if current >= needed {
-                return Ok(());
-            }
-
-            // Ask parent to continue parsing (may update multiple fields).
-            {
-                let mut state = self.parent_parser_state.borrow_mut();
-                // Ignore errors from callback targets being dropped; keep propagating parser errors.
-                let _ = state.continue_parsing_for_children();
-            }
-
-            // If no progress and iterator is exhausted, stop.
-            let after = self.list.iter().count();
-            if after >= needed {
-                return Ok(());
-            }
-            let exhausted = self.parent_parser_state.borrow().is_field_iter_exhausted();
-            if exhausted {
-                return Ok(());
-            }
+        // Check if we already have enough elements
+        if self.list.iter().count() >= needed {
+            return Ok(());
         }
+
+        // Parse until we have enough elements for this field
+        // The condition checks if we've reached the target count
+        {
+            let mut state = self.parent_parser_state.borrow_mut();
+            let _ = state.parse_until(|_field| {
+                // Stop when we have enough elements for this field
+                // Note: This checks after each field is processed via the callback
+                // The field parameter is unused but required by the closure signature
+                self.list.iter().count() >= needed
+            });
+        }
+
+        Ok(())
     }
 
     /// Ensure the parent is fully parsed (used for operations that require total length).
     fn ensure_fully_parsed(&self) -> Result<(), Error> {
-        loop {
-            let mut state = self.parent_parser_state.borrow_mut();
-            if state.is_field_iter_exhausted() {
-                return Ok(());
-            }
-            let _ = state.continue_parsing_for_children();
-            // Loop until iterator becomes None (exhausted).
-        }
+        // Parse all remaining fields until iterator is exhausted
+        // Use a condition that always returns false to parse all fields
+        let mut state = self.parent_parser_state.borrow_mut();
+        let _ = state.parse_until(|_| false);
+        Ok(())
     }
 
     /// Return an iterator over the elements in the repeated field.
@@ -140,23 +132,14 @@ where
         }
 
         // Current iterator exhausted - check if we need to parse more
-        let parser_exhausted = self
-            .lazy_repeated
-            .parent_parser_state
-            .borrow()
-            .is_field_iter_exhausted();
-        if parser_exhausted {
-            // No more elements will be available
-            return None;
-        }
-
-        // Trigger parsing to get more elements
-        let current_total = self.lazy_repeated.list.iter().count();
-        let _ = self.lazy_repeated.ensure_at_least(current_total + 1);
+        // Try to continue parsing and see if we get more elements
+        let previous_count = self.lazy_repeated.list.iter().count();
+        // Try to parse at least one more element
+        let _ = self.lazy_repeated.ensure_at_least(previous_count + 1);
 
         // Check if we got new elements after parsing
         let new_total = self.lazy_repeated.list.iter().count();
-        if new_total <= current_total {
+        if new_total <= previous_count {
             // No progress made - parser exhausted or no more elements
             return None;
         }
@@ -166,8 +149,8 @@ where
         // all elements from the old iterator, so we just get the new ones
         let iter = self.lazy_repeated.list.iter().cloned();
         self.inner_iter = ::std::boxed::Box::new(iter);
-        // Skip the elements we've already seen (all current_total of them)
-        for _ in 0..current_total {
+        // Skip the elements we've already seen (all previous_count of them)
+        for _ in 0..previous_count {
             self.inner_iter.next();
         }
 
