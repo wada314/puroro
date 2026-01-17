@@ -120,32 +120,29 @@ where
     type Item = Result<Field<&'slice [u8]>, Error>;
 
     fn next(&mut self) -> Option<Self::Item> {
-        // Lazily initialize iterator on first access if not already initialized
-        // Even with Rc and OnceCell, we still need to collect to Vec to own the slices
-        // and satisfy the 'slice lifetime requirement for the iterator
-        if self.field_iter.get().is_none() {
-            // Collect slices to Vec to transfer ownership and satisfy lifetime requirements
-            let slices_vec: Vec<&'slice [u8]> = self.field_slices.iter().copied().collect();
-            let alloc_clone = self.allocator.clone();
-            let iter = slices_vec.into_iter().flat_map(|slice| {
+        // Lazily initialize iterator on first access using get_or_init
+        // Attempting without Vec - this may cause compile errors
+        let alloc_clone = self.allocator.clone();
+        // Clone Rc in closure to capture ownership
+        let field_slices_clone = self.field_slices.clone();
+        let field_iter = self.field_iter.get_or_init(move || {
+            // Try to directly iterate without Vec
+            let iter = field_slices_clone.iter().copied().flat_map(|slice| {
                 slice
                     .read_protobuf_fields()
                     .map(|result| result.map_err(|e| Error::from(e)))
             });
-            let boxed = Box::new_in(iter, alloc_clone.clone());
+            let boxed = Box::new_in(iter, alloc_clone);
             let field_iter: Box<
                 dyn Iterator<Item = Result<Field<&'slice [u8]>, Error>> + 'slice,
                 A,
             > = ::allocator_api2::unsize_box!(boxed);
-            // Initialize OnceCell - this only works once
-            let _ = self.field_iter.set(field_iter);
-        }
+            field_iter
+        });
 
-        // get_mut() gives us &mut Box<...>, then as_mut() gives us &mut dyn Iterator
-        self.field_iter
-            .get_mut()
-            .map(|iter_box| iter_box.as_mut().next())
-            .flatten()
+        // get_or_init returns &Box<...>, we need &mut for next()
+        // This will cause compile error - get_or_init returns &T, not &mut T
+        field_iter.as_mut().next()
     }
 }
 
