@@ -9,7 +9,7 @@ use crate::error::Error;
 use ::allocator_api2::boxed::Box;
 use ::allocator_extras::{Allocator, Global};
 use ::once_list2::OnceList;
-use ::protobuf_core::{AsRefExtProtobuf, Field};
+use ::protobuf_core::{AsRefExtProtobuf, Field, ProtobufFieldSliceIterator};
 use ::std::cell::Cell;
 use ::std::cell::RefCell;
 use ::std::rc::Rc;
@@ -46,10 +46,9 @@ use ::std::rc::Rc;
 pub struct FieldIterator<'slice, A: Allocator = Global> {
     /// List of field iterators, one per slice
     /// Each iterator is generated from its corresponding slice
-    /// read_protobuf_fields() returns ProtobufFieldSliceIterator with Item = Result<Field<Vec<u8>>, ...>
-    /// We convert Field<Vec<u8>> to Field<&'slice [u8]> and error type at iterator creation time
-    field_iterators:
-        OnceList<Box<dyn Iterator<Item = Result<Field<&'slice [u8]>, Error>> + 'slice, A>, A>,
+    /// Using ProtobufFieldSliceIterator directly without Box - all slices return the same iterator type
+    /// ProtobufFieldSliceIterator already returns Field<&'slice [u8]>
+    field_iterators: OnceList<ProtobufFieldSliceIterator<'slice>, A>,
 }
 
 impl<'slice, A: Allocator> FieldIterator<'slice, A>
@@ -63,15 +62,9 @@ where
         A: Allocator + Clone,
     {
         let field_iterators = OnceList::new_in(alloc.clone());
-        // Create iterator from the initial slice, converting error type only
-        // read_protobuf_fields() already returns Field<&'slice [u8]>
-        let iter = initial_slice
-            .read_protobuf_fields()
-            .map(|result| result.map_err(|e| Error::from(e)));
-        let boxed = Box::new_in(iter, alloc.clone());
-        let field_iter: Box<dyn Iterator<Item = Result<Field<&'slice [u8]>, Error>> + 'slice, A> =
-            ::allocator_api2::unsize_box!(boxed);
-        field_iterators.push(field_iter);
+        // Create iterator from the initial slice - no map or Box needed
+        let iter = initial_slice.read_protobuf_fields();
+        field_iterators.push(iter);
         Self { field_iterators }
     }
 
@@ -84,17 +77,9 @@ where
     {
         let field_iterators = OnceList::new_in(alloc.clone());
         for slice in slice_iter {
-            // Create iterator, converting error type only
-            // read_protobuf_fields() already returns Field<&'slice [u8]>
-            let iter = slice
-                .read_protobuf_fields()
-                .map(|result| result.map_err(|e| Error::from(e)));
-            let boxed = Box::new_in(iter, alloc.clone());
-            let field_iter: Box<
-                dyn Iterator<Item = Result<Field<&'slice [u8]>, Error>> + 'slice,
-                A,
-            > = ::allocator_api2::unsize_box!(boxed);
-            field_iterators.push(field_iter);
+            // Create iterator from slice - no map or Box needed
+            let iter = slice.read_protobuf_fields();
+            field_iterators.push(iter);
         }
 
         Self { field_iterators }
@@ -102,19 +87,13 @@ where
 
     /// Add a slice to the field iterators list
     /// Creates a new iterator from the slice and appends it to the list
-    pub fn add_slice(&self, slice: &'slice [u8], alloc: A)
+    pub fn add_slice(&self, slice: &'slice [u8])
     where
         A: Allocator + Clone,
     {
-        // Create iterator, converting error type only
-        // read_protobuf_fields() already returns Field<&'slice [u8]>
-        let iter = slice
-            .read_protobuf_fields()
-            .map(|result| result.map_err(|e| Error::from(e)));
-        let boxed = Box::new_in(iter, alloc);
-        let field_iter: Box<dyn Iterator<Item = Result<Field<&'slice [u8]>, Error>> + 'slice, A> =
-            ::allocator_api2::unsize_box!(boxed);
-        self.field_iterators.push(field_iter);
+        // Create iterator from slice - no map or Box needed
+        let iter = slice.read_protobuf_fields();
+        self.field_iterators.push(iter);
     }
 
     /// Get the number of iterators in the list.
@@ -137,9 +116,9 @@ impl<'slice, A: Allocator> Iterator for FieldIterator<'slice, A> {
             };
 
             // Try to get next item from the first iterator
-            // Error and field type conversion already done at iterator creation time
+            // Convert error type at this point (ProtobufError -> Error)
             if let Some(item) = first_iter_mut.next() {
-                return Some(item);
+                return Some(item.map_err(|e| Error::from(e)));
             }
 
             // First iterator is exhausted, remove it
@@ -271,7 +250,7 @@ impl<'slice, A: Allocator> MessageParserState<'slice, A> {
 
         // Add the slice to the iterator
         // The new approach automatically detects new slices without recreation
-        self.field_iter.add_slice(slice, self.allocator.clone());
+        self.field_iter.add_slice(slice);
 
         Ok(())
     }
