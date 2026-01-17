@@ -21,29 +21,12 @@ use ::std::rc::Rc;
 /// Uses flat_map approach to convert slice iterator to field iterator.
 ///
 /// - `'slice`: Lifetime of the input slices (external data)
-/// Iterator over protobuf fields from multiple slices.
-///
-/// TODO: Currently, `field_iter` is created from a snapshot of `field_slices` at construction time.
-/// When new slices are added via `add_slice()`, the iterator doesn't automatically see them.
-/// This requires manual recreation of the iterator (as done in `get_next_field`).
-/// We should refactor `FieldIterator` so that `next()` can automatically detect and include
-/// newly added slices from `field_slices`, eliminating the need for manual iterator recreation.
-/// This would simplify `get_next_field` and make the iterator more robust.
-///
-/// **Self-referential struct problem**: If we try to make `field_iter` directly reference `field_slices`,
-/// we get a self-referential struct which Rust's borrow checker doesn't allow. Potential solutions:
-/// 1. Use `Rc<OnceList<...>>` to share `field_slices` (adds reference counting overhead)
-/// 2. Store iterator state manually (slice index + field offset) instead of a boxed iterator
-/// 3. Keep current `Vec` approach but optimize recreation logic
-/// 4. Use `Pin` (complex, may require unstable APIs)
-///
-/// Iterator over protobuf fields from multiple slices.
 ///
 /// Instead of storing slices and creating an iterator from them, we store a list of iterators,
 /// one per slice. When a slice is added via `add_slice()`, a new iterator is created and appended
 /// to the list. When `next()` is called, we get the first iterator and try to get an item from it.
 /// If the iterator is exhausted, we remove it and try the next one. This allows automatic
-/// detection of newly added slices without iterator recreation.
+/// detection of newly added slices without iterator recreation nor self-referential structs.
 pub struct FieldIterator<'slice, A: Allocator = Global> {
     /// List of field iterators, one per slice
     /// Each iterator is generated from its corresponding slice
