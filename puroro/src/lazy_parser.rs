@@ -286,16 +286,12 @@ impl<'slice, A: Allocator> MessageParserState<'slice, A> {
 
             // Request parent to continue parsing, which may add more slices to this state
             // Stop when field_iter gets new slices (has_next_slice() becomes true)
-            let mut slice_added = false;
-            parent_state.borrow_mut().parse_until(|_field| {
-                if self.field_iter.has_next_slice() {
-                    slice_added = true;
-                    return true;
-                }
-                false
-            })?;
+            parent_state
+                .borrow_mut()
+                .parse_until(|_field| self.field_iter.has_next_slice())?;
 
-            if !slice_added {
+            // Check if any slices were added after parent parsing
+            if !self.field_iter.has_next_slice() {
                 // No slices were added - parent's iterator is exhausted
                 // Mark as terminated since no more input will be available
                 self.terminated.set(true);
