@@ -121,9 +121,34 @@ impl<'slice, A: Allocator> Iterator for FieldIterator<'slice, A> {
 /// - `'slice`: Lifetime of the input slices (external data)
 pub struct MessageParserState<'slice, A: Allocator = Global> {
     /// FieldIterator - needs &mut self for Iterator::next()
+    ///
+    /// **State meanings:**
+    /// - `Some(iter)`: The iterator is active and can yield more fields. This does NOT mean
+    ///   that all input has been consumed - in lazy parsing, the parent message might not have
+    ///   been fully parsed yet, so more input slices could arrive later.
+    /// - `None`: The iterator has been exhausted with the currently available input slices.
+    ///   However, this does NOT mean the message parsing is complete - the parent message
+    ///   might still have more input to provide. When `field_iter` is `None`, the caller
+    ///   should request the parent message to continue parsing (via `continue_parsing_for_children()`)
+    ///   before assuming the message is fully parsed.
+    ///
+    /// **Important**: In lazy parsing, input slices might arrive incrementally. Therefore,
+    /// `field_iter` being `None` only means "no more fields available *right now*", not
+    /// "all fields have been parsed".
     field_iter: Option<FieldIterator<'slice, A>>,
     allocator: A,
-    /// Flag indicating whether the message has been terminated by a terminating getter.
+    /// Flag indicating whether the message has been terminated by a terminating operation.
+    ///
+    /// **State meanings:**
+    /// - `false`: The message is still accepting new input slices. Parsing operations can
+    ///   be performed incrementally (e.g., `parse_until` for conditional parsing).
+    /// - `true`: The message has been fully parsed via `ensure_all_fields_parsed()` (a
+    ///   terminating operation). No further input slices will be accepted, and the message
+    ///   state is now immutable. Attempts to call `add_slice()` will return an error.
+    ///
+    /// **Key distinction**: `terminated = true` means "all fields have been parsed and
+    /// no more input will be accepted", while `field_iter = None` only means "the current
+    /// iterator is exhausted, but more input might arrive from the parent message".
     terminated: Cell<bool>,
     /// Parent parser state - strong Rc<RefCell<...>> reference (no cycle!)
     /// Child needs parent's parser state to request continued parsing
@@ -209,34 +234,37 @@ impl<'slice, A: Allocator> MessageParserState<'slice, A> {
 
     /// Add a slice to the field iterator
     /// This will add the slice to the underlying FieldIterator and recreate the field iterator
+    ///
+    /// **Important**: This method can only be called when `terminated = false`. Once
+    /// `ensure_all_fields_parsed()` has been called, this method will return an error.
+    ///
+    /// If `field_iter` is `None` (exhausted), we recreate it with the new slice, allowing
+    /// the iterator to continue parsing with the additional input.
     pub fn add_slice(&mut self, slice: &'slice [u8]) -> Result<(), Error>
     where
         A: Clone,
     {
-        // Check if message has been terminated by a terminating getter
-        // Terminating getters (e.g., scalar field getters that check all slices) make the
-        // message state immutable to maintain consistency.
+        // Check if message has been terminated by ensure_all_fields_parsed()
+        // Once terminated, no new slices can be added to maintain consistency
         if self.terminated.get() {
             return Err(Error::MessageTerminated);
         }
 
-        // If field_iter is None (already exhausted), we can't add more slices
-        // This is a design decision - once exhausted, we don't allow adding more slices
-        if self.field_iter.is_none() {
-            return Err(Error::InvalidWireFormat(
-                "Cannot add slice: field iterator is exhausted".to_string(),
-            ));
-        }
+        // If field_iter is None (exhausted), we recreate it with the new slice
+        // This allows continuing parsing when more input arrives from the parent message
 
-        // Take the field iterator, add the slice, and recreate the iterator
+        // Add the slice to the iterator (recreating if necessary)
         if let Some(field_iter) = self.field_iter.take() {
+            // Iterator exists - add slice and recreate from all slices
             field_iter.add_slice(slice);
-            // Recreate the field iterator from all slices
             let slices_iter = field_iter.field_slices_iter();
             self.field_iter = Some(FieldIterator::from_slices(
                 slices_iter,
                 self.allocator.clone(),
             ));
+        } else {
+            // Iterator was None (exhausted) - create new iterator with just this slice
+            self.field_iter = Some(FieldIterator::new(slice, self.allocator.clone()));
         }
 
         Ok(())
@@ -259,16 +287,23 @@ impl<'slice, A: Allocator> MessageParserState<'slice, A> {
     /// This is the common implementation used by `parse_until`, `continue_parsing_for_children`,
     /// and `ensure_all_fields_parsed`.
     ///
+    /// **Important**: If `field_iter` is `None` (exhausted), this method returns `Ok(())` immediately.
+    /// However, in lazy parsing, this does NOT mean the message is fully parsed - the parent message
+    /// might still have more input. The caller should handle this by requesting the parent to continue
+    /// parsing (e.g., via `continue_parsing_for_children()`) before assuming parsing is complete.
+    ///
     /// # Parameters
     /// * `condition` - Closure that takes a reference to a field and returns `true` when parsing should stop.
-    ///   Pass `|_| false` if you want to parse all fields.
+    ///   Pass `|_| false` if you want to parse all available fields.
     fn parse_fields_internal<F>(&mut self, mut condition: F) -> Result<(), Error>
     where
         F: FnMut(&Field<&'slice [u8]>) -> bool,
     {
         // Get mutable reference to iterator
+        // If None, it means the iterator is exhausted with currently available input.
+        // In lazy parsing, this is temporary - more input might arrive from the parent message.
         let Some(field_iter) = self.field_iter.as_mut() else {
-            return Ok(()); // Already parsed completely
+            return Ok(()); // Iterator exhausted - caller should check parent for more input
         };
 
         // Parse fields
