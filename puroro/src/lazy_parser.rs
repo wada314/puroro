@@ -20,6 +20,14 @@ use ::std::rc::Rc;
 /// Uses flat_map approach to convert slice iterator to field iterator.
 ///
 /// - `'slice`: Lifetime of the input slices (external data)
+/// Iterator over protobuf fields from multiple slices.
+///
+/// TODO: Currently, `field_iter` is created from a snapshot of `field_slices` at construction time.
+/// When new slices are added via `add_slice()`, the iterator doesn't automatically see them.
+/// This requires manual recreation of the iterator (as done in `get_next_field`).
+/// We should refactor `FieldIterator` so that `next()` can automatically detect and include
+/// newly added slices from `field_slices`, eliminating the need for manual iterator recreation.
+/// This would simplify `get_next_field` and make the iterator more robust.
 pub struct FieldIterator<'slice, A: Allocator = Global> {
     /// Field slices container
     field_slices: OnceList<&'slice [u8], A>,
@@ -303,6 +311,10 @@ impl<'slice, A: Allocator> MessageParserState<'slice, A> {
         })?;
 
         // After parent parsing, check if field_iter has new slices
+        // TODO: See FieldIterator struct documentation - we need to manually recreate the iterator
+        // when new slices are added because the current implementation doesn't automatically detect
+        // changes to field_slices. Once FieldIterator is refactored to detect new slices automatically,
+        // this manual recreation can be removed.
         let slices_count_after = self.field_iter.field_slices_count();
         if slices_count_after > slices_count_before {
             // New slices were added - recreate the iterator to include them
