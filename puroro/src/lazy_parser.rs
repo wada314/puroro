@@ -272,54 +272,45 @@ impl<'slice, A: Allocator> MessageParserState<'slice, A> {
         A: Clone,
     {
         loop {
-            // Parse fields until condition is met or iterator is exhausted
-            // When next() returns None, it means the iterator is exhausted with currently available input.
-            // In lazy parsing, this is temporary - more input might arrive from the parent message.
-            for result in &mut self.field_iter {
-                let field = result?;
+            // Step 1: Try to get the next field from field_iter
+            let field = match self.field_iter.next() {
+                Some(result) => result?,
+                None => {
+                    // field_iter is exhausted - try to get more from parent
+                    if let Some(ref parent_state) = self.parent_parser_state {
+                        // Request parent to continue parsing, which may add more slices to this state
+                        parent_state.borrow_mut().parse_until(|_| false)?;
 
-                // Check if condition is met
-                let should_stop = condition(&field);
-
-                // Update field via callback
-                (self.field_update_callback)(field)?;
-
-                if should_stop {
-                    // Condition met - stop parsing
-                    // The iterator state is preserved, so we can continue from here later
-                    return Ok(());
-                }
-            }
-
-            // Iterator exhausted - next() returned None
-            // If parent exists, request it to continue parsing
-            if let Some(ref parent_state) = self.parent_parser_state {
-                // Request parent to continue parsing, which may add more slices to this state
-                parent_state.borrow_mut().parse_until(|_| false)?;
-
-                // After parent continues parsing, check if iterator can yield more fields
-                // If iterator is still exhausted (parent didn't add new slices), stop
-                // We check this by trying to peek at the next field
-                // If we can't get a field, iterator is still exhausted - stop
-                if let Some(result) = self.field_iter.next() {
-                    // Parent added new slices - process the field
-                    let field = result?;
-                    let should_stop = condition(&field);
-                    (self.field_update_callback)(field)?;
-                    if should_stop {
-                        // Condition met - stop parsing
+                        // Try again to get the next field from field_iter
+                        match self.field_iter.next() {
+                            Some(result) => result?,
+                            None => {
+                                // Iterator is still exhausted - parent didn't add new slices
+                                // This means parent's iterator is also exhausted
+                                // Mark as terminated since no more input will be available
+                                self.terminated.set(true);
+                                return Ok(());
+                            }
+                        }
+                    } else {
+                        // No parent - iterator is truly exhausted
+                        // Mark as terminated since no more input will be available
+                        self.terminated.set(true);
                         return Ok(());
                     }
-                    // Continue loop to parse more fields from new slices
-                } else {
-                    // Iterator is still exhausted - parent didn't add new slices
-                    // This means parent's iterator is also exhausted
-                    return Ok(());
                 }
-            } else {
-                // No parent - iterator is truly exhausted
+            };
+
+            // Step 2: Process the field
+            let should_stop = condition(&field);
+            (self.field_update_callback)(field)?;
+
+            if should_stop {
+                // Condition met - stop parsing
                 return Ok(());
             }
+
+            // Continue loop to get and process the next field
         }
     }
 
