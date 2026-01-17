@@ -262,12 +262,7 @@ impl<'slice, A: Allocator> MessageParserState<'slice, A> {
     /// # Parameters
     /// * `condition` - Optional closure that takes a field and returns `true` when parsing should stop.
     ///   If `None`, parsing continues until iterator is exhausted.
-    /// * `ignore_callback_errors` - If `true`, errors from the callback are ignored (for `continue_parsing_for_children`).
-    fn parse_fields_internal<F>(
-        &mut self,
-        mut condition: Option<F>,
-        ignore_callback_errors: bool,
-    ) -> Result<(), Error>
+    fn parse_fields_internal<F>(&mut self, mut condition: Option<F>) -> Result<(), Error>
     where
         F: FnMut(Field<&'slice [u8]>) -> bool,
     {
@@ -291,11 +286,7 @@ impl<'slice, A: Allocator> MessageParserState<'slice, A> {
                     }
 
                     // Update field via callback
-                    if ignore_callback_errors {
-                        let _ = (self.field_update_callback)(field);
-                    } else {
-                        (self.field_update_callback)(field)?;
-                    }
+                    (self.field_update_callback)(field)?;
                 }
                 Some(Err(e)) => {
                     return Err(e);
@@ -324,7 +315,7 @@ impl<'slice, A: Allocator> MessageParserState<'slice, A> {
     where
         F: FnMut(Field<&'slice [u8]>) -> bool,
     {
-        self.parse_fields_internal(Some(condition), false)
+        self.parse_fields_internal(Some(condition))
     }
 }
 
@@ -340,8 +331,8 @@ impl<'slice, A: Allocator + Clone> MessageParserState<'slice, A> {
     /// This ensures that multiple scalar message child fields can all receive their slices when
     /// any one of them calls this method.
     pub fn continue_parsing_for_children(&mut self) -> Result<(), Error> {
-        // Parse all fields, ignoring callback errors (Message Body or child might be dropped)
-        self.parse_fields_internal(None::<fn(Field<&'slice [u8]>) -> bool>, true)
+        // Parse all fields, updating all registered fields via the callback
+        self.parse_fields_internal(None::<fn(Field<&'slice [u8]>) -> bool>)
     }
 
     /// Ensure all fields are parsed
@@ -370,7 +361,7 @@ impl<'slice, A: Allocator + Clone> MessageParserState<'slice, A> {
         }
 
         // Parse all fields until iterator is exhausted
-        self.parse_fields_internal(None::<fn(Field<&'slice [u8]>) -> bool>, false)?;
+        self.parse_fields_internal(None::<fn(Field<&'slice [u8]>) -> bool>)?;
 
         // Mark message as terminated after parsing all fields
         // This prevents adding new slices which would cause inconsistent behavior
