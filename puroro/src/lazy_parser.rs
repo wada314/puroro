@@ -7,6 +7,7 @@
 
 use crate::error::Error;
 use ::allocator_api2::boxed::Box;
+use ::allocator_api2::unsize_box;
 use ::allocator_extras::{Allocator, Global};
 use ::once_list2::OnceList;
 use ::protobuf_core::{AsRefExtProtobuf, Field, ProtobufFieldSliceIterator};
@@ -182,15 +183,15 @@ impl<'slice, A: Allocator> MessageParserState<'slice, A> {
         F: FnMut(Field<&'slice [u8]>) -> Result<(), Error> + 'slice,
         A: Allocator + Clone,
     {
-        let boxed = Box::new_in(field_update_callback, allocator.clone());
-        let callback: Box<dyn FnMut(Field<&'slice [u8]>) -> Result<(), Error> + 'slice, A> =
-            ::allocator_api2::unsize_box!(boxed);
         Self {
             field_iter: FieldIterator::new(initial_slice, allocator.clone()),
-            allocator,
+            allocator: allocator.clone(),
             terminated: Cell::new(false),
             parent_parser_state,
-            field_update_callback: callback,
+            field_update_callback: unsize_box!(Box::new_in(
+                field_update_callback,
+                allocator.clone()
+            )),
         }
     }
 
