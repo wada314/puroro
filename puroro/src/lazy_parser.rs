@@ -260,11 +260,11 @@ impl<'slice, A: Allocator> MessageParserState<'slice, A> {
     /// and `ensure_all_fields_parsed`.
     ///
     /// # Parameters
-    /// * `condition` - Optional closure that takes a field and returns `true` when parsing should stop.
-    ///   If `None`, parsing continues until iterator is exhausted.
-    fn parse_fields_internal<F>(&mut self, mut condition: Option<F>) -> Result<(), Error>
+    /// * `condition` - Closure that takes a reference to a field and returns `true` when parsing should stop.
+    ///   Pass `|_| false` if you want to parse all fields.
+    fn parse_fields_internal<F>(&mut self, mut condition: F) -> Result<(), Error>
     where
-        F: FnMut(Field<&'slice [u8]>) -> bool,
+        F: FnMut(&Field<&'slice [u8]>) -> bool,
     {
         // Get mutable reference to iterator
         let field_iter = match self.field_iter.as_mut() {
@@ -277,12 +277,10 @@ impl<'slice, A: Allocator> MessageParserState<'slice, A> {
             match field_iter.next() {
                 Some(Ok(field)) => {
                     // Check if condition is met
-                    if let Some(ref mut cond) = condition {
-                        let should_stop = cond(field.clone());
-                        if should_stop {
-                            // Condition met - stop parsing but keep iterator
-                            return Ok(());
-                        }
+                    let should_stop = condition(&field);
+                    if should_stop {
+                        // Condition met - stop parsing but keep iterator
+                        return Ok(());
                     }
 
                     // Update field via callback
@@ -303,19 +301,19 @@ impl<'slice, A: Allocator> MessageParserState<'slice, A> {
     /// Parse fields until a certain condition is met.
     ///
     /// This function reads fields from the input slice until the condition closure returns `true`.
-    /// The condition closure receives the current field and should return `true` when parsing should stop.
+    /// The condition closure receives a reference to the current field and should return `true` when parsing should stop.
     ///
     /// # Arguments
-    /// * `condition` - A closure that takes a field and returns `true` when parsing should stop
+    /// * `condition` - A closure that takes a reference to a field and returns `true` when parsing should stop
     ///
     /// # Returns
     /// * `Ok(())` - Parsing completed (either condition was met or iterator exhausted)
     /// * `Err(Error)` - An error occurred during parsing
     pub fn parse_until<F>(&mut self, condition: F) -> Result<(), Error>
     where
-        F: FnMut(Field<&'slice [u8]>) -> bool,
+        F: FnMut(&Field<&'slice [u8]>) -> bool,
     {
-        self.parse_fields_internal(Some(condition))
+        self.parse_fields_internal(condition)
     }
 }
 
@@ -332,7 +330,8 @@ impl<'slice, A: Allocator + Clone> MessageParserState<'slice, A> {
     /// any one of them calls this method.
     pub fn continue_parsing_for_children(&mut self) -> Result<(), Error> {
         // Parse all fields, updating all registered fields via the callback
-        self.parse_fields_internal(None::<fn(Field<&'slice [u8]>) -> bool>)
+        // Use a constant function that always returns false to parse all fields
+        self.parse_fields_internal(|_| false)
     }
 
     /// Ensure all fields are parsed
@@ -361,7 +360,8 @@ impl<'slice, A: Allocator + Clone> MessageParserState<'slice, A> {
         }
 
         // Parse all fields until iterator is exhausted
-        self.parse_fields_internal(None::<fn(Field<&'slice [u8]>) -> bool>)?;
+        // Use a constant function that always returns false to parse all fields
+        self.parse_fields_internal(|_| false)?;
 
         // Mark message as terminated after parsing all fields
         // This prevents adding new slices which would cause inconsistent behavior
