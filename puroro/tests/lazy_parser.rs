@@ -1,11 +1,7 @@
 //! Tests for lazy parser implementation
 //!
 //! Tests for the core lazy parser infrastructure:
-//! - Varint decoding functions
-//! - Field tag parsing
-//! - Basic wire format parsing utilities
-
-use puroro::lazy_parser::{decode_varint, parse_varint};
+//! - Field tag encoding
 
 /// Encode a varint value
 fn encode_varint(mut value: u64) -> Vec<u8> {
@@ -28,32 +24,6 @@ fn encode_varint(mut value: u64) -> Vec<u8> {
 fn encode_field_tag(field_number: u32, wire_type: u32) -> Vec<u8> {
     let tag = (field_number << 3) | wire_type;
     encode_varint(tag as u64)
-}
-
-#[test]
-fn test_decode_varint() {
-    // Test simple varint: 30 = 0x1E (single byte, no continuation)
-    let bytes = vec![0x1E];
-    let (value, consumed) = decode_varint(&bytes).unwrap();
-    assert_eq!(value, 30);
-    assert_eq!(consumed, 1);
-
-    // Test multi-byte varint: 300 = 0xAC 0x02
-    // 300 in binary: 100101100
-    // Split into 7-bit chunks: 0101100 (0x2C) and 0000010 (0x02)
-    // With continuation bit: 0xAC (0x2C | 0x80) and 0x02
-    let bytes = vec![0xAC, 0x02];
-    let (value, consumed) = decode_varint(&bytes).unwrap();
-    assert_eq!(value, 300);
-    assert_eq!(consumed, 2);
-}
-
-#[test]
-fn test_parse_varint() {
-    // Test simple varint: 30
-    let bytes = vec![0x1E];
-    let value = parse_varint(&bytes).unwrap();
-    assert_eq!(value, 30);
 }
 
 #[test]

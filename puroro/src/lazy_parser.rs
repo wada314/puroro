@@ -14,69 +14,6 @@ use ::std::cell::Cell;
 use ::std::cell::RefCell;
 use ::std::rc::Rc;
 
-/// Decode a varint-encoded value from a byte slice.
-///
-/// Returns the decoded value and the number of bytes consumed.
-/// This is a simplified implementation - in production, use protobuf-core's varint decoding.
-pub fn decode_varint(bytes: &[u8]) -> Result<(u64, usize), Error> {
-    let mut result = 0u64;
-    let mut shift = 0;
-    let mut consumed = 0;
-
-    for &byte in bytes {
-        consumed += 1;
-        result |= ((byte & 0x7F) as u64) << shift;
-
-        if (byte & 0x80) == 0 {
-            return Ok((result, consumed));
-        }
-
-        shift += 7;
-        if shift >= 64 {
-            return Err(Error::InvalidWireFormat("Varint too long".to_string()));
-        }
-    }
-
-    Err(Error::InvalidWireFormat("Incomplete varint".to_string()))
-}
-
-/// Decode a field tag (varint-encoded field number and wire type) from a byte slice.
-///
-/// Returns (field_number, wire_type, bytes_consumed).
-/// Wire type is encoded in the lower 3 bits of the tag.
-/// Field number is encoded in the upper bits.
-pub fn decode_field_tag(bytes: &[u8]) -> Result<(u32, u32, usize), Error> {
-    let (tag, consumed) = decode_varint(bytes)?;
-    let wire_type = (tag & 0x7) as u32;
-    let field_number = (tag >> 3) as u32;
-
-    if field_number == 0 {
-        return Err(Error::InvalidWireFormat(
-            "Field number cannot be zero".to_string(),
-        ));
-    }
-
-    Ok((field_number, wire_type, consumed))
-}
-
-/// Parse a varint-encoded i32 value from a byte slice.
-///
-/// This is a convenience function that decodes a varint and casts it to i32.
-pub fn parse_varint(bytes: &[u8]) -> Result<i32, Error> {
-    let (value, _) = decode_varint(bytes)?;
-    // Cast u64 to i32 (varint encoding uses zigzag encoding for signed integers,
-    // but for simplicity in Phase 1, we just cast)
-    Ok(value as i32)
-}
-
-/// Parse a UTF-8 string from a length-delimited field value slice.
-///
-/// The value_slice is the actual value bytes (without the length prefix).
-/// This function validates UTF-8 and returns a String.
-pub fn parse_string(bytes: &[u8]) -> Result<String, Error> {
-    String::from_utf8(bytes.to_vec()).map_err(|e| Error::InvalidUtf8(e))
-}
-
 /// Iterator over protobuf fields in slices.
 ///
 /// Can be paused and resumed, making it easy to parse incrementally.
