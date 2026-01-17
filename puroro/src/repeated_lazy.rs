@@ -53,6 +53,9 @@ where
     /// This will request the parent to continue parsing until either:
     /// - the required number of elements are available, or
     /// - the parent input is exhausted.
+    ///
+    /// If the parent's iterator is exhausted, `parse_until` will automatically request
+    /// the parent's parent to continue parsing, so this method only needs to call `parse_until`.
     fn ensure_at_least(&self, needed: usize) -> Result<(), Error> {
         // Check if we already have enough elements
         if self.list.iter().count() >= needed {
@@ -61,6 +64,8 @@ where
 
         // Parse until we have enough elements for this field
         // The condition checks if we've reached the target count
+        // If the parent's iterator is exhausted, parse_until will automatically
+        // request the parent's parent to continue parsing
         let mut state = self.parent_parser_state.borrow_mut();
         state.parse_until(|_field| {
             // Stop when we have enough elements for this field

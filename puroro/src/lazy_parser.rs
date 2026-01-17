@@ -127,7 +127,7 @@ pub struct MessageParserState<'slice, A: Allocator = Global> {
     ///   it means the iterator has been exhausted with the currently available input slices.
     ///   However, this does NOT mean the message parsing is complete - the parent message
     ///   might still have more input to provide. When `field_iter.next()` returns `None`,
-    ///   the caller should request the parent message to continue parsing (via `continue_parsing_for_children()`)
+    ///   the caller should request the parent message to continue parsing (via `parse_until(|_| false)`)
     ///   before assuming the message is fully parsed.
     ///
     /// **Important**: In lazy parsing, input slices might arrive incrementally. Therefore,
@@ -210,6 +210,11 @@ impl<'slice, A: Allocator> MessageParserState<'slice, A> {
         &self.allocator
     }
 
+    /// Get a reference to the parent parser state, if any.
+    pub fn parent_parser_state(&self) -> Option<&Rc<RefCell<MessageParserState<'slice, A>>>> {
+        self.parent_parser_state.as_ref()
+    }
+
     /// Add a slice to the field iterator
     /// This will add the slice to the underlying FieldIterator and recreate the field iterator
     ///
@@ -251,13 +256,12 @@ impl<'slice, A: Allocator> MessageParserState<'slice, A> {
 
     /// Internal method for parsing fields with configurable behavior.
     ///
-    /// This is the common implementation used by `parse_until`, `continue_parsing_for_children`,
-    /// and `ensure_all_fields_parsed`.
+    /// This is the common implementation used by `parse_until` and `ensure_all_fields_parsed`.
     ///
-    /// **Important**: If `field_iter` is `None` (exhausted), this method returns `Ok(())` immediately.
-    /// However, in lazy parsing, this does NOT mean the message is fully parsed - the parent message
-    /// might still have more input. The caller should handle this by requesting the parent to continue
-    /// parsing (e.g., via `continue_parsing_for_children()`) before assuming parsing is complete.
+    /// **Important**: If the iterator is exhausted and the condition is not met, this method will
+    /// automatically request the parent parser state (if it exists) to continue parsing. This ensures
+    /// that lazy parsing works correctly with nested messages - when a child message needs more input,
+    /// it can request its parent to continue parsing, which may in turn request its own parent.
     ///
     /// # Parameters
     /// * `condition` - Closure that takes a reference to a field and returns `true` when parsing should stop.
@@ -265,35 +269,69 @@ impl<'slice, A: Allocator> MessageParserState<'slice, A> {
     fn parse_fields_internal<F>(&mut self, mut condition: F) -> Result<(), Error>
     where
         F: FnMut(&Field<&'slice [u8]>) -> bool,
+        A: Clone,
     {
-        // Parse fields
-        // When next() returns None, it means the iterator is exhausted with currently available input.
-        // In lazy parsing, this is temporary - more input might arrive from the parent message.
-        for result in &mut self.field_iter {
-            let field = result?;
+        loop {
+            // Parse fields until condition is met or iterator is exhausted
+            // When next() returns None, it means the iterator is exhausted with currently available input.
+            // In lazy parsing, this is temporary - more input might arrive from the parent message.
+            for result in &mut self.field_iter {
+                let field = result?;
 
-            // Check if condition is met
-            let should_stop = condition(&field);
+                // Check if condition is met
+                let should_stop = condition(&field);
 
-            // Update field via callback
-            (self.field_update_callback)(field)?;
+                // Update field via callback
+                (self.field_update_callback)(field)?;
 
-            if should_stop {
-                // Condition met - stop parsing
-                // The iterator state is preserved, so we can continue from here later
+                if should_stop {
+                    // Condition met - stop parsing
+                    // The iterator state is preserved, so we can continue from here later
+                    return Ok(());
+                }
+            }
+
+            // Iterator exhausted - next() returned None
+            // If parent exists, request it to continue parsing
+            if let Some(ref parent_state) = self.parent_parser_state {
+                // Request parent to continue parsing, which may add more slices to this state
+                parent_state.borrow_mut().parse_until(|_| false)?;
+
+                // After parent continues parsing, check if iterator can yield more fields
+                // If iterator is still exhausted (parent didn't add new slices), stop
+                // We check this by trying to peek at the next field
+                // If we can't get a field, iterator is still exhausted - stop
+                if let Some(result) = self.field_iter.next() {
+                    // Parent added new slices - process the field
+                    let field = result?;
+                    let should_stop = condition(&field);
+                    (self.field_update_callback)(field)?;
+                    if should_stop {
+                        // Condition met - stop parsing
+                        return Ok(());
+                    }
+                    // Continue loop to parse more fields from new slices
+                } else {
+                    // Iterator is still exhausted - parent didn't add new slices
+                    // This means parent's iterator is also exhausted
+                    return Ok(());
+                }
+            } else {
+                // No parent - iterator is truly exhausted
                 return Ok(());
             }
         }
-
-        // Iterator exhausted - next() returned None
-        // The caller should check parent for more input if needed
-        Ok(())
     }
 
     /// Parse fields until a certain condition is met.
     ///
     /// This function reads fields from the input slice until the condition closure returns `true`.
     /// The condition closure receives a reference to the current field and should return `true` when parsing should stop.
+    ///
+    /// **Important**: If the iterator is exhausted and the condition is not met, this method will
+    /// request the parent parser state (if it exists) to continue parsing. This ensures that
+    /// lazy parsing works correctly with nested messages - when a child message needs more input,
+    /// it can request its parent to continue parsing, which may in turn request its own parent.
     ///
     /// # Arguments
     /// * `condition` - A closure that takes a reference to a field and returns `true` when parsing should stop
@@ -304,28 +342,15 @@ impl<'slice, A: Allocator> MessageParserState<'slice, A> {
     pub fn parse_until<F>(&mut self, condition: F) -> Result<(), Error>
     where
         F: FnMut(&Field<&'slice [u8]>) -> bool,
+        A: Clone,
     {
+        // parse_fields_internal handles requesting parent to continue parsing
+        // if the iterator is exhausted, so we just call it directly
         self.parse_fields_internal(condition)
     }
 }
 
 impl<'slice, A: Allocator + Clone> MessageParserState<'slice, A> {
-    /// Continue parsing and update all registered fields via the callback
-    /// Called by child when it needs all slices - works even if parent Message Body is dropped
-    ///
-    /// **Key Design**: Uses a single callback mechanism that is updated when Message Body is dropped:
-    /// - Initially: Callback captures Weak reference to Message Body and calls update_field
-    /// - After Drop: Callback is replaced with one that captures child Weak references and uses static match-case
-    ///
-    /// **Important**: When Message Body is dropped, the callback updates ALL registered child message fields.
-    /// This ensures that multiple scalar message child fields can all receive their slices when
-    /// any one of them calls this method.
-    pub fn continue_parsing_for_children(&mut self) -> Result<(), Error> {
-        // Parse all fields, updating all registered fields via the callback
-        // Use a constant function that always returns false to parse all fields
-        self.parse_fields_internal(|_| false)
-    }
-
     /// Ensure all fields are parsed
     ///
     /// This will request parent's parser state to continue parsing if needed (for child messages).
@@ -345,10 +370,10 @@ impl<'slice, A: Allocator + Clone> MessageParserState<'slice, A> {
         // Request parent's parser state to continue parsing if this is a child message
         // This works even if parent Message Body is dropped, because:
         // 1. Child holds strong Rc reference to parent's Parser State
-        // 2. continue_parsing_for_children doesn't require parent Message Body to be alive
+        // 2. parse_until doesn't require parent Message Body to be alive
         // 3. Callbacks (field_update_callback) already add slices to child messages via add_slice
         if let Some(ref parent_state) = self.parent_parser_state {
-            parent_state.borrow_mut().continue_parsing_for_children()?;
+            parent_state.borrow_mut().parse_until(|_| false)?;
         }
 
         // Parse all fields until iterator is exhausted
