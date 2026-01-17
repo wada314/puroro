@@ -267,35 +267,30 @@ impl<'slice, A: Allocator> MessageParserState<'slice, A> {
         F: FnMut(&Field<&'slice [u8]>) -> bool,
     {
         // Get mutable reference to iterator
-        let field_iter = match self.field_iter.as_mut() {
-            Some(iter) => iter,
-            None => return Ok(()), // Already parsed completely
+        let Some(field_iter) = self.field_iter.as_mut() else {
+            return Ok(()); // Already parsed completely
         };
 
         // Parse fields
-        loop {
-            match field_iter.next() {
-                Some(Ok(field)) => {
-                    // Check if condition is met
-                    let should_stop = condition(&field);
-                    if should_stop {
-                        // Condition met - stop parsing but keep iterator
-                        return Ok(());
-                    }
+        for result in field_iter {
+            let field = result?;
 
-                    // Update field via callback
-                    (self.field_update_callback)(field)?;
-                }
-                Some(Err(e)) => {
-                    return Err(e);
-                }
-                None => {
-                    // Iterator exhausted - mark it as None
-                    self.field_iter = None;
-                    return Ok(());
-                }
+            // Check if condition is met
+            let should_stop = condition(&field);
+
+            // Update field via callback
+            (self.field_update_callback)(field)?;
+
+            if should_stop {
+                // Condition met - stop parsing
+                // field_iter is a mutable reference, so the iterator state is preserved
+                return Ok(());
             }
         }
+
+        // Iterator exhausted - mark it as None
+        self.field_iter = None;
+        Ok(())
     }
 
     /// Parse fields until a certain condition is met.
