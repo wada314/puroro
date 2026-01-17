@@ -371,29 +371,23 @@ impl<'slice, A: Allocator + Clone + 'slice> AddressLazyImpl<'slice, A> {
     /// Update a field with parsed value
     fn update_field(&self, field: Field<&'slice [u8]>) -> Result<(), Error> {
         let field_num = field.field_number.as_u32();
-        match field_num {
-            1 => {
+        match (field_num, field.value) {
+            (1, FieldValue::Len(data)) => {
                 // street field - string
-                if let FieldValue::Len(data) = field.value {
-                    let street_value =
-                        String::from_utf8(data.to_vec()).map_err(|e| Error::InvalidUtf8(e))?;
-                    *self.street.borrow_mut() = street_value;
-                }
+                let street_value =
+                    String::from_utf8(data.to_vec()).map_err(|e| Error::InvalidUtf8(e))?;
+                *self.street.borrow_mut() = street_value;
             }
-            2 => {
+            (2, FieldValue::Len(data)) => {
                 // city field - string
-                if let FieldValue::Len(data) = field.value {
-                    let city_value =
-                        String::from_utf8(data.to_vec()).map_err(|e| Error::InvalidUtf8(e))?;
-                    *self.city.borrow_mut() = city_value;
-                }
+                let city_value =
+                    String::from_utf8(data.to_vec()).map_err(|e| Error::InvalidUtf8(e))?;
+                *self.city.borrow_mut() = city_value;
             }
-            3 => {
+            (3, FieldValue::Varint(varint)) => {
                 // zip_code field - varint
-                if let FieldValue::Varint(varint) = field.value {
-                    let zip_code_value = varint.try_to_int32()?;
-                    self.zip_code.set(zip_code_value);
-                }
+                let zip_code_value = varint.try_to_int32()?;
+                self.zip_code.set(zip_code_value);
             }
             _ => {
                 // Unknown field - ignore

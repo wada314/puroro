@@ -591,50 +591,42 @@ impl<'slice, A: Allocator + Clone + 'slice> PersonLazyImpl<'slice, A> {
     /// Called during parsing to update field values
     fn update_field(&self, field: Field<&'slice [u8]>) -> Result<(), Error> {
         let field_num = field.field_number.as_u32();
-        match field_num {
-            2 => {
+        match (field_num, field.value) {
+            (2, FieldValue::Varint(varint)) => {
                 // age field - varint
-                if let FieldValue::Varint(varint) = field.value {
-                    let age_value = varint.try_to_int32()?;
-                    self.age.set(age_value);
-                }
+                let age_value = varint.try_to_int32()?;
+                self.age.set(age_value);
             }
-            6 => {
+            (6, FieldValue::Len(data)) => {
                 // address field - scalar message field (length-delimited)
-                if let FieldValue::Len(data) = field.value {
-                    let mut address = self.address.borrow_mut();
-                    if let Some(ref addr) = *address {
-                        // Child already exists - add slice to it
-                        addr.add_slice(data)?;
-                    } else {
-                        // First occurrence - create child with first slice
-                        let allocator = self.parser_state.borrow().allocator().clone();
-                        let parent_parser_state = Some(self.parser_state.clone());
-                        let child = AddressLazyImpl::new(data, allocator, parent_parser_state);
-                        *address = Some(child);
-                    }
-                }
-            }
-            9 => {
-                // addresses field - repeated message field (length-delimited)
-                if let FieldValue::Len(data) = field.value {
-                    // For repeated message fields, each occurrence is a separate message
-                    // Create a new AddressLazyImpl for this occurrence
-                    let data_slice = data.as_ref();
+                let mut address = self.address.borrow_mut();
+                if let Some(ref addr) = *address {
+                    // Child already exists - add slice to it
+                    addr.add_slice(data)?;
+                } else {
+                    // First occurrence - create child with first slice
                     let allocator = self.parser_state.borrow().allocator().clone();
                     let parent_parser_state = Some(self.parser_state.clone());
-                    let child = AddressLazyImpl::new(data_slice, allocator, parent_parser_state);
-                    // Use OnceList's built-in interior mutability
-                    self.addresses.push(child); // push() takes &self
+                    let child = AddressLazyImpl::new(data, allocator, parent_parser_state);
+                    *address = Some(child);
                 }
             }
-            10 => {
+            (9, FieldValue::Len(data)) => {
+                // addresses field - repeated message field (length-delimited)
+                // For repeated message fields, each occurrence is a separate message
+                // Create a new AddressLazyImpl for this occurrence
+                let data_slice = data.as_ref();
+                let allocator = self.parser_state.borrow().allocator().clone();
+                let parent_parser_state = Some(self.parser_state.clone());
+                let child = AddressLazyImpl::new(data_slice, allocator, parent_parser_state);
+                // Use OnceList's built-in interior mutability
+                self.addresses.push(child); // push() takes &self
+            }
+            (10, FieldValue::Varint(varint)) => {
                 // scores field - repeated varint
-                if let FieldValue::Varint(varint) = field.value {
-                    // Use OnceList's built-in interior mutability
-                    let score_value = varint.try_to_int32()?;
-                    self.scores.push(score_value); // push() takes &self
-                }
+                // Use OnceList's built-in interior mutability
+                let score_value = varint.try_to_int32()?;
+                self.scores.push(score_value); // push() takes &self
             }
             // Other fields will be added in subsequent phases
             _ => {
