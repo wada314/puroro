@@ -11,6 +11,7 @@ use ::allocator_extras::{Allocator, Global};
 use ::once_list2::OnceList;
 use ::protobuf_core::{AsRefExtProtobuf, Field};
 use ::std::cell::Cell;
+use ::std::cell::OnceCell;
 use ::std::cell::RefCell;
 use ::std::rc::Rc;
 
@@ -28,12 +29,27 @@ use ::std::rc::Rc;
 /// We should refactor `FieldIterator` so that `next()` can automatically detect and include
 /// newly added slices from `field_slices`, eliminating the need for manual iterator recreation.
 /// This would simplify `get_next_field` and make the iterator more robust.
+///
+/// **Self-referential struct problem**: If we try to make `field_iter` directly reference `field_slices`,
+/// we get a self-referential struct which Rust's borrow checker doesn't allow. Potential solutions:
+/// 1. Use `Rc<OnceList<...>>` to share `field_slices` (adds reference counting overhead)
+/// 2. Store iterator state manually (slice index + field offset) instead of a boxed iterator
+/// 3. Keep current `Vec` approach but optimize recreation logic
+/// 4. Use `Pin` (complex, may require unstable APIs)
+///
+/// Solution: Using `Rc<OnceList<...>>` for `field_slices` and `OnceCell<Box<dyn Iterator<...>>>`
+/// for `field_iter` allows lazy initialization without self-referential struct issues.
+/// The iterator is created on first `next()` call, directly from `field_slices` without
+/// needing to collect to Vec first. This also allows automatic detection of newly added slices
+/// (though iterator recreation would still be needed after new slices are added).
 pub struct FieldIterator<'slice, A: Allocator = Global> {
-    /// Field slices container
-    field_slices: OnceList<&'slice [u8], A>,
+    /// Field slices container (wrapped in Rc to allow sharing)
+    field_slices: Rc<OnceList<&'slice [u8], A>>,
+    /// Allocator for lazy iterator initialization
+    allocator: A,
     /// Flattened iterator over protobuf fields from all slices
-    /// The slices it references live for 'slice
-    field_iter: Box<dyn Iterator<Item = Result<Field<&'slice [u8]>, Error>> + 'slice, A>,
+    /// Lazily initialized from field_slices to avoid Vec collection
+    field_iter: OnceCell<Box<dyn Iterator<Item = Result<Field<&'slice [u8]>, Error>> + 'slice, A>>,
 }
 
 impl<'slice, A: Allocator> FieldIterator<'slice, A>
@@ -46,19 +62,12 @@ where
     where
         A: Allocator + Clone,
     {
-        let field_slices = OnceList::new_in(alloc.clone());
+        let field_slices = Rc::new(OnceList::new_in(alloc.clone()));
         field_slices.push(initial_slice);
-        // Create field iterator from the initial slice
-        // This will be updated later to recreate from field_slices
-        let field_iter = initial_slice
-            .read_protobuf_fields()
-            .map(|result| result.map_err(|e| Error::from(e)));
-        let boxed = Box::new_in(field_iter, alloc.clone());
-        let field_iter: Box<dyn Iterator<Item = Result<Field<&'slice [u8]>, Error>> + 'slice, A> =
-            ::allocator_api2::unsize_box!(boxed);
         Self {
             field_slices,
-            field_iter,
+            allocator: alloc,
+            field_iter: OnceCell::new(),
         }
     }
 
@@ -69,32 +78,16 @@ where
         I: Iterator<Item = &'slice [u8]>,
         A: Allocator + Clone,
     {
-        let field_slices = OnceList::new_in(alloc.clone());
+        let field_slices = Rc::new(OnceList::new_in(alloc.clone()));
         // Collect slices into OnceList first
         for slice in slice_iter {
             field_slices.push(slice);
         }
 
-        // Create field iterator from all slices using flat_map
-        // We need to collect slices into a Vec to avoid lifetime issues
-        // Note: This is a temporary solution - ideally we'd iterate directly from OnceList
-        let slices_vec: Vec<&'slice [u8]> = field_slices.iter().copied().collect();
-        let field_iter: Box<dyn Iterator<Item = Result<Field<&'slice [u8]>, Error>> + 'slice, A> =
-            if slices_vec.is_empty() {
-                let boxed = Box::new_in(std::iter::empty(), alloc.clone());
-                ::allocator_api2::unsize_box!(boxed)
-            } else {
-                let iter = slices_vec.into_iter().flat_map(|slice| {
-                    slice
-                        .read_protobuf_fields()
-                        .map(|result| result.map_err(|e| Error::from(e)))
-                });
-                let boxed = Box::new_in(iter, alloc.clone());
-                ::allocator_api2::unsize_box!(boxed)
-            };
         Self {
             field_slices,
-            field_iter,
+            allocator: alloc,
+            field_iter: OnceCell::new(),
         }
     }
 
@@ -120,11 +113,39 @@ where
     }
 }
 
-impl<'slice, A: Allocator> Iterator for FieldIterator<'slice, A> {
+impl<'slice, A: Allocator> Iterator for FieldIterator<'slice, A>
+where
+    A: Allocator + Clone,
+{
     type Item = Result<Field<&'slice [u8]>, Error>;
 
     fn next(&mut self) -> Option<Self::Item> {
-        self.field_iter.next()
+        // Lazily initialize iterator on first access if not already initialized
+        // Even with Rc and OnceCell, we still need to collect to Vec to own the slices
+        // and satisfy the 'slice lifetime requirement for the iterator
+        if self.field_iter.get().is_none() {
+            // Collect slices to Vec to transfer ownership and satisfy lifetime requirements
+            let slices_vec: Vec<&'slice [u8]> = self.field_slices.iter().copied().collect();
+            let alloc_clone = self.allocator.clone();
+            let iter = slices_vec.into_iter().flat_map(|slice| {
+                slice
+                    .read_protobuf_fields()
+                    .map(|result| result.map_err(|e| Error::from(e)))
+            });
+            let boxed = Box::new_in(iter, alloc_clone.clone());
+            let field_iter: Box<
+                dyn Iterator<Item = Result<Field<&'slice [u8]>, Error>> + 'slice,
+                A,
+            > = ::allocator_api2::unsize_box!(boxed);
+            // Initialize OnceCell - this only works once
+            let _ = self.field_iter.set(field_iter);
+        }
+
+        // get_mut() gives us &mut Box<...>, then as_mut() gives us &mut dyn Iterator
+        self.field_iter
+            .get_mut()
+            .map(|iter_box| iter_box.as_mut().next())
+            .flatten()
     }
 }
 
