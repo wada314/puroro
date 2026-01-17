@@ -108,13 +108,7 @@ impl<'slice, A: Allocator> Iterator for FieldIterator<'slice, A> {
     type Item = Result<Field<&'slice [u8]>, Error>;
 
     fn next(&mut self) -> Option<Self::Item> {
-        loop {
-            // Get mutable reference to the first iterator directly
-            let first_iter_mut = match self.field_iterators.first_mut() {
-                Some(iter) => iter,
-                None => return None, // No iterators left
-            };
-
+        while let Some(first_iter_mut) = self.field_iterators.first_mut() {
             // Try to get next item from the first iterator
             // Convert error type at this point (ProtobufError -> Error)
             if let Some(item) = first_iter_mut.next() {
@@ -125,6 +119,7 @@ impl<'slice, A: Allocator> Iterator for FieldIterator<'slice, A> {
             self.field_iterators.remove(|_| true);
             // Continue loop to try next iterator (if any)
         }
+        None
     }
 }
 
