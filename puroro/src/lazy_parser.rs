@@ -11,7 +11,6 @@ use ::allocator_extras::{Allocator, Global};
 use ::once_list2::OnceList;
 use ::protobuf_core::{AsRefExtProtobuf, Field};
 use ::std::cell::Cell;
-use ::std::cell::OnceCell;
 use ::std::cell::RefCell;
 use ::std::rc::Rc;
 
@@ -37,19 +36,18 @@ use ::std::rc::Rc;
 /// 3. Keep current `Vec` approach but optimize recreation logic
 /// 4. Use `Pin` (complex, may require unstable APIs)
 ///
-/// Solution: Using `Rc<OnceList<...>>` for `field_slices` and `OnceCell<Box<dyn Iterator<...>>>`
-/// for `field_iter` allows lazy initialization without self-referential struct issues.
-/// The iterator is created on first `next()` call, directly from `field_slices` without
-/// needing to collect to Vec first. This also allows automatic detection of newly added slices
-/// (though iterator recreation would still be needed after new slices are added).
+/// Iterator over protobuf fields from multiple slices.
+///
+/// Instead of storing slices and creating an iterator from them, we store a list of iterators,
+/// one per slice. When a slice is added via `add_slice()`, a new iterator is created and appended
+/// to the list. When `next()` is called, we get the first iterator and try to get an item from it.
+/// If the iterator is exhausted, we remove it and try the next one. This allows automatic
+/// detection of newly added slices without iterator recreation.
 pub struct FieldIterator<'slice, A: Allocator = Global> {
-    /// Field slices container (wrapped in Rc to allow sharing)
-    field_slices: Rc<OnceList<&'slice [u8], A>>,
-    /// Allocator for lazy iterator initialization
-    allocator: A,
-    /// Flattened iterator over protobuf fields from all slices
-    /// Lazily initialized from field_slices to avoid Vec collection
-    field_iter: OnceCell<Box<dyn Iterator<Item = Result<Field<&'slice [u8]>, Error>> + 'slice, A>>,
+    /// List of field iterators, one per slice
+    /// Each iterator is generated from its corresponding slice
+    field_iterators:
+        OnceList<Box<dyn Iterator<Item = Result<Field<&'slice [u8]>, Error>> + 'slice, A>, A>,
 }
 
 impl<'slice, A: Allocator> FieldIterator<'slice, A>
@@ -57,92 +55,90 @@ where
     A: Allocator + Clone,
 {
     /// Create a new FieldIterator from an initial slice
-    /// The slice is stored in OnceList and used to create the field iterator
+    /// Creates an iterator from the slice and stores it in the list
     pub fn new(initial_slice: &'slice [u8], alloc: A) -> Self
     where
         A: Allocator + Clone,
     {
-        let field_slices = Rc::new(OnceList::new_in(alloc.clone()));
-        field_slices.push(initial_slice);
-        Self {
-            field_slices,
-            allocator: alloc,
-            field_iter: OnceCell::new(),
-        }
+        let field_iterators = OnceList::new_in(alloc.clone());
+        // Create iterator from the initial slice
+        let iter = initial_slice
+            .read_protobuf_fields()
+            .map(|result| result.map_err(|e| Error::from(e)));
+        let boxed = Box::new_in(iter, alloc.clone());
+        let field_iter: Box<dyn Iterator<Item = Result<Field<&'slice [u8]>, Error>> + 'slice, A> =
+            ::allocator_api2::unsize_box!(boxed);
+        field_iterators.push(field_iter);
+        Self { field_iterators }
     }
 
     /// Create a new FieldIterator from an iterator of slices
-    /// All slices are stored in OnceList and used to create the field iterator
+    /// Creates an iterator from each slice and stores them in the list
     pub fn from_slices<I>(slice_iter: I, alloc: A) -> Self
     where
         I: Iterator<Item = &'slice [u8]>,
         A: Allocator + Clone,
     {
-        let field_slices = Rc::new(OnceList::new_in(alloc.clone()));
-        // Collect slices into OnceList first
+        let field_iterators = OnceList::new_in(alloc.clone());
         for slice in slice_iter {
-            field_slices.push(slice);
-        }
-
-        Self {
-            field_slices,
-            allocator: alloc,
-            field_iter: OnceCell::new(),
-        }
-    }
-
-    /// Add a slice to the field slices container
-    pub fn add_slice(&self, slice: &'slice [u8])
-    where
-        A: Allocator + Clone,
-    {
-        self.field_slices.push(slice);
-    }
-
-    /// Get an iterator over the field slices
-    /// This is used to recreate the field iterator after adding new slices
-    pub fn field_slices_iter(&self) -> impl Iterator<Item = &'slice [u8]> {
-        self.field_slices.iter().copied()
-    }
-
-    /// Get the number of slices in the field slices container.
-    ///
-    /// This can be used to detect if new slices have been added during parent parsing.
-    pub fn field_slices_count(&self) -> usize {
-        self.field_slices.iter().count()
-    }
-}
-
-impl<'slice, A: Allocator> Iterator for FieldIterator<'slice, A>
-where
-    A: Allocator + Clone,
-{
-    type Item = Result<Field<&'slice [u8]>, Error>;
-
-    fn next(&mut self) -> Option<Self::Item> {
-        // Lazily initialize iterator on first access using get_or_init
-        // Attempting without Vec - this may cause compile errors
-        let alloc_clone = self.allocator.clone();
-        // Clone Rc in closure to capture ownership
-        let field_slices_clone = self.field_slices.clone();
-        let field_iter = self.field_iter.get_or_init(move || {
-            // Try to directly iterate without Vec
-            let iter = field_slices_clone.iter().copied().flat_map(|slice| {
-                slice
-                    .read_protobuf_fields()
-                    .map(|result| result.map_err(|e| Error::from(e)))
-            });
-            let boxed = Box::new_in(iter, alloc_clone);
+            let iter = slice
+                .read_protobuf_fields()
+                .map(|result| result.map_err(|e| Error::from(e)));
+            let boxed = Box::new_in(iter, alloc.clone());
             let field_iter: Box<
                 dyn Iterator<Item = Result<Field<&'slice [u8]>, Error>> + 'slice,
                 A,
             > = ::allocator_api2::unsize_box!(boxed);
-            field_iter
-        });
+            field_iterators.push(field_iter);
+        }
 
-        // get_or_init returns &Box<...>, we need &mut for next()
-        // This will cause compile error - get_or_init returns &T, not &mut T
-        field_iter.as_mut().next()
+        Self { field_iterators }
+    }
+
+    /// Add a slice to the field iterators list
+    /// Creates a new iterator from the slice and appends it to the list
+    pub fn add_slice(&self, slice: &'slice [u8], alloc: A)
+    where
+        A: Allocator + Clone,
+    {
+        let iter = slice
+            .read_protobuf_fields()
+            .map(|result| result.map_err(|e| Error::from(e)));
+        let boxed = Box::new_in(iter, alloc);
+        let field_iter: Box<dyn Iterator<Item = Result<Field<&'slice [u8]>, Error>> + 'slice, A> =
+            ::allocator_api2::unsize_box!(boxed);
+        self.field_iterators.push(field_iter);
+    }
+
+    /// Get the number of iterators in the list.
+    ///
+    /// This can be used to detect if new slices have been added during parent parsing.
+    pub fn field_slices_count(&self) -> usize {
+        self.field_iterators.len()
+    }
+}
+
+impl<'slice, A: Allocator> Iterator for FieldIterator<'slice, A> {
+    type Item = Result<Field<&'slice [u8]>, Error>;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        loop {
+            // Get mutable reference to the first iterator directly
+            let first_iter_mut = match self.field_iterators.first_mut() {
+                Some(iter) => iter,
+                None => return None, // No iterators left
+            };
+
+            // Try to get next item from the first iterator
+            // Box implements Iterator, so we can call next() directly
+            if let Some(item) = first_iter_mut.next() {
+                return Some(item);
+            }
+
+            // First iterator is exhausted, remove it
+            self.field_iterators.remove(|_| true);
+            // Continue loop to try next iterator (if any)
+        }
     }
 }
 
@@ -266,11 +262,9 @@ impl<'slice, A: Allocator> MessageParserState<'slice, A> {
             return Err(Error::MessageTerminated);
         }
 
-        // Add the slice to the iterator and recreate from all slices
-        // This allows continuing parsing when more input arrives from the parent message
-        self.field_iter.add_slice(slice);
-        let slices_iter = self.field_iter.field_slices_iter();
-        self.field_iter = FieldIterator::from_slices(slices_iter, self.allocator.clone());
+        // Add the slice to the iterator
+        // The new approach automatically detects new slices without recreation
+        self.field_iter.add_slice(slice, self.allocator.clone());
 
         Ok(())
     }
@@ -328,17 +322,8 @@ impl<'slice, A: Allocator> MessageParserState<'slice, A> {
             slices_count_after > slices_count_before
         })?;
 
-        // After parent parsing, check if field_iter has new slices
-        // TODO: See FieldIterator struct documentation - we need to manually recreate the iterator
-        // when new slices are added because the current implementation doesn't automatically detect
-        // changes to field_slices. Once FieldIterator is refactored to detect new slices automatically,
-        // this manual recreation can be removed.
-        let slices_count_after = self.field_iter.field_slices_count();
-        if slices_count_after > slices_count_before {
-            // New slices were added - recreate the iterator to include them
-            let slices_iter = self.field_iter.field_slices_iter();
-            self.field_iter = FieldIterator::from_slices(slices_iter, self.allocator.clone());
-        }
+        // After parent parsing, new iterators should have been added automatically
+        // The iterator will automatically see new items via first_mut() without recreation
 
         // Try again to get the next field from field_iter
         match self.field_iter.next() {
