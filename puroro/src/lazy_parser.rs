@@ -253,6 +253,56 @@ impl<'slice, A: Allocator> MessageParserState<'slice, A> {
             ::allocator_api2::unsize_box!(boxed);
         self.field_update_callback = new_callback;
     }
+
+    /// Parse fields until a certain condition is met.
+    ///
+    /// This function reads fields from the input slice until the condition closure returns `true`.
+    /// The condition closure receives the current field and should return `true` when parsing should stop.
+    ///
+    /// # Arguments
+    /// * `condition` - A closure that takes a field and returns `true` when parsing should stop
+    ///
+    /// # Returns
+    /// * `Ok(())` - Parsing completed (either condition was met or iterator exhausted)
+    /// * `Err(Error)` - An error occurred during parsing
+    pub fn parse_until<F>(&mut self, mut condition: F) -> Result<(), Error>
+    where
+        F: FnMut(Field<&'slice [u8]>) -> bool,
+    {
+        // If iterator is None (already exhausted), we're done
+        let mut field_iter = match self.field_iter.take() {
+            Some(iter) => iter,
+            None => return Ok(()), // Already parsed completely
+        };
+
+        // Parse until condition is met
+        loop {
+            match field_iter.next() {
+                Some(Ok(field)) => {
+                    // Check if condition is met (clone field for condition check)
+                    let should_stop = condition(field.clone());
+                    if should_stop {
+                        // Store iterator back (not exhausted, condition was met)
+                        self.field_iter = Some(field_iter);
+                        return Ok(());
+                    }
+
+                    // Update field via callback
+                    (self.field_update_callback)(field)?;
+                }
+                Some(Err(e)) => {
+                    // Store iterator back before returning error
+                    self.field_iter = Some(field_iter);
+                    return Err(e);
+                }
+                None => {
+                    // Iterator exhausted - store None to indicate parsing is complete
+                    self.field_iter = None;
+                    return Ok(());
+                }
+            }
+        }
+    }
 }
 
 impl<'slice, A: Allocator + Clone> MessageParserState<'slice, A> {
