@@ -513,7 +513,7 @@ impl<'slice, A: Allocator + Clone + 'slice> PersonLazyImpl<'slice, A> {
                 // Update via Message Body (should always succeed when this callback is active)
                 if let Some(message_body) = message_body_weak.upgrade() {
                     // Rc implements Deref, so we can call update_field directly
-                    let _ = message_body.update_field(field);
+                    message_body.update_field(field)?;
                 }
                 Ok(())
             };
