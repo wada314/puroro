@@ -507,8 +507,8 @@ impl<'slice, A: Allocator + Clone + 'slice> PersonLazyImpl<'slice, A> {
         Rc::new_cyclic(move |weak: &Weak<Self>| {
             let message_body_weak = weak.clone();
 
-            // Create initial callback that only handles Message Body (when it's alive)
-            // This callback will be replaced in Drop::drop with one that handles child messages
+            // Create initial callback that handles all fields
+            // This callback will be replaced in Drop::drop with one that only handles child messages
             let closure = move |field: Field<&'slice [u8]>| -> Result<(), Error> {
                 // Update via Message Body (should always succeed when this callback is active)
                 if let Some(message_body) = message_body_weak.upgrade() {
