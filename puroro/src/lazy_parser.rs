@@ -12,6 +12,7 @@ use ::once_list2::OnceList;
 use ::protobuf_core::{AsRefExtProtobuf, Field, ProtobufFieldSliceIterator};
 use ::std::cell::Cell;
 use ::std::cell::RefCell;
+use ::std::iter::Peekable;
 use ::std::rc::Rc;
 
 /// Iterator over protobuf fields in slices.
@@ -46,9 +47,9 @@ use ::std::rc::Rc;
 pub struct FieldIterator<'slice, A: Allocator = Global> {
     /// List of field iterators, one per slice
     /// Each iterator is generated from its corresponding slice
-    /// Using ProtobufFieldSliceIterator directly without Box - all slices return the same iterator type
+    /// Using Peekable to allow checking if iterator has next item without consuming it
     /// ProtobufFieldSliceIterator already returns Field<&'slice [u8]>
-    field_iterators: OnceList<ProtobufFieldSliceIterator<'slice>, A>,
+    field_iterators: OnceList<Peekable<ProtobufFieldSliceIterator<'slice>>, A>,
 }
 
 impl<'slice, A: Allocator> FieldIterator<'slice, A>
@@ -62,8 +63,8 @@ where
         A: Allocator + Clone,
     {
         let field_iterators = OnceList::new_in(alloc.clone());
-        // Create iterator from the initial slice - no map or Box needed
-        let iter = initial_slice.read_protobuf_fields();
+        // Create peekable iterator from the initial slice
+        let iter = initial_slice.read_protobuf_fields().peekable();
         field_iterators.push(iter);
         Self { field_iterators }
     }
@@ -77,8 +78,8 @@ where
     {
         let field_iterators = OnceList::new_in(alloc.clone());
         for slice in slice_iter {
-            // Create iterator from slice - no map or Box needed
-            let iter = slice.read_protobuf_fields();
+            // Create peekable iterator from slice
+            let iter = slice.read_protobuf_fields().peekable();
             field_iterators.push(iter);
         }
 
@@ -91,9 +92,26 @@ where
     where
         A: Allocator + Clone,
     {
-        // Create iterator from slice - no map or Box needed
-        let iter = slice.read_protobuf_fields();
+        // Create peekable iterator from slice
+        let iter = slice.read_protobuf_fields().peekable();
         self.field_iterators.push(iter);
+    }
+
+    /// Check if there is at least one more field available
+    ///
+    /// Returns `true` if:
+    /// - `field_iterators` is not empty, AND
+    /// - At least one of the iterators in `field_iterators` has a next item
+    ///
+    /// This method does not consume any items from the iterators.
+    pub fn has_next(&mut self) -> bool {
+        // Iterate mutably over all iterators and check if any has a next item
+        for iter in self.field_iterators.iter_mut() {
+            if iter.peek().is_some() {
+                return true;
+            }
+        }
+        false
     }
 
     /// Get the number of iterators in the list.
