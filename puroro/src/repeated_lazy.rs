@@ -61,15 +61,13 @@ where
 
         // Parse until we have enough elements for this field
         // The condition checks if we've reached the target count
-        {
-            let mut state = self.parent_parser_state.borrow_mut();
-            let _ = state.parse_until(|_field| {
-                // Stop when we have enough elements for this field
-                // Note: This checks after each field is processed via the callback
-                // The field parameter is unused but required by the closure signature
-                self.list.iter().count() >= needed
-            });
-        }
+        let mut state = self.parent_parser_state.borrow_mut();
+        state.parse_until(|_field| {
+            // Stop when we have enough elements for this field
+            // Note: This checks after each field is processed via the callback
+            // The field parameter is unused but required by the closure signature
+            self.list.iter().count() >= needed
+        })?;
 
         Ok(())
     }
