@@ -254,6 +254,61 @@ impl<'slice, A: Allocator> MessageParserState<'slice, A> {
         self.field_update_callback = new_callback;
     }
 
+    /// Internal method for parsing fields with configurable behavior.
+    ///
+    /// This is the common implementation used by `parse_until`, `continue_parsing_for_children`,
+    /// and `ensure_all_fields_parsed`.
+    ///
+    /// # Parameters
+    /// * `condition` - Optional closure that takes a field and returns `true` when parsing should stop.
+    ///   If `None`, parsing continues until iterator is exhausted.
+    /// * `ignore_callback_errors` - If `true`, errors from the callback are ignored (for `continue_parsing_for_children`).
+    fn parse_fields_internal<F>(
+        &mut self,
+        mut condition: Option<F>,
+        ignore_callback_errors: bool,
+    ) -> Result<(), Error>
+    where
+        F: FnMut(Field<&'slice [u8]>) -> bool,
+    {
+        // Get mutable reference to iterator
+        let field_iter = match self.field_iter.as_mut() {
+            Some(iter) => iter,
+            None => return Ok(()), // Already parsed completely
+        };
+
+        // Parse fields
+        loop {
+            match field_iter.next() {
+                Some(Ok(field)) => {
+                    // Check if condition is met
+                    if let Some(ref mut cond) = condition {
+                        let should_stop = cond(field.clone());
+                        if should_stop {
+                            // Condition met - stop parsing but keep iterator
+                            return Ok(());
+                        }
+                    }
+
+                    // Update field via callback
+                    if ignore_callback_errors {
+                        let _ = (self.field_update_callback)(field);
+                    } else {
+                        (self.field_update_callback)(field)?;
+                    }
+                }
+                Some(Err(e)) => {
+                    return Err(e);
+                }
+                None => {
+                    // Iterator exhausted - mark it as None
+                    self.field_iter = None;
+                    return Ok(());
+                }
+            }
+        }
+    }
+
     /// Parse fields until a certain condition is met.
     ///
     /// This function reads fields from the input slice until the condition closure returns `true`.
@@ -265,43 +320,11 @@ impl<'slice, A: Allocator> MessageParserState<'slice, A> {
     /// # Returns
     /// * `Ok(())` - Parsing completed (either condition was met or iterator exhausted)
     /// * `Err(Error)` - An error occurred during parsing
-    pub fn parse_until<F>(&mut self, mut condition: F) -> Result<(), Error>
+    pub fn parse_until<F>(&mut self, condition: F) -> Result<(), Error>
     where
         F: FnMut(Field<&'slice [u8]>) -> bool,
     {
-        // If iterator is None (already exhausted), we're done
-        let mut field_iter = match self.field_iter.take() {
-            Some(iter) => iter,
-            None => return Ok(()), // Already parsed completely
-        };
-
-        // Parse until condition is met
-        loop {
-            match field_iter.next() {
-                Some(Ok(field)) => {
-                    // Check if condition is met (clone field for condition check)
-                    let should_stop = condition(field.clone());
-                    if should_stop {
-                        // Store iterator back (not exhausted, condition was met)
-                        self.field_iter = Some(field_iter);
-                        return Ok(());
-                    }
-
-                    // Update field via callback
-                    (self.field_update_callback)(field)?;
-                }
-                Some(Err(e)) => {
-                    // Store iterator back before returning error
-                    self.field_iter = Some(field_iter);
-                    return Err(e);
-                }
-                None => {
-                    // Iterator exhausted - store None to indicate parsing is complete
-                    self.field_iter = None;
-                    return Ok(());
-                }
-            }
-        }
+        self.parse_fields_internal(Some(condition), false)
     }
 }
 
@@ -317,28 +340,8 @@ impl<'slice, A: Allocator + Clone> MessageParserState<'slice, A> {
     /// This ensures that multiple scalar message child fields can all receive their slices when
     /// any one of them calls this method.
     pub fn continue_parsing_for_children(&mut self) -> Result<(), Error> {
-        // Parse using the existing field iterator
-        // If field_iter is None (already exhausted), we're done
-        if let Some(ref mut field_iter) = self.field_iter {
-            loop {
-                match field_iter.next() {
-                    Some(Ok(field)) => {
-                        // Update field via callback (handles both Message Body and child messages)
-                        let _ = (self.field_update_callback)(field);
-                        // Ignore errors - Message Body or child might be dropped
-                    }
-                    Some(Err(e)) => {
-                        return Err(e);
-                    }
-                    None => {
-                        // Iterator exhausted, mark it as None
-                        self.field_iter = None;
-                        return Ok(());
-                    }
-                }
-            }
-        }
-        Ok(())
+        // Parse all fields, ignoring callback errors (Message Body or child might be dropped)
+        self.parse_fields_internal(None::<fn(Field<&'slice [u8]>) -> bool>, true)
     }
 
     /// Ensure all fields are parsed
@@ -366,27 +369,8 @@ impl<'slice, A: Allocator + Clone> MessageParserState<'slice, A> {
             parent_state.borrow_mut().continue_parsing_for_children()?;
         }
 
-        // Parse using the existing field iterator
-        // If field_iter is None (already exhausted or never created), we're done
-        // Otherwise, we'll parse until exhausted
-        if let Some(ref mut field_iter) = self.field_iter {
-            loop {
-                match field_iter.next() {
-                    Some(Ok(field)) => {
-                        // Update field via callback
-                        (self.field_update_callback)(field)?;
-                    }
-                    Some(Err(e)) => {
-                        return Err(e);
-                    }
-                    None => {
-                        // Iterator exhausted, mark it as None
-                        self.field_iter = None;
-                        break;
-                    }
-                }
-            }
-        }
+        // Parse all fields until iterator is exhausted
+        self.parse_fields_internal(None::<fn(Field<&'slice [u8]>) -> bool>, false)?;
 
         // Mark message as terminated after parsing all fields
         // This prevents adding new slices which would cause inconsistent behavior
