@@ -97,21 +97,15 @@ where
         self.field_iterators.push(iter);
     }
 
-    /// Check if there is at least one more field available
+    /// Check if there is at least one more slice (iterator) available
     ///
-    /// Returns `true` if:
-    /// - `field_iterators` is not empty, AND
-    /// - At least one of the iterators in `field_iterators` has a next item
+    /// Returns `true` if `field_iterators` is not empty.
+    /// This returns `true` even if the slice is empty (iterator has no items).
+    /// To check if there are actually items, use the iterator's `next()` method.
     ///
-    /// This method does not consume any items from the iterators.
-    pub fn has_next(&mut self) -> bool {
-        // Iterate mutably over all iterators and check if any has a next item
-        for iter in self.field_iterators.iter_mut() {
-            if iter.peek().is_some() {
-                return true;
-            }
-        }
-        false
+    /// This method does not require mutation and does not consume any items.
+    pub fn has_next_slice(&self) -> bool {
+        !self.field_iterators.is_empty()
     }
 
     /// Get the number of iterators in the list.
