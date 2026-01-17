@@ -277,50 +277,48 @@ impl<'slice, A: Allocator> MessageParserState<'slice, A> {
         A: Clone,
     {
         // Step 1: Try to get the next field from field_iter
+        if let Some(result) = self.field_iter.next() {
+            return Ok(Some(result?));
+        }
+
+        // field_iter is exhausted - try to get more from parent
+        let Some(ref parent_state) = self.parent_parser_state else {
+            // No parent - iterator is truly exhausted
+            // Mark as terminated since no more input will be available
+            self.terminated.set(true);
+            return Ok(None);
+        };
+
+        // Remember the number of slices before requesting parent to parse
+        let slices_count_before = self.field_iter.field_slices_count();
+
+        // Request parent to continue parsing, which may add more slices to this state
+        // Stop when field_iter gets new slices (indicated by slice count increase)
+        parent_state.borrow_mut().parse_until(|_field| {
+            // Check if new slices were added to our field_iter
+            // We can access self.field_iter.field_slices_count() here because
+            // parent_state.borrow_mut() doesn't conflict with self.field_iter
+            let slices_count_after = self.field_iter.field_slices_count();
+            slices_count_after > slices_count_before
+        })?;
+
+        // After parent parsing, check if field_iter has new slices
+        let slices_count_after = self.field_iter.field_slices_count();
+        if slices_count_after > slices_count_before {
+            // New slices were added - recreate the iterator to include them
+            let slices_iter = self.field_iter.field_slices_iter();
+            self.field_iter = FieldIterator::from_slices(slices_iter, self.allocator.clone());
+        }
+
+        // Try again to get the next field from field_iter
         match self.field_iter.next() {
             Some(result) => Ok(Some(result?)),
             None => {
-                // field_iter is exhausted - try to get more from parent
-                if let Some(ref parent_state) = self.parent_parser_state {
-                    // Remember the number of slices before requesting parent to parse
-                    let slices_count_before = self.field_iter.field_slices_count();
-
-                    // Request parent to continue parsing, which may add more slices to this state
-                    // Stop when field_iter gets new slices (indicated by slice count increase)
-                    parent_state.borrow_mut().parse_until(|_field| {
-                        // Check if new slices were added to our field_iter
-                        // We can access self.field_iter.field_slices_count() here because
-                        // parent_state.borrow_mut() doesn't conflict with self.field_iter
-                        let slices_count_after = self.field_iter.field_slices_count();
-                        slices_count_after > slices_count_before
-                    })?;
-
-                    // After parent parsing, check if field_iter has new slices
-                    let slices_count_after = self.field_iter.field_slices_count();
-                    if slices_count_after > slices_count_before {
-                        // New slices were added - recreate the iterator to include them
-                        let slices_iter = self.field_iter.field_slices_iter();
-                        self.field_iter =
-                            FieldIterator::from_slices(slices_iter, self.allocator.clone());
-                    }
-
-                    // Try again to get the next field from field_iter
-                    match self.field_iter.next() {
-                        Some(result) => Ok(Some(result?)),
-                        None => {
-                            // Iterator is still exhausted - parent didn't add new slices
-                            // This means parent's iterator is also exhausted
-                            // Mark as terminated since no more input will be available
-                            self.terminated.set(true);
-                            Ok(None)
-                        }
-                    }
-                } else {
-                    // No parent - iterator is truly exhausted
-                    // Mark as terminated since no more input will be available
-                    self.terminated.set(true);
-                    Ok(None)
-                }
+                // Iterator is still exhausted - parent didn't add new slices
+                // This means parent's iterator is also exhausted
+                // Mark as terminated since no more input will be available
+                self.terminated.set(true);
+                Ok(None)
             }
         }
     }
