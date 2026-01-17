@@ -107,13 +107,6 @@ where
     pub fn has_next_slice(&self) -> bool {
         !self.field_iterators.is_empty()
     }
-
-    /// Get the number of iterators in the list.
-    ///
-    /// This can be used to detect if new slices have been added during parent parsing.
-    pub fn field_slices_count(&self) -> usize {
-        self.field_iterators.len()
-    }
 }
 
 impl<'slice, A: Allocator> Iterator for FieldIterator<'slice, A> {
@@ -277,9 +270,9 @@ impl<'slice, A: Allocator> MessageParserState<'slice, A> {
     /// Get the next field from the iterator, requesting parent to parse if needed.
     ///
     /// This method tries to get the next field from `field_iter`. If the iterator is exhausted,
-    /// it requests the parent parser state (if it exists) to continue parsing, which may add
-    /// more slices to this state's `field_iter`. The method stops parent parsing when new slices
-    /// are added to `field_iter` (detected by slice count increase).
+    /// it checks if there are more slices available (via `has_next_slice()`) or requests the parent
+    /// parser state (if it exists) to continue parsing, which may add more slices to this state's
+    /// `field_iter`. The method stops parent parsing when new slices are added to `field_iter`.
     ///
     /// Returns:
     /// - `Ok(Some(field))` - A field was successfully retrieved
@@ -294,7 +287,12 @@ impl<'slice, A: Allocator> MessageParserState<'slice, A> {
             return Ok(Some(result?));
         }
 
-        // field_iter is exhausted - try to get more from parent
+        // field_iter is exhausted - check if we have more slices available from parent
+        //
+        // Note: When field_iter is exhausted (next() returns None), has_next_slice() is guaranteed
+        // to be false. So we can simply check if has_next_slice() becomes true to detect new slices.
+
+        // Check if parent exists and can provide more slices
         let Some(ref parent_state) = self.parent_parser_state else {
             // No parent - iterator is truly exhausted
             // Mark as terminated since no more input will be available
@@ -302,17 +300,12 @@ impl<'slice, A: Allocator> MessageParserState<'slice, A> {
             return Ok(None);
         };
 
-        // Remember the number of slices before requesting parent to parse
-        let slices_count_before = self.field_iter.field_slices_count();
-
         // Request parent to continue parsing, which may add more slices to this state
-        // Stop when field_iter gets new slices (indicated by slice count increase)
+        // Stop when field_iter gets new slices (has_next_slice() becomes true)
         parent_state.borrow_mut().parse_until(|_field| {
             // Check if new slices were added to our field_iter
-            // We can access self.field_iter.field_slices_count() here because
-            // parent_state.borrow_mut() doesn't conflict with self.field_iter
-            let slices_count_after = self.field_iter.field_slices_count();
-            slices_count_after > slices_count_before
+            // Since has_next_slice() is false when exhausted, becoming true means new slices added
+            self.field_iter.has_next_slice()
         })?;
 
         // After parent parsing, new iterators should have been added automatically
@@ -322,10 +315,13 @@ impl<'slice, A: Allocator> MessageParserState<'slice, A> {
         match self.field_iter.next() {
             Some(result) => Ok(Some(result?)),
             None => {
-                // Iterator is still exhausted - parent didn't add new slices
-                // This means parent's iterator is also exhausted
-                // Mark as terminated since no more input will be available
-                self.terminated.set(true);
+                // Iterator is still exhausted - check if parent can still provide slices
+                // by checking if we have any slices available
+                if !self.field_iter.has_next_slice() {
+                    // No slices available - parent's iterator is also exhausted
+                    // Mark as terminated since no more input will be available
+                    self.terminated.set(true);
+                }
                 Ok(None)
             }
         }
