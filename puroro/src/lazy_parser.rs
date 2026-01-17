@@ -46,16 +46,10 @@ use ::std::rc::Rc;
 pub struct FieldIterator<'slice, A: Allocator = Global> {
     /// List of field iterators, one per slice
     /// Each iterator is generated from its corresponding slice
-    /// Storing raw iterators from read_protobuf_fields() without error conversion
-    /// Error conversion happens in next() to avoid Box if possible
-    /// However, we still need Box because OnceList needs a uniform type
-    field_iterators: OnceList<
-        Box<
-            dyn Iterator<Item = Result<Field<&'slice [u8]>, protobuf_core::ProtobufError>> + 'slice,
-            A,
-        >,
-        A,
-    >,
+    /// read_protobuf_fields() returns ProtobufFieldSliceIterator with Item = Result<Field<Vec<u8>>, ...>
+    /// We convert Field<Vec<u8>> to Field<&'slice [u8]> and error type at iterator creation time
+    field_iterators:
+        OnceList<Box<dyn Iterator<Item = Result<Field<&'slice [u8]>, Error>> + 'slice, A>, A>,
 }
 
 impl<'slice, A: Allocator> FieldIterator<'slice, A>
@@ -69,13 +63,14 @@ where
         A: Allocator + Clone,
     {
         let field_iterators = OnceList::new_in(alloc.clone());
-        // Create iterator from the initial slice without error conversion
-        let iter = initial_slice.read_protobuf_fields();
+        // Create iterator from the initial slice, converting error type only
+        // read_protobuf_fields() already returns Field<&'slice [u8]>
+        let iter = initial_slice
+            .read_protobuf_fields()
+            .map(|result| result.map_err(|e| Error::from(e)));
         let boxed = Box::new_in(iter, alloc.clone());
-        let field_iter: Box<
-            dyn Iterator<Item = Result<Field<&'slice [u8]>, protobuf_core::ProtobufError>> + 'slice,
-            A,
-        > = ::allocator_api2::unsize_box!(boxed);
+        let field_iter: Box<dyn Iterator<Item = Result<Field<&'slice [u8]>, Error>> + 'slice, A> =
+            ::allocator_api2::unsize_box!(boxed);
         field_iterators.push(field_iter);
         Self { field_iterators }
     }
@@ -89,12 +84,14 @@ where
     {
         let field_iterators = OnceList::new_in(alloc.clone());
         for slice in slice_iter {
-            // Create iterator without error conversion
-            let iter = slice.read_protobuf_fields();
+            // Create iterator, converting error type only
+            // read_protobuf_fields() already returns Field<&'slice [u8]>
+            let iter = slice
+                .read_protobuf_fields()
+                .map(|result| result.map_err(|e| Error::from(e)));
             let boxed = Box::new_in(iter, alloc.clone());
             let field_iter: Box<
-                dyn Iterator<Item = Result<Field<&'slice [u8]>, protobuf_core::ProtobufError>>
-                    + 'slice,
+                dyn Iterator<Item = Result<Field<&'slice [u8]>, Error>> + 'slice,
                 A,
             > = ::allocator_api2::unsize_box!(boxed);
             field_iterators.push(field_iter);
@@ -109,13 +106,14 @@ where
     where
         A: Allocator + Clone,
     {
-        // Create iterator without error conversion
-        let iter = slice.read_protobuf_fields();
+        // Create iterator, converting error type only
+        // read_protobuf_fields() already returns Field<&'slice [u8]>
+        let iter = slice
+            .read_protobuf_fields()
+            .map(|result| result.map_err(|e| Error::from(e)));
         let boxed = Box::new_in(iter, alloc);
-        let field_iter: Box<
-            dyn Iterator<Item = Result<Field<&'slice [u8]>, protobuf_core::ProtobufError>> + 'slice,
-            A,
-        > = ::allocator_api2::unsize_box!(boxed);
+        let field_iter: Box<dyn Iterator<Item = Result<Field<&'slice [u8]>, Error>> + 'slice, A> =
+            ::allocator_api2::unsize_box!(boxed);
         self.field_iterators.push(field_iter);
     }
 
@@ -139,9 +137,9 @@ impl<'slice, A: Allocator> Iterator for FieldIterator<'slice, A> {
             };
 
             // Try to get next item from the first iterator
-            // Convert error type at this point
+            // Error and field type conversion already done at iterator creation time
             if let Some(item) = first_iter_mut.next() {
-                return Some(item.map_err(|e| Error::from(e)));
+                return Some(item);
             }
 
             // First iterator is exhausted, remove it
