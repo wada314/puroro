@@ -64,10 +64,9 @@ where
         // The condition checks if we've reached the target count
         // If the parent's iterator is exhausted, parse_until will automatically
         // request the parent's parent to continue parsing
-        self.parent_parser_state.parse_until_with_callback(|_field| {
-            // Stop when we have enough elements for this field
-            // Note: This checks after each field is processed via the callback
-            // The field parameter is unused but required by the closure signature
+        self.parent_parser_state.parse_until_with_callback(|| {
+            // Stop when we have enough elements for this field.
+            // Note: This is checked after each field is processed via the callback.
             self.list.iter().count() >= needed
         })?;
 
@@ -78,7 +77,7 @@ where
     fn ensure_fully_parsed(&self) -> Result<(), Error> {
         // Parse all remaining fields until iterator is exhausted
         // Use a condition that always returns false to parse all fields
-        let _ = self.parent_parser_state.parse_until_with_callback(|_| false);
+        let _ = self.parent_parser_state.parse_until_with_callback(|| false);
         Ok(())
     }
 

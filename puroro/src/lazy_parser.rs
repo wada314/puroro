@@ -123,7 +123,7 @@ pub(crate) struct MessageParserStateInner<'slice, A: Allocator = Global> {
     ///   it means the iterator has been exhausted with the currently available input slices.
     ///   However, this does NOT mean the message parsing is complete - the parent message
     ///   might still have more input to provide. When `field_iter.next()` returns `None`,
-    ///   the caller should request the parent message to continue parsing (via `parse_until_with_callback(|_| false)`)
+    ///   the caller should request the parent message to continue parsing (via `parse_until_with_callback(|| false)`)
     ///   before assuming the message is fully parsed.
     ///
     /// **Important**: In lazy parsing, input slices might arrive incrementally. Therefore,
@@ -310,7 +310,7 @@ impl<'slice, A: Allocator + Clone> MessageParserStateRef<'slice, A> {
                 return Ok(None);
             };
 
-            MessageParserStateRef::from_inner(parent_state).parse_until_with_callback(|_field| {
+            MessageParserStateRef::from_inner(parent_state).parse_until_with_callback(|| {
                 let state = self.state.borrow();
                 state.field_iter.has_next_slice()
             })?;
@@ -331,7 +331,8 @@ impl<'slice, A: Allocator + Clone> MessageParserStateRef<'slice, A> {
     /// Parse fields until a certain condition is met.
     ///
     /// This function reads fields from the input slice until the condition closure returns `true`.
-    /// The condition closure receives a reference to the current field and should return `true` when parsing should stop.
+    /// The condition closure is evaluated after each field is processed via the field update callback,
+    /// and should return `true` when parsing should stop.
     ///
     /// **Important**: If the iterator is exhausted and the condition is not met, this method will
     /// request the parent parser state (if it exists) to continue parsing. This ensures that
@@ -339,14 +340,14 @@ impl<'slice, A: Allocator + Clone> MessageParserStateRef<'slice, A> {
     /// it can request its parent to continue parsing, which may in turn request its own parent.
     ///
     /// # Arguments
-    /// * `condition` - A closure that takes a reference to a field and returns `true` when parsing should stop
+    /// * `condition` - A closure that returns `true` when parsing should stop
     ///
     /// # Returns
     /// * `Ok(())` - Parsing completed (either condition was met or iterator exhausted)
     /// * `Err(Error)` - An error occurred during parsing
     pub fn parse_until_with_callback<F>(&self, mut condition: F) -> Result<(), Error>
     where
-        F: FnMut(&Field<&'slice [u8]>) -> bool,
+        F: FnMut() -> bool,
     {
         loop {
             let field = match self.next_field()? {
@@ -361,10 +362,9 @@ impl<'slice, A: Allocator + Clone> MessageParserStateRef<'slice, A> {
                 state.field_update_callback.clone()
             };
 
-            let should_stop = condition(&field);
             (callback)(field)?;
 
-            if should_stop {
+            if condition() {
                 return Ok(());
             }
         }
@@ -379,7 +379,7 @@ impl<'slice, A: Allocator + Clone> MessageParserStateRef<'slice, A> {
     /// and no additional slices can be added.
     pub fn ensure_all_fields_parsed_with_callback(&self) -> Result<(), Error> {
         let parent_state = {
-            let mut state = self.state.borrow_mut();
+            let state = self.state.borrow_mut();
             if state.terminated {
                 return Ok(());
             }
@@ -387,10 +387,10 @@ impl<'slice, A: Allocator + Clone> MessageParserStateRef<'slice, A> {
         };
 
         if let Some(parent_state) = parent_state {
-            MessageParserStateRef::from_inner(parent_state).parse_until_with_callback(|_| false)?;
+            MessageParserStateRef::from_inner(parent_state).parse_until_with_callback(|| false)?;
         }
 
-        self.parse_until_with_callback(|_| false)?;
+        self.parse_until_with_callback(|| false)?;
 
         let mut state = self.state.borrow_mut();
         state.terminated = true;
