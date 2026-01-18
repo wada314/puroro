@@ -11,7 +11,6 @@ use ::allocator_api2::unsize_box;
 use ::allocator_extras::{Allocator, Global};
 use ::once_list2::OnceList;
 use ::protobuf_core::{AsRefExtProtobuf, Field, ProtobufFieldSliceIterator};
-use ::std::cell::Cell;
 use ::std::cell::RefCell;
 use ::std::iter::Peekable;
 use ::std::rc::Rc;
@@ -146,7 +145,7 @@ pub struct MessageParserState<'slice, A: Allocator = Global> {
     /// **Key distinction**: `terminated = true` means "all fields have been parsed and
     /// no more input will be accepted", while `field_iter.next()` returning `None` only means
     /// "the current iterator is exhausted, but more input might arrive from the parent message".
-    terminated: Cell<bool>,
+    terminated: bool,
     /// Parent parser state - strong Rc<RefCell<...>> reference (no cycle!)
     /// Child needs parent's parser state to request continued parsing
     /// None for top-level messages, Some(...) for child messages
@@ -186,7 +185,7 @@ impl<'slice, A: Allocator> MessageParserState<'slice, A> {
         Self {
             field_iter: FieldIterator::new(initial_slice, allocator.clone()),
             allocator: allocator.clone(),
-            terminated: Cell::new(false),
+            terminated: false,
             parent_parser_state,
             field_update_callback: unsize_box!(Box::new_in(
                 field_update_callback,
@@ -228,7 +227,7 @@ impl<'slice, A: Allocator> MessageParserState<'slice, A> {
     {
         // Check if message has been terminated by ensure_all_fields_parsed()
         // Once terminated, no new slices can be added to maintain consistency
-        if self.terminated.get() {
+        if self.terminated {
             return Err(Error::MessageTerminated);
         }
 
@@ -280,7 +279,7 @@ impl<'slice, A: Allocator> MessageParserState<'slice, A> {
             let Some(ref parent_state) = self.parent_parser_state else {
                 // No parent - iterator is truly exhausted
                 // Mark as terminated since no more input will be available
-                self.terminated.set(true);
+                self.terminated = true;
                 return Ok(None);
             };
 
@@ -294,7 +293,7 @@ impl<'slice, A: Allocator> MessageParserState<'slice, A> {
             if !self.field_iter.has_next_slice() {
                 // No slices were added - parent's iterator is exhausted
                 // Mark as terminated since no more input will be available
-                self.terminated.set(true);
+                self.terminated = true;
                 return Ok(None);
             }
 
@@ -382,7 +381,7 @@ impl<'slice, A: Allocator + Clone> MessageParserState<'slice, A> {
         A: Clone,
     {
         // If already terminated, return early (idempotent operation)
-        if self.terminated.get() {
+        if self.terminated {
             return Ok(());
         }
 
@@ -401,7 +400,7 @@ impl<'slice, A: Allocator + Clone> MessageParserState<'slice, A> {
 
         // Mark message as terminated after parsing all fields
         // This prevents adding new slices which would cause inconsistent behavior
-        self.terminated.set(true);
+        self.terminated = true;
 
         Ok(())
     }
