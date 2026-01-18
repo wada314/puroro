@@ -260,7 +260,7 @@ impl<A: Allocator + Clone> Message for AddressImpl<A> {
 // AddressLazyImpl Structure (Lazy Implementation - Phase 3)
 // ============================================================================
 
-use ::puroro::lazy_parser::MessageParserState;
+use ::puroro::lazy_parser::MessageParserStateRef;
 use ::puroro::protobuf_core::{Field, FieldValue};
 use ::std::cell::{Cell, RefCell};
 use ::std::rc::{Rc, Weak};
@@ -272,8 +272,8 @@ use ::std::rc::{Rc, Weak};
 /// - `'slice`: Lifetime of the input slices (external data)
 /// - `'slice`: Lifetime of the input slices (external data)
 pub struct AddressLazyImpl<'slice, A: Allocator = Global> {
-    /// Owns parser state via Rc<RefCell<...>> - State itself is mutable
-    parser_state: Rc<RefCell<MessageParserState<'slice, A>>>,
+    /// Owns parser state handle (wraps Rc<RefCell<...>>)
+    parser_state: MessageParserStateRef<'slice, A>,
 
     /// Field 1: street (implicit presence string field)
     street: RefCell<String>,
@@ -297,7 +297,7 @@ impl<'slice, A: Allocator + Clone + 'slice> AddressLazyImpl<'slice, A> {
     pub fn new(
         slice: &'slice [u8],
         alloc: A,
-        parent_parser_state: Option<Rc<RefCell<MessageParserState<'slice, A>>>>,
+        parent_parser_state: Option<MessageParserStateRef<'slice, A>>,
     ) -> Rc<Self> {
         // Use Rc::new_cyclic with callback that handles Message Body
         // This is needed for both top-level and child messages because they may have their own child messages
@@ -315,16 +315,16 @@ impl<'slice, A: Allocator + Clone + 'slice> AddressLazyImpl<'slice, A> {
                 Ok(())
             };
             // Create parser state with initial callback
-            let parser_state = Rc::new(RefCell::new(MessageParserState::new(
+            let parser_state = MessageParserStateRef::create(
                 slice,
                 alloc.clone(),
                 parent_parser_state,
                 closure,
-            )));
+            );
 
             // Create message body
             Self {
-                parser_state: parser_state.clone(),
+                parser_state,
                 street: RefCell::new(String::new()),
                 city: RefCell::new(String::new()),
                 zip_code: Cell::new(0),
@@ -335,8 +335,8 @@ impl<'slice, A: Allocator + Clone + 'slice> AddressLazyImpl<'slice, A> {
     /// Add additional slice from parent
     pub(crate) fn add_slice(&self, slice: &'slice [u8]) -> Result<(), Error> {
         // Add slice to the parser state's field iterator
-        // Terminated check is handled inside MessageParserState::add_slice()
-        self.parser_state.borrow_mut().add_slice(slice)
+        // Terminated check is handled inside MessageParserStateRef::add_slice()
+        self.parser_state.add_slice(slice)
     }
 
     /// Getter for street field
@@ -365,7 +365,7 @@ impl<'slice, A: Allocator + Clone + 'slice> AddressLazyImpl<'slice, A> {
     /// This is a terminating operation - after this method completes, the message is marked as terminated
     /// and no additional slices can be added.
     fn ensure_all_fields_parsed(&self) -> Result<(), Error> {
-        self.parser_state.borrow_mut().ensure_all_fields_parsed()
+        self.parser_state.ensure_all_fields_parsed_with_callback()
     }
 
     /// Update a field with parsed value

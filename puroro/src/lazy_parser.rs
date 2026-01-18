@@ -2,12 +2,10 @@
 //!
 //! This module provides the core parsing infrastructure for lazy deserialization:
 //! - FieldIterator: Iterator over protobuf fields in slices
-//! - MessageParserState: Parser state that can be shared between message bodies and child messages
+//! - MessageParserStateRef: Parser state that can be shared between message bodies and child messages
 //! - Helper functions for wire format parsing (varint decoding, field tag parsing)
 
 use crate::error::Error;
-use ::allocator_api2::boxed::Box;
-use ::allocator_api2::unsize_box;
 use ::allocator_extras::{Allocator, Global};
 use ::once_list2::OnceList;
 use ::protobuf_core::{AsRefExtProtobuf, Field, ProtobufFieldSliceIterator};
@@ -117,7 +115,7 @@ impl<'slice, A: Allocator> Iterator for FieldIterator<'slice, A> {
 /// The entire State is wrapped in RefCell (it's a state, so it should be mutable).
 ///
 /// - `'slice`: Lifetime of the input slices (external data)
-pub struct MessageParserState<'slice, A: Allocator = Global> {
+pub(crate) struct MessageParserStateInner<'slice, A: Allocator = Global> {
     /// FieldIterator - needs &mut self for Iterator::next()
     ///
     /// **State meanings:**
@@ -125,7 +123,7 @@ pub struct MessageParserState<'slice, A: Allocator = Global> {
     ///   it means the iterator has been exhausted with the currently available input slices.
     ///   However, this does NOT mean the message parsing is complete - the parent message
     ///   might still have more input to provide. When `field_iter.next()` returns `None`,
-    ///   the caller should request the parent message to continue parsing (via `parse_until(|_| false)`)
+    ///   the caller should request the parent message to continue parsing (via `parse_until_with_callback(|_| false)`)
     ///   before assuming the message is fully parsed.
     ///
     /// **Important**: In lazy parsing, input slices might arrive incrementally. Therefore,
@@ -138,7 +136,7 @@ pub struct MessageParserState<'slice, A: Allocator = Global> {
     /// **State meanings:**
     /// - `false`: The message is still accepting new input slices. Parsing operations can
     ///   be performed incrementally (e.g., `parse_until` for conditional parsing).
-    /// - `true`: The message has been fully parsed via `ensure_all_fields_parsed()` (a
+    /// - `true`: The message has been fully parsed via `ensure_all_fields_parsed_with_callback()` (a
     ///   terminating operation). No further input slices will be accepted, and the message
     ///   state is now immutable. Attempts to call `add_slice()` will return an error.
     ///
@@ -149,7 +147,7 @@ pub struct MessageParserState<'slice, A: Allocator = Global> {
     /// Parent parser state - strong Rc<RefCell<...>> reference (no cycle!)
     /// Child needs parent's parser state to request continued parsing
     /// None for top-level messages, Some(...) for child messages
-    parent_parser_state: Option<Rc<RefCell<MessageParserState<'slice, A>>>>,
+    parent_parser_state: Option<Rc<RefCell<MessageParserStateInner<'slice, A>>>>,
     /// Field update callback - handles field updates
     ///
     /// This callback is responsible for updating fields when iterating over field_iter.
@@ -158,24 +156,24 @@ pub struct MessageParserState<'slice, A: Allocator = Global> {
     /// When Message Body is dropped, Drop::drop updates this callback to one that captures
     /// child message Weak references and uses static match-case to update them directly.
     ///
-    /// This design allows MessageParserState to be generic across all message types,
+    /// This design allows MessageParserStateInner to be generic across all message types,
     /// as it doesn't need to know the specific message type at compile time.
-    /// Use allocator_api2::boxed::Box to use the allocator A for consistency with MessageParserState's allocator.
+    /// Use allocator_api2::boxed::Box to use the allocator A for consistency with MessageParserStateInner's allocator.
     /// The callback captures Weak references by value.
-    field_update_callback: Box<dyn Fn(Field<&'slice [u8]>) -> Result<(), Error> + 'slice, A>,
+    field_update_callback: Rc<dyn Fn(Field<&'slice [u8]>) -> Result<(), Error> + 'slice>,
 }
 
-impl<'slice, A: Allocator> MessageParserState<'slice, A> {
-    /// Create a new MessageParserState with all parameters specified.
+impl<'slice, A: Allocator> MessageParserStateInner<'slice, A> {
+    /// Create a new MessageParserStateInner with all parameters specified.
     ///
     /// `initial_slice` is the first byte slice that will be parsed as protobuf fields.
     ///
     /// - For top-level messages: pass `parent_parser_state: None`
     /// - For child messages: pass `parent_parser_state: Some(parent_parser_state)`
-    pub fn new<F>(
+    pub(crate) fn new<F>(
         initial_slice: &'slice [u8],
         allocator: A,
-        parent_parser_state: Option<Rc<RefCell<MessageParserState<'slice, A>>>>,
+        parent_parser_state: Option<Rc<RefCell<MessageParserStateInner<'slice, A>>>>,
         field_update_callback: F,
     ) -> Self
     where
@@ -187,10 +185,7 @@ impl<'slice, A: Allocator> MessageParserState<'slice, A> {
             allocator: allocator.clone(),
             terminated: false,
             parent_parser_state,
-            field_update_callback: unsize_box!(Box::new_in(
-                field_update_callback,
-                allocator.clone()
-            )),
+            field_update_callback: Rc::new(field_update_callback),
         }
     }
 
@@ -209,7 +204,7 @@ impl<'slice, A: Allocator> MessageParserState<'slice, A> {
     }
 
     /// Get a reference to the parent parser state, if any.
-    pub fn parent_parser_state(&self) -> Option<&Rc<RefCell<MessageParserState<'slice, A>>>> {
+    pub fn parent_parser_state(&self) -> Option<&Rc<RefCell<MessageParserStateInner<'slice, A>>>> {
         self.parent_parser_state.as_ref()
     }
 
@@ -217,7 +212,7 @@ impl<'slice, A: Allocator> MessageParserState<'slice, A> {
     /// This will add the slice to the underlying FieldIterator and recreate the field iterator
     ///
     /// **Important**: This method can only be called when `terminated = false`. Once
-    /// `ensure_all_fields_parsed()` has been called, this method will return an error.
+    /// `ensure_all_fields_parsed_with_callback()` has been called, this method will return an error.
     ///
     /// If `field_iter` is `None` (exhausted), we recreate it with the new slice, allowing
     /// the iterator to continue parsing with the additional input.
@@ -225,7 +220,7 @@ impl<'slice, A: Allocator> MessageParserState<'slice, A> {
     where
         A: Clone,
     {
-        // Check if message has been terminated by ensure_all_fields_parsed()
+        // Check if message has been terminated by ensure_all_fields_parsed_with_callback()
         // Once terminated, no new slices can be added to maintain consistency
         if self.terminated {
             return Err(Error::MessageTerminated);
@@ -244,100 +239,92 @@ impl<'slice, A: Allocator> MessageParserState<'slice, A> {
         F: Fn(Field<&'slice [u8]>) -> Result<(), Error> + 'slice,
         A: Allocator + Clone,
     {
-        let boxed = Box::new_in(callback, self.allocator.clone());
-        let new_callback: Box<dyn Fn(Field<&'slice [u8]>) -> Result<(), Error> + 'slice, A> =
-            ::allocator_api2::unsize_box!(boxed);
-        self.field_update_callback = new_callback;
+        self.field_update_callback = Rc::new(callback);
+    }
+}
+
+/// Cheaply cloneable handle to shared parser state (Rc<RefCell<...>>).
+#[derive(Clone)]
+pub struct MessageParserStateRef<'slice, A: Allocator = Global> {
+    state: Rc<RefCell<MessageParserStateInner<'slice, A>>>,
+}
+
+impl<'slice, A: Allocator + Clone> MessageParserStateRef<'slice, A> {
+    pub fn create<F>(
+        initial_slice: &'slice [u8],
+        allocator: A,
+        parent_parser_state: Option<MessageParserStateRef<'slice, A>>,
+        field_update_callback: F,
+    ) -> Self
+    where
+        F: Fn(Field<&'slice [u8]>) -> Result<(), Error> + 'slice,
+    {
+        let parent_inner = parent_parser_state.map(|parent| parent.state.clone());
+        let inner = MessageParserStateInner::new(
+            initial_slice,
+            allocator,
+            parent_inner,
+            field_update_callback,
+        );
+        Self {
+            state: Rc::new(RefCell::new(inner)),
+        }
+    }
+
+    pub(crate) fn from_inner(state: Rc<RefCell<MessageParserStateInner<'slice, A>>>) -> Self {
+        Self { state }
+    }
+
+    pub fn add_slice(&self, slice: &'slice [u8]) -> Result<(), Error> {
+        self.state.borrow_mut().add_slice(slice)
+    }
+
+    pub fn allocator(&self) -> A {
+        self.state.borrow().allocator().clone()
+    }
+
+    pub fn set_field_update_callback<F>(&self, callback: F)
+    where
+        F: Fn(Field<&'slice [u8]>) -> Result<(), Error> + 'slice,
+    {
+        self.state.borrow_mut().set_field_update_callback(callback);
     }
 
     /// Get the next field from the iterator, requesting parent to parse if needed.
     ///
-    /// This method tries to get the next field from `field_iter`. If the iterator is exhausted,
-    /// it requests the parent parser state (if it exists) to continue parsing, which may add more
-    /// slices to this state's `field_iter`. Parent parsing stops when a new slice is added.
-    ///
-    /// Returns:
-    /// - `Ok(Some(field))` - A field was successfully retrieved
-    /// - `Ok(None)` - No more fields available (iterator and parent are exhausted)
-    /// - `Err(error)` - An error occurred during parsing
-    fn get_next_field(&mut self) -> Result<Option<Field<&'slice [u8]>>, Error>
-    where
-        A: Clone,
-    {
+    /// This method uses short borrows on parser state so callbacks can run without
+    /// overlapping with state borrows.
+    fn next_field(&self) -> Result<Option<Field<&'slice [u8]>>, Error> {
         loop {
-            // Step 1: Try to get the next field from field_iter
-            if let Some(result) = self.field_iter.next() {
-                return Ok(Some(result?));
-            }
-
-            // field_iter is exhausted - check if we have more slices available from parent
-            //
-            // Note: When field_iter is exhausted (next() returns None), has_next_slice() is guaranteed
-            // to be false. So we can simply check if has_next_slice() becomes true to detect new slices.
-
-            // Check if parent exists and can provide more slices
-            let Some(ref parent_state) = self.parent_parser_state else {
-                // No parent - iterator is truly exhausted
-                // Mark as terminated since no more input will be available
-                self.terminated = true;
-                return Ok(None);
-            };
-
-            // Request parent to continue parsing, which may add more slices to this state
-            // Stop when field_iter gets new slices (has_next_slice() becomes true)
-            parent_state
-                .borrow_mut()
-                .parse_until(|_field| self.field_iter.has_next_slice())?;
-
-            // Check if any slices were added after parent parsing
-            if !self.field_iter.has_next_slice() {
-                // No slices were added - parent's iterator is exhausted
-                // Mark as terminated since no more input will be available
-                self.terminated = true;
-                return Ok(None);
-            }
-
-            // A slice was added (even if it is empty). Retry from the beginning.
-        }
-    }
-
-    /// Internal method for parsing fields with configurable behavior.
-    ///
-    /// This is the common implementation used by `parse_until` and `ensure_all_fields_parsed`.
-    ///
-    /// **Important**: If the iterator is exhausted and the condition is not met, this method will
-    /// automatically request the parent parser state (if it exists) to continue parsing. This ensures
-    /// that lazy parsing works correctly with nested messages - when a child message needs more input,
-    /// it can request its parent to continue parsing, which may in turn request its own parent.
-    ///
-    /// # Parameters
-    /// * `condition` - Closure that takes a reference to a field and returns `true` when parsing should stop.
-    ///   Pass `|_| false` if you want to parse all available fields.
-    fn parse_fields_internal<F>(&mut self, mut condition: F) -> Result<(), Error>
-    where
-        F: FnMut(&Field<&'slice [u8]>) -> bool,
-        A: Clone,
-    {
-        loop {
-            // Step 1: Get the next field (handles parent parsing if needed)
-            let field = match self.get_next_field()? {
-                Some(field) => field,
-                None => {
-                    // No more fields available - iterator and parent are exhausted
-                    return Ok(());
+            let parent_state = {
+                let mut state = self.state.borrow_mut();
+                if let Some(result) = state.field_iter.next() {
+                    return Ok(Some(result?));
                 }
+                state.parent_parser_state.clone()
             };
 
-            // Step 2: Process the field
-            let should_stop = condition(&field);
-            (self.field_update_callback)(field)?;
+            let Some(parent_state) = parent_state else {
+                let mut state = self.state.borrow_mut();
+                state.terminated = true;
+                return Ok(None);
+            };
 
-            if should_stop {
-                // Condition met - stop parsing
-                return Ok(());
+            MessageParserStateRef::from_inner(parent_state).parse_until_with_callback(|_field| {
+                let state = self.state.borrow();
+                state.field_iter.has_next_slice()
+            })?;
+
+            let has_next_slice = {
+                let state = self.state.borrow();
+                state.field_iter.has_next_slice()
+            };
+
+            if !has_next_slice {
+                let mut state = self.state.borrow_mut();
+                state.terminated = true;
+                return Ok(None);
             }
-
-            // Continue loop to get and process the next field
         }
     }
 
@@ -350,25 +337,39 @@ impl<'slice, A: Allocator> MessageParserState<'slice, A> {
     /// request the parent parser state (if it exists) to continue parsing. This ensures that
     /// lazy parsing works correctly with nested messages - when a child message needs more input,
     /// it can request its parent to continue parsing, which may in turn request its own parent.
-
+    ///
     /// # Arguments
     /// * `condition` - A closure that takes a reference to a field and returns `true` when parsing should stop
     ///
     /// # Returns
     /// * `Ok(())` - Parsing completed (either condition was met or iterator exhausted)
     /// * `Err(Error)` - An error occurred during parsing
-    pub fn parse_until<F>(&mut self, condition: F) -> Result<(), Error>
+    pub fn parse_until_with_callback<F>(&self, mut condition: F) -> Result<(), Error>
     where
         F: FnMut(&Field<&'slice [u8]>) -> bool,
-        A: Clone,
     {
-        // parse_fields_internal handles requesting parent to continue parsing
-        // if the iterator is exhausted, so we just call it directly
-        self.parse_fields_internal(condition)
-    }
-}
+        loop {
+            let field = match self.next_field()? {
+                Some(field) => field,
+                None => {
+                    return Ok(());
+                }
+            };
 
-impl<'slice, A: Allocator + Clone> MessageParserState<'slice, A> {
+            let callback = {
+                let state = self.state.borrow();
+                state.field_update_callback.clone()
+            };
+
+            let should_stop = condition(&field);
+            (callback)(field)?;
+
+            if should_stop {
+                return Ok(());
+            }
+        }
+    }
+
     /// Ensure all fields are parsed
     ///
     /// This will request parent's parser state to continue parsing if needed (for child messages).
@@ -376,31 +377,23 @@ impl<'slice, A: Allocator + Clone> MessageParserState<'slice, A> {
     ///
     /// This is a terminating operation - after this method completes, the message is marked as terminated
     /// and no additional slices can be added.
-    pub fn ensure_all_fields_parsed(&mut self) -> Result<(), Error>
-    where
-        A: Clone,
-    {
-        // If already terminated, return early (idempotent operation)
-        if self.terminated {
-            return Ok(());
+    pub fn ensure_all_fields_parsed_with_callback(&self) -> Result<(), Error> {
+        let parent_state = {
+            let mut state = self.state.borrow_mut();
+            if state.terminated {
+                return Ok(());
+            }
+            state.parent_parser_state.clone()
+        };
+
+        if let Some(parent_state) = parent_state {
+            MessageParserStateRef::from_inner(parent_state).parse_until_with_callback(|_| false)?;
         }
 
-        // Request parent's parser state to continue parsing if this is a child message
-        // This works even if parent Message Body is dropped, because:
-        // 1. Child holds strong Rc reference to parent's Parser State
-        // 2. parse_until doesn't require parent Message Body to be alive
-        // 3. Callbacks (field_update_callback) already add slices to child messages via add_slice
-        if let Some(ref parent_state) = self.parent_parser_state {
-            parent_state.borrow_mut().parse_until(|_| false)?;
-        }
+        self.parse_until_with_callback(|_| false)?;
 
-        // Parse all fields until iterator is exhausted
-        // Use a constant function that always returns false to parse all fields
-        self.parse_fields_internal(|_| false)?;
-
-        // Mark message as terminated after parsing all fields
-        // This prevents adding new slices which would cause inconsistent behavior
-        self.terminated = true;
+        let mut state = self.state.borrow_mut();
+        state.terminated = true;
 
         Ok(())
     }

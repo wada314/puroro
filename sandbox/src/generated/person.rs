@@ -11,7 +11,7 @@ use ::allocator_api2::boxed::Box;
 use ::allocator_api2::vec::Vec as AllocVec;
 use ::allocator_extras::{Allocator, Global};
 use ::once_list2::OnceList;
-use ::puroro::lazy_parser::MessageParserState;
+use ::puroro::lazy_parser::MessageParserStateRef;
 use ::puroro::protobuf_core::{Field, FieldValue};
 use ::puroro::repeated_lazy::LazyRepeated;
 use ::puroro::{
@@ -467,8 +467,8 @@ impl<A: Allocator + Clone> Message for PersonImpl<A> {
 /// - `'slice`: Lifetime of the input slices (external data)
 /// - `'slice`: Lifetime of the input slices (external data)
 pub struct PersonLazyImpl<'slice, A: Allocator + Clone + 'slice = Global> {
-    /// Owns parser state via Rc<RefCell<...>> - State itself is mutable
-    parser_state: Rc<RefCell<MessageParserState<'slice, A>>>,
+    /// Owns parser state handle (wraps Rc<RefCell<...>>)
+    parser_state: MessageParserStateRef<'slice, A>,
 
     /// Field 2: age (implicit presence varint field)
     /// Copy type - Cell is sufficient
@@ -500,7 +500,7 @@ impl<'slice, A: Allocator + Clone + 'slice> PersonLazyImpl<'slice, A> {
     pub fn new(
         slice: &'slice [u8],
         alloc: A,
-        parent_parser_state: Option<Rc<RefCell<MessageParserState<'slice, A>>>>,
+        parent_parser_state: Option<MessageParserStateRef<'slice, A>>,
     ) -> Rc<Self> {
         // Use Rc::new_cyclic with callback that handles Message Body
         // This is needed for both top-level and child messages because they may have their own child messages
@@ -518,12 +518,12 @@ impl<'slice, A: Allocator + Clone + 'slice> PersonLazyImpl<'slice, A> {
                 Ok(())
             };
             // Create parser state with initial callback
-            let parser_state = Rc::new(RefCell::new(MessageParserState::new(
+            let parser_state = MessageParserStateRef::create(
                 slice,
                 alloc.clone(),
                 parent_parser_state,
                 closure,
-            )));
+            );
 
             // Create message body
             Self {
@@ -541,8 +541,8 @@ impl<'slice, A: Allocator + Clone + 'slice> PersonLazyImpl<'slice, A> {
     #[allow(dead_code)] // Used when PersonLazyImpl is used as a child message
     pub(crate) fn add_slice(&self, slice: &'slice [u8]) -> Result<(), Error> {
         // Add slice to the parser state's field iterator
-        // Terminated check is handled inside MessageParserState::add_slice()
-        self.parser_state.borrow_mut().add_slice(slice)
+        // Terminated check is handled inside MessageParserStateRef::add_slice()
+        self.parser_state.add_slice(slice)
     }
 
     /// Getter for age field
@@ -584,7 +584,7 @@ impl<'slice, A: Allocator + Clone + 'slice> PersonLazyImpl<'slice, A> {
     /// This is a terminating operation - after this method completes, the message is marked as terminated
     /// and no additional slices can be added.
     fn ensure_all_fields_parsed(&self) -> Result<(), Error> {
-        self.parser_state.borrow_mut().ensure_all_fields_parsed()
+        self.parser_state.ensure_all_fields_parsed_with_callback()
     }
 
     /// Update a field with parsed value
@@ -605,7 +605,7 @@ impl<'slice, A: Allocator + Clone + 'slice> PersonLazyImpl<'slice, A> {
                     addr.add_slice(data)?;
                 } else {
                     // First occurrence - create child with first slice
-                    let allocator = self.parser_state.borrow().allocator().clone();
+                    let allocator = self.parser_state.allocator();
                     let parent_parser_state = Some(self.parser_state.clone());
                     let child = AddressLazyImpl::new(data, allocator, parent_parser_state);
                     *address = Some(child);
@@ -616,7 +616,7 @@ impl<'slice, A: Allocator + Clone + 'slice> PersonLazyImpl<'slice, A> {
                 // For repeated message fields, each occurrence is a separate message
                 // Create a new AddressLazyImpl for this occurrence
                 let data_slice = data.as_ref();
-                let allocator = self.parser_state.borrow().allocator().clone();
+                let allocator = self.parser_state.allocator();
                 let parent_parser_state = Some(self.parser_state.clone());
                 let child = AddressLazyImpl::new(data_slice, allocator, parent_parser_state);
                 // Use OnceList's built-in interior mutability
@@ -671,9 +671,7 @@ impl<'slice, A: Allocator + Clone + 'slice> Drop for PersonLazyImpl<'slice, A> {
         };
 
         // Update callback in parser state
-        self.parser_state
-            .borrow_mut()
-            .set_field_update_callback(closure);
+        self.parser_state.set_field_update_callback(closure);
     }
 }
 

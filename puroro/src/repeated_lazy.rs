@@ -2,16 +2,14 @@
 //!
 //! This type is intended to be a common return type for all message repeated
 //! field getters in lazy implementations. It delegates storage to `OnceList`
-//! while coordinating with the parent's `MessageParserState` to advance parsing
+//! while coordinating with the parent's `MessageParserStateRef` to advance parsing
 //! just enough to satisfy access patterns (indexing/peek/length).
 
 use crate::error::Error;
-use crate::lazy_parser::MessageParserState;
+use crate::lazy_parser::MessageParserStateRef;
 use crate::repeated::Repeated;
 use ::allocator_extras::Allocator;
 use ::once_list2::OnceList;
-use ::std::cell::RefCell;
-use ::std::rc::Rc;
 
 /// A lazy, on-demand parsing adapter over a repeated field.
 ///
@@ -24,7 +22,7 @@ where
     T: Clone + 'message,
     A: Allocator + Clone + 'slice,
 {
-    parent_parser_state: Rc<RefCell<MessageParserState<'slice, A>>>,
+    parent_parser_state: MessageParserStateRef<'slice, A>,
     _field_number: u32,
     list: &'message OnceList<T, A>,
 }
@@ -37,7 +35,7 @@ where
     /// Create a new `LazyRepeated` adapter.
     #[inline]
     pub fn new(
-        parent_parser_state: Rc<RefCell<MessageParserState<'slice, A>>>,
+        parent_parser_state: MessageParserStateRef<'slice, A>,
         field_number: u32,
         list: &'message OnceList<T, A>,
     ) -> Self {
@@ -66,8 +64,7 @@ where
         // The condition checks if we've reached the target count
         // If the parent's iterator is exhausted, parse_until will automatically
         // request the parent's parent to continue parsing
-        let mut state = self.parent_parser_state.borrow_mut();
-        state.parse_until(|_field| {
+        self.parent_parser_state.parse_until_with_callback(|_field| {
             // Stop when we have enough elements for this field
             // Note: This checks after each field is processed via the callback
             // The field parameter is unused but required by the closure signature
@@ -81,8 +78,7 @@ where
     fn ensure_fully_parsed(&self) -> Result<(), Error> {
         // Parse all remaining fields until iterator is exhausted
         // Use a condition that always returns false to parse all fields
-        let mut state = self.parent_parser_state.borrow_mut();
-        let _ = state.parse_until(|_| false);
+        let _ = self.parent_parser_state.parse_until_with_callback(|_| false);
         Ok(())
     }
 
