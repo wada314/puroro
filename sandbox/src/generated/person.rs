@@ -1,10 +1,9 @@
-//! Hand-written code for Person message.
+//! Reference generated-style code for the `Person` message.
 //!
-//! This represents our ideal API for the generated code using the Closed Struct approach.
+//! This file is checked into the repository as a concrete example of the intended generated API
+//! (traits + standard implementation + lazy implementation), and as test input for the code generator.
 //!
-//! Uses trait-based field operations for type-safe, scalable code generation.
-//!
-//! This code is (supposed to be) generated from `sandbox/protos/person.proto`.
+//! Source schema: `sandbox/protos/person.proto`.
 
 use super::address::AddressLazyImpl;
 use ::allocator_api2::boxed::Box;
@@ -77,7 +76,7 @@ pub trait Person: DynPerson {
     fn scores(&self) -> impl Repeated<'_, Item = i32> + use<'_, Self>;
 
     // NOTE: Must return `impl Repeated<'_>`, not a dyn type
-    // The returned type is RefVecMap which yields &AddressImpl, and AddressImpl implements Address
+    // The returned item type must implement `Address` and must not expose a concrete implementation type.
     fn addresses(&self) -> impl Repeated<'_, Item = impl Address + '_> + use<'_, Self>;
 }
 
@@ -456,15 +455,17 @@ impl<A: Allocator + Clone> Message for PersonImpl<A> {
 }
 
 // ============================================================================
-// PersonLazyImpl Structure (Lazy Implementation - Phase 1: age field only)
+// PersonLazyImpl Structure (Lazy Implementation)
 // ============================================================================
 
 /// Lazy implementation of Person message that deserializes fields on-demand.
 ///
-/// Phase 4: age field (field 2), scores field (field 10), address field (field 6), and addresses field (field 9) are implemented.
-/// Other fields will be added in subsequent phases.
+/// Currently this implementation handles:
+/// - `age` (field 2)
+/// - `scores` (field 10)
+/// - `address` (field 6)
+/// - `addresses` (field 9)
 ///
-/// - `'slice`: Lifetime of the input slices (external data)
 /// - `'slice`: Lifetime of the input slices (external data)
 pub struct PersonLazyImpl<'slice, A: Allocator + Clone + 'slice = Global> {
     /// Owns parser state handle (wraps Rc<RefCell<...>>)
@@ -518,12 +519,8 @@ impl<'slice, A: Allocator + Clone + 'slice> PersonLazyImpl<'slice, A> {
                 Ok(())
             };
             // Create parser state with initial callback
-            let parser_state = MessageParserStateRef::create(
-                slice,
-                alloc.clone(),
-                parent_parser_state,
-                closure,
-            );
+            let parser_state =
+                MessageParserStateRef::create(slice, alloc.clone(), parent_parser_state, closure);
 
             // Create message body
             Self {
@@ -560,12 +557,11 @@ impl<'slice, A: Allocator + Clone + 'slice> PersonLazyImpl<'slice, A> {
     }
 
     /// Getter for address field
-    /// Returns a reference to the AddressLazyImpl if present, None otherwise
+    /// Returns the parsed child message if present, or `None` otherwise.
+    ///
+    /// Note: Currently this calls `ensure_all_fields_parsed()` so the child has received all
+    /// available slices before it is returned.
     pub fn address(&self) -> Option<Rc<AddressLazyImpl<'slice, A>>> {
-        // Parse until first occurrence of address field to create child if needed
-        // Note: This only parses until first occurrence, not all occurrences
-        // The child will request continued parsing when it needs all slices
-        // For now, we parse all fields to ensure child is created
         let _ = self.ensure_all_fields_parsed();
         self.address.borrow().clone()
     }
@@ -628,7 +624,7 @@ impl<'slice, A: Allocator + Clone + 'slice> PersonLazyImpl<'slice, A> {
                 let score_value = varint.try_to_int32()?;
                 self.scores.push(score_value); // push() takes &self
             }
-            // Other fields will be added in subsequent phases
+            // Other fields are currently ignored.
             _ => {
                 // Unknown field - ignore
             }

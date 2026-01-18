@@ -16,7 +16,8 @@ use ::std::rc::Rc;
 /// Iterator over protobuf fields in slices.
 ///
 /// Can be paused and resumed, making it easy to parse incrementally.
-/// Uses flat_map approach to convert slice iterator to field iterator.
+/// Internally stores a list of per-slice iterators so new slices can be appended
+/// without recreating a single "global" iterator or using self-referential structs.
 ///
 /// - `'slice`: Lifetime of the input slices (external data)
 ///
@@ -209,13 +210,12 @@ impl<'slice, A: Allocator> MessageParserStateInner<'slice, A> {
     }
 
     /// Add a slice to the field iterator
-    /// This will add the slice to the underlying FieldIterator and recreate the field iterator
+    /// This will append a new per-slice iterator to the underlying `FieldIterator`.
     ///
     /// **Important**: This method can only be called when `terminated = false`. Once
     /// `ensure_all_fields_parsed_with_callback()` has been called, this method will return an error.
     ///
-    /// If `field_iter` is `None` (exhausted), we recreate it with the new slice, allowing
-    /// the iterator to continue parsing with the additional input.
+    /// The existing iterators are not recreated; they are consumed in order.
     pub fn add_slice(&mut self, slice: &'slice [u8]) -> Result<(), Error>
     where
         A: Clone,

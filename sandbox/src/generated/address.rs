@@ -1,9 +1,9 @@
-//! Hand-written code for Address message.
+//! Reference generated-style code for the `Address` message.
 //!
-//! This represents a submessage of Person message.
-//! Uses trait-based field operations for type-safe, scalable code generation.
+//! This file is checked into the repository as a concrete example of the intended generated API
+//! (traits + standard implementation + lazy implementation), and as test input for the code generator.
 //!
-//! This code is (supposed to be) generated from `sandbox/protos/person.proto`.
+//! Source schema: `sandbox/protos/person.proto`.
 
 use ::allocator_api2::boxed::Box;
 use ::allocator_api2::vec::Vec as AllocVec;
@@ -257,7 +257,7 @@ impl<A: Allocator + Clone> Message for AddressImpl<A> {
 }
 
 // ============================================================================
-// AddressLazyImpl Structure (Lazy Implementation - Phase 3)
+// AddressLazyImpl Structure (Lazy Implementation)
 // ============================================================================
 
 use ::puroro::lazy_parser::MessageParserStateRef;
@@ -265,11 +265,13 @@ use ::puroro::protobuf_core::{Field, FieldValue};
 use ::std::cell::{Cell, RefCell};
 use ::std::rc::{Rc, Weak};
 
-/// Lazy implementation of Address message that deserializes fields on-demand.
+/// Lazy implementation of `Address` that deserializes fields on-demand.
 ///
-/// Phase 3: Basic implementation with street, city, zip_code fields.
+/// Fields handled:
+/// - `street` (field 1)
+/// - `city` (field 2)
+/// - `zip_code` (field 3)
 ///
-/// - `'slice`: Lifetime of the input slices (external data)
 /// - `'slice`: Lifetime of the input slices (external data)
 pub struct AddressLazyImpl<'slice, A: Allocator = Global> {
     /// Owns parser state handle (wraps Rc<RefCell<...>>)
@@ -315,12 +317,8 @@ impl<'slice, A: Allocator + Clone + 'slice> AddressLazyImpl<'slice, A> {
                 Ok(())
             };
             // Create parser state with initial callback
-            let parser_state = MessageParserStateRef::create(
-                slice,
-                alloc.clone(),
-                parent_parser_state,
-                closure,
-            );
+            let parser_state =
+                MessageParserStateRef::create(slice, alloc.clone(), parent_parser_state, closure);
 
             // Create message body
             Self {

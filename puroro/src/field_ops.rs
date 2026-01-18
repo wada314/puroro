@@ -580,11 +580,8 @@ impl<T: Eq, L: FieldLabel, const FIELD_NUMBER: u32, const SHARED_BYTES_LEN: usiz
 // Sample implementation for i32 (varint). Extend similarly for other types.
 
 /// Implementation for repeated i32 using allocator-aware Vec<i32, A>
-impl<
-        A: Allocator,
-        const FIELD_NUMBER: u32,
-        const SHARED_BYTES_LEN: usize,
-    > FieldOperations<Vec<i32, A>, Repeated, FIELD_NUMBER, SHARED_BYTES_LEN>
+impl<A: Allocator, const FIELD_NUMBER: u32, const SHARED_BYTES_LEN: usize>
+    FieldOperations<Vec<i32, A>, Repeated, FIELD_NUMBER, SHARED_BYTES_LEN>
     for FieldStorage<Vec<i32, A>, Repeated, FIELD_NUMBER, SHARED_BYTES_LEN, A>
 {
     type SetValue<'a> = &'a [i32];

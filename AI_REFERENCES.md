@@ -9,9 +9,29 @@ Puroro is a Rust-idiomatic implementation of Google Protocol Buffers, focusing o
 
 ## Lazy Parser Implementation - Session Summary (2025-01)
 
+## Lazy Parser Implementation - Current Snapshot (2026-01)
+
+This section describes the current code behavior at a high level (as of 2026-01), to avoid
+confusion with older design notes below.
+
+- **Core types**: `FieldIterator`, `MessageParserStateRef`
+- **FieldIterator**: stores per-slice iterators (`ProtobufFieldSliceIterator`) inside
+  `OnceList<Peekable<_>>`, so new input slices can be appended without recreating a single global iterator.
+- **MessageParserStateRef**: wraps `Rc<RefCell<MessageParserStateInner>>` and provides:
+  - incremental parsing via `parse_until_with_callback`
+  - a parent-chain request mechanism (`next_field()` can request the parent to parse until a new slice is available)
+  - a terminating operation `ensure_all_fields_parsed_with_callback()` (after termination, `add_slice()` is rejected)
+- **Generated reference implementations** (`sandbox/src/generated/*.rs`):
+  - keep a `parser_state: MessageParserStateRef` plus per-field storage
+  - `ensure_all_fields_parsed()` delegates to `parser_state.ensure_all_fields_parsed_with_callback()`
+
+## Lazy Parser Implementation - Historical Notes (2025-01)
+
+NOTE: The following section is preserved as historical discussion and may not match the current code.
+
 ### Current Implementation Status
 
-**Status**: ✅ **Phase 1-4 Complete** (as of 2025-01)
+**Status**: Historical note (2025-01); may not match the current code.
 
 **Key Achievements**:
 1. **Unified Interface Pattern**: All message types (`PersonLazyImpl`, `AddressLazyImpl`, etc.) now use the same structure and interface
@@ -20,7 +40,7 @@ Puroro is a Rust-idiomatic implementation of Google Protocol Buffers, focusing o
 
 ### Unified Message Structure
 
-All lazy message implementations follow the same pattern:
+All lazy message implementations follow the same pattern (historical sketch; may be outdated):
 
 ```rust
 pub struct MessageLazyImpl<'a, A: Allocator + Clone + 'a = Global> {
