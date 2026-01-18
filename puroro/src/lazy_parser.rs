@@ -190,23 +190,9 @@ impl<'slice, A: Allocator> MessageParserStateInner<'slice, A> {
         }
     }
 
-    /// Set the field iterator from a slice iterator.
-    pub fn set_field_iter_from_slices<I>(&mut self, slice_iter: I)
-    where
-        I: Iterator<Item = &'slice [u8]>,
-        A: Clone,
-    {
-        self.field_iter = FieldIterator::from_slices(slice_iter, self.allocator.clone());
-    }
-
     /// Get a reference to the allocator.
     pub fn allocator(&self) -> &A {
         &self.allocator
-    }
-
-    /// Get a reference to the parent parser state, if any.
-    pub fn parent_parser_state(&self) -> Option<&Rc<RefCell<MessageParserStateInner<'slice, A>>>> {
-        self.parent_parser_state.as_ref()
     }
 
     /// Add a slice to the field iterator
