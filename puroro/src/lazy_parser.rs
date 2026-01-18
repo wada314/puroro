@@ -335,14 +335,7 @@ impl<'slice, A: Allocator + Clone> MessageParserStateRef<'slice, A> {
     where
         F: FnMut() -> bool,
     {
-        loop {
-            let field = match self.next_field()? {
-                Some(field) => field,
-                None => {
-                    return Ok(());
-                }
-            };
-
+        while let Some(field) = self.next_field()? {
             let callback = {
                 let state = self.state.borrow();
                 state.field_update_callback.clone()
@@ -354,6 +347,7 @@ impl<'slice, A: Allocator + Clone> MessageParserStateRef<'slice, A> {
                 return Ok(());
             }
         }
+        Ok(())
     }
 
     /// Ensure all fields are parsed
