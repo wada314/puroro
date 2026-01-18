@@ -11,91 +11,63 @@
 //! but note that true laziness is not yet implemented.
 
 use ::allocator_extras::Global;
+use ::puroro::protobuf_core::{Field, FieldNumber, FieldValue, WriteExtProtobuf};
 use sandbox::generated::person::PersonLazyImpl;
 
-/// Encode a varint value
-fn encode_varint(mut value: u64) -> Vec<u8> {
+fn build_varint_field(field_number: u32, value: i32) -> Vec<u8> {
+    let field = Field::<Vec<u8>>::new(
+        FieldNumber::try_from(field_number).unwrap(),
+        FieldValue::from_int32(value),
+    );
     let mut bytes = Vec::new();
-    loop {
-        let mut byte = (value & 0x7F) as u8;
-        value >>= 7;
-        if value != 0 {
-            byte |= 0x80;
-        }
-        bytes.push(byte);
-        if value == 0 {
-            break;
-        }
-    }
+    bytes.write_protobuf_field(&field).unwrap();
     bytes
 }
 
-/// Encode a field tag (field_number and wire_type)
-fn encode_field_tag(field_number: u32, wire_type: u32) -> Vec<u8> {
-    let tag = (field_number << 3) | wire_type;
-    encode_varint(tag as u64)
-}
-
-/// Encode a varint field (field number 2, value 30) for testing
-fn encode_age_field(age: i32) -> Vec<u8> {
-    let mut bytes = encode_field_tag(2, 0); // field 2, wire type 0 (varint)
-    bytes.extend_from_slice(&encode_varint(age as u64));
+fn build_length_delimited_field(field_number: u32, value_bytes: &[u8]) -> Vec<u8> {
+    let field = Field::<Vec<u8>>::new(
+        FieldNumber::try_from(field_number).unwrap(),
+        FieldValue::Len(value_bytes.to_vec()),
+    );
+    let mut bytes = Vec::new();
+    bytes.write_protobuf_field(&field).unwrap();
     bytes
 }
 
-/// Encode a repeated varint field (field number 10) for testing
-fn encode_score_field(score: i32) -> Vec<u8> {
-    let mut bytes = encode_field_tag(10, 0); // field 10, wire type 0 (varint)
-    bytes.extend_from_slice(&encode_varint(score as u64));
-    bytes
+fn build_string_field(field_number: u32, value: &str) -> Vec<u8> {
+    build_length_delimited_field(field_number, value.as_bytes())
 }
 
-/// Encode a length-delimited field (field number, value bytes)
-/// Used for string fields and message fields
-fn encode_length_delimited_field(field_number: u32, value_bytes: &[u8]) -> Vec<u8> {
-    let mut bytes = encode_field_tag(field_number, 2); // wire type 2 (length-delimited)
-    bytes.extend_from_slice(&encode_varint(value_bytes.len() as u64)); // length prefix
-    bytes.extend_from_slice(value_bytes); // value bytes
-    bytes
-}
-
-/// Encode a string field (field number, string value)
-fn encode_string_field(field_number: u32, value: &str) -> Vec<u8> {
-    encode_length_delimited_field(field_number, value.as_bytes())
-}
-
-/// Encode an Address message
+/// Build an Address message
 /// Returns the encoded Address message bytes (not wrapped in a Person.address field)
 /// Only encodes non-empty/non-zero fields
-fn encode_address_message(street: &str, city: &str, zip_code: i32) -> Vec<u8> {
+fn build_address_message(street: &str, city: &str, zip_code: i32) -> Vec<u8> {
     let mut bytes = Vec::new();
     // Field 1: street (string) - only encode if non-empty
     if !street.is_empty() {
-        bytes.extend_from_slice(&encode_string_field(1, street));
+        bytes.extend_from_slice(&build_string_field(1, street));
     }
     // Field 2: city (string) - only encode if non-empty
     if !city.is_empty() {
-        bytes.extend_from_slice(&encode_string_field(2, city));
+        bytes.extend_from_slice(&build_string_field(2, city));
     }
     // Field 3: zip_code (varint) - only encode if non-zero
     if zip_code != 0 {
-        let mut zip_bytes = encode_field_tag(3, 0); // field 3, wire type 0 (varint)
-        zip_bytes.extend_from_slice(&encode_varint(zip_code as u64));
-        bytes.extend_from_slice(&zip_bytes);
+        bytes.extend_from_slice(&build_varint_field(3, zip_code));
     }
     bytes
 }
 
-/// Encode a Person.address field (field number 6, Address message)
-fn encode_address_field(street: &str, city: &str, zip_code: i32) -> Vec<u8> {
-    let address_bytes = encode_address_message(street, city, zip_code);
-    encode_length_delimited_field(6, &address_bytes) // field 6 (address), wire type 2
+/// Build a Person.address field (field number 6, Address message)
+fn build_address_field(street: &str, city: &str, zip_code: i32) -> Vec<u8> {
+    let address_bytes = build_address_message(street, city, zip_code);
+    build_length_delimited_field(6, &address_bytes) // field 6 (address), wire type 2
 }
 
 #[test]
 fn test_person_lazy_age_field() {
     // Encode a simple message with age = 30
-    let encoded = encode_age_field(30);
+    let encoded = build_varint_field(2, 30);
 
     // Create PersonLazyImpl from encoded bytes
     let person_rc = PersonLazyImpl::new(&encoded, Global, None);
@@ -110,8 +82,8 @@ fn test_person_lazy_age_field_multiple_occurrences() {
     // Test that later occurrences overwrite earlier ones
     // Encode: age = 25, then age = 30
     // Expected: age should be 30 (last value)
-    let mut encoded = encode_age_field(25);
-    encoded.extend_from_slice(&encode_age_field(30));
+    let mut encoded = build_varint_field(2, 25);
+    encoded.extend_from_slice(&build_varint_field(2, 30));
 
     let person_rc = PersonLazyImpl::new(&encoded, Global, None);
     let age = person_rc.age();
@@ -134,7 +106,7 @@ fn test_person_lazy_age_field_default() {
 #[test]
 fn test_person_lazy_scores_field_single() {
     // Test message with a single score = 85
-    let encoded = encode_score_field(85);
+    let encoded = build_varint_field(10, 85);
 
     let person_rc = PersonLazyImpl::new(&encoded, Global, None);
     let scores = person_rc.scores();
@@ -148,9 +120,9 @@ fn test_person_lazy_scores_field_single() {
 fn test_person_lazy_scores_field_multiple() {
     // Test message with multiple scores: 10, 20, 30
     let mut encoded = Vec::new();
-    encoded.extend_from_slice(&encode_score_field(10));
-    encoded.extend_from_slice(&encode_score_field(20));
-    encoded.extend_from_slice(&encode_score_field(30));
+    encoded.extend_from_slice(&build_varint_field(10, 10));
+    encoded.extend_from_slice(&build_varint_field(10, 20));
+    encoded.extend_from_slice(&build_varint_field(10, 30));
 
     let person_rc = PersonLazyImpl::new(&encoded, Global, None);
     let scores = person_rc.scores();
@@ -174,9 +146,9 @@ fn test_person_lazy_scores_field_empty() {
 fn test_person_lazy_scores_and_age_together() {
     // Test message with both age and scores fields
     let mut encoded = Vec::new();
-    encoded.extend_from_slice(&encode_age_field(30));
-    encoded.extend_from_slice(&encode_score_field(85));
-    encoded.extend_from_slice(&encode_score_field(90));
+    encoded.extend_from_slice(&build_varint_field(2, 30));
+    encoded.extend_from_slice(&build_varint_field(10, 85));
+    encoded.extend_from_slice(&build_varint_field(10, 90));
 
     let person_rc = PersonLazyImpl::new(&encoded, Global, None);
 
@@ -196,7 +168,7 @@ fn test_person_lazy_scores_and_age_together() {
 #[test]
 fn test_person_lazy_address_field_simple() {
     // Test message with address field containing street="Main St", city="New York", zip_code=10001
-    let encoded = encode_address_field("Main St", "New York", 10001);
+    let encoded = build_address_field("Main St", "New York", 10001);
 
     let person_rc = PersonLazyImpl::new(&encoded, Global, None);
     let address_opt = person_rc.address();
@@ -231,12 +203,12 @@ fn test_person_lazy_address_field_multiple_slices() {
     // Expected: address should contain both slices concatenated
 
     // First slice: only street field
-    let first_slice = encode_address_message("Main St", "", 0);
-    let first_address_field = encode_length_delimited_field(6, &first_slice);
+    let first_slice = build_address_message("Main St", "", 0);
+    let first_address_field = build_length_delimited_field(6, &first_slice);
 
     // Second slice: city and zip_code fields
-    let second_slice = encode_address_message("", "New York", 10001);
-    let second_address_field = encode_length_delimited_field(6, &second_slice);
+    let second_slice = build_address_message("", "New York", 10001);
+    let second_address_field = build_length_delimited_field(6, &second_slice);
 
     // Combine both
     let mut encoded = first_address_field;
@@ -259,8 +231,8 @@ fn test_person_lazy_address_field_multiple_slices() {
 fn test_person_lazy_address_and_age_together() {
     // Test message with both age and address fields
     let mut encoded = Vec::new();
-    encoded.extend_from_slice(&encode_age_field(30));
-    encoded.extend_from_slice(&encode_address_field("Oak Ave", "Boston", 02115));
+    encoded.extend_from_slice(&build_varint_field(2, 30));
+    encoded.extend_from_slice(&build_address_field("Oak Ave", "Boston", 02115));
 
     let person_rc = PersonLazyImpl::new(&encoded, Global, None);
 
