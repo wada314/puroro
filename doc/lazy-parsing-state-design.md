@@ -6,18 +6,14 @@ This document describes the finalized design for tracking "in-parsing" state in 
 
 ## Design Overview
 
-Each message struct has its **own cursor** that tracks parsing progress through its own `field_slices`. When parsing for one field, we update ALL fields we encounter along the way. This allows us to pause parsing after finding the first occurrence of a field and resume later when needed.
+Each lazy message owns a **parser state** (`MessageParserStateRef`) that tracks parsing progress through the currently available input slices. While parsing for one field, we update ALL fields we encounter along the way (protobuf semantics). This allows us to pause parsing and resume later when needed.
 
 **Key Design Principles**:
 - **Unified interface**: All message types (top-level and child) use the same structure and methods
-- **Multiple parse support**: Input slices are stored in `field_slices`, allowing getters to be called multiple times
 - **Flexible message hierarchy**: Any message can be used as both top-level and child message
 
 **Critical Insight**: For scalar message fields (e.g., Person → Address → Location):
-- Each message has its own cursor for parsing its own `field_slices`
-- Scalar message fields hold a reference to the parent's parser state (not message body)
-- When the child needs all slices, it asks the parent to continue parsing from the parent's cursor
-- The parent continues parsing and collects all occurrences of the child's field number
+- Message fields hold a reference to the parent's parser state (not message body)
 
 ## Final Recommended Design
 
@@ -35,26 +31,22 @@ Each message struct has its **own cursor** that tracks parsing progress through 
 
 ### Implementation
 
-**Status**: ✅ **Implemented** (Phase 1-4 complete as of 2025-01, unified interface pattern added 2025-01)
+**Status**: ✅ Implemented
 
 The actual implementation can be found in:
-- `sandbox/src/generated/lazy_parser.rs` - Core parsing infrastructure (FieldIterator, MessageParserState)
-- `sandbox/src/generated/person.rs` - PersonLazyImpl implementation
-- `sandbox/src/generated/address.rs` - AddressLazyImpl implementation
+- `puroro/src/lazy_parser.rs` - Core parsing infrastructure (`FieldIterator`, `MessageParserStateRef`, `MessageParserStateInner`)
+- `puroro/src/repeated_lazy.rs` - `LazyRepeated` adapter
+- `sandbox/src/generated/person.rs` - reference generated-style `Person*` implementations
+- `sandbox/src/generated/address.rs` - reference generated-style `Address*` implementations
 
 **Key Design Points**:
-- Message body owns parser state via `Rc<RefCell<MessageParserState>>`
+- Message body owns parser state via `MessageParserStateRef` (internally `Rc<RefCell<MessageParserStateInner>>`)
 - Field-level interior mutability: `RefCell`/`Cell` for scalar fields, `OnceList` for repeated fields
-- All methods use `self: &Rc<Self>` to allow cloning when needed
 - Field getters ensure parsing is complete before returning values (for scalar fields)
 - **Unified interface**: All message types (`PersonLazyImpl`, `AddressLazyImpl`, etc.) have the same structure and interface
-  - All messages have `field_slices: OnceList<&'a [u8], A>` to store input slices
-  - All messages have `parent_parser_state: Option<Rc<RefCell<MessageParserState<'a, A>>>>` (None for top-level, Some(...) for child messages)
+  - All messages have `parent_parser_state: Option<MessageParserStateRef<...>>` (None for top-level, Some(...) for child messages)
   - All messages use the same `new(slice, alloc, parent_parser_state)` constructor pattern
   - All messages can be used as both top-level and child messages
-- **Multiple parse support**: Getters can be called multiple times by recreating iterators from `field_slices`
-
-For detailed sample code, see `historical/lazy-parsing-implementation-samples.md`.
 
 ### Benefits
 
@@ -68,21 +60,20 @@ For detailed sample code, see `historical/lazy-parsing-implementation-samples.md
 
 ## Core Data Structure
 
-**Status**: ✅ **Implemented** in `sandbox/src/generated/lazy_parser.rs`
+**Status**: ✅ Implemented in `puroro/src/lazy_parser.rs`
 
 The core data structures are:
 
 1. **FieldIterator**: Iterator over protobuf fields in slices that can be paused and resumed
    - Tracks current slice and position within that slice
    - Accepts any `Iterator<Item = &'a [u8]>`
-   - Stored in `RefCell<Option<FieldIterator>>` because `Iterator::next()` requires `&mut self`
+   - Internally stores per-slice iterators so additional slices can be appended
 
-2. **MessageParserState**: Parser state that can be shared between message bodies and child messages
-   - Contains `FieldIterator` and field update callback
-   - Generic across all message types
-   - Wrapped in `Rc<RefCell<...>>` for sharing
+2. **MessageParserStateInner / MessageParserStateRef**: parser state shared between message bodies and child messages
+   - Contains a `FieldIterator` and a field update callback
+   - Stored as `Rc<RefCell<MessageParserStateInner>>` and accessed via `MessageParserStateRef`
 
-See the actual implementation in `sandbox/src/generated/lazy_parser.rs` for details.
+See the actual implementation in `puroro/src/lazy_parser.rs` for details.
 
 ## Parsing Strategy
 
@@ -108,7 +99,7 @@ The getters (`scores()`, `addresses()`) return `LazyRepeated` wrapper that imple
 - All fields encountered during parsing are still updated (protobuf semantics)
 
 See the actual implementation in:
-- `sandbox/src/generated/repeated_lazy.rs` - `LazyRepeated` and `LazyRepeatedIter` implementation
+- `puroro/src/repeated_lazy.rs` - `LazyRepeated` and `LazyRepeatedIter` implementation
 - `sandbox/src/generated/person.rs` - `PersonLazyImpl::scores()` and `addresses()` getters
 
 For detailed implementation details and known limitations, see the "Implementation: True Lazy Parsing for Repeated Fields" section below.
@@ -143,20 +134,17 @@ The Message Body owns the Parser State via `Rc`, and child messages hold a stron
 - **No cycle**: Parent Message Body owns both, so Child → Parent Parser State doesn't create a cycle
 
 **Implementation Details**:
-- `MessageParserState` contains `FieldIterator` and field update callback
+- `MessageParserStateInner` contains `FieldIterator` and field update callback
 - Callback is updated in `Drop::drop` to handle child messages after parent Message Body is dropped
 - Child messages collect slices via `add_slice()` and parse them when `ensure_all_fields_parsed()` is called
 - **Unified constructor**: All message types use `new(slice, alloc, parent_parser_state)` where:
   - `parent_parser_state: None` for top-level messages
   - `parent_parser_state: Some(parent_parser_state)` for child messages
-- **Input slice storage**: All messages store input slices in `field_slices: OnceList<&'a [u8], A>` to enable multiple parsing passes
-- **Parser state sharing**: Child messages hold `Option<Rc<RefCell<MessageParserState>>>` to request continued parsing from parent
+- **Parser state sharing**: Child messages hold `Option<MessageParserStateRef<...>>` to request continued parsing from parent
 
 See the actual implementation in:
 - `sandbox/src/generated/person.rs` - `PersonLazyImpl` implementation
 - `sandbox/src/generated/address.rs` - `AddressLazyImpl` implementation (same pattern as PersonLazyImpl)
-
-For detailed sample code, see `historical/lazy-parsing-implementation-samples.md`.
 
 **Note**: For detailed discussion of design alternatives and decision rationale, including the Arena approach, see `lazy-parsing-state-design-discussion.md`.
 
@@ -172,7 +160,7 @@ Since we're updating fields during parsing (which happens through `&self`), we n
 | **Optional fields** (`Option<Copy>`) | `Cell<Option<T>>` | Update via `Cell::set()` | `Option<Copy>` is `Copy`, so `Cell` is sufficient |
 | **Optional fields** (`Option<non-Copy>`) | `RefCell<Option<T>>` | Update via `RefCell::borrow_mut()` | `Option<non-Copy>` is not `Copy`, so `RefCell` is needed |
 | **Repeated fields** | `OnceList<T, A>` | Push via `OnceList::push(&self)` | **Built-in interior mutability** - no `RefCell` needed! |
-| **Scalar message fields** | `RefCell<Option<MessageLazyImpl>>` | Set once, then push slices | Child's `field_slices` has built-in interior mutability, but `Option<MessageLazyImpl>` is not `Copy` |
+| **Scalar message fields** | `RefCell<Option<MessageLazyImpl>>` | Set/replace and route additional slices | `Option<non-Copy>` requires `RefCell` |
 
 **Key Insights**: 
 - `OnceList` already provides interior mutability via `push(&self)`, so it doesn't need `RefCell` wrapping
@@ -315,7 +303,7 @@ Our design shares similarities with the Builder pattern in Rust, but with import
 
 **Code Example** (from `sandbox/src/generated/person.rs`):
 ```rust
-pub fn scores(self: &Rc<Self>) -> LazyRepeated<'a, '_, i32, A> {
+pub fn scores(&self) -> LazyRepeated<'slice, '_, i32, A> {
     LazyRepeated::new(self.parser_state.clone(), 10, &self.scores)
 }
 ```
@@ -323,7 +311,7 @@ pub fn scores(self: &Rc<Self>) -> LazyRepeated<'a, '_, i32, A> {
 ### Implementation Details
 
 **LazyRepeated Wrapper**:
-- Holds a reference to the parent's `MessageParserState`
+- Holds a reference to the parent's `MessageParserStateRef`
 - Holds a reference to the underlying `OnceList`
 - Implements the `Repeated` trait by delegating to `OnceList` but triggering parsing when needed
 
@@ -352,7 +340,7 @@ pub fn scores(self: &Rc<Self>) -> LazyRepeated<'a, '_, i32, A> {
 1. **Getter Call**: `person.scores()` returns `LazyRepeated` immediately (no parsing)
 2. **Element Access**: When `scores().get(5)` is called:
    - `LazyRepeated::get()` calls `ensure_at_least(6)` (need 6 elements for index 5)
-   - `ensure_at_least()` calls `parent_parser_state.continue_parsing_for_children()`
+   - `ensure_at_least()` calls `parent_parser_state.parse_until_with_callback(...)`
    - Parent parser continues parsing, updating all fields via callback
    - Target field (`scores`) gets new elements added to `OnceList` via `push()`
    - Loop continues until 6 elements are available or parser is exhausted
@@ -364,7 +352,7 @@ pub fn scores(self: &Rc<Self>) -> LazyRepeated<'a, '_, i32, A> {
 
 ### Known Limitations and Future Optimizations
 
-1. **Efficiency**: `continue_parsing_for_children()` parses all remaining fields, not just until the target field has enough elements. This works correctly but could be optimized further.
+1. **Efficiency**: the current implementation is correct, but has avoidable overhead (e.g., repeated `.iter().count()` checks and iterator recreation in `LazyRepeatedIter`).
 
 2. **Unused Field**: `LazyRepeated` stores `_field_number` but doesn't currently use it. This could be used for future field-specific optimizations.
 
@@ -377,7 +365,7 @@ See `doc/lazy-parsing-next-steps.md` for detailed next steps and optimization op
 **Scalar Child Message Field Pattern**:
 - The child message object (`AddressLazyImpl`) holds a reference to the parent's parser state
 - When the child's field getter is called (e.g., `address().street()`), the child calls `ensure_all_fields_parsed()`
-- `ensure_all_fields_parsed()` calls `parent_parser_state.borrow_mut().continue_parsing_for_children()` to collect all slices
+- `ensure_all_fields_parsed()` calls `parent_parser_state.ensure_all_fields_parsed_with_callback()` to collect all slices
 - The parent's parser state continues parsing and collects all occurrences of the child's field number
 - The child's `Drop::drop` updates the parent's callback to route new slices to the child via `add_slice()`
 - **Key**: Fields are parsed ON-DEMAND when accessed, not when the child object is created
@@ -389,7 +377,7 @@ See `doc/lazy-parsing-next-steps.md` for detailed next steps and optimization op
 - The parent's parser state continues parsing and collects occurrences of the repeated field's field number
 - Each occurrence is added to the underlying `OnceList` via `push()`
 - **Key**: Elements are parsed ON-DEMAND when accessed, not when the getter is called
-- **Implementation**: See `sandbox/src/generated/repeated_lazy.rs` for the actual implementation
+- **Implementation**: See `puroro/src/repeated_lazy.rs` for the actual implementation
 
 **Key Similarity**:
 - Both cases need an "object" that can **trigger the owner message's parse until a condition is met**
@@ -411,7 +399,7 @@ This insight led to the implementation of the **`LazyRepeated` wrapper type** fo
 2. Holds a reference to the underlying `OnceList`
 3. Implements the `Repeated` trait by delegating to `OnceList` but triggering parsing when needed
 
-**Implementation**: See `sandbox/src/generated/repeated_lazy.rs` for the complete implementation.
+**Implementation**: See `puroro/src/repeated_lazy.rs` for the complete implementation.
 
 ### Implementation Summary
 

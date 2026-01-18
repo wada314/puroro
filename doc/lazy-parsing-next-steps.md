@@ -1,7 +1,7 @@
 # Next Steps for Lazy Repeated Field Parsing
 
 **Last Updated**: 2025-01-01  
-**Status**: ✅ Basic implementation complete, unified interface pattern implemented, optimizations and documentation updates in progress
+**Status**: ✅ Basic implementation complete; optimizations and documentation updates in progress
 
 ## Current Implementation Status
 
@@ -20,21 +20,20 @@
 
 ## Known Issues and Potential Improvements
 
-### 1. Efficiency: `continue_parsing_for_children()` Parses All Fields
+### 1. Efficiency: Counting and Iterator Recreation Overhead
 
 **Current Behavior**:
-- `ensure_at_least()` calls `continue_parsing_for_children()` which parses until iterator is exhausted
-- This means if we need just 1 element, we might parse ALL remaining fields in the message
-- This works correctly but is not optimal
+- `ensure_at_least()` calls `parse_until_with_callback(...)` and checks a condition after each processed field
+- This avoids parsing the entire message when only a small number of elements are needed
+- However, there is still overhead from repeated counting and iterator recreation
 
 **Impact**:
 - Correctness: ✅ Correct (all tests pass)
 - Efficiency: ⚠️ Could be improved (parses more than necessary)
 
 **Potential Solution**:
-- Create a new method `continue_parsing_until_condition()` that can stop when a condition is met
-- Or modify `ensure_at_least()` to check after each field if we have enough elements
-- **Note**: Current implementation uses a loop that checks `list.iter().count()` after each `continue_parsing_for_children()` call, which provides some efficiency, but `continue_parsing_for_children()` itself still parses all fields
+- Reduce repeated `list.iter().count()` calls (currently O(n) per check) by tracking counts more directly
+- Reduce iterator recreation/skip cost in `LazyRepeatedIter::next()`
 
 ### 2. Unused `_field_number` Field
 
@@ -46,29 +45,20 @@
 
 ### 3. Design Documentation Update
 
-**Status**: ✅ **Updated** (2025-01)
-
-**Completed Updates**:
-- Documented unified interface pattern (all message types use same structure)
-- Documented unified `new()` constructor pattern
-- Documented `field_slices` storage for multiple parse support
-- Documented `parent_parser_state: Option<...>` pattern for flexible message hierarchy
-- Marked implementation as complete with actual implementation details
+**Status**: In progress (this document is being updated to match the current implementation)
 
 ## Next Steps (Priority Order)
 
 ### High Priority
 
-1. **Update Design Documentation** ✅ **Completed**
-   - ✅ Updated `lazy-parsing-state-design.md` to reflect completed implementation
-   - ✅ Documented actual implementation approach and patterns used
-   - ✅ Documented unified interface pattern and multiple parse support
+1. **Update Design Documentation**
+   - Keep `lazy-parsing-state-design.md` aligned with current code and avoid drifting historical notes
 
 ### Medium Priority
 
 2. **Performance Optimization (if needed)**
    - Measure performance impact of current implementation
-   - Consider optimizing `continue_parsing_for_children()` usage if performance is an issue
+   - Consider optimizing the current `LazyRepeated`/`LazyRepeatedIter` hot paths if performance is an issue
    - This is a "nice to have" - current implementation is correct and works
 
 3. **Code Cleanup**
@@ -89,7 +79,7 @@
 
 ## Unresolved Questions
 
-1. **Performance Trade-offs**: Is the current implementation's efficiency acceptable, or do we need to optimize `continue_parsing_for_children()` usage?
+1. **Performance Trade-offs**: Is the current implementation's efficiency acceptable, or do we need to optimize the current `LazyRepeated`/`LazyRepeatedIter` hot paths?
 
 2. **`_field_number` Usage**: Should we keep this field for future optimizations, or remove it if not needed?
 
