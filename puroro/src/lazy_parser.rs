@@ -162,7 +162,7 @@ pub struct MessageParserState<'slice, A: Allocator = Global> {
     /// as it doesn't need to know the specific message type at compile time.
     /// Use allocator_api2::boxed::Box to use the allocator A for consistency with MessageParserState's allocator.
     /// The callback captures Weak references by value.
-    field_update_callback: Box<dyn FnMut(Field<&'slice [u8]>) -> Result<(), Error> + 'slice, A>,
+    field_update_callback: Box<dyn Fn(Field<&'slice [u8]>) -> Result<(), Error> + 'slice, A>,
 }
 
 impl<'slice, A: Allocator> MessageParserState<'slice, A> {
@@ -179,7 +179,7 @@ impl<'slice, A: Allocator> MessageParserState<'slice, A> {
         field_update_callback: F,
     ) -> Self
     where
-        F: FnMut(Field<&'slice [u8]>) -> Result<(), Error> + 'slice,
+        F: Fn(Field<&'slice [u8]>) -> Result<(), Error> + 'slice,
         A: Allocator + Clone,
     {
         Self {
@@ -241,11 +241,11 @@ impl<'slice, A: Allocator> MessageParserState<'slice, A> {
     /// Set the field update callback.
     pub fn set_field_update_callback<F>(&mut self, callback: F)
     where
-        F: FnMut(Field<&'slice [u8]>) -> Result<(), Error> + 'slice,
+        F: Fn(Field<&'slice [u8]>) -> Result<(), Error> + 'slice,
         A: Allocator + Clone,
     {
         let boxed = Box::new_in(callback, self.allocator.clone());
-        let new_callback: Box<dyn FnMut(Field<&'slice [u8]>) -> Result<(), Error> + 'slice, A> =
+        let new_callback: Box<dyn Fn(Field<&'slice [u8]>) -> Result<(), Error> + 'slice, A> =
             ::allocator_api2::unsize_box!(boxed);
         self.field_update_callback = new_callback;
     }
@@ -350,7 +350,7 @@ impl<'slice, A: Allocator> MessageParserState<'slice, A> {
     /// request the parent parser state (if it exists) to continue parsing. This ensures that
     /// lazy parsing works correctly with nested messages - when a child message needs more input,
     /// it can request its parent to continue parsing, which may in turn request its own parent.
-    ///
+
     /// # Arguments
     /// * `condition` - A closure that takes a reference to a field and returns `true` when parsing should stop
     ///
