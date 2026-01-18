@@ -23,6 +23,7 @@ confusion and to keep this file small.
 - **Generated reference implementations** (`sandbox/src/generated/*.rs`):
   - keep a `parser_state: MessageParserStateRef` plus per-field storage
   - `ensure_all_fields_parsed()` delegates to `parser_state.ensure_all_fields_parsed_with_callback()`
+  - `LazyRepeated::new()` takes `(parser_state, &OnceList)` (no field-number metadata)
 
 ## Handy File Pointers
 

@@ -38,8 +38,7 @@
 ### 2. Unused `_field_number` Field
 
 **Current State**:
-- `LazyRepeated` stores `_field_number` but doesn't use it (indicated by `_` prefix)
-- This field could be used for future optimizations (e.g., field-specific parsing logic)
+- (resolved) `LazyRepeated` no longer stores `_field_number` since it was unused.
 
 **Action**: Document why it's stored but unused, or remove if not needed for future optimizations
 
@@ -62,8 +61,7 @@
    - This is a "nice to have" - current implementation is correct and works
 
 3. **Code Cleanup**
-   - Decide whether to keep or remove `_field_number` field
-   - Add documentation comments explaining design decisions
+   - (done) Remove unused `_field_number` field from `LazyRepeated`
 
 ### Low Priority
 
@@ -73,7 +71,7 @@
    - Stress tests
 
 5. **Future Enhancements**
-   - Consider field-specific parsing optimizations using `_field_number`
+   - Consider field-specific parsing optimizations (would require reintroducing field metadata)
    - Consider caching parsed state more aggressively
    - Consider supporting parallel parsing (if applicable)
 
@@ -81,7 +79,7 @@
 
 1. **Performance Trade-offs**: Is the current implementation's efficiency acceptable, or do we need to optimize the current `LazyRepeated`/`LazyRepeatedIter` hot paths?
 
-2. **`_field_number` Usage**: Should we keep this field for future optimizations, or remove it if not needed?
+2. **Field metadata**: If we need field-specific parsing optimizations later, what's the right way to pass the metadata (without bloating the common case)?
 
 3. **Documentation Strategy**: Should we update the existing design document or create a new implementation guide?
 

@@ -304,7 +304,7 @@ Our design shares similarities with the Builder pattern in Rust, but with import
 **Code Example** (from `sandbox/src/generated/person.rs`):
 ```rust
 pub fn scores(&self) -> LazyRepeated<'slice, '_, i32, A> {
-    LazyRepeated::new(self.parser_state.clone(), 10, &self.scores)
+    LazyRepeated::new(self.parser_state.clone(), &self.scores)
 }
 ```
 
@@ -354,7 +354,7 @@ pub fn scores(&self) -> LazyRepeated<'slice, '_, i32, A> {
 
 1. **Efficiency**: the current implementation is correct, but has avoidable overhead (e.g., repeated `.iter().count()` checks and iterator recreation in `LazyRepeatedIter`).
 
-2. **Unused Field**: `LazyRepeated` stores `_field_number` but doesn't currently use it. This could be used for future field-specific optimizations.
+2. **Unused Field**: (resolved) `LazyRepeated` no longer stores `_field_number` since it was unused.
 
 See `doc/lazy-parsing-next-steps.md` for detailed next steps and optimization opportunities.
 

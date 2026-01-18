@@ -23,7 +23,6 @@ where
     A: Allocator + Clone + 'slice,
 {
     parent_parser_state: MessageParserStateRef<'slice, A>,
-    _field_number: u32,
     list: &'message OnceList<T, A>,
 }
 
@@ -36,12 +35,10 @@ where
     #[inline]
     pub fn new(
         parent_parser_state: MessageParserStateRef<'slice, A>,
-        field_number: u32,
         list: &'message OnceList<T, A>,
     ) -> Self {
         Self {
             parent_parser_state,
-            _field_number: field_number,
             list,
         }
     }

@@ -553,7 +553,7 @@ impl<'slice, A: Allocator + Clone + 'slice> PersonLazyImpl<'slice, A> {
     /// Getter for scores field
     /// Returns a LazyRepeated adapter that enables on-demand parsing
     pub fn scores(&self) -> LazyRepeated<'slice, '_, i32, A> {
-        LazyRepeated::new(self.parser_state.clone(), 10, &self.scores)
+        LazyRepeated::new(self.parser_state.clone(), &self.scores)
     }
 
     /// Getter for address field
@@ -569,7 +569,7 @@ impl<'slice, A: Allocator + Clone + 'slice> PersonLazyImpl<'slice, A> {
     /// Getter for addresses field
     /// Returns a LazyRepeated adapter that enables on-demand parsing
     pub fn addresses(&self) -> LazyRepeated<'slice, '_, Rc<AddressLazyImpl<'slice, A>>, A> {
-        LazyRepeated::new(self.parser_state.clone(), 9, &self.addresses)
+        LazyRepeated::new(self.parser_state.clone(), &self.addresses)
     }
 
     /// Ensure all fields are parsed
