@@ -335,16 +335,14 @@ impl<'slice, A: Allocator + Clone> MessageParserStateRef<'slice, A> {
     where
         F: FnMut() -> bool,
     {
-        loop {
-            // Advance exactly one field (requesting parent to continue parsing if needed),
-            // then stop when the condition becomes true.
-            if !self.parse_one_field_with_callback()? {
-                return Ok(());
-            }
+        // Advance exactly one field (requesting parent to continue parsing if needed),
+        // then stop when the condition becomes true.
+        while self.parse_one_field_with_callback()? {
             if condition() {
                 return Ok(());
             }
         }
+        Ok(())
     }
 
     /// Parses and processes exactly one field (if available), then returns whether progress was made.
@@ -397,5 +395,284 @@ impl<'slice, A: Allocator + Clone> MessageParserStateRef<'slice, A> {
         state.terminated = true;
 
         Ok(())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{FieldIterator, MessageParserStateRef};
+    use crate::error::Error;
+    use ::allocator_extras::Global;
+    use ::protobuf_core::{Field, FieldNumber, FieldValue, WriteExtProtobuf};
+    use ::std::cell::RefCell;
+
+    fn build_varint_field_bytes(field_number: u32, value: i32) -> Vec<u8> {
+        let field = Field::<Vec<u8>>::new(
+            FieldNumber::try_from(field_number).unwrap(),
+            FieldValue::from_int32(value),
+        );
+        let mut bytes = Vec::new();
+        bytes.write_protobuf_field(&field).unwrap();
+        bytes
+    }
+
+    #[test]
+    fn test_field_iterator_empty_slice() {
+        let empty_slice: &[u8] = &[];
+        let iter = FieldIterator::new(empty_slice, Global);
+
+        // Should have at least one slice (even if empty)
+        assert!(iter.has_next_slice());
+
+        // But iterator should return None immediately
+        let mut iter = iter;
+        assert!(iter.next().is_none());
+    }
+
+    #[test]
+    fn test_field_iterator_single_field() {
+        let encoded = build_varint_field_bytes(1, 42);
+        let iter = FieldIterator::new(&encoded, Global);
+
+        let mut iter = iter;
+        let field_result = iter.next();
+        assert!(field_result.is_some());
+
+        let field = field_result.unwrap().unwrap();
+        assert_eq!(field.field_number.as_u32(), 1);
+        if let FieldValue::Varint(varint) = field.value {
+            assert_eq!(varint.try_to_int32().unwrap(), 42);
+        } else {
+            panic!("Expected Varint field value");
+        }
+
+        // Should be exhausted now
+        assert!(iter.next().is_none());
+    }
+
+    #[test]
+    fn test_field_iterator_multiple_fields() {
+        let mut encoded = build_varint_field_bytes(1, 10);
+        encoded.extend_from_slice(&build_varint_field_bytes(2, 20));
+        encoded.extend_from_slice(&build_varint_field_bytes(3, 30));
+
+        let iter = FieldIterator::new(&encoded, Global);
+        let mut iter = iter;
+
+        // First field
+        let field1 = iter.next().unwrap().unwrap();
+        assert_eq!(field1.field_number.as_u32(), 1);
+
+        // Second field
+        let field2 = iter.next().unwrap().unwrap();
+        assert_eq!(field2.field_number.as_u32(), 2);
+
+        // Third field
+        let field3 = iter.next().unwrap().unwrap();
+        assert_eq!(field3.field_number.as_u32(), 3);
+
+        // Should be exhausted
+        assert!(iter.next().is_none());
+    }
+
+    #[test]
+    fn test_field_iterator_add_slice() {
+        let first_slice = build_varint_field_bytes(1, 10);
+        let second_slice = build_varint_field_bytes(2, 20);
+
+        let iter = FieldIterator::new(&first_slice, Global);
+        iter.add_slice(&second_slice);
+
+        let mut iter = iter;
+
+        // First field from first slice
+        let field1 = iter.next().unwrap().unwrap();
+        assert_eq!(field1.field_number.as_u32(), 1);
+
+        // Second field from second slice
+        let field2 = iter.next().unwrap().unwrap();
+        assert_eq!(field2.field_number.as_u32(), 2);
+
+        // Should be exhausted
+        assert!(iter.next().is_none());
+    }
+
+    #[test]
+    fn test_field_iterator_from_slices() {
+        let slice1 = build_varint_field_bytes(1, 10);
+        let slice2 = build_varint_field_bytes(2, 20);
+        let slice3 = build_varint_field_bytes(3, 30);
+
+        let slices = vec![slice1.as_slice(), slice2.as_slice(), slice3.as_slice()];
+        let iter = FieldIterator::from_slices(slices.into_iter(), Global);
+
+        let mut iter = iter;
+
+        let field1 = iter.next().unwrap().unwrap();
+        assert_eq!(field1.field_number.as_u32(), 1);
+
+        let field2 = iter.next().unwrap().unwrap();
+        assert_eq!(field2.field_number.as_u32(), 2);
+
+        let field3 = iter.next().unwrap().unwrap();
+        assert_eq!(field3.field_number.as_u32(), 3);
+
+        assert!(iter.next().is_none());
+    }
+
+    #[test]
+    fn test_field_iterator_has_next_slice() {
+        let iter = FieldIterator::new(&[], Global);
+        assert!(iter.has_next_slice());
+
+        // After iterator is exhausted, the empty iterator is removed from the list
+        // so has_next_slice() should return false
+        let mut iter = iter;
+        assert!(iter.next().is_none());
+        assert!(!iter.has_next_slice()); // No more slices after exhaustion
+    }
+
+    #[test]
+    fn test_message_parser_state_ref_basic() {
+        let encoded = build_varint_field_bytes(1, 42);
+        let captured_field = RefCell::new(None::<Field<&[u8]>>);
+
+        let captured_field_clone = &captured_field;
+        let parser_state = MessageParserStateRef::create(&encoded, Global, None, |field| {
+            *captured_field_clone.borrow_mut() = Some(field);
+            Ok(())
+        });
+
+        // Parse until callback returns true
+        parser_state
+            .parse_until_with_callback(|| captured_field.borrow().is_some())
+            .unwrap();
+
+        let field_num = {
+            let borrowed = captured_field.borrow();
+            assert!(borrowed.is_some());
+            borrowed.as_ref().unwrap().field_number.as_u32()
+        };
+        assert_eq!(field_num, 1);
+    }
+
+    #[test]
+    fn test_message_parser_state_ref_add_slice() {
+        let first_slice = build_varint_field_bytes(1, 10);
+        let second_slice = build_varint_field_bytes(2, 20);
+        let captured_fields = RefCell::new(Vec::new());
+
+        let captured_fields_clone = &captured_fields;
+        let parser_state = MessageParserStateRef::create(&first_slice, Global, None, |field| {
+            captured_fields_clone
+                .borrow_mut()
+                .push(field.field_number.as_u32());
+            Ok(())
+        });
+
+        // Add second slice
+        parser_state.add_slice(&second_slice).unwrap();
+
+        // Parse all fields
+        parser_state.parse_until_with_callback(|| false).unwrap();
+
+        assert_eq!(*captured_fields.borrow(), vec![1, 2]);
+    }
+
+    #[test]
+    fn test_message_parser_state_ref_terminated_error() {
+        let encoded = build_varint_field_bytes(1, 42);
+        let parser_state = MessageParserStateRef::create(&encoded, Global, None, |_field| Ok(()));
+
+        // Terminate the message
+        parser_state
+            .ensure_all_fields_parsed_with_callback()
+            .unwrap();
+
+        // Attempting to add slice after termination should fail
+        let result = parser_state.add_slice(&[]);
+        assert!(result.is_err());
+        if let Err(Error::MessageTerminated) = result {
+            // Expected error
+        } else {
+            panic!("Expected MessageTerminated error");
+        }
+    }
+
+    #[test]
+    fn test_message_parser_state_ref_parse_until_condition() {
+        let mut encoded = build_varint_field_bytes(1, 10);
+        encoded.extend_from_slice(&build_varint_field_bytes(2, 20));
+        encoded.extend_from_slice(&build_varint_field_bytes(3, 30));
+        encoded.extend_from_slice(&build_varint_field_bytes(4, 40));
+
+        let captured_fields = RefCell::new(Vec::new());
+        let captured_fields_clone = &captured_fields;
+        let parser_state = MessageParserStateRef::create(&encoded, Global, None, |field| {
+            let field_num = field.field_number.as_u32();
+            captured_fields_clone.borrow_mut().push(field_num);
+            Ok(())
+        });
+
+        // Parse until we encounter field 3
+        parser_state
+            .parse_until_with_callback(|| captured_fields.borrow().last() == Some(&3))
+            .unwrap();
+
+        // Should have parsed fields 1, 2, and 3
+        assert_eq!(*captured_fields.borrow(), vec![1, 2, 3]);
+
+        // Field 4 should not have been parsed yet
+        // (We can continue parsing to get field 4)
+    }
+
+    #[test]
+    fn test_message_parser_state_ref_ensure_all_fields_parsed() {
+        let mut encoded = build_varint_field_bytes(1, 10);
+        encoded.extend_from_slice(&build_varint_field_bytes(2, 20));
+        encoded.extend_from_slice(&build_varint_field_bytes(3, 30));
+
+        let captured_fields = RefCell::new(Vec::new());
+        let captured_fields_clone = &captured_fields;
+        let parser_state = MessageParserStateRef::create(&encoded, Global, None, |field| {
+            captured_fields_clone
+                .borrow_mut()
+                .push(field.field_number.as_u32());
+            Ok(())
+        });
+
+        // Ensure all fields are parsed
+        parser_state
+            .ensure_all_fields_parsed_with_callback()
+            .unwrap();
+
+        // All fields should be captured
+        assert_eq!(*captured_fields.borrow(), vec![1, 2, 3]);
+
+        // Second call should be idempotent
+        parser_state
+            .ensure_all_fields_parsed_with_callback()
+            .unwrap();
+        assert_eq!(*captured_fields.borrow(), vec![1, 2, 3]); // Should not have changed
+    }
+
+    #[test]
+    fn test_message_parser_state_ref_empty_message() {
+        let empty_slice: &[u8] = &[];
+        let capture_called = RefCell::new(false);
+
+        let capture_called_clone = &capture_called;
+        let parser_state = MessageParserStateRef::create(empty_slice, Global, None, |_field| {
+            *capture_called_clone.borrow_mut() = true;
+            Ok(())
+        });
+
+        // Parse all fields (none should be found)
+        parser_state
+            .ensure_all_fields_parsed_with_callback()
+            .unwrap();
+
+        // Callback should not have been called
+        assert!(!*capture_called.borrow());
     }
 }
