@@ -238,7 +238,11 @@ where
     type Item = T;
 
     fn len(&self) -> usize {
-        self.once_list.iter().count()
+        let mut n = 0usize;
+        for _ in self.once_list.iter() {
+            n += 1;
+        }
+        n
     }
 
     fn is_empty(&self) -> bool {
@@ -246,7 +250,12 @@ where
     }
 
     fn get(&self, index: usize) -> Option<Self::Item> {
-        self.once_list.iter().nth(index).map(&self.map)
+        for (i, v) in self.once_list.iter().enumerate() {
+            if i == index {
+                return Some((self.map)(v));
+            }
+        }
+        None
     }
 
     fn iter_box(&self) -> Box<dyn Iterator<Item = Self::Item> + 'a> {
@@ -263,7 +272,11 @@ impl<'a, T: Copy + 'a, A: Allocator + 'a> Repeated<'a> for &'a OnceList<T, A> {
     type Item = T;
 
     fn len(&self) -> usize {
-        self.iter().count()
+        let mut n = 0usize;
+        for _ in self.iter() {
+            n += 1;
+        }
+        n
     }
 
     fn is_empty(&self) -> bool {
@@ -271,7 +284,12 @@ impl<'a, T: Copy + 'a, A: Allocator + 'a> Repeated<'a> for &'a OnceList<T, A> {
     }
 
     fn get(&self, index: usize) -> Option<Self::Item> {
-        self.iter().nth(index).copied()
+        for (i, v) in self.iter().enumerate() {
+            if i == index {
+                return Some(*v);
+            }
+        }
+        None
     }
 
     fn iter_box(&self) -> Box<dyn Iterator<Item = Self::Item> + 'a> {

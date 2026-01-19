@@ -25,6 +25,14 @@ confusion and to keep this file small.
   - `ensure_all_fields_parsed()` delegates to `parser_state.ensure_all_fields_parsed_with_callback()`
   - `LazyRepeated::new()` takes `(parser_state, &OnceList)` (no field-number metadata)
 
+## 2026-01-19: Removed `.count()` / `.nth()` usage from lazy repeated implementation
+
+- Added `MessageParserStateRef::parse_one_field_with_callback()` to advance parsing by exactly one field.
+- Reworked `LazyRepeatedIter` to be streaming: when the underlying `OnceList` iterator reaches the end,
+  it advances the parent parser one field at a time until a new element appears or the parent is exhausted.
+- Updated `Repeated` adapters for `OnceList` to avoid `.count()`/`.nth()` (use manual loops / `enumerate()`).
+- Added an integration test asserting that a `OnceList::iter()` created before a `push()` can observe the newly pushed element.
+
 ## Handy File Pointers
 
 - `puroro/src/lazy_parser.rs`: incremental parser state + parent-chain parsing requests

@@ -336,24 +336,39 @@ impl<'slice, A: Allocator + Clone> MessageParserStateRef<'slice, A> {
         F: FnMut() -> bool,
     {
         loop {
-            let field = match self.next_field()? {
-                Some(field) => field,
-                None => {
-                    return Ok(());
-                }
-            };
-
-            let callback = {
-                let state = self.state.borrow();
-                state.field_update_callback.clone()
-            };
-
-            (callback)(field)?;
-
+            // Advance exactly one field (requesting parent to continue parsing if needed),
+            // then stop when the condition becomes true.
+            if !self.parse_one_field_with_callback()? {
+                return Ok(());
+            }
             if condition() {
                 return Ok(());
             }
         }
+    }
+
+    /// Parses and processes exactly one field (if available), then returns whether progress was made.
+    ///
+    /// This is useful for iterator-driven lazy parsing where callers want to advance the parent
+    /// parser incrementally instead of parsing until a count/length condition is met.
+    ///
+    /// # Returns
+    /// - `Ok(true)`: One field was read and the update callback was invoked.
+    /// - `Ok(false)`: No field was available (the iterator is exhausted for now / terminated).
+    /// - `Err(Error)`: Parsing or callback failed.
+    pub fn parse_one_field_with_callback(&self) -> Result<bool, Error> {
+        let field = match self.next_field()? {
+            Some(field) => field,
+            None => return Ok(false),
+        };
+
+        let callback = {
+            let state = self.state.borrow();
+            state.field_update_callback.clone()
+        };
+
+        (callback)(field)?;
+        Ok(true)
     }
 
     /// Ensure all fields are parsed

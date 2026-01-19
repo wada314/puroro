@@ -52,20 +52,23 @@ where
     /// If the parent's iterator is exhausted, `parse_until` will automatically request
     /// the parent's parent to continue parsing, so this method only needs to call `parse_until`.
     fn ensure_at_least(&self, needed: usize) -> Result<(), Error> {
-        // Check if we already have enough elements
-        if self.list.iter().count() >= needed {
-            return Ok(());
-        }
+        // We avoid relying on `len()`/`count()` here. Instead, we keep a single iterator that can
+        // observe newly pushed elements (OnceList::iter() checks the underlying OnceCell each time).
+        let mut it = self.list.iter();
+        let mut seen = 0usize;
 
-        // Parse until we have enough elements for this field
-        // The condition checks if we've reached the target count
-        // If the parent's iterator is exhausted, parse_until will automatically
-        // request the parent's parent to continue parsing
-        self.parent_parser_state.parse_until_with_callback(|| {
-            // Stop when we have enough elements for this field.
-            // Note: This is checked after each field is processed via the callback.
-            self.list.iter().count() >= needed
-        })?;
+        while seen < needed {
+            if it.next().is_some() {
+                seen += 1;
+                continue;
+            }
+
+            // No more elements right now; advance the parent by one field and retry.
+            // If the parent is exhausted, we cannot make further progress.
+            if !self.parent_parser_state.parse_one_field_with_callback()? {
+                break;
+            }
+        }
 
         Ok(())
     }
@@ -121,36 +124,29 @@ where
     type Item = T;
 
     fn next(&mut self) -> Option<Self::Item> {
-        // Try to get next element from the current iterator
+        // Fast path: already-parsed elements.
         if let Some(item) = self.inner_iter.next() {
             return Some(item);
         }
 
-        // Current iterator exhausted - check if we need to parse more
-        // Try to continue parsing and see if we get more elements
-        let previous_count = self.lazy_repeated.list.iter().count();
-        // Try to parse at least one more element
-        let _ = self.lazy_repeated.ensure_at_least(previous_count + 1);
+        // We are at the end of what is currently available. Advance the parent parser one field at
+        // a time until this repeated field receives at least one new element, or the parent is
+        // exhausted.
+        loop {
+            let progressed = self
+                .lazy_repeated
+                .parent_parser_state
+                .parse_one_field_with_callback()
+                .ok()?;
 
-        // Check if we got new elements after parsing
-        let new_total = self.lazy_repeated.list.iter().count();
-        if new_total <= previous_count {
-            // No progress made - parser exhausted or no more elements
-            return None;
+            if !progressed {
+                return None;
+            }
+
+            if let Some(item) = self.inner_iter.next() {
+                return Some(item);
+            }
         }
-
-        // Recreate the iterator to include newly parsed elements
-        // The new iterator will iterate over all elements, but we've already consumed
-        // all elements from the old iterator, so we just get the new ones
-        let iter = self.lazy_repeated.list.iter().cloned();
-        self.inner_iter = ::std::boxed::Box::new(iter);
-        // Skip the elements we've already seen (all previous_count of them)
-        for _ in 0..previous_count {
-            self.inner_iter.next();
-        }
-
-        // Now get the next element (which should be newly parsed)
-        self.inner_iter.next()
     }
 }
 
@@ -165,18 +161,27 @@ where
     fn len(&self) -> usize {
         // Length requires knowing all elements; fall back to full parse.
         let _ = self.ensure_fully_parsed();
-        self.list.iter().count()
+        let mut n = 0usize;
+        for _ in self.list.iter() {
+            n += 1;
+        }
+        n
     }
 
     fn is_empty(&self) -> bool {
         // Parse just enough to know if at least one exists.
         let _ = self.ensure_at_least(1);
-        self.list.iter().next().is_none()
+        self.list.first().is_none()
     }
 
     fn get(&self, index: usize) -> Option<Self::Item> {
         let _ = self.ensure_at_least(index.saturating_add(1));
-        self.list.iter().nth(index).cloned()
+        for (i, v) in self.list.iter().enumerate() {
+            if i == index {
+                return Some(v.clone());
+            }
+        }
+        None
     }
 
     fn iter_box(&self) -> ::allocator_api2::boxed::Box<dyn Iterator<Item = Self::Item> + 'message> {
