@@ -28,6 +28,7 @@ focus of the project (serialization/deserialization, codegen, and other runtime 
   - `ensure_all_fields_parsed()` delegates to `parser_state.ensure_all_fields_parsed_with_callback()`
   - `LazyRepeated::new()` takes `(parser_state, &OnceList)` (no field-number metadata)
   - scalar child message caches can be expressed as `OnceCell<Rc<ChildLazyImpl>>` (instead of `RefCell<Option<Rc<_>>>`) when they are set at most once
+  - `AddressLazyImpl` string fields are now validated with `str::from_utf8` and stored as `&'slice str` (zero-copy) instead of allocating `String`
 
 ## 2026-01-19: Removed `.count()` / `.nth()` usage from lazy repeated implementation
 
@@ -44,7 +45,7 @@ focus of the project (serialization/deserialization, codegen, and other runtime 
 - We use `once_list2::OnceListWithTailLen<T, A>` (via `use ::once_list2::OnceListWithTailLen as OnceList;`) so repeated tail appends are fast and `len()` is O(1).
 - `LazyRepeated` was updated to leverage O(1) `len()` for `ensure_at_least()` and to reduce overhead:
   - `LazyRepeatedIter` no longer uses `Box<dyn Iterator>`; it stores the concrete `once_list2::Iter` (cloned).
-  - `Repeated::iter_box()` no longer collects into a temporary `Vec<T>`; it boxes `self.list.iter().cloned()` after fully parsing.
+  - `Repeated::iter_box()` returns an on-demand iterator (does not force full parsing up-front).
 
 ## 2026-01-22: why lazy message impls use `Rc`
 
@@ -68,11 +69,11 @@ focus of the project (serialization/deserialization, codegen, and other runtime 
 ## 2026-01-22: lazy parsing - known gaps / TODOs (design stage)
 
 - **`iter_box()` should not force full parse**: `LazyRepeated::iter_box()` should return an on-demand iterator
-  (while `len()` may inevitably require full parse). (This was addressed in `puroro/src/repeated_lazy.rs`.)
+  (while `len()` may inevitably require full parse). (Implemented in `puroro/src/repeated_lazy.rs`.)
 - **Packed repeated**: Support packed encoding for repeated numeric fields (wire type Len) in lazy impls.
 - **Unknown fields**: Preserve unknown fields (store + round-trip) instead of discarding them.
 - **Zero-copy views**: High-priority future work. Prefer returning borrowed views (`&'slice [u8]` / `&'slice str`)
-  where possible; avoid `to_vec()` copies in lazy impls.
+  where possible; avoid `to_vec()` copies in lazy impls. (Started with `AddressLazyImpl` string fields.)
 - **Slice contract**: Multiple slice input is intentional, but each slice is expected to be a self-contained,
   valid protobuf encoding of (part of) the same message (not arbitrary byte-stream fragmentation).
 - **Standard impl parse/write/size**: `PersonImpl` and other standard impls still have `todo!()` for parsing/serialization/size.

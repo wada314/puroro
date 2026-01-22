@@ -13,7 +13,7 @@
 - Reduced overhead in hot paths:
   - `ensure_at_least()` uses O(1) `len()` (tail+len caching)
   - `LazyRepeatedIter` stores the concrete `once_list2::Iter` (no `Box<dyn Iterator>` field)
-  - `Repeated::iter_box()` no longer collects into a temporary `Vec<T>`
+  - `Repeated::iter_box()` returns an on-demand iterator (does not force full parsing up-front)
 - All tests passing
 
 ## Completed Features
@@ -50,6 +50,16 @@
 ### 3. Design Documentation Update
 
 **Status**: In progress (this document is being updated to match the current implementation)
+
+### 4. Zero-copy string/bytes views (high priority)
+
+**Goal**:
+- Avoid allocating `String`/`Vec<u8>` in lazy message implementations when the input slice can be borrowed.
+
+**Proposed approach**:
+- On decoding a `string` field, validate UTF-8 via `str::from_utf8(data)` and store `&'slice str` in the message body.
+- For `bytes`, store `&'slice [u8]` directly.
+- Preserve the protobuf "last one wins" semantics by allowing overwrite on repeated occurrences (e.g., store `Option<&'slice str>`).
 
 ## Next Steps (Priority Order)
 
