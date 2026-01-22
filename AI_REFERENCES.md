@@ -27,6 +27,7 @@ focus of the project (serialization/deserialization, codegen, and other runtime 
   - keep a `parser_state: MessageParserStateRef` plus per-field storage
   - `ensure_all_fields_parsed()` delegates to `parser_state.ensure_all_fields_parsed_with_callback()`
   - `LazyRepeated::new()` takes `(parser_state, &OnceList)` (no field-number metadata)
+  - scalar child message caches can be expressed as `OnceCell<Rc<ChildLazyImpl>>` (instead of `RefCell<Option<Rc<_>>>`) when they are set at most once
 
 ## 2026-01-19: Removed `.count()` / `.nth()` usage from lazy repeated implementation
 
@@ -44,6 +45,11 @@ focus of the project (serialization/deserialization, codegen, and other runtime 
 - `LazyRepeated` was updated to leverage O(1) `len()` for `ensure_at_least()` and to reduce overhead:
   - `LazyRepeatedIter` no longer uses `Box<dyn Iterator>`; it stores the concrete `once_list2::Iter` (cloned).
   - `Repeated::iter_box()` no longer collects into a temporary `Vec<T>`; it boxes `self.list.iter().cloned()` after fully parsing.
+
+## 2026-01-22: why lazy message impls use `Rc`
+
+- Generated lazy message bodies (e.g. `PersonLazyImpl`, `AddressLazyImpl`) are constructed with `Rc::new_cyclic` so the `MessageParserStateRef` callback can capture a `Weak<Self>` and update fields while avoiding cycles.
+- Child messages are cached/returned as `Rc<Child>` and repeated message fields store `Rc<Child>` for cheap cloning and stable identity.
 
 ## Handy File Pointers
 

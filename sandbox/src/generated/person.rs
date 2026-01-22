@@ -24,7 +24,7 @@ use ::puroro::{
     shared::SharedFields,
     view::ViewCow,
 };
-use ::std::cell::{Cell, RefCell};
+use ::std::cell::{Cell, OnceCell};
 use ::std::rc::{Rc, Weak};
 
 // Import Address-related types from the separate module
@@ -480,12 +480,15 @@ pub struct PersonLazyImpl<'slice, A: Allocator + Clone + 'slice = Global> {
     scores: OnceList<i32, A>,
 
     /// Field 6: address (scalar message field)
-    /// RefCell needed because Option<AddressLazyImpl> is not Copy
-    address: RefCell<Option<Rc<AddressLazyImpl<'slice, A>>>>,
+    /// Scalar message field cache.
+    ///
+    /// This is set at most once (first occurrence) and then reused; `OnceCell` provides
+    /// interior mutability without dynamic borrow checks.
+    address: OnceCell<Rc<AddressLazyImpl<'slice, A>>>,
 
     /// Field 9: addresses (repeated message field)
     /// OnceList has built-in interior mutability - no RefCell needed
-    /// Use Rc because OnceList requires Copy, and AddressLazyImpl is not Copy
+    /// Use Rc so each element is cheaply cloneable and can be returned/shared without borrowing.
     addresses: OnceList<Rc<AddressLazyImpl<'slice, A>>, A>,
 }
 
@@ -528,7 +531,7 @@ impl<'slice, A: Allocator + Clone + 'slice> PersonLazyImpl<'slice, A> {
                 // Initialize fields with default values
                 age: Cell::new(0),
                 scores: OnceList::new_in(alloc.clone()),
-                address: RefCell::new(None),
+                address: OnceCell::new(),
                 addresses: OnceList::new_in(alloc.clone()),
             }
         })
@@ -563,7 +566,7 @@ impl<'slice, A: Allocator + Clone + 'slice> PersonLazyImpl<'slice, A> {
     /// available slices before it is returned.
     pub fn address(&self) -> Option<Rc<AddressLazyImpl<'slice, A>>> {
         let _ = self.ensure_all_fields_parsed();
-        self.address.borrow().clone()
+        self.address.get().cloned()
     }
 
     /// Getter for addresses field
@@ -595,8 +598,7 @@ impl<'slice, A: Allocator + Clone + 'slice> PersonLazyImpl<'slice, A> {
             }
             (6, FieldValue::Len(data)) => {
                 // address field - scalar message field (length-delimited)
-                let mut address = self.address.borrow_mut();
-                if let Some(ref addr) = *address {
+                if let Some(addr) = self.address.get() {
                     // Child already exists - add slice to it
                     addr.add_slice(data)?;
                 } else {
@@ -604,7 +606,14 @@ impl<'slice, A: Allocator + Clone + 'slice> PersonLazyImpl<'slice, A> {
                     let allocator = self.parser_state.allocator();
                     let parent_parser_state = Some(self.parser_state.clone());
                     let child = AddressLazyImpl::new(data, allocator, parent_parser_state);
-                    *address = Some(child);
+
+                    // This should succeed because we are in the "unset" branch. If it ever fails
+                    // (e.g., via re-entrancy), fall back to updating the existing child.
+                    if self.address.set(child).is_err() {
+                        if let Some(addr) = self.address.get() {
+                            addr.add_slice(data)?;
+                        }
+                    }
                 }
             }
             (9, FieldValue::Len(data)) => {
@@ -637,11 +646,7 @@ impl<'slice, A: Allocator + Clone + 'slice> Drop for PersonLazyImpl<'slice, A> {
     fn drop(&mut self) {
         // When Message Body is dropped, update callback to handle child messages
         // Extract child Weak references from fields
-        let address_weak = self
-            .address
-            .borrow()
-            .as_ref()
-            .map(|addr| Rc::downgrade(addr));
+        let address_weak = self.address.get().map(Rc::downgrade);
 
         // Create new callback that captures child Weak references and uses static match-case
         let closure = move |field: Field<&'slice [u8]>| -> Result<(), Error> {
