@@ -9,7 +9,7 @@ use super::address::AddressLazyImpl;
 use ::allocator_api2::boxed::Box;
 use ::allocator_api2::vec::Vec as AllocVec;
 use ::allocator_extras::{Allocator, Global};
-use ::once_list2::OnceListWithTail as OnceList;
+use ::once_list2::OnceListWithTailLen as OnceList;
 use ::puroro::lazy_parser::MessageParserStateRef;
 use ::puroro::protobuf_core::{Field, FieldValue};
 use ::puroro::repeated_lazy::LazyRepeated;

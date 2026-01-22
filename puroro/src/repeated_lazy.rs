@@ -9,7 +9,7 @@ use crate::error::Error;
 use crate::lazy_parser::MessageParserStateRef;
 use crate::repeated::Repeated;
 use ::allocator_extras::Allocator;
-use ::once_list2::OnceListWithTail as OnceList;
+use ::once_list2::OnceListWithTailLen as OnceList;
 /// A lazy, on-demand parsing adapter over a repeated field.
 ///
 /// - `T`: element type contained in the repeated field (should be `Clone`).
@@ -51,24 +51,13 @@ where
     /// If the parent's iterator is exhausted, `parse_until` will automatically request
     /// the parent's parent to continue parsing, so this method only needs to call `parse_until`.
     fn ensure_at_least(&self, needed: usize) -> Result<(), Error> {
-        // We avoid relying on `len()`/`count()` here. Instead, we keep a single iterator that can
-        // observe newly pushed elements (OnceList::iter() checks the underlying OnceCell each time).
-        let mut it = self.list.iter();
-        let mut seen = 0usize;
-
-        while seen < needed {
-            if it.next().is_some() {
-                seen += 1;
-                continue;
-            }
-
+        while self.list.len() < needed {
             // No more elements right now; advance the parent by one field and retry.
             // If the parent is exhausted, we cannot make further progress.
             if !self.parent_parser_state.parse_one_field_with_callback()? {
                 break;
             }
         }
-
         Ok(())
     }
 
@@ -98,7 +87,7 @@ where
     A: Allocator + Clone + 'slice,
 {
     lazy_repeated: &'iter LazyRepeated<'slice, 'message, T, A>,
-    inner_iter: ::std::boxed::Box<dyn Iterator<Item = T> + 'iter>,
+    inner_iter: ::std::iter::Cloned<::once_list2::Iter<'message, T, A>>,
 }
 
 impl<'iter, 'slice, 'message, T, A> LazyRepeatedIter<'iter, 'slice, 'message, T, A>
@@ -107,10 +96,9 @@ where
     A: Allocator + Clone + 'slice,
 {
     fn new(lazy_repeated: &'iter LazyRepeated<'slice, 'message, T, A>) -> Self {
-        let iter = lazy_repeated.list.iter().cloned();
         Self {
             lazy_repeated,
-            inner_iter: ::std::boxed::Box::new(iter),
+            inner_iter: lazy_repeated.list.iter().cloned(),
         }
     }
 }
@@ -160,11 +148,7 @@ where
     fn len(&self) -> usize {
         // Length requires knowing all elements; fall back to full parse.
         let _ = self.ensure_fully_parsed();
-        let mut n = 0usize;
-        for _ in self.list.iter() {
-            n += 1;
-        }
-        n
+        self.list.len()
     }
 
     fn is_empty(&self) -> bool {
@@ -175,19 +159,13 @@ where
 
     fn get(&self, index: usize) -> Option<Self::Item> {
         let _ = self.ensure_at_least(index.saturating_add(1));
-        for (i, v) in self.list.iter().enumerate() {
-            if i == index {
-                return Some(v.clone());
-            }
-        }
-        None
+        self.list.iter().nth(index).cloned()
     }
 
     fn iter_box(&self) -> ::allocator_api2::boxed::Box<dyn Iterator<Item = Self::Item> + 'message> {
-        // For the initial boilerplate, materialize by fully parsing and collecting.
+        // For the initial boilerplate, fully parse, then return a non-allocating iterator.
         let _ = self.ensure_fully_parsed();
-        let owned: ::std::vec::Vec<T> = self.list.iter().cloned().collect();
-        let it = owned.into_iter();
+        let it = self.list.iter().cloned();
         let boxed = ::allocator_api2::boxed::Box::new(it);
         let boxed_dyn: ::allocator_api2::boxed::Box<dyn Iterator<Item = T> + 'message> =
             ::allocator_api2::unsize_box!(boxed);

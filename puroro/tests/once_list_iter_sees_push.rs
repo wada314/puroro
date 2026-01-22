@@ -1,4 +1,4 @@
-use ::once_list2::OnceListWithTail as OnceList;
+use ::once_list2::OnceListWithTailLen as OnceList;
 #[test]
 fn once_list_iter_sees_push_after_exhausted() {
     let list = OnceList::<i32>::new();

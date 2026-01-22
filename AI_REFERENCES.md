@@ -33,10 +33,14 @@ confusion and to keep this file small.
 - Updated `Repeated` adapters for `OnceList` to avoid `.count()`/`.nth()` (use manual loops / `enumerate()`).
 - Added an integration test asserting that a `OnceList::iter()` created before a `push()` can observe the newly pushed element.
 
-## 2026-01-19: once-list2 tail caching option
+## 2026-01-22: once-list2 0.4.0 tail append integration
 
-- `once-list2::OnceList` gained an optional tail-caching mode to optimize repeated tail appends while preserving the iterator behavior.
-- Opt-in via `OnceList::new_with_tail()`, `OnceList::new_in_with_tail(...)`, or the type alias `once_list2::OnceListWithTail<T, A>`.
+- `puroro` now pins `once-list2 = "0.4.0"`.
+- `sandbox` also pins `once-list2 = "0.4.0"` to avoid multiple versions (the generated reference code imports tail-caching aliases).
+- We use `once_list2::OnceListWithTailLen<T, A>` (via `use ::once_list2::OnceListWithTailLen as OnceList;`) so repeated tail appends are fast and `len()` is O(1).
+- `LazyRepeated` was updated to leverage O(1) `len()` for `ensure_at_least()` and to reduce overhead:
+  - `LazyRepeatedIter` no longer uses `Box<dyn Iterator>`; it stores the concrete `once_list2::Iter` (cloned).
+  - `Repeated::iter_box()` no longer collects into a temporary `Vec<T>`; it boxes `self.list.iter().cloned()` after fully parsing.
 
 ## Handy File Pointers
 
