@@ -1,7 +1,7 @@
 # Next Steps for Lazy Repeated Field Parsing
 
-**Last Updated**: 2025-01-01  
-**Status**: ✅ Basic implementation complete; optimizations and documentation updates in progress
+**Last Updated**: 2026-01-22  
+**Status**: ✅ Basic implementation complete; key performance optimizations implemented
 
 ## Current Implementation Status
 
@@ -9,7 +9,12 @@
 - `LazyRepeated` wrapper type that implements `Repeated` trait
 - `LazyRepeatedIter` iterator that triggers parsing on-demand in `next()`
 - `PersonLazyImpl::scores()` and `addresses()` return `LazyRepeated`
-- All tests passing (15 tests)
+- `once-list2` tail append optimization integrated (0.4.0)
+- Reduced overhead in hot paths:
+  - `ensure_at_least()` uses O(1) `len()` (tail+len caching)
+  - `LazyRepeatedIter` stores the concrete `once_list2::Iter` (no `Box<dyn Iterator>` field)
+  - `Repeated::iter_box()` no longer collects into a temporary `Vec<T>`
+- All tests passing
 
 ## Completed Features
 
@@ -23,17 +28,17 @@
 ### 1. Efficiency: Counting and Iterator Recreation Overhead
 
 **Current Behavior**:
-- `ensure_at_least()` calls `parse_until_with_callback(...)` and checks a condition after each processed field
+- `ensure_at_least()` advances the parent parser one field at a time and uses a cheap check (`len()`)
+- `LazyRepeatedIter` advances parsing only when its underlying iterator is exhausted
 - This avoids parsing the entire message when only a small number of elements are needed
-- However, there is still overhead from repeated counting and iterator recreation
 
 **Impact**:
 - Correctness: ✅ Correct (all tests pass)
-- Efficiency: ⚠️ Could be improved (parses more than necessary)
+- Efficiency: ✅ Improved (removed repeated O(n) counting and iterator boxing/collection)
 
-**Potential Solution**:
-- Reduce repeated `list.iter().count()` calls (currently O(n) per check) by tracking counts more directly
-- Reduce iterator recreation/skip cost in `LazyRepeatedIter::next()`
+**Remaining Considerations**:
+- `Repeated::get(index)` is inherently O(n) on a singly-linked list (acceptable for now; can be revisited if needed)
+- If we ever remove random-access APIs (`get()`/`len()`) from `Repeated`, we may be able to simplify or remove `ensure_at_least()`
 
 ### 2. Unused `_field_number` Field
 

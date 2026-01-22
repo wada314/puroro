@@ -1,7 +1,7 @@
 # Next Steps for Puroro Development
 
-**Last Updated**: 2025-10-21  
-**Status**: Core field operations complete, ready for serialization/deserialization
+**Last Updated**: 2026-01-22  
+**Status**: Lazy parsing infrastructure implemented; serialization/deserialization remains the main milestone
 
 ## Current Status Summary
 
@@ -14,7 +14,7 @@
 - ✅ String field implementations (both ImplicitOptional and ExplicitOptional)
 - ✅ Scalar field implementations (i32, i64, u32, u64, f32, f64, bool)
 - ✅ SharedFields with BitArray for presence tracking
-- ✅ Generated code integration in sandbox (17 tests passing)
+- ✅ Reference generated-style code in sandbox (tests passing, including lazy parsing examples)
 
 **Memory Layout Optimization**:
 - ✅ Stack-allocated SharedFields with BitArray
@@ -109,12 +109,17 @@
 ### 3.1 Performance Optimizations
 - [ ] Arena allocation support
 - [ ] Zero-copy deserialization (views)
-- [ ] Lazy deserialization implementation
-  - Implement `PersonTry` with actual lazy loading
-  - Cache deserialized fields
+- ✅ Lazy parsing infrastructure (incremental parsing)
+  - `MessageParserStateRef` + `FieldIterator` in `puroro/src/lazy_parser.rs`
+  - `LazyRepeated` in `puroro/src/repeated_lazy.rs`
+  - Reference lazy implementations in `sandbox/src/generated/*.rs`
+
+- [ ] Lazy deserialization ergonomics / expansion
+  - Extend lazy support beyond the reference sandbox code
+  - Decide whether `Repeated` should keep `get()`/`len()` (random access) or move to a streaming-only API
 
 ### 3.2 Additional Implementations
-- [ ] `PersonLazy` - Lazy deserialization
+- [ ] `PersonLazy` - Lazy deserialization (beyond sandbox reference)
 - [ ] `PersonView<'a>` - Zero-copy view
 - [ ] `PersonCompact` - Code size optimized
 - [ ] `PersonOpen` - Public fields (for pattern matching use cases)

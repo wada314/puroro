@@ -5,12 +5,15 @@ Puroro is a Rust-idiomatic implementation of Google Protocol Buffers, focusing o
 - Precise Protocol Buffers specification support
 - Rust-idiomatic APIs that leverage the type system
 - Memory safety without sacrificing performance
-- Lazy parsing support for on-demand deserialization
+- Practical performance (e.g., incremental parsing / lazy parsing where it makes sense)
 
 ## Lazy Parser Implementation - Current Snapshot (2026-01)
 
 This section describes the current code behavior at a high level (as of 2026-01), to avoid
 confusion and to keep this file small.
+
+Note: Lazy parsing is a current hot topic and an actively developed area, but it is not the only
+focus of the project (serialization/deserialization, codegen, and other runtime pieces are also in scope).
 
 - **Core types**: `FieldIterator`, `MessageParserStateRef`
 - **Internal core**: `MessageParserStateInner` (the mutable state behind `MessageParserStateRef`, stored as `Rc<RefCell<...>>`)
@@ -52,3 +55,11 @@ confusion and to keep this file small.
 
 - `doc/lazy-parsing-state-design.md`
 - `doc/lazy-parsing-next-steps.md`
+
+## Minimal Reading Order (for new AI agents)
+
+If you are new to this repo and want to avoid reading many docs, start here:
+
+1. `puroro/src/lazy_parser.rs` + `puroro/src/repeated_lazy.rs` (ground truth implementation)
+2. `doc/lazy-parsing-state-design.md` (current invariants / mental model)
+3. `doc/design-discussion.md` (the top "Current Implementation Status (2026-01-22)" snapshot only; the rest is historical log)

@@ -4,8 +4,8 @@ This document records the design discussions and decisions for the Puroro projec
 
 ## Quick Reference: Design Decisions
 
-**Last Updated**: 2025-10-21  
-**Current Status**: Core field operations implemented, ready for serialization/deserialization
+**Last Updated**: 2026-01-22  
+**Current Status**: Lazy parsing infrastructure implemented; serialization/deserialization and code generator remain in progress
 
 ### Core Decisions
 
@@ -61,7 +61,33 @@ trait PersonMut: PersonAppend {
 
 ---
 
-## Current Implementation Status (2025-10-21)
+## Current Implementation Status (2026-01-22)
+
+This section is a small, up-to-date snapshot. The rest of this document is primarily a discussion log
+and may describe older intermediate plans.
+
+### ✅ Implemented (selected highlights)
+
+- This list is intentionally selective. Lazy parsing is highlighted because it is a current hot topic,
+  but it is not the only focus of the project.
+
+- **Lazy parsing infrastructure**:
+  - `MessageParserStateRef` / `MessageParserStateInner` and `FieldIterator` in `puroro/src/lazy_parser.rs`
+  - `LazyRepeated` adapter in `puroro/src/repeated_lazy.rs`
+  - Reference generated-style implementations under `sandbox/src/generated/*.rs`
+  - See also: `doc/lazy-parsing-state-design.md`
+
+- **once-list2 0.4.0 integration**:
+  - `puroro` and `sandbox` pin `once-list2 = "0.4.0"` to avoid multiple versions and to use tail/len caching variants
+
+### 🚧 In Progress
+
+- **Serialization/deserialization** (core milestone)
+- **Code generator** (`puroro-codegen` is currently a stub and not yet producing the sandbox reference code)
+
+---
+
+## Historical Snapshot: Implementation Status (2025-10-21)
 
 ### ✅ Completed Core Components
 

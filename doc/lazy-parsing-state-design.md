@@ -89,9 +89,7 @@ See `PersonLazyImpl::age()` in `sandbox/src/generated/person.rs`.
 
 **Requirement**: Parse only until first occurrence of target field, but still update other fields
 
-**Note**: This uses the generic `ensure_field_first_occurrence` method, which works for any field type.
-
-**Status**: ✅ **Implemented** (2025-01)
+**Status**: ✅ Implemented (updated 2026-01)
 
 The getters (`scores()`, `addresses()`) return `LazyRepeated` wrapper that implements true lazy parsing:
 - Elements are parsed on-demand when accessed via `iter()`, `get()`, `len()`, etc.
@@ -178,6 +176,10 @@ Following Protobuf semantics:
   - Use `RefCell<Option<T>>` for `Option<non-Copy>` types (e.g., `RefCell<Option<String<A>>>`)
 - **Scalar message fields**: Use `RefCell<Option<MessageLazyImpl>>` (may be absent)
 - **Repeated fields**: Use `OnceList<T, A>` directly (can add items incrementally via `push(&self)`)
+
+**Implementation Note (Performance)**:
+- In the current implementation, `OnceList` is typically an alias for `once_list2::OnceListWithTailLen<T, A>`
+  to optimize repeated tail appends and make `len()` O(1), while preserving iterator behavior.
 
 **Note**: In the sample code, `String<A>` is used for brevity. In the actual implementation, this should be `allocator_extras::String<A>` (allocator-aware String) with `String::new_in(allocator)` for initialization.
 
@@ -293,7 +295,7 @@ Our design shares similarities with the Builder pattern in Rust, but with import
 
 ### Status: ✅ Implemented
 
-**Implementation Complete (2025-01)**: Repeated fields (`scores`, `addresses`) now support true lazy parsing via the `LazyRepeated` wrapper type.
+**Implementation**: Repeated fields (`scores`, `addresses`) support true lazy parsing via the `LazyRepeated` wrapper type.
 
 **Current Implementation**:
 - `PersonLazyImpl::scores()` and `addresses()` return `LazyRepeated` wrapper (not `&OnceList`)
@@ -321,17 +323,18 @@ pub fn scores(&self) -> LazyRepeated<'slice, '_, i32, A> {
 3. **`iter()`**: Returns `LazyRepeatedIter` that triggers parsing on-demand in `next()`
 
 **Repeated Trait Implementation**:
-- `get(index)`: Calls `ensure_at_least(index + 1)` then delegates to `OnceList::get()`
+- `get(index)`: Calls `ensure_at_least(index + 1)` then finds the element (O(n) on a singly-linked list)
 - `len()`: Calls `ensure_fully_parsed()` then delegates to `OnceList::len()`
 - `is_empty()`: Calls `ensure_at_least(1)` then checks if any elements exist
 - `iter()`: Returns `LazyRepeatedIter` wrapper
-- `iter_box()`: Calls `ensure_fully_parsed()` then collects all elements into a boxed iterator
+- `iter_box()`: Calls `ensure_fully_parsed()` then returns a boxed iterator over the list (no temporary `Vec` collection)
 
 **LazyRepeatedIter Iterator**:
 - Wraps the underlying `OnceList::iter()` iterator
-- When iterator is exhausted, checks if parent parser has more fields
-- If yes, triggers parsing via `ensure_at_least()` and recreates iterator with newly parsed elements
-- Provides seamless on-demand parsing during iteration
+- When iterator is exhausted, it advances the parent parser one field at a time until either:
+  - the repeated field receives a new element (then yields it), or
+  - the parent is exhausted
+- No iterator recreation / skip is needed because `once_list2::Iter` observes newly pushed elements
 
 ### How It Works
 
@@ -340,19 +343,18 @@ pub fn scores(&self) -> LazyRepeated<'slice, '_, i32, A> {
 1. **Getter Call**: `person.scores()` returns `LazyRepeated` immediately (no parsing)
 2. **Element Access**: When `scores().get(5)` is called:
    - `LazyRepeated::get()` calls `ensure_at_least(6)` (need 6 elements for index 5)
-   - `ensure_at_least()` calls `parent_parser_state.parse_until_with_callback(...)`
-   - Parent parser continues parsing, updating all fields via callback
+   - `ensure_at_least()` repeatedly calls `parent_parser_state.parse_one_field_with_callback()` as needed
+   - Parent parser continues parsing, updating all fields via callback (protobuf semantics preserved)
    - Target field (`scores`) gets new elements added to `OnceList` via `push()`
    - Loop continues until 6 elements are available or parser is exhausted
 3. **Iterator Access**: When `scores().iter().next()` is called:
    - `LazyRepeatedIter::next()` checks if inner iterator has more elements
-   - If exhausted, calls `ensure_at_least(current_count + 1)` to get one more element
-   - Recreates iterator and skips already-seen elements
-   - Returns the next newly-parsed element
+   - If exhausted, it advances the parent parser one field at a time until a new element appears (or the parent is exhausted)
+   - Returns the next newly-parsed element if it appears
 
 ### Known Limitations and Future Optimizations
 
-1. **Efficiency**: the current implementation is correct, but has avoidable overhead (e.g., repeated `.iter().count()` checks and iterator recreation in `LazyRepeatedIter`).
+1. **Random access cost**: `Repeated::get(index)` is O(n) due to the underlying singly-linked list (acceptable for now; optimize if it becomes hot).
 
 2. **Unused Field**: (resolved) `LazyRepeated` no longer stores `_field_number` since it was unused.
 
