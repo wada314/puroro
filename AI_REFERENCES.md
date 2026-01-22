@@ -51,11 +51,26 @@ focus of the project (serialization/deserialization, codegen, and other runtime 
 - Generated lazy message bodies (e.g. `PersonLazyImpl`, `AddressLazyImpl`) are constructed with `Rc::new_cyclic` so the `MessageParserStateRef` callback can capture a `Weak<Self>` and update fields while avoiding cycles.
 - Child messages are cached/returned as `Rc<Child>` and repeated message fields store `Rc<Child>` for cheap cloning and stable identity.
 
+## 2026-01-22: split the reference generated `Person` code into submodules
+
+- `sandbox/src/generated/person.rs` is now a thin facade module.
+- The reference generated `Person` implementation is split under `sandbox/src/generated/person/` into:
+  - `traits.rs` (public traits)
+  - `status.rs` (enum)
+  - `impl_.rs` (standard impl)
+  - `lazy.rs` (lazy impl)
+  - `tests.rs` (unit tests)
+- This keeps the public surface stable (`generated::person::PersonImpl`, etc.) while making the file sizes manageable as the API grows.
+- IMPORTANT: This split is a **design-stage convenience**. The real code generator may choose a different
+  output layout (including a simpler "one module = one file" approach). Do not treat the current file
+  structure as the final generated format.
+
 ## Handy File Pointers
 
 - `puroro/src/lazy_parser.rs`: incremental parser state + parent-chain parsing requests
 - `puroro/src/repeated_lazy.rs`: `LazyRepeated` adapter
-- `sandbox/src/generated/person.rs`, `sandbox/src/generated/address.rs`: reference generated-style code (traits + impl + lazy impl)
+- `sandbox/src/generated/person.rs` + `sandbox/src/generated/person/`: reference generated-style code for `Person`
+- `sandbox/src/generated/address.rs`: reference generated-style code for `Address`
 
 ## More Detailed Design Docs
 
