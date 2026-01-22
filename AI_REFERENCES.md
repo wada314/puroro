@@ -33,6 +33,11 @@ confusion and to keep this file small.
 - Updated `Repeated` adapters for `OnceList` to avoid `.count()`/`.nth()` (use manual loops / `enumerate()`).
 - Added an integration test asserting that a `OnceList::iter()` created before a `push()` can observe the newly pushed element.
 
+## 2026-01-19: once-list2 tail caching option
+
+- `once-list2::OnceList` gained an optional tail-caching mode to optimize repeated tail appends while preserving the iterator behavior.
+- Opt-in via `OnceList::new_with_tail()`, `OnceList::new_in_with_tail(...)`, or the type alias `once_list2::OnceListWithTail<T, A>`.
+
 ## Handy File Pointers
 
 - `puroro/src/lazy_parser.rs`: incremental parser state + parent-chain parsing requests

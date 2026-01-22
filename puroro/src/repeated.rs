@@ -2,8 +2,7 @@ use ::allocator_api2::alloc::Allocator;
 use ::allocator_api2::boxed::Box;
 use ::allocator_api2::unsize_box;
 use ::allocator_api2::vec::Vec;
-use ::once_list2::OnceList;
-
+use ::once_list2::OnceListWithTail as OnceList;
 /// Object-safe trait representing a repeated field using an associated type.
 ///
 /// This trait uses an associated type `Item` instead of a type parameter,

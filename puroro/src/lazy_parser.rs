@@ -7,7 +7,7 @@
 
 use crate::error::Error;
 use ::allocator_extras::{Allocator, Global};
-use ::once_list2::OnceList;
+use ::once_list2::OnceListWithTail as OnceList;
 use ::protobuf_core::{AsRefExtProtobuf, Field, ProtobufFieldSliceIterator};
 use ::std::cell::RefCell;
 use ::std::iter::Peekable;

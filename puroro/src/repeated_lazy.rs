@@ -9,8 +9,7 @@ use crate::error::Error;
 use crate::lazy_parser::MessageParserStateRef;
 use crate::repeated::Repeated;
 use ::allocator_extras::Allocator;
-use ::once_list2::OnceList;
-
+use ::once_list2::OnceListWithTail as OnceList;
 /// A lazy, on-demand parsing adapter over a repeated field.
 ///
 /// - `T`: element type contained in the repeated field (should be `Clone`).

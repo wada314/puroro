@@ -1,5 +1,4 @@
-use ::once_list2::OnceList;
-
+use ::once_list2::OnceListWithTail as OnceList;
 #[test]
 fn once_list_iter_sees_push_after_exhausted() {
     let list = OnceList::<i32>::new();
@@ -15,4 +14,3 @@ fn once_list_iter_sees_push_after_exhausted() {
     assert_eq!(it.next().copied(), Some(2));
     assert_eq!(it.next().copied(), None);
 }
-
