@@ -65,6 +65,18 @@ focus of the project (serialization/deserialization, codegen, and other runtime 
   output layout (including a simpler "one module = one file" approach). Do not treat the current file
   structure as the final generated format.
 
+## 2026-01-22: lazy parsing - known gaps / TODOs (design stage)
+
+- **`iter_box()` should not force full parse**: `LazyRepeated::iter_box()` should return an on-demand iterator
+  (while `len()` may inevitably require full parse). (This was addressed in `puroro/src/repeated_lazy.rs`.)
+- **Packed repeated**: Support packed encoding for repeated numeric fields (wire type Len) in lazy impls.
+- **Unknown fields**: Preserve unknown fields (store + round-trip) instead of discarding them.
+- **Zero-copy views**: High-priority future work. Prefer returning borrowed views (`&'slice [u8]` / `&'slice str`)
+  where possible; avoid `to_vec()` copies in lazy impls.
+- **Slice contract**: Multiple slice input is intentional, but each slice is expected to be a self-contained,
+  valid protobuf encoding of (part of) the same message (not arbitrary byte-stream fragmentation).
+- **Standard impl parse/write/size**: `PersonImpl` and other standard impls still have `todo!()` for parsing/serialization/size.
+
 ## Handy File Pointers
 
 - `puroro/src/lazy_parser.rs`: incremental parser state + parent-chain parsing requests

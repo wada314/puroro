@@ -276,7 +276,7 @@ impl<A: Allocator + Clone> Message for AddressImpl<A> {
 
 use ::puroro::lazy_parser::MessageParserStateRef;
 use ::puroro::protobuf_core::{Field, FieldValue};
-use ::std::cell::{Cell, RefCell};
+use ::std::cell::Cell;
 use ::std::rc::{Rc, Weak};
 
 /// Lazy implementation of `Address` that deserializes fields on-demand.
@@ -292,10 +292,10 @@ pub struct AddressLazyImpl<'slice, A: Allocator = Global> {
     parser_state: MessageParserStateRef<'slice, A>,
 
     /// Field 1: street (implicit presence string field)
-    street: RefCell<String>,
+    street: Cell<Option<&'slice str>>,
 
     /// Field 2: city (implicit presence string field)
-    city: RefCell<String>,
+    city: Cell<Option<&'slice str>>,
 
     /// Field 3: zip_code (implicit presence varint field)
     zip_code: Cell<i32>,
@@ -337,8 +337,8 @@ impl<'slice, A: Allocator + Clone + 'slice> AddressLazyImpl<'slice, A> {
             // Create message body
             Self {
                 parser_state,
-                street: RefCell::new(String::new()),
-                city: RefCell::new(String::new()),
+                street: Cell::new(None),
+                city: Cell::new(None),
                 zip_code: Cell::new(0),
             }
         })
@@ -352,21 +352,21 @@ impl<'slice, A: Allocator + Clone + 'slice> AddressLazyImpl<'slice, A> {
     }
 
     /// Getter for street field
-    pub fn street(self: &Rc<Self>) -> std::cell::Ref<'_, String> {
-        let _ = self.ensure_all_fields_parsed();
-        self.street.borrow()
+    pub fn street(&self) -> Result<&'slice str, Error> {
+        self.ensure_all_fields_parsed()?;
+        Ok(self.street.get().unwrap_or(""))
     }
 
     /// Getter for city field
-    pub fn city(self: &Rc<Self>) -> std::cell::Ref<'_, String> {
-        let _ = self.ensure_all_fields_parsed();
-        self.city.borrow()
+    pub fn city(&self) -> Result<&'slice str, Error> {
+        self.ensure_all_fields_parsed()?;
+        Ok(self.city.get().unwrap_or(""))
     }
 
     /// Getter for zip_code field
-    pub fn zip_code(&self) -> i32 {
-        let _ = self.ensure_all_fields_parsed();
-        self.zip_code.get()
+    pub fn zip_code(&self) -> Result<i32, Error> {
+        self.ensure_all_fields_parsed()?;
+        Ok(self.zip_code.get())
     }
 
     /// Ensure all fields are parsed
@@ -386,15 +386,15 @@ impl<'slice, A: Allocator + Clone + 'slice> AddressLazyImpl<'slice, A> {
         match (field_num, field.value) {
             (1, FieldValue::Len(data)) => {
                 // street field - string
-                let street_value =
-                    String::from_utf8(data.to_vec()).map_err(|e| Error::InvalidUtf8(e))?;
-                *self.street.borrow_mut() = street_value;
+                let bytes = data.as_ref();
+                let street_value = ::std::str::from_utf8(bytes)?;
+                self.street.set(Some(street_value));
             }
             (2, FieldValue::Len(data)) => {
                 // city field - string
-                let city_value =
-                    String::from_utf8(data.to_vec()).map_err(|e| Error::InvalidUtf8(e))?;
-                *self.city.borrow_mut() = city_value;
+                let bytes = data.as_ref();
+                let city_value = ::std::str::from_utf8(bytes)?;
+                self.city.set(Some(city_value));
             }
             (3, FieldValue::Varint(varint)) => {
                 // zip_code field - varint

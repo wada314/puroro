@@ -192,9 +192,9 @@ fn test_person_lazy_address_field_simple() {
     let address = address_opt.unwrap();
 
     // Check Address fields
-    assert_eq!(*address.street(), "Main St");
-    assert_eq!(*address.city(), "New York");
-    assert_eq!(address.zip_code(), 10001);
+    assert_eq!(address.street().unwrap(), "Main St");
+    assert_eq!(address.city().unwrap(), "New York");
+    assert_eq!(address.zip_code().unwrap(), 10001);
 }
 
 #[test]
@@ -236,9 +236,9 @@ fn test_person_lazy_address_field_multiple_slices() {
     let address = address_opt.unwrap();
 
     // Check that both slices are concatenated
-    assert_eq!(*address.street(), "Main St");
-    assert_eq!(*address.city(), "New York");
-    assert_eq!(address.zip_code(), 10001);
+    assert_eq!(address.street().unwrap(), "Main St");
+    assert_eq!(address.city().unwrap(), "New York");
+    assert_eq!(address.zip_code().unwrap(), 10001);
 }
 
 #[test]
@@ -257,7 +257,7 @@ fn test_person_lazy_address_and_age_together() {
     let address_opt = person_rc.address();
     assert!(address_opt.is_some());
     let address = address_opt.unwrap();
-    assert_eq!(*address.street(), "Oak Ave");
-    assert_eq!(*address.city(), "Boston");
-    assert_eq!(address.zip_code(), 02115);
+    assert_eq!(address.street().unwrap(), "Oak Ave");
+    assert_eq!(address.city().unwrap(), "Boston");
+    assert_eq!(address.zip_code().unwrap(), 02115);
 }

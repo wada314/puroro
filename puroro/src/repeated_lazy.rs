@@ -86,38 +86,41 @@ where
     /// Return an iterator over the elements in the repeated field.
     ///
     /// The iterator's `next()` method triggers parsing on-demand when needed.
-    pub fn iter(&self) -> LazyRepeatedIter<'_, 'slice, 'message, T, A>
+    pub fn iter(&self) -> LazyRepeatedIter<'slice, 'message, T, A>
     where
         T: 'message,
     {
-        LazyRepeatedIter::new(self)
+        LazyRepeatedIter::new(self.parent_parser_state.clone(), self.list)
     }
 }
 
 /// Iterator over `LazyRepeated` that triggers parsing on-demand in `next()`.
-pub struct LazyRepeatedIter<'iter, 'slice, 'message, T, A>
+pub struct LazyRepeatedIter<'slice, 'message, T, A>
 where
     T: Clone + 'message,
     A: Allocator + Clone + 'slice,
 {
-    lazy_repeated: &'iter LazyRepeated<'slice, 'message, T, A>,
+    parent_parser_state: MessageParserStateRef<'slice, A>,
     inner_iter: ::std::iter::Cloned<::once_list2::Iter<'message, T, A>>,
 }
 
-impl<'iter, 'slice, 'message, T, A> LazyRepeatedIter<'iter, 'slice, 'message, T, A>
+impl<'slice, 'message, T, A> LazyRepeatedIter<'slice, 'message, T, A>
 where
     T: Clone + 'message,
     A: Allocator + Clone + 'slice,
 {
-    fn new(lazy_repeated: &'iter LazyRepeated<'slice, 'message, T, A>) -> Self {
+    fn new(
+        parent_parser_state: MessageParserStateRef<'slice, A>,
+        list: &'message OnceList<T, A>,
+    ) -> Self {
         Self {
-            lazy_repeated,
-            inner_iter: lazy_repeated.list.iter().cloned(),
+            parent_parser_state,
+            inner_iter: list.iter().cloned(),
         }
     }
 }
 
-impl<'iter, 'slice, 'message, T, A> Iterator for LazyRepeatedIter<'iter, 'slice, 'message, T, A>
+impl<'slice, 'message, T, A> Iterator for LazyRepeatedIter<'slice, 'message, T, A>
 where
     T: Clone + 'message,
     A: Allocator + Clone + 'slice,
@@ -135,7 +138,6 @@ where
         // exhausted.
         loop {
             let progressed = self
-                .lazy_repeated
                 .parent_parser_state
                 .parse_one_field_with_callback()
                 .ok()?;
@@ -154,6 +156,7 @@ where
 #[allow(missing_docs)]
 impl<'slice, 'message, T, A> Repeated<'message> for LazyRepeated<'slice, 'message, T, A>
 where
+    'slice: 'message,
     T: Clone + 'message,
     A: Allocator + Clone + 'slice,
 {
@@ -177,9 +180,8 @@ where
     }
 
     fn iter_box(&self) -> ::allocator_api2::boxed::Box<dyn Iterator<Item = Self::Item> + 'message> {
-        // For the initial boilerplate, fully parse, then return a non-allocating iterator.
-        let _ = self.ensure_fully_parsed();
-        let it = self.list.iter().cloned();
+        // Return an on-demand iterator (does NOT fully parse up-front).
+        let it = LazyRepeatedIter::new(self.parent_parser_state.clone(), self.list);
         let boxed = ::allocator_api2::boxed::Box::new(it);
         let boxed_dyn: ::allocator_api2::boxed::Box<dyn Iterator<Item = T> + 'message> =
             ::allocator_api2::unsize_box!(boxed);

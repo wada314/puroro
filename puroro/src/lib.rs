@@ -127,6 +127,12 @@ pub mod error {
         #[error("Invalid UTF-8: {0}")]
         InvalidUtf8(#[from] std::string::FromUtf8Error),
 
+        /// Invalid UTF-8 in string field (borrowed view).
+        ///
+        /// This is used by lazy parsing paths that validate UTF-8 without allocating a `String`.
+        #[error("Invalid UTF-8: {0}")]
+        InvalidUtf8Str(#[from] std::str::Utf8Error),
+
         /// Attempted to add slice after message has been terminated.
         /// This occurs when a terminating getter (e.g., scalar field getter that checks all slices)
         /// has been called, making the message state immutable.
