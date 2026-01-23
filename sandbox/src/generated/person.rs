@@ -35,9 +35,9 @@ mod traits;
 mod tests;
 
 // Import Address-related types from the separate module
-pub use super::address::{Address, AddressImpl, AddressMut, DynAddress, DynAddressMut};
+pub use super::address::{Address, AddressImpl, AddressMut, AddressTry};
 
 pub use self::impl_::PersonImpl;
 pub use self::lazy::PersonLazyImpl;
 pub use self::status::Status;
-pub use self::traits::{DynPerson, DynPersonMut, DynPersonTry, Person, PersonMut, PersonTry};
+pub use self::traits::{Person, PersonMut, PersonTry};

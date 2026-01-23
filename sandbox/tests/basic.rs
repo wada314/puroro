@@ -15,7 +15,7 @@
 //! Basic integration tests for our API design.
 
 use ::allocator_extras::Global;
-use sandbox::generated::person::{DynPerson, Person, PersonImpl, PersonMut};
+use sandbox::generated::person::{Person, PersonImpl, PersonMut};
 
 #[test]
 fn test_person_creation() {
@@ -25,8 +25,7 @@ fn test_person_creation() {
     assert_eq!(Person::email(&person), None);
 
     // ImplicitOptional fields are present only if not equal to default value
-    assert!(!DynPerson::has_name(&person)); // Empty string is default value
-    // Sample: only has_name is available in DynPerson trait
+    assert!(!Person::has_name(&person)); // Empty string is default value
 }
 
 #[test]
@@ -46,8 +45,7 @@ fn test_person_setters() {
     assert_eq!(Person::name(&person), "Alice");
 
     // After setting, fields should be marked as "set"
-    assert!(DynPerson::has_name(&person));
-    // Sample: only has_name is available in DynPerson trait
+    assert!(Person::has_name(&person));
 }
 
 #[test]
@@ -200,7 +198,7 @@ fn test_inline_optimization_hint() {
     // These calls should be inlined in release builds
     PersonMut::set_name(&mut person, "Inline Test");
     let _ = Person::name(&person);
-    let _ = DynPerson::has_name(&person);
+    let _ = Person::has_name(&person);
 
     // Just verify functionality
     assert_eq!(Person::name(&person), "Inline Test");

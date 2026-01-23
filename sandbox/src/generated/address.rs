@@ -36,15 +36,39 @@ use ::puroro::{
 /// Flexible view trait for Address message (not dyn-compatible).
 ///
 /// Code generation note: MUST NOT reference implementation struct names. Trait-only abstraction.
-pub trait Address: DynAddress {}
+pub trait Address: AddressTry {
+    fn street(&self) -> &str;
+    fn city(&self) -> &str;
+    fn zip_code(&self) -> i32;
+}
 
-// Blanket implementation for references
-impl<T: Address> Address for &T {}
-impl<T: Address> Address for &mut T {}
-impl<T: AddressMut> AddressMut for &mut T {}
+// Blanket implementation for references (infallible)
+impl<T: Address> Address for &T {
+    fn street(&self) -> &str {
+        (*self).street()
+    }
+    fn city(&self) -> &str {
+        (*self).city()
+    }
+    fn zip_code(&self) -> i32 {
+        (*self).zip_code()
+    }
+}
 
-// Blanket implementation for Option
-impl<T: DynAddress> DynAddress for Option<T> {
+impl<T: Address> Address for &mut T {
+    fn street(&self) -> &str {
+        (**self).street()
+    }
+    fn city(&self) -> &str {
+        (**self).city()
+    }
+    fn zip_code(&self) -> i32 {
+        (**self).zip_code()
+    }
+}
+
+// Blanket implementation for Option (infallible)
+impl<T: Address> Address for Option<T> {
     fn street(&self) -> &str {
         self.as_ref().map(|v| v.street()).unwrap_or("")
     }
@@ -58,86 +82,100 @@ impl<T: DynAddress> DynAddress for Option<T> {
     }
 }
 
-impl<T: Address> Address for Option<T> {}
-
 // Blanket implementation for Box
-impl<T: Address> Address for Box<T> {}
-impl<T: AddressMut> AddressMut for Box<T> {}
-
-// Blanket implementation for Option
-impl<T: AddressMut> AddressMut for Option<T> {}
+impl<T: Address> Address for Box<T> {
+    fn street(&self) -> &str {
+        (**self).street()
+    }
+    fn city(&self) -> &str {
+        (**self).city()
+    }
+    fn zip_code(&self) -> i32 {
+        (**self).zip_code()
+    }
+}
 
 /// Flexible view fully mutable trait for Address message (not dyn-compatible).
 ///
 /// Code generation note: MUST NOT reference implementation struct names. Trait-only abstraction.
-pub trait AddressMut: Address + DynAddressMut {}
-
-/// Dyn-compatible immutable trait for Address message.
-///
-/// Code generation note: This trait MUST be dyn-compatible. Do not use `impl Trait` here.
-pub trait DynAddress {
-    fn street(&self) -> &str;
-    fn city(&self) -> &str;
-    fn zip_code(&self) -> i32;
-}
-
-// Blanket implementation for references
-impl<T: DynAddress> DynAddress for &T {
-    fn street(&self) -> &str {
-        (*self).street()
-    }
-
-    fn city(&self) -> &str {
-        (*self).city()
-    }
-
-    fn zip_code(&self) -> i32 {
-        (*self).zip_code()
-    }
-}
-
-impl<T: DynAddress> DynAddress for &mut T {
-    fn street(&self) -> &str {
-        (**self).street()
-    }
-
-    fn city(&self) -> &str {
-        (**self).city()
-    }
-
-    fn zip_code(&self) -> i32 {
-        (**self).zip_code()
-    }
-}
-
-// Blanket implementation for Box
-impl<T: DynAddress> DynAddress for Box<T> {
-    fn street(&self) -> &str {
-        (**self).street()
-    }
-
-    fn city(&self) -> &str {
-        (**self).city()
-    }
-
-    fn zip_code(&self) -> i32 {
-        (**self).zip_code()
-    }
-}
-
-/// Dyn-compatible fully mutable trait for Address message.
-///
-/// Code generation note: This trait MUST be dyn-compatible. Do not use `impl Trait` here.
-pub trait DynAddressMut: DynAddress {
-    // Setters - sample: set_street (others follow same pattern: field.set(&mut self._shared, v))
+pub trait AddressMut: Address {
     fn set_street(&mut self, v: &str);
-
-    // Clear methods - sample: clear_street (others follow same pattern: field.clear(&mut self._shared))
     fn clear_street(&mut self);
 }
 
-// Blanket implementation for references
-impl<T: DynAddressMut> DynAddressMut for &mut T {
+/// Flexible view trait for Address message (not dyn-compatible), fallible variant.
+///
+/// This trait is intended for implementations where field access can fail (e.g. lazy parsing,
+/// validation, IO-backed sources). Methods use the `try_` prefix to avoid collisions with the
+/// infallible trait.
+pub trait AddressTry {
+    fn try_street(&self) -> Result<&str, Error>;
+    fn try_city(&self) -> Result<&str, Error>;
+    fn try_zip_code(&self) -> Result<i32, Error>;
+}
+
+// Blanket implementation for references (fallible)
+impl<T: AddressTry> AddressTry for &T {
+    fn try_street(&self) -> Result<&str, Error> {
+        (*self).try_street()
+    }
+    fn try_city(&self) -> Result<&str, Error> {
+        (*self).try_city()
+    }
+    fn try_zip_code(&self) -> Result<i32, Error> {
+        (*self).try_zip_code()
+    }
+}
+
+impl<T: AddressTry> AddressTry for &mut T {
+    fn try_street(&self) -> Result<&str, Error> {
+        (**self).try_street()
+    }
+    fn try_city(&self) -> Result<&str, Error> {
+        (**self).try_city()
+    }
+    fn try_zip_code(&self) -> Result<i32, Error> {
+        (**self).try_zip_code()
+    }
+}
+
+// Blanket implementation for Box (fallible)
+impl<T: AddressTry> AddressTry for Box<T> {
+    fn try_street(&self) -> Result<&str, Error> {
+        (**self).try_street()
+    }
+    fn try_city(&self) -> Result<&str, Error> {
+        (**self).try_city()
+    }
+    fn try_zip_code(&self) -> Result<i32, Error> {
+        (**self).try_zip_code()
+    }
+}
+
+// Blanket implementation for Option (fallible)
+impl<T: AddressTry> AddressTry for Option<T> {
+    fn try_street(&self) -> Result<&str, Error> {
+        match self.as_ref() {
+            Some(v) => v.try_street(),
+            None => Ok(""),
+        }
+    }
+    fn try_city(&self) -> Result<&str, Error> {
+        match self.as_ref() {
+            Some(v) => v.try_city(),
+            None => Ok(""),
+        }
+    }
+    fn try_zip_code(&self) -> Result<i32, Error> {
+        match self.as_ref() {
+            Some(v) => v.try_zip_code(),
+            None => Ok(0),
+        }
+    }
+}
+
+// Blanket implementation for references (mutable)
+impl<T: AddressMut> AddressMut for &mut T {
     fn set_street(&mut self, v: &str) {
         (**self).set_street(v)
     }
@@ -146,8 +184,8 @@ impl<T: DynAddressMut> DynAddressMut for &mut T {
     }
 }
 
-// Blanket implementation for Box
-impl<T: DynAddressMut> DynAddressMut for Box<T> {
+// Blanket implementation for Box (mutable)
+impl<T: AddressMut> AddressMut for Box<T> {
     fn set_street(&mut self, v: &str) {
         (**self).set_street(v)
     }
@@ -156,8 +194,8 @@ impl<T: DynAddressMut> DynAddressMut for Box<T> {
     }
 }
 
-// Blanket implementation for Option
-impl<T: DynAddressMut> DynAddressMut for Option<T> {
+// Blanket implementation for Option (mutable)
+impl<T: AddressMut> AddressMut for Option<T> {
     fn set_street(&mut self, v: &str) {
         if let Some(t) = self {
             t.set_street(v);
@@ -222,9 +260,19 @@ where
 
 impl<A> Eq for AddressImpl<A> where A: Allocator {}
 
-impl<A: Allocator + Clone> Address for AddressImpl<A> {}
+impl<A: Allocator + Clone> AddressTry for AddressImpl<A> {
+    fn try_street(&self) -> Result<&str, Error> {
+        Ok(self.street())
+    }
+    fn try_city(&self) -> Result<&str, Error> {
+        Ok(self.city())
+    }
+    fn try_zip_code(&self) -> Result<i32, Error> {
+        Ok(self.zip_code())
+    }
+}
 
-impl<A: Allocator + Clone> DynAddress for AddressImpl<A> {
+impl<A: Allocator + Clone> Address for AddressImpl<A> {
     fn street(&self) -> &str {
         self.street.get(&self._shared)
     }
@@ -236,15 +284,10 @@ impl<A: Allocator + Clone> DynAddress for AddressImpl<A> {
     }
 }
 
-impl<A: Allocator + Clone> AddressMut for AddressImpl<A> {}
-
-impl<A: Allocator + Clone> DynAddressMut for AddressImpl<A> {
-    // set_* methods - sample implementation (others follow same pattern: field.set(&mut self._shared, v))
+impl<A: Allocator + Clone> AddressMut for AddressImpl<A> {
     fn set_street(&mut self, v: &str) {
         self.street.set(&mut self._shared, v)
     }
-
-    // clear_* methods - sample implementation (others follow same pattern: field.clear(&mut self._shared))
     fn clear_street(&mut self) {
         self.street.clear(&mut self._shared)
     }

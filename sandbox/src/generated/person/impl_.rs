@@ -13,10 +13,8 @@
 // limitations under the License.
 
 use super::{
-    Address, AddressImpl, AddressMut, DynAddress, DynAddressMut, DynPerson, DynPersonMut,
-    DynPersonTry, Person, PersonMut, PersonTry, Status,
+    Address, AddressImpl, AddressMut, Person, PersonMut, PersonTry, Status,
 };
-use ::allocator_api2::boxed::Box;
 use ::allocator_api2::vec::Vec as AllocVec;
 use ::allocator_extras::{Allocator, Global};
 use ::puroro::{
@@ -26,10 +24,10 @@ use ::puroro::{
         ExplicitOptional, FieldOperations, FieldStorage, ImplicitOptional, MessageFieldWrapper,
         SingularMessage, StringFieldWrapper,
     },
-    repeated::{RefVec, RefVecMap, Repeated, repeated_from_slice},
+    repeated::{RefVec, Repeated},
     shared::SharedFields,
-    view::ViewCow,
 };
+use ::puroro::repeated::RefVecMap;
 
 /// Standard implementation of Person message.
 ///
@@ -135,80 +133,7 @@ impl<A: Allocator + Clone> Person for PersonImpl<A> {
     fn addresses(&self) -> impl Repeated<'_, Item = impl Address + '_> + use<'_, A> {
         RefVecMap::new(&self.addresses.data, |addr: &AddressImpl<A>| addr)
     }
-    // All other methods use default implementations from the trait definition
-}
 
-impl<A: Allocator + Clone> PersonMut for PersonImpl<A> {
-    fn address_mut(&mut self) -> impl AddressMut + use<'_, A> {
-        self.address.data.as_mut()
-    }
-
-    fn push_address(&mut self) -> impl AddressMut + use<'_, A> {
-        let alloc = self._shared.allocator().clone();
-        self.addresses.data.push(AddressImpl::new_in(alloc));
-        // Safe to unwrap: just pushed one
-        let last_index = self.addresses.data.len() - 1;
-        &mut self.addresses.data[last_index]
-    }
-}
-
-impl<A: Allocator + Clone> DynPersonTry for PersonImpl<A> {
-    fn try_name(&self) -> Result<&str, Error> {
-        Ok(DynPerson::name(self))
-    }
-    fn try_age(&self) -> Result<i32, Error> {
-        Ok(DynPerson::age(self))
-    }
-    fn try_email(&self) -> Result<Option<&str>, Error> {
-        Ok(DynPerson::email(self))
-    }
-    fn try_score(&self) -> Result<Option<i32>, Error> {
-        Ok(DynPerson::score(self))
-    }
-
-    fn try_status(&self) -> Result<Result<Status, i32>, Error> {
-        Ok(DynPerson::status(self))
-    }
-    fn try_secondary_status(&self) -> Result<Result<Option<Status>, i32>, Error> {
-        Ok(DynPerson::secondary_status(self))
-    }
-
-    fn try_address(&self) -> Result<Option<ViewCow<'_, dyn DynAddress>>, Error> {
-        Ok(DynPerson::address(self))
-    }
-
-    fn try_scores(&self) -> Result<ViewCow<'_, dyn Repeated<'_, Item = i32>>, Error> {
-        Ok(DynPerson::scores(self))
-    }
-
-    fn try_addresses<'a: 'b, 'b>(
-        &'a self,
-    ) -> Result<ViewCow<'a, dyn Repeated<'a, Item = ViewCow<'b, dyn DynAddress>> + 'b>, Error> {
-        Ok(DynPerson::addresses(self))
-    }
-
-    fn try_has_name(&self) -> Result<bool, Error> {
-        Ok(DynPerson::has_name(self))
-    }
-}
-
-impl<A: Allocator + Clone> PersonTry for PersonImpl<A> {
-    fn try_address(&self) -> Result<impl Address + use<'_, A>, Error> {
-        Ok(Person::address(self))
-    }
-
-    fn try_scores(&self) -> Result<impl Repeated<'_, Item = i32> + use<'_, A>, Error> {
-        Ok(Person::scores(self))
-    }
-
-    fn try_addresses(
-        &self,
-    ) -> Result<impl Repeated<'_, Item = impl Address + '_> + use<'_, A>, Error> {
-        Ok(Person::addresses(self))
-    }
-}
-
-impl<A: Allocator + Clone> DynPerson for PersonImpl<A> {
     fn name(&self) -> &str {
         self.name.get(&self._shared)
     }
@@ -224,7 +149,6 @@ impl<A: Allocator + Clone> DynPerson for PersonImpl<A> {
     fn status(&self) -> Result<Status, i32> {
         Status::from_wire(self.status.get(&self._shared))
     }
-
     fn secondary_status(&self) -> Result<Option<Status>, i32> {
         if self.secondary_status.is_present(&self._shared) {
             match Status::from_wire(self.secondary_status.get(&self._shared).unwrap_or(0)) {
@@ -235,71 +159,80 @@ impl<A: Allocator + Clone> DynPerson for PersonImpl<A> {
             Ok(None)
         }
     }
-
-    fn address(&self) -> Option<ViewCow<'_, dyn DynAddress>> {
-        self.address
-            .get(&self._shared)
-            .map(|address| ViewCow::Borrowed(address as &dyn DynAddress))
-    }
-
-    fn scores(&self) -> ViewCow<'_, dyn Repeated<'_, Item = i32>> {
-        let rep = repeated_from_slice(self.scores.data.as_slice());
-        ViewCow::Owned(rep)
-    }
-
-    fn addresses<'a: 'b, 'b>(
-        &'a self,
-    ) -> ViewCow<'a, dyn Repeated<'a, Item = ViewCow<'b, dyn DynAddress>> + 'b> {
-        let adapter = RefVecMap::new(&self.addresses.data, |addr: &AddressImpl<A>| {
-            ViewCow::Borrowed(addr as &dyn DynAddress)
-        });
-        let boxed = Box::new_in(adapter, Global);
-        let boxed_dyn: Box<dyn Repeated<'a, Item = ViewCow<'b, dyn DynAddress>> + 'b> =
-            ::allocator_api2::unsize_box!(boxed);
-        ViewCow::Owned(boxed_dyn)
-    }
-
-    // has_* methods - sample implementation (others follow same pattern: field.is_present(&self._shared))
     fn has_name(&self) -> bool {
         self.name.is_present(&self._shared)
     }
 }
 
-impl<A: Allocator + Clone> DynPersonMut for PersonImpl<A> {
-    // set_* methods - sample implementation (others follow same pattern: field.set(&mut self._shared, v) or field.set(&mut self._shared, v.to_wire()))
+impl<A: Allocator + Clone> PersonTry for PersonImpl<A> {
+    fn try_name(&self) -> Result<&str, Error> {
+        Ok(Person::name(self))
+    }
+    fn try_age(&self) -> Result<i32, Error> {
+        Ok(Person::age(self))
+    }
+    fn try_email(&self) -> Result<Option<&str>, Error> {
+        Ok(Person::email(self))
+    }
+    fn try_score(&self) -> Result<Option<i32>, Error> {
+        Ok(Person::score(self))
+    }
+
+    fn try_status(&self) -> Result<Result<Status, i32>, Error> {
+        Ok(Person::status(self))
+    }
+    fn try_secondary_status(&self) -> Result<Result<Option<Status>, i32>, Error> {
+        Ok(Person::secondary_status(self))
+    }
+
+    fn try_has_name(&self) -> Result<bool, Error> {
+        Ok(Person::has_name(self))
+    }
+
+    fn try_address(&self) -> Result<impl Address + use<'_, A>, Error> {
+        Ok(Person::address(self))
+    }
+
+    fn try_scores(&self) -> Result<impl Repeated<'_, Item = i32> + use<'_, A>, Error> {
+        Ok(Person::scores(self))
+    }
+
+    fn try_addresses(
+        &self,
+    ) -> Result<impl Repeated<'_, Item = impl Address + '_> + use<'_, A>, Error> {
+        Ok(Person::addresses(self))
+    }
+}
+
+impl<A: Allocator + Clone> PersonMut for PersonImpl<A> {
     fn set_name(&mut self, v: &str) {
         self.name.set(&mut self._shared, v)
     }
-
-    fn push_score(&mut self, v: i32) {
-        self.scores.data.push(v)
-    }
-    // clear_* methods - sample implementation (others follow same pattern: field.clear(&mut self._shared))
     fn clear_name(&mut self) {
         self.name.clear(&mut self._shared)
     }
-
     fn clear_scores(&mut self) {
         self.scores.data.clear()
     }
-
     fn clear_addresses(&mut self) {
         self.addresses.data.clear()
     }
+    fn push_score(&mut self, v: i32) {
+        self.scores.data.push(v)
+    }
 
-    fn address_mut(&mut self) -> &mut dyn DynAddressMut {
+    fn address_mut(&mut self) -> impl AddressMut + use<'_, A> {
         let alloc = self._shared.allocator().clone();
         self.address
             .data
-            .get_or_insert_with(|| AddressImpl::new_in(alloc)) as &mut dyn DynAddressMut
+            .get_or_insert_with(|| AddressImpl::new_in(alloc))
     }
 
-    fn push_address(&mut self) -> &mut dyn DynAddressMut {
+    fn push_address(&mut self) -> impl AddressMut + use<'_, A> {
         let alloc = self._shared.allocator().clone();
         self.addresses.data.push(AddressImpl::new_in(alloc));
-        // Safe to unwrap: just pushed one
         let last_index = self.addresses.data.len() - 1;
-        &mut self.addresses.data[last_index] as &mut dyn DynAddressMut
+        &mut self.addresses.data[last_index]
     }
 }
 

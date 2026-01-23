@@ -13,20 +13,16 @@
 // limitations under the License.
 
 use super::{
-    AddressImpl, DynAddress, DynAddressMut, DynPerson, DynPersonMut, Person, PersonImpl, PersonMut,
-    Status,
+    Address, AddressImpl, AddressMut, Person, PersonImpl, PersonMut, Status,
 };
 use ::puroro::field_ops::{MessageFieldWrapper, StringFieldWrapper};
+use ::puroro::repeated::Repeated;
 
 #[test]
 fn test_message_fields() {
     let mut person = PersonImpl::new();
 
     // Test setting message fields via mutable builder
-    // Initialize first using DynPersonMut (destructive, but needed for testing)
-    {
-        DynPersonMut::address_mut(&mut person);
-    }
     {
         let mut address_impl = PersonMut::address_mut(&mut person);
         // address_impl is Option<&mut AddressImpl> which implements AddressMut
@@ -74,10 +70,10 @@ fn test_enum_fields() {
         Err(unknown) => println!("Unknown secondary status: {}", unknown),
     }
 
-    // Test presence checking (sample: only has_name is available in DynPerson)
+    // Test presence checking
     assert!(Person::has_name(&person));
 
-    // Test clearing enum fields (sample: only clear_name is available in DynPersonMut)
+    // Test clearing enum fields
     PersonMut::clear_name(&mut person);
     assert!(!Person::has_name(&person));
 }
@@ -103,14 +99,14 @@ fn test_repeated_scalars_and_messages() {
     PersonMut::push_score(&mut person, 10);
     PersonMut::push_score(&mut person, 20);
     {
-        let rep = DynPerson::scores(&person);
+        let rep = Person::scores(&person);
         assert_eq!(rep.len(), 2);
         let collected: Vec<i32> = rep.iter_box().collect();
         assert_eq!(collected, vec![10, 20]);
         assert_eq!(rep.get(1), Some(20));
     }
     PersonMut::clear_scores(&mut person);
-    assert!(DynPerson::scores(&person).is_empty());
+    assert!(Person::scores(&person).is_empty());
 
     // push and read addresses
     {
@@ -122,7 +118,7 @@ fn test_repeated_scalars_and_messages() {
         addr_mut.set_street("Second Ave");
     }
     {
-        let rep = DynPerson::addresses(&person);
+        let rep = Person::addresses(&person);
         assert_eq!(rep.len(), 2);
         let streets: Vec<String> = rep.iter_box().map(|m| m.street().to_string()).collect();
         assert_eq!(
@@ -132,7 +128,7 @@ fn test_repeated_scalars_and_messages() {
         assert!(rep.get(0).is_some());
     }
     PersonMut::clear_addresses(&mut person);
-    assert!(DynPerson::addresses(&person).is_empty());
+    assert!(Person::addresses(&person).is_empty());
 }
 
 #[test]
@@ -175,13 +171,13 @@ fn test_repeated_fields_edge_cases() {
 
     // Test empty repeated fields
     {
-        let scores = DynPerson::scores(&person);
+        let scores = Person::scores(&person);
         assert!(scores.is_empty());
         assert_eq!(scores.len(), 0);
     }
 
     {
-        let addresses = DynPerson::addresses(&person);
+        let addresses = Person::addresses(&person);
         assert!(addresses.is_empty());
         assert_eq!(addresses.len(), 0);
     }
@@ -189,7 +185,7 @@ fn test_repeated_fields_edge_cases() {
     // Test adding single item
     PersonMut::push_score(&mut person, 42);
     {
-        let scores = DynPerson::scores(&person);
+        let scores = Person::scores(&person);
         assert_eq!(scores.len(), 1);
         assert_eq!(scores.get(0), Some(42));
         assert_eq!(scores.get(1), None); // Out of bounds
@@ -200,14 +196,14 @@ fn test_repeated_fields_edge_cases() {
         PersonMut::push_score(&mut person, i * 10);
     }
     {
-        let scores = DynPerson::scores(&person);
+        let scores = Person::scores(&person);
         assert_eq!(scores.len(), 11); // 42 + 10 more items
     }
 
     // Clear and verify empty again
     PersonMut::clear_scores(&mut person);
     {
-        let scores = DynPerson::scores(&person);
+        let scores = Person::scores(&person);
         assert!(scores.is_empty());
     }
 }
@@ -218,7 +214,7 @@ fn test_repeated_message_fields_edge_cases() {
 
     // Test empty repeated message fields
     {
-        let addresses = DynPerson::addresses(&person);
+        let addresses = Person::addresses(&person);
         assert!(addresses.is_empty());
     }
 
@@ -228,7 +224,7 @@ fn test_repeated_message_fields_edge_cases() {
         addr_mut.set_street("Single St");
     }
     {
-        let addresses = DynPerson::addresses(&person);
+        let addresses = Person::addresses(&person);
         assert_eq!(addresses.len(), 1);
         let first = addresses.get(0).unwrap();
         assert_eq!(first.street(), "Single St");
@@ -240,14 +236,14 @@ fn test_repeated_message_fields_edge_cases() {
         addr_mut.set_street(&format!("Street {}", i));
     }
     {
-        let addresses = DynPerson::addresses(&person);
+        let addresses = Person::addresses(&person);
         assert_eq!(addresses.len(), 6); // 1 + 5 more
     }
 
     // Clear and verify
     PersonMut::clear_addresses(&mut person);
     {
-        let addresses = DynPerson::addresses(&person);
+        let addresses = Person::addresses(&person);
         assert!(addresses.is_empty());
     }
 }
@@ -301,19 +297,17 @@ fn test_message_field_presence() {
 
     // Initially, address should not be present
     {
-        // Address trait returns default values even if not set, so we check via DynPerson
-        let address_cow = DynPerson::address(&person);
-        assert!(address_cow.is_none());
+        // Person::address returns default values even if not set; check wrapper directly
+        let address_impl = Person::address(&person);
+        assert_eq!(address_impl.street(), "");
     }
 
-    // After setting address, it should be present
+    // After setting address, it should have the new value
     {
-        DynPersonMut::address_mut(&mut person);
+        let mut addr_mut = PersonMut::address_mut(&mut person);
+        addr_mut.set_street("Present");
     }
-    {
-        let address_cow = DynPerson::address(&person);
-        assert!(address_cow.is_some());
-    }
+    assert_eq!(Person::address(&person).street(), "Present");
 
     // Note: Message fields don't have a clear() method in the current API,
     // but we can verify the field wrapper behavior
@@ -332,8 +326,8 @@ fn test_clone_consistency() {
     assert_eq!(Person::name(&person1), "Original");
 
     {
-        let scores1 = DynPerson::scores(&person1);
-        let scores2 = DynPerson::scores(&person2);
+        let scores1 = Person::scores(&person1);
+        let scores2 = Person::scores(&person2);
         assert_eq!(scores1.len(), scores2.len());
         assert_eq!(scores1.get(0), scores2.get(0));
     }
