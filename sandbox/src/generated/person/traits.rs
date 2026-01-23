@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::{Address, AddressMut, Status};
+use super::{Address, AddressMut, AddressTry, Status};
 use ::puroro::error::Error;
 use ::puroro::repeated::Repeated;
 
@@ -22,6 +22,19 @@ use ::puroro::repeated::Repeated;
 /// validation, IO-backed sources). Methods use the `try_` prefix to avoid collisions with the
 /// infallible trait.
 pub trait PersonTry {
+    type Address<'a>: AddressTry + 'a
+    where
+        Self: 'a;
+    type Scores<'a>: Repeated<'a, Item = i32> + 'a
+    where
+        Self: 'a;
+    type AddressItem<'a>: AddressTry + 'a
+    where
+        Self: 'a;
+    type Addresses<'a>: Repeated<'a, Item = Self::AddressItem<'a>> + 'a
+    where
+        Self: 'a;
+
     // Getters
     fn try_name(&self) -> Result<&str, Error>;
     fn try_age(&self) -> Result<i32, Error>;
@@ -36,11 +49,9 @@ pub trait PersonTry {
     fn try_has_name(&self) -> Result<bool, Error>;
 
     // Message/repeated getters
-    fn try_address(&self) -> Result<impl Address + use<'_, Self>, Error>;
-    fn try_scores(&self) -> Result<impl Repeated<'_, Item = i32> + use<'_, Self>, Error>;
-    fn try_addresses(
-        &self,
-    ) -> Result<impl Repeated<'_, Item = impl Address + '_> + use<'_, Self>, Error>;
+    fn try_address(&self) -> Result<Self::Address<'_>, Error>;
+    fn try_scores(&self) -> Result<Self::Scores<'_>, Error>;
+    fn try_addresses(&self) -> Result<Self::Addresses<'_>, Error>;
 }
 
 /// Flexible view trait for Person message (not dyn-compatible).

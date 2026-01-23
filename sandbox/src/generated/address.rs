@@ -152,6 +152,19 @@ impl<T: AddressTry> AddressTry for Box<T> {
     }
 }
 
+// Blanket implementation for Rc (fallible)
+impl<T: AddressTry> AddressTry for ::std::rc::Rc<T> {
+    fn try_street(&self) -> Result<&str, Error> {
+        (**self).try_street()
+    }
+    fn try_city(&self) -> Result<&str, Error> {
+        (**self).try_city()
+    }
+    fn try_zip_code(&self) -> Result<i32, Error> {
+        (**self).try_zip_code()
+    }
+}
+
 // Blanket implementation for Option (fallible)
 impl<T: AddressTry> AddressTry for Option<T> {
     fn try_street(&self) -> Result<&str, Error> {
@@ -449,5 +462,17 @@ impl<'slice, A: Allocator + Clone + 'slice> AddressLazyImpl<'slice, A> {
             }
         }
         Ok(())
+    }
+}
+
+impl<'slice, A: Allocator + Clone + 'slice> AddressTry for AddressLazyImpl<'slice, A> {
+    fn try_street(&self) -> Result<&str, Error> {
+        self.street()
+    }
+    fn try_city(&self) -> Result<&str, Error> {
+        self.city()
+    }
+    fn try_zip_code(&self) -> Result<i32, Error> {
+        self.zip_code()
     }
 }

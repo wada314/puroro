@@ -13,6 +13,7 @@
 // limitations under the License.
 
 use super::super::address::AddressLazyImpl;
+use super::{PersonTry, Status};
 use ::allocator_extras::{Allocator, Global};
 use ::once_list2::OnceListWithTailLen as OnceList;
 use ::puroro::error::Error;
@@ -237,5 +238,75 @@ impl<'slice, A: Allocator + Clone + 'slice> Drop for PersonLazyImpl<'slice, A> {
 
         // Update callback in parser state
         self.parser_state.set_field_update_callback(closure);
+    }
+}
+
+impl<'slice, A: Allocator + Clone + 'slice> PersonTry for PersonLazyImpl<'slice, A> {
+    type Address<'a>
+        = Option<Rc<AddressLazyImpl<'slice, A>>>
+    where
+        Self: 'a;
+    type Scores<'a>
+        = LazyRepeated<'slice, 'a, i32, A>
+    where
+        Self: 'a;
+    type AddressItem<'a>
+        = Rc<AddressLazyImpl<'slice, A>>
+    where
+        Self: 'a;
+    type Addresses<'a>
+        = LazyRepeated<'slice, 'a, Rc<AddressLazyImpl<'slice, A>>, A>
+    where
+        Self: 'a;
+
+    fn try_name(&self) -> Result<&str, Error> {
+        // Not implemented yet in the current lazy prototype; return default.
+        Ok("")
+    }
+
+    fn try_age(&self) -> Result<i32, Error> {
+        self.ensure_all_fields_parsed()?;
+        Ok(self.age.get())
+    }
+
+    fn try_email(&self) -> Result<Option<&str>, Error> {
+        // Not implemented yet in the current lazy prototype; return default.
+        Ok(None)
+    }
+
+    fn try_score(&self) -> Result<Option<i32>, Error> {
+        // Not implemented yet in the current lazy prototype; return default.
+        Ok(None)
+    }
+
+    fn try_status(&self) -> Result<Result<Status, i32>, Error> {
+        // Not implemented yet in the current lazy prototype; return default.
+        Ok(Status::from_wire(0))
+    }
+
+    fn try_secondary_status(&self) -> Result<Result<Option<Status>, i32>, Error> {
+        // Not implemented yet in the current lazy prototype; return default.
+        Ok(Ok(None))
+    }
+
+    fn try_has_name(&self) -> Result<bool, Error> {
+        // Not implemented yet in the current lazy prototype; return default.
+        Ok(false)
+    }
+
+    fn try_address(&self) -> Result<Self::Address<'_>, Error> {
+        self.ensure_all_fields_parsed()?;
+        Ok(self.address.get().cloned())
+    }
+
+    fn try_scores(&self) -> Result<Self::Scores<'_>, Error> {
+        Ok(LazyRepeated::new(self.parser_state.clone(), &self.scores))
+    }
+
+    fn try_addresses(&self) -> Result<Self::Addresses<'_>, Error> {
+        Ok(LazyRepeated::new(
+            self.parser_state.clone(),
+            &self.addresses,
+        ))
     }
 }

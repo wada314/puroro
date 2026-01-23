@@ -165,6 +165,23 @@ impl<A: Allocator + Clone> Person for PersonImpl<A> {
 }
 
 impl<A: Allocator + Clone> PersonTry for PersonImpl<A> {
+    type Address<'a>
+        = Option<&'a AddressImpl<A>>
+    where
+        Self: 'a;
+    type Scores<'a>
+        = RefVec<'a, i32, A>
+    where
+        Self: 'a;
+    type AddressItem<'a>
+        = &'a AddressImpl<A>
+    where
+        Self: 'a;
+    type Addresses<'a>
+        = RefVecMap<'a, AddressImpl<A>, &'a AddressImpl<A>, A, fn(&'a AddressImpl<A>) -> &'a AddressImpl<A>>
+    where
+        Self: 'a;
+
     fn try_name(&self) -> Result<&str, Error> {
         Ok(Person::name(self))
     }
@@ -189,18 +206,19 @@ impl<A: Allocator + Clone> PersonTry for PersonImpl<A> {
         Ok(Person::has_name(self))
     }
 
-    fn try_address(&self) -> Result<impl Address + use<'_, A>, Error> {
-        Ok(Person::address(self))
+    fn try_address(&self) -> Result<Self::Address<'_>, Error> {
+        Ok(self.address.data.as_ref())
     }
 
-    fn try_scores(&self) -> Result<impl Repeated<'_, Item = i32> + use<'_, A>, Error> {
-        Ok(Person::scores(self))
+    fn try_scores(&self) -> Result<Self::Scores<'_>, Error> {
+        Ok(RefVec::new(&self.scores.data))
     }
 
-    fn try_addresses(
-        &self,
-    ) -> Result<impl Repeated<'_, Item = impl Address + '_> + use<'_, A>, Error> {
-        Ok(Person::addresses(self))
+    fn try_addresses(&self) -> Result<Self::Addresses<'_>, Error> {
+        fn id<'a, A: Allocator>(a: &'a AddressImpl<A>) -> &'a AddressImpl<A> {
+            a
+        }
+        Ok(RefVecMap::new(&self.addresses.data, id::<A>))
     }
 }
 
