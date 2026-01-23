@@ -13,8 +13,8 @@
 // limitations under the License.
 
 use super::{
-    Address, AddressImpl, AddressMut, DynAddress, DynAddressMut, DynPerson, DynPersonMut, Person,
-    PersonMut, Status,
+    Address, AddressImpl, AddressMut, DynAddress, DynAddressMut, DynPerson, DynPersonMut,
+    DynPersonTry, Person, PersonMut, PersonTry, Status,
 };
 use ::allocator_api2::boxed::Box;
 use ::allocator_api2::vec::Vec as AllocVec;
@@ -149,6 +149,62 @@ impl<A: Allocator + Clone> PersonMut for PersonImpl<A> {
         // Safe to unwrap: just pushed one
         let last_index = self.addresses.data.len() - 1;
         &mut self.addresses.data[last_index]
+    }
+}
+
+impl<A: Allocator + Clone> DynPersonTry for PersonImpl<A> {
+    fn try_name(&self) -> Result<&str, Error> {
+        Ok(DynPerson::name(self))
+    }
+    fn try_age(&self) -> Result<i32, Error> {
+        Ok(DynPerson::age(self))
+    }
+    fn try_email(&self) -> Result<Option<&str>, Error> {
+        Ok(DynPerson::email(self))
+    }
+    fn try_score(&self) -> Result<Option<i32>, Error> {
+        Ok(DynPerson::score(self))
+    }
+
+    fn try_status(&self) -> Result<Result<Status, i32>, Error> {
+        Ok(DynPerson::status(self))
+    }
+    fn try_secondary_status(&self) -> Result<Result<Option<Status>, i32>, Error> {
+        Ok(DynPerson::secondary_status(self))
+    }
+
+    fn try_address(&self) -> Result<Option<ViewCow<'_, dyn DynAddress>>, Error> {
+        Ok(DynPerson::address(self))
+    }
+
+    fn try_scores(&self) -> Result<ViewCow<'_, dyn Repeated<'_, Item = i32>>, Error> {
+        Ok(DynPerson::scores(self))
+    }
+
+    fn try_addresses<'a: 'b, 'b>(
+        &'a self,
+    ) -> Result<ViewCow<'a, dyn Repeated<'a, Item = ViewCow<'b, dyn DynAddress>> + 'b>, Error> {
+        Ok(DynPerson::addresses(self))
+    }
+
+    fn try_has_name(&self) -> Result<bool, Error> {
+        Ok(DynPerson::has_name(self))
+    }
+}
+
+impl<A: Allocator + Clone> PersonTry for PersonImpl<A> {
+    fn try_address(&self) -> Result<impl Address + use<'_, A>, Error> {
+        Ok(Person::address(self))
+    }
+
+    fn try_scores(&self) -> Result<impl Repeated<'_, Item = i32> + use<'_, A>, Error> {
+        Ok(Person::scores(self))
+    }
+
+    fn try_addresses(
+        &self,
+    ) -> Result<impl Repeated<'_, Item = impl Address + '_> + use<'_, A>, Error> {
+        Ok(Person::addresses(self))
     }
 }
 

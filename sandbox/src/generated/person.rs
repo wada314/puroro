@@ -40,4 +40,4 @@ pub use super::address::{Address, AddressImpl, AddressMut, DynAddress, DynAddres
 pub use self::impl_::PersonImpl;
 pub use self::lazy::PersonLazyImpl;
 pub use self::status::Status;
-pub use self::traits::{DynPerson, DynPersonMut, Person, PersonMut};
+pub use self::traits::{DynPerson, DynPersonMut, DynPersonTry, Person, PersonMut, PersonTry};
