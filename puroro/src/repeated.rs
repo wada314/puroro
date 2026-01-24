@@ -40,6 +40,53 @@ pub trait Repeated<'a> {
 
 // Note: No blanket impl for slices to avoid missing_docs on public trait methods in impls.
 
+/// `Repeated` adapter that represents an optional repeated source.
+///
+/// When `inner` is `None`, this behaves like an empty repeated field.
+pub struct OptionRepeated<R>(pub Option<R>);
+
+#[allow(missing_docs)]
+impl<'a, R> Repeated<'a> for OptionRepeated<R>
+where
+    R: Repeated<'a> + 'a,
+    R::Item: 'a,
+{
+    type Item = R::Item;
+
+    fn len(&self) -> usize {
+        match &self.0 {
+            Some(r) => r.len(),
+            None => 0,
+        }
+    }
+
+    fn is_empty(&self) -> bool {
+        match &self.0 {
+            Some(r) => r.is_empty(),
+            None => true,
+        }
+    }
+
+    fn get(&self, index: usize) -> Option<Self::Item> {
+        match &self.0 {
+            Some(r) => r.get(index),
+            None => None,
+        }
+    }
+
+    fn iter_box(&self) -> Box<dyn Iterator<Item = Self::Item> + 'a> {
+        match &self.0 {
+            Some(r) => r.iter_box(),
+            None => {
+                let it = std::iter::empty::<Self::Item>();
+                let boxed = Box::new(it);
+                let boxed_dyn: Box<dyn Iterator<Item = Self::Item> + 'a> = unsize_box!(boxed);
+                boxed_dyn
+            }
+        }
+    }
+}
+
 /// Adapter over a reference to an allocator-aware Vec for Copy items (e.g., i32).
 pub struct RefVec<'a, T: Copy, A: Allocator> {
     vec: &'a Vec<T, A>,
