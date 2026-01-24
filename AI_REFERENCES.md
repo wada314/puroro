@@ -78,6 +78,17 @@ focus of the project (serialization/deserialization, codegen, and other runtime 
   valid protobuf encoding of (part of) the same message (not arbitrary byte-stream fragmentation).
 - **Standard impl parse/write/size**: `PersonImpl` and other standard impls still have `todo!()` for parsing/serialization/size.
 
+## 2026-01-24: why we use GATs for fallible lazy traits (design stage)
+
+- We prefer modeling fallible getter return types via **GAT / associated type families** (e.g. `type Addresses<'a>`) instead of
+  return-position `impl Trait` in trait methods.
+- Rationale:
+  - **Encapsulation**: lifetime/allocator captures (e.g. lazy impls carrying `'slice` and `A`) are an implementation detail and should not
+    leak into the base trait's signature/capture rules.
+  - **Composability**: nested return types like `Repeated<Item = MessageView>` become easier to express by naming components (`AddressItem<'a>`,
+    `Addresses<'a>`) without introducing multiple nested opaque types.
+  - **Strategy flexibility**: eager and lazy implementations can choose different concrete return types while satisfying the same trait bounds.
+
 ## Handy File Pointers
 
 - `puroro/src/lazy_parser.rs`: incremental parser state + parent-chain parsing requests

@@ -49,7 +49,7 @@ pub trait PersonTry {
     fn try_has_name(&self) -> Result<bool, Error>;
 
     // Message/repeated getters
-    fn try_address(&self) -> Result<Self::Address<'_>, Error>;
+    fn try_address(&self) -> Result<Option<Self::Address<'_>>, Error>;
     fn try_scores(&self) -> Result<Self::Scores<'_>, Error>;
     fn try_addresses(&self) -> Result<Self::Addresses<'_>, Error>;
 }

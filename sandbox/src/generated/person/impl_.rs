@@ -166,7 +166,7 @@ impl<A: Allocator + Clone> Person for PersonImpl<A> {
 
 impl<A: Allocator + Clone> PersonTry for PersonImpl<A> {
     type Address<'a>
-        = Option<&'a AddressImpl<A>>
+        = &'a AddressImpl<A>
     where
         Self: 'a;
     type Scores<'a>
@@ -206,7 +206,7 @@ impl<A: Allocator + Clone> PersonTry for PersonImpl<A> {
         Ok(Person::has_name(self))
     }
 
-    fn try_address(&self) -> Result<Self::Address<'_>, Error> {
+    fn try_address(&self) -> Result<Option<Self::Address<'_>>, Error> {
         Ok(self.address.data.as_ref())
     }
 

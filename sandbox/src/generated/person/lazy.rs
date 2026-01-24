@@ -243,7 +243,7 @@ impl<'slice, A: Allocator + Clone + 'slice> Drop for PersonLazyImpl<'slice, A> {
 
 impl<'slice, A: Allocator + Clone + 'slice> PersonTry for PersonLazyImpl<'slice, A> {
     type Address<'a>
-        = Option<Rc<AddressLazyImpl<'slice, A>>>
+        = Rc<AddressLazyImpl<'slice, A>>
     where
         Self: 'a;
     type Scores<'a>
@@ -294,7 +294,7 @@ impl<'slice, A: Allocator + Clone + 'slice> PersonTry for PersonLazyImpl<'slice,
         Ok(false)
     }
 
-    fn try_address(&self) -> Result<Self::Address<'_>, Error> {
+    fn try_address(&self) -> Result<Option<Self::Address<'_>>, Error> {
         self.ensure_all_fields_parsed()?;
         Ok(self.address.get().cloned())
     }
