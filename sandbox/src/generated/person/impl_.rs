@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use super::{
-    Address, AddressImpl, AddressMut, Person, PersonMut, PersonTry, Status,
+    AddressImpl, Person, PersonMut, PersonTry, Status,
 };
 use ::allocator_api2::vec::Vec as AllocVec;
 use ::allocator_extras::{Allocator, Global};
@@ -24,7 +24,7 @@ use ::puroro::{
         ExplicitOptional, FieldOperations, FieldStorage, ImplicitOptional, MessageFieldWrapper,
         SingularMessage, StringFieldWrapper,
     },
-    repeated::{RefVec, Repeated},
+    repeated::RefVec,
     shared::SharedFields,
 };
 use ::puroro::repeated::RefVecMap;
@@ -122,16 +122,45 @@ where
 impl<A> Eq for PersonImpl<A> where A: Allocator {}
 
 impl<A: Allocator + Clone> Person for PersonImpl<A> {
-    fn address(&self) -> impl Address + use<'_, A> {
+    type AddressView<'a>
+        = Option<&'a AddressImpl<A>>
+    where
+        Self: 'a;
+
+    type ScoresView<'a>
+        = RefVec<'a, i32, A>
+    where
+        Self: 'a;
+
+    type AddressItemView<'a>
+        = &'a AddressImpl<A>
+    where
+        Self: 'a;
+
+    type AddressesView<'a>
+        = RefVecMap<
+            'a,
+            AddressImpl<A>,
+            &'a AddressImpl<A>,
+            A,
+            fn(&'a AddressImpl<A>) -> &'a AddressImpl<A>,
+        >
+    where
+        Self: 'a;
+
+    fn address(&self) -> Self::AddressView<'_> {
         self.address.get(&self._shared)
     }
 
-    fn scores(&self) -> impl Repeated<'_, Item = i32> + use<'_, A> {
+    fn scores(&self) -> Self::ScoresView<'_> {
         RefVec::new(&self.scores.data)
     }
 
-    fn addresses(&self) -> impl Repeated<'_, Item = impl Address + '_> + use<'_, A> {
-        RefVecMap::new(&self.addresses.data, |addr: &AddressImpl<A>| addr)
+    fn addresses(&self) -> Self::AddressesView<'_> {
+        fn id<'a, A: Allocator>(a: &'a AddressImpl<A>) -> &'a AddressImpl<A> {
+            a
+        }
+        RefVecMap::new(&self.addresses.data, id::<A>)
     }
 
     fn name(&self) -> &str {
@@ -223,6 +252,16 @@ impl<A: Allocator + Clone> PersonTry for PersonImpl<A> {
 }
 
 impl<A: Allocator + Clone> PersonMut for PersonImpl<A> {
+    type AddressMut<'a>
+        = &'a mut AddressImpl<A>
+    where
+        Self: 'a;
+
+    type AddressPush<'a>
+        = &'a mut AddressImpl<A>
+    where
+        Self: 'a;
+
     fn set_name(&mut self, v: &str) {
         self.name.set(&mut self._shared, v)
     }
@@ -239,14 +278,14 @@ impl<A: Allocator + Clone> PersonMut for PersonImpl<A> {
         self.scores.data.push(v)
     }
 
-    fn address_mut(&mut self) -> impl AddressMut + use<'_, A> {
+    fn address_mut(&mut self) -> Self::AddressMut<'_> {
         let alloc = self._shared.allocator().clone();
         self.address
             .data
             .get_or_insert_with(|| AddressImpl::new_in(alloc))
     }
 
-    fn push_address(&mut self) -> impl AddressMut + use<'_, A> {
+    fn push_address(&mut self) -> Self::AddressPush<'_> {
         let alloc = self._shared.allocator().clone();
         self.addresses.data.push(AddressImpl::new_in(alloc));
         let last_index = self.addresses.data.len() - 1;

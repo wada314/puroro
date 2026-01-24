@@ -63,6 +63,19 @@ pub trait PersonTry {
 /// Code generation note: This trait MUST NOT reference any implementation struct names (e.g., PersonImpl, AddressImpl).
 /// Use only trait names and `impl Trait` syntax to maintain abstraction.
 pub trait Person: PersonTry {
+    type AddressView<'a>: Address + 'a
+    where
+        Self: 'a;
+    type ScoresView<'a>: Repeated<'a, Item = i32> + 'a
+    where
+        Self: 'a;
+    type AddressItemView<'a>: Address + 'a
+    where
+        Self: 'a;
+    type AddressesView<'a>: Repeated<'a, Item = Self::AddressItemView<'a>> + 'a
+    where
+        Self: 'a;
+
     // Getters
     fn name(&self) -> &str;
     fn age(&self) -> i32;
@@ -77,15 +90,22 @@ pub trait Person: PersonTry {
     fn has_name(&self) -> bool;
 
     // Message/repeated getters
-    fn address(&self) -> impl Address + use<'_, Self>;
-    fn scores(&self) -> impl Repeated<'_, Item = i32> + use<'_, Self>;
-    fn addresses(&self) -> impl Repeated<'_, Item = impl Address + '_> + use<'_, Self>;
+    fn address(&self) -> Self::AddressView<'_>;
+    fn scores(&self) -> Self::ScoresView<'_>;
+    fn addresses(&self) -> Self::AddressesView<'_>;
 }
 
 /// Flexible view fully mutable trait for Person message (not dyn-compatible).
 ///
 /// Code generation note: MUST NOT reference implementation struct names. All methods must use trait types only.
 pub trait PersonMut: Person {
+    type AddressMut<'a>: AddressMut + 'a
+    where
+        Self: 'a;
+    type AddressPush<'a>: AddressMut + 'a
+    where
+        Self: 'a;
+
     // Setters / clears / repeated mutators
     fn set_name(&mut self, v: &str);
     fn clear_name(&mut self);
@@ -94,6 +114,6 @@ pub trait PersonMut: Person {
     fn push_score(&mut self, v: i32);
 
     // Builder-style methods for nested message construction
-    fn address_mut(&mut self) -> impl AddressMut + use<'_, Self>;
-    fn push_address(&mut self) -> impl AddressMut + use<'_, Self>;
+    fn address_mut(&mut self) -> Self::AddressMut<'_>;
+    fn push_address(&mut self) -> Self::AddressPush<'_>;
 }

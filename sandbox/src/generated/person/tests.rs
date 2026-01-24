@@ -24,7 +24,7 @@ fn test_message_fields() {
 
     // Test setting message fields via mutable builder
     {
-        let mut address_impl = PersonMut::address_mut(&mut person);
+        let address_impl = PersonMut::address_mut(&mut person);
         // address_impl is Option<&mut AddressImpl> which implements AddressMut
         // For Option<T>, None case does nothing, so initialization is required
         address_impl.set_street("123 Main St");
@@ -40,7 +40,7 @@ fn test_message_fields() {
 
     // Test builder pattern
     {
-        let mut address_impl = PersonMut::address_mut(&mut person);
+        let address_impl = PersonMut::address_mut(&mut person);
         address_impl.set_street("456 Oak Ave");
     }
     {
@@ -110,11 +110,11 @@ fn test_repeated_scalars_and_messages() {
 
     // push and read addresses
     {
-        let mut addr_mut = PersonMut::push_address(&mut person);
+        let addr_mut = PersonMut::push_address(&mut person);
         addr_mut.set_street("First St");
     }
     {
-        let mut addr_mut = PersonMut::push_address(&mut person);
+        let addr_mut = PersonMut::push_address(&mut person);
         addr_mut.set_street("Second Ave");
     }
     {
@@ -220,7 +220,7 @@ fn test_repeated_message_fields_edge_cases() {
 
     // Test adding single address
     {
-        let mut addr_mut = PersonMut::push_address(&mut person);
+        let addr_mut = PersonMut::push_address(&mut person);
         addr_mut.set_street("Single St");
     }
     {
@@ -232,7 +232,7 @@ fn test_repeated_message_fields_edge_cases() {
 
     // Test adding multiple addresses
     for i in 1..=5 {
-        let mut addr_mut = PersonMut::push_address(&mut person);
+        let addr_mut = PersonMut::push_address(&mut person);
         addr_mut.set_street(&format!("Street {}", i));
     }
     {
@@ -304,7 +304,7 @@ fn test_message_field_presence() {
 
     // After setting address, it should have the new value
     {
-        let mut addr_mut = PersonMut::address_mut(&mut person);
+        let addr_mut = PersonMut::address_mut(&mut person);
         addr_mut.set_street("Present");
     }
     assert_eq!(Person::address(&person).street(), "Present");
