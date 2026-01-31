@@ -9,7 +9,6 @@ use crate::repeated::Repeated;
 use ::allocator_extras::Allocator;
 use ::futures_io::AsyncRead;
 use ::once_list2::OnceListWithTailLen as OnceList;
-use ::std::task::ready;
 use ::std::task::{Context, Poll};
 
 /// A poll-driven, on-demand parsing adapter over a repeated field.
@@ -32,20 +31,25 @@ where
 {
     /// Create a new `LazyRepeatedAsync` adapter.
     #[inline]
-    pub fn new(parent_parser_state: AsyncMessageParserStateRef<R>, list: &'message OnceList<T, A>) -> Self {
+    pub fn new(
+        parent_parser_state: AsyncMessageParserStateRef<R>,
+        list: &'message OnceList<T, A>,
+    ) -> Self {
         Self {
             parent_parser_state,
             list,
         }
     }
 
-    fn poll_ensure_at_least(
-        &self,
-        cx: &mut Context<'_>,
-        needed: usize,
-    ) -> Poll<Result<(), Error>> {
+    fn poll_ensure_at_least(&self, cx: &mut Context<'_>, needed: usize) -> Poll<Result<(), Error>> {
         while self.list.len() < needed {
-            let progressed = ready!(self.parent_parser_state.poll_parse_one_field_with_callback(cx))?;
+            let progressed = match self
+                .parent_parser_state
+                .poll_parse_one_field_with_callback(cx)
+            {
+                Poll::Ready(r) => r?,
+                Poll::Pending => return Poll::Pending,
+            };
             if !progressed {
                 break;
             }
@@ -60,19 +64,28 @@ where
 
     /// Poll the length of the repeated field (requires fully parsing the message).
     pub fn poll_len(&self, cx: &mut Context<'_>) -> Poll<Result<usize, Error>> {
-        ready!(self.poll_ensure_fully_parsed(cx)?);
+        let _ = match self.poll_ensure_fully_parsed(cx)? {
+            Poll::Ready(()) => (),
+            Poll::Pending => return Poll::Pending,
+        };
         Poll::Ready(Ok(self.list.len()))
     }
 
     /// Poll whether the repeated field is empty (parses just enough to know).
     pub fn poll_is_empty(&self, cx: &mut Context<'_>) -> Poll<Result<bool, Error>> {
-        ready!(self.poll_ensure_at_least(cx, 1)?);
+        let _ = match self.poll_ensure_at_least(cx, 1)? {
+            Poll::Ready(()) => (),
+            Poll::Pending => return Poll::Pending,
+        };
         Poll::Ready(Ok(self.list.first().is_none()))
     }
 
     /// Poll and get an element by index, parsing on-demand until it is available or EOF is reached.
     pub fn poll_get(&self, cx: &mut Context<'_>, index: usize) -> Poll<Result<Option<T>, Error>> {
-        ready!(self.poll_ensure_at_least(cx, index.saturating_add(1))?);
+        let _ = match self.poll_ensure_at_least(cx, index.saturating_add(1))? {
+            Poll::Ready(()) => (),
+            Poll::Pending => return Poll::Pending,
+        };
         Poll::Ready(Ok(self.list.iter().nth(index).cloned()))
     }
 }
@@ -107,4 +120,3 @@ where
         boxed_dyn
     }
 }
-

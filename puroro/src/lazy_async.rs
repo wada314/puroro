@@ -17,7 +17,7 @@ use ::std::pin::Pin;
 use ::std::task::ready;
 use ::std::task::{Context, Poll};
 
-use ::protobuf_core::{Field, FieldValue};
+use ::protobuf_core::{Field, FieldValue, ReadExtVarint};
 use ::protobuf_core::{Tag, Varint, WireType};
 
 /// Maximum allowed length-delimited size (2 GiB), matching the protobuf wire format limits.
@@ -157,11 +157,7 @@ where
 
     /// Consume and return exactly `len` bytes as a `Bytes`.
     /// Zero-copy if the bytes fit in one segment; otherwise coalesces into a single buffer.
-    fn poll_take_bytes(
-        &mut self,
-        cx: &mut Context<'_>,
-        len: usize,
-    ) -> Poll<Result<Bytes, Error>> {
+    fn poll_take_bytes(&mut self, cx: &mut Context<'_>, len: usize) -> Poll<Result<Bytes, Error>> {
         if len == 0 {
             return Poll::Ready(Ok(Bytes::new()));
         }
@@ -236,7 +232,8 @@ where
         if let Some(rem) = self.remaining_limit.as_mut() {
             *rem = rem.saturating_sub(n);
             if *rem == 0 {
-                self.reader_eof = true;            }
+                self.reader_eof = true;
+            }
         }
 
         chunk.truncate(n);
@@ -347,7 +344,6 @@ where
     }
 }
 
-
 impl<R> AsyncFieldReader<R>
 where
     R: AsyncRead + Unpin,
@@ -451,6 +447,32 @@ where
     ///
     /// Returns `Ok(None)` if no bytes are available and the message has ended.
     fn poll_read_varint(&mut self, cx: &mut Context<'_>) -> Poll<Result<Option<Varint>, Error>> {
+        // Fast path: try to decode from the already-buffered peek chunk using protobuf-core.
+        // &[u8] implements Read and advances as bytes are consumed.
+        let mut chunk = self.input.peek_chunk();
+        if !chunk.is_empty() {
+            let len_before = chunk.len();
+            match chunk.read_varint() {
+                Ok(Some(varint)) => {
+                    let consumed = len_before - chunk.len();
+                    self.input.advance(consumed);
+                    return Poll::Ready(Ok(Some(varint)));
+                }
+                Ok(None) => {
+                    // Empty reader; fall through to byte-by-byte path.
+                }
+                Err(e) => {
+                    // VarintTooLong: malformed if 10+ bytes read, else incomplete (need more).
+                    let consumed = len_before - chunk.len();
+                    if consumed >= MAX_VARINT_BYTES_LOCAL {
+                        return Poll::Ready(Err(Error::from(e)));
+                    }
+                    // Incomplete: fall through to byte-by-byte path.
+                }
+            }
+        }
+
+        // Fallback: decode byte-by-byte, polling for more input as needed.
         let mut value: u64 = 0;
         let mut shift: u32 = 0;
         let mut read_any = false;
@@ -487,4 +509,3 @@ where
         )))
     }
 }
-
