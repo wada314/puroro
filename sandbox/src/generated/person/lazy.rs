@@ -17,9 +17,9 @@ use super::{PersonTry, Status};
 use ::allocator_extras::{Allocator, Global};
 use ::once_list2::OnceListWithTailLen as OnceList;
 use ::puroro::error::Error;
-use ::puroro::lazy_parser::MessageParserStateRef;
+use ::puroro::lazy_slice_parser::MessageParserStateRef;
 use ::puroro::protobuf_core::{Field, FieldValue};
-use ::puroro::repeated_lazy::LazyRepeated;
+use ::puroro::repeated_lazy_slice::LazyRepeated;
 use ::std::cell::{Cell, OnceCell};
 use ::std::rc::{Rc, Weak};
 

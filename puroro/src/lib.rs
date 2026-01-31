@@ -62,19 +62,29 @@ pub mod repeated;
 
 pub use repeated::OnceListRepeatedMap;
 
-/// Lazy parser infrastructure for Protocol Buffer messages.
+/// Slice-backed lazy parser infrastructure for Protocol Buffer messages.
 ///
-/// Provides the core parsing infrastructure for lazy deserialization:
-/// - FieldIterator: Iterator over protobuf fields in slices
-/// - MessageParserState: Parser state that can be shared between message bodies and child messages
-/// - Helper functions for wire format parsing (varint decoding, field tag parsing)
-pub mod lazy_parser;
+/// This is the original lazy parsing implementation that assumes input slices have
+/// a stable lifetime (`&'slice [u8]`), allowing zero-copy field iteration.
+///
+/// Provides:
+/// - FieldIterator: iterator over protobuf fields in slices
+/// - MessageParserStateRef: parser state shared between message bodies and child messages
+#[path = "lazy_parser.rs"]
+pub mod lazy_slice_parser;
 
-/// Lazy wrapper for repeated fields enabling on-demand parsing.
+/// Slice-backed lazy wrapper for repeated fields enabling on-demand parsing.
+#[path = "repeated_lazy.rs"]
+pub mod repeated_lazy_slice;
+
+/// Async/streaming lazy parsing implementation.
 ///
-/// Provides `LazyRepeated` type that enables on-demand parsing of repeated fields
-/// by coordinating with the parent's `MessageParserState`.
-pub mod repeated_lazy;
+/// This module provides a poll-based lazy parser that can read from an async reader
+/// and supports random-access getters by caching decoded values and/or raw bytes.
+pub mod lazy_async;
+
+/// Async/streaming lazy wrapper for repeated fields.
+pub mod repeated_lazy_async;
 
 /// Core message trait that all generated Protocol Buffer messages implement.
 pub trait Message: Sized + Clone + PartialEq {

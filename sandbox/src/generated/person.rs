@@ -28,6 +28,7 @@
 
 mod impl_;
 mod lazy;
+mod lazy_async;
 mod status;
 mod traits;
 
@@ -39,5 +40,6 @@ pub use super::address::{Address, AddressImpl, AddressMut, AddressTry};
 
 pub use self::impl_::PersonImpl;
 pub use self::lazy::PersonLazyImpl;
+pub use self::lazy_async::PersonLazyAsyncImpl;
 pub use self::status::Status;
 pub use self::traits::{Person, PersonMut, PersonTry};

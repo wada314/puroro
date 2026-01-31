@@ -20,7 +20,7 @@
 //! just enough to satisfy access patterns (indexing/peek/length).
 
 use crate::error::Error;
-use crate::lazy_parser::MessageParserStateRef;
+use crate::lazy_slice_parser::MessageParserStateRef;
 use crate::repeated::Repeated;
 use ::allocator_extras::Allocator;
 use ::once_list2::OnceListWithTailLen as OnceList;
