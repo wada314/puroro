@@ -109,11 +109,12 @@ focus of the project (serialization/deserialization, codegen, and other runtime 
   - **Fallback**: When the chunk is empty or the varint is incomplete, we decode byte-by-byte with `poll_ensure(1)`
     per byte. This path is used when a varint spans segment boundaries.
 - **protobuf-core `futures` feature**: protobuf-core now has an optional `futures` feature that provides
-  `StreamExtVarint` and `VarintDecoder` for async varint reading from `TryStream<Ok = u8, Error = E>`.
+  `StreamExtVarint` for async varint reading from `TryStream<Ok = u8, Error = E>`.
   The API is `decoder.read_varint().await` (async fn, state retained across .await).
 - **Future puroro integration**: puroro could implement `Stream<Item = Result<u8, Error>>` for a wrapper around
-  `AsyncInput` and use protobuf-core's `VarintDecoder` for the fallback path, replacing the manual byte-by-byte
-  loop. This would require protobuf-core to be published with the `futures` feature and puroro to depend on it.
+  `AsyncInput` and use protobuf-core's `StreamExtVarint::read_varint()` for the fallback path, replacing the
+  manual byte-by-byte loop. This would require protobuf-core to be published with the `futures` feature and puroro
+  to depend on it.
 - **puroro uses**: `protobuf-core = "0.2.1"` from crates.io (path override for local dev is possible).
 
 ## Minimal Reading Order (for new AI agents)
