@@ -63,15 +63,29 @@ const DEFAULT_READ_CHUNK_SIZE: usize = 8 * 1024;
 
 /// Buffered async input that supports partial reads and cheap slicing.
 ///
-/// The buffer is stored as multiple `Bytes` segments to allow zero-copy subslices when a field's
-/// bytes are fully contained in a single segment. When a field spans multiple segments, callers
-/// can coalesce it into a single owned buffer.
-pub(crate) struct AsyncInput<R> {
+/// Internal to [`AsyncFieldReader`]. The buffer is stored as multiple `Bytes` segments to allow
+/// zero-copy subslices when a field's bytes are fully contained in a single segment.
+struct AsyncInput<R> {
+    /// The underlying async I/O source (e.g. `BytesReader` for in-memory data, or a network stream).
+    /// All bytes are read from this via `poll_read`.
     reader: R,
-    /// Remaining bytes allowed to read from the reader (message boundary), if known.
+
+    /// When `Some(n)`, we stop reading from the reader after consuming `n` bytes total.
+    /// Used for length-delimited message boundaries. Decremented as we read.
+    /// `None` means read until the reader returns EOF.
     remaining_limit: Option<usize>,
-    eof: bool,
+
+    /// `true` when the underlying reader will produce no more data. Set when: (a) the reader returns
+    /// 0 bytes (actual EOF), (b) `remaining_limit` reaches 0, or (c) constructed with `limit == 0`.
+    /// Note: this does *not* mean "all buffered data consumed" — segments may still hold data.
+    reader_eof: bool,
+
+    /// Maximum bytes to request per `poll_read` call. Larger values reduce syscalls but use more
+    /// memory; smaller values yield more granular progress.
     read_chunk_size: usize,
+
+    /// Queue of buffered byte chunks already read from the reader but not yet consumed by the
+    /// parser. Oldest segment at front. Enables zero-copy when a field fits entirely in one segment.
     segments: VecDeque<Bytes>,
 }
 
@@ -79,47 +93,35 @@ impl<R> AsyncInput<R>
 where
     R: AsyncRead + Unpin,
 {
-    /// Create a new input that reads until EOF.
-    pub(crate) fn new(reader: R) -> Self {
+    fn new(reader: R) -> Self {
         Self {
             reader,
             remaining_limit: None,
-            eof: false,
+            reader_eof: false,
             read_chunk_size: DEFAULT_READ_CHUNK_SIZE,
             segments: VecDeque::new(),
         }
     }
 
-    /// Create a new input that reads at most `limit` bytes.
-    pub(crate) fn with_limit(reader: R, limit: usize) -> Self {
+    fn with_limit(reader: R, limit: usize) -> Self {
         Self {
             reader,
             remaining_limit: Some(limit),
-            eof: limit == 0,
+            reader_eof: limit == 0,
             read_chunk_size: DEFAULT_READ_CHUNK_SIZE,
             segments: VecDeque::new(),
         }
     }
 
-    /// Set the internal read chunk size.
-    pub(crate) fn set_read_chunk_size(&mut self, bytes: usize) {
-        self.read_chunk_size = bytes.max(1);
-    }
-
-    /// Returns `true` if the buffered input has no remaining bytes and will never produce more.
-    pub(crate) fn is_eof(&self) -> bool {
-        self.eof && self.segments.is_empty()
-    }
-
     /// Returns the number of bytes currently buffered (not yet consumed).
-    pub(crate) fn buffered_len(&self) -> usize {
+    fn buffered_len(&self) -> usize {
         self.segments.iter().map(|b| b.remaining()).sum()
     }
 
     /// Ensure at least `needed` bytes are buffered, reading from the underlying reader if needed.
-    pub(crate) fn poll_ensure(&mut self, cx: &mut Context<'_>, needed: usize) -> Poll<Result<(), Error>> {
+    fn poll_ensure(&mut self, cx: &mut Context<'_>, needed: usize) -> Poll<Result<(), Error>> {
         while self.buffered_len() < needed {
-            if self.eof {
+            if self.reader_eof {
                 break;
             }
             let read = match self.poll_read_more(cx)? {
@@ -134,12 +136,12 @@ where
     }
 
     /// Returns the first contiguous chunk of buffered bytes (may be empty).
-    pub(crate) fn peek_chunk(&self) -> &[u8] {
+    fn peek_chunk(&self) -> &[u8] {
         self.segments.front().map(|b| b.chunk()).unwrap_or(&[])
     }
 
     /// Consume `n` bytes from the buffer.
-    pub(crate) fn advance(&mut self, mut n: usize) {
+    fn advance(&mut self, mut n: usize) {
         while n > 0 {
             let Some(mut front) = self.segments.pop_front() else {
                 break;
@@ -156,10 +158,8 @@ where
     }
 
     /// Consume and return exactly `len` bytes as a `Bytes`.
-    ///
-    /// - If the bytes are fully contained in the first segment, this returns a zero-copy `Bytes`.
-    /// - Otherwise, this allocates and coalesces the bytes into a single buffer.
-    pub(crate) fn poll_take_bytes(
+    /// Zero-copy if the bytes fit in one segment; otherwise coalesces into a single buffer.
+    fn poll_take_bytes(
         &mut self,
         cx: &mut Context<'_>,
         len: usize,
@@ -212,13 +212,13 @@ where
     }
 
     fn poll_read_more(&mut self, cx: &mut Context<'_>) -> Poll<Result<usize, Error>> {
-        if self.eof {
+        if self.reader_eof {
             return Poll::Ready(Ok(0));
         }
 
         let to_read = match self.remaining_limit {
             Some(0) => {
-                self.eof = true;
+                self.reader_eof = true;
                 return Poll::Ready(Ok(0));
             }
             Some(rem) => rem.min(self.read_chunk_size),
@@ -235,15 +235,14 @@ where
         };
 
         if n == 0 {
-            self.eof = true;
+            self.reader_eof = true;
             return Poll::Ready(Ok(0));
         }
 
         if let Some(rem) = self.remaining_limit.as_mut() {
             *rem = rem.saturating_sub(n);
             if *rem == 0 {
-                self.eof = true;
-            }
+                self.reader_eof = true;            }
         }
 
         chunk.truncate(n);
@@ -266,8 +265,8 @@ pub struct AsyncFieldReader<R> {
 /// This is the async/streaming counterpart of `lazy_slice_parser::MessageParserStateRef`,
 /// but is designed for a single message boundary (either EOF or an explicit byte limit).
 ///
-/// The parser yields fields sequentially and invokes a user-provided callback for the fields
-/// selected by `field_filter`. Fields not selected by the filter are skipped without allocating.
+/// The parser yields fields sequentially and invokes the callback for each field. The callback
+/// (owned by the message struct) decides which fields to record and which to drop.
 pub struct AsyncMessageParserStateRef<R> {
     state: Rc<RefCell<AsyncMessageParserStateInner<R>>>,
 }
@@ -282,7 +281,6 @@ impl<R> Clone for AsyncMessageParserStateRef<R> {
 
 struct AsyncMessageParserStateInner<R> {
     field_reader: AsyncFieldReader<R>,
-    field_filter: Rc<dyn Fn(u32) -> bool>,
     field_update_callback: Rc<dyn Fn(Field<Bytes>) -> Result<(), Error>>,
 }
 
@@ -291,13 +289,9 @@ where
     R: AsyncRead + Unpin,
 {
     /// Create a new parser state from an async reader.
-    ///
-    /// `field_filter` decides which fields are kept (decoded into `Field<Bytes>` and passed to
-    /// the callback). Fields not kept are skipped efficiently.
-    pub fn create<F, G>(reader: R, limit: Option<usize>, field_filter: G, field_update_callback: F) -> Self
+    pub fn create<F>(reader: R, limit: Option<usize>, field_update_callback: F) -> Self
     where
         F: Fn(Field<Bytes>) -> Result<(), Error> + 'static,
-        G: Fn(u32) -> bool + 'static,
     {
         let field_reader = match limit {
             Some(limit) => AsyncFieldReader::with_limit(reader, limit),
@@ -305,7 +299,6 @@ where
         };
         let inner = AsyncMessageParserStateInner {
             field_reader,
-            field_filter: Rc::new(field_filter),
             field_update_callback: Rc::new(field_update_callback),
         };
         Self {
@@ -315,7 +308,7 @@ where
 
     /// Parse and process exactly one field (if available), then return whether progress was made.
     ///
-    /// - `Ok(true)`: one kept field was parsed and the update callback was invoked.
+    /// - `Ok(true)`: one field was parsed and the update callback was invoked.
     /// - `Ok(false)`: end-of-message reached (no more fields available).
     /// - `Pending`: more input is needed.
     pub fn poll_parse_one_field_with_callback(
@@ -325,10 +318,7 @@ where
         // Poll the next field with only a short mutable borrow.
         let next = {
             let mut state = self.state.borrow_mut();
-            let filter = state.field_filter.clone();
-            state
-                .field_reader
-                .poll_next_field_filtered(cx, move |n| (filter)(n))
+            state.field_reader.poll_next_field(cx)
         };
 
         let next = match next {

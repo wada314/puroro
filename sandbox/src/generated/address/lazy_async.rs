@@ -53,8 +53,6 @@ where
         Rc::new_cyclic(move |weak: &Weak<Self>| {
             let message_body_weak = weak.clone();
 
-            let field_filter = |n: u32| matches!(n, 1 | 2 | 3);
-
             let callback = move |field: Field<Bytes>| -> Result<(), Error> {
                 if let Some(message_body) = message_body_weak.upgrade() {
                     message_body.update_field(field)?;
@@ -62,8 +60,7 @@ where
                 Ok(())
             };
 
-            let parser_state =
-                AsyncMessageParserStateRef::create(reader, limit, field_filter, callback);
+            let parser_state = AsyncMessageParserStateRef::create(reader, limit, callback);
 
             Self {
                 parser_state,
