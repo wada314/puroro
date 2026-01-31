@@ -14,6 +14,7 @@ use ::bytes::{Buf, Bytes, BytesMut};
 use ::futures_io::AsyncRead;
 use ::std::collections::VecDeque;
 use ::std::pin::Pin;
+use ::std::task::ready;
 use ::std::task::{Context, Poll};
 
 use ::protobuf_core::{Field, FieldValue};
@@ -124,10 +125,7 @@ where
             if self.reader_eof {
                 break;
             }
-            let read = match self.poll_read_more(cx)? {
-                Poll::Ready(n) => n,
-                Poll::Pending => return Poll::Pending,
-            };
+            let read = ready!(self.poll_read_more(cx)?);
             if read == 0 {
                 break;
             }
@@ -169,10 +167,7 @@ where
         }
 
         // Ensure we have enough buffered.
-        let _ = match self.poll_ensure(cx, len)? {
-            Poll::Ready(()) => (),
-            Poll::Pending => return Poll::Pending,
-        };
+        ready!(self.poll_ensure(cx, len)?);
 
         if self.buffered_len() < len {
             // True EOF / limit reached before we could collect enough bytes.
@@ -228,10 +223,9 @@ where
         let mut chunk = BytesMut::new();
         chunk.resize(to_read, 0);
 
-        let n = match Pin::new(&mut self.reader).poll_read(cx, &mut chunk[..]) {
-            Poll::Ready(Ok(n)) => n,
-            Poll::Ready(Err(e)) => return Poll::Ready(Err(Error::Io(e))),
-            Poll::Pending => return Poll::Pending,
+        let n = match ready!(Pin::new(&mut self.reader).poll_read(cx, &mut chunk[..])) {
+            Ok(n) => n,
+            Err(e) => return Poll::Ready(Err(Error::Io(e))),
         };
 
         if n == 0 {
@@ -318,13 +312,8 @@ where
         // Poll the next field with only a short mutable borrow.
         let next = {
             let mut state = self.state.borrow_mut();
-            state.field_reader.poll_next_field(cx)
+            ready!(state.field_reader.poll_next_field(cx))?
         };
-
-        let next = match next {
-            Poll::Ready(r) => r,
-            Poll::Pending => return Poll::Pending,
-        }?;
 
         let Some(field) = next else {
             return Poll::Ready(Ok(false));
@@ -349,10 +338,7 @@ where
         C: FnMut() -> bool,
     {
         while !condition() {
-            let progressed = match self.poll_parse_one_field_with_callback(cx) {
-                Poll::Ready(r) => r?,
-                Poll::Pending => return Poll::Pending,
-            };
+            let progressed = ready!(self.poll_parse_one_field_with_callback(cx))?;
             if !progressed {
                 break;
             }
@@ -418,13 +404,12 @@ where
                 return Poll::Ready(Ok(None));
             }
 
-            let tag_varint = match self.poll_read_varint(cx)? {
-                Poll::Ready(Some(v)) => v,
-                Poll::Ready(None) => {
+            let tag_varint = match ready!(self.poll_read_varint(cx)?) {
+                Some(v) => v,
+                None => {
                     self.terminated = true;
                     return Poll::Ready(Ok(None));
                 }
-                Poll::Pending => return Poll::Pending,
             };
 
             let tag = Tag::from_encoded(tag_varint)?;
@@ -434,30 +419,18 @@ where
                 // Skip without allocating.
                 match tag.wire_type {
                     WireType::Varint => {
-                        let _ = match self.poll_read_required_varint(cx)? {
-                            Poll::Ready(v) => v,
-                            Poll::Pending => return Poll::Pending,
-                        };
+                        let _ = ready!(self.poll_read_required_varint(cx)?);
                     }
                     WireType::Int32 => {
-                        let _ = match self.input.poll_ensure(cx, 4)? {
-                            Poll::Ready(()) => (),
-                            Poll::Pending => return Poll::Pending,
-                        };
+                        ready!(self.input.poll_ensure(cx, 4)?);
                         self.input.advance(4);
                     }
                     WireType::Int64 => {
-                        let _ = match self.input.poll_ensure(cx, 8)? {
-                            Poll::Ready(()) => (),
-                            Poll::Pending => return Poll::Pending,
-                        };
+                        ready!(self.input.poll_ensure(cx, 8)?);
                         self.input.advance(8);
                     }
                     WireType::Len => {
-                        let len_varint = match self.poll_read_required_varint(cx)? {
-                            Poll::Ready(v) => v,
-                            Poll::Pending => return Poll::Pending,
-                        };
+                        let len_varint = ready!(self.poll_read_required_varint(cx)?);
                         let len_u64 = len_varint.to_uint64();
                         let len: usize = len_u64.try_into().map_err(|_| {
                             Error::InvalidWireFormat("Length-delimited size out of range".to_string())
@@ -467,10 +440,7 @@ where
                                 "Length-delimited size exceeds maximum allowed".to_string(),
                             )));
                         }
-                        let _ = match self.input.poll_ensure(cx, len)? {
-                            Poll::Ready(()) => (),
-                            Poll::Pending => return Poll::Pending,
-                        };
+                        ready!(self.input.poll_ensure(cx, len)?);
                         self.input.advance(len);
                     }
                     WireType::SGroup | WireType::EGroup => {
@@ -485,35 +455,23 @@ where
             // Keep: read the value and return it.
             let value = match tag.wire_type {
                 WireType::Varint => {
-                    let v = match self.poll_read_required_varint(cx)? {
-                        Poll::Ready(v) => v,
-                        Poll::Pending => return Poll::Pending,
-                    };
+                    let v = ready!(self.poll_read_required_varint(cx)?);
                     FieldValue::Varint(v)
                 }
                 WireType::Int32 => {
-                    let bytes = match self.input.poll_take_bytes(cx, 4)? {
-                        Poll::Ready(b) => b,
-                        Poll::Pending => return Poll::Pending,
-                    };
+                    let bytes = ready!(self.input.poll_take_bytes(cx, 4)?);
                     let mut arr = [0u8; 4];
                     arr.copy_from_slice(bytes.as_ref());
                     FieldValue::I32(arr)
                 }
                 WireType::Int64 => {
-                    let bytes = match self.input.poll_take_bytes(cx, 8)? {
-                        Poll::Ready(b) => b,
-                        Poll::Pending => return Poll::Pending,
-                    };
+                    let bytes = ready!(self.input.poll_take_bytes(cx, 8)?);
                     let mut arr = [0u8; 8];
                     arr.copy_from_slice(bytes.as_ref());
                     FieldValue::I64(arr)
                 }
                 WireType::Len => {
-                    let len_varint = match self.poll_read_required_varint(cx)? {
-                        Poll::Ready(v) => v,
-                        Poll::Pending => return Poll::Pending,
-                    };
+                    let len_varint = ready!(self.poll_read_required_varint(cx)?);
                     let len_u64 = len_varint.to_uint64();
                     let len: usize = len_u64.try_into().map_err(|_| {
                         Error::InvalidWireFormat("Length-delimited size out of range".to_string())
@@ -523,10 +481,7 @@ where
                             "Length-delimited size exceeds maximum allowed".to_string(),
                         )));
                     }
-                    let bytes = match self.input.poll_take_bytes(cx, len)? {
-                        Poll::Ready(b) => b,
-                        Poll::Pending => return Poll::Pending,
-                    };
+                    let bytes = ready!(self.input.poll_take_bytes(cx, len)?);
                     FieldValue::Len(bytes)
                 }
                 WireType::SGroup | WireType::EGroup => {
@@ -541,12 +496,11 @@ where
     }
 
     fn poll_read_required_varint(&mut self, cx: &mut Context<'_>) -> Poll<Result<Varint, Error>> {
-        match self.poll_read_varint(cx)? {
-            Poll::Ready(Some(v)) => Poll::Ready(Ok(v)),
-            Poll::Ready(None) => Poll::Ready(Err(Error::InvalidWireFormat(
+        match ready!(self.poll_read_varint(cx)?) {
+            Some(v) => Poll::Ready(Ok(v)),
+            None => Poll::Ready(Err(Error::InvalidWireFormat(
                 "Unexpected EOF while reading varint".to_string(),
             ))),
-            Poll::Pending => Poll::Pending,
         }
     }
 
@@ -560,10 +514,7 @@ where
 
         for _ in 0..MAX_VARINT_BYTES_LOCAL {
             // Ensure at least one byte is available (or we hit EOF).
-            let _ = match self.input.poll_ensure(cx, 1)? {
-                Poll::Ready(()) => (),
-                Poll::Pending => return Poll::Pending,
-            };
+            ready!(self.input.poll_ensure(cx, 1)?);
 
             let chunk = self.input.peek_chunk();
             if chunk.is_empty() {
