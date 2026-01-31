@@ -101,6 +101,21 @@ focus of the project (serialization/deserialization, codegen, and other runtime 
 - `doc/lazy-parsing-state-design.md`
 - `doc/lazy-parsing-next-steps.md`
 
+## 2026-01-31: Async lazy parsing and protobuf-core integration
+
+- **puroro `lazy_async` (`puroro/src/lazy_async.rs`)**: `poll_read_varint` uses a fast path and fallback:
+  - **Fast path**: `peek_chunk()` gives `&[u8]`; `&[u8]` implements `Read`, so we use `ReadExtVarint::read_varint()`
+    from protobuf-core. If a complete varint is in the buffer, we return immediately without polling for more bytes.
+  - **Fallback**: When the chunk is empty or the varint is incomplete, we decode byte-by-byte with `poll_ensure(1)`
+    per byte. This path is used when a varint spans segment boundaries.
+- **protobuf-core `futures` feature**: protobuf-core now has an optional `futures` feature that provides
+  `StreamExtVarint` and `VarintDecoder` for async varint reading from `TryStream<Ok = u8, Error = E>`.
+  The API is `decoder.read_varint().await` (async fn, state retained across .await).
+- **Future puroro integration**: puroro could implement `Stream<Item = Result<u8, Error>>` for a wrapper around
+  `AsyncInput` and use protobuf-core's `VarintDecoder` for the fallback path, replacing the manual byte-by-byte
+  loop. This would require protobuf-core to be published with the `futures` feature and puroro to depend on it.
+- **puroro uses**: `protobuf-core = "0.2.1"` from crates.io (path override for local dev is possible).
+
 ## Minimal Reading Order (for new AI agents)
 
 If you are new to this repo and want to avoid reading many docs, start here:
