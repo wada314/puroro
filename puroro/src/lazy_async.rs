@@ -382,117 +382,60 @@ where
         &mut self,
         cx: &mut Context<'_>,
     ) -> Poll<Result<Option<Field<Bytes>>, Error>> {
-        self.poll_next_field_filtered(cx, |_field_number| true)
-    }
+        if self.terminated {
+            return Poll::Ready(Ok(None));
+        }
 
-    /// Poll for the next field, allowing the caller to skip (drop) fields without allocating.
-    ///
-    /// The `keep` predicate is called with the decoded field number. If it returns `false`,
-    /// the field is skipped:
-    /// - varint/fixed values are read and discarded
-    /// - length-delimited values are advanced over without coalescing into an owned buffer
-    pub fn poll_next_field_filtered<F>(
-        &mut self,
-        cx: &mut Context<'_>,
-        mut keep: F,
-    ) -> Poll<Result<Option<Field<Bytes>>, Error>>
-    where
-        F: FnMut(u32) -> bool,
-    {
-        loop {
-            if self.terminated {
+        let tag_varint = match ready!(self.poll_read_varint(cx)?) {
+            Some(v) => v,
+            None => {
+                self.terminated = true;
                 return Poll::Ready(Ok(None));
             }
+        };
 
-            let tag_varint = match ready!(self.poll_read_varint(cx)?) {
-                Some(v) => v,
-                None => {
-                    self.terminated = true;
-                    return Poll::Ready(Ok(None));
-                }
-            };
+        let tag = Tag::from_encoded(tag_varint)?;
+        let field_number = tag.field_number;
 
-            let tag = Tag::from_encoded(tag_varint)?;
-            let field_number = tag.field_number;
-
-            if !keep(field_number.as_u32()) {
-                // Skip without allocating.
-                match tag.wire_type {
-                    WireType::Varint => {
-                        let _ = ready!(self.poll_read_required_varint(cx)?);
-                    }
-                    WireType::Int32 => {
-                        ready!(self.input.poll_ensure(cx, 4)?);
-                        self.input.advance(4);
-                    }
-                    WireType::Int64 => {
-                        ready!(self.input.poll_ensure(cx, 8)?);
-                        self.input.advance(8);
-                    }
-                    WireType::Len => {
-                        let len_varint = ready!(self.poll_read_required_varint(cx)?);
-                        let len_u64 = len_varint.to_uint64();
-                        let len: usize = len_u64.try_into().map_err(|_| {
-                            Error::InvalidWireFormat("Length-delimited size out of range".to_string())
-                        })?;
-                        if len > MAX_LEN_DELIMITED_SIZE {
-                            return Poll::Ready(Err(Error::InvalidWireFormat(
-                                "Length-delimited size exceeds maximum allowed".to_string(),
-                            )));
-                        }
-                        ready!(self.input.poll_ensure(cx, len)?);
-                        self.input.advance(len);
-                    }
-                    WireType::SGroup | WireType::EGroup => {
-                        return Poll::Ready(Err(Error::InvalidWireFormat(
-                            "Group wire types are not supported".to_string(),
-                        )));
-                    }
-                }
-                continue;
+        let value = match tag.wire_type {
+            WireType::Varint => {
+                let v = ready!(self.poll_read_required_varint(cx)?);
+                FieldValue::Varint(v)
             }
-
-            // Keep: read the value and return it.
-            let value = match tag.wire_type {
-                WireType::Varint => {
-                    let v = ready!(self.poll_read_required_varint(cx)?);
-                    FieldValue::Varint(v)
-                }
-                WireType::Int32 => {
-                    let bytes = ready!(self.input.poll_take_bytes(cx, 4)?);
-                    let mut arr = [0u8; 4];
-                    arr.copy_from_slice(bytes.as_ref());
-                    FieldValue::I32(arr)
-                }
-                WireType::Int64 => {
-                    let bytes = ready!(self.input.poll_take_bytes(cx, 8)?);
-                    let mut arr = [0u8; 8];
-                    arr.copy_from_slice(bytes.as_ref());
-                    FieldValue::I64(arr)
-                }
-                WireType::Len => {
-                    let len_varint = ready!(self.poll_read_required_varint(cx)?);
-                    let len_u64 = len_varint.to_uint64();
-                    let len: usize = len_u64.try_into().map_err(|_| {
-                        Error::InvalidWireFormat("Length-delimited size out of range".to_string())
-                    })?;
-                    if len > MAX_LEN_DELIMITED_SIZE {
-                        return Poll::Ready(Err(Error::InvalidWireFormat(
-                            "Length-delimited size exceeds maximum allowed".to_string(),
-                        )));
-                    }
-                    let bytes = ready!(self.input.poll_take_bytes(cx, len)?);
-                    FieldValue::Len(bytes)
-                }
-                WireType::SGroup | WireType::EGroup => {
+            WireType::Int32 => {
+                let bytes = ready!(self.input.poll_take_bytes(cx, 4)?);
+                let mut arr = [0u8; 4];
+                arr.copy_from_slice(bytes.as_ref());
+                FieldValue::I32(arr)
+            }
+            WireType::Int64 => {
+                let bytes = ready!(self.input.poll_take_bytes(cx, 8)?);
+                let mut arr = [0u8; 8];
+                arr.copy_from_slice(bytes.as_ref());
+                FieldValue::I64(arr)
+            }
+            WireType::Len => {
+                let len_varint = ready!(self.poll_read_required_varint(cx)?);
+                let len_u64 = len_varint.to_uint64();
+                let len: usize = len_u64.try_into().map_err(|_| {
+                    Error::InvalidWireFormat("Length-delimited size out of range".to_string())
+                })?;
+                if len > MAX_LEN_DELIMITED_SIZE {
                     return Poll::Ready(Err(Error::InvalidWireFormat(
-                        "Group wire types are not supported".to_string(),
+                        "Length-delimited size exceeds maximum allowed".to_string(),
                     )));
                 }
-            };
+                let bytes = ready!(self.input.poll_take_bytes(cx, len)?);
+                FieldValue::Len(bytes)
+            }
+            WireType::SGroup | WireType::EGroup => {
+                return Poll::Ready(Err(Error::InvalidWireFormat(
+                    "Group wire types are not supported".to_string(),
+                )));
+            }
+        };
 
-            return Poll::Ready(Ok(Some(Field::new(field_number, value))));
-        }
+        Poll::Ready(Ok(Some(Field::new(field_number, value))))
     }
 
     fn poll_read_required_varint(&mut self, cx: &mut Context<'_>) -> Poll<Result<Varint, Error>> {
