@@ -42,46 +42,36 @@ where
 
     /// Async length of the repeated field (requires fully parsing the message).
     /// Note: Returns a future that is not `Send` due to shared `Rc`/callback design.
-    pub fn len_async(&self) -> impl Future<Output = Result<usize, Error>> {
-        let state = self.parent_parser_state.clone();
-        let list = self.list;
-        async move {
-            state.parse_until_with_callback(|| false).await?;
-            Ok(list.len())
-        }
+    pub async fn len_async(&self) -> Result<usize, Error> {
+        self.parent_parser_state
+            .parse_until_with_callback(|| false)
+            .await?;
+        Ok(self.list.len())
     }
 
     /// Async check whether the repeated field is empty (parses just enough to know).
     /// Note: Returns a future that is not `Send` due to shared `Rc`/callback design.
-    pub fn is_empty_async(&self) -> impl Future<Output = Result<bool, Error>> {
-        let state = self.parent_parser_state.clone();
-        let list = self.list;
-        async move {
-            while list.len() < 1 {
-                let progressed = state.parse_one_field_with_callback().await?;
-                if !progressed {
-                    break;
-                }
+    pub async fn is_empty_async(&self) -> Result<bool, Error> {
+        while self.list.len() < 1 {
+            let progressed = self.parent_parser_state.parse_one_field_with_callback().await?;
+            if !progressed {
+                break;
             }
-            Ok(list.first().is_none())
         }
+        Ok(self.list.first().is_none())
     }
 
     /// Async get an element by index, parsing on-demand until it is available or EOF is reached.
     /// Note: Returns a future that is not `Send` due to shared `Rc`/callback design.
-    pub fn get_async(&self, index: usize) -> impl Future<Output = Result<Option<T>, Error>> {
-        let state = self.parent_parser_state.clone();
-        let list = self.list;
+    pub async fn get_async(&self, index: usize) -> Result<Option<T>, Error> {
         let needed = index.saturating_add(1);
-        async move {
-            while list.len() < needed {
-                let progressed = state.parse_one_field_with_callback().await?;
-                if !progressed {
-                    break;
-                }
+        while self.list.len() < needed {
+            let progressed = self.parent_parser_state.parse_one_field_with_callback().await?;
+            if !progressed {
+                break;
             }
-            Ok(list.iter().nth(index).cloned())
         }
+        Ok(self.list.iter().nth(index).cloned())
     }
 }
 

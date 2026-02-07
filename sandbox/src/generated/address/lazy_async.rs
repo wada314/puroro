@@ -91,35 +91,26 @@ where
     ///
     /// Takes `&Rc<Self>` because the future needs to read from the message; the returned
     /// future is not `Send` due to `Rc`.
-    pub fn street_bytes(self: &Rc<Self>) -> impl Future<Output = Result<Bytes, Error>> {
-        let this = self.clone();
-        async move {
-            this.parser_state.parse_until_with_callback(|| false).await?;
-            Ok(this.street.borrow().clone().unwrap_or_else(Bytes::new))
-        }
+    pub async fn street_bytes(self: &Rc<Self>) -> Result<Bytes, Error> {
+        self.parser_state.parse_until_with_callback(|| false).await?;
+        Ok(self.street.borrow().clone().unwrap_or_else(Bytes::new))
     }
 
     /// Async getter for city bytes.
     ///
     /// Takes `&Rc<Self>` because the future needs to read from the message; the returned
     /// future is not `Send` due to `Rc`.
-    pub fn city_bytes(self: &Rc<Self>) -> impl Future<Output = Result<Bytes, Error>> {
-        let this = self.clone();
-        async move {
-            this.parser_state.parse_until_with_callback(|| false).await?;
-            Ok(this.city.borrow().clone().unwrap_or_else(Bytes::new))
-        }
+    pub async fn city_bytes(self: &Rc<Self>) -> Result<Bytes, Error> {
+        self.parser_state.parse_until_with_callback(|| false).await?;
+        Ok(self.city.borrow().clone().unwrap_or_else(Bytes::new))
     }
 
     /// Async getter for zip code.
     ///
     /// Takes `&Rc<Self>` because the future needs to read from the message; the returned
     /// future is not `Send` due to `Rc`.
-    pub fn zip_code(self: &Rc<Self>) -> impl Future<Output = Result<i32, Error>> {
-        let this = self.clone();
-        async move {
-            this.parser_state.parse_until_with_callback(|| false).await?;
-            Ok(this.zip_code.get())
-        }
+    pub async fn zip_code(self: &Rc<Self>) -> Result<i32, Error> {
+        self.parser_state.parse_until_with_callback(|| false).await?;
+        Ok(self.zip_code.get())
     }
 }

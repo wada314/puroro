@@ -110,12 +110,9 @@ where
     ///
     /// Takes `&Rc<Self>` because the future needs to read from the message; the returned
     /// future is not `Send` due to `Rc`.
-    pub fn age(self: &Rc<Self>) -> impl Future<Output = Result<i32, Error>> {
-        let this = self.clone();
-        async move {
-            this.parser_state.parse_until_with_callback(|| false).await?;
-            Ok(this.age.get())
-        }
+    pub async fn age(self: &Rc<Self>) -> Result<i32, Error> {
+        self.parser_state.parse_until_with_callback(|| false).await?;
+        Ok(self.age.get())
     }
 
     /// Repeated scores adapter (async).
@@ -135,24 +132,21 @@ where
     ///
     /// Takes `&Rc<Self>` because the future needs to read from shared fields; the returned
     /// future is not `Send` due to `Rc`.
-    pub fn address(self: &Rc<Self>) -> impl Future<Output = Result<Option<Rc<AddressLazyAsyncImpl<BytesReader>>>, Error>> {
-        let this = self.clone();
-        async move {
-            this.parser_state.parse_until_with_callback(|| false).await?;
+    pub async fn address(self: &Rc<Self>) -> Result<Option<Rc<AddressLazyAsyncImpl<BytesReader>>>, Error> {
+        self.parser_state.parse_until_with_callback(|| false).await?;
 
-            if let Some(addr) = this.address.get() {
-                return Ok(Some(addr.clone()));
-            }
-
-            let mut slot = this.address_payload.borrow_mut();
-            let Some(buf) = slot.take() else {
-                return Ok(None);
-            };
-            let bytes = buf.freeze();
-            let child = AddressLazyAsyncImpl::from_bytes(bytes);
-            let _ = this.address.set(child.clone());
-            Ok(Some(child))
+        if let Some(addr) = self.address.get() {
+            return Ok(Some(addr.clone()));
         }
+
+        let mut slot = self.address_payload.borrow_mut();
+        let Some(buf) = slot.take() else {
+            return Ok(None);
+        };
+        let bytes = buf.freeze();
+        let child = AddressLazyAsyncImpl::from_bytes(bytes);
+        let _ = self.address.set(child.clone());
+        Ok(Some(child))
     }
 }
 
