@@ -452,23 +452,19 @@ where
         let mut chunk = self.input.peek_chunk();
         if !chunk.is_empty() {
             let len_before = chunk.len();
-            match chunk.read_varint() {
-                Ok(Some(varint)) => {
+            match chunk.read_varint_partial() {
+                Ok(protobuf_core::DecodeOutcome::Complete(varint)) => {
                     let consumed = len_before - chunk.len();
                     self.input.advance(consumed);
                     return Poll::Ready(Ok(Some(varint)));
                 }
-                Ok(None) => {
+                Ok(protobuf_core::DecodeOutcome::Empty) => {
                     // Empty reader; fall through to byte-by-byte path.
                 }
-                Err(e) => {
-                    // VarintTooLong: malformed if 10+ bytes read, else incomplete (need more).
-                    let consumed = len_before - chunk.len();
-                    if consumed >= MAX_VARINT_BYTES_LOCAL {
-                        return Poll::Ready(Err(Error::from(e)));
-                    }
-                    // Incomplete: fall through to byte-by-byte path.
+                Ok(protobuf_core::DecodeOutcome::Incomplete(_)) => {
+                    // Incomplete: fall through to byte-by-byte path (do not advance; it will re-read from start).
                 }
+                Err(e) => return Poll::Ready(Err(Error::from(e))),
             }
         }
 
