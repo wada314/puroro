@@ -388,15 +388,13 @@ where
             return Poll::Ready(Ok(None));
         }
 
-        let tag_varint = match ready!(self.poll_read_varint(cx)?) {
-            Some(v) => v,
+        let tag = match ready!(self.poll_read_tag(cx)?) {
+            Some(t) => t,
             None => {
                 self.terminated = true;
                 return Poll::Ready(Ok(None));
             }
         };
-
-        let tag = Tag::from_encoded(tag_varint)?;
         let field_number = tag.field_number;
 
         let value = match tag.wire_type {
@@ -438,6 +436,20 @@ where
         };
 
         Poll::Ready(Ok(Some(Field::new(field_number, value))))
+    }
+
+    /// Poll for the next protobuf tag (field number + wire type).
+    ///
+    /// Returns `Ok(None)` when no more bytes are available (end-of-message).
+    pub fn poll_read_tag(
+        &mut self,
+        cx: &mut Context<'_>,
+    ) -> Poll<Result<Option<Tag>, Error>> {
+        let varint_opt = ready!(self.poll_read_varint(cx)?);
+        Poll::Ready(match varint_opt {
+            Some(varint) => Tag::from_encoded(varint).map(Some).map_err(Error::from),
+            None => Ok(None),
+        })
     }
 
     fn poll_read_required_varint(&mut self, cx: &mut Context<'_>) -> Poll<Result<Varint, Error>> {
