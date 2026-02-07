@@ -114,10 +114,7 @@ focus of the project (serialization/deserialization, codegen, and other runtime 
 - **Current `lazy_async` (`puroro/src/lazy_async.rs`)**: `poll_read_varint` has a fast path and a fallback:
   - **Fast path**: `peek_chunk()` gives `&[u8]`; we use `ReadExtVarint::read_varint_partial()`. If
     `DecodeOutcome::Complete(varint)`, return immediately. If `Empty`, fall through. If `Incomplete(_)`, fall through.
-  - **Fallback (TODO)**: When the varint spans segment boundaries, the code currently uses a manual byte-by-byte
-    loop with `poll_ensure(1)` per byte. This should be refactored to use protobuf-core’s partial/resume: on
-    `Incomplete(state)`, do not advance the input; store `state` and any unconsumed bytes; when more bytes are
-    available, call `read_varint_resume(reader, state)` with a reader over (unconsumed bytes + new chunk).
+  - **Resume path (implemented)**: When `varint_resume_state` is `Some(state)`, we poll for one byte then call `read_varint_resume(chunk, state)`. On `Complete` we advance and return; on `Incomplete(s)` we advance, store `s`, return `Pending`; on EOF we return error.
 - **Tag reading**: Any async tag reading in puroro should similarly use `read_tag_partial` / `read_tag_resume`
   when available, instead of ad-hoc logic.
 

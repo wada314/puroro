@@ -17,13 +17,11 @@ use ::std::pin::Pin;
 use ::std::task::ready;
 use ::std::task::{Context, Poll};
 
-use ::protobuf_core::{Field, FieldValue, ReadExtVarint};
+use ::protobuf_core::{DecodeOutcome, DecodeState, Field, FieldValue, ReadExtVarint};
 use ::protobuf_core::{Tag, Varint, WireType};
 
 /// Maximum allowed length-delimited size (2 GiB), matching the protobuf wire format limits.
 const MAX_LEN_DELIMITED_SIZE: usize = 2 * 1024 * 1024 * 1024;
-/// Maximum varint length in bytes.
-const MAX_VARINT_BYTES_LOCAL: usize = 10;
 use ::std::cell::RefCell;
 use ::std::rc::Rc;
 
@@ -120,14 +118,23 @@ where
     }
 
     /// Ensure at least `needed` bytes are buffered, reading from the underlying reader if needed.
+    ///
+    /// Semantics match `std::io::Read::read_exact` / `futures::AsyncReadExt::read_exact` / `tokio::io::AsyncReadExt::read_exact`:
+    /// returns `Ok(())` when at least `needed` bytes are available, or `Err` with `UnexpectedEof` when EOF is hit before that.
     fn poll_ensure(&mut self, cx: &mut Context<'_>, needed: usize) -> Poll<Result<(), Error>> {
         while self.buffered_len() < needed {
             if self.reader_eof {
-                break;
+                return Poll::Ready(Err(Error::Io(::std::io::Error::new(
+                    ::std::io::ErrorKind::UnexpectedEof,
+                    "failed to fill buffer",
+                ))));
             }
             let read = ready!(self.poll_read_more(cx)?);
             if read == 0 {
-                break;
+                return Poll::Ready(Err(Error::Io(::std::io::Error::new(
+                    ::std::io::ErrorKind::UnexpectedEof,
+                    "failed to fill buffer",
+                ))));
             }
         }
         Poll::Ready(Ok(()))
@@ -162,15 +169,8 @@ where
             return Poll::Ready(Ok(Bytes::new()));
         }
 
-        // Ensure we have enough buffered.
+        // Ensure we have enough buffered (read_exact semantics: error if EOF before full).
         ready!(self.poll_ensure(cx, len)?);
-
-        if self.buffered_len() < len {
-            // True EOF / limit reached before we could collect enough bytes.
-            return Poll::Ready(Err(Error::InvalidWireFormat(
-                "Unexpected EOF while reading length-delimited field".to_string(),
-            )));
-        }
 
         // Fast path: the first segment contains the entire range.
         if let Some(mut front) = self.segments.pop_front() {
@@ -249,6 +249,10 @@ where
 pub struct AsyncFieldReader<R> {
     input: AsyncInput<R>,
     terminated: bool,
+    /// When a varint spans segment boundaries, we get `DecodeOutcome::Incomplete(state)` from
+    /// `read_varint_partial`. We store the state here and continue with `read_varint_resume` on
+    /// the next poll when more bytes are available.
+    varint_resume_state: Option<DecodeState>,
 }
 
 /// Shared, poll-driven parser state for a single message.
@@ -353,6 +357,7 @@ where
         Self {
             input: AsyncInput::new(reader),
             terminated: false,
+            varint_resume_state: None,
         }
     }
 
@@ -361,6 +366,7 @@ where
         Self {
             input: AsyncInput::with_limit(reader, limit),
             terminated: limit == 0,
+            varint_resume_state: None,
         }
     }
 
@@ -447,61 +453,35 @@ where
     ///
     /// Returns `Ok(None)` if no bytes are available and the message has ended.
     fn poll_read_varint(&mut self, cx: &mut Context<'_>) -> Poll<Result<Option<Varint>, Error>> {
-        // Fast path: try to decode from the already-buffered peek chunk using protobuf-core.
-        // &[u8] implements Read and advances as bytes are consumed.
-        let mut chunk = self.input.peek_chunk();
-        if !chunk.is_empty() {
-            let len_before = chunk.len();
-            match chunk.read_varint_partial() {
-                Ok(protobuf_core::DecodeOutcome::Complete(varint)) => {
-                    let consumed = len_before - chunk.len();
-                    self.input.advance(consumed);
-                    return Poll::Ready(Ok(Some(varint)));
-                }
-                Ok(protobuf_core::DecodeOutcome::Empty) => {
-                    // Empty reader; fall through to byte-by-byte path.
-                }
-                Ok(protobuf_core::DecodeOutcome::Incomplete(_)) => {
-                    // Incomplete: fall through to byte-by-byte path (do not advance; it will re-read from start).
-                }
-                Err(e) => return Poll::Ready(Err(Error::from(e))),
-            }
-        }
-
-        // Fallback: decode byte-by-byte, polling for more input as needed.
-        let mut value: u64 = 0;
-        let mut shift: u32 = 0;
-        let mut read_any = false;
-
-        for _ in 0..MAX_VARINT_BYTES_LOCAL {
-            // Ensure at least one byte is available (or we hit EOF).
-            ready!(self.input.poll_ensure(cx, 1)?);
-
-            let chunk = self.input.peek_chunk();
-            if chunk.is_empty() {
-                if read_any {
-                    return Poll::Ready(Err(Error::InvalidWireFormat(
-                        "Unexpected EOF while reading varint".to_string(),
-                    )));
-                }
+        // Ensure at least 1 byte so we can decode or detect EOF. Cheap when already buffered (one bounds check).
+        if let Err(e) = ready!(self.input.poll_ensure(cx, 1)) {
+            // Empty input is legal only when we are in clean state (not resuming a partial varint).
+            if e.is_unexpected_eof() && self.varint_resume_state.is_none() {
                 return Poll::Ready(Ok(None));
             }
-
-            read_any = true;
-            let byte = chunk[0];
-            self.input.advance(1);
-
-            value |= ((byte & 0x7F) as u64) << shift;
-
-            if (byte & 0x80) == 0 {
-                return Poll::Ready(Ok(Some(Varint::from_uint64(value))));
-            }
-
-            shift = shift.saturating_add(7);
+            return Poll::Ready(Err(e));
         }
 
-        Poll::Ready(Err(Error::InvalidWireFormat(
-            "Varint exceeds maximum length of 10 bytes".to_string(),
-        )))
+        let state = self.varint_resume_state.take();
+        let mut chunk = self.input.peek_chunk();
+        let len_before = chunk.len();
+        let outcome = match state {
+            Some(s) => chunk.read_varint_resume(s).map_err(Error::from),
+            None => chunk.read_varint_partial().map_err(Error::from),
+        };
+        let consumed = len_before - chunk.len();
+        self.input.advance(consumed);
+
+        match outcome {
+            Ok(DecodeOutcome::Complete(varint)) => Poll::Ready(Ok(Some(varint))),
+            Ok(DecodeOutcome::Incomplete(s)) => {
+                self.varint_resume_state = Some(s);
+                Poll::Pending
+            }
+            Ok(DecodeOutcome::Empty) => {
+                unreachable!("we ensure at least 1 byte before decoding; Empty cannot occur")
+            }
+            Err(e) => Poll::Ready(Err(e)),
+        }
     }
 }

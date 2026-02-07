@@ -209,6 +209,17 @@ pub mod error {
         }
     }
 
+    impl Error {
+        /// Returns true if this error is "unexpected EOF" (e.g. from `read_exact`-style operations).
+        /// Callers can use this to treat EOF as a normal end-of-stream (e.g. return `Ok(None)`) instead of propagating an error.
+        pub fn is_unexpected_eof(&self) -> bool {
+            matches!(
+                self,
+                Error::Io(e) if e.kind() == std::io::ErrorKind::UnexpectedEof
+            )
+        }
+    }
+
     /// Get the wire type name from a FieldValue.
     ///
     /// Returns a static string representation of the wire type.
