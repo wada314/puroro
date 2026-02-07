@@ -12,4 +12,5 @@ allocator_extras.workspace = true
 allocator-api2.workspace = true
 once-list2 = "0.4.0"
 bytes = "1"
+futures = "0.3"
 futures-io = "0.3"

@@ -21,9 +21,9 @@ use ::puroro::error::Error;
 use ::puroro::lazy_async::{AsyncMessageParserStateRef, BytesReader};
 use ::puroro::protobuf_core::{Field, FieldValue};
 use ::puroro::repeated_lazy_async::LazyRepeatedAsync;
-use ::std::cell::{Cell, OnceCell, RefCell};
+use ::std::cell::{OnceCell, RefCell};
 use ::std::rc::{Rc, Weak};
-use ::std::task::{Context, Poll};
+use ::std::sync::Arc;
 
 /// Async/streaming lazy implementation of Person message that deserializes fields on-demand.
 ///
@@ -38,7 +38,7 @@ where
 {
     parser_state: AsyncMessageParserStateRef<R>,
 
-    age: Cell<i32>,
+    age: Arc<std::cell::Cell<i32>>,
     scores: OnceList<i32, Global>,
 
     // Scalar message field payload (concatenated across multiple occurrences).
@@ -68,7 +68,7 @@ where
 
             Self {
                 parser_state,
-                age: Cell::new(0),
+                age: Arc::new(std::cell::Cell::new(0)),
                 scores: OnceList::new_in(Global),
                 address_payload: RefCell::new(None),
                 address: OnceCell::new(),
@@ -107,54 +107,50 @@ where
         Ok(())
     }
 
-    fn poll_ensure_all_fields_parsed(&self, _cx: &mut Context<'_>) -> Poll<Result<(), Error>> {
-        todo!("poll_parse_until_with_callback was removed; switch to async API or implement")
+    /// Async getter for age (parses the whole message to ensure the last value wins).
+    pub fn age(&self) -> impl Future<Output = Result<i32, Error>> {
+        let state = self.parser_state.clone();
+        let age = self.age.clone();
+        async move {
+            state.parse_until_with_callback(|| false).await?;
+            Ok(age.get())
+        }
     }
 
-    /// Poll getter for age (parses the whole message to ensure the last value wins).
-    pub fn poll_age(&self, cx: &mut Context<'_>) -> Poll<Result<i32, Error>> {
-        let _ = match self.poll_ensure_all_fields_parsed(cx) {
-            Poll::Ready(r) => r?,
-            Poll::Pending => return Poll::Pending,
-        };
-        Poll::Ready(Ok(self.age.get()))
-    }
-
-    /// Repeated scores adapter (poll-driven).
+    /// Repeated scores adapter (async).
     pub fn scores(&self) -> LazyRepeatedAsync<'_, i32, Global, R> {
         LazyRepeatedAsync::new(self.parser_state.clone(), &self.scores)
     }
 
-    /// Repeated addresses adapter (poll-driven).
+    /// Repeated addresses adapter (async).
     pub fn addresses(&self) -> LazyRepeatedAsync<'_, Rc<AddressLazyAsyncImpl<BytesReader>>, Global, R> {
         LazyRepeatedAsync::new(self.parser_state.clone(), &self.addresses)
     }
 
-    /// Poll getter for the scalar `address` field.
+    /// Async getter for the scalar `address` field.
     ///
-    /// This parses the whole message before returning, so that all occurrences have been
+    /// Parses the whole message before returning, so that all occurrences have been
     /// concatenated into the payload.
-    pub fn poll_address(
-        &self,
-        cx: &mut Context<'_>,
-    ) -> Poll<Result<Option<Rc<AddressLazyAsyncImpl<BytesReader>>>, Error>> {
-        let _ = match self.poll_ensure_all_fields_parsed(cx) {
-            Poll::Ready(r) => r?,
-            Poll::Pending => return Poll::Pending,
-        };
+    ///
+    /// Takes `Rc<Self>` because the future needs to read from shared fields; the returned
+    /// future is not `Send` due to `Rc`.
+    pub fn address(self: Rc<Self>) -> impl Future<Output = Result<Option<Rc<AddressLazyAsyncImpl<BytesReader>>>, Error>> {
+        async move {
+            self.parser_state.parse_until_with_callback(|| false).await?;
 
-        if let Some(addr) = self.address.get() {
-            return Poll::Ready(Ok(Some(addr.clone())));
+            if let Some(addr) = self.address.get() {
+                return Ok(Some(addr.clone()));
+            }
+
+            let mut slot = self.address_payload.borrow_mut();
+            let Some(buf) = slot.take() else {
+                return Ok(None);
+            };
+            let bytes = buf.freeze();
+            let child = AddressLazyAsyncImpl::from_bytes(bytes);
+            let _ = self.address.set(child.clone());
+            Ok(Some(child))
         }
-
-        let mut slot = self.address_payload.borrow_mut();
-        let Some(buf) = slot.take() else {
-            return Poll::Ready(Ok(None));
-        };
-        let bytes = buf.freeze();
-        let child = AddressLazyAsyncImpl::from_bytes(bytes);
-        let _ = self.address.set(child.clone());
-        Poll::Ready(Ok(Some(child)))
     }
 }
 

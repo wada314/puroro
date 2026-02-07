@@ -1,7 +1,7 @@
 //! Async/streaming lazy wrapper for repeated fields.
 //!
-//! This module will mirror `repeated_lazy_slice`, but will be driven by the async/streaming
-//! parser state and use poll-based progress.
+//! This module mirrors `repeated_lazy_slice`, but is driven by the async/streaming
+//! parser state using async methods.
 
 use crate::error::Error;
 use crate::lazy_async::AsyncMessageParserStateRef;
@@ -9,9 +9,8 @@ use crate::repeated::Repeated;
 use ::allocator_extras::Allocator;
 use ::futures_io::AsyncRead;
 use ::once_list2::OnceListWithTailLen as OnceList;
-use ::std::task::{Context, Poll};
 
-/// A poll-driven, on-demand parsing adapter over a repeated field.
+/// An async, on-demand parsing adapter over a repeated field.
 ///
 /// This is intended to be returned by async-lazy message repeated field getters.
 pub struct LazyRepeatedAsync<'message, T, A, R>
@@ -41,39 +40,48 @@ where
         }
     }
 
-    fn poll_ensure_at_least(&self, _cx: &mut Context<'_>, _needed: usize) -> Poll<Result<(), Error>> {
-        todo!("poll_parse_one_field_with_callback was removed; switch to async API or implement")
+    /// Async length of the repeated field (requires fully parsing the message).
+    /// Note: Returns a future that is not `Send` due to shared `Rc`/callback design.
+    pub fn len_async(&self) -> impl Future<Output = Result<usize, Error>> {
+        let state = self.parent_parser_state.clone();
+        let list = self.list;
+        async move {
+            state.parse_until_with_callback(|| false).await?;
+            Ok(list.len())
+        }
     }
 
-    fn poll_ensure_fully_parsed(&self, _cx: &mut Context<'_>) -> Poll<Result<(), Error>> {
-        todo!("poll_parse_until_with_callback was removed; switch to async API or implement")
+    /// Async check whether the repeated field is empty (parses just enough to know).
+    /// Note: Returns a future that is not `Send` due to shared `Rc`/callback design.
+    pub fn is_empty_async(&self) -> impl Future<Output = Result<bool, Error>> {
+        let state = self.parent_parser_state.clone();
+        let list = self.list;
+        async move {
+            while list.len() < 1 {
+                let progressed = state.parse_one_field_with_callback().await?;
+                if !progressed {
+                    break;
+                }
+            }
+            Ok(list.first().is_none())
+        }
     }
 
-    /// Poll the length of the repeated field (requires fully parsing the message).
-    pub fn poll_len(&self, cx: &mut Context<'_>) -> Poll<Result<usize, Error>> {
-        let _ = match self.poll_ensure_fully_parsed(cx)? {
-            Poll::Ready(()) => (),
-            Poll::Pending => return Poll::Pending,
-        };
-        Poll::Ready(Ok(self.list.len()))
-    }
-
-    /// Poll whether the repeated field is empty (parses just enough to know).
-    pub fn poll_is_empty(&self, cx: &mut Context<'_>) -> Poll<Result<bool, Error>> {
-        let _ = match self.poll_ensure_at_least(cx, 1)? {
-            Poll::Ready(()) => (),
-            Poll::Pending => return Poll::Pending,
-        };
-        Poll::Ready(Ok(self.list.first().is_none()))
-    }
-
-    /// Poll and get an element by index, parsing on-demand until it is available or EOF is reached.
-    pub fn poll_get(&self, cx: &mut Context<'_>, index: usize) -> Poll<Result<Option<T>, Error>> {
-        let _ = match self.poll_ensure_at_least(cx, index.saturating_add(1))? {
-            Poll::Ready(()) => (),
-            Poll::Pending => return Poll::Pending,
-        };
-        Poll::Ready(Ok(self.list.iter().nth(index).cloned()))
+    /// Async get an element by index, parsing on-demand until it is available or EOF is reached.
+    /// Note: Returns a future that is not `Send` due to shared `Rc`/callback design.
+    pub fn get_async(&self, index: usize) -> impl Future<Output = Result<Option<T>, Error>> {
+        let state = self.parent_parser_state.clone();
+        let list = self.list;
+        let needed = index.saturating_add(1);
+        async move {
+            while list.len() < needed {
+                let progressed = state.parse_one_field_with_callback().await?;
+                if !progressed {
+                    break;
+                }
+            }
+            Ok(list.iter().nth(index).cloned())
+        }
     }
 }
 
@@ -100,7 +108,7 @@ where
     }
 
     fn iter_box(&self) -> ::allocator_api2::boxed::Box<dyn Iterator<Item = Self::Item> + 'message> {
-        // Note: this iterator does not drive parsing. Use poll-based APIs for on-demand parsing.
+        // Note: this iterator does not drive parsing. Use async APIs (len_async, get_async) for on-demand parsing.
         let boxed = ::allocator_api2::boxed::Box::new(self.list.iter().cloned());
         let boxed_dyn: ::allocator_api2::boxed::Box<dyn Iterator<Item = T> + 'message> =
             ::allocator_api2::unsize_box!(boxed);

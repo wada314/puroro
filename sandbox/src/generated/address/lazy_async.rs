@@ -19,20 +19,19 @@ use ::puroro::lazy_async::{AsyncMessageParserStateRef, BytesReader};
 use ::puroro::protobuf_core::{Field, FieldValue};
 use ::std::cell::{Cell, RefCell};
 use ::std::rc::{Rc, Weak};
-use ::std::task::{Context, Poll};
 
 /// Async/streaming lazy implementation of `Address`.
 ///
-/// This implementation uses `puroro::lazy_async::AsyncMessageParserStateRef` and poll-based
+/// This implementation uses `puroro::lazy_async::AsyncMessageParserStateRef` and async
 /// getters. It supports random-access getters by caching decoded values and/or raw bytes.
 pub struct AddressLazyAsyncImpl<R>
 where
     R: AsyncRead + Unpin + 'static,
 {
     parser_state: AsyncMessageParserStateRef<R>,
-    street: RefCell<Option<Bytes>>,
-    city: RefCell<Option<Bytes>>,
-    zip_code: Cell<i32>,
+    street: Rc<RefCell<Option<Bytes>>>,
+    city: Rc<RefCell<Option<Bytes>>>,
+    zip_code: Rc<Cell<i32>>,
 }
 
 impl AddressLazyAsyncImpl<BytesReader> {
@@ -64,9 +63,9 @@ where
 
             Self {
                 parser_state,
-                street: RefCell::new(None),
-                city: RefCell::new(None),
-                zip_code: Cell::new(0),
+                street: Rc::new(RefCell::new(None)),
+                city: Rc::new(RefCell::new(None)),
+                zip_code: Rc::new(Cell::new(0)),
             }
         })
     }
@@ -88,33 +87,33 @@ where
         Ok(())
     }
 
-    fn poll_ensure_all_fields_parsed(&self, _cx: &mut Context<'_>) -> Poll<Result<(), Error>> {
-        todo!("poll_parse_until_with_callback was removed; switch to async API or implement")
+    /// Async getter for street bytes.
+    pub fn street_bytes(&self) -> impl Future<Output = Result<Bytes, Error>> {
+        let state = self.parser_state.clone();
+        let street = self.street.clone();
+        async move {
+            state.parse_until_with_callback(|| false).await?;
+            Ok(street.borrow().clone().unwrap_or_else(Bytes::new))
+        }
     }
 
-    pub fn poll_street_bytes(&self, cx: &mut Context<'_>) -> Poll<Result<Bytes, Error>> {
-        let _ = match self.poll_ensure_all_fields_parsed(cx) {
-            Poll::Ready(r) => r?,
-            Poll::Pending => return Poll::Pending,
-        };
-        let bytes = self.street.borrow().clone().unwrap_or_else(Bytes::new);
-        Poll::Ready(Ok(bytes))
+    /// Async getter for city bytes.
+    pub fn city_bytes(&self) -> impl Future<Output = Result<Bytes, Error>> {
+        let state = self.parser_state.clone();
+        let city = self.city.clone();
+        async move {
+            state.parse_until_with_callback(|| false).await?;
+            Ok(city.borrow().clone().unwrap_or_else(Bytes::new))
+        }
     }
 
-    pub fn poll_city_bytes(&self, cx: &mut Context<'_>) -> Poll<Result<Bytes, Error>> {
-        let _ = match self.poll_ensure_all_fields_parsed(cx) {
-            Poll::Ready(r) => r?,
-            Poll::Pending => return Poll::Pending,
-        };
-        let bytes = self.city.borrow().clone().unwrap_or_else(Bytes::new);
-        Poll::Ready(Ok(bytes))
-    }
-
-    pub fn poll_zip_code(&self, cx: &mut Context<'_>) -> Poll<Result<i32, Error>> {
-        let _ = match self.poll_ensure_all_fields_parsed(cx) {
-            Poll::Ready(r) => r?,
-            Poll::Pending => return Poll::Pending,
-        };
-        Poll::Ready(Ok(self.zip_code.get()))
+    /// Async getter for zip code.
+    pub fn zip_code(&self) -> impl Future<Output = Result<i32, Error>> {
+        let state = self.parser_state.clone();
+        let zip_code = self.zip_code.clone();
+        async move {
+            state.parse_until_with_callback(|| false).await?;
+            Ok(zip_code.get())
+        }
     }
 }

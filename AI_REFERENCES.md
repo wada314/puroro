@@ -108,6 +108,14 @@ focus of the project (serialization/deserialization, codegen, and other runtime 
 - **Rust’s default**: With only shared references (`&T`), the compiler forbids mutation. To mutate we would normally need a single owner and `&mut self`, but then only that owner could parse—we could not have multiple handles that each can trigger parsing.
 - **Conclusion**: Because we have **multiple instances sharing a reference to a single state** and we need **to mutate that state from any of those references**, we must use **interior mutability** (`Arc<Mutex<AsyncMessageParserState>>`). We give up compile-time exclusivity and pay lock cost in exchange for shared mutable state. Re-entrancy (e.g. callback triggering another parse) is possible; we avoid deadlock by releasing the lock before invoking the callback.
 
+## 2026-02: Async lazy message getters – use async interface, return `impl Future`
+
+- **Decision**: Use **async interfaces** (not poll-based) for async message field getter methods.
+  - Rationale: Poll-based implementation requires persisting in-flight futures across poll calls; state management becomes complicated when there are multiple suspension points. Async keeps the code linear and lets the compiler generate the state machine.
+  - Performance: Difference is negligible; async may avoid explicit boxing and benefit from optimizer.
+- **Return type**: Return `impl Future<Output = T>` instead of `async fn`.
+  - Note: The returned futures are **not `Send`** due to the current design (Rc, RefCell, dyn Fn callback in `AsyncMessageParserStateRef`). To make them `Send` would require a larger refactor (Arc, Mutex, Send callbacks). Single-threaded async executors (e.g. `LocalPool`) work fine.
+
 ## 2026-01-31 / 2026-02: Async lazy parsing and protobuf-core integration
 
 - **puroro uses**: `protobuf-core = "0.2.2"` from crates.io.

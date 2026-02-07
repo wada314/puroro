@@ -1,8 +1,8 @@
 use sandbox::generated::person::PersonLazyAsyncImpl;
 
+use ::futures::executor::block_on;
 use ::puroro::protobuf_core::{Field, FieldNumber, FieldValue, WriteExtProtobuf};
 use ::std::pin::Pin;
-use ::std::task::{Context, Poll, RawWaker, RawWakerVTable, Waker};
 
 fn build_varint_field(field_number: u32, value: i32) -> Vec<u8> {
     let field = Field::<Vec<u8>>::new(
@@ -42,32 +42,6 @@ fn build_address_message(street: &str, city: &str, zip_code: i32) -> Vec<u8> {
     bytes
 }
 
-fn noop_waker() -> Waker {
-    unsafe fn clone(_: *const ()) -> RawWaker {
-        RawWaker::new(::std::ptr::null(), &VTABLE)
-    }
-    unsafe fn wake(_: *const ()) {}
-    unsafe fn wake_by_ref(_: *const ()) {}
-    unsafe fn drop(_: *const ()) {}
-
-    static VTABLE: RawWakerVTable = RawWakerVTable::new(clone, wake, wake_by_ref, drop);
-    unsafe { Waker::from_raw(RawWaker::new(::std::ptr::null(), &VTABLE)) }
-}
-
-fn poll_until_ready<T>(mut f: impl FnMut(&mut Context<'_>) -> Poll<T>) -> T {
-    let waker = noop_waker();
-    let mut cx = Context::from_waker(&waker);
-    loop {
-        match f(&mut cx) {
-            Poll::Ready(v) => return v,
-            Poll::Pending => {
-                // Busy-polling is fine for unit tests.
-                continue;
-            }
-        }
-    }
-}
-
 struct ChunkedReader {
     data: Vec<u8>,
     pos: usize,
@@ -89,9 +63,9 @@ impl ChunkedReader {
 impl ::futures_io::AsyncRead for ChunkedReader {
     fn poll_read(
         mut self: Pin<&mut Self>,
-        _cx: &mut Context<'_>,
+        _cx: &mut ::std::task::Context<'_>,
         out: &mut [u8],
-    ) -> Poll<Result<usize, ::std::io::Error>> {
+    ) -> ::std::task::Poll<Result<usize, ::std::io::Error>> {
         let chunk_limit = self
             .chunks
             .get(self.chunk_idx)
@@ -101,18 +75,17 @@ impl ::futures_io::AsyncRead for ChunkedReader {
 
         let remaining_len = self.data.len().saturating_sub(self.pos);
         if remaining_len == 0 {
-            return Poll::Ready(Ok(0));
+            return ::std::task::Poll::Ready(Ok(0));
         }
 
         let n = remaining_len.min(out.len()).min(chunk_limit.max(1));
         out[..n].copy_from_slice(&self.data[self.pos..self.pos + n]);
         self.pos += n;
-        Poll::Ready(Ok(n))
+        ::std::task::Poll::Ready(Ok(n))
     }
 }
 
 #[test]
-#[ignore = "poll_parse_until_with_callback is todo! until implemented via next_field()"]
 fn test_person_lazy_async_random_split() {
     // Build a person message:
     // - age = 30
@@ -131,22 +104,22 @@ fn test_person_lazy_async_random_split() {
     let reader = ChunkedReader::new(encoded, vec![1, 2, 1, 3, 1, 1, 4, 2, 1, 5, 1, 2, 1]);
     let person = PersonLazyAsyncImpl::new(reader, None);
 
-    let age = poll_until_ready(|cx| person.poll_age(cx)).unwrap();
+    let age = block_on(person.age()).unwrap();
     assert_eq!(age, 30);
 
     let scores = person.scores();
-    let s0 = poll_until_ready(|cx| scores.poll_get(cx, 0)).unwrap().unwrap();
-    let s2 = poll_until_ready(|cx| scores.poll_get(cx, 2)).unwrap().unwrap();
+    let s0 = block_on(scores.get_async(0)).unwrap().unwrap();
+    let s2 = block_on(scores.get_async(2)).unwrap().unwrap();
     assert_eq!(s0, 10);
     assert_eq!(s2, 30);
 
-    let scores_len = poll_until_ready(|cx| scores.poll_len(cx)).unwrap();
+    let scores_len = block_on(scores.len_async()).unwrap();
     assert_eq!(scores_len, 3);
 
     let addresses = person.addresses();
-    let a0 = poll_until_ready(|cx| addresses.poll_get(cx, 0)).unwrap().unwrap();
-    let city_bytes = poll_until_ready(|cx| a0.poll_city_bytes(cx)).unwrap();
-    let zip = poll_until_ready(|cx| a0.poll_zip_code(cx)).unwrap();
+    let a0 = block_on(addresses.get_async(0)).unwrap().unwrap();
+    let city_bytes = block_on(a0.city_bytes()).unwrap();
+    let zip = block_on(a0.zip_code()).unwrap();
     assert_eq!(::std::str::from_utf8(city_bytes.as_ref()).unwrap(), "NY");
     assert_eq!(zip, 10001);
 }
