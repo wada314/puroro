@@ -14,6 +14,7 @@ use ::bytes::{Buf, Bytes, BytesMut};
 use ::futures_io::AsyncRead;
 use ::std::collections::VecDeque;
 use ::std::pin::Pin;
+use ::std::future::poll_fn;
 use ::std::task::ready;
 use ::std::task::{Context, Poll};
 
@@ -380,6 +381,9 @@ where
     /// - `Poll::Pending` if more input is needed.
     /// - `Poll::Ready(Ok(Some(field)))` when a field is decoded.
     /// - `Poll::Ready(Ok(None))` on end-of-message.
+    ///
+    /// For correct suspension/resume when reading length-delimited or fixed-length payloads,
+    /// use [`next_field()`](Self::next_field) instead.
     pub fn poll_next_field(
         &mut self,
         cx: &mut Context<'_>,
@@ -436,6 +440,65 @@ where
         };
 
         Poll::Ready(Ok(Some(Field::new(field_number, value))))
+    }
+
+    /// Read the next field asynchronously.
+    ///
+    /// Suspension and resume are handled correctly at tag, varint, and length-delimited
+    /// boundaries. Returns `Ok(None)` on end-of-message.
+    pub async fn next_field(&mut self) -> Result<Option<Field<Bytes>>, Error> {
+        if self.terminated {
+            return Ok(None);
+        }
+
+        let tag = match poll_fn(|cx| self.poll_read_tag(cx)).await? {
+            Some(t) => t,
+            None => {
+                self.terminated = true;
+                return Ok(None);
+            }
+        };
+        let field_number = tag.field_number;
+
+        let value = match tag.wire_type {
+            WireType::Varint => {
+                let v = poll_fn(|cx| self.poll_read_required_varint(cx)).await?;
+                FieldValue::Varint(v)
+            }
+            WireType::Int32 => {
+                let bytes = poll_fn(|cx| self.input.poll_take_bytes(cx, 4)).await?;
+                let mut arr = [0u8; 4];
+                arr.copy_from_slice(bytes.as_ref());
+                FieldValue::I32(arr)
+            }
+            WireType::Int64 => {
+                let bytes = poll_fn(|cx| self.input.poll_take_bytes(cx, 8)).await?;
+                let mut arr = [0u8; 8];
+                arr.copy_from_slice(bytes.as_ref());
+                FieldValue::I64(arr)
+            }
+            WireType::Len => {
+                let len_varint = poll_fn(|cx| self.poll_read_required_varint(cx)).await?;
+                let len_u64 = len_varint.to_uint64();
+                let len: usize = len_u64.try_into().map_err(|_| {
+                    Error::InvalidWireFormat("Length-delimited size out of range".to_string())
+                })?;
+                if len > MAX_LEN_DELIMITED_SIZE {
+                    return Err(Error::InvalidWireFormat(
+                        "Length-delimited size exceeds maximum allowed".to_string(),
+                    ));
+                }
+                let bytes = poll_fn(|cx| self.input.poll_take_bytes(cx, len)).await?;
+                FieldValue::Len(bytes)
+            }
+            WireType::SGroup | WireType::EGroup => {
+                return Err(Error::InvalidWireFormat(
+                    "Group wire types are not supported".to_string(),
+                ));
+            }
+        };
+
+        Ok(Some(Field::new(field_number, value)))
     }
 
     /// Poll for the next protobuf tag (field number + wire type).
