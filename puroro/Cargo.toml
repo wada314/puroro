@@ -17,6 +17,7 @@ allocator_extras.workspace = true
 once-list2 = "0.4.0"
 bytes = "1"
 futures-io = "0.3"
+futures = "0.3"
 
 [features]
 default = []

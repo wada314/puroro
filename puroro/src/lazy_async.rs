@@ -23,7 +23,8 @@ use ::protobuf_core::{Tag, Varint, WireType};
 
 /// Maximum allowed length-delimited size (2 GiB), matching the protobuf wire format limits.
 const MAX_LEN_DELIMITED_SIZE: usize = 2 * 1024 * 1024 * 1024;
-use ::std::sync::{Arc, RwLock};
+use ::futures::lock::Mutex;
+use ::std::sync::Arc;
 
 /// An in-memory async reader over a `Bytes` buffer.
 ///
@@ -255,7 +256,7 @@ pub struct AsyncFieldReader<R> {
     varint_resume_state: Option<DecodeState>,
 }
 
-/// Shared, poll-driven parser state for a single message.
+/// Shared reference to parser state: `Arc<Mutex<State>>` so message and children can share.
 ///
 /// This is the async/streaming counterpart of `lazy_slice_parser::MessageParserStateRef`,
 /// but is designed for a single message boundary (either EOF or an explicit byte limit).
@@ -263,7 +264,7 @@ pub struct AsyncFieldReader<R> {
 /// The parser yields fields sequentially and invokes the callback for each field. The callback
 /// (owned by the message struct) decides which fields to record and which to drop.
 pub struct AsyncMessageParserStateRef<R> {
-    state: Arc<RwLock<AsyncMessageParserStateInner<R>>>,
+    state: Arc<Mutex<AsyncMessageParserState<R>>>,
 }
 
 impl<R> Clone for AsyncMessageParserStateRef<R> {
@@ -274,10 +275,26 @@ impl<R> Clone for AsyncMessageParserStateRef<R> {
     }
 }
 
-#[allow(dead_code)] // used when poll_parse_*_with_callback are implemented via next_field()
-struct AsyncMessageParserStateInner<R> {
+/// Mutable parser state: holds the reader and callback. Methods take `&mut self`.
+struct AsyncMessageParserState<R> {
     field_reader: AsyncFieldReader<R>,
     field_update_callback: Arc<dyn Fn(Field<Bytes>) -> Result<(), Error>>,
+}
+
+impl<R> AsyncMessageParserState<R>
+where
+    R: AsyncRead + Unpin,
+{
+    /// Read one field and return it plus a clone of the callback.
+    /// Caller must release the lock before invoking the callback (to avoid re-entrancy deadlock).
+    async fn parse_one_field(
+        &mut self,
+    ) -> Result<(Option<Field<Bytes>>, Arc<dyn Fn(Field<Bytes>) -> Result<(), Error>>), Error>
+    {
+        let field = self.field_reader.next_field().await?;
+        let callback = self.field_update_callback.clone();
+        Ok((field, callback))
+    }
 }
 
 impl<R> AsyncMessageParserStateRef<R>
@@ -293,12 +310,12 @@ where
             Some(limit) => AsyncFieldReader::with_limit(reader, limit),
             None => AsyncFieldReader::new(reader),
         };
-        let inner = AsyncMessageParserStateInner {
+        let state = AsyncMessageParserState {
             field_reader,
             field_update_callback: Arc::new(field_update_callback),
         };
         Self {
-            state: Arc::new(RwLock::new(inner)),
+            state: Arc::new(Mutex::new(state)),
         }
     }
 
@@ -306,19 +323,44 @@ where
     ///
     /// - `Ok(true)`: one field was parsed and the update callback was invoked.
     /// - `Ok(false)`: end-of-message reached (no more fields available).
-    /// - `Pending`: more input is needed.
-    ///
-    /// TODO: Implement by driving [`AsyncFieldReader::next_field`] and invoking the callback.
+    /// - `Err(...)`: I/O or parse error.
+    pub async fn parse_one_field_with_callback(&self) -> Result<bool, Error> {
+        let (field, callback) = {
+            let mut guard = self.state.lock().await;
+            guard.parse_one_field().await?
+        };
+        match field {
+            Some(f) => {
+                (callback)(f)?;
+                Ok(true)
+            }
+            None => Ok(false),
+        }
+    }
+
+    /// Parse fields until `condition()` becomes true, or end-of-message is reached.
+    pub async fn parse_until_with_callback<C>(&self, mut condition: C) -> Result<(), Error>
+    where
+        C: FnMut() -> bool,
+    {
+        while !condition() {
+            let progressed = self.parse_one_field_with_callback().await?;
+            if !progressed {
+                break;
+            }
+        }
+        Ok(())
+    }
+
+    /// Poll for one field (legacy API). Prefer [`parse_one_field_with_callback`](Self::parse_one_field_with_callback) for correct suspend/resume.
     pub fn poll_parse_one_field_with_callback(
         &self,
         _cx: &mut Context<'_>,
     ) -> Poll<Result<bool, Error>> {
-        todo!("poll_parse_one_field_with_callback: drive next_field() and invoke callback")
+        todo!("use parse_one_field_with_callback().await instead")
     }
 
-    /// Parse fields until `condition()` becomes true, or end-of-message is reached.
-    ///
-    /// TODO: Implement by driving [`poll_parse_one_field_with_callback`](Self::poll_parse_one_field_with_callback) or [`AsyncFieldReader::next_field`].
+    /// Poll until condition (legacy API). Prefer [`parse_until_with_callback`](Self::parse_until_with_callback) for correct suspend/resume.
     pub fn poll_parse_until_with_callback<C>(
         &self,
         _cx: &mut Context<'_>,
@@ -327,7 +369,7 @@ where
     where
         C: FnMut() -> bool,
     {
-        todo!("poll_parse_until_with_callback: drive next_field() until condition or EOM")
+        todo!("use parse_until_with_callback(condition).await instead")
     }
 }
 
