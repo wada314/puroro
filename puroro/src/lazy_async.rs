@@ -13,8 +13,8 @@ use crate::error::Error;
 use ::bytes::{Buf, Bytes, BytesMut};
 use ::futures_io::AsyncRead;
 use ::std::collections::VecDeque;
-use ::std::pin::Pin;
 use ::std::future::poll_fn;
+use ::std::pin::Pin;
 use ::std::task::ready;
 use ::std::task::{Context, Poll};
 
@@ -23,8 +23,7 @@ use ::protobuf_core::{Tag, Varint, WireType};
 
 /// Maximum allowed length-delimited size (2 GiB), matching the protobuf wire format limits.
 const MAX_LEN_DELIMITED_SIZE: usize = 2 * 1024 * 1024 * 1024;
-use ::std::cell::RefCell;
-use ::std::rc::Rc;
+use ::std::sync::{Arc, RwLock};
 
 /// An in-memory async reader over a `Bytes` buffer.
 ///
@@ -264,7 +263,7 @@ pub struct AsyncFieldReader<R> {
 /// The parser yields fields sequentially and invokes the callback for each field. The callback
 /// (owned by the message struct) decides which fields to record and which to drop.
 pub struct AsyncMessageParserStateRef<R> {
-    state: Rc<RefCell<AsyncMessageParserStateInner<R>>>,
+    state: Arc<RwLock<AsyncMessageParserStateInner<R>>>,
 }
 
 impl<R> Clone for AsyncMessageParserStateRef<R> {
@@ -275,9 +274,10 @@ impl<R> Clone for AsyncMessageParserStateRef<R> {
     }
 }
 
+#[allow(dead_code)] // used when poll_parse_*_with_callback are implemented via next_field()
 struct AsyncMessageParserStateInner<R> {
     field_reader: AsyncFieldReader<R>,
-    field_update_callback: Rc<dyn Fn(Field<Bytes>) -> Result<(), Error>>,
+    field_update_callback: Arc<dyn Fn(Field<Bytes>) -> Result<(), Error>>,
 }
 
 impl<R> AsyncMessageParserStateRef<R>
@@ -295,10 +295,10 @@ where
         };
         let inner = AsyncMessageParserStateInner {
             field_reader,
-            field_update_callback: Rc::new(field_update_callback),
+            field_update_callback: Arc::new(field_update_callback),
         };
         Self {
-            state: Rc::new(RefCell::new(inner)),
+            state: Arc::new(RwLock::new(inner)),
         }
     }
 
@@ -307,45 +307,27 @@ where
     /// - `Ok(true)`: one field was parsed and the update callback was invoked.
     /// - `Ok(false)`: end-of-message reached (no more fields available).
     /// - `Pending`: more input is needed.
+    ///
+    /// TODO: Implement by driving [`AsyncFieldReader::next_field`] and invoking the callback.
     pub fn poll_parse_one_field_with_callback(
         &self,
-        cx: &mut Context<'_>,
+        _cx: &mut Context<'_>,
     ) -> Poll<Result<bool, Error>> {
-        // Poll the next field with only a short mutable borrow.
-        let next = {
-            let mut state = self.state.borrow_mut();
-            ready!(state.field_reader.poll_next_field(cx))?
-        };
-
-        let Some(field) = next else {
-            return Poll::Ready(Ok(false));
-        };
-
-        // Invoke the callback without holding a mutable borrow of the state.
-        let callback = {
-            let state = self.state.borrow();
-            state.field_update_callback.clone()
-        };
-        (callback)(field)?;
-        Poll::Ready(Ok(true))
+        todo!("poll_parse_one_field_with_callback: drive next_field() and invoke callback")
     }
 
     /// Parse fields until `condition()` becomes true, or end-of-message is reached.
+    ///
+    /// TODO: Implement by driving [`poll_parse_one_field_with_callback`](Self::poll_parse_one_field_with_callback) or [`AsyncFieldReader::next_field`].
     pub fn poll_parse_until_with_callback<C>(
         &self,
-        cx: &mut Context<'_>,
-        mut condition: C,
+        _cx: &mut Context<'_>,
+        _condition: C,
     ) -> Poll<Result<(), Error>>
     where
         C: FnMut() -> bool,
     {
-        while !condition() {
-            let progressed = ready!(self.poll_parse_one_field_with_callback(cx))?;
-            if !progressed {
-                break;
-            }
-        }
-        Poll::Ready(Ok(()))
+        todo!("poll_parse_until_with_callback: drive next_field() until condition or EOM")
     }
 }
 
@@ -374,72 +356,6 @@ where
     /// Returns `true` if the message is fully terminated and no more fields are available.
     pub fn is_terminated(&self) -> bool {
         self.terminated
-    }
-
-    /// Poll for the next field.
-    ///
-    /// - `Poll::Pending` if more input is needed.
-    /// - `Poll::Ready(Ok(Some(field)))` when a field is decoded.
-    /// - `Poll::Ready(Ok(None))` on end-of-message.
-    ///
-    /// For correct suspension/resume when reading length-delimited or fixed-length payloads,
-    /// use [`next_field()`](Self::next_field) instead.
-    pub fn poll_next_field(
-        &mut self,
-        cx: &mut Context<'_>,
-    ) -> Poll<Result<Option<Field<Bytes>>, Error>> {
-        if self.terminated {
-            return Poll::Ready(Ok(None));
-        }
-
-        let tag = match ready!(self.poll_read_tag(cx)?) {
-            Some(t) => t,
-            None => {
-                self.terminated = true;
-                return Poll::Ready(Ok(None));
-            }
-        };
-        let field_number = tag.field_number;
-
-        let value = match tag.wire_type {
-            WireType::Varint => {
-                let v = ready!(self.poll_read_required_varint(cx)?);
-                FieldValue::Varint(v)
-            }
-            WireType::Int32 => {
-                let bytes = ready!(self.input.poll_take_bytes(cx, 4)?);
-                let mut arr = [0u8; 4];
-                arr.copy_from_slice(bytes.as_ref());
-                FieldValue::I32(arr)
-            }
-            WireType::Int64 => {
-                let bytes = ready!(self.input.poll_take_bytes(cx, 8)?);
-                let mut arr = [0u8; 8];
-                arr.copy_from_slice(bytes.as_ref());
-                FieldValue::I64(arr)
-            }
-            WireType::Len => {
-                let len_varint = ready!(self.poll_read_required_varint(cx)?);
-                let len_u64 = len_varint.to_uint64();
-                let len: usize = len_u64.try_into().map_err(|_| {
-                    Error::InvalidWireFormat("Length-delimited size out of range".to_string())
-                })?;
-                if len > MAX_LEN_DELIMITED_SIZE {
-                    return Poll::Ready(Err(Error::InvalidWireFormat(
-                        "Length-delimited size exceeds maximum allowed".to_string(),
-                    )));
-                }
-                let bytes = ready!(self.input.poll_take_bytes(cx, len)?);
-                FieldValue::Len(bytes)
-            }
-            WireType::SGroup | WireType::EGroup => {
-                return Poll::Ready(Err(Error::InvalidWireFormat(
-                    "Group wire types are not supported".to_string(),
-                )));
-            }
-        };
-
-        Poll::Ready(Ok(Some(Field::new(field_number, value))))
     }
 
     /// Read the next field asynchronously.
