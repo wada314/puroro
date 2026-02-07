@@ -88,9 +88,8 @@ where
         Ok(())
     }
 
-    fn poll_ensure_all_fields_parsed(&self, cx: &mut Context<'_>) -> Poll<Result<(), Error>> {
-        self.parser_state
-            .poll_parse_until_with_callback(cx, || false)
+    fn poll_ensure_all_fields_parsed(&self, _cx: &mut Context<'_>) -> Poll<Result<(), Error>> {
+        todo!("poll_parse_until_with_callback was removed; switch to async API or implement")
     }
 
     pub fn poll_street_bytes(&self, cx: &mut Context<'_>) -> Poll<Result<Bytes, Error>> {

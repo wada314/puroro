@@ -294,22 +294,6 @@ struct AsyncMessageParserState<R> {
     field_update_callback: Arc<dyn Fn(Field<Bytes>) -> Result<(), Error>>,
 }
 
-impl<R> AsyncMessageParserState<R>
-where
-    R: AsyncRead + Unpin,
-{
-    /// Read one field and return it plus a clone of the callback.
-    /// Caller must release the lock before invoking the callback (to avoid re-entrancy deadlock).
-    async fn parse_one_field(
-        &mut self,
-    ) -> Result<(Option<Field<Bytes>>, Arc<dyn Fn(Field<Bytes>) -> Result<(), Error>>), Error>
-    {
-        let field = self.field_reader.next_field().await?;
-        let callback = self.field_update_callback.clone();
-        Ok((field, callback))
-    }
-}
-
 impl<R> AsyncMessageParserStateRef<R>
 where
     R: AsyncRead + Unpin,
@@ -338,9 +322,13 @@ where
     /// - `Ok(false)`: end-of-message reached (no more fields available).
     /// - `Err(...)`: I/O or parse error.
     pub async fn parse_one_field_with_callback(&self) -> Result<bool, Error> {
+        // Read one field and clone callback while holding the lock; release lock before invoking
+        // callback to avoid re-entrancy deadlock.
         let (field, callback) = {
             let mut guard = self.state.lock().await;
-            guard.parse_one_field().await?
+            let field = guard.field_reader.next_field().await?;
+            let callback = guard.field_update_callback.clone();
+            (field, callback)
         };
         match field {
             Some(f) => {
@@ -363,26 +351,6 @@ where
             }
         }
         Ok(())
-    }
-
-    /// Poll for one field (legacy API). Prefer [`parse_one_field_with_callback`](Self::parse_one_field_with_callback) for correct suspend/resume.
-    pub fn poll_parse_one_field_with_callback(
-        &self,
-        _cx: &mut Context<'_>,
-    ) -> Poll<Result<bool, Error>> {
-        todo!("use parse_one_field_with_callback().await instead")
-    }
-
-    /// Poll until condition (legacy API). Prefer [`parse_until_with_callback`](Self::parse_until_with_callback) for correct suspend/resume.
-    pub fn poll_parse_until_with_callback<C>(
-        &self,
-        _cx: &mut Context<'_>,
-        _condition: C,
-    ) -> Poll<Result<(), Error>>
-    where
-        C: FnMut() -> bool,
-    {
-        todo!("use parse_until_with_callback(condition).await instead")
     }
 }
 

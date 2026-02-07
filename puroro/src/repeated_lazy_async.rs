@@ -41,25 +41,12 @@ where
         }
     }
 
-    fn poll_ensure_at_least(&self, cx: &mut Context<'_>, needed: usize) -> Poll<Result<(), Error>> {
-        while self.list.len() < needed {
-            let progressed = match self
-                .parent_parser_state
-                .poll_parse_one_field_with_callback(cx)
-            {
-                Poll::Ready(r) => r?,
-                Poll::Pending => return Poll::Pending,
-            };
-            if !progressed {
-                break;
-            }
-        }
-        Poll::Ready(Ok(()))
+    fn poll_ensure_at_least(&self, _cx: &mut Context<'_>, _needed: usize) -> Poll<Result<(), Error>> {
+        todo!("poll_parse_one_field_with_callback was removed; switch to async API or implement")
     }
 
-    fn poll_ensure_fully_parsed(&self, cx: &mut Context<'_>) -> Poll<Result<(), Error>> {
-        self.parent_parser_state
-            .poll_parse_until_with_callback(cx, || false)
+    fn poll_ensure_fully_parsed(&self, _cx: &mut Context<'_>) -> Poll<Result<(), Error>> {
+        todo!("poll_parse_until_with_callback was removed; switch to async API or implement")
     }
 
     /// Poll the length of the repeated field (requires fully parsing the message).

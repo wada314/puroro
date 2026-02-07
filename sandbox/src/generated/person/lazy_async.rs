@@ -107,8 +107,8 @@ where
         Ok(())
     }
 
-    fn poll_ensure_all_fields_parsed(&self, cx: &mut Context<'_>) -> Poll<Result<(), Error>> {
-        self.parser_state.poll_parse_until_with_callback(cx, || false)
+    fn poll_ensure_all_fields_parsed(&self, _cx: &mut Context<'_>) -> Poll<Result<(), Error>> {
+        todo!("poll_parse_until_with_callback was removed; switch to async API or implement")
     }
 
     /// Poll getter for age (parses the whole message to ensure the last value wins).
