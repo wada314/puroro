@@ -21,9 +21,8 @@ use ::puroro::error::Error;
 use ::puroro::lazy_async::{AsyncMessageParserStateRef, BytesReader};
 use ::puroro::protobuf_core::{Field, FieldValue};
 use ::puroro::repeated_lazy_async::LazyRepeatedAsync;
-use ::std::cell::{OnceCell, RefCell};
+use ::std::cell::{Cell, OnceCell, RefCell};
 use ::std::rc::{Rc, Weak};
-use ::std::sync::Arc;
 
 /// Async/streaming lazy implementation of Person message that deserializes fields on-demand.
 ///
@@ -38,7 +37,7 @@ where
 {
     parser_state: AsyncMessageParserStateRef<R>,
 
-    age: Arc<std::cell::Cell<i32>>,
+    age: Cell<i32>,
     scores: OnceList<i32, Global>,
 
     // Scalar message field payload (concatenated across multiple occurrences).
@@ -68,7 +67,7 @@ where
 
             Self {
                 parser_state,
-                age: Arc::new(std::cell::Cell::new(0)),
+                age: Cell::new(0),
                 scores: OnceList::new_in(Global),
                 address_payload: RefCell::new(None),
                 address: OnceCell::new(),
@@ -108,12 +107,14 @@ where
     }
 
     /// Async getter for age (parses the whole message to ensure the last value wins).
-    pub fn age(&self) -> impl Future<Output = Result<i32, Error>> {
-        let state = self.parser_state.clone();
-        let age = self.age.clone();
+    ///
+    /// Takes `&Rc<Self>` because the future needs to read from the message; the returned
+    /// future is not `Send` due to `Rc`.
+    pub fn age(self: &Rc<Self>) -> impl Future<Output = Result<i32, Error>> {
+        let this = self.clone();
         async move {
-            state.parse_until_with_callback(|| false).await?;
-            Ok(age.get())
+            this.parser_state.parse_until_with_callback(|| false).await?;
+            Ok(this.age.get())
         }
     }
 
@@ -132,23 +133,24 @@ where
     /// Parses the whole message before returning, so that all occurrences have been
     /// concatenated into the payload.
     ///
-    /// Takes `Rc<Self>` because the future needs to read from shared fields; the returned
+    /// Takes `&Rc<Self>` because the future needs to read from shared fields; the returned
     /// future is not `Send` due to `Rc`.
-    pub fn address(self: Rc<Self>) -> impl Future<Output = Result<Option<Rc<AddressLazyAsyncImpl<BytesReader>>>, Error>> {
+    pub fn address(self: &Rc<Self>) -> impl Future<Output = Result<Option<Rc<AddressLazyAsyncImpl<BytesReader>>>, Error>> {
+        let this = self.clone();
         async move {
-            self.parser_state.parse_until_with_callback(|| false).await?;
+            this.parser_state.parse_until_with_callback(|| false).await?;
 
-            if let Some(addr) = self.address.get() {
+            if let Some(addr) = this.address.get() {
                 return Ok(Some(addr.clone()));
             }
 
-            let mut slot = self.address_payload.borrow_mut();
+            let mut slot = this.address_payload.borrow_mut();
             let Some(buf) = slot.take() else {
                 return Ok(None);
             };
             let bytes = buf.freeze();
             let child = AddressLazyAsyncImpl::from_bytes(bytes);
-            let _ = self.address.set(child.clone());
+            let _ = this.address.set(child.clone());
             Ok(Some(child))
         }
     }

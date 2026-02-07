@@ -24,7 +24,7 @@ use ::protobuf_core::{Tag, Varint, WireType};
 /// Maximum allowed length-delimited size (2 GiB), matching the protobuf wire format limits.
 const MAX_LEN_DELIMITED_SIZE: usize = 2 * 1024 * 1024 * 1024;
 use ::futures::lock::Mutex;
-use ::std::sync::Arc;
+use ::std::rc::Rc;
 
 /// An in-memory async reader over a `Bytes` buffer.
 ///
@@ -271,13 +271,13 @@ pub struct AsyncFieldReader<R> {
 /// `LazyRepeatedAsync`) each hold a handle to the same parser state so that any of them can
 /// trigger parsing when needed (e.g. when you call `.len()` on a repeated field). If we want
 /// to mutate that shared state (advance the parser) from any of those handles, we cannot use
-/// plain `&mut self`—only one owner could call it. So we use **interior mutability** (`Arc<Mutex<State>>`):
+/// plain `&mut self`—only one owner could call it. So we use **interior mutability** (`Rc<Mutex<State>>`):
 /// the outer type is cloneable and its methods take `&self`, but the inner state is mutated
 /// under a lock. The trade-off: we sacrifice compile-time exclusivity (the lock enforces it at
 /// runtime) and pay lock cost, in exchange for the ability to share the same state across
 /// message and children. See also `AI_REFERENCES.md` (§ Async lazy: interior mutability).
 pub struct AsyncMessageParserStateRef<R> {
-    state: Arc<Mutex<AsyncMessageParserState<R>>>,
+    state: Rc<Mutex<AsyncMessageParserState<R>>>,
 }
 
 impl<R> Clone for AsyncMessageParserStateRef<R> {
@@ -291,7 +291,7 @@ impl<R> Clone for AsyncMessageParserStateRef<R> {
 /// Mutable parser state: holds the reader and callback. Methods take `&mut self`.
 struct AsyncMessageParserState<R> {
     field_reader: AsyncFieldReader<R>,
-    field_update_callback: Arc<dyn Fn(Field<Bytes>) -> Result<(), Error>>,
+    field_update_callback: Rc<dyn Fn(Field<Bytes>) -> Result<(), Error>>,
 }
 
 impl<R> AsyncMessageParserStateRef<R>
@@ -309,10 +309,10 @@ where
         };
         let state = AsyncMessageParserState {
             field_reader,
-            field_update_callback: Arc::new(field_update_callback),
+            field_update_callback: Rc::new(field_update_callback),
         };
         Self {
-            state: Arc::new(Mutex::new(state)),
+            state: Rc::new(Mutex::new(state)),
         }
     }
 

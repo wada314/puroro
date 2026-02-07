@@ -114,7 +114,7 @@ focus of the project (serialization/deserialization, codegen, and other runtime 
   - Rationale: Poll-based implementation requires persisting in-flight futures across poll calls; state management becomes complicated when there are multiple suspension points. Async keeps the code linear and lets the compiler generate the state machine.
   - Performance: Difference is negligible; async may avoid explicit boxing and benefit from optimizer.
 - **Return type**: Return `impl Future<Output = T>` instead of `async fn`.
-  - Note: The returned futures are **not `Send`** due to the current design (Rc, RefCell, dyn Fn callback in `AsyncMessageParserStateRef`). To make them `Send` would require a larger refactor (Arc, Mutex, Send callbacks). Single-threaded async executors (e.g. `LocalPool`) work fine.
+  - Note: The returned futures are **not `Send`** due to the current design (Rc, RefCell, dyn Fn callback). We deliberately use **Rc** (not Arc) throughout—parser state is `Rc<Mutex<State>>`, message structs use Rc—because thread-sharing of parsed results is not a common use case; users should copy out to their own types if needed. Single-threaded async executors (e.g. `LocalPool`, `block_on`) work fine.
 
 ## 2026-01-31 / 2026-02: Async lazy parsing and protobuf-core integration
 
