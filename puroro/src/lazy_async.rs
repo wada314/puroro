@@ -485,3 +485,110 @@ where
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use ::bytes::Bytes;
+    use ::std::task::Poll;
+
+    fn noop_waker() -> ::std::task::Waker {
+        unsafe fn clone(_: *const ()) -> ::std::task::RawWaker {
+            ::std::task::RawWaker::new(::std::ptr::null(), &VTABLE)
+        }
+        unsafe fn wake(_: *const ()) {}
+        unsafe fn wake_by_ref(_: *const ()) {}
+        unsafe fn drop(_: *const ()) {}
+        static VTABLE: ::std::task::RawWakerVTable =
+            ::std::task::RawWakerVTable::new(clone, wake, wake_by_ref, drop);
+        unsafe { ::std::task::Waker::from_raw(::std::task::RawWaker::new(::std::ptr::null(), &VTABLE)) }
+    }
+
+    fn poll_until_ready<T>(
+        mut f: impl FnMut(&mut Context<'_>) -> Poll<Result<T, Error>>,
+    ) -> Result<T, Error> {
+        let waker = noop_waker();
+        let mut cx = Context::from_waker(&waker);
+        loop {
+            match f(&mut cx) {
+                Poll::Ready(r) => return r,
+                Poll::Pending => continue,
+            }
+        }
+    }
+
+    /// Yields one byte per poll for testing varint resume across chunk boundaries.
+    struct OneByteReader {
+        data: Vec<u8>,
+        pos: usize,
+    }
+    impl OneByteReader {
+        fn new(data: Vec<u8>) -> Self {
+            Self { data, pos: 0 }
+        }
+    }
+    impl AsyncRead for OneByteReader {
+        fn poll_read(
+            mut self: Pin<&mut Self>,
+            _cx: &mut Context<'_>,
+            out: &mut [u8],
+        ) -> Poll<Result<usize, ::std::io::Error>> {
+            if self.pos >= self.data.len() {
+                return Poll::Ready(Ok(0));
+            }
+            let n = 1.min(out.len());
+            out[..n].copy_from_slice(&self.data[self.pos..self.pos + n]);
+            self.pos += n;
+            Poll::Ready(Ok(n))
+        }
+    }
+
+    #[test]
+    fn test_poll_read_varint_empty_input_returns_none() {
+        let reader = BytesReader::new(Bytes::new());
+        let mut field_reader = AsyncFieldReader::new(reader);
+        let result = poll_until_ready(|cx| field_reader.poll_read_varint(cx));
+        assert!(matches!(result, Ok(None)));
+    }
+
+    #[test]
+    fn test_poll_read_varint_single_byte_varint() {
+        // Varint 0 is encoded as 0x00.
+        let reader = BytesReader::new(Bytes::from_static(&[0x00]));
+        let mut field_reader = AsyncFieldReader::new(reader);
+        let result = poll_until_ready(|cx| field_reader.poll_read_varint(cx));
+        let varint = result.unwrap().unwrap();
+        assert_eq!(varint.to_uint64(), 0);
+    }
+
+    #[test]
+    fn test_poll_read_varint_multi_byte_complete() {
+        // Varint 150 = 0x96 0x01.
+        let reader = BytesReader::new(Bytes::from_static(&[0x96, 0x01]));
+        let mut field_reader = AsyncFieldReader::new(reader);
+        let result = poll_until_ready(|cx| field_reader.poll_read_varint(cx));
+        let varint = result.unwrap().unwrap();
+        assert_eq!(varint.to_uint64(), 150);
+    }
+
+    #[test]
+    fn test_poll_read_varint_incomplete_then_resume() {
+        // Varint 150 = 0x96 0x01. Feed one byte per poll to force Incomplete then resume.
+        let reader = OneByteReader::new(vec![0x96, 0x01]);
+        let mut field_reader = AsyncFieldReader::new(reader);
+        let waker = noop_waker();
+        let mut cx = Context::from_waker(&waker);
+
+        // First poll: only 0x96 is available, varint is incomplete -> Pending.
+        let first = field_reader.poll_read_varint(&mut cx);
+        assert!(matches!(first, Poll::Pending));
+
+        // Second poll: 0x01 is available, resume completes -> Ready(Some(150)).
+        let second = field_reader.poll_read_varint(&mut cx);
+        let varint = match second {
+            Poll::Ready(Ok(Some(v))) => v,
+            other => panic!("expected Ready(Ok(Some(_))), got {:?}", other),
+        };
+        assert_eq!(varint.to_uint64(), 150);
+    }
+}
