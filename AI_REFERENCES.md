@@ -103,10 +103,10 @@ focus of the project (serialization/deserialization, codegen, and other runtime 
 
 ## Async lazy: why interior mutability is required
 
-- **Message design**: The top-level lazy message and its children (e.g. `LazyRepeatedAsync` for a repeated field) must **share** access to a single parser state. Each holds a handle (clone of the same `Arc<Mutex<State>>`) so that parsing can be triggered from the message or from a child (e.g. when you call `.len()` on a repeated field, that adapter needs to drive the same parser).
+- **Message design**: The top-level lazy message and its children (e.g. `LazyRepeatedAsync` for a repeated field) must **share** access to a single parser state. Each holds a handle (clone of the same `Rc<RefCell<State>>`) so that parsing can be triggered from the message or from a child (e.g. when you call `.len()` on a repeated field, that adapter needs to drive the same parser).
 - **Need to mutate from any handle**: Parsing mutates the state (advances the reader, etc.). So we need to be able to mutate the state when calling `parse_one_field_with_callback` or `parse_until_with_callback` from any of those shared handles.
 - **Rust’s default**: With only shared references (`&T`), the compiler forbids mutation. To mutate we would normally need a single owner and `&mut self`, but then only that owner could parse—we could not have multiple handles that each can trigger parsing.
-- **Conclusion**: Because we have **multiple instances sharing a reference to a single state** and we need **to mutate that state from any of those references**, we must use **interior mutability** (`Arc<Mutex<AsyncMessageParserState>>`). We give up compile-time exclusivity and pay lock cost in exchange for shared mutable state. Re-entrancy (e.g. callback triggering another parse) is possible; we avoid deadlock by releasing the lock before invoking the callback.
+- **Conclusion**: Because we have **multiple instances sharing a reference to a single state** and we need **to mutate that state from any of those references**, we must use **interior mutability** (`Rc<RefCell<AsyncMessageParserState>>`). We give up compile-time exclusivity in exchange for shared mutable state. Re-entrancy (e.g. callback triggering another parse) is possible; we avoid double-borrow by releasing the RefCell borrow before invoking the callback.
 
 ## 2026-02: Async lazy message getters – use async interface, return `impl Future`
 
@@ -114,7 +114,7 @@ focus of the project (serialization/deserialization, codegen, and other runtime 
   - Rationale: Poll-based implementation requires persisting in-flight futures across poll calls; state management becomes complicated when there are multiple suspension points. Async keeps the code linear and lets the compiler generate the state machine.
   - Performance: Difference is negligible; async may avoid explicit boxing and benefit from optimizer.
 - **Return type**: Return `impl Future<Output = T>` instead of `async fn`.
-  - Note: The returned futures are **not `Send`** due to the current design (Rc, RefCell, dyn Fn callback). We deliberately use **Rc** (not Arc) throughout—parser state is `Rc<Mutex<State>>`, message structs use Rc—because thread-sharing of parsed results is not a common use case; users should copy out to their own types if needed. Single-threaded async executors (e.g. `LocalPool`, `block_on`) work fine.
+  - Note: The returned futures are **not `Send`** due to the current design (Rc, RefCell, dyn Fn callback). We deliberately use **Rc** and **RefCell** (not Arc/Mutex)—parser state is `Rc<RefCell<State>>`, message structs use Rc—because thread-sharing of parsed results is not a common use case; users should copy out to their own types if needed. Single-threaded async executors (e.g. `LocalPool`, `block_on`) work fine.
 
 ## 2026-01-31 / 2026-02: Async lazy parsing and protobuf-core integration
 

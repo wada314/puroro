@@ -23,7 +23,7 @@ use ::protobuf_core::{Tag, Varint, WireType};
 
 /// Maximum allowed length-delimited size (2 GiB), matching the protobuf wire format limits.
 const MAX_LEN_DELIMITED_SIZE: usize = 2 * 1024 * 1024 * 1024;
-use ::futures::lock::Mutex;
+use ::std::cell::RefCell;
 use ::std::rc::Rc;
 
 /// An in-memory async reader over a `Bytes` buffer.
@@ -271,13 +271,12 @@ pub struct AsyncFieldReader<R> {
 /// `LazyRepeatedAsync`) each hold a handle to the same parser state so that any of them can
 /// trigger parsing when needed (e.g. when you call `.len()` on a repeated field). If we want
 /// to mutate that shared state (advance the parser) from any of those handles, we cannot use
-/// plain `&mut self`—only one owner could call it. So we use **interior mutability** (`Rc<Mutex<State>>`):
+/// plain `&mut self`—only one owner could call it. So we use **interior mutability** (`Rc<RefCell<State>>`):
 /// the outer type is cloneable and its methods take `&self`, but the inner state is mutated
-/// under a lock. The trade-off: we sacrifice compile-time exclusivity (the lock enforces it at
-/// runtime) and pay lock cost, in exchange for the ability to share the same state across
-/// message and children. See also `AI_REFERENCES.md` (§ Async lazy: interior mutability).
+/// under a RefCell. We use RefCell (not Mutex) because the parser is single-threaded; the returned
+/// futures are not `Send`. See also `AI_REFERENCES.md` (§ Async lazy: interior mutability).
 pub struct AsyncMessageParserStateRef<R> {
-    state: Rc<Mutex<AsyncMessageParserState<R>>>,
+    state: Rc<RefCell<AsyncMessageParserState<R>>>,
 }
 
 impl<R> Clone for AsyncMessageParserStateRef<R> {
@@ -312,7 +311,7 @@ where
             field_update_callback: Rc::new(field_update_callback),
         };
         Self {
-            state: Rc::new(Mutex::new(state)),
+            state: Rc::new(RefCell::new(state)),
         }
     }
 
@@ -322,10 +321,10 @@ where
     /// - `Ok(false)`: end-of-message reached (no more fields available).
     /// - `Err(...)`: I/O or parse error.
     pub async fn parse_one_field_with_callback(&self) -> Result<bool, Error> {
-        // Read one field and clone callback while holding the lock; release lock before invoking
-        // callback to avoid re-entrancy deadlock.
+        // Read one field and clone callback while holding the borrow; release before invoking
+        // callback to avoid re-entrancy (callback may trigger another parse).
         let (field, callback) = {
-            let mut guard = self.state.lock().await;
+            let mut guard = self.state.borrow_mut();
             let field = guard.field_reader.next_field().await?;
             let callback = guard.field_update_callback.clone();
             (field, callback)
