@@ -101,21 +101,25 @@ focus of the project (serialization/deserialization, codegen, and other runtime 
 - `doc/lazy-parsing-state-design.md`
 - `doc/lazy-parsing-next-steps.md`
 
-## 2026-01-31: Async lazy parsing and protobuf-core integration
+## 2026-01-31 / 2026-02: Async lazy parsing and protobuf-core integration
 
-- **puroro `lazy_async` (`puroro/src/lazy_async.rs`)**: `poll_read_varint` uses a fast path and fallback:
-  - **Fast path**: `peek_chunk()` gives `&[u8]`; `&[u8]` implements `Read`, so we use `ReadExtVarint::read_varint()`
-    from protobuf-core. If a complete varint is in the buffer, we return immediately without polling for more bytes.
-  - **Fallback**: When the chunk is empty or the varint is incomplete, we decode byte-by-byte with `poll_ensure(1)`
-    per byte. This path is used when a varint spans segment boundaries.
-- **protobuf-core `futures` feature**: protobuf-core now has an optional `futures` feature that provides
-  `StreamExtVarint` for async varint reading from `TryStream<Ok = u8, Error = E>`.
-  The API is `decoder.read_varint().await` (async fn, state retained across .await).
-- **Future puroro integration**: puroro could implement `Stream<Item = Result<u8, Error>>` for a wrapper around
-  `AsyncInput` and use protobuf-core's `StreamExtVarint::read_varint()` for the fallback path, replacing the
-  manual byte-by-byte loop. This would require protobuf-core to be published with the `futures` feature and puroro
-  to depend on it.
-- **puroro uses**: `protobuf-core = "0.2.1"` from crates.io (path override for local dev is possible).
+- **puroro uses**: `protobuf-core = "0.2.2"` from crates.io.
+- **protobuf-core partial/resume API** (see protobuf-core’s `AI_REFERENCES.md`): protobuf-core provides sync
+  partial parsing and resume for chunked/incomplete input:
+  - **Varint**: `ReadExtVarint::read_varint_partial()` returns `DecodeOutcome` (Complete / Empty / Incomplete).
+    On `Incomplete(DecodeState)`, call `read_varint_resume(reader, state)` with a reader that supplies more bytes.
+  - **Tag**: `read_tag_partial()` / `read_tag_resume()` follow the same pattern.
+- **puroro must use these methods**: Async composition is puroro’s responsibility (protobuf-core stays sync-only; no
+  Stream-based async API). Pattern: buffer bytes from async input, then call sync partial/resume on that buffer.
+- **Current `lazy_async` (`puroro/src/lazy_async.rs`)**: `poll_read_varint` has a fast path and a fallback:
+  - **Fast path**: `peek_chunk()` gives `&[u8]`; we use `ReadExtVarint::read_varint_partial()`. If
+    `DecodeOutcome::Complete(varint)`, return immediately. If `Empty`, fall through. If `Incomplete(_)`, fall through.
+  - **Fallback (TODO)**: When the varint spans segment boundaries, the code currently uses a manual byte-by-byte
+    loop with `poll_ensure(1)` per byte. This should be refactored to use protobuf-core’s partial/resume: on
+    `Incomplete(state)`, do not advance the input; store `state` and any unconsumed bytes; when more bytes are
+    available, call `read_varint_resume(reader, state)` with a reader over (unconsumed bytes + new chunk).
+- **Tag reading**: Any async tag reading in puroro should similarly use `read_tag_partial` / `read_tag_resume`
+  when available, instead of ad-hoc logic.
 
 ## Minimal Reading Order (for new AI agents)
 
