@@ -256,13 +256,26 @@ pub struct AsyncFieldReader<R> {
     varint_resume_state: Option<DecodeState>,
 }
 
-/// Shared reference to parser state: `Arc<Mutex<State>>` so message and children can share.
+/// Shared handle to parser state: wraps mutable state behind an immutable interface using interior mutability.
 ///
 /// This is the async/streaming counterpart of `lazy_slice_parser::MessageParserStateRef`,
 /// but is designed for a single message boundary (either EOF or an explicit byte limit).
 ///
 /// The parser yields fields sequentially and invokes the callback for each field. The callback
 /// (owned by the message struct) decides which fields to record and which to drop.
+///
+/// # Why interior mutability?
+///
+/// Our message struct design requires **multiple instances to share a reference to a single
+/// state object**: the top-level message and its children (e.g. repeated-field adapters like
+/// `LazyRepeatedAsync`) each hold a handle to the same parser state so that any of them can
+/// trigger parsing when needed (e.g. when you call `.len()` on a repeated field). If we want
+/// to mutate that shared state (advance the parser) from any of those handles, we cannot use
+/// plain `&mut self`—only one owner could call it. So we use **interior mutability** (`Arc<Mutex<State>>`):
+/// the outer type is cloneable and its methods take `&self`, but the inner state is mutated
+/// under a lock. The trade-off: we sacrifice compile-time exclusivity (the lock enforces it at
+/// runtime) and pay lock cost, in exchange for the ability to share the same state across
+/// message and children. See also `AI_REFERENCES.md` (§ Async lazy: interior mutability).
 pub struct AsyncMessageParserStateRef<R> {
     state: Arc<Mutex<AsyncMessageParserState<R>>>,
 }

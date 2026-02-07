@@ -101,6 +101,13 @@ focus of the project (serialization/deserialization, codegen, and other runtime 
 - `doc/lazy-parsing-state-design.md`
 - `doc/lazy-parsing-next-steps.md`
 
+## Async lazy: why interior mutability is required
+
+- **Message design**: The top-level lazy message and its children (e.g. `LazyRepeatedAsync` for a repeated field) must **share** access to a single parser state. Each holds a handle (clone of the same `Arc<Mutex<State>>`) so that parsing can be triggered from the message or from a child (e.g. when you call `.len()` on a repeated field, that adapter needs to drive the same parser).
+- **Need to mutate from any handle**: Parsing mutates the state (advances the reader, etc.). So we need to be able to mutate the state when calling `parse_one_field_with_callback` or `parse_until_with_callback` from any of those shared handles.
+- **Rust’s default**: With only shared references (`&T`), the compiler forbids mutation. To mutate we would normally need a single owner and `&mut self`, but then only that owner could parse—we could not have multiple handles that each can trigger parsing.
+- **Conclusion**: Because we have **multiple instances sharing a reference to a single state** and we need **to mutate that state from any of those references**, we must use **interior mutability** (`Arc<Mutex<AsyncMessageParserState>>`). We give up compile-time exclusivity and pay lock cost in exchange for shared mutable state. Re-entrancy (e.g. callback triggering another parse) is possible; we avoid deadlock by releasing the lock before invoking the callback.
+
 ## 2026-01-31 / 2026-02: Async lazy parsing and protobuf-core integration
 
 - **puroro uses**: `protobuf-core = "0.2.2"` from crates.io.
