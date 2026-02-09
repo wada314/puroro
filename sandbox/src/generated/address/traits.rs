@@ -96,10 +96,10 @@ pub trait AddressMut: Address {
 ///
 /// Code generation note: MUST NOT reference implementation struct names. Trait-only abstraction.
 pub trait AddressAsync {
-    /// Async getter for street (decoded as UTF-8 string).
-    fn street(self: &Rc<Self>) -> Pin<StdBox<dyn Future<Output = Result<String, Error>> + '_>>;
-    /// Async getter for city (decoded as UTF-8 string).
-    fn city(self: &Rc<Self>) -> Pin<StdBox<dyn Future<Output = Result<String, Error>> + '_>>;
+    /// Async getter for street (decoded as UTF-8 string). Returns `&str` with same lifetime as the message.
+    fn street(self: &Rc<Self>) -> Pin<StdBox<dyn Future<Output = Result<&str, Error>> + '_>>;
+    /// Async getter for city (decoded as UTF-8 string). Returns `&str` with same lifetime as the message.
+    fn city(self: &Rc<Self>) -> Pin<StdBox<dyn Future<Output = Result<&str, Error>> + '_>>;
     /// Async getter for zip_code.
     fn zip_code(self: &Rc<Self>) -> Pin<StdBox<dyn Future<Output = Result<i32, Error>> + '_>>;
 }

@@ -19,10 +19,34 @@ use ::puroro::error::Error;
 use ::puroro::lazy_async::{AsyncMessageParserStateRef, BytesReader};
 use ::puroro::protobuf_core::{Field, FieldValue};
 use ::std::boxed::Box as StdBox;
-use ::std::cell::{Cell, RefCell};
+use ::std::cell::{Cell, OnceCell, RefCell};
 use ::std::future::Future;
 use ::std::pin::Pin;
 use ::std::rc::{Rc, Weak};
+
+/// Parse-intermediate state for Address: holds values as the parser updates them (interior mutability).
+struct AddressParseIntermediate {
+    street: RefCell<Option<Bytes>>,
+    city: RefCell<Option<Bytes>>,
+    zip_code: Cell<i32>,
+}
+
+/// Finalized, strictly immutable view of an Address (built once parsing is complete for the message).
+struct AddressFinalized {
+    street: String,
+    city: String,
+    #[allow(dead_code)] // filled for consistency; zip_code getter reads from intermediate
+    zip_code: i32,
+}
+
+impl AddressFinalized {
+    fn street(&self) -> &str {
+        &self.street
+    }
+    fn city(&self) -> &str {
+        &self.city
+    }
+}
 
 /// Async/streaming lazy implementation of `Address`.
 ///
@@ -33,9 +57,8 @@ where
     R: AsyncRead + Unpin + 'static,
 {
     parser_state: AsyncMessageParserStateRef<R>,
-    street: RefCell<Option<Bytes>>,
-    city: RefCell<Option<Bytes>>,
-    zip_code: Cell<i32>,
+    intermediate: AddressParseIntermediate,
+    finalized: OnceCell<AddressFinalized>,
 }
 
 impl AddressLazyAsyncImpl<BytesReader> {
@@ -67,9 +90,12 @@ where
 
             Self {
                 parser_state,
-                street: RefCell::new(None),
-                city: RefCell::new(None),
-                zip_code: Cell::new(0),
+                intermediate: AddressParseIntermediate {
+                    street: RefCell::new(None),
+                    city: RefCell::new(None),
+                    zip_code: Cell::new(0),
+                },
+                finalized: OnceCell::new(),
             }
         })
     }
@@ -78,41 +104,62 @@ where
         let field_num = field.field_number.as_u32();
         match (field_num, field.value) {
             (1, FieldValue::Len(bytes)) => {
-                *self.street.borrow_mut() = Some(bytes);
+                *self.intermediate.street.borrow_mut() = Some(bytes);
             }
             (2, FieldValue::Len(bytes)) => {
-                *self.city.borrow_mut() = Some(bytes);
+                *self.intermediate.city.borrow_mut() = Some(bytes);
             }
             (3, FieldValue::Varint(varint)) => {
-                self.zip_code.set(varint.try_to_int32()?);
+                self.intermediate.zip_code.set(varint.try_to_int32()?);
             }
             _ => {}
         }
         Ok(())
     }
 
-    /// Async getter for street bytes.
-    ///
-    /// Takes `&Rc<Self>` because the future needs to read from the message.
-    pub async fn street_bytes(self: &Rc<Self>) -> Result<Bytes, Error> {
-        self.parser_state.parse_until_with_callback(|| false).await?;
-        Ok(self.street.borrow().clone().unwrap_or_else(Bytes::new))
+    /// Build finalized view from intermediate (decode bytes to UTF-8 strings). Called after parsing.
+    fn build_finalized(intermediate: &AddressParseIntermediate) -> Result<AddressFinalized, Error> {
+        let street = intermediate
+            .street
+            .borrow()
+            .clone()
+            .unwrap_or_else(Bytes::new);
+        let city = intermediate.city.borrow().clone().unwrap_or_else(Bytes::new);
+        let street_str = String::from_utf8(street.to_vec()).map_err(Error::from)?;
+        let city_str = String::from_utf8(city.to_vec()).map_err(Error::from)?;
+        Ok(AddressFinalized {
+            street: street_str,
+            city: city_str,
+            zip_code: intermediate.zip_code.get(),
+        })
     }
 
-    /// Async getter for city bytes.
-    ///
-    /// Takes `&Rc<Self>` because the future needs to read from the message.
+    /// Async getter for street bytes (internal; used when building finalized).
+    pub async fn street_bytes(self: &Rc<Self>) -> Result<Bytes, Error> {
+        self.parser_state.parse_until_with_callback(|| false).await?;
+        Ok(self
+            .intermediate
+            .street
+            .borrow()
+            .clone()
+            .unwrap_or_else(Bytes::new))
+    }
+
+    /// Async getter for city bytes (internal; used when building finalized).
     pub async fn city_bytes(self: &Rc<Self>) -> Result<Bytes, Error> {
         self.parser_state.parse_until_with_callback(|| false).await?;
-        Ok(self.city.borrow().clone().unwrap_or_else(Bytes::new))
+        Ok(self
+            .intermediate
+            .city
+            .borrow()
+            .clone()
+            .unwrap_or_else(Bytes::new))
     }
 
     /// Async getter for zip code.
-    ///
-    /// Takes `&Rc<Self>` because the future needs to read from the message.
     pub async fn zip_code(self: &Rc<Self>) -> Result<i32, Error> {
         self.parser_state.parse_until_with_callback(|| false).await?;
-        Ok(self.zip_code.get())
+        Ok(self.intermediate.zip_code.get())
     }
 }
 
@@ -122,28 +169,40 @@ where
 {
     fn street(
         self: &Rc<Self>,
-    ) -> Pin<StdBox<dyn Future<Output = Result<String, Error>> + '_>> {
-        let this = self.clone();
+    ) -> Pin<StdBox<dyn Future<Output = Result<&str, Error>> + '_>> {
+        let this = self;
         Box::pin(async move {
-            let bytes = this.street_bytes().await?;
-            String::from_utf8(bytes.to_vec()).map_err(Error::from)
+            this.parser_state
+                .parse_until_with_callback(|| false)
+                .await?;
+            if this.finalized.get().is_none() {
+                let f = AddressLazyAsyncImpl::<R>::build_finalized(&this.intermediate)?;
+                let _ = this.finalized.set(f);
+            }
+            Ok(this.finalized.get().unwrap().street())
         })
     }
 
     fn city(
         self: &Rc<Self>,
-    ) -> Pin<StdBox<dyn Future<Output = Result<String, Error>> + '_>> {
-        let this = self.clone();
+    ) -> Pin<StdBox<dyn Future<Output = Result<&str, Error>> + '_>> {
+        let this = self;
         Box::pin(async move {
-            let bytes = this.city_bytes().await?;
-            String::from_utf8(bytes.to_vec()).map_err(Error::from)
+            this.parser_state
+                .parse_until_with_callback(|| false)
+                .await?;
+            if this.finalized.get().is_none() {
+                let f = AddressLazyAsyncImpl::<R>::build_finalized(&this.intermediate)?;
+                let _ = this.finalized.set(f);
+            }
+            Ok(this.finalized.get().unwrap().city())
         })
     }
 
     fn zip_code(
         self: &Rc<Self>,
     ) -> Pin<StdBox<dyn Future<Output = Result<i32, Error>> + '_>> {
-        let this = self.clone();
+        let this = self;
         Box::pin(async move { this.zip_code().await })
     }
 }
