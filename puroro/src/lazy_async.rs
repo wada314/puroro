@@ -186,21 +186,58 @@ where
             self.segments.push_front(front);
         }
 
-        // Slow path: coalesce across segments.
+        // Slow path: copy into a single buffer via poll_take_into_buf.
         let mut out = BytesMut::with_capacity(len);
-        let mut remaining = len;
-        while remaining > 0 {
+        out.resize(len, 0);
+        ready!(self.poll_take_into_buf(cx, &mut out)?);
+        Poll::Ready(Ok(out.freeze()))
+    }
+
+    /// Consume exactly `buf.len()` bytes from the stream and copy them into `buf`.
+    ///
+    /// Ensures enough bytes are buffered via [`poll_ensure`](Self::poll_ensure); returns an error
+    /// if the stream ends before `buf.len()` bytes are available. No heap allocation; copies
+    /// directly from the segment queue after ensuring.
+    fn poll_take_into_buf(
+        &mut self,
+        cx: &mut Context<'_>,
+        buf: &mut [u8],
+    ) -> Poll<Result<(), Error>> {
+        let n = buf.len();
+        if n == 0 {
+            return Poll::Ready(Ok(()));
+        }
+        ready!(self.poll_ensure(cx, n)?);
+        let mut filled = 0;
+        while filled < n {
             let mut front = self.segments.pop_front().expect("buffered_len checked");
             let chunk = front.chunk();
-            let take = remaining.min(chunk.len());
-            out.extend_from_slice(&chunk[..take]);
+            let take = (n - filled).min(chunk.len());
+            buf[filled..filled + take].copy_from_slice(&chunk[..take]);
+            filled += take;
             front.advance(take);
-            remaining -= take;
             if front.remaining() > 0 {
                 self.segments.push_front(front);
             }
         }
-        Poll::Ready(Ok(out.freeze()))
+        Poll::Ready(Ok(()))
+    }
+
+    /// Consume and return exactly `N` bytes as a fixed-size array `[u8; N]`.
+    ///
+    /// Returns an error if the stream ends before `N` bytes are available.
+    /// For `N == 0`, returns `Ok([0u8; 0])` without reading.
+    /// Allocates no heap memory; fills the array directly from the buffer segments.
+    fn poll_take_array<const N: usize>(
+        &mut self,
+        cx: &mut Context<'_>,
+    ) -> Poll<Result<[u8; N], Error>> {
+        if N == 0 {
+            return Poll::Ready(Ok([0u8; N]));
+        }
+        let mut arr = [0u8; N];
+        ready!(self.poll_take_into_buf(cx, &mut arr)?);
+        Poll::Ready(Ok(arr))
     }
 
     fn poll_read_more(&mut self, cx: &mut Context<'_>) -> Poll<Result<usize, Error>> {
@@ -404,15 +441,11 @@ where
                 FieldValue::Varint(v)
             }
             WireType::Int32 => {
-                let bytes = poll_fn(|cx| self.input.poll_take_bytes(cx, 4)).await?;
-                let mut arr = [0u8; 4];
-                arr.copy_from_slice(bytes.as_ref());
+                let arr = poll_fn(|cx| self.input.poll_take_array::<4>(cx)).await?;
                 FieldValue::I32(arr)
             }
             WireType::Int64 => {
-                let bytes = poll_fn(|cx| self.input.poll_take_bytes(cx, 8)).await?;
-                let mut arr = [0u8; 8];
-                arr.copy_from_slice(bytes.as_ref());
+                let arr = poll_fn(|cx| self.input.poll_take_array::<8>(cx)).await?;
                 FieldValue::I64(arr)
             }
             WireType::Len => {
