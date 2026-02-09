@@ -13,6 +13,7 @@
 // limitations under the License.
 
 use super::super::address::AddressLazyAsyncImpl;
+use super::traits::PersonAsync;
 use ::allocator_extras::Global;
 use ::bytes::{Bytes, BytesMut};
 use ::futures_io::AsyncRead;
@@ -21,7 +22,10 @@ use ::puroro::error::Error;
 use ::puroro::lazy_async::{AsyncMessageParserStateRef, BytesReader};
 use ::puroro::protobuf_core::{Field, FieldValue};
 use ::puroro::repeated_lazy_async::LazyRepeatedAsync;
+use ::std::boxed::Box as StdBox;
 use ::std::cell::{Cell, OnceCell, RefCell};
+use ::std::future::Future;
+use ::std::pin::Pin;
 use ::std::rc::{Rc, Weak};
 
 /// Async/streaming lazy implementation of Person message that deserializes fields on-demand.
@@ -145,6 +149,27 @@ where
         let child = AddressLazyAsyncImpl::from_bytes(bytes);
         let _ = self.address.set(child.clone());
         Ok(Some(child))
+    }
+}
+
+impl<R> PersonAsync for PersonLazyAsyncImpl<R>
+where
+    R: AsyncRead + Unpin + 'static,
+{
+    type AddressAsyncItem = AddressLazyAsyncImpl<BytesReader>;
+
+    fn age(
+        self: &Rc<Self>,
+    ) -> Pin<StdBox<dyn Future<Output = Result<i32, Error>> + '_>> {
+        let this = self.clone();
+        Box::pin(async move { this.age().await })
+    }
+
+    fn address(
+        self: &Rc<Self>,
+    ) -> Pin<StdBox<dyn Future<Output = Result<Option<Rc<Self::AddressAsyncItem>>, Error>> + '_>> {
+        let this = self.clone();
+        Box::pin(async move { this.address().await })
     }
 }
 

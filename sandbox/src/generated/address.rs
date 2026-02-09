@@ -37,4 +37,4 @@ mod tests;
 pub use self::impl_::AddressImpl;
 pub use self::lazy::AddressLazyImpl;
 pub use self::lazy_async::AddressLazyAsyncImpl;
-pub use self::traits::{Address, AddressMut, AddressTry};
+pub use self::traits::{Address, AddressAsync, AddressMut, AddressTry};

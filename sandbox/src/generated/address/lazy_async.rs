@@ -12,12 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use super::traits::AddressAsync;
 use ::bytes::Bytes;
 use ::futures_io::AsyncRead;
 use ::puroro::error::Error;
 use ::puroro::lazy_async::{AsyncMessageParserStateRef, BytesReader};
 use ::puroro::protobuf_core::{Field, FieldValue};
+use ::std::boxed::Box as StdBox;
 use ::std::cell::{Cell, RefCell};
+use ::std::future::Future;
+use ::std::pin::Pin;
 use ::std::rc::{Rc, Weak};
 
 /// Async/streaming lazy implementation of `Address`.
@@ -109,5 +113,37 @@ where
     pub async fn zip_code(self: &Rc<Self>) -> Result<i32, Error> {
         self.parser_state.parse_until_with_callback(|| false).await?;
         Ok(self.zip_code.get())
+    }
+}
+
+impl<R> AddressAsync for AddressLazyAsyncImpl<R>
+where
+    R: AsyncRead + Unpin + 'static,
+{
+    fn street(
+        self: &Rc<Self>,
+    ) -> Pin<StdBox<dyn Future<Output = Result<String, Error>> + '_>> {
+        let this = self.clone();
+        Box::pin(async move {
+            let bytes = this.street_bytes().await?;
+            String::from_utf8(bytes.to_vec()).map_err(Error::from)
+        })
+    }
+
+    fn city(
+        self: &Rc<Self>,
+    ) -> Pin<StdBox<dyn Future<Output = Result<String, Error>> + '_>> {
+        let this = self.clone();
+        Box::pin(async move {
+            let bytes = this.city_bytes().await?;
+            String::from_utf8(bytes.to_vec()).map_err(Error::from)
+        })
+    }
+
+    fn zip_code(
+        self: &Rc<Self>,
+    ) -> Pin<StdBox<dyn Future<Output = Result<i32, Error>> + '_>> {
+        let this = self.clone();
+        Box::pin(async move { this.zip_code().await })
     }
 }

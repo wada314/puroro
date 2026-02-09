@@ -14,6 +14,10 @@
 
 use ::allocator_api2::boxed::Box;
 use ::puroro::error::Error;
+use ::std::boxed::Box as StdBox;
+use ::std::future::Future;
+use ::std::pin::Pin;
+use ::std::rc::Rc;
 
 /// Flexible view trait for Address message (not dyn-compatible).
 ///
@@ -83,6 +87,21 @@ impl<T: Address> Address for Box<T> {
 pub trait AddressMut: Address {
     fn set_street(&mut self, v: &str);
     fn clear_street(&mut self);
+}
+
+/// Async view trait for Address message (streaming/lazy async implementations).
+///
+/// Implemented by types that read fields asynchronously (e.g. from an async stream).
+/// Uses `self: &Rc<Self>` so that the future can hold a shared reference to the message.
+///
+/// Code generation note: MUST NOT reference implementation struct names. Trait-only abstraction.
+pub trait AddressAsync {
+    /// Async getter for street (decoded as UTF-8 string).
+    fn street(self: &Rc<Self>) -> Pin<StdBox<dyn Future<Output = Result<String, Error>> + '_>>;
+    /// Async getter for city (decoded as UTF-8 string).
+    fn city(self: &Rc<Self>) -> Pin<StdBox<dyn Future<Output = Result<String, Error>> + '_>>;
+    /// Async getter for zip_code.
+    fn zip_code(self: &Rc<Self>) -> Pin<StdBox<dyn Future<Output = Result<i32, Error>> + '_>>;
 }
 
 /// Flexible view trait for Address message (not dyn-compatible), fallible variant.

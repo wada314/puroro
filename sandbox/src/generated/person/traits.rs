@@ -12,10 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::{Address, AddressMut, AddressTry, Status};
+use super::{Address, AddressAsync, AddressMut, AddressTry, Status};
 use ::allocator_api2::boxed::Box;
 use ::puroro::error::Error;
 use ::puroro::repeated::{OptionRepeated, Repeated};
+use ::std::boxed::Box as StdBox;
+use ::std::future::Future;
+use ::std::pin::Pin;
 use ::std::rc::Rc;
 
 /// Flexible view trait for Person message (not dyn-compatible), fallible variant.
@@ -326,6 +329,31 @@ impl<T: PersonTry> PersonTry for Option<T> {
 /// Flexible view trait for Person message (not dyn-compatible).
 ///
 /// This is the non-object-safe “ergonomic extension” layer (uses `impl Trait` returns).
+/// Since any infallible getter can be lifted into a fallible one by returning `Ok(...)`,
+/// `Person` is modeled as a refinement of `PersonTry`.
+///
+/// Async view trait for Person message (streaming/lazy async implementations).
+///
+/// Implemented by types that read fields asynchronously (e.g. from an async stream).
+/// Uses `self: &Rc<Self>` so that the future can hold a shared reference to the message.
+///
+/// Code generation note: This trait MUST NOT reference any implementation struct names (e.g., PersonImpl, AddressImpl).
+/// Use only trait names to maintain abstraction.
+pub trait PersonAsync {
+    /// Type of the nested `address` field when read asynchronously (must implement [`AddressAsync`]).
+    type AddressAsyncItem: AddressAsync;
+
+    /// Async getter for age.
+    fn age(self: &Rc<Self>) -> Pin<StdBox<dyn Future<Output = Result<i32, Error>> + '_>>;
+    /// Async getter for the scalar address field.
+    fn address(
+        self: &Rc<Self>,
+    ) -> Pin<StdBox<dyn Future<Output = Result<Option<Rc<Self::AddressAsyncItem>>, Error>> + '_>>;
+}
+
+/// Flexible view trait for Person message (not dyn-compatible).
+///
+/// This is the non-object-safe "ergonomic extension" layer (uses `impl Trait` returns).
 /// Since any infallible getter can be lifted into a fallible one by returning `Ok(...)`,
 /// `Person` is modeled as a refinement of `PersonTry`.
 ///

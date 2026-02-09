@@ -1,3 +1,4 @@
+use sandbox::generated::address::AddressAsync;
 use sandbox::generated::person::PersonLazyAsyncImpl;
 
 use ::futures::executor::block_on;
@@ -118,9 +119,9 @@ fn test_person_lazy_async_random_split() {
 
     let addresses = person.addresses();
     let a0 = block_on(addresses.get_async(0)).unwrap().unwrap();
-    let city_bytes = block_on(a0.city_bytes()).unwrap();
+    let city = block_on(a0.city()).unwrap();
     let zip = block_on(a0.zip_code()).unwrap();
-    assert_eq!(::std::str::from_utf8(city_bytes.as_ref()).unwrap(), "NY");
+    assert_eq!(city, "NY");
     assert_eq!(zip, 10001);
 }
 
