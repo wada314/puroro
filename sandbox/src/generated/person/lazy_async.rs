@@ -108,8 +108,7 @@ where
 
     /// Async getter for age (parses the whole message to ensure the last value wins).
     ///
-    /// Takes `&Rc<Self>` because the future needs to read from the message; the returned
-    /// future is not `Send` due to `Rc`.
+    /// Takes `&Rc<Self>` because the future needs to read from the message.
     pub async fn age(self: &Rc<Self>) -> Result<i32, Error> {
         self.parser_state.parse_until_with_callback(|| false).await?;
         Ok(self.age.get())
@@ -130,8 +129,7 @@ where
     /// Parses the whole message before returning, so that all occurrences have been
     /// concatenated into the payload.
     ///
-    /// Takes `&Rc<Self>` because the future needs to read from shared fields; the returned
-    /// future is not `Send` due to `Rc`.
+    /// Takes `&Rc<Self>` because the future needs to read from shared fields.
     pub async fn address(self: &Rc<Self>) -> Result<Option<Rc<AddressLazyAsyncImpl<BytesReader>>>, Error> {
         self.parser_state.parse_until_with_callback(|| false).await?;
 

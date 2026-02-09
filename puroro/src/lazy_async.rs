@@ -273,8 +273,8 @@ pub struct AsyncFieldReader<R> {
 /// to mutate that shared state (advance the parser) from any of those handles, we cannot use
 /// plain `&mut self`—only one owner could call it. So we use **interior mutability** (`Rc<RefCell<State>>`):
 /// the outer type is cloneable and its methods take `&self`, but the inner state is mutated
-/// under a RefCell. We use RefCell (not Mutex) because the parser is single-threaded; the returned
-/// futures are not `Send`. See also `AI_REFERENCES.md` (§ Async lazy: interior mutability).
+/// under a RefCell. We use RefCell (not Mutex) because the parser is single-threaded.
+/// See also `AI_REFERENCES.md` (§ Async lazy: interior mutability).
 pub struct AsyncMessageParserStateRef<R> {
     state: Rc<RefCell<AsyncMessageParserState<R>>>,
 }

@@ -41,7 +41,6 @@ where
     }
 
     /// Async length of the repeated field (requires fully parsing the message).
-    /// Note: Returns a future that is not `Send` due to shared `Rc`/callback design.
     pub async fn len_async(&self) -> Result<usize, Error> {
         self.parent_parser_state
             .parse_until_with_callback(|| false)
@@ -50,7 +49,6 @@ where
     }
 
     /// Async check whether the repeated field is empty (parses just enough to know).
-    /// Note: Returns a future that is not `Send` due to shared `Rc`/callback design.
     pub async fn is_empty_async(&self) -> Result<bool, Error> {
         while self.list.len() < 1 {
             let progressed = self.parent_parser_state.parse_one_field_with_callback().await?;
@@ -62,7 +60,6 @@ where
     }
 
     /// Async get an element by index, parsing on-demand until it is available or EOF is reached.
-    /// Note: Returns a future that is not `Send` due to shared `Rc`/callback design.
     pub async fn get_async(&self, index: usize) -> Result<Option<T>, Error> {
         let needed = index.saturating_add(1);
         while self.list.len() < needed {
