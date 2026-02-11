@@ -19,3 +19,4 @@ bitvec = "1.0"
 # Common dependencies
 thiserror = "2.0"
 allocator_extras = { path = "allocator_extras" }
+orx-split-vec = "3"

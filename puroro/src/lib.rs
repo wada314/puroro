@@ -62,6 +62,9 @@ pub mod repeated;
 
 pub use repeated::OnceListRepeatedMap;
 
+/// Reference-separated vector: split API for holding element refs while appending.
+pub mod split_vec;
+
 /// Slice-backed lazy parser infrastructure for Protocol Buffer messages.
 ///
 /// This is the original lazy parsing implementation that assumes input slices have

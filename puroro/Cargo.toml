@@ -15,6 +15,7 @@ bitvec.workspace = true
 thiserror.workspace = true
 allocator_extras.workspace = true
 once-list2 = "0.4.0"
+orx-split-vec.workspace = true
 bytes = "1"
 futures-io = "0.3"
 futures = "0.3"
