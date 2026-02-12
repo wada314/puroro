@@ -269,6 +269,7 @@ fn test_person_lazy_async_address_empty() {
 
 #[test]
 fn test_person_lazy_async_address_multiple_slices() {
+    // Scalar message field 6 split across two chunks; segments are concatenated by SegmentsReader.
     let first_slice = build_address_message("Main St", "", 0);
     let first_field = build_length_delimited_field(6, &first_slice);
     let second_slice = build_address_message("", "New York", 10001);
@@ -280,6 +281,8 @@ fn test_person_lazy_async_address_multiple_slices() {
     let addr_opt = block_on(person.address()).unwrap();
     assert!(addr_opt.is_some());
     let addr = addr_opt.unwrap();
+    // Parse the rest of the message so the second field-6 chunk is appended to the shared reader.
+    let _ = block_on(person.age()).unwrap();
     assert_eq!(block_on(addr.street()).unwrap(), "Main St");
     assert_eq!(block_on(addr.city()).unwrap(), "New York");
     assert_eq!(block_on(addr.zip_code()).unwrap(), 10001);

@@ -58,6 +58,70 @@ impl AsyncRead for BytesReader {
     }
 }
 
+/// An async reader that treats multiple `Bytes` segments as a single concatenated input.
+///
+/// Used for scalar message fields where the wire format may split the field across several
+/// length-delimited chunks; the parent parser appends each chunk via [`append`](SegmentsReader::append),
+/// and the child message reads from this reader, which yields bytes from the first segment until
+/// exhausted, then the next, and so on.
+///
+/// Cloning yields a reader that shares the same underlying segment queue, so appending more
+/// segments after a clone is created is visible to the clone's reads.
+pub struct SegmentsReader(Rc<RefCell<VecDeque<Bytes>>>);
+
+impl SegmentsReader {
+    /// Create a new reader with a single initial segment.
+    pub fn new(first: Bytes) -> Self {
+        let mut deque = VecDeque::new();
+        if !first.is_empty() {
+            deque.push_back(first);
+        }
+        Self(Rc::new(RefCell::new(deque)))
+    }
+
+    /// Append another segment to the end of the logical concatenated buffer.
+    pub fn append(&self, bytes: Bytes) {
+        if !bytes.is_empty() {
+            self.0.borrow_mut().push_back(bytes);
+        }
+    }
+}
+
+impl Clone for SegmentsReader {
+    fn clone(&self) -> Self {
+        Self(Rc::clone(&self.0))
+    }
+}
+
+impl AsyncRead for SegmentsReader {
+    fn poll_read(
+        self: Pin<&mut Self>,
+        _cx: &mut Context<'_>,
+        out: &mut [u8],
+    ) -> Poll<Result<usize, ::std::io::Error>> {
+        if out.is_empty() {
+            return Poll::Ready(Ok(0));
+        }
+        let mut deque = self.0.borrow_mut();
+        loop {
+            let mut front = match deque.pop_front() {
+                None => return Poll::Ready(Ok(0)),
+                Some(b) => b,
+            };
+            if front.is_empty() {
+                continue;
+            }
+            let n = front.len().min(out.len());
+            let take = front.split_to(n);
+            out[..n].copy_from_slice(&take);
+            if !front.is_empty() {
+                deque.push_front(front);
+            }
+            return Poll::Ready(Ok(n));
+        }
+    }
+}
+
 /// Default chunk size to read from the underlying reader.
 const DEFAULT_READ_CHUNK_SIZE: usize = 8 * 1024;
 

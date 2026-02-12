@@ -15,11 +15,11 @@
 use super::super::address::AddressLazyAsyncImpl;
 use super::traits::PersonAsync;
 use ::allocator_extras::Global;
-use ::bytes::{Bytes, BytesMut};
+use ::bytes::Bytes;
 use ::futures_io::AsyncRead;
 use ::once_list2::OnceListWithTailLen as OnceList;
 use ::puroro::error::Error;
-use ::puroro::lazy_async::{AsyncMessageParserStateRef, BytesReader};
+use ::puroro::lazy_async::{AsyncMessageParserStateRef, BytesReader, SegmentsReader};
 use ::puroro::protobuf_core::{Field, FieldValue};
 use ::puroro::repeated_lazy_async::LazyRepeatedAsync;
 use ::std::boxed::Box as StdBox;
@@ -44,9 +44,9 @@ where
     age: Cell<i32>,
     scores: OnceList<i32, Global>,
 
-    // Scalar message field payload (concatenated across multiple occurrences).
-    address_payload: RefCell<Option<BytesMut>>,
-    address: OnceCell<Rc<AddressLazyAsyncImpl<BytesReader>>>,
+    // Scalar message field (field 6). Segments are concatenated; reader is shared with Address.
+    address_segments: RefCell<Option<SegmentsReader>>,
+    address: OnceCell<Rc<AddressLazyAsyncImpl<SegmentsReader>>>,
 
     // Repeated message field (each occurrence is a separate embedded message).
     addresses: OnceList<Rc<AddressLazyAsyncImpl<BytesReader>>, Global>,
@@ -73,7 +73,7 @@ where
                 parser_state,
                 age: Cell::new(0),
                 scores: OnceList::new_in(Global),
-                address_payload: RefCell::new(None),
+                address_segments: RefCell::new(None),
                 address: OnceCell::new(),
                 addresses: OnceList::new_in(Global),
             }
@@ -90,15 +90,11 @@ where
                 self.scores.push(varint.try_to_int32()?);
             }
             (6, FieldValue::Len(bytes)) => {
-                // Scalar message field: concatenate payloads across occurrences.
-                let mut slot = self.address_payload.borrow_mut();
+                // Scalar message field: concatenate chunks; reader treats segments as one input.
+                let mut slot = self.address_segments.borrow_mut();
                 match slot.as_mut() {
-                    Some(buf) => buf.extend_from_slice(bytes.as_ref()),
-                    None => {
-                        let mut buf = BytesMut::with_capacity(bytes.len());
-                        buf.extend_from_slice(bytes.as_ref());
-                        *slot = Some(buf);
-                    }
+                    Some(reader) => reader.append(bytes),
+                    None => *slot = Some(SegmentsReader::new(bytes)),
                 }
             }
             (9, FieldValue::Len(bytes)) => {
@@ -130,23 +126,25 @@ where
 
     /// Async getter for the scalar `address` field.
     ///
-    /// Parses the whole message before returning, so that all occurrences have been
-    /// concatenated into the payload.
+    /// Parses until at least the first occurrence of field 6 is read; then returns an
+    /// Address that reads from the concatenated segment buffer. Later field 6 chunks
+    /// are appended to that buffer and the Address sees them as one stream.
     ///
     /// Takes `&Rc<Self>` because the future needs to read from shared fields.
-    pub async fn address(self: &Rc<Self>) -> Result<Option<Rc<AddressLazyAsyncImpl<BytesReader>>>, Error> {
-        self.parser_state.parse_until_with_callback(|| false).await?;
-
+    pub async fn address(
+        self: &Rc<Self>,
+    ) -> Result<Option<Rc<AddressLazyAsyncImpl<SegmentsReader>>>, Error> {
+        self.parser_state
+            .parse_until_with_callback(|| self.address_segments.borrow().as_ref().is_some())
+            .await?;
         if let Some(addr) = self.address.get() {
             return Ok(Some(addr.clone()));
         }
-
-        let mut slot = self.address_payload.borrow_mut();
-        let Some(buf) = slot.take() else {
-            return Ok(None);
+        let reader = match self.address_segments.borrow().as_ref() {
+            Some(seg) => seg.clone(),
+            None => return Ok(None),
         };
-        let bytes = buf.freeze();
-        let child = AddressLazyAsyncImpl::from_bytes(bytes);
+        let child = AddressLazyAsyncImpl::new(reader, None);
         let _ = self.address.set(child.clone());
         Ok(Some(child))
     }
@@ -156,7 +154,7 @@ impl<R> PersonAsync for PersonLazyAsyncImpl<R>
 where
     R: AsyncRead + Unpin + 'static,
 {
-    type AddressAsyncItem = AddressLazyAsyncImpl<BytesReader>;
+    type AddressAsyncItem = AddressLazyAsyncImpl<SegmentsReader>;
 
     fn age(
         self: &Rc<Self>,
