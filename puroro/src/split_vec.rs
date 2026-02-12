@@ -153,39 +153,31 @@ where
     }
 }
 
-/// Implements `RefSeparatedVec` for `OnceListCore<T, A, C>` for any of the four cache mode types
-/// (`NoCache`, `WithLen`, `WithTail`, `WithTailLen`) exported by once_list2.
-macro_rules! impl_ref_separated_vec_for_once_list_core {
-    ($cache:ty) => {
-        impl<T, A> RefSeparatedVec for once_list2::OnceListCore<T, A, $cache>
-        where
-            A: ::allocator_api2::alloc::Allocator + Clone,
-        {
-            type Item = T;
+/// Implemented for `OnceListCore<T, A, C>` for any cache mode `C: once_list2::CacheMode<T, A>`
+/// (e.g. `NoCache`, `WithLen`, `WithTail`, `WithTailLen`).
+impl<T, A, C> RefSeparatedVec for once_list2::OnceListCore<T, A, C>
+where
+    A: ::allocator_api2::alloc::Allocator + Clone,
+    C: once_list2::CacheMode<T, A>,
+{
+    type Item = T;
 
-            fn count(&self) -> usize {
-                self.len()
-            }
+    fn count(&self) -> usize {
+        self.len()
+    }
 
-            fn get(&self, i: usize) -> Option<&T> {
-                self.iter().nth(i)
-            }
+    fn get(&self, i: usize) -> Option<&T> {
+        self.iter().nth(i)
+    }
 
-            fn get_mut(&mut self, i: usize) -> Option<&mut T> {
-                self.iter_mut().nth(i)
-            }
+    fn get_mut(&mut self, i: usize) -> Option<&mut T> {
+        self.iter_mut().nth(i)
+    }
 
-            fn push(&mut self, value: T) {
-                once_list2::OnceListCore::push(self, value);
-            }
-        }
-    };
+    fn push(&mut self, value: T) {
+        once_list2::OnceListCore::push(self, value);
+    }
 }
-
-impl_ref_separated_vec_for_once_list_core!(once_list2::NoCache);
-impl_ref_separated_vec_for_once_list_core!(once_list2::WithLen<T, A>);
-impl_ref_separated_vec_for_once_list_core!(once_list2::WithTail<T, A>);
-impl_ref_separated_vec_for_once_list_core!(once_list2::WithTailLen<T, A>);
 
 #[cfg(test)]
 mod tests {
