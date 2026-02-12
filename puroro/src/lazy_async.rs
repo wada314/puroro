@@ -12,7 +12,8 @@
 use crate::error::Error;
 use ::bytes::{Buf, Bytes, BytesMut};
 use ::futures_io::AsyncRead;
-use ::std::collections::VecDeque;
+use ::std::collections::{LinkedList, VecDeque};
+use ::std::future::Future;
 use ::std::future::poll_fn;
 use ::std::pin::Pin;
 use ::std::task::ready;
@@ -58,66 +59,110 @@ impl AsyncRead for BytesReader {
     }
 }
 
-/// An async reader that treats multiple `Bytes` segments as a single concatenated input.
+/// An async reader that treats multiple segment readers as a single concatenated input.
 ///
 /// Used for scalar message fields where the wire format may split the field across several
-/// length-delimited chunks; the parent parser appends each chunk via [`append`](SegmentsReader::append),
-/// and the child message reads from this reader, which yields bytes from the first segment until
-/// exhausted, then the next, and so on.
+/// length-delimited chunks. Each chunk is one `AsyncRead` (e.g. [`BytesReader`]); the parent
+/// appends via [`append`](SegmentsReader::append). When the queue is exhausted and a parent
+/// parser is set, this reader requests one more field from the parent so the callback can
+/// push another segment.
 ///
-/// Cloning yields a reader that shares the same underlying segment queue, so appending more
-/// segments after a clone is created is visible to the clone's reads.
-pub struct SegmentsReader(Rc<RefCell<VecDeque<Bytes>>>);
+/// Cloning yields a reader that shares the same underlying queue, so appending more segments
+/// after a clone is created is visible to the clone's reads.
+///
+/// Uses a [`LinkedList`] of segment readers so that we only read from the front and append
+/// at the back; no contiguous buffer or reallocation is needed.
+pub struct SegmentsReader<R> {
+    readers: Rc<RefCell<LinkedList<Box<dyn AsyncRead + Unpin + 'static>>>>,
+    parent_parser: Option<AsyncMessageParserStateRef<R>>,
+}
 
-impl SegmentsReader {
-    /// Create a new reader with a single initial segment.
-    pub fn new(first: Bytes) -> Self {
-        let mut deque = VecDeque::new();
+impl<R> SegmentsReader<R>
+where
+    R: AsyncRead + Unpin + 'static,
+{
+    /// Create a new reader with an optional initial segment and optional parent parser.
+    ///
+    /// When `parent` is `Some`, exhausting the queue will trigger one parent
+    /// `parse_one_field_with_callback()` before returning EOF.
+    pub fn new(first: Bytes, parent: Option<AsyncMessageParserStateRef<R>>) -> Self {
+        let mut readers = LinkedList::new();
         if !first.is_empty() {
-            deque.push_back(first);
+            readers.push_back(
+                Box::new(BytesReader::new(first)) as Box<dyn AsyncRead + Unpin + 'static>
+            );
         }
-        Self(Rc::new(RefCell::new(deque)))
+        Self {
+            readers: Rc::new(RefCell::new(readers)),
+            parent_parser: parent,
+        }
     }
 
     /// Append another segment to the end of the logical concatenated buffer.
     pub fn append(&self, bytes: Bytes) {
         if !bytes.is_empty() {
-            self.0.borrow_mut().push_back(bytes);
+            self.readers
+                .borrow_mut()
+                .push_back(Box::new(BytesReader::new(bytes)));
         }
     }
 }
 
-impl Clone for SegmentsReader {
+impl<R> Clone for SegmentsReader<R> {
     fn clone(&self) -> Self {
-        Self(Rc::clone(&self.0))
+        Self {
+            readers: Rc::clone(&self.readers),
+            parent_parser: self.parent_parser.clone(),
+        }
     }
 }
 
-impl AsyncRead for SegmentsReader {
+impl<R> AsyncRead for SegmentsReader<R>
+where
+    R: AsyncRead + Unpin + 'static,
+{
+    /// Returns `Ready(Ok(0))` only when the input is **terminated** (EOF): no parent parser, or
+    /// parent has reached EOF and did not append any segment. Do not return `Ok(0)` while more
+    /// data might still arrive (e.g. when the queue is empty but the parent may produce more).
     fn poll_read(
         self: Pin<&mut Self>,
-        _cx: &mut Context<'_>,
+        cx: &mut Context<'_>,
         out: &mut [u8],
     ) -> Poll<Result<usize, ::std::io::Error>> {
         if out.is_empty() {
             return Poll::Ready(Ok(0));
         }
-        let mut deque = self.0.borrow_mut();
         loop {
-            let mut front = match deque.pop_front() {
-                None => return Poll::Ready(Ok(0)),
-                Some(b) => b,
+            // Try to read from the front reader.
+            {
+                let mut guard = self.readers.borrow_mut();
+                if let Some(reader) = guard.front_mut() {
+                    let n = ready!(Pin::new(reader.as_mut()).poll_read(cx, out));
+                    if let Ok(0) = n {
+                        guard.pop_front();
+                        // Current segment exhausted. Do not return Ok(0) — more segments or parent may have data.
+                        continue;
+                    }
+                    return Poll::Ready(n);
+                }
+            }
+            // Queue is empty; refill from parent if present.
+            let Some(parent) = self.parent_parser.as_ref().cloned() else {
+                return Poll::Ready(Ok(0)); // no parent → input terminated
             };
-            if front.is_empty() {
-                continue;
+            let mut fut = Box::pin(parent.parse_until_with_callback(|| !self.readers.borrow().is_empty()));
+            if let Err(e) = ready!(fut.as_mut().poll(cx)) {
+                return Poll::Ready(Err(::std::io::Error::new(
+                    ::std::io::ErrorKind::InvalidData,
+                    e,
+                )));
             }
-            let n = front.len().min(out.len());
-            let take = front.split_to(n);
-            out[..n].copy_from_slice(&take);
-            if !front.is_empty() {
-                deque.push_front(front);
+            if self.readers.borrow().is_empty() {
+                return Poll::Ready(Ok(0)); // parent at EOF, no segment appended → input terminated
             }
-            return Poll::Ready(Ok(n));
+            // At least one segment was appended. Do not return Ok(0) here — input is not terminated.
+            // Continue the loop to read from the new segment(s).
+            continue;
         }
     }
 }
@@ -539,10 +584,7 @@ where
     /// Poll for the next protobuf tag (field number + wire type).
     ///
     /// Returns `Ok(None)` when no more bytes are available (end-of-message).
-    pub fn poll_read_tag(
-        &mut self,
-        cx: &mut Context<'_>,
-    ) -> Poll<Result<Option<Tag>, Error>> {
+    pub fn poll_read_tag(&mut self, cx: &mut Context<'_>) -> Poll<Result<Option<Tag>, Error>> {
         let varint_opt = ready!(self.poll_read_varint(cx)?);
         Poll::Ready(match varint_opt {
             Some(varint) => Tag::from_encoded(varint).map(Some).map_err(Error::from),
@@ -611,7 +653,9 @@ mod tests {
         unsafe fn drop(_: *const ()) {}
         static VTABLE: ::std::task::RawWakerVTable =
             ::std::task::RawWakerVTable::new(clone, wake, wake_by_ref, drop);
-        unsafe { ::std::task::Waker::from_raw(::std::task::RawWaker::new(::std::ptr::null(), &VTABLE)) }
+        unsafe {
+            ::std::task::Waker::from_raw(::std::task::RawWaker::new(::std::ptr::null(), &VTABLE))
+        }
     }
 
     fn poll_until_ready<T>(

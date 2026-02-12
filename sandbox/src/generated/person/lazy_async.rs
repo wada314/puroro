@@ -45,8 +45,8 @@ where
     scores: OnceList<i32, Global>,
 
     // Scalar message field (field 6). Segments are concatenated; reader is shared with Address.
-    address_segments: RefCell<Option<SegmentsReader>>,
-    address: OnceCell<Rc<AddressLazyAsyncImpl<SegmentsReader>>>,
+    address_segments: RefCell<Option<SegmentsReader<R>>>,
+    address: OnceCell<Rc<AddressLazyAsyncImpl<SegmentsReader<R>>>>,
 
     // Repeated message field (each occurrence is a separate embedded message).
     addresses: OnceList<Rc<AddressLazyAsyncImpl<BytesReader>>, Global>,
@@ -94,7 +94,7 @@ where
                 let mut slot = self.address_segments.borrow_mut();
                 match slot.as_mut() {
                     Some(reader) => reader.append(bytes),
-                    None => *slot = Some(SegmentsReader::new(bytes)),
+                    None => *slot = Some(SegmentsReader::new(bytes, Some(self.parser_state.clone()))),
                 }
             }
             (9, FieldValue::Len(bytes)) => {
@@ -133,7 +133,7 @@ where
     /// Takes `&Rc<Self>` because the future needs to read from shared fields.
     pub async fn address(
         self: &Rc<Self>,
-    ) -> Result<Option<Rc<AddressLazyAsyncImpl<SegmentsReader>>>, Error> {
+    ) -> Result<Option<Rc<AddressLazyAsyncImpl<SegmentsReader<R>>>>, Error> {
         self.parser_state
             .parse_until_with_callback(|| self.address_segments.borrow().as_ref().is_some())
             .await?;
@@ -154,7 +154,7 @@ impl<R> PersonAsync for PersonLazyAsyncImpl<R>
 where
     R: AsyncRead + Unpin + 'static,
 {
-    type AddressAsyncItem = AddressLazyAsyncImpl<SegmentsReader>;
+    type AddressAsyncItem = AddressLazyAsyncImpl<SegmentsReader<R>>;
 
     fn age(
         self: &Rc<Self>,
