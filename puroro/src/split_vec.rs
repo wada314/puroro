@@ -29,9 +29,24 @@ use std::marker::PhantomData;
 /// Trait for address-stable growable containers that support splitting into read, push, and count handles.
 ///
 /// Implementors must ensure that `push` does not invalidate existing element references.
+///
+/// Implementors can reuse their container's native iterator types by overriding the
+/// [`Iter`](Self::Iter) and [`IterMut`](Self::IterMut) associated types and the `iter` / `iter_mut` methods.
 pub trait RefSeparatedVec {
     /// Element type.
     type Item;
+
+    /// Iterator over shared references. Each implementor uses its container's native type
+    /// (e.g. [`orx_split_vec::Iter`], [`once_list2::Iter`]).
+    type Iter<'a>: Iterator<Item = &'a Self::Item>
+    where
+        Self: 'a;
+
+    /// Iterator over mutable references. Each implementor uses its container's native type
+    /// (e.g. [`orx_split_vec::IterMut`], [`once_list2::IterMut`]).
+    type IterMut<'a>: Iterator<Item = &'a mut Self::Item>
+    where
+        Self: 'a;
 
     /// Number of elements.
     fn count(&self) -> usize;
@@ -44,6 +59,28 @@ pub trait RefSeparatedVec {
 
     /// Appends an element. Must not invalidate existing `&Self::Item` or `&mut Self::Item`.
     fn push(&mut self, value: Self::Item);
+
+    /// Reference to the first element, or `None` if empty.
+    #[inline]
+    fn first(&self) -> Option<&Self::Item> {
+        self.get(0)
+    }
+
+    /// Returns `true` if the container has no elements.
+    #[inline]
+    fn is_empty(&self) -> bool {
+        self.count() == 0
+    }
+
+    /// Returns an iterator over shared references to the elements.
+    fn iter(&self) -> Self::Iter<'_>
+    where
+        Self: Sized;
+
+    /// Returns an iterator over mutable references to the elements.
+    fn iter_mut(&mut self) -> Self::IterMut<'_>
+    where
+        Self: Sized;
 
     /// Splits into read, push, and count handles. While the returned handles are alive,
     /// the container must not be used for structural mutation (e.g. clear).
@@ -128,11 +165,15 @@ where
 
 // --- Implementations ---
 
+/// Implemented for [`orx_split_vec::SplitVec`]. Reuses the container's native
+/// [`orx_split_vec::Iter`] and [`orx_split_vec::IterMut`].
 impl<T, G> RefSeparatedVec for orx_split_vec::SplitVec<T, G>
 where
     G: orx_split_vec::Growth,
 {
     type Item = T;
+    type Iter<'a> = orx_split_vec::Iter<'a, T> where Self: 'a;
+    type IterMut<'a> = orx_split_vec::IterMut<'a, T> where Self: 'a;
 
     fn count(&self) -> usize {
         orx_split_vec::PinnedVec::len(self)
@@ -151,31 +192,50 @@ where
     fn push(&mut self, value: T) {
         orx_split_vec::PinnedVec::push(self, value);
     }
+
+    fn iter(&self) -> Self::Iter<'_> {
+        orx_split_vec::Collection::iter(self)
+    }
+
+    fn iter_mut(&mut self) -> Self::IterMut<'_> {
+        orx_split_vec::CollectionMut::iter_mut(self)
+    }
 }
 
 /// Implemented for `OnceListCore<T, A, C>` for any cache mode `C: once_list2::CacheMode<T, A>`
 /// (e.g. `NoCache`, `WithLen`, `WithTail`, `WithTailLen`).
+/// Reuses the container's native [`once_list2::Iter`] and [`once_list2::IterMut`].
 impl<T, A, C> RefSeparatedVec for once_list2::OnceListCore<T, A, C>
 where
     A: ::allocator_api2::alloc::Allocator + Clone,
     C: once_list2::CacheMode<T, A>,
 {
     type Item = T;
+    type Iter<'a> = once_list2::Iter<'a, T, A> where Self: 'a;
+    type IterMut<'a> = once_list2::IterMut<'a, T, A> where Self: 'a;
 
     fn count(&self) -> usize {
         self.len()
     }
 
     fn get(&self, i: usize) -> Option<&T> {
-        self.iter().nth(i)
+        once_list2::OnceListCore::iter(self).nth(i)
     }
 
     fn get_mut(&mut self, i: usize) -> Option<&mut T> {
-        self.iter_mut().nth(i)
+        once_list2::OnceListCore::iter_mut(self).nth(i)
     }
 
     fn push(&mut self, value: T) {
         once_list2::OnceListCore::push(self, value);
+    }
+
+    fn iter(&self) -> Self::Iter<'_> {
+        once_list2::OnceListCore::iter(self)
+    }
+
+    fn iter_mut(&mut self) -> Self::IterMut<'_> {
+        once_list2::OnceListCore::iter_mut(self)
     }
 }
 

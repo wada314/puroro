@@ -119,12 +119,12 @@ where
     }
 
     /// Repeated scores adapter (async).
-    pub fn scores(&self) -> LazyRepeatedAsync<'_, i32, Global, R> {
+    pub fn scores(&self) -> LazyRepeatedAsync<'_, i32, OnceList<i32, Global>, R> {
         LazyRepeatedAsync::new(self.parser_state.clone(), &self.scores)
     }
 
     /// Repeated addresses adapter (async).
-    pub fn addresses(&self) -> LazyRepeatedAsync<'_, Rc<AddressLazyAsyncImpl<BytesReader>>, Global, R> {
+    pub fn addresses(&self) -> LazyRepeatedAsync<'_, Rc<AddressLazyAsyncImpl<BytesReader>>, OnceList<Rc<AddressLazyAsyncImpl<BytesReader>>, Global>, R> {
         LazyRepeatedAsync::new(self.parser_state.clone(), &self.addresses)
     }
 
