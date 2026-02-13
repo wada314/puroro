@@ -117,6 +117,7 @@ impl<R> Clone for SegmentsReader<R> {
     }
 }
 
+/// Like `?` for `Poll<Result<T, E>>`-returning functions: on `Err(e)` returns `Poll::Ready(Err(e))`.
 impl<R> AsyncRead for SegmentsReader<R>
 where
     R: AsyncRead + Unpin + 'static,
@@ -151,12 +152,7 @@ where
                 return Poll::Ready(Ok(0)); // no parent → input terminated
             };
             let mut fut = Box::pin(parent.parse_until_with_callback(|| !self.readers.borrow().is_empty()));
-            if let Err(e) = ready!(fut.as_mut().poll(cx)) {
-                return Poll::Ready(Err(::std::io::Error::new(
-                    ::std::io::ErrorKind::InvalidData,
-                    e,
-                )));
-            }
+            ready!(fut.as_mut().poll(cx))?;
             if self.readers.borrow().is_empty() {
                 return Poll::Ready(Ok(0)); // parent at EOF, no segment appended → input terminated
             }
@@ -319,14 +315,14 @@ where
         ready!(self.poll_ensure(cx, n)?);
         let mut filled = 0;
         while filled < n {
-            let mut front = self.segments.pop_front().expect("buffered_len checked");
+            let front = self.segments.front_mut().expect("buffered_len checked");
             let chunk = front.chunk();
             let take = (n - filled).min(chunk.len());
             buf[filled..filled + take].copy_from_slice(&chunk[..take]);
             filled += take;
             front.advance(take);
-            if front.remaining() > 0 {
-                self.segments.push_front(front);
+            if front.remaining() == 0 {
+                self.segments.pop_front();
             }
         }
         Poll::Ready(Ok(()))

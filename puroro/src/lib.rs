@@ -212,6 +212,12 @@ pub mod error {
         }
     }
 
+    impl From<Error> for std::io::Error {
+        fn from(e: Error) -> Self {
+            std::io::Error::new(std::io::ErrorKind::InvalidData, e)
+        }
+    }
+
     impl Error {
         /// Returns true if this error is "unexpected EOF" (e.g. from `read_exact`-style operations).
         /// Callers can use this to treat EOF as a normal end-of-stream (e.g. return `Ok(None)`) instead of propagating an error.
