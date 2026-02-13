@@ -24,41 +24,28 @@ use ::std::future::Future;
 use ::std::pin::Pin;
 use ::std::rc::{Rc, Weak};
 
-/// Parse-intermediate state for Address: holds values as the parser updates them (interior mutability).
-struct AddressParseIntermediate {
-    street: RefCell<Option<Bytes>>,
-    city: RefCell<Option<Bytes>>,
-    zip_code: Cell<i32>,
-}
-
-/// Finalized, strictly immutable view of an Address (built once parsing is complete for the message).
-struct AddressFinalized {
-    street: String,
-    city: String,
-    #[allow(dead_code)] // filled for consistency; zip_code getter reads from intermediate
-    zip_code: i32,
-}
-
-impl AddressFinalized {
-    fn street(&self) -> &str {
-        &self.street
-    }
-    fn city(&self) -> &str {
-        &self.city
-    }
-}
-
 /// Async/streaming lazy implementation of `Address`.
 ///
-/// This implementation uses `puroro::lazy_async::AsyncMessageParserStateRef` and async
-/// getters. It supports random-access getters by caching decoded values and/or raw bytes.
+/// Fields stored directly (same pattern as Person): raw bytes for length-delimited
+/// fields, decoded strings cached in OnceCell when first accessed.
+///
+/// Fields handled:
+/// - `street` (field 1)
+/// - `city` (field 2)
+/// - `zip_code` (field 3)
 pub struct AddressLazyAsyncImpl<R>
 where
     R: AsyncRead + Unpin + 'static,
 {
     parser_state: AsyncMessageParserStateRef<R>,
-    intermediate: AddressParseIntermediate,
-    finalized: OnceCell<AddressFinalized>,
+
+    street: RefCell<Option<Bytes>>,
+    city: RefCell<Option<Bytes>>,
+    zip_code: Cell<i32>,
+
+    // Decoded UTF-8 cache for string getters (filled on first access).
+    street_decoded: OnceCell<String>,
+    city_decoded: OnceCell<String>,
 }
 
 impl AddressLazyAsyncImpl<BytesReader> {
@@ -90,12 +77,11 @@ where
 
             Self {
                 parser_state,
-                intermediate: AddressParseIntermediate {
-                    street: RefCell::new(None),
-                    city: RefCell::new(None),
-                    zip_code: Cell::new(0),
-                },
-                finalized: OnceCell::new(),
+                street: RefCell::new(None),
+                city: RefCell::new(None),
+                zip_code: Cell::new(0),
+                street_decoded: OnceCell::new(),
+                city_decoded: OnceCell::new(),
             }
         })
     }
@@ -104,62 +90,57 @@ where
         let field_num = field.field_number.as_u32();
         match (field_num, field.value) {
             (1, FieldValue::Len(bytes)) => {
-                *self.intermediate.street.borrow_mut() = Some(bytes);
+                *self.street.borrow_mut() = Some(bytes);
             }
             (2, FieldValue::Len(bytes)) => {
-                *self.intermediate.city.borrow_mut() = Some(bytes);
+                *self.city.borrow_mut() = Some(bytes);
             }
             (3, FieldValue::Varint(varint)) => {
-                self.intermediate.zip_code.set(varint.try_to_int32()?);
+                self.zip_code.set(varint.try_to_int32()?);
             }
             _ => {}
         }
         Ok(())
     }
 
-    /// Build finalized view from intermediate (decode bytes to UTF-8 strings). Called after parsing.
-    fn build_finalized(intermediate: &AddressParseIntermediate) -> Result<AddressFinalized, Error> {
-        let street = intermediate
+    /// Async getter for street (parses the whole message then decodes UTF-8; result cached).
+    ///
+    /// Takes `&Rc<Self>` because the future needs to read from the message.
+    pub async fn street(self: &Rc<Self>) -> Result<&str, Error> {
+        self.parser_state.parse_until_with_callback(|| false).await?;
+        if let Some(s) = self.street_decoded.get() {
+            return Ok(s.as_str());
+        }
+        let bytes = self
             .street
             .borrow()
             .clone()
             .unwrap_or_else(Bytes::new);
-        let city = intermediate.city.borrow().clone().unwrap_or_else(Bytes::new);
-        let street_str = String::from_utf8(street.to_vec()).map_err(Error::from)?;
-        let city_str = String::from_utf8(city.to_vec()).map_err(Error::from)?;
-        Ok(AddressFinalized {
-            street: street_str,
-            city: city_str,
-            zip_code: intermediate.zip_code.get(),
-        })
+        let s = String::from_utf8(bytes.to_vec()).map_err(Error::from)?;
+        let _ = self.street_decoded.set(s);
+        Ok(self.street_decoded.get().unwrap().as_str())
     }
 
-    /// Async getter for street bytes (internal; used when building finalized).
-    pub async fn street_bytes(self: &Rc<Self>) -> Result<Bytes, Error> {
+    /// Async getter for city (parses the whole message then decodes UTF-8; result cached).
+    ///
+    /// Takes `&Rc<Self>` because the future needs to read from the message.
+    pub async fn city(self: &Rc<Self>) -> Result<&str, Error> {
         self.parser_state.parse_until_with_callback(|| false).await?;
-        Ok(self
-            .intermediate
-            .street
-            .borrow()
-            .clone()
-            .unwrap_or_else(Bytes::new))
+        if let Some(s) = self.city_decoded.get() {
+            return Ok(s.as_str());
+        }
+        let bytes = self.city.borrow().clone().unwrap_or_else(Bytes::new);
+        let s = String::from_utf8(bytes.to_vec()).map_err(Error::from)?;
+        let _ = self.city_decoded.set(s);
+        Ok(self.city_decoded.get().unwrap().as_str())
     }
 
-    /// Async getter for city bytes (internal; used when building finalized).
-    pub async fn city_bytes(self: &Rc<Self>) -> Result<Bytes, Error> {
-        self.parser_state.parse_until_with_callback(|| false).await?;
-        Ok(self
-            .intermediate
-            .city
-            .borrow()
-            .clone()
-            .unwrap_or_else(Bytes::new))
-    }
-
-    /// Async getter for zip code.
+    /// Async getter for zip_code (parses the whole message to ensure the last value wins).
+    ///
+    /// Takes `&Rc<Self>` because the future needs to read from the message.
     pub async fn zip_code(self: &Rc<Self>) -> Result<i32, Error> {
         self.parser_state.parse_until_with_callback(|| false).await?;
-        Ok(self.intermediate.zip_code.get())
+        Ok(self.zip_code.get())
     }
 }
 
@@ -170,39 +151,22 @@ where
     fn street(
         self: &Rc<Self>,
     ) -> Pin<StdBox<dyn Future<Output = Result<&str, Error>> + '_>> {
+        // Keep reference (do not clone): returned &str must outlive the future and borrow from self.
         let this = self;
-        Box::pin(async move {
-            this.parser_state
-                .parse_until_with_callback(|| false)
-                .await?;
-            if this.finalized.get().is_none() {
-                let f = AddressLazyAsyncImpl::<R>::build_finalized(&this.intermediate)?;
-                let _ = this.finalized.set(f);
-            }
-            Ok(this.finalized.get().unwrap().street())
-        })
+        Box::pin(async move { this.street().await })
     }
 
     fn city(
         self: &Rc<Self>,
     ) -> Pin<StdBox<dyn Future<Output = Result<&str, Error>> + '_>> {
         let this = self;
-        Box::pin(async move {
-            this.parser_state
-                .parse_until_with_callback(|| false)
-                .await?;
-            if this.finalized.get().is_none() {
-                let f = AddressLazyAsyncImpl::<R>::build_finalized(&this.intermediate)?;
-                let _ = this.finalized.set(f);
-            }
-            Ok(this.finalized.get().unwrap().city())
-        })
+        Box::pin(async move { this.city().await })
     }
 
     fn zip_code(
         self: &Rc<Self>,
     ) -> Pin<StdBox<dyn Future<Output = Result<i32, Error>> + '_>> {
-        let this = self;
+        let this = self.clone();
         Box::pin(async move { this.zip_code().await })
     }
 }
