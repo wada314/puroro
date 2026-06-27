@@ -237,33 +237,26 @@ if let Some(v) = self.max_retries {
 (3, WireType::Varint) => { self.max_retries = Some(decode_varint(buf)? as i32); }
 ```
 
-**Accessor implementation** — the `Optional` view is created locally in the method body.
-Because the scalar View copies `i32` from `self` at construction, it holds no borrow of
-`self`.  Using `+ use<>` in the return type prevents Rust 2024 from implicitly capturing
-the caller's lifetime, making the View effectively `'static` and enabling direct chaining.
+**Accessor implementation** — the `HasDefault` implementor is defined locally inside the
+method body.  Using `impl HasDefault<i32>` as the second type parameter of `Optional`
+keeps the concrete type private while allowing the compiler to infer it.
 
 ```rust
 // Generated for: optional int32 max_retries = 3 [default = 3];
-pub fn max_retries(&self) -> impl puroro::Optional<Value<'static> = i32> + use<> {
-    struct View { value: Option<i32> }
-    impl puroro::Optional for View {
-        type Value<'a> = i32 where Self: 'a;
-        fn get(&self) -> i32 { self.value.unwrap_or(3) }   // 3 is compile-time constant
-        fn get_opt(&self) -> Option<i32> { self.value }
-        fn is_set(&self) -> bool { self.value.is_some() }
-    }
-    View { value: self.max_retries }  // copies Option<i32>, no borrow of self
+pub fn max_retries(&self) -> ::puroro::Optional<i32, impl ::puroro::HasDefault<i32>> {
+    struct Default3;
+    impl ::puroro::HasDefault<i32> for Default3 { const DEFAULT: i32 = 3; }
+    ::puroro::Optional::new(self.max_retries, Default3)
 }
 
-pub fn max_retries_raw(&self) -> i32 {
-    // Bypasses Optional; used for simple value access.
-    self.max_retries.unwrap_or(3)
-}
-
+pub fn max_retries_raw(&self) -> i32 { self.max_retries.unwrap_or(3) }
 pub fn has_max_retries(&self) -> bool { self.max_retries.is_some() }
 pub fn set_max_retries(&mut self, v: i32) { self.max_retries = Some(v); }
 pub fn clear_max_retries(&mut self) { self.max_retries = None; }
 ```
+
+Because `Optional<i32, Default3>` is a concrete struct with no custom `Drop`,
+`task.max_retries().get()` chains directly without a `let` binding.
 
 ### 6.3 String fields
 
@@ -300,35 +293,29 @@ pub fn set_title(&mut self, v: &str) {
 }
 ```
 
-**Accessor implementation** — for EXPLICIT-presence string fields, the View borrows `&'s str`
-from the message.  Using `+ use<'s>` in the return type precisely captures only `'s`
-(the caller's borrow of the message), avoiding implicit over-capturing in Rust 2024.
+**Accessor implementation** — for string fields the `HasDefault<&'a str>` implementor uses a
+lifetime-generic blanket impl so the same private struct works for any borrow lifetime.
 
 ```rust
 // Generated for: string title = 1 [default = "N/A"];  (EXPLICIT presence)
-pub fn title<'s>(&'s self) -> impl puroro::Optional<Value<'s> = &'s str> + use<'s> {
-    struct View<'a> { value: Option<&'a str> }
-    impl<'a> puroro::Optional for View<'a> {
-        type Value<'b> = &'b str where Self: 'b;
-        fn get(&self) -> &str { self.value.unwrap_or("N/A") }  // "N/A" is 'static const
-        fn get_opt(&self) -> Option<&str> { self.value }
-        fn is_set(&self) -> bool { self.value.is_some() }
+pub fn title<'s>(&'s self)
+    -> ::puroro::Optional<&'s str, impl ::puroro::HasDefault<&'s str>>
+{
+    struct DefaultNA;
+    // &'static str coerces to &'a str for any 'a, so the blanket impl works:
+    impl<'a> ::puroro::HasDefault<&'a str> for DefaultNA {
+        const DEFAULT: &'a str = "N/A";
     }
-    View { value: self.title.as_deref() }
+    ::puroro::Optional::new(self.title.as_deref(), DefaultNA)
 }
 
-// Bypasses Optional; returns &str directly.  No let-binding restriction.
-pub fn title_raw(&self) -> &str {
-    self.title.as_deref().unwrap_or("N/A")
-}
+pub fn title_raw(&self) -> &str { self.title.as_deref().unwrap_or("N/A") }
 pub fn has_title(&self) -> bool { self.title.is_some() }
 ```
 
-> **RPIT drop-check note:** because the View borrows from `self`, Rust's conservative
-> drop-check for opaque return types requires a `let` binding before calling `.get()`:
-> `let v = task.title(); let s = v.get();`
->
-> `title_raw()` has no such restriction and is preferred for simple `&str` access.
+Because `Optional<&'s str, DefaultNA>` is a concrete struct (not an opaque `impl Trait`
+return), the borrow checker sees its trivial drop, and `task.title().get()` chains
+directly — no `let` binding required.
 
 ### 6.4 Bytes fields
 

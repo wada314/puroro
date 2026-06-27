@@ -28,5 +28,5 @@ pub mod wire_type;
 pub use decode::MessageDecode;
 pub use encode::MessageEncode;
 pub use error::{DecodeError, EncodeError};
-pub use optional::Optional;
+pub use optional::{HasDefault, Optional};
 pub use wire_type::WireType;

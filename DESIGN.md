@@ -72,25 +72,40 @@ Wire types 3 and 4 (SGROUP / EGROUP) are deprecated. The decoder must skip them;
 
 The runtime library (`puroro`) exposes two core traits and one accessor trait. Generated code depends only on these public items.
 
-### `Optional`
+### `HasDefault` and `Optional`
 
 ```rust
-pub trait Optional {
-    /// Value type: scalar (e.g. `i32`) or reference (e.g. `&'a str`).
-    type Value<'a> where Self: 'a;
+/// Implemented by a zero-sized struct that carries a compile-time default.
+/// The implementing struct is defined locally inside each accessor method.
+pub trait HasDefault<T: Copy> {
+    const DEFAULT: T;
+}
 
-    /// Value or proto-declared default when not set.
-    fn get(&self) -> Self::Value<'_>;
+/// Concrete return type for every explicit-presence field accessor.
+/// `T` — Copy scalar or reference (`&'a str`, `&'a [u8]`).
+/// `D` — zero-sized default provider; hidden behind `impl HasDefault<T>`.
+pub struct Optional<T: Copy, D: HasDefault<T>> { … }
 
-    /// `Some(value)` when set, `None` when not set (no default substitution).
-    fn get_opt(&self) -> Option<Self::Value<'_>>;
-
-    /// `true` when the field was explicitly set.
-    fn is_set(&self) -> bool;
+impl<T: Copy, D: HasDefault<T>> Optional<T, D> {
+    pub fn new(value: Option<T>, _tag: D) -> Self;
+    pub fn get(&self) -> T;            // value or proto-declared default
+    pub fn get_opt(&self) -> Option<T>; // None when not set
+    pub fn is_set(&self) -> bool;
 }
 ```
 
-This trait is returned by the accessor method of every **explicit-presence** field.  The concrete implementing type is created inside the accessor's method body and is never named in the public API.
+`Optional` is a **concrete struct** (not a trait), so the borrow checker can always verify its trivial drop — enabling direct chaining for both scalar and string accessors.
+
+The concrete `D` type is a private zero-sized struct defined locally inside the accessor method body.  The return type in generated code uses `impl HasDefault<T>` in the second type-parameter position to keep `D` opaque:
+
+```rust
+pub fn max_retries(&self) -> Optional<i32, impl HasDefault<i32>> { … }
+pub fn title<'s>(&'s self) -> Optional<&'s str, impl HasDefault<&'s str>> { … }
+
+// Both chain directly without a let binding:
+let n: i32  = task.max_retries().get();
+let s: &str = task.title().get();
+```
 
 ### `MessageEncode`
 
@@ -239,7 +254,7 @@ Three accessors are generated:
 
 | Method | Return type | Description |
 |---|---|---|
-| `max_retries()` | `impl Optional` | Rich view: `get()`, `get_opt()`, `is_set()` |
+| `max_retries()` | `Optional<i32, impl HasDefault<i32>>` | Rich view: `get()`, `get_opt()`, `is_set()` |
 | `max_retries_raw()` | `i32` | Direct value with default applied; no wrapper |
 | `has_max_retries()` | `bool` | Presence check |
 
@@ -247,15 +262,15 @@ Three accessors are generated:
 - Clearer: `fn clear_max_retries(&mut self)` — makes `has_max_retries()` false
 - Wire rule: field absent when `has_max_retries()` is `false`; present even when the value is zero.
 
-The `[default = 3]` option on `max_retries` means `max_retries().get()` and `max_retries_raw()` return `3` when the field is unset.
+The `[default = 3]` option means `max_retries().get()` and `max_retries_raw()` return `3` when unset.
 
-**Scalar `Optional` views capture no lifetime** (the concrete View copies the scalar value at construction), so direct chaining compiles:
+Because `Optional` is a concrete struct with no custom `Drop`, chaining compiles directly:
 
 ```rust
-let n: i32 = task.max_retries().get();      // works — no let binding needed
-let n: i32 = task.max_retries_raw();        // also works; bypasses Optional
-if task.max_retries().is_set() { … }
-match task.max_retries().get_opt() { … }
+let n: i32 = task.max_retries().get();   // ok
+if task.max_retries().is_set() { … }     // ok
+match task.max_retries().get_opt() { … } // ok
+let n: i32 = task.max_retries_raw();     // ok — bypasses Optional
 ```
 
 #### Scalar type mapping
@@ -287,22 +302,16 @@ String fields always yield a borrowed `&str`. The internal storage type is an im
 
 | Method | Return type | Description |
 |---|---|---|
-| `title()` | `impl Optional` | Rich view: `get()` → `&str`, `get_opt()` → `Option<&str>`, `is_set()` |
+| `title()` | `Optional<&'s str, impl HasDefault<&'s str>>` | Rich view: `get()`, `get_opt()`, `is_set()` |
 | `title_raw()` | `&str` | Direct `&str` with default applied |
 | `has_title()` | `bool` | Presence check |
 
-Because the `Optional` view for string fields borrows from the message, direct chaining does **not** compile with Rust's drop-check rules.  Use a `let` binding or `title_raw()`:
+Because `Optional` is a concrete struct, chaining compiles directly for string fields too:
 
 ```rust
-// ✅ Use title_raw() for simple &str access:
-let s: &str = task.title_raw();
-
-// ✅ Use let binding when you need is_set() / get_opt():
-let v = task.title();
-if v.is_set() { println!("{}", v.get()); }
-
-// ❌ Does not compile (drop-check restriction on RPIT + borrowed view):
-// let s = task.title().get();
+let s: &str = task.title().get();          // ok
+if task.title().is_set() { … }             // ok
+let s: &str = task.title_raw();            // ok — bypasses Optional
 ```
 
 Wire rule: absent when `has_title()` is false (EXPLICIT) or `""` (IMPLICIT).
@@ -315,11 +324,11 @@ Bytes fields follow the same three-accessor pattern as strings, with `&[u8]` as 
 
 **Explicit presence:**
 
-- `payload()` → `impl Optional` (`.get()` → `&[u8]`, `.get_opt()` → `Option<&[u8]>`)
+- `payload()` → `Optional<&'s [u8], impl HasDefault<&'s [u8]>>` (`.get()`, `.get_opt()`, `.is_set()`)
 - `payload_raw()` → `&[u8]` (direct, with default applied)
 - `has_payload()` → `bool`
 
-The same `let`-binding requirement applies for `payload()`.  `payload_raw()` is the simpler choice for direct access.
+All three chain directly, same as string fields.
 
 ---
 
