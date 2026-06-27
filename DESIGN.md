@@ -701,6 +701,18 @@ A future design would need:
 
 Giving `string` and `bytes` fields a lifetime parameter would enable zero-copy decoding but would propagate that lifetime to every generated type and its callers. The current API is lifetime-free, which significantly simplifies usage. A future extension could introduce a borrowing "view" type alongside the existing owned type without breaking the current API.
 
+### No builder / immutable-object pattern
+
+The Java protobuf implementation separates a mutable `Builder` type from an immutable `Message` type, with `build()` as the transition point.  This pattern exists because Java has no ownership semantics: any holder of a reference could mutate a shared object, so immutability must be enforced at the type level.
+
+Rust's ownership system already provides the same guarantees without a dedicated builder type:
+
+- A caller that binds with `let mut` can mutate the message; one that binds with `let` cannot.
+- Sharing across threads uses `Arc<Task>` (immutable) or `Arc<Mutex<Task>>` (shared mutation).
+- `LEGACY_REQUIRED` field validation is covered by `validate()` / `decode_strict()` without needing a `build()` step.
+
+Generating both `Task<A>` and `TaskBuilder<A>` would double the generated code, complicate the allocator design, and add a `build()` conversion step — all for a guarantee Rust already provides for free through its borrow checker.
+
 ### Accessor methods instead of public fields
 
 Public struct fields are simpler but prevent changing internal representations without a breaking API change. Accessor methods decouple the interface from the implementation — for example, presence tracking could move from per-field `Option<T>` to a per-message bitmask without any change to the accessor signatures.
