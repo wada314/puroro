@@ -38,7 +38,7 @@ This document specifies the **public interface** of the `puroro` Protocol Buffer
 - **Protobuf spec compliance.** Support the canonical wire format (varints, I32, I64, LEN records, packed repeated, oneofs, unknown fields) for proto2, proto3, and editions. Group tags are deprecated and need not be generated, but the decoder must preserve them for round-trip fidelity.
 - **Allocator support.** Every generated type is generic over `A: Allocator` using the `allocator-api2` crate. Arena allocators (e.g. `bumpalo`) and custom pools are first-class citizens.
 - **Performance-oriented interface.** Accessors return borrowed references (`&str`, `&[u8]`, `&[T]`), never freshly allocated containers. The `encode_to_vec` / `encode_to_bytes` convenience methods allocate, but `encode_raw` does not.
-- **Rust idioms.** Private fields accessed via generated accessor methods; `Option<&T>` for optional message fields; `Result<EnumType, i32>` for enum accessors; no `unsafe` in user-visible APIs.
+- **Rust idioms.** Private fields accessed via generated accessor methods; `Optional<T, impl HasDefault<T>>` for explicit-presence scalar and string fields; `Option<&M<A>>` for optional message fields; `Result<EnumType, i32>` for enum accessors; no `unsafe` in user-visible APIs.
 - **Implementation flexibility.** The public interface described here must remain stable even if internal storage representations change. For example, presence tracking could use `Option<T>` fields or a per-message bitmask; the accessor API is the same either way.
 - **Nightly toolchain, minimal unstable features.** The `rust-toolchain.toml` pins nightly; no `#![feature(…)]` flags are used in this crate itself.
 
@@ -475,19 +475,24 @@ Setting any variant replaces the whole `Option`; the last field seen on the wire
 
 On the wire, a `LEGACY_REQUIRED` field is indistinguishable from an `EXPLICIT` field; the constraint is schema-level only.
 
-The generated message provides a `validate()` method and a `decode_strict()` wrapper:
+**Accessor API** — same three-accessor pattern as `EXPLICIT`, with two additional methods:
 
 ```rust
-/// Returns Err if any LEGACY_REQUIRED field was absent from the decoded wire data.
-pub fn validate(&self) -> Result<(), DecodeError>;
+// Same as EXPLICIT:
+pub fn owner_id<'s>(&'s self) -> Optional<&'s str, impl HasDefault<&'s str>>;
+pub fn owner_id_raw(&self) -> &str;
+pub fn has_owner_id(&self) -> bool;
+pub fn set_owner_id(&mut self, v: &str);
+pub fn clear_owner_id(&mut self);
 
-/// Decodes and validates in one step.
+// Additional: required-field validation
+pub fn validate(&self) -> Result<(), DecodeError>;
 pub fn decode_strict<B: Buf>(buf: B) -> Result<Self, DecodeError>
 where
     Self: Default + MessageDecode;
 ```
 
-The accessor for a `LEGACY_REQUIRED` field returns `Option<&str>` (or `Option<T>`) — `None` means not seen on the wire. `validate()` converts those `None` values into `Err(DecodeError::MissingRequiredField { field_number })`.
+When a `LEGACY_REQUIRED` field was absent from the wire, `owner_id().is_set()` is `false` and `validate()` returns `Err(DecodeError::MissingRequiredField { field_number })`.
 
 `MessageDecode::decode` does **not** call `validate()` automatically.
 
@@ -672,7 +677,16 @@ Giving `string` and `bytes` fields a lifetime parameter would enable zero-copy d
 
 ### Accessor methods instead of public fields
 
-Public struct fields are simpler but prevent changing internal representations without a breaking API change. Accessor methods decouple the interface from the implementation — for example, presence tracking could move from per-field `Option` to a per-message bitmask without any accessor change.
+Public struct fields are simpler but prevent changing internal representations without a breaking API change. Accessor methods decouple the interface from the implementation — for example, presence tracking could move from per-field `Option<T>` to a per-message bitmask without any change to the accessor signatures.
+
+### `Optional<T, impl HasDefault<T>>` as a concrete struct
+
+Explicit-presence field accessors return `Optional<T, D>` — a concrete struct rather than a trait or `Option<T>` directly.  Key benefits of this design:
+
+- **Default value as compile-time constant.** `D::DEFAULT` is a `const` expression, so the "return default when not set" branch has zero runtime overhead.
+- **No RPIT drop-check restriction.** Because the concrete struct's `Drop` is trivially visible to the borrow checker, `task.title().get()` chains directly without a `let` binding — even for string fields that return `&str`.
+- **Private default provider.** The `D` type is a zero-sized struct defined locally inside the method body, then hidden behind `impl HasDefault<T>` in the return type.  Callers never need to name it.
+- **String defaults without unstable features.** `&'static str` cannot currently be a `const` generic parameter, but `const DEFAULT: &'a str` in a blanket `impl<'a> HasDefault<&'a str>` is fully stable on nightly.
 
 ### Slice-like return type for repeated fields
 
