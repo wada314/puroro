@@ -21,6 +21,11 @@ pub enum DecodeError {
     TruncatedMessage,
     /// Decode recursion exceeded the implementation-defined limit.
     RecursionLimitExceeded,
+    /// A proto2 `required` field was absent from the wire.
+    ///
+    /// This error is only produced by the generated `validate()` method, which
+    /// callers must invoke explicitly after `merge_from` or `decode`.
+    MissingRequiredField { field_number: u32 },
 }
 
 impl ::core::fmt::Display for DecodeError {
@@ -36,6 +41,9 @@ impl ::core::fmt::Display for DecodeError {
             DecodeError::InvalidUtf8 => write!(f, "string field is not valid UTF-8"),
             DecodeError::TruncatedMessage => write!(f, "message was truncated"),
             DecodeError::RecursionLimitExceeded => write!(f, "recursion limit exceeded"),
+            DecodeError::MissingRequiredField { field_number } => {
+                write!(f, "proto2 required field {field_number} was not present")
+            }
         }
     }
 }

@@ -803,3 +803,529 @@ pub mod example {
         }
     }
 }
+
+// =============================================================================
+// proto2 sample
+//
+// Source `.proto` this module corresponds to:
+//
+// ```proto
+// syntax = "proto2";
+// package example;
+//
+// // Closed enum: unknown numeric values must NOT be stored in the typed field;
+// // they are preserved as unknown fields instead.
+// enum Difficulty {
+//     EASY   = 0;
+//     NORMAL = 1;
+//     HARD   = 2;
+// }
+//
+// message PlayerConfig {
+//     required string     player_id  = 1;               // required → validate()
+//     optional int32      score      = 2 [default=100]; // explicit presence + custom default
+//     optional bool       active     = 3;               // explicit presence, default false
+//     repeated int32      levels     = 4 [packed=false];// explicitly non-packed repeated
+//     optional Difficulty difficulty = 5;               // closed enum
+// }
+// ```
+//
+// Key differences from the proto3 sample:
+//
+//   1. `required` fields: stored as `Option<T>` for presence detection; a separate
+//      `validate()` method checks all required fields are `Some(_)`.
+//
+//   2. `optional` scalar fields: stored as `Option<T>`.  The wire default suppression
+//      rule changes — a field is omitted only when `None`, **not** when the value
+//      equals zero.  Zero is a legitimate explicitly-set value.
+//
+//   3. Custom defaults: the accessor `score()` returns the proto-declared default
+//      (100) when the field is `None`, not the Rust zero-default.
+//
+//   4. Closed enum: unknown numeric values are saved as unknown fields rather than
+//      stored in the typed field.
+//
+//   5. Non-packed repeated: each element is a separate VARINT record (one tag per
+//      element) instead of a single LEN record.
+//
+// =============================================================================
+
+pub mod example_proto2 {
+    use ::allocator_api2::alloc::{Allocator, Global};
+    use ::allocator_api2::boxed::Box as ABox;
+    use ::allocator_api2::vec::Vec as AVec;
+    use crate::decode::{self, MessageDecode};
+    use crate::encode::{self, MessageEncode};
+    use crate::error::DecodeError;
+    use crate::wire_type::WireType;
+
+    // =========================================================================
+    // Closed enum: Difficulty
+    //
+    // The enum definition is identical to the open-enum case in proto3.
+    // The difference is purely in how the *decoder* handles unknown values.
+    // =========================================================================
+
+    #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+    #[repr(i32)]
+    pub enum Difficulty {
+        Easy   = 0,
+        Normal = 1,
+        Hard   = 2,
+    }
+
+    impl TryFrom<i32> for Difficulty {
+        type Error = i32;
+        fn try_from(v: i32) -> Result<Self, i32> {
+            match v {
+                0 => Ok(Difficulty::Easy),
+                1 => Ok(Difficulty::Normal),
+                2 => Ok(Difficulty::Hard),
+                other => Err(other),
+            }
+        }
+    }
+
+    impl From<Difficulty> for i32 {
+        fn from(v: Difficulty) -> i32 { v as i32 }
+    }
+
+    // =========================================================================
+    // Message: PlayerConfig (proto2)
+    // =========================================================================
+
+    pub struct PlayerConfig<A: Allocator = Global> {
+        // Field 1: required string player_id
+        // Stored as Option<Box<str, A>> so we can detect absence after decoding.
+        player_id: Option<ABox<str, A>>,
+
+        // Field 2: optional int32 score [default = 100]
+        // None  → not set on wire; accessor returns custom default (100)
+        // Some(v) → explicitly set; accessor returns v, even if v == 0
+        score: Option<i32>,
+
+        // Field 3: optional bool active [default = false]
+        active: Option<bool>,
+
+        // Field 4: repeated int32 levels [packed = false]
+        // Same storage as proto3, but encoded/decoded as individual VARINT records.
+        levels: AVec<i32, A>,
+
+        // Field 5: optional Difficulty difficulty (closed enum)
+        // Unknown values are rejected and routed to _unknown_fields.
+        difficulty: Option<i32>,
+
+        _unknown_fields: AVec<u8, A>,
+        _alloc: A,
+    }
+
+    // ── Constructors ──────────────────────────────────────────────────────────
+
+    impl<A: Allocator + Clone> PlayerConfig<A> {
+        pub fn new_in(alloc: A) -> Self {
+            PlayerConfig {
+                player_id:  None,
+                score:      None,
+                active:     None,
+                levels:     AVec::new_in(alloc.clone()),
+                difficulty: None,
+                _unknown_fields: AVec::new_in(alloc.clone()),
+                _alloc: alloc,
+            }
+        }
+    }
+
+    impl PlayerConfig<Global> {
+        pub fn new() -> Self { Self::new_in(Global) }
+    }
+
+    impl<A: Allocator + Clone + Default> Default for PlayerConfig<A> {
+        fn default() -> Self { Self::new_in(A::default()) }
+    }
+
+    // ── Field accessors ───────────────────────────────────────────────────────
+
+    impl<A: Allocator + Clone> PlayerConfig<A> {
+        // ---- player_id (required string) ----
+
+        /// Returns `None` if the field has not been set or decoded yet.
+        ///
+        /// After decoding, call [`validate`](Self::validate) to ensure a
+        /// `required` field was present on the wire.
+        pub fn player_id(&self) -> Option<&str> {
+            self.player_id.as_deref()
+        }
+
+        pub fn set_player_id(&mut self, v: &str) {
+            self.player_id = Some(decode::str_to_box_in(v, self._alloc.clone()));
+        }
+
+        pub fn clear_player_id(&mut self) {
+            self.player_id = None;
+        }
+
+        // ---- score (optional int32, default = 100) ----
+
+        /// Returns the field value, or the proto-declared default (100) if unset.
+        pub fn score(&self) -> i32 {
+            self.score.unwrap_or(100)
+        }
+
+        /// Returns `true` if the field was explicitly set (even if the value is 0).
+        pub fn has_score(&self) -> bool {
+            self.score.is_some()
+        }
+
+        pub fn set_score(&mut self, v: i32) {
+            self.score = Some(v);
+        }
+
+        pub fn clear_score(&mut self) {
+            self.score = None;
+        }
+
+        // ---- active (optional bool) ----
+
+        pub fn active(&self) -> bool {
+            self.active.unwrap_or(false)
+        }
+
+        pub fn has_active(&self) -> bool {
+            self.active.is_some()
+        }
+
+        pub fn set_active(&mut self, v: bool) {
+            self.active = Some(v);
+        }
+
+        pub fn clear_active(&mut self) {
+            self.active = None;
+        }
+
+        // ---- levels (repeated int32, non-packed) ----
+
+        pub fn levels(&self) -> &[i32] {
+            &self.levels
+        }
+
+        pub fn push_level(&mut self, v: i32) {
+            self.levels.push(v);
+        }
+
+        pub fn clear_levels(&mut self) {
+            self.levels.clear();
+        }
+
+        // ---- difficulty (optional closed enum) ----
+
+        pub fn difficulty_raw(&self) -> Option<i32> {
+            self.difficulty
+        }
+
+        pub fn difficulty(&self) -> Option<Result<Difficulty, i32>> {
+            self.difficulty.map(Difficulty::try_from)
+        }
+
+        pub fn set_difficulty(&mut self, v: Difficulty) {
+            self.difficulty = Some(v as i32);
+        }
+
+        pub fn clear_difficulty(&mut self) {
+            self.difficulty = None;
+        }
+
+        // ---- unknown fields ----
+
+        pub fn unknown_fields(&self) -> &[u8] {
+            &self._unknown_fields
+        }
+
+        // ── Required-field validation ──────────────────────────────────────────
+
+        /// Checks that all `required` fields are present.
+        ///
+        /// Call this after [`MessageDecode::decode`] or [`MessageDecode::merge_from`]
+        /// when decoding a proto2 message.  A missing required field is not an error
+        /// at the wire-format level (the decoder still succeeds), but it violates the
+        /// schema contract.
+        pub fn validate(&self) -> Result<(), DecodeError> {
+            if self.player_id.is_none() {
+                return Err(DecodeError::MissingRequiredField { field_number: 1 });
+            }
+            Ok(())
+        }
+
+    }
+
+    impl<A: Allocator + Clone + Default> PlayerConfig<A> {
+        /// Decodes the message **and** validates required fields in one step.
+        ///
+        /// Equivalent to calling [`MessageDecode::decode`] followed by
+        /// [`validate`](Self::validate).
+        pub fn decode_strict<B: ::bytes::Buf>(buf: B) -> Result<Self, DecodeError> {
+            let msg = <Self as MessageDecode>::decode(buf)?;
+            msg.validate()?;
+            Ok(msg)
+        }
+    }
+
+    // ── MessageEncode ─────────────────────────────────────────────────────────
+
+    impl<A: Allocator + Clone> MessageEncode for PlayerConfig<A> {
+        fn encoded_len(&self) -> usize {
+            let mut len = 0usize;
+
+            // Field 1: required string player_id
+            // Omit if None (field not yet set). On a valid message, validate()
+            // would catch this case before encoding.
+            if let Some(pid) = &self.player_id {
+                len += encode::encoded_len_len_field(1, pid.len());
+            }
+
+            // Field 2: optional int32 score
+            // Proto2 rule: a field is included if and only if it is explicitly set
+            // (Some). Do NOT apply the "omit if zero" rule — zero is a legitimate
+            // explicitly-set value.
+            if let Some(v) = self.score {
+                len += encode::encoded_len_varint_field(2, v as u64);
+            }
+
+            // Field 3: optional bool active
+            if let Some(v) = self.active {
+                len += encode::encoded_len_varint_field(3, v as u64);
+            }
+
+            // Field 4: repeated int32 levels [packed = false]
+            // Each element is its own VARINT record (tag + value).
+            for &v in &self.levels {
+                len += encode::encoded_len_varint_field(4, v as u64);
+            }
+
+            // Field 5: optional closed enum difficulty
+            if let Some(v) = self.difficulty {
+                len += encode::encoded_len_varint_field(5, v as u64);
+            }
+
+            len += self._unknown_fields.len();
+            len
+        }
+
+        fn encode_raw<B: ::bytes::BufMut>(&self, buf: &mut B) {
+            if let Some(pid) = &self.player_id {
+                encode::encode_len_field(1, pid.as_bytes(), buf);
+            }
+            if let Some(v) = self.score {
+                encode::encode_varint_field(2, v as u64, buf);
+            }
+            if let Some(v) = self.active {
+                encode::encode_varint_field(3, v as u64, buf);
+            }
+            // Non-packed: one VARINT record per element.
+            for &v in &self.levels {
+                encode::encode_varint_field(4, v as u64, buf);
+            }
+            if let Some(v) = self.difficulty {
+                encode::encode_varint_field(5, v as u64, buf);
+            }
+            buf.put_slice(&self._unknown_fields);
+        }
+    }
+
+    // ── MessageDecode ─────────────────────────────────────────────────────────
+
+    impl<A: Allocator + Clone + Default> MessageDecode for PlayerConfig<A> {
+        fn merge_from<B: ::bytes::Buf>(&mut self, buf: &mut B) -> Result<(), DecodeError> {
+            use ::bytes::Buf as _;
+            while buf.has_remaining() {
+                let (field_number, wire_type) = decode::decode_tag(buf)?;
+                match (field_number, wire_type) {
+                    // Field 1: required string player_id
+                    (1, WireType::Len) => {
+                        self.player_id =
+                            Some(decode::decode_string_in(buf, self._alloc.clone())?);
+                    }
+                    // Field 2: optional int32 score
+                    // Store as Some(v) regardless of whether v == 0.
+                    (2, WireType::Varint) => {
+                        self.score = Some(decode::decode_varint(buf)? as i32);
+                    }
+                    // Field 3: optional bool active
+                    (3, WireType::Varint) => {
+                        self.active = Some(decode::decode_varint(buf)? != 0);
+                    }
+                    // Field 4: repeated int32 levels (non-packed)
+                    // Parses one element per record. The decoder must also handle
+                    // the packed form (a single LEN record) for forward-compat:
+                    (4, WireType::Varint) => {
+                        self.levels.push(decode::decode_varint(buf)? as i32);
+                    }
+                    (4, WireType::Len) => {
+                        // Accept packed encoding even though the field declares [packed=false].
+                        // The proto spec requires parsers to accept both forms.
+                        let payload_len = decode::decode_varint(buf)? as usize;
+                        if buf.remaining() < payload_len {
+                            return Err(DecodeError::TruncatedMessage);
+                        }
+                        let leftover = {
+                            let mut sub = (&mut *buf).take(payload_len);
+                            while sub.has_remaining() {
+                                self.levels.push(decode::decode_varint(&mut sub)? as i32);
+                            }
+                            sub.remaining()
+                        };
+                        if leftover > 0 { buf.advance(leftover); }
+                    }
+                    // Field 5: optional Difficulty (CLOSED enum)
+                    // Unknown values are treated as unknown fields, not stored in the
+                    // typed field. This is the defining difference from open (proto3)
+                    // enums.
+                    (5, WireType::Varint) => {
+                        let raw = decode::decode_varint(buf)? as i32;
+                        if Difficulty::try_from(raw).is_ok() {
+                            self.difficulty = Some(raw);
+                        } else {
+                            // Unknown value → preserve as unknown field for round-trip.
+                            decode::save_unknown_varint_field(
+                                5,
+                                raw as u64,
+                                &mut self._unknown_fields,
+                            );
+                        }
+                    }
+                    _ => {
+                        decode::skip_field_and_save(
+                            field_number,
+                            wire_type,
+                            buf,
+                            &mut self._unknown_fields,
+                        )?;
+                    }
+                }
+            }
+            Ok(())
+        }
+    }
+
+    // =========================================================================
+    // Tests
+    // =========================================================================
+
+    #[cfg(test)]
+    mod tests {
+        // `MessageDecode` and `MessageEncode` are accessible here without an
+        // explicit `use` because `tests` is a child module of `example_proto2`.
+        use super::*;
+
+        fn round_trip(p: &PlayerConfig) -> PlayerConfig {
+            let bytes = p.encode_to_vec();
+            PlayerConfig::decode(::bytes::Bytes::from(bytes)).unwrap()  // PlayerConfig = PlayerConfig<Global>
+        }
+
+        #[test]
+        fn required_field_missing_fails_validate() {
+            let p = PlayerConfig::new();
+            assert_eq!(
+                p.validate(),
+                Err(crate::error::DecodeError::MissingRequiredField { field_number: 1 }),
+            );
+        }
+
+        #[test]
+        fn required_field_present_passes_validate() {
+            let mut p = PlayerConfig::new();
+            p.set_player_id("user-42");
+            assert!(p.validate().is_ok());
+        }
+
+        #[test]
+        fn decode_strict_rejects_missing_required() {
+            // An empty wire buffer decodes fine but validate() should catch the
+            // missing required field.
+            let result: Result<PlayerConfig, _> = PlayerConfig::decode_strict(::bytes::Bytes::new());
+            assert!(matches!(
+                result,
+                Err(crate::error::DecodeError::MissingRequiredField { field_number: 1 })
+            ));
+        }
+
+        #[test]
+        fn optional_scalar_zero_is_different_from_unset() {
+            // score = 0 is a valid, explicitly-set value and must survive the round-trip.
+            let mut p = PlayerConfig::new();
+            p.set_player_id("u1");
+            p.set_score(0);
+
+            let p2 = round_trip(&p);
+            assert!(p2.has_score(), "score should be present");
+            assert_eq!(p2.score(), 0, "explicitly-set zero must round-trip");
+        }
+
+        #[test]
+        fn optional_scalar_unset_returns_custom_default() {
+            // score field is absent → accessor returns the proto-declared default 100.
+            let p = PlayerConfig::new();
+            assert!(!p.has_score());
+            assert_eq!(p.score(), 100, "custom default must be returned when unset");
+        }
+
+        #[test]
+        fn non_packed_repeated_round_trips() {
+            let mut p = PlayerConfig::new();
+            p.set_player_id("u1");
+            p.push_level(10);
+            p.push_level(20);
+            p.push_level(30);
+
+            let p2 = round_trip(&p);
+            assert_eq!(p2.levels(), &[10, 20, 30]);
+        }
+
+        #[test]
+        fn non_packed_repeated_accepts_packed_encoding() {
+            // A newer version of the schema might declare the field packed; the
+            // decoder must still accept it.
+            let mut raw = Vec::new();
+            // Encode levels [10, 20] as packed LEN record for field 4.
+            let payload: Vec<u8> = {
+                let mut v = Vec::new();
+                crate::encode::encode_varint(10, &mut v);
+                crate::encode::encode_varint(20, &mut v);
+                v
+            };
+            crate::encode::encode_len_field(4, &payload, &mut raw);
+            // Also include the required player_id field.
+            crate::encode::encode_len_field(1, b"u1", &mut raw);
+
+            let p: PlayerConfig = PlayerConfig::decode(::bytes::Bytes::from(raw)).unwrap();
+            assert_eq!(p.levels(), &[10, 20]);
+        }
+
+        #[test]
+        fn closed_enum_known_value_round_trips() {
+            let mut p = PlayerConfig::new();
+            p.set_player_id("u1");
+            p.set_difficulty(Difficulty::Hard);
+
+            let p2 = round_trip(&p);
+            assert_eq!(p2.difficulty(), Some(Ok(Difficulty::Hard)));
+        }
+
+        #[test]
+        fn closed_enum_unknown_value_goes_to_unknown_fields() {
+            // Encode a raw difficulty value of 99 (not defined in the enum).
+            let mut raw = Vec::new();
+            crate::encode::encode_len_field(1, b"u1", &mut raw);
+            crate::encode::encode_varint_field(5, 99, &mut raw);
+
+            let p: PlayerConfig = PlayerConfig::decode(::bytes::Bytes::from(raw)).unwrap();
+            // The typed field must be empty.
+            assert!(p.difficulty().is_none(), "unknown value must not be stored in typed field");
+            // The unknown bytes must be non-empty (the value was preserved).
+            assert!(!p.unknown_fields().is_empty(), "unknown value must be saved");
+
+            // The unknown field must survive a re-encode → decode round-trip.
+            let p2 = round_trip(&p);
+            assert_eq!(p.unknown_fields(), p2.unknown_fields());
+        }
+    }
+}
