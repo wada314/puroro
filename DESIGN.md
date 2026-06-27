@@ -88,15 +88,32 @@ pub struct Optional<T: Copy, D: HasDefault<T>> { … }
 
 impl<T: Copy, D: HasDefault<T>> Optional<T, D> {
     pub fn new(value: Option<T>, _tag: D) -> Self;
-    pub fn get(&self) -> T;            // value or proto-declared default
-    pub fn get_opt(&self) -> Option<T>; // None when not set
+
+    /// Value or proto-declared default; always returns something meaningful.
+    pub fn get(&self) -> T;
+
+    /// True when explicitly set; false when using the proto default.
     pub fn is_set(&self) -> bool;
+
+    // No get_opt() / From<Optional> for Option<T>:
+    // Converting to Option<T> would conflate "not set" with "no value",
+    // undermining the default-value semantics of Optional.
 }
 ```
 
 `Optional` is a **concrete struct** (not a trait), so the borrow checker can always verify its trivial drop — enabling direct chaining for both scalar and string accessors.
 
-The concrete `D` type is a private zero-sized struct defined locally inside the accessor method body.  The return type in generated code uses `impl HasDefault<T>` in the second type-parameter position to keep `D` opaque:
+**No `Option<T>` conversion is provided.**  Proto explicit-presence fields always carry a meaningful value (either the explicit value or the declared default).  If presence matters, call `is_set()` first:
+
+```rust
+if task.max_retries().is_set() {
+    // get() returns the explicit value
+} else {
+    // get() still works — returns the proto default (3)
+}
+```
+
+The concrete `D` type is a private zero-sized struct defined locally inside the accessor method body.  The return type uses `impl HasDefault<T>` to keep `D` opaque:
 
 ```rust
 pub fn max_retries(&self) -> Optional<i32, impl HasDefault<i32>> { … }
@@ -105,6 +122,7 @@ pub fn title<'s>(&'s self) -> Optional<&'s str, impl HasDefault<&'s str>> { … 
 // Both chain directly without a let binding:
 let n: i32  = task.max_retries().get();
 let s: &str = task.title().get();
+if task.max_retries().is_set() { … }
 ```
 
 ### `MessageEncode`
@@ -254,7 +272,7 @@ Three accessors are generated:
 
 | Method | Return type | Description |
 |---|---|---|
-| `max_retries()` | `Optional<i32, impl HasDefault<i32>>` | Rich view: `get()`, `get_opt()`, `is_set()` |
+| `max_retries()` | `Optional<i32, impl HasDefault<i32>>` | `get()` and `is_set()` |
 | `max_retries_raw()` | `i32` | Direct value with default applied; no wrapper |
 | `has_max_retries()` | `bool` | Presence check |
 
@@ -267,10 +285,9 @@ The `[default = 3]` option means `max_retries().get()` and `max_retries_raw()` r
 Because `Optional` is a concrete struct with no custom `Drop`, chaining compiles directly:
 
 ```rust
-let n: i32 = task.max_retries().get();   // ok
-if task.max_retries().is_set() { … }     // ok
-match task.max_retries().get_opt() { … } // ok
-let n: i32 = task.max_retries_raw();     // ok — bypasses Optional
+let n: i32 = task.max_retries().get();  // value or default
+if task.max_retries().is_set() { … }    // presence check
+let n: i32 = task.max_retries_raw();   // bypasses Optional
 ```
 
 #### Scalar type mapping
@@ -302,16 +319,16 @@ String fields always yield a borrowed `&str`. The internal storage type is an im
 
 | Method | Return type | Description |
 |---|---|---|
-| `title()` | `Optional<&'s str, impl HasDefault<&'s str>>` | Rich view: `get()`, `get_opt()`, `is_set()` |
+| `title()` | `Optional<&'s str, impl HasDefault<&'s str>>` | `get()` and `is_set()` |
 | `title_raw()` | `&str` | Direct `&str` with default applied |
 | `has_title()` | `bool` | Presence check |
 
 Because `Optional` is a concrete struct, chaining compiles directly for string fields too:
 
 ```rust
-let s: &str = task.title().get();          // ok
-if task.title().is_set() { … }             // ok
-let s: &str = task.title_raw();            // ok — bypasses Optional
+let s: &str = task.title().get();   // value or default
+if task.title().is_set() { … }      // presence check
+let s: &str = task.title_raw();     // bypasses Optional
 ```
 
 Wire rule: absent when `has_title()` is false (EXPLICIT) or `""` (IMPLICIT).
@@ -324,7 +341,7 @@ Bytes fields follow the same three-accessor pattern as strings, with `&[u8]` as 
 
 **Explicit presence:**
 
-- `payload()` → `Optional<&'s [u8], impl HasDefault<&'s [u8]>>` (`.get()`, `.get_opt()`, `.is_set()`)
+- `payload()` → `Optional<&'s [u8], impl HasDefault<&'s [u8]>>` (`.get()`, `.is_set()`)
 - `payload_raw()` → `&[u8]` (direct, with default applied)
 - `has_payload()` → `bool`
 
@@ -478,7 +495,7 @@ On the wire, a `LEGACY_REQUIRED` field is indistinguishable from an `EXPLICIT` f
 **Accessor API** — same three-accessor pattern as `EXPLICIT`, with two additional methods:
 
 ```rust
-// Same as EXPLICIT:
+// Same three-accessor pattern as EXPLICIT:
 pub fn owner_id<'s>(&'s self) -> Optional<&'s str, impl HasDefault<&'s str>>;
 pub fn owner_id_raw(&self) -> &str;
 pub fn has_owner_id(&self) -> bool;
@@ -685,6 +702,7 @@ Explicit-presence field accessors return `Optional<T, D>` — a concrete struct 
 
 - **Default value as compile-time constant.** `D::DEFAULT` is a `const` expression, so the "return default when not set" branch has zero runtime overhead.
 - **No RPIT drop-check restriction.** Because the concrete struct's `Drop` is trivially visible to the borrow checker, `task.title().get()` chains directly without a `let` binding — even for string fields that return `&str`.
+- **No `Option<T>` conversion.** `Optional` provides only `get()` and `is_set()` — no `get_opt()` and no `From`/`Into` for `Option<T>`.  Proto explicit-presence fields always carry a meaningful value (explicit or default); converting to `Option<T>` would conflate "not set" with "no value" and make the declared default impossible to enforce.
 - **Private default provider.** The `D` type is a zero-sized struct defined locally inside the method body, then hidden behind `impl HasDefault<T>` in the return type.  Callers never need to name it.
 - **String defaults without unstable features.** `&'static str` cannot currently be a `const` generic parameter, but `const DEFAULT: &'a str` in a blanket `impl<'a> HasDefault<&'a str>` is fully stable on nightly.
 

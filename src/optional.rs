@@ -65,12 +65,21 @@ impl<T: Copy, D: HasDefault<T>> Optional<T, D> {
         Self { value, _phantom: PhantomData }
     }
 
-    /// Returns the value, or the proto-declared default when not set.
+    /// Returns the field's value, or the proto-declared default when not set.
+    ///
+    /// This is the primary accessor.  The returned value is always meaningful —
+    /// callers never receive a "nothing" result.  Use [`is_set`](Self::is_set)
+    /// separately if you need to distinguish "explicitly set" from "default".
     pub fn get(&self) -> T { self.value.unwrap_or(D::DEFAULT) }
 
-    /// Returns `Some(value)` if set, `None` if not set (no default applied).
-    pub fn get_opt(&self) -> Option<T> { self.value }
-
-    /// Returns `true` if the field was explicitly set.
+    /// Returns `true` if the field was explicitly set on the wire.
+    ///
+    /// # Note on `Option` conversion
+    ///
+    /// `Optional<T, D>` intentionally provides no method that returns
+    /// `Option<T>`.  Proto explicit-presence fields always carry a meaningful
+    /// value (either the set value or the declared default); mapping to
+    /// `Option` would conflate "not set" with "no value", making the
+    /// default-value semantics impossible to enforce at the type level.
     pub fn is_set(&self) -> bool { self.value.is_some() }
 }

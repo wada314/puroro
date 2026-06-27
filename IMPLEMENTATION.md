@@ -247,6 +247,7 @@ pub fn max_retries(&self) -> ::puroro::Optional<i32, impl ::puroro::HasDefault<i
     struct Default3;
     impl ::puroro::HasDefault<i32> for Default3 { const DEFAULT: i32 = 3; }
     ::puroro::Optional::new(self.max_retries, Default3)
+    // Note: Optional exposes only get() and is_set() — no get_opt() or From<Option>
 }
 
 pub fn max_retries_raw(&self) -> i32 { self.max_retries.unwrap_or(3) }
@@ -257,6 +258,8 @@ pub fn clear_max_retries(&mut self) { self.max_retries = None; }
 
 Because `Optional<i32, Default3>` is a concrete struct with no custom `Drop`,
 `task.max_retries().get()` chains directly without a `let` binding.
+No `get_opt()` is provided: `Optional` is intentionally not convertible to `Option<T>`
+to preserve the default-value semantics.
 
 ### 6.3 String fields
 
