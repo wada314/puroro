@@ -8,14 +8,15 @@ This document describes the design of the `puroro` Protocol Buffers runtime libr
 2. [Wire format overview](#2-wire-format-overview)
 3. [Runtime trait API](#3-runtime-trait-api)
 4. [Generated code specification](#4-generated-code-specification)
-   - 4.1 [Scalar fields](#41-scalar-fields)
+   - 4.1 [Scalar fields](#41-scalar-fields) — implicit vs explicit presence, all numeric types
    - 4.2 [String fields](#42-string-fields)
    - 4.3 [Bytes fields](#43-bytes-fields)
-   - 4.4 [Repeated fields](#44-repeated-fields)
+   - 4.4 [Repeated fields](#44-repeated-fields) — packed vs non-packed, dual-form decode
    - 4.5 [Nested message fields](#45-nested-message-fields)
-   - 4.6 [Enum fields](#46-enum-fields)
+   - 4.6 [Enum fields](#46-enum-fields) — open (proto3) vs closed (proto2)
    - 4.7 [Oneof fields](#47-oneof-fields)
-   - 4.8 [Unknown fields](#48-unknown-fields)
+   - 4.8 [Required fields (proto2 only)](#48-required-fields-proto2-only)
+   - 4.9 [Unknown fields](#49-unknown-fields)
 5. [Allocator design](#5-allocator-design)
    - 5.1 [Chosen design: single type parameter](#51-chosen-design-single-type-parameter)
    - 5.2 [Alternative: per-field allocator type parameters](#52-alternative-per-field-allocator-type-parameters)
@@ -125,148 +126,262 @@ The primary operation is *merge*, not *decode-from-scratch*. This matches protob
 
 ## 4. Generated code specification
 
-Reference proto file for this section:
+This section is the normative reference for what the code generator emits.  Each subsection covers the pattern for **all syntax versions** (proto3, proto2, and editions).  The two reference schemas used throughout are:
+
+**proto3 reference** (`src/sample.rs` → `example`):
 
 ```protobuf
 syntax = "proto3";
 package example;
 
-enum PhoneType {
-    PHONE_TYPE_UNSPECIFIED = 0;
-    MOBILE = 1;
-    HOME   = 2;
-    WORK   = 3;
-}
+enum PhoneType { PHONE_TYPE_UNSPECIFIED = 0; MOBILE = 1; HOME = 2; WORK = 3; }
 
-message Address {
-    string street = 1;
-    string city   = 2;
-}
+message Address { string street = 1; string city = 2; }
 
 message Person {
-    string          name               = 1;
-    int32           age                = 2;
+    string          name               = 1;   // implicit presence
+    int32           age                = 2;   // implicit presence
     bytes           avatar             = 3;
-    repeated string emails             = 4;
+    repeated string emails             = 4;   // packed not applicable (string)
     Address         address            = 5;
-    PhoneType       primary_phone_type = 6;
-    oneof contact_method {
-        string phone_number = 7;
-        string fax_number   = 8;
-    }
+    PhoneType       primary_phone_type = 6;   // open enum
+    oneof contact_method { string phone_number = 7; string fax_number = 8; }
 }
 ```
 
-The full compilable code is in `src/sample.rs`. The subsections below explain each pattern.
+**proto2 reference** (`src/sample.rs` → `example_proto2`):
+
+```protobuf
+syntax = "proto2";
+package example;
+
+enum Difficulty { EASY = 0; NORMAL = 1; HARD = 2; }  // closed enum
+
+message PlayerConfig {
+    required string     player_id  = 1;
+    optional int32      score      = 2 [default = 100];
+    optional bool       active     = 3;
+    repeated int32      levels     = 4 [packed = false];  // non-packed
+    optional Difficulty difficulty = 5;                   // closed enum
+}
+```
+
+The subsections below document all field patterns, noting where proto2 or editions introduce a different variant.
+
+---
 
 ### 4.1 Scalar fields
 
-Proto3 scalar types map to Rust copy types. The accessor returns by value.
+Scalar types are copy types in Rust (`i32`, `bool`, `f32`, …).  The key variation across syntax versions is **field presence**: whether the field tracks "has been explicitly set" or just holds a value.
+
+#### Implicit presence (proto3 default / editions `IMPLICIT`)
+
+The field is stored as a plain `T`.  A value equal to the language default (0 / `false` / 0.0) is treated as "not set" and **omitted from the wire**.
 
 ```rust
 // Proto:  int32 age = 2;
-// Field:
 age: i32,
 
-// Accessors:
 pub fn age(&self) -> i32 { self.age }
 pub fn set_age(&mut self, v: i32) { self.age = v; }
 ```
 
-**Encoding** uses `encode_varint_field(field_number, v as u64, buf)`. The field is **omitted** when it equals the proto3 default (`0` for integers, `false` for bools).
+Encode:
+```rust
+if self.age != 0 {
+    encode_varint_field(2, self.age as u64, buf);
+}
+```
 
-**Decoding** reads `decode_varint(buf)? as i32`. The match arm is:
+Decode:
 ```rust
 (2, WireType::Varint) => { self.age = decode_varint(buf)? as i32; }
 ```
 
-**Extension to other integer types:**
+#### Explicit presence (proto2 `optional` / proto3 `optional` keyword / editions `EXPLICIT`)
 
-| Proto type | Decode expression | `as u64` cast for encode |
-|---|---|---|
-| `int64` | `decode_varint(buf)? as i64` | `v as u64` |
-| `uint32` | `decode_varint(buf)? as u32` | `v as u64` |
-| `uint64` | `decode_varint(buf)?` | `v` |
-| `sint32` | `unzigzag32(decode_varint(buf)?)` | `zigzag32(v)` |
-| `sint64` | `unzigzag64(decode_varint(buf)?)` | `zigzag64(v)` |
-| `bool` | `decode_varint(buf)? != 0` | `v as u64` |
-| `float` | `f32::from_bits(buf.get_u32_le())` (WireType::I32) | — |
-| `double` | `f64::from_bits(buf.get_u64_le())` (WireType::I64) | — |
-| `fixed32` | `buf.get_u32_le()` (WireType::I32) | — |
-| `fixed64` | `buf.get_u64_le()` (WireType::I64) | — |
-| `sfixed32` | `buf.get_i32_le()` (WireType::I32) | — |
-| `sfixed64` | `buf.get_i64_le()` (WireType::I64) | — |
+The field is stored as `Option<T>`.  Presence is tracked independently of the value: `Some(0)` means "explicitly set to zero" and is **included** on the wire; `None` means "not set" and is **omitted**.  A custom proto2 default value (e.g. `[default = 100]`) affects only the *accessor*, not the stored `None`.
+
+```rust
+// Proto2:  optional int32 score = 2 [default = 100];
+score: Option<i32>,
+
+// Accessor returns the proto-declared default when unset:
+pub fn score(&self) -> i32 { self.score.unwrap_or(100) }
+pub fn has_score(&self) -> bool { self.score.is_some() }
+pub fn set_score(&mut self, v: i32) { self.score = Some(v); }
+pub fn clear_score(&mut self) { self.score = None; }
+```
+
+Encode (note: includes value even if it is 0):
+```rust
+if let Some(v) = self.score {
+    encode_varint_field(2, v as u64, buf);
+}
+```
+
+Decode (stores `Some(v)` regardless of value):
+```rust
+(2, WireType::Varint) => { self.score = Some(decode_varint(buf)? as i32); }
+```
+
+#### Extension to all scalar types
+
+The table below shows the decode expression and encode cast for every scalar type.  The implicit/explicit presence pattern from above applies to all of them uniformly; only the wire encoding differs.
+
+| Proto type | Wire type | Decode expression | Encode: `v` as `u64` |
+|---|---|---|---|
+| `int32` | VARINT | `decode_varint(buf)? as i32` | `v as u64` |
+| `int64` | VARINT | `decode_varint(buf)? as i64` | `v as u64` |
+| `uint32` | VARINT | `decode_varint(buf)? as u32` | `v as u64` |
+| `uint64` | VARINT | `decode_varint(buf)?` | `v` |
+| `sint32` | VARINT | `unzigzag32(decode_varint(buf)?)` | `zigzag32(v)` |
+| `sint64` | VARINT | `unzigzag64(decode_varint(buf)?)` | `zigzag64(v)` |
+| `bool` | VARINT | `decode_varint(buf)? != 0` | `v as u64` |
+| `float` | I32 | `f32::from_bits(buf.get_u32_le())` | *(use `encode_i32_field`)* |
+| `double` | I64 | `f64::from_bits(buf.get_u64_le())` | *(use `encode_i64_field`)* |
+| `fixed32` | I32 | `buf.get_u32_le()` | *(use `encode_i32_field`)* |
+| `fixed64` | I64 | `buf.get_u64_le()` | *(use `encode_i64_field`)* |
+| `sfixed32` | I32 | `buf.get_i32_le()` | *(use `encode_i32_field`)* |
+| `sfixed64` | I64 | `buf.get_i64_le()` | *(use `encode_i64_field`)* |
+
+For I32/I64 types: omit on wire when `None` (explicit presence) or when value is the zero-bit pattern (implicit presence, e.g. `0.0f32`, `0u32`).
+
+---
 
 ### 4.2 String fields
 
-Strings are stored as `Box<str, A>` (2 words: pointer + byte length, no capacity), and exposed via `&str` accessors.
+Strings are stored as `Box<str, A>` (pointer + byte length, no capacity word) and exposed via `&str` accessors.  The storage and accessor pattern is identical across all syntax versions; only the **wire omission rule** differs.
 
 ```rust
-// Field:
+// Field (all syntax versions):
 name: allocator_api2::boxed::Box<str, A>,
 
-// Accessors:
 pub fn name(&self) -> &str { &self.name }
 pub fn set_name(&mut self, v: &str) {
     self.name = puroro::decode::str_to_box_in(v, self._alloc.clone());
 }
 ```
 
-The helper `str_to_box_in(s: &str, alloc: A) -> Box<str, A>` allocates a `Vec<u8, A>`, copies the bytes, then transmutes to `Box<str, A>` (one unsafe block, hidden in the runtime library).
+The helper `str_to_box_in(s: &str, alloc: A) -> Box<str, A>` is provided by the runtime library.
 
-An **empty string** is the proto3 default; it is **omitted** from the wire.
+**Wire omission:**
+
+| Presence mode | Omit from wire when… |
+|---|---|
+| Implicit (proto3 default) | value is the empty string `""` |
+| Explicit (proto2 `optional` / proto3 `optional` keyword) | field stores `None` (use `Option<Box<str, A>>`) |
+
+For explicit-presence strings, the field type and accessors follow the same `Option<T>` pattern as scalar fields in §4.1, with `Box<str, A>` in place of the scalar type and `""` as the conceptual zero-value.
+
+**Decode:** Uses `decode_string_in(buf, alloc)` which validates UTF-8 and returns `Box<str, A>`.
+
+---
 
 ### 4.3 Bytes fields
 
-Bytes fields are stored as `Vec<u8, A>` (3 words, but allows incremental appending) and exposed via `&[u8]`.
+`bytes` fields are stored as `Vec<u8, A>` and exposed via `&[u8]`.  The same implicit/explicit presence distinction from §4.1–4.2 applies.
 
 ```rust
-// Field:
+// Implicit presence (proto3 default):
 avatar: allocator_api2::vec::Vec<u8, A>,
 
-// Accessors:
 pub fn avatar(&self) -> &[u8] { &self.avatar }
 pub fn set_avatar(&mut self, v: &[u8]) {
     self.avatar.clear();
     self.avatar.extend_from_slice(v);
 }
+// Omit from wire when empty.
+
+// Explicit presence (proto2 optional / proto3 optional keyword):
+avatar: Option<allocator_api2::vec::Vec<u8, A>>,
+pub fn avatar(&self) -> Option<&[u8]> { self.avatar.as_deref() }
+pub fn has_avatar(&self) -> bool { self.avatar.is_some() }
+// Omit from wire when None; include even if the Vec is empty.
 ```
+
+**Decode:** Uses `decode_bytes_in(buf, alloc)` which returns `Vec<u8, A>`.
+
+---
 
 ### 4.4 Repeated fields
 
-Repeated fields are stored as `Vec<Element, A>`. The accessor returns `&[Element]` — **not** a `Vec` — so callers get O(1) random access without triggering a re-allocation.
+Repeated fields are always stored as `Vec<Element, A>` regardless of syntax version.  The accessor returns `&[Element]` — **not** `Vec` — for O(1) access without allocation.
 
 ```rust
-// Proto:  repeated string emails = 4;
-// Field:
+// Repeated string (proto3 example):
 emails: allocator_api2::vec::Vec<allocator_api2::boxed::Box<str, A>, A>,
 
-// Accessors:
 pub fn emails(&self) -> &[allocator_api2::boxed::Box<str, A>] { &self.emails }
 pub fn push_email(&mut self, v: &str) { self.emails.push(str_to_box_in(v, self._alloc.clone())); }
 pub fn clear_emails(&mut self) { self.emails.clear(); }
 ```
 
-Because `Box<str, A>: Deref<Target = str>`, iterating produces values that coerce to `&str`:
-
+Because `Box<str, A>: Deref<Target = str>`, iteration with deref coercion works:
 ```rust
 for email in person.emails() {
     let s: &str = email;  // deref coercion — no copy
-    println!("{email}");  // Box<str, A>: Display via Box<T: Display>
 }
 ```
 
-**Packed repeated scalars** (e.g. `repeated int32`) are encoded as a single LEN record. Decoding handles both packed and non-packed forms, as required by the proto3 spec. The helpers `encode_packed_varint_field` / `encoded_len_packed_varint_field` are provided by the runtime.
+#### Packed vs non-packed encoding
+
+The default packing behaviour depends on syntax version and field type:
+
+| Syntax | Packable numeric `repeated` field | Default encoding |
+|---|---|---|
+| proto3 | Yes | **Packed** (single LEN record) |
+| proto2 | No (unless `[packed = true]`) | **Non-packed** (one record per element) |
+| editions | Controlled by `features.repeated_field_encoding` | |
+
+**Packed encode** (proto3 default for numeric types):
+```rust
+encode_packed_varint_field(3, &self.levels, |v| *v as u64, buf);
+```
+
+**Non-packed encode** (proto2 default, or editions `EXPANDED`):
+```rust
+for &v in &self.levels {
+    encode_varint_field(3, v as u64, buf);  // one tag per element
+}
+```
+
+#### Dual-form decode (required by the spec)
+
+**Regardless of what the schema declares**, the decoder must accept *both* packed and non-packed forms for all numeric repeated fields.  This ensures forward- and backward-compatibility when the `packed` option changes.
+
+```rust
+// Field 4: repeated int32 levels — accepts both forms
+(4, WireType::Varint) => {
+    // Non-packed: one element per record
+    self.levels.push(decode_varint(buf)? as i32);
+}
+(4, WireType::Len) => {
+    // Packed: all elements in one LEN payload
+    let payload_len = decode_varint(buf)? as usize;
+    let leftover = {
+        let mut sub = (&mut *buf).take(payload_len);
+        while sub.has_remaining() {
+            self.levels.push(decode_varint(&mut sub)? as i32);
+        }
+        sub.remaining()
+    };
+    if leftover > 0 { buf.advance(leftover); }
+}
+```
+
+Repeated **string** and **message** fields cannot be packed; they always use one LEN record per element.
+
+---
 
 ### 4.5 Nested message fields
 
-Message fields are `Option<Box<M<A>, A>>` (`None` = not set). Boxing avoids infinite-size structs for mutually recursive messages and keeps the parent message compact.
+Message fields are always represented as `Option<Box<M<A>, A>>` regardless of syntax version (`None` = not set).  Boxing prevents infinite-size structs for recursive types and keeps the parent compact.
 
 ```rust
-// Field:
+// Field (proto3 and proto2):
 address: Option<allocator_api2::boxed::Box<Address<A>, A>>,
 
-// Accessors:
 pub fn address(&self) -> Option<&Address<A>> { self.address.as_deref() }
 pub fn address_mut(&mut self) -> &mut Address<A> {
     self.address.get_or_insert_with(|| {
@@ -279,11 +394,12 @@ pub fn set_address(&mut self, v: Address<A>) {
 pub fn clear_address(&mut self) { self.address = None; }
 ```
 
-**Decode** uses `buf.take(len)` to limit the sub-buffer to exactly the declared length, matching the proto3 spec for nested message parsing:
+**Decode** bounds the sub-message read to exactly the declared byte length using `Buf::take`:
 
 ```rust
 (5, WireType::Len) => {
     let len = decode_varint(buf)? as usize;
+    if buf.remaining() < len { return Err(DecodeError::TruncatedMessage); }
     let addr = self.address.get_or_insert_with(|| { /* create default */ });
     let leftover = {
         let mut sub_buf = (&mut *buf).take(len);
@@ -294,21 +410,26 @@ pub fn clear_address(&mut self) { self.address = None; }
 }
 ```
 
-Merging into an existing sub-message (rather than replacing it) correctly implements protobuf's "concatenation = merge" semantics.
+Merging into an *existing* sub-message (rather than replacing it) implements protobuf's "concatenated messages = merged message" semantics, which applies identically in proto2, proto3, and editions.
+
+---
 
 ### 4.6 Enum fields
 
-Proto3 enums are **open**: the wire may carry numeric values not listed in the definition. The field is stored as `i32`; a typed accessor wraps it in `Result<MyEnum, i32>`.
+The wire encoding of enums is always VARINT.  The difference between syntax versions is whether unknown numeric values are *accepted* (open) or *rejected into unknown fields* (closed).
+
+#### Open enum (proto3 / editions `OPEN`)
+
+The field is stored as plain `i32`; unknown values are stored transparently.
 
 ```rust
 // Field:
 primary_phone_type: i32,
 
-// Raw access (always available):
 pub fn primary_phone_type_raw(&self) -> i32 { self.primary_phone_type }
 pub fn set_primary_phone_type_raw(&mut self, v: i32) { self.primary_phone_type = v; }
 
-// Typed access (returns Err(i32) for unknown values):
+// Typed accessor wraps the raw value:
 pub fn primary_phone_type(&self) -> Result<PhoneType, i32> {
     PhoneType::try_from(self.primary_phone_type)
 }
@@ -317,17 +438,70 @@ pub fn set_primary_phone_type(&mut self, v: PhoneType) {
 }
 ```
 
-The generated enum implements `TryFrom<i32>` and `From<EnumType> for i32`.
+Decode:
+```rust
+(6, WireType::Varint) => {
+    self.primary_phone_type = decode_varint(buf)? as i32;  // accept any value
+}
+```
+
+Encode (implicit presence — omit when 0):
+```rust
+if self.primary_phone_type != 0 {
+    encode_varint_field(6, self.primary_phone_type as u64, buf);
+}
+```
+
+#### Closed enum (proto2 / editions `CLOSED`)
+
+The field is stored as `Option<i32>` (`None` = not set, or a known value is present).  Unknown numeric values are diverted to `_unknown_fields` so they survive a round-trip.
+
+```rust
+// Field:
+difficulty: Option<i32>,
+
+pub fn difficulty_raw(&self) -> Option<i32> { self.difficulty }
+
+// Typed accessor returns None when the field is unset:
+pub fn difficulty(&self) -> Option<Result<Difficulty, i32>> {
+    self.difficulty.map(Difficulty::try_from)
+}
+pub fn set_difficulty(&mut self, v: Difficulty) { self.difficulty = Some(v as i32); }
+pub fn clear_difficulty(&mut self) { self.difficulty = None; }
+```
+
+Decode (unknown values → unknown fields via runtime helper):
+```rust
+(5, WireType::Varint) => {
+    let raw = decode_varint(buf)? as i32;
+    if Difficulty::try_from(raw).is_ok() {
+        self.difficulty = Some(raw);
+    } else {
+        save_unknown_varint_field(5, raw as u64, &mut self._unknown_fields);
+    }
+}
+```
+
+Encode (explicit presence — omit when `None`; always include when `Some`):
+```rust
+if let Some(v) = self.difficulty {
+    encode_varint_field(5, v as u64, buf);
+}
+```
+
+The generated enum type (`TryFrom<i32>` + `From<EnumType> for i32`) is identical between open and closed; only the decode arm differs.
+
+---
 
 ### 4.7 Oneof fields
 
-Each `oneof` group is represented as an `Option<SomeEnum<A>>` where the enum is placed in a submodule named after the parent message (lower-snake-case).
+Each `oneof` group is represented as `Option<SomeEnum<A>>` in the parent struct, with the enum placed in a submodule named after the parent message (lower-snake-case).  This pattern is identical across all syntax versions.
 
 ```rust
 // In module `person`:
 pub enum ContactMethod<A: Allocator = Global> {
-    PhoneNumber(Box<str, A>),
-    FaxNumber(Box<str, A>),
+    PhoneNumber(Box<str, A>),   // field 7
+    FaxNumber(Box<str, A>),     // field 8
 }
 
 // Field in Person:
@@ -337,16 +511,55 @@ contact_method: Option<person::ContactMethod<A>>,
 pub fn contact_method(&self) -> Option<&person::ContactMethod<A>>;
 pub fn contact_method_mut(&mut self) -> Option<&mut person::ContactMethod<A>>;
 pub fn set_contact_method(&mut self, v: Option<person::ContactMethod<A>>);
-// Convenience setters for individual variants:
-pub fn set_phone_number(&mut self, v: &str);  // clears fax_number
-pub fn set_fax_number(&mut self, v: &str);    // clears phone_number
+// Per-variant convenience setters (each clears the other variants):
+pub fn set_phone_number(&mut self, v: &str);
+pub fn set_fax_number(&mut self, v: &str);
 ```
 
-**Oneof decode semantics:** setting any variant replaces the whole `Option`, so the last field seen on the wire wins — which is the correct proto3 behaviour.
+Setting any variant replaces the whole `Option`, so the last field seen on the wire wins — correct for all syntax versions.
 
-### 4.8 Unknown fields
+---
 
-Unknown fields are accumulated as raw wire bytes in a `Vec<u8, A>`. On encode, they are re-emitted verbatim at the end of the message, ensuring forward-compatibility round-trips.
+### 4.8 Required fields (proto2 only)
+
+`required` fields exist only in proto2.  On the wire, a required field is indistinguishable from an `optional` field; the constraint is purely at the schema level.
+
+**Storage:** Same as `optional` — `Option<T>` — so the decoder can detect whether the field was present.
+
+**Validation:** A generated `validate()` inherent method checks that all `required` fields are `Some(_)`.  Callers that need strict enforcement use `decode_strict`, which calls `decode` followed by `validate`.
+
+```rust
+// Required string field example:
+player_id: Option<allocator_api2::boxed::Box<str, A>>,
+
+pub fn player_id(&self) -> Option<&str> { self.player_id.as_deref() }
+pub fn set_player_id(&mut self, v: &str) { self.player_id = Some(str_to_box_in(v, …)); }
+
+pub fn validate(&self) -> Result<(), DecodeError> {
+    if self.player_id.is_none() {
+        return Err(DecodeError::MissingRequiredField { field_number: 1 });
+    }
+    // … check other required fields …
+    Ok(())
+}
+
+pub fn decode_strict<B: Buf>(buf: B) -> Result<Self, DecodeError>
+where
+    Self: Default + MessageDecode,
+{
+    let msg = Self::decode(buf)?;
+    msg.validate()?;
+    Ok(msg)
+}
+```
+
+`MessageDecode::decode` (the provided trait method) does **not** call `validate()` automatically, keeping the trait generic across proto2 and proto3.
+
+---
+
+### 4.9 Unknown fields
+
+Unknown fields are accumulated as raw wire bytes in a `Vec<u8, A>` and re-emitted verbatim on encode, ensuring forward-compatibility round-trips.  This behaviour is identical across all syntax versions.
 
 ```rust
 _unknown_fields: allocator_api2::vec::Vec<u8, A>,
@@ -354,9 +567,9 @@ _unknown_fields: allocator_api2::vec::Vec<u8, A>,
 pub fn unknown_fields(&self) -> &[u8] { &self._unknown_fields }
 ```
 
-The runtime helper `skip_field_and_save(field_number, wire_type, buf, &mut self._unknown_fields)` handles accumulation.
+The runtime helper `skip_field_and_save(field_number, wire_type, buf, &mut self._unknown_fields)` handles accumulation for truly unknown fields.  For **closed-enum unknown values** (§4.6), the dedicated `save_unknown_varint_field(field_number, value, &mut self._unknown_fields)` helper is used instead, since the value has already been read from `buf`.
 
-**Disabling unknown-field preservation:** A future extension could let users annotate a message type with something like `#[puroro(no_unknown_fields)]`, which would swap `skip_field_and_save` for `skip_field` (a discard-only variant) and remove the `_unknown_fields` member. This is not yet implemented.
+**Disabling unknown-field preservation:** A future annotation (e.g. `#[puroro(no_unknown_fields)]`) would swap both helpers for their discard-only variants and remove the `_unknown_fields` member.  Not yet implemented.
 
 ---
 
@@ -507,175 +720,35 @@ The wire format — varints, I32/I64 fixed-width values, LEN-prefixed payloads �
 
 ### 6.2 Field presence and optional scalars
 
-This is the most impactful difference between proto2 and proto3.
+See **§4.1** for the complete generated code patterns (implicit vs explicit presence, custom defaults, all numeric types).
 
-| Syntax | `optional int32 age` | Default behaviour |
-|---|---|---|
-| proto3 | `age: i32` | Presence not tracked; value 0 is indistinguishable from "not set" |
-| proto3 + `optional` keyword | `age: Option<i32>` | Explicit presence tracking |
-| proto2 | `age: Option<i32>` | Explicit presence always (for `optional` fields) |
-| editions `IMPLICIT` | `age: i32` | Same as proto3 default |
-| editions `EXPLICIT` | `age: Option<i32>` | Same as proto2 optional |
+Summary:
 
-**Generated struct field:**
-
-```rust
-// proto3: singular scalar — no Option wrapper
-age: i32,
-pub fn age(&self) -> i32 { self.age }
-pub fn set_age(&mut self, v: i32) { self.age = v; }
-
-// proto2 optional / proto3 explicit optional — Option wrapper
-age: Option<i32>,
-pub fn age(&self) -> i32 { self.age.unwrap_or(0) }  // or custom default, see §6.3
-pub fn has_age(&self) -> bool { self.age.is_some() }
-pub fn set_age(&mut self, v: i32) { self.age = Some(v); }
-pub fn clear_age(&mut self) { self.age = None; }
-```
-
-**Encoding rule difference:**
-
-```rust
-// proto3: omit if value equals the type's zero-value
-if self.age != 0 {
-    encode_varint_field(2, self.age as u64, buf);
-}
-
-// proto2 optional: omit only if None; encode even if value == 0
-if let Some(v) = self.age {
-    encode_varint_field(2, v as u64, buf);
-}
-```
+| Syntax | `optional int32 age` | Storage | Omit from wire when |
+|---|---|---|---|
+| proto3 (default) | Implicit presence | `age: i32` | value == 0 |
+| proto3 `optional` keyword | Explicit presence | `age: Option<i32>` | `None` |
+| proto2 `optional` | Explicit presence | `age: Option<i32>` | `None` |
+| editions `IMPLICIT` | Implicit presence | `age: i32` | value == 0 |
+| editions `EXPLICIT` | Explicit presence | `age: Option<i32>` | `None` |
 
 ### 6.3 Custom default values (proto2)
 
-proto2 allows per-field defaults: `optional int32 score = 2 [default = 100];`.
+See **§4.1** (explicit presence pattern).
 
-The generated accessor returns the proto-declared default when the field is `None`:
-
-```rust
-// Field declared with [default = 100]
-pub fn score(&self) -> i32 {
-    self.score.unwrap_or(100)  // 100 is code-generated from the .proto
-}
-```
-
-The `new_in()` constructor still initialises the field to `None` (not set), not to 100.  The accessor returns 100 for an unset field, which is the correct proto2 semantics: the default is a *read-time* substitution, not a stored value.
+The accessor returns the proto-declared default when the field is `None`; the `new_in()` constructor always initialises the field to `None` (unset), not to the custom default.  The default is a *read-time* substitution only.
 
 ### 6.4 Required fields (proto2)
 
-proto2's `required` modifier means the field **must** be present on every serialised message.  The wire format itself provides no enforcement — `required` is purely a schema-level constraint.
-
-**Representation:** The field is stored as `Option<T>` (same as `optional`) so that the decoder can detect whether it was seen on the wire.
-
-**Validation:** A generated `validate()` method checks that all `required` fields are `Some(_)`.  Callers that need strict conformance use `decode_strict`, which chains `decode` and `validate`:
-
-```rust
-// Generated for a message with `required string player_id = 1`
-pub fn validate(&self) -> Result<(), DecodeError> {
-    if self.player_id.is_none() {
-        return Err(DecodeError::MissingRequiredField { field_number: 1 });
-    }
-    Ok(())
-}
-
-pub fn decode_strict<B: Buf>(buf: B) -> Result<Self, DecodeError>
-where
-    Self: Default,
-{
-    let msg = Self::decode(buf)?;
-    msg.validate()?;
-    Ok(msg)
-}
-```
-
-`MessageDecode::decode` (the provided trait method) does *not* call `validate()` automatically; this keeps the runtime trait generic across proto2 and proto3 without adding a required-field concept to the trait itself.
+See **§4.8** for the complete generated code pattern (`validate()` + `decode_strict()`).
 
 ### 6.5 Closed vs open enums
 
-| Behaviour | proto3 | proto2 | editions `OPEN` | editions `CLOSED` |
-|---|---|---|---|---|
-| Unknown value | Stored in typed field as `i32` | Stored in unknown fields | Same as proto3 | Same as proto2 |
-
-**Open enum (proto3 / editions OPEN):** The decode arm stores the raw `i32` unconditionally.
-
-```rust
-// Open enum — unknown values are accepted
-(6, WireType::Varint) => {
-    self.primary_phone_type = decode_varint(buf)? as i32;
-}
-```
-
-**Closed enum (proto2 / editions CLOSED):** Unknown numeric values are diverted to the unknown-fields buffer using the runtime helper `save_unknown_varint_field`.
-
-```rust
-// Closed enum — unknown values go to unknown_fields
-(5, WireType::Varint) => {
-    let raw = decode_varint(buf)? as i32;
-    if Difficulty::try_from(raw).is_ok() {
-        self.difficulty = Some(raw);
-    } else {
-        save_unknown_varint_field(5, raw as u64, &mut self._unknown_fields);
-    }
-}
-```
-
-The runtime library provides `decode::save_unknown_varint_field` for this purpose.
-
-The typed accessor signature is also different: for a closed enum the field is `Option<i32>` (the field might not be set, and unknown values are not stored), whereas for an open enum the field is always `i32`.
-
-```rust
-// Open enum accessor
-pub fn primary_phone_type(&self) -> Result<PhoneType, i32> {
-    PhoneType::try_from(self.primary_phone_type)
-}
-
-// Closed enum accessor
-pub fn difficulty(&self) -> Option<Result<Difficulty, i32>> {
-    self.difficulty.map(Difficulty::try_from)
-}
-```
+See **§4.6** for the complete generated code patterns and the `save_unknown_varint_field` helper usage.
 
 ### 6.6 Packed repeated fields
 
-| Syntax | Default behaviour |
-|---|---|
-| proto3 | Numeric repeated fields are **packed by default** (one LEN record) |
-| proto2 | Numeric repeated fields are **non-packed by default** (one VARINT record per element) |
-| editions | Controlled per-field via `features.repeated_field_encoding` |
-
-**Non-packed encode/decode** uses one tag+value record per element:
-
-```rust
-// Encode (non-packed):
-for &v in &self.levels {
-    encode_varint_field(4, v as u64, buf);  // one tag per element
-}
-
-// Decode (non-packed):
-(4, WireType::Varint) => { self.levels.push(decode_varint(buf)? as i32); }
-```
-
-**Important compatibility rule (required by the proto spec):** A decoder must accept *both* packed and non-packed encodings for a given field, regardless of what the schema declares.  The generated `merge_from` always handles both forms, even for a `[packed = false]` field.
-
-```rust
-// Field 4: repeated int32 levels [packed = false]
-(4, WireType::Varint) => {
-    self.levels.push(decode_varint(buf)? as i32);
-}
-(4, WireType::Len) => {
-    // Accept packed encoding for forward-compat, even though [packed=false].
-    let payload_len = decode_varint(buf)? as usize;
-    let leftover = {
-        let mut sub = (&mut *buf).take(payload_len);
-        while sub.has_remaining() {
-            self.levels.push(decode_varint(&mut sub)? as i32);
-        }
-        sub.remaining()
-    };
-    if leftover > 0 { buf.advance(leftover); }
-}
-```
+See **§4.4** for the complete patterns (packed encode, non-packed encode, dual-form decode).
 
 ### 6.7 Editions feature matrix
 
