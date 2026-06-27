@@ -315,13 +315,15 @@ String fields always yield a borrowed `&str`. The internal storage type is an im
 - Accessor: `fn name(&self) -> &str` — returns `""` when not set
 - Setter: `fn set_name(&mut self, v: &str)`
 
-**Explicit presence (three accessors):**
+**Explicit presence:**
 
 | Method | Return type | Description |
 |---|---|---|
 | `title()` | `Optional<&'s str, impl HasDefault<&'s str>>` | `get()` and `is_set()` |
 | `title_raw()` | `&str` | Direct `&str` with default applied |
 | `has_title()` | `bool` | Presence check |
+| `set_title(&mut self, v: &str)` | `()` | Copies string data; marks field as set |
+| `clear_title(&mut self)` | `()` | Marks field as unset |
 
 Because `Optional` is a concrete struct, chaining compiles directly for string fields too:
 
@@ -337,15 +339,22 @@ Wire rule: absent when `has_title()` is false (EXPLICIT) or `""` (IMPLICIT).
 
 ### 4.3 Bytes fields
 
-Bytes fields follow the same three-accessor pattern as strings, with `&[u8]` as the value type instead of `&str`.
+Bytes fields follow the same pattern as strings with `&[u8]` as the value type.
+
+**Implicit presence:**
+
+- `fn payload(&self) -> &[u8]` — returns `&[]` when not set
+- `fn set_payload(&mut self, v: &[u8])` — copies data
 
 **Explicit presence:**
 
-- `payload()` → `Optional<&'s [u8], impl HasDefault<&'s [u8]>>` (`.get()`, `.is_set()`)
-- `payload_raw()` → `&[u8]` (direct, with default applied)
-- `has_payload()` → `bool`
-
-All three chain directly, same as string fields.
+| Method | Return type | Description |
+|---|---|---|
+| `payload()` | `Optional<&'s [u8], impl HasDefault<&'s [u8]>>` | `get()` and `is_set()` |
+| `payload_raw()` | `&[u8]` | Direct, with default applied |
+| `has_payload()` | `bool` | Presence check |
+| `set_payload(&mut self, v: &[u8])` | `()` | Copies data; marks field as set |
+| `clear_payload(&mut self)` | `()` | Marks field as unset |
 
 ---
 
