@@ -70,7 +70,27 @@ Wire types 3 and 4 (SGROUP / EGROUP) are deprecated. The decoder must skip them;
 
 ## 3. Runtime trait API
 
-The runtime library (`puroro`) exposes two core traits. Generated code depends only on these public items.
+The runtime library (`puroro`) exposes two core traits and one accessor trait. Generated code depends only on these public items.
+
+### `Optional`
+
+```rust
+pub trait Optional {
+    /// Value type: scalar (e.g. `i32`) or reference (e.g. `&'a str`).
+    type Value<'a> where Self: 'a;
+
+    /// Value or proto-declared default when not set.
+    fn get(&self) -> Self::Value<'_>;
+
+    /// `Some(value)` when set, `None` when not set (no default substitution).
+    fn get_opt(&self) -> Option<Self::Value<'_>>;
+
+    /// `true` when the field was explicitly set.
+    fn is_set(&self) -> bool;
+}
+```
+
+This trait is returned by the accessor method of every **explicit-presence** field.  The concrete implementing type is created inside the accessor's method body and is never named in the public API.
 
 ### `MessageEncode`
 
@@ -215,18 +235,32 @@ Equivalent to proto3's default singular scalar behaviour.
 #### Explicit presence (`features.field_presence = EXPLICIT`, edition 2024 default)
 
 Equivalent to proto2 `optional`. Presence is tracked independently of value.
+Three accessors are generated:
 
-- Presence query: `fn has_score(&self) -> bool`
-- Value accessor: `fn score(&self) -> i32` — returns the proto-declared default (or the type-zero if none) when `has_score()` is `false`
-- Setter: `fn set_score(&mut self, v: i32)` — also makes `has_score()` true
-- Clearer: `fn clear_score(&mut self)` — makes `has_score()` false
-- Wire rule: field absent when `has_score()` is `false`; present even when the value is zero.
+| Method | Return type | Description |
+|---|---|---|
+| `max_retries()` | `impl Optional` | Rich view: `get()`, `get_opt()`, `is_set()` |
+| `max_retries_raw()` | `i32` | Direct value with default applied; no wrapper |
+| `has_max_retries()` | `bool` | Presence check |
 
-The `[default = 3]` option on `max_retries` only affects the accessor: `max_retries()` returns `3` when `has_max_retries()` is false. The `new_in()` constructor always initialises the field to the unset state.
+- Setter: `fn set_max_retries(&mut self, v: i32)` — makes `has_max_retries()` true
+- Clearer: `fn clear_max_retries(&mut self)` — makes `has_max_retries()` false
+- Wire rule: field absent when `has_max_retries()` is `false`; present even when the value is zero.
+
+The `[default = 3]` option on `max_retries` means `max_retries().get()` and `max_retries_raw()` return `3` when the field is unset.
+
+**Scalar `Optional` views capture no lifetime** (the concrete View copies the scalar value at construction), so direct chaining compiles:
+
+```rust
+let n: i32 = task.max_retries().get();      // works — no let binding needed
+let n: i32 = task.max_retries_raw();        // also works; bypasses Optional
+if task.max_retries().is_set() { … }
+match task.max_retries().get_opt() { … }
+```
 
 #### Scalar type mapping
 
-| Proto type | Accessor return type | Wire type |
+| Proto type | Accessor return type (implicit/explicit) | Wire type |
 |---|---|---|
 | `int32`, `sint32`, `sfixed32` | `i32` | VARINT / VARINT(ZigZag) / I32 |
 | `int64`, `sint64`, `sfixed64` | `i64` | VARINT / VARINT(ZigZag) / I64 |
@@ -242,23 +276,50 @@ Both presence modes apply uniformly across every entry in this table.
 
 ### 4.2 String fields
 
-- Value accessor: `fn title(&self) -> Option<&str>` (EXPLICIT presence) or `fn name(&self) -> &str` (IMPLICIT presence)
-- Setter: `fn set_title(&mut self, v: &str)` — copies the string data
-- `has_title()` / `clear_title()` for EXPLICIT presence
+String fields always yield a borrowed `&str`. The internal storage type is an implementation detail.
 
-The internal storage representation is an implementation detail and may change. The accessor always yields a borrowed `&str`.
+**Implicit presence:**
 
-**Wire rule:** absent when `has_title()` is false (EXPLICIT) or when the value is `""` (IMPLICIT, same as proto3).
+- Accessor: `fn name(&self) -> &str` — returns `""` when not set
+- Setter: `fn set_name(&mut self, v: &str)`
+
+**Explicit presence (three accessors):**
+
+| Method | Return type | Description |
+|---|---|---|
+| `title()` | `impl Optional` | Rich view: `get()` → `&str`, `get_opt()` → `Option<&str>`, `is_set()` |
+| `title_raw()` | `&str` | Direct `&str` with default applied |
+| `has_title()` | `bool` | Presence check |
+
+Because the `Optional` view for string fields borrows from the message, direct chaining does **not** compile with Rust's drop-check rules.  Use a `let` binding or `title_raw()`:
+
+```rust
+// ✅ Use title_raw() for simple &str access:
+let s: &str = task.title_raw();
+
+// ✅ Use let binding when you need is_set() / get_opt():
+let v = task.title();
+if v.is_set() { println!("{}", v.get()); }
+
+// ❌ Does not compile (drop-check restriction on RPIT + borrowed view):
+// let s = task.title().get();
+```
+
+Wire rule: absent when `has_title()` is false (EXPLICIT) or `""` (IMPLICIT).
 
 ---
 
 ### 4.3 Bytes fields
 
-- Value accessor: `fn payload(&self) -> Option<&[u8]>` (EXPLICIT presence)
-- Setter: `fn set_payload(&mut self, v: &[u8])`
-- `has_payload()` / `clear_payload()` for EXPLICIT presence
+Bytes fields follow the same three-accessor pattern as strings, with `&[u8]` as the value type instead of `&str`.
 
-Wire omission follows the same rule as strings.
+**Explicit presence:**
+
+- `payload()` → `impl Optional` (`.get()` → `&[u8]`, `.get_opt()` → `Option<&[u8]>`)
+- `payload_raw()` → `&[u8]` (direct, with default applied)
+- `has_payload()` → `bool`
+
+The same `let`-binding requirement applies for `payload()`.  `payload_raw()` is the simpler choice for direct access.
 
 ---
 

@@ -21,10 +21,12 @@
 pub mod decode;
 pub mod encode;
 pub mod error;
+pub mod optional;
 pub mod wire_type;
 
 // Flat re-exports for convenience in generated code.
 pub use decode::MessageDecode;
 pub use encode::MessageEncode;
 pub use error::{DecodeError, EncodeError};
+pub use optional::Optional;
 pub use wire_type::WireType;

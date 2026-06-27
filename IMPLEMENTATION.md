@@ -204,6 +204,8 @@ if self.score != 0 {
 (2, WireType::Varint) => { self.score = decode_varint(buf)? as i32; }
 ```
 
+No `Optional` is involved — `fn score(&self) -> i32` returns the value directly.
+
 **All scalar types:**
 
 | Proto type | Decode expression | Encode cast |
@@ -233,6 +235,34 @@ if let Some(v) = self.max_retries {
 }
 // Decode: always wrap in Some
 (3, WireType::Varint) => { self.max_retries = Some(decode_varint(buf)? as i32); }
+```
+
+**Accessor implementation** — the `Optional` view is created locally in the method body.
+Because the scalar View copies `i32` from `self` at construction, it holds no borrow of
+`self`.  Using `+ use<>` in the return type prevents Rust 2024 from implicitly capturing
+the caller's lifetime, making the View effectively `'static` and enabling direct chaining.
+
+```rust
+// Generated for: optional int32 max_retries = 3 [default = 3];
+pub fn max_retries(&self) -> impl puroro::Optional<Value<'static> = i32> + use<> {
+    struct View { value: Option<i32> }
+    impl puroro::Optional for View {
+        type Value<'a> = i32 where Self: 'a;
+        fn get(&self) -> i32 { self.value.unwrap_or(3) }   // 3 is compile-time constant
+        fn get_opt(&self) -> Option<i32> { self.value }
+        fn is_set(&self) -> bool { self.value.is_some() }
+    }
+    View { value: self.max_retries }  // copies Option<i32>, no borrow of self
+}
+
+pub fn max_retries_raw(&self) -> i32 {
+    // Bypasses Optional; used for simple value access.
+    self.max_retries.unwrap_or(3)
+}
+
+pub fn has_max_retries(&self) -> bool { self.max_retries.is_some() }
+pub fn set_max_retries(&mut self, v: i32) { self.max_retries = Some(v); }
+pub fn clear_max_retries(&mut self) { self.max_retries = None; }
 ```
 
 ### 6.3 String fields
@@ -269,6 +299,36 @@ pub fn set_title(&mut self, v: &str) {
     self.title = Some(str_to_box_in(v, self._alloc.clone()));
 }
 ```
+
+**Accessor implementation** — for EXPLICIT-presence string fields, the View borrows `&'s str`
+from the message.  Using `+ use<'s>` in the return type precisely captures only `'s`
+(the caller's borrow of the message), avoiding implicit over-capturing in Rust 2024.
+
+```rust
+// Generated for: string title = 1 [default = "N/A"];  (EXPLICIT presence)
+pub fn title<'s>(&'s self) -> impl puroro::Optional<Value<'s> = &'s str> + use<'s> {
+    struct View<'a> { value: Option<&'a str> }
+    impl<'a> puroro::Optional for View<'a> {
+        type Value<'b> = &'b str where Self: 'b;
+        fn get(&self) -> &str { self.value.unwrap_or("N/A") }  // "N/A" is 'static const
+        fn get_opt(&self) -> Option<&str> { self.value }
+        fn is_set(&self) -> bool { self.value.is_some() }
+    }
+    View { value: self.title.as_deref() }
+}
+
+// Bypasses Optional; returns &str directly.  No let-binding restriction.
+pub fn title_raw(&self) -> &str {
+    self.title.as_deref().unwrap_or("N/A")
+}
+pub fn has_title(&self) -> bool { self.title.is_some() }
+```
+
+> **RPIT drop-check note:** because the View borrows from `self`, Rust's conservative
+> drop-check for opaque return types requires a `let` binding before calling `.get()`:
+> `let v = task.title(); let s = v.get();`
+>
+> `title_raw()` has no such restriction and is preferred for simple `&str` access.
 
 ### 6.4 Bytes fields
 
