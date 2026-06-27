@@ -290,7 +290,27 @@ impl<A: Allocator + Clone> TaskMessageFallible for Task<A> {
 
 Using `Infallible` as the error type signals at compile time that a particular code path, when generic over `T: TaskMessageFallible`, will never encounter an actual error when given a `Task<A>`.
 
-> **Note:** The concrete struct `Task<A>` provides additional rich accessors beyond the trait — for example, `task.tag_ids()` returns `&[i32]` (O(1) random access) when called directly, whereas the trait's `tag_ids()` returns an iterator for implementation-agnostic code.
+> **Native methods vs trait methods.**  Each concrete struct provides **its own set of native methods** in a plain `impl` block, in addition to implementing the traits.  The traits define the minimum interoperability contract; native methods expose whatever each struct can do most efficiently or expressively, without being constrained to the trait signature.
+>
+> ```rust
+> // Trait (interoperability layer — generic code uses this)
+> impl<A: Allocator + Clone> TaskMessage for Task<A> { … }
+>
+> // Native methods (optimised, richer API — concrete callers use these)
+> impl<A: Allocator + Clone> Task<A> {
+>     /// O(1) random access — the trait only promises an iterator.
+>     pub fn tag_ids(&self) -> &[i32] { … }
+>
+>     /// Returns Optional<T, D> in one call — the trait exposes two separate methods.
+>     pub fn max_retries(&self) -> Optional<i32, impl HasDefault<i32>> { … }
+>
+>     /// Write methods (not mandated by the read-oriented trait).
+>     pub fn push_tag_id(&mut self, v: i32) { … }
+>     pub fn set_title(&mut self, v: &str) { … }
+> }
+> ```
+>
+> This mirrors how `Vec<T>` implements `Iterator` while also exposing `push`, `sort`, and many other methods that are not part of the `Iterator` contract.
 
 ---
 
@@ -853,6 +873,12 @@ Explicit-presence field accessors return `Optional<T, D>` — a concrete struct 
 
 Repeated field accessors return a reference to a contiguous sequence rather than a freshly allocated `Vec`. This allows O(1) random access without triggering allocation. The concrete element type is intentionally not part of the stable API.
 
+### Native methods alongside trait methods
+
+Each concrete struct provides its own `impl` block with native methods in addition to implementing the generated traits.  The traits define the minimum interoperability contract; native methods expose whatever that struct can do most efficiently.  Code that knows the concrete type uses native methods; generic code uses the trait.
+
+This is the standard Rust pattern: `Vec<T>` implements `Iterator` but also has `push`, `sort`, and hundreds of other methods that the `Iterator` trait does not mandate.
+
 ### `Default` bound on `MessageDecode::decode`
 
 The provided `decode` method requires `Self: Default`. The lower-level `merge_from` has no such requirement, which is important for callers using non-`Default` allocators.
@@ -872,6 +898,19 @@ In addition to the primary `Task<A>` struct, the following specialized implement
 - Optimal when only a subset of fields is read (avoids paying the decode cost for unused fields).
 - Implements `TaskMessageFallible` with `Error = DecodeError`.
 
+**Native methods beyond the trait:**
+```rust
+impl<A: Allocator + Clone> TaskLazy<A> {
+    /// Decodes all remaining fields and converts to the fully-eager Task<A>.
+    /// Useful when access patterns change and all fields become needed.
+    pub fn into_eager(self) -> Result<Task<A>, DecodeError> { … }
+
+    /// Attempt to return a fully-decoded slice for a repeated field,
+    /// decoding all elements at once (amortises per-element overhead).
+    pub fn tag_ids_all(&self) -> Result<&[i32], DecodeError> { … }
+}
+```
+
 #### `TaskView<'buf>` — zero-copy, buffer-referencing
 
 - Holds a `&'buf [u8]` reference to the original input buffer; no heap allocations for field data.
@@ -880,6 +919,21 @@ In addition to the primary `Task<A>` struct, the following specialized implement
 - Can be implemented as fully lazy (scan on each access) or semi-eager (build a field-offset index once, then access in O(1)).
 - Implements `TaskMessageFallible` with `Error = DecodeError`.
 - Enables early termination for repeated fields: `task.tag_ids().take_while(|v| v.is_ok())`.
+
+**Native methods beyond the trait:**
+```rust
+impl<'buf> TaskView<'buf> {
+    /// Returns &'buf str — lifetime tied to the input buffer, not to self.
+    /// The trait can only express &'s str (lifetime of the borrow of self).
+    pub fn title(&self) -> Result<&'buf str, DecodeError> { … }
+
+    /// Convert to an owned Task<A>, copying all fields.
+    pub fn to_owned<A: Allocator + Clone>(&self, alloc: A) -> Result<Task<A>, DecodeError> { … }
+
+    /// Access the raw packed bytes for a repeated field — zero-copy.
+    pub fn tag_ids_raw(&self) -> Result<&'buf [u8], DecodeError> { … }
+}
+```
 
 #### Relationship between implementations
 
