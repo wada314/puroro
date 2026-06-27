@@ -1,18 +1,6 @@
-[workspace]
-members = [
-    "puroro",
-    "codegen",
-    "inline",
-    "update-puroro-doc-samples",
-    "update-puroro-protobuf",
-    "tests",
-]
-default-members = [
-    "puroro",
-    "codegen",
-    "inline",
-    #    "update-puroro-doc-samples",
-    #    "update-puroro-protobuf",
-    "tests",
-]
-resolver = "2"
+[package]
+name = "puroro"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]

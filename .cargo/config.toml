@@ -1,5 +1,0 @@
-[unstable]
-bindeps = true
-
-[net]
-git-fetch-with-cli = true
