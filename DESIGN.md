@@ -8,6 +8,7 @@ This document specifies the **public interface** of the `puroro` Protocol Buffer
 2. [Wire format overview](#2-wire-format-overview)
 3. [Runtime trait API](#3-runtime-trait-api)
 4. [Generated code specification](#4-generated-code-specification)
+   - 4.0 [Generated per-message traits](#40-generated-per-message-traits)
    - 4.1 [Scalar fields](#41-scalar-fields) — implicit vs explicit presence
    - 4.2 [String fields](#42-string-fields)
    - 4.3 [Bytes fields](#43-bytes-fields)
@@ -30,6 +31,8 @@ This document specifies the **public interface** of the `puroro` Protocol Buffer
    - 6.5 [Extensions (not yet implemented)](#65-extensions-not-yet-implemented)
 7. [Design decisions and trade-offs](#7-design-decisions-and-trade-offs)
 8. [Future work](#8-future-work)
+   - 8.1 [Specialized message implementations](#specialized-message-implementations) (`TaskLazy<A>`, `TaskView<'buf>`)
+   - 8.2 [Other future work](#other-future-work)
 
 ---
 
@@ -171,6 +174,125 @@ The primary operation is *merge*, not *decode-from-scratch*. `decode` is a conve
 ## 4. Generated code specification
 
 This section is the normative reference for what the code generator emits. All field patterns are illustrated using a single **editions** reference schema, since editions can express every variant (implicit/explicit presence, custom defaults, required-like semantics, open/closed enums, packed/expanded repeated) in one file.
+
+For each message type the code generator produces **three kinds of output**:
+
+1. **Two traits** — a stable API contract that multiple implementations satisfy (§4.0).
+2. **The primary struct** — a full-featured owned implementation (§4.1–4.9).
+3. **(Future) Specialized structs** — alternative implementations for specific performance scenarios (§8).
+
+---
+
+### 4.0 Generated per-message traits
+
+For each message the generator emits two traits. User code that is generic over a message type depends on these traits, not on any concrete struct.
+
+#### `FooMessage` — infallible, for eager implementations
+
+All accessors succeed unconditionally.  The primary struct `Task<A>` implements this trait.
+
+```rust
+// Generated for: message Task { … }
+pub trait TaskMessage {
+    // IMPLICIT scalar — always returns a value
+    fn score(&self) -> i32;
+
+    // EXPLICIT scalar — three accessors (value, presence, raw)
+    fn max_retries(&self) -> Optional<i32, impl HasDefault<i32>>;
+    fn max_retries_raw(&self) -> i32;
+    fn has_max_retries(&self) -> bool;
+
+    // EXPLICIT string — same three-accessor pattern
+    fn title<'s>(&'s self) -> Optional<&'s str, impl HasDefault<&'s str>>;
+    fn title_raw(&self) -> &str;
+    fn has_title(&self) -> bool;
+    fn set_title(&mut self, v: &str);
+    fn clear_title(&mut self);
+
+    // Repeated scalar — slice reference (O(1) random access)
+    fn tag_ids(&self) -> &[i32];
+    fn push_tag_id(&mut self, v: i32);
+    fn clear_tag_ids(&mut self);
+
+    // Repeated string — iterator of str references (implementation-agnostic)
+    fn labels(&self) -> impl Iterator<Item = &str> + '_;
+    fn push_label(&mut self, v: &str);
+    fn clear_labels(&mut self);
+
+    // Nested message
+    fn assignee(&self) -> Option<&impl AddressMessage>;
+    fn assignee_mut(&mut self) -> &mut impl AddressMessage;
+    fn has_assignee(&self) -> bool;
+
+    // Open enum (IMPLICIT)
+    fn status_raw(&self) -> i32;
+    fn status(&self) -> Result<Status, i32>;
+
+    // Closed enum (EXPLICIT)
+    fn priority(&self) -> Option<Result<Priority, i32>>;
+    fn has_priority(&self) -> bool;
+
+    // Oneof
+    fn notification(&self) -> Option<&task::Notification<impl Allocator>>;
+    fn set_notification(&mut self, v: Option<task::Notification<impl Allocator>>);
+
+    // LEGACY_REQUIRED validation
+    fn validate(&self) -> Result<(), DecodeError>;
+
+    // Unknown fields
+    fn unknown_fields(&self) -> &[u8];
+}
+```
+
+#### `FooMessageFallible` — Result-returning, for lazy implementations
+
+All accessors return `Result`; even presence checks may fail (e.g., if the field has not yet been parsed from the wire).  The primary struct `Task<A>` also implements this trait with `Error = Infallible`.
+
+```rust
+pub trait TaskMessageFallible {
+    type Error;
+
+    fn score(&self) -> Result<i32, Self::Error>;
+
+    fn max_retries(&self) -> Result<i32, Self::Error>;
+    fn has_max_retries(&self) -> Result<bool, Self::Error>;
+
+    fn title(&self) -> Result<&str, Self::Error>;
+    fn has_title(&self) -> Result<bool, Self::Error>;
+
+    // Repeated: lazy iterator; early termination is possible
+    fn tag_ids(&self) -> impl Iterator<Item = Result<i32, Self::Error>> + '_;
+    fn labels(&self) -> impl Iterator<Item = Result<&str, Self::Error>> + '_;
+
+    // Nested message — the sub-message is also fallible
+    fn assignee(&self) -> Result<Option<impl AddressMessageFallible<Error = Self::Error>>, Self::Error>;
+
+    fn status(&self) -> Result<Result<Status, i32>, Self::Error>;  // outer: parse error, inner: unknown variant
+    fn priority(&self) -> Result<Option<Result<Priority, i32>>, Self::Error>;
+}
+```
+
+#### Primary struct implements both
+
+```rust
+// Task<A> is the all-in-one implementation.
+impl<A: Allocator + Clone> TaskMessage for Task<A> { … }
+
+impl<A: Allocator + Clone> TaskMessageFallible for Task<A> {
+    type Error = core::convert::Infallible;  // never fails
+    fn score(&self) -> Result<i32, Infallible> { Ok(TaskMessage::score(self)) }
+    fn tag_ids(&self) -> impl Iterator<Item = Result<i32, Infallible>> + '_ {
+        TaskMessage::tag_ids(self).iter().map(|&v| Ok(v))
+    }
+    // … all other methods wrap Ok(…)
+}
+```
+
+Using `Infallible` as the error type signals at compile time that a particular code path, when generic over `T: TaskMessageFallible`, will never encounter an actual error when given a `Task<A>`.
+
+> **Note:** The concrete struct `Task<A>` provides additional rich accessors beyond the trait — for example, `task.tag_ids()` returns `&[i32]` (O(1) random access) when called directly, whereas the trait's `tag_ids()` returns an iterator for implementation-agnostic code.
+
+---
 
 ### Reference schema
 
@@ -739,7 +861,57 @@ The provided `decode` method requires `Self: Default`. The lower-level `merge_fr
 
 ## 8. Future work
 
-- **Zero-copy decode.** Borrowing view types (e.g. `TaskView<'buf>`) for string and bytes fields.
+### Specialized message implementations
+
+In addition to the primary `Task<A>` struct, the following specialized implementations are planned.  Each implements `TaskMessageFallible` (and possibly `TaskMessage`) and is interchangeable with `Task<A>` in generic code that depends only on the trait.
+
+#### `TaskLazy<A>` — lazy validation
+
+- `merge_from` stores raw bytes per field; no UTF-8 validation or nested-message parsing during decode.
+- Getters decode and validate on demand, returning `Result<T, DecodeError>`.
+- Optimal when only a subset of fields is read (avoids paying the decode cost for unused fields).
+- Implements `TaskMessageFallible` with `Error = DecodeError`.
+
+#### `TaskView<'buf>` — zero-copy, buffer-referencing
+
+- Holds a `&'buf [u8]` reference to the original input buffer; no heap allocations for field data.
+- String and bytes fields return `&'buf str` / `&'buf [u8]` — direct slices into the input.
+- Read-only (tied to the buffer lifetime, no mutation).
+- Can be implemented as fully lazy (scan on each access) or semi-eager (build a field-offset index once, then access in O(1)).
+- Implements `TaskMessageFallible` with `Error = DecodeError`.
+- Enables early termination for repeated fields: `task.tag_ids().take_while(|v| v.is_ok())`.
+
+#### Relationship between implementations
+
+```
+TaskMessage (infallible trait)
+    ↑ impl
+    Task<A>  ←── primary, all-in-one
+
+TaskMessageFallible (Result-returning trait)
+    ↑ impl
+    Task<A>        (Error = Infallible)
+    TaskLazy<A>    (Error = DecodeError)
+    TaskView<'buf> (Error = DecodeError)
+```
+
+Generic code that only reads fields can be written once and used with any implementation:
+
+```rust
+fn print_score(msg: &impl TaskMessageFallible) -> Result<(), msg::Error> {
+    println!("{}", msg.score()?);
+    Ok(())
+}
+
+print_score(&Task::decode(buf)?);           // Infallible error — never fails
+print_score(&TaskLazy::from_bytes(buf));     // lazy; decodes on access
+print_score(&TaskView::new(buf));            // zero-copy; scans buffer
+```
+
+---
+
+### Other future work
+
 - **Unknown-field preservation opt-out.** A per-message attribute to omit the unknown-fields buffer.
 - **Map fields.** Syntactic sugar for a repeated message entry; requires an allocator-aware map type.
 - **Service / RPC definitions.** Out of scope for the runtime library.
