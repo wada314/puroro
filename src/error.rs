@@ -1,0 +1,64 @@
+use crate::wire_type::WireType;
+
+/// Errors that can occur while decoding a protobuf message from the wire format.
+#[derive(Debug, Clone, PartialEq)]
+pub enum DecodeError {
+    /// The input buffer ended before the message was complete.
+    UnexpectedEof,
+    /// A varint was longer than 10 bytes (exceeds u64 range).
+    InvalidVarint,
+    /// The tag byte contained an unrecognised wire type id.
+    InvalidTag,
+    /// A field was encountered with the correct field number but an unexpected wire type.
+    UnexpectedWireType {
+        field_number: u32,
+        expected: WireType,
+        actual: WireType,
+    },
+    /// A string field contained bytes that are not valid UTF-8.
+    InvalidUtf8,
+    /// A nested message's declared length exceeded the remaining buffer.
+    TruncatedMessage,
+    /// Decode recursion exceeded the implementation-defined limit.
+    RecursionLimitExceeded,
+}
+
+impl ::core::fmt::Display for DecodeError {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
+        match self {
+            DecodeError::UnexpectedEof => write!(f, "unexpected end of input"),
+            DecodeError::InvalidVarint => write!(f, "varint is too long (> 10 bytes)"),
+            DecodeError::InvalidTag => write!(f, "tag contains an unknown wire type"),
+            DecodeError::UnexpectedWireType { field_number, expected, actual } => write!(
+                f,
+                "field {field_number}: expected wire type {expected:?}, got {actual:?}"
+            ),
+            DecodeError::InvalidUtf8 => write!(f, "string field is not valid UTF-8"),
+            DecodeError::TruncatedMessage => write!(f, "message was truncated"),
+            DecodeError::RecursionLimitExceeded => write!(f, "recursion limit exceeded"),
+        }
+    }
+}
+
+impl ::std::error::Error for DecodeError {}
+
+/// Errors that can occur while encoding a protobuf message to the wire format.
+///
+/// In practice this is almost never triggered — encoding to a `Vec` or
+/// `bytes::BytesMut` is infallible — but the type exists for completeness so
+/// that callers targeting fixed-size buffers can propagate capacity errors.
+#[derive(Debug, Clone, PartialEq)]
+pub enum EncodeError {
+    /// The output buffer did not have enough capacity.
+    BufferFull,
+}
+
+impl ::core::fmt::Display for EncodeError {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
+        match self {
+            EncodeError::BufferFull => write!(f, "output buffer is full"),
+        }
+    }
+}
+
+impl ::std::error::Error for EncodeError {}
