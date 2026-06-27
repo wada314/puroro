@@ -1,8 +1,10 @@
 # puroro — Implementation Notes
 
-This document describes the **internal implementation** of the reference generated code in `src/sample.rs`. It covers storage types, encode/decode algorithms, and runtime helper usage. The stable **public interface** is specified in [DESIGN.md](DESIGN.md).
+This document describes the **internal implementation** of generated code. It covers storage types, encode/decode algorithms, and runtime helper usage. The stable **public interface** is specified in [DESIGN.md](DESIGN.md).
 
-> **Note:** The public API described in DESIGN.md must remain stable even if the internal representations documented here change.  For example, presence tracking for optional scalars currently uses `Option<T>` fields, but could be replaced by a per-message bitfield without any change to the accessor API.
+> **Note:** The public API described in DESIGN.md must remain stable even if the internal representations documented here change. For example, presence tracking for optional scalars currently uses `Option<T>` fields, but could be replaced by a per-message bitfield without any change to the accessor API.
+
+All examples use the **editions reference schema** from DESIGN.md §4.
 
 ## Table of contents
 
@@ -12,19 +14,19 @@ This document describes the **internal implementation** of the reference generat
 4. [Encode implementation](#4-encode-implementation)
 5. [Decode implementation](#5-decode-implementation)
 6. [Per-field encode/decode patterns](#6-per-field-encodedecode-patterns)
-   - 6.1 [Scalar fields (implicit presence)](#61-scalar-fields-implicit-presence)
-   - 6.2 [Scalar fields (explicit presence)](#62-scalar-fields-explicit-presence)
+   - 6.1 [Scalar: implicit presence](#61-scalar-implicit-presence)
+   - 6.2 [Scalar: explicit presence](#62-scalar-explicit-presence)
    - 6.3 [String fields](#63-string-fields)
    - 6.4 [Bytes fields](#64-bytes-fields)
-   - 6.5 [Repeated scalar fields (packed)](#65-repeated-scalar-fields-packed)
-   - 6.6 [Repeated scalar fields (non-packed, with packed fallback)](#66-repeated-scalar-fields-non-packed-with-packed-fallback)
-   - 6.7 [Repeated string / message fields](#67-repeated-string--message-fields)
+   - 6.5 [Repeated scalar: packed](#65-repeated-scalar-packed)
+   - 6.6 [Repeated scalar: non-packed (with packed fallback)](#66-repeated-scalar-non-packed-with-packed-fallback)
+   - 6.7 [Repeated string fields](#67-repeated-string-fields)
    - 6.8 [Nested message fields](#68-nested-message-fields)
    - 6.9 [Open enum fields](#69-open-enum-fields)
    - 6.10 [Closed enum fields](#610-closed-enum-fields)
    - 6.11 [Oneof fields](#611-oneof-fields)
    - 6.12 [Unknown fields](#612-unknown-fields)
-   - 6.13 [Required fields (proto2)](#613-required-fields-proto2)
+   - 6.13 [LEGACY_REQUIRED fields](#613-legacy_required-fields)
 7. [Optimization opportunities](#7-optimization-opportunities)
 
 ---
@@ -33,110 +35,121 @@ This document describes the **internal implementation** of the reference generat
 
 | Field kind | Internal storage type |
 |---|---|
-| Implicit-presence scalar (e.g. `int32 age`) | `i32` (the Rust primitive directly) |
-| Explicit-presence scalar (e.g. `optional int32 score`) | `Option<i32>` |
+| Implicit-presence scalar (`IMPLICIT`) | `T` (e.g. `i32`) — the Rust primitive directly |
+| Explicit-presence scalar (`EXPLICIT`) | `Option<T>` |
 | Implicit-presence string | `allocator_api2::boxed::Box<str, A>` |
 | Explicit-presence string | `Option<allocator_api2::boxed::Box<str, A>>` |
 | `bytes` field (implicit presence) | `allocator_api2::vec::Vec<u8, A>` |
 | `bytes` field (explicit presence) | `Option<allocator_api2::vec::Vec<u8, A>>` |
-| Repeated scalar / string / bytes / message | `allocator_api2::vec::Vec<ElementType, A>` |
-| Message field (always optional) | `Option<allocator_api2::boxed::Box<MessageType<A>, A>>` |
-| Open enum field | `i32` |
-| Closed enum field | `Option<i32>` |
-| Oneof group | `Option<Oneof<A>>` |
+| Repeated scalar / string / message | `allocator_api2::vec::Vec<ElementType, A>` |
+| Message field (always optional in struct) | `Option<allocator_api2::boxed::Box<MessageType<A>, A>>` |
+| Open enum (`OPEN`) | `i32` (IMPLICIT) or `Option<i32>` (EXPLICIT) |
+| Closed enum (`CLOSED`) | `Option<i32>` |
+| Oneof group | `Option<OurEnum<A>>` |
 | Unknown fields | `allocator_api2::vec::Vec<u8, A>` |
+| `LEGACY_REQUIRED` field | Same as `EXPLICIT` (`Option<T>`) |
 
-`Box<str, A>` (2 words: ptr + byte length, no capacity word) is preferred over `Vec<u8, A>` (3 words) for owned strings since strings are generally set once and then read.  `Vec<u8, A>` is used for `bytes` fields where incremental appending is more natural.
+`Box<str, A>` (2 words: ptr + byte length) is preferred over `Vec<u8, A>` (3 words) for owned strings since strings are generally written once and then read. `Vec<u8, A>` is used for `bytes` fields where incremental appending is more natural.
 
-> **Optimization note:** explicit-presence scalars currently use `Option<T>` which takes extra space (e.g. `Option<i32>` is typically 8 bytes on a 64-bit platform due to the discriminant).  A future optimisation could use `T` storage with a per-message bitfield to track presence, reducing struct size at the cost of more complex accessor code.  The public accessor API (`has_X()`, `set_X()`, `clear_X()`) would remain unchanged.
+> **Optimization note:** explicit-presence scalars currently use `Option<T>`. A future optimisation could use `T` storage with a per-message presence bitfield, reducing struct size at the cost of slightly more complex accessor code. The public API (`has_X()`, `set_X()`, `clear_X()`) would be identical. This is the approach used by Google protobuf's generated C++ code.
 
 ---
 
 ## 2. Struct layout
 
-Every generated message struct carries the following private fields:
-
 ```rust
-pub struct Person<A: Allocator = Global> {
-    // ── User fields (one per .proto field) ────────────────────────────────
-    name:                Box<str, A>,
-    age:                 i32,
-    avatar:              Vec<u8, A>,
-    emails:              Vec<Box<str, A>, A>,
-    address:             Option<Box<Address<A>, A>>,
-    primary_phone_type:  i32,                         // open enum
-    contact_method:      Option<person::ContactMethod<A>>,
+pub struct Task<A: Allocator = Global> {
+    // ── User fields ─────────────────────────────────────────────────────────
+    title:       Option<Box<str, A>>,           // field 1: EXPLICIT string
+    score:       i32,                           // field 2: IMPLICIT i32
+    max_retries: Option<i32>,                   // field 3: EXPLICIT i32, default 3
+    owner_id:    Option<Box<str, A>>,           // field 4: LEGACY_REQUIRED string
+    payload:     Option<Vec<u8, A>>,            // field 5: EXPLICIT bytes
+    tag_ids:     Vec<i32, A>,                   // field 6: repeated packed int32
+    scores:      Vec<i32, A>,                   // field 7: repeated expanded int32
+    labels:      Vec<Box<str, A>, A>,           // field 8: repeated string
+    status:      i32,                           // field 9: IMPLICIT open enum
+    priority:    Option<i32>,                   // field 10: EXPLICIT closed enum
+    assignee:    Option<Box<Address<A>, A>>,    // field 11: EXPLICIT message
+    notification: Option<task::Notification<A>>, // fields 12–13: oneof
 
-    // ── Infrastructure ─────────────────────────────────────────────────────
+    // ── Infrastructure ──────────────────────────────────────────────────────
     _unknown_fields: Vec<u8, A>,
-    // Retained copy of the allocator for use by setter / push methods.
-    // For ZST allocators (e.g. Global) this adds zero size.
+    // Retained allocator for setter / push methods.
+    // ZST for Global; one pointer for &'arena Bump.
     _alloc: A,
 }
 ```
 
-The `_alloc` field is necessary because setters and push methods need to create new heap values without the caller passing an allocator argument.  They clone `_alloc` at call time.  For reference-typed allocators such as `&'arena Bump`, cloning is a pointer copy.
+The `_alloc` field is necessary because setters and push methods need to create new heap values without the caller providing an allocator. They clone `_alloc` at call time.
 
 ---
 
 ## 3. Constructors and the stored allocator
 
 ```rust
-impl<A: Allocator + Clone> Person<A> {
+impl<A: Allocator + Clone> Task<A> {
     pub fn new_in(alloc: A) -> Self {
-        Person {
-            name:               str_to_box_in("", alloc.clone()),
-            age:                0,
-            avatar:             Vec::new_in(alloc.clone()),
-            emails:             Vec::new_in(alloc.clone()),
-            address:            None,
-            primary_phone_type: 0,
-            contact_method:     None,
-            _unknown_fields:    Vec::new_in(alloc.clone()),
-            _alloc:             alloc,
+        Task {
+            title:        None,
+            score:        0,
+            max_retries:  None,
+            owner_id:     None,
+            payload:      None,
+            tag_ids:      Vec::new_in(alloc.clone()),
+            scores:       Vec::new_in(alloc.clone()),
+            labels:       Vec::new_in(alloc.clone()),
+            status:       0,
+            priority:     None,
+            assignee:     None,
+            notification: None,
+            _unknown_fields: Vec::new_in(alloc.clone()),
+            _alloc: alloc,
         }
     }
 }
 
-impl<A: Allocator + Clone + Default> Default for Person<A> {
+impl<A: Allocator + Clone + Default> Default for Task<A> {
     fn default() -> Self { Self::new_in(A::default()) }
 }
 ```
 
-The helper `str_to_box_in(s: &str, alloc: A) -> Box<str, A>` (provided by the runtime) allocates a `Vec<u8, A>`, copies the bytes, converts to `Box<[u8], A>`, then reinterprets as `Box<str, A>` (one unsafe block inside the runtime, not visible to generated code).
+The helper `str_to_box_in(s: &str, alloc: A) -> Box<str, A>` (runtime library) allocates a `Vec<u8, A>`, copies the bytes, converts to `Box<[u8], A>`, then reinterprets as `Box<str, A>` using one unsafe block inside the runtime.
 
 ---
 
 ## 4. Encode implementation
 
-`MessageEncode` is implemented for `Person<A: Allocator + Clone>`.
-
-The general structure of `encode_raw` and `encoded_len`:
-
 ```rust
-impl<A: Allocator + Clone> MessageEncode for Person<A> {
+impl<A: Allocator + Clone> MessageEncode for Task<A> {
     fn encoded_len(&self) -> usize {
         let mut len = 0;
-        // Field 1: string name (implicit presence — omit if empty)
-        if !self.name.is_empty() {
-            len += encoded_len_len_field(1, self.name.len());
+        // Field 1: EXPLICIT string — omit if None
+        if let Some(s) = &self.title {
+            len += encoded_len_len_field(1, s.len());
         }
-        // Field 2: int32 age (implicit presence — omit if zero)
-        if self.age != 0 {
-            len += encoded_len_varint_field(2, self.age as u64);
+        // Field 2: IMPLICIT i32 — omit if zero
+        if self.score != 0 {
+            len += encoded_len_varint_field(2, self.score as u64);
+        }
+        // Field 3: EXPLICIT i32 — omit if None (do NOT apply "omit if 0" rule)
+        if let Some(v) = self.max_retries {
+            len += encoded_len_varint_field(3, v as u64);
         }
         // … other fields …
-        // Unknown fields pass through unchanged.
         len += self._unknown_fields.len();
         len
     }
 
     fn encode_raw<B: BufMut>(&self, buf: &mut B) {
-        if !self.name.is_empty() {
-            encode_len_field(1, self.name.as_bytes(), buf);
+        if let Some(s) = &self.title {
+            encode_len_field(1, s.as_bytes(), buf);
         }
-        if self.age != 0 {
-            encode_varint_field(2, self.age as u64, buf);
+        if self.score != 0 {
+            encode_varint_field(2, self.score as u64, buf);
+        }
+        if let Some(v) = self.max_retries {
+            encode_varint_field(3, v as u64, buf);
         }
         // … other fields …
         buf.put_slice(&self._unknown_fields);
@@ -148,19 +161,20 @@ impl<A: Allocator + Clone> MessageEncode for Person<A> {
 
 ## 5. Decode implementation
 
-`MessageDecode` is implemented for `Person<A: Allocator + Clone + Default>`.
-
 ```rust
-impl<A: Allocator + Clone + Default> MessageDecode for Person<A> {
+impl<A: Allocator + Clone + Default> MessageDecode for Task<A> {
     fn merge_from<B: Buf>(&mut self, buf: &mut B) -> Result<(), DecodeError> {
         while buf.has_remaining() {
             let (field_number, wire_type) = decode_tag(buf)?;
             match (field_number, wire_type) {
                 (1, WireType::Len) => {
-                    self.name = decode_string_in(buf, self._alloc.clone())?;
+                    self.title = Some(decode_string_in(buf, self._alloc.clone())?);
                 }
                 (2, WireType::Varint) => {
-                    self.age = decode_varint(buf)? as i32;
+                    self.score = decode_varint(buf)? as i32;
+                }
+                (3, WireType::Varint) => {
+                    self.max_retries = Some(decode_varint(buf)? as i32);
                 }
                 // … other fields …
                 _ => {
@@ -177,26 +191,22 @@ impl<A: Allocator + Clone + Default> MessageDecode for Person<A> {
 
 ## 6. Per-field encode/decode patterns
 
-### 6.1 Scalar fields (implicit presence)
+### 6.1 Scalar: implicit presence
 
-**Storage:** plain `T` (e.g. `i32`).
+**Storage:** `T` (e.g. `i32`). **Omit if zero.**
 
-**Encode:** omit when value equals the type-zero.
 ```rust
-// int32 age, field 2
-if self.age != 0 {
-    encode_varint_field(2, self.age as u64, buf);
+// Encode:
+if self.score != 0 {
+    encode_varint_field(2, self.score as u64, buf);
 }
+// Decode:
+(2, WireType::Varint) => { self.score = decode_varint(buf)? as i32; }
 ```
 
-**Decode:**
-```rust
-(2, WireType::Varint) => { self.age = decode_varint(buf)? as i32; }
-```
+**All scalar types:**
 
-**Extension to all scalar types:**
-
-| Proto type | Decode expression | Encode: cast to `u64` |
+| Proto type | Decode expression | Encode cast |
 |---|---|---|
 | `int32` | `decode_varint(buf)? as i32` | `v as u64` |
 | `int64` | `decode_varint(buf)? as i64` | `v as u64` |
@@ -212,91 +222,89 @@ if self.age != 0 {
 | `sfixed32` | `buf.get_i32_le()` | `encode_i32_field(n, v as u32, buf)` |
 | `sfixed64` | `buf.get_i64_le()` | `encode_i64_field(n, v as u64, buf)` |
 
-### 6.2 Scalar fields (explicit presence)
+### 6.2 Scalar: explicit presence
 
-**Storage:** `Option<T>`.
+**Storage:** `Option<T>`. **Omit if `None`; include even if the inner value is zero.**
 
-**Encode:** include when `Some`, even if the value is zero.
 ```rust
-// optional int32 score = 2 [default = 100]
-if let Some(v) = self.score {
-    encode_varint_field(2, v as u64, buf);
+// Encode:
+if let Some(v) = self.max_retries {
+    encode_varint_field(3, v as u64, buf);
 }
-```
-
-**Decode:** always wrap in `Some`.
-```rust
-(2, WireType::Varint) => { self.score = Some(decode_varint(buf)? as i32); }
+// Decode: always wrap in Some
+(3, WireType::Varint) => { self.max_retries = Some(decode_varint(buf)? as i32); }
 ```
 
 ### 6.3 String fields
 
-**Storage:** `Box<str, A>` (implicit presence) or `Option<Box<str, A>>` (explicit presence).
+**Storage:** `Option<Box<str, A>>` (EXPLICIT, edition 2024 default) or `Box<str, A>` (IMPLICIT).
 
-**Encode:**
+**Encode (EXPLICIT — omit if None):**
 ```rust
-// Implicit — omit if empty
+if let Some(s) = &self.title {
+    encode_len_field(1, s.as_bytes(), buf);
+}
+```
+
+**Encode (IMPLICIT — omit if empty):**
+```rust
 if !self.name.is_empty() {
     encode_len_field(1, self.name.as_bytes(), buf);
-}
-// Explicit — omit if None
-if let Some(ref s) = self.name {
-    encode_len_field(1, s.as_bytes(), buf);
 }
 ```
 
 **Decode:**
 ```rust
 (1, WireType::Len) => {
-    self.name = decode_string_in(buf, self._alloc.clone())?;
-    // For explicit presence: self.name = Some(decode_string_in(…)?);
+    self.title = Some(decode_string_in(buf, self._alloc.clone())?);
+    // IMPLICIT variant: self.name = decode_string_in(buf, self._alloc.clone())?;
 }
 ```
 
-`decode_string_in(buf, alloc)` reads a LEN-prefixed payload, validates UTF-8, and returns `Box<str, A>`.
+`decode_string_in(buf, alloc)` reads a LEN-prefixed payload, validates UTF-8, returns `Box<str, A>`.
 
-**Setter implementation:**
+**Setter:**
 ```rust
-pub fn set_name(&mut self, v: &str) {
-    self.name = str_to_box_in(v, self._alloc.clone());
+pub fn set_title(&mut self, v: &str) {
+    self.title = Some(str_to_box_in(v, self._alloc.clone()));
 }
 ```
 
 ### 6.4 Bytes fields
 
-**Storage:** `Vec<u8, A>` (implicit) or `Option<Vec<u8, A>>` (explicit).
+**Storage:** `Option<Vec<u8, A>>` (EXPLICIT) or `Vec<u8, A>` (IMPLICIT).
 
-**Encode/decode** follow the same pattern as strings, using `encode_len_field` / `decode_bytes_in`.
+**Encode/decode** follow the same EXPLICIT/IMPLICIT pattern as strings, using `encode_len_field` / `decode_bytes_in`.
 
 **Setter:**
 ```rust
-pub fn set_avatar(&mut self, v: &[u8]) {
-    self.avatar.clear();
-    self.avatar.extend_from_slice(v);
+pub fn set_payload(&mut self, v: &[u8]) {
+    let vec = self.payload.get_or_insert_with(|| Vec::new_in(self._alloc.clone()));
+    vec.clear();
+    vec.extend_from_slice(v);
 }
 ```
 
-### 6.5 Repeated scalar fields (packed)
+### 6.5 Repeated scalar: packed
 
 **Storage:** `Vec<i32, A>`.
 
 **Encode:**
 ```rust
-// encode_packed_varint_field handles tag + length + all elements
-encode_packed_varint_field(4, &self.levels, |v| *v as u64, buf);
+encode_packed_varint_field(6, &self.tag_ids, |v| *v as u64, buf);
 ```
 
-**Decode (accepts both packed and non-packed):**
+**Decode (always accepts both packed and non-packed):**
 ```rust
-(4, WireType::Varint) => {
-    self.levels.push(decode_varint(buf)? as i32);
+(6, WireType::Varint) => {
+    self.tag_ids.push(decode_varint(buf)? as i32);
 }
-(4, WireType::Len) => {
+(6, WireType::Len) => {
     let payload_len = decode_varint(buf)? as usize;
     let leftover = {
         let mut sub = (&mut *buf).take(payload_len);
         while sub.has_remaining() {
-            self.levels.push(decode_varint(&mut sub)? as i32);
+            self.tag_ids.push(decode_varint(&mut sub)? as i32);
         }
         sub.remaining()
     };
@@ -304,45 +312,45 @@ encode_packed_varint_field(4, &self.levels, |v| *v as u64, buf);
 }
 ```
 
-### 6.6 Repeated scalar fields (non-packed, with packed fallback)
+### 6.6 Repeated scalar: non-packed (with packed fallback)
 
 **Encode** (one record per element):
 ```rust
-for &v in &self.levels {
-    encode_varint_field(4, v as u64, buf);
+for &v in &self.scores {
+    encode_varint_field(7, v as u64, buf);
 }
 ```
 
-**Decode** is identical to the packed case above — both VARINT and LEN arms are always present.
+**Decode** is identical to the packed case above — both `VARINT` and `LEN` arms are always present regardless of the schema's `EXPANDED` declaration.
 
-### 6.7 Repeated string / message fields
+### 6.7 Repeated string fields
 
-**Storage:** `Vec<Box<str, A>, A>` for strings; `Vec<Box<M<A>, A>, A>` for messages.
+**Storage:** `Vec<Box<str, A>, A>`.
 
 **Encode:**
 ```rust
-for email in &self.emails {
-    encode_len_field(4, email.as_bytes(), buf);
+for label in &self.labels {
+    encode_len_field(8, label.as_bytes(), buf);
 }
 ```
 
 **Decode:**
 ```rust
-(4, WireType::Len) => {
+(8, WireType::Len) => {
     let s = decode_string_in(buf, self._alloc.clone())?;
-    self.emails.push(s);
+    self.labels.push(s);
 }
 ```
 
 ### 6.8 Nested message fields
 
-**Storage:** `Option<Box<M<A>, A>>`.
+**Storage:** `Option<Box<Address<A>, A>>`.
 
 **Encode:**
 ```rust
-if let Some(addr) = &self.address {
+if let Some(addr) = &self.assignee {
     let msg_len = addr.encoded_len();
-    encode_tag(5, WireType::Len, buf);
+    encode_tag(11, WireType::Len, buf);
     encode_varint(msg_len as u64, buf);
     addr.encode_raw(buf);
 }
@@ -350,10 +358,10 @@ if let Some(addr) = &self.address {
 
 **Decode** uses `Buf::take` to bound the sub-message to exactly the declared byte length:
 ```rust
-(5, WireType::Len) => {
+(11, WireType::Len) => {
     let len = decode_varint(buf)? as usize;
     if buf.remaining() < len { return Err(DecodeError::TruncatedMessage); }
-    let addr = self.address.get_or_insert_with(|| {
+    let addr = self.assignee.get_or_insert_with(|| {
         Box::new_in(Address::new_in(self._alloc.clone()), self._alloc.clone())
     });
     let leftover = {
@@ -365,110 +373,105 @@ if let Some(addr) = &self.address {
 }
 ```
 
-Merging into an existing sub-message (not replacing it) implements protobuf's "concatenation = merge" semantics.
+Merging into an existing sub-message (not replacing it) implements "concatenation = merge".
 
 ### 6.9 Open enum fields
 
-**Storage:** `i32`.
+**Storage:** `i32` (IMPLICIT) or `Option<i32>` (EXPLICIT).
 
-**Encode:**
 ```rust
-if self.primary_phone_type != 0 {
-    encode_varint_field(6, self.primary_phone_type as u64, buf);
+// IMPLICIT — omit if zero:
+if self.status != 0 {
+    encode_varint_field(9, self.status as u64, buf);
 }
-```
-
-**Decode:**
-```rust
-(6, WireType::Varint) => {
-    self.primary_phone_type = decode_varint(buf)? as i32;
-}
+(9, WireType::Varint) => { self.status = decode_varint(buf)? as i32; }
 ```
 
 ### 6.10 Closed enum fields
 
-**Storage:** `Option<i32>`.
+**Storage:** `Option<i32>`. Unknown values are diverted to `_unknown_fields`.
 
-**Encode:**
 ```rust
-if let Some(v) = self.difficulty {
-    encode_varint_field(5, v as u64, buf);
+// Encode (EXPLICIT — include even if value is the zero variant):
+if let Some(v) = self.priority {
+    encode_varint_field(10, v as u64, buf);
 }
-```
 
-**Decode:** unknown values are diverted to `_unknown_fields` via `save_unknown_varint_field`:
-```rust
-(5, WireType::Varint) => {
+// Decode:
+(10, WireType::Varint) => {
     let raw = decode_varint(buf)? as i32;
-    if Difficulty::try_from(raw).is_ok() {
-        self.difficulty = Some(raw);
+    if Priority::try_from(raw).is_ok() {
+        self.priority = Some(raw);
     } else {
-        save_unknown_varint_field(5, raw as u64, &mut self._unknown_fields);
+        // Unknown value → preserve as unknown field for round-trip
+        save_unknown_varint_field(10, raw as u64, &mut self._unknown_fields);
     }
 }
 ```
+
+`save_unknown_varint_field` is provided by the runtime library.
 
 ### 6.11 Oneof fields
 
-**Storage:** `Option<person::ContactMethod<A>>` where the enum holds the string/scalar/message value.
+**Storage:** `Option<task::Notification<A>>`.
 
-**Encode:**
 ```rust
-if let Some(cm) = &self.contact_method {
-    match cm {
-        person::ContactMethod::PhoneNumber(s) => encode_len_field(7, s.as_bytes(), buf),
-        person::ContactMethod::FaxNumber(s)   => encode_len_field(8, s.as_bytes(), buf),
+// Encode:
+if let Some(n) = &self.notification {
+    match n {
+        task::Notification::EmailAddress(s) => encode_len_field(12, s.as_bytes(), buf),
+        task::Notification::PhoneNumber(s)  => encode_len_field(13, s.as_bytes(), buf),
     }
 }
-```
 
-**Decode:** each variant's field number sets a new `Some(_)`, replacing any prior variant:
-```rust
-(7, WireType::Len) => {
+// Decode: each variant overwrites the previous one
+(12, WireType::Len) => {
     let s = decode_string_in(buf, self._alloc.clone())?;
-    self.contact_method = Some(person::ContactMethod::PhoneNumber(s));
+    self.notification = Some(task::Notification::EmailAddress(s));
 }
-(8, WireType::Len) => {
+(13, WireType::Len) => {
     let s = decode_string_in(buf, self._alloc.clone())?;
-    self.contact_method = Some(person::ContactMethod::FaxNumber(s));
+    self.notification = Some(task::Notification::PhoneNumber(s));
 }
 ```
 
 ### 6.12 Unknown fields
 
-**Storage:** `Vec<u8, A>` containing a valid (partial) protobuf wire stream.
+**Storage:** `Vec<u8, A>` — a valid partial protobuf wire stream.
 
-**Accumulation during decode:**
 ```rust
-_ => {
-    skip_field_and_save(field_number, wire_type, buf, &mut self._unknown_fields)?;
-}
-```
+// Accumulate during decode:
+_ => { skip_field_and_save(field_number, wire_type, buf, &mut self._unknown_fields)?; }
 
-`skip_field_and_save` re-serialises the tag and copies the payload verbatim into `_unknown_fields`.
-
-For closed-enum unknown values (§6.10), `save_unknown_varint_field` writes only the tag and the already-read value, since the value has been decoded before the check.
-
-**Emit during encode:**
-```rust
+// Emit during encode:
 buf.put_slice(&self._unknown_fields);
 ```
 
-### 6.13 Required fields (proto2)
+### 6.13 LEGACY_REQUIRED fields
 
-**Storage:** `Option<T>` (same as an `optional` field) to track whether the field was seen on the wire.
+**Storage:** `Option<T>` (identical to `EXPLICIT`).
+
+The only difference from `EXPLICIT` is the generated `validate()` method:
 
 ```rust
-// impl block for validate():
 pub fn validate(&self) -> Result<(), DecodeError> {
-    if self.player_id.is_none() {
-        return Err(DecodeError::MissingRequiredField { field_number: 1 });
+    if self.owner_id.is_none() {
+        return Err(DecodeError::MissingRequiredField { field_number: 4 });
     }
     Ok(())
 }
+
+pub fn decode_strict<B: Buf>(buf: B) -> Result<Self, DecodeError>
+where
+    Self: Default + MessageDecode,
+{
+    let msg = <Self as MessageDecode>::decode(buf)?;
+    msg.validate()?;
+    Ok(msg)
+}
 ```
 
-The decode arm is identical to an `optional` field.
+The encode and decode arms are identical to an `EXPLICIT` field.
 
 ---
 
@@ -476,14 +479,23 @@ The decode arm is identical to an `optional` field.
 
 ### Presence bitfield
 
-Currently, each `optional` scalar field uses `Option<T>` which requires storing a discriminant alongside the value. For a message with many optional fields, this wastes space. An alternative: store all scalar presence flags in a single `u64` (or a `[u64; N]` bitfield) and use plain `T` fields for the values. The public accessor API (`has_X()`, `set_X()`, `clear_X()`) is identical; only the generated implementation changes.
+Currently each `EXPLICIT`-presence scalar uses `Option<T>`, which stores a discriminant alongside the value (e.g. `Option<i32>` is typically 8 bytes). For a message with many optional scalars, a per-message `u64` (or `[u64; N]`) bitfield could replace the discriminants:
 
-Google protobuf's generated C++ code already does this. The Rust implementation could adopt the same approach.
+```rust
+// Hypothetical optimised layout:
+pub struct Task<A: Allocator = Global> {
+    _presence: u64,  // bit i set ↔ field i is present
+    score:     i32,  // plain T, presence checked via bit
+    // …
+}
+```
 
-### `Box<str, A>` vs borrowed string
+The public accessor API (`has_X()`, `set_X()`, `clear_X()`, `X()`) is identical in both representations. This is the approach used by Google protobuf's generated C++ and Java code.
 
-For use cases where messages are decoded and immediately read without modification, zero-copy decoding (returning `&'buf str` from string fields) would avoid all string allocations. This requires a lifetime parameter on the message type. See §8 of DESIGN.md for the future work item.
+### Zero-copy string fields
+
+For use cases where messages are decoded and immediately consumed without modification, zero-copy decoding (`&'buf str` instead of `Box<str, A>`) would eliminate all string allocations. This requires a lifetime parameter on the message type. See DESIGN.md §8 for the future work item.
 
 ### Arena allocation
 
-Arena allocators (e.g. `bumpalo`) already work with the current design via `new_in(&bump)`. All heap allocations for a message land in the same arena; dropping the arena frees them all at once without `Drop` overhead. This is the primary motivator for the `A: Allocator` generic parameter.
+Arena allocators (`&bumpalo::Bump`, etc.) already work with the current design via `new_in(alloc)`. All heap allocations for a message and its nested messages land in the same arena; dropping the arena frees everything at once without `Drop` overhead.

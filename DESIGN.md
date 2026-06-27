@@ -15,7 +15,7 @@ This document specifies the **public interface** of the `puroro` Protocol Buffer
    - 4.5 [Nested message fields](#45-nested-message-fields)
    - 4.6 [Enum fields](#46-enum-fields) — open vs closed
    - 4.7 [Oneof fields](#47-oneof-fields)
-   - 4.8 [Required fields (proto2 only)](#48-required-fields-proto2-only)
+   - 4.8 [Required fields (`LEGACY_REQUIRED`)](#48-required-fields-legacy_required)
    - 4.9 [Unknown fields](#49-unknown-fields)
 5. [Allocator design](#5-allocator-design)
    - 5.1 [Chosen design: single type parameter](#51-chosen-design-single-type-parameter)
@@ -24,14 +24,10 @@ This document specifies the **public interface** of the `puroro` Protocol Buffer
    - 5.4 [Comparison summary](#54-comparison-summary)
 6. [Proto syntax versions: proto2, proto3, and editions](#6-proto-syntax-versions-proto2-proto3-and-editions)
    - 6.1 [Wire format is version-agnostic](#61-wire-format-is-version-agnostic)
-   - 6.2 [Field presence and optional scalars](#62-field-presence-and-optional-scalars)
-   - 6.3 [Custom default values (proto2)](#63-custom-default-values-proto2)
-   - 6.4 [Required fields (proto2)](#64-required-fields-proto2)
-   - 6.5 [Closed vs open enums](#65-closed-vs-open-enums)
-   - 6.6 [Packed repeated fields](#66-packed-repeated-fields)
-   - 6.7 [Editions feature matrix](#67-editions-feature-matrix)
-   - 6.8 [Extensions (not yet implemented)](#68-extensions-not-yet-implemented)
-   - 6.9 [Comparison summary](#69-comparison-summary)
+   - 6.2 [Editions as the unified syntax](#62-editions-as-the-unified-syntax)
+   - 6.3 [Editions feature matrix](#63-editions-feature-matrix)
+   - 6.4 [Migration from proto2 / proto3](#64-migration-from-proto2--proto3)
+   - 6.5 [Extensions (not yet implemented)](#65-extensions-not-yet-implemented)
 7. [Design decisions and trade-offs](#7-design-decisions-and-trade-offs)
 8. [Future work](#8-future-work)
 
@@ -85,7 +81,6 @@ pub trait MessageEncode {
     fn encoded_len(&self) -> usize;
 
     /// Writes the message body to `buf` without a framing length prefix.
-    /// Panics or produces garbage if `buf` has insufficient capacity.
     fn encode_raw<B: bytes::BufMut>(&self, buf: &mut B);
 
     // Provided convenience methods:
@@ -122,65 +117,112 @@ The primary operation is *merge*, not *decode-from-scratch*. `decode` is a conve
 
 ## 4. Generated code specification
 
-This section is the normative reference for what the code generator emits. Each subsection covers all syntax versions (proto2, proto3, editions). The two reference schemas used throughout are:
+This section is the normative reference for what the code generator emits. All field patterns are illustrated using a single **editions** reference schema, since editions can express every variant (implicit/explicit presence, custom defaults, required-like semantics, open/closed enums, packed/expanded repeated) in one file.
 
-**proto3 reference** (`src/sample.rs` → `example`):
+### Reference schema
 
 ```protobuf
-syntax = "proto3";
+edition = "2024";
 package example;
 
-enum PhoneType { PHONE_TYPE_UNSPECIFIED = 0; MOBILE = 1; HOME = 2; WORK = 3; }
+// Edition 2024 file-level defaults:
+//   field_presence         = EXPLICIT  (presence tracked for all singular fields)
+//   repeated_field_encoding = PACKED   (numeric repeated fields are packed)
+//   enum_type              = OPEN      (unknown enum values are accepted)
 
-message Address { string street = 1; string city = 2; }
+// ── Enums ──────────────────────────────────────────────────────────────────
 
-message Person {
-    string          name               = 1;   // implicit presence
-    int32           age                = 2;   // implicit presence
-    bytes           avatar             = 3;
-    repeated string emails             = 4;
-    Address         address            = 5;
-    PhoneType       primary_phone_type = 6;   // open enum
-    oneof contact_method { string phone_number = 7; string fax_number = 8; }
+// Open enum (edition default): unknown values stored in the typed field.
+enum Status {
+    STATUS_UNSPECIFIED = 0;
+    PENDING = 1;
+    DONE    = 2;
+}
+
+// Closed enum: unknown values diverted to unknown fields.
+enum Priority {
+    option features.enum_type = CLOSED;
+    PRIORITY_UNSPECIFIED = 0;
+    LOW  = 1;
+    HIGH = 2;
+}
+
+// ── Messages ───────────────────────────────────────────────────────────────
+
+message Address {
+    string street = 1;   // EXPLICIT presence (edition default)
+    string city   = 2;
+}
+
+message Task {
+    // Field 1: EXPLICIT presence (edition 2024 default) — tracks whether set
+    string title = 1;
+
+    // Field 2: IMPLICIT presence — omit when zero, like proto3 scalars
+    int32 score = 2 [features.field_presence = IMPLICIT];
+
+    // Field 3: EXPLICIT presence with custom default value
+    int32 max_retries = 3 [default = 3];
+
+    // Field 4: LEGACY_REQUIRED — must be present; validated via validate()
+    string owner_id = 4 [features.field_presence = LEGACY_REQUIRED];
+
+    // Field 5: bytes (EXPLICIT presence)
+    bytes payload = 5;
+
+    // Field 6: Packed repeated int32 (PACKED is the edition default)
+    repeated int32 tag_ids = 6;
+
+    // Field 7: Non-packed repeated int32 (explicitly EXPANDED)
+    repeated int32 scores = 7 [features.repeated_field_encoding = EXPANDED];
+
+    // Field 8: Repeated string (strings cannot be packed; EXPANDED implicitly)
+    repeated string labels = 8;
+
+    // Field 9: Open enum, IMPLICIT presence
+    Status status = 9 [features.field_presence = IMPLICIT];
+
+    // Field 10: Closed enum (EXPLICIT presence)
+    Priority priority = 10;
+
+    // Field 11: Nested message (EXPLICIT presence)
+    Address assignee = 11;
+
+    // Fields 12–13: Oneof (presence is intrinsic to oneof)
+    oneof notification {
+        string email_address = 12;
+        string phone_number  = 13;
+    }
 }
 ```
 
-**proto2 reference** (`src/sample.rs` → `example_proto2`):
-
-```protobuf
-syntax = "proto2";
-package example;
-
-enum Difficulty { EASY = 0; NORMAL = 1; HARD = 2; }  // closed enum
-
-message PlayerConfig {
-    required string     player_id  = 1;
-    optional int32      score      = 2 [default = 100];
-    optional bool       active     = 3;
-    repeated int32      levels     = 4 [packed = false];
-    optional Difficulty difficulty = 5;               // closed enum
-}
-```
+The subsections below document each field pattern in terms of its generated accessor API.
 
 ---
 
 ### 4.1 Scalar fields
 
-The Rust accessor type for a scalar field is the natural Rust equivalent of the proto type. The key variation across syntax versions is **field presence**.
+Scalar types are copy types in Rust (`i32`, `bool`, `f32`, …). The key variation is **field presence**.
 
-#### Implicit presence (proto3 default / editions `IMPLICIT`)
+#### Implicit presence (`features.field_presence = IMPLICIT`)
 
-- Value accessor: `fn age(&self) -> i32`
-- Setter: `fn set_age(&mut self, v: i32)`
-- Wire rule: field is absent from the wire when the value equals the type's zero (`0`, `false`, `0.0`).
+Equivalent to proto3's default singular scalar behaviour.
 
-#### Explicit presence (proto2 `optional` / proto3 `optional` keyword / editions `EXPLICIT`)
+- Value accessor: `fn score(&self) -> i32`
+- Setter: `fn set_score(&mut self, v: i32)`
+- Wire rule: field absent from the wire when value equals the type-zero (`0`, `false`, `0.0`).
+
+#### Explicit presence (`features.field_presence = EXPLICIT`, edition 2024 default)
+
+Equivalent to proto2 `optional`. Presence is tracked independently of value.
 
 - Presence query: `fn has_score(&self) -> bool`
 - Value accessor: `fn score(&self) -> i32` — returns the proto-declared default (or the type-zero if none) when `has_score()` is `false`
-- Setter: `fn set_score(&mut self, v: i32)` — also sets `has_score()` to `true`
-- Clearer: `fn clear_score(&mut self)` — sets `has_score()` to `false`
+- Setter: `fn set_score(&mut self, v: i32)` — also makes `has_score()` true
+- Clearer: `fn clear_score(&mut self)` — makes `has_score()` false
 - Wire rule: field absent when `has_score()` is `false`; present even when the value is zero.
+
+The `[default = 3]` option on `max_retries` only affects the accessor: `max_retries()` returns `3` when `has_max_retries()` is false. The `new_in()` constructor always initialises the field to the unset state.
 
 #### Scalar type mapping
 
@@ -194,34 +236,29 @@ The Rust accessor type for a scalar field is the natural Rust equivalent of the 
 | `float` | `f32` | I32 |
 | `double` | `f64` | I64 |
 
-All seven presence patterns (implicit vs explicit) apply uniformly across every entry in this table.
+Both presence modes apply uniformly across every entry in this table.
 
 ---
 
 ### 4.2 String fields
 
-- Value accessor: `fn name(&self) -> &str`
-- Setter: `fn set_name(&mut self, v: &str)` — copies the string data
+- Value accessor: `fn title(&self) -> Option<&str>` (EXPLICIT presence) or `fn name(&self) -> &str` (IMPLICIT presence)
+- Setter: `fn set_title(&mut self, v: &str)` — copies the string data
+- `has_title()` / `clear_title()` for EXPLICIT presence
 
-The internal storage representation (e.g. `Box<str, A>`) is an implementation detail and may change. The accessor always returns a borrowed `&str`.
+The internal storage representation is an implementation detail and may change. The accessor always yields a borrowed `&str`.
 
-**Wire rules:**
-
-| Presence mode | Absent from wire when |
-|---|---|
-| Implicit (proto3 default) | value is the empty string `""` |
-| Explicit (`optional` / `optional` keyword) | `has_name()` is false |
-
-For explicit-presence strings the same `has_X()` / `set_X()` / `clear_X()` pattern from §4.1 applies.
+**Wire rule:** absent when `has_title()` is false (EXPLICIT) or when the value is `""` (IMPLICIT, same as proto3).
 
 ---
 
 ### 4.3 Bytes fields
 
-- Value accessor: `fn avatar(&self) -> &[u8]`
-- Setter: `fn set_avatar(&mut self, v: &[u8])` — copies the byte data
+- Value accessor: `fn payload(&self) -> Option<&[u8]>` (EXPLICIT presence)
+- Setter: `fn set_payload(&mut self, v: &[u8])`
+- `has_payload()` / `clear_payload()` for EXPLICIT presence
 
-For explicit-presence bytes, `has_avatar()` / `clear_avatar()` are also generated. Wire omission follows the same rule as strings.
+Wire omission follows the same rule as strings.
 
 ---
 
@@ -229,40 +266,45 @@ For explicit-presence bytes, `has_avatar()` / `clear_avatar()` are also generate
 
 Repeated fields expose a slice-like read API and append/clear mutation. The accessor returns a reference to a contiguous sequence, **not** a `Vec`, so callers get O(1) random access without allocation.
 
-**Repeated string example (`repeated string emails = 4`):**
+**Packed repeated scalar (`tag_ids: repeated int32`, field 6):**
 
 ```rust
-// Read — returns a slice whose elements deref to &str:
-pub fn emails(&self) -> &[impl Deref<Target = str>];
-
-// Write:
-pub fn push_email(&mut self, v: &str);
-pub fn clear_emails(&mut self);
+pub fn tag_ids(&self) -> &[i32];
+pub fn push_tag_id(&mut self, v: i32);
+pub fn clear_tag_ids(&mut self);
 ```
 
-Note: the concrete element type is an implementation detail; callers rely on the `Deref<Target = str>` bound and should not name the type directly.
-
-**Repeated scalar example (`repeated int32 levels = 4`):**
+**Non-packed repeated scalar (`scores: repeated int32 [EXPANDED]`, field 7):**
 
 ```rust
-pub fn levels(&self) -> &[i32];
-pub fn push_level(&mut self, v: i32);
-pub fn clear_levels(&mut self);
+pub fn scores(&self) -> &[i32];
+pub fn push_score(&mut self, v: i32);
+pub fn clear_scores(&mut self);
 ```
+
+The accessor API is identical for packed and non-packed; the difference is only in the wire encoding.
+
+**Repeated string (`labels: repeated string`, field 8):**
+
+```rust
+// Returns a slice whose elements deref to &str:
+pub fn labels(&self) -> &[impl Deref<Target = str>];
+pub fn push_label(&mut self, v: &str);
+pub fn clear_labels(&mut self);
+```
+
+The concrete element type is an implementation detail; callers rely on the `Deref<Target = str>` bound.
 
 #### Packed vs non-packed encoding
 
-The default packing behaviour depends on syntax version and field type:
+| Feature setting | Wire encoding |
+|---|---|
+| `PACKED` (edition 2024 default for numeric fields) | One LEN record containing all element values |
+| `EXPANDED` | One VARINT/I32/I64 record per element |
 
-| Syntax | Packable numeric `repeated` field | Default encoding |
-|---|---|---|
-| proto3 | Yes (all numeric types) | **Packed** (one LEN record for all elements) |
-| proto2 | No (unless `[packed = true]`) | **Non-packed** (one record per element) |
-| editions | Per-field `features.repeated_field_encoding` | `PACKED` or `EXPANDED` |
+**Compatibility requirement (spec-mandated):** The decoder must accept *both* packed and non-packed forms for any packable repeated field, regardless of what the schema declares.
 
-**Compatibility requirement (spec-mandated):** The decoder must accept *both* packed and non-packed forms for any packable repeated field, regardless of what the schema declares. This ensures forward- and backward-compatibility when the `packed` option changes between schema versions.
-
-Repeated **string** and **message** fields cannot be packed; they always use one LEN record per element.
+String and message fields cannot be packed; they always use one LEN record per element.
 
 ---
 
@@ -271,16 +313,16 @@ Repeated **string** and **message** fields cannot be packed; they always use one
 Message fields are always optional in the generated struct (`None` = not present). The accessor returns `Option<&M<A>>`.
 
 ```rust
-pub fn address(&self) -> Option<&Address<A>>;
+pub fn assignee(&self) -> Option<&Address<A>>;
 
-/// Returns a mutable reference to the field, creating a default value if absent.
-pub fn address_mut(&mut self) -> &mut Address<A>;
+/// Returns a mutable reference, creating a default value if absent.
+pub fn assignee_mut(&mut self) -> &mut Address<A>;
 
-pub fn set_address(&mut self, v: Address<A>);
-pub fn clear_address(&mut self);
+pub fn set_assignee(&mut self, v: Address<A>);
+pub fn clear_assignee(&mut self);
 ```
 
-**Merge semantics:** when the same message field appears more than once on the wire, occurrences are *merged* (not replaced). This is identical across all syntax versions and implements protobuf's "concatenated bytes = merged message" property.
+**Merge semantics:** when the same message field appears more than once on the wire, occurrences are *merged* rather than replaced. This implements protobuf's "concatenated bytes = merged message" property.
 
 ---
 
@@ -288,87 +330,85 @@ pub fn clear_address(&mut self);
 
 The wire encoding is always VARINT. The variation is whether unknown numeric values are accepted.
 
-#### Open enum (proto3 / editions `OPEN`)
+#### Open enum (`enum_type = OPEN`, edition 2024 default)
 
-Unknown numeric values are accepted and preserved. A raw accessor always succeeds; a typed accessor returns `Result`.
+Unknown numeric values are stored in the typed field. A raw accessor always succeeds; a typed accessor returns `Result`.
 
 ```rust
 // Always available:
-pub fn primary_phone_type_raw(&self) -> i32;
-pub fn set_primary_phone_type_raw(&mut self, v: i32);
+pub fn status_raw(&self) -> i32;
+pub fn set_status_raw(&mut self, v: i32);
 
-// Typed; returns Err(raw_value) for unknown values:
-pub fn primary_phone_type(&self) -> Result<PhoneType, i32>;
-pub fn set_primary_phone_type(&mut self, v: PhoneType);
+// Typed; Err(raw_value) for unknown values:
+pub fn status(&self) -> Result<Status, i32>;
+pub fn set_status(&mut self, v: Status);
 ```
 
-Wire rule: field absent when the raw value is 0 (implicit presence).
+Wire rule: field absent when the raw value is 0 (IMPLICIT presence).
 
-#### Closed enum (proto2 / editions `CLOSED`)
+#### Closed enum (`enum_type = CLOSED`)
 
-Unknown numeric values are rejected and stored as unknown fields instead. The typed field may be absent even if the field was present on the wire (because the value was unknown).
+Unknown numeric values are diverted to unknown fields. The typed field may be absent even when the field was on the wire (unknown value was encountered).
 
 ```rust
-// Typed; returns None if unset, Some(Ok(_)) for known values:
-pub fn difficulty(&self) -> Option<Result<Difficulty, i32>>;
-pub fn set_difficulty(&mut self, v: Difficulty);
-pub fn clear_difficulty(&mut self);
+// Typed; None if unset, Some(Ok(_)) for known values, Some(Err(raw)) for unknown:
+pub fn priority(&self) -> Option<Result<Priority, i32>>;
+pub fn set_priority(&mut self, v: Priority);
+pub fn clear_priority(&mut self);
 ```
 
-Wire rule: field absent when not set (`None`); present even when the value is the zero variant.
+Wire rule: field absent when not set; present even for the zero variant.
 
 #### Generated enum type
 
-Both open and closed enums generate the same enum type:
+Both open and closed enums produce the same enum definition:
 
 ```rust
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 #[repr(i32)]
-pub enum PhoneType {
-    Unspecified = 0,
-    Mobile = 1,
-    // …
-}
+pub enum Status { Unspecified = 0, Pending = 1, Done = 2 }
 
-impl TryFrom<i32> for PhoneType { type Error = i32; … }
-impl From<PhoneType> for i32 { … }
+impl TryFrom<i32> for Status { type Error = i32; … }
+impl From<Status> for i32 { … }
 ```
 
 ---
 
 ### 4.7 Oneof fields
 
-Each `oneof` group generates a Rust `enum` placed in a submodule named after the parent message (lower-snake-case). The parent message holds an `Option` of that enum.
+Each `oneof` group generates a Rust `enum` in a submodule named after the parent message (lower-snake-case). The parent message holds an `Option` of that enum.
 
 ```rust
-// In module `person`:
-pub enum ContactMethod<A: Allocator = Global> {
+// In module `task`:
+pub enum Notification<A: Allocator = Global> {
+    EmailAddress(/* owned string */),
     PhoneNumber(/* owned string */),
-    FaxNumber(/* owned string */),
 }
 
-// Accessors on Person:
-pub fn contact_method(&self) -> Option<&person::ContactMethod<A>>;
-pub fn contact_method_mut(&mut self) -> Option<&mut person::ContactMethod<A>>;
-pub fn set_contact_method(&mut self, v: Option<person::ContactMethod<A>>);
+// Accessors on Task:
+pub fn notification(&self) -> Option<&task::Notification<A>>;
+pub fn notification_mut(&mut self) -> Option<&mut task::Notification<A>>;
+pub fn set_notification(&mut self, v: Option<task::Notification<A>>);
 
 // Per-variant convenience setters; each clears any previously set variant:
+pub fn set_email_address(&mut self, v: &str);
 pub fn set_phone_number(&mut self, v: &str);
-pub fn set_fax_number(&mut self, v: &str);
 ```
 
-Setting any variant replaces the whole `Option`; the last field seen on the wire wins, which is correct for all syntax versions.
+Setting any variant replaces the whole `Option`; the last field seen on the wire wins.
 
 ---
 
-### 4.8 Required fields (proto2 only)
+### 4.8 Required fields (`LEGACY_REQUIRED`)
 
-`required` fields exist only in proto2. On the wire they are indistinguishable from `optional` fields; the constraint is schema-level only.
+`features.field_presence = LEGACY_REQUIRED` corresponds to proto2's `required` modifier. It is intended as a **migration path** for existing proto2 schemas and is not recommended for new fields.
 
-The generated message provides a `validate()` method that checks all required fields are present, and a `decode_strict()` that combines decode and validation:
+On the wire, a `LEGACY_REQUIRED` field is indistinguishable from an `EXPLICIT` field; the constraint is schema-level only.
+
+The generated message provides a `validate()` method and a `decode_strict()` wrapper:
 
 ```rust
-/// Returns Err if any required field was absent from the decoded wire data.
+/// Returns Err if any LEGACY_REQUIRED field was absent from the decoded wire data.
 pub fn validate(&self) -> Result<(), DecodeError>;
 
 /// Decodes and validates in one step.
@@ -377,23 +417,23 @@ where
     Self: Default + MessageDecode;
 ```
 
-The accessor for a required field returns `Option<&str>` (or `Option<T>`) — `None` means the field was not seen on the wire. `validate()` converts those `None` values into `Err(DecodeError::MissingRequiredField { field_number })`.
+The accessor for a `LEGACY_REQUIRED` field returns `Option<&str>` (or `Option<T>`) — `None` means not seen on the wire. `validate()` converts those `None` values into `Err(DecodeError::MissingRequiredField { field_number })`.
 
-`MessageDecode::decode` does **not** call `validate()` automatically, keeping the trait generic across proto2 and proto3.
+`MessageDecode::decode` does **not** call `validate()` automatically.
 
 ---
 
 ### 4.9 Unknown fields
 
-All generated messages expose the raw bytes of any fields whose field numbers are not known to the current schema version:
+All generated messages expose the raw bytes of any unrecognised fields:
 
 ```rust
 pub fn unknown_fields(&self) -> &[u8];
 ```
 
-These bytes are a valid (partial) protobuf wire stream and are re-emitted verbatim at the end of the message on encode, ensuring forward-compatibility round-trips. This behaviour is identical across all syntax versions.
+These bytes form a valid partial protobuf stream and are re-emitted verbatim at the end of the message on encode, ensuring forward-compatibility round-trips.
 
-**Disabling unknown-field preservation:** a future attribute (e.g. `#[puroro(no_unknown_fields)]`) would omit the unknown-fields buffer from a specific message type. Not yet implemented.
+**Disabling unknown-field preservation:** a future attribute (e.g. `#[puroro(no_unknown_fields)]`) would omit the unknown-fields buffer. Not yet implemented.
 
 ---
 
@@ -404,25 +444,24 @@ These bytes are a valid (partial) protobuf wire stream and are re-emitted verbat
 Every generated type carries a single allocator type parameter `A` that applies to all heap allocations within that message and its nested messages:
 
 ```rust
-pub struct Person<A: Allocator = Global> { /* … */ }
+pub struct Task<A: Allocator = Global> { /* … */ }
 ```
 
-`A` defaults to `Global`, so `Person` (without a type argument) behaves identically to a version without allocator support.
+`A` defaults to `Global`, so `Task` (without a type argument) works identically to a version without allocator support.
 
 **Constructor API:**
 
 ```rust
-impl<A: Allocator + Clone> Person<A> {
+impl<A: Allocator + Clone> Task<A> {
     /// Creates an empty message using the given allocator.
     pub fn new_in(alloc: A) -> Self;
 }
 
-impl Person<Global> {
-    /// Creates an empty message using the global allocator.
+impl Task<Global> {
     pub fn new() -> Self;
 }
 
-impl<A: Allocator + Clone + Default> Default for Person<A> { … }
+impl<A: Allocator + Clone + Default> Default for Task<A> { … }
 ```
 
 **Allocator bound on mutation:** setter methods and `push_*` methods require `A: Clone` because they may create new heap values at call time. Read-only methods do not.
@@ -430,20 +469,20 @@ impl<A: Allocator + Clone + Default> Default for Person<A> { … }
 **Decode API:**
 
 ```rust
-impl<A: Allocator + Clone + Default> MessageDecode for Person<A> {
+impl<A: Allocator + Clone + Default> MessageDecode for Task<A> {
     fn merge_from<B: Buf>(&mut self, buf: &mut B) -> Result<(), DecodeError>;
 }
 ```
 
-The `Default` bound is required because `MessageDecode::decode` calls `A::default()` to obtain the initial allocator.  Callers using a non-`Default` allocator must call `new_in(alloc)` followed by `merge_from` instead of calling `decode` directly.
+The `Default` bound is required because `MessageDecode::decode` calls `A::default()` to obtain the initial allocator.  Callers using a non-`Default` allocator must call `new_in(alloc)` followed by `merge_from` instead of `decode`.
 
 **Arena allocator example:**
 
 ```rust
 let bump = bumpalo::Bump::new();
-let mut p = Person::new_in(&bump);
-p.set_name("Alice");
-// All allocations — name, emails, nested messages — land in `bump`.
+let mut t = Task::new_in(&bump);
+t.set_title("Fix bug");
+// All allocations (title, labels, nested messages) land in `bump`.
 // Dropping `bump` frees everything at once without individual Drop calls.
 ```
 
@@ -455,22 +494,17 @@ To allow each field to use a different allocator, every dynamically-sized field 
 
 ```rust
 // Illustrative sketch — not the chosen design:
-pub struct Person<A1 = Global, A2 = Global, A3 = Global, …>
+pub struct Task<A1 = Global, A2 = Global, A3 = Global, …>
 where A1: Allocator, A2: Allocator, …
-{
-    name:    /* string stored with A1 */,
-    emails:  /* each element with A2, container with A3 */,
-    address: Option</* Address<???, …> stored with A4 */>,
-    // address itself has its own type parameters …
-}
+{ … }
 ```
 
-**Problems that make this design impractical:**
+**Problems:**
 
-1. **Combinatorial explosion.** A message with `N` heap-allocated fields needs up to `2N` type parameters; nested messages multiply this by their own count.
-2. **No natural default allocator for setters.** With a single `A`, a setter can always use the stored allocator. With per-field parameters there is no obvious choice.
-3. **Type inference failure.** Call sites require turbofish annotations for every parameter.
-4. **Unwieldy function signatures.** Any function accepting a `Person<…>` must list all allocator parameters.
+1. **Combinatorial explosion.** A message with `N` heap-allocated fields needs up to `2N` type parameters; nested messages multiply this.
+2. **No natural default allocator for setters.**
+3. **Type inference failure** at call sites.
+4. **Unwieldy function signatures.**
 
 **Verdict:** Impractical.
 
@@ -478,23 +512,21 @@ where A1: Allocator, A2: Allocator, …
 
 ### 5.3 Alternative: dynamic dispatch (`Box<dyn Allocator>`)
 
-A shared reference-counted pointer is used in place of the type parameter:
-
 ```rust
 // Illustrative sketch — not the chosen design:
-pub struct Person {
-    // all fields allocated through a shared Arc<dyn Allocator + Send + Sync>
+pub struct Task {
+    // all fields allocated through Arc<dyn Allocator + Send + Sync>
 }
 ```
 
 **Problems:**
 
-1. **Runtime overhead.** Every allocation goes through a virtual call.
-2. **`Arc` cost.** Reference counting requires atomic operations.
-3. **`Send + Sync` requirement.** Many useful arena allocators (e.g. `bumpalo::Bump`) are `!Sync`.
-4. **Loss of monomorphisation.** The compiler cannot inline or specialise allocations.
+1. **Runtime overhead** — every allocation goes through a virtual call.
+2. **`Arc` cost** — atomic reference counting.
+3. **`Send + Sync` requirement** excludes arena allocators like `bumpalo::Bump` (`!Sync`).
+4. **Loss of monomorphisation.**
 
-**Verdict:** Viable as a concrete type alias for users who need runtime allocator dispatch, but not as the primary design.
+**Verdict:** Viable as a type alias for users who need runtime dispatch, but not as the primary design.
 
 ---
 
@@ -504,13 +536,11 @@ pub struct Person {
 |---|---|---|---|
 | Number of type params | 1 | O(fields × depth) | 0 |
 | Can mix allocators | No | Yes | Yes (runtime) |
-| Zero-cost when using `Global` | Yes (ZST) | Yes | No (Arc overhead) |
+| Zero-cost for `Global` | Yes (ZST) | Yes | No (Arc overhead) |
 | Arena allocator support | Yes | Yes | Partial (`!Sync` excluded) |
 | Type inference ergonomics | Good | Poor | Good |
 | Compile-time monomorphisation | Yes | Yes | No |
 | Generated code complexity | Low | Very high | Low |
-
-The single-`A` design is the clear practical choice.
 
 ---
 
@@ -520,68 +550,47 @@ The single-`A` design is the clear practical choice.
 
 The wire format is **identical** across proto2, proto3, and editions. The runtime library (`MessageEncode`, `MessageDecode`, all helpers) requires no changes to support different syntax versions. All differences are in what the **code generator emits**.
 
-### 6.2 Field presence and optional scalars
+### 6.2 Editions as the unified syntax
 
-See **§4.1** for the complete accessor API.
+Editions (edition 2023 onward) replace the proto2/proto3 binary choice with per-field feature flags. They can express every behaviour that proto2 and proto3 offered:
 
-| Syntax | Singular scalar | Presence mode | Omit from wire when |
-|---|---|---|---|
-| proto3 (default) | `fn age() -> i32` | Implicit | value == 0 |
-| proto3 `optional` keyword | `fn age() -> i32` + `fn has_age() -> bool` | Explicit | `has_age()` false |
-| proto2 `optional` | same as proto3 `optional` | Explicit | `has_age()` false |
-| editions `IMPLICIT` | same as proto3 default | Implicit | value == 0 |
-| editions `EXPLICIT` | same as proto3 `optional` | Explicit | `has_age()` false |
+| proto2 / proto3 concept | Editions equivalent |
+|---|---|
+| proto3 implicit-presence scalar | `[features.field_presence = IMPLICIT]` |
+| proto2 `optional` | `[features.field_presence = EXPLICIT]` (edition 2024 default) |
+| proto2 `[default = 100]` | `[default = 100]` (supported unchanged) |
+| proto2 `required` | `[features.field_presence = LEGACY_REQUIRED]` (migration only) |
+| proto2 non-packed repeated | `[features.repeated_field_encoding = EXPANDED]` |
+| proto3 packed repeated | `[features.repeated_field_encoding = PACKED]` (edition 2024 default) |
+| proto3 open enum | `features.enum_type = OPEN` (edition 2024 default) |
+| proto2 closed enum | `option features.enum_type = CLOSED;` inside the enum |
 
-### 6.3 Custom default values (proto2)
+Note: **edition 2024 defaults to `EXPLICIT` field presence**, which is the opposite of proto3's default. A proto3-style implicit-presence scalar must be annotated with `[features.field_presence = IMPLICIT]` in an editions file.
 
-proto2 allows `optional int32 score = 2 [default = 100];`.
-
-The `score()` accessor returns `100` (the declared default) when `has_score()` is false. The default is a *read-time* substitution, not a stored value; `new_in()` initialises the field to the "not set" state, not to 100.
-
-### 6.4 Required fields (proto2)
-
-See **§4.8** for the complete accessor API (`validate()` + `decode_strict()`).
-
-### 6.5 Closed vs open enums
-
-See **§4.6** for the complete accessor API.
-
-### 6.6 Packed repeated fields
-
-See **§4.4** for the complete accessor API and the dual-form decode requirement.
-
-### 6.7 Editions feature matrix
+### 6.3 Editions feature matrix
 
 | Feature | Values | Effect on generated API |
 |---|---|---|
-| `field_presence` | `IMPLICIT` / `EXPLICIT` | Presence query methods generated or not |
+| `field_presence` | `IMPLICIT` / `EXPLICIT` / `LEGACY_REQUIRED` | Presence query methods generated or not; `validate()` for `LEGACY_REQUIRED` |
 | `repeated_field_encoding` | `PACKED` / `EXPANDED` | Affects encode format (decode always accepts both) |
-| `enum_type` | `OPEN` / `CLOSED` | Determines open vs closed enum accessor pattern |
+| `enum_type` | `OPEN` / `CLOSED` | Accessor returns `Result<E, i32>` vs `Option<Result<E, i32>>` |
 | `message_encoding` | `LENGTH_PREFIXED` / `DELIMITED` | `DELIMITED` (groups) is deprecated; not generated |
 | `utf8_validation` | `VERIFY` / `NONE` | Whether decode errors on invalid UTF-8 strings |
 
-Edition 2023 file-level defaults: `IMPLICIT`, `PACKED`, `OPEN`.
+### 6.4 Migration from proto2 / proto3
 
-### 6.8 Extensions (not yet implemented)
+Editions are a **superset** of both proto2 and proto3: any valid proto2 or proto3 schema can be mechanically translated into an equivalent editions schema (the official Prototiller tool does this). The wire format is unchanged by such a migration.
 
-proto2 `extensions` / `extend` blocks are **out of scope** for the current design. They require a fundamentally different storage mechanism: a message must hold an opaque, field-number-keyed store for extension fields unknown to the current compilation unit. This is architecturally more complex than the existing unknown-fields buffer, which is opaque and not keyed.
+The generated Rust accessor API after migration is identical — the same accessor names, presence semantics, and enum handling — because the generated code pattern is determined by the field's feature settings, not by whether the source was proto2, proto3, or editions.
 
-A future design would need to specify:
+### 6.5 Extensions (not yet implemented)
+
+proto2 `extensions` / `extend` blocks are **out of scope** for the current design. They require a fundamentally different storage mechanism: a message must hold an opaque, field-number-keyed store for extension fields not known to the current compilation unit.
+
+A future design would need:
 - An `ExtensionSet<A>` type with typed get/set accessors.
-- A registration mechanism for extension descriptors (compile-time and/or runtime).
-- A code-generation strategy for extension accessor files separate from the base message.
-
-### 6.9 Comparison summary
-
-| | Runtime change? | Generated API change |
-|---|---|---|
-| Explicit-presence scalar | None | `has_X()` / `clear_X()` methods added |
-| Custom default value | None | `X()` returns `unwrap_or(declared_default)` |
-| `required` field | `DecodeError::MissingRequiredField` added | `validate()` + `decode_strict()` added |
-| Closed enum | `save_unknown_varint_field` helper added | Accessor returns `Option<Result<E, i32>>` |
-| Non-packed repeated | None | Encode uses one-per-element loop |
-| Editions features | None | Generator reads features, emits matching pattern |
-| Extensions | **Significant** — new storage and accessor mechanism | Separate accessor generation |
+- A registration mechanism for extension descriptors.
+- A code-generation strategy for extension accessors separate from the base message.
 
 ---
 
@@ -589,28 +598,28 @@ A future design would need to specify:
 
 ### No zero-copy decode (for now)
 
-Giving `string` and `bytes` fields a lifetime parameter would enable zero-copy decoding but would propagate that lifetime to every generated type and every callers. The current API is lifetime-free, which significantly simplifies usage. A future extension could introduce a borrowing "view" type alongside the existing owned type without breaking the current API.
+Giving `string` and `bytes` fields a lifetime parameter would enable zero-copy decoding but would propagate that lifetime to every generated type and its callers. The current API is lifetime-free, which significantly simplifies usage. A future extension could introduce a borrowing "view" type alongside the existing owned type without breaking the current API.
 
 ### Accessor methods instead of public fields
 
-Public struct fields are simpler but make it impossible to change internal representations without a breaking API change. Accessor methods add generated boilerplate but decouple the interface from the implementation — for example, string storage could change from one owned type to another, or scalar presence tracking could move from per-field `Option` to a per-message bitmask, without any change to the accessor API.
+Public struct fields are simpler but prevent changing internal representations without a breaking API change. Accessor methods decouple the interface from the implementation — for example, presence tracking could move from per-field `Option` to a per-message bitmask without any accessor change.
 
 ### Slice-like return type for repeated fields
 
-Repeated field accessors return a reference to a contiguous sequence rather than a freshly allocated `Vec`. This allows O(1) random access without triggering allocation and matches the principle that `encode_raw` is zero-allocation. The concrete element type is intentionally not part of the stable API; callers use it through its `Deref` bound.
+Repeated field accessors return a reference to a contiguous sequence rather than a freshly allocated `Vec`. This allows O(1) random access without triggering allocation. The concrete element type is intentionally not part of the stable API.
 
 ### `Default` bound on `MessageDecode::decode`
 
-The provided `decode` method requires `Self: Default` to initialise the message before merging. The lower-level `merge_from` has no such requirement, which is important for callers using non-`Default` allocators (they call `new_in(alloc)` + `merge_from`).
+The provided `decode` method requires `Self: Default`. The lower-level `merge_from` has no such requirement, which is important for callers using non-`Default` allocators.
 
 ---
 
 ## 8. Future work
 
-- **Zero-copy decode.** Introduce borrowing view types (e.g. `PersonView<'buf>`) for string and bytes fields.
-- **Unknown-field preservation opt-out.** A per-message attribute to omit the unknown-fields buffer where round-trip fidelity is not required.
-- **Map fields.** Syntactic sugar for a `repeated` message with `key` and `value` fields; requires an allocator-aware map type (e.g. `hashbrown::HashMap<K, V, S, A>`).
+- **Zero-copy decode.** Borrowing view types (e.g. `TaskView<'buf>`) for string and bytes fields.
+- **Unknown-field preservation opt-out.** A per-message attribute to omit the unknown-fields buffer.
+- **Map fields.** Syntactic sugar for a repeated message entry; requires an allocator-aware map type.
 - **Service / RPC definitions.** Out of scope for the runtime library.
 - **Well-known types.** `google.protobuf.Timestamp`, `Duration`, `Any`, etc.
 - **Reflection / descriptors.** Runtime introspection of message schema.
-- **Extensions.** See §6.8.
+- **Extensions.** See §6.5.
