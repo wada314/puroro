@@ -218,24 +218,7 @@ pub fn skip_field_and_save<B: Buf, A: Allocator>(
     Ok(())
 }
 
-/// Saves a single VARINT field (tag + value) directly into an unknown-fields buffer.
-///
-/// Used for proto2 **closed enum** handling: when the wire carries a numeric enum
-/// value that is not listed in the `.proto` definition, it must be preserved as an
-/// unknown field rather than stored in the typed field.
-///
-/// # Example
-///
-/// ```rust,ignore
-/// // In generated merge_from for a proto2 closed-enum field (e.g. field 5):
-/// (5, WireType::Varint) => {
-///     let raw = puroro::decode::decode_varint(buf)? as i32;
-///     match Difficulty::try_from(raw) {
-///         Ok(_) => self.difficulty = Some(raw),
-///         Err(_) => puroro::decode::save_unknown_varint_field(5, raw as u64, &mut self._unknown_fields),
-///     }
-/// }
-/// ```
+/// Saves a VARINT field into an unknown-fields buffer (e.g. closed enum unknown variant).
 pub fn save_unknown_varint_field<A: Allocator>(
     field_number: u32,
     value: u64,

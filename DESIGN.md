@@ -338,69 +338,16 @@ pub trait TaskMessageFallible {
 
 #### Primary struct implements both
 
-```rust
-// Task<A> is the all-in-one implementation.
-impl<A: Allocator + Clone> TaskMessage for Task<A> {
-    // Only the Optional-returning accessors need explicit impls for explicit-presence
-    // fields; _raw and has_ inherit the trait's default methods.
-    fn max_retries(&self) -> Optional<i32, impl HasDefault<i32>> { … }
-    fn title<'s>(&'s self) -> Optional<&'s str, impl HasDefault<&'s str>> { … }
-    // … other required trait methods …
-}
+For **`Task<A>`** (eager):
 
-impl<A: Allocator + Clone> TaskMessageFallible for Task<A> {
-    type Error = core::convert::Infallible;  // never fails
-    fn score(&self) -> Result<i32, Infallible> { Ok(TaskMessage::score(self)) }
-    fn max_retries(&self) -> Result<Optional<i32, impl HasDefault<i32>>, Infallible> {
-        Ok(TaskMessage::max_retries(self))
-    }
-    fn title<'s>(&'s self) -> Result<Optional<&'s str, impl HasDefault<&'s str>>, Infallible> {
-        Ok(TaskMessage::title(self))
-    }
-    fn tag_ids(&self) -> impl Iterator<Item = Result<i32, Infallible>> + '_ {
-        TaskMessage::tag_ids(self).iter().map(|&v| Ok(v))
-    }
-    // … other required trait methods; _raw / has_ use trait defaults …
-}
-```
+- **`TaskMessage`** — implement required accessors; `_raw` / `has_` for explicit-presence fields inherit trait defaults.
+- **`TaskMessageFallible`** — `type Error = Infallible`; wrap each infallible accessor in `Ok(…)`. Explicit-presence fallible getters return `Ok(TaskMessage::field(self))` for the `Optional` accessor.
 
-Using `Infallible` as the error type signals at compile time that a particular code path, when generic over `T: TaskMessageFallible`, will never encounter an actual error when given a `Task<A>`.
+Using `Infallible` signals at compile time that generic code over `TaskMessageFallible` never encounters a real error when given `Task<A>`.
 
-On **`TaskLazy<A>`**, the same trait signatures apply, but explicit-presence getters **wire-scan the stored buffer and semantically decode** on first access; they return `Err` before constructing `Optional` when decode fails (e.g. invalid UTF-8).  `has_*()` wire-scans for presence without semantic decode.  See [§8 — `TaskLazy` lazy parse timing](#tasklaya--lazy-parse-timing).
+On **`TaskLazy<A>`**, the same trait signatures apply, but getters wire-scan `_wire` and decode on demand. Explicit-presence getters return `Err` before constructing `Optional` on semantic failure. `has_*()` wire-scans for presence only. See [§8 — `TaskLazy`](#tasklaya--lazy-parse-timing).
 
-Generic code can use the same `Optional` chaining on fallible types:
-
-```rust
-fn print_retries(msg: &impl TaskMessageFallible) -> Result<(), msg::Error> {
-    if msg.max_retries()?.is_set() {
-        println!("{}", msg.max_retries()?.get());
-    }
-    Ok(())
-}
-```
-
-> **Native methods vs trait methods.**  Each concrete struct provides **its own set of native methods** in a plain `impl` block, in addition to implementing the traits.  The traits define the minimum interoperability contract; native methods expose whatever each struct can do most efficiently or expressively, without being constrained to the trait signature.
->
-> ```rust
-> // Trait (interoperability layer — generic code uses this)
-> impl<A: Allocator + Clone> TaskMessage for Task<A> { … }
->
-> // Native methods (optimised, richer API — concrete callers use these)
-> impl<A: Allocator + Clone> Task<A> {
->     /// O(1) random access — the trait only promises an iterator.
->     pub fn tag_ids(&self) -> &[i32] { … }
->
->     /// Native methods mirror the trait's Optional accessor; _raw / has_ may
->     /// delegate to it directly rather than going through the trait default.
->     pub fn max_retries(&self) -> Optional<i32, impl HasDefault<i32>> { … }
->
->     /// Write methods (not mandated by the read-oriented trait).
->     pub fn push_tag_id(&mut self, v: i32) { … }
->     pub fn set_title(&mut self, v: &str) { … }
-> }
-> ```
->
-> This mirrors how `Vec<T>` implements `Iterator` while also exposing `push`, `sort`, and many other methods that are not part of the `Iterator` contract.
+> **Native methods vs trait methods.** Each concrete struct also has a native `impl` block. Traits are the interoperability contract; native methods may expose richer APIs (e.g. `&[i32]` instead of an iterator on the trait, mutation helpers not on the trait). Same pattern as `Vec<T>` implementing `Iterator` while also providing `push` and `sort`.
 
 ---
 
@@ -741,27 +688,14 @@ Setting any variant replaces the whole `Option`; the last field seen on the wire
 
 On the wire, a `LEGACY_REQUIRED` field is indistinguishable from an `EXPLICIT` field; the constraint is schema-level only.
 
-**Accessor API** — same `Optional` pattern as `EXPLICIT`, with two additional methods.  On generated traits, `_raw` and `has_` are default methods delegating to the `Optional` accessor (see [§4.0](#40-generated-per-message-traits)):
+**Accessor API** — same `Optional` pattern as `EXPLICIT`, plus `validate()` and `decode_strict()`. On generated traits, `_raw` and `has_` are default methods (see [§4.0](#40-generated-per-message-traits)). Additionally:
 
-```rust
-// Optional accessor — required trait method:
-pub fn owner_id<'s>(&'s self) -> Optional<&'s str, impl HasDefault<&'s str>>;
-// Trait defaults:
-pub fn owner_id_raw<'s>(&'s self) -> &'s str { self.owner_id().get() }
-pub fn has_owner_id(&self) -> bool { self.owner_id().is_set() }
-pub fn set_owner_id(&mut self, v: &str);
-pub fn clear_owner_id(&mut self);
-
-// Additional: required-field validation
-pub fn validate(&self) -> Result<(), DecodeError>;
-pub fn decode_strict<B: Buf>(buf: B) -> Result<Self, DecodeError>
-where
-    Self: Default + MessageDecode;
-```
-
-When a `LEGACY_REQUIRED` field was absent from the wire, `owner_id().is_set()` is `false` and `validate()` returns `Err(DecodeError::MissingRequiredField { field_number })`.
+- **`validate() -> Result<(), DecodeError>`** — returns `MissingRequiredField` when unset.
+- **`decode_strict(buf)`** — `decode` then `validate`.
 
 `MessageDecode::decode` does **not** call `validate()` automatically.
+
+When a `LEGACY_REQUIRED` field was absent from the wire, `owner_id().is_set()` is `false` and `validate()` returns `Err(MissingRequiredField { … })`.
 
 ---
 
@@ -1032,26 +966,26 @@ The internal wire buffer is **`bytes::Bytes`**, not `Vec<u8, A>`.  `Bytes` is a 
 
 ##### `merge_from`: store the input buffer only
 
-`merge_from` performs **no parsing of any kind** — no tag reading, no field routing, no payload skipping, no UTF-8 validation.  It only **appends the remaining input bytes** to the internal wire buffer:
-
-```rust
-fn merge_from<B: Buf>(&mut self, buf: &mut B) -> Result<(), DecodeError> {
-    let chunk = buf.copy_to_bytes(buf.remaining());
-    self._wire = cat_bytes(self._wire.clone(), chunk); // append; may realloc on merge
-    self.invalidate_field_caches();
-    Ok(())
-}
-```
+`merge_from` performs **no parsing of any kind** — no tag reading, no field routing, no payload skipping, no UTF-8 validation. It only **appends the remaining input bytes** to `_wire: Bytes` and **invalidates all field caches**.
 
 | Concern | Behaviour |
 |---|---|
-| Internal storage | `_wire: Bytes` — complete protobuf wire stream accumulated across all `merge_from` calls |
-| Append cost | Each `merge_from` may copy into a new backing buffer when concatenating — **O(n) per merge, not per field access** |
-| Proto merge semantics | Each `merge_from` **appends** new bytes; last-wins / repeated-append rules are applied later when getters **scan** `_wire` in field order |
-| Unknown fields | Remain inside `_wire` as received; no separate extraction at `merge_from` time |
-| Nested messages | Not expanded; nested LEN payloads stay inside `_wire` until a getter **slices** them into a child |
+| Internal storage | `_wire: Bytes` — complete wire stream accumulated across all `merge_from` calls |
+| Append cost | Concatenating on merge may reallocate — **O(n) per merge, not per field access** |
+| Proto merge semantics | Bytes are appended; last-wins / repeated-append applied when getters scan `_wire` |
+| Unknown fields | Stay inside `_wire`; not extracted at merge time |
+| Nested messages | Stay inside `_wire` until a getter slices them into a child |
 
-This is intentionally simpler than partitioning by field at merge time: **`merge_from` is append-only with no wire interpretation.**
+##### Internal storage (`TaskLazy<A>`)
+
+| Component | Type / role |
+|---|---|
+| `_wire` | `bytes::Bytes` — shared wire blob |
+| Per-field cache | `RefCell<FieldCache<T>>` or similar — see state machine below |
+| `_alloc` | `A` — for decoded values only, not for `_wire` |
+| Nested child | `AddressLazy { _wire: Bytes }` — subslice of parent via `.slice()`, zero-copy |
+
+**Interior mutability** is required because trait accessors take `&self` but populate caches on first decode.
 
 ##### Field cache state machine
 
@@ -1059,10 +993,10 @@ Each field maintains a **cache slot** (independent of `_wire`).  Slots start **u
 
 ```
 Uninitialized   — not yet scanned in _wire (or cache invalidated)
-Absent          — scanned; field not present on wire
-WireFound { … } — wire-located (optional); payload bounds known, not semantically decoded
-Parsed { value } — semantically decoded and cached
-Failed { err }   — decode failed; subsequent getters return Err without re-parsing
+Absent          — wire-scanned; field not on wire
+WireFound       — optional; payload located as Bytes subslice, not semantically decoded
+Parsed          — semantically decoded and cached
+Failed          — decode error; subsequent getters return Err without re-parsing
 ```
 
 Typical transitions on getter access:
@@ -1097,55 +1031,17 @@ Explicit-presence fields expose `Result<Optional<T, impl HasDefault<T>>, DecodeE
 | `*_()` → `Result<Optional<…>>` | **Yes** — locate payload (or use cache) | **Yes** — full field decode | Semantic failure (e.g. `InvalidUtf8`) → **`Err` before `Optional` is built** |
 | `*_raw()` trait default | Via `Optional` getter | Via `Optional` getter | Same |
 
-Example — lazy string field:
-
-```rust
-fn title<'s>(&'s self) -> Result<Optional<&'s str, impl HasDefault<&'s str>>, DecodeError> {
-    match self.title_cache.get() {
-        Cache::Parsed(ref s) => return Ok(Optional::new(Some(s.as_ref()), TitleDefault)),
-        Cache::Absent => return Ok(Optional::new(None, TitleDefault)),
-        Cache::Failed(ref e) => return Err(e.clone()),
-        Cache::Uninitialized | Cache::WireFound { .. } => { /* fall through */ }
-    }
-    let payload = wire_find_last_len_payload(&self._wire, field_number: 1)?; // wire scan
-    match payload {
-        None => { self.title_cache.set(Cache::Absent); Ok(Optional::new(None, TitleDefault)) }
-        Some(bytes) => {
-            let s = decode_string_semantics(bytes, self._alloc.clone())?; // Err → no Optional
-            self.title_cache.set(Cache::Parsed(s));
-            Ok(Optional::new(Some(/* borrow from cache */), TitleDefault))
-        }
-    }
-}
-
-// Presence only — wire scan, no UTF-8:
-fn has_title(&self) -> Result<bool, DecodeError> {
-    if let Cache::Absent = self.title_cache.get() { return Ok(false); }
-    if self.title_cache.is_present() { return Ok(true); }  // Parsed, WireFound, Failed
-    Ok(wire_field_exists(&self._wire, 1)?)                  // scan _wire; cache Absent / WireFound
-}
-```
-
 Because `has_*()` performs wire scanning but not semantic validation, **`has_title() == true` does not guarantee `title()?` succeeds** — malformed UTF-8 surfaces only when the `Optional` getter runs.
 
 For **implicit-presence** scalars (`score`), the getter wire-scans for the last occurrence (or returns zero if absent), then semantically decodes.
 
 ##### Nested messages — zero-copy via `Bytes::slice`
 
-On first access to `assignee()`, the parent **wire-scans** `_wire` for field 11, locates the LEN-delimited sub-message bytes, and constructs a child **`AddressLazy<A>`** whose `_wire` is a **subslice** of the parent's buffer:
+On first access to `assignee()`, the parent wire-scans `_wire` for field 11, then sets the child's `_wire` to `parent._wire.slice(start..start + len)` — **O(1) refcount, no payload copy**. The child shares the parent's allocation until all `Bytes` handles are dropped. The child stores the subslice only; semantic decode happens when the child's getters run.
 
-```rust
-// Parent wire-scan found nested message at payload range:
-let child_wire = self._wire.slice(start..start + len); // O(1): shared Arc, no copy
-let child = AddressLazy::from_wire(child_wire, self._alloc.clone());
-self.assignee_cache.set(Parsed(child));
-```
+Repeated nested messages each get their own `Bytes` subslice from the same parent allocation.
 
-The child shares the parent's underlying allocation.  Dropping the parent remains safe while any child (or cached subslice) still holds a `Bytes` handle.  The child performs **no semantic decode** in its constructor — only stores the subslice.  Decoding happens when the child's own getters run.
-
-Repeated nested messages (if any) each get their own `Bytes` subslice from the same parent allocation.
-
-> **Contrast with `TaskView<'buf>`.**  `TaskView` uses borrowed `&'buf [u8]` subslices (zero-copy via lifetimes).  `TaskLazy` uses owned `Bytes` subslices (zero-copy via reference counting) so nested message types do not carry a lifetime parameter and can be stored in struct fields indefinitely.
+> **Contrast with `TaskView<'buf>`.**  `TaskView` uses borrowed `&'buf [u8]` subslices (lifetimes).  `TaskLazy` uses owned `Bytes` subslices (reference counting) so nested types need no lifetime parameter and can live in struct fields indefinitely.
 
 ##### Singular vs repeated decode granularity
 
@@ -1164,42 +1060,20 @@ There is no meaningful partial **semantic** decode within a singular string or s
 - Does **not** implement `TaskMessage` (infallible) — all access goes through the fallible trait.
 
 **Native methods beyond the trait:**
-```rust
-impl<A: Allocator + Clone> TaskLazy<A> {
-    /// Wire-scans and semantically decodes every field, then builds eager `Task<A>`.
-    pub fn into_eager(self) -> Result<Task<A>, DecodeError> { … }
 
-    /// Wire-scans `_wire` for all occurrences of a repeated field, decodes
-    /// every element, caches `Parsed(Vec<…>)`, and returns the slice.
-    pub fn tag_ids_all(&self) -> Result<&[i32], DecodeError> { … }
-}
-```
-
-> **Interior mutability.** Wire scans that populate caches, cursors, and `Parsed` values require `RefCell` / `OnceCell` / similar because trait accessors take `&self`.  See [IMPLEMENTATION.md §8](IMPLEMENTATION.md#8-tasklazy-storage-sketch).
+- **`into_eager(self) -> Result<Task<A>, DecodeError>`** — wire-scan and decode all fields; build eager `Task<A>`.
+- **`tag_ids_all(&self) -> Result<&[i32], DecodeError>`** — decode all remaining repeated elements in one pass and cache `Parsed(Vec<…>)`.
 
 #### `TaskView<'buf>` — zero-copy, buffer-referencing
 
-- Holds a `&'buf [u8]` reference to the original input buffer; no heap allocations for field data.
-- String and bytes fields return `&'buf str` / `&'buf [u8]` — direct slices into the input.
-- Read-only (tied to the buffer lifetime, no mutation).
-- Can be implemented as fully lazy (scan on each access) or semi-eager (build a field-offset index once, then access in O(1)).
+- Holds `&'buf [u8]` to the original input; no heap allocation for field data.
+- String / bytes fields return subslices into the input buffer.
+- Read-only; tied to buffer lifetime.
+- Fully lazy (scan on each access) or semi-eager (field-offset index built once).
 - Implements `TaskMessageFallible` with `Error = DecodeError`.
-- Enables early termination for repeated fields: `task.tag_ids().take_while(|v| v.is_ok())`.
+- Repeated fields support early termination via fallible iterators.
 
-**Native methods beyond the trait:**
-```rust
-impl<'buf> TaskView<'buf> {
-    /// Returns &'buf str — lifetime tied to the input buffer, not to self.
-    /// The trait can only express &'s str (lifetime of the borrow of self).
-    pub fn title(&self) -> Result<&'buf str, DecodeError> { … }
-
-    /// Convert to an owned Task<A>, copying all fields.
-    pub fn to_owned<A: Allocator + Clone>(&self, alloc: A) -> Result<Task<A>, DecodeError> { … }
-
-    /// Access the raw packed bytes for a repeated field — zero-copy.
-    pub fn tag_ids_raw(&self) -> Result<&'buf [u8], DecodeError> { … }
-}
-```
+**Native methods beyond the trait:** `title() -> Result<&'buf str, …>` (buffer lifetime, not `&self`), `to_owned(alloc) -> Task<A>`, `tag_ids_raw() -> Result<&'buf [u8], …>`.
 
 #### Relationship between implementations
 
@@ -1215,18 +1089,7 @@ TaskMessageFallible (Result-returning trait)
     TaskView<'buf> (Error = DecodeError)
 ```
 
-Generic code that only reads fields can be written once and used with any implementation:
-
-```rust
-fn print_score(msg: &impl TaskMessageFallible) -> Result<(), msg::Error> {
-    println!("{}", msg.score()?);
-    Ok(())
-}
-
-print_score(&Task::decode(buf)?);           // Infallible error — never fails
-print_score(&TaskLazy::from_bytes(buf));     // lazy; decodes on access
-print_score(&TaskView::new(buf));            // zero-copy; scans buffer
-```
+Generic code that only reads fields can be written once against `TaskMessageFallible` and used with `Task<A>`, `TaskLazy<A>`, or `TaskView<'buf>`.
 
 ---
 
