@@ -68,53 +68,77 @@ Use the [`bitvec`](https://docs.rs/bitvec) crate. Prefer **`BitArray`** (inline,
 | **`BitArray<[u8; N], Lsb0>`** (chosen) | Inline in the message struct; no heap | **Not needed** — presence bits are not allocator-aware |
 | `BitVec` | Global heap only | **Incompatible** with per-message `A` |
 
-At codegen time the plugin counts every presence-tracked singular field and emits a storage array large enough to hold that many bits (typically `BitArr!(for N, in u8, Lsb0)` or `BitArray<[u64; W], Lsb0>` with `W = ⌈N / 64⌉`). Each field receives a stable bit index (by ascending proto field number among tracked fields). Generated constants name the indices, e.g. `const BIT_TITLE: usize = 0;`.
+At codegen time the plugin counts every presence-tracked singular field and emits a storage array large enough to hold that many bits (typically `BitArr!(for N, in u8, Lsb0)` or `BitArray<[u64; W], Lsb0>` with `W = ⌈N / 64⌉`). Each field receives a stable bit index assigned **by ascending proto field number among tracked fields only** (gaps in field numbers do not create gaps in bit indices). Generated constants name the indices, e.g. `const BIT_TITLE: usize = 0;`.
+
+**Reference `Task` — five tracked bits** (IMPLICIT / repeated / nested / oneof fields are omitted from the count):
+
+| Proto field | Field # | Presence | Bit index |
+|---|---|---|---|
+| `title` | 1 | EXPLICIT | `BIT_TITLE = 0` |
+| `max_retries` | 3 | EXPLICIT | `BIT_MAX_RETRIES = 1` |
+| `owner_id` | 4 | LEGACY_REQUIRED | `BIT_OWNER_ID = 2` |
+| `payload` | 5 | EXPLICIT | `BIT_PAYLOAD = 3` |
+| `priority` | 10 | EXPLICIT (closed enum) | `BIT_PRIORITY = 4` |
+
+→ `BitArray<[u8; 1], Lsb0>` (one byte, five bits used). **Not** ten bits — older drafts over-counted.
+
+The bitfield lives in [`MessageCommon::presence`](src/fields/common.rs), not as a loose struct member. Generated code wraps `BitArray` in a **message-specific newtype** so it can implement [`PresenceBits`](src/fields/presence.rs) without orphan-rule issues:
 
 ```rust
-// Illustrative sketch for reference `Task`:
+// Illustrative — see sample-generated/src/task.rs
 use ::bitvec::array::BitArray;
 use ::bitvec::order::Lsb0;
 
-type TaskPresence = BitArray<[u8; 2], Lsb0>; // 10 tracked bits → 2 bytes
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct TaskPresence(BitArray<[u8; 1], Lsb0>);
+
+impl TaskPresence {
+    pub const ZERO: Self = Self(BitArray::ZERO);
+}
+
+impl PresenceBits for TaskPresence {
+    fn is_set(&self, bit: usize) -> bool { self.0[bit] }
+    fn set(&mut self, bit: usize, present: bool) { self.0.set(bit, present); }
+}
 
 pub struct Task<A: Allocator = Global> {
-    _presence: TaskPresence,
-    title: Box<str, A>,           // bit BIT_TITLE
-    score: i32,                   // IMPLICIT — no bit
-    max_retries: i32,             // bit BIT_MAX_RETRIES
-    // ...
-    assignee: Option<Box<Address<A>, A>>, // nested — see §2
-    _unknown_fields: Vec<u8, A>,
-    _alloc: A,
+    _common: MessageCommon<TaskPresence, A>,
+    title: SingularLenField<ProtoString, Explicit, A>,       // BIT_TITLE
+    score: SingularVarintField<ProtoInt32, Implicit>,        // no bit
+    max_retries: SingularVarintField<ProtoInt32, Explicit>,   // BIT_MAX_RETRIES
+    owner_id: SingularLenField<ProtoString, LegacyRequired, A>, // BIT_OWNER_ID
+    // …
+    assignee: NestedMessageField<Address<A>, A>,            // Option — no bit
+    notification: OneofSlot<task::Notification<A>>,         // Option — no bit
 }
 ```
 
-**Accessor pattern:** `has_title()` → `_presence[BIT_TITLE]`; `title()` → `Optional::new(if has { Some(&*self.title) } else { None }, …)` for strings; `clear_title()` → clear bit and drop/replace heap data; `set_title(v)` → set bit and assign value.
+**Accessor pattern (EXPLICIT):** `has_title()` → `self.title.has(&self._common)` (delegates to `common.is_present(BIT_TITLE)`); `title()` → `self.title.optional(&self._common, TitleDefault)`; `set_title` / `clear_title` → field catalog `set_str` / `clear` with `&mut self._common` (catalog calls `FieldPresence::on_set` / `on_clear`).
+
+**IMPLICIT fields** still pass a `BIT` const to catalog methods for a uniform signature; `Implicit` ignores it (`on_set` / `on_clear` are no-ops).
 
 **Fields that stay `Option<…>`:** nested messages and oneofs. Absence there implies no heap allocation for that subtree; a separate presence bit would still require an `Option` (or equivalent) on the `Box`/enum payload.
 
-Runtime helpers (planned): `presence_get`, `presence_set`, `presence_clear` on `&mut BitArray<…>` — thin wrappers so generated code stays readable.
+Runtime access: field types call [`MessageCommon::is_present`](src/fields/common.rs) / `set_presence`, which forward to [`PresenceBits`](src/fields/presence.rs). Generated code does **not** index `BitArray` directly outside the `PresenceBits` impl.
 
 ---
 
 ## 2. Storage types per field kind
 
-| Field kind | Internal storage type | Presence |
+| Field kind | Catalog storage (inside wrapper) | Presence |
 |---|---|---|
-| Implicit-presence scalar (`IMPLICIT`) | `T` (e.g. `i32`) | — |
-| Explicit-presence scalar (`EXPLICIT`) | `T` | bit in `_presence` |
-| Implicit-presence string | `Box<str, A>` | — |
-| Explicit-presence string | `Box<str, A>` | bit in `_presence` |
-| `bytes` (implicit) | `Vec<u8, A>` | — |
-| `bytes` (explicit) | `Vec<u8, A>` | bit in `_presence` |
+| Implicit-presence scalar (`IMPLICIT`) | `T` in `SingularVarintField<T, Implicit>` | — |
+| Explicit-presence scalar (`EXPLICIT`) | `T` in `SingularVarintField<T, Explicit>` | bit in `_common.presence` |
+| `LEGACY_REQUIRED` scalar | same as EXPLICIT + `LegacyRequired` marker | bit in `_common.presence` |
+| Implicit-presence string / bytes | `Box<str, A>` / `Vec<u8, A>` in `SingularLenField<…, Implicit, A>` | — |
+| Explicit-presence string / bytes | same containers in `SingularLenField<…, Explicit, A>` | bit in `_common.presence` |
 | Repeated scalar / string / message | `Vec<ElementType, A>` | — (empty vec = absent) |
-| Message field | `Option<Box<MessageType<A>, A>>` | `Option` (not bitfield) |
-| Open enum (`OPEN`, IMPLICIT) | `i32` | — |
-| Open enum (`OPEN`, EXPLICIT) | `i32` | bit in `_presence` |
-| Closed enum (`CLOSED`) | `i32` | bit in `_presence` |
-| Oneof group | `Option<OurEnum<A>>` | `Option` (not bitfield) |
-| Unknown fields | `Vec<u8, A>` | — |
-| `LEGACY_REQUIRED` | same as `EXPLICIT` | bit in `_presence` |
+| Message field | `Option<Box<MessageType<A>, A>>` in `NestedMessageField` | `Option` (not bitfield) |
+| Open enum (`OPEN`, IMPLICIT) | `i32` in `SingularVarintField<ProtoEnum, Implicit>` | — |
+| Open enum (`OPEN`, EXPLICIT) | `i32` in `SingularVarintField<ProtoEnum, Explicit>` | bit in `_common.presence` |
+| Closed enum (`CLOSED`, EXPLICIT) | `i32` in `SingularVarintField<ProtoEnum, Explicit>` | bit in `_common.presence` |
+| Oneof group | `Option<OurEnum<A>>` in `OneofSlot` | `Option` (not bitfield) |
+| Unknown fields | `Vec<u8, A>` in `_common.unknown_fields` | — |
 
 When an explicit-presence string/bytes field is **unset**, the bit is `false` and the heap container may be empty (no payload allocation until `set_*`). Scalars and enums store the type zero in the value slot when unset; only the bit distinguishes unset from explicitly set zero.
 
@@ -130,28 +154,30 @@ Generated eager messages are a **product of composable field types** (see [§10]
 // Illustrative generated layout for reference `Task`:
 pub struct Task<A: Allocator = Global> {
     _common: MessageCommon<TaskPresence, A>,
-    title: puroro::fields::ExplicitString<A>,
-    score: puroro::fields::ImplicitVarintField<puroro::fields::ProtoInt32>,
-    max_retries: puroro::fields::ExplicitVarintField<puroro::fields::ProtoInt32>,
-    owner_id: puroro::fields::ExplicitString<A>,
-    payload: puroro::fields::ExplicitBytes<A>,
-    tag_ids: puroro::fields::RepeatedPackedI32<6, A>,
-    scores: puroro::fields::RepeatedExpandedI32<7, A>,
-    labels: puroro::fields::RepeatedString<8, A>,
-    status: puroro::fields::ImplicitVarintField<puroro::fields::ProtoEnum>,
-    priority: puroro::fields::ExplicitVarintField<puroro::fields::ProtoEnum>,
-    assignee: puroro::fields::NestedMessageField<Address<A>, A>,
+    title: SingularLenField<ProtoString, Explicit, A>,
+    score: SingularVarintField<ProtoInt32, Implicit>,
+    max_retries: SingularVarintField<ProtoInt32, Explicit>,
+    owner_id: SingularLenField<ProtoString, LegacyRequired, A>,
+    payload: SingularLenField<ProtoBytes, Explicit, A>,
+    tag_ids: /* RepeatedPacked… — planned */,
+    scores: /* RepeatedExpanded… — planned */,
+    labels: /* RepeatedString… — planned */,
+    status: SingularVarintField<ProtoEnum, Implicit>,
+    priority: SingularVarintField<ProtoEnum, Explicit>,
+    assignee: NestedMessageField<Address<A>, A>,
     notification: OneofSlot<task::Notification<A>>,
 }
 ```
 
 | Member | Role |
 |---|---|
-| `_common.presence` | `BitArray<[u8; 2], Lsb0>` — 10 tracked bits |
+| `_common.presence` | `TaskPresence` newtype over `BitArray<[u8; 1], Lsb0>` — **5** tracked bits (see §1 table) |
 | `_common.unknown_fields` | Round-trip unknown wire |
 | `_common.alloc` | Cloned by field setters / push |
 | `title` … `assignee` | Independent field types; each knows its field number and (if applicable) presence bit |
 | `notification` | [`OneofSlot`](src/fields/oneof.rs) — **not** a catalog field type; variants are mutually exclusive |
+
+Working reference implementation: [`sample-generated/`](sample-generated/).
 
 Public accessors on `Task` are **one-line delegates** into the field type, passing `&self._common` or `&mut self._common` as needed. `MessageEncode`, `MessageDecode`, `Clone`, and `PartialEq` on the message are the **sum of the same delegates** — no field-specific logic lives in the message `impl` body beyond dispatch tables.
 
@@ -161,7 +187,7 @@ Public accessors on `Task` are **one-line delegates** into the field type, passi
 
 ## 4. Constructors and the stored allocator
 
-- **`Task::new_in(alloc)`** — initialises every field to its type default; clears `_presence` to all-false; heap containers use `Vec::new_in(alloc.clone())` / equivalent.
+- **`Task::new_in(alloc)`** — initialises every field to its type default; `_common.presence` cleared to all-false (`TaskPresence::ZERO`); heap containers use `Vec::new_in(alloc.clone())` / equivalent.
 - **`Task::new()`** — available when `A = Global`.
 - **`Default`** — requires `A: Clone + Default`; delegates to `new_in(A::default())`.
 
@@ -175,7 +201,7 @@ Generated `MessageEncode` for eager messages follows these rules:
 
 1. Walk each present field in **implementation-defined order** (typically declaration order in generated code, but **not guaranteed**).
 2. Apply the per-field omit rule from [§7](#7-per-field-encodedecode-patterns) before writing.
-3. Append `_unknown_fields` verbatim at the end (order relative to known fields is not specified).
+3. Append `_common.unknown_fields` verbatim at the end (order relative to known fields is not specified).
 4. `encoded_len` must equal the byte count written by `encode_raw`.
 
 **Non-deterministic wire layout.** Two messages with identical field values may encode to **different byte sequences** (field order, spacing inside packed blobs where applicable, ordering inside `_unknown_fields` after merges). Callers must not rely on byte-for-byte equality of `encode_raw` output across encodes or implementations. Semantic equality is via `PartialEq` (see [§8](#8-derived-and-utility-traits)), not wire bytes.
@@ -190,7 +216,7 @@ Generated `MessageDecode::merge_from` for eager messages:
 
 1. Loop while the buffer has remaining bytes: read `(field_number, wire_type)` via `decode_tag`.
 2. Dispatch on `(field_number, wire_type)` — one arm per known field using patterns in [§7](#7-per-field-encodedecode-patterns).
-3. Unknown `(field_number, wire_type)` pairs call `skip_field_and_save` into `_unknown_fields`.
+3. Unknown `(field_number, wire_type)` pairs call `skip_field_and_save` into `_common.unknown_fields`.
 4. Singular scalars: last value wins. Repeated: append. Nested messages: merge into existing sub-message (see §7.8).
 
 Nested sub-messages use `Buf::take(len)` to bound the slice to the declared LEN payload length.
@@ -201,23 +227,15 @@ Nested sub-messages use `Buf::take(len)` to bound the slice to the declared LEN 
 
 ### 7.1 Scalar: implicit presence
 
-**Storage:** plain `T`. **Encode:** omit when value equals the type zero. **Decode:** assign directly (last wins).
+**Catalog:** `SingularVarintField<T, Implicit>` (or fixed-width equivalent when implemented). **Encode:** `FieldPresence::should_emit` → omit when value equals type-zero. **Decode:** `merge` assigns value directly (last wins); `Implicit::on_set` is a no-op.
 
-| Proto type | Decode | Encode value cast |
-|---|---|---|
-| `int32` / `int64` / `uint32` / `uint64` | `decode_varint` + cast | `v as u64` |
-| `sint32` / `sint64` | `unzigzag*` after varint | `zigzag*(v)` |
-| `bool` | varint `!= 0` | `v as u64` |
-| `float` / `double` | `from_bits` on I32 / I64 | `to_bits` |
-| `fixed*` / `sfixed*` | `get_u*_le` / `get_i*_le` | `encode_i32_field` / `encode_i64_field` |
-
-No `Optional` wrapper — accessor returns `T` directly.
+Accessor returns `field.value()` directly — no `Optional` wrapper.
 
 ### 7.2 Scalar: explicit presence
 
-**Storage:** plain `T` + presence bit. **Encode:** omit when bit is `false`; emit even if value is zero when bit is `true`. **Decode:** set bit and assign value (last wins).
+**Catalog:** `SingularVarintField<T, Explicit>`. **Encode:** omit when `common.is_present(BIT)` is false; emit even if value is zero when the bit is set. **Decode:** `Explicit::on_set` then assign value (last wins).
 
-**Generated accessor:** `has_*()` reads `_presence[BIT_*]`; `Optional::new(if has { Some(self.field) } else { None }, ThatDefault)` with a private ZST implementing `HasDefault<T>`. On traits, `_raw` and `has_` are default methods calling `.get()` / `.is_set()`. Native `impl` may read the bit and value directly.
+**Generated accessor:** `has_*()` → `field.has(&self._common)`; `*_()` → `field.optional(&self._common, ThatDefault)` with a private ZST implementing `HasDefault<T>`. On traits, `_raw` and `has_` are default methods calling `.get()` / `.is_set()`.
 
 **Fallible trait on `Task<A>`:** wrap the infallible `Optional` getter in `Ok(…)` with `Error = Infallible`.
 
@@ -225,17 +243,17 @@ No `Optional` wrapper — accessor returns `T` directly.
 
 ### 7.3 String fields
 
-**Storage:** `Box<str, A>` (EXPLICIT or IMPLICIT). EXPLICIT presence from `_presence` bit.
+**Catalog:** `SingularLenField<ProtoString, P, A>` where `P` is `Implicit` or `Explicit` / `LegacyRequired`. Payload is `Box<str, A>` inside the wrapper.
 
-- **Encode EXPLICIT:** omit when bit is `false`; IMPLICIT: omit when empty.
-- **Decode:** `decode_string_in(buf, alloc)` — validates UTF-8 when `utf8_validation = VERIFY`. A `NONE` helper is planned; not yet in the runtime. EXPLICIT: set bit and replace `Box<str, A>`.
-- **Setter:** set bit, then `str_to_box_in(v, self._alloc.clone())`.
-- **Clear:** clear bit; optionally replace with empty `Box<str, A>` to release storage.
-- **Accessor:** same `HasDefault` + `Optional` pattern as scalars; lifetime-generic `impl<'a> HasDefault<&'a str>` for string defaults.
+- **Encode:** `P::should_emit(common, BIT, is_empty)` — EXPLICIT omits when bit unset; IMPLICIT omits when empty.
+- **Decode:** `merge` → `decode_string_in` via `LenProtoType`; `P::on_set` for EXPLICIT / LEGACY_REQUIRED.
+- **Setter:** `set_str(&mut common, v)` — sets bit (if applicable) then `str_to_box_in`.
+- **Clear:** `clear(&mut common)` on EXPLICIT types.
+- **Accessor:** IMPLICIT → `borrow()`; EXPLICIT → `optional(&common, default)`.
 
 ### 7.4 Bytes fields
 
-Same EXPLICIT / IMPLICIT rules as strings. Use `decode_bytes_in` / `encode_len_field`. EXPLICIT setter writes into `Vec<u8, A>` and sets the presence bit.
+**Catalog:** `SingularLenField<ProtoBytes, P, A>`. Same presence rules as strings; `set_from_slice` for setters.
 
 ### 7.5 Repeated scalar: packed
 
@@ -257,11 +275,20 @@ Same EXPLICIT / IMPLICIT rules as strings. Use `decode_bytes_in` / `encode_len_f
 
 ### 7.9 Open enum fields
 
-**Storage:** `i32` (IMPLICIT or EXPLICIT). EXPLICIT presence from bit. Wire encoding is VARINT. IMPLICIT encode omits when zero.
+**Catalog:** `SingularVarintField<ProtoEnum, P>`. Wire encoding is VARINT. IMPLICIT encode omits when zero; EXPLICIT uses the presence bit like any other scalar.
 
 ### 7.10 Closed enum fields
 
-**Storage:** `i32` + presence bit. On decode, if the numeric value is not a known variant, call `save_unknown_varint_field` instead of setting the bit. Encode includes the field even for the zero variant when the bit is set.
+**Catalog:** `SingularVarintField<ProtoEnum, Explicit>`. On decode, call [`merge_closed`](src/fields/scalar.rs) with an `is_known` predicate; unknown numeric values go to `_common.unknown_fields` **without** setting the presence bit. Encode includes the field even for the zero variant when the bit is set.
+
+```rust
+self.priority.merge_closed::<_, _, _, FIELD_PRIORITY, BIT_PRIORITY>(
+    &mut self._common,
+    wire_type,
+    buf,
+    |v| Priority::try_from(v).is_ok(),
+)?;
+```
 
 ### 7.11 Oneof fields
 
@@ -269,11 +296,16 @@ Same EXPLICIT / IMPLICIT rules as strings. Use `decode_bytes_in` / `encode_len_f
 
 ### 7.12 Unknown fields
 
-**Storage:** `Vec<u8, A>` — valid partial wire stream. Accumulate via `skip_field_and_save`; re-emit with `put_slice` on encode. Deprecated group wire types are **not** saved — see DESIGN.md §0.
+**Storage:** `_common.unknown_fields: Vec<u8, A>` — valid partial wire stream. Accumulate via `skip_field_and_save`; re-emit with `put_slice` on encode. Deprecated group wire types are **not** saved — see DESIGN.md §0.
 
 ### 7.13 LEGACY_REQUIRED fields
 
-Same storage and encode/decode as EXPLICIT (value + bit). Additionally generate `validate()` (checks presence bit) and `decode_strict()` (`decode` then `validate`). `MessageDecode::decode` does **not** call `validate` automatically.
+**Catalog:** `Singular*Field<T, LegacyRequired>` — wire/encode/merge identical to `Explicit` ([`FieldPresence`](src/fields/field_presence.rs) impl delegates to the same bit rules). Additionally generate:
+
+- **`validate()`** — per required field: `field.validate_required::<_, BIT>(&self._common, FIELD_NO)?` (LEN fields) or equivalent via [`RequiredFieldPresence::validate_present`](src/fields/field_presence.rs).
+- **`decode_strict()`** — `decode` then `validate`.
+
+`MessageDecode::decode` does **not** call `validate` automatically.
 
 ---
 
@@ -285,10 +317,10 @@ Generated **message** structs (`Task<A>`, nested messages, etc.) implement the t
 
 | Trait | Bounds on `A` | Behaviour |
 |---|---|---|
-| **`Default`** | `A: Allocator + Clone + Default` | `Default::default()` → `Task::new_in(A::default())`. Clears `_presence`; heap fields empty. |
-| **`Clone`** | `A: Allocator + Clone` | Deep clone: copy `_presence` bitwise; clone heap fields with **`clone_in` / equivalent using `self._alloc.clone()`** so the duplicate uses the same allocator instance as the source; recursively clone nested messages. Does **not** deduplicate arena memory — two clones are independent trees. |
+| **`Default`** | `A: Allocator + Clone + Default` | `Default::default()` → `Task::new_in(A::default())`. Clears `_common.presence`; heap fields empty. |
+| **`Clone`** | `A: Allocator + Clone` | Deep clone: copy `_common.presence` bitwise; clone each catalog field; clone `_common.unknown_fields`; `_common.alloc.clone()`. |
 | **`Debug`** | none beyond field types | Prints field values and presence (e.g. `title: … (set)` / `(unset)`). Does not print `_alloc`. |
-| **`PartialEq`** | none beyond field types | **Semantic equality:** compares presence bits and field values; unset explicit fields compare equal regardless of stale value slots; `_unknown_fields` compared bytewise; **`_alloc` is ignored**. |
+| **`PartialEq`** | none beyond field types | **Semantic equality:** compares `_common.presence`, field values, `_common.unknown_fields`; unset explicit fields compare equal regardless of stale value slots; **`_common.alloc` is ignored**. |
 | **`Eq`** | same as `PartialEq` | Markers when all compared components are `Eq`. |
 
 **Not generated:** `Copy` (heap-owned), `PartialOrd` / `Ord` (no total order on messages), `Hash` (see below).
@@ -320,12 +352,15 @@ Custom-allocator users call `Task::new_in(alloc)` and `merge_from` (or a future 
 impl<A: Allocator + Clone> Clone for Task<A> {
     fn clone(&self) -> Self {
         Self {
-            _presence: self._presence.clone(), // BitArray: bitwise copy
-            title: self.title.clone(),       // Box<str, A>: Clone uses same allocator
-            // … each heap field cloned …
-            assignee: self.assignee.as_ref().map(|b| b.clone()),
-            _unknown_fields: self._unknown_fields.clone(),
-            _alloc: self._alloc.clone(),
+            _common: MessageCommon {
+                presence: self._common.presence, // Copy newtype
+                unknown_fields: self._common.unknown_fields.clone(),
+                alloc: self._common.alloc.clone(),
+            },
+            title: self.title.clone(),
+            // … each catalog field …
+            assignee: self.assignee.clone(),
+            notification: self.notification.clone(),
         }
     }
 }
@@ -417,7 +452,7 @@ Protobuf field behaviour splits into two **orthogonal** axes:
 | Axis | What varies | Where it lives |
 |---|---|---|
 | **Wire encoding** | int32 vs sint32 vs bool vs float vs string … | Zero-sized marker + trait (`VarintProtoType`, `Fixed32ProtoType`, …) |
-| **Presence** | IMPLICIT vs EXPLICIT vs LEGACY_REQUIRED | [`FieldPresence`](src/fields/field_presence.rs) marker (`Implicit` / `Explicit`) composed into `Singular*Field<T, P>` |
+| **Presence** | IMPLICIT vs EXPLICIT vs LEGACY_REQUIRED | [`FieldPresence`](src/fields/field_presence.rs) marker (`Implicit` / `Explicit` / `LegacyRequired`) composed into `Singular*Field<T, P>` |
 
 The plugin never emits `ImplicitI32` vs `ImplicitSint32` as separate catalog entries — it emits **`SingularVarintField<ProtoInt32, Implicit>`** (alias `ImplicitVarintField<ProtoInt32>`) vs **`SingularVarintField<ProtoSint32, Implicit>`**. All varint wire logic is written **once** in `SingularVarintField`; presence policy lives in **`FieldPresence`** impls; zigzag/bool/enum semantics live in **`VarintProtoType`** impls.
 
@@ -427,10 +462,12 @@ The plugin never emits `ImplicitI32` vs `ImplicitSint32` as separate catalog ent
   ─────────►        │  SingularLenField<T, P, A>          │
   int32 IMPLICIT    │  SingularFixed32Field<T, P> (plan)  │
   int32 EXPLICIT    └──────────────┬──────────────────────┘
-                                   │ P: FieldPresence (Implicit / Explicit)
+                                   │ P: FieldPresence (Implicit / Explicit / LegacyRequired)
                     ┌──────────────▼──────────────────────┐
                     │  Implicit  — omit when payload empty│
-                    │  Explicit  — bitfield via common    │
+                    │  Explicit  — bitfield via common      │
+                    │  LegacyRequired — same as Explicit  │
+                    │    + validate_required on message   │
                     └──────────────┬──────────────────────┘
                                    │ T: VarintProtoType / LenProtoType / …
                     ┌──────────────▼──────────────────────┐
@@ -487,8 +524,9 @@ Parallel traits for other wire families ([`fixed32.rs`](src/fields/fixed32.rs), 
 |---|---|
 | `Implicit` | Emit when payload non-empty; no bitfield updates |
 | `Explicit` | Emit when `common.is_present(bit)`; bitfield on set/clear |
+| `LegacyRequired` | Same wire behaviour as `Explicit`; adds [`RequiredFieldPresence::validate_present`](src/fields/field_presence.rs) |
 
-[`ExplicitFieldPresence`](src/fields/field_presence.rs) is a sub-trait gating EXPLICIT-only accessors (`optional`, `has`, `clear`).
+[`ExplicitFieldPresence`](src/fields/field_presence.rs) is a sub-trait gating EXPLICIT-only accessors (`optional`, `has`, `clear`). Implemented for `Explicit` and `LegacyRequired`.
 
 #### Layer 3 — singular wrappers ([`src/fields/scalar.rs`](src/fields/scalar.rs), [`len_field.rs`](src/fields/len_field.rs))
 
@@ -520,14 +558,14 @@ pub fn set_score(&mut self, v: i32) {
     self.score.set::<_, _, BIT_SCORE>(&mut self._common, v);  // IMPLICIT: on_set is a no-op
 }
 pub fn max_retries(&self) -> Optional<i32, impl HasDefault<i32>> {
-    self.max_retries.optional(&self._common, MaxRetriesDefault)
+    self.max_retries.optional::<_, _, MaxRetriesDefault, BIT_MAX_RETRIES>(&self._common, MaxRetriesDefault)
 }
-// encode (field number + bit index are const args):
-self.score.encode_raw::<2, _>(&self._common, buf);
-self.max_retries.encode_raw::<_, 3, BIT_MAX_RETRIES>(&self._common, buf);
+// encode (field number + bit index are const method params):
+self.score.encode_raw::<_, _, _, FIELD_SCORE, BIT_UNUSED>(&self._common, buf);
+self.max_retries.encode_raw::<_, _, _, FIELD_MAX_RETRIES, BIT_MAX_RETRIES>(&self._common, buf);
 ```
 
-Open enum accessors (`status() -> Result<Status, i32>`) are **thin generated glue** on top of `ImplicitVarintField<ProtoEnum>::value()` + `Status::try_from`. Closed enum merge adds a **policy** hook (unknown variant → `unknown_fields`) — same `ExplicitVarintField<ProtoEnum>` storage, specialised `merge` wrapper.
+Open enum accessors (`status() -> Result<Status, i32>`) are **thin generated glue** on top of `SingularVarintField<ProtoEnum, Implicit>::value()` + `Status::try_from`. Closed enum decode uses [`merge_closed`](src/fields/scalar.rs) (see §7.10).
 
 #### Plugin mapping (replaces flat catalog table)
 
@@ -538,7 +576,8 @@ Open enum accessors (`status() -> Result<Status, i32>`) are **thin generated glu
 | `IMPLICIT sint32` | `ImplicitVarintField<ProtoSint32>` |
 | `IMPLICIT bool` | `ImplicitVarintField<ProtoBool>` |
 | `IMPLICIT open enum` | `ImplicitVarintField<ProtoEnum>` |
-| `EXPLICIT closed enum` | `ExplicitVarintField<ProtoEnum>` + closed merge policy |
+| `EXPLICIT closed enum` | `SingularVarintField<ProtoEnum, Explicit>` + `merge_closed` |
+| `LEGACY_REQUIRED string` | `SingularLenField<ProtoString, LegacyRequired, A>` |
 | `IMPLICIT float` | `ImplicitFixed32Field<ProtoFloat>` (planned) |
 | `IMPLICIT string` | `ImplicitString<A>` (= `SingularLenField<ProtoString, Implicit, A>`) |
 | `EXPLICIT string` | `ExplicitString<A>` (= `SingularLenField<ProtoString, Explicit, A>`) |
@@ -559,18 +598,17 @@ Adding a new varint protobuf type (e.g. a future edition type) = **one new `Vari
 ```rust
 fn encoded_len(&self) -> usize {
     let c = &self._common;
-    0
-        .adding(self.title.encoded_len(c))
-        .adding(self.score.encoded_len())
+    self.title.encoded_len::<_, FIELD_TITLE, BIT_TITLE>(c)
+        + self.score.encoded_len::<_, _, FIELD_SCORE, BIT_UNUSED>(c)
         // … every field …
-        + self._common.unknown_fields.len()
+        + c.unknown_fields.len()
 }
 fn encode_raw<B: BufMut>(&self, buf: &mut B) {
     let c = &self._common;
-    self.title.encode_raw(c, buf);
-    self.score.encode_raw(buf);
+    self.title.encode_raw::<_, _, FIELD_TITLE, BIT_TITLE>(c, buf);
+    self.score.encode_raw::<_, _, _, FIELD_SCORE, BIT_UNUSED>(c, buf);
     // …
-    buf.put_slice(&self._common.unknown_fields);
+    buf.put_slice(&c.unknown_fields);
 }
 ```
 
@@ -578,23 +616,25 @@ fn encode_raw<B: BufMut>(&self, buf: &mut B) {
 
 ```rust
 match field_number {
-    1 => self.title.merge(wire_type, &mut self._common, buf)?,
-    2 => self.score.merge(wire_type, buf)?,
-    12 => self.notification.merge_email(wire_type, &mut self._common, buf)?,
-    13 => self.notification.merge_phone(wire_type, &mut self._common, buf)?,
-    _ => skip_field_and_save(field_number, wire_type, &mut self._common.unknown_fields, buf)?,
+    FIELD_TITLE => self.title.merge::<_, _, BIT_TITLE>(&mut self._common, wire_type, buf)?,
+    FIELD_SCORE => self.score.merge::<_, _, _, BIT_UNUSED>(&mut self._common, wire_type, buf)?,
+    FIELD_PRIORITY => self.priority.merge_closed::<_, _, _, FIELD_PRIORITY, BIT_PRIORITY>(
+        &mut self._common, wire_type, buf, |v| Priority::try_from(v).is_ok(),
+    )?,
+    // oneof arms …
+    _ => skip_field_and_save(field_number, wire_type, buf, &mut self._common.unknown_fields)?,
 }
 ```
 
 **Clone / PartialEq / Debug / Default** — same delegation pattern; each catalog type implements the same-named inherent methods.
 
-**`validate()`** — iterate LEGACY_REQUIRED fields only: `owner_id.validate_bit(BIT_OWNER_ID, &self._common.presence)?`.
+**`validate()`** — per LEGACY_REQUIRED field, e.g. `self.owner_id.validate_required::<_, BIT_OWNER_ID>(&self._common, FIELD_OWNER_ID)?`.
 
 ### Codegen emission per message
 
 For each proto message the plugin emits:
 
-1. **`PresenceBits` impl** on the message's `BitArray` alias (forwards const bit indices).
+1. **`PresenceBits` impl** on the message-specific presence **newtype** (wraps `BitArray`, forwards bit indices).
 2. **Struct** — `MessageCommon<P, A>` + one catalog-typed member per field + `OneofSlot` per oneof.
 3. **Const block** — `FIELD_*`, `BIT_*` for each field.
 4. **Public accessors** — one-line delegates (§4.0 API in DESIGN.md unchanged).
@@ -605,16 +645,19 @@ The plugin's internal IR step is: **`ProtoField → FieldKind enum → pick cata
 
 ### `PresenceBits` on the message bitfield
 
-Generated code implements [`PresenceBits`](src/fields/presence.rs) on the message-specific `BitArray` alias so field types depend on the trait, not on `bitvec` in generated code:
+Generated code implements [`PresenceBits`](src/fields/presence.rs) on a message-specific newtype wrapping `BitArray` (required for orphan rules — see §1):
 
 ```rust
-type TaskPresence = BitArray<[u8; 2], Lsb0>;
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct TaskPresence(BitArray<[u8; 1], Lsb0>);
 
 impl PresenceBits for TaskPresence {
-    fn is_set(&self, bit: usize) -> bool { self[bit] }
-    fn set(&mut self, bit: usize, present: bool) { self.set(bit, present); }
+    fn is_set(&self, bit: usize) -> bool { self.0[bit] }
+    fn set(&mut self, bit: usize, present: bool) { self.0.set(bit, present); }
 }
 ```
+
+`Address` uses the same pattern with **two** tracked bits (`street`, `city`) in `BitArray<[u8; 1], Lsb0>`.
 
 ### Independence summary
 
@@ -634,7 +677,10 @@ impl PresenceBits for TaskPresence {
 |---|---|
 | `MessageCommon`, `PresenceBits`, `OneofSlot` | **Done** |
 | `VarintProtoType` + markers | **Done** |
-| `FieldPresence` + `Implicit` / `Explicit` | **Done** |
+| `FieldPresence` + `Implicit` / `Explicit` / `LegacyRequired` | **Done** |
+| `merge_closed` on `SingularVarintField` | **Done** |
+| `validate_required` on `SingularLenField<_, LegacyRequired, _>` | **Done** |
+| `sample-generated` reference (`Task` / `Address`) | **Done** |
 | `SingularVarintField<T, P>` (+ `ImplicitVarintField` / `ExplicitVarintField` aliases) | **Done** |
 | `LenProtoType` + `ProtoString` / `ProtoBytes` | **Done** |
 | `SingularLenField<T, P, A>` (+ string/bytes aliases) | **Done** |
