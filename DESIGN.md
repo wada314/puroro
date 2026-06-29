@@ -70,7 +70,7 @@ The puroro project comprises several crates and tools with distinct roles:
 - **Allocator support.** Every generated type is generic over `A: Allocator` using the `allocator-api2` crate. Arena allocators (e.g. `bumpalo`) and custom pools are first-class citizens.
 - **Performance-oriented interface.** Accessors return borrowed references (`&str`, `&[u8]`, `&[T]`), never freshly allocated containers. The `encode_to_vec` / `encode_to_bytes` convenience methods allocate, but `encode_raw` does not.
 - **Rust idioms.** Private fields accessed via generated accessor methods; `Optional<T, impl HasDefault<T>>` for explicit-presence scalar and string fields; `Option<&M<A>>` for optional message fields; `Result<EnumType, i32>` for enum accessors; no `unsafe` in user-visible APIs.
-- **Implementation flexibility.** The public interface described here must remain stable even if internal storage representations change. Eager messages use a per-message presence bitfield (see [IMPLEMENTATION.md §1](IMPLEMENTATION.md#1-presence-bitfield)); the accessor API is unchanged if storage layout evolves.
+- **Implementation flexibility.** The public interface described here must remain stable even if internal storage representations change. Eager messages use a per-message presence bitfield (see [IMPLEMENTATION.md §10](IMPLEMENTATION.md#10-presence-bit-indices)); the accessor API is unchanged if storage layout evolves.
 - **Nightly toolchain, minimal unstable features.** The `rust-toolchain.toml` pins nightly; no `#![feature(…)]` flags are used in this crate itself.
 
 ---
@@ -177,7 +177,7 @@ pub trait MessageEncode {
 
 `encode_raw` is generic over `B: BufMut` so the compiler can monomorphise and inline field writes. This makes the trait **non-object-safe** by design; trait objects are not a target use case.
 
-**Non-deterministic field order.** The encoder may emit known fields in any order. Two encodes of the same logical message are not guaranteed to produce identical bytes; compare messages with `PartialEq`, not with `encode_raw` output equality. See [IMPLEMENTATION.md §5](IMPLEMENTATION.md#5-encode-implementation).
+**Non-deterministic field order.** The encoder may emit known fields in any order. Two encodes of the same logical message are not guaranteed to produce identical bytes; compare messages with `PartialEq`, not with `encode_raw` output equality. See [IMPLEMENTATION.md §12](IMPLEMENTATION.md#12-message-level-wire-io).
 
 ### `MessageDecode`
 
@@ -210,7 +210,7 @@ This section is the normative reference for what the code generator emits. All f
 For each message type the code generator produces **three kinds of output**:
 
 1. **Two traits** — a stable API contract that multiple implementations satisfy (§4.0).
-2. **The primary struct** — a full-featured owned implementation (§4.1–4.9), internally a product of **`puroro::fields` catalog types** + shared `MessageCommon` (see [IMPLEMENTATION.md §10](IMPLEMENTATION.md#10-field-centric-codegen-architecture)).
+2. **The primary struct** — a full-featured owned implementation (§4.1–4.9), internally a product of **`puroro::fields` catalog types** + shared `MessageCommon` (see [IMPLEMENTATION.md §2](IMPLEMENTATION.md#2-architecture-overview)).
 3. **(Future) Specialized structs** — alternative implementations for specific performance scenarios (§8).
 
 ---
@@ -742,7 +742,7 @@ impl Task<Global> {
 impl<A: Allocator + Clone + Default> Default for Task<A> { … }
 ```
 
-**Derived traits.** Generated messages implement `Default`, `Clone`, `Debug`, `PartialEq`, and `Eq` for any `A: Allocator + Clone` (with extra bounds on `Default`). Additional `Global`-only convenience (`Task::new()`, `impl Default for Task`) applies when `A = Global`. Wire bytes are not deterministic across encodes; use `PartialEq` for semantic comparison. Full matrix: [IMPLEMENTATION.md §8](IMPLEMENTATION.md#8-derived-and-utility-traits).
+**Derived traits.** Generated messages implement `Default`, `Clone`, `Debug`, `PartialEq`, and `Eq` for any `A: Allocator + Clone` (with extra bounds on `Default`). Additional `Global`-only convenience (`Task::new()`, `impl Default for Task`) applies when `A = Global`. Wire bytes are not deterministic across encodes; use `PartialEq` for semantic comparison. Full matrix: [IMPLEMENTATION.md §13](IMPLEMENTATION.md#13-derived-traits).
 
 **Allocator bound on mutation:** setter methods and `push_*` methods require `A: Clone` because they may create new heap values at call time. Read-only methods do not.
 
