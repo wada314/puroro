@@ -2,31 +2,33 @@
 
 This document describes the **internal implementation** of generated code. It covers storage types, encode/decode algorithms, and runtime helper usage. The stable **public interface** is specified in [DESIGN.md](DESIGN.md).
 
-> **Note:** The public API described in DESIGN.md must remain stable even if the internal representations documented here change. For example, presence tracking for optional scalars currently uses `Option<T>` fields, but could be replaced by a per-message bitfield without any change to the accessor API.
+> **Note:** The public API described in DESIGN.md must remain stable even if the internal representations documented here change. For example, presence tracking could move from a per-message bitfield to a different layout without any change to the accessor API.
 
 ## Table of contents
 
 0. [Project context](#0-project-context)
-1. [Storage types per field kind](#1-storage-types-per-field-kind)
-2. [Struct layout](#2-struct-layout)
-3. [Constructors and the stored allocator](#3-constructors-and-the-stored-allocator)
-4. [Encode implementation](#4-encode-implementation)
-5. [Decode implementation](#5-decode-implementation)
-6. [Per-field encode/decode patterns](#6-per-field-encodedecode-patterns)
-   - 6.1 [Scalar: implicit presence](#61-scalar-implicit-presence)
-   - 6.2 [Scalar: explicit presence](#62-scalar-explicit-presence)
-   - 6.3 [String fields](#63-string-fields)
-   - 6.4 [Bytes fields](#64-bytes-fields)
-   - 6.5 [Repeated scalar: packed](#65-repeated-scalar-packed)
-   - 6.6 [Repeated scalar: non-packed (with packed fallback)](#66-repeated-scalar-non-packed-with-packed-fallback)
-   - 6.7 [Repeated string fields](#67-repeated-string-fields)
-   - 6.8 [Nested message fields](#68-nested-message-fields)
-   - 6.9 [Open enum fields](#69-open-enum-fields)
-   - 6.10 [Closed enum fields](#610-closed-enum-fields)
-   - 6.11 [Oneof fields](#611-oneof-fields)
-   - 6.12 [Unknown fields](#612-unknown-fields)
-   - 6.13 [LEGACY_REQUIRED fields](#613-legacy_required-fields)
-7. [Optimization opportunities](#7-optimization-opportunities)
+1. [Presence bitfield](#1-presence-bitfield)
+2. [Storage types per field kind](#2-storage-types-per-field-kind)
+3. [Struct layout](#3-struct-layout)
+4. [Constructors and the stored allocator](#4-constructors-and-the-stored-allocator)
+5. [Encode implementation](#5-encode-implementation)
+6. [Decode implementation](#6-decode-implementation)
+7. [Per-field encode/decode patterns](#7-per-field-encodedecode-patterns)
+   - 7.1 [Scalar: implicit presence](#71-scalar-implicit-presence)
+   - 7.2 [Scalar: explicit presence](#72-scalar-explicit-presence)
+   - 7.3 [String fields](#73-string-fields)
+   - 7.4 [Bytes fields](#74-bytes-fields)
+   - 7.5 [Repeated scalar: packed](#75-repeated-scalar-packed)
+   - 7.6 [Repeated scalar: non-packed (with packed fallback)](#76-repeated-scalar-non-packed-with-packed-fallback)
+   - 7.7 [Repeated string fields](#77-repeated-string-fields)
+   - 7.8 [Nested message fields](#78-nested-message-fields)
+   - 7.9 [Open enum fields](#79-open-enum-fields)
+   - 7.10 [Closed enum fields](#710-closed-enum-fields)
+   - 7.11 [Oneof fields](#711-oneof-fields)
+   - 7.12 [Unknown fields](#712-unknown-fields)
+   - 7.13 [LEGACY_REQUIRED fields](#713-legacy_required-fields)
+8. [Derived and utility traits](#8-derived-and-utility-traits)
+9. [Other optimization opportunities](#9-other-optimization-opportunities)
 
 ---
 
@@ -52,46 +54,90 @@ The design in DESIGN.md is ahead of the current `puroro` runtime in a few areas:
 
 ---
 
-## 1. Storage types per field kind
+## 1. Presence bitfield
 
-| Field kind | Internal storage type |
-|---|---|
-| Implicit-presence scalar (`IMPLICIT`) | `T` (e.g. `i32`) — the Rust primitive directly |
-| Explicit-presence scalar (`EXPLICIT`) | `Option<T>` |
-| Implicit-presence string | `allocator_api2::boxed::Box<str, A>` |
-| Explicit-presence string | `Option<allocator_api2::boxed::Box<str, A>>` |
-| `bytes` field (implicit presence) | `allocator_api2::vec::Vec<u8, A>` |
-| `bytes` field (explicit presence) | `Option<allocator_api2::vec::Vec<u8, A>>` |
-| Repeated scalar / string / message | `allocator_api2::vec::Vec<ElementType, A>` |
-| Message field (always optional in struct) | `Option<allocator_api2::boxed::Box<MessageType<A>, A>>` |
-| Open enum (`OPEN`) | `i32` (IMPLICIT) or `Option<i32>` (EXPLICIT) |
-| Closed enum (`CLOSED`) | `Option<i32>` |
-| Oneof group | `Option<OurEnum<A>>` |
-| Unknown fields | `allocator_api2::vec::Vec<u8, A>` |
-| `LEGACY_REQUIRED` field | Same as `EXPLICIT` (`Option<T>`) |
+Explicit presence for **singular** fields (scalar, string, bytes, open/closed enum with `EXPLICIT`, and `LEGACY_REQUIRED`) is tracked in a per-message bitfield, not with per-field `Option<T>` discriminants. This matches the approach used by Google protobuf's C++/Java generators and keeps struct size smaller when many optional fields exist.
 
-`Box<str, A>` (2 words: ptr + byte length) is preferred over `Vec<u8, A>` (3 words) for owned strings since strings are generally written once and then read. `Vec<u8, A>` is used for `bytes` fields where incremental appending is more natural.
+### Crate and type: `bitvec::array::BitArray`
 
-> **Optimization note:** explicit-presence scalars currently use `Option<T>`. A future optimisation could use `T` storage with a per-message presence bitfield, reducing struct size at the cost of slightly more complex accessor code. The public API (`has_X()`, `set_X()`, `clear_X()`) would be identical. This is the approach used by Google protobuf's generated C++ code.
+Use the [`bitvec`](https://docs.rs/bitvec) crate. Prefer **`BitArray`** (inline, fixed-capacity) over **`BitVec`** (heap-backed):
+
+| Type | Allocation | Custom `A: Allocator` |
+|---|---|---|
+| **`BitArray<[u8; N], Lsb0>`** (chosen) | Inline in the message struct; no heap | **Not needed** — presence bits are not allocator-aware |
+| `BitVec` | Global heap only | **Incompatible** with per-message `A` |
+
+At codegen time the plugin counts every presence-tracked singular field and emits a storage array large enough to hold that many bits (typically `BitArr!(for N, in u8, Lsb0)` or `BitArray<[u64; W], Lsb0>` with `W = ⌈N / 64⌉`). Each field receives a stable bit index (by ascending proto field number among tracked fields). Generated constants name the indices, e.g. `const BIT_TITLE: usize = 0;`.
+
+```rust
+// Illustrative sketch for reference `Task`:
+use ::bitvec::array::BitArray;
+use ::bitvec::order::Lsb0;
+
+type TaskPresence = BitArray<[u8; 2], Lsb0>; // 10 tracked bits → 2 bytes
+
+pub struct Task<A: Allocator = Global> {
+    _presence: TaskPresence,
+    title: Box<str, A>,           // bit BIT_TITLE
+    score: i32,                   // IMPLICIT — no bit
+    max_retries: i32,             // bit BIT_MAX_RETRIES
+    // ...
+    assignee: Option<Box<Address<A>, A>>, // nested — see §2
+    _unknown_fields: Vec<u8, A>,
+    _alloc: A,
+}
+```
+
+**Accessor pattern:** `has_title()` → `_presence[BIT_TITLE]`; `title()` → `Optional::new(if has { Some(&*self.title) } else { None }, …)` for strings; `clear_title()` → clear bit and drop/replace heap data; `set_title(v)` → set bit and assign value.
+
+**Fields that stay `Option<…>`:** nested messages and oneofs. Absence there implies no heap allocation for that subtree; a separate presence bit would still require an `Option` (or equivalent) on the `Box`/enum payload.
+
+Runtime helpers (planned): `presence_get`, `presence_set`, `presence_clear` on `&mut BitArray<…>` — thin wrappers so generated code stays readable.
 
 ---
 
-## 2. Struct layout (`Task<A>`)
+## 2. Storage types per field kind
 
-Generated eager messages contain one private field per proto field, plus two infrastructure fields:
+| Field kind | Internal storage type | Presence |
+|---|---|---|
+| Implicit-presence scalar (`IMPLICIT`) | `T` (e.g. `i32`) | — |
+| Explicit-presence scalar (`EXPLICIT`) | `T` | bit in `_presence` |
+| Implicit-presence string | `Box<str, A>` | — |
+| Explicit-presence string | `Box<str, A>` | bit in `_presence` |
+| `bytes` (implicit) | `Vec<u8, A>` | — |
+| `bytes` (explicit) | `Vec<u8, A>` | bit in `_presence` |
+| Repeated scalar / string / message | `Vec<ElementType, A>` | — (empty vec = absent) |
+| Message field | `Option<Box<MessageType<A>, A>>` | `Option` (not bitfield) |
+| Open enum (`OPEN`, IMPLICIT) | `i32` | — |
+| Open enum (`OPEN`, EXPLICIT) | `i32` | bit in `_presence` |
+| Closed enum (`CLOSED`) | `i32` | bit in `_presence` |
+| Oneof group | `Option<OurEnum<A>>` | `Option` (not bitfield) |
+| Unknown fields | `Vec<u8, A>` | — |
+| `LEGACY_REQUIRED` | same as `EXPLICIT` | bit in `_presence` |
+
+When an explicit-presence string/bytes field is **unset**, the bit is `false` and the heap container may be empty (no payload allocation until `set_*`). Scalars and enums store the type zero in the value slot when unset; only the bit distinguishes unset from explicitly set zero.
+
+`Box<str, A>` (2 words) is preferred over `Vec<u8, A>` (3 words) for owned strings. `Vec<u8, A>` is used for `bytes` fields.
+
+---
+
+## 3. Struct layout (`Task<A>`)
+
+Generated eager messages contain one private field per proto field, plus infrastructure fields:
 
 | Field (reference `Task`) | Storage | Notes |
 |---|---|---|
-| `title` | `Option<Box<str, A>>` | field 1, EXPLICIT |
+| `_presence` | `BitArray<[u8; 2], Lsb0>` | 10 bits for EXPLICIT / LEGACY_REQUIRED singular fields |
+| `title` | `Box<str, A>` | field 1, EXPLICIT |
 | `score` | `i32` | field 2, IMPLICIT |
-| `max_retries` | `Option<i32>` | field 3, EXPLICIT, default 3 |
-| `owner_id` | `Option<Box<str, A>>` | field 4, LEGACY_REQUIRED |
-| `payload` | `Option<Vec<u8, A>>` | field 5, EXPLICIT bytes |
+| `max_retries` | `i32` | field 3, EXPLICIT, default 3 |
+| `owner_id` | `Box<str, A>` | field 4, LEGACY_REQUIRED |
+| `payload` | `Vec<u8, A>` | field 5, EXPLICIT bytes |
 | `tag_ids` | `Vec<i32, A>` | field 6, repeated packed |
 | `scores` | `Vec<i32, A>` | field 7, repeated expanded |
 | `labels` | `Vec<Box<str, A>, A>` | field 8, repeated string |
 | `status` | `i32` | field 9, IMPLICIT open enum |
-| `priority` | `Option<i32>` | field 10, EXPLICIT closed enum |
+| `priority` | `i32` | field 10, EXPLICIT closed enum |
 | `assignee` | `Option<Box<Address<A>, A>>` | field 11, nested message |
 | `notification` | `Option<task::Notification<A>>` | fields 12–13, oneof |
 | `_unknown_fields` | `Vec<u8, A>` | round-trip unknown wire |
@@ -103,9 +149,9 @@ The `_alloc` field lets setters allocate without the caller supplying an allocat
 
 ---
 
-## 3. Constructors and the stored allocator
+## 4. Constructors and the stored allocator
 
-- **`Task::new_in(alloc)`** — initialises every field to its type default; heap containers use `Vec::new_in(alloc.clone())` / equivalent.
+- **`Task::new_in(alloc)`** — initialises every field to its type default; clears `_presence` to all-false; heap containers use `Vec::new_in(alloc.clone())` / equivalent.
 - **`Task::new()`** — available when `A = Global`.
 - **`Default`** — requires `A: Clone + Default`; delegates to `new_in(A::default())`.
 
@@ -113,35 +159,37 @@ Runtime helper **`str_to_box_in(s, alloc) -> Box<str, A>`** copies `s` into a `V
 
 ---
 
-## 4. Encode implementation
+## 5. Encode implementation
 
 Generated `MessageEncode` for eager messages follows these rules:
 
-1. Walk each field in field-number order (or any order — wire order among fields is not semantically significant).
-2. Apply the per-field omit rule from [§6](#6-per-field-encodedecode-patterns) before writing.
-3. Append `_unknown_fields` verbatim at the end.
+1. Walk each present field in **implementation-defined order** (typically declaration order in generated code, but **not guaranteed**).
+2. Apply the per-field omit rule from [§7](#7-per-field-encodedecode-patterns) before writing.
+3. Append `_unknown_fields` verbatim at the end (order relative to known fields is not specified).
 4. `encoded_len` must equal the byte count written by `encode_raw`.
+
+**Non-deterministic wire layout.** Two messages with identical field values may encode to **different byte sequences** (field order, spacing inside packed blobs where applicable, ordering inside `_unknown_fields` after merges). Callers must not rely on byte-for-byte equality of `encode_raw` output across encodes or implementations. Semantic equality is via `PartialEq` (see [§8](#8-derived-and-utility-traits)), not wire bytes.
 
 Runtime helpers used: `encode_varint_field`, `encode_len_field`, `encode_packed_*_field`, `encode_i32_field`, `encode_i64_field`, plus `encoded_len_*` counterparts.
 
 ---
 
-## 5. Decode implementation
+## 6. Decode implementation
 
 Generated `MessageDecode::merge_from` for eager messages:
 
 1. Loop while the buffer has remaining bytes: read `(field_number, wire_type)` via `decode_tag`.
-2. Dispatch on `(field_number, wire_type)` — one arm per known field using patterns in [§6](#6-per-field-encodedecode-patterns).
+2. Dispatch on `(field_number, wire_type)` — one arm per known field using patterns in [§7](#7-per-field-encodedecode-patterns).
 3. Unknown `(field_number, wire_type)` pairs call `skip_field_and_save` into `_unknown_fields`.
-4. Singular scalars: last value wins. Repeated: append. Nested messages: merge into existing sub-message (see §6.8).
+4. Singular scalars: last value wins. Repeated: append. Nested messages: merge into existing sub-message (see §7.8).
 
 Nested sub-messages use `Buf::take(len)` to bound the slice to the declared LEN payload length.
 
 ---
 
-## 6. Per-field encode/decode patterns
+## 7. Per-field encode/decode patterns
 
-### 6.1 Scalar: implicit presence
+### 7.1 Scalar: implicit presence
 
 **Storage:** plain `T`. **Encode:** omit when value equals the type zero. **Decode:** assign directly (last wins).
 
@@ -155,72 +203,129 @@ Nested sub-messages use `Buf::take(len)` to bound the slice to the declared LEN 
 
 No `Optional` wrapper — accessor returns `T` directly.
 
-### 6.2 Scalar: explicit presence
+### 7.2 Scalar: explicit presence
 
-**Storage:** `Option<T>`. **Encode:** omit when `None`; emit even if inner value is zero. **Decode:** always `Some(decode …)`.
+**Storage:** plain `T` + presence bit. **Encode:** omit when bit is `false`; emit even if value is zero when bit is `true`. **Decode:** set bit and assign value (last wins).
 
-**Generated accessor:** define a private ZST implementing `HasDefault<T>` with the proto `[default = …]` constant; return `Optional::new(self.field, ThatDefault)`. On traits, `_raw` and `has_` are default methods calling `.get()` / `.is_set()`. Native `impl` may read the internal `Option` directly.
+**Generated accessor:** `has_*()` reads `_presence[BIT_*]`; `Optional::new(if has { Some(self.field) } else { None }, ThatDefault)` with a private ZST implementing `HasDefault<T>`. On traits, `_raw` and `has_` are default methods calling `.get()` / `.is_set()`. Native `impl` may read the bit and value directly.
 
 **Fallible trait on `Task<A>`:** wrap the infallible `Optional` getter in `Ok(…)` with `Error = Infallible`.
 
 `Optional` is a concrete struct with trivial drop — `task.max_retries().get()` chains without a `let` binding. No conversion to `Option<T>` is provided (see DESIGN.md §3).
 
-### 6.3 String fields
+### 7.3 String fields
 
-**Storage:** `Option<Box<str, A>>` (EXPLICIT) or `Box<str, A>` (IMPLICIT).
+**Storage:** `Box<str, A>` (EXPLICIT or IMPLICIT). EXPLICIT presence from `_presence` bit.
 
-- **Encode EXPLICIT:** omit when `None`; IMPLICIT: omit when empty.
-- **Decode:** `decode_string_in(buf, alloc)` — validates UTF-8 when `utf8_validation = VERIFY`. A `NONE` helper is planned; not yet in the runtime.
-- **Setter:** `str_to_box_in(v, self._alloc.clone())`.
+- **Encode EXPLICIT:** omit when bit is `false`; IMPLICIT: omit when empty.
+- **Decode:** `decode_string_in(buf, alloc)` — validates UTF-8 when `utf8_validation = VERIFY`. A `NONE` helper is planned; not yet in the runtime. EXPLICIT: set bit and replace `Box<str, A>`.
+- **Setter:** set bit, then `str_to_box_in(v, self._alloc.clone())`.
+- **Clear:** clear bit; optionally replace with empty `Box<str, A>` to release storage.
 - **Accessor:** same `HasDefault` + `Optional` pattern as scalars; lifetime-generic `impl<'a> HasDefault<&'a str>` for string defaults.
 
-### 6.4 Bytes fields
+### 7.4 Bytes fields
 
-Same EXPLICIT / IMPLICIT rules as strings. Use `decode_bytes_in` / `encode_len_field`. EXPLICIT setter reuses or creates `Vec<u8, A>` via `get_or_insert_with`.
+Same EXPLICIT / IMPLICIT rules as strings. Use `decode_bytes_in` / `encode_len_field`. EXPLICIT setter writes into `Vec<u8, A>` and sets the presence bit.
 
-### 6.5 Repeated scalar: packed
+### 7.5 Repeated scalar: packed
 
 **Storage:** `Vec<T, A>`. **Encode:** `encode_packed_varint_field` (or packed I32/I64 helpers). **Decode:** accept **both** `WireType::Varint` (one element) and `WireType::Len` (packed blob) regardless of schema declaration — spec requirement.
 
-### 6.6 Repeated scalar: non-packed (with packed fallback)
+### 7.6 Repeated scalar: non-packed (with packed fallback)
 
-**Encode:** one wire record per element. **Decode:** identical dual-arm pattern as §6.5.
+**Encode:** one wire record per element. **Decode:** identical dual-arm pattern as §7.5.
 
-### 6.7 Repeated string fields
+### 7.7 Repeated string fields
 
 **Storage:** `Vec<Box<str, A>, A>`. **Encode:** one LEN record per element. **Decode:** `decode_string_in` + push.
 
-### 6.8 Nested message fields
+### 7.8 Nested message fields
 
 **Storage:** `Option<Box<Child<A>, A>>`. **Encode:** LEN wrapper — tag, length varint, `child.encode_raw`. **Decode:** read length, `Buf::take(len)`, `merge_from` into existing sub-message (create default child if absent) — concatenation equals merge.
 
 **Recursion limit (stub):** nested merge should decrement a depth counter; at zero return `DecodeError::RecursionLimitExceeded`. Error variant exists; enforcement not yet implemented.
 
-### 6.9 Open enum fields
+### 7.9 Open enum fields
 
-**Storage:** `i32` (IMPLICIT) or `Option<i32>` (EXPLICIT). Wire encoding is VARINT. IMPLICIT encode omits when zero.
+**Storage:** `i32` (IMPLICIT or EXPLICIT). EXPLICIT presence from bit. Wire encoding is VARINT. IMPLICIT encode omits when zero.
 
-### 6.10 Closed enum fields
+### 7.10 Closed enum fields
 
-**Storage:** `Option<i32>`. On decode, if the numeric value is not a known variant, call `save_unknown_varint_field` instead of storing in the typed field. Encode includes the field even for the zero variant when set.
+**Storage:** `i32` + presence bit. On decode, if the numeric value is not a known variant, call `save_unknown_varint_field` instead of setting the bit. Encode includes the field even for the zero variant when the bit is set.
 
-### 6.11 Oneof fields
+### 7.11 Oneof fields
 
 **Storage:** `Option<NotificationEnum<A>>`. Each variant arm overwrites the previous on decode. Encode writes only the active variant's field number.
 
-### 6.12 Unknown fields
+### 7.12 Unknown fields
 
 **Storage:** `Vec<u8, A>` — valid partial wire stream. Accumulate via `skip_field_and_save`; re-emit with `put_slice` on encode. Deprecated group wire types are **not** saved — see DESIGN.md §0.
 
-### 6.13 LEGACY_REQUIRED fields
+### 7.13 LEGACY_REQUIRED fields
 
-Same storage and encode/decode as EXPLICIT. Additionally generate `validate()` (checks `Option` is `Some`) and `decode_strict()` (`decode` then `validate`). `MessageDecode::decode` does **not** call `validate` automatically.
+Same storage and encode/decode as EXPLICIT (value + bit). Additionally generate `validate()` (checks presence bit) and `decode_strict()` (`decode` then `validate`). `MessageDecode::decode` does **not** call `validate` automatically.
 
 ---
 
-## 7. Optimization opportunities
+## 8. Derived and utility traits
 
-**Presence bitfield** — replace per-field `Option<T>` discriminants with a `_presence: u64` bitset; accessor API unchanged. Used by Google protobuf C++/Java generators.
+Generated **message** structs (`Task<A>`, nested messages, etc.) implement the traits below. **Enum types** (`Status`, `Priority`, oneof enums) are separate: they are plain `Copy` types and always get `Clone, Copy, Debug, PartialEq, Eq, Hash` via `derive` (see DESIGN.md §4.6).
+
+### Always generated (any `A: Allocator + Clone`)
+
+| Trait | Bounds on `A` | Behaviour |
+|---|---|---|
+| **`Default`** | `A: Allocator + Clone + Default` | `Default::default()` → `Task::new_in(A::default())`. Clears `_presence`; heap fields empty. |
+| **`Clone`** | `A: Allocator + Clone` | Deep clone: copy `_presence` bitwise; clone heap fields with **`clone_in` / equivalent using `self._alloc.clone()`** so the duplicate uses the same allocator instance as the source; recursively clone nested messages. Does **not** deduplicate arena memory — two clones are independent trees. |
+| **`Debug`** | none beyond field types | Prints field values and presence (e.g. `title: … (set)` / `(unset)`). Does not print `_alloc`. |
+| **`PartialEq`** | none beyond field types | **Semantic equality:** compares presence bits and field values; unset explicit fields compare equal regardless of stale value slots; `_unknown_fields` compared bytewise; **`_alloc` is ignored**. |
+| **`Eq`** | same as `PartialEq` | Markers when all compared components are `Eq`. |
+
+**Not generated:** `Copy` (heap-owned), `PartialOrd` / `Ord` (no total order on messages), `Hash` (see below).
+
+**Auto traits:** `Send` / `Sync` are inferred from field types (e.g. `Task<&'a Bump>` is `Send` if `Bump: Send`, but typically not `Sync`).
+
+### `Global`-only convenience (in addition to generic impls)
+
+When `A = Global` (the default type parameter), the generator also emits:
+
+| Item | Purpose |
+|---|---|
+| **`impl Default for Task`** | Ergonomic `Task::default()` without naming `Global`. |
+| **`Task::new()`** | Same as `Task::default()` / `Task::new_in(Global)`. |
+| **`MessageDecode::decode(buf)`** | Usable without `A: Default` on a custom allocator — callers with `Task<Global>` only. |
+
+Custom-allocator users call `Task::new_in(alloc)` and `merge_from` (or a future `decode_in`) instead.
+
+### Optional / deferred
+
+| Trait | Status | Notes |
+|---|---|---|
+| **`Hash`** | **Deferred** | Could hash semantic content like `PartialEq`, but protobuf messages are rarely map keys; add only if requested. |
+| **`serde::Serialize` / `Deserialize`** | **Future feature** | Likely behind `#[puroro(serde)]` or crate feature; would need a defined JSON mapping. Not part of core codegen. |
+
+### Clone and custom allocators (detail)
+
+```rust
+impl<A: Allocator + Clone> Clone for Task<A> {
+    fn clone(&self) -> Self {
+        Self {
+            _presence: self._presence.clone(), // BitArray: bitwise copy
+            title: self.title.clone(),       // Box<str, A>: Clone uses same allocator
+            // … each heap field cloned …
+            assignee: self.assignee.as_ref().map(|b| b.clone()),
+            _unknown_fields: self._unknown_fields.clone(),
+            _alloc: self._alloc.clone(),
+        }
+    }
+}
+```
+
+For **`A = Global`**, `Clone` on `Box<str, A>` / `Vec<T, A>` matches `std` behaviour. For **arena `A`**, cloning allocates a **second copy** of all string/bytes/nested data into the same arena (or a cloned bump handle, depending on how the user shares `A`) — it does **not** share `Box` internals between clones. If sharing immutable messages is required, use `Arc<Task<A>>` (user-side), not a special generated impl.
+
+---
+
+## 9. Other optimization opportunities
 
 **Zero-copy strings** — `TaskView<'buf>` (DESIGN.md §8) holds `&'buf str` instead of `Box<str, A>`.
 

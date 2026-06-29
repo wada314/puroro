@@ -70,7 +70,7 @@ The puroro project comprises several crates and tools with distinct roles:
 - **Allocator support.** Every generated type is generic over `A: Allocator` using the `allocator-api2` crate. Arena allocators (e.g. `bumpalo`) and custom pools are first-class citizens.
 - **Performance-oriented interface.** Accessors return borrowed references (`&str`, `&[u8]`, `&[T]`), never freshly allocated containers. The `encode_to_vec` / `encode_to_bytes` convenience methods allocate, but `encode_raw` does not.
 - **Rust idioms.** Private fields accessed via generated accessor methods; `Optional<T, impl HasDefault<T>>` for explicit-presence scalar and string fields; `Option<&M<A>>` for optional message fields; `Result<EnumType, i32>` for enum accessors; no `unsafe` in user-visible APIs.
-- **Implementation flexibility.** The public interface described here must remain stable even if internal storage representations change. For example, presence tracking could use `Option<T>` fields or a per-message bitmask; the accessor API is the same either way.
+- **Implementation flexibility.** The public interface described here must remain stable even if internal storage representations change. Eager messages use a per-message presence bitfield (see [IMPLEMENTATION.md §1](IMPLEMENTATION.md#1-presence-bitfield)); the accessor API is unchanged if storage layout evolves.
 - **Nightly toolchain, minimal unstable features.** The `rust-toolchain.toml` pins nightly; no `#![feature(…)]` flags are used in this crate itself.
 
 ---
@@ -156,7 +156,7 @@ let s: &str = task.title().get();
 if task.max_retries().is_set() { … }
 ```
 
-**Lazy implementations (`TaskLazy`).** On the eager path, `Optional::new` receives the internal `Option<T>` directly.  On the lazy path, getters **wire-scan** the stored buffer and semantically decode on demand; the `Optional` getter returns `Err` before constructing `Optional` if decode fails (e.g. `InvalidUtf8`).  `has_*()` may wire-scan for presence without semantic decode.  See [§8 — `TaskLazy` lazy parse timing](#tasklaya--lazy-parse-timing).
+**Lazy implementations (`TaskLazy`).** On the eager path, `Optional::new` receives `Some(value)` or `None` derived from the internal presence bitfield and value slot.  On the lazy path, getters **wire-scan** the stored buffer and semantically decode on demand; the `Optional` getter returns `Err` before constructing `Optional` if decode fails (e.g. `InvalidUtf8`).  `has_*()` may wire-scan for presence without semantic decode.  See [§8 — `TaskLazy` lazy parse timing](#tasklaya--lazy-parse-timing).
 
 ### `MessageEncode`
 
@@ -176,6 +176,8 @@ pub trait MessageEncode {
 ```
 
 `encode_raw` is generic over `B: BufMut` so the compiler can monomorphise and inline field writes. This makes the trait **non-object-safe** by design; trait objects are not a target use case.
+
+**Non-deterministic field order.** The encoder may emit known fields in any order. Two encodes of the same logical message are not guaranteed to produce identical bytes; compare messages with `PartialEq`, not with `encode_raw` output equality. See [IMPLEMENTATION.md §5](IMPLEMENTATION.md#5-encode-implementation).
 
 ### `MessageDecode`
 
@@ -740,6 +742,8 @@ impl Task<Global> {
 impl<A: Allocator + Clone + Default> Default for Task<A> { … }
 ```
 
+**Derived traits.** Generated messages implement `Default`, `Clone`, `Debug`, `PartialEq`, and `Eq` for any `A: Allocator + Clone` (with extra bounds on `Default`). Additional `Global`-only convenience (`Task::new()`, `impl Default for Task`) applies when `A = Global`. Wire bytes are not deterministic across encodes; use `PartialEq` for semantic comparison. Full matrix: [IMPLEMENTATION.md §8](IMPLEMENTATION.md#8-derived-and-utility-traits).
+
 **Allocator bound on mutation:** setter methods and `push_*` methods require `A: Clone` because they may create new heap values at call time. Read-only methods do not.
 
 **Decode API:**
@@ -890,7 +894,7 @@ Generating both `Task<A>` and `TaskBuilder<A>` would double the generated code, 
 
 ### Accessor methods instead of public fields
 
-Public struct fields are simpler but prevent changing internal representations without a breaking API change. Accessor methods decouple the interface from the implementation — for example, presence tracking could move from per-field `Option<T>` to a per-message bitmask without any change to the accessor signatures.
+Public struct fields are simpler but prevent changing internal representations without a breaking API change. Accessor methods decouple the interface from the implementation — for example, presence tracking uses a per-message bitfield internally while exposing `has_X()` / `Optional` accessors unchanged.
 
 ### `Optional<T, impl HasDefault<T>>` as a concrete struct
 
@@ -910,7 +914,7 @@ Repeated field accessors return a reference to a contiguous sequence rather than
 
 Each concrete struct provides its own `impl` block with native methods in addition to implementing the generated traits.  The traits define the minimum interoperability contract; native methods expose whatever that struct can do most efficiently.  Code that knows the concrete type uses native methods; generic code uses the trait.
 
-For explicit-presence fields, **both traits treat the `Optional` accessor as the single required method**; `_raw` and `has_` are default trait methods that wrap it.  Native methods on the struct may implement all three names directly (reading the internal `Option<T>` field) without calling through the trait defaults.
+For explicit-presence fields, **both traits treat the `Optional` accessor as the single required method**; `_raw` and `has_` are default trait methods that wrap it.  Native methods on the struct may implement all three names directly (reading the internal presence bit and value) without calling through the trait defaults.
 
 This is the standard Rust pattern: `Vec<T>` implements `Iterator` but also has `push`, `sort`, and hundreds of other methods that the `Iterator` trait does not mandate.
 
