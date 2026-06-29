@@ -16,19 +16,26 @@
 //!
 //! | Submodule / type | Proto pattern |
 //! |---|---|
-//! | `scalar` | IMPLICIT / EXPLICIT singular scalars |
-//! | `string` | IMPLICIT / EXPLICIT `string` |
-//! | `bytes` | IMPLICIT / EXPLICIT `bytes` |
-//! | `repeated` | packed / expanded repeated fields |
-//! | `message` | singular nested message |
-//! | `enum_` | open / closed enum |
+//! | [`varint`] | `VarintProtoType` markers (`ProtoInt32`, `ProtoBool`, …) |
+//! | [`scalar`] | `ImplicitVarintField` / `ExplicitVarintField` |
+//! | [`fixed32`] / [`fixed64`] | fixed-width scalar markers (planned) |
+//! | `string` | IMPLICIT / EXPLICIT `string` (planned) |
+//! | `bytes` | IMPLICIT / EXPLICIT `bytes` (planned) |
+//! | `repeated` | packed / expanded repeated fields (planned) |
+//! | `message` | singular nested message (planned) |
 //! | [`oneof::OneofSlot`] | `oneof` group (mutual exclusion) |
 //! | [`common::MessageCommon`] | presence + unknown + allocator |
 
 pub mod common;
+pub mod fixed32;
+pub mod fixed64;
 pub mod oneof;
 pub mod presence;
+pub mod scalar;
+pub mod varint;
 
 pub use common::{MessageCommon, MessageParts, MessagePartsMut};
 pub use oneof::OneofSlot;
 pub use presence::PresenceBits;
+pub use scalar::{ExplicitVarint, ExplicitVarintField, ImplicitEnum, ImplicitInt32, ImplicitVarint, ImplicitVarintField};
+pub use varint::{ProtoBool, ProtoEnum, ProtoInt32, ProtoInt64, ProtoSint32, ProtoSint64, ProtoUInt32, ProtoUInt64, VarintProtoType};

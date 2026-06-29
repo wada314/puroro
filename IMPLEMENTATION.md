@@ -37,8 +37,8 @@ This document describes the **internal implementation** of generated code. It co
 
 | Crate | Responsibility |
 |---|---|
-| **`protobuf-core`** | Submodule providing wire-format primitives (varint, tags, field I/O). Used by tooling and potentially by `puroro` internals; **generated code does not import it directly**. |
-| **`puroro`** | Message runtime imported by generated code (`MessageEncode`, `MessageDecode`, `Optional`, encode/decode helpers). |
+| **`protobuf-core`** | Wire-format primitives: `Varint`, `Tag`, `WireType`, field read/write traits. **`puroro` depends on it** for all varint/tag logic; generated code does not import it directly. |
+| **`puroro`** | Message runtime imported by generated code (`MessageEncode`, `MessageDecode`, `Optional`, **`fields`**, encode/decode helpers). **Uses `protobuf-core`** internally for varints, tags, and wire types. |
 | **`protoc` plugin** | Emits the Rust types and `impl` blocks described here. Primary invocation path; see [DESIGN.md §0](DESIGN.md#0-project-architecture). |
 
 All examples below use the **`Task` / `Address` reference schema** from [DESIGN.md §4](DESIGN.md#reference-schema). That pair is the canonical design example — not a throwaway fixture.
@@ -131,15 +131,15 @@ Generated eager messages are a **product of composable field types** (see [§10]
 pub struct Task<A: Allocator = Global> {
     _common: MessageCommon<TaskPresence, A>,
     title: puroro::fields::ExplicitString<1, BIT_TITLE, A>,
-    score: puroro::fields::ImplicitI32<2>,
-    max_retries: puroro::fields::ExplicitI32<3, BIT_MAX_RETRIES, MaxRetriesDefault>,
+    score: puroro::fields::ImplicitVarintField<puroro::fields::ProtoInt32>,
+    max_retries: puroro::fields::ExplicitVarintField<puroro::fields::ProtoInt32>,
     owner_id: puroro::fields::ExplicitString<4, BIT_OWNER_ID, A>,
     payload: puroro::fields::ExplicitBytes<5, BIT_PAYLOAD, A>,
     tag_ids: puroro::fields::RepeatedPackedI32<6, A>,
     scores: puroro::fields::RepeatedExpandedI32<7, A>,
     labels: puroro::fields::RepeatedString<8, A>,
-    status: puroro::fields::ImplicitOpenEnum<9>,
-    priority: puroro::fields::ClosedEnum<10, BIT_PRIORITY, Priority, A>,
+    status: puroro::fields::ImplicitVarintField<puroro::fields::ProtoEnum>,
+    priority: puroro::fields::ExplicitVarintField<puroro::fields::ProtoEnum>,
     assignee: puroro::fields::NestedMessage<11, Address<A>, A>,
     notification: OneofSlot<task::Notification<A>>,
 }
@@ -356,7 +356,7 @@ Protobuf message fields (except **`oneof`**) are **independent**: each field's g
 | Goal | Approach |
 |---|---|
 | Minimal generated logic | Message `impl` = thin delegates + dispatch tables |
-| Single implementation per proto pattern | One Rust type per field *kind* (e.g. `ExplicitString<…>`) |
+| Single implementation per proto pattern | **Two-layer** catalog: wire-encoding trait + presence wrapper (see below) |
 | Monomorphised hot path | `const` field number / presence bit / wire encoding as type parameters — no trait objects |
 | Stable public API | User-facing `task.title()` unchanged; only generated internals differ |
 
@@ -371,12 +371,17 @@ Protobuf message fields (except **`oneof`**) are **independent**: each field's g
                            │ uses
 ┌──────────────────────────▼──────────────────────────────────┐
 │  puroro::fields  (runtime catalog)                          │
-│  ExplicitString, ImplicitI32, RepeatedPackedI32, …          │
-│  MessageCommon, PresenceBits, OneofSlot                     │
+│  VarintProtoType + ImplicitVarintField / ExplicitVarintField│
+│  Fixed32/64ProtoType + …  String/LEN …  MessageCommon       │
 └──────────────────────────┬──────────────────────────────────┘
                            │ calls
 ┌──────────────────────────▼──────────────────────────────────┐
-│  puroro::encode / puroro::decode  (wire helpers)            │
+│  puroro::encode / puroro::decode / puroro::fields::varint    │
+│  Buf/BufMut adapters + message-level helpers (LEN, unknown)   │
+└──────────────────────────┬──────────────────────────────────┘
+                           │ delegates varint/tag/wire types
+┌──────────────────────────▼──────────────────────────────────┐
+│  protobuf-core (Varint, Tag, WireType, Field, …)            │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -405,27 +410,121 @@ where
 }
 ```
 
-### Field catalog (runtime types to implement)
+### Two-layer field catalog
 
-Each row is **one generic type** in `puroro::fields`. Const parameters are filled in by the plugin.
+Protobuf field behaviour splits into two **orthogonal** axes:
 
-| Catalog type | Const params | Proto mapping | Needs `MessagePartsMut` |
-|---|---|---|---|
-| `ImplicitI32<F>` | field no. `F` | `IMPLICIT int32` / bool / … | merge only (no presence) |
-| `ExplicitI32<F, BIT, D>` | field no., bit, default provider | `EXPLICIT` scalar + `[default]` | yes (presence) |
-| `ImplicitString<F, A>` | field no. | `IMPLICIT string` | alloc on set/merge |
-| `ExplicitString<F, BIT, A>` | field no., bit | `EXPLICIT string` | presence + alloc |
-| `ImplicitBytes<F, A>` / `ExplicitBytes<F, BIT, A>` | … | `bytes` | same as string |
-| `RepeatedPackedI32<F, A>` | field no. | `repeated` + `PACKED` | alloc on push |
-| `RepeatedExpandedI32<F, A>` | field no. | `repeated` + `EXPANDED` | alloc on push |
-| `RepeatedString<F, A>` | field no. | `repeated string` | alloc on push |
-| `NestedMessage<F, M, A>` | field no., child message type | singular message | alloc on first insert |
-| `ImplicitOpenEnum<F>` | field no. | open enum, implicit | — |
-| `ExplicitOpenEnum<F, BIT>` | field no., bit | open enum, explicit | presence |
-| `ClosedEnum<F, BIT, E, A>` | field no., bit, enum | closed enum | presence + **unknown** |
-| `LegacyRequiredString<F, BIT, A>` | … | `LEGACY_REQUIRED` | same as explicit + `validate_bit(BIT)` |
+| Axis | What varies | Where it lives |
+|---|---|---|
+| **Wire encoding** | int32 vs sint32 vs bool vs float vs string … | Zero-sized marker + trait (`VarintProtoType`, `Fixed32ProtoType`, …) |
+| **Presence** | IMPLICIT vs EXPLICIT vs LEGACY_REQUIRED | Field wrapper (`ImplicitVarintField<T>`, `ExplicitVarintField<T>`, …) |
 
-**Scalar wire encoding** (varint vs zigzag vs fixed) is a **separate type parameter** or sibling catalog entry (e.g. `ImplicitSint32<F>` vs `ImplicitSfixed32<F>`) so each type monomorphises to the correct helper.
+The plugin never emits `ImplicitI32` vs `ImplicitSint32` as separate catalog entries — it emits **`ImplicitVarintField<ProtoInt32>`** vs **`ImplicitVarintField<ProtoSint32>`**. All varint wire logic is written **once** in the wrappers; all zigzag/bool/enum semantics live in **`VarintProtoType`** impls.
+
+```
+                    ┌─────────────────────────────────────┐
+  ProtoField        │  presence layer (1 impl per mode)   │
+  ─────────►        │  ImplicitVarintField<T>             │
+  int32 IMPLICIT    │  ExplicitVarintField<T>             │
+  int32 EXPLICIT    │  ImplicitFixed32Field<T>  (planned) │
+                    └──────────────┬──────────────────────┘
+                                   │ T: VarintProtoType / …
+                    ┌──────────────▼──────────────────────┐
+  wire layer        │  ProtoInt32, ProtoSint32, ProtoBool,  │
+  (marker types)    │  ProtoUInt64, ProtoEnum, …            │
+                    └──────────────┬──────────────────────┘
+                                   │ calls
+                    ┌──────────────▼──────────────────────┐
+                    │  puroro::encode / puroro::decode    │
+                    └─────────────────────────────────────┘
+```
+
+#### Layer 1 — wire encoding traits ([`src/fields/varint.rs`](src/fields/varint.rs))
+
+Each protobuf **type** that shares a wire representation gets a marker struct and a trait impl.
+**Semantic conversions use [`protobuf_core::Varint`](../../protobuf-core/src/varint.rs)** (`from_int32`, `to_sint32`, …) — puroro does not reimplement zigzag or varint parsing in the field layer.
+
+```rust
+pub trait VarintProtoType {
+    type Value: Copy + PartialEq;
+    fn proto_zero() -> Self::Value;
+    fn decode_wire(raw: u64) -> Result<Self::Value, DecodeError>;
+    fn encode_wire(value: Self::Value) -> u64;
+}
+
+// Markers (all in varint.rs):
+// ProtoInt32, ProtoInt64, ProtoUInt32, ProtoUInt64,
+// ProtoSint32 (zigzag), ProtoSint64 (zigzag),
+// ProtoBool, ProtoEnum (same wire as int32)
+```
+
+Parallel traits for other wire families ([`fixed32.rs`](src/fields/fixed32.rs), [`fixed64.rs`](src/fields/fixed64.rs), future `len.rs` for string/bytes/message):
+
+| Trait | Wire type | Planned markers |
+|---|---|---|
+| `VarintProtoType` | VARINT | above |
+| `Fixed32ProtoType` | I32 | `ProtoFixed32`, `ProtoSfixed32`, `ProtoFloat` |
+| `Fixed64ProtoType` | I64 | `ProtoFixed64`, `ProtoSfixed64`, `ProtoDouble` |
+| `LenProtoType` | LEN | `ProtoString`, `ProtoBytes`, `ProtoMessage<M>` |
+
+**Important:** Rust storage type alone does **not** identify protobuf encoding (`i32` can be int32, sint32, sfixed32, or enum). The marker type is the source of truth — matching the naming rule in `protobuf-core` docs.
+
+#### Layer 2 — presence wrappers ([`src/fields/scalar.rs`](src/fields/scalar.rs))
+
+One generic struct per `(wire family × presence mode)` pair:
+
+| Wrapper | Param `T` | Const params on methods |
+|---|---|---|
+| `ImplicitVarintField<T>` | `T: VarintProtoType` | `FIELD: u32` |
+| `ExplicitVarintField<T>` | `T: VarintProtoType` | `FIELD: u32`, `BIT: usize` |
+| `ImplicitFixed32Field<T>` | `T: Fixed32ProtoType` | `FIELD` (planned) |
+| `RepeatedPackedVarintField<T, A>` | `T: VarintProtoType` | `FIELD` (planned) |
+
+Generated struct members and accessors:
+
+```rust
+pub struct Task<A: Allocator = Global> {
+    _common: MessageCommon<TaskPresence, A>,
+    score: ImplicitVarintField<ProtoInt32>,
+    max_retries: ExplicitVarintField<ProtoInt32>,
+    status: ImplicitVarintField<ProtoEnum>,
+    // …
+}
+
+pub fn score(&self) -> i32 {
+    self.score.get()
+}
+pub fn set_score(&mut self, v: i32) {
+    self.score.set(v);
+}
+pub fn max_retries(&self) -> Optional<i32, impl HasDefault<i32>> {
+    self.max_retries.get(self._common.parts(), MaxRetriesDefault)
+}
+// encode (field number + bit index are const args):
+self.score.encode_raw::<2, _>(buf);
+self.max_retries.encode_raw::<_, _, 3, BIT_MAX_RETRIES>(self._common.parts(), buf);
+```
+
+Open enum accessors (`status() -> Result<Status, i32>`) are **thin generated glue** on top of `ImplicitVarintField<ProtoEnum>::get()` + `Status::try_from`. Closed enum merge adds a **policy** hook (unknown variant → `unknown_fields`) — same `ExplicitVarintField<ProtoEnum>` storage, specialised `merge` wrapper.
+
+#### Plugin mapping (replaces flat catalog table)
+
+| Proto field | Generated member type |
+|---|---|
+| `IMPLICIT int32` | `ImplicitVarintField<ProtoInt32>` |
+| `EXPLICIT int32 [default=3]` | `ExplicitVarintField<ProtoInt32>` |
+| `IMPLICIT sint32` | `ImplicitVarintField<ProtoSint32>` |
+| `IMPLICIT bool` | `ImplicitVarintField<ProtoBool>` |
+| `IMPLICIT open enum` | `ImplicitVarintField<ProtoEnum>` |
+| `EXPLICIT closed enum` | `ExplicitVarintField<ProtoEnum>` + closed merge policy |
+| `IMPLICIT float` | `ImplicitFixed32Field<ProtoFloat>` (planned) |
+| `IMPLICIT string` | `ImplicitLenField<ProtoString, A>` (planned) |
+| `EXPLICIT string` | `ExplicitLenField<ProtoString, A>` (planned) |
+| `repeated int32 PACKED` | `RepeatedPackedVarintField<ProtoInt32, A>` (planned) |
+| nested message | `NestedMessageField<M, A>` (planned) |
+| `oneof` | [`OneofSlot<E>`](src/fields/oneof.rs) |
+
+Adding a new varint protobuf type (e.g. a future edition type) = **one new `VarintProtoType` impl** — zero changes to `ImplicitVarintField` / `ExplicitVarintField`.
 
 **Not in the catalog:** `oneof` — use [`OneofSlot<E>`](src/fields/oneof.rs). Decode emits **one match arm per variant field number**, each calling `notification.merge_variant_12(…)` / `merge_variant_13(…)` on the slot. Coupling stays inside `OneofSlot` + generated merge helpers, not spread across independent field members.
 
@@ -509,6 +608,9 @@ impl PresenceBits for TaskPresence {
 
 | Component | Status |
 |---|---|
-| `MessageCommon`, `MessageParts*`, `PresenceBits`, `OneofSlot` | **In crate** ([`src/fields/`](src/fields/)) |
-| Catalog field types (`ExplicitString`, …) | **Planned** — encode/decode/accessor bodies move from §7 patterns into these types |
+| `MessageCommon`, `MessageParts*`, `PresenceBits`, `OneofSlot` | **Done** |
+| `VarintProtoType` + markers (`ProtoInt32` … `ProtoEnum`) | **Done** |
+| `ImplicitVarintField` / `ExplicitVarintField` | **Done** |
+| `Fixed32ProtoType` / `Fixed64ProtoType` traits | **Stub** |
+| LEN / repeated / nested / closed-enum policy wrappers | **Planned** |
 | `protoc` plugin field-kind → type mapping | **Planned** |

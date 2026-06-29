@@ -43,7 +43,7 @@ The puroro project comprises several crates and tools with distinct roles:
 
 | Component | Role |
 |---|---|
-| **`protobuf-core`** (git submodule) | Wire-format **primitives** — varint and tag encode/decode, field I/O traits, wire-type constants, and similar generic building blocks. Not a message runtime; `puroro` and the code generator compose these primitives. |
+| **`protobuf-core`** (git submodule) | Wire-format **primitives** — `Varint`, `Tag`, `WireType`, field I/O traits, varint read/write. **`puroro` depends on this crate** for all low-level wire encoding; generated code imports **`puroro` only**. |
 | **`puroro`** (this crate) | The **runtime library** that generated code depends on: `MessageEncode` / `MessageDecode`, `Optional`, **`fields`** (composable field types + `MessageCommon`), per-field encode/decode helpers, allocator-aware string/bytes utilities, and error types. |
 | **Code generator** (`protoc` plugin) | Reads `.proto` input (via `protoc`) and emits Rust source implementing the API defined in this document. **Primary execution path:** register as a `protoc` plugin (`--puroro_out=…`). Other invocation styles (standalone CLI, `build.rs` wrapper, etc.) are permitted but not required. |
 

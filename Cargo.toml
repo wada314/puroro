@@ -6,3 +6,4 @@ edition = "2024"
 [dependencies]
 bytes = "1"
 allocator-api2 = "0.4"
+protobuf-core = { path = "protobuf-core" }
