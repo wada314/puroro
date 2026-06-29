@@ -37,6 +37,12 @@ pub mod wire_type;
 pub use decode::MessageDecode;
 pub use encode::MessageEncode;
 pub use error::{DecodeError, EncodeError};
-pub use fields::{MessageCommon, OneofSlot, PresenceBits};
+pub use fields::{
+    ExplicitBytes, ExplicitLenField, ExplicitString, ExplicitVarint, ExplicitVarintField,
+    ImplicitBytes, ImplicitEnum, ImplicitInt32, ImplicitLenField, ImplicitString, ImplicitVarint,
+    ImplicitVarintField, LenProtoType, MessageCommon, NestedMessage, NestedMessageField, OneofSlot,
+    PresenceBits, ProtoBool, ProtoBytes, ProtoEnum, ProtoInt32, ProtoInt64, ProtoSint32, ProtoSint64,
+    ProtoString, ProtoUInt32, ProtoUInt64, VarintProtoType,
+};
 pub use optional::{HasDefault, Optional};
 pub use wire_type::WireType;

@@ -18,22 +18,29 @@
 //! | [`varint`] | `VarintProtoType` markers (`ProtoInt32`, `ProtoBool`, …) |
 //! | [`scalar`] | `ImplicitVarintField` / `ExplicitVarintField` |
 //! | [`fixed32`] / [`fixed64`] | fixed-width scalar markers (planned) |
-//! | `string` | IMPLICIT / EXPLICIT `string` (planned) |
-//! | `bytes` | IMPLICIT / EXPLICIT `bytes` (planned) |
-//! | `repeated` | packed / expanded repeated fields (planned) |
-//! | `message` | singular nested message (planned) |
+//! | [`len`] / [`len_field`] | `LenProtoType`, `ImplicitLenField`, `ExplicitLenField` |
+//! | [`message`] | `NestedMessageField` |
 //! | [`oneof::OneofSlot`] | `oneof` group (mutual exclusion) |
 //! | [`common::MessageCommon`] | presence + unknown + allocator |
 
 pub mod common;
 pub mod fixed32;
 pub mod fixed64;
+pub mod len;
+pub mod len_field;
+pub mod message;
 pub mod oneof;
 pub mod presence;
 pub mod scalar;
 pub mod varint;
 
 pub use common::MessageCommon;
+pub use len::{LenProtoType, ProtoBytes, ProtoString};
+pub use len_field::{
+    ExplicitBytes, ExplicitLenField, ExplicitString, ImplicitBytes, ImplicitLenField,
+    ImplicitString,
+};
+pub use message::{NestedMessage, NestedMessageField};
 pub use oneof::OneofSlot;
 pub use presence::PresenceBits;
 pub use scalar::{ExplicitVarint, ExplicitVarintField, ImplicitEnum, ImplicitInt32, ImplicitVarint, ImplicitVarintField};

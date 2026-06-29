@@ -130,17 +130,17 @@ Generated eager messages are a **product of composable field types** (see [§10]
 // Illustrative generated layout for reference `Task`:
 pub struct Task<A: Allocator = Global> {
     _common: MessageCommon<TaskPresence, A>,
-    title: puroro::fields::ExplicitString<1, BIT_TITLE, A>,
+    title: puroro::fields::ExplicitString<A>,
     score: puroro::fields::ImplicitVarintField<puroro::fields::ProtoInt32>,
     max_retries: puroro::fields::ExplicitVarintField<puroro::fields::ProtoInt32>,
-    owner_id: puroro::fields::ExplicitString<4, BIT_OWNER_ID, A>,
-    payload: puroro::fields::ExplicitBytes<5, BIT_PAYLOAD, A>,
+    owner_id: puroro::fields::ExplicitString<A>,
+    payload: puroro::fields::ExplicitBytes<A>,
     tag_ids: puroro::fields::RepeatedPackedI32<6, A>,
     scores: puroro::fields::RepeatedExpandedI32<7, A>,
     labels: puroro::fields::RepeatedString<8, A>,
     status: puroro::fields::ImplicitVarintField<puroro::fields::ProtoEnum>,
     priority: puroro::fields::ExplicitVarintField<puroro::fields::ProtoEnum>,
-    assignee: puroro::fields::NestedMessage<11, Address<A>, A>,
+    assignee: puroro::fields::NestedMessageField<Address<A>, A>,
     notification: OneofSlot<task::Notification<A>>,
 }
 ```
@@ -518,10 +518,12 @@ Open enum accessors (`status() -> Result<Status, i32>`) are **thin generated glu
 | `IMPLICIT open enum` | `ImplicitVarintField<ProtoEnum>` |
 | `EXPLICIT closed enum` | `ExplicitVarintField<ProtoEnum>` + closed merge policy |
 | `IMPLICIT float` | `ImplicitFixed32Field<ProtoFloat>` (planned) |
-| `IMPLICIT string` | `ImplicitLenField<ProtoString, A>` (planned) |
-| `EXPLICIT string` | `ExplicitLenField<ProtoString, A>` (planned) |
+| `IMPLICIT string` | `ImplicitString<A>` (= `ImplicitLenField<ProtoString, A>`) |
+| `EXPLICIT string` | `ExplicitString<A>` |
+| `IMPLICIT bytes` | `ImplicitBytes<A>` |
+| `EXPLICIT bytes` | `ExplicitBytes<A>` |
 | `repeated int32 PACKED` | `RepeatedPackedVarintField<ProtoInt32, A>` (planned) |
-| nested message | `NestedMessageField<M, A>` (planned) |
+| nested message | `NestedMessageField<M, A>` |
 | `oneof` | [`OneofSlot<E>`](src/fields/oneof.rs) |
 
 Adding a new varint protobuf type (e.g. a future edition type) = **one new `VarintProtoType` impl** — zero changes to `ImplicitVarintField` / `ExplicitVarintField`.
@@ -609,8 +611,11 @@ impl PresenceBits for TaskPresence {
 | Component | Status |
 |---|---|
 | `MessageCommon`, `PresenceBits`, `OneofSlot` | **Done** |
-| `VarintProtoType` + markers (`ProtoInt32` … `ProtoEnum`) | **Done** |
+| `VarintProtoType` + markers | **Done** |
 | `ImplicitVarintField` / `ExplicitVarintField` | **Done** |
+| `LenProtoType` + `ProtoString` / `ProtoBytes` | **Done** |
+| `ImplicitLenField` / `ExplicitLenField` (+ string/bytes aliases) | **Done** |
+| `NestedMessageField` | **Done** |
 | `Fixed32ProtoType` / `Fixed64ProtoType` traits | **Stub** |
-| LEN / repeated / nested / closed-enum policy wrappers | **Planned** |
+| Repeated LEN / packed scalar wrappers | **Planned** |
 | `protoc` plugin field-kind → type mapping | **Planned** |
