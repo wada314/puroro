@@ -4,10 +4,9 @@ This document describes the **internal implementation** of generated code. It co
 
 > **Note:** The public API described in DESIGN.md must remain stable even if the internal representations documented here change. For example, presence tracking for optional scalars currently uses `Option<T>` fields, but could be replaced by a per-message bitfield without any change to the accessor API.
 
-All examples use the **editions reference schema** from DESIGN.md §4.
-
 ## Table of contents
 
+0. [Project context](#0-project-context)
 1. [Storage types per field kind](#1-storage-types-per-field-kind)
 2. [Struct layout](#2-struct-layout)
 3. [Constructors and the stored allocator](#3-constructors-and-the-stored-allocator)
@@ -28,6 +27,29 @@ All examples use the **editions reference schema** from DESIGN.md §4.
    - 6.12 [Unknown fields](#612-unknown-fields)
    - 6.13 [LEGACY_REQUIRED fields](#613-legacy_required-fields)
 7. [Optimization opportunities](#7-optimization-opportunities)
+8. [`TaskLazy` storage sketch](#8-tasklazy-storage-sketch)
+
+---
+
+## 0. Project context
+
+| Crate | Responsibility |
+|---|---|
+| **`protobuf-core`** | Submodule providing wire-format primitives (varint, tags, field I/O). Used by tooling and potentially by `puroro` internals; **generated code does not import it directly**. |
+| **`puroro`** | Message runtime imported by generated code (`MessageEncode`, `MessageDecode`, `Optional`, encode/decode helpers). |
+| **`protoc` plugin** | Emits the Rust types and `impl` blocks described here. Primary invocation path; see [DESIGN.md §0](DESIGN.md#0-project-architecture). |
+
+All examples below use the **`Task` / `Address` reference schema** from [DESIGN.md §4](DESIGN.md#reference-schema). That pair is the canonical design example — not a throwaway fixture.
+
+### Runtime stubs (implementation in progress)
+
+The design in DESIGN.md is ahead of the current `puroro` runtime in a few areas:
+
+| Area | Current behaviour | Target behaviour |
+|---|---|---|
+| UTF-8 validation | `decode_string_in` always validates and returns `DecodeError::InvalidUtf8`. | Generated code calls `decode_string_in` (VERIFY) or `decode_string_unchecked_in` (NONE) based on the field's `utf8_validation` feature. |
+| Recursion limit | Not enforced during nested-message merge. | Generated `merge_from` passes a decremented depth counter; depth 0 → `DecodeError::RecursionLimitExceeded`. |
+| Group wire types | `skip_field_and_save` / `skip_field` return `DecodeError::InvalidTag` for `SGroup` / `EGroup`. | Unchanged — groups are not preserved; error or ignore is acceptable per DESIGN.md §0. |
 
 ---
 
@@ -250,10 +272,22 @@ pub fn max_retries(&self) -> ::puroro::Optional<i32, impl ::puroro::HasDefault<i
     // Note: Optional exposes only get() and is_set() — no get_opt() or From<Option>
 }
 
-pub fn max_retries_raw(&self) -> i32 { self.max_retries.unwrap_or(3) }
-pub fn has_max_retries(&self) -> bool { self.max_retries.is_some() }
+pub fn max_retries_raw(&self) -> i32 { self.max_retries().get() }
+pub fn has_max_retries(&self) -> bool { self.max_retries().is_set() }
 pub fn set_max_retries(&mut self, v: i32) { self.max_retries = Some(v); }
 pub fn clear_max_retries(&mut self) { self.max_retries = None; }
+```
+
+On generated **traits**, `max_retries_raw` and `has_max_retries` are **default methods** with the same bodies shown above.  The native `impl` block on `Task<A>` implements the `Optional` accessor directly from the internal `Option<i32>` field and may expose `_raw` / `has_` either by delegating to `max_retries()` or by reading the field (as shown here).
+
+**Fallible trait impl** wraps the infallible `Optional` accessor:
+
+```rust
+// In impl TaskMessageFallible for Task<A> { type Error = Infallible; … }
+fn max_retries(&self) -> Result<Optional<i32, impl HasDefault<i32>>, Infallible> {
+    Ok(TaskMessage::max_retries(self))
+}
+// max_retries_raw / has_max_retries inherit the fallible trait's default methods
 ```
 
 Because `Optional<i32, Default3>` is a concrete struct with no custom `Drop`,
@@ -287,7 +321,9 @@ if !self.name.is_empty() {
 }
 ```
 
-`decode_string_in(buf, alloc)` reads a LEN-prefixed payload, validates UTF-8, returns `Box<str, A>`.
+`decode_string_in(buf, alloc)` reads a LEN-prefixed payload, validates UTF-8 when `utf8_validation = VERIFY`, returns `Box<str, A>`.
+
+When the schema sets `utf8_validation = NONE` on a string field, generated decode arms call a runtime helper that skips UTF-8 validation (unchecked conversion after copy). The `VERIFY` path is what `decode_string_in` implements today; the `NONE` helper is **not yet exposed** in the runtime.
 
 **Setter:**
 ```rust
@@ -312,8 +348,8 @@ pub fn title<'s>(&'s self)
     ::puroro::Optional::new(self.title.as_deref(), DefaultNA)
 }
 
-pub fn title_raw(&self) -> &str { self.title.as_deref().unwrap_or("N/A") }
-pub fn has_title(&self) -> bool { self.title.is_some() }
+pub fn title_raw<'s>(&'s self) -> &'s str { self.title().get() }
+pub fn has_title(&self) -> bool { self.title().is_set() }
 ```
 
 Because `Optional<&'s str, DefaultNA>` is a concrete struct (not an opaque `impl Trait`
@@ -416,7 +452,7 @@ if let Some(addr) = &self.assignee {
     });
     let leftover = {
         let mut sub_buf = (&mut *buf).take(len);
-        addr.merge_from(&mut sub_buf)?;
+        addr.merge_from(&mut sub_buf)?;  // TODO: pass recursion depth; enforce RecursionLimitExceeded
         sub_buf.remaining()
     };
     if leftover > 0 { buf.advance(leftover); }
@@ -424,6 +460,8 @@ if let Some(addr) = &self.assignee {
 ```
 
 Merging into an existing sub-message (not replacing it) implements "concatenation = merge".
+
+> **Recursion limit (stub).** Nested-message decode should decrement a depth counter and return `DecodeError::RecursionLimitExceeded` at depth zero. The error variant exists in `puroro`; generated code and/or a `merge_from_with_depth` runtime helper will enforce the limit — not yet implemented.
 
 ### 6.9 Open enum fields
 
@@ -497,6 +535,8 @@ _ => { skip_field_and_save(field_number, wire_type, buf, &mut self._unknown_fiel
 buf.put_slice(&self._unknown_fields);
 ```
 
+**Deprecated groups.** `SGroup` / `EGroup` wire types are not saved to `_unknown_fields`. The runtime returns `DecodeError::InvalidTag` (or may skip/panic). Round-trip preservation of group payloads is not a goal — see [DESIGN.md §0](DESIGN.md#0-project-architecture).
+
 ### 6.13 LEGACY_REQUIRED fields
 
 **Storage:** `Option<T>` (identical to `EXPLICIT`).
@@ -527,6 +567,17 @@ The encode and decode arms are identical to an `EXPLICIT` field.
 
 ## 7. Optimization opportunities
 
+### Recursion limit enforcement
+
+Generated `merge_from` for messages containing nested message fields (e.g. `Task.assignee → Address`) should thread a remaining-depth parameter. A planned runtime signature:
+
+```rust
+// Illustrative — not yet in puroro:
+fn merge_from_with_depth<B: Buf>(&mut self, buf: &mut B, depth: u32) -> Result<(), DecodeError>;
+```
+
+When `depth == 0` before recursing into a sub-message, return `DecodeError::RecursionLimitExceeded`. The default `merge_from` wrapper starts at a fixed limit (e.g. 100). **Status: stub** — error type only; no enforcement yet.
+
 ### Presence bitfield
 
 Currently each `EXPLICIT`-presence scalar uses `Option<T>`, which stores a discriminant alongside the value (e.g. `Option<i32>` is typically 8 bytes). For a message with many optional scalars, a per-message `u64` (or `[u64; N]`) bitfield could replace the discriminants:
@@ -549,3 +600,111 @@ For use cases where messages are decoded and immediately consumed without modifi
 ### Arena allocation
 
 Arena allocators (`&bumpalo::Bump`, etc.) already work with the current design via `new_in(alloc)`. All heap allocations for a message and its nested messages land in the same arena; dropping the arena frees everything at once without `Drop` overhead.
+
+---
+
+## 8. `TaskLazy` storage sketch
+
+Planned internal layout for the reference `TaskLazy<A>` message (see [DESIGN.md §8 — lazy parse timing](DESIGN.md#tasklaya--lazy-parse-timing)).
+
+### Message-level storage
+
+```rust
+pub struct TaskLazy<A: Allocator = Global> {
+    /// Shared wire stream (`Arc` internally).  Subslice via `.slice()` for nested messages.
+    _wire: Bytes,
+
+    /// Per-field decode / scan caches (interior mutability).
+    title_cache: RefCell<FieldCache<Box<str, A>>>,
+    max_retries_cache: RefCell<FieldCache<i32>>,
+    assignee_cache: RefCell<FieldCache<AddressLazy<A>>>,
+    tag_ids_cache: RefCell<RepeatedCache<i32, A>>,
+    // …
+
+    _alloc: A,   // used for decoded/cached values, not for _wire
+}
+
+impl<A: Allocator + Clone> AddressLazy<A> {
+    /// Constructs from a `Bytes` subslice (typically `parent._wire.slice(start..end)`).
+    fn from_wire(wire: Bytes, alloc: A) -> Self { … }
+}
+```
+
+### `merge_from`: append only
+
+```rust
+fn merge_from<B: Buf>(&mut self, buf: &mut B) -> Result<(), DecodeError> {
+    let chunk = buf.copy_to_bytes(buf.remaining());
+    self._wire = cat_bytes(self._wire.clone(), chunk);
+    self.invalidate_all_field_caches();
+    Ok(())
+}
+```
+
+No tags are read.  Concatenating on merge may allocate a new backing buffer; nested field access does **not** copy payload bytes (see nested message below).
+
+### Field cache (singular)
+
+```rust
+enum FieldCache<T> {
+    Uninitialized,
+    Absent,                    // wire-scanned; field not found
+    WireFound { wire: Bytes }, // payload subslice located, not semantically decoded
+    Parsed(T),
+    Failed(DecodeError),
+}
+```
+
+`WireFound { wire: Bytes }` holds a `Bytes` subslice into `_wire` (or the full `_wire` range for that payload) — no separate copy.
+
+### Nested message: zero-copy child
+
+```rust
+// In TaskLazy::assignee() — after wire scan locates field 11 LEN payload:
+let child_wire = self._wire.slice(start..start + len);
+let child = AddressLazy::from_wire(child_wire, self._alloc.clone());
+*cache = FieldCache::Parsed(child);
+// child._wire shares Arc allocation with parent._wire
+```
+
+### Getter flow (explicit-presence string)
+
+```rust
+fn title(&self) -> Result<Optional<…>, DecodeError> {
+    let mut cache = self.title_cache.borrow_mut();
+    match &*cache {
+        FieldCache::Parsed(s) => return Ok(Optional::new(Some(s.as_ref()), TitleDefault)),
+        FieldCache::Absent => return Ok(Optional::new(None, TitleDefault)),
+        FieldCache::Failed(e) => return Err(e.clone()),
+        _ => {}
+    }
+    let payload = wire_find_last_len_payload(&self._wire, 1)?; // scan _wire
+    match payload {
+        None => { *cache = FieldCache::Absent; Ok(Optional::new(None, TitleDefault)) }
+        Some(range) => {
+            let s = decode_string_semantics(&self._wire[range], self._alloc.clone())?;
+            *cache = FieldCache::Parsed(s);
+            Ok(Optional::new(Some(/* borrow from cache */), TitleDefault))
+        }
+    }
+}
+
+fn has_title(&self) -> Result<bool, DecodeError> {
+    // Use cache if known; else wire-scan _wire for field 1 (skip payload, no UTF-8)
+    …
+}
+```
+
+### Repeated field: cursor in `_wire`
+
+```rust
+struct RepeatedCache<T, A> {
+    state: FieldCache<Vec<T, A>>,
+    scan_cursor: usize,   // next wire scan starts here in _wire
+}
+
+// tag_ids().next():
+//   Parsed(vec) + index → return cached elements
+//   else scan _wire from scan_cursor for field 6, decode one occurrence,
+//   advance scan_cursor; optionally append to partial Vec
+```

@@ -81,5 +81,11 @@ impl<T: Copy, D: HasDefault<T>> Optional<T, D> {
     /// value (either the set value or the declared default); mapping to
     /// `Option` would conflate "not set" with "no value", making the
     /// default-value semantics impossible to enforce at the type level.
+    ///
+    /// # Lazy implementations (`TaskLazy`)
+    ///
+    /// `merge_from` stores wire bytes only.  Getters wire-scan and decode on
+    /// demand; `Optional` is constructed only after a successful semantic decode.
+    /// `has_*()` may wire-scan without semantic decode.  See `DESIGN.md` §8.
     pub fn is_set(&self) -> bool { self.value.is_some() }
 }

@@ -1,0 +1,3 @@
+[submodule "protobuf-core"]
+	path = protobuf-core
+	url = git@github.com:wada314/protobuf-core.git

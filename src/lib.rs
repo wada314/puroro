@@ -1,8 +1,10 @@
 //! **puroro** — A performance-oriented Protocol Buffers runtime for Rust.
 //!
 //! This crate provides the runtime traits and wire-format helpers that
-//! protobuf-generated code depends on.  The code generator is a separate tool
-//! that emits Rust source using the types and functions defined here.
+//! protobuf-generated code depends on.  The code generator is a separate
+//! **`protoc` plugin** (see [`DESIGN.md`](DESIGN.md) §0) that emits Rust
+//! source using the types and functions defined here.  Wire-format primitives
+//! live in the sibling **`protobuf-core`** submodule.
 //!
 //! # Crate layout
 //!
