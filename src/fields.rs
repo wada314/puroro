@@ -10,7 +10,7 @@
 //! The `protoc` plugin picks a catalog type per field, instantiates it with
 //! `const` field number / presence bit / wire-encoding parameters, and emits
 //! thin delegating methods on the message struct. See
-//! [`IMPLEMENTATION.md`](../../IMPLEMENTATION.md) §10.
+//! [`IMPLEMENTATION.md`](../IMPLEMENTATION.md) §10.
 //!
 //! # Module layout (field catalog — implementation in progress)
 //!
