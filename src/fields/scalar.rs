@@ -13,7 +13,7 @@ use crate::error::DecodeError;
 use crate::optional::{HasDefault, Optional};
 use crate::wire_type::WireType;
 
-use super::common::{MessageParts, MessagePartsMut};
+use super::common::MessageCommon;
 use super::presence::PresenceBits;
 use super::varint::{self, VarintProtoType};
 
@@ -104,18 +104,18 @@ impl<T: VarintProtoType> ExplicitVarintField<T> {
 
     /// Returns whether the presence bit is set.
     #[inline]
-    pub fn has<P, A, const BIT: usize>(&self, parts: MessageParts<P, A>) -> bool
+    pub fn has<P, A, const BIT: usize>(&self, common: &MessageCommon<P, A>) -> bool
     where
         P: PresenceBits,
         A: ::allocator_api2::alloc::Allocator,
     {
-        parts.presence.is_set(BIT)
+        common.is_present(BIT)
     }
 
     /// Returns an [`Optional`] wrapping the semantic value.
     pub fn get<P, A, D, const BIT: usize>(
         &self,
-        parts: MessageParts<P, A>,
+        common: &MessageCommon<P, A>,
         default: D,
     ) -> Optional<T::Value, D>
     where
@@ -124,7 +124,7 @@ impl<T: VarintProtoType> ExplicitVarintField<T> {
         D: HasDefault<T::Value>,
         T::Value: Copy,
     {
-        let v = if parts.presence.is_set(BIT) {
+        let v = if common.is_present(BIT) {
             Some(self.value)
         } else {
             None
@@ -136,37 +136,37 @@ impl<T: VarintProtoType> ExplicitVarintField<T> {
     #[inline]
     pub fn set<P, A, const BIT: usize>(
         &mut self,
-        parts: &mut MessagePartsMut<P, A>,
+        common: &mut MessageCommon<P, A>,
         v: T::Value,
     ) where
         P: PresenceBits,
         A: ::allocator_api2::alloc::Allocator,
     {
-        parts.set_presence(BIT, true);
+        common.set_presence(BIT, true);
         self.value = v;
     }
 
     /// Clears presence and resets the value slot to type-zero.
     #[inline]
-    pub fn clear<P, A, const BIT: usize>(&mut self, parts: &mut MessagePartsMut<P, A>)
+    pub fn clear<P, A, const BIT: usize>(&mut self, common: &mut MessageCommon<P, A>)
     where
         P: PresenceBits,
         A: ::allocator_api2::alloc::Allocator,
     {
-        parts.set_presence(BIT, false);
+        common.set_presence(BIT, false);
         self.value = T::proto_zero();
     }
 
     /// Wire byte length when the presence bit is set.
     pub fn encoded_len<P, A, const FIELD: u32, const BIT: usize>(
         &self,
-        parts: MessageParts<P, A>,
+        common: &MessageCommon<P, A>,
     ) -> usize
     where
         P: PresenceBits,
         A: ::allocator_api2::alloc::Allocator,
     {
-        if parts.presence.is_set(BIT) {
+        if common.is_present(BIT) {
             encode::encoded_len_varint_field(FIELD, T::encode_wire(self.value))
         } else {
             0
@@ -176,13 +176,13 @@ impl<T: VarintProtoType> ExplicitVarintField<T> {
     /// Encodes when the presence bit is set.
     pub fn encode_raw<P, A, B: BufMut, const FIELD: u32, const BIT: usize>(
         &self,
-        parts: MessageParts<P, A>,
+        common: &MessageCommon<P, A>,
         buf: &mut B,
     ) where
         P: PresenceBits,
         A: ::allocator_api2::alloc::Allocator,
     {
-        if parts.presence.is_set(BIT) {
+        if common.is_present(BIT) {
             encode::encode_varint_field(FIELD, T::encode_wire(self.value), buf);
         }
     }
@@ -190,7 +190,7 @@ impl<T: VarintProtoType> ExplicitVarintField<T> {
     /// Merges one wire occurrence (sets presence bit; last value wins).
     pub fn merge<P, A, B: Buf, const BIT: usize>(
         &mut self,
-        parts: &mut MessagePartsMut<P, A>,
+        common: &mut MessageCommon<P, A>,
         wire_type: WireType,
         buf: &mut B,
     ) -> Result<(), DecodeError>
@@ -202,7 +202,7 @@ impl<T: VarintProtoType> ExplicitVarintField<T> {
             return Err(DecodeError::InvalidTag);
         }
         let raw = decode::decode_varint(buf)?;
-        parts.set_presence(BIT, true);
+        common.set_presence(BIT, true);
         self.value = T::decode_wire(raw)?;
         Ok(())
     }

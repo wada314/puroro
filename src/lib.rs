@@ -37,6 +37,6 @@ pub mod wire_type;
 pub use decode::MessageDecode;
 pub use encode::MessageEncode;
 pub use error::{DecodeError, EncodeError};
-pub use fields::{MessageCommon, MessageParts, MessagePartsMut, OneofSlot, PresenceBits};
+pub use fields::{MessageCommon, OneofSlot, PresenceBits};
 pub use optional::{HasDefault, Optional};
 pub use wire_type::WireType;

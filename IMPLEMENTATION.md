@@ -153,7 +153,7 @@ pub struct Task<A: Allocator = Global> {
 | `title` … `assignee` | Independent field types; each knows its field number and (if applicable) presence bit |
 | `notification` | [`OneofSlot`](src/fields/oneof.rs) — **not** a catalog field type; variants are mutually exclusive |
 
-Public accessors on `Task` are **one-line delegates** into the field type, passing `_common.parts()` or `_common.parts_mut()` as needed. `MessageEncode`, `MessageDecode`, `Clone`, and `PartialEq` on the message are the **sum of the same delegates** — no field-specific logic lives in the message `impl` body beyond dispatch tables.
+Public accessors on `Task` are **one-line delegates** into the field type, passing `&self._common` or `&mut self._common` as needed. `MessageEncode`, `MessageDecode`, `Clone`, and `PartialEq` on the message are the **sum of the same delegates** — no field-specific logic lives in the message `impl` body beyond dispatch tables.
 
 `TaskLazy<A>` layout is specified in [DESIGN.md §8](DESIGN.md#tasklaya--lazy-parse-timing).
 
@@ -395,18 +395,18 @@ All singular/repeated fields share one struct (see [`src/fields/common.rs`](src/
 | `unknown_fields: Vec<u8, A>` | Message-level unknown tags; **closed enum** diversion |
 | `alloc: A` | String/bytes/repeated/nested setters and decode |
 
-Field methods take a **`MessageParts`** (read) or **`MessagePartsMut`** (write/merge) view — not `&Task` — so field types stay decoupled from the parent message type.
+Field methods take **`&MessageCommon`** or **`&mut MessageCommon`** — not `&Task` — so field types stay decoupled from the parent message type.
 
 ```rust
 // Generated accessor (always this shape):
 pub fn title(&self) -> Optional<&str, impl HasDefault<&str>> {
-    self.title.get(self._common.parts())
+    self.title.get(&self._common)
 }
 pub fn set_title(&mut self, v: &str)
 where
     A: Clone,
 {
-    self.title.set(self._common.parts_mut(), v);
+    self.title.set(&mut self._common, v);
 }
 ```
 
@@ -498,11 +498,11 @@ pub fn set_score(&mut self, v: i32) {
     self.score.set(v);
 }
 pub fn max_retries(&self) -> Optional<i32, impl HasDefault<i32>> {
-    self.max_retries.get(self._common.parts(), MaxRetriesDefault)
+    self.max_retries.get(&self._common, MaxRetriesDefault)
 }
 // encode (field number + bit index are const args):
 self.score.encode_raw::<2, _>(buf);
-self.max_retries.encode_raw::<_, _, 3, BIT_MAX_RETRIES>(self._common.parts(), buf);
+self.max_retries.encode_raw::<_, _, 3, BIT_MAX_RETRIES>(&self._common, buf);
 ```
 
 Open enum accessors (`status() -> Result<Status, i32>`) are **thin generated glue** on top of `ImplicitVarintField<ProtoEnum>::get()` + `Status::try_from`. Closed enum merge adds a **policy** hook (unknown variant → `unknown_fields`) — same `ExplicitVarintField<ProtoEnum>` storage, specialised `merge` wrapper.
@@ -534,16 +534,16 @@ Adding a new varint protobuf type (e.g. a future edition type) = **one new `Vari
 
 ```rust
 fn encoded_len(&self) -> usize {
-    let p = self._common.parts();
+    let c = &self._common;
     0
-        .adding(self.title.encoded_len(&p))
+        .adding(self.title.encoded_len(c))
         .adding(self.score.encoded_len())
         // … every field …
         + self._common.unknown_fields.len()
 }
 fn encode_raw<B: BufMut>(&self, buf: &mut B) {
-    let p = self._common.parts();
-    self.title.encode_raw(&p, buf);
+    let c = &self._common;
+    self.title.encode_raw(c, buf);
     self.score.encode_raw(buf);
     // …
     buf.put_slice(&self._common.unknown_fields);
@@ -554,10 +554,10 @@ fn encode_raw<B: BufMut>(&self, buf: &mut B) {
 
 ```rust
 match field_number {
-    1 => self.title.merge(wire_type, self._common.parts_mut(), buf)?,
+    1 => self.title.merge(wire_type, &mut self._common, buf)?,
     2 => self.score.merge(wire_type, buf)?,
-    12 => self.notification.merge_email(wire_type, self._common.parts_mut(), buf)?,
-    13 => self.notification.merge_phone(wire_type, self._common.parts_mut(), buf)?,
+    12 => self.notification.merge_email(wire_type, &mut self._common, buf)?,
+    13 => self.notification.merge_phone(wire_type, &mut self._common, buf)?,
     _ => skip_field_and_save(field_number, wire_type, &mut self._common.unknown_fields, buf)?,
 }
 ```
@@ -608,7 +608,7 @@ impl PresenceBits for TaskPresence {
 
 | Component | Status |
 |---|---|
-| `MessageCommon`, `MessageParts*`, `PresenceBits`, `OneofSlot` | **Done** |
+| `MessageCommon`, `PresenceBits`, `OneofSlot` | **Done** |
 | `VarintProtoType` + markers (`ProtoInt32` … `ProtoEnum`) | **Done** |
 | `ImplicitVarintField` / `ExplicitVarintField` | **Done** |
 | `Fixed32ProtoType` / `Fixed64ProtoType` traits | **Stub** |
