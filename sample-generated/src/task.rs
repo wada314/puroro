@@ -10,10 +10,9 @@ use ::bitvec::order::Lsb0;
 use ::bytes::{Buf, BufMut};
 
 use ::puroro::{
-    DecodeError, ExplicitBytes, ExplicitEnum, ExplicitInt32, ExplicitString, ExplicitVarintField,
-    HasDefault, ImplicitEnum, ImplicitInt32, MessageCommon, MessageDecode, MessageEncode,
-    NestedMessageField, OneofSlot, Optional, PresenceBits, ProtoEnum, ProtoInt32,
-    VarintProtoType, WireType,
+    DecodeError, Explicit, HasDefault, Implicit, LegacyRequired, MessageCommon, MessageDecode,
+    MessageEncode, NestedMessageField, OneofSlot, Optional, PresenceBits, ProtoBytes, ProtoEnum,
+    ProtoInt32, ProtoString, SingularLenField, SingularVarintField, VarintProtoType, WireType,
 };
 
 use crate::address::Address;
@@ -76,16 +75,16 @@ const BIT_UNUSED: usize = 0;
 /// Reference `Task` message from `DESIGN.md`.
 pub struct Task<A: Allocator = Global> {
     _common: MessageCommon<TaskPresence, A>,
-    title: ExplicitString<A>,
-    score: ImplicitInt32,
-    max_retries: ExplicitInt32,
-    owner_id: ExplicitString<A>,
-    payload: ExplicitBytes<A>,
+    title: SingularLenField<ProtoString, Explicit, A>,
+    score: SingularVarintField<ProtoInt32, Implicit>,
+    max_retries: SingularVarintField<ProtoInt32, Explicit>,
+    owner_id: SingularLenField<ProtoString, LegacyRequired, A>,
+    payload: SingularLenField<ProtoBytes, Explicit, A>,
     tag_ids: AVec<i32, A>,
     scores: AVec<i32, A>,
     labels: AVec<ABox<str, A>, A>,
-    status: ImplicitEnum,
-    priority: ExplicitEnum,
+    status: SingularVarintField<ProtoEnum, Implicit>,
+    priority: SingularVarintField<ProtoEnum, Explicit>,
     assignee: NestedMessageField<Address<A>, A>,
     notification: OneofSlot<Notification<A>>,
 }
@@ -94,16 +93,16 @@ impl<A: Allocator + Clone> Task<A> {
     pub fn new_in(alloc: A) -> Self {
         Self {
             _common: MessageCommon::new_in(TaskPresence::ZERO, alloc.clone()),
-            title: ExplicitString::new_in(alloc.clone()),
-            score: ImplicitInt32::new(),
-            max_retries: ExplicitInt32::new(),
-            owner_id: ExplicitString::new_in(alloc.clone()),
-            payload: ExplicitBytes::new_in(alloc.clone()),
+            title: SingularLenField::new_in(alloc.clone()),
+            score: SingularVarintField::new(),
+            max_retries: SingularVarintField::new(),
+            owner_id: SingularLenField::new_in(alloc.clone()),
+            payload: SingularLenField::new_in(alloc.clone()),
             tag_ids: AVec::new_in(alloc.clone()),
             scores: AVec::new_in(alloc.clone()),
             labels: AVec::new_in(alloc.clone()),
-            status: ImplicitEnum::new(),
-            priority: ExplicitEnum::new(),
+            status: SingularVarintField::new(),
+            priority: SingularVarintField::new(),
             assignee: NestedMessageField::new(),
             notification: OneofSlot::new(),
         }
@@ -345,12 +344,8 @@ impl<A: Allocator + Clone> Task<A> {
 
     /// Checks `LEGACY_REQUIRED` fields (`owner_id`).
     pub fn validate(&self) -> Result<(), DecodeError> {
-        if !self.owner_id.has::<_, BIT_OWNER_ID>(&self._common) {
-            return Err(DecodeError::MissingRequiredField {
-                field_number: FIELD_OWNER_ID,
-            });
-        }
-        Ok(())
+        self.owner_id
+            .validate_required::<_, BIT_OWNER_ID>(&self._common, FIELD_OWNER_ID)
     }
 
     pub fn decode_strict<B: Buf>(buf: B) -> Result<Self, DecodeError>
@@ -479,11 +474,11 @@ impl<A: Allocator + Clone> MessageDecode for Task<A> {
                     )?;
                 }
                 FIELD_PRIORITY => {
-                    merge_priority_closed(
-                        &mut self.priority,
+                    self.priority.merge_closed::<_, _, _, FIELD_PRIORITY, BIT_PRIORITY>(
                         &mut self._common,
                         wire_type,
                         buf,
+                        |v| Priority::try_from(v).is_ok(),
                     )?;
                 }
                 FIELD_ASSIGNEE => {
@@ -634,29 +629,6 @@ fn merge_repeated_label<A: Allocator + Clone, B: Buf>(
     }
     let s = ::puroro::decode::decode_string_in(buf, common.alloc.clone())?;
     vec.push(s);
-    Ok(())
-}
-
-fn merge_priority_closed<A: Allocator + Clone, B: Buf>(
-    field: &mut ExplicitVarintField<ProtoEnum>,
-    common: &mut MessageCommon<TaskPresence, A>,
-    wire_type: WireType,
-    buf: &mut B,
-) -> Result<(), DecodeError> {
-    if wire_type != WireType::Varint {
-        return Err(DecodeError::InvalidTag);
-    }
-    let raw = ::puroro::decode::decode_varint(buf)?;
-    let value = raw as i32;
-    if Priority::try_from(value).is_err() {
-        ::puroro::decode::save_unknown_varint_field(
-            FIELD_PRIORITY,
-            raw,
-            &mut common.unknown_fields,
-        );
-        return Ok(());
-    }
-    field.set::<_, _, BIT_PRIORITY>(common, value);
     Ok(())
 }
 

@@ -41,10 +41,10 @@ pub use fields::{
     Explicit, ExplicitBytes, ExplicitEnum, ExplicitFieldPresence, ExplicitInt32, ExplicitLenField,
     ExplicitString, ExplicitVarint, ExplicitVarintField, FieldPresence, Implicit, ImplicitBytes,
     ImplicitEnum, ImplicitInt32, ImplicitLenField, ImplicitString, ImplicitVarint,
-    ImplicitVarintField, LenProtoType, MessageCommon, NestedMessage, NestedMessageField, OneofSlot,
-    PresenceBits, ProtoBool, ProtoBytes, ProtoEnum, ProtoInt32, ProtoInt64, ProtoSint32, ProtoSint64,
-    ProtoString, ProtoUInt32, ProtoUInt64, SingularLen, SingularLenField, SingularVarint,
-    SingularVarintField, VarintProtoType,
+    ImplicitVarintField, LegacyRequired, LenProtoType, MessageCommon, NestedMessage,
+    NestedMessageField, OneofSlot, PresenceBits, ProtoBool, ProtoBytes, ProtoEnum, ProtoInt32,
+    ProtoInt64, ProtoSint32, ProtoSint64, ProtoString, ProtoUInt32, ProtoUInt64, RequiredFieldPresence,
+    SingularLen, SingularLenField, SingularVarint, SingularVarintField, VarintProtoType,
 };
 pub use optional::{HasDefault, Optional};
 pub use wire_type::WireType;

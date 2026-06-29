@@ -1,9 +1,11 @@
-//! Field presence policy markers (`Implicit` / `Explicit`).
+//! Field presence policy markers (`Implicit` / `Explicit` / `LegacyRequired`).
 //!
 //! Composed with wire-encoding markers ([`VarintProtoType`](super::varint::VarintProtoType),
 //! [`LenProtoType`](super::len::LenProtoType)) in singular field wrappers.
 
 use ::allocator_api2::alloc::Allocator;
+
+use crate::error::DecodeError;
 
 use super::common::MessageCommon;
 use super::presence::PresenceBits;
@@ -91,7 +93,70 @@ impl FieldPresence for Explicit {
     }
 }
 
+/// Marker for LEGACY_REQUIRED — wire/encode/merge identical to [`Explicit`];
+/// message `validate()` must check the presence bit.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
+pub struct LegacyRequired;
+
+impl FieldPresence for LegacyRequired {
+    fn should_emit<P, A>(common: &MessageCommon<P, A>, bit: usize, _: bool) -> bool
+    where
+        P: PresenceBits,
+        A: Allocator,
+    {
+        common.is_present(bit)
+    }
+
+    fn on_set<P, A>(common: &mut MessageCommon<P, A>, bit: usize)
+    where
+        P: PresenceBits,
+        A: Allocator,
+    {
+        common.set_presence(bit, true);
+    }
+
+    fn on_clear<P, A>(common: &mut MessageCommon<P, A>, bit: usize)
+    where
+        P: PresenceBits,
+        A: Allocator,
+    {
+        common.set_presence(bit, false);
+    }
+}
+
 /// Sub-trait for EXPLICIT-only accessors (`optional`, `has`, `clear`).
 pub trait ExplicitFieldPresence: FieldPresence {}
 
 impl ExplicitFieldPresence for Explicit {}
+impl ExplicitFieldPresence for LegacyRequired {}
+
+/// Sub-trait for LEGACY_REQUIRED fields — adds presence validation for `validate()`.
+pub trait RequiredFieldPresence: ExplicitFieldPresence {
+    /// Returns `MissingRequiredField` when the bit is unset.
+    fn validate_present<P, A>(
+        common: &MessageCommon<P, A>,
+        bit: usize,
+        field_number: u32,
+    ) -> Result<(), DecodeError>
+    where
+        P: PresenceBits,
+        A: Allocator;
+}
+
+impl RequiredFieldPresence for LegacyRequired {
+    fn validate_present<P, A>(
+        common: &MessageCommon<P, A>,
+        bit: usize,
+        field_number: u32,
+    ) -> Result<(), DecodeError>
+    where
+        P: PresenceBits,
+        A: Allocator,
+    {
+        if common.is_present(bit) {
+            Ok(())
+        } else {
+            Err(DecodeError::MissingRequiredField { field_number })
+        }
+    }
+}

@@ -6,8 +6,8 @@ use ::bitvec::order::Lsb0;
 use ::bytes::{Buf, BufMut};
 
 use ::puroro::{
-    DecodeError, ExplicitString, MessageCommon, MessageDecode, MessageEncode, NestedMessage,
-    PresenceBits,
+    DecodeError, Explicit, MessageCommon, MessageDecode, MessageEncode, NestedMessage,
+    PresenceBits, ProtoString, SingularLenField,
 };
 
 // ---------------------------------------------------------------------------
@@ -48,16 +48,16 @@ const BIT_CITY: usize = 1;
 /// `message Address { string street = 1; string city = 2; }`
 pub struct Address<A: Allocator = Global> {
     _common: MessageCommon<AddressPresence, A>,
-    street: ExplicitString<A>,
-    city: ExplicitString<A>,
+    street: SingularLenField<ProtoString, Explicit, A>,
+    city: SingularLenField<ProtoString, Explicit, A>,
 }
 
 impl<A: Allocator + Clone> Address<A> {
     pub fn new_in(alloc: A) -> Self {
         Self {
             _common: MessageCommon::new_in(AddressPresence::ZERO, alloc.clone()),
-            street: ExplicitString::new_in(alloc.clone()),
-            city: ExplicitString::new_in(alloc),
+            street: SingularLenField::new_in(alloc.clone()),
+            city: SingularLenField::new_in(alloc),
         }
     }
 

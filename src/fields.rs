@@ -35,7 +35,9 @@ pub mod scalar;
 pub mod varint;
 
 pub use common::MessageCommon;
-pub use field_presence::{Explicit, ExplicitFieldPresence, FieldPresence, Implicit};
+pub use field_presence::{
+    Explicit, ExplicitFieldPresence, FieldPresence, Implicit, LegacyRequired, RequiredFieldPresence,
+};
 pub use len::{LenProtoType, ProtoBytes, ProtoString};
 pub use len_field::{
     ExplicitBytes, ExplicitLenField, ExplicitString, ImplicitBytes, ImplicitLenField,

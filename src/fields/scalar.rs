@@ -155,6 +155,33 @@ impl<T: VarintProtoType, P: ExplicitFieldPresence> SingularVarintField<T, P> {
         P::on_clear(common, BIT);
         self.value = T::proto_zero();
     }
+
+    /// Merges a closed-enum occurrence; unknown values go to `common.unknown_fields`.
+    pub fn merge_closed<Pb, A, B: Buf, const FIELD: u32, const BIT: usize>(
+        &mut self,
+        common: &mut MessageCommon<Pb, A>,
+        wire_type: WireType,
+        buf: &mut B,
+        is_known: impl FnOnce(T::Value) -> bool,
+    ) -> Result<(), DecodeError>
+    where
+        Pb: PresenceBits,
+        A: ::allocator_api2::alloc::Allocator,
+        T::Value: Copy,
+    {
+        if wire_type != varint::WIRE_TYPE {
+            return Err(DecodeError::InvalidTag);
+        }
+        let raw = decode::decode_varint(buf)?;
+        let value = T::decode_wire(raw)?;
+        if !is_known(value) {
+            decode::save_unknown_varint_field(FIELD, raw, &mut common.unknown_fields);
+            return Ok(());
+        }
+        P::on_set(common, BIT);
+        self.value = value;
+        Ok(())
+    }
 }
 
 // ---------------------------------------------------------------------------

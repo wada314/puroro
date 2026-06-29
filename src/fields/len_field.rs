@@ -12,7 +12,7 @@ use crate::optional::{HasDefault, Optional};
 use crate::wire_type::WireType;
 
 use super::common::MessageCommon;
-use super::field_presence::{ExplicitFieldPresence, FieldPresence};
+use super::field_presence::{ExplicitFieldPresence, FieldPresence, RequiredFieldPresence};
 use super::len::{self, LenProtoType};
 use super::presence::PresenceBits;
 
@@ -145,6 +145,20 @@ impl<T: LenProtoType, P: ExplicitFieldPresence, A: Allocator + Clone> SingularLe
     {
         P::on_clear(common, BIT);
         self.value = T::new_empty(common.alloc.clone());
+    }
+}
+
+impl<T: LenProtoType, P: RequiredFieldPresence, A: Allocator + Clone> SingularLenField<T, P, A> {
+    /// Checks the presence bit for a LEGACY_REQUIRED field.
+    pub fn validate_required<Pb, const BIT: usize>(
+        &self,
+        common: &MessageCommon<Pb, A>,
+        field_number: u32,
+    ) -> Result<(), DecodeError>
+    where
+        Pb: PresenceBits,
+    {
+        P::validate_present(common, BIT, field_number)
     }
 }
 
