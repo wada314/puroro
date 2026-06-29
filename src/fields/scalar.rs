@@ -1,9 +1,10 @@
-//! Singular scalar field wrappers generic over wire-encoding traits.
+//! Singular varint field wrapper — generic over wire type and presence policy.
 //!
-//! Varint-backed fields use [`VarintProtoType`](super::varint::VarintProtoType)
-//! as the type parameter. Fixed-width scalars use
+//! Fixed-width scalars will follow the same `Singular*Field<T, P>` pattern with
 //! [`Fixed32ProtoType`](super::fixed32::Fixed32ProtoType) /
-//! [`Fixed64ProtoType`](super::fixed64::Fixed64ProtoType) (same pattern).
+//! [`Fixed64ProtoType`](super::fixed64::Fixed64ProtoType).
+
+use ::core::marker::PhantomData;
 
 use ::bytes::{Buf, BufMut};
 
@@ -14,112 +15,126 @@ use crate::optional::{HasDefault, Optional};
 use crate::wire_type::WireType;
 
 use super::common::MessageCommon;
+use super::field_presence::{ExplicitFieldPresence, FieldPresence};
 use super::presence::PresenceBits;
 use super::varint::{self, VarintProtoType};
 
-// ---------------------------------------------------------------------------
-// IMPLICIT presence
-// ---------------------------------------------------------------------------
-
-/// Singular scalar with IMPLICIT presence, generic over a varint protobuf type.
+/// Singular scalar on the wire as VARINT — parametrised by protobuf type `T` and
+/// presence policy `P` ([`Implicit`](super::field_presence::Implicit) /
+/// [`Explicit`](super::field_presence::Explicit)).
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub struct ImplicitVarintField<T: VarintProtoType> {
+pub struct SingularVarintField<T: VarintProtoType, P: FieldPresence> {
     value: T::Value,
+    _presence: PhantomData<P>,
 }
 
-impl<T: VarintProtoType> ImplicitVarintField<T> {
-    /// Creates a field holding the protobuf type-zero.
+impl<T: VarintProtoType, P: FieldPresence> SingularVarintField<T, P> {
+    /// Creates a field with the protobuf type-zero in the value slot.
     pub fn new() -> Self {
         Self {
             value: T::proto_zero(),
+            _presence: PhantomData,
         }
     }
 
-    /// Returns the stored value.
+    /// Raw stored value (use for IMPLICIT public getters).
     #[inline]
-    pub fn get(&self) -> T::Value {
+    pub fn value(&self) -> T::Value {
         self.value
     }
 
-    /// Sets the value.
-    #[inline]
-    pub fn set(&mut self, v: T::Value) {
+    /// Stores `v`, applying the presence policy (`on_set` for EXPLICIT).
+    pub fn set<Pb, A, const BIT: usize>(
+        &mut self,
+        common: &mut MessageCommon<Pb, A>,
+        v: T::Value,
+    ) where
+        Pb: PresenceBits,
+        A: ::allocator_api2::alloc::Allocator,
+    {
+        P::on_set(common, BIT);
         self.value = v;
     }
 
-    /// Wire byte length, or `0` when omitted (value equals type-zero).
-    pub fn encoded_len<const FIELD: u32>(&self) -> usize {
-        if self.value == T::proto_zero() {
-            0
-        } else {
+    /// Resets the value slot to type-zero (does not touch the bitfield).
+    #[inline]
+    pub fn clear_value(&mut self) {
+        self.value = T::proto_zero();
+    }
+
+    pub fn encoded_len<Pb, A, const FIELD: u32, const BIT: usize>(
+        &self,
+        common: &MessageCommon<Pb, A>,
+    ) -> usize
+    where
+        Pb: PresenceBits,
+        A: ::allocator_api2::alloc::Allocator,
+    {
+        let empty = self.value == T::proto_zero();
+        if P::should_emit(common, BIT, empty) {
             encode::encoded_len_varint_field(FIELD, T::encode_wire(self.value))
+        } else {
+            0
         }
     }
 
-    /// Encodes when present on wire (non-type-zero).
-    pub fn encode_raw<const FIELD: u32, B: BufMut>(&self, buf: &mut B) {
-        if self.value != T::proto_zero() {
+    pub fn encode_raw<Pb, A, B: BufMut, const FIELD: u32, const BIT: usize>(
+        &self,
+        common: &MessageCommon<Pb, A>,
+        buf: &mut B,
+    ) where
+        Pb: PresenceBits,
+        A: ::allocator_api2::alloc::Allocator,
+    {
+        let empty = self.value == T::proto_zero();
+        if P::should_emit(common, BIT, empty) {
             encode::encode_varint_field(FIELD, T::encode_wire(self.value), buf);
         }
     }
 
-    /// Merges one wire occurrence (last value wins).
-    pub fn merge<B: Buf>(
+    pub fn merge<Pb, A, B: Buf, const BIT: usize>(
         &mut self,
+        common: &mut MessageCommon<Pb, A>,
         wire_type: WireType,
         buf: &mut B,
-    ) -> Result<(), DecodeError> {
+    ) -> Result<(), DecodeError>
+    where
+        Pb: PresenceBits,
+        A: ::allocator_api2::alloc::Allocator,
+    {
         if wire_type != varint::WIRE_TYPE {
             return Err(DecodeError::InvalidTag);
         }
         let raw = decode::decode_varint(buf)?;
+        P::on_set(common, BIT);
         self.value = T::decode_wire(raw)?;
         Ok(())
     }
 }
 
-impl<T: VarintProtoType> Default for ImplicitVarintField<T> {
+impl<T: VarintProtoType, P: FieldPresence> Default for SingularVarintField<T, P> {
     fn default() -> Self {
         Self::new()
     }
 }
 
-// ---------------------------------------------------------------------------
-// EXPLICIT presence
-// ---------------------------------------------------------------------------
-
-/// Singular scalar with EXPLICIT presence (presence bit + value slot).
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub struct ExplicitVarintField<T: VarintProtoType> {
-    value: T::Value,
-}
-
-impl<T: VarintProtoType> ExplicitVarintField<T> {
-    /// Creates an unset field (bit clear, value slot at type-zero).
-    pub fn new() -> Self {
-        Self {
-            value: T::proto_zero(),
-        }
-    }
-
-    /// Returns whether the presence bit is set.
+impl<T: VarintProtoType, P: ExplicitFieldPresence> SingularVarintField<T, P> {
     #[inline]
-    pub fn has<P, A, const BIT: usize>(&self, common: &MessageCommon<P, A>) -> bool
+    pub fn has<Pb, A, const BIT: usize>(&self, common: &MessageCommon<Pb, A>) -> bool
     where
-        P: PresenceBits,
+        Pb: PresenceBits,
         A: ::allocator_api2::alloc::Allocator,
     {
         common.is_present(BIT)
     }
 
-    /// Returns an [`Optional`] wrapping the semantic value.
-    pub fn get<P, A, D, const BIT: usize>(
+    pub fn optional<Pb, A, D, const BIT: usize>(
         &self,
-        common: &MessageCommon<P, A>,
+        common: &MessageCommon<Pb, A>,
         default: D,
     ) -> Optional<T::Value, D>
     where
-        P: PresenceBits,
+        Pb: PresenceBits,
         A: ::allocator_api2::alloc::Allocator,
         D: HasDefault<T::Value>,
         T::Value: Copy,
@@ -132,99 +147,29 @@ impl<T: VarintProtoType> ExplicitVarintField<T> {
         Optional::new(v, default)
     }
 
-    /// Marks the field set and stores `v`.
-    #[inline]
-    pub fn set<P, A, const BIT: usize>(
-        &mut self,
-        common: &mut MessageCommon<P, A>,
-        v: T::Value,
-    ) where
-        P: PresenceBits,
-        A: ::allocator_api2::alloc::Allocator,
-    {
-        common.set_presence(BIT, true);
-        self.value = v;
-    }
-
-    /// Clears presence and resets the value slot to type-zero.
-    #[inline]
-    pub fn clear<P, A, const BIT: usize>(&mut self, common: &mut MessageCommon<P, A>)
+    pub fn clear<Pb, A, const BIT: usize>(&mut self, common: &mut MessageCommon<Pb, A>)
     where
-        P: PresenceBits,
+        Pb: PresenceBits,
         A: ::allocator_api2::alloc::Allocator,
     {
-        common.set_presence(BIT, false);
+        P::on_clear(common, BIT);
         self.value = T::proto_zero();
     }
-
-    /// Wire byte length when the presence bit is set.
-    pub fn encoded_len<P, A, const FIELD: u32, const BIT: usize>(
-        &self,
-        common: &MessageCommon<P, A>,
-    ) -> usize
-    where
-        P: PresenceBits,
-        A: ::allocator_api2::alloc::Allocator,
-    {
-        if common.is_present(BIT) {
-            encode::encoded_len_varint_field(FIELD, T::encode_wire(self.value))
-        } else {
-            0
-        }
-    }
-
-    /// Encodes when the presence bit is set.
-    pub fn encode_raw<P, A, B: BufMut, const FIELD: u32, const BIT: usize>(
-        &self,
-        common: &MessageCommon<P, A>,
-        buf: &mut B,
-    ) where
-        P: PresenceBits,
-        A: ::allocator_api2::alloc::Allocator,
-    {
-        if common.is_present(BIT) {
-            encode::encode_varint_field(FIELD, T::encode_wire(self.value), buf);
-        }
-    }
-
-    /// Merges one wire occurrence (sets presence bit; last value wins).
-    pub fn merge<P, A, B: Buf, const BIT: usize>(
-        &mut self,
-        common: &mut MessageCommon<P, A>,
-        wire_type: WireType,
-        buf: &mut B,
-    ) -> Result<(), DecodeError>
-    where
-        P: PresenceBits,
-        A: ::allocator_api2::alloc::Allocator,
-    {
-        if wire_type != varint::WIRE_TYPE {
-            return Err(DecodeError::InvalidTag);
-        }
-        let raw = decode::decode_varint(buf)?;
-        common.set_presence(BIT, true);
-        self.value = T::decode_wire(raw)?;
-        Ok(())
-    }
-}
-
-impl<T: VarintProtoType> Default for ExplicitVarintField<T> {
-    fn default() -> Self {
-        Self::new()
-    }
 }
 
 // ---------------------------------------------------------------------------
-// Type aliases for generated code ergonomics
+// Type aliases
 // ---------------------------------------------------------------------------
 
-/// IMPLICIT varint field; protobuf type is the type parameter `T`.
+pub type SingularVarint<T, P> = SingularVarintField<T, P>;
+
+pub type ImplicitVarintField<T> = SingularVarintField<T, super::field_presence::Implicit>;
+pub type ExplicitVarintField<T> = SingularVarintField<T, super::field_presence::Explicit>;
+
 pub type ImplicitVarint<T> = ImplicitVarintField<T>;
-
-/// EXPLICIT varint field; default provider `D` is passed to [`ExplicitVarintField::get`].
 pub type ExplicitVarint<T> = ExplicitVarintField<T>;
 
-/// IMPLICIT `int32`.
 pub type ImplicitInt32 = ImplicitVarintField<varint::ProtoInt32>;
-/// IMPLICIT open enum (raw `i32` on wire).
+pub type ExplicitInt32 = ExplicitVarintField<varint::ProtoInt32>;
 pub type ImplicitEnum = ImplicitVarintField<varint::ProtoEnum>;
+pub type ExplicitEnum = ExplicitVarintField<varint::ProtoEnum>;

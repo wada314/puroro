@@ -371,8 +371,8 @@ Protobuf message fields (except **`oneof`**) are **independent**: each field's g
                            │ uses
 ┌──────────────────────────▼──────────────────────────────────┐
 │  puroro::fields  (runtime catalog)                          │
-│  VarintProtoType + ImplicitVarintField / ExplicitVarintField│
-│  Fixed32/64ProtoType + …  String/LEN …  MessageCommon       │
+│  VarintProtoType + SingularVarintField<T, P>                 │
+│  LenProtoType + SingularLenField<T, P, A>  FieldPresence    │
 └──────────────────────────┬──────────────────────────────────┘
                            │ calls
 ┌──────────────────────────▼──────────────────────────────────┐
@@ -417,21 +417,25 @@ Protobuf field behaviour splits into two **orthogonal** axes:
 | Axis | What varies | Where it lives |
 |---|---|---|
 | **Wire encoding** | int32 vs sint32 vs bool vs float vs string … | Zero-sized marker + trait (`VarintProtoType`, `Fixed32ProtoType`, …) |
-| **Presence** | IMPLICIT vs EXPLICIT vs LEGACY_REQUIRED | Field wrapper (`ImplicitVarintField<T>`, `ExplicitVarintField<T>`, …) |
+| **Presence** | IMPLICIT vs EXPLICIT vs LEGACY_REQUIRED | [`FieldPresence`](src/fields/field_presence.rs) marker (`Implicit` / `Explicit`) composed into `Singular*Field<T, P>` |
 
-The plugin never emits `ImplicitI32` vs `ImplicitSint32` as separate catalog entries — it emits **`ImplicitVarintField<ProtoInt32>`** vs **`ImplicitVarintField<ProtoSint32>`**. All varint wire logic is written **once** in the wrappers; all zigzag/bool/enum semantics live in **`VarintProtoType`** impls.
+The plugin never emits `ImplicitI32` vs `ImplicitSint32` as separate catalog entries — it emits **`SingularVarintField<ProtoInt32, Implicit>`** (alias `ImplicitVarintField<ProtoInt32>`) vs **`SingularVarintField<ProtoSint32, Implicit>`**. All varint wire logic is written **once** in `SingularVarintField`; presence policy lives in **`FieldPresence`** impls; zigzag/bool/enum semantics live in **`VarintProtoType`** impls.
 
 ```
                     ┌─────────────────────────────────────┐
-  ProtoField        │  presence layer (1 impl per mode)   │
-  ─────────►        │  ImplicitVarintField<T>             │
-  int32 IMPLICIT    │  ExplicitVarintField<T>             │
-  int32 EXPLICIT    │  ImplicitFixed32Field<T>  (planned) │
+  ProtoField        │  SingularVarintField<T, P>          │
+  ─────────►        │  SingularLenField<T, P, A>          │
+  int32 IMPLICIT    │  SingularFixed32Field<T, P> (plan)  │
+  int32 EXPLICIT    └──────────────┬──────────────────────┘
+                                   │ P: FieldPresence (Implicit / Explicit)
+                    ┌──────────────▼──────────────────────┐
+                    │  Implicit  — omit when payload empty│
+                    │  Explicit  — bitfield via common    │
                     └──────────────┬──────────────────────┘
-                                   │ T: VarintProtoType / …
+                                   │ T: VarintProtoType / LenProtoType / …
                     ┌──────────────▼──────────────────────┐
   wire layer        │  ProtoInt32, ProtoSint32, ProtoBool,  │
-  (marker types)    │  ProtoUInt64, ProtoEnum, …            │
+  (marker types)    │  ProtoUInt64, ProtoEnum, ProtoString… │
                     └──────────────┬──────────────────────┘
                                    │ calls
                     ┌──────────────▼──────────────────────┐
@@ -458,54 +462,72 @@ pub trait VarintProtoType {
 // ProtoBool, ProtoEnum (same wire as int32)
 ```
 
-Parallel traits for other wire families ([`fixed32.rs`](src/fields/fixed32.rs), [`fixed64.rs`](src/fields/fixed64.rs), future `len.rs` for string/bytes/message):
+Parallel traits for other wire families ([`fixed32.rs`](src/fields/fixed32.rs), [`fixed64.rs`](src/fields/fixed64.rs), [`len.rs`](src/fields/len.rs)):
 
-| Trait | Wire type | Planned markers |
+| Trait | Wire type | Markers |
 |---|---|---|
 | `VarintProtoType` | VARINT | above |
-| `Fixed32ProtoType` | I32 | `ProtoFixed32`, `ProtoSfixed32`, `ProtoFloat` |
-| `Fixed64ProtoType` | I64 | `ProtoFixed64`, `ProtoSfixed64`, `ProtoDouble` |
-| `LenProtoType` | LEN | `ProtoString`, `ProtoBytes`, `ProtoMessage<M>` |
+| `Fixed32ProtoType` | I32 | `ProtoFixed32`, `ProtoSfixed32`, `ProtoFloat` (planned) |
+| `Fixed64ProtoType` | I64 | `ProtoFixed64`, `ProtoSfixed64`, `ProtoDouble` (planned) |
+| `LenProtoType` | LEN | `ProtoString`, `ProtoBytes` (**done**); `ProtoMessage<M>` (planned) |
 
 **Important:** Rust storage type alone does **not** identify protobuf encoding (`i32` can be int32, sint32, sfixed32, or enum). The marker type is the source of truth — matching the naming rule in `protobuf-core` docs.
 
-#### Layer 2 — presence wrappers ([`src/fields/scalar.rs`](src/fields/scalar.rs))
+#### Layer 2 — presence policy ([`src/fields/field_presence.rs`](src/fields/field_presence.rs))
 
-One generic struct per `(wire family × presence mode)` pair:
+[`FieldPresence`](src/fields/field_presence.rs) is a zero-sized marker trait with three hooks used by all singular wrappers:
 
-| Wrapper | Param `T` | Const params on methods |
-|---|---|---|
-| `ImplicitVarintField<T>` | `T: VarintProtoType` | `FIELD: u32` |
-| `ExplicitVarintField<T>` | `T: VarintProtoType` | `FIELD: u32`, `BIT: usize` |
-| `ImplicitFixed32Field<T>` | `T: Fixed32ProtoType` | `FIELD` (planned) |
-| `RepeatedPackedVarintField<T, A>` | `T: VarintProtoType` | `FIELD` (planned) |
+| Method | Role |
+|---|---|
+| `should_emit(common, bit, payload_empty)` | Whether to write on encode |
+| `on_set(common, bit)` | After setter / merge (sets bit for EXPLICIT) |
+| `on_clear(common, bit)` | When EXPLICIT field is cleared |
+
+| Marker | Behaviour |
+|---|---|
+| `Implicit` | Emit when payload non-empty; no bitfield updates |
+| `Explicit` | Emit when `common.is_present(bit)`; bitfield on set/clear |
+
+[`ExplicitFieldPresence`](src/fields/field_presence.rs) is a sub-trait gating EXPLICIT-only accessors (`optional`, `has`, `clear`).
+
+#### Layer 3 — singular wrappers ([`src/fields/scalar.rs`](src/fields/scalar.rs), [`len_field.rs`](src/fields/len_field.rs))
+
+One generic struct per wire family, parametrised by wire marker `T` and presence `P`:
+
+| Wrapper | Param `T` | Param `P` | Type aliases |
+|---|---|---|---|
+| `SingularVarintField<T, P>` | `T: VarintProtoType` | `P: FieldPresence` | `ImplicitVarintField<T>`, `ExplicitVarintField<T>` |
+| `SingularLenField<T, P, A>` | `T: LenProtoType` | `P: FieldPresence` | `ImplicitString<A>`, `ExplicitString<A>`, … |
+| `SingularFixed32Field<T, P>` | `T: Fixed32ProtoType` | `P: FieldPresence` | (planned) |
+
+Const params (`FIELD: u32`, `BIT: usize`) are method type parameters, not struct generics.
 
 Generated struct members and accessors:
 
 ```rust
 pub struct Task<A: Allocator = Global> {
     _common: MessageCommon<TaskPresence, A>,
-    score: ImplicitVarintField<ProtoInt32>,
-    max_retries: ExplicitVarintField<ProtoInt32>,
+    score: ImplicitVarintField<ProtoInt32>,           // = SingularVarintField<ProtoInt32, Implicit>
+    max_retries: ExplicitVarintField<ProtoInt32>,     // = SingularVarintField<ProtoInt32, Explicit>
     status: ImplicitVarintField<ProtoEnum>,
     // …
 }
 
 pub fn score(&self) -> i32 {
-    self.score.get()
+    self.score.value()
 }
 pub fn set_score(&mut self, v: i32) {
-    self.score.set(v);
+    self.score.set::<_, _, BIT_SCORE>(&mut self._common, v);  // IMPLICIT: on_set is a no-op
 }
 pub fn max_retries(&self) -> Optional<i32, impl HasDefault<i32>> {
-    self.max_retries.get(&self._common, MaxRetriesDefault)
+    self.max_retries.optional(&self._common, MaxRetriesDefault)
 }
 // encode (field number + bit index are const args):
-self.score.encode_raw::<2, _>(buf);
-self.max_retries.encode_raw::<_, _, 3, BIT_MAX_RETRIES>(&self._common, buf);
+self.score.encode_raw::<2, _>(&self._common, buf);
+self.max_retries.encode_raw::<_, 3, BIT_MAX_RETRIES>(&self._common, buf);
 ```
 
-Open enum accessors (`status() -> Result<Status, i32>`) are **thin generated glue** on top of `ImplicitVarintField<ProtoEnum>::get()` + `Status::try_from`. Closed enum merge adds a **policy** hook (unknown variant → `unknown_fields`) — same `ExplicitVarintField<ProtoEnum>` storage, specialised `merge` wrapper.
+Open enum accessors (`status() -> Result<Status, i32>`) are **thin generated glue** on top of `ImplicitVarintField<ProtoEnum>::value()` + `Status::try_from`. Closed enum merge adds a **policy** hook (unknown variant → `unknown_fields`) — same `ExplicitVarintField<ProtoEnum>` storage, specialised `merge` wrapper.
 
 #### Plugin mapping (replaces flat catalog table)
 
@@ -518,15 +540,15 @@ Open enum accessors (`status() -> Result<Status, i32>`) are **thin generated glu
 | `IMPLICIT open enum` | `ImplicitVarintField<ProtoEnum>` |
 | `EXPLICIT closed enum` | `ExplicitVarintField<ProtoEnum>` + closed merge policy |
 | `IMPLICIT float` | `ImplicitFixed32Field<ProtoFloat>` (planned) |
-| `IMPLICIT string` | `ImplicitString<A>` (= `ImplicitLenField<ProtoString, A>`) |
-| `EXPLICIT string` | `ExplicitString<A>` |
+| `IMPLICIT string` | `ImplicitString<A>` (= `SingularLenField<ProtoString, Implicit, A>`) |
+| `EXPLICIT string` | `ExplicitString<A>` (= `SingularLenField<ProtoString, Explicit, A>`) |
 | `IMPLICIT bytes` | `ImplicitBytes<A>` |
 | `EXPLICIT bytes` | `ExplicitBytes<A>` |
 | `repeated int32 PACKED` | `RepeatedPackedVarintField<ProtoInt32, A>` (planned) |
 | nested message | `NestedMessageField<M, A>` |
 | `oneof` | [`OneofSlot<E>`](src/fields/oneof.rs) |
 
-Adding a new varint protobuf type (e.g. a future edition type) = **one new `VarintProtoType` impl** — zero changes to `ImplicitVarintField` / `ExplicitVarintField`.
+Adding a new varint protobuf type (e.g. a future edition type) = **one new `VarintProtoType` impl** — zero changes to `SingularVarintField`. Adding a new presence mode = **one new `FieldPresence` impl** — zero changes to wire encoding.
 
 **Not in the catalog:** `oneof` — use [`OneofSlot<E>`](src/fields/oneof.rs). Decode emits **one match arm per variant field number**, each calling `notification.merge_variant_12(…)` / `merge_variant_13(…)` on the slot. Coupling stays inside `OneofSlot` + generated merge helpers, not spread across independent field members.
 
@@ -612,9 +634,10 @@ impl PresenceBits for TaskPresence {
 |---|---|
 | `MessageCommon`, `PresenceBits`, `OneofSlot` | **Done** |
 | `VarintProtoType` + markers | **Done** |
-| `ImplicitVarintField` / `ExplicitVarintField` | **Done** |
+| `FieldPresence` + `Implicit` / `Explicit` | **Done** |
+| `SingularVarintField<T, P>` (+ `ImplicitVarintField` / `ExplicitVarintField` aliases) | **Done** |
 | `LenProtoType` + `ProtoString` / `ProtoBytes` | **Done** |
-| `ImplicitLenField` / `ExplicitLenField` (+ string/bytes aliases) | **Done** |
+| `SingularLenField<T, P, A>` (+ string/bytes aliases) | **Done** |
 | `NestedMessageField` | **Done** |
 | `Fixed32ProtoType` / `Fixed64ProtoType` traits | **Stub** |
 | Repeated LEN / packed scalar wrappers | **Planned** |

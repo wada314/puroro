@@ -1,3 +1,7 @@
+[workspace]
+members = [".", "protobuf-core", "sample-generated"]
+resolver = "2"
+
 [package]
 name = "puroro"
 version = "0.1.0"

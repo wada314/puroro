@@ -1,0 +1,14 @@
+[package]
+name = "puroro-sample-generated"
+version = "0.0.0"
+edition = "2024"
+publish = false
+description = "Hand-written sample of puroro protoc plugin output (Task / Address)"
+
+[dependencies]
+allocator-api2 = "0.4"
+bitvec = "1"
+bytes = "1"
+puroro = { path = ".." }
+
+[dev-dependencies]
