@@ -29,6 +29,7 @@ This document describes the **internal implementation** of generated code. It co
    - 7.13 [LEGACY_REQUIRED fields](#713-legacy_required-fields)
 8. [Derived and utility traits](#8-derived-and-utility-traits)
 9. [Other optimization opportunities](#9-other-optimization-opportunities)
+10. [Field-centric codegen architecture](#10-field-centric-codegen-architecture)
 
 ---
 
@@ -123,29 +124,38 @@ When an explicit-presence string/bytes field is **unset**, the bit is `false` an
 
 ## 3. Struct layout (`Task<A>`)
 
-Generated eager messages contain one private field per proto field, plus infrastructure fields:
+Generated eager messages are a **product of composable field types** (see [§10](#10-field-centric-codegen-architecture)) plus one shared [`MessageCommon`](src/fields/common.rs) and any oneof slots.
 
-| Field (reference `Task`) | Storage | Notes |
-|---|---|---|
-| `_presence` | `BitArray<[u8; 2], Lsb0>` | 10 bits for EXPLICIT / LEGACY_REQUIRED singular fields |
-| `title` | `Box<str, A>` | field 1, EXPLICIT |
-| `score` | `i32` | field 2, IMPLICIT |
-| `max_retries` | `i32` | field 3, EXPLICIT, default 3 |
-| `owner_id` | `Box<str, A>` | field 4, LEGACY_REQUIRED |
-| `payload` | `Vec<u8, A>` | field 5, EXPLICIT bytes |
-| `tag_ids` | `Vec<i32, A>` | field 6, repeated packed |
-| `scores` | `Vec<i32, A>` | field 7, repeated expanded |
-| `labels` | `Vec<Box<str, A>, A>` | field 8, repeated string |
-| `status` | `i32` | field 9, IMPLICIT open enum |
-| `priority` | `i32` | field 10, EXPLICIT closed enum |
-| `assignee` | `Option<Box<Address<A>, A>>` | field 11, nested message |
-| `notification` | `Option<task::Notification<A>>` | fields 12–13, oneof |
-| `_unknown_fields` | `Vec<u8, A>` | round-trip unknown wire |
-| `_alloc` | `A` | cloned by setters / push methods |
+```rust
+// Illustrative generated layout for reference `Task`:
+pub struct Task<A: Allocator = Global> {
+    _common: MessageCommon<TaskPresence, A>,
+    title: puroro::fields::ExplicitString<1, BIT_TITLE, A>,
+    score: puroro::fields::ImplicitI32<2>,
+    max_retries: puroro::fields::ExplicitI32<3, BIT_MAX_RETRIES, MaxRetriesDefault>,
+    owner_id: puroro::fields::ExplicitString<4, BIT_OWNER_ID, A>,
+    payload: puroro::fields::ExplicitBytes<5, BIT_PAYLOAD, A>,
+    tag_ids: puroro::fields::RepeatedPackedI32<6, A>,
+    scores: puroro::fields::RepeatedExpandedI32<7, A>,
+    labels: puroro::fields::RepeatedString<8, A>,
+    status: puroro::fields::ImplicitOpenEnum<9>,
+    priority: puroro::fields::ClosedEnum<10, BIT_PRIORITY, Priority, A>,
+    assignee: puroro::fields::NestedMessage<11, Address<A>, A>,
+    notification: OneofSlot<task::Notification<A>>,
+}
+```
 
-The `_alloc` field lets setters allocate without the caller supplying an allocator. It is a ZST when `A = Global`; one pointer when `A = &bumpalo::Bump`.
+| Member | Role |
+|---|---|
+| `_common.presence` | `BitArray<[u8; 2], Lsb0>` — 10 tracked bits |
+| `_common.unknown_fields` | Round-trip unknown wire |
+| `_common.alloc` | Cloned by field setters / push |
+| `title` … `assignee` | Independent field types; each knows its field number and (if applicable) presence bit |
+| `notification` | [`OneofSlot`](src/fields/oneof.rs) — **not** a catalog field type; variants are mutually exclusive |
 
-`TaskLazy<A>` layout is specified in [DESIGN.md §8](DESIGN.md#tasklaya--lazy-parse-timing) — wire in `bytes::Bytes`, per-field caches with interior mutability, decoded values still using `A`.
+Public accessors on `Task` are **one-line delegates** into the field type, passing `_common.parts()` or `_common.parts_mut()` as needed. `MessageEncode`, `MessageDecode`, `Clone`, and `PartialEq` on the message are the **sum of the same delegates** — no field-specific logic lives in the message `impl` body beyond dispatch tables.
+
+`TaskLazy<A>` layout is specified in [DESIGN.md §8](DESIGN.md#tasklaya--lazy-parse-timing).
 
 ---
 
@@ -334,3 +344,171 @@ For **`A = Global`**, `Clone` on `Box<str, A>` / `Vec<T, A>` matches `std` behav
 **Recursion limit** — planned `merge_from_with_depth` runtime helper; default limit TBD (e.g. 100). **Status: stub.**
 
 **`TaskLazy`** — see [DESIGN.md §8](DESIGN.md#tasklaya--lazy-parse-timing) for wire storage, cache states, cursors, and nested `Bytes::slice` — not repeated here.
+
+---
+
+## 10. Field-centric codegen architecture
+
+Protobuf message fields (except **`oneof`**) are **independent**: each field's getter, setter, encode arm, decode arm, clone, and equality check only reads/writes **its own member** plus **shared message infrastructure** (presence bitfield, allocator, unknown-field buffer). The code generator should not emit bespoke logic per message — it **composes** a fixed catalog of runtime field types from `puroro::fields`.
+
+### Design goals (hobby-project aggressive)
+
+| Goal | Approach |
+|---|---|
+| Minimal generated logic | Message `impl` = thin delegates + dispatch tables |
+| Single implementation per proto pattern | One Rust type per field *kind* (e.g. `ExplicitString<…>`) |
+| Monomorphised hot path | `const` field number / presence bit / wire encoding as type parameters — no trait objects |
+| Stable public API | User-facing `task.title()` unchanged; only generated internals differ |
+
+### Three layers
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  protoc plugin                                              │
+│  Maps each proto field → catalog type + const parameters    │
+│  Emits: struct members, delegate accessors, match arms      │
+└──────────────────────────┬──────────────────────────────────┘
+                           │ uses
+┌──────────────────────────▼──────────────────────────────────┐
+│  puroro::fields  (runtime catalog)                          │
+│  ExplicitString, ImplicitI32, RepeatedPackedI32, …          │
+│  MessageCommon, PresenceBits, OneofSlot                     │
+└──────────────────────────┬──────────────────────────────────┘
+                           │ calls
+┌──────────────────────────▼──────────────────────────────────┐
+│  puroro::encode / puroro::decode  (wire helpers)            │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Shared infrastructure: `MessageCommon`
+
+All singular/repeated fields share one struct (see [`src/fields/common.rs`](src/fields/common.rs)):
+
+| Member | Used by |
+|---|---|
+| `presence: P` | EXPLICIT / LEGACY_REQUIRED singular fields |
+| `unknown_fields: Vec<u8, A>` | Message-level unknown tags; **closed enum** diversion |
+| `alloc: A` | String/bytes/repeated/nested setters and decode |
+
+Field methods take a **`MessageParts`** (read) or **`MessagePartsMut`** (write/merge) view — not `&Task` — so field types stay decoupled from the parent message type.
+
+```rust
+// Generated accessor (always this shape):
+pub fn title(&self) -> Optional<&str, impl HasDefault<&str>> {
+    self.title.get(self._common.parts())
+}
+pub fn set_title(&mut self, v: &str)
+where
+    A: Clone,
+{
+    self.title.set(self._common.parts_mut(), v);
+}
+```
+
+### Field catalog (runtime types to implement)
+
+Each row is **one generic type** in `puroro::fields`. Const parameters are filled in by the plugin.
+
+| Catalog type | Const params | Proto mapping | Needs `MessagePartsMut` |
+|---|---|---|---|
+| `ImplicitI32<F>` | field no. `F` | `IMPLICIT int32` / bool / … | merge only (no presence) |
+| `ExplicitI32<F, BIT, D>` | field no., bit, default provider | `EXPLICIT` scalar + `[default]` | yes (presence) |
+| `ImplicitString<F, A>` | field no. | `IMPLICIT string` | alloc on set/merge |
+| `ExplicitString<F, BIT, A>` | field no., bit | `EXPLICIT string` | presence + alloc |
+| `ImplicitBytes<F, A>` / `ExplicitBytes<F, BIT, A>` | … | `bytes` | same as string |
+| `RepeatedPackedI32<F, A>` | field no. | `repeated` + `PACKED` | alloc on push |
+| `RepeatedExpandedI32<F, A>` | field no. | `repeated` + `EXPANDED` | alloc on push |
+| `RepeatedString<F, A>` | field no. | `repeated string` | alloc on push |
+| `NestedMessage<F, M, A>` | field no., child message type | singular message | alloc on first insert |
+| `ImplicitOpenEnum<F>` | field no. | open enum, implicit | — |
+| `ExplicitOpenEnum<F, BIT>` | field no., bit | open enum, explicit | presence |
+| `ClosedEnum<F, BIT, E, A>` | field no., bit, enum | closed enum | presence + **unknown** |
+| `LegacyRequiredString<F, BIT, A>` | … | `LEGACY_REQUIRED` | same as explicit + `validate_bit(BIT)` |
+
+**Scalar wire encoding** (varint vs zigzag vs fixed) is a **separate type parameter** or sibling catalog entry (e.g. `ImplicitSint32<F>` vs `ImplicitSfixed32<F>`) so each type monomorphises to the correct helper.
+
+**Not in the catalog:** `oneof` — use [`OneofSlot<E>`](src/fields/oneof.rs). Decode emits **one match arm per variant field number**, each calling `notification.merge_variant_12(…)` / `merge_variant_13(…)` on the slot. Coupling stays inside `OneofSlot` + generated merge helpers, not spread across independent field members.
+
+### Message-level glue (generated, but trivial)
+
+**Encode / `encoded_len`** — sum field contributions; no field order guarantee (§5):
+
+```rust
+fn encoded_len(&self) -> usize {
+    let p = self._common.parts();
+    0
+        .adding(self.title.encoded_len(&p))
+        .adding(self.score.encoded_len())
+        // … every field …
+        + self._common.unknown_fields.len()
+}
+fn encode_raw<B: BufMut>(&self, buf: &mut B) {
+    let p = self._common.parts();
+    self.title.encode_raw(&p, buf);
+    self.score.encode_raw(buf);
+    // …
+    buf.put_slice(&self._common.unknown_fields);
+}
+```
+
+**Decode** — only the message owns the tag loop; each arm is one call:
+
+```rust
+match field_number {
+    1 => self.title.merge(wire_type, self._common.parts_mut(), buf)?,
+    2 => self.score.merge(wire_type, buf)?,
+    12 => self.notification.merge_email(wire_type, self._common.parts_mut(), buf)?,
+    13 => self.notification.merge_phone(wire_type, self._common.parts_mut(), buf)?,
+    _ => skip_field_and_save(field_number, wire_type, &mut self._common.unknown_fields, buf)?,
+}
+```
+
+**Clone / PartialEq / Debug / Default** — same delegation pattern; each catalog type implements the same-named inherent methods.
+
+**`validate()`** — iterate LEGACY_REQUIRED fields only: `owner_id.validate_bit(BIT_OWNER_ID, &self._common.presence)?`.
+
+### Codegen emission per message
+
+For each proto message the plugin emits:
+
+1. **`PresenceBits` impl** on the message's `BitArray` alias (forwards const bit indices).
+2. **Struct** — `MessageCommon<P, A>` + one catalog-typed member per field + `OneofSlot` per oneof.
+3. **Const block** — `FIELD_*`, `BIT_*` for each field.
+4. **Public accessors** — one-line delegates (§4.0 API in DESIGN.md unchanged).
+5. **Trait impls** — `MessageEncode`, `MessageDecode`, `Clone`, … as sums of field delegates.
+6. **Child modules** — only for nested enums / oneof enums (unchanged).
+
+The plugin's internal IR step is: **`ProtoField → FieldKind enum → pick catalog type → render const args`**. Adding a new proto feature (e.g. map) means **one new catalog type**, not changes to every message template.
+
+### `PresenceBits` on the message bitfield
+
+Generated code implements [`PresenceBits`](src/fields/presence.rs) on the message-specific `BitArray` alias so field types depend on the trait, not on `bitvec` in generated code:
+
+```rust
+type TaskPresence = BitArray<[u8; 2], Lsb0>;
+
+impl PresenceBits for TaskPresence {
+    fn is_set(&self, bit: usize) -> bool { self[bit] }
+    fn set(&mut self, bit: usize, present: bool) { self.set(bit, present); }
+}
+```
+
+### Independence summary
+
+| Field kind | Touches other field members? | Touches `_common`? |
+|---|---|---|
+| Singular scalar/string/bytes | No | presence ± alloc |
+| Repeated | No | alloc |
+| Nested message | No (only own `Option<Box<Child>>`) | alloc |
+| Closed enum | No | presence + unknown |
+| Open enum | No | presence (if explicit) |
+| **Oneof** | **Yes — replaces whole slot** | alloc on variant payload |
+| Unknown tags | No | unknown buffer only |
+
+### Implementation status
+
+| Component | Status |
+|---|---|
+| `MessageCommon`, `MessageParts*`, `PresenceBits`, `OneofSlot` | **In crate** ([`src/fields/`](src/fields/)) |
+| Catalog field types (`ExplicitString`, …) | **Planned** — encode/decode/accessor bodies move from §7 patterns into these types |
+| `protoc` plugin field-kind → type mapping | **Planned** |

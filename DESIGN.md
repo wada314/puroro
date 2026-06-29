@@ -44,7 +44,7 @@ The puroro project comprises several crates and tools with distinct roles:
 | Component | Role |
 |---|---|
 | **`protobuf-core`** (git submodule) | Wire-format **primitives** — varint and tag encode/decode, field I/O traits, wire-type constants, and similar generic building blocks. Not a message runtime; `puroro` and the code generator compose these primitives. |
-| **`puroro`** (this crate) | The **runtime library** that generated code depends on: `MessageEncode` / `MessageDecode`, `Optional`, per-field encode/decode helpers, allocator-aware string/bytes utilities, and error types. |
+| **`puroro`** (this crate) | The **runtime library** that generated code depends on: `MessageEncode` / `MessageDecode`, `Optional`, **`fields`** (composable field types + `MessageCommon`), per-field encode/decode helpers, allocator-aware string/bytes utilities, and error types. |
 | **Code generator** (`protoc` plugin) | Reads `.proto` input (via `protoc`) and emits Rust source implementing the API defined in this document. **Primary execution path:** register as a `protoc` plugin (`--puroro_out=…`). Other invocation styles (standalone CLI, `build.rs` wrapper, etc.) are permitted but not required. |
 
 **Reference schema.** The `Task` and `Address` messages in [§4 Reference schema](#reference-schema) are the **canonical examples** for describing and reviewing generated code. All field-pattern subsections (§4.1–4.9) and [IMPLEMENTATION.md](IMPLEMENTATION.md) use this same schema unless noted otherwise.
@@ -210,7 +210,7 @@ This section is the normative reference for what the code generator emits. All f
 For each message type the code generator produces **three kinds of output**:
 
 1. **Two traits** — a stable API contract that multiple implementations satisfy (§4.0).
-2. **The primary struct** — a full-featured owned implementation (§4.1–4.9).
+2. **The primary struct** — a full-featured owned implementation (§4.1–4.9), internally a product of **`puroro::fields` catalog types** + shared `MessageCommon` (see [IMPLEMENTATION.md §10](IMPLEMENTATION.md#10-field-centric-codegen-architecture)).
 3. **(Future) Specialized structs** — alternative implementations for specific performance scenarios (§8).
 
 ---

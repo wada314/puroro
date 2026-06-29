@@ -14,6 +14,7 @@
 //! | [`decode`] | [`MessageDecode`] trait + per-field decode helpers |
 //! | [`error`] | [`DecodeError`] and [`EncodeError`] types |
 //! | [`wire_type`] | [`WireType`] enum (VARINT, I64, LEN, …) |
+//! | [`fields`] | Composable field types + [`MessageCommon`] for generated messages |
 //!
 //! See [`DESIGN.md`](https://github.com/wada314/puroro/blob/cursor/protobuf-interface-design-ea49/DESIGN.md)
 //! for the interface specification and
@@ -23,6 +24,7 @@
 pub mod decode;
 pub mod encode;
 pub mod error;
+pub mod fields;
 pub mod optional;
 pub mod wire_type;
 
@@ -30,5 +32,6 @@ pub mod wire_type;
 pub use decode::MessageDecode;
 pub use encode::MessageEncode;
 pub use error::{DecodeError, EncodeError};
+pub use fields::{MessageCommon, MessageParts, MessagePartsMut, OneofSlot, PresenceBits};
 pub use optional::{HasDefault, Optional};
 pub use wire_type::WireType;
