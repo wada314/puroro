@@ -4,7 +4,6 @@ mod notification;
 
 use ::allocator_api2::alloc::{Allocator, Global};
 use ::allocator_api2::boxed::Box as ABox;
-use ::allocator_api2::vec::Vec as AVec;
 use ::bitvec::array::BitArray;
 use ::bitvec::order::Lsb0;
 use ::bytes::{Buf, BufMut};
@@ -12,7 +11,8 @@ use ::bytes::{Buf, BufMut};
 use ::puroro::{
     DecodeError, Explicit, HasDefault, Implicit, LegacyRequired, MessageCommon, MessageDecode,
     MessageEncode, NestedMessageField, OneofSlot, Optional, PresenceBits, ProtoBytes, ProtoEnum,
-    ProtoInt32, ProtoString, SingularLenField, SingularVarintField, VarintProtoType, WireType,
+    ProtoInt32, ProtoString, RepeatedExpandedVarintField, RepeatedLenField,
+    RepeatedPackedVarintField, SingularLenField, SingularVarintField, WireType,
 };
 
 use crate::address::Address;
@@ -80,9 +80,9 @@ pub struct Task<A: Allocator = Global> {
     max_retries: SingularVarintField<ProtoInt32, Explicit>,
     owner_id: SingularLenField<ProtoString, LegacyRequired, A>,
     payload: SingularLenField<ProtoBytes, Explicit, A>,
-    tag_ids: AVec<i32, A>,
-    scores: AVec<i32, A>,
-    labels: AVec<ABox<str, A>, A>,
+    tag_ids: RepeatedPackedVarintField<ProtoInt32, A>,
+    scores: RepeatedExpandedVarintField<ProtoInt32, A>,
+    labels: RepeatedLenField<ProtoString, A>,
     status: SingularVarintField<ProtoEnum, Implicit>,
     priority: SingularVarintField<ProtoEnum, Explicit>,
     assignee: NestedMessageField<Address<A>, A>,
@@ -98,9 +98,9 @@ impl<A: Allocator + Clone> Task<A> {
             max_retries: SingularVarintField::new(),
             owner_id: SingularLenField::new_in(alloc.clone()),
             payload: SingularLenField::new_in(alloc.clone()),
-            tag_ids: AVec::new_in(alloc.clone()),
-            scores: AVec::new_in(alloc.clone()),
-            labels: AVec::new_in(alloc.clone()),
+            tag_ids: RepeatedPackedVarintField::new_in(alloc.clone()),
+            scores: RepeatedExpandedVarintField::new_in(alloc.clone()),
+            labels: RepeatedLenField::new_in(alloc.clone()),
             status: SingularVarintField::new(),
             priority: SingularVarintField::new(),
             assignee: NestedMessageField::new(),
@@ -212,10 +212,8 @@ impl<A: Allocator + Clone> Task<A> {
         self.payload.clear::<_, BIT_PAYLOAD>(&mut self._common);
     }
 
-    // -- repeated fields (inline until catalog wrappers land) ---------------
-
     pub fn tag_ids(&self) -> &[i32] {
-        &self.tag_ids
+        self.tag_ids.as_slice()
     }
 
     pub fn push_tag_id(&mut self, v: i32) {
@@ -227,7 +225,7 @@ impl<A: Allocator + Clone> Task<A> {
     }
 
     pub fn scores(&self) -> &[i32] {
-        &self.scores
+        self.scores.as_slice()
     }
 
     pub fn push_score(&mut self, v: i32) {
@@ -239,12 +237,11 @@ impl<A: Allocator + Clone> Task<A> {
     }
 
     pub fn labels(&self) -> &[ABox<str, A>] {
-        &self.labels
+        self.labels.as_slice()
     }
 
     pub fn push_label(&mut self, v: &str) {
-        self.labels
-            .push(::puroro::decode::str_to_box_in(v, self._common.alloc.clone()));
+        self.labels.push_str(&self._common, v);
     }
 
     pub fn clear_labels(&mut self) {
@@ -387,9 +384,9 @@ impl<A: Allocator + Clone> MessageEncode for Task<A> {
         n += self
             .payload
             .encoded_len::<_, FIELD_PAYLOAD, BIT_PAYLOAD>(c);
-        n += encoded_len_tag_ids(&self.tag_ids);
-        n += encoded_len_scores(&self.scores);
-        n += encoded_len_labels(&self.labels);
+        n += self.tag_ids.encoded_len::<FIELD_TAG_IDS>();
+        n += self.scores.encoded_len::<FIELD_SCORES>();
+        n += self.labels.encoded_len::<FIELD_LABELS>();
         n += self
             .status
             .encoded_len::<_, _, FIELD_STATUS, BIT_UNUSED>(c);
@@ -413,9 +410,9 @@ impl<A: Allocator + Clone> MessageEncode for Task<A> {
             .encode_raw::<_, _, FIELD_OWNER_ID, BIT_OWNER_ID>(c, buf);
         self.payload
             .encode_raw::<_, _, FIELD_PAYLOAD, BIT_PAYLOAD>(c, buf);
-        encode_tag_ids(&self.tag_ids, buf);
-        encode_scores(&self.scores, buf);
-        encode_labels(&self.labels, buf);
+        self.tag_ids.encode_raw::<_, FIELD_TAG_IDS>(buf);
+        self.scores.encode_raw::<_, FIELD_SCORES>(buf);
+        self.labels.encode_raw::<_, FIELD_LABELS>(buf);
         self.status
             .encode_raw::<_, _, _, FIELD_STATUS, BIT_UNUSED>(c, buf);
         self.priority
@@ -458,13 +455,14 @@ impl<A: Allocator + Clone> MessageDecode for Task<A> {
                         .merge::<_, _, BIT_PAYLOAD>(&mut self._common, wire_type, buf)?;
                 }
                 FIELD_TAG_IDS => {
-                    merge_repeated_i32(&mut self.tag_ids, wire_type, buf)?;
+                    self.tag_ids.merge(wire_type, buf)?;
                 }
                 FIELD_SCORES => {
-                    merge_repeated_i32(&mut self.scores, wire_type, buf)?;
+                    self.scores.merge(wire_type, buf)?;
                 }
                 FIELD_LABELS => {
-                    merge_repeated_label(&mut self.labels, &self._common, wire_type, buf)?;
+                    self.labels
+                        .merge(&self._common, wire_type, buf)?;
                 }
                 FIELD_STATUS => {
                     self.status.merge::<_, _, _, BIT_UNUSED>(
@@ -514,60 +512,8 @@ impl<A: Allocator + Clone> MessageDecode for Task<A> {
 }
 
 // ---------------------------------------------------------------------------
-// Repeated / oneof / closed-enum helpers (generated per message today)
+// Oneof helpers (generated per message today)
 // ---------------------------------------------------------------------------
-
-fn encoded_len_tag_ids(tag_ids: &[i32]) -> usize {
-    ::puroro::encode::encoded_len_packed_varint_field(
-        FIELD_TAG_IDS,
-        tag_ids,
-        |v| ProtoInt32::encode_wire(*v),
-    )
-}
-
-fn encode_tag_ids<B: BufMut>(tag_ids: &[i32], buf: &mut B) {
-    ::puroro::encode::encode_packed_varint_field(
-        FIELD_TAG_IDS,
-        tag_ids,
-        |v| ProtoInt32::encode_wire(*v),
-        buf,
-    );
-}
-
-fn encoded_len_scores(scores: &[i32]) -> usize {
-    scores
-        .iter()
-        .map(|&v| {
-            ::puroro::encode::encoded_len_varint_field(
-                FIELD_SCORES,
-                ProtoInt32::encode_wire(v),
-            )
-        })
-        .sum()
-}
-
-fn encode_scores<B: BufMut>(scores: &[i32], buf: &mut B) {
-    for &v in scores {
-        ::puroro::encode::encode_varint_field(
-            FIELD_SCORES,
-            ProtoInt32::encode_wire(v),
-            buf,
-        );
-    }
-}
-
-fn encoded_len_labels<A: Allocator>(labels: &[ABox<str, A>]) -> usize {
-    labels
-        .iter()
-        .map(|s| ::puroro::encode::encoded_len_len_field(FIELD_LABELS, s.len()))
-        .sum()
-}
-
-fn encode_labels<A: Allocator, B: BufMut>(labels: &[ABox<str, A>], buf: &mut B) {
-    for s in labels {
-        ::puroro::encode::encode_len_field(FIELD_LABELS, s.as_bytes(), buf);
-    }
-}
 
 fn encoded_len_notification<A: Allocator>(slot: &OneofSlot<Notification<A>>) -> usize {
     match slot.get() {
@@ -594,42 +540,6 @@ fn encode_notification<A: Allocator, B: BufMut>(
         }
         None => {}
     }
-}
-
-fn merge_repeated_i32<B: Buf>(vec: &mut AVec<i32, impl Allocator>, wire_type: WireType, buf: &mut B) -> Result<(), DecodeError> {
-    match wire_type {
-        WireType::Len => {
-            let len = ::puroro::decode::decode_varint(buf)? as usize;
-            if buf.remaining() < len {
-                return Err(DecodeError::TruncatedMessage);
-            }
-            let mut sub = buf.take(len);
-            while sub.has_remaining() {
-                let raw = ::puroro::decode::decode_varint(&mut sub)?;
-                vec.push(ProtoInt32::decode_wire(raw)?);
-            }
-        }
-        WireType::Varint => {
-            let raw = ::puroro::decode::decode_varint(buf)?;
-            vec.push(ProtoInt32::decode_wire(raw)?);
-        }
-        _ => return Err(DecodeError::InvalidTag),
-    }
-    Ok(())
-}
-
-fn merge_repeated_label<A: Allocator + Clone, B: Buf>(
-    vec: &mut AVec<ABox<str, A>, A>,
-    common: &MessageCommon<TaskPresence, A>,
-    wire_type: WireType,
-    buf: &mut B,
-) -> Result<(), DecodeError> {
-    if wire_type != WireType::Len {
-        return Err(DecodeError::InvalidTag);
-    }
-    let s = ::puroro::decode::decode_string_in(buf, common.alloc.clone())?;
-    vec.push(s);
-    Ok(())
 }
 
 fn merge_notification_email<A: Allocator + Clone, B: Buf>(

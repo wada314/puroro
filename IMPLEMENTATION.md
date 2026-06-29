@@ -113,7 +113,7 @@ protobuf-core           Varint, Tag, WireType
 | `NestedMessageField` | **Done** |
 | [`sample-generated`](sample-generated/) (`Task` / `Address`) | **Done** |
 | `Fixed32ProtoType` / `Fixed64ProtoType` | **Stub** |
-| Repeated catalog wrappers | **Planned** |
+| Repeated catalog (`RepeatedVarintField`, `RepeatedLenField`) | **Done** |
 | `protoc` plugin | **Planned** |
 
 ---
@@ -220,7 +220,10 @@ Adding a wire type = one new `VarintProtoType` impl. Adding a presence mode = on
 | `EXPLICIT string` | `SingularLenField<ProtoString, Explicit, A>` |
 | `LEGACY_REQUIRED string` | `SingularLenField<ProtoString, LegacyRequired, A>` |
 | `IMPLICIT` / `EXPLICIT bytes` | `SingularLenField<ProtoBytes, P, A>` |
-| `repeated int32 PACKED` | `RepeatedPackedVarintField<…>` (planned) |
+| `repeated int32 PACKED` | `RepeatedPackedVarintField<ProtoInt32, A>` |
+| `repeated int32 EXPANDED` | `RepeatedExpandedVarintField<ProtoInt32, A>` |
+| `repeated string` | `RepeatedLenField<ProtoString, A>` |
+| `repeated bytes` | `RepeatedLenField<ProtoBytes, A>` |
 | nested message | `NestedMessageField<M, A>` |
 | `oneof` | `OneofSlot<E>` — not a singular catalog entry |
 
@@ -238,9 +241,9 @@ pub struct Task<A: Allocator = Global> {
     max_retries: SingularVarintField<ProtoInt32, Explicit>,
     owner_id: SingularLenField<ProtoString, LegacyRequired, A>,
     payload: SingularLenField<ProtoBytes, Explicit, A>,
-    tag_ids: /* repeated — planned */,
-    scores: /* repeated — planned */,
-    labels: /* repeated — planned */,
+    tag_ids: RepeatedPackedVarintField<ProtoInt32, A>,
+    scores: RepeatedExpandedVarintField<ProtoInt32, A>,
+    labels: RepeatedLenField<ProtoString, A>,
     status: SingularVarintField<ProtoEnum, Implicit>,
     priority: SingularVarintField<ProtoEnum, Explicit>,
     assignee: NestedMessageField<Address<A>, A>,
@@ -255,7 +258,7 @@ pub struct Task<A: Allocator = Global> {
 | IMPLICIT scalar / open enum | `T` or `i32` | — |
 | EXPLICIT scalar / enum / string / bytes | same containers | bit in `_common.presence` |
 | LEGACY_REQUIRED | same as EXPLICIT + `LegacyRequired` | bit |
-| Repeated | `Vec<…, A>` (planned catalog) | empty = absent |
+| Repeated | `RepeatedVarintField` / `RepeatedLenField` | empty = absent |
 | Nested message | `Option<Box<M, A>>` | `Option`, not bitfield |
 | Oneof | `Option<E>` in slot | `Option`, not bitfield |
 
@@ -424,13 +427,22 @@ Wire identical to EXPLICIT. Message `validate()` calls `validate_required` on ea
 
 ## 15. Repeated fields
 
-**Status:** planned catalog types; [`sample-generated`](sample-generated/) uses inline helpers.
+**Catalog:** [`RepeatedVarintField<T, E, A>`](src/fields/repeated_varint.rs) and [`RepeatedLenField<T, A>`](src/fields/repeated_len.rs). Empty vec = absent on encode.
 
-| Pattern | Storage | Encode | Decode |
-|---|---|---|---|
-| Packed scalar | `Vec<T, A>` | One LEN blob | **Both** `WireType::Len` (packed) and `Varint` (single element) — spec requirement |
-| Expanded scalar | `Vec<T, A>` | One record per element | Same dual-arm accept |
-| Repeated string | `Vec<Box<str, A>, A>` | One LEN per element | `decode_string_in` + push |
+### Varint (`RepeatedVarintField<T, E, A>`)
+
+`E` is [`Packed`](src/fields/repeated_encoding.rs) or [`Expanded`](src/fields/repeated_encoding.rs) — affects **encode only**. [`merge`](src/fields/repeated_varint.rs) always accepts both LEN (packed blob) and VARINT (single element).
+
+| | Packed (`E = Packed`) | Expanded (`E = Expanded`) |
+|---|---|---|
+| Encode | One LEN record | One VARINT per element |
+| Decode | Both forms | Both forms |
+
+Accessors: `as_slice()`, `push(v)`, `clear()`.
+
+### LEN (`RepeatedLenField<T, A>`)
+
+One LEN record per element (`repeated string` / `repeated bytes`). `push_str` / `push_from_slice` take `&MessageCommon` for allocator.
 
 ---
 
@@ -458,7 +470,7 @@ Each wire occurrence replaces the whole slot (last wins). Encode active variant 
 |---|---|---|
 | UTF-8 validation | Always `decode_string_in` (VERIFY) | Per-field `utf8_validation` feature |
 | Recursion limit | Not enforced | Depth counter in nested merge → `RecursionLimitExceeded` |
-| Repeated wrappers | Inline in sample | `RepeatedPackedVarintField`, `RepeatedLenField`, … |
+| Repeated wrappers | `RepeatedVarintField`, `RepeatedLenField` |
 | Fixed32/64 catalog | Trait stubs | `SingularFixed32Field<T, P>`, … |
 | `protoc` plugin | — | FieldKind → catalog emission |
 | Zero-copy views | — | `TaskView<'buf>` (DESIGN.md §8) |

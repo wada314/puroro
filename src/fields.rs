@@ -19,6 +19,7 @@
 //! | [`scalar`] | `SingularVarintField<T, P>` |
 //! | [`len`] / [`len_field`] | `SingularLenField<T, P, A>` |
 //! | [`message`] | `NestedMessageField` |
+//! | [`repeated_varint`] / [`repeated_len`] | `RepeatedVarintField`, `RepeatedLenField` |
 //! | [`oneof::OneofSlot`] | `oneof` group |
 //! | [`common::MessageCommon`] | shared infrastructure |
 
@@ -31,6 +32,9 @@ pub mod len_field;
 pub mod message;
 pub mod oneof;
 pub mod presence;
+pub mod repeated_encoding;
+pub mod repeated_len;
+pub mod repeated_varint;
 pub mod scalar;
 pub mod varint;
 
@@ -46,6 +50,12 @@ pub use len_field::{
 pub use message::{NestedMessage, NestedMessageField};
 pub use oneof::OneofSlot;
 pub use presence::PresenceBits;
+pub use repeated_encoding::{Expanded, Packed, RepeatedVarintEncoding};
+pub use repeated_len::{RepeatedBytes, RepeatedLen, RepeatedLenField, RepeatedString};
+pub use repeated_varint::{
+    RepeatedExpandedInt32, RepeatedExpandedVarintField, RepeatedPackedInt32,
+    RepeatedPackedVarintField, RepeatedVarint, RepeatedVarintField,
+};
 pub use scalar::{
     ExplicitEnum, ExplicitInt32, ExplicitVarint, ExplicitVarintField, ImplicitEnum, ImplicitInt32,
     ImplicitVarint, ImplicitVarintField, SingularVarint, SingularVarintField,
