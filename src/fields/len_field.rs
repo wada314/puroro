@@ -37,27 +37,29 @@ impl<T: LenProtoType, P: FieldPresence, A: Allocator + Clone> SingularLenField<T
         T::borrow(&self.value)
     }
 
-    pub fn set_str<Pb, const BIT: usize>(
+    pub fn set_str<Pb>(
         &mut self,
         common: &mut MessageCommon<Pb, A>,
+        bit: usize,
         v: &str,
     ) where
         Pb: PresenceBits,
         T: LenProtoType<Storage<A> = ::allocator_api2::boxed::Box<str, A>>,
     {
-        P::on_set(common, BIT);
+        P::on_set(common, bit);
         self.value = decode::str_to_box_in(v, common.alloc.clone());
     }
 
-    pub fn set_from_slice<Pb, const BIT: usize>(
+    pub fn set_from_slice<Pb>(
         &mut self,
         common: &mut MessageCommon<Pb, A>,
+        bit: usize,
         v: &[u8],
     ) -> Result<(), DecodeError>
     where
         Pb: PresenceBits,
     {
-        P::on_set(common, BIT);
+        P::on_set(common, bit);
         self.value = T::store_from_slice(v, common.alloc.clone())?;
         Ok(())
     }
@@ -66,37 +68,42 @@ impl<T: LenProtoType, P: FieldPresence, A: Allocator + Clone> SingularLenField<T
         self.value = T::new_empty(alloc);
     }
 
-    pub fn encoded_len<Pb, const FIELD: u32, const BIT: usize>(
+    pub fn encoded_len<Pb>(
         &self,
         common: &MessageCommon<Pb, A>,
+        field: u32,
+        bit: usize,
     ) -> usize
     where
         Pb: PresenceBits,
     {
         let empty = T::is_empty(&self.value);
-        if P::should_emit(common, BIT, empty) {
-            encode::encoded_len_len_field(FIELD, T::as_bytes(&self.value).len())
+        if P::should_emit(common, bit, empty) {
+            encode::encoded_len_len_field(field, T::as_bytes(&self.value).len())
         } else {
             0
         }
     }
 
-    pub fn encode_raw<Pb, B: BufMut, const FIELD: u32, const BIT: usize>(
+    pub fn encode_raw<Pb, B: BufMut>(
         &self,
         common: &MessageCommon<Pb, A>,
+        field: u32,
+        bit: usize,
         buf: &mut B,
     ) where
         Pb: PresenceBits,
     {
         let empty = T::is_empty(&self.value);
-        if P::should_emit(common, BIT, empty) {
-            encode::encode_len_field(FIELD, T::as_bytes(&self.value), buf);
+        if P::should_emit(common, bit, empty) {
+            encode::encode_len_field(field, T::as_bytes(&self.value), buf);
         }
     }
 
-    pub fn merge<Pb, B: Buf, const BIT: usize>(
+    pub fn merge<Pb, B: Buf>(
         &mut self,
         common: &mut MessageCommon<Pb, A>,
+        bit: usize,
         wire_type: WireType,
         buf: &mut B,
     ) -> Result<(), DecodeError>
@@ -107,23 +114,24 @@ impl<T: LenProtoType, P: FieldPresence, A: Allocator + Clone> SingularLenField<T
             return Err(DecodeError::InvalidTag);
         }
         self.value = T::decode(buf, common.alloc.clone())?;
-        P::on_set(common, BIT);
+        P::on_set(common, bit);
         Ok(())
     }
 }
 
 impl<T: LenProtoType, P: ExplicitFieldPresence, A: Allocator + Clone> SingularLenField<T, P, A> {
     #[inline]
-    pub fn has<Pb, const BIT: usize>(&self, common: &MessageCommon<Pb, A>) -> bool
+    pub fn has<Pb>(&self, common: &MessageCommon<Pb, A>, bit: usize) -> bool
     where
         Pb: PresenceBits,
     {
-        common.is_present(BIT)
+        common.is_present(bit)
     }
 
-    pub fn optional<'a, Pb, D, const BIT: usize>(
+    pub fn optional<'a, Pb, D>(
         &'a self,
         common: &MessageCommon<Pb, A>,
+        bit: usize,
         default: D,
     ) -> Optional<T::Ref<'a, A>, D>
     where
@@ -131,7 +139,7 @@ impl<T: LenProtoType, P: ExplicitFieldPresence, A: Allocator + Clone> SingularLe
         D: HasDefault<T::Ref<'a, A>>,
         T::Ref<'a, A>: Copy,
     {
-        let v = if common.is_present(BIT) {
+        let v = if common.is_present(bit) {
             Some(T::borrow(&self.value))
         } else {
             None
@@ -139,26 +147,27 @@ impl<T: LenProtoType, P: ExplicitFieldPresence, A: Allocator + Clone> SingularLe
         Optional::new(v, default)
     }
 
-    pub fn clear<Pb, const BIT: usize>(&mut self, common: &mut MessageCommon<Pb, A>)
+    pub fn clear<Pb>(&mut self, common: &mut MessageCommon<Pb, A>, bit: usize)
     where
         Pb: PresenceBits,
     {
-        P::on_clear(common, BIT);
+        P::on_clear(common, bit);
         self.value = T::new_empty(common.alloc.clone());
     }
 }
 
 impl<T: LenProtoType, P: RequiredFieldPresence, A: Allocator + Clone> SingularLenField<T, P, A> {
     /// Checks the presence bit for a LEGACY_REQUIRED field.
-    pub fn validate_required<Pb, const BIT: usize>(
+    pub fn validate_required<Pb>(
         &self,
         common: &MessageCommon<Pb, A>,
+        bit: usize,
         field_number: u32,
     ) -> Result<(), DecodeError>
     where
         Pb: PresenceBits,
     {
-        P::validate_present(common, BIT, field_number)
+        P::validate_present(common, bit, field_number)
     }
 }
 

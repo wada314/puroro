@@ -64,16 +64,16 @@ impl<T: LenProtoType, A: Allocator + Clone> RepeatedLenField<T, A> {
         Ok(())
     }
 
-    pub fn encoded_len<const FIELD: u32>(&self) -> usize {
+    pub fn encoded_len(&self, field: u32) -> usize {
         self.values
             .iter()
-            .map(|v| encode::encoded_len_len_field(FIELD, T::as_bytes(v).len()))
+            .map(|v| encode::encoded_len_len_field(field, T::as_bytes(v).len()))
             .sum()
     }
 
-    pub fn encode_raw<B: BufMut, const FIELD: u32>(&self, buf: &mut B) {
+    pub fn encode_raw<B: BufMut>(&self, field: u32, buf: &mut B) {
         for v in &self.values {
-            encode::encode_len_field(FIELD, T::as_bytes(v), buf);
+            encode::encode_len_field(field, T::as_bytes(v), buf);
         }
     }
 

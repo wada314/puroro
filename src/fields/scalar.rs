@@ -44,15 +44,16 @@ impl<T: VarintProtoType, P: FieldPresence> SingularVarintField<T, P> {
     }
 
     /// Stores `v`, applying the presence policy (`on_set` for EXPLICIT).
-    pub fn set<Pb, A, const BIT: usize>(
+    pub fn set<Pb, A>(
         &mut self,
         common: &mut MessageCommon<Pb, A>,
+        bit: usize,
         v: T::Value,
     ) where
         Pb: PresenceBits,
         A: ::allocator_api2::alloc::Allocator,
     {
-        P::on_set(common, BIT);
+        P::on_set(common, bit);
         self.value = v;
     }
 
@@ -62,39 +63,44 @@ impl<T: VarintProtoType, P: FieldPresence> SingularVarintField<T, P> {
         self.value = T::proto_zero();
     }
 
-    pub fn encoded_len<Pb, A, const FIELD: u32, const BIT: usize>(
+    pub fn encoded_len<Pb, A>(
         &self,
         common: &MessageCommon<Pb, A>,
+        field: u32,
+        bit: usize,
     ) -> usize
     where
         Pb: PresenceBits,
         A: ::allocator_api2::alloc::Allocator,
     {
         let empty = self.value == T::proto_zero();
-        if P::should_emit(common, BIT, empty) {
-            encode::encoded_len_varint_field(FIELD, T::encode_wire(self.value))
+        if P::should_emit(common, bit, empty) {
+            encode::encoded_len_varint_field(field, T::encode_wire(self.value))
         } else {
             0
         }
     }
 
-    pub fn encode_raw<Pb, A, B: BufMut, const FIELD: u32, const BIT: usize>(
+    pub fn encode_raw<Pb, A, B: BufMut>(
         &self,
         common: &MessageCommon<Pb, A>,
+        field: u32,
+        bit: usize,
         buf: &mut B,
     ) where
         Pb: PresenceBits,
         A: ::allocator_api2::alloc::Allocator,
     {
         let empty = self.value == T::proto_zero();
-        if P::should_emit(common, BIT, empty) {
-            encode::encode_varint_field(FIELD, T::encode_wire(self.value), buf);
+        if P::should_emit(common, bit, empty) {
+            encode::encode_varint_field(field, T::encode_wire(self.value), buf);
         }
     }
 
-    pub fn merge<Pb, A, B: Buf, const BIT: usize>(
+    pub fn merge<Pb, A, B: Buf>(
         &mut self,
         common: &mut MessageCommon<Pb, A>,
+        bit: usize,
         wire_type: WireType,
         buf: &mut B,
     ) -> Result<(), DecodeError>
@@ -106,7 +112,7 @@ impl<T: VarintProtoType, P: FieldPresence> SingularVarintField<T, P> {
             return Err(DecodeError::InvalidTag);
         }
         let raw = decode::decode_varint(buf)?;
-        P::on_set(common, BIT);
+        P::on_set(common, bit);
         self.value = T::decode_wire(raw)?;
         Ok(())
     }
@@ -120,17 +126,18 @@ impl<T: VarintProtoType, P: FieldPresence> Default for SingularVarintField<T, P>
 
 impl<T: VarintProtoType, P: ExplicitFieldPresence> SingularVarintField<T, P> {
     #[inline]
-    pub fn has<Pb, A, const BIT: usize>(&self, common: &MessageCommon<Pb, A>) -> bool
+    pub fn has<Pb, A>(&self, common: &MessageCommon<Pb, A>, bit: usize) -> bool
     where
         Pb: PresenceBits,
         A: ::allocator_api2::alloc::Allocator,
     {
-        common.is_present(BIT)
+        common.is_present(bit)
     }
 
-    pub fn optional<Pb, A, D, const BIT: usize>(
+    pub fn optional<Pb, A, D>(
         &self,
         common: &MessageCommon<Pb, A>,
+        bit: usize,
         default: D,
     ) -> Optional<T::Value, D>
     where
@@ -139,7 +146,7 @@ impl<T: VarintProtoType, P: ExplicitFieldPresence> SingularVarintField<T, P> {
         D: HasDefault<T::Value>,
         T::Value: Copy,
     {
-        let v = if common.is_present(BIT) {
+        let v = if common.is_present(bit) {
             Some(self.value)
         } else {
             None
@@ -147,19 +154,21 @@ impl<T: VarintProtoType, P: ExplicitFieldPresence> SingularVarintField<T, P> {
         Optional::new(v, default)
     }
 
-    pub fn clear<Pb, A, const BIT: usize>(&mut self, common: &mut MessageCommon<Pb, A>)
+    pub fn clear<Pb, A>(&mut self, common: &mut MessageCommon<Pb, A>, bit: usize)
     where
         Pb: PresenceBits,
         A: ::allocator_api2::alloc::Allocator,
     {
-        P::on_clear(common, BIT);
+        P::on_clear(common, bit);
         self.value = T::proto_zero();
     }
 
     /// Merges a closed-enum occurrence; unknown values go to `common.unknown_fields`.
-    pub fn merge_closed<Pb, A, B: Buf, const FIELD: u32, const BIT: usize>(
+    pub fn merge_closed<Pb, A, B: Buf>(
         &mut self,
         common: &mut MessageCommon<Pb, A>,
+        field: u32,
+        bit: usize,
         wire_type: WireType,
         buf: &mut B,
         is_known: impl FnOnce(T::Value) -> bool,
@@ -175,10 +184,10 @@ impl<T: VarintProtoType, P: ExplicitFieldPresence> SingularVarintField<T, P> {
         let raw = decode::decode_varint(buf)?;
         let value = T::decode_wire(raw)?;
         if !is_known(value) {
-            decode::save_unknown_varint_field(FIELD, raw, &mut common.unknown_fields);
+            decode::save_unknown_varint_field(field, raw, &mut common.unknown_fields);
             return Ok(());
         }
-        P::on_set(common, BIT);
+        P::on_set(common, bit);
         self.value = value;
         Ok(())
     }

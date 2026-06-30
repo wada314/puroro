@@ -49,17 +49,17 @@ impl<T: VarintProtoType, E: RepeatedVarintEncoding, A: Allocator> RepeatedVarint
         self.values.clear();
     }
 
-    pub fn encoded_len<const FIELD: u32>(&self) -> usize {
+    pub fn encoded_len(&self, field: u32) -> usize {
         if self.values.is_empty() {
             0
         } else {
-            E::encoded_len::<T>(FIELD, &self.values)
+            E::encoded_len::<T>(field, &self.values)
         }
     }
 
-    pub fn encode_raw<B: BufMut, const FIELD: u32>(&self, buf: &mut B) {
+    pub fn encode_raw<B: BufMut>(&self, field: u32, buf: &mut B) {
         if !self.values.is_empty() {
-            E::encode::<B, T>(FIELD, &self.values, buf);
+            E::encode::<B, T>(field, &self.values, buf);
         }
     }
 

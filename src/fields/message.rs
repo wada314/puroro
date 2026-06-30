@@ -74,27 +74,27 @@ impl<M, A: Allocator + Clone> NestedMessageField<M, A> {
     }
 
     /// Wire byte length when the child is present.
-    pub fn encoded_len<const FIELD: u32>(&self) -> usize
+    pub fn encoded_len(&self, field: u32) -> usize
     where
         M: MessageEncode,
     {
         match self.child.as_deref() {
             Some(child) => {
                 let payload_len = child.encoded_len();
-                encode::encoded_len_len_field(FIELD, payload_len)
+                encode::encoded_len_len_field(field, payload_len)
             }
             None => 0,
         }
     }
 
     /// Encodes tag + length + child body when present.
-    pub fn encode_raw<B: BufMut, const FIELD: u32>(&self, buf: &mut B)
+    pub fn encode_raw<B: BufMut>(&self, field: u32, buf: &mut B)
     where
         M: MessageEncode,
     {
         if let Some(child) = self.child.as_deref() {
             let payload_len = child.encoded_len();
-            encode::encode_tag(FIELD, WireType::Len, buf);
+            encode::encode_tag(field, WireType::Len, buf);
             encode::encode_varint(payload_len as u64, buf);
             child.encode_raw(buf);
         }

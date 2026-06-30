@@ -270,7 +270,7 @@ Public accessors are **one-line delegates** into catalog methods with `&self._co
 
 1. Presence **newtype** + `PresenceBits` impl
 2. Struct — `MessageCommon` + catalog members + `OneofSlot` per oneof
-3. Const block — `FIELD_*`, `BIT_*`
+3. Associated constants on the message type — `impl Foo<A> { pub const FIELD_* …; pub const BIT_* …; }`. Catalog methods take `field: u32` / `bit: usize` as normal parameters.
 4. Accessor delegates ([DESIGN.md §4](DESIGN.md#40-generated-per-message-traits))
 5. Trait impls — encode/decode/clone/eq as field sums
 6. Child modules — enums, oneof enums
@@ -295,8 +295,13 @@ Generated Rust is not meant to be hand-edited, but **must be easy to navigate wh
 // Presence bitfield (N tracked singular fields)
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
-// Field constants
+// Field constants (associated with `Task`)
 // ---------------------------------------------------------------------------
+
+impl<A: Allocator> Task<A> {
+    pub const FIELD_TITLE: u32 = 1;   // title
+    pub const BIT_TITLE: usize = 0;   // title (EXPLICIT)
+}
 // ---------------------------------------------------------------------------
 // Message struct
 // ---------------------------------------------------------------------------
@@ -319,18 +324,20 @@ Include **presence**, **wire/kind** (string, int32, repeated packed, nested, …
 title: SingularLenField<ProtoString, Explicit, A>, // proto: string title = 1;
 ```
 
-**Constants** — `FIELD_*` / `BIT_*` annotated on the same line:
+**Constants** — associated constants on `impl Task<A>`. Use `Self::FIELD_*` / `Self::BIT_*` inside message impls; `Task::<A>::FIELD_*` in free helpers outside the type.
 
 ```rust
-const FIELD_TITLE: u32 = 1;   // title
-const BIT_TITLE: usize = 0;   // title (EXPLICIT)
+impl<A: Allocator> Task<A> {
+    pub const FIELD_TITLE: u32 = 1;   // title
+    pub const BIT_TITLE: usize = 0;   // title (EXPLICIT)
+}
 ```
 
-**Wire I/O** — `merge_from` match arms (and optionally `encode_raw` / `encoded_len` groups) label the proto field:
+**Wire I/O** — `merge_from` match arms label the proto field:
 
 ```rust
-FIELD_TITLE => { // title = 1, EXPLICIT string
-    self.title.merge::<_, _, BIT_TITLE>(...)?;
+Self::FIELD_TITLE => { // title = 1, EXPLICIT string
+    self.title.merge(&mut self._common, Self::BIT_TITLE, wire_type, buf)?;
 }
 ```
 
@@ -410,8 +417,8 @@ Runtime: `encode_varint_field`, `encode_len_field`, `encode_packed_*`, `encoded_
 ```rust
 fn encode_raw<B: BufMut>(&self, buf: &mut B) {
     let c = &self._common;
-    self.title.encode_raw::<_, _, FIELD_TITLE, BIT_TITLE>(c, buf);
-    self.score.encode_raw::<_, _, _, FIELD_SCORE, BIT_UNUSED>(c, buf);
+    self.title.encode_raw(c, Self::FIELD_TITLE, Self::BIT_TITLE, buf);
+    self.score.encode_raw(c, Self::FIELD_SCORE, Self::BIT_UNUSED, buf);
     // …
     buf.put_slice(&c.unknown_fields);
 }
@@ -425,8 +432,13 @@ fn encode_raw<B: BufMut>(&self, buf: &mut B) {
 4. Singular: last wins. Repeated: append. Nested: merge sub-buffer.
 
 ```rust
-FIELD_PRIORITY => self.priority.merge_closed::<_, _, _, FIELD_PRIORITY, BIT_PRIORITY>(
-    &mut self._common, wire_type, buf, |v| Priority::try_from(v).is_ok(),
+Self::FIELD_PRIORITY => self.priority.merge_closed(
+    &mut self._common,
+    Self::FIELD_PRIORITY,
+    Self::BIT_PRIORITY,
+    wire_type,
+    buf,
+    |v| Priority::try_from(v).is_ok(),
 )?,
 ```
 
@@ -434,7 +446,7 @@ Nested LEN payloads use `Buf::take(len)` before child `merge_from`.
 
 ### Validation
 
-`validate()` — `owner_id.validate_required::<_, BIT_OWNER_ID>(&self._common, FIELD_OWNER_ID)?` (and any other `LegacyRequired` fields). `decode_strict` = decode + validate. `MessageDecode::decode` does **not** auto-validate.
+`validate()` — `owner_id.validate_required(&self._common, Self::BIT_OWNER_ID, Self::FIELD_OWNER_ID)?` (and any other `LegacyRequired` fields). `decode_strict` = decode + validate. `MessageDecode::decode` does **not** auto-validate.
 
 ---
 

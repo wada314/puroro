@@ -43,33 +43,6 @@ impl PresenceBits for TaskPresence {
 }
 
 // ---------------------------------------------------------------------------
-// Field constants
-// ---------------------------------------------------------------------------
-
-const FIELD_TITLE: u32 = 1;       // title
-const FIELD_SCORE: u32 = 2;       // score
-const FIELD_MAX_RETRIES: u32 = 3; // max_retries
-const FIELD_OWNER_ID: u32 = 4;    // owner_id
-const FIELD_PAYLOAD: u32 = 5;     // payload
-const FIELD_TAG_IDS: u32 = 6;     // tag_ids
-const FIELD_SCORES: u32 = 7;      // scores
-const FIELD_LABELS: u32 = 8;      // labels
-const FIELD_STATUS: u32 = 9;      // status
-const FIELD_PRIORITY: u32 = 10;   // priority
-const FIELD_ASSIGNEE: u32 = 11;    // assignee
-const FIELD_EMAIL: u32 = 12;      // notification.email_address
-const FIELD_PHONE: u32 = 13;      // notification.phone_number
-
-const BIT_TITLE: usize = 0;       // title (EXPLICIT)
-const BIT_MAX_RETRIES: usize = 1; // max_retries (EXPLICIT)
-const BIT_OWNER_ID: usize = 2;    // owner_id (LEGACY_REQUIRED)
-const BIT_PAYLOAD: usize = 3;     // payload (EXPLICIT)
-const BIT_PRIORITY: usize = 4;    // priority (EXPLICIT)
-
-// IMPLICIT / nested / repeated fields use a dummy bit index (ignored by `Implicit`).
-const BIT_UNUSED: usize = 0;
-
-// ---------------------------------------------------------------------------
 // Message struct
 // ---------------------------------------------------------------------------
 
@@ -88,6 +61,35 @@ pub struct Task<A: Allocator = Global> {
     priority: SingularVarintField<ProtoEnum, Explicit>,            // proto: Priority priority = 10;
     assignee: NestedMessageField<Address<A>, A>,                    // proto: Address assignee = 11;
     notification: OneofSlot<Notification<A>>,                     // proto: oneof notification { ... }
+}
+
+// ---------------------------------------------------------------------------
+// Field constants (associated with `Task`)
+// ---------------------------------------------------------------------------
+
+impl<A: Allocator> Task<A> {
+    pub const FIELD_TITLE: u32 = 1;       // title
+    pub const FIELD_SCORE: u32 = 2;       // score
+    pub const FIELD_MAX_RETRIES: u32 = 3; // max_retries
+    pub const FIELD_OWNER_ID: u32 = 4;    // owner_id
+    pub const FIELD_PAYLOAD: u32 = 5;     // payload
+    pub const FIELD_TAG_IDS: u32 = 6;     // tag_ids
+    pub const FIELD_SCORES: u32 = 7;      // scores
+    pub const FIELD_LABELS: u32 = 8;      // labels
+    pub const FIELD_STATUS: u32 = 9;      // status
+    pub const FIELD_PRIORITY: u32 = 10;   // priority
+    pub const FIELD_ASSIGNEE: u32 = 11;   // assignee
+    pub const FIELD_EMAIL: u32 = 12;      // notification.email_address
+    pub const FIELD_PHONE: u32 = 13;      // notification.phone_number
+
+    pub const BIT_TITLE: usize = 0;       // title (EXPLICIT)
+    pub const BIT_MAX_RETRIES: usize = 1; // max_retries (EXPLICIT)
+    pub const BIT_OWNER_ID: usize = 2;    // owner_id (LEGACY_REQUIRED)
+    pub const BIT_PAYLOAD: usize = 3;     // payload (EXPLICIT)
+    pub const BIT_PRIORITY: usize = 4;    // priority (EXPLICIT)
+
+    /// Dummy bit index for IMPLICIT / nested / repeated fields (ignored by `Implicit`).
+    pub const BIT_UNUSED: usize = 0;
 }
 
 impl<A: Allocator + Clone> Task<A> {
@@ -116,19 +118,19 @@ impl<A: Allocator + Clone> Task<A> {
         impl<'a> HasDefault<&'a str> for TitleDefault {
             const DEFAULT: &'a str = "";
         }
-        self.title.optional::<_, _, BIT_TITLE>(&self._common, TitleDefault)
+        self.title.optional(&self._common, Self::BIT_TITLE, TitleDefault)
     }
 
     pub fn has_title(&self) -> bool {
-        self.title.has::<_, BIT_TITLE>(&self._common)
+        self.title.has(&self._common, Self::BIT_TITLE)
     }
 
     pub fn set_title(&mut self, v: &str) {
-        self.title.set_str::<_, BIT_TITLE>(&mut self._common, v);
+        self.title.set_str(&mut self._common, Self::BIT_TITLE, v);
     }
 
     pub fn clear_title(&mut self) {
-        self.title.clear::<_, BIT_TITLE>(&mut self._common);
+        self.title.clear(&mut self._common, Self::BIT_TITLE);
     }
 
     // -- score (IMPLICIT int32, proto field 2) ------------------------------
@@ -138,7 +140,7 @@ impl<A: Allocator + Clone> Task<A> {
     }
 
     pub fn set_score(&mut self, v: i32) {
-        self.score.set::<_, _, BIT_UNUSED>(&mut self._common, v);
+        self.score.set(&mut self._common, Self::BIT_UNUSED, v);
     }
 
     // -- max_retries (EXPLICIT int32, default = 3, proto field 3) ------------
@@ -149,21 +151,21 @@ impl<A: Allocator + Clone> Task<A> {
             const DEFAULT: i32 = 3;
         }
         self.max_retries
-            .optional::<_, _, MaxRetriesDefault, BIT_MAX_RETRIES>(&self._common, MaxRetriesDefault)
+            .optional(&self._common, Self::BIT_MAX_RETRIES, MaxRetriesDefault)
     }
 
     pub fn has_max_retries(&self) -> bool {
-        self.max_retries.has::<_, _, BIT_MAX_RETRIES>(&self._common)
+        self.max_retries.has(&self._common, Self::BIT_MAX_RETRIES)
     }
 
     pub fn set_max_retries(&mut self, v: i32) {
         self.max_retries
-            .set::<_, _, BIT_MAX_RETRIES>(&mut self._common, v);
+            .set(&mut self._common, Self::BIT_MAX_RETRIES, v);
     }
 
     pub fn clear_max_retries(&mut self) {
         self.max_retries
-            .clear::<_, _, BIT_MAX_RETRIES>(&mut self._common);
+            .clear(&mut self._common, Self::BIT_MAX_RETRIES);
     }
 
     // -- owner_id (LEGACY_REQUIRED string, proto field 4) --------------------
@@ -174,19 +176,19 @@ impl<A: Allocator + Clone> Task<A> {
             const DEFAULT: &'a str = "";
         }
         self.owner_id
-            .optional::<_, _, BIT_OWNER_ID>(&self._common, OwnerIdDefault)
+            .optional(&self._common, Self::BIT_OWNER_ID, OwnerIdDefault)
     }
 
     pub fn has_owner_id(&self) -> bool {
-        self.owner_id.has::<_, BIT_OWNER_ID>(&self._common)
+        self.owner_id.has(&self._common, Self::BIT_OWNER_ID)
     }
 
     pub fn set_owner_id(&mut self, v: &str) {
-        self.owner_id.set_str::<_, BIT_OWNER_ID>(&mut self._common, v);
+        self.owner_id.set_str(&mut self._common, Self::BIT_OWNER_ID, v);
     }
 
     pub fn clear_owner_id(&mut self) {
-        self.owner_id.clear::<_, BIT_OWNER_ID>(&mut self._common);
+        self.owner_id.clear(&mut self._common, Self::BIT_OWNER_ID);
     }
 
     // -- payload (EXPLICIT bytes, proto field 5) -----------------------------
@@ -197,20 +199,20 @@ impl<A: Allocator + Clone> Task<A> {
             const DEFAULT: &'a [u8] = &[];
         }
         self.payload
-            .optional::<_, _, BIT_PAYLOAD>(&self._common, PayloadDefault)
+            .optional(&self._common, Self::BIT_PAYLOAD, PayloadDefault)
     }
 
     pub fn has_payload(&self) -> bool {
-        self.payload.has::<_, BIT_PAYLOAD>(&self._common)
+        self.payload.has(&self._common, Self::BIT_PAYLOAD)
     }
 
     pub fn set_payload(&mut self, v: &[u8]) -> Result<(), DecodeError> {
         self.payload
-            .set_from_slice::<_, BIT_PAYLOAD>(&mut self._common, v)
+            .set_from_slice(&mut self._common, Self::BIT_PAYLOAD, v)
     }
 
     pub fn clear_payload(&mut self) {
-        self.payload.clear::<_, BIT_PAYLOAD>(&mut self._common);
+        self.payload.clear(&mut self._common, Self::BIT_PAYLOAD);
     }
 
     // -- tag_ids (repeated int32 PACKED, proto field 6) ----------------------
@@ -262,7 +264,7 @@ impl<A: Allocator + Clone> Task<A> {
     }
 
     pub fn set_status_raw(&mut self, v: i32) {
-        self.status.set::<_, _, BIT_UNUSED>(&mut self._common, v);
+        self.status.set(&mut self._common, Self::BIT_UNUSED, v);
     }
 
     pub fn status(&self) -> Result<Status, i32> {
@@ -276,7 +278,7 @@ impl<A: Allocator + Clone> Task<A> {
     // -- priority (EXPLICIT closed enum, proto field 10) ---------------------
 
     pub fn priority(&self) -> Option<Result<Priority, i32>> {
-        if !self.priority.has::<_, _, BIT_PRIORITY>(&self._common) {
+        if !self.priority.has(&self._common, Self::BIT_PRIORITY) {
             return None;
         }
         Some(Priority::try_from(self.priority.value()))
@@ -284,12 +286,12 @@ impl<A: Allocator + Clone> Task<A> {
 
     pub fn set_priority(&mut self, v: Priority) {
         self.priority
-            .set::<_, _, BIT_PRIORITY>(&mut self._common, v.into());
+            .set(&mut self._common, Self::BIT_PRIORITY, v.into());
     }
 
     pub fn clear_priority(&mut self) {
         self.priority
-            .clear::<_, _, BIT_PRIORITY>(&mut self._common);
+            .clear(&mut self._common, Self::BIT_PRIORITY);
     }
 
     // -- assignee (nested message, proto field 11) --------------------------
@@ -349,7 +351,7 @@ impl<A: Allocator + Clone> Task<A> {
     /// Checks `LEGACY_REQUIRED` fields (`owner_id`).
     pub fn validate(&self) -> Result<(), DecodeError> {
         self.owner_id
-            .validate_required::<_, BIT_OWNER_ID>(&self._common, FIELD_OWNER_ID)
+            .validate_required(&self._common, Self::BIT_OWNER_ID, Self::FIELD_OWNER_ID)
     }
 
     pub fn decode_strict<B: Buf>(buf: B) -> Result<Self, DecodeError>
@@ -382,29 +384,29 @@ impl<A: Allocator + Clone> MessageEncode for Task<A> {
     fn encoded_len(&self) -> usize {
         let c = &self._common;
         let mut n = 0usize;
-        n += self.title.encoded_len::<_, FIELD_TITLE, BIT_TITLE>(c);
+        n += self.title.encoded_len(c, Self::FIELD_TITLE, Self::BIT_TITLE);
         n += self
             .score
-            .encoded_len::<_, _, FIELD_SCORE, BIT_UNUSED>(c);
+            .encoded_len(c, Self::FIELD_SCORE, Self::BIT_UNUSED);
         n += self
             .max_retries
-            .encoded_len::<_, _, FIELD_MAX_RETRIES, BIT_MAX_RETRIES>(c);
+            .encoded_len(c, Self::FIELD_MAX_RETRIES, Self::BIT_MAX_RETRIES);
         n += self
             .owner_id
-            .encoded_len::<_, FIELD_OWNER_ID, BIT_OWNER_ID>(c);
+            .encoded_len(c, Self::FIELD_OWNER_ID, Self::BIT_OWNER_ID);
         n += self
             .payload
-            .encoded_len::<_, FIELD_PAYLOAD, BIT_PAYLOAD>(c);
-        n += self.tag_ids.encoded_len::<FIELD_TAG_IDS>();
-        n += self.scores.encoded_len::<FIELD_SCORES>();
-        n += self.labels.encoded_len::<FIELD_LABELS>();
+            .encoded_len(c, Self::FIELD_PAYLOAD, Self::BIT_PAYLOAD);
+        n += self.tag_ids.encoded_len(Self::FIELD_TAG_IDS);
+        n += self.scores.encoded_len(Self::FIELD_SCORES);
+        n += self.labels.encoded_len(Self::FIELD_LABELS);
         n += self
             .status
-            .encoded_len::<_, _, FIELD_STATUS, BIT_UNUSED>(c);
+            .encoded_len(c, Self::FIELD_STATUS, Self::BIT_UNUSED);
         n += self
             .priority
-            .encoded_len::<_, _, FIELD_PRIORITY, BIT_PRIORITY>(c);
-        n += self.assignee.encoded_len::<FIELD_ASSIGNEE>();
+            .encoded_len(c, Self::FIELD_PRIORITY, Self::BIT_PRIORITY);
+        n += self.assignee.encoded_len(Self::FIELD_ASSIGNEE);
         n += encoded_len_notification(&self.notification);
         n + c.unknown_fields.len()
     }
@@ -412,23 +414,23 @@ impl<A: Allocator + Clone> MessageEncode for Task<A> {
     fn encode_raw<B: BufMut>(&self, buf: &mut B) {
         let c = &self._common;
         self.title
-            .encode_raw::<_, _, FIELD_TITLE, BIT_TITLE>(c, buf);
+            .encode_raw(c, Self::FIELD_TITLE, Self::BIT_TITLE, buf);
         self.score
-            .encode_raw::<_, _, _, FIELD_SCORE, BIT_UNUSED>(c, buf);
+            .encode_raw(c, Self::FIELD_SCORE, Self::BIT_UNUSED, buf);
         self.max_retries
-            .encode_raw::<_, _, _, FIELD_MAX_RETRIES, BIT_MAX_RETRIES>(c, buf);
+            .encode_raw(c, Self::FIELD_MAX_RETRIES, Self::BIT_MAX_RETRIES, buf);
         self.owner_id
-            .encode_raw::<_, _, FIELD_OWNER_ID, BIT_OWNER_ID>(c, buf);
+            .encode_raw(c, Self::FIELD_OWNER_ID, Self::BIT_OWNER_ID, buf);
         self.payload
-            .encode_raw::<_, _, FIELD_PAYLOAD, BIT_PAYLOAD>(c, buf);
-        self.tag_ids.encode_raw::<_, FIELD_TAG_IDS>(buf);
-        self.scores.encode_raw::<_, FIELD_SCORES>(buf);
-        self.labels.encode_raw::<_, FIELD_LABELS>(buf);
+            .encode_raw(c, Self::FIELD_PAYLOAD, Self::BIT_PAYLOAD, buf);
+        self.tag_ids.encode_raw(Self::FIELD_TAG_IDS, buf);
+        self.scores.encode_raw(Self::FIELD_SCORES, buf);
+        self.labels.encode_raw(Self::FIELD_LABELS, buf);
         self.status
-            .encode_raw::<_, _, _, FIELD_STATUS, BIT_UNUSED>(c, buf);
+            .encode_raw(c, Self::FIELD_STATUS, Self::BIT_UNUSED, buf);
         self.priority
-            .encode_raw::<_, _, _, FIELD_PRIORITY, BIT_PRIORITY>(c, buf);
-        self.assignee.encode_raw::<_, FIELD_ASSIGNEE>(buf);
+            .encode_raw(c, Self::FIELD_PRIORITY, Self::BIT_PRIORITY, buf);
+        self.assignee.encode_raw(Self::FIELD_ASSIGNEE, buf);
         encode_notification(&self.notification, buf);
         buf.put_slice(&c.unknown_fields);
     }
@@ -439,62 +441,67 @@ impl<A: Allocator + Clone> MessageDecode for Task<A> {
         while buf.has_remaining() {
             let (field_number, wire_type) = ::puroro::decode::decode_tag(buf)?;
             match field_number {
-                FIELD_TITLE => { // title = 1, EXPLICIT string
+                Self::FIELD_TITLE => { // title = 1, EXPLICIT string
                     self.title
-                        .merge::<_, _, BIT_TITLE>(&mut self._common, wire_type, buf)?;
+                        .merge(&mut self._common, Self::BIT_TITLE, wire_type, buf)?;
                 }
-                FIELD_SCORE => { // score = 2, IMPLICIT int32
-                    self.score.merge::<_, _, _, BIT_UNUSED>(
+                Self::FIELD_SCORE => { // score = 2, IMPLICIT int32
+                    self.score.merge(
                         &mut self._common,
+                        Self::BIT_UNUSED,
                         wire_type,
                         buf,
                     )?;
                 }
-                FIELD_MAX_RETRIES => { // max_retries = 3, EXPLICIT int32
-                    self.max_retries.merge::<_, _, _, BIT_MAX_RETRIES>(
+                Self::FIELD_MAX_RETRIES => { // max_retries = 3, EXPLICIT int32
+                    self.max_retries.merge(
                         &mut self._common,
+                        Self::BIT_MAX_RETRIES,
                         wire_type,
                         buf,
                     )?;
                 }
-                FIELD_OWNER_ID => { // owner_id = 4, LEGACY_REQUIRED string
+                Self::FIELD_OWNER_ID => { // owner_id = 4, LEGACY_REQUIRED string
                     self.owner_id
-                        .merge::<_, _, BIT_OWNER_ID>(&mut self._common, wire_type, buf)?;
+                        .merge(&mut self._common, Self::BIT_OWNER_ID, wire_type, buf)?;
                 }
-                FIELD_PAYLOAD => { // payload = 5, EXPLICIT bytes
+                Self::FIELD_PAYLOAD => { // payload = 5, EXPLICIT bytes
                     self.payload
-                        .merge::<_, _, BIT_PAYLOAD>(&mut self._common, wire_type, buf)?;
+                        .merge(&mut self._common, Self::BIT_PAYLOAD, wire_type, buf)?;
                 }
-                FIELD_TAG_IDS => { // tag_ids = 6, repeated int32 PACKED
+                Self::FIELD_TAG_IDS => { // tag_ids = 6, repeated int32 PACKED
                     self.tag_ids.merge(wire_type, buf)?;
                 }
-                FIELD_SCORES => { // scores = 7, repeated int32 EXPANDED
+                Self::FIELD_SCORES => { // scores = 7, repeated int32 EXPANDED
                     self.scores.merge(wire_type, buf)?;
                 }
-                FIELD_LABELS => { // labels = 8, repeated string
+                Self::FIELD_LABELS => { // labels = 8, repeated string
                     self.labels
                         .merge(&self._common, wire_type, buf)?;
                 }
-                FIELD_STATUS => { // status = 9, IMPLICIT open enum
-                    self.status.merge::<_, _, _, BIT_UNUSED>(
+                Self::FIELD_STATUS => { // status = 9, IMPLICIT open enum
+                    self.status.merge(
                         &mut self._common,
+                        Self::BIT_UNUSED,
                         wire_type,
                         buf,
                     )?;
                 }
-                FIELD_PRIORITY => { // priority = 10, EXPLICIT closed enum
-                    self.priority.merge_closed::<_, _, _, FIELD_PRIORITY, BIT_PRIORITY>(
+                Self::FIELD_PRIORITY => { // priority = 10, EXPLICIT closed enum
+                    self.priority.merge_closed(
                         &mut self._common,
+                        Self::FIELD_PRIORITY,
+                        Self::BIT_PRIORITY,
                         wire_type,
                         buf,
                         |v| Priority::try_from(v).is_ok(),
                     )?;
                 }
-                FIELD_ASSIGNEE => { // assignee = 11, nested message
+                Self::FIELD_ASSIGNEE => { // assignee = 11, nested message
                     self.assignee
                         .merge(&mut self._common, wire_type, buf)?;
                 }
-                FIELD_EMAIL => { // notification.email_address = 12
+                Self::FIELD_EMAIL => { // notification.email_address = 12
                     merge_notification_email(
                         &mut self.notification,
                         &self._common,
@@ -502,7 +509,7 @@ impl<A: Allocator + Clone> MessageDecode for Task<A> {
                         buf,
                     )?;
                 }
-                FIELD_PHONE => { // notification.phone_number = 13
+                Self::FIELD_PHONE => { // notification.phone_number = 13
                     merge_notification_phone(
                         &mut self.notification,
                         &self._common,
@@ -531,10 +538,10 @@ impl<A: Allocator + Clone> MessageDecode for Task<A> {
 fn encoded_len_notification<A: Allocator>(slot: &OneofSlot<Notification<A>>) -> usize {
     match slot.get() {
         Some(Notification::EmailAddress(s)) => {
-            ::puroro::encode::encoded_len_len_field(FIELD_EMAIL, s.len())
+            ::puroro::encode::encoded_len_len_field(Task::<A>::FIELD_EMAIL, s.len())
         }
         Some(Notification::PhoneNumber(s)) => {
-            ::puroro::encode::encoded_len_len_field(FIELD_PHONE, s.len())
+            ::puroro::encode::encoded_len_len_field(Task::<A>::FIELD_PHONE, s.len())
         }
         None => 0,
     }
@@ -546,10 +553,10 @@ fn encode_notification<A: Allocator, B: BufMut>(
 ) {
     match slot.get() {
         Some(Notification::EmailAddress(s)) => {
-            ::puroro::encode::encode_len_field(FIELD_EMAIL, s.as_bytes(), buf);
+            ::puroro::encode::encode_len_field(Task::<A>::FIELD_EMAIL, s.as_bytes(), buf);
         }
         Some(Notification::PhoneNumber(s)) => {
-            ::puroro::encode::encode_len_field(FIELD_PHONE, s.as_bytes(), buf);
+            ::puroro::encode::encode_len_field(Task::<A>::FIELD_PHONE, s.as_bytes(), buf);
         }
         None => {}
     }

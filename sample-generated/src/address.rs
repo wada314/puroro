@@ -33,16 +33,6 @@ impl PresenceBits for AddressPresence {
 }
 
 // ---------------------------------------------------------------------------
-// Field constants
-// ---------------------------------------------------------------------------
-
-const FIELD_STREET: u32 = 1; // street
-const FIELD_CITY: u32 = 2;   // city
-
-const BIT_STREET: usize = 0; // street (EXPLICIT)
-const BIT_CITY: usize = 1;   // city (EXPLICIT)
-
-// ---------------------------------------------------------------------------
 // Message struct
 // ---------------------------------------------------------------------------
 
@@ -50,6 +40,18 @@ pub struct Address<A: Allocator = Global> {
     _common: MessageCommon<AddressPresence, A>,
     street: SingularLenField<ProtoString, Explicit, A>, // proto: string street = 1;
     city: SingularLenField<ProtoString, Explicit, A>,   // proto: string city = 2;
+}
+
+// ---------------------------------------------------------------------------
+// Field constants (associated with `Address`)
+// ---------------------------------------------------------------------------
+
+impl<A: Allocator> Address<A> {
+    pub const FIELD_STREET: u32 = 1; // street
+    pub const FIELD_CITY: u32 = 2;   // city
+
+    pub const BIT_STREET: usize = 0; // street (EXPLICIT)
+    pub const BIT_CITY: usize = 1;   // city (EXPLICIT)
 }
 
 impl<A: Allocator + Clone> Address<A> {
@@ -70,19 +72,19 @@ impl<A: Allocator + Clone> Address<A> {
         impl<'a> ::puroro::HasDefault<&'a str> for StreetDefault {
             const DEFAULT: &'a str = "";
         }
-        self.street.optional::<_, _, BIT_STREET>(&self._common, StreetDefault)
+        self.street.optional(&self._common, Self::BIT_STREET, StreetDefault)
     }
 
     pub fn has_street(&self) -> bool {
-        self.street.has::<_, BIT_STREET>(&self._common)
+        self.street.has(&self._common, Self::BIT_STREET)
     }
 
     pub fn set_street(&mut self, v: &str) {
-        self.street.set_str::<_, BIT_STREET>(&mut self._common, v);
+        self.street.set_str(&mut self._common, Self::BIT_STREET, v);
     }
 
     pub fn clear_street(&mut self) {
-        self.street.clear::<_, BIT_STREET>(&mut self._common);
+        self.street.clear(&mut self._common, Self::BIT_STREET);
     }
 
     // -- city (EXPLICIT string, proto field 2) ------------------------------
@@ -92,19 +94,19 @@ impl<A: Allocator + Clone> Address<A> {
         impl<'a> ::puroro::HasDefault<&'a str> for CityDefault {
             const DEFAULT: &'a str = "";
         }
-        self.city.optional::<_, _, BIT_CITY>(&self._common, CityDefault)
+        self.city.optional(&self._common, Self::BIT_CITY, CityDefault)
     }
 
     pub fn has_city(&self) -> bool {
-        self.city.has::<_, BIT_CITY>(&self._common)
+        self.city.has(&self._common, Self::BIT_CITY)
     }
 
     pub fn set_city(&mut self, v: &str) {
-        self.city.set_str::<_, BIT_CITY>(&mut self._common, v);
+        self.city.set_str(&mut self._common, Self::BIT_CITY, v);
     }
 
     pub fn clear_city(&mut self) {
-        self.city.clear::<_, BIT_CITY>(&mut self._common);
+        self.city.clear(&mut self._common, Self::BIT_CITY);
     }
 
     pub fn unknown_fields(&self) -> &[u8] {
@@ -137,17 +139,17 @@ impl<A: Allocator + Clone> NestedMessage<A> for Address<A> {
 impl<A: Allocator + Clone> MessageEncode for Address<A> {
     fn encoded_len(&self) -> usize {
         let c = &self._common;
-        self.street.encoded_len::<_, FIELD_STREET, BIT_STREET>(c)
-            + self.city.encoded_len::<_, FIELD_CITY, BIT_CITY>(c)
+        self.street.encoded_len(c, Self::FIELD_STREET, Self::BIT_STREET)
+            + self.city.encoded_len(c, Self::FIELD_CITY, Self::BIT_CITY)
             + c.unknown_fields.len()
     }
 
     fn encode_raw<B: BufMut>(&self, buf: &mut B) {
         let c = &self._common;
         self.street
-            .encode_raw::<_, _, FIELD_STREET, BIT_STREET>(c, buf);
+            .encode_raw(c, Self::FIELD_STREET, Self::BIT_STREET, buf);
         self.city
-            .encode_raw::<_, _, FIELD_CITY, BIT_CITY>(c, buf);
+            .encode_raw(c, Self::FIELD_CITY, Self::BIT_CITY, buf);
         buf.put_slice(&c.unknown_fields);
     }
 }
@@ -157,13 +159,13 @@ impl<A: Allocator + Clone> MessageDecode for Address<A> {
         while buf.has_remaining() {
             let (field_number, wire_type) = ::puroro::decode::decode_tag(buf)?;
             match field_number {
-                FIELD_STREET => { // street = 1, EXPLICIT string
+                Self::FIELD_STREET => { // street = 1, EXPLICIT string
                     self.street
-                        .merge::<_, _, BIT_STREET>(&mut self._common, wire_type, buf)?;
+                        .merge(&mut self._common, Self::BIT_STREET, wire_type, buf)?;
                 }
-                FIELD_CITY => { // city = 2, EXPLICIT string
+                Self::FIELD_CITY => { // city = 2, EXPLICIT string
                     self.city
-                        .merge::<_, _, BIT_CITY>(&mut self._common, wire_type, buf)?;
+                        .merge(&mut self._common, Self::BIT_CITY, wire_type, buf)?;
                 }
                 _ => { // unknown field — preserve in _common.unknown_fields
                     ::puroro::decode::skip_field_and_save(
