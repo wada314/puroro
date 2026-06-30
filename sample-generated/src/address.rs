@@ -1,4 +1,5 @@
-//! Generated `Address` message (`example.Address`).
+//! @generated from example.proto — do not edit
+//! Message `example.Address`
 
 use ::allocator_api2::alloc::{Allocator, Global};
 use ::bitvec::array::BitArray;
@@ -11,7 +12,7 @@ use ::puroro::{
 };
 
 // ---------------------------------------------------------------------------
-// Presence bitfield (2 EXPLICIT string fields)
+// Presence bitfield (2 tracked singular fields)
 // ---------------------------------------------------------------------------
 
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
@@ -35,21 +36,20 @@ impl PresenceBits for AddressPresence {
 // Field constants
 // ---------------------------------------------------------------------------
 
-const FIELD_STREET: u32 = 1;
-const FIELD_CITY: u32 = 2;
+const FIELD_STREET: u32 = 1; // street
+const FIELD_CITY: u32 = 2;   // city
 
-const BIT_STREET: usize = 0;
-const BIT_CITY: usize = 1;
+const BIT_STREET: usize = 0; // street (EXPLICIT)
+const BIT_CITY: usize = 1;   // city (EXPLICIT)
 
 // ---------------------------------------------------------------------------
 // Message struct
 // ---------------------------------------------------------------------------
 
-/// `message Address { string street = 1; string city = 2; }`
 pub struct Address<A: Allocator = Global> {
     _common: MessageCommon<AddressPresence, A>,
-    street: SingularLenField<ProtoString, Explicit, A>,
-    city: SingularLenField<ProtoString, Explicit, A>,
+    street: SingularLenField<ProtoString, Explicit, A>, // proto: string street = 1;
+    city: SingularLenField<ProtoString, Explicit, A>,   // proto: string city = 2;
 }
 
 impl<A: Allocator + Clone> Address<A> {
@@ -61,7 +61,7 @@ impl<A: Allocator + Clone> Address<A> {
         }
     }
 
-    // -- street (EXPLICIT string, field 1) ----------------------------------
+    // -- street (EXPLICIT string, proto field 1) ----------------------------
 
     pub fn street<'a>(
         &'a self,
@@ -85,7 +85,7 @@ impl<A: Allocator + Clone> Address<A> {
         self.street.clear::<_, BIT_STREET>(&mut self._common);
     }
 
-    // -- city (EXPLICIT string, field 2) ------------------------------------
+    // -- city (EXPLICIT string, proto field 2) ------------------------------
 
     pub fn city<'a>(&'a self) -> ::puroro::Optional<&'a str, impl ::puroro::HasDefault<&'a str>> {
         struct CityDefault;
@@ -130,6 +130,10 @@ impl<A: Allocator + Clone> NestedMessage<A> for Address<A> {
     }
 }
 
+// ---------------------------------------------------------------------------
+// MessageEncode / MessageDecode
+// ---------------------------------------------------------------------------
+
 impl<A: Allocator + Clone> MessageEncode for Address<A> {
     fn encoded_len(&self) -> usize {
         let c = &self._common;
@@ -153,20 +157,22 @@ impl<A: Allocator + Clone> MessageDecode for Address<A> {
         while buf.has_remaining() {
             let (field_number, wire_type) = ::puroro::decode::decode_tag(buf)?;
             match field_number {
-                FIELD_STREET => {
+                FIELD_STREET => { // street = 1, EXPLICIT string
                     self.street
                         .merge::<_, _, BIT_STREET>(&mut self._common, wire_type, buf)?;
                 }
-                FIELD_CITY => {
+                FIELD_CITY => { // city = 2, EXPLICIT string
                     self.city
                         .merge::<_, _, BIT_CITY>(&mut self._common, wire_type, buf)?;
                 }
-                _ => ::puroro::decode::skip_field_and_save(
-                    field_number,
-                    wire_type,
-                    buf,
-                    &mut self._common.unknown_fields,
-                )?,
+                _ => { // unknown field — preserve in _common.unknown_fields
+                    ::puroro::decode::skip_field_and_save(
+                        field_number,
+                        wire_type,
+                        buf,
+                        &mut self._common.unknown_fields,
+                    )?
+                }
             }
         }
         Ok(())

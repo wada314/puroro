@@ -213,6 +213,8 @@ For each message type the code generator produces **three kinds of output**:
 2. **The primary struct** — a full-featured owned implementation (§4.1–4.9), internally a product of **`puroro::fields` catalog types** + shared `MessageCommon` (see [IMPLEMENTATION.md §2](IMPLEMENTATION.md#2-architecture-overview)).
 3. **(Future) Specialized structs** — alternative implementations for specific performance scenarios (§8).
 
+Generated Rust is not hand-edited; the plugin still emits **section banners, proto field labels, and `merge_from` dispatch comments** so build output is navigable when debugging. Convention: [IMPLEMENTATION.md §9 — Generated code comments](IMPLEMENTATION.md#generated-code-comments). Reference output: [`sample-generated/`](sample-generated/).
+
 ---
 
 ### 4.0 Generated per-message traits

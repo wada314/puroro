@@ -277,6 +277,69 @@ Public accessors are **one-line delegates** into catalog methods with `&self._co
 
 IR step: `ProtoField → FieldKind → catalog type + const args`.
 
+### Generated code comments
+
+Generated Rust is not meant to be hand-edited, but **must be easy to navigate when debugging** (breakpoints, `merge_from` dispatch, diffing encode output). The protoc plugin emits comments from proto metadata; [`sample-generated/`](sample-generated/) demonstrates the convention.
+
+**File header** — every generated module:
+
+```rust
+//! @generated from example.proto — do not edit
+//! Message `example.Task`
+```
+
+**Section banners** — major blocks inside the file:
+
+```text
+// ---------------------------------------------------------------------------
+// Presence bitfield (N tracked singular fields)
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// Field constants
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// Message struct
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// MessageEncode / MessageDecode
+// ---------------------------------------------------------------------------
+```
+
+**Per-field accessor block** — before each field’s `impl` methods:
+
+```text
+// -- title (EXPLICIT string, proto field 1) --
+```
+
+Include **presence**, **wire/kind** (string, int32, repeated packed, nested, …), and **proto field number**.
+
+**Struct members** — trailing comment tying storage to proto:
+
+```rust
+title: SingularLenField<ProtoString, Explicit, A>, // proto: string title = 1;
+```
+
+**Constants** — `FIELD_*` / `BIT_*` annotated on the same line:
+
+```rust
+const FIELD_TITLE: u32 = 1;   // title
+const BIT_TITLE: usize = 0;   // title (EXPLICIT)
+```
+
+**Wire I/O** — `merge_from` match arms (and optionally `encode_raw` / `encoded_len` groups) label the proto field:
+
+```rust
+FIELD_TITLE => { // title = 1, EXPLICIT string
+    self.title.merge::<_, _, BIT_TITLE>(...)?;
+}
+```
+
+Oneof variant arms use the **variant field name** and number. The `_ =>` unknown-field arm gets a short comment (`// unknown field — preserve in _common`).
+
+**What not to comment** — avoid restating obvious one-line delegates (`has_title` → `self.title.has(...)`). Section + struct + dispatch comments are enough.
+
+**Proto doc comments** — when the `.proto` field has `///` documentation, emit a Rust `///` doc comment on the **public accessor methods** (not on private struct fields unless the proto doc is part of the public API story).
+
 ---
 
 ## 10. Presence bit indices

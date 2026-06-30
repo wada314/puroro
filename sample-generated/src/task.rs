@@ -1,4 +1,5 @@
-//! Generated `Task` message (`example.Task`).
+//! @generated from example.proto — do not edit
+//! Message `example.Task`
 
 mod notification;
 
@@ -45,25 +46,25 @@ impl PresenceBits for TaskPresence {
 // Field constants
 // ---------------------------------------------------------------------------
 
-const FIELD_TITLE: u32 = 1;
-const FIELD_SCORE: u32 = 2;
-const FIELD_MAX_RETRIES: u32 = 3;
-const FIELD_OWNER_ID: u32 = 4;
-const FIELD_PAYLOAD: u32 = 5;
-const FIELD_TAG_IDS: u32 = 6;
-const FIELD_SCORES: u32 = 7;
-const FIELD_LABELS: u32 = 8;
-const FIELD_STATUS: u32 = 9;
-const FIELD_PRIORITY: u32 = 10;
-const FIELD_ASSIGNEE: u32 = 11;
-const FIELD_EMAIL: u32 = 12;
-const FIELD_PHONE: u32 = 13;
+const FIELD_TITLE: u32 = 1;       // title
+const FIELD_SCORE: u32 = 2;       // score
+const FIELD_MAX_RETRIES: u32 = 3; // max_retries
+const FIELD_OWNER_ID: u32 = 4;    // owner_id
+const FIELD_PAYLOAD: u32 = 5;     // payload
+const FIELD_TAG_IDS: u32 = 6;     // tag_ids
+const FIELD_SCORES: u32 = 7;      // scores
+const FIELD_LABELS: u32 = 8;      // labels
+const FIELD_STATUS: u32 = 9;      // status
+const FIELD_PRIORITY: u32 = 10;   // priority
+const FIELD_ASSIGNEE: u32 = 11;    // assignee
+const FIELD_EMAIL: u32 = 12;      // notification.email_address
+const FIELD_PHONE: u32 = 13;      // notification.phone_number
 
-const BIT_TITLE: usize = 0;
-const BIT_MAX_RETRIES: usize = 1;
-const BIT_OWNER_ID: usize = 2;
-const BIT_PAYLOAD: usize = 3;
-const BIT_PRIORITY: usize = 4;
+const BIT_TITLE: usize = 0;       // title (EXPLICIT)
+const BIT_MAX_RETRIES: usize = 1; // max_retries (EXPLICIT)
+const BIT_OWNER_ID: usize = 2;    // owner_id (LEGACY_REQUIRED)
+const BIT_PAYLOAD: usize = 3;     // payload (EXPLICIT)
+const BIT_PRIORITY: usize = 4;    // priority (EXPLICIT)
 
 // IMPLICIT / nested / repeated fields use a dummy bit index (ignored by `Implicit`).
 const BIT_UNUSED: usize = 0;
@@ -75,18 +76,18 @@ const BIT_UNUSED: usize = 0;
 /// Reference `Task` message from `DESIGN.md`.
 pub struct Task<A: Allocator = Global> {
     _common: MessageCommon<TaskPresence, A>,
-    title: SingularLenField<ProtoString, Explicit, A>,
-    score: SingularVarintField<ProtoInt32, Implicit>,
-    max_retries: SingularVarintField<ProtoInt32, Explicit>,
-    owner_id: SingularLenField<ProtoString, LegacyRequired, A>,
-    payload: SingularLenField<ProtoBytes, Explicit, A>,
-    tag_ids: RepeatedPackedVarintField<ProtoInt32, A>,
-    scores: RepeatedExpandedVarintField<ProtoInt32, A>,
-    labels: RepeatedLenField<ProtoString, A>,
-    status: SingularVarintField<ProtoEnum, Implicit>,
-    priority: SingularVarintField<ProtoEnum, Explicit>,
-    assignee: NestedMessageField<Address<A>, A>,
-    notification: OneofSlot<Notification<A>>,
+    title: SingularLenField<ProtoString, Explicit, A>,              // proto: string title = 1;
+    score: SingularVarintField<ProtoInt32, Implicit>,               // proto: int32 score = 2;
+    max_retries: SingularVarintField<ProtoInt32, Explicit>,         // proto: int32 max_retries = 3;
+    owner_id: SingularLenField<ProtoString, LegacyRequired, A>,     // proto: string owner_id = 4;
+    payload: SingularLenField<ProtoBytes, Explicit, A>,             // proto: bytes payload = 5;
+    tag_ids: RepeatedPackedVarintField<ProtoInt32, A>,              // proto: repeated int32 tag_ids = 6 [packed];
+    scores: RepeatedExpandedVarintField<ProtoInt32, A>,             // proto: repeated int32 scores = 7;
+    labels: RepeatedLenField<ProtoString, A>,                       // proto: repeated string labels = 8;
+    status: SingularVarintField<ProtoEnum, Implicit>,               // proto: Status status = 9;
+    priority: SingularVarintField<ProtoEnum, Explicit>,            // proto: Priority priority = 10;
+    assignee: NestedMessageField<Address<A>, A>,                    // proto: Address assignee = 11;
+    notification: OneofSlot<Notification<A>>,                     // proto: oneof notification { ... }
 }
 
 impl<A: Allocator + Clone> Task<A> {
@@ -108,7 +109,7 @@ impl<A: Allocator + Clone> Task<A> {
         }
     }
 
-    // -- title (EXPLICIT string) --------------------------------------------
+    // -- title (EXPLICIT string, proto field 1) ----------------------------
 
     pub fn title<'a>(&'a self) -> Optional<&'a str, impl HasDefault<&'a str>> {
         struct TitleDefault;
@@ -130,7 +131,7 @@ impl<A: Allocator + Clone> Task<A> {
         self.title.clear::<_, BIT_TITLE>(&mut self._common);
     }
 
-    // -- score (IMPLICIT int32) ---------------------------------------------
+    // -- score (IMPLICIT int32, proto field 2) ------------------------------
 
     pub fn score(&self) -> i32 {
         self.score.value()
@@ -140,7 +141,7 @@ impl<A: Allocator + Clone> Task<A> {
         self.score.set::<_, _, BIT_UNUSED>(&mut self._common, v);
     }
 
-    // -- max_retries (EXPLICIT int32, default = 3) --------------------------
+    // -- max_retries (EXPLICIT int32, default = 3, proto field 3) ------------
 
     pub fn max_retries(&self) -> Optional<i32, impl HasDefault<i32>> {
         struct MaxRetriesDefault;
@@ -165,7 +166,7 @@ impl<A: Allocator + Clone> Task<A> {
             .clear::<_, _, BIT_MAX_RETRIES>(&mut self._common);
     }
 
-    // -- owner_id (LEGACY_REQUIRED string) ----------------------------------
+    // -- owner_id (LEGACY_REQUIRED string, proto field 4) --------------------
 
     pub fn owner_id<'a>(&'a self) -> Optional<&'a str, impl HasDefault<&'a str>> {
         struct OwnerIdDefault;
@@ -188,7 +189,7 @@ impl<A: Allocator + Clone> Task<A> {
         self.owner_id.clear::<_, BIT_OWNER_ID>(&mut self._common);
     }
 
-    // -- payload (EXPLICIT bytes) -------------------------------------------
+    // -- payload (EXPLICIT bytes, proto field 5) -----------------------------
 
     pub fn payload<'a>(&'a self) -> Optional<&'a [u8], impl HasDefault<&'a [u8]>> {
         struct PayloadDefault;
@@ -212,6 +213,8 @@ impl<A: Allocator + Clone> Task<A> {
         self.payload.clear::<_, BIT_PAYLOAD>(&mut self._common);
     }
 
+    // -- tag_ids (repeated int32 PACKED, proto field 6) ----------------------
+
     pub fn tag_ids(&self) -> &[i32] {
         self.tag_ids.as_slice()
     }
@@ -223,6 +226,8 @@ impl<A: Allocator + Clone> Task<A> {
     pub fn clear_tag_ids(&mut self) {
         self.tag_ids.clear();
     }
+
+    // -- scores (repeated int32 EXPANDED, proto field 7) ---------------------
 
     pub fn scores(&self) -> &[i32] {
         self.scores.as_slice()
@@ -236,6 +241,8 @@ impl<A: Allocator + Clone> Task<A> {
         self.scores.clear();
     }
 
+    // -- labels (repeated string, proto field 8) -----------------------------
+
     pub fn labels(&self) -> &[ABox<str, A>] {
         self.labels.as_slice()
     }
@@ -248,7 +255,7 @@ impl<A: Allocator + Clone> Task<A> {
         self.labels.clear();
     }
 
-    // -- status (IMPLICIT open enum) ----------------------------------------
+    // -- status (IMPLICIT open enum, proto field 9) -------------------------
 
     pub fn status_raw(&self) -> i32 {
         self.status.value()
@@ -266,7 +273,7 @@ impl<A: Allocator + Clone> Task<A> {
         self.set_status_raw(v.into());
     }
 
-    // -- priority (EXPLICIT closed enum) ------------------------------------
+    // -- priority (EXPLICIT closed enum, proto field 10) ---------------------
 
     pub fn priority(&self) -> Option<Result<Priority, i32>> {
         if !self.priority.has::<_, _, BIT_PRIORITY>(&self._common) {
@@ -285,7 +292,7 @@ impl<A: Allocator + Clone> Task<A> {
             .clear::<_, _, BIT_PRIORITY>(&mut self._common);
     }
 
-    // -- assignee (nested message) ------------------------------------------
+    // -- assignee (nested message, proto field 11) --------------------------
 
     pub fn assignee(&self) -> Option<&Address<A>> {
         self.assignee.get()
@@ -303,7 +310,7 @@ impl<A: Allocator + Clone> Task<A> {
         self.assignee.clear();
     }
 
-    // -- oneof notification -------------------------------------------------
+    // -- oneof notification (proto fields 12 / 13) --------------------------
 
     pub fn notification(&self) -> Option<&Notification<A>> {
         self.notification.get()
@@ -367,6 +374,10 @@ impl<A: Allocator + Clone + Default> Default for Task<A> {
     }
 }
 
+// ---------------------------------------------------------------------------
+// MessageEncode / MessageDecode
+// ---------------------------------------------------------------------------
+
 impl<A: Allocator + Clone> MessageEncode for Task<A> {
     fn encoded_len(&self) -> usize {
         let c = &self._common;
@@ -428,50 +439,50 @@ impl<A: Allocator + Clone> MessageDecode for Task<A> {
         while buf.has_remaining() {
             let (field_number, wire_type) = ::puroro::decode::decode_tag(buf)?;
             match field_number {
-                FIELD_TITLE => {
+                FIELD_TITLE => { // title = 1, EXPLICIT string
                     self.title
                         .merge::<_, _, BIT_TITLE>(&mut self._common, wire_type, buf)?;
                 }
-                FIELD_SCORE => {
+                FIELD_SCORE => { // score = 2, IMPLICIT int32
                     self.score.merge::<_, _, _, BIT_UNUSED>(
                         &mut self._common,
                         wire_type,
                         buf,
                     )?;
                 }
-                FIELD_MAX_RETRIES => {
+                FIELD_MAX_RETRIES => { // max_retries = 3, EXPLICIT int32
                     self.max_retries.merge::<_, _, _, BIT_MAX_RETRIES>(
                         &mut self._common,
                         wire_type,
                         buf,
                     )?;
                 }
-                FIELD_OWNER_ID => {
+                FIELD_OWNER_ID => { // owner_id = 4, LEGACY_REQUIRED string
                     self.owner_id
                         .merge::<_, _, BIT_OWNER_ID>(&mut self._common, wire_type, buf)?;
                 }
-                FIELD_PAYLOAD => {
+                FIELD_PAYLOAD => { // payload = 5, EXPLICIT bytes
                     self.payload
                         .merge::<_, _, BIT_PAYLOAD>(&mut self._common, wire_type, buf)?;
                 }
-                FIELD_TAG_IDS => {
+                FIELD_TAG_IDS => { // tag_ids = 6, repeated int32 PACKED
                     self.tag_ids.merge(wire_type, buf)?;
                 }
-                FIELD_SCORES => {
+                FIELD_SCORES => { // scores = 7, repeated int32 EXPANDED
                     self.scores.merge(wire_type, buf)?;
                 }
-                FIELD_LABELS => {
+                FIELD_LABELS => { // labels = 8, repeated string
                     self.labels
                         .merge(&self._common, wire_type, buf)?;
                 }
-                FIELD_STATUS => {
+                FIELD_STATUS => { // status = 9, IMPLICIT open enum
                     self.status.merge::<_, _, _, BIT_UNUSED>(
                         &mut self._common,
                         wire_type,
                         buf,
                     )?;
                 }
-                FIELD_PRIORITY => {
+                FIELD_PRIORITY => { // priority = 10, EXPLICIT closed enum
                     self.priority.merge_closed::<_, _, _, FIELD_PRIORITY, BIT_PRIORITY>(
                         &mut self._common,
                         wire_type,
@@ -479,11 +490,11 @@ impl<A: Allocator + Clone> MessageDecode for Task<A> {
                         |v| Priority::try_from(v).is_ok(),
                     )?;
                 }
-                FIELD_ASSIGNEE => {
+                FIELD_ASSIGNEE => { // assignee = 11, nested message
                     self.assignee
                         .merge(&mut self._common, wire_type, buf)?;
                 }
-                FIELD_EMAIL => {
+                FIELD_EMAIL => { // notification.email_address = 12
                     merge_notification_email(
                         &mut self.notification,
                         &self._common,
@@ -491,7 +502,7 @@ impl<A: Allocator + Clone> MessageDecode for Task<A> {
                         buf,
                     )?;
                 }
-                FIELD_PHONE => {
+                FIELD_PHONE => { // notification.phone_number = 13
                     merge_notification_phone(
                         &mut self.notification,
                         &self._common,
@@ -499,12 +510,14 @@ impl<A: Allocator + Clone> MessageDecode for Task<A> {
                         buf,
                     )?;
                 }
-                _ => ::puroro::decode::skip_field_and_save(
-                    field_number,
-                    wire_type,
-                    buf,
-                    &mut self._common.unknown_fields,
-                )?,
+                _ => { // unknown field — preserve in _common.unknown_fields
+                    ::puroro::decode::skip_field_and_save(
+                        field_number,
+                        wire_type,
+                        buf,
+                        &mut self._common.unknown_fields,
+                    )?
+                }
             }
         }
         Ok(())
