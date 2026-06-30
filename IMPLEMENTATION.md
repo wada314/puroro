@@ -177,7 +177,7 @@ Rust storage type alone does **not** identify protobuf encoding (`i32` can be in
 
 | Marker | Encode | Bitfield | Accessors |
 |---|---|---|---|
-| `Implicit` | Omit when payload empty / type-zero | No-op | `value()` / `borrow()` |
+| `Implicit` | Omit when payload empty / type-zero | No-op | `value()` |
 | `Explicit` | Omit when bit unset | Set/clear bit | `optional`, `has`, `clear` |
 | `LegacyRequired` | Same as `Explicit` | Same as `Explicit` | Same + `validate_required` |
 
@@ -490,8 +490,8 @@ Open enum: thin glue — `Status::try_from(field.value())`. Closed enum: use `me
 |---|---|---|
 | Encode | Omit when empty | Omit when bit unset |
 | Merge | `decode_string_in` / `decode_bytes_in` | + `on_set` |
-| Getter | `borrow()` | `optional(&common, default)` |
-| Setter | `set_str` / `set_from_slice` | same (sets bit when applicable) |
+| Getter | `value()` | `optional(&common, bit, default)` |
+| Setter | `set` → `Result` (`impl AsRef<[u8]>`) | same (sets bit when applicable) |
 | Clear | `clear_value(alloc)` | `clear(&mut common)` |
 
 ### LEGACY_REQUIRED
@@ -517,7 +517,7 @@ Accessors: `as_slice()`, `push(v)`, `clear()`.
 
 ### LEN (`RepeatedLenField<T, A>`)
 
-One LEN record per element (`repeated string` / `repeated bytes`). `push_str` / `push_from_slice` take `&MessageCommon` for allocator.
+One LEN record per element (`repeated string` / `repeated bytes`). `push` takes `&MessageCommon` for allocator (`&str` for string elements, `&[u8]` for bytes).
 
 ---
 

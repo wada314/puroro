@@ -80,7 +80,7 @@ impl<A: Allocator + Clone> Address<A> {
     }
 
     pub fn set_street(&mut self, v: &str) {
-        self.street.set_str(&mut self._common, Self::BIT_STREET, v);
+        self.street.set(&mut self._common, Self::BIT_STREET, v).ok();
     }
 
     pub fn clear_street(&mut self) {
@@ -102,7 +102,7 @@ impl<A: Allocator + Clone> Address<A> {
     }
 
     pub fn set_city(&mut self, v: &str) {
-        self.city.set_str(&mut self._common, Self::BIT_CITY, v);
+        self.city.set(&mut self._common, Self::BIT_CITY, v).ok();
     }
 
     pub fn clear_city(&mut self) {

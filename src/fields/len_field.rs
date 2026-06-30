@@ -5,7 +5,6 @@ use ::core::marker::PhantomData;
 use ::bytes::{Buf, BufMut};
 use ::allocator_api2::alloc::Allocator;
 
-use crate::decode;
 use crate::encode;
 use crate::error::DecodeError;
 use crate::optional::{HasDefault, Optional};
@@ -33,34 +32,21 @@ impl<T: LenProtoType, P: FieldPresence, A: Allocator + Clone> SingularLenField<T
 
     /// Borrowed payload (IMPLICIT public getters).
     #[inline]
-    pub fn borrow(&self) -> T::Ref<'_, A> {
+    pub fn value(&self) -> T::Ref<'_, A> {
         T::borrow(&self.value)
     }
 
-    pub fn set_str<Pb>(
+    pub fn set<Pb>(
         &mut self,
         common: &mut MessageCommon<Pb, A>,
         bit: usize,
-        v: &str,
-    ) where
-        Pb: PresenceBits,
-        T: LenProtoType<Storage<A> = ::allocator_api2::boxed::Box<str, A>>,
-    {
-        P::on_set(common, bit);
-        self.value = decode::str_to_box_in(v, common.alloc.clone());
-    }
-
-    pub fn set_from_slice<Pb>(
-        &mut self,
-        common: &mut MessageCommon<Pb, A>,
-        bit: usize,
-        v: &[u8],
+        v: impl AsRef<[u8]>,
     ) -> Result<(), DecodeError>
     where
         Pb: PresenceBits,
     {
         P::on_set(common, bit);
-        self.value = T::store_from_slice(v, common.alloc.clone())?;
+        self.value = T::store_from_slice(v.as_ref(), common.alloc.clone())?;
         Ok(())
     }
 

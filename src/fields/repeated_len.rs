@@ -4,7 +4,6 @@ use ::bytes::{Buf, BufMut};
 use ::allocator_api2::alloc::Allocator;
 use ::allocator_api2::vec::Vec as AVec;
 
-use crate::decode;
 use crate::encode;
 use crate::error::DecodeError;
 use crate::wire_type::WireType;
@@ -39,27 +38,15 @@ impl<T: LenProtoType, A: Allocator + Clone> RepeatedLenField<T, A> {
         self.values.clear();
     }
 
-    pub fn push_str<P>(
+    pub fn push<P>(
         &mut self,
         common: &MessageCommon<P, A>,
-        v: &str,
-    ) where
-        P: PresenceBits,
-        T: LenProtoType<Storage<A> = ::allocator_api2::boxed::Box<str, A>>,
-    {
-        self.values
-            .push(decode::str_to_box_in(v, common.alloc.clone()));
-    }
-
-    pub fn push_from_slice<P>(
-        &mut self,
-        common: &MessageCommon<P, A>,
-        v: &[u8],
+        v: impl AsRef<[u8]>,
     ) -> Result<(), DecodeError>
     where
         P: PresenceBits,
     {
-        let stored = T::store_from_slice(v, common.alloc.clone())?;
+        let stored = T::store_from_slice(v.as_ref(), common.alloc.clone())?;
         self.values.push(stored);
         Ok(())
     }

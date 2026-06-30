@@ -126,7 +126,7 @@ impl<A: Allocator + Clone> Task<A> {
     }
 
     pub fn set_title(&mut self, v: &str) {
-        self.title.set_str(&mut self._common, Self::BIT_TITLE, v);
+        self.title.set(&mut self._common, Self::BIT_TITLE, v).ok();
     }
 
     pub fn clear_title(&mut self) {
@@ -184,7 +184,7 @@ impl<A: Allocator + Clone> Task<A> {
     }
 
     pub fn set_owner_id(&mut self, v: &str) {
-        self.owner_id.set_str(&mut self._common, Self::BIT_OWNER_ID, v);
+        self.owner_id.set(&mut self._common, Self::BIT_OWNER_ID, v).ok();
     }
 
     pub fn clear_owner_id(&mut self) {
@@ -208,7 +208,7 @@ impl<A: Allocator + Clone> Task<A> {
 
     pub fn set_payload(&mut self, v: &[u8]) -> Result<(), DecodeError> {
         self.payload
-            .set_from_slice(&mut self._common, Self::BIT_PAYLOAD, v)
+            .set(&mut self._common, Self::BIT_PAYLOAD, v)
     }
 
     pub fn clear_payload(&mut self) {
@@ -250,7 +250,7 @@ impl<A: Allocator + Clone> Task<A> {
     }
 
     pub fn push_label(&mut self, v: &str) {
-        self.labels.push_str(&self._common, v);
+        self.labels.push(&self._common, v).ok();
     }
 
     pub fn clear_labels(&mut self) {
