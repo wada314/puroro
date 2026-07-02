@@ -42,22 +42,30 @@ impl<T: LenProtoType, A: Allocator> RepeatedLenField<T, A> {
         self.values.is_empty()
     }
 
-    /// Appends an element built from a payload slice, allocating through `alloc`.
-    pub fn push_in(&mut self, alloc: &A, v: impl AsRef<[u8]>) -> Result<(), DecodeError> {
-        let stored = T::store_from_slice(v.as_ref(), alloc)?;
-        // SAFETY: `alloc` owns this vector's buffer for its whole lifetime.
+    /// Appends an element built from a payload slice, allocating through owned
+    /// `alloc` clones (callers pass an `alloc.clone()`).
+    pub fn push_in(&mut self, alloc: A, v: impl AsRef<[u8]>) -> Result<(), DecodeError>
+    where
+        A: Clone,
+    {
+        let stored = T::store_from_slice(v.as_ref(), alloc.clone())?;
+        // SAFETY: owned clones of the message allocator are interchangeable and
+        // own this vector's buffer.
         let mut g = unsafe { self.values.with_alloc(alloc) };
         g.push(stored);
         Ok(())
     }
 
     /// Drops every element and empties the vector (keeps the buffer capacity).
-    pub fn clear(&mut self, alloc: &A) {
-        // SAFETY: `alloc` owns this vector's buffer.
-        let mut g = unsafe { self.values.with_alloc(alloc) };
+    pub fn clear(&mut self, alloc: A)
+    where
+        A: Clone,
+    {
+        // SAFETY: owned clones of the message allocator own this vector's buffer
+        // and every element.
+        let mut g = unsafe { self.values.with_alloc(alloc.clone()) };
         while let Some(elem) = g.pop() {
-            // SAFETY: `alloc` owns each element's buffer.
-            unsafe { T::deallocate(elem, alloc) };
+            unsafe { T::deallocate(elem, alloc.clone()) };
         }
     }
 
@@ -76,29 +84,36 @@ impl<T: LenProtoType, A: Allocator> RepeatedLenField<T, A> {
 
     pub fn merge<B: Buf>(
         &mut self,
-        alloc: &A,
+        alloc: A,
         wire_type: WireType,
         buf: &mut B,
-    ) -> Result<(), DecodeError> {
+    ) -> Result<(), DecodeError>
+    where
+        A: Clone,
+    {
         if wire_type != len::WIRE_TYPE {
             return Err(DecodeError::InvalidTag);
         }
-        let stored = T::decode(buf, alloc)?;
-        // SAFETY: `alloc` owns this vector's buffer.
+        let stored = T::decode(buf, alloc.clone())?;
+        // SAFETY: owned clones of the message allocator own this vector's buffer.
         let mut g = unsafe { self.values.with_alloc(alloc) };
         g.push(stored);
         Ok(())
     }
 
-    /// Releases every element and the backing buffer through `alloc`.
-    /// Terminal; call once from the owning message's `Drop`.
-    pub fn deallocate(&mut self, alloc: &A) {
-        // SAFETY: called once; `alloc` owns the buffer and every element.
+    /// Releases every element and the backing buffer through owned `alloc`
+    /// clones. Terminal; call once from the owning message's `Drop`.
+    pub fn deallocate(&mut self, alloc: A)
+    where
+        A: Clone,
+    {
+        // SAFETY: called once; owned clones of the message allocator own the
+        // buffer and every element.
         let mut v = unsafe { ManuallyDrop::take(&mut self.values) };
         {
-            let mut g = unsafe { v.with_alloc(alloc) };
+            let mut g = unsafe { v.with_alloc(alloc.clone()) };
             while let Some(elem) = g.pop() {
-                unsafe { T::deallocate(elem, alloc) };
+                unsafe { T::deallocate(elem, alloc.clone()) };
             }
         }
         unsafe { v.deallocate(alloc) };

@@ -266,7 +266,7 @@ The `A: Allocator + Clone` struct bound is what lets the generated `Drop` clone 
 
 Unset EXPLICIT slots may hold type-zero / empty heap data; **only the bit** means "set". `UnmanagedString` for strings; `UnmanagedVec<u8>` for bytes (each wrapped in `ManuallyDrop`).
 
-Public accessors are **one-line delegates** into catalog methods with `&self._common` / `&mut self._common`. `MessageEncode` and `MessageDecode` sum the same delegates; the generated `Drop` walks the same fields calling `deallocate(&self._common.alloc)`.
+Public accessors are **one-line delegates** into catalog methods with `&self._common` / `&mut self._common`. `MessageEncode` and `MessageDecode` sum the same delegates; the generated `Drop` walks the same fields calling `deallocate(self._common.alloc.clone())`.
 
 ### Codegen emission per message
 
@@ -494,9 +494,11 @@ The payload is `ManuallyDrop<T::Storage>` (`UnmanagedString` / `UnmanagedVec<u8>
 | Encode | Omit when empty | Omit when bit unset |
 | Merge | decode new, then `deallocate` old, then store | + `on_set` |
 | Getter | `value()` | `optional(&common, bit, default)` |
-| Mutator | `value_mut(&self.alloc)` → guard (`impl DerefMut`) | same; generated `_mut` sets the bit first |
+| Mutator | `value_mut(alloc.clone())` → guard (`impl DerefMut`) | same; generated `_mut` sets the bit first |
 | Clear | `clear(&mut common, bit)` (frees old, resets empty) | same |
-| Release | `deallocate(&mut self, &A)` (called from message `Drop`) | same |
+| Release | `deallocate(&mut self, A)` (owned clone; called from message `Drop`) | same |
+
+Every operation that actually (de)allocates takes the allocator **by value** — the caller passes an `alloc.clone()`. The allocator is thus consistently type `A` for both the growing allocation and the eventual free (never `&A`); interchangeability of clones is guaranteed by the `Allocator + Clone` contract.
 
 ### LEGACY_REQUIRED
 
@@ -517,11 +519,11 @@ Wire identical to EXPLICIT. Message `validate()` calls `validate_required` on ea
 | Encode | One LEN record | One VARINT per element |
 | Decode | Both forms | Both forms |
 
-Elements live in `ManuallyDrop<UnmanagedVec<T::Value>>`. Accessors: `as_slice()`, `values_mut(&A)` → guard (`impl DerefMut<Target = Vec<_, &A>>`), `clear(&A)`, `merge(&A, …)`, `deallocate(&A)`.
+Elements live in `ManuallyDrop<UnmanagedVec<T::Value>>`. Accessors take the allocator by value (an `alloc.clone()`): `as_slice()`, `values_mut(A)` → guard (`impl DerefMut<Target = Vec<_, A>>`), `clear(A)`, `merge(A, …)`, `deallocate(A)`.
 
 ### LEN (`RepeatedLenField<T, A>`)
 
-One LEN record per element (`repeated string` / `repeated bytes`), stored as `ManuallyDrop<UnmanagedVec<T::Storage>>`. Because each element is itself allocator-less, `deallocate`/`clear` **drain and free every element first**, then free the buffer. The typed `push_in(&A, impl AsRef<[u8]>)` helper is kept (the bare `DerefMut` would expose allocator-less element storage that is impractical to construct).
+One LEN record per element (`repeated string` / `repeated bytes`), stored as `ManuallyDrop<UnmanagedVec<T::Storage>>`. Because each element is itself allocator-less, `deallocate`/`clear` **drain and free every element first** (each via its own owned `alloc.clone()`), then free the buffer. The typed `push_in(A, impl AsRef<[u8]>)` helper is kept (the bare `DerefMut` would expose allocator-less element storage that is impractical to construct).
 
 ---
 
@@ -529,7 +531,7 @@ One LEN record per element (`repeated string` / `repeated bytes`), stored as `Ma
 
 ### Nested (`NestedMessageField<M, A>`)
 
-`Option<UnmanagedBox<M>>`. Encode: LEN tag + `child.encode_raw`. Decode: create child (via `M::new_in(common.alloc.clone())` boxed with `&common.alloc`) if absent, `merge_from` on sub-slice (concatenation = merge). `deallocate`/`clear` take the box and release it; the child's own `Drop` frees its fields recursively. Recursion limit: planned ([§17](#17-planned-optimisations--runtime-gaps)).
+`Option<UnmanagedBox<M>>`. Encode: LEN tag + `child.encode_raw`. Decode: create child (via `M::new_in(common.alloc.clone())` boxed with `common.alloc.clone()`) if absent, `merge_from` on sub-slice (concatenation = merge). `deallocate`/`clear` take the box and release it through an owned `alloc.clone()`; the child's own `Drop` frees its fields recursively. Recursion limit: planned ([§17](#17-planned-optimisations--runtime-gaps)).
 
 ### Oneof (`OneofSlot<E>`)
 

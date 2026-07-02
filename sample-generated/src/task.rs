@@ -128,9 +128,9 @@ impl<A: Allocator + Clone> Task<A> {
 
     pub fn title_mut<'s>(
         &'s mut self,
-    ) -> impl ::core::ops::DerefMut<Target = ::unmanaged::String<&'s A>> + 's {
+    ) -> impl ::core::ops::DerefMut<Target = ::unmanaged::String<A>> + 's {
         self._common.set_presence(Self::BIT_TITLE, true);
-        self.title.value_mut(&self._common.alloc)
+        self.title.value_mut(self._common.alloc.clone())
     }
 
     pub fn clear_title(&mut self) {
@@ -189,9 +189,9 @@ impl<A: Allocator + Clone> Task<A> {
 
     pub fn owner_id_mut<'s>(
         &'s mut self,
-    ) -> impl ::core::ops::DerefMut<Target = ::unmanaged::String<&'s A>> + 's {
+    ) -> impl ::core::ops::DerefMut<Target = ::unmanaged::String<A>> + 's {
         self._common.set_presence(Self::BIT_OWNER_ID, true);
-        self.owner_id.value_mut(&self._common.alloc)
+        self.owner_id.value_mut(self._common.alloc.clone())
     }
 
     pub fn clear_owner_id(&mut self) {
@@ -215,9 +215,9 @@ impl<A: Allocator + Clone> Task<A> {
 
     pub fn payload_mut<'s>(
         &'s mut self,
-    ) -> impl ::core::ops::DerefMut<Target = ::allocator_api2::vec::Vec<u8, &'s A>> + 's {
+    ) -> impl ::core::ops::DerefMut<Target = ::allocator_api2::vec::Vec<u8, A>> + 's {
         self._common.set_presence(Self::BIT_PAYLOAD, true);
-        self.payload.value_mut(&self._common.alloc)
+        self.payload.value_mut(self._common.alloc.clone())
     }
 
     pub fn clear_payload(&mut self) {
@@ -232,12 +232,12 @@ impl<A: Allocator + Clone> Task<A> {
 
     pub fn tag_ids_mut<'s>(
         &'s mut self,
-    ) -> impl ::core::ops::DerefMut<Target = ::allocator_api2::vec::Vec<i32, &'s A>> + 's {
-        self.tag_ids.values_mut(&self._common.alloc)
+    ) -> impl ::core::ops::DerefMut<Target = ::allocator_api2::vec::Vec<i32, A>> + 's {
+        self.tag_ids.values_mut(self._common.alloc.clone())
     }
 
     pub fn clear_tag_ids(&mut self) {
-        self.tag_ids.clear(&self._common.alloc);
+        self.tag_ids.clear(self._common.alloc.clone());
     }
 
     // -- scores (repeated int32 EXPANDED, proto field 7) ---------------------
@@ -248,12 +248,12 @@ impl<A: Allocator + Clone> Task<A> {
 
     pub fn scores_mut<'s>(
         &'s mut self,
-    ) -> impl ::core::ops::DerefMut<Target = ::allocator_api2::vec::Vec<i32, &'s A>> + 's {
-        self.scores.values_mut(&self._common.alloc)
+    ) -> impl ::core::ops::DerefMut<Target = ::allocator_api2::vec::Vec<i32, A>> + 's {
+        self.scores.values_mut(self._common.alloc.clone())
     }
 
     pub fn clear_scores(&mut self) {
-        self.scores.clear(&self._common.alloc);
+        self.scores.clear(self._common.alloc.clone());
     }
 
     // -- labels (repeated string, proto field 8) -----------------------------
@@ -265,11 +265,11 @@ impl<A: Allocator + Clone> Task<A> {
     /// Typed append helper for repeated LEN fields (the `_mut` accessor would
     /// expose allocator-less element storage, which is impractical to build).
     pub fn push_label(&mut self, v: &str) {
-        self.labels.push_in(&self._common.alloc, v).ok();
+        self.labels.push_in(self._common.alloc.clone(), v).ok();
     }
 
     pub fn clear_labels(&mut self) {
-        self.labels.clear(&self._common.alloc);
+        self.labels.clear(self._common.alloc.clone());
     }
 
     // -- status (IMPLICIT open enum, proto field 9) -------------------------
@@ -315,7 +315,7 @@ impl<A: Allocator + Clone> Task<A> {
     }
 
     pub fn clear_assignee(&mut self) {
-        self.assignee.clear(&self._common.alloc);
+        self.assignee.clear(self._common.alloc.clone());
     }
 
     // -- oneof notification (proto fields 12 / 13) --------------------------
@@ -326,26 +326,29 @@ impl<A: Allocator + Clone> Task<A> {
 
     pub fn set_email_address(&mut self, v: &str) {
         if let Some(old) = self.notification.take() {
-            // SAFETY: the message allocator owns the previous variant's buffer.
-            unsafe { old.deallocate(&self._common.alloc) };
+            // SAFETY: an owned clone of the message allocator owns the previous
+            // variant's buffer.
+            unsafe { old.deallocate(self._common.alloc.clone()) };
         }
-        let s = ::puroro::decode::str_to_unmanaged_in(v, &self._common.alloc);
+        let s = ::puroro::decode::str_to_unmanaged_in(v, self._common.alloc.clone());
         self.notification.set(Some(Notification::EmailAddress(s)));
     }
 
     pub fn set_phone_number(&mut self, v: &str) {
         if let Some(old) = self.notification.take() {
-            // SAFETY: the message allocator owns the previous variant's buffer.
-            unsafe { old.deallocate(&self._common.alloc) };
+            // SAFETY: an owned clone of the message allocator owns the previous
+            // variant's buffer.
+            unsafe { old.deallocate(self._common.alloc.clone()) };
         }
-        let s = ::puroro::decode::str_to_unmanaged_in(v, &self._common.alloc);
+        let s = ::puroro::decode::str_to_unmanaged_in(v, self._common.alloc.clone());
         self.notification.set(Some(Notification::PhoneNumber(s)));
     }
 
     pub fn clear_notification(&mut self) {
         if let Some(old) = self.notification.take() {
-            // SAFETY: the message allocator owns the active variant's buffer.
-            unsafe { old.deallocate(&self._common.alloc) };
+            // SAFETY: an owned clone of the message allocator owns the active
+            // variant's buffer.
+            unsafe { old.deallocate(self._common.alloc.clone()) };
         }
     }
 
@@ -389,16 +392,17 @@ impl<A: Allocator + Clone + Default> Default for Task<A> {
 
 impl<A: Allocator + Clone> Drop for Task<A> {
     fn drop(&mut self) {
-        self.title.deallocate(&self._common.alloc);
-        self.owner_id.deallocate(&self._common.alloc);
-        self.payload.deallocate(&self._common.alloc);
-        self.tag_ids.deallocate(&self._common.alloc);
-        self.scores.deallocate(&self._common.alloc);
-        self.labels.deallocate(&self._common.alloc);
-        self.assignee.deallocate(&self._common.alloc);
+        self.title.deallocate(self._common.alloc.clone());
+        self.owner_id.deallocate(self._common.alloc.clone());
+        self.payload.deallocate(self._common.alloc.clone());
+        self.tag_ids.deallocate(self._common.alloc.clone());
+        self.scores.deallocate(self._common.alloc.clone());
+        self.labels.deallocate(self._common.alloc.clone());
+        self.assignee.deallocate(self._common.alloc.clone());
         if let Some(n) = self.notification.take() {
-            // SAFETY: the message allocator owns the active variant's buffer.
-            unsafe { n.deallocate(&self._common.alloc) };
+            // SAFETY: an owned clone of the message allocator owns the active
+            // variant's buffer.
+            unsafe { n.deallocate(self._common.alloc.clone()) };
         }
         self._common.deallocate();
     }
@@ -501,15 +505,18 @@ impl<A: Allocator + Clone> MessageDecode for Task<A> {
                 }
                 Self::FIELD_TAG_IDS => {
                     // tag_ids = 6, repeated int32 PACKED
-                    self.tag_ids.merge(&self._common.alloc, wire_type, buf)?;
+                    self.tag_ids
+                        .merge(self._common.alloc.clone(), wire_type, buf)?;
                 }
                 Self::FIELD_SCORES => {
                     // scores = 7, repeated int32 EXPANDED
-                    self.scores.merge(&self._common.alloc, wire_type, buf)?;
+                    self.scores
+                        .merge(self._common.alloc.clone(), wire_type, buf)?;
                 }
                 Self::FIELD_LABELS => {
                     // labels = 8, repeated string
-                    self.labels.merge(&self._common.alloc, wire_type, buf)?;
+                    self.labels
+                        .merge(self._common.alloc.clone(), wire_type, buf)?;
                 }
                 Self::FIELD_STATUS => {
                     // status = 9, IMPLICIT open enum
@@ -546,7 +553,7 @@ impl<A: Allocator + Clone> MessageDecode for Task<A> {
                         wire_type,
                         buf,
                         &mut self._common.unknown_fields,
-                        &self._common.alloc,
+                        self._common.alloc.clone(),
                     )?
                 }
             }
@@ -595,10 +602,11 @@ fn merge_notification_email<A: Allocator + Clone, B: Buf>(
     if wire_type != WireType::Len {
         return Err(DecodeError::InvalidTag);
     }
-    let s = ::puroro::decode::decode_string_in(buf, &common.alloc)?;
+    let s = ::puroro::decode::decode_string_in(buf, common.alloc.clone())?;
     if let Some(old) = slot.take() {
-        // SAFETY: `common.alloc` owns the previous variant's buffer.
-        unsafe { old.deallocate(&common.alloc) };
+        // SAFETY: an owned clone of `common.alloc` owns the previous variant's
+        // buffer.
+        unsafe { old.deallocate(common.alloc.clone()) };
     }
     slot.set(Some(Notification::EmailAddress(s)));
     Ok(())
@@ -613,10 +621,11 @@ fn merge_notification_phone<A: Allocator + Clone, B: Buf>(
     if wire_type != WireType::Len {
         return Err(DecodeError::InvalidTag);
     }
-    let s = ::puroro::decode::decode_string_in(buf, &common.alloc)?;
+    let s = ::puroro::decode::decode_string_in(buf, common.alloc.clone())?;
     if let Some(old) = slot.take() {
-        // SAFETY: `common.alloc` owns the previous variant's buffer.
-        unsafe { old.deallocate(&common.alloc) };
+        // SAFETY: an owned clone of `common.alloc` owns the previous variant's
+        // buffer.
+        unsafe { old.deallocate(common.alloc.clone()) };
     }
     slot.set(Some(Notification::PhoneNumber(s)));
     Ok(())

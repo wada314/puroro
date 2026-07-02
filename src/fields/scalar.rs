@@ -190,7 +190,7 @@ impl<T: VarintProtoType, P: ExplicitFieldPresence> SingularVarintField<T, P> {
     ) -> Result<(), DecodeError>
     where
         Pb: PresenceBits,
-        A: ::allocator_api2::alloc::Allocator,
+        A: ::allocator_api2::alloc::Allocator + Clone,
         T::Value: Copy,
     {
         if wire_type != varint::WIRE_TYPE {
@@ -203,7 +203,7 @@ impl<T: VarintProtoType, P: ExplicitFieldPresence> SingularVarintField<T, P> {
                 field,
                 raw,
                 &mut common.unknown_fields,
-                &common.alloc,
+                common.alloc.clone(),
             );
             return Ok(());
         }

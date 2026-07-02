@@ -77,14 +77,21 @@ impl<M, A: Allocator> NestedMessageField<M, A> {
         }
     }
 
-    /// Releases the child through `alloc`, if present. Also used by generated
-    /// `clear_*` accessors.
-    pub fn deallocate(&mut self, alloc: &A) {
+    /// Releases the child through the owned `alloc`, if present. Also used by
+    /// generated `clear_*` accessors.
+    pub fn deallocate(&mut self, alloc: A) {
         if let Some(b) = self.child.take() {
-            // SAFETY: `alloc` owns the box's allocation; dropping the child runs
-            // its own `Drop`, which recursively frees its fields.
+            // SAFETY: an owned clone of the message allocator owns the box's
+            // allocation; dropping the child runs its own `Drop`, which
+            // recursively frees its fields.
             unsafe { b.deallocate(alloc) };
         }
+    }
+
+    /// Clears the nested message, freeing it through the owned `alloc`.
+    #[inline]
+    pub fn clear(&mut self, alloc: A) {
+        self.deallocate(alloc);
     }
 }
 
@@ -96,15 +103,9 @@ impl<M, A: Allocator + Clone> NestedMessageField<M, A> {
     {
         if self.child.is_none() {
             let m = M::new_in(common.alloc.clone());
-            self.child = Some(UnmanagedBox::new_in(m, &common.alloc));
+            self.child = Some(UnmanagedBox::new_in(m, common.alloc.clone()));
         }
         self.child.as_deref_mut().unwrap()
-    }
-
-    /// Clears the nested message, freeing it through `alloc`.
-    #[inline]
-    pub fn clear(&mut self, alloc: &A) {
-        self.deallocate(alloc);
     }
 
     /// Merges one LEN occurrence into the child (creates child on first merge).
@@ -127,7 +128,7 @@ impl<M, A: Allocator + Clone> NestedMessageField<M, A> {
         let mut sub = buf.take(len);
         if self.child.is_none() {
             let m = M::new_in(common.alloc.clone());
-            self.child = Some(UnmanagedBox::new_in(m, &common.alloc));
+            self.child = Some(UnmanagedBox::new_in(m, common.alloc.clone()));
         }
         let child = self.child.as_deref_mut().unwrap();
         child.merge_from(&mut sub)?;

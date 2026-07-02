@@ -83,9 +83,9 @@ impl<A: Allocator + Clone> Address<A> {
 
     pub fn street_mut<'s>(
         &'s mut self,
-    ) -> impl ::core::ops::DerefMut<Target = ::unmanaged::String<&'s A>> + 's {
+    ) -> impl ::core::ops::DerefMut<Target = ::unmanaged::String<A>> + 's {
         self._common.set_presence(Self::BIT_STREET, true);
-        self.street.value_mut(&self._common.alloc)
+        self.street.value_mut(self._common.alloc.clone())
     }
 
     pub fn clear_street(&mut self) {
@@ -108,9 +108,9 @@ impl<A: Allocator + Clone> Address<A> {
 
     pub fn city_mut<'s>(
         &'s mut self,
-    ) -> impl ::core::ops::DerefMut<Target = ::unmanaged::String<&'s A>> + 's {
+    ) -> impl ::core::ops::DerefMut<Target = ::unmanaged::String<A>> + 's {
         self._common.set_presence(Self::BIT_CITY, true);
-        self.city.value_mut(&self._common.alloc)
+        self.city.value_mut(self._common.alloc.clone())
     }
 
     pub fn clear_city(&mut self) {
@@ -146,8 +146,8 @@ impl<A: Allocator + Clone> NestedMessage<A> for Address<A> {
 
 impl<A: Allocator + Clone> Drop for Address<A> {
     fn drop(&mut self) {
-        self.street.deallocate(&self._common.alloc);
-        self.city.deallocate(&self._common.alloc);
+        self.street.deallocate(self._common.alloc.clone());
+        self.city.deallocate(self._common.alloc.clone());
         self._common.deallocate();
     }
 }
@@ -197,7 +197,7 @@ impl<A: Allocator + Clone> MessageDecode for Address<A> {
                         wire_type,
                         buf,
                         &mut self._common.unknown_fields,
-                        &self._common.alloc,
+                        self._common.alloc.clone(),
                     )?
                 }
             }

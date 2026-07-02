@@ -729,9 +729,11 @@ pub struct Task<A: Allocator + Clone = Global> { /* … */ }
 
 `A` defaults to `Global`, so `Task` (without a type argument) works identically to a version without allocator support. The `Clone` bound lets each message clone its allocator into nested children and free every field from a single `Drop` (see below).
 
-**Single canonical allocator (no per-field copies).** The allocator is stored *once*, in `MessageCommon.alloc`. Heap-backed fields do **not** embed their own allocator: they use the allocator-less types from the private [`unmanaged`](unmanaged/) crate — `UnmanagedBox<T>`, `UnmanagedVec<T>`, `UnmanagedString` — which keep only `ptr`/`len`/`cap` inline and take `&A` on each operation that (de)allocates. For a non-ZST allocator (e.g. `&bumpalo::Bump`) this removes the redundant copy that a naive `Box<T, A>` / `Vec<T, A>` layout would embed in every field, so `size_of::<Task<A>>` grows by exactly one `A` regardless of field count.
+**Single canonical allocator (no per-field copies).** The allocator is stored *once*, in `MessageCommon.alloc`. Heap-backed fields do **not** embed their own allocator: they use the allocator-less types from the private [`unmanaged`](unmanaged/) crate — `UnmanagedBox<T>`, `UnmanagedVec<T>`, `UnmanagedString` — which keep only `ptr`/`len`/`cap` inline and receive an owned allocator (an `alloc.clone()`) on each operation that (de)allocates. For a non-ZST allocator (e.g. `&bumpalo::Bump`) this removes the redundant copy that a naive `Box<T, A>` / `Vec<T, A>` layout would embed in every field, so `size_of::<Task<A>>` grows by exactly one `A` regardless of field count.
 
-**Manual release via `Drop`.** Because `unmanaged` values cannot free themselves (they panic if dropped implicitly), each field wraps its payload in `ManuallyDrop` and exposes `deallocate(&mut self, alloc: &A)`. Every generated message implements `Drop`, walking its fields and calling `deallocate` with the single `MessageCommon.alloc`; nested messages are freed recursively by their own `Drop`. The `unsafe` boundary is confined to the `puroro` runtime and the generated `Drop`.
+**Owned allocator, never a borrow.** Operations pass the allocator **by value** rather than `&A`: the caller clones the canonical `MessageCommon.alloc` for each field operation. This keeps the allocator type consistently `A` for both a buffer's growth and its eventual free — mixing `&A` at allocation with `A` at deallocation is fragile and not obviously idempotent. Correctness relies on the `Allocator + Clone` contract that clones are interchangeable. (The one exception is building an *empty* `unmanaged` container, which never allocates, so it may borrow.)
+
+**Manual release via `Drop`.** Because `unmanaged` values cannot free themselves (they panic if dropped implicitly), each field wraps its payload in `ManuallyDrop` and exposes `deallocate(&mut self, alloc: A)`. Every generated message implements `Drop`, walking its fields and calling `deallocate` with an `alloc.clone()` of the single `MessageCommon.alloc`; nested messages are freed recursively by their own `Drop`. The `unsafe` boundary is confined to the `puroro` runtime and the generated `Drop`.
 
 **Constructor API:**
 
@@ -748,9 +750,9 @@ impl Task<Global> {
 impl<A: Allocator + Clone + Default> Default for Task<A> { … }
 ```
 
-**Derived traits.** Generated messages implement `Default` (for `A: Allocator + Clone + Default`) plus a custom `Drop` (for `A: Allocator + Clone`). Additional `Global`-only convenience (`Task::new()`) applies when `A = Global`. `Clone` / `PartialEq` / `Debug` cannot be `#[derive]`d because the allocator-less fields need `&A` to copy or format; a `clone_in(&self, alloc)`-style API is future work. Wire bytes are not deterministic across encodes; compare semantically via getters. Full matrix: [IMPLEMENTATION.md §13](IMPLEMENTATION.md#13-derived-traits).
+**Derived traits.** Generated messages implement `Default` (for `A: Allocator + Clone + Default`) plus a custom `Drop` (for `A: Allocator + Clone`). Additional `Global`-only convenience (`Task::new()`) applies when `A = Global`. `Clone` / `PartialEq` / `Debug` cannot be `#[derive]`d because the allocator-less fields need an owned allocator to copy or format; a `clone_in(&self, alloc)`-style API is future work. Wire bytes are not deterministic across encodes; compare semantically via getters. Full matrix: [IMPLEMENTATION.md §13](IMPLEMENTATION.md#13-derived-traits).
 
-**Mutation API (`_mut`).** Mutation is unified under `_mut` accessors that return a guard implementing `impl DerefMut<Target = …>` (RPIT): `title_mut()` yields `impl DerefMut<Target = ::unmanaged::String<&A>>`, `payload_mut()`/`tag_ids_mut()` yield `impl DerefMut<Target = Vec<_, &A>>`, and scalar/enum `_mut` accessors return `&mut T`. Acquiring an explicit-presence `_mut` sets the presence bit. The old `set_*` / `push_*` setters are removed; the one exception is repeated `string`/`bytes`, which keep a typed `push_*` helper because their element storage is allocator-less and impractical to construct through a bare `DerefMut`.
+**Mutation API (`_mut`).** Mutation is unified under `_mut` accessors that return a guard implementing `impl DerefMut<Target = …>` (RPIT): `title_mut()` yields `impl DerefMut<Target = ::unmanaged::String<A>>`, `payload_mut()`/`tag_ids_mut()` yield `impl DerefMut<Target = Vec<_, A>>`, and scalar/enum `_mut` accessors return `&mut T`. The guard **owns** a clone of the message allocator (the accessor passes `self._common.alloc.clone()`), so growth and the eventual free both use allocator type `A`. Acquiring an explicit-presence `_mut` sets the presence bit. The old `set_*` / `push_*` setters are removed; the one exception is repeated `string`/`bytes`, which keep a typed `push_*` helper because their element storage is allocator-less and impractical to construct through a bare `DerefMut`.
 
 **Decode API:**
 
@@ -769,8 +771,10 @@ let bump = bumpalo::Bump::new();
 let mut t = Task::new_in(&bump);
 t.title_mut().push_str("Fix bug");
 // All allocations (title, labels, nested messages) land in `bump`.
-// When `t` drops, its `Drop` calls `deallocate(&bump)` on each field. For an
-// arena that is effectively a no-op; the memory is reclaimed in bulk when
+// Here `A = &Bump`, which is `Copy`, so each op just re-uses the borrow; for an
+// owned arena handle the message would clone it per op instead.
+// When `t` drops, its `Drop` calls `deallocate((&bump).clone())` on each field.
+// For an arena that is effectively a no-op; the memory is reclaimed in bulk when
 // `bump` itself is dropped. (For `Global`, `deallocate` returns the blocks.)
 ```
 

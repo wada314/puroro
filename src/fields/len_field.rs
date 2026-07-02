@@ -42,11 +42,15 @@ impl<T: LenProtoType, P: FieldPresence, A: Allocator> SingularLenField<T, P, A> 
         T::borrow(&self.value)
     }
 
-    /// Returns a growable handle over the payload, borrowing `alloc`.
+    /// Returns a growable handle over the payload, backed by the owned `alloc`.
+    ///
+    /// The allocator is taken by value (callers pass an `alloc.clone()`): the
+    /// returned guard owns it, so growth and the eventual free all use the same
+    /// allocator type `A` rather than a borrow.
     ///
     /// Presence is the caller's responsibility: generated `_mut` accessors set
     /// the presence bit before calling this.
-    pub fn value_mut<'a>(&'a mut self, alloc: &'a A) -> T::Mut<'a, &'a A> {
+    pub fn value_mut(&mut self, alloc: A) -> T::Mut<'_, A> {
         T::with_alloc(&mut self.value, alloc)
     }
 
@@ -59,15 +63,18 @@ impl<T: LenProtoType, P: FieldPresence, A: Allocator> SingularLenField<T, P, A> 
     ) -> Result<(), DecodeError>
     where
         Pb: PresenceBits,
+        A: Clone,
     {
         if wire_type != len::WIRE_TYPE {
             return Err(DecodeError::InvalidTag);
         }
-        // Decode first so a failure leaves the old value intact.
-        let new = T::decode(buf, &common.alloc)?;
+        // Decode first so a failure leaves the old value intact. Each `unmanaged`
+        // op gets its own owned `alloc` clone (never a borrow).
+        let new = T::decode(buf, common.alloc.clone())?;
         let old = unsafe { ManuallyDrop::take(&mut self.value) };
-        // SAFETY: `common.alloc` owns the old payload's buffer.
-        unsafe { T::deallocate(old, &common.alloc) };
+        // SAFETY: an owned clone of `common.alloc` is interchangeable with the
+        // allocator that owns the old payload's buffer.
+        unsafe { T::deallocate(old, common.alloc.clone()) };
         self.value = ManuallyDrop::new(new);
         P::on_set(common, bit);
         Ok(())
@@ -100,10 +107,11 @@ impl<T: LenProtoType, P: FieldPresence, A: Allocator> SingularLenField<T, P, A> 
         }
     }
 
-    /// Releases the payload through `alloc`. Terminal; call once from the
-    /// owning message's `Drop`, after which `self` must not be used.
-    pub fn deallocate(&mut self, alloc: &A) {
-        // SAFETY: called once; `alloc` owns the payload's buffer.
+    /// Releases the payload through the owned `alloc`. Terminal; call once from
+    /// the owning message's `Drop`, after which `self` must not be used.
+    pub fn deallocate(&mut self, alloc: A) {
+        // SAFETY: called once; an owned clone of the message allocator owns the
+        // payload's buffer.
         let old = unsafe { ManuallyDrop::take(&mut self.value) };
         unsafe { T::deallocate(old, alloc) };
     }
@@ -140,12 +148,14 @@ impl<T: LenProtoType, P: ExplicitFieldPresence, A: Allocator> SingularLenField<T
     pub fn clear<Pb>(&mut self, common: &mut MessageCommon<Pb, A>, bit: usize)
     where
         Pb: PresenceBits,
+        A: Clone,
     {
         P::on_clear(common, bit);
         let old = unsafe { ManuallyDrop::take(&mut self.value) };
-        // SAFETY: `common.alloc` owns the old payload's buffer.
-        unsafe { T::deallocate(old, &common.alloc) };
-        self.value = ManuallyDrop::new(T::new_empty(&common.alloc));
+        // SAFETY: an owned clone of `common.alloc` is interchangeable with the
+        // allocator that owns the old payload's buffer.
+        unsafe { T::deallocate(old, common.alloc.clone()) };
+        self.value = ManuallyDrop::new(T::new_empty(common.alloc.clone()));
     }
 }
 

@@ -46,15 +46,18 @@ impl<T: VarintProtoType, E: RepeatedVarintEncoding, A: Allocator> RepeatedVarint
         self.values.is_empty()
     }
 
-    /// Returns a growable handle over the elements, borrowing `alloc`.
-    pub fn values_mut<'a>(&'a mut self, alloc: &'a A) -> VecGuard<'a, T::Value, &'a A> {
-        // SAFETY: `alloc` owns this vector's buffer for its whole lifetime.
+    /// Returns a growable handle over the elements, backed by the owned `alloc`
+    /// (callers pass an `alloc.clone()`); the guard owns it.
+    pub fn values_mut(&mut self, alloc: A) -> VecGuard<'_, T::Value, A> {
+        // SAFETY: an owned clone of the message allocator owns this vector's
+        // buffer.
         unsafe { self.values.with_alloc(alloc) }
     }
 
     /// Empties the vector (keeps the buffer capacity).
-    pub fn clear(&mut self, alloc: &A) {
-        // SAFETY: `alloc` owns this vector's buffer.
+    pub fn clear(&mut self, alloc: A) {
+        // SAFETY: an owned clone of the message allocator owns this vector's
+        // buffer.
         let mut g = unsafe { self.values.with_alloc(alloc) };
         g.clear();
     }
@@ -76,11 +79,12 @@ impl<T: VarintProtoType, E: RepeatedVarintEncoding, A: Allocator> RepeatedVarint
     /// Merges one packed (LEN) or expanded (VARINT) occurrence — appends element(s).
     pub fn merge<B: Buf>(
         &mut self,
-        alloc: &A,
+        alloc: A,
         wire_type: WireType,
         buf: &mut B,
     ) -> Result<(), DecodeError> {
-        // SAFETY: `alloc` owns this vector's buffer.
+        // SAFETY: an owned clone of the message allocator owns this vector's
+        // buffer.
         let mut g = unsafe { self.values.with_alloc(alloc) };
         match wire_type {
             WireType::Len => {
@@ -103,11 +107,11 @@ impl<T: VarintProtoType, E: RepeatedVarintEncoding, A: Allocator> RepeatedVarint
         Ok(())
     }
 
-    /// Releases the backing buffer through `alloc`. Terminal; call once from the
-    /// owning message's `Drop`.
-    pub fn deallocate(&mut self, alloc: &A) {
-        // SAFETY: called once; `alloc` owns the buffer. Elements are `Copy`
-        // scalars with no per-element cleanup.
+    /// Releases the backing buffer through the owned `alloc`. Terminal; call
+    /// once from the owning message's `Drop`.
+    pub fn deallocate(&mut self, alloc: A) {
+        // SAFETY: called once; an owned clone of the message allocator owns the
+        // buffer. Elements are `Copy` scalars with no per-element cleanup.
         let v = unsafe { ManuallyDrop::take(&mut self.values) };
         unsafe { v.deallocate(alloc) };
     }

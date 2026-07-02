@@ -30,9 +30,11 @@ pub struct MessageCommon<P, A: Allocator> {
 impl<P, A: Allocator> MessageCommon<P, A> {
     /// Creates common state with the given presence bitfield and allocator.
     pub fn new_in(presence: P, alloc: A) -> Self {
-        // `UnmanagedVec::new` does not allocate; it only needs an allocator to
-        // decompose an empty `Vec`. Borrow `alloc` so it stays owned for the
-        // canonical `alloc` slot below.
+        // `UnmanagedVec::new` does not allocate; it only decomposes an empty
+        // `Vec`, so the borrow here never establishes buffer ownership (this is
+        // the documented no-op use of `UnmanagedVec::new(&alloc)`). Once the
+        // buffer actually grows it is owned by an owned-`A` clone, and it is
+        // freed with an owned-`A` clone in `deallocate`.
         let unknown_fields = ManuallyDrop::new(UnmanagedVec::new(&alloc));
         Self {
             presence,
@@ -40,14 +42,17 @@ impl<P, A: Allocator> MessageCommon<P, A> {
             alloc,
         }
     }
+}
 
+impl<P, A: Allocator + Clone> MessageCommon<P, A> {
     /// Releases the unknown-field buffer. Must be called exactly once from the
     /// owning message's `Drop`; afterwards `self` must not be used.
     pub fn deallocate(&mut self) {
         // SAFETY: called once from the message `Drop`; `unknown_fields` is not
-        // touched again, and `self.alloc` is the allocator that owns the buffer.
+        // touched again, and an owned clone of `self.alloc` is interchangeable
+        // with the clones that grew the buffer (`Allocator + Clone` contract).
         let uf = unsafe { ManuallyDrop::take(&mut self.unknown_fields) };
-        unsafe { uf.deallocate(&self.alloc) };
+        unsafe { uf.deallocate(self.alloc.clone()) };
     }
 }
 

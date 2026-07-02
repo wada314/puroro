@@ -82,22 +82,18 @@ pub fn decode_bytes_in<B: Buf, A: Allocator>(
     if buf.remaining() < len {
         return Err(DecodeError::TruncatedMessage);
     }
-    let mut uv = UnmanagedVec::<u8>::new(&alloc);
-    {
-        // SAFETY: `&alloc` is the allocator that owns (and will grow) this
-        // vector's buffer for its whole lifetime.
-        let mut g = unsafe { uv.with_alloc(&alloc) };
-        g.reserve(len);
-        let mut remaining = len;
-        while remaining > 0 {
-            let chunk = buf.chunk();
-            let to_copy = chunk.len().min(remaining);
-            g.extend_from_slice(&chunk[..to_copy]);
-            buf.advance(to_copy);
-            remaining -= to_copy;
-        }
+    // Build an owned `Vec` with the owned `alloc`, then hand its buffer over to
+    // an `UnmanagedVec`. The buffer is thus owned by allocator type `A`.
+    let mut vec = ::allocator_api2::vec::Vec::<u8, A>::with_capacity_in(len, alloc);
+    let mut remaining = len;
+    while remaining > 0 {
+        let chunk = buf.chunk();
+        let to_copy = chunk.len().min(remaining);
+        vec.extend_from_slice(&chunk[..to_copy]);
+        buf.advance(to_copy);
+        remaining -= to_copy;
     }
-    Ok(uv)
+    Ok(UnmanagedVec::from_vec(vec))
 }
 
 /// Decodes one LEN payload as UTF-8 into an allocator-less [`UnmanagedString`].
@@ -114,26 +110,18 @@ pub fn decode_string_in<B: Buf, A: Allocator>(
     Ok(str_to_unmanaged_in(s, alloc))
 }
 
-/// Copies `s` into a freshly allocated [`UnmanagedString`] backed by `alloc`.
+/// Copies `s` into a freshly allocated [`UnmanagedString`] backed by the owned
+/// `alloc` (its buffer is owned by allocator type `A`).
 pub fn str_to_unmanaged_in<A: Allocator>(s: &str, alloc: A) -> UnmanagedString {
-    let mut us = UnmanagedString::new(&alloc);
-    {
-        // SAFETY: `&alloc` owns this string's buffer for its whole lifetime.
-        let mut g = unsafe { us.with_alloc(&alloc) };
-        g.push_str(s);
-    }
-    us
+    UnmanagedString::from_string(::unmanaged::String::from_str_in(s, alloc))
 }
 
-/// Copies `v` into a freshly allocated [`UnmanagedVec<u8>`] backed by `alloc`.
+/// Copies `v` into a freshly allocated [`UnmanagedVec<u8>`] backed by the owned
+/// `alloc` (its buffer is owned by allocator type `A`).
 pub fn bytes_to_unmanaged_in<A: Allocator>(v: &[u8], alloc: A) -> UnmanagedVec<u8> {
-    let mut uv = UnmanagedVec::<u8>::new(&alloc);
-    {
-        // SAFETY: `&alloc` owns this vector's buffer for its whole lifetime.
-        let mut g = unsafe { uv.with_alloc(&alloc) };
-        g.extend_from_slice(v);
-    }
-    uv
+    let mut vec = ::allocator_api2::vec::Vec::<u8, A>::with_capacity_in(v.len(), alloc);
+    vec.extend_from_slice(v);
+    UnmanagedVec::from_vec(vec)
 }
 
 // ---------------------------------------------------------------------------
@@ -145,9 +133,10 @@ pub fn skip_field_and_save<B: Buf, A: Allocator>(
     wire_type: WireType,
     buf: &mut B,
     unknown_fields: &mut UnmanagedVec<u8>,
-    alloc: &A,
+    alloc: A,
 ) -> Result<(), DecodeError> {
-    // SAFETY: `alloc` owns this vector's buffer for its whole lifetime.
+    // SAFETY: the owned `alloc` (an `alloc.clone()` from the caller) is
+    // interchangeable with the allocator that owns this vector's buffer.
     let mut g = unsafe { unknown_fields.with_alloc(alloc) };
     let tag = encode::tag_to_u64_for_unknown(field_number, wire_type);
     encode::write_varint_to_vec(tag, &mut *g);
@@ -191,9 +180,10 @@ pub fn save_unknown_varint_field<A: Allocator>(
     field_number: u32,
     value: u64,
     unknown_fields: &mut UnmanagedVec<u8>,
-    alloc: &A,
+    alloc: A,
 ) {
-    // SAFETY: `alloc` owns this vector's buffer for its whole lifetime.
+    // SAFETY: the owned `alloc` (an `alloc.clone()` from the caller) is
+    // interchangeable with the allocator that owns this vector's buffer.
     let mut g = unsafe { unknown_fields.with_alloc(alloc) };
     let tag = encode::tag_to_u64_for_unknown(field_number, WireType::Varint);
     encode::write_varint_to_vec(tag, &mut *g);
