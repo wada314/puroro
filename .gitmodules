@@ -1,3 +1,6 @@
 [submodule "protobuf-core"]
 	path = protobuf-core
 	url = git@github.com:wada314/protobuf-core.git
+[submodule "unmanaged"]
+	path = unmanaged
+	url = git@github.com:wada314/unmanaged.git
