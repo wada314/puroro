@@ -35,6 +35,16 @@ pub trait OneofDeallocate {
 
 /// Storage for a protobuf `oneof` group.
 ///
+/// `E` is the generated `enum` for the group: one unit-or-tuple variant per
+/// oneof member, each holding that member's storage (allocator-less
+/// `UnmanagedString` / `UnmanagedVec`, a nested-message box, or an inline scalar
+/// — never an allocator). At most one variant is active, so the slot is just an
+/// `Option<E>`. For the allocator-owning cases, `E` is expected to implement
+/// [`OneofDeallocate`] so a previously-active variant can be released explicitly
+/// before it is overwritten; that bound is required by the mutating view
+/// ([`OneofSlotMut`]) rather than by the slot itself, so plain read/encode paths
+/// stay free of it.
+///
 /// The stored variant is replaced whenever another one is set or decoded (last
 /// wins on the wire). All mutation goes through [`bind`](Self::bind); the
 /// inherent [`set`](Self::set) / [`take`](Self::take) / [`clear`](Self::clear)

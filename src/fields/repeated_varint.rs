@@ -24,7 +24,7 @@ use super::varint::{self, VarintProtoType};
 ///
 /// Param `E` is [`Packed`](super::repeated_encoding::Packed) or
 /// [`Expanded`](super::repeated_encoding::Expanded) — affects **encode only**.
-/// [`merge`](Self::merge) accepts both packed and expanded wire forms.
+/// [`RepeatedVarintFieldMut::merge`] accepts both packed and expanded wire forms.
 pub struct RepeatedVarintField<T: VarintProtoType, E: RepeatedVarintEncoding, A: Allocator> {
     values: ManuallyDrop<UnmanagedVec<T::Value>>,
     _marker: PhantomData<(E, A)>,
