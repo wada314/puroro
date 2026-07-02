@@ -29,7 +29,7 @@ pub struct SingularLenField<T: LenProtoType, P: FieldPresence, A: Allocator> {
 }
 
 impl<T: LenProtoType, P: FieldPresence, A: Allocator> SingularLenField<T, P, A> {
-    pub fn new_in(alloc: &A) -> Self {
+    pub fn new_in(alloc: A) -> Self {
         Self {
             value: ManuallyDrop::new(T::new_empty(alloc)),
             _marker: PhantomData,

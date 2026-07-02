@@ -93,22 +93,22 @@ impl<A: Allocator + Clone> Task<A> {
 
 impl<A: Allocator + Clone> Task<A> {
     pub fn new_in(alloc: A) -> Self {
-        // Fields borrow `alloc` (no per-field clone); the single canonical copy
-        // is moved into `_common` last.
+        // Each field initializer gets its own clone of the allocator; the last
+        // heap field (`labels`) takes the original by move.
         Self {
-            title: SingularLenField::new_in(&alloc),
+            _common: MessageCommon::new_in(TaskPresence::ZERO, alloc.clone()),
+            title: SingularLenField::new_in(alloc.clone()),
             score: SingularVarintField::new(),
             max_retries: SingularVarintField::new(),
-            owner_id: SingularLenField::new_in(&alloc),
-            payload: SingularLenField::new_in(&alloc),
-            tag_ids: RepeatedPackedVarintField::new_in(&alloc),
-            scores: RepeatedExpandedVarintField::new_in(&alloc),
-            labels: RepeatedLenField::new_in(&alloc),
+            owner_id: SingularLenField::new_in(alloc.clone()),
+            payload: SingularLenField::new_in(alloc.clone()),
+            tag_ids: RepeatedPackedVarintField::new_in(alloc.clone()),
+            scores: RepeatedExpandedVarintField::new_in(alloc.clone()),
+            labels: RepeatedLenField::new_in(alloc),
             status: SingularVarintField::new(),
             priority: SingularVarintField::new(),
             assignee: NestedMessageField::new(),
             notification: OneofSlot::new(),
-            _common: MessageCommon::new_in(TaskPresence::ZERO, alloc),
         }
     }
 

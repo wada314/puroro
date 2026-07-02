@@ -396,7 +396,7 @@ Generated code indexes bits only inside this `impl`, never elsewhere.
 
 ## 11. Constructors & allocator
 
-- **`Task::new_in(alloc)`** — default every field; `_common.presence = TaskPresence::ZERO`; heap fields via `*_in(&alloc)` (they only need a borrow to build the empty `unmanaged` container). The single owned `alloc` is moved into `_common` last, so construction needs no `A: Clone`.
+- **`Task::new_in(alloc)`** — default every field; `_common.presence = TaskPresence::ZERO`; heap fields via `*_in(alloc.clone())`, with the last heap field taking the original by move. (Building an empty `unmanaged` container does not allocate, so the clone is only used to decompose an empty `Vec`.)
 - **`Task::new()`** — when `A = Global`.
 - **`Default`** — `A: Clone + Default` → `new_in(A::default())`.
 

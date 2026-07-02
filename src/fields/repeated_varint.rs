@@ -29,7 +29,7 @@ pub struct RepeatedVarintField<T: VarintProtoType, E: RepeatedVarintEncoding, A:
 }
 
 impl<T: VarintProtoType, E: RepeatedVarintEncoding, A: Allocator> RepeatedVarintField<T, E, A> {
-    pub fn new_in(alloc: &A) -> Self {
+    pub fn new_in(alloc: A) -> Self {
         Self {
             values: ManuallyDrop::new(UnmanagedVec::new(alloc)),
             _marker: PhantomData,

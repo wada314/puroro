@@ -56,12 +56,12 @@ impl<A: Allocator + Clone> Address<A> {
 
 impl<A: Allocator + Clone> Address<A> {
     pub fn new_in(alloc: A) -> Self {
-        // Fields borrow `alloc` (no per-field clone); the single canonical copy
-        // is moved into `_common` last.
+        // Each field initializer gets its own clone of the allocator; the last
+        // heap field (`city`) takes the original by move.
         Self {
-            street: SingularLenField::new_in(&alloc),
-            city: SingularLenField::new_in(&alloc),
-            _common: MessageCommon::new_in(AddressPresence::ZERO, alloc),
+            _common: MessageCommon::new_in(AddressPresence::ZERO, alloc.clone()),
+            street: SingularLenField::new_in(alloc.clone()),
+            city: SingularLenField::new_in(alloc),
         }
     }
 

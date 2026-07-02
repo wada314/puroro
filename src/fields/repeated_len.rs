@@ -25,7 +25,7 @@ pub struct RepeatedLenField<T: LenProtoType, A: Allocator> {
 }
 
 impl<T: LenProtoType, A: Allocator> RepeatedLenField<T, A> {
-    pub fn new_in(alloc: &A) -> Self {
+    pub fn new_in(alloc: A) -> Self {
         Self {
             values: ManuallyDrop::new(UnmanagedVec::new(alloc)),
             _marker: PhantomData,
