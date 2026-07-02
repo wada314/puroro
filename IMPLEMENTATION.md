@@ -550,7 +550,7 @@ One LEN record per element (`repeated string` / `repeated bytes`), stored as `Ma
 
 Each wire occurrence replaces the whole slot (last wins). Encode active variant only. Decode: one match arm per variant field number; coupling stays in slot + generated helpers — not spread across singular members.
 
-Because variants hold allocator-less storage (`UnmanagedString`, …), the enum implements [`OneofVariant`](src/fields/oneof.rs) (`unsafe fn deallocate<A>(self, alloc)`) so the previously-active variant is freed before the slot is overwritten. Mutation uses the same bound-view idiom as the other families: `slot.bind(&mut common)` yields an [`OneofSlotMut`](src/fields/oneof.rs) whose consuming methods are:
+Because variants hold allocator-less storage (`UnmanagedString`, …), the enum implements [`OneofDeallocate`](src/fields/oneof.rs) (`unsafe fn deallocate<A>(self, alloc)`) so the previously-active variant is freed explicitly through the message allocator before the slot is overwritten. Mutation uses the same bound-view idiom as the other families: `slot.bind(&mut common)` yields an [`OneofSlotMut`](src/fields/oneof.rs) whose consuming methods are:
 
 - `variant_mut(is_match, make) -> &mut E` — keeps the active variant if `is_match`, else frees it and installs `make(alloc.clone())`; backs the per-variant `_mut` accessors, which then pattern-match out the inner storage and return a `with_alloc` guard.
 - `set(value)` — replaces the whole group (frees the old variant); backs the decode arms (`merge_notification_*` decode first, then `set`).

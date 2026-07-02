@@ -1,20 +1,20 @@
 //! Sample of the `oneof notification` enum puroro generates for `Task`.
 
 use ::allocator_api2::alloc::Allocator;
-use ::puroro::OneofVariant;
+use ::puroro::OneofDeallocate;
 use ::unmanaged::UnmanagedString;
 
 /// `oneof notification { string email_address = 12; string phone_number = 13; }`
 ///
 /// Variants hold allocator-less [`UnmanagedString`]; the parent `Task` releases
-/// the active variant via the [`OneofVariant`] impl (from its `Drop` and before
-/// overwriting the oneof).
+/// the active variant via the [`OneofDeallocate`] impl (from its `Drop` and
+/// before overwriting the oneof).
 pub enum Notification {
     EmailAddress(UnmanagedString),
     PhoneNumber(UnmanagedString),
 }
 
-impl OneofVariant for Notification {
+impl OneofDeallocate for Notification {
     /// Drops the active variant's string and frees it through `alloc`.
     ///
     /// # Safety

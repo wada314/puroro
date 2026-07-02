@@ -8,21 +8,23 @@
 //! [`OneofSlot::bind`], mirroring the bound-view idiom used by the singular /
 //! repeated field families: the slot is bound to the message
 //! [`MessageCommon`] (for the allocator), and the previously-active variant is
-//! released through [`OneofVariant::deallocate`] before the slot is overwritten.
+//! released through [`OneofDeallocate::deallocate`] before the slot is overwritten.
 
 use ::allocator_api2::alloc::Allocator;
 
 use super::common::MessageCommon;
 use super::presence::PresenceBits;
 
-/// Per-variant cleanup for a generated `oneof` enum.
+/// Explicit, allocator-driven release of a generated `oneof` enum.
 ///
 /// A oneof enum owns allocator-less storage in its variants (`UnmanagedString`,
 /// `UnmanagedVec`, nested messages, …), which cannot free themselves. The enum
-/// implements this trait so [`OneofSlotMut`] can release the active variant
-/// before overwriting the slot. Variants that hold only inline scalars make
-/// `deallocate` a no-op.
-pub trait OneofVariant {
+/// implements this trait so [`OneofSlotMut`] can release the active variant —
+/// handing it the message allocator — before overwriting the slot. This mirrors
+/// the `deallocate(self, alloc)` contract of the `unmanaged` types: the name
+/// stresses that dropping is *not* implicit; the caller must pass the owning
+/// allocator. Variants that hold only inline scalars make `deallocate` a no-op.
+pub trait OneofDeallocate {
     /// Drops the active variant and frees its storage through `alloc`.
     ///
     /// # Safety
@@ -113,7 +115,7 @@ impl<E> Default for OneofSlot<E> {
 ///
 /// Bundles the slot with the allocator context so that generated code can
 /// mutate through a single call while the previously-active variant is released
-/// consistently (via [`OneofVariant`]). A oneof has no presence bit, so the view
+/// consistently (via [`OneofDeallocate`]). A oneof has no presence bit, so the view
 /// carries only `common` (for the allocator). Every method consumes the view, so
 /// a fresh `bind` precedes each mutation.
 pub struct OneofSlotMut<'f, 'c, E, Pb: PresenceBits, A: Allocator> {
@@ -131,7 +133,7 @@ impl<'f, 'c, E, Pb: PresenceBits, A: Allocator> OneofSlotMut<'f, 'c, E, Pb, A> {
     /// variant first (last wins on the wire). Backs the decode arms.
     pub fn set(self, value: E)
     where
-        E: OneofVariant,
+        E: OneofDeallocate,
         A: Clone,
     {
         if let Some(old) = self.slot.take() {
@@ -153,7 +155,7 @@ impl<'f, 'c, E, Pb: PresenceBits, A: Allocator> OneofSlotMut<'f, 'c, E, Pb, A> {
         make: impl FnOnce(A) -> E,
     ) -> &'f mut E
     where
-        E: OneofVariant,
+        E: OneofDeallocate,
         A: Clone,
     {
         let slot = self.slot;
@@ -174,7 +176,7 @@ impl<'f, 'c, E, Pb: PresenceBits, A: Allocator> OneofSlotMut<'f, 'c, E, Pb, A> {
     /// Frees the active variant (if any), leaving the slot empty.
     pub fn clear(self)
     where
-        E: OneofVariant,
+        E: OneofDeallocate,
         A: Clone,
     {
         if let Some(old) = self.slot.take() {
