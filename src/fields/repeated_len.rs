@@ -1,31 +1,39 @@
 //! Repeated LEN field wrapper (`repeated string`, `repeated bytes`, …).
+//!
+//! Elements are stored in an allocator-less [`UnmanagedVec`] wrapped in
+//! [`ManuallyDrop`]; each element is itself allocator-less
+//! ([`LenProtoType::Storage`]). Releasing therefore drains and frees every
+//! element first, then frees the buffer.
+
+use ::core::marker::PhantomData;
+use ::core::mem::ManuallyDrop;
 
 use ::bytes::{Buf, BufMut};
 use ::allocator_api2::alloc::Allocator;
-use ::allocator_api2::vec::Vec as AVec;
+use ::unmanaged::UnmanagedVec;
 
 use crate::encode;
 use crate::error::DecodeError;
 use crate::wire_type::WireType;
 
-use super::common::MessageCommon;
 use super::len::{self, LenProtoType};
-use super::presence::PresenceBits;
 
 /// Repeated field whose elements are length-delimited records (one tag per element).
 pub struct RepeatedLenField<T: LenProtoType, A: Allocator> {
-    values: AVec<T::Storage<A>, A>,
+    values: ManuallyDrop<UnmanagedVec<T::Storage>>,
+    _marker: PhantomData<A>,
 }
 
-impl<T: LenProtoType, A: Allocator + Clone> RepeatedLenField<T, A> {
-    pub fn new_in(alloc: A) -> Self {
+impl<T: LenProtoType, A: Allocator> RepeatedLenField<T, A> {
+    pub fn new_in(alloc: &A) -> Self {
         Self {
-            values: AVec::new_in(alloc),
+            values: ManuallyDrop::new(UnmanagedVec::new(alloc)),
+            _marker: PhantomData,
         }
     }
 
     #[inline]
-    pub fn as_slice(&self) -> &[T::Storage<A>] {
+    pub fn as_slice(&self) -> &[T::Storage] {
         &self.values
     }
 
@@ -34,21 +42,23 @@ impl<T: LenProtoType, A: Allocator + Clone> RepeatedLenField<T, A> {
         self.values.is_empty()
     }
 
-    pub fn clear(&mut self) {
-        self.values.clear();
+    /// Appends an element built from a payload slice, allocating through `alloc`.
+    pub fn push_in(&mut self, alloc: &A, v: impl AsRef<[u8]>) -> Result<(), DecodeError> {
+        let stored = T::store_from_slice(v.as_ref(), alloc)?;
+        // SAFETY: `alloc` owns this vector's buffer for its whole lifetime.
+        let mut g = unsafe { self.values.with_alloc(alloc) };
+        g.push(stored);
+        Ok(())
     }
 
-    pub fn push<P>(
-        &mut self,
-        common: &MessageCommon<P, A>,
-        v: impl AsRef<[u8]>,
-    ) -> Result<(), DecodeError>
-    where
-        P: PresenceBits,
-    {
-        let stored = T::store_from_slice(v.as_ref(), common.alloc.clone())?;
-        self.values.push(stored);
-        Ok(())
+    /// Drops every element and empties the vector (keeps the buffer capacity).
+    pub fn clear(&mut self, alloc: &A) {
+        // SAFETY: `alloc` owns this vector's buffer.
+        let mut g = unsafe { self.values.with_alloc(alloc) };
+        while let Some(elem) = g.pop() {
+            // SAFETY: `alloc` owns each element's buffer.
+            unsafe { T::deallocate(elem, alloc) };
+        }
     }
 
     pub fn encoded_len(&self, field: u32) -> usize {
@@ -59,59 +69,39 @@ impl<T: LenProtoType, A: Allocator + Clone> RepeatedLenField<T, A> {
     }
 
     pub fn encode_raw<B: BufMut>(&self, field: u32, buf: &mut B) {
-        for v in &self.values {
+        for v in self.values.iter() {
             encode::encode_len_field(field, T::as_bytes(v), buf);
         }
     }
 
-    pub fn merge<P, B: Buf>(
+    pub fn merge<B: Buf>(
         &mut self,
-        common: &MessageCommon<P, A>,
+        alloc: &A,
         wire_type: WireType,
         buf: &mut B,
-    ) -> Result<(), DecodeError>
-    where
-        P: PresenceBits,
-    {
+    ) -> Result<(), DecodeError> {
         if wire_type != len::WIRE_TYPE {
             return Err(DecodeError::InvalidTag);
         }
-        let stored = T::decode(buf, common.alloc.clone())?;
-        self.values.push(stored);
+        let stored = T::decode(buf, alloc)?;
+        // SAFETY: `alloc` owns this vector's buffer.
+        let mut g = unsafe { self.values.with_alloc(alloc) };
+        g.push(stored);
         Ok(())
     }
-}
 
-impl<T: LenProtoType, A: Allocator + Clone> Clone for RepeatedLenField<T, A>
-where
-    T::Storage<A>: Clone,
-{
-    fn clone(&self) -> Self {
-        Self {
-            values: self.values.clone(),
+    /// Releases every element and the backing buffer through `alloc`.
+    /// Terminal; call once from the owning message's `Drop`.
+    pub fn deallocate(&mut self, alloc: &A) {
+        // SAFETY: called once; `alloc` owns the buffer and every element.
+        let mut v = unsafe { ManuallyDrop::take(&mut self.values) };
+        {
+            let mut g = unsafe { v.with_alloc(alloc) };
+            while let Some(elem) = g.pop() {
+                unsafe { T::deallocate(elem, alloc) };
+            }
         }
-    }
-}
-
-impl<T: LenProtoType, A: Allocator + Clone> PartialEq for RepeatedLenField<T, A>
-where
-    T::Storage<A>: PartialEq,
-{
-    fn eq(&self, other: &Self) -> bool {
-        self.values == other.values
-    }
-}
-
-impl<T: LenProtoType, A: Allocator + Clone> Eq for RepeatedLenField<T, A> where T::Storage<A>: Eq {}
-
-impl<T: LenProtoType, A: Allocator + Clone> ::core::fmt::Debug for RepeatedLenField<T, A>
-where
-    T::Storage<A>: ::core::fmt::Debug,
-{
-    fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
-        f.debug_tuple("RepeatedLenField")
-            .field(&self.values)
-            .finish()
+        unsafe { v.deallocate(alloc) };
     }
 }
 

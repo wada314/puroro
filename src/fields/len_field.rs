@@ -1,6 +1,12 @@
 //! Singular LEN field wrapper — generic over payload type and presence policy.
+//!
+//! The payload is stored allocator-less ([`LenProtoType::Storage`]) wrapped in
+//! [`ManuallyDrop`], so it never frees itself implicitly. The owning message
+//! releases it via [`deallocate`](SingularLenField::deallocate) in its `Drop`,
+//! and mutation flows through [`value_mut`](SingularLenField::value_mut).
 
 use ::core::marker::PhantomData;
+use ::core::mem::ManuallyDrop;
 
 use ::bytes::{Buf, BufMut};
 use ::allocator_api2::alloc::Allocator;
@@ -16,50 +22,58 @@ use super::len::{self, LenProtoType};
 use super::presence::PresenceBits;
 
 /// Singular LEN field (`string`, `bytes`, …) — parametrised by [`LenProtoType`] `T`
-/// and presence policy `P`.
+/// and presence policy `P`. `A` is the message allocator; it is not stored inline.
 pub struct SingularLenField<T: LenProtoType, P: FieldPresence, A: Allocator> {
-    value: T::Storage<A>,
-    _presence: PhantomData<P>,
+    value: ManuallyDrop<T::Storage>,
+    _marker: PhantomData<(P, A)>,
 }
 
-impl<T: LenProtoType, P: FieldPresence, A: Allocator + Clone> SingularLenField<T, P, A> {
-    pub fn new_in(alloc: A) -> Self {
+impl<T: LenProtoType, P: FieldPresence, A: Allocator> SingularLenField<T, P, A> {
+    pub fn new_in(alloc: &A) -> Self {
         Self {
-            value: T::new_empty(alloc),
-            _presence: PhantomData,
+            value: ManuallyDrop::new(T::new_empty(alloc)),
+            _marker: PhantomData,
         }
     }
 
     /// Borrowed payload (IMPLICIT public getters).
     #[inline]
-    pub fn value(&self) -> T::Ref<'_, A> {
+    pub fn value(&self) -> T::Ref<'_> {
         T::borrow(&self.value)
     }
 
-    pub fn set<Pb>(
+    /// Returns a growable handle over the payload, borrowing `alloc`.
+    ///
+    /// Presence is the caller's responsibility: generated `_mut` accessors set
+    /// the presence bit before calling this.
+    pub fn value_mut<'a>(&'a mut self, alloc: &'a A) -> T::Mut<'a, &'a A> {
+        T::with_alloc(&mut self.value, alloc)
+    }
+
+    pub fn merge<Pb, B: Buf>(
         &mut self,
         common: &mut MessageCommon<Pb, A>,
         bit: usize,
-        v: impl AsRef<[u8]>,
+        wire_type: WireType,
+        buf: &mut B,
     ) -> Result<(), DecodeError>
     where
         Pb: PresenceBits,
     {
+        if wire_type != len::WIRE_TYPE {
+            return Err(DecodeError::InvalidTag);
+        }
+        // Decode first so a failure leaves the old value intact.
+        let new = T::decode(buf, &common.alloc)?;
+        let old = unsafe { ManuallyDrop::take(&mut self.value) };
+        // SAFETY: `common.alloc` owns the old payload's buffer.
+        unsafe { T::deallocate(old, &common.alloc) };
+        self.value = ManuallyDrop::new(new);
         P::on_set(common, bit);
-        self.value = T::store_from_slice(v.as_ref(), common.alloc.clone())?;
         Ok(())
     }
 
-    pub fn clear_value(&mut self, alloc: A) {
-        self.value = T::new_empty(alloc);
-    }
-
-    pub fn encoded_len<Pb>(
-        &self,
-        common: &MessageCommon<Pb, A>,
-        field: u32,
-        bit: usize,
-    ) -> usize
+    pub fn encoded_len<Pb>(&self, common: &MessageCommon<Pb, A>, field: u32, bit: usize) -> usize
     where
         Pb: PresenceBits,
     {
@@ -86,26 +100,16 @@ impl<T: LenProtoType, P: FieldPresence, A: Allocator + Clone> SingularLenField<T
         }
     }
 
-    pub fn merge<Pb, B: Buf>(
-        &mut self,
-        common: &mut MessageCommon<Pb, A>,
-        bit: usize,
-        wire_type: WireType,
-        buf: &mut B,
-    ) -> Result<(), DecodeError>
-    where
-        Pb: PresenceBits,
-    {
-        if wire_type != len::WIRE_TYPE {
-            return Err(DecodeError::InvalidTag);
-        }
-        self.value = T::decode(buf, common.alloc.clone())?;
-        P::on_set(common, bit);
-        Ok(())
+    /// Releases the payload through `alloc`. Terminal; call once from the
+    /// owning message's `Drop`, after which `self` must not be used.
+    pub fn deallocate(&mut self, alloc: &A) {
+        // SAFETY: called once; `alloc` owns the payload's buffer.
+        let old = unsafe { ManuallyDrop::take(&mut self.value) };
+        unsafe { T::deallocate(old, alloc) };
     }
 }
 
-impl<T: LenProtoType, P: ExplicitFieldPresence, A: Allocator + Clone> SingularLenField<T, P, A> {
+impl<T: LenProtoType, P: ExplicitFieldPresence, A: Allocator> SingularLenField<T, P, A> {
     #[inline]
     pub fn has<Pb>(&self, common: &MessageCommon<Pb, A>, bit: usize) -> bool
     where
@@ -119,11 +123,11 @@ impl<T: LenProtoType, P: ExplicitFieldPresence, A: Allocator + Clone> SingularLe
         common: &MessageCommon<Pb, A>,
         bit: usize,
         default: D,
-    ) -> Optional<T::Ref<'a, A>, D>
+    ) -> Optional<T::Ref<'a>, D>
     where
         Pb: PresenceBits,
-        D: HasDefault<T::Ref<'a, A>>,
-        T::Ref<'a, A>: Copy,
+        D: HasDefault<T::Ref<'a>>,
+        T::Ref<'a>: Copy,
     {
         let v = if common.is_present(bit) {
             Some(T::borrow(&self.value))
@@ -138,11 +142,14 @@ impl<T: LenProtoType, P: ExplicitFieldPresence, A: Allocator + Clone> SingularLe
         Pb: PresenceBits,
     {
         P::on_clear(common, bit);
-        self.value = T::new_empty(common.alloc.clone());
+        let old = unsafe { ManuallyDrop::take(&mut self.value) };
+        // SAFETY: `common.alloc` owns the old payload's buffer.
+        unsafe { T::deallocate(old, &common.alloc) };
+        self.value = ManuallyDrop::new(T::new_empty(&common.alloc));
     }
 }
 
-impl<T: LenProtoType, P: RequiredFieldPresence, A: Allocator + Clone> SingularLenField<T, P, A> {
+impl<T: LenProtoType, P: RequiredFieldPresence, A: Allocator> SingularLenField<T, P, A> {
     /// Checks the presence bit for a LEGACY_REQUIRED field.
     pub fn validate_required<Pb>(
         &self,
@@ -154,45 +161,6 @@ impl<T: LenProtoType, P: RequiredFieldPresence, A: Allocator + Clone> SingularLe
         Pb: PresenceBits,
     {
         P::validate_present(common, bit, field_number)
-    }
-}
-
-impl<T: LenProtoType, P: FieldPresence, A: Allocator + Clone> Clone for SingularLenField<T, P, A>
-where
-    T::Storage<A>: Clone,
-{
-    fn clone(&self) -> Self {
-        Self {
-            value: self.value.clone(),
-            _presence: PhantomData,
-        }
-    }
-}
-
-impl<T: LenProtoType, P: FieldPresence, A: Allocator + Clone> PartialEq
-    for SingularLenField<T, P, A>
-where
-    T::Storage<A>: PartialEq,
-{
-    fn eq(&self, other: &Self) -> bool {
-        self.value == other.value
-    }
-}
-
-impl<T: LenProtoType, P: FieldPresence, A: Allocator + Clone> Eq for SingularLenField<T, P, A> where
-    T::Storage<A>: Eq
-{
-}
-
-impl<T: LenProtoType, P: FieldPresence, A: Allocator + Clone> ::core::fmt::Debug
-    for SingularLenField<T, P, A>
-where
-    T::Storage<A>: ::core::fmt::Debug,
-{
-    fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
-        f.debug_struct("SingularLenField")
-            .field("value", &self.value)
-            .finish()
     }
 }
 

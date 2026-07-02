@@ -1,15 +1,31 @@
 //! Generated `oneof notification` enum for `Task`.
 
 use ::allocator_api2::alloc::Allocator;
-use ::allocator_api2::boxed::Box as ABox;
+use ::unmanaged::UnmanagedString;
 
 /// `oneof notification { string email_address = 12; string phone_number = 13; }`
-pub enum Notification<A: Allocator> {
-    EmailAddress(ABox<str, A>),
-    PhoneNumber(ABox<str, A>),
+///
+/// Variants hold allocator-less [`UnmanagedString`]; the parent `Task` releases
+/// the active variant via [`Notification::deallocate`] in its `Drop`.
+pub enum Notification {
+    EmailAddress(UnmanagedString),
+    PhoneNumber(UnmanagedString),
 }
 
-impl<A: Allocator> ::core::fmt::Debug for Notification<A> {
+impl Notification {
+    /// Drops the active variant's string and frees it through `alloc`.
+    ///
+    /// # Safety
+    ///
+    /// `alloc` must be the allocator that owns the variant's buffer.
+    pub unsafe fn deallocate<A: Allocator>(self, alloc: A) {
+        match self {
+            Self::EmailAddress(s) | Self::PhoneNumber(s) => unsafe { s.deallocate(alloc) },
+        }
+    }
+}
+
+impl ::core::fmt::Debug for Notification {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         match self {
             Self::EmailAddress(s) => f.debug_tuple("EmailAddress").field(&&**s).finish(),
@@ -18,14 +34,14 @@ impl<A: Allocator> ::core::fmt::Debug for Notification<A> {
     }
 }
 
-impl<A: Allocator> PartialEq for Notification<A> {
+impl PartialEq for Notification {
     fn eq(&self, other: &Self) -> bool {
         match (self, other) {
-            (Self::EmailAddress(a), Self::EmailAddress(b)) => a == b,
-            (Self::PhoneNumber(a), Self::PhoneNumber(b)) => a == b,
+            (Self::EmailAddress(a), Self::EmailAddress(b)) => **a == **b,
+            (Self::PhoneNumber(a), Self::PhoneNumber(b)) => **a == **b,
             _ => false,
         }
     }
 }
 
-impl<A: Allocator> Eq for Notification<A> {}
+impl Eq for Notification {}

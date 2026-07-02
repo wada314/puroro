@@ -127,8 +127,8 @@ protobuf-core           Varint, Tag, WireType
 | Member | Role |
 |---|---|
 | `presence: P` | Bitfield newtype (`TaskPresence`, …) for EXPLICIT / LEGACY_REQUIRED singular fields |
-| `unknown_fields: Vec<u8, A>` | Round-trip unknown wire; closed-enum unknown variants |
-| `alloc: A` | Cloned by setters, decode, repeated push |
+| `unknown_fields: ManuallyDrop<UnmanagedVec<u8>>` | Round-trip unknown wire; closed-enum unknown variants. Allocator-less; freed by `MessageCommon::deallocate` |
+| `alloc: A` | The single canonical allocator copy; borrowed (`&A`) by every field operation that (de)allocates |
 
 Field catalog methods take `&MessageCommon` / `&mut MessageCommon`, not `&Task`, so wrappers stay decoupled from the parent message type.
 
@@ -234,7 +234,7 @@ Adding a wire type = one new `VarintProtoType` impl. Adding a presence mode = on
 ## 9. Struct layout
 
 ```rust
-pub struct Task<A: Allocator = Global> {
+pub struct Task<A: Allocator + Clone = Global> {
     _common: MessageCommon<TaskPresence, A>,
     title: SingularLenField<ProtoString, Explicit, A>,
     score: SingularVarintField<ProtoInt32, Implicit>,
@@ -247,9 +247,11 @@ pub struct Task<A: Allocator = Global> {
     status: SingularVarintField<ProtoEnum, Implicit>,
     priority: SingularVarintField<ProtoEnum, Explicit>,
     assignee: NestedMessageField<Address<A>, A>,
-    notification: OneofSlot<task::Notification<A>>,
+    notification: OneofSlot<task::Notification>,
 }
 ```
+
+The `A: Allocator + Clone` struct bound is what lets the generated `Drop` clone the allocator into nested children and free every field from one place. Field wrappers keep their payloads in allocator-less `unmanaged` containers behind `ManuallyDrop`, so `A` appears inline only once (in `_common.alloc`); the per-field `A` in the wrapper types is a `PhantomData` marker, not a stored allocator.
 
 ### Storage summary
 
@@ -259,12 +261,12 @@ pub struct Task<A: Allocator = Global> {
 | EXPLICIT scalar / enum / string / bytes | same containers | bit in `_common.presence` |
 | LEGACY_REQUIRED | same as EXPLICIT + `LegacyRequired` | bit |
 | Repeated | `RepeatedVarintField` / `RepeatedLenField` | empty = absent |
-| Nested message | `Option<Box<M, A>>` | `Option`, not bitfield |
+| Nested message | `Option<UnmanagedBox<M>>` | `Option`, not bitfield |
 | Oneof | `Option<E>` in slot | `Option`, not bitfield |
 
-Unset EXPLICIT slots may hold type-zero / empty heap data; **only the bit** means "set". `Box<str, A>` for strings; `Vec<u8, A>` for bytes.
+Unset EXPLICIT slots may hold type-zero / empty heap data; **only the bit** means "set". `UnmanagedString` for strings; `UnmanagedVec<u8>` for bytes (each wrapped in `ManuallyDrop`).
 
-Public accessors are **one-line delegates** into catalog methods with `&self._common` / `&mut self._common`. `MessageEncode`, `MessageDecode`, `Clone`, `PartialEq` sum the same delegates.
+Public accessors are **one-line delegates** into catalog methods with `&self._common` / `&mut self._common`. `MessageEncode` and `MessageDecode` sum the same delegates; the generated `Drop` walks the same fields calling `deallocate(&self._common.alloc)`.
 
 ### Codegen emission per message
 
@@ -394,11 +396,11 @@ Generated code indexes bits only inside this `impl`, never elsewhere.
 
 ## 11. Constructors & allocator
 
-- **`Task::new_in(alloc)`** — default every field; `_common.presence = TaskPresence::ZERO`; heap fields via `*_in(alloc.clone())`.
+- **`Task::new_in(alloc)`** — default every field; `_common.presence = TaskPresence::ZERO`; heap fields via `*_in(&alloc)` (they only need a borrow to build the empty `unmanaged` container). The single owned `alloc` is moved into `_common` last, so construction needs no `A: Clone`.
 - **`Task::new()`** — when `A = Global`.
 - **`Default`** — `A: Clone + Default` → `new_in(A::default())`.
 
-Runtime **`str_to_box_in(s, alloc)`** — copy bytes into `Box<str, A>` (one `unsafe` in runtime, not generated code).
+Runtime **`str_to_unmanaged_in(s, alloc)`** — copy bytes into an `UnmanagedString`; **`bytes_to_unmanaged_in(v, alloc)`** for `UnmanagedVec<u8>`. The `unsafe` (raw-parts / `deallocate`) is confined to the `puroro` runtime and the generated `Drop`, not to generated accessors.
 
 ---
 
@@ -420,7 +422,8 @@ fn encode_raw<B: BufMut>(&self, buf: &mut B) {
     self.title.encode_raw(c, Self::FIELD_TITLE, Self::BIT_TITLE, buf);
     self.score.encode_raw(c, Self::FIELD_SCORE, Self::BIT_UNUSED, buf);
     // …
-    buf.put_slice(&c.unknown_fields);
+    let unknown: &[u8] = &c.unknown_fields;
+    buf.put_slice(unknown);
 }
 ```
 
@@ -452,20 +455,18 @@ Nested LEN payloads use `Buf::take(len)` before child `merge_from`.
 
 ## 13. Derived traits
 
-**Messages** (`Task<A>`, …): generated as below. **Enums** (`Status`, `Priority`, oneof): `derive(Clone, Copy, Debug, PartialEq, Eq, Hash)`.
+**Messages** (`Task<A>`, …): generated as below. **Scalar enums** (`Status`, `Priority`): `derive(Clone, Copy, Debug, PartialEq, Eq, Hash)`. **Oneof enums** (`Notification`): hand-written `Debug` / `PartialEq` / `Eq` that compare through `Deref` to `str` (the variants hold allocator-less `UnmanagedString`, so `#[derive]` is not possible).
 
 | Trait | Bounds | Notes |
 |---|---|---|
 | `Default` | `A: Clone + Default` | Clears presence; empty heap fields |
-| `Clone` | `A: Clone` | Copy presence newtype; deep-clone catalog fields + `unknown_fields` |
-| `Debug` | — | Values + set/unset; no `_alloc` |
-| `PartialEq` / `Eq` | — | Semantic: presence + values + `unknown_fields`; ignore stale unset slots and `_alloc` |
+| `Drop` | `A: Clone` | Frees every field through `_common.alloc`, then `_common.deallocate()` |
 
-**Not generated:** `Copy`, `Ord`, `Hash` (deferred).
+**Not currently generated:** `Clone`, `PartialEq`, `Eq`, `Debug`, `Copy`, `Ord`, `Hash`. `Clone`/`PartialEq`/`Debug` need `&A` to copy or format the allocator-less fields, so they require a `clone_in(&self, alloc)`-style API (future work) rather than `#[derive]`.
 
 **`Global` extras:** `Task::new()`, `impl Default for Task`, `Task::decode(buf)`.
 
-Arena clone copies data into a second tree — use `Arc<Task<A>>` for shared immutable messages.
+Compare messages semantically via getters; deep copy (when added) will copy data into a second tree, so prefer `Arc<Task<A>>` for shared immutable messages.
 
 ---
 
@@ -480,19 +481,22 @@ Arena clone copies data into a second tree — use `Arc<Task<A>>` for shared imm
 | Encode | Omit at type-zero | Omit when bit unset; emit zero if bit set |
 | Merge | Set value; `on_set` no-op | `on_set` + set value |
 | Getter | `value()` | `optional(&common, DefaultZst)` |
-| Setter | `set(&mut common, v)` | same (sets bit) |
+| Mutator | `value_mut(&mut common, bit)` → `&mut T::Value` | same (sets bit) |
 
-Open enum: thin glue — `Status::try_from(field.value())`. Closed enum: use `merge_closed` ([§7](#7-field-wrappers)). `Optional` is a concrete struct (DESIGN.md §3); no `Option<T>` conversion.
+Open enum: thin glue — `Status::try_from(field.value())`. Closed enum: use `merge_closed` ([§7](#7-field-wrappers)). `Optional` is a concrete struct (DESIGN.md §3); no `Option<T>` conversion. Enum `_mut` accessors expose the raw `i32` storage.
 
 ### LEN — string & bytes (`SingularLenField<T, P, A>`)
+
+The payload is `ManuallyDrop<T::Storage>` (`UnmanagedString` / `UnmanagedVec<u8>`).
 
 | | IMPLICIT | EXPLICIT / LEGACY_REQUIRED |
 |---|---|---|
 | Encode | Omit when empty | Omit when bit unset |
-| Merge | `decode_string_in` / `decode_bytes_in` | + `on_set` |
+| Merge | decode new, then `deallocate` old, then store | + `on_set` |
 | Getter | `value()` | `optional(&common, bit, default)` |
-| Setter | `set` → `Result` (`impl AsRef<[u8]>`) | same (sets bit when applicable) |
-| Clear | `clear_value(alloc)` | `clear(&mut common)` |
+| Mutator | `value_mut(&self.alloc)` → guard (`impl DerefMut`) | same; generated `_mut` sets the bit first |
+| Clear | `clear(&mut common, bit)` (frees old, resets empty) | same |
+| Release | `deallocate(&mut self, &A)` (called from message `Drop`) | same |
 
 ### LEGACY_REQUIRED
 
@@ -513,11 +517,11 @@ Wire identical to EXPLICIT. Message `validate()` calls `validate_required` on ea
 | Encode | One LEN record | One VARINT per element |
 | Decode | Both forms | Both forms |
 
-Accessors: `as_slice()`, `push(v)`, `clear()`.
+Elements live in `ManuallyDrop<UnmanagedVec<T::Value>>`. Accessors: `as_slice()`, `values_mut(&A)` → guard (`impl DerefMut<Target = Vec<_, &A>>`), `clear(&A)`, `merge(&A, …)`, `deallocate(&A)`.
 
 ### LEN (`RepeatedLenField<T, A>`)
 
-One LEN record per element (`repeated string` / `repeated bytes`). `push` takes `&MessageCommon` for allocator (`&str` for string elements, `&[u8]` for bytes).
+One LEN record per element (`repeated string` / `repeated bytes`), stored as `ManuallyDrop<UnmanagedVec<T::Storage>>`. Because each element is itself allocator-less, `deallocate`/`clear` **drain and free every element first**, then free the buffer. The typed `push_in(&A, impl AsRef<[u8]>)` helper is kept (the bare `DerefMut` would expose allocator-less element storage that is impractical to construct).
 
 ---
 
@@ -525,11 +529,11 @@ One LEN record per element (`repeated string` / `repeated bytes`). `push` takes 
 
 ### Nested (`NestedMessageField<M, A>`)
 
-`Option<Box<M, A>>`. Encode: LEN tag + `child.encode_raw`. Decode: create child if absent, `merge_from` on sub-slice (concatenation = merge). Recursion limit: planned ([§17](#17-planned-optimisations--runtime-gaps)).
+`Option<UnmanagedBox<M>>`. Encode: LEN tag + `child.encode_raw`. Decode: create child (via `M::new_in(common.alloc.clone())` boxed with `&common.alloc`) if absent, `merge_from` on sub-slice (concatenation = merge). `deallocate`/`clear` take the box and release it; the child's own `Drop` frees its fields recursively. Recursion limit: planned ([§17](#17-planned-optimisations--runtime-gaps)).
 
 ### Oneof (`OneofSlot<E>`)
 
-Each wire occurrence replaces the whole slot (last wins). Encode active variant only. Decode: one match arm per variant field number; coupling stays in slot + generated helpers — not spread across singular members.
+Each wire occurrence replaces the whole slot (last wins). Encode active variant only. Decode: one match arm per variant field number; coupling stays in slot + generated helpers — not spread across singular members. Because variants hold allocator-less `UnmanagedString`, setters/decode `take()` and `deallocate` the previous variant before storing a new one, and the message `Drop` `take()`s and frees the active variant. (Oneof is a tentative implementation prioritising correctness of compile/round-trip.)
 
 ### Unknown
 

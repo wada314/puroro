@@ -10,5 +10,6 @@ allocator-api2 = "0.4"
 bitvec = "1"
 bytes = "1"
 puroro = { path = ".." }
+unmanaged = { path = "../unmanaged" }
 
 [dev-dependencies]

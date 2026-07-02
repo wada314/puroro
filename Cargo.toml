@@ -1,5 +1,5 @@
 [workspace]
-members = [".", "protobuf-core", "sample-generated"]
+members = [".", "protobuf-core", "sample-generated", "unmanaged"]
 resolver = "2"
 
 [package]
@@ -11,3 +11,4 @@ edition = "2024"
 bytes = "1"
 allocator-api2 = "0.4"
 protobuf-core = { path = "protobuf-core" }
+unmanaged = { path = "unmanaged" }

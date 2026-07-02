@@ -1,10 +1,15 @@
 //! Repeated varint field wrapper — generic over wire type and encode policy.
+//!
+//! Elements are stored in an allocator-less [`UnmanagedVec`] wrapped in
+//! [`ManuallyDrop`]. Growth and release borrow the message allocator.
 
 use ::core::marker::PhantomData;
+use ::core::mem::ManuallyDrop;
 
 use ::bytes::{Buf, BufMut};
 use ::allocator_api2::alloc::Allocator;
-use ::allocator_api2::vec::Vec as AVec;
+use ::unmanaged::UnmanagedVec;
+use ::unmanaged::vec::VecGuard;
 
 use crate::decode;
 use crate::error::DecodeError;
@@ -19,15 +24,15 @@ use super::varint::{self, VarintProtoType};
 /// [`Expanded`](super::repeated_encoding::Expanded) — affects **encode only**.
 /// [`merge`](Self::merge) accepts both packed and expanded wire forms.
 pub struct RepeatedVarintField<T: VarintProtoType, E: RepeatedVarintEncoding, A: Allocator> {
-    values: AVec<T::Value, A>,
-    _encoding: PhantomData<E>,
+    values: ManuallyDrop<UnmanagedVec<T::Value>>,
+    _marker: PhantomData<(E, A)>,
 }
 
 impl<T: VarintProtoType, E: RepeatedVarintEncoding, A: Allocator> RepeatedVarintField<T, E, A> {
-    pub fn new_in(alloc: A) -> Self {
+    pub fn new_in(alloc: &A) -> Self {
         Self {
-            values: AVec::new_in(alloc),
-            _encoding: PhantomData,
+            values: ManuallyDrop::new(UnmanagedVec::new(alloc)),
+            _marker: PhantomData,
         }
     }
 
@@ -41,30 +46,42 @@ impl<T: VarintProtoType, E: RepeatedVarintEncoding, A: Allocator> RepeatedVarint
         self.values.is_empty()
     }
 
-    pub fn push(&mut self, v: T::Value) {
-        self.values.push(v);
+    /// Returns a growable handle over the elements, borrowing `alloc`.
+    pub fn values_mut<'a>(&'a mut self, alloc: &'a A) -> VecGuard<'a, T::Value, &'a A> {
+        // SAFETY: `alloc` owns this vector's buffer for its whole lifetime.
+        unsafe { self.values.with_alloc(alloc) }
     }
 
-    pub fn clear(&mut self) {
-        self.values.clear();
+    /// Empties the vector (keeps the buffer capacity).
+    pub fn clear(&mut self, alloc: &A) {
+        // SAFETY: `alloc` owns this vector's buffer.
+        let mut g = unsafe { self.values.with_alloc(alloc) };
+        g.clear();
     }
 
     pub fn encoded_len(&self, field: u32) -> usize {
         if self.values.is_empty() {
             0
         } else {
-            E::encoded_len::<T>(field, &self.values)
+            E::encoded_len::<T>(field, self.as_slice())
         }
     }
 
     pub fn encode_raw<B: BufMut>(&self, field: u32, buf: &mut B) {
         if !self.values.is_empty() {
-            E::encode::<B, T>(field, &self.values, buf);
+            E::encode::<B, T>(field, self.as_slice(), buf);
         }
     }
 
     /// Merges one packed (LEN) or expanded (VARINT) occurrence — appends element(s).
-    pub fn merge<B: Buf>(&mut self, wire_type: WireType, buf: &mut B) -> Result<(), DecodeError> {
+    pub fn merge<B: Buf>(
+        &mut self,
+        alloc: &A,
+        wire_type: WireType,
+        buf: &mut B,
+    ) -> Result<(), DecodeError> {
+        // SAFETY: `alloc` owns this vector's buffer.
+        let mut g = unsafe { self.values.with_alloc(alloc) };
         match wire_type {
             WireType::Len => {
                 let len = decode::decode_varint(buf)? as usize;
@@ -74,58 +91,25 @@ impl<T: VarintProtoType, E: RepeatedVarintEncoding, A: Allocator> RepeatedVarint
                 let mut sub = buf.take(len);
                 while sub.has_remaining() {
                     let raw = decode::decode_varint(&mut sub)?;
-                    self.values.push(T::decode_wire(raw)?);
+                    g.push(T::decode_wire(raw)?);
                 }
             }
             WireType::Varint => {
                 let raw = decode::decode_varint(buf)?;
-                self.values.push(T::decode_wire(raw)?);
+                g.push(T::decode_wire(raw)?);
             }
             _ => return Err(DecodeError::InvalidTag),
         }
         Ok(())
     }
-}
 
-impl<T: VarintProtoType, E: RepeatedVarintEncoding, A: Allocator + Clone> Clone
-    for RepeatedVarintField<T, E, A>
-where
-    T::Value: Clone,
-{
-    fn clone(&self) -> Self {
-        Self {
-            values: self.values.clone(),
-            _encoding: PhantomData,
-        }
-    }
-}
-
-impl<T: VarintProtoType, E: RepeatedVarintEncoding, A: Allocator + Clone> PartialEq
-    for RepeatedVarintField<T, E, A>
-where
-    T::Value: PartialEq,
-{
-    fn eq(&self, other: &Self) -> bool {
-        self.values == other.values
-    }
-}
-
-impl<T: VarintProtoType, E: RepeatedVarintEncoding, A: Allocator + Clone> Eq
-    for RepeatedVarintField<T, E, A>
-where
-    T::Value: Eq,
-{
-}
-
-impl<T: VarintProtoType, E: RepeatedVarintEncoding, A: Allocator + Clone> ::core::fmt::Debug
-    for RepeatedVarintField<T, E, A>
-where
-    T::Value: ::core::fmt::Debug,
-{
-    fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
-        f.debug_tuple("RepeatedVarintField")
-            .field(&self.values)
-            .finish()
+    /// Releases the backing buffer through `alloc`. Terminal; call once from the
+    /// owning message's `Drop`.
+    pub fn deallocate(&mut self, alloc: &A) {
+        // SAFETY: called once; `alloc` owns the buffer. Elements are `Copy`
+        // scalars with no per-element cleanup.
+        let v = unsafe { ManuallyDrop::take(&mut self.values) };
+        unsafe { v.deallocate(alloc) };
     }
 }
 

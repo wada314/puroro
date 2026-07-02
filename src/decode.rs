@@ -5,9 +5,8 @@
 
 use ::bytes::Buf;
 use ::allocator_api2::alloc::Allocator;
-use ::allocator_api2::boxed::Box as ABox;
-use ::allocator_api2::vec::Vec as AVec;
 use ::protobuf_core::{IteratorExtVarint, Tag, Varint};
+use ::unmanaged::{UnmanagedString, UnmanagedVec};
 
 use crate::encode;
 use crate::error::DecodeError;
@@ -74,46 +73,67 @@ pub fn decode_tag<B: Buf>(buf: &mut B) -> Result<(u32, WireType), DecodeError> {
 // LEN-payload helpers
 // ---------------------------------------------------------------------------
 
+/// Decodes one LEN payload into an allocator-less [`UnmanagedVec<u8>`].
 pub fn decode_bytes_in<B: Buf, A: Allocator>(
     buf: &mut B,
     alloc: A,
-) -> Result<AVec<u8, A>, DecodeError> {
+) -> Result<UnmanagedVec<u8>, DecodeError> {
     let len = decode_varint(buf)? as usize;
     if buf.remaining() < len {
         return Err(DecodeError::TruncatedMessage);
     }
-    let mut v = AVec::<u8, A>::with_capacity_in(len, alloc);
-    let mut remaining = len;
-    while remaining > 0 {
-        let chunk = buf.chunk();
-        let to_copy = chunk.len().min(remaining);
-        v.extend_from_slice(&chunk[..to_copy]);
-        buf.advance(to_copy);
-        remaining -= to_copy;
+    let mut uv = UnmanagedVec::<u8>::new(&alloc);
+    {
+        // SAFETY: `&alloc` is the allocator that owns (and will grow) this
+        // vector's buffer for its whole lifetime.
+        let mut g = unsafe { uv.with_alloc(&alloc) };
+        g.reserve(len);
+        let mut remaining = len;
+        while remaining > 0 {
+            let chunk = buf.chunk();
+            let to_copy = chunk.len().min(remaining);
+            g.extend_from_slice(&chunk[..to_copy]);
+            buf.advance(to_copy);
+            remaining -= to_copy;
+        }
     }
-    Ok(v)
+    Ok(uv)
 }
 
+/// Decodes one LEN payload as UTF-8 into an allocator-less [`UnmanagedString`].
 pub fn decode_string_in<B: Buf, A: Allocator>(
     buf: &mut B,
     alloc: A,
-) -> Result<ABox<str, A>, DecodeError> {
-    let v = decode_bytes_in(buf, alloc)?;
-    ::core::str::from_utf8(&v).map_err(|_| DecodeError::InvalidUtf8)?;
-    Ok(bytes_vec_into_str_box(v))
+) -> Result<UnmanagedString, DecodeError> {
+    let len = decode_varint(buf)? as usize;
+    if buf.remaining() < len {
+        return Err(DecodeError::TruncatedMessage);
+    }
+    let bytes = buf.copy_to_bytes(len);
+    let s = ::core::str::from_utf8(&bytes).map_err(|_| DecodeError::InvalidUtf8)?;
+    Ok(str_to_unmanaged_in(s, alloc))
 }
 
-fn bytes_vec_into_str_box<A: Allocator>(v: AVec<u8, A>) -> ABox<str, A> {
-    let boxed_bytes: ABox<[u8], A> = v.into_boxed_slice();
-    let (ptr, alloc) = ABox::into_raw_with_allocator(boxed_bytes);
-    // SAFETY: UTF-8 validated at the call site.
-    unsafe { ABox::from_raw_in(ptr as *mut str, alloc) }
+/// Copies `s` into a freshly allocated [`UnmanagedString`] backed by `alloc`.
+pub fn str_to_unmanaged_in<A: Allocator>(s: &str, alloc: A) -> UnmanagedString {
+    let mut us = UnmanagedString::new(&alloc);
+    {
+        // SAFETY: `&alloc` owns this string's buffer for its whole lifetime.
+        let mut g = unsafe { us.with_alloc(&alloc) };
+        g.push_str(s);
+    }
+    us
 }
 
-pub fn str_to_box_in<A: Allocator>(s: &str, alloc: A) -> ABox<str, A> {
-    let mut v = AVec::<u8, A>::with_capacity_in(s.len(), alloc);
-    v.extend_from_slice(s.as_bytes());
-    bytes_vec_into_str_box(v)
+/// Copies `v` into a freshly allocated [`UnmanagedVec<u8>`] backed by `alloc`.
+pub fn bytes_to_unmanaged_in<A: Allocator>(v: &[u8], alloc: A) -> UnmanagedVec<u8> {
+    let mut uv = UnmanagedVec::<u8>::new(&alloc);
+    {
+        // SAFETY: `&alloc` owns this vector's buffer for its whole lifetime.
+        let mut g = unsafe { uv.with_alloc(&alloc) };
+        g.extend_from_slice(v);
+    }
+    uv
 }
 
 // ---------------------------------------------------------------------------
@@ -124,38 +144,41 @@ pub fn skip_field_and_save<B: Buf, A: Allocator>(
     field_number: u32,
     wire_type: WireType,
     buf: &mut B,
-    unknown_fields: &mut AVec<u8, A>,
+    unknown_fields: &mut UnmanagedVec<u8>,
+    alloc: &A,
 ) -> Result<(), DecodeError> {
+    // SAFETY: `alloc` owns this vector's buffer for its whole lifetime.
+    let mut g = unsafe { unknown_fields.with_alloc(alloc) };
     let tag = encode::tag_to_u64_for_unknown(field_number, wire_type);
-    encode::write_varint_to_vec(tag, unknown_fields);
+    encode::write_varint_to_vec(tag, &mut *g);
 
     match wire_type {
         WireType::Varint => {
             let v = decode_varint(buf)?;
-            encode::write_varint_to_vec(v, unknown_fields);
+            encode::write_varint_to_vec(v, &mut *g);
         }
         WireType::Int64 => {
             if buf.remaining() < 8 {
                 return Err(DecodeError::UnexpectedEof);
             }
             let bytes = buf.copy_to_bytes(8);
-            unknown_fields.extend_from_slice(&bytes);
+            g.extend_from_slice(&bytes);
         }
         WireType::Len => {
             let len = decode_varint(buf)?;
             if buf.remaining() < len as usize {
                 return Err(DecodeError::TruncatedMessage);
             }
-            encode::write_varint_to_vec(len, unknown_fields);
+            encode::write_varint_to_vec(len, &mut *g);
             let bytes = buf.copy_to_bytes(len as usize);
-            unknown_fields.extend_from_slice(&bytes);
+            g.extend_from_slice(&bytes);
         }
         WireType::Int32 => {
             if buf.remaining() < 4 {
                 return Err(DecodeError::UnexpectedEof);
             }
             let bytes = buf.copy_to_bytes(4);
-            unknown_fields.extend_from_slice(&bytes);
+            g.extend_from_slice(&bytes);
         }
         WireType::SGroup | WireType::EGroup => {
             return Err(DecodeError::InvalidTag);
@@ -167,11 +190,14 @@ pub fn skip_field_and_save<B: Buf, A: Allocator>(
 pub fn save_unknown_varint_field<A: Allocator>(
     field_number: u32,
     value: u64,
-    unknown_fields: &mut AVec<u8, A>,
+    unknown_fields: &mut UnmanagedVec<u8>,
+    alloc: &A,
 ) {
+    // SAFETY: `alloc` owns this vector's buffer for its whole lifetime.
+    let mut g = unsafe { unknown_fields.with_alloc(alloc) };
     let tag = encode::tag_to_u64_for_unknown(field_number, WireType::Varint);
-    encode::write_varint_to_vec(tag, unknown_fields);
-    encode::write_varint_to_vec(value, unknown_fields);
+    encode::write_varint_to_vec(tag, &mut *g);
+    encode::write_varint_to_vec(value, &mut *g);
 }
 
 pub fn skip_field<B: Buf>(wire_type: WireType, buf: &mut B) -> Result<(), DecodeError> {

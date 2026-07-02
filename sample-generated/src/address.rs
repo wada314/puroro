@@ -36,7 +36,7 @@ impl PresenceBits for AddressPresence {
 // Message struct
 // ---------------------------------------------------------------------------
 
-pub struct Address<A: Allocator = Global> {
+pub struct Address<A: Allocator + Clone = Global> {
     _common: MessageCommon<AddressPresence, A>,
     street: SingularLenField<ProtoString, Explicit, A>, // proto: string street = 1;
     city: SingularLenField<ProtoString, Explicit, A>,   // proto: string city = 2;
@@ -46,20 +46,22 @@ pub struct Address<A: Allocator = Global> {
 // Field constants (associated with `Address`)
 // ---------------------------------------------------------------------------
 
-impl<A: Allocator> Address<A> {
+impl<A: Allocator + Clone> Address<A> {
     pub const FIELD_STREET: u32 = 1; // street
-    pub const FIELD_CITY: u32 = 2;   // city
+    pub const FIELD_CITY: u32 = 2; // city
 
     pub const BIT_STREET: usize = 0; // street (EXPLICIT)
-    pub const BIT_CITY: usize = 1;   // city (EXPLICIT)
+    pub const BIT_CITY: usize = 1; // city (EXPLICIT)
 }
 
 impl<A: Allocator + Clone> Address<A> {
     pub fn new_in(alloc: A) -> Self {
+        // Fields borrow `alloc` (no per-field clone); the single canonical copy
+        // is moved into `_common` last.
         Self {
-            _common: MessageCommon::new_in(AddressPresence::ZERO, alloc.clone()),
-            street: SingularLenField::new_in(alloc.clone()),
-            city: SingularLenField::new_in(alloc),
+            street: SingularLenField::new_in(&alloc),
+            city: SingularLenField::new_in(&alloc),
+            _common: MessageCommon::new_in(AddressPresence::ZERO, alloc),
         }
     }
 
@@ -79,8 +81,11 @@ impl<A: Allocator + Clone> Address<A> {
         self.street.has(&self._common, Self::BIT_STREET)
     }
 
-    pub fn set_street(&mut self, v: &str) {
-        self.street.set(&mut self._common, Self::BIT_STREET, v).ok();
+    pub fn street_mut<'s>(
+        &'s mut self,
+    ) -> impl ::core::ops::DerefMut<Target = ::unmanaged::String<&'s A>> + 's {
+        self._common.set_presence(Self::BIT_STREET, true);
+        self.street.value_mut(&self._common.alloc)
     }
 
     pub fn clear_street(&mut self) {
@@ -101,8 +106,11 @@ impl<A: Allocator + Clone> Address<A> {
         self.city.has(&self._common, Self::BIT_CITY)
     }
 
-    pub fn set_city(&mut self, v: &str) {
-        self.city.set(&mut self._common, Self::BIT_CITY, v).ok();
+    pub fn city_mut<'s>(
+        &'s mut self,
+    ) -> impl ::core::ops::DerefMut<Target = ::unmanaged::String<&'s A>> + 's {
+        self._common.set_presence(Self::BIT_CITY, true);
+        self.city.value_mut(&self._common.alloc)
     }
 
     pub fn clear_city(&mut self) {
@@ -133,6 +141,18 @@ impl<A: Allocator + Clone> NestedMessage<A> for Address<A> {
 }
 
 // ---------------------------------------------------------------------------
+// Drop — releases every unmanaged field through the single allocator
+// ---------------------------------------------------------------------------
+
+impl<A: Allocator + Clone> Drop for Address<A> {
+    fn drop(&mut self) {
+        self.street.deallocate(&self._common.alloc);
+        self.city.deallocate(&self._common.alloc);
+        self._common.deallocate();
+    }
+}
+
+// ---------------------------------------------------------------------------
 // MessageEncode / MessageDecode
 // ---------------------------------------------------------------------------
 
@@ -150,7 +170,8 @@ impl<A: Allocator + Clone> MessageEncode for Address<A> {
             .encode_raw(c, Self::FIELD_STREET, Self::BIT_STREET, buf);
         self.city
             .encode_raw(c, Self::FIELD_CITY, Self::BIT_CITY, buf);
-        buf.put_slice(&c.unknown_fields);
+        let unknown: &[u8] = &c.unknown_fields;
+        buf.put_slice(unknown);
     }
 }
 
@@ -159,20 +180,24 @@ impl<A: Allocator + Clone> MessageDecode for Address<A> {
         while buf.has_remaining() {
             let (field_number, wire_type) = ::puroro::decode::decode_tag(buf)?;
             match field_number {
-                Self::FIELD_STREET => { // street = 1, EXPLICIT string
+                Self::FIELD_STREET => {
+                    // street = 1, EXPLICIT string
                     self.street
                         .merge(&mut self._common, Self::BIT_STREET, wire_type, buf)?;
                 }
-                Self::FIELD_CITY => { // city = 2, EXPLICIT string
+                Self::FIELD_CITY => {
+                    // city = 2, EXPLICIT string
                     self.city
                         .merge(&mut self._common, Self::BIT_CITY, wire_type, buf)?;
                 }
-                _ => { // unknown field — preserve in _common.unknown_fields
+                _ => {
+                    // unknown field — preserve in _common.unknown_fields
                     ::puroro::decode::skip_field_and_save(
                         field_number,
                         wire_type,
                         buf,
                         &mut self._common.unknown_fields,
+                        &self._common.alloc,
                     )?
                 }
             }

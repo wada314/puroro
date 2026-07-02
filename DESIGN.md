@@ -724,10 +724,14 @@ These bytes form a valid partial protobuf stream and are re-emitted verbatim at 
 Every generated type carries a single allocator type parameter `A` that applies to all heap allocations within that message and its nested messages:
 
 ```rust
-pub struct Task<A: Allocator = Global> { /* … */ }
+pub struct Task<A: Allocator + Clone = Global> { /* … */ }
 ```
 
-`A` defaults to `Global`, so `Task` (without a type argument) works identically to a version without allocator support.
+`A` defaults to `Global`, so `Task` (without a type argument) works identically to a version without allocator support. The `Clone` bound lets each message clone its allocator into nested children and free every field from a single `Drop` (see below).
+
+**Single canonical allocator (no per-field copies).** The allocator is stored *once*, in `MessageCommon.alloc`. Heap-backed fields do **not** embed their own allocator: they use the allocator-less types from the private [`unmanaged`](unmanaged/) crate — `UnmanagedBox<T>`, `UnmanagedVec<T>`, `UnmanagedString` — which keep only `ptr`/`len`/`cap` inline and take `&A` on each operation that (de)allocates. For a non-ZST allocator (e.g. `&bumpalo::Bump`) this removes the redundant copy that a naive `Box<T, A>` / `Vec<T, A>` layout would embed in every field, so `size_of::<Task<A>>` grows by exactly one `A` regardless of field count.
+
+**Manual release via `Drop`.** Because `unmanaged` values cannot free themselves (they panic if dropped implicitly), each field wraps its payload in `ManuallyDrop` and exposes `deallocate(&mut self, alloc: &A)`. Every generated message implements `Drop`, walking its fields and calling `deallocate` with the single `MessageCommon.alloc`; nested messages are freed recursively by their own `Drop`. The `unsafe` boundary is confined to the `puroro` runtime and the generated `Drop`.
 
 **Constructor API:**
 
@@ -744,9 +748,9 @@ impl Task<Global> {
 impl<A: Allocator + Clone + Default> Default for Task<A> { … }
 ```
 
-**Derived traits.** Generated messages implement `Default`, `Clone`, `Debug`, `PartialEq`, and `Eq` for any `A: Allocator + Clone` (with extra bounds on `Default`). Additional `Global`-only convenience (`Task::new()`, `impl Default for Task`) applies when `A = Global`. Wire bytes are not deterministic across encodes; use `PartialEq` for semantic comparison. Full matrix: [IMPLEMENTATION.md §13](IMPLEMENTATION.md#13-derived-traits).
+**Derived traits.** Generated messages implement `Default` (for `A: Allocator + Clone + Default`) plus a custom `Drop` (for `A: Allocator + Clone`). Additional `Global`-only convenience (`Task::new()`) applies when `A = Global`. `Clone` / `PartialEq` / `Debug` cannot be `#[derive]`d because the allocator-less fields need `&A` to copy or format; a `clone_in(&self, alloc)`-style API is future work. Wire bytes are not deterministic across encodes; compare semantically via getters. Full matrix: [IMPLEMENTATION.md §13](IMPLEMENTATION.md#13-derived-traits).
 
-**Allocator bound on mutation:** setter methods and `push_*` methods require `A: Clone` because they may create new heap values at call time. Read-only methods do not.
+**Mutation API (`_mut`).** Mutation is unified under `_mut` accessors that return a guard implementing `impl DerefMut<Target = …>` (RPIT): `title_mut()` yields `impl DerefMut<Target = ::unmanaged::String<&A>>`, `payload_mut()`/`tag_ids_mut()` yield `impl DerefMut<Target = Vec<_, &A>>`, and scalar/enum `_mut` accessors return `&mut T`. Acquiring an explicit-presence `_mut` sets the presence bit. The old `set_*` / `push_*` setters are removed; the one exception is repeated `string`/`bytes`, which keep a typed `push_*` helper because their element storage is allocator-less and impractical to construct through a bare `DerefMut`.
 
 **Decode API:**
 
@@ -763,9 +767,11 @@ The `Default` bound is required because `MessageDecode::decode` calls `A::defaul
 ```rust
 let bump = bumpalo::Bump::new();
 let mut t = Task::new_in(&bump);
-t.set_title("Fix bug");
+t.title_mut().push_str("Fix bug");
 // All allocations (title, labels, nested messages) land in `bump`.
-// Dropping `bump` frees everything at once without individual Drop calls.
+// When `t` drops, its `Drop` calls `deallocate(&bump)` on each field. For an
+// arena that is effectively a no-op; the memory is reclaimed in bulk when
+// `bump` itself is dropped. (For `Global`, `deallocate` returns the blocks.)
 ```
 
 ---
@@ -942,7 +948,7 @@ The code generator is designed first as a `protoc` plugin. That is the expected 
 
 ### `Bytes` for lazy wire storage vs `A: Allocator` for decoded values
 
-Eager `Task<A>` stores decoded field data in allocator-aware containers (`Box<str, A>`, `Vec<i32, A>`, …).  `TaskLazy<A>` stores the opaque wire stream in **`bytes::Bytes`** so nested messages can share the parent's allocation through **`Bytes::slice`** without copying LEN payloads.  Allocator customisation applies to **owned decoded data**; wire blobs prioritise cheap sharing and sub-slicing over per-field allocator control.
+Eager `Task<A>` stores decoded field data in allocator-less `unmanaged` containers (`UnmanagedString`, `UnmanagedVec<i32>`, …) that share the single `MessageCommon.alloc`.  `TaskLazy<A>` stores the opaque wire stream in **`bytes::Bytes`** so nested messages can share the parent's allocation through **`Bytes::slice`** without copying LEN payloads.  Allocator customisation applies to **owned decoded data**; wire blobs prioritise cheap sharing and sub-slicing over per-field allocator control.
 
 ---
 
@@ -966,7 +972,7 @@ The internal wire buffer is **`bytes::Bytes`**, not `Vec<u8, A>`.  `Bytes` is a 
 | `.slice(range)` / `.slice_ref(sub)` | **Zero-copy** sub-range for nested messages — O(1), no payload memcpy |
 | Implements `bytes::Buf` | Wire scanners and existing encode/decode helpers work directly |
 
-**Why not `Vec<u8, A>` for `_wire`?**  Custom allocator support for the *wire blob* is less important than cheap sub-slicing.  Decoded values (`Box<str, A>`, `Vec<i32, A>`, …) still use `A: Allocator`.  Only the opaque wire storage uses `Bytes` (global/shared allocator).
+**Why not `Vec<u8, A>` for `_wire`?**  Custom allocator support for the *wire blob* is less important than cheap sub-slicing.  Decoded values (`UnmanagedString`, `UnmanagedVec<i32>`, …) still allocate through `A: Allocator`.  Only the opaque wire storage uses `Bytes` (global/shared allocator).
 
 **Alternatives** if `Send` is not required: [`slice-rc`](https://docs.rs/slice-rc) (`Src<T>` — literal `Rc` with `.slice()`).  [`arc-slice`](https://docs.rs/arc-slice) (`ArcSlice` — similar to `Bytes` with custom metadata).  **`bytes::Bytes` is the default choice** unless a future requirement forces otherwise.
 

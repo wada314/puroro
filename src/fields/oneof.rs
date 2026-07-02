@@ -32,9 +32,19 @@ impl<E> OneofSlot<E> {
     }
 
     /// Replaces the whole oneof (clears any previous variant).
+    ///
+    /// Note: assigning over an existing variant drops it. When `E` owns
+    /// allocator-less storage, callers must [`take`](Self::take) and release the
+    /// previous variant explicitly before calling `set`.
     #[inline]
     pub fn set(&mut self, value: Option<E>) {
         self.value = value;
+    }
+
+    /// Removes and returns the active variant, leaving the slot empty.
+    #[inline]
+    pub fn take(&mut self) -> Option<E> {
+        self.value.take()
     }
 
     /// Clears whichever variant was active.

@@ -57,6 +57,21 @@ impl<T: VarintProtoType, P: FieldPresence> SingularVarintField<T, P> {
         self.value = v;
     }
 
+    /// Returns a mutable reference to the value, applying the presence policy
+    /// (`on_set` for EXPLICIT). Backs generated `*_mut` accessors.
+    pub fn value_mut<Pb, A>(
+        &mut self,
+        common: &mut MessageCommon<Pb, A>,
+        bit: usize,
+    ) -> &mut T::Value
+    where
+        Pb: PresenceBits,
+        A: ::allocator_api2::alloc::Allocator,
+    {
+        P::on_set(common, bit);
+        &mut self.value
+    }
+
     /// Resets the value slot to type-zero (does not touch the bitfield).
     #[inline]
     pub fn clear_value(&mut self) {
@@ -184,7 +199,12 @@ impl<T: VarintProtoType, P: ExplicitFieldPresence> SingularVarintField<T, P> {
         let raw = decode::decode_varint(buf)?;
         let value = T::decode_wire(raw)?;
         if !is_known(value) {
-            decode::save_unknown_varint_field(field, raw, &mut common.unknown_fields);
+            decode::save_unknown_varint_field(
+                field,
+                raw,
+                &mut common.unknown_fields,
+                &common.alloc,
+            );
             return Ok(());
         }
         P::on_set(common, bit);
