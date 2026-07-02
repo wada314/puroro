@@ -4,7 +4,17 @@
 //! This crate exists to compile-check the runtime [`puroro`] field catalog against
 //! realistic generated accessors, encode/decode glue, and presence bit indices.
 //!
-//! **Do not edit by hand in production** — the plugin will generate equivalent sources.
+//! **Naming vs. real generated code.** The production plugin must *fully-qualify*
+//! every path it emits (`::puroro::SingularLenField`, `::core::ops::DerefMut`, …)
+//! because a `.proto` schema may name things that would collide with unqualified
+//! identifiers. This sample deliberately relaxes that: it uses `use` imports and
+//! short names for readability. Read the short names here as stand-ins for their
+//! fully-qualified forms. See `IMPLEMENTATION.md` § "Path qualification (naming)".
+//!
+//! These files are maintained by hand as a readable reference; in a real project
+//! the equivalent sources would come from the plugin instead. Comments here are
+//! free-form and intentionally omit machine markers like `@generated`, which
+//! would wrongly imply the files are tool-generated.
 
 #![allow(dead_code)]
 

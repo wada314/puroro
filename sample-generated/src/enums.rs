@@ -1,4 +1,4 @@
-//! Generated enums from `example.proto`.
+//! Sample of the enums puroro generates from `example.proto`.
 
 use ::core::convert::TryFrom;
 

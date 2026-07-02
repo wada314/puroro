@@ -1,5 +1,5 @@
-//! @generated from example.proto — do not edit
-//! Message `example.Address`
+//! Sample of the code puroro generates for message `example.Address`
+//! (from `example.proto`).
 
 use ::allocator_api2::alloc::{Allocator, Global};
 use ::bitvec::array::BitArray;

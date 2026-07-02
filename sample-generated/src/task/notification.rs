@@ -1,4 +1,4 @@
-//! Generated `oneof notification` enum for `Task`.
+//! Sample of the `oneof notification` enum puroro generates for `Task`.
 
 use ::allocator_api2::alloc::Allocator;
 use ::unmanaged::UnmanagedString;

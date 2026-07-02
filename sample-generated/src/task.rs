@@ -1,5 +1,8 @@
-//! @generated from example.proto — do not edit
-//! Message `example.Task`
+//! Sample of the accessors, encode/decode glue, and presence handling that
+//! puroro generates for message `example.Task` (from `example.proto`).
+//!
+//! Written for human readers: unlike real plugin output it uses short imported
+//! names instead of fully-qualified paths (see the crate root docs).
 
 mod notification;
 

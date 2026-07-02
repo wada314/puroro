@@ -279,16 +279,24 @@ Public accessors are **one-line delegates** into catalog methods with `&self._co
 
 IR step: `ProtoField → FieldKind → catalog type + const args`.
 
+### Path qualification (naming)
+
+**Real generated code must fully-qualify every path it emits** — leading-`::` absolute paths such as `::puroro::SingularLenField`, `::core::ops::DerefMut`, `::allocator_api2::alloc::Allocator` — and must not depend on `use` imports for the items it references. A `.proto` file can name its packages, messages, and fields with almost any identifier, so any *unqualified* name in the generated output risks colliding with a user-defined type, module, or import that lands in the same scope. Fully-qualified paths are collision-proof. The only names exempt from this are the ones the generator introduces itself and reserves by convention — e.g. the `_common` field and other `_`-prefixed internals — which cannot clash with proto-derived names.
+
+**The checked-in [`sample-generated/`](sample-generated/) deliberately breaks this rule for readability.** It pulls names in with `use` and refers to them by short name (`SingularLenField`, `Allocator`, `MessageCommon`, …) so the reference output stays easy to read and review. Read those short names as stand-ins for the fully-qualified paths the production protoc plugin would actually emit.
+
 ### Generated code comments
 
 Generated Rust is not meant to be hand-edited, but **must be easy to navigate when debugging** (breakpoints, `merge_from` dispatch, diffing encode output). The protoc plugin emits comments from proto metadata; [`sample-generated/`](sample-generated/) demonstrates the convention.
 
-**File header** — every generated module:
+**File header** — every generated module carries a machine marker and the source message:
 
 ```rust
 //! @generated from example.proto — do not edit
 //! Message `example.Task`
 ```
+
+The `@generated` marker belongs on **real** plugin output (tooling uses it to collapse/skip generated files). The checked-in [`sample-generated/`](sample-generated/) intentionally **omits** it — those files are a hand-maintained reference, and an `@generated`/`do not edit` banner there would wrongly imply they are tool-generated. Sample headers instead describe what the module illustrates in plain prose.
 
 **Section banners** — major blocks inside the file:
 
