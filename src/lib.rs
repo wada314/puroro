@@ -47,9 +47,9 @@ pub use fields::{
     RepeatedExpandedInt32, RepeatedExpandedVarintField, RepeatedLen, RepeatedLenField,
     RepeatedLenFieldMut, RepeatedPackedInt32, RepeatedPackedVarintField, RepeatedString,
     RepeatedVarint,
-    RepeatedVarintEncoding, RepeatedVarintField, RequiredFieldPresence,
+    RepeatedVarintEncoding, RepeatedVarintField, RepeatedVarintFieldMut, RequiredFieldPresence,
     SingularLen, SingularLenField, SingularLenFieldMut, SingularVarint, SingularVarintField,
-    VarintProtoType,
+    SingularVarintFieldMut, VarintProtoType,
 };
 pub use optional::{HasDefault, Optional};
 pub use wire_type::WireType;

@@ -146,7 +146,7 @@ impl<A: Allocator + Clone> Task<A> {
     }
 
     pub fn score_mut(&mut self) -> &mut i32 {
-        self.score.value_mut(&mut self._common, Self::BIT_UNUSED)
+        self.score.bind(&mut self._common, Self::BIT_UNUSED).value_mut()
     }
 
     // -- max_retries (EXPLICIT int32, default = 3, proto field 3) ------------
@@ -166,12 +166,14 @@ impl<A: Allocator + Clone> Task<A> {
 
     pub fn max_retries_mut(&mut self) -> &mut i32 {
         self.max_retries
-            .value_mut(&mut self._common, Self::BIT_MAX_RETRIES)
+            .bind(&mut self._common, Self::BIT_MAX_RETRIES)
+            .value_mut()
     }
 
     pub fn clear_max_retries(&mut self) {
         self.max_retries
-            .clear(&mut self._common, Self::BIT_MAX_RETRIES);
+            .bind(&mut self._common, Self::BIT_MAX_RETRIES)
+            .clear();
     }
 
     // -- owner_id (LEGACY_REQUIRED string, proto field 4) --------------------
@@ -241,11 +243,11 @@ impl<A: Allocator + Clone> Task<A> {
     pub fn tag_ids_mut<'s>(
         &'s mut self,
     ) -> impl ::core::ops::DerefMut<Target = ::allocator_api2::vec::Vec<i32, A>> + 's {
-        self.tag_ids.values_mut(self._common.alloc.clone())
+        self.tag_ids.bind(&mut self._common).values_mut()
     }
 
     pub fn clear_tag_ids(&mut self) {
-        self.tag_ids.clear(self._common.alloc.clone());
+        self.tag_ids.bind(&mut self._common).clear();
     }
 
     // -- scores (repeated int32 EXPANDED, proto field 7) ---------------------
@@ -257,11 +259,11 @@ impl<A: Allocator + Clone> Task<A> {
     pub fn scores_mut<'s>(
         &'s mut self,
     ) -> impl ::core::ops::DerefMut<Target = ::allocator_api2::vec::Vec<i32, A>> + 's {
-        self.scores.values_mut(self._common.alloc.clone())
+        self.scores.bind(&mut self._common).values_mut()
     }
 
     pub fn clear_scores(&mut self) {
-        self.scores.clear(self._common.alloc.clone());
+        self.scores.bind(&mut self._common).clear();
     }
 
     // -- labels (repeated string, proto field 8) -----------------------------
@@ -287,7 +289,7 @@ impl<A: Allocator + Clone> Task<A> {
     }
 
     pub fn status_mut(&mut self) -> &mut i32 {
-        self.status.value_mut(&mut self._common, Self::BIT_UNUSED)
+        self.status.bind(&mut self._common, Self::BIT_UNUSED).value_mut()
     }
 
     pub fn status(&self) -> Result<Status, i32> {
@@ -305,11 +307,14 @@ impl<A: Allocator + Clone> Task<A> {
 
     pub fn priority_mut(&mut self) -> &mut i32 {
         self.priority
-            .value_mut(&mut self._common, Self::BIT_PRIORITY)
+            .bind(&mut self._common, Self::BIT_PRIORITY)
+            .value_mut()
     }
 
     pub fn clear_priority(&mut self) {
-        self.priority.clear(&mut self._common, Self::BIT_PRIORITY);
+        self.priority
+            .bind(&mut self._common, Self::BIT_PRIORITY)
+            .clear();
     }
 
     // -- assignee (nested message, proto field 11) --------------------------
@@ -491,16 +496,14 @@ impl<A: Allocator + Clone> MessageDecode for Task<A> {
                 Self::FIELD_SCORE => {
                     // score = 2, IMPLICIT int32
                     self.score
-                        .merge(&mut self._common, Self::BIT_UNUSED, wire_type, buf)?;
+                        .bind(&mut self._common, Self::BIT_UNUSED)
+                        .merge(wire_type, buf)?;
                 }
                 Self::FIELD_MAX_RETRIES => {
                     // max_retries = 3, EXPLICIT int32
-                    self.max_retries.merge(
-                        &mut self._common,
-                        Self::BIT_MAX_RETRIES,
-                        wire_type,
-                        buf,
-                    )?;
+                    self.max_retries
+                        .bind(&mut self._common, Self::BIT_MAX_RETRIES)
+                        .merge(wire_type, buf)?;
                 }
                 Self::FIELD_OWNER_ID => {
                     // owner_id = 4, LEGACY_REQUIRED string
@@ -516,13 +519,11 @@ impl<A: Allocator + Clone> MessageDecode for Task<A> {
                 }
                 Self::FIELD_TAG_IDS => {
                     // tag_ids = 6, repeated int32 PACKED
-                    self.tag_ids
-                        .merge(self._common.alloc.clone(), wire_type, buf)?;
+                    self.tag_ids.bind(&mut self._common).merge(wire_type, buf)?;
                 }
                 Self::FIELD_SCORES => {
                     // scores = 7, repeated int32 EXPANDED
-                    self.scores
-                        .merge(self._common.alloc.clone(), wire_type, buf)?;
+                    self.scores.bind(&mut self._common).merge(wire_type, buf)?;
                 }
                 Self::FIELD_LABELS => {
                     // labels = 8, repeated string
@@ -531,18 +532,16 @@ impl<A: Allocator + Clone> MessageDecode for Task<A> {
                 Self::FIELD_STATUS => {
                     // status = 9, IMPLICIT open enum
                     self.status
-                        .merge(&mut self._common, Self::BIT_UNUSED, wire_type, buf)?;
+                        .bind(&mut self._common, Self::BIT_UNUSED)
+                        .merge(wire_type, buf)?;
                 }
                 Self::FIELD_PRIORITY => {
                     // priority = 10, EXPLICIT closed enum
-                    self.priority.merge_closed(
-                        &mut self._common,
-                        Self::FIELD_PRIORITY,
-                        Self::BIT_PRIORITY,
-                        wire_type,
-                        buf,
-                        |v| Priority::try_from(v).is_ok(),
-                    )?;
+                    self.priority
+                        .bind(&mut self._common, Self::BIT_PRIORITY)
+                        .merge_closed(Self::FIELD_PRIORITY, wire_type, buf, |v| {
+                            Priority::try_from(v).is_ok()
+                        })?;
                 }
                 Self::FIELD_ASSIGNEE => {
                     // assignee = 11, nested message

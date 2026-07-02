@@ -6,6 +6,7 @@
 
 use ::core::marker::PhantomData;
 
+use ::allocator_api2::alloc::Allocator;
 use ::bytes::{Buf, BufMut};
 
 use crate::decode;
@@ -43,33 +44,22 @@ impl<T: VarintProtoType, P: FieldPresence> SingularVarintField<T, P> {
         self.value
     }
 
-    /// Stores `v`, applying the presence policy (`on_set` for EXPLICIT).
-    pub fn set<Pb, A>(
-        &mut self,
-        common: &mut MessageCommon<Pb, A>,
+    /// Binds this field to its message `common` state (presence), producing a
+    /// short-lived [`SingularVarintFieldMut`] view that carries the whole
+    /// mutation context. `bit` is the presence index for policy `P`.
+    ///
+    /// This is the entry point for every mutation (`value_mut` / `set` /
+    /// `merge` / `clear` / `merge_closed`): generated accessors call
+    /// `field.bind(&mut common, bit).…()` instead of threading `common` through
+    /// each method. Scalars store no allocator, but the view still carries
+    /// `common` for presence and (closed-enum) unknown-field handling.
+    #[inline]
+    pub fn bind<'f, 'c, Pb: PresenceBits, A: Allocator>(
+        &'f mut self,
+        common: &'c mut MessageCommon<Pb, A>,
         bit: usize,
-        v: T::Value,
-    ) where
-        Pb: PresenceBits,
-        A: ::allocator_api2::alloc::Allocator,
-    {
-        P::on_set(common, bit);
-        self.value = v;
-    }
-
-    /// Returns a mutable reference to the value, applying the presence policy
-    /// (`on_set` for EXPLICIT). Backs generated `*_mut` accessors.
-    pub fn value_mut<Pb, A>(
-        &mut self,
-        common: &mut MessageCommon<Pb, A>,
-        bit: usize,
-    ) -> &mut T::Value
-    where
-        Pb: PresenceBits,
-        A: ::allocator_api2::alloc::Allocator,
-    {
-        P::on_set(common, bit);
-        &mut self.value
+    ) -> SingularVarintFieldMut<'f, 'c, T, P, Pb, A> {
+        SingularVarintFieldMut::new(self, common, bit)
     }
 
     /// Resets the value slot to type-zero (does not touch the bitfield).
@@ -111,26 +101,6 @@ impl<T: VarintProtoType, P: FieldPresence> SingularVarintField<T, P> {
             encode::encode_varint_field(field, T::encode_wire(self.value), buf);
         }
     }
-
-    pub fn merge<Pb, A, B: Buf>(
-        &mut self,
-        common: &mut MessageCommon<Pb, A>,
-        bit: usize,
-        wire_type: WireType,
-        buf: &mut B,
-    ) -> Result<(), DecodeError>
-    where
-        Pb: PresenceBits,
-        A: ::allocator_api2::alloc::Allocator,
-    {
-        if wire_type != varint::WIRE_TYPE {
-            return Err(DecodeError::InvalidTag);
-        }
-        let raw = decode::decode_varint(buf)?;
-        P::on_set(common, bit);
-        self.value = T::decode_wire(raw)?;
-        Ok(())
-    }
 }
 
 impl<T: VarintProtoType, P: FieldPresence> Default for SingularVarintField<T, P> {
@@ -168,29 +138,94 @@ impl<T: VarintProtoType, P: ExplicitFieldPresence> SingularVarintField<T, P> {
         };
         Optional::new(v, default)
     }
+}
 
-    pub fn clear<Pb, A>(&mut self, common: &mut MessageCommon<Pb, A>, bit: usize)
-    where
-        Pb: PresenceBits,
-        A: ::allocator_api2::alloc::Allocator,
-    {
-        P::on_clear(common, bit);
-        self.value = T::proto_zero();
+// ---------------------------------------------------------------------------
+// Mutation view
+// ---------------------------------------------------------------------------
+
+/// Short-lived binding of a singular varint field to its message common state,
+/// produced by [`SingularVarintField::bind`].
+///
+/// It bundles the value slot with the presence/allocator context so a generated
+/// accessor can express a whole mutation as a single call (mirrors the
+/// `SingularLenField` view). Scalars are inline (no heap payload), so the value
+/// itself is `Copy`; the view exists purely to fold presence — and, for closed
+/// enums, unknown-field capture — into one call. Two lifetimes keep the `&mut`
+/// returned by `value_mut` tied to the field slot only (`'f`); the `common`
+/// borrow (`'c`) is released as the method returns. Every method consumes the
+/// view, so a fresh `bind` precedes each mutation.
+pub struct SingularVarintFieldMut<
+    'f,
+    'c,
+    T: VarintProtoType,
+    P: FieldPresence,
+    Pb: PresenceBits,
+    A: Allocator,
+> {
+    field: &'f mut SingularVarintField<T, P>,
+    common: &'c mut MessageCommon<Pb, A>,
+    bit: usize,
+}
+
+impl<'f, 'c, T: VarintProtoType, P: FieldPresence, Pb: PresenceBits, A: Allocator>
+    SingularVarintFieldMut<'f, 'c, T, P, Pb, A>
+{
+    #[inline]
+    fn new(
+        field: &'f mut SingularVarintField<T, P>,
+        common: &'c mut MessageCommon<Pb, A>,
+        bit: usize,
+    ) -> Self {
+        Self { field, common, bit }
     }
 
-    /// Merges a closed-enum occurrence; unknown values go to `common.unknown_fields`.
-    pub fn merge_closed<Pb, A, B: Buf>(
-        &mut self,
-        common: &mut MessageCommon<Pb, A>,
+    /// Marks presence (per `P`) and returns a mutable reference to the value.
+    #[inline]
+    pub fn value_mut(self) -> &'f mut T::Value {
+        P::on_set(self.common, self.bit);
+        &mut self.field.value
+    }
+
+    /// Stores `v`, applying the presence policy (`on_set` for EXPLICIT).
+    #[inline]
+    pub fn set(self, v: T::Value) {
+        P::on_set(self.common, self.bit);
+        self.field.value = v;
+    }
+
+    /// Merges one VARINT occurrence and marks presence (per `P`).
+    pub fn merge<B: Buf>(self, wire_type: WireType, buf: &mut B) -> Result<(), DecodeError> {
+        if wire_type != varint::WIRE_TYPE {
+            return Err(DecodeError::InvalidTag);
+        }
+        let raw = decode::decode_varint(buf)?;
+        P::on_set(self.common, self.bit);
+        self.field.value = T::decode_wire(raw)?;
+        Ok(())
+    }
+}
+
+impl<'f, 'c, T: VarintProtoType, P: ExplicitFieldPresence, Pb: PresenceBits, A: Allocator>
+    SingularVarintFieldMut<'f, 'c, T, P, Pb, A>
+{
+    /// Clears presence and resets the value slot to type-zero.
+    pub fn clear(self) {
+        P::on_clear(self.common, self.bit);
+        self.field.value = T::proto_zero();
+    }
+
+    /// Merges a closed-enum occurrence; unknown values go to
+    /// `common.unknown_fields`. `field` is the proto field number.
+    pub fn merge_closed<B: Buf>(
+        self,
         field: u32,
-        bit: usize,
         wire_type: WireType,
         buf: &mut B,
         is_known: impl FnOnce(T::Value) -> bool,
     ) -> Result<(), DecodeError>
     where
-        Pb: PresenceBits,
-        A: ::allocator_api2::alloc::Allocator + Clone,
+        A: Clone,
         T::Value: Copy,
     {
         if wire_type != varint::WIRE_TYPE {
@@ -202,13 +237,13 @@ impl<T: VarintProtoType, P: ExplicitFieldPresence> SingularVarintField<T, P> {
             decode::save_unknown_varint_field(
                 field,
                 raw,
-                &mut common.unknown_fields,
-                common.alloc.clone(),
+                &mut self.common.unknown_fields,
+                self.common.alloc.clone(),
             );
             return Ok(());
         }
-        P::on_set(common, bit);
-        self.value = value;
+        P::on_set(self.common, self.bit);
+        self.field.value = value;
         Ok(())
     }
 }

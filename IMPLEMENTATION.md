@@ -443,14 +443,12 @@ fn encode_raw<B: BufMut>(&self, buf: &mut B) {
 4. Singular: last wins. Repeated: append. Nested: merge sub-buffer.
 
 ```rust
-Self::FIELD_PRIORITY => self.priority.merge_closed(
-    &mut self._common,
-    Self::FIELD_PRIORITY,
-    Self::BIT_PRIORITY,
-    wire_type,
-    buf,
-    |v| Priority::try_from(v).is_ok(),
-)?,
+Self::FIELD_PRIORITY => self
+    .priority
+    .bind(&mut self._common, Self::BIT_PRIORITY)
+    .merge_closed(Self::FIELD_PRIORITY, wire_type, buf, |v| {
+        Priority::try_from(v).is_ok()
+    })?,
 ```
 
 Nested LEN payloads use `Buf::take(len)` before child `merge_from`.
@@ -484,14 +482,17 @@ Compare messages semantically via getters; deep copy (when added) will copy data
 
 ### Varint (`SingularVarintField<T, P>`)
 
+**Mutation goes through a bound view**, exactly like the LEN family: callers first `field.bind(&mut common, bit)` to get a short-lived [`SingularVarintFieldMut`](src/fields/scalar.rs) view carrying `(field, common, bit)`, then call one consuming method. Scalars store no allocator inline (the value is `Copy`), so the view exists purely to fold presence — and, for closed enums, `unknown_fields` capture — into one call. Two lifetimes keep the `&mut T::Value` returned by `value_mut` tied to the field slot (`'f`) only; the `common` borrow (`'c`) is released as the method returns.
+
 | | IMPLICIT | EXPLICIT |
 |---|---|---|
 | Encode | Omit at type-zero | Omit when bit unset; emit zero if bit set |
-| Merge | Set value; `on_set` no-op | `on_set` + set value |
-| Getter | `value()` | `optional(&common, DefaultZst)` |
-| Mutator | `value_mut(&mut common, bit)` → `&mut T::Value` | same (sets bit) |
+| Merge | `bind(&mut common, bit).merge(wire, buf)` — set value; `on_set` no-op | same (sets bit) |
+| Getter | `value()` | `optional(&common, bit, default)` |
+| Mutator | `bind(&mut common, bit).value_mut()` → `&mut T::Value` | same (sets bit) |
+| Clear | — | `bind(&mut common, bit).clear()` (resets type-zero) |
 
-Open enum: thin glue — `Status::try_from(field.value())`. Closed enum: use `merge_closed` ([§7](#7-field-wrappers)). `Optional` is a concrete struct (DESIGN.md §3); no `Option<T>` conversion. Enum `_mut` accessors expose the raw `i32` storage.
+Getters and encode (`value` / `optional` / `has` / `encoded_len` / `encode_raw`) need only a shared `&common` and stay as plain field methods. Open enum: thin glue — `Status::try_from(field.value())`. Closed enum: `bind(&mut common, bit).merge_closed(field_number, wire, buf, is_known)` — unknown values go to `unknown_fields` (needs `A: Clone`), bit not set ([§7](#7-field-wrappers)). `Optional` is a concrete struct (DESIGN.md §3); no `Option<T>` conversion. Enum `_mut` accessors expose the raw `i32` storage.
 
 ### LEN — string & bytes (`SingularLenField<T, P, A>`)
 
@@ -529,13 +530,13 @@ Wire identical to EXPLICIT. Message `validate()` calls `validate_required` on ea
 | Encode | One LEN record | One VARINT per element |
 | Decode | Both forms | Both forms |
 
-Elements live in `ManuallyDrop<UnmanagedVec<T::Value>>`. Accessors take the allocator by value (an `alloc.clone()`): `as_slice()`, `values_mut(A)` → guard (`impl DerefMut<Target = Vec<_, A>>`), `clear(A)`, `merge(A, …)`, `deallocate(A)`.
+Elements live in `ManuallyDrop<UnmanagedVec<T::Value>>`. Mutation uses the same bound-view idiom as the LEN family: `field.bind(&mut common)` yields a [`RepeatedVarintFieldMut`](src/fields/repeated_varint.rs) (no presence bit — repeated fields have none), whose consuming methods are `values_mut()` → guard (`impl DerefMut<Target = Vec<_, A>>`), `merge(wire, buf)`, and `clear()`; each obtains its own owned `alloc.clone()` from `common`. Read-only paths (`as_slice` / `is_empty` / `encoded_len` / `encode_raw`) stay on the field. `deallocate(A)` also stays on the field (called once from message `Drop`).
 
 ### LEN (`RepeatedLenField<T, A>`)
 
 One LEN record per element (`repeated string` / `repeated bytes`), stored as `ManuallyDrop<UnmanagedVec<T::Storage>>`. Mutation uses the same bound-view idiom: `field.bind(&mut common)` yields a [`RepeatedLenFieldMut`](src/fields/repeated_len.rs) (no presence bit — repeated fields have none), whose consuming methods are `push_in(impl AsRef<[u8]>)`, `merge(wire, buf)`, and `clear()`. The typed `push_in` helper is kept instead of a bare `DerefMut` (which would expose allocator-less element storage that is impractical to construct). Because each element is itself allocator-less, `clear`/`deallocate` **drain and free every element first** (each via its own owned `alloc.clone()`), then free the buffer. `deallocate(A)` stays on the field (called from `Drop`).
 
-> Note: `RepeatedVarintField` still exposes its mutators (`values_mut` / `clear` / `merge`) directly with an `A` argument; the bound-view rollout currently covers the LEN families (`SingularLenField`, `RepeatedLenField`). Extending it to the varint/scalar families is straightforward but not yet done.
+> Note: the bound-view idiom (`field.bind(&mut common[, bit]).op()`) now covers every mutable field family — `SingularLenField`, `RepeatedLenField`, `SingularVarintField`, and `RepeatedVarintField`. Only the terminal `deallocate(A)` stays a direct field method (called from `Drop`).
 
 ---
 

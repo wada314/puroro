@@ -56,11 +56,12 @@ pub use repeated_len::{
 };
 pub use repeated_varint::{
     RepeatedExpandedInt32, RepeatedExpandedVarintField, RepeatedPackedInt32,
-    RepeatedPackedVarintField, RepeatedVarint, RepeatedVarintField,
+    RepeatedPackedVarintField, RepeatedVarint, RepeatedVarintField, RepeatedVarintFieldMut,
 };
 pub use scalar::{
     ExplicitEnum, ExplicitInt32, ExplicitVarint, ExplicitVarintField, ImplicitEnum, ImplicitInt32,
     ImplicitVarint, ImplicitVarintField, SingularVarint, SingularVarintField,
+    SingularVarintFieldMut,
 };
 pub use varint::{
     ProtoBool, ProtoEnum, ProtoInt32, ProtoInt64, ProtoSint32, ProtoSint64, ProtoUInt32, ProtoUInt64,
