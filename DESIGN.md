@@ -686,7 +686,9 @@ pub fn phone_number_mut(&mut self) -> impl DerefMut<Target = ::unmanaged::String
 pub fn clear_notification(&mut self);
 ```
 
-Mutation goes through the same bound-view idiom as the other families: `slot.bind(&mut common)` yields an `OneofSlotMut`, whose `variant_mut(is_match, make)` returns a `&mut` to the (possibly freshly-installed) active variant, `set(value)` replaces the whole group, and `clear()` frees the active variant. Each of these releases the previously-active variant via `OneofDeallocate::deallocate` before overwriting the slot, so the last field seen on the wire wins with no leak. The old `set_*` per-variant setters are removed, matching the `set_*`-abolition across the other families.
+Mutation goes through the same bound-view idiom as the other families: `slot.bind(&mut common)` yields an `OneofSlotMut`, whose `variant_mut(is_match, make)` returns a `&mut` to the (possibly freshly-installed) active variant, `try_set_with(make)` decodes then installs a variant, `set(value)` replaces the whole group, and `clear()` frees the active variant. Each of these releases the previously-active variant via `OneofDeallocate::deallocate` before overwriting the slot, so the last field seen on the wire wins with no leak. The old `set_*` per-variant setters are removed, matching the `set_*`-abolition across the other families.
+
+The group's field-number constants and its encode / merge glue live **on the enum** (`Notification::FIELD_EMAIL_ADDRESS`, `Notification::encoded_len` / `encode` / `merge_email_address` / `merge_phone_number`), not as free functions on the parent message; the merge helpers are generic over the parent's `PresenceBits` and take the bound view, so the enum stays self-contained and message-agnostic.
 
 ---
 

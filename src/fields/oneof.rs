@@ -154,6 +154,26 @@ impl<'f, 'c, E, Pb: PresenceBits, A: Allocator> OneofSlotMut<'f, 'c, E, Pb, A> {
         self.slot.set(Some(value));
     }
 
+    /// Builds a new variant with `make` (which receives an owned allocator clone,
+    /// e.g. to decode a LEN payload), then installs it, freeing the
+    /// previously-active variant. The new variant is built **before** the old one
+    /// is released, so a `make` failure leaves the slot untouched. Backs the
+    /// decode arms of oneof groups whose variants own heap storage.
+    pub fn try_set_with<Err>(self, make: impl FnOnce(A) -> Result<E, Err>) -> Result<(), Err>
+    where
+        E: OneofDeallocate,
+        A: Clone,
+    {
+        let value = make(self.common.alloc.clone())?;
+        if let Some(old) = self.slot.take() {
+            // SAFETY: an owned clone of the message allocator owns the previous
+            // variant's buffers.
+            unsafe { old.deallocate(self.common.alloc.clone()) };
+        }
+        self.slot.set(Some(value));
+        Ok(())
+    }
+
     /// Ensures the active variant satisfies `is_match`; otherwise frees any
     /// existing variant and installs a fresh one built by `make` (which receives
     /// an owned allocator clone). Returns a mutable reference to the now-active

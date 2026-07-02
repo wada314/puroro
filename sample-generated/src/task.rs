@@ -15,7 +15,7 @@ use ::puroro::{
     DecodeError, Explicit, HasDefault, Implicit, LegacyRequired, MessageCommon, MessageDecode,
     MessageEncode, NestedMessageField, OneofSlot, Optional, PresenceBits, ProtoBytes, ProtoEnum,
     ProtoInt32, ProtoString, RepeatedExpandedVarintField, RepeatedLenField,
-    RepeatedPackedVarintField, SingularLenField, SingularVarintField, WireType,
+    RepeatedPackedVarintField, SingularLenField, SingularVarintField,
 };
 
 use ::unmanaged::UnmanagedString;
@@ -83,8 +83,8 @@ impl<A: Allocator + Clone> Task<A> {
     pub const FIELD_STATUS: u32 = 9; // status
     pub const FIELD_PRIORITY: u32 = 10; // priority
     pub const FIELD_ASSIGNEE: u32 = 11; // assignee
-    pub const FIELD_EMAIL: u32 = 12; // notification.email_address
-    pub const FIELD_PHONE: u32 = 13; // notification.phone_number
+    // oneof notification variant field numbers live on `Notification`
+    // (`FIELD_EMAIL_ADDRESS` = 12, `FIELD_PHONE_NUMBER` = 13).
 
     pub const BIT_TITLE: usize = 0; // title (EXPLICIT)
     pub const BIT_MAX_RETRIES: usize = 1; // max_retries (EXPLICIT)
@@ -456,7 +456,7 @@ impl<A: Allocator + Clone> MessageEncode for Task<A> {
             .priority
             .encoded_len(c, Self::FIELD_PRIORITY, Self::BIT_PRIORITY);
         n += self.assignee.encoded_len(Self::FIELD_ASSIGNEE);
-        n += encoded_len_notification::<A>(&self.notification);
+        n += Notification::encoded_len(&self.notification);
         n + c.unknown_fields.len()
     }
 
@@ -480,7 +480,7 @@ impl<A: Allocator + Clone> MessageEncode for Task<A> {
         self.priority
             .encode_raw(c, Self::FIELD_PRIORITY, Self::BIT_PRIORITY, buf);
         self.assignee.encode_raw(Self::FIELD_ASSIGNEE, buf);
-        encode_notification::<A, B>(&self.notification, buf);
+        Notification::encode(&self.notification, buf);
         let unknown: &[u8] = &c.unknown_fields;
         buf.put_slice(unknown);
     }
@@ -551,20 +551,18 @@ impl<A: Allocator + Clone> MessageDecode for Task<A> {
                     // assignee = 11, nested message
                     self.assignee.merge(&self._common, wire_type, buf)?;
                 }
-                Self::FIELD_EMAIL => {
+                Notification::FIELD_EMAIL_ADDRESS => {
                     // notification.email_address = 12
-                    merge_notification_email(
-                        &mut self.notification,
-                        &mut self._common,
+                    Notification::merge_email_address(
+                        self.notification.bind(&mut self._common),
                         wire_type,
                         buf,
                     )?;
                 }
-                Self::FIELD_PHONE => {
+                Notification::FIELD_PHONE_NUMBER => {
                     // notification.phone_number = 13
-                    merge_notification_phone(
-                        &mut self.notification,
-                        &mut self._common,
+                    Notification::merge_phone_number(
+                        self.notification.bind(&mut self._common),
                         wire_type,
                         buf,
                     )?;
@@ -583,65 +581,4 @@ impl<A: Allocator + Clone> MessageDecode for Task<A> {
         }
         Ok(())
     }
-}
-
-// ---------------------------------------------------------------------------
-// Oneof helpers (generated per message today)
-// ---------------------------------------------------------------------------
-
-fn encoded_len_notification<A: Allocator + Clone>(slot: &OneofSlot<Notification>) -> usize {
-    match slot.get() {
-        Some(Notification::EmailAddress(s)) => {
-            ::puroro::encode::encoded_len_len_field(Task::<A>::FIELD_EMAIL, s.len())
-        }
-        Some(Notification::PhoneNumber(s)) => {
-            ::puroro::encode::encoded_len_len_field(Task::<A>::FIELD_PHONE, s.len())
-        }
-        None => 0,
-    }
-}
-
-fn encode_notification<A: Allocator + Clone, B: BufMut>(
-    slot: &OneofSlot<Notification>,
-    buf: &mut B,
-) {
-    match slot.get() {
-        Some(Notification::EmailAddress(s)) => {
-            ::puroro::encode::encode_len_field(Task::<A>::FIELD_EMAIL, s.as_bytes(), buf);
-        }
-        Some(Notification::PhoneNumber(s)) => {
-            ::puroro::encode::encode_len_field(Task::<A>::FIELD_PHONE, s.as_bytes(), buf);
-        }
-        None => {}
-    }
-}
-
-fn merge_notification_email<A: Allocator + Clone, B: Buf>(
-    slot: &mut OneofSlot<Notification>,
-    common: &mut MessageCommon<TaskPresence, A>,
-    wire_type: WireType,
-    buf: &mut B,
-) -> Result<(), DecodeError> {
-    if wire_type != WireType::Len {
-        return Err(DecodeError::InvalidTag);
-    }
-    // Decode first so a failure leaves the old variant intact.
-    let s = ::puroro::decode::decode_string_in(buf, common.alloc.clone())?;
-    slot.bind(common).set(Notification::EmailAddress(s));
-    Ok(())
-}
-
-fn merge_notification_phone<A: Allocator + Clone, B: Buf>(
-    slot: &mut OneofSlot<Notification>,
-    common: &mut MessageCommon<TaskPresence, A>,
-    wire_type: WireType,
-    buf: &mut B,
-) -> Result<(), DecodeError> {
-    if wire_type != WireType::Len {
-        return Err(DecodeError::InvalidTag);
-    }
-    // Decode first so a failure leaves the old variant intact.
-    let s = ::puroro::decode::decode_string_in(buf, common.alloc.clone())?;
-    slot.bind(common).set(Notification::PhoneNumber(s));
-    Ok(())
 }
