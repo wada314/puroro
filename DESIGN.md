@@ -663,26 +663,30 @@ impl From<Status> for i32 { … }
 
 ### 4.7 Oneof fields
 
-Each `oneof` group generates a Rust `enum` in a submodule named after the parent message (lower-snake-case). The parent message holds an `Option` of that enum.
+Each `oneof` group generates a Rust `enum` in a submodule named after the parent message (lower-snake-case). The variants hold allocator-less storage (`UnmanagedString`, …), and the enum implements `OneofVariant` so its active variant can be released through the message allocator. The parent message stores the group in an `OneofSlot<Notification>`.
 
 ```rust
 // In module `task`:
-pub enum Notification<A: Allocator = Global> {
-    EmailAddress(/* owned string */),
-    PhoneNumber(/* owned string */),
+pub enum Notification {
+    EmailAddress(/* UnmanagedString */),
+    PhoneNumber(/* UnmanagedString */),
 }
+impl ::puroro::OneofVariant for Notification { /* deallocate active variant */ }
 
 // Accessors on Task:
-pub fn notification(&self) -> Option<&task::Notification<A>>;
-pub fn notification_mut(&mut self) -> Option<&mut task::Notification<A>>;
-pub fn set_notification(&mut self, v: Option<task::Notification<A>>);
+pub fn notification(&self) -> Option<&task::Notification>;
 
-// Per-variant convenience setters; each clears any previously set variant:
-pub fn set_email_address(&mut self, v: &str);
-pub fn set_phone_number(&mut self, v: &str);
+// Per-variant `_mut` accessors (mutation is unified under `_mut`, mirroring the
+// singular field families). Acquiring one switches the oneof to that variant —
+// freeing any previously-active variant — and returns a growable guard:
+pub fn email_address_mut(&mut self) -> impl DerefMut<Target = ::unmanaged::String<A>> + '_;
+pub fn phone_number_mut(&mut self) -> impl DerefMut<Target = ::unmanaged::String<A>> + '_;
+
+// Clears whichever variant is active (freeing it):
+pub fn clear_notification(&mut self);
 ```
 
-Setting any variant replaces the whole `Option`; the last field seen on the wire wins.
+Mutation goes through the same bound-view idiom as the other families: `slot.bind(&mut common)` yields an `OneofSlotMut`, whose `variant_mut(is_match, make)` returns a `&mut` to the (possibly freshly-installed) active variant, `set(value)` replaces the whole group, and `clear()` frees the active variant. Each of these releases the previously-active variant via `OneofVariant::deallocate` before overwriting the slot, so the last field seen on the wire wins with no leak. The old `set_*` per-variant setters are removed, matching the `set_*`-abolition across the other families.
 
 ---
 

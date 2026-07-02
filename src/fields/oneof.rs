@@ -3,12 +3,41 @@
 //! Protobuf oneof variants are mutually exclusive: setting or decoding one
 //! variant clears any other. [`OneofSlot`] centralises that coupling so
 //! individual variant field types are not used on the message struct.
+//!
+//! Mutation flows through [`OneofSlotMut`], obtained via
+//! [`OneofSlot::bind`], mirroring the bound-view idiom used by the singular /
+//! repeated field families: the slot is bound to the message
+//! [`MessageCommon`] (for the allocator), and the previously-active variant is
+//! released through [`OneofVariant::deallocate`] before the slot is overwritten.
+
+use ::allocator_api2::alloc::Allocator;
+
+use super::common::MessageCommon;
+use super::presence::PresenceBits;
+
+/// Per-variant cleanup for a generated `oneof` enum.
+///
+/// A oneof enum owns allocator-less storage in its variants (`UnmanagedString`,
+/// `UnmanagedVec`, nested messages, …), which cannot free themselves. The enum
+/// implements this trait so [`OneofSlotMut`] can release the active variant
+/// before overwriting the slot. Variants that hold only inline scalars make
+/// `deallocate` a no-op.
+pub trait OneofVariant {
+    /// Drops the active variant and frees its storage through `alloc`.
+    ///
+    /// # Safety
+    ///
+    /// `alloc` must be the allocator that owns the variant's buffers.
+    unsafe fn deallocate<A: Allocator>(self, alloc: A);
+}
 
 /// Storage for a protobuf `oneof` group.
 ///
-/// Decode arms for each variant field number call [`set`](Self::set) with the
-/// decoded enum value; each call replaces the entire slot (last wins on wire).
-/// Per-variant convenience setters on the parent message delegate here.
+/// The stored variant is replaced whenever another one is set or decoded (last
+/// wins on the wire). All mutation goes through [`bind`](Self::bind); the
+/// inherent [`set`](Self::set) / [`take`](Self::take) / [`clear`](Self::clear)
+/// are low-level primitives used by the view and do **not** release the
+/// previous variant on their own.
 pub struct OneofSlot<E> {
     value: Option<E>,
 }
@@ -29,6 +58,21 @@ impl<E> OneofSlot<E> {
     #[inline]
     pub fn get_mut(&mut self) -> Option<&mut E> {
         self.value.as_mut()
+    }
+
+    /// Binds this slot to its message `common` state (for the allocator),
+    /// producing a short-lived [`OneofSlotMut`] view.
+    ///
+    /// This is the entry point for every mutation (`set` / `variant_mut` /
+    /// `clear`): generated accessors call `slot.bind(&mut common).…()` instead
+    /// of releasing the old variant and rewriting the slot by hand. A oneof
+    /// carries no presence bit, so the view needs only `common`.
+    #[inline]
+    pub fn bind<'f, 'c, Pb: PresenceBits, A: Allocator>(
+        &'f mut self,
+        common: &'c mut MessageCommon<Pb, A>,
+    ) -> OneofSlotMut<'f, 'c, E, Pb, A> {
+        OneofSlotMut::new(self, common)
     }
 
     /// Replaces the whole oneof (clears any previous variant).
@@ -57,6 +101,87 @@ impl<E> OneofSlot<E> {
 impl<E> Default for OneofSlot<E> {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Mutation view
+// ---------------------------------------------------------------------------
+
+/// Short-lived binding of a oneof slot to its message common state, produced by
+/// [`OneofSlot::bind`].
+///
+/// Bundles the slot with the allocator context so that generated code can
+/// mutate through a single call while the previously-active variant is released
+/// consistently (via [`OneofVariant`]). A oneof has no presence bit, so the view
+/// carries only `common` (for the allocator). Every method consumes the view, so
+/// a fresh `bind` precedes each mutation.
+pub struct OneofSlotMut<'f, 'c, E, Pb: PresenceBits, A: Allocator> {
+    slot: &'f mut OneofSlot<E>,
+    common: &'c mut MessageCommon<Pb, A>,
+}
+
+impl<'f, 'c, E, Pb: PresenceBits, A: Allocator> OneofSlotMut<'f, 'c, E, Pb, A> {
+    #[inline]
+    fn new(slot: &'f mut OneofSlot<E>, common: &'c mut MessageCommon<Pb, A>) -> Self {
+        Self { slot, common }
+    }
+
+    /// Replaces the whole oneof with `value`, freeing the previously-active
+    /// variant first (last wins on the wire). Backs the decode arms.
+    pub fn set(self, value: E)
+    where
+        E: OneofVariant,
+        A: Clone,
+    {
+        if let Some(old) = self.slot.take() {
+            // SAFETY: an owned clone of the message allocator owns the previous
+            // variant's buffers.
+            unsafe { old.deallocate(self.common.alloc.clone()) };
+        }
+        self.slot.set(Some(value));
+    }
+
+    /// Ensures the active variant satisfies `is_match`; otherwise frees any
+    /// existing variant and installs a fresh one built by `make` (which receives
+    /// an owned allocator clone). Returns a mutable reference to the now-active
+    /// variant, borrowing only the slot (`'f`), so `common` is free once this
+    /// returns. Backs the per-variant `_mut` accessors.
+    pub fn variant_mut(
+        self,
+        is_match: impl FnOnce(&E) -> bool,
+        make: impl FnOnce(A) -> E,
+    ) -> &'f mut E
+    where
+        E: OneofVariant,
+        A: Clone,
+    {
+        let slot = self.slot;
+        let common = self.common;
+        let active = matches!(slot.get(), Some(e) if is_match(e));
+        if !active {
+            if let Some(old) = slot.take() {
+                // SAFETY: an owned clone of the message allocator owns the
+                // previous variant's buffers.
+                unsafe { old.deallocate(common.alloc.clone()) };
+            }
+            slot.set(Some(make(common.alloc.clone())));
+        }
+        // The branch above guarantees the slot is now occupied.
+        slot.get_mut().unwrap()
+    }
+
+    /// Frees the active variant (if any), leaving the slot empty.
+    pub fn clear(self)
+    where
+        E: OneofVariant,
+        A: Clone,
+    {
+        if let Some(old) = self.slot.take() {
+            // SAFETY: an owned clone of the message allocator owns the active
+            // variant's buffers.
+            unsafe { old.deallocate(self.common.alloc.clone()) };
+        }
     }
 }
 

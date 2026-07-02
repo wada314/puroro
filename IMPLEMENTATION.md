@@ -548,7 +548,15 @@ One LEN record per element (`repeated string` / `repeated bytes`), stored as `Ma
 
 ### Oneof (`OneofSlot<E>`)
 
-Each wire occurrence replaces the whole slot (last wins). Encode active variant only. Decode: one match arm per variant field number; coupling stays in slot + generated helpers — not spread across singular members. Because variants hold allocator-less `UnmanagedString`, setters/decode `take()` and `deallocate` the previous variant before storing a new one, and the message `Drop` `take()`s and frees the active variant. (Oneof is a tentative implementation prioritising correctness of compile/round-trip.)
+Each wire occurrence replaces the whole slot (last wins). Encode active variant only. Decode: one match arm per variant field number; coupling stays in slot + generated helpers — not spread across singular members.
+
+Because variants hold allocator-less storage (`UnmanagedString`, …), the enum implements [`OneofVariant`](src/fields/oneof.rs) (`unsafe fn deallocate<A>(self, alloc)`) so the previously-active variant is freed before the slot is overwritten. Mutation uses the same bound-view idiom as the other families: `slot.bind(&mut common)` yields an [`OneofSlotMut`](src/fields/oneof.rs) whose consuming methods are:
+
+- `variant_mut(is_match, make) -> &mut E` — keeps the active variant if `is_match`, else frees it and installs `make(alloc.clone())`; backs the per-variant `_mut` accessors, which then pattern-match out the inner storage and return a `with_alloc` guard.
+- `set(value)` — replaces the whole group (frees the old variant); backs the decode arms (`merge_notification_*` decode first, then `set`).
+- `clear()` — frees the active variant; backs `clear_*` and the message `Drop`.
+
+The inherent `OneofSlot::{set, take, clear, get_mut}` remain as low-level primitives used by the view; they do not free on their own. The `set_*` per-variant setters are removed, matching the `set_*`-abolition across the other families. (Oneof is a tentative implementation prioritising correctness of compile/round-trip.)
 
 ### Unknown
 

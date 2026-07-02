@@ -18,6 +18,8 @@ use ::puroro::{
     RepeatedPackedVarintField, SingularLenField, SingularVarintField, WireType,
 };
 
+use ::unmanaged::UnmanagedString;
+
 use crate::address::Address;
 use crate::enums::{Priority, Status};
 
@@ -337,32 +339,38 @@ impl<A: Allocator + Clone> Task<A> {
         self.notification.get()
     }
 
-    pub fn set_email_address(&mut self, v: &str) {
-        if let Some(old) = self.notification.take() {
-            // SAFETY: an owned clone of the message allocator owns the previous
-            // variant's buffer.
-            unsafe { old.deallocate(self._common.alloc.clone()) };
-        }
-        let s = ::puroro::decode::str_to_unmanaged_in(v, self._common.alloc.clone());
-        self.notification.set(Some(Notification::EmailAddress(s)));
+    pub fn email_address_mut(
+        &mut self,
+    ) -> impl ::core::ops::DerefMut<Target = ::unmanaged::String<A>> + '_ {
+        let variant = self.notification.bind(&mut self._common).variant_mut(
+            |n| matches!(n, Notification::EmailAddress(_)),
+            |alloc| Notification::EmailAddress(UnmanagedString::new(alloc)),
+        );
+        let alloc = self._common.alloc.clone();
+        let Notification::EmailAddress(s) = variant else {
+            unreachable!()
+        };
+        // SAFETY: an owned clone of the message allocator owns this string's buffer.
+        unsafe { s.with_alloc(alloc) }
     }
 
-    pub fn set_phone_number(&mut self, v: &str) {
-        if let Some(old) = self.notification.take() {
-            // SAFETY: an owned clone of the message allocator owns the previous
-            // variant's buffer.
-            unsafe { old.deallocate(self._common.alloc.clone()) };
-        }
-        let s = ::puroro::decode::str_to_unmanaged_in(v, self._common.alloc.clone());
-        self.notification.set(Some(Notification::PhoneNumber(s)));
+    pub fn phone_number_mut(
+        &mut self,
+    ) -> impl ::core::ops::DerefMut<Target = ::unmanaged::String<A>> + '_ {
+        let variant = self.notification.bind(&mut self._common).variant_mut(
+            |n| matches!(n, Notification::PhoneNumber(_)),
+            |alloc| Notification::PhoneNumber(UnmanagedString::new(alloc)),
+        );
+        let alloc = self._common.alloc.clone();
+        let Notification::PhoneNumber(s) = variant else {
+            unreachable!()
+        };
+        // SAFETY: an owned clone of the message allocator owns this string's buffer.
+        unsafe { s.with_alloc(alloc) }
     }
 
     pub fn clear_notification(&mut self) {
-        if let Some(old) = self.notification.take() {
-            // SAFETY: an owned clone of the message allocator owns the active
-            // variant's buffer.
-            unsafe { old.deallocate(self._common.alloc.clone()) };
-        }
+        self.notification.bind(&mut self._common).clear();
     }
 
     // -- message-level ------------------------------------------------------
@@ -412,11 +420,7 @@ impl<A: Allocator + Clone> Drop for Task<A> {
         self.scores.deallocate(self._common.alloc.clone());
         self.labels.deallocate(self._common.alloc.clone());
         self.assignee.deallocate(self._common.alloc.clone());
-        if let Some(n) = self.notification.take() {
-            // SAFETY: an owned clone of the message allocator owns the active
-            // variant's buffer.
-            unsafe { n.deallocate(self._common.alloc.clone()) };
-        }
+        self.notification.bind(&mut self._common).clear();
         self._common.deallocate();
     }
 }
@@ -549,11 +553,21 @@ impl<A: Allocator + Clone> MessageDecode for Task<A> {
                 }
                 Self::FIELD_EMAIL => {
                     // notification.email_address = 12
-                    merge_notification_email(&mut self.notification, &self._common, wire_type, buf)?;
+                    merge_notification_email(
+                        &mut self.notification,
+                        &mut self._common,
+                        wire_type,
+                        buf,
+                    )?;
                 }
                 Self::FIELD_PHONE => {
                     // notification.phone_number = 13
-                    merge_notification_phone(&mut self.notification, &self._common, wire_type, buf)?;
+                    merge_notification_phone(
+                        &mut self.notification,
+                        &mut self._common,
+                        wire_type,
+                        buf,
+                    )?;
                 }
                 _ => {
                     // unknown field — preserve in _common.unknown_fields
@@ -604,38 +618,30 @@ fn encode_notification<A: Allocator + Clone, B: BufMut>(
 
 fn merge_notification_email<A: Allocator + Clone, B: Buf>(
     slot: &mut OneofSlot<Notification>,
-    common: &MessageCommon<TaskPresence, A>,
+    common: &mut MessageCommon<TaskPresence, A>,
     wire_type: WireType,
     buf: &mut B,
 ) -> Result<(), DecodeError> {
     if wire_type != WireType::Len {
         return Err(DecodeError::InvalidTag);
     }
+    // Decode first so a failure leaves the old variant intact.
     let s = ::puroro::decode::decode_string_in(buf, common.alloc.clone())?;
-    if let Some(old) = slot.take() {
-        // SAFETY: an owned clone of `common.alloc` owns the previous variant's
-        // buffer.
-        unsafe { old.deallocate(common.alloc.clone()) };
-    }
-    slot.set(Some(Notification::EmailAddress(s)));
+    slot.bind(common).set(Notification::EmailAddress(s));
     Ok(())
 }
 
 fn merge_notification_phone<A: Allocator + Clone, B: Buf>(
     slot: &mut OneofSlot<Notification>,
-    common: &MessageCommon<TaskPresence, A>,
+    common: &mut MessageCommon<TaskPresence, A>,
     wire_type: WireType,
     buf: &mut B,
 ) -> Result<(), DecodeError> {
     if wire_type != WireType::Len {
         return Err(DecodeError::InvalidTag);
     }
+    // Decode first so a failure leaves the old variant intact.
     let s = ::puroro::decode::decode_string_in(buf, common.alloc.clone())?;
-    if let Some(old) = slot.take() {
-        // SAFETY: an owned clone of `common.alloc` owns the previous variant's
-        // buffer.
-        unsafe { old.deallocate(common.alloc.clone()) };
-    }
-    slot.set(Some(Notification::PhoneNumber(s)));
+    slot.bind(common).set(Notification::PhoneNumber(s));
     Ok(())
 }

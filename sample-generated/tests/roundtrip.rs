@@ -15,7 +15,7 @@ fn task_roundtrip() {
     task.push_label("urgent");
     *task.status_mut() = i32::from(Status::Pending);
     *task.priority_mut() = i32::from(Priority::High);
-    task.set_email_address("a@example.com");
+    task.email_address_mut().push_str("a@example.com");
 
     let mut assignee = Address::new();
     assignee.street_mut().push_str("1 Main St");
