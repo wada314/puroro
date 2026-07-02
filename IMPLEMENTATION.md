@@ -497,16 +497,18 @@ Open enum: thin glue — `Status::try_from(field.value())`. Closed enum: use `me
 
 The payload is `ManuallyDrop<T::Storage>` (`UnmanagedString` / `UnmanagedVec<u8>`).
 
+**Mutation goes through a bound view.** Rather than threading `common` (and `bit`) through every method, callers first `field.bind(&mut common, bit)` to get a short-lived [`SingularLenFieldMut`](src/fields/len_field.rs) view that carries the whole mutation context, then call one of its consuming methods. This keeps the field struct a pure storage holder and collapses each generated accessor to a single call (no separate `set_presence`). The view uses **two lifetimes** so the guard returned by `value_mut` borrows only the field storage (`'f`) — the `common` borrow (`'c`) is released as the method returns.
+
 | | IMPLICIT | EXPLICIT / LEGACY_REQUIRED |
 |---|---|---|
 | Encode | Omit when empty | Omit when bit unset |
-| Merge | decode new, then `deallocate` old, then store | + `on_set` |
+| Merge | `bind(&mut common, bit).merge(wire, buf)` — decode new, free old, store, `on_set` | same |
 | Getter | `value()` | `optional(&common, bit, default)` |
-| Mutator | `value_mut(alloc.clone())` → guard (`impl DerefMut`) | same; generated `_mut` sets the bit first |
-| Clear | `clear(&mut common, bit)` (frees old, resets empty) | same |
+| Mutator | `bind(&mut common, bit).value_mut()` → guard (`impl DerefMut`), marks presence | same |
+| Clear | `bind(&mut common, bit).clear()` (frees old, resets empty) | same |
 | Release | `deallocate(&mut self, A)` (owned clone; called from message `Drop`) | same |
 
-Every operation that actually (de)allocates takes the allocator **by value** — the caller passes an `alloc.clone()`. The allocator is thus consistently type `A` for both the growing allocation and the eventual free (never `&A`); interchangeability of clones is guaranteed by the `Allocator + Clone` contract.
+Getters and encode (`value` / `optional` / `has` / `encoded_len` / `encode_raw`) stay on the field itself: they only need a shared `&common`, so they are already clean one-line delegates and are left outside the view. Every operation that actually (de)allocates takes the allocator **by value** — an `alloc.clone()`, obtained inside the view from `common.alloc`. The allocator is thus consistently type `A` for both the growing allocation and the eventual free (never `&A`); interchangeability of clones is guaranteed by the `Allocator + Clone` contract.
 
 ### LEGACY_REQUIRED
 
@@ -531,7 +533,9 @@ Elements live in `ManuallyDrop<UnmanagedVec<T::Value>>`. Accessors take the allo
 
 ### LEN (`RepeatedLenField<T, A>`)
 
-One LEN record per element (`repeated string` / `repeated bytes`), stored as `ManuallyDrop<UnmanagedVec<T::Storage>>`. Because each element is itself allocator-less, `deallocate`/`clear` **drain and free every element first** (each via its own owned `alloc.clone()`), then free the buffer. The typed `push_in(A, impl AsRef<[u8]>)` helper is kept (the bare `DerefMut` would expose allocator-less element storage that is impractical to construct).
+One LEN record per element (`repeated string` / `repeated bytes`), stored as `ManuallyDrop<UnmanagedVec<T::Storage>>`. Mutation uses the same bound-view idiom: `field.bind(&mut common)` yields a [`RepeatedLenFieldMut`](src/fields/repeated_len.rs) (no presence bit — repeated fields have none), whose consuming methods are `push_in(impl AsRef<[u8]>)`, `merge(wire, buf)`, and `clear()`. The typed `push_in` helper is kept instead of a bare `DerefMut` (which would expose allocator-less element storage that is impractical to construct). Because each element is itself allocator-less, `clear`/`deallocate` **drain and free every element first** (each via its own owned `alloc.clone()`), then free the buffer. `deallocate(A)` stays on the field (called from `Drop`).
+
+> Note: `RepeatedVarintField` still exposes its mutators (`values_mut` / `clear` / `merge`) directly with an `A` argument; the bound-view rollout currently covers the LEN families (`SingularLenField`, `RepeatedLenField`). Extending it to the varint/scalar families is straightforward but not yet done.
 
 ---
 

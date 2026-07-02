@@ -84,12 +84,13 @@ impl<A: Allocator + Clone> Address<A> {
     pub fn street_mut<'s>(
         &'s mut self,
     ) -> impl ::core::ops::DerefMut<Target = ::unmanaged::String<A>> + 's {
-        self._common.set_presence(Self::BIT_STREET, true);
-        self.street.value_mut(self._common.alloc.clone())
+        self.street
+            .bind(&mut self._common, Self::BIT_STREET)
+            .value_mut()
     }
 
     pub fn clear_street(&mut self) {
-        self.street.clear(&mut self._common, Self::BIT_STREET);
+        self.street.bind(&mut self._common, Self::BIT_STREET).clear();
     }
 
     // -- city (EXPLICIT string, proto field 2) ------------------------------
@@ -109,12 +110,11 @@ impl<A: Allocator + Clone> Address<A> {
     pub fn city_mut<'s>(
         &'s mut self,
     ) -> impl ::core::ops::DerefMut<Target = ::unmanaged::String<A>> + 's {
-        self._common.set_presence(Self::BIT_CITY, true);
-        self.city.value_mut(self._common.alloc.clone())
+        self.city.bind(&mut self._common, Self::BIT_CITY).value_mut()
     }
 
     pub fn clear_city(&mut self) {
-        self.city.clear(&mut self._common, Self::BIT_CITY);
+        self.city.bind(&mut self._common, Self::BIT_CITY).clear();
     }
 
     pub fn unknown_fields(&self) -> &[u8] {
@@ -183,12 +183,14 @@ impl<A: Allocator + Clone> MessageDecode for Address<A> {
                 Self::FIELD_STREET => {
                     // street = 1, EXPLICIT string
                     self.street
-                        .merge(&mut self._common, Self::BIT_STREET, wire_type, buf)?;
+                        .bind(&mut self._common, Self::BIT_STREET)
+                        .merge(wire_type, buf)?;
                 }
                 Self::FIELD_CITY => {
                     // city = 2, EXPLICIT string
                     self.city
-                        .merge(&mut self._common, Self::BIT_CITY, wire_type, buf)?;
+                        .bind(&mut self._common, Self::BIT_CITY)
+                        .merge(wire_type, buf)?;
                 }
                 _ => {
                     // unknown field — preserve in _common.unknown_fields

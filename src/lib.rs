@@ -45,9 +45,11 @@ pub use fields::{
     NestedMessageField, OneofSlot, Expanded, Packed, PresenceBits, ProtoBool, ProtoBytes, ProtoEnum, ProtoInt32,
     ProtoInt64, ProtoSint32, ProtoSint64, ProtoString, ProtoUInt32, ProtoUInt64, RepeatedBytes,
     RepeatedExpandedInt32, RepeatedExpandedVarintField, RepeatedLen, RepeatedLenField,
-    RepeatedPackedInt32, RepeatedPackedVarintField, RepeatedString, RepeatedVarint,
+    RepeatedLenFieldMut, RepeatedPackedInt32, RepeatedPackedVarintField, RepeatedString,
+    RepeatedVarint,
     RepeatedVarintEncoding, RepeatedVarintField, RequiredFieldPresence,
-    SingularLen, SingularLenField, SingularVarint, SingularVarintField, VarintProtoType,
+    SingularLen, SingularLenField, SingularLenFieldMut, SingularVarint, SingularVarintField,
+    VarintProtoType,
 };
 pub use optional::{HasDefault, Optional};
 pub use wire_type::WireType;

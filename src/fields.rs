@@ -45,13 +45,15 @@ pub use field_presence::{
 pub use len::{LenProtoType, ProtoBytes, ProtoString};
 pub use len_field::{
     ExplicitBytes, ExplicitLenField, ExplicitString, ImplicitBytes, ImplicitLenField,
-    ImplicitString, SingularLen, SingularLenField,
+    ImplicitString, SingularLen, SingularLenField, SingularLenFieldMut,
 };
 pub use message::{NestedMessage, NestedMessageField};
 pub use oneof::OneofSlot;
 pub use presence::PresenceBits;
 pub use repeated_encoding::{Expanded, Packed, RepeatedVarintEncoding};
-pub use repeated_len::{RepeatedBytes, RepeatedLen, RepeatedLenField, RepeatedString};
+pub use repeated_len::{
+    RepeatedBytes, RepeatedLen, RepeatedLenField, RepeatedLenFieldMut, RepeatedString,
+};
 pub use repeated_varint::{
     RepeatedExpandedInt32, RepeatedExpandedVarintField, RepeatedPackedInt32,
     RepeatedPackedVarintField, RepeatedVarint, RepeatedVarintField,

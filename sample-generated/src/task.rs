@@ -132,12 +132,11 @@ impl<A: Allocator + Clone> Task<A> {
     pub fn title_mut<'s>(
         &'s mut self,
     ) -> impl ::core::ops::DerefMut<Target = ::unmanaged::String<A>> + 's {
-        self._common.set_presence(Self::BIT_TITLE, true);
-        self.title.value_mut(self._common.alloc.clone())
+        self.title.bind(&mut self._common, Self::BIT_TITLE).value_mut()
     }
 
     pub fn clear_title(&mut self) {
-        self.title.clear(&mut self._common, Self::BIT_TITLE);
+        self.title.bind(&mut self._common, Self::BIT_TITLE).clear();
     }
 
     // -- score (IMPLICIT int32, proto field 2) ------------------------------
@@ -193,12 +192,15 @@ impl<A: Allocator + Clone> Task<A> {
     pub fn owner_id_mut<'s>(
         &'s mut self,
     ) -> impl ::core::ops::DerefMut<Target = ::unmanaged::String<A>> + 's {
-        self._common.set_presence(Self::BIT_OWNER_ID, true);
-        self.owner_id.value_mut(self._common.alloc.clone())
+        self.owner_id
+            .bind(&mut self._common, Self::BIT_OWNER_ID)
+            .value_mut()
     }
 
     pub fn clear_owner_id(&mut self) {
-        self.owner_id.clear(&mut self._common, Self::BIT_OWNER_ID);
+        self.owner_id
+            .bind(&mut self._common, Self::BIT_OWNER_ID)
+            .clear();
     }
 
     // -- payload (EXPLICIT bytes, proto field 5) -----------------------------
@@ -219,12 +221,15 @@ impl<A: Allocator + Clone> Task<A> {
     pub fn payload_mut<'s>(
         &'s mut self,
     ) -> impl ::core::ops::DerefMut<Target = ::allocator_api2::vec::Vec<u8, A>> + 's {
-        self._common.set_presence(Self::BIT_PAYLOAD, true);
-        self.payload.value_mut(self._common.alloc.clone())
+        self.payload
+            .bind(&mut self._common, Self::BIT_PAYLOAD)
+            .value_mut()
     }
 
     pub fn clear_payload(&mut self) {
-        self.payload.clear(&mut self._common, Self::BIT_PAYLOAD);
+        self.payload
+            .bind(&mut self._common, Self::BIT_PAYLOAD)
+            .clear();
     }
 
     // -- tag_ids (repeated int32 PACKED, proto field 6) ----------------------
@@ -268,11 +273,11 @@ impl<A: Allocator + Clone> Task<A> {
     /// Typed append helper for repeated LEN fields (the `_mut` accessor would
     /// expose allocator-less element storage, which is impractical to build).
     pub fn push_label(&mut self, v: &str) {
-        self.labels.push_in(self._common.alloc.clone(), v).ok();
+        self.labels.bind(&mut self._common).push_in(v).ok();
     }
 
     pub fn clear_labels(&mut self) {
-        self.labels.clear(self._common.alloc.clone());
+        self.labels.bind(&mut self._common).clear();
     }
 
     // -- status (IMPLICIT open enum, proto field 9) -------------------------
@@ -480,7 +485,8 @@ impl<A: Allocator + Clone> MessageDecode for Task<A> {
                 Self::FIELD_TITLE => {
                     // title = 1, EXPLICIT string
                     self.title
-                        .merge(&mut self._common, Self::BIT_TITLE, wire_type, buf)?;
+                        .bind(&mut self._common, Self::BIT_TITLE)
+                        .merge(wire_type, buf)?;
                 }
                 Self::FIELD_SCORE => {
                     // score = 2, IMPLICIT int32
@@ -499,12 +505,14 @@ impl<A: Allocator + Clone> MessageDecode for Task<A> {
                 Self::FIELD_OWNER_ID => {
                     // owner_id = 4, LEGACY_REQUIRED string
                     self.owner_id
-                        .merge(&mut self._common, Self::BIT_OWNER_ID, wire_type, buf)?;
+                        .bind(&mut self._common, Self::BIT_OWNER_ID)
+                        .merge(wire_type, buf)?;
                 }
                 Self::FIELD_PAYLOAD => {
                     // payload = 5, EXPLICIT bytes
                     self.payload
-                        .merge(&mut self._common, Self::BIT_PAYLOAD, wire_type, buf)?;
+                        .bind(&mut self._common, Self::BIT_PAYLOAD)
+                        .merge(wire_type, buf)?;
                 }
                 Self::FIELD_TAG_IDS => {
                     // tag_ids = 6, repeated int32 PACKED
@@ -518,8 +526,7 @@ impl<A: Allocator + Clone> MessageDecode for Task<A> {
                 }
                 Self::FIELD_LABELS => {
                     // labels = 8, repeated string
-                    self.labels
-                        .merge(self._common.alloc.clone(), wire_type, buf)?;
+                    self.labels.bind(&mut self._common).merge(wire_type, buf)?;
                 }
                 Self::FIELD_STATUS => {
                     // status = 9, IMPLICIT open enum
