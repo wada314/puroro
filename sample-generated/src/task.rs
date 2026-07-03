@@ -357,57 +357,33 @@ impl<A: Allocator + Clone> Task<A> {
     pub fn email_address_mut(
         &mut self,
     ) -> impl ::core::ops::DerefMut<Target = ::unmanaged::String<A>> + '_ {
-        let variant = self.notification.bind(&mut self._common).variant_mut(
-            |n| matches!(n, NotificationStorage::EmailAddress(_)),
-            |alloc| NotificationStorage::EmailAddress(SingularLenField::new_in(alloc)),
-        );
         let alloc = self._common.alloc.clone();
-        let NotificationStorage::EmailAddress(f) = variant else {
-            unreachable!()
-        };
-        f.value_mut(alloc)
+        NotificationStorage::bind_email_address_mut(&mut self.notification, &mut self._common)
+            .value_mut(alloc)
     }
 
     pub fn phone_number_mut(
         &mut self,
     ) -> impl ::core::ops::DerefMut<Target = ::unmanaged::String<A>> + '_ {
-        let variant = self.notification.bind(&mut self._common).variant_mut(
-            |n| matches!(n, NotificationStorage::PhoneNumber(_)),
-            |alloc| NotificationStorage::PhoneNumber(SingularLenField::new_in(alloc)),
-        );
         let alloc = self._common.alloc.clone();
-        let NotificationStorage::PhoneNumber(f) = variant else {
-            unreachable!()
-        };
-        f.value_mut(alloc)
+        NotificationStorage::bind_phone_number_mut(&mut self.notification, &mut self._common)
+            .value_mut(alloc)
     }
 
     /// Switches the group to `webhook_id` (freeing any other variant) and returns
-    /// a mutable handle to the scalar. The varint wrapper stores no allocator, so
-    /// the `make` closure ignores the allocator it is handed.
+    /// a mutable handle to the scalar.
     pub fn webhook_id_mut(&mut self) -> &mut i32 {
-        let variant = self.notification.bind(&mut self._common).variant_mut(
-            |n| matches!(n, NotificationStorage::WebhookId(_)),
-            |_alloc| NotificationStorage::WebhookId(SingularVarintField::new()),
-        );
-        let NotificationStorage::WebhookId(f) = variant else {
-            unreachable!()
-        };
-        f.value_mut()
+        NotificationStorage::bind_webhook_id_mut(&mut self.notification, &mut self._common)
+            .value_mut()
     }
 
     /// Switches the group to `postal` (freeing any other variant) and returns a
     /// mutable handle to the nested message, creating an empty one if needed.
     pub fn postal_mut(&mut self) -> &mut Address<A> {
-        let variant = self.notification.bind(&mut self._common).variant_mut(
-            |n| matches!(n, NotificationStorage::Postal(_)),
-            |alloc| NotificationStorage::Postal(NestedMessageField::with_message_in(alloc)),
-        );
-        let NotificationStorage::Postal(f) = variant else {
-            unreachable!()
-        };
-        // The `make` closure above guarantees the child is present.
-        f.get_present_mut().unwrap()
+        // The variant invariant guarantees the child is present.
+        NotificationStorage::bind_postal_mut(&mut self.notification, &mut self._common)
+            .get_present_mut()
+            .unwrap()
     }
 
     pub fn clear_notification(&mut self) {
@@ -595,47 +571,35 @@ impl<A: Allocator + Clone> MessageDecode for Task<A> {
                 notification::FIELD_EMAIL_ADDRESS => {
                     // notification.email_address = 12 (LEN variant): select the
                     // variant (freeing any other), then merge via the field's bind.
-                    let variant = self.notification.bind(&mut self._common).variant_mut(
-                        |n| matches!(n, NotificationStorage::EmailAddress(_)),
-                        |alloc| NotificationStorage::EmailAddress(SingularLenField::new_in(alloc)),
+                    let f = NotificationStorage::bind_email_address_mut(
+                        &mut self.notification,
+                        &mut self._common,
                     );
-                    let NotificationStorage::EmailAddress(f) = variant else {
-                        unreachable!()
-                    };
                     f.bind_oneof(&mut self._common).merge(wire_type, buf)?;
                 }
                 notification::FIELD_PHONE_NUMBER => {
                     // notification.phone_number = 13 (LEN variant)
-                    let variant = self.notification.bind(&mut self._common).variant_mut(
-                        |n| matches!(n, NotificationStorage::PhoneNumber(_)),
-                        |alloc| NotificationStorage::PhoneNumber(SingularLenField::new_in(alloc)),
+                    let f = NotificationStorage::bind_phone_number_mut(
+                        &mut self.notification,
+                        &mut self._common,
                     );
-                    let NotificationStorage::PhoneNumber(f) = variant else {
-                        unreachable!()
-                    };
                     f.bind_oneof(&mut self._common).merge(wire_type, buf)?;
                 }
                 notification::FIELD_WEBHOOK_ID => {
                     // notification.webhook_id = 14 (varint variant)
-                    let variant = self.notification.bind(&mut self._common).variant_mut(
-                        |n| matches!(n, NotificationStorage::WebhookId(_)),
-                        |_alloc| NotificationStorage::WebhookId(SingularVarintField::new()),
+                    let f = NotificationStorage::bind_webhook_id_mut(
+                        &mut self.notification,
+                        &mut self._common,
                     );
-                    let NotificationStorage::WebhookId(f) = variant else {
-                        unreachable!()
-                    };
                     f.bind_oneof(&mut self._common).merge(wire_type, buf)?;
                 }
                 notification::FIELD_POSTAL => {
                     // notification.postal = 15 (message variant): merge into the
                     // (present) child via the nested-message field's own merge.
-                    let variant = self.notification.bind(&mut self._common).variant_mut(
-                        |n| matches!(n, NotificationStorage::Postal(_)),
-                        |alloc| NotificationStorage::Postal(NestedMessageField::with_message_in(alloc)),
+                    let f = NotificationStorage::bind_postal_mut(
+                        &mut self.notification,
+                        &mut self._common,
                     );
-                    let NotificationStorage::Postal(f) = variant else {
-                        unreachable!()
-                    };
                     f.merge(&self._common, wire_type, buf)?;
                 }
                 _ => {

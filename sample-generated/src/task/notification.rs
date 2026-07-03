@@ -40,8 +40,8 @@
 use ::allocator_api2::alloc::Allocator;
 use ::bytes::BufMut;
 use ::puroro::{
-    Implicit, NestedMessageField, OneofDeallocate, OneofSlot, ProtoInt32, ProtoString,
-    SingularLenField, SingularVarintField, VarintProtoType,
+    Implicit, MessageCommon, NestedMessageField, OneofDeallocate, OneofSlot, PresenceBits,
+    ProtoInt32, ProtoString, SingularLenField, SingularVarintField, VarintProtoType,
 };
 use ::unmanaged::string::StringGuard;
 
@@ -158,6 +158,77 @@ impl<A: Allocator + Clone> NotificationStorage<A> {
             // The variant invariant guarantees the child is present.
             Self::Postal(f) => NotificationMut::Postal(f.get_present_mut().unwrap()),
         }
+    }
+
+    /// Forces the group to the `email_address` variant and returns its field
+    /// wrapper (installing a default and freeing any other variant if needed).
+    ///
+    /// This centralises the `bind(...).variant_mut(...)` + `let … else
+    /// unreachable!()` dance so the parent's `_mut` accessors and decode arms
+    /// stay one-liners. The returned reference borrows only the slot, so `common`
+    /// is free again once this returns; the caller then applies the kind-specific
+    /// step (`value_mut`, `bind_oneof(common).merge`, …).
+    pub(crate) fn bind_email_address_mut<'f, Pb: PresenceBits>(
+        slot: &'f mut OneofSlot<Self>,
+        common: &mut MessageCommon<Pb, A>,
+    ) -> &'f mut SingularLenField<ProtoString, Implicit, A> {
+        let variant = slot.bind(common).variant_mut(
+            |n| matches!(n, Self::EmailAddress(_)),
+            |alloc| Self::EmailAddress(SingularLenField::new_in(alloc)),
+        );
+        let Self::EmailAddress(f) = variant else {
+            unreachable!()
+        };
+        f
+    }
+
+    /// Forces the group to the `phone_number` variant and returns its field
+    /// wrapper (see [`bind_email_address_mut`](Self::bind_email_address_mut)).
+    pub(crate) fn bind_phone_number_mut<'f, Pb: PresenceBits>(
+        slot: &'f mut OneofSlot<Self>,
+        common: &mut MessageCommon<Pb, A>,
+    ) -> &'f mut SingularLenField<ProtoString, Implicit, A> {
+        let variant = slot.bind(common).variant_mut(
+            |n| matches!(n, Self::PhoneNumber(_)),
+            |alloc| Self::PhoneNumber(SingularLenField::new_in(alloc)),
+        );
+        let Self::PhoneNumber(f) = variant else {
+            unreachable!()
+        };
+        f
+    }
+
+    /// Forces the group to the `webhook_id` variant and returns its field
+    /// wrapper. The scalar wrapper stores no allocator, so the `make` closure
+    /// ignores the one it is handed.
+    pub(crate) fn bind_webhook_id_mut<'f, Pb: PresenceBits>(
+        slot: &'f mut OneofSlot<Self>,
+        common: &mut MessageCommon<Pb, A>,
+    ) -> &'f mut SingularVarintField<ProtoInt32, Implicit> {
+        let variant = slot.bind(common).variant_mut(
+            |n| matches!(n, Self::WebhookId(_)),
+            |_alloc| Self::WebhookId(SingularVarintField::new()),
+        );
+        let Self::WebhookId(f) = variant else {
+            unreachable!()
+        };
+        f
+    }
+
+    /// Forces the group to the `postal` variant and returns its field wrapper,
+    /// with the child message already present (`with_message_in`).
+    pub(crate) fn bind_postal_mut<'f, Pb: PresenceBits>(
+        slot: &'f mut OneofSlot<Self>,
+        common: &mut MessageCommon<Pb, A>,
+    ) -> &'f mut NestedMessageField<Address<A>, A> {
+        let variant = slot.bind(common).variant_mut(
+            |n| matches!(n, Self::Postal(_)),
+            |alloc| Self::Postal(NestedMessageField::with_message_in(alloc)),
+        );
+        let Self::Postal(f) = variant else {
+            unreachable!()
+        };
+        f
     }
 
     /// Encoded length of the active variant (0 when the group is unset).
