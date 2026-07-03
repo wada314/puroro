@@ -7,7 +7,7 @@
 //! - [`NotificationStorage`] — the owned storage enum (`pub(crate)`, deliberately
 //!   *not* the canonical `Notification` name): each variant owns the same **field
 //!   wrapper** a singular field of that kind uses, implements [`OneofDeallocate`],
-//!   and carries the encode / merge glue. Never public.
+//!   and carries the encode glue. Never public.
 //! - [`NotificationCase`] — a payload-less, `Copy` discriminant of which variant
 //!   is active.
 //! - [`NotificationRef`] — a safe borrowed read view.
@@ -28,16 +28,20 @@
 //! associated `const`s) so they stay usable as `match` patterns even though
 //! [`NotificationStorage`] is generic over the allocator `A`.
 //!
-//! The group carries no presence bit, so the merge helpers are generic over the
-//! parent's `PresenceBits` type and only reach `MessageCommon` for the allocator
-//! (through the `bind` view).
+//! **Merge has no bespoke `merge_*` helpers on this enum.** Because each variant
+//! *is* a field wrapper, the parent's `merge_from` selects the variant through
+//! `OneofSlot::bind(...).variant_mut(...)` (which frees any other variant) and
+//! then merges into it with the field's **own** bind idiom —
+//! `field.bind_oneof(common).merge(...)` for LEN / varint variants, or
+//! `field.merge(common, ...)` for the message variant (mirroring how ordinary
+//! message fields merge). A oneof carries no presence bit; `bind_oneof` exists
+//! for exactly that case.
 
 use ::allocator_api2::alloc::Allocator;
-use ::bytes::{Buf, BufMut};
+use ::bytes::BufMut;
 use ::puroro::{
-    DecodeError, Implicit, NestedMessageField, OneofDeallocate, OneofSlot, OneofSlotMut,
-    PresenceBits, ProtoInt32, ProtoString, SingularLenField, SingularVarintField, VarintProtoType,
-    WireType,
+    Implicit, NestedMessageField, OneofDeallocate, OneofSlot, ProtoInt32, ProtoString,
+    SingularLenField, SingularVarintField, VarintProtoType,
 };
 use ::unmanaged::string::StringGuard;
 
@@ -193,62 +197,6 @@ impl<A: Allocator + Clone> NotificationStorage<A> {
             Some(Self::Postal(f)) => f.encode_raw(FIELD_POSTAL, buf),
             None => {}
         }
-    }
-
-    /// Merges an `email_address` occurrence into the bound oneof slot, switching
-    /// the group to that variant (last wins on the wire).
-    pub(crate) fn merge_email_address<Pb: PresenceBits, B: Buf>(
-        view: OneofSlotMut<'_, '_, Self, Pb, A>,
-        wire_type: WireType,
-        buf: &mut B,
-    ) -> Result<(), DecodeError> {
-        view.try_set_with(|alloc| {
-            Ok(Self::EmailAddress(SingularLenField::decode_in(
-                wire_type, buf, alloc,
-            )?))
-        })
-    }
-
-    /// Merges a `phone_number` occurrence into the bound oneof slot, switching
-    /// the group to that variant (last wins on the wire).
-    pub(crate) fn merge_phone_number<Pb: PresenceBits, B: Buf>(
-        view: OneofSlotMut<'_, '_, Self, Pb, A>,
-        wire_type: WireType,
-        buf: &mut B,
-    ) -> Result<(), DecodeError> {
-        view.try_set_with(|alloc| {
-            Ok(Self::PhoneNumber(SingularLenField::decode_in(
-                wire_type, buf, alloc,
-            )?))
-        })
-    }
-
-    /// Merges a `webhook_id` occurrence into the bound oneof slot. The scalar
-    /// carries no allocator, so the `make` closure ignores the one it is handed.
-    pub(crate) fn merge_webhook_id<Pb: PresenceBits, B: Buf>(
-        view: OneofSlotMut<'_, '_, Self, Pb, A>,
-        wire_type: WireType,
-        buf: &mut B,
-    ) -> Result<(), DecodeError> {
-        view.try_set_with(|_alloc| Ok(Self::WebhookId(SingularVarintField::decode_in(wire_type, buf)?)))
-    }
-
-    /// Merges a `postal` occurrence into the bound oneof slot, decoding a fresh
-    /// child message (last wins on the wire).
-    ///
-    /// Real generators may instead *merge* successive occurrences into the
-    /// current child when the group is already `Postal`; this tentative oneof
-    /// keeps the uniform last-wins-replace behaviour of the other variants.
-    pub(crate) fn merge_postal<Pb: PresenceBits, B: Buf>(
-        view: OneofSlotMut<'_, '_, Self, Pb, A>,
-        wire_type: WireType,
-        buf: &mut B,
-    ) -> Result<(), DecodeError> {
-        view.try_set_with(|alloc| {
-            Ok(Self::Postal(NestedMessageField::decode_in(
-                alloc, wire_type, buf,
-            )?))
-        })
     }
 }
 

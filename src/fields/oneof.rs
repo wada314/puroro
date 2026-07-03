@@ -160,31 +160,18 @@ impl<'f, 'c, E, Pb: PresenceBits, A: Allocator> OneofSlotMut<'f, 'c, E, Pb, A> {
         self.slot.set(Some(value));
     }
 
-    /// Builds a new variant with `make` (which receives an owned allocator clone,
-    /// e.g. to decode a LEN payload), then installs it, freeing the
-    /// previously-active variant. The new variant is built **before** the old one
-    /// is released, so a `make` failure leaves the slot untouched. Backs the
-    /// decode arms of oneof groups whose variants own heap storage.
-    pub fn try_set_with<Err>(self, make: impl FnOnce(A) -> Result<E, Err>) -> Result<(), Err>
-    where
-        E: OneofDeallocate<A>,
-        A: Clone,
-    {
-        let value = make(self.common.alloc.clone())?;
-        if let Some(old) = self.slot.take() {
-            // SAFETY: an owned clone of the message allocator owns the previous
-            // variant's buffers.
-            unsafe { old.deallocate(self.common.alloc.clone()) };
-        }
-        self.slot.set(Some(value));
-        Ok(())
-    }
-
     /// Ensures the active variant satisfies `is_match`; otherwise frees any
     /// existing variant and installs a fresh one built by `make` (which receives
     /// an owned allocator clone). Returns a mutable reference to the now-active
     /// variant, borrowing only the slot (`'f`), so `common` is free once this
-    /// returns. Backs the per-variant `_mut` accessors.
+    /// returns.
+    ///
+    /// Backs both the per-variant `_mut` accessors and the decode arms: after
+    /// selecting the variant, generated `merge_from` merges the wire occurrence
+    /// into the returned field through that field's own bind idiom
+    /// (`field.bind_oneof(common).merge(…)`, or `field.merge(common, …)` for a
+    /// message variant) — so the oneof reuses each field's merge machinery
+    /// instead of a bespoke `merge_<variant>` helper on the enum.
     pub fn variant_mut(
         self,
         is_match: impl FnOnce(&E) -> bool,

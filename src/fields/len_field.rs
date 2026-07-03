@@ -17,7 +17,7 @@ use crate::optional::{HasDefault, Optional};
 use crate::wire_type::WireType;
 
 use super::common::MessageCommon;
-use super::field_presence::{ExplicitFieldPresence, FieldPresence, RequiredFieldPresence};
+use super::field_presence::{ExplicitFieldPresence, FieldPresence, Implicit, RequiredFieldPresence};
 use super::len::{self, LenProtoType};
 use super::presence::PresenceBits;
 
@@ -34,35 +34,6 @@ impl<T: LenProtoType, P: FieldPresence, A: Allocator> SingularLenField<T, P, A> 
             value: ManuallyDrop::new(T::new_empty(alloc)),
             _marker: PhantomData,
         }
-    }
-
-    /// Wraps already-decoded [`LenProtoType::Storage`] into a field.
-    ///
-    /// Presence-agnostic (does not touch `MessageCommon`): the payload is simply
-    /// adopted, so the caller owns responsibility for eventual
-    /// [`deallocate`](Self::deallocate). Used by oneof variants, whose presence is
-    /// tracked by the enclosing `OneofSlot` rather than a presence bit.
-    pub fn from_storage(value: T::Storage) -> Self {
-        Self {
-            value: ManuallyDrop::new(value),
-            _marker: PhantomData,
-        }
-    }
-
-    /// Decodes one LEN occurrence into a fresh, presence-agnostic field.
-    ///
-    /// Checks the wire type, decodes the payload through `alloc`, and adopts it
-    /// via [`from_storage`](Self::from_storage). Used by oneof variants: the
-    /// enclosing `OneofSlot` tracks presence, so no `MessageCommon` is threaded.
-    pub fn decode_in<B: Buf>(
-        wire_type: WireType,
-        buf: &mut B,
-        alloc: A,
-    ) -> Result<Self, DecodeError> {
-        if wire_type != len::WIRE_TYPE {
-            return Err(DecodeError::InvalidTag);
-        }
-        Ok(Self::from_storage(T::decode(buf, alloc)?))
     }
 
     /// Borrowed payload (IMPLICIT public getters).
@@ -133,6 +104,25 @@ impl<T: LenProtoType, P: FieldPresence, A: Allocator> SingularLenField<T, P, A> 
         // payload's buffer.
         let old = unsafe { ManuallyDrop::take(&mut self.value) };
         unsafe { T::deallocate(old, alloc) };
+    }
+}
+
+impl<T: LenProtoType, A: Allocator> SingularLenField<T, Implicit, A> {
+    /// Binds an `Implicit`-presence **oneof variant** field for mutation,
+    /// yielding the same [`SingularLenFieldMut`] view as [`bind`](Self::bind) so
+    /// generated oneof code merges through `field.bind_oneof(common).merge(…)` —
+    /// the field's own bind idiom — rather than a bespoke helper on the oneof enum.
+    ///
+    /// A oneof carries no presence bit (the enclosing `OneofSlot` tracks which
+    /// variant is set); `Implicit` presence ignores the bit, so this binds
+    /// against a dummy index. Restricting the method to `Implicit` keeps that
+    /// dummy safe — no `Explicit` bitfield can be corrupted.
+    #[inline]
+    pub fn bind_oneof<'f, 'c, Pb: PresenceBits>(
+        &'f mut self,
+        common: &'c mut MessageCommon<Pb, A>,
+    ) -> SingularLenFieldMut<'f, 'c, T, Implicit, Pb, A> {
+        self.bind(common, 0)
     }
 }
 

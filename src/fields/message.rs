@@ -121,33 +121,6 @@ impl<M, A: Allocator + Clone> NestedMessageField<M, A> {
         }
     }
 
-    /// Decodes one LEN occurrence into a fresh field holding the decoded child
-    /// (presence-agnostic). Used by oneof variants; the enclosing `OneofSlot`
-    /// tracks presence, so no `MessageCommon` is threaded.
-    pub fn decode_in<B: Buf>(
-        alloc: A,
-        wire_type: WireType,
-        buf: &mut B,
-    ) -> Result<Self, DecodeError>
-    where
-        M: NestedMessage<A>,
-    {
-        if wire_type != len::WIRE_TYPE {
-            return Err(DecodeError::InvalidTag);
-        }
-        let len = decode::decode_varint(buf)? as usize;
-        if buf.remaining() < len {
-            return Err(DecodeError::TruncatedMessage);
-        }
-        let mut sub = buf.take(len);
-        let mut child = M::new_in(alloc.clone());
-        child.merge_from(&mut sub)?;
-        Ok(Self {
-            child: Some(UnmanagedBox::new_in(child, alloc)),
-            _marker: ::core::marker::PhantomData,
-        })
-    }
-
     /// Returns a mutable child reference, inserting a default instance if absent.
     pub fn get_mut<P: PresenceBits>(&mut self, common: &MessageCommon<P, A>) -> &mut M
     where

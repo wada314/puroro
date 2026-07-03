@@ -16,12 +16,12 @@ use crate::optional::{HasDefault, Optional};
 use crate::wire_type::WireType;
 
 use super::common::MessageCommon;
-use super::field_presence::{ExplicitFieldPresence, FieldPresence};
+use super::field_presence::{ExplicitFieldPresence, FieldPresence, Implicit};
 use super::presence::PresenceBits;
 use super::varint::{self, VarintProtoType};
 
 /// Singular scalar on the wire as VARINT — parametrised by protobuf type `T` and
-/// presence policy `P` ([`Implicit`](super::field_presence::Implicit) /
+/// presence policy `P` ([`Implicit`] /
 /// [`Explicit`](super::field_presence::Explicit)).
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct SingularVarintField<T: VarintProtoType, P: FieldPresence> {
@@ -52,28 +52,6 @@ impl<T: VarintProtoType, P: FieldPresence> SingularVarintField<T, P> {
     #[inline]
     pub fn value_mut(&mut self) -> &mut T::Value {
         &mut self.value
-    }
-
-    /// Builds a field directly from a decoded value (presence-agnostic).
-    #[inline]
-    pub fn from_value(value: T::Value) -> Self {
-        Self {
-            value,
-            _presence: PhantomData,
-        }
-    }
-
-    /// Decodes one VARINT occurrence into a fresh, presence-agnostic field.
-    ///
-    /// Used by oneof variants; the enclosing `OneofSlot` tracks presence, so no
-    /// `MessageCommon` is threaded. (Closed enums whose unknown values must be
-    /// preserved still go through [`bind`](Self::bind)'s `merge_closed`.)
-    pub fn decode_in<B: Buf>(wire_type: WireType, buf: &mut B) -> Result<Self, DecodeError> {
-        if wire_type != varint::WIRE_TYPE {
-            return Err(DecodeError::InvalidTag);
-        }
-        let raw = decode::decode_varint(buf)?;
-        Ok(Self::from_value(T::decode_wire(raw)?))
     }
 
     /// Binds this field to its message `common` state (presence), producing a
@@ -132,6 +110,26 @@ impl<T: VarintProtoType, P: FieldPresence> SingularVarintField<T, P> {
         if P::should_emit(common, bit, empty) {
             encode::encode_varint_field(field, T::encode_wire(self.value), buf);
         }
+    }
+}
+
+impl<T: VarintProtoType> SingularVarintField<T, Implicit> {
+    /// Binds an `Implicit`-presence **oneof variant** field for mutation,
+    /// yielding the same [`SingularVarintFieldMut`] view as [`bind`](Self::bind)
+    /// so generated oneof code merges through
+    /// `field.bind_oneof(common).merge(…)` — the field's own bind idiom — rather
+    /// than a bespoke helper on the oneof enum.
+    ///
+    /// A oneof carries no presence bit (the enclosing `OneofSlot` tracks which
+    /// variant is set); `Implicit` presence ignores the bit, so this binds
+    /// against a dummy index. Restricting the method to `Implicit` keeps that
+    /// dummy safe — no `Explicit` bitfield can be corrupted.
+    #[inline]
+    pub fn bind_oneof<'f, 'c, Pb: PresenceBits, A: Allocator>(
+        &'f mut self,
+        common: &'c mut MessageCommon<Pb, A>,
+    ) -> SingularVarintFieldMut<'f, 'c, T, Implicit, Pb, A> {
+        self.bind(common, 0)
     }
 }
 

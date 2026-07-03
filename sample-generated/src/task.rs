@@ -593,36 +593,50 @@ impl<A: Allocator + Clone> MessageDecode for Task<A> {
                     self.assignee.merge(&self._common, wire_type, buf)?;
                 }
                 notification::FIELD_EMAIL_ADDRESS => {
-                    // notification.email_address = 12
-                    NotificationStorage::merge_email_address(
-                        self.notification.bind(&mut self._common),
-                        wire_type,
-                        buf,
-                    )?;
+                    // notification.email_address = 12 (LEN variant): select the
+                    // variant (freeing any other), then merge via the field's bind.
+                    let variant = self.notification.bind(&mut self._common).variant_mut(
+                        |n| matches!(n, NotificationStorage::EmailAddress(_)),
+                        |alloc| NotificationStorage::EmailAddress(SingularLenField::new_in(alloc)),
+                    );
+                    let NotificationStorage::EmailAddress(f) = variant else {
+                        unreachable!()
+                    };
+                    f.bind_oneof(&mut self._common).merge(wire_type, buf)?;
                 }
                 notification::FIELD_PHONE_NUMBER => {
-                    // notification.phone_number = 13
-                    NotificationStorage::merge_phone_number(
-                        self.notification.bind(&mut self._common),
-                        wire_type,
-                        buf,
-                    )?;
+                    // notification.phone_number = 13 (LEN variant)
+                    let variant = self.notification.bind(&mut self._common).variant_mut(
+                        |n| matches!(n, NotificationStorage::PhoneNumber(_)),
+                        |alloc| NotificationStorage::PhoneNumber(SingularLenField::new_in(alloc)),
+                    );
+                    let NotificationStorage::PhoneNumber(f) = variant else {
+                        unreachable!()
+                    };
+                    f.bind_oneof(&mut self._common).merge(wire_type, buf)?;
                 }
                 notification::FIELD_WEBHOOK_ID => {
                     // notification.webhook_id = 14 (varint variant)
-                    NotificationStorage::merge_webhook_id(
-                        self.notification.bind(&mut self._common),
-                        wire_type,
-                        buf,
-                    )?;
+                    let variant = self.notification.bind(&mut self._common).variant_mut(
+                        |n| matches!(n, NotificationStorage::WebhookId(_)),
+                        |_alloc| NotificationStorage::WebhookId(SingularVarintField::new()),
+                    );
+                    let NotificationStorage::WebhookId(f) = variant else {
+                        unreachable!()
+                    };
+                    f.bind_oneof(&mut self._common).merge(wire_type, buf)?;
                 }
                 notification::FIELD_POSTAL => {
-                    // notification.postal = 15 (message variant)
-                    NotificationStorage::merge_postal(
-                        self.notification.bind(&mut self._common),
-                        wire_type,
-                        buf,
-                    )?;
+                    // notification.postal = 15 (message variant): merge into the
+                    // (present) child via the nested-message field's own merge.
+                    let variant = self.notification.bind(&mut self._common).variant_mut(
+                        |n| matches!(n, NotificationStorage::Postal(_)),
+                        |alloc| NotificationStorage::Postal(NestedMessageField::with_message_in(alloc)),
+                    );
+                    let NotificationStorage::Postal(f) = variant else {
+                        unreachable!()
+                    };
+                    f.merge(&self._common, wire_type, buf)?;
                 }
                 _ => {
                     // unknown field — preserve in _common.unknown_fields
