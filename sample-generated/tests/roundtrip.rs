@@ -31,7 +31,7 @@ fn task_roundtrip() {
     assert_eq!(decoded.title().get(), "Write docs");
     assert_eq!(decoded.score(), 42);
     assert_eq!(decoded.max_retries().get(), 5);
-    assert!(decoded.has_owner_id());
+    assert!(decoded.owner_id().is_set());
     assert_eq!(decoded.payload().get(), b"data");
     assert_eq!(decoded.tag_ids(), &[10, 20]);
     assert_eq!(decoded.scores(), &[1]);

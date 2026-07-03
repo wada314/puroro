@@ -77,10 +77,6 @@ impl<A: Allocator + Clone> Address<A> {
         self.street.optional(&self._common, Self::BIT_STREET, StreetDefault)
     }
 
-    pub fn has_street(&self) -> bool {
-        self.street.has(&self._common, Self::BIT_STREET)
-    }
-
     pub fn street_mut<'s>(
         &'s mut self,
     ) -> impl ::core::ops::DerefMut<Target = ::unmanaged::String<A>> + 's {
@@ -101,10 +97,6 @@ impl<A: Allocator + Clone> Address<A> {
             const DEFAULT: &'a str = "";
         }
         self.city.optional(&self._common, Self::BIT_CITY, CityDefault)
-    }
-
-    pub fn has_city(&self) -> bool {
-        self.city.has(&self._common, Self::BIT_CITY)
     }
 
     pub fn city_mut<'s>(

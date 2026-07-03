@@ -130,10 +130,6 @@ impl<A: Allocator + Clone> Task<A> {
         self.title.optional(&self._common, Self::BIT_TITLE, TitleDefault)
     }
 
-    pub fn has_title(&self) -> bool {
-        self.title.has(&self._common, Self::BIT_TITLE)
-    }
-
     pub fn title_mut<'s>(
         &'s mut self,
     ) -> impl ::core::ops::DerefMut<Target = ::unmanaged::String<A>> + 's {
@@ -165,10 +161,6 @@ impl<A: Allocator + Clone> Task<A> {
             .optional(&self._common, Self::BIT_MAX_RETRIES, MaxRetriesDefault)
     }
 
-    pub fn has_max_retries(&self) -> bool {
-        self.max_retries.has(&self._common, Self::BIT_MAX_RETRIES)
-    }
-
     pub fn max_retries_mut(&mut self) -> &mut i32 {
         self.max_retries
             .bind(&mut self._common, Self::BIT_MAX_RETRIES)
@@ -190,10 +182,6 @@ impl<A: Allocator + Clone> Task<A> {
         }
         self.owner_id
             .optional(&self._common, Self::BIT_OWNER_ID, OwnerIdDefault)
-    }
-
-    pub fn has_owner_id(&self) -> bool {
-        self.owner_id.has(&self._common, Self::BIT_OWNER_ID)
     }
 
     pub fn owner_id_mut<'s>(
@@ -219,10 +207,6 @@ impl<A: Allocator + Clone> Task<A> {
         }
         self.payload
             .optional(&self._common, Self::BIT_PAYLOAD, PayloadDefault)
-    }
-
-    pub fn has_payload(&self) -> bool {
-        self.payload.has(&self._common, Self::BIT_PAYLOAD)
     }
 
     pub fn payload_mut<'s>(
