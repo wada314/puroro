@@ -44,6 +44,16 @@ impl<M, A: Allocator> NestedMessageField<M, A> {
         self.child.as_deref()
     }
 
+    /// Presence-agnostic mutable access to the child, if present.
+    ///
+    /// Unlike [`get_mut`](Self::get_mut) this never inserts and needs no
+    /// `MessageCommon`; used by oneof variants, which are always constructed with
+    /// the child present (their presence is tracked by the enclosing `OneofSlot`).
+    #[inline]
+    pub fn get_present_mut(&mut self) -> Option<&mut M> {
+        self.child.as_deref_mut()
+    }
+
     /// Returns whether the field is present.
     #[inline]
     pub fn is_present(&self) -> bool {
@@ -96,6 +106,48 @@ impl<M, A: Allocator> NestedMessageField<M, A> {
 }
 
 impl<M, A: Allocator + Clone> NestedMessageField<M, A> {
+    /// Builds a field holding a fresh, empty child (presence-agnostic).
+    ///
+    /// Used by oneof variants (via a per-variant `_mut` accessor) so the variant
+    /// is always constructed with the child present.
+    pub fn with_message_in(alloc: A) -> Self
+    where
+        M: NestedMessage<A>,
+    {
+        let m = M::new_in(alloc.clone());
+        Self {
+            child: Some(UnmanagedBox::new_in(m, alloc)),
+            _marker: ::core::marker::PhantomData,
+        }
+    }
+
+    /// Decodes one LEN occurrence into a fresh field holding the decoded child
+    /// (presence-agnostic). Used by oneof variants; the enclosing `OneofSlot`
+    /// tracks presence, so no `MessageCommon` is threaded.
+    pub fn decode_in<B: Buf>(
+        alloc: A,
+        wire_type: WireType,
+        buf: &mut B,
+    ) -> Result<Self, DecodeError>
+    where
+        M: NestedMessage<A>,
+    {
+        if wire_type != len::WIRE_TYPE {
+            return Err(DecodeError::InvalidTag);
+        }
+        let len = decode::decode_varint(buf)? as usize;
+        if buf.remaining() < len {
+            return Err(DecodeError::TruncatedMessage);
+        }
+        let mut sub = buf.take(len);
+        let mut child = M::new_in(alloc.clone());
+        child.merge_from(&mut sub)?;
+        Ok(Self {
+            child: Some(UnmanagedBox::new_in(child, alloc)),
+            _marker: ::core::marker::PhantomData,
+        })
+    }
+
     /// Returns a mutable child reference, inserting a default instance if absent.
     pub fn get_mut<P: PresenceBits>(&mut self, common: &MessageCommon<P, A>) -> &mut M
     where

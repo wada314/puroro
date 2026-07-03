@@ -49,6 +49,22 @@ impl<T: LenProtoType, P: FieldPresence, A: Allocator> SingularLenField<T, P, A> 
         }
     }
 
+    /// Decodes one LEN occurrence into a fresh, presence-agnostic field.
+    ///
+    /// Checks the wire type, decodes the payload through `alloc`, and adopts it
+    /// via [`from_storage`](Self::from_storage). Used by oneof variants: the
+    /// enclosing `OneofSlot` tracks presence, so no `MessageCommon` is threaded.
+    pub fn decode_in<B: Buf>(
+        wire_type: WireType,
+        buf: &mut B,
+        alloc: A,
+    ) -> Result<Self, DecodeError> {
+        if wire_type != len::WIRE_TYPE {
+            return Err(DecodeError::InvalidTag);
+        }
+        Ok(Self::from_storage(T::decode(buf, alloc)?))
+    }
+
     /// Borrowed payload (IMPLICIT public getters).
     #[inline]
     pub fn value(&self) -> T::Ref<'_> {

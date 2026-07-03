@@ -63,7 +63,9 @@ pub struct Task<A: Allocator + Clone = Global> {
     status: SingularVarintField<ProtoEnum, Implicit>,  // proto: Status status = 9;
     priority: SingularVarintField<ProtoEnum, Explicit>, // proto: Priority priority = 10;
     assignee: NestedMessageField<Address<A>, A>,       // proto: Address assignee = 11;
-    notification: OneofSlot<NotificationStorage<A>>,   // proto: oneof notification { ... }
+    // proto: oneof notification { string email_address=12; string phone_number=13;
+    //                             int32 webhook_id=14; Address postal=15; }
+    notification: OneofSlot<NotificationStorage<A>>,
 }
 
 // ---------------------------------------------------------------------------
@@ -83,8 +85,9 @@ impl<A: Allocator + Clone> Task<A> {
     pub const FIELD_PRIORITY: u32 = 10; // priority
     pub const FIELD_ASSIGNEE: u32 = 11; // assignee
     // oneof notification variant field numbers live in the `notification` module
-    // (`FIELD_EMAIL_ADDRESS` = 12, `FIELD_PHONE_NUMBER` = 13), so they stay usable
-    // as `match` patterns despite `NotificationStorage` being generic over `A`.
+    // (`FIELD_EMAIL_ADDRESS` = 12, `FIELD_PHONE_NUMBER` = 13, `FIELD_WEBHOOK_ID` = 14,
+    // `FIELD_POSTAL` = 15), so they stay usable as `match` patterns despite
+    // `NotificationStorage` being generic over `A`.
 
     pub const BIT_TITLE: usize = 0; // title (EXPLICIT)
     pub const BIT_MAX_RETRIES: usize = 1; // max_retries (EXPLICIT)
@@ -333,7 +336,7 @@ impl<A: Allocator + Clone> Task<A> {
         self.assignee.clear(self._common.alloc.clone());
     }
 
-    // -- oneof notification (proto fields 12 / 13) --------------------------
+    // -- oneof notification (proto fields 12 / 13 / 14 / 15) ----------------
 
     /// Which variant is set (payload-less; `None` when the group is unset).
     pub fn notification_case(&self) -> Option<NotificationCase> {
@@ -341,7 +344,7 @@ impl<A: Allocator + Clone> Task<A> {
     }
 
     /// Safe borrowed read view of the active variant.
-    pub fn notification(&self) -> Option<NotificationRef<'_>> {
+    pub fn notification(&self) -> Option<NotificationRef<'_, A>> {
         self.notification.get().map(|s| s.to_ref())
     }
 
@@ -377,6 +380,34 @@ impl<A: Allocator + Clone> Task<A> {
             unreachable!()
         };
         f.value_mut(alloc)
+    }
+
+    /// Switches the group to `webhook_id` (freeing any other variant) and returns
+    /// a mutable handle to the scalar. The varint wrapper stores no allocator, so
+    /// the `make` closure ignores the allocator it is handed.
+    pub fn webhook_id_mut(&mut self) -> &mut i32 {
+        let variant = self.notification.bind(&mut self._common).variant_mut(
+            |n| matches!(n, NotificationStorage::WebhookId(_)),
+            |_alloc| NotificationStorage::WebhookId(SingularVarintField::new()),
+        );
+        let NotificationStorage::WebhookId(f) = variant else {
+            unreachable!()
+        };
+        f.value_mut()
+    }
+
+    /// Switches the group to `postal` (freeing any other variant) and returns a
+    /// mutable handle to the nested message, creating an empty one if needed.
+    pub fn postal_mut(&mut self) -> &mut Address<A> {
+        let variant = self.notification.bind(&mut self._common).variant_mut(
+            |n| matches!(n, NotificationStorage::Postal(_)),
+            |alloc| NotificationStorage::Postal(NestedMessageField::with_message_in(alloc)),
+        );
+        let NotificationStorage::Postal(f) = variant else {
+            unreachable!()
+        };
+        // The `make` closure above guarantees the child is present.
+        f.get_present_mut().unwrap()
     }
 
     pub fn clear_notification(&mut self) {
@@ -572,6 +603,22 @@ impl<A: Allocator + Clone> MessageDecode for Task<A> {
                 notification::FIELD_PHONE_NUMBER => {
                     // notification.phone_number = 13
                     NotificationStorage::merge_phone_number(
+                        self.notification.bind(&mut self._common),
+                        wire_type,
+                        buf,
+                    )?;
+                }
+                notification::FIELD_WEBHOOK_ID => {
+                    // notification.webhook_id = 14 (varint variant)
+                    NotificationStorage::merge_webhook_id(
+                        self.notification.bind(&mut self._common),
+                        wire_type,
+                        buf,
+                    )?;
+                }
+                notification::FIELD_POSTAL => {
+                    // notification.postal = 15 (message variant)
+                    NotificationStorage::merge_postal(
                         self.notification.bind(&mut self._common),
                         wire_type,
                         buf,

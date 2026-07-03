@@ -44,6 +44,38 @@ impl<T: VarintProtoType, P: FieldPresence> SingularVarintField<T, P> {
         self.value
     }
 
+    /// Presence-agnostic mutable access to the value slot.
+    ///
+    /// Regular message fields mutate through [`bind`](Self::bind) (to fold in the
+    /// presence bit); this bypass exists for oneof variants, whose presence is
+    /// tracked by the enclosing `OneofSlot` rather than a bit.
+    #[inline]
+    pub fn value_mut(&mut self) -> &mut T::Value {
+        &mut self.value
+    }
+
+    /// Builds a field directly from a decoded value (presence-agnostic).
+    #[inline]
+    pub fn from_value(value: T::Value) -> Self {
+        Self {
+            value,
+            _presence: PhantomData,
+        }
+    }
+
+    /// Decodes one VARINT occurrence into a fresh, presence-agnostic field.
+    ///
+    /// Used by oneof variants; the enclosing `OneofSlot` tracks presence, so no
+    /// `MessageCommon` is threaded. (Closed enums whose unknown values must be
+    /// preserved still go through [`bind`](Self::bind)'s `merge_closed`.)
+    pub fn decode_in<B: Buf>(wire_type: WireType, buf: &mut B) -> Result<Self, DecodeError> {
+        if wire_type != varint::WIRE_TYPE {
+            return Err(DecodeError::InvalidTag);
+        }
+        let raw = decode::decode_varint(buf)?;
+        Ok(Self::from_value(T::decode_wire(raw)?))
+    }
+
     /// Binds this field to its message `common` state (presence), producing a
     /// short-lived [`SingularVarintFieldMut`] view that carries the whole
     /// mutation context. `bit` is the presence index for policy `P`.

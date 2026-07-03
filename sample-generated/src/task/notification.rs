@@ -6,13 +6,23 @@
 //!
 //! - [`NotificationStorage`] — the owned storage enum (`pub(crate)`, deliberately
 //!   *not* the canonical `Notification` name): each variant owns the same **field
-//!   wrapper** a singular field of that kind uses ([`SingularLenField`] here),
-//!   implements [`OneofDeallocate`], and carries the encode / merge glue. Never
-//!   public.
+//!   wrapper** a singular field of that kind uses, implements [`OneofDeallocate`],
+//!   and carries the encode / merge glue. Never public.
 //! - [`NotificationCase`] — a payload-less, `Copy` discriminant of which variant
 //!   is active.
-//! - [`NotificationRef`] — a safe borrowed read view (`&str` payloads).
-//! - [`NotificationMut`] — a safe borrowed mutable view (growable string guards).
+//! - [`NotificationRef`] — a safe borrowed read view.
+//! - [`NotificationMut`] — a safe borrowed mutable view.
+//!
+//! This group is deliberately **heterogeneous** to show every field kind:
+//!
+//! | variant | proto | field wrapper | `Ref` payload | `Mut` payload |
+//! |---|---|---|---|---|
+//! | `email_address` / `phone_number` | `string` | [`SingularLenField`] | `&str` | string guard |
+//! | `webhook_id` | `int32` | [`SingularVarintField`] | `i32` (by value) | `&mut i32` |
+//! | `postal` | `Address` message | [`NestedMessageField`] | `&Address<A>` | `&mut Address<A>` |
+//!
+//! The scalar variant owns no heap, so its `OneofDeallocate` arm is a no-op; the
+//! LEN and message variants free their storage through the message allocator.
 //!
 //! The group's field-number constants live at module scope (rather than as
 //! associated `const`s) so they stay usable as `match` patterns even though
@@ -25,15 +35,22 @@
 use ::allocator_api2::alloc::Allocator;
 use ::bytes::{Buf, BufMut};
 use ::puroro::{
-    DecodeError, Implicit, OneofDeallocate, OneofSlot, OneofSlotMut, PresenceBits, ProtoString,
-    SingularLenField, WireType,
+    DecodeError, Implicit, NestedMessageField, OneofDeallocate, OneofSlot, OneofSlotMut,
+    PresenceBits, ProtoInt32, ProtoString, SingularLenField, SingularVarintField, VarintProtoType,
+    WireType,
 };
 use ::unmanaged::string::StringGuard;
+
+use crate::address::Address;
 
 /// `email_address` variant field number.
 pub(crate) const FIELD_EMAIL_ADDRESS: u32 = 12;
 /// `phone_number` variant field number.
 pub(crate) const FIELD_PHONE_NUMBER: u32 = 13;
+/// `webhook_id` variant field number.
+pub(crate) const FIELD_WEBHOOK_ID: u32 = 14;
+/// `postal` variant field number.
+pub(crate) const FIELD_POSTAL: u32 = 15;
 
 /// The field wrapper each `string` variant owns: a singular LEN field minus
 /// presence.
@@ -44,6 +61,11 @@ pub(crate) const FIELD_PHONE_NUMBER: u32 = 13;
 /// singular field wrapper keeps oneof members and ordinary fields uniform (same
 /// storage, `value` / `value_mut` / `deallocate`).
 type StringVariant<A> = SingularLenField<ProtoString, Implicit, A>;
+/// The field wrapper the `int32` variant owns (a singular varint field; scalars
+/// store no allocator, so this type is allocator-free).
+type Int32Variant = SingularVarintField<ProtoInt32, Implicit>;
+/// The field wrapper the message variant owns (a singular nested-message field).
+type PostalVariant<A> = NestedMessageField<Address<A>, A>;
 
 /// Which variant of `oneof notification` is set — a payload-less discriminant.
 ///
@@ -54,65 +76,93 @@ type StringVariant<A> = SingularLenField<ProtoString, Implicit, A>;
 pub enum NotificationCase {
     EmailAddress,
     PhoneNumber,
+    WebhookId,
+    Postal,
 }
 
 /// Borrowed read view of the active `notification` variant.
 ///
-/// Backs `Task::notification`; the payloads borrow the message (no allocator and
-/// no `unmanaged` type in sight).
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub enum NotificationRef<'a> {
+/// Backs `Task::notification`; every payload borrows the message (no allocator
+/// and no `unmanaged` type in sight). All payloads are `Copy` (scalars, `&str`,
+/// and a `&Address<A>` reference), so the view is `Copy` — but the derive is
+/// hand-written to avoid a spurious `A: Copy` bound from `#[derive(Copy)]`, and
+/// `Debug` / `PartialEq` are omitted because the message payload `Address<A>`
+/// implements neither.
+pub enum NotificationRef<'a, A: Allocator + Clone> {
     EmailAddress(&'a str),
     PhoneNumber(&'a str),
+    WebhookId(i32),
+    Postal(&'a Address<A>),
 }
+
+impl<A: Allocator + Clone> Clone for NotificationRef<'_, A> {
+    fn clone(&self) -> Self {
+        *self
+    }
+}
+impl<A: Allocator + Clone> Copy for NotificationRef<'_, A> {}
 
 /// Borrowed mutable view of the active `notification` variant.
 ///
-/// Backs `Task::notification_mut`; each variant hands out a growable guard
-/// (`DerefMut<Target = String<A>>`) over the active variant's storage, writing
-/// edits back when the guard drops.
-pub enum NotificationMut<'a, A: Allocator> {
+/// Backs `Task::notification_mut`; string variants hand out a growable guard
+/// (`DerefMut<Target = String<A>>`), the scalar variant a `&mut i32`, and the
+/// message variant a `&mut Address<A>`. Edits are written back live (the string
+/// guard on drop; the `&mut` targets in place).
+pub enum NotificationMut<'a, A: Allocator + Clone> {
     EmailAddress(StringGuard<'a, A>),
     PhoneNumber(StringGuard<'a, A>),
+    WebhookId(&'a mut i32),
+    Postal(&'a mut Address<A>),
 }
 
 /// Owned storage for `oneof notification` (crate-internal).
 ///
-/// Variants own a [`StringVariant`] field wrapper (allocator-less storage that
-/// cannot free itself); [`OneofDeallocate`] releases the active variant through
-/// the message allocator. This type is intentionally **not public** and does
-/// **not** take the canonical `Notification` name: exposing an `unmanaged`-holding
-/// value by name would let a caller own one and hit the panic-on-implicit-drop
-/// footgun. All public access is through [`NotificationCase`] / [`NotificationRef`]
-/// / [`NotificationMut`].
-pub(crate) enum NotificationStorage<A: Allocator> {
+/// Each variant owns the field wrapper an ordinary singular field of that kind
+/// would use — allocator-less storage that cannot free itself; [`OneofDeallocate`]
+/// releases the active variant through the message allocator (a no-op for the
+/// scalar variant). This type is intentionally **not public** and does **not**
+/// take the canonical `Notification` name: exposing an `unmanaged`-holding value
+/// by name would let a caller own one and hit the panic-on-implicit-drop footgun.
+/// All public access is through [`NotificationCase`] / [`NotificationRef`] /
+/// [`NotificationMut`].
+pub(crate) enum NotificationStorage<A: Allocator + Clone> {
     EmailAddress(StringVariant<A>),
     PhoneNumber(StringVariant<A>),
+    WebhookId(Int32Variant),
+    Postal(PostalVariant<A>),
 }
 
-impl<A: Allocator> NotificationStorage<A> {
+impl<A: Allocator + Clone> NotificationStorage<A> {
     /// This variant's payload-less discriminant.
     pub(crate) fn case(&self) -> NotificationCase {
         match self {
             Self::EmailAddress(_) => NotificationCase::EmailAddress,
             Self::PhoneNumber(_) => NotificationCase::PhoneNumber,
+            Self::WebhookId(_) => NotificationCase::WebhookId,
+            Self::Postal(_) => NotificationCase::Postal,
         }
     }
 
     /// Safe borrowed read view of this variant.
-    pub(crate) fn to_ref(&self) -> NotificationRef<'_> {
+    pub(crate) fn to_ref(&self) -> NotificationRef<'_, A> {
         match self {
             Self::EmailAddress(f) => NotificationRef::EmailAddress(f.value()),
             Self::PhoneNumber(f) => NotificationRef::PhoneNumber(f.value()),
+            Self::WebhookId(f) => NotificationRef::WebhookId(f.value()),
+            // The variant invariant guarantees the child is present.
+            Self::Postal(f) => NotificationRef::Postal(f.get().unwrap()),
         }
     }
 
-    /// Safe borrowed mutable view of this variant, backed by an owned allocator
-    /// clone (the guard owns it and writes edits back on drop).
+    /// Safe borrowed mutable view of this variant. `alloc` (an owned message
+    /// allocator clone) backs the string guards; the other variants ignore it.
     pub(crate) fn to_mut(&mut self, alloc: A) -> NotificationMut<'_, A> {
         match self {
             Self::EmailAddress(f) => NotificationMut::EmailAddress(f.value_mut(alloc)),
             Self::PhoneNumber(f) => NotificationMut::PhoneNumber(f.value_mut(alloc)),
+            Self::WebhookId(f) => NotificationMut::WebhookId(f.value_mut()),
+            // The variant invariant guarantees the child is present.
+            Self::Postal(f) => NotificationMut::Postal(f.get_present_mut().unwrap()),
         }
     }
 
@@ -125,6 +175,11 @@ impl<A: Allocator> NotificationStorage<A> {
             Some(Self::PhoneNumber(f)) => {
                 ::puroro::encode::encoded_len_len_field(FIELD_PHONE_NUMBER, f.value().len())
             }
+            Some(Self::WebhookId(f)) => ::puroro::encode::encoded_len_varint_field(
+                FIELD_WEBHOOK_ID,
+                ProtoInt32::encode_wire(f.value()),
+            ),
+            Some(Self::Postal(f)) => f.encoded_len(FIELD_POSTAL),
             None => 0,
         }
     }
@@ -138,6 +193,14 @@ impl<A: Allocator> NotificationStorage<A> {
             Some(Self::PhoneNumber(f)) => {
                 ::puroro::encode::encode_len_field(FIELD_PHONE_NUMBER, f.value().as_bytes(), buf);
             }
+            Some(Self::WebhookId(f)) => {
+                ::puroro::encode::encode_varint_field(
+                    FIELD_WEBHOOK_ID,
+                    ProtoInt32::encode_wire(f.value()),
+                    buf,
+                );
+            }
+            Some(Self::Postal(f)) => f.encode_raw(FIELD_POSTAL, buf),
             None => {}
         }
     }
@@ -148,17 +211,11 @@ impl<A: Allocator> NotificationStorage<A> {
         view: OneofSlotMut<'_, '_, Self, Pb, A>,
         wire_type: WireType,
         buf: &mut B,
-    ) -> Result<(), DecodeError>
-    where
-        A: Clone,
-    {
-        if wire_type != WireType::Len {
-            return Err(DecodeError::InvalidTag);
-        }
+    ) -> Result<(), DecodeError> {
         view.try_set_with(|alloc| {
-            Ok(Self::EmailAddress(SingularLenField::from_storage(
-                ::puroro::decode::decode_string_in(buf, alloc)?,
-            )))
+            Ok(Self::EmailAddress(SingularLenField::decode_in(
+                wire_type, buf, alloc,
+            )?))
         })
     }
 
@@ -168,23 +225,46 @@ impl<A: Allocator> NotificationStorage<A> {
         view: OneofSlotMut<'_, '_, Self, Pb, A>,
         wire_type: WireType,
         buf: &mut B,
-    ) -> Result<(), DecodeError>
-    where
-        A: Clone,
-    {
-        if wire_type != WireType::Len {
-            return Err(DecodeError::InvalidTag);
-        }
+    ) -> Result<(), DecodeError> {
         view.try_set_with(|alloc| {
-            Ok(Self::PhoneNumber(SingularLenField::from_storage(
-                ::puroro::decode::decode_string_in(buf, alloc)?,
-            )))
+            Ok(Self::PhoneNumber(SingularLenField::decode_in(
+                wire_type, buf, alloc,
+            )?))
+        })
+    }
+
+    /// Merges a `webhook_id` occurrence into the bound oneof slot. The scalar
+    /// carries no allocator, so the `make` closure ignores the one it is handed.
+    pub(crate) fn merge_webhook_id<Pb: PresenceBits, B: Buf>(
+        view: OneofSlotMut<'_, '_, Self, Pb, A>,
+        wire_type: WireType,
+        buf: &mut B,
+    ) -> Result<(), DecodeError> {
+        view.try_set_with(|_alloc| Ok(Self::WebhookId(SingularVarintField::decode_in(wire_type, buf)?)))
+    }
+
+    /// Merges a `postal` occurrence into the bound oneof slot, decoding a fresh
+    /// child message (last wins on the wire).
+    ///
+    /// Real generators may instead *merge* successive occurrences into the
+    /// current child when the group is already `Postal`; this tentative oneof
+    /// keeps the uniform last-wins-replace behaviour of the other variants.
+    pub(crate) fn merge_postal<Pb: PresenceBits, B: Buf>(
+        view: OneofSlotMut<'_, '_, Self, Pb, A>,
+        wire_type: WireType,
+        buf: &mut B,
+    ) -> Result<(), DecodeError> {
+        view.try_set_with(|alloc| {
+            Ok(Self::Postal(NestedMessageField::decode_in(
+                alloc, wire_type, buf,
+            )?))
         })
     }
 }
 
-impl<A: Allocator> OneofDeallocate<A> for NotificationStorage<A> {
-    /// Drops the active variant's field wrapper and frees it through `alloc`.
+impl<A: Allocator + Clone> OneofDeallocate<A> for NotificationStorage<A> {
+    /// Frees the active variant through `alloc`: LEN and message variants release
+    /// their heap storage; the scalar variant has nothing to free.
     ///
     /// # Safety
     ///
@@ -192,6 +272,8 @@ impl<A: Allocator> OneofDeallocate<A> for NotificationStorage<A> {
     unsafe fn deallocate(self, alloc: A) {
         match self {
             Self::EmailAddress(mut f) | Self::PhoneNumber(mut f) => f.deallocate(alloc),
+            Self::WebhookId(_) => {}
+            Self::Postal(mut f) => f.deallocate(alloc),
         }
     }
 }

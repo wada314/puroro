@@ -426,10 +426,13 @@ message Task {
     // Field 11: Nested message (EXPLICIT presence)
     Address assignee = 11;
 
-    // Fields 12–13: Oneof (presence is intrinsic to oneof)
+    // Fields 12–15: Oneof (presence is intrinsic to oneof). Deliberately
+    // heterogeneous to show LEN, VARINT, and message variants.
     oneof notification {
-        string email_address = 12;
-        string phone_number  = 13;
+        string  email_address = 12;
+        string  phone_number  = 13;
+        int32   webhook_id    = 14;  // VARINT variant
+        Address postal        = 15;  // message variant
     }
 }
 ```
@@ -669,51 +672,75 @@ Each `oneof` group generates **four** types in a submodule named after the paren
 // In module `task`:
 
 // (1) Owned storage — crate-internal, deliberately NOT named `Notification`.
-//     Each variant owns the SAME field wrapper a singular field of that kind uses
-//     (here `SingularLenField<ProtoString, Implicit, A>`), minus presence; it
-//     implements OneofDeallocate and carries the encode/merge glue. The variant
-//     field wrapper pins the allocator type, so the enum is generic over `A`.
-pub(crate) enum NotificationStorage<A: Allocator> {
-    EmailAddress(SingularLenField<ProtoString, Implicit, A>),
-    PhoneNumber(SingularLenField<ProtoString, Implicit, A>),
+//     Each variant owns the SAME field wrapper a singular field of that kind
+//     uses, minus presence; it implements OneofDeallocate and carries the
+//     encode/merge glue. The message/LEN wrappers pin the allocator type, so the
+//     enum is generic over `A` (the scalar wrapper carries no allocator).
+pub(crate) enum NotificationStorage<A: Allocator + Clone> {
+    EmailAddress(SingularLenField<ProtoString, Implicit, A>), // LEN   (heap)
+    PhoneNumber(SingularLenField<ProtoString, Implicit, A>),  // LEN   (heap)
+    WebhookId(SingularVarintField<ProtoInt32, Implicit>),     // VARINT (inline)
+    Postal(NestedMessageField<Address<A>, A>),                // message (heap box)
 }
-impl<A: Allocator> ::puroro::OneofDeallocate<A> for NotificationStorage<A> {
-    /* free active variant via field.deallocate(alloc) */
+impl<A: Allocator + Clone> ::puroro::OneofDeallocate<A> for NotificationStorage<A> {
+    // LEN + message variants call field.deallocate(alloc); the scalar is a no-op.
 }
 
 // (2) Payload-less case discriminant (unset is `None`, so no `NotSet` member).
-pub enum NotificationCase { EmailAddress, PhoneNumber }
+pub enum NotificationCase { EmailAddress, PhoneNumber, WebhookId, Postal }
 
-// (3) Safe borrowed read view.
-pub enum NotificationRef<'a> { EmailAddress(&'a str), PhoneNumber(&'a str) }
+// (3) Safe borrowed read view. VARINT is returned by value (Copy); a message is
+//     a plain shared reference. (Copy/Clone are hand-written to avoid a spurious
+//     `A: Copy` bound; Debug/Eq are omitted since `Address<A>` implements neither.)
+pub enum NotificationRef<'a, A: Allocator + Clone> {
+    EmailAddress(&'a str),
+    PhoneNumber(&'a str),
+    WebhookId(i32),
+    Postal(&'a Address<A>),
+}
 
-// (4) Safe borrowed mutable view (growable guards).
-pub enum NotificationMut<'a, A: Allocator> {
+// (4) Safe borrowed mutable view: LEN → growable guard, VARINT → &mut scalar,
+//     message → &mut child.
+pub enum NotificationMut<'a, A: Allocator + Clone> {
     EmailAddress(StringGuard<'a, A>),
     PhoneNumber(StringGuard<'a, A>),
+    WebhookId(&'a mut i32),
+    Postal(&'a mut Address<A>),
 }
 
 // Accessors on Task:
-pub fn notification_case(&self) -> Option<NotificationCase>;   // which variant (None = unset)
-pub fn notification(&self) -> Option<NotificationRef<'_>>;      // read active
+pub fn notification_case(&self) -> Option<NotificationCase>;      // which variant (None = unset)
+pub fn notification(&self) -> Option<NotificationRef<'_, A>>;      // read active
 pub fn notification_mut(&mut self) -> Option<NotificationMut<'_, A>>; // edit active in place
 
 // Per-variant `_mut` accessors switch the oneof to that variant (freeing any
-// previously-active one) and return a growable guard:
+// previously-active one) and return a handle appropriate to the kind:
 pub fn email_address_mut(&mut self) -> impl DerefMut<Target = ::unmanaged::String<A>> + '_;
 pub fn phone_number_mut(&mut self) -> impl DerefMut<Target = ::unmanaged::String<A>> + '_;
+pub fn webhook_id_mut(&mut self) -> &mut i32;          // VARINT variant
+pub fn postal_mut(&mut self) -> &mut Address<A>;       // message variant
 
 // Clears whichever variant is active (freeing it):
 pub fn clear_notification(&mut self);
 ```
 
-**Variants own field wrappers, not raw storage.** A oneof member of a given kind reuses the exact field wrapper an ordinary singular field of that kind uses (`SingularLenField` for `string`/`bytes`, `SingularVarintField` for scalars, a nested-message field for messages), so the storage / `value` / `value_mut` / `deallocate` machinery is shared rather than reimplemented. The wrapper's *presence* is inert for a oneof — presence is tracked by the enclosing `OneofSlot`, and the storage enum frames encode/merge itself — so a presence-agnostic policy (`Implicit`) is picked and the wrapper's presence-aware methods are never called. To build a variant from a decoded payload without re-copying, `SingularLenField::from_storage(storage)` adopts already-decoded `LenProtoType::Storage`. (New dedicated presence-less oneof field types were considered and rejected: reusing the field catalog keeps oneof members and ordinary fields uniform for the generator, at the cost of one inert type parameter.)
+**Variants own field wrappers, not raw storage.** A oneof member of a given kind reuses the exact field wrapper an ordinary singular field of that kind uses (`SingularLenField` for `string`/`bytes`, `SingularVarintField` for scalars, `NestedMessageField` for messages), so the storage / `value` / `value_mut` / `deallocate` machinery is shared rather than reimplemented. The wrapper's *presence* is inert for a oneof — presence is tracked by the enclosing `OneofSlot`, and the storage enum frames encode/merge itself — so a presence-agnostic policy (`Implicit`) is picked and the wrapper's presence-aware methods are never called. (New dedicated presence-less oneof field types were considered and rejected: reusing the field catalog keeps oneof members and ordinary fields uniform for the generator, at the cost of one inert type parameter.)
+
+To keep generated code thin, each wrapper exposes **presence-agnostic** primitives the oneof drives (no `MessageCommon` threaded):
+
+| kind | build empty (`variant_mut` `make`) | build from wire (`merge`) | read / read-mut |
+|---|---|---|---|
+| LEN | `SingularLenField::new_in(alloc)` | `SingularLenField::decode_in(wire, buf, alloc)` | `value()` / `value_mut(alloc)` |
+| VARINT | `SingularVarintField::new()` | `SingularVarintField::decode_in(wire, buf)` | `value()` / `value_mut()` |
+| message | `NestedMessageField::with_message_in(alloc)` | `NestedMessageField::decode_in(alloc, wire, buf)` | `get()` / `get_present_mut()` |
+
+The VARINT variant owns no heap: its `OneofDeallocate` arm is a no-op, and its `make`/`decode_in` ignore the allocator. The message variant is always constructed with the child present, so its read/mut accessors `unwrap()` the child.
 
 **Why four types, and why the storage is not `Notification`.** The storage variants own `unmanaged`-backed field wrappers, which panic on implicit drop and need the message allocator to free. Exposing them publicly (let alone under the canonical `Notification` name) would let a caller own one and hit that footgun, and would leak the `unmanaged` type into the API. So the storage enum is `pub(crate)` and non-canonically named (`NotificationStorage`); the public surface is the payload-less `NotificationCase`, the borrowed read view `NotificationRef`, and the borrowed mutable view `NotificationMut` — all safe. (A single generic enum parametrised over a "payload mode" was considered and rejected for generated code: the case enum is payload-less, the ref/mut modes need GAT-style lifetime/allocator threading, and per-mode trait impls diverge — concrete enums are simpler to emit, read, and debug.)
 
 Mutation goes through the same bound-view idiom as the other families: `slot.bind(&mut common)` yields an `OneofSlotMut`, whose `variant_mut(is_match, make)` returns a `&mut` to the (possibly freshly-installed) active variant, `try_set_with(make)` decodes then installs a variant, `set(value)` replaces the whole group, and `clear()` frees the active variant. Each of these releases the previously-active variant via `OneofDeallocate::deallocate` before overwriting the slot, so the last field seen on the wire wins with no leak. Because a variant field wrapper pins its allocator type, `OneofDeallocate<A>` takes `A` as a **trait** parameter (the enum implements it only for its own `A`), rather than a generic-method parameter. The old `set_*` per-variant setters are removed, matching the `set_*`-abolition across the other families.
 
-The group's encode / merge glue lives **on the storage enum** (`::encoded_len` / `::encode` / `::merge_email_address` / `::merge_phone_number`), not as free functions on the parent message; the merge helpers are generic over the parent's `PresenceBits` and take the bound view, so the group stays self-contained and message-agnostic. The variant field-number constants sit at **module scope** (`notification::FIELD_EMAIL_ADDRESS`, …) rather than as associated `const`s, so they remain usable as `match` patterns in the parent's `merge_from` even though the storage enum is generic over `A`.
+The group's encode / merge glue lives **on the storage enum** (`::encoded_len` / `::encode` / one `::merge_<variant>` per member), not as free functions on the parent message; the merge helpers are generic over the parent's `PresenceBits` and take the bound view, so the group stays self-contained and message-agnostic. The variant field-number constants sit at **module scope** (`notification::FIELD_EMAIL_ADDRESS`, …) rather than as associated `const`s, so they remain usable as `match` patterns in the parent's `merge_from` even though the storage enum is generic over `A`.
 
 ---
 

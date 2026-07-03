@@ -461,7 +461,7 @@ Nested LEN payloads use `Buf::take(len)` before child `merge_from`.
 
 ## 13. Derived traits
 
-**Messages** (`Task<A>`, …): generated as below. **Scalar enums** (`Status`, `Priority`): `derive(Clone, Copy, Debug, PartialEq, Eq, Hash)`. **Oneof types**: the public `NotificationCase` / `NotificationRef<'a>` carry only `Copy` payloads (`&str`), so they plainly `derive(Clone, Copy, Debug, PartialEq, Eq)`; `NotificationMut<'a, A>` holds guards and derives nothing; the internal `NotificationStorage` needs no trait derives (comparison/formatting happen on the safe views).
+**Messages** (`Task<A>`, …): generated as below. **Scalar enums** (`Status`, `Priority`): `derive(Clone, Copy, Debug, PartialEq, Eq, Hash)`. **Oneof types**: the payload-less `NotificationCase` `derive`s `Clone, Copy, Debug, PartialEq, Eq`. `NotificationRef<'a, A>` is `Copy` (all payloads are `Copy`), but its `Copy`/`Clone` are hand-written to drop the spurious `A: Copy` bound the derive would add, and it omits `Debug`/`PartialEq`/`Eq` once a variant borrows a message (`&Address<A>`, which derives neither); a string/scalar-only group could keep the full derives. `NotificationMut<'a, A>` holds guards / `&mut` and derives nothing; the internal `NotificationStorage` needs no trait derives (comparison/formatting happen on the safe views).
 
 | Trait | Bounds | Notes |
 |---|---|---|
@@ -552,14 +552,20 @@ Each wire occurrence replaces the whole slot (last wins). Encode active variant 
 
 **Four generated types per group.** The owned storage holds allocator-less `unmanaged` values, so it is kept out of the public API and split from the safe views:
 
-| Type | Vis | Payload | Role |
-|---|---|---|---|
-| `NotificationStorage<A>` | `pub(crate)` | `SingularLenField<ProtoString, Implicit, A>` | owned storage (field wrappers); `OneofDeallocate<A>`; owns encode/merge glue |
-| `NotificationCase` | `pub` | — | `Copy` discriminant (variants only; unset is `None`) → `notification_case() -> Option<_>` |
-| `NotificationRef<'a>` | `pub` | `&'a str` | borrowed read view → `notification()` |
-| `NotificationMut<'a, A>` | `pub` | `StringGuard<'a, A>` | borrowed mutable view → `notification_mut()` |
+The sample `oneof notification` is deliberately **heterogeneous** — LEN, VARINT, and message variants — to show all three storage kinds:
 
-**Variants own field wrappers, not raw storage.** Each variant holds the same field wrapper an ordinary singular field of that kind uses (`SingularLenField` for `string`/`bytes`, `SingularVarintField` for scalars, a nested-message field for messages), so `value` / `value_mut` / `deallocate` are reused rather than reimplemented. The wrapper's presence is inert here (the `OneofSlot` tracks presence and the storage enum frames encode/merge itself), so a presence-agnostic policy (`Implicit`) is picked and the wrapper's presence-aware methods are never called. `SingularLenField::from_storage(storage)` adopts an already-decoded `LenProtoType::Storage` so a variant can be built from a decoded payload without re-copying. Because a variant field wrapper pins its allocator type, the storage enum is generic over `A`.
+| Type | Vis | Payloads | Role |
+|---|---|---|---|
+| `NotificationStorage<A>` | `pub(crate)` | `SingularLenField` / `SingularVarintField` / `NestedMessageField` | owned storage (field wrappers); `OneofDeallocate<A>`; owns encode/merge glue |
+| `NotificationCase` | `pub` | — | `Copy` discriminant (variants only; unset is `None`) → `notification_case() -> Option<_>` |
+| `NotificationRef<'a, A>` | `pub` | `&'a str` / `i32` / `&'a Address<A>` | borrowed read view → `notification()` |
+| `NotificationMut<'a, A>` | `pub` | `StringGuard<'a, A>` / `&'a mut i32` / `&'a mut Address<A>` | borrowed mutable view → `notification_mut()` |
+
+**Variants own field wrappers, not raw storage.** Each variant holds the same field wrapper an ordinary singular field of that kind uses (`SingularLenField` for `string`/`bytes`, `SingularVarintField` for scalars, `NestedMessageField` for messages), so `value` / `value_mut` / `deallocate` are reused rather than reimplemented. The wrapper's presence is inert here (the `OneofSlot` tracks presence and the storage enum frames encode/merge itself), so a presence-agnostic policy (`Implicit`) is picked and the wrapper's presence-aware methods are never called. Because the LEN/message wrappers pin their allocator type, the storage enum is generic over `A` (the scalar wrapper is allocator-free).
+
+Each wrapper exposes **presence-agnostic** primitives so the oneof code stays thin (no `MessageCommon` threaded): build-empty `new_in(alloc)` / `new()` / `with_message_in(alloc)`; build-from-wire `decode_in(…)` (LEN/message take `alloc`; VARINT does not); and read/read-mut `value()`/`value_mut(…)` (LEN/VARINT) or `get()`/`get_present_mut()` (message). The VARINT variant owns no heap, so its `OneofDeallocate` arm is a no-op and its constructors ignore the allocator; the message variant is always built with the child present, so its accessors `unwrap()` the child.
+
+`NotificationRef` is `Copy` (all payloads are `Copy`, including the `&Address<A>` reference), but its `Copy`/`Clone` are hand-written to avoid a spurious `A: Copy` bound from the derive, and it omits `Debug`/`PartialEq`/`Eq` because the message payload `Address<A>` implements neither.
 
 The storage enum is deliberately **not** named `Notification`: exposing an `unmanaged`-holding value by the canonical name would let a caller own one and hit the panic-on-implicit-drop footgun, and would leak the `unmanaged` type into the API. `NotificationStorage::{case, to_ref, to_mut}` map storage → the safe views. (A single generic enum parametrised over a payload "mode" was rejected: the case enum is payload-less, ref/mut need GAT-style lifetime/allocator threading, and per-mode impls diverge — concrete enums emit and read better.)
 
@@ -567,7 +573,7 @@ The storage enum is deliberately **not** named `Notification`: exposing an `unma
 
 The storage enum implements [`OneofDeallocate<A>`](src/fields/oneof.rs) (`unsafe fn deallocate(self, alloc: A)` — `A` is a **trait** parameter, since the field wrappers pin the allocator type) so the previously-active variant is freed explicitly through the message allocator before the slot is overwritten. Mutation uses the same bound-view idiom as the other families: `slot.bind(&mut common)` yields an [`OneofSlotMut`](src/fields/oneof.rs) whose consuming methods are:
 
-- `variant_mut(is_match, make) -> &mut E` — keeps the active variant if `is_match`, else frees it and installs `make(alloc.clone())`; backs the per-variant `_mut` accessors, which then pattern-match out the inner field wrapper and return `field.value_mut(alloc)`.
+- `variant_mut(is_match, make) -> &mut E` — keeps the active variant if `is_match`, else frees it and installs `make(alloc.clone())`; backs the per-variant `_mut` accessors, which then pattern-match out the inner field wrapper and return the kind-appropriate handle (`value_mut(alloc)` for LEN, `value_mut()` for VARINT, `get_present_mut().unwrap()` for message).
 - `try_set_with(make) -> Result<(), Err>` — builds the new variant from an owned allocator clone (e.g. decoding a LEN payload) **before** freeing the old one, so a decode failure leaves the slot intact; backs the enum's `merge_<variant>` helpers.
 - `set(value)` — replaces the whole group with an already-built value (frees the old variant).
 - `clear()` — frees the active variant; backs `clear_*` and the message `Drop`.
