@@ -7,8 +7,7 @@
 //! 2. [`MessageCommon`] (presence bitfield, allocator, unknown-field buffer).
 //!
 //! Singular fields are parametrised by **wire type** (`ProtoInt32`, `ProtoString`, …)
-//! and **presence policy** ([`Implicit`](field_presence::Implicit) /
-//! [`Explicit`](field_presence::Explicit)).
+//! and **presence policy** ([`Implicit`] / [`Explicit`]).
 //!
 //! # Module layout
 //!
