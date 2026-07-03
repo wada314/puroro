@@ -663,22 +663,39 @@ impl From<Status> for i32 { … }
 
 ### 4.7 Oneof fields
 
-Each `oneof` group generates a Rust `enum` in a submodule named after the parent message (lower-snake-case). The variants hold allocator-less storage (`UnmanagedString`, …), and the enum implements `OneofDeallocate` so its active variant can be released explicitly through the message allocator. The parent message stores the group in an `OneofSlot<Notification>`.
+Each `oneof` group generates **four** types in a submodule named after the parent message (lower-snake-case), because the owned storage holds allocator-less `unmanaged` values (unsafe to drop implicitly) that must not leak into the public API:
 
 ```rust
 // In module `task`:
-pub enum Notification {
+
+// (1) Owned storage — crate-internal, deliberately NOT named `Notification`.
+//     Holds the UnmanagedString payloads and implements OneofDeallocate; it also
+//     carries the group's field-number constants + encode/merge glue.
+pub(crate) enum NotificationStorage {
     EmailAddress(/* UnmanagedString */),
     PhoneNumber(/* UnmanagedString */),
 }
-impl ::puroro::OneofDeallocate for Notification { /* deallocate active variant */ }
+impl ::puroro::OneofDeallocate for NotificationStorage { /* free active variant */ }
+
+// (2) Payload-less case discriminant (unset is `None`, so no `NotSet` member).
+pub enum NotificationCase { EmailAddress, PhoneNumber }
+
+// (3) Safe borrowed read view.
+pub enum NotificationRef<'a> { EmailAddress(&'a str), PhoneNumber(&'a str) }
+
+// (4) Safe borrowed mutable view (growable guards).
+pub enum NotificationMut<'a, A: Allocator> {
+    EmailAddress(StringGuard<'a, A>),
+    PhoneNumber(StringGuard<'a, A>),
+}
 
 // Accessors on Task:
-pub fn notification(&self) -> Option<&task::Notification>;
+pub fn notification_case(&self) -> Option<NotificationCase>;   // which variant (None = unset)
+pub fn notification(&self) -> Option<NotificationRef<'_>>;      // read active
+pub fn notification_mut(&mut self) -> Option<NotificationMut<'_, A>>; // edit active in place
 
-// Per-variant `_mut` accessors (mutation is unified under `_mut`, mirroring the
-// singular field families). Acquiring one switches the oneof to that variant —
-// freeing any previously-active variant — and returns a growable guard:
+// Per-variant `_mut` accessors switch the oneof to that variant (freeing any
+// previously-active one) and return a growable guard:
 pub fn email_address_mut(&mut self) -> impl DerefMut<Target = ::unmanaged::String<A>> + '_;
 pub fn phone_number_mut(&mut self) -> impl DerefMut<Target = ::unmanaged::String<A>> + '_;
 
@@ -686,9 +703,11 @@ pub fn phone_number_mut(&mut self) -> impl DerefMut<Target = ::unmanaged::String
 pub fn clear_notification(&mut self);
 ```
 
+**Why four types, and why the storage is not `Notification`.** The storage enum wraps `UnmanagedString`, which panics on implicit drop and needs the message allocator to free. Exposing it publicly (let alone under the canonical `Notification` name) would let a caller own one and hit that footgun, and would leak the `unmanaged` type into the API. So the storage enum is `pub(crate)` and non-canonically named (`NotificationStorage`); the public surface is the payload-less `NotificationCase`, the borrowed read view `NotificationRef`, and the borrowed mutable view `NotificationMut` — all safe. (A single generic enum parametrised over a "payload mode" was considered and rejected for generated code: the case enum is payload-less, the ref/mut modes need GAT-style lifetime/allocator threading, and per-mode trait impls diverge — concrete enums are simpler to emit, read, and debug.)
+
 Mutation goes through the same bound-view idiom as the other families: `slot.bind(&mut common)` yields an `OneofSlotMut`, whose `variant_mut(is_match, make)` returns a `&mut` to the (possibly freshly-installed) active variant, `try_set_with(make)` decodes then installs a variant, `set(value)` replaces the whole group, and `clear()` frees the active variant. Each of these releases the previously-active variant via `OneofDeallocate::deallocate` before overwriting the slot, so the last field seen on the wire wins with no leak. The old `set_*` per-variant setters are removed, matching the `set_*`-abolition across the other families.
 
-The group's field-number constants and its encode / merge glue live **on the enum** (`Notification::FIELD_EMAIL_ADDRESS`, `Notification::encoded_len` / `encode` / `merge_email_address` / `merge_phone_number`), not as free functions on the parent message; the merge helpers are generic over the parent's `PresenceBits` and take the bound view, so the enum stays self-contained and message-agnostic.
+The group's field-number constants and its encode / merge glue live **on the storage enum** (`NotificationStorage::FIELD_EMAIL_ADDRESS`, `::encoded_len` / `::encode` / `::merge_email_address` / `::merge_phone_number`), not as free functions on the parent message; the merge helpers are generic over the parent's `PresenceBits` and take the bound view, so the group stays self-contained and message-agnostic.
 
 ---
 

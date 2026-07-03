@@ -461,7 +461,7 @@ Nested LEN payloads use `Buf::take(len)` before child `merge_from`.
 
 ## 13. Derived traits
 
-**Messages** (`Task<A>`, …): generated as below. **Scalar enums** (`Status`, `Priority`): `derive(Clone, Copy, Debug, PartialEq, Eq, Hash)`. **Oneof enums** (`Notification`): hand-written `Debug` / `PartialEq` / `Eq` that compare through `Deref` to `str` (the variants hold allocator-less `UnmanagedString`, so `#[derive]` is not possible).
+**Messages** (`Task<A>`, …): generated as below. **Scalar enums** (`Status`, `Priority`): `derive(Clone, Copy, Debug, PartialEq, Eq, Hash)`. **Oneof types**: the public `NotificationCase` / `NotificationRef<'a>` carry only `Copy` payloads (`&str`), so they plainly `derive(Clone, Copy, Debug, PartialEq, Eq)`; `NotificationMut<'a, A>` holds guards and derives nothing; the internal `NotificationStorage` needs no trait derives (comparison/formatting happen on the safe views).
 
 | Trait | Bounds | Notes |
 |---|---|---|
@@ -550,9 +550,20 @@ One LEN record per element (`repeated string` / `repeated bytes`), stored as `Ma
 
 Each wire occurrence replaces the whole slot (last wins). Encode active variant only. Decode: one match arm per variant field number.
 
-**The whole group lives on its enum, not on the parent message.** The generated oneof enum owns its variant field-number constants (`Notification::FIELD_EMAIL_ADDRESS`, …) and its wire glue as associated functions — `Notification::encoded_len(&slot)`, `Notification::encode(&slot, buf)`, and one `merge_<variant>(view, wire, buf)` per variant — rather than the parent emitting free functions. A oneof carries no presence bit, so the merge helpers are generic over the parent's `Pb: PresenceBits` and only reach `MessageCommon` for the allocator (through the bound view), keeping the enum decoupled from any specific message. The parent's `merge_from` arms match `Notification::FIELD_*` and forward the bound slot.
+**Four generated types per group.** The owned storage holds allocator-less `unmanaged` values, so it is kept out of the public API and split from the safe views:
 
-Because variants hold allocator-less storage (`UnmanagedString`, …), the enum implements [`OneofDeallocate`](src/fields/oneof.rs) (`unsafe fn deallocate<A>(self, alloc)`) so the previously-active variant is freed explicitly through the message allocator before the slot is overwritten. Mutation uses the same bound-view idiom as the other families: `slot.bind(&mut common)` yields an [`OneofSlotMut`](src/fields/oneof.rs) whose consuming methods are:
+| Type | Vis | Payload | Role |
+|---|---|---|---|
+| `NotificationStorage` | `pub(crate)` | `UnmanagedString` | owned storage; `OneofDeallocate`; owns field-number consts + encode/merge glue |
+| `NotificationCase` | `pub` | — | `Copy` discriminant (variants only; unset is `None`) → `notification_case() -> Option<_>` |
+| `NotificationRef<'a>` | `pub` | `&'a str` | borrowed read view → `notification()` |
+| `NotificationMut<'a, A>` | `pub` | `StringGuard<'a, A>` | borrowed mutable view → `notification_mut()` |
+
+The storage enum is deliberately **not** named `Notification`: exposing an `unmanaged`-holding value by the canonical name would let a caller own one and hit the panic-on-implicit-drop footgun, and would leak the `unmanaged` type into the API. `NotificationStorage::{case, as_ref, as_mut}` map storage → the safe views. (A single generic enum parametrised over a payload "mode" was rejected: the case enum is payload-less, ref/mut need GAT-style lifetime/allocator threading, and per-mode impls diverge — concrete enums emit and read better.)
+
+**The whole group lives on the storage enum, not on the parent message.** It owns its variant field-number constants (`NotificationStorage::FIELD_EMAIL_ADDRESS`, …) and its wire glue as associated functions — `encoded_len(&slot)`, `encode(&slot, buf)`, and one `merge_<variant>(view, wire, buf)` per variant — rather than the parent emitting free functions. A oneof carries no presence bit, so the merge helpers are generic over the parent's `Pb: PresenceBits` and only reach `MessageCommon` for the allocator (through the bound view), keeping the group decoupled from any specific message. The parent's `merge_from` arms match `NotificationStorage::FIELD_*` and forward the bound slot.
+
+The storage enum implements [`OneofDeallocate`](src/fields/oneof.rs) (`unsafe fn deallocate<A>(self, alloc)`) so the previously-active variant is freed explicitly through the message allocator before the slot is overwritten. Mutation uses the same bound-view idiom as the other families: `slot.bind(&mut common)` yields an [`OneofSlotMut`](src/fields/oneof.rs) whose consuming methods are:
 
 - `variant_mut(is_match, make) -> &mut E` — keeps the active variant if `is_match`, else frees it and installs `make(alloc.clone())`; backs the per-variant `_mut` accessors, which then pattern-match out the inner storage and return a `with_alloc` guard.
 - `try_set_with(make) -> Result<(), Err>` — builds the new variant from an owned allocator clone (e.g. decoding a LEN payload) **before** freeing the old one, so a decode failure leaves the slot intact; backs the enum's `merge_<variant>` helpers.

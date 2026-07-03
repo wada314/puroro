@@ -40,7 +40,7 @@ fn task_roundtrip() {
     assert_eq!(decoded.priority().unwrap().unwrap(), Priority::High);
     assert!(matches!(
         decoded.notification(),
-        Some(puroro_sample_generated::task::Notification::EmailAddress(s)) if &**s == "a@example.com"
+        Some(puroro_sample_generated::task::NotificationRef::EmailAddress(s)) if s == "a@example.com"
     ));
     let a = decoded.assignee().unwrap();
     assert_eq!(a.street().get(), "1 Main St");
