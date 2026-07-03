@@ -52,21 +52,6 @@ pub(crate) const FIELD_WEBHOOK_ID: u32 = 14;
 /// `postal` variant field number.
 pub(crate) const FIELD_POSTAL: u32 = 15;
 
-/// The field wrapper each `string` variant owns: a singular LEN field minus
-/// presence.
-///
-/// The presence policy (`Implicit`) is inert here — the enclosing [`OneofSlot`]
-/// tracks which variant is set, and [`NotificationStorage`] frames encode / merge
-/// itself, so the wrapper's presence-aware methods are never called. Reusing the
-/// singular field wrapper keeps oneof members and ordinary fields uniform (same
-/// storage, `value` / `value_mut` / `deallocate`).
-type StringVariant<A> = SingularLenField<ProtoString, Implicit, A>;
-/// The field wrapper the `int32` variant owns (a singular varint field; scalars
-/// store no allocator, so this type is allocator-free).
-type Int32Variant = SingularVarintField<ProtoInt32, Implicit>;
-/// The field wrapper the message variant owns (a singular nested-message field).
-type PostalVariant<A> = NestedMessageField<Address<A>, A>;
-
 /// Which variant of `oneof notification` is set — a payload-less discriminant.
 ///
 /// Backs `Task::notification_case`, which returns `Option<NotificationCase>`;
@@ -125,11 +110,16 @@ pub enum NotificationMut<'a, A: Allocator + Clone> {
 /// by name would let a caller own one and hit the panic-on-implicit-drop footgun.
 /// All public access is through [`NotificationCase`] / [`NotificationRef`] /
 /// [`NotificationMut`].
+///
+/// The LEN/varint wrappers carry a presence policy (`Implicit`) that is inert
+/// here: the enclosing [`OneofSlot`] tracks which variant is set, and this enum
+/// frames encode / merge itself, so the wrappers' presence-aware methods are
+/// never called.
 pub(crate) enum NotificationStorage<A: Allocator + Clone> {
-    EmailAddress(StringVariant<A>),
-    PhoneNumber(StringVariant<A>),
-    WebhookId(Int32Variant),
-    Postal(PostalVariant<A>),
+    EmailAddress(SingularLenField<ProtoString, Implicit, A>),
+    PhoneNumber(SingularLenField<ProtoString, Implicit, A>),
+    WebhookId(SingularVarintField<ProtoInt32, Implicit>),
+    Postal(NestedMessageField<Address<A>, A>),
 }
 
 impl<A: Allocator + Clone> NotificationStorage<A> {
