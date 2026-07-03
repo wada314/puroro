@@ -18,8 +18,6 @@ use ::puroro::{
     RepeatedPackedVarintField, SingularLenField, SingularVarintField,
 };
 
-use ::unmanaged::UnmanagedString;
-
 use crate::address::Address;
 use crate::enums::{Priority, Status};
 
@@ -65,7 +63,7 @@ pub struct Task<A: Allocator + Clone = Global> {
     status: SingularVarintField<ProtoEnum, Implicit>,  // proto: Status status = 9;
     priority: SingularVarintField<ProtoEnum, Explicit>, // proto: Priority priority = 10;
     assignee: NestedMessageField<Address<A>, A>,       // proto: Address assignee = 11;
-    notification: OneofSlot<NotificationStorage>,      // proto: oneof notification { ... }
+    notification: OneofSlot<NotificationStorage<A>>,   // proto: oneof notification { ... }
 }
 
 // ---------------------------------------------------------------------------
@@ -84,8 +82,9 @@ impl<A: Allocator + Clone> Task<A> {
     pub const FIELD_STATUS: u32 = 9; // status
     pub const FIELD_PRIORITY: u32 = 10; // priority
     pub const FIELD_ASSIGNEE: u32 = 11; // assignee
-    // oneof notification variant field numbers live on `NotificationStorage`
-    // (`FIELD_EMAIL_ADDRESS` = 12, `FIELD_PHONE_NUMBER` = 13).
+    // oneof notification variant field numbers live in the `notification` module
+    // (`FIELD_EMAIL_ADDRESS` = 12, `FIELD_PHONE_NUMBER` = 13), so they stay usable
+    // as `match` patterns despite `NotificationStorage` being generic over `A`.
 
     pub const BIT_TITLE: usize = 0; // title (EXPLICIT)
     pub const BIT_MAX_RETRIES: usize = 1; // max_retries (EXPLICIT)
@@ -338,18 +337,18 @@ impl<A: Allocator + Clone> Task<A> {
 
     /// Which variant is set (payload-less; `None` when the group is unset).
     pub fn notification_case(&self) -> Option<NotificationCase> {
-        self.notification.get().map(NotificationStorage::case)
+        self.notification.get().map(|s| s.case())
     }
 
     /// Safe borrowed read view of the active variant.
     pub fn notification(&self) -> Option<NotificationRef<'_>> {
-        self.notification.get().map(NotificationStorage::as_ref)
+        self.notification.get().map(|s| s.to_ref())
     }
 
     /// Safe borrowed mutable view of the *currently active* variant (no switch).
     pub fn notification_mut(&mut self) -> Option<NotificationMut<'_, A>> {
         let alloc = self._common.alloc.clone();
-        self.notification.get_mut().map(|s| s.as_mut(alloc))
+        self.notification.get_mut().map(|s| s.to_mut(alloc))
     }
 
     pub fn email_address_mut(
@@ -357,14 +356,13 @@ impl<A: Allocator + Clone> Task<A> {
     ) -> impl ::core::ops::DerefMut<Target = ::unmanaged::String<A>> + '_ {
         let variant = self.notification.bind(&mut self._common).variant_mut(
             |n| matches!(n, NotificationStorage::EmailAddress(_)),
-            |alloc| NotificationStorage::EmailAddress(UnmanagedString::new(alloc)),
+            |alloc| NotificationStorage::EmailAddress(SingularLenField::new_in(alloc)),
         );
         let alloc = self._common.alloc.clone();
-        let NotificationStorage::EmailAddress(s) = variant else {
+        let NotificationStorage::EmailAddress(f) = variant else {
             unreachable!()
         };
-        // SAFETY: an owned clone of the message allocator owns this string's buffer.
-        unsafe { s.with_alloc(alloc) }
+        f.value_mut(alloc)
     }
 
     pub fn phone_number_mut(
@@ -372,14 +370,13 @@ impl<A: Allocator + Clone> Task<A> {
     ) -> impl ::core::ops::DerefMut<Target = ::unmanaged::String<A>> + '_ {
         let variant = self.notification.bind(&mut self._common).variant_mut(
             |n| matches!(n, NotificationStorage::PhoneNumber(_)),
-            |alloc| NotificationStorage::PhoneNumber(UnmanagedString::new(alloc)),
+            |alloc| NotificationStorage::PhoneNumber(SingularLenField::new_in(alloc)),
         );
         let alloc = self._common.alloc.clone();
-        let NotificationStorage::PhoneNumber(s) = variant else {
+        let NotificationStorage::PhoneNumber(f) = variant else {
             unreachable!()
         };
-        // SAFETY: an owned clone of the message allocator owns this string's buffer.
-        unsafe { s.with_alloc(alloc) }
+        f.value_mut(alloc)
     }
 
     pub fn clear_notification(&mut self) {
@@ -564,7 +561,7 @@ impl<A: Allocator + Clone> MessageDecode for Task<A> {
                     // assignee = 11, nested message
                     self.assignee.merge(&self._common, wire_type, buf)?;
                 }
-                NotificationStorage::FIELD_EMAIL_ADDRESS => {
+                notification::FIELD_EMAIL_ADDRESS => {
                     // notification.email_address = 12
                     NotificationStorage::merge_email_address(
                         self.notification.bind(&mut self._common),
@@ -572,7 +569,7 @@ impl<A: Allocator + Clone> MessageDecode for Task<A> {
                         buf,
                     )?;
                 }
-                NotificationStorage::FIELD_PHONE_NUMBER => {
+                notification::FIELD_PHONE_NUMBER => {
                     // notification.phone_number = 13
                     NotificationStorage::merge_phone_number(
                         self.notification.bind(&mut self._common),

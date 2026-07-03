@@ -15,35 +15,41 @@ use ::allocator_api2::alloc::Allocator;
 use super::common::MessageCommon;
 use super::presence::PresenceBits;
 
-/// Explicit, allocator-driven release of a generated `oneof` enum.
+/// Explicit, allocator-driven release of a generated `oneof` enum over allocator `A`.
 ///
-/// A oneof enum owns allocator-less storage in its variants (`UnmanagedString`,
-/// `UnmanagedVec`, nested messages, …), which cannot free themselves. The enum
-/// implements this trait so [`OneofSlotMut`] can release the active variant —
-/// handing it the message allocator — before overwriting the slot. This mirrors
-/// the `deallocate(self, alloc)` contract of the `unmanaged` types: the name
-/// stresses that dropping is *not* implicit; the caller must pass the owning
-/// allocator. Variants that hold only inline scalars make `deallocate` a no-op.
-pub trait OneofDeallocate {
+/// A oneof enum owns allocator-less storage in its variants (field wrappers such
+/// as `SingularLenField<_, _, A>`, nested messages, …), which cannot free
+/// themselves. The enum implements this trait so [`OneofSlotMut`] can release the
+/// active variant — handing it the message allocator — before overwriting the
+/// slot. This mirrors the `deallocate(self, alloc)` contract of the `unmanaged`
+/// types: the name stresses that dropping is *not* implicit; the caller must pass
+/// the owning allocator. Variants that hold only inline scalars make `deallocate`
+/// a no-op.
+///
+/// `A` is a trait parameter (rather than a generic method parameter) because a
+/// storage enum that owns field wrappers pins their allocator type to its own
+/// `A`; the freed allocator must match that type exactly.
+pub trait OneofDeallocate<A: Allocator> {
     /// Drops the active variant and frees its storage through `alloc`.
     ///
     /// # Safety
     ///
     /// `alloc` must be the allocator that owns the variant's buffers.
-    unsafe fn deallocate<A: Allocator>(self, alloc: A);
+    unsafe fn deallocate(self, alloc: A);
 }
 
 /// Storage for a protobuf `oneof` group.
 ///
 /// `E` is the generated `enum` for the group: one unit-or-tuple variant per
-/// oneof member, each holding that member's storage (allocator-less
-/// `UnmanagedString` / `UnmanagedVec`, a nested-message box, or an inline scalar
-/// — never an allocator). At most one variant is active, so the slot is just an
-/// `Option<E>`. For the allocator-owning cases, `E` is expected to implement
-/// [`OneofDeallocate`] so a previously-active variant can be released explicitly
-/// before it is overwritten; that bound is required by the mutating view
-/// ([`OneofSlotMut`]) rather than by the slot itself, so plain read/encode paths
-/// stay free of it.
+/// oneof member, each holding that member's **field wrapper** — the same type a
+/// singular field of that kind would use (`SingularLenField<_, _, A>`,
+/// `SingularVarintField<_, _>`, a nested-message field, …), minus presence
+/// (which the slot itself tracks). At most one variant is active, so the slot is
+/// just an `Option<E>`. For the allocator-owning cases, `E` is expected to
+/// implement [`OneofDeallocate`] so a previously-active variant can be released
+/// explicitly before it is overwritten; that bound is required by the mutating
+/// view ([`OneofSlotMut`]) rather than by the slot itself, so plain read/encode
+/// paths stay free of it.
 ///
 /// The stored variant is replaced whenever another one is set or decoded (last
 /// wins on the wire). All mutation goes through [`bind`](Self::bind); the
@@ -143,7 +149,7 @@ impl<'f, 'c, E, Pb: PresenceBits, A: Allocator> OneofSlotMut<'f, 'c, E, Pb, A> {
     /// variant first (last wins on the wire). Backs the decode arms.
     pub fn set(self, value: E)
     where
-        E: OneofDeallocate,
+        E: OneofDeallocate<A>,
         A: Clone,
     {
         if let Some(old) = self.slot.take() {
@@ -161,7 +167,7 @@ impl<'f, 'c, E, Pb: PresenceBits, A: Allocator> OneofSlotMut<'f, 'c, E, Pb, A> {
     /// decode arms of oneof groups whose variants own heap storage.
     pub fn try_set_with<Err>(self, make: impl FnOnce(A) -> Result<E, Err>) -> Result<(), Err>
     where
-        E: OneofDeallocate,
+        E: OneofDeallocate<A>,
         A: Clone,
     {
         let value = make(self.common.alloc.clone())?;
@@ -185,7 +191,7 @@ impl<'f, 'c, E, Pb: PresenceBits, A: Allocator> OneofSlotMut<'f, 'c, E, Pb, A> {
         make: impl FnOnce(A) -> E,
     ) -> &'f mut E
     where
-        E: OneofDeallocate,
+        E: OneofDeallocate<A>,
         A: Clone,
     {
         let slot = self.slot;
@@ -206,7 +212,7 @@ impl<'f, 'c, E, Pb: PresenceBits, A: Allocator> OneofSlotMut<'f, 'c, E, Pb, A> {
     /// Frees the active variant (if any), leaving the slot empty.
     pub fn clear(self)
     where
-        E: OneofDeallocate,
+        E: OneofDeallocate<A>,
         A: Clone,
     {
         if let Some(old) = self.slot.take() {

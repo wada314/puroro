@@ -36,6 +36,19 @@ impl<T: LenProtoType, P: FieldPresence, A: Allocator> SingularLenField<T, P, A> 
         }
     }
 
+    /// Wraps already-decoded [`LenProtoType::Storage`] into a field.
+    ///
+    /// Presence-agnostic (does not touch `MessageCommon`): the payload is simply
+    /// adopted, so the caller owns responsibility for eventual
+    /// [`deallocate`](Self::deallocate). Used by oneof variants, whose presence is
+    /// tracked by the enclosing `OneofSlot` rather than a presence bit.
+    pub fn from_storage(value: T::Storage) -> Self {
+        Self {
+            value: ManuallyDrop::new(value),
+            _marker: PhantomData,
+        }
+    }
+
     /// Borrowed payload (IMPLICIT public getters).
     #[inline]
     pub fn value(&self) -> T::Ref<'_> {
