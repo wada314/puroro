@@ -347,11 +347,13 @@ impl<A: Allocator> Task<A> {
 
 ```rust
 Self::FIELD_TITLE => { // title = 1, EXPLICIT string
-    self.title.merge(&mut self._common, Self::BIT_TITLE, wire_type, buf)?;
+    self.title
+        .bind(&mut self._common, Self::BIT_TITLE)
+        .merge(wire_type, buf)?;
 }
 ```
 
-Oneof variant arms use the **variant field name** and number. The `_ =>` unknown-field arm gets a short comment (`// unknown field — preserve in _common`).
+Every field kind merges through the same bound-view shape — `self.<field>.bind(&mut self._common[, BIT]).merge(wire_type, buf)?` (singular scalars/LEN take the presence `BIT`; repeated and nested-message fields have no bit) — so the code generator emits one form. Oneof variant arms use the **variant field name** and number. The `_ =>` unknown-field arm gets a short comment (`// unknown field — preserve in _common`).
 
 **What not to comment** — avoid restating obvious one-line delegates (`has_title` → `self.title.has(...)`). Section + struct + dispatch comments are enough.
 
@@ -544,7 +546,7 @@ One LEN record per element (`repeated string` / `repeated bytes`), stored as `Ma
 
 ### Nested (`NestedMessageField<M, A>`)
 
-`Option<UnmanagedBox<M>>`. Encode: LEN tag + `child.encode_raw`. Decode: create child (via `M::new_in(common.alloc.clone())` boxed with `common.alloc.clone()`) if absent, `merge_from` on sub-slice (concatenation = merge). `deallocate`/`clear` take the box and release it through an owned `alloc.clone()`; the child's own `Drop` frees its fields recursively. Recursion limit: planned ([§17](#17-planned-optimisations--runtime-gaps)).
+`Option<UnmanagedBox<M>>`. Mutation uses the **same bound-view idiom** as the other families (`field.bind(&mut common).merge(wire, buf)` / `.get_mut()` / `.clear()`), so a nested message reads and merges exactly like a scalar or repeated field in generated code — the code generator emits one shape for every field kind. A nested message has no presence bit (presence is the inline `Option<Box>`), so — like a repeated field — `bind` takes no `bit` and the view carries only `common` (for the allocator). Encode: LEN tag + `child.encode_raw`. Decode: create child (via `M::new_in(common.alloc.clone())` boxed with `common.alloc.clone()`) if absent, `merge_from` on sub-slice (concatenation = merge). `deallocate` (terminal, from the owning `Drop`) and the view's `clear` release the box through an owned `alloc.clone()`; the child's own `Drop` frees its fields recursively. Recursion limit: planned ([§17](#17-planned-optimisations--runtime-gaps)).
 
 ### Oneof (`OneofSlot<E>`)
 
@@ -571,7 +573,7 @@ The storage enum is deliberately **not** named `Notification`: exposing an `unma
 
 **Per-variant `bind_<variant>_mut` helpers on the storage enum** hide the `variant_mut(is_match, make)` + `let Self::Variant(f) = … else unreachable!()` boilerplate: `bind_email_address_mut(slot, common) -> &mut SingularLenField<…>`, `bind_webhook_id_mut(…) -> &mut SingularVarintField<…>`, `bind_postal_mut(…) -> &mut NestedMessageField<…>`, etc. Each forces the group to its variant (installing a default, freeing any other) and returns the inner field wrapper, borrowing only the slot so `common` is free on return. The single `unreachable!()` per variant lives here instead of at every call site.
 
-**The encode glue lives on the storage enum, not on the parent message** — `encoded_len(&slot)` and `encode(&slot, buf)` as associated functions — keeping the group decoupled from any specific message. **Merge, however, is not a `merge_<variant>` helper on the enum.** Because each variant *is* a field wrapper, the parent's `merge_from` selects the variant with `NotificationStorage::bind_<variant>_mut(&mut slot, &mut common)` (freeing any other variant) and merges the occurrence into the returned field via that field's own idiom (`bind_oneof(common).merge(…)` / `merge(common, …)`). This reuses each field's merge machinery rather than re-deriving it on the enum, and lets the message variant merge successive occurrences into the current child rather than replacing it. The variant field-number constants sit at **module scope** (`notification::FIELD_EMAIL_ADDRESS`, …) rather than as associated `const`s, so they stay usable as `match` patterns in the parent's `merge_from` even though the storage enum is generic over `A`.
+**The encode glue lives on the storage enum, not on the parent message** — `encoded_len(&slot)` and `encode(&slot, buf)` as associated functions — keeping the group decoupled from any specific message. **Merge, however, is not a `merge_<variant>` helper on the enum.** Because each variant *is* a field wrapper, the parent's `merge_from` selects the variant with `NotificationStorage::bind_<variant>_mut(&mut slot, &mut common)` (freeing any other variant) and merges the occurrence into the returned field via that field's own idiom — uniformly `field.bind_oneof(common).merge(…)` for every kind (the message wrapper's `bind_oneof` is an alias of `bind`). This reuses each field's merge machinery rather than re-deriving it on the enum, and lets the message variant merge successive occurrences into the current child rather than replacing it. The variant field-number constants sit at **module scope** (`notification::FIELD_EMAIL_ADDRESS`, …) rather than as associated `const`s, so they stay usable as `match` patterns in the parent's `merge_from` even though the storage enum is generic over `A`.
 
 The storage enum implements [`OneofDeallocate<A>`](src/fields/oneof.rs) (`unsafe fn deallocate(self, alloc: A)` — `A` is a **trait** parameter, since the field wrappers pin the allocator type) so the previously-active variant is freed explicitly through the message allocator before the slot is overwritten. Mutation uses the same bound-view idiom as the other families: `slot.bind(&mut common)` yields an [`OneofSlotMut`](src/fields/oneof.rs) whose consuming methods are:
 

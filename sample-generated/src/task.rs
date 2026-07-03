@@ -329,11 +329,11 @@ impl<A: Allocator + Clone> Task<A> {
     }
 
     pub fn assignee_mut(&mut self) -> &mut Address<A> {
-        self.assignee.get_mut(&self._common)
+        self.assignee.bind(&mut self._common).get_mut()
     }
 
     pub fn clear_assignee(&mut self) {
-        self.assignee.clear(self._common.alloc.clone());
+        self.assignee.bind(&mut self._common).clear();
     }
 
     // -- oneof notification (proto fields 12 / 13 / 14 / 15) ----------------
@@ -566,7 +566,9 @@ impl<A: Allocator + Clone> MessageDecode for Task<A> {
                 }
                 Self::FIELD_ASSIGNEE => {
                     // assignee = 11, nested message
-                    self.assignee.merge(&self._common, wire_type, buf)?;
+                    self.assignee
+                        .bind(&mut self._common)
+                        .merge(wire_type, buf)?;
                 }
                 notification::FIELD_EMAIL_ADDRESS => {
                     // notification.email_address = 12 (LEN variant): select the
@@ -595,12 +597,13 @@ impl<A: Allocator + Clone> MessageDecode for Task<A> {
                 }
                 notification::FIELD_POSTAL => {
                     // notification.postal = 15 (message variant): merge into the
-                    // (present) child via the nested-message field's own merge.
+                    // (present) child via the field's bind (same shape as the
+                    // other variants).
                     let f = NotificationStorage::bind_postal_mut(
                         &mut self.notification,
                         &mut self._common,
                     );
-                    f.merge(&self._common, wire_type, buf)?;
+                    f.bind_oneof(&mut self._common).merge(wire_type, buf)?;
                 }
                 _ => {
                     // unknown field — preserve in _common.unknown_fields
