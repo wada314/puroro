@@ -46,7 +46,9 @@ pub use len_field::{
     ExplicitBytes, ExplicitLenField, ExplicitString, ImplicitBytes, ImplicitLenField,
     ImplicitString, SingularLen, SingularLenField, SingularLenFieldMut,
 };
-pub use message::{NestedMessage, NestedMessageField, NestedMessageFieldMut};
+pub use message::{
+    MessagePresence, NestedMessage, NestedMessageField, NestedMessageFieldMut, Present,
+};
 pub use oneof::{OneofDeallocate, OneofSlot, OneofSlotMut};
 pub use presence::PresenceBits;
 pub use repeated_encoding::{Expanded, Packed, RepeatedVarintEncoding};

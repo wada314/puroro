@@ -40,7 +40,7 @@
 use ::allocator_api2::alloc::Allocator;
 use ::bytes::BufMut;
 use ::puroro::{
-    Implicit, MessageCommon, NestedMessageField, OneofDeallocate, OneofSlot, PresenceBits,
+    Implicit, MessageCommon, NestedMessageField, OneofDeallocate, OneofSlot, PresenceBits, Present,
     ProtoInt32, ProtoString, SingularLenField, SingularVarintField, VarintProtoType,
 };
 use ::unmanaged::string::StringGuard;
@@ -123,7 +123,9 @@ pub(crate) enum NotificationStorage<A: Allocator + Clone> {
     EmailAddress(SingularLenField<ProtoString, Implicit, A>),
     PhoneNumber(SingularLenField<ProtoString, Implicit, A>),
     WebhookId(SingularVarintField<ProtoInt32, Implicit>),
-    Postal(NestedMessageField<Address<A>, A>),
+    // `Present`: a oneof message variant is always present (the slot tracks
+    // presence), so the box is unwrapped — no `Option`, no per-access `unwrap`.
+    Postal(NestedMessageField<Address<A>, A, Present>),
 }
 
 impl<A: Allocator + Clone> NotificationStorage<A> {
@@ -143,8 +145,7 @@ impl<A: Allocator + Clone> NotificationStorage<A> {
             Self::EmailAddress(f) => NotificationRef::EmailAddress(f.value()),
             Self::PhoneNumber(f) => NotificationRef::PhoneNumber(f.value()),
             Self::WebhookId(f) => NotificationRef::WebhookId(f.value()),
-            // The variant invariant guarantees the child is present.
-            Self::Postal(f) => NotificationRef::Postal(f.get().unwrap()),
+            Self::Postal(f) => NotificationRef::Postal(f.value()),
         }
     }
 
@@ -155,8 +156,7 @@ impl<A: Allocator + Clone> NotificationStorage<A> {
             Self::EmailAddress(f) => NotificationMut::EmailAddress(f.value_mut(alloc)),
             Self::PhoneNumber(f) => NotificationMut::PhoneNumber(f.value_mut(alloc)),
             Self::WebhookId(f) => NotificationMut::WebhookId(f.value_mut()),
-            // The variant invariant guarantees the child is present.
-            Self::Postal(f) => NotificationMut::Postal(f.get_present_mut().unwrap()),
+            Self::Postal(f) => NotificationMut::Postal(f.value_mut()),
         }
     }
 
@@ -220,7 +220,7 @@ impl<A: Allocator + Clone> NotificationStorage<A> {
     pub(crate) fn bind_postal_mut<'f, Pb: PresenceBits>(
         slot: &'f mut OneofSlot<Self>,
         common: &mut MessageCommon<Pb, A>,
-    ) -> &'f mut NestedMessageField<Address<A>, A> {
+    ) -> &'f mut NestedMessageField<Address<A>, A, Present> {
         let variant = slot.bind(common).variant_mut(
             |n| matches!(n, Self::Postal(_)),
             |alloc| Self::Postal(NestedMessageField::with_message_in(alloc)),
@@ -282,7 +282,9 @@ impl<A: Allocator + Clone> OneofDeallocate<A> for NotificationStorage<A> {
         match self {
             Self::EmailAddress(mut f) | Self::PhoneNumber(mut f) => f.deallocate(alloc),
             Self::WebhookId(_) => {}
-            Self::Postal(mut f) => f.deallocate(alloc),
+            // `Present::deallocate` consumes the field by value (no `Option` to
+            // null out); we already own the variant here.
+            Self::Postal(f) => f.deallocate(alloc),
         }
     }
 }

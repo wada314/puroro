@@ -380,10 +380,7 @@ impl<A: Allocator + Clone> Task<A> {
     /// Switches the group to `postal` (freeing any other variant) and returns a
     /// mutable handle to the nested message, creating an empty one if needed.
     pub fn postal_mut(&mut self) -> &mut Address<A> {
-        // The variant invariant guarantees the child is present.
-        NotificationStorage::bind_postal_mut(&mut self.notification, &mut self._common)
-            .get_present_mut()
-            .unwrap()
+        NotificationStorage::bind_postal_mut(&mut self.notification, &mut self._common).value_mut()
     }
 
     pub fn clear_notification(&mut self) {
