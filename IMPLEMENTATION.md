@@ -150,7 +150,7 @@ pub trait VarintProtoType {
     fn encode_wire(value: Self::Value) -> u64;
 }
 // Markers: ProtoInt32, ProtoInt64, ProtoUInt32, ProtoUInt64,
-//          ProtoSint32, ProtoSint64, ProtoBool, ProtoEnum
+//          ProtoSint32, ProtoSint64, ProtoBool, ProtoEnum<E>
 ```
 
 ### Other families
@@ -199,7 +199,7 @@ One generic struct per wire family, parametrised by wire marker `T` and presence
 | `NestedMessageField<M, A, P = Optional>` | `Optional`: `Option<Box<M>>`; `Present`: bare `Box<M>` — no bitfield | — |
 | `OneofSlot<E>` | mutually exclusive variants | — |
 
-**Closed enum:** `SingularVarintField<ProtoEnum, Explicit>::merge_closed(…, is_known)` — unknown values → `unknown_fields`, bit not set.
+**Closed enum:** `SingularVarintField<ProtoEnum<E>, Explicit>::merge_closed(…, |wire: i32| …)` — unknown values → `unknown_fields`, bit not set.
 
 **LEGACY_REQUIRED (LEN):** `SingularLenField<…, LegacyRequired, A>::validate_required`.
 
@@ -214,8 +214,8 @@ Adding a wire type = one new `VarintProtoType` impl. Adding a presence mode = on
 | `IMPLICIT int32` | `SingularVarintField<ProtoInt32, Implicit>` |
 | `EXPLICIT int32` | `SingularVarintField<ProtoInt32, Explicit>` |
 | `IMPLICIT sint32` / `bool` | `SingularVarintField<ProtoSint32 \| ProtoBool, Implicit>` |
-| `IMPLICIT open enum` | `SingularVarintField<ProtoEnum, Implicit>` |
-| `EXPLICIT closed enum` | `SingularVarintField<ProtoEnum, Explicit>` + `merge_closed` |
+| `IMPLICIT open enum` | `SingularVarintField<ProtoEnum<E>, Implicit>` |
+| `EXPLICIT closed enum` | `SingularVarintField<ProtoEnum<E>, Explicit>` + `merge_closed` |
 | `IMPLICIT string` | `SingularLenField<ProtoString, Implicit, A>` |
 | `EXPLICIT string` | `SingularLenField<ProtoString, Explicit, A>` |
 | `LEGACY_REQUIRED string` | `SingularLenField<ProtoString, LegacyRequired, A>` |
@@ -244,8 +244,8 @@ pub struct Task<A: Allocator + Clone = Global> {
     tag_ids: RepeatedPackedVarintField<ProtoInt32, A>,
     scores: RepeatedExpandedVarintField<ProtoInt32, A>,
     labels: RepeatedLenField<ProtoString, A>,
-    status: SingularVarintField<ProtoEnum, Implicit>,
-    priority: SingularVarintField<ProtoEnum, Explicit>,
+    status: SingularVarintField<ProtoEnum<Status>, Implicit>,
+    priority: SingularVarintField<ProtoEnum<Priority>, Explicit>,
     assignee: NestedMessageField<Address<A>, A>,
     notification: OneofSlot<task::Notification>,
 }
@@ -494,7 +494,7 @@ Compare messages semantically via getters; deep copy (when added) will copy data
 | Mutator | `bind(&mut common, bit).value_mut()` → `&mut T::Value` | same (sets bit) |
 | Clear | — | `bind(&mut common, bit).clear()` (resets type-zero) |
 
-Getters and encode (`value` / `optional` / `has` / `encoded_len` / `encode_raw`) need only a shared `&common` and stay as plain field methods. Open enum: thin glue — `Status::try_from(field.value())`. Closed enum: `bind(&mut common, bit).merge_closed(field_number, wire, buf, is_known)` — unknown values go to `unknown_fields` (needs `A: Clone`), bit not set ([§7](#7-field-wrappers)). `Optional` is a concrete struct (DESIGN.md §3); no `Option<T>` conversion. Enum `_mut` accessors expose the raw `i32` storage.
+Getters and encode (`value` / `optional` / `has` / `encoded_len` / `encode_raw`) need only a shared `&common` and stay as plain field methods. Enum fields use `ProtoEnum<E>` where `E: ProtoEnumStorage`; open vs closed decode rules live in the generated `decode_from_wire` impl. Closed enum unknown values use `merge_closed(…, |wire: i32| …)` on decode. `Optional` is a concrete struct (DESIGN.md §3); no `Option<T>` conversion.
 
 ### LEN — string & bytes (`SingularLenField<T, P, A>`)
 

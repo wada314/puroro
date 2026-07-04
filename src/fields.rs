@@ -66,6 +66,6 @@ pub use scalar::{
     SingularVarintFieldMut,
 };
 pub use varint::{
-    ProtoBool, ProtoEnum, ProtoInt32, ProtoInt64, ProtoSint32, ProtoSint64, ProtoUInt32, ProtoUInt64,
-    VarintProtoType,
+    ProtoBool, ProtoEnum, ProtoEnumStorage, ProtoInt32, ProtoInt64, ProtoSint32, ProtoSint64,
+    ProtoUInt32, ProtoUInt64, VarintProtoType,
 };

@@ -103,7 +103,11 @@ impl<T: VarintProtoType, P: FieldPresence, const FIELD: u32, D> SingularVarintFi
     }
 }
 
-impl<T: VarintProtoType, const FIELD: u32, D> SingularVarintField<T, Implicit, FIELD, D> {
+impl<T: VarintProtoType, const FIELD: u32, D> SingularVarintField<T, Implicit, FIELD, D>
+where
+    D: HasDefault<T::Value>,
+    T::Value: Copy,
+{
     /// Binds an `Implicit`-presence **oneof variant** field for mutation.
     #[inline]
     pub fn bind_oneof<'f, 'c, Pb: PresenceBits, A: Allocator>(
@@ -111,6 +115,20 @@ impl<T: VarintProtoType, const FIELD: u32, D> SingularVarintField<T, Implicit, F
         common: &'c mut MessageCommon<Pb, A>,
     ) -> SingularVarintFieldMut<'f, 'c, T, Implicit, FIELD, D, Pb, A> {
         self.bind(common)
+    }
+
+    /// `Optional` getter (`is_set` when the stored value is not [`VarintProtoType::proto_zero`]).
+    pub fn optional<Pb, A>(&self, _common: &MessageCommon<Pb, A>) -> Optional<T::Value, D>
+    where
+        Pb: PresenceBits,
+        A: Allocator,
+    {
+        let v = if self.value == T::proto_zero() {
+            None
+        } else {
+            Some(self.value)
+        };
+        Optional::new(v)
     }
 
     /// Wire byte length without `MessageCommon` (IMPLICIT presence only).
@@ -247,11 +265,13 @@ impl<
     }
 
     /// Merges a closed-enum occurrence; unknown values go to `common.unknown_fields`.
+    ///
+    /// `is_known` is called with the decoded `i32` wire value before it is stored.
     pub fn merge_closed<B: Buf>(
         self,
         wire_type: WireType,
         buf: &mut B,
-        is_known: impl FnOnce(T::Value) -> bool,
+        is_known: impl FnOnce(i32) -> bool,
     ) -> Result<(), DecodeError>
     where
         A: Clone,
@@ -261,8 +281,8 @@ impl<
             return Err(DecodeError::InvalidTag);
         }
         let raw = decode::decode_varint(buf)?;
-        let value = T::decode_wire(raw)?;
-        if !is_known(value) {
+        let wire = varint::ProtoInt32::decode_wire(raw)?;
+        if !is_known(wire) {
             decode::save_unknown_varint_field(
                 FIELD,
                 raw,
@@ -272,7 +292,7 @@ impl<
             return Ok(());
         }
         P::on_set(self.common);
-        self.field.value = value;
+        self.field.value = T::decode_wire(raw)?;
         Ok(())
     }
 }
@@ -297,6 +317,6 @@ pub type ExplicitVarint<T, const BIT: usize, const FIELD: u32, D = ProtoDefault>
 pub type ImplicitInt32<const FIELD: u32> = ImplicitVarintField<varint::ProtoInt32, FIELD>;
 pub type ExplicitInt32<const BIT: usize, const FIELD: u32, D = ProtoDefault> =
     ExplicitVarintField<varint::ProtoInt32, BIT, FIELD, D>;
-pub type ImplicitEnum<const FIELD: u32> = ImplicitVarintField<varint::ProtoEnum, FIELD>;
-pub type ExplicitEnum<const BIT: usize, const FIELD: u32, D = ProtoDefault> =
-    ExplicitVarintField<varint::ProtoEnum, BIT, FIELD, D>;
+pub type ImplicitEnum<E, const FIELD: u32> = ImplicitVarintField<varint::ProtoEnum<E>, FIELD>;
+pub type ExplicitEnum<E, const BIT: usize, const FIELD: u32, D = ProtoDefault> =
+    ExplicitVarintField<varint::ProtoEnum<E>, BIT, FIELD, D>;

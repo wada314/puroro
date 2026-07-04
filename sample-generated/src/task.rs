@@ -93,8 +93,8 @@ pub struct Task<A: Allocator + Clone = Global> {
     tag_ids: RepeatedPackedVarintField<ProtoInt32, { FIELD_TAG_IDS }, A>, // proto: repeated int32 tag_ids = 6 [packed];
     scores: RepeatedExpandedVarintField<ProtoInt32, { FIELD_SCORES }, A>, // proto: repeated int32 scores = 7;
     labels: RepeatedLenField<ProtoString, { FIELD_LABELS }, A>, // proto: repeated string labels = 8;
-    status: SingularVarintField<ProtoEnum, Implicit, { FIELD_STATUS }>, // proto: Status status = 9;
-    priority: SingularVarintField<ProtoEnum, Explicit<{ BIT_PRIORITY }>, { FIELD_PRIORITY }>, // proto: Priority priority = 10;
+    status: SingularVarintField<ProtoEnum<Status>, Implicit, { FIELD_STATUS }>, // proto: Status status = 9;
+    priority: SingularVarintField<ProtoEnum<Priority>, Explicit<{ BIT_PRIORITY }>, { FIELD_PRIORITY }>, // proto: Priority priority = 10;
     assignee: NestedMessageField<Address<A>, A, { FIELD_ASSIGNEE }>, // proto: Address assignee = 11;
     // proto: oneof notification { string email_address=12; string phone_number=13;
     //                             int32 webhook_id=14; Address postal=15; }
@@ -252,28 +252,21 @@ impl<A: Allocator + Clone> Task<A> {
 
     // -- status (IMPLICIT open enum, proto field 9) -------------------------
 
-    pub fn status_raw(&self) -> i32 {
-        self.status.value()
+    pub fn status(&self) -> Optional<Status, impl HasDefault<Status>> {
+        self.status.optional(&self._common)
     }
 
-    pub fn status_mut(&mut self) -> &mut i32 {
+    pub fn status_mut(&mut self) -> &mut Status {
         self.status.bind(&mut self._common).value_mut()
-    }
-
-    pub fn status(&self) -> Result<Status, i32> {
-        Status::try_from(self.status.value())
     }
 
     // -- priority (EXPLICIT closed enum, proto field 10) ---------------------
 
-    pub fn priority(&self) -> Option<Result<Priority, i32>> {
-        if !self.priority.has(&self._common) {
-            return None;
-        }
-        Some(Priority::try_from(self.priority.value()))
+    pub fn priority(&self) -> Optional<Priority, impl HasDefault<Priority>> {
+        self.priority.optional(&self._common)
     }
 
-    pub fn priority_mut(&mut self) -> &mut i32 {
+    pub fn priority_mut(&mut self) -> &mut Priority {
         self.priority.bind(&mut self._common).value_mut()
     }
 

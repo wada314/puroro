@@ -14,8 +14,8 @@ fn task_roundtrip() {
     task.tag_ids_mut().push(20);
     task.scores_mut().push(1);
     task.push_label("urgent");
-    *task.status_mut() = i32::from(Status::PENDING);
-    *task.priority_mut() = i32::from(Priority::HIGH);
+    *task.status_mut() = Status::PENDING;
+    *task.priority_mut() = Priority::HIGH;
     task.email_address_mut().push_str("a@example.com");
 
     let mut assignee = Address::new();
@@ -37,8 +37,10 @@ fn task_roundtrip() {
     assert_eq!(decoded.scores(), &[1]);
     assert_eq!(decoded.labels().len(), 1);
     assert_eq!(&*decoded.labels()[0], "urgent");
-    assert_eq!(decoded.status().unwrap(), Status::PENDING);
-    assert_eq!(decoded.priority().unwrap().unwrap(), Priority::HIGH);
+    assert_eq!(decoded.status().get(), Status::PENDING);
+    assert!(decoded.status().is_set());
+    assert_eq!(decoded.priority().get(), Priority::HIGH);
+    assert!(decoded.priority().is_set());
     assert!(matches!(
         decoded.notification(),
         Some(NotificationRef::EmailAddress(s)) if s == "a@example.com"
@@ -116,6 +118,6 @@ fn closed_enum_unknown_goes_to_unknown_fields() {
 
     task.merge_from(&mut &bytes[..]).unwrap();
 
-    assert!(task.priority().is_none());
+    assert!(!task.priority().is_set());
     assert!(!task.unknown_fields().is_empty());
 }

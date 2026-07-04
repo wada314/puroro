@@ -2,9 +2,11 @@
 //!
 //! Protobuf enums are newtypes over `i32`, not Rust enums: multiple proto
 //! value names may share the same integer (`allow_alias`), and the wire
-//! carries only the number.
+//! carries only the number. Open vs closed is encoded in [`ProtoEnumStorage`].
 
 use ::core::convert::TryFrom;
+
+use ::puroro::{HasDefault, ProtoDefault, ProtoEnumStorage};
 
 /// Open enum (`enum_type = OPEN`).
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
@@ -23,21 +25,39 @@ impl Default for Status {
     }
 }
 
-impl TryFrom<i32> for Status {
+impl From<i32> for Status {
+    fn from(value: i32) -> Self {
+        Self(value)
+    }
+}
+
+impl TryFrom<Status> for i32 {
     type Error = i32;
 
-    fn try_from(value: i32) -> Result<Self, Self::Error> {
-        match value {
-            0 | 1 | 2 => Ok(Self(value)),
+    fn try_from(value: Status) -> Result<Self, Self::Error> {
+        match value.0 {
+            0 | 1 | 2 => Ok(value.0),
             other => Err(other),
         }
     }
 }
 
-impl From<Status> for i32 {
-    fn from(value: Status) -> Self {
-        value.0
+impl ProtoEnumStorage for Status {
+    fn proto_zero() -> Self {
+        Self::UNSPECIFIED
     }
+
+    fn to_wire(self) -> i32 {
+        self.0
+    }
+
+    fn decode_from_wire(wire: i32) -> Result<Self, ::puroro::DecodeError> {
+        Ok(Self::from(wire))
+    }
+}
+
+impl HasDefault<Status> for ProtoDefault {
+    const DEFAULT: Status = Status::UNSPECIFIED;
 }
 
 /// Closed enum (`enum_type = CLOSED`).
@@ -72,4 +92,22 @@ impl From<Priority> for i32 {
     fn from(value: Priority) -> Self {
         value.0
     }
+}
+
+impl ProtoEnumStorage for Priority {
+    fn proto_zero() -> Self {
+        Self::UNSPECIFIED
+    }
+
+    fn to_wire(self) -> i32 {
+        self.0
+    }
+
+    fn decode_from_wire(wire: i32) -> Result<Self, ::puroro::DecodeError> {
+        Self::try_from(wire).map_err(|_| ::puroro::DecodeError::InvalidTag)
+    }
+}
+
+impl HasDefault<Priority> for ProtoDefault {
+    const DEFAULT: Priority = Priority::UNSPECIFIED;
 }

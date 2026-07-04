@@ -4,6 +4,7 @@
 //! zigzag or varint byte logic here.
 
 use ::core::convert::TryFrom;
+use ::core::marker::PhantomData;
 use ::protobuf_core::Varint;
 
 use crate::error::DecodeError;
@@ -29,6 +30,44 @@ pub trait VarintProtoType {
 
     /// Converts a semantic value into the raw varint numeric value for the wire.
     fn encode_wire(value: Self::Value) -> u64;
+}
+
+// ---------------------------------------------------------------------------
+// Generated protobuf enum newtypes
+// ---------------------------------------------------------------------------
+
+/// Wire/storage behaviour for a generated protobuf enum newtype.
+///
+/// Implemented once per protobuf enum by the code generator. Open enums accept
+/// any wire value in [`decode_from_wire`](Self::decode_from_wire); closed enums
+/// reject unknown values there (and use [`merge_closed`](super::scalar::SingularVarintFieldMut::merge_closed)
+/// on decode to divert them to unknown fields when appropriate).
+pub trait ProtoEnumStorage: Copy + PartialEq {
+    fn proto_zero() -> Self;
+    fn to_wire(self) -> i32;
+    fn decode_from_wire(wire: i32) -> Result<Self, DecodeError>
+    where
+        Self: Sized;
+}
+
+/// Wire marker parametrised by the generated enum newtype `E`.
+#[derive(Clone, Copy, Debug, Default)]
+pub struct ProtoEnum<E: ProtoEnumStorage>(PhantomData<E>);
+
+impl<E: ProtoEnumStorage> VarintProtoType for ProtoEnum<E> {
+    type Value = E;
+
+    fn proto_zero() -> Self::Value {
+        E::proto_zero()
+    }
+
+    fn decode_wire(raw: u64) -> Result<Self::Value, DecodeError> {
+        E::decode_from_wire(ProtoInt32::decode_wire(raw)?)
+    }
+
+    fn encode_wire(value: Self::Value) -> u64 {
+        ProtoInt32::encode_wire(value.to_wire())
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -168,26 +207,6 @@ impl VarintProtoType for ProtoBool {
 
     fn encode_wire(value: Self::Value) -> u64 {
         Varint::from_bool(value).to_uint64()
-    }
-}
-
-/// Protobuf `enum` on the wire — identical to `int32` varint encoding.
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
-pub struct ProtoEnum;
-
-impl VarintProtoType for ProtoEnum {
-    type Value = i32;
-
-    fn proto_zero() -> Self::Value {
-        0
-    }
-
-    fn decode_wire(raw: u64) -> Result<Self::Value, DecodeError> {
-        ProtoInt32::decode_wire(raw)
-    }
-
-    fn encode_wire(value: Self::Value) -> u64 {
-        ProtoInt32::encode_wire(value)
     }
 }
 

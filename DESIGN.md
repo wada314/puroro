@@ -69,7 +69,7 @@ The puroro project comprises several crates and tools with distinct roles:
 - **Protobuf spec compliance.** Support the canonical wire format (varints, I32, I64, LEN records, packed repeated, oneofs, unknown fields) for proto2, proto3, and editions. Deprecated group wire types (`SGroup` / `EGroup`) are never generated; the decoder does not preserve them (see [§0](#0-project-architecture)).
 - **Allocator support.** Every generated type is generic over `A: Allocator` using the `allocator-api2` crate. Arena allocators (e.g. `bumpalo`) and custom pools are first-class citizens.
 - **Performance-oriented interface.** Accessors return borrowed references (`&str`, `&[u8]`, `&[T]`), never freshly allocated containers. The `encode_to_vec` / `encode_to_bytes` convenience methods allocate, but `encode_raw` does not.
-- **Rust idioms.** Private fields accessed via generated accessor methods; `Optional<T, impl HasDefault<T>>` for explicit-presence scalar and string fields; `Option<&M<A>>` for optional message fields; `Result<EnumType, i32>` for enum accessors; no `unsafe` in user-visible APIs.
+- **Rust idioms.** Private fields accessed via generated accessor methods; `Optional<T, impl HasDefault<T>>` for explicit-presence scalar, string, and enum fields; `Option<&M<A>>` for optional message fields; no `unsafe` in user-visible APIs.
 - **Implementation flexibility.** The public interface described here must remain stable even if internal storage representations change. Eager messages use a per-message presence bitfield (see [IMPLEMENTATION.md §10](IMPLEMENTATION.md#10-presence-bit-indices)); the accessor API is unchanged if storage layout evolves.
 - **Nightly toolchain, minimal unstable features.** The `rust-toolchain.toml` pins nightly; no `#![feature(…)]` flags are used in this crate itself.
 
@@ -258,13 +258,14 @@ pub trait TaskMessage {
     fn assignee_mut(&mut self) -> &mut impl AddressMessage;
     fn has_assignee(&self) -> bool;
 
-    // Open enum (IMPLICIT)
-    fn status_raw(&self) -> i32;
-    fn status(&self) -> Result<Status, i32>;
+    // Open enum (IMPLICIT) — Optional; `is_set` when wire value is non-zero
+    fn status(&self) -> Optional<Status, impl HasDefault<Status>>;
 
-    // Closed enum (EXPLICIT)
-    fn priority(&self) -> Option<Result<Priority, i32>>;
-    fn has_priority(&self) -> bool;
+    // Closed enum (EXPLICIT) — Optional; `has_` is a trait default
+    fn priority(&self) -> Optional<Priority, impl HasDefault<Priority>>;
+    fn has_priority(&self) -> bool {
+        self.priority().is_set()
+    }
 
     // Oneof
     fn notification(&self) -> Option<&task::Notification<impl Allocator>>;
@@ -333,8 +334,11 @@ pub trait TaskMessageFallible {
     // Nested message — the sub-message is also fallible
     fn assignee(&self) -> Result<Option<impl AddressMessageFallible<Error = Self::Error>>, Self::Error>;
 
-    fn status(&self) -> Result<Result<Status, i32>, Self::Error>;  // outer: parse error, inner: unknown variant
-    fn priority(&self) -> Result<Option<Result<Priority, i32>>, Self::Error>;
+    fn status(&self) -> Result<Optional<Status, impl HasDefault<Status>>, Self::Error>;
+    fn priority(&self) -> Result<Optional<Priority, impl HasDefault<Priority>>, Self::Error>;
+    fn has_priority(&self) -> Result<bool, Self::Error> {
+        Ok(self.priority()?.is_set())
+    }
 }
 ```
 
@@ -618,55 +622,62 @@ pub fn clear_assignee(&mut self);
 
 ### 4.6 Enum fields
 
-The wire encoding is always VARINT. The variation is whether unknown numeric values are accepted.
+The wire encoding is always VARINT. Open vs closed is reflected in the **generated enum newtype** (see [Generated enum type](#generated-enum-type) below); field accessors use the same [`Optional`](#hasdefault-and-optional) pattern as other singular fields — no `Result` wrapper and no `_raw` accessors.
 
 #### Open enum (`enum_type = OPEN`, edition 2024 default)
 
-Unknown numeric values are stored in the typed field. A raw accessor always succeeds; a typed accessor returns `Result`.
+Unknown wire values are stored in the field. The generated type accepts any `i32` (`From<i32>`); converting a known named value back to `i32` is fallible (`TryFrom<Status> for i32`).
 
 ```rust
-// Always available:
-pub fn status_raw(&self) -> i32;
-pub fn set_status_raw(&mut self, v: i32);
-
-// Typed; Err(raw_value) for unknown values:
-pub fn status(&self) -> Result<Status, i32>;
-pub fn set_status(&mut self, v: Status);
+pub fn status(&self) -> Optional<Status, impl HasDefault<Status>> {
+    self.status.optional(&self._common)
+}
+pub fn status_mut(&mut self) -> &mut Status;
 ```
 
-Wire rule: field absent when the raw value is 0 (IMPLICIT presence).
+IMPLICIT presence: `is_set()` is `true` when the wire value is non-zero; `get()` returns `Status::UNSPECIFIED` when unset.
 
 #### Closed enum (`enum_type = CLOSED`)
 
-Unknown numeric values are diverted to unknown fields. The typed field may be absent even when the field was on the wire (unknown value was encountered).
+Unknown wire values are diverted to unknown fields on decode. The generated type accepts only known values (`TryFrom<i32>`); conversion to `i32` is infallible (`From<Priority> for i32`).
 
 ```rust
-// Typed; None if unset, Some(Ok(_)) for known values, Some(Err(raw)) for unknown:
-pub fn priority(&self) -> Option<Result<Priority, i32>>;
-pub fn set_priority(&mut self, v: Priority);
+pub fn priority(&self) -> Optional<Priority, impl HasDefault<Priority>> {
+    self.priority.optional(&self._common)
+}
+pub fn priority_mut(&mut self) -> &mut Priority;
 pub fn clear_priority(&mut self);
 ```
 
-Wire rule: field absent when not set; present even for the zero variant.
+EXPLICIT presence: `is_set()` tracks the presence bit; `get()` returns `Priority::UNSPECIFIED` when unset.
 
 #### Generated enum type
 
-Both open and closed enums produce the same **newtype-over-`i32`** definition — not a Rust `enum`. Protobuf allows multiple value names to share one integer (`allow_alias`), and the wire carries only the number, so a Rust enum (which requires unique discriminants) cannot represent the full proto definition.
+Both open and closed enums produce a **newtype-over-`i32`** — not a Rust `enum`. Field storage uses [`ProtoEnum<E>`](src/fields/varint.rs) so `SingularVarintField` holds `E` directly and reuses the same `optional()` / `value_mut()` paths as other varint fields.
 
 ```rust
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+// Open — any wire value is valid storage (`OpenProtoEnum`)
+status: SingularVarintField<ProtoEnum<Status>, Implicit, FIELD>,
+
+// Closed — only known wire values are stored (`ClosedProtoEnum`)
+priority: SingularVarintField<ProtoEnum<Priority>, Explicit<BIT>, FIELD>,
+
+// Generated newtypes implement [`ProtoEnumStorage`] once (open vs closed differs in `decode_from_wire`):
 #[repr(transparent)]
 pub struct Status(i32);
 
-impl Status {
-    pub const UNSPECIFIED: Self = Self(0);
-    pub const PENDING: Self = Self(1);
-    pub const DONE: Self = Self(2);
+impl ProtoEnumStorage for Status {
+    fn proto_zero() -> Self { … }
+    fn to_wire(self) -> i32 { … }
+    fn decode_from_wire(wire: i32) -> Result<Self, DecodeError> { … } // open: Ok(Self(wire))
 }
 
-impl Default for Status { … }  // UNSPECIFIED
-impl TryFrom<i32> for Status { type Error = i32; … }  // known values → Ok(Self(v))
-impl From<Status> for i32 { … }  // `i32::from(status)` / `status.into()`
+#[repr(transparent)]
+pub struct Priority(i32);
+
+impl ProtoEnumStorage for Priority {
+    fn decode_from_wire(wire: i32) -> Result<Self, DecodeError> { … } // closed: TryFrom
+}
 ```
 
 Alias names with the same integer all map to the same `Self(v)`; equality is by wire value.
