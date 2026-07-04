@@ -25,12 +25,14 @@ use super::varint::{self, VarintProtoType};
 /// Param `E` is [`Packed`](super::repeated_encoding::Packed) or
 /// [`Expanded`](super::repeated_encoding::Expanded) — affects **encode only**.
 /// [`RepeatedVarintFieldMut::merge`] accepts both packed and expanded wire forms.
-pub struct RepeatedVarintField<T: VarintProtoType, E: RepeatedVarintEncoding, A: Allocator> {
+pub struct RepeatedVarintField<T: VarintProtoType, E: RepeatedVarintEncoding, const FIELD: u32, A: Allocator> {
     values: ManuallyDrop<UnmanagedVec<T::Value>>,
     _marker: PhantomData<(E, A)>,
 }
 
-impl<T: VarintProtoType, E: RepeatedVarintEncoding, A: Allocator> RepeatedVarintField<T, E, A> {
+impl<T: VarintProtoType, E: RepeatedVarintEncoding, const FIELD: u32, A: Allocator>
+    RepeatedVarintField<T, E, FIELD, A>
+{
     pub fn new_in(alloc: A) -> Self {
         Self {
             values: ManuallyDrop::new(UnmanagedVec::new(alloc)),
@@ -59,21 +61,21 @@ impl<T: VarintProtoType, E: RepeatedVarintEncoding, A: Allocator> RepeatedVarint
     pub fn bind<'f, 'c, Pb: PresenceBits>(
         &'f mut self,
         common: &'c mut MessageCommon<Pb, A>,
-    ) -> RepeatedVarintFieldMut<'f, 'c, T, E, Pb, A> {
+    ) -> RepeatedVarintFieldMut<'f, 'c, T, E, FIELD, Pb, A> {
         RepeatedVarintFieldMut::new(self, common)
     }
 
-    pub fn encoded_len(&self, field: u32) -> usize {
+    pub fn encoded_len(&self) -> usize {
         if self.values.is_empty() {
             0
         } else {
-            E::encoded_len::<T>(field, self.as_slice())
+            E::encoded_len::<T>(FIELD, self.as_slice())
         }
     }
 
-    pub fn encode_raw<B: BufMut>(&self, field: u32, buf: &mut B) {
+    pub fn encode_raw<B: BufMut>(&self, buf: &mut B) {
         if !self.values.is_empty() {
-            E::encode::<B, T>(field, self.as_slice(), buf);
+            E::encode::<B, T>(FIELD, self.as_slice(), buf);
         }
     }
 
@@ -103,19 +105,27 @@ pub struct RepeatedVarintFieldMut<
     'c,
     T: VarintProtoType,
     E: RepeatedVarintEncoding,
+    const FIELD: u32,
     Pb: PresenceBits,
     A: Allocator,
 > {
-    field: &'f mut RepeatedVarintField<T, E, A>,
+    field: &'f mut RepeatedVarintField<T, E, FIELD, A>,
     common: &'c mut MessageCommon<Pb, A>,
 }
 
-impl<'f, 'c, T: VarintProtoType, E: RepeatedVarintEncoding, Pb: PresenceBits, A: Allocator>
-    RepeatedVarintFieldMut<'f, 'c, T, E, Pb, A>
+impl<
+        'f,
+        'c,
+        T: VarintProtoType,
+        E: RepeatedVarintEncoding,
+        const FIELD: u32,
+        Pb: PresenceBits,
+        A: Allocator,
+    > RepeatedVarintFieldMut<'f, 'c, T, E, FIELD, Pb, A>
 {
     #[inline]
     fn new(
-        field: &'f mut RepeatedVarintField<T, E, A>,
+        field: &'f mut RepeatedVarintField<T, E, FIELD, A>,
         common: &'c mut MessageCommon<Pb, A>,
     ) -> Self {
         Self { field, common }
@@ -180,12 +190,14 @@ impl<'f, 'c, T: VarintProtoType, E: RepeatedVarintEncoding, Pb: PresenceBits, A:
 // Type aliases
 // ---------------------------------------------------------------------------
 
-pub type RepeatedVarint<T, E, A> = RepeatedVarintField<T, E, A>;
+pub type RepeatedVarint<T, E, const FIELD: u32, A> = RepeatedVarintField<T, E, FIELD, A>;
 
-pub type RepeatedPackedVarintField<T, A> =
-    RepeatedVarintField<T, super::repeated_encoding::Packed, A>;
-pub type RepeatedExpandedVarintField<T, A> =
-    RepeatedVarintField<T, super::repeated_encoding::Expanded, A>;
+pub type RepeatedPackedVarintField<T, const FIELD: u32, A> =
+    RepeatedVarintField<T, super::repeated_encoding::Packed, FIELD, A>;
+pub type RepeatedExpandedVarintField<T, const FIELD: u32, A> =
+    RepeatedVarintField<T, super::repeated_encoding::Expanded, FIELD, A>;
 
-pub type RepeatedPackedInt32<A> = RepeatedPackedVarintField<varint::ProtoInt32, A>;
-pub type RepeatedExpandedInt32<A> = RepeatedExpandedVarintField<varint::ProtoInt32, A>;
+pub type RepeatedPackedInt32<const FIELD: u32, A> =
+    RepeatedPackedVarintField<varint::ProtoInt32, FIELD, A>;
+pub type RepeatedExpandedInt32<const FIELD: u32, A> =
+    RepeatedExpandedVarintField<varint::ProtoInt32, FIELD, A>;

@@ -21,12 +21,12 @@ use super::len::{self, LenProtoType};
 use super::presence::PresenceBits;
 
 /// Repeated field whose elements are length-delimited records (one tag per element).
-pub struct RepeatedLenField<T: LenProtoType, A: Allocator> {
+pub struct RepeatedLenField<T: LenProtoType, const FIELD: u32, A: Allocator> {
     values: ManuallyDrop<UnmanagedVec<T::Storage>>,
     _marker: PhantomData<A>,
 }
 
-impl<T: LenProtoType, A: Allocator> RepeatedLenField<T, A> {
+impl<T: LenProtoType, const FIELD: u32, A: Allocator> RepeatedLenField<T, FIELD, A> {
     pub fn new_in(alloc: A) -> Self {
         Self {
             values: ManuallyDrop::new(UnmanagedVec::new(alloc)),
@@ -55,20 +55,20 @@ impl<T: LenProtoType, A: Allocator> RepeatedLenField<T, A> {
     pub fn bind<'f, 'c, Pb: PresenceBits>(
         &'f mut self,
         common: &'c mut MessageCommon<Pb, A>,
-    ) -> RepeatedLenFieldMut<'f, 'c, T, Pb, A> {
+    ) -> RepeatedLenFieldMut<'f, 'c, T, FIELD, Pb, A> {
         RepeatedLenFieldMut::new(self, common)
     }
 
-    pub fn encoded_len(&self, field: u32) -> usize {
+    pub fn encoded_len(&self) -> usize {
         self.values
             .iter()
-            .map(|v| encode::encoded_len_len_field(field, T::as_bytes(v).len()))
+            .map(|v| encode::encoded_len_len_field(FIELD, T::as_bytes(v).len()))
             .sum()
     }
 
-    pub fn encode_raw<B: BufMut>(&self, field: u32, buf: &mut B) {
+    pub fn encode_raw<B: BufMut>(&self, buf: &mut B) {
         for v in self.values.iter() {
-            encode::encode_len_field(field, T::as_bytes(v), buf);
+            encode::encode_len_field(FIELD, T::as_bytes(v), buf);
         }
     }
 
@@ -102,16 +102,17 @@ impl<T: LenProtoType, A: Allocator> RepeatedLenField<T, A> {
 /// can mutate through a single call. Repeated fields have no presence bit, so
 /// the view carries only `common` (for the allocator). Every method consumes
 /// the view, so a fresh `bind` precedes each mutation.
-pub struct RepeatedLenFieldMut<'f, 'c, T: LenProtoType, Pb: PresenceBits, A: Allocator> {
-    field: &'f mut RepeatedLenField<T, A>,
+pub struct RepeatedLenFieldMut<'f, 'c, T: LenProtoType, const FIELD: u32, Pb: PresenceBits, A: Allocator>
+{
+    field: &'f mut RepeatedLenField<T, FIELD, A>,
     common: &'c mut MessageCommon<Pb, A>,
 }
 
-impl<'f, 'c, T: LenProtoType, Pb: PresenceBits, A: Allocator>
-    RepeatedLenFieldMut<'f, 'c, T, Pb, A>
+impl<'f, 'c, T: LenProtoType, const FIELD: u32, Pb: PresenceBits, A: Allocator>
+    RepeatedLenFieldMut<'f, 'c, T, FIELD, Pb, A>
 {
     #[inline]
-    fn new(field: &'f mut RepeatedLenField<T, A>, common: &'c mut MessageCommon<Pb, A>) -> Self {
+    fn new(field: &'f mut RepeatedLenField<T, FIELD, A>, common: &'c mut MessageCommon<Pb, A>) -> Self {
         Self { field, common }
     }
 
@@ -165,6 +166,6 @@ impl<'f, 'c, T: LenProtoType, Pb: PresenceBits, A: Allocator>
 // Type aliases
 // ---------------------------------------------------------------------------
 
-pub type RepeatedLen<T, A> = RepeatedLenField<T, A>;
-pub type RepeatedString<A> = RepeatedLenField<len::ProtoString, A>;
-pub type RepeatedBytes<A> = RepeatedLenField<len::ProtoBytes, A>;
+pub type RepeatedLen<T, const FIELD: u32, A> = RepeatedLenField<T, FIELD, A>;
+pub type RepeatedString<const FIELD: u32, A> = RepeatedLenField<len::ProtoString, FIELD, A>;
+pub type RepeatedBytes<const FIELD: u32, A> = RepeatedLenField<len::ProtoBytes, FIELD, A>;

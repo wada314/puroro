@@ -56,48 +56,45 @@ pub const BIT_PAYLOAD: usize = 3; // payload (EXPLICIT)
 pub const BIT_PRIORITY: usize = 4; // priority (EXPLICIT)
 
 // ---------------------------------------------------------------------------
+// Proto field numbers
+// ---------------------------------------------------------------------------
+
+pub const FIELD_TITLE: u32 = 1; // title
+pub const FIELD_SCORE: u32 = 2; // score
+pub const FIELD_MAX_RETRIES: u32 = 3; // max_retries
+pub const FIELD_OWNER_ID: u32 = 4; // owner_id
+pub const FIELD_PAYLOAD: u32 = 5; // payload
+pub const FIELD_TAG_IDS: u32 = 6; // tag_ids
+pub const FIELD_SCORES: u32 = 7; // scores
+pub const FIELD_LABELS: u32 = 8; // labels
+pub const FIELD_STATUS: u32 = 9; // status
+pub const FIELD_PRIORITY: u32 = 10; // priority
+pub const FIELD_ASSIGNEE: u32 = 11; // assignee
+// oneof notification variant field numbers live in the `notification` module
+// (`FIELD_EMAIL_ADDRESS` = 12, `FIELD_PHONE_NUMBER` = 13, `FIELD_WEBHOOK_ID` = 14,
+// `FIELD_POSTAL` = 15).
+
+// ---------------------------------------------------------------------------
 // Message struct
 // ---------------------------------------------------------------------------
 
 /// Reference `Task` message from `DESIGN.md`.
 pub struct Task<A: Allocator + Clone = Global> {
     _common: MessageCommon<TaskPresence, A>,
-    title: SingularLenField<ProtoString, Explicit<{ BIT_TITLE }>, A>, // proto: string title = 1;
-    score: SingularVarintField<ProtoInt32, Implicit>, // proto: int32 score = 2;
-    max_retries: SingularVarintField<ProtoInt32, Explicit<{ BIT_MAX_RETRIES }>>, // proto: int32 max_retries = 3;
-    owner_id: SingularLenField<ProtoString, LegacyRequired<{ BIT_OWNER_ID }>, A>, // proto: string owner_id = 4;
-    payload: SingularLenField<ProtoBytes, Explicit<{ BIT_PAYLOAD }>, A>, // proto: bytes payload = 5;
-    tag_ids: RepeatedPackedVarintField<ProtoInt32, A>, // proto: repeated int32 tag_ids = 6 [packed];
-    scores: RepeatedExpandedVarintField<ProtoInt32, A>, // proto: repeated int32 scores = 7;
-    labels: RepeatedLenField<ProtoString, A>,          // proto: repeated string labels = 8;
-    status: SingularVarintField<ProtoEnum, Implicit>, // proto: Status status = 9;
-    priority: SingularVarintField<ProtoEnum, Explicit<{ BIT_PRIORITY }>>, // proto: Priority priority = 10;
-    assignee: NestedMessageField<Address<A>, A>,       // proto: Address assignee = 11;
+    title: SingularLenField<ProtoString, Explicit<{ BIT_TITLE }>, { FIELD_TITLE }, A>, // proto: string title = 1;
+    score: SingularVarintField<ProtoInt32, Implicit, { FIELD_SCORE }>, // proto: int32 score = 2;
+    max_retries: SingularVarintField<ProtoInt32, Explicit<{ BIT_MAX_RETRIES }>, { FIELD_MAX_RETRIES }>, // proto: int32 max_retries = 3;
+    owner_id: SingularLenField<ProtoString, LegacyRequired<{ BIT_OWNER_ID }>, { FIELD_OWNER_ID }, A>, // proto: string owner_id = 4;
+    payload: SingularLenField<ProtoBytes, Explicit<{ BIT_PAYLOAD }>, { FIELD_PAYLOAD }, A>, // proto: bytes payload = 5;
+    tag_ids: RepeatedPackedVarintField<ProtoInt32, { FIELD_TAG_IDS }, A>, // proto: repeated int32 tag_ids = 6 [packed];
+    scores: RepeatedExpandedVarintField<ProtoInt32, { FIELD_SCORES }, A>, // proto: repeated int32 scores = 7;
+    labels: RepeatedLenField<ProtoString, { FIELD_LABELS }, A>, // proto: repeated string labels = 8;
+    status: SingularVarintField<ProtoEnum, Implicit, { FIELD_STATUS }>, // proto: Status status = 9;
+    priority: SingularVarintField<ProtoEnum, Explicit<{ BIT_PRIORITY }>, { FIELD_PRIORITY }>, // proto: Priority priority = 10;
+    assignee: NestedMessageField<Address<A>, A, { FIELD_ASSIGNEE }>, // proto: Address assignee = 11;
     // proto: oneof notification { string email_address=12; string phone_number=13;
     //                             int32 webhook_id=14; Address postal=15; }
     notification: OneofSlot<NotificationStorage<A>>,
-}
-
-// ---------------------------------------------------------------------------
-// Field constants (associated with `Task`)
-// ---------------------------------------------------------------------------
-
-impl<A: Allocator + Clone> Task<A> {
-    pub const FIELD_TITLE: u32 = 1; // title
-    pub const FIELD_SCORE: u32 = 2; // score
-    pub const FIELD_MAX_RETRIES: u32 = 3; // max_retries
-    pub const FIELD_OWNER_ID: u32 = 4; // owner_id
-    pub const FIELD_PAYLOAD: u32 = 5; // payload
-    pub const FIELD_TAG_IDS: u32 = 6; // tag_ids
-    pub const FIELD_SCORES: u32 = 7; // scores
-    pub const FIELD_LABELS: u32 = 8; // labels
-    pub const FIELD_STATUS: u32 = 9; // status
-    pub const FIELD_PRIORITY: u32 = 10; // priority
-    pub const FIELD_ASSIGNEE: u32 = 11; // assignee
-    // oneof notification variant field numbers live in the `notification` module
-    // (`FIELD_EMAIL_ADDRESS` = 12, `FIELD_PHONE_NUMBER` = 13, `FIELD_WEBHOOK_ID` = 14,
-    // `FIELD_POSTAL` = 15), so they stay usable as `match` patterns despite
-    // `NotificationStorage` being generic over `A`.
 }
 
 impl<A: Allocator + Clone> Task<A> {
@@ -364,8 +361,7 @@ impl<A: Allocator + Clone> Task<A> {
 
     /// Checks `LEGACY_REQUIRED` fields (`owner_id`).
     pub fn validate(&self) -> Result<(), DecodeError> {
-        self.owner_id
-            .validate_required(&self._common, Self::FIELD_OWNER_ID)
+        self.owner_id.validate_required(&self._common)
     }
 
     pub fn decode_strict<B: Buf>(buf: B) -> Result<Self, DecodeError>
@@ -416,51 +412,34 @@ impl<A: Allocator + Clone> MessageEncode for Task<A> {
     fn encoded_len(&self) -> usize {
         let c = &self._common;
         let mut n = 0usize;
-        n += self.title.encoded_len(c, Self::FIELD_TITLE);
-        n += self.score.encoded_len(c, Self::FIELD_SCORE);
-        n += self
-            .max_retries
-            .encoded_len(c, Self::FIELD_MAX_RETRIES);
-        n += self
-            .owner_id
-            .encoded_len(c, Self::FIELD_OWNER_ID);
-        n += self
-            .payload
-            .encoded_len(c, Self::FIELD_PAYLOAD);
-        n += self.tag_ids.encoded_len(Self::FIELD_TAG_IDS);
-        n += self.scores.encoded_len(Self::FIELD_SCORES);
-        n += self.labels.encoded_len(Self::FIELD_LABELS);
-        n += self
-            .status
-            .encoded_len(c, Self::FIELD_STATUS);
-        n += self
-            .priority
-            .encoded_len(c, Self::FIELD_PRIORITY);
-        n += self.assignee.encoded_len(Self::FIELD_ASSIGNEE);
+        n += self.title.encoded_len(c);
+        n += self.score.encoded_len(c);
+        n += self.max_retries.encoded_len(c);
+        n += self.owner_id.encoded_len(c);
+        n += self.payload.encoded_len(c);
+        n += self.tag_ids.encoded_len();
+        n += self.scores.encoded_len();
+        n += self.labels.encoded_len();
+        n += self.status.encoded_len(c);
+        n += self.priority.encoded_len(c);
+        n += self.assignee.encoded_len();
         n += NotificationStorage::encoded_len(&self.notification);
         n + c.unknown_fields.len()
     }
 
     fn encode_raw<B: BufMut>(&self, buf: &mut B) {
         let c = &self._common;
-        self.title
-            .encode_raw(c, Self::FIELD_TITLE, buf);
-        self.score
-            .encode_raw(c, Self::FIELD_SCORE, buf);
-        self.max_retries
-            .encode_raw(c, Self::FIELD_MAX_RETRIES, buf);
-        self.owner_id
-            .encode_raw(c, Self::FIELD_OWNER_ID, buf);
-        self.payload
-            .encode_raw(c, Self::FIELD_PAYLOAD, buf);
-        self.tag_ids.encode_raw(Self::FIELD_TAG_IDS, buf);
-        self.scores.encode_raw(Self::FIELD_SCORES, buf);
-        self.labels.encode_raw(Self::FIELD_LABELS, buf);
-        self.status
-            .encode_raw(c, Self::FIELD_STATUS, buf);
-        self.priority
-            .encode_raw(c, Self::FIELD_PRIORITY, buf);
-        self.assignee.encode_raw(Self::FIELD_ASSIGNEE, buf);
+        self.title.encode_raw(c, buf);
+        self.score.encode_raw(c, buf);
+        self.max_retries.encode_raw(c, buf);
+        self.owner_id.encode_raw(c, buf);
+        self.payload.encode_raw(c, buf);
+        self.tag_ids.encode_raw(buf);
+        self.scores.encode_raw(buf);
+        self.labels.encode_raw(buf);
+        self.status.encode_raw(c, buf);
+        self.priority.encode_raw(c, buf);
+        self.assignee.encode_raw(buf);
         NotificationStorage::encode(&self.notification, buf);
         let unknown: &[u8] = &c.unknown_fields;
         buf.put_slice(unknown);
@@ -472,63 +451,63 @@ impl<A: Allocator + Clone> MessageDecode for Task<A> {
         while buf.has_remaining() {
             let (field_number, wire_type) = ::puroro::decode::decode_tag(buf)?;
             match field_number {
-                Self::FIELD_TITLE => {
+                FIELD_TITLE => {
                     // title = 1, EXPLICIT string
                     self.title
                         .bind(&mut self._common)
                         .merge(wire_type, buf)?;
                 }
-                Self::FIELD_SCORE => {
+                FIELD_SCORE => {
                     // score = 2, IMPLICIT int32
                     self.score
                         .bind(&mut self._common)
                         .merge(wire_type, buf)?;
                 }
-                Self::FIELD_MAX_RETRIES => {
+                FIELD_MAX_RETRIES => {
                     // max_retries = 3, EXPLICIT int32
                     self.max_retries
                         .bind(&mut self._common)
                         .merge(wire_type, buf)?;
                 }
-                Self::FIELD_OWNER_ID => {
+                FIELD_OWNER_ID => {
                     // owner_id = 4, LEGACY_REQUIRED string
                     self.owner_id
                         .bind(&mut self._common)
                         .merge(wire_type, buf)?;
                 }
-                Self::FIELD_PAYLOAD => {
+                FIELD_PAYLOAD => {
                     // payload = 5, EXPLICIT bytes
                     self.payload
                         .bind(&mut self._common)
                         .merge(wire_type, buf)?;
                 }
-                Self::FIELD_TAG_IDS => {
+                FIELD_TAG_IDS => {
                     // tag_ids = 6, repeated int32 PACKED
                     self.tag_ids.bind(&mut self._common).merge(wire_type, buf)?;
                 }
-                Self::FIELD_SCORES => {
+                FIELD_SCORES => {
                     // scores = 7, repeated int32 EXPANDED
                     self.scores.bind(&mut self._common).merge(wire_type, buf)?;
                 }
-                Self::FIELD_LABELS => {
+                FIELD_LABELS => {
                     // labels = 8, repeated string
                     self.labels.bind(&mut self._common).merge(wire_type, buf)?;
                 }
-                Self::FIELD_STATUS => {
+                FIELD_STATUS => {
                     // status = 9, IMPLICIT open enum
                     self.status
                         .bind(&mut self._common)
                         .merge(wire_type, buf)?;
                 }
-                Self::FIELD_PRIORITY => {
+                FIELD_PRIORITY => {
                     // priority = 10, EXPLICIT closed enum
                     self.priority
                         .bind(&mut self._common)
-                        .merge_closed(Self::FIELD_PRIORITY, wire_type, buf, |v| {
+                        .merge_closed(wire_type, buf, |v| {
                             Priority::try_from(v).is_ok()
                         })?;
                 }
-                Self::FIELD_ASSIGNEE => {
+                FIELD_ASSIGNEE => {
                     // assignee = 11, nested message
                     self.assignee
                         .bind(&mut self._common)

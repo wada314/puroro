@@ -1,9 +1,4 @@
 //! Singular LEN field wrapper — generic over payload type and presence policy.
-//!
-//! The payload is stored allocator-less ([`LenProtoType::Storage`]) wrapped in
-//! [`ManuallyDrop`], so it never frees itself implicitly. The owning message
-//! releases it via [`deallocate`](SingularLenField::deallocate) in its `Drop`,
-//! and mutation flows through [`value_mut`](SingularLenField::value_mut).
 
 use ::core::marker::PhantomData;
 use ::core::mem::ManuallyDrop;
@@ -23,14 +18,16 @@ use super::field_presence::{
 use super::len::{self, LenProtoType};
 use super::presence::PresenceBits;
 
-/// Singular LEN field (`string`, `bytes`, …) — parametrised by [`LenProtoType`] `T`,
-/// presence policy `P`, and message allocator `A` (not stored inline).
-pub struct SingularLenField<T: LenProtoType, P: FieldPresence, A: Allocator> {
+/// Singular LEN field — parametrised by [`LenProtoType`] `T`, presence policy `P`,
+/// proto field number `FIELD`, and message allocator `A` (not stored inline).
+pub struct SingularLenField<T: LenProtoType, P: FieldPresence, const FIELD: u32, A: Allocator> {
     value: ManuallyDrop<T::Storage>,
     _marker: PhantomData<(P, A)>,
 }
 
-impl<T: LenProtoType, P: FieldPresence, A: Allocator> SingularLenField<T, P, A> {
+impl<T: LenProtoType, P: FieldPresence, const FIELD: u32, A: Allocator>
+    SingularLenField<T, P, FIELD, A>
+{
     pub fn new_in(alloc: A) -> Self {
         Self {
             value: ManuallyDrop::new(T::new_empty(alloc)),
@@ -38,94 +35,80 @@ impl<T: LenProtoType, P: FieldPresence, A: Allocator> SingularLenField<T, P, A> 
         }
     }
 
-    /// Borrowed payload (IMPLICIT public getters).
     #[inline]
     pub fn value(&self) -> T::Ref<'_> {
         T::borrow(&self.value)
     }
 
-    /// Returns a growable handle over the payload, backed by the owned `alloc`.
-    ///
-    /// The allocator is taken by value (callers pass an `alloc.clone()`): the
-    /// returned guard owns it, so growth and the eventual free all use the same
-    /// allocator type `A` rather than a borrow.
-    ///
-    /// Presence is the caller's responsibility: generated `_mut` accessors set
-    /// the presence bit before calling this.
     pub fn value_mut(&mut self, alloc: A) -> T::Mut<'_, A> {
         T::with_alloc(&mut self.value, alloc)
     }
 
-    /// Binds this field to its message `common` state (presence + allocator),
-    /// producing a short-lived [`SingularLenFieldMut`] view that carries the
-    /// whole mutation context.
-    ///
-    /// This is the entry point for every mutation (`value_mut` / `merge` /
-    /// `clear`): generated accessors call `field.bind(&mut common).…()` instead
-    /// of threading `common` through each method.
     #[inline]
     pub fn bind<'f, 'c, Pb: PresenceBits>(
         &'f mut self,
         common: &'c mut MessageCommon<Pb, A>,
-    ) -> SingularLenFieldMut<'f, 'c, T, P, Pb, A> {
+    ) -> SingularLenFieldMut<'f, 'c, T, P, FIELD, Pb, A> {
         SingularLenFieldMut::new(self, common)
     }
 
-    pub fn encoded_len<Pb>(&self, common: &MessageCommon<Pb, A>, field: u32) -> usize
+    pub fn encoded_len<Pb>(&self, common: &MessageCommon<Pb, A>) -> usize
     where
         Pb: PresenceBits,
     {
         let empty = T::is_empty(&self.value);
         if P::should_emit(common, empty) {
-            encode::encoded_len_len_field(field, T::as_bytes(&self.value).len())
+            encode::encoded_len_len_field(FIELD, T::as_bytes(&self.value).len())
         } else {
             0
         }
     }
 
-    pub fn encode_raw<Pb, B: BufMut>(
-        &self,
-        common: &MessageCommon<Pb, A>,
-        field: u32,
-        buf: &mut B,
-    ) where
+    pub fn encode_raw<Pb, B: BufMut>(&self, common: &MessageCommon<Pb, A>, buf: &mut B)
+    where
         Pb: PresenceBits,
     {
         let empty = T::is_empty(&self.value);
         if P::should_emit(common, empty) {
-            encode::encode_len_field(field, T::as_bytes(&self.value), buf);
+            encode::encode_len_field(FIELD, T::as_bytes(&self.value), buf);
         }
     }
 
-    /// Releases the payload through the owned `alloc`. Terminal; call once from
-    /// the owning message's `Drop`, after which `self` must not be used.
     pub fn deallocate(&mut self, alloc: A) {
-        // SAFETY: called once; an owned clone of the message allocator owns the
-        // payload's buffer.
         let old = unsafe { ManuallyDrop::take(&mut self.value) };
         unsafe { T::deallocate(old, alloc) };
     }
 }
 
-impl<T: LenProtoType, A: Allocator> SingularLenField<T, Implicit, A> {
-    /// Binds an `Implicit`-presence **oneof variant** field for mutation,
-    /// yielding the same [`SingularLenFieldMut`] view as [`bind`](Self::bind) so
-    /// generated oneof code merges through `field.bind_oneof(common).merge(…)` —
-    /// the field's own bind idiom — rather than a bespoke helper on the oneof enum.
-    ///
-    /// A oneof carries no presence bit (the enclosing `OneofSlot` tracks which
-    /// variant is set). Restricting the method to `Implicit` keeps no
-    /// `Explicit` bitfield from being touched.
+impl<T: LenProtoType, const FIELD: u32, A: Allocator> SingularLenField<T, Implicit, FIELD, A> {
     #[inline]
     pub fn bind_oneof<'f, 'c, Pb: PresenceBits>(
         &'f mut self,
         common: &'c mut MessageCommon<Pb, A>,
-    ) -> SingularLenFieldMut<'f, 'c, T, Implicit, Pb, A> {
+    ) -> SingularLenFieldMut<'f, 'c, T, Implicit, FIELD, Pb, A> {
         self.bind(common)
+    }
+
+    /// Wire byte length without `MessageCommon` (IMPLICIT presence only).
+    pub fn encoded_len_wire(&self) -> usize {
+        if T::is_empty(&self.value) {
+            0
+        } else {
+            encode::encoded_len_len_field(FIELD, T::as_bytes(&self.value).len())
+        }
+    }
+
+    /// Encodes without `MessageCommon` (IMPLICIT presence only).
+    pub fn encode_raw_wire<B: BufMut>(&self, buf: &mut B) {
+        if !T::is_empty(&self.value) {
+            encode::encode_len_field(FIELD, T::as_bytes(&self.value), buf);
+        }
     }
 }
 
-impl<T: LenProtoType, P: ExplicitFieldPresence, A: Allocator> SingularLenField<T, P, A> {
+impl<T: LenProtoType, P: ExplicitFieldPresence, const FIELD: u32, A: Allocator>
+    SingularLenField<T, P, FIELD, A>
+{
     #[inline]
     pub fn has<Pb>(&self, common: &MessageCommon<Pb, A>) -> bool
     where
@@ -153,17 +136,14 @@ impl<T: LenProtoType, P: ExplicitFieldPresence, A: Allocator> SingularLenField<T
     }
 }
 
-impl<T: LenProtoType, const BIT: usize, A: Allocator> SingularLenField<T, LegacyRequired<BIT>, A> {
-    /// Checks the presence bit for a LEGACY_REQUIRED field.
-    pub fn validate_required<Pb>(
-        &self,
-        common: &MessageCommon<Pb, A>,
-        field_number: u32,
-    ) -> Result<(), DecodeError>
+impl<T: LenProtoType, const BIT: usize, const FIELD: u32, A: Allocator>
+    SingularLenField<T, LegacyRequired<BIT>, FIELD, A>
+{
+    pub fn validate_required<Pb>(&self, common: &MessageCommon<Pb, A>) -> Result<(), DecodeError>
     where
         Pb: PresenceBits,
     {
-        LegacyRequired::<BIT>::validate_present(common, field_number)
+        LegacyRequired::<BIT>::validate_present(common, FIELD)
     }
 }
 
@@ -171,45 +151,37 @@ impl<T: LenProtoType, const BIT: usize, A: Allocator> SingularLenField<T, Legacy
 // Mutation view
 // ---------------------------------------------------------------------------
 
-/// Short-lived binding of a singular LEN field to its message common state,
-/// produced by [`SingularLenField::bind`].
-///
-/// It bundles the field storage with the presence/allocator context so that a
-/// generated accessor can express a whole mutation as a single call, instead of
-/// poking `_common` and the field separately (mirrors the `unmanaged` guard
-/// idiom of temporarily reuniting split state). Two lifetimes keep the returned
-/// guard tied to the field storage only (`'f`); the `common` borrow (`'c`) is
-/// released as soon as the method returns. Every method consumes the view, so a
-/// fresh `bind` precedes each mutation.
 pub struct SingularLenFieldMut<
     'f,
     'c,
     T: LenProtoType,
     P: FieldPresence,
+    const FIELD: u32,
     Pb: PresenceBits,
     A: Allocator,
 > {
-    field: &'f mut SingularLenField<T, P, A>,
+    field: &'f mut SingularLenField<T, P, FIELD, A>,
     common: &'c mut MessageCommon<Pb, A>,
 }
 
-impl<'f, 'c, T: LenProtoType, P: FieldPresence, Pb: PresenceBits, A: Allocator>
-    SingularLenFieldMut<'f, 'c, T, P, Pb, A>
+impl<
+        'f,
+        'c,
+        T: LenProtoType,
+        P: FieldPresence,
+        const FIELD: u32,
+        Pb: PresenceBits,
+        A: Allocator,
+    > SingularLenFieldMut<'f, 'c, T, P, FIELD, Pb, A>
 {
     #[inline]
     fn new(
-        field: &'f mut SingularLenField<T, P, A>,
+        field: &'f mut SingularLenField<T, P, FIELD, A>,
         common: &'c mut MessageCommon<Pb, A>,
     ) -> Self {
         Self { field, common }
     }
 
-    /// Marks presence (per `P`) and returns a growable guard over the payload.
-    ///
-    /// The guard implements `DerefMut<Target = String<A>>` / `Vec<u8, A>` and
-    /// writes the payload back into the allocator-less storage on drop. It
-    /// borrows only the field (`'f`), so `common` is free again once this
-    /// returns.
     #[inline]
     pub fn value_mut(self) -> T::Mut<'f, A>
     where
@@ -220,8 +192,6 @@ impl<'f, 'c, T: LenProtoType, P: FieldPresence, Pb: PresenceBits, A: Allocator>
         self.field.value_mut(alloc)
     }
 
-    /// Merges one LEN occurrence: decodes a fresh payload, frees the old one,
-    /// and marks presence (per `P`).
     pub fn merge<B: Buf>(self, wire_type: WireType, buf: &mut B) -> Result<(), DecodeError>
     where
         A: Clone,
@@ -229,12 +199,8 @@ impl<'f, 'c, T: LenProtoType, P: FieldPresence, Pb: PresenceBits, A: Allocator>
         if wire_type != len::WIRE_TYPE {
             return Err(DecodeError::InvalidTag);
         }
-        // Decode first so a failure leaves the old value intact. Each `unmanaged`
-        // op gets its own owned `alloc` clone (never a borrow).
         let new = T::decode(buf, self.common.alloc.clone())?;
         let old = unsafe { ManuallyDrop::take(&mut self.field.value) };
-        // SAFETY: an owned clone of `common.alloc` is interchangeable with the
-        // allocator that owns the old payload's buffer.
         unsafe { T::deallocate(old, self.common.alloc.clone()) };
         self.field.value = ManuallyDrop::new(new);
         P::on_set(self.common);
@@ -242,18 +208,22 @@ impl<'f, 'c, T: LenProtoType, P: FieldPresence, Pb: PresenceBits, A: Allocator>
     }
 }
 
-impl<'f, 'c, T: LenProtoType, P: ExplicitFieldPresence, Pb: PresenceBits, A: Allocator>
-    SingularLenFieldMut<'f, 'c, T, P, Pb, A>
+impl<
+        'f,
+        'c,
+        T: LenProtoType,
+        P: ExplicitFieldPresence,
+        const FIELD: u32,
+        Pb: PresenceBits,
+        A: Allocator,
+    > SingularLenFieldMut<'f, 'c, T, P, FIELD, Pb, A>
 {
-    /// Clears presence and resets the payload to empty, freeing the old buffer.
     pub fn clear(self)
     where
         A: Clone,
     {
         P::on_clear(self.common);
         let old = unsafe { ManuallyDrop::take(&mut self.field.value) };
-        // SAFETY: an owned clone of `common.alloc` is interchangeable with the
-        // allocator that owns the old payload's buffer.
         unsafe { T::deallocate(old, self.common.alloc.clone()) };
         self.field.value = ManuallyDrop::new(T::new_empty(self.common.alloc.clone()));
     }
@@ -263,15 +233,18 @@ impl<'f, 'c, T: LenProtoType, P: ExplicitFieldPresence, Pb: PresenceBits, A: All
 // Type aliases
 // ---------------------------------------------------------------------------
 
-pub type SingularLen<T, P, A> = SingularLenField<T, P, A>;
+pub type SingularLen<T, P, const FIELD: u32, A> = SingularLenField<T, P, FIELD, A>;
 
-pub type ImplicitLenField<T, A> = SingularLenField<T, super::field_presence::Implicit, A>;
-pub type ExplicitLenField<T, const BIT: usize, A> =
-    SingularLenField<T, super::field_presence::Explicit<BIT>, A>;
-pub type LegacyRequiredLenField<T, const BIT: usize, A> =
-    SingularLenField<T, super::field_presence::LegacyRequired<BIT>, A>;
+pub type ImplicitLenField<T, const FIELD: u32, A> =
+    SingularLenField<T, super::field_presence::Implicit, FIELD, A>;
+pub type ExplicitLenField<T, const BIT: usize, const FIELD: u32, A> =
+    SingularLenField<T, super::field_presence::Explicit<BIT>, FIELD, A>;
+pub type LegacyRequiredLenField<T, const BIT: usize, const FIELD: u32, A> =
+    SingularLenField<T, super::field_presence::LegacyRequired<BIT>, FIELD, A>;
 
-pub type ImplicitString<A> = ImplicitLenField<len::ProtoString, A>;
-pub type ExplicitString<const BIT: usize, A> = ExplicitLenField<len::ProtoString, BIT, A>;
-pub type ImplicitBytes<A> = ImplicitLenField<len::ProtoBytes, A>;
-pub type ExplicitBytes<const BIT: usize, A> = ExplicitLenField<len::ProtoBytes, BIT, A>;
+pub type ImplicitString<const FIELD: u32, A> = ImplicitLenField<len::ProtoString, FIELD, A>;
+pub type ExplicitString<const BIT: usize, const FIELD: u32, A> =
+    ExplicitLenField<len::ProtoString, BIT, FIELD, A>;
+pub type ImplicitBytes<const FIELD: u32, A> = ImplicitLenField<len::ProtoBytes, FIELD, A>;
+pub type ExplicitBytes<const BIT: usize, const FIELD: u32, A> =
+    ExplicitLenField<len::ProtoBytes, BIT, FIELD, A>;

@@ -1,6 +1,6 @@
 //! Singular varint field wrapper — generic over wire type and presence policy.
 //!
-//! Fixed-width scalars will follow the same `Singular*Field<T, P>` pattern with
+//! Fixed-width scalars will follow the same `Singular*Field<T, P, FIELD>` pattern with
 //! [`Fixed32ProtoType`](super::fixed32::Fixed32ProtoType) /
 //! [`Fixed64ProtoType`](super::fixed64::Fixed64ProtoType).
 
@@ -20,16 +20,17 @@ use super::field_presence::{ExplicitFieldPresence, FieldPresence, Implicit};
 use super::presence::PresenceBits;
 use super::varint::{self, VarintProtoType};
 
-/// Singular scalar on the wire as VARINT — parametrised by protobuf type `T` and
+/// Singular scalar on the wire as VARINT — parametrised by protobuf type `T`,
 /// presence policy `P` ([`Implicit`] / [`Explicit`](super::field_presence::Explicit)
-/// / [`LegacyRequired`](super::field_presence::LegacyRequired)).
+/// / [`LegacyRequired`](super::field_presence::LegacyRequired)), and proto field
+/// number `FIELD`.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub struct SingularVarintField<T: VarintProtoType, P: FieldPresence> {
+pub struct SingularVarintField<T: VarintProtoType, P: FieldPresence, const FIELD: u32> {
     value: T::Value,
     _presence: PhantomData<P>,
 }
 
-impl<T: VarintProtoType, P: FieldPresence> SingularVarintField<T, P> {
+impl<T: VarintProtoType, P: FieldPresence, const FIELD: u32> SingularVarintField<T, P, FIELD> {
     /// Creates a field with the protobuf type-zero in the value slot.
     pub fn new() -> Self {
         Self {
@@ -57,17 +58,11 @@ impl<T: VarintProtoType, P: FieldPresence> SingularVarintField<T, P> {
     /// Binds this field to its message `common` state (presence), producing a
     /// short-lived [`SingularVarintFieldMut`] view that carries the whole
     /// mutation context.
-    ///
-    /// This is the entry point for every mutation (`value_mut` / `set` /
-    /// `merge` / `clear` / `merge_closed`): generated accessors call
-    /// `field.bind(&mut common).…()` instead of threading `common` through
-    /// each method. Scalars store no allocator, but the view still carries
-    /// `common` for presence and (closed-enum) unknown-field handling.
     #[inline]
     pub fn bind<'f, 'c, Pb: PresenceBits, A: Allocator>(
         &'f mut self,
         common: &'c mut MessageCommon<Pb, A>,
-    ) -> SingularVarintFieldMut<'f, 'c, T, P, Pb, A> {
+    ) -> SingularVarintFieldMut<'f, 'c, T, P, FIELD, Pb, A> {
         SingularVarintFieldMut::new(self, common)
     }
 
@@ -77,61 +72,71 @@ impl<T: VarintProtoType, P: FieldPresence> SingularVarintField<T, P> {
         self.value = T::proto_zero();
     }
 
-    pub fn encoded_len<Pb, A>(&self, common: &MessageCommon<Pb, A>, field: u32) -> usize
+    pub fn encoded_len<Pb, A>(&self, common: &MessageCommon<Pb, A>) -> usize
     where
         Pb: PresenceBits,
         A: ::allocator_api2::alloc::Allocator,
     {
         let empty = self.value == T::proto_zero();
         if P::should_emit(common, empty) {
-            encode::encoded_len_varint_field(field, T::encode_wire(self.value))
+            encode::encoded_len_varint_field(FIELD, T::encode_wire(self.value))
         } else {
             0
         }
     }
 
-    pub fn encode_raw<Pb, A, B: BufMut>(
-        &self,
-        common: &MessageCommon<Pb, A>,
-        field: u32,
-        buf: &mut B,
-    ) where
+    pub fn encode_raw<Pb, A, B: BufMut>(&self, common: &MessageCommon<Pb, A>, buf: &mut B)
+    where
         Pb: PresenceBits,
         A: ::allocator_api2::alloc::Allocator,
     {
         let empty = self.value == T::proto_zero();
         if P::should_emit(common, empty) {
-            encode::encode_varint_field(field, T::encode_wire(self.value), buf);
+            encode::encode_varint_field(FIELD, T::encode_wire(self.value), buf);
         }
     }
 }
 
-impl<T: VarintProtoType> SingularVarintField<T, Implicit> {
-    /// Binds an `Implicit`-presence **oneof variant** field for mutation,
-    /// yielding the same [`SingularVarintFieldMut`] view as [`bind`](Self::bind)
-    /// so generated oneof code merges through
-    /// `field.bind_oneof(common).merge(…)` — the field's own bind idiom — rather
-    /// than a bespoke helper on the oneof enum.
-    ///
-    /// A oneof carries no presence bit (the enclosing `OneofSlot` tracks which
-    /// variant is set). Restricting the method to `Implicit` keeps no
-    /// `Explicit` bitfield from being touched.
+impl<T: VarintProtoType, const FIELD: u32> SingularVarintField<T, Implicit, FIELD> {
+    /// Binds an `Implicit`-presence **oneof variant** field for mutation.
     #[inline]
     pub fn bind_oneof<'f, 'c, Pb: PresenceBits, A: Allocator>(
         &'f mut self,
         common: &'c mut MessageCommon<Pb, A>,
-    ) -> SingularVarintFieldMut<'f, 'c, T, Implicit, Pb, A> {
+    ) -> SingularVarintFieldMut<'f, 'c, T, Implicit, FIELD, Pb, A> {
         self.bind(common)
+    }
+
+    /// Wire byte length without `MessageCommon` (IMPLICIT presence only).
+    pub fn encoded_len_wire(&self) -> usize {
+        let empty = self.value == T::proto_zero();
+        if empty {
+            0
+        } else {
+            encode::encoded_len_varint_field(FIELD, T::encode_wire(self.value))
+        }
+    }
+
+    /// Encodes without `MessageCommon` (IMPLICIT presence only).
+    pub fn encode_raw_wire<B: BufMut>(&self, buf: &mut B) {
+        let empty = self.value == T::proto_zero();
+        if !empty {
+            encode::encode_varint_field(FIELD, T::encode_wire(self.value), buf);
+        }
     }
 }
 
-impl<T: VarintProtoType, P: FieldPresence> Default for SingularVarintField<T, P> {
+impl<T: VarintProtoType, P: FieldPresence, const FIELD: u32> Default
+    for SingularVarintField<T, P, FIELD>
+{
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl<T: VarintProtoType, P: ExplicitFieldPresence> SingularVarintField<T, P> {
+impl<T: VarintProtoType, P: ExplicitFieldPresence, const FIELD: u32>
+    SingularVarintField<T, P, FIELD>
+{
     #[inline]
     pub fn has<Pb, A>(&self, common: &MessageCommon<Pb, A>) -> bool
     where
@@ -165,55 +170,49 @@ impl<T: VarintProtoType, P: ExplicitFieldPresence> SingularVarintField<T, P> {
 // Mutation view
 // ---------------------------------------------------------------------------
 
-/// Short-lived binding of a singular varint field to its message common state,
-/// produced by [`SingularVarintField::bind`].
-///
-/// It bundles the value slot with the presence/allocator context so a generated
-/// accessor can express a whole mutation as a single call (mirrors the
-/// `SingularLenField` view). Scalars are inline (no heap payload), so the value
-/// itself is `Copy`; the view exists purely to fold presence — and, for closed
-/// enums, unknown-field capture — into one call. Two lifetimes keep the `&mut`
-/// returned by `value_mut` tied to the field slot only (`'f`); the `common`
-/// borrow (`'c`) is released as the method returns. Every method consumes the
-/// view, so a fresh `bind` precedes each mutation.
 pub struct SingularVarintFieldMut<
     'f,
     'c,
     T: VarintProtoType,
     P: FieldPresence,
+    const FIELD: u32,
     Pb: PresenceBits,
     A: Allocator,
 > {
-    field: &'f mut SingularVarintField<T, P>,
+    field: &'f mut SingularVarintField<T, P, FIELD>,
     common: &'c mut MessageCommon<Pb, A>,
 }
 
-impl<'f, 'c, T: VarintProtoType, P: FieldPresence, Pb: PresenceBits, A: Allocator>
-    SingularVarintFieldMut<'f, 'c, T, P, Pb, A>
+impl<
+        'f,
+        'c,
+        T: VarintProtoType,
+        P: FieldPresence,
+        const FIELD: u32,
+        Pb: PresenceBits,
+        A: Allocator,
+    > SingularVarintFieldMut<'f, 'c, T, P, FIELD, Pb, A>
 {
     #[inline]
     fn new(
-        field: &'f mut SingularVarintField<T, P>,
+        field: &'f mut SingularVarintField<T, P, FIELD>,
         common: &'c mut MessageCommon<Pb, A>,
     ) -> Self {
         Self { field, common }
     }
 
-    /// Marks presence (per `P`) and returns a mutable reference to the value.
     #[inline]
     pub fn value_mut(self) -> &'f mut T::Value {
         P::on_set(self.common);
         &mut self.field.value
     }
 
-    /// Stores `v`, applying the presence policy (`on_set` for EXPLICIT).
     #[inline]
     pub fn set(self, v: T::Value) {
         P::on_set(self.common);
         self.field.value = v;
     }
 
-    /// Merges one VARINT occurrence and marks presence (per `P`).
     pub fn merge<B: Buf>(self, wire_type: WireType, buf: &mut B) -> Result<(), DecodeError> {
         if wire_type != varint::WIRE_TYPE {
             return Err(DecodeError::InvalidTag);
@@ -225,20 +224,24 @@ impl<'f, 'c, T: VarintProtoType, P: FieldPresence, Pb: PresenceBits, A: Allocato
     }
 }
 
-impl<'f, 'c, T: VarintProtoType, P: ExplicitFieldPresence, Pb: PresenceBits, A: Allocator>
-    SingularVarintFieldMut<'f, 'c, T, P, Pb, A>
+impl<
+        'f,
+        'c,
+        T: VarintProtoType,
+        P: ExplicitFieldPresence,
+        const FIELD: u32,
+        Pb: PresenceBits,
+        A: Allocator,
+    > SingularVarintFieldMut<'f, 'c, T, P, FIELD, Pb, A>
 {
-    /// Clears presence and resets the value slot to type-zero.
     pub fn clear(self) {
         P::on_clear(self.common);
         self.field.value = T::proto_zero();
     }
 
-    /// Merges a closed-enum occurrence; unknown values go to
-    /// `common.unknown_fields`. `field` is the proto field number.
+    /// Merges a closed-enum occurrence; unknown values go to `common.unknown_fields`.
     pub fn merge_closed<B: Buf>(
         self,
-        field: u32,
         wire_type: WireType,
         buf: &mut B,
         is_known: impl FnOnce(T::Value) -> bool,
@@ -254,7 +257,7 @@ impl<'f, 'c, T: VarintProtoType, P: ExplicitFieldPresence, Pb: PresenceBits, A: 
         let value = T::decode_wire(raw)?;
         if !is_known(value) {
             decode::save_unknown_varint_field(
-                field,
+                FIELD,
                 raw,
                 &mut self.common.unknown_fields,
                 self.common.alloc.clone(),
@@ -271,18 +274,22 @@ impl<'f, 'c, T: VarintProtoType, P: ExplicitFieldPresence, Pb: PresenceBits, A: 
 // Type aliases
 // ---------------------------------------------------------------------------
 
-pub type SingularVarint<T, P> = SingularVarintField<T, P>;
+pub type SingularVarint<T, P, const FIELD: u32> = SingularVarintField<T, P, FIELD>;
 
-pub type ImplicitVarintField<T> = SingularVarintField<T, super::field_presence::Implicit>;
-pub type ExplicitVarintField<T, const BIT: usize> =
-    SingularVarintField<T, super::field_presence::Explicit<BIT>>;
-pub type LegacyRequiredVarintField<T, const BIT: usize> =
-    SingularVarintField<T, super::field_presence::LegacyRequired<BIT>>;
+pub type ImplicitVarintField<T, const FIELD: u32> =
+    SingularVarintField<T, super::field_presence::Implicit, FIELD>;
+pub type ExplicitVarintField<T, const BIT: usize, const FIELD: u32> =
+    SingularVarintField<T, super::field_presence::Explicit<BIT>, FIELD>;
+pub type LegacyRequiredVarintField<T, const BIT: usize, const FIELD: u32> =
+    SingularVarintField<T, super::field_presence::LegacyRequired<BIT>, FIELD>;
 
-pub type ImplicitVarint<T> = ImplicitVarintField<T>;
-pub type ExplicitVarint<T, const BIT: usize> = ExplicitVarintField<T, BIT>;
+pub type ImplicitVarint<T, const FIELD: u32> = ImplicitVarintField<T, FIELD>;
+pub type ExplicitVarint<T, const BIT: usize, const FIELD: u32> =
+    ExplicitVarintField<T, BIT, FIELD>;
 
-pub type ImplicitInt32 = ImplicitVarintField<varint::ProtoInt32>;
-pub type ExplicitInt32<const BIT: usize> = ExplicitVarintField<varint::ProtoInt32, BIT>;
-pub type ImplicitEnum = ImplicitVarintField<varint::ProtoEnum>;
-pub type ExplicitEnum<const BIT: usize> = ExplicitVarintField<varint::ProtoEnum, BIT>;
+pub type ImplicitInt32<const FIELD: u32> = ImplicitVarintField<varint::ProtoInt32, FIELD>;
+pub type ExplicitInt32<const BIT: usize, const FIELD: u32> =
+    ExplicitVarintField<varint::ProtoInt32, BIT, FIELD>;
+pub type ImplicitEnum<const FIELD: u32> = ImplicitVarintField<varint::ProtoEnum, FIELD>;
+pub type ExplicitEnum<const BIT: usize, const FIELD: u32> =
+    ExplicitVarintField<varint::ProtoEnum, BIT, FIELD>;

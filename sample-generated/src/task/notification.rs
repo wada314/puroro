@@ -41,7 +41,7 @@ use ::allocator_api2::alloc::Allocator;
 use ::bytes::BufMut;
 use ::puroro::{
     Implicit, MessageCommon, NestedMessageField, OneofDeallocate, OneofSlot, PresenceBits, Present,
-    ProtoInt32, ProtoString, SingularLenField, SingularVarintField, VarintProtoType,
+    ProtoInt32, ProtoString, SingularLenField, SingularVarintField,
 };
 use ::unmanaged::string::StringGuard;
 
@@ -120,12 +120,12 @@ pub enum NotificationMut<'a, A: Allocator + Clone> {
 /// frames encode / merge itself, so the wrappers' presence-aware methods are
 /// never called.
 pub(crate) enum NotificationStorage<A: Allocator + Clone> {
-    EmailAddress(SingularLenField<ProtoString, Implicit, A>),
-    PhoneNumber(SingularLenField<ProtoString, Implicit, A>),
-    WebhookId(SingularVarintField<ProtoInt32, Implicit>),
+    EmailAddress(SingularLenField<ProtoString, Implicit, { FIELD_EMAIL_ADDRESS }, A>),
+    PhoneNumber(SingularLenField<ProtoString, Implicit, { FIELD_PHONE_NUMBER }, A>),
+    WebhookId(SingularVarintField<ProtoInt32, Implicit, { FIELD_WEBHOOK_ID }>),
     // `Present`: a oneof message variant is always present (the slot tracks
     // presence), so the box is unwrapped — no `Option`, no per-access `unwrap`.
-    Postal(NestedMessageField<Address<A>, A, Present>),
+    Postal(NestedMessageField<Address<A>, A, { FIELD_POSTAL }, Present>),
 }
 
 impl<A: Allocator + Clone> NotificationStorage<A> {
@@ -171,7 +171,7 @@ impl<A: Allocator + Clone> NotificationStorage<A> {
     pub(crate) fn bind_email_address_mut<'f, Pb: PresenceBits>(
         slot: &'f mut OneofSlot<Self>,
         common: &mut MessageCommon<Pb, A>,
-    ) -> &'f mut SingularLenField<ProtoString, Implicit, A> {
+    ) -> &'f mut SingularLenField<ProtoString, Implicit, { FIELD_EMAIL_ADDRESS }, A> {
         let variant = slot.bind(common).variant_mut(
             |n| matches!(n, Self::EmailAddress(_)),
             |alloc| Self::EmailAddress(SingularLenField::new_in(alloc)),
@@ -187,7 +187,7 @@ impl<A: Allocator + Clone> NotificationStorage<A> {
     pub(crate) fn bind_phone_number_mut<'f, Pb: PresenceBits>(
         slot: &'f mut OneofSlot<Self>,
         common: &mut MessageCommon<Pb, A>,
-    ) -> &'f mut SingularLenField<ProtoString, Implicit, A> {
+    ) -> &'f mut SingularLenField<ProtoString, Implicit, { FIELD_PHONE_NUMBER }, A> {
         let variant = slot.bind(common).variant_mut(
             |n| matches!(n, Self::PhoneNumber(_)),
             |alloc| Self::PhoneNumber(SingularLenField::new_in(alloc)),
@@ -204,7 +204,7 @@ impl<A: Allocator + Clone> NotificationStorage<A> {
     pub(crate) fn bind_webhook_id_mut<'f, Pb: PresenceBits>(
         slot: &'f mut OneofSlot<Self>,
         common: &mut MessageCommon<Pb, A>,
-    ) -> &'f mut SingularVarintField<ProtoInt32, Implicit> {
+    ) -> &'f mut SingularVarintField<ProtoInt32, Implicit, { FIELD_WEBHOOK_ID }> {
         let variant = slot.bind(common).variant_mut(
             |n| matches!(n, Self::WebhookId(_)),
             |_alloc| Self::WebhookId(SingularVarintField::new()),
@@ -220,7 +220,7 @@ impl<A: Allocator + Clone> NotificationStorage<A> {
     pub(crate) fn bind_postal_mut<'f, Pb: PresenceBits>(
         slot: &'f mut OneofSlot<Self>,
         common: &mut MessageCommon<Pb, A>,
-    ) -> &'f mut NestedMessageField<Address<A>, A, Present> {
+    ) -> &'f mut NestedMessageField<Address<A>, A, { FIELD_POSTAL }, Present> {
         let variant = slot.bind(common).variant_mut(
             |n| matches!(n, Self::Postal(_)),
             |alloc| Self::Postal(NestedMessageField::with_message_in(alloc)),
@@ -234,17 +234,10 @@ impl<A: Allocator + Clone> NotificationStorage<A> {
     /// Encoded length of the active variant (0 when the group is unset).
     pub(crate) fn encoded_len(slot: &OneofSlot<Self>) -> usize {
         match slot.get() {
-            Some(Self::EmailAddress(f)) => {
-                ::puroro::encode::encoded_len_len_field(FIELD_EMAIL_ADDRESS, f.value().len())
-            }
-            Some(Self::PhoneNumber(f)) => {
-                ::puroro::encode::encoded_len_len_field(FIELD_PHONE_NUMBER, f.value().len())
-            }
-            Some(Self::WebhookId(f)) => ::puroro::encode::encoded_len_varint_field(
-                FIELD_WEBHOOK_ID,
-                ProtoInt32::encode_wire(f.value()),
-            ),
-            Some(Self::Postal(f)) => f.encoded_len(FIELD_POSTAL),
+            Some(Self::EmailAddress(f)) => f.encoded_len_wire(),
+            Some(Self::PhoneNumber(f)) => f.encoded_len_wire(),
+            Some(Self::WebhookId(f)) => f.encoded_len_wire(),
+            Some(Self::Postal(f)) => f.encoded_len_wire(),
             None => 0,
         }
     }
@@ -252,20 +245,10 @@ impl<A: Allocator + Clone> NotificationStorage<A> {
     /// Encodes the active variant (nothing when the group is unset).
     pub(crate) fn encode<B: BufMut>(slot: &OneofSlot<Self>, buf: &mut B) {
         match slot.get() {
-            Some(Self::EmailAddress(f)) => {
-                ::puroro::encode::encode_len_field(FIELD_EMAIL_ADDRESS, f.value().as_bytes(), buf);
-            }
-            Some(Self::PhoneNumber(f)) => {
-                ::puroro::encode::encode_len_field(FIELD_PHONE_NUMBER, f.value().as_bytes(), buf);
-            }
-            Some(Self::WebhookId(f)) => {
-                ::puroro::encode::encode_varint_field(
-                    FIELD_WEBHOOK_ID,
-                    ProtoInt32::encode_wire(f.value()),
-                    buf,
-                );
-            }
-            Some(Self::Postal(f)) => f.encode_raw(FIELD_POSTAL, buf),
+            Some(Self::EmailAddress(f)) => f.encode_raw_wire(buf),
+            Some(Self::PhoneNumber(f)) => f.encode_raw_wire(buf),
+            Some(Self::WebhookId(f)) => f.encode_raw_wire(buf),
+            Some(Self::Postal(f)) => f.encode_raw_wire(buf),
             None => {}
         }
     }
@@ -280,7 +263,8 @@ impl<A: Allocator + Clone> OneofDeallocate<A> for NotificationStorage<A> {
     /// `alloc` must be the allocator that owns the variant's buffer.
     unsafe fn deallocate(self, alloc: A) {
         match self {
-            Self::EmailAddress(mut f) | Self::PhoneNumber(mut f) => f.deallocate(alloc),
+            Self::EmailAddress(mut f) => f.deallocate(alloc),
+            Self::PhoneNumber(mut f) => f.deallocate(alloc),
             Self::WebhookId(_) => {}
             // `Present::deallocate` consumes the field by value (no `Option` to
             // null out); we already own the variant here.

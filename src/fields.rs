@@ -15,8 +15,8 @@
 //! |---|---|
 //! | [`varint`] | `VarintProtoType` markers |
 //! | [`field_presence`] | `FieldPresence` (`Implicit` / `Explicit`) |
-//! | [`scalar`] | `SingularVarintField<T, P>` |
-//! | [`len`] / [`len_field`] | `SingularLenField<T, P, A>` |
+//! | [`scalar`] | `SingularVarintField<T, P, FIELD>` |
+//! | [`len`] / [`len_field`] | `SingularLenField<T, P, FIELD, A>` |
 //! | [`message`] | `NestedMessageField` |
 //! | [`repeated_varint`] / [`repeated_len`] | `RepeatedVarintField`, `RepeatedLenField` |
 //! | [`oneof::OneofSlot`] | `oneof` group |
