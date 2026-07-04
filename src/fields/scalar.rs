@@ -21,8 +21,8 @@ use super::presence::PresenceBits;
 use super::varint::{self, VarintProtoType};
 
 /// Singular scalar on the wire as VARINT — parametrised by protobuf type `T` and
-/// presence policy `P` ([`Implicit`] /
-/// [`Explicit`](super::field_presence::Explicit)).
+/// presence policy `P` ([`Implicit`] / [`Explicit`](super::field_presence::Explicit)
+/// / [`LegacyRequired`](super::field_presence::LegacyRequired)).
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct SingularVarintField<T: VarintProtoType, P: FieldPresence> {
     value: T::Value,
@@ -56,20 +56,19 @@ impl<T: VarintProtoType, P: FieldPresence> SingularVarintField<T, P> {
 
     /// Binds this field to its message `common` state (presence), producing a
     /// short-lived [`SingularVarintFieldMut`] view that carries the whole
-    /// mutation context. `bit` is the presence index for policy `P`.
+    /// mutation context.
     ///
     /// This is the entry point for every mutation (`value_mut` / `set` /
     /// `merge` / `clear` / `merge_closed`): generated accessors call
-    /// `field.bind(&mut common, bit).…()` instead of threading `common` through
+    /// `field.bind(&mut common).…()` instead of threading `common` through
     /// each method. Scalars store no allocator, but the view still carries
     /// `common` for presence and (closed-enum) unknown-field handling.
     #[inline]
     pub fn bind<'f, 'c, Pb: PresenceBits, A: Allocator>(
         &'f mut self,
         common: &'c mut MessageCommon<Pb, A>,
-        bit: usize,
     ) -> SingularVarintFieldMut<'f, 'c, T, P, Pb, A> {
-        SingularVarintFieldMut::new(self, common, bit)
+        SingularVarintFieldMut::new(self, common)
     }
 
     /// Resets the value slot to type-zero (does not touch the bitfield).
@@ -78,18 +77,13 @@ impl<T: VarintProtoType, P: FieldPresence> SingularVarintField<T, P> {
         self.value = T::proto_zero();
     }
 
-    pub fn encoded_len<Pb, A>(
-        &self,
-        common: &MessageCommon<Pb, A>,
-        field: u32,
-        bit: usize,
-    ) -> usize
+    pub fn encoded_len<Pb, A>(&self, common: &MessageCommon<Pb, A>, field: u32) -> usize
     where
         Pb: PresenceBits,
         A: ::allocator_api2::alloc::Allocator,
     {
         let empty = self.value == T::proto_zero();
-        if P::should_emit(common, bit, empty) {
+        if P::should_emit(common, empty) {
             encode::encoded_len_varint_field(field, T::encode_wire(self.value))
         } else {
             0
@@ -100,14 +94,13 @@ impl<T: VarintProtoType, P: FieldPresence> SingularVarintField<T, P> {
         &self,
         common: &MessageCommon<Pb, A>,
         field: u32,
-        bit: usize,
         buf: &mut B,
     ) where
         Pb: PresenceBits,
         A: ::allocator_api2::alloc::Allocator,
     {
         let empty = self.value == T::proto_zero();
-        if P::should_emit(common, bit, empty) {
+        if P::should_emit(common, empty) {
             encode::encode_varint_field(field, T::encode_wire(self.value), buf);
         }
     }
@@ -121,15 +114,14 @@ impl<T: VarintProtoType> SingularVarintField<T, Implicit> {
     /// than a bespoke helper on the oneof enum.
     ///
     /// A oneof carries no presence bit (the enclosing `OneofSlot` tracks which
-    /// variant is set); `Implicit` presence ignores the bit, so this binds
-    /// against a dummy index. Restricting the method to `Implicit` keeps that
-    /// dummy safe — no `Explicit` bitfield can be corrupted.
+    /// variant is set). Restricting the method to `Implicit` keeps no
+    /// `Explicit` bitfield from being touched.
     #[inline]
     pub fn bind_oneof<'f, 'c, Pb: PresenceBits, A: Allocator>(
         &'f mut self,
         common: &'c mut MessageCommon<Pb, A>,
     ) -> SingularVarintFieldMut<'f, 'c, T, Implicit, Pb, A> {
-        self.bind(common, 0)
+        self.bind(common)
     }
 }
 
@@ -141,18 +133,17 @@ impl<T: VarintProtoType, P: FieldPresence> Default for SingularVarintField<T, P>
 
 impl<T: VarintProtoType, P: ExplicitFieldPresence> SingularVarintField<T, P> {
     #[inline]
-    pub fn has<Pb, A>(&self, common: &MessageCommon<Pb, A>, bit: usize) -> bool
+    pub fn has<Pb, A>(&self, common: &MessageCommon<Pb, A>) -> bool
     where
         Pb: PresenceBits,
         A: ::allocator_api2::alloc::Allocator,
     {
-        common.is_present(bit)
+        common.is_present(P::BIT)
     }
 
     pub fn optional<Pb, A, D>(
         &self,
         common: &MessageCommon<Pb, A>,
-        bit: usize,
         default: D,
     ) -> Optional<T::Value, D>
     where
@@ -161,7 +152,7 @@ impl<T: VarintProtoType, P: ExplicitFieldPresence> SingularVarintField<T, P> {
         D: HasDefault<T::Value>,
         T::Value: Copy,
     {
-        let v = if common.is_present(bit) {
+        let v = if common.is_present(P::BIT) {
             Some(self.value)
         } else {
             None
@@ -195,7 +186,6 @@ pub struct SingularVarintFieldMut<
 > {
     field: &'f mut SingularVarintField<T, P>,
     common: &'c mut MessageCommon<Pb, A>,
-    bit: usize,
 }
 
 impl<'f, 'c, T: VarintProtoType, P: FieldPresence, Pb: PresenceBits, A: Allocator>
@@ -205,22 +195,21 @@ impl<'f, 'c, T: VarintProtoType, P: FieldPresence, Pb: PresenceBits, A: Allocato
     fn new(
         field: &'f mut SingularVarintField<T, P>,
         common: &'c mut MessageCommon<Pb, A>,
-        bit: usize,
     ) -> Self {
-        Self { field, common, bit }
+        Self { field, common }
     }
 
     /// Marks presence (per `P`) and returns a mutable reference to the value.
     #[inline]
     pub fn value_mut(self) -> &'f mut T::Value {
-        P::on_set(self.common, self.bit);
+        P::on_set(self.common);
         &mut self.field.value
     }
 
     /// Stores `v`, applying the presence policy (`on_set` for EXPLICIT).
     #[inline]
     pub fn set(self, v: T::Value) {
-        P::on_set(self.common, self.bit);
+        P::on_set(self.common);
         self.field.value = v;
     }
 
@@ -230,7 +219,7 @@ impl<'f, 'c, T: VarintProtoType, P: FieldPresence, Pb: PresenceBits, A: Allocato
             return Err(DecodeError::InvalidTag);
         }
         let raw = decode::decode_varint(buf)?;
-        P::on_set(self.common, self.bit);
+        P::on_set(self.common);
         self.field.value = T::decode_wire(raw)?;
         Ok(())
     }
@@ -241,7 +230,7 @@ impl<'f, 'c, T: VarintProtoType, P: ExplicitFieldPresence, Pb: PresenceBits, A: 
 {
     /// Clears presence and resets the value slot to type-zero.
     pub fn clear(self) {
-        P::on_clear(self.common, self.bit);
+        P::on_clear(self.common);
         self.field.value = T::proto_zero();
     }
 
@@ -272,7 +261,7 @@ impl<'f, 'c, T: VarintProtoType, P: ExplicitFieldPresence, Pb: PresenceBits, A: 
             );
             return Ok(());
         }
-        P::on_set(self.common, self.bit);
+        P::on_set(self.common);
         self.field.value = value;
         Ok(())
     }
@@ -285,12 +274,15 @@ impl<'f, 'c, T: VarintProtoType, P: ExplicitFieldPresence, Pb: PresenceBits, A: 
 pub type SingularVarint<T, P> = SingularVarintField<T, P>;
 
 pub type ImplicitVarintField<T> = SingularVarintField<T, super::field_presence::Implicit>;
-pub type ExplicitVarintField<T> = SingularVarintField<T, super::field_presence::Explicit>;
+pub type ExplicitVarintField<T, const BIT: usize> =
+    SingularVarintField<T, super::field_presence::Explicit<BIT>>;
+pub type LegacyRequiredVarintField<T, const BIT: usize> =
+    SingularVarintField<T, super::field_presence::LegacyRequired<BIT>>;
 
 pub type ImplicitVarint<T> = ImplicitVarintField<T>;
-pub type ExplicitVarint<T> = ExplicitVarintField<T>;
+pub type ExplicitVarint<T, const BIT: usize> = ExplicitVarintField<T, BIT>;
 
 pub type ImplicitInt32 = ImplicitVarintField<varint::ProtoInt32>;
-pub type ExplicitInt32 = ExplicitVarintField<varint::ProtoInt32>;
+pub type ExplicitInt32<const BIT: usize> = ExplicitVarintField<varint::ProtoInt32, BIT>;
 pub type ImplicitEnum = ImplicitVarintField<varint::ProtoEnum>;
-pub type ExplicitEnum = ExplicitVarintField<varint::ProtoEnum>;
+pub type ExplicitEnum<const BIT: usize> = ExplicitVarintField<varint::ProtoEnum, BIT>;

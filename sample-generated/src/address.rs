@@ -33,13 +33,20 @@ impl PresenceBits for AddressPresence {
 }
 
 // ---------------------------------------------------------------------------
+// Presence bit indices (2 tracked singular fields)
+// ---------------------------------------------------------------------------
+
+pub const BIT_STREET: usize = 0; // street (EXPLICIT)
+pub const BIT_CITY: usize = 1; // city (EXPLICIT)
+
+// ---------------------------------------------------------------------------
 // Message struct
 // ---------------------------------------------------------------------------
 
 pub struct Address<A: Allocator + Clone = Global> {
     _common: MessageCommon<AddressPresence, A>,
-    street: SingularLenField<ProtoString, Explicit, A>, // proto: string street = 1;
-    city: SingularLenField<ProtoString, Explicit, A>,   // proto: string city = 2;
+    street: SingularLenField<ProtoString, Explicit<{ BIT_STREET }>, A>, // proto: string street = 1;
+    city: SingularLenField<ProtoString, Explicit<{ BIT_CITY }>, A>,   // proto: string city = 2;
 }
 
 // ---------------------------------------------------------------------------
@@ -49,9 +56,6 @@ pub struct Address<A: Allocator + Clone = Global> {
 impl<A: Allocator + Clone> Address<A> {
     pub const FIELD_STREET: u32 = 1; // street
     pub const FIELD_CITY: u32 = 2; // city
-
-    pub const BIT_STREET: usize = 0; // street (EXPLICIT)
-    pub const BIT_CITY: usize = 1; // city (EXPLICIT)
 }
 
 impl<A: Allocator + Clone> Address<A> {
@@ -74,19 +78,17 @@ impl<A: Allocator + Clone> Address<A> {
         impl<'a> ::puroro::HasDefault<&'a str> for StreetDefault {
             const DEFAULT: &'a str = "";
         }
-        self.street.optional(&self._common, Self::BIT_STREET, StreetDefault)
+        self.street.optional(&self._common, StreetDefault)
     }
 
     pub fn street_mut<'s>(
         &'s mut self,
     ) -> impl ::core::ops::DerefMut<Target = ::unmanaged::String<A>> + 's {
-        self.street
-            .bind(&mut self._common, Self::BIT_STREET)
-            .value_mut()
+        self.street.bind(&mut self._common).value_mut()
     }
 
     pub fn clear_street(&mut self) {
-        self.street.bind(&mut self._common, Self::BIT_STREET).clear();
+        self.street.bind(&mut self._common).clear();
     }
 
     // -- city (EXPLICIT string, proto field 2) ------------------------------
@@ -96,17 +98,17 @@ impl<A: Allocator + Clone> Address<A> {
         impl<'a> ::puroro::HasDefault<&'a str> for CityDefault {
             const DEFAULT: &'a str = "";
         }
-        self.city.optional(&self._common, Self::BIT_CITY, CityDefault)
+        self.city.optional(&self._common, CityDefault)
     }
 
     pub fn city_mut<'s>(
         &'s mut self,
     ) -> impl ::core::ops::DerefMut<Target = ::unmanaged::String<A>> + 's {
-        self.city.bind(&mut self._common, Self::BIT_CITY).value_mut()
+        self.city.bind(&mut self._common).value_mut()
     }
 
     pub fn clear_city(&mut self) {
-        self.city.bind(&mut self._common, Self::BIT_CITY).clear();
+        self.city.bind(&mut self._common).clear();
     }
 
     pub fn unknown_fields(&self) -> &[u8] {
@@ -151,17 +153,17 @@ impl<A: Allocator + Clone> Drop for Address<A> {
 impl<A: Allocator + Clone> MessageEncode for Address<A> {
     fn encoded_len(&self) -> usize {
         let c = &self._common;
-        self.street.encoded_len(c, Self::FIELD_STREET, Self::BIT_STREET)
-            + self.city.encoded_len(c, Self::FIELD_CITY, Self::BIT_CITY)
+        self.street.encoded_len(c, Self::FIELD_STREET)
+            + self.city.encoded_len(c, Self::FIELD_CITY)
             + c.unknown_fields.len()
     }
 
     fn encode_raw<B: BufMut>(&self, buf: &mut B) {
         let c = &self._common;
         self.street
-            .encode_raw(c, Self::FIELD_STREET, Self::BIT_STREET, buf);
+            .encode_raw(c, Self::FIELD_STREET, buf);
         self.city
-            .encode_raw(c, Self::FIELD_CITY, Self::BIT_CITY, buf);
+            .encode_raw(c, Self::FIELD_CITY, buf);
         let unknown: &[u8] = &c.unknown_fields;
         buf.put_slice(unknown);
     }
@@ -175,13 +177,13 @@ impl<A: Allocator + Clone> MessageDecode for Address<A> {
                 Self::FIELD_STREET => {
                     // street = 1, EXPLICIT string
                     self.street
-                        .bind(&mut self._common, Self::BIT_STREET)
+                        .bind(&mut self._common)
                         .merge(wire_type, buf)?;
                 }
                 Self::FIELD_CITY => {
                     // city = 2, EXPLICIT string
                     self.city
-                        .bind(&mut self._common, Self::BIT_CITY)
+                        .bind(&mut self._common)
                         .merge(wire_type, buf)?;
                 }
                 _ => {

@@ -46,22 +46,32 @@ impl PresenceBits for TaskPresence {
 }
 
 // ---------------------------------------------------------------------------
+// Presence bit indices (5 tracked singular fields)
+// ---------------------------------------------------------------------------
+
+pub const BIT_TITLE: usize = 0; // title (EXPLICIT)
+pub const BIT_MAX_RETRIES: usize = 1; // max_retries (EXPLICIT)
+pub const BIT_OWNER_ID: usize = 2; // owner_id (LEGACY_REQUIRED)
+pub const BIT_PAYLOAD: usize = 3; // payload (EXPLICIT)
+pub const BIT_PRIORITY: usize = 4; // priority (EXPLICIT)
+
+// ---------------------------------------------------------------------------
 // Message struct
 // ---------------------------------------------------------------------------
 
 /// Reference `Task` message from `DESIGN.md`.
 pub struct Task<A: Allocator + Clone = Global> {
     _common: MessageCommon<TaskPresence, A>,
-    title: SingularLenField<ProtoString, Explicit, A>, // proto: string title = 1;
-    score: SingularVarintField<ProtoInt32, Implicit>,  // proto: int32 score = 2;
-    max_retries: SingularVarintField<ProtoInt32, Explicit>, // proto: int32 max_retries = 3;
-    owner_id: SingularLenField<ProtoString, LegacyRequired, A>, // proto: string owner_id = 4;
-    payload: SingularLenField<ProtoBytes, Explicit, A>, // proto: bytes payload = 5;
+    title: SingularLenField<ProtoString, Explicit<{ BIT_TITLE }>, A>, // proto: string title = 1;
+    score: SingularVarintField<ProtoInt32, Implicit>, // proto: int32 score = 2;
+    max_retries: SingularVarintField<ProtoInt32, Explicit<{ BIT_MAX_RETRIES }>>, // proto: int32 max_retries = 3;
+    owner_id: SingularLenField<ProtoString, LegacyRequired<{ BIT_OWNER_ID }>, A>, // proto: string owner_id = 4;
+    payload: SingularLenField<ProtoBytes, Explicit<{ BIT_PAYLOAD }>, A>, // proto: bytes payload = 5;
     tag_ids: RepeatedPackedVarintField<ProtoInt32, A>, // proto: repeated int32 tag_ids = 6 [packed];
     scores: RepeatedExpandedVarintField<ProtoInt32, A>, // proto: repeated int32 scores = 7;
     labels: RepeatedLenField<ProtoString, A>,          // proto: repeated string labels = 8;
-    status: SingularVarintField<ProtoEnum, Implicit>,  // proto: Status status = 9;
-    priority: SingularVarintField<ProtoEnum, Explicit>, // proto: Priority priority = 10;
+    status: SingularVarintField<ProtoEnum, Implicit>, // proto: Status status = 9;
+    priority: SingularVarintField<ProtoEnum, Explicit<{ BIT_PRIORITY }>>, // proto: Priority priority = 10;
     assignee: NestedMessageField<Address<A>, A>,       // proto: Address assignee = 11;
     // proto: oneof notification { string email_address=12; string phone_number=13;
     //                             int32 webhook_id=14; Address postal=15; }
@@ -88,15 +98,6 @@ impl<A: Allocator + Clone> Task<A> {
     // (`FIELD_EMAIL_ADDRESS` = 12, `FIELD_PHONE_NUMBER` = 13, `FIELD_WEBHOOK_ID` = 14,
     // `FIELD_POSTAL` = 15), so they stay usable as `match` patterns despite
     // `NotificationStorage` being generic over `A`.
-
-    pub const BIT_TITLE: usize = 0; // title (EXPLICIT)
-    pub const BIT_MAX_RETRIES: usize = 1; // max_retries (EXPLICIT)
-    pub const BIT_OWNER_ID: usize = 2; // owner_id (LEGACY_REQUIRED)
-    pub const BIT_PAYLOAD: usize = 3; // payload (EXPLICIT)
-    pub const BIT_PRIORITY: usize = 4; // priority (EXPLICIT)
-
-    /// Dummy bit index for IMPLICIT / nested / repeated fields (ignored by `Implicit`).
-    pub const BIT_UNUSED: usize = 0;
 }
 
 impl<A: Allocator + Clone> Task<A> {
@@ -127,17 +128,17 @@ impl<A: Allocator + Clone> Task<A> {
         impl<'a> HasDefault<&'a str> for TitleDefault {
             const DEFAULT: &'a str = "";
         }
-        self.title.optional(&self._common, Self::BIT_TITLE, TitleDefault)
+        self.title.optional(&self._common, TitleDefault)
     }
 
     pub fn title_mut<'s>(
         &'s mut self,
     ) -> impl ::core::ops::DerefMut<Target = ::unmanaged::String<A>> + 's {
-        self.title.bind(&mut self._common, Self::BIT_TITLE).value_mut()
+        self.title.bind(&mut self._common).value_mut()
     }
 
     pub fn clear_title(&mut self) {
-        self.title.bind(&mut self._common, Self::BIT_TITLE).clear();
+        self.title.bind(&mut self._common).clear();
     }
 
     // -- score (IMPLICIT int32, proto field 2) ------------------------------
@@ -147,7 +148,7 @@ impl<A: Allocator + Clone> Task<A> {
     }
 
     pub fn score_mut(&mut self) -> &mut i32 {
-        self.score.bind(&mut self._common, Self::BIT_UNUSED).value_mut()
+        self.score.bind(&mut self._common).value_mut()
     }
 
     // -- max_retries (EXPLICIT int32, default = 3, proto field 3) ------------
@@ -158,19 +159,15 @@ impl<A: Allocator + Clone> Task<A> {
             const DEFAULT: i32 = 3;
         }
         self.max_retries
-            .optional(&self._common, Self::BIT_MAX_RETRIES, MaxRetriesDefault)
+            .optional(&self._common, MaxRetriesDefault)
     }
 
     pub fn max_retries_mut(&mut self) -> &mut i32 {
-        self.max_retries
-            .bind(&mut self._common, Self::BIT_MAX_RETRIES)
-            .value_mut()
+        self.max_retries.bind(&mut self._common).value_mut()
     }
 
     pub fn clear_max_retries(&mut self) {
-        self.max_retries
-            .bind(&mut self._common, Self::BIT_MAX_RETRIES)
-            .clear();
+        self.max_retries.bind(&mut self._common).clear();
     }
 
     // -- owner_id (LEGACY_REQUIRED string, proto field 4) --------------------
@@ -181,21 +178,17 @@ impl<A: Allocator + Clone> Task<A> {
             const DEFAULT: &'a str = "";
         }
         self.owner_id
-            .optional(&self._common, Self::BIT_OWNER_ID, OwnerIdDefault)
+            .optional(&self._common, OwnerIdDefault)
     }
 
     pub fn owner_id_mut<'s>(
         &'s mut self,
     ) -> impl ::core::ops::DerefMut<Target = ::unmanaged::String<A>> + 's {
-        self.owner_id
-            .bind(&mut self._common, Self::BIT_OWNER_ID)
-            .value_mut()
+        self.owner_id.bind(&mut self._common).value_mut()
     }
 
     pub fn clear_owner_id(&mut self) {
-        self.owner_id
-            .bind(&mut self._common, Self::BIT_OWNER_ID)
-            .clear();
+        self.owner_id.bind(&mut self._common).clear();
     }
 
     // -- payload (EXPLICIT bytes, proto field 5) -----------------------------
@@ -206,21 +199,17 @@ impl<A: Allocator + Clone> Task<A> {
             const DEFAULT: &'a [u8] = &[];
         }
         self.payload
-            .optional(&self._common, Self::BIT_PAYLOAD, PayloadDefault)
+            .optional(&self._common, PayloadDefault)
     }
 
     pub fn payload_mut<'s>(
         &'s mut self,
     ) -> impl ::core::ops::DerefMut<Target = ::allocator_api2::vec::Vec<u8, A>> + 's {
-        self.payload
-            .bind(&mut self._common, Self::BIT_PAYLOAD)
-            .value_mut()
+        self.payload.bind(&mut self._common).value_mut()
     }
 
     pub fn clear_payload(&mut self) {
-        self.payload
-            .bind(&mut self._common, Self::BIT_PAYLOAD)
-            .clear();
+        self.payload.bind(&mut self._common).clear();
     }
 
     // -- tag_ids (repeated int32 PACKED, proto field 6) ----------------------
@@ -278,7 +267,7 @@ impl<A: Allocator + Clone> Task<A> {
     }
 
     pub fn status_mut(&mut self) -> &mut i32 {
-        self.status.bind(&mut self._common, Self::BIT_UNUSED).value_mut()
+        self.status.bind(&mut self._common).value_mut()
     }
 
     pub fn status(&self) -> Result<Status, i32> {
@@ -288,22 +277,18 @@ impl<A: Allocator + Clone> Task<A> {
     // -- priority (EXPLICIT closed enum, proto field 10) ---------------------
 
     pub fn priority(&self) -> Option<Result<Priority, i32>> {
-        if !self.priority.has(&self._common, Self::BIT_PRIORITY) {
+        if !self.priority.has(&self._common) {
             return None;
         }
         Some(Priority::try_from(self.priority.value()))
     }
 
     pub fn priority_mut(&mut self) -> &mut i32 {
-        self.priority
-            .bind(&mut self._common, Self::BIT_PRIORITY)
-            .value_mut()
+        self.priority.bind(&mut self._common).value_mut()
     }
 
     pub fn clear_priority(&mut self) {
-        self.priority
-            .bind(&mut self._common, Self::BIT_PRIORITY)
-            .clear();
+        self.priority.bind(&mut self._common).clear();
     }
 
     // -- assignee (nested message, proto field 11) --------------------------
@@ -380,7 +365,7 @@ impl<A: Allocator + Clone> Task<A> {
     /// Checks `LEGACY_REQUIRED` fields (`owner_id`).
     pub fn validate(&self) -> Result<(), DecodeError> {
         self.owner_id
-            .validate_required(&self._common, Self::BIT_OWNER_ID, Self::FIELD_OWNER_ID)
+            .validate_required(&self._common, Self::FIELD_OWNER_ID)
     }
 
     pub fn decode_strict<B: Buf>(buf: B) -> Result<Self, DecodeError>
@@ -431,28 +416,26 @@ impl<A: Allocator + Clone> MessageEncode for Task<A> {
     fn encoded_len(&self) -> usize {
         let c = &self._common;
         let mut n = 0usize;
-        n += self.title.encoded_len(c, Self::FIELD_TITLE, Self::BIT_TITLE);
-        n += self
-            .score
-            .encoded_len(c, Self::FIELD_SCORE, Self::BIT_UNUSED);
+        n += self.title.encoded_len(c, Self::FIELD_TITLE);
+        n += self.score.encoded_len(c, Self::FIELD_SCORE);
         n += self
             .max_retries
-            .encoded_len(c, Self::FIELD_MAX_RETRIES, Self::BIT_MAX_RETRIES);
+            .encoded_len(c, Self::FIELD_MAX_RETRIES);
         n += self
             .owner_id
-            .encoded_len(c, Self::FIELD_OWNER_ID, Self::BIT_OWNER_ID);
+            .encoded_len(c, Self::FIELD_OWNER_ID);
         n += self
             .payload
-            .encoded_len(c, Self::FIELD_PAYLOAD, Self::BIT_PAYLOAD);
+            .encoded_len(c, Self::FIELD_PAYLOAD);
         n += self.tag_ids.encoded_len(Self::FIELD_TAG_IDS);
         n += self.scores.encoded_len(Self::FIELD_SCORES);
         n += self.labels.encoded_len(Self::FIELD_LABELS);
         n += self
             .status
-            .encoded_len(c, Self::FIELD_STATUS, Self::BIT_UNUSED);
+            .encoded_len(c, Self::FIELD_STATUS);
         n += self
             .priority
-            .encoded_len(c, Self::FIELD_PRIORITY, Self::BIT_PRIORITY);
+            .encoded_len(c, Self::FIELD_PRIORITY);
         n += self.assignee.encoded_len(Self::FIELD_ASSIGNEE);
         n += NotificationStorage::encoded_len(&self.notification);
         n + c.unknown_fields.len()
@@ -461,22 +444,22 @@ impl<A: Allocator + Clone> MessageEncode for Task<A> {
     fn encode_raw<B: BufMut>(&self, buf: &mut B) {
         let c = &self._common;
         self.title
-            .encode_raw(c, Self::FIELD_TITLE, Self::BIT_TITLE, buf);
+            .encode_raw(c, Self::FIELD_TITLE, buf);
         self.score
-            .encode_raw(c, Self::FIELD_SCORE, Self::BIT_UNUSED, buf);
+            .encode_raw(c, Self::FIELD_SCORE, buf);
         self.max_retries
-            .encode_raw(c, Self::FIELD_MAX_RETRIES, Self::BIT_MAX_RETRIES, buf);
+            .encode_raw(c, Self::FIELD_MAX_RETRIES, buf);
         self.owner_id
-            .encode_raw(c, Self::FIELD_OWNER_ID, Self::BIT_OWNER_ID, buf);
+            .encode_raw(c, Self::FIELD_OWNER_ID, buf);
         self.payload
-            .encode_raw(c, Self::FIELD_PAYLOAD, Self::BIT_PAYLOAD, buf);
+            .encode_raw(c, Self::FIELD_PAYLOAD, buf);
         self.tag_ids.encode_raw(Self::FIELD_TAG_IDS, buf);
         self.scores.encode_raw(Self::FIELD_SCORES, buf);
         self.labels.encode_raw(Self::FIELD_LABELS, buf);
         self.status
-            .encode_raw(c, Self::FIELD_STATUS, Self::BIT_UNUSED, buf);
+            .encode_raw(c, Self::FIELD_STATUS, buf);
         self.priority
-            .encode_raw(c, Self::FIELD_PRIORITY, Self::BIT_PRIORITY, buf);
+            .encode_raw(c, Self::FIELD_PRIORITY, buf);
         self.assignee.encode_raw(Self::FIELD_ASSIGNEE, buf);
         NotificationStorage::encode(&self.notification, buf);
         let unknown: &[u8] = &c.unknown_fields;
@@ -492,31 +475,31 @@ impl<A: Allocator + Clone> MessageDecode for Task<A> {
                 Self::FIELD_TITLE => {
                     // title = 1, EXPLICIT string
                     self.title
-                        .bind(&mut self._common, Self::BIT_TITLE)
+                        .bind(&mut self._common)
                         .merge(wire_type, buf)?;
                 }
                 Self::FIELD_SCORE => {
                     // score = 2, IMPLICIT int32
                     self.score
-                        .bind(&mut self._common, Self::BIT_UNUSED)
+                        .bind(&mut self._common)
                         .merge(wire_type, buf)?;
                 }
                 Self::FIELD_MAX_RETRIES => {
                     // max_retries = 3, EXPLICIT int32
                     self.max_retries
-                        .bind(&mut self._common, Self::BIT_MAX_RETRIES)
+                        .bind(&mut self._common)
                         .merge(wire_type, buf)?;
                 }
                 Self::FIELD_OWNER_ID => {
                     // owner_id = 4, LEGACY_REQUIRED string
                     self.owner_id
-                        .bind(&mut self._common, Self::BIT_OWNER_ID)
+                        .bind(&mut self._common)
                         .merge(wire_type, buf)?;
                 }
                 Self::FIELD_PAYLOAD => {
                     // payload = 5, EXPLICIT bytes
                     self.payload
-                        .bind(&mut self._common, Self::BIT_PAYLOAD)
+                        .bind(&mut self._common)
                         .merge(wire_type, buf)?;
                 }
                 Self::FIELD_TAG_IDS => {
@@ -534,13 +517,13 @@ impl<A: Allocator + Clone> MessageDecode for Task<A> {
                 Self::FIELD_STATUS => {
                     // status = 9, IMPLICIT open enum
                     self.status
-                        .bind(&mut self._common, Self::BIT_UNUSED)
+                        .bind(&mut self._common)
                         .merge(wire_type, buf)?;
                 }
                 Self::FIELD_PRIORITY => {
                     // priority = 10, EXPLICIT closed enum
                     self.priority
-                        .bind(&mut self._common, Self::BIT_PRIORITY)
+                        .bind(&mut self._common)
                         .merge_closed(Self::FIELD_PRIORITY, wire_type, buf, |v| {
                             Priority::try_from(v).is_ok()
                         })?;

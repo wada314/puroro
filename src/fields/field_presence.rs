@@ -1,7 +1,10 @@
-//! Field presence policy markers (`Implicit` / `Explicit` / `LegacyRequired`).
+//! Field presence policy markers (`Implicit` / `Explicit<BIT>` / `LegacyRequired<BIT>`).
 //!
 //! Composed with wire-encoding markers ([`VarintProtoType`](super::varint::VarintProtoType),
 //! [`LenProtoType`](super::len::LenProtoType)) in singular field wrappers.
+//!
+//! Only [`Explicit`] and [`LegacyRequired`] carry a presence bit index; [`Implicit`]
+//! has none.
 
 use ::allocator_api2::alloc::Allocator;
 
@@ -15,7 +18,6 @@ pub trait FieldPresence: Copy {
     /// `true` when this field should be written on the wire.
     fn should_emit<P, A>(
         common: &MessageCommon<P, A>,
-        bit: usize,
         payload_empty: bool,
     ) -> bool
     where
@@ -23,24 +25,25 @@ pub trait FieldPresence: Copy {
         A: Allocator;
 
     /// Called after a successful merge or setter (marks EXPLICIT fields present).
-    fn on_set<P, A>(common: &mut MessageCommon<P, A>, bit: usize)
+    fn on_set<P, A>(common: &mut MessageCommon<P, A>)
     where
         P: PresenceBits,
         A: Allocator;
 
     /// Called when an EXPLICIT field is cleared.
-    fn on_clear<P, A>(common: &mut MessageCommon<P, A>, bit: usize)
+    fn on_clear<P, A>(common: &mut MessageCommon<P, A>)
     where
         P: PresenceBits,
         A: Allocator;
 }
 
 /// Marker for IMPLICIT presence — omit on wire when payload is empty / type-zero.
+/// Carries no presence bit index.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
 pub struct Implicit;
 
 impl FieldPresence for Implicit {
-    fn should_emit<P, A>(_: &MessageCommon<P, A>, _: usize, payload_empty: bool) -> bool
+    fn should_emit<P, A>(_: &MessageCommon<P, A>, payload_empty: bool) -> bool
     where
         P: PresenceBits,
         A: Allocator,
@@ -48,14 +51,14 @@ impl FieldPresence for Implicit {
         !payload_empty
     }
 
-    fn on_set<P, A>(_: &mut MessageCommon<P, A>, _: usize)
+    fn on_set<P, A>(_: &mut MessageCommon<P, A>)
     where
         P: PresenceBits,
         A: Allocator,
     {
     }
 
-    fn on_clear<P, A>(_: &mut MessageCommon<P, A>, _: usize)
+    fn on_clear<P, A>(_: &mut MessageCommon<P, A>)
     where
         P: PresenceBits,
         A: Allocator,
@@ -63,100 +66,110 @@ impl FieldPresence for Implicit {
     }
 }
 
-/// Marker for EXPLICIT presence — tracked in the message bitfield.
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
-pub struct Explicit;
+/// Marker for EXPLICIT presence — tracked in the message bitfield at `BIT`.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub struct Explicit<const BIT: usize>;
 
-impl FieldPresence for Explicit {
-    fn should_emit<P, A>(common: &MessageCommon<P, A>, bit: usize, _: bool) -> bool
+impl<const BIT: usize> Default for Explicit<BIT> {
+    fn default() -> Self {
+        Self
+    }
+}
+
+impl<const BIT: usize> FieldPresence for Explicit<BIT> {
+    fn should_emit<P, A>(common: &MessageCommon<P, A>, _: bool) -> bool
     where
         P: PresenceBits,
         A: Allocator,
     {
-        common.is_present(bit)
+        common.is_present(BIT)
     }
 
-    fn on_set<P, A>(common: &mut MessageCommon<P, A>, bit: usize)
+    fn on_set<P, A>(common: &mut MessageCommon<P, A>)
     where
         P: PresenceBits,
         A: Allocator,
     {
-        common.set_presence(bit, true);
+        common.set_presence(BIT, true);
     }
 
-    fn on_clear<P, A>(common: &mut MessageCommon<P, A>, bit: usize)
+    fn on_clear<P, A>(common: &mut MessageCommon<P, A>)
     where
         P: PresenceBits,
         A: Allocator,
     {
-        common.set_presence(bit, false);
+        common.set_presence(BIT, false);
     }
 }
 
 /// Marker for LEGACY_REQUIRED — wire/encode/merge identical to [`Explicit`];
-/// message `validate()` must check the presence bit.
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
-pub struct LegacyRequired;
+/// message `validate()` must check the presence bit at `BIT`.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub struct LegacyRequired<const BIT: usize>;
 
-impl FieldPresence for LegacyRequired {
-    fn should_emit<P, A>(common: &MessageCommon<P, A>, bit: usize, _: bool) -> bool
+impl<const BIT: usize> Default for LegacyRequired<BIT> {
+    fn default() -> Self {
+        Self
+    }
+}
+
+impl<const BIT: usize> FieldPresence for LegacyRequired<BIT> {
+    fn should_emit<P, A>(common: &MessageCommon<P, A>, _: bool) -> bool
     where
         P: PresenceBits,
         A: Allocator,
     {
-        common.is_present(bit)
+        common.is_present(BIT)
     }
 
-    fn on_set<P, A>(common: &mut MessageCommon<P, A>, bit: usize)
+    fn on_set<P, A>(common: &mut MessageCommon<P, A>)
     where
         P: PresenceBits,
         A: Allocator,
     {
-        common.set_presence(bit, true);
+        common.set_presence(BIT, true);
     }
 
-    fn on_clear<P, A>(common: &mut MessageCommon<P, A>, bit: usize)
+    fn on_clear<P, A>(common: &mut MessageCommon<P, A>)
     where
         P: PresenceBits,
         A: Allocator,
     {
-        common.set_presence(bit, false);
+        common.set_presence(BIT, false);
     }
 }
 
 /// Sub-trait for EXPLICIT-only accessors (`optional`, `has`, `clear`).
-pub trait ExplicitFieldPresence: FieldPresence {}
+pub trait ExplicitFieldPresence: FieldPresence {
+    /// Presence bit index in the message bitfield.
+    const BIT: usize;
+}
 
-impl ExplicitFieldPresence for Explicit {}
-impl ExplicitFieldPresence for LegacyRequired {}
+impl<const BIT: usize> ExplicitFieldPresence for Explicit<BIT> {
+    const BIT: usize = BIT;
+}
+
+impl<const BIT: usize> ExplicitFieldPresence for LegacyRequired<BIT> {
+    const BIT: usize = BIT;
+}
 
 /// Sub-trait for LEGACY_REQUIRED fields — adds presence validation for `validate()`.
 pub trait RequiredFieldPresence: ExplicitFieldPresence {
     /// Returns `MissingRequiredField` when the bit is unset.
     fn validate_present<P, A>(
         common: &MessageCommon<P, A>,
-        bit: usize,
-        field_number: u32,
-    ) -> Result<(), DecodeError>
-    where
-        P: PresenceBits,
-        A: Allocator;
-}
-
-impl RequiredFieldPresence for LegacyRequired {
-    fn validate_present<P, A>(
-        common: &MessageCommon<P, A>,
-        bit: usize,
         field_number: u32,
     ) -> Result<(), DecodeError>
     where
         P: PresenceBits,
         A: Allocator,
     {
-        if common.is_present(bit) {
+        if common.is_present(Self::BIT) {
             Ok(())
         } else {
             Err(DecodeError::MissingRequiredField { field_number })
         }
     }
 }
+
+impl<const BIT: usize> RequiredFieldPresence for LegacyRequired<BIT> {}
