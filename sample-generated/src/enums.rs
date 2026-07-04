@@ -1,15 +1,26 @@
 //! Sample of the enums puroro generates from `example.proto`.
+//!
+//! Protobuf enums are newtypes over `i32`, not Rust enums: multiple proto
+//! value names may share the same integer (`allow_alias`), and the wire
+//! carries only the number.
 
 use ::core::convert::TryFrom;
 
 /// Open enum (`enum_type = OPEN`).
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
-#[repr(i32)]
-pub enum Status {
-    #[default]
-    Unspecified = 0,
-    Pending = 1,
-    Done = 2,
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+#[repr(transparent)]
+pub struct Status(i32);
+
+impl Status {
+    pub const UNSPECIFIED: Self = Self(0);
+    pub const PENDING: Self = Self(1);
+    pub const DONE: Self = Self(2);
+}
+
+impl Default for Status {
+    fn default() -> Self {
+        Self::UNSPECIFIED
+    }
 }
 
 impl TryFrom<i32> for Status {
@@ -17,9 +28,7 @@ impl TryFrom<i32> for Status {
 
     fn try_from(value: i32) -> Result<Self, Self::Error> {
         match value {
-            0 => Ok(Self::Unspecified),
-            1 => Ok(Self::Pending),
-            2 => Ok(Self::Done),
+            0 | 1 | 2 => Ok(Self(value)),
             other => Err(other),
         }
     }
@@ -27,18 +36,25 @@ impl TryFrom<i32> for Status {
 
 impl From<Status> for i32 {
     fn from(value: Status) -> Self {
-        value as Self
+        value.0
     }
 }
 
 /// Closed enum (`enum_type = CLOSED`).
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
-#[repr(i32)]
-pub enum Priority {
-    #[default]
-    Unspecified = 0,
-    Low = 1,
-    High = 2,
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+#[repr(transparent)]
+pub struct Priority(i32);
+
+impl Priority {
+    pub const UNSPECIFIED: Self = Self(0);
+    pub const LOW: Self = Self(1);
+    pub const HIGH: Self = Self(2);
+}
+
+impl Default for Priority {
+    fn default() -> Self {
+        Self::UNSPECIFIED
+    }
 }
 
 impl TryFrom<i32> for Priority {
@@ -46,9 +62,7 @@ impl TryFrom<i32> for Priority {
 
     fn try_from(value: i32) -> Result<Self, Self::Error> {
         match value {
-            0 => Ok(Self::Unspecified),
-            1 => Ok(Self::Low),
-            2 => Ok(Self::High),
+            0 | 1 | 2 => Ok(Self(value)),
             other => Err(other),
         }
     }
@@ -56,6 +70,6 @@ impl TryFrom<i32> for Priority {
 
 impl From<Priority> for i32 {
     fn from(value: Priority) -> Self {
-        value as Self
+        value.0
     }
 }

@@ -651,16 +651,25 @@ Wire rule: field absent when not set; present even for the zero variant.
 
 #### Generated enum type
 
-Both open and closed enums produce the same enum definition:
+Both open and closed enums produce the same **newtype-over-`i32`** definition — not a Rust `enum`. Protobuf allows multiple value names to share one integer (`allow_alias`), and the wire carries only the number, so a Rust enum (which requires unique discriminants) cannot represent the full proto definition.
 
 ```rust
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
-#[repr(i32)]
-pub enum Status { Unspecified = 0, Pending = 1, Done = 2 }
+#[repr(transparent)]
+pub struct Status(i32);
 
-impl TryFrom<i32> for Status { type Error = i32; … }
-impl From<Status> for i32 { … }
+impl Status {
+    pub const UNSPECIFIED: Self = Self(0);
+    pub const PENDING: Self = Self(1);
+    pub const DONE: Self = Self(2);
+}
+
+impl Default for Status { … }  // UNSPECIFIED
+impl TryFrom<i32> for Status { type Error = i32; … }  // known values → Ok(Self(v))
+impl From<Status> for i32 { … }  // `i32::from(status)` / `status.into()`
 ```
+
+Alias names with the same integer all map to the same `Self(v)`; equality is by wire value.
 
 ---
 
