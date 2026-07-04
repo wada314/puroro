@@ -24,9 +24,10 @@
 //! The scalar variant owns no heap, so its `OneofDeallocate` arm is a no-op; the
 //! LEN and message variants free their storage through the message allocator.
 //!
-//! The group's field-number constants live at module scope (rather than as
-//! associated `const`s) so they stay usable as `match` patterns even though
-//! [`NotificationStorage`] is generic over the allocator `A`.
+//! Variant proto field numbers are supplied as separate const generic parameters
+//! on [`NotificationStorage`] (Rust has no variable-length const-generic list).
+//! The parent message module defines named `FIELD_*` constants and passes them
+//! when instantiating the storage type, so `merge_from` match arms stay readable.
 //!
 //! **Merge has no bespoke `merge_*` helpers on this enum.** Because each variant
 //! *is* a field wrapper, the parent's `merge_from` selects the variant through
@@ -47,15 +48,6 @@ use ::unmanaged::string::StringGuard;
 
 use crate::address::Address;
 
-/// `email_address` variant field number.
-pub(crate) const FIELD_EMAIL_ADDRESS: u32 = 12;
-/// `phone_number` variant field number.
-pub(crate) const FIELD_PHONE_NUMBER: u32 = 13;
-/// `webhook_id` variant field number.
-pub(crate) const FIELD_WEBHOOK_ID: u32 = 14;
-/// `postal` variant field number.
-pub(crate) const FIELD_POSTAL: u32 = 15;
-
 /// Which variant of `oneof notification` is set — a payload-less discriminant.
 ///
 /// Backs `Task::notification_case`, which returns `Option<NotificationCase>`;
@@ -70,13 +62,6 @@ pub enum NotificationCase {
 }
 
 /// Borrowed read view of the active `notification` variant.
-///
-/// Backs `Task::notification`; every payload borrows the message (no allocator
-/// and no `unmanaged` type in sight). All payloads are `Copy` (scalars, `&str`,
-/// and a `&Address<A>` reference), so the view is `Copy` — but the derive is
-/// hand-written to avoid a spurious `A: Copy` bound from `#[derive(Copy)]`, and
-/// `Debug` / `PartialEq` are omitted because the message payload `Address<A>`
-/// implements neither.
 pub enum NotificationRef<'a, A: Allocator + Clone> {
     EmailAddress(&'a str),
     PhoneNumber(&'a str),
@@ -92,11 +77,6 @@ impl<A: Allocator + Clone> Clone for NotificationRef<'_, A> {
 impl<A: Allocator + Clone> Copy for NotificationRef<'_, A> {}
 
 /// Borrowed mutable view of the active `notification` variant.
-///
-/// Backs `Task::notification_mut`; string variants hand out a growable guard
-/// (`DerefMut<Target = String<A>>`), the scalar variant a `&mut i32`, and the
-/// message variant a `&mut Address<A>`. Edits are written back live (the string
-/// guard on drop; the `&mut` targets in place).
 pub enum NotificationMut<'a, A: Allocator + Clone> {
     EmailAddress(StringGuard<'a, A>),
     PhoneNumber(StringGuard<'a, A>),
@@ -106,30 +86,30 @@ pub enum NotificationMut<'a, A: Allocator + Clone> {
 
 /// Owned storage for `oneof notification` (crate-internal).
 ///
-/// Each variant owns the field wrapper an ordinary singular field of that kind
-/// would use — allocator-less storage that cannot free itself; [`OneofDeallocate`]
-/// releases the active variant through the message allocator (a no-op for the
-/// scalar variant). This type is intentionally **not public** and does **not**
-/// take the canonical `Notification` name: exposing an `unmanaged`-holding value
-/// by name would let a caller own one and hit the panic-on-implicit-drop footgun.
-/// All public access is through [`NotificationCase`] / [`NotificationRef`] /
-/// [`NotificationMut`].
-///
-/// The LEN/varint wrappers carry a presence policy (`Implicit`) that is inert
-/// here: the enclosing [`OneofSlot`] tracks which variant is set, and this enum
-/// frames encode / merge itself, so the wrappers' presence-aware methods are
-/// never called.
-pub(crate) enum NotificationStorage<A: Allocator + Clone> {
+/// Parametrised by the allocator `A` and one const generic per variant proto
+/// field number. Each variant's field wrapper reuses the corresponding parameter
+/// as its `FIELD` type argument.
+pub(crate) enum NotificationStorage<
+    A: Allocator + Clone,
+    const FIELD_EMAIL_ADDRESS: u32,
+    const FIELD_PHONE_NUMBER: u32,
+    const FIELD_WEBHOOK_ID: u32,
+    const FIELD_POSTAL: u32,
+> {
     EmailAddress(SingularLenField<ProtoString, Implicit, { FIELD_EMAIL_ADDRESS }, A>),
     PhoneNumber(SingularLenField<ProtoString, Implicit, { FIELD_PHONE_NUMBER }, A>),
     WebhookId(SingularVarintField<ProtoInt32, Implicit, { FIELD_WEBHOOK_ID }>),
-    // `Present`: a oneof message variant is always present (the slot tracks
-    // presence), so the box is unwrapped — no `Option`, no per-access `unwrap`.
     Postal(NestedMessageField<Address<A>, A, { FIELD_POSTAL }, Present>),
 }
 
-impl<A: Allocator + Clone> NotificationStorage<A> {
-    /// This variant's payload-less discriminant.
+impl<
+        A: Allocator + Clone,
+        const FIELD_EMAIL_ADDRESS: u32,
+        const FIELD_PHONE_NUMBER: u32,
+        const FIELD_WEBHOOK_ID: u32,
+        const FIELD_POSTAL: u32,
+    > NotificationStorage<A, FIELD_EMAIL_ADDRESS, FIELD_PHONE_NUMBER, FIELD_WEBHOOK_ID, FIELD_POSTAL>
+{
     pub(crate) fn case(&self) -> NotificationCase {
         match self {
             Self::EmailAddress(_) => NotificationCase::EmailAddress,
@@ -139,7 +119,6 @@ impl<A: Allocator + Clone> NotificationStorage<A> {
         }
     }
 
-    /// Safe borrowed read view of this variant.
     pub(crate) fn to_ref(&self) -> NotificationRef<'_, A> {
         match self {
             Self::EmailAddress(f) => NotificationRef::EmailAddress(f.value()),
@@ -149,8 +128,6 @@ impl<A: Allocator + Clone> NotificationStorage<A> {
         }
     }
 
-    /// Safe borrowed mutable view of this variant. `alloc` (an owned message
-    /// allocator clone) backs the string guards; the other variants ignore it.
     pub(crate) fn to_mut(&mut self, alloc: A) -> NotificationMut<'_, A> {
         match self {
             Self::EmailAddress(f) => NotificationMut::EmailAddress(f.value_mut(alloc)),
@@ -160,14 +137,6 @@ impl<A: Allocator + Clone> NotificationStorage<A> {
         }
     }
 
-    /// Forces the group to the `email_address` variant and returns its field
-    /// wrapper (installing a default and freeing any other variant if needed).
-    ///
-    /// This centralises the `bind(...).variant_mut(...)` + `let … else
-    /// unreachable!()` dance so the parent's `_mut` accessors and decode arms
-    /// stay one-liners. The returned reference borrows only the slot, so `common`
-    /// is free again once this returns; the caller then applies the kind-specific
-    /// step (`value_mut`, `bind_oneof(common).merge`, …).
     pub(crate) fn bind_email_address_mut<'f, Pb: PresenceBits>(
         slot: &'f mut OneofSlot<Self>,
         common: &mut MessageCommon<Pb, A>,
@@ -182,8 +151,6 @@ impl<A: Allocator + Clone> NotificationStorage<A> {
         f
     }
 
-    /// Forces the group to the `phone_number` variant and returns its field
-    /// wrapper (see [`bind_email_address_mut`](Self::bind_email_address_mut)).
     pub(crate) fn bind_phone_number_mut<'f, Pb: PresenceBits>(
         slot: &'f mut OneofSlot<Self>,
         common: &mut MessageCommon<Pb, A>,
@@ -198,9 +165,6 @@ impl<A: Allocator + Clone> NotificationStorage<A> {
         f
     }
 
-    /// Forces the group to the `webhook_id` variant and returns its field
-    /// wrapper. The scalar wrapper stores no allocator, so the `make` closure
-    /// ignores the one it is handed.
     pub(crate) fn bind_webhook_id_mut<'f, Pb: PresenceBits>(
         slot: &'f mut OneofSlot<Self>,
         common: &mut MessageCommon<Pb, A>,
@@ -215,8 +179,6 @@ impl<A: Allocator + Clone> NotificationStorage<A> {
         f
     }
 
-    /// Forces the group to the `postal` variant and returns its field wrapper,
-    /// with the child message already present (`with_message_in`).
     pub(crate) fn bind_postal_mut<'f, Pb: PresenceBits>(
         slot: &'f mut OneofSlot<Self>,
         common: &mut MessageCommon<Pb, A>,
@@ -231,7 +193,6 @@ impl<A: Allocator + Clone> NotificationStorage<A> {
         f
     }
 
-    /// Encoded length of the active variant (0 when the group is unset).
     pub(crate) fn encoded_len(slot: &OneofSlot<Self>) -> usize {
         match slot.get() {
             Some(Self::EmailAddress(f)) => f.encoded_len_wire(),
@@ -242,7 +203,6 @@ impl<A: Allocator + Clone> NotificationStorage<A> {
         }
     }
 
-    /// Encodes the active variant (nothing when the group is unset).
     pub(crate) fn encode<B: BufMut>(slot: &OneofSlot<Self>, buf: &mut B) {
         match slot.get() {
             Some(Self::EmailAddress(f)) => f.encode_raw_wire(buf),
@@ -254,10 +214,15 @@ impl<A: Allocator + Clone> NotificationStorage<A> {
     }
 }
 
-impl<A: Allocator + Clone> OneofDeallocate<A> for NotificationStorage<A> {
-    /// Frees the active variant through `alloc`: LEN and message variants release
-    /// their heap storage; the scalar variant has nothing to free.
-    ///
+impl<
+        A: Allocator + Clone,
+        const FIELD_EMAIL_ADDRESS: u32,
+        const FIELD_PHONE_NUMBER: u32,
+        const FIELD_WEBHOOK_ID: u32,
+        const FIELD_POSTAL: u32,
+    > OneofDeallocate<A>
+    for NotificationStorage<A, FIELD_EMAIL_ADDRESS, FIELD_PHONE_NUMBER, FIELD_WEBHOOK_ID, FIELD_POSTAL>
+{
     /// # Safety
     ///
     /// `alloc` must be the allocator that owns the variant's buffer.
@@ -266,8 +231,6 @@ impl<A: Allocator + Clone> OneofDeallocate<A> for NotificationStorage<A> {
             Self::EmailAddress(mut f) => f.deallocate(alloc),
             Self::PhoneNumber(mut f) => f.deallocate(alloc),
             Self::WebhookId(_) => {}
-            // `Present::deallocate` consumes the field by value (no `Option` to
-            // null out); we already own the variant here.
             Self::Postal(f) => f.deallocate(alloc),
         }
     }

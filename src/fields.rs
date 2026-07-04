@@ -37,6 +37,7 @@ pub mod repeated_varint;
 pub mod scalar;
 pub mod varint;
 
+pub use ::protobuf_core::FieldNumber;
 pub use common::MessageCommon;
 pub use field_presence::{
     Explicit, ExplicitFieldPresence, FieldPresence, Implicit, LegacyRequired, RequiredFieldPresence,

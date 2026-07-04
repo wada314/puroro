@@ -39,17 +39,17 @@ pub use encode::MessageEncode;
 pub use error::{DecodeError, EncodeError};
 pub use fields::{
     Explicit, ExplicitBytes, ExplicitEnum, ExplicitFieldPresence, ExplicitInt32, ExplicitLenField,
-    ExplicitString, ExplicitVarint, ExplicitVarintField, FieldPresence, Implicit, ImplicitBytes,
-    ImplicitEnum, ImplicitInt32, ImplicitLenField, ImplicitString, ImplicitVarint,
-    ImplicitVarintField, LegacyRequired, LenProtoType, MessageCommon, MessagePresence,
-    NestedMessage, NestedMessageField, NestedMessageFieldMut, OneofDeallocate, OneofSlot,
-    OneofSlotMut, Expanded, Packed, Present, PresenceBits, ProtoBool, ProtoBytes, ProtoEnum, ProtoInt32,
-    ProtoInt64, ProtoSint32, ProtoSint64, ProtoString, ProtoUInt32, ProtoUInt64, RepeatedBytes,
-    RepeatedExpandedInt32, RepeatedExpandedVarintField, RepeatedLen, RepeatedLenField,
-    RepeatedLenFieldMut, RepeatedPackedInt32, RepeatedPackedVarintField, RepeatedString,
-    RepeatedVarint,
-    RepeatedVarintEncoding, RepeatedVarintField, RepeatedVarintFieldMut, RequiredFieldPresence,
-    SingularLen, SingularLenField, SingularLenFieldMut, SingularVarint, SingularVarintField,
+    ExplicitString, ExplicitVarint, ExplicitVarintField, FieldNumber,
+    FieldPresence, Implicit, ImplicitBytes, ImplicitEnum, ImplicitInt32, ImplicitLenField,
+    ImplicitString, ImplicitVarint, ImplicitVarintField, LegacyRequired, LenProtoType,
+    MessageCommon, MessagePresence, NestedMessage, NestedMessageField, NestedMessageFieldMut,
+    OneofDeallocate, OneofSlot, OneofSlotMut, Expanded, Packed, Present, PresenceBits, ProtoBool,
+    ProtoBytes, ProtoEnum, ProtoInt32, ProtoInt64, ProtoSint32, ProtoSint64, ProtoString,
+    ProtoUInt32, ProtoUInt64, RepeatedBytes, RepeatedExpandedInt32, RepeatedExpandedVarintField,
+    RepeatedLen, RepeatedLenField, RepeatedLenFieldMut, RepeatedPackedInt32,
+    RepeatedPackedVarintField, RepeatedString, RepeatedVarint, RepeatedVarintEncoding,
+    RepeatedVarintField, RepeatedVarintFieldMut, RequiredFieldPresence, SingularLen,
+    SingularLenField, SingularLenFieldMut, SingularVarint, SingularVarintField,
     SingularVarintFieldMut, VarintProtoType,
 };
 pub use optional::{HasDefault, Optional};
