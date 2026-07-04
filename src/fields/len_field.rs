@@ -8,6 +8,7 @@ use ::allocator_api2::alloc::Allocator;
 
 use crate::encode;
 use crate::error::DecodeError;
+use crate::defaults::ProtoDefault;
 use crate::optional::{HasDefault, Optional};
 use crate::wire_type::WireType;
 
@@ -19,14 +20,20 @@ use super::len::{self, LenProtoType};
 use super::presence::PresenceBits;
 
 /// Singular LEN field — parametrised by [`LenProtoType`] `T`, presence policy `P`,
-/// proto field number `FIELD`, and message allocator `A` (not stored inline).
-pub struct SingularLenField<T: LenProtoType, P: FieldPresence, const FIELD: u32, A: Allocator> {
+/// proto field number `FIELD`, message allocator `A`, and compile-time default marker `D`.
+pub struct SingularLenField<
+    T: LenProtoType,
+    P: FieldPresence,
+    const FIELD: u32,
+    A: Allocator,
+    D = ProtoDefault,
+> {
     value: ManuallyDrop<T::Storage>,
-    _marker: PhantomData<(P, A)>,
+    _marker: PhantomData<(P, A, D)>,
 }
 
-impl<T: LenProtoType, P: FieldPresence, const FIELD: u32, A: Allocator>
-    SingularLenField<T, P, FIELD, A>
+impl<T: LenProtoType, P: FieldPresence, const FIELD: u32, A: Allocator, D>
+    SingularLenField<T, P, FIELD, A, D>
 {
     pub fn new_in(alloc: A) -> Self {
         Self {
@@ -48,7 +55,7 @@ impl<T: LenProtoType, P: FieldPresence, const FIELD: u32, A: Allocator>
     pub fn bind<'f, 'c, Pb: PresenceBits>(
         &'f mut self,
         common: &'c mut MessageCommon<Pb, A>,
-    ) -> SingularLenFieldMut<'f, 'c, T, P, FIELD, Pb, A> {
+    ) -> SingularLenFieldMut<'f, 'c, T, P, FIELD, A, D, Pb> {
         SingularLenFieldMut::new(self, common)
     }
 
@@ -80,12 +87,12 @@ impl<T: LenProtoType, P: FieldPresence, const FIELD: u32, A: Allocator>
     }
 }
 
-impl<T: LenProtoType, const FIELD: u32, A: Allocator> SingularLenField<T, Implicit, FIELD, A> {
+impl<T: LenProtoType, const FIELD: u32, A: Allocator, D> SingularLenField<T, Implicit, FIELD, A, D> {
     #[inline]
     pub fn bind_oneof<'f, 'c, Pb: PresenceBits>(
         &'f mut self,
         common: &'c mut MessageCommon<Pb, A>,
-    ) -> SingularLenFieldMut<'f, 'c, T, Implicit, FIELD, Pb, A> {
+    ) -> SingularLenFieldMut<'f, 'c, T, Implicit, FIELD, A, D, Pb> {
         self.bind(common)
     }
 
@@ -106,8 +113,8 @@ impl<T: LenProtoType, const FIELD: u32, A: Allocator> SingularLenField<T, Implic
     }
 }
 
-impl<T: LenProtoType, P: ExplicitFieldPresence, const FIELD: u32, A: Allocator>
-    SingularLenField<T, P, FIELD, A>
+impl<T: LenProtoType, P: ExplicitFieldPresence, const FIELD: u32, A: Allocator, D>
+    SingularLenField<T, P, FIELD, A, D>
 {
     #[inline]
     pub fn has<Pb>(&self, common: &MessageCommon<Pb, A>) -> bool
@@ -116,28 +123,29 @@ impl<T: LenProtoType, P: ExplicitFieldPresence, const FIELD: u32, A: Allocator>
     {
         common.is_present(P::BIT)
     }
+}
 
-    pub fn optional<'a, Pb, D>(
-        &'a self,
-        common: &MessageCommon<Pb, A>,
-        default: D,
-    ) -> Optional<T::Ref<'a>, D>
+impl<T: LenProtoType, P: ExplicitFieldPresence, const FIELD: u32, A: Allocator, D>
+    SingularLenField<T, P, FIELD, A, D>
+where
+    for<'a> T::Ref<'a>: Copy,
+    D: for<'a> HasDefault<T::Ref<'a>>,
+{
+    pub fn optional<'a, Pb>(&'a self, common: &MessageCommon<Pb, A>) -> Optional<T::Ref<'a>, D>
     where
         Pb: PresenceBits,
-        D: HasDefault<T::Ref<'a>>,
-        T::Ref<'a>: Copy,
     {
         let v = if common.is_present(P::BIT) {
             Some(T::borrow(&self.value))
         } else {
             None
         };
-        Optional::new(v, default)
+        Optional::new(v)
     }
 }
 
-impl<T: LenProtoType, const BIT: usize, const FIELD: u32, A: Allocator>
-    SingularLenField<T, LegacyRequired<BIT>, FIELD, A>
+impl<T: LenProtoType, const BIT: usize, const FIELD: u32, A: Allocator, D>
+    SingularLenField<T, LegacyRequired<BIT>, FIELD, A, D>
 {
     pub fn validate_required<Pb>(&self, common: &MessageCommon<Pb, A>) -> Result<(), DecodeError>
     where
@@ -157,10 +165,11 @@ pub struct SingularLenFieldMut<
     T: LenProtoType,
     P: FieldPresence,
     const FIELD: u32,
-    Pb: PresenceBits,
     A: Allocator,
+    D,
+    Pb: PresenceBits,
 > {
-    field: &'f mut SingularLenField<T, P, FIELD, A>,
+    field: &'f mut SingularLenField<T, P, FIELD, A, D>,
     common: &'c mut MessageCommon<Pb, A>,
 }
 
@@ -170,13 +179,14 @@ impl<
         T: LenProtoType,
         P: FieldPresence,
         const FIELD: u32,
-        Pb: PresenceBits,
         A: Allocator,
-    > SingularLenFieldMut<'f, 'c, T, P, FIELD, Pb, A>
+        D,
+        Pb: PresenceBits,
+    > SingularLenFieldMut<'f, 'c, T, P, FIELD, A, D, Pb>
 {
     #[inline]
     fn new(
-        field: &'f mut SingularLenField<T, P, FIELD, A>,
+        field: &'f mut SingularLenField<T, P, FIELD, A, D>,
         common: &'c mut MessageCommon<Pb, A>,
     ) -> Self {
         Self { field, common }
@@ -214,9 +224,10 @@ impl<
         T: LenProtoType,
         P: ExplicitFieldPresence,
         const FIELD: u32,
-        Pb: PresenceBits,
         A: Allocator,
-    > SingularLenFieldMut<'f, 'c, T, P, FIELD, Pb, A>
+        D,
+        Pb: PresenceBits,
+    > SingularLenFieldMut<'f, 'c, T, P, FIELD, A, D, Pb>
 {
     pub fn clear(self)
     where
@@ -233,18 +244,18 @@ impl<
 // Type aliases
 // ---------------------------------------------------------------------------
 
-pub type SingularLen<T, P, const FIELD: u32, A> = SingularLenField<T, P, FIELD, A>;
+pub type SingularLen<T, P, const FIELD: u32, A, D = ProtoDefault> = SingularLenField<T, P, FIELD, A, D>;
 
 pub type ImplicitLenField<T, const FIELD: u32, A> =
     SingularLenField<T, super::field_presence::Implicit, FIELD, A>;
-pub type ExplicitLenField<T, const BIT: usize, const FIELD: u32, A> =
-    SingularLenField<T, super::field_presence::Explicit<BIT>, FIELD, A>;
-pub type LegacyRequiredLenField<T, const BIT: usize, const FIELD: u32, A> =
-    SingularLenField<T, super::field_presence::LegacyRequired<BIT>, FIELD, A>;
+pub type ExplicitLenField<T, const BIT: usize, const FIELD: u32, A, D = ProtoDefault> =
+    SingularLenField<T, super::field_presence::Explicit<BIT>, FIELD, A, D>;
+pub type LegacyRequiredLenField<T, const BIT: usize, const FIELD: u32, A, D = ProtoDefault> =
+    SingularLenField<T, super::field_presence::LegacyRequired<BIT>, FIELD, A, D>;
 
 pub type ImplicitString<const FIELD: u32, A> = ImplicitLenField<len::ProtoString, FIELD, A>;
-pub type ExplicitString<const BIT: usize, const FIELD: u32, A> =
-    ExplicitLenField<len::ProtoString, BIT, FIELD, A>;
+pub type ExplicitString<const BIT: usize, const FIELD: u32, A, D = ProtoDefault> =
+    ExplicitLenField<len::ProtoString, BIT, FIELD, A, D>;
 pub type ImplicitBytes<const FIELD: u32, A> = ImplicitLenField<len::ProtoBytes, FIELD, A>;
-pub type ExplicitBytes<const BIT: usize, const FIELD: u32, A> =
-    ExplicitLenField<len::ProtoBytes, BIT, FIELD, A>;
+pub type ExplicitBytes<const BIT: usize, const FIELD: u32, A, D = ProtoDefault> =
+    ExplicitLenField<len::ProtoBytes, BIT, FIELD, A, D>;

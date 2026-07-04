@@ -1,6 +1,8 @@
 //! Sample of the code puroro generates for message `example.Address`
 //! (from `example.proto`).
 
+mod defaults;
+
 use ::allocator_api2::alloc::{Allocator, Global};
 use ::bitvec::array::BitArray;
 use ::bitvec::order::Lsb0;
@@ -69,14 +71,8 @@ impl<A: Allocator + Clone> Address<A> {
 
     // -- street (EXPLICIT string, proto field 1) ----------------------------
 
-    pub fn street<'a>(
-        &'a self,
-    ) -> ::puroro::Optional<&'a str, impl ::puroro::HasDefault<&'a str>> {
-        struct StreetDefault;
-        impl<'a> ::puroro::HasDefault<&'a str> for StreetDefault {
-            const DEFAULT: &'a str = "";
-        }
-        self.street.optional(&self._common, StreetDefault)
+    pub fn street<'a>(&'a self) -> ::puroro::Optional<&'a str, impl ::puroro::HasDefault<&'a str>> {
+        self.street.optional(&self._common)
     }
 
     pub fn street_mut<'s>(
@@ -92,11 +88,7 @@ impl<A: Allocator + Clone> Address<A> {
     // -- city (EXPLICIT string, proto field 2) ------------------------------
 
     pub fn city<'a>(&'a self) -> ::puroro::Optional<&'a str, impl ::puroro::HasDefault<&'a str>> {
-        struct CityDefault;
-        impl<'a> ::puroro::HasDefault<&'a str> for CityDefault {
-            const DEFAULT: &'a str = "";
-        }
-        self.city.optional(&self._common, CityDefault)
+        self.city.optional(&self._common)
     }
 
     pub fn city_mut<'s>(

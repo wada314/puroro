@@ -6,9 +6,9 @@ use ::core::marker::PhantomData;
 
 /// Zero-sized type carrying a compile-time default for explicit-presence fields.
 ///
-/// Generated code defines a private struct inside each accessor and implements
-/// this trait with the proto `[default = …]` value. For strings, use a
-/// lifetime-generic impl so `const DEFAULT: &'static str` coerces to any `&'a str`.
+/// Generated code defines a message-local ZST in `{message}/defaults.rs` when the
+/// proto field has `[default = …]`. Otherwise the field type's default `D`
+/// parameter is [`crate::defaults::ProtoDefault`].
 pub trait HasDefault<T: Copy> {
     const DEFAULT: T;
 }
@@ -27,8 +27,8 @@ pub struct Optional<T: Copy, D: HasDefault<T>> {
 }
 
 impl<T: Copy, D: HasDefault<T>> Optional<T, D> {
-    /// Creates an `Optional`. `_tag` is a zero-sized `D` for type inference.
-    pub fn new(value: Option<T>, _tag: D) -> Self {
+    /// Creates an `Optional` using the default marker `D` from the field type.
+    pub fn new(value: Option<T>) -> Self {
         Self { value, _phantom: PhantomData }
     }
 

@@ -12,6 +12,7 @@ use ::bytes::{Buf, BufMut};
 use crate::decode;
 use crate::encode;
 use crate::error::DecodeError;
+use crate::defaults::ProtoDefault;
 use crate::optional::{HasDefault, Optional};
 use crate::wire_type::WireType;
 
@@ -23,19 +24,24 @@ use super::varint::{self, VarintProtoType};
 /// Singular scalar on the wire as VARINT — parametrised by protobuf type `T`,
 /// presence policy `P` ([`Implicit`] / [`Explicit`](super::field_presence::Explicit)
 /// / [`LegacyRequired`](super::field_presence::LegacyRequired)), and proto field
-/// number `FIELD`.
+/// number `FIELD`, and compile-time default marker `D` ([`HasDefault`]).
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub struct SingularVarintField<T: VarintProtoType, P: FieldPresence, const FIELD: u32> {
+pub struct SingularVarintField<
+    T: VarintProtoType,
+    P: FieldPresence,
+    const FIELD: u32,
+    D = ProtoDefault,
+> {
     value: T::Value,
-    _presence: PhantomData<P>,
+    _marker: PhantomData<(P, D)>,
 }
 
-impl<T: VarintProtoType, P: FieldPresence, const FIELD: u32> SingularVarintField<T, P, FIELD> {
+impl<T: VarintProtoType, P: FieldPresence, const FIELD: u32, D> SingularVarintField<T, P, FIELD, D> {
     /// Creates a field with the protobuf type-zero in the value slot.
     pub fn new() -> Self {
         Self {
             value: T::proto_zero(),
-            _presence: PhantomData,
+            _marker: PhantomData,
         }
     }
 
@@ -62,7 +68,7 @@ impl<T: VarintProtoType, P: FieldPresence, const FIELD: u32> SingularVarintField
     pub fn bind<'f, 'c, Pb: PresenceBits, A: Allocator>(
         &'f mut self,
         common: &'c mut MessageCommon<Pb, A>,
-    ) -> SingularVarintFieldMut<'f, 'c, T, P, FIELD, Pb, A> {
+    ) -> SingularVarintFieldMut<'f, 'c, T, P, FIELD, D, Pb, A> {
         SingularVarintFieldMut::new(self, common)
     }
 
@@ -97,13 +103,13 @@ impl<T: VarintProtoType, P: FieldPresence, const FIELD: u32> SingularVarintField
     }
 }
 
-impl<T: VarintProtoType, const FIELD: u32> SingularVarintField<T, Implicit, FIELD> {
+impl<T: VarintProtoType, const FIELD: u32, D> SingularVarintField<T, Implicit, FIELD, D> {
     /// Binds an `Implicit`-presence **oneof variant** field for mutation.
     #[inline]
     pub fn bind_oneof<'f, 'c, Pb: PresenceBits, A: Allocator>(
         &'f mut self,
         common: &'c mut MessageCommon<Pb, A>,
-    ) -> SingularVarintFieldMut<'f, 'c, T, Implicit, FIELD, Pb, A> {
+    ) -> SingularVarintFieldMut<'f, 'c, T, Implicit, FIELD, D, Pb, A> {
         self.bind(common)
     }
 
@@ -126,17 +132,15 @@ impl<T: VarintProtoType, const FIELD: u32> SingularVarintField<T, Implicit, FIEL
     }
 }
 
-impl<T: VarintProtoType, P: FieldPresence, const FIELD: u32> Default
-    for SingularVarintField<T, P, FIELD>
+impl<T: VarintProtoType, P: FieldPresence, const FIELD: u32, D> Default
+    for SingularVarintField<T, P, FIELD, D>
 {
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl<T: VarintProtoType, P: ExplicitFieldPresence, const FIELD: u32>
-    SingularVarintField<T, P, FIELD>
-{
+impl<T: VarintProtoType, P: ExplicitFieldPresence, const FIELD: u32, D> SingularVarintField<T, P, FIELD, D> {
     #[inline]
     pub fn has<Pb, A>(&self, common: &MessageCommon<Pb, A>) -> bool
     where
@@ -145,24 +149,24 @@ impl<T: VarintProtoType, P: ExplicitFieldPresence, const FIELD: u32>
     {
         common.is_present(P::BIT)
     }
+}
 
-    pub fn optional<Pb, A, D>(
-        &self,
-        common: &MessageCommon<Pb, A>,
-        default: D,
-    ) -> Optional<T::Value, D>
+impl<T: VarintProtoType, P: ExplicitFieldPresence, const FIELD: u32, D> SingularVarintField<T, P, FIELD, D>
+where
+    D: HasDefault<T::Value>,
+    T::Value: Copy,
+{
+    pub fn optional<Pb, A>(&self, common: &MessageCommon<Pb, A>) -> Optional<T::Value, D>
     where
         Pb: PresenceBits,
         A: ::allocator_api2::alloc::Allocator,
-        D: HasDefault<T::Value>,
-        T::Value: Copy,
     {
         let v = if common.is_present(P::BIT) {
             Some(self.value)
         } else {
             None
         };
-        Optional::new(v, default)
+        Optional::new(v)
     }
 }
 
@@ -176,10 +180,11 @@ pub struct SingularVarintFieldMut<
     T: VarintProtoType,
     P: FieldPresence,
     const FIELD: u32,
+    D,
     Pb: PresenceBits,
     A: Allocator,
 > {
-    field: &'f mut SingularVarintField<T, P, FIELD>,
+    field: &'f mut SingularVarintField<T, P, FIELD, D>,
     common: &'c mut MessageCommon<Pb, A>,
 }
 
@@ -189,13 +194,14 @@ impl<
         T: VarintProtoType,
         P: FieldPresence,
         const FIELD: u32,
+        D,
         Pb: PresenceBits,
         A: Allocator,
-    > SingularVarintFieldMut<'f, 'c, T, P, FIELD, Pb, A>
+    > SingularVarintFieldMut<'f, 'c, T, P, FIELD, D, Pb, A>
 {
     #[inline]
     fn new(
-        field: &'f mut SingularVarintField<T, P, FIELD>,
+        field: &'f mut SingularVarintField<T, P, FIELD, D>,
         common: &'c mut MessageCommon<Pb, A>,
     ) -> Self {
         Self { field, common }
@@ -230,9 +236,10 @@ impl<
         T: VarintProtoType,
         P: ExplicitFieldPresence,
         const FIELD: u32,
+        D,
         Pb: PresenceBits,
         A: Allocator,
-    > SingularVarintFieldMut<'f, 'c, T, P, FIELD, Pb, A>
+    > SingularVarintFieldMut<'f, 'c, T, P, FIELD, D, Pb, A>
 {
     pub fn clear(self) {
         P::on_clear(self.common);
@@ -274,22 +281,22 @@ impl<
 // Type aliases
 // ---------------------------------------------------------------------------
 
-pub type SingularVarint<T, P, const FIELD: u32> = SingularVarintField<T, P, FIELD>;
+pub type SingularVarint<T, P, const FIELD: u32, D = ProtoDefault> = SingularVarintField<T, P, FIELD, D>;
 
 pub type ImplicitVarintField<T, const FIELD: u32> =
     SingularVarintField<T, super::field_presence::Implicit, FIELD>;
-pub type ExplicitVarintField<T, const BIT: usize, const FIELD: u32> =
-    SingularVarintField<T, super::field_presence::Explicit<BIT>, FIELD>;
-pub type LegacyRequiredVarintField<T, const BIT: usize, const FIELD: u32> =
-    SingularVarintField<T, super::field_presence::LegacyRequired<BIT>, FIELD>;
+pub type ExplicitVarintField<T, const BIT: usize, const FIELD: u32, D = ProtoDefault> =
+    SingularVarintField<T, super::field_presence::Explicit<BIT>, FIELD, D>;
+pub type LegacyRequiredVarintField<T, const BIT: usize, const FIELD: u32, D = ProtoDefault> =
+    SingularVarintField<T, super::field_presence::LegacyRequired<BIT>, FIELD, D>;
 
 pub type ImplicitVarint<T, const FIELD: u32> = ImplicitVarintField<T, FIELD>;
-pub type ExplicitVarint<T, const BIT: usize, const FIELD: u32> =
-    ExplicitVarintField<T, BIT, FIELD>;
+pub type ExplicitVarint<T, const BIT: usize, const FIELD: u32, D = ProtoDefault> =
+    ExplicitVarintField<T, BIT, FIELD, D>;
 
 pub type ImplicitInt32<const FIELD: u32> = ImplicitVarintField<varint::ProtoInt32, FIELD>;
-pub type ExplicitInt32<const BIT: usize, const FIELD: u32> =
-    ExplicitVarintField<varint::ProtoInt32, BIT, FIELD>;
+pub type ExplicitInt32<const BIT: usize, const FIELD: u32, D = ProtoDefault> =
+    ExplicitVarintField<varint::ProtoInt32, BIT, FIELD, D>;
 pub type ImplicitEnum<const FIELD: u32> = ImplicitVarintField<varint::ProtoEnum, FIELD>;
-pub type ExplicitEnum<const BIT: usize, const FIELD: u32> =
-    ExplicitVarintField<varint::ProtoEnum, BIT, FIELD>;
+pub type ExplicitEnum<const BIT: usize, const FIELD: u32, D = ProtoDefault> =
+    ExplicitVarintField<varint::ProtoEnum, BIT, FIELD, D>;

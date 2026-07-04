@@ -26,6 +26,7 @@
 //! for the generated-code implementation reference.
 
 pub mod decode;
+pub mod defaults;
 pub mod encode;
 pub mod error;
 pub mod fields;
@@ -52,5 +53,6 @@ pub use fields::{
     SingularLenField, SingularLenFieldMut, SingularVarint, SingularVarintField,
     SingularVarintFieldMut, VarintProtoType,
 };
+pub use defaults::ProtoDefault;
 pub use optional::{HasDefault, Optional};
 pub use wire_type::WireType;

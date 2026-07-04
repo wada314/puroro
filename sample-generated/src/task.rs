@@ -4,6 +4,7 @@
 //! Written for human readers: unlike real plugin output it uses short imported
 //! names instead of fully-qualified paths (see the crate root docs).
 
+mod defaults;
 mod notification;
 
 use ::allocator_api2::alloc::{Allocator, Global};
@@ -12,11 +13,13 @@ use ::bitvec::order::Lsb0;
 use ::bytes::{Buf, BufMut};
 
 use ::puroro::{
-    DecodeError, Explicit, HasDefault, Implicit, LegacyRequired, MessageCommon, MessageDecode,
-    MessageEncode, NestedMessageField, OneofSlot, Optional, PresenceBits, ProtoBytes, ProtoEnum,
-    ProtoInt32, ProtoString, RepeatedExpandedVarintField, RepeatedLenField,
-    RepeatedPackedVarintField, SingularLenField, SingularVarintField,
+    DecodeError, Explicit, HasDefault, Implicit, LegacyRequired, MessageCommon, MessageDecode, MessageEncode,
+    NestedMessageField, OneofSlot, Optional, PresenceBits, ProtoBytes, ProtoEnum, ProtoInt32,
+    ProtoString, RepeatedExpandedVarintField, RepeatedLenField, RepeatedPackedVarintField,
+    SingularLenField, SingularVarintField,
 };
+
+use defaults::MaxRetriesDefault;
 
 use crate::address::Address;
 use crate::enums::{Priority, Status};
@@ -84,7 +87,7 @@ pub struct Task<A: Allocator + Clone = Global> {
     _common: MessageCommon<TaskPresence, A>,
     title: SingularLenField<ProtoString, Explicit<{ BIT_TITLE }>, { FIELD_TITLE }, A>, // proto: string title = 1;
     score: SingularVarintField<ProtoInt32, Implicit, { FIELD_SCORE }>, // proto: int32 score = 2;
-    max_retries: SingularVarintField<ProtoInt32, Explicit<{ BIT_MAX_RETRIES }>, { FIELD_MAX_RETRIES }>, // proto: int32 max_retries = 3;
+    max_retries: SingularVarintField<ProtoInt32, Explicit<{ BIT_MAX_RETRIES }>, { FIELD_MAX_RETRIES }, MaxRetriesDefault>, // proto: int32 max_retries = 3;
     owner_id: SingularLenField<ProtoString, LegacyRequired<{ BIT_OWNER_ID }>, { FIELD_OWNER_ID }, A>, // proto: string owner_id = 4;
     payload: SingularLenField<ProtoBytes, Explicit<{ BIT_PAYLOAD }>, { FIELD_PAYLOAD }, A>, // proto: bytes payload = 5;
     tag_ids: RepeatedPackedVarintField<ProtoInt32, { FIELD_TAG_IDS }, A>, // proto: repeated int32 tag_ids = 6 [packed];
@@ -130,11 +133,7 @@ impl<A: Allocator + Clone> Task<A> {
     // -- title (EXPLICIT string, proto field 1) ----------------------------
 
     pub fn title<'a>(&'a self) -> Optional<&'a str, impl HasDefault<&'a str>> {
-        struct TitleDefault;
-        impl<'a> HasDefault<&'a str> for TitleDefault {
-            const DEFAULT: &'a str = "";
-        }
-        self.title.optional(&self._common, TitleDefault)
+        self.title.optional(&self._common)
     }
 
     pub fn title_mut<'s>(
@@ -160,12 +159,7 @@ impl<A: Allocator + Clone> Task<A> {
     // -- max_retries (EXPLICIT int32, default = 3, proto field 3) ------------
 
     pub fn max_retries(&self) -> Optional<i32, impl HasDefault<i32>> {
-        struct MaxRetriesDefault;
-        impl HasDefault<i32> for MaxRetriesDefault {
-            const DEFAULT: i32 = 3;
-        }
-        self.max_retries
-            .optional(&self._common, MaxRetriesDefault)
+        self.max_retries.optional(&self._common)
     }
 
     pub fn max_retries_mut(&mut self) -> &mut i32 {
@@ -179,12 +173,7 @@ impl<A: Allocator + Clone> Task<A> {
     // -- owner_id (LEGACY_REQUIRED string, proto field 4) --------------------
 
     pub fn owner_id<'a>(&'a self) -> Optional<&'a str, impl HasDefault<&'a str>> {
-        struct OwnerIdDefault;
-        impl<'a> HasDefault<&'a str> for OwnerIdDefault {
-            const DEFAULT: &'a str = "";
-        }
-        self.owner_id
-            .optional(&self._common, OwnerIdDefault)
+        self.owner_id.optional(&self._common)
     }
 
     pub fn owner_id_mut<'s>(
@@ -200,12 +189,7 @@ impl<A: Allocator + Clone> Task<A> {
     // -- payload (EXPLICIT bytes, proto field 5) -----------------------------
 
     pub fn payload<'a>(&'a self) -> Optional<&'a [u8], impl HasDefault<&'a [u8]>> {
-        struct PayloadDefault;
-        impl<'a> HasDefault<&'a [u8]> for PayloadDefault {
-            const DEFAULT: &'a [u8] = &[];
-        }
-        self.payload
-            .optional(&self._common, PayloadDefault)
+        self.payload.optional(&self._common)
     }
 
     pub fn payload_mut<'s>(
