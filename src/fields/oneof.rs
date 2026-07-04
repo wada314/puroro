@@ -11,6 +11,10 @@
 //! released through [`OneofDeallocate::deallocate`] before the slot is overwritten.
 
 use ::allocator_api2::alloc::Allocator;
+use ::bytes::{Buf, BufMut};
+
+use crate::error::DecodeError;
+use crate::wire_type::WireType;
 
 use super::common::MessageCommon;
 use super::presence::PresenceBits;
@@ -36,6 +40,35 @@ pub trait OneofDeallocate<A: Allocator> {
     ///
     /// `alloc` must be the allocator that owns the variant's buffers.
     unsafe fn deallocate(self, alloc: A);
+}
+
+/// Wire encode behaviour for a generated oneof storage enum variant.
+pub trait OneofEncodable {
+    /// Wire byte length of this active variant.
+    fn encoded_len_wire(&self) -> usize;
+
+    /// Encodes this active variant.
+    fn encode_raw_wire<B: BufMut>(&self, buf: &mut B);
+}
+
+/// Wire decode behaviour for a generated oneof storage enum.
+///
+/// Implemented by the crate-internal enum held in [`OneofSlot`]. Lets the parent
+/// message use the same `encoded_len` / `encode_raw` / merge shape as other
+/// fields without storage-specific static helpers.
+pub trait OneofGroup<A: Allocator + Clone>: OneofDeallocate<A> + OneofEncodable {
+    /// Merges a wire occurrence into the matching variant, selecting it first.
+    fn merge_wire<Pb, B>(
+        slot: &mut OneofSlot<Self>,
+        common: &mut MessageCommon<Pb, A>,
+        field_number: u32,
+        wire_type: WireType,
+        buf: &mut B,
+    ) -> Result<(), DecodeError>
+    where
+        Pb: PresenceBits,
+        B: Buf,
+        Self: Sized;
 }
 
 /// Storage for a protobuf `oneof` group.
@@ -113,6 +146,39 @@ impl<E> OneofSlot<E> {
     #[inline]
     pub fn clear(&mut self) {
         self.value = None;
+    }
+}
+
+impl<E: OneofEncodable> OneofSlot<E> {
+    /// Wire byte length when a variant is active (same shape as nested/repeated fields).
+    pub fn encoded_len(&self) -> usize {
+        self.get().map(E::encoded_len_wire).unwrap_or(0)
+    }
+
+    /// Encodes the active variant (same shape as nested/repeated fields).
+    pub fn encode_raw<B: BufMut>(&self, buf: &mut B) {
+        if let Some(v) = self.get() {
+            v.encode_raw_wire(buf);
+        }
+    }
+}
+
+impl<E> OneofSlot<E> {
+    /// Merges a wire occurrence for one member of this oneof group.
+    pub fn merge_wire<Pb, A, B>(
+        &mut self,
+        common: &mut MessageCommon<Pb, A>,
+        field_number: u32,
+        wire_type: WireType,
+        buf: &mut B,
+    ) -> Result<(), DecodeError>
+    where
+        E: OneofGroup<A>,
+        A: Allocator + Clone,
+        Pb: PresenceBits,
+        B: Buf,
+    {
+        E::merge_wire(self, common, field_number, wire_type, buf)
     }
 }
 

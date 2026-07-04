@@ -39,10 +39,11 @@
 //! for exactly that case.
 
 use ::allocator_api2::alloc::Allocator;
-use ::bytes::BufMut;
+use ::bytes::{Buf, BufMut};
 use ::puroro::{
-    Implicit, MessageCommon, NestedMessageField, OneofDeallocate, OneofSlot, PresenceBits, Present,
-    ProtoInt32, ProtoString, SingularLenField, SingularVarintField,
+    DecodeError, Implicit, MessageCommon, NestedMessageField, OneofDeallocate, OneofEncodable, OneofGroup,
+    OneofSlot, PresenceBits, Present, ProtoInt32, ProtoString, SingularLenField, SingularVarintField,
+    WireType,
 };
 use ::unmanaged::string::StringGuard;
 
@@ -192,24 +193,74 @@ impl<
         };
         f
     }
+}
 
-    pub(crate) fn encoded_len(slot: &OneofSlot<Self>) -> usize {
-        match slot.get() {
-            Some(Self::EmailAddress(f)) => f.encoded_len_wire(),
-            Some(Self::PhoneNumber(f)) => f.encoded_len_wire(),
-            Some(Self::WebhookId(f)) => f.encoded_len_wire(),
-            Some(Self::Postal(f)) => f.encoded_len_wire(),
-            None => 0,
+impl<
+        A: Allocator + Clone,
+        const FIELD_EMAIL_ADDRESS: u32,
+        const FIELD_PHONE_NUMBER: u32,
+        const FIELD_WEBHOOK_ID: u32,
+        const FIELD_POSTAL: u32,
+    > OneofEncodable
+    for NotificationStorage<A, FIELD_EMAIL_ADDRESS, FIELD_PHONE_NUMBER, FIELD_WEBHOOK_ID, FIELD_POSTAL>
+{
+    fn encoded_len_wire(&self) -> usize {
+        match self {
+            Self::EmailAddress(f) => f.encoded_len_wire(),
+            Self::PhoneNumber(f) => f.encoded_len_wire(),
+            Self::WebhookId(f) => f.encoded_len_wire(),
+            Self::Postal(f) => f.encoded_len_wire(),
         }
     }
 
-    pub(crate) fn encode<B: BufMut>(slot: &OneofSlot<Self>, buf: &mut B) {
-        match slot.get() {
-            Some(Self::EmailAddress(f)) => f.encode_raw_wire(buf),
-            Some(Self::PhoneNumber(f)) => f.encode_raw_wire(buf),
-            Some(Self::WebhookId(f)) => f.encode_raw_wire(buf),
-            Some(Self::Postal(f)) => f.encode_raw_wire(buf),
-            None => {}
+    fn encode_raw_wire<B: BufMut>(&self, buf: &mut B) {
+        match self {
+            Self::EmailAddress(f) => f.encode_raw_wire(buf),
+            Self::PhoneNumber(f) => f.encode_raw_wire(buf),
+            Self::WebhookId(f) => f.encode_raw_wire(buf),
+            Self::Postal(f) => f.encode_raw_wire(buf),
+        }
+    }
+}
+
+impl<
+        A: Allocator + Clone,
+        const FIELD_EMAIL_ADDRESS: u32,
+        const FIELD_PHONE_NUMBER: u32,
+        const FIELD_WEBHOOK_ID: u32,
+        const FIELD_POSTAL: u32,
+    > OneofGroup<A>
+    for NotificationStorage<A, FIELD_EMAIL_ADDRESS, FIELD_PHONE_NUMBER, FIELD_WEBHOOK_ID, FIELD_POSTAL>
+{
+    fn merge_wire<Pb, B>(
+        slot: &mut OneofSlot<Self>,
+        common: &mut MessageCommon<Pb, A>,
+        field_number: u32,
+        wire_type: WireType,
+        buf: &mut B,
+    ) -> Result<(), DecodeError>
+    where
+        Pb: PresenceBits,
+        B: Buf,
+    {
+        if field_number == FIELD_EMAIL_ADDRESS {
+            Self::bind_email_address_mut(slot, common)
+                .bind_oneof(common)
+                .merge(wire_type, buf)
+        } else if field_number == FIELD_PHONE_NUMBER {
+            Self::bind_phone_number_mut(slot, common)
+                .bind_oneof(common)
+                .merge(wire_type, buf)
+        } else if field_number == FIELD_WEBHOOK_ID {
+            Self::bind_webhook_id_mut(slot, common)
+                .bind_oneof(common)
+                .merge(wire_type, buf)
+        } else if field_number == FIELD_POSTAL {
+            Self::bind_postal_mut(slot, common)
+                .bind_oneof(common)
+                .merge(wire_type, buf)
+        } else {
+            Err(DecodeError::InvalidTag)
         }
     }
 }

@@ -50,7 +50,7 @@ pub use len_field::{
 pub use message::{
     MessagePresence, NestedMessage, NestedMessageField, NestedMessageFieldMut, Present,
 };
-pub use oneof::{OneofDeallocate, OneofSlot, OneofSlotMut};
+pub use oneof::{OneofDeallocate, OneofEncodable, OneofGroup, OneofSlot, OneofSlotMut};
 pub use presence::PresenceBits;
 pub use repeated_encoding::{Expanded, Packed, RepeatedVarintEncoding};
 pub use repeated_len::{

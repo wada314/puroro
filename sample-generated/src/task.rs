@@ -416,7 +416,7 @@ impl<A: Allocator + Clone> MessageEncode for Task<A> {
         n += self.status.encoded_len(c);
         n += self.priority.encoded_len(c);
         n += self.assignee.encoded_len();
-        n += NotificationStorage::encoded_len(&self.notification);
+        n += self.notification.encoded_len();
         n + c.unknown_fields.len()
     }
 
@@ -433,7 +433,7 @@ impl<A: Allocator + Clone> MessageEncode for Task<A> {
         self.status.encode_raw(c, buf);
         self.priority.encode_raw(c, buf);
         self.assignee.encode_raw(buf);
-        NotificationStorage::encode(&self.notification, buf);
+        self.notification.encode_raw(buf);
         let unknown: &[u8] = &c.unknown_fields;
         buf.put_slice(unknown);
     }
@@ -506,40 +506,9 @@ impl<A: Allocator + Clone> MessageDecode for Task<A> {
                         .bind(&mut self._common)
                         .merge(wire_type, buf)?;
                 }
-                FIELD_EMAIL_ADDRESS => {
-                    // notification.email_address = 12 (LEN variant): select the
-                    // variant (freeing any other), then merge via the field's bind.
-                    let f = NotificationStorage::bind_email_address_mut(
-                        &mut self.notification,
-                        &mut self._common,
-                    );
-                    f.bind_oneof(&mut self._common).merge(wire_type, buf)?;
-                }
-                FIELD_PHONE_NUMBER => {
-                    // notification.phone_number = 13 (LEN variant)
-                    let f = NotificationStorage::bind_phone_number_mut(
-                        &mut self.notification,
-                        &mut self._common,
-                    );
-                    f.bind_oneof(&mut self._common).merge(wire_type, buf)?;
-                }
-                FIELD_WEBHOOK_ID => {
-                    // notification.webhook_id = 14 (varint variant)
-                    let f = NotificationStorage::bind_webhook_id_mut(
-                        &mut self.notification,
-                        &mut self._common,
-                    );
-                    f.bind_oneof(&mut self._common).merge(wire_type, buf)?;
-                }
-                FIELD_POSTAL => {
-                    // notification.postal = 15 (message variant): merge into the
-                    // (present) child via the field's bind (same shape as the
-                    // other variants).
-                    let f = NotificationStorage::bind_postal_mut(
-                        &mut self.notification,
-                        &mut self._common,
-                    );
-                    f.bind_oneof(&mut self._common).merge(wire_type, buf)?;
+                FIELD_EMAIL_ADDRESS | FIELD_PHONE_NUMBER | FIELD_WEBHOOK_ID | FIELD_POSTAL => {
+                    self.notification
+                        .merge_wire(&mut self._common, field_number, wire_type, buf)?;
                 }
                 _ => {
                     // unknown field — preserve in _common.unknown_fields

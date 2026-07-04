@@ -44,7 +44,7 @@ pub use fields::{
     FieldPresence, Implicit, ImplicitBytes, ImplicitEnum, ImplicitInt32, ImplicitLenField,
     ImplicitString, ImplicitVarint, ImplicitVarintField, LegacyRequired, LenProtoType,
     MessageCommon, MessagePresence, NestedMessage, NestedMessageField, NestedMessageFieldMut,
-    OneofDeallocate, OneofSlot, OneofSlotMut, Expanded, Packed, Present, PresenceBits, ProtoBool,
+    OneofDeallocate, OneofEncodable, OneofGroup, OneofSlot, OneofSlotMut, Expanded, Packed, Present, PresenceBits, ProtoBool,
     ProtoBytes, ProtoEnum, ProtoInt32, ProtoInt64, ProtoSint32, ProtoSint64, ProtoString,
     ProtoUInt32, ProtoUInt64, RepeatedBytes, RepeatedExpandedInt32, RepeatedExpandedVarintField,
     RepeatedLen, RepeatedLenField, RepeatedLenFieldMut, RepeatedPackedInt32,
