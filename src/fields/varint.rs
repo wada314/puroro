@@ -10,6 +10,8 @@ use ::protobuf_core::Varint;
 use crate::error::DecodeError;
 use crate::wire_type::WireType;
 
+use super::proto_zero::ProtoZero;
+
 // ---------------------------------------------------------------------------
 // Core trait
 // ---------------------------------------------------------------------------
@@ -20,10 +22,7 @@ use crate::wire_type::WireType;
 /// [`Varint`] from `protobuf-core` for all encode/decode conversions.
 pub trait VarintProtoType {
     /// Rust storage (`i32`, `u64`, `bool`, …).
-    type Value: Copy + PartialEq;
-
-    /// Value used for IMPLICIT omit-on-encode and unset slot storage.
-    fn proto_zero() -> Self::Value;
+    type Value: Copy + ProtoZero;
 
     /// Converts a decoded raw varint (numeric wire value) into the semantic value.
     fn decode_wire(raw: u64) -> Result<Self::Value, DecodeError>;
@@ -57,10 +56,6 @@ pub struct ProtoEnum<E: ProtoEnumStorage>(PhantomData<E>);
 impl<E: ProtoEnumStorage> VarintProtoType for ProtoEnum<E> {
     type Value = E;
 
-    fn proto_zero() -> Self::Value {
-        E::proto_zero()
-    }
-
     fn decode_wire(raw: u64) -> Result<Self::Value, DecodeError> {
         E::decode_from_wire(ProtoInt32::decode_wire(raw)?)
     }
@@ -80,10 +75,6 @@ pub struct ProtoUInt32;
 impl VarintProtoType for ProtoUInt32 {
     type Value = u32;
 
-    fn proto_zero() -> Self::Value {
-        0
-    }
-
     fn decode_wire(raw: u64) -> Result<Self::Value, DecodeError> {
         Varint::from_uint64(raw).try_to_uint32().map_err(Into::into)
     }
@@ -98,10 +89,6 @@ pub struct ProtoUInt64;
 
 impl VarintProtoType for ProtoUInt64 {
     type Value = u64;
-
-    fn proto_zero() -> Self::Value {
-        0
-    }
 
     fn decode_wire(raw: u64) -> Result<Self::Value, DecodeError> {
         Ok(Varint::from_uint64(raw).to_uint64())
@@ -118,10 +105,6 @@ pub struct ProtoInt32;
 impl VarintProtoType for ProtoInt32 {
     type Value = i32;
 
-    fn proto_zero() -> Self::Value {
-        0
-    }
-
     fn decode_wire(raw: u64) -> Result<Self::Value, DecodeError> {
         Varint::from_uint64(raw).try_to_int32().map_err(Into::into)
     }
@@ -136,10 +119,6 @@ pub struct ProtoInt64;
 
 impl VarintProtoType for ProtoInt64 {
     type Value = i64;
-
-    fn proto_zero() -> Self::Value {
-        0
-    }
 
     fn decode_wire(raw: u64) -> Result<Self::Value, DecodeError> {
         Ok(Varint::from_uint64(raw).to_int64())
@@ -157,10 +136,6 @@ pub struct ProtoSint32;
 impl VarintProtoType for ProtoSint32 {
     type Value = i32;
 
-    fn proto_zero() -> Self::Value {
-        0
-    }
-
     fn decode_wire(raw: u64) -> Result<Self::Value, DecodeError> {
         Varint::from_uint64(raw).try_to_sint32().map_err(Into::into)
     }
@@ -177,10 +152,6 @@ pub struct ProtoSint64;
 impl VarintProtoType for ProtoSint64 {
     type Value = i64;
 
-    fn proto_zero() -> Self::Value {
-        0
-    }
-
     fn decode_wire(raw: u64) -> Result<Self::Value, DecodeError> {
         Ok(Varint::from_uint64(raw).to_sint64())
     }
@@ -196,10 +167,6 @@ pub struct ProtoBool;
 
 impl VarintProtoType for ProtoBool {
     type Value = bool;
-
-    fn proto_zero() -> Self::Value {
-        false
-    }
 
     fn decode_wire(raw: u64) -> Result<Self::Value, DecodeError> {
         Ok(Varint::from_uint64(raw).to_bool())

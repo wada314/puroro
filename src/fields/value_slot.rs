@@ -3,28 +3,43 @@
 //!
 //! [`ValueSlot`] is implemented for raw `T` and [`MaybeUninit<T>`]. The trait's
 //! type parameter `T` disambiguates the two blanket impls so they do not overlap.
+//!
+//! Presence-aware mutation ([`FieldPresence::write_slot`](super::field_presence::FieldPresence::write_slot),
+//! [`clear_slot`](super::field_presence::FieldPresence::clear_slot),
+//! [`prepare_mut_slot`](super::field_presence::FieldPresence::prepare_mut_slot)) lives on
+//! [`FieldPresence`](super::field_presence::FieldPresence).
 
 use ::core::mem::MaybeUninit;
 
-/// Operations on a singular field's value slot.
-pub trait ValueSlot<T> {
+use super::proto_zero::ProtoZero;
+
+/// Storage operations for a singular field value slot.
+pub trait ValueSlot<T: ProtoZero> {
     /// Constructs an empty slot at message creation (`new_in` / `Default`).
     ///
-    /// For raw `T`, stores `proto_zero`. For [`MaybeUninit`], leaves the slot
-    /// uninitialized.
-    fn new_in(proto_zero: T) -> Self;
+    /// For raw `T`, writes type-zero via [`ProtoZero::set_proto_zero`]. For
+    /// [`MaybeUninit`], leaves the slot uninitialized.
+    fn new_empty() -> Self;
 
-    /// Writes a value after merge or setter.
+    /// Writes `value` into the slot **without** dropping a previous value.
     ///
-    /// `replacing` is `true` when the slot already holds an initialized value
-    /// (e.g. explicit presence was already set).
-    fn write(&mut self, value: T, replacing: bool);
+    /// For [`MaybeUninit`], uses [`MaybeUninit::write`].
+    ///
+    /// For raw `T`, assigns in place (same as [`write_dropping_previous`](Self::write_dropping_previous)).
+    ///
+    /// # Safety
+    ///
+    /// For [`MaybeUninit`], the slot must be **uninitialized** before this call.
+    unsafe fn write_without_drop(&mut self, value: T);
 
-    /// Clears the payload slot (bitfield updates are handled separately).
+    /// Overwrites the slot with `value`, **dropping** the previous value if `T: Drop`.
     ///
-    /// For raw `T`, always stores `proto_zero`. For [`MaybeUninit`], drops the
-    /// initialized value when `was_set` is `true`, leaving the slot uninitialized.
-    fn clear(&mut self, proto_zero: T, was_set: bool);
+    /// For [`MaybeUninit`], assigns through [`MaybeUninit::assume_init_mut`].
+    ///
+    /// # Safety
+    ///
+    /// For [`MaybeUninit`], the slot must be **initialized** before this call.
+    unsafe fn write_dropping_previous(&mut self, value: T);
 
     /// Borrows the stored value.
     ///
@@ -33,61 +48,46 @@ pub trait ValueSlot<T> {
     /// For [`MaybeUninit`] slots, the caller must ensure the slot is initialized
     /// (e.g. explicit presence bit is set).
     unsafe fn read_unchecked(&self) -> &T;
-
-    /// Mutably borrows the stored value.
-    ///
-    /// # Safety
-    ///
-    /// Same as [`read_unchecked`](Self::read_unchecked).
-    unsafe fn mut_unchecked(&mut self) -> &mut T;
 }
 
-impl<T> ValueSlot<T> for T {
-    fn new_in(proto_zero: T) -> Self {
-        proto_zero
+impl<T: ProtoZero> ValueSlot<T> for T {
+    fn new_empty() -> Self {
+        let mut slot = MaybeUninit::<T>::uninit();
+        unsafe {
+            T::set_proto_zero(&mut *slot.as_mut_ptr());
+            slot.assume_init()
+        }
     }
 
-    fn write(&mut self, value: T, _replacing: bool) {
+    unsafe fn write_without_drop(&mut self, value: T) {
         *self = value;
     }
 
-    fn clear(&mut self, proto_zero: T, _was_set: bool) {
-        *self = proto_zero;
+    unsafe fn write_dropping_previous(&mut self, value: T) {
+        *self = value;
     }
 
     unsafe fn read_unchecked(&self) -> &T {
         self
     }
-
-    unsafe fn mut_unchecked(&mut self) -> &mut T {
-        self
-    }
 }
 
-impl<T> ValueSlot<T> for MaybeUninit<T> {
-    fn new_in(_proto_zero: T) -> Self {
+impl<T: ProtoZero> ValueSlot<T> for MaybeUninit<T> {
+    fn new_empty() -> Self {
         MaybeUninit::uninit()
     }
 
-    fn write(&mut self, value: T, replacing: bool) {
-        if replacing {
-            unsafe { *self.assume_init_mut() = value };
-        } else {
-            self.write(value);
-        }
+    unsafe fn write_without_drop(&mut self, value: T) {
+        self.write(value);
     }
 
-    fn clear(&mut self, _proto_zero: T, was_set: bool) {
-        if was_set {
-            unsafe { self.assume_init_drop() };
+    unsafe fn write_dropping_previous(&mut self, value: T) {
+        unsafe {
+            *self.assume_init_mut() = value;
         }
     }
 
     unsafe fn read_unchecked(&self) -> &T {
         unsafe { self.assume_init_ref() }
-    }
-
-    unsafe fn mut_unchecked(&mut self) -> &mut T {
-        unsafe { self.assume_init_mut() }
     }
 }

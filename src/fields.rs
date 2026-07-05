@@ -31,6 +31,7 @@ pub mod len_field;
 pub mod message;
 pub mod oneof;
 pub mod presence;
+pub mod proto_zero;
 pub mod repeated_encoding;
 pub mod repeated_len;
 pub mod repeated_varint;

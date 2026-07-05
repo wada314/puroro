@@ -45,7 +45,7 @@ where
     #[inline]
     pub fn new_in<A: Allocator>(_alloc: A) -> Self {
         Self {
-            value: ValueSlot::new_in(T::proto_zero()),
+            value: ValueSlot::new_empty(),
             _marker: PhantomData,
         }
     }
@@ -62,17 +62,6 @@ where
         *unsafe { ValueSlot::read_unchecked(&self.value) }
     }
 
-    /// Presence-agnostic mutable access to the value slot.
-    ///
-    /// Regular message fields mutate through [`bind`](Self::bind) (to fold in the
-    /// presence bit); [`Oneof`] variants use [`bind`](Self::bind) too, but the
-    /// marker's `on_set` is a no-op because the enclosing `OneofSlot` tracks
-    /// presence.
-    #[inline]
-    pub fn value_mut(&mut self) -> &mut T::Value {
-        unsafe { ValueSlot::mut_unchecked(&mut self.value) }
-    }
-
     /// Binds this field to its message `common` state (presence), producing a
     /// short-lived [`SingularVarintFieldMut`] view that carries the whole
     /// mutation context.
@@ -84,22 +73,12 @@ where
         SingularVarintFieldMut::new(self, common)
     }
 
-    /// Resets the value slot (does not touch the bitfield).
-    ///
-    /// `was_set` must reflect whether the field was present before clearing
-    /// (explicit / legacy required); implicit callers may pass any value.
-    #[inline]
-    pub fn clear_value(&mut self, was_set: bool) {
-        ValueSlot::clear(&mut self.value, T::proto_zero(), was_set);
-    }
-
     pub fn encoded_len<Pb, A>(&self, common: &MessageCommon<Pb, A>) -> usize
     where
         Pb: PresenceBits,
         A: ::allocator_api2::alloc::Allocator,
     {
-        let proto_zero = T::proto_zero();
-        if P::should_emit(common, || P::payload_is_empty(&self.value, proto_zero)) {
+        if P::should_emit(common, || P::payload_is_empty(&self.value)) {
             let v = *unsafe { ValueSlot::read_unchecked(&self.value) };
             encode::encoded_len_varint_field(FIELD, T::encode_wire(v))
         } else {
@@ -112,8 +91,7 @@ where
         Pb: PresenceBits,
         A: ::allocator_api2::alloc::Allocator,
     {
-        let proto_zero = T::proto_zero();
-        if P::should_emit(common, || P::payload_is_empty(&self.value, proto_zero)) {
+        if P::should_emit(common, || P::payload_is_empty(&self.value)) {
             let v = *unsafe { ValueSlot::read_unchecked(&self.value) };
             encode::encode_varint_field(FIELD, T::encode_wire(v), buf);
         }
@@ -125,8 +103,7 @@ where
         Pb: PresenceBits,
         A: ::allocator_api2::alloc::Allocator,
     {
-        let proto_zero = T::proto_zero();
-        P::is_set(common, || P::payload_is_empty(&self.value, proto_zero))
+        P::is_set(common, || P::payload_is_empty(&self.value))
     }
 }
 
@@ -141,13 +118,23 @@ where
         Pb: PresenceBits,
         A: ::allocator_api2::alloc::Allocator,
     {
-        let proto_zero = T::proto_zero();
-        let v = if P::is_set(common, || P::payload_is_empty(&self.value, proto_zero)) {
+        let v = if P::is_set(common, || P::payload_is_empty(&self.value)) {
             Some(*unsafe { ValueSlot::read_unchecked(&self.value) })
         } else {
             None
         };
         Optional::new(v)
+    }
+}
+
+impl<T: VarintProtoType, const FIELD: u32, D> SingularVarintField<T, super::field_presence::Oneof, FIELD, D>
+where
+    T::Value: super::proto_zero::ProtoZero,
+{
+    /// Mutable access for [`Oneof`] variants — slot is always-initialized `T::Value`.
+    #[inline]
+    pub fn value_mut(&mut self) -> &mut T::Value {
+        &mut self.value
     }
 }
 
@@ -158,7 +145,7 @@ where
 {
     fn default() -> Self {
         Self {
-            value: ValueSlot::new_in(T::proto_zero()),
+            value: ValueSlot::new_empty(),
             _marker: PhantomData,
         }
     }
@@ -205,23 +192,13 @@ where
 
     #[inline]
     pub fn value_mut(self) -> &'f mut T::Value {
-        let proto_zero = T::proto_zero();
-        let replacing =
-            P::is_set(self.common, || P::payload_is_empty(&self.field.value, proto_zero));
-        P::on_set(self.common);
-        if !replacing {
-            ValueSlot::write(&mut self.field.value, proto_zero, false);
-        }
-        unsafe { ValueSlot::mut_unchecked(&mut self.field.value) }
+        P::prepare_mut_slot(self.common, &mut self.field.value)
     }
 
     #[inline]
     pub fn set(self, v: T::Value) {
-        let proto_zero = T::proto_zero();
-        let replacing =
-            P::is_set(self.common, || P::payload_is_empty(&self.field.value, proto_zero));
+        P::write_slot(self.common, &mut self.field.value, v);
         P::on_set(self.common);
-        ValueSlot::write(&mut self.field.value, v, replacing);
     }
 
     pub fn merge<B: Buf>(self, wire_type: WireType, buf: &mut B) -> Result<(), DecodeError> {
@@ -229,11 +206,8 @@ where
             return Err(DecodeError::InvalidTag);
         }
         let raw = decode::decode_varint(buf)?;
-        let proto_zero = T::proto_zero();
-        let replacing =
-            P::is_set(self.common, || P::payload_is_empty(&self.field.value, proto_zero));
+        P::write_slot(self.common, &mut self.field.value, T::decode_wire(raw)?);
         P::on_set(self.common);
-        ValueSlot::write(&mut self.field.value, T::decode_wire(raw)?, replacing);
         Ok(())
     }
 
@@ -242,11 +216,8 @@ where
     /// For [`Implicit`](super::field_presence::Implicit) fields this omits the field on
     /// the wire (equivalent to assigning the type-zero); `on_clear` is a no-op.
     pub fn clear(self) {
-        let proto_zero = T::proto_zero();
-        let was_set =
-            P::is_set(self.common, || P::payload_is_empty(&self.field.value, proto_zero));
+        P::clear_slot(self.common, &mut self.field.value);
         P::on_clear(self.common);
-        self.field.clear_value(was_set);
     }
 }
 
@@ -290,11 +261,8 @@ where
             );
             return Ok(());
         }
-        let proto_zero = T::proto_zero();
-        let replacing =
-            P::is_set(self.common, || P::payload_is_empty(&self.field.value, proto_zero));
+        P::write_slot(self.common, &mut self.field.value, T::decode_wire(raw)?);
         P::on_set(self.common);
-        ValueSlot::write(&mut self.field.value, T::decode_wire(raw)?, replacing);
         Ok(())
     }
 }
