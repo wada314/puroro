@@ -190,19 +190,11 @@ impl<
         P::on_set(self.common);
         Ok(())
     }
-}
 
-impl<
-        'f,
-        'c,
-        T: LenProtoType,
-        P: ExplicitFieldPresence,
-        const FIELD: u32,
-        A: Allocator,
-        D,
-        Pb: PresenceBits,
-    > SingularLenFieldMut<'f, 'c, T, P, FIELD, A, D, Pb>
-{
+    /// Resets payload to empty / type-zero and clears explicit presence when applicable.
+    ///
+    /// For [`Implicit`](super::field_presence::Implicit) fields this omits the field on
+    /// the wire; `on_clear` is a no-op.
     pub fn clear(self)
     where
         A: Clone,

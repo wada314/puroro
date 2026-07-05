@@ -108,6 +108,25 @@ fn oneof_switching_frees_previous_variant() {
 }
 
 #[test]
+fn implicit_clear_omits_from_wire() {
+    let mut task = Task::new();
+    task.owner_id_mut().push_str("user-1");
+    *task.score_mut() = 42;
+    *task.status_mut() = Status::PENDING;
+
+    task.clear_score();
+    task.clear_status();
+
+    assert_eq!(task.score(), 0);
+    assert!(!task.status().is_set());
+
+    let bytes = task.encode_to_vec();
+    let decoded: Task = Task::decode(&bytes[..]).unwrap();
+    assert_eq!(decoded.score(), 0);
+    assert!(!decoded.status().is_set());
+}
+
+#[test]
 fn closed_enum_unknown_goes_to_unknown_fields() {
     let mut task = Task::new();
     task.owner_id_mut().push_str("x");

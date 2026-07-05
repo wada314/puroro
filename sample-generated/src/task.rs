@@ -156,6 +156,10 @@ impl<A: Allocator + Clone> Task<A> {
         self.score.bind(&mut self._common).value_mut()
     }
 
+    pub fn clear_score(&mut self) {
+        self.score.bind(&mut self._common).clear();
+    }
+
     // -- max_retries (EXPLICIT int32, default = 3, proto field 3) ------------
 
     pub fn max_retries(&self) -> Optional<i32, impl HasDefault<i32>> {
@@ -258,6 +262,10 @@ impl<A: Allocator + Clone> Task<A> {
 
     pub fn status_mut(&mut self) -> &mut Status {
         self.status.bind(&mut self._common).value_mut()
+    }
+
+    pub fn clear_status(&mut self) {
+        self.status.bind(&mut self._common).clear();
     }
 
     // -- priority (EXPLICIT closed enum, proto field 10) ---------------------

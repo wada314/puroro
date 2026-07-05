@@ -224,6 +224,15 @@ impl<
         self.field.value = T::decode_wire(raw)?;
         Ok(())
     }
+
+    /// Resets the value slot to type-zero and clears explicit presence when applicable.
+    ///
+    /// For [`Implicit`](super::field_presence::Implicit) fields this omits the field on
+    /// the wire (equivalent to assigning the type-zero); `on_clear` is a no-op.
+    pub fn clear(self) {
+        P::on_clear(self.common);
+        self.field.clear_value();
+    }
 }
 
 impl<
@@ -237,11 +246,6 @@ impl<
         A: Allocator,
     > SingularVarintFieldMut<'f, 'c, T, P, FIELD, D, Pb, A>
 {
-    pub fn clear(self) {
-        P::on_clear(self.common);
-        self.field.value = T::proto_zero();
-    }
-
     /// Merges a closed-enum occurrence; unknown values go to `common.unknown_fields`.
     ///
     /// `is_known` is called with the decoded `i32` wire value before it is stored.
