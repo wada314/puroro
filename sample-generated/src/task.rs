@@ -31,7 +31,7 @@ pub use notification::{NotificationCase, NotificationMut, NotificationRef};
 // Presence bitfield (5 tracked singular fields)
 // ---------------------------------------------------------------------------
 
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, Default)]
 pub struct TaskPresence(BitArray<[u8; 1], Lsb0>);
 
 impl TaskPresence {

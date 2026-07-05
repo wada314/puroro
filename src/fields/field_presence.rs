@@ -7,14 +7,21 @@
 //! [`Oneof`] have none.
 
 use ::allocator_api2::alloc::Allocator;
+use ::core::mem::MaybeUninit;
 
 use crate::error::DecodeError;
 
 use super::common::MessageCommon;
 use super::presence::PresenceBits;
+use super::value_slot::ValueSlot;
 
 /// Encode / merge / clear behaviour for singular field presence.
 pub trait FieldPresence: Copy {
+    /// Stored value layout for singular scalar fields.
+    ///
+    /// [`Implicit`] and [`Oneof`] use always-initialized `T`; [`Explicit`] and
+    /// [`LegacyRequired`] use [`MaybeUninit<T>`].
+    type ValueSlot<T: PartialEq>: ValueSlot<T>;
     /// `true` when this field should be written on the wire.
     ///
     /// `is_payload_empty` is evaluated only when the policy depends on the stored
@@ -57,6 +64,8 @@ pub trait FieldPresence: Copy {
 pub struct Implicit;
 
 impl FieldPresence for Implicit {
+    type ValueSlot<T: PartialEq> = T;
+
     fn should_emit<P, A, F>(_: &MessageCommon<P, A>, is_payload_empty: F) -> bool
     where
         P: PresenceBits,
@@ -97,6 +106,8 @@ impl FieldPresence for Implicit {
 pub struct Oneof;
 
 impl FieldPresence for Oneof {
+    type ValueSlot<T: PartialEq> = T;
+
     fn should_emit<P, A, F>(_: &MessageCommon<P, A>, _: F) -> bool
     where
         P: PresenceBits,
@@ -141,6 +152,8 @@ impl<const BIT: usize> Default for Explicit<BIT> {
 }
 
 impl<const BIT: usize> FieldPresence for Explicit<BIT> {
+    type ValueSlot<T: PartialEq> = MaybeUninit<T>;
+
     fn should_emit<P, A, F>(common: &MessageCommon<P, A>, _: F) -> bool
     where
         P: PresenceBits,
@@ -188,6 +201,8 @@ impl<const BIT: usize> Default for LegacyRequired<BIT> {
 }
 
 impl<const BIT: usize> FieldPresence for LegacyRequired<BIT> {
+    type ValueSlot<T: PartialEq> = MaybeUninit<T>;
+
     fn should_emit<P, A, F>(common: &MessageCommon<P, A>, _: F) -> bool
     where
         P: PresenceBits,

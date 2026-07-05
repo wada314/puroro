@@ -19,37 +19,47 @@ use crate::wire_type::WireType;
 use super::common::MessageCommon;
 use super::field_presence::FieldPresence;
 use super::presence::PresenceBits;
+use super::value_slot::ValueSlot;
 use super::varint::{self, VarintProtoType};
 
 /// Singular scalar on the wire as VARINT — parametrised by protobuf type `T`,
 /// presence policy `P` ([`Implicit`] / [`Explicit`](super::field_presence::Explicit)
 /// / [`LegacyRequired`](super::field_presence::LegacyRequired)), and proto field
 /// number `FIELD`, and compile-time default marker `D` ([`HasDefault`]).
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug)]
 pub struct SingularVarintField<
     T: VarintProtoType,
     P: FieldPresence,
     const FIELD: u32,
     D = ProtoDefault,
 > {
-    value: T::Value,
+    value: P::ValueSlot<T::Value>,
     _marker: PhantomData<(P, D)>,
 }
 
-impl<T: VarintProtoType, P: FieldPresence, const FIELD: u32, D> SingularVarintField<T, P, FIELD, D> {
-    /// Creates a field with the protobuf type-zero in the value slot.
+impl<T: VarintProtoType, P: FieldPresence, const FIELD: u32, D> SingularVarintField<T, P, FIELD, D>
+where
+    P::ValueSlot<T::Value>: ValueSlot<T::Value>,
+{
+    /// Creates a field with an empty value slot.
     #[inline]
     pub fn new_in<A: Allocator>(_alloc: A) -> Self {
         Self {
-            value: T::proto_zero(),
+            value: ValueSlot::new_in(T::proto_zero()),
             _marker: PhantomData,
         }
     }
 
     /// Raw stored value (use for IMPLICIT public getters).
+    ///
+    /// # Safety
+    ///
+    /// For explicit-presence fields, the slot may be uninitialized when the
+    /// presence bit is clear — callers must use [`optional`](Self::optional) or
+    /// check `has_*` first.
     #[inline]
     pub fn value(&self) -> T::Value {
-        self.value
+        *unsafe { ValueSlot::read_unchecked(&self.value) }
     }
 
     /// Presence-agnostic mutable access to the value slot.
@@ -60,7 +70,7 @@ impl<T: VarintProtoType, P: FieldPresence, const FIELD: u32, D> SingularVarintFi
     /// presence.
     #[inline]
     pub fn value_mut(&mut self) -> &mut T::Value {
-        &mut self.value
+        unsafe { ValueSlot::mut_unchecked(&mut self.value) }
     }
 
     /// Binds this field to its message `common` state (presence), producing a
@@ -74,10 +84,13 @@ impl<T: VarintProtoType, P: FieldPresence, const FIELD: u32, D> SingularVarintFi
         SingularVarintFieldMut::new(self, common)
     }
 
-    /// Resets the value slot to type-zero (does not touch the bitfield).
+    /// Resets the value slot (does not touch the bitfield).
+    ///
+    /// `was_set` must reflect whether the field was present before clearing
+    /// (explicit / legacy required); implicit callers may pass any value.
     #[inline]
-    pub fn clear_value(&mut self) {
-        self.value = T::proto_zero();
+    pub fn clear_value(&mut self, was_set: bool) {
+        ValueSlot::clear(&mut self.value, T::proto_zero(), was_set);
     }
 
     pub fn encoded_len<Pb, A>(&self, common: &MessageCommon<Pb, A>) -> usize
@@ -85,8 +98,10 @@ impl<T: VarintProtoType, P: FieldPresence, const FIELD: u32, D> SingularVarintFi
         Pb: PresenceBits,
         A: ::allocator_api2::alloc::Allocator,
     {
-        if P::should_emit(common, || self.value == T::proto_zero()) {
-            encode::encoded_len_varint_field(FIELD, T::encode_wire(self.value))
+        let proto_zero = T::proto_zero();
+        if P::should_emit(common, || ValueSlot::is_payload_empty(&self.value, proto_zero)) {
+            let v = *unsafe { ValueSlot::read_unchecked(&self.value) };
+            encode::encoded_len_varint_field(FIELD, T::encode_wire(v))
         } else {
             0
         }
@@ -97,8 +112,10 @@ impl<T: VarintProtoType, P: FieldPresence, const FIELD: u32, D> SingularVarintFi
         Pb: PresenceBits,
         A: ::allocator_api2::alloc::Allocator,
     {
-        if P::should_emit(common, || self.value == T::proto_zero()) {
-            encode::encode_varint_field(FIELD, T::encode_wire(self.value), buf);
+        let proto_zero = T::proto_zero();
+        if P::should_emit(common, || ValueSlot::is_payload_empty(&self.value, proto_zero)) {
+            let v = *unsafe { ValueSlot::read_unchecked(&self.value) };
+            encode::encode_varint_field(FIELD, T::encode_wire(v), buf);
         }
     }
 
@@ -108,12 +125,14 @@ impl<T: VarintProtoType, P: FieldPresence, const FIELD: u32, D> SingularVarintFi
         Pb: PresenceBits,
         A: ::allocator_api2::alloc::Allocator,
     {
-        P::is_set(common, || self.value == T::proto_zero())
+        let proto_zero = T::proto_zero();
+        P::is_set(common, || ValueSlot::is_payload_empty(&self.value, proto_zero))
     }
 }
 
 impl<T: VarintProtoType, P: FieldPresence, const FIELD: u32, D> SingularVarintField<T, P, FIELD, D>
 where
+    P::ValueSlot<T::Value>: ValueSlot<T::Value>,
     D: HasDefault<T::Value>,
     T::Value: Copy,
 {
@@ -122,8 +141,9 @@ where
         Pb: PresenceBits,
         A: ::allocator_api2::alloc::Allocator,
     {
-        let v = if P::is_set(common, || self.value == T::proto_zero()) {
-            Some(self.value)
+        let proto_zero = T::proto_zero();
+        let v = if P::is_set(common, || ValueSlot::is_payload_empty(&self.value, proto_zero)) {
+            Some(*unsafe { ValueSlot::read_unchecked(&self.value) })
         } else {
             None
         };
@@ -133,10 +153,12 @@ where
 
 impl<T: VarintProtoType, P: FieldPresence, const FIELD: u32, D> Default
     for SingularVarintField<T, P, FIELD, D>
+where
+    P::ValueSlot<T::Value>: ValueSlot<T::Value>,
 {
     fn default() -> Self {
         Self {
-            value: T::proto_zero(),
+            value: ValueSlot::new_in(T::proto_zero()),
             _marker: PhantomData,
         }
     }
@@ -170,6 +192,8 @@ impl<
         Pb: PresenceBits,
         A: Allocator,
     > SingularVarintFieldMut<'f, 'c, T, P, FIELD, D, Pb, A>
+where
+    P::ValueSlot<T::Value>: ValueSlot<T::Value>,
 {
     #[inline]
     fn new(
@@ -181,14 +205,23 @@ impl<
 
     #[inline]
     pub fn value_mut(self) -> &'f mut T::Value {
+        let proto_zero = T::proto_zero();
+        let replacing =
+            P::is_set(self.common, || ValueSlot::is_payload_empty(&self.field.value, proto_zero));
         P::on_set(self.common);
-        &mut self.field.value
+        if !replacing {
+            ValueSlot::write(&mut self.field.value, proto_zero, false);
+        }
+        unsafe { ValueSlot::mut_unchecked(&mut self.field.value) }
     }
 
     #[inline]
     pub fn set(self, v: T::Value) {
+        let proto_zero = T::proto_zero();
+        let replacing =
+            P::is_set(self.common, || ValueSlot::is_payload_empty(&self.field.value, proto_zero));
         P::on_set(self.common);
-        self.field.value = v;
+        ValueSlot::write(&mut self.field.value, v, replacing);
     }
 
     pub fn merge<B: Buf>(self, wire_type: WireType, buf: &mut B) -> Result<(), DecodeError> {
@@ -196,18 +229,24 @@ impl<
             return Err(DecodeError::InvalidTag);
         }
         let raw = decode::decode_varint(buf)?;
+        let proto_zero = T::proto_zero();
+        let replacing =
+            P::is_set(self.common, || ValueSlot::is_payload_empty(&self.field.value, proto_zero));
         P::on_set(self.common);
-        self.field.value = T::decode_wire(raw)?;
+        ValueSlot::write(&mut self.field.value, T::decode_wire(raw)?, replacing);
         Ok(())
     }
 
-    /// Resets the value slot to type-zero and clears explicit presence when applicable.
+    /// Resets the value slot and clears explicit presence when applicable.
     ///
     /// For [`Implicit`](super::field_presence::Implicit) fields this omits the field on
     /// the wire (equivalent to assigning the type-zero); `on_clear` is a no-op.
     pub fn clear(self) {
+        let proto_zero = T::proto_zero();
+        let was_set =
+            P::is_set(self.common, || ValueSlot::is_payload_empty(&self.field.value, proto_zero));
         P::on_clear(self.common);
-        self.field.clear_value();
+        self.field.clear_value(was_set);
     }
 }
 
@@ -221,6 +260,8 @@ impl<
         Pb: PresenceBits,
         A: Allocator,
     > SingularVarintFieldMut<'f, 'c, T, P, FIELD, D, Pb, A>
+where
+    P::ValueSlot<T::Value>: ValueSlot<T::Value>,
 {
     /// Merges a closed-enum occurrence; unknown values go to `common.unknown_fields`.
     ///
@@ -249,8 +290,11 @@ impl<
             );
             return Ok(());
         }
+        let proto_zero = T::proto_zero();
+        let replacing =
+            P::is_set(self.common, || ValueSlot::is_payload_empty(&self.field.value, proto_zero));
         P::on_set(self.common);
-        self.field.value = T::decode_wire(raw)?;
+        ValueSlot::write(&mut self.field.value, T::decode_wire(raw)?, replacing);
         Ok(())
     }
 }

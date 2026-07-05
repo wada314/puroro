@@ -52,7 +52,7 @@ pub use fields::{
     RepeatedString, RepeatedVarint, RepeatedVarintEncoding,
     RepeatedVarintField, RepeatedVarintFieldMut, RequiredFieldPresence, SingularLen,
     SingularLenField, SingularLenFieldMut, SingularVarint, SingularVarintField,
-    SingularVarintFieldMut, VarintProtoType,
+    SingularVarintFieldMut, ValueSlot, VarintProtoType,
 };
 pub use defaults::ProtoDefault;
 pub use optional::{HasDefault, Optional};

@@ -35,6 +35,7 @@ pub mod repeated_encoding;
 pub mod repeated_len;
 pub mod repeated_varint;
 pub mod scalar;
+pub mod value_slot;
 pub mod varint;
 
 pub use ::protobuf_core::FieldNumber;
@@ -52,6 +53,7 @@ pub use message::{
 };
 pub use oneof::{OneofDeallocate, OneofEncodable, OneofGroup, OneofSlot, OneofSlotMut};
 pub use presence::PresenceBits;
+pub use value_slot::ValueSlot;
 pub use repeated_encoding::{Expanded, Packed, RepeatedVarintEncoding};
 pub use repeated_len::{
     RepeatedBytes, RepeatedLen, RepeatedLenField, RepeatedLenFieldMut, RepeatedString,
