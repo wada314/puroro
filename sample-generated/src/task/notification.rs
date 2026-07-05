@@ -169,7 +169,7 @@ impl<
     ) -> &'f mut SingularVarintField<ProtoInt32, Oneof, { FIELD_WEBHOOK_ID }> {
         let variant = slot.bind(common).variant_mut(
             |n| matches!(n, Self::WebhookId(_)),
-            |_alloc| Self::WebhookId(SingularVarintField::new()),
+            |_alloc| Self::WebhookId(SingularVarintField::new_in(_alloc)),
         );
         let Self::WebhookId(f) = variant else {
             unreachable!()
@@ -198,24 +198,24 @@ impl<
         const FIELD_PHONE_NUMBER: u32,
         const FIELD_WEBHOOK_ID: u32,
         const FIELD_POSTAL: u32,
-    > OneofEncodable
+    > OneofEncodable<A>
     for NotificationStorage<A, FIELD_EMAIL_ADDRESS, FIELD_PHONE_NUMBER, FIELD_WEBHOOK_ID, FIELD_POSTAL>
 {
-    fn encoded_len_wire(&self) -> usize {
+    fn encoded_len<Pb: PresenceBits>(&self, common: &MessageCommon<Pb, A>) -> usize {
         match self {
-            Self::EmailAddress(f) => f.encoded_len_wire(),
-            Self::PhoneNumber(f) => f.encoded_len_wire(),
-            Self::WebhookId(f) => f.encoded_len_wire(),
-            Self::Postal(f) => f.encoded_len_wire(),
+            Self::EmailAddress(f) => f.encoded_len(common),
+            Self::PhoneNumber(f) => f.encoded_len(common),
+            Self::WebhookId(f) => f.encoded_len(common),
+            Self::Postal(f) => f.encoded_len(common),
         }
     }
 
-    fn encode_raw_wire<B: BufMut>(&self, buf: &mut B) {
+    fn encode_raw<Pb: PresenceBits, B: BufMut>(&self, common: &MessageCommon<Pb, A>, buf: &mut B) {
         match self {
-            Self::EmailAddress(f) => f.encode_raw_wire(buf),
-            Self::PhoneNumber(f) => f.encode_raw_wire(buf),
-            Self::WebhookId(f) => f.encode_raw_wire(buf),
-            Self::Postal(f) => f.encode_raw_wire(buf),
+            Self::EmailAddress(f) => f.encode_raw(common, buf),
+            Self::PhoneNumber(f) => f.encode_raw(common, buf),
+            Self::WebhookId(f) => f.encode_raw(common, buf),
+            Self::Postal(f) => f.encode_raw(common, buf),
         }
     }
 }

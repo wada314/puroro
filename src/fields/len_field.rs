@@ -14,7 +14,7 @@ use crate::wire_type::WireType;
 
 use super::common::MessageCommon;
 use super::field_presence::{
-    ExplicitFieldPresence, FieldPresence, Implicit, LegacyRequired, Oneof, RequiredFieldPresence,
+    ExplicitFieldPresence, FieldPresence, LegacyRequired, RequiredFieldPresence,
 };
 use super::len::{self, LenProtoType};
 use super::presence::PresenceBits;
@@ -84,36 +84,6 @@ impl<T: LenProtoType, P: FieldPresence, const FIELD: u32, A: Allocator, D>
     pub fn deallocate(&mut self, alloc: A) {
         let old = unsafe { ManuallyDrop::take(&mut self.value) };
         unsafe { T::deallocate(old, alloc) };
-    }
-}
-
-impl<T: LenProtoType, const FIELD: u32, A: Allocator, D> SingularLenField<T, Implicit, FIELD, A, D> {
-    /// Wire byte length without `MessageCommon` (IMPLICIT presence only).
-    pub fn encoded_len_wire(&self) -> usize {
-        if T::is_empty(&self.value) {
-            0
-        } else {
-            encode::encoded_len_len_field(FIELD, T::as_bytes(&self.value).len())
-        }
-    }
-
-    /// Encodes without `MessageCommon` (IMPLICIT presence only).
-    pub fn encode_raw_wire<B: BufMut>(&self, buf: &mut B) {
-        if !T::is_empty(&self.value) {
-            encode::encode_len_field(FIELD, T::as_bytes(&self.value), buf);
-        }
-    }
-}
-
-impl<T: LenProtoType, const FIELD: u32, A: Allocator, D> SingularLenField<T, Oneof, FIELD, A, D> {
-    /// Wire byte length without `MessageCommon` (active oneof variant only).
-    pub fn encoded_len_wire(&self) -> usize {
-        encode::encoded_len_len_field(FIELD, T::as_bytes(&self.value).len())
-    }
-
-    /// Encodes without `MessageCommon` (active oneof variant only).
-    pub fn encode_raw_wire<B: BufMut>(&self, buf: &mut B) {
-        encode::encode_len_field(FIELD, T::as_bytes(&self.value), buf);
     }
 }
 

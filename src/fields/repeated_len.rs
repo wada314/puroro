@@ -59,14 +59,20 @@ impl<T: LenProtoType, const FIELD: u32, A: Allocator> RepeatedLenField<T, FIELD,
         RepeatedLenFieldMut::new(self, common)
     }
 
-    pub fn encoded_len(&self) -> usize {
+    pub fn encoded_len<Pb>(&self, _common: &MessageCommon<Pb, A>) -> usize
+    where
+        Pb: PresenceBits,
+    {
         self.values
             .iter()
             .map(|v| encode::encoded_len_len_field(FIELD, T::as_bytes(v).len()))
             .sum()
     }
 
-    pub fn encode_raw<B: BufMut>(&self, buf: &mut B) {
+    pub fn encode_raw<Pb, B: BufMut>(&self, _common: &MessageCommon<Pb, A>, buf: &mut B)
+    where
+        Pb: PresenceBits,
+    {
         for v in self.values.iter() {
             encode::encode_len_field(FIELD, T::as_bytes(v), buf);
         }

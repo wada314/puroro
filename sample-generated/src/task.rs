@@ -116,17 +116,17 @@ impl<A: Allocator + Clone> Task<A> {
         Self {
             _common: MessageCommon::new_in(TaskPresence::ZERO, alloc.clone()),
             title: SingularLenField::new_in(alloc.clone()),
-            score: SingularVarintField::new(),
-            max_retries: SingularVarintField::new(),
+            score: SingularVarintField::new_in(alloc.clone()),
+            max_retries: SingularVarintField::new_in(alloc.clone()),
             owner_id: SingularLenField::new_in(alloc.clone()),
             payload: SingularLenField::new_in(alloc.clone()),
             tag_ids: RepeatedPackedVarintField::new_in(alloc.clone()),
             scores: RepeatedExpandedVarintField::new_in(alloc.clone()),
-            labels: RepeatedLenField::new_in(alloc),
-            status: SingularVarintField::new(),
-            priority: SingularVarintField::new(),
-            assignee: NestedMessageField::new(),
-            notification: OneofSlot::new(),
+            labels: RepeatedLenField::new_in(alloc.clone()),
+            status: SingularVarintField::new_in(alloc.clone()),
+            priority: SingularVarintField::new_in(alloc.clone()),
+            assignee: NestedMessageField::new_in(alloc.clone()),
+            notification: OneofSlot::new_in(alloc),
         }
     }
 
@@ -403,13 +403,13 @@ impl<A: Allocator + Clone> MessageEncode for Task<A> {
         n += self.max_retries.encoded_len(c);
         n += self.owner_id.encoded_len(c);
         n += self.payload.encoded_len(c);
-        n += self.tag_ids.encoded_len();
-        n += self.scores.encoded_len();
-        n += self.labels.encoded_len();
+        n += self.tag_ids.encoded_len(c);
+        n += self.scores.encoded_len(c);
+        n += self.labels.encoded_len(c);
         n += self.status.encoded_len(c);
         n += self.priority.encoded_len(c);
-        n += self.assignee.encoded_len_wire();
-        n += self.notification.encoded_len();
+        n += self.assignee.encoded_len(c);
+        n += self.notification.encoded_len(c);
         n + c.unknown_fields.len()
     }
 
@@ -420,13 +420,13 @@ impl<A: Allocator + Clone> MessageEncode for Task<A> {
         self.max_retries.encode_raw(c, buf);
         self.owner_id.encode_raw(c, buf);
         self.payload.encode_raw(c, buf);
-        self.tag_ids.encode_raw(buf);
-        self.scores.encode_raw(buf);
-        self.labels.encode_raw(buf);
+        self.tag_ids.encode_raw(c, buf);
+        self.scores.encode_raw(c, buf);
+        self.labels.encode_raw(c, buf);
         self.status.encode_raw(c, buf);
         self.priority.encode_raw(c, buf);
-        self.assignee.encode_raw_wire(buf);
-        self.notification.encode_raw(buf);
+        self.assignee.encode_raw(c, buf);
+        self.notification.encode_raw(c, buf);
         let unknown: &[u8] = &c.unknown_fields;
         buf.put_slice(unknown);
     }

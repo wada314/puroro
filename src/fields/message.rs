@@ -108,8 +108,9 @@ impl<M, P: MessagePresence, const FIELD: u32, A: Allocator> NestedMessageField<M
         P::as_ref(&self.store)
     }
 
-    /// Wire byte length without `MessageCommon`.
-    pub fn encoded_len_wire(&self) -> usize
+    /// Wire byte length of this field occurrence (ignores `common`; inline / oneof
+    /// presence is handled by the field or enclosing slot).
+    pub fn encoded_len<Pb>(&self, _common: &MessageCommon<Pb, A>) -> usize
     where
         M: MessageEncode,
     {
@@ -118,8 +119,8 @@ impl<M, P: MessagePresence, const FIELD: u32, A: Allocator> NestedMessageField<M
             .unwrap_or(0)
     }
 
-    /// Encodes without `MessageCommon`.
-    pub fn encode_raw_wire<B: BufMut>(&self, buf: &mut B)
+    /// Encodes this field occurrence (ignores `common`).
+    pub fn encode_raw<Pb, B: BufMut>(&self, _common: &MessageCommon<Pb, A>, buf: &mut B)
     where
         M: MessageEncode,
     {
@@ -143,8 +144,10 @@ impl<M, P: MessagePresence, const FIELD: u32, A: Allocator> NestedMessageField<M
 }
 
 impl<M, const FIELD: u32, A: Allocator> NestedMessageField<M, Singular, FIELD, A> {
-    /// Creates an absent nested message field.
-    pub fn new() -> Self {
+    /// Creates an absent nested message field, ignoring `alloc` (codegen uses
+    /// `new_in` uniformly).
+    #[inline]
+    pub fn new_in(_alloc: A) -> Self {
         Self { store: None }
     }
 
@@ -169,7 +172,7 @@ impl<M, const FIELD: u32, A: Allocator> NestedMessageField<M, Singular, FIELD, A
 
 impl<M, const FIELD: u32, A: Allocator> Default for NestedMessageField<M, Singular, FIELD, A> {
     fn default() -> Self {
-        Self::new()
+        Self { store: None }
     }
 }
 

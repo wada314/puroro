@@ -17,7 +17,7 @@ use crate::optional::{HasDefault, Optional};
 use crate::wire_type::WireType;
 
 use super::common::MessageCommon;
-use super::field_presence::{ExplicitFieldPresence, FieldPresence, Implicit, Oneof};
+use super::field_presence::{ExplicitFieldPresence, FieldPresence, Implicit};
 use super::presence::PresenceBits;
 use super::varint::{self, VarintProtoType};
 
@@ -38,7 +38,8 @@ pub struct SingularVarintField<
 
 impl<T: VarintProtoType, P: FieldPresence, const FIELD: u32, D> SingularVarintField<T, P, FIELD, D> {
     /// Creates a field with the protobuf type-zero in the value slot.
-    pub fn new() -> Self {
+    #[inline]
+    pub fn new_in<A: Allocator>(_alloc: A) -> Self {
         Self {
             value: T::proto_zero(),
             _marker: PhantomData,
@@ -122,43 +123,16 @@ where
         };
         Optional::new(v)
     }
-
-    /// Wire byte length without `MessageCommon` (IMPLICIT presence only).
-    pub fn encoded_len_wire(&self) -> usize {
-        let empty = self.value == T::proto_zero();
-        if empty {
-            0
-        } else {
-            encode::encoded_len_varint_field(FIELD, T::encode_wire(self.value))
-        }
-    }
-
-    /// Encodes without `MessageCommon` (IMPLICIT presence only).
-    pub fn encode_raw_wire<B: BufMut>(&self, buf: &mut B) {
-        let empty = self.value == T::proto_zero();
-        if !empty {
-            encode::encode_varint_field(FIELD, T::encode_wire(self.value), buf);
-        }
-    }
-}
-
-impl<T: VarintProtoType, const FIELD: u32, D> SingularVarintField<T, Oneof, FIELD, D> {
-    /// Wire byte length without `MessageCommon` (active oneof variant only).
-    pub fn encoded_len_wire(&self) -> usize {
-        encode::encoded_len_varint_field(FIELD, T::encode_wire(self.value))
-    }
-
-    /// Encodes without `MessageCommon` (active oneof variant only).
-    pub fn encode_raw_wire<B: BufMut>(&self, buf: &mut B) {
-        encode::encode_varint_field(FIELD, T::encode_wire(self.value), buf);
-    }
 }
 
 impl<T: VarintProtoType, P: FieldPresence, const FIELD: u32, D> Default
     for SingularVarintField<T, P, FIELD, D>
 {
     fn default() -> Self {
-        Self::new()
+        Self {
+            value: T::proto_zero(),
+            _marker: PhantomData,
+        }
     }
 }
 

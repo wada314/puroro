@@ -65,7 +65,10 @@ impl<T: VarintProtoType, E: RepeatedVarintEncoding, const FIELD: u32, A: Allocat
         RepeatedVarintFieldMut::new(self, common)
     }
 
-    pub fn encoded_len(&self) -> usize {
+    pub fn encoded_len<Pb>(&self, _common: &MessageCommon<Pb, A>) -> usize
+    where
+        Pb: PresenceBits,
+    {
         if self.values.is_empty() {
             0
         } else {
@@ -73,7 +76,10 @@ impl<T: VarintProtoType, E: RepeatedVarintEncoding, const FIELD: u32, A: Allocat
         }
     }
 
-    pub fn encode_raw<B: BufMut>(&self, buf: &mut B) {
+    pub fn encode_raw<Pb, B: BufMut>(&self, _common: &MessageCommon<Pb, A>, buf: &mut B)
+    where
+        Pb: PresenceBits,
+    {
         if !self.values.is_empty() {
             E::encode::<B, T>(FIELD, self.as_slice(), buf);
         }

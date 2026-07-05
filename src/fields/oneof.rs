@@ -43,12 +43,12 @@ pub trait OneofDeallocate<A: Allocator> {
 }
 
 /// Wire encode behaviour for a generated oneof storage enum variant.
-pub trait OneofEncodable {
+pub trait OneofEncodable<A: Allocator> {
     /// Wire byte length of this active variant.
-    fn encoded_len_wire(&self) -> usize;
+    fn encoded_len<Pb: PresenceBits>(&self, common: &MessageCommon<Pb, A>) -> usize;
 
     /// Encodes this active variant.
-    fn encode_raw_wire<B: BufMut>(&self, buf: &mut B);
+    fn encode_raw<Pb: PresenceBits, B: BufMut>(&self, common: &MessageCommon<Pb, A>, buf: &mut B);
 }
 
 /// Wire decode behaviour for a generated oneof storage enum.
@@ -56,7 +56,7 @@ pub trait OneofEncodable {
 /// Implemented by the crate-internal enum held in [`OneofSlot`]. Lets the parent
 /// message use the same `encoded_len` / `encode_raw` / merge shape as other
 /// fields without storage-specific static helpers.
-pub trait OneofGroup<A: Allocator + Clone>: OneofDeallocate<A> + OneofEncodable {
+pub trait OneofGroup<A: Allocator + Clone>: OneofDeallocate<A> + OneofEncodable<A> {
     /// Merges a wire occurrence into the matching variant, selecting it first.
     fn merge_wire<Pb, B>(
         slot: &mut OneofSlot<Self>,
@@ -94,8 +94,9 @@ pub struct OneofSlot<E> {
 }
 
 impl<E> OneofSlot<E> {
-    /// Creates an empty oneof slot.
-    pub fn new() -> Self {
+    /// Creates an empty oneof slot, ignoring `alloc` (codegen uses `new_in` uniformly).
+    #[inline]
+    pub fn new_in<A: Allocator>(_alloc: A) -> Self {
         Self { value: None }
     }
 
@@ -147,18 +148,26 @@ impl<E> OneofSlot<E> {
     pub fn clear(&mut self) {
         self.value = None;
     }
-}
 
-impl<E: OneofEncodable> OneofSlot<E> {
-    /// Wire byte length when a variant is active (same shape as nested/repeated fields).
-    pub fn encoded_len(&self) -> usize {
-        self.get().map(E::encoded_len_wire).unwrap_or(0)
+    /// Wire byte length when a variant is active.
+    pub fn encoded_len<Pb, A>(&self, common: &MessageCommon<Pb, A>) -> usize
+    where
+        E: OneofEncodable<A>,
+        Pb: PresenceBits,
+        A: Allocator,
+    {
+        self.get().map(|v| v.encoded_len(common)).unwrap_or(0)
     }
 
-    /// Encodes the active variant (same shape as nested/repeated fields).
-    pub fn encode_raw<B: BufMut>(&self, buf: &mut B) {
+    /// Encodes the active variant.
+    pub fn encode_raw<Pb, A, B: BufMut>(&self, common: &MessageCommon<Pb, A>, buf: &mut B)
+    where
+        E: OneofEncodable<A>,
+        Pb: PresenceBits,
+        A: Allocator,
+    {
         if let Some(v) = self.get() {
-            v.encode_raw_wire(buf);
+            v.encode_raw(common, buf);
         }
     }
 }
@@ -184,7 +193,7 @@ impl<E> OneofSlot<E> {
 
 impl<E> Default for OneofSlot<E> {
     fn default() -> Self {
-        Self::new()
+        Self { value: None }
     }
 }
 
