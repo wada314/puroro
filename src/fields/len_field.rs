@@ -14,7 +14,7 @@ use crate::wire_type::WireType;
 
 use super::common::MessageCommon;
 use super::field_presence::{
-    ExplicitFieldPresence, FieldPresence, Implicit, LegacyRequired, RequiredFieldPresence,
+    ExplicitFieldPresence, FieldPresence, Implicit, LegacyRequired, Oneof, RequiredFieldPresence,
 };
 use super::len::{self, LenProtoType};
 use super::presence::PresenceBits;
@@ -88,14 +88,6 @@ impl<T: LenProtoType, P: FieldPresence, const FIELD: u32, A: Allocator, D>
 }
 
 impl<T: LenProtoType, const FIELD: u32, A: Allocator, D> SingularLenField<T, Implicit, FIELD, A, D> {
-    #[inline]
-    pub fn bind_oneof<'f, 'c, Pb: PresenceBits>(
-        &'f mut self,
-        common: &'c mut MessageCommon<Pb, A>,
-    ) -> SingularLenFieldMut<'f, 'c, T, Implicit, FIELD, A, D, Pb> {
-        self.bind(common)
-    }
-
     /// Wire byte length without `MessageCommon` (IMPLICIT presence only).
     pub fn encoded_len_wire(&self) -> usize {
         if T::is_empty(&self.value) {
@@ -110,6 +102,18 @@ impl<T: LenProtoType, const FIELD: u32, A: Allocator, D> SingularLenField<T, Imp
         if !T::is_empty(&self.value) {
             encode::encode_len_field(FIELD, T::as_bytes(&self.value), buf);
         }
+    }
+}
+
+impl<T: LenProtoType, const FIELD: u32, A: Allocator, D> SingularLenField<T, Oneof, FIELD, A, D> {
+    /// Wire byte length without `MessageCommon` (active oneof variant only).
+    pub fn encoded_len_wire(&self) -> usize {
+        encode::encoded_len_len_field(FIELD, T::as_bytes(&self.value).len())
+    }
+
+    /// Encodes without `MessageCommon` (active oneof variant only).
+    pub fn encode_raw_wire<B: BufMut>(&self, buf: &mut B) {
+        encode::encode_len_field(FIELD, T::as_bytes(&self.value), buf);
     }
 }
 
@@ -248,6 +252,8 @@ pub type SingularLen<T, P, const FIELD: u32, A, D = ProtoDefault> = SingularLenF
 
 pub type ImplicitLenField<T, const FIELD: u32, A> =
     SingularLenField<T, super::field_presence::Implicit, FIELD, A>;
+pub type OneofLenField<T, const FIELD: u32, A> =
+    SingularLenField<T, super::field_presence::Oneof, FIELD, A>;
 pub type ExplicitLenField<T, const BIT: usize, const FIELD: u32, A, D = ProtoDefault> =
     SingularLenField<T, super::field_presence::Explicit<BIT>, FIELD, A, D>;
 pub type LegacyRequiredLenField<T, const BIT: usize, const FIELD: u32, A, D = ProtoDefault> =

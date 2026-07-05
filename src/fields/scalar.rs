@@ -17,7 +17,7 @@ use crate::optional::{HasDefault, Optional};
 use crate::wire_type::WireType;
 
 use super::common::MessageCommon;
-use super::field_presence::{ExplicitFieldPresence, FieldPresence, Implicit};
+use super::field_presence::{ExplicitFieldPresence, FieldPresence, Implicit, Oneof};
 use super::presence::PresenceBits;
 use super::varint::{self, VarintProtoType};
 
@@ -54,8 +54,9 @@ impl<T: VarintProtoType, P: FieldPresence, const FIELD: u32, D> SingularVarintFi
     /// Presence-agnostic mutable access to the value slot.
     ///
     /// Regular message fields mutate through [`bind`](Self::bind) (to fold in the
-    /// presence bit); this bypass exists for oneof variants, whose presence is
-    /// tracked by the enclosing `OneofSlot` rather than a bit.
+    /// presence bit); [`Oneof`] variants use [`bind`](Self::bind) too, but the
+    /// marker's `on_set` is a no-op because the enclosing `OneofSlot` tracks
+    /// presence.
     #[inline]
     pub fn value_mut(&mut self) -> &mut T::Value {
         &mut self.value
@@ -108,15 +109,6 @@ where
     D: HasDefault<T::Value>,
     T::Value: Copy,
 {
-    /// Binds an `Implicit`-presence **oneof variant** field for mutation.
-    #[inline]
-    pub fn bind_oneof<'f, 'c, Pb: PresenceBits, A: Allocator>(
-        &'f mut self,
-        common: &'c mut MessageCommon<Pb, A>,
-    ) -> SingularVarintFieldMut<'f, 'c, T, Implicit, FIELD, D, Pb, A> {
-        self.bind(common)
-    }
-
     /// `Optional` getter (`is_set` when the stored value is not [`VarintProtoType::proto_zero`]).
     pub fn optional<Pb, A>(&self, _common: &MessageCommon<Pb, A>) -> Optional<T::Value, D>
     where
@@ -147,6 +139,18 @@ where
         if !empty {
             encode::encode_varint_field(FIELD, T::encode_wire(self.value), buf);
         }
+    }
+}
+
+impl<T: VarintProtoType, const FIELD: u32, D> SingularVarintField<T, Oneof, FIELD, D> {
+    /// Wire byte length without `MessageCommon` (active oneof variant only).
+    pub fn encoded_len_wire(&self) -> usize {
+        encode::encoded_len_varint_field(FIELD, T::encode_wire(self.value))
+    }
+
+    /// Encodes without `MessageCommon` (active oneof variant only).
+    pub fn encode_raw_wire<B: BufMut>(&self, buf: &mut B) {
+        encode::encode_varint_field(FIELD, T::encode_wire(self.value), buf);
     }
 }
 
@@ -305,6 +309,8 @@ pub type SingularVarint<T, P, const FIELD: u32, D = ProtoDefault> = SingularVari
 
 pub type ImplicitVarintField<T, const FIELD: u32> =
     SingularVarintField<T, super::field_presence::Implicit, FIELD>;
+pub type OneofVarintField<T, const FIELD: u32> =
+    SingularVarintField<T, super::field_presence::Oneof, FIELD>;
 pub type ExplicitVarintField<T, const BIT: usize, const FIELD: u32, D = ProtoDefault> =
     SingularVarintField<T, super::field_presence::Explicit<BIT>, FIELD, D>;
 pub type LegacyRequiredVarintField<T, const BIT: usize, const FIELD: u32, D = ProtoDefault> =

@@ -13,10 +13,10 @@ use ::bitvec::order::Lsb0;
 use ::bytes::{Buf, BufMut};
 
 use ::puroro::{
-    DecodeError, Explicit, HasDefault, Implicit, LegacyRequired, MessageCommon, MessageDecode, MessageEncode,
-    NestedMessageField, OneofSlot, Optional, PresenceBits, ProtoBytes, ProtoEnum, ProtoInt32,
-    ProtoString, RepeatedExpandedVarintField, RepeatedLenField, RepeatedPackedVarintField,
-    SingularLenField, SingularVarintField,
+    DecodeError, Explicit, HasDefault, Implicit, LegacyRequired, MessageCommon, MessageDecode,
+    MessageEncode, NestedMessageField, OneofSlot, Optional, PresenceBits, ProtoBytes, ProtoEnum,
+    ProtoInt32, ProtoString, RepeatedExpandedVarintField, RepeatedLenField, RepeatedPackedVarintField,
+    Singular, SingularLenField, SingularVarintField,
 };
 
 use defaults::MaxRetriesDefault;
@@ -95,7 +95,7 @@ pub struct Task<A: Allocator + Clone = Global> {
     labels: RepeatedLenField<ProtoString, { FIELD_LABELS }, A>, // proto: repeated string labels = 8;
     status: SingularVarintField<ProtoEnum<Status>, Implicit, { FIELD_STATUS }>, // proto: Status status = 9;
     priority: SingularVarintField<ProtoEnum<Priority>, Explicit<{ BIT_PRIORITY }>, { FIELD_PRIORITY }>, // proto: Priority priority = 10;
-    assignee: NestedMessageField<Address<A>, A, { FIELD_ASSIGNEE }>, // proto: Address assignee = 11;
+    assignee: NestedMessageField<Address<A>, Singular, { FIELD_ASSIGNEE }, A>, // proto: Address assignee = 11;
     // proto: oneof notification { string email_address=12; string phone_number=13;
     //                             int32 webhook_id=14; Address postal=15; }
     notification: OneofSlot<

@@ -1,10 +1,10 @@
-//! Field presence policy markers (`Implicit` / `Explicit<BIT>` / `LegacyRequired<BIT>`).
+//! Field presence policy markers (`Implicit` / `Explicit<BIT>` / `LegacyRequired<BIT>` / [`Oneof`]).
 //!
 //! Composed with wire-encoding markers ([`VarintProtoType`](super::varint::VarintProtoType),
 //! [`LenProtoType`](super::len::LenProtoType)) in singular field wrappers.
 //!
-//! Only [`Explicit`] and [`LegacyRequired`] carry a presence bit index; [`Implicit`]
-//! has none.
+//! Only [`Explicit`] and [`LegacyRequired`] carry a presence bit index; [`Implicit`] and
+//! [`Oneof`] have none.
 
 use ::allocator_api2::alloc::Allocator;
 
@@ -49,6 +49,36 @@ impl FieldPresence for Implicit {
         A: Allocator,
     {
         !payload_empty
+    }
+
+    fn on_set<P, A>(_: &mut MessageCommon<P, A>)
+    where
+        P: PresenceBits,
+        A: Allocator,
+    {
+    }
+
+    fn on_clear<P, A>(_: &mut MessageCommon<P, A>)
+    where
+        P: PresenceBits,
+        A: Allocator,
+    {
+    }
+}
+
+/// Marker for a **oneof variant** field — presence is tracked by the enclosing
+/// [`OneofSlot`](super::oneof::OneofSlot), not by this wrapper. Always emits on
+/// the wire when the variant is active (even when the payload is empty / type-zero).
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
+pub struct Oneof;
+
+impl FieldPresence for Oneof {
+    fn should_emit<P, A>(_: &MessageCommon<P, A>, _: bool) -> bool
+    where
+        P: PresenceBits,
+        A: Allocator,
+    {
+        true
     }
 
     fn on_set<P, A>(_: &mut MessageCommon<P, A>)

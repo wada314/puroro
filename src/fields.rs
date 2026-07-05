@@ -7,17 +7,17 @@
 //! 2. [`MessageCommon`] (presence bitfield, allocator, unknown-field buffer).
 //!
 //! Singular fields are parametrised by **wire type** (`ProtoInt32`, `ProtoString`, …)
-//! and **presence policy** ([`Implicit`] / [`Explicit`]).
+//! and **presence policy** ([`Implicit`] / [`Explicit`] / [`Oneof`]).
 //!
 //! # Module layout
 //!
 //! | Submodule / type | Proto pattern |
 //! |---|---|
 //! | [`varint`] | `VarintProtoType` markers |
-//! | [`field_presence`] | `FieldPresence` (`Implicit` / `Explicit`) |
+//! | [`field_presence`] | `FieldPresence` (`Implicit` / `Explicit` / `Oneof`) |
 //! | [`scalar`] | `SingularVarintField<T, P, FIELD>` |
 //! | [`len`] / [`len_field`] | `SingularLenField<T, P, FIELD, A>` |
-//! | [`message`] | `NestedMessageField` |
+//! | [`message`] | `NestedMessageField<M, P, FIELD, A>` |
 //! | [`repeated_varint`] / [`repeated_len`] | `RepeatedVarintField`, `RepeatedLenField` |
 //! | [`oneof::OneofSlot`] | `oneof` group |
 //! | [`common::MessageCommon`] | shared infrastructure |
@@ -40,7 +40,8 @@ pub mod varint;
 pub use ::protobuf_core::FieldNumber;
 pub use common::MessageCommon;
 pub use field_presence::{
-    Explicit, ExplicitFieldPresence, FieldPresence, Implicit, LegacyRequired, RequiredFieldPresence,
+    Explicit, ExplicitFieldPresence, FieldPresence, Implicit, LegacyRequired, Oneof,
+    RequiredFieldPresence,
 };
 pub use len::{LenProtoType, ProtoBytes, ProtoString};
 pub use len_field::{
@@ -48,7 +49,7 @@ pub use len_field::{
     ImplicitString, SingularLen, SingularLenField, SingularLenFieldMut,
 };
 pub use message::{
-    MessagePresence, NestedMessage, NestedMessageField, NestedMessageFieldMut, Present,
+    MessagePresence, NestedMessage, NestedMessageField, NestedMessageFieldMut, Singular,
 };
 pub use oneof::{OneofDeallocate, OneofEncodable, OneofGroup, OneofSlot, OneofSlotMut};
 pub use presence::PresenceBits;

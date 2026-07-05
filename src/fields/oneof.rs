@@ -235,9 +235,9 @@ impl<'f, 'c, E, Pb: PresenceBits, A: Allocator> OneofSlotMut<'f, 'c, E, Pb, A> {
     /// Backs both the per-variant `_mut` accessors and the decode arms: after
     /// selecting the variant, generated `merge_from` merges the wire occurrence
     /// into the returned field through that field's own bind idiom
-    /// (`field.bind_oneof(common).merge(…)`, or `field.merge(common, …)` for a
-    /// message variant) — so the oneof reuses each field's merge machinery
-    /// instead of a bespoke `merge_<variant>` helper on the enum.
+    /// (`field.bind(common).merge(…)` for every variant kind) — so the oneof
+    /// reuses each field's merge machinery instead of a bespoke `merge_<variant>`
+    /// helper on the enum.
     pub fn variant_mut(
         self,
         is_match: impl FnOnce(&E) -> bool,
