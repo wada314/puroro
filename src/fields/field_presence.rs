@@ -21,7 +21,13 @@ pub trait FieldPresence: Copy {
     ///
     /// [`Implicit`] and [`Oneof`] use always-initialized `T`; [`Explicit`] and
     /// [`LegacyRequired`] use [`MaybeUninit<T>`].
-    type ValueSlot<T: PartialEq>: ValueSlot<T>;
+    type ValueSlot<T>: ValueSlot<T>;
+
+    /// `true` when the stored payload equals the protobuf type-zero.
+    ///
+    /// Only [`Implicit`] consults the slot; bitfield-backed policies never call this.
+    fn payload_is_empty<T: PartialEq>(slot: &Self::ValueSlot<T>, proto_zero: T) -> bool;
+
     /// `true` when this field should be written on the wire.
     ///
     /// `is_payload_empty` is evaluated only when the policy depends on the stored
@@ -64,7 +70,11 @@ pub trait FieldPresence: Copy {
 pub struct Implicit;
 
 impl FieldPresence for Implicit {
-    type ValueSlot<T: PartialEq> = T;
+    type ValueSlot<T> = T;
+
+    fn payload_is_empty<T: PartialEq>(slot: &T, proto_zero: T) -> bool {
+        *slot == proto_zero
+    }
 
     fn should_emit<P, A, F>(_: &MessageCommon<P, A>, is_payload_empty: F) -> bool
     where
@@ -106,7 +116,11 @@ impl FieldPresence for Implicit {
 pub struct Oneof;
 
 impl FieldPresence for Oneof {
-    type ValueSlot<T: PartialEq> = T;
+    type ValueSlot<T> = T;
+
+    fn payload_is_empty<T: PartialEq>(_slot: &T, _proto_zero: T) -> bool {
+        false
+    }
 
     fn should_emit<P, A, F>(_: &MessageCommon<P, A>, _: F) -> bool
     where
@@ -152,7 +166,11 @@ impl<const BIT: usize> Default for Explicit<BIT> {
 }
 
 impl<const BIT: usize> FieldPresence for Explicit<BIT> {
-    type ValueSlot<T: PartialEq> = MaybeUninit<T>;
+    type ValueSlot<T> = MaybeUninit<T>;
+
+    fn payload_is_empty<T: PartialEq>(_slot: &MaybeUninit<T>, _proto_zero: T) -> bool {
+        false
+    }
 
     fn should_emit<P, A, F>(common: &MessageCommon<P, A>, _: F) -> bool
     where
@@ -201,7 +219,11 @@ impl<const BIT: usize> Default for LegacyRequired<BIT> {
 }
 
 impl<const BIT: usize> FieldPresence for LegacyRequired<BIT> {
-    type ValueSlot<T: PartialEq> = MaybeUninit<T>;
+    type ValueSlot<T> = MaybeUninit<T>;
+
+    fn payload_is_empty<T: PartialEq>(_slot: &MaybeUninit<T>, _proto_zero: T) -> bool {
+        false
+    }
 
     fn should_emit<P, A, F>(common: &MessageCommon<P, A>, _: F) -> bool
     where

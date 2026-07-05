@@ -26,12 +26,6 @@ pub trait ValueSlot<T> {
     /// initialized value when `was_set` is `true`, leaving the slot uninitialized.
     fn clear(&mut self, proto_zero: T, was_set: bool);
 
-    /// `true` when the payload equals the protobuf type-zero (implicit omit rule).
-    ///
-    /// Only called for implicit presence policies; explicit policies use the
-    /// message bitfield instead.
-    fn is_payload_empty(&self, proto_zero: T) -> bool;
-
     /// Borrows the stored value.
     ///
     /// # Safety
@@ -48,7 +42,7 @@ pub trait ValueSlot<T> {
     unsafe fn mut_unchecked(&mut self) -> &mut T;
 }
 
-impl<T: PartialEq> ValueSlot<T> for T {
+impl<T> ValueSlot<T> for T {
     fn new_in(proto_zero: T) -> Self {
         proto_zero
     }
@@ -59,10 +53,6 @@ impl<T: PartialEq> ValueSlot<T> for T {
 
     fn clear(&mut self, proto_zero: T, _was_set: bool) {
         *self = proto_zero;
-    }
-
-    fn is_payload_empty(&self, proto_zero: T) -> bool {
-        *self == proto_zero
     }
 
     unsafe fn read_unchecked(&self) -> &T {
@@ -91,10 +81,6 @@ impl<T> ValueSlot<T> for MaybeUninit<T> {
         if was_set {
             unsafe { self.assume_init_drop() };
         }
-    }
-
-    fn is_payload_empty(&self, _proto_zero: T) -> bool {
-        false
     }
 
     unsafe fn read_unchecked(&self) -> &T {

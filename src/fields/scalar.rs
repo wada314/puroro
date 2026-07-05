@@ -99,7 +99,7 @@ where
         A: ::allocator_api2::alloc::Allocator,
     {
         let proto_zero = T::proto_zero();
-        if P::should_emit(common, || ValueSlot::is_payload_empty(&self.value, proto_zero)) {
+        if P::should_emit(common, || P::payload_is_empty(&self.value, proto_zero)) {
             let v = *unsafe { ValueSlot::read_unchecked(&self.value) };
             encode::encoded_len_varint_field(FIELD, T::encode_wire(v))
         } else {
@@ -113,7 +113,7 @@ where
         A: ::allocator_api2::alloc::Allocator,
     {
         let proto_zero = T::proto_zero();
-        if P::should_emit(common, || ValueSlot::is_payload_empty(&self.value, proto_zero)) {
+        if P::should_emit(common, || P::payload_is_empty(&self.value, proto_zero)) {
             let v = *unsafe { ValueSlot::read_unchecked(&self.value) };
             encode::encode_varint_field(FIELD, T::encode_wire(v), buf);
         }
@@ -126,7 +126,7 @@ where
         A: ::allocator_api2::alloc::Allocator,
     {
         let proto_zero = T::proto_zero();
-        P::is_set(common, || ValueSlot::is_payload_empty(&self.value, proto_zero))
+        P::is_set(common, || P::payload_is_empty(&self.value, proto_zero))
     }
 }
 
@@ -142,7 +142,7 @@ where
         A: ::allocator_api2::alloc::Allocator,
     {
         let proto_zero = T::proto_zero();
-        let v = if P::is_set(common, || ValueSlot::is_payload_empty(&self.value, proto_zero)) {
+        let v = if P::is_set(common, || P::payload_is_empty(&self.value, proto_zero)) {
             Some(*unsafe { ValueSlot::read_unchecked(&self.value) })
         } else {
             None
@@ -207,7 +207,7 @@ where
     pub fn value_mut(self) -> &'f mut T::Value {
         let proto_zero = T::proto_zero();
         let replacing =
-            P::is_set(self.common, || ValueSlot::is_payload_empty(&self.field.value, proto_zero));
+            P::is_set(self.common, || P::payload_is_empty(&self.field.value, proto_zero));
         P::on_set(self.common);
         if !replacing {
             ValueSlot::write(&mut self.field.value, proto_zero, false);
@@ -219,7 +219,7 @@ where
     pub fn set(self, v: T::Value) {
         let proto_zero = T::proto_zero();
         let replacing =
-            P::is_set(self.common, || ValueSlot::is_payload_empty(&self.field.value, proto_zero));
+            P::is_set(self.common, || P::payload_is_empty(&self.field.value, proto_zero));
         P::on_set(self.common);
         ValueSlot::write(&mut self.field.value, v, replacing);
     }
@@ -231,7 +231,7 @@ where
         let raw = decode::decode_varint(buf)?;
         let proto_zero = T::proto_zero();
         let replacing =
-            P::is_set(self.common, || ValueSlot::is_payload_empty(&self.field.value, proto_zero));
+            P::is_set(self.common, || P::payload_is_empty(&self.field.value, proto_zero));
         P::on_set(self.common);
         ValueSlot::write(&mut self.field.value, T::decode_wire(raw)?, replacing);
         Ok(())
@@ -244,7 +244,7 @@ where
     pub fn clear(self) {
         let proto_zero = T::proto_zero();
         let was_set =
-            P::is_set(self.common, || ValueSlot::is_payload_empty(&self.field.value, proto_zero));
+            P::is_set(self.common, || P::payload_is_empty(&self.field.value, proto_zero));
         P::on_clear(self.common);
         self.field.clear_value(was_set);
     }
@@ -292,7 +292,7 @@ where
         }
         let proto_zero = T::proto_zero();
         let replacing =
-            P::is_set(self.common, || ValueSlot::is_payload_empty(&self.field.value, proto_zero));
+            P::is_set(self.common, || P::payload_is_empty(&self.field.value, proto_zero));
         P::on_set(self.common);
         ValueSlot::write(&mut self.field.value, T::decode_wire(raw)?, replacing);
         Ok(())
