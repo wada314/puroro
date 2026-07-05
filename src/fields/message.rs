@@ -120,9 +120,7 @@ impl<M, const FIELD: u32, A: Allocator> NestedMessageField<M, Singular, FIELD, A
             unsafe { b.deallocate(alloc) };
         }
     }
-}
 
-impl<M, const FIELD: u32, A: Allocator + Clone> NestedMessageField<M, Singular, FIELD, A> {
     /// Binds this field to its message `common` state (for the allocator),
     /// producing a short-lived [`NestedMessageFieldMut`] view.
     #[inline]
@@ -187,15 +185,14 @@ impl<M, const FIELD: u32, A: Allocator> NestedMessageField<M, Oneof, FIELD, A> {
         // allocation; dropping the child runs its own `Drop` recursively.
         unsafe { self.store.deallocate(alloc) };
     }
-}
 
-impl<M, const FIELD: u32, A: Allocator + Clone> NestedMessageField<M, Oneof, FIELD, A> {
     /// Builds an always-present field holding a fresh, empty child.
     ///
     /// Used by oneof variants (via a per-variant `bind_*_mut` accessor) so the
     /// variant is always constructed with the child present.
     pub fn with_message_in(alloc: A) -> Self
     where
+        A: Clone,
         M: NestedMessage<A>,
     {
         let m = M::new_in(alloc.clone());
@@ -294,7 +291,7 @@ impl<'f, 'c, M, const FIELD: u32, A: Allocator + Clone, Pb: PresenceBits>
     }
 }
 
-impl<'f, 'c, M, const FIELD: u32, A: Allocator + Clone, Pb: PresenceBits>
+impl<'f, 'c, M, const FIELD: u32, A: Allocator, Pb: PresenceBits>
     NestedMessageFieldMut<'f, 'c, M, Oneof, FIELD, A, Pb>
 {
     /// Merges one LEN occurrence into the always-present child.
