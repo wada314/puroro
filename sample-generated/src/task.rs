@@ -408,7 +408,7 @@ impl<A: Allocator + Clone> MessageEncode for Task<A> {
         n += self.labels.encoded_len();
         n += self.status.encoded_len(c);
         n += self.priority.encoded_len(c);
-        n += self.assignee.encoded_len();
+        n += self.assignee.encoded_len_wire();
         n += self.notification.encoded_len();
         n + c.unknown_fields.len()
     }
@@ -425,7 +425,7 @@ impl<A: Allocator + Clone> MessageEncode for Task<A> {
         self.labels.encode_raw(buf);
         self.status.encode_raw(c, buf);
         self.priority.encode_raw(c, buf);
-        self.assignee.encode_raw(buf);
+        self.assignee.encode_raw_wire(buf);
         self.notification.encode_raw(buf);
         let unknown: &[u8] = &c.unknown_fields;
         buf.put_slice(unknown);

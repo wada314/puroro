@@ -42,16 +42,54 @@ pub trait MessagePresence {
     /// The stored container: `Option<UnmanagedBox<M>>` for [`Singular`], a bare
     /// `UnmanagedBox<M>` for [`Oneof`].
     type Store<M, A: Allocator>;
+
+    /// Borrows the child when present (`None` only for [`Singular`] when absent).
+    fn as_ref<M, A: Allocator>(store: &Self::Store<M, A>) -> Option<&M>;
+
+    /// Returns a mutable child for merge, inserting an empty one when absent
+    /// ([`Singular`] only).
+    fn as_mut_for_merge<M, A: Allocator>(store: &mut Self::Store<M, A>, alloc: A) -> &mut M
+    where
+        M: NestedMessage<A>,
+        A: Clone;
 }
 
 /// Ordinary nested message field: `Option<UnmanagedBox<M>>`.
 pub struct Singular;
 impl MessagePresence for Singular {
     type Store<M, A: Allocator> = Option<UnmanagedBox<M>>;
+
+    fn as_ref<M, A: Allocator>(store: &Self::Store<M, A>) -> Option<&M> {
+        store.as_deref()
+    }
+
+    fn as_mut_for_merge<M, A: Allocator>(store: &mut Self::Store<M, A>, alloc: A) -> &mut M
+    where
+        M: NestedMessage<A>,
+        A: Clone,
+    {
+        if store.is_none() {
+            let m = M::new_in(alloc.clone());
+            *store = Some(UnmanagedBox::new_in(m, alloc));
+        }
+        store.as_deref_mut().unwrap()
+    }
 }
 
 impl MessagePresence for Oneof {
     type Store<M, A: Allocator> = UnmanagedBox<M>;
+
+    fn as_ref<M, A: Allocator>(store: &Self::Store<M, A>) -> Option<&M> {
+        Some(store)
+    }
+
+    fn as_mut_for_merge<M, A: Allocator>(store: &mut Self::Store<M, A>, _: A) -> &mut M
+    where
+        M: NestedMessage<A>,
+        A: Clone,
+    {
+        store
+    }
 }
 
 /// Singular embedded message field.
@@ -63,9 +101,46 @@ pub struct NestedMessageField<M, P: MessagePresence, const FIELD: u32, A: Alloca
     store: P::Store<M, A>,
 }
 
-// ---------------------------------------------------------------------------
-// Singular — ordinary nested message field (`Option<UnmanagedBox<M>>`)
-// ---------------------------------------------------------------------------
+impl<M, P: MessagePresence, const FIELD: u32, A: Allocator> NestedMessageField<M, P, FIELD, A> {
+    /// Returns the child when present.
+    #[inline]
+    pub fn get(&self) -> Option<&M> {
+        P::as_ref(&self.store)
+    }
+
+    /// Wire byte length without `MessageCommon`.
+    pub fn encoded_len_wire(&self) -> usize
+    where
+        M: MessageEncode,
+    {
+        P::as_ref(&self.store)
+            .map(|child| encode::encoded_len_len_field(FIELD, child.encoded_len()))
+            .unwrap_or(0)
+    }
+
+    /// Encodes without `MessageCommon`.
+    pub fn encode_raw_wire<B: BufMut>(&self, buf: &mut B)
+    where
+        M: MessageEncode,
+    {
+        if let Some(child) = P::as_ref(&self.store) {
+            let payload_len = child.encoded_len();
+            encode::encode_tag(FIELD, WireType::Len, buf);
+            encode::encode_varint(payload_len as u64, buf);
+            child.encode_raw(buf);
+        }
+    }
+
+    /// Binds this field to its message `common` state (for the allocator),
+    /// producing a short-lived [`NestedMessageFieldMut`] view.
+    #[inline]
+    pub fn bind<'f, 'c, Pb: PresenceBits>(
+        &'f mut self,
+        common: &'c mut MessageCommon<Pb, A>,
+    ) -> NestedMessageFieldMut<'f, 'c, M, P, FIELD, A, Pb> {
+        NestedMessageFieldMut::new(self, common)
+    }
+}
 
 impl<M, const FIELD: u32, A: Allocator> NestedMessageField<M, Singular, FIELD, A> {
     /// Creates an absent nested message field.
@@ -73,40 +148,10 @@ impl<M, const FIELD: u32, A: Allocator> NestedMessageField<M, Singular, FIELD, A
         Self { store: None }
     }
 
-    /// Returns the child when present.
-    #[inline]
-    pub fn get(&self) -> Option<&M> {
-        self.store.as_deref()
-    }
-
     /// Returns whether the field is present.
     #[inline]
     pub fn is_present(&self) -> bool {
         self.store.is_some()
-    }
-
-    /// Wire byte length when the child is present.
-    pub fn encoded_len(&self) -> usize
-    where
-        M: MessageEncode,
-    {
-        match self.store.as_deref() {
-            Some(child) => encode::encoded_len_len_field(FIELD, child.encoded_len()),
-            None => 0,
-        }
-    }
-
-    /// Encodes tag + length + child body when present.
-    pub fn encode_raw<B: BufMut>(&self, buf: &mut B)
-    where
-        M: MessageEncode,
-    {
-        if let Some(child) = self.store.as_deref() {
-            let payload_len = child.encoded_len();
-            encode::encode_tag(FIELD, WireType::Len, buf);
-            encode::encode_varint(payload_len as u64, buf);
-            child.encode_raw(buf);
-        }
     }
 
     /// Releases the child through the owned `alloc`, if present. Terminal; called
@@ -120,16 +165,6 @@ impl<M, const FIELD: u32, A: Allocator> NestedMessageField<M, Singular, FIELD, A
             unsafe { b.deallocate(alloc) };
         }
     }
-
-    /// Binds this field to its message `common` state (for the allocator),
-    /// producing a short-lived [`NestedMessageFieldMut`] view.
-    #[inline]
-    pub fn bind<'f, 'c, Pb: PresenceBits>(
-        &'f mut self,
-        common: &'c mut MessageCommon<Pb, A>,
-    ) -> NestedMessageFieldMut<'f, 'c, M, Singular, FIELD, A, Pb> {
-        NestedMessageFieldMut::new(self, common)
-    }
 }
 
 impl<M, const FIELD: u32, A: Allocator> Default for NestedMessageField<M, Singular, FIELD, A> {
@@ -138,43 +173,17 @@ impl<M, const FIELD: u32, A: Allocator> Default for NestedMessageField<M, Singul
     }
 }
 
-// ---------------------------------------------------------------------------
-// Oneof — message variant (bare `UnmanagedBox<M>`, always present)
-// ---------------------------------------------------------------------------
-
 impl<M, const FIELD: u32, A: Allocator> NestedMessageField<M, Oneof, FIELD, A> {
     /// Borrows the always-present child.
     #[inline]
     pub fn value(&self) -> &M {
-        &self.store
+        self.get().unwrap()
     }
 
     /// Mutably borrows the always-present child.
-    ///
-    /// Presence-agnostic and allocator-free (the box is already there), so a
-    /// oneof `_mut` accessor reads `field.value_mut()` exactly like a scalar's.
     #[inline]
     pub fn value_mut(&mut self) -> &mut M {
         &mut self.store
-    }
-
-    /// Wire byte length (the child is always present).
-    pub fn encoded_len_wire(&self) -> usize
-    where
-        M: MessageEncode,
-    {
-        encode::encoded_len_len_field(FIELD, self.store.encoded_len())
-    }
-
-    /// Encodes tag + length + child body (always present).
-    pub fn encode_raw_wire<B: BufMut>(&self, buf: &mut B)
-    where
-        M: MessageEncode,
-    {
-        let payload_len = self.store.encoded_len();
-        encode::encode_tag(FIELD, WireType::Len, buf);
-        encode::encode_varint(payload_len as u64, buf);
-        self.store.encode_raw(buf);
     }
 
     /// Releases the child through the owned `alloc`. Consumes the field by value
@@ -187,9 +196,6 @@ impl<M, const FIELD: u32, A: Allocator> NestedMessageField<M, Oneof, FIELD, A> {
     }
 
     /// Builds an always-present field holding a fresh, empty child.
-    ///
-    /// Used by oneof variants (via a per-variant `bind_*_mut` accessor) so the
-    /// variant is always constructed with the child present.
     pub fn with_message_in(alloc: A) -> Self
     where
         A: Clone,
@@ -199,16 +205,6 @@ impl<M, const FIELD: u32, A: Allocator> NestedMessageField<M, Oneof, FIELD, A> {
         Self {
             store: UnmanagedBox::new_in(m, alloc),
         }
-    }
-
-    /// Binds this oneof-variant field to its message `common` state (for the
-    /// allocator), producing a short-lived [`NestedMessageFieldMut`] view.
-    #[inline]
-    pub fn bind<'f, 'c, Pb: PresenceBits>(
-        &'f mut self,
-        common: &'c mut MessageCommon<Pb, A>,
-    ) -> NestedMessageFieldMut<'f, 'c, M, Oneof, FIELD, A, Pb> {
-        NestedMessageFieldMut::new(self, common)
     }
 }
 
@@ -245,6 +241,26 @@ impl<'f, 'c, M, P: MessagePresence, const FIELD: u32, A: Allocator, Pb: Presence
     ) -> Self {
         Self { field, common }
     }
+
+    /// Merges one LEN occurrence into the child (creates the child on first
+    /// merge for [`Singular`], then merges subsequent occurrences into it).
+    pub fn merge<B: Buf>(self, wire_type: WireType, buf: &mut B) -> Result<(), DecodeError>
+    where
+        M: NestedMessage<A>,
+        A: Clone,
+    {
+        if wire_type != len::WIRE_TYPE {
+            return Err(DecodeError::InvalidTag);
+        }
+        let len = decode::decode_varint(buf)? as usize;
+        if buf.remaining() < len {
+            return Err(DecodeError::TruncatedMessage);
+        }
+        let mut sub = buf.take(len);
+        P::as_mut_for_merge(&mut self.field.store, self.common.alloc.clone())
+            .merge_from(&mut sub)?;
+        Ok(())
+    }
 }
 
 impl<'f, 'c, M, const FIELD: u32, A: Allocator + Clone, Pb: PresenceBits>
@@ -256,58 +272,11 @@ impl<'f, 'c, M, const FIELD: u32, A: Allocator + Clone, Pb: PresenceBits>
     where
         M: NestedMessage<A>,
     {
-        if self.field.store.is_none() {
-            let m = M::new_in(self.common.alloc.clone());
-            self.field.store = Some(UnmanagedBox::new_in(m, self.common.alloc.clone()));
-        }
-        self.field.store.as_deref_mut().unwrap()
-    }
-
-    /// Merges one LEN occurrence into the child (creates the child on first
-    /// merge, then merges subsequent occurrences into it).
-    pub fn merge<B: Buf>(self, wire_type: WireType, buf: &mut B) -> Result<(), DecodeError>
-    where
-        M: NestedMessage<A>,
-    {
-        if wire_type != len::WIRE_TYPE {
-            return Err(DecodeError::InvalidTag);
-        }
-        let len = decode::decode_varint(buf)? as usize;
-        if buf.remaining() < len {
-            return Err(DecodeError::TruncatedMessage);
-        }
-        let mut sub = buf.take(len);
-        if self.field.store.is_none() {
-            let m = M::new_in(self.common.alloc.clone());
-            self.field.store = Some(UnmanagedBox::new_in(m, self.common.alloc.clone()));
-        }
-        self.field.store.as_deref_mut().unwrap().merge_from(&mut sub)?;
-        Ok(())
+        Singular::as_mut_for_merge(&mut self.field.store, self.common.alloc.clone())
     }
 
     /// Clears the nested message, freeing it through the message allocator.
     pub fn clear(self) {
         self.field.deallocate(self.common.alloc.clone());
-    }
-}
-
-impl<'f, 'c, M, const FIELD: u32, A: Allocator, Pb: PresenceBits>
-    NestedMessageFieldMut<'f, 'c, M, Oneof, FIELD, A, Pb>
-{
-    /// Merges one LEN occurrence into the always-present child.
-    pub fn merge<B: Buf>(self, wire_type: WireType, buf: &mut B) -> Result<(), DecodeError>
-    where
-        M: MessageDecode,
-    {
-        if wire_type != len::WIRE_TYPE {
-            return Err(DecodeError::InvalidTag);
-        }
-        let len = decode::decode_varint(buf)? as usize;
-        if buf.remaining() < len {
-            return Err(DecodeError::TruncatedMessage);
-        }
-        let mut sub = buf.take(len);
-        self.field.store.merge_from(&mut sub)?;
-        Ok(())
     }
 }
