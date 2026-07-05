@@ -13,9 +13,7 @@ use crate::optional::{HasDefault, Optional};
 use crate::wire_type::WireType;
 
 use super::common::MessageCommon;
-use super::field_presence::{
-    ExplicitFieldPresence, FieldPresence, LegacyRequired, RequiredFieldPresence,
-};
+use super::field_presence::{FieldPresence, LegacyRequired, RequiredFieldPresence};
 use super::len::{self, LenProtoType};
 use super::presence::PresenceBits;
 
@@ -63,8 +61,7 @@ impl<T: LenProtoType, P: FieldPresence, const FIELD: u32, A: Allocator, D>
     where
         Pb: PresenceBits,
     {
-        let empty = T::is_empty(&self.value);
-        if P::should_emit(common, empty) {
+        if P::should_emit(common, || T::is_empty(&self.value)) {
             encode::encoded_len_len_field(FIELD, T::as_bytes(&self.value).len())
         } else {
             0
@@ -75,8 +72,7 @@ impl<T: LenProtoType, P: FieldPresence, const FIELD: u32, A: Allocator, D>
     where
         Pb: PresenceBits,
     {
-        let empty = T::is_empty(&self.value);
-        if P::should_emit(common, empty) {
+        if P::should_emit(common, || T::is_empty(&self.value)) {
             encode::encode_len_field(FIELD, T::as_bytes(&self.value), buf);
         }
     }
@@ -85,21 +81,17 @@ impl<T: LenProtoType, P: FieldPresence, const FIELD: u32, A: Allocator, D>
         let old = unsafe { ManuallyDrop::take(&mut self.value) };
         unsafe { T::deallocate(old, alloc) };
     }
-}
 
-impl<T: LenProtoType, P: ExplicitFieldPresence, const FIELD: u32, A: Allocator, D>
-    SingularLenField<T, P, FIELD, A, D>
-{
     #[inline]
     pub fn has<Pb>(&self, common: &MessageCommon<Pb, A>) -> bool
     where
         Pb: PresenceBits,
     {
-        common.is_present(P::BIT)
+        P::is_set(common, || T::is_empty(&self.value))
     }
 }
 
-impl<T: LenProtoType, P: ExplicitFieldPresence, const FIELD: u32, A: Allocator, D>
+impl<T: LenProtoType, P: FieldPresence, const FIELD: u32, A: Allocator, D>
     SingularLenField<T, P, FIELD, A, D>
 where
     for<'a> T::Ref<'a>: Copy,
@@ -109,7 +101,7 @@ where
     where
         Pb: PresenceBits,
     {
-        let v = if common.is_present(P::BIT) {
+        let v = if P::is_set(common, || T::is_empty(&self.value)) {
             Some(T::borrow(&self.value))
         } else {
             None
@@ -125,7 +117,7 @@ impl<T: LenProtoType, const BIT: usize, const FIELD: u32, A: Allocator, D>
     where
         Pb: PresenceBits,
     {
-        LegacyRequired::<BIT>::validate_present(common, FIELD)
+        LegacyRequired::<BIT>::validate_present(common, FIELD, || T::is_empty(&self.value))
     }
 }
 

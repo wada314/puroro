@@ -40,8 +40,7 @@ pub mod varint;
 pub use ::protobuf_core::FieldNumber;
 pub use common::MessageCommon;
 pub use field_presence::{
-    Explicit, ExplicitFieldPresence, FieldPresence, Implicit, LegacyRequired, Oneof,
-    RequiredFieldPresence,
+    Explicit, FieldPresence, Implicit, LegacyRequired, Oneof, RequiredFieldPresence,
 };
 pub use len::{LenProtoType, ProtoBytes, ProtoString};
 pub use len_field::{

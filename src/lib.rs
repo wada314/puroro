@@ -39,7 +39,7 @@ pub use decode::MessageDecode;
 pub use encode::MessageEncode;
 pub use error::{DecodeError, EncodeError};
 pub use fields::{
-    Explicit, ExplicitBytes, ExplicitEnum, ExplicitFieldPresence, ExplicitInt32, ExplicitLenField,
+    Explicit, ExplicitBytes, ExplicitEnum, ExplicitInt32, ExplicitLenField,
     ExplicitString, ExplicitVarint, ExplicitVarintField, FieldNumber,
     FieldPresence, Implicit, ImplicitBytes, ImplicitEnum, ImplicitInt32, ImplicitLenField,
     ImplicitString, ImplicitVarint, ImplicitVarintField, LegacyRequired, LenProtoType,

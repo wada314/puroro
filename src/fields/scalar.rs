@@ -17,7 +17,7 @@ use crate::optional::{HasDefault, Optional};
 use crate::wire_type::WireType;
 
 use super::common::MessageCommon;
-use super::field_presence::{ExplicitFieldPresence, FieldPresence, Implicit};
+use super::field_presence::FieldPresence;
 use super::presence::PresenceBits;
 use super::varint::{self, VarintProtoType};
 
@@ -85,8 +85,7 @@ impl<T: VarintProtoType, P: FieldPresence, const FIELD: u32, D> SingularVarintFi
         Pb: PresenceBits,
         A: ::allocator_api2::alloc::Allocator,
     {
-        let empty = self.value == T::proto_zero();
-        if P::should_emit(common, empty) {
+        if P::should_emit(common, || self.value == T::proto_zero()) {
             encode::encoded_len_varint_field(FIELD, T::encode_wire(self.value))
         } else {
             0
@@ -98,28 +97,35 @@ impl<T: VarintProtoType, P: FieldPresence, const FIELD: u32, D> SingularVarintFi
         Pb: PresenceBits,
         A: ::allocator_api2::alloc::Allocator,
     {
-        let empty = self.value == T::proto_zero();
-        if P::should_emit(common, empty) {
+        if P::should_emit(common, || self.value == T::proto_zero()) {
             encode::encode_varint_field(FIELD, T::encode_wire(self.value), buf);
         }
     }
+
+    #[inline]
+    pub fn has<Pb, A>(&self, common: &MessageCommon<Pb, A>) -> bool
+    where
+        Pb: PresenceBits,
+        A: ::allocator_api2::alloc::Allocator,
+    {
+        P::is_set(common, || self.value == T::proto_zero())
+    }
 }
 
-impl<T: VarintProtoType, const FIELD: u32, D> SingularVarintField<T, Implicit, FIELD, D>
+impl<T: VarintProtoType, P: FieldPresence, const FIELD: u32, D> SingularVarintField<T, P, FIELD, D>
 where
     D: HasDefault<T::Value>,
     T::Value: Copy,
 {
-    /// `Optional` getter (`is_set` when the stored value is not [`VarintProtoType::proto_zero`]).
-    pub fn optional<Pb, A>(&self, _common: &MessageCommon<Pb, A>) -> Optional<T::Value, D>
+    pub fn optional<Pb, A>(&self, common: &MessageCommon<Pb, A>) -> Optional<T::Value, D>
     where
         Pb: PresenceBits,
-        A: Allocator,
+        A: ::allocator_api2::alloc::Allocator,
     {
-        let v = if self.value == T::proto_zero() {
-            None
-        } else {
+        let v = if P::is_set(common, || self.value == T::proto_zero()) {
             Some(self.value)
+        } else {
+            None
         };
         Optional::new(v)
     }
@@ -133,36 +139,6 @@ impl<T: VarintProtoType, P: FieldPresence, const FIELD: u32, D> Default
             value: T::proto_zero(),
             _marker: PhantomData,
         }
-    }
-}
-
-impl<T: VarintProtoType, P: ExplicitFieldPresence, const FIELD: u32, D> SingularVarintField<T, P, FIELD, D> {
-    #[inline]
-    pub fn has<Pb, A>(&self, common: &MessageCommon<Pb, A>) -> bool
-    where
-        Pb: PresenceBits,
-        A: ::allocator_api2::alloc::Allocator,
-    {
-        common.is_present(P::BIT)
-    }
-}
-
-impl<T: VarintProtoType, P: ExplicitFieldPresence, const FIELD: u32, D> SingularVarintField<T, P, FIELD, D>
-where
-    D: HasDefault<T::Value>,
-    T::Value: Copy,
-{
-    pub fn optional<Pb, A>(&self, common: &MessageCommon<Pb, A>) -> Optional<T::Value, D>
-    where
-        Pb: PresenceBits,
-        A: ::allocator_api2::alloc::Allocator,
-    {
-        let v = if common.is_present(P::BIT) {
-            Some(self.value)
-        } else {
-            None
-        };
-        Optional::new(v)
     }
 }
 
@@ -239,7 +215,7 @@ impl<
         'f,
         'c,
         T: VarintProtoType,
-        P: ExplicitFieldPresence,
+        P: FieldPresence,
         const FIELD: u32,
         D,
         Pb: PresenceBits,
