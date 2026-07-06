@@ -46,7 +46,7 @@ where
     #[inline]
     pub fn new_in<A: Allocator>(_alloc: A) -> Self {
         Self {
-            value: ValueSlot::new_empty(),
+            value: ValueSlot::new(),
             _marker: PhantomData,
         }
     }
@@ -166,7 +166,7 @@ where
 {
     fn default() -> Self {
         Self {
-            value: ValueSlot::new_empty(),
+            value: ValueSlot::new(),
             _marker: PhantomData,
         }
     }

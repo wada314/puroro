@@ -14,11 +14,11 @@ use super::slot_presence::{SlotInitState, SlotPresence};
 
 /// Storage operations for a singular field value slot.
 pub trait ValueSlot<T: ProtoZero> {
-    /// Constructs an empty slot at message creation (`new_in` / `Default`).
+    /// Creates value storage when the parent message is constructed ([`Default`]).
     ///
-    /// For raw `T`, writes type-zero via [`ProtoZero::set_proto_zero`]. For
-    /// [`MaybeUninit`], leaves the slot uninitialized.
-    fn new_empty() -> Self;
+    /// For raw `T`, returns [`ProtoZero::proto_zero`] — the slot is always initialized.
+    /// For [`MaybeUninit`], returns [`MaybeUninit::uninit`] — the slot starts absent.
+    fn new() -> Self;
 
     /// Assigns `value`, updating presence when the slot was uninitialized.
     ///
@@ -44,12 +44,8 @@ pub trait ValueSlot<T: ProtoZero> {
 }
 
 impl<T: ProtoZero> ValueSlot<T> for T {
-    fn new_empty() -> Self {
-        let mut slot = MaybeUninit::<T>::uninit();
-        unsafe {
-            T::set_proto_zero(&mut *slot.as_mut_ptr());
-            slot.assume_init()
-        }
+    fn new() -> Self {
+        T::proto_zero()
     }
 
     fn set(&mut self, _: &mut impl SlotPresence, value: T) {
@@ -70,7 +66,7 @@ impl<T: ProtoZero> ValueSlot<T> for T {
 }
 
 impl<T: ProtoZero> ValueSlot<T> for MaybeUninit<T> {
-    fn new_empty() -> Self {
+    fn new() -> Self {
         MaybeUninit::uninit()
     }
 
@@ -96,9 +92,7 @@ impl<T: ProtoZero> ValueSlot<T> for MaybeUninit<T> {
 
     fn as_mut(&mut self, presence: &mut impl SlotPresence) -> &mut T {
         if !presence.is_initialized() {
-            unsafe {
-                T::set_proto_zero(&mut *self.as_mut_ptr());
-            }
+            MaybeUninit::write(self, T::proto_zero());
             presence.set_initialized(true);
         }
         unsafe { self.assume_init_mut() }
