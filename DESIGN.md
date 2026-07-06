@@ -1,6 +1,6 @@
 # puroro — Design Document
 
-This document specifies the **public interface** of the `puroro` Protocol Buffers runtime library and the accessor API that the code generator must emit. It intentionally omits internal implementation details — storage types, encode/decode algorithms, and runtime helper usage are documented in [IMPLEMENTATION.md](IMPLEMENTATION.md).
+This document specifies the **public interface** of the `puroro` Protocol Buffers runtime library and the accessor API that the code generator must emit. It intentionally omits internal implementation details — storage types, encode/decode algorithms, and the composable field catalog — which live in the sibling **`puroro-rt`** crate and are documented in [IMPLEMENTATION.md](IMPLEMENTATION.md).
 
 ## Table of contents
 
@@ -43,9 +43,10 @@ The puroro project comprises several crates and tools with distinct roles:
 
 | Component | Role |
 |---|---|
-| **`protobuf-core`** (git submodule) | Wire-format **primitives** — `Varint`, `Tag`, `WireType`, field I/O traits, varint read/write. **`puroro` depends on this crate** for all low-level wire encoding; generated code imports **`puroro` only**. |
-| **`puroro`** (this crate) | The **runtime library** that generated code depends on: `MessageEncode` / `MessageDecode`, `Optional`, **`fields`** (composable field types under `shared/`, `wire/`, `singular/`, `repeated/`, `oneof/` + `MessageCommon`; see [IMPLEMENTATION.md §4](IMPLEMENTATION.md#4-shared-infrastructure)), per-field encode/decode helpers, allocator-aware string/bytes utilities, and error types. |
-| **Code generator** (`protoc` plugin) | Reads `.proto` input (via `protoc`) and emits Rust source implementing the API defined in this document. **Primary execution path:** register as a `protoc` plugin (`--puroro_out=…`). Other invocation styles (standalone CLI, `build.rs` wrapper, etc.) are permitted but not required. |
+| **`protobuf-core`** (git submodule) | Wire-format **primitives** — `Varint`, `Tag`, `WireType`, field I/O traits, varint read/write. Used by `puroro` and `puroro-rt`; **generated code does not import it directly**. |
+| **`puroro`** | **Stable user-facing runtime API** — `MessageEncode` / `MessageDecode`, `Optional`, `HasDefault`, `DecodeError` / `EncodeError`, `WireType`. Library users depend on this crate; generated message code imports it for traits, accessor return types, and error handling. |
+| **`puroro-rt`** | **Generated-code runtime** — composable field catalog (`fields::*`, `MessageCommon`), wire encode/decode helpers (`encode` / `decode` modules), `ProtoDefault`, and allocator-aware string/bytes utilities. Emitted generated code imports this crate (transitively for end users). Semver is looser than `puroro`; do not depend on it directly from application code. See [IMPLEMENTATION.md §4](IMPLEMENTATION.md#4-shared-infrastructure). |
+| **Code generator** (`protoc` plugin) | Reads `.proto` input (via `protoc`) and emits Rust source implementing the API defined in this document. **Primary execution path:** register as a `protoc` plugin (`--puroro_out=…`). Other invocation styles (standalone CLI, `build.rs` wrapper, etc.) are permitted but not required. Emits fully-qualified paths into both `::puroro::…` (traits, `Optional`, errors) and `::puroro_rt::…` (field catalog, wire helpers). |
 
 **Reference schema.** The `Task` and `Address` messages in [§4 Reference schema](#reference-schema) are the **canonical examples** for describing and reviewing generated code. All field-pattern subsections (§4.1–4.9) and [IMPLEMENTATION.md](IMPLEMENTATION.md) use this same schema unless noted otherwise.
 
@@ -54,7 +55,7 @@ The puroro project comprises several crates and tools with distinct roles:
 - **No compatibility** with other Rust protobuf libraries (`prost`, `protobuf`, `quick-protobuf`, etc.). API shapes, type names, and generated module layout are puroro-specific.
 - **Extensions** (§6.5) are out of scope for the current design.
 
-**Runtime completeness.** The public API in this document is normative and intended to remain stable; the **`puroro` runtime implementation is still evolving**. Items designed but not yet fully wired:
+**Runtime completeness.** The public API in this document is normative and intended to remain stable; the **`puroro-rt` implementation is still evolving**. Items designed but not yet fully wired:
 
 | Feature | Design intent | Implementation status |
 |---|---|---|
@@ -101,7 +102,7 @@ Wire types 3 and 4 (SGROUP / EGROUP) are deprecated. The encoder must never emit
 
 ## 3. Runtime trait API
 
-The runtime library (`puroro`) exposes two core traits and one accessor trait. Generated code depends only on these public items.
+The **`puroro`** crate exposes two core traits and one accessor trait. Generated code imports these items from `puroro`; the field catalog and wire helpers come from `puroro-rt` (see [§0](#0-project-architecture)). Library users who handle decode errors or write generic code over `MessageEncode` / `MessageDecode` depend on **`puroro` only**.
 
 ### `HasDefault` and `Optional`
 
@@ -210,7 +211,7 @@ This section is the normative reference for what the code generator emits. All f
 For each message type the code generator produces **three kinds of output**:
 
 1. **Two traits** — a stable API contract that multiple implementations satisfy (§4.0).
-2. **The primary struct** — a full-featured owned implementation (§4.1–4.9), internally a product of **`puroro::fields` catalog types** + shared `MessageCommon` (see [IMPLEMENTATION.md §2](IMPLEMENTATION.md#2-architecture-overview)).
+2. **The primary struct** — a full-featured owned implementation (§4.1–4.9), internally a product of **`puroro_rt::fields` catalog types** + shared `MessageCommon` (see [IMPLEMENTATION.md §2](IMPLEMENTATION.md#2-architecture-overview)).
 3. **(Future) Specialized structs** — alternative implementations for specific performance scenarios (§8).
 
 Generated Rust is not hand-edited; the plugin still emits **section banners, proto field labels, and `merge_from` dispatch comments** so build output is navigable when debugging. Convention: [IMPLEMENTATION.md §9 — Generated code comments](IMPLEMENTATION.md#generated-code-comments). Reference output: [`sample-generated/`](sample-generated/).
@@ -653,7 +654,7 @@ EXPLICIT presence: `is_set()` tracks the presence bit; `get()` returns `Priority
 
 #### Generated enum type
 
-Both open and closed enums produce a **newtype-over-`i32`** — not a Rust `enum`. Field storage uses [`ProtoEnum<E>`](src/fields/wire/varint.rs) so `SingularVarintField` holds `E` directly and reuses the same `optional()` / `value_mut()` paths as other varint fields.
+Both open and closed enums produce a **newtype-over-`i32`** — not a Rust `enum`. Field storage uses [`ProtoEnum<E>`](puroro-rt/src/fields/wire/varint.rs) so `SingularVarintField` holds `E` directly and reuses the same `optional()` / `value_mut()` paths as other varint fields.
 
 ```rust
 // Open — any wire value is valid storage (`OpenProtoEnum`)
@@ -702,7 +703,7 @@ pub(crate) enum NotificationStorage<A: Allocator + Clone> {
     WebhookId(SingularVarintField<ProtoInt32, Implicit>),     // VARINT (inline)
     Postal(NestedMessageField<Address<A>, A>),                // message (heap box)
 }
-impl<A: Allocator + Clone> ::puroro::OneofDeallocate<A> for NotificationStorage<A> {
+impl<A: Allocator + Clone> ::puroro_rt::OneofDeallocate<A> for NotificationStorage<A> {
     // LEN + message variants call field.deallocate(alloc); the scalar is a no-op.
 }
 
@@ -817,7 +818,7 @@ pub struct Task<A: Allocator + Clone = Global> { /* … */ }
 
 **Owned allocator, never a borrow.** Operations pass the allocator **by value** rather than `&A`: the caller clones the canonical `MessageCommon.alloc` for each field operation. This keeps the allocator type consistently `A` for both a buffer's growth and its eventual free — mixing `&A` at allocation with `A` at deallocation is fragile and not obviously idempotent. Correctness relies on the `Allocator + Clone` contract that clones are interchangeable. (The one exception is building an *empty* `unmanaged` container, which never allocates, so it may borrow.)
 
-**Manual release via `Drop`.** Because `unmanaged` values cannot free themselves (they panic if dropped implicitly), each field wraps its payload in `ManuallyDrop` and exposes `deallocate(&mut self, alloc: A)`. Every generated message implements `Drop`, walking its fields and calling `deallocate` with an `alloc.clone()` of the single `MessageCommon.alloc`; nested messages are freed recursively by their own `Drop`. The `unsafe` boundary is confined to the `puroro` runtime and the generated `Drop`.
+**Manual release via `Drop`.** Because `unmanaged` values cannot free themselves (they panic if dropped implicitly), each field wraps its payload in `ManuallyDrop` and exposes `deallocate(&mut self, alloc: A)`. Every generated message implements `Drop`, walking its fields and calling `deallocate` with an `alloc.clone()` of the single `MessageCommon.alloc`; nested messages are freed recursively by their own `Drop`. The `unsafe` boundary is confined to the `puroro-rt` runtime and the generated `Drop`.
 
 **Constructor API:**
 
@@ -1032,9 +1033,9 @@ Groups (`SGroup` / `EGroup`) are not generated and are not stored in unknown fie
 
 The code generator is designed first as a `protoc` plugin. That is the expected way users invoke generation (`protoc --puroro_out=…`). Wrapper scripts, `build.rs` integration, or a standalone binary may exist alongside the plugin, but the plugin interface is the reference integration point.
 
-### `protobuf-core` vs `puroro`
+### `protobuf-core`, `puroro`, and `puroro-rt`
 
-`protobuf-core` holds reusable wire-format primitives (varint, tags, field readers/writers). `puroro` holds the message-level runtime API (`MessageEncode`, `MessageDecode`, `Optional`, allocator helpers) that generated code imports directly. The two crates may share concepts but serve different layers; generated code depends on `puroro`, not on `protobuf-core`.
+`protobuf-core` holds reusable wire-format primitives (varint, tags, field readers/writers). **`puroro`** holds the stable message-level API (`MessageEncode`, `MessageDecode`, `Optional`, errors) that library users and generated `impl` blocks share. **`puroro-rt`** holds the composable field catalog, wire helpers, and other generator-facing runtime pieces. Generated crates list both `puroro` and `puroro-rt` as dependencies; application code should depend on the generated crate and `puroro` only — not on `puroro-rt` or `protobuf-core` directly.
 
 ### `Bytes` for lazy wire storage vs `A: Allocator` for decoded values
 
@@ -1054,7 +1055,7 @@ In addition to the primary `Task<A>` struct, the following specialized implement
 
 ##### Wire buffer: `bytes::Bytes` (shared, sliceable)
 
-The internal wire buffer is **`bytes::Bytes`**, not `Vec<u8, A>`.  `Bytes` is a reference-counted handle to a shared byte allocation (internally `Arc` — the same pattern as `Rc`, but `Send + Sync`).  It is already a dependency of `puroro` and is the standard choice in the Rust protobuf/network ecosystem (`prost`, `tonic`, `hyper`).
+The internal wire buffer is **`bytes::Bytes`**, not `Vec<u8, A>`.  `Bytes` is a reference-counted handle to a shared byte allocation (internally `Arc` — the same pattern as `Rc`, but `Send + Sync`).  It is already a dependency of `puroro-rt` and is the standard choice in the Rust protobuf/network ecosystem (`prost`, `tonic`, `hyper`).
 
 | Property | Benefit for `TaskLazy` |
 |---|---|

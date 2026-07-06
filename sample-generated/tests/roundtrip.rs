@@ -133,7 +133,7 @@ fn closed_enum_unknown_goes_to_unknown_fields() {
 
     // field 10 (priority) = 99 (unknown closed enum value), wire: tag + varint
     let mut bytes = Vec::new();
-    ::puroro::encode::encode_varint_field(10, 99, &mut bytes);
+    ::puroro_rt::encode::encode_varint_field(10, 99, &mut bytes);
 
     task.merge_from(&mut &bytes[..]).unwrap();
 

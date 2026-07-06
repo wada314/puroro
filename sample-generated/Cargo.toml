@@ -10,6 +10,7 @@ allocator-api2 = "0.4"
 bitvec = "1"
 bytes = "1"
 puroro = { path = ".." }
+puroro-rt = { path = "../puroro-rt" }
 unmanaged = { path = "../unmanaged" }
 
 [dev-dependencies]

@@ -8,7 +8,7 @@ use ::core::marker::PhantomData;
 ///
 /// Generated code defines a message-local ZST in `{message}/defaults.rs` when the
 /// proto field has `[default = …]`. Otherwise the field type's default `D`
-/// parameter is [`crate::defaults::ProtoDefault`].
+/// parameter is [`puroro_rt::ProtoDefault`].
 pub trait HasDefault<T: Copy> {
     const DEFAULT: T;
 }

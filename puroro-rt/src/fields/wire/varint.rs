@@ -7,8 +7,8 @@ use ::core::convert::TryFrom;
 use ::core::marker::PhantomData;
 use ::protobuf_core::Varint;
 
-use crate::error::DecodeError;
-use crate::wire_type::WireType;
+use ::puroro::DecodeError;
+use ::puroro::WireType;
 
 use crate::fields::shared::ProtoZero;
 

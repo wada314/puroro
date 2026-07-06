@@ -3,18 +3,19 @@
 use ::core::marker::PhantomData;
 use ::core::mem::ManuallyDrop;
 
-use ::bytes::{Buf, BufMut};
 use ::allocator_api2::alloc::Allocator;
+use ::bytes::{Buf, BufMut};
 
 use crate::defaults::ProtoDefault;
 use crate::encode;
-use crate::error::DecodeError;
-use crate::optional::{HasDefault, Optional};
-use crate::wire_type::WireType;
+use ::puroro::DecodeError;
+use ::puroro::WireType;
+use ::puroro::{HasDefault, Optional};
 
 use crate::fields::shared::{
+    MessageCommon, PresenceBits,
     field_presence::{FieldPresence, LegacyRequired, RequiredFieldPresence},
-    slot_init::SlotInitMut, MessageCommon, PresenceBits,
+    slot_init::SlotInitMut,
 };
 use crate::fields::wire::len::{self, LenProtoType};
 
@@ -36,7 +37,7 @@ impl<T: LenProtoType, P: FieldPresence, const FIELD: u32, A: Allocator, D>
 {
     pub fn new_in(alloc: A) -> Self {
         Self {
-            value: ManuallyDrop::new(T::new_empty(alloc)),
+            value: ManuallyDrop::new(T::new_in(alloc)),
             _marker: PhantomData,
         }
     }
@@ -140,16 +141,8 @@ pub struct SingularLenFieldMut<
     common: &'c mut MessageCommon<Pb, A>,
 }
 
-impl<
-        'f,
-        'c,
-        T: LenProtoType,
-        P: FieldPresence,
-        const FIELD: u32,
-        A: Allocator,
-        D,
-        Pb: PresenceBits,
-    > SingularLenFieldMut<'f, 'c, T, P, FIELD, A, D, Pb>
+impl<'f, 'c, T: LenProtoType, P: FieldPresence, const FIELD: u32, A: Allocator, D, Pb: PresenceBits>
+    SingularLenFieldMut<'f, 'c, T, P, FIELD, A, D, Pb>
 {
     #[inline]
     fn new(
@@ -204,7 +197,7 @@ impl<
         }
         let old = unsafe { ManuallyDrop::take(&mut self.field.value) };
         unsafe { T::deallocate(old, self.common.alloc.clone()) };
-        self.field.value = ManuallyDrop::new(T::new_empty(self.common.alloc.clone()));
+        self.field.value = ManuallyDrop::new(T::new_in(self.common.alloc.clone()));
     }
 }
 
@@ -212,7 +205,8 @@ impl<
 // Type aliases
 // ---------------------------------------------------------------------------
 
-pub type SingularLen<T, P, const FIELD: u32, A, D = ProtoDefault> = SingularLenField<T, P, FIELD, A, D>;
+pub type SingularLen<T, P, const FIELD: u32, A, D = ProtoDefault> =
+    SingularLenField<T, P, FIELD, A, D>;
 
 pub type ImplicitLenField<T, const FIELD: u32, A> =
     SingularLenField<T, crate::fields::shared::field_presence::Implicit, FIELD, A>;

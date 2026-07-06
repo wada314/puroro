@@ -11,10 +11,10 @@ use ::bytes::{Buf, BufMut};
 
 use crate::decode;
 use crate::encode;
-use crate::error::DecodeError;
+use ::puroro::DecodeError;
 use crate::defaults::ProtoDefault;
-use crate::optional::{HasDefault, Optional};
-use crate::wire_type::WireType;
+use ::puroro::{HasDefault, Optional};
+use ::puroro::WireType;
 
 use crate::fields::shared::{
     field_presence::FieldPresence, slot_init::AlwaysInitialized, value_slot::ValueSlot,

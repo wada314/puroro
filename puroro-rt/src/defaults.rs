@@ -4,7 +4,7 @@
 //! generated `{message}/defaults.rs` submodule. All other fields rely on the
 //! default type parameter [`ProtoDefault`] (protobuf type zero).
 
-use crate::optional::HasDefault;
+use ::puroro::HasDefault;
 
 /// Protobuf type zero — the default `D` type parameter on generated field types.
 ///

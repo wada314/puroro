@@ -5,8 +5,8 @@
 
 use ::bytes::{Buf, BufMut};
 
-use crate::error::DecodeError;
-use crate::wire_type::WireType;
+use ::puroro::DecodeError;
+use ::puroro::WireType;
 
 /// Wire semantics for protobuf types encoded as 4 little-endian bytes (I32).
 pub trait Fixed32ProtoType {

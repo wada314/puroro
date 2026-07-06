@@ -37,10 +37,10 @@
 
 use ::allocator_api2::alloc::Allocator;
 use ::bytes::{Buf, BufMut};
-use ::puroro::{
-    DecodeError, MessageCommon, NestedMessageField, Oneof, OneofDeallocate, OneofEncodable, OneofGroup,
+use ::puroro::{DecodeError, WireType};
+use ::puroro_rt::{
+    MessageCommon, NestedMessageField, Oneof, OneofDeallocate, OneofEncodable, OneofGroup,
     OneofSlot, PresenceBits, ProtoInt32, ProtoString, SingularLenField, SingularVarintField,
-    WireType,
 };
 use ::unmanaged::string::StringGuard;
 

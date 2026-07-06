@@ -12,8 +12,8 @@ use ::unmanaged::UnmanagedVec;
 use ::unmanaged::vec::VecGuard;
 
 use crate::decode;
-use crate::error::DecodeError;
-use crate::wire_type::WireType;
+use ::puroro::DecodeError;
+use ::puroro::WireType;
 
 use crate::fields::shared::{MessageCommon, PresenceBits};
 use crate::fields::wire::varint::{self, VarintProtoType};

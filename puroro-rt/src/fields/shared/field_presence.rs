@@ -9,7 +9,7 @@
 use ::allocator_api2::alloc::Allocator;
 use ::core::mem::MaybeUninit;
 
-use crate::error::DecodeError;
+use ::puroro::DecodeError;
 
 use super::{
     slot_init::{AlwaysInitialized, BitInitMut, BitInitView, SlotInitMut, SlotInitView},

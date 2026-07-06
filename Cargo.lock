@@ -59,9 +59,18 @@ dependencies = [
 name = "puroro"
 version = "0.1.0"
 dependencies = [
+ "bytes",
+ "protobuf-core",
+]
+
+[[package]]
+name = "puroro-rt"
+version = "0.1.0"
+dependencies = [
  "allocator-api2",
  "bytes",
  "protobuf-core",
+ "puroro",
  "unmanaged",
 ]
 
@@ -73,6 +82,7 @@ dependencies = [
  "bitvec",
  "bytes",
  "puroro",
+ "puroro-rt",
  "unmanaged",
 ]
 

@@ -7,15 +7,15 @@
 //! allocator is supplied on every operation that (de)allocates, so a generated
 //! message keeps a single allocator in [`MessageCommon`](crate::fields::shared::MessageCommon).
 
-use ::bytes::Buf;
 use ::allocator_api2::alloc::Allocator;
+use ::bytes::Buf;
 use ::unmanaged::string::StringGuard;
 use ::unmanaged::vec::VecGuard;
 use ::unmanaged::{UnmanagedString, UnmanagedVec};
 
 use crate::decode;
-use crate::error::DecodeError;
-use crate::wire_type::WireType;
+use ::puroro::DecodeError;
+use ::puroro::WireType;
 
 /// Wire semantics for protobuf types encoded as length-delimited records.
 pub trait LenProtoType {
@@ -36,7 +36,7 @@ pub trait LenProtoType {
         Self: 'a;
 
     /// Empty value used for IMPLICIT omit-on-encode and EXPLICIT unset slots.
-    fn new_empty<A: Allocator>(alloc: A) -> Self::Storage;
+    fn new_in<A: Allocator>(alloc: A) -> Self::Storage;
 
     /// `true` when the field should be omitted on encode (IMPLICIT presence).
     fn is_empty(value: &Self::Storage) -> bool;
@@ -79,7 +79,7 @@ impl LenProtoType for ProtoString {
     where
         Self: 'a;
 
-    fn new_empty<A: Allocator>(alloc: A) -> Self::Storage {
+    fn new_in<A: Allocator>(alloc: A) -> Self::Storage {
         UnmanagedString::new(alloc)
     }
 
@@ -131,7 +131,7 @@ impl LenProtoType for ProtoBytes {
     where
         Self: 'a;
 
-    fn new_empty<A: Allocator>(alloc: A) -> Self::Storage {
+    fn new_in<A: Allocator>(alloc: A) -> Self::Storage {
         UnmanagedVec::new(alloc)
     }
 

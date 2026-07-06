@@ -13,8 +13,8 @@
 use ::allocator_api2::alloc::Allocator;
 use ::bytes::{Buf, BufMut};
 
-use crate::error::DecodeError;
-use crate::wire_type::WireType;
+use ::puroro::DecodeError;
+use ::puroro::WireType;
 
 use crate::fields::shared::{MessageCommon, PresenceBits};
 

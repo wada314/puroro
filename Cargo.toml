@@ -1,5 +1,5 @@
 [workspace]
-members = [".", "protobuf-core", "sample-generated", "unmanaged"]
+members = [".", "puroro-rt", "protobuf-core", "sample-generated", "unmanaged"]
 resolver = "2"
 
 [package]
@@ -9,6 +9,4 @@ edition = "2024"
 
 [dependencies]
 bytes = "1"
-allocator-api2 = "0.4"
 protobuf-core = { path = "protobuf-core" }
-unmanaged = { path = "unmanaged" }

@@ -8,9 +8,9 @@ use ::bitvec::array::BitArray;
 use ::bitvec::order::Lsb0;
 use ::bytes::{Buf, BufMut};
 
-use ::puroro::{
-    DecodeError, Explicit, MessageCommon, MessageDecode, MessageEncode, NestedMessage,
-    PresenceBits, ProtoString, SingularLenField,
+use ::puroro::{DecodeError, MessageDecode, MessageEncode};
+use ::puroro_rt::{
+    Explicit, MessageCommon, NestedMessage, PresenceBits, ProtoString, SingularLenField,
 };
 
 // ---------------------------------------------------------------------------
@@ -160,7 +160,7 @@ impl<A: Allocator + Clone> MessageEncode for Address<A> {
 impl<A: Allocator + Clone> MessageDecode for Address<A> {
     fn merge_from<B: Buf>(&mut self, buf: &mut B) -> Result<(), DecodeError> {
         while buf.has_remaining() {
-            let (field_number, wire_type) = ::puroro::decode::decode_tag(buf)?;
+            let (field_number, wire_type) = ::puroro_rt::decode::decode_tag(buf)?;
             match field_number {
                 FIELD_STREET => {
                     // street = 1, EXPLICIT string
@@ -176,7 +176,7 @@ impl<A: Allocator + Clone> MessageDecode for Address<A> {
                 }
                 _ => {
                     // unknown field — preserve in _common.unknown_fields
-                    ::puroro::decode::skip_field_and_save(
+                    ::puroro_rt::decode::skip_field_and_save(
                         field_number,
                         wire_type,
                         buf,

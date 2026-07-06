@@ -12,11 +12,11 @@ use ::bitvec::array::BitArray;
 use ::bitvec::order::Lsb0;
 use ::bytes::{Buf, BufMut};
 
-use ::puroro::{
-    DecodeError, Explicit, HasDefault, Implicit, LegacyRequired, MessageCommon, MessageDecode,
-    MessageEncode, NestedMessageField, OneofSlot, Optional, PresenceBits, ProtoBytes, ProtoEnum,
-    ProtoInt32, ProtoString, RepeatedExpandedVarintField, RepeatedLenField, RepeatedPackedVarintField,
-    Singular, SingularLenField, SingularVarintField,
+use ::puroro::{DecodeError, HasDefault, MessageDecode, MessageEncode, Optional};
+use ::puroro_rt::{
+    Explicit, Implicit, LegacyRequired, MessageCommon, NestedMessageField, OneofSlot, PresenceBits,
+    ProtoBytes, ProtoEnum, ProtoInt32, ProtoString, RepeatedExpandedVarintField, RepeatedLenField,
+    RepeatedPackedVarintField, Singular, SingularLenField, SingularVarintField,
 };
 
 use defaults::MaxRetriesDefault;
@@ -443,7 +443,7 @@ impl<A: Allocator + Clone> MessageEncode for Task<A> {
 impl<A: Allocator + Clone> MessageDecode for Task<A> {
     fn merge_from<B: Buf>(&mut self, buf: &mut B) -> Result<(), DecodeError> {
         while buf.has_remaining() {
-            let (field_number, wire_type) = ::puroro::decode::decode_tag(buf)?;
+            let (field_number, wire_type) = ::puroro_rt::decode::decode_tag(buf)?;
             match field_number {
                 FIELD_TITLE => {
                     // title = 1, EXPLICIT string
@@ -513,7 +513,7 @@ impl<A: Allocator + Clone> MessageDecode for Task<A> {
                 }
                 _ => {
                     // unknown field — preserve in _common.unknown_fields
-                    ::puroro::decode::skip_field_and_save(
+                    ::puroro_rt::decode::skip_field_and_save(
                         field_number,
                         wire_type,
                         buf,

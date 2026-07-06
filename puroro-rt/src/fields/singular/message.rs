@@ -20,10 +20,10 @@ use ::allocator_api2::alloc::Allocator;
 use ::bytes::{Buf, BufMut};
 use ::unmanaged::UnmanagedBox;
 
-use crate::decode::{self, MessageDecode};
-use crate::encode::{self, MessageEncode};
-use crate::error::DecodeError;
-use crate::wire_type::WireType;
+use ::puroro::{DecodeError, MessageDecode, MessageEncode, WireType};
+
+use crate::decode;
+use crate::encode;
 
 use crate::fields::shared::{field_presence::Oneof, MessageCommon, PresenceBits};
 use crate::fields::wire::len;

@@ -6,7 +6,8 @@
 
 use ::core::convert::TryFrom;
 
-use ::puroro::{HasDefault, ProtoDefault, ProtoEnumStorage};
+use ::puroro::{DecodeError, HasDefault};
+use ::puroro_rt::{ProtoDefault, ProtoEnumStorage};
 
 /// Open enum (`enum_type = OPEN`).
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
@@ -51,7 +52,7 @@ impl ProtoEnumStorage for Status {
         self.0
     }
 
-    fn decode_from_wire(wire: i32) -> Result<Self, ::puroro::DecodeError> {
+    fn decode_from_wire(wire: i32) -> Result<Self, DecodeError> {
         Ok(Self::from(wire))
     }
 }
@@ -103,8 +104,8 @@ impl ProtoEnumStorage for Priority {
         self.0
     }
 
-    fn decode_from_wire(wire: i32) -> Result<Self, ::puroro::DecodeError> {
-        Self::try_from(wire).map_err(|_| ::puroro::DecodeError::InvalidTag)
+    fn decode_from_wire(wire: i32) -> Result<Self, DecodeError> {
+        Self::try_from(wire).map_err(|_| DecodeError::InvalidTag)
     }
 }
 
