@@ -159,6 +159,16 @@ impl<E> OneofSlot<E> {
         self.as_ref().map(|v| v.encoded_len(common)).unwrap_or(0)
     }
 
+    /// Projects the active storage enum onto one variant's field wrapper.
+    ///
+    /// Generated code passes the storage enum's per-variant accessor (for example
+    /// `NotificationStorage::webhook_id`) so message getters can mirror ordinary
+    /// fields: `self.notification.variant_of(Storage::webhook_id).optional(common)`.
+    #[inline]
+    pub fn variant_of<'a, F>(&'a self, select: fn(&E) -> Option<&F>) -> OneofVariantRef<'a, F> {
+        OneofVariantRef::new(self.as_ref().and_then(select))
+    }
+
     /// Encodes the active variant.
     pub fn encode_raw<Pb, A, B: BufMut>(&self, common: &MessageCommon<Pb, A>, buf: &mut B)
     where
@@ -312,5 +322,83 @@ impl<E: ::core::fmt::Debug> ::core::fmt::Debug for OneofSlot<E> {
 impl<E: PartialEq> PartialEq for OneofSlot<E> {
     fn eq(&self, other: &Self) -> bool {
         self.value == other.value
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Per-variant read handles
+// ---------------------------------------------------------------------------
+
+/// Borrowed read handle for one member of an active [`OneofSlot`].
+///
+/// `None` when the slot is unset or holds a different variant. Generated
+/// `OneofSlot` impls expose one accessor per variant; each returns this type so
+/// message getters can mirror ordinary fields
+/// (`self.notification.webhook_id().optional(&self._common)`).
+pub struct OneofVariantRef<'a, F> {
+    field: Option<&'a F>,
+}
+
+impl<'a, F> OneofVariantRef<'a, F> {
+    #[inline]
+    pub fn new(field: Option<&'a F>) -> Self {
+        Self { field }
+    }
+}
+
+impl<
+        'a,
+        T: crate::fields::wire::len::LenProtoType,
+        const FIELD: u32,
+        A: Allocator,
+        D,
+    > OneofVariantRef<'a, crate::fields::singular::len::SingularLenField<T, crate::fields::shared::field_presence::Oneof, FIELD, A, D>>
+where
+    for<'b> T::Ref<'b>: Copy,
+    D: for<'b> ::puroro::HasDefault<T::Ref<'b>>,
+{
+    pub fn optional<Pb: PresenceBits>(
+        self,
+        common: &MessageCommon<Pb, A>,
+    ) -> ::puroro::Optional<T::Ref<'a>, D> {
+        match self.field {
+            Some(f) => f.optional(common),
+            None => ::puroro::Optional::new(None),
+        }
+    }
+}
+
+impl<
+        'a,
+        T: crate::fields::wire::varint::VarintProtoType,
+        const FIELD: u32,
+        D,
+    > OneofVariantRef<'a, crate::fields::singular::varint::SingularVarintField<T, crate::fields::shared::field_presence::Oneof, FIELD, D>>
+where
+    T::Value: Copy,
+    D: ::puroro::HasDefault<T::Value>,
+    <crate::fields::shared::field_presence::Oneof as crate::fields::shared::field_presence::FieldPresence>::ValueSlot<T::Value>:
+        crate::fields::shared::value_slot::ValueSlot<T::Value>,
+{
+    pub fn optional<Pb: PresenceBits, A: Allocator>(
+        self,
+        common: &MessageCommon<Pb, A>,
+    ) -> ::puroro::Optional<T::Value, D> {
+        match self.field {
+            Some(f) => f.optional(common),
+            None => ::puroro::Optional::new(None),
+        }
+    }
+}
+
+impl<
+        'a,
+        M,
+        const FIELD: u32,
+        A: Allocator,
+    > OneofVariantRef<'a, crate::fields::singular::message::NestedMessageField<M, crate::fields::shared::field_presence::Oneof, FIELD, A>>
+{
+    pub fn get(self) -> Option<&'a M> {
+        self.field.map(crate::fields::singular::message::NestedMessageField::value)
     }
 }

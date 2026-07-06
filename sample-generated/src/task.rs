@@ -316,31 +316,27 @@ impl<A: Allocator + Clone> Task<A> {
     }
 
     pub fn email_address<'a>(&'a self) -> Optional<&'a str, impl HasDefault<&'a str>> {
-        match self.notification.as_ref() {
-            Some(NotificationStorage::EmailAddress(f)) => f.optional(&self._common),
-            _ => Optional::new(None),
-        }
+        self.notification
+            .variant_of(NotificationStorage::email_address)
+            .optional(&self._common)
     }
 
     pub fn phone_number<'a>(&'a self) -> Optional<&'a str, impl HasDefault<&'a str>> {
-        match self.notification.as_ref() {
-            Some(NotificationStorage::PhoneNumber(f)) => f.optional(&self._common),
-            _ => Optional::new(None),
-        }
+        self.notification
+            .variant_of(NotificationStorage::phone_number)
+            .optional(&self._common)
     }
 
     pub fn webhook_id(&self) -> Optional<i32, impl HasDefault<i32>> {
-        match self.notification.as_ref() {
-            Some(NotificationStorage::WebhookId(f)) => f.optional(&self._common),
-            _ => Optional::new(None),
-        }
+        self.notification
+            .variant_of(NotificationStorage::webhook_id)
+            .optional(&self._common)
     }
 
     pub fn postal(&self) -> Option<&Address<A>> {
-        match self.notification.as_ref() {
-            Some(NotificationStorage::Postal(f)) => Some(f.value()),
-            _ => None,
-        }
+        self.notification
+            .variant_of(NotificationStorage::postal)
+            .get()
     }
 
     /// Safe borrowed mutable view of the *currently active* variant (no switch).

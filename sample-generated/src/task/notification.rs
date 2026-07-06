@@ -198,6 +198,42 @@ impl<
         );
         field.bind(common)
     }
+
+    pub fn email_address(
+        &self,
+    ) -> Option<&SingularLenField<ProtoString, Oneof, { FIELD_EMAIL_ADDRESS }, A>> {
+        match self {
+            Self::EmailAddress(f) => Some(f),
+            _ => None,
+        }
+    }
+
+    pub fn phone_number(
+        &self,
+    ) -> Option<&SingularLenField<ProtoString, Oneof, { FIELD_PHONE_NUMBER }, A>> {
+        match self {
+            Self::PhoneNumber(f) => Some(f),
+            _ => None,
+        }
+    }
+
+    pub fn webhook_id(
+        &self,
+    ) -> Option<&SingularVarintField<ProtoInt32, Oneof, { FIELD_WEBHOOK_ID }>> {
+        match self {
+            Self::WebhookId(f) => Some(f),
+            _ => None,
+        }
+    }
+
+    pub fn postal(
+        &self,
+    ) -> Option<&NestedMessageField<Address<A>, Oneof, { FIELD_POSTAL }, A>> {
+        match self {
+            Self::Postal(f) => Some(f),
+            _ => None,
+        }
+    }
 }
 
 impl<
