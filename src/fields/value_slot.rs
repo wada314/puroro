@@ -4,13 +4,13 @@
 //! [`ValueSlot`] is implemented for raw `T` and [`MaybeUninit<T>`]. The trait's
 //! type parameter `T` disambiguates the two blanket impls so they do not overlap.
 //!
-//! Mutation takes a [`SlotPresence`](super::slot_presence::SlotPresence) adapter so
-//! init-state branching is centralized here rather than in [`FieldPresence`](super::field_presence::FieldPresence).
+//! Mutation takes a [`SlotInitMut`](super::slot_init::SlotInitMut) handle so init-state
+//! branching is centralized here rather than in [`FieldPresence`](super::field_presence::FieldPresence).
 
 use ::core::mem::MaybeUninit;
 
 use super::proto_zero::ProtoZero;
-use super::slot_presence::{SlotInitState, SlotPresence};
+use super::slot_init::{SlotInitMut, SlotInitView};
 
 /// Storage operations for a singular field value slot.
 pub trait ValueSlot<T: ProtoZero> {
@@ -20,27 +20,27 @@ pub trait ValueSlot<T: ProtoZero> {
     /// For [`MaybeUninit`], returns [`MaybeUninit::uninit`] — the slot starts absent.
     fn new() -> Self;
 
-    /// Assigns `value`, updating presence when the slot was uninitialized.
+    /// Assigns `value`, updating init state when the slot was uninitialized.
     ///
     /// Unlike [`as_mut`](Self::as_mut), the slot does **not** need to be initialized
     /// first — for [`MaybeUninit`] this uses [`MaybeUninit::write`] on first assign.
-    fn set(&mut self, presence: &mut impl SlotPresence, value: T);
+    fn set(&mut self, init: &mut impl SlotInitMut, value: T);
 
-    /// Drops an initialized payload and clears presence; no-op when uninitialized.
-    fn clear(&mut self, presence: &mut impl SlotPresence);
+    /// Drops an initialized payload and clears init state; no-op when uninitialized.
+    fn clear(&mut self, init: &mut impl SlotInitMut);
 
     /// Returns `&mut T`, lazy-initializing with type-zero when the slot is uninitialized.
     ///
-    /// Like [`Box::as_mut`](Box::as_mut), but also marks the slot present via `presence`.
+    /// Like [`Box::as_mut`](Box::as_mut), but also marks the slot initialized via `init`.
     /// When the slot is not yet initialized, writes protobuf type-zero as a placeholder
     /// before returning — use [`set`](Self::set) when you have the final value and want
     /// to avoid that intermediate state.
-    fn as_mut<'a>(&'a mut self, presence: &mut impl SlotPresence) -> &'a mut T;
+    fn as_mut<'a>(&'a mut self, init: &mut impl SlotInitMut) -> &'a mut T;
 
     /// Borrows `&T` when initialized.
     ///
     /// Like [`Option::as_ref`](Option::as_ref) — `None` when the slot is not initialized.
-    fn as_ref<'a>(&'a self, init: &impl SlotInitState) -> Option<&'a T>;
+    fn as_ref<'a>(&'a self, init: &impl SlotInitView) -> Option<&'a T>;
 }
 
 impl<T: ProtoZero> ValueSlot<T> for T {
@@ -48,19 +48,19 @@ impl<T: ProtoZero> ValueSlot<T> for T {
         T::proto_zero()
     }
 
-    fn set(&mut self, _: &mut impl SlotPresence, value: T) {
+    fn set(&mut self, _: &mut impl SlotInitMut, value: T) {
         *self = value;
     }
 
-    fn clear(&mut self, _: &mut impl SlotPresence) {
+    fn clear(&mut self, _: &mut impl SlotInitMut) {
         T::set_proto_zero(self);
     }
 
-    fn as_mut(&mut self, _: &mut impl SlotPresence) -> &mut T {
+    fn as_mut(&mut self, _: &mut impl SlotInitMut) -> &mut T {
         self
     }
 
-    fn as_ref(&self, _: &impl SlotInitState) -> Option<&T> {
+    fn as_ref(&self, _: &impl SlotInitView) -> Option<&T> {
         Some(self)
     }
 }
@@ -70,35 +70,35 @@ impl<T: ProtoZero> ValueSlot<T> for MaybeUninit<T> {
         MaybeUninit::uninit()
     }
 
-    fn set(&mut self, presence: &mut impl SlotPresence, value: T) {
-        if presence.is_initialized() {
+    fn set(&mut self, init: &mut impl SlotInitMut, value: T) {
+        if init.is_initialized() {
             unsafe {
                 *self.assume_init_mut() = value;
             }
         } else {
             MaybeUninit::write(self, value);
-            presence.set_initialized(true);
+            init.set_initialized(true);
         }
     }
 
-    fn clear(&mut self, presence: &mut impl SlotPresence) {
-        if presence.is_initialized() {
+    fn clear(&mut self, init: &mut impl SlotInitMut) {
+        if init.is_initialized() {
             unsafe {
                 self.assume_init_drop();
             }
-            presence.set_initialized(false);
+            init.set_initialized(false);
         }
     }
 
-    fn as_mut(&mut self, presence: &mut impl SlotPresence) -> &mut T {
-        if !presence.is_initialized() {
+    fn as_mut(&mut self, init: &mut impl SlotInitMut) -> &mut T {
+        if !init.is_initialized() {
             MaybeUninit::write(self, T::proto_zero());
-            presence.set_initialized(true);
+            init.set_initialized(true);
         }
         unsafe { self.assume_init_mut() }
     }
 
-    fn as_ref(&self, init: &impl SlotInitState) -> Option<&T> {
+    fn as_ref(&self, init: &impl SlotInitView) -> Option<&T> {
         if init.is_initialized() {
             Some(unsafe { self.assume_init_ref() })
         } else {

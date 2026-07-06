@@ -36,7 +36,7 @@ pub mod repeated_encoding;
 pub mod repeated_len;
 pub mod repeated_varint;
 pub mod scalar;
-pub mod slot_presence;
+pub mod slot_init;
 pub mod value_slot;
 pub mod varint;
 
@@ -55,7 +55,7 @@ pub use message::{
 };
 pub use oneof::{OneofDeallocate, OneofEncodable, OneofGroup, OneofSlot, OneofSlotMut};
 pub use presence::PresenceBits;
-pub use slot_presence::{AlwaysInitialized, BitInitView, BitPresence, SlotInitState, SlotPresence};
+pub use slot_init::{AlwaysInitialized, BitInitMut, BitInitView, SlotInitMut, SlotInitView};
 pub use value_slot::ValueSlot;
 pub use repeated_encoding::{Expanded, Packed, RepeatedVarintEncoding};
 pub use repeated_len::{

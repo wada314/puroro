@@ -19,7 +19,7 @@ use crate::wire_type::WireType;
 use super::common::MessageCommon;
 use super::field_presence::FieldPresence;
 use super::presence::PresenceBits;
-use super::slot_presence::AlwaysInitialized;
+use super::slot_init::AlwaysInitialized;
 use super::value_slot::ValueSlot;
 use super::varint::{self, VarintProtoType};
 
@@ -213,14 +213,14 @@ where
 
     #[inline]
     pub fn value_mut(self) -> &'f mut T::Value {
-        let mut presence = P::slot_presence(self.common);
-        self.field.value.as_mut(&mut presence)
+        let mut init = P::slot_init_mut(self.common);
+        self.field.value.as_mut(&mut init)
     }
 
     #[inline]
     pub fn set(self, v: T::Value) {
-        let mut presence = P::slot_presence(self.common);
-        self.field.value.set(&mut presence, v);
+        let mut init = P::slot_init_mut(self.common);
+        self.field.value.set(&mut init, v);
     }
 
     pub fn merge<B: Buf>(self, wire_type: WireType, buf: &mut B) -> Result<(), DecodeError> {
@@ -228,10 +228,10 @@ where
             return Err(DecodeError::InvalidTag);
         }
         let raw = decode::decode_varint(buf)?;
-        let mut presence = P::slot_presence(self.common);
+        let mut init = P::slot_init_mut(self.common);
         self.field
             .value
-            .set(&mut presence, T::decode_wire(raw)?);
+            .set(&mut init, T::decode_wire(raw)?);
         Ok(())
     }
 
@@ -240,8 +240,8 @@ where
     /// For [`Implicit`](super::field_presence::Implicit) fields this omits the field on
     /// the wire (equivalent to assigning the type-zero).
     pub fn clear(self) {
-        let mut presence = P::slot_presence(self.common);
-        self.field.value.clear(&mut presence);
+        let mut init = P::slot_init_mut(self.common);
+        self.field.value.clear(&mut init);
     }
 }
 
@@ -285,10 +285,10 @@ where
             );
             return Ok(());
         }
-        let mut presence = P::slot_presence(self.common);
+        let mut init = P::slot_init_mut(self.common);
         self.field
             .value
-            .set(&mut presence, T::decode_wire(raw)?);
+            .set(&mut init, T::decode_wire(raw)?);
         Ok(())
     }
 }

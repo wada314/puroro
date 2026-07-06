@@ -16,7 +16,7 @@ use super::common::MessageCommon;
 use super::field_presence::{FieldPresence, LegacyRequired, RequiredFieldPresence};
 use super::len::{self, LenProtoType};
 use super::presence::PresenceBits;
-use super::slot_presence::SlotPresence;
+use super::slot_init::SlotInitMut;
 
 /// Singular LEN field — parametrised by [`LenProtoType`] `T`, presence policy `P`,
 /// proto field number `FIELD`, message allocator `A`, and compile-time default marker `D`.
@@ -165,8 +165,8 @@ impl<
         A: Clone,
     {
         {
-            let mut presence = P::slot_presence(self.common);
-            presence.set_initialized(true);
+            let mut init = P::slot_init_mut(self.common);
+            init.set_initialized(true);
         }
         let alloc = self.common.alloc.clone();
         self.field.value_mut(alloc)
@@ -184,8 +184,8 @@ impl<
         unsafe { T::deallocate(old, self.common.alloc.clone()) };
         self.field.value = ManuallyDrop::new(new);
         {
-            let mut presence = P::slot_presence(self.common);
-            presence.set_initialized(true);
+            let mut init = P::slot_init_mut(self.common);
+            init.set_initialized(true);
         }
         Ok(())
     }
@@ -199,8 +199,8 @@ impl<
         A: Clone,
     {
         {
-            let mut presence = P::slot_presence(self.common);
-            presence.set_initialized(false);
+            let mut init = P::slot_init_mut(self.common);
+            init.set_initialized(false);
         }
         let old = unsafe { ManuallyDrop::take(&mut self.field.value) };
         unsafe { T::deallocate(old, self.common.alloc.clone()) };

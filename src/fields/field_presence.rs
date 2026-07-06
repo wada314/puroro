@@ -14,8 +14,8 @@ use crate::error::DecodeError;
 use super::common::MessageCommon;
 use super::presence::PresenceBits;
 use super::proto_zero::ProtoZero;
-use super::slot_presence::{
-    AlwaysInitialized, BitInitView, BitPresence, SlotInitState, SlotPresence,
+use super::slot_init::{
+    AlwaysInitialized, BitInitMut, BitInitView, SlotInitMut, SlotInitView,
 };
 use super::value_slot::ValueSlot;
 
@@ -27,21 +27,21 @@ pub trait FieldPresence: Copy {
     /// [`LegacyRequired`] use [`MaybeUninit<T>`].
     type ValueSlot<T: ProtoZero>: ValueSlot<T>;
 
-    /// Mutable presence adapter for value-slot mutation.
-    type SlotPresence<'a, P: PresenceBits + 'a, A: Allocator + 'a>: SlotPresence;
+    /// Mutable init-state handle for value-slot mutation.
+    type SlotInitMut<'a, P: PresenceBits + 'a, A: Allocator + 'a>: SlotInitMut;
 
-    /// Read-only presence view for value-slot reads.
-    type SlotInitView<'a, P: PresenceBits + 'a, A: Allocator + 'a>: SlotInitState;
+    /// Read-only init-state view for value-slot reads.
+    type SlotInitView<'a, P: PresenceBits + 'a, A: Allocator + 'a>: SlotInitView;
 
-    /// Returns a mutable presence adapter bound to `common`.
-    fn slot_presence<'a, Pb, A>(
+    /// Returns a mutable init-state handle bound to `common`.
+    fn slot_init_mut<'a, Pb, A>(
         common: &'a mut MessageCommon<Pb, A>,
-    ) -> Self::SlotPresence<'a, Pb, A>
+    ) -> Self::SlotInitMut<'a, Pb, A>
     where
         Pb: PresenceBits,
         A: Allocator;
 
-    /// Returns a read-only presence view bound to `common`.
+    /// Returns a read-only init-state view bound to `common`.
     fn slot_init_view<'a, Pb, A>(common: &'a MessageCommon<Pb, A>) -> Self::SlotInitView<'a, Pb, A>
     where
         Pb: PresenceBits,
@@ -83,10 +83,10 @@ pub struct Implicit;
 
 impl FieldPresence for Implicit {
     type ValueSlot<T: ProtoZero> = T;
-    type SlotPresence<'a, P: PresenceBits + 'a, A: Allocator + 'a> = AlwaysInitialized;
+    type SlotInitMut<'a, P: PresenceBits + 'a, A: Allocator + 'a> = AlwaysInitialized;
     type SlotInitView<'a, P: PresenceBits + 'a, A: Allocator + 'a> = AlwaysInitialized;
 
-    fn slot_presence<'a, Pb, A>(_: &'a mut MessageCommon<Pb, A>) -> AlwaysInitialized
+    fn slot_init_mut<'a, Pb, A>(_: &'a mut MessageCommon<Pb, A>) -> AlwaysInitialized
     where
         Pb: PresenceBits,
         A: Allocator,
@@ -133,10 +133,10 @@ pub struct Oneof;
 
 impl FieldPresence for Oneof {
     type ValueSlot<T: ProtoZero> = T;
-    type SlotPresence<'a, P: PresenceBits + 'a, A: Allocator + 'a> = AlwaysInitialized;
+    type SlotInitMut<'a, P: PresenceBits + 'a, A: Allocator + 'a> = AlwaysInitialized;
     type SlotInitView<'a, P: PresenceBits + 'a, A: Allocator + 'a> = AlwaysInitialized;
 
-    fn slot_presence<'a, Pb, A>(_: &'a mut MessageCommon<Pb, A>) -> AlwaysInitialized
+    fn slot_init_mut<'a, Pb, A>(_: &'a mut MessageCommon<Pb, A>) -> AlwaysInitialized
     where
         Pb: PresenceBits,
         A: Allocator,
@@ -187,17 +187,17 @@ impl<const BIT: usize> Default for Explicit<BIT> {
 
 impl<const BIT: usize> FieldPresence for Explicit<BIT> {
     type ValueSlot<T: ProtoZero> = MaybeUninit<T>;
-    type SlotPresence<'a, P: PresenceBits + 'a, A: Allocator + 'a> = BitPresence<'a, BIT, P, A>;
+    type SlotInitMut<'a, P: PresenceBits + 'a, A: Allocator + 'a> = BitInitMut<'a, BIT, P, A>;
     type SlotInitView<'a, P: PresenceBits + 'a, A: Allocator + 'a> = BitInitView<'a, BIT, P, A>;
 
-    fn slot_presence<'a, Pb, A>(
+    fn slot_init_mut<'a, Pb, A>(
         common: &'a mut MessageCommon<Pb, A>,
-    ) -> BitPresence<'a, BIT, Pb, A>
+    ) -> BitInitMut<'a, BIT, Pb, A>
     where
         Pb: PresenceBits,
         A: Allocator,
     {
-        BitPresence::new(common)
+        BitInitMut::new(common)
     }
 
     fn slot_init_view<'a, Pb, A>(
@@ -246,17 +246,17 @@ impl<const BIT: usize> Default for LegacyRequired<BIT> {
 
 impl<const BIT: usize> FieldPresence for LegacyRequired<BIT> {
     type ValueSlot<T: ProtoZero> = MaybeUninit<T>;
-    type SlotPresence<'a, P: PresenceBits + 'a, A: Allocator + 'a> = BitPresence<'a, BIT, P, A>;
+    type SlotInitMut<'a, P: PresenceBits + 'a, A: Allocator + 'a> = BitInitMut<'a, BIT, P, A>;
     type SlotInitView<'a, P: PresenceBits + 'a, A: Allocator + 'a> = BitInitView<'a, BIT, P, A>;
 
-    fn slot_presence<'a, Pb, A>(
+    fn slot_init_mut<'a, Pb, A>(
         common: &'a mut MessageCommon<Pb, A>,
-    ) -> BitPresence<'a, BIT, Pb, A>
+    ) -> BitInitMut<'a, BIT, Pb, A>
     where
         Pb: PresenceBits,
         A: Allocator,
     {
-        BitPresence::new(common)
+        BitInitMut::new(common)
     }
 
     fn slot_init_view<'a, Pb, A>(
