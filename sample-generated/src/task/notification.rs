@@ -139,56 +139,56 @@ impl<
         slot: &'f mut OneofSlot<Self>,
         common: &mut MessageCommon<Pb, A>,
     ) -> &'f mut SingularLenField<ProtoString, Oneof, { FIELD_EMAIL_ADDRESS }, A> {
-        let variant = slot.bind(common).variant_mut(
-            |n| matches!(n, Self::EmailAddress(_)),
+        slot.bind(common).variant_mut(
+            |e| matches!(e, Self::EmailAddress(_)),
+            |e| match e {
+                Self::EmailAddress(f) => Some(f),
+                _ => None,
+            },
             |alloc| Self::EmailAddress(SingularLenField::new_in(alloc)),
-        );
-        let Self::EmailAddress(f) = variant else {
-            unreachable!()
-        };
-        f
+        )
     }
 
     pub(crate) fn bind_phone_number_mut<'f, Pb: PresenceBits>(
         slot: &'f mut OneofSlot<Self>,
         common: &mut MessageCommon<Pb, A>,
     ) -> &'f mut SingularLenField<ProtoString, Oneof, { FIELD_PHONE_NUMBER }, A> {
-        let variant = slot.bind(common).variant_mut(
-            |n| matches!(n, Self::PhoneNumber(_)),
+        slot.bind(common).variant_mut(
+            |e| matches!(e, Self::PhoneNumber(_)),
+            |e| match e {
+                Self::PhoneNumber(f) => Some(f),
+                _ => None,
+            },
             |alloc| Self::PhoneNumber(SingularLenField::new_in(alloc)),
-        );
-        let Self::PhoneNumber(f) = variant else {
-            unreachable!()
-        };
-        f
+        )
     }
 
     pub(crate) fn bind_webhook_id_mut<'f, Pb: PresenceBits>(
         slot: &'f mut OneofSlot<Self>,
         common: &mut MessageCommon<Pb, A>,
     ) -> &'f mut SingularVarintField<ProtoInt32, Oneof, { FIELD_WEBHOOK_ID }> {
-        let variant = slot.bind(common).variant_mut(
-            |n| matches!(n, Self::WebhookId(_)),
+        slot.bind(common).variant_mut(
+            |e| matches!(e, Self::WebhookId(_)),
+            |e| match e {
+                Self::WebhookId(f) => Some(f),
+                _ => None,
+            },
             |_alloc| Self::WebhookId(SingularVarintField::new_in(_alloc)),
-        );
-        let Self::WebhookId(f) = variant else {
-            unreachable!()
-        };
-        f
+        )
     }
 
     pub(crate) fn bind_postal_mut<'f, Pb: PresenceBits>(
         slot: &'f mut OneofSlot<Self>,
         common: &mut MessageCommon<Pb, A>,
     ) -> &'f mut NestedMessageField<Address<A>, Oneof, { FIELD_POSTAL }, A> {
-        let variant = slot.bind(common).variant_mut(
-            |n| matches!(n, Self::Postal(_)),
+        slot.bind(common).variant_mut(
+            |e| matches!(e, Self::Postal(_)),
+            |e| match e {
+                Self::Postal(f) => Some(f),
+                _ => None,
+            },
             |alloc| Self::Postal(NestedMessageField::with_message_in(alloc)),
-        );
-        let Self::Postal(f) = variant else {
-            unreachable!()
-        };
-        f
+        )
     }
 }
 

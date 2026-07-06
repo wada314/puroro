@@ -101,13 +101,13 @@ impl<E> OneofSlot<E> {
 
     /// Returns the active variant, if any.
     #[inline]
-    pub fn get(&self) -> Option<&E> {
+    pub fn as_ref(&self) -> Option<&E> {
         self.value.as_ref()
     }
 
     /// Returns a mutable reference to the active variant, if any.
     #[inline]
-    pub fn get_mut(&mut self) -> Option<&mut E> {
+    pub fn as_mut(&mut self) -> Option<&mut E> {
         self.value.as_mut()
     }
 
@@ -155,7 +155,7 @@ impl<E> OneofSlot<E> {
         Pb: PresenceBits,
         A: Allocator,
     {
-        self.get().map(|v| v.encoded_len(common)).unwrap_or(0)
+        self.as_ref().map(|v| v.encoded_len(common)).unwrap_or(0)
     }
 
     /// Encodes the active variant.
@@ -165,7 +165,7 @@ impl<E> OneofSlot<E> {
         Pb: PresenceBits,
         A: Allocator,
     {
-        if let Some(v) = self.get() {
+        if let Some(v) = self.as_ref() {
             v.encode_raw(common, buf);
         }
     }
@@ -234,11 +234,17 @@ impl<'f, 'c, E, Pb: PresenceBits, A: Allocator> OneofSlotMut<'f, 'c, E, Pb, A> {
         self.slot.set(Some(value));
     }
 
-    /// Ensures the active variant satisfies `is_match`; otherwise frees any
-    /// existing variant and installs a fresh one built by `make` (which receives
-    /// an owned allocator clone). Returns a mutable reference to the now-active
-    /// variant, borrowing only the slot (`'f`), so `common` is free once this
+    /// Ensures the active variant is the one `project` extracts; otherwise frees any
+    /// existing variant and installs a fresh one built by `install` (which receives
+    /// an owned allocator clone). Returns a mutable reference to the variant's
+    /// inner payload, borrowing only the slot (`'f`), so `common` is free once this
     /// returns.
+    ///
+    /// `is_active` inspects the stored enum immutably; `project` extracts the inner
+    /// field wrapper when that variant is active (`None` for other variants). Because `E` may own
+    /// non-droppable storage, switching variants always goes through this method
+    /// (or [`set`](Self::set) / [`clear`](Self::clear)) so the previous variant is
+    /// released with the message allocator before the slot is overwritten.
     ///
     /// Backs both the per-variant `_mut` accessors and the decode arms: after
     /// selecting the variant, generated `merge_from` merges the wire occurrence
@@ -246,28 +252,30 @@ impl<'f, 'c, E, Pb: PresenceBits, A: Allocator> OneofSlotMut<'f, 'c, E, Pb, A> {
     /// (`field.bind(common).merge(…)` for every variant kind) — so the oneof
     /// reuses each field's merge machinery instead of a bespoke `merge_<variant>`
     /// helper on the enum.
-    pub fn variant_mut(
+    pub fn variant_mut<V>(
         self,
-        is_match: impl FnOnce(&E) -> bool,
-        make: impl FnOnce(A) -> E,
-    ) -> &'f mut E
+        is_active: impl FnOnce(&E) -> bool,
+        project: impl FnOnce(&mut E) -> Option<&mut V>,
+        install: impl FnOnce(A) -> E,
+    ) -> &'f mut V
     where
         E: OneofDeallocate<A>,
         A: Clone,
     {
         let slot = self.slot;
         let common = self.common;
-        let active = matches!(slot.get(), Some(e) if is_match(e));
-        if !active {
+
+        if !matches!(slot.as_ref(), Some(e) if is_active(e)) {
             if let Some(old) = slot.take() {
                 // SAFETY: an owned clone of the message allocator owns the
                 // previous variant's buffers.
                 unsafe { old.deallocate(common.alloc.clone()) };
             }
-            slot.set(Some(make(common.alloc.clone())));
+            slot.set(Some(install(common.alloc.clone())));
         }
-        // The branch above guarantees the slot is now occupied.
-        slot.get_mut().unwrap()
+        project(slot.as_mut().unwrap()).expect(
+            "install closure must construct the variant that project extracts",
+        )
     }
 
     /// Frees the active variant (if any), leaving the slot empty.
@@ -294,7 +302,9 @@ impl<E: Clone> Clone for OneofSlot<E> {
 
 impl<E: ::core::fmt::Debug> ::core::fmt::Debug for OneofSlot<E> {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
-        f.debug_struct("OneofSlot").field("value", &self.value).finish()
+        f.debug_struct("OneofSlot")
+            .field("value", &self.value)
+            .finish()
     }
 }
 

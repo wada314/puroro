@@ -87,14 +87,21 @@ pub struct Task<A: Allocator + Clone = Global> {
     _common: MessageCommon<TaskPresence, A>,
     title: SingularLenField<ProtoString, Explicit<{ BIT_TITLE }>, { FIELD_TITLE }, A>, // proto: string title = 1;
     score: SingularVarintField<ProtoInt32, Implicit, { FIELD_SCORE }>, // proto: int32 score = 2;
-    max_retries: SingularVarintField<ProtoInt32, Explicit<{ BIT_MAX_RETRIES }>, { FIELD_MAX_RETRIES }, MaxRetriesDefault>, // proto: int32 max_retries = 3;
-    owner_id: SingularLenField<ProtoString, LegacyRequired<{ BIT_OWNER_ID }>, { FIELD_OWNER_ID }, A>, // proto: string owner_id = 4;
+    max_retries: SingularVarintField<
+        ProtoInt32,
+        Explicit<{ BIT_MAX_RETRIES }>,
+        { FIELD_MAX_RETRIES },
+        MaxRetriesDefault,
+    >, // proto: int32 max_retries = 3;
+    owner_id:
+        SingularLenField<ProtoString, LegacyRequired<{ BIT_OWNER_ID }>, { FIELD_OWNER_ID }, A>, // proto: string owner_id = 4;
     payload: SingularLenField<ProtoBytes, Explicit<{ BIT_PAYLOAD }>, { FIELD_PAYLOAD }, A>, // proto: bytes payload = 5;
     tag_ids: RepeatedPackedVarintField<ProtoInt32, { FIELD_TAG_IDS }, A>, // proto: repeated int32 tag_ids = 6 [packed];
     scores: RepeatedExpandedVarintField<ProtoInt32, { FIELD_SCORES }, A>, // proto: repeated int32 scores = 7;
     labels: RepeatedLenField<ProtoString, { FIELD_LABELS }, A>, // proto: repeated string labels = 8;
     status: SingularVarintField<ProtoEnum<Status>, Implicit, { FIELD_STATUS }>, // proto: Status status = 9;
-    priority: SingularVarintField<ProtoEnum<Priority>, Explicit<{ BIT_PRIORITY }>, { FIELD_PRIORITY }>, // proto: Priority priority = 10;
+    priority:
+        SingularVarintField<ProtoEnum<Priority>, Explicit<{ BIT_PRIORITY }>, { FIELD_PRIORITY }>, // proto: Priority priority = 10;
     assignee: NestedMessageField<Address<A>, Singular, { FIELD_ASSIGNEE }, A>, // proto: Address assignee = 11;
     // proto: oneof notification { string email_address=12; string phone_number=13;
     //                             int32 webhook_id=14; Address postal=15; }
@@ -300,18 +307,18 @@ impl<A: Allocator + Clone> Task<A> {
 
     /// Which variant is set (payload-less; `None` when the group is unset).
     pub fn notification_case(&self) -> Option<NotificationCase> {
-        self.notification.get().map(|s| s.case())
+        self.notification.as_ref().map(|s| s.case())
     }
 
     /// Safe borrowed read view of the active variant.
     pub fn notification(&self) -> Option<NotificationRef<'_, A>> {
-        self.notification.get().map(|s| s.to_ref())
+        self.notification.as_ref().map(|s| s.to_ref())
     }
 
     /// Safe borrowed mutable view of the *currently active* variant (no switch).
     pub fn notification_mut(&mut self) -> Option<NotificationMut<'_, A>> {
         let alloc = self._common.alloc.clone();
-        self.notification.get_mut().map(|s| s.to_mut(alloc))
+        self.notification.as_mut().map(|s| s.to_mut(alloc))
     }
 
     pub fn email_address_mut(
@@ -447,15 +454,11 @@ impl<A: Allocator + Clone> MessageDecode for Task<A> {
             match field_number {
                 FIELD_TITLE => {
                     // title = 1, EXPLICIT string
-                    self.title
-                        .bind(&mut self._common)
-                        .merge(wire_type, buf)?;
+                    self.title.bind(&mut self._common).merge(wire_type, buf)?;
                 }
                 FIELD_SCORE => {
                     // score = 2, IMPLICIT int32
-                    self.score
-                        .bind(&mut self._common)
-                        .merge(wire_type, buf)?;
+                    self.score.bind(&mut self._common).merge(wire_type, buf)?;
                 }
                 FIELD_MAX_RETRIES => {
                     // max_retries = 3, EXPLICIT int32
@@ -471,9 +474,7 @@ impl<A: Allocator + Clone> MessageDecode for Task<A> {
                 }
                 FIELD_PAYLOAD => {
                     // payload = 5, EXPLICIT bytes
-                    self.payload
-                        .bind(&mut self._common)
-                        .merge(wire_type, buf)?;
+                    self.payload.bind(&mut self._common).merge(wire_type, buf)?;
                 }
                 FIELD_TAG_IDS => {
                     // tag_ids = 6, repeated int32 PACKED
@@ -489,17 +490,13 @@ impl<A: Allocator + Clone> MessageDecode for Task<A> {
                 }
                 FIELD_STATUS => {
                     // status = 9, IMPLICIT open enum
-                    self.status
-                        .bind(&mut self._common)
-                        .merge(wire_type, buf)?;
+                    self.status.bind(&mut self._common).merge(wire_type, buf)?;
                 }
                 FIELD_PRIORITY => {
                     // priority = 10, EXPLICIT closed enum
                     self.priority
                         .bind(&mut self._common)
-                        .merge_closed(wire_type, buf, |v| {
-                            Priority::try_from(v).is_ok()
-                        })?;
+                        .merge_closed(wire_type, buf, |v| Priority::try_from(v).is_ok())?;
                 }
                 FIELD_ASSIGNEE => {
                     // assignee = 11, nested message
@@ -508,8 +505,12 @@ impl<A: Allocator + Clone> MessageDecode for Task<A> {
                         .merge(wire_type, buf)?;
                 }
                 FIELD_EMAIL_ADDRESS | FIELD_PHONE_NUMBER | FIELD_WEBHOOK_ID | FIELD_POSTAL => {
-                    self.notification
-                        .merge_wire(&mut self._common, field_number, wire_type, buf)?;
+                    self.notification.merge_wire(
+                        &mut self._common,
+                        field_number,
+                        wire_type,
+                        buf,
+                    )?;
                 }
                 _ => {
                     // unknown field — preserve in _common.unknown_fields
