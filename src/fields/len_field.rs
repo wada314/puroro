@@ -16,6 +16,7 @@ use super::common::MessageCommon;
 use super::field_presence::{FieldPresence, LegacyRequired, RequiredFieldPresence};
 use super::len::{self, LenProtoType};
 use super::presence::PresenceBits;
+use super::slot_presence::SlotPresence;
 
 /// Singular LEN field — parametrised by [`LenProtoType`] `T`, presence policy `P`,
 /// proto field number `FIELD`, message allocator `A`, and compile-time default marker `D`.
@@ -163,7 +164,10 @@ impl<
     where
         A: Clone,
     {
-        P::on_set(self.common);
+        {
+            let mut presence = P::slot_presence(self.common);
+            presence.set_initialized(true);
+        }
         let alloc = self.common.alloc.clone();
         self.field.value_mut(alloc)
     }
@@ -179,19 +183,25 @@ impl<
         let old = unsafe { ManuallyDrop::take(&mut self.field.value) };
         unsafe { T::deallocate(old, self.common.alloc.clone()) };
         self.field.value = ManuallyDrop::new(new);
-        P::on_set(self.common);
+        {
+            let mut presence = P::slot_presence(self.common);
+            presence.set_initialized(true);
+        }
         Ok(())
     }
 
     /// Resets payload to empty / type-zero and clears explicit presence when applicable.
     ///
     /// For [`Implicit`](super::field_presence::Implicit) fields this omits the field on
-    /// the wire; `on_clear` is a no-op.
+    /// the wire.
     pub fn clear(self)
     where
         A: Clone,
     {
-        P::on_clear(self.common);
+        {
+            let mut presence = P::slot_presence(self.common);
+            presence.set_initialized(false);
+        }
         let old = unsafe { ManuallyDrop::take(&mut self.field.value) };
         unsafe { T::deallocate(old, self.common.alloc.clone()) };
         self.field.value = ManuallyDrop::new(T::new_empty(self.common.alloc.clone()));

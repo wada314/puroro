@@ -19,6 +19,7 @@ use crate::wire_type::WireType;
 use super::common::MessageCommon;
 use super::field_presence::FieldPresence;
 use super::presence::PresenceBits;
+use super::slot_presence::AlwaysInitialized;
 use super::value_slot::ValueSlot;
 use super::varint::{self, VarintProtoType};
 
@@ -50,18 +51,6 @@ where
         }
     }
 
-    /// Raw stored value (use for IMPLICIT public getters).
-    ///
-    /// # Safety
-    ///
-    /// For explicit-presence fields, the slot may be uninitialized when the
-    /// presence bit is clear — callers must use [`optional`](Self::optional) or
-    /// check `has_*` first.
-    #[inline]
-    pub fn value(&self) -> T::Value {
-        *unsafe { ValueSlot::read_unchecked(&self.value) }
-    }
-
     /// Binds this field to its message `common` state (presence), producing a
     /// short-lived [`SingularVarintFieldMut`] view that carries the whole
     /// mutation context.
@@ -79,7 +68,11 @@ where
         A: ::allocator_api2::alloc::Allocator,
     {
         if P::should_emit(common, || P::payload_is_empty(&self.value)) {
-            let v = *unsafe { ValueSlot::read_unchecked(&self.value) };
+            let init = P::slot_init_view(common);
+            let v = *self
+                .value
+                .as_ref(&init)
+                .expect("should_emit implies initialized slot");
             encode::encoded_len_varint_field(FIELD, T::encode_wire(v))
         } else {
             0
@@ -92,7 +85,11 @@ where
         A: ::allocator_api2::alloc::Allocator,
     {
         if P::should_emit(common, || P::payload_is_empty(&self.value)) {
-            let v = *unsafe { ValueSlot::read_unchecked(&self.value) };
+            let init = P::slot_init_view(common);
+            let v = *self
+                .value
+                .as_ref(&init)
+                .expect("should_emit implies initialized slot");
             encode::encode_varint_field(FIELD, T::encode_wire(v), buf);
         }
     }
@@ -118,8 +115,9 @@ where
         Pb: PresenceBits,
         A: ::allocator_api2::alloc::Allocator,
     {
+        let init = P::slot_init_view(common);
         let v = if P::is_set(common, || P::payload_is_empty(&self.value)) {
-            Some(*unsafe { ValueSlot::read_unchecked(&self.value) })
+            Some(*self.value.as_ref(&init).expect("is_set implies initialized slot"))
         } else {
             None
         };
@@ -127,10 +125,33 @@ where
     }
 }
 
+impl<T: VarintProtoType, const FIELD: u32, D> SingularVarintField<T, super::field_presence::Implicit, FIELD, D>
+where
+    T::Value: super::proto_zero::ProtoZero,
+{
+    /// Raw stored value for [`Implicit`] fields (always initialized).
+    #[inline]
+    pub fn value(&self) -> T::Value {
+        *self
+            .value
+            .as_ref(&AlwaysInitialized)
+            .expect("always-initialized slot")
+    }
+}
+
 impl<T: VarintProtoType, const FIELD: u32, D> SingularVarintField<T, super::field_presence::Oneof, FIELD, D>
 where
     T::Value: super::proto_zero::ProtoZero,
 {
+    /// Raw stored value for [`Oneof`] variants (always initialized).
+    #[inline]
+    pub fn value(&self) -> T::Value {
+        *self
+            .value
+            .as_ref(&AlwaysInitialized)
+            .expect("always-initialized slot")
+    }
+
     /// Mutable access for [`Oneof`] variants — slot is always-initialized `T::Value`.
     #[inline]
     pub fn value_mut(&mut self) -> &mut T::Value {
@@ -192,13 +213,14 @@ where
 
     #[inline]
     pub fn value_mut(self) -> &'f mut T::Value {
-        P::prepare_mut_slot(self.common, &mut self.field.value)
+        let mut presence = P::slot_presence(self.common);
+        self.field.value.as_mut(&mut presence)
     }
 
     #[inline]
     pub fn set(self, v: T::Value) {
-        P::write_slot(self.common, &mut self.field.value, v);
-        P::on_set(self.common);
+        let mut presence = P::slot_presence(self.common);
+        self.field.value.set(&mut presence, v);
     }
 
     pub fn merge<B: Buf>(self, wire_type: WireType, buf: &mut B) -> Result<(), DecodeError> {
@@ -206,18 +228,20 @@ where
             return Err(DecodeError::InvalidTag);
         }
         let raw = decode::decode_varint(buf)?;
-        P::write_slot(self.common, &mut self.field.value, T::decode_wire(raw)?);
-        P::on_set(self.common);
+        let mut presence = P::slot_presence(self.common);
+        self.field
+            .value
+            .set(&mut presence, T::decode_wire(raw)?);
         Ok(())
     }
 
     /// Resets the value slot and clears explicit presence when applicable.
     ///
     /// For [`Implicit`](super::field_presence::Implicit) fields this omits the field on
-    /// the wire (equivalent to assigning the type-zero); `on_clear` is a no-op.
+    /// the wire (equivalent to assigning the type-zero).
     pub fn clear(self) {
-        P::clear_slot(self.common, &mut self.field.value);
-        P::on_clear(self.common);
+        let mut presence = P::slot_presence(self.common);
+        self.field.value.clear(&mut presence);
     }
 }
 
@@ -261,8 +285,10 @@ where
             );
             return Ok(());
         }
-        P::write_slot(self.common, &mut self.field.value, T::decode_wire(raw)?);
-        P::on_set(self.common);
+        let mut presence = P::slot_presence(self.common);
+        self.field
+            .value
+            .set(&mut presence, T::decode_wire(raw)?);
         Ok(())
     }
 }

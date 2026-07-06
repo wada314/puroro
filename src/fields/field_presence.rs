@@ -14,6 +14,9 @@ use crate::error::DecodeError;
 use super::common::MessageCommon;
 use super::presence::PresenceBits;
 use super::proto_zero::ProtoZero;
+use super::slot_presence::{
+    AlwaysInitialized, BitInitView, BitPresence, SlotInitState, SlotPresence,
+};
 use super::value_slot::ValueSlot;
 
 /// Encode / merge / clear behaviour for singular field presence.
@@ -23,6 +26,26 @@ pub trait FieldPresence: Copy {
     /// [`Implicit`] and [`Oneof`] use always-initialized `T`; [`Explicit`] and
     /// [`LegacyRequired`] use [`MaybeUninit<T>`].
     type ValueSlot<T: ProtoZero>: ValueSlot<T>;
+
+    /// Mutable presence adapter for value-slot mutation.
+    type SlotPresence<'a, P: PresenceBits + 'a, A: Allocator + 'a>: SlotPresence;
+
+    /// Read-only presence view for value-slot reads.
+    type SlotInitView<'a, P: PresenceBits + 'a, A: Allocator + 'a>: SlotInitState;
+
+    /// Returns a mutable presence adapter bound to `common`.
+    fn slot_presence<'a, Pb, A>(
+        common: &'a mut MessageCommon<Pb, A>,
+    ) -> Self::SlotPresence<'a, Pb, A>
+    where
+        Pb: PresenceBits,
+        A: Allocator;
+
+    /// Returns a read-only presence view bound to `common`.
+    fn slot_init_view<'a, Pb, A>(common: &'a MessageCommon<Pb, A>) -> Self::SlotInitView<'a, Pb, A>
+    where
+        Pb: PresenceBits,
+        A: Allocator;
 
     /// `true` when the stored payload equals the protobuf type-zero.
     ///
@@ -51,47 +74,6 @@ pub trait FieldPresence: Copy {
         P: PresenceBits,
         A: Allocator,
         F: FnOnce() -> bool;
-
-    /// Called after a successful merge or setter (marks EXPLICIT fields present).
-    fn on_set<P, A>(common: &mut MessageCommon<P, A>)
-    where
-        P: PresenceBits,
-        A: Allocator;
-
-    /// Called when an EXPLICIT field is cleared.
-    fn on_clear<P, A>(common: &mut MessageCommon<P, A>)
-    where
-        P: PresenceBits,
-        A: Allocator;
-
-    /// Writes `value` into the slot (first write vs overwrite decided from `common`).
-    fn write_slot<P, A, T>(
-        common: &MessageCommon<P, A>,
-        slot: &mut Self::ValueSlot<T>,
-        value: T,
-    ) where
-        P: PresenceBits,
-        A: Allocator,
-        T: ProtoZero;
-
-    /// Clears the payload slot using presence state in `common` (call before [`on_clear`](Self::on_clear)).
-    fn clear_slot<P, A, T>(
-        common: &MessageCommon<P, A>,
-        slot: &mut Self::ValueSlot<T>,
-    ) where
-        P: PresenceBits,
-        A: Allocator,
-        T: ProtoZero;
-
-    /// Marks the field present and returns a mutable reference to the initialized slot.
-    fn prepare_mut_slot<'slot, P, A, T>(
-        common: &mut MessageCommon<P, A>,
-        slot: &'slot mut Self::ValueSlot<T>,
-    ) -> &'slot mut T
-    where
-        P: PresenceBits,
-        A: Allocator,
-        T: ProtoZero;
 }
 
 /// Marker for IMPLICIT presence — omit on wire when payload is empty / type-zero.
@@ -101,6 +83,24 @@ pub struct Implicit;
 
 impl FieldPresence for Implicit {
     type ValueSlot<T: ProtoZero> = T;
+    type SlotPresence<'a, P: PresenceBits + 'a, A: Allocator + 'a> = AlwaysInitialized;
+    type SlotInitView<'a, P: PresenceBits + 'a, A: Allocator + 'a> = AlwaysInitialized;
+
+    fn slot_presence<'a, Pb, A>(_: &'a mut MessageCommon<Pb, A>) -> AlwaysInitialized
+    where
+        Pb: PresenceBits,
+        A: Allocator,
+    {
+        AlwaysInitialized
+    }
+
+    fn slot_init_view<'a, Pb, A>(_: &'a MessageCommon<Pb, A>) -> AlwaysInitialized
+    where
+        Pb: PresenceBits,
+        A: Allocator,
+    {
+        AlwaysInitialized
+    }
 
     fn payload_is_empty<T: ProtoZero>(slot: &T) -> bool {
         T::is_proto_zero(slot)
@@ -123,50 +123,6 @@ impl FieldPresence for Implicit {
     {
         !is_payload_empty()
     }
-
-    fn on_set<P, A>(_: &mut MessageCommon<P, A>)
-    where
-        P: PresenceBits,
-        A: Allocator,
-    {
-    }
-
-    fn on_clear<P, A>(_: &mut MessageCommon<P, A>)
-    where
-        P: PresenceBits,
-        A: Allocator,
-    {
-    }
-
-    fn write_slot<P, A, T>(_: &MessageCommon<P, A>, slot: &mut T, value: T)
-    where
-        P: PresenceBits,
-        A: Allocator,
-        T: ProtoZero,
-    {
-        unsafe { slot.write_dropping_previous(value) };
-    }
-
-    fn clear_slot<P, A, T>(_: &MessageCommon<P, A>, slot: &mut T)
-    where
-        P: PresenceBits,
-        A: Allocator,
-        T: ProtoZero,
-    {
-        T::set_proto_zero(slot);
-    }
-
-    fn prepare_mut_slot<'slot, P, A, T>(
-        _: &mut MessageCommon<P, A>,
-        slot: &'slot mut T,
-    ) -> &'slot mut T
-    where
-        P: PresenceBits,
-        A: Allocator,
-        T: ProtoZero,
-    {
-        slot
-    }
 }
 
 /// Marker for a **oneof variant** field — presence is tracked by the enclosing
@@ -177,6 +133,24 @@ pub struct Oneof;
 
 impl FieldPresence for Oneof {
     type ValueSlot<T: ProtoZero> = T;
+    type SlotPresence<'a, P: PresenceBits + 'a, A: Allocator + 'a> = AlwaysInitialized;
+    type SlotInitView<'a, P: PresenceBits + 'a, A: Allocator + 'a> = AlwaysInitialized;
+
+    fn slot_presence<'a, Pb, A>(_: &'a mut MessageCommon<Pb, A>) -> AlwaysInitialized
+    where
+        Pb: PresenceBits,
+        A: Allocator,
+    {
+        AlwaysInitialized
+    }
+
+    fn slot_init_view<'a, Pb, A>(_: &'a MessageCommon<Pb, A>) -> AlwaysInitialized
+    where
+        Pb: PresenceBits,
+        A: Allocator,
+    {
+        AlwaysInitialized
+    }
 
     fn payload_is_empty<T: ProtoZero>(_slot: &T) -> bool {
         false
@@ -199,50 +173,6 @@ impl FieldPresence for Oneof {
     {
         true
     }
-
-    fn on_set<P, A>(_: &mut MessageCommon<P, A>)
-    where
-        P: PresenceBits,
-        A: Allocator,
-    {
-    }
-
-    fn on_clear<P, A>(_: &mut MessageCommon<P, A>)
-    where
-        P: PresenceBits,
-        A: Allocator,
-    {
-    }
-
-    fn write_slot<P, A, T>(_: &MessageCommon<P, A>, slot: &mut T, value: T)
-    where
-        P: PresenceBits,
-        A: Allocator,
-        T: ProtoZero,
-    {
-        unsafe { slot.write_dropping_previous(value) };
-    }
-
-    fn clear_slot<P, A, T>(_: &MessageCommon<P, A>, slot: &mut T)
-    where
-        P: PresenceBits,
-        A: Allocator,
-        T: ProtoZero,
-    {
-        T::set_proto_zero(slot);
-    }
-
-    fn prepare_mut_slot<'slot, P, A, T>(
-        _: &mut MessageCommon<P, A>,
-        slot: &'slot mut T,
-    ) -> &'slot mut T
-    where
-        P: PresenceBits,
-        A: Allocator,
-        T: ProtoZero,
-    {
-        slot
-    }
 }
 
 /// Marker for EXPLICIT presence — tracked in the message bitfield at `BIT`.
@@ -257,6 +187,28 @@ impl<const BIT: usize> Default for Explicit<BIT> {
 
 impl<const BIT: usize> FieldPresence for Explicit<BIT> {
     type ValueSlot<T: ProtoZero> = MaybeUninit<T>;
+    type SlotPresence<'a, P: PresenceBits + 'a, A: Allocator + 'a> = BitPresence<'a, BIT, P, A>;
+    type SlotInitView<'a, P: PresenceBits + 'a, A: Allocator + 'a> = BitInitView<'a, BIT, P, A>;
+
+    fn slot_presence<'a, Pb, A>(
+        common: &'a mut MessageCommon<Pb, A>,
+    ) -> BitPresence<'a, BIT, Pb, A>
+    where
+        Pb: PresenceBits,
+        A: Allocator,
+    {
+        BitPresence::new(common)
+    }
+
+    fn slot_init_view<'a, Pb, A>(
+        common: &'a MessageCommon<Pb, A>,
+    ) -> BitInitView<'a, BIT, Pb, A>
+    where
+        Pb: PresenceBits,
+        A: Allocator,
+    {
+        BitInitView::new(common)
+    }
 
     fn payload_is_empty<T: ProtoZero>(_slot: &MaybeUninit<T>) -> bool {
         false
@@ -278,67 +230,6 @@ impl<const BIT: usize> FieldPresence for Explicit<BIT> {
         F: FnOnce() -> bool,
     {
         common.is_present(BIT)
-    }
-
-    fn on_set<P, A>(common: &mut MessageCommon<P, A>)
-    where
-        P: PresenceBits,
-        A: Allocator,
-    {
-        common.set_presence(BIT, true);
-    }
-
-    fn on_clear<P, A>(common: &mut MessageCommon<P, A>)
-    where
-        P: PresenceBits,
-        A: Allocator,
-    {
-        common.set_presence(BIT, false);
-    }
-
-    fn write_slot<P, A, T>(common: &MessageCommon<P, A>, slot: &mut MaybeUninit<T>, value: T)
-    where
-        P: PresenceBits,
-        A: Allocator,
-        T: ProtoZero,
-    {
-        if common.is_present(BIT) {
-            unsafe { slot.write_dropping_previous(value) };
-        } else {
-            unsafe { slot.write_without_drop(value) };
-        }
-    }
-
-    fn clear_slot<P, A, T>(common: &MessageCommon<P, A>, slot: &mut MaybeUninit<T>)
-    where
-        P: PresenceBits,
-        A: Allocator,
-        T: ProtoZero,
-    {
-        if common.is_present(BIT) {
-            unsafe { slot.assume_init_drop() };
-        }
-    }
-
-    fn prepare_mut_slot<'slot, P, A, T>(
-        common: &mut MessageCommon<P, A>,
-        slot: &'slot mut MaybeUninit<T>,
-    ) -> &'slot mut T
-    where
-        P: PresenceBits,
-        A: Allocator,
-        T: ProtoZero,
-    {
-        let was_present = common.is_present(BIT);
-        common.set_presence(BIT, true);
-        if was_present {
-            unsafe { slot.assume_init_mut() }
-        } else {
-            unsafe {
-                T::set_proto_zero(&mut *slot.as_mut_ptr());
-                slot.assume_init_mut()
-            }
-        }
     }
 }
 
@@ -355,6 +246,28 @@ impl<const BIT: usize> Default for LegacyRequired<BIT> {
 
 impl<const BIT: usize> FieldPresence for LegacyRequired<BIT> {
     type ValueSlot<T: ProtoZero> = MaybeUninit<T>;
+    type SlotPresence<'a, P: PresenceBits + 'a, A: Allocator + 'a> = BitPresence<'a, BIT, P, A>;
+    type SlotInitView<'a, P: PresenceBits + 'a, A: Allocator + 'a> = BitInitView<'a, BIT, P, A>;
+
+    fn slot_presence<'a, Pb, A>(
+        common: &'a mut MessageCommon<Pb, A>,
+    ) -> BitPresence<'a, BIT, Pb, A>
+    where
+        Pb: PresenceBits,
+        A: Allocator,
+    {
+        BitPresence::new(common)
+    }
+
+    fn slot_init_view<'a, Pb, A>(
+        common: &'a MessageCommon<Pb, A>,
+    ) -> BitInitView<'a, BIT, Pb, A>
+    where
+        Pb: PresenceBits,
+        A: Allocator,
+    {
+        BitInitView::new(common)
+    }
 
     fn payload_is_empty<T: ProtoZero>(_slot: &MaybeUninit<T>) -> bool {
         false
@@ -376,67 +289,6 @@ impl<const BIT: usize> FieldPresence for LegacyRequired<BIT> {
         F: FnOnce() -> bool,
     {
         common.is_present(BIT)
-    }
-
-    fn on_set<P, A>(common: &mut MessageCommon<P, A>)
-    where
-        P: PresenceBits,
-        A: Allocator,
-    {
-        common.set_presence(BIT, true);
-    }
-
-    fn on_clear<P, A>(common: &mut MessageCommon<P, A>)
-    where
-        P: PresenceBits,
-        A: Allocator,
-    {
-        common.set_presence(BIT, false);
-    }
-
-    fn write_slot<P, A, T>(common: &MessageCommon<P, A>, slot: &mut MaybeUninit<T>, value: T)
-    where
-        P: PresenceBits,
-        A: Allocator,
-        T: ProtoZero,
-    {
-        if common.is_present(BIT) {
-            unsafe { slot.write_dropping_previous(value) };
-        } else {
-            unsafe { slot.write_without_drop(value) };
-        }
-    }
-
-    fn clear_slot<P, A, T>(common: &MessageCommon<P, A>, slot: &mut MaybeUninit<T>)
-    where
-        P: PresenceBits,
-        A: Allocator,
-        T: ProtoZero,
-    {
-        if common.is_present(BIT) {
-            unsafe { slot.assume_init_drop() };
-        }
-    }
-
-    fn prepare_mut_slot<'slot, P, A, T>(
-        common: &mut MessageCommon<P, A>,
-        slot: &'slot mut MaybeUninit<T>,
-    ) -> &'slot mut T
-    where
-        P: PresenceBits,
-        A: Allocator,
-        T: ProtoZero,
-    {
-        let was_present = common.is_present(BIT);
-        common.set_presence(BIT, true);
-        if was_present {
-            unsafe { slot.assume_init_mut() }
-        } else {
-            unsafe {
-                T::set_proto_zero(&mut *slot.as_mut_ptr());
-                slot.assume_init_mut()
-            }
-        }
     }
 }
 
