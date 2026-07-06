@@ -126,14 +126,15 @@ impl<E> OneofSlot<E> {
         OneofSlotMut::new(self, common)
     }
 
-    /// Replaces the whole oneof (clears any previous variant).
+    /// Installs `value` as the active variant.
     ///
     /// Note: assigning over an existing variant drops it. When `E` owns
     /// allocator-less storage, callers must [`take`](Self::take) and release the
-    /// previous variant explicitly before calling `set`.
+    /// previous variant explicitly before calling `set`. To leave the slot empty,
+    /// use [`clear`](Self::clear).
     #[inline]
-    pub fn set(&mut self, value: Option<E>) {
-        self.value = value;
+    pub fn set(&mut self, value: E) {
+        self.value = Some(value);
     }
 
     /// Removes and returns the active variant, leaving the slot empty.
@@ -231,7 +232,7 @@ impl<'f, 'c, E, Pb: PresenceBits, A: Allocator> OneofSlotMut<'f, 'c, E, Pb, A> {
             // variant's buffers.
             unsafe { old.deallocate(self.common.alloc.clone()) };
         }
-        self.slot.set(Some(value));
+        self.slot.set(value);
     }
 
     /// Ensures the active variant is the one `project` extracts; otherwise frees any
@@ -271,7 +272,7 @@ impl<'f, 'c, E, Pb: PresenceBits, A: Allocator> OneofSlotMut<'f, 'c, E, Pb, A> {
                 // previous variant's buffers.
                 unsafe { old.deallocate(common.alloc.clone()) };
             }
-            slot.set(Some(install(common.alloc.clone())));
+            slot.set(install(common.alloc.clone()));
         }
         project(slot.as_mut().unwrap()).expect(
             "install closure must construct the variant that project extracts",
