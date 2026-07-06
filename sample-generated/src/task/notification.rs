@@ -31,16 +31,17 @@
 //!
 //! **Merge has no bespoke `merge_*` helpers on this enum.** Because each variant
 //! *is* a field wrapper, the parent's `merge_from` selects the variant through
-//! `OneofSlot::bind(...).variant_mut(...)` (which frees any other variant) and
-//! then merges into it with the field's **own** bind idiom —
-//! `field.bind(common).merge(...)` for every variant kind.
+//! `bind_<variant>_mut` (which frees any other variant and returns the field's
+//! bound mutation view) and then calls `merge(...)` on it — uniformly for every
+//! variant kind.
 
 use ::allocator_api2::alloc::Allocator;
 use ::bytes::{Buf, BufMut};
 use ::puroro::{DecodeError, WireType};
 use ::puroro_rt::{
-    MessageCommon, NestedMessageField, Oneof, OneofDeallocate, OneofEncodable, OneofGroup,
-    OneofSlot, PresenceBits, ProtoInt32, ProtoString, SingularLenField, SingularVarintField,
+    MessageCommon, NestedMessageField, NestedMessageFieldMut, Oneof, OneofDeallocate, OneofEncodable,
+    OneofGroup, OneofSlot, PresenceBits, ProtoInt32, ProtoString, SingularLenField,
+    SingularLenFieldMut, SingularVarintField, SingularVarintFieldMut,
 };
 use ::unmanaged::string::StringGuard;
 
@@ -135,60 +136,67 @@ impl<
         }
     }
 
-    pub(crate) fn bind_email_address_mut<'f, Pb: PresenceBits>(
+    pub(crate) fn bind_email_address_mut<'f, 'c, Pb: PresenceBits>(
         slot: &'f mut OneofSlot<Self>,
-        common: &mut MessageCommon<Pb, A>,
-    ) -> &'f mut SingularLenField<ProtoString, Oneof, { FIELD_EMAIL_ADDRESS }, A> {
-        slot.bind(common).variant_mut(
+        common: &'c mut MessageCommon<Pb, A>,
+    ) -> SingularLenFieldMut<'f, 'c, ProtoString, Oneof, { FIELD_EMAIL_ADDRESS }, A, ::puroro_rt::ProtoDefault, Pb>
+    {
+        let field = slot.bind(common).variant_mut(
             |e| matches!(e, Self::EmailAddress(_)),
             |e| match e {
                 Self::EmailAddress(f) => Some(f),
                 _ => None,
             },
             |alloc| Self::EmailAddress(SingularLenField::new_in(alloc)),
-        )
+        );
+        field.bind(common)
     }
 
-    pub(crate) fn bind_phone_number_mut<'f, Pb: PresenceBits>(
+    pub(crate) fn bind_phone_number_mut<'f, 'c, Pb: PresenceBits>(
         slot: &'f mut OneofSlot<Self>,
-        common: &mut MessageCommon<Pb, A>,
-    ) -> &'f mut SingularLenField<ProtoString, Oneof, { FIELD_PHONE_NUMBER }, A> {
-        slot.bind(common).variant_mut(
+        common: &'c mut MessageCommon<Pb, A>,
+    ) -> SingularLenFieldMut<'f, 'c, ProtoString, Oneof, { FIELD_PHONE_NUMBER }, A, ::puroro_rt::ProtoDefault, Pb>
+    {
+        let field = slot.bind(common).variant_mut(
             |e| matches!(e, Self::PhoneNumber(_)),
             |e| match e {
                 Self::PhoneNumber(f) => Some(f),
                 _ => None,
             },
             |alloc| Self::PhoneNumber(SingularLenField::new_in(alloc)),
-        )
+        );
+        field.bind(common)
     }
 
-    pub(crate) fn bind_webhook_id_mut<'f, Pb: PresenceBits>(
+    pub(crate) fn bind_webhook_id_mut<'f, 'c, Pb: PresenceBits>(
         slot: &'f mut OneofSlot<Self>,
-        common: &mut MessageCommon<Pb, A>,
-    ) -> &'f mut SingularVarintField<ProtoInt32, Oneof, { FIELD_WEBHOOK_ID }> {
-        slot.bind(common).variant_mut(
+        common: &'c mut MessageCommon<Pb, A>,
+    ) -> SingularVarintFieldMut<'f, 'c, ProtoInt32, Oneof, { FIELD_WEBHOOK_ID }, ::puroro_rt::ProtoDefault, Pb, A>
+    {
+        let field = slot.bind(common).variant_mut(
             |e| matches!(e, Self::WebhookId(_)),
             |e| match e {
                 Self::WebhookId(f) => Some(f),
                 _ => None,
             },
             |_alloc| Self::WebhookId(SingularVarintField::new_in(_alloc)),
-        )
+        );
+        field.bind(common)
     }
 
-    pub(crate) fn bind_postal_mut<'f, Pb: PresenceBits>(
+    pub(crate) fn bind_postal_mut<'f, 'c, Pb: PresenceBits>(
         slot: &'f mut OneofSlot<Self>,
-        common: &mut MessageCommon<Pb, A>,
-    ) -> &'f mut NestedMessageField<Address<A>, Oneof, { FIELD_POSTAL }, A> {
-        slot.bind(common).variant_mut(
+        common: &'c mut MessageCommon<Pb, A>,
+    ) -> NestedMessageFieldMut<'f, 'c, Address<A>, Oneof, { FIELD_POSTAL }, A, Pb> {
+        let field = slot.bind(common).variant_mut(
             |e| matches!(e, Self::Postal(_)),
             |e| match e {
                 Self::Postal(f) => Some(f),
                 _ => None,
             },
             |alloc| Self::Postal(NestedMessageField::with_message_in(alloc)),
-        )
+        );
+        field.bind(common)
     }
 }
 
@@ -241,21 +249,13 @@ impl<
         B: Buf,
     {
         if field_number == FIELD_EMAIL_ADDRESS {
-            Self::bind_email_address_mut(slot, common)
-                .bind(common)
-                .merge(wire_type, buf)
+            Self::bind_email_address_mut(slot, common).merge(wire_type, buf)
         } else if field_number == FIELD_PHONE_NUMBER {
-            Self::bind_phone_number_mut(slot, common)
-                .bind(common)
-                .merge(wire_type, buf)
+            Self::bind_phone_number_mut(slot, common).merge(wire_type, buf)
         } else if field_number == FIELD_WEBHOOK_ID {
-            Self::bind_webhook_id_mut(slot, common)
-                .bind(common)
-                .merge(wire_type, buf)
+            Self::bind_webhook_id_mut(slot, common).merge(wire_type, buf)
         } else if field_number == FIELD_POSTAL {
-            Self::bind_postal_mut(slot, common)
-                .bind(common)
-                .merge(wire_type, buf)
+            Self::bind_postal_mut(slot, common).merge(wire_type, buf)
         } else {
             Err(DecodeError::InvalidTag)
         }

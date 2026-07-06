@@ -281,3 +281,13 @@ impl<'f, 'c, M, const FIELD: u32, A: Allocator + Clone, Pb: PresenceBits>
         self.field.deallocate(self.common.alloc.clone());
     }
 }
+
+impl<'f, 'c, M, const FIELD: u32, A: Allocator, Pb: PresenceBits>
+    NestedMessageFieldMut<'f, 'c, M, Oneof, FIELD, A, Pb>
+{
+    /// Mutably borrows the always-present child.
+    /// Borrows only the field (`'f`), so `common` is free once this returns.
+    pub fn value_mut(self) -> &'f mut M {
+        self.field.value_mut()
+    }
+}

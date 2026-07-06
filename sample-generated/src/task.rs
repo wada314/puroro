@@ -324,17 +324,15 @@ impl<A: Allocator + Clone> Task<A> {
     pub fn email_address_mut(
         &mut self,
     ) -> impl ::core::ops::DerefMut<Target = ::unmanaged::String<A>> + '_ {
-        let alloc = self._common.alloc.clone();
         NotificationStorage::bind_email_address_mut(&mut self.notification, &mut self._common)
-            .value_mut(alloc)
+            .value_mut()
     }
 
     pub fn phone_number_mut(
         &mut self,
     ) -> impl ::core::ops::DerefMut<Target = ::unmanaged::String<A>> + '_ {
-        let alloc = self._common.alloc.clone();
         NotificationStorage::bind_phone_number_mut(&mut self.notification, &mut self._common)
-            .value_mut(alloc)
+            .value_mut()
     }
 
     /// Switches the group to `webhook_id` (freeing any other variant) and returns
