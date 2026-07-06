@@ -54,11 +54,11 @@ where
     /// short-lived [`SingularVarintFieldMut`] view that carries the whole
     /// mutation context.
     #[inline]
-    pub fn bind<'f, 'c, Pb: PresenceBits, A: Allocator>(
+    pub fn bind<'f, 'c, Pb: PresenceBits, A: Allocator + Clone + 'f>(
         &'f mut self,
         common: &'c mut MessageCommon<Pb, A>,
     ) -> SingularVarintFieldMut<'f, 'c, T, P, FIELD, D, Pb, A> {
-        SingularVarintFieldMut::new(self, common)
+        BindableMut::bind_mut(self, common)
     }
 
     pub fn encoded_len<Pb, A>(&self, common: &MessageCommon<Pb, A>) -> usize
@@ -298,20 +298,17 @@ impl<
         const FIELD: u32,
         D,
         A: Allocator + Clone,
-    > BindableMut<A> for SingularVarintField<T, P, FIELD, D>
+        Pb: PresenceBits,
+    > BindableMut<MessageCommon<Pb, A>> for SingularVarintField<T, P, FIELD, D>
 where
     P::ValueSlot<T::Value>: ValueSlot<T::Value>,
 {
-    type BoundMut<'f, 'c, Pb: PresenceBits + 'c> =
-        SingularVarintFieldMut<'f, 'c, T, P, FIELD, D, Pb, A>
+    type BoundMut<'f, 'c> = SingularVarintFieldMut<'f, 'c, T, P, FIELD, D, Pb, A>
     where
-        T: 'f,
-        P: 'f,
-        D: 'f,
-        A: 'c,
-        A: 'f;
+        Self: 'f,
+        MessageCommon<Pb, A>: 'c;
 
-    fn bind_mut<'f, 'c, Pb: PresenceBits>(
+    fn bind_mut<'f, 'c>(
         &'f mut self,
         common: &'c mut MessageCommon<Pb, A>,
     ) -> SingularVarintFieldMut<'f, 'c, T, P, FIELD, D, Pb, A> {

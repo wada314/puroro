@@ -96,11 +96,11 @@ impl<E> OneofSlot<E> {
     /// of releasing the old variant and rewriting the slot by hand. A oneof
     /// carries no presence bit, so the view needs only `common`.
     #[inline]
-    pub fn bind<'f, 'c, Pb: PresenceBits, A: Allocator>(
+    pub fn bind<'f, 'c, Pb: PresenceBits, A: Allocator + Clone + 'f>(
         &'f mut self,
         common: &'c mut MessageCommon<Pb, A>,
     ) -> OneofSlotMut<'f, 'c, E, Pb, A> {
-        OneofSlotMut::new(self, common)
+        BindableMut::bind_mut(self, common)
     }
 
     /// Installs `value` as the active variant.
@@ -165,14 +165,13 @@ impl<E> Default for OneofSlot<E> {
     }
 }
 
-impl<E, A: Allocator + Clone> BindableMut<A> for OneofSlot<E> {
-    type BoundMut<'f, 'c, Pb: PresenceBits + 'c> = OneofSlotMut<'f, 'c, E, Pb, A>
+impl<E, A: Allocator + Clone, Pb: PresenceBits> BindableMut<MessageCommon<Pb, A>> for OneofSlot<E> {
+    type BoundMut<'f, 'c> = OneofSlotMut<'f, 'c, E, Pb, A>
     where
-        E: 'f,
-        A: 'c,
-        A: 'f;
+        Self: 'f,
+        MessageCommon<Pb, A>: 'c;
 
-    fn bind_mut<'f, 'c, Pb: PresenceBits>(
+    fn bind_mut<'f, 'c>(
         &'f mut self,
         common: &'c mut MessageCommon<Pb, A>,
     ) -> OneofSlotMut<'f, 'c, E, Pb, A> {

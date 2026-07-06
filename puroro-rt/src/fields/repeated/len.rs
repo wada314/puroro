@@ -54,8 +54,11 @@ impl<T: LenProtoType, const FIELD: u32, A: Allocator> RepeatedLenField<T, FIELD,
     pub fn bind<'f, 'c, Pb: PresenceBits>(
         &'f mut self,
         common: &'c mut MessageCommon<Pb, A>,
-    ) -> RepeatedLenFieldMut<'f, 'c, T, FIELD, Pb, A> {
-        RepeatedLenFieldMut::new(self, common)
+    ) -> RepeatedLenFieldMut<'f, 'c, T, FIELD, Pb, A>
+    where
+        A: Clone,
+    {
+        BindableMut::bind_mut(self, common)
     }
 
     pub fn encoded_len<Pb>(&self, _common: &MessageCommon<Pb, A>) -> usize
@@ -167,16 +170,15 @@ impl<'f, 'c, T: LenProtoType, const FIELD: u32, Pb: PresenceBits, A: Allocator>
     }
 }
 
-impl<T: LenProtoType, const FIELD: u32, A: Allocator + Clone> BindableMut<A>
-    for RepeatedLenField<T, FIELD, A>
+impl<T: LenProtoType, const FIELD: u32, A: Allocator + Clone, Pb: PresenceBits>
+    BindableMut<MessageCommon<Pb, A>> for RepeatedLenField<T, FIELD, A>
 {
-    type BoundMut<'f, 'c, Pb: PresenceBits + 'c> = RepeatedLenFieldMut<'f, 'c, T, FIELD, Pb, A>
+    type BoundMut<'f, 'c> = RepeatedLenFieldMut<'f, 'c, T, FIELD, Pb, A>
     where
-        T: 'f,
-        A: 'c,
-        A: 'f;
+        Self: 'f,
+        MessageCommon<Pb, A>: 'c;
 
-    fn bind_mut<'f, 'c, Pb: PresenceBits>(
+    fn bind_mut<'f, 'c>(
         &'f mut self,
         common: &'c mut MessageCommon<Pb, A>,
     ) -> RepeatedLenFieldMut<'f, 'c, T, FIELD, Pb, A> {

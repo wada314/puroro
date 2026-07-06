@@ -61,8 +61,11 @@ impl<T: VarintProtoType, E: RepeatedVarintEncoding, const FIELD: u32, A: Allocat
     pub fn bind<'f, 'c, Pb: PresenceBits>(
         &'f mut self,
         common: &'c mut MessageCommon<Pb, A>,
-    ) -> RepeatedVarintFieldMut<'f, 'c, T, E, FIELD, Pb, A> {
-        RepeatedVarintFieldMut::new(self, common)
+    ) -> RepeatedVarintFieldMut<'f, 'c, T, E, FIELD, Pb, A>
+    where
+        A: Clone,
+    {
+        BindableMut::bind_mut(self, common)
     }
 
     pub fn encoded_len<Pb>(&self, _common: &MessageCommon<Pb, A>) -> usize
@@ -197,16 +200,15 @@ impl<
         E: RepeatedVarintEncoding,
         const FIELD: u32,
         A: Allocator + Clone,
-    > BindableMut<A> for RepeatedVarintField<T, E, FIELD, A>
+        Pb: PresenceBits,
+    > BindableMut<MessageCommon<Pb, A>> for RepeatedVarintField<T, E, FIELD, A>
 {
-    type BoundMut<'f, 'c, Pb: PresenceBits + 'c> = RepeatedVarintFieldMut<'f, 'c, T, E, FIELD, Pb, A>
+    type BoundMut<'f, 'c> = RepeatedVarintFieldMut<'f, 'c, T, E, FIELD, Pb, A>
     where
-        T: 'f,
-        E: 'f,
-        A: 'c,
-        A: 'f;
+        Self: 'f,
+        MessageCommon<Pb, A>: 'c;
 
-    fn bind_mut<'f, 'c, Pb: PresenceBits>(
+    fn bind_mut<'f, 'c>(
         &'f mut self,
         common: &'c mut MessageCommon<Pb, A>,
     ) -> RepeatedVarintFieldMut<'f, 'c, T, E, FIELD, Pb, A> {
