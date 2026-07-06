@@ -38,8 +38,8 @@
 use ::allocator_api2::alloc::Allocator;
 use ::bytes::BufMut;
 use ::puroro_rt::{
-    MessageCommon, NestedMessageField, NestedMessageFieldMut, Oneof, OneofDeallocate, OneofEncodable,
-    OneofSlot, PresenceBits, ProtoInt32, ProtoString, SingularLenField,
+    BindableMut, MessageCommon, NestedMessageField, NestedMessageFieldMut, Oneof, OneofDeallocate,
+    OneofEncodable, OneofSlot, PresenceBits, ProtoInt32, ProtoString, SingularLenField,
     SingularLenFieldMut, SingularVarintField, SingularVarintFieldMut,
 };
 use ::unmanaged::string::StringGuard;
@@ -140,7 +140,7 @@ impl<
         common: &'c mut MessageCommon<Pb, A>,
     ) -> SingularLenFieldMut<'f, 'c, ProtoString, Oneof, { FIELD_EMAIL_ADDRESS }, A, ::puroro_rt::ProtoDefault, Pb>
     {
-        let field = slot.bind(common).variant_mut(
+        let field = slot.bind_mut(common).variant_mut(
             |e| matches!(e, Self::EmailAddress(_)),
             |e| match e {
                 Self::EmailAddress(f) => Some(f),
@@ -148,7 +148,7 @@ impl<
             },
             |alloc| Self::EmailAddress(SingularLenField::new_in(alloc)),
         );
-        field.bind(common)
+        field.bind_mut(common)
     }
 
     pub(crate) fn bind_phone_number_mut<'f, 'c, Pb: PresenceBits>(
@@ -156,7 +156,7 @@ impl<
         common: &'c mut MessageCommon<Pb, A>,
     ) -> SingularLenFieldMut<'f, 'c, ProtoString, Oneof, { FIELD_PHONE_NUMBER }, A, ::puroro_rt::ProtoDefault, Pb>
     {
-        let field = slot.bind(common).variant_mut(
+        let field = slot.bind_mut(common).variant_mut(
             |e| matches!(e, Self::PhoneNumber(_)),
             |e| match e {
                 Self::PhoneNumber(f) => Some(f),
@@ -164,7 +164,7 @@ impl<
             },
             |alloc| Self::PhoneNumber(SingularLenField::new_in(alloc)),
         );
-        field.bind(common)
+        field.bind_mut(common)
     }
 
     pub(crate) fn bind_webhook_id_mut<'f, 'c, Pb: PresenceBits>(
@@ -172,7 +172,7 @@ impl<
         common: &'c mut MessageCommon<Pb, A>,
     ) -> SingularVarintFieldMut<'f, 'c, ProtoInt32, Oneof, { FIELD_WEBHOOK_ID }, ::puroro_rt::ProtoDefault, Pb, A>
     {
-        let field = slot.bind(common).variant_mut(
+        let field = slot.bind_mut(common).variant_mut(
             |e| matches!(e, Self::WebhookId(_)),
             |e| match e {
                 Self::WebhookId(f) => Some(f),
@@ -180,14 +180,14 @@ impl<
             },
             |_alloc| Self::WebhookId(SingularVarintField::new_in(_alloc)),
         );
-        field.bind(common)
+        field.bind_mut(common)
     }
 
     pub(crate) fn bind_postal_mut<'f, 'c, Pb: PresenceBits>(
         slot: &'f mut OneofSlot<Self>,
         common: &'c mut MessageCommon<Pb, A>,
     ) -> NestedMessageFieldMut<'f, 'c, Address<A>, Oneof, { FIELD_POSTAL }, A, Pb> {
-        let field = slot.bind(common).variant_mut(
+        let field = slot.bind_mut(common).variant_mut(
             |e| matches!(e, Self::Postal(_)),
             |e| match e {
                 Self::Postal(f) => Some(f),
@@ -195,7 +195,7 @@ impl<
             },
             |alloc| Self::Postal(NestedMessageField::with_message_in(alloc)),
         );
-        field.bind(common)
+        field.bind_mut(common)
     }
 
     pub fn email_address(

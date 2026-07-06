@@ -43,24 +43,6 @@ impl<T: LenProtoType, const FIELD: u32, A: Allocator> RepeatedLenField<T, FIELD,
         self.values.is_empty()
     }
 
-    /// Binds this field to its message `common` state (for the allocator),
-    /// producing a short-lived [`RepeatedLenFieldMut`] view.
-    ///
-    /// This is the entry point for every mutation (`push_in` / `merge` /
-    /// `clear`): generated code calls `field.bind(&mut common).…()` instead of
-    /// threading the allocator through each method. Repeated fields carry no
-    /// presence bit, so the view needs only `common`.
-    #[inline]
-    pub fn bind<'f, 'c, Pb: PresenceBits>(
-        &'f mut self,
-        common: &'c mut MessageCommon<Pb, A>,
-    ) -> RepeatedLenFieldMut<'f, 'c, T, FIELD, Pb, A>
-    where
-        A: Clone,
-    {
-        BindableMut::bind_mut(self, common)
-    }
-
     pub fn encoded_len<Pb>(&self, _common: &MessageCommon<Pb, A>) -> usize
     where
         Pb: PresenceBits,
@@ -104,12 +86,12 @@ impl<T: LenProtoType, const FIELD: u32, A: Allocator> RepeatedLenField<T, FIELD,
 // ---------------------------------------------------------------------------
 
 /// Short-lived binding of a repeated LEN field to its message common state,
-/// produced by [`RepeatedLenField::bind`].
+/// produced by [`BindableMut::bind_mut`](crate::fields::shared::BindableMut::bind_mut).
 ///
 /// Bundles the element buffer with the allocator context so that generated code
 /// can mutate through a single call. Repeated fields have no presence bit, so
 /// the view carries only `common` (for the allocator). Every method consumes
-/// the view, so a fresh `bind` precedes each mutation.
+/// a fresh `bind_mut` precedes each mutation.
 pub struct RepeatedLenFieldMut<'f, 'c, T: LenProtoType, const FIELD: u32, Pb: PresenceBits, A: Allocator>
 {
     field: &'f mut RepeatedLenField<T, FIELD, A>,

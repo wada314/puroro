@@ -5,7 +5,7 @@
 //! individual variant field types are not used on the message struct.
 //!
 //! Mutation flows through [`OneofSlotMut`], obtained via
-//! [`OneofSlot::bind`], mirroring the bound-view idiom used by the singular /
+//! [`BindableMut::bind_mut`](crate::fields::shared::BindableMut::bind_mut), mirroring the bound-view idiom used by the singular /
 //! repeated field families: the slot is bound to the message
 //! [`MessageCommon`] (for the allocator), and the previously-active variant is
 //! released through [`OneofDeallocate::deallocate`] before the slot is overwritten.
@@ -61,7 +61,7 @@ pub trait OneofEncodable<A: Allocator> {
 /// paths stay free of it.
 ///
 /// The stored variant is replaced whenever another one is set or decoded (last
-/// wins on the wire). All mutation goes through [`bind`](Self::bind); the
+/// wins on the wire). All mutation goes through [`BindableMut::bind_mut`](crate::fields::shared::BindableMut::bind_mut); the
 /// inherent [`set`](Self::set) / [`take`](Self::take) / [`clear`](Self::clear)
 /// are low-level primitives used by the view and do **not** release the
 /// previous variant on their own.
@@ -86,21 +86,6 @@ impl<E> OneofSlot<E> {
     #[inline]
     pub fn as_mut(&mut self) -> Option<&mut E> {
         self.value.as_mut()
-    }
-
-    /// Binds this slot to its message `common` state (for the allocator),
-    /// producing a short-lived [`OneofSlotMut`] view.
-    ///
-    /// This is the entry point for every mutation (`set` / `variant_mut` /
-    /// `clear`): generated accessors call `slot.bind(&mut common).…()` instead
-    /// of releasing the old variant and rewriting the slot by hand. A oneof
-    /// carries no presence bit, so the view needs only `common`.
-    #[inline]
-    pub fn bind<'f, 'c, Pb: PresenceBits, A: Allocator + Clone + 'f>(
-        &'f mut self,
-        common: &'c mut MessageCommon<Pb, A>,
-    ) -> OneofSlotMut<'f, 'c, E, Pb, A> {
-        BindableMut::bind_mut(self, common)
     }
 
     /// Installs `value` as the active variant.
@@ -183,14 +168,15 @@ impl<E, A: Allocator + Clone, Pb: PresenceBits> BindableMut<MessageCommon<Pb, A>
 // Mutation view
 // ---------------------------------------------------------------------------
 
-/// Short-lived binding of a oneof slot to its message common state, produced by
-/// [`OneofSlot::bind`].
+/// Short-lived binding of a oneof slot to its message common state,
+/// [`OneofSlotMut`](crate::fields::oneof::OneofSlotMut), produced by
+/// [`BindableMut::bind_mut`](crate::fields::shared::BindableMut::bind_mut).
 ///
 /// Bundles the slot with the allocator context so that generated code can
 /// mutate through a single call while the previously-active variant is released
 /// consistently (via [`OneofDeallocate`]). A oneof has no presence bit, so the view
 /// carries only `common` (for the allocator). Every method consumes the view, so
-/// a fresh `bind` precedes each mutation.
+/// a fresh `bind_mut` precedes each mutation.
 pub struct OneofSlotMut<'f, 'c, E, Pb: PresenceBits, A: Allocator> {
     slot: &'f mut OneofSlot<E>,
     common: &'c mut MessageCommon<Pb, A>,

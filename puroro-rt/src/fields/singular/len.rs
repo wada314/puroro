@@ -51,17 +51,6 @@ impl<T: LenProtoType, P: FieldPresence, const FIELD: u32, A: Allocator, D>
         T::with_alloc(&mut self.value, alloc)
     }
 
-    #[inline]
-    pub fn bind<'f, 'c, Pb: PresenceBits>(
-        &'f mut self,
-        common: &'c mut MessageCommon<Pb, A>,
-    ) -> SingularLenFieldMut<'f, 'c, T, P, FIELD, A, D, Pb>
-    where
-        A: Clone,
-    {
-        BindableMut::bind_mut(self, common)
-    }
-
     pub fn encoded_len<Pb>(&self, common: &MessageCommon<Pb, A>) -> usize
     where
         Pb: PresenceBits,

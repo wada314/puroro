@@ -30,9 +30,7 @@ pub trait Bindable<Common: ?Sized> {
 
 /// Mutation-side binding for a field storage type.
 ///
-/// Generated decode/merge code uses `field.bind_mut(&mut common).merge(…)` (or
-/// the inherent [`bind`](crate::fields::singular::len::SingularLenField::bind)
-/// alias on types that expose it today).
+/// Generated decode/merge code uses `BindableMut::bind_mut(field, &mut common).merge(…)`.
 pub trait BindableMut<Common: ?Sized> {
     /// Short-lived mutation view after binding to `common`.
     type BoundMut<'f, 'c>

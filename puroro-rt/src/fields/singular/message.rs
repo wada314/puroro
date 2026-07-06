@@ -129,19 +129,6 @@ impl<M, P: MessagePresence, const FIELD: u32, A: Allocator> NestedMessageField<M
             child.encode_raw(buf);
         }
     }
-
-    /// Binds this field to its message `common` state (for the allocator),
-    /// producing a short-lived [`NestedMessageFieldMut`] view.
-    #[inline]
-    pub fn bind<'f, 'c, Pb: PresenceBits>(
-        &'f mut self,
-        common: &'c mut MessageCommon<Pb, A>,
-    ) -> NestedMessageFieldMut<'f, 'c, M, P, FIELD, A, Pb>
-    where
-        A: Clone,
-    {
-        BindableMut::bind_mut(self, common)
-    }
 }
 
 impl<M, const FIELD: u32, A: Allocator> NestedMessageField<M, Singular, FIELD, A> {
@@ -233,7 +220,7 @@ impl<M, P: MessagePresence, const FIELD: u32, A: Allocator + Clone, Pb: Presence
 // ---------------------------------------------------------------------------
 
 /// Short-lived binding of a nested message field to its message common state,
-/// produced by [`NestedMessageField::bind`].
+/// produced by [`BindableMut::bind_mut`](crate::fields::shared::BindableMut::bind_mut).
 ///
 /// Bundles the field with the allocator context so a generated accessor can
 /// express a whole mutation as a single call, mirroring the bound-view idiom of

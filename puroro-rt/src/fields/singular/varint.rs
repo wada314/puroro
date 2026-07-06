@@ -50,17 +50,6 @@ where
         }
     }
 
-    /// Binds this field to its message `common` state (presence), producing a
-    /// short-lived [`SingularVarintFieldMut`] view that carries the whole
-    /// mutation context.
-    #[inline]
-    pub fn bind<'f, 'c, Pb: PresenceBits, A: Allocator + Clone + 'f>(
-        &'f mut self,
-        common: &'c mut MessageCommon<Pb, A>,
-    ) -> SingularVarintFieldMut<'f, 'c, T, P, FIELD, D, Pb, A> {
-        BindableMut::bind_mut(self, common)
-    }
-
     pub fn encoded_len<Pb, A>(&self, common: &MessageCommon<Pb, A>) -> usize
     where
         Pb: PresenceBits,

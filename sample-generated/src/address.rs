@@ -10,7 +10,7 @@ use ::bytes::{Buf, BufMut};
 
 use ::puroro::{DecodeError, MessageDecode, MessageEncode};
 use ::puroro_rt::{
-    Explicit, MessageCommon, NestedMessage, PresenceBits, ProtoString, SingularLenField,
+    BindableMut, Explicit, MessageCommon, NestedMessage, PresenceBits, ProtoString, SingularLenField,
 };
 
 // ---------------------------------------------------------------------------
@@ -78,11 +78,11 @@ impl<A: Allocator + Clone> Address<A> {
     pub fn street_mut<'s>(
         &'s mut self,
     ) -> impl ::core::ops::DerefMut<Target = ::unmanaged::String<A>> + 's {
-        self.street.bind(&mut self._common).value_mut()
+        self.street.bind_mut(&mut self._common).value_mut()
     }
 
     pub fn clear_street(&mut self) {
-        self.street.bind(&mut self._common).clear();
+        self.street.bind_mut(&mut self._common).clear();
     }
 
     // -- city (EXPLICIT string, proto field 2) ------------------------------
@@ -94,11 +94,11 @@ impl<A: Allocator + Clone> Address<A> {
     pub fn city_mut<'s>(
         &'s mut self,
     ) -> impl ::core::ops::DerefMut<Target = ::unmanaged::String<A>> + 's {
-        self.city.bind(&mut self._common).value_mut()
+        self.city.bind_mut(&mut self._common).value_mut()
     }
 
     pub fn clear_city(&mut self) {
-        self.city.bind(&mut self._common).clear();
+        self.city.bind_mut(&mut self._common).clear();
     }
 
     pub fn unknown_fields(&self) -> &[u8] {
@@ -165,13 +165,13 @@ impl<A: Allocator + Clone> MessageDecode for Address<A> {
                 FIELD_STREET => {
                     // street = 1, EXPLICIT string
                     self.street
-                        .bind(&mut self._common)
+                        .bind_mut(&mut self._common)
                         .merge(wire_type, buf)?;
                 }
                 FIELD_CITY => {
                     // city = 2, EXPLICIT string
                     self.city
-                        .bind(&mut self._common)
+                        .bind_mut(&mut self._common)
                         .merge(wire_type, buf)?;
                 }
                 _ => {
