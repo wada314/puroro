@@ -15,7 +15,7 @@ use crate::decode;
 use ::puroro::DecodeError;
 use ::puroro::WireType;
 
-use crate::fields::shared::{MessageCommon, PresenceBits};
+use crate::fields::shared::{BindableMut, MessageCommon, PresenceBits};
 use crate::fields::wire::varint::{self, VarintProtoType};
 
 use super::encoding::RepeatedVarintEncoding;
@@ -189,6 +189,28 @@ impl<
             _ => return Err(DecodeError::InvalidTag),
         }
         Ok(())
+    }
+}
+
+impl<
+        T: VarintProtoType,
+        E: RepeatedVarintEncoding,
+        const FIELD: u32,
+        A: Allocator + Clone,
+    > BindableMut<A> for RepeatedVarintField<T, E, FIELD, A>
+{
+    type BoundMut<'f, 'c, Pb: PresenceBits + 'c> = RepeatedVarintFieldMut<'f, 'c, T, E, FIELD, Pb, A>
+    where
+        T: 'f,
+        E: 'f,
+        A: 'c,
+        A: 'f;
+
+    fn bind_mut<'f, 'c, Pb: PresenceBits>(
+        &'f mut self,
+        common: &'c mut MessageCommon<Pb, A>,
+    ) -> RepeatedVarintFieldMut<'f, 'c, T, E, FIELD, Pb, A> {
+        RepeatedVarintFieldMut::new(self, common)
     }
 }
 

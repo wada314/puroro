@@ -16,7 +16,7 @@ use crate::encode;
 use ::puroro::DecodeError;
 use ::puroro::WireType;
 
-use crate::fields::shared::{MessageCommon, PresenceBits};
+use crate::fields::shared::{BindableMut, MessageCommon, PresenceBits};
 use crate::fields::wire::len::{self, LenProtoType};
 
 /// Repeated field whose elements are length-delimited records (one tag per element).
@@ -164,6 +164,23 @@ impl<'f, 'c, T: LenProtoType, const FIELD: u32, Pb: PresenceBits, A: Allocator>
         while let Some(elem) = g.pop() {
             unsafe { T::deallocate(elem, alloc.clone()) };
         }
+    }
+}
+
+impl<T: LenProtoType, const FIELD: u32, A: Allocator + Clone> BindableMut<A>
+    for RepeatedLenField<T, FIELD, A>
+{
+    type BoundMut<'f, 'c, Pb: PresenceBits + 'c> = RepeatedLenFieldMut<'f, 'c, T, FIELD, Pb, A>
+    where
+        T: 'f,
+        A: 'c,
+        A: 'f;
+
+    fn bind_mut<'f, 'c, Pb: PresenceBits>(
+        &'f mut self,
+        common: &'c mut MessageCommon<Pb, A>,
+    ) -> RepeatedLenFieldMut<'f, 'c, T, FIELD, Pb, A> {
+        RepeatedLenFieldMut::new(self, common)
     }
 }
 

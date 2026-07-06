@@ -34,6 +34,7 @@ pub use repeated::{
     RepeatedVarintField, RepeatedVarintFieldMut,
 };
 pub use shared::{
+    bindable::{Bindable, BindableMut},
     field_presence::{
         Explicit, FieldPresence, Implicit, LegacyRequired, RequiredFieldPresence,
     },

@@ -17,7 +17,7 @@ use ::puroro::{HasDefault, Optional};
 use ::puroro::WireType;
 
 use crate::fields::shared::{
-    field_presence::FieldPresence, slot_init::AlwaysInitialized, value_slot::ValueSlot,
+    BindableMut, field_presence::FieldPresence, slot_init::AlwaysInitialized, value_slot::ValueSlot,
     MessageCommon, PresenceBits, ProtoZero,
 };
 use crate::fields::wire::varint::{self, VarintProtoType};
@@ -289,6 +289,33 @@ where
             .value
             .set(&mut init, T::decode_wire(raw)?);
         Ok(())
+    }
+}
+
+impl<
+        T: VarintProtoType,
+        P: FieldPresence,
+        const FIELD: u32,
+        D,
+        A: Allocator + Clone,
+    > BindableMut<A> for SingularVarintField<T, P, FIELD, D>
+where
+    P::ValueSlot<T::Value>: ValueSlot<T::Value>,
+{
+    type BoundMut<'f, 'c, Pb: PresenceBits + 'c> =
+        SingularVarintFieldMut<'f, 'c, T, P, FIELD, D, Pb, A>
+    where
+        T: 'f,
+        P: 'f,
+        D: 'f,
+        A: 'c,
+        A: 'f;
+
+    fn bind_mut<'f, 'c, Pb: PresenceBits>(
+        &'f mut self,
+        common: &'c mut MessageCommon<Pb, A>,
+    ) -> SingularVarintFieldMut<'f, 'c, T, P, FIELD, D, Pb, A> {
+        SingularVarintFieldMut::new(self, common)
     }
 }
 

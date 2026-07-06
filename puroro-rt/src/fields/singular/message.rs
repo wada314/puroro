@@ -25,7 +25,7 @@ use ::puroro::{DecodeError, MessageDecode, MessageEncode, WireType};
 use crate::decode;
 use crate::encode;
 
-use crate::fields::shared::{field_presence::Oneof, MessageCommon, PresenceBits};
+use crate::fields::shared::{field_presence::Oneof, BindableMut, MessageCommon, PresenceBits};
 use crate::fields::wire::len;
 
 /// Trait for child message types stored in [`NestedMessageField`].
@@ -206,6 +206,24 @@ impl<M, const FIELD: u32, A: Allocator> NestedMessageField<M, Oneof, FIELD, A> {
         Self {
             store: UnmanagedBox::new_in(m, alloc),
         }
+    }
+}
+
+impl<M, P: MessagePresence, const FIELD: u32, A: Allocator + Clone> BindableMut<A>
+    for NestedMessageField<M, P, FIELD, A>
+{
+    type BoundMut<'f, 'c, Pb: PresenceBits + 'c> = NestedMessageFieldMut<'f, 'c, M, P, FIELD, A, Pb>
+    where
+        M: 'f,
+        P: 'f,
+        A: 'c,
+        A: 'f;
+
+    fn bind_mut<'f, 'c, Pb: PresenceBits>(
+        &'f mut self,
+        common: &'c mut MessageCommon<Pb, A>,
+    ) -> NestedMessageFieldMut<'f, 'c, M, P, FIELD, A, Pb> {
+        NestedMessageFieldMut::new(self, common)
     }
 }
 

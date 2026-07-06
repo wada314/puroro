@@ -13,7 +13,7 @@ use ::puroro::WireType;
 use ::puroro::{HasDefault, Optional};
 
 use crate::fields::shared::{
-    MessageCommon, PresenceBits,
+    BindableMut, MessageCommon, PresenceBits,
     field_presence::{FieldPresence, LegacyRequired, RequiredFieldPresence},
     slot_init::SlotInitMut,
 };
@@ -198,6 +198,25 @@ impl<'f, 'c, T: LenProtoType, P: FieldPresence, const FIELD: u32, A: Allocator, 
         let old = unsafe { ManuallyDrop::take(&mut self.field.value) };
         unsafe { T::deallocate(old, self.common.alloc.clone()) };
         self.field.value = ManuallyDrop::new(T::new_in(self.common.alloc.clone()));
+    }
+}
+
+impl<T: LenProtoType, P: FieldPresence, const FIELD: u32, A: Allocator + Clone, D> BindableMut<A>
+    for SingularLenField<T, P, FIELD, A, D>
+{
+    type BoundMut<'f, 'c, Pb: PresenceBits + 'c> = SingularLenFieldMut<'f, 'c, T, P, FIELD, A, D, Pb>
+    where
+        T: 'f,
+        P: 'f,
+        D: 'f,
+        A: 'c,
+        A: 'f;
+
+    fn bind_mut<'f, 'c, Pb: PresenceBits>(
+        &'f mut self,
+        common: &'c mut MessageCommon<Pb, A>,
+    ) -> SingularLenFieldMut<'f, 'c, T, P, FIELD, A, D, Pb> {
+        SingularLenFieldMut::new(self, common)
     }
 }
 

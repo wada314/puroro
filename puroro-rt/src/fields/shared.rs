@@ -5,9 +5,12 @@
 //! [`SlotInitMut`](slot_init::SlotInitMut), and [`FieldPresence`](field_presence::FieldPresence)
 //! govern singular scalar storage and init state.
 
+pub mod bindable;
 pub mod field_presence;
 pub mod slot_init;
 pub mod value_slot;
+
+pub use bindable::{Bindable, BindableMut};
 
 use ::core::mem::ManuallyDrop;
 

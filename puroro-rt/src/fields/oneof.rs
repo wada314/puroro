@@ -13,7 +13,7 @@
 use ::allocator_api2::alloc::Allocator;
 use ::bytes::BufMut;
 
-use crate::fields::shared::{MessageCommon, PresenceBits};
+use crate::fields::shared::{BindableMut, MessageCommon, PresenceBits};
 
 /// Explicit, allocator-driven release of a generated `oneof` enum over allocator `A`.
 ///
@@ -162,6 +162,21 @@ impl<E> OneofSlot<E> {
 impl<E> Default for OneofSlot<E> {
     fn default() -> Self {
         Self { value: None }
+    }
+}
+
+impl<E, A: Allocator + Clone> BindableMut<A> for OneofSlot<E> {
+    type BoundMut<'f, 'c, Pb: PresenceBits + 'c> = OneofSlotMut<'f, 'c, E, Pb, A>
+    where
+        E: 'f,
+        A: 'c,
+        A: 'f;
+
+    fn bind_mut<'f, 'c, Pb: PresenceBits>(
+        &'f mut self,
+        common: &'c mut MessageCommon<Pb, A>,
+    ) -> OneofSlotMut<'f, 'c, E, Pb, A> {
+        OneofSlotMut::new(self, common)
     }
 }
 

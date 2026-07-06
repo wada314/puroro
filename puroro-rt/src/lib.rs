@@ -12,7 +12,8 @@ pub mod fields;
 pub use defaults::ProtoDefault;
 pub use fields::{
     Explicit, ExplicitBytes, ExplicitEnum, ExplicitInt32, ExplicitLenField, ExplicitString,
-    ExplicitVarint, ExplicitVarintField, FieldNumber, FieldPresence, Implicit, ImplicitBytes,
+    ExplicitVarint, ExplicitVarintField,     FieldNumber, FieldPresence, Implicit, ImplicitBytes,
+    Bindable, BindableMut,
     ImplicitEnum, ImplicitInt32, ImplicitLenField, ImplicitString, ImplicitVarint,
     ImplicitVarintField, LegacyRequired, LenProtoType, MessageCommon, MessagePresence,
     NestedMessage, NestedMessageField, NestedMessageFieldMut, Oneof, OneofDeallocate,
