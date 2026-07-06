@@ -26,7 +26,7 @@ pub mod singular;
 pub mod wire;
 
 pub use ::protobuf_core::FieldNumber;
-pub use oneof::{OneofDeallocate, OneofEncodable, OneofGroup, OneofSlot, OneofSlotMut, OneofVariantRef};
+pub use oneof::{OneofDeallocate, OneofEncodable, OneofSlot, OneofSlotMut, OneofVariantRef};
 pub use repeated::{
     Expanded, Packed, RepeatedBytes, RepeatedExpandedInt32, RepeatedExpandedVarintField,
     RepeatedLen, RepeatedLenField, RepeatedLenFieldMut, RepeatedPackedInt32,

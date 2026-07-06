@@ -526,13 +526,34 @@ impl<A: Allocator + Clone> MessageDecode for Task<A> {
                         .bind(&mut self._common)
                         .merge(wire_type, buf)?;
                 }
-                FIELD_EMAIL_ADDRESS | FIELD_PHONE_NUMBER | FIELD_WEBHOOK_ID | FIELD_POSTAL => {
-                    self.notification.merge_wire(
+                FIELD_EMAIL_ADDRESS => {
+                    // notification.email_address = 12, oneof LEN string
+                    NotificationStorage::bind_email_address_mut(
+                        &mut self.notification,
                         &mut self._common,
-                        field_number,
-                        wire_type,
-                        buf,
-                    )?;
+                    )
+                    .merge(wire_type, buf)?;
+                }
+                FIELD_PHONE_NUMBER => {
+                    // notification.phone_number = 13, oneof LEN string
+                    NotificationStorage::bind_phone_number_mut(
+                        &mut self.notification,
+                        &mut self._common,
+                    )
+                    .merge(wire_type, buf)?;
+                }
+                FIELD_WEBHOOK_ID => {
+                    // notification.webhook_id = 14, oneof VARINT int32
+                    NotificationStorage::bind_webhook_id_mut(
+                        &mut self.notification,
+                        &mut self._common,
+                    )
+                    .merge(wire_type, buf)?;
+                }
+                FIELD_POSTAL => {
+                    // notification.postal = 15, oneof nested message
+                    NotificationStorage::bind_postal_mut(&mut self.notification, &mut self._common)
+                        .merge(wire_type, buf)?;
                 }
                 _ => {
                     // unknown field — preserve in _common.unknown_fields

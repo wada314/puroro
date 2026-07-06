@@ -30,17 +30,16 @@
 //! when instantiating the storage type, so `merge_from` match arms stay readable.
 //!
 //! **Merge has no bespoke `merge_*` helpers on this enum.** Because each variant
-//! *is* a field wrapper, the parent's `merge_from` selects the variant through
-//! `bind_<variant>_mut` (which frees any other variant and returns the field's
-//! bound mutation view) and then calls `merge(...)` on it — uniformly for every
-//! variant kind.
+//! *is* a field wrapper, the parent message's `merge_from` dispatches on field
+//! number (one match arm per variant) and calls `bind_<variant>_mut` (which
+//! frees any other variant and returns the field's bound mutation view), then
+//! `merge(...)` on it — uniformly for every variant kind.
 
 use ::allocator_api2::alloc::Allocator;
-use ::bytes::{Buf, BufMut};
-use ::puroro::{DecodeError, WireType};
+use ::bytes::BufMut;
 use ::puroro_rt::{
     MessageCommon, NestedMessageField, NestedMessageFieldMut, Oneof, OneofDeallocate, OneofEncodable,
-    OneofGroup, OneofSlot, PresenceBits, ProtoInt32, ProtoString, SingularLenField,
+    OneofSlot, PresenceBits, ProtoInt32, ProtoString, SingularLenField,
     SingularLenFieldMut, SingularVarintField, SingularVarintFieldMut,
 };
 use ::unmanaged::string::StringGuard;
@@ -260,40 +259,6 @@ impl<
             Self::PhoneNumber(f) => f.encode_raw(common, buf),
             Self::WebhookId(f) => f.encode_raw(common, buf),
             Self::Postal(f) => f.encode_raw(common, buf),
-        }
-    }
-}
-
-impl<
-        A: Allocator + Clone,
-        const FIELD_EMAIL_ADDRESS: u32,
-        const FIELD_PHONE_NUMBER: u32,
-        const FIELD_WEBHOOK_ID: u32,
-        const FIELD_POSTAL: u32,
-    > OneofGroup<A>
-    for NotificationStorage<A, FIELD_EMAIL_ADDRESS, FIELD_PHONE_NUMBER, FIELD_WEBHOOK_ID, FIELD_POSTAL>
-{
-    fn merge_wire<Pb, B>(
-        slot: &mut OneofSlot<Self>,
-        common: &mut MessageCommon<Pb, A>,
-        field_number: u32,
-        wire_type: WireType,
-        buf: &mut B,
-    ) -> Result<(), DecodeError>
-    where
-        Pb: PresenceBits,
-        B: Buf,
-    {
-        if field_number == FIELD_EMAIL_ADDRESS {
-            Self::bind_email_address_mut(slot, common).merge(wire_type, buf)
-        } else if field_number == FIELD_PHONE_NUMBER {
-            Self::bind_phone_number_mut(slot, common).merge(wire_type, buf)
-        } else if field_number == FIELD_WEBHOOK_ID {
-            Self::bind_webhook_id_mut(slot, common).merge(wire_type, buf)
-        } else if field_number == FIELD_POSTAL {
-            Self::bind_postal_mut(slot, common).merge(wire_type, buf)
-        } else {
-            Err(DecodeError::InvalidTag)
         }
     }
 }

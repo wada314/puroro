@@ -11,10 +11,7 @@
 //! released through [`OneofDeallocate::deallocate`] before the slot is overwritten.
 
 use ::allocator_api2::alloc::Allocator;
-use ::bytes::{Buf, BufMut};
-
-use ::puroro::DecodeError;
-use ::puroro::WireType;
+use ::bytes::BufMut;
 
 use crate::fields::shared::{MessageCommon, PresenceBits};
 
@@ -48,26 +45,6 @@ pub trait OneofEncodable<A: Allocator> {
 
     /// Encodes this active variant.
     fn encode_raw<Pb: PresenceBits, B: BufMut>(&self, common: &MessageCommon<Pb, A>, buf: &mut B);
-}
-
-/// Wire decode behaviour for a generated oneof storage enum.
-///
-/// Implemented by the crate-internal enum held in [`OneofSlot`]. Lets the parent
-/// message use the same `encoded_len` / `encode_raw` / merge shape as other
-/// fields without storage-specific static helpers.
-pub trait OneofGroup<A: Allocator + Clone>: OneofDeallocate<A> + OneofEncodable<A> {
-    /// Merges a wire occurrence into the matching variant, selecting it first.
-    fn merge_wire<Pb, B>(
-        slot: &mut OneofSlot<Self>,
-        common: &mut MessageCommon<Pb, A>,
-        field_number: u32,
-        wire_type: WireType,
-        buf: &mut B,
-    ) -> Result<(), DecodeError>
-    where
-        Pb: PresenceBits,
-        B: Buf,
-        Self: Sized;
 }
 
 /// Storage for a protobuf `oneof` group.
@@ -182,25 +159,6 @@ impl<E> OneofSlot<E> {
     }
 }
 
-impl<E> OneofSlot<E> {
-    /// Merges a wire occurrence for one member of this oneof group.
-    pub fn merge_wire<Pb, A, B>(
-        &mut self,
-        common: &mut MessageCommon<Pb, A>,
-        field_number: u32,
-        wire_type: WireType,
-        buf: &mut B,
-    ) -> Result<(), DecodeError>
-    where
-        E: OneofGroup<A>,
-        A: Allocator + Clone,
-        Pb: PresenceBits,
-        B: Buf,
-    {
-        E::merge_wire(self, common, field_number, wire_type, buf)
-    }
-}
-
 impl<E> Default for OneofSlot<E> {
     fn default() -> Self {
         Self { value: None }
@@ -257,12 +215,11 @@ impl<'f, 'c, E, Pb: PresenceBits, A: Allocator> OneofSlotMut<'f, 'c, E, Pb, A> {
     /// (or [`set`](Self::set) / [`clear`](Self::clear)) so the previous variant is
     /// released with the message allocator before the slot is overwritten.
     ///
-    /// Backs both the per-variant `_mut` accessors and the decode arms: after
-    /// selecting the variant, generated `merge_from` merges the wire occurrence
-    /// into the returned field through that field's own bind idiom
-    /// (`field.bind(common).merge(…)` for every variant kind) — so the oneof
-    /// reuses each field's merge machinery instead of a bespoke `merge_<variant>`
-    /// helper on the enum.
+    /// Backs the per-variant `_mut` accessors. Generated `merge_from` selects the
+    /// variant through the storage enum's `bind_<variant>_mut` helper (which
+    /// calls this method internally), then merges the wire occurrence through
+    /// the returned bound field view — reusing each field's merge machinery
+    /// instead of a bespoke `merge_<variant>` helper on the enum.
     pub fn variant_mut<V>(
         self,
         is_active: impl FnOnce(&E) -> bool,
