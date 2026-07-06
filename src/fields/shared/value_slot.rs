@@ -9,8 +9,7 @@
 
 use ::core::mem::MaybeUninit;
 
-use super::proto_zero::ProtoZero;
-use super::slot_init::{SlotInitMut, SlotInitView};
+use super::{slot_init::{SlotInitMut, SlotInitView}, ProtoZero};
 
 /// Storage operations for a singular field value slot.
 pub trait ValueSlot<T: ProtoZero> {

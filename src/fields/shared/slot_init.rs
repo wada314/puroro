@@ -11,8 +11,7 @@
 
 use ::allocator_api2::alloc::Allocator;
 
-use super::common::MessageCommon;
-use super::presence::PresenceBits;
+use super::{MessageCommon, PresenceBits};
 
 /// Read-only view of whether a value slot is initialized.
 pub trait SlotInitView {

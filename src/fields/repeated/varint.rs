@@ -15,15 +15,15 @@ use crate::decode;
 use crate::error::DecodeError;
 use crate::wire_type::WireType;
 
-use super::common::MessageCommon;
-use super::presence::PresenceBits;
-use super::repeated_encoding::RepeatedVarintEncoding;
-use super::varint::{self, VarintProtoType};
+use crate::fields::shared::{MessageCommon, PresenceBits};
+use crate::fields::wire::varint::{self, VarintProtoType};
+
+use super::encoding::RepeatedVarintEncoding;
 
 /// Repeated field whose elements share a varint wire representation.
 ///
-/// Param `E` is [`Packed`](super::repeated_encoding::Packed) or
-/// [`Expanded`](super::repeated_encoding::Expanded) — affects **encode only**.
+/// Param `E` is [`Packed`](super::encoding::Packed) or
+/// [`Expanded`](super::encoding::Expanded) — affects **encode only**.
 /// [`RepeatedVarintFieldMut::merge`] accepts both packed and expanded wire forms.
 pub struct RepeatedVarintField<T: VarintProtoType, E: RepeatedVarintEncoding, const FIELD: u32, A: Allocator> {
     values: ManuallyDrop<UnmanagedVec<T::Value>>,
@@ -199,9 +199,9 @@ impl<
 pub type RepeatedVarint<T, E, const FIELD: u32, A> = RepeatedVarintField<T, E, FIELD, A>;
 
 pub type RepeatedPackedVarintField<T, const FIELD: u32, A> =
-    RepeatedVarintField<T, super::repeated_encoding::Packed, FIELD, A>;
+    RepeatedVarintField<T, super::encoding::Packed, FIELD, A>;
 pub type RepeatedExpandedVarintField<T, const FIELD: u32, A> =
-    RepeatedVarintField<T, super::repeated_encoding::Expanded, FIELD, A>;
+    RepeatedVarintField<T, super::encoding::Expanded, FIELD, A>;
 
 pub type RepeatedPackedInt32<const FIELD: u32, A> =
     RepeatedPackedVarintField<varint::ProtoInt32, FIELD, A>;

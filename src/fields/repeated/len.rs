@@ -16,9 +16,8 @@ use crate::encode;
 use crate::error::DecodeError;
 use crate::wire_type::WireType;
 
-use super::common::MessageCommon;
-use super::len::{self, LenProtoType};
-use super::presence::PresenceBits;
+use crate::fields::shared::{MessageCommon, PresenceBits};
+use crate::fields::wire::len::{self, LenProtoType};
 
 /// Repeated field whose elements are length-delimited records (one tag per element).
 pub struct RepeatedLenField<T: LenProtoType, const FIELD: u32, A: Allocator> {

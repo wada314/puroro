@@ -6,17 +6,17 @@ use ::core::mem::ManuallyDrop;
 use ::bytes::{Buf, BufMut};
 use ::allocator_api2::alloc::Allocator;
 
+use crate::defaults::ProtoDefault;
 use crate::encode;
 use crate::error::DecodeError;
-use crate::defaults::ProtoDefault;
 use crate::optional::{HasDefault, Optional};
 use crate::wire_type::WireType;
 
-use super::common::MessageCommon;
-use super::field_presence::{FieldPresence, LegacyRequired, RequiredFieldPresence};
-use super::len::{self, LenProtoType};
-use super::presence::PresenceBits;
-use super::slot_init::SlotInitMut;
+use crate::fields::shared::{
+    field_presence::{FieldPresence, LegacyRequired, RequiredFieldPresence},
+    slot_init::SlotInitMut, MessageCommon, PresenceBits,
+};
+use crate::fields::wire::len::{self, LenProtoType};
 
 /// Singular LEN field — parametrised by [`LenProtoType`] `T`, presence policy `P`,
 /// proto field number `FIELD`, message allocator `A`, and compile-time default marker `D`.
@@ -192,7 +192,7 @@ impl<
 
     /// Resets payload to empty / type-zero and clears explicit presence when applicable.
     ///
-    /// For [`Implicit`](super::field_presence::Implicit) fields this omits the field on
+    /// For [`Implicit`](crate::fields::shared::field_presence::Implicit) fields this omits the field on
     /// the wire.
     pub fn clear(self)
     where
@@ -215,13 +215,13 @@ impl<
 pub type SingularLen<T, P, const FIELD: u32, A, D = ProtoDefault> = SingularLenField<T, P, FIELD, A, D>;
 
 pub type ImplicitLenField<T, const FIELD: u32, A> =
-    SingularLenField<T, super::field_presence::Implicit, FIELD, A>;
+    SingularLenField<T, crate::fields::shared::field_presence::Implicit, FIELD, A>;
 pub type OneofLenField<T, const FIELD: u32, A> =
-    SingularLenField<T, super::field_presence::Oneof, FIELD, A>;
+    SingularLenField<T, crate::fields::shared::field_presence::Oneof, FIELD, A>;
 pub type ExplicitLenField<T, const BIT: usize, const FIELD: u32, A, D = ProtoDefault> =
-    SingularLenField<T, super::field_presence::Explicit<BIT>, FIELD, A, D>;
+    SingularLenField<T, crate::fields::shared::field_presence::Explicit<BIT>, FIELD, A, D>;
 pub type LegacyRequiredLenField<T, const BIT: usize, const FIELD: u32, A, D = ProtoDefault> =
-    SingularLenField<T, super::field_presence::LegacyRequired<BIT>, FIELD, A, D>;
+    SingularLenField<T, crate::fields::shared::field_presence::LegacyRequired<BIT>, FIELD, A, D>;
 
 pub type ImplicitString<const FIELD: u32, A> = ImplicitLenField<len::ProtoString, FIELD, A>;
 pub type ExplicitString<const BIT: usize, const FIELD: u32, A, D = ProtoDefault> =

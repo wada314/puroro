@@ -7,14 +7,14 @@
 //!
 //! - [`Singular`] — `Option<UnmanagedBox<M>>`, for ordinary nested message
 //!   fields whose presence is tracked by the field itself (absent vs present).
-//! - [`Oneof`](super::field_presence::Oneof) — a bare `UnmanagedBox<M>`, for oneof
+//! - [`Oneof`](crate::fields::shared::field_presence::Oneof) — a bare `UnmanagedBox<M>`, for oneof
 //!   message variants: the enclosing `OneofSlot` tracks presence, so the box is
 //!   *always* there and the field behaves like a scalar (`value` / `value_mut`, no
 //!   `Option`, no per-access `unwrap`).
 //!
 //! Either way the box is allocator-less; it is freed explicitly (via
 //! [`deallocate`](NestedMessageField::deallocate)) — from the owning message's
-//! `Drop` for [`Singular`], or through `OneofDeallocate` for [`Oneof`](super::field_presence::Oneof).
+//! `Drop` for [`Singular`], or through `OneofDeallocate` for [`Oneof`](crate::fields::shared::field_presence::Oneof).
 
 use ::allocator_api2::alloc::Allocator;
 use ::bytes::{Buf, BufMut};
@@ -25,10 +25,8 @@ use crate::encode::{self, MessageEncode};
 use crate::error::DecodeError;
 use crate::wire_type::WireType;
 
-use super::common::MessageCommon;
-use super::field_presence::Oneof;
-use super::len;
-use super::presence::PresenceBits;
+use crate::fields::shared::{field_presence::Oneof, MessageCommon, PresenceBits};
+use crate::fields::wire::len;
 
 /// Trait for child message types stored in [`NestedMessageField`].
 pub trait NestedMessage<A: Allocator + Clone>: MessageEncode + MessageDecode + Sized {

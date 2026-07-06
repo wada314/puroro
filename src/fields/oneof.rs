@@ -16,8 +16,7 @@ use ::bytes::{Buf, BufMut};
 use crate::error::DecodeError;
 use crate::wire_type::WireType;
 
-use super::common::MessageCommon;
-use super::presence::PresenceBits;
+use crate::fields::shared::{MessageCommon, PresenceBits};
 
 /// Explicit, allocator-driven release of a generated `oneof` enum over allocator `A`.
 ///

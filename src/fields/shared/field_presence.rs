@@ -1,7 +1,7 @@
 //! Field presence policy markers (`Implicit` / `Explicit<BIT>` / `LegacyRequired<BIT>` / [`Oneof`]).
 //!
-//! Composed with wire-encoding markers ([`VarintProtoType`](super::varint::VarintProtoType),
-//! [`LenProtoType`](super::len::LenProtoType)) in singular field wrappers.
+//! Composed with wire-encoding markers ([`VarintProtoType`](crate::fields::wire::varint::VarintProtoType),
+//! [`LenProtoType`](crate::fields::wire::len::LenProtoType)) in singular field wrappers.
 //!
 //! Only [`Explicit`] and [`LegacyRequired`] carry a presence bit index; [`Implicit`] and
 //! [`Oneof`] have none.
@@ -11,13 +11,10 @@ use ::core::mem::MaybeUninit;
 
 use crate::error::DecodeError;
 
-use super::common::MessageCommon;
-use super::presence::PresenceBits;
-use super::proto_zero::ProtoZero;
-use super::slot_init::{
-    AlwaysInitialized, BitInitMut, BitInitView, SlotInitMut, SlotInitView,
+use super::{
+    slot_init::{AlwaysInitialized, BitInitMut, BitInitView, SlotInitMut, SlotInitView},
+    value_slot::ValueSlot, MessageCommon, PresenceBits, ProtoZero,
 };
-use super::value_slot::ValueSlot;
 
 /// Encode / merge / clear behaviour for singular field presence.
 pub trait FieldPresence: Copy {

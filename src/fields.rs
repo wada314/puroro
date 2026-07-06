@@ -4,73 +4,54 @@
 //! type in this module. Field getters/setters/encode/decode only touch:
 //!
 //! 1. The field's own struct member, and
-//! 2. [`MessageCommon`] (presence bitfield, allocator, unknown-field buffer).
+//! 2. [`MessageCommon`](shared::MessageCommon) (presence bitfield, allocator, unknown-field buffer).
 //!
 //! Singular fields are parametrised by **wire type** (`ProtoInt32`, `ProtoString`, …)
-//! and **presence policy** ([`Implicit`] / [`Explicit`] / [`Oneof`]).
+//! and **presence policy** ([`Implicit`](shared::field_presence::Implicit) / [`Explicit`](shared::field_presence::Explicit) / [`Oneof`](shared::field_presence::Oneof)).
 //!
 //! # Module layout
 //!
-//! | Submodule / type | Proto pattern |
+//! | Submodule | Contents |
 //! |---|---|
-//! | [`varint`] | `VarintProtoType` markers |
-//! | [`field_presence`] | `FieldPresence` (`Implicit` / `Explicit` / `Oneof`) |
-//! | [`scalar`] | `SingularVarintField<T, P, FIELD>` |
-//! | [`len`] / [`len_field`] | `SingularLenField<T, P, FIELD, A>` |
-//! | [`message`] | `NestedMessageField<M, P, FIELD, A>` |
-//! | [`repeated_varint`] / [`repeated_len`] | `RepeatedVarintField`, `RepeatedLenField` |
-//! | [`oneof::OneofSlot`] | `oneof` group |
-//! | [`common::MessageCommon`] | shared infrastructure |
+//! | [`shared`] | `MessageCommon`, `PresenceBits`, `FieldPresence`, `ValueSlot`, … |
+//! | [`wire`] | `VarintProtoType`, `LenProtoType`, fixed-width markers |
+//! | [`singular`] | `SingularVarintField`, `SingularLenField`, `NestedMessageField` |
+//! | [`repeated`] | `RepeatedVarintField`, `RepeatedLenField` |
+//! | [`oneof`] | `OneofSlot` |
 
-pub mod common;
-pub mod field_presence;
-pub mod fixed32;
-pub mod fixed64;
-pub mod len;
-pub mod len_field;
-pub mod message;
 pub mod oneof;
-pub mod presence;
-pub mod proto_zero;
-pub mod repeated_encoding;
-pub mod repeated_len;
-pub mod repeated_varint;
-pub mod scalar;
-pub mod slot_init;
-pub mod value_slot;
-pub mod varint;
+pub mod repeated;
+pub mod shared;
+pub mod singular;
+pub mod wire;
 
 pub use ::protobuf_core::FieldNumber;
-pub use common::MessageCommon;
-pub use field_presence::{
-    Explicit, FieldPresence, Implicit, LegacyRequired, Oneof, RequiredFieldPresence,
-};
-pub use len::{LenProtoType, ProtoBytes, ProtoString};
-pub use len_field::{
-    ExplicitBytes, ExplicitLenField, ExplicitString, ImplicitBytes, ImplicitLenField,
-    ImplicitString, SingularLen, SingularLenField, SingularLenFieldMut,
-};
-pub use message::{
-    MessagePresence, NestedMessage, NestedMessageField, NestedMessageFieldMut, Singular,
-};
 pub use oneof::{OneofDeallocate, OneofEncodable, OneofGroup, OneofSlot, OneofSlotMut};
-pub use presence::PresenceBits;
-pub use slot_init::{AlwaysInitialized, BitInitMut, BitInitView, SlotInitMut, SlotInitView};
-pub use value_slot::ValueSlot;
-pub use repeated_encoding::{Expanded, Packed, RepeatedVarintEncoding};
-pub use repeated_len::{
-    RepeatedBytes, RepeatedLen, RepeatedLenField, RepeatedLenFieldMut, RepeatedString,
+pub use repeated::{
+    Expanded, Packed, RepeatedBytes, RepeatedExpandedInt32, RepeatedExpandedVarintField,
+    RepeatedLen, RepeatedLenField, RepeatedLenFieldMut, RepeatedPackedInt32,
+    RepeatedPackedVarintField, RepeatedString, RepeatedVarint, RepeatedVarintEncoding,
+    RepeatedVarintField, RepeatedVarintFieldMut,
 };
-pub use repeated_varint::{
-    RepeatedExpandedInt32, RepeatedExpandedVarintField, RepeatedPackedInt32,
-    RepeatedPackedVarintField, RepeatedVarint, RepeatedVarintField, RepeatedVarintFieldMut,
+pub use shared::{
+    field_presence::{
+        Explicit, FieldPresence, Implicit, LegacyRequired, RequiredFieldPresence,
+    },
+    slot_init::{AlwaysInitialized, BitInitMut, BitInitView, SlotInitMut, SlotInitView},
+    value_slot::ValueSlot,
+    MessageCommon, PresenceBits,
 };
-pub use scalar::{
-    ExplicitEnum, ExplicitInt32, ExplicitVarint, ExplicitVarintField, ImplicitEnum, ImplicitInt32,
-    ImplicitVarint, ImplicitVarintField, SingularVarint, SingularVarintField,
-    SingularVarintFieldMut,
+pub use singular::{
+    ExplicitBytes, ExplicitEnum, ExplicitInt32, ExplicitLenField, ExplicitString, ExplicitVarint,
+    ExplicitVarintField, ImplicitBytes, ImplicitEnum, ImplicitInt32, ImplicitLenField,
+    ImplicitString, ImplicitVarint, ImplicitVarintField, MessagePresence, NestedMessage,
+    NestedMessageField, NestedMessageFieldMut, Singular, SingularLen, SingularLenField,
+    SingularLenFieldMut, SingularVarint, SingularVarintField, SingularVarintFieldMut,
 };
-pub use varint::{
-    ProtoBool, ProtoEnum, ProtoEnumStorage, ProtoInt32, ProtoInt64, ProtoSint32, ProtoSint64,
-    ProtoUInt32, ProtoUInt64, VarintProtoType,
+pub use wire::{
+    enum_value_is_known, LenProtoType, ProtoBool, ProtoBytes, ProtoEnum, ProtoEnumStorage, ProtoInt32,
+    ProtoInt64, ProtoSint32, ProtoSint64, ProtoString, ProtoUInt32, ProtoUInt64, VarintProtoType,
 };
+
+// Preserve the historical `Oneof` name for the field-presence marker (distinct from `oneof` module).
+pub use shared::field_presence::Oneof;

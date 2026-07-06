@@ -6,7 +6,7 @@
 use ::bytes::BufMut;
 
 use crate::encode;
-use super::varint::VarintProtoType;
+use crate::fields::wire::varint::VarintProtoType;
 
 /// How a repeated varint-backed field is written on encode.
 pub trait RepeatedVarintEncoding: Copy {

@@ -1,8 +1,8 @@
 //! Singular varint field wrapper — generic over wire type and presence policy.
 //!
 //! Fixed-width scalars will follow the same `Singular*Field<T, P, FIELD>` pattern with
-//! [`Fixed32ProtoType`](super::fixed32::Fixed32ProtoType) /
-//! [`Fixed64ProtoType`](super::fixed64::Fixed64ProtoType).
+//! [`Fixed32ProtoType`](crate::fields::wire::fixed::Fixed32ProtoType) /
+//! [`Fixed64ProtoType`](crate::fields::wire::fixed::Fixed64ProtoType).
 
 use ::core::marker::PhantomData;
 
@@ -16,16 +16,15 @@ use crate::defaults::ProtoDefault;
 use crate::optional::{HasDefault, Optional};
 use crate::wire_type::WireType;
 
-use super::common::MessageCommon;
-use super::field_presence::FieldPresence;
-use super::presence::PresenceBits;
-use super::slot_init::AlwaysInitialized;
-use super::value_slot::ValueSlot;
-use super::varint::{self, VarintProtoType};
+use crate::fields::shared::{
+    field_presence::FieldPresence, slot_init::AlwaysInitialized, value_slot::ValueSlot,
+    MessageCommon, PresenceBits, ProtoZero,
+};
+use crate::fields::wire::varint::{self, VarintProtoType};
 
-/// Singular scalar on the wire as VARINT — parametrised by protobuf type `T`,
-/// presence policy `P` ([`Implicit`] / [`Explicit`](super::field_presence::Explicit)
-/// / [`LegacyRequired`](super::field_presence::LegacyRequired)), and proto field
+/// Singular varint field on the wire — parametrised by protobuf type `T`,
+/// presence policy `P` ([`Implicit`] / [`Explicit`](crate::fields::shared::field_presence::Explicit)
+/// / [`LegacyRequired`](crate::fields::shared::field_presence::LegacyRequired)), and proto field
 /// number `FIELD`, and compile-time default marker `D` ([`HasDefault`]).
 #[derive(Clone, Copy, Debug)]
 pub struct SingularVarintField<
@@ -125,9 +124,9 @@ where
     }
 }
 
-impl<T: VarintProtoType, const FIELD: u32, D> SingularVarintField<T, super::field_presence::Implicit, FIELD, D>
+impl<T: VarintProtoType, const FIELD: u32, D> SingularVarintField<T, crate::fields::shared::field_presence::Implicit, FIELD, D>
 where
-    T::Value: super::proto_zero::ProtoZero,
+    T::Value: ProtoZero,
 {
     /// Raw stored value for [`Implicit`] fields (always initialized).
     #[inline]
@@ -139,9 +138,9 @@ where
     }
 }
 
-impl<T: VarintProtoType, const FIELD: u32, D> SingularVarintField<T, super::field_presence::Oneof, FIELD, D>
+impl<T: VarintProtoType, const FIELD: u32, D> SingularVarintField<T, crate::fields::shared::field_presence::Oneof, FIELD, D>
 where
-    T::Value: super::proto_zero::ProtoZero,
+    T::Value: ProtoZero,
 {
     /// Raw stored value for [`Oneof`] variants (always initialized).
     #[inline]
@@ -237,7 +236,7 @@ where
 
     /// Resets the value slot and clears explicit presence when applicable.
     ///
-    /// For [`Implicit`](super::field_presence::Implicit) fields this omits the field on
+    /// For [`Implicit`](crate::fields::shared::field_presence::Implicit) fields this omits the field on
     /// the wire (equivalent to assigning the type-zero).
     pub fn clear(self) {
         let mut init = P::slot_init_mut(self.common);
@@ -300,13 +299,13 @@ where
 pub type SingularVarint<T, P, const FIELD: u32, D = ProtoDefault> = SingularVarintField<T, P, FIELD, D>;
 
 pub type ImplicitVarintField<T, const FIELD: u32> =
-    SingularVarintField<T, super::field_presence::Implicit, FIELD>;
+    SingularVarintField<T, crate::fields::shared::field_presence::Implicit, FIELD>;
 pub type OneofVarintField<T, const FIELD: u32> =
-    SingularVarintField<T, super::field_presence::Oneof, FIELD>;
+    SingularVarintField<T, crate::fields::shared::field_presence::Oneof, FIELD>;
 pub type ExplicitVarintField<T, const BIT: usize, const FIELD: u32, D = ProtoDefault> =
-    SingularVarintField<T, super::field_presence::Explicit<BIT>, FIELD, D>;
+    SingularVarintField<T, crate::fields::shared::field_presence::Explicit<BIT>, FIELD, D>;
 pub type LegacyRequiredVarintField<T, const BIT: usize, const FIELD: u32, D = ProtoDefault> =
-    SingularVarintField<T, super::field_presence::LegacyRequired<BIT>, FIELD, D>;
+    SingularVarintField<T, crate::fields::shared::field_presence::LegacyRequired<BIT>, FIELD, D>;
 
 pub type ImplicitVarint<T, const FIELD: u32> = ImplicitVarintField<T, FIELD>;
 pub type ExplicitVarint<T, const BIT: usize, const FIELD: u32, D = ProtoDefault> =

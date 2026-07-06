@@ -10,7 +10,7 @@ use ::protobuf_core::Varint;
 use crate::error::DecodeError;
 use crate::wire_type::WireType;
 
-use super::proto_zero::ProtoZero;
+use crate::fields::shared::ProtoZero;
 
 // ---------------------------------------------------------------------------
 // Core trait
@@ -39,7 +39,7 @@ pub trait VarintProtoType {
 ///
 /// Implemented once per protobuf enum by the code generator. Open enums accept
 /// any wire value in [`decode_from_wire`](Self::decode_from_wire); closed enums
-/// reject unknown values there (and use [`merge_closed`](super::scalar::SingularVarintFieldMut::merge_closed)
+/// reject unknown values there (and use [`merge_closed`](crate::fields::singular::varint::SingularVarintFieldMut::merge_closed)
 /// on decode to divert them to unknown fields when appropriate).
 pub trait ProtoEnumStorage: Copy + PartialEq {
     fn proto_zero() -> Self;
@@ -187,3 +187,16 @@ where
 
 /// Always [`WireType::Varint`] for singular field merge/encode checks.
 pub const WIRE_TYPE: WireType = WireType::Varint;
+
+impl<E> ProtoZero for E
+where
+    E: ProtoEnumStorage + PartialEq,
+{
+    fn proto_zero() -> Self {
+        E::proto_zero()
+    }
+
+    fn is_proto_zero(value: &Self) -> bool {
+        *value == E::proto_zero()
+    }
+}

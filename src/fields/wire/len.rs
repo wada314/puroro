@@ -5,7 +5,7 @@
 //!
 //! Storage is allocator-less ([`UnmanagedString`] / [`UnmanagedVec`]): the
 //! allocator is supplied on every operation that (de)allocates, so a generated
-//! message keeps a single allocator in [`MessageCommon`](super::common::MessageCommon).
+//! message keeps a single allocator in [`MessageCommon`](crate::fields::shared::MessageCommon).
 
 use ::bytes::Buf;
 use ::allocator_api2::alloc::Allocator;
