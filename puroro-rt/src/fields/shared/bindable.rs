@@ -6,41 +6,42 @@
 //! [`SingularLenFieldMut`](crate::fields::singular::len::SingularLenFieldMut)).
 //!
 //! Read-side binding ([`Bindable`]) uses the same shape with immutable
-//! `common`; not every field family has a separate read view yet.
+//! context; not every field family has a separate read view yet.
 
 /// Read-side binding for a field storage type.
 ///
-/// `bind` produces a short-lived view that carries `common` for accessors that
-/// need presence or allocator context. Field families without a dedicated read
-/// view may omit this trait until one is introduced.
+/// `bind` produces a short-lived view that carries `ctx` for accessors that
+/// need shared message state (presence, allocator, …). Field families without a
+/// dedicated read view may omit this trait until one is introduced.
 ///
-/// `Common` is the message context type (typically
-/// [`MessageCommon`](crate::fields::shared::MessageCommon)`<Pb, A>` for some
-/// presence bitfield `Pb` and allocator `A`).
-pub trait Bindable<Common: ?Sized> {
-    /// Short-lived read view after binding to `common`.
+/// `Ctx` is the type passed at bind time. Generated messages use
+/// [`MessageCommon`](crate::fields::shared::MessageCommon)`<Pb, A>` today, but
+/// the trait is not tied to that concrete type.
+pub trait Bindable<Ctx: ?Sized> {
+    /// Short-lived read view after binding to `ctx`.
     type Bound<'a>
     where
         Self: 'a,
-        Common: 'a;
+        Ctx: 'a;
 
-    /// Binds this field to `common` for read access.
-    fn bind<'a>(&'a self, common: &Common) -> Self::Bound<'a>;
+    /// Binds this field to `ctx` for read access.
+    fn bind<'a>(&'a self, ctx: &Ctx) -> Self::Bound<'a>;
 }
 
 /// Mutation-side binding for a field storage type.
 ///
-/// Generated decode/merge code uses `BindableMut::bind_mut(field, &mut common).merge(…)`.
-pub trait BindableMut<Common: ?Sized> {
-    /// Short-lived mutation view after binding to `common`.
+/// Generated decode/merge code uses
+/// `BindableMut::bind_mut(field, &mut ctx).merge(…)`.
+pub trait BindableMut<Ctx: ?Sized> {
+    /// Short-lived mutation view after binding to `ctx`.
     type BoundMut<'f, 'c>
     where
         Self: 'f,
-        Common: 'c;
+        Ctx: 'c;
 
-    /// Binds this field to `common` for mutation.
+    /// Binds this field to `ctx` for mutation.
     fn bind_mut<'f, 'c>(
         &'f mut self,
-        common: &'c mut Common,
+        ctx: &'c mut Ctx,
     ) -> Self::BoundMut<'f, 'c>;
 }
