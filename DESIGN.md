@@ -769,6 +769,28 @@ To avoid open-coding the `variant_mut(is_match, make)` call plus its `let Self::
 
 The group's **encode** glue lives on the storage enum (`::encoded_len` / `::encode`), keeping the group self-contained and message-agnostic. **Merge, by contrast, is not a `merge_<variant>` helper on the enum** — now that each variant *is* a field wrapper, the parent's `merge_from` selects the variant with `NotificationStorage::bind_<variant>_mut(&mut slot, &mut common)` (which frees any other variant) and then merges into the returned field through the field's own idiom — uniformly `field.bind_oneof(common).merge(…)` for every kind. This reuses each field's merge machinery instead of re-deriving it on the enum, and — for the message variant — merges successive occurrences into the current child rather than replacing it. The variant field-number constants sit at **module scope** (`notification::FIELD_EMAIL_ADDRESS`, …) rather than as associated `const`s, so they remain usable as `match` patterns in the parent's `merge_from` even though the storage enum is generic over `A`.
 
+#### Default values on oneof members
+
+Protobuf distinguishes **custom defaults** (`[default = X]` in proto2 / editions) from **type defaults** (0, `""`, `false`, first enum value, …). Oneof semantics differ from ordinary singular fields in both cases.
+
+**What the wire spec allows**
+
+| | proto3 | proto2 / editions |
+|---|---|---|
+| `[default = X]` on a scalar oneof member | not allowed (no custom defaults at all) | allowed syntactically for scalar / enum members |
+| `[default = X]` on a message oneof member | — | not allowed (`Messages can't have default values`) |
+| Default *variant* when the oneof group is unset | no — `case()` / `WhichOneof()` is `NOT_SET` | same |
+
+There is no way to declare “when the oneof is unset, behave as if variant `foo` were selected.”
+
+**Type-default exception (all syntaxes).** For ordinary implicit-presence scalars, setting a field to its type default means “unset” and the value is omitted on the wire. For a oneof member the rule is inverted: *if that variant is selected and holds the type default* (e.g. `int32` 0), the oneof **case is set** and the value **is serialized**. See the [proto3 oneof section](https://protobuf.dev/programming-guides/proto3/#oneof).
+
+**Generated read accessors.** Per-variant getters consult the oneof group first — `notification_case()` / `OneofSlot::variant_of::<V>()` — and only expose a value when that variant is the active case. When the group is unset or another variant is active, they return `None` or an empty `Optional`; they do not fall back to `[default = X]` or to a schema default as if the member were an ordinary unset singular field.
+
+When a variant **is** active, the getter returns the **stored** value from its field wrapper (including type zero / empty string). Freshly installed variants are built with `new_in` / `new` / `with_message_in`, so they start from the **type** default, not from `[default = X]`. Custom proto defaults on oneof scalar members are therefore **not** applied on the read path; per-variant accessors use the type-default provider (`ProtoDefault` / `HasDefault` for the wire type) only in the `Optional` wrapper sense, not as a substitute for oneof case selection.
+
+If a schema author needs proto2-style “unset means return 10” semantics for a scalar, they should use an ordinary `EXPLICIT` singular field (`Optional`), not a oneof member.
+
 ---
 
 ### 4.8 Required fields (`LEGACY_REQUIRED`)

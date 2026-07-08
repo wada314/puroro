@@ -619,7 +619,7 @@ The storage enum is deliberately **not** named `Notification`: exposing an `unma
 
 The storage enum implements [`OneofDeallocate<A>`](puroro-rt/src/fields/oneof.rs) (`unsafe fn deallocate(self, alloc: A)` — `A` is a **trait** parameter, since the field wrappers pin the allocator type) so the previously-active variant is freed explicitly through the message allocator before the slot is overwritten. Mutation uses the same bound-view idiom as the other families: `slot.bind(&mut common)` yields an [`OneofSlotMut`](puroro-rt/src/fields/oneof.rs) whose consuming methods are:
 
-- `variant_mut(is_match, make) -> &mut E` — keeps the active variant if `is_match`, else frees it and installs `make(alloc.clone())`. Backs the per-variant `bind_<variant>_mut` helpers, which pattern-match out the inner field wrapper (the lone `unreachable!()`) and hand it back; the parent's `_mut` accessors and decode arms then apply the kind-appropriate step (`value_mut(alloc)` for LEN, `value_mut()` for VARINT, `get_present_mut().unwrap()` for message) or merge into it (`bind_oneof(common).merge(…)` / `merge(common, …)`).
+- `variant_mut::<V>(make) -> &mut Value` — keeps the active variant if it is already `V`, else frees the previous variant and installs `from_variant(make(alloc.clone()))`. Backs the per-variant `bind_<variant>_mut` helpers. See [DESIGN.md §4.7 — Default values on oneof members](DESIGN.md#default-values-on-oneof-members) for how proto `[default = X]` relates to generated read accessors.
 - `set(value)` — replaces the whole group with an already-built value (frees the old variant).
 - `clear()` — frees the active variant; backs `clear_*` and the message `Drop`.
 
