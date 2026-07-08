@@ -152,7 +152,7 @@ impl<A: Allocator + Clone> Task<A> {
         self.score.value()
     }
 
-    pub fn score_mut(&mut self) -> &mut i32 {
+    pub fn score_mut(&mut self) -> impl ::core::ops::DerefMut<Target = i32> + '_ {
         self.score.bind_mut(&mut self._common).value_mut()
     }
 
@@ -166,7 +166,7 @@ impl<A: Allocator + Clone> Task<A> {
         self.max_retries.optional(&self._common)
     }
 
-    pub fn max_retries_mut(&mut self) -> &mut i32 {
+    pub fn max_retries_mut(&mut self) -> impl ::core::ops::DerefMut<Target = i32> + '_ {
         self.max_retries.bind_mut(&mut self._common).value_mut()
     }
 
@@ -260,7 +260,7 @@ impl<A: Allocator + Clone> Task<A> {
         self.status.optional(&self._common)
     }
 
-    pub fn status_mut(&mut self) -> &mut Status {
+    pub fn status_mut(&mut self) -> impl ::core::ops::DerefMut<Target = Status> + '_ {
         self.status.bind_mut(&mut self._common).value_mut()
     }
 
@@ -274,7 +274,7 @@ impl<A: Allocator + Clone> Task<A> {
         self.priority.optional(&self._common)
     }
 
-    pub fn priority_mut(&mut self) -> &mut Priority {
+    pub fn priority_mut(&mut self) -> impl ::core::ops::DerefMut<Target = Priority> + '_ {
         self.priority.bind_mut(&mut self._common).value_mut()
     }
 
@@ -352,7 +352,7 @@ impl<A: Allocator + Clone> Task<A> {
 
     /// Switches the group to `webhook_id` (freeing any other variant) and returns
     /// a mutable handle to the scalar.
-    pub fn webhook_id_mut(&mut self) -> &mut i32 {
+    pub fn webhook_id_mut(&mut self) -> impl ::core::ops::DerefMut<Target = i32> + '_ {
         NotificationStorage::bind_webhook_id_mut(&mut self.notification, &mut self._common)
             .value_mut()
     }

@@ -175,3 +175,46 @@ impl ProtoZero for bool {
         !*value
     }
 }
+
+// ---------------------------------------------------------------------------
+// Allocator-aware construction / release (`DefaultIn` / `DeallocateIn`)
+// ---------------------------------------------------------------------------
+
+/// Allocator-aware construction of the protobuf type-zero / empty value.
+///
+/// Generalizes [`Default`] for payloads whose empty form needs an allocator
+/// (`UnmanagedString`, `UnmanagedVec`). Allocator-less scalars ignore `alloc`.
+/// This lets [`ValueSlot`](value_slot::ValueSlot) construct any stored value
+/// uniformly, whether or not it is heap-backed.
+pub trait DefaultIn {
+    /// Builds the empty / type-zero value, using `alloc` when heap-backed.
+    fn default_in<A: Allocator>(alloc: A) -> Self;
+}
+
+/// Allocator-aware release of a stored value.
+///
+/// Pairs with [`DefaultIn`] so [`ValueSlot`](value_slot::ValueSlot) can replace
+/// or clear a payload without leaking. Allocator-less scalars are a no-op.
+pub trait DeallocateIn {
+    /// Drops the value and frees its backing allocation through `alloc`.
+    ///
+    /// # Safety
+    ///
+    /// `alloc` must be the allocator that owns this value's buffer.
+    unsafe fn deallocate_in<A: Allocator>(self, alloc: A);
+}
+
+// Scalars (and generated enum newtypes) reach both traits through `ProtoZero`.
+// The unmanaged heap payloads used by LEN fields are not `ProtoZero`, so they
+// will get their own dedicated impls when LEN migrates to `ValueSlot`.
+impl<T: ProtoZero> DefaultIn for T {
+    #[inline]
+    fn default_in<A: Allocator>(_alloc: A) -> Self {
+        T::proto_zero()
+    }
+}
+
+impl<T: ProtoZero> DeallocateIn for T {
+    #[inline]
+    unsafe fn deallocate_in<A: Allocator>(self, _alloc: A) {}
+}

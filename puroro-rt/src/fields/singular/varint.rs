@@ -43,9 +43,9 @@ where
 {
     /// Creates a field with an empty value slot.
     #[inline]
-    pub fn new_in<A: Allocator>(_alloc: A) -> Self {
+    pub fn new_in<A: Allocator>(alloc: A) -> Self {
         Self {
-            value: ValueSlot::new(),
+            value: ValueSlot::new_in(alloc),
             _marker: PhantomData,
         }
     }
@@ -147,19 +147,6 @@ where
     }
 }
 
-impl<T: VarintProtoType, P: FieldPresence, const FIELD: u32, D> Default
-    for SingularVarintField<T, P, FIELD, D>
-where
-    P::ValueSlot<T::Value>: ValueSlot<T::Value>,
-{
-    fn default() -> Self {
-        Self {
-            value: ValueSlot::new(),
-            _marker: PhantomData,
-        }
-    }
-}
-
 // ---------------------------------------------------------------------------
 // Mutation view
 // ---------------------------------------------------------------------------
@@ -200,26 +187,37 @@ where
     }
 
     #[inline]
-    pub fn value_mut(self) -> &'f mut T::Value {
-        let mut init = P::slot_init_mut(self.common);
-        self.field.value.as_mut(&mut init)
+    pub fn value_mut(self) -> impl ::core::ops::DerefMut<Target = T::Value>
+    where
+        A: Clone,
+    {
+        let alloc = self.common.alloc.clone();
+        let init = P::slot_init_mut(self.common);
+        self.field.value.as_mut(init, alloc)
     }
 
     #[inline]
-    pub fn set(self, v: T::Value) {
+    pub fn set(self, v: T::Value)
+    where
+        A: Clone,
+    {
+        let alloc = self.common.alloc.clone();
         let mut init = P::slot_init_mut(self.common);
-        self.field.value.set(&mut init, v);
+        self.field.value.set(&mut init, alloc, v);
     }
 
-    pub fn merge<B: Buf>(self, wire_type: WireType, buf: &mut B) -> Result<(), DecodeError> {
+    pub fn merge<B: Buf>(self, wire_type: WireType, buf: &mut B) -> Result<(), DecodeError>
+    where
+        A: Clone,
+    {
         if wire_type != varint::WIRE_TYPE {
             return Err(DecodeError::InvalidTag);
         }
         let raw = decode::decode_varint(buf)?;
+        let value = T::decode_wire(raw)?;
+        let alloc = self.common.alloc.clone();
         let mut init = P::slot_init_mut(self.common);
-        self.field
-            .value
-            .set(&mut init, T::decode_wire(raw)?);
+        self.field.value.set(&mut init, alloc, value);
         Ok(())
     }
 
@@ -227,9 +225,13 @@ where
     ///
     /// For [`Implicit`](crate::fields::shared::field_presence::Implicit) fields this omits the field on
     /// the wire (equivalent to assigning the type-zero).
-    pub fn clear(self) {
+    pub fn clear(self)
+    where
+        A: Clone,
+    {
+        let alloc = self.common.alloc.clone();
         let mut init = P::slot_init_mut(self.common);
-        self.field.value.clear(&mut init);
+        self.field.value.clear(&mut init, alloc);
     }
 }
 
@@ -273,10 +275,10 @@ where
             );
             return Ok(());
         }
+        let value = T::decode_wire(raw)?;
+        let alloc = self.common.alloc.clone();
         let mut init = P::slot_init_mut(self.common);
-        self.field
-            .value
-            .set(&mut init, T::decode_wire(raw)?);
+        self.field.value.set(&mut init, alloc, value);
         Ok(())
     }
 }
