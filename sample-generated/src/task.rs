@@ -105,15 +105,7 @@ pub struct Task<A: Allocator + Clone = Global> {
     assignee: NestedMessageField<Address<A>, Singular, { FIELD_ASSIGNEE }, A>, // proto: Address assignee = 11;
     // proto: oneof notification { string email_address=12; string phone_number=13;
     //                             int32 webhook_id=14; Address postal=15; }
-    notification: OneofSlot<
-        NotificationStorage<
-            A,
-            { FIELD_EMAIL_ADDRESS },
-            { FIELD_PHONE_NUMBER },
-            { FIELD_WEBHOOK_ID },
-            { FIELD_POSTAL },
-        >,
-    >,
+    notification: OneofSlot<NotificationStorage<A>>,
 }
 
 impl<A: Allocator + Clone> Task<A> {

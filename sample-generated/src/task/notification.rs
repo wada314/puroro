@@ -24,10 +24,10 @@
 //! The scalar variant owns no heap, so its `OneofDeallocate` arm is a no-op; the
 //! LEN and message variants free their storage through the message allocator.
 //!
-//! Variant proto field numbers are supplied as separate const generic parameters
-//! on [`NotificationStorage`] (Rust has no variable-length const-generic list).
-//! The parent message module defines named `FIELD_*` constants and passes them
-//! when instantiating the storage type, so `merge_from` match arms stay readable.
+//! Variant proto field numbers are fixed for this generated oneof, so
+//! [`NotificationStorage`] is *not* parametrised by them: each variant's field
+//! wrapper references the parent message module's named `FIELD_*` constant
+//! (via `super::FIELD_*`) directly, keeping a single source of truth.
 //!
 //! **Merge has no bespoke `merge_*` helpers on this enum.** Because each variant
 //! *is* a field wrapper, the parent message's `merge_from` dispatches on field
@@ -84,30 +84,17 @@ pub enum NotificationMut<'a, A: Allocator + Clone> {
 
 /// Owned storage for `oneof notification` (crate-internal).
 ///
-/// Parametrised by the allocator `A` and one const generic per variant proto
-/// field number. Each variant's field wrapper reuses the corresponding parameter
-/// as its `FIELD` type argument.
-pub(crate) enum NotificationStorage<
-    A: Allocator + Clone,
-    const FIELD_EMAIL_ADDRESS: u32,
-    const FIELD_PHONE_NUMBER: u32,
-    const FIELD_WEBHOOK_ID: u32,
-    const FIELD_POSTAL: u32,
-> {
-    EmailAddress(SingularLenField<ProtoString, Oneof, { FIELD_EMAIL_ADDRESS }, A>),
-    PhoneNumber(SingularLenField<ProtoString, Oneof, { FIELD_PHONE_NUMBER }, A>),
-    WebhookId(SingularVarintField<ProtoInt32, Oneof, { FIELD_WEBHOOK_ID }>),
-    Postal(NestedMessageField<Address<A>, Oneof, { FIELD_POSTAL }, A>),
+/// Parametrised only by the allocator `A`. Each variant's field wrapper uses the
+/// parent message's `FIELD_*` constant directly as its `FIELD` type argument,
+/// since the field numbers are fixed for this generated oneof.
+pub(crate) enum NotificationStorage<A: Allocator + Clone> {
+    EmailAddress(SingularLenField<ProtoString, Oneof, { super::FIELD_EMAIL_ADDRESS }, A>),
+    PhoneNumber(SingularLenField<ProtoString, Oneof, { super::FIELD_PHONE_NUMBER }, A>),
+    WebhookId(SingularVarintField<ProtoInt32, Oneof, { super::FIELD_WEBHOOK_ID }>),
+    Postal(NestedMessageField<Address<A>, Oneof, { super::FIELD_POSTAL }, A>),
 }
 
-impl<
-        A: Allocator + Clone,
-        const FIELD_EMAIL_ADDRESS: u32,
-        const FIELD_PHONE_NUMBER: u32,
-        const FIELD_WEBHOOK_ID: u32,
-        const FIELD_POSTAL: u32,
-    > NotificationStorage<A, FIELD_EMAIL_ADDRESS, FIELD_PHONE_NUMBER, FIELD_WEBHOOK_ID, FIELD_POSTAL>
-{
+impl<A: Allocator + Clone> NotificationStorage<A> {
     pub(crate) fn case(&self) -> NotificationCase {
         match self {
             Self::EmailAddress(_) => NotificationCase::EmailAddress,
@@ -138,7 +125,7 @@ impl<
     pub(crate) fn bind_email_address_mut<'f, 'c, Pb: PresenceBits>(
         slot: &'f mut OneofSlot<Self>,
         common: &'c mut MessageCommon<Pb, A>,
-    ) -> SingularLenFieldMut<'f, 'c, ProtoString, Oneof, { FIELD_EMAIL_ADDRESS }, A, ::puroro_rt::ProtoDefault, Pb>
+    ) -> SingularLenFieldMut<'f, 'c, ProtoString, Oneof, { super::FIELD_EMAIL_ADDRESS }, A, ::puroro_rt::ProtoDefault, Pb>
     {
         let field = slot.bind_mut(common).variant_mut(
             |e| matches!(e, Self::EmailAddress(_)),
@@ -154,7 +141,7 @@ impl<
     pub(crate) fn bind_phone_number_mut<'f, 'c, Pb: PresenceBits>(
         slot: &'f mut OneofSlot<Self>,
         common: &'c mut MessageCommon<Pb, A>,
-    ) -> SingularLenFieldMut<'f, 'c, ProtoString, Oneof, { FIELD_PHONE_NUMBER }, A, ::puroro_rt::ProtoDefault, Pb>
+    ) -> SingularLenFieldMut<'f, 'c, ProtoString, Oneof, { super::FIELD_PHONE_NUMBER }, A, ::puroro_rt::ProtoDefault, Pb>
     {
         let field = slot.bind_mut(common).variant_mut(
             |e| matches!(e, Self::PhoneNumber(_)),
@@ -170,7 +157,7 @@ impl<
     pub(crate) fn bind_webhook_id_mut<'f, 'c, Pb: PresenceBits>(
         slot: &'f mut OneofSlot<Self>,
         common: &'c mut MessageCommon<Pb, A>,
-    ) -> SingularVarintFieldMut<'f, 'c, ProtoInt32, Oneof, { FIELD_WEBHOOK_ID }, ::puroro_rt::ProtoDefault, Pb, A>
+    ) -> SingularVarintFieldMut<'f, 'c, ProtoInt32, Oneof, { super::FIELD_WEBHOOK_ID }, ::puroro_rt::ProtoDefault, Pb, A>
     {
         let field = slot.bind_mut(common).variant_mut(
             |e| matches!(e, Self::WebhookId(_)),
@@ -186,7 +173,7 @@ impl<
     pub(crate) fn bind_postal_mut<'f, 'c, Pb: PresenceBits>(
         slot: &'f mut OneofSlot<Self>,
         common: &'c mut MessageCommon<Pb, A>,
-    ) -> NestedMessageFieldMut<'f, 'c, Address<A>, Oneof, { FIELD_POSTAL }, A, Pb> {
+    ) -> NestedMessageFieldMut<'f, 'c, Address<A>, Oneof, { super::FIELD_POSTAL }, A, Pb> {
         let field = slot.bind_mut(common).variant_mut(
             |e| matches!(e, Self::Postal(_)),
             |e| match e {
@@ -200,7 +187,7 @@ impl<
 
     pub fn email_address(
         &self,
-    ) -> Option<&SingularLenField<ProtoString, Oneof, { FIELD_EMAIL_ADDRESS }, A>> {
+    ) -> Option<&SingularLenField<ProtoString, Oneof, { super::FIELD_EMAIL_ADDRESS }, A>> {
         match self {
             Self::EmailAddress(f) => Some(f),
             _ => None,
@@ -209,7 +196,7 @@ impl<
 
     pub fn phone_number(
         &self,
-    ) -> Option<&SingularLenField<ProtoString, Oneof, { FIELD_PHONE_NUMBER }, A>> {
+    ) -> Option<&SingularLenField<ProtoString, Oneof, { super::FIELD_PHONE_NUMBER }, A>> {
         match self {
             Self::PhoneNumber(f) => Some(f),
             _ => None,
@@ -218,7 +205,7 @@ impl<
 
     pub fn webhook_id(
         &self,
-    ) -> Option<&SingularVarintField<ProtoInt32, Oneof, { FIELD_WEBHOOK_ID }>> {
+    ) -> Option<&SingularVarintField<ProtoInt32, Oneof, { super::FIELD_WEBHOOK_ID }>> {
         match self {
             Self::WebhookId(f) => Some(f),
             _ => None,
@@ -227,7 +214,7 @@ impl<
 
     pub fn postal(
         &self,
-    ) -> Option<&NestedMessageField<Address<A>, Oneof, { FIELD_POSTAL }, A>> {
+    ) -> Option<&NestedMessageField<Address<A>, Oneof, { super::FIELD_POSTAL }, A>> {
         match self {
             Self::Postal(f) => Some(f),
             _ => None,
@@ -235,15 +222,7 @@ impl<
     }
 }
 
-impl<
-        A: Allocator + Clone,
-        const FIELD_EMAIL_ADDRESS: u32,
-        const FIELD_PHONE_NUMBER: u32,
-        const FIELD_WEBHOOK_ID: u32,
-        const FIELD_POSTAL: u32,
-    > OneofEncodable<A>
-    for NotificationStorage<A, FIELD_EMAIL_ADDRESS, FIELD_PHONE_NUMBER, FIELD_WEBHOOK_ID, FIELD_POSTAL>
-{
+impl<A: Allocator + Clone> OneofEncodable<A> for NotificationStorage<A> {
     fn encoded_len<Pb: PresenceBits>(&self, common: &MessageCommon<Pb, A>) -> usize {
         match self {
             Self::EmailAddress(f) => f.encoded_len(common),
@@ -263,15 +242,7 @@ impl<
     }
 }
 
-impl<
-        A: Allocator + Clone,
-        const FIELD_EMAIL_ADDRESS: u32,
-        const FIELD_PHONE_NUMBER: u32,
-        const FIELD_WEBHOOK_ID: u32,
-        const FIELD_POSTAL: u32,
-    > OneofDeallocate<A>
-    for NotificationStorage<A, FIELD_EMAIL_ADDRESS, FIELD_PHONE_NUMBER, FIELD_WEBHOOK_ID, FIELD_POSTAL>
-{
+impl<A: Allocator + Clone> OneofDeallocate<A> for NotificationStorage<A> {
     /// # Safety
     ///
     /// `alloc` must be the allocator that owns the variant's buffer.
