@@ -24,6 +24,7 @@ use defaults::MaxRetriesDefault;
 use crate::address::Address;
 use crate::enums::{Priority, Status};
 
+use notification::variant::{EmailAddress, PhoneNumber, Postal, WebhookId};
 use notification::NotificationStorage;
 pub use notification::{NotificationCase, NotificationMut, NotificationRef};
 
@@ -309,26 +310,24 @@ impl<A: Allocator + Clone> Task<A> {
 
     pub fn email_address<'a>(&'a self) -> Optional<&'a str, impl HasDefault<&'a str>> {
         self.notification
-            .variant_of(NotificationStorage::email_address)
+            .variant_of::<EmailAddress>()
             .optional(&self._common)
     }
 
     pub fn phone_number<'a>(&'a self) -> Optional<&'a str, impl HasDefault<&'a str>> {
         self.notification
-            .variant_of(NotificationStorage::phone_number)
+            .variant_of::<PhoneNumber>()
             .optional(&self._common)
     }
 
     pub fn webhook_id(&self) -> Optional<i32, impl HasDefault<i32>> {
         self.notification
-            .variant_of(NotificationStorage::webhook_id)
+            .variant_of::<WebhookId>()
             .optional(&self._common)
     }
 
     pub fn postal(&self) -> Option<&Address<A>> {
-        self.notification
-            .variant_of(NotificationStorage::postal)
-            .get()
+        self.notification.variant_of::<Postal>().get()
     }
 
     /// Safe borrowed mutable view of the *currently active* variant (no switch).

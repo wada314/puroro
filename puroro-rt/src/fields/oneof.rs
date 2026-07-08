@@ -13,6 +13,7 @@
 use ::allocator_api2::alloc::Allocator;
 use ::bytes::BufMut;
 
+use crate::fields::enum_variant::EnumVariant;
 use crate::fields::shared::{BindableMut, MessageCommon, PresenceBits};
 
 /// Explicit, allocator-driven release of a generated `oneof` enum over allocator `A`.
@@ -123,12 +124,21 @@ impl<E> OneofSlot<E> {
 
     /// Projects the active storage enum onto one variant's field wrapper.
     ///
-    /// Generated code passes the storage enum's per-variant accessor (for example
-    /// `NotificationStorage::webhook_id`) so message getters can mirror ordinary
-    /// fields: `self.notification.variant_of(Storage::webhook_id).optional(common)`.
+    /// `V` is the zero-sized marker type for which the storage enum implements
+    /// [`EnumVariant`]. Generated message getters use this so oneof members
+    /// mirror ordinary fields:
+    /// `self.notification.variant_of::<EmailAddress>().optional(common)`.
     #[inline]
-    pub fn variant_of<'a, F>(&'a self, select: fn(&E) -> Option<&F>) -> OneofVariantRef<'a, F> {
-        OneofVariantRef::new(self.as_ref().and_then(select))
+    pub fn variant_of<'a, V>(
+        &'a self,
+    ) -> OneofVariantRef<'a, <E as EnumVariant<V>>::Value>
+    where
+        E: EnumVariant<V>,
+    {
+        OneofVariantRef::new(
+            self.as_ref()
+                .and_then(|e| <E as EnumVariant<V>>::variant_ref(e)),
+        )
     }
 
     /// Encodes the active variant.
@@ -203,46 +213,48 @@ impl<'f, 'c, E, Pb: PresenceBits, A: Allocator> OneofSlotMut<'f, 'c, E, Pb, A> {
         self.slot.set(value);
     }
 
-    /// Ensures the active variant is the one `project` extracts; otherwise frees any
-    /// existing variant and installs a fresh one built by `install` (which receives
-    /// an owned allocator clone). Returns a mutable reference to the variant's
-    /// inner payload, borrowing only the slot (`'f`), so `common` is free once this
-    /// returns.
+    /// Ensures the active variant is `V`; otherwise frees any existing variant and
+    /// installs a fresh one built by `make` (which receives an owned allocator
+    /// clone). Returns a mutable reference to the variant's inner payload,
+    /// borrowing only the slot (`'f`), so `common` is free once this returns.
     ///
-    /// `is_active` inspects the stored enum immutably; `project` extracts the inner
-    /// field wrapper when that variant is active (`None` for other variants). Because `E` may own
-    /// non-droppable storage, switching variants always goes through this method
-    /// (or [`set`](Self::set) / [`clear`](Self::clear)) so the previous variant is
-    /// released with the message allocator before the slot is overwritten.
+    /// Because `E` may own non-droppable storage, switching variants always goes
+    /// through this method (or [`set`](Self::set) / [`clear`](Self::clear)) so the
+    /// previous variant is released with the message allocator before the slot is
+    /// overwritten.
     ///
-    /// Backs the per-variant `_mut` accessors. Generated `merge_from` selects the
-    /// variant through the storage enum's `bind_<variant>_mut` helper (which
-    /// calls this method internally), then merges the wire occurrence through
-    /// the returned bound field view — reusing each field's merge machinery
-    /// instead of a bespoke `merge_<variant>` helper on the enum.
+    /// Backs the per-variant `bind_<variant>_mut` helpers on generated storage
+    /// enums. `merge_from` selects the variant through those helpers, then merges
+    /// the wire occurrence through the returned bound field view.
     pub fn variant_mut<V>(
         self,
-        is_active: impl FnOnce(&E) -> bool,
-        project: impl FnOnce(&mut E) -> Option<&mut V>,
-        install: impl FnOnce(A) -> E,
-    ) -> &'f mut V
+        make: impl FnOnce(A) -> <E as EnumVariant<V>>::Value,
+    ) -> &'f mut <E as EnumVariant<V>>::Value
     where
-        E: OneofDeallocate<A>,
+        E: EnumVariant<V> + OneofDeallocate<A>,
         A: Clone,
     {
         let slot = self.slot;
         let common = self.common;
 
-        if !matches!(slot.as_ref(), Some(e) if is_active(e)) {
+        let needs_install = !matches!(
+            slot.as_ref(),
+            Some(e) if <E as EnumVariant<V>>::variant_ref(e).is_some()
+        );
+
+        if needs_install {
             if let Some(old) = slot.take() {
                 // SAFETY: an owned clone of the message allocator owns the
                 // previous variant's buffers.
                 unsafe { old.deallocate(common.alloc.clone()) };
             }
-            slot.set(install(common.alloc.clone()));
+            slot.set(<E as EnumVariant<V>>::from_variant(make(
+                common.alloc.clone(),
+            )));
         }
-        project(slot.as_mut().unwrap()).expect(
-            "install closure must construct the variant that project extracts",
+
+        <E as EnumVariant<V>>::variant_mut(slot.as_mut().unwrap()).expect(
+            "from_variant must construct the variant that V selects",
         )
     }
 

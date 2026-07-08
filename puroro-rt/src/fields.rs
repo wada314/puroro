@@ -19,6 +19,7 @@
 //! | [`repeated`] | `RepeatedVarintField`, `RepeatedLenField` |
 //! | [`oneof`] | `OneofSlot` |
 
+pub mod enum_variant;
 pub mod oneof;
 pub mod repeated;
 pub mod shared;
@@ -26,6 +27,7 @@ pub mod singular;
 pub mod wire;
 
 pub use ::protobuf_core::FieldNumber;
+pub use enum_variant::EnumVariant;
 pub use oneof::{OneofDeallocate, OneofEncodable, OneofSlot, OneofSlotMut, OneofVariantRef};
 pub use repeated::{
     Expanded, Packed, RepeatedBytes, RepeatedExpandedInt32, RepeatedExpandedVarintField,
