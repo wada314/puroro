@@ -105,7 +105,7 @@ pub struct Task<A: Allocator + Clone = Global> {
         SingularVarintField<ProtoEnum<Priority>, Explicit<{ BIT_PRIORITY }>, { FIELD_PRIORITY }>, // proto: Priority priority = 10;
     assignee: NestedMessageField<Address<A>, Singular, { FIELD_ASSIGNEE }, A>, // proto: Address assignee = 11;
     // proto: oneof notification { string email_address=12; string phone_number=13;
-    //                             int32 webhook_id=14; Address postal=15; }
+    //                             int32 webhook_id=14 [default=-1]; Address postal=15; }
     notification: OneofSlot<NotificationStorage<A>>,
 }
 
@@ -309,6 +309,7 @@ impl<A: Allocator + Clone> Task<A> {
     }
 
     pub fn email_address<'a>(&'a self) -> Optional<&'a str, impl HasDefault<&'a str>> {
+        // Unset / other variant → Optional::None → get() is ProtoDefault ("").
         self.notification
             .variant_of::<EmailAddress>()
             .optional(&self._common)
@@ -320,6 +321,8 @@ impl<A: Allocator + Clone> Task<A> {
             .optional(&self._common)
     }
 
+    /// `[default = -1]`: when this variant is not active, `get()` returns `-1`
+    /// and `is_set()` is false (does not select the variant).
     pub fn webhook_id(&self) -> Optional<i32, impl HasDefault<i32>> {
         self.notification
             .variant_of::<WebhookId>()

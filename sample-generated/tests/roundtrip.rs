@@ -66,6 +66,28 @@ fn oneof_varint_variant_roundtrip() {
         decoded.notification(),
         Some(NotificationRef::WebhookId(4321))
     ));
+    assert!(decoded.webhook_id().is_set());
+    assert_eq!(decoded.webhook_id().get(), 4321);
+}
+
+#[test]
+fn oneof_scalar_getter_uses_custom_default_when_unset() {
+    // Official const-getter contract: unset / other variant → custom default,
+    // without selecting the variant. `webhook_id = 14 [default = -1]`.
+    let mut task = Task::new();
+    task.owner_id_mut().push_str("user-1");
+
+    assert!(task.notification_case().is_none());
+    assert!(!task.webhook_id().is_set());
+    assert_eq!(task.webhook_id().get(), -1);
+
+    task.email_address_mut().push_str("a@example.com");
+    assert_eq!(task.notification_case(), Some(NotificationCase::EmailAddress));
+    assert!(!task.webhook_id().is_set());
+    assert_eq!(task.webhook_id().get(), -1);
+    // String members without [default] still fall back to the type default.
+    assert!(!task.phone_number().is_set());
+    assert_eq!(task.phone_number().get(), "");
 }
 
 #[test]

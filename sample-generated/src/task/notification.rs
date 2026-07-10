@@ -17,9 +17,14 @@
 //!
 //! | variant | proto | field wrapper | `Ref` payload | `Mut` payload |
 //! |---|---|---|---|---|
-//! | `email_address` / `phone_number` | `string` | [`SingularLenField`] | `&str` | string guard |
-//! | `webhook_id` | `int32` | [`SingularVarintField`] | `i32` (by value) | `&mut i32` |
+//! | `email_address` / `phone_number` | `string` | [`SingularLenField`] (+ `ProtoDefault`) | `&str` | string guard |
+//! | `webhook_id` | `int32` `[default = -1]` | [`SingularVarintField`] + [`WebhookIdDefault`] | `i32` (by value) | `&mut i32` |
 //! | `postal` | `Address` message | [`NestedMessageField`] | `&Address<A>` | `&mut Address<A>` |
+//!
+//! Per-variant **immutable** getters return [`Optional`](::puroro::Optional) whose
+//! `D` is the field wrapper's default marker: when the case is unset or another
+//! variant, `get()` yields that proto default (custom or type-zero) without
+//! selecting the variant — same contract as official const getters.
 //!
 //! The scalar variant owns no heap, so its `OneofDeallocate` arm is a no-op; the
 //! LEN and message variants free their storage through the message allocator.
@@ -48,6 +53,8 @@ use ::puroro_rt::{
 use ::unmanaged::string::StringGuard;
 
 use crate::address::Address;
+
+use super::defaults::WebhookIdDefault;
 
 /// Zero-sized markers for [`EnumVariant`] dispatch on [`NotificationStorage`].
 pub(crate) mod variant {
@@ -103,7 +110,9 @@ pub enum NotificationMut<'a, A: Allocator + Clone> {
 pub(crate) enum NotificationStorage<A: Allocator + Clone> {
     EmailAddress(SingularLenField<ProtoString, Oneof, { super::FIELD_EMAIL_ADDRESS }>),
     PhoneNumber(SingularLenField<ProtoString, Oneof, { super::FIELD_PHONE_NUMBER }>),
-    WebhookId(SingularVarintField<ProtoInt32, Oneof, { super::FIELD_WEBHOOK_ID }>),
+    WebhookId(
+        SingularVarintField<ProtoInt32, Oneof, { super::FIELD_WEBHOOK_ID }, WebhookIdDefault>,
+    ),
     Postal(NestedMessageField<Address<A>, Oneof, { super::FIELD_POSTAL }, A>),
 }
 
@@ -160,8 +169,16 @@ impl<A: Allocator + Clone> NotificationStorage<A> {
     pub(crate) fn bind_webhook_id_mut<'f, 'c, Pb: PresenceBits>(
         slot: &'f mut OneofSlot<Self>,
         common: &'c mut MessageCommon<Pb, A>,
-    ) -> SingularVarintFieldMut<'f, 'c, ProtoInt32, Oneof, { super::FIELD_WEBHOOK_ID }, ::puroro_rt::ProtoDefault, Pb, A>
-    {
+    ) -> SingularVarintFieldMut<
+        'f,
+        'c,
+        ProtoInt32,
+        Oneof,
+        { super::FIELD_WEBHOOK_ID },
+        WebhookIdDefault,
+        Pb,
+        A,
+    > {
         let field = slot
             .bind_mut(common)
             .variant_mut::<WebhookId>(|alloc| SingularVarintField::new_in(alloc));
@@ -224,7 +241,8 @@ impl<A: Allocator + Clone> EnumVariant<PhoneNumber> for NotificationStorage<A> {
 }
 
 impl<A: Allocator + Clone> EnumVariant<WebhookId> for NotificationStorage<A> {
-    type Value = SingularVarintField<ProtoInt32, Oneof, { super::FIELD_WEBHOOK_ID }>;
+    type Value =
+        SingularVarintField<ProtoInt32, Oneof, { super::FIELD_WEBHOOK_ID }, WebhookIdDefault>;
 
     fn variant_ref(&self) -> Option<&Self::Value> {
         match self {

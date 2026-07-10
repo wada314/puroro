@@ -436,7 +436,7 @@ message Task {
     oneof notification {
         string  email_address = 12;
         string  phone_number  = 13;
-        int32   webhook_id    = 14;  // VARINT variant
+        int32   webhook_id    = 14 [default = -1];  // VARINT + custom default
         Address postal        = 15;  // message variant
     }
 }
@@ -811,13 +811,13 @@ Concrete C++ codegen shapes (proto2 / editions):
 - String oneof getter: `if (!has) return $kDefaultStr$;` — same.
 - String oneof `mutable_*`: `clear_oneof(); set_has; field.InitDefault();` then return a mutable buffer. `InitDefault()` points at the empty-string sentinel, not the custom default. The guide states explicitly: *“If the oneof case was not `kFoo` prior to the call, then the returned string will be empty (not the default value).”*
 
-**puroro today vs that contract.** The hand-written `Task` sample follows the mutator half, but not yet the const-getter half for custom defaults:
+**puroro vs that contract.** The hand-written `Task` sample matches both halves:
 
 - Per-variant **`_mut`** (`email_address_mut`, …) goes through `bind_<variant>_mut` → `OneofSlotMut::variant_mut`, which force-switches the case and builds a fresh wrapper via `new_in` / `with_message_in` (**type** default). That matches official `mutable_*`.
-- Per-variant **getters** use `OneofSlot::variant_of::<V>().optional(...)`. When the case is unset or another variant, they return an empty `Optional` whose `get()` falls back to **`ProtoDefault`** (type default only). They do **not** yet thread a field-specific `D` carrying `[default = X]`, so they diverge from official const getters whenever a oneof scalar declares a custom default.
+- Per-variant **getters** use `OneofSlot::variant_of::<V>().optional(...)`. The field wrapper's `D` type parameter is the proto default marker (`ProtoDefault`, or a message-local ZST such as `WebhookIdDefault` for `[default = -1]`). When the case is unset or another variant, `optional` returns `Optional::new(None)` so `is_set()` is false and `get()` yields `D::DEFAULT` — without selecting the variant. That matches official const getters.
 - When the variant **is** active, getters return the **stored** value (including type zero / empty string), same as official.
 
-**Implication for codegen.** If / when puroro supports `[default = X]` on oneof scalars, that `D` belongs on the **read** accessor (`Optional<…, D>` / `HasDefault`), not on `_mut` installation. Mutators should keep installing type-default storage; custom defaults must not be written into the slot merely because the caller asked for a mutable handle.
+**Codegen rule.** `[default = X]` on a oneof scalar becomes the field wrapper's `D` (`Singular*Field<…, D>`), which flows into the read accessor (`Optional<…, D>`). It must **not** change `_mut` installation: mutators keep installing type-default storage; custom defaults must not be written into the slot merely because the caller asked for a mutable handle.
 
 ---
 

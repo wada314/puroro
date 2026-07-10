@@ -303,7 +303,12 @@ impl<E: PartialEq> PartialEq for OneofSlot<E> {
 /// `None` when the slot is unset or holds a different variant. Generated
 /// `OneofSlot` impls expose one accessor per variant; each returns this type so
 /// message getters can mirror ordinary fields
-/// (`self.notification.webhook_id().optional(&self._common)`).
+/// (`self.notification.variant_of::<WebhookId>().optional(&self._common)`).
+///
+/// [`optional`](Self::optional) threads the field wrapper's default marker `D`:
+/// when this handle is empty, the returned [`Optional`](::puroro::Optional) is
+/// unset and `get()` yields `D::DEFAULT` (proto custom default or type zero)
+/// without activating the variant — matching official const oneof getters.
 pub struct OneofVariantRef<'a, F> {
     field: Option<&'a F>,
 }
