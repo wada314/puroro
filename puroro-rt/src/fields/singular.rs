@@ -1,4 +1,7 @@
-//! Singular field wrappers (scalar + nested message).
+//! Singular (non-repeated) field wrappers — scalars and nested messages.
+//!
+//! “Singular” covers both presence-tracked (`EXPLICIT`) and non-presence-tracked
+//! (`IMPLICIT`) fields; see [`field`](crate::fields::singular::field).
 
 pub mod field;
 pub mod len;

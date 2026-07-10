@@ -6,7 +6,8 @@
 //! 1. The field's own struct member, and
 //! 2. [`MessageCommon`](shared::MessageCommon) (presence bitfield, allocator, unknown-field buffer).
 //!
-//! Singular fields are parametrised by **wire type** (`ProtoInt32`, `ProtoString`, …)
+//! Singular fields (non-repeated — both `IMPLICIT` and `EXPLICIT` presence) are
+//! parametrised by **wire type** (`ProtoInt32`, `ProtoString`, …)
 //! and **presence policy** ([`Implicit`](shared::field_presence::Implicit) / [`Explicit`](shared::field_presence::Explicit) / [`Oneof`](shared::field_presence::Oneof)).
 //!
 //! # Module layout

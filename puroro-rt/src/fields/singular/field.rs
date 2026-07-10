@@ -1,5 +1,10 @@
 //! Unified singular scalar field — varint and LEN share one wrapper.
 //!
+//! **Singular** here means **non-repeated**: both presence-tracked fields
+//! (`EXPLICIT` / “optional”) and non-presence-tracked fields (`IMPLICIT`) use
+//! this type. Cardinality (singular vs repeated) is separate from presence
+//! ([`FieldPresence`](crate::fields::shared::field_presence::FieldPresence)).
+//!
 //! Parametrised by [`ScalarProtoType`] (wire/storage), [`FieldPresence`], proto
 //! field number `FIELD`, and compile-time default marker `D`. Heap payloads are
 //! wrapped in [`ManuallyDrop`] so message / oneof `Drop` can release them
@@ -28,7 +33,9 @@ use crate::fields::shared::{
 use crate::fields::wire::scalar::ScalarProtoType;
 use crate::fields::wire::varint::{self, VarintProtoType};
 
-/// Singular scalar field on the wire — varint or LEN, selected by `T`.
+/// Singular (non-repeated) scalar field — varint or LEN, selected by `T`.
+///
+/// Covers both `IMPLICIT` and `EXPLICIT` / `LEGACY_REQUIRED` presence via `P`.
 pub struct SingularField<
     T: ScalarProtoType,
     P: FieldPresence,
