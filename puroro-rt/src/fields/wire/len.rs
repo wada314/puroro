@@ -14,6 +14,7 @@ use ::unmanaged::vec::VecGuard;
 use ::unmanaged::{UnmanagedString, UnmanagedVec};
 
 use crate::decode;
+use crate::fields::shared::{DefaultIn, DeallocateIn, ProtoEmpty};
 use ::puroro::DecodeError;
 use ::puroro::WireType;
 
@@ -21,7 +22,7 @@ use ::puroro::WireType;
 pub trait LenProtoType {
     /// Owned, allocator-less storage in a generated message field
     /// (`UnmanagedString`, `UnmanagedVec<u8>`, …).
-    type Storage;
+    type Storage: DefaultIn + DeallocateIn + ProtoEmpty;
 
     /// Borrowed view returned by getters (`&str`, `&[u8]`, …).
     type Ref<'a>

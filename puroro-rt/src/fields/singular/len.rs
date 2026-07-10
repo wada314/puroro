@@ -1,4 +1,10 @@
 //! Singular LEN field wrapper — generic over payload type and presence policy.
+//!
+//! Storage uses the same [`ValueSlot`](crate::fields::shared::value_slot::ValueSlot)
+//! model as varint fields (`T` for Implicit/Oneof, `MaybeUninit<T>` for Explicit /
+//! LegacyRequired). Heap payloads are wrapped in [`ManuallyDrop`] so message /
+//! oneof `Drop` can release them through [`deallocate`](SingularLenField::deallocate)
+//! without an implicit panic from `UnmanagedString` / `UnmanagedVec`.
 
 use ::core::marker::PhantomData;
 use ::core::mem::ManuallyDrop;
@@ -14,8 +20,9 @@ use ::puroro::{HasDefault, Optional};
 
 use crate::fields::shared::{
     BindableMut, MessageCommon, PresenceBits,
-    field_presence::{FieldPresence, LegacyRequired, RequiredFieldPresence},
-    slot_init::SlotInitMut,
+    field_presence::{FieldPresence, LegacyRequired, Oneof, RequiredFieldPresence},
+    slot_init::AlwaysInitialized,
+    value_slot::ValueSlot,
 };
 use crate::fields::wire::len::{self, LenProtoType};
 
@@ -27,36 +34,36 @@ pub struct SingularLenField<
     const FIELD: u32,
     A: Allocator,
     D = ProtoDefault,
-> {
-    value: ManuallyDrop<T::Storage>,
+> where
+    P::ValueSlot<T::Storage>: ValueSlot<T::Storage>,
+{
+    value: ManuallyDrop<P::ValueSlot<T::Storage>>,
     _marker: PhantomData<(P, A, D)>,
 }
 
 impl<T: LenProtoType, P: FieldPresence, const FIELD: u32, A: Allocator, D>
     SingularLenField<T, P, FIELD, A, D>
+where
+    P::ValueSlot<T::Storage>: ValueSlot<T::Storage>,
 {
     pub fn new_in(alloc: A) -> Self {
         Self {
-            value: ManuallyDrop::new(T::new_in(alloc)),
+            value: ManuallyDrop::new(ValueSlot::new_in(alloc)),
             _marker: PhantomData,
         }
-    }
-
-    #[inline]
-    pub fn value(&self) -> T::Ref<'_> {
-        T::borrow(&self.value)
-    }
-
-    pub fn value_mut(&mut self, alloc: A) -> T::Mut<'_, A> {
-        T::with_alloc(&mut self.value, alloc)
     }
 
     pub fn encoded_len<Pb>(&self, common: &MessageCommon<Pb, A>) -> usize
     where
         Pb: PresenceBits,
     {
-        if P::should_emit(common, || T::is_empty(&self.value)) {
-            encode::encoded_len_len_field(FIELD, T::as_bytes(&self.value).len())
+        if P::should_emit(common, || P::payload_is_empty(&self.value)) {
+            let init = P::slot_init_view(common);
+            let storage = self
+                .value
+                .as_ref(&init)
+                .expect("should_emit implies initialized slot");
+            encode::encoded_len_len_field(FIELD, T::as_bytes(storage).len())
         } else {
             0
         }
@@ -66,14 +73,27 @@ impl<T: LenProtoType, P: FieldPresence, const FIELD: u32, A: Allocator, D>
     where
         Pb: PresenceBits,
     {
-        if P::should_emit(common, || T::is_empty(&self.value)) {
-            encode::encode_len_field(FIELD, T::as_bytes(&self.value), buf);
+        if P::should_emit(common, || P::payload_is_empty(&self.value)) {
+            let init = P::slot_init_view(common);
+            let storage = self
+                .value
+                .as_ref(&init)
+                .expect("should_emit implies initialized slot");
+            encode::encode_len_field(FIELD, T::as_bytes(storage), buf);
         }
     }
 
-    pub fn deallocate(&mut self, alloc: A) {
-        let old = unsafe { ManuallyDrop::take(&mut self.value) };
-        unsafe { T::deallocate(old, alloc) };
+    /// Releases the payload through `common`'s allocator. Must be called from the
+    /// owning message's `Drop` (or equivalent) before the field itself is dropped.
+    pub fn deallocate<Pb>(&mut self, common: &MessageCommon<Pb, A>)
+    where
+        Pb: PresenceBits,
+        A: Clone,
+    {
+        let init = P::slot_init_view(common);
+        let alloc = common.alloc.clone();
+        let slot = unsafe { ManuallyDrop::take(&mut self.value) };
+        slot.deallocate_in(&init, alloc);
     }
 
     #[inline]
@@ -81,13 +101,14 @@ impl<T: LenProtoType, P: FieldPresence, const FIELD: u32, A: Allocator, D>
     where
         Pb: PresenceBits,
     {
-        P::is_set(common, || T::is_empty(&self.value))
+        P::is_set(common, || P::payload_is_empty(&self.value))
     }
 }
 
 impl<T: LenProtoType, P: FieldPresence, const FIELD: u32, A: Allocator, D>
     SingularLenField<T, P, FIELD, A, D>
 where
+    P::ValueSlot<T::Storage>: ValueSlot<T::Storage>,
     for<'a> T::Ref<'a>: Copy,
     D: for<'a> HasDefault<T::Ref<'a>>,
 {
@@ -95,8 +116,13 @@ where
     where
         Pb: PresenceBits,
     {
-        let v = if P::is_set(common, || T::is_empty(&self.value)) {
-            Some(T::borrow(&self.value))
+        let init = P::slot_init_view(common);
+        let v = if P::is_set(common, || P::payload_is_empty(&self.value)) {
+            Some(T::borrow(
+                self.value
+                    .as_ref(&init)
+                    .expect("is_set implies initialized slot"),
+            ))
         } else {
             None
         };
@@ -104,14 +130,55 @@ where
     }
 }
 
+impl<T: LenProtoType, const FIELD: u32, A: Allocator, D>
+    SingularLenField<T, crate::fields::shared::field_presence::Implicit, FIELD, A, D>
+{
+    #[inline]
+    pub fn value(&self) -> T::Ref<'_> {
+        T::borrow(
+            self.value
+                .as_ref(&AlwaysInitialized)
+                .expect("always-initialized slot"),
+        )
+    }
+}
+
+impl<T: LenProtoType, const FIELD: u32, A: Allocator, D>
+    SingularLenField<T, Oneof, FIELD, A, D>
+{
+    #[inline]
+    pub fn value(&self) -> T::Ref<'_> {
+        T::borrow(
+            self.value
+                .as_ref(&AlwaysInitialized)
+                .expect("always-initialized slot"),
+        )
+    }
+
+    /// Growable handle for a oneof LEN variant (slot is always initialized).
+    pub fn value_mut(&mut self, alloc: A) -> T::Mut<'_, A> {
+        T::with_alloc(self.value.get_mut(), alloc)
+    }
+
+    /// Releases the always-present payload. Used from [`OneofDeallocate`].
+    pub fn deallocate_in(&mut self, alloc: A) {
+        let slot = unsafe { ManuallyDrop::take(&mut self.value) };
+        slot.deallocate_in(&AlwaysInitialized, alloc);
+    }
+}
+
 impl<T: LenProtoType, const BIT: usize, const FIELD: u32, A: Allocator, D>
     SingularLenField<T, LegacyRequired<BIT>, FIELD, A, D>
+where
+    <LegacyRequired<BIT> as FieldPresence>::ValueSlot<T::Storage>: ValueSlot<T::Storage>,
 {
     pub fn validate_required<Pb>(&self, common: &MessageCommon<Pb, A>) -> Result<(), DecodeError>
     where
         Pb: PresenceBits,
     {
-        LegacyRequired::<BIT>::validate_present(common, FIELD, || T::is_empty(&self.value))
+        LegacyRequired::<BIT>::validate_present(common, FIELD, || {
+            LegacyRequired::<BIT>::payload_is_empty(&self.value)
+        })
     }
 }
 
@@ -128,13 +195,17 @@ pub struct SingularLenFieldMut<
     A: Allocator,
     D,
     Pb: PresenceBits,
-> {
+> where
+    P::ValueSlot<T::Storage>: ValueSlot<T::Storage>,
+{
     field: &'f mut SingularLenField<T, P, FIELD, A, D>,
     common: &'c mut MessageCommon<Pb, A>,
 }
 
 impl<'f, 'c, T: LenProtoType, P: FieldPresence, const FIELD: u32, A: Allocator, D, Pb: PresenceBits>
     SingularLenFieldMut<'f, 'c, T, P, FIELD, A, D, Pb>
+where
+    P::ValueSlot<T::Storage>: ValueSlot<T::Storage>,
 {
     #[inline]
     fn new(
@@ -144,17 +215,19 @@ impl<'f, 'c, T: LenProtoType, P: FieldPresence, const FIELD: u32, A: Allocator, 
         Self { field, common }
     }
 
+    /// Returns a growable guard. Ensures the slot is initialized, then releases
+    /// the `common` borrow so the guard only ties up the field (`'f`).
     #[inline]
     pub fn value_mut(self) -> T::Mut<'f, A>
     where
         A: Clone,
     {
+        let alloc = self.common.alloc.clone();
         {
             let mut init = P::slot_init_mut(self.common);
-            init.set_initialized(true);
+            self.field.value.ensure_init(&mut init, alloc.clone());
         }
-        let alloc = self.common.alloc.clone();
-        self.field.value_mut(alloc)
+        T::with_alloc(self.field.value.get_mut(), alloc)
     }
 
     pub fn merge<B: Buf>(self, wire_type: WireType, buf: &mut B) -> Result<(), DecodeError>
@@ -165,13 +238,9 @@ impl<'f, 'c, T: LenProtoType, P: FieldPresence, const FIELD: u32, A: Allocator, 
             return Err(DecodeError::InvalidTag);
         }
         let new = T::decode(buf, self.common.alloc.clone())?;
-        let old = unsafe { ManuallyDrop::take(&mut self.field.value) };
-        unsafe { T::deallocate(old, self.common.alloc.clone()) };
-        self.field.value = ManuallyDrop::new(new);
-        {
-            let mut init = P::slot_init_mut(self.common);
-            init.set_initialized(true);
-        }
+        let alloc = self.common.alloc.clone();
+        let mut init = P::slot_init_mut(self.common);
+        self.field.value.set(&mut init, alloc, new);
         Ok(())
     }
 
@@ -183,18 +252,16 @@ impl<'f, 'c, T: LenProtoType, P: FieldPresence, const FIELD: u32, A: Allocator, 
     where
         A: Clone,
     {
-        {
-            let mut init = P::slot_init_mut(self.common);
-            init.set_initialized(false);
-        }
-        let old = unsafe { ManuallyDrop::take(&mut self.field.value) };
-        unsafe { T::deallocate(old, self.common.alloc.clone()) };
-        self.field.value = ManuallyDrop::new(T::new_in(self.common.alloc.clone()));
+        let alloc = self.common.alloc.clone();
+        let mut init = P::slot_init_mut(self.common);
+        self.field.value.clear(&mut init, alloc);
     }
 }
 
 impl<T: LenProtoType, P: FieldPresence, const FIELD: u32, A: Allocator + Clone, D, Pb: PresenceBits>
     BindableMut<MessageCommon<Pb, A>> for SingularLenField<T, P, FIELD, A, D>
+where
+    P::ValueSlot<T::Storage>: ValueSlot<T::Storage>,
 {
     type BoundMut<'f, 'c> = SingularLenFieldMut<'f, 'c, T, P, FIELD, A, D, Pb>
     where

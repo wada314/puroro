@@ -60,6 +60,28 @@ pub trait ValueSlot<T: DefaultIn + DeallocateIn> {
         alloc: A,
     ) -> impl DerefMut<Target = T>;
 
+    /// Ensures the slot holds a value, writing [`DefaultIn::default_in`] (using
+    /// `alloc`) and marking init state when it was previously uninitialized.
+    ///
+    /// Call this before [`get_mut`](Self::get_mut) when the caller needs a bare
+    /// `&mut T` that borrows only the field (e.g. LEN growable guards that wrap
+    /// storage with an allocator and must release `common` first).
+    fn ensure_init<A: Allocator>(&mut self, init: &mut impl SlotInitMut, alloc: A);
+
+    /// Returns `&mut T`.
+    ///
+    /// # Precondition
+    ///
+    /// The slot must be initialized — call [`ensure_init`](Self::ensure_init)
+    /// first (always-initialized slots satisfy this trivially).
+    fn get_mut(&mut self) -> &mut T;
+
+    /// Consumes the slot and frees any live payload through `alloc`.
+    ///
+    /// Used from message / oneof `Drop` paths. For [`MaybeUninit`] the init view
+    /// decides whether a payload exists; always-initialized slots always free.
+    fn deallocate_in<A: Allocator>(self, init: &impl SlotInitView, alloc: A);
+
     /// Borrows `&T` when initialized.
     ///
     /// Like [`Option::as_ref`](Option::as_ref) — `None` when the slot is not initialized.
@@ -89,6 +111,17 @@ impl<T: DefaultIn + DeallocateIn> ValueSlot<T> for T {
         _alloc: A,
     ) -> impl DerefMut<Target = T> {
         self
+    }
+
+    fn ensure_init<A: Allocator>(&mut self, _: &mut impl SlotInitMut, _alloc: A) {}
+
+    fn get_mut(&mut self) -> &mut T {
+        self
+    }
+
+    fn deallocate_in<A: Allocator>(self, _: &impl SlotInitView, alloc: A) {
+        // SAFETY: `alloc` owns this value's buffer.
+        unsafe { DeallocateIn::deallocate_in(self, alloc) };
     }
 
     fn as_ref<'a>(&'a self, _: &impl SlotInitView) -> Option<&'a T> {
@@ -134,6 +167,27 @@ impl<T: DefaultIn + DeallocateIn> ValueSlot<T> for MaybeUninit<T> {
         }
         // SAFETY: just ensured the slot is initialized.
         unsafe { self.assume_init_mut() }
+    }
+
+    fn ensure_init<A: Allocator>(&mut self, init: &mut impl SlotInitMut, alloc: A) {
+        if !init.is_initialized() {
+            self.write(T::default_in(alloc));
+            init.set_initialized(true);
+        }
+    }
+
+    fn get_mut(&mut self) -> &mut T {
+        // SAFETY: the `ensure_init` / `as_mut` precondition guarantees a live payload.
+        unsafe { self.assume_init_mut() }
+    }
+
+    fn deallocate_in<A: Allocator>(self, init: &impl SlotInitView, alloc: A) {
+        if init.is_initialized() {
+            // SAFETY: init bit set implies a live payload we now take ownership of.
+            let value = unsafe { self.assume_init() };
+            // SAFETY: `alloc` owns `value`'s buffer.
+            unsafe { DeallocateIn::deallocate_in(value, alloc) };
+        }
     }
 
     fn as_ref<'a>(&'a self, init: &impl SlotInitView) -> Option<&'a T> {

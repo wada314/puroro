@@ -406,9 +406,9 @@ impl<A: Allocator + Clone + Default> Default for Task<A> {
 
 impl<A: Allocator + Clone> Drop for Task<A> {
     fn drop(&mut self) {
-        self.title.deallocate(self._common.alloc.clone());
-        self.owner_id.deallocate(self._common.alloc.clone());
-        self.payload.deallocate(self._common.alloc.clone());
+        self.title.deallocate(&self._common);
+        self.owner_id.deallocate(&self._common);
+        self.payload.deallocate(&self._common);
         self.tag_ids.deallocate(self._common.alloc.clone());
         self.scores.deallocate(self._common.alloc.clone());
         self.labels.deallocate(self._common.alloc.clone());

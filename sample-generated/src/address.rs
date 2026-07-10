@@ -130,8 +130,8 @@ impl<A: Allocator + Clone> NestedMessage<A> for Address<A> {
 
 impl<A: Allocator + Clone> Drop for Address<A> {
     fn drop(&mut self) {
-        self.street.deallocate(self._common.alloc.clone());
-        self.city.deallocate(self._common.alloc.clone());
+        self.street.deallocate(&self._common);
+        self.city.deallocate(&self._common);
         self._common.deallocate();
     }
 }

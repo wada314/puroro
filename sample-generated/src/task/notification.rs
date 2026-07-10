@@ -293,8 +293,8 @@ impl<A: Allocator + Clone> OneofDeallocate<A> for NotificationStorage<A> {
     /// `alloc` must be the allocator that owns the variant's buffer.
     unsafe fn deallocate(self, alloc: A) {
         match self {
-            Self::EmailAddress(mut f) => f.deallocate(alloc),
-            Self::PhoneNumber(mut f) => f.deallocate(alloc),
+            Self::EmailAddress(mut f) => f.deallocate_in(alloc),
+            Self::PhoneNumber(mut f) => f.deallocate_in(alloc),
             Self::WebhookId(_) => {}
             Self::Postal(f) => f.deallocate(alloc),
         }

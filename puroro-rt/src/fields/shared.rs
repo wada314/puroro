@@ -204,9 +204,17 @@ pub trait DeallocateIn {
     unsafe fn deallocate_in<A: Allocator>(self, alloc: A);
 }
 
-// Scalars (and generated enum newtypes) reach both traits through `ProtoZero`.
-// The unmanaged heap payloads used by LEN fields are not `ProtoZero`, so they
-// will get their own dedicated impls when LEN migrates to `ValueSlot`.
+/// Empty / type-zero predicate for IMPLICIT omit-on-encode.
+///
+/// Scalars use [`ProtoZero::is_proto_zero`]; LEN payloads use `is_empty`.
+pub trait ProtoEmpty {
+    /// `true` when the value equals the protobuf empty / type-zero.
+    fn is_proto_empty(&self) -> bool;
+}
+
+// Scalars (and generated enum newtypes) reach these traits through `ProtoZero`.
+// `UnmanagedString` / `UnmanagedVec` are not `ProtoZero`, so they get dedicated
+// impls below without overlapping the blankets.
 impl<T: ProtoZero> DefaultIn for T {
     #[inline]
     fn default_in<A: Allocator>(_alloc: A) -> Self {
@@ -217,4 +225,55 @@ impl<T: ProtoZero> DefaultIn for T {
 impl<T: ProtoZero> DeallocateIn for T {
     #[inline]
     unsafe fn deallocate_in<A: Allocator>(self, _alloc: A) {}
+}
+
+impl<T: ProtoZero> ProtoEmpty for T {
+    #[inline]
+    fn is_proto_empty(&self) -> bool {
+        T::is_proto_zero(self)
+    }
+}
+
+impl DefaultIn for ::unmanaged::UnmanagedString {
+    #[inline]
+    fn default_in<A: Allocator>(alloc: A) -> Self {
+        ::unmanaged::UnmanagedString::new(alloc)
+    }
+}
+
+impl DeallocateIn for ::unmanaged::UnmanagedString {
+    #[inline]
+    unsafe fn deallocate_in<A: Allocator>(self, alloc: A) {
+        // SAFETY: forwarded to the caller's obligation on `alloc`.
+        unsafe { self.deallocate(alloc) };
+    }
+}
+
+impl ProtoEmpty for ::unmanaged::UnmanagedString {
+    #[inline]
+    fn is_proto_empty(&self) -> bool {
+        self.is_empty()
+    }
+}
+
+impl DefaultIn for ::unmanaged::UnmanagedVec<u8> {
+    #[inline]
+    fn default_in<A: Allocator>(alloc: A) -> Self {
+        ::unmanaged::UnmanagedVec::new(alloc)
+    }
+}
+
+impl DeallocateIn for ::unmanaged::UnmanagedVec<u8> {
+    #[inline]
+    unsafe fn deallocate_in<A: Allocator>(self, alloc: A) {
+        // SAFETY: forwarded to the caller's obligation on `alloc`.
+        unsafe { self.deallocate(alloc) };
+    }
+}
+
+impl ProtoEmpty for ::unmanaged::UnmanagedVec<u8> {
+    #[inline]
+    fn is_proto_empty(&self) -> bool {
+        self.is_empty()
+    }
 }

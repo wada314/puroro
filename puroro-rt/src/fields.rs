@@ -42,7 +42,7 @@ pub use shared::{
     },
     slot_init::{AlwaysInitialized, BitInitMut, BitInitView, SlotInitMut, SlotInitView},
     value_slot::ValueSlot,
-    DefaultIn, DeallocateIn, MessageCommon, PresenceBits,
+    DefaultIn, DeallocateIn, MessageCommon, PresenceBits, ProtoEmpty,
 };
 pub use singular::{
     ExplicitBytes, ExplicitEnum, ExplicitInt32, ExplicitLenField, ExplicitString, ExplicitVarint,
