@@ -1,9 +1,11 @@
-//! Singular field wrappers (varint, LEN, nested message).
+//! Singular field wrappers (scalar + nested message).
 
+pub mod field;
 pub mod len;
 pub mod message;
 pub mod varint;
 
+pub use field::{SingularField, SingularFieldMut};
 pub use len::{
     ExplicitBytes, ExplicitLenField, ExplicitString, ImplicitBytes, ImplicitLenField,
     ImplicitString, LegacyRequiredLenField, SingularLen, SingularLenField, SingularLenFieldMut,

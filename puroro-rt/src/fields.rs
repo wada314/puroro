@@ -14,8 +14,8 @@
 //! | Submodule | Contents |
 //! |---|---|
 //! | [`shared`] | `MessageCommon`, `PresenceBits`, `FieldPresence`, `ValueSlot`, … |
-//! | [`wire`] | `VarintProtoType`, `LenProtoType`, fixed-width markers |
-//! | [`singular`] | `SingularVarintField`, `SingularLenField`, `NestedMessageField` |
+//! | [`wire`] | `ScalarProtoType`, `VarintProtoType`, `LenProtoType`, fixed-width markers |
+//! | [`singular`] | `SingularField`, `NestedMessageField` |
 //! | [`repeated`] | `RepeatedVarintField`, `RepeatedLenField` |
 //! | [`oneof`] | `OneofSlot` |
 
@@ -48,12 +48,14 @@ pub use singular::{
     ExplicitBytes, ExplicitEnum, ExplicitInt32, ExplicitLenField, ExplicitString, ExplicitVarint,
     ExplicitVarintField, ImplicitBytes, ImplicitEnum, ImplicitInt32, ImplicitLenField,
     ImplicitString, ImplicitVarint, ImplicitVarintField, MessagePresence, NestedMessage,
-    NestedMessageField, NestedMessageFieldMut, Singular, SingularLen, SingularLenField,
-    SingularLenFieldMut, SingularVarint, SingularVarintField, SingularVarintFieldMut,
+    NestedMessageField, NestedMessageFieldMut, Singular, SingularField, SingularFieldMut,
+    SingularLen, SingularLenField, SingularLenFieldMut, SingularVarint, SingularVarintField,
+    SingularVarintFieldMut,
 };
 pub use wire::{
     enum_value_is_known, LenProtoType, ProtoBool, ProtoBytes, ProtoEnum, ProtoEnumStorage, ProtoInt32,
-    ProtoInt64, ProtoSint32, ProtoSint64, ProtoString, ProtoUInt32, ProtoUInt64, VarintProtoType,
+    ProtoInt64, ProtoSint32, ProtoSint64, ProtoString, ProtoUInt32, ProtoUInt64, ScalarProtoType,
+    VarintProtoType,
 };
 
 // Preserve the historical `Oneof` name for the field-presence marker (distinct from `oneof` module).

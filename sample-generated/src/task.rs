@@ -86,7 +86,7 @@ pub const FIELD_POSTAL: u32 = 15; // notification.postal
 /// Reference `Task` message from `DESIGN.md`.
 pub struct Task<A: Allocator + Clone = Global> {
     _common: MessageCommon<TaskPresence, A>,
-    title: SingularLenField<ProtoString, Explicit<{ BIT_TITLE }>, { FIELD_TITLE }, A>, // proto: string title = 1;
+    title: SingularLenField<ProtoString, Explicit<{ BIT_TITLE }>, { FIELD_TITLE }>, // proto: string title = 1;
     score: SingularVarintField<ProtoInt32, Implicit, { FIELD_SCORE }>, // proto: int32 score = 2;
     max_retries: SingularVarintField<
         ProtoInt32,
@@ -95,8 +95,8 @@ pub struct Task<A: Allocator + Clone = Global> {
         MaxRetriesDefault,
     >, // proto: int32 max_retries = 3;
     owner_id:
-        SingularLenField<ProtoString, LegacyRequired<{ BIT_OWNER_ID }>, { FIELD_OWNER_ID }, A>, // proto: string owner_id = 4;
-    payload: SingularLenField<ProtoBytes, Explicit<{ BIT_PAYLOAD }>, { FIELD_PAYLOAD }, A>, // proto: bytes payload = 5;
+        SingularLenField<ProtoString, LegacyRequired<{ BIT_OWNER_ID }>, { FIELD_OWNER_ID }>, // proto: string owner_id = 4;
+    payload: SingularLenField<ProtoBytes, Explicit<{ BIT_PAYLOAD }>, { FIELD_PAYLOAD }>, // proto: bytes payload = 5;
     tag_ids: RepeatedPackedVarintField<ProtoInt32, { FIELD_TAG_IDS }, A>, // proto: repeated int32 tag_ids = 6 [packed];
     scores: RepeatedExpandedVarintField<ProtoInt32, { FIELD_SCORES }, A>, // proto: repeated int32 scores = 7;
     labels: RepeatedLenField<ProtoString, { FIELD_LABELS }, A>, // proto: repeated string labels = 8;

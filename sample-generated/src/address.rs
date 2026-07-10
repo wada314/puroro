@@ -54,8 +54,8 @@ pub const FIELD_CITY: u32 = 2; // city
 
 pub struct Address<A: Allocator + Clone = Global> {
     _common: MessageCommon<AddressPresence, A>,
-    street: SingularLenField<ProtoString, Explicit<{ BIT_STREET }>, { FIELD_STREET }, A>, // proto: string street = 1;
-    city: SingularLenField<ProtoString, Explicit<{ BIT_CITY }>, { FIELD_CITY }, A>,   // proto: string city = 2;
+    street: SingularLenField<ProtoString, Explicit<{ BIT_STREET }>, { FIELD_STREET }>, // proto: string street = 1;
+    city: SingularLenField<ProtoString, Explicit<{ BIT_CITY }>, { FIELD_CITY }>,   // proto: string city = 2;
 }
 
 impl<A: Allocator + Clone> Address<A> {

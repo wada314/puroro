@@ -101,8 +101,8 @@ pub enum NotificationMut<'a, A: Allocator + Clone> {
 /// parent message's `FIELD_*` constant directly as its `FIELD` type argument,
 /// since the field numbers are fixed for this generated oneof.
 pub(crate) enum NotificationStorage<A: Allocator + Clone> {
-    EmailAddress(SingularLenField<ProtoString, Oneof, { super::FIELD_EMAIL_ADDRESS }, A>),
-    PhoneNumber(SingularLenField<ProtoString, Oneof, { super::FIELD_PHONE_NUMBER }, A>),
+    EmailAddress(SingularLenField<ProtoString, Oneof, { super::FIELD_EMAIL_ADDRESS }>),
+    PhoneNumber(SingularLenField<ProtoString, Oneof, { super::FIELD_PHONE_NUMBER }>),
     WebhookId(SingularVarintField<ProtoInt32, Oneof, { super::FIELD_WEBHOOK_ID }>),
     Postal(NestedMessageField<Address<A>, Oneof, { super::FIELD_POSTAL }, A>),
 }
@@ -130,7 +130,7 @@ impl<A: Allocator + Clone> NotificationStorage<A> {
         match self {
             Self::EmailAddress(f) => NotificationMut::EmailAddress(f.value_mut(alloc)),
             Self::PhoneNumber(f) => NotificationMut::PhoneNumber(f.value_mut(alloc)),
-            Self::WebhookId(f) => NotificationMut::WebhookId(f.value_mut()),
+            Self::WebhookId(f) => NotificationMut::WebhookId(f.value_mut(alloc)),
             Self::Postal(f) => NotificationMut::Postal(f.value_mut()),
         }
     }
@@ -138,7 +138,7 @@ impl<A: Allocator + Clone> NotificationStorage<A> {
     pub(crate) fn bind_email_address_mut<'f, 'c, Pb: PresenceBits>(
         slot: &'f mut OneofSlot<Self>,
         common: &'c mut MessageCommon<Pb, A>,
-    ) -> SingularLenFieldMut<'f, 'c, ProtoString, Oneof, { super::FIELD_EMAIL_ADDRESS }, A, ::puroro_rt::ProtoDefault, Pb>
+    ) -> SingularLenFieldMut<'f, 'c, ProtoString, Oneof, { super::FIELD_EMAIL_ADDRESS }, ::puroro_rt::ProtoDefault, Pb, A>
     {
         let field = slot
             .bind_mut(common)
@@ -149,7 +149,7 @@ impl<A: Allocator + Clone> NotificationStorage<A> {
     pub(crate) fn bind_phone_number_mut<'f, 'c, Pb: PresenceBits>(
         slot: &'f mut OneofSlot<Self>,
         common: &'c mut MessageCommon<Pb, A>,
-    ) -> SingularLenFieldMut<'f, 'c, ProtoString, Oneof, { super::FIELD_PHONE_NUMBER }, A, ::puroro_rt::ProtoDefault, Pb>
+    ) -> SingularLenFieldMut<'f, 'c, ProtoString, Oneof, { super::FIELD_PHONE_NUMBER }, ::puroro_rt::ProtoDefault, Pb, A>
     {
         let field = slot
             .bind_mut(common)
@@ -180,7 +180,7 @@ impl<A: Allocator + Clone> NotificationStorage<A> {
 }
 
 impl<A: Allocator + Clone> EnumVariant<EmailAddress> for NotificationStorage<A> {
-    type Value = SingularLenField<ProtoString, Oneof, { super::FIELD_EMAIL_ADDRESS }, A>;
+    type Value = SingularLenField<ProtoString, Oneof, { super::FIELD_EMAIL_ADDRESS }>;
 
     fn variant_ref(&self) -> Option<&Self::Value> {
         match self {
@@ -202,7 +202,7 @@ impl<A: Allocator + Clone> EnumVariant<EmailAddress> for NotificationStorage<A> 
 }
 
 impl<A: Allocator + Clone> EnumVariant<PhoneNumber> for NotificationStorage<A> {
-    type Value = SingularLenField<ProtoString, Oneof, { super::FIELD_PHONE_NUMBER }, A>;
+    type Value = SingularLenField<ProtoString, Oneof, { super::FIELD_PHONE_NUMBER }>;
 
     fn variant_ref(&self) -> Option<&Self::Value> {
         match self {
@@ -295,7 +295,7 @@ impl<A: Allocator + Clone> OneofDeallocate<A> for NotificationStorage<A> {
         match self {
             Self::EmailAddress(mut f) => f.deallocate_in(alloc),
             Self::PhoneNumber(mut f) => f.deallocate_in(alloc),
-            Self::WebhookId(_) => {}
+            Self::WebhookId(mut f) => f.deallocate_in(alloc),
             Self::Postal(f) => f.deallocate(alloc),
         }
     }

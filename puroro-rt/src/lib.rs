@@ -23,6 +23,7 @@ pub use fields::{
     RepeatedExpandedVarintField, RepeatedLen, RepeatedLenField, RepeatedLenFieldMut,
     RepeatedPackedInt32, RepeatedPackedVarintField, RepeatedString, RepeatedVarint,
     RepeatedVarintEncoding, RepeatedVarintField, RepeatedVarintFieldMut, RequiredFieldPresence,
-    Singular, SingularLen, SingularLenField, SingularLenFieldMut, SingularVarint,
-    SingularVarintField, SingularVarintFieldMut, ValueSlot, VarintProtoType,
+    Singular, SingularField, SingularFieldMut, SingularLen, SingularLenField, SingularLenFieldMut,
+    SingularVarint, SingularVarintField, SingularVarintFieldMut, ValueSlot, VarintProtoType,
+    ScalarProtoType,
 };

@@ -317,42 +317,20 @@ impl<'a, F> OneofVariantRef<'a, F> {
 
 impl<
         'a,
-        T: crate::fields::wire::len::LenProtoType,
+        T: crate::fields::wire::scalar::ScalarProtoType,
         const FIELD: u32,
-        A: Allocator,
         D,
-    > OneofVariantRef<'a, crate::fields::singular::len::SingularLenField<T, crate::fields::shared::field_presence::Oneof, FIELD, A, D>>
+    > OneofVariantRef<'a, crate::fields::singular::field::SingularField<T, crate::fields::shared::field_presence::Oneof, FIELD, D>>
 where
     for<'b> T::Ref<'b>: Copy,
     D: for<'b> ::puroro::HasDefault<T::Ref<'b>>,
-{
-    pub fn optional<Pb: PresenceBits>(
-        self,
-        common: &MessageCommon<Pb, A>,
-    ) -> ::puroro::Optional<T::Ref<'a>, D> {
-        match self.field {
-            Some(f) => f.optional(common),
-            None => ::puroro::Optional::new(None),
-        }
-    }
-}
-
-impl<
-        'a,
-        T: crate::fields::wire::varint::VarintProtoType,
-        const FIELD: u32,
-        D,
-    > OneofVariantRef<'a, crate::fields::singular::varint::SingularVarintField<T, crate::fields::shared::field_presence::Oneof, FIELD, D>>
-where
-    T::Value: Copy,
-    D: ::puroro::HasDefault<T::Value>,
-    <crate::fields::shared::field_presence::Oneof as crate::fields::shared::field_presence::FieldPresence>::ValueSlot<T::Value>:
-        crate::fields::shared::value_slot::ValueSlot<T::Value>,
+    <crate::fields::shared::field_presence::Oneof as crate::fields::shared::field_presence::FieldPresence>::ValueSlot<T::Storage>:
+        crate::fields::shared::value_slot::ValueSlot<T::Storage>,
 {
     pub fn optional<Pb: PresenceBits, A: Allocator>(
         self,
         common: &MessageCommon<Pb, A>,
-    ) -> ::puroro::Optional<T::Value, D> {
+    ) -> ::puroro::Optional<T::Ref<'a>, D> {
         match self.field {
             Some(f) => f.optional(common),
             None => ::puroro::Optional::new(None),
