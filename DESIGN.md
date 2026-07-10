@@ -773,25 +773,51 @@ The group's **encode** glue lives on the storage enum. **Merge** selects the var
 
 #### Default values on oneof members
 
-Protobuf distinguishes **custom defaults** (`[default = X]` in proto2 / editions) from **type defaults** (0, `""`, `false`, first enum value, …). Oneof semantics differ from ordinary singular fields in both cases.
+Protobuf distinguishes **custom defaults** (`[default = X]` in proto2 / editions) from **type defaults** (0, `""`, `false`, first enum value, …). Oneof semantics differ from ordinary singular fields: presence is the oneof *case*, not a per-field has-bit, and getter vs mutator treat defaults differently.
 
-**What the wire spec allows**
+The normative reference below is the official C++ generated API ([C++ Generated Code Guide — oneof fields](https://protobuf.dev/reference/cpp/cpp-generated/)), cross-checked against `protoc`'s C++ / C# field generators and `descriptor.cc` in [protocolbuffers/protobuf](https://github.com/protocolbuffers/protobuf). (proto3 forbids custom defaults entirely, so it is omitted here; the interesting cases are **proto2** and **editions**.)
 
-| | proto3 | proto2 / editions |
-|---|---|---|
-| `[default = X]` on a scalar oneof member | not allowed (no custom defaults at all) | allowed syntactically for scalar / enum members |
-| `[default = X]` on a message oneof member | — | not allowed (`Messages can't have default values`) |
-| Default *variant* when the oneof group is unset | no — `case()` / `WhichOneof()` is `NOT_SET` | same |
+**What the schema allows (proto2 / editions)**
+
+| | proto2 / editions |
+|---|---|
+| `[default = X]` on a scalar / enum oneof member | allowed (descriptor does not reject oneof members; see e.g. `unittest_lite.proto`) |
+| `[default = X]` on a message oneof member | not allowed (`Messages can't have default values`) |
+| Default *variant* when the oneof group is unset | no — `case()` / `WhichOneof()` is `NOT_SET` |
 
 There is no way to declare “when the oneof is unset, behave as if variant `foo` were selected.”
 
-**Type-default exception (all syntaxes).** For ordinary implicit-presence scalars, setting a field to its type default means “unset” and the value is omitted on the wire. For a oneof member the rule is inverted: *if that variant is selected and holds the type default* (e.g. `int32` 0), the oneof **case is set** and the value **is serialized**. See the [proto3 oneof section](https://protobuf.dev/programming-guides/proto3/#oneof).
+**Type-default exception on the wire.** For ordinary implicit-presence scalars, setting a field to its type default means “unset” and the value is omitted on the wire. For a oneof member the rule is inverted: *if that variant is selected and holds the type default* (e.g. `int32` 0), the oneof **case is set** and the value **is serialized**.
 
-**Generated read accessors.** Per-variant getters consult the oneof group first — `notification_case()` / `OneofSlot::variant_of::<V>()` — and only expose a value when that variant is the active case. When the group is unset or another variant is active, they return `None` or an empty `Optional`; they do not fall back to `[default = X]` or to a schema default as if the member were an ordinary unset singular field.
+**Official accessor split (do not conflate getter and mutator)**
 
-When a variant **is** active, the getter returns the **stored** value from its field wrapper (including type zero / empty string). Freshly installed variants are built with `new_in` / `new` / `with_message_in`, so they start from the **type** default, not from `[default = X]`. Custom proto defaults on oneof scalar members are therefore **not** applied on the read path; per-variant accessors use the type-default provider (`ProtoDefault` / `HasDefault` for the wire type) only in the `Optional` wrapper sense, not as a substitute for oneof case selection.
+| API | Sets oneof case? | Value when that variant was not active |
+|---|---|---|
+| Const getter (`foo()`) | **No** | Returns the field's **proto default** (`[default = X]` if declared, else the type default). `has_foo()` stays false. |
+| Mutator (`mutable_foo()` / `set_foo`) | **Yes** (clears any other variant first) | `mutable_*` installs a **fresh empty / zero / empty-message** payload — documented as empty, *not* the custom default. `set_*` writes the caller-supplied value. |
 
-If a schema author needs proto2-style “unset means return 10” semantics for a scalar, they should use an ordinary `EXPLICIT` singular field (`Optional`), not a oneof member.
+So a custom default on a oneof member is **not unused**, but it is used only on the **read path when the case is not that member**:
+
+| Uses `[default = X]` | Does **not** use `[default = X]` |
+|---|---|
+| Const getter / hazzer-false path (`return $kDefault$` / `$kDefaultStr$`) | `mutable_*` init (`InitDefault()` → empty string sentinel; new empty submessage) |
+| After `clear_foo()` / `clear_oneof()`, subsequent getters | Wire encode of an unset oneof (nothing is emitted) |
+| Reflection `Get*` when the field is unset | Automatically selecting a default variant |
+| Descriptor metadata / some language codecs (e.g. C# `has ? stored : default`) | |
+
+Concrete C++ codegen shapes (proto2 / editions):
+
+- Numeric oneof getter: `if (has) return field; return $kDefault$;` — `$kDefault$` is `DefaultValue(...)`, i.e. the custom default when present.
+- String oneof getter: `if (!has) return $kDefaultStr$;` — same.
+- String oneof `mutable_*`: `clear_oneof(); set_has; field.InitDefault();` then return a mutable buffer. `InitDefault()` points at the empty-string sentinel, not the custom default. The guide states explicitly: *“If the oneof case was not `kFoo` prior to the call, then the returned string will be empty (not the default value).”*
+
+**puroro today vs that contract.** The hand-written `Task` sample follows the mutator half, but not yet the const-getter half for custom defaults:
+
+- Per-variant **`_mut`** (`email_address_mut`, …) goes through `bind_<variant>_mut` → `OneofSlotMut::variant_mut`, which force-switches the case and builds a fresh wrapper via `new_in` / `with_message_in` (**type** default). That matches official `mutable_*`.
+- Per-variant **getters** use `OneofSlot::variant_of::<V>().optional(...)`. When the case is unset or another variant, they return an empty `Optional` whose `get()` falls back to **`ProtoDefault`** (type default only). They do **not** yet thread a field-specific `D` carrying `[default = X]`, so they diverge from official const getters whenever a oneof scalar declares a custom default.
+- When the variant **is** active, getters return the **stored** value (including type zero / empty string), same as official.
+
+**Implication for codegen.** If / when puroro supports `[default = X]` on oneof scalars, that `D` belongs on the **read** accessor (`Optional<…, D>` / `HasDefault`), not on `_mut` installation. Mutators should keep installing type-default storage; custom defaults must not be written into the slot merely because the caller asked for a mutable handle.
 
 ---
 
