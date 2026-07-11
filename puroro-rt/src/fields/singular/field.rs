@@ -169,8 +169,10 @@ impl<T: ScalarProtoType, const FIELD: u32, D> SingularField<T, Oneof, FIELD, D> 
     }
 
     /// Mutable accessor for a oneof variant (slot is always initialized).
-    pub fn value_mut<A: Allocator>(&mut self, alloc: A) -> T::Mut<'_, A> {
-        self.value.get_mut().with_mut(alloc)
+    pub fn value_mut<A: Allocator + Clone>(&mut self, alloc: A) -> T::Mut<'_, A> {
+        self.value
+            .as_mut(AlwaysInitialized, alloc.clone())
+            .with_mut(alloc)
     }
 }
 
@@ -351,19 +353,17 @@ where
         Self { field, common }
     }
 
-    /// Returns a mutable accessor. Ensures the slot is initialized, then
-    /// releases the `common` borrow so the handle only ties up the field (`'f`).
+    /// Returns a mutable accessor, lazy-initializing the slot when needed.
     #[inline]
     pub fn value_mut(self) -> T::Mut<'f, A>
     where
         A: Clone,
     {
         let alloc = self.common.alloc.clone();
-        {
-            let mut init = P::slot_init_mut(self.common);
-            self.field.value.ensure_init(&mut init, alloc.clone());
-        }
-        self.field.value.get_mut().with_mut(alloc)
+        self.field
+            .value
+            .as_mut(P::slot_init_mut(self.common), alloc.clone())
+            .with_mut(alloc)
     }
 
     #[inline]

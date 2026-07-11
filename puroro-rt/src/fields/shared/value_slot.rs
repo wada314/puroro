@@ -13,7 +13,6 @@
 //! branching is centralized here rather than in [`FieldPresence`](super::field_presence::FieldPresence).
 
 use ::core::mem::MaybeUninit;
-use ::core::ops::DerefMut;
 
 use ::allocator_api2::alloc::Allocator;
 
@@ -42,41 +41,17 @@ pub trait ValueSlot<T: DefaultIn + DeallocateIn> {
     /// always-initialized variant reinstalls an empty value, hence `A: Clone`.
     fn clear<A: Allocator + Clone>(&mut self, init: &mut impl SlotInitMut, alloc: A);
 
-    /// Returns a mutable guard to the value, lazy-initializing with
-    /// [`DefaultIn::default_in`] (using `alloc`) when the slot is uninitialized.
+    /// Lazy-initializes with [`DefaultIn::default_in`] when uninitialized, then
+    /// returns `&mut T`.
     ///
-    /// `init` is taken **by value** so its `common` borrow can be threaded into
-    /// the returned guard: the opaque return therefore binds *both* the field
-    /// borrow and `init`'s `common` borrow. Bit-packed bools use a separate
-    /// [`BoolField`](crate::BoolField) rather than this trait, because a
-    /// bit is not addressable as `&T` / `&mut T`. Mutable bool accessors return
-    /// `impl DerefMut<Target = bool>` from
-    /// [`MessageCommon::bit_mut`](crate::MessageCommon::bit_mut) instead.
+    /// `init` is consumed here (presence / init-bit updates). Callers that need a
+    /// growable guard (`StringGuard`, …) chain `.with_mut(alloc)` on the result.
+    /// Today `init` is not retained in the return value; a future `Mut` that also
+    /// borrows `MessageCommon` can change this return type without a second API.
     ///
-    /// The returned guard dereferences to `T`; for the current slots it is just
-    /// `&mut T`, but the opaque return also keeps room for heap payloads to hand
-    /// back a write-back guard instead.
-    fn as_mut<A: Allocator>(
-        &mut self,
-        init: impl SlotInitMut,
-        alloc: A,
-    ) -> impl DerefMut<Target = T>;
-
-    /// Ensures the slot holds a value, writing [`DefaultIn::default_in`] (using
-    /// `alloc`) and marking init state when it was previously uninitialized.
-    ///
-    /// Call this before [`get_mut`](Self::get_mut) when the caller needs a bare
-    /// `&mut T` that borrows only the field (e.g. LEN growable guards that wrap
-    /// storage with an allocator and must release `common` first).
-    fn ensure_init<A: Allocator>(&mut self, init: &mut impl SlotInitMut, alloc: A);
-
-    /// Returns `&mut T`.
-    ///
-    /// # Precondition
-    ///
-    /// The slot must be initialized — call [`ensure_init`](Self::ensure_init)
-    /// first (always-initialized slots satisfy this trivially).
-    fn get_mut(&mut self) -> &mut T;
+    /// Bit-packed bools use a separate [`BoolField`](crate::BoolField) rather than
+    /// this trait, because a bit is not addressable as `&mut T`.
+    fn as_mut<A: Allocator>(&mut self, init: impl SlotInitMut, alloc: A) -> &mut T;
 
     /// Consumes the slot and frees any live payload through `alloc`.
     ///
@@ -107,17 +82,7 @@ impl<T: DefaultIn + DeallocateIn> ValueSlot<T> for T {
         unsafe { old.deallocate_in(alloc) };
     }
 
-    fn as_mut<A: Allocator>(
-        &mut self,
-        _init: impl SlotInitMut,
-        _alloc: A,
-    ) -> impl DerefMut<Target = T> {
-        self
-    }
-
-    fn ensure_init<A: Allocator>(&mut self, _: &mut impl SlotInitMut, _alloc: A) {}
-
-    fn get_mut(&mut self) -> &mut T {
+    fn as_mut<A: Allocator>(&mut self, _init: impl SlotInitMut, _alloc: A) -> &mut T {
         self
     }
 
@@ -158,28 +123,12 @@ impl<T: DefaultIn + DeallocateIn> ValueSlot<T> for MaybeUninit<T> {
         }
     }
 
-    fn as_mut<A: Allocator>(
-        &mut self,
-        mut init: impl SlotInitMut,
-        alloc: A,
-    ) -> impl DerefMut<Target = T> {
+    fn as_mut<A: Allocator>(&mut self, mut init: impl SlotInitMut, alloc: A) -> &mut T {
         if !init.is_initialized() {
             self.write(T::default_in(alloc));
             init.set_initialized(true);
         }
         // SAFETY: just ensured the slot is initialized.
-        unsafe { self.assume_init_mut() }
-    }
-
-    fn ensure_init<A: Allocator>(&mut self, init: &mut impl SlotInitMut, alloc: A) {
-        if !init.is_initialized() {
-            self.write(T::default_in(alloc));
-            init.set_initialized(true);
-        }
-    }
-
-    fn get_mut(&mut self) -> &mut T {
-        // SAFETY: the `ensure_init` / `as_mut` precondition guarantees a live payload.
         unsafe { self.assume_init_mut() }
     }
 

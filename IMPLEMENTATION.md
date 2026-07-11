@@ -243,7 +243,7 @@ Rust payload type alone does **not** identify protobuf encoding (`i32` can be in
 | Marker | Encode | Slot init | Bitfield | Accessors |
 |---|---|---|---|---|
 | `Implicit` | Omit when payload empty / type-zero | Always initialized | No-op | `value()` |
-| `Explicit<BIT>` | Omit when bit unset | Lazy via `ValueSlot::ensure_init` / `as_mut` | Set on `set` / `merge` / `value_mut` | `optional`, `clear` |
+| `Explicit<BIT>` | Omit when bit unset | Lazy via `ValueSlot::as_mut` | Set on `set` / `merge` / `value_mut` | `optional`, `clear` |
 | `LegacyRequired<BIT>` | Same as `Explicit` | Same as `Explicit` | Same as `Explicit` | Same + `validate_required` |
 | `Oneof` | Always emit when variant active | Always initialized | No-op (slot tracks presence) | `value()` / `value_mut(alloc)` |
 
@@ -582,7 +582,7 @@ Varint and LEN share [`SingularField`](puroro-rt/src/fields/singular/field.rs), 
 
 Storage is `ManuallyDrop<P::ValueSlot<T>>` where `T` is the thin wrapper (`ProtoInt32`, `ProtoString`, …) — `T` or `MaybeUninit<T>` depending on presence. Heap LEN payloads need an explicit [`FieldDeallocate::deallocate`](puroro-rt/src/fields/shared/field_deallocate.rs)(`&common`) from message / oneof teardown; copy scalars’ `DeallocateIn` is a no-op.
 
-**Mutation goes through a bound view:** `field.bind_mut(&mut common)` yields [`SingularFieldMut`](puroro-rt/src/fields/singular/field.rs). `value_mut` ensures the slot is initialized, then returns `T::Mut` (e.g. `&mut i32` or `StringGuard`) after releasing the `common` borrow so the handle only ties up the field.
+**Mutation goes through a bound view:** `field.bind_mut(&mut common)` yields [`SingularFieldMut`](puroro-rt/src/fields/singular/field.rs). `value_mut` lazy-inits via [`ValueSlot::as_mut`](puroro-rt/src/fields/shared/value_slot.rs), then returns `T::Mut` (e.g. `&mut i32` or `StringGuard`).
 
 **Read accessors also go through a bound view:** `field.bind(&common)` yields [`SingularFieldRef`](puroro-rt/src/fields/singular/field.rs). Generated getters always bind first — even for `IMPLICIT` `value()` which does not consult `common` — so read and write share one shape.
 
