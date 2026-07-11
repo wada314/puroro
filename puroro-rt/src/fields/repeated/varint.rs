@@ -138,24 +138,37 @@ impl<
 }
 
 impl<
+    'a,
     T: VarintProtoType,
     E: RepeatedVarintEncoding,
     const FIELD: u32,
     A: Allocator + Clone,
     Pb: PresenceBits,
-> Bindable<MessageCommon<Pb, A>> for RepeatedVarintField<T, E, FIELD, A>
+> Bindable<&'a MessageCommon<Pb, A>> for &'a RepeatedVarintField<T, E, FIELD, A>
 {
-    type Bound<'a>
-        = RepeatedVarintFieldRef<'a, T, E, FIELD, Pb, A>
-    where
-        Self: 'a,
-        MessageCommon<Pb, A>: 'a;
+    type Bound = RepeatedVarintFieldRef<'a, T, E, FIELD, Pb, A>;
 
-    fn bind<'a>(
-        &'a self,
-        common: &'a MessageCommon<Pb, A>,
-    ) -> RepeatedVarintFieldRef<'a, T, E, FIELD, Pb, A> {
+    #[inline]
+    fn bind(self, common: &'a MessageCommon<Pb, A>) -> Self::Bound {
         RepeatedVarintFieldRef::new(self, common)
+    }
+}
+
+impl<
+    'f,
+    'c,
+    T: VarintProtoType,
+    E: RepeatedVarintEncoding,
+    const FIELD: u32,
+    A: Allocator + Clone,
+    Pb: PresenceBits,
+> BindableMut<&'c mut MessageCommon<Pb, A>> for &'f mut RepeatedVarintField<T, E, FIELD, A>
+{
+    type BoundMut = RepeatedVarintFieldMut<'f, 'c, T, E, FIELD, Pb, A>;
+
+    #[inline]
+    fn bind_mut(self, common: &'c mut MessageCommon<Pb, A>) -> Self::BoundMut {
+        RepeatedVarintFieldMut::new(self, common)
     }
 }
 
@@ -169,7 +182,7 @@ impl<
 /// Bundles the element buffer with the allocator context so that generated code
 /// can mutate through a single call. Repeated fields have no presence bit, so
 /// the view carries only `common` (for the allocator). Every method consumes
-/// a fresh `bind_mut` precedes each mutation.
+/// the view, so a fresh `bind_mut` precedes each mutation.
 pub struct RepeatedVarintFieldMut<
     'f,
     'c,
@@ -253,28 +266,6 @@ impl<
             _ => return Err(DecodeError::InvalidTag),
         }
         Ok(())
-    }
-}
-
-impl<
-    T: VarintProtoType,
-    E: RepeatedVarintEncoding,
-    const FIELD: u32,
-    A: Allocator + Clone,
-    Pb: PresenceBits,
-> BindableMut<MessageCommon<Pb, A>> for RepeatedVarintField<T, E, FIELD, A>
-{
-    type BoundMut<'f, 'c>
-        = RepeatedVarintFieldMut<'f, 'c, T, E, FIELD, Pb, A>
-    where
-        Self: 'f,
-        MessageCommon<Pb, A>: 'c;
-
-    fn bind_mut<'f, 'c>(
-        &'f mut self,
-        common: &'c mut MessageCommon<Pb, A>,
-    ) -> RepeatedVarintFieldMut<'f, 'c, T, E, FIELD, Pb, A> {
-        RepeatedVarintFieldMut::new(self, common)
     }
 }
 

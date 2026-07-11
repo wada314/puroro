@@ -261,7 +261,7 @@ Varint and LEN singular scalars share one wrapper, parametrised by [`ScalarProto
 | `NestedMessageField<M, P, FIELD, A>` | [`singular/message.rs`](puroro-rt/src/fields/singular/message.rs) | `P: MessagePresence` — `Singular`: `Option<UnmanagedBox<M>>`; `Oneof`: bare `UnmanagedBox<M>` — no bitfield | — |
 | `OneofSlot<E>` | [`oneof.rs`](puroro-rt/src/fields/oneof.rs) | mutually exclusive variants | — |
 
-**Closed enum:** `SingularField<ProtoEnum<E>, Explicit, FIELD>::bind_mut(…).merge_closed(…, |wire: i32| …)` — unknown values → `unknown_fields`, bit not set.
+**Closed enum:** `SingularField<ProtoEnum<E>, Explicit, FIELD>::bind(…).merge_closed(…, |wire: i32| …)` — unknown values → `unknown_fields`, bit not set.
 
 **LEGACY_REQUIRED:** `SingularField<…, LegacyRequired<BIT>, FIELD>::validate_required`.
 
@@ -416,7 +416,7 @@ Self::FIELD_TITLE => { // title = 1, EXPLICIT string
 }
 ```
 
-Every field kind merges through the same bound-view shape — `self.<field>.bind(&mut self._common).merge(wire_type, buf)?` (repeated and nested-message fields likewise take only `common`; oneof uses `OneofSlotMut`) — so the code generator emits one form. Oneof variant arms use the **variant field name** and number. The `_ =>` unknown-field arm gets a short comment (`// unknown field — preserve in _common`).
+Every field kind merges through the same bound-view shape — `self.<field>.bind_mut(&mut self._common).merge(wire_type, buf)?` (repeated and nested-message fields likewise take only `common`; oneof uses `OneofSlotMut`) — so the code generator emits one form. Oneof variant arms use the **variant field name** and number. The `_ =>` unknown-field arm gets a short comment (`// unknown field — preserve in _common`).
 
 **What not to comment** — avoid restating obvious one-line delegates (`has_title` → `self.title().is_set()`). Section + struct + dispatch comments are enough.
 

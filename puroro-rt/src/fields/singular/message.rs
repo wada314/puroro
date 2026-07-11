@@ -206,36 +206,24 @@ impl<M, const FIELD: u32, A: Allocator> NestedMessageField<M, Oneof, FIELD, A> {
     }
 }
 
-impl<M, P: MessagePresence, const FIELD: u32, A: Allocator + Clone, Pb: PresenceBits>
-    Bindable<MessageCommon<Pb, A>> for NestedMessageField<M, P, FIELD, A>
+impl<'a, M, P: MessagePresence, const FIELD: u32, A: Allocator + Clone, Pb: PresenceBits>
+    Bindable<&'a MessageCommon<Pb, A>> for &'a NestedMessageField<M, P, FIELD, A>
 {
-    type Bound<'a>
-        = NestedMessageFieldRef<'a, M, P, FIELD, A, Pb>
-    where
-        Self: 'a,
-        MessageCommon<Pb, A>: 'a;
+    type Bound = NestedMessageFieldRef<'a, M, P, FIELD, A, Pb>;
 
-    fn bind<'a>(
-        &'a self,
-        common: &'a MessageCommon<Pb, A>,
-    ) -> NestedMessageFieldRef<'a, M, P, FIELD, A, Pb> {
+    #[inline]
+    fn bind(self, common: &'a MessageCommon<Pb, A>) -> Self::Bound {
         NestedMessageFieldRef::new(self, common)
     }
 }
 
-impl<M, P: MessagePresence, const FIELD: u32, A: Allocator + Clone, Pb: PresenceBits>
-    BindableMut<MessageCommon<Pb, A>> for NestedMessageField<M, P, FIELD, A>
+impl<'f, 'c, M, P: MessagePresence, const FIELD: u32, A: Allocator + Clone, Pb: PresenceBits>
+    BindableMut<&'c mut MessageCommon<Pb, A>> for &'f mut NestedMessageField<M, P, FIELD, A>
 {
-    type BoundMut<'f, 'c>
-        = NestedMessageFieldMut<'f, 'c, M, P, FIELD, A, Pb>
-    where
-        Self: 'f,
-        MessageCommon<Pb, A>: 'c;
+    type BoundMut = NestedMessageFieldMut<'f, 'c, M, P, FIELD, A, Pb>;
 
-    fn bind_mut<'f, 'c>(
-        &'f mut self,
-        common: &'c mut MessageCommon<Pb, A>,
-    ) -> NestedMessageFieldMut<'f, 'c, M, P, FIELD, A, Pb> {
+    #[inline]
+    fn bind_mut(self, common: &'c mut MessageCommon<Pb, A>) -> Self::BoundMut {
         NestedMessageFieldMut::new(self, common)
     }
 }

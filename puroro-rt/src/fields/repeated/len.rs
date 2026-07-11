@@ -123,20 +123,25 @@ impl<'a, T: LenProtoType, const FIELD: u32, Pb: PresenceBits, A: Allocator>
     }
 }
 
-impl<T: LenProtoType, const FIELD: u32, A: Allocator + Clone, Pb: PresenceBits>
-    Bindable<MessageCommon<Pb, A>> for RepeatedLenField<T, FIELD, A>
+impl<'a, T: LenProtoType, const FIELD: u32, A: Allocator + Clone, Pb: PresenceBits>
+    Bindable<&'a MessageCommon<Pb, A>> for &'a RepeatedLenField<T, FIELD, A>
 {
-    type Bound<'a>
-        = RepeatedLenFieldRef<'a, T, FIELD, Pb, A>
-    where
-        Self: 'a,
-        MessageCommon<Pb, A>: 'a;
+    type Bound = RepeatedLenFieldRef<'a, T, FIELD, Pb, A>;
 
-    fn bind<'a>(
-        &'a self,
-        common: &'a MessageCommon<Pb, A>,
-    ) -> RepeatedLenFieldRef<'a, T, FIELD, Pb, A> {
+    #[inline]
+    fn bind(self, common: &'a MessageCommon<Pb, A>) -> Self::Bound {
         RepeatedLenFieldRef::new(self, common)
+    }
+}
+
+impl<'f, 'c, T: LenProtoType, const FIELD: u32, A: Allocator + Clone, Pb: PresenceBits>
+    BindableMut<&'c mut MessageCommon<Pb, A>> for &'f mut RepeatedLenField<T, FIELD, A>
+{
+    type BoundMut = RepeatedLenFieldMut<'f, 'c, T, FIELD, Pb, A>;
+
+    #[inline]
+    fn bind_mut(self, common: &'c mut MessageCommon<Pb, A>) -> Self::BoundMut {
+        RepeatedLenFieldMut::new(self, common)
     }
 }
 
@@ -150,7 +155,7 @@ impl<T: LenProtoType, const FIELD: u32, A: Allocator + Clone, Pb: PresenceBits>
 /// Bundles the element buffer with the allocator context so that generated code
 /// can mutate through a single call. Repeated fields have no presence bit, so
 /// the view carries only `common` (for the allocator). Every method consumes
-/// a fresh `bind_mut` precedes each mutation.
+/// the view, so a fresh `bind_mut` precedes each mutation.
 pub struct RepeatedLenFieldMut<
     'f,
     'c,
@@ -217,23 +222,6 @@ impl<'f, 'c, T: LenProtoType, const FIELD: u32, Pb: PresenceBits, A: Allocator>
         while let Some(elem) = g.pop() {
             unsafe { T::deallocate(elem, alloc.clone()) };
         }
-    }
-}
-
-impl<T: LenProtoType, const FIELD: u32, A: Allocator + Clone, Pb: PresenceBits>
-    BindableMut<MessageCommon<Pb, A>> for RepeatedLenField<T, FIELD, A>
-{
-    type BoundMut<'f, 'c>
-        = RepeatedLenFieldMut<'f, 'c, T, FIELD, Pb, A>
-    where
-        Self: 'f,
-        MessageCommon<Pb, A>: 'c;
-
-    fn bind_mut<'f, 'c>(
-        &'f mut self,
-        common: &'c mut MessageCommon<Pb, A>,
-    ) -> RepeatedLenFieldMut<'f, 'c, T, FIELD, Pb, A> {
-        RepeatedLenFieldMut::new(self, common)
     }
 }
 

@@ -151,29 +151,24 @@ impl<E> Default for OneofSlot<E> {
     }
 }
 
-impl<E, A: Allocator + Clone, Pb: PresenceBits> Bindable<MessageCommon<Pb, A>> for OneofSlot<E> {
-    type Bound<'a>
-        = OneofSlotRef<'a, E, Pb, A>
-    where
-        Self: 'a,
-        MessageCommon<Pb, A>: 'a;
+impl<'a, E, A: Allocator + Clone, Pb: PresenceBits> Bindable<&'a MessageCommon<Pb, A>>
+    for &'a OneofSlot<E>
+{
+    type Bound = OneofSlotRef<'a, E, Pb, A>;
 
-    fn bind<'a>(&'a self, common: &'a MessageCommon<Pb, A>) -> OneofSlotRef<'a, E, Pb, A> {
+    #[inline]
+    fn bind(self, common: &'a MessageCommon<Pb, A>) -> Self::Bound {
         OneofSlotRef::new(self, common)
     }
 }
 
-impl<E, A: Allocator + Clone, Pb: PresenceBits> BindableMut<MessageCommon<Pb, A>> for OneofSlot<E> {
-    type BoundMut<'f, 'c>
-        = OneofSlotMut<'f, 'c, E, Pb, A>
-    where
-        Self: 'f,
-        MessageCommon<Pb, A>: 'c;
+impl<'f, 'c, E, A: Allocator + Clone, Pb: PresenceBits> BindableMut<&'c mut MessageCommon<Pb, A>>
+    for &'f mut OneofSlot<E>
+{
+    type BoundMut = OneofSlotMut<'f, 'c, E, Pb, A>;
 
-    fn bind_mut<'f, 'c>(
-        &'f mut self,
-        common: &'c mut MessageCommon<Pb, A>,
-    ) -> OneofSlotMut<'f, 'c, E, Pb, A> {
+    #[inline]
+    fn bind_mut(self, common: &'c mut MessageCommon<Pb, A>) -> Self::BoundMut {
         OneofSlotMut::new(self, common)
     }
 }

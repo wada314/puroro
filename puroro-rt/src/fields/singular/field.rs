@@ -270,27 +270,43 @@ impl<'a, T: ScalarProtoType, const FIELD: u32, D, Pb: PresenceBits, A: Allocator
 }
 
 impl<
+    'a,
     T: ScalarProtoType,
     P: FieldPresence,
     const FIELD: u32,
     D,
     A: Allocator + Clone,
     Pb: PresenceBits,
-> Bindable<MessageCommon<Pb, A>> for SingularField<T, P, FIELD, D>
+> Bindable<&'a MessageCommon<Pb, A>> for &'a SingularField<T, P, FIELD, D>
 where
     P::ValueSlot<T>: ValueSlot<T>,
 {
-    type Bound<'a>
-        = SingularFieldRef<'a, T, P, FIELD, D, Pb, A>
-    where
-        Self: 'a,
-        MessageCommon<Pb, A>: 'a;
+    type Bound = SingularFieldRef<'a, T, P, FIELD, D, Pb, A>;
 
-    fn bind<'a>(
-        &'a self,
-        common: &'a MessageCommon<Pb, A>,
-    ) -> SingularFieldRef<'a, T, P, FIELD, D, Pb, A> {
+    #[inline]
+    fn bind(self, common: &'a MessageCommon<Pb, A>) -> Self::Bound {
         SingularFieldRef::new(self, common)
+    }
+}
+
+impl<
+    'f,
+    'c,
+    T: ScalarProtoType,
+    P: FieldPresence,
+    const FIELD: u32,
+    D,
+    A: Allocator + Clone,
+    Pb: PresenceBits,
+> BindableMut<&'c mut MessageCommon<Pb, A>> for &'f mut SingularField<T, P, FIELD, D>
+where
+    P::ValueSlot<T>: ValueSlot<T>,
+{
+    type BoundMut = SingularFieldMut<'f, 'c, T, P, FIELD, D, Pb, A>;
+
+    #[inline]
+    fn bind_mut(self, common: &'c mut MessageCommon<Pb, A>) -> Self::BoundMut {
+        SingularFieldMut::new(self, common)
     }
 }
 
@@ -429,30 +445,5 @@ where
         let mut init = P::slot_init_mut(self.common);
         self.field.value.set(&mut init, alloc, value);
         Ok(())
-    }
-}
-
-impl<
-    T: ScalarProtoType,
-    P: FieldPresence,
-    const FIELD: u32,
-    D,
-    A: Allocator + Clone,
-    Pb: PresenceBits,
-> BindableMut<MessageCommon<Pb, A>> for SingularField<T, P, FIELD, D>
-where
-    P::ValueSlot<T>: ValueSlot<T>,
-{
-    type BoundMut<'f, 'c>
-        = SingularFieldMut<'f, 'c, T, P, FIELD, D, Pb, A>
-    where
-        Self: 'f,
-        MessageCommon<Pb, A>: 'c;
-
-    fn bind_mut<'f, 'c>(
-        &'f mut self,
-        common: &'c mut MessageCommon<Pb, A>,
-    ) -> SingularFieldMut<'f, 'c, T, P, FIELD, D, Pb, A> {
-        SingularFieldMut::new(self, common)
     }
 }
