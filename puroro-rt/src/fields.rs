@@ -11,6 +11,8 @@
 //! for singular fields; repeated fields use the inner `Value` / `Storage`)
 //! and **presence policy** ([`Implicit`](shared::field_presence::Implicit) / [`Explicit`](shared::field_presence::Explicit) / [`Oneof`](shared::field_presence::Oneof)).
 //!
+//! Flat crate-root re-exports of the catalog live in [`crate`](crate) (`lib.rs`).
+//!
 //! # Module layout
 //!
 //! | Submodule | Contents |
@@ -21,46 +23,9 @@
 //! | [`repeated`] | `RepeatedVarintField`, `RepeatedLenField` |
 //! | [`oneof`] | `OneofSlot` |
 
-pub mod enum_variant;
-pub mod oneof;
-pub mod repeated;
-pub mod shared;
-pub mod singular;
-pub mod wire;
-
-pub use ::protobuf_core::FieldNumber;
-pub use enum_variant::EnumVariant;
-pub use oneof::{
-    OneofDeallocate, OneofEncodable, OneofSlot, OneofSlotMut, OneofSlotRef, OneofVariantRef,
-};
-pub use repeated::{
-    Expanded, Packed, RepeatedBytes, RepeatedExpandedInt32, RepeatedExpandedVarintField,
-    RepeatedLen, RepeatedLenField, RepeatedLenFieldMut, RepeatedLenFieldRef, RepeatedPackedInt32,
-    RepeatedPackedVarintField, RepeatedString, RepeatedVarint, RepeatedVarintEncoding,
-    RepeatedVarintField, RepeatedVarintFieldMut, RepeatedVarintFieldRef,
-};
-pub use shared::{
-    DeallocateIn, DefaultIn, FieldDeallocate, MessageCommon, PresenceBits, ProtoEmpty,
-    bindable::{Bindable, BindableMut},
-    field_presence::{Explicit, FieldPresence, Implicit, LegacyRequired, RequiredFieldPresence},
-    slot_init::{AlwaysInitialized, BitInitMut, BitInitView, SlotInitMut, SlotInitView},
-    value_slot::ValueSlot,
-};
-pub use singular::{
-    BoolField, BoolFieldMut, BoolFieldRef, ExplicitBoolField, ExplicitBytes, ExplicitEnum,
-    ExplicitInt32, ExplicitLenField, ExplicitString, ExplicitVarint, ExplicitVarintField,
-    ImplicitBoolField, ImplicitBytes, ImplicitEnum, ImplicitInt32, ImplicitLenField, ImplicitString,
-    ImplicitVarint, ImplicitVarintField, LegacyRequiredBoolField, MessagePresence, NestedMessage,
-    NestedMessageField, NestedMessageFieldMut, NestedMessageFieldRef, OneofBoolField, Singular,
-    SingularField, SingularFieldMut, SingularFieldRef, SingularLen, SingularLenField,
-    SingularLenFieldMut, SingularLenFieldRef, SingularVarint, SingularVarintField,
-    SingularVarintFieldMut, SingularVarintFieldRef,
-};
-pub use wire::{
-    LenProtoType, ProtoBool, ProtoBytes, ProtoEnum, ProtoEnumStorage, ProtoInt32, ProtoInt64,
-    ProtoSint32, ProtoSint64, ProtoString, ProtoUInt32, ProtoUInt64, ScalarProtoType,
-    VarintProtoType, enum_value_is_known,
-};
-
-// Preserve the historical `Oneof` name for the field-presence marker (distinct from `oneof` module).
-pub use shared::field_presence::Oneof;
+pub(crate) mod enum_variant;
+pub(crate) mod oneof;
+pub(crate) mod repeated;
+pub(crate) mod shared;
+pub(crate) mod singular;
+pub(crate) mod wire;

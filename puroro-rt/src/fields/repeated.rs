@@ -1,8 +1,8 @@
 //! Repeated field wrappers.
 
-pub mod encoding;
-pub mod len;
-pub mod varint;
+pub(crate) mod encoding;
+pub(crate) mod len;
+pub(crate) mod varint;
 
 pub use encoding::{Expanded, Packed, RepeatedVarintEncoding};
 pub use len::{

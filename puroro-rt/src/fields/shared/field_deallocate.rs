@@ -13,7 +13,7 @@ use super::{MessageCommon, PresenceBits};
 /// bit-packed fields are no-ops.
 ///
 /// Oneof **variants** are not message children; the group's `deallocate` takes
-/// the active variant and frees it via [`OneofDeallocate`](crate::fields::OneofDeallocate),
+/// the active variant and frees it via [`OneofDeallocate`](crate::OneofDeallocate),
 /// which in turn calls this trait on the variant's field wrapper.
 ///
 /// After `deallocate`, `self` must not be used again (except as part of the

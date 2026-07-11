@@ -4,7 +4,7 @@
 //! boolean payload is stored at `VALUE_BIT` inside `_common.presence`. Explicit /
 //! legacy-required presence still uses [`FieldPresence`]'s presence bit; Implicit
 //! omit-on-encode treats a clear value bit as absent; Oneof presence stays on the
-//! enclosing [`OneofSlot`](crate::fields::OneofSlot).
+//! enclosing [`OneofSlot`](crate::OneofSlot).
 
 use ::core::marker::PhantomData;
 use ::core::ops::DerefMut;
@@ -28,7 +28,7 @@ use crate::fields::wire::varint::{self, ProtoBool, VarintProtoType};
 
 /// Singular `bool` field whose value is packed into the message bitvec at `VALUE_BIT`.
 ///
-/// `P` selects presence policy ([`Implicit`] / [`Explicit`](crate::fields::Explicit) /
+/// `P` selects presence policy ([`Implicit`] / [`Explicit`](crate::Explicit) /
 /// [`LegacyRequired`] / [`Oneof`]). The struct itself holds no payload.
 ///
 /// `Clone` / `Copy` / `Debug` / `Default` are hand-written rather than `#[derive]`'d:

@@ -28,7 +28,7 @@ impl<B: Buf> Iterator for BufVarintReader<'_, B> {
 }
 
 /// Decodes a base-128 varint from `buf`.
-pub fn decode_varint<B: Buf>(buf: &mut B) -> Result<u64, DecodeError> {
+pub(crate) fn decode_varint<B: Buf>(buf: &mut B) -> Result<u64, DecodeError> {
     match (BufVarintReader { buf }).read_varint()? {
         Some(v) => Ok(v.to_uint64()),
         None => Err(DecodeError::UnexpectedEof),
@@ -43,7 +43,7 @@ pub fn decode_tag<B: Buf>(buf: &mut B) -> Result<(u32, WireType), DecodeError> {
 }
 
 /// Decodes one LEN payload into an allocator-less [`UnmanagedVec<u8>`].
-pub fn decode_bytes_in<B: Buf, A: Allocator>(
+pub(crate) fn decode_bytes_in<B: Buf, A: Allocator>(
     buf: &mut B,
     alloc: A,
 ) -> Result<UnmanagedVec<u8>, DecodeError> {
@@ -64,7 +64,7 @@ pub fn decode_bytes_in<B: Buf, A: Allocator>(
 }
 
 /// Decodes one LEN payload as UTF-8 into an allocator-less [`UnmanagedString`].
-pub fn decode_string_in<B: Buf, A: Allocator>(
+pub(crate) fn decode_string_in<B: Buf, A: Allocator>(
     buf: &mut B,
     alloc: A,
 ) -> Result<UnmanagedString, DecodeError> {
@@ -79,13 +79,13 @@ pub fn decode_string_in<B: Buf, A: Allocator>(
 
 /// Copies `s` into a freshly allocated [`UnmanagedString`] backed by the owned
 /// `alloc` (its buffer is owned by allocator type `A`).
-pub fn str_to_unmanaged_in<A: Allocator>(s: &str, alloc: A) -> UnmanagedString {
+pub(crate) fn str_to_unmanaged_in<A: Allocator>(s: &str, alloc: A) -> UnmanagedString {
     UnmanagedString::from_string(::unmanaged::String::from_str_in(s, alloc))
 }
 
 /// Copies `v` into a freshly allocated [`UnmanagedVec<u8>`] backed by the owned
 /// `alloc` (its buffer is owned by allocator type `A`).
-pub fn bytes_to_unmanaged_in<A: Allocator>(v: &[u8], alloc: A) -> UnmanagedVec<u8> {
+pub(crate) fn bytes_to_unmanaged_in<A: Allocator>(v: &[u8], alloc: A) -> UnmanagedVec<u8> {
     let mut vec = ::allocator_api2::vec::Vec::<u8, A>::with_capacity_in(v.len(), alloc);
     vec.extend_from_slice(v);
     UnmanagedVec::from_vec(vec)
@@ -139,7 +139,7 @@ pub fn skip_field_and_save<B: Buf, A: Allocator>(
     Ok(())
 }
 
-pub fn save_unknown_varint_field<A: Allocator>(
+pub(crate) fn save_unknown_varint_field<A: Allocator>(
     field_number: u32,
     value: u64,
     unknown_fields: &mut UnmanagedVec<u8>,
@@ -151,35 +151,4 @@ pub fn save_unknown_varint_field<A: Allocator>(
     let tag = encode::tag_to_u64_for_unknown(field_number, WireType::Varint);
     encode::write_varint_to_vec(tag, &mut *g);
     encode::write_varint_to_vec(value, &mut *g);
-}
-
-pub fn skip_field<B: Buf>(wire_type: WireType, buf: &mut B) -> Result<(), DecodeError> {
-    match wire_type {
-        WireType::Varint => {
-            decode_varint(buf)?;
-        }
-        WireType::Int64 => {
-            if buf.remaining() < 8 {
-                return Err(DecodeError::UnexpectedEof);
-            }
-            buf.advance(8);
-        }
-        WireType::Len => {
-            let len = decode_varint(buf)? as usize;
-            if buf.remaining() < len {
-                return Err(DecodeError::TruncatedMessage);
-            }
-            buf.advance(len);
-        }
-        WireType::Int32 => {
-            if buf.remaining() < 4 {
-                return Err(DecodeError::UnexpectedEof);
-            }
-            buf.advance(4);
-        }
-        WireType::SGroup | WireType::EGroup => {
-            return Err(DecodeError::InvalidTag);
-        }
-    }
-    Ok(())
 }

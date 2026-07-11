@@ -11,7 +11,6 @@
 //! (the inner primitive / enum) in the element buffer so `as_slice()` stays
 //! `&[i32]` / `&[E]`.
 
-use ::core::convert::TryFrom;
 use ::derive_more::{Deref, DerefMut, From, Into};
 use ::protobuf_core::Varint;
 
@@ -198,13 +197,5 @@ proto_varint_wrapper! {
     encode = |value| Varint::from_bool(value).to_uint64(),
 }
 
-/// Returns `true` when `raw` is a known variant of `E`.
-pub fn enum_value_is_known<E>(raw: i32) -> bool
-where
-    E: TryFrom<i32, Error = i32>,
-{
-    E::try_from(raw).is_ok()
-}
-
 /// Always [`WireType::Varint`] for singular field merge/encode checks.
-pub const WIRE_TYPE: WireType = WireType::Varint;
+pub(crate) const WIRE_TYPE: WireType = WireType::Varint;

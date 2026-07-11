@@ -31,7 +31,7 @@ use crate::fields::wire::scalar::ScalarProtoType;
 /// The enum owns allocator-less field wrappers in its variants. [`OneofSlotMut`]
 /// takes the active variant and calls this before overwriting the slot, passing
 /// the same [`MessageCommon`] message `Drop` uses so each arm can call
-/// [`FieldDeallocate::deallocate`](crate::fields::FieldDeallocate::deallocate).
+/// [`FieldDeallocate::deallocate`](crate::FieldDeallocate::deallocate).
 ///
 /// `Pb` and `A` are trait parameters because the storage enum pins the message's
 /// presence newtype and allocator type.
@@ -394,7 +394,7 @@ where
 }
 
 impl<'a, const VALUE_BIT: usize, const FIELD: u32, D, Pb: PresenceBits, A: Allocator>
-    OneofVariantRef<'a, crate::fields::BoolField<Oneof, VALUE_BIT, FIELD, D>, Pb, A>
+    OneofVariantRef<'a, crate::fields::singular::BoolField<Oneof, VALUE_BIT, FIELD, D>, Pb, A>
 where
     D: HasDefault<bool>,
 {

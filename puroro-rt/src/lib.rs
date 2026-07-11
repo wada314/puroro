@@ -5,26 +5,41 @@
 //! a separate semver track from the stable user API.
 
 pub mod decode;
-pub mod defaults;
+pub(crate) mod defaults;
 pub mod encode;
-pub mod fields;
+pub(crate) mod fields;
 
+pub use ::protobuf_core::FieldNumber;
 pub use defaults::ProtoDefault;
-pub use fields::{
-    Bindable, BindableMut, BoolField, BoolFieldMut, BoolFieldRef, EnumVariant, Expanded, Explicit,
-    ExplicitBoolField, ExplicitBytes, ExplicitEnum, ExplicitInt32, ExplicitLenField, ExplicitString,
-    ExplicitVarint, ExplicitVarintField, FieldDeallocate, FieldNumber, FieldPresence, Implicit,
-    ImplicitBoolField, ImplicitBytes, ImplicitEnum, ImplicitInt32, ImplicitLenField, ImplicitString,
-    ImplicitVarint, ImplicitVarintField, LegacyRequired, LegacyRequiredBoolField, LenProtoType,
-    MessageCommon, MessagePresence, NestedMessage, NestedMessageField, NestedMessageFieldMut,
-    NestedMessageFieldRef, Oneof, OneofBoolField, OneofDeallocate, OneofEncodable, OneofSlot,
-    OneofSlotMut, OneofSlotRef, OneofVariantRef, Packed, PresenceBits, ProtoBool, ProtoBytes,
-    ProtoEnum, ProtoEnumStorage, ProtoInt32, ProtoInt64, ProtoSint32, ProtoSint64, ProtoString,
-    ProtoUInt32, ProtoUInt64, RepeatedBytes, RepeatedExpandedInt32, RepeatedExpandedVarintField,
+pub use fields::enum_variant::EnumVariant;
+pub use fields::oneof::{
+    OneofDeallocate, OneofEncodable, OneofSlot, OneofSlotMut, OneofSlotRef, OneofVariantRef,
+};
+pub use fields::repeated::{
+    Expanded, Packed, RepeatedBytes, RepeatedExpandedInt32, RepeatedExpandedVarintField,
     RepeatedLen, RepeatedLenField, RepeatedLenFieldMut, RepeatedLenFieldRef, RepeatedPackedInt32,
     RepeatedPackedVarintField, RepeatedString, RepeatedVarint, RepeatedVarintEncoding,
-    RepeatedVarintField, RepeatedVarintFieldMut, RepeatedVarintFieldRef, RequiredFieldPresence,
-    ScalarProtoType, Singular, SingularField, SingularFieldMut, SingularFieldRef, SingularLen,
-    SingularLenField, SingularLenFieldMut, SingularLenFieldRef, SingularVarint, SingularVarintField,
-    SingularVarintFieldMut, SingularVarintFieldRef, ValueSlot, VarintProtoType,
+    RepeatedVarintField, RepeatedVarintFieldMut, RepeatedVarintFieldRef,
+};
+pub use fields::shared::{
+    Bindable, BindableMut, FieldDeallocate, MessageCommon, PresenceBits,
+};
+pub use fields::shared::field_presence::{
+    Explicit, FieldPresence, Implicit, LegacyRequired, Oneof, RequiredFieldPresence,
+};
+pub use fields::shared::value_slot::ValueSlot;
+pub use fields::singular::{
+    BoolField, BoolFieldMut, BoolFieldRef, ExplicitBoolField, ExplicitBytes, ExplicitEnum,
+    ExplicitInt32, ExplicitLenField, ExplicitString, ExplicitVarint, ExplicitVarintField,
+    ImplicitBoolField, ImplicitBytes, ImplicitEnum, ImplicitInt32, ImplicitLenField, ImplicitString,
+    ImplicitVarint, ImplicitVarintField, LegacyRequiredBoolField, MessagePresence, NestedMessage,
+    NestedMessageField, NestedMessageFieldMut, NestedMessageFieldRef, OneofBoolField, Singular,
+    SingularField, SingularFieldMut, SingularFieldRef, SingularLen, SingularLenField,
+    SingularLenFieldMut, SingularLenFieldRef, SingularVarint, SingularVarintField,
+    SingularVarintFieldMut, SingularVarintFieldRef,
+};
+pub use fields::wire::{
+    LenProtoType, ProtoBool, ProtoBytes, ProtoEnum, ProtoEnumStorage, ProtoInt32, ProtoInt64,
+    ProtoSint32, ProtoSint64, ProtoString, ProtoUInt32, ProtoUInt64, ScalarProtoType,
+    VarintProtoType,
 };

@@ -237,4 +237,4 @@ impl LenProtoType for ProtoBytes {
 }
 
 /// Always [`WireType::Len`] for singular field merge/encode checks.
-pub const WIRE_TYPE: WireType = WireType::Len;
+pub(crate) const WIRE_TYPE: WireType = WireType::Len;

@@ -1,7 +1,7 @@
 //! Type aliases for singular varint fields ([`SingularField`] with varint markers).
 
 use crate::defaults::ProtoDefault;
-use crate::fields::shared::field_presence::{Explicit, Implicit, LegacyRequired, Oneof};
+use crate::fields::shared::field_presence::{Explicit, Implicit};
 use crate::fields::singular::field::{SingularField, SingularFieldMut, SingularFieldRef};
 use crate::fields::wire::varint;
 
@@ -21,11 +21,8 @@ pub type SingularVarint<T, P, const FIELD: u32, D = ProtoDefault> =
     SingularVarintField<T, P, FIELD, D>;
 
 pub type ImplicitVarintField<T, const FIELD: u32> = SingularVarintField<T, Implicit, FIELD>;
-pub type OneofVarintField<T, const FIELD: u32> = SingularVarintField<T, Oneof, FIELD>;
 pub type ExplicitVarintField<T, const BIT: usize, const FIELD: u32, D = ProtoDefault> =
     SingularVarintField<T, Explicit<BIT>, FIELD, D>;
-pub type LegacyRequiredVarintField<T, const BIT: usize, const FIELD: u32, D = ProtoDefault> =
-    SingularVarintField<T, LegacyRequired<BIT>, FIELD, D>;
 
 pub type ImplicitVarint<T, const FIELD: u32> = ImplicitVarintField<T, FIELD>;
 pub type ExplicitVarint<T, const BIT: usize, const FIELD: u32, D = ProtoDefault> =

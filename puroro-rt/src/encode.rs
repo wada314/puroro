@@ -4,7 +4,7 @@
 //! `BufMut` adapters live here because generated code targets `bytes` buffers.
 
 use ::bytes::BufMut;
-use ::protobuf_core::{FIXED32_BYTES, FIXED64_BYTES, FieldNumber, Tag, Varint};
+use ::protobuf_core::{FieldNumber, Tag, Varint};
 use ::puroro::WireType;
 
 /// Encoded tag as a raw varint numeric value (used when re-serialising unknown fields).
@@ -15,26 +15,26 @@ pub(crate) fn tag_to_u64_for_unknown(field_number: u32, wire_type: WireType) -> 
 
 /// Returns the number of bytes needed to encode `v` as a base-128 varint.
 #[inline]
-pub fn encoded_len_varint(v: u64) -> usize {
+pub(crate) fn encoded_len_varint(v: u64) -> usize {
     Varint::from_uint64(v).varint_size()
 }
 
 /// Writes `v` as a base-128 varint to `buf`.
 #[inline]
-pub fn encode_varint<B: BufMut>(v: u64, buf: &mut B) {
+pub(crate) fn encode_varint<B: BufMut>(v: u64, buf: &mut B) {
     let (bytes, count) = Varint::from_uint64(v).encode();
     buf.put_slice(&bytes[..count]);
 }
 
 /// Returns the number of bytes needed to encode a tag for the given field number.
 #[inline]
-pub fn encoded_len_tag(field_number: u32, wire_type: WireType) -> usize {
+pub(crate) fn encoded_len_tag(field_number: u32, wire_type: WireType) -> usize {
     encoded_len_varint(tag_to_u64(field_number, wire_type))
 }
 
 /// Writes the tag (field_number + wire_type pair) to `buf`.
 #[inline]
-pub fn encode_tag<B: BufMut>(field_number: u32, wire_type: WireType, buf: &mut B) {
+pub(crate) fn encode_tag<B: BufMut>(field_number: u32, wire_type: WireType, buf: &mut B) {
     encode_varint(tag_to_u64(field_number, wire_type), buf);
 }
 
@@ -52,7 +52,7 @@ fn tag_to_u64(field_number: u32, wire_type: WireType) -> u64 {
 
 /// Returns the encoded byte length of a varint field (tag + value).
 #[inline]
-pub fn encoded_len_varint_field(field_number: u32, v: u64) -> usize {
+pub(crate) fn encoded_len_varint_field(field_number: u32, v: u64) -> usize {
     encoded_len_tag(field_number, WireType::Varint) + encoded_len_varint(v)
 }
 
@@ -63,35 +63,9 @@ pub fn encode_varint_field<B: BufMut>(field_number: u32, v: u64, buf: &mut B) {
     encode_varint(v, buf);
 }
 
-/// Returns the encoded byte length of an Int32 field (tag + 4 bytes).
-#[inline]
-pub fn encoded_len_i32_field(field_number: u32) -> usize {
-    encoded_len_tag(field_number, WireType::Int32) + FIXED32_BYTES
-}
-
-/// Writes an Int32 field (tag + raw little-endian 32-bit value) to `buf`.
-#[inline]
-pub fn encode_i32_field<B: BufMut>(field_number: u32, v: u32, buf: &mut B) {
-    encode_tag(field_number, WireType::Int32, buf);
-    buf.put_u32_le(v);
-}
-
-/// Returns the encoded byte length of an Int64 field (tag + 8 bytes).
-#[inline]
-pub fn encoded_len_i64_field(field_number: u32) -> usize {
-    encoded_len_tag(field_number, WireType::Int64) + FIXED64_BYTES
-}
-
-/// Writes an Int64 field (tag + raw little-endian 64-bit value) to `buf`.
-#[inline]
-pub fn encode_i64_field<B: BufMut>(field_number: u32, v: u64, buf: &mut B) {
-    encode_tag(field_number, WireType::Int64, buf);
-    buf.put_u64_le(v);
-}
-
 /// Returns the encoded byte length of a LEN field (tag + length varint + payload).
 #[inline]
-pub fn encoded_len_len_field(field_number: u32, payload_len: usize) -> usize {
+pub(crate) fn encoded_len_len_field(field_number: u32, payload_len: usize) -> usize {
     encoded_len_tag(field_number, WireType::Len)
         + encoded_len_varint(payload_len as u64)
         + payload_len
@@ -99,13 +73,13 @@ pub fn encoded_len_len_field(field_number: u32, payload_len: usize) -> usize {
 
 /// Writes a LEN field (tag + length + payload bytes) to `buf`.
 #[inline]
-pub fn encode_len_field<B: BufMut>(field_number: u32, payload: &[u8], buf: &mut B) {
+pub(crate) fn encode_len_field<B: BufMut>(field_number: u32, payload: &[u8], buf: &mut B) {
     encode_tag(field_number, WireType::Len, buf);
     encode_varint(payload.len() as u64, buf);
     buf.put_slice(payload);
 }
 
-pub fn encoded_len_packed_varint_field<T, F>(field_number: u32, values: &[T], to_u64: F) -> usize
+pub(crate) fn encoded_len_packed_varint_field<T, F>(field_number: u32, values: &[T], to_u64: F) -> usize
 where
     F: Fn(&T) -> u64,
 {
@@ -116,7 +90,7 @@ where
     encoded_len_len_field(field_number, payload_len)
 }
 
-pub fn encode_packed_varint_field<B: BufMut, T, F>(
+pub(crate) fn encode_packed_varint_field<B: BufMut, T, F>(
     field_number: u32,
     values: &[T],
     to_u64: F,
@@ -135,48 +109,8 @@ pub fn encode_packed_varint_field<B: BufMut, T, F>(
     }
 }
 
-#[inline]
-pub fn encoded_len_packed_i32_field(field_number: u32, values: &[u32]) -> usize {
-    if values.is_empty() {
-        0
-    } else {
-        encoded_len_len_field(field_number, values.len() * FIXED32_BYTES)
-    }
-}
-
-pub fn encode_packed_i32_field<B: BufMut>(field_number: u32, values: &[u32], buf: &mut B) {
-    if values.is_empty() {
-        return;
-    }
-    encode_tag(field_number, WireType::Len, buf);
-    encode_varint((values.len() * FIXED32_BYTES) as u64, buf);
-    for &v in values {
-        buf.put_u32_le(v);
-    }
-}
-
-#[inline]
-pub fn encoded_len_packed_i64_field(field_number: u32, values: &[u64]) -> usize {
-    if values.is_empty() {
-        0
-    } else {
-        encoded_len_len_field(field_number, values.len() * FIXED64_BYTES)
-    }
-}
-
-pub fn encode_packed_i64_field<B: BufMut>(field_number: u32, values: &[u64], buf: &mut B) {
-    if values.is_empty() {
-        return;
-    }
-    encode_tag(field_number, WireType::Len, buf);
-    encode_varint((values.len() * FIXED64_BYTES) as u64, buf);
-    for &v in values {
-        buf.put_u64_le(v);
-    }
-}
-
 /// Writes a varint into an allocator-aware byte vector.
-pub fn write_varint_to_vec<A: ::allocator_api2::alloc::Allocator>(
+pub(crate) fn write_varint_to_vec<A: ::allocator_api2::alloc::Allocator>(
     v: u64,
     buf: &mut ::allocator_api2::vec::Vec<u8, A>,
 ) {

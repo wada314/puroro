@@ -5,7 +5,7 @@
 //! at method call sites (same as varint).
 
 use crate::defaults::ProtoDefault;
-use crate::fields::shared::field_presence::{Explicit, Implicit, LegacyRequired, Oneof};
+use crate::fields::shared::field_presence::{Explicit, Implicit};
 use crate::fields::singular::field::{SingularField, SingularFieldMut, SingularFieldRef};
 use crate::fields::wire::len;
 
@@ -23,11 +23,8 @@ pub type SingularLenFieldMut<'f, 'c, T, P, const FIELD: u32, D, Pb, A> =
 pub type SingularLen<T, P, const FIELD: u32, D = ProtoDefault> = SingularLenField<T, P, FIELD, D>;
 
 pub type ImplicitLenField<T, const FIELD: u32> = SingularLenField<T, Implicit, FIELD>;
-pub type OneofLenField<T, const FIELD: u32> = SingularLenField<T, Oneof, FIELD>;
 pub type ExplicitLenField<T, const BIT: usize, const FIELD: u32, D = ProtoDefault> =
     SingularLenField<T, Explicit<BIT>, FIELD, D>;
-pub type LegacyRequiredLenField<T, const BIT: usize, const FIELD: u32, D = ProtoDefault> =
-    SingularLenField<T, LegacyRequired<BIT>, FIELD, D>;
 
 pub type ImplicitString<const FIELD: u32> = ImplicitLenField<len::ProtoString, FIELD>;
 pub type ExplicitString<const BIT: usize, const FIELD: u32, D = ProtoDefault> =

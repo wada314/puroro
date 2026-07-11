@@ -3,11 +3,11 @@
 //! “Singular” covers both presence-tracked (`EXPLICIT`) and non-presence-tracked
 //! (`IMPLICIT`) fields; see [`field`](crate::fields::singular::field).
 
-pub mod bool;
-pub mod field;
-pub mod len;
-pub mod message;
-pub mod varint;
+pub(crate) mod bool;
+pub(crate) mod field;
+pub(crate) mod len;
+pub(crate) mod message;
+pub(crate) mod varint;
 
 pub use bool::{
     BoolField, BoolFieldMut, BoolFieldRef, ExplicitBoolField, ImplicitBoolField,
@@ -16,8 +16,7 @@ pub use bool::{
 pub use field::{SingularField, SingularFieldMut, SingularFieldRef};
 pub use len::{
     ExplicitBytes, ExplicitLenField, ExplicitString, ImplicitBytes, ImplicitLenField,
-    ImplicitString, LegacyRequiredLenField, SingularLen, SingularLenField, SingularLenFieldMut,
-    SingularLenFieldRef,
+    ImplicitString, SingularLen, SingularLenField, SingularLenFieldMut, SingularLenFieldRef,
 };
 pub use message::{
     MessagePresence, NestedMessage, NestedMessageField, NestedMessageFieldMut,
