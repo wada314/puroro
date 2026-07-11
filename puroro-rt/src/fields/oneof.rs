@@ -272,24 +272,23 @@ impl<'f, 'c, E, Pb: PresenceBits, A: Allocator> OneofSlotMut<'f, 'c, E, Pb, A> {
     }
 
     /// Ensures the active variant is `V`; otherwise frees any existing variant and
-    /// installs a fresh one built by `make` (which receives an owned allocator
-    /// clone). Returns a mutable reference to the variant's inner payload,
-    /// borrowing only the slot (`'f`), so `common` is free once this returns.
+    /// installs a fresh one via [`EnumVariant::new_value`]. Returns the field's
+    /// bound mutation view (so callers do not re-bind `common`).
     ///
     /// Because `E` may own non-droppable storage, switching variants always goes
     /// through this method (or [`set`](Self::set) / [`clear`](Self::clear)) so the
     /// previous variant is released with the message allocator before the slot is
     /// overwritten.
     ///
-    /// Backs the per-variant `bind_<variant>_mut` helpers on generated storage
-    /// enums. `merge_from` selects the variant through those helpers, then merges
-    /// the wire occurrence through the returned bound field view.
+    /// Generated accessors and decode arms use
+    /// `slot.bind_mut(common).variant_mut::<V>().value_mut()` /
+    /// `.merge(…)`.
     pub fn variant_mut<V>(
         self,
-        make: impl FnOnce(A) -> <E as EnumVariant<V>>::Value,
-    ) -> &'f mut <E as EnumVariant<V>>::Value
+    ) -> <&'f mut <E as EnumVariant<V>>::Value as BindableMut<&'c mut MessageCommon<Pb, A>>>::BoundMut
     where
-        E: EnumVariant<V> + OneofDeallocate<Pb, A>,
+        E: EnumVariant<V, Alloc = A> + OneofDeallocate<Pb, A>,
+        &'f mut <E as EnumVariant<V>>::Value: BindableMut<&'c mut MessageCommon<Pb, A>>,
         A: Clone,
     {
         let slot = self.slot;
@@ -305,13 +304,14 @@ impl<'f, 'c, E, Pb: PresenceBits, A: Allocator> OneofSlotMut<'f, 'c, E, Pb, A> {
                 // SAFETY: `common.alloc` owns the previous variant's buffers.
                 unsafe { old.deallocate(common) };
             }
-            slot.set(<E as EnumVariant<V>>::from_variant(make(
-                common.alloc.clone(),
-            )));
+            slot.set(<E as EnumVariant<V>>::from_variant(
+                <E as EnumVariant<V>>::new_value(common.alloc.clone()),
+            ));
         }
 
-        <E as EnumVariant<V>>::variant_mut(slot.as_mut().unwrap())
-            .expect("from_variant must construct the variant that V selects")
+        let field = <E as EnumVariant<V>>::variant_mut(slot.as_mut().unwrap())
+            .expect("from_variant must construct the variant that V selects");
+        field.bind_mut(common)
     }
 
     /// Frees the active variant (if any), leaving the slot empty.

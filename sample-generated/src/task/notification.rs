@@ -40,9 +40,9 @@
 //!
 //! **Merge has no bespoke `merge_*` helpers on this enum.** Because each variant
 //! *is* a field wrapper, the parent message's `merge_from` dispatches on field
-//! number (one match arm per variant) and calls `bind_<variant>_mut` (which
-//! frees any other variant and returns the field's bound mutation view), then
-//! `merge(...)` on it — uniformly for every variant kind.
+//! number (one match arm per variant) and calls
+//! `slot.bind_mut(common).variant_mut::<V>().merge(...)` — uniformly for every
+//! variant kind.
 //!
 //! Per-variant dispatch uses [`EnumVariant`] on zero-sized marker types in
 //! [`variant`]; see that module for the type-parameter wiring.
@@ -50,10 +50,9 @@
 use ::allocator_api2::alloc::Allocator;
 use ::bytes::BufMut;
 use ::puroro_rt::{
-    Bindable, BindableMut, BoolField, BoolFieldMut, EnumVariant, FieldDeallocate, MessageCommon,
-    NestedMessageField, NestedMessageFieldMut, Oneof, OneofDeallocate, OneofEncodable, OneofSlot,
-    PresenceBits, ProtoInt32, ProtoString, SingularLenField, SingularLenFieldMut,
-    SingularVarintField, SingularVarintFieldMut,
+    Bindable, BindableMut, BoolField, EnumVariant, FieldDeallocate, MessageCommon,
+    NestedMessageField, Oneof, OneofDeallocate, OneofEncodable, OneofSlot, PresenceBits,
+    ProtoInt32, ProtoString, SingularLenField, SingularVarintField,
 };
 use ::unmanaged::string::StringGuard;
 
@@ -248,96 +247,15 @@ impl<A: Allocator + Clone> NotificationStorage<A> {
             }
         }
     }
-
-    pub(crate) fn bind_email_address_mut<'f, 'c, Pb: PresenceBits>(
-        slot: &'f mut OneofSlot<Self>,
-        common: &'c mut MessageCommon<Pb, A>,
-    ) -> SingularLenFieldMut<
-        'f,
-        'c,
-        ProtoString,
-        Oneof,
-        { super::FIELD_EMAIL_ADDRESS },
-        ::puroro_rt::ProtoDefault,
-        Pb,
-        A,
-    > {
-        let field = slot
-            .bind_mut(common)
-            .variant_mut::<EmailAddress>(|alloc| SingularLenField::new_in(alloc));
-        field.bind_mut(common)
-    }
-
-    pub(crate) fn bind_phone_number_mut<'f, 'c, Pb: PresenceBits>(
-        slot: &'f mut OneofSlot<Self>,
-        common: &'c mut MessageCommon<Pb, A>,
-    ) -> SingularLenFieldMut<
-        'f,
-        'c,
-        ProtoString,
-        Oneof,
-        { super::FIELD_PHONE_NUMBER },
-        ::puroro_rt::ProtoDefault,
-        Pb,
-        A,
-    > {
-        let field = slot
-            .bind_mut(common)
-            .variant_mut::<PhoneNumber>(|alloc| SingularLenField::new_in(alloc));
-        field.bind_mut(common)
-    }
-
-    pub(crate) fn bind_webhook_id_mut<'f, 'c, Pb: PresenceBits>(
-        slot: &'f mut OneofSlot<Self>,
-        common: &'c mut MessageCommon<Pb, A>,
-    ) -> SingularVarintFieldMut<
-        'f,
-        'c,
-        ProtoInt32,
-        Oneof,
-        { super::FIELD_WEBHOOK_ID },
-        WebhookIdDefault,
-        Pb,
-        A,
-    > {
-        let field = slot
-            .bind_mut(common)
-            .variant_mut::<WebhookId>(|alloc| SingularVarintField::new_in(alloc));
-        field.bind_mut(common)
-    }
-
-    pub(crate) fn bind_postal_mut<'f, 'c, Pb: PresenceBits>(
-        slot: &'f mut OneofSlot<Self>,
-        common: &'c mut MessageCommon<Pb, A>,
-    ) -> NestedMessageFieldMut<'f, 'c, Address<A>, Oneof, { super::FIELD_POSTAL }, A, Pb> {
-        let field = slot
-            .bind_mut(common)
-            .variant_mut::<Postal>(|alloc| NestedMessageField::with_message_in(alloc));
-        field.bind_mut(common)
-    }
-
-    pub(crate) fn bind_urgent_mut<'f, 'c, Pb: PresenceBits>(
-        slot: &'f mut OneofSlot<Self>,
-        common: &'c mut MessageCommon<Pb, A>,
-    ) -> BoolFieldMut<
-        'f,
-        'c,
-        Oneof,
-        { super::BIT_URGENT_VALUE },
-        { super::FIELD_URGENT },
-        ::puroro_rt::ProtoDefault,
-        Pb,
-        A,
-    > {
-        let field = slot
-            .bind_mut(common)
-            .variant_mut::<Urgent>(|alloc| BoolField::new_in(alloc));
-        field.bind_mut(common)
-    }
 }
 
 impl<A: Allocator + Clone> EnumVariant<EmailAddress> for NotificationStorage<A> {
     type Value = SingularLenField<ProtoString, Oneof, { super::FIELD_EMAIL_ADDRESS }>;
+    type Alloc = A;
+
+    fn new_value(alloc: A) -> Self::Value {
+        SingularLenField::new_in(alloc)
+    }
 
     fn variant_ref(&self) -> Option<&Self::Value> {
         match self {
@@ -360,6 +278,11 @@ impl<A: Allocator + Clone> EnumVariant<EmailAddress> for NotificationStorage<A> 
 
 impl<A: Allocator + Clone> EnumVariant<PhoneNumber> for NotificationStorage<A> {
     type Value = SingularLenField<ProtoString, Oneof, { super::FIELD_PHONE_NUMBER }>;
+    type Alloc = A;
+
+    fn new_value(alloc: A) -> Self::Value {
+        SingularLenField::new_in(alloc)
+    }
 
     fn variant_ref(&self) -> Option<&Self::Value> {
         match self {
@@ -383,6 +306,11 @@ impl<A: Allocator + Clone> EnumVariant<PhoneNumber> for NotificationStorage<A> {
 impl<A: Allocator + Clone> EnumVariant<WebhookId> for NotificationStorage<A> {
     type Value =
         SingularVarintField<ProtoInt32, Oneof, { super::FIELD_WEBHOOK_ID }, WebhookIdDefault>;
+    type Alloc = A;
+
+    fn new_value(alloc: A) -> Self::Value {
+        SingularVarintField::new_in(alloc)
+    }
 
     fn variant_ref(&self) -> Option<&Self::Value> {
         match self {
@@ -405,6 +333,11 @@ impl<A: Allocator + Clone> EnumVariant<WebhookId> for NotificationStorage<A> {
 
 impl<A: Allocator + Clone> EnumVariant<Postal> for NotificationStorage<A> {
     type Value = NestedMessageField<Address<A>, Oneof, { super::FIELD_POSTAL }, A>;
+    type Alloc = A;
+
+    fn new_value(alloc: A) -> Self::Value {
+        NestedMessageField::with_message_in(alloc)
+    }
 
     fn variant_ref(&self) -> Option<&Self::Value> {
         match self {
@@ -427,6 +360,11 @@ impl<A: Allocator + Clone> EnumVariant<Postal> for NotificationStorage<A> {
 
 impl<A: Allocator + Clone> EnumVariant<Urgent> for NotificationStorage<A> {
     type Value = BoolField<Oneof, { super::BIT_URGENT_VALUE }, { super::FIELD_URGENT }>;
+    type Alloc = A;
+
+    fn new_value(alloc: A) -> Self::Value {
+        BoolField::new_in(alloc)
+    }
 
     fn variant_ref(&self) -> Option<&Self::Value> {
         match self {

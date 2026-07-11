@@ -389,7 +389,9 @@ impl<A: Allocator + Clone> Task<A> {
     pub fn email_address_mut(
         &mut self,
     ) -> impl ::core::ops::DerefMut<Target = ::unmanaged::String<A>> + '_ {
-        NotificationStorage::bind_email_address_mut(&mut self.notification, &mut self._common)
+        self.notification
+            .bind_mut(&mut self._common)
+            .variant_mut::<EmailAddress>()
             .value_mut()
     }
 
@@ -405,7 +407,9 @@ impl<A: Allocator + Clone> Task<A> {
     pub fn phone_number_mut(
         &mut self,
     ) -> impl ::core::ops::DerefMut<Target = ::unmanaged::String<A>> + '_ {
-        NotificationStorage::bind_phone_number_mut(&mut self.notification, &mut self._common)
+        self.notification
+            .bind_mut(&mut self._common)
+            .variant_mut::<PhoneNumber>()
             .value_mut()
     }
 
@@ -423,7 +427,9 @@ impl<A: Allocator + Clone> Task<A> {
     /// Switches the group to `webhook_id` (freeing any other variant) and returns
     /// a mutable handle to the scalar.
     pub fn webhook_id_mut(&mut self) -> impl ::core::ops::DerefMut<Target = i32> + '_ {
-        NotificationStorage::bind_webhook_id_mut(&mut self.notification, &mut self._common)
+        self.notification
+            .bind_mut(&mut self._common)
+            .variant_mut::<WebhookId>()
             .value_mut()
     }
 
@@ -439,7 +445,10 @@ impl<A: Allocator + Clone> Task<A> {
     /// Switches the group to `postal` (freeing any other variant) and returns a
     /// mutable handle to the nested message, creating an empty one if needed.
     pub fn postal_mut(&mut self) -> &mut Address<A> {
-        NotificationStorage::bind_postal_mut(&mut self.notification, &mut self._common).value_mut()
+        self.notification
+            .bind_mut(&mut self._common)
+            .variant_mut::<Postal>()
+            .value_mut()
     }
 
     // -- notification.urgent (bool, proto field 18) -------------------------
@@ -452,7 +461,10 @@ impl<A: Allocator + Clone> Task<A> {
     }
 
     pub fn urgent_mut(&mut self) -> impl ::core::ops::DerefMut<Target = bool> + '_ {
-        NotificationStorage::bind_urgent_mut(&mut self.notification, &mut self._common).value_mut()
+        self.notification
+            .bind_mut(&mut self._common)
+            .variant_mut::<Urgent>()
+            .value_mut()
     }
 
     // -- message-level ------------------------------------------------------
@@ -634,31 +646,30 @@ impl<A: Allocator + Clone> MessageDecode for Task<A> {
                 }
                 FIELD_EMAIL_ADDRESS => {
                     // notification.email_address = 12, oneof LEN string
-                    NotificationStorage::bind_email_address_mut(
-                        &mut self.notification,
-                        &mut self._common,
-                    )
-                    .merge(wire_type, buf)?;
+                    self.notification
+                        .bind_mut(&mut self._common)
+                        .variant_mut::<EmailAddress>()
+                        .merge(wire_type, buf)?;
                 }
                 FIELD_PHONE_NUMBER => {
                     // notification.phone_number = 13, oneof LEN string
-                    NotificationStorage::bind_phone_number_mut(
-                        &mut self.notification,
-                        &mut self._common,
-                    )
-                    .merge(wire_type, buf)?;
+                    self.notification
+                        .bind_mut(&mut self._common)
+                        .variant_mut::<PhoneNumber>()
+                        .merge(wire_type, buf)?;
                 }
                 FIELD_WEBHOOK_ID => {
                     // notification.webhook_id = 14, oneof VARINT int32
-                    NotificationStorage::bind_webhook_id_mut(
-                        &mut self.notification,
-                        &mut self._common,
-                    )
-                    .merge(wire_type, buf)?;
+                    self.notification
+                        .bind_mut(&mut self._common)
+                        .variant_mut::<WebhookId>()
+                        .merge(wire_type, buf)?;
                 }
                 FIELD_POSTAL => {
                     // notification.postal = 15, oneof nested message
-                    NotificationStorage::bind_postal_mut(&mut self.notification, &mut self._common)
+                    self.notification
+                        .bind_mut(&mut self._common)
+                        .variant_mut::<Postal>()
                         .merge(wire_type, buf)?;
                 }
                 FIELD_DONE => {
@@ -675,11 +686,10 @@ impl<A: Allocator + Clone> MessageDecode for Task<A> {
                 }
                 FIELD_URGENT => {
                     // notification.urgent = 18, oneof bool
-                    NotificationStorage::bind_urgent_mut(
-                        &mut self.notification,
-                        &mut self._common,
-                    )
-                    .merge(wire_type, buf)?;
+                    self.notification
+                        .bind_mut(&mut self._common)
+                        .variant_mut::<Urgent>()
+                        .merge(wire_type, buf)?;
                 }
                 _ => {
                     // unknown field — preserve in _common.unknown_fields

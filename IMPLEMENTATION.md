@@ -655,15 +655,16 @@ The sample `oneof notification` is deliberately **heterogeneous** — LEN, VARIN
 
 **Variants own field wrappers, not raw storage.** Each variant holds the same field wrapper an ordinary singular field of that kind uses (`SingularField` / aliases for non-bool scalars and LEN; `BoolField` for `bool`; `NestedMessageField` for messages), so `value` / `value_mut` / `deallocate` are reused. The wrapper's presence is inert here (`Oneof` / `FieldPresence::Oneof`), so presence-aware omit rules are never consulted; bool still packs its value into `_common.presence`. Singular scalar / LEN wrappers no longer take `A`; the storage enum stays generic over `A` for nested message variants and for `value_mut(alloc)` call sites.
 
-The oneof drives each variant with the **field's own** primitives. Build-empty is `new_in(alloc)` / `with_message_in(alloc)`. Merging is `bind_<variant>_mut(…).merge(wire, buf)`. Read/read-mut are `value()` / `value_mut(alloc)` for scalar and LEN (alloc ignored for copy scalars).
+The oneof drives each variant with the **field's own** primitives. Empty construction is [`EnumVariant::new_value`](puroro-rt/src/fields/enum_variant.rs) (`new_in` / `with_message_in`). Merging is `slot.bind_mut(common).variant_mut::<V>().merge(wire, buf)`. Read getters use `slot.bind(common).variant_of::<V>().optional()` / `.get()`.
 
 **The message variant uses `NestedMessageField<…, Oneof, …>` — `ManuallyDrop<UnmanagedBox<M>>`, not `Option`.**
 
-**Per-variant `bind_<variant>_mut` helpers** return the field's bound mutation view. Parent `_mut` accessors are one-liners: `bind_email_address_mut(…).value_mut()`, `bind_webhook_id_mut(…).value_mut()`, `bind_postal_mut(…).value_mut()`.
+Parent `_mut` accessors are one-liners:
+`slot.bind_mut(common).variant_mut::<V>().value_mut()`.
 
 The storage enum implements [`OneofDeallocate<A>`](puroro-rt/src/fields/oneof.rs) (`unsafe fn deallocate(self, alloc: A)`) so the previously-active variant is freed through the message allocator before the slot is overwritten. Group accessors use the bound-view idiom: `slot.bind(&common)` / `slot.bind_mut(&mut common)` yield [`OneofSlotRef`](puroro-rt/src/fields/oneof.rs) / [`OneofSlotMut`](puroro-rt/src/fields/oneof.rs). Generated `NotificationView` / `NotificationViewMut` hold that pair. `OneofSlotMut` consuming methods:
 
-- `variant_mut::<V>(make) -> &mut Value` — keeps the active variant if it is already `V`, else frees the previous variant and installs `from_variant(make(alloc.clone()))`. Backs the per-variant `bind_<variant>_mut` helpers.
+- `variant_mut::<V>() -> Field::BoundMut` — keeps the active variant if it is already `V`, else frees the previous variant and installs `from_variant(EnumVariant::new_value(alloc.clone()))`, then binds the field to `common` once. Callers chain `.value_mut()` / `.merge(…)`.
 - `set(value)` — replaces the whole group (frees the old variant).
 - `clear()` — frees the active variant; backs `NotificationViewMut::clear`, `clear_notification`, and the message `Drop`.
 
