@@ -178,7 +178,7 @@ Field catalog methods take `&MessageCommon` / `&mut MessageCommon`, not `&Task`,
 
 [`PresenceBits`](puroro-rt/src/fields/shared.rs) — trait implemented on the message-specific bitfield **newtype** (not on raw `BitArray` — orphan rules). Bits cover EXPLICIT / LEGACY_REQUIRED **presence** and packed **bool values**. [`MessageCommon::is_bit_set`](puroro-rt/src/fields/shared.rs) / `set_bit` / `bit_mut` forward to it; `bit_mut` returns `impl DerefMut<Target = bool>` (RPITIT; typically bitvec's `BitRef<'_, Mut, …>`).
 
-[`ValueSlot<T>`](puroro-rt/src/fields/shared/value_slot.rs) — singular scalar storage behind a GAT on [`FieldPresence`](puroro-rt/src/fields/shared/field_presence.rs): always-initialized `T` for `Implicit` / `Oneof`; `MaybeUninit<T>` for `Explicit` / `LegacyRequired`. Construction / replace / clear thread an allocator via [`DefaultIn`](puroro-rt/src/fields/shared.rs) / [`DeallocateIn`](puroro-rt/src/fields/shared.rs) so heap payloads (`UnmanagedString`, `UnmanagedVec`) and copy scalars share one slot API. Mutation passes a [`SlotInitMut`](puroro-rt/src/fields/shared/slot_init.rs) handle (`slot_init_mut(common)`); reads pass [`SlotInitView`](puroro-rt/src/fields/shared/slot_init.rs) (`slot_init_view(common)`). [`ProtoEmpty`](puroro-rt/src/fields/shared.rs) drives IMPLICIT omit-on-encode (`is_proto_empty`).
+[`ValueSlot<T>`](puroro-rt/src/fields/shared/value_slot.rs) — singular scalar storage behind a GAT on [`FieldPresence`](puroro-rt/src/fields/shared/field_presence.rs): always-initialized `T` for `Implicit` / `Oneof`; `MaybeUninit<T>` for `Explicit` / `LegacyRequired`. Construction / teardown thread an allocator via [`DefaultIn`](puroro-rt/src/fields/shared.rs) / [`DeallocateIn`](puroro-rt/src/fields/shared.rs). Reads and mutation go through short-lived views: `slot.with(init)` → [`ValueSlotRef`](puroro-rt/src/fields/shared/value_slot.rs) / `slot.with_mut(init, alloc)` → [`ValueSlotMut`](puroro-rt/src/fields/shared/value_slot.rs) (`get` / `get_mut` / `set` / `clear`). Init handles come from [`SlotInitView`](puroro-rt/src/fields/shared/slot_init.rs) / [`SlotInitMut`](puroro-rt/src/fields/shared/slot_init.rs) (`slot_init_view` / `slot_init_mut` on presence). [`ProtoEmpty`](puroro-rt/src/fields/shared.rs) drives IMPLICIT omit-on-encode (`is_proto_empty`).
 
 [`SingularAccess`](puroro-rt/src/fields/singular/access.rs) — singular wrappers expose getter payloads (`Ref` / `Mut`) and MessageCommon binding (`bind` / `bind_mut` → `View` / `ViewMut`). Repeated fields and [`OneofSlot`](puroro-rt/src/fields/oneof.rs) use the same call shape via inherent `bind` / `bind_mut`.
 
@@ -245,7 +245,7 @@ Rust payload type alone does **not** identify protobuf encoding (`i32` can be in
 | Marker | Encode | Slot init | Bitfield | Accessors |
 |---|---|---|---|---|
 | `Implicit` | Omit when payload empty / type-zero | Always initialized | No-op | `value()` |
-| `Explicit<BIT>` | Omit when bit unset | Lazy via `ValueSlot::as_mut` | Set on `set` / `merge` / `value_mut` | `optional`, `clear` |
+| `Explicit<BIT>` | Omit when bit unset | Lazy via `with_mut(...).get_mut()` | Set on `set` / `merge` / `value_mut` | `optional`, `clear` |
 | `LegacyRequired<BIT>` | Same as `Explicit` | Same as `Explicit` | Same as `Explicit` | Same + `validate_required` |
 | `Oneof` | Always emit when variant active | Always initialized | No-op (slot tracks presence) | `value()` / `value_mut(alloc)` |
 
@@ -584,7 +584,7 @@ Varint and LEN share [`SingularField`](puroro-rt/src/fields/singular/field.rs), 
 
 Storage is `ManuallyDrop<P::ValueSlot<T>>` where `T` is the thin wrapper (`ProtoInt32`, `ProtoString`, …) — `T` or `MaybeUninit<T>` depending on presence. Heap LEN payloads need an explicit [`FieldDeallocate::deallocate`](puroro-rt/src/fields/shared/field_deallocate.rs)(`&common`) from message / oneof teardown; copy scalars’ `DeallocateIn` is a no-op.
 
-**Mutation goes through a bound view:** `field.bind_mut(&mut common)` yields [`SingularFieldMut`](puroro-rt/src/fields/singular/field.rs). `value_mut` lazy-inits via [`ValueSlot::as_mut`](puroro-rt/src/fields/shared/value_slot.rs), then returns `T::Mut` (e.g. `&mut i32` or `StringGuard`).
+**Mutation goes through a bound view:** `field.bind_mut(&mut common)` yields [`SingularFieldMut`](puroro-rt/src/fields/singular/field.rs). `value_mut` lazy-inits via [`ValueSlot::with_mut`](puroro-rt/src/fields/shared/value_slot.rs) → [`ValueSlotMut::get_mut`](puroro-rt/src/fields/shared/value_slot.rs), then returns `T::Mut` (e.g. `&mut i32` or `StringGuard`).
 
 **Read accessors also go through a bound view:** `field.bind(&common)` yields [`SingularFieldRef`](puroro-rt/src/fields/singular/field.rs). Generated getters always bind first — even for `IMPLICIT` `value()` which does not consult `common` — so read and write share one shape.
 

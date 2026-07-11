@@ -29,7 +29,7 @@ use crate::fields::shared::{
     MessageCommon, PresenceBits,
     field_presence::{FieldPresence, Implicit, LegacyRequired, Oneof, RequiredFieldPresence},
     slot_init::AlwaysInitialized,
-    value_slot::ValueSlot,
+    value_slot::{ValueSlot, ValueSlotMutAccess, ValueSlotRefAccess},
 };
 use crate::fields::shared::FieldDeallocate;
 use crate::fields::wire::scalar::ScalarProtoType;
@@ -98,7 +98,8 @@ where
             let init = P::slot_init_view(common);
             let v = self
                 .value
-                .as_ref(&init)
+                .with(&init)
+                .get()
                 .expect("should_emit implies initialized slot");
             v.encoded_len(FIELD)
         } else {
@@ -115,7 +116,8 @@ where
             let init = P::slot_init_view(common);
             let v = self
                 .value
-                .as_ref(&init)
+                .with(&init)
+                .get()
                 .expect("should_emit implies initialized slot");
             v.encode(FIELD, buf);
         }
@@ -149,7 +151,8 @@ impl<T: ScalarProtoType, const FIELD: u32, D> SingularField<T, Implicit, FIELD, 
     #[inline]
     pub fn value(&self) -> T::Ref<'_> {
         self.value
-            .as_ref(&AlwaysInitialized)
+            .with(&AlwaysInitialized)
+            .get()
             .expect("always-initialized slot")
             .get()
     }
@@ -163,15 +166,16 @@ impl<T: ScalarProtoType, const FIELD: u32, D> SingularField<T, Oneof, FIELD, D> 
     #[inline]
     pub fn value(&self) -> T::Ref<'_> {
         self.value
-            .as_ref(&AlwaysInitialized)
+            .with(&AlwaysInitialized)
+            .get()
             .expect("always-initialized slot")
             .get()
     }
 
     /// Mutable accessor for a oneof variant (slot is always initialized).
     pub fn value_mut<A: Allocator + Clone>(&mut self, alloc: A) -> T::Mut<'_, A> {
-        self.value
-            .as_mut(AlwaysInitialized, alloc.clone())
+        ValueSlot::with_mut(&mut *self.value, AlwaysInitialized, alloc.clone())
+            .get_mut()
             .with_mut(alloc)
     }
 }
@@ -244,7 +248,8 @@ where
             Some(
                 self.field
                     .value
-                    .as_ref(&init)
+                    .with(&init)
+                    .get()
                     .expect("is_set implies initialized slot")
                     .get(),
             )
@@ -323,10 +328,13 @@ where
         A: Clone,
     {
         let alloc = self.common.alloc.clone();
-        self.field
-            .value
-            .as_mut(P::slot_init_mut(self.common), alloc.clone())
-            .with_mut(alloc)
+        ValueSlot::with_mut(
+            &mut *self.field.value,
+            P::slot_init_mut(self.common),
+            alloc.clone(),
+        )
+        .get_mut()
+        .with_mut(alloc)
     }
 
     #[inline]
@@ -335,8 +343,7 @@ where
         A: Clone,
     {
         let alloc = self.common.alloc.clone();
-        let mut init = P::slot_init_mut(self.common);
-        self.field.value.set(&mut init, alloc, v);
+        ValueSlot::with_mut(&mut *self.field.value, P::slot_init_mut(self.common), alloc).set(v);
     }
 
     pub fn merge<B: Buf>(self, wire_type: WireType, buf: &mut B) -> Result<(), DecodeError>
@@ -345,8 +352,7 @@ where
     {
         let new = T::decode(wire_type, buf, self.common.alloc.clone())?;
         let alloc = self.common.alloc.clone();
-        let mut init = P::slot_init_mut(self.common);
-        self.field.value.set(&mut init, alloc, new);
+        ValueSlot::with_mut(&mut *self.field.value, P::slot_init_mut(self.common), alloc).set(new);
         Ok(())
     }
 
@@ -356,8 +362,7 @@ where
         A: Clone,
     {
         let alloc = self.common.alloc.clone();
-        let mut init = P::slot_init_mut(self.common);
-        self.field.value.clear(&mut init, alloc);
+        ValueSlot::with_mut(&mut *self.field.value, P::slot_init_mut(self.common), alloc).clear();
     }
 }
 
@@ -404,8 +409,8 @@ where
         }
         let value = T::from(<T as VarintProtoType>::decode_wire(raw)?);
         let alloc = self.common.alloc.clone();
-        let mut init = P::slot_init_mut(self.common);
-        self.field.value.set(&mut init, alloc, value);
+        ValueSlot::with_mut(&mut *self.field.value, P::slot_init_mut(self.common), alloc)
+            .set(value);
         Ok(())
     }
 }

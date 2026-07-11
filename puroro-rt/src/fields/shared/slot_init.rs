@@ -5,9 +5,12 @@
 //! and writes), not wire-level field presence. Wire policy lives on
 //! [`FieldPresence`](super::field_presence::FieldPresence).
 //!
-//! - [`SlotInitView`] — read-only (`is_initialized`), used by [`ValueSlot::as_ref`].
-//! - [`SlotInitMut`] — read + update init state, used by [`ValueSlot::set`] /
-//!   [`clear`](ValueSlot::clear) / [`as_mut`](ValueSlot::as_mut).
+//! - [`SlotInitView`] — read-only (`is_initialized`), used by
+//!   [`ValueSlot::with`](super::value_slot::ValueSlot::with) /
+//!   [`ValueSlotRef::get`](super::value_slot::ValueSlotRef::get).
+//! - [`SlotInitMut`] — read + update init state, used by
+//!   [`ValueSlot::with_mut`](super::value_slot::ValueSlot::with_mut) views
+//!   (`get_mut` / `set` / `clear`).
 
 use ::allocator_api2::alloc::Allocator;
 
