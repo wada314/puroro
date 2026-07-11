@@ -737,11 +737,11 @@ pub fn notification_case(&self) -> Option<NotificationCase>; // = notification()
 pub fn notification(&self) -> NotificationView<'_, A>;       // shared bind (always)
 pub fn notification_mut(&mut self) -> NotificationViewMut<'_, A>; // mut bind (always)
 
-// On NotificationView / NotificationViewMut (shared getters; mut delegates via as_view):
+// On NotificationView:
 //   case() -> Option<NotificationCase>
 //   as_ref() -> Option<NotificationRef<'_, A>>
-// On NotificationViewMut only:
-//   as_view(&self) -> NotificationView<'_, A>
+// On NotificationViewMut:
+//   as_view(&self) -> NotificationView<'_, A>   // shared getters via this
 //   as_mut(self) -> Option<NotificationMut<'_, A>>  // active variant; no switch
 //   clear(self)                                     // free active variant
 
@@ -772,7 +772,7 @@ The VARINT variant owns no heap: its `DeallocateIn` is a no-op.
 
 **The message variant uses `Oneof` storage — a bare box, not `Option`.** An ordinary message field (`NestedMessageField<…, Singular, …>`) stores `Option<UnmanagedBox<M>>`. A *oneof* message variant uses `NestedMessageField<…, Oneof, …>`, whose storage is a bare `UnmanagedBox<M>` that is **always present**, so accessors are plain `value()` / `value_mut()`.
 
-**Why these types, and why the storage is not `Notification`.** The storage variants own `unmanaged`-backed field wrappers, which panic on implicit drop and need the message allocator to free. Exposing them publicly (let alone under the canonical `Notification` name) would let a caller own one and hit that footgun, and would leak the `unmanaged` type into the API. So the storage enum is `pub(crate)` and non-canonically named (`NotificationStorage`). The public surface is `NotificationCase`, the group bound views `NotificationView` / `NotificationViewMut` (slot + `MessageCommon`, always returned), and the projected enums `NotificationRef` / `NotificationMut` (active variant only). Shared getters on the mut view use `as_view()` reborrow — not a trait and not `Deref` (a by-value reborrowed view cannot be returned from `Deref::deref`).
+**Why these types, and why the storage is not `Notification`.** The storage variants own `unmanaged`-backed field wrappers, which panic on implicit drop and need the message allocator to free. Exposing them publicly (let alone under the canonical `Notification` name) would let a caller own one and hit that footgun, and would leak the `unmanaged` type into the API. So the storage enum is `pub(crate)` and non-canonically named (`NotificationStorage`). The public surface is `NotificationCase`, the group bound views `NotificationView` / `NotificationViewMut` (slot + `MessageCommon`, always returned), and the projected enums `NotificationRef` / `NotificationMut` (active variant only). Shared getters live only on `NotificationView`; while holding a mut view, call `as_view()` (not a trait and not `Deref` — a by-value reborrowed view cannot be returned from `Deref::deref`).
 
 Group accessors follow the same bound-view idiom as other fields: `slot.bind(&common)` / `slot.bind_mut(&mut common)` yield [`OneofSlotRef`](puroro-rt/src/fields/oneof.rs) / [`OneofSlotMut`](puroro-rt/src/fields/oneof.rs). Generated `NotificationView` / `NotificationViewMut` wrap that pair. `OneofSlotMut::variant_mut(make)` returns a `&mut` to the (possibly freshly-installed) active variant, `set(value)` replaces the whole group, and `clear()` frees the active variant. Each of these releases the previously-active variant via `OneofDeallocate::deallocate` before overwriting the slot. The old `set_*` per-variant setters are removed.
 

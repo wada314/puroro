@@ -164,18 +164,6 @@ impl<'a, A: Allocator + Clone> NotificationViewMut<'a, A> {
         NotificationView::new(self.slot, self.common)
     }
 
-    /// Which variant is set (`None` when the group is unset).
-    #[inline]
-    pub fn case(&self) -> Option<NotificationCase> {
-        self.as_view().case()
-    }
-
-    /// Projected read view of the active variant, if any.
-    #[inline]
-    pub fn as_ref(&self) -> Option<NotificationRef<'_, A>> {
-        self.as_view().as_ref()
-    }
-
     /// Projected mutable view of the *currently active* variant (no switch).
     ///
     /// Consumes this bound view. Returns `None` when the group is unset.

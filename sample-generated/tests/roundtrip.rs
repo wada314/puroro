@@ -140,8 +140,8 @@ fn oneof_group_bound_views_when_unset() {
     assert!(view.as_ref().is_none());
 
     let view_mut = task.notification_mut();
-    assert!(view_mut.case().is_none());
-    assert!(view_mut.as_ref().is_none());
+    assert!(view_mut.as_view().case().is_none());
+    assert!(view_mut.as_view().as_ref().is_none());
     assert!(view_mut.as_mut().is_none());
 }
 
@@ -156,7 +156,7 @@ fn oneof_group_view_mut_as_view_and_clear() {
         // Shared getters work while holding the mut bound view.
         assert_eq!(view_mut.as_view().case(), Some(NotificationCase::EmailAddress));
         assert!(matches!(
-            view_mut.as_ref(),
+            view_mut.as_view().as_ref(),
             Some(NotificationRef::EmailAddress(s)) if s == "a@example.com"
         ));
         assert!(matches!(
