@@ -310,34 +310,22 @@ impl<A: Allocator + Clone> Task<A> {
         NotificationView::new(&self.notification, &self._common)
     }
 
+    /// Bound mutable view of the oneof group (always available, including when unset).
+    pub fn notification_mut(&mut self) -> NotificationViewMut<'_, A> {
+        NotificationViewMut::new(&mut self.notification, &mut self._common)
+    }
+
+    pub fn clear_notification(&mut self) {
+        self.notification_mut().clear();
+    }
+
+    // -- notification.email_address (string, proto field 12) ----------------
+
     pub fn email_address<'a>(&'a self) -> Optional<&'a str, impl HasDefault<&'a str>> {
         // Unset / other variant → Optional::None → get() is ProtoDefault ("").
         self.notification
             .variant_of::<EmailAddress>()
             .optional(&self._common)
-    }
-
-    pub fn phone_number<'a>(&'a self) -> Optional<&'a str, impl HasDefault<&'a str>> {
-        self.notification
-            .variant_of::<PhoneNumber>()
-            .optional(&self._common)
-    }
-
-    /// `[default = -1]`: when this variant is not active, `get()` returns `-1`
-    /// and `is_set()` is false (does not select the variant).
-    pub fn webhook_id(&self) -> Optional<i32, impl HasDefault<i32>> {
-        self.notification
-            .variant_of::<WebhookId>()
-            .optional(&self._common)
-    }
-
-    pub fn postal(&self) -> Option<&Address<A>> {
-        self.notification.variant_of::<Postal>().get()
-    }
-
-    /// Bound mutable view of the oneof group (always available, including when unset).
-    pub fn notification_mut(&mut self) -> NotificationViewMut<'_, A> {
-        NotificationViewMut::new(&mut self.notification, &mut self._common)
     }
 
     pub fn email_address_mut(
@@ -347,11 +335,29 @@ impl<A: Allocator + Clone> Task<A> {
             .value_mut()
     }
 
+    // -- notification.phone_number (string, proto field 13) -----------------
+
+    pub fn phone_number<'a>(&'a self) -> Optional<&'a str, impl HasDefault<&'a str>> {
+        self.notification
+            .variant_of::<PhoneNumber>()
+            .optional(&self._common)
+    }
+
     pub fn phone_number_mut(
         &mut self,
     ) -> impl ::core::ops::DerefMut<Target = ::unmanaged::String<A>> + '_ {
         NotificationStorage::bind_phone_number_mut(&mut self.notification, &mut self._common)
             .value_mut()
+    }
+
+    // -- notification.webhook_id (int32, default = -1, proto field 14) ------
+
+    /// `[default = -1]`: when this variant is not active, `get()` returns `-1`
+    /// and `is_set()` is false (does not select the variant).
+    pub fn webhook_id(&self) -> Optional<i32, impl HasDefault<i32>> {
+        self.notification
+            .variant_of::<WebhookId>()
+            .optional(&self._common)
     }
 
     /// Switches the group to `webhook_id` (freeing any other variant) and returns
@@ -361,14 +367,16 @@ impl<A: Allocator + Clone> Task<A> {
             .value_mut()
     }
 
+    // -- notification.postal (Address message, proto field 15) --------------
+
+    pub fn postal(&self) -> Option<&Address<A>> {
+        self.notification.variant_of::<Postal>().get()
+    }
+
     /// Switches the group to `postal` (freeing any other variant) and returns a
     /// mutable handle to the nested message, creating an empty one if needed.
     pub fn postal_mut(&mut self) -> &mut Address<A> {
         NotificationStorage::bind_postal_mut(&mut self.notification, &mut self._common).value_mut()
-    }
-
-    pub fn clear_notification(&mut self) {
-        self.notification_mut().clear();
     }
 
     // -- message-level ------------------------------------------------------
