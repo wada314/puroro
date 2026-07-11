@@ -13,7 +13,9 @@
 //!   is active.
 //! - [`NotificationRef`] / [`NotificationMut`] — safe projected aliases of the
 //!   *active* variant (`as_ref` / `as_mut` on [`OneofView`] /
-//!   [`OneofViewMut`](::puroro_rt::OneofViewMut)).
+//!   [`OneofViewMut`](::puroro_rt::OneofViewMut)). Payloads come from
+//!   [`SingularAccess`](::puroro_rt::SingularAccess) on each variant's field
+//!   wrapper (no `StringGuard` / `BitRef` hard-coding in generated aliases).
 //!
 //! Group bound views come from `puroro-rt` ([`OneofView`] /
 //! [`OneofViewMut`](::puroro_rt::OneofViewMut)), not per-oneof generated structs.
@@ -25,7 +27,7 @@
 //! | `email_address` / `phone_number` | `string` | [`SingularLenField`] (+ `ProtoDefault`) | `&str` | string guard |
 //! | `webhook_id` | `int32` `[default = -1]` | [`SingularVarintField`] + [`WebhookIdDefault`] | `i32` (by value) | `&mut i32` |
 //! | `postal` | `Address` message | [`NestedMessageField`] | `&Address<A>` | `&mut Address<A>` |
-//! | `urgent` | `bool` | [`BoolField`] | `bool` | bitvec `BitRef<'_, Mut, …>` |
+//! | `urgent` | `bool` | [`BoolField`] | `bool` | `SingularAccess::Mut` (named bit handle) |
 //!
 //! Per-variant **immutable** getters return [`Optional`](::puroro::Optional) whose
 //! `D` is the field wrapper's default marker: when the case is unset or another
@@ -56,11 +58,10 @@
 use ::allocator_api2::alloc::Allocator;
 use ::bytes::BufMut;
 use ::puroro_rt::{
-    Bindable, BoolField, EnumVariant, FieldDeallocate, MessageCommon, NestedMessageField,
-    Oneof, OneofDeallocate, OneofEncodable, OneofGroup, PresenceBits, ProtoInt32, ProtoString,
-    SingularLenField, SingularVarintField,
+    Bindable, BoolField, EnumVariant, FieldDeallocate, MessageCommon, NestedMessageField, Oneof,
+    OneofDeallocate, OneofEncodable, OneofGroup, PresenceBits, ProtoInt32, ProtoString,
+    SingularAccess, SingularLenField, SingularVarintField,
 };
-use ::unmanaged::string::StringGuard;
 
 use crate::address::Address;
 
@@ -105,38 +106,69 @@ pub enum NotificationCase {
     Urgent,
 }
 
+type EmailAddressField = SingularLenField<ProtoString, Oneof, { super::FIELD_EMAIL_ADDRESS }>;
+type PhoneNumberField = SingularLenField<ProtoString, Oneof, { super::FIELD_PHONE_NUMBER }>;
+type WebhookIdField =
+    SingularVarintField<ProtoInt32, Oneof, { super::FIELD_WEBHOOK_ID }, WebhookIdDefault>;
+type PostalField<A> = NestedMessageField<Address<A>, Oneof, { super::FIELD_POSTAL }, A>;
+type UrgentField = BoolField<Oneof, { super::BIT_URGENT_VALUE }, { super::FIELD_URGENT }>;
+
 /// Owned storage for `oneof notification` (crate-internal).
 pub(crate) type NotificationStorage<A> = Notification<
-    SingularLenField<ProtoString, Oneof, { super::FIELD_EMAIL_ADDRESS }>,
-    SingularLenField<ProtoString, Oneof, { super::FIELD_PHONE_NUMBER }>,
-    SingularVarintField<ProtoInt32, Oneof, { super::FIELD_WEBHOOK_ID }, WebhookIdDefault>,
-    NestedMessageField<Address<A>, Oneof, { super::FIELD_POSTAL }, A>,
-    BoolField<Oneof, { super::BIT_URGENT_VALUE }, { super::FIELD_URGENT }>,
+    EmailAddressField,
+    PhoneNumberField,
+    WebhookIdField,
+    PostalField<A>,
+    UrgentField,
 >;
 
 /// Borrowed read view of the active `notification` variant.
-pub type NotificationRef<'a, A> =
-    Notification<&'a str, &'a str, i32, &'a Address<A>, bool>;
+pub type NotificationRef<'a, A> = Notification<
+    <EmailAddressField as SingularAccess>::Ref<'a>,
+    <PhoneNumberField as SingularAccess>::Ref<'a>,
+    <WebhookIdField as SingularAccess>::Ref<'a>,
+    <PostalField<A> as SingularAccess>::Ref<'a>,
+    <UrgentField as SingularAccess>::Ref<'a>,
+>;
 
 /// Borrowed mutable projection of the active `notification` variant.
 ///
-/// `Urgent` uses a concrete [`BitRef`] rather than `impl Trait` because enum
-/// variants cannot hold `impl Trait`; public `_mut` accessors still return
-/// `impl DerefMut<Target = bool>`.
+/// Payload types come from [`SingularAccess::Mut`] on each field wrapper. Public
+/// `_mut` accessors may still return `impl Trait` (e.g. bool) where ergonomics
+/// prefer it; enum variants need the named associated type.
 pub type NotificationMut<'a, A> = Notification<
-    StringGuard<'a, A>,
-    StringGuard<'a, A>,
-    &'a mut i32,
-    &'a mut Address<A>,
-    ::bitvec::ptr::BitRef<'a, ::bitvec::ptr::Mut, u8, ::bitvec::order::Lsb0>,
+    <EmailAddressField as SingularAccess>::Mut<'a, A>,
+    <PhoneNumberField as SingularAccess>::Mut<'a, A>,
+    <WebhookIdField as SingularAccess>::Mut<'a, A>,
+    <PostalField<A> as SingularAccess>::Mut<'a, A>,
+    <UrgentField as SingularAccess>::Mut<'a, A>,
 >;
 
-impl<A: Allocator + Clone> Clone for NotificationRef<'_, A> {
+// `A` must appear structurally (not only inside an associated-type projection)
+// for these impls — see rustc E0207. `PostalField`'s `Ref` is `&Address<A>`.
+impl<'a, A: Allocator + Clone> Clone
+    for Notification<
+        <EmailAddressField as SingularAccess>::Ref<'a>,
+        <PhoneNumberField as SingularAccess>::Ref<'a>,
+        <WebhookIdField as SingularAccess>::Ref<'a>,
+        &'a Address<A>,
+        <UrgentField as SingularAccess>::Ref<'a>,
+    >
+{
     fn clone(&self) -> Self {
         *self
     }
 }
-impl<A: Allocator + Clone> Copy for NotificationRef<'_, A> {}
+impl<'a, A: Allocator + Clone> Copy
+    for Notification<
+        <EmailAddressField as SingularAccess>::Ref<'a>,
+        <PhoneNumberField as SingularAccess>::Ref<'a>,
+        <WebhookIdField as SingularAccess>::Ref<'a>,
+        &'a Address<A>,
+        <UrgentField as SingularAccess>::Ref<'a>,
+    >
+{
+}
 
 impl<A: Allocator + Clone> OneofGroup for NotificationStorage<A> {
     type Case = NotificationCase;
@@ -201,7 +233,7 @@ impl<A: Allocator + Clone> OneofGroup for NotificationStorage<A> {
 }
 
 impl<A: Allocator + Clone> EnumVariant<EmailAddress> for NotificationStorage<A> {
-    type Value = SingularLenField<ProtoString, Oneof, { super::FIELD_EMAIL_ADDRESS }>;
+    type Value = EmailAddressField;
     type Alloc = A;
 
     fn new_value(alloc: A) -> Self::Value {
@@ -228,7 +260,7 @@ impl<A: Allocator + Clone> EnumVariant<EmailAddress> for NotificationStorage<A> 
 }
 
 impl<A: Allocator + Clone> EnumVariant<PhoneNumber> for NotificationStorage<A> {
-    type Value = SingularLenField<ProtoString, Oneof, { super::FIELD_PHONE_NUMBER }>;
+    type Value = PhoneNumberField;
     type Alloc = A;
 
     fn new_value(alloc: A) -> Self::Value {
@@ -255,8 +287,7 @@ impl<A: Allocator + Clone> EnumVariant<PhoneNumber> for NotificationStorage<A> {
 }
 
 impl<A: Allocator + Clone> EnumVariant<WebhookId> for NotificationStorage<A> {
-    type Value =
-        SingularVarintField<ProtoInt32, Oneof, { super::FIELD_WEBHOOK_ID }, WebhookIdDefault>;
+    type Value = WebhookIdField;
     type Alloc = A;
 
     fn new_value(alloc: A) -> Self::Value {
@@ -283,7 +314,7 @@ impl<A: Allocator + Clone> EnumVariant<WebhookId> for NotificationStorage<A> {
 }
 
 impl<A: Allocator + Clone> EnumVariant<Postal> for NotificationStorage<A> {
-    type Value = NestedMessageField<Address<A>, Oneof, { super::FIELD_POSTAL }, A>;
+    type Value = PostalField<A>;
     type Alloc = A;
 
     fn new_value(alloc: A) -> Self::Value {
@@ -310,7 +341,7 @@ impl<A: Allocator + Clone> EnumVariant<Postal> for NotificationStorage<A> {
 }
 
 impl<A: Allocator + Clone> EnumVariant<Urgent> for NotificationStorage<A> {
-    type Value = BoolField<Oneof, { super::BIT_URGENT_VALUE }, { super::FIELD_URGENT }>;
+    type Value = UrgentField;
     type Alloc = A;
 
     fn new_value(alloc: A) -> Self::Value {

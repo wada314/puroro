@@ -650,8 +650,10 @@ The sample `oneof notification` is deliberately **heterogeneous** — LEN, VARIN
 | `NotificationStorage<A>` | `pub(crate)` | field wrappers | owned storage; `OneofGroup` + `OneofDeallocate`; encode glue |
 | `NotificationCase` | `pub` | — | `Copy` discriminant (variants only; unset is `None`) → `notification_case() -> Option<_>` |
 | `OneofView` / `OneofViewMut` | rt `pub` | — | group bind (slot + `MessageCommon`) → `notification()` / `notification_mut()` |
-| `NotificationRef<'a, A>` | `pub` alias | `&'a str` / `i32` / `&'a Address<A>` / `bool` | projected read → `view.as_ref()` |
-| `NotificationMut<'a, A>` | `pub` alias | `StringGuard` / `&mut i32` / `&mut Address` / `BitRef` | projected mut → `view_mut.as_mut()` |
+| `NotificationRef<'a, A>` | `pub` alias | via [`SingularAccess`](puroro-rt/src/fields/singular/access.rs)::`Ref` | projected read → `view.as_ref()` |
+| `NotificationMut<'a, A>` | `pub` alias | via `SingularAccess::Mut` | projected mut → `view_mut.as_mut()` |
+
+**Ref/Mut payloads are not hard-coded in generated aliases.** Each singular wrapper implements [`SingularAccess`](puroro-rt/src/fields/singular/access.rs) (`SingularField` forwards to [`ScalarProtoType`](puroro-rt/src/fields/wire/scalar.rs); `BoolField` / `NestedMessageField` supply their own). Per-variant private field type aliases are the single source for Storage and for those projections.
 
 **Variants own field wrappers, not raw storage.** Each variant holds the same field wrapper an ordinary singular field of that kind uses (`SingularField` / aliases for non-bool scalars and LEN; `BoolField` for `bool`; `NestedMessageField` for messages), so `value` / `value_mut` / `deallocate` are reused. The wrapper's presence is inert here (`Oneof` / `FieldPresence::Oneof`), so presence-aware omit rules are never consulted; bool still packs its value into `_common.presence`. Singular scalar / LEN wrappers no longer take `A`; the storage alias stays generic over `A` for nested message variants and for `value_mut(alloc)` call sites.
 

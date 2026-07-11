@@ -701,24 +701,27 @@ pub enum Notification<Ea, Pn, Wh, Po, Ur> {
     EmailAddress(Ea), PhoneNumber(Pn), WebhookId(Wh), Postal(Po), Urgent(Ur),
 }
 
-// (1) Owned storage — crate-internal alias of the shape with field-wrapper payloads.
-//     Implements OneofGroup, OneofDeallocate, and encode glue. Never public.
+// (1) Owned storage — crate-internal alias; per-variant private field aliases
+//     are the single source of truth. Implements OneofGroup, OneofDeallocate,
+//     encode glue. Never public.
+type EmailAddressField = SingularLenField<ProtoString, Oneof, FIELD_EMAIL>;
+// … PhoneNumberField, WebhookIdField, PostalField<A>, UrgentField
 pub(crate) type NotificationStorage<A> = Notification<
-    SingularLenField<ProtoString, Oneof, FIELD_EMAIL>,
-    SingularLenField<ProtoString, Oneof, FIELD_PHONE>,
-    SingularVarintField<ProtoInt32, Oneof, FIELD_WEBHOOK, WebhookIdDefault>,
-    NestedMessageField<Address<A>, Oneof, FIELD_POSTAL, A>,
-    BoolField<Oneof, FIELD_URGENT>,
+    EmailAddressField, PhoneNumberField, WebhookIdField, PostalField<A>, UrgentField,
 >;
 
 // (2) Payload-less case discriminant (unset is `None`, so no `NotSet` member).
 pub enum NotificationCase { EmailAddress, PhoneNumber, WebhookId, Postal, Urgent }
 
-// (3) Safe projected aliases of the *active* variant (from view.as_ref / as_mut).
-//     Pattern-match with `Notification::…` (type aliases do not invent variant paths).
-pub type NotificationRef<'a, A> = Notification<&'a str, &'a str, i32, &'a Address<A>, bool>;
+// (3) Safe projected aliases — payloads from SingularAccess on each field wrapper
+//     (no StringGuard / BitRef hard-coding). Pattern-match with `Notification::…`.
+pub type NotificationRef<'a, A> = Notification<
+    <EmailAddressField as SingularAccess>::Ref<'a>,
+    /* … */,
+>;
 pub type NotificationMut<'a, A> = Notification<
-    StringGuard<'a, A>, StringGuard<'a, A>, &'a mut i32, &'a mut Address<A>, /* BitRef */,
+    <EmailAddressField as SingularAccess>::Mut<'a, A>,
+    /* … */,
 >;
 
 // Accessors on Task — RPIT so `NotificationStorage` stays out of the signature:

@@ -7,6 +7,7 @@ publish = false
 
 [dependencies]
 allocator-api2 = "0.4"
+bitvec = "1"
 bytes = "1"
 derive_more = { version = "2.1", default-features = false, features = ["deref", "deref_mut", "from", "into"] }
 protobuf-core = { path = "../protobuf-core" }

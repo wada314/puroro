@@ -89,6 +89,7 @@ name = "puroro-rt"
 version = "0.1.0"
 dependencies = [
  "allocator-api2",
+ "bitvec",
  "bytes",
  "derive_more",
  "protobuf-core",

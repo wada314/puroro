@@ -3,12 +3,14 @@
 //! “Singular” covers both presence-tracked (`EXPLICIT`) and non-presence-tracked
 //! (`IMPLICIT`) fields; see [`field`](crate::fields::singular::field).
 
+pub(crate) mod access;
 pub(crate) mod bool;
 pub(crate) mod field;
 pub(crate) mod len;
 pub(crate) mod message;
 pub(crate) mod varint;
 
+pub use access::SingularAccess;
 pub use bool::{
     BoolField, BoolFieldMut, BoolFieldRef, ExplicitBoolField, ImplicitBoolField,
     LegacyRequiredBoolField, OneofBoolField,

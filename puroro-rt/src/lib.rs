@@ -35,8 +35,8 @@ pub use fields::singular::{
     ImplicitBoolField, ImplicitBytes, ImplicitEnum, ImplicitInt32, ImplicitLenField, ImplicitString,
     ImplicitVarint, ImplicitVarintField, LegacyRequiredBoolField, MessagePresence, NestedMessage,
     NestedMessageField, NestedMessageFieldMut, NestedMessageFieldRef, OneofBoolField, Singular,
-    SingularField, SingularFieldMut, SingularFieldRef, SingularLen, SingularLenField,
-    SingularLenFieldMut, SingularLenFieldRef, SingularVarint, SingularVarintField,
+    SingularAccess, SingularField, SingularFieldMut, SingularFieldRef, SingularLen,
+    SingularLenField, SingularLenFieldMut, SingularLenFieldRef, SingularVarint, SingularVarintField,
     SingularVarintFieldMut, SingularVarintFieldRef,
 };
 pub use fields::wire::{
