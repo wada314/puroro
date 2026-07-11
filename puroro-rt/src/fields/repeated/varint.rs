@@ -6,8 +6,8 @@
 use ::core::marker::PhantomData;
 use ::core::mem::ManuallyDrop;
 
-use ::bytes::{Buf, BufMut};
 use ::allocator_api2::alloc::Allocator;
+use ::bytes::{Buf, BufMut};
 use ::unmanaged::UnmanagedVec;
 use ::unmanaged::vec::VecGuard;
 
@@ -15,7 +15,7 @@ use crate::decode;
 use ::puroro::DecodeError;
 use ::puroro::WireType;
 
-use crate::fields::shared::{BindableMut, MessageCommon, PresenceBits};
+use crate::fields::shared::{Bindable, BindableMut, MessageCommon, PresenceBits};
 use crate::fields::wire::varint::{self, VarintProtoType};
 
 use super::encoding::RepeatedVarintEncoding;
@@ -25,7 +25,12 @@ use super::encoding::RepeatedVarintEncoding;
 /// Param `E` is [`Packed`](super::encoding::Packed) or
 /// [`Expanded`](super::encoding::Expanded) — affects **encode only**.
 /// [`RepeatedVarintFieldMut::merge`] accepts both packed and expanded wire forms.
-pub struct RepeatedVarintField<T: VarintProtoType, E: RepeatedVarintEncoding, const FIELD: u32, A: Allocator> {
+pub struct RepeatedVarintField<
+    T: VarintProtoType,
+    E: RepeatedVarintEncoding,
+    const FIELD: u32,
+    A: Allocator,
+> {
     values: ManuallyDrop<UnmanagedVec<T::Value>>,
     _marker: PhantomData<(E, A)>,
 }
@@ -81,6 +86,80 @@ impl<T: VarintProtoType, E: RepeatedVarintEncoding, const FIELD: u32, A: Allocat
 }
 
 // ---------------------------------------------------------------------------
+// Read view
+// ---------------------------------------------------------------------------
+
+/// Short-lived shared binding of a repeated varint field to its message common
+/// state, produced by [`Bindable::bind`](crate::fields::shared::Bindable::bind).
+///
+/// Mirrors [`RepeatedVarintFieldMut`] for the read path. Generated getters always
+/// go through this view — `field.bind(&common).as_slice()` — even though the
+/// accessor does not consult `common`.
+pub struct RepeatedVarintFieldRef<
+    'a,
+    T: VarintProtoType,
+    E: RepeatedVarintEncoding,
+    const FIELD: u32,
+    Pb: PresenceBits,
+    A: Allocator,
+> {
+    field: &'a RepeatedVarintField<T, E, FIELD, A>,
+    /// Bound for symmetry with [`RepeatedVarintFieldMut`]; unused by current getters.
+    #[allow(dead_code)]
+    common: &'a MessageCommon<Pb, A>,
+}
+
+impl<
+    'a,
+    T: VarintProtoType,
+    E: RepeatedVarintEncoding,
+    const FIELD: u32,
+    Pb: PresenceBits,
+    A: Allocator,
+> RepeatedVarintFieldRef<'a, T, E, FIELD, Pb, A>
+{
+    #[inline]
+    fn new(
+        field: &'a RepeatedVarintField<T, E, FIELD, A>,
+        common: &'a MessageCommon<Pb, A>,
+    ) -> Self {
+        Self { field, common }
+    }
+
+    #[inline]
+    pub fn as_slice(self) -> &'a [T::Value] {
+        self.field.as_slice()
+    }
+
+    #[inline]
+    pub fn is_empty(self) -> bool {
+        self.field.is_empty()
+    }
+}
+
+impl<
+    T: VarintProtoType,
+    E: RepeatedVarintEncoding,
+    const FIELD: u32,
+    A: Allocator + Clone,
+    Pb: PresenceBits,
+> Bindable<MessageCommon<Pb, A>> for RepeatedVarintField<T, E, FIELD, A>
+{
+    type Bound<'a>
+        = RepeatedVarintFieldRef<'a, T, E, FIELD, Pb, A>
+    where
+        Self: 'a,
+        MessageCommon<Pb, A>: 'a;
+
+    fn bind<'a>(
+        &'a self,
+        common: &'a MessageCommon<Pb, A>,
+    ) -> RepeatedVarintFieldRef<'a, T, E, FIELD, Pb, A> {
+        RepeatedVarintFieldRef::new(self, common)
+    }
+}
+
+// ---------------------------------------------------------------------------
 // Mutation view
 // ---------------------------------------------------------------------------
 
@@ -105,14 +184,14 @@ pub struct RepeatedVarintFieldMut<
 }
 
 impl<
-        'f,
-        'c,
-        T: VarintProtoType,
-        E: RepeatedVarintEncoding,
-        const FIELD: u32,
-        Pb: PresenceBits,
-        A: Allocator,
-    > RepeatedVarintFieldMut<'f, 'c, T, E, FIELD, Pb, A>
+    'f,
+    'c,
+    T: VarintProtoType,
+    E: RepeatedVarintEncoding,
+    const FIELD: u32,
+    Pb: PresenceBits,
+    A: Allocator,
+> RepeatedVarintFieldMut<'f, 'c, T, E, FIELD, Pb, A>
 {
     #[inline]
     fn new(
@@ -178,14 +257,15 @@ impl<
 }
 
 impl<
-        T: VarintProtoType,
-        E: RepeatedVarintEncoding,
-        const FIELD: u32,
-        A: Allocator + Clone,
-        Pb: PresenceBits,
-    > BindableMut<MessageCommon<Pb, A>> for RepeatedVarintField<T, E, FIELD, A>
+    T: VarintProtoType,
+    E: RepeatedVarintEncoding,
+    const FIELD: u32,
+    A: Allocator + Clone,
+    Pb: PresenceBits,
+> BindableMut<MessageCommon<Pb, A>> for RepeatedVarintField<T, E, FIELD, A>
 {
-    type BoundMut<'f, 'c> = RepeatedVarintFieldMut<'f, 'c, T, E, FIELD, Pb, A>
+    type BoundMut<'f, 'c>
+        = RepeatedVarintFieldMut<'f, 'c, T, E, FIELD, Pb, A>
     where
         Self: 'f,
         MessageCommon<Pb, A>: 'c;

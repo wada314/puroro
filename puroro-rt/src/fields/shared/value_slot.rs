@@ -18,8 +18,8 @@ use ::core::ops::DerefMut;
 use ::allocator_api2::alloc::Allocator;
 
 use super::{
+    DeallocateIn, DefaultIn,
     slot_init::{SlotInitMut, SlotInitView},
-    DefaultIn, DeallocateIn,
 };
 
 /// Storage operations for a singular field value slot.

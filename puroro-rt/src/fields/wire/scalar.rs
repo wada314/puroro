@@ -15,7 +15,7 @@ use ::puroro::WireType;
 
 use crate::decode;
 use crate::encode;
-use crate::fields::shared::{DefaultIn, DeallocateIn, ProtoEmpty};
+use crate::fields::shared::{DeallocateIn, DefaultIn, ProtoEmpty};
 
 use super::len::{LenProtoType, ProtoBytes, ProtoString};
 use super::varint::{
@@ -95,7 +95,10 @@ macro_rules! impl_varint_scalar {
 
             #[inline]
             fn encoded_len(field: u32, storage: &Self::Storage) -> usize {
-                encode::encoded_len_varint_field(field, <Self as VarintProtoType>::encode_wire(*storage))
+                encode::encoded_len_varint_field(
+                    field,
+                    <Self as VarintProtoType>::encode_wire(*storage),
+                )
             }
 
             #[inline]
@@ -133,8 +136,14 @@ impl_varint_scalar!(ProtoBool);
 
 impl<E: ProtoEnumStorage> ScalarProtoType for ProtoEnum<E> {
     type Storage = E;
-    type Ref<'a> = E where E: 'a;
-    type Mut<'a, A: Allocator + 'a> = &'a mut E where E: 'a;
+    type Ref<'a>
+        = E
+    where
+        E: 'a;
+    type Mut<'a, A: Allocator + 'a>
+        = &'a mut E
+    where
+        E: 'a;
     const WIRE_TYPE: WireType = WireType::Varint;
 
     #[inline]
@@ -201,7 +210,10 @@ macro_rules! impl_len_scalar {
 
             #[inline]
             fn encoded_len(field: u32, storage: &Self::Storage) -> usize {
-                encode::encoded_len_len_field(field, <Self as LenProtoType>::as_bytes(storage).len())
+                encode::encoded_len_len_field(
+                    field,
+                    <Self as LenProtoType>::as_bytes(storage).len(),
+                )
             }
 
             #[inline]

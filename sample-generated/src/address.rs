@@ -10,7 +10,8 @@ use ::bytes::{Buf, BufMut};
 
 use ::puroro::{DecodeError, MessageDecode, MessageEncode};
 use ::puroro_rt::{
-    BindableMut, Explicit, MessageCommon, NestedMessage, PresenceBits, ProtoString, SingularLenField,
+    Bindable, BindableMut, Explicit, MessageCommon, NestedMessage, PresenceBits, ProtoString,
+    SingularLenField,
 };
 
 // ---------------------------------------------------------------------------
@@ -55,7 +56,7 @@ pub const FIELD_CITY: u32 = 2; // city
 pub struct Address<A: Allocator + Clone = Global> {
     _common: MessageCommon<AddressPresence, A>,
     street: SingularLenField<ProtoString, Explicit<{ BIT_STREET }>, { FIELD_STREET }>, // proto: string street = 1;
-    city: SingularLenField<ProtoString, Explicit<{ BIT_CITY }>, { FIELD_CITY }>,   // proto: string city = 2;
+    city: SingularLenField<ProtoString, Explicit<{ BIT_CITY }>, { FIELD_CITY }>, // proto: string city = 2;
 }
 
 impl<A: Allocator + Clone> Address<A> {
@@ -72,7 +73,7 @@ impl<A: Allocator + Clone> Address<A> {
     // -- street (EXPLICIT string, proto field 1) ----------------------------
 
     pub fn street<'a>(&'a self) -> ::puroro::Optional<&'a str, impl ::puroro::HasDefault<&'a str>> {
-        self.street.optional(&self._common)
+        self.street.bind(&self._common).optional()
     }
 
     pub fn street_mut<'s>(
@@ -88,7 +89,7 @@ impl<A: Allocator + Clone> Address<A> {
     // -- city (EXPLICIT string, proto field 2) ------------------------------
 
     pub fn city<'a>(&'a self) -> ::puroro::Optional<&'a str, impl ::puroro::HasDefault<&'a str>> {
-        self.city.optional(&self._common)
+        self.city.bind(&self._common).optional()
     }
 
     pub fn city_mut<'s>(
@@ -143,9 +144,7 @@ impl<A: Allocator + Clone> Drop for Address<A> {
 impl<A: Allocator + Clone> MessageEncode for Address<A> {
     fn encoded_len(&self) -> usize {
         let c = &self._common;
-        self.street.encoded_len(c)
-            + self.city.encoded_len(c)
-            + c.unknown_fields.len()
+        self.street.encoded_len(c) + self.city.encoded_len(c) + c.unknown_fields.len()
     }
 
     fn encode_raw<B: BufMut>(&self, buf: &mut B) {

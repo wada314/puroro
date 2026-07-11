@@ -8,16 +8,18 @@ pub mod len;
 pub mod message;
 pub mod varint;
 
-pub use field::{SingularField, SingularFieldMut};
+pub use field::{SingularField, SingularFieldMut, SingularFieldRef};
 pub use len::{
     ExplicitBytes, ExplicitLenField, ExplicitString, ImplicitBytes, ImplicitLenField,
     ImplicitString, LegacyRequiredLenField, SingularLen, SingularLenField, SingularLenFieldMut,
+    SingularLenFieldRef,
 };
 pub use message::{
-    MessagePresence, NestedMessage, NestedMessageField, NestedMessageFieldMut, Singular,
+    MessagePresence, NestedMessage, NestedMessageField, NestedMessageFieldMut,
+    NestedMessageFieldRef, Singular,
 };
 pub use varint::{
     ExplicitEnum, ExplicitInt32, ExplicitVarint, ExplicitVarintField, ImplicitEnum, ImplicitInt32,
     ImplicitVarint, ImplicitVarintField, SingularVarint, SingularVarintField,
-    SingularVarintFieldMut,
+    SingularVarintFieldMut, SingularVarintFieldRef,
 };

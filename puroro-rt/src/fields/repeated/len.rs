@@ -8,15 +8,15 @@
 use ::core::marker::PhantomData;
 use ::core::mem::ManuallyDrop;
 
-use ::bytes::{Buf, BufMut};
 use ::allocator_api2::alloc::Allocator;
+use ::bytes::{Buf, BufMut};
 use ::unmanaged::UnmanagedVec;
 
 use crate::encode;
 use ::puroro::DecodeError;
 use ::puroro::WireType;
 
-use crate::fields::shared::{BindableMut, MessageCommon, PresenceBits};
+use crate::fields::shared::{Bindable, BindableMut, MessageCommon, PresenceBits};
 use crate::fields::wire::len::{self, LenProtoType};
 
 /// Repeated field whose elements are length-delimited records (one tag per element).
@@ -82,6 +82,65 @@ impl<T: LenProtoType, const FIELD: u32, A: Allocator> RepeatedLenField<T, FIELD,
 }
 
 // ---------------------------------------------------------------------------
+// Read view
+// ---------------------------------------------------------------------------
+
+/// Short-lived shared binding of a repeated LEN field to its message common
+/// state, produced by [`Bindable::bind`](crate::fields::shared::Bindable::bind).
+///
+/// Mirrors [`RepeatedLenFieldMut`] for the read path. Generated getters always
+/// go through this view — `field.bind(&common).as_slice()` — even though the
+/// accessor does not consult `common`.
+pub struct RepeatedLenFieldRef<
+    'a,
+    T: LenProtoType,
+    const FIELD: u32,
+    Pb: PresenceBits,
+    A: Allocator,
+> {
+    field: &'a RepeatedLenField<T, FIELD, A>,
+    /// Bound for symmetry with [`RepeatedLenFieldMut`]; unused by current getters.
+    #[allow(dead_code)]
+    common: &'a MessageCommon<Pb, A>,
+}
+
+impl<'a, T: LenProtoType, const FIELD: u32, Pb: PresenceBits, A: Allocator>
+    RepeatedLenFieldRef<'a, T, FIELD, Pb, A>
+{
+    #[inline]
+    fn new(field: &'a RepeatedLenField<T, FIELD, A>, common: &'a MessageCommon<Pb, A>) -> Self {
+        Self { field, common }
+    }
+
+    #[inline]
+    pub fn as_slice(self) -> &'a [T::Storage] {
+        self.field.as_slice()
+    }
+
+    #[inline]
+    pub fn is_empty(self) -> bool {
+        self.field.is_empty()
+    }
+}
+
+impl<T: LenProtoType, const FIELD: u32, A: Allocator + Clone, Pb: PresenceBits>
+    Bindable<MessageCommon<Pb, A>> for RepeatedLenField<T, FIELD, A>
+{
+    type Bound<'a>
+        = RepeatedLenFieldRef<'a, T, FIELD, Pb, A>
+    where
+        Self: 'a,
+        MessageCommon<Pb, A>: 'a;
+
+    fn bind<'a>(
+        &'a self,
+        common: &'a MessageCommon<Pb, A>,
+    ) -> RepeatedLenFieldRef<'a, T, FIELD, Pb, A> {
+        RepeatedLenFieldRef::new(self, common)
+    }
+}
+
+// ---------------------------------------------------------------------------
 // Mutation view
 // ---------------------------------------------------------------------------
 
@@ -92,8 +151,14 @@ impl<T: LenProtoType, const FIELD: u32, A: Allocator> RepeatedLenField<T, FIELD,
 /// can mutate through a single call. Repeated fields have no presence bit, so
 /// the view carries only `common` (for the allocator). Every method consumes
 /// a fresh `bind_mut` precedes each mutation.
-pub struct RepeatedLenFieldMut<'f, 'c, T: LenProtoType, const FIELD: u32, Pb: PresenceBits, A: Allocator>
-{
+pub struct RepeatedLenFieldMut<
+    'f,
+    'c,
+    T: LenProtoType,
+    const FIELD: u32,
+    Pb: PresenceBits,
+    A: Allocator,
+> {
     field: &'f mut RepeatedLenField<T, FIELD, A>,
     common: &'c mut MessageCommon<Pb, A>,
 }
@@ -102,7 +167,10 @@ impl<'f, 'c, T: LenProtoType, const FIELD: u32, Pb: PresenceBits, A: Allocator>
     RepeatedLenFieldMut<'f, 'c, T, FIELD, Pb, A>
 {
     #[inline]
-    fn new(field: &'f mut RepeatedLenField<T, FIELD, A>, common: &'c mut MessageCommon<Pb, A>) -> Self {
+    fn new(
+        field: &'f mut RepeatedLenField<T, FIELD, A>,
+        common: &'c mut MessageCommon<Pb, A>,
+    ) -> Self {
         Self { field, common }
     }
 
@@ -155,7 +223,8 @@ impl<'f, 'c, T: LenProtoType, const FIELD: u32, Pb: PresenceBits, A: Allocator>
 impl<T: LenProtoType, const FIELD: u32, A: Allocator + Clone, Pb: PresenceBits>
     BindableMut<MessageCommon<Pb, A>> for RepeatedLenField<T, FIELD, A>
 {
-    type BoundMut<'f, 'c> = RepeatedLenFieldMut<'f, 'c, T, FIELD, Pb, A>
+    type BoundMut<'f, 'c>
+        = RepeatedLenFieldMut<'f, 'c, T, FIELD, Pb, A>
     where
         Self: 'f,
         MessageCommon<Pb, A>: 'c;

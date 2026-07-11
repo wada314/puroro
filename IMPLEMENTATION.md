@@ -554,16 +554,18 @@ Storage is `ManuallyDrop<P::ValueSlot<T::Storage>>` (`T` or `MaybeUninit<T>`). H
 
 **Mutation goes through a bound view:** `field.bind_mut(&mut common)` yields [`SingularFieldMut`](puroro-rt/src/fields/singular/field.rs). `value_mut` ensures the slot is initialized, then returns `T::Mut` (e.g. `&mut i32` or `StringGuard`) after releasing the `common` borrow so the handle only ties up the field.
 
+**Read accessors also go through a bound view:** `field.bind(&common)` yields [`SingularFieldRef`](puroro-rt/src/fields/singular/field.rs). Generated getters always bind first — even for `IMPLICIT` `value()` which does not consult `common` — so read and write share one shape.
+
 | | IMPLICIT | EXPLICIT / LEGACY_REQUIRED |
 |---|---|---|
 | Encode | Omit when empty / type-zero | Omit when bit unset |
 | Merge | `bind_mut(&mut common).merge(wire, buf)` | same (sets bit via `SlotInitMut`) |
-| Getter | `value()` | `optional(&common)` |
+| Getter | `bind(&common).value()` | `bind(&common).optional()` |
 | Mutator | `bind_mut(&mut common).value_mut()` → `T::Mut` | same (sets bit) |
 | Clear | `bind_mut(&mut common).clear()` | same |
 | Release (LEN) | `deallocate(&common)` from message `Drop` | same |
 
-Getters and encode (`value` / `optional` / `has` / `encoded_len` / `encode_raw`) need only a shared `&common` and stay as plain field methods. Enum fields use `ProtoEnum<E>`; closed-enum unknown values use `merge_closed(…, |wire: i32| …)` on decode. `Optional` is a concrete struct (DESIGN.md §3); no `Option<T>` conversion.
+Encode / `deallocate` / `validate_required` stay as plain field methods that take `&common` directly. Enum fields use `ProtoEnum<E>`; closed-enum unknown values use `merge_closed(…, |wire: i32| …)` on decode. `Optional` is a concrete struct (DESIGN.md §3); no `Option<T>` conversion.
 
 ### LEGACY_REQUIRED
 
@@ -584,13 +586,13 @@ Wire identical to EXPLICIT. Message `validate()` calls `validate_required` on ea
 | Encode | One LEN record | One VARINT per element |
 | Decode | Both forms | Both forms |
 
-Elements live in `ManuallyDrop<UnmanagedVec<T::Value>>`. Mutation uses the same bound-view idiom as the LEN family: `field.bind(&mut common)` yields a [`RepeatedVarintFieldMut`](puroro-rt/src/fields/repeated/varint.rs) (no presence bit — repeated fields have none), whose consuming methods are `values_mut()` → guard (`impl DerefMut<Target = Vec<_, A>>`), `merge(wire, buf)`, and `clear()`; each obtains its own owned `alloc.clone()` from `common`. Read-only paths (`as_slice` / `is_empty` / `encoded_len` / `encode_raw`) stay on the field. `deallocate(A)` also stays on the field (called once from message `Drop`).
+Elements live in `ManuallyDrop<UnmanagedVec<T::Value>>`. Mutation uses the bound-view idiom: `field.bind_mut(&mut common)` yields a [`RepeatedVarintFieldMut`](puroro-rt/src/fields/repeated/varint.rs) (no presence bit — repeated fields have none), whose consuming methods are `values_mut()` → guard (`impl DerefMut<Target = Vec<_, A>>`), `merge(wire, buf)`, and `clear()`; each obtains its own owned `alloc.clone()` from `common`. Read accessors use the same idiom: `field.bind(&common)` yields [`RepeatedVarintFieldRef`](puroro-rt/src/fields/repeated/varint.rs) with `as_slice` / `is_empty` (they ignore `common`, but generated getters still bind for uniformity). Encode / `deallocate(A)` stay on the field (called once from message `Drop`).
 
 ### LEN (`RepeatedLenField<T, A>`)
 
-One LEN record per element (`repeated string` / `repeated bytes`), stored as `ManuallyDrop<UnmanagedVec<T::Storage>>`. Mutation uses the same bound-view idiom: `field.bind(&mut common)` yields a [`RepeatedLenFieldMut`](puroro-rt/src/fields/repeated/len.rs) (no presence bit — repeated fields have none), whose consuming methods are `push_in(impl AsRef<[u8]>)`, `merge(wire, buf)`, and `clear()`. The typed `push_in` helper is kept instead of a bare `DerefMut` (which would expose allocator-less element storage that is impractical to construct). Because each element is itself allocator-less, `clear`/`deallocate` **drain and free every element first** (each via its own owned `alloc.clone()`), then free the buffer. `deallocate(A)` stays on the field (called from `Drop`).
+One LEN record per element (`repeated string` / `repeated bytes`), stored as `ManuallyDrop<UnmanagedVec<T::Storage>>`. Mutation uses the same bound-view idiom: `field.bind_mut(&mut common)` yields a [`RepeatedLenFieldMut`](puroro-rt/src/fields/repeated/len.rs) (no presence bit — repeated fields have none), whose consuming methods are `push_in(impl AsRef<[u8]>)`, `merge(wire, buf)`, and `clear()`. The typed `push_in` helper is kept instead of a bare `DerefMut` (which would expose allocator-less element storage that is impractical to construct). Because each element is itself allocator-less, `clear`/`deallocate` **drain and free every element first** (each via its own owned `alloc.clone()`), then free the buffer. Read accessors use `field.bind(&common)` → [`RepeatedLenFieldRef`](puroro-rt/src/fields/repeated/len.rs) (`as_slice` / `is_empty`). `deallocate(A)` stays on the field (called from `Drop`).
 
-> Note: the bound-view idiom (`field.bind_mut(&mut common).op()`) covers every mutable field family — `SingularField`, `RepeatedLenField`, `RepeatedVarintField`, and `OneofSlot`. Terminal `deallocate` stays a direct field method (called from `Drop`).
+> Note: the bound-view idiom (`field.bind(&common).op()` / `field.bind_mut(&mut common).op()`) covers every field family — `SingularField`, `RepeatedLenField`, `RepeatedVarintField`, `NestedMessageField`, and `OneofSlot` — on both read and write paths. Terminal `deallocate` stays a direct field method (called from `Drop`).
 
 ---
 
@@ -598,7 +600,7 @@ One LEN record per element (`repeated string` / `repeated bytes`), stored as `Ma
 
 ### Nested (`NestedMessageField<M, P, FIELD, A>`)
 
-Storage is chosen by a `MessagePresence` marker (a GAT): [`Singular`](puroro-rt/src/fields/singular/message.rs) = `Option<UnmanagedBox<M>>` for ordinary fields; [`Oneof`](puroro-rt/src/fields/shared/field_presence.rs) = a bare `UnmanagedBox<M>` for oneof variants (the slot tracks presence, so the box is always there). Mutation uses the **same bound-view idiom** as scalar fields (`field.bind_mut(&mut common).merge(wire, buf)` / `.get_mut()` / `.clear()`). A nested message has no presence bit. `Singular` exposes `get()` / `get_mut()` (insert-if-absent); `Oneof` exposes `value()` / `value_mut()` (`&M` / `&mut M`). Encode: LEN tag + `child.encode_raw`. Decode merges into the child (creating it on first merge for `Singular`). Recursion limit: planned ([§17](#17-planned-optimisations--runtime-gaps)).
+Storage is chosen by a `MessagePresence` marker (a GAT): [`Singular`](puroro-rt/src/fields/singular/message.rs) = `Option<UnmanagedBox<M>>` for ordinary fields; [`Oneof`](puroro-rt/src/fields/shared/field_presence.rs) = a bare `UnmanagedBox<M>` for oneof variants (the slot tracks presence, so the box is always there). Mutation uses the **same bound-view idiom** as scalar fields (`field.bind_mut(&mut common).merge(wire, buf)` / `.get_mut()` / `.clear()`). Read accessors use `field.bind(&common).get()` / `.value()`. A nested message has no presence bit. `Singular` exposes `get()` / `get_mut()` (insert-if-absent); `Oneof` exposes `value()` / `value_mut()` (`&M` / `&mut M`). Encode: LEN tag + `child.encode_raw`. Decode merges into the child (creating it on first merge for `Singular`). Recursion limit: planned ([§17](#17-planned-optimisations--runtime-gaps)).
 
 ### Oneof (`OneofSlot<E>`)
 

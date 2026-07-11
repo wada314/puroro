@@ -25,8 +25,8 @@ use ::puroro::WireType;
 use ::puroro::{HasDefault, Optional};
 
 use crate::fields::shared::{
-    BindableMut, MessageCommon, PresenceBits,
-    field_presence::{FieldPresence, LegacyRequired, Oneof, RequiredFieldPresence},
+    Bindable, BindableMut, MessageCommon, PresenceBits,
+    field_presence::{FieldPresence, Implicit, LegacyRequired, Oneof, RequiredFieldPresence},
     slot_init::AlwaysInitialized,
     value_slot::ValueSlot,
 };
@@ -36,12 +36,8 @@ use crate::fields::wire::varint::{self, VarintProtoType};
 /// Singular (non-repeated) scalar field — varint or LEN, selected by `T`.
 ///
 /// Covers both `IMPLICIT` and `EXPLICIT` / `LEGACY_REQUIRED` presence via `P`.
-pub struct SingularField<
-    T: ScalarProtoType,
-    P: FieldPresence,
-    const FIELD: u32,
-    D = ProtoDefault,
-> where
+pub struct SingularField<T: ScalarProtoType, P: FieldPresence, const FIELD: u32, D = ProtoDefault>
+where
     P::ValueSlot<T::Storage>: ValueSlot<T::Storage>,
 {
     value: ManuallyDrop<P::ValueSlot<T::Storage>>,
@@ -148,37 +144,10 @@ where
     }
 }
 
-impl<T: ScalarProtoType, P: FieldPresence, const FIELD: u32, D> SingularField<T, P, FIELD, D>
-where
-    P::ValueSlot<T::Storage>: ValueSlot<T::Storage>,
-    for<'a> T::Ref<'a>: Copy,
-    D: for<'a> HasDefault<T::Ref<'a>>,
-{
-    pub fn optional<'a, Pb, A>(
-        &'a self,
-        common: &MessageCommon<Pb, A>,
-    ) -> Optional<T::Ref<'a>, D>
-    where
-        Pb: PresenceBits,
-        A: Allocator,
-    {
-        let init = P::slot_init_view(common);
-        let v = if P::is_set(common, || P::payload_is_empty(&self.value)) {
-            Some(T::borrow(
-                self.value
-                    .as_ref(&init)
-                    .expect("is_set implies initialized slot"),
-            ))
-        } else {
-            None
-        };
-        Optional::new(v)
-    }
-}
-
-impl<T: ScalarProtoType, const FIELD: u32, D>
-    SingularField<T, crate::fields::shared::field_presence::Implicit, FIELD, D>
-{
+impl<T: ScalarProtoType, const FIELD: u32, D> SingularField<T, Implicit, FIELD, D> {
+    /// Low-level borrow of the always-initialized slot (no `common`).
+    ///
+    /// Generated message getters go through [`SingularFieldRef::value`] instead.
     #[inline]
     pub fn value(&self) -> T::Ref<'_> {
         T::borrow(
@@ -190,6 +159,10 @@ impl<T: ScalarProtoType, const FIELD: u32, D>
 }
 
 impl<T: ScalarProtoType, const FIELD: u32, D> SingularField<T, Oneof, FIELD, D> {
+    /// Low-level borrow of the always-initialized oneof-variant slot (no `common`).
+    ///
+    /// Used by oneof storage projections; generated getters go through
+    /// [`SingularFieldRef::value`] / [`SingularFieldRef::optional`].
     #[inline]
     pub fn value(&self) -> T::Ref<'_> {
         T::borrow(
@@ -216,10 +189,7 @@ impl<T: ScalarProtoType, const BIT: usize, const FIELD: u32, D>
 where
     <LegacyRequired<BIT> as FieldPresence>::ValueSlot<T::Storage>: ValueSlot<T::Storage>,
 {
-    pub fn validate_required<Pb, A>(
-        &self,
-        common: &MessageCommon<Pb, A>,
-    ) -> Result<(), DecodeError>
+    pub fn validate_required<Pb, A>(&self, common: &MessageCommon<Pb, A>) -> Result<(), DecodeError>
     where
         Pb: PresenceBits,
         A: Allocator,
@@ -227,6 +197,113 @@ where
         LegacyRequired::<BIT>::validate_present(common, FIELD, || {
             LegacyRequired::<BIT>::payload_is_empty(&self.value)
         })
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Read view
+// ---------------------------------------------------------------------------
+
+/// Short-lived shared binding of a singular field to its message common state,
+/// produced by [`Bindable::bind`](crate::fields::shared::Bindable::bind).
+///
+/// Mirrors [`SingularFieldMut`] for the read path. Generated getters always go
+/// through this view — `field.bind(&common).optional()` / `.value()` — even when
+/// a particular accessor does not consult `common`.
+pub struct SingularFieldRef<
+    'a,
+    T: ScalarProtoType,
+    P: FieldPresence,
+    const FIELD: u32,
+    D,
+    Pb: PresenceBits,
+    A: Allocator,
+> where
+    P::ValueSlot<T::Storage>: ValueSlot<T::Storage>,
+{
+    field: &'a SingularField<T, P, FIELD, D>,
+    common: &'a MessageCommon<Pb, A>,
+}
+
+impl<'a, T: ScalarProtoType, P: FieldPresence, const FIELD: u32, D, Pb: PresenceBits, A: Allocator>
+    SingularFieldRef<'a, T, P, FIELD, D, Pb, A>
+where
+    P::ValueSlot<T::Storage>: ValueSlot<T::Storage>,
+{
+    #[inline]
+    fn new(field: &'a SingularField<T, P, FIELD, D>, common: &'a MessageCommon<Pb, A>) -> Self {
+        Self { field, common }
+    }
+
+    #[inline]
+    pub fn has(self) -> bool {
+        P::is_set(self.common, || P::payload_is_empty(&self.field.value))
+    }
+}
+
+impl<'a, T: ScalarProtoType, P: FieldPresence, const FIELD: u32, D, Pb: PresenceBits, A: Allocator>
+    SingularFieldRef<'a, T, P, FIELD, D, Pb, A>
+where
+    P::ValueSlot<T::Storage>: ValueSlot<T::Storage>,
+    for<'b> T::Ref<'b>: Copy,
+    D: for<'b> HasDefault<T::Ref<'b>>,
+{
+    pub fn optional(self) -> Optional<T::Ref<'a>, D> {
+        let init = P::slot_init_view(self.common);
+        let v = if P::is_set(self.common, || P::payload_is_empty(&self.field.value)) {
+            Some(T::borrow(
+                self.field
+                    .value
+                    .as_ref(&init)
+                    .expect("is_set implies initialized slot"),
+            ))
+        } else {
+            None
+        };
+        Optional::new(v)
+    }
+}
+
+impl<'a, T: ScalarProtoType, const FIELD: u32, D, Pb: PresenceBits, A: Allocator>
+    SingularFieldRef<'a, T, Implicit, FIELD, D, Pb, A>
+{
+    #[inline]
+    pub fn value(self) -> T::Ref<'a> {
+        self.field.value()
+    }
+}
+
+impl<'a, T: ScalarProtoType, const FIELD: u32, D, Pb: PresenceBits, A: Allocator>
+    SingularFieldRef<'a, T, Oneof, FIELD, D, Pb, A>
+{
+    #[inline]
+    pub fn value(self) -> T::Ref<'a> {
+        self.field.value()
+    }
+}
+
+impl<
+    T: ScalarProtoType,
+    P: FieldPresence,
+    const FIELD: u32,
+    D,
+    A: Allocator + Clone,
+    Pb: PresenceBits,
+> Bindable<MessageCommon<Pb, A>> for SingularField<T, P, FIELD, D>
+where
+    P::ValueSlot<T::Storage>: ValueSlot<T::Storage>,
+{
+    type Bound<'a>
+        = SingularFieldRef<'a, T, P, FIELD, D, Pb, A>
+    where
+        Self: 'a,
+        MessageCommon<Pb, A>: 'a;
+
+    fn bind<'a>(
+        &'a self,
+        common: &'a MessageCommon<Pb, A>,
+    ) -> SingularFieldRef<'a, T, P, FIELD, D, Pb, A> {
+        SingularFieldRef::new(self, common)
     }
 }
 
@@ -252,15 +329,15 @@ pub struct SingularFieldMut<
 }
 
 impl<
-        'f,
-        'c,
-        T: ScalarProtoType,
-        P: FieldPresence,
-        const FIELD: u32,
-        D,
-        Pb: PresenceBits,
-        A: Allocator,
-    > SingularFieldMut<'f, 'c, T, P, FIELD, D, Pb, A>
+    'f,
+    'c,
+    T: ScalarProtoType,
+    P: FieldPresence,
+    const FIELD: u32,
+    D,
+    Pb: PresenceBits,
+    A: Allocator,
+> SingularFieldMut<'f, 'c, T, P, FIELD, D, Pb, A>
 where
     P::ValueSlot<T::Storage>: ValueSlot<T::Storage>,
 {
@@ -320,15 +397,15 @@ where
 }
 
 impl<
-        'f,
-        'c,
-        T: ScalarProtoType + VarintProtoType<Value = <T as ScalarProtoType>::Storage>,
-        P: FieldPresence,
-        const FIELD: u32,
-        D,
-        Pb: PresenceBits,
-        A: Allocator,
-    > SingularFieldMut<'f, 'c, T, P, FIELD, D, Pb, A>
+    'f,
+    'c,
+    T: ScalarProtoType + VarintProtoType<Value = <T as ScalarProtoType>::Storage>,
+    P: FieldPresence,
+    const FIELD: u32,
+    D,
+    Pb: PresenceBits,
+    A: Allocator,
+> SingularFieldMut<'f, 'c, T, P, FIELD, D, Pb, A>
 where
     P::ValueSlot<T::Storage>: ValueSlot<T::Storage>,
     T::Storage: Copy,
@@ -368,17 +445,18 @@ where
 }
 
 impl<
-        T: ScalarProtoType,
-        P: FieldPresence,
-        const FIELD: u32,
-        D,
-        A: Allocator + Clone,
-        Pb: PresenceBits,
-    > BindableMut<MessageCommon<Pb, A>> for SingularField<T, P, FIELD, D>
+    T: ScalarProtoType,
+    P: FieldPresence,
+    const FIELD: u32,
+    D,
+    A: Allocator + Clone,
+    Pb: PresenceBits,
+> BindableMut<MessageCommon<Pb, A>> for SingularField<T, P, FIELD, D>
 where
     P::ValueSlot<T::Storage>: ValueSlot<T::Storage>,
 {
-    type BoundMut<'f, 'c> = SingularFieldMut<'f, 'c, T, P, FIELD, D, Pb, A>
+    type BoundMut<'f, 'c>
+        = SingularFieldMut<'f, 'c, T, P, FIELD, D, Pb, A>
     where
         Self: 'f,
         MessageCommon<Pb, A>: 'c;

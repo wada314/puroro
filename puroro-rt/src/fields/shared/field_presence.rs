@@ -12,8 +12,9 @@ use ::core::mem::MaybeUninit;
 use ::puroro::DecodeError;
 
 use super::{
+    DeallocateIn, DefaultIn, MessageCommon, PresenceBits, ProtoEmpty,
     slot_init::{AlwaysInitialized, BitInitMut, BitInitView, SlotInitMut, SlotInitView},
-    value_slot::ValueSlot, DefaultIn, DeallocateIn, MessageCommon, PresenceBits, ProtoEmpty,
+    value_slot::ValueSlot,
 };
 
 /// Encode / merge / clear behaviour for singular field presence.
@@ -47,16 +48,15 @@ pub trait FieldPresence: Copy {
     /// `true` when the stored payload equals the protobuf empty / type-zero.
     ///
     /// Only [`Implicit`] consults the slot; bitfield-backed policies never call this.
-    fn payload_is_empty<T: DefaultIn + DeallocateIn + ProtoEmpty>(slot: &Self::ValueSlot<T>) -> bool;
+    fn payload_is_empty<T: DefaultIn + DeallocateIn + ProtoEmpty>(
+        slot: &Self::ValueSlot<T>,
+    ) -> bool;
 
     /// `true` when this field should be written on the wire.
     ///
     /// `is_payload_empty` is evaluated only when the policy depends on the stored
     /// value (e.g. [`Implicit`]); bitfield-backed policies ignore it.
-    fn should_emit<P, A, F>(
-        common: &MessageCommon<P, A>,
-        is_payload_empty: F,
-    ) -> bool
+    fn should_emit<P, A, F>(common: &MessageCommon<P, A>, is_payload_empty: F) -> bool
     where
         P: PresenceBits,
         A: Allocator,
@@ -187,9 +187,7 @@ impl<const BIT: usize> FieldPresence for Explicit<BIT> {
     type SlotInitMut<'a, P: PresenceBits + 'a, A: Allocator + 'a> = BitInitMut<'a, BIT, P, A>;
     type SlotInitView<'a, P: PresenceBits + 'a, A: Allocator + 'a> = BitInitView<'a, BIT, P, A>;
 
-    fn slot_init_mut<'a, Pb, A>(
-        common: &'a mut MessageCommon<Pb, A>,
-    ) -> BitInitMut<'a, BIT, Pb, A>
+    fn slot_init_mut<'a, Pb, A>(common: &'a mut MessageCommon<Pb, A>) -> BitInitMut<'a, BIT, Pb, A>
     where
         Pb: PresenceBits,
         A: Allocator,
@@ -197,9 +195,7 @@ impl<const BIT: usize> FieldPresence for Explicit<BIT> {
         BitInitMut::new(common)
     }
 
-    fn slot_init_view<'a, Pb, A>(
-        common: &'a MessageCommon<Pb, A>,
-    ) -> BitInitView<'a, BIT, Pb, A>
+    fn slot_init_view<'a, Pb, A>(common: &'a MessageCommon<Pb, A>) -> BitInitView<'a, BIT, Pb, A>
     where
         Pb: PresenceBits,
         A: Allocator,
@@ -246,9 +242,7 @@ impl<const BIT: usize> FieldPresence for LegacyRequired<BIT> {
     type SlotInitMut<'a, P: PresenceBits + 'a, A: Allocator + 'a> = BitInitMut<'a, BIT, P, A>;
     type SlotInitView<'a, P: PresenceBits + 'a, A: Allocator + 'a> = BitInitView<'a, BIT, P, A>;
 
-    fn slot_init_mut<'a, Pb, A>(
-        common: &'a mut MessageCommon<Pb, A>,
-    ) -> BitInitMut<'a, BIT, Pb, A>
+    fn slot_init_mut<'a, Pb, A>(common: &'a mut MessageCommon<Pb, A>) -> BitInitMut<'a, BIT, Pb, A>
     where
         Pb: PresenceBits,
         A: Allocator,
@@ -256,9 +250,7 @@ impl<const BIT: usize> FieldPresence for LegacyRequired<BIT> {
         BitInitMut::new(common)
     }
 
-    fn slot_init_view<'a, Pb, A>(
-        common: &'a MessageCommon<Pb, A>,
-    ) -> BitInitView<'a, BIT, Pb, A>
+    fn slot_init_view<'a, Pb, A>(common: &'a MessageCommon<Pb, A>) -> BitInitView<'a, BIT, Pb, A>
     where
         Pb: PresenceBits,
         A: Allocator,

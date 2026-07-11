@@ -1,36 +1,31 @@
 //! Type aliases for singular varint fields ([`SingularField`] with varint markers).
 
 use crate::defaults::ProtoDefault;
-use crate::fields::singular::field::{SingularField, SingularFieldMut};
+use crate::fields::shared::field_presence::{Explicit, Implicit, LegacyRequired, Oneof};
+use crate::fields::singular::field::{SingularField, SingularFieldMut, SingularFieldRef};
 use crate::fields::wire::varint;
 
 /// Singular varint field — alias of [`SingularField`].
 pub type SingularVarintField<T, P, const FIELD: u32, D = ProtoDefault> =
     SingularField<T, P, FIELD, D>;
 
+/// Bound shared view for a singular varint field.
+pub type SingularVarintFieldRef<'a, T, P, const FIELD: u32, D, Pb, A> =
+    SingularFieldRef<'a, T, P, FIELD, D, Pb, A>;
+
 /// Bound mutation view for a singular varint field.
-pub type SingularVarintFieldMut<
-    'f,
-    'c,
-    T,
-    P,
-    const FIELD: u32,
-    D,
-    Pb,
-    A,
-> = SingularFieldMut<'f, 'c, T, P, FIELD, D, Pb, A>;
+pub type SingularVarintFieldMut<'f, 'c, T, P, const FIELD: u32, D, Pb, A> =
+    SingularFieldMut<'f, 'c, T, P, FIELD, D, Pb, A>;
 
 pub type SingularVarint<T, P, const FIELD: u32, D = ProtoDefault> =
     SingularVarintField<T, P, FIELD, D>;
 
-pub type ImplicitVarintField<T, const FIELD: u32> =
-    SingularVarintField<T, crate::fields::shared::field_presence::Implicit, FIELD>;
-pub type OneofVarintField<T, const FIELD: u32> =
-    SingularVarintField<T, crate::fields::shared::field_presence::Oneof, FIELD>;
+pub type ImplicitVarintField<T, const FIELD: u32> = SingularVarintField<T, Implicit, FIELD>;
+pub type OneofVarintField<T, const FIELD: u32> = SingularVarintField<T, Oneof, FIELD>;
 pub type ExplicitVarintField<T, const BIT: usize, const FIELD: u32, D = ProtoDefault> =
-    SingularVarintField<T, crate::fields::shared::field_presence::Explicit<BIT>, FIELD, D>;
+    SingularVarintField<T, Explicit<BIT>, FIELD, D>;
 pub type LegacyRequiredVarintField<T, const BIT: usize, const FIELD: u32, D = ProtoDefault> =
-    SingularVarintField<T, crate::fields::shared::field_presence::LegacyRequired<BIT>, FIELD, D>;
+    SingularVarintField<T, LegacyRequired<BIT>, FIELD, D>;
 
 pub type ImplicitVarint<T, const FIELD: u32> = ImplicitVarintField<T, FIELD>;
 pub type ExplicitVarint<T, const BIT: usize, const FIELD: u32, D = ProtoDefault> =

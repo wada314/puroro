@@ -9,8 +9,9 @@ impl From<ProtobufError> for DecodeError {
         match err {
             ProtobufError::UnexpectedEof => DecodeError::UnexpectedEof,
             ProtobufError::VarintTooLong => DecodeError::InvalidVarint,
-            ProtobufError::InvalidWireType { .. }
-            | ProtobufError::MalformedTag { .. } => DecodeError::InvalidTag,
+            ProtobufError::InvalidWireType { .. } | ProtobufError::MalformedTag { .. } => {
+                DecodeError::InvalidTag
+            }
             ProtobufError::VarintDowncastOutOfRange { .. } => DecodeError::InvalidVarint,
             ProtobufError::FieldTypeDowncastError { .. } => DecodeError::InvalidTag,
             ProtobufError::FieldNumberOutOfRange { .. } => DecodeError::InvalidTag,

@@ -14,9 +14,17 @@
 
 use ::allocator_api2::alloc::Allocator;
 use ::bytes::BufMut;
+use ::puroro::{HasDefault, Optional};
 
 use crate::fields::enum_variant::EnumVariant;
-use crate::fields::shared::{Bindable, BindableMut, MessageCommon, PresenceBits};
+use crate::fields::shared::{
+    Bindable, BindableMut, MessageCommon, PresenceBits,
+    field_presence::{FieldPresence, Oneof},
+    value_slot::ValueSlot,
+};
+use crate::fields::singular::field::SingularField;
+use crate::fields::singular::message::NestedMessageField;
+use crate::fields::wire::scalar::ScalarProtoType;
 
 /// Explicit, allocator-driven release of a generated `oneof` enum over allocator `A`.
 ///
@@ -124,25 +132,6 @@ impl<E> OneofSlot<E> {
         self.as_ref().map(|v| v.encoded_len(common)).unwrap_or(0)
     }
 
-    /// Projects the active storage enum onto one variant's field wrapper.
-    ///
-    /// `V` is the zero-sized marker type for which the storage enum implements
-    /// [`EnumVariant`]. Generated message getters use this so oneof members
-    /// mirror ordinary fields:
-    /// `self.notification.variant_of::<EmailAddress>().optional(common)`.
-    #[inline]
-    pub fn variant_of<'a, V>(
-        &'a self,
-    ) -> OneofVariantRef<'a, <E as EnumVariant<V>>::Value>
-    where
-        E: EnumVariant<V>,
-    {
-        OneofVariantRef::new(
-            self.as_ref()
-                .and_then(|e| <E as EnumVariant<V>>::variant_ref(e)),
-        )
-    }
-
     /// Encodes the active variant.
     pub fn encode_raw<Pb, A, B: BufMut>(&self, common: &MessageCommon<Pb, A>, buf: &mut B)
     where
@@ -163,21 +152,20 @@ impl<E> Default for OneofSlot<E> {
 }
 
 impl<E, A: Allocator + Clone, Pb: PresenceBits> Bindable<MessageCommon<Pb, A>> for OneofSlot<E> {
-    type Bound<'a> = OneofSlotRef<'a, E, Pb, A>
+    type Bound<'a>
+        = OneofSlotRef<'a, E, Pb, A>
     where
         Self: 'a,
         MessageCommon<Pb, A>: 'a;
 
-    fn bind<'a>(
-        &'a self,
-        common: &'a MessageCommon<Pb, A>,
-    ) -> OneofSlotRef<'a, E, Pb, A> {
+    fn bind<'a>(&'a self, common: &'a MessageCommon<Pb, A>) -> OneofSlotRef<'a, E, Pb, A> {
         OneofSlotRef::new(self, common)
     }
 }
 
 impl<E, A: Allocator + Clone, Pb: PresenceBits> BindableMut<MessageCommon<Pb, A>> for OneofSlot<E> {
-    type BoundMut<'f, 'c> = OneofSlotMut<'f, 'c, E, Pb, A>
+    type BoundMut<'f, 'c>
+        = OneofSlotMut<'f, 'c, E, Pb, A>
     where
         Self: 'f,
         MessageCommon<Pb, A>: 'c;
@@ -199,11 +187,10 @@ impl<E, A: Allocator + Clone, Pb: PresenceBits> BindableMut<MessageCommon<Pb, A>
 ///
 /// Mirrors [`OneofSlotMut`] for the read path. Generated group views wrap this
 /// (or hold the same pair of references) so `notification()`-style accessors
-/// always return a handle, including when the group is unset.
+/// always return a handle, including when the group is unset. Per-variant
+/// getters go through [`variant_of`](Self::variant_of).
 pub struct OneofSlotRef<'a, E, Pb: PresenceBits, A: Allocator> {
     slot: &'a OneofSlot<E>,
-    /// Bound for symmetry with [`OneofSlotMut`]; unused by current read accessors.
-    #[allow(dead_code)]
     common: &'a MessageCommon<Pb, A>,
 }
 
@@ -217,6 +204,25 @@ impl<'a, E, Pb: PresenceBits, A: Allocator> OneofSlotRef<'a, E, Pb, A> {
     #[inline]
     pub fn as_ref(&self) -> Option<&'a E> {
         self.slot.as_ref()
+    }
+
+    /// Projects the active storage enum onto one variant's field wrapper.
+    ///
+    /// `V` is the zero-sized marker type for which the storage enum implements
+    /// [`EnumVariant`]. Generated message getters use this so oneof members
+    /// mirror ordinary fields:
+    /// `self.notification.bind(&common).variant_of::<EmailAddress>().optional()`.
+    #[inline]
+    pub fn variant_of<V>(self) -> OneofVariantRef<'a, <E as EnumVariant<V>>::Value, Pb, A>
+    where
+        E: EnumVariant<V>,
+    {
+        OneofVariantRef::new(
+            self.slot
+                .as_ref()
+                .and_then(|e| <E as EnumVariant<V>>::variant_ref(e)),
+            self.common,
+        )
     }
 }
 
@@ -299,9 +305,8 @@ impl<'f, 'c, E, Pb: PresenceBits, A: Allocator> OneofSlotMut<'f, 'c, E, Pb, A> {
             )));
         }
 
-        <E as EnumVariant<V>>::variant_mut(slot.as_mut().unwrap()).expect(
-            "from_variant must construct the variant that V selects",
-        )
+        <E as EnumVariant<V>>::variant_mut(slot.as_mut().unwrap())
+            .expect("from_variant must construct the variant that V selects")
     }
 
     /// Frees the active variant (if any), leaving the slot empty.
@@ -346,57 +351,51 @@ impl<E: PartialEq> PartialEq for OneofSlot<E> {
 
 /// Borrowed read handle for one member of an active [`OneofSlot`].
 ///
-/// `None` when the slot is unset or holds a different variant. Generated
-/// `OneofSlot` impls expose one accessor per variant; each returns this type so
-/// message getters can mirror ordinary fields
-/// (`self.notification.variant_of::<WebhookId>().optional(&self._common)`).
+/// `None` when the slot is unset or holds a different variant. Produced by
+/// [`OneofSlotRef::variant_of`] so message getters can mirror ordinary fields
+/// (`self.notification.bind(&common).variant_of::<WebhookId>().optional()`).
 ///
 /// [`optional`](Self::optional) threads the field wrapper's default marker `D`:
 /// when this handle is empty, the returned [`Optional`](::puroro::Optional) is
 /// unset and `get()` yields `D::DEFAULT` (proto custom default or type zero)
 /// without activating the variant — matching official const oneof getters.
-pub struct OneofVariantRef<'a, F> {
+pub struct OneofVariantRef<'a, F, Pb: PresenceBits, A: Allocator> {
     field: Option<&'a F>,
+    common: &'a MessageCommon<Pb, A>,
 }
 
-impl<'a, F> OneofVariantRef<'a, F> {
+impl<'a, F, Pb: PresenceBits, A: Allocator> OneofVariantRef<'a, F, Pb, A> {
     #[inline]
-    pub fn new(field: Option<&'a F>) -> Self {
-        Self { field }
+    pub fn new(field: Option<&'a F>, common: &'a MessageCommon<Pb, A>) -> Self {
+        Self { field, common }
     }
 }
 
-impl<
-        'a,
-        T: crate::fields::wire::scalar::ScalarProtoType,
-        const FIELD: u32,
-        D,
-    > OneofVariantRef<'a, crate::fields::singular::field::SingularField<T, crate::fields::shared::field_presence::Oneof, FIELD, D>>
+impl<'a, T: ScalarProtoType, const FIELD: u32, D, Pb: PresenceBits, A: Allocator>
+    OneofVariantRef<'a, SingularField<T, Oneof, FIELD, D>, Pb, A>
 where
     for<'b> T::Ref<'b>: Copy,
-    D: for<'b> ::puroro::HasDefault<T::Ref<'b>>,
-    <crate::fields::shared::field_presence::Oneof as crate::fields::shared::field_presence::FieldPresence>::ValueSlot<T::Storage>:
-        crate::fields::shared::value_slot::ValueSlot<T::Storage>,
+    D: for<'b> HasDefault<T::Ref<'b>>,
+    <Oneof as FieldPresence>::ValueSlot<T::Storage>: ValueSlot<T::Storage>,
 {
-    pub fn optional<Pb: PresenceBits, A: Allocator>(
-        self,
-        common: &MessageCommon<Pb, A>,
-    ) -> ::puroro::Optional<T::Ref<'a>, D> {
+    pub fn optional(self) -> Optional<T::Ref<'a>, D>
+    where
+        A: Clone,
+    {
         match self.field {
-            Some(f) => f.optional(common),
-            None => ::puroro::Optional::new(None),
+            Some(f) => f.bind(self.common).optional(),
+            None => Optional::new(None),
         }
     }
 }
 
-impl<
-        'a,
-        M,
-        const FIELD: u32,
-        A: Allocator,
-    > OneofVariantRef<'a, crate::fields::singular::message::NestedMessageField<M, crate::fields::shared::field_presence::Oneof, FIELD, A>>
+impl<'a, M, const FIELD: u32, A: Allocator, Pb: PresenceBits>
+    OneofVariantRef<'a, NestedMessageField<M, Oneof, FIELD, A>, Pb, A>
 {
-    pub fn get(self) -> Option<&'a M> {
-        self.field.map(crate::fields::singular::message::NestedMessageField::value)
+    pub fn get(self) -> Option<&'a M>
+    where
+        A: Clone,
+    {
+        self.field.map(|f| f.bind(self.common).value())
     }
 }

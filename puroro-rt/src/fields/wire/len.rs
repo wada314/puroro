@@ -14,7 +14,7 @@ use ::unmanaged::vec::VecGuard;
 use ::unmanaged::{UnmanagedString, UnmanagedVec};
 
 use crate::decode;
-use crate::fields::shared::{DefaultIn, DeallocateIn, ProtoEmpty};
+use crate::fields::shared::{DeallocateIn, DefaultIn, ProtoEmpty};
 use ::puroro::DecodeError;
 use ::puroro::WireType;
 

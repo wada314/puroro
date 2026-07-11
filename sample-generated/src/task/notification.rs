@@ -57,8 +57,8 @@ use ::unmanaged::string::StringGuard;
 
 use crate::address::Address;
 
-use super::defaults::WebhookIdDefault;
 use super::TaskPresence;
+use super::defaults::WebhookIdDefault;
 
 /// Zero-sized markers for [`EnumVariant`] dispatch on [`NotificationStorage`].
 pub(crate) mod variant {
@@ -225,8 +225,16 @@ impl<A: Allocator + Clone> NotificationStorage<A> {
     pub(crate) fn bind_email_address_mut<'f, 'c, Pb: PresenceBits>(
         slot: &'f mut OneofSlot<Self>,
         common: &'c mut MessageCommon<Pb, A>,
-    ) -> SingularLenFieldMut<'f, 'c, ProtoString, Oneof, { super::FIELD_EMAIL_ADDRESS }, ::puroro_rt::ProtoDefault, Pb, A>
-    {
+    ) -> SingularLenFieldMut<
+        'f,
+        'c,
+        ProtoString,
+        Oneof,
+        { super::FIELD_EMAIL_ADDRESS },
+        ::puroro_rt::ProtoDefault,
+        Pb,
+        A,
+    > {
         let field = slot
             .bind_mut(common)
             .variant_mut::<EmailAddress>(|alloc| SingularLenField::new_in(alloc));
@@ -236,8 +244,16 @@ impl<A: Allocator + Clone> NotificationStorage<A> {
     pub(crate) fn bind_phone_number_mut<'f, 'c, Pb: PresenceBits>(
         slot: &'f mut OneofSlot<Self>,
         common: &'c mut MessageCommon<Pb, A>,
-    ) -> SingularLenFieldMut<'f, 'c, ProtoString, Oneof, { super::FIELD_PHONE_NUMBER }, ::puroro_rt::ProtoDefault, Pb, A>
-    {
+    ) -> SingularLenFieldMut<
+        'f,
+        'c,
+        ProtoString,
+        Oneof,
+        { super::FIELD_PHONE_NUMBER },
+        ::puroro_rt::ProtoDefault,
+        Pb,
+        A,
+    > {
         let field = slot
             .bind_mut(common)
             .variant_mut::<PhoneNumber>(|alloc| SingularLenField::new_in(alloc));
@@ -267,9 +283,9 @@ impl<A: Allocator + Clone> NotificationStorage<A> {
         slot: &'f mut OneofSlot<Self>,
         common: &'c mut MessageCommon<Pb, A>,
     ) -> NestedMessageFieldMut<'f, 'c, Address<A>, Oneof, { super::FIELD_POSTAL }, A, Pb> {
-        let field = slot.bind_mut(common).variant_mut::<Postal>(|alloc| {
-            NestedMessageField::with_message_in(alloc)
-        });
+        let field = slot
+            .bind_mut(common)
+            .variant_mut::<Postal>(|alloc| NestedMessageField::with_message_in(alloc));
         field.bind_mut(common)
     }
 }

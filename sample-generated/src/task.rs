@@ -14,9 +14,10 @@ use ::bytes::{Buf, BufMut};
 
 use ::puroro::{DecodeError, HasDefault, MessageDecode, MessageEncode, Optional};
 use ::puroro_rt::{
-    BindableMut, Explicit, Implicit, LegacyRequired, MessageCommon, NestedMessageField, OneofSlot,
-    PresenceBits, ProtoBytes, ProtoEnum, ProtoInt32, ProtoString, RepeatedExpandedVarintField,
-    RepeatedLenField, RepeatedPackedVarintField, Singular, SingularLenField, SingularVarintField,
+    Bindable, BindableMut, Explicit, Implicit, LegacyRequired, MessageCommon, NestedMessageField,
+    OneofSlot, PresenceBits, ProtoBytes, ProtoEnum, ProtoInt32, ProtoString,
+    RepeatedExpandedVarintField, RepeatedLenField, RepeatedPackedVarintField, Singular,
+    SingularLenField, SingularVarintField,
 };
 
 use defaults::MaxRetriesDefault;
@@ -24,8 +25,8 @@ use defaults::MaxRetriesDefault;
 use crate::address::Address;
 use crate::enums::{Priority, Status};
 
-use notification::variant::{EmailAddress, PhoneNumber, Postal, WebhookId};
 use notification::NotificationStorage;
+use notification::variant::{EmailAddress, PhoneNumber, Postal, WebhookId};
 pub use notification::{
     NotificationCase, NotificationMut, NotificationRef, NotificationView, NotificationViewMut,
 };
@@ -96,8 +97,7 @@ pub struct Task<A: Allocator + Clone = Global> {
         { FIELD_MAX_RETRIES },
         MaxRetriesDefault,
     >, // proto: int32 max_retries = 3;
-    owner_id:
-        SingularLenField<ProtoString, LegacyRequired<{ BIT_OWNER_ID }>, { FIELD_OWNER_ID }>, // proto: string owner_id = 4;
+    owner_id: SingularLenField<ProtoString, LegacyRequired<{ BIT_OWNER_ID }>, { FIELD_OWNER_ID }>, // proto: string owner_id = 4;
     payload: SingularLenField<ProtoBytes, Explicit<{ BIT_PAYLOAD }>, { FIELD_PAYLOAD }>, // proto: bytes payload = 5;
     tag_ids: RepeatedPackedVarintField<ProtoInt32, { FIELD_TAG_IDS }, A>, // proto: repeated int32 tag_ids = 6 [packed];
     scores: RepeatedExpandedVarintField<ProtoInt32, { FIELD_SCORES }, A>, // proto: repeated int32 scores = 7;
@@ -135,7 +135,7 @@ impl<A: Allocator + Clone> Task<A> {
     // -- title (EXPLICIT string, proto field 1) ----------------------------
 
     pub fn title<'a>(&'a self) -> Optional<&'a str, impl HasDefault<&'a str>> {
-        self.title.optional(&self._common)
+        self.title.bind(&self._common).optional()
     }
 
     pub fn title_mut<'s>(
@@ -151,7 +151,7 @@ impl<A: Allocator + Clone> Task<A> {
     // -- score (IMPLICIT int32, proto field 2) ------------------------------
 
     pub fn score(&self) -> i32 {
-        self.score.value()
+        self.score.bind(&self._common).value()
     }
 
     pub fn score_mut(&mut self) -> impl ::core::ops::DerefMut<Target = i32> + '_ {
@@ -165,7 +165,7 @@ impl<A: Allocator + Clone> Task<A> {
     // -- max_retries (EXPLICIT int32, default = 3, proto field 3) ------------
 
     pub fn max_retries(&self) -> Optional<i32, impl HasDefault<i32>> {
-        self.max_retries.optional(&self._common)
+        self.max_retries.bind(&self._common).optional()
     }
 
     pub fn max_retries_mut(&mut self) -> impl ::core::ops::DerefMut<Target = i32> + '_ {
@@ -179,7 +179,7 @@ impl<A: Allocator + Clone> Task<A> {
     // -- owner_id (LEGACY_REQUIRED string, proto field 4) --------------------
 
     pub fn owner_id<'a>(&'a self) -> Optional<&'a str, impl HasDefault<&'a str>> {
-        self.owner_id.optional(&self._common)
+        self.owner_id.bind(&self._common).optional()
     }
 
     pub fn owner_id_mut<'s>(
@@ -195,7 +195,7 @@ impl<A: Allocator + Clone> Task<A> {
     // -- payload (EXPLICIT bytes, proto field 5) -----------------------------
 
     pub fn payload<'a>(&'a self) -> Optional<&'a [u8], impl HasDefault<&'a [u8]>> {
-        self.payload.optional(&self._common)
+        self.payload.bind(&self._common).optional()
     }
 
     pub fn payload_mut<'s>(
@@ -211,7 +211,7 @@ impl<A: Allocator + Clone> Task<A> {
     // -- tag_ids (repeated int32 PACKED, proto field 6) ----------------------
 
     pub fn tag_ids(&self) -> &[i32] {
-        self.tag_ids.as_slice()
+        self.tag_ids.bind(&self._common).as_slice()
     }
 
     pub fn tag_ids_mut<'s>(
@@ -227,7 +227,7 @@ impl<A: Allocator + Clone> Task<A> {
     // -- scores (repeated int32 EXPANDED, proto field 7) ---------------------
 
     pub fn scores(&self) -> &[i32] {
-        self.scores.as_slice()
+        self.scores.bind(&self._common).as_slice()
     }
 
     pub fn scores_mut<'s>(
@@ -243,7 +243,7 @@ impl<A: Allocator + Clone> Task<A> {
     // -- labels (repeated string, proto field 8) -----------------------------
 
     pub fn labels(&self) -> &[::unmanaged::UnmanagedString] {
-        self.labels.as_slice()
+        self.labels.bind(&self._common).as_slice()
     }
 
     /// Typed append helper for repeated LEN fields (the `_mut` accessor would
@@ -259,7 +259,7 @@ impl<A: Allocator + Clone> Task<A> {
     // -- status (IMPLICIT open enum, proto field 9) -------------------------
 
     pub fn status(&self) -> Optional<Status, impl HasDefault<Status>> {
-        self.status.optional(&self._common)
+        self.status.bind(&self._common).optional()
     }
 
     pub fn status_mut(&mut self) -> impl ::core::ops::DerefMut<Target = Status> + '_ {
@@ -273,7 +273,7 @@ impl<A: Allocator + Clone> Task<A> {
     // -- priority (EXPLICIT closed enum, proto field 10) ---------------------
 
     pub fn priority(&self) -> Optional<Priority, impl HasDefault<Priority>> {
-        self.priority.optional(&self._common)
+        self.priority.bind(&self._common).optional()
     }
 
     pub fn priority_mut(&mut self) -> impl ::core::ops::DerefMut<Target = Priority> + '_ {
@@ -287,7 +287,7 @@ impl<A: Allocator + Clone> Task<A> {
     // -- assignee (nested message, proto field 11) --------------------------
 
     pub fn assignee(&self) -> Option<&Address<A>> {
-        self.assignee.get()
+        self.assignee.bind(&self._common).get()
     }
 
     pub fn assignee_mut(&mut self) -> &mut Address<A> {
@@ -324,8 +324,9 @@ impl<A: Allocator + Clone> Task<A> {
     pub fn email_address<'a>(&'a self) -> Optional<&'a str, impl HasDefault<&'a str>> {
         // Unset / other variant → Optional::None → get() is ProtoDefault ("").
         self.notification
+            .bind(&self._common)
             .variant_of::<EmailAddress>()
-            .optional(&self._common)
+            .optional()
     }
 
     pub fn email_address_mut(
@@ -339,8 +340,9 @@ impl<A: Allocator + Clone> Task<A> {
 
     pub fn phone_number<'a>(&'a self) -> Optional<&'a str, impl HasDefault<&'a str>> {
         self.notification
+            .bind(&self._common)
             .variant_of::<PhoneNumber>()
-            .optional(&self._common)
+            .optional()
     }
 
     pub fn phone_number_mut(
@@ -356,8 +358,9 @@ impl<A: Allocator + Clone> Task<A> {
     /// and `is_set()` is false (does not select the variant).
     pub fn webhook_id(&self) -> Optional<i32, impl HasDefault<i32>> {
         self.notification
+            .bind(&self._common)
             .variant_of::<WebhookId>()
-            .optional(&self._common)
+            .optional()
     }
 
     /// Switches the group to `webhook_id` (freeing any other variant) and returns
@@ -370,7 +373,10 @@ impl<A: Allocator + Clone> Task<A> {
     // -- notification.postal (Address message, proto field 15) --------------
 
     pub fn postal(&self) -> Option<&Address<A>> {
-        self.notification.variant_of::<Postal>().get()
+        self.notification
+            .bind(&self._common)
+            .variant_of::<Postal>()
+            .get()
     }
 
     /// Switches the group to `postal` (freeing any other variant) and returns a
@@ -479,11 +485,15 @@ impl<A: Allocator + Clone> MessageDecode for Task<A> {
             match field_number {
                 FIELD_TITLE => {
                     // title = 1, EXPLICIT string
-                    self.title.bind_mut(&mut self._common).merge(wire_type, buf)?;
+                    self.title
+                        .bind_mut(&mut self._common)
+                        .merge(wire_type, buf)?;
                 }
                 FIELD_SCORE => {
                     // score = 2, IMPLICIT int32
-                    self.score.bind_mut(&mut self._common).merge(wire_type, buf)?;
+                    self.score
+                        .bind_mut(&mut self._common)
+                        .merge(wire_type, buf)?;
                 }
                 FIELD_MAX_RETRIES => {
                     // max_retries = 3, EXPLICIT int32
@@ -499,29 +509,41 @@ impl<A: Allocator + Clone> MessageDecode for Task<A> {
                 }
                 FIELD_PAYLOAD => {
                     // payload = 5, EXPLICIT bytes
-                    self.payload.bind_mut(&mut self._common).merge(wire_type, buf)?;
+                    self.payload
+                        .bind_mut(&mut self._common)
+                        .merge(wire_type, buf)?;
                 }
                 FIELD_TAG_IDS => {
                     // tag_ids = 6, repeated int32 PACKED
-                    self.tag_ids.bind_mut(&mut self._common).merge(wire_type, buf)?;
+                    self.tag_ids
+                        .bind_mut(&mut self._common)
+                        .merge(wire_type, buf)?;
                 }
                 FIELD_SCORES => {
                     // scores = 7, repeated int32 EXPANDED
-                    self.scores.bind_mut(&mut self._common).merge(wire_type, buf)?;
+                    self.scores
+                        .bind_mut(&mut self._common)
+                        .merge(wire_type, buf)?;
                 }
                 FIELD_LABELS => {
                     // labels = 8, repeated string
-                    self.labels.bind_mut(&mut self._common).merge(wire_type, buf)?;
+                    self.labels
+                        .bind_mut(&mut self._common)
+                        .merge(wire_type, buf)?;
                 }
                 FIELD_STATUS => {
                     // status = 9, IMPLICIT open enum
-                    self.status.bind_mut(&mut self._common).merge(wire_type, buf)?;
+                    self.status
+                        .bind_mut(&mut self._common)
+                        .merge(wire_type, buf)?;
                 }
                 FIELD_PRIORITY => {
                     // priority = 10, EXPLICIT closed enum
-                    self.priority
-                        .bind_mut(&mut self._common)
-                        .merge_closed(wire_type, buf, |v| Priority::try_from(v).is_ok())?;
+                    self.priority.bind_mut(&mut self._common).merge_closed(
+                        wire_type,
+                        buf,
+                        |v| Priority::try_from(v).is_ok(),
+                    )?;
                 }
                 FIELD_ASSIGNEE => {
                     // assignee = 11, nested message

@@ -34,7 +34,11 @@ impl ::core::fmt::Display for DecodeError {
             DecodeError::UnexpectedEof => write!(f, "unexpected end of input"),
             DecodeError::InvalidVarint => write!(f, "varint is too long (> 10 bytes)"),
             DecodeError::InvalidTag => write!(f, "tag contains an unknown wire type"),
-            DecodeError::UnexpectedWireType { field_number, expected, actual } => write!(
+            DecodeError::UnexpectedWireType {
+                field_number,
+                expected,
+                actual,
+            } => write!(
                 f,
                 "field {field_number}: expected wire type {expected:?}, got {actual:?}"
             ),

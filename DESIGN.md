@@ -633,7 +633,7 @@ Unknown wire values are stored in the field. The generated type accepts any `i32
 
 ```rust
 pub fn status(&self) -> Optional<Status, impl HasDefault<Status>> {
-    self.status.optional(&self._common)
+    self.status.bind(&self._common).optional()
 }
 pub fn status_mut(&mut self) -> &mut Status;
 ```
@@ -646,7 +646,7 @@ Unknown wire values are diverted to unknown fields on decode. The generated type
 
 ```rust
 pub fn priority(&self) -> Optional<Priority, impl HasDefault<Priority>> {
-    self.priority.optional(&self._common)
+    self.priority.bind(&self._common).optional()
 }
 pub fn priority_mut(&mut self) -> &mut Priority;
 pub fn clear_priority(&mut self);
@@ -823,7 +823,7 @@ Concrete C++ codegen shapes (proto2 / editions):
 **puroro vs that contract.** The hand-written `Task` sample matches both halves:
 
 - Per-variant **`_mut`** (`email_address_mut`, …) goes through `bind_<variant>_mut` → `OneofSlotMut::variant_mut`, which force-switches the case and builds a fresh wrapper via `new_in` / `with_message_in` (**type** default). That matches official `mutable_*`.
-- Per-variant **getters** use `OneofSlot::variant_of::<V>().optional(...)`. The field wrapper's `D` type parameter is the proto default marker (`ProtoDefault`, or a message-local ZST such as `WebhookIdDefault` for `[default = -1]`). When the case is unset or another variant, `optional` returns `Optional::new(None)` so `is_set()` is false and `get()` yields `D::DEFAULT` — without selecting the variant. That matches official const getters.
+- Per-variant **getters** use `slot.bind(&common).variant_of::<V>().optional()`. The field wrapper's `D` type parameter is the proto default marker (`ProtoDefault`, or a message-local ZST such as `WebhookIdDefault` for `[default = -1]`). When the case is unset or another variant, `optional` returns `Optional::new(None)` so `is_set()` is false and `get()` yields `D::DEFAULT` — without selecting the variant. That matches official const getters.
 - When the variant **is** active, getters return the **stored** value (including type zero / empty string), same as official.
 
 **Codegen rule.** `[default = X]` on a oneof scalar becomes the field wrapper's `D` (`Singular*Field<…, D>`), which flows into the read accessor (`Optional<…, D>`). It must **not** change `_mut` installation: mutators keep installing type-default storage; custom defaults must not be written into the slot merely because the caller asked for a mutable handle.
@@ -898,7 +898,7 @@ impl<A: Allocator + Clone + Default> Default for Task<A> { … }
 
 **Mutation API (`_mut`).** Mutation is unified under `_mut` accessors that return a guard implementing `impl DerefMut<Target = …>` (RPIT): `title_mut()` yields `impl DerefMut<Target = ::unmanaged::String<A>>`, `payload_mut()`/`tag_ids_mut()` yield `impl DerefMut<Target = Vec<_, A>>`, and scalar/enum `_mut` accessors also return `impl DerefMut<Target = T>` (today that is `&mut T`). The guard **owns** a clone of the message allocator when the payload is heap-backed. Acquiring an explicit-presence `_mut` sets the presence bit. The old `set_*` / `push_*` setters are removed; the one exception is repeated `string`/`bytes`, which keep a typed `push_*` helper because their element storage is allocator-less and impractical to construct through a bare `DerefMut`.
 
-**Bound-view mutation (`bind_mut`).** Every mutable field family goes through this idiom: the field is first *bound* to the message common state: `field.bind_mut(&mut self._common)` returns a short-lived view (`SingularFieldMut` / `RepeatedLenFieldMut` / `RepeatedVarintFieldMut` / `OneofSlotMut`) that carries `(field, common)` together, and the actual operation (`value_mut` / `merge` / `clear` / `push_in` / `merge_closed` / `values_mut`) is a consuming method on that view. This keeps the field struct a pure storage holder and collapses each generated accessor to a single call — e.g. `self.owner_id.bind_mut(&mut self._common).value_mut()` or `self.priority.bind_mut(&mut self._common).clear()`. The presence bit index for EXPLICIT / LEGACY_REQUIRED fields is a **const generic on the field type** (`Explicit<BIT>`), not a runtime argument to `bind_mut`. Oneof **group** accessors also bind on the read path (`OneofSlotRef` via `Bindable::bind`) so `notification()` / `notification_mut()` always return a handle. Other read-only paths (`value` / `optional` / `has` / `encoded_len` / `encode_raw`) need only a shared `&common` and stay as plain field methods.
+**Bound-view accessors (`bind` / `bind_mut`).** Every field family goes through this idiom on both read and write paths: the field is first *bound* to the message common state — `field.bind(&self._common)` / `field.bind_mut(&mut self._common)` — returning a short-lived view (`SingularFieldRef` / `SingularFieldMut`, `Repeated*FieldRef` / `Repeated*FieldMut`, `NestedMessageFieldRef` / `NestedMessageFieldMut`, `OneofSlotRef` / `OneofSlotMut`) that carries `(field, common)` together. The actual operation (`optional` / `value` / `as_slice` / `get` / `value_mut` / `merge` / `clear` / …) is a consuming method on that view. This keeps the field struct a pure storage holder and collapses each generated accessor to a single call — e.g. `self.owner_id.bind(&self._common).optional()` or `self.priority.bind_mut(&mut self._common).clear()`. Binding happens even when a particular accessor does not consult `common` (e.g. `IMPLICIT` `value()`, repeated `as_slice()`), so read and write share one shape. The presence bit index for EXPLICIT / LEGACY_REQUIRED fields is a **const generic on the field type** (`Explicit<BIT>`), not a runtime argument to `bind` / `bind_mut`. Encode / `deallocate` / `validate_required` stay as plain field methods that take `&common` directly (they are not generated getters).
 
 Varint and LEN singular scalars share one runtime type, [`SingularField`](puroro-rt/src/fields/singular/field.rs), parametrised by [`ScalarProtoType`](puroro-rt/src/fields/wire/scalar.rs) (see [IMPLEMENTATION.md §7](IMPLEMENTATION.md#7-field-wrappers) / [§14](IMPLEMENTATION.md#14-singular-fields)). Nested messages remain a separate wrapper.
 

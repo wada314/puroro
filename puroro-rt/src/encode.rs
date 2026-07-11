@@ -4,7 +4,7 @@
 //! `BufMut` adapters live here because generated code targets `bytes` buffers.
 
 use ::bytes::BufMut;
-use ::protobuf_core::{FieldNumber, Tag, Varint, FIXED32_BYTES, FIXED64_BYTES};
+use ::protobuf_core::{FIXED32_BYTES, FIXED64_BYTES, FieldNumber, Tag, Varint};
 use ::puroro::WireType;
 
 /// Encoded tag as a raw varint numeric value (used when re-serialising unknown fields).
@@ -40,8 +40,8 @@ pub fn encode_tag<B: BufMut>(field_number: u32, wire_type: WireType, buf: &mut B
 
 #[inline]
 fn tag_to_u64(field_number: u32, wire_type: WireType) -> u64 {
-    let field_number = FieldNumber::try_new(field_number)
-        .expect("generated code uses valid field numbers");
+    let field_number =
+        FieldNumber::try_new(field_number).expect("generated code uses valid field numbers");
     Tag {
         field_number,
         wire_type,
@@ -105,11 +105,7 @@ pub fn encode_len_field<B: BufMut>(field_number: u32, payload: &[u8], buf: &mut 
     buf.put_slice(payload);
 }
 
-pub fn encoded_len_packed_varint_field<T, F>(
-    field_number: u32,
-    values: &[T],
-    to_u64: F,
-) -> usize
+pub fn encoded_len_packed_varint_field<T, F>(field_number: u32, values: &[T], to_u64: F) -> usize
 where
     F: Fn(&T) -> u64,
 {

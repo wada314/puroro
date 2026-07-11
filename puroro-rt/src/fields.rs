@@ -34,31 +34,30 @@ pub use oneof::{
 };
 pub use repeated::{
     Expanded, Packed, RepeatedBytes, RepeatedExpandedInt32, RepeatedExpandedVarintField,
-    RepeatedLen, RepeatedLenField, RepeatedLenFieldMut, RepeatedPackedInt32,
+    RepeatedLen, RepeatedLenField, RepeatedLenFieldMut, RepeatedLenFieldRef, RepeatedPackedInt32,
     RepeatedPackedVarintField, RepeatedString, RepeatedVarint, RepeatedVarintEncoding,
-    RepeatedVarintField, RepeatedVarintFieldMut,
+    RepeatedVarintField, RepeatedVarintFieldMut, RepeatedVarintFieldRef,
 };
 pub use shared::{
+    DeallocateIn, DefaultIn, MessageCommon, PresenceBits, ProtoEmpty,
     bindable::{Bindable, BindableMut},
-    field_presence::{
-        Explicit, FieldPresence, Implicit, LegacyRequired, RequiredFieldPresence,
-    },
+    field_presence::{Explicit, FieldPresence, Implicit, LegacyRequired, RequiredFieldPresence},
     slot_init::{AlwaysInitialized, BitInitMut, BitInitView, SlotInitMut, SlotInitView},
     value_slot::ValueSlot,
-    DefaultIn, DeallocateIn, MessageCommon, PresenceBits, ProtoEmpty,
 };
 pub use singular::{
     ExplicitBytes, ExplicitEnum, ExplicitInt32, ExplicitLenField, ExplicitString, ExplicitVarint,
     ExplicitVarintField, ImplicitBytes, ImplicitEnum, ImplicitInt32, ImplicitLenField,
     ImplicitString, ImplicitVarint, ImplicitVarintField, MessagePresence, NestedMessage,
-    NestedMessageField, NestedMessageFieldMut, Singular, SingularField, SingularFieldMut,
-    SingularLen, SingularLenField, SingularLenFieldMut, SingularVarint, SingularVarintField,
-    SingularVarintFieldMut,
+    NestedMessageField, NestedMessageFieldMut, NestedMessageFieldRef, Singular, SingularField,
+    SingularFieldMut, SingularFieldRef, SingularLen, SingularLenField, SingularLenFieldMut,
+    SingularLenFieldRef, SingularVarint, SingularVarintField, SingularVarintFieldMut,
+    SingularVarintFieldRef,
 };
 pub use wire::{
-    enum_value_is_known, LenProtoType, ProtoBool, ProtoBytes, ProtoEnum, ProtoEnumStorage, ProtoInt32,
-    ProtoInt64, ProtoSint32, ProtoSint64, ProtoString, ProtoUInt32, ProtoUInt64, ScalarProtoType,
-    VarintProtoType,
+    LenProtoType, ProtoBool, ProtoBytes, ProtoEnum, ProtoEnumStorage, ProtoInt32, ProtoInt64,
+    ProtoSint32, ProtoSint64, ProtoString, ProtoUInt32, ProtoUInt64, ScalarProtoType,
+    VarintProtoType, enum_value_is_known,
 };
 
 // Preserve the historical `Oneof` name for the field-presence marker (distinct from `oneof` module).

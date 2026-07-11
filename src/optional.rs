@@ -29,12 +29,19 @@ pub struct Optional<T: Copy, D: HasDefault<T>> {
 impl<T: Copy, D: HasDefault<T>> Optional<T, D> {
     /// Creates an `Optional` using the default marker `D` from the field type.
     pub fn new(value: Option<T>) -> Self {
-        Self { value, _phantom: PhantomData }
+        Self {
+            value,
+            _phantom: PhantomData,
+        }
     }
 
     /// Value or proto-declared default when not set.
-    pub fn get(&self) -> T { self.value.unwrap_or(D::DEFAULT) }
+    pub fn get(&self) -> T {
+        self.value.unwrap_or(D::DEFAULT)
+    }
 
     /// `true` if explicitly set on the wire.
-    pub fn is_set(&self) -> bool { self.value.is_some() }
+    pub fn is_set(&self) -> bool {
+        self.value.is_some()
+    }
 }

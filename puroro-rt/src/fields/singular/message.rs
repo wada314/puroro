@@ -25,7 +25,9 @@ use ::puroro::{DecodeError, MessageDecode, MessageEncode, WireType};
 use crate::decode;
 use crate::encode;
 
-use crate::fields::shared::{field_presence::Oneof, BindableMut, MessageCommon, PresenceBits};
+use crate::fields::shared::{
+    Bindable, BindableMut, MessageCommon, PresenceBits, field_presence::Oneof,
+};
 use crate::fields::wire::len;
 
 /// Trait for child message types stored in [`NestedMessageField`].
@@ -100,7 +102,9 @@ pub struct NestedMessageField<M, P: MessagePresence, const FIELD: u32, A: Alloca
 }
 
 impl<M, P: MessagePresence, const FIELD: u32, A: Allocator> NestedMessageField<M, P, FIELD, A> {
-    /// Returns the child when present.
+    /// Low-level borrow of the child when present.
+    ///
+    /// Generated message getters go through [`NestedMessageFieldRef::get`] instead.
     #[inline]
     pub fn get(&self) -> Option<&M> {
         P::as_ref(&self.store)
@@ -165,7 +169,10 @@ impl<M, const FIELD: u32, A: Allocator> Default for NestedMessageField<M, Singul
 }
 
 impl<M, const FIELD: u32, A: Allocator> NestedMessageField<M, Oneof, FIELD, A> {
-    /// Borrows the always-present child.
+    /// Low-level borrow of the always-present child (no `common`).
+    ///
+    /// Used by oneof storage projections; generated getters go through
+    /// [`NestedMessageFieldRef::value`].
     #[inline]
     pub fn value(&self) -> &M {
         self.get().unwrap()
@@ -200,9 +207,27 @@ impl<M, const FIELD: u32, A: Allocator> NestedMessageField<M, Oneof, FIELD, A> {
 }
 
 impl<M, P: MessagePresence, const FIELD: u32, A: Allocator + Clone, Pb: PresenceBits>
+    Bindable<MessageCommon<Pb, A>> for NestedMessageField<M, P, FIELD, A>
+{
+    type Bound<'a>
+        = NestedMessageFieldRef<'a, M, P, FIELD, A, Pb>
+    where
+        Self: 'a,
+        MessageCommon<Pb, A>: 'a;
+
+    fn bind<'a>(
+        &'a self,
+        common: &'a MessageCommon<Pb, A>,
+    ) -> NestedMessageFieldRef<'a, M, P, FIELD, A, Pb> {
+        NestedMessageFieldRef::new(self, common)
+    }
+}
+
+impl<M, P: MessagePresence, const FIELD: u32, A: Allocator + Clone, Pb: PresenceBits>
     BindableMut<MessageCommon<Pb, A>> for NestedMessageField<M, P, FIELD, A>
 {
-    type BoundMut<'f, 'c> = NestedMessageFieldMut<'f, 'c, M, P, FIELD, A, Pb>
+    type BoundMut<'f, 'c>
+        = NestedMessageFieldMut<'f, 'c, M, P, FIELD, A, Pb>
     where
         Self: 'f,
         MessageCommon<Pb, A>: 'c;
@@ -212,6 +237,58 @@ impl<M, P: MessagePresence, const FIELD: u32, A: Allocator + Clone, Pb: Presence
         common: &'c mut MessageCommon<Pb, A>,
     ) -> NestedMessageFieldMut<'f, 'c, M, P, FIELD, A, Pb> {
         NestedMessageFieldMut::new(self, common)
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Read view
+// ---------------------------------------------------------------------------
+
+/// Short-lived shared binding of a nested message field to its message common
+/// state, produced by [`Bindable::bind`](crate::fields::shared::Bindable::bind).
+///
+/// Mirrors [`NestedMessageFieldMut`] for the read path. Generated getters always
+/// go through this view — `field.bind(&common).get()` / `.value()` — even when
+/// the accessor does not consult `common`.
+pub struct NestedMessageFieldRef<
+    'a,
+    M,
+    P: MessagePresence,
+    const FIELD: u32,
+    A: Allocator,
+    Pb: PresenceBits,
+> {
+    field: &'a NestedMessageField<M, P, FIELD, A>,
+    /// Bound for symmetry with [`NestedMessageFieldMut`]; unused by current getters.
+    #[allow(dead_code)]
+    common: &'a MessageCommon<Pb, A>,
+}
+
+impl<'a, M, P: MessagePresence, const FIELD: u32, A: Allocator, Pb: PresenceBits>
+    NestedMessageFieldRef<'a, M, P, FIELD, A, Pb>
+{
+    #[inline]
+    fn new(
+        field: &'a NestedMessageField<M, P, FIELD, A>,
+        common: &'a MessageCommon<Pb, A>,
+    ) -> Self {
+        Self { field, common }
+    }
+
+    /// Returns the child when present.
+    #[inline]
+    pub fn get(self) -> Option<&'a M> {
+        self.field.get()
+    }
+}
+
+impl<'a, M, const FIELD: u32, A: Allocator, Pb: PresenceBits>
+    NestedMessageFieldRef<'a, M, Oneof, FIELD, A, Pb>
+{
+    /// Borrows the always-present child.
+    #[inline]
+    pub fn value(self) -> &'a M {
+        self.field.value()
     }
 }
 

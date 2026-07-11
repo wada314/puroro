@@ -61,7 +61,10 @@ fn oneof_varint_variant_roundtrip() {
     let bytes = task.encode_to_vec();
     let decoded: Task = Task::decode(&bytes[..]).unwrap();
 
-    assert_eq!(decoded.notification_case(), Some(NotificationCase::WebhookId));
+    assert_eq!(
+        decoded.notification_case(),
+        Some(NotificationCase::WebhookId)
+    );
     assert!(matches!(
         decoded.notification().as_ref(),
         Some(NotificationRef::WebhookId(4321))
@@ -82,7 +85,10 @@ fn oneof_scalar_getter_uses_custom_default_when_unset() {
     assert_eq!(task.webhook_id().get(), -1);
 
     task.email_address_mut().push_str("a@example.com");
-    assert_eq!(task.notification_case(), Some(NotificationCase::EmailAddress));
+    assert_eq!(
+        task.notification_case(),
+        Some(NotificationCase::EmailAddress)
+    );
     assert!(!task.webhook_id().is_set());
     assert_eq!(task.webhook_id().get(), -1);
     // String members without [default] still fall back to the type default.
@@ -120,7 +126,7 @@ fn oneof_switching_frees_previous_variant() {
     let mut task = Task::new();
     task.owner_id_mut().push_str("user-1");
     task.email_address_mut().push_str("a@example.com"); // LEN (heap string)
-    task.postal_mut().street_mut().push_str("St");      // -> message (frees string)
+    task.postal_mut().street_mut().push_str("St"); // -> message (frees string)
     *task.webhook_id_mut() = 3; // -> scalar (frees message)
 
     assert!(matches!(
@@ -154,7 +160,10 @@ fn oneof_group_view_mut_as_view_and_clear() {
     {
         let view_mut = task.notification_mut();
         // Shared getters work while holding the mut bound view.
-        assert_eq!(view_mut.as_view().case(), Some(NotificationCase::EmailAddress));
+        assert_eq!(
+            view_mut.as_view().case(),
+            Some(NotificationCase::EmailAddress)
+        );
         assert!(matches!(
             view_mut.as_view().as_ref(),
             Some(NotificationRef::EmailAddress(s)) if s == "a@example.com"
