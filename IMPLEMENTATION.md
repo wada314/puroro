@@ -180,6 +180,8 @@ Field catalog methods take `&MessageCommon` / `&mut MessageCommon`, not `&Task`,
 
 [`ValueSlot<T>`](puroro-rt/src/fields/shared/value_slot.rs) — singular scalar storage behind a GAT on [`FieldPresence`](puroro-rt/src/fields/shared/field_presence.rs): always-initialized `T` for `Implicit` / `Oneof`; `MaybeUninit<T>` for `Explicit` / `LegacyRequired`. Construction / replace / clear thread an allocator via [`DefaultIn`](puroro-rt/src/fields/shared.rs) / [`DeallocateIn`](puroro-rt/src/fields/shared.rs) so heap payloads (`UnmanagedString`, `UnmanagedVec`) and copy scalars share one slot API. Mutation passes a [`SlotInitMut`](puroro-rt/src/fields/shared/slot_init.rs) handle (`slot_init_mut(common)`); reads pass [`SlotInitView`](puroro-rt/src/fields/shared/slot_init.rs) (`slot_init_view(common)`). [`ProtoEmpty`](puroro-rt/src/fields/shared.rs) drives IMPLICIT omit-on-encode (`is_proto_empty`).
 
+[`Bindable`](puroro-rt/src/fields/shared/bindable.rs) / [`BindableMut`](puroro-rt/src/fields/shared/bindable.rs) — **general** receiver+context pairing (`bind` / `bind_mut` → short-lived view). They are **not** scoped to “message field + `MessageCommon`”; that pairing is just the common catalog use today. Owned or other contexts are equally in scope for the traits.
+
 ---
 
 ## 5. Wire encoding traits
