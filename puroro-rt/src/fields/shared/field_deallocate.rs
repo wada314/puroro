@@ -7,9 +7,10 @@ use super::{MessageCommon, PresenceBits};
 
 /// Releases a field's owned payloads through the message allocator in `common`.
 ///
-/// Generated message `Drop` calls this on **every direct child** (scalars, bools,
-/// LEN, repeated, nested messages, and oneof **groups**) with the same shape:
-/// `field.deallocate(&self._common)`. Copy / bit-packed fields are no-ops.
+/// Generated message `Drop` imports this trait and calls it on **every direct
+/// child** (scalars, bools, LEN, repeated, nested messages, and oneof
+/// **groups**) with the same shape: `field.deallocate(&self._common)`. Copy /
+/// bit-packed fields are no-ops.
 ///
 /// Oneof **variants** are not message children; the group's `deallocate` takes
 /// the active variant and frees it via [`OneofDeallocate`](crate::fields::OneofDeallocate),

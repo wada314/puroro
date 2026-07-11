@@ -263,7 +263,7 @@ Varint and LEN singular scalars share one wrapper, parametrised by [`ScalarProto
 | `SingularField<T, P, FIELD>` | [`singular/field.rs`](puroro-rt/src/fields/singular/field.rs) | `T: ScalarProtoType`, `P: FieldPresence` | `SingularVarintField`, `SingularLenField`, `ImplicitInt32`, `ExplicitString`, … |
 | `BoolField<P, VALUE_BIT, FIELD>` | [`singular/bool.rs`](puroro-rt/src/fields/singular/bool.rs) | ZST; value at `VALUE_BIT` in `_common.presence` | `ImplicitBoolField`, `ExplicitBoolField`, … |
 | Fixed-width singular | (planned via `ScalarProtoType` + `SingularField`) | — | — |
-| `NestedMessageField<M, P, FIELD, A>` | [`singular/message.rs`](puroro-rt/src/fields/singular/message.rs) | `P: MessagePresence` — `Singular`: `Option<UnmanagedBox<M>>`; `Oneof`: bare `UnmanagedBox<M>` — no bitfield | — |
+| `NestedMessageField<M, P, FIELD, A>` | [`singular/message.rs`](puroro-rt/src/fields/singular/message.rs) | `P: MessagePresence` — `Singular`: `Option<UnmanagedBox<M>>`; `Oneof`: `ManuallyDrop<UnmanagedBox<M>>` — no bitfield | — |
 | `OneofSlot<E>` | [`oneof.rs`](puroro-rt/src/fields/oneof.rs) | mutually exclusive variants | — |
 
 **Closed enum:** `SingularField<ProtoEnum<E>, Explicit, FIELD>::bind(…).merge_closed(…, |wire: i32| …)` — unknown values → `unknown_fields`, bit not set.
@@ -633,7 +633,7 @@ One LEN record per element (`repeated string` / `repeated bytes`), stored as `Ma
 
 ### Nested (`NestedMessageField<M, P, FIELD, A>`)
 
-Storage is chosen by a `MessagePresence` marker (a GAT): [`Singular`](puroro-rt/src/fields/singular/message.rs) = `Option<UnmanagedBox<M>>` for ordinary fields; [`Oneof`](puroro-rt/src/fields/shared/field_presence.rs) = a bare `UnmanagedBox<M>` for oneof variants (the slot tracks presence, so the box is always there). Mutation uses the **same bound-view idiom** as scalar fields (`field.bind_mut(&mut common).merge(wire, buf)` / `.get_mut()` / `.clear()`). Read accessors use `field.bind(&common).get()` / `.value()`. A nested message has no presence bit. `Singular` exposes `get()` / `get_mut()` (insert-if-absent); `Oneof` exposes `value()` / `value_mut()` (`&M` / `&mut M`). Encode: LEN tag + `child.encode_raw`. Decode merges into the child (creating it on first merge for `Singular`). Recursion limit: planned ([§17](#17-planned-optimisations--runtime-gaps)).
+Storage is chosen by a `MessagePresence` marker (a GAT): [`Singular`](puroro-rt/src/fields/singular/message.rs) = `Option<UnmanagedBox<M>>` for ordinary fields; [`Oneof`](puroro-rt/src/fields/shared/field_presence.rs) = `ManuallyDrop<UnmanagedBox<M>>` for oneof variants (the slot tracks presence, so the box is always there; `ManuallyDrop` matches other catalog fields for [`FieldDeallocate`](puroro-rt/src/fields/shared/field_deallocate.rs)). Mutation uses the **same bound-view idiom** as scalar fields (`field.bind_mut(&mut common).merge(wire, buf)` / `.get_mut()` / `.clear()`). Read accessors use `field.bind(&common).get()` / `.value()`. A nested message has no presence bit. `Singular` exposes `get()` / `get_mut()` (insert-if-absent); `Oneof` exposes `value()` / `value_mut()` (`&M` / `&mut M`). Encode: LEN tag + `child.encode_raw`. Decode merges into the child (creating it on first merge for `Singular`). Recursion limit: planned ([§17](#17-planned-optimisations--runtime-gaps)).
 
 ### Oneof (`OneofSlot<E>`)
 
@@ -656,7 +656,7 @@ The sample `oneof notification` is deliberately **heterogeneous** — LEN, VARIN
 
 The oneof drives each variant with the **field's own** primitives. Build-empty is `new_in(alloc)` / `with_message_in(alloc)`. Merging is `bind_<variant>_mut(…).merge(wire, buf)`. Read/read-mut are `value()` / `value_mut(alloc)` for scalar and LEN (alloc ignored for copy scalars).
 
-**The message variant uses `NestedMessageField<…, Oneof, …>` — a bare box, not `Option`.**
+**The message variant uses `NestedMessageField<…, Oneof, …>` — `ManuallyDrop<UnmanagedBox<M>>`, not `Option`.**
 
 **Per-variant `bind_<variant>_mut` helpers** return the field's bound mutation view. Parent `_mut` accessors are one-liners: `bind_email_address_mut(…).value_mut()`, `bind_webhook_id_mut(…).value_mut()`, `bind_postal_mut(…).value_mut()`.
 

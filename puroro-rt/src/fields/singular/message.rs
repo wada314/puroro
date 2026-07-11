@@ -7,17 +7,20 @@
 //!
 //! - [`Singular`] — `Option<UnmanagedBox<M>>`, for ordinary nested message
 //!   fields whose presence is tracked by the field itself (absent vs present).
-//! - [`Oneof`](crate::fields::shared::field_presence::Oneof) — a bare `UnmanagedBox<M>`, for oneof
-//!   message variants: the enclosing `OneofSlot` tracks presence, so the box is
-//!   *always* there and the field behaves like a scalar (`value` / `value_mut`, no
-//!   `Option`, no per-access `unwrap`).
+//! - [`Oneof`](crate::fields::shared::field_presence::Oneof) —
+//!   `ManuallyDrop<UnmanagedBox<M>>` for oneof message variants: the enclosing
+//!   `OneofSlot` tracks presence, so the box is *always* there (no `Option`) and
+//!   the field behaves like a scalar (`value` / `value_mut`). `ManuallyDrop`
+//!   lets [`FieldDeallocate`] take the box from `&mut self` without a later
+//!   implicit-drop panic.
 //!
-//! Either way the box is allocator-less; it is freed explicitly (via
-//! [`deallocate`](NestedMessageField::deallocate)) — from the owning message's
-//! `Drop` for [`Singular`], or through `OneofDeallocate` for [`Oneof`](crate::fields::shared::field_presence::Oneof).
+//! Either way the box is allocator-less; it is freed via [`FieldDeallocate`] —
+//! from the owning message's `Drop` for [`Singular`], or through
+//! `OneofDeallocate` for [`Oneof`](crate::fields::shared::field_presence::Oneof).
 
 use ::allocator_api2::alloc::Allocator;
 use ::bytes::{Buf, BufMut};
+use ::core::mem::ManuallyDrop;
 use ::unmanaged::UnmanagedBox;
 
 use ::puroro::{DecodeError, MessageDecode, MessageEncode, WireType};
@@ -37,10 +40,10 @@ pub trait NestedMessage<A: Allocator + Clone>: MessageEncode + MessageDecode + S
 }
 
 /// Storage strategy for [`NestedMessageField`] — whether the child box is
-/// wrapped in `Option` (optional presence) or always present.
+/// wrapped in `Option` (optional presence) or always present under `ManuallyDrop`.
 pub trait MessagePresence {
-    /// The stored container: `Option<UnmanagedBox<M>>` for [`Singular`], a bare
-    /// `UnmanagedBox<M>` for [`Oneof`].
+    /// The stored container: `Option<UnmanagedBox<M>>` for [`Singular`],
+    /// `ManuallyDrop<UnmanagedBox<M>>` for [`Oneof`].
     type Store<M, A: Allocator>;
 
     /// Borrows the child when present (`None` only for [`Singular`] when absent).
@@ -77,7 +80,7 @@ impl MessagePresence for Singular {
 }
 
 impl MessagePresence for Oneof {
-    type Store<M, A: Allocator> = UnmanagedBox<M>;
+    type Store<M, A: Allocator> = ManuallyDrop<UnmanagedBox<M>>;
 
     fn as_ref<M, A: Allocator>(store: &Self::Store<M, A>) -> Option<&M> {
         Some(store)
@@ -149,20 +152,6 @@ impl<M, const FIELD: u32, A: Allocator> NestedMessageField<M, Singular, FIELD, A
         self.store.is_some()
     }
 
-    /// Releases the child through `common.alloc`, if present. Terminal; called
-    /// from the owning message's `Drop`. Generated `clear_*` accessors go through
-    /// the bound view ([`NestedMessageFieldMut::clear`]) instead.
-    pub fn deallocate<Pb: PresenceBits>(&mut self, common: &MessageCommon<Pb, A>)
-    where
-        A: Clone,
-    {
-        if let Some(b) = self.store.take() {
-            // SAFETY: an owned clone of the message allocator owns the box's
-            // allocation; dropping the child runs its own `Drop`, which
-            // recursively frees its fields.
-            unsafe { b.deallocate(common.alloc.clone()) };
-        }
-    }
 }
 
 impl<M, const FIELD: u32, A: Allocator, Pb: PresenceBits> FieldDeallocate<Pb, A>
@@ -170,10 +159,13 @@ impl<M, const FIELD: u32, A: Allocator, Pb: PresenceBits> FieldDeallocate<Pb, A>
 where
     A: Clone,
 {
+    /// Releases the child through `common.alloc`, if present.
     #[inline]
     fn deallocate(&mut self, common: &MessageCommon<Pb, A>) {
         if let Some(b) = self.store.take() {
-            // SAFETY: see inherent `deallocate`.
+            // SAFETY: an owned clone of the message allocator owns the box's
+            // allocation; dropping the child runs its own `Drop`, which
+            // recursively frees its fields.
             unsafe { b.deallocate(common.alloc.clone()) };
         }
     }
@@ -209,19 +201,24 @@ impl<M, const FIELD: u32, A: Allocator> NestedMessageField<M, Oneof, FIELD, A> {
     {
         let m = M::new_in(alloc.clone());
         Self {
-            store: UnmanagedBox::new_in(m, alloc),
+            store: ManuallyDrop::new(UnmanagedBox::new_in(m, alloc)),
         }
     }
 }
 
-impl<M, const FIELD: u32, A: Allocator + Clone> NestedMessageField<M, Oneof, FIELD, A> {
-    /// Releases the child through `common.alloc`. Consumes the field by value
-    /// (there is no `Option` to null out); the enclosing oneof calls this via
-    /// `OneofDeallocate`, which already owns the variant by value.
-    pub fn deallocate<Pb: PresenceBits>(self, common: &MessageCommon<Pb, A>) {
-        // SAFETY: an owned clone of the message allocator owns the box's
-        // allocation; dropping the child runs its own `Drop` recursively.
-        unsafe { self.store.deallocate(common.alloc.clone()) };
+impl<M, const FIELD: u32, A: Allocator, Pb: PresenceBits> FieldDeallocate<Pb, A>
+    for NestedMessageField<M, Oneof, FIELD, A>
+where
+    A: Clone,
+{
+    /// Releases the child through `common.alloc`.
+    #[inline]
+    fn deallocate(&mut self, common: &MessageCommon<Pb, A>) {
+        // SAFETY: called once from message / oneof teardown; an owned clone of
+        // the message allocator owns the box. `ManuallyDrop::take` leaves an
+        // empty shell so a later field drop does not panic on `UnmanagedBox`.
+        let b = unsafe { ManuallyDrop::take(&mut self.store) };
+        unsafe { b.deallocate(common.alloc.clone()) };
     }
 }
 
@@ -368,7 +365,7 @@ impl<'f, 'c, M, const FIELD: u32, A: Allocator + Clone, Pb: PresenceBits>
 
     /// Clears the nested message, freeing it through the message allocator.
     pub fn clear(self) {
-        self.field.deallocate(self.common);
+        FieldDeallocate::deallocate(self.field, self.common);
     }
 }
 

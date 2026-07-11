@@ -121,26 +121,14 @@ impl<P: FieldPresence, const VALUE_BIT: usize, const FIELD: u32, D>
         }
     }
 
-    /// No-op — bool values live in the bitvec and need no allocator release.
-    ///
-    /// Present so message `Drop` / oneof teardown can call [`FieldDeallocate`]
-    /// uniformly on every field.
-    #[inline]
-    pub fn deallocate<Pb, A>(&mut self, _common: &MessageCommon<Pb, A>)
-    where
-        Pb: PresenceBits,
-        A: Allocator,
-    {
-    }
 }
 
 impl<P: FieldPresence, const VALUE_BIT: usize, const FIELD: u32, D, Pb: PresenceBits, A: Allocator>
     FieldDeallocate<Pb, A> for BoolField<P, VALUE_BIT, FIELD, D>
 {
+    /// No-op — bool values live in the bitvec and need no allocator release.
     #[inline]
-    fn deallocate(&mut self, common: &MessageCommon<Pb, A>) {
-        BoolField::deallocate(self, common);
-    }
+    fn deallocate(&mut self, _common: &MessageCommon<Pb, A>) {}
 }
 
 impl<P: FieldPresence, const VALUE_BIT: usize, const FIELD: u32, D>

@@ -62,12 +62,14 @@ impl<T: LenProtoType, const FIELD: u32, A: Allocator> RepeatedLenField<T, FIELD,
         }
     }
 
+}
+
+impl<T: LenProtoType, const FIELD: u32, Pb: PresenceBits, A: Allocator + Clone>
+    FieldDeallocate<Pb, A> for RepeatedLenField<T, FIELD, A>
+{
     /// Releases every element and the backing buffer through `common.alloc`.
-    /// Terminal; call once from the owning message's `Drop`.
-    pub fn deallocate<Pb: PresenceBits>(&mut self, common: &MessageCommon<Pb, A>)
-    where
-        A: Clone,
-    {
+    #[inline]
+    fn deallocate(&mut self, common: &MessageCommon<Pb, A>) {
         // SAFETY: called once; owned clones of the message allocator own the
         // buffer and every element.
         let alloc = common.alloc.clone();
@@ -79,15 +81,6 @@ impl<T: LenProtoType, const FIELD: u32, A: Allocator> RepeatedLenField<T, FIELD,
             }
         }
         unsafe { v.deallocate(alloc) };
-    }
-}
-
-impl<T: LenProtoType, const FIELD: u32, Pb: PresenceBits, A: Allocator + Clone>
-    FieldDeallocate<Pb, A> for RepeatedLenField<T, FIELD, A>
-{
-    #[inline]
-    fn deallocate(&mut self, common: &MessageCommon<Pb, A>) {
-        RepeatedLenField::deallocate(self, common);
     }
 }
 

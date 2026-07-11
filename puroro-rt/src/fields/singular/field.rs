@@ -121,21 +121,6 @@ where
         }
     }
 
-    /// Releases the payload through `common`'s allocator. Must be called from the
-    /// owning message's `Drop` (or oneof teardown) before the field itself is dropped.
-    ///
-    /// No-op for copy scalars whose [`DeallocateIn`](crate::fields::shared::DeallocateIn)
-    /// does nothing.
-    pub fn deallocate<Pb, A>(&mut self, common: &MessageCommon<Pb, A>)
-    where
-        Pb: PresenceBits,
-        A: Allocator + Clone,
-    {
-        let init = P::slot_init_view(common);
-        let alloc = common.alloc.clone();
-        let slot = unsafe { ManuallyDrop::take(&mut self.value) };
-        slot.deallocate_in(&init, alloc);
-    }
 }
 
 impl<T: ScalarProtoType, P: FieldPresence, const FIELD: u32, D, Pb: PresenceBits, A: Allocator>
@@ -144,9 +129,16 @@ where
     P::ValueSlot<T>: ValueSlot<T>,
     A: Clone,
 {
+    /// Releases the payload through `common`'s allocator.
+    ///
+    /// No-op for copy scalars whose [`DeallocateIn`](crate::fields::shared::DeallocateIn)
+    /// does nothing.
     #[inline]
     fn deallocate(&mut self, common: &MessageCommon<Pb, A>) {
-        SingularField::deallocate(self, common);
+        let init = P::slot_init_view(common);
+        let alloc = common.alloc.clone();
+        let slot = unsafe { ManuallyDrop::take(&mut self.value) };
+        slot.deallocate_in(&init, alloc);
     }
 }
 

@@ -147,21 +147,9 @@ impl<E, Pb: PresenceBits, A: Allocator> FieldDeallocate<Pb, A> for OneofSlot<E>
 where
     E: OneofDeallocate<Pb, A>,
 {
+    /// Releases the active variant through `common` (no-op when unset).
     #[inline]
     fn deallocate(&mut self, common: &MessageCommon<Pb, A>) {
-        OneofSlot::deallocate(self, common);
-    }
-}
-
-impl<E> OneofSlot<E> {
-    /// Releases the active variant through `common` (no-op when unset).
-    ///
-    /// Same shape as other catalog fields' `deallocate` for message `Drop`.
-    #[inline]
-    pub fn deallocate<Pb: PresenceBits, A: Allocator>(&mut self, common: &MessageCommon<Pb, A>)
-    where
-        E: OneofDeallocate<Pb, A>,
-    {
         if let Some(old) = self.take() {
             // SAFETY: `common.alloc` owns the active variant's buffers.
             unsafe { old.deallocate(common) };

@@ -11,8 +11,8 @@ use ::core::ops::DerefMut;
 
 use ::puroro::{DecodeError, MessageDecode, MessageEncode};
 use ::puroro_rt::{
-    Bindable, BindableMut, Explicit, MessageCommon, NestedMessage, PresenceBits, ProtoString,
-    SingularLenField,
+    Bindable, BindableMut, Explicit, FieldDeallocate, MessageCommon, NestedMessage, PresenceBits,
+    ProtoString, SingularLenField,
 };
 
 // ---------------------------------------------------------------------------

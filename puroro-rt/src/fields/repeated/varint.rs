@@ -75,17 +75,6 @@ impl<T: VarintProtoType, E: RepeatedVarintEncoding, const FIELD: u32, A: Allocat
         }
     }
 
-    /// Releases the backing buffer through `common.alloc`. Terminal; call once
-    /// from the owning message's `Drop`.
-    pub fn deallocate<Pb: PresenceBits>(&mut self, common: &MessageCommon<Pb, A>)
-    where
-        A: Clone,
-    {
-        // SAFETY: called once; an owned clone of the message allocator owns the
-        // buffer. Elements are `Copy` scalars with no per-element cleanup.
-        let v = unsafe { ManuallyDrop::take(&mut self.values) };
-        unsafe { v.deallocate(common.alloc.clone()) };
-    }
 }
 
 impl<
@@ -96,9 +85,13 @@ impl<
     A: Allocator + Clone,
 > FieldDeallocate<Pb, A> for RepeatedVarintField<T, E, FIELD, A>
 {
+    /// Releases the backing buffer through `common.alloc`.
     #[inline]
     fn deallocate(&mut self, common: &MessageCommon<Pb, A>) {
-        RepeatedVarintField::deallocate(self, common);
+        // SAFETY: called once; an owned clone of the message allocator owns the
+        // buffer. Elements are `Copy` scalars with no per-element cleanup.
+        let v = unsafe { ManuallyDrop::take(&mut self.values) };
+        unsafe { v.deallocate(common.alloc.clone()) };
     }
 }
 

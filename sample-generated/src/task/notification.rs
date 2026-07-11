@@ -50,10 +50,10 @@
 use ::allocator_api2::alloc::Allocator;
 use ::bytes::BufMut;
 use ::puroro_rt::{
-    Bindable, BindableMut, BoolField, BoolFieldMut, EnumVariant, MessageCommon, NestedMessageField,
-    NestedMessageFieldMut, Oneof, OneofDeallocate, OneofEncodable, OneofSlot, PresenceBits,
-    ProtoInt32, ProtoString, SingularLenField, SingularLenFieldMut, SingularVarintField,
-    SingularVarintFieldMut,
+    Bindable, BindableMut, BoolField, BoolFieldMut, EnumVariant, FieldDeallocate, MessageCommon,
+    NestedMessageField, NestedMessageFieldMut, Oneof, OneofDeallocate, OneofEncodable, OneofSlot,
+    PresenceBits, ProtoInt32, ProtoString, SingularLenField, SingularLenFieldMut,
+    SingularVarintField, SingularVarintFieldMut,
 };
 use ::unmanaged::string::StringGuard;
 
@@ -478,7 +478,7 @@ impl<A: Allocator + Clone, Pb: PresenceBits> OneofDeallocate<Pb, A> for Notifica
             Self::EmailAddress(mut f) => f.deallocate(common),
             Self::PhoneNumber(mut f) => f.deallocate(common),
             Self::WebhookId(mut f) => f.deallocate(common),
-            Self::Postal(f) => f.deallocate(common),
+            Self::Postal(mut f) => f.deallocate(common),
             Self::Urgent(mut f) => f.deallocate(common),
         }
     }

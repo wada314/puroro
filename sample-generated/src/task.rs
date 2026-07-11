@@ -15,10 +15,10 @@ use ::core::ops::DerefMut;
 
 use ::puroro::{DecodeError, HasDefault, MessageDecode, MessageEncode, Optional};
 use ::puroro_rt::{
-    Bindable, BindableMut, BoolField, Explicit, Implicit, LegacyRequired, MessageCommon,
-    NestedMessageField, OneofSlot, PresenceBits, ProtoBytes, ProtoEnum, ProtoInt32, ProtoString,
-    RepeatedExpandedVarintField, RepeatedLenField, RepeatedPackedVarintField, Singular,
-    SingularLenField, SingularVarintField,
+    Bindable, BindableMut, BoolField, Explicit, FieldDeallocate, Implicit, LegacyRequired,
+    MessageCommon, NestedMessageField, OneofSlot, PresenceBits, ProtoBytes, ProtoEnum, ProtoInt32,
+    ProtoString, RepeatedExpandedVarintField, RepeatedLenField, RepeatedPackedVarintField,
+    Singular, SingularLenField, SingularVarintField,
 };
 
 use defaults::MaxRetriesDefault;
