@@ -17,7 +17,7 @@
 //! |---|---|
 //! | [`shared`] | `MessageCommon`, `PresenceBits`, `FieldPresence`, `ValueSlot`, … |
 //! | [`wire`] | `ScalarProtoType` (thin wrappers), `VarintProtoType` / `LenProtoType` (repeated inners), fixed-width stubs |
-//! | [`singular`] | `SingularField`, `NestedMessageField` |
+//! | [`singular`] | `SingularField`, `BoolField`, `NestedMessageField` |
 //! | [`repeated`] | `RepeatedVarintField`, `RepeatedLenField` |
 //! | [`oneof`] | `OneofSlot` |
 
@@ -40,20 +40,21 @@ pub use repeated::{
     RepeatedVarintField, RepeatedVarintFieldMut, RepeatedVarintFieldRef,
 };
 pub use shared::{
-    DeallocateIn, DefaultIn, MessageCommon, PresenceBits, ProtoEmpty,
+    DeallocateIn, DefaultIn, FieldDeallocate, MessageCommon, PresenceBits, ProtoEmpty,
     bindable::{Bindable, BindableMut},
     field_presence::{Explicit, FieldPresence, Implicit, LegacyRequired, RequiredFieldPresence},
     slot_init::{AlwaysInitialized, BitInitMut, BitInitView, SlotInitMut, SlotInitView},
     value_slot::ValueSlot,
 };
 pub use singular::{
-    ExplicitBytes, ExplicitEnum, ExplicitInt32, ExplicitLenField, ExplicitString, ExplicitVarint,
-    ExplicitVarintField, ImplicitBytes, ImplicitEnum, ImplicitInt32, ImplicitLenField,
-    ImplicitString, ImplicitVarint, ImplicitVarintField, MessagePresence, NestedMessage,
-    NestedMessageField, NestedMessageFieldMut, NestedMessageFieldRef, Singular, SingularField,
-    SingularFieldMut, SingularFieldRef, SingularLen, SingularLenField, SingularLenFieldMut,
-    SingularLenFieldRef, SingularVarint, SingularVarintField, SingularVarintFieldMut,
-    SingularVarintFieldRef,
+    BoolField, BoolFieldMut, BoolFieldRef, ExplicitBoolField, ExplicitBytes, ExplicitEnum,
+    ExplicitInt32, ExplicitLenField, ExplicitString, ExplicitVarint, ExplicitVarintField,
+    ImplicitBoolField, ImplicitBytes, ImplicitEnum, ImplicitInt32, ImplicitLenField, ImplicitString,
+    ImplicitVarint, ImplicitVarintField, LegacyRequiredBoolField, MessagePresence, NestedMessage,
+    NestedMessageField, NestedMessageFieldMut, NestedMessageFieldRef, OneofBoolField, Singular,
+    SingularField, SingularFieldMut, SingularFieldRef, SingularLen, SingularLenField,
+    SingularLenFieldMut, SingularLenFieldRef, SingularVarint, SingularVarintField,
+    SingularVarintFieldMut, SingularVarintFieldRef,
 };
 pub use wire::{
     LenProtoType, ProtoBool, ProtoBytes, ProtoEnum, ProtoEnumStorage, ProtoInt32, ProtoInt64,

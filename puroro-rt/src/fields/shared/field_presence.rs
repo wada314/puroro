@@ -213,7 +213,7 @@ impl<const BIT: usize> FieldPresence for Explicit<BIT> {
         A: Allocator,
         F: FnOnce() -> bool,
     {
-        common.is_present(BIT)
+        common.is_bit_set(BIT)
     }
 
     fn is_set<P, A, F>(common: &MessageCommon<P, A>, _: F) -> bool
@@ -222,7 +222,7 @@ impl<const BIT: usize> FieldPresence for Explicit<BIT> {
         A: Allocator,
         F: FnOnce() -> bool,
     {
-        common.is_present(BIT)
+        common.is_bit_set(BIT)
     }
 }
 
@@ -268,7 +268,7 @@ impl<const BIT: usize> FieldPresence for LegacyRequired<BIT> {
         A: Allocator,
         F: FnOnce() -> bool,
     {
-        common.is_present(BIT)
+        common.is_bit_set(BIT)
     }
 
     fn is_set<P, A, F>(common: &MessageCommon<P, A>, _: F) -> bool
@@ -277,7 +277,7 @@ impl<const BIT: usize> FieldPresence for LegacyRequired<BIT> {
         A: Allocator,
         F: FnOnce() -> bool,
     {
-        common.is_present(BIT)
+        common.is_bit_set(BIT)
     }
 }
 

@@ -47,9 +47,11 @@ pub trait ValueSlot<T: DefaultIn + DeallocateIn> {
     ///
     /// `init` is taken **by value** so its `common` borrow can be threaded into
     /// the returned guard: the opaque return therefore binds *both* the field
-    /// borrow and `init`'s `common` borrow. That keeps room for a slot whose
-    /// value lives inside `common` (e.g. a bool packed into the presence
-    /// bitvec) to hand back a guard that borrows `common` rather than the field.
+    /// borrow and `init`'s `common` borrow. Bit-packed bools use a separate
+    /// [`BoolField`](crate::fields::BoolField) rather than this trait, because a
+    /// bit is not addressable as `&T` / `&mut T`. Mutable bool accessors return
+    /// `impl DerefMut<Target = bool>` from
+    /// [`MessageCommon::bit_mut`](crate::fields::MessageCommon::bit_mut) instead.
     ///
     /// The returned guard dereferences to `T`; for the current slots it is just
     /// `&mut T`, but the opaque return also keeps room for heap payloads to hand

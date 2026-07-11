@@ -15,7 +15,7 @@ use crate::decode;
 use ::puroro::DecodeError;
 use ::puroro::WireType;
 
-use crate::fields::shared::{Bindable, BindableMut, MessageCommon, PresenceBits};
+use crate::fields::shared::{Bindable, BindableMut, FieldDeallocate, MessageCommon, PresenceBits};
 use crate::fields::wire::varint::{self, VarintProtoType};
 
 use super::encoding::RepeatedVarintEncoding;
@@ -75,13 +75,30 @@ impl<T: VarintProtoType, E: RepeatedVarintEncoding, const FIELD: u32, A: Allocat
         }
     }
 
-    /// Releases the backing buffer through the owned `alloc`. Terminal; call
-    /// once from the owning message's `Drop`.
-    pub fn deallocate(&mut self, alloc: A) {
+    /// Releases the backing buffer through `common.alloc`. Terminal; call once
+    /// from the owning message's `Drop`.
+    pub fn deallocate<Pb: PresenceBits>(&mut self, common: &MessageCommon<Pb, A>)
+    where
+        A: Clone,
+    {
         // SAFETY: called once; an owned clone of the message allocator owns the
         // buffer. Elements are `Copy` scalars with no per-element cleanup.
         let v = unsafe { ManuallyDrop::take(&mut self.values) };
-        unsafe { v.deallocate(alloc) };
+        unsafe { v.deallocate(common.alloc.clone()) };
+    }
+}
+
+impl<
+    T: VarintProtoType,
+    E: RepeatedVarintEncoding,
+    const FIELD: u32,
+    Pb: PresenceBits,
+    A: Allocator + Clone,
+> FieldDeallocate<Pb, A> for RepeatedVarintField<T, E, FIELD, A>
+{
+    #[inline]
+    fn deallocate(&mut self, common: &MessageCommon<Pb, A>) {
+        RepeatedVarintField::deallocate(self, common);
     }
 }
 

@@ -31,6 +31,7 @@ use crate::fields::shared::{
     slot_init::AlwaysInitialized,
     value_slot::ValueSlot,
 };
+use crate::fields::shared::FieldDeallocate;
 use crate::fields::wire::scalar::ScalarProtoType;
 use crate::fields::wire::varint::{self, VarintProtoType};
 
@@ -121,7 +122,7 @@ where
     }
 
     /// Releases the payload through `common`'s allocator. Must be called from the
-    /// owning message's `Drop` (or equivalent) before the field itself is dropped.
+    /// owning message's `Drop` (or oneof teardown) before the field itself is dropped.
     ///
     /// No-op for copy scalars whose [`DeallocateIn`](crate::fields::shared::DeallocateIn)
     /// does nothing.
@@ -134,6 +135,18 @@ where
         let alloc = common.alloc.clone();
         let slot = unsafe { ManuallyDrop::take(&mut self.value) };
         slot.deallocate_in(&init, alloc);
+    }
+}
+
+impl<T: ScalarProtoType, P: FieldPresence, const FIELD: u32, D, Pb: PresenceBits, A: Allocator>
+    FieldDeallocate<Pb, A> for SingularField<T, P, FIELD, D>
+where
+    P::ValueSlot<T>: ValueSlot<T>,
+    A: Clone,
+{
+    #[inline]
+    fn deallocate(&mut self, common: &MessageCommon<Pb, A>) {
+        SingularField::deallocate(self, common);
     }
 }
 
@@ -166,12 +179,6 @@ impl<T: ScalarProtoType, const FIELD: u32, D> SingularField<T, Oneof, FIELD, D> 
     /// Mutable accessor for a oneof variant (slot is always initialized).
     pub fn value_mut<A: Allocator>(&mut self, alloc: A) -> T::Mut<'_, A> {
         self.value.get_mut().with_mut(alloc)
-    }
-
-    /// Releases the always-present payload. Used from [`OneofDeallocate`](crate::fields::OneofDeallocate).
-    pub fn deallocate_in<A: Allocator>(&mut self, alloc: A) {
-        let slot = unsafe { ManuallyDrop::take(&mut self.value) };
-        ValueSlot::deallocate_in(slot, &AlwaysInitialized, alloc);
     }
 }
 

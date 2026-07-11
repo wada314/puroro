@@ -7,38 +7,52 @@
 //! storage and init state.
 
 pub mod bindable;
+pub mod field_deallocate;
 pub mod field_presence;
 pub mod slot_init;
 pub mod value_slot;
 
 pub use bindable::{Bindable, BindableMut};
+pub use field_deallocate::FieldDeallocate;
 
 use ::core::mem::ManuallyDrop;
+use ::core::ops::DerefMut;
 
 use ::allocator_api2::alloc::Allocator;
 use ::unmanaged::UnmanagedVec;
 
 // ---------------------------------------------------------------------------
-// Presence bitfield (`PresenceBits`)
+// Message bitfield (`PresenceBits`)
 // ---------------------------------------------------------------------------
 
-/// Read/write interface to a message's presence bitfield.
+/// Read/write interface to a message's packed bitfield.
 ///
-/// Each EXPLICIT / LEGACY_REQUIRED singular field has a stable `bit` index
-/// assigned at codegen time. Field runtime types take `bit` as a `const` generic
-/// or method parameter and use this trait to query/update presence.
+/// Codegen assigns stable `bit` indices for:
+/// - EXPLICIT / LEGACY_REQUIRED singular **presence**
+/// - singular / oneof **bool value** bits packed into the same array
+///
+/// The historical name `PresenceBits` remains; the bits themselves are not
+/// presence-only. Generated newtypes typically wrap `bitvec::BitArray` and return
+/// bitvec's `BitRef<'_, Mut, …>` from [`bit_mut`](Self::bit_mut).
 pub trait PresenceBits {
-    /// Returns whether the field at `bit` is explicitly present.
+    /// Returns whether bit `bit` is set.
     fn is_set(&self, bit: usize) -> bool;
 
-    /// Sets or clears the presence bit at `bit`.
-    fn set(&mut self, bit: usize, present: bool);
+    /// Sets or clears bit `bit`.
+    fn set(&mut self, bit: usize, value: bool);
 
-    /// Clears the presence bit at `bit`.
+    /// Clears bit `bit`.
     #[inline]
     fn clear(&mut self, bit: usize) {
         self.set(bit, false);
     }
+
+    /// Returns a mutable handle to bit `bit` (`DerefMut<Target = bool>`).
+    ///
+    /// # Panics
+    ///
+    /// Generated impls panic if `bit` is out of range for the message bitfield.
+    fn bit_mut(&mut self, bit: usize) -> impl DerefMut<Target = bool> + '_;
 }
 
 // ---------------------------------------------------------------------------
@@ -91,16 +105,22 @@ impl<P, A: Allocator + Clone> MessageCommon<P, A> {
 }
 
 impl<P: PresenceBits, A: Allocator> MessageCommon<P, A> {
-    /// Returns whether a presence bit is set.
+    /// Returns whether bit `bit` is set.
     #[inline]
-    pub fn is_present(&self, bit: usize) -> bool {
+    pub fn is_bit_set(&self, bit: usize) -> bool {
         self.presence.is_set(bit)
     }
 
-    /// Sets or clears a presence bit.
+    /// Sets or clears bit `bit`.
     #[inline]
-    pub fn set_presence(&mut self, bit: usize, present: bool) {
-        self.presence.set(bit, present);
+    pub fn set_bit(&mut self, bit: usize, value: bool) {
+        self.presence.set(bit, value);
+    }
+
+    /// Returns a mutable handle to bit `bit` (`DerefMut<Target = bool>`).
+    #[inline]
+    pub fn bit_mut(&mut self, bit: usize) -> impl DerefMut<Target = bool> + '_ {
+        self.presence.bit_mut(bit)
     }
 }
 

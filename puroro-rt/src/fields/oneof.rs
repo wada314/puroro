@@ -18,7 +18,7 @@ use ::puroro::{HasDefault, Optional};
 
 use crate::fields::enum_variant::EnumVariant;
 use crate::fields::shared::{
-    Bindable, BindableMut, MessageCommon, PresenceBits,
+    Bindable, BindableMut, FieldDeallocate, MessageCommon, PresenceBits,
     field_presence::{FieldPresence, Oneof},
     value_slot::ValueSlot,
 };
@@ -26,27 +26,22 @@ use crate::fields::singular::field::SingularField;
 use crate::fields::singular::message::NestedMessageField;
 use crate::fields::wire::scalar::ScalarProtoType;
 
-/// Explicit, allocator-driven release of a generated `oneof` enum over allocator `A`.
+/// Explicit release of a generated `oneof` storage enum.
 ///
-/// A oneof enum owns allocator-less storage in its variants (field wrappers such
-/// as `SingularLenField<_, _, A>`, nested messages, …), which cannot free
-/// themselves. The enum implements this trait so [`OneofSlotMut`] can release the
-/// active variant — handing it the message allocator — before overwriting the
-/// slot. This mirrors the `deallocate(self, alloc)` contract of the `unmanaged`
-/// types: the name stresses that dropping is *not* implicit; the caller must pass
-/// the owning allocator. Variants that hold only inline scalars make `deallocate`
-/// a no-op.
+/// The enum owns allocator-less field wrappers in its variants. [`OneofSlotMut`]
+/// takes the active variant and calls this before overwriting the slot, passing
+/// the same [`MessageCommon`] message `Drop` uses so each arm can call
+/// [`FieldDeallocate::deallocate`](crate::fields::FieldDeallocate::deallocate).
 ///
-/// `A` is a trait parameter (rather than a generic method parameter) because a
-/// storage enum that owns field wrappers pins their allocator type to its own
-/// `A`; the freed allocator must match that type exactly.
-pub trait OneofDeallocate<A: Allocator> {
-    /// Drops the active variant and frees its storage through `alloc`.
+/// `Pb` and `A` are trait parameters because the storage enum pins the message's
+/// presence newtype and allocator type.
+pub trait OneofDeallocate<Pb: PresenceBits, A: Allocator> {
+    /// Drops the active variant and frees its storage through `common`.
     ///
     /// # Safety
     ///
-    /// `alloc` must be the allocator that owns the variant's buffers.
-    unsafe fn deallocate(self, alloc: A);
+    /// `common.alloc` must be the allocator that owns the variant's buffers.
+    unsafe fn deallocate(self, common: &MessageCommon<Pb, A>);
 }
 
 /// Wire encode behaviour for a generated oneof storage enum variant.
@@ -116,7 +111,10 @@ impl<E> OneofSlot<E> {
         self.value.take()
     }
 
-    /// Clears whichever variant was active.
+    /// Clears whichever variant was active without freeing it.
+    ///
+    /// Prefer [`OneofSlotMut::clear`](OneofSlotMut::clear) / [`FieldDeallocate`]
+    /// so the active variant is released through the message allocator.
     #[inline]
     pub fn clear(&mut self) {
         self.value = None;
@@ -141,6 +139,32 @@ impl<E> OneofSlot<E> {
     {
         if let Some(v) = self.as_ref() {
             v.encode_raw(common, buf);
+        }
+    }
+}
+
+impl<E, Pb: PresenceBits, A: Allocator> FieldDeallocate<Pb, A> for OneofSlot<E>
+where
+    E: OneofDeallocate<Pb, A>,
+{
+    #[inline]
+    fn deallocate(&mut self, common: &MessageCommon<Pb, A>) {
+        OneofSlot::deallocate(self, common);
+    }
+}
+
+impl<E> OneofSlot<E> {
+    /// Releases the active variant through `common` (no-op when unset).
+    ///
+    /// Same shape as other catalog fields' `deallocate` for message `Drop`.
+    #[inline]
+    pub fn deallocate<Pb: PresenceBits, A: Allocator>(&mut self, common: &MessageCommon<Pb, A>)
+    where
+        E: OneofDeallocate<Pb, A>,
+    {
+        if let Some(old) = self.take() {
+            // SAFETY: `common.alloc` owns the active variant's buffers.
+            unsafe { old.deallocate(common) };
         }
     }
 }
@@ -249,13 +273,12 @@ impl<'f, 'c, E, Pb: PresenceBits, A: Allocator> OneofSlotMut<'f, 'c, E, Pb, A> {
     /// variant first (last wins on the wire). Backs the decode arms.
     pub fn set(self, value: E)
     where
-        E: OneofDeallocate<A>,
+        E: OneofDeallocate<Pb, A>,
         A: Clone,
     {
         if let Some(old) = self.slot.take() {
-            // SAFETY: an owned clone of the message allocator owns the previous
-            // variant's buffers.
-            unsafe { old.deallocate(self.common.alloc.clone()) };
+            // SAFETY: `common.alloc` owns the previous variant's buffers.
+            unsafe { old.deallocate(self.common) };
         }
         self.slot.set(value);
     }
@@ -278,7 +301,7 @@ impl<'f, 'c, E, Pb: PresenceBits, A: Allocator> OneofSlotMut<'f, 'c, E, Pb, A> {
         make: impl FnOnce(A) -> <E as EnumVariant<V>>::Value,
     ) -> &'f mut <E as EnumVariant<V>>::Value
     where
-        E: EnumVariant<V> + OneofDeallocate<A>,
+        E: EnumVariant<V> + OneofDeallocate<Pb, A>,
         A: Clone,
     {
         let slot = self.slot;
@@ -291,9 +314,8 @@ impl<'f, 'c, E, Pb: PresenceBits, A: Allocator> OneofSlotMut<'f, 'c, E, Pb, A> {
 
         if needs_install {
             if let Some(old) = slot.take() {
-                // SAFETY: an owned clone of the message allocator owns the
-                // previous variant's buffers.
-                unsafe { old.deallocate(common.alloc.clone()) };
+                // SAFETY: `common.alloc` owns the previous variant's buffers.
+                unsafe { old.deallocate(common) };
             }
             slot.set(<E as EnumVariant<V>>::from_variant(make(
                 common.alloc.clone(),
@@ -307,13 +329,12 @@ impl<'f, 'c, E, Pb: PresenceBits, A: Allocator> OneofSlotMut<'f, 'c, E, Pb, A> {
     /// Frees the active variant (if any), leaving the slot empty.
     pub fn clear(self)
     where
-        E: OneofDeallocate<A>,
+        E: OneofDeallocate<Pb, A>,
         A: Clone,
     {
         if let Some(old) = self.slot.take() {
-            // SAFETY: an owned clone of the message allocator owns the active
-            // variant's buffers.
-            unsafe { old.deallocate(self.common.alloc.clone()) };
+            // SAFETY: `common.alloc` owns the active variant's buffers.
+            unsafe { old.deallocate(self.common) };
         }
     }
 }
@@ -374,6 +395,22 @@ where
     <Oneof as FieldPresence>::ValueSlot<T>: ValueSlot<T>,
 {
     pub fn optional(self) -> Optional<T::Ref<'a>, D>
+    where
+        A: Clone,
+    {
+        match self.field {
+            Some(f) => f.bind(self.common).optional(),
+            None => Optional::new(None),
+        }
+    }
+}
+
+impl<'a, const VALUE_BIT: usize, const FIELD: u32, D, Pb: PresenceBits, A: Allocator>
+    OneofVariantRef<'a, crate::fields::BoolField<Oneof, VALUE_BIT, FIELD, D>, Pb, A>
+where
+    D: HasDefault<bool>,
+{
+    pub fn optional(self) -> Optional<bool, D>
     where
         A: Clone,
     {

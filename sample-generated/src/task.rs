@@ -11,11 +11,12 @@ use ::allocator_api2::alloc::{Allocator, Global};
 use ::bitvec::array::BitArray;
 use ::bitvec::order::Lsb0;
 use ::bytes::{Buf, BufMut};
+use ::core::ops::DerefMut;
 
 use ::puroro::{DecodeError, HasDefault, MessageDecode, MessageEncode, Optional};
 use ::puroro_rt::{
-    Bindable, BindableMut, Explicit, Implicit, LegacyRequired, MessageCommon, NestedMessageField,
-    OneofSlot, PresenceBits, ProtoBytes, ProtoEnum, ProtoInt32, ProtoString,
+    Bindable, BindableMut, BoolField, Explicit, Implicit, LegacyRequired, MessageCommon,
+    NestedMessageField, OneofSlot, PresenceBits, ProtoBytes, ProtoEnum, ProtoInt32, ProtoString,
     RepeatedExpandedVarintField, RepeatedLenField, RepeatedPackedVarintField, Singular,
     SingularLenField, SingularVarintField,
 };
@@ -26,20 +27,32 @@ use crate::address::Address;
 use crate::enums::{Priority, Status};
 
 use notification::NotificationStorage;
-use notification::variant::{EmailAddress, PhoneNumber, Postal, WebhookId};
+use notification::variant::{EmailAddress, PhoneNumber, Postal, Urgent, WebhookId};
 pub use notification::{
     NotificationCase, NotificationMut, NotificationRef, NotificationView, NotificationViewMut,
 };
 
 // ---------------------------------------------------------------------------
-// Presence bitfield (5 tracked singular fields)
+// Presence bitfield (presence + bool value bits)
 // ---------------------------------------------------------------------------
 
 #[derive(Clone, Copy, Debug, Default)]
-pub struct TaskPresence(BitArray<[u8; 1], Lsb0>);
+pub struct TaskPresence(BitArray<[u8; 2], Lsb0>);
 
 impl TaskPresence {
     pub const ZERO: Self = Self(BitArray::ZERO);
+
+    /// Concrete [`BitRef`] for projections that cannot hold `impl Trait`
+    /// (e.g. [`NotificationMut`](notification::NotificationMut)).
+    #[inline]
+    pub(crate) fn bit_ref_mut(
+        &mut self,
+        bit: usize,
+    ) -> ::bitvec::ptr::BitRef<'_, ::bitvec::ptr::Mut, u8, Lsb0> {
+        self.0
+            .get_mut(bit)
+            .expect("bool / presence bit index in range")
+    }
 }
 
 impl PresenceBits for TaskPresence {
@@ -50,17 +63,26 @@ impl PresenceBits for TaskPresence {
     fn set(&mut self, bit: usize, present: bool) {
         self.0.set(bit, present);
     }
+
+    fn bit_mut(&mut self, bit: usize) -> impl DerefMut<Target = bool> + '_ {
+        self.bit_ref_mut(bit)
+    }
 }
 
 // ---------------------------------------------------------------------------
-// Presence bit indices (5 tracked singular fields)
+// Bit indices — presence (EXPLICIT/LEGACY_REQUIRED) then bool value bits,
+// assigned by ascending field number in one pass.
 // ---------------------------------------------------------------------------
 
-pub const BIT_TITLE: usize = 0; // title (EXPLICIT)
-pub const BIT_MAX_RETRIES: usize = 1; // max_retries (EXPLICIT)
-pub const BIT_OWNER_ID: usize = 2; // owner_id (LEGACY_REQUIRED)
-pub const BIT_PAYLOAD: usize = 3; // payload (EXPLICIT)
-pub const BIT_PRIORITY: usize = 4; // priority (EXPLICIT)
+pub const BIT_TITLE: usize = 0; // title (EXPLICIT presence)
+pub const BIT_MAX_RETRIES: usize = 1; // max_retries (EXPLICIT presence)
+pub const BIT_OWNER_ID: usize = 2; // owner_id (LEGACY_REQUIRED presence)
+pub const BIT_PAYLOAD: usize = 3; // payload (EXPLICIT presence)
+pub const BIT_PRIORITY: usize = 4; // priority (EXPLICIT presence)
+pub const BIT_DONE_VALUE: usize = 5; // done (IMPLICIT bool value)
+pub const BIT_FLAG: usize = 6; // flag (EXPLICIT presence)
+pub const BIT_FLAG_VALUE: usize = 7; // flag (EXPLICIT bool value)
+pub const BIT_URGENT_VALUE: usize = 8; // notification.urgent (oneof bool value)
 
 // ---------------------------------------------------------------------------
 // Proto field numbers
@@ -81,7 +103,9 @@ pub const FIELD_EMAIL_ADDRESS: u32 = 12; // notification.email_address
 pub const FIELD_PHONE_NUMBER: u32 = 13; // notification.phone_number
 pub const FIELD_WEBHOOK_ID: u32 = 14; // notification.webhook_id
 pub const FIELD_POSTAL: u32 = 15; // notification.postal
-
+pub const FIELD_DONE: u32 = 16; // done (IMPLICIT bool)
+pub const FIELD_FLAG: u32 = 17; // flag (EXPLICIT bool)
+pub const FIELD_URGENT: u32 = 18; // notification.urgent (oneof bool)
 // ---------------------------------------------------------------------------
 // Message struct
 // ---------------------------------------------------------------------------
@@ -107,8 +131,11 @@ pub struct Task<A: Allocator + Clone = Global> {
         SingularVarintField<ProtoEnum<Priority>, Explicit<{ BIT_PRIORITY }>, { FIELD_PRIORITY }>, // proto: Priority priority = 10;
     assignee: NestedMessageField<Address<A>, Singular, { FIELD_ASSIGNEE }, A>, // proto: Address assignee = 11;
     // proto: oneof notification { string email_address=12; string phone_number=13;
-    //                             int32 webhook_id=14 [default=-1]; Address postal=15; }
+    //                             int32 webhook_id=14 [default=-1]; Address postal=15;
+    //                             bool urgent=18; }
     notification: OneofSlot<NotificationStorage<A>>,
+    done: BoolField<Implicit, { BIT_DONE_VALUE }, { FIELD_DONE }>, // proto: bool done = 16;
+    flag: BoolField<Explicit<{ BIT_FLAG }>, { BIT_FLAG_VALUE }, { FIELD_FLAG }>, // proto: bool flag = 17;
 }
 
 impl<A: Allocator + Clone> Task<A> {
@@ -128,7 +155,9 @@ impl<A: Allocator + Clone> Task<A> {
             status: SingularVarintField::new_in(alloc.clone()),
             priority: SingularVarintField::new_in(alloc.clone()),
             assignee: NestedMessageField::new_in(alloc.clone()),
-            notification: OneofSlot::new_in(alloc),
+            notification: OneofSlot::new_in(alloc.clone()),
+            done: BoolField::new_in(alloc.clone()),
+            flag: BoolField::new_in(alloc),
         }
     }
 
@@ -298,7 +327,35 @@ impl<A: Allocator + Clone> Task<A> {
         self.assignee.bind_mut(&mut self._common).clear();
     }
 
-    // -- oneof notification (proto fields 12 / 13 / 14 / 15) ----------------
+    // -- done (IMPLICIT bool, proto field 16) --------------------------------
+
+    pub fn done(&self) -> bool {
+        self.done.bind(&self._common).value()
+    }
+
+    pub fn done_mut(&mut self) -> impl ::core::ops::DerefMut<Target = bool> + '_ {
+        self.done.bind_mut(&mut self._common).value_mut()
+    }
+
+    pub fn clear_done(&mut self) {
+        self.done.bind_mut(&mut self._common).clear();
+    }
+
+    // -- flag (EXPLICIT bool, proto field 17) --------------------------------
+
+    pub fn flag(&self) -> Optional<bool, impl HasDefault<bool>> {
+        self.flag.bind(&self._common).optional()
+    }
+
+    pub fn flag_mut(&mut self) -> impl ::core::ops::DerefMut<Target = bool> + '_ {
+        self.flag.bind_mut(&mut self._common).value_mut()
+    }
+
+    pub fn clear_flag(&mut self) {
+        self.flag.bind_mut(&mut self._common).clear();
+    }
+
+    // -- oneof notification (proto fields 12 / 13 / 14 / 15 / 18) ------------
 
     /// Which variant is set (payload-less; `None` when the group is unset).
     pub fn notification_case(&self) -> Option<NotificationCase> {
@@ -385,6 +442,19 @@ impl<A: Allocator + Clone> Task<A> {
         NotificationStorage::bind_postal_mut(&mut self.notification, &mut self._common).value_mut()
     }
 
+    // -- notification.urgent (bool, proto field 18) -------------------------
+
+    pub fn urgent(&self) -> Optional<bool, impl HasDefault<bool>> {
+        self.notification
+            .bind(&self._common)
+            .variant_of::<Urgent>()
+            .optional()
+    }
+
+    pub fn urgent_mut(&mut self) -> impl ::core::ops::DerefMut<Target = bool> + '_ {
+        NotificationStorage::bind_urgent_mut(&mut self.notification, &mut self._common).value_mut()
+    }
+
     // -- message-level ------------------------------------------------------
 
     pub fn unknown_fields(&self) -> &[u8] {
@@ -424,14 +494,21 @@ impl<A: Allocator + Clone + Default> Default for Task<A> {
 
 impl<A: Allocator + Clone> Drop for Task<A> {
     fn drop(&mut self) {
+        // Every direct child — same `deallocate(&common)` shape (FieldDeallocate).
         self.title.deallocate(&self._common);
+        self.score.deallocate(&self._common);
+        self.max_retries.deallocate(&self._common);
         self.owner_id.deallocate(&self._common);
         self.payload.deallocate(&self._common);
-        self.tag_ids.deallocate(self._common.alloc.clone());
-        self.scores.deallocate(self._common.alloc.clone());
-        self.labels.deallocate(self._common.alloc.clone());
-        self.assignee.deallocate(self._common.alloc.clone());
-        self.notification.bind_mut(&mut self._common).clear();
+        self.tag_ids.deallocate(&self._common);
+        self.scores.deallocate(&self._common);
+        self.labels.deallocate(&self._common);
+        self.status.deallocate(&self._common);
+        self.priority.deallocate(&self._common);
+        self.assignee.deallocate(&self._common);
+        self.notification.deallocate(&self._common);
+        self.done.deallocate(&self._common);
+        self.flag.deallocate(&self._common);
         self._common.deallocate();
     }
 }
@@ -456,6 +533,8 @@ impl<A: Allocator + Clone> MessageEncode for Task<A> {
         n += self.priority.encoded_len(c);
         n += self.assignee.encoded_len(c);
         n += self.notification.encoded_len(c);
+        n += self.done.encoded_len(c);
+        n += self.flag.encoded_len(c);
         n + c.unknown_fields.len()
     }
 
@@ -473,6 +552,8 @@ impl<A: Allocator + Clone> MessageEncode for Task<A> {
         self.priority.encode_raw(c, buf);
         self.assignee.encode_raw(c, buf);
         self.notification.encode_raw(c, buf);
+        self.done.encode_raw(c, buf);
+        self.flag.encode_raw(c, buf);
         let unknown: &[u8] = &c.unknown_fields;
         buf.put_slice(unknown);
     }
@@ -579,6 +660,26 @@ impl<A: Allocator + Clone> MessageDecode for Task<A> {
                     // notification.postal = 15, oneof nested message
                     NotificationStorage::bind_postal_mut(&mut self.notification, &mut self._common)
                         .merge(wire_type, buf)?;
+                }
+                FIELD_DONE => {
+                    // done = 16, IMPLICIT bool
+                    self.done
+                        .bind_mut(&mut self._common)
+                        .merge(wire_type, buf)?;
+                }
+                FIELD_FLAG => {
+                    // flag = 17, EXPLICIT bool
+                    self.flag
+                        .bind_mut(&mut self._common)
+                        .merge(wire_type, buf)?;
+                }
+                FIELD_URGENT => {
+                    // notification.urgent = 18, oneof bool
+                    NotificationStorage::bind_urgent_mut(
+                        &mut self.notification,
+                        &mut self._common,
+                    )
+                    .merge(wire_type, buf)?;
                 }
                 _ => {
                     // unknown field — preserve in _common.unknown_fields

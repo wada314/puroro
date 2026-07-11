@@ -16,7 +16,7 @@ use crate::encode;
 use ::puroro::DecodeError;
 use ::puroro::WireType;
 
-use crate::fields::shared::{Bindable, BindableMut, MessageCommon, PresenceBits};
+use crate::fields::shared::{Bindable, BindableMut, FieldDeallocate, MessageCommon, PresenceBits};
 use crate::fields::wire::len::{self, LenProtoType};
 
 /// Repeated field whose elements are length-delimited records (one tag per element).
@@ -62,14 +62,15 @@ impl<T: LenProtoType, const FIELD: u32, A: Allocator> RepeatedLenField<T, FIELD,
         }
     }
 
-    /// Releases every element and the backing buffer through owned `alloc`
-    /// clones. Terminal; call once from the owning message's `Drop`.
-    pub fn deallocate(&mut self, alloc: A)
+    /// Releases every element and the backing buffer through `common.alloc`.
+    /// Terminal; call once from the owning message's `Drop`.
+    pub fn deallocate<Pb: PresenceBits>(&mut self, common: &MessageCommon<Pb, A>)
     where
         A: Clone,
     {
         // SAFETY: called once; owned clones of the message allocator own the
         // buffer and every element.
+        let alloc = common.alloc.clone();
         let mut v = unsafe { ManuallyDrop::take(&mut self.values) };
         {
             let mut g = unsafe { v.with_alloc(alloc.clone()) };
@@ -78,6 +79,15 @@ impl<T: LenProtoType, const FIELD: u32, A: Allocator> RepeatedLenField<T, FIELD,
             }
         }
         unsafe { v.deallocate(alloc) };
+    }
+}
+
+impl<T: LenProtoType, const FIELD: u32, Pb: PresenceBits, A: Allocator + Clone>
+    FieldDeallocate<Pb, A> for RepeatedLenField<T, FIELD, A>
+{
+    #[inline]
+    fn deallocate(&mut self, common: &MessageCommon<Pb, A>) {
+        RepeatedLenField::deallocate(self, common);
     }
 }
 

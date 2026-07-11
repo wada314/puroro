@@ -16,6 +16,8 @@ fn task_roundtrip() {
     task.push_label("urgent");
     *task.status_mut() = Status::PENDING;
     *task.priority_mut() = Priority::HIGH;
+    *task.done_mut() = true;
+    *task.flag_mut() = false;
     task.email_address_mut().push_str("a@example.com");
 
     let mut assignee = Address::new();
@@ -41,6 +43,9 @@ fn task_roundtrip() {
     assert!(decoded.status().is_set());
     assert_eq!(decoded.priority().get(), Priority::HIGH);
     assert!(decoded.priority().is_set());
+    assert!(decoded.done());
+    assert!(decoded.flag().is_set());
+    assert!(!decoded.flag().get());
     assert!(matches!(
         decoded.notification().as_ref(),
         Some(NotificationRef::EmailAddress(s)) if s == "a@example.com"
@@ -211,4 +216,72 @@ fn closed_enum_unknown_goes_to_unknown_fields() {
 
     assert!(!task.priority().is_set());
     assert!(!task.unknown_fields().is_empty());
+}
+
+#[test]
+fn implicit_bool_omits_false_on_wire() {
+    let mut task = Task::new();
+    task.owner_id_mut().push_str("user-1");
+    *task.done_mut() = true;
+    task.clear_done();
+    assert!(!task.done());
+
+    let bytes = task.encode_to_vec();
+    let decoded: Task = Task::decode(&bytes[..]).unwrap();
+    assert!(!decoded.done());
+}
+
+#[test]
+fn explicit_bool_preserves_false() {
+    let mut task = Task::new();
+    task.owner_id_mut().push_str("user-1");
+    *task.flag_mut() = false;
+    assert!(task.flag().is_set());
+    assert!(!task.flag().get());
+
+    let bytes = task.encode_to_vec();
+    let decoded: Task = Task::decode(&bytes[..]).unwrap();
+    assert!(decoded.flag().is_set());
+    assert!(!decoded.flag().get());
+
+    task.clear_flag();
+    assert!(!task.flag().is_set());
+    let bytes = task.encode_to_vec();
+    let decoded: Task = Task::decode(&bytes[..]).unwrap();
+    assert!(!decoded.flag().is_set());
+}
+
+#[test]
+fn oneof_bool_variant_roundtrip() {
+    let mut task = Task::new();
+    task.owner_id_mut().push_str("user-1");
+    *task.urgent_mut() = true;
+    task.validate().unwrap();
+
+    let bytes = task.encode_to_vec();
+    let decoded: Task = Task::decode(&bytes[..]).unwrap();
+
+    assert_eq!(
+        decoded.notification_case(),
+        Some(NotificationCase::Urgent)
+    );
+    assert!(matches!(
+        decoded.notification().as_ref(),
+        Some(NotificationRef::Urgent(true))
+    ));
+    assert!(decoded.urgent().is_set());
+    assert!(decoded.urgent().get());
+
+    // Type-default false is still emitted when the oneof case is selected.
+    *task.urgent_mut() = false;
+    let bytes = task.encode_to_vec();
+    let decoded: Task = Task::decode(&bytes[..]).unwrap();
+    assert_eq!(
+        decoded.notification_case(),
+        Some(NotificationCase::Urgent)
+    );
+    assert!(matches!(
+        decoded.notification().as_ref(),
+        Some(NotificationRef::Urgent(false))
+    ));
 }

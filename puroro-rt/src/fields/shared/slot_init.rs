@@ -57,7 +57,7 @@ impl<'a, const BIT: usize, P: PresenceBits, A: Allocator> BitInitView<'a, BIT, P
 impl<const BIT: usize, P: PresenceBits, A: Allocator> SlotInitView for BitInitView<'_, BIT, P, A> {
     #[inline]
     fn is_initialized(&self) -> bool {
-        self.common.is_present(BIT)
+        self.common.is_bit_set(BIT)
     }
 }
 
@@ -76,13 +76,13 @@ impl<'a, const BIT: usize, P: PresenceBits, A: Allocator> BitInitMut<'a, BIT, P,
 impl<const BIT: usize, P: PresenceBits, A: Allocator> SlotInitView for BitInitMut<'_, BIT, P, A> {
     #[inline]
     fn is_initialized(&self) -> bool {
-        self.common.is_present(BIT)
+        self.common.is_bit_set(BIT)
     }
 }
 
 impl<const BIT: usize, P: PresenceBits, A: Allocator> SlotInitMut for BitInitMut<'_, BIT, P, A> {
     #[inline]
     fn set_initialized(&mut self, initialized: bool) {
-        self.common.set_presence(BIT, initialized);
+        self.common.set_bit(BIT, initialized);
     }
 }

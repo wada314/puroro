@@ -706,7 +706,7 @@ pub(crate) enum NotificationStorage<A: Allocator + Clone> {
     Postal(NestedMessageField<Address<A>, Oneof, FIELD, A>),   // message (heap box)
 }
 impl<A: Allocator + Clone> ::puroro_rt::OneofDeallocate<A> for NotificationStorage<A> {
-    // LEN + message (+ scalar no-op) call field.deallocate_in(alloc).
+    // LEN + message (+ scalar no-op) call field.deallocate(common).
 }
 
 // (2) Payload-less case discriminant (unset is `None`, so no `NotSet` member).
@@ -756,7 +756,7 @@ pub fn postal_mut(&mut self) -> &mut Address<A>;       // message variant
 pub fn clear_notification(&mut self); // = notification_mut().clear()
 ```
 
-**Variants own field wrappers, not raw storage.** A oneof member of a given kind reuses the exact field wrapper an ordinary singular field of that kind uses (`SingularField` / `SingularLenField` / `SingularVarintField` for scalars and LEN; `NestedMessageField` for messages), so the storage / `value` / `value_mut` / `deallocate` machinery is shared rather than reimplemented. The wrapper's *presence* is inert for a oneof — presence is tracked by the enclosing `OneofSlot` — so `FieldPresence::Oneof` is used (always-initialized storage; omit rules never consulted).
+**Variants own field wrappers, not raw storage.** A oneof member of a given kind reuses the exact field wrapper an ordinary singular field of that kind uses (`SingularField` / `SingularLenField` / `SingularVarintField` for non-bool scalars and LEN; [`BoolField`](puroro-rt/src/fields/singular/bool.rs) for `bool` — value packed into `_common.presence`; `NestedMessageField` for messages), so the storage / `value` / `value_mut` / `deallocate` machinery is shared rather than reimplemented. The wrapper's *presence* is inert for a oneof — presence is tracked by the enclosing `OneofSlot` — so `FieldPresence::Oneof` is used (omit rules never consulted; bool still reads/writes its value bit).
 
 To keep generated code thin, each wrapper is driven with the **field's own** construction, merge, and access primitives — no bespoke helpers on the oneof enum:
 
@@ -764,6 +764,7 @@ To keep generated code thin, each wrapper is driven with the **field's own** con
 |---|---|---|---|
 | LEN | `SingularLenField::new_in(alloc)` | `bind_<variant>_mut(…).merge(wire, buf)` | `value()` / `value_mut(alloc)` |
 | VARINT | `SingularVarintField::new_in(alloc)` | `bind_<variant>_mut(…).merge(wire, buf)` | `value()` / `value_mut(alloc)` |
+| bool | `BoolField::new_in(alloc)` | `bind_<variant>_mut(…).merge(wire, buf)` | `bind(common).value()` / `bind_mut(common).value_mut()` → `impl DerefMut<Target = bool>` |
 | message | `NestedMessageField::with_message_in(alloc)` | `bind_<variant>_mut(…).merge(wire, buf)` | `value()` / `value_mut()` |
 
 Every variant merges through the **same** `bind_<variant>_mut(…).merge(wire, buf)` shape. The message variant merges *into* the present child rather than replacing it.

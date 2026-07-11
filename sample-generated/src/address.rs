@@ -7,6 +7,7 @@ use ::allocator_api2::alloc::{Allocator, Global};
 use ::bitvec::array::BitArray;
 use ::bitvec::order::Lsb0;
 use ::bytes::{Buf, BufMut};
+use ::core::ops::DerefMut;
 
 use ::puroro::{DecodeError, MessageDecode, MessageEncode};
 use ::puroro_rt::{
@@ -32,6 +33,12 @@ impl PresenceBits for AddressPresence {
 
     fn set(&mut self, bit: usize, present: bool) {
         self.0.set(bit, present);
+    }
+
+    fn bit_mut(&mut self, bit: usize) -> impl DerefMut<Target = bool> + '_ {
+        self.0
+            .get_mut(bit)
+            .expect("presence bit index in range")
     }
 }
 

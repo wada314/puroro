@@ -23,6 +23,7 @@
 //! | `email_address` / `phone_number` | `string` | [`SingularLenField`] (+ `ProtoDefault`) | `&str` | string guard |
 //! | `webhook_id` | `int32` `[default = -1]` | [`SingularVarintField`] + [`WebhookIdDefault`] | `i32` (by value) | `&mut i32` |
 //! | `postal` | `Address` message | [`NestedMessageField`] | `&Address<A>` | `&mut Address<A>` |
+//! | `urgent` | `bool` | [`BoolField`] | `bool` | bitvec `BitRef<'_, Mut, …>` |
 //!
 //! Per-variant **immutable** getters return [`Optional`](::puroro::Optional) whose
 //! `D` is the field wrapper's default marker: when the case is unset or another
@@ -49,9 +50,10 @@
 use ::allocator_api2::alloc::Allocator;
 use ::bytes::BufMut;
 use ::puroro_rt::{
-    BindableMut, EnumVariant, MessageCommon, NestedMessageField, NestedMessageFieldMut, Oneof,
-    OneofDeallocate, OneofEncodable, OneofSlot, PresenceBits, ProtoInt32, ProtoString,
-    SingularLenField, SingularLenFieldMut, SingularVarintField, SingularVarintFieldMut,
+    Bindable, BindableMut, BoolField, BoolFieldMut, EnumVariant, MessageCommon, NestedMessageField,
+    NestedMessageFieldMut, Oneof, OneofDeallocate, OneofEncodable, OneofSlot, PresenceBits,
+    ProtoInt32, ProtoString, SingularLenField, SingularLenFieldMut, SingularVarintField,
+    SingularVarintFieldMut,
 };
 use ::unmanaged::string::StringGuard;
 
@@ -66,9 +68,10 @@ pub(crate) mod variant {
     pub struct PhoneNumber;
     pub struct WebhookId;
     pub struct Postal;
+    pub struct Urgent;
 }
 
-use variant::{EmailAddress, PhoneNumber, Postal, WebhookId};
+use variant::{EmailAddress, PhoneNumber, Postal, Urgent, WebhookId};
 
 /// Which variant of `oneof notification` is set — a payload-less discriminant.
 ///
@@ -81,6 +84,7 @@ pub enum NotificationCase {
     PhoneNumber,
     WebhookId,
     Postal,
+    Urgent,
 }
 
 /// Borrowed read view of the active `notification` variant.
@@ -89,6 +93,7 @@ pub enum NotificationRef<'a, A: Allocator + Clone> {
     PhoneNumber(&'a str),
     WebhookId(i32),
     Postal(&'a Address<A>),
+    Urgent(bool),
 }
 
 impl<A: Allocator + Clone> Clone for NotificationRef<'_, A> {
@@ -104,6 +109,9 @@ pub enum NotificationMut<'a, A: Allocator + Clone> {
     PhoneNumber(StringGuard<'a, A>),
     WebhookId(&'a mut i32),
     Postal(&'a mut Address<A>),
+    /// Named only because enum variants cannot hold `impl Trait`; public
+    /// `_mut` accessors still return `impl DerefMut<Target = bool>`.
+    Urgent(::bitvec::ptr::BitRef<'a, ::bitvec::ptr::Mut, u8, ::bitvec::order::Lsb0>),
 }
 
 /// Shared bound view of the `notification` oneof group (slot + message common).
@@ -112,8 +120,6 @@ pub enum NotificationMut<'a, A: Allocator + Clone> {
 /// group is unset. Project the active variant with [`as_ref`](Self::as_ref).
 pub struct NotificationView<'a, A: Allocator + Clone> {
     slot: &'a OneofSlot<NotificationStorage<A>>,
-    /// Bound for symmetry with [`NotificationViewMut`]; unused by current getters.
-    #[allow(dead_code)]
     common: &'a MessageCommon<TaskPresence, A>,
 }
 
@@ -135,7 +141,7 @@ impl<'a, A: Allocator + Clone> NotificationView<'a, A> {
     /// Projected read view of the active variant, if any.
     #[inline]
     pub fn as_ref(&self) -> Option<NotificationRef<'a, A>> {
-        self.slot.as_ref().map(|s| s.to_ref())
+        self.slot.as_ref().map(|s| s.to_ref(self.common))
     }
 }
 
@@ -169,8 +175,7 @@ impl<'a, A: Allocator + Clone> NotificationViewMut<'a, A> {
     /// Consumes this bound view. Returns `None` when the group is unset.
     #[inline]
     pub fn as_mut(self) -> Option<NotificationMut<'a, A>> {
-        let alloc = self.common.alloc.clone();
-        self.slot.as_mut().map(|s| s.to_mut(alloc))
+        self.slot.as_mut().map(|s| s.to_mut(self.common))
     }
 
     /// Clears whichever variant is active (freeing it through the message allocator).
@@ -192,6 +197,7 @@ pub(crate) enum NotificationStorage<A: Allocator + Clone> {
         SingularVarintField<ProtoInt32, Oneof, { super::FIELD_WEBHOOK_ID }, WebhookIdDefault>,
     ),
     Postal(NestedMessageField<Address<A>, Oneof, { super::FIELD_POSTAL }, A>),
+    Urgent(BoolField<Oneof, { super::BIT_URGENT_VALUE }, { super::FIELD_URGENT }>),
 }
 
 impl<A: Allocator + Clone> NotificationStorage<A> {
@@ -201,24 +207,45 @@ impl<A: Allocator + Clone> NotificationStorage<A> {
             Self::PhoneNumber(_) => NotificationCase::PhoneNumber,
             Self::WebhookId(_) => NotificationCase::WebhookId,
             Self::Postal(_) => NotificationCase::Postal,
+            Self::Urgent(_) => NotificationCase::Urgent,
         }
     }
 
-    pub(crate) fn to_ref(&self) -> NotificationRef<'_, A> {
+    pub(crate) fn to_ref<'a, Pb: PresenceBits>(
+        &'a self,
+        common: &'a MessageCommon<Pb, A>,
+    ) -> NotificationRef<'a, A> {
         match self {
             Self::EmailAddress(f) => NotificationRef::EmailAddress(f.value()),
             Self::PhoneNumber(f) => NotificationRef::PhoneNumber(f.value()),
             Self::WebhookId(f) => NotificationRef::WebhookId(f.value()),
             Self::Postal(f) => NotificationRef::Postal(f.value()),
+            Self::Urgent(f) => NotificationRef::Urgent(f.bind(common).value()),
         }
     }
 
-    pub(crate) fn to_mut(&mut self, alloc: A) -> NotificationMut<'_, A> {
+    pub(crate) fn to_mut<'a>(
+        &'a mut self,
+        common: &'a mut MessageCommon<TaskPresence, A>,
+    ) -> NotificationMut<'a, A> {
         match self {
-            Self::EmailAddress(f) => NotificationMut::EmailAddress(f.value_mut(alloc)),
-            Self::PhoneNumber(f) => NotificationMut::PhoneNumber(f.value_mut(alloc)),
-            Self::WebhookId(f) => NotificationMut::WebhookId(f.value_mut(alloc)),
+            Self::EmailAddress(f) => {
+                let alloc = common.alloc.clone();
+                NotificationMut::EmailAddress(f.value_mut(alloc))
+            }
+            Self::PhoneNumber(f) => {
+                let alloc = common.alloc.clone();
+                NotificationMut::PhoneNumber(f.value_mut(alloc))
+            }
+            Self::WebhookId(f) => {
+                let alloc = common.alloc.clone();
+                NotificationMut::WebhookId(f.value_mut(alloc))
+            }
             Self::Postal(f) => NotificationMut::Postal(f.value_mut()),
+            // Enum variants cannot store RPITIT; use the concrete BitRef.
+            Self::Urgent(_) => {
+                NotificationMut::Urgent(common.presence.bit_ref_mut(super::BIT_URGENT_VALUE))
+            }
         }
     }
 
@@ -286,6 +313,25 @@ impl<A: Allocator + Clone> NotificationStorage<A> {
         let field = slot
             .bind_mut(common)
             .variant_mut::<Postal>(|alloc| NestedMessageField::with_message_in(alloc));
+        field.bind_mut(common)
+    }
+
+    pub(crate) fn bind_urgent_mut<'f, 'c, Pb: PresenceBits>(
+        slot: &'f mut OneofSlot<Self>,
+        common: &'c mut MessageCommon<Pb, A>,
+    ) -> BoolFieldMut<
+        'f,
+        'c,
+        Oneof,
+        { super::BIT_URGENT_VALUE },
+        { super::FIELD_URGENT },
+        ::puroro_rt::ProtoDefault,
+        Pb,
+        A,
+    > {
+        let field = slot
+            .bind_mut(common)
+            .variant_mut::<Urgent>(|alloc| BoolField::new_in(alloc));
         field.bind_mut(common)
     }
 }
@@ -379,6 +425,28 @@ impl<A: Allocator + Clone> EnumVariant<Postal> for NotificationStorage<A> {
     }
 }
 
+impl<A: Allocator + Clone> EnumVariant<Urgent> for NotificationStorage<A> {
+    type Value = BoolField<Oneof, { super::BIT_URGENT_VALUE }, { super::FIELD_URGENT }>;
+
+    fn variant_ref(&self) -> Option<&Self::Value> {
+        match self {
+            Self::Urgent(f) => Some(f),
+            _ => None,
+        }
+    }
+
+    fn variant_mut(&mut self) -> Option<&mut Self::Value> {
+        match self {
+            Self::Urgent(f) => Some(f),
+            _ => None,
+        }
+    }
+
+    fn from_variant(value: Self::Value) -> Self {
+        Self::Urgent(value)
+    }
+}
+
 impl<A: Allocator + Clone> OneofEncodable<A> for NotificationStorage<A> {
     fn encoded_len<Pb: PresenceBits>(&self, common: &MessageCommon<Pb, A>) -> usize {
         match self {
@@ -386,6 +454,7 @@ impl<A: Allocator + Clone> OneofEncodable<A> for NotificationStorage<A> {
             Self::PhoneNumber(f) => f.encoded_len(common),
             Self::WebhookId(f) => f.encoded_len(common),
             Self::Postal(f) => f.encoded_len(common),
+            Self::Urgent(f) => f.encoded_len(common),
         }
     }
 
@@ -395,20 +464,22 @@ impl<A: Allocator + Clone> OneofEncodable<A> for NotificationStorage<A> {
             Self::PhoneNumber(f) => f.encode_raw(common, buf),
             Self::WebhookId(f) => f.encode_raw(common, buf),
             Self::Postal(f) => f.encode_raw(common, buf),
+            Self::Urgent(f) => f.encode_raw(common, buf),
         }
     }
 }
 
-impl<A: Allocator + Clone> OneofDeallocate<A> for NotificationStorage<A> {
+impl<A: Allocator + Clone, Pb: PresenceBits> OneofDeallocate<Pb, A> for NotificationStorage<A> {
     /// # Safety
     ///
-    /// `alloc` must be the allocator that owns the variant's buffer.
-    unsafe fn deallocate(self, alloc: A) {
+    /// `common.alloc` must be the allocator that owns the variant's buffer.
+    unsafe fn deallocate(self, common: &MessageCommon<Pb, A>) {
         match self {
-            Self::EmailAddress(mut f) => f.deallocate_in(alloc),
-            Self::PhoneNumber(mut f) => f.deallocate_in(alloc),
-            Self::WebhookId(mut f) => f.deallocate_in(alloc),
-            Self::Postal(f) => f.deallocate(alloc),
+            Self::EmailAddress(mut f) => f.deallocate(common),
+            Self::PhoneNumber(mut f) => f.deallocate(common),
+            Self::WebhookId(mut f) => f.deallocate(common),
+            Self::Postal(f) => f.deallocate(common),
+            Self::Urgent(mut f) => f.deallocate(common),
         }
     }
 }
