@@ -26,7 +26,9 @@ use crate::enums::{Priority, Status};
 
 use notification::variant::{EmailAddress, PhoneNumber, Postal, WebhookId};
 use notification::NotificationStorage;
-pub use notification::{NotificationCase, NotificationMut, NotificationRef};
+pub use notification::{
+    NotificationCase, NotificationMut, NotificationRef, NotificationView, NotificationViewMut,
+};
 
 // ---------------------------------------------------------------------------
 // Presence bitfield (5 tracked singular fields)
@@ -300,12 +302,12 @@ impl<A: Allocator + Clone> Task<A> {
 
     /// Which variant is set (payload-less; `None` when the group is unset).
     pub fn notification_case(&self) -> Option<NotificationCase> {
-        self.notification.as_ref().map(|s| s.case())
+        self.notification().case()
     }
 
-    /// Safe borrowed read view of the active variant.
-    pub fn notification(&self) -> Option<NotificationRef<'_, A>> {
-        self.notification.as_ref().map(|s| s.to_ref())
+    /// Bound shared view of the oneof group (always available, including when unset).
+    pub fn notification(&self) -> NotificationView<'_, A> {
+        NotificationView::new(&self.notification, &self._common)
     }
 
     pub fn email_address<'a>(&'a self) -> Optional<&'a str, impl HasDefault<&'a str>> {
@@ -333,10 +335,9 @@ impl<A: Allocator + Clone> Task<A> {
         self.notification.variant_of::<Postal>().get()
     }
 
-    /// Safe borrowed mutable view of the *currently active* variant (no switch).
-    pub fn notification_mut(&mut self) -> Option<NotificationMut<'_, A>> {
-        let alloc = self._common.alloc.clone();
-        self.notification.as_mut().map(|s| s.to_mut(alloc))
+    /// Bound mutable view of the oneof group (always available, including when unset).
+    pub fn notification_mut(&mut self) -> NotificationViewMut<'_, A> {
+        NotificationViewMut::new(&mut self.notification, &mut self._common)
     }
 
     pub fn email_address_mut(
@@ -367,7 +368,7 @@ impl<A: Allocator + Clone> Task<A> {
     }
 
     pub fn clear_notification(&mut self) {
-        self.notification.bind_mut(&mut self._common).clear();
+        self.notification_mut().clear();
     }
 
     // -- message-level ------------------------------------------------------

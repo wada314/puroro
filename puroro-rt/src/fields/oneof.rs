@@ -5,16 +5,18 @@
 //! individual variant field types are not used on the message struct.
 //!
 //! Mutation flows through [`OneofSlotMut`], obtained via
-//! [`BindableMut::bind_mut`](crate::fields::shared::BindableMut::bind_mut), mirroring the bound-view idiom used by the singular /
-//! repeated field families: the slot is bound to the message
-//! [`MessageCommon`] (for the allocator), and the previously-active variant is
-//! released through [`OneofDeallocate::deallocate`] before the slot is overwritten.
+//! [`BindableMut::bind_mut`](crate::fields::shared::BindableMut::bind_mut); read
+//! binding uses [`OneofSlotRef`] via [`Bindable::bind`](crate::fields::shared::Bindable::bind).
+//! Both mirror the bound-view idiom used by the singular / repeated field
+//! families: the slot is bound to the message [`MessageCommon`] (for the
+//! allocator on the mut path), and the previously-active variant is released
+//! through [`OneofDeallocate::deallocate`] before the slot is overwritten.
 
 use ::allocator_api2::alloc::Allocator;
 use ::bytes::BufMut;
 
 use crate::fields::enum_variant::EnumVariant;
-use crate::fields::shared::{BindableMut, MessageCommon, PresenceBits};
+use crate::fields::shared::{Bindable, BindableMut, MessageCommon, PresenceBits};
 
 /// Explicit, allocator-driven release of a generated `oneof` enum over allocator `A`.
 ///
@@ -160,6 +162,20 @@ impl<E> Default for OneofSlot<E> {
     }
 }
 
+impl<E, A: Allocator + Clone, Pb: PresenceBits> Bindable<MessageCommon<Pb, A>> for OneofSlot<E> {
+    type Bound<'a> = OneofSlotRef<'a, E, Pb, A>
+    where
+        Self: 'a,
+        MessageCommon<Pb, A>: 'a;
+
+    fn bind<'a>(
+        &'a self,
+        common: &'a MessageCommon<Pb, A>,
+    ) -> OneofSlotRef<'a, E, Pb, A> {
+        OneofSlotRef::new(self, common)
+    }
+}
+
 impl<E, A: Allocator + Clone, Pb: PresenceBits> BindableMut<MessageCommon<Pb, A>> for OneofSlot<E> {
     type BoundMut<'f, 'c> = OneofSlotMut<'f, 'c, E, Pb, A>
     where
@@ -171,6 +187,40 @@ impl<E, A: Allocator + Clone, Pb: PresenceBits> BindableMut<MessageCommon<Pb, A>
         common: &'c mut MessageCommon<Pb, A>,
     ) -> OneofSlotMut<'f, 'c, E, Pb, A> {
         OneofSlotMut::new(self, common)
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Read view
+// ---------------------------------------------------------------------------
+
+/// Short-lived shared binding of a oneof slot to its message common state,
+/// produced by [`Bindable::bind`](crate::fields::shared::Bindable::bind).
+///
+/// Mirrors [`OneofSlotMut`] for the read path. Generated group views wrap this
+/// (or hold the same pair of references) so `notification()`-style accessors
+/// always return a handle, including when the group is unset.
+pub struct OneofSlotRef<'a, E, Pb: PresenceBits, A: Allocator> {
+    slot: &'a OneofSlot<E>,
+    common: &'a MessageCommon<Pb, A>,
+}
+
+impl<'a, E, Pb: PresenceBits, A: Allocator> OneofSlotRef<'a, E, Pb, A> {
+    #[inline]
+    fn new(slot: &'a OneofSlot<E>, common: &'a MessageCommon<Pb, A>) -> Self {
+        Self { slot, common }
+    }
+
+    /// Returns the active storage variant, if any.
+    #[inline]
+    pub fn as_ref(&self) -> Option<&'a E> {
+        self.slot.as_ref()
+    }
+
+    /// Shared message common (allocator / presence / unknown fields).
+    #[inline]
+    pub fn common(&self) -> &'a MessageCommon<Pb, A> {
+        self.common
     }
 }
 

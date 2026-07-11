@@ -689,7 +689,7 @@ Alias names with the same integer all map to the same `Self(v)`; equality is by 
 
 ### 4.7 Oneof fields
 
-Each `oneof` group generates **four** types in a submodule named after the parent message (lower-snake-case), because the owned storage holds allocator-less `unmanaged` values (unsafe to drop implicitly) that must not leak into the public API:
+Each `oneof` group generates types in a submodule named after the parent message (lower-snake-case), because the owned storage holds allocator-less `unmanaged` values (unsafe to drop implicitly) that must not leak into the public API:
 
 ```rust
 // In module `task`:
@@ -702,7 +702,7 @@ Each `oneof` group generates **four** types in a submodule named after the paren
 pub(crate) enum NotificationStorage<A: Allocator + Clone> {
     EmailAddress(SingularLenField<ProtoString, Oneof, FIELD>), // LEN   (heap)
     PhoneNumber(SingularLenField<ProtoString, Oneof, FIELD>),  // LEN   (heap)
-    WebhookId(SingularVarintField<ProtoInt32, Oneof, FIELD>),  // VARINT (inline)
+    WebhookId(SingularVarintField<ProtoInt32, Oneof, FIELD, WebhookIdDefault>), // VARINT
     Postal(NestedMessageField<Address<A>, Oneof, FIELD, A>),   // message (heap box)
 }
 impl<A: Allocator + Clone> ::puroro_rt::OneofDeallocate<A> for NotificationStorage<A> {
@@ -712,18 +712,19 @@ impl<A: Allocator + Clone> ::puroro_rt::OneofDeallocate<A> for NotificationStora
 // (2) Payload-less case discriminant (unset is `None`, so no `NotSet` member).
 pub enum NotificationCase { EmailAddress, PhoneNumber, WebhookId, Postal }
 
-// (3) Safe borrowed read view. VARINT is returned by value (Copy); a message is
-//     a plain shared reference. (Copy/Clone are hand-written to avoid a spurious
-//     `A: Copy` bound; Debug/Eq are omitted since `Address<A>` implements neither.)
+// (3) Bound views of the *group* (slot + MessageCommon) — always returned by
+//     `notification()` / `notification_mut()`, including when unset.
+pub struct NotificationView<'a, A: Allocator + Clone> { /* … */ }
+pub struct NotificationViewMut<'a, A: Allocator + Clone> { /* … */ }
+
+// (4) Safe projected enums of the *active* variant (from view.as_ref / as_mut).
+//     VARINT is by value (Copy); a message is a plain reference.
 pub enum NotificationRef<'a, A: Allocator + Clone> {
     EmailAddress(&'a str),
     PhoneNumber(&'a str),
     WebhookId(i32),
     Postal(&'a Address<A>),
 }
-
-// (4) Safe borrowed mutable view: LEN → growable guard, VARINT → &mut scalar,
-//     message → &mut child.
 pub enum NotificationMut<'a, A: Allocator + Clone> {
     EmailAddress(StringGuard<'a, A>),
     PhoneNumber(StringGuard<'a, A>),
@@ -732,9 +733,17 @@ pub enum NotificationMut<'a, A: Allocator + Clone> {
 }
 
 // Accessors on Task:
-pub fn notification_case(&self) -> Option<NotificationCase>;      // which variant (None = unset)
-pub fn notification(&self) -> Option<NotificationRef<'_, A>>;      // read active
-pub fn notification_mut(&mut self) -> Option<NotificationMut<'_, A>>; // edit active in place
+pub fn notification_case(&self) -> Option<NotificationCase>; // = notification().case()
+pub fn notification(&self) -> NotificationView<'_, A>;       // shared bind (always)
+pub fn notification_mut(&mut self) -> NotificationViewMut<'_, A>; // mut bind (always)
+
+// On NotificationView / NotificationViewMut (shared getters; mut delegates via as_view):
+//   case() -> Option<NotificationCase>
+//   as_ref() -> Option<NotificationRef<'_, A>>
+// On NotificationViewMut only:
+//   as_view(&self) -> NotificationView<'_, A>
+//   as_mut(self) -> Option<NotificationMut<'_, A>>  // active variant; no switch
+//   clear(self)                                     // free active variant
 
 // Per-variant `_mut` accessors switch the oneof to that variant (freeing any
 // previously-active one) and return a handle appropriate to the kind:
@@ -744,7 +753,7 @@ pub fn webhook_id_mut(&mut self) -> impl DerefMut<Target = i32> + '_; // VARINT 
 pub fn postal_mut(&mut self) -> &mut Address<A>;       // message variant
 
 // Clears whichever variant is active (freeing it):
-pub fn clear_notification(&mut self);
+pub fn clear_notification(&mut self); // = notification_mut().clear()
 ```
 
 **Variants own field wrappers, not raw storage.** A oneof member of a given kind reuses the exact field wrapper an ordinary singular field of that kind uses (`SingularField` / `SingularLenField` / `SingularVarintField` for scalars and LEN; `NestedMessageField` for messages), so the storage / `value` / `value_mut` / `deallocate` machinery is shared rather than reimplemented. The wrapper's *presence* is inert for a oneof — presence is tracked by the enclosing `OneofSlot` — so `FieldPresence::Oneof` is used (always-initialized storage; omit rules never consulted).
@@ -763,9 +772,9 @@ The VARINT variant owns no heap: its `DeallocateIn` is a no-op.
 
 **The message variant uses `Oneof` storage — a bare box, not `Option`.** An ordinary message field (`NestedMessageField<…, Singular, …>`) stores `Option<UnmanagedBox<M>>`. A *oneof* message variant uses `NestedMessageField<…, Oneof, …>`, whose storage is a bare `UnmanagedBox<M>` that is **always present**, so accessors are plain `value()` / `value_mut()`.
 
-**Why four types, and why the storage is not `Notification`.** The storage variants own `unmanaged`-backed field wrappers, which panic on implicit drop and need the message allocator to free. Exposing them publicly (let alone under the canonical `Notification` name) would let a caller own one and hit that footgun, and would leak the `unmanaged` type into the API. So the storage enum is `pub(crate)` and non-canonically named (`NotificationStorage`); the public surface is the payload-less `NotificationCase`, the borrowed read view `NotificationRef`, and the borrowed mutable view `NotificationMut` — all safe. (A single generic enum parametrised over a "payload mode" was considered and rejected for generated code: the case enum is payload-less, the ref/mut modes need GAT-style lifetime/allocator threading, and per-mode trait impls diverge — concrete enums are simpler to emit, read, and debug.)
+**Why these types, and why the storage is not `Notification`.** The storage variants own `unmanaged`-backed field wrappers, which panic on implicit drop and need the message allocator to free. Exposing them publicly (let alone under the canonical `Notification` name) would let a caller own one and hit that footgun, and would leak the `unmanaged` type into the API. So the storage enum is `pub(crate)` and non-canonically named (`NotificationStorage`). The public surface is `NotificationCase`, the group bound views `NotificationView` / `NotificationViewMut` (slot + `MessageCommon`, always returned), and the projected enums `NotificationRef` / `NotificationMut` (active variant only). Shared getters on the mut view use `as_view()` reborrow — not a trait and not `Deref` (a by-value reborrowed view cannot be returned from `Deref::deref`).
 
-Mutation goes through the same bound-view idiom as the other families: `slot.bind_mut(&mut common)` yields an `OneofSlotMut`, whose `variant_mut(make)` returns a `&mut` to the (possibly freshly-installed) active variant, `set(value)` replaces the whole group, and `clear()` frees the active variant. Each of these releases the previously-active variant via `OneofDeallocate::deallocate` before overwriting the slot. The old `set_*` per-variant setters are removed.
+Group accessors follow the same bound-view idiom as other fields: `slot.bind(&common)` / `slot.bind_mut(&mut common)` yield [`OneofSlotRef`](puroro-rt/src/fields/oneof.rs) / [`OneofSlotMut`](puroro-rt/src/fields/oneof.rs). Generated `NotificationView` / `NotificationViewMut` wrap that pair. `OneofSlotMut::variant_mut(make)` returns a `&mut` to the (possibly freshly-installed) active variant, `set(value)` replaces the whole group, and `clear()` frees the active variant. Each of these releases the previously-active variant via `OneofDeallocate::deallocate` before overwriting the slot. The old `set_*` per-variant setters are removed.
 
 To avoid open-coding the `variant_mut` call plus its unwrap at every use site, the storage enum carries one **`bind_<variant>_mut(slot, common)`** helper per variant that returns the field's bound mutation view. Parent `_mut` accessors and decode arms are then one-liners — `bind_email_address_mut(…).value_mut()`, `bind_webhook_id_mut(…).value_mut()`, `bind_postal_mut(…).value_mut()`, `bind_webhook_id_mut(…).merge(wire, buf)`, etc.
 
@@ -889,7 +898,7 @@ impl<A: Allocator + Clone + Default> Default for Task<A> { … }
 
 **Mutation API (`_mut`).** Mutation is unified under `_mut` accessors that return a guard implementing `impl DerefMut<Target = …>` (RPIT): `title_mut()` yields `impl DerefMut<Target = ::unmanaged::String<A>>`, `payload_mut()`/`tag_ids_mut()` yield `impl DerefMut<Target = Vec<_, A>>`, and scalar/enum `_mut` accessors also return `impl DerefMut<Target = T>` (today that is `&mut T`). The guard **owns** a clone of the message allocator when the payload is heap-backed. Acquiring an explicit-presence `_mut` sets the presence bit. The old `set_*` / `push_*` setters are removed; the one exception is repeated `string`/`bytes`, which keep a typed `push_*` helper because their element storage is allocator-less and impractical to construct through a bare `DerefMut`.
 
-**Bound-view mutation (`bind_mut`).** Every mutable field family goes through this idiom: the field is first *bound* to the message common state: `field.bind_mut(&mut self._common)` returns a short-lived view (`SingularFieldMut` / `RepeatedLenFieldMut` / `RepeatedVarintFieldMut` / `OneofSlotMut`) that carries `(field, common)` together, and the actual operation (`value_mut` / `merge` / `clear` / `push_in` / `merge_closed` / `values_mut`) is a consuming method on that view. This keeps the field struct a pure storage holder and collapses each generated accessor to a single call — e.g. `self.owner_id.bind_mut(&mut self._common).value_mut()` or `self.priority.bind_mut(&mut self._common).clear()`. The presence bit index for EXPLICIT / LEGACY_REQUIRED fields is a **const generic on the field type** (`Explicit<BIT>`), not a runtime argument to `bind_mut`. Read-only paths (`value` / `optional` / `has` / `encoded_len` / `encode_raw`) need only a shared `&common` and stay as plain field methods.
+**Bound-view mutation (`bind_mut`).** Every mutable field family goes through this idiom: the field is first *bound* to the message common state: `field.bind_mut(&mut self._common)` returns a short-lived view (`SingularFieldMut` / `RepeatedLenFieldMut` / `RepeatedVarintFieldMut` / `OneofSlotMut`) that carries `(field, common)` together, and the actual operation (`value_mut` / `merge` / `clear` / `push_in` / `merge_closed` / `values_mut`) is a consuming method on that view. This keeps the field struct a pure storage holder and collapses each generated accessor to a single call — e.g. `self.owner_id.bind_mut(&mut self._common).value_mut()` or `self.priority.bind_mut(&mut self._common).clear()`. The presence bit index for EXPLICIT / LEGACY_REQUIRED fields is a **const generic on the field type** (`Explicit<BIT>`), not a runtime argument to `bind_mut`. Oneof **group** accessors also bind on the read path (`OneofSlotRef` via `Bindable::bind`) so `notification()` / `notification_mut()` always return a handle. Other read-only paths (`value` / `optional` / `has` / `encoded_len` / `encode_raw`) need only a shared `&common` and stay as plain field methods.
 
 Varint and LEN singular scalars share one runtime type, [`SingularField`](puroro-rt/src/fields/singular/field.rs), parametrised by [`ScalarProtoType`](puroro-rt/src/fields/wire/scalar.rs) (see [IMPLEMENTATION.md §7](IMPLEMENTATION.md#7-field-wrappers) / [§14](IMPLEMENTATION.md#14-singular-fields)). Nested messages remain a separate wrapper.
 

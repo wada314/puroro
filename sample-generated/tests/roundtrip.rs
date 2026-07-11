@@ -1,5 +1,5 @@
 use ::puroro::{MessageDecode, MessageEncode};
-use ::puroro_sample_generated::task::{NotificationCase, NotificationRef};
+use ::puroro_sample_generated::task::{NotificationCase, NotificationMut, NotificationRef};
 use ::puroro_sample_generated::{Address, Priority, Status, Task};
 
 #[test]
@@ -42,7 +42,7 @@ fn task_roundtrip() {
     assert_eq!(decoded.priority().get(), Priority::HIGH);
     assert!(decoded.priority().is_set());
     assert!(matches!(
-        decoded.notification(),
+        decoded.notification().as_ref(),
         Some(NotificationRef::EmailAddress(s)) if s == "a@example.com"
     ));
     let a = decoded.assignee().unwrap();
@@ -63,7 +63,7 @@ fn oneof_varint_variant_roundtrip() {
 
     assert_eq!(decoded.notification_case(), Some(NotificationCase::WebhookId));
     assert!(matches!(
-        decoded.notification(),
+        decoded.notification().as_ref(),
         Some(NotificationRef::WebhookId(4321))
     ));
     assert!(decoded.webhook_id().is_set());
@@ -106,7 +106,7 @@ fn oneof_message_variant_roundtrip() {
     let decoded: Task = Task::decode(&bytes[..]).unwrap();
 
     assert_eq!(decoded.notification_case(), Some(NotificationCase::Postal));
-    let Some(NotificationRef::Postal(addr)) = decoded.notification() else {
+    let Some(NotificationRef::Postal(addr)) = decoded.notification().as_ref() else {
         panic!("expected postal variant");
     };
     assert_eq!(addr.street().get(), "5 Oak Ave");
@@ -124,9 +124,50 @@ fn oneof_switching_frees_previous_variant() {
     *task.webhook_id_mut() = 3; // -> scalar (frees message)
 
     assert!(matches!(
-        task.notification(),
+        task.notification().as_ref(),
         Some(NotificationRef::WebhookId(3))
     ));
+}
+
+#[test]
+fn oneof_group_bound_views_when_unset() {
+    let mut task = Task::new();
+    task.owner_id_mut().push_str("user-1");
+
+    // Bound views are always available, including when the group is unset.
+    let view = task.notification();
+    assert!(view.case().is_none());
+    assert!(view.as_ref().is_none());
+
+    let view_mut = task.notification_mut();
+    assert!(view_mut.case().is_none());
+    assert!(view_mut.as_ref().is_none());
+    assert!(view_mut.as_mut().is_none());
+}
+
+#[test]
+fn oneof_group_view_mut_as_view_and_clear() {
+    let mut task = Task::new();
+    task.owner_id_mut().push_str("user-1");
+    task.email_address_mut().push_str("a@example.com");
+
+    {
+        let view_mut = task.notification_mut();
+        // Shared getters work while holding the mut bound view.
+        assert_eq!(view_mut.as_view().case(), Some(NotificationCase::EmailAddress));
+        assert!(matches!(
+            view_mut.as_ref(),
+            Some(NotificationRef::EmailAddress(s)) if s == "a@example.com"
+        ));
+        assert!(matches!(
+            view_mut.as_mut(),
+            Some(NotificationMut::EmailAddress(_))
+        ));
+    }
+
+    task.notification_mut().clear();
+    assert!(task.notification_case().is_none());
+    assert!(task.notification().as_ref().is_none());
 }
 
 #[test]

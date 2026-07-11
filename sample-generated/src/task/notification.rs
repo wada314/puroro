@@ -1,6 +1,6 @@
 //! Sample of the `oneof notification` types puroro generates for `Task`.
 //!
-//! A oneof that owns heap storage is represented by **four** generated types,
+//! A oneof that owns heap storage is represented by several generated types,
 //! because the owned storage holds allocator-less `unmanaged` values (unsafe to
 //! drop implicitly) and must not leak into the public API:
 //!
@@ -10,8 +10,11 @@
 //!   and carries the encode glue. Never public.
 //! - [`NotificationCase`] — a payload-less, `Copy` discriminant of which variant
 //!   is active.
-//! - [`NotificationRef`] — a safe borrowed read view.
-//! - [`NotificationMut`] — a safe borrowed mutable view.
+//! - [`NotificationView`] / [`NotificationViewMut`] — bound views of the group
+//!   (slot + [`MessageCommon`]), returned by `Task::notification` /
+//!   `notification_mut` even when unset.
+//! - [`NotificationRef`] / [`NotificationMut`] — safe projected enums of the
+//!   *active* variant (`as_ref` / `as_mut` on the bound views).
 //!
 //! This group is deliberately **heterogeneous** to show every field kind:
 //!
@@ -55,6 +58,7 @@ use ::unmanaged::string::StringGuard;
 use crate::address::Address;
 
 use super::defaults::WebhookIdDefault;
+use super::TaskPresence;
 
 /// Zero-sized markers for [`EnumVariant`] dispatch on [`NotificationStorage`].
 pub(crate) mod variant {
@@ -94,12 +98,102 @@ impl<A: Allocator + Clone> Clone for NotificationRef<'_, A> {
 }
 impl<A: Allocator + Clone> Copy for NotificationRef<'_, A> {}
 
-/// Borrowed mutable view of the active `notification` variant.
+/// Borrowed mutable projection of the active `notification` variant.
 pub enum NotificationMut<'a, A: Allocator + Clone> {
     EmailAddress(StringGuard<'a, A>),
     PhoneNumber(StringGuard<'a, A>),
     WebhookId(&'a mut i32),
     Postal(&'a mut Address<A>),
+}
+
+/// Shared bound view of the `notification` oneof group (slot + message common).
+///
+/// Returned by [`Task::notification`](super::Task::notification) even when the
+/// group is unset. Project the active variant with [`as_ref`](Self::as_ref).
+pub struct NotificationView<'a, A: Allocator + Clone> {
+    slot: &'a OneofSlot<NotificationStorage<A>>,
+    common: &'a MessageCommon<TaskPresence, A>,
+}
+
+impl<'a, A: Allocator + Clone> NotificationView<'a, A> {
+    #[inline]
+    pub(crate) fn new(
+        slot: &'a OneofSlot<NotificationStorage<A>>,
+        common: &'a MessageCommon<TaskPresence, A>,
+    ) -> Self {
+        Self { slot, common }
+    }
+
+    /// Which variant is set (`None` when the group is unset).
+    #[inline]
+    pub fn case(&self) -> Option<NotificationCase> {
+        self.slot.as_ref().map(|s| s.case())
+    }
+
+    /// Projected read view of the active variant, if any.
+    #[inline]
+    pub fn as_ref(&self) -> Option<NotificationRef<'a, A>> {
+        self.slot.as_ref().map(|s| s.to_ref())
+    }
+
+    /// Shared message common bound into this view.
+    #[inline]
+    pub fn common(&self) -> &'a MessageCommon<TaskPresence, A> {
+        self.common
+    }
+}
+
+/// Mutable bound view of the `notification` oneof group (slot + message common).
+///
+/// Returned by [`Task::notification_mut`](super::Task::notification_mut) even
+/// when the group is unset. Shared getters go through [`as_view`](Self::as_view);
+/// mutation uses [`as_mut`](Self::as_mut) / [`clear`](Self::clear).
+pub struct NotificationViewMut<'a, A: Allocator + Clone> {
+    slot: &'a mut OneofSlot<NotificationStorage<A>>,
+    common: &'a mut MessageCommon<TaskPresence, A>,
+}
+
+impl<'a, A: Allocator + Clone> NotificationViewMut<'a, A> {
+    #[inline]
+    pub(crate) fn new(
+        slot: &'a mut OneofSlot<NotificationStorage<A>>,
+        common: &'a mut MessageCommon<TaskPresence, A>,
+    ) -> Self {
+        Self { slot, common }
+    }
+
+    /// Reborrow as a shared bound view (for `case` / `as_ref` while mutating).
+    #[inline]
+    pub fn as_view(&self) -> NotificationView<'_, A> {
+        NotificationView::new(self.slot, self.common)
+    }
+
+    /// Which variant is set (`None` when the group is unset).
+    #[inline]
+    pub fn case(&self) -> Option<NotificationCase> {
+        self.as_view().case()
+    }
+
+    /// Projected read view of the active variant, if any.
+    #[inline]
+    pub fn as_ref(&self) -> Option<NotificationRef<'_, A>> {
+        self.as_view().as_ref()
+    }
+
+    /// Projected mutable view of the *currently active* variant (no switch).
+    ///
+    /// Consumes this bound view. Returns `None` when the group is unset.
+    #[inline]
+    pub fn as_mut(self) -> Option<NotificationMut<'a, A>> {
+        let alloc = self.common.alloc.clone();
+        self.slot.as_mut().map(|s| s.to_mut(alloc))
+    }
+
+    /// Clears whichever variant is active (freeing it through the message allocator).
+    #[inline]
+    pub fn clear(self) {
+        self.slot.bind_mut(self.common).clear();
+    }
 }
 
 /// Owned storage for `oneof notification` (crate-internal).

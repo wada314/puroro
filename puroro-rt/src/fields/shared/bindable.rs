@@ -25,7 +25,7 @@ pub trait Bindable<Ctx: ?Sized> {
         Ctx: 'a;
 
     /// Binds this field to `ctx` for read access.
-    fn bind<'a>(&'a self, ctx: &Ctx) -> Self::Bound<'a>;
+    fn bind<'a>(&'a self, ctx: &'a Ctx) -> Self::Bound<'a>;
 }
 
 /// Mutation-side binding for a field storage type.
