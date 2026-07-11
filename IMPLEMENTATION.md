@@ -191,7 +191,7 @@ pub trait ScalarProtoType {
     type Ref<'a> where Self: 'a;
     type Mut<'a, A: Allocator + 'a>: DerefMut where Self: 'a;
     const WIRE_TYPE: WireType;
-    fn borrow<'a>(storage: &'a Self::Storage) -> Self::Ref<'a>;
+    fn get<'a>(storage: &'a Self::Storage) -> Self::Ref<'a>;
     fn with_mut<'a, A: Allocator + 'a>(storage: &'a mut Self::Storage, alloc: A) -> Self::Mut<'a, A>;
     fn encoded_len(field: u32, storage: &Self::Storage) -> usize;
     fn encode<B: BufMut>(field: u32, storage: &Self::Storage, buf: &mut B);

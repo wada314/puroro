@@ -45,8 +45,8 @@ pub trait ScalarProtoType {
     /// Expected wire type for a singular occurrence of this field.
     const WIRE_TYPE: WireType;
 
-    /// Borrows (or copies) the stored value for accessors.
-    fn borrow<'a>(storage: &'a Self::Storage) -> Self::Ref<'a>;
+    /// Returns the getter view of `storage` (by reference or by value).
+    fn get<'a>(storage: &'a Self::Storage) -> Self::Ref<'a>;
 
     /// Builds a mutable accessor handle from storage + allocator.
     fn with_mut<'a, A: Allocator + 'a>(
@@ -81,7 +81,7 @@ macro_rules! impl_varint_scalar {
             const WIRE_TYPE: WireType = WireType::Varint;
 
             #[inline]
-            fn borrow<'a>(storage: &'a Self::Storage) -> Self::Ref<'a> {
+            fn get<'a>(storage: &'a Self::Storage) -> Self::Ref<'a> {
                 *storage
             }
 
@@ -147,7 +147,7 @@ impl<E: ProtoEnumStorage> ScalarProtoType for ProtoEnum<E> {
     const WIRE_TYPE: WireType = WireType::Varint;
 
     #[inline]
-    fn borrow<'a>(storage: &'a Self::Storage) -> Self::Ref<'a> {
+    fn get<'a>(storage: &'a Self::Storage) -> Self::Ref<'a> {
         *storage
     }
 
@@ -196,8 +196,8 @@ macro_rules! impl_len_scalar {
             const WIRE_TYPE: WireType = WireType::Len;
 
             #[inline]
-            fn borrow<'a>(storage: &'a Self::Storage) -> Self::Ref<'a> {
-                <Self as LenProtoType>::borrow(storage)
+            fn get<'a>(storage: &'a Self::Storage) -> Self::Ref<'a> {
+                <Self as LenProtoType>::get(storage)
             }
 
             #[inline]

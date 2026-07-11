@@ -141,7 +141,7 @@ impl<T: ScalarProtoType, const FIELD: u32, D> SingularField<T, Implicit, FIELD, 
     /// Generated message getters go through [`SingularFieldRef::value`] instead.
     #[inline]
     pub fn value(&self) -> T::Ref<'_> {
-        T::borrow(
+        T::get(
             self.value
                 .as_ref(&AlwaysInitialized)
                 .expect("always-initialized slot"),
@@ -156,7 +156,7 @@ impl<T: ScalarProtoType, const FIELD: u32, D> SingularField<T, Oneof, FIELD, D> 
     /// [`SingularFieldRef::value`] / [`SingularFieldRef::optional`].
     #[inline]
     pub fn value(&self) -> T::Ref<'_> {
-        T::borrow(
+        T::get(
             self.value
                 .as_ref(&AlwaysInitialized)
                 .expect("always-initialized slot"),
@@ -237,7 +237,7 @@ where
     pub fn optional(self) -> Optional<T::Ref<'a>, D> {
         let init = P::slot_init_view(self.common);
         let v = if P::is_set(self.common, || P::payload_is_empty(&self.field.value)) {
-            Some(T::borrow(
+            Some(T::get(
                 self.field
                     .value
                     .as_ref(&init)

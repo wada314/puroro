@@ -42,8 +42,8 @@ pub trait LenProtoType {
     /// `true` when the field should be omitted on encode (IMPLICIT presence).
     fn is_empty(value: &Self::Storage) -> bool;
 
-    /// Borrows the stored value for accessors.
-    fn borrow<'a>(value: &'a Self::Storage) -> Self::Ref<'a>;
+    /// Returns the getter view of `value` (e.g. `&str`, `&[u8]`).
+    fn get<'a>(value: &'a Self::Storage) -> Self::Ref<'a>;
 
     /// Payload bytes for [`encode_len_field`](crate::encode::encode_len_field).
     fn as_bytes(value: &Self::Storage) -> &[u8];
@@ -88,7 +88,7 @@ impl LenProtoType for ProtoString {
         value.is_empty()
     }
 
-    fn borrow<'a>(value: &'a Self::Storage) -> Self::Ref<'a> {
+    fn get<'a>(value: &'a Self::Storage) -> Self::Ref<'a> {
         value
     }
 
@@ -140,7 +140,7 @@ impl LenProtoType for ProtoBytes {
         value.is_empty()
     }
 
-    fn borrow<'a>(value: &'a Self::Storage) -> Self::Ref<'a> {
+    fn get<'a>(value: &'a Self::Storage) -> Self::Ref<'a> {
         value
     }
 
