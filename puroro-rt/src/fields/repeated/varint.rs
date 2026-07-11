@@ -15,7 +15,7 @@ use crate::decode;
 use ::puroro::DecodeError;
 use ::puroro::WireType;
 
-use crate::fields::shared::{Bindable, BindableMut, FieldDeallocate, MessageCommon, PresenceBits};
+use crate::fields::shared::{FieldDeallocate, MessageCommon, PresenceBits};
 use crate::fields::wire::varint::{self, VarintProtoType};
 
 use super::encoding::RepeatedVarintEncoding;
@@ -75,6 +75,29 @@ impl<T: VarintProtoType, E: RepeatedVarintEncoding, const FIELD: u32, A: Allocat
         }
     }
 
+    /// Binds this field to `common` for read access.
+    #[inline]
+    pub fn bind<'a, Pb: PresenceBits>(
+        &'a self,
+        common: &'a MessageCommon<Pb, A>,
+    ) -> RepeatedVarintFieldRef<'a, T, E, FIELD, Pb, A>
+    where
+        A: Clone,
+    {
+        RepeatedVarintFieldRef::new(self, common)
+    }
+
+    /// Binds this field to `common` for mutation.
+    #[inline]
+    pub fn bind_mut<'f, 'c, Pb: PresenceBits>(
+        &'f mut self,
+        common: &'c mut MessageCommon<Pb, A>,
+    ) -> RepeatedVarintFieldMut<'f, 'c, T, E, FIELD, Pb, A>
+    where
+        A: Clone,
+    {
+        RepeatedVarintFieldMut::new(self, common)
+    }
 }
 
 impl<
@@ -100,7 +123,7 @@ impl<
 // ---------------------------------------------------------------------------
 
 /// Short-lived shared binding of a repeated varint field to its message common
-/// state, produced by [`Bindable::bind`](crate::fields::shared::Bindable::bind).
+/// state, produced by [`RepeatedVarintField::bind`].
 ///
 /// Mirrors [`RepeatedVarintFieldMut`] for the read path. Generated getters always
 /// go through this view — `field.bind(&common).as_slice()` — even though the
@@ -147,47 +170,12 @@ impl<
     }
 }
 
-impl<
-    'a,
-    T: VarintProtoType,
-    E: RepeatedVarintEncoding,
-    const FIELD: u32,
-    A: Allocator + Clone,
-    Pb: PresenceBits,
-> Bindable<&'a MessageCommon<Pb, A>> for &'a RepeatedVarintField<T, E, FIELD, A>
-{
-    type Bound = RepeatedVarintFieldRef<'a, T, E, FIELD, Pb, A>;
-
-    #[inline]
-    fn bind(self, common: &'a MessageCommon<Pb, A>) -> Self::Bound {
-        RepeatedVarintFieldRef::new(self, common)
-    }
-}
-
-impl<
-    'f,
-    'c,
-    T: VarintProtoType,
-    E: RepeatedVarintEncoding,
-    const FIELD: u32,
-    A: Allocator + Clone,
-    Pb: PresenceBits,
-> BindableMut<&'c mut MessageCommon<Pb, A>> for &'f mut RepeatedVarintField<T, E, FIELD, A>
-{
-    type BoundMut = RepeatedVarintFieldMut<'f, 'c, T, E, FIELD, Pb, A>;
-
-    #[inline]
-    fn bind_mut(self, common: &'c mut MessageCommon<Pb, A>) -> Self::BoundMut {
-        RepeatedVarintFieldMut::new(self, common)
-    }
-}
-
 // ---------------------------------------------------------------------------
 // Mutation view
 // ---------------------------------------------------------------------------
 
 /// Short-lived binding of a repeated varint field to its message common state,
-/// produced by [`BindableMut::bind_mut`](crate::fields::shared::BindableMut::bind_mut).
+/// produced by [`RepeatedVarintField::bind_mut`].
 ///
 /// Bundles the element buffer with the allocator context so that generated code
 /// can mutate through a single call. Repeated fields have no presence bit, so

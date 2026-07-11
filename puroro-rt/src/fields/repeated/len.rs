@@ -16,7 +16,7 @@ use crate::encode;
 use ::puroro::DecodeError;
 use ::puroro::WireType;
 
-use crate::fields::shared::{Bindable, BindableMut, FieldDeallocate, MessageCommon, PresenceBits};
+use crate::fields::shared::{FieldDeallocate, MessageCommon, PresenceBits};
 use crate::fields::wire::len::{self, LenProtoType};
 
 /// Repeated field whose elements are length-delimited records (one tag per element).
@@ -62,6 +62,29 @@ impl<T: LenProtoType, const FIELD: u32, A: Allocator> RepeatedLenField<T, FIELD,
         }
     }
 
+    /// Binds this field to `common` for read access.
+    #[inline]
+    pub fn bind<'a, Pb: PresenceBits>(
+        &'a self,
+        common: &'a MessageCommon<Pb, A>,
+    ) -> RepeatedLenFieldRef<'a, T, FIELD, Pb, A>
+    where
+        A: Clone,
+    {
+        RepeatedLenFieldRef::new(self, common)
+    }
+
+    /// Binds this field to `common` for mutation.
+    #[inline]
+    pub fn bind_mut<'f, 'c, Pb: PresenceBits>(
+        &'f mut self,
+        common: &'c mut MessageCommon<Pb, A>,
+    ) -> RepeatedLenFieldMut<'f, 'c, T, FIELD, Pb, A>
+    where
+        A: Clone,
+    {
+        RepeatedLenFieldMut::new(self, common)
+    }
 }
 
 impl<T: LenProtoType, const FIELD: u32, Pb: PresenceBits, A: Allocator + Clone>
@@ -89,7 +112,7 @@ impl<T: LenProtoType, const FIELD: u32, Pb: PresenceBits, A: Allocator + Clone>
 // ---------------------------------------------------------------------------
 
 /// Short-lived shared binding of a repeated LEN field to its message common
-/// state, produced by [`Bindable::bind`](crate::fields::shared::Bindable::bind).
+/// state, produced by [`RepeatedLenField::bind`].
 ///
 /// Mirrors [`RepeatedLenFieldMut`] for the read path. Generated getters always
 /// go through this view — `field.bind(&common).as_slice()` — even though the
@@ -126,34 +149,12 @@ impl<'a, T: LenProtoType, const FIELD: u32, Pb: PresenceBits, A: Allocator>
     }
 }
 
-impl<'a, T: LenProtoType, const FIELD: u32, A: Allocator + Clone, Pb: PresenceBits>
-    Bindable<&'a MessageCommon<Pb, A>> for &'a RepeatedLenField<T, FIELD, A>
-{
-    type Bound = RepeatedLenFieldRef<'a, T, FIELD, Pb, A>;
-
-    #[inline]
-    fn bind(self, common: &'a MessageCommon<Pb, A>) -> Self::Bound {
-        RepeatedLenFieldRef::new(self, common)
-    }
-}
-
-impl<'f, 'c, T: LenProtoType, const FIELD: u32, A: Allocator + Clone, Pb: PresenceBits>
-    BindableMut<&'c mut MessageCommon<Pb, A>> for &'f mut RepeatedLenField<T, FIELD, A>
-{
-    type BoundMut = RepeatedLenFieldMut<'f, 'c, T, FIELD, Pb, A>;
-
-    #[inline]
-    fn bind_mut(self, common: &'c mut MessageCommon<Pb, A>) -> Self::BoundMut {
-        RepeatedLenFieldMut::new(self, common)
-    }
-}
-
 // ---------------------------------------------------------------------------
 // Mutation view
 // ---------------------------------------------------------------------------
 
 /// Short-lived binding of a repeated LEN field to its message common state,
-/// produced by [`BindableMut::bind_mut`](crate::fields::shared::BindableMut::bind_mut).
+/// produced by [`RepeatedLenField::bind_mut`].
 ///
 /// Bundles the element buffer with the allocator context so that generated code
 /// can mutate through a single call. Repeated fields have no presence bit, so

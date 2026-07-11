@@ -5,12 +5,12 @@
 //! individual variant field types are not used on the message struct.
 //!
 //! Mutation flows through [`OneofSlotMut`], obtained via
-//! [`BindableMut::bind_mut`](crate::fields::shared::BindableMut::bind_mut); read
-//! binding uses [`OneofSlotRef`] via [`Bindable::bind`](crate::fields::shared::Bindable::bind).
-//! Both mirror the bound-view idiom used by the singular / repeated field
-//! families: the slot is bound to the message [`MessageCommon`] (for the
-//! allocator on the mut path), and the previously-active variant is released
-//! through [`OneofDeallocate::deallocate`] before the slot is overwritten.
+//! [`OneofSlot::bind_mut`]; read binding uses [`OneofSlotRef`] via
+//! [`OneofSlot::bind`]. Both mirror the bound-view idiom used by the singular /
+//! repeated field families: the slot is bound to the message [`MessageCommon`]
+//! (for the allocator on the mut path), and the previously-active variant is
+//! released through [`OneofDeallocate::deallocate`] before the slot is
+//! overwritten.
 
 use ::allocator_api2::alloc::Allocator;
 use ::bytes::BufMut;
@@ -18,10 +18,11 @@ use ::puroro::{HasDefault, Optional};
 
 use crate::fields::enum_variant::EnumVariant;
 use crate::fields::shared::{
-    Bindable, BindableMut, FieldDeallocate, MessageCommon, PresenceBits,
+    FieldDeallocate, MessageCommon, PresenceBits,
     field_presence::{FieldPresence, Oneof},
     value_slot::ValueSlot,
 };
+use crate::fields::singular::SingularAccess;
 use crate::fields::singular::field::SingularField;
 use crate::fields::singular::message::NestedMessageField;
 use crate::fields::wire::scalar::ScalarProtoType;
@@ -67,7 +68,7 @@ pub trait OneofEncodable<A: Allocator> {
 /// paths stay free of it.
 ///
 /// The stored variant is replaced whenever another one is set or decoded (last
-/// wins on the wire). All mutation goes through [`BindableMut::bind_mut`](crate::fields::shared::BindableMut::bind_mut); the
+/// wins on the wire). All mutation goes through [`OneofSlot::bind_mut`]; the
 /// inherent [`set`](Self::set) / [`take`](Self::take) / [`clear`](Self::clear)
 /// are low-level primitives used by the view and do **not** release the
 /// previous variant on their own.
@@ -141,6 +142,24 @@ impl<E> OneofSlot<E> {
             v.encode_raw(common, buf);
         }
     }
+
+    /// Binds this slot to `common` for read access.
+    #[inline]
+    pub fn bind<'a, Pb: PresenceBits, A: Allocator + Clone>(
+        &'a self,
+        common: &'a MessageCommon<Pb, A>,
+    ) -> OneofSlotRef<'a, E, Pb, A> {
+        OneofSlotRef::new(self, common)
+    }
+
+    /// Binds this slot to `common` for mutation.
+    #[inline]
+    pub fn bind_mut<'f, 'c, Pb: PresenceBits, A: Allocator + Clone>(
+        &'f mut self,
+        common: &'c mut MessageCommon<Pb, A>,
+    ) -> OneofSlotMut<'f, 'c, E, Pb, A> {
+        OneofSlotMut::new(self, common)
+    }
 }
 
 impl<E, Pb: PresenceBits, A: Allocator> FieldDeallocate<Pb, A> for OneofSlot<E>
@@ -163,34 +182,12 @@ impl<E> Default for OneofSlot<E> {
     }
 }
 
-impl<'a, E, A: Allocator + Clone, Pb: PresenceBits> Bindable<&'a MessageCommon<Pb, A>>
-    for &'a OneofSlot<E>
-{
-    type Bound = OneofSlotRef<'a, E, Pb, A>;
-
-    #[inline]
-    fn bind(self, common: &'a MessageCommon<Pb, A>) -> Self::Bound {
-        OneofSlotRef::new(self, common)
-    }
-}
-
-impl<'f, 'c, E, A: Allocator + Clone, Pb: PresenceBits> BindableMut<&'c mut MessageCommon<Pb, A>>
-    for &'f mut OneofSlot<E>
-{
-    type BoundMut = OneofSlotMut<'f, 'c, E, Pb, A>;
-
-    #[inline]
-    fn bind_mut(self, common: &'c mut MessageCommon<Pb, A>) -> Self::BoundMut {
-        OneofSlotMut::new(self, common)
-    }
-}
-
 // ---------------------------------------------------------------------------
 // Read view
 // ---------------------------------------------------------------------------
 
 /// Short-lived shared binding of a oneof slot to its message common state,
-/// produced by [`Bindable::bind`](crate::fields::shared::Bindable::bind).
+/// produced by [`OneofSlot::bind`].
 ///
 /// Mirrors [`OneofSlotMut`] for the read path. Generated group views wrap this
 /// (or hold the same pair of references) so `notification()`-style accessors
@@ -238,8 +235,7 @@ impl<'a, E, Pb: PresenceBits, A: Allocator> OneofSlotRef<'a, E, Pb, A> {
 // ---------------------------------------------------------------------------
 
 /// Short-lived binding of a oneof slot to its message common state,
-/// [`OneofSlotMut`](crate::fields::oneof::OneofSlotMut), produced by
-/// [`BindableMut::bind_mut`](crate::fields::shared::BindableMut::bind_mut).
+/// produced by [`OneofSlot::bind_mut`].
 ///
 /// Bundles the slot with the allocator context so that generated code can
 /// mutate through a single call while the previously-active variant is released
@@ -285,10 +281,10 @@ impl<'f, 'c, E, Pb: PresenceBits, A: Allocator> OneofSlotMut<'f, 'c, E, Pb, A> {
     /// `.merge(…)`.
     pub fn variant_mut<V>(
         self,
-    ) -> <&'f mut <E as EnumVariant<V>>::Value as BindableMut<&'c mut MessageCommon<Pb, A>>>::BoundMut
+    ) -> <<E as EnumVariant<V>>::Value as SingularAccess>::ViewMut<'f, 'c, Pb, A>
     where
         E: EnumVariant<V, Alloc = A> + OneofDeallocate<Pb, A>,
-        &'f mut <E as EnumVariant<V>>::Value: BindableMut<&'c mut MessageCommon<Pb, A>>,
+        <E as EnumVariant<V>>::Value: SingularAccess,
         A: Clone,
     {
         let slot = self.slot;

@@ -22,9 +22,7 @@ pub use fields::repeated::{
     RepeatedPackedVarintField, RepeatedString, RepeatedVarint, RepeatedVarintEncoding,
     RepeatedVarintField, RepeatedVarintFieldMut, RepeatedVarintFieldRef,
 };
-pub use fields::shared::{
-    Bindable, BindableMut, FieldDeallocate, MessageCommon, PresenceBits,
-};
+pub use fields::shared::{FieldDeallocate, MessageCommon, PresenceBits};
 pub use fields::shared::field_presence::{
     Explicit, FieldPresence, Implicit, LegacyRequired, Oneof, RequiredFieldPresence,
 };

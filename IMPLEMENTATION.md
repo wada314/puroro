@@ -180,7 +180,7 @@ Field catalog methods take `&MessageCommon` / `&mut MessageCommon`, not `&Task`,
 
 [`ValueSlot<T>`](puroro-rt/src/fields/shared/value_slot.rs) — singular scalar storage behind a GAT on [`FieldPresence`](puroro-rt/src/fields/shared/field_presence.rs): always-initialized `T` for `Implicit` / `Oneof`; `MaybeUninit<T>` for `Explicit` / `LegacyRequired`. Construction / replace / clear thread an allocator via [`DefaultIn`](puroro-rt/src/fields/shared.rs) / [`DeallocateIn`](puroro-rt/src/fields/shared.rs) so heap payloads (`UnmanagedString`, `UnmanagedVec`) and copy scalars share one slot API. Mutation passes a [`SlotInitMut`](puroro-rt/src/fields/shared/slot_init.rs) handle (`slot_init_mut(common)`); reads pass [`SlotInitView`](puroro-rt/src/fields/shared/slot_init.rs) (`slot_init_view(common)`). [`ProtoEmpty`](puroro-rt/src/fields/shared.rs) drives IMPLICIT omit-on-encode (`is_proto_empty`).
 
-[`Bindable`](puroro-rt/src/fields/shared/bindable.rs) / [`BindableMut`](puroro-rt/src/fields/shared/bindable.rs) — **general** receiver+context pairing (`bind` / `bind_mut` → short-lived view). They are **not** scoped to “message field + `MessageCommon`”; that pairing is just the common catalog use today. Owned or other contexts are equally in scope for the traits.
+[`SingularAccess`](puroro-rt/src/fields/singular/access.rs) — singular wrappers expose getter payloads (`Ref` / `Mut`) and MessageCommon binding (`bind` / `bind_mut` → `View` / `ViewMut`). Repeated fields and [`OneofSlot`](puroro-rt/src/fields/oneof.rs) use the same call shape via inherent `bind` / `bind_mut`.
 
 ---
 
@@ -668,7 +668,7 @@ Parent `_mut` accessors are one-liners:
 
 The storage alias implements [`OneofDeallocate`](puroro-rt/src/fields/oneof.rs) so the previously-active variant is freed through the message allocator before the slot is overwritten. Group accessors use the bound-view idiom: `slot.bind(&common)` / `slot.bind_mut(&mut common)` yield [`OneofSlotRef`](puroro-rt/src/fields/oneof.rs) / [`OneofSlotMut`](puroro-rt/src/fields/oneof.rs). `OneofView` / `OneofViewMut` hold that pair via `OneofGroup`. `OneofSlotMut` consuming methods:
 
-- `variant_mut::<V>() -> Field::BoundMut` — keeps the active variant if it is already `V`, else frees the previous variant and installs `from_variant(EnumVariant::new_value(alloc.clone()))`, then binds the field to `common` once. Callers chain `.value_mut()` / `.merge(…)`.
+- `variant_mut::<V>() -> Field::ViewMut` — keeps the active variant if it is already `V`, else frees the previous variant and installs `from_variant(EnumVariant::new_value(alloc.clone()))`, then binds the field to `common` once. Callers chain `.value_mut()` / `.merge(…)`.
 - `set(value)` — replaces the whole group (frees the old variant).
 - `clear()` — frees the active variant; backs `OneofViewMut::clear`, `clear_notification`, and the message `Drop`.
 

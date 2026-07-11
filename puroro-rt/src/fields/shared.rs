@@ -6,13 +6,11 @@
 //! and [`FieldPresence`](field_presence::FieldPresence) govern singular scalar
 //! storage and init state.
 
-pub(crate) mod bindable;
 pub(crate) mod field_deallocate;
 pub(crate) mod field_presence;
 pub(crate) mod slot_init;
 pub(crate) mod value_slot;
 
-pub use bindable::{Bindable, BindableMut};
 pub use field_deallocate::FieldDeallocate;
 
 use ::core::mem::ManuallyDrop;

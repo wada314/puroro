@@ -29,7 +29,7 @@ use crate::decode;
 use crate::encode;
 
 use crate::fields::shared::{
-    Bindable, BindableMut, FieldDeallocate, MessageCommon, PresenceBits, field_presence::Oneof,
+    FieldDeallocate, MessageCommon, PresenceBits, field_presence::Oneof,
 };
 use crate::fields::wire::len;
 
@@ -222,58 +222,46 @@ where
     }
 }
 
-impl<'a, M, P: MessagePresence, const FIELD: u32, A: Allocator + Clone, Pb: PresenceBits>
-    Bindable<&'a MessageCommon<Pb, A>> for &'a NestedMessageField<M, P, FIELD, A>
-{
-    type Bound = NestedMessageFieldRef<'a, M, P, FIELD, A, Pb>;
-
-    #[inline]
-    fn bind(self, common: &'a MessageCommon<Pb, A>) -> Self::Bound {
-        NestedMessageFieldRef::new(self, common)
-    }
-}
-
-impl<'f, 'c, M, P: MessagePresence, const FIELD: u32, A: Allocator + Clone, Pb: PresenceBits>
-    BindableMut<&'c mut MessageCommon<Pb, A>> for &'f mut NestedMessageField<M, P, FIELD, A>
-{
-    type BoundMut = NestedMessageFieldMut<'f, 'c, M, P, FIELD, A, Pb>;
-
-    #[inline]
-    fn bind_mut(self, common: &'c mut MessageCommon<Pb, A>) -> Self::BoundMut {
-        NestedMessageFieldMut::new(self, common)
-    }
-}
-
 // ---------------------------------------------------------------------------
 // Read view
 // ---------------------------------------------------------------------------
 
 /// Short-lived shared binding of a nested message field to its message common
-/// state, produced by [`Bindable::bind`](crate::fields::shared::Bindable::bind).
+/// state, produced by [`SingularAccess::bind`](crate::fields::singular::SingularAccess::bind).
 ///
-/// Mirrors [`NestedMessageFieldMut`] for the read path. Generated getters always
-/// go through this view — `field.bind(&common).get()` / `.value()` — even when
+/// `AField` is the field wrapper's allocator; `A` is [`MessageCommon`]'s.
+/// Generated call sites use the same type for both. Mirrors
+/// [`NestedMessageFieldMut`] for the read path. Generated getters always go
+/// through this view — `field.bind(&common).get()` / `.value()` — even when
 /// the accessor does not consult `common`.
 pub struct NestedMessageFieldRef<
     'a,
     M,
     P: MessagePresence,
     const FIELD: u32,
+    AField: Allocator,
     A: Allocator,
     Pb: PresenceBits,
 > {
-    field: &'a NestedMessageField<M, P, FIELD, A>,
+    field: &'a NestedMessageField<M, P, FIELD, AField>,
     /// Bound for symmetry with [`NestedMessageFieldMut`]; unused by current getters.
     #[allow(dead_code)]
     common: &'a MessageCommon<Pb, A>,
 }
 
-impl<'a, M, P: MessagePresence, const FIELD: u32, A: Allocator, Pb: PresenceBits>
-    NestedMessageFieldRef<'a, M, P, FIELD, A, Pb>
+impl<
+    'a,
+    M,
+    P: MessagePresence,
+    const FIELD: u32,
+    AField: Allocator,
+    A: Allocator,
+    Pb: PresenceBits,
+> NestedMessageFieldRef<'a, M, P, FIELD, AField, A, Pb>
 {
     #[inline]
-    fn new(
-        field: &'a NestedMessageField<M, P, FIELD, A>,
+    pub(crate) fn new(
+        field: &'a NestedMessageField<M, P, FIELD, AField>,
         common: &'a MessageCommon<Pb, A>,
     ) -> Self {
         Self { field, common }
@@ -286,8 +274,8 @@ impl<'a, M, P: MessagePresence, const FIELD: u32, A: Allocator, Pb: PresenceBits
     }
 }
 
-impl<'a, M, const FIELD: u32, A: Allocator, Pb: PresenceBits>
-    NestedMessageFieldRef<'a, M, Oneof, FIELD, A, Pb>
+impl<'a, M, const FIELD: u32, AField: Allocator, A: Allocator, Pb: PresenceBits>
+    NestedMessageFieldRef<'a, M, Oneof, FIELD, AField, A, Pb>
 {
     /// Borrows the always-present child.
     #[inline]
@@ -301,41 +289,54 @@ impl<'a, M, const FIELD: u32, A: Allocator, Pb: PresenceBits>
 // ---------------------------------------------------------------------------
 
 /// Short-lived binding of a nested message field to its message common state,
-/// produced by [`BindableMut::bind_mut`](crate::fields::shared::BindableMut::bind_mut).
+/// produced by [`SingularAccess::bind_mut`](crate::fields::singular::SingularAccess::bind_mut).
 ///
-/// Bundles the field with the allocator context so a generated accessor can
-/// express a whole mutation as a single call, mirroring the bound-view idiom of
-/// the other field families. Every method consumes the view.
+/// `AField` is the field wrapper's allocator; `A` is [`MessageCommon`]'s.
+/// Mutation methods that allocate or free are implemented when both are the
+/// same type (the usual generated case). Every method consumes the view.
 pub struct NestedMessageFieldMut<
     'f,
     'c,
     M,
     P: MessagePresence,
     const FIELD: u32,
+    AField: Allocator,
     A: Allocator,
     Pb: PresenceBits,
 > {
-    field: &'f mut NestedMessageField<M, P, FIELD, A>,
+    field: &'f mut NestedMessageField<M, P, FIELD, AField>,
     common: &'c mut MessageCommon<Pb, A>,
 }
 
-impl<'f, 'c, M, P: MessagePresence, const FIELD: u32, A: Allocator, Pb: PresenceBits>
-    NestedMessageFieldMut<'f, 'c, M, P, FIELD, A, Pb>
+impl<
+    'f,
+    'c,
+    M,
+    P: MessagePresence,
+    const FIELD: u32,
+    AField: Allocator,
+    A: Allocator,
+    Pb: PresenceBits,
+> NestedMessageFieldMut<'f, 'c, M, P, FIELD, AField, A, Pb>
 {
     #[inline]
-    fn new(
-        field: &'f mut NestedMessageField<M, P, FIELD, A>,
+    pub(crate) fn new(
+        field: &'f mut NestedMessageField<M, P, FIELD, AField>,
         common: &'c mut MessageCommon<Pb, A>,
     ) -> Self {
         Self { field, common }
     }
+}
 
+/// Merge / allocate path when the field and message share one allocator type.
+impl<'f, 'c, M, P: MessagePresence, const FIELD: u32, A: Allocator + Clone, Pb: PresenceBits>
+    NestedMessageFieldMut<'f, 'c, M, P, FIELD, A, A, Pb>
+{
     /// Merges one LEN occurrence into the child (creates the child on first
     /// merge for [`Singular`], then merges subsequent occurrences into it).
     pub fn merge<B: Buf>(self, wire_type: WireType, buf: &mut B) -> Result<(), DecodeError>
     where
         M: NestedMessage<A>,
-        A: Clone,
     {
         if wire_type != len::WIRE_TYPE {
             return Err(DecodeError::InvalidTag);
@@ -352,7 +353,7 @@ impl<'f, 'c, M, P: MessagePresence, const FIELD: u32, A: Allocator, Pb: Presence
 }
 
 impl<'f, 'c, M, const FIELD: u32, A: Allocator + Clone, Pb: PresenceBits>
-    NestedMessageFieldMut<'f, 'c, M, Singular, FIELD, A, Pb>
+    NestedMessageFieldMut<'f, 'c, M, Singular, FIELD, A, A, Pb>
 {
     /// Returns a mutable child reference, inserting a default instance if absent.
     /// Borrows only the field (`'f`), so `common` is free once this returns.
@@ -369,8 +370,8 @@ impl<'f, 'c, M, const FIELD: u32, A: Allocator + Clone, Pb: PresenceBits>
     }
 }
 
-impl<'f, 'c, M, const FIELD: u32, A: Allocator, Pb: PresenceBits>
-    NestedMessageFieldMut<'f, 'c, M, Oneof, FIELD, A, Pb>
+impl<'f, 'c, M, const FIELD: u32, AField: Allocator, A: Allocator, Pb: PresenceBits>
+    NestedMessageFieldMut<'f, 'c, M, Oneof, FIELD, AField, A, Pb>
 {
     /// Mutably borrows the always-present child.
     /// Borrows only the field (`'f`), so `common` is free once this returns.

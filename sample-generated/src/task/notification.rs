@@ -58,7 +58,7 @@
 use ::allocator_api2::alloc::Allocator;
 use ::bytes::BufMut;
 use ::puroro_rt::{
-    Bindable, BoolField, EnumVariant, FieldDeallocate, MessageCommon, NestedMessageField, Oneof,
+    BoolField, EnumVariant, FieldDeallocate, MessageCommon, NestedMessageField, Oneof,
     OneofDeallocate, OneofEncodable, OneofGroup, PresenceBits, ProtoInt32, ProtoString,
     SingularAccess, SingularLenField, SingularVarintField,
 };

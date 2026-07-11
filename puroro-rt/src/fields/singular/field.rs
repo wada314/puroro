@@ -26,7 +26,7 @@ use ::puroro::WireType;
 use ::puroro::{HasDefault, Optional};
 
 use crate::fields::shared::{
-    Bindable, BindableMut, MessageCommon, PresenceBits,
+    MessageCommon, PresenceBits,
     field_presence::{FieldPresence, Implicit, LegacyRequired, Oneof, RequiredFieldPresence},
     slot_init::AlwaysInitialized,
     value_slot::ValueSlot,
@@ -197,7 +197,7 @@ where
 // ---------------------------------------------------------------------------
 
 /// Short-lived shared binding of a singular field to its message common state,
-/// produced by [`Bindable::bind`](crate::fields::shared::Bindable::bind).
+/// produced by [`SingularAccess::bind`](crate::fields::singular::SingularAccess::bind).
 ///
 /// Mirrors [`SingularFieldMut`] for the read path. Generated getters always go
 /// through this view — `field.bind(&common).optional()` / `.value()` — even when
@@ -223,7 +223,10 @@ where
     P::ValueSlot<T>: ValueSlot<T>,
 {
     #[inline]
-    fn new(field: &'a SingularField<T, P, FIELD, D>, common: &'a MessageCommon<Pb, A>) -> Self {
+    pub(crate) fn new(
+        field: &'a SingularField<T, P, FIELD, D>,
+        common: &'a MessageCommon<Pb, A>,
+    ) -> Self {
         Self { field, common }
     }
 }
@@ -270,52 +273,12 @@ impl<'a, T: ScalarProtoType, const FIELD: u32, D, Pb: PresenceBits, A: Allocator
     }
 }
 
-impl<
-    'a,
-    T: ScalarProtoType,
-    P: FieldPresence,
-    const FIELD: u32,
-    D,
-    A: Allocator + Clone,
-    Pb: PresenceBits,
-> Bindable<&'a MessageCommon<Pb, A>> for &'a SingularField<T, P, FIELD, D>
-where
-    P::ValueSlot<T>: ValueSlot<T>,
-{
-    type Bound = SingularFieldRef<'a, T, P, FIELD, D, Pb, A>;
-
-    #[inline]
-    fn bind(self, common: &'a MessageCommon<Pb, A>) -> Self::Bound {
-        SingularFieldRef::new(self, common)
-    }
-}
-
-impl<
-    'f,
-    'c,
-    T: ScalarProtoType,
-    P: FieldPresence,
-    const FIELD: u32,
-    D,
-    A: Allocator + Clone,
-    Pb: PresenceBits,
-> BindableMut<&'c mut MessageCommon<Pb, A>> for &'f mut SingularField<T, P, FIELD, D>
-where
-    P::ValueSlot<T>: ValueSlot<T>,
-{
-    type BoundMut = SingularFieldMut<'f, 'c, T, P, FIELD, D, Pb, A>;
-
-    #[inline]
-    fn bind_mut(self, common: &'c mut MessageCommon<Pb, A>) -> Self::BoundMut {
-        SingularFieldMut::new(self, common)
-    }
-}
-
 // ---------------------------------------------------------------------------
 // Mutation view
 // ---------------------------------------------------------------------------
 
-/// Short-lived binding of a singular field to its message common state.
+/// Short-lived binding of a singular field to its message common state,
+/// produced by [`SingularAccess::bind_mut`](crate::fields::singular::SingularAccess::bind_mut).
 pub struct SingularFieldMut<
     'f,
     'c,
@@ -346,7 +309,7 @@ where
     P::ValueSlot<T>: ValueSlot<T>,
 {
     #[inline]
-    fn new(
+    pub(crate) fn new(
         field: &'f mut SingularField<T, P, FIELD, D>,
         common: &'c mut MessageCommon<Pb, A>,
     ) -> Self {

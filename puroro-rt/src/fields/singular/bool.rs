@@ -18,7 +18,7 @@ use ::puroro::{HasDefault, Optional};
 use crate::defaults::ProtoDefault;
 use crate::encode;
 use crate::fields::shared::{
-    Bindable, BindableMut, FieldDeallocate, MessageCommon, PresenceBits,
+    FieldDeallocate, MessageCommon, PresenceBits,
     field_presence::{
         Explicit, FieldPresence, Implicit, LegacyRequired, Oneof, RequiredFieldPresence,
     },
@@ -149,7 +149,8 @@ impl<P: FieldPresence, const VALUE_BIT: usize, const FIELD: u32, D>
 // Read view
 // ---------------------------------------------------------------------------
 
-/// Short-lived shared binding of a [`BoolField`] to its message common state.
+/// Short-lived shared binding of a [`BoolField`] to its message common state,
+/// produced by [`SingularAccess::bind`](crate::fields::singular::SingularAccess::bind).
 pub struct BoolFieldRef<
     'a,
     P: FieldPresence,
@@ -175,7 +176,7 @@ impl<
 > BoolFieldRef<'a, P, VALUE_BIT, FIELD, D, Pb, A>
 {
     #[inline]
-    fn new(
+    pub(crate) fn new(
         field: &'a BoolField<P, VALUE_BIT, FIELD, D>,
         common: &'a MessageCommon<Pb, A>,
     ) -> Self {
@@ -223,48 +224,12 @@ impl<'a, const VALUE_BIT: usize, const FIELD: u32, D, Pb: PresenceBits, A: Alloc
     }
 }
 
-impl<
-    'a,
-    P: FieldPresence,
-    const VALUE_BIT: usize,
-    const FIELD: u32,
-    D,
-    A: Allocator + Clone,
-    Pb: PresenceBits,
-> Bindable<&'a MessageCommon<Pb, A>> for &'a BoolField<P, VALUE_BIT, FIELD, D>
-{
-    type Bound = BoolFieldRef<'a, P, VALUE_BIT, FIELD, D, Pb, A>;
-
-    #[inline]
-    fn bind(self, common: &'a MessageCommon<Pb, A>) -> Self::Bound {
-        BoolFieldRef::new(self, common)
-    }
-}
-
-impl<
-    'f,
-    'c,
-    P: FieldPresence,
-    const VALUE_BIT: usize,
-    const FIELD: u32,
-    D,
-    A: Allocator + Clone,
-    Pb: PresenceBits,
-> BindableMut<&'c mut MessageCommon<Pb, A>> for &'f mut BoolField<P, VALUE_BIT, FIELD, D>
-{
-    type BoundMut = BoolFieldMut<'f, 'c, P, VALUE_BIT, FIELD, D, Pb, A>;
-
-    #[inline]
-    fn bind_mut(self, common: &'c mut MessageCommon<Pb, A>) -> Self::BoundMut {
-        BoolFieldMut::new(self, common)
-    }
-}
-
 // ---------------------------------------------------------------------------
 // Mutation view
 // ---------------------------------------------------------------------------
 
-/// Short-lived binding of a [`BoolField`] to its message common state.
+/// Short-lived binding of a [`BoolField`] to its message common state,
+/// produced by [`SingularAccess::bind_mut`](crate::fields::singular::SingularAccess::bind_mut).
 pub struct BoolFieldMut<
     'f,
     'c,
@@ -292,7 +257,7 @@ impl<
 > BoolFieldMut<'f, 'c, P, VALUE_BIT, FIELD, D, Pb, A>
 {
     #[inline]
-    fn new(
+    pub(crate) fn new(
         field: &'f mut BoolField<P, VALUE_BIT, FIELD, D>,
         common: &'c mut MessageCommon<Pb, A>,
     ) -> Self {
