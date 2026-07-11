@@ -17,12 +17,12 @@ use ::puroro::WireType;
 
 use crate::decode;
 use crate::encode;
-use crate::fields::shared::{DeallocateIn, DefaultIn, ProtoEmpty};
+use crate::fields::shared::{ProtoEmpty, value_slot::AddressableSlot};
 
 use super::len::{LenProtoType, ProtoBytes, ProtoString};
 use super::varint::{
-    ProtoBool, ProtoEnum, ProtoEnumStorage, ProtoInt32, ProtoInt64, ProtoSint32, ProtoSint64,
-    ProtoUInt32, ProtoUInt64, VarintProtoType,
+    ProtoEnum, ProtoEnumStorage, ProtoInt32, ProtoInt64, ProtoSint32, ProtoSint64, ProtoUInt32,
+    ProtoUInt64, VarintProtoType,
 };
 
 /// Wire + storage semantics for a singular scalar protobuf type.
@@ -30,7 +30,7 @@ use super::varint::{
 /// The implementor **is** the value stored in a singular field (thin wrapper).
 /// Drives [`SingularField`](crate::fields::singular::field::SingularField)
 /// encode / decode / accessor behaviour for both varint and LEN payloads.
-pub trait ScalarProtoType: DefaultIn + DeallocateIn + ProtoEmpty + Sized {
+pub trait ScalarProtoType: AddressableSlot + ProtoEmpty + Sized {
     /// Borrowed / by-value view returned by getters (`i32`, `&str`, …).
     type Ref<'a>
     where
@@ -125,7 +125,9 @@ impl_varint_scalar!(ProtoInt32);
 impl_varint_scalar!(ProtoInt64);
 impl_varint_scalar!(ProtoSint32);
 impl_varint_scalar!(ProtoSint64);
-impl_varint_scalar!(ProtoBool);
+
+// `ProtoBool` is bit-packed: encode/merge go through `SingularField` + wire
+// helpers, not `ScalarProtoType` on an addressable `&self` payload.
 
 impl<E: ProtoEnumStorage> ScalarProtoType for ProtoEnum<E> {
     type Ref<'a>

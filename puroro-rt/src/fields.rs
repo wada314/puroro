@@ -19,7 +19,7 @@
 //! |---|---|
 //! | [`shared`] | `MessageCommon`, `PresenceBits`, `FieldPresence`, `ValueSlot`, … |
 //! | [`wire`] | `ScalarProtoType` (thin wrappers), `VarintProtoType` / `LenProtoType` (repeated inners), fixed-width stubs |
-//! | [`singular`] | `SingularField`, `BoolField`, `NestedMessageField` |
+//! | [`singular`] | `SingularField`, `NestedMessageField` |
 //! | [`repeated`] | `RepeatedVarintField`, `RepeatedLenField` |
 //! | [`oneof`] | `OneofSlot` |
 

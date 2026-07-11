@@ -26,6 +26,7 @@ use crate::fields::singular::SingularAccess;
 use crate::fields::singular::field::SingularField;
 use crate::fields::singular::message::NestedMessageField;
 use crate::fields::wire::scalar::ScalarProtoType;
+use crate::fields::wire::varint::ProtoBool;
 
 /// Explicit release of a generated `oneof` storage enum.
 ///
@@ -390,9 +391,10 @@ where
 }
 
 impl<'a, const VALUE_BIT: usize, const FIELD: u32, D, Pb: PresenceBits, A: Allocator>
-    OneofVariantRef<'a, crate::fields::singular::BoolField<Oneof, VALUE_BIT, FIELD, D>, Pb, A>
+    OneofVariantRef<'a, SingularField<ProtoBool<VALUE_BIT>, Oneof, FIELD, D>, Pb, A>
 where
     D: HasDefault<bool>,
+    <Oneof as FieldPresence>::ValueSlot<ProtoBool<VALUE_BIT>>: ValueSlot<ProtoBool<VALUE_BIT>>,
 {
     pub fn optional(self) -> Optional<bool, D>
     where

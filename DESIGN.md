@@ -758,7 +758,7 @@ pub fn clear_notification(&mut self); // = notification_mut().clear()
 
 Note: enums cannot carry unused lifetime/allocator parameters via `PhantomData` (unlike a struct). Integer-only oneofs therefore omit `'a` / `A` from the shape and from `Ref`/`Mut` aliases when no variant payload needs them.
 
-**Variants own field wrappers, not raw storage.** A oneof member of a given kind reuses the exact field wrapper an ordinary singular field of that kind uses (`SingularField` / `SingularLenField` / `SingularVarintField` for non-bool scalars and LEN; [`BoolField`](puroro-rt/src/fields/singular/bool.rs) for `bool` — value packed into `_common.presence`; `NestedMessageField` for messages), so the storage / `value` / `value_mut` / `deallocate` machinery is shared rather than reimplemented. The wrapper's *presence* is inert for a oneof — presence is tracked by the enclosing `OneofSlot` — so `FieldPresence::Oneof` is used (omit rules never consulted; bool still reads/writes its value bit).
+**Variants own field wrappers, not raw storage.** A oneof member of a given kind reuses the exact field wrapper an ordinary singular field of that kind uses (`SingularField` / `SingularLenField` / `SingularVarintField` — including [`ProtoBool`](puroro-rt/src/fields/wire/varint.rs) for `bool`, value packed into `_common.presence`; `NestedMessageField` for messages), so the storage / `value` / `value_mut` / `deallocate` machinery is shared rather than reimplemented. The wrapper's *presence* is inert for a oneof — presence is tracked by the enclosing `OneofSlot` — so `FieldPresence::Oneof` is used (omit rules never consulted; bool still reads/writes its value bit).
 
 To keep generated code thin, each wrapper is driven with the **field's own** construction, merge, and access primitives — no bespoke helpers on the oneof enum. Empty construction lives on [`EnumVariant::new_value`](puroro-rt/src/fields/enum_variant.rs); mut paths use a single bind:
 
@@ -766,7 +766,7 @@ To keep generated code thin, each wrapper is driven with the **field's own** con
 |---|---|---|---|
 | LEN | `SingularLenField::new_in(alloc)` | `slot.bind_mut(common).variant_mut::<V>().merge(…)` | `…variant_mut::<V>().value_mut()` |
 | VARINT | `SingularVarintField::new_in(alloc)` | same | same |
-| bool | `BoolField::new_in(alloc)` | same | same → `impl DerefMut<Target = bool>` |
+| bool | `SingularVarintField::<ProtoBool<BIT>>::new_in(alloc)` | same | same → `impl DerefMut<Target = bool>` |
 | message | `NestedMessageField::with_message_in(alloc)` | same | same → `&mut M` |
 
 Every variant merges through the **same** `slot.bind_mut(common).variant_mut::<V>().merge(wire, buf)` shape. The message variant merges *into* the present child rather than replacing it.

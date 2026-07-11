@@ -2,8 +2,9 @@
 //!
 //! [`SingularAccess`] names getter / `_mut` payload types (`Ref` / `Mut`) and
 //! pairs a field with [`MessageCommon`] via `bind` / `bind_mut` (`View` /
-//! `ViewMut`). [`SingularField`] forwards payloads to [`ScalarProtoType`];
-//! [`BoolField`] / [`NestedMessageField`] supply their own.
+//! `ViewMut`). [`SingularField`] forwards addressable payloads to
+//! [`ScalarProtoType`]; [`ProtoBool`](crate::ProtoBool) and
+//! [`NestedMessageField`] supply their own.
 
 use ::allocator_api2::alloc::Allocator;
 
@@ -11,15 +12,15 @@ use crate::fields::shared::field_presence::FieldPresence;
 use crate::fields::shared::value_slot::ValueSlot;
 use crate::fields::shared::{MessageCommon, PresenceBits};
 use crate::fields::wire::scalar::ScalarProtoType;
+use crate::fields::wire::varint::ProtoBool;
 
-use super::bool::{BoolField, BoolFieldMut, BoolFieldRef};
 use super::field::{SingularField, SingularFieldMut, SingularFieldRef};
 use super::message::{MessagePresence, NestedMessageField, NestedMessageFieldMut, NestedMessageFieldRef};
 
 /// Getter / mutable-accessor payloads and MessageCommon binding for a singular
 /// field wrapper.
 ///
-/// Implemented by [`SingularField`], [`BoolField`], and [`NestedMessageField`].
+/// Implemented by [`SingularField`] and [`NestedMessageField`].
 pub trait SingularAccess {
     /// Borrowed or by-value view returned by shared getters.
     type Ref<'a>
@@ -101,6 +102,50 @@ where
     }
 }
 
+impl<const VALUE_BIT: usize, P: FieldPresence, const FIELD: u32, D> SingularAccess
+    for SingularField<ProtoBool<VALUE_BIT>, P, FIELD, D>
+where
+    P::ValueSlot<ProtoBool<VALUE_BIT>>: ValueSlot<ProtoBool<VALUE_BIT>>,
+{
+    type Ref<'a>
+        = bool
+    where
+        Self: 'a;
+    /// Named bit handle for enum payloads; public `_mut` still returns `impl DerefMut`.
+    type Mut<'a, A: Allocator + 'a>
+        = ::bitvec::ptr::BitRef<'a, ::bitvec::ptr::Mut, u8, ::bitvec::order::Lsb0>
+    where
+        Self: 'a;
+    type View<'a, Pb: PresenceBits, A: Allocator>
+        = SingularFieldRef<'a, ProtoBool<VALUE_BIT>, P, FIELD, D, Pb, A>
+    where
+        Self: 'a,
+        Pb: 'a,
+        A: 'a;
+    type ViewMut<'f, 'c, Pb: PresenceBits, A: Allocator>
+        = SingularFieldMut<'f, 'c, ProtoBool<VALUE_BIT>, P, FIELD, D, Pb, A>
+    where
+        Self: 'f,
+        Pb: 'c,
+        A: 'c;
+
+    #[inline]
+    fn bind<'a, Pb: PresenceBits, A: Allocator + Clone>(
+        &'a self,
+        common: &'a MessageCommon<Pb, A>,
+    ) -> Self::View<'a, Pb, A> {
+        SingularFieldRef::new(self, common)
+    }
+
+    #[inline]
+    fn bind_mut<'f, 'c, Pb: PresenceBits, A: Allocator + Clone>(
+        &'f mut self,
+        common: &'c mut MessageCommon<Pb, A>,
+    ) -> Self::ViewMut<'f, 'c, Pb, A> {
+        SingularFieldMut::new(self, common)
+    }
+}
+
 impl<M, P: MessagePresence, const FIELD: u32, AField: Allocator> SingularAccess
     for NestedMessageField<M, P, FIELD, AField>
 {
@@ -141,47 +186,5 @@ impl<M, P: MessagePresence, const FIELD: u32, AField: Allocator> SingularAccess
         common: &'c mut MessageCommon<Pb, A>,
     ) -> Self::ViewMut<'f, 'c, Pb, A> {
         NestedMessageFieldMut::new(self, common)
-    }
-}
-
-impl<P: FieldPresence, const VALUE_BIT: usize, const FIELD: u32, D> SingularAccess
-    for BoolField<P, VALUE_BIT, FIELD, D>
-{
-    type Ref<'a>
-        = bool
-    where
-        Self: 'a;
-    /// Named bit handle for enum payloads; public `_mut` still returns `impl DerefMut`.
-    type Mut<'a, A: Allocator + 'a>
-        = ::bitvec::ptr::BitRef<'a, ::bitvec::ptr::Mut, u8, ::bitvec::order::Lsb0>
-    where
-        Self: 'a;
-    type View<'a, Pb: PresenceBits, A: Allocator>
-        = BoolFieldRef<'a, P, VALUE_BIT, FIELD, D, Pb, A>
-    where
-        Self: 'a,
-        Pb: 'a,
-        A: 'a;
-    type ViewMut<'f, 'c, Pb: PresenceBits, A: Allocator>
-        = BoolFieldMut<'f, 'c, P, VALUE_BIT, FIELD, D, Pb, A>
-    where
-        Self: 'f,
-        Pb: 'c,
-        A: 'c;
-
-    #[inline]
-    fn bind<'a, Pb: PresenceBits, A: Allocator + Clone>(
-        &'a self,
-        common: &'a MessageCommon<Pb, A>,
-    ) -> Self::View<'a, Pb, A> {
-        BoolFieldRef::new(self, common)
-    }
-
-    #[inline]
-    fn bind_mut<'f, 'c, Pb: PresenceBits, A: Allocator + Clone>(
-        &'f mut self,
-        common: &'c mut MessageCommon<Pb, A>,
-    ) -> Self::ViewMut<'f, 'c, Pb, A> {
-        BoolFieldMut::new(self, common)
     }
 }

@@ -190,11 +190,46 @@ proto_varint_wrapper! {
     encode = |value| Varint::from_sint64(value).to_uint64(),
 }
 
-proto_varint_wrapper! {
-    /// Protobuf `bool` — varint 0 or 1.
-    ProtoBool(bool),
-    decode = |raw| Ok(Varint::from_uint64(raw).to_bool()),
-    encode = |value| Varint::from_bool(value).to_uint64(),
+/// Protobuf `bool` — varint 0 or 1; value packed at `VALUE_BIT` in the message bitvec.
+///
+/// The singular field slot stores this ZST (or `MaybeUninit` of it). The logical
+/// `bool` is not addressable as `&mut bool` inside the slot — it is read/written
+/// through [`MessageCommon`](crate::MessageCommon) via [`ValueSlot`](crate::fields::shared::value_slot::ValueSlot).
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
+pub struct ProtoBool<const VALUE_BIT: usize>;
+
+impl<const VALUE_BIT: usize> DefaultIn for ProtoBool<VALUE_BIT> {
+    #[inline]
+    fn default_in<A: ::allocator_api2::alloc::Allocator>(_alloc: A) -> Self {
+        Self
+    }
+}
+
+impl<const VALUE_BIT: usize> DeallocateIn for ProtoBool<VALUE_BIT> {
+    #[inline]
+    unsafe fn deallocate_in<A: ::allocator_api2::alloc::Allocator>(self, _alloc: A) {}
+}
+
+impl<const VALUE_BIT: usize> ProtoEmpty for ProtoBool<VALUE_BIT> {
+    /// Slot-side emptiness is meaningless for a ZST; IMPLICIT omit uses the value bit.
+    #[inline]
+    fn is_proto_empty(&self) -> bool {
+        true
+    }
+}
+
+impl<const VALUE_BIT: usize> VarintProtoType for ProtoBool<VALUE_BIT> {
+    type Value = bool;
+
+    #[inline]
+    fn decode_wire(raw: u64) -> Result<Self::Value, DecodeError> {
+        Ok(Varint::from_uint64(raw).to_bool())
+    }
+
+    #[inline]
+    fn encode_wire(value: Self::Value) -> u64 {
+        Varint::from_bool(value).to_uint64()
+    }
 }
 
 /// Always [`WireType::Varint`] for singular field merge/encode checks.

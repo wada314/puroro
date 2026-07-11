@@ -15,8 +15,8 @@ use ::core::ops::DerefMut;
 
 use ::puroro::{DecodeError, HasDefault, MessageDecode, MessageEncode, Optional};
 use ::puroro_rt::{
-    BoolField, Explicit, FieldDeallocate, Implicit, LegacyRequired, MessageCommon,
-    NestedMessageField, OneofSlot, PresenceBits, ProtoBytes, ProtoEnum, ProtoInt32, ProtoString,
+    Explicit, FieldDeallocate, Implicit, LegacyRequired, MessageCommon, NestedMessageField,
+    OneofSlot, PresenceBits, ProtoBool, ProtoBytes, ProtoEnum, ProtoInt32, ProtoString,
     RepeatedExpandedVarintField, RepeatedLenField, RepeatedPackedVarintField, Singular,
     SingularAccess, SingularLenField, SingularVarintField,
 };
@@ -134,8 +134,12 @@ pub struct Task<A: Allocator + Clone = Global> {
     //                             int32 webhook_id=14 [default=-1]; Address postal=15;
     //                             bool urgent=18; }
     notification: OneofSlot<NotificationStorage<A>>,
-    done: BoolField<Implicit, { BIT_DONE_VALUE }, { FIELD_DONE }>, // proto: bool done = 16;
-    flag: BoolField<Explicit<{ BIT_FLAG }>, { BIT_FLAG_VALUE }, { FIELD_FLAG }>, // proto: bool flag = 17;
+    done: SingularVarintField<ProtoBool<{ BIT_DONE_VALUE }>, Implicit, { FIELD_DONE }>, // proto: bool done = 16;
+    flag: SingularVarintField<
+        ProtoBool<{ BIT_FLAG_VALUE }>,
+        Explicit<{ BIT_FLAG }>,
+        { FIELD_FLAG },
+    >, // proto: bool flag = 17;
 }
 
 impl<A: Allocator + Clone> Task<A> {
@@ -156,8 +160,8 @@ impl<A: Allocator + Clone> Task<A> {
             priority: SingularVarintField::new_in(alloc.clone()),
             assignee: NestedMessageField::new_in(alloc.clone()),
             notification: OneofSlot::new_in(alloc.clone()),
-            done: BoolField::new_in(alloc.clone()),
-            flag: BoolField::new_in(alloc),
+            done: SingularVarintField::new_in(alloc.clone()),
+            flag: SingularVarintField::new_in(alloc),
         }
     }
 

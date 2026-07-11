@@ -28,13 +28,12 @@ pub use fields::shared::field_presence::{
 };
 pub use fields::shared::value_slot::ValueSlot;
 pub use fields::singular::{
-    BoolField, BoolFieldMut, BoolFieldRef, ExplicitBoolField, ExplicitBytes, ExplicitEnum,
-    ExplicitInt32, ExplicitLenField, ExplicitString, ExplicitVarint, ExplicitVarintField,
-    ImplicitBoolField, ImplicitBytes, ImplicitEnum, ImplicitInt32, ImplicitLenField, ImplicitString,
-    ImplicitVarint, ImplicitVarintField, LegacyRequiredBoolField, MessagePresence, NestedMessage,
-    NestedMessageField, NestedMessageFieldMut, NestedMessageFieldRef, OneofBoolField, Singular,
-    SingularAccess, SingularField, SingularFieldMut, SingularFieldRef, SingularLen,
-    SingularLenField, SingularLenFieldMut, SingularLenFieldRef, SingularVarint, SingularVarintField,
+    ExplicitBytes, ExplicitEnum, ExplicitInt32, ExplicitLenField, ExplicitString, ExplicitVarint,
+    ExplicitVarintField, ImplicitBytes, ImplicitEnum, ImplicitInt32, ImplicitLenField,
+    ImplicitString, ImplicitVarint, ImplicitVarintField, MessagePresence, NestedMessage,
+    NestedMessageField, NestedMessageFieldMut, NestedMessageFieldRef, Singular, SingularAccess,
+    SingularField, SingularFieldMut, SingularFieldRef, SingularLen, SingularLenField,
+    SingularLenFieldMut, SingularLenFieldRef, SingularVarint, SingularVarintField,
     SingularVarintFieldMut, SingularVarintFieldRef,
 };
 pub use fields::wire::{
