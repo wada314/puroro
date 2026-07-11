@@ -202,6 +202,8 @@ impl<E, A: Allocator + Clone, Pb: PresenceBits> BindableMut<MessageCommon<Pb, A>
 /// always return a handle, including when the group is unset.
 pub struct OneofSlotRef<'a, E, Pb: PresenceBits, A: Allocator> {
     slot: &'a OneofSlot<E>,
+    /// Bound for symmetry with [`OneofSlotMut`]; unused by current read accessors.
+    #[allow(dead_code)]
     common: &'a MessageCommon<Pb, A>,
 }
 
@@ -215,12 +217,6 @@ impl<'a, E, Pb: PresenceBits, A: Allocator> OneofSlotRef<'a, E, Pb, A> {
     #[inline]
     pub fn as_ref(&self) -> Option<&'a E> {
         self.slot.as_ref()
-    }
-
-    /// Shared message common (allocator / presence / unknown fields).
-    #[inline]
-    pub fn common(&self) -> &'a MessageCommon<Pb, A> {
-        self.common
     }
 }
 

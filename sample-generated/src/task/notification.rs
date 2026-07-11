@@ -112,6 +112,8 @@ pub enum NotificationMut<'a, A: Allocator + Clone> {
 /// group is unset. Project the active variant with [`as_ref`](Self::as_ref).
 pub struct NotificationView<'a, A: Allocator + Clone> {
     slot: &'a OneofSlot<NotificationStorage<A>>,
+    /// Bound for symmetry with [`NotificationViewMut`]; unused by current getters.
+    #[allow(dead_code)]
     common: &'a MessageCommon<TaskPresence, A>,
 }
 
@@ -134,12 +136,6 @@ impl<'a, A: Allocator + Clone> NotificationView<'a, A> {
     #[inline]
     pub fn as_ref(&self) -> Option<NotificationRef<'a, A>> {
         self.slot.as_ref().map(|s| s.to_ref())
-    }
-
-    /// Shared message common bound into this view.
-    #[inline]
-    pub fn common(&self) -> &'a MessageCommon<TaskPresence, A> {
-        self.common
     }
 }
 
