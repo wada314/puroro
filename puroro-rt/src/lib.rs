@@ -13,7 +13,8 @@ pub use ::protobuf_core::FieldNumber;
 pub use defaults::ProtoDefault;
 pub use fields::enum_variant::EnumVariant;
 pub use fields::oneof::{
-    OneofDeallocate, OneofEncodable, OneofSlot, OneofSlotMut, OneofSlotRef, OneofVariantRef,
+    OneofDeallocate, OneofEncodable, OneofGroup, OneofSlot, OneofSlotMut, OneofSlotRef,
+    OneofVariantRef, OneofView, OneofViewMut,
 };
 pub use fields::repeated::{
     Expanded, Packed, RepeatedBytes, RepeatedExpandedInt32, RepeatedExpandedVarintField,

@@ -419,3 +419,137 @@ impl<'a, M, const FIELD: u32, A: Allocator, Pb: PresenceBits>
         self.field.map(|f| f.bind(self.common).value())
     }
 }
+
+// ---------------------------------------------------------------------------
+// Group identity + public bound views
+// ---------------------------------------------------------------------------
+
+/// Generated oneof storage identity: case / projected Ref / Mut, plus the
+/// message presence and allocator types.
+///
+/// Implemented on the crate-internal storage alias (e.g. `NotificationStorage`).
+/// [`OneofView`] / [`OneofViewMut`] are parametrised by this trait so message
+/// accessors need not expose the storage type in their signatures (RPIT).
+pub trait OneofGroup {
+    /// Payload-less discriminant of the active variant.
+    type Case: Copy;
+
+    /// Projected shared view of the active variant.
+    type Ref<'a>
+    where
+        Self: 'a;
+
+    /// Projected mutable view of the active variant.
+    type Mut<'a>
+    where
+        Self: 'a;
+
+    /// Per-message presence bitfield type.
+    type Presence: PresenceBits;
+
+    /// Message allocator type.
+    type Alloc: Allocator + Clone;
+
+    /// Owned storage enum type held in [`OneofSlot`]. Usually `Self`.
+    type Storage: OneofDeallocate<Self::Presence, Self::Alloc>;
+
+    /// Discriminant for an active storage value.
+    fn case(storage: &Self::Storage) -> Self::Case;
+
+    /// Project an active storage value to the shared view.
+    fn to_ref<'a>(
+        storage: &'a Self::Storage,
+        common: &'a MessageCommon<Self::Presence, Self::Alloc>,
+    ) -> Self::Ref<'a>;
+
+    /// Project an active storage value to the mutable view.
+    fn to_mut<'a>(
+        storage: &'a mut Self::Storage,
+        common: &'a mut MessageCommon<Self::Presence, Self::Alloc>,
+    ) -> Self::Mut<'a>;
+}
+
+/// Shared bound view of a oneof group (slot + [`MessageCommon`]).
+///
+/// Returned by generated `notification()`-style accessors even when unset.
+pub struct OneofView<'a, G: OneofGroup> {
+    slot: &'a OneofSlot<G::Storage>,
+    common: &'a MessageCommon<G::Presence, G::Alloc>,
+}
+
+impl<'a, G: OneofGroup> OneofView<'a, G> {
+    /// Creates a shared group view from a slot and message common state.
+    #[inline]
+    pub fn new(
+        slot: &'a OneofSlot<G::Storage>,
+        common: &'a MessageCommon<G::Presence, G::Alloc>,
+    ) -> Self {
+        Self { slot, common }
+    }
+
+    /// Which variant is set (`None` when the group is unset).
+    #[inline]
+    pub fn case(&self) -> Option<G::Case> {
+        self.slot.as_ref().map(G::case)
+    }
+
+    /// Projected read view of the active variant, if any.
+    #[inline]
+    pub fn as_ref(&self) -> Option<G::Ref<'a>> {
+        self.slot.as_ref().map(|s| G::to_ref(s, self.common))
+    }
+}
+
+/// Mutable bound view of a oneof group (slot + [`MessageCommon`]).
+///
+/// Returned by generated `notification_mut()`-style accessors even when unset.
+pub struct OneofViewMut<'a, G: OneofGroup> {
+    slot: &'a mut OneofSlot<G::Storage>,
+    common: &'a mut MessageCommon<G::Presence, G::Alloc>,
+}
+
+impl<'a, G: OneofGroup> OneofViewMut<'a, G> {
+    /// Creates a mutable group view from a slot and message common state.
+    #[inline]
+    pub fn new(
+        slot: &'a mut OneofSlot<G::Storage>,
+        common: &'a mut MessageCommon<G::Presence, G::Alloc>,
+    ) -> Self {
+        Self { slot, common }
+    }
+
+    /// Reborrow as a shared bound view (for `case` / `as_ref` while mutating).
+    #[inline]
+    pub fn as_view<'b>(&'b self) -> OneofView<'b, G> {
+        OneofView {
+            slot: &*self.slot,
+            common: &*self.common,
+        }
+    }
+
+    /// Which variant is set (`None` when the group is unset).
+    #[inline]
+    pub fn case(&self) -> Option<G::Case> {
+        self.as_view().case()
+    }
+
+    /// Projected read view of the active variant, if any (reborrows `self`).
+    #[inline]
+    pub fn as_ref(&self) -> Option<G::Ref<'_>> {
+        self.as_view().as_ref()
+    }
+
+    /// Projected mutable view of the *currently active* variant (no switch).
+    ///
+    /// Consumes this bound view. Returns `None` when the group is unset.
+    #[inline]
+    pub fn as_mut(self) -> Option<G::Mut<'a>> {
+        self.slot.as_mut().map(|s| G::to_mut(s, self.common))
+    }
+
+    /// Clears whichever variant is active (freeing it through the message allocator).
+    #[inline]
+    pub fn clear(self) {
+        self.slot.bind_mut(self.common).clear();
+    }
+}

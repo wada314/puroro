@@ -29,7 +29,7 @@ use crate::enums::{Priority, Status};
 use notification::NotificationStorage;
 use notification::variant::{EmailAddress, PhoneNumber, Postal, Urgent, WebhookId};
 pub use notification::{
-    NotificationCase, NotificationMut, NotificationRef, NotificationView, NotificationViewMut,
+    Notification, NotificationCase, NotificationMut, NotificationRef,
 };
 
 // ---------------------------------------------------------------------------
@@ -363,13 +363,36 @@ impl<A: Allocator + Clone> Task<A> {
     }
 
     /// Bound shared view of the oneof group (always available, including when unset).
-    pub fn notification(&self) -> NotificationView<'_, A> {
-        NotificationView::new(&self.notification, &self._common)
+    pub fn notification<'a>(
+        &'a self,
+    ) -> ::puroro_rt::OneofView<
+        'a,
+        impl ::puroro_rt::OneofGroup<
+            Case = NotificationCase,
+            Ref<'a> = NotificationRef<'a, A>,
+            Mut<'a> = NotificationMut<'a, A>,
+        >,
+    > {
+        ::puroro_rt::OneofView::<NotificationStorage<A>>::new(&self.notification, &self._common)
     }
 
     /// Bound mutable view of the oneof group (always available, including when unset).
-    pub fn notification_mut(&mut self) -> NotificationViewMut<'_, A> {
-        NotificationViewMut::new(&mut self.notification, &mut self._common)
+    ///
+    /// RPIT omits `Ref` so `as_view` reborrows stay short-lived; match shared
+    /// payloads via [`Self::notification`].
+    pub fn notification_mut<'a>(
+        &'a mut self,
+    ) -> ::puroro_rt::OneofViewMut<
+        'a,
+        impl ::puroro_rt::OneofGroup<
+            Case = NotificationCase,
+            Mut<'a> = NotificationMut<'a, A>,
+        >,
+    > {
+        ::puroro_rt::OneofViewMut::<NotificationStorage<A>>::new(
+            &mut self.notification,
+            &mut self._common,
+        )
     }
 
     pub fn clear_notification(&mut self) {

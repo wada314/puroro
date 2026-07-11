@@ -1,20 +1,22 @@
 //! Sample of the `oneof notification` types puroro generates for `Task`.
 //!
-//! A oneof that owns heap storage is represented by several generated types,
+//! A oneof that owns heap storage is represented by several generated items,
 //! because the owned storage holds allocator-less `unmanaged` values (unsafe to
 //! drop implicitly) and must not leak into the public API:
 //!
-//! - [`NotificationStorage`] — the owned storage enum (`pub(crate)`, deliberately
-//!   *not* the canonical `Notification` name): each variant owns the same **field
-//!   wrapper** a singular field of that kind uses, implements [`OneofDeallocate`],
-//!   and carries the encode glue. Never public.
+//! - [`Notification`] — canonical **shape** enum; variant payloads are type
+//!   parameters. [`NotificationStorage`] / [`NotificationRef`] /
+//!   [`NotificationMut`] are aliases of this shape.
+//! - [`NotificationStorage`] — `pub(crate)` alias with field-wrapper payloads;
+//!   implements [`OneofGroup`], [`OneofDeallocate`], encode glue. Never public.
 //! - [`NotificationCase`] — a payload-less, `Copy` discriminant of which variant
 //!   is active.
-//! - [`NotificationView`] / [`NotificationViewMut`] — bound views of the group
-//!   (slot + [`MessageCommon`]), returned by `Task::notification` /
-//!   `notification_mut` even when unset.
-//! - [`NotificationRef`] / [`NotificationMut`] — safe projected enums of the
-//!   *active* variant (`as_ref` / `as_mut` on the bound views).
+//! - [`NotificationRef`] / [`NotificationMut`] — safe projected aliases of the
+//!   *active* variant (`as_ref` / `as_mut` on [`OneofView`] /
+//!   [`OneofViewMut`](::puroro_rt::OneofViewMut)).
+//!
+//! Group bound views come from `puroro-rt` ([`OneofView`] /
+//! [`OneofViewMut`](::puroro_rt::OneofViewMut)), not per-oneof generated structs.
 //!
 //! This group is deliberately **heterogeneous** to show every field kind:
 //!
@@ -46,13 +48,17 @@
 //!
 //! Per-variant dispatch uses [`EnumVariant`] on zero-sized marker types in
 //! [`variant`]; see that module for the type-parameter wiring.
+//!
+//! Note: this enum cannot carry unused lifetime/allocator parameters via
+//! `PhantomData` (unlike a struct). Integer-only oneofs therefore omit `'a` / `A`
+//! from the shape and from `Ref`/`Mut` aliases when no variant payload needs them.
 
 use ::allocator_api2::alloc::Allocator;
 use ::bytes::BufMut;
 use ::puroro_rt::{
-    Bindable, BindableMut, BoolField, EnumVariant, FieldDeallocate, MessageCommon,
-    NestedMessageField, Oneof, OneofDeallocate, OneofEncodable, OneofSlot, PresenceBits,
-    ProtoInt32, ProtoString, SingularLenField, SingularVarintField,
+    Bindable, BoolField, EnumVariant, FieldDeallocate, MessageCommon, NestedMessageField,
+    Oneof, OneofDeallocate, OneofEncodable, OneofGroup, PresenceBits, ProtoInt32, ProtoString,
+    SingularLenField, SingularVarintField,
 };
 use ::unmanaged::string::StringGuard;
 
@@ -72,6 +78,19 @@ pub(crate) mod variant {
 
 use variant::{EmailAddress, PhoneNumber, Postal, Urgent, WebhookId};
 
+/// Canonical shape for `oneof notification`.
+///
+/// Note: this enum cannot carry unused lifetime/allocator parameters via
+/// `PhantomData` (unlike a struct). Integer-only oneofs therefore omit `'a` / `A`
+/// from the shape and from `Ref`/`Mut` aliases when no variant payload needs them.
+pub enum Notification<Ea, Pn, Wh, Po, Ur> {
+    EmailAddress(Ea),
+    PhoneNumber(Pn),
+    WebhookId(Wh),
+    Postal(Po),
+    Urgent(Ur),
+}
+
 /// Which variant of `oneof notification` is set — a payload-less discriminant.
 ///
 /// Backs `Task::notification_case`, which returns `Option<NotificationCase>`;
@@ -86,14 +105,31 @@ pub enum NotificationCase {
     Urgent,
 }
 
+/// Owned storage for `oneof notification` (crate-internal).
+pub(crate) type NotificationStorage<A> = Notification<
+    SingularLenField<ProtoString, Oneof, { super::FIELD_EMAIL_ADDRESS }>,
+    SingularLenField<ProtoString, Oneof, { super::FIELD_PHONE_NUMBER }>,
+    SingularVarintField<ProtoInt32, Oneof, { super::FIELD_WEBHOOK_ID }, WebhookIdDefault>,
+    NestedMessageField<Address<A>, Oneof, { super::FIELD_POSTAL }, A>,
+    BoolField<Oneof, { super::BIT_URGENT_VALUE }, { super::FIELD_URGENT }>,
+>;
+
 /// Borrowed read view of the active `notification` variant.
-pub enum NotificationRef<'a, A: Allocator + Clone> {
-    EmailAddress(&'a str),
-    PhoneNumber(&'a str),
-    WebhookId(i32),
-    Postal(&'a Address<A>),
-    Urgent(bool),
-}
+pub type NotificationRef<'a, A> =
+    Notification<&'a str, &'a str, i32, &'a Address<A>, bool>;
+
+/// Borrowed mutable projection of the active `notification` variant.
+///
+/// `Urgent` uses a concrete [`BitRef`] rather than `impl Trait` because enum
+/// variants cannot hold `impl Trait`; public `_mut` accessors still return
+/// `impl DerefMut<Target = bool>`.
+pub type NotificationMut<'a, A> = Notification<
+    StringGuard<'a, A>,
+    StringGuard<'a, A>,
+    &'a mut i32,
+    &'a mut Address<A>,
+    ::bitvec::ptr::BitRef<'a, ::bitvec::ptr::Mut, u8, ::bitvec::order::Lsb0>,
+>;
 
 impl<A: Allocator + Clone> Clone for NotificationRef<'_, A> {
     fn clone(&self) -> Self {
@@ -102,106 +138,22 @@ impl<A: Allocator + Clone> Clone for NotificationRef<'_, A> {
 }
 impl<A: Allocator + Clone> Copy for NotificationRef<'_, A> {}
 
-/// Borrowed mutable projection of the active `notification` variant.
-pub enum NotificationMut<'a, A: Allocator + Clone> {
-    EmailAddress(StringGuard<'a, A>),
-    PhoneNumber(StringGuard<'a, A>),
-    WebhookId(&'a mut i32),
-    Postal(&'a mut Address<A>),
-    /// Named only because enum variants cannot hold `impl Trait`; public
-    /// `_mut` accessors still return `impl DerefMut<Target = bool>`.
-    Urgent(::bitvec::ptr::BitRef<'a, ::bitvec::ptr::Mut, u8, ::bitvec::order::Lsb0>),
-}
+impl<A: Allocator + Clone> OneofGroup for NotificationStorage<A> {
+    type Case = NotificationCase;
+    type Ref<'a>
+        = NotificationRef<'a, A>
+    where
+        A: 'a;
+    type Mut<'a>
+        = NotificationMut<'a, A>
+    where
+        A: 'a;
+    type Storage = Self;
+    type Presence = TaskPresence;
+    type Alloc = A;
 
-/// Shared bound view of the `notification` oneof group (slot + message common).
-///
-/// Returned by [`Task::notification`](super::Task::notification) even when the
-/// group is unset. Project the active variant with [`as_ref`](Self::as_ref).
-pub struct NotificationView<'a, A: Allocator + Clone> {
-    slot: &'a OneofSlot<NotificationStorage<A>>,
-    common: &'a MessageCommon<TaskPresence, A>,
-}
-
-impl<'a, A: Allocator + Clone> NotificationView<'a, A> {
-    #[inline]
-    pub(crate) fn new(
-        slot: &'a OneofSlot<NotificationStorage<A>>,
-        common: &'a MessageCommon<TaskPresence, A>,
-    ) -> Self {
-        Self { slot, common }
-    }
-
-    /// Which variant is set (`None` when the group is unset).
-    #[inline]
-    pub fn case(&self) -> Option<NotificationCase> {
-        self.slot.as_ref().map(|s| s.case())
-    }
-
-    /// Projected read view of the active variant, if any.
-    #[inline]
-    pub fn as_ref(&self) -> Option<NotificationRef<'a, A>> {
-        self.slot.as_ref().map(|s| s.to_ref(self.common))
-    }
-}
-
-/// Mutable bound view of the `notification` oneof group (slot + message common).
-///
-/// Returned by [`Task::notification_mut`](super::Task::notification_mut) even
-/// when the group is unset. Shared getters go through [`as_view`](Self::as_view);
-/// mutation uses [`as_mut`](Self::as_mut) / [`clear`](Self::clear).
-pub struct NotificationViewMut<'a, A: Allocator + Clone> {
-    slot: &'a mut OneofSlot<NotificationStorage<A>>,
-    common: &'a mut MessageCommon<TaskPresence, A>,
-}
-
-impl<'a, A: Allocator + Clone> NotificationViewMut<'a, A> {
-    #[inline]
-    pub(crate) fn new(
-        slot: &'a mut OneofSlot<NotificationStorage<A>>,
-        common: &'a mut MessageCommon<TaskPresence, A>,
-    ) -> Self {
-        Self { slot, common }
-    }
-
-    /// Reborrow as a shared bound view (for `case` / `as_ref` while mutating).
-    #[inline]
-    pub fn as_view(&self) -> NotificationView<'_, A> {
-        NotificationView::new(self.slot, self.common)
-    }
-
-    /// Projected mutable view of the *currently active* variant (no switch).
-    ///
-    /// Consumes this bound view. Returns `None` when the group is unset.
-    #[inline]
-    pub fn as_mut(self) -> Option<NotificationMut<'a, A>> {
-        self.slot.as_mut().map(|s| s.to_mut(self.common))
-    }
-
-    /// Clears whichever variant is active (freeing it through the message allocator).
-    #[inline]
-    pub fn clear(self) {
-        self.slot.bind_mut(self.common).clear();
-    }
-}
-
-/// Owned storage for `oneof notification` (crate-internal).
-///
-/// Parametrised only by the allocator `A`. Each variant's field wrapper uses the
-/// parent message's `FIELD_*` constant directly as its `FIELD` type argument,
-/// since the field numbers are fixed for this generated oneof.
-pub(crate) enum NotificationStorage<A: Allocator + Clone> {
-    EmailAddress(SingularLenField<ProtoString, Oneof, { super::FIELD_EMAIL_ADDRESS }>),
-    PhoneNumber(SingularLenField<ProtoString, Oneof, { super::FIELD_PHONE_NUMBER }>),
-    WebhookId(
-        SingularVarintField<ProtoInt32, Oneof, { super::FIELD_WEBHOOK_ID }, WebhookIdDefault>,
-    ),
-    Postal(NestedMessageField<Address<A>, Oneof, { super::FIELD_POSTAL }, A>),
-    Urgent(BoolField<Oneof, { super::BIT_URGENT_VALUE }, { super::FIELD_URGENT }>),
-}
-
-impl<A: Allocator + Clone> NotificationStorage<A> {
-    pub(crate) fn case(&self) -> NotificationCase {
-        match self {
+    fn case(storage: &Self::Storage) -> Self::Case {
+        match storage {
             Self::EmailAddress(_) => NotificationCase::EmailAddress,
             Self::PhoneNumber(_) => NotificationCase::PhoneNumber,
             Self::WebhookId(_) => NotificationCase::WebhookId,
@@ -210,40 +162,39 @@ impl<A: Allocator + Clone> NotificationStorage<A> {
         }
     }
 
-    pub(crate) fn to_ref<'a, Pb: PresenceBits>(
-        &'a self,
-        common: &'a MessageCommon<Pb, A>,
-    ) -> NotificationRef<'a, A> {
-        match self {
-            Self::EmailAddress(f) => NotificationRef::EmailAddress(f.value()),
-            Self::PhoneNumber(f) => NotificationRef::PhoneNumber(f.value()),
-            Self::WebhookId(f) => NotificationRef::WebhookId(f.value()),
-            Self::Postal(f) => NotificationRef::Postal(f.value()),
-            Self::Urgent(f) => NotificationRef::Urgent(f.bind(common).value()),
+    fn to_ref<'a>(
+        storage: &'a Self::Storage,
+        common: &'a MessageCommon<Self::Presence, Self::Alloc>,
+    ) -> Self::Ref<'a> {
+        match storage {
+            Self::EmailAddress(f) => Notification::EmailAddress(f.value()),
+            Self::PhoneNumber(f) => Notification::PhoneNumber(f.value()),
+            Self::WebhookId(f) => Notification::WebhookId(f.value()),
+            Self::Postal(f) => Notification::Postal(f.value()),
+            Self::Urgent(f) => Notification::Urgent(f.bind(common).value()),
         }
     }
 
-    pub(crate) fn to_mut<'a>(
-        &'a mut self,
-        common: &'a mut MessageCommon<TaskPresence, A>,
-    ) -> NotificationMut<'a, A> {
-        match self {
+    fn to_mut<'a>(
+        storage: &'a mut Self::Storage,
+        common: &'a mut MessageCommon<Self::Presence, Self::Alloc>,
+    ) -> Self::Mut<'a> {
+        match storage {
             Self::EmailAddress(f) => {
                 let alloc = common.alloc.clone();
-                NotificationMut::EmailAddress(f.value_mut(alloc))
+                Notification::EmailAddress(f.value_mut(alloc))
             }
             Self::PhoneNumber(f) => {
                 let alloc = common.alloc.clone();
-                NotificationMut::PhoneNumber(f.value_mut(alloc))
+                Notification::PhoneNumber(f.value_mut(alloc))
             }
             Self::WebhookId(f) => {
                 let alloc = common.alloc.clone();
-                NotificationMut::WebhookId(f.value_mut(alloc))
+                Notification::WebhookId(f.value_mut(alloc))
             }
-            Self::Postal(f) => NotificationMut::Postal(f.value_mut()),
-            // Enum variants cannot store RPITIT; use the concrete BitRef.
+            Self::Postal(f) => Notification::Postal(f.value_mut()),
             Self::Urgent(_) => {
-                NotificationMut::Urgent(common.presence.bit_ref_mut(super::BIT_URGENT_VALUE))
+                Notification::Urgent(common.presence.bit_ref_mut(super::BIT_URGENT_VALUE))
             }
         }
     }

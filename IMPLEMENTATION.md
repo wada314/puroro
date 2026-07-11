@@ -555,7 +555,7 @@ Nested LEN payloads use `Buf::take(len)` before child `merge_from`.
 
 ## 13. Derived traits
 
-**Messages** (`Task<A>`, …): generated as below. **Scalar enums** (`Status`, `Priority`): `#[repr(transparent)]` newtypes over `i32` with associated constants (not Rust enums — proto value aliases may share an integer); `derive(Clone, Copy, Debug, PartialEq, Eq, Hash)`. **Oneof types**: the payload-less `NotificationCase` `derive`s `Clone, Copy, Debug, PartialEq, Eq`. `NotificationView` / `NotificationViewMut` are bound-view structs (no derives). `NotificationRef<'a, A>` is `Copy` (all payloads are `Copy`), but its `Copy`/`Clone` are hand-written to drop the spurious `A: Copy` bound the derive would add, and it omits `Debug`/`PartialEq`/`Eq` once a variant borrows a message (`&Address<A>`, which derives neither); a string/scalar-only group could keep the full derives. `NotificationMut<'a, A>` holds guards / `&mut` and derives nothing; the internal `NotificationStorage` needs no trait derives (comparison/formatting happen on the safe views).
+**Messages** (`Task<A>`, …): generated as below. **Scalar enums** (`Status`, `Priority`): `#[repr(transparent)]` newtypes over `i32` with associated constants (not Rust enums — proto value aliases may share an integer); `derive(Clone, Copy, Debug, PartialEq, Eq, Hash)`. **Oneof types**: the payload-less `NotificationCase` `derive`s `Clone, Copy, Debug, PartialEq, Eq`. Group bound views are rt `OneofView` / `OneofViewMut` (no derives). `NotificationRef<'a, A>` is a type alias of the shared `Notification` shape and is `Copy` (all payloads are `Copy`), but its `Copy`/`Clone` are hand-written to drop the spurious `A: Copy` bound the derive would add, and it omits `Debug`/`PartialEq`/`Eq` once a variant borrows a message (`&Address<A>`, which derives neither); a string/scalar-only group could keep the full derives. `NotificationMut<'a, A>` holds guards / `&mut` and derives nothing; the internal `NotificationStorage` alias needs no trait derives (comparison/formatting happen on the safe views). Pattern matching uses `Notification::…` (aliases do not invent variant paths).
 
 | Trait | Bounds | Notes |
 |---|---|---|
@@ -640,20 +640,20 @@ Storage is chosen by a `MessagePresence` marker (a GAT): [`Singular`](puroro-rt/
 
 Each wire occurrence replaces the whole slot (last wins). Encode active variant only. Decode: one match arm per variant field number.
 
-**Generated types per group.** The owned storage holds allocator-less `unmanaged` values, so it is kept out of the public API and split from the safe views:
+**Generated types per group.** The owned storage holds allocator-less `unmanaged` values, so it is kept out of the public API. Shape / Storage / Ref / Mut share one generic enum; Storage is a `pub(crate)` alias that implements [`OneofGroup`](puroro-rt/src/fields/oneof.rs). Group bound views are rt [`OneofView`](puroro-rt/src/fields/oneof.rs) / [`OneofViewMut`](puroro-rt/src/fields/oneof.rs) (no per-oneof generated View structs). Message accessors return RPIT `impl OneofGroup<Case = …>` so Storage never appears in signatures.
 
-The sample `oneof notification` is deliberately **heterogeneous** — LEN, VARINT, and message variants — to show all three storage kinds:
+The sample `oneof notification` is deliberately **heterogeneous** — LEN, VARINT, bool, and message variants — to show the storage kinds:
 
 | Type | Vis | Payloads | Role |
 |---|---|---|---|
-| `NotificationStorage<A>` | `pub(crate)` | `SingularLenField` / `SingularVarintField` / `NestedMessageField` | owned storage (field wrappers); `OneofDeallocate<A>`; owns encode glue |
+| `Notification<…>` | `pub` | type params | canonical shape (shared by aliases) |
+| `NotificationStorage<A>` | `pub(crate)` | field wrappers | owned storage; `OneofGroup` + `OneofDeallocate`; encode glue |
 | `NotificationCase` | `pub` | — | `Copy` discriminant (variants only; unset is `None`) → `notification_case() -> Option<_>` |
-| `NotificationView<'a, A>` | `pub` | — | shared group bind (slot + `MessageCommon`) → `notification()` |
-| `NotificationViewMut<'a, A>` | `pub` | — | mut group bind → `notification_mut()`; `as_view` / `as_mut` / `clear` |
-| `NotificationRef<'a, A>` | `pub` | `&'a str` / `i32` / `&'a Address<A>` | projected read enum → `view.as_ref()` |
-| `NotificationMut<'a, A>` | `pub` | `StringGuard<'a, A>` / `&'a mut i32` / `&'a mut Address<A>` | projected mut enum → `view_mut.as_mut()` |
+| `OneofView` / `OneofViewMut` | rt `pub` | — | group bind (slot + `MessageCommon`) → `notification()` / `notification_mut()` |
+| `NotificationRef<'a, A>` | `pub` alias | `&'a str` / `i32` / `&'a Address<A>` / `bool` | projected read → `view.as_ref()` |
+| `NotificationMut<'a, A>` | `pub` alias | `StringGuard` / `&mut i32` / `&mut Address` / `BitRef` | projected mut → `view_mut.as_mut()` |
 
-**Variants own field wrappers, not raw storage.** Each variant holds the same field wrapper an ordinary singular field of that kind uses (`SingularField` / aliases for non-bool scalars and LEN; `BoolField` for `bool`; `NestedMessageField` for messages), so `value` / `value_mut` / `deallocate` are reused. The wrapper's presence is inert here (`Oneof` / `FieldPresence::Oneof`), so presence-aware omit rules are never consulted; bool still packs its value into `_common.presence`. Singular scalar / LEN wrappers no longer take `A`; the storage enum stays generic over `A` for nested message variants and for `value_mut(alloc)` call sites.
+**Variants own field wrappers, not raw storage.** Each variant holds the same field wrapper an ordinary singular field of that kind uses (`SingularField` / aliases for non-bool scalars and LEN; `BoolField` for `bool`; `NestedMessageField` for messages), so `value` / `value_mut` / `deallocate` are reused. The wrapper's presence is inert here (`Oneof` / `FieldPresence::Oneof`), so presence-aware omit rules are never consulted; bool still packs its value into `_common.presence`. Singular scalar / LEN wrappers no longer take `A`; the storage alias stays generic over `A` for nested message variants and for `value_mut(alloc)` call sites.
 
 The oneof drives each variant with the **field's own** primitives. Empty construction is [`EnumVariant::new_value`](puroro-rt/src/fields/enum_variant.rs) (`new_in` / `with_message_in`). Merging is `slot.bind_mut(common).variant_mut::<V>().merge(wire, buf)`. Read getters use `slot.bind(common).variant_of::<V>().optional()` / `.get()`.
 
@@ -662,11 +662,11 @@ The oneof drives each variant with the **field's own** primitives. Empty constru
 Parent `_mut` accessors are one-liners:
 `slot.bind_mut(common).variant_mut::<V>().value_mut()`.
 
-The storage enum implements [`OneofDeallocate<A>`](puroro-rt/src/fields/oneof.rs) (`unsafe fn deallocate(self, alloc: A)`) so the previously-active variant is freed through the message allocator before the slot is overwritten. Group accessors use the bound-view idiom: `slot.bind(&common)` / `slot.bind_mut(&mut common)` yield [`OneofSlotRef`](puroro-rt/src/fields/oneof.rs) / [`OneofSlotMut`](puroro-rt/src/fields/oneof.rs). Generated `NotificationView` / `NotificationViewMut` hold that pair. `OneofSlotMut` consuming methods:
+The storage alias implements [`OneofDeallocate`](puroro-rt/src/fields/oneof.rs) so the previously-active variant is freed through the message allocator before the slot is overwritten. Group accessors use the bound-view idiom: `slot.bind(&common)` / `slot.bind_mut(&mut common)` yield [`OneofSlotRef`](puroro-rt/src/fields/oneof.rs) / [`OneofSlotMut`](puroro-rt/src/fields/oneof.rs). `OneofView` / `OneofViewMut` hold that pair via `OneofGroup`. `OneofSlotMut` consuming methods:
 
 - `variant_mut::<V>() -> Field::BoundMut` — keeps the active variant if it is already `V`, else frees the previous variant and installs `from_variant(EnumVariant::new_value(alloc.clone()))`, then binds the field to `common` once. Callers chain `.value_mut()` / `.merge(…)`.
 - `set(value)` — replaces the whole group (frees the old variant).
-- `clear()` — frees the active variant; backs `NotificationViewMut::clear`, `clear_notification`, and the message `Drop`.
+- `clear()` — frees the active variant; backs `OneofViewMut::clear`, `clear_notification`, and the message `Drop`.
 
 The `set_*` per-variant setters are removed, matching the other field families.
 

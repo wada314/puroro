@@ -1,5 +1,5 @@
 use ::puroro::{MessageDecode, MessageEncode};
-use ::puroro_sample_generated::task::{NotificationCase, NotificationMut, NotificationRef};
+use ::puroro_sample_generated::task::{Notification, NotificationCase};
 use ::puroro_sample_generated::{Address, Priority, Status, Task};
 
 #[test]
@@ -48,7 +48,7 @@ fn task_roundtrip() {
     assert!(!decoded.flag().get());
     assert!(matches!(
         decoded.notification().as_ref(),
-        Some(NotificationRef::EmailAddress(s)) if s == "a@example.com"
+        Some(Notification::EmailAddress(s)) if s == "a@example.com"
     ));
     let a = decoded.assignee().unwrap();
     assert_eq!(a.street().get(), "1 Main St");
@@ -72,7 +72,7 @@ fn oneof_varint_variant_roundtrip() {
     );
     assert!(matches!(
         decoded.notification().as_ref(),
-        Some(NotificationRef::WebhookId(4321))
+        Some(Notification::WebhookId(4321))
     ));
     assert!(decoded.webhook_id().is_set());
     assert_eq!(decoded.webhook_id().get(), 4321);
@@ -117,7 +117,7 @@ fn oneof_message_variant_roundtrip() {
     let decoded: Task = Task::decode(&bytes[..]).unwrap();
 
     assert_eq!(decoded.notification_case(), Some(NotificationCase::Postal));
-    let Some(NotificationRef::Postal(addr)) = decoded.notification().as_ref() else {
+    let Some(Notification::Postal(addr)) = decoded.notification().as_ref() else {
         panic!("expected postal variant");
     };
     assert_eq!(addr.street().get(), "5 Oak Ave");
@@ -136,7 +136,7 @@ fn oneof_switching_frees_previous_variant() {
 
     assert!(matches!(
         task.notification().as_ref(),
-        Some(NotificationRef::WebhookId(3))
+        Some(Notification::WebhookId(3))
     ));
 }
 
@@ -169,15 +169,17 @@ fn oneof_group_view_mut_as_view_and_clear() {
             view_mut.as_view().case(),
             Some(NotificationCase::EmailAddress)
         );
-        assert!(matches!(
-            view_mut.as_view().as_ref(),
-            Some(NotificationRef::EmailAddress(s)) if s == "a@example.com"
-        ));
+        assert!(view_mut.as_view().as_ref().is_some());
         assert!(matches!(
             view_mut.as_mut(),
-            Some(NotificationMut::EmailAddress(_))
+            Some(Notification::EmailAddress(_))
         ));
     }
+    assert!(matches!(
+        task.notification().as_ref(),
+        Some(Notification::EmailAddress(s)) if s == "a@example.com"
+    ));
+
 
     task.notification_mut().clear();
     assert!(task.notification_case().is_none());
@@ -267,7 +269,7 @@ fn oneof_bool_variant_roundtrip() {
     );
     assert!(matches!(
         decoded.notification().as_ref(),
-        Some(NotificationRef::Urgent(true))
+        Some(Notification::Urgent(true))
     ));
     assert!(decoded.urgent().is_set());
     assert!(decoded.urgent().get());
@@ -282,6 +284,6 @@ fn oneof_bool_variant_roundtrip() {
     );
     assert!(matches!(
         decoded.notification().as_ref(),
-        Some(NotificationRef::Urgent(false))
+        Some(Notification::Urgent(false))
     ));
 }
