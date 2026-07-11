@@ -1,9 +1,10 @@
 //! Shared infrastructure for generated message fields.
 //!
-//! [`MessageCommon`] and [`PresenceBits`] are per-message state. [`ProtoZero`],
-//! [`ValueSlot`](value_slot::ValueSlot), [`SlotInitView`](slot_init::SlotInitView) /
-//! [`SlotInitMut`](slot_init::SlotInitMut), and [`FieldPresence`](field_presence::FieldPresence)
-//! govern singular scalar storage and init state.
+//! [`MessageCommon`] and [`PresenceBits`] are per-message state. [`DefaultIn`],
+//! [`DeallocateIn`], [`ProtoEmpty`], [`ValueSlot`](value_slot::ValueSlot),
+//! [`SlotInitView`](slot_init::SlotInitView) / [`SlotInitMut`](slot_init::SlotInitMut),
+//! and [`FieldPresence`](field_presence::FieldPresence) govern singular scalar
+//! storage and init state.
 
 pub mod bindable;
 pub mod field_presence;
@@ -104,79 +105,6 @@ impl<P: PresenceBits, A: Allocator> MessageCommon<P, A> {
 }
 
 // ---------------------------------------------------------------------------
-// Protobuf type-zero (`ProtoZero`)
-// ---------------------------------------------------------------------------
-
-/// Protobuf type-zero for a singular scalar storage type.
-///
-/// [`proto_zero`](Self::proto_zero) constructs the type-zero value (message ctor,
-/// lazy-init placeholder). [`is_proto_zero`](Self::is_proto_zero) drives implicit
-/// presence omit-on-wire checks. [`set_proto_zero`](Self::set_proto_zero) writes
-/// the type-zero into an existing storage slot (clear).
-pub trait ProtoZero: Copy {
-    /// Returns the protobuf type-zero (`0`, `false`, …).
-    fn proto_zero() -> Self;
-
-    /// Returns `true` when `value` equals the protobuf type-zero.
-    fn is_proto_zero(value: &Self) -> bool;
-
-    /// Writes the protobuf type-zero into `value`.
-    fn set_proto_zero(value: &mut Self) {
-        *value = Self::proto_zero();
-    }
-}
-
-impl ProtoZero for i32 {
-    fn proto_zero() -> Self {
-        0
-    }
-
-    fn is_proto_zero(value: &Self) -> bool {
-        *value == 0
-    }
-}
-
-impl ProtoZero for i64 {
-    fn proto_zero() -> Self {
-        0
-    }
-
-    fn is_proto_zero(value: &Self) -> bool {
-        *value == 0
-    }
-}
-
-impl ProtoZero for u32 {
-    fn proto_zero() -> Self {
-        0
-    }
-
-    fn is_proto_zero(value: &Self) -> bool {
-        *value == 0
-    }
-}
-
-impl ProtoZero for u64 {
-    fn proto_zero() -> Self {
-        0
-    }
-
-    fn is_proto_zero(value: &Self) -> bool {
-        *value == 0
-    }
-}
-
-impl ProtoZero for bool {
-    fn proto_zero() -> Self {
-        false
-    }
-
-    fn is_proto_zero(value: &Self) -> bool {
-        !*value
-    }
-}
-
-// ---------------------------------------------------------------------------
 // Allocator-aware construction / release (`DefaultIn` / `DeallocateIn`)
 // ---------------------------------------------------------------------------
 
@@ -206,33 +134,40 @@ pub trait DeallocateIn {
 
 /// Empty / type-zero predicate for IMPLICIT omit-on-encode.
 ///
-/// Scalars use [`ProtoZero::is_proto_zero`]; LEN payloads use `is_empty`.
+/// Copy scalars compare to `0` / `false`; LEN payloads use `is_empty`.
 pub trait ProtoEmpty {
     /// `true` when the value equals the protobuf empty / type-zero.
     fn is_proto_empty(&self) -> bool;
 }
 
-// Scalars (and generated enum newtypes) reach these traits through `ProtoZero`.
-// `UnmanagedString` / `UnmanagedVec` are not `ProtoZero`, so they get dedicated
-// impls below without overlapping the blankets.
-impl<T: ProtoZero> DefaultIn for T {
-    #[inline]
-    fn default_in<A: Allocator>(_alloc: A) -> Self {
-        T::proto_zero()
-    }
+macro_rules! impl_copy_scalar_slot {
+    ($ty:ty, $zero:expr) => {
+        impl DefaultIn for $ty {
+            #[inline]
+            fn default_in<A: Allocator>(_alloc: A) -> Self {
+                $zero
+            }
+        }
+
+        impl DeallocateIn for $ty {
+            #[inline]
+            unsafe fn deallocate_in<A: Allocator>(self, _alloc: A) {}
+        }
+
+        impl ProtoEmpty for $ty {
+            #[inline]
+            fn is_proto_empty(&self) -> bool {
+                *self == $zero
+            }
+        }
+    };
 }
 
-impl<T: ProtoZero> DeallocateIn for T {
-    #[inline]
-    unsafe fn deallocate_in<A: Allocator>(self, _alloc: A) {}
-}
-
-impl<T: ProtoZero> ProtoEmpty for T {
-    #[inline]
-    fn is_proto_empty(&self) -> bool {
-        T::is_proto_zero(self)
-    }
-}
+impl_copy_scalar_slot!(i32, 0);
+impl_copy_scalar_slot!(i64, 0);
+impl_copy_scalar_slot!(u32, 0);
+impl_copy_scalar_slot!(u64, 0);
+impl_copy_scalar_slot!(bool, false);
 
 impl DefaultIn for ::unmanaged::UnmanagedString {
     #[inline]

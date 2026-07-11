@@ -656,7 +656,7 @@ EXPLICIT presence: `is_set()` tracks the presence bit; `get()` returns `Priority
 
 #### Generated enum type
 
-Both open and closed enums produce a **newtype-over-`i32`** — not a Rust `enum`. Field storage uses [`ProtoEnum<E>`](puroro-rt/src/fields/wire/varint.rs) so [`SingularField`](puroro-rt/src/fields/singular/field.rs) (alias `SingularVarintField`) holds `E` directly and reuses the same `optional()` / `value_mut()` paths as other singular scalars.
+Both open and closed enums produce a **newtype-over-`i32`** — not a Rust `enum`. Field storage uses [`ProtoEnum<E>`](puroro-rt/src/fields/wire/varint.rs) (thin wrapper `ProtoEnum(E)`) so [`SingularField`](puroro-rt/src/fields/singular/field.rs) (alias `SingularVarintField`) stores `ProtoEnum<E>` and reuses the same `optional()` / `value_mut()` paths as other singular scalars (getters still project to `E` / `&mut E`).
 
 ```rust
 // Open — any wire value is valid storage
@@ -900,7 +900,7 @@ impl<A: Allocator + Clone + Default> Default for Task<A> { … }
 
 **Bound-view accessors (`bind` / `bind_mut`).** Every field family goes through this idiom on both read and write paths: the field is first *bound* to the message common state — `field.bind(&self._common)` / `field.bind_mut(&mut self._common)` — returning a short-lived view (`SingularFieldRef` / `SingularFieldMut`, `Repeated*FieldRef` / `Repeated*FieldMut`, `NestedMessageFieldRef` / `NestedMessageFieldMut`, `OneofSlotRef` / `OneofSlotMut`) that carries `(field, common)` together. The actual operation (`optional` / `value` / `as_slice` / `get` / `value_mut` / `merge` / `clear` / …) is a consuming method on that view. This keeps the field struct a pure storage holder and collapses each generated accessor to a single call — e.g. `self.owner_id.bind(&self._common).optional()` or `self.priority.bind_mut(&mut self._common).clear()`. Binding happens even when a particular accessor does not consult `common` (e.g. `IMPLICIT` `value()`, repeated `as_slice()`), so read and write share one shape. The presence bit index for EXPLICIT / LEGACY_REQUIRED fields is a **const generic on the field type** (`Explicit<BIT>`), not a runtime argument to `bind` / `bind_mut`. Encode / `deallocate` / `validate_required` stay as plain field methods that take `&common` directly (they are not generated getters).
 
-Varint and LEN singular scalars share one runtime type, [`SingularField`](puroro-rt/src/fields/singular/field.rs), parametrised by [`ScalarProtoType`](puroro-rt/src/fields/wire/scalar.rs) (see [IMPLEMENTATION.md §7](IMPLEMENTATION.md#7-field-wrappers) / [§14](IMPLEMENTATION.md#14-singular-fields)). Nested messages remain a separate wrapper.
+Varint and LEN singular scalars share one runtime type, [`SingularField`](puroro-rt/src/fields/singular/field.rs), parametrised by [`ScalarProtoType`](puroro-rt/src/fields/wire/scalar.rs) thin wrappers such as `ProtoInt32(i32)` / `ProtoString(UnmanagedString)` (see [IMPLEMENTATION.md §7](IMPLEMENTATION.md#7-field-wrappers) / [§14](IMPLEMENTATION.md#14-singular-fields)). Nested messages remain a separate wrapper.
 
 **Decode API:**
 

@@ -376,7 +376,7 @@ impl<'a, T: ScalarProtoType, const FIELD: u32, D, Pb: PresenceBits, A: Allocator
 where
     for<'b> T::Ref<'b>: Copy,
     D: for<'b> HasDefault<T::Ref<'b>>,
-    <Oneof as FieldPresence>::ValueSlot<T::Storage>: ValueSlot<T::Storage>,
+    <Oneof as FieldPresence>::ValueSlot<T>: ValueSlot<T>,
 {
     pub fn optional(self) -> Optional<T::Ref<'a>, D>
     where

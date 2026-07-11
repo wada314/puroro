@@ -1,10 +1,12 @@
 //! Unified wire/storage semantics for singular scalar fields (varint + LEN).
 //!
+//! Each implementor is a **thin wrapper** over its payload (`ProtoInt32(i32)`,
+//! `ProtoString(UnmanagedString)`, …). [`SingularField`] stores `T` directly.
+//!
 //! [`VarintProtoType`](super::varint::VarintProtoType) and
-//! [`LenProtoType`](super::len::LenProtoType) remain for repeated-field helpers;
-//! singular fields go through [`ScalarProtoType`] so one
-//! [`SingularField`](crate::fields::singular::field::SingularField) wrapper
-//! covers both wire families.
+//! [`LenProtoType`](super::len::LenProtoType) remain for **repeated** fields,
+//! which keep storing the inner [`VarintProtoType::Value`] /
+//! [`LenProtoType::Storage`] so public slices stay `&[i32]` / `&[UnmanagedString]`.
 
 use ::allocator_api2::alloc::Allocator;
 use ::bytes::{Buf, BufMut};
@@ -25,13 +27,10 @@ use super::varint::{
 
 /// Wire + storage semantics for a singular scalar protobuf type.
 ///
-/// Implemented once per protobuf *type* (not per message field). Drives
-/// [`SingularField`](crate::fields::singular::field::SingularField) encode /
-/// decode / accessor behaviour for both varint and LEN payloads.
-pub trait ScalarProtoType {
-    /// Owned storage in a generated message field (`i32`, `UnmanagedString`, …).
-    type Storage: DefaultIn + DeallocateIn + ProtoEmpty;
-
+/// The implementor **is** the value stored in a singular field (thin wrapper).
+/// Drives [`SingularField`](crate::fields::singular::field::SingularField)
+/// encode / decode / accessor behaviour for both varint and LEN payloads.
+pub trait ScalarProtoType: DefaultIn + DeallocateIn + ProtoEmpty + Sized {
     /// Borrowed / by-value view returned by getters (`i32`, `&str`, …).
     type Ref<'a>
     where
@@ -45,67 +44,61 @@ pub trait ScalarProtoType {
     /// Expected wire type for a singular occurrence of this field.
     const WIRE_TYPE: WireType;
 
-    /// Returns the getter view of `storage` (by reference or by value).
-    fn get<'a>(storage: &'a Self::Storage) -> Self::Ref<'a>;
+    /// Returns the getter view (by reference or by value).
+    fn get(&self) -> Self::Ref<'_>;
 
-    /// Builds a mutable accessor handle from storage + allocator.
-    fn with_mut<'a, A: Allocator + 'a>(
-        storage: &'a mut Self::Storage,
-        alloc: A,
-    ) -> Self::Mut<'a, A>;
+    /// Builds a mutable accessor handle, taking an owned allocator clone when
+    /// the payload is heap-backed.
+    fn with_mut<'a, A: Allocator + 'a>(&'a mut self, alloc: A) -> Self::Mut<'a, A>;
 
-    /// Wire byte length of one tagged occurrence of `storage`.
-    fn encoded_len(field: u32, storage: &Self::Storage) -> usize;
+    /// Wire byte length of one tagged occurrence.
+    fn encoded_len(&self, field: u32) -> usize;
 
-    /// Encodes one tagged occurrence of `storage`.
-    fn encode<B: BufMut>(field: u32, storage: &Self::Storage, buf: &mut B);
+    /// Encodes one tagged occurrence.
+    fn encode<B: BufMut>(&self, field: u32, buf: &mut B);
 
     /// Decodes one occurrence after the tag has been read (`wire_type` checked here).
     fn decode<B: Buf, A: Allocator>(
         wire_type: WireType,
         buf: &mut B,
         alloc: A,
-    ) -> Result<Self::Storage, DecodeError>;
+    ) -> Result<Self, DecodeError>;
 }
 
 // ---------------------------------------------------------------------------
-// Varint markers
+// Varint wrappers
 // ---------------------------------------------------------------------------
 
 macro_rules! impl_varint_scalar {
     ($ty:ty) => {
         impl ScalarProtoType for $ty {
-            type Storage = <Self as VarintProtoType>::Value;
             type Ref<'a> = <Self as VarintProtoType>::Value;
             type Mut<'a, A: Allocator + 'a> = &'a mut <Self as VarintProtoType>::Value;
             const WIRE_TYPE: WireType = WireType::Varint;
 
             #[inline]
-            fn get<'a>(storage: &'a Self::Storage) -> Self::Ref<'a> {
-                *storage
+            fn get(&self) -> Self::Ref<'_> {
+                self.0
             }
 
             #[inline]
-            fn with_mut<'a, A: Allocator + 'a>(
-                storage: &'a mut Self::Storage,
-                _alloc: A,
-            ) -> Self::Mut<'a, A> {
-                storage
+            fn with_mut<'a, A: Allocator + 'a>(&'a mut self, _alloc: A) -> Self::Mut<'a, A> {
+                &mut self.0
             }
 
             #[inline]
-            fn encoded_len(field: u32, storage: &Self::Storage) -> usize {
+            fn encoded_len(&self, field: u32) -> usize {
                 encode::encoded_len_varint_field(
                     field,
-                    <Self as VarintProtoType>::encode_wire(*storage),
+                    <Self as VarintProtoType>::encode_wire(self.0),
                 )
             }
 
             #[inline]
-            fn encode<B: BufMut>(field: u32, storage: &Self::Storage, buf: &mut B) {
+            fn encode<B: BufMut>(&self, field: u32, buf: &mut B) {
                 encode::encode_varint_field(
                     field,
-                    <Self as VarintProtoType>::encode_wire(*storage),
+                    <Self as VarintProtoType>::encode_wire(self.0),
                     buf,
                 );
             }
@@ -115,12 +108,12 @@ macro_rules! impl_varint_scalar {
                 wire_type: WireType,
                 buf: &mut B,
                 _alloc: A,
-            ) -> Result<Self::Storage, DecodeError> {
+            ) -> Result<Self, DecodeError> {
                 if wire_type != WireType::Varint {
                     return Err(DecodeError::InvalidTag);
                 }
                 let raw = decode::decode_varint(buf)?;
-                <Self as VarintProtoType>::decode_wire(raw)
+                Ok(Self::from(<Self as VarintProtoType>::decode_wire(raw)?))
             }
         }
     };
@@ -135,7 +128,6 @@ impl_varint_scalar!(ProtoSint64);
 impl_varint_scalar!(ProtoBool);
 
 impl<E: ProtoEnumStorage> ScalarProtoType for ProtoEnum<E> {
-    type Storage = E;
     type Ref<'a>
         = E
     where
@@ -147,26 +139,23 @@ impl<E: ProtoEnumStorage> ScalarProtoType for ProtoEnum<E> {
     const WIRE_TYPE: WireType = WireType::Varint;
 
     #[inline]
-    fn get<'a>(storage: &'a Self::Storage) -> Self::Ref<'a> {
-        *storage
+    fn get(&self) -> E {
+        self.0
     }
 
     #[inline]
-    fn with_mut<'a, A: Allocator + 'a>(
-        storage: &'a mut Self::Storage,
-        _alloc: A,
-    ) -> Self::Mut<'a, A> {
-        storage
+    fn with_mut<'a, A: Allocator + 'a>(&'a mut self, _alloc: A) -> &'a mut E {
+        &mut self.0
     }
 
     #[inline]
-    fn encoded_len(field: u32, storage: &Self::Storage) -> usize {
-        encode::encoded_len_varint_field(field, <Self as VarintProtoType>::encode_wire(*storage))
+    fn encoded_len(&self, field: u32) -> usize {
+        encode::encoded_len_varint_field(field, <Self as VarintProtoType>::encode_wire(self.0))
     }
 
     #[inline]
-    fn encode<B: BufMut>(field: u32, storage: &Self::Storage, buf: &mut B) {
-        encode::encode_varint_field(field, <Self as VarintProtoType>::encode_wire(*storage), buf);
+    fn encode<B: BufMut>(&self, field: u32, buf: &mut B) {
+        encode::encode_varint_field(field, <Self as VarintProtoType>::encode_wire(self.0), buf);
     }
 
     #[inline]
@@ -174,67 +163,91 @@ impl<E: ProtoEnumStorage> ScalarProtoType for ProtoEnum<E> {
         wire_type: WireType,
         buf: &mut B,
         _alloc: A,
-    ) -> Result<Self::Storage, DecodeError> {
+    ) -> Result<Self, DecodeError> {
         if wire_type != WireType::Varint {
             return Err(DecodeError::InvalidTag);
         }
         let raw = decode::decode_varint(buf)?;
-        <Self as VarintProtoType>::decode_wire(raw)
+        Ok(Self(<Self as VarintProtoType>::decode_wire(raw)?))
     }
 }
 
 // ---------------------------------------------------------------------------
-// LEN markers
+// LEN wrappers
 // ---------------------------------------------------------------------------
 
-macro_rules! impl_len_scalar {
-    ($ty:ty) => {
-        impl ScalarProtoType for $ty {
-            type Storage = <Self as LenProtoType>::Storage;
-            type Ref<'a> = <Self as LenProtoType>::Ref<'a>;
-            type Mut<'a, A: Allocator + 'a> = <Self as LenProtoType>::Mut<'a, A>;
-            const WIRE_TYPE: WireType = WireType::Len;
+impl ScalarProtoType for ProtoString {
+    type Ref<'a> = &'a str;
+    type Mut<'a, A: Allocator + 'a> = <Self as LenProtoType>::Mut<'a, A>;
+    const WIRE_TYPE: WireType = WireType::Len;
 
-            #[inline]
-            fn get<'a>(storage: &'a Self::Storage) -> Self::Ref<'a> {
-                <Self as LenProtoType>::get(storage)
-            }
+    #[inline]
+    fn get(&self) -> &str {
+        &self.0
+    }
 
-            #[inline]
-            fn with_mut<'a, A: Allocator + 'a>(
-                storage: &'a mut Self::Storage,
-                alloc: A,
-            ) -> Self::Mut<'a, A> {
-                <Self as LenProtoType>::with_alloc(storage, alloc)
-            }
+    #[inline]
+    fn with_mut<'a, A: Allocator + 'a>(&'a mut self, alloc: A) -> Self::Mut<'a, A> {
+        <Self as LenProtoType>::with_alloc(&mut self.0, alloc)
+    }
 
-            #[inline]
-            fn encoded_len(field: u32, storage: &Self::Storage) -> usize {
-                encode::encoded_len_len_field(
-                    field,
-                    <Self as LenProtoType>::as_bytes(storage).len(),
-                )
-            }
+    #[inline]
+    fn encoded_len(&self, field: u32) -> usize {
+        encode::encoded_len_len_field(field, self.0.as_bytes().len())
+    }
 
-            #[inline]
-            fn encode<B: BufMut>(field: u32, storage: &Self::Storage, buf: &mut B) {
-                encode::encode_len_field(field, <Self as LenProtoType>::as_bytes(storage), buf);
-            }
+    #[inline]
+    fn encode<B: BufMut>(&self, field: u32, buf: &mut B) {
+        encode::encode_len_field(field, self.0.as_bytes(), buf);
+    }
 
-            #[inline]
-            fn decode<B: Buf, A: Allocator>(
-                wire_type: WireType,
-                buf: &mut B,
-                alloc: A,
-            ) -> Result<Self::Storage, DecodeError> {
-                if wire_type != WireType::Len {
-                    return Err(DecodeError::InvalidTag);
-                }
-                <Self as LenProtoType>::decode(buf, alloc)
-            }
+    #[inline]
+    fn decode<B: Buf, A: Allocator>(
+        wire_type: WireType,
+        buf: &mut B,
+        alloc: A,
+    ) -> Result<Self, DecodeError> {
+        if wire_type != WireType::Len {
+            return Err(DecodeError::InvalidTag);
         }
-    };
+        Ok(Self(<Self as LenProtoType>::decode(buf, alloc)?))
+    }
 }
 
-impl_len_scalar!(ProtoString);
-impl_len_scalar!(ProtoBytes);
+impl ScalarProtoType for ProtoBytes {
+    type Ref<'a> = &'a [u8];
+    type Mut<'a, A: Allocator + 'a> = <Self as LenProtoType>::Mut<'a, A>;
+    const WIRE_TYPE: WireType = WireType::Len;
+
+    #[inline]
+    fn get(&self) -> &[u8] {
+        &self.0
+    }
+
+    #[inline]
+    fn with_mut<'a, A: Allocator + 'a>(&'a mut self, alloc: A) -> Self::Mut<'a, A> {
+        <Self as LenProtoType>::with_alloc(&mut self.0, alloc)
+    }
+
+    #[inline]
+    fn encoded_len(&self, field: u32) -> usize {
+        encode::encoded_len_len_field(field, self.0.len())
+    }
+
+    #[inline]
+    fn encode<B: BufMut>(&self, field: u32, buf: &mut B) {
+        encode::encode_len_field(field, &self.0, buf);
+    }
+
+    #[inline]
+    fn decode<B: Buf, A: Allocator>(
+        wire_type: WireType,
+        buf: &mut B,
+        alloc: A,
+    ) -> Result<Self, DecodeError> {
+        if wire_type != WireType::Len {
+            return Err(DecodeError::InvalidTag);
+        }
+        Ok(Self(<Self as LenProtoType>::decode(buf, alloc)?))
+    }
+}

@@ -7,7 +7,8 @@
 //! 2. [`MessageCommon`](shared::MessageCommon) (presence bitfield, allocator, unknown-field buffer).
 //!
 //! Singular fields (non-repeated — both `IMPLICIT` and `EXPLICIT` presence) are
-//! parametrised by **wire type** (`ProtoInt32`, `ProtoString`, …)
+//! parametrised by **wire type** (`ProtoInt32`, `ProtoString`, … — thin wrappers
+//! for singular fields; repeated fields use the inner `Value` / `Storage`)
 //! and **presence policy** ([`Implicit`](shared::field_presence::Implicit) / [`Explicit`](shared::field_presence::Explicit) / [`Oneof`](shared::field_presence::Oneof)).
 //!
 //! # Module layout
@@ -15,7 +16,7 @@
 //! | Submodule | Contents |
 //! |---|---|
 //! | [`shared`] | `MessageCommon`, `PresenceBits`, `FieldPresence`, `ValueSlot`, … |
-//! | [`wire`] | `ScalarProtoType`, `VarintProtoType`, `LenProtoType`, fixed-width markers |
+//! | [`wire`] | `ScalarProtoType` (thin wrappers), `VarintProtoType` / `LenProtoType` (repeated inners), fixed-width stubs |
 //! | [`singular`] | `SingularField`, `NestedMessageField` |
 //! | [`repeated`] | `RepeatedVarintField`, `RepeatedLenField` |
 //! | [`oneof`] | `OneofSlot` |

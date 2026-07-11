@@ -3,9 +3,17 @@
 //! Payload decode uses [`crate::decode`] helpers; LEN record framing uses
 //! [`crate::encode::encode_len_field`].
 //!
-//! Storage is allocator-less ([`UnmanagedString`] / [`UnmanagedVec`]): the
-//! allocator is supplied on every operation that (de)allocates, so a generated
-//! message keeps a single allocator in [`MessageCommon`](crate::fields::shared::MessageCommon).
+//! # Singular vs repeated
+//!
+//! [`ProtoString`] / [`ProtoBytes`] are **thin wrappers** over allocator-less
+//! storage. Singular fields store the wrapper
+//! ([`ScalarProtoType`](super::scalar::ScalarProtoType)). Repeated fields keep
+//! [`LenProtoType::Storage`] (the inner `UnmanagedString` / `UnmanagedVec<u8>`)
+//! in the element buffer so `as_slice()` stays `&[UnmanagedString]` / …
+//!
+//! The allocator is supplied on every operation that (de)allocates, so a
+//! generated message keeps a single allocator in
+//! [`MessageCommon`](crate::fields::shared::MessageCommon).
 
 use ::allocator_api2::alloc::Allocator;
 use ::bytes::Buf;
@@ -19,8 +27,11 @@ use ::puroro::DecodeError;
 use ::puroro::WireType;
 
 /// Wire semantics for protobuf types encoded as length-delimited records.
+///
+/// [`Storage`](Self::Storage) is the **element type for repeated fields**.
+/// Singular fields store the thin wrapper type itself.
 pub trait LenProtoType {
-    /// Owned, allocator-less storage in a generated message field
+    /// Owned, allocator-less element storage for **repeated** fields
     /// (`UnmanagedString`, `UnmanagedVec<u8>`, …).
     type Storage: DefaultIn + DeallocateIn + ProtoEmpty;
 
@@ -68,9 +79,36 @@ pub trait LenProtoType {
     unsafe fn deallocate<A: Allocator>(value: Self::Storage, alloc: A);
 }
 
-/// Protobuf `string` — UTF-8 LEN payload stored as [`UnmanagedString`].
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
-pub struct ProtoString;
+/// Protobuf `string` — thin wrapper over [`UnmanagedString`].
+#[repr(transparent)]
+pub struct ProtoString(pub UnmanagedString);
+
+impl ::core::fmt::Debug for ProtoString {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
+        f.debug_tuple("ProtoString").field(&&*self.0).finish()
+    }
+}
+
+impl DefaultIn for ProtoString {
+    #[inline]
+    fn default_in<A: Allocator>(alloc: A) -> Self {
+        Self(UnmanagedString::new(alloc))
+    }
+}
+
+impl DeallocateIn for ProtoString {
+    #[inline]
+    unsafe fn deallocate_in<A: Allocator>(self, alloc: A) {
+        unsafe { self.0.deallocate(alloc) };
+    }
+}
+
+impl ProtoEmpty for ProtoString {
+    #[inline]
+    fn is_proto_empty(&self) -> bool {
+        self.0.is_empty()
+    }
+}
 
 impl LenProtoType for ProtoString {
     type Storage = UnmanagedString;
@@ -100,8 +138,8 @@ impl LenProtoType for ProtoString {
         value: &'a mut Self::Storage,
         alloc: A,
     ) -> Self::Mut<'a, A> {
-        // SAFETY: the caller (`SingularLenField`) always passes the same
-        // allocator that owns this string's buffer.
+        // SAFETY: the caller always passes the same allocator that owns this
+        // string's buffer.
         unsafe { value.with_alloc(alloc) }
     }
 
@@ -120,9 +158,36 @@ impl LenProtoType for ProtoString {
     }
 }
 
-/// Protobuf `bytes` — opaque LEN payload stored as [`UnmanagedVec<u8>`].
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
-pub struct ProtoBytes;
+/// Protobuf `bytes` — thin wrapper over [`UnmanagedVec<u8>`].
+#[repr(transparent)]
+pub struct ProtoBytes(pub UnmanagedVec<u8>);
+
+impl ::core::fmt::Debug for ProtoBytes {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
+        f.debug_tuple("ProtoBytes").field(&&*self.0).finish()
+    }
+}
+
+impl DefaultIn for ProtoBytes {
+    #[inline]
+    fn default_in<A: Allocator>(alloc: A) -> Self {
+        Self(UnmanagedVec::new(alloc))
+    }
+}
+
+impl DeallocateIn for ProtoBytes {
+    #[inline]
+    unsafe fn deallocate_in<A: Allocator>(self, alloc: A) {
+        unsafe { self.0.deallocate(alloc) };
+    }
+}
+
+impl ProtoEmpty for ProtoBytes {
+    #[inline]
+    fn is_proto_empty(&self) -> bool {
+        self.0.is_empty()
+    }
+}
 
 impl LenProtoType for ProtoBytes {
     type Storage = UnmanagedVec<u8>;

@@ -2,27 +2,36 @@
 //!
 //! Wire encode/decode uses [`protobuf_core::Varint`] — puroro does not duplicate
 //! zigzag or varint byte logic here.
+//!
+//! # Singular vs repeated
+//!
+//! Each `Proto*` type is a **thin wrapper** over its payload (`ProtoInt32(i32)`,
+//! …). Singular fields ([`ScalarProtoType`](super::scalar::ScalarProtoType))
+//! store the wrapper itself. Repeated fields use [`VarintProtoType::Value`]
+//! (the inner primitive / enum) in the element buffer so `as_slice()` stays
+//! `&[i32]` / `&[E]`.
 
 use ::core::convert::TryFrom;
-use ::core::marker::PhantomData;
+use ::derive_more::{Deref, DerefMut, From, Into};
 use ::protobuf_core::Varint;
 
 use ::puroro::DecodeError;
 use ::puroro::WireType;
 
-use crate::fields::shared::ProtoZero;
+use crate::fields::shared::{DeallocateIn, DefaultIn, ProtoEmpty};
 
 // ---------------------------------------------------------------------------
-// Core trait
+// Core trait (repeated + shared wire helpers)
 // ---------------------------------------------------------------------------
 
 /// Wire semantics for a protobuf type encoded as a base-128 varint.
 ///
-/// One implementation per protobuf *type* (not per message field). Uses
-/// [`Varint`] from `protobuf-core` for all encode/decode conversions.
+/// [`Value`](Self::Value) is the **element type for repeated fields** and the
+/// inner payload of the thin wrapper. Singular fields store the wrapper type
+/// itself (see [`ScalarProtoType`](super::scalar::ScalarProtoType)).
 pub trait VarintProtoType {
-    /// Rust storage (`i32`, `u64`, `bool`, …).
-    type Value: Copy + ProtoZero;
+    /// Inner / repeated-element type (`i32`, `u64`, `bool`, enum newtype, …).
+    type Value: Copy;
 
     /// Converts a decoded raw varint (numeric wire value) into the semantic value.
     fn decode_wire(raw: u64) -> Result<Self::Value, DecodeError>;
@@ -39,7 +48,7 @@ pub trait VarintProtoType {
 ///
 /// Implemented once per protobuf enum by the code generator. Open enums accept
 /// any wire value in [`decode_from_wire`](Self::decode_from_wire); closed enums
-/// reject unknown values there (and use [`merge_closed`](crate::fields::singular::varint::SingularVarintFieldMut::merge_closed)
+/// reject unknown values there (and use [`merge_closed`](crate::fields::singular::field::SingularFieldMut::merge_closed)
 /// on decode to divert them to unknown fields when appropriate).
 pub trait ProtoEnumStorage: Copy + PartialEq {
     fn proto_zero() -> Self;
@@ -49,9 +58,32 @@ pub trait ProtoEnumStorage: Copy + PartialEq {
         Self: Sized;
 }
 
-/// Wire marker parametrised by the generated enum newtype `E`.
-#[derive(Clone, Copy, Debug, Default)]
-pub struct ProtoEnum<E: ProtoEnumStorage>(PhantomData<E>);
+/// Thin wrapper around a generated enum newtype `E` for singular fields.
+///
+/// Repeated enum fields (if any) still store bare `E` via
+/// [`VarintProtoType::Value`].
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash, Deref, DerefMut, From)]
+#[repr(transparent)]
+pub struct ProtoEnum<E: ProtoEnumStorage>(pub E);
+
+impl<E: ProtoEnumStorage> DefaultIn for ProtoEnum<E> {
+    #[inline]
+    fn default_in<A: ::allocator_api2::alloc::Allocator>(_alloc: A) -> Self {
+        Self(E::proto_zero())
+    }
+}
+
+impl<E: ProtoEnumStorage> DeallocateIn for ProtoEnum<E> {
+    #[inline]
+    unsafe fn deallocate_in<A: ::allocator_api2::alloc::Allocator>(self, _alloc: A) {}
+}
+
+impl<E: ProtoEnumStorage> ProtoEmpty for ProtoEnum<E> {
+    #[inline]
+    fn is_proto_empty(&self) -> bool {
+        self.0 == E::proto_zero()
+    }
+}
 
 impl<E: ProtoEnumStorage> VarintProtoType for ProtoEnum<E> {
     type Value = E;
@@ -66,115 +98,104 @@ impl<E: ProtoEnumStorage> VarintProtoType for ProtoEnum<E> {
 }
 
 // ---------------------------------------------------------------------------
-// Marker types — delegate to protobuf-core Varint API
+// Thin wrappers — payload + wire identity
 // ---------------------------------------------------------------------------
 
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
-pub struct ProtoUInt32;
+macro_rules! proto_varint_wrapper {
+    (
+        $(#[$meta:meta])*
+        $name:ident($inner:ty),
+        decode = $decode:expr,
+        encode = $encode:expr $(,)?
+    ) => {
+        $(#[$meta])*
+        #[derive(
+            Clone, Copy, Debug, Default, PartialEq, Eq, Hash, Deref, DerefMut, From, Into,
+        )]
+        #[repr(transparent)]
+        pub struct $name(pub $inner);
 
-impl VarintProtoType for ProtoUInt32 {
-    type Value = u32;
+        impl DefaultIn for $name {
+            #[inline]
+            fn default_in<A: ::allocator_api2::alloc::Allocator>(alloc: A) -> Self {
+                Self(<$inner as DefaultIn>::default_in(alloc))
+            }
+        }
 
-    fn decode_wire(raw: u64) -> Result<Self::Value, DecodeError> {
-        Varint::from_uint64(raw).try_to_uint32().map_err(Into::into)
-    }
+        impl DeallocateIn for $name {
+            #[inline]
+            unsafe fn deallocate_in<A: ::allocator_api2::alloc::Allocator>(self, alloc: A) {
+                unsafe { <$inner as DeallocateIn>::deallocate_in(self.0, alloc) };
+            }
+        }
 
-    fn encode_wire(value: Self::Value) -> u64 {
-        Varint::from_uint32(value).to_uint64()
-    }
+        impl ProtoEmpty for $name {
+            #[inline]
+            fn is_proto_empty(&self) -> bool {
+                self.0.is_proto_empty()
+            }
+        }
+
+        impl VarintProtoType for $name {
+            type Value = $inner;
+
+            #[inline]
+            fn decode_wire(raw: u64) -> Result<Self::Value, DecodeError> {
+                ($decode)(raw)
+            }
+
+            #[inline]
+            fn encode_wire(value: Self::Value) -> u64 {
+                ($encode)(value)
+            }
+        }
+    };
 }
 
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
-pub struct ProtoUInt64;
-
-impl VarintProtoType for ProtoUInt64 {
-    type Value = u64;
-
-    fn decode_wire(raw: u64) -> Result<Self::Value, DecodeError> {
-        Ok(Varint::from_uint64(raw).to_uint64())
-    }
-
-    fn encode_wire(value: Self::Value) -> u64 {
-        Varint::from_uint64(value).to_uint64()
-    }
+proto_varint_wrapper! {
+    ProtoUInt32(u32),
+    decode = |raw| Varint::from_uint64(raw).try_to_uint32().map_err(DecodeError::from),
+    encode = |value| Varint::from_uint32(value).to_uint64(),
 }
 
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
-pub struct ProtoInt32;
-
-impl VarintProtoType for ProtoInt32 {
-    type Value = i32;
-
-    fn decode_wire(raw: u64) -> Result<Self::Value, DecodeError> {
-        Varint::from_uint64(raw).try_to_int32().map_err(Into::into)
-    }
-
-    fn encode_wire(value: Self::Value) -> u64 {
-        Varint::from_int32(value).to_uint64()
-    }
+proto_varint_wrapper! {
+    ProtoUInt64(u64),
+    decode = |raw| Ok(Varint::from_uint64(raw).to_uint64()),
+    encode = |value| Varint::from_uint64(value).to_uint64(),
 }
 
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
-pub struct ProtoInt64;
-
-impl VarintProtoType for ProtoInt64 {
-    type Value = i64;
-
-    fn decode_wire(raw: u64) -> Result<Self::Value, DecodeError> {
-        Ok(Varint::from_uint64(raw).to_int64())
-    }
-
-    fn encode_wire(value: Self::Value) -> u64 {
-        Varint::from_int64(value).to_uint64()
-    }
+proto_varint_wrapper! {
+    /// Protobuf `int32`.
+    ProtoInt32(i32),
+    decode = |raw| Varint::from_uint64(raw).try_to_int32().map_err(DecodeError::from),
+    encode = |value| Varint::from_int32(value).to_uint64(),
 }
 
-/// Protobuf `sint32` — varint with ZigZag encoding.
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
-pub struct ProtoSint32;
-
-impl VarintProtoType for ProtoSint32 {
-    type Value = i32;
-
-    fn decode_wire(raw: u64) -> Result<Self::Value, DecodeError> {
-        Varint::from_uint64(raw).try_to_sint32().map_err(Into::into)
-    }
-
-    fn encode_wire(value: Self::Value) -> u64 {
-        Varint::from_sint32(value).to_uint64()
-    }
+proto_varint_wrapper! {
+    ProtoInt64(i64),
+    decode = |raw| Ok(Varint::from_uint64(raw).to_int64()),
+    encode = |value| Varint::from_int64(value).to_uint64(),
 }
 
-/// Protobuf `sint64` — varint with ZigZag encoding.
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
-pub struct ProtoSint64;
-
-impl VarintProtoType for ProtoSint64 {
-    type Value = i64;
-
-    fn decode_wire(raw: u64) -> Result<Self::Value, DecodeError> {
-        Ok(Varint::from_uint64(raw).to_sint64())
-    }
-
-    fn encode_wire(value: Self::Value) -> u64 {
-        Varint::from_sint64(value).to_uint64()
-    }
+proto_varint_wrapper! {
+    /// Protobuf `sint32` — varint with ZigZag encoding.
+    ProtoSint32(i32),
+    decode = |raw| Varint::from_uint64(raw).try_to_sint32().map_err(DecodeError::from),
+    encode = |value| Varint::from_sint32(value).to_uint64(),
 }
 
-/// Protobuf `bool` — varint 0 or 1.
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
-pub struct ProtoBool;
+proto_varint_wrapper! {
+    /// Protobuf `sint64` — varint with ZigZag encoding.
+    ProtoSint64(i64),
+    decode = |raw| Ok(Varint::from_uint64(raw).to_sint64()),
+    encode = |value| Varint::from_sint64(value).to_uint64(),
+}
 
-impl VarintProtoType for ProtoBool {
-    type Value = bool;
-
-    fn decode_wire(raw: u64) -> Result<Self::Value, DecodeError> {
-        Ok(Varint::from_uint64(raw).to_bool())
-    }
-
-    fn encode_wire(value: Self::Value) -> u64 {
-        Varint::from_bool(value).to_uint64()
-    }
+proto_varint_wrapper! {
+    /// Protobuf `bool` — varint 0 or 1.
+    ProtoBool(bool),
+    decode = |raw| Ok(Varint::from_uint64(raw).to_bool()),
+    encode = |value| Varint::from_bool(value).to_uint64(),
 }
 
 /// Returns `true` when `raw` is a known variant of `E`.
@@ -187,16 +208,3 @@ where
 
 /// Always [`WireType::Varint`] for singular field merge/encode checks.
 pub const WIRE_TYPE: WireType = WireType::Varint;
-
-impl<E> ProtoZero for E
-where
-    E: ProtoEnumStorage + PartialEq,
-{
-    fn proto_zero() -> Self {
-        E::proto_zero()
-    }
-
-    fn is_proto_zero(value: &Self) -> bool {
-        *value == E::proto_zero()
-    }
-}

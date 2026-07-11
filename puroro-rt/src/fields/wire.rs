@@ -1,4 +1,7 @@
-//! Wire-encoding type markers (`VarintProtoType`, `LenProtoType`, `ScalarProtoType`, …).
+//! Wire-encoding types (`VarintProtoType`, `LenProtoType`, `ScalarProtoType`, …).
+//!
+//! Singular scalars are thin wrappers (`ProtoInt32(i32)`, …). Repeated fields
+//! use the inner `Value` / `Storage` associated types.
 
 pub mod fixed;
 pub mod len;
