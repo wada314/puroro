@@ -133,15 +133,6 @@ where
         let slot = unsafe { ManuallyDrop::take(&mut self.value) };
         slot.deallocate_in(&init, alloc);
     }
-
-    #[inline]
-    pub fn has<Pb, A>(&self, common: &MessageCommon<Pb, A>) -> bool
-    where
-        Pb: PresenceBits,
-        A: Allocator,
-    {
-        P::is_set(common, || P::payload_is_empty(&self.value))
-    }
 }
 
 impl<T: ScalarProtoType, const FIELD: u32, D> SingularField<T, Implicit, FIELD, D> {
@@ -233,11 +224,6 @@ where
     #[inline]
     fn new(field: &'a SingularField<T, P, FIELD, D>, common: &'a MessageCommon<Pb, A>) -> Self {
         Self { field, common }
-    }
-
-    #[inline]
-    pub fn has(self) -> bool {
-        P::is_set(self.common, || P::payload_is_empty(&self.field.value))
     }
 }
 

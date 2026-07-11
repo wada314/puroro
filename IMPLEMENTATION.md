@@ -239,7 +239,7 @@ Rust storage type alone does **not** identify protobuf encoding (`i32` can be in
 | Marker | Encode | Slot init | Bitfield | Accessors |
 |---|---|---|---|---|
 | `Implicit` | Omit when payload empty / type-zero | Always initialized | No-op | `value()` |
-| `Explicit<BIT>` | Omit when bit unset | Lazy via `ValueSlot::ensure_init` / `as_mut` | Set on `set` / `merge` / `value_mut` | `optional`, `has`, `clear` |
+| `Explicit<BIT>` | Omit when bit unset | Lazy via `ValueSlot::ensure_init` / `as_mut` | Set on `set` / `merge` / `value_mut` | `optional`, `clear` |
 | `LegacyRequired<BIT>` | Same as `Explicit` | Same as `Explicit` | Same as `Explicit` | Same + `validate_required` |
 | `Oneof` | Always emit when variant active | Always initialized | No-op (slot tracks presence) | `value()` / `value_mut(alloc)` |
 
@@ -419,7 +419,7 @@ Self::FIELD_TITLE => { // title = 1, EXPLICIT string
 
 Every field kind merges through the same bound-view shape — `self.<field>.bind(&mut self._common).merge(wire_type, buf)?` (repeated and nested-message fields likewise take only `common`; oneof uses `OneofSlotMut`) — so the code generator emits one form. Oneof variant arms use the **variant field name** and number. The `_ =>` unknown-field arm gets a short comment (`// unknown field — preserve in _common`).
 
-**What not to comment** — avoid restating obvious one-line delegates (`has_title` → `self.title.has(...)`). Section + struct + dispatch comments are enough.
+**What not to comment** — avoid restating obvious one-line delegates (`has_title` → `self.title().is_set()`). Section + struct + dispatch comments are enough.
 
 **Proto doc comments** — when the `.proto` field has `///` documentation, emit a Rust `///` doc comment on the **public accessor methods** (not on private struct fields unless the proto doc is part of the public API story).
 
