@@ -16,7 +16,7 @@
 
 use ::allocator_api2::alloc::Allocator;
 use ::bytes::{Buf, BufMut};
-use ::core::ops::DerefMut;
+use ::core::ops::{Deref, DerefMut};
 
 use ::puroro::DecodeError;
 use ::puroro::WireType;
@@ -30,10 +30,7 @@ use crate::fields::shared::{
 };
 
 use super::len::{LenProtoType, ProtoBytes, ProtoString};
-use super::varint::{
-    ProtoBool, ProtoEnum, ProtoEnumStorage, ProtoInt32, ProtoInt64, ProtoSint32, ProtoSint64,
-    ProtoUInt32, ProtoUInt64, VarintProtoType,
-};
+use super::varint::{ProtoBool, ProtoEnumStorage, VarintProtoType};
 
 /// Logical getter payload for a singular scalar (`i32`, `bool`, `&str`, …).
 ///
@@ -178,111 +175,24 @@ pub trait ScalarProtoType: Sized {
 }
 
 // ---------------------------------------------------------------------------
-// Varint wrappers (Slot = Self)
+// Addressable varint wrappers (Slot = Self): numerics + ProtoEnum
 // ---------------------------------------------------------------------------
 
-macro_rules! impl_varint_scalar {
-    ($ty:ty) => {
-        impl ScalarProtoType for $ty {
-            type Slot = Self;
-            type Ref<'a> = <Self as VarintProtoType>::Value;
-            type Mut<'a, A: Allocator + 'a> = &'a mut <Self as VarintProtoType>::Value;
-            type Written = Self;
-            const WIRE_TYPE: WireType = WireType::Varint;
-
-            #[inline]
-            fn get<'a, Pb: PresenceBits, A: Allocator>(
-                slot: &'a Self::Slot,
-                _common: &'a MessageCommon<Pb, A>,
-            ) -> Self::Ref<'a> {
-                slot.0
-            }
-
-            #[inline]
-            fn with_mut<'a, VS, I, Pb, A>(
-                slot: &'a mut VS,
-                init: I,
-                common: &'a mut MessageCommon<Pb, A>,
-            ) -> Self::Mut<'a, A>
-            where
-                VS: ValueSlot<Self::Slot>,
-                I: SlotInitMut,
-                Pb: PresenceBits,
-                A: Allocator + Clone + 'a,
-            {
-                &mut ValueSlot::with_mut(slot, init, common).get_mut().0
-            }
-
-            #[inline]
-            fn write<VS, I, Pb, A>(
-                slot: &mut VS,
-                init: I,
-                common: &mut MessageCommon<Pb, A>,
-                value: Self::Written,
-            ) where
-                VS: ValueSlot<Self::Slot>,
-                I: SlotInitMut,
-                Pb: PresenceBits,
-                A: Allocator + Clone,
-            {
-                ValueSlot::with_mut(slot, init, common).set(value);
-            }
-
-            #[inline]
-            fn clear<VS, I, Pb, A>(slot: &mut VS, init: I, common: &mut MessageCommon<Pb, A>)
-            where
-                VS: ValueSlot<Self::Slot>,
-                I: SlotInitMut,
-                Pb: PresenceBits,
-                A: Allocator + Clone,
-            {
-                ValueSlot::with_mut(slot, init, common).clear();
-            }
-
-            #[inline]
-            fn encoded_len(value: Self::Ref<'_>, field: u32) -> usize {
-                encode::encoded_len_varint_field(
-                    field,
-                    <Self as VarintProtoType>::encode_wire(value),
-                )
-            }
-
-            #[inline]
-            fn encode<B: BufMut>(value: Self::Ref<'_>, field: u32, buf: &mut B) {
-                encode::encode_varint_field(
-                    field,
-                    <Self as VarintProtoType>::encode_wire(value),
-                    buf,
-                );
-            }
-
-            #[inline]
-            fn decode<B: Buf, A: Allocator>(
-                wire_type: WireType,
-                buf: &mut B,
-                _alloc: A,
-            ) -> Result<Self::Written, DecodeError> {
-                if wire_type != WireType::Varint {
-                    return Err(DecodeError::InvalidTag);
-                }
-                let raw = decode::decode_varint(buf)?;
-                Ok(Self::from(<Self as VarintProtoType>::decode_wire(raw)?))
-            }
-        }
-    };
-}
-
-impl_varint_scalar!(ProtoUInt32);
-impl_varint_scalar!(ProtoUInt64);
-impl_varint_scalar!(ProtoInt32);
-impl_varint_scalar!(ProtoInt64);
-impl_varint_scalar!(ProtoSint32);
-impl_varint_scalar!(ProtoSint64);
-
-impl<E: ProtoEnumStorage> ScalarProtoType for ProtoEnum<E> {
+impl<T> ScalarProtoType for T
+where
+    T: VarintProtoType + AddressableSlot + From<T::Value> + 'static,
+    T: Deref<Target = T::Value> + DerefMut,
+    T::Value: ScalarRef,
+{
     type Slot = Self;
-    type Ref<'a> = E;
-    type Mut<'a, A: Allocator + 'a> = &'a mut E;
+    type Ref<'a>
+        = T::Value
+    where
+        Self: 'a;
+    type Mut<'a, A: Allocator + 'a>
+        = &'a mut T::Value
+    where
+        Self: 'a;
     type Written = Self;
     const WIRE_TYPE: WireType = WireType::Varint;
 
@@ -290,8 +200,8 @@ impl<E: ProtoEnumStorage> ScalarProtoType for ProtoEnum<E> {
     fn get<'a, Pb: PresenceBits, A: Allocator>(
         slot: &'a Self::Slot,
         _common: &'a MessageCommon<Pb, A>,
-    ) -> E {
-        slot.0
+    ) -> Self::Ref<'a> {
+        *Deref::deref(slot)
     }
 
     #[inline]
@@ -306,7 +216,7 @@ impl<E: ProtoEnumStorage> ScalarProtoType for ProtoEnum<E> {
         Pb: PresenceBits,
         A: Allocator + Clone + 'a,
     {
-        &mut ValueSlot::with_mut(slot, init, common).get_mut().0
+        DerefMut::deref_mut(ValueSlot::with_mut(slot, init, common).get_mut())
     }
 
     #[inline]
@@ -337,12 +247,12 @@ impl<E: ProtoEnumStorage> ScalarProtoType for ProtoEnum<E> {
 
     #[inline]
     fn encoded_len(value: Self::Ref<'_>, field: u32) -> usize {
-        encode::encoded_len_varint_field(field, <Self as VarintProtoType>::encode_wire(value))
+        encode::encoded_len_varint_field(field, T::encode_wire(value))
     }
 
     #[inline]
     fn encode<B: BufMut>(value: Self::Ref<'_>, field: u32, buf: &mut B) {
-        encode::encode_varint_field(field, <Self as VarintProtoType>::encode_wire(value), buf);
+        encode::encode_varint_field(field, T::encode_wire(value), buf);
     }
 
     #[inline]
@@ -355,7 +265,7 @@ impl<E: ProtoEnumStorage> ScalarProtoType for ProtoEnum<E> {
             return Err(DecodeError::InvalidTag);
         }
         let raw = decode::decode_varint(buf)?;
-        Ok(Self(<Self as VarintProtoType>::decode_wire(raw)?))
+        Ok(Self::from(T::decode_wire(raw)?))
     }
 }
 
