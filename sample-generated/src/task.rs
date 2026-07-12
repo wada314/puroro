@@ -11,7 +11,6 @@ use ::allocator_api2::alloc::{Allocator, Global};
 use ::bitvec::array::BitArray;
 use ::bitvec::order::Lsb0;
 use ::bytes::{Buf, BufMut};
-use ::core::ops::DerefMut;
 
 use ::puroro::{DecodeError, HasDefault, MessageDecode, MessageEncode, Optional};
 use ::puroro_rt::{
@@ -64,7 +63,10 @@ impl PresenceBits for TaskPresence {
         self.0.set(bit, present);
     }
 
-    fn bit_mut(&mut self, bit: usize) -> impl DerefMut<Target = bool> + '_ {
+    fn bit_mut(
+        &mut self,
+        bit: usize,
+    ) -> ::bitvec::ptr::BitRef<'_, ::bitvec::ptr::Mut, u8, Lsb0> {
         self.bit_ref_mut(bit)
     }
 }

@@ -38,6 +38,6 @@ pub use fields::singular::{
 };
 pub use fields::wire::{
     LenProtoType, ProtoBool, ProtoBytes, ProtoEnum, ProtoEnumStorage, ProtoInt32, ProtoInt64,
-    ProtoSint32, ProtoSint64, ProtoString, ProtoUInt32, ProtoUInt64, ScalarProtoType,
+    ProtoSint32, ProtoSint64, ProtoString, ProtoUInt32, ProtoUInt64, ScalarProtoType, ScalarRef,
     VarintProtoType,
 };

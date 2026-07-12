@@ -26,7 +26,6 @@ use crate::fields::singular::SingularAccess;
 use crate::fields::singular::field::SingularField;
 use crate::fields::singular::message::NestedMessageField;
 use crate::fields::wire::scalar::ScalarProtoType;
-use crate::fields::wire::varint::ProtoBool;
 
 /// Explicit release of a generated `oneof` storage enum.
 ///
@@ -377,26 +376,9 @@ impl<'a, T: ScalarProtoType, const FIELD: u32, D, Pb: PresenceBits, A: Allocator
 where
     for<'b> T::Ref<'b>: Copy,
     D: for<'b> HasDefault<T::Ref<'b>>,
-    <Oneof as FieldPresence>::ValueSlot<T>: ValueSlot<T>,
+    <Oneof as FieldPresence>::ValueSlot<T::Slot>: ValueSlot<T::Slot>,
 {
     pub fn optional(self) -> Optional<T::Ref<'a>, D>
-    where
-        A: Clone,
-    {
-        match self.field {
-            Some(f) => f.bind(self.common).optional(),
-            None => Optional::new(None),
-        }
-    }
-}
-
-impl<'a, const VALUE_BIT: usize, const FIELD: u32, D, Pb: PresenceBits, A: Allocator>
-    OneofVariantRef<'a, SingularField<ProtoBool<VALUE_BIT>, Oneof, FIELD, D>, Pb, A>
-where
-    D: HasDefault<bool>,
-    <Oneof as FieldPresence>::ValueSlot<ProtoBool<VALUE_BIT>>: ValueSlot<ProtoBool<VALUE_BIT>>,
-{
-    pub fn optional(self) -> Optional<bool, D>
     where
         A: Clone,
     {

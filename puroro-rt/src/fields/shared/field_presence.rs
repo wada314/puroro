@@ -23,9 +23,9 @@ pub trait FieldPresence: Copy {
     /// [`Implicit`] and [`Oneof`] use always-initialized `T`; [`Explicit`] and
     /// [`LegacyRequired`] use [`MaybeUninit<T>`].
     ///
-    /// The `ValueSlot<T>` bound is enforced at use sites ([`SingularField`]) so
-    /// both addressable scalars and bit-packed [`ProtoBool`](crate::ProtoBool)
-    /// can share these markers.
+    /// The `ValueSlot<T>` bound is enforced at use sites ([`SingularField`]).
+    /// `T` here is the **slot** payload ([`ScalarProtoType::Slot`](crate::ScalarProtoType)),
+    /// not the protobuf type marker.
     type ValueSlot<T: DefaultIn + DeallocateIn>;
 
     /// Borrow-free mutable init-state marker.

@@ -2,9 +2,9 @@
 //! presence-tracked ([`MaybeUninit<T>`]), selected by [`FieldPresence::ValueSlot`].
 //!
 //! [`ValueSlot`] is implemented for raw `T` and [`MaybeUninit<T>`] when `T` is
-//! [`AddressableSlot`]. Bit-packed [`ProtoBool`](crate::ProtoBool) has its own
-//! impls: the slot stores a ZST and the logical `bool` lives in
-//! [`MessageCommon`](super::MessageCommon)'s bitvec.
+//! [`AddressableSlot`]. Slot payloads are physical storage only (e.g. thin
+//! wrappers, or `()` for bit-packed bool); logical bit-packed values live in
+//! [`MessageCommon`](super::MessageCommon).
 //!
 //! Construction and teardown thread an allocator (via
 //! [`DefaultIn`](super::DefaultIn) / [`DeallocateIn`](super::DeallocateIn)).
@@ -18,20 +18,21 @@ use ::core::mem::MaybeUninit;
 use ::allocator_api2::alloc::Allocator;
 
 use super::{
-    DeallocateIn, DefaultIn, MessageCommon, PresenceBits,
+    DeallocateIn, DefaultIn, MessageCommon, PresenceBits, ProtoEmpty,
     slot_init::{SlotInitMut, SlotInitView},
 };
 use crate::fields::wire::len::{ProtoBytes, ProtoString};
 use crate::fields::wire::varint::{
-    ProtoBool, ProtoEnum, ProtoEnumStorage, ProtoInt32, ProtoInt64, ProtoSint32, ProtoSint64,
-    ProtoUInt32, ProtoUInt64,
+    ProtoEnum, ProtoEnumStorage, ProtoInt32, ProtoInt64, ProtoSint32, ProtoSint64, ProtoUInt32,
+    ProtoUInt64,
 };
 
 /// Marker for payloads stored as addressable `T` / [`MaybeUninit<T>`] in the
-/// field slot (varint wrappers, LEN wrappers, enums). [`ProtoBool`] is excluded
-/// — its value lives in the message bitvec.
+/// field slot (varint wrappers, LEN wrappers, enums, and `()` for bit-packed
+/// bool presence/init only).
 pub trait AddressableSlot: DefaultIn + DeallocateIn {}
 
+impl AddressableSlot for () {}
 impl AddressableSlot for ProtoUInt32 {}
 impl AddressableSlot for ProtoUInt64 {}
 impl AddressableSlot for ProtoInt32 {}
@@ -41,6 +42,25 @@ impl AddressableSlot for ProtoSint64 {}
 impl AddressableSlot for ProtoString {}
 impl AddressableSlot for ProtoBytes {}
 impl<E: ProtoEnumStorage> AddressableSlot for ProtoEnum<E> {}
+
+impl DefaultIn for () {
+    #[inline]
+    fn default_in<A: Allocator>(_alloc: A) -> Self {}
+}
+
+impl DeallocateIn for () {
+    #[inline]
+    unsafe fn deallocate_in<A: Allocator>(self, _alloc: A) {}
+}
+
+impl ProtoEmpty for () {
+    /// Unit has no payload; bit-packed bool emptiness is decided via
+    /// [`ScalarRef::is_empty`](crate::fields::wire::scalar::ScalarRef::is_empty).
+    #[inline]
+    fn is_proto_empty(&self) -> bool {
+        true
+    }
+}
 
 /// Storage construction / teardown and view binding for a singular field value slot.
 ///
@@ -76,34 +96,26 @@ pub trait ValueSlot<T: DefaultIn + DeallocateIn>: Sized {
     ) -> impl ValueSlotMutAccess<'a, T>;
 }
 
-/// Read ops on a value-slot view whose logical payload type is `T`.
+/// Read ops on a value-slot view whose physical payload type is `T`.
 pub trait ValueSlotRefAccess<'s, T> {
     /// Borrows `&T` when initialized (`None` when the slot is not initialized).
-    ///
-    /// For [`ProtoBool`], returns `Some(&ProtoBool)` when the field is present;
-    /// the logical `bool` is read via [`MessageCommon::is_bit_set`].
     fn get(self) -> Option<&'s T>;
 }
 
-/// Mutation ops on a value-slot view whose logical payload type is `T`.
+/// Mutation ops on a value-slot view whose physical payload type is `T`.
 pub trait ValueSlotMutAccess<'a, T> {
     /// Lazy-initializes when uninitialized, then returns `&mut T`.
     ///
-    /// For addressable slots, callers chain [`ScalarProtoType::with_mut`](crate::fields::wire::scalar::ScalarProtoType::with_mut).
-    /// For [`ProtoBool`], this is the ZST marker; the value bit is updated by
-    /// specialized [`SingularFieldMut`](crate::fields::singular::field::SingularFieldMut) methods.
+    /// Callers that need a logical accessor chain through
+    /// [`ScalarProtoType::with_mut`](crate::fields::wire::scalar::ScalarProtoType::with_mut).
     fn get_mut(self) -> &'a mut T;
 
     /// Assigns `value`, releasing any previously stored payload and updating
     /// init state when the slot was uninitialized.
-    ///
-    /// For [`ProtoBool`], this only writes the ZST / presence; assign the value
-    /// bit through specialized field `set(bool)` / `value_mut`.
     fn set(self, value: T);
 
     /// Drops an initialized payload and clears init state; the always-initialized
-    /// variant reinstalls an empty value. For [`ProtoBool`], also clears the
-    /// value bit.
+    /// variant reinstalls an empty value.
     fn clear(self);
 }
 
@@ -289,184 +301,6 @@ impl<T: AddressableSlot> ValueSlot<T> for MaybeUninit<T> {
             init,
             common,
             _t: PhantomData,
-        }
-    }
-}
-
-// ---------------------------------------------------------------------------
-// ProtoBool bit-packed views
-// ---------------------------------------------------------------------------
-
-/// Read view over a [`ProtoBool`] slot (ZST) + value bit in `common`.
-pub struct BoolValueSlotRef<'s, S: ?Sized, const VALUE_BIT: usize, I: SlotInitView, Pb: PresenceBits, A: Allocator>
-{
-    slot: &'s S,
-    init: I,
-    common: &'s MessageCommon<Pb, A>,
-}
-
-impl<'s, const VALUE_BIT: usize, I: SlotInitView, Pb: PresenceBits, A: Allocator>
-    ValueSlotRefAccess<'s, ProtoBool<VALUE_BIT>>
-    for BoolValueSlotRef<'s, ProtoBool<VALUE_BIT>, VALUE_BIT, I, Pb, A>
-{
-    #[inline]
-    fn get(self) -> Option<&'s ProtoBool<VALUE_BIT>> {
-        Some(self.slot)
-    }
-}
-
-impl<'s, const VALUE_BIT: usize, I: SlotInitView, Pb: PresenceBits, A: Allocator>
-    ValueSlotRefAccess<'s, ProtoBool<VALUE_BIT>>
-    for BoolValueSlotRef<'s, MaybeUninit<ProtoBool<VALUE_BIT>>, VALUE_BIT, I, Pb, A>
-{
-    #[inline]
-    fn get(self) -> Option<&'s ProtoBool<VALUE_BIT>> {
-        if self.init.is_initialized(self.common) {
-            // SAFETY: init bit set implies a live ZST payload.
-            Some(unsafe { self.slot.assume_init_ref() })
-        } else {
-            None
-        }
-    }
-}
-
-/// Mutation view over a [`ProtoBool`] slot (ZST) + value bit in `common`.
-pub struct BoolValueSlotMut<
-    'a,
-    S: ?Sized,
-    const VALUE_BIT: usize,
-    I: SlotInitMut,
-    Pb: PresenceBits,
-    A: Allocator,
-> {
-    slot: &'a mut S,
-    init: I,
-    common: &'a mut MessageCommon<Pb, A>,
-}
-
-impl<'a, const VALUE_BIT: usize, I: SlotInitMut, Pb: PresenceBits, A: Allocator + Clone>
-    ValueSlotMutAccess<'a, ProtoBool<VALUE_BIT>>
-    for BoolValueSlotMut<'a, ProtoBool<VALUE_BIT>, VALUE_BIT, I, Pb, A>
-{
-    #[inline]
-    fn get_mut(self) -> &'a mut ProtoBool<VALUE_BIT> {
-        self.slot
-    }
-
-    #[inline]
-    fn set(self, _value: ProtoBool<VALUE_BIT>) {
-        // ZST has no payload; presence is always-on for Implicit/Oneof.
-    }
-
-    #[inline]
-    fn clear(self) {
-        self.common.set_bit(VALUE_BIT, false);
-    }
-}
-
-impl<'a, const VALUE_BIT: usize, I: SlotInitMut, Pb: PresenceBits, A: Allocator + Clone>
-    ValueSlotMutAccess<'a, ProtoBool<VALUE_BIT>>
-    for BoolValueSlotMut<'a, MaybeUninit<ProtoBool<VALUE_BIT>>, VALUE_BIT, I, Pb, A>
-{
-    #[inline]
-    fn get_mut(self) -> &'a mut ProtoBool<VALUE_BIT> {
-        if !self.init.is_initialized(self.common) {
-            self.slot.write(ProtoBool);
-            self.init.set_initialized(self.common, true);
-            self.common.set_bit(VALUE_BIT, false);
-        }
-        // SAFETY: just ensured the slot is initialized.
-        unsafe { self.slot.assume_init_mut() }
-    }
-
-    #[inline]
-    fn set(self, _value: ProtoBool<VALUE_BIT>) {
-        if !self.init.is_initialized(self.common) {
-            self.slot.write(ProtoBool);
-            self.init.set_initialized(self.common, true);
-        }
-    }
-
-    #[inline]
-    fn clear(self) {
-        if self.init.is_initialized(self.common) {
-            // SAFETY: init bit set; ZST payload has nothing to free.
-            let _ = unsafe { self.slot.assume_init_read() };
-            self.init.set_initialized(self.common, false);
-        }
-        self.common.set_bit(VALUE_BIT, false);
-    }
-}
-
-impl<const VALUE_BIT: usize> ValueSlot<ProtoBool<VALUE_BIT>> for ProtoBool<VALUE_BIT> {
-    fn new_in<A: Allocator>(_alloc: A) -> Self {
-        ProtoBool
-    }
-
-    fn deallocate_in<A: Allocator>(self, _: bool, _alloc: A) {}
-
-    #[inline]
-    fn with<'s, I: SlotInitView, Pb: PresenceBits, A: Allocator>(
-        &'s self,
-        init: I,
-        common: &'s MessageCommon<Pb, A>,
-    ) -> impl ValueSlotRefAccess<'s, ProtoBool<VALUE_BIT>> {
-        BoolValueSlotRef {
-            slot: self,
-            init,
-            common,
-        }
-    }
-
-    #[inline]
-    fn with_mut<'a, I: SlotInitMut, Pb: PresenceBits, A: Allocator + Clone>(
-        &'a mut self,
-        init: I,
-        common: &'a mut MessageCommon<Pb, A>,
-    ) -> impl ValueSlotMutAccess<'a, ProtoBool<VALUE_BIT>> {
-        BoolValueSlotMut {
-            slot: self,
-            init,
-            common,
-        }
-    }
-}
-
-impl<const VALUE_BIT: usize> ValueSlot<ProtoBool<VALUE_BIT>> for MaybeUninit<ProtoBool<VALUE_BIT>> {
-    fn new_in<A: Allocator>(_alloc: A) -> Self {
-        MaybeUninit::uninit()
-    }
-
-    fn deallocate_in<A: Allocator>(self, initialized: bool, _alloc: A) {
-        if initialized {
-            // SAFETY: init bit set; ZST payload has nothing to free.
-            let _ = unsafe { self.assume_init() };
-        }
-    }
-
-    #[inline]
-    fn with<'s, I: SlotInitView, Pb: PresenceBits, A: Allocator>(
-        &'s self,
-        init: I,
-        common: &'s MessageCommon<Pb, A>,
-    ) -> impl ValueSlotRefAccess<'s, ProtoBool<VALUE_BIT>> {
-        BoolValueSlotRef {
-            slot: self,
-            init,
-            common,
-        }
-    }
-
-    #[inline]
-    fn with_mut<'a, I: SlotInitMut, Pb: PresenceBits, A: Allocator + Clone>(
-        &'a mut self,
-        init: I,
-        common: &'a mut MessageCommon<Pb, A>,
-    ) -> impl ValueSlotMutAccess<'a, ProtoBool<VALUE_BIT>> {
-        BoolValueSlotMut {
-            slot: self,
-            init,
-            common,
         }
     }
 }

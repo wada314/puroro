@@ -49,7 +49,7 @@ pub trait VarintProtoType {
 /// any wire value in [`decode_from_wire`](Self::decode_from_wire); closed enums
 /// reject unknown values there (and use [`merge_closed`](crate::fields::singular::field::SingularFieldMut::merge_closed)
 /// on decode to divert them to unknown fields when appropriate).
-pub trait ProtoEnumStorage: Copy + PartialEq {
+pub trait ProtoEnumStorage: Copy + PartialEq + 'static {
     fn proto_zero() -> Self;
     fn to_wire(self) -> i32;
     fn decode_from_wire(wire: i32) -> Result<Self, DecodeError>
@@ -190,33 +190,18 @@ proto_varint_wrapper! {
     encode = |value| Varint::from_sint64(value).to_uint64(),
 }
 
-/// Protobuf `bool` — varint 0 or 1; value packed at `VALUE_BIT` in the message bitvec.
+/// Protobuf `bool` type marker — varint 0 or 1.
 ///
-/// The singular field slot stores this ZST (or `MaybeUninit` of it). The logical
-/// `bool` is not addressable as `&mut bool` inside the slot — it is read/written
-/// through [`MessageCommon`](crate::MessageCommon) via [`ValueSlot`](crate::fields::shared::value_slot::ValueSlot).
+/// Implements [`ScalarProtoType`](super::scalar::ScalarProtoType) with
+/// `Slot = ()`. The logical `bool` is packed at `VALUE_BIT` in
+/// [`MessageCommon`](crate::MessageCommon)'s bitvec; the field struct only
+/// stores a unit slot for presence/init.
+///
+/// Interim: `VALUE_BIT` lives on this type marker for codegen stability. A
+/// future cleanup should move the index to the field / layout side so the
+/// marker is bit-index-free.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
 pub struct ProtoBool<const VALUE_BIT: usize>;
-
-impl<const VALUE_BIT: usize> DefaultIn for ProtoBool<VALUE_BIT> {
-    #[inline]
-    fn default_in<A: ::allocator_api2::alloc::Allocator>(_alloc: A) -> Self {
-        Self
-    }
-}
-
-impl<const VALUE_BIT: usize> DeallocateIn for ProtoBool<VALUE_BIT> {
-    #[inline]
-    unsafe fn deallocate_in<A: ::allocator_api2::alloc::Allocator>(self, _alloc: A) {}
-}
-
-impl<const VALUE_BIT: usize> ProtoEmpty for ProtoBool<VALUE_BIT> {
-    /// Slot-side emptiness is meaningless for a ZST; IMPLICIT omit uses the value bit.
-    #[inline]
-    fn is_proto_empty(&self) -> bool {
-        true
-    }
-}
 
 impl<const VALUE_BIT: usize> VarintProtoType for ProtoBool<VALUE_BIT> {
     type Value = bool;

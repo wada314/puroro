@@ -14,7 +14,6 @@ pub(crate) mod value_slot;
 pub use field_deallocate::FieldDeallocate;
 
 use ::core::mem::ManuallyDrop;
-use ::core::ops::DerefMut;
 
 use ::allocator_api2::alloc::Allocator;
 use ::unmanaged::UnmanagedVec;
@@ -45,12 +44,18 @@ pub trait PresenceBits {
         self.set(bit, false);
     }
 
-    /// Returns a mutable handle to bit `bit` (`DerefMut<Target = bool>`).
+    /// Returns a mutable handle to bit `bit`.
+    ///
+    /// Generated presence newtypes wrap `bitvec::BitArray<[u8; N], Lsb0>`, so
+    /// the handle is a concrete [`BitRef`](::bitvec::ptr::BitRef).
     ///
     /// # Panics
     ///
     /// Generated impls panic if `bit` is out of range for the message bitfield.
-    fn bit_mut(&mut self, bit: usize) -> impl DerefMut<Target = bool> + '_;
+    fn bit_mut(
+        &mut self,
+        bit: usize,
+    ) -> ::bitvec::ptr::BitRef<'_, ::bitvec::ptr::Mut, u8, ::bitvec::order::Lsb0>;
 }
 
 // ---------------------------------------------------------------------------
@@ -117,7 +122,10 @@ impl<P: PresenceBits, A: Allocator> MessageCommon<P, A> {
 
     /// Returns a mutable handle to bit `bit` (`DerefMut<Target = bool>`).
     #[inline]
-    pub fn bit_mut(&mut self, bit: usize) -> impl DerefMut<Target = bool> + '_ {
+    pub fn bit_mut(
+        &mut self,
+        bit: usize,
+    ) -> ::bitvec::ptr::BitRef<'_, ::bitvec::ptr::Mut, u8, ::bitvec::order::Lsb0> {
         self.presence.bit_mut(bit)
     }
 }

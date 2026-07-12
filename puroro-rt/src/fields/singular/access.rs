@@ -2,9 +2,8 @@
 //!
 //! [`SingularAccess`] names getter / `_mut` payload types (`Ref` / `Mut`) and
 //! pairs a field with [`MessageCommon`] via `bind` / `bind_mut` (`View` /
-//! `ViewMut`). [`SingularField`] forwards addressable payloads to
-//! [`ScalarProtoType`]; [`ProtoBool`](crate::ProtoBool) and
-//! [`NestedMessageField`] supply their own.
+//! `ViewMut`). [`SingularField`] forwards to [`ScalarProtoType`];
+//! [`NestedMessageField`] supplies its own.
 
 use ::allocator_api2::alloc::Allocator;
 
@@ -12,7 +11,6 @@ use crate::fields::shared::field_presence::FieldPresence;
 use crate::fields::shared::value_slot::ValueSlot;
 use crate::fields::shared::{MessageCommon, PresenceBits};
 use crate::fields::wire::scalar::ScalarProtoType;
-use crate::fields::wire::varint::ProtoBool;
 
 use super::field::{SingularField, SingularFieldMut, SingularFieldRef};
 use super::message::{MessagePresence, NestedMessageField, NestedMessageFieldMut, NestedMessageFieldRef};
@@ -62,7 +60,7 @@ pub trait SingularAccess {
 impl<T: ScalarProtoType, P: FieldPresence, const FIELD: u32, D> SingularAccess
     for SingularField<T, P, FIELD, D>
 where
-    P::ValueSlot<T>: ValueSlot<T>,
+    P::ValueSlot<T::Slot>: ValueSlot<T::Slot>,
 {
     type Ref<'a>
         = T::Ref<'a>
@@ -80,50 +78,6 @@ where
         A: 'a;
     type ViewMut<'f, 'c, Pb: PresenceBits, A: Allocator>
         = SingularFieldMut<'f, 'c, T, P, FIELD, D, Pb, A>
-    where
-        Self: 'f,
-        Pb: 'c,
-        A: 'c;
-
-    #[inline]
-    fn bind<'a, Pb: PresenceBits, A: Allocator + Clone>(
-        &'a self,
-        common: &'a MessageCommon<Pb, A>,
-    ) -> Self::View<'a, Pb, A> {
-        SingularFieldRef::new(self, common)
-    }
-
-    #[inline]
-    fn bind_mut<'f, 'c, Pb: PresenceBits, A: Allocator + Clone>(
-        &'f mut self,
-        common: &'c mut MessageCommon<Pb, A>,
-    ) -> Self::ViewMut<'f, 'c, Pb, A> {
-        SingularFieldMut::new(self, common)
-    }
-}
-
-impl<const VALUE_BIT: usize, P: FieldPresence, const FIELD: u32, D> SingularAccess
-    for SingularField<ProtoBool<VALUE_BIT>, P, FIELD, D>
-where
-    P::ValueSlot<ProtoBool<VALUE_BIT>>: ValueSlot<ProtoBool<VALUE_BIT>>,
-{
-    type Ref<'a>
-        = bool
-    where
-        Self: 'a;
-    /// Named bit handle for enum payloads; public `_mut` still returns `impl DerefMut`.
-    type Mut<'a, A: Allocator + 'a>
-        = ::bitvec::ptr::BitRef<'a, ::bitvec::ptr::Mut, u8, ::bitvec::order::Lsb0>
-    where
-        Self: 'a;
-    type View<'a, Pb: PresenceBits, A: Allocator>
-        = SingularFieldRef<'a, ProtoBool<VALUE_BIT>, P, FIELD, D, Pb, A>
-    where
-        Self: 'a,
-        Pb: 'a,
-        A: 'a;
-    type ViewMut<'f, 'c, Pb: PresenceBits, A: Allocator>
-        = SingularFieldMut<'f, 'c, ProtoBool<VALUE_BIT>, P, FIELD, D, Pb, A>
     where
         Self: 'f,
         Pb: 'c,
