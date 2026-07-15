@@ -1,9 +1,18 @@
+//! Integration tests for the sample `Task` / `Address` messages.
+//!
+//! Grouped by what they exercise: encode/decode roundtrips, oneof accessor
+//! behaviour (no wire), and enum merge / unknown-field handling.
+
 use ::puroro::{MessageDecode, MessageEncode, UnknownPayload};
 use ::puroro_sample_generated::task::{Notification, NotificationCase};
 use ::puroro_sample_generated::{Address, Priority, Status, Task};
 
+// ---------------------------------------------------------------------------
+// Encode / decode roundtrips
+// ---------------------------------------------------------------------------
+
 #[test]
-fn task_roundtrip() {
+fn task_fields_roundtrip() {
     let mut task = Task::new();
     task.title_mut().push_str("Write docs");
     *task.score_mut() = 42;
@@ -79,29 +88,6 @@ fn oneof_varint_variant_roundtrip() {
 }
 
 #[test]
-fn oneof_scalar_getter_uses_custom_default_when_unset() {
-    // Official const-getter contract: unset / other variant → custom default,
-    // without selecting the variant. `webhook_id = 14 [default = -1]`.
-    let mut task = Task::new();
-    task.owner_id_mut().push_str("user-1");
-
-    assert!(task.notification_case().is_none());
-    assert!(!task.webhook_id().is_set());
-    assert_eq!(task.webhook_id().get(), -1);
-
-    task.email_address_mut().push_str("a@example.com");
-    assert_eq!(
-        task.notification_case(),
-        Some(NotificationCase::EmailAddress)
-    );
-    assert!(!task.webhook_id().is_set());
-    assert_eq!(task.webhook_id().get(), -1);
-    // String members without [default] still fall back to the type default.
-    assert!(!task.phone_number().is_set());
-    assert_eq!(task.phone_number().get(), "");
-}
-
-#[test]
 fn oneof_message_variant_roundtrip() {
     // A oneof that resolves to a nested-MESSAGE variant (`Address postal = 15`).
     let mut task = Task::new();
@@ -122,6 +108,120 @@ fn oneof_message_variant_roundtrip() {
     };
     assert_eq!(addr.street().get(), "5 Oak Ave");
     assert_eq!(addr.city().get(), "Kyoto");
+}
+
+#[test]
+fn oneof_bool_variant_roundtrip() {
+    let mut task = Task::new();
+    task.owner_id_mut().push_str("user-1");
+    *task.urgent_mut() = true;
+    task.validate().unwrap();
+
+    let bytes = task.encode_to_vec();
+    let decoded: Task = Task::decode(&bytes[..]).unwrap();
+
+    assert_eq!(
+        decoded.notification_case(),
+        Some(NotificationCase::Urgent)
+    );
+    assert!(matches!(
+        decoded.notification().as_ref(),
+        Some(Notification::Urgent(true))
+    ));
+    assert!(decoded.urgent().is_set());
+    assert!(decoded.urgent().get());
+
+    // Type-default false is still emitted when the oneof case is selected.
+    *task.urgent_mut() = false;
+    let bytes = task.encode_to_vec();
+    let decoded: Task = Task::decode(&bytes[..]).unwrap();
+    assert_eq!(
+        decoded.notification_case(),
+        Some(NotificationCase::Urgent)
+    );
+    assert!(matches!(
+        decoded.notification().as_ref(),
+        Some(Notification::Urgent(false))
+    ));
+}
+
+#[test]
+fn implicit_clear_omits_from_wire() {
+    let mut task = Task::new();
+    task.owner_id_mut().push_str("user-1");
+    *task.score_mut() = 42;
+    *task.status_mut() = Status::PENDING;
+
+    task.clear_score();
+    task.clear_status();
+
+    assert_eq!(task.score(), 0);
+    assert!(!task.status().is_set());
+
+    let bytes = task.encode_to_vec();
+    let decoded: Task = Task::decode(&bytes[..]).unwrap();
+    assert_eq!(decoded.score(), 0);
+    assert!(!decoded.status().is_set());
+}
+
+#[test]
+fn implicit_bool_omits_false_on_wire() {
+    let mut task = Task::new();
+    task.owner_id_mut().push_str("user-1");
+    *task.done_mut() = true;
+    task.clear_done();
+    assert!(!task.done());
+
+    let bytes = task.encode_to_vec();
+    let decoded: Task = Task::decode(&bytes[..]).unwrap();
+    assert!(!decoded.done());
+}
+
+#[test]
+fn explicit_bool_preserves_false() {
+    let mut task = Task::new();
+    task.owner_id_mut().push_str("user-1");
+    *task.flag_mut() = false;
+    assert!(task.flag().is_set());
+    assert!(!task.flag().get());
+
+    let bytes = task.encode_to_vec();
+    let decoded: Task = Task::decode(&bytes[..]).unwrap();
+    assert!(decoded.flag().is_set());
+    assert!(!decoded.flag().get());
+
+    task.clear_flag();
+    assert!(!task.flag().is_set());
+    let bytes = task.encode_to_vec();
+    let decoded: Task = Task::decode(&bytes[..]).unwrap();
+    assert!(!decoded.flag().is_set());
+}
+
+// ---------------------------------------------------------------------------
+// Oneof accessors / views (no encode/decode)
+// ---------------------------------------------------------------------------
+
+#[test]
+fn oneof_scalar_getter_uses_custom_default_when_unset() {
+    // Official const-getter contract: unset / other variant → custom default,
+    // without selecting the variant. `webhook_id = 14 [default = -1]`.
+    let mut task = Task::new();
+    task.owner_id_mut().push_str("user-1");
+
+    assert!(task.notification_case().is_none());
+    assert!(!task.webhook_id().is_set());
+    assert_eq!(task.webhook_id().get(), -1);
+
+    task.email_address_mut().push_str("a@example.com");
+    assert_eq!(
+        task.notification_case(),
+        Some(NotificationCase::EmailAddress)
+    );
+    assert!(!task.webhook_id().is_set());
+    assert_eq!(task.webhook_id().get(), -1);
+    // String members without [default] still fall back to the type default.
+    assert!(!task.phone_number().is_set());
+    assert_eq!(task.phone_number().get(), "");
 }
 
 #[test]
@@ -180,30 +280,14 @@ fn oneof_group_view_mut_as_view_and_clear() {
         Some(Notification::EmailAddress(s)) if s == "a@example.com"
     ));
 
-
     task.notification_mut().clear();
     assert!(task.notification_case().is_none());
     assert!(task.notification().as_ref().is_none());
 }
 
-#[test]
-fn implicit_clear_omits_from_wire() {
-    let mut task = Task::new();
-    task.owner_id_mut().push_str("user-1");
-    *task.score_mut() = 42;
-    *task.status_mut() = Status::PENDING;
-
-    task.clear_score();
-    task.clear_status();
-
-    assert_eq!(task.score(), 0);
-    assert!(!task.status().is_set());
-
-    let bytes = task.encode_to_vec();
-    let decoded: Task = Task::decode(&bytes[..]).unwrap();
-    assert_eq!(decoded.score(), 0);
-    assert!(!decoded.status().is_set());
-}
+// ---------------------------------------------------------------------------
+// Enum merge / unknown fields (decode into existing message)
+// ---------------------------------------------------------------------------
 
 #[test]
 fn closed_enum_unknown_goes_to_unknown_fields() {
@@ -242,72 +326,4 @@ fn open_enum_unknown_stays_in_field() {
     assert!(task.status().is_set());
     assert_eq!(task.status().get(), Status::from(99));
     assert!(task.unknown_fields().next().is_none());
-}
-
-#[test]
-fn implicit_bool_omits_false_on_wire() {
-    let mut task = Task::new();
-    task.owner_id_mut().push_str("user-1");
-    *task.done_mut() = true;
-    task.clear_done();
-    assert!(!task.done());
-
-    let bytes = task.encode_to_vec();
-    let decoded: Task = Task::decode(&bytes[..]).unwrap();
-    assert!(!decoded.done());
-}
-
-#[test]
-fn explicit_bool_preserves_false() {
-    let mut task = Task::new();
-    task.owner_id_mut().push_str("user-1");
-    *task.flag_mut() = false;
-    assert!(task.flag().is_set());
-    assert!(!task.flag().get());
-
-    let bytes = task.encode_to_vec();
-    let decoded: Task = Task::decode(&bytes[..]).unwrap();
-    assert!(decoded.flag().is_set());
-    assert!(!decoded.flag().get());
-
-    task.clear_flag();
-    assert!(!task.flag().is_set());
-    let bytes = task.encode_to_vec();
-    let decoded: Task = Task::decode(&bytes[..]).unwrap();
-    assert!(!decoded.flag().is_set());
-}
-
-#[test]
-fn oneof_bool_variant_roundtrip() {
-    let mut task = Task::new();
-    task.owner_id_mut().push_str("user-1");
-    *task.urgent_mut() = true;
-    task.validate().unwrap();
-
-    let bytes = task.encode_to_vec();
-    let decoded: Task = Task::decode(&bytes[..]).unwrap();
-
-    assert_eq!(
-        decoded.notification_case(),
-        Some(NotificationCase::Urgent)
-    );
-    assert!(matches!(
-        decoded.notification().as_ref(),
-        Some(Notification::Urgent(true))
-    ));
-    assert!(decoded.urgent().is_set());
-    assert!(decoded.urgent().get());
-
-    // Type-default false is still emitted when the oneof case is selected.
-    *task.urgent_mut() = false;
-    let bytes = task.encode_to_vec();
-    let decoded: Task = Task::decode(&bytes[..]).unwrap();
-    assert_eq!(
-        decoded.notification_case(),
-        Some(NotificationCase::Urgent)
-    );
-    assert!(matches!(
-        decoded.notification().as_ref(),
-        Some(Notification::Urgent(false))
-    ));
 }
