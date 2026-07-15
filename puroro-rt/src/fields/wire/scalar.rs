@@ -25,7 +25,7 @@ use ::puroro::WireType;
 use crate::decode;
 use crate::encode;
 use crate::fields::shared::{
-    MessageCommon, PresenceBits, ProtoEmpty,
+    DefaultIn, MessageCommon, PresenceBits, ProtoEmpty,
     slot_init::SlotInitMut,
     value_slot::{AddressableSlot, ValueSlot, ValueSlotMutAccess},
 };
@@ -44,9 +44,12 @@ use super::varint::{ProtoBool, VarintProtoType};
 /// codegen stability; a future cleanup should move that index to the field /
 /// layout side so the type marker is bit-index-free.
 pub trait ScalarProtoType: Sized {
+    /// Allocator type retained by the marker and its physical slot.
+    type Alloc: Allocator + Clone;
+
     /// Physical value stored in the singular field slot (excluding
     /// [`MessageCommon`] bits).
-    type Slot: AddressableSlot;
+    type Slot: AddressableSlot<SlotAlloc = Self::Alloc> + DefaultIn<Alloc = Self::Alloc>;
 
     /// Borrowed / by-value view returned by getters (`i32`, `&str`, `bool`, …).
     type Ref<'a>
@@ -55,7 +58,7 @@ pub trait ScalarProtoType: Sized {
 
     /// Mutable handle returned by `_mut` accessors (`&mut i32`, `StringGuard`,
     /// bit handle, …).
-    type Mut<'a, A: Allocator + 'a>: DerefMut
+    type Mut<'a>: DerefMut
     where
         Self: 'a;
 
@@ -69,65 +72,67 @@ pub trait ScalarProtoType: Sized {
     ///
     /// Addressable payload slots delegate to [`ProtoEmpty`]; bit-packed
     /// [`ProtoBool`] reads the value bit from `common`.
-    fn is_proto_empty<Pb: PresenceBits, A: Allocator>(
+    fn is_proto_empty<Pb: PresenceBits>(
         slot: &Self::Slot,
-        common: &MessageCommon<Pb, A>,
+        common: &MessageCommon<Pb, Self::Alloc>,
     ) -> bool;
 
     /// Reads the logical getter view from the slot and/or `common`.
-    fn get<'a, Pb: PresenceBits, A: Allocator>(
+    fn get<'a, Pb: PresenceBits>(
         slot: &'a Self::Slot,
-        common: &'a MessageCommon<Pb, A>,
+        common: &'a MessageCommon<Pb, Self::Alloc>,
     ) -> Self::Ref<'a>;
 
     /// Ensures the slot is present and returns a mutable accessor handle.
     ///
     /// Heap-backed mutators clone the allocator from `common.alloc`.
-    fn with_mut<'a, VS, I, Pb, A>(
+    fn with_mut<'a, VS, I, Pb>(
         slot: &'a mut VS,
         init: I,
-        common: &'a mut MessageCommon<Pb, A>,
-    ) -> Self::Mut<'a, A>
+        common: &'a mut MessageCommon<Pb, Self::Alloc>,
+    ) -> Self::Mut<'a>
     where
         VS: ValueSlot<Self::Slot>,
         I: SlotInitMut,
         Pb: PresenceBits,
-        A: Allocator + Clone + 'a;
+        Self: 'a;
 
     /// Writes `value`, ensuring slot presence when applicable.
-    fn write<VS, I, Pb, A>(
+    fn write<VS, I, Pb>(
         slot: &mut VS,
         init: I,
-        common: &mut MessageCommon<Pb, A>,
+        common: &mut MessageCommon<Pb, Self::Alloc>,
         value: Self::Written,
     ) where
         VS: ValueSlot<Self::Slot>,
         I: SlotInitMut,
-        Pb: PresenceBits,
-        A: Allocator + Clone;
+        Pb: PresenceBits;
 
     /// Clears the logical value and slot presence / payload.
-    fn clear<VS, I, Pb, A>(slot: &mut VS, init: I, common: &mut MessageCommon<Pb, A>)
+    fn clear<VS, I, Pb>(slot: &mut VS, init: I, common: &mut MessageCommon<Pb, Self::Alloc>)
     where
         VS: ValueSlot<Self::Slot>,
         I: SlotInitMut,
-        Pb: PresenceBits,
-        A: Allocator + Clone;
+        Pb: PresenceBits;
 
     /// Wire byte length of one tagged occurrence for `value`.
     ///
     /// Kept on the type marker so int32 vs sint32 can share `Ref = i32` with
     /// different wire encodings.
-    fn encoded_len(value: Self::Ref<'_>, field: u32) -> usize;
+    fn encoded_len<'a>(value: Self::Ref<'a>, field: u32) -> usize
+    where
+        Self: 'a;
 
     /// Encodes one tagged occurrence for `value`.
-    fn encode<B: BufMut>(value: Self::Ref<'_>, field: u32, buf: &mut B);
+    fn encode<'a, B: BufMut>(value: Self::Ref<'a>, field: u32, buf: &mut B)
+    where
+        Self: 'a;
 
     /// Decodes one occurrence after the tag has been read (`wire_type` checked here).
-    fn decode<B: Buf, A: Allocator>(
+    fn decode<B: Buf>(
         wire_type: WireType,
         buf: &mut B,
-        alloc: A,
+        alloc: Self::Alloc,
     ) -> Result<Self::Written, DecodeError>;
 }
 
@@ -137,15 +142,16 @@ pub trait ScalarProtoType: Sized {
 
 impl<T> ScalarProtoType for T
 where
-    T: VarintProtoType + AddressableSlot + From<T::Value> + ProtoEmpty + 'static,
+    T: VarintProtoType + AddressableSlot + From<T::Value> + ProtoEmpty,
     T: Deref<Target = T::Value> + DerefMut,
 {
+    type Alloc = T::SlotAlloc;
     type Slot = Self;
     type Ref<'a>
         = T::Value
     where
         Self: 'a;
-    type Mut<'a, A: Allocator + 'a>
+    type Mut<'a>
         = &'a mut T::Value
     where
         Self: 'a;
@@ -153,77 +159,85 @@ where
     const WIRE_TYPE: WireType = WireType::Varint;
 
     #[inline]
-    fn is_proto_empty<Pb: PresenceBits, A: Allocator>(
+    fn is_proto_empty<Pb: PresenceBits>(
         slot: &Self::Slot,
-        _common: &MessageCommon<Pb, A>,
+        _common: &MessageCommon<Pb, Self::Alloc>,
     ) -> bool {
         slot.is_proto_empty()
     }
 
     #[inline]
-    fn get<'a, Pb: PresenceBits, A: Allocator>(
+    fn get<'a, Pb: PresenceBits>(
         slot: &'a Self::Slot,
-        _common: &'a MessageCommon<Pb, A>,
+        _common: &'a MessageCommon<Pb, Self::Alloc>,
     ) -> Self::Ref<'a> {
         *Deref::deref(slot)
     }
 
     #[inline]
-    fn with_mut<'a, VS, I, Pb, A>(
+    fn with_mut<'a, VS, I, Pb>(
         slot: &'a mut VS,
         init: I,
-        common: &'a mut MessageCommon<Pb, A>,
-    ) -> Self::Mut<'a, A>
+        common: &'a mut MessageCommon<Pb, Self::Alloc>,
+    ) -> Self::Mut<'a>
     where
         VS: ValueSlot<Self::Slot>,
         I: SlotInitMut,
         Pb: PresenceBits,
-        A: Allocator + Clone + 'a,
+        Self: 'a,
     {
         DerefMut::deref_mut(ValueSlot::with_mut(slot, init, common).get_mut())
     }
 
     #[inline]
-    fn write<VS, I, Pb, A>(
+    fn write<VS, I, Pb>(
         slot: &mut VS,
         init: I,
-        common: &mut MessageCommon<Pb, A>,
+        common: &mut MessageCommon<Pb, Self::Alloc>,
         value: Self::Written,
     ) where
         VS: ValueSlot<Self::Slot>,
         I: SlotInitMut,
         Pb: PresenceBits,
-        A: Allocator + Clone,
     {
         ValueSlot::with_mut(slot, init, common).set(value);
     }
 
     #[inline]
-    fn clear<VS, I, Pb, A>(slot: &mut VS, init: I, common: &mut MessageCommon<Pb, A>)
+    fn clear<VS, I, Pb>(
+        slot: &mut VS,
+        init: I,
+        common: &mut MessageCommon<Pb, Self::Alloc>,
+    )
     where
         VS: ValueSlot<Self::Slot>,
         I: SlotInitMut,
         Pb: PresenceBits,
-        A: Allocator + Clone,
     {
         ValueSlot::with_mut(slot, init, common).clear();
     }
 
     #[inline]
-    fn encoded_len(value: Self::Ref<'_>, field: u32) -> usize {
+    fn encoded_len<'a>(value: Self::Ref<'a>, field: u32) -> usize
+    where
+        Self: 'a,
+    {
         encode::encoded_len_varint_field(field, T::encode_wire(value))
     }
 
     #[inline]
-    fn encode<B: BufMut>(value: Self::Ref<'_>, field: u32, buf: &mut B) {
+    fn encode<'a, B: BufMut>(value: Self::Ref<'a>, field: u32, buf: &mut B)
+    where
+        Self: 'a,
+    {
         encode::encode_varint_field(field, T::encode_wire(value), buf);
     }
 
     #[inline]
-    fn decode<B: Buf, A: Allocator>(
+    fn decode<B: Buf>(
         wire_type: WireType,
         buf: &mut B,
-        _alloc: A,
+        _alloc: Self::Alloc,
     ) -> Result<Self::Written, DecodeError> {
         if wire_type != WireType::Varint {
             return Err(DecodeError::InvalidTag);
@@ -237,15 +251,22 @@ where
 // LEN wrappers (Slot = Self)
 // ---------------------------------------------------------------------------
 
-impl ScalarProtoType for ProtoString {
+impl<A: Allocator + Clone> ScalarProtoType for ProtoString<A> {
+    type Alloc = A;
     type Slot = Self;
-    type Ref<'a> = &'a str;
-    type Mut<'a, A: Allocator + 'a> = <Self as LenProtoType>::Mut<'a, A>;
+    type Ref<'a>
+        = &'a str
+    where
+        Self: 'a;
+    type Mut<'a>
+        = <Self as LenProtoType>::Mut<'a>
+    where
+        Self: 'a;
     type Written = Self;
     const WIRE_TYPE: WireType = WireType::Len;
 
     #[inline]
-    fn is_proto_empty<Pb: PresenceBits, A: Allocator>(
+    fn is_proto_empty<Pb: PresenceBits>(
         slot: &Self::Slot,
         _common: &MessageCommon<Pb, A>,
     ) -> bool {
@@ -253,7 +274,7 @@ impl ScalarProtoType for ProtoString {
     }
 
     #[inline]
-    fn get<'a, Pb: PresenceBits, A: Allocator>(
+    fn get<'a, Pb: PresenceBits>(
         slot: &'a Self::Slot,
         _common: &'a MessageCommon<Pb, A>,
     ) -> &'a str {
@@ -261,16 +282,16 @@ impl ScalarProtoType for ProtoString {
     }
 
     #[inline]
-    fn with_mut<'a, VS, I, Pb, A>(
+    fn with_mut<'a, VS, I, Pb>(
         slot: &'a mut VS,
         init: I,
         common: &'a mut MessageCommon<Pb, A>,
-    ) -> Self::Mut<'a, A>
+    ) -> Self::Mut<'a>
     where
         VS: ValueSlot<Self::Slot>,
         I: SlotInitMut,
         Pb: PresenceBits,
-        A: Allocator + Clone + 'a,
+        Self: 'a,
     {
         let alloc = common.alloc.clone();
         <Self as LenProtoType>::with_alloc(
@@ -280,7 +301,7 @@ impl ScalarProtoType for ProtoString {
     }
 
     #[inline]
-    fn write<VS, I, Pb, A>(
+    fn write<VS, I, Pb>(
         slot: &mut VS,
         init: I,
         common: &mut MessageCommon<Pb, A>,
@@ -289,34 +310,38 @@ impl ScalarProtoType for ProtoString {
         VS: ValueSlot<Self::Slot>,
         I: SlotInitMut,
         Pb: PresenceBits,
-        A: Allocator + Clone,
     {
         ValueSlot::with_mut(slot, init, common).set(value);
     }
 
     #[inline]
-    fn clear<VS, I, Pb, A>(slot: &mut VS, init: I, common: &mut MessageCommon<Pb, A>)
+    fn clear<VS, I, Pb>(slot: &mut VS, init: I, common: &mut MessageCommon<Pb, A>)
     where
         VS: ValueSlot<Self::Slot>,
         I: SlotInitMut,
         Pb: PresenceBits,
-        A: Allocator + Clone,
     {
         ValueSlot::with_mut(slot, init, common).clear();
     }
 
     #[inline]
-    fn encoded_len(value: Self::Ref<'_>, field: u32) -> usize {
+    fn encoded_len<'a>(value: Self::Ref<'a>, field: u32) -> usize
+    where
+        Self: 'a,
+    {
         encode::encoded_len_len_field(field, value.as_bytes().len())
     }
 
     #[inline]
-    fn encode<B: BufMut>(value: Self::Ref<'_>, field: u32, buf: &mut B) {
+    fn encode<'a, B: BufMut>(value: Self::Ref<'a>, field: u32, buf: &mut B)
+    where
+        Self: 'a,
+    {
         encode::encode_len_field(field, value.as_bytes(), buf);
     }
 
     #[inline]
-    fn decode<B: Buf, A: Allocator>(
+    fn decode<B: Buf>(
         wire_type: WireType,
         buf: &mut B,
         alloc: A,
@@ -328,15 +353,22 @@ impl ScalarProtoType for ProtoString {
     }
 }
 
-impl ScalarProtoType for ProtoBytes {
+impl<A: Allocator + Clone> ScalarProtoType for ProtoBytes<A> {
+    type Alloc = A;
     type Slot = Self;
-    type Ref<'a> = &'a [u8];
-    type Mut<'a, A: Allocator + 'a> = <Self as LenProtoType>::Mut<'a, A>;
+    type Ref<'a>
+        = &'a [u8]
+    where
+        Self: 'a;
+    type Mut<'a>
+        = <Self as LenProtoType>::Mut<'a>
+    where
+        Self: 'a;
     type Written = Self;
     const WIRE_TYPE: WireType = WireType::Len;
 
     #[inline]
-    fn is_proto_empty<Pb: PresenceBits, A: Allocator>(
+    fn is_proto_empty<Pb: PresenceBits>(
         slot: &Self::Slot,
         _common: &MessageCommon<Pb, A>,
     ) -> bool {
@@ -344,7 +376,7 @@ impl ScalarProtoType for ProtoBytes {
     }
 
     #[inline]
-    fn get<'a, Pb: PresenceBits, A: Allocator>(
+    fn get<'a, Pb: PresenceBits>(
         slot: &'a Self::Slot,
         _common: &'a MessageCommon<Pb, A>,
     ) -> &'a [u8] {
@@ -352,16 +384,16 @@ impl ScalarProtoType for ProtoBytes {
     }
 
     #[inline]
-    fn with_mut<'a, VS, I, Pb, A>(
+    fn with_mut<'a, VS, I, Pb>(
         slot: &'a mut VS,
         init: I,
         common: &'a mut MessageCommon<Pb, A>,
-    ) -> Self::Mut<'a, A>
+    ) -> Self::Mut<'a>
     where
         VS: ValueSlot<Self::Slot>,
         I: SlotInitMut,
         Pb: PresenceBits,
-        A: Allocator + Clone + 'a,
+        Self: 'a,
     {
         let alloc = common.alloc.clone();
         <Self as LenProtoType>::with_alloc(
@@ -371,7 +403,7 @@ impl ScalarProtoType for ProtoBytes {
     }
 
     #[inline]
-    fn write<VS, I, Pb, A>(
+    fn write<VS, I, Pb>(
         slot: &mut VS,
         init: I,
         common: &mut MessageCommon<Pb, A>,
@@ -380,34 +412,38 @@ impl ScalarProtoType for ProtoBytes {
         VS: ValueSlot<Self::Slot>,
         I: SlotInitMut,
         Pb: PresenceBits,
-        A: Allocator + Clone,
     {
         ValueSlot::with_mut(slot, init, common).set(value);
     }
 
     #[inline]
-    fn clear<VS, I, Pb, A>(slot: &mut VS, init: I, common: &mut MessageCommon<Pb, A>)
+    fn clear<VS, I, Pb>(slot: &mut VS, init: I, common: &mut MessageCommon<Pb, A>)
     where
         VS: ValueSlot<Self::Slot>,
         I: SlotInitMut,
         Pb: PresenceBits,
-        A: Allocator + Clone,
     {
         ValueSlot::with_mut(slot, init, common).clear();
     }
 
     #[inline]
-    fn encoded_len(value: Self::Ref<'_>, field: u32) -> usize {
+    fn encoded_len<'a>(value: Self::Ref<'a>, field: u32) -> usize
+    where
+        Self: 'a,
+    {
         encode::encoded_len_len_field(field, value.len())
     }
 
     #[inline]
-    fn encode<B: BufMut>(value: Self::Ref<'_>, field: u32, buf: &mut B) {
+    fn encode<'a, B: BufMut>(value: Self::Ref<'a>, field: u32, buf: &mut B)
+    where
+        Self: 'a,
+    {
         encode::encode_len_field(field, value, buf);
     }
 
     #[inline]
-    fn decode<B: Buf, A: Allocator>(
+    fn decode<B: Buf>(
         wire_type: WireType,
         buf: &mut B,
         alloc: A,
@@ -423,18 +459,26 @@ impl ScalarProtoType for ProtoBytes {
 // Bit-packed bool (Slot = Self, ZST; value in MessageCommon)
 // ---------------------------------------------------------------------------
 
-impl<const VALUE_BIT: usize> ScalarProtoType for ProtoBool<VALUE_BIT> {
+impl<A: Allocator + Clone, const VALUE_BIT: usize> ScalarProtoType
+    for ProtoBool<A, VALUE_BIT>
+{
+    type Alloc = A;
     /// ZST slot: presence/init layout only. Logical `bool` lives at `VALUE_BIT`
     /// in [`MessageCommon`].
     type Slot = Self;
-    type Ref<'a> = bool;
-    type Mut<'a, A: Allocator + 'a> =
-        ::bitvec::ptr::BitRef<'a, ::bitvec::ptr::Mut, u8, ::bitvec::order::Lsb0>;
+    type Ref<'a>
+        = bool
+    where
+        Self: 'a;
+    type Mut<'a>
+        = ::bitvec::ptr::BitRef<'a, ::bitvec::ptr::Mut, u8, ::bitvec::order::Lsb0>
+    where
+        Self: 'a;
     type Written = bool;
     const WIRE_TYPE: WireType = WireType::Varint;
 
     #[inline]
-    fn is_proto_empty<Pb: PresenceBits, A: Allocator>(
+    fn is_proto_empty<Pb: PresenceBits>(
         _slot: &Self::Slot,
         common: &MessageCommon<Pb, A>,
     ) -> bool {
@@ -442,7 +486,7 @@ impl<const VALUE_BIT: usize> ScalarProtoType for ProtoBool<VALUE_BIT> {
     }
 
     #[inline]
-    fn get<'a, Pb: PresenceBits, A: Allocator>(
+    fn get<'a, Pb: PresenceBits>(
         _slot: &'a Self::Slot,
         common: &'a MessageCommon<Pb, A>,
     ) -> bool {
@@ -450,23 +494,23 @@ impl<const VALUE_BIT: usize> ScalarProtoType for ProtoBool<VALUE_BIT> {
     }
 
     #[inline]
-    fn with_mut<'a, VS, I, Pb, A>(
+    fn with_mut<'a, VS, I, Pb>(
         slot: &'a mut VS,
         init: I,
         common: &'a mut MessageCommon<Pb, A>,
-    ) -> Self::Mut<'a, A>
+    ) -> Self::Mut<'a>
     where
         VS: ValueSlot<Self::Slot>,
         I: SlotInitMut,
         Pb: PresenceBits,
-        A: Allocator + Clone + 'a,
+        Self: 'a,
     {
         let _ = ValueSlot::with_mut(slot, init, common).get_mut();
         common.bit_mut(VALUE_BIT)
     }
 
     #[inline]
-    fn write<VS, I, Pb, A>(
+    fn write<VS, I, Pb>(
         slot: &mut VS,
         init: I,
         common: &mut MessageCommon<Pb, A>,
@@ -475,36 +519,40 @@ impl<const VALUE_BIT: usize> ScalarProtoType for ProtoBool<VALUE_BIT> {
         VS: ValueSlot<Self::Slot>,
         I: SlotInitMut,
         Pb: PresenceBits,
-        A: Allocator + Clone,
     {
         let _ = ValueSlot::with_mut(slot, init, common).get_mut();
         common.set_bit(VALUE_BIT, value);
     }
 
     #[inline]
-    fn clear<VS, I, Pb, A>(slot: &mut VS, init: I, common: &mut MessageCommon<Pb, A>)
+    fn clear<VS, I, Pb>(slot: &mut VS, init: I, common: &mut MessageCommon<Pb, A>)
     where
         VS: ValueSlot<Self::Slot>,
         I: SlotInitMut,
         Pb: PresenceBits,
-        A: Allocator + Clone,
     {
         common.set_bit(VALUE_BIT, false);
         ValueSlot::with_mut(slot, init, common).clear();
     }
 
     #[inline]
-    fn encoded_len(value: bool, field: u32) -> usize {
+    fn encoded_len<'a>(value: bool, field: u32) -> usize
+    where
+        Self: 'a,
+    {
         encode::encoded_len_varint_field(field, Self::encode_wire(value))
     }
 
     #[inline]
-    fn encode<B: BufMut>(value: bool, field: u32, buf: &mut B) {
+    fn encode<'a, B: BufMut>(value: bool, field: u32, buf: &mut B)
+    where
+        Self: 'a,
+    {
         encode::encode_varint_field(field, Self::encode_wire(value), buf);
     }
 
     #[inline]
-    fn decode<B: Buf, A: Allocator>(
+    fn decode<B: Buf>(
         wire_type: WireType,
         buf: &mut B,
         _alloc: A,

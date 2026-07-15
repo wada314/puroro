@@ -281,10 +281,10 @@ impl<'f, 'c, E, Pb: PresenceBits, A: Allocator> OneofSlotMut<'f, 'c, E, Pb, A> {
     /// `.merge(…)`.
     pub fn variant_mut<V>(
         self,
-    ) -> <<E as EnumVariant<V>>::Value as SingularAccess>::ViewMut<'f, 'c, Pb, A>
+    ) -> <<E as EnumVariant<V>>::Value as SingularAccess>::ViewMut<'f, 'c, Pb>
     where
         E: EnumVariant<V, Alloc = A> + OneofDeallocate<Pb, A>,
-        <E as EnumVariant<V>>::Value: SingularAccess,
+        <E as EnumVariant<V>>::Value: SingularAccess<Alloc = A>,
         A: Clone,
     {
         let slot = self.slot;
@@ -371,11 +371,11 @@ impl<'a, F, Pb: PresenceBits, A: Allocator> OneofVariantRef<'a, F, Pb, A> {
     }
 }
 
-impl<'a, T: ScalarProtoType, const FIELD: u32, D, Pb: PresenceBits, A: Allocator>
+impl<'a, T: ScalarProtoType<Alloc = A>, const FIELD: u32, D, Pb: PresenceBits, A: Allocator>
     OneofVariantRef<'a, SingularField<T, Oneof, FIELD, D>, Pb, A>
 where
-    for<'b> T::Ref<'b>: Copy,
-    D: for<'b> HasDefault<T::Ref<'b>>,
+    T::Ref<'a>: Copy,
+    D: HasDefault<T::Ref<'a>>,
     <Oneof as FieldPresence>::ValueSlot<T::Slot>: ValueSlot<T::Slot>,
 {
     pub fn optional(self) -> Optional<T::Ref<'a>, D>
@@ -389,12 +389,10 @@ where
     }
 }
 
-impl<'a, M, const FIELD: u32, A: Allocator, Pb: PresenceBits>
+impl<'a, M, const FIELD: u32, A: Allocator + Clone, Pb: PresenceBits>
     OneofVariantRef<'a, NestedMessageField<M, Oneof, FIELD, A>, Pb, A>
 {
     pub fn get(self) -> Option<&'a M>
-    where
-        A: Clone,
     {
         self.field.map(|f| f.bind(self.common).value())
     }

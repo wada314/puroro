@@ -3,8 +3,8 @@
 //! Elements are stored in an allocator-less [`UnmanagedVec`] wrapped in
 //! [`ManuallyDrop`]. Growth and release borrow the message allocator.
 
-use ::core::marker::PhantomData;
 use ::core::mem::ManuallyDrop;
+use ::core::marker::PhantomData;
 
 use ::allocator_api2::alloc::Allocator;
 use ::bytes::{Buf, BufMut};
@@ -31,8 +31,8 @@ pub struct RepeatedVarintField<
     const FIELD: u32,
     A: Allocator,
 > {
-    values: ManuallyDrop<UnmanagedVec<T::Value>>,
-    _marker: PhantomData<(E, A)>,
+    values: ManuallyDrop<UnmanagedVec<T::Value, A>>,
+    _encoding: PhantomData<E>,
 }
 
 impl<T: VarintProtoType, E: RepeatedVarintEncoding, const FIELD: u32, A: Allocator>
@@ -41,7 +41,7 @@ impl<T: VarintProtoType, E: RepeatedVarintEncoding, const FIELD: u32, A: Allocat
     pub fn new_in(alloc: A) -> Self {
         Self {
             values: ManuallyDrop::new(UnmanagedVec::new(alloc)),
-            _marker: PhantomData,
+            _encoding: PhantomData,
         }
     }
 
@@ -140,6 +140,7 @@ pub struct RepeatedVarintFieldRef<
     /// Bound for symmetry with [`RepeatedVarintFieldMut`]; unused by current getters.
     #[allow(dead_code)]
     common: &'a MessageCommon<Pb, A>,
+    _encoding: PhantomData<E>,
 }
 
 impl<
@@ -156,7 +157,7 @@ impl<
         field: &'a RepeatedVarintField<T, E, FIELD, A>,
         common: &'a MessageCommon<Pb, A>,
     ) -> Self {
-        Self { field, common }
+        Self { field, common, _encoding: PhantomData }
     }
 
     #[inline]
@@ -192,6 +193,7 @@ pub struct RepeatedVarintFieldMut<
 > {
     field: &'f mut RepeatedVarintField<T, E, FIELD, A>,
     common: &'c mut MessageCommon<Pb, A>,
+    _encoding: PhantomData<E>,
 }
 
 impl<
@@ -209,7 +211,7 @@ impl<
         field: &'f mut RepeatedVarintField<T, E, FIELD, A>,
         common: &'c mut MessageCommon<Pb, A>,
     ) -> Self {
-        Self { field, common }
+        Self { field, common, _encoding: PhantomData }
     }
 
     /// Returns a growable handle over the elements, backed by an owned clone of
@@ -279,6 +281,6 @@ pub type RepeatedExpandedVarintField<T, const FIELD: u32, A> =
     RepeatedVarintField<T, super::encoding::Expanded, FIELD, A>;
 
 pub type RepeatedPackedInt32<const FIELD: u32, A> =
-    RepeatedPackedVarintField<varint::ProtoInt32, FIELD, A>;
+    RepeatedPackedVarintField<varint::ProtoInt32<A>, FIELD, A>;
 pub type RepeatedExpandedInt32<const FIELD: u32, A> =
-    RepeatedExpandedVarintField<varint::ProtoInt32, FIELD, A>;
+    RepeatedExpandedVarintField<varint::ProtoInt32<A>, FIELD, A>;

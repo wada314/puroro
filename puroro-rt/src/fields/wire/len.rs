@@ -5,7 +5,7 @@
 //!
 //! # Singular vs repeated
 //!
-//! [`ProtoString`] / [`ProtoBytes`] are **thin wrappers** over allocator-less
+//! [`ProtoString`] / [`ProtoBytes`] are thin wrappers over allocator-typed
 //! storage. Singular fields store the wrapper
 //! ([`ScalarProtoType`](super::scalar::ScalarProtoType)). Repeated fields keep
 //! [`LenProtoType::Storage`] (the inner `UnmanagedString` / `UnmanagedVec<u8>`)
@@ -31,9 +31,11 @@ use ::puroro::WireType;
 /// [`Storage`](Self::Storage) is the **element type for repeated fields**.
 /// Singular fields store the thin wrapper type itself.
 pub trait LenProtoType {
-    /// Owned, allocator-less element storage for **repeated** fields
-    /// (`UnmanagedString`, `UnmanagedVec<u8>`, …).
-    type Storage: DefaultIn + DeallocateIn + ProtoEmpty;
+    /// Allocator type used by this protobuf marker and its storage.
+    type Alloc: Allocator + Clone;
+
+    /// Owned element storage for **repeated** fields.
+    type Storage: DefaultIn<Alloc = Self::Alloc> + DeallocateIn<Alloc = Self::Alloc> + ProtoEmpty;
 
     /// Borrowed view returned by getters (`&str`, `&[u8]`, …).
     type Ref<'a>
@@ -43,12 +45,12 @@ pub trait LenProtoType {
     /// Growable handle returned by `_mut` accessors, borrowing the storage
     /// together with an allocator `A`. Dereferences to the full owning type
     /// (`String<A>`, `Vec<u8, A>`) and writes back on drop.
-    type Mut<'a, A: Allocator + 'a>
+    type Mut<'a>
     where
         Self: 'a;
 
     /// Empty value used for IMPLICIT omit-on-encode and EXPLICIT unset slots.
-    fn new_in<A: Allocator>(alloc: A) -> Self::Storage;
+    fn new_in(alloc: Self::Alloc) -> Self::Storage;
 
     /// `true` when the field should be omitted on encode (IMPLICIT presence).
     fn is_empty(value: &Self::Storage) -> bool;
@@ -60,65 +62,74 @@ pub trait LenProtoType {
     fn as_bytes(value: &Self::Storage) -> &[u8];
 
     /// Borrows the storage together with `alloc`, yielding a growable guard.
-    fn with_alloc<'a, A: Allocator + 'a>(
+    fn with_alloc<'a>(
         value: &'a mut Self::Storage,
-        alloc: A,
-    ) -> Self::Mut<'a, A>;
+        alloc: Self::Alloc,
+    ) -> Self::Mut<'a>;
 
     /// Decodes one LEN payload (length varint + body consumed by helper).
-    fn decode<B: Buf, A: Allocator>(buf: &mut B, alloc: A) -> Result<Self::Storage, DecodeError>;
+    fn decode<B: Buf>(buf: &mut B, alloc: Self::Alloc) -> Result<Self::Storage, DecodeError>;
 
     /// Builds storage from an already-decoded payload slice (setters).
-    fn store_from_slice<A: Allocator>(v: &[u8], alloc: A) -> Result<Self::Storage, DecodeError>;
+    fn store_from_slice(v: &[u8], alloc: Self::Alloc) -> Result<Self::Storage, DecodeError>;
 
     /// Drops the value and frees its backing allocation through `alloc`.
     ///
     /// # Safety
     ///
     /// `alloc` must be the allocator that owns `value`'s buffer.
-    unsafe fn deallocate<A: Allocator>(value: Self::Storage, alloc: A);
+    unsafe fn deallocate(value: Self::Storage, alloc: Self::Alloc);
 }
 
 /// Protobuf `string` — thin wrapper over [`UnmanagedString`].
 #[repr(transparent)]
-pub struct ProtoString(pub UnmanagedString);
+pub struct ProtoString<A: Allocator>(pub UnmanagedString<A>);
 
-impl ::core::fmt::Debug for ProtoString {
+impl<A: Allocator> ::core::fmt::Debug for ProtoString<A> {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         f.debug_tuple("ProtoString").field(&&*self.0).finish()
     }
 }
 
-impl DefaultIn for ProtoString {
+impl<A: Allocator + Clone> DefaultIn for ProtoString<A> {
+    type Alloc = A;
+
     #[inline]
-    fn default_in<A: Allocator>(alloc: A) -> Self {
+    fn default_in(alloc: A) -> Self {
         Self(UnmanagedString::new(alloc))
     }
 }
 
-impl DeallocateIn for ProtoString {
+impl<A: Allocator + Clone> DeallocateIn for ProtoString<A> {
+    type Alloc = A;
+
     #[inline]
-    unsafe fn deallocate_in<A: Allocator>(self, alloc: A) {
+    unsafe fn deallocate_in(self, alloc: A) {
         unsafe { self.0.deallocate(alloc) };
     }
 }
 
-impl ProtoEmpty for ProtoString {
+impl<A: Allocator> ProtoEmpty for ProtoString<A> {
     #[inline]
     fn is_proto_empty(&self) -> bool {
         self.0.is_empty()
     }
 }
 
-impl LenProtoType for ProtoString {
-    type Storage = UnmanagedString;
-    type Ref<'a> = &'a str;
-    type Mut<'a, A: Allocator + 'a>
-        = StringGuard<'a, A>
+impl<A: Allocator + Clone> LenProtoType for ProtoString<A> {
+    type Alloc = A;
+    type Storage = UnmanagedString<A>;
+    type Ref<'a>
+        = &'a str
     where
         Self: 'a;
+    type Mut<'a>
+        = StringGuard<'a, A>
+    where
+        Self: 'a,
+        A: 'a;
 
-    fn new_in<A: Allocator>(alloc: A) -> Self::Storage {
+    fn new_in(alloc: A) -> Self::Storage {
         UnmanagedString::new(alloc)
     }
 
@@ -134,25 +145,25 @@ impl LenProtoType for ProtoString {
         value.as_bytes()
     }
 
-    fn with_alloc<'a, A: Allocator + 'a>(
+    fn with_alloc<'a>(
         value: &'a mut Self::Storage,
         alloc: A,
-    ) -> Self::Mut<'a, A> {
+    ) -> Self::Mut<'a> {
         // SAFETY: the caller always passes the same allocator that owns this
         // string's buffer.
         unsafe { value.with_alloc(alloc) }
     }
 
-    fn decode<B: Buf, A: Allocator>(buf: &mut B, alloc: A) -> Result<Self::Storage, DecodeError> {
+    fn decode<B: Buf>(buf: &mut B, alloc: A) -> Result<Self::Storage, DecodeError> {
         decode::decode_string_in(buf, alloc)
     }
 
-    fn store_from_slice<A: Allocator>(v: &[u8], alloc: A) -> Result<Self::Storage, DecodeError> {
+    fn store_from_slice(v: &[u8], alloc: A) -> Result<Self::Storage, DecodeError> {
         let s = ::core::str::from_utf8(v).map_err(|_| DecodeError::InvalidUtf8)?;
         Ok(decode::str_to_unmanaged_in(s, alloc))
     }
 
-    unsafe fn deallocate<A: Allocator>(value: Self::Storage, alloc: A) {
+    unsafe fn deallocate(value: Self::Storage, alloc: A) {
         // SAFETY: forwarded to the caller's obligation.
         unsafe { value.deallocate(alloc) };
     }
@@ -160,44 +171,53 @@ impl LenProtoType for ProtoString {
 
 /// Protobuf `bytes` — thin wrapper over [`UnmanagedVec<u8>`].
 #[repr(transparent)]
-pub struct ProtoBytes(pub UnmanagedVec<u8>);
+pub struct ProtoBytes<A: Allocator>(pub UnmanagedVec<u8, A>);
 
-impl ::core::fmt::Debug for ProtoBytes {
+impl<A: Allocator> ::core::fmt::Debug for ProtoBytes<A> {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         f.debug_tuple("ProtoBytes").field(&&*self.0).finish()
     }
 }
 
-impl DefaultIn for ProtoBytes {
+impl<A: Allocator + Clone> DefaultIn for ProtoBytes<A> {
+    type Alloc = A;
+
     #[inline]
-    fn default_in<A: Allocator>(alloc: A) -> Self {
+    fn default_in(alloc: A) -> Self {
         Self(UnmanagedVec::new(alloc))
     }
 }
 
-impl DeallocateIn for ProtoBytes {
+impl<A: Allocator + Clone> DeallocateIn for ProtoBytes<A> {
+    type Alloc = A;
+
     #[inline]
-    unsafe fn deallocate_in<A: Allocator>(self, alloc: A) {
+    unsafe fn deallocate_in(self, alloc: A) {
         unsafe { self.0.deallocate(alloc) };
     }
 }
 
-impl ProtoEmpty for ProtoBytes {
+impl<A: Allocator> ProtoEmpty for ProtoBytes<A> {
     #[inline]
     fn is_proto_empty(&self) -> bool {
         self.0.is_empty()
     }
 }
 
-impl LenProtoType for ProtoBytes {
-    type Storage = UnmanagedVec<u8>;
-    type Ref<'a> = &'a [u8];
-    type Mut<'a, A: Allocator + 'a>
-        = VecGuard<'a, u8, A>
+impl<A: Allocator + Clone> LenProtoType for ProtoBytes<A> {
+    type Alloc = A;
+    type Storage = UnmanagedVec<u8, A>;
+    type Ref<'a>
+        = &'a [u8]
     where
         Self: 'a;
+    type Mut<'a>
+        = VecGuard<'a, u8, A>
+    where
+        Self: 'a,
+        A: 'a;
 
-    fn new_in<A: Allocator>(alloc: A) -> Self::Storage {
+    fn new_in(alloc: A) -> Self::Storage {
         UnmanagedVec::new(alloc)
     }
 
@@ -213,24 +233,24 @@ impl LenProtoType for ProtoBytes {
         value
     }
 
-    fn with_alloc<'a, A: Allocator + 'a>(
+    fn with_alloc<'a>(
         value: &'a mut Self::Storage,
         alloc: A,
-    ) -> Self::Mut<'a, A> {
+    ) -> Self::Mut<'a> {
         // SAFETY: the caller always passes the same allocator that owns this
         // vector's buffer.
         unsafe { value.with_alloc(alloc) }
     }
 
-    fn decode<B: Buf, A: Allocator>(buf: &mut B, alloc: A) -> Result<Self::Storage, DecodeError> {
+    fn decode<B: Buf>(buf: &mut B, alloc: A) -> Result<Self::Storage, DecodeError> {
         decode::decode_bytes_in(buf, alloc)
     }
 
-    fn store_from_slice<A: Allocator>(v: &[u8], alloc: A) -> Result<Self::Storage, DecodeError> {
+    fn store_from_slice(v: &[u8], alloc: A) -> Result<Self::Storage, DecodeError> {
         Ok(decode::bytes_to_unmanaged_in(v, alloc))
     }
 
-    unsafe fn deallocate<A: Allocator>(value: Self::Storage, alloc: A) {
+    unsafe fn deallocate(value: Self::Storage, alloc: A) {
         // SAFETY: forwarded to the caller's obligation.
         unsafe { value.deallocate(alloc) };
     }

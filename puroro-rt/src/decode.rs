@@ -42,11 +42,11 @@ pub fn decode_tag<B: Buf>(buf: &mut B) -> Result<(u32, WireType), DecodeError> {
     Ok((u32::from(tag.field_number), tag.wire_type))
 }
 
-/// Decodes one LEN payload into an allocator-less [`UnmanagedVec<u8>`].
+/// Decodes one LEN payload into an [`UnmanagedVec<u8, A>`].
 pub(crate) fn decode_bytes_in<B: Buf, A: Allocator>(
     buf: &mut B,
     alloc: A,
-) -> Result<UnmanagedVec<u8>, DecodeError> {
+) -> Result<UnmanagedVec<u8, A>, DecodeError> {
     let len = decode_varint(buf)? as usize;
     if buf.remaining() < len {
         return Err(DecodeError::TruncatedMessage);
@@ -63,11 +63,11 @@ pub(crate) fn decode_bytes_in<B: Buf, A: Allocator>(
     Ok(UnmanagedVec::from_vec(vec))
 }
 
-/// Decodes one LEN payload as UTF-8 into an allocator-less [`UnmanagedString`].
+/// Decodes one LEN payload as UTF-8 into an [`UnmanagedString<A>`].
 pub(crate) fn decode_string_in<B: Buf, A: Allocator>(
     buf: &mut B,
     alloc: A,
-) -> Result<UnmanagedString, DecodeError> {
+) -> Result<UnmanagedString<A>, DecodeError> {
     let len = decode_varint(buf)? as usize;
     if buf.remaining() < len {
         return Err(DecodeError::TruncatedMessage);
@@ -79,13 +79,13 @@ pub(crate) fn decode_string_in<B: Buf, A: Allocator>(
 
 /// Copies `s` into a freshly allocated [`UnmanagedString`] backed by the owned
 /// `alloc` (its buffer is owned by allocator type `A`).
-pub(crate) fn str_to_unmanaged_in<A: Allocator>(s: &str, alloc: A) -> UnmanagedString {
+pub(crate) fn str_to_unmanaged_in<A: Allocator>(s: &str, alloc: A) -> UnmanagedString<A> {
     UnmanagedString::from_string(::unmanaged::String::from_str_in(s, alloc))
 }
 
 /// Copies `v` into a freshly allocated [`UnmanagedVec<u8>`] backed by the owned
 /// `alloc` (its buffer is owned by allocator type `A`).
-pub(crate) fn bytes_to_unmanaged_in<A: Allocator>(v: &[u8], alloc: A) -> UnmanagedVec<u8> {
+pub(crate) fn bytes_to_unmanaged_in<A: Allocator>(v: &[u8], alloc: A) -> UnmanagedVec<u8, A> {
     let mut vec = ::allocator_api2::vec::Vec::<u8, A>::with_capacity_in(v.len(), alloc);
     vec.extend_from_slice(v);
     UnmanagedVec::from_vec(vec)
@@ -95,7 +95,7 @@ pub fn skip_field_and_save<B: Buf, A: Allocator>(
     field_number: u32,
     wire_type: WireType,
     buf: &mut B,
-    unknown_fields: &mut UnmanagedVec<u8>,
+    unknown_fields: &mut UnmanagedVec<u8, A>,
     alloc: A,
 ) -> Result<(), DecodeError> {
     // SAFETY: the owned `alloc` (an `alloc.clone()` from the caller) is
@@ -142,7 +142,7 @@ pub fn skip_field_and_save<B: Buf, A: Allocator>(
 pub(crate) fn save_unknown_varint_field<A: Allocator>(
     field_number: u32,
     value: u64,
-    unknown_fields: &mut UnmanagedVec<u8>,
+    unknown_fields: &mut UnmanagedVec<u8, A>,
     alloc: A,
 ) {
     // SAFETY: the owned `alloc` (an `alloc.clone()` from the caller) is

@@ -5,10 +5,10 @@
 //!
 //! Storage is chosen by a [`MessagePresence`] marker:
 //!
-//! - [`Singular`] — `Option<UnmanagedBox<M>>`, for ordinary nested message
+//! - [`Singular`] — `Option<UnmanagedBox<M, A>>`, for ordinary nested message
 //!   fields whose presence is tracked by the field itself (absent vs present).
 //! - [`Oneof`](crate::fields::shared::field_presence::Oneof) —
-//!   `ManuallyDrop<UnmanagedBox<M>>` for oneof message variants: the enclosing
+//!   `ManuallyDrop<UnmanagedBox<M, A>>` for oneof message variants: the enclosing
 //!   `OneofSlot` tracks presence, so the box is *always* there (no `Option`) and
 //!   the field behaves like a scalar (`value` / `value_mut`). `ManuallyDrop`
 //!   lets [`FieldDeallocate`] take the box from `&mut self` without a later
@@ -36,8 +36,8 @@ use crate::fields::wire::len;
 /// Storage strategy for [`NestedMessageField`] — whether the child box is
 /// wrapped in `Option` (optional presence) or always present under `ManuallyDrop`.
 pub trait MessagePresence {
-    /// The stored container: `Option<UnmanagedBox<M>>` for [`Singular`],
-    /// `ManuallyDrop<UnmanagedBox<M>>` for [`Oneof`].
+    /// The stored container: `Option<UnmanagedBox<M, A>>` for [`Singular`],
+    /// `ManuallyDrop<UnmanagedBox<M, A>>` for [`Oneof`].
     type Store<M, A: Allocator>;
 
     /// Borrows the child when present (`None` only for [`Singular`] when absent).
@@ -51,10 +51,10 @@ pub trait MessagePresence {
         A: Clone;
 }
 
-/// Ordinary nested message field: `Option<UnmanagedBox<M>>`.
+/// Ordinary nested message field: `Option<UnmanagedBox<M, A>>`.
 pub struct Singular;
 impl MessagePresence for Singular {
-    type Store<M, A: Allocator> = Option<UnmanagedBox<M>>;
+    type Store<M, A: Allocator> = Option<UnmanagedBox<M, A>>;
 
     fn as_ref<M, A: Allocator>(store: &Self::Store<M, A>) -> Option<&M> {
         store.as_deref()
@@ -74,7 +74,7 @@ impl MessagePresence for Singular {
 }
 
 impl MessagePresence for Oneof {
-    type Store<M, A: Allocator> = ManuallyDrop<UnmanagedBox<M>>;
+    type Store<M, A: Allocator> = ManuallyDrop<UnmanagedBox<M, A>>;
 
     fn as_ref<M, A: Allocator>(store: &Self::Store<M, A>) -> Option<&M> {
         Some(store)

@@ -68,25 +68,20 @@ pub trait PresenceBits {
 /// parent message struct.
 ///
 /// The allocator `alloc` is the single canonical copy for the whole message:
-/// unmanaged field payloads borrow it (`&alloc`) for every operation that
-/// (de)allocates. `unknown_fields` is an allocator-less [`UnmanagedVec`] wrapped
-/// in [`ManuallyDrop`], so it never frees itself implicitly; the owning message
+/// unmanaged field payloads retain only its type and receive cloned instances
+/// for operations that (de)allocate. `unknown_fields` is wrapped in
+/// [`ManuallyDrop`], so it never frees itself implicitly; the owning message
 /// releases it via [`deallocate`](Self::deallocate) in its `Drop`.
 pub struct MessageCommon<P, A: Allocator> {
     pub presence: P,
-    pub unknown_fields: ManuallyDrop<UnmanagedVec<u8>>,
+    pub unknown_fields: ManuallyDrop<UnmanagedVec<u8, A>>,
     pub alloc: A,
 }
 
-impl<P, A: Allocator> MessageCommon<P, A> {
+impl<P, A: Allocator + Clone> MessageCommon<P, A> {
     /// Creates common state with the given presence bitfield and allocator.
     pub fn new_in(presence: P, alloc: A) -> Self {
-        // `UnmanagedVec::new` does not allocate; it only decomposes an empty
-        // `Vec`, so the borrow here never establishes buffer ownership (this is
-        // the documented no-op use of `UnmanagedVec::new(&alloc)`). Once the
-        // buffer actually grows it is owned by an owned-`A` clone, and it is
-        // freed with an owned-`A` clone in `deallocate`.
-        let unknown_fields = ManuallyDrop::new(UnmanagedVec::new(&alloc));
+        let unknown_fields = ManuallyDrop::new(UnmanagedVec::new(alloc.clone()));
         Self {
             presence,
             unknown_fields,
@@ -150,8 +145,11 @@ impl<P: PresenceBits, A: Allocator> MessageCommon<P, A> {
 /// This lets [`ValueSlot`](value_slot::ValueSlot) construct any stored value
 /// uniformly, whether or not it is heap-backed.
 pub trait DefaultIn {
+    /// Allocator type used by this value's backing storage.
+    type Alloc: Allocator + Clone;
+
     /// Builds the empty / type-zero value, using `alloc` when heap-backed.
-    fn default_in<A: Allocator>(alloc: A) -> Self;
+    fn default_in(alloc: Self::Alloc) -> Self;
 }
 
 /// Allocator-aware release of a stored value.
@@ -159,12 +157,15 @@ pub trait DefaultIn {
 /// Pairs with [`DefaultIn`] so [`ValueSlot`](value_slot::ValueSlot) can replace
 /// or clear a payload without leaking. Allocator-less scalars are a no-op.
 pub trait DeallocateIn {
+    /// Allocator type used by this value's backing storage.
+    type Alloc: Allocator + Clone;
+
     /// Drops the value and frees its backing allocation through `alloc`.
     ///
     /// # Safety
     ///
     /// `alloc` must be the allocator that owns this value's buffer.
-    unsafe fn deallocate_in<A: Allocator>(self, alloc: A);
+    unsafe fn deallocate_in(self, alloc: Self::Alloc);
 }
 
 /// Empty / type-zero predicate for IMPLICIT omit-on-encode.
@@ -175,73 +176,52 @@ pub trait ProtoEmpty {
     fn is_proto_empty(&self) -> bool;
 }
 
-macro_rules! impl_copy_scalar_slot {
-    ($ty:ty, $zero:expr) => {
-        impl DefaultIn for $ty {
-            #[inline]
-            fn default_in<A: Allocator>(_alloc: A) -> Self {
-                $zero
-            }
-        }
+impl<A: Allocator + Clone> DefaultIn for ::unmanaged::UnmanagedString<A> {
+    type Alloc = A;
 
-        impl DeallocateIn for $ty {
-            #[inline]
-            unsafe fn deallocate_in<A: Allocator>(self, _alloc: A) {}
-        }
-
-        impl ProtoEmpty for $ty {
-            #[inline]
-            fn is_proto_empty(&self) -> bool {
-                *self == $zero
-            }
-        }
-    };
-}
-
-impl_copy_scalar_slot!(i32, 0);
-impl_copy_scalar_slot!(i64, 0);
-impl_copy_scalar_slot!(u32, 0);
-impl_copy_scalar_slot!(u64, 0);
-impl_copy_scalar_slot!(bool, false);
-
-impl DefaultIn for ::unmanaged::UnmanagedString {
     #[inline]
-    fn default_in<A: Allocator>(alloc: A) -> Self {
+    fn default_in(alloc: A) -> Self {
         ::unmanaged::UnmanagedString::new(alloc)
     }
 }
 
-impl DeallocateIn for ::unmanaged::UnmanagedString {
+impl<A: Allocator + Clone> DeallocateIn for ::unmanaged::UnmanagedString<A> {
+    type Alloc = A;
+
     #[inline]
-    unsafe fn deallocate_in<A: Allocator>(self, alloc: A) {
+    unsafe fn deallocate_in(self, alloc: A) {
         // SAFETY: forwarded to the caller's obligation on `alloc`.
         unsafe { self.deallocate(alloc) };
     }
 }
 
-impl ProtoEmpty for ::unmanaged::UnmanagedString {
+impl<A: Allocator> ProtoEmpty for ::unmanaged::UnmanagedString<A> {
     #[inline]
     fn is_proto_empty(&self) -> bool {
         self.is_empty()
     }
 }
 
-impl DefaultIn for ::unmanaged::UnmanagedVec<u8> {
+impl<A: Allocator + Clone> DefaultIn for ::unmanaged::UnmanagedVec<u8, A> {
+    type Alloc = A;
+
     #[inline]
-    fn default_in<A: Allocator>(alloc: A) -> Self {
+    fn default_in(alloc: A) -> Self {
         ::unmanaged::UnmanagedVec::new(alloc)
     }
 }
 
-impl DeallocateIn for ::unmanaged::UnmanagedVec<u8> {
+impl<A: Allocator + Clone> DeallocateIn for ::unmanaged::UnmanagedVec<u8, A> {
+    type Alloc = A;
+
     #[inline]
-    unsafe fn deallocate_in<A: Allocator>(self, alloc: A) {
+    unsafe fn deallocate_in(self, alloc: A) {
         // SAFETY: forwarded to the caller's obligation on `alloc`.
         unsafe { self.deallocate(alloc) };
     }
 }
 
-impl ProtoEmpty for ::unmanaged::UnmanagedVec<u8> {
+impl<A: Allocator> ProtoEmpty for ::unmanaged::UnmanagedVec<u8, A> {
     #[inline]
     fn is_proto_empty(&self) -> bool {
         self.is_empty()

@@ -28,10 +28,10 @@ pub type ImplicitVarint<T, const FIELD: u32> = ImplicitVarintField<T, FIELD>;
 pub type ExplicitVarint<T, const BIT: usize, const FIELD: u32, D = ProtoDefault> =
     ExplicitVarintField<T, BIT, FIELD, D>;
 
-pub type ImplicitInt32<const FIELD: u32> = ImplicitVarintField<varint::ProtoInt32, FIELD>;
-pub type ExplicitInt32<const BIT: usize, const FIELD: u32, D = ProtoDefault> =
-    ExplicitVarintField<varint::ProtoInt32, BIT, FIELD, D>;
-pub type ImplicitEnum<E, K, const FIELD: u32> =
-    ImplicitVarintField<varint::ProtoEnum<E, K>, FIELD>;
-pub type ExplicitEnum<E, K, const BIT: usize, const FIELD: u32, D = ProtoDefault> =
-    ExplicitVarintField<varint::ProtoEnum<E, K>, BIT, FIELD, D>;
+pub type ImplicitInt32<A, const FIELD: u32> = ImplicitVarintField<varint::ProtoInt32<A>, FIELD>;
+pub type ExplicitInt32<A, const BIT: usize, const FIELD: u32, D = ProtoDefault> =
+    ExplicitVarintField<varint::ProtoInt32<A>, BIT, FIELD, D>;
+pub type ImplicitEnum<E, K, A, const FIELD: u32> =
+    ImplicitVarintField<varint::ProtoEnum<E, K, A>, FIELD>;
+pub type ExplicitEnum<E, K, A, const BIT: usize, const FIELD: u32, D = ProtoDefault> =
+    ExplicitVarintField<varint::ProtoEnum<E, K, A>, BIT, FIELD, D>;

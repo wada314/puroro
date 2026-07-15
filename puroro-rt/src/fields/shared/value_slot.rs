@@ -30,50 +30,54 @@ use crate::fields::wire::varint::{
 /// Marker for payloads stored as addressable `T` / [`MaybeUninit<T>`] in the
 /// field slot (varint wrappers, LEN wrappers, enums, and ZST [`ProtoBool`] for
 /// bit-packed bool presence/init only).
-pub trait AddressableSlot: DefaultIn + DeallocateIn {}
+pub trait AddressableSlot:
+    DefaultIn<Alloc = Self::SlotAlloc> + DeallocateIn<Alloc = Self::SlotAlloc>
+{
+    type SlotAlloc: Allocator + Clone;
+}
 
-impl AddressableSlot for ProtoUInt32 {}
-impl AddressableSlot for ProtoUInt64 {}
-impl AddressableSlot for ProtoInt32 {}
-impl AddressableSlot for ProtoInt64 {}
-impl AddressableSlot for ProtoSint32 {}
-impl AddressableSlot for ProtoSint64 {}
-impl AddressableSlot for ProtoString {}
-impl AddressableSlot for ProtoBytes {}
-impl<E: ProtoEnumStorage, K> AddressableSlot for ProtoEnum<E, K> {}
-impl<const VALUE_BIT: usize> AddressableSlot for ProtoBool<VALUE_BIT> {}
+impl<A: Allocator + Clone> AddressableSlot for ProtoUInt32<A> { type SlotAlloc = A; }
+impl<A: Allocator + Clone> AddressableSlot for ProtoUInt64<A> { type SlotAlloc = A; }
+impl<A: Allocator + Clone> AddressableSlot for ProtoInt32<A> { type SlotAlloc = A; }
+impl<A: Allocator + Clone> AddressableSlot for ProtoInt64<A> { type SlotAlloc = A; }
+impl<A: Allocator + Clone> AddressableSlot for ProtoSint32<A> { type SlotAlloc = A; }
+impl<A: Allocator + Clone> AddressableSlot for ProtoSint64<A> { type SlotAlloc = A; }
+impl<A: Allocator + Clone> AddressableSlot for ProtoString<A> { type SlotAlloc = A; }
+impl<A: Allocator + Clone> AddressableSlot for ProtoBytes<A> { type SlotAlloc = A; }
+impl<E: ProtoEnumStorage, K, A: Allocator + Clone> AddressableSlot for ProtoEnum<E, K, A> { type SlotAlloc = A; }
+impl<A: Allocator + Clone, const VALUE_BIT: usize> AddressableSlot for ProtoBool<A, VALUE_BIT> { type SlotAlloc = A; }
 
 /// Storage construction / teardown and view binding for a singular field value slot.
 ///
 /// Prefer [`with`](Self::with) / [`with_mut`](Self::with_mut) for reads and
 /// mutation. [`new_in`](Self::new_in) / [`deallocate_in`](Self::deallocate_in)
 /// cover construction and message / oneof teardown.
-pub trait ValueSlot<T: DefaultIn + DeallocateIn>: Sized {
+pub trait ValueSlot<T: AddressableSlot>: Sized {
     /// Creates value storage when the parent message is constructed.
     ///
     /// For raw `T`, returns [`DefaultIn::default_in`] — the slot is always
     /// initialized. For [`MaybeUninit`], returns [`MaybeUninit::uninit`] and
     /// ignores `alloc` — the slot starts absent.
-    fn new_in<A: Allocator>(alloc: A) -> Self;
+    fn new_in(alloc: <T as DefaultIn>::Alloc) -> Self;
 
     /// Consumes the slot and frees any live payload through `alloc`.
     ///
     /// Used from message / oneof `Drop` paths. `initialized` is taken from the
     /// init marker + [`MessageCommon`] by the caller.
-    fn deallocate_in<A: Allocator>(self, initialized: bool, alloc: A);
+    fn deallocate_in(self, initialized: bool, alloc: <T as DefaultIn>::Alloc);
 
     /// Pairs this slot with an init marker and message common for read access.
-    fn with<'s, I: SlotInitView, Pb: PresenceBits, A: Allocator>(
+    fn with<'s, I: SlotInitView, Pb: PresenceBits>(
         &'s self,
         init: I,
-        common: &'s MessageCommon<Pb, A>,
+        common: &'s MessageCommon<Pb, T::SlotAlloc>,
     ) -> impl ValueSlotRefAccess<'s, T>;
 
     /// Pairs this slot with an init marker and message common for mutation.
-    fn with_mut<'a, I: SlotInitMut, Pb: PresenceBits, A: Allocator + Clone>(
+    fn with_mut<'a, I: SlotInitMut, Pb: PresenceBits>(
         &'a mut self,
         init: I,
-        common: &'a mut MessageCommon<Pb, A>,
+        common: &'a mut MessageCommon<Pb, T::SlotAlloc>,
     ) -> impl ValueSlotMutAccess<'a, T>;
 }
 
@@ -143,7 +147,7 @@ pub struct ValueSlotMut<'a, S: ?Sized, T, I: SlotInitMut, Pb: PresenceBits, A: A
     _t: PhantomData<T>,
 }
 
-impl<'a, T: AddressableSlot, I: SlotInitMut, Pb: PresenceBits, A: Allocator + Clone>
+impl<'a, T: AddressableSlot<SlotAlloc = A>, I: SlotInitMut, Pb: PresenceBits, A: Allocator + Clone>
     ValueSlotMutAccess<'a, T> for ValueSlotMut<'a, T, T, I, Pb, A>
 {
     #[inline]
@@ -166,7 +170,7 @@ impl<'a, T: AddressableSlot, I: SlotInitMut, Pb: PresenceBits, A: Allocator + Cl
     }
 }
 
-impl<'a, T: AddressableSlot, I: SlotInitMut, Pb: PresenceBits, A: Allocator + Clone>
+impl<'a, T: AddressableSlot<SlotAlloc = A>, I: SlotInitMut, Pb: PresenceBits, A: Allocator + Clone>
     ValueSlotMutAccess<'a, T> for ValueSlotMut<'a, MaybeUninit<T>, T, I, Pb, A>
 {
     #[inline]
@@ -205,20 +209,20 @@ impl<'a, T: AddressableSlot, I: SlotInitMut, Pb: PresenceBits, A: Allocator + Cl
 }
 
 impl<T: AddressableSlot> ValueSlot<T> for T {
-    fn new_in<A: Allocator>(alloc: A) -> Self {
+    fn new_in(alloc: <T as DefaultIn>::Alloc) -> Self {
         T::default_in(alloc)
     }
 
-    fn deallocate_in<A: Allocator>(self, _: bool, alloc: A) {
+    fn deallocate_in(self, _: bool, alloc: <T as DefaultIn>::Alloc) {
         // SAFETY: `alloc` owns this value's buffer.
         unsafe { DeallocateIn::deallocate_in(self, alloc) };
     }
 
     #[inline]
-    fn with<'s, I: SlotInitView, Pb: PresenceBits, A: Allocator>(
+    fn with<'s, I: SlotInitView, Pb: PresenceBits>(
         &'s self,
         init: I,
-        common: &'s MessageCommon<Pb, A>,
+        common: &'s MessageCommon<Pb, T::SlotAlloc>,
     ) -> impl ValueSlotRefAccess<'s, T> {
         ValueSlotRef {
             slot: self,
@@ -229,10 +233,10 @@ impl<T: AddressableSlot> ValueSlot<T> for T {
     }
 
     #[inline]
-    fn with_mut<'a, I: SlotInitMut, Pb: PresenceBits, A: Allocator + Clone>(
+    fn with_mut<'a, I: SlotInitMut, Pb: PresenceBits>(
         &'a mut self,
         init: I,
-        common: &'a mut MessageCommon<Pb, A>,
+        common: &'a mut MessageCommon<Pb, T::SlotAlloc>,
     ) -> impl ValueSlotMutAccess<'a, T> {
         ValueSlotMut {
             slot: self,
@@ -244,11 +248,11 @@ impl<T: AddressableSlot> ValueSlot<T> for T {
 }
 
 impl<T: AddressableSlot> ValueSlot<T> for MaybeUninit<T> {
-    fn new_in<A: Allocator>(_alloc: A) -> Self {
+    fn new_in(_alloc: <T as DefaultIn>::Alloc) -> Self {
         MaybeUninit::uninit()
     }
 
-    fn deallocate_in<A: Allocator>(self, initialized: bool, alloc: A) {
+    fn deallocate_in(self, initialized: bool, alloc: <T as DefaultIn>::Alloc) {
         if initialized {
             // SAFETY: init bit set implies a live payload we now take ownership of.
             let value = unsafe { self.assume_init() };
@@ -258,10 +262,10 @@ impl<T: AddressableSlot> ValueSlot<T> for MaybeUninit<T> {
     }
 
     #[inline]
-    fn with<'s, I: SlotInitView, Pb: PresenceBits, A: Allocator>(
+    fn with<'s, I: SlotInitView, Pb: PresenceBits>(
         &'s self,
         init: I,
-        common: &'s MessageCommon<Pb, A>,
+        common: &'s MessageCommon<Pb, T::SlotAlloc>,
     ) -> impl ValueSlotRefAccess<'s, T> {
         ValueSlotRef {
             slot: self,
@@ -272,10 +276,10 @@ impl<T: AddressableSlot> ValueSlot<T> for MaybeUninit<T> {
     }
 
     #[inline]
-    fn with_mut<'a, I: SlotInitMut, Pb: PresenceBits, A: Allocator + Clone>(
+    fn with_mut<'a, I: SlotInitMut, Pb: PresenceBits>(
         &'a mut self,
         init: I,
-        common: &'a mut MessageCommon<Pb, A>,
+        common: &'a mut MessageCommon<Pb, T::SlotAlloc>,
     ) -> impl ValueSlotMutAccess<'a, T> {
         ValueSlotMut {
             slot: self,

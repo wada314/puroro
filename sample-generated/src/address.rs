@@ -65,8 +65,8 @@ pub const FIELD_CITY: u32 = 2; // city
 
 pub struct Address<A: Allocator + Clone = Global> {
     _common: MessageCommon<AddressPresence, A>,
-    street: SingularLenField<ProtoString, Explicit<{ BIT_STREET }>, { FIELD_STREET }>, // proto: string street = 1;
-    city: SingularLenField<ProtoString, Explicit<{ BIT_CITY }>, { FIELD_CITY }>, // proto: string city = 2;
+    street: SingularLenField<ProtoString<A>, Explicit<{ BIT_STREET }>, { FIELD_STREET }>, // proto: string street = 1;
+    city: SingularLenField<ProtoString<A>, Explicit<{ BIT_CITY }>, { FIELD_CITY }>, // proto: string city = 2;
 }
 
 impl<A: Allocator + Clone> Address<A> {
@@ -82,7 +82,10 @@ impl<A: Allocator + Clone> Address<A> {
 
     // -- street (EXPLICIT string, proto field 1) ----------------------------
 
-    pub fn street<'a>(&'a self) -> ::puroro::Optional<&'a str, impl ::puroro::HasDefault<&'a str>> {
+    pub fn street<'a>(&'a self) -> ::puroro::Optional<&'a str, impl ::puroro::HasDefault<&'a str>>
+    where
+        A: 'a,
+    {
         self.street.bind(&self._common).optional()
     }
 
@@ -98,7 +101,10 @@ impl<A: Allocator + Clone> Address<A> {
 
     // -- city (EXPLICIT string, proto field 2) ------------------------------
 
-    pub fn city<'a>(&'a self) -> ::puroro::Optional<&'a str, impl ::puroro::HasDefault<&'a str>> {
+    pub fn city<'a>(&'a self) -> ::puroro::Optional<&'a str, impl ::puroro::HasDefault<&'a str>>
+    where
+        A: 'a,
+    {
         self.city.bind(&self._common).optional()
     }
 

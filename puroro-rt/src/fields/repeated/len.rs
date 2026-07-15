@@ -5,7 +5,6 @@
 //! ([`LenProtoType::Storage`]). Releasing therefore drains and frees every
 //! element first, then frees the buffer.
 
-use ::core::marker::PhantomData;
 use ::core::mem::ManuallyDrop;
 
 use ::allocator_api2::alloc::Allocator;
@@ -20,16 +19,14 @@ use crate::fields::shared::{FieldDeallocate, MessageCommon, PresenceBits};
 use crate::fields::wire::len::{self, LenProtoType};
 
 /// Repeated field whose elements are length-delimited records (one tag per element).
-pub struct RepeatedLenField<T: LenProtoType, const FIELD: u32, A: Allocator> {
-    values: ManuallyDrop<UnmanagedVec<T::Storage>>,
-    _marker: PhantomData<A>,
+pub struct RepeatedLenField<T: LenProtoType<Alloc = A>, const FIELD: u32, A: Allocator> {
+    values: ManuallyDrop<UnmanagedVec<T::Storage, A>>,
 }
 
-impl<T: LenProtoType, const FIELD: u32, A: Allocator> RepeatedLenField<T, FIELD, A> {
+impl<T: LenProtoType<Alloc = A>, const FIELD: u32, A: Allocator> RepeatedLenField<T, FIELD, A> {
     pub fn new_in(alloc: A) -> Self {
         Self {
             values: ManuallyDrop::new(UnmanagedVec::new(alloc)),
-            _marker: PhantomData,
         }
     }
 
@@ -87,7 +84,7 @@ impl<T: LenProtoType, const FIELD: u32, A: Allocator> RepeatedLenField<T, FIELD,
     }
 }
 
-impl<T: LenProtoType, const FIELD: u32, Pb: PresenceBits, A: Allocator + Clone>
+impl<T: LenProtoType<Alloc = A>, const FIELD: u32, Pb: PresenceBits, A: Allocator + Clone>
     FieldDeallocate<Pb, A> for RepeatedLenField<T, FIELD, A>
 {
     /// Releases every element and the backing buffer through `common.alloc`.
@@ -119,7 +116,7 @@ impl<T: LenProtoType, const FIELD: u32, Pb: PresenceBits, A: Allocator + Clone>
 /// accessor does not consult `common`.
 pub struct RepeatedLenFieldRef<
     'a,
-    T: LenProtoType,
+    T: LenProtoType<Alloc = A>,
     const FIELD: u32,
     Pb: PresenceBits,
     A: Allocator,
@@ -130,7 +127,7 @@ pub struct RepeatedLenFieldRef<
     common: &'a MessageCommon<Pb, A>,
 }
 
-impl<'a, T: LenProtoType, const FIELD: u32, Pb: PresenceBits, A: Allocator>
+impl<'a, T: LenProtoType<Alloc = A>, const FIELD: u32, Pb: PresenceBits, A: Allocator>
     RepeatedLenFieldRef<'a, T, FIELD, Pb, A>
 {
     #[inline]
@@ -163,7 +160,7 @@ impl<'a, T: LenProtoType, const FIELD: u32, Pb: PresenceBits, A: Allocator>
 pub struct RepeatedLenFieldMut<
     'f,
     'c,
-    T: LenProtoType,
+    T: LenProtoType<Alloc = A>,
     const FIELD: u32,
     Pb: PresenceBits,
     A: Allocator,
@@ -172,7 +169,7 @@ pub struct RepeatedLenFieldMut<
     common: &'c mut MessageCommon<Pb, A>,
 }
 
-impl<'f, 'c, T: LenProtoType, const FIELD: u32, Pb: PresenceBits, A: Allocator>
+impl<'f, 'c, T: LenProtoType<Alloc = A>, const FIELD: u32, Pb: PresenceBits, A: Allocator>
     RepeatedLenFieldMut<'f, 'c, T, FIELD, Pb, A>
 {
     #[inline]
@@ -234,5 +231,5 @@ impl<'f, 'c, T: LenProtoType, const FIELD: u32, Pb: PresenceBits, A: Allocator>
 // ---------------------------------------------------------------------------
 
 pub type RepeatedLen<T, const FIELD: u32, A> = RepeatedLenField<T, FIELD, A>;
-pub type RepeatedString<const FIELD: u32, A> = RepeatedLenField<len::ProtoString, FIELD, A>;
-pub type RepeatedBytes<const FIELD: u32, A> = RepeatedLenField<len::ProtoBytes, FIELD, A>;
+pub type RepeatedString<const FIELD: u32, A> = RepeatedLenField<len::ProtoString<A>, FIELD, A>;
+pub type RepeatedBytes<const FIELD: u32, A> = RepeatedLenField<len::ProtoBytes<A>, FIELD, A>;

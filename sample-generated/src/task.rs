@@ -116,22 +116,22 @@ pub const FIELD_URGENT: u32 = 18; // notification.urgent (oneof bool)
 /// Reference `Task` message from `DESIGN.md`.
 pub struct Task<A: Allocator + Clone = Global> {
     _common: MessageCommon<TaskPresence, A>,
-    title: SingularLenField<ProtoString, Explicit<{ BIT_TITLE }>, { FIELD_TITLE }>, // proto: string title = 1;
-    score: SingularVarintField<ProtoInt32, Implicit, { FIELD_SCORE }>, // proto: int32 score = 2;
+    title: SingularLenField<ProtoString<A>, Explicit<{ BIT_TITLE }>, { FIELD_TITLE }>, // proto: string title = 1;
+    score: SingularVarintField<ProtoInt32<A>, Implicit, { FIELD_SCORE }>, // proto: int32 score = 2;
     max_retries: SingularVarintField<
-        ProtoInt32,
+        ProtoInt32<A>,
         Explicit<{ BIT_MAX_RETRIES }>,
         { FIELD_MAX_RETRIES },
         MaxRetriesDefault,
     >, // proto: int32 max_retries = 3;
-    owner_id: SingularLenField<ProtoString, LegacyRequired<{ BIT_OWNER_ID }>, { FIELD_OWNER_ID }>, // proto: string owner_id = 4;
-    payload: SingularLenField<ProtoBytes, Explicit<{ BIT_PAYLOAD }>, { FIELD_PAYLOAD }>, // proto: bytes payload = 5;
-    tag_ids: RepeatedPackedVarintField<ProtoInt32, { FIELD_TAG_IDS }, A>, // proto: repeated int32 tag_ids = 6 [packed];
-    scores: RepeatedExpandedVarintField<ProtoInt32, { FIELD_SCORES }, A>, // proto: repeated int32 scores = 7;
-    labels: RepeatedLenField<ProtoString, { FIELD_LABELS }, A>, // proto: repeated string labels = 8;
-    status: SingularVarintField<ProtoEnum<Status, Open>, Implicit, { FIELD_STATUS }>, // proto: Status status = 9;
+    owner_id: SingularLenField<ProtoString<A>, LegacyRequired<{ BIT_OWNER_ID }>, { FIELD_OWNER_ID }>, // proto: string owner_id = 4;
+    payload: SingularLenField<ProtoBytes<A>, Explicit<{ BIT_PAYLOAD }>, { FIELD_PAYLOAD }>, // proto: bytes payload = 5;
+    tag_ids: RepeatedPackedVarintField<ProtoInt32<A>, { FIELD_TAG_IDS }, A>, // proto: repeated int32 tag_ids = 6 [packed];
+    scores: RepeatedExpandedVarintField<ProtoInt32<A>, { FIELD_SCORES }, A>, // proto: repeated int32 scores = 7;
+    labels: RepeatedLenField<ProtoString<A>, { FIELD_LABELS }, A>, // proto: repeated string labels = 8;
+    status: SingularVarintField<ProtoEnum<Status, Open, A>, Implicit, { FIELD_STATUS }>, // proto: Status status = 9;
     priority: SingularVarintField<
-        ProtoEnum<Priority, Closed>,
+        ProtoEnum<Priority, Closed, A>,
         Explicit<{ BIT_PRIORITY }>,
         { FIELD_PRIORITY },
     >, // proto: Priority priority = 10;
@@ -140,9 +140,9 @@ pub struct Task<A: Allocator + Clone = Global> {
     //                             int32 webhook_id=14 [default=-1]; Address postal=15;
     //                             bool urgent=18; }
     notification: OneofSlot<NotificationStorage<A>>,
-    done: SingularVarintField<ProtoBool<{ BIT_DONE_VALUE }>, Implicit, { FIELD_DONE }>, // proto: bool done = 16;
+    done: SingularVarintField<ProtoBool<A, { BIT_DONE_VALUE }>, Implicit, { FIELD_DONE }>, // proto: bool done = 16;
     flag: SingularVarintField<
-        ProtoBool<{ BIT_FLAG_VALUE }>,
+        ProtoBool<A, { BIT_FLAG_VALUE }>,
         Explicit<{ BIT_FLAG }>,
         { FIELD_FLAG },
     >, // proto: bool flag = 17;
@@ -173,7 +173,10 @@ impl<A: Allocator + Clone> Task<A> {
 
     // -- title (EXPLICIT string, proto field 1) ----------------------------
 
-    pub fn title<'a>(&'a self) -> Optional<&'a str, impl HasDefault<&'a str>> {
+    pub fn title<'a>(&'a self) -> Optional<&'a str, impl HasDefault<&'a str>>
+    where
+        A: 'a,
+    {
         self.title.bind(&self._common).optional()
     }
 
@@ -203,7 +206,10 @@ impl<A: Allocator + Clone> Task<A> {
 
     // -- max_retries (EXPLICIT int32, default = 3, proto field 3) ------------
 
-    pub fn max_retries(&self) -> Optional<i32, impl HasDefault<i32>> {
+    pub fn max_retries<'a>(&'a self) -> Optional<i32, impl HasDefault<i32>>
+    where
+        A: 'a,
+    {
         self.max_retries.bind(&self._common).optional()
     }
 
@@ -217,7 +223,10 @@ impl<A: Allocator + Clone> Task<A> {
 
     // -- owner_id (LEGACY_REQUIRED string, proto field 4) --------------------
 
-    pub fn owner_id<'a>(&'a self) -> Optional<&'a str, impl HasDefault<&'a str>> {
+    pub fn owner_id<'a>(&'a self) -> Optional<&'a str, impl HasDefault<&'a str>>
+    where
+        A: 'a,
+    {
         self.owner_id.bind(&self._common).optional()
     }
 
@@ -233,7 +242,10 @@ impl<A: Allocator + Clone> Task<A> {
 
     // -- payload (EXPLICIT bytes, proto field 5) -----------------------------
 
-    pub fn payload<'a>(&'a self) -> Optional<&'a [u8], impl HasDefault<&'a [u8]>> {
+    pub fn payload<'a>(&'a self) -> Optional<&'a [u8], impl HasDefault<&'a [u8]>>
+    where
+        A: 'a,
+    {
         self.payload.bind(&self._common).optional()
     }
 
@@ -281,7 +293,7 @@ impl<A: Allocator + Clone> Task<A> {
 
     // -- labels (repeated string, proto field 8) -----------------------------
 
-    pub fn labels(&self) -> &[::unmanaged::UnmanagedString] {
+    pub fn labels(&self) -> &[::unmanaged::UnmanagedString<A>] {
         self.labels.bind(&self._common).as_slice()
     }
 
@@ -297,7 +309,10 @@ impl<A: Allocator + Clone> Task<A> {
 
     // -- status (IMPLICIT open enum, proto field 9) -------------------------
 
-    pub fn status(&self) -> Optional<Status, impl HasDefault<Status>> {
+    pub fn status<'a>(&'a self) -> Optional<Status, impl HasDefault<Status>>
+    where
+        A: 'a,
+    {
         self.status.bind(&self._common).optional()
     }
 
@@ -311,7 +326,10 @@ impl<A: Allocator + Clone> Task<A> {
 
     // -- priority (EXPLICIT closed enum, proto field 10) ---------------------
 
-    pub fn priority(&self) -> Optional<Priority, impl HasDefault<Priority>> {
+    pub fn priority<'a>(&'a self) -> Optional<Priority, impl HasDefault<Priority>>
+    where
+        A: 'a,
+    {
         self.priority.bind(&self._common).optional()
     }
 
@@ -353,7 +371,10 @@ impl<A: Allocator + Clone> Task<A> {
 
     // -- flag (EXPLICIT bool, proto field 17) --------------------------------
 
-    pub fn flag(&self) -> Optional<bool, impl HasDefault<bool>> {
+    pub fn flag<'a>(&'a self) -> Optional<bool, impl HasDefault<bool>>
+    where
+        A: 'a,
+    {
         self.flag.bind(&self._common).optional()
     }
 
@@ -411,7 +432,10 @@ impl<A: Allocator + Clone> Task<A> {
 
     // -- notification.email_address (string, proto field 12) ----------------
 
-    pub fn email_address<'a>(&'a self) -> Optional<&'a str, impl HasDefault<&'a str>> {
+    pub fn email_address<'a>(&'a self) -> Optional<&'a str, impl HasDefault<&'a str>>
+    where
+        A: 'a,
+    {
         // Unset / other variant → Optional::None → get() is ProtoDefault ("").
         self.notification
             .bind(&self._common)
@@ -430,7 +454,10 @@ impl<A: Allocator + Clone> Task<A> {
 
     // -- notification.phone_number (string, proto field 13) -----------------
 
-    pub fn phone_number<'a>(&'a self) -> Optional<&'a str, impl HasDefault<&'a str>> {
+    pub fn phone_number<'a>(&'a self) -> Optional<&'a str, impl HasDefault<&'a str>>
+    where
+        A: 'a,
+    {
         self.notification
             .bind(&self._common)
             .variant_of::<PhoneNumber>()
@@ -450,7 +477,10 @@ impl<A: Allocator + Clone> Task<A> {
 
     /// `[default = -1]`: when this variant is not active, `get()` returns `-1`
     /// and `is_set()` is false (does not select the variant).
-    pub fn webhook_id(&self) -> Optional<i32, impl HasDefault<i32>> {
+    pub fn webhook_id<'a>(&'a self) -> Optional<i32, impl HasDefault<i32>>
+    where
+        A: 'a,
+    {
         self.notification
             .bind(&self._common)
             .variant_of::<WebhookId>()
@@ -486,7 +516,10 @@ impl<A: Allocator + Clone> Task<A> {
 
     // -- notification.urgent (bool, proto field 18) -------------------------
 
-    pub fn urgent(&self) -> Optional<bool, impl HasDefault<bool>> {
+    pub fn urgent<'a>(&'a self) -> Optional<bool, impl HasDefault<bool>>
+    where
+        A: 'a,
+    {
         self.notification
             .bind(&self._common)
             .variant_of::<Urgent>()

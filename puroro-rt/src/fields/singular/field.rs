@@ -83,17 +83,16 @@ where
 {
     /// Creates a field with an empty value slot.
     #[inline]
-    pub fn new_in<A: Allocator>(alloc: A) -> Self {
+    pub fn new_in(alloc: T::Alloc) -> Self {
         Self {
             value: ManuallyDrop::new(ValueSlot::new_in(alloc)),
             _marker: PhantomData,
         }
     }
 
-    pub fn encoded_len<Pb, A>(&self, common: &MessageCommon<Pb, A>) -> usize
+    pub fn encoded_len<Pb>(&self, common: &MessageCommon<Pb, T::Alloc>) -> usize
     where
         Pb: PresenceBits,
-        A: Allocator,
     {
         if P::should_emit(common, || {
             let init = P::slot_init_view();
@@ -114,10 +113,9 @@ where
         }
     }
 
-    pub fn encode_raw<Pb, A, B: BufMut>(&self, common: &MessageCommon<Pb, A>, buf: &mut B)
+    pub fn encode_raw<Pb, B: BufMut>(&self, common: &MessageCommon<Pb, T::Alloc>, buf: &mut B)
     where
         Pb: PresenceBits,
-        A: Allocator,
     {
         if P::should_emit(common, || {
             let init = P::slot_init_view();
@@ -137,18 +135,17 @@ where
     }
 }
 
-impl<T: ScalarProtoType, P: FieldPresence, const FIELD: u32, D, Pb: PresenceBits, A: Allocator>
-    FieldDeallocate<Pb, A> for SingularField<T, P, FIELD, D>
+impl<T: ScalarProtoType, P: FieldPresence, const FIELD: u32, D, Pb: PresenceBits>
+    FieldDeallocate<Pb, T::Alloc> for SingularField<T, P, FIELD, D>
 where
     P::ValueSlot<T::Slot>: ValueSlot<T::Slot>,
-    A: Clone,
 {
     /// Releases the payload through `common`'s allocator.
     ///
     /// No-op for copy scalars / unit bool slots whose [`DeallocateIn`](crate::fields::shared::DeallocateIn)
     /// does nothing.
     #[inline]
-    fn deallocate(&mut self, common: &MessageCommon<Pb, A>) {
+    fn deallocate(&mut self, common: &MessageCommon<Pb, T::Alloc>) {
         let init = P::slot_init_view();
         let initialized = init.is_initialized(common);
         let alloc = common.alloc.clone();
@@ -163,9 +160,9 @@ where
 {
     /// Low-level borrow of the always-initialized slot's logical value.
     #[inline]
-    pub fn value<'a, Pb: PresenceBits, A: Allocator>(
+    pub fn value<'a, Pb: PresenceBits>(
         &'a self,
-        common: &'a MessageCommon<Pb, A>,
+        common: &'a MessageCommon<Pb, T::Alloc>,
     ) -> T::Ref<'a> {
         let slot = self
             .value
@@ -182,9 +179,9 @@ where
 {
     /// Low-level borrow of the always-initialized oneof-variant slot's logical value.
     #[inline]
-    pub fn value<'a, Pb: PresenceBits, A: Allocator>(
+    pub fn value<'a, Pb: PresenceBits>(
         &'a self,
-        common: &'a MessageCommon<Pb, A>,
+        common: &'a MessageCommon<Pb, T::Alloc>,
     ) -> T::Ref<'a> {
         let slot = self
             .value
@@ -195,10 +192,10 @@ where
     }
 
     /// Mutable accessor for a oneof variant (slot is always initialized).
-    pub fn value_mut<'a, Pb: PresenceBits, A: Allocator + Clone>(
+    pub fn value_mut<'a, Pb: PresenceBits>(
         &'a mut self,
-        common: &'a mut MessageCommon<Pb, A>,
-    ) -> T::Mut<'a, A> {
+        common: &'a mut MessageCommon<Pb, T::Alloc>,
+    ) -> T::Mut<'a> {
         T::with_mut(&mut *self.value, AlwaysInitialized, common)
     }
 }
@@ -208,10 +205,12 @@ impl<T: ScalarProtoType, const BIT: usize, const FIELD: u32, D>
 where
     <LegacyRequired<BIT> as FieldPresence>::ValueSlot<T::Slot>: ValueSlot<T::Slot>,
 {
-    pub fn validate_required<Pb, A>(&self, common: &MessageCommon<Pb, A>) -> Result<(), DecodeError>
+    pub fn validate_required<Pb>(
+        &self,
+        common: &MessageCommon<Pb, T::Alloc>,
+    ) -> Result<(), DecodeError>
     where
         Pb: PresenceBits,
-        A: Allocator,
     {
         LegacyRequired::<BIT>::validate_present(common, FIELD, || {
             let init = <LegacyRequired<BIT> as FieldPresence>::slot_init_view();
@@ -244,26 +243,26 @@ pub struct SingularFieldRef<
     common: &'a MessageCommon<Pb, A>,
 }
 
-impl<'a, T: ScalarProtoType, P: FieldPresence, const FIELD: u32, D, Pb: PresenceBits, A: Allocator>
-    SingularFieldRef<'a, T, P, FIELD, D, Pb, A>
+impl<'a, T: ScalarProtoType, P: FieldPresence, const FIELD: u32, D, Pb: PresenceBits>
+    SingularFieldRef<'a, T, P, FIELD, D, Pb, T::Alloc>
 where
     P::ValueSlot<T::Slot>: ValueSlot<T::Slot>,
 {
     #[inline]
     pub(crate) fn new(
         field: &'a SingularField<T, P, FIELD, D>,
-        common: &'a MessageCommon<Pb, A>,
+        common: &'a MessageCommon<Pb, T::Alloc>,
     ) -> Self {
         Self { field, common }
     }
 }
 
-impl<'a, T: ScalarProtoType, P: FieldPresence, const FIELD: u32, D, Pb: PresenceBits, A: Allocator>
-    SingularFieldRef<'a, T, P, FIELD, D, Pb, A>
+impl<'a, T: ScalarProtoType, P: FieldPresence, const FIELD: u32, D, Pb: PresenceBits>
+    SingularFieldRef<'a, T, P, FIELD, D, Pb, T::Alloc>
 where
     P::ValueSlot<T::Slot>: ValueSlot<T::Slot>,
-    for<'b> T::Ref<'b>: Copy,
-    D: for<'b> HasDefault<T::Ref<'b>>,
+    T::Ref<'a>: Copy,
+    D: HasDefault<T::Ref<'a>>,
 {
     pub fn optional(self) -> Optional<T::Ref<'a>, D> {
         let v = if P::is_set(self.common, || {
@@ -291,8 +290,8 @@ where
     }
 }
 
-impl<'a, T: ScalarProtoType, const FIELD: u32, D, Pb: PresenceBits, A: Allocator>
-    SingularFieldRef<'a, T, Implicit, FIELD, D, Pb, A>
+impl<'a, T: ScalarProtoType, const FIELD: u32, D, Pb: PresenceBits>
+    SingularFieldRef<'a, T, Implicit, FIELD, D, Pb, T::Alloc>
 where
     <Implicit as FieldPresence>::ValueSlot<T::Slot>: ValueSlot<T::Slot>,
 {
@@ -302,8 +301,8 @@ where
     }
 }
 
-impl<'a, T: ScalarProtoType, const FIELD: u32, D, Pb: PresenceBits, A: Allocator>
-    SingularFieldRef<'a, T, Oneof, FIELD, D, Pb, A>
+impl<'a, T: ScalarProtoType, const FIELD: u32, D, Pb: PresenceBits>
+    SingularFieldRef<'a, T, Oneof, FIELD, D, Pb, T::Alloc>
 where
     <Oneof as FieldPresence>::ValueSlot<T::Slot>: ValueSlot<T::Slot>,
 {
@@ -343,24 +342,22 @@ impl<
     const FIELD: u32,
     D,
     Pb: PresenceBits,
-    A: Allocator,
-> SingularFieldMut<'f, 'c, T, P, FIELD, D, Pb, A>
+> SingularFieldMut<'f, 'c, T, P, FIELD, D, Pb, T::Alloc>
 where
     P::ValueSlot<T::Slot>: ValueSlot<T::Slot>,
 {
     #[inline]
     pub(crate) fn new(
         field: &'f mut SingularField<T, P, FIELD, D>,
-        common: &'c mut MessageCommon<Pb, A>,
+        common: &'c mut MessageCommon<Pb, T::Alloc>,
     ) -> Self {
         Self { field, common }
     }
 
     /// Returns a mutable accessor, lazy-initializing the slot when needed.
     #[inline]
-    pub fn value_mut(self) -> T::Mut<'f, A>
+    pub fn value_mut(self) -> T::Mut<'f>
     where
-        A: Clone,
         'c: 'f,
     {
         T::with_mut(
@@ -373,7 +370,6 @@ where
     #[inline]
     pub fn set(self, v: T::Written)
     where
-        A: Clone,
     {
         T::write(
             &mut *self.field.value,
@@ -385,7 +381,6 @@ where
 
     pub fn merge<B: Buf>(self, wire_type: WireType, buf: &mut B) -> Result<(), DecodeError>
     where
-        A: Clone,
     {
         match T::decode(wire_type, buf, self.common.alloc.clone()) {
             Ok(new) => {
@@ -416,7 +411,6 @@ where
     /// Resets the value slot and clears explicit presence when applicable.
     pub fn clear(self)
     where
-        A: Clone,
     {
         T::clear(
             &mut *self.field.value,

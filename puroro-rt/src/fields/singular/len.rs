@@ -26,9 +26,9 @@ pub type ImplicitLenField<T, const FIELD: u32> = SingularLenField<T, Implicit, F
 pub type ExplicitLenField<T, const BIT: usize, const FIELD: u32, D = ProtoDefault> =
     SingularLenField<T, Explicit<BIT>, FIELD, D>;
 
-pub type ImplicitString<const FIELD: u32> = ImplicitLenField<len::ProtoString, FIELD>;
-pub type ExplicitString<const BIT: usize, const FIELD: u32, D = ProtoDefault> =
-    ExplicitLenField<len::ProtoString, BIT, FIELD, D>;
-pub type ImplicitBytes<const FIELD: u32> = ImplicitLenField<len::ProtoBytes, FIELD>;
-pub type ExplicitBytes<const BIT: usize, const FIELD: u32, D = ProtoDefault> =
-    ExplicitLenField<len::ProtoBytes, BIT, FIELD, D>;
+pub type ImplicitString<A, const FIELD: u32> = ImplicitLenField<len::ProtoString<A>, FIELD>;
+pub type ExplicitString<A, const BIT: usize, const FIELD: u32, D = ProtoDefault> =
+    ExplicitLenField<len::ProtoString<A>, BIT, FIELD, D>;
+pub type ImplicitBytes<A, const FIELD: u32> = ImplicitLenField<len::ProtoBytes<A>, FIELD>;
+pub type ExplicitBytes<A, const BIT: usize, const FIELD: u32, D = ProtoDefault> =
+    ExplicitLenField<len::ProtoBytes<A>, BIT, FIELD, D>;
