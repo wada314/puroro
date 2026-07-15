@@ -51,7 +51,7 @@ Internal implementation of **generated** protobuf message code: storage, wire I/
 | Crate | Responsibility |
 |---|---|
 | **`protobuf-core`** | Wire primitives (`Varint`, `Tag`, `WireType`). Used by `puroro` and `puroro-rt`; generated code does not import it. |
-| **`puroro`** | Stable user API: `MessageEncode` / `MessageDecode`, `Optional`, `HasDefault`, errors, `WireType`. |
+| **`puroro`** | Stable user API: `Message`, `Optional`, `HasDefault`, errors, `WireType`, `UnknownField`. |
 | **`puroro-rt`** | Generated-code runtime: [`fields`](puroro-rt/src/fields.rs), wire `encode` / `decode` helpers, `ProtoDefault`. Depends on `puroro` for shared types. |
 | **`protoc` plugin** | Emits Rust types and `impl` blocks described here ([DESIGN.md §0](DESIGN.md#0-project-architecture)). |
 
@@ -81,7 +81,7 @@ puroro_rt::fields       SingularField<T, P, FIELD>, NestedMessageField, …
 puroro_rt::encode/decode   Buf adapters, LEN framing, unknown-field helpers
     │  (DecodeError, WireType from puroro)
     ▼
-puroro                  MessageEncode, MessageDecode, Optional, errors
+puroro                  Message, Optional, errors
     ▼
 protobuf-core           Varint, Tag, WireType
 ```
@@ -348,7 +348,7 @@ The `A: Allocator + Clone` struct bound is what lets the generated `Drop` clone 
 
 Unset EXPLICIT slots are uninitialized (`MaybeUninit`); **only the bit** means "set". LEN storage is `UnmanagedString` / `UnmanagedVec<u8>`.
 
-Public accessors are **one-line delegates** into catalog methods with `&self._common` / `&mut self._common`. `MessageEncode` and `MessageDecode` sum the same delegates; the generated `Drop` walks heap fields calling `deallocate(&self._common)` (or oneof `clear`).
+Public accessors are **one-line delegates** into catalog methods with `&self._common` / `&mut self._common`. `Message` (encode / merge / unknown / validate) sums the same delegates; the generated `Drop` walks heap fields calling `deallocate(&self._common)` (or oneof `clear`).
 
 ### Codegen emission per message
 
@@ -363,9 +363,9 @@ IR step: `ProtoField → FieldKind → catalog type + const args`.
 
 ### Path qualification (naming)
 
-**Real generated code must fully-qualify every path it emits** — leading-`::` absolute paths such as `::puroro_rt::SingularLenField`, `::puroro::MessageDecode`, `::core::ops::DerefMut`, `::allocator_api2::alloc::Allocator` — and must not depend on `use` imports for the items it references. A `.proto` file can name its packages, messages, and fields with almost any identifier, so any *unqualified* name in the generated output risks colliding with a user-defined type, module, or import that lands in the same scope. Fully-qualified paths are collision-proof. The only names exempt from this are the ones the generator introduces itself and reserves by convention — e.g. the `_common` field and other `_`-prefixed internals — which cannot clash with proto-derived names.
+**Real generated code must fully-qualify every path it emits** — leading-`::` absolute paths such as `::puroro_rt::SingularLenField`, `::puroro::Message`, `::core::ops::DerefMut`, `::allocator_api2::alloc::Allocator` — and must not depend on `use` imports for the items it references. A `.proto` file can name its packages, messages, and fields with almost any identifier, so any *unqualified* name in the generated output risks colliding with a user-defined type, module, or import that lands in the same scope. Fully-qualified paths are collision-proof. The only names exempt from this are the ones the generator introduces itself and reserves by convention — e.g. the `_common` field and other `_`-prefixed internals — which cannot clash with proto-derived names.
 
-**Crate split.** Items from [DESIGN.md §3](DESIGN.md#3-runtime-trait-api) (`MessageEncode`, `MessageDecode`, `Optional`, `HasDefault`, `DecodeError`, …) are emitted as `::puroro::…`. Field catalog types, `MessageCommon`, wire helpers, and `ProtoDefault` are emitted as `::puroro_rt::…`. A generated crate's `Cargo.toml` lists both dependencies; end-user application code should not add `puroro-rt` directly.
+**Crate split.** Items from [DESIGN.md §3](DESIGN.md#3-runtime-trait-api) (`Message`, `Optional`, `HasDefault`, `DecodeError`, …) are emitted as `::puroro::…`. Field catalog types, `MessageCommon`, wire helpers, and `ProtoDefault` are emitted as `::puroro_rt::…`. A generated crate's `Cargo.toml` lists both dependencies; end-user application code should not add `puroro-rt` directly.
 
 **The checked-in [`sample-generated/`](sample-generated/) deliberately breaks this rule for readability.** It pulls names in with `use` and refers to them by short name (`SingularLenField`, `Allocator`, `MessageCommon`, …) so the reference output stays easy to read and review. Read those short names as stand-ins for the fully-qualified paths the production protoc plugin would actually emit.
 
@@ -400,7 +400,7 @@ impl<A: Allocator> Task<A> {
 // Message struct
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
-// MessageEncode / MessageDecode
+// Message
 // ---------------------------------------------------------------------------
 ```
 
@@ -557,7 +557,7 @@ Nested LEN payloads use `Buf::take(len)` before child `merge_from`.
 
 ### Validation
 
-`validate()` — `owner_id.validate_required(&self._common)?` (and any other `LegacyRequired` fields). `decode_strict` = decode + validate. `MessageDecode::decode` does **not** auto-validate.
+`Message::validate()` — `owner_id.validate_required(&self._common)?` (and any other `LegacyRequired` fields); messages with none return `Ok(())`. `Message::decode` does **not** auto-validate.
 
 ---
 
@@ -687,7 +687,7 @@ The `set_*` per-variant setters are removed, matching the other field families.
 
 **Storage (default Preserve):** `_common.unknown_fields` — contiguous partial wire stream via `puroro_rt::decode::skip_field_and_save` / `save_unknown_varint_field`; re-emitted on encode. `SGroup` / `EGroup` not preserved.
 
-**Public accessor:** `unknown_fields()` returns `impl Iterator<Item = ::puroro::UnknownField<'_>>` by parsing that blob with [`iter_unknown_fields`](puroro-rt/src/decode.rs) (also `MessageCommon::iter_unknown_fields`). Encode paths read the blob directly and do not go through the iterator.
+**Public accessor:** `Message::unknown_fields()` returns `impl Iterator<Item = ::puroro::UnknownField<'_>>` by parsing that blob with [`iter_unknown_fields`](puroro-rt/src/decode.rs) (also `MessageCommon::iter_unknown_fields`). Encode paths read the blob directly and do not go through the iterator.
 
 ---
 

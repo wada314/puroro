@@ -9,7 +9,7 @@ use ::bitvec::order::Lsb0;
 use ::bytes::{Buf, BufMut};
 use ::core::ops::DerefMut;
 
-use ::puroro::{DecodeError, MessageDecode, MessageEncode};
+use ::puroro::{DecodeError, Message};
 use ::puroro_rt::{
     Explicit, FieldDeallocate, MessageCommon, NestedMessage, PresenceBits, ProtoString,
     SingularAccess, SingularLenField,
@@ -111,10 +111,6 @@ impl<A: Allocator + Clone> Address<A> {
     pub fn clear_city(&mut self) {
         self.city.bind_mut(&mut self._common).clear();
     }
-
-    pub fn unknown_fields(&self) -> impl Iterator<Item = ::puroro::UnknownField<'_>> + '_ {
-        self._common.iter_unknown_fields()
-    }
 }
 
 impl Address<::allocator_api2::alloc::Global> {
@@ -148,10 +144,10 @@ impl<A: Allocator + Clone> Drop for Address<A> {
 }
 
 // ---------------------------------------------------------------------------
-// MessageEncode / MessageDecode
+// Message
 // ---------------------------------------------------------------------------
 
-impl<A: Allocator + Clone> MessageEncode for Address<A> {
+impl<A: Allocator + Clone> Message for Address<A> {
     fn encoded_len(&self) -> usize {
         let c = &self._common;
         self.street.encoded_len(c) + self.city.encoded_len(c) + c.unknown_fields.len()
@@ -164,9 +160,7 @@ impl<A: Allocator + Clone> MessageEncode for Address<A> {
         let unknown: &[u8] = &c.unknown_fields;
         buf.put_slice(unknown);
     }
-}
 
-impl<A: Allocator + Clone> MessageDecode for Address<A> {
     fn merge_from<B: Buf>(&mut self, buf: &mut B) -> Result<(), DecodeError> {
         while buf.has_remaining() {
             let (field_number, wire_type) = ::puroro_rt::decode::decode_tag(buf)?;
@@ -195,6 +189,14 @@ impl<A: Allocator + Clone> MessageDecode for Address<A> {
                 }
             }
         }
+        Ok(())
+    }
+
+    fn unknown_fields(&self) -> impl Iterator<Item = ::puroro::UnknownField<'_>> + '_ {
+        self._common.iter_unknown_fields()
+    }
+
+    fn validate(&self) -> Result<(), DecodeError> {
         Ok(())
     }
 }

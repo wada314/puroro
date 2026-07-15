@@ -3,7 +3,7 @@
 //! Grouped by what they exercise: encode/decode roundtrips, oneof accessor
 //! behaviour (no wire), and enum merge / unknown-field handling.
 
-use ::puroro::{MessageDecode, MessageEncode, UnknownPayload};
+use ::puroro::{Message, UnknownPayload};
 use ::puroro_sample_generated::task::{Notification, NotificationCase};
 use ::puroro_sample_generated::{Address, Priority, Status, Task};
 

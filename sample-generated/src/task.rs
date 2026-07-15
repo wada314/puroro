@@ -13,7 +13,7 @@ use ::bitvec::order::Lsb0;
 use ::bytes::{Buf, BufMut};
 use ::core::ops::DerefMut;
 
-use ::puroro::{DecodeError, HasDefault, MessageDecode, MessageEncode, Optional};
+use ::puroro::{DecodeError, HasDefault, Message, Optional};
 use ::puroro_rt::{
     Closed, Explicit, FieldDeallocate, Implicit, LegacyRequired, MessageCommon,
     NestedMessageField, OneofSlot, Open, PresenceBits, ProtoBool, ProtoBytes, ProtoEnum,
@@ -499,26 +499,6 @@ impl<A: Allocator + Clone> Task<A> {
             .variant_mut::<Urgent>()
             .value_mut()
     }
-
-    // -- message-level ------------------------------------------------------
-
-    pub fn unknown_fields(&self) -> impl Iterator<Item = ::puroro::UnknownField<'_>> + '_ {
-        self._common.iter_unknown_fields()
-    }
-
-    /// Checks `LEGACY_REQUIRED` fields (`owner_id`).
-    pub fn validate(&self) -> Result<(), DecodeError> {
-        self.owner_id.validate_required(&self._common)
-    }
-
-    pub fn decode_strict<B: Buf>(buf: B) -> Result<Self, DecodeError>
-    where
-        Self: Default,
-    {
-        let msg = Self::decode(buf)?;
-        msg.validate()?;
-        Ok(msg)
-    }
 }
 
 impl Task<::allocator_api2::alloc::Global> {
@@ -559,10 +539,10 @@ impl<A: Allocator + Clone> Drop for Task<A> {
 }
 
 // ---------------------------------------------------------------------------
-// MessageEncode / MessageDecode
+// Message
 // ---------------------------------------------------------------------------
 
-impl<A: Allocator + Clone> MessageEncode for Task<A> {
+impl<A: Allocator + Clone> Message for Task<A> {
     fn encoded_len(&self) -> usize {
         let c = &self._common;
         let mut n = 0usize;
@@ -602,9 +582,7 @@ impl<A: Allocator + Clone> MessageEncode for Task<A> {
         let unknown: &[u8] = &c.unknown_fields;
         buf.put_slice(unknown);
     }
-}
 
-impl<A: Allocator + Clone> MessageDecode for Task<A> {
     fn merge_from<B: Buf>(&mut self, buf: &mut B) -> Result<(), DecodeError> {
         while buf.has_remaining() {
             let (field_number, wire_type) = ::puroro_rt::decode::decode_tag(buf)?;
@@ -735,5 +713,13 @@ impl<A: Allocator + Clone> MessageDecode for Task<A> {
             }
         }
         Ok(())
+    }
+
+    fn unknown_fields(&self) -> impl Iterator<Item = ::puroro::UnknownField<'_>> + '_ {
+        self._common.iter_unknown_fields()
+    }
+
+    fn validate(&self) -> Result<(), DecodeError> {
+        self.owner_id.validate_required(&self._common)
     }
 }

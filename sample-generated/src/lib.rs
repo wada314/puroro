@@ -6,7 +6,7 @@
 //! encode/decode glue, and presence bit indices.
 //!
 //! **Naming vs. real generated code.** The production plugin must *fully-qualify*
-//! every path it emits (`::puroro_rt::SingularLenField`, `::puroro::MessageDecode`,
+//! every path it emits (`::puroro_rt::SingularLenField`, `::puroro::Message`,
 //! `::core::ops::DerefMut`, …)
 //! because a `.proto` schema may name things that would collide with unqualified
 //! identifiers. This sample deliberately relaxes that: it uses `use` imports and

@@ -23,7 +23,7 @@ use ::bytes::{Buf, BufMut};
 use ::core::mem::ManuallyDrop;
 use ::unmanaged::UnmanagedBox;
 
-use ::puroro::{DecodeError, MessageDecode, MessageEncode, WireType};
+use ::puroro::{DecodeError, Message, WireType};
 
 use crate::decode;
 use crate::encode;
@@ -34,7 +34,7 @@ use crate::fields::shared::{
 use crate::fields::wire::len;
 
 /// Trait for child message types stored in [`NestedMessageField`].
-pub trait NestedMessage<A: Allocator + Clone>: MessageEncode + MessageDecode + Sized {
+pub trait NestedMessage<A: Allocator + Clone>: Message {
     /// Creates an empty child message with the given allocator.
     fn new_in(alloc: A) -> Self;
 }
@@ -117,7 +117,7 @@ impl<M, P: MessagePresence, const FIELD: u32, A: Allocator> NestedMessageField<M
     /// presence is handled by the field or enclosing slot).
     pub fn encoded_len<Pb>(&self, _common: &MessageCommon<Pb, A>) -> usize
     where
-        M: MessageEncode,
+        M: Message,
     {
         P::as_ref(&self.store)
             .map(|child| encode::encoded_len_len_field(FIELD, child.encoded_len()))
@@ -127,7 +127,7 @@ impl<M, P: MessagePresence, const FIELD: u32, A: Allocator> NestedMessageField<M
     /// Encodes this field occurrence (ignores `common`).
     pub fn encode_raw<Pb, B: BufMut>(&self, _common: &MessageCommon<Pb, A>, buf: &mut B)
     where
-        M: MessageEncode,
+        M: Message,
     {
         if let Some(child) = P::as_ref(&self.store) {
             let payload_len = child.encoded_len();

@@ -44,7 +44,7 @@ The puroro project comprises several crates and tools with distinct roles:
 | Component | Role |
 |---|---|
 | **`protobuf-core`** (git submodule) | Wire-format **primitives** — `Varint`, `Tag`, `WireType`, field I/O traits, varint read/write. Used by `puroro` and `puroro-rt`; **generated code does not import it directly**. |
-| **`puroro`** | **Stable user-facing runtime API** — `MessageEncode` / `MessageDecode`, `Optional`, `HasDefault`, `DecodeError` / `EncodeError`, `WireType`, `UnknownField` / `UnknownPayload`. Library users depend on this crate; generated message code imports it for traits, accessor return types, and error handling. |
+| **`puroro`** | **Stable user-facing runtime API** — `Message`, `Optional`, `HasDefault`, `DecodeError` / `EncodeError`, `WireType`, `UnknownField` / `UnknownPayload`. Library users depend on this crate; generated message code imports it for traits, accessor return types, and error handling. |
 | **`puroro-rt`** | **Generated-code runtime** — composable field catalog (`fields::*`, `MessageCommon`), wire encode/decode helpers (`encode` / `decode` modules), `ProtoDefault`, and allocator-aware string/bytes utilities. Emitted generated code imports this crate (transitively for end users). Semver is looser than `puroro`; do not depend on it directly from application code. See [IMPLEMENTATION.md §4](IMPLEMENTATION.md#4-shared-infrastructure). |
 | **Code generator** (`protoc` plugin) | Reads `.proto` input (via `protoc`) and emits Rust source implementing the API defined in this document. **Primary execution path:** register as a `protoc` plugin (`--puroro_out=…`). Other invocation styles (standalone CLI, `build.rs` wrapper, etc.) are permitted but not required. Emits fully-qualified paths into both `::puroro::…` (traits, `Optional`, errors) and `::puroro_rt::…` (field catalog, wire helpers). |
 
@@ -102,7 +102,7 @@ Wire types 3 and 4 (SGROUP / EGROUP) are deprecated. The encoder must never emit
 
 ## 3. Runtime trait API
 
-The **`puroro`** crate exposes two core traits and one accessor trait. Generated code imports these items from `puroro`; the field catalog and wire helpers come from `puroro-rt` (see [§0](#0-project-architecture)). Library users who handle decode errors or write generic code over `MessageEncode` / `MessageDecode` depend on **`puroro` only**.
+The **`puroro`** crate exposes the shared [`Message`](#message) trait and the accessor helpers below. Generated code imports these items from `puroro`; the field catalog and wire helpers come from `puroro-rt` (see [§0](#0-project-architecture)). Library users who handle decode errors or write generic code over `Message` depend on **`puroro` only**.
 
 ### `HasDefault` and `Optional`
 
@@ -159,48 +159,39 @@ if task.max_retries().is_set() { … }
 
 **Lazy implementations (`TaskLazy`).** On the eager path, `Optional::new` receives `Some(value)` or `None` derived from the internal presence bitfield and value slot.  On the lazy path, getters **wire-scan** the stored buffer and semantically decode on demand; the `Optional` getter returns `Err` before constructing `Optional` if decode fails (e.g. `InvalidUtf8`).  `has_*()` may wire-scan for presence without semantic decode.  See [§8 — `TaskLazy` lazy parse timing](#tasklaya--lazy-parse-timing).
 
-### `MessageEncode`
+### `Message`
+
+Implemented by **every** generated message (C++ `MessageLite`-like surface: codec + shared infrastructure). Field accessors stay as inherent methods so proto field names do not collide with these helpers.
 
 ```rust
-pub trait MessageEncode {
-    /// Exact number of bytes this message occupies on the wire.
-    /// Must be consistent with `encode_raw`.
+pub trait Message: Sized {
+    // Codec (required)
     fn encoded_len(&self) -> usize;
-
-    /// Writes the message body to `buf` without a framing length prefix.
     fn encode_raw<B: bytes::BufMut>(&self, buf: &mut B);
-
-    // Provided convenience methods:
-    fn encode_to_vec(&self) -> Vec<u8>;
-    fn encode_to_bytes(&self) -> bytes::Bytes;
-}
-```
-
-`encode_raw` is generic over `B: BufMut` so the compiler can monomorphise and inline field writes. This makes the trait **non-object-safe** by design; trait objects are not a target use case.
-
-**Non-deterministic field order.** The encoder may emit known fields in any order. Two encodes of the same logical message are not guaranteed to produce identical bytes; compare messages with `PartialEq`, not with `encode_raw` output equality. See [IMPLEMENTATION.md §12](IMPLEMENTATION.md#12-message-level-wire-io).
-
-### `MessageDecode`
-
-```rust
-pub trait MessageDecode: Sized {
-    /// Reads fields from `buf` and merges them into `self`.
-    ///
-    /// Merge semantics (identical across proto2, proto3, editions):
-    /// - Singular scalar: last value seen wins.
-    /// - Singular message: recursively merged.
-    /// - Repeated: each occurrence appends to the list.
-    /// - Unknown fields: accumulated for round-trip preservation.
     fn merge_from<B: bytes::Buf>(&mut self, buf: &mut B) -> Result<(), DecodeError>;
 
-    /// Decodes a complete message. Provided; requires `Self: Default`.
+    // Codec (provided)
+    fn encode_to_vec(&self) -> Vec<u8>;
+    fn encode_to_bytes(&self) -> bytes::Bytes;
     fn decode<B: bytes::Buf>(buf: B) -> Result<Self, DecodeError>
     where
         Self: Default;
+
+    // Infrastructure (required)
+    fn unknown_fields(&self) -> impl Iterator<Item = UnknownField<'_>> + '_;
+    fn validate(&self) -> Result<(), DecodeError>; // Ok(()) when no LEGACY_REQUIRED
 }
 ```
 
-The primary operation is *merge*, not *decode-from-scratch*. `decode` is a convenience wrapper.
+`encode_raw` / `merge_from` are generic over `BufMut` / `Buf` so the compiler can monomorphise; the trait is **non-object-safe** by design.
+
+**Merge semantics** (identical across proto2, proto3, editions): singular scalar — last wins; singular message — recursive merge; repeated — append; unknown fields — accumulated for round-trip.
+
+**Non-deterministic field order.** The encoder may emit known fields in any order. Two encodes of the same logical message are not guaranteed to produce identical bytes; compare with `PartialEq`, not with `encode_raw` output equality. See [IMPLEMENTATION.md §12](IMPLEMENTATION.md#12-message-level-wire-io).
+
+**Name conflicts.** If a proto field is named `validate`, `unknown_fields`, `encoded_len`, etc., the inherent field getter wins; use `Message::validate(&msg)` (UFCS).
+
+Constructors (`new` / `new_in`) remain inherent methods on the generated struct. `decode` requires `Self: Default` (typically `A: Default`); otherwise use `new_in(alloc)` then `merge_from`.
 
 ---
 
@@ -271,12 +262,6 @@ pub trait TaskMessage {
     // Oneof
     fn notification(&self) -> Option<&task::Notification<impl Allocator>>;
     fn set_notification(&mut self, v: Option<task::Notification<impl Allocator>>);
-
-    // LEGACY_REQUIRED validation
-    fn validate(&self) -> Result<(), DecodeError>;
-
-    // Unknown fields — structured views; storage may be a wire blob or empty
-    fn unknown_fields(&self) -> impl Iterator<Item = UnknownField<'_>> + '_;
 }
 ```
 
@@ -852,23 +837,22 @@ Concrete C++ codegen shapes (proto2 / editions):
 
 On the wire, a `LEGACY_REQUIRED` field is indistinguishable from an `EXPLICIT` field; the constraint is schema-level only.
 
-**Accessor API** — same `Optional` pattern as `EXPLICIT`, plus `validate()` and `decode_strict()`. On generated traits, `_raw` and `has_` are default methods (see [§4.0](#40-generated-per-message-traits)). Additionally:
+**Accessor API** — same `Optional` pattern as `EXPLICIT`, plus [`Message::validate`](#message). On generated traits, `_raw` and `has_` are default methods (see [§4.0](#40-generated-per-message-traits)). Additionally:
 
-- **`validate() -> Result<(), DecodeError>`** — returns `MissingRequiredField` when unset.
-- **`decode_strict(buf)`** — `decode` then `validate`.
+- **`Message::validate() -> Result<(), DecodeError>`** — returns `MissingRequiredField` when a `LEGACY_REQUIRED` field is unset. Messages with no such fields still implement `Message` and return `Ok(())`.
 
-`MessageDecode::decode` does **not** call `validate()` automatically.
+`Message::decode` does **not** call `validate()` automatically.
 
-When a `LEGACY_REQUIRED` field was absent from the wire, `owner_id().is_set()` is `false` and `validate()` returns `Err(MissingRequiredField { … })`.
+When a `LEGACY_REQUIRED` field was absent from the wire, `owner_id().is_set()` is `false` and `Message::validate()` returns `Err(MissingRequiredField { … })`.
 
 ---
 
 ### 4.9 Unknown fields
 
-All generated messages expose unrecognised fields (and closed-enum unknowns diverted into the unknown set) as a **structured iterator**, not as a raw `&[u8]`:
+All generated messages expose unrecognised fields (and closed-enum unknowns diverted into the unknown set) via [`Message::unknown_fields`](#message):
 
 ```rust
-pub fn unknown_fields(&self) -> impl Iterator<Item = UnknownField<'_>> + '_;
+fn unknown_fields(&self) -> impl Iterator<Item = UnknownField<'_>> + '_;
 ```
 
 [`UnknownField`](src/unknown.rs) carries the field number and an [`UnknownPayload`](src/unknown.rs) (`Varint` / `Fixed64` / `Bytes` / `Fixed32`). `wire_type()` is derived from the payload. The same field number may appear more than once.
@@ -931,12 +915,12 @@ Varint and LEN singular scalars share one runtime type, [`SingularField`](puroro
 **Decode API:**
 
 ```rust
-impl<A: Allocator + Clone + Default> MessageDecode for Task<A> {
+impl<A: Allocator + Clone + Default> Message for Task<A> {
     fn merge_from<B: Buf>(&mut self, buf: &mut B) -> Result<(), DecodeError>;
 }
 ```
 
-The `Default` bound is required because `MessageDecode::decode` calls `A::default()` to obtain the initial allocator.  Callers using a non-`Default` allocator must call `new_in(alloc)` followed by `merge_from` instead of `decode`.
+The `Default` bound is required because `Message::decode` calls `A::default()` to obtain the initial allocator.  Callers using a non-`Default` allocator must call `new_in(alloc)` followed by `merge_from` instead of `decode`.
 
 **Arena allocator example:**
 
@@ -1014,7 +998,7 @@ pub struct Task {
 
 ### 6.1 Wire format is version-agnostic
 
-The wire format is **identical** across proto2, proto3, and editions. The runtime library (`MessageEncode`, `MessageDecode`, all helpers) requires no changes to support different syntax versions. All differences are in what the **code generator emits**.
+The wire format is **identical** across proto2, proto3, and editions. The runtime library (`Message`, all helpers) requires no changes to support different syntax versions. All differences are in what the **code generator emits**.
 
 ### 6.2 Editions as the unified syntax
 
@@ -1074,7 +1058,7 @@ Rust's ownership system already provides the same guarantees without a dedicated
 
 - A caller that binds with `let mut` can mutate the message; one that binds with `let` cannot.
 - Sharing across threads uses `Arc<Task>` (immutable) or `Arc<Mutex<Task>>` (shared mutation).
-- `LEGACY_REQUIRED` field validation is covered by `validate()` / `decode_strict()` without needing a `build()` step.
+- `LEGACY_REQUIRED` field validation is covered by `Message::validate()` without needing a `build()` step.
 
 Generating both `Task<A>` and `TaskBuilder<A>` would double the generated code, complicate the allocator design, and add a `build()` conversion step — all for a guarantee Rust already provides for free through its borrow checker.
 
@@ -1104,7 +1088,7 @@ For explicit-presence fields, **both traits treat the `Optional` accessor as the
 
 This is the standard Rust pattern: `Vec<T>` implements `Iterator` but also has `push`, `sort`, and hundreds of other methods that the `Iterator` trait does not mandate.
 
-### `Default` bound on `MessageDecode::decode`
+### `Default` bound on `Message::decode`
 
 The provided `decode` method requires `Self: Default`. The lower-level `merge_from` has no such requirement, which is important for callers using non-`Default` allocators.
 
@@ -1122,7 +1106,7 @@ The code generator is designed first as a `protoc` plugin. That is the expected 
 
 ### `protobuf-core`, `puroro`, and `puroro-rt`
 
-`protobuf-core` holds reusable wire-format primitives (varint, tags, field readers/writers). **`puroro`** holds the stable message-level API (`MessageEncode`, `MessageDecode`, `Optional`, errors) that library users and generated `impl` blocks share. **`puroro-rt`** holds the composable field catalog, wire helpers, and other generator-facing runtime pieces. Generated crates list both `puroro` and `puroro-rt` as dependencies; application code should depend on the generated crate and `puroro` only — not on `puroro-rt` or `protobuf-core` directly.
+`protobuf-core` holds reusable wire-format primitives (varint, tags, field readers/writers). **`puroro`** holds the stable message-level API (`Message`, `Optional`, errors) that library users and generated `impl` blocks share. **`puroro-rt`** holds the composable field catalog, wire helpers, and other generator-facing runtime pieces. Generated crates list both `puroro` and `puroro-rt` as dependencies; application code should depend on the generated crate and `puroro` only — not on `puroro-rt` or `protobuf-core` directly.
 
 ### `Bytes` for lazy wire storage vs `A: Allocator` for decoded values
 
