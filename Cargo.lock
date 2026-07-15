@@ -80,6 +80,7 @@ dependencies = [
 name = "puroro"
 version = "0.1.0"
 dependencies = [
+ "allocator-api2",
  "bytes",
  "protobuf-core",
 ]

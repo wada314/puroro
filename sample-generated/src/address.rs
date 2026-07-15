@@ -11,8 +11,8 @@ use ::core::ops::DerefMut;
 
 use ::puroro::{DecodeError, Message};
 use ::puroro_rt::{
-    Explicit, FieldDeallocate, MessageCommon, NestedMessage, PresenceBits, ProtoString,
-    SingularAccess, SingularLenField,
+    Explicit, FieldDeallocate, MessageCommon, PresenceBits, ProtoString, SingularAccess,
+    SingularLenField,
 };
 
 // ---------------------------------------------------------------------------
@@ -125,12 +125,6 @@ impl<A: Allocator + Clone + Default> Default for Address<A> {
     }
 }
 
-impl<A: Allocator + Clone> NestedMessage<A> for Address<A> {
-    fn new_in(alloc: A) -> Self {
-        Self::new_in(alloc)
-    }
-}
-
 // ---------------------------------------------------------------------------
 // Drop — releases every unmanaged field through the single allocator
 // ---------------------------------------------------------------------------
@@ -148,6 +142,12 @@ impl<A: Allocator + Clone> Drop for Address<A> {
 // ---------------------------------------------------------------------------
 
 impl<A: Allocator + Clone> Message for Address<A> {
+    type Alloc = A;
+
+    fn new_in(alloc: A) -> Self {
+        Self::new_in(alloc)
+    }
+
     fn encoded_len(&self) -> usize {
         let c = &self._common;
         self.street.encoded_len(c) + self.city.encoded_len(c) + c.unknown_fields.len()

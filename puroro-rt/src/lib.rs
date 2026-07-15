@@ -30,8 +30,8 @@ pub use fields::shared::value_slot::ValueSlot;
 pub use fields::singular::{
     ExplicitBytes, ExplicitEnum, ExplicitInt32, ExplicitLenField, ExplicitString, ExplicitVarint,
     ExplicitVarintField, ImplicitBytes, ImplicitEnum, ImplicitInt32, ImplicitLenField,
-    ImplicitString, ImplicitVarint, ImplicitVarintField, MessagePresence, NestedMessage,
-    NestedMessageField, NestedMessageFieldMut, NestedMessageFieldRef, Singular, SingularAccess,
+    ImplicitString, ImplicitVarint, ImplicitVarintField, MessagePresence, NestedMessageField,
+    NestedMessageFieldMut, NestedMessageFieldRef, Singular, SingularAccess,
     SingularField, SingularFieldMut, SingularFieldRef, SingularLen, SingularLenField,
     SingularLenFieldMut, SingularLenFieldRef, SingularVarint, SingularVarintField,
     SingularVarintFieldMut, SingularVarintFieldRef,

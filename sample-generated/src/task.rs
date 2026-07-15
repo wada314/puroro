@@ -543,6 +543,12 @@ impl<A: Allocator + Clone> Drop for Task<A> {
 // ---------------------------------------------------------------------------
 
 impl<A: Allocator + Clone> Message for Task<A> {
+    type Alloc = A;
+
+    fn new_in(alloc: A) -> Self {
+        Self::new_in(alloc)
+    }
+
     fn encoded_len(&self) -> usize {
         let c = &self._common;
         let mut n = 0usize;

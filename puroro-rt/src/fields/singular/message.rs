@@ -33,12 +33,6 @@ use crate::fields::shared::{
 };
 use crate::fields::wire::len;
 
-/// Trait for child message types stored in [`NestedMessageField`].
-pub trait NestedMessage<A: Allocator + Clone>: Message {
-    /// Creates an empty child message with the given allocator.
-    fn new_in(alloc: A) -> Self;
-}
-
 /// Storage strategy for [`NestedMessageField`] — whether the child box is
 /// wrapped in `Option` (optional presence) or always present under `ManuallyDrop`.
 pub trait MessagePresence {
@@ -53,7 +47,7 @@ pub trait MessagePresence {
     /// ([`Singular`] only).
     fn as_mut_for_merge<M, A: Allocator>(store: &mut Self::Store<M, A>, alloc: A) -> &mut M
     where
-        M: NestedMessage<A>,
+        M: Message<Alloc = A>,
         A: Clone;
 }
 
@@ -68,7 +62,7 @@ impl MessagePresence for Singular {
 
     fn as_mut_for_merge<M, A: Allocator>(store: &mut Self::Store<M, A>, alloc: A) -> &mut M
     where
-        M: NestedMessage<A>,
+        M: Message<Alloc = A>,
         A: Clone,
     {
         if store.is_none() {
@@ -88,7 +82,7 @@ impl MessagePresence for Oneof {
 
     fn as_mut_for_merge<M, A: Allocator>(store: &mut Self::Store<M, A>, _: A) -> &mut M
     where
-        M: NestedMessage<A>,
+        M: Message<Alloc = A>,
         A: Clone,
     {
         store
@@ -197,7 +191,7 @@ impl<M, const FIELD: u32, A: Allocator> NestedMessageField<M, Oneof, FIELD, A> {
     pub fn with_message_in(alloc: A) -> Self
     where
         A: Clone,
-        M: NestedMessage<A>,
+        M: Message<Alloc = A>,
     {
         let m = M::new_in(alloc.clone());
         Self {
@@ -336,7 +330,7 @@ impl<'f, 'c, M, P: MessagePresence, const FIELD: u32, A: Allocator + Clone, Pb: 
     /// merge for [`Singular`], then merges subsequent occurrences into it).
     pub fn merge<B: Buf>(self, wire_type: WireType, buf: &mut B) -> Result<(), DecodeError>
     where
-        M: NestedMessage<A>,
+        M: Message<Alloc = A>,
     {
         if wire_type != len::WIRE_TYPE {
             return Err(DecodeError::InvalidTag);
@@ -359,7 +353,7 @@ impl<'f, 'c, M, const FIELD: u32, A: Allocator + Clone, Pb: PresenceBits>
     /// Borrows only the field (`'f`), so `common` is free once this returns.
     pub fn get_mut(self) -> &'f mut M
     where
-        M: NestedMessage<A>,
+        M: Message<Alloc = A>,
     {
         Singular::as_mut_for_merge(&mut self.field.store, self.common.alloc.clone())
     }

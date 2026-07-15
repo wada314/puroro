@@ -1,5 +1,6 @@
 //! The [`Message`] trait shared by every generated protobuf message.
 
+use ::allocator_api2::alloc::Allocator;
 use ::bytes::{Buf, BufMut};
 
 use crate::error::DecodeError;
@@ -13,9 +14,17 @@ use crate::unknown::UnknownField;
 /// wins method resolution; call the trait method via UFCS
 /// (e.g. [`Message::validate`]).
 ///
-/// Constructors (`new` / `new_in`) remain inherent methods on the generated
-/// struct.
+/// The associated [`Alloc`](Self::Alloc) is the message's single allocator type
+/// parameter. Nested fields construct children with
+/// [`new_in`](Self::new_in) using the parent allocator (`M: Message<Alloc = A>`).
+/// An inherent `new()` for `Global` may still be provided on the concrete type.
 pub trait Message: Sized {
+    /// Allocator that owns this message's heap allocations.
+    type Alloc: Allocator + Clone;
+
+    /// Creates an empty message with the given allocator.
+    fn new_in(alloc: Self::Alloc) -> Self;
+
     // -- codec --------------------------------------------------------------
 
     /// Exact number of bytes this message occupies on the wire.

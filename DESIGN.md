@@ -165,6 +165,9 @@ Implemented by **every** generated message (C++ `MessageLite`-like surface: code
 
 ```rust
 pub trait Message: Sized {
+    type Alloc: Allocator + Clone;
+    fn new_in(alloc: Self::Alloc) -> Self;
+
     // Codec (required)
     fn encoded_len(&self) -> usize;
     fn encode_raw<B: bytes::BufMut>(&self, buf: &mut B);
@@ -191,7 +194,7 @@ pub trait Message: Sized {
 
 **Name conflicts.** If a proto field is named `validate`, `unknown_fields`, `encoded_len`, etc., the inherent field getter wins; use `Message::validate(&msg)` (UFCS).
 
-Constructors (`new` / `new_in`) remain inherent methods on the generated struct. `decode` requires `Self: Default` (typically `A: Default`); otherwise use `new_in(alloc)` then `merge_from`.
+**Allocator.** `Alloc` is the message's single allocator type. Nested message fields construct children with `Message::new_in` under the bound `M: Message<Alloc = A>` (same `A` as the parent). An inherent `new()` for `Global` may still be emitted on the concrete type. `decode` requires `Self: Default` (typically `A: Default`); otherwise use `new_in(alloc)` then `merge_from`.
 
 ---
 
