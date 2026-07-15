@@ -55,7 +55,7 @@ impl DeallocateIn for () {
 
 impl ProtoEmpty for () {
     /// Unit has no payload; bit-packed bool emptiness is decided via
-    /// [`ScalarRef::is_empty`](crate::fields::wire::scalar::ScalarRef::is_empty).
+    /// [`ScalarProtoType::is_proto_empty`](crate::fields::wire::scalar::ScalarProtoType::is_proto_empty).
     #[inline]
     fn is_proto_empty(&self) -> bool {
         true

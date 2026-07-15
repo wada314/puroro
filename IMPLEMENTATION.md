@@ -178,7 +178,7 @@ Field catalog methods take `&MessageCommon` / `&mut MessageCommon`, not `&Task`,
 
 [`PresenceBits`](puroro-rt/src/fields/shared.rs) — trait implemented on the message-specific bitfield **newtype** (not on raw `BitArray` — orphan rules). Bits cover EXPLICIT / LEGACY_REQUIRED **presence** and packed **bool values**. [`MessageCommon::is_bit_set`](puroro-rt/src/fields/shared.rs) / `set_bit` / `bit_mut` forward to it; `bit_mut` returns bitvec's `BitRef<'_, Mut, u8, Lsb0>` (generated presence newtypes wrap `BitArray<[u8; N], Lsb0>`).
 
-[`ValueSlot<T>`](puroro-rt/src/fields/shared/value_slot.rs) — singular scalar **slot** storage behind a GAT on [`FieldPresence`](puroro-rt/src/fields/shared/field_presence.rs): always-initialized `T` for `Implicit` / `Oneof`; `MaybeUninit<T>` for `Explicit` / `LegacyRequired`. Here `T` is [`ScalarProtoType::Slot`](puroro-rt/src/fields/wire/scalar.rs) (addressable wrapper or `()` for bool), not the protobuf type marker. Construction / teardown thread an allocator via [`DefaultIn`](puroro-rt/src/fields/shared.rs) / [`DeallocateIn`](puroro-rt/src/fields/shared.rs). Reads and mutation go through short-lived views: `slot.with(init, common)` → [`ValueSlotRefAccess`](puroro-rt/src/fields/shared/value_slot.rs) / `slot.with_mut(init, common)` → [`ValueSlotMutAccess`](puroro-rt/src/fields/shared/value_slot.rs) (`get` / `get_mut` / `set` / `clear`). Init markers ([`AlwaysInitialized`](puroro-rt/src/fields/shared/slot_init.rs) / [`BitInit`](puroro-rt/src/fields/shared/slot_init.rs)) are borrow-free; they read/update state through the passed [`MessageCommon`](puroro-rt/src/fields/shared.rs). Slot payloads use [`AddressableSlot`](puroro-rt/src/fields/shared/value_slot.rs); logical bool values are read/written via [`ScalarProtoType`](puroro-rt/src/fields/wire/scalar.rs) against `_common.presence`. [`ProtoEmpty`](puroro-rt/src/fields/shared.rs) still backs addressable IMPLICIT omit via slot `is_proto_empty` where used; singular omit checks go through [`ScalarRef::is_empty`](puroro-rt/src/fields/wire/scalar.rs) on `T::get(…)`.
+[`ValueSlot<T>`](puroro-rt/src/fields/shared/value_slot.rs) — singular scalar **slot** storage behind a GAT on [`FieldPresence`](puroro-rt/src/fields/shared/field_presence.rs): always-initialized `T` for `Implicit` / `Oneof`; `MaybeUninit<T>` for `Explicit` / `LegacyRequired`. Here `T` is [`ScalarProtoType::Slot`](puroro-rt/src/fields/wire/scalar.rs) (addressable wrapper or `()` for bool), not the protobuf type marker. Construction / teardown thread an allocator via [`DefaultIn`](puroro-rt/src/fields/shared.rs) / [`DeallocateIn`](puroro-rt/src/fields/shared.rs). Reads and mutation go through short-lived views: `slot.with(init, common)` → [`ValueSlotRefAccess`](puroro-rt/src/fields/shared/value_slot.rs) / `slot.with_mut(init, common)` → [`ValueSlotMutAccess`](puroro-rt/src/fields/shared/value_slot.rs) (`get` / `get_mut` / `set` / `clear`). Init markers ([`AlwaysInitialized`](puroro-rt/src/fields/shared/slot_init.rs) / [`BitInit`](puroro-rt/src/fields/shared/slot_init.rs)) are borrow-free; they read/update state through the passed [`MessageCommon`](puroro-rt/src/fields/shared.rs). Slot payloads use [`AddressableSlot`](puroro-rt/src/fields/shared/value_slot.rs); logical bool values are read/written via [`ScalarProtoType`](puroro-rt/src/fields/wire/scalar.rs) against `_common.presence`. Singular IMPLICIT omit goes through [`ScalarProtoType::is_proto_empty`](puroro-rt/src/fields/wire/scalar.rs) (slot [`ProtoEmpty`](puroro-rt/src/fields/shared.rs) for addressable types; bit read for `ProtoBool`).
 
 [`SingularAccess`](puroro-rt/src/fields/singular/access.rs) — singular wrappers expose getter payloads (`Ref` / `Mut`) and MessageCommon binding (`bind` / `bind_mut` → `View` / `ViewMut`). Repeated fields and [`OneofSlot`](puroro-rt/src/fields/oneof.rs) use the same call shape via inherent `bind` / `bind_mut`.
 
@@ -193,16 +193,14 @@ One marker + trait per protobuf **wire family**. Semantic conversions delegate t
 [`ScalarProtoType`](puroro-rt/src/fields/wire/scalar.rs) is the trait consumed by [`SingularField`](puroro-rt/src/fields/singular/field.rs). It unifies varint and LEN for **non-repeated** fields. Each implementor is a **protobuf type marker**; physical field storage is the associated `Slot` (`Self` for addressable wrappers; `()` for bit-packed [`ProtoBool`](puroro-rt/src/fields/wire/varint.rs)):
 
 ```rust
-pub trait ScalarRef {
-    fn is_empty(self) -> bool;
-}
-
 pub trait ScalarProtoType: Sized {
     type Slot: AddressableSlot; // Self for addressable; () for ProtoBool
-    type Ref<'a>: ScalarRef where Self: 'a;
+    type Ref<'a> where Self: 'a;
     type Mut<'a, A: Allocator + 'a>: DerefMut where Self: 'a;
     type Written;
     const WIRE_TYPE: WireType;
+    // IMPLICIT omit: ProtoEmpty on addressable slots; bit read for ProtoBool
+    fn is_proto_empty<Pb, A>(slot: &Self::Slot, common: &MessageCommon<Pb, A>) -> bool;
     fn get<'a, Pb, A>(slot: &'a Self::Slot, common: &'a MessageCommon<Pb, A>) -> Self::Ref<'a>;
     fn with_mut / write / clear(/* ValueSlot + MessageCommon */);
     // encoded_len / encode stay on the marker: int32 vs sint32 share Ref = i32
@@ -588,7 +586,7 @@ In this catalog, **singular** means a **non-repeated** field — both `IMPLICIT`
 
 ### Unified wrapper (`SingularField<T, P, FIELD>`)
 
-Varint and LEN share [`SingularField`](puroro-rt/src/fields/singular/field.rs), parametrised by type marker `T: ScalarProtoType`. Addressable scalars and bit-packed [`ProtoBool<VALUE_BIT>`](puroro-rt/src/fields/wire/varint.rs) share one encode/merge/accessor path via contextual `ScalarProtoType` methods (`get` / `with_mut` / …) and [`ScalarRef::is_empty`](puroro-rt/src/fields/wire/scalar.rs) on getter payloads. Ergonomic aliases (`SingularVarintField`, `SingularLenField`, `ImplicitInt32`, `ExplicitString`, …) are type aliases of the same struct.
+Varint and LEN share [`SingularField`](puroro-rt/src/fields/singular/field.rs), parametrised by type marker `T: ScalarProtoType`. Addressable scalars and bit-packed [`ProtoBool<VALUE_BIT>`](puroro-rt/src/fields/wire/varint.rs) share one encode/merge/accessor path via contextual `ScalarProtoType` methods (`get` / `with_mut` / `is_proto_empty` / …). Ergonomic aliases (`SingularVarintField`, `SingularLenField`, `ImplicitInt32`, `ExplicitString`, …) are type aliases of the same struct.
 
 Storage is `ManuallyDrop<P::ValueSlot<T::Slot>>` — `T` / `MaybeUninit<T>` for addressable wrappers, or `()` / `MaybeUninit<()>` for bool — depending on presence. Heap LEN payloads need an explicit [`FieldDeallocate::deallocate`](puroro-rt/src/fields/shared/field_deallocate.rs)(`&common`) from message / oneof teardown; copy scalars’ / unit-slot `DeallocateIn` is a no-op.
 

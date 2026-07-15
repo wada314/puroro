@@ -33,7 +33,7 @@ use crate::fields::shared::{
     value_slot::{ValueSlot, ValueSlotRefAccess},
 };
 use crate::fields::shared::FieldDeallocate;
-use crate::fields::wire::scalar::{ScalarProtoType, ScalarRef};
+use crate::fields::wire::scalar::ScalarProtoType;
 use crate::fields::wire::varint::{self, VarintProtoType};
 
 /// Singular (non-repeated) scalar field — varint or LEN, selected by type marker `T`.
@@ -99,7 +99,7 @@ where
         if P::should_emit(common, || {
             let init = P::slot_init_view();
             match self.value.with(init, common).get() {
-                Some(slot) => T::get(slot, common).is_empty(),
+                Some(slot) => T::is_proto_empty(slot, common),
                 None => true,
             }
         }) {
@@ -123,7 +123,7 @@ where
         if P::should_emit(common, || {
             let init = P::slot_init_view();
             match self.value.with(init, common).get() {
-                Some(slot) => T::get(slot, common).is_empty(),
+                Some(slot) => T::is_proto_empty(slot, common),
                 None => true,
             }
         }) {
@@ -217,7 +217,7 @@ where
         LegacyRequired::<BIT>::validate_present(common, FIELD, || {
             let init = <LegacyRequired<BIT> as FieldPresence>::slot_init_view();
             match self.value.with(init, common).get() {
-                Some(slot) => T::get(slot, common).is_empty(),
+                Some(slot) => T::is_proto_empty(slot, common),
                 None => true,
             }
         })
@@ -274,7 +274,7 @@ where
                 .with(P::slot_init_view(), self.common)
                 .get()
             {
-                Some(slot) => T::get(slot, self.common).is_empty(),
+                Some(slot) => T::is_proto_empty(slot, self.common),
                 None => true,
             }
         }) {

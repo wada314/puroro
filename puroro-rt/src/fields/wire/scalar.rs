@@ -4,10 +4,11 @@
 //! The physical field slot is the associated [`Slot`](ScalarProtoType::Slot)
 //! (`Self` for addressable wrappers; `()` for bit-packed [`ProtoBool`]).
 //!
-//! Logical getter payloads implement [`ScalarRef`] (`is_empty`). Wire
-//! `encoded_len` / `encode` stay on [`ScalarProtoType`] because multiple markers
-//! can share the same `Ref` type (e.g. [`ProtoInt32`] and [`ProtoSint32`] both
-//! use `i32`).
+//! IMPLICIT omit uses [`is_proto_empty`](ScalarProtoType::is_proto_empty) on the
+//! type marker (slot [`ProtoEmpty`](crate::fields::shared::ProtoEmpty) for
+//! addressable types; bit read for [`ProtoBool`]). Wire `encoded_len` /
+//! `encode` stay on the marker because multiple markers can share the same
+//! `Ref` type (e.g. [`ProtoInt32`] and [`ProtoSint32`] both use `i32`).
 //!
 //! [`VarintProtoType`](super::varint::VarintProtoType) and
 //! [`LenProtoType`](super::len::LenProtoType) remain for **repeated** fields,
@@ -24,66 +25,13 @@ use ::puroro::WireType;
 use crate::decode;
 use crate::encode;
 use crate::fields::shared::{
-    MessageCommon, PresenceBits,
+    MessageCommon, PresenceBits, ProtoEmpty,
     slot_init::SlotInitMut,
     value_slot::{AddressableSlot, ValueSlot, ValueSlotMutAccess},
 };
 
 use super::len::{LenProtoType, ProtoBytes, ProtoString};
-use super::varint::{ProtoBool, ProtoEnumStorage, VarintProtoType};
-
-/// Logical getter payload for a singular scalar (`i32`, `bool`, `&str`, …).
-///
-/// Emptiness for IMPLICIT omit lives here. Wire encode stays on
-/// [`ScalarProtoType`] because distinct markers may share the same `Ref` type.
-pub trait ScalarRef {
-    /// `true` when this value is protobuf empty / type-zero.
-    fn is_empty(self) -> bool;
-}
-
-macro_rules! impl_scalar_ref_zero {
-    ($ty:ty, $zero:expr) => {
-        impl ScalarRef for $ty {
-            #[inline]
-            fn is_empty(self) -> bool {
-                self == $zero
-            }
-        }
-    };
-}
-
-impl_scalar_ref_zero!(i32, 0);
-impl_scalar_ref_zero!(i64, 0);
-impl_scalar_ref_zero!(u32, 0);
-impl_scalar_ref_zero!(u64, 0);
-
-impl ScalarRef for bool {
-    #[inline]
-    fn is_empty(self) -> bool {
-        !self
-    }
-}
-
-impl ScalarRef for &str {
-    #[inline]
-    fn is_empty(self) -> bool {
-        self.is_empty()
-    }
-}
-
-impl ScalarRef for &[u8] {
-    #[inline]
-    fn is_empty(self) -> bool {
-        self.is_empty()
-    }
-}
-
-impl<E: ProtoEnumStorage> ScalarRef for E {
-    #[inline]
-    fn is_empty(self) -> bool {
-        self == E::proto_zero()
-    }
-}
+use super::varint::{ProtoBool, VarintProtoType};
 
 /// Wire + accessor semantics for a singular scalar protobuf type.
 ///
@@ -101,7 +49,7 @@ pub trait ScalarProtoType: Sized {
     type Slot: AddressableSlot;
 
     /// Borrowed / by-value view returned by getters (`i32`, `&str`, `bool`, …).
-    type Ref<'a>: ScalarRef
+    type Ref<'a>
     where
         Self: 'a;
 
@@ -116,6 +64,15 @@ pub trait ScalarProtoType: Sized {
 
     /// Expected wire type for a singular occurrence of this field.
     const WIRE_TYPE: WireType;
+
+    /// `true` when the field holds protobuf empty / type-zero (IMPLICIT omit).
+    ///
+    /// Addressable slots delegate to [`ProtoEmpty`]; bit-packed [`ProtoBool`]
+    /// reads the value bit from `common`.
+    fn is_proto_empty<Pb: PresenceBits, A: Allocator>(
+        slot: &Self::Slot,
+        common: &MessageCommon<Pb, A>,
+    ) -> bool;
 
     /// Reads the logical getter view from the slot and/or `common`.
     fn get<'a, Pb: PresenceBits, A: Allocator>(
@@ -159,8 +116,8 @@ pub trait ScalarProtoType: Sized {
 
     /// Wire byte length of one tagged occurrence for `value`.
     ///
-    /// Kept on the type marker (not [`ScalarRef`]) so int32 vs sint32 can share
-    /// `Ref = i32` with different wire encodings.
+    /// Kept on the type marker so int32 vs sint32 can share `Ref = i32` with
+    /// different wire encodings.
     fn encoded_len(value: Self::Ref<'_>, field: u32) -> usize;
 
     /// Encodes one tagged occurrence for `value`.
@@ -180,9 +137,8 @@ pub trait ScalarProtoType: Sized {
 
 impl<T> ScalarProtoType for T
 where
-    T: VarintProtoType + AddressableSlot + From<T::Value> + 'static,
+    T: VarintProtoType + AddressableSlot + From<T::Value> + ProtoEmpty + 'static,
     T: Deref<Target = T::Value> + DerefMut,
-    T::Value: ScalarRef,
 {
     type Slot = Self;
     type Ref<'a>
@@ -195,6 +151,14 @@ where
         Self: 'a;
     type Written = Self;
     const WIRE_TYPE: WireType = WireType::Varint;
+
+    #[inline]
+    fn is_proto_empty<Pb: PresenceBits, A: Allocator>(
+        slot: &Self::Slot,
+        _common: &MessageCommon<Pb, A>,
+    ) -> bool {
+        slot.is_proto_empty()
+    }
 
     #[inline]
     fn get<'a, Pb: PresenceBits, A: Allocator>(
@@ -281,6 +245,14 @@ impl ScalarProtoType for ProtoString {
     const WIRE_TYPE: WireType = WireType::Len;
 
     #[inline]
+    fn is_proto_empty<Pb: PresenceBits, A: Allocator>(
+        slot: &Self::Slot,
+        _common: &MessageCommon<Pb, A>,
+    ) -> bool {
+        slot.is_proto_empty()
+    }
+
+    #[inline]
     fn get<'a, Pb: PresenceBits, A: Allocator>(
         slot: &'a Self::Slot,
         _common: &'a MessageCommon<Pb, A>,
@@ -362,6 +334,14 @@ impl ScalarProtoType for ProtoBytes {
     type Mut<'a, A: Allocator + 'a> = <Self as LenProtoType>::Mut<'a, A>;
     type Written = Self;
     const WIRE_TYPE: WireType = WireType::Len;
+
+    #[inline]
+    fn is_proto_empty<Pb: PresenceBits, A: Allocator>(
+        slot: &Self::Slot,
+        _common: &MessageCommon<Pb, A>,
+    ) -> bool {
+        slot.is_proto_empty()
+    }
 
     #[inline]
     fn get<'a, Pb: PresenceBits, A: Allocator>(
@@ -452,6 +432,14 @@ impl<const VALUE_BIT: usize> ScalarProtoType for ProtoBool<VALUE_BIT> {
         ::bitvec::ptr::BitRef<'a, ::bitvec::ptr::Mut, u8, ::bitvec::order::Lsb0>;
     type Written = bool;
     const WIRE_TYPE: WireType = WireType::Varint;
+
+    #[inline]
+    fn is_proto_empty<Pb: PresenceBits, A: Allocator>(
+        _slot: &(),
+        common: &MessageCommon<Pb, A>,
+    ) -> bool {
+        !common.is_bit_set(VALUE_BIT)
+    }
 
     #[inline]
     fn get<'a, Pb: PresenceBits, A: Allocator>(
