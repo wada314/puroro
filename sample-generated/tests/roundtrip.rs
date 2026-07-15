@@ -1,4 +1,4 @@
-use ::puroro::{MessageDecode, MessageEncode};
+use ::puroro::{MessageDecode, MessageEncode, UnknownPayload};
 use ::puroro_sample_generated::task::{Notification, NotificationCase};
 use ::puroro_sample_generated::{Address, Priority, Status, Task};
 
@@ -220,7 +220,10 @@ fn closed_enum_unknown_goes_to_unknown_fields() {
 
     assert!(!task.priority().is_set());
     assert_eq!(task.priority().get(), Priority::UNSPECIFIED);
-    assert!(!task.unknown_fields().is_empty());
+    let unknowns: Vec<_> = task.unknown_fields().collect();
+    assert_eq!(unknowns.len(), 1);
+    assert_eq!(unknowns[0].number(), 10);
+    assert_eq!(*unknowns[0].payload(), UnknownPayload::Varint(99));
 }
 
 #[test]
@@ -238,7 +241,7 @@ fn open_enum_unknown_stays_in_field() {
 
     assert!(task.status().is_set());
     assert_eq!(task.status().get(), Status::from(99));
-    assert!(task.unknown_fields().is_empty());
+    assert!(task.unknown_fields().next().is_none());
 }
 
 #[test]

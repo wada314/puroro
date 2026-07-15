@@ -44,7 +44,7 @@ The puroro project comprises several crates and tools with distinct roles:
 | Component | Role |
 |---|---|
 | **`protobuf-core`** (git submodule) | Wire-format **primitives** — `Varint`, `Tag`, `WireType`, field I/O traits, varint read/write. Used by `puroro` and `puroro-rt`; **generated code does not import it directly**. |
-| **`puroro`** | **Stable user-facing runtime API** — `MessageEncode` / `MessageDecode`, `Optional`, `HasDefault`, `DecodeError` / `EncodeError`, `WireType`. Library users depend on this crate; generated message code imports it for traits, accessor return types, and error handling. |
+| **`puroro`** | **Stable user-facing runtime API** — `MessageEncode` / `MessageDecode`, `Optional`, `HasDefault`, `DecodeError` / `EncodeError`, `WireType`, `UnknownField` / `UnknownPayload`. Library users depend on this crate; generated message code imports it for traits, accessor return types, and error handling. |
 | **`puroro-rt`** | **Generated-code runtime** — composable field catalog (`fields::*`, `MessageCommon`), wire encode/decode helpers (`encode` / `decode` modules), `ProtoDefault`, and allocator-aware string/bytes utilities. Emitted generated code imports this crate (transitively for end users). Semver is looser than `puroro`; do not depend on it directly from application code. See [IMPLEMENTATION.md §4](IMPLEMENTATION.md#4-shared-infrastructure). |
 | **Code generator** (`protoc` plugin) | Reads `.proto` input (via `protoc`) and emits Rust source implementing the API defined in this document. **Primary execution path:** register as a `protoc` plugin (`--puroro_out=…`). Other invocation styles (standalone CLI, `build.rs` wrapper, etc.) are permitted but not required. Emits fully-qualified paths into both `::puroro::…` (traits, `Optional`, errors) and `::puroro_rt::…` (field catalog, wire helpers). |
 
@@ -275,8 +275,8 @@ pub trait TaskMessage {
     // LEGACY_REQUIRED validation
     fn validate(&self) -> Result<(), DecodeError>;
 
-    // Unknown fields
-    fn unknown_fields(&self) -> &[u8];
+    // Unknown fields — structured views; storage may be a wire blob or empty
+    fn unknown_fields(&self) -> impl Iterator<Item = UnknownField<'_>> + '_;
 }
 ```
 
@@ -865,15 +865,25 @@ When a `LEGACY_REQUIRED` field was absent from the wire, `owner_id().is_set()` i
 
 ### 4.9 Unknown fields
 
-All generated messages expose the raw bytes of any unrecognised fields:
+All generated messages expose unrecognised fields (and closed-enum unknowns diverted into the unknown set) as a **structured iterator**, not as a raw `&[u8]`:
 
 ```rust
-pub fn unknown_fields(&self) -> &[u8];
+pub fn unknown_fields(&self) -> impl Iterator<Item = UnknownField<'_>> + '_;
 ```
 
-These bytes form a valid partial protobuf stream and are re-emitted verbatim at the end of the message on encode, ensuring forward-compatibility round-trips.
+[`UnknownField`](src/unknown.rs) carries the field number and an [`UnknownPayload`](src/unknown.rs) (`Varint` / `Fixed64` / `Bytes` / `Fixed32`). `wire_type()` is derived from the payload. The same field number may appear more than once.
 
-**Disabling unknown-field preservation:** a future attribute (e.g. `#[puroro(no_unknown_fields)]`) would omit the unknown-fields buffer. Not yet implemented.
+This shape is the **common public contract**: it does not require contiguous wire storage, so future policies (discard, alternate layouts, custom handlers) can keep the same accessor. A common-trait `as_bytes()` is intentionally not provided.
+
+**Default implementation (today):** `MessageCommon` still stores a contiguous partial protobuf stream (`UnmanagedVec<u8>`), filled by `skip_field_and_save` / closed-enum diversion. Encode re-emits that blob verbatim at the end of the message. The public iterator parses the blob via `puroro_rt::decode::iter_unknown_fields`.
+
+**Future policies (not yet implemented):**
+
+| Policy | Behaviour |
+|---|---|
+| **Preserve** (default) | Keep unknowns for round-trip; expose via the iterator |
+| **Discard** | Opt-in (e.g. `#[puroro(no_unknown_fields)]`); omit the buffer; iterator is empty. Spec prefers preserve; discard is a deliberate size/privacy trade-off |
+| **Custom** | Later hook / type-parameterised storage owned by the message |
 
 ---
 
@@ -1277,7 +1287,7 @@ Generic code that only reads fields can be written once against `TaskMessageFall
 
 - **UTF-8 validation (`NONE` path).** Expose an unchecked decode helper; wire per-field dispatch in generated code. (`VERIFY` path exists today.)
 - **Recursion limit enforcement.** Thread depth through nested `merge_from`; return `DecodeError::RecursionLimitExceeded`. (Error variant exists; enforcement is a stub.)
-- **Unknown-field preservation opt-out.** A per-message attribute to omit the unknown-fields buffer.
+- **Unknown-field preservation opt-out.** A per-message attribute to discard unknowns (`Discard` policy in §4.9); public accessor remains an empty iterator.
 - **Map fields.** Syntactic sugar for a repeated message entry; requires an allocator-aware map type.
 - **Service / RPC definitions.** Out of scope for the runtime library.
 - **Well-known types.** `google.protobuf.Timestamp`, `Duration`, `Any`, etc.

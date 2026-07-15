@@ -502,8 +502,8 @@ impl<A: Allocator + Clone> Task<A> {
 
     // -- message-level ------------------------------------------------------
 
-    pub fn unknown_fields(&self) -> &[u8] {
-        &self._common.unknown_fields
+    pub fn unknown_fields(&self) -> impl Iterator<Item = ::puroro::UnknownField<'_>> + '_ {
+        self._common.iter_unknown_fields()
     }
 
     /// Checks `LEGACY_REQUIRED` fields (`owner_id`).

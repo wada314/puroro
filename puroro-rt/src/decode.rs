@@ -6,7 +6,7 @@
 use ::allocator_api2::alloc::Allocator;
 use ::bytes::Buf;
 use ::protobuf_core::{IteratorExtVarint, Tag, Varint};
-use ::puroro::{DecodeError, WireType};
+use ::puroro::{DecodeError, UnknownField, UnknownPayload, WireType};
 use ::unmanaged::{UnmanagedString, UnmanagedVec};
 
 use crate::encode;
@@ -151,4 +151,103 @@ pub(crate) fn save_unknown_varint_field<A: Allocator>(
     let tag = encode::tag_to_u64_for_unknown(field_number, WireType::Varint);
     encode::write_varint_to_vec(tag, &mut *g);
     encode::write_varint_to_vec(value, &mut *g);
+}
+
+/// Iterates unknown fields stored as a contiguous partial protobuf stream.
+///
+/// The buffer is expected to be written only by [`skip_field_and_save`] and
+/// [`save_unknown_varint_field`]. On truncated or otherwise corrupt input the
+/// iterator ends (infallible for callers).
+#[inline]
+pub fn iter_unknown_fields(bytes: &[u8]) -> UnknownFieldsIter<'_> {
+    UnknownFieldsIter { rest: bytes }
+}
+
+/// Iterator over [`UnknownField`] values parsed from a preserved unknown-fields
+/// wire blob.
+#[derive(Debug, Clone)]
+pub struct UnknownFieldsIter<'a> {
+    rest: &'a [u8],
+}
+
+impl<'a> Iterator for UnknownFieldsIter<'a> {
+    type Item = UnknownField<'a>;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.rest.is_empty() {
+            return None;
+        }
+
+        let mut buf = self.rest;
+        let (number, wire_type) = match decode_tag(&mut buf) {
+            Ok(t) => t,
+            Err(_) => {
+                debug_assert!(false, "corrupt unknown-fields blob: bad tag");
+                self.rest = &[];
+                return None;
+            }
+        };
+
+        let payload = match wire_type {
+            WireType::Varint => {
+                let v = match decode_varint(&mut buf) {
+                    Ok(v) => v,
+                    Err(_) => {
+                        debug_assert!(false, "corrupt unknown-fields blob: bad varint");
+                        self.rest = &[];
+                        return None;
+                    }
+                };
+                UnknownPayload::Varint(v)
+            }
+            WireType::Int64 => {
+                if buf.len() < 8 {
+                    debug_assert!(false, "corrupt unknown-fields blob: truncated I64");
+                    self.rest = &[];
+                    return None;
+                }
+                let mut le = [0u8; 8];
+                le.copy_from_slice(&buf[..8]);
+                buf = &buf[8..];
+                UnknownPayload::Fixed64(u64::from_le_bytes(le))
+            }
+            WireType::Len => {
+                let len = match decode_varint(&mut buf) {
+                    Ok(v) => v as usize,
+                    Err(_) => {
+                        debug_assert!(false, "corrupt unknown-fields blob: bad LEN length");
+                        self.rest = &[];
+                        return None;
+                    }
+                };
+                if buf.len() < len {
+                    debug_assert!(false, "corrupt unknown-fields blob: truncated LEN");
+                    self.rest = &[];
+                    return None;
+                }
+                let payload = &buf[..len];
+                buf = &buf[len..];
+                UnknownPayload::Bytes(payload)
+            }
+            WireType::Int32 => {
+                if buf.len() < 4 {
+                    debug_assert!(false, "corrupt unknown-fields blob: truncated I32");
+                    self.rest = &[];
+                    return None;
+                }
+                let mut le = [0u8; 4];
+                le.copy_from_slice(&buf[..4]);
+                buf = &buf[4..];
+                UnknownPayload::Fixed32(u32::from_le_bytes(le))
+            }
+            WireType::SGroup | WireType::EGroup => {
+                debug_assert!(false, "groups are not preserved in unknown fields");
+                self.rest = &[];
+                return None;
+            }
+        };
+
+        self.rest = buf;
+        Some(UnknownField::new(number, payload))
+    }
 }

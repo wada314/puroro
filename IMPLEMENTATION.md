@@ -169,7 +169,7 @@ protobuf-core           Varint, Tag, WireType
 | Member | Role |
 |---|---|
 | `presence: P` | Bitfield newtype (`TaskPresence`, …) for EXPLICIT / LEGACY_REQUIRED presence **and** packed bool value bits |
-| `unknown_fields: ManuallyDrop<UnmanagedVec<u8>>` | Round-trip unknown wire; closed-enum unknown variants. Allocator-less; freed by `MessageCommon::deallocate` |
+| `unknown_fields: ManuallyDrop<UnmanagedVec<u8>>` | Preserve policy: round-trip unknown wire blob; closed-enum unknowns. Public view via `iter_unknown_fields`. Freed by `MessageCommon::deallocate` |
 | `alloc: A` | The single canonical allocator copy; borrowed (`&A`) by every field operation that (de)allocates |
 
 Field catalog methods take `&MessageCommon` / `&mut MessageCommon`, not `&Task`, so wrappers stay decoupled from the parent message type.
@@ -685,7 +685,9 @@ The `set_*` per-variant setters are removed, matching the other field families.
 
 ### Unknown
 
-`_common.unknown_fields` — valid partial wire stream via `puroro_rt::decode::skip_field_and_save`; re-emitted on encode. `SGroup` / `EGroup` not preserved.
+**Storage (default Preserve):** `_common.unknown_fields` — contiguous partial wire stream via `puroro_rt::decode::skip_field_and_save` / `save_unknown_varint_field`; re-emitted on encode. `SGroup` / `EGroup` not preserved.
+
+**Public accessor:** `unknown_fields()` returns `impl Iterator<Item = ::puroro::UnknownField<'_>>` by parsing that blob with [`iter_unknown_fields`](puroro-rt/src/decode.rs) (also `MessageCommon::iter_unknown_fields`). Encode paths read the blob directly and do not go through the iterator.
 
 ---
 

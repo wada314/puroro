@@ -93,6 +93,15 @@ impl<P, A: Allocator> MessageCommon<P, A> {
             alloc,
         }
     }
+
+    /// Iterates preserved unknown fields as structured views.
+    ///
+    /// Storage remains a contiguous wire blob; this only parses it for the
+    /// public accessor shape.
+    #[inline]
+    pub fn iter_unknown_fields(&self) -> crate::decode::UnknownFieldsIter<'_> {
+        crate::decode::iter_unknown_fields(&self.unknown_fields)
+    }
 }
 
 impl<P, A: Allocator + Clone> MessageCommon<P, A> {
