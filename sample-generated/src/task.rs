@@ -14,10 +14,10 @@ use ::bytes::{Buf, BufMut};
 
 use ::puroro::{DecodeError, HasDefault, MessageDecode, MessageEncode, Optional};
 use ::puroro_rt::{
-    Explicit, FieldDeallocate, Implicit, LegacyRequired, MessageCommon, NestedMessageField,
-    OneofSlot, PresenceBits, ProtoBool, ProtoBytes, ProtoEnum, ProtoInt32, ProtoString,
-    RepeatedExpandedVarintField, RepeatedLenField, RepeatedPackedVarintField, Singular,
-    SingularAccess, SingularLenField, SingularVarintField,
+    Closed, Explicit, FieldDeallocate, Implicit, LegacyRequired, MessageCommon,
+    NestedMessageField, OneofSlot, Open, PresenceBits, ProtoBool, ProtoBytes, ProtoEnum,
+    ProtoInt32, ProtoString, RepeatedExpandedVarintField, RepeatedLenField,
+    RepeatedPackedVarintField, Singular, SingularAccess, SingularLenField, SingularVarintField,
 };
 
 use defaults::MaxRetriesDefault;
@@ -128,9 +128,12 @@ pub struct Task<A: Allocator + Clone = Global> {
     tag_ids: RepeatedPackedVarintField<ProtoInt32, { FIELD_TAG_IDS }, A>, // proto: repeated int32 tag_ids = 6 [packed];
     scores: RepeatedExpandedVarintField<ProtoInt32, { FIELD_SCORES }, A>, // proto: repeated int32 scores = 7;
     labels: RepeatedLenField<ProtoString, { FIELD_LABELS }, A>, // proto: repeated string labels = 8;
-    status: SingularVarintField<ProtoEnum<Status>, Implicit, { FIELD_STATUS }>, // proto: Status status = 9;
-    priority:
-        SingularVarintField<ProtoEnum<Priority>, Explicit<{ BIT_PRIORITY }>, { FIELD_PRIORITY }>, // proto: Priority priority = 10;
+    status: SingularVarintField<ProtoEnum<Status, Open>, Implicit, { FIELD_STATUS }>, // proto: Status status = 9;
+    priority: SingularVarintField<
+        ProtoEnum<Priority, Closed>,
+        Explicit<{ BIT_PRIORITY }>,
+        { FIELD_PRIORITY },
+    >, // proto: Priority priority = 10;
     assignee: NestedMessageField<Address<A>, Singular, { FIELD_ASSIGNEE }, A>, // proto: Address assignee = 11;
     // proto: oneof notification { string email_address=12; string phone_number=13;
     //                             int32 webhook_id=14 [default=-1]; Address postal=15;
@@ -661,11 +664,9 @@ impl<A: Allocator + Clone> MessageDecode for Task<A> {
                 }
                 FIELD_PRIORITY => {
                     // priority = 10, EXPLICIT closed enum
-                    self.priority.bind_mut(&mut self._common).merge_closed(
-                        wire_type,
-                        buf,
-                        |v| Priority::try_from(v).is_ok(),
-                    )?;
+                    self.priority
+                        .bind_mut(&mut self._common)
+                        .merge(wire_type, buf)?;
                 }
                 FIELD_ASSIGNEE => {
                     // assignee = 11, nested message

@@ -37,7 +37,7 @@ pub use fields::singular::{
     SingularVarintFieldMut, SingularVarintFieldRef,
 };
 pub use fields::wire::{
-    LenProtoType, ProtoBool, ProtoBytes, ProtoEnum, ProtoEnumStorage, ProtoInt32, ProtoInt64,
-    ProtoSint32, ProtoSint64, ProtoString, ProtoUInt32, ProtoUInt64, ScalarProtoType,
-    VarintProtoType,
+    Closed, ClosedEnum, LenProtoType, Open, OpenEnum, ProtoBool, ProtoBytes, ProtoEnum,
+    ProtoEnumStorage, ProtoInt32, ProtoInt64, ProtoSint32, ProtoSint64, ProtoString, ProtoUInt32,
+    ProtoUInt64, ScalarProtoType, VarintProtoType,
 };

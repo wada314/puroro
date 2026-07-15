@@ -207,6 +207,8 @@ fn implicit_clear_omits_from_wire() {
 
 #[test]
 fn closed_enum_unknown_goes_to_unknown_fields() {
+    // Spec: https://protobuf.dev/programming-guides/enum/
+    // Closed: unrecognized value → unknown field set; field unset; default returned.
     let mut task = Task::new();
     task.owner_id_mut().push_str("x");
 
@@ -217,7 +219,26 @@ fn closed_enum_unknown_goes_to_unknown_fields() {
     task.merge_from(&mut &bytes[..]).unwrap();
 
     assert!(!task.priority().is_set());
+    assert_eq!(task.priority().get(), Priority::UNSPECIFIED);
     assert!(!task.unknown_fields().is_empty());
+}
+
+#[test]
+fn open_enum_unknown_stays_in_field() {
+    // Spec: https://protobuf.dev/programming-guides/enum/
+    // Open: unrecognized value → stored in the field; accessors report set.
+    let mut task = Task::new();
+    task.owner_id_mut().push_str("x");
+
+    // field 9 (status) = 99 (unknown open enum value)
+    let mut bytes = Vec::new();
+    ::puroro_rt::encode::encode_varint_field(9, 99, &mut bytes);
+
+    task.merge_from(&mut &bytes[..]).unwrap();
+
+    assert!(task.status().is_set());
+    assert_eq!(task.status().get(), Status::from(99));
+    assert!(task.unknown_fields().is_empty());
 }
 
 #[test]

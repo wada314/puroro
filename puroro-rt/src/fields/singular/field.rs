@@ -34,7 +34,6 @@ use crate::fields::shared::{
 };
 use crate::fields::shared::FieldDeallocate;
 use crate::fields::wire::scalar::ScalarProtoType;
-use crate::fields::wire::varint::{self, VarintProtoType};
 
 /// Singular (non-repeated) scalar field — varint or LEN, selected by type marker `T`.
 ///
@@ -388,14 +387,30 @@ where
     where
         A: Clone,
     {
-        let new = T::decode(wire_type, buf, self.common.alloc.clone())?;
-        T::write(
-            &mut *self.field.value,
-            P::slot_init_mut(),
-            self.common,
-            new,
-        );
-        Ok(())
+        match T::decode(wire_type, buf, self.common.alloc.clone()) {
+            Ok(new) => {
+                T::write(
+                    &mut *self.field.value,
+                    P::slot_init_mut(),
+                    self.common,
+                    new,
+                );
+                Ok(())
+            }
+            // Closed enum, unrecognized value: park in unknown fields (not a
+            // decode failure). See https://protobuf.dev/programming-guides/enum/
+            // — field stays unset; accessors return the enum default.
+            Err(DecodeError::UnknownClosedEnum { raw }) => {
+                decode::save_unknown_varint_field(
+                    FIELD,
+                    raw,
+                    &mut self.common.unknown_fields,
+                    self.common.alloc.clone(),
+                );
+                Ok(())
+            }
+            Err(e) => Err(e),
+        }
     }
 
     /// Resets the value slot and clears explicit presence when applicable.
@@ -408,55 +423,5 @@ where
             P::slot_init_mut(),
             self.common,
         );
-    }
-}
-
-impl<
-    'f,
-    'c,
-    T: ScalarProtoType + VarintProtoType,
-    P: FieldPresence,
-    const FIELD: u32,
-    D,
-    Pb: PresenceBits,
-    A: Allocator,
-> SingularFieldMut<'f, 'c, T, P, FIELD, D, Pb, A>
-where
-    P::ValueSlot<T::Slot>: ValueSlot<T::Slot>,
-    T::Written: From<<T as VarintProtoType>::Value>,
-    <T as VarintProtoType>::Value: Copy,
-{
-    /// Merges a closed-enum occurrence; unknown values go to `common.unknown_fields`.
-    pub fn merge_closed<B: Buf>(
-        self,
-        wire_type: WireType,
-        buf: &mut B,
-        is_known: impl FnOnce(i32) -> bool,
-    ) -> Result<(), DecodeError>
-    where
-        A: Clone,
-    {
-        if wire_type != varint::WIRE_TYPE {
-            return Err(DecodeError::InvalidTag);
-        }
-        let raw = decode::decode_varint(buf)?;
-        let wire = varint::ProtoInt32::decode_wire(raw)?;
-        if !is_known(wire) {
-            decode::save_unknown_varint_field(
-                FIELD,
-                raw,
-                &mut self.common.unknown_fields,
-                self.common.alloc.clone(),
-            );
-            return Ok(());
-        }
-        let value = T::Written::from(<T as VarintProtoType>::decode_wire(raw)?);
-        T::write(
-            &mut *self.field.value,
-            P::slot_init_mut(),
-            self.common,
-            value,
-        );
-        Ok(())
     }
 }

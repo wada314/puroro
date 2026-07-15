@@ -11,11 +11,13 @@
 //! (the inner primitive / enum) in the element buffer so `as_slice()` stays
 //! `&[i32]` / `&[E]`.
 
+use ::core::convert::TryFrom;
+use ::core::marker::PhantomData;
+
 use ::derive_more::{Deref, DerefMut, From, Into};
 use ::protobuf_core::Varint;
 
 use ::puroro::DecodeError;
-use ::puroro::WireType;
 
 use crate::fields::shared::{DeallocateIn, DefaultIn, ProtoEmpty};
 
@@ -43,54 +45,131 @@ pub trait VarintProtoType {
 // Generated protobuf enum newtypes
 // ---------------------------------------------------------------------------
 
-/// Wire/storage behaviour for a generated protobuf enum newtype.
+/// Marker for [`features.enum_type = OPEN`](https://protobuf.dev/editions/features/#enum_type).
+pub struct Open;
+
+/// Marker for [`features.enum_type = CLOSED`](https://protobuf.dev/editions/features/#enum_type).
+pub struct Closed;
+
+/// Shared wire/storage basics for a generated protobuf enum newtype.
 ///
-/// Implemented once per protobuf enum by the code generator. Open enums accept
-/// any wire value in [`decode_from_wire`](Self::decode_from_wire); closed enums
-/// reject unknown values there (and use [`merge_closed`](crate::fields::singular::field::SingularFieldMut::merge_closed)
-/// on decode to divert them to unknown fields when appropriate).
+/// Open vs closed is expressed by implementing [`OpenEnum`] or [`ClosedEnum`]
+/// and wrapping as [`ProtoEnum<E, Open>`] / [`ProtoEnum<E, Closed>`].
 pub trait ProtoEnumStorage: Copy + PartialEq + 'static {
     fn proto_zero() -> Self;
     fn to_wire(self) -> i32;
-    fn decode_from_wire(wire: i32) -> Result<Self, DecodeError>
-    where
-        Self: Sized;
 }
+
+/// Open protobuf enum — any `i32` is a valid wire/storage value (`From<i32>`).
+///
+/// Spec ([Enum Behavior](https://protobuf.dev/programming-guides/enum/)): an
+/// unrecognized wire value is stored in the field; accessors report the field
+/// as set and return a value representing that integer.
+pub trait OpenEnum: ProtoEnumStorage + From<i32> {}
+
+/// Closed protobuf enum — only known values are valid (`TryFrom<i32>`).
+///
+/// Unknown wire values yield [`DecodeError::UnknownClosedEnum`]; singular
+/// [`merge`](crate::fields::singular::field::SingularFieldMut::merge) catches
+/// that and appends the raw varint to unknown fields.
+///
+/// Spec ([Enum Behavior](https://protobuf.dev/programming-guides/enum/)): an
+/// unrecognized wire value is stored in the message's unknown field set;
+/// accessors report the field as unset and return the enum default.
+pub trait ClosedEnum: ProtoEnumStorage + TryFrom<i32, Error = i32> {}
 
 /// Thin wrapper around a generated enum newtype `E` for singular fields.
 ///
-/// Repeated enum fields (if any) still store bare `E` via
-/// [`VarintProtoType::Value`].
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash, Deref, DerefMut, From)]
+/// `K` is [`Open`] or [`Closed`]. Repeated enum fields (if any) still store bare
+/// `E` via [`VarintProtoType::Value`].
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 #[repr(transparent)]
-pub struct ProtoEnum<E: ProtoEnumStorage>(pub E);
+pub struct ProtoEnum<E, K>(pub E, PhantomData<K>);
 
-impl<E: ProtoEnumStorage> DefaultIn for ProtoEnum<E> {
+impl<E, K> ProtoEnum<E, K> {
     #[inline]
-    fn default_in<A: ::allocator_api2::alloc::Allocator>(_alloc: A) -> Self {
-        Self(E::proto_zero())
+    pub const fn new(value: E) -> Self {
+        Self(value, PhantomData)
     }
 }
 
-impl<E: ProtoEnumStorage> DeallocateIn for ProtoEnum<E> {
+impl<E, K> ::core::ops::Deref for ProtoEnum<E, K> {
+    type Target = E;
+
+    #[inline]
+    fn deref(&self) -> &E {
+        &self.0
+    }
+}
+
+impl<E, K> ::core::ops::DerefMut for ProtoEnum<E, K> {
+    #[inline]
+    fn deref_mut(&mut self) -> &mut E {
+        &mut self.0
+    }
+}
+
+impl<E, K> From<E> for ProtoEnum<E, K> {
+    #[inline]
+    fn from(value: E) -> Self {
+        Self::new(value)
+    }
+}
+
+impl<E: Default, K> Default for ProtoEnum<E, K> {
+    #[inline]
+    fn default() -> Self {
+        Self::new(E::default())
+    }
+}
+
+impl<E: ProtoEnumStorage, K> DefaultIn for ProtoEnum<E, K> {
+    #[inline]
+    fn default_in<A: ::allocator_api2::alloc::Allocator>(_alloc: A) -> Self {
+        Self::new(E::proto_zero())
+    }
+}
+
+impl<E: ProtoEnumStorage, K> DeallocateIn for ProtoEnum<E, K> {
     #[inline]
     unsafe fn deallocate_in<A: ::allocator_api2::alloc::Allocator>(self, _alloc: A) {}
 }
 
-impl<E: ProtoEnumStorage> ProtoEmpty for ProtoEnum<E> {
+impl<E: ProtoEnumStorage, K> ProtoEmpty for ProtoEnum<E, K> {
     #[inline]
     fn is_proto_empty(&self) -> bool {
         self.0 == E::proto_zero()
     }
 }
 
-impl<E: ProtoEnumStorage> VarintProtoType for ProtoEnum<E> {
+impl<E: OpenEnum> VarintProtoType for ProtoEnum<E, Open> {
     type Value = E;
 
+    #[inline]
     fn decode_wire(raw: u64) -> Result<Self::Value, DecodeError> {
-        E::decode_from_wire(ProtoInt32::decode_wire(raw)?)
+        Ok(E::from(ProtoInt32::decode_wire(raw)?))
     }
 
+    #[inline]
+    fn encode_wire(value: Self::Value) -> u64 {
+        ProtoInt32::encode_wire(value.to_wire())
+    }
+}
+
+impl<E: ClosedEnum> VarintProtoType for ProtoEnum<E, Closed> {
+    type Value = E;
+
+    /// Known values succeed. Unknown values return
+    /// [`DecodeError::UnknownClosedEnum`] so singular `merge` can divert `raw`
+    /// into unknown fields
+    /// ([spec](https://protobuf.dev/programming-guides/enum/)).
+    #[inline]
+    fn decode_wire(raw: u64) -> Result<Self::Value, DecodeError> {
+        let wire = ProtoInt32::decode_wire(raw)?;
+        E::try_from(wire).map_err(|_| DecodeError::UnknownClosedEnum { raw })
+    }
+
+    #[inline]
     fn encode_wire(value: Self::Value) -> u64 {
         ProtoInt32::encode_wire(value.to_wire())
     }
@@ -233,6 +312,3 @@ impl<const VALUE_BIT: usize> VarintProtoType for ProtoBool<VALUE_BIT> {
         Varint::from_bool(value).to_uint64()
     }
 }
-
-/// Always [`WireType::Varint`] for singular field merge/encode checks.
-pub(crate) const WIRE_TYPE: WireType = WireType::Varint;

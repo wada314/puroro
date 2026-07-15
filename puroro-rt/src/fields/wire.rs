@@ -11,6 +11,6 @@ pub(crate) mod varint;
 pub use len::{LenProtoType, ProtoBytes, ProtoString};
 pub use scalar::ScalarProtoType;
 pub use varint::{
-    ProtoBool, ProtoEnum, ProtoEnumStorage, ProtoInt32, ProtoInt64, ProtoSint32, ProtoSint64,
-    ProtoUInt32, ProtoUInt64, VarintProtoType,
+    Closed, ClosedEnum, Open, OpenEnum, ProtoBool, ProtoEnum, ProtoEnumStorage, ProtoInt32,
+    ProtoInt64, ProtoSint32, ProtoSint64, ProtoUInt32, ProtoUInt64, VarintProtoType,
 };

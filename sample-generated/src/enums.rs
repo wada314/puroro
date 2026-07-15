@@ -2,12 +2,18 @@
 //!
 //! Protobuf enums are newtypes over `i32`, not Rust enums: multiple proto
 //! value names may share the same integer (`allow_alias`), and the wire
-//! carries only the number. Open vs closed is encoded in [`ProtoEnumStorage`].
+//! carries only the number. Open vs closed is a type-level distinction via
+//! [`OpenEnum`] / [`ClosedEnum`] and [`ProtoEnum<E, Open|Closed>`].
+//!
+//! Unknown-value semantics follow
+//! [Enum Behavior](https://protobuf.dev/programming-guides/enum/).
 
 use ::core::convert::TryFrom;
 
-use ::puroro::{DecodeError, HasDefault};
-use ::puroro_rt::{ProtoDefault, ProtoEnumStorage};
+use ::puroro::HasDefault;
+use ::puroro_rt::{
+    ClosedEnum, OpenEnum, ProtoDefault, ProtoEnumStorage,
+};
 
 /// Open enum (`enum_type = OPEN`).
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
@@ -51,11 +57,9 @@ impl ProtoEnumStorage for Status {
     fn to_wire(self) -> i32 {
         self.0
     }
-
-    fn decode_from_wire(wire: i32) -> Result<Self, DecodeError> {
-        Ok(Self::from(wire))
-    }
 }
+
+impl OpenEnum for Status {}
 
 impl HasDefault<Status> for ProtoDefault {
     const DEFAULT: Status = Status::UNSPECIFIED;
@@ -103,11 +107,9 @@ impl ProtoEnumStorage for Priority {
     fn to_wire(self) -> i32 {
         self.0
     }
-
-    fn decode_from_wire(wire: i32) -> Result<Self, DecodeError> {
-        Self::try_from(wire).map_err(|_| DecodeError::InvalidTag)
-    }
 }
+
+impl ClosedEnum for Priority {}
 
 impl HasDefault<Priority> for ProtoDefault {
     const DEFAULT: Priority = Priority::UNSPECIFIED;

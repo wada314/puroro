@@ -627,6 +627,13 @@ pub fn clear_assignee(&mut self);
 
 The wire encoding is always VARINT. Open vs closed is reflected in the **generated enum newtype** (see [Generated enum type](#generated-enum-type) below); field accessors use the same [`Optional`](#hasdefault-and-optional) pattern as other singular fields — no `Result` wrapper and no `_raw` accessors.
 
+**Spec reference:** [Enum Behavior](https://protobuf.dev/programming-guides/enum/) (and Editions [`features.enum_type`](https://protobuf.dev/editions/features/#enum_type)). For an unrecognized wire integer:
+
+| Kind | Storage | Accessor `is_set` | Accessor value |
+|---|---|---|---|
+| Open | field | set | that integer |
+| Closed | unknown field set | unset | enum default |
+
 #### Open enum (`enum_type = OPEN`, edition 2024 default)
 
 Unknown wire values are stored in the field. The generated type accepts any `i32` (`From<i32>`); converting a known named value back to `i32` is fallible (`TryFrom<Status> for i32`).
@@ -656,31 +663,35 @@ EXPLICIT presence: `is_set()` tracks the presence bit; `get()` returns `Priority
 
 #### Generated enum type
 
-Both open and closed enums produce a **newtype-over-`i32`** — not a Rust `enum`. Field storage uses [`ProtoEnum<E>`](puroro-rt/src/fields/wire/varint.rs) (thin wrapper `ProtoEnum(E)`) so [`SingularField`](puroro-rt/src/fields/singular/field.rs) (alias `SingularVarintField`) stores `ProtoEnum<E>` and reuses the same `optional()` / `value_mut()` paths as other singular scalars (getters still project to `E` / `&mut E`).
+Both open and closed enums produce a **newtype-over-`i32`** — not a Rust `enum`. Openness is a **type-level** distinction:
+
+- Markers [`Open`](puroro-rt/src/fields/wire/varint.rs) / [`Closed`](puroro-rt/src/fields/wire/varint.rs)
+- Traits [`OpenEnum`](puroro-rt/src/fields/wire/varint.rs) (`From<i32>`) / [`ClosedEnum`](puroro-rt/src/fields/wire/varint.rs) (`TryFrom<i32>`)
+- Field wrapper [`ProtoEnum<E, K>`](puroro-rt/src/fields/wire/varint.rs)
+
+[`SingularField`](puroro-rt/src/fields/singular/field.rs) (alias `SingularVarintField`) stores `ProtoEnum<E, K>` and reuses the same `optional()` / `value_mut()` paths as other singular scalars (getters still project to `E` / `&mut E`). Merge is a single decode-then-write path: closed enums signal unknowns via [`DecodeError::UnknownClosedEnum`](src/error.rs) from `decode_wire`, and `merge` catches that to append the raw varint to unknown fields (`TryFrom` is the single source of truth).
 
 ```rust
 // Open — any wire value is valid storage
-status: SingularField<ProtoEnum<Status>, Implicit, FIELD>,
+status: SingularField<ProtoEnum<Status, Open>, Implicit, FIELD>,
 
 // Closed — only known wire values are stored
-priority: SingularField<ProtoEnum<Priority>, Explicit<BIT>, FIELD>,
+priority: SingularField<ProtoEnum<Priority, Closed>, Explicit<BIT>, FIELD>,
 
-// Generated newtypes implement [`ProtoEnumStorage`] once (open vs closed differs in `decode_from_wire`):
 #[repr(transparent)]
 pub struct Status(i32);
 
 impl ProtoEnumStorage for Status {
     fn proto_zero() -> Self { … }
     fn to_wire(self) -> i32 { … }
-    fn decode_from_wire(wire: i32) -> Result<Self, DecodeError> { … } // open: Ok(Self(wire))
 }
+impl OpenEnum for Status {}
 
 #[repr(transparent)]
 pub struct Priority(i32);
 
-impl ProtoEnumStorage for Priority {
-    fn decode_from_wire(wire: i32) -> Result<Self, DecodeError> { … } // closed: TryFrom
-}
+impl ProtoEnumStorage for Priority { … }
+impl ClosedEnum for Priority {}
 ```
 
 Alias names with the same integer all map to the same `Self(v)`; equality is by wire value.
@@ -1018,7 +1029,7 @@ Note: **edition 2024 defaults to `EXPLICIT` field presence**, which is the oppos
 |---|---|---|
 | `field_presence` | `IMPLICIT` / `EXPLICIT` / `LEGACY_REQUIRED` | Presence query methods generated or not; `validate()` for `LEGACY_REQUIRED` |
 | `repeated_field_encoding` | `PACKED` / `EXPANDED` | Affects encode format (decode always accepts both) |
-| `enum_type` | `OPEN` / `CLOSED` | Accessor returns `Result<E, i32>` vs `Option<Result<E, i32>>` |
+| `enum_type` | `OPEN` / `CLOSED` | Generated newtype implements `OpenEnum` vs `ClosedEnum`; field is `ProtoEnum<E, Open>` vs `ProtoEnum<E, Closed>` (unknown closed values → unknown fields) |
 | `message_encoding` | `LENGTH_PREFIXED` / `DELIMITED` | `DELIMITED` (groups) is deprecated; not generated |
 | `utf8_validation` | `VERIFY` / `NONE` | `VERIFY`: `decode_string_in` returns `DecodeError::InvalidUtf8` on bad UTF-8 (default). `NONE`: copy bytes without validation (generated code uses an unchecked conversion). Runtime support for per-field dispatch is **pending** — see [§0](#0-project-architecture). |
 

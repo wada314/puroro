@@ -26,6 +26,21 @@ pub enum DecodeError {
     /// This error is only produced by the generated `validate()` method, which
     /// callers must invoke explicitly after `merge_from` or `decode`.
     MissingRequiredField { field_number: u32 },
+    /// A closed-enum field saw a wire value outside the known set.
+    ///
+    /// This is **not** a fatal decode failure for message parsing: the singular
+    /// field `merge` path in `puroro-rt` catches it and appends `raw` to the
+    /// message's unknown fields. It lives on [`DecodeError`] so the shared
+    /// `decode` → `merge` `Result` path can divert without a separate
+    /// control-flow type.
+    ///
+    /// Spec: [Enum Behavior](https://protobuf.dev/programming-guides/enum/) —
+    /// closed enums store unrecognized values in the unknown field set; accessors
+    /// report the field as unset and return the enum default.
+    UnknownClosedEnum {
+        /// Raw varint numeric value as read from the wire (for unknown-field round-trip).
+        raw: u64,
+    },
 }
 
 impl ::core::fmt::Display for DecodeError {
@@ -47,6 +62,9 @@ impl ::core::fmt::Display for DecodeError {
             DecodeError::RecursionLimitExceeded => write!(f, "recursion limit exceeded"),
             DecodeError::MissingRequiredField { field_number } => {
                 write!(f, "proto2 required field {field_number} was not present")
+            }
+            DecodeError::UnknownClosedEnum { raw } => {
+                write!(f, "closed enum value {raw} is not in the known set")
             }
         }
     }

@@ -40,7 +40,7 @@ impl AddressableSlot for ProtoSint32 {}
 impl AddressableSlot for ProtoSint64 {}
 impl AddressableSlot for ProtoString {}
 impl AddressableSlot for ProtoBytes {}
-impl<E: ProtoEnumStorage> AddressableSlot for ProtoEnum<E> {}
+impl<E: ProtoEnumStorage, K> AddressableSlot for ProtoEnum<E, K> {}
 impl<const VALUE_BIT: usize> AddressableSlot for ProtoBool<VALUE_BIT> {}
 
 /// Storage construction / teardown and view binding for a singular field value slot.

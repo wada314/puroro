@@ -122,7 +122,7 @@ protobuf-core           Varint, Tag, WireType
 | `ValueSlot`, `SlotInitView` / `SlotInitMut`, `DefaultIn` / `DeallocateIn` / `ProtoEmpty` | **Done** |
 | `SingularField<T, P, FIELD>` (+ `SingularVarintField` / `SingularLenField` aliases) | **Done** |
 | `ProtoBool<VALUE_BIT>` on `SingularField` (bit-packed singular / oneof `bool`) | **Done** |
-| `merge_closed`, `validate_required` | **Done** |
+| Closed-enum unknown → `DecodeError::UnknownClosedEnum` → unknown fields, `validate_required` | **Done** |
 | `NestedMessageField` | **Done** |
 | [`sample-generated`](sample-generated/) (`Task` / `Address`) | **Done** |
 | `Fixed32ProtoType` / `Fixed64ProtoType` on `SingularField` | **Stub** |
@@ -208,7 +208,7 @@ pub trait ScalarProtoType: Sized {
     fn encode<B: BufMut>(value: Self::Ref<'_>, field: u32, buf: &mut B);
     fn decode<B: Buf, A: Allocator>(…) -> Result<Self::Written, DecodeError>;
 }
-// Implemented for ProtoInt32, …, ProtoBool, ProtoEnum<E>, ProtoString, ProtoBytes
+// Implemented for ProtoInt32, …, ProtoBool, ProtoEnum<E, K>, ProtoString, ProtoBytes
 ```
 
 **Interim:** [`ProtoBool<VALUE_BIT>`](puroro-rt/src/fields/wire/varint.rs) still carries the value-bit index as a const generic so generated spellings stay `SingularVarintField<ProtoBool<{ BIT_*_VALUE }>, …>`. The type/slot split is done (`Slot = Self`); a future cleanup should move `VALUE_BIT` to the field / layout side so the marker is bit-index-free.
@@ -275,7 +275,7 @@ Varint and LEN singular scalars share one wrapper, parametrised by [`ScalarProto
 | `NestedMessageField<M, P, FIELD, A>` | [`singular/message.rs`](puroro-rt/src/fields/singular/message.rs) | `P: MessagePresence` — `Singular`: `Option<UnmanagedBox<M>>`; `Oneof`: `ManuallyDrop<UnmanagedBox<M>>` — no bitfield | — |
 | `OneofSlot<E>` | [`oneof.rs`](puroro-rt/src/fields/oneof.rs) | mutually exclusive variants | — |
 
-**Closed enum:** `SingularField<ProtoEnum<E>, Explicit, FIELD>::bind(…).merge_closed(…, |wire: i32| …)` — unknown values → `unknown_fields`, bit not set.
+**Closed enum:** `SingularField<ProtoEnum<E, Closed>, Explicit, FIELD>::bind(…).merge(…)` — `decode` yields `UnknownClosedEnum { raw }`, which `merge` diverts → `unknown_fields`, bit not set.
 
 **LEGACY_REQUIRED:** `SingularField<…, LegacyRequired<BIT>, FIELD>::validate_required`.
 
@@ -294,8 +294,8 @@ Adding a singular wire type = one new `ScalarProtoType` impl (and usually a `Var
 | `EXPLICIT bool` | `SingularVarintField<ProtoBool<VALUE_BIT>, Explicit<PRESENCE_BIT>, FIELD>` |
 | `LEGACY_REQUIRED bool` | `SingularVarintField<ProtoBool<VALUE_BIT>, LegacyRequired<PRESENCE_BIT>, FIELD>` |
 | oneof `bool` | `SingularVarintField<ProtoBool<VALUE_BIT>, Oneof, FIELD>` inside the oneof storage enum |
-| `IMPLICIT open enum` | `SingularField<ProtoEnum<E>, Implicit, FIELD>` |
-| `EXPLICIT closed enum` | `SingularField<ProtoEnum<E>, Explicit<BIT>, FIELD>` + `merge_closed` |
+| `IMPLICIT open enum` | `SingularField<ProtoEnum<E, Open>, Implicit, FIELD>` |
+| `EXPLICIT closed enum` | `SingularField<ProtoEnum<E, Closed>, Explicit<BIT>, FIELD>` (same `.merge`) |
 | `IMPLICIT string` | `SingularField<ProtoString, Implicit, FIELD>` (= `SingularLenField<…>`) |
 | `EXPLICIT string` | `SingularField<ProtoString, Explicit<BIT>, FIELD>` |
 | `LEGACY_REQUIRED string` | `SingularField<ProtoString, LegacyRequired<BIT>, FIELD>` |
@@ -324,8 +324,8 @@ pub struct Task<A: Allocator + Clone = Global> {
     tag_ids: RepeatedPackedVarintField<ProtoInt32, { FIELD_TAG_IDS }, A>,
     scores: RepeatedExpandedVarintField<ProtoInt32, { FIELD_SCORES }, A>,
     labels: RepeatedLenField<ProtoString, { FIELD_LABELS }, A>,
-    status: SingularVarintField<ProtoEnum<Status>, Implicit, { FIELD_STATUS }>,
-    priority: SingularVarintField<ProtoEnum<Priority>, Explicit<{ BIT_PRIORITY }>, { FIELD_PRIORITY }>,
+    status: SingularVarintField<ProtoEnum<Status, Open>, Implicit, { FIELD_STATUS }>,
+    priority: SingularVarintField<ProtoEnum<Priority, Closed>, Explicit<{ BIT_PRIORITY }>, { FIELD_PRIORITY }>,
     assignee: NestedMessageField<Address<A>, Singular, { FIELD_ASSIGNEE }, A>,
     notification: OneofSlot<NotificationStorage<A>>,
     done: SingularVarintField<ProtoBool<{ BIT_DONE_VALUE }>, Implicit, { FIELD_DONE }>,
@@ -542,15 +542,15 @@ fn encode_raw<B: BufMut>(&self, buf: &mut B) {
 ### Decode
 
 1. Loop: `puroro_rt::decode::decode_tag` → `(field_number, wire_type)`.
-2. `match field_number` — one catalog `merge` (or `merge_closed`) per arm.
+2. `match field_number` — one catalog `merge` per arm (closed-enum unknowns are diverted inside `merge` via `DecodeError::UnknownClosedEnum`).
 3. Unknown → `puroro_rt::decode::skip_field_and_save` into `_common.unknown_fields`.
 4. Singular: last wins. Repeated: append. Nested: merge sub-buffer.
 
 ```rust
 Self::FIELD_PRIORITY => self
     .priority
-    .bind(&mut self._common)
-    .merge_closed(wire_type, buf, |v| Priority::try_from(v).is_ok())?,
+    .bind_mut(&mut self._common)
+    .merge(wire_type, buf)?,
 ```
 
 Nested LEN payloads use `Buf::take(len)` before child `merge_from`.
@@ -602,7 +602,7 @@ Storage is `ManuallyDrop<P::ValueSlot<T::Slot>>` — `T` / `MaybeUninit<T>` (inc
 | Clear | `bind_mut(&mut common).clear()` | same |
 | Release (LEN) | `deallocate(&common)` from message `Drop` | same |
 
-Encode / `deallocate` / `validate_required` stay as plain field methods that take `&common` directly. Enum fields use `ProtoEnum<E>`; closed-enum unknown values use `merge_closed(…, |wire: i32| …)` on decode. `Optional` is a concrete struct (DESIGN.md §3); no `Option<T>` conversion.
+Encode / `deallocate` / `validate_required` stay as plain field methods that take `&common` directly. Enum fields use `ProtoEnum<E, Open|Closed>`; closed-enum unknown values surface as `DecodeError::UnknownClosedEnum` and are diverted by singular `merge`. `Optional` is a concrete struct (DESIGN.md §3); no `Option<T>` conversion.
 
 ### Bit-packed `bool` (`ProtoBool`)
 
