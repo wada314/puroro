@@ -608,7 +608,8 @@ Encode / `deallocate` / `validate_required` stay as plain field methods that tak
 
 Singular / oneof `bool` uses [`SingularField`](puroro-rt/src/fields/singular/field.rs) with type marker [`ProtoBool<VALUE_BIT>`](puroro-rt/src/fields/wire/varint.rs) (`ScalarProtoType::Slot = Self`, ZST). The logical `bool` lives at `VALUE_BIT` in `_common.presence`; EXPLICIT / LEGACY_REQUIRED also use `P`'s presence bit. Bound views are the same `SingularFieldRef` / `SingularFieldMut`; `value_mut` returns bitvec's `BitRef<'_, Mut, …>` via [`MessageCommon::bit_mut`](puroro-rt/src/fields/shared.rs). Wire encode/decode goes through `ScalarProtoType` (backed by `VarintProtoType` helpers). Implicit omit treats a clear value bit as absent; Explicit can encode an explicit `false`.
 
-**Interim:** `VALUE_BIT` remains on `ProtoBool` for codegen stability. Intended end state: a bit-index-free type marker plus a field/layout-owned value-bit index.
+**Interim / future split:** `VALUE_BIT` remains on `ProtoBool` for codegen stability of *singular / oneof* fields. Intended end state for singular: a bit-index-free type marker plus a field/layout-owned value-bit index. **`repeated bool` is a different shape** — elements are plain `bool` in the repeated buffer and do not need (and must not use) a MessageCommon bit index or `ProtoBool<VALUE_BIT>`. When repeated bool is wired up, keep scalar bit-packed bool and repeated element `bool` on distinct type paths; do not force one marker to serve both.
+
 ### LEGACY_REQUIRED
 
 Wire identical to EXPLICIT. Message `validate()` calls `validate_required` on each `LegacyRequired` field ([§12](#12-message-level-wire-io)).
@@ -629,6 +630,8 @@ Wire identical to EXPLICIT. Message `validate()` calls `validate_required` on ea
 | Decode | Both forms | Both forms |
 
 Elements live in `ManuallyDrop<UnmanagedVec<T::Value>>`. Mutation uses the bound-view idiom: `field.bind_mut(&mut common)` yields a [`RepeatedVarintFieldMut`](puroro-rt/src/fields/repeated/varint.rs) (no presence bit — repeated fields have none), whose consuming methods are `values_mut()` → guard (`impl DerefMut<Target = Vec<_, A>>`), `merge(wire, buf)`, and `clear()`; each obtains its own owned `alloc.clone()` from `common`. Read accessors use the same idiom: `field.bind(&common)` yields [`RepeatedVarintFieldRef`](puroro-rt/src/fields/repeated/varint.rs) with `as_slice` / `is_empty` (they ignore `common`, but generated getters still bind for uniformity). Encode / `deallocate` stay on the field (called once from message `Drop` via [`FieldDeallocate`](puroro-rt/src/fields/shared/field_deallocate.rs)).
+
+**`repeated bool`:** not wired yet. When it is, elements should be plain `bool` (`T::Value = bool`) with **no** MessageCommon bit index — do not use singular [`ProtoBool<VALUE_BIT>`](puroro-rt/src/fields/wire/varint.rs) here (see [Bit-packed bool](#bit-packed-bool-protobool)).
 
 ### LEN (`RepeatedLenField<T, A>`)
 

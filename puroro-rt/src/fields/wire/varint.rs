@@ -197,9 +197,14 @@ proto_varint_wrapper! {
 /// [`MessageCommon`](crate::MessageCommon)'s bitvec; the field struct only
 /// stores this marker for presence/init layout.
 ///
-/// Interim: `VALUE_BIT` lives on this type marker for codegen stability. A
-/// future cleanup should move the index to the field / layout side so the
-/// marker is bit-index-free.
+/// **Singular / oneof vs repeated (future):** this bit-packed form (and the
+/// `VALUE_BIT` const generic) is only for singular and oneof `bool`. A
+/// `repeated bool` must store plain `bool` elements in the repeated buffer and
+/// must **not** take a MessageCommon bit index. Do not reuse this marker as-is
+/// for repeated; keep scalar (bit-packed) and repeated (element `bool`) as
+/// distinct type paths. Interim: `VALUE_BIT` still lives on this marker for
+/// codegen stability; a later cleanup should move the index to the
+/// field / layout side so the singular marker can be bit-index-free too.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
 pub struct ProtoBool<const VALUE_BIT: usize>;
 
