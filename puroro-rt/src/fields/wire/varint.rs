@@ -193,15 +193,27 @@ proto_varint_wrapper! {
 /// Protobuf `bool` type marker — varint 0 or 1.
 ///
 /// Implements [`ScalarProtoType`](super::scalar::ScalarProtoType) with
-/// `Slot = ()`. The logical `bool` is packed at `VALUE_BIT` in
+/// `Slot = Self` (ZST). The logical `bool` is packed at `VALUE_BIT` in
 /// [`MessageCommon`](crate::MessageCommon)'s bitvec; the field struct only
-/// stores a unit slot for presence/init.
+/// stores this marker for presence/init layout.
 ///
 /// Interim: `VALUE_BIT` lives on this type marker for codegen stability. A
 /// future cleanup should move the index to the field / layout side so the
 /// marker is bit-index-free.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
 pub struct ProtoBool<const VALUE_BIT: usize>;
+
+impl<const VALUE_BIT: usize> DefaultIn for ProtoBool<VALUE_BIT> {
+    #[inline]
+    fn default_in<A: ::allocator_api2::alloc::Allocator>(_alloc: A) -> Self {
+        Self
+    }
+}
+
+impl<const VALUE_BIT: usize> DeallocateIn for ProtoBool<VALUE_BIT> {
+    #[inline]
+    unsafe fn deallocate_in<A: ::allocator_api2::alloc::Allocator>(self, _alloc: A) {}
+}
 
 impl<const VALUE_BIT: usize> VarintProtoType for ProtoBool<VALUE_BIT> {
     type Value = bool;

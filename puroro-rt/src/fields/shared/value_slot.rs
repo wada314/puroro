@@ -2,9 +2,9 @@
 //! presence-tracked ([`MaybeUninit<T>`]), selected by [`FieldPresence::ValueSlot`].
 //!
 //! [`ValueSlot`] is implemented for raw `T` and [`MaybeUninit<T>`] when `T` is
-//! [`AddressableSlot`]. Slot payloads are physical storage only (e.g. thin
-//! wrappers, or `()` for bit-packed bool); logical bit-packed values live in
-//! [`MessageCommon`](super::MessageCommon).
+//! [`AddressableSlot`]. Slot payloads are physical storage (thin wrappers, or
+//! ZST [`ProtoBool`](crate::ProtoBool) for bit-packed bool); logical bit-packed
+//! values live in [`MessageCommon`](super::MessageCommon).
 //!
 //! Construction and teardown thread an allocator (via
 //! [`DefaultIn`](super::DefaultIn) / [`DeallocateIn`](super::DeallocateIn)).
@@ -18,21 +18,20 @@ use ::core::mem::MaybeUninit;
 use ::allocator_api2::alloc::Allocator;
 
 use super::{
-    DeallocateIn, DefaultIn, MessageCommon, PresenceBits, ProtoEmpty,
+    DeallocateIn, DefaultIn, MessageCommon, PresenceBits,
     slot_init::{SlotInitMut, SlotInitView},
 };
 use crate::fields::wire::len::{ProtoBytes, ProtoString};
 use crate::fields::wire::varint::{
-    ProtoEnum, ProtoEnumStorage, ProtoInt32, ProtoInt64, ProtoSint32, ProtoSint64, ProtoUInt32,
-    ProtoUInt64,
+    ProtoBool, ProtoEnum, ProtoEnumStorage, ProtoInt32, ProtoInt64, ProtoSint32, ProtoSint64,
+    ProtoUInt32, ProtoUInt64,
 };
 
 /// Marker for payloads stored as addressable `T` / [`MaybeUninit<T>`] in the
-/// field slot (varint wrappers, LEN wrappers, enums, and `()` for bit-packed
-/// bool presence/init only).
+/// field slot (varint wrappers, LEN wrappers, enums, and ZST [`ProtoBool`] for
+/// bit-packed bool presence/init only).
 pub trait AddressableSlot: DefaultIn + DeallocateIn {}
 
-impl AddressableSlot for () {}
 impl AddressableSlot for ProtoUInt32 {}
 impl AddressableSlot for ProtoUInt64 {}
 impl AddressableSlot for ProtoInt32 {}
@@ -42,25 +41,7 @@ impl AddressableSlot for ProtoSint64 {}
 impl AddressableSlot for ProtoString {}
 impl AddressableSlot for ProtoBytes {}
 impl<E: ProtoEnumStorage> AddressableSlot for ProtoEnum<E> {}
-
-impl DefaultIn for () {
-    #[inline]
-    fn default_in<A: Allocator>(_alloc: A) -> Self {}
-}
-
-impl DeallocateIn for () {
-    #[inline]
-    unsafe fn deallocate_in<A: Allocator>(self, _alloc: A) {}
-}
-
-impl ProtoEmpty for () {
-    /// Unit has no payload; bit-packed bool emptiness is decided via
-    /// [`ScalarProtoType::is_proto_empty`](crate::fields::wire::scalar::ScalarProtoType::is_proto_empty).
-    #[inline]
-    fn is_proto_empty(&self) -> bool {
-        true
-    }
-}
+impl<const VALUE_BIT: usize> AddressableSlot for ProtoBool<VALUE_BIT> {}
 
 /// Storage construction / teardown and view binding for a singular field value slot.
 ///

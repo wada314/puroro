@@ -2,11 +2,11 @@
 //!
 //! Each implementor is a **protobuf type marker** (`ProtoInt32`, `ProtoBool`, …).
 //! The physical field slot is the associated [`Slot`](ScalarProtoType::Slot)
-//! (`Self` for addressable wrappers; `()` for bit-packed [`ProtoBool`]).
+//! (`Self` for addressable wrappers and bit-packed [`ProtoBool`]).
 //!
 //! IMPLICIT omit uses [`is_proto_empty`](ScalarProtoType::is_proto_empty) on the
 //! type marker (slot [`ProtoEmpty`](crate::fields::shared::ProtoEmpty) for
-//! addressable types; bit read for [`ProtoBool`]). Wire `encoded_len` /
+//! payload-bearing types; bit read for [`ProtoBool`]). Wire `encoded_len` /
 //! `encode` stay on the marker because multiple markers can share the same
 //! `Ref` type (e.g. [`ProtoInt32`] and [`ProtoSint32`] both use `i32`).
 //!
@@ -38,7 +38,7 @@ use super::varint::{ProtoBool, VarintProtoType};
 /// The implementor is the **type marker** (not necessarily what sits in the
 /// field struct). Physical storage is [`Slot`](Self::Slot):
 /// - addressable wrappers: `Slot = Self` (thin payload in the field)
-/// - [`ProtoBool`]: `Slot = ()` (logical `bool` in [`MessageCommon`] bitvec)
+/// - [`ProtoBool`]: `Slot = Self` (ZST; logical `bool` in [`MessageCommon`] bitvec)
 ///
 /// Interim: [`ProtoBool`] still carries `VALUE_BIT` as a const generic for
 /// codegen stability; a future cleanup should move that index to the field /
@@ -67,8 +67,8 @@ pub trait ScalarProtoType: Sized {
 
     /// `true` when the field holds protobuf empty / type-zero (IMPLICIT omit).
     ///
-    /// Addressable slots delegate to [`ProtoEmpty`]; bit-packed [`ProtoBool`]
-    /// reads the value bit from `common`.
+    /// Addressable payload slots delegate to [`ProtoEmpty`]; bit-packed
+    /// [`ProtoBool`] reads the value bit from `common`.
     fn is_proto_empty<Pb: PresenceBits, A: Allocator>(
         slot: &Self::Slot,
         common: &MessageCommon<Pb, A>,
@@ -420,13 +420,13 @@ impl ScalarProtoType for ProtoBytes {
 }
 
 // ---------------------------------------------------------------------------
-// Bit-packed bool (Slot = ())
+// Bit-packed bool (Slot = Self, ZST; value in MessageCommon)
 // ---------------------------------------------------------------------------
 
 impl<const VALUE_BIT: usize> ScalarProtoType for ProtoBool<VALUE_BIT> {
-    /// Unit slot: presence/init only. Logical `bool` lives at `VALUE_BIT` in
-    /// [`MessageCommon`].
-    type Slot = ();
+    /// ZST slot: presence/init layout only. Logical `bool` lives at `VALUE_BIT`
+    /// in [`MessageCommon`].
+    type Slot = Self;
     type Ref<'a> = bool;
     type Mut<'a, A: Allocator + 'a> =
         ::bitvec::ptr::BitRef<'a, ::bitvec::ptr::Mut, u8, ::bitvec::order::Lsb0>;
@@ -435,7 +435,7 @@ impl<const VALUE_BIT: usize> ScalarProtoType for ProtoBool<VALUE_BIT> {
 
     #[inline]
     fn is_proto_empty<Pb: PresenceBits, A: Allocator>(
-        _slot: &(),
+        _slot: &Self::Slot,
         common: &MessageCommon<Pb, A>,
     ) -> bool {
         !common.is_bit_set(VALUE_BIT)
@@ -443,7 +443,7 @@ impl<const VALUE_BIT: usize> ScalarProtoType for ProtoBool<VALUE_BIT> {
 
     #[inline]
     fn get<'a, Pb: PresenceBits, A: Allocator>(
-        _slot: &'a (),
+        _slot: &'a Self::Slot,
         common: &'a MessageCommon<Pb, A>,
     ) -> bool {
         common.is_bit_set(VALUE_BIT)
@@ -456,7 +456,7 @@ impl<const VALUE_BIT: usize> ScalarProtoType for ProtoBool<VALUE_BIT> {
         common: &'a mut MessageCommon<Pb, A>,
     ) -> Self::Mut<'a, A>
     where
-        VS: ValueSlot<()>,
+        VS: ValueSlot<Self::Slot>,
         I: SlotInitMut,
         Pb: PresenceBits,
         A: Allocator + Clone + 'a,
@@ -472,7 +472,7 @@ impl<const VALUE_BIT: usize> ScalarProtoType for ProtoBool<VALUE_BIT> {
         common: &mut MessageCommon<Pb, A>,
         value: bool,
     ) where
-        VS: ValueSlot<()>,
+        VS: ValueSlot<Self::Slot>,
         I: SlotInitMut,
         Pb: PresenceBits,
         A: Allocator + Clone,
@@ -484,7 +484,7 @@ impl<const VALUE_BIT: usize> ScalarProtoType for ProtoBool<VALUE_BIT> {
     #[inline]
     fn clear<VS, I, Pb, A>(slot: &mut VS, init: I, common: &mut MessageCommon<Pb, A>)
     where
-        VS: ValueSlot<()>,
+        VS: ValueSlot<Self::Slot>,
         I: SlotInitMut,
         Pb: PresenceBits,
         A: Allocator + Clone,

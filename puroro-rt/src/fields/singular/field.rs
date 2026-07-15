@@ -7,11 +7,11 @@
 //!
 //! Parametrised by protobuf type marker `T: ScalarProtoType`, [`FieldPresence`],
 //! proto field number `FIELD`, and compile-time default marker `D`. Physical
-//! storage is `P::ValueSlot<T::Slot>` (`T` itself for addressable scalars;
-//! `()` for bit-packed [`ProtoBool`](crate::ProtoBool)). Heap payloads are
+//! storage is `P::ValueSlot<T::Slot>` (`T` itself — including ZST
+//! [`ProtoBool`](crate::ProtoBool)). Heap payloads are
 //! wrapped in [`ManuallyDrop`] so message / oneof `Drop` can release them
 //! through [`deallocate`](SingularField::deallocate) without an implicit panic
-//! from `UnmanagedString` / `UnmanagedVec`. Copy scalars / unit slots use the
+//! from `UnmanagedString` / `UnmanagedVec`. Copy scalars / ZST bool slots use the
 //! same layout; their `DeallocateIn` is a no-op.
 
 use ::core::marker::PhantomData;
