@@ -7,6 +7,7 @@ use ::allocator_api2::alloc::{Allocator, Global};
 use ::bitvec::array::BitArray;
 use ::bitvec::order::Lsb0;
 use ::bytes::{Buf, BufMut};
+use ::core::ops::DerefMut;
 
 use ::puroro::{DecodeError, MessageDecode, MessageEncode};
 use ::puroro_rt::{
@@ -87,7 +88,7 @@ impl<A: Allocator + Clone> Address<A> {
 
     pub fn street_mut<'s>(
         &'s mut self,
-    ) -> impl ::core::ops::DerefMut<Target = ::unmanaged::String<A>> + 's {
+    ) -> impl DerefMut<Target = ::unmanaged::String<A>> + 's {
         self.street.bind_mut(&mut self._common).value_mut()
     }
 
@@ -103,7 +104,7 @@ impl<A: Allocator + Clone> Address<A> {
 
     pub fn city_mut<'s>(
         &'s mut self,
-    ) -> impl ::core::ops::DerefMut<Target = ::unmanaged::String<A>> + 's {
+    ) -> impl DerefMut<Target = ::unmanaged::String<A>> + 's {
         self.city.bind_mut(&mut self._common).value_mut()
     }
 

@@ -11,6 +11,7 @@ use ::allocator_api2::alloc::{Allocator, Global};
 use ::bitvec::array::BitArray;
 use ::bitvec::order::Lsb0;
 use ::bytes::{Buf, BufMut};
+use ::core::ops::DerefMut;
 
 use ::puroro::{DecodeError, HasDefault, MessageDecode, MessageEncode, Optional};
 use ::puroro_rt::{
@@ -178,7 +179,7 @@ impl<A: Allocator + Clone> Task<A> {
 
     pub fn title_mut<'s>(
         &'s mut self,
-    ) -> impl ::core::ops::DerefMut<Target = ::unmanaged::String<A>> + 's {
+    ) -> impl DerefMut<Target = ::unmanaged::String<A>> + 's {
         self.title.bind_mut(&mut self._common).value_mut()
     }
 
@@ -192,7 +193,7 @@ impl<A: Allocator + Clone> Task<A> {
         self.score.bind(&self._common).value()
     }
 
-    pub fn score_mut(&mut self) -> impl ::core::ops::DerefMut<Target = i32> + '_ {
+    pub fn score_mut(&mut self) -> impl DerefMut<Target = i32> + '_ {
         self.score.bind_mut(&mut self._common).value_mut()
     }
 
@@ -206,7 +207,7 @@ impl<A: Allocator + Clone> Task<A> {
         self.max_retries.bind(&self._common).optional()
     }
 
-    pub fn max_retries_mut(&mut self) -> impl ::core::ops::DerefMut<Target = i32> + '_ {
+    pub fn max_retries_mut(&mut self) -> impl DerefMut<Target = i32> + '_ {
         self.max_retries.bind_mut(&mut self._common).value_mut()
     }
 
@@ -222,7 +223,7 @@ impl<A: Allocator + Clone> Task<A> {
 
     pub fn owner_id_mut<'s>(
         &'s mut self,
-    ) -> impl ::core::ops::DerefMut<Target = ::unmanaged::String<A>> + 's {
+    ) -> impl DerefMut<Target = ::unmanaged::String<A>> + 's {
         self.owner_id.bind_mut(&mut self._common).value_mut()
     }
 
@@ -238,7 +239,7 @@ impl<A: Allocator + Clone> Task<A> {
 
     pub fn payload_mut<'s>(
         &'s mut self,
-    ) -> impl ::core::ops::DerefMut<Target = ::allocator_api2::vec::Vec<u8, A>> + 's {
+    ) -> impl DerefMut<Target = ::allocator_api2::vec::Vec<u8, A>> + 's {
         self.payload.bind_mut(&mut self._common).value_mut()
     }
 
@@ -254,7 +255,7 @@ impl<A: Allocator + Clone> Task<A> {
 
     pub fn tag_ids_mut<'s>(
         &'s mut self,
-    ) -> impl ::core::ops::DerefMut<Target = ::allocator_api2::vec::Vec<i32, A>> + 's {
+    ) -> impl DerefMut<Target = ::allocator_api2::vec::Vec<i32, A>> + 's {
         self.tag_ids.bind_mut(&mut self._common).values_mut()
     }
 
@@ -270,7 +271,7 @@ impl<A: Allocator + Clone> Task<A> {
 
     pub fn scores_mut<'s>(
         &'s mut self,
-    ) -> impl ::core::ops::DerefMut<Target = ::allocator_api2::vec::Vec<i32, A>> + 's {
+    ) -> impl DerefMut<Target = ::allocator_api2::vec::Vec<i32, A>> + 's {
         self.scores.bind_mut(&mut self._common).values_mut()
     }
 
@@ -300,7 +301,7 @@ impl<A: Allocator + Clone> Task<A> {
         self.status.bind(&self._common).optional()
     }
 
-    pub fn status_mut(&mut self) -> impl ::core::ops::DerefMut<Target = Status> + '_ {
+    pub fn status_mut(&mut self) -> impl DerefMut<Target = Status> + '_ {
         self.status.bind_mut(&mut self._common).value_mut()
     }
 
@@ -314,7 +315,7 @@ impl<A: Allocator + Clone> Task<A> {
         self.priority.bind(&self._common).optional()
     }
 
-    pub fn priority_mut(&mut self) -> impl ::core::ops::DerefMut<Target = Priority> + '_ {
+    pub fn priority_mut(&mut self) -> impl DerefMut<Target = Priority> + '_ {
         self.priority.bind_mut(&mut self._common).value_mut()
     }
 
@@ -342,7 +343,7 @@ impl<A: Allocator + Clone> Task<A> {
         self.done.bind(&self._common).value()
     }
 
-    pub fn done_mut(&mut self) -> impl ::core::ops::DerefMut<Target = bool> + '_ {
+    pub fn done_mut(&mut self) -> impl DerefMut<Target = bool> + '_ {
         self.done.bind_mut(&mut self._common).value_mut()
     }
 
@@ -356,7 +357,7 @@ impl<A: Allocator + Clone> Task<A> {
         self.flag.bind(&self._common).optional()
     }
 
-    pub fn flag_mut(&mut self) -> impl ::core::ops::DerefMut<Target = bool> + '_ {
+    pub fn flag_mut(&mut self) -> impl DerefMut<Target = bool> + '_ {
         self.flag.bind_mut(&mut self._common).value_mut()
     }
 
@@ -420,7 +421,7 @@ impl<A: Allocator + Clone> Task<A> {
 
     pub fn email_address_mut(
         &mut self,
-    ) -> impl ::core::ops::DerefMut<Target = ::unmanaged::String<A>> + '_ {
+    ) -> impl DerefMut<Target = ::unmanaged::String<A>> + '_ {
         self.notification
             .bind_mut(&mut self._common)
             .variant_mut::<EmailAddress>()
@@ -438,7 +439,7 @@ impl<A: Allocator + Clone> Task<A> {
 
     pub fn phone_number_mut(
         &mut self,
-    ) -> impl ::core::ops::DerefMut<Target = ::unmanaged::String<A>> + '_ {
+    ) -> impl DerefMut<Target = ::unmanaged::String<A>> + '_ {
         self.notification
             .bind_mut(&mut self._common)
             .variant_mut::<PhoneNumber>()
@@ -458,7 +459,7 @@ impl<A: Allocator + Clone> Task<A> {
 
     /// Switches the group to `webhook_id` (freeing any other variant) and returns
     /// a mutable handle to the scalar.
-    pub fn webhook_id_mut(&mut self) -> impl ::core::ops::DerefMut<Target = i32> + '_ {
+    pub fn webhook_id_mut(&mut self) -> impl DerefMut<Target = i32> + '_ {
         self.notification
             .bind_mut(&mut self._common)
             .variant_mut::<WebhookId>()
@@ -492,7 +493,7 @@ impl<A: Allocator + Clone> Task<A> {
             .optional()
     }
 
-    pub fn urgent_mut(&mut self) -> impl ::core::ops::DerefMut<Target = bool> + '_ {
+    pub fn urgent_mut(&mut self) -> impl DerefMut<Target = bool> + '_ {
         self.notification
             .bind_mut(&mut self._common)
             .variant_mut::<Urgent>()
