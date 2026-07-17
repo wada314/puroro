@@ -1,0 +1,15 @@
+---
+description: Run cargo fmt and clippy before handing off Rust changes
+alwaysApply: true
+---
+
+# Format and Clippy before handoff
+
+After editing Rust code in this workspace, before telling the user the work is done:
+
+1. Run `cargo fmt` on the crates you changed (or the workspace).
+2. Run `cargo clippy` on those crates (`--all-targets` when practical).
+3. Fix new issues you introduced. Do not “fix” by silencing lints unless the project already does so for that case.
+4. Do not change git submodules (`protobuf-core`, `unmanaged`) to satisfy workspace-only lint policy unless the user explicitly asks.
+
+If fmt/clippy fails because of a pre-existing submodule or unrelated problem, report it; do not workaround by editing those crates unprompted.
