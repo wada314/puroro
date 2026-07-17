@@ -41,7 +41,7 @@ impl TryFrom<Status> for i32 {
 
     fn try_from(value: Status) -> Result<Self, Self::Error> {
         match value.0 {
-            0 | 1 | 2 => Ok(value.0),
+            0..=2 => Ok(value.0),
             other => Err(other),
         }
     }
@@ -85,7 +85,7 @@ impl TryFrom<i32> for Priority {
 
     fn try_from(value: i32) -> Result<Self, Self::Error> {
         match value {
-            0 | 1 | 2 => Ok(Self(value)),
+            0..=2 => Ok(Self(value)),
             other => Err(other),
         }
     }

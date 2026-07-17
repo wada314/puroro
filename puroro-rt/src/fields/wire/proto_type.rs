@@ -370,7 +370,7 @@ impl<A: Allocator + Clone> ProtoType for ProtoString<A> {
     where
         Self: 'a,
     {
-        encode::encoded_len_len_field(field, value.as_bytes().len())
+        encode::encoded_len_len_field(field, value.len())
     }
 
     #[inline]
