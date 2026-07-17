@@ -30,10 +30,10 @@ pub use fields::shared::value_slot::ValueSlot;
 pub use fields::singular::{
     ExplicitBytes, ExplicitEnum, ExplicitInt32, ExplicitLenField, ExplicitString, ExplicitVarint,
     ExplicitVarintField, ImplicitBytes, ImplicitEnum, ImplicitInt32, ImplicitLenField,
-    ImplicitString, ImplicitVarint, ImplicitVarintField, NestedMessageField, NestedMessageFieldMut,
-    NestedMessageFieldRef, SingularAccess, SingularField, SingularFieldMut, SingularFieldRef,
-    SingularLen, SingularLenField, SingularLenFieldMut, SingularLenFieldRef, SingularVarint,
-    SingularVarintField, SingularVarintFieldMut, SingularVarintFieldRef,
+    ImplicitString, ImplicitVarint, ImplicitVarintField, SingularAccess, SingularField,
+    SingularFieldMut, SingularFieldRef, SingularLen, SingularLenField, SingularLenFieldMut,
+    SingularLenFieldRef, SingularVarint, SingularVarintField, SingularVarintFieldMut,
+    SingularVarintFieldRef,
 };
 pub use fields::wire::{
     Closed, ClosedEnum, LenProtoType, Open, OpenEnum, ProtoBool, ProtoBytes, ProtoEnum,

@@ -2,11 +2,9 @@
 //!
 //! [`SingularAccess`] names getter / `_mut` payload types (`Ref` / `Mut`) and
 //! pairs a field with [`MessageCommon`] via `bind` / `bind_mut` (`View` /
-//! `ViewMut`). [`SingularField`] forwards to [`ProtoType`];
-//! [`NestedMessageField`] supplies its own.
-
-use ::allocator_api2::alloc::Allocator;
-use ::unmanaged::UnmanagedBox;
+//! `ViewMut`). [`SingularField`] (including nested messages via
+//! [`ProtoMessage`](crate::fields::wire::proto_message::ProtoMessage)) forwards
+//! to [`ProtoType`].
 
 use crate::fields::shared::field_presence::FieldPresence;
 use crate::fields::shared::value_slot::ValueSlot;
@@ -14,12 +12,12 @@ use crate::fields::shared::{MessageCommon, PresenceBits};
 use crate::fields::wire::proto_type::ProtoType;
 
 use super::field::{SingularField, SingularFieldMut, SingularFieldRef};
-use super::message::{NestedMessageField, NestedMessageFieldMut, NestedMessageFieldRef};
 
 /// Getter / mutable-accessor payloads and MessageCommon binding for a singular
 /// field wrapper.
 ///
-/// Implemented by [`SingularField`] and [`NestedMessageField`].
+/// Implemented by [`SingularField`] (varint, LEN, bool, enum, and nested
+/// message via [`ProtoMessage`](crate::ProtoMessage)).
 pub trait SingularAccess {
     /// Allocator type retained by this field's storage.
     type Alloc: Allocator + Clone;
@@ -61,6 +59,8 @@ pub trait SingularAccess {
         common: &'c mut MessageCommon<Pb, Self::Alloc>,
     ) -> Self::ViewMut<'f, 'c, Pb>;
 }
+
+use ::allocator_api2::alloc::Allocator;
 
 impl<T: ProtoType, P: FieldPresence, const FIELD: u32, D> SingularAccess
     for SingularField<T, P, FIELD, D>
@@ -104,53 +104,5 @@ where
         common: &'c mut MessageCommon<Pb, T::Alloc>,
     ) -> Self::ViewMut<'f, 'c, Pb> {
         SingularFieldMut::new(self, common)
-    }
-}
-
-impl<M, P: FieldPresence, const FIELD: u32, AField: Allocator + Clone> SingularAccess
-    for NestedMessageField<M, P, FIELD, AField>
-where
-    M: ::puroro::Message<Alloc = AField>,
-    P::ValueSlot<UnmanagedBox<M, AField>>: ValueSlot<UnmanagedBox<M, AField>>,
-{
-    type Alloc = AField;
-    type Ref<'a>
-        = &'a M
-    where
-        Self: 'a;
-    type Mut<'a>
-        = &'a mut M
-    where
-        Self: 'a;
-    /// `A` is the message allocator; the field's own allocator type is `AField`.
-    /// Call sites always use the same type for both.
-    type View<'a, Pb: PresenceBits>
-        = NestedMessageFieldRef<'a, M, P, FIELD, AField, AField, Pb>
-    where
-        Self: 'a,
-        Pb: 'a,
-        AField: 'a;
-    type ViewMut<'f, 'c, Pb: PresenceBits>
-        = NestedMessageFieldMut<'f, 'c, M, P, FIELD, AField, AField, Pb>
-    where
-        Self: 'f,
-        Pb: 'c,
-        AField: 'f,
-        AField: 'c;
-
-    #[inline]
-    fn bind<'a, Pb: PresenceBits>(
-        &'a self,
-        common: &'a MessageCommon<Pb, AField>,
-    ) -> Self::View<'a, Pb> {
-        NestedMessageFieldRef::new(self, common)
-    }
-
-    #[inline]
-    fn bind_mut<'f, 'c, Pb: PresenceBits>(
-        &'f mut self,
-        common: &'c mut MessageCommon<Pb, AField>,
-    ) -> Self::ViewMut<'f, 'c, Pb> {
-        NestedMessageFieldMut::new(self, common)
     }
 }

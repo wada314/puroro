@@ -25,7 +25,7 @@ use crate::fields::shared::{
 };
 use crate::fields::singular::SingularAccess;
 use crate::fields::singular::field::SingularField;
-use crate::fields::singular::message::NestedMessageField;
+use crate::fields::wire::proto_message::ProtoMessage;
 use crate::fields::wire::proto_type::ProtoType;
 
 /// Explicit release of a generated `oneof` storage enum.
@@ -391,14 +391,13 @@ where
 }
 
 impl<'a, M, const FIELD: u32, A: Allocator + Clone, Pb: PresenceBits>
-    OneofVariantRef<'a, NestedMessageField<M, Oneof, FIELD, A>, Pb, A>
+    OneofVariantRef<'a, SingularField<ProtoMessage<M, A>, Oneof, FIELD>, Pb, A>
 where
     M: ::puroro::Message<Alloc = A>,
-    UnmanagedBox<M, A>: crate::fields::shared::DefaultIn<Alloc = A>
-        + crate::fields::shared::DeallocateIn<Alloc = A>,
     <Oneof as FieldPresence>::ValueSlot<UnmanagedBox<M, A>>:
         ValueSlot<UnmanagedBox<M, A>>,
 {
+    /// Returns the child when this message variant is active.
     pub fn get(self) -> Option<&'a M> {
         self.field.map(|f| f.bind(self.common).value())
     }

@@ -114,7 +114,7 @@ impl FieldPresence for Implicit {
 /// Marker for a **non-oneof** nested-message field — presence is the slot itself
 /// ([`Option`](core::option::Option) via [`ValueSlot`](super::value_slot::ValueSlot)),
 /// not a message bitfield. Emit / `is_set` consult the caller callback (absent =
-/// empty). Used by [`NestedMessageField`](crate::fields::singular::NestedMessageField).
+/// empty). Used for nested messages via [`ProtoMessage`](crate::ProtoMessage).
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
 pub struct NonOneof;
 

@@ -26,7 +26,7 @@
 //! |---|---|---|---|---|
 //! | `email_address` / `phone_number` | `string` | [`SingularLenField`] (+ `ProtoDefault`) | `&str` | string guard |
 //! | `webhook_id` | `int32` `[default = -1]` | [`SingularVarintField`] + [`WebhookIdDefault`] | `i32` (by value) | `&mut i32` |
-//! | `postal` | `Address` message | [`NestedMessageField`] | `&Address<A>` | `&mut Address<A>` |
+//! | `postal` | `Address` message | [`SingularField`] + [`ProtoMessage`] | `&Address<A>` | `&mut Address<A>` |
 //! | `urgent` | `bool` | [`SingularVarintField`] + [`ProtoBool`] | `bool` | `SingularAccess::Mut` (named bit handle) |
 //!
 //! Per-variant **immutable** getters return [`Optional`](::puroro::Optional) whose
@@ -58,9 +58,9 @@
 use ::allocator_api2::alloc::Allocator;
 use ::bytes::BufMut;
 use ::puroro_rt::{
-    EnumVariant, FieldDeallocate, MessageCommon, NestedMessageField, Oneof, OneofDeallocate,
-    OneofEncodable, OneofGroup, PresenceBits, ProtoBool, ProtoInt32, ProtoString, SingularAccess,
-    SingularLenField, SingularVarintField,
+    EnumVariant, FieldDeallocate, MessageCommon, Oneof, OneofDeallocate, OneofEncodable,
+    OneofGroup, PresenceBits, ProtoBool, ProtoInt32, ProtoMessage, ProtoString, SingularAccess,
+    SingularField, SingularLenField, SingularVarintField,
 };
 
 use crate::address::Address;
@@ -116,7 +116,8 @@ type WebhookIdField<A> = SingularVarintField<
     { super::FIELD_WEBHOOK_ID },
     WebhookIdDefault,
 >;
-type PostalField<A> = NestedMessageField<Address<A>, Oneof, { super::FIELD_POSTAL }, A>;
+type PostalField<A> =
+    SingularField<ProtoMessage<Address<A>, A>, Oneof, { super::FIELD_POSTAL }>;
 type UrgentField<A> = SingularVarintField<
     ProtoBool<A, { super::BIT_URGENT_VALUE }>,
     Oneof,
@@ -212,7 +213,7 @@ impl<A: Allocator + Clone> OneofGroup for NotificationStorage<A> {
             Self::EmailAddress(f) => Notification::EmailAddress(f.value(common)),
             Self::PhoneNumber(f) => Notification::PhoneNumber(f.value(common)),
             Self::WebhookId(f) => Notification::WebhookId(f.value(common)),
-            Self::Postal(f) => Notification::Postal(f.value()),
+            Self::Postal(f) => Notification::Postal(f.value(common)),
             Self::Urgent(f) => Notification::Urgent(f.value(common)),
         }
     }
@@ -225,7 +226,7 @@ impl<A: Allocator + Clone> OneofGroup for NotificationStorage<A> {
             Self::EmailAddress(f) => Notification::EmailAddress(f.value_mut(common)),
             Self::PhoneNumber(f) => Notification::PhoneNumber(f.value_mut(common)),
             Self::WebhookId(f) => Notification::WebhookId(f.value_mut(common)),
-            Self::Postal(f) => Notification::Postal(f.value_mut()),
+            Self::Postal(f) => Notification::Postal(f.value_mut(common)),
             Self::Urgent(_) => {
                 Notification::Urgent(common.presence.bit_ref_mut(super::BIT_URGENT_VALUE))
             }
@@ -319,7 +320,7 @@ impl<A: Allocator + Clone> EnumVariant<Postal> for NotificationStorage<A> {
     type Alloc = A;
 
     fn new_value(alloc: A) -> Self::Value {
-        NestedMessageField::with_message_in(alloc)
+        SingularField::with_message_in(alloc)
     }
 
     fn variant_ref(&self) -> Option<&Self::Value> {

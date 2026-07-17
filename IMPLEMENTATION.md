@@ -69,7 +69,7 @@ protoc plugin
     │  emits ::puroro::… (traits, Optional, errors)
     │       ::puroro_rt::… (catalog, wire helpers)
     ▼
-puroro_rt::fields       SingularField<T, P, FIELD>, NestedMessageField, …
+puroro_rt::fields       SingularField<T, P, FIELD> (T includes ProtoMessage), …
     │  shared/ — MessageCommon, FieldPresence, ValueSlot,
     │            DefaultIn / DeallocateIn / ProtoEmpty
     │  wire/   — ProtoType (singular); VarintProtoType / LenProtoType
@@ -123,7 +123,7 @@ protobuf-core           Varint, Tag, WireType
 | `SingularField<T, P, FIELD>` (+ `SingularVarintField` / `SingularLenField` aliases) | **Done** |
 | `ProtoBool<VALUE_BIT>` on `SingularField` (bit-packed singular / oneof `bool`) | **Done** |
 | Closed-enum unknown → `DecodeError::UnknownClosedEnum` → unknown fields, `validate_required` | **Done** |
-| `NestedMessageField` | **Done** |
+| Nested message via `SingularField<ProtoMessage<…>, …>` | **Done** |
 | [`sample-generated`](sample-generated/) (`Task` / `Address`) | **Done** |
 | `Fixed32ProtoType` / `Fixed64ProtoType` on `SingularField` | **Stub** |
 | Repeated catalog (`RepeatedVarintField`, `RepeatedLenField`) | **Done** |
@@ -153,7 +153,6 @@ protobuf-core           Varint, Tag, WireType
 | [`singular/field.rs`](puroro-rt/src/fields/singular/field.rs) | `SingularField` — `T: ProtoType`, stores `T::Slot` |
 | [`singular/varint.rs`](puroro-rt/src/fields/singular/varint.rs) | `SingularVarintField` aliases |
 | [`singular/len.rs`](puroro-rt/src/fields/singular/len.rs) | `SingularLenField` aliases |
-| [`singular/message.rs`](puroro-rt/src/fields/singular/message.rs) | `NestedMessageField` |
 | [`repeated.rs`](puroro-rt/src/fields/repeated.rs) | Repeated field re-exports |
 | [`repeated/encoding.rs`](puroro-rt/src/fields/repeated/encoding.rs) | `Packed` / `Expanded` |
 | [`repeated/varint.rs`](puroro-rt/src/fields/repeated/varint.rs) | `RepeatedVarintField` |
@@ -190,7 +189,7 @@ One marker + trait per protobuf **wire family**. Semantic conversions delegate t
 
 ### Singular field type markers ([`wire/proto_type.rs`](puroro-rt/src/fields/wire/proto_type.rs))
 
-[`ProtoType`](puroro-rt/src/fields/wire/proto_type.rs) is the trait consumed by [`SingularField`](puroro-rt/src/fields/singular/field.rs) (and by [`NestedMessageField`](puroro-rt/src/fields/singular/message.rs) via [`ProtoMessage`](puroro-rt/src/fields/wire/proto_message.rs)). It unifies wire/storage semantics for **non-repeated** fields. Each implementor is a **protobuf type marker**; physical field storage is the associated `Slot` (`Self` for addressable markers / ZST [`ProtoBool`](puroro-rt/src/fields/wire/varint.rs); `UnmanagedBox<M, A>` for messages):
+[`ProtoType`](puroro-rt/src/fields/wire/proto_type.rs) is the trait consumed by [`SingularField`](puroro-rt/src/fields/singular/field.rs) (including nested messages via [`ProtoMessage`](puroro-rt/src/fields/wire/proto_message.rs)). It unifies wire/storage semantics for **non-repeated** fields. Each implementor is a **protobuf type marker**; physical field storage is the associated `Slot` (`Self` for addressable markers / ZST [`ProtoBool`](puroro-rt/src/fields/wire/varint.rs); `UnmanagedBox<M, A>` for messages):
 
 ```rust
 pub trait ProtoType: Sized {
@@ -268,14 +267,14 @@ Rust payload type alone does **not** identify protobuf encoding (`i32` can be in
 
 **“Singular” means non-repeated** — both presence-tracked (“optional” / `EXPLICIT`) and non-presence-tracked (`IMPLICIT`) fields. It is *not* limited to proto `optional`. Cardinality is singular vs repeated; presence is a separate axis (`FieldPresence`).
 
-Varint and LEN singular scalars share one wrapper, parametrised by [`ProtoType`](puroro-rt/src/fields/wire/proto_type.rs) `T` and presence `P`. `FIELD: u32` is a **struct** const generic; `BIT` lives on `Explicit<BIT>` / `LegacyRequired<BIT>`. Markers such as `ProtoString<A>` / `ProtoInt32<A>` carry allocator type `A` (and `PhantomData` on unmanaged payloads) so `T::Alloc` matches [`MessageCommon`](puroro-rt/src/fields/shared.rs); fields still do **not** store an allocator instance. Nested messages stay a separate wrapper (`NestedMessageField`) but share `ProtoType` / `FieldPresence` / `ValueSlot` with other singular fields (`ProtoMessage` + `NonOneof` / `Oneof`).
+Varint and LEN singular scalars share one wrapper, parametrised by [`ProtoType`](puroro-rt/src/fields/wire/proto_type.rs) `T` and presence `P`. `FIELD: u32` is a **struct** const generic; `BIT` lives on `Explicit<BIT>` / `LegacyRequired<BIT>`. Markers such as `ProtoString<A>` / `ProtoInt32<A>` carry allocator type `A` (and `PhantomData` on unmanaged payloads) so `T::Alloc` matches [`MessageCommon`](puroro-rt/src/fields/shared.rs); fields still do **not** store an allocator instance. Nested messages use the same wrapper: `SingularField<ProtoMessage<M, A>, NonOneof|Oneof, FIELD>`.
 
 | Wrapper | Module | Params | Aliases (ergonomics) |
 |---|---|---|---|
 | `SingularField<T, P, FIELD>` | [`singular/field.rs`](puroro-rt/src/fields/singular/field.rs) | `T: ProtoType`, stores `P::ValueSlot<T::Slot>` | `SingularVarintField`, `SingularLenField`, `ImplicitInt32`, `ExplicitString`, … |
 | `SingularField<ProtoBool<A, VALUE_BIT>, P, FIELD>` | same | `Slot = Self` (ZST); value at `VALUE_BIT` in `_common.presence` | existing varint aliases |
+| `SingularField<ProtoMessage<M, A>, P, FIELD>` | same | `Slot = UnmanagedBox<M, A>`; `NonOneof` → `Option`; `Oneof` → always-present | — |
 | Fixed-width singular | (planned via `ProtoType` + `SingularField`) | — | — |
-| `NestedMessageField<M, P, FIELD, A>` | [`singular/message.rs`](puroro-rt/src/fields/singular/message.rs) | `P: FieldPresence` — `NonOneof`: `Option<UnmanagedBox<M, A>>`; `Oneof`: `UnmanagedBox<M, A>` under `ManuallyDrop`; wire via `ProtoMessage` | — |
 | `OneofSlot<E>` | [`oneof.rs`](puroro-rt/src/fields/oneof.rs) | mutually exclusive variants | — |
 
 **Closed enum:** `SingularField<ProtoEnum<E, Closed>, Explicit, FIELD>::bind(…).merge(…)` — `decode` yields `UnknownClosedEnum { raw }`, which `merge` diverts → `unknown_fields`, bit not set.
@@ -307,7 +306,7 @@ Adding a singular wire type = one new `ProtoType` impl (and usually a `VarintPro
 | `repeated int32 EXPANDED` | `RepeatedExpandedVarintField<ProtoInt32, FIELD, A>` |
 | `repeated string` | `RepeatedLenField<ProtoString, FIELD, A>` |
 | `repeated bytes` | `RepeatedLenField<ProtoBytes, FIELD, A>` |
-| nested message | `NestedMessageField<M, NonOneof, FIELD, A>` |
+| nested message | `SingularField<ProtoMessage<M, A>, NonOneof, FIELD>` |
 | `oneof` | `OneofSlot<E>` — not a singular catalog entry |
 
 ---
@@ -329,7 +328,7 @@ pub struct Task<A: Allocator + Clone = Global> {
     labels: RepeatedLenField<ProtoString<A>, { FIELD_LABELS }, A>,
     status: SingularVarintField<ProtoEnum<Status, Open, A>, Implicit, { FIELD_STATUS }>,
     priority: SingularVarintField<ProtoEnum<Priority, Closed, A>, Explicit<{ BIT_PRIORITY }>, { FIELD_PRIORITY }>,
-    assignee: NestedMessageField<Address<A>, NonOneof, { FIELD_ASSIGNEE }, A>,
+    assignee: SingularField<ProtoMessage<Address<A>, A>, NonOneof, { FIELD_ASSIGNEE }>,
     notification: OneofSlot<NotificationStorage<A>>,
     done: SingularVarintField<ProtoBool<A, { BIT_DONE_VALUE }>, Implicit, { FIELD_DONE }>,
     flag: SingularVarintField<ProtoBool<A, { BIT_FLAG_VALUE }>, Explicit<{ BIT_FLAG }>, { FIELD_FLAG }>,
@@ -640,15 +639,15 @@ Elements live in `ManuallyDrop<UnmanagedVec<T::Value>>`. Mutation uses the bound
 
 One LEN record per element (`repeated string` / `repeated bytes`), stored as `ManuallyDrop<UnmanagedVec<T::Storage>>`. Mutation uses the same bound-view idiom: `field.bind_mut(&mut common)` yields a [`RepeatedLenFieldMut`](puroro-rt/src/fields/repeated/len.rs) (no presence bit — repeated fields have none), whose consuming methods are `push_in(impl AsRef<[u8]>)`, `merge(wire, buf)`, and `clear()`. The typed `push_in` helper is kept instead of a bare `DerefMut` (which would expose allocator-less element storage that is impractical to construct). Because each element is itself allocator-less, `clear`/`deallocate` **drain and free every element first** (each via its own owned `alloc.clone()`), then free the buffer. Read accessors use `field.bind(&common)` → [`RepeatedLenFieldRef`](puroro-rt/src/fields/repeated/len.rs) (`as_slice` / `is_empty`). `deallocate(&common)` stays on the field (called from `Drop` via [`FieldDeallocate`](puroro-rt/src/fields/shared/field_deallocate.rs)).
 
-> Note: the bound-view idiom (`field.bind(&common).op()` / `field.bind_mut(&mut common).op()`) covers every field family — `SingularField`, `RepeatedLenField`, `RepeatedVarintField`, `NestedMessageField`, and `OneofSlot` — on both read and write paths. Terminal `deallocate` stays a direct field method (called from `Drop`).
+> Note: the bound-view idiom (`field.bind(&common).op()` / `field.bind_mut(&mut common).op()`) covers every field family — `SingularField`, `RepeatedLenField`, `RepeatedVarintField`, and `OneofSlot` — on both read and write paths. Terminal `deallocate` stays a direct field method (called from `Drop`).
 
 ---
 
 ## 16. Nested messages, oneof, unknown fields
 
-### Nested (`NestedMessageField<M, P, FIELD, A>`)
+### Nested (`SingularField<ProtoMessage<M, A>, P, FIELD>`)
 
-Storage is `ManuallyDrop<P::ValueSlot<UnmanagedBox<M, A>>>` with `P: FieldPresence`: [`NonOneof`](puroro-rt/src/fields/shared/field_presence.rs) → `Option<UnmanagedBox<M, A>>`; [`Oneof`](puroro-rt/src/fields/shared/field_presence.rs) → always-present `UnmanagedBox<M, A>` (the slot tracks case presence; `ManuallyDrop` matches other catalog fields for [`FieldDeallocate`](puroro-rt/src/fields/shared/field_deallocate.rs)). Child type bound is `M: Message<Alloc = A>` (empty children via [`Message::new_in`](src/message.rs)). Wire merge / encode / clear delegate to [`ProtoMessage`](puroro-rt/src/fields/wire/proto_message.rs) / [`ProtoType::merge`](puroro-rt/src/fields/wire/proto_type.rs) (merge-into). Mutation uses the **same bound-view idiom** as other singular fields (`field.bind_mut(&mut common).merge(wire, buf)` / `.get_mut()` / `.clear()`). Read accessors use `field.bind(&common).get()` / `.value()`. A nested message has no presence bit. `NonOneof` exposes `get()` / `get_mut()` (insert-if-absent); `Oneof` exposes `value()` / `value_mut()` (`&M` / `&mut M`). Recursion limit: planned ([§17](#17-planned-optimisations--runtime-gaps)).
+Same wrapper as other singular fields. Storage is `ManuallyDrop<P::ValueSlot<UnmanagedBox<M, A>>>` with `P: FieldPresence`: [`NonOneof`](puroro-rt/src/fields/shared/field_presence.rs) → `Option<UnmanagedBox<M, A>>`; [`Oneof`](puroro-rt/src/fields/shared/field_presence.rs) → always-present `UnmanagedBox<M, A>` (the slot tracks case presence). Child type bound is `M: Message<Alloc = A>` (empty children via [`Message::new_in`](src/message.rs)). Wire merge / encode / clear live on [`ProtoMessage`](puroro-rt/src/fields/wire/proto_message.rs) / [`ProtoType::merge`](puroro-rt/src/fields/wire/proto_type.rs) (merge-into). Accessors use the usual bound-view idiom (`bind` / `bind_mut` → `get` / `get_mut` / `value` / `merge` / `clear`). Recursion limit: planned ([§17](#17-planned-optimisations--runtime-gaps)).
 
 ### Oneof (`OneofSlot<E>`)
 
@@ -667,13 +666,13 @@ The sample `oneof notification` is deliberately **heterogeneous** — LEN, VARIN
 | `NotificationRef<'a, A>` | `pub` alias | via [`SingularAccess`](puroro-rt/src/fields/singular/access.rs)::`Ref` | projected read → `view.as_ref()` |
 | `NotificationMut<'a, A>` | `pub` alias | via `SingularAccess::Mut` | projected mut → `view_mut.as_mut()` |
 
-**Ref/Mut payloads are not hard-coded in generated aliases.** Each singular wrapper implements [`SingularAccess`](puroro-rt/src/fields/singular/access.rs) (`SingularField` forwards to [`ProtoType`](puroro-rt/src/fields/wire/proto_type.rs); `NestedMessageField` supplies its own). Per-variant private field type aliases are the single source for Storage and for those projections.
+**Ref/Mut payloads are not hard-coded in generated aliases.** Each singular wrapper implements [`SingularAccess`](puroro-rt/src/fields/singular/access.rs) (`SingularField` forwards to [`ProtoType`](puroro-rt/src/fields/wire/proto_type.rs)). Per-variant private field type aliases are the single source for Storage and for those projections.
 
-**Variants own field wrappers, not raw storage.** Each variant holds the same field wrapper an ordinary singular field of that kind uses (`SingularField` / aliases — including `ProtoBool<A, VALUE_BIT>` for `bool`; `NestedMessageField` for messages), so `value` / `value_mut` / `deallocate` are reused. The wrapper's presence is inert here (`Oneof` / `FieldPresence::Oneof`), so presence-aware omit rules are never consulted; bool still packs its value into `_common.presence`. Markers and unmanaged payloads are parameterized by `A` (type only / `PhantomData`); the owned allocator instance stays on the message.
+**Variants own field wrappers, not raw storage.** Each variant holds the same field wrapper an ordinary singular field of that kind uses (`SingularField` / aliases — including `ProtoBool<A, VALUE_BIT>` for `bool` and `ProtoMessage<M, A>` for messages), so `value` / `value_mut` / `deallocate` are reused. The wrapper's presence is inert here (`Oneof` / `FieldPresence::Oneof`), so presence-aware omit rules are never consulted; bool still packs its value into `_common.presence`. Markers and unmanaged payloads are parameterized by `A` (type only / `PhantomData`); the owned allocator instance stays on the message.
 
 The oneof drives each variant with the **field's own** primitives. Empty construction is [`EnumVariant::new_value`](puroro-rt/src/fields/enum_variant.rs) (`new_in` / `with_message_in`). Merging is `slot.bind_mut(common).variant_mut::<V>().merge(wire, buf)`. Read getters use `slot.bind(common).variant_of::<V>().optional()` / `.get()`.
 
-**The message variant uses `NestedMessageField<…, Oneof, …>` — `ManuallyDrop<UnmanagedBox<M>>`, not `Option`.**
+**The message variant uses `SingularField<ProtoMessage<…>, Oneof, …>` — always-present `UnmanagedBox<M, A>`, not `Option`.**
 
 Parent `_mut` accessors are one-liners:
 `slot.bind_mut(common).variant_mut::<V>().value_mut()`.

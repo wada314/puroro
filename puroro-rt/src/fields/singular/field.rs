@@ -27,12 +27,15 @@ use ::puroro::{HasDefault, Optional};
 
 use crate::fields::shared::{
     MessageCommon, PresenceBits,
-    field_presence::{FieldPresence, Implicit, LegacyRequired, Oneof, RequiredFieldPresence},
+    field_presence::{FieldPresence, Implicit, LegacyRequired, NonOneof, Oneof, RequiredFieldPresence},
     slot_init::{AlwaysInitialized, SlotInitView},
     value_slot::{ValueSlot, ValueSlotRefAccess},
 };
 use crate::fields::shared::FieldDeallocate;
+use crate::fields::wire::proto_message::ProtoMessage;
 use crate::fields::wire::proto_type::ProtoType;
+use ::puroro::Message;
+use ::unmanaged::UnmanagedBox;
 
 /// Singular (non-repeated) scalar field — varint or LEN, selected by type marker `T`.
 ///
@@ -199,6 +202,30 @@ where
     }
 }
 
+impl<T: ProtoType, const FIELD: u32, D> SingularField<T, NonOneof, FIELD, D>
+where
+    <NonOneof as FieldPresence>::ValueSlot<T::Slot>: ValueSlot<T::Slot>,
+{
+    /// Returns whether the pointer-present slot holds a value.
+    #[inline]
+    pub fn is_present(&self) -> bool {
+        (*self.value).is_some()
+    }
+}
+
+impl<M, const FIELD: u32, D, A: Allocator + Clone>
+    SingularField<ProtoMessage<M, A>, Oneof, FIELD, D>
+where
+    M: Message<Alloc = A>,
+    <Oneof as FieldPresence>::ValueSlot<UnmanagedBox<M, A>>: ValueSlot<UnmanagedBox<M, A>>,
+{
+    /// Builds an always-present nested-message oneof variant with an empty child.
+    #[inline]
+    pub fn with_message_in(alloc: A) -> Self {
+        Self::new_in(alloc)
+    }
+}
+
 impl<T: ProtoType, const BIT: usize, const FIELD: u32, D>
     SingularField<T, LegacyRequired<BIT>, FIELD, D>
 where
@@ -254,17 +281,13 @@ where
     ) -> Self {
         Self { field, common }
     }
-}
 
-impl<'a, T: ProtoType, P: FieldPresence, const FIELD: u32, D, Pb: PresenceBits>
-    SingularFieldRef<'a, T, P, FIELD, D, Pb, T::Alloc>
-where
-    P::ValueSlot<T::Slot>: ValueSlot<T::Slot>,
-    T::Ref<'a>: Copy,
-    D: HasDefault<T::Ref<'a>>,
-{
-    pub fn optional(self) -> Optional<T::Ref<'a>, D> {
-        let v = if P::is_set(self.common, || {
+    /// Returns the logical value when the field is present.
+    ///
+    /// Unlike [`optional`](Self::optional), this does not require `Ref: Copy`,
+    /// so nested messages (`Ref = &M`) can use it.
+    pub fn get(self) -> Option<T::Ref<'a>> {
+        if P::is_set(self.common, || {
             match self
                 .field
                 .value
@@ -284,8 +307,19 @@ where
             Some(T::get(slot, self.common))
         } else {
             None
-        };
-        Optional::new(v)
+        }
+    }
+}
+
+impl<'a, T: ProtoType, P: FieldPresence, const FIELD: u32, D, Pb: PresenceBits>
+    SingularFieldRef<'a, T, P, FIELD, D, Pb, T::Alloc>
+where
+    P::ValueSlot<T::Slot>: ValueSlot<T::Slot>,
+    T::Ref<'a>: Copy,
+    D: HasDefault<T::Ref<'a>>,
+{
+    pub fn optional(self) -> Optional<T::Ref<'a>, D> {
+        Optional::new(self.get())
     }
 }
 
@@ -364,6 +398,15 @@ where
             P::slot_init_mut(),
             self.common,
         )
+    }
+
+    /// Alias of [`value_mut`](Self::value_mut) for nested-message call sites.
+    #[inline]
+    pub fn get_mut(self) -> T::Mut<'f>
+    where
+        'c: 'f,
+    {
+        self.value_mut()
     }
 
     #[inline]

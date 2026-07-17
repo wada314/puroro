@@ -15,10 +15,10 @@ use ::core::ops::DerefMut;
 
 use ::puroro::{DecodeError, HasDefault, Message, Optional};
 use ::puroro_rt::{
-    Closed, Explicit, FieldDeallocate, Implicit, LegacyRequired, MessageCommon,
-    NestedMessageField, OneofSlot, Open, PresenceBits, ProtoBool, ProtoBytes, ProtoEnum,
-    ProtoInt32, ProtoString, RepeatedExpandedVarintField, RepeatedLenField,
-    NonOneof, RepeatedPackedVarintField, SingularAccess, SingularLenField, SingularVarintField,
+    Closed, Explicit, FieldDeallocate, Implicit, LegacyRequired, MessageCommon, NonOneof,
+    OneofSlot, Open, PresenceBits, ProtoBool, ProtoBytes, ProtoEnum, ProtoInt32, ProtoMessage,
+    ProtoString, RepeatedExpandedVarintField, RepeatedLenField, RepeatedPackedVarintField,
+    SingularAccess, SingularField, SingularLenField, SingularVarintField,
 };
 
 use defaults::MaxRetriesDefault;
@@ -135,7 +135,7 @@ pub struct Task<A: Allocator + Clone = Global> {
         Explicit<{ BIT_PRIORITY }>,
         { FIELD_PRIORITY },
     >, // proto: Priority priority = 10;
-    assignee: NestedMessageField<Address<A>, NonOneof, { FIELD_ASSIGNEE }, A>, // proto: Address assignee = 11;
+    assignee: SingularField<ProtoMessage<Address<A>, A>, NonOneof, { FIELD_ASSIGNEE }>, // proto: Address assignee = 11;
     // proto: oneof notification { string email_address=12; string phone_number=13;
     //                             int32 webhook_id=14 [default=-1]; Address postal=15;
     //                             bool urgent=18; }
@@ -164,7 +164,7 @@ impl<A: Allocator + Clone> Task<A> {
             labels: RepeatedLenField::new_in(alloc.clone()),
             status: SingularVarintField::new_in(alloc.clone()),
             priority: SingularVarintField::new_in(alloc.clone()),
-            assignee: NestedMessageField::new_in(alloc.clone()),
+            assignee: SingularField::new_in(alloc.clone()),
             notification: OneofSlot::new_in(alloc.clone()),
             done: SingularVarintField::new_in(alloc.clone()),
             flag: SingularVarintField::new_in(alloc),
