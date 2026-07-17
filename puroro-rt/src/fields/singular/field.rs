@@ -6,7 +6,8 @@
 //! ([`FieldPresence`](crate::fields::shared::field_presence::FieldPresence)).
 //!
 //! Parametrised by protobuf type marker `T: ProtoType`, [`FieldPresence`],
-//! proto field number `FIELD`, and compile-time default marker `D`. Physical
+//! proto field number `FIELD`, value [`ValueLayout`] `L` (`Inline` or
+//! [`BitPacked`] for bool), and compile-time default marker `D`. Physical
 //! storage is `P::ValueSlot<T::Slot>` (`T` itself — including ZST
 //! [`ProtoBool`](crate::ProtoBool)). Heap payloads are
 //! wrapped in [`ManuallyDrop`] so message / oneof `Drop` can release them
@@ -33,6 +34,7 @@ use crate::fields::shared::{
         FieldPresence, Implicit, LegacyRequired, NonOneof, Oneof, RequiredFieldPresence,
     },
     slot_init::{AlwaysInitialized, SlotInitView},
+    value_layout::{Inline, ValueLayout},
     value_slot::{ValueSlot, ValueSlotRefAccess},
 };
 use crate::fields::wire::proto_message::ProtoMessage;
@@ -44,16 +46,23 @@ use ::unmanaged::UnmanagedBox;
 ///
 /// `T` is the protobuf type ([`ProtoType`]); the field stores
 /// `P::ValueSlot<T::Slot>`. Covers both `IMPLICIT` and `EXPLICIT` /
-/// `LEGACY_REQUIRED` presence via `P`.
-pub struct SingularField<T: ProtoType, P: FieldPresence, const FIELD: u32, D = ProtoDefault>
-where
+/// `LEGACY_REQUIRED` presence via `P`. Value storage layout is `L`
+/// ([`Inline`] or [`BitPacked`](crate::fields::shared::value_layout::BitPacked)).
+pub struct SingularField<
+    T: ProtoType,
+    P: FieldPresence,
+    const FIELD: u32,
+    L: ValueLayout<T> = Inline,
+    D = ProtoDefault,
+> where
     P::ValueSlot<T::Slot>: ValueSlot<T::Slot>,
 {
     value: ManuallyDrop<P::ValueSlot<T::Slot>>,
-    _marker: PhantomData<(T, P, D)>,
+    _marker: PhantomData<(T, P, L, D)>,
 }
 
-impl<T: ProtoType, P: FieldPresence, const FIELD: u32, D> Clone for SingularField<T, P, FIELD, D>
+impl<T: ProtoType, P: FieldPresence, const FIELD: u32, L: ValueLayout<T>, D> Clone
+    for SingularField<T, P, FIELD, L, D>
 where
     P::ValueSlot<T::Slot>: ValueSlot<T::Slot> + Copy,
 {
@@ -62,13 +71,15 @@ where
     }
 }
 
-impl<T: ProtoType, P: FieldPresence, const FIELD: u32, D> Copy for SingularField<T, P, FIELD, D> where
-    P::ValueSlot<T::Slot>: ValueSlot<T::Slot> + Copy
+impl<T: ProtoType, P: FieldPresence, const FIELD: u32, L: ValueLayout<T>, D> Copy
+    for SingularField<T, P, FIELD, L, D>
+where
+    P::ValueSlot<T::Slot>: ValueSlot<T::Slot> + Copy,
 {
 }
 
-impl<T: ProtoType, P: FieldPresence, const FIELD: u32, D> fmt::Debug
-    for SingularField<T, P, FIELD, D>
+impl<T: ProtoType, P: FieldPresence, const FIELD: u32, L: ValueLayout<T>, D> fmt::Debug
+    for SingularField<T, P, FIELD, L, D>
 where
     P::ValueSlot<T::Slot>: ValueSlot<T::Slot> + Debug,
 {
@@ -79,7 +90,8 @@ where
     }
 }
 
-impl<T: ProtoType, P: FieldPresence, const FIELD: u32, D> SingularField<T, P, FIELD, D>
+impl<T: ProtoType, P: FieldPresence, const FIELD: u32, L: ValueLayout<T>, D>
+    SingularField<T, P, FIELD, L, D>
 where
     P::ValueSlot<T::Slot>: ValueSlot<T::Slot>,
 {
@@ -97,7 +109,7 @@ where
     pub fn bind<'a, Pb: PresenceBits>(
         &'a self,
         common: &'a MessageCommon<Pb, T::Alloc>,
-    ) -> SingularFieldRef<'a, T, P, FIELD, D, Pb, T::Alloc> {
+    ) -> SingularFieldRef<'a, T, P, FIELD, L, D, Pb, T::Alloc> {
         SingularFieldRef::new(self, common)
     }
 
@@ -106,7 +118,7 @@ where
     pub fn bind_mut<'f, 'c, Pb: PresenceBits>(
         &'f mut self,
         common: &'c mut MessageCommon<Pb, T::Alloc>,
-    ) -> SingularFieldMut<'f, 'c, T, P, FIELD, D, Pb, T::Alloc> {
+    ) -> SingularFieldMut<'f, 'c, T, P, FIELD, L, D, Pb, T::Alloc> {
         SingularFieldMut::new(self, common)
     }
 
@@ -117,7 +129,7 @@ where
         if P::should_emit(common, || {
             let init = P::slot_init_view();
             match self.value.with(init, common).get() {
-                Some(slot) => T::is_proto_empty(slot, common),
+                Some(slot) => L::is_proto_empty(slot, common),
                 None => true,
             }
         }) {
@@ -127,7 +139,7 @@ where
                 .with(init, common)
                 .get()
                 .expect("should_emit implies initialized slot");
-            T::encoded_len(T::get(slot, common), FIELD)
+            T::encoded_len(L::get(slot, common), FIELD)
         } else {
             0
         }
@@ -140,7 +152,7 @@ where
         if P::should_emit(common, || {
             let init = P::slot_init_view();
             match self.value.with(init, common).get() {
-                Some(slot) => T::is_proto_empty(slot, common),
+                Some(slot) => L::is_proto_empty(slot, common),
                 None => true,
             }
         }) {
@@ -150,13 +162,13 @@ where
                 .with(init, common)
                 .get()
                 .expect("should_emit implies initialized slot");
-            T::encode(T::get(slot, common), FIELD, buf);
+            T::encode(L::get(slot, common), FIELD, buf);
         }
     }
 }
 
-impl<T: ProtoType, P: FieldPresence, const FIELD: u32, D, Pb: PresenceBits>
-    FieldDeallocate<Pb, T::Alloc> for SingularField<T, P, FIELD, D>
+impl<T: ProtoType, P: FieldPresence, const FIELD: u32, L: ValueLayout<T>, D, Pb: PresenceBits>
+    FieldDeallocate<Pb, T::Alloc> for SingularField<T, P, FIELD, L, D>
 where
     P::ValueSlot<T::Slot>: ValueSlot<T::Slot>,
 {
@@ -174,7 +186,7 @@ where
     }
 }
 
-impl<T: ProtoType, const FIELD: u32, D> SingularField<T, Implicit, FIELD, D>
+impl<T: ProtoType, const FIELD: u32, L: ValueLayout<T>, D> SingularField<T, Implicit, FIELD, L, D>
 where
     <Implicit as FieldPresence>::ValueSlot<T::Slot>: ValueSlot<T::Slot>,
 {
@@ -189,11 +201,11 @@ where
             .with(AlwaysInitialized, common)
             .get()
             .expect("always-initialized slot");
-        T::get(slot, common)
+        L::get(slot, common)
     }
 }
 
-impl<T: ProtoType, const FIELD: u32, D> SingularField<T, Oneof, FIELD, D>
+impl<T: ProtoType, const FIELD: u32, L: ValueLayout<T>, D> SingularField<T, Oneof, FIELD, L, D>
 where
     <Oneof as FieldPresence>::ValueSlot<T::Slot>: ValueSlot<T::Slot>,
 {
@@ -208,7 +220,7 @@ where
             .with(AlwaysInitialized, common)
             .get()
             .expect("always-initialized slot");
-        T::get(slot, common)
+        L::get(slot, common)
     }
 
     /// Mutable accessor for a oneof variant (slot is always initialized).
@@ -216,11 +228,11 @@ where
         &'a mut self,
         common: &'a mut MessageCommon<Pb, T::Alloc>,
     ) -> T::Mut<'a> {
-        T::with_mut(&mut *self.value, AlwaysInitialized, common)
+        L::with_mut(&mut *self.value, AlwaysInitialized, common)
     }
 }
 
-impl<T: ProtoType, const FIELD: u32, D> SingularField<T, NonOneof, FIELD, D>
+impl<T: ProtoType, const FIELD: u32, L: ValueLayout<T>, D> SingularField<T, NonOneof, FIELD, L, D>
 where
     <NonOneof as FieldPresence>::ValueSlot<T::Slot>: ValueSlot<T::Slot>,
 {
@@ -231,8 +243,8 @@ where
     }
 }
 
-impl<M, const FIELD: u32, D, A: Allocator + Clone>
-    SingularField<ProtoMessage<M, A>, Oneof, FIELD, D>
+impl<M, const FIELD: u32, L: ValueLayout<ProtoMessage<M, A>>, D, A: Allocator + Clone>
+    SingularField<ProtoMessage<M, A>, Oneof, FIELD, L, D>
 where
     M: Message<Alloc = A>,
     <Oneof as FieldPresence>::ValueSlot<UnmanagedBox<M, A>>: ValueSlot<UnmanagedBox<M, A>>,
@@ -244,8 +256,8 @@ where
     }
 }
 
-impl<T: ProtoType, const BIT: usize, const FIELD: u32, D>
-    SingularField<T, LegacyRequired<BIT>, FIELD, D>
+impl<T: ProtoType, const BIT: usize, const FIELD: u32, L: ValueLayout<T>, D>
+    SingularField<T, LegacyRequired<BIT>, FIELD, L, D>
 where
     <LegacyRequired<BIT> as FieldPresence>::ValueSlot<T::Slot>: ValueSlot<T::Slot>,
 {
@@ -259,7 +271,7 @@ where
         LegacyRequired::<BIT>::validate_present(common, FIELD, || {
             let init = <LegacyRequired<BIT> as FieldPresence>::slot_init_view();
             match self.value.with(init, common).get() {
-                Some(slot) => T::is_proto_empty(slot, common),
+                Some(slot) => L::is_proto_empty(slot, common),
                 None => true,
             }
         })
@@ -277,24 +289,25 @@ pub struct SingularFieldRef<
     T: ProtoType,
     P: FieldPresence,
     const FIELD: u32,
+    L: ValueLayout<T>,
     D,
     Pb: PresenceBits,
     A: Allocator,
 > where
     P::ValueSlot<T::Slot>: ValueSlot<T::Slot>,
 {
-    field: &'a SingularField<T, P, FIELD, D>,
+    field: &'a SingularField<T, P, FIELD, L, D>,
     common: &'a MessageCommon<Pb, A>,
 }
 
-impl<'a, T: ProtoType, P: FieldPresence, const FIELD: u32, D, Pb: PresenceBits>
-    SingularFieldRef<'a, T, P, FIELD, D, Pb, T::Alloc>
+impl<'a, T: ProtoType, P: FieldPresence, const FIELD: u32, L: ValueLayout<T>, D, Pb: PresenceBits>
+    SingularFieldRef<'a, T, P, FIELD, L, D, Pb, T::Alloc>
 where
     P::ValueSlot<T::Slot>: ValueSlot<T::Slot>,
 {
     #[inline]
     pub(crate) fn new(
-        field: &'a SingularField<T, P, FIELD, D>,
+        field: &'a SingularField<T, P, FIELD, L, D>,
         common: &'a MessageCommon<Pb, T::Alloc>,
     ) -> Self {
         Self { field, common }
@@ -312,7 +325,7 @@ where
                 .with(P::slot_init_view(), self.common)
                 .get()
             {
-                Some(slot) => T::is_proto_empty(slot, self.common),
+                Some(slot) => L::is_proto_empty(slot, self.common),
                 None => true,
             }
         }) {
@@ -322,15 +335,15 @@ where
                 .with(P::slot_init_view(), self.common)
                 .get()
                 .expect("is_set implies initialized slot");
-            Some(T::get(slot, self.common))
+            Some(L::get(slot, self.common))
         } else {
             None
         }
     }
 }
 
-impl<'a, T: ProtoType, P: FieldPresence, const FIELD: u32, D, Pb: PresenceBits>
-    SingularFieldRef<'a, T, P, FIELD, D, Pb, T::Alloc>
+impl<'a, T: ProtoType, P: FieldPresence, const FIELD: u32, L: ValueLayout<T>, D, Pb: PresenceBits>
+    SingularFieldRef<'a, T, P, FIELD, L, D, Pb, T::Alloc>
 where
     P::ValueSlot<T::Slot>: ValueSlot<T::Slot>,
     T::Ref<'a>: Copy,
@@ -341,8 +354,8 @@ where
     }
 }
 
-impl<'a, T: ProtoType, const FIELD: u32, D, Pb: PresenceBits>
-    SingularFieldRef<'a, T, Implicit, FIELD, D, Pb, T::Alloc>
+impl<'a, T: ProtoType, const FIELD: u32, L: ValueLayout<T>, D, Pb: PresenceBits>
+    SingularFieldRef<'a, T, Implicit, FIELD, L, D, Pb, T::Alloc>
 where
     <Implicit as FieldPresence>::ValueSlot<T::Slot>: ValueSlot<T::Slot>,
 {
@@ -352,8 +365,8 @@ where
     }
 }
 
-impl<'a, T: ProtoType, const FIELD: u32, D, Pb: PresenceBits>
-    SingularFieldRef<'a, T, Oneof, FIELD, D, Pb, T::Alloc>
+impl<'a, T: ProtoType, const FIELD: u32, L: ValueLayout<T>, D, Pb: PresenceBits>
+    SingularFieldRef<'a, T, Oneof, FIELD, L, D, Pb, T::Alloc>
 where
     <Oneof as FieldPresence>::ValueSlot<T::Slot>: ValueSlot<T::Slot>,
 {
@@ -375,24 +388,33 @@ pub struct SingularFieldMut<
     T: ProtoType,
     P: FieldPresence,
     const FIELD: u32,
+    L: ValueLayout<T>,
     D,
     Pb: PresenceBits,
     A: Allocator,
 > where
     P::ValueSlot<T::Slot>: ValueSlot<T::Slot>,
 {
-    field: &'f mut SingularField<T, P, FIELD, D>,
+    field: &'f mut SingularField<T, P, FIELD, L, D>,
     common: &'c mut MessageCommon<Pb, A>,
 }
 
-impl<'f, 'c, T: ProtoType, P: FieldPresence, const FIELD: u32, D, Pb: PresenceBits>
-    SingularFieldMut<'f, 'c, T, P, FIELD, D, Pb, T::Alloc>
+impl<
+    'f,
+    'c,
+    T: ProtoType,
+    P: FieldPresence,
+    const FIELD: u32,
+    L: ValueLayout<T>,
+    D,
+    Pb: PresenceBits,
+> SingularFieldMut<'f, 'c, T, P, FIELD, L, D, Pb, T::Alloc>
 where
     P::ValueSlot<T::Slot>: ValueSlot<T::Slot>,
 {
     #[inline]
     pub(crate) fn new(
-        field: &'f mut SingularField<T, P, FIELD, D>,
+        field: &'f mut SingularField<T, P, FIELD, L, D>,
         common: &'c mut MessageCommon<Pb, T::Alloc>,
     ) -> Self {
         Self { field, common }
@@ -404,7 +426,7 @@ where
     where
         'c: 'f,
     {
-        T::with_mut(&mut *self.field.value, P::slot_init_mut(), self.common)
+        L::with_mut(&mut *self.field.value, P::slot_init_mut(), self.common)
     }
 
     /// Alias of [`value_mut`](Self::value_mut) for nested-message call sites.
@@ -418,12 +440,11 @@ where
 
     #[inline]
     pub fn set(self, v: T::Written) {
-        T::write(&mut *self.field.value, P::slot_init_mut(), self.common, v);
+        L::write(&mut *self.field.value, P::slot_init_mut(), self.common, v);
     }
 
-    pub fn merge<B: Buf>(self, wire_type: WireType, buf: &mut B) -> Result<(), DecodeError>
-where {
-        T::merge(
+    pub fn merge<B: Buf>(self, wire_type: WireType, buf: &mut B) -> Result<(), DecodeError> {
+        L::merge(
             &mut *self.field.value,
             P::slot_init_mut(),
             self.common,
@@ -435,6 +456,6 @@ where {
 
     /// Resets the value slot and clears explicit presence when applicable.
     pub fn clear(self) {
-        T::clear(&mut *self.field.value, P::slot_init_mut(), self.common);
+        L::clear(&mut *self.field.value, P::slot_init_mut(), self.common);
     }
 }

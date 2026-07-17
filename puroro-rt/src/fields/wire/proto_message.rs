@@ -20,7 +20,7 @@ use crate::fields::shared::{
     value_slot::{AddressableSlot, ValueSlot, ValueSlotMutAccess},
 };
 use crate::fields::wire::len;
-use crate::fields::wire::proto_type::ProtoType;
+use crate::fields::wire::proto_type::{PayloadAccess, ProtoType};
 
 /// Type marker for a singular nested message `M`.
 ///
@@ -88,6 +88,46 @@ impl<M: Message<Alloc = A>, A: Allocator + Clone> ProtoType for ProtoMessage<M, 
     const WIRE_TYPE: WireType = WireType::Len;
 
     #[inline]
+    fn encoded_len<'a>(value: Self::Ref<'a>, field: u32) -> usize
+    where
+        Self: 'a,
+    {
+        encode::encoded_len_len_field(field, value.encoded_len())
+    }
+
+    #[inline]
+    fn encode<'a, B: BufMut>(value: Self::Ref<'a>, field: u32, buf: &mut B)
+    where
+        Self: 'a,
+    {
+        let payload_len = value.encoded_len();
+        encode::encode_tag(field, WireType::Len, buf);
+        encode::encode_varint(payload_len as u64, buf);
+        value.encode_raw(buf);
+    }
+
+    #[inline]
+    fn decode<B: Buf>(
+        wire_type: WireType,
+        buf: &mut B,
+        alloc: A,
+    ) -> Result<Self::Written, DecodeError> {
+        if wire_type != len::WIRE_TYPE {
+            return Err(DecodeError::InvalidTag);
+        }
+        let len = decode::decode_varint(buf)? as usize;
+        if buf.remaining() < len {
+            return Err(DecodeError::TruncatedMessage);
+        }
+        let mut sub = buf.take(len);
+        let mut child = M::new_in(alloc.clone());
+        child.merge_from(&mut sub)?;
+        Ok(UnmanagedBox::new_in(child, alloc))
+    }
+}
+
+impl<M: Message<Alloc = A>, A: Allocator + Clone> PayloadAccess for ProtoMessage<M, A> {
+    #[inline]
     fn is_proto_empty<Pb: PresenceBits>(
         _slot: &Self::Slot,
         _common: &MessageCommon<Pb, A>,
@@ -137,44 +177,6 @@ impl<M: Message<Alloc = A>, A: Allocator + Clone> ProtoType for ProtoMessage<M, 
         Pb: PresenceBits,
     {
         ValueSlot::with_mut(slot, init, common).clear();
-    }
-
-    #[inline]
-    fn encoded_len<'a>(value: Self::Ref<'a>, field: u32) -> usize
-    where
-        Self: 'a,
-    {
-        encode::encoded_len_len_field(field, value.encoded_len())
-    }
-
-    #[inline]
-    fn encode<'a, B: BufMut>(value: Self::Ref<'a>, field: u32, buf: &mut B)
-    where
-        Self: 'a,
-    {
-        let payload_len = value.encoded_len();
-        encode::encode_tag(field, WireType::Len, buf);
-        encode::encode_varint(payload_len as u64, buf);
-        value.encode_raw(buf);
-    }
-
-    #[inline]
-    fn decode<B: Buf>(
-        wire_type: WireType,
-        buf: &mut B,
-        alloc: A,
-    ) -> Result<Self::Written, DecodeError> {
-        if wire_type != len::WIRE_TYPE {
-            return Err(DecodeError::InvalidTag);
-        }
-        let len = decode::decode_varint(buf)? as usize;
-        if buf.remaining() < len {
-            return Err(DecodeError::TruncatedMessage);
-        }
-        let mut sub = buf.take(len);
-        let mut child = M::new_in(alloc.clone());
-        child.merge_from(&mut sub)?;
-        Ok(UnmanagedBox::new_in(child, alloc))
     }
 
     fn merge<VS, I, Pb, B>(

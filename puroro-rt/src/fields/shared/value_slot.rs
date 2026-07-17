@@ -65,7 +65,7 @@ impl<A: Allocator + Clone> AddressableSlot for ProtoBytes<A> {
 impl<E: ProtoEnumStorage, K, A: Allocator + Clone> AddressableSlot for ProtoEnum<E, K, A> {
     type SlotAlloc = A;
 }
-impl<A: Allocator + Clone, const VALUE_BIT: usize> AddressableSlot for ProtoBool<A, VALUE_BIT> {
+impl<A: Allocator + Clone> AddressableSlot for ProtoBool<A> {
     type SlotAlloc = A;
 }
 

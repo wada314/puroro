@@ -309,23 +309,19 @@ proto_varint_wrapper! {
 
 /// Protobuf `bool` type marker — varint 0 or 1.
 ///
-/// Implements [`ProtoType`](super::proto_type::ProtoType) with
-/// `Slot = Self` (ZST). The logical `bool` is packed at `VALUE_BIT` in
-/// [`MessageCommon`](crate::MessageCommon)'s bitvec; the field struct only
-/// stores this marker for presence/init layout.
+/// Implements [`ProtoType`](super::proto_type::ProtoType) with `Slot = Self`
+/// (ZST). Singular / oneof fields store the logical value via
+/// [`BitPacked`](crate::fields::shared::value_layout::BitPacked) on
+/// [`SingularField`](crate::fields::singular::field::SingularField); the field
+/// struct only holds this marker for presence/init layout.
 ///
-/// **Singular / oneof vs repeated (future):** this bit-packed form (and the
-/// `VALUE_BIT` const generic) is only for singular and oneof `bool`. A
-/// `repeated bool` must store plain `bool` elements in the repeated buffer and
-/// must **not** take a MessageCommon bit index. Do not reuse this marker as-is
-/// for repeated; keep scalar (bit-packed) and repeated (element `bool`) as
-/// distinct type paths. Interim: `VALUE_BIT` still lives on this marker for
-/// codegen stability; a later cleanup should move the index to the
-/// field / layout side so the singular marker can be bit-index-free too.
+/// **Repeated (future):** `repeated bool` must store plain `bool` elements and
+/// must **not** use [`BitPacked`] / a MessageCommon bit index. Keep scalar
+/// bit-packed bool and repeated element `bool` as distinct type paths.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
-pub struct ProtoBool<A: Allocator, const VALUE_BIT: usize>(PhantomData<A>);
+pub struct ProtoBool<A: Allocator>(PhantomData<A>);
 
-impl<A: Allocator + Clone, const VALUE_BIT: usize> DefaultIn for ProtoBool<A, VALUE_BIT> {
+impl<A: Allocator + Clone> DefaultIn for ProtoBool<A> {
     type Alloc = A;
 
     #[inline]
@@ -334,14 +330,14 @@ impl<A: Allocator + Clone, const VALUE_BIT: usize> DefaultIn for ProtoBool<A, VA
     }
 }
 
-impl<A: Allocator + Clone, const VALUE_BIT: usize> DeallocateIn for ProtoBool<A, VALUE_BIT> {
+impl<A: Allocator + Clone> DeallocateIn for ProtoBool<A> {
     type Alloc = A;
 
     #[inline]
     unsafe fn deallocate_in(self, _alloc: A) {}
 }
 
-impl<A: Allocator, const VALUE_BIT: usize> VarintProtoType for ProtoBool<A, VALUE_BIT> {
+impl<A: Allocator> VarintProtoType for ProtoBool<A> {
     type Value = bool;
 
     #[inline]

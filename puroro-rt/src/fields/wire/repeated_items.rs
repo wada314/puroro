@@ -5,8 +5,9 @@
 //! (`i32`, `UnmanagedString`, …), and for a future nested-message repeated
 //! field the message type `M` itself (not [`UnmanagedBox`](::unmanaged::UnmanagedBox)).
 //!
-//! Bit-packed [`ProtoBool`](super::varint::ProtoBool) does **not** implement
-//! this trait; a future `repeated bool` will use plain `bool` elements.
+//! [`ProtoBool`](super::varint::ProtoBool) (singular bit-packed via
+//! [`BitPacked`](crate::fields::shared::value_layout::BitPacked)) does **not**
+//! implement this trait; a future `repeated bool` will use plain `bool` elements.
 
 use ::allocator_api2::alloc::Allocator;
 use ::bytes::{Buf, BufMut};

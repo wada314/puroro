@@ -12,7 +12,7 @@ pub(crate) mod varint;
 
 pub use len::{LenProtoType, ProtoBytes, ProtoString};
 pub use proto_message::ProtoMessage;
-pub use proto_type::ProtoType;
+pub use proto_type::{PayloadAccess, ProtoType};
 pub use repeated_items::{PackableRepeatedItems, RepeatedItems, RepeatedSlicePush};
 pub use varint::{
     Closed, ClosedEnum, Open, OpenEnum, ProtoBool, ProtoEnum, ProtoEnumStorage, ProtoInt32,

@@ -58,9 +58,9 @@
 use ::allocator_api2::alloc::Allocator;
 use ::bytes::BufMut;
 use ::puroro_rt::{
-    EnumVariant, FieldDeallocate, MessageCommon, Oneof, OneofDeallocate, OneofEncodable,
-    OneofGroup, PresenceBits, ProtoBool, ProtoInt32, ProtoMessage, ProtoString, ProtoType,
-    SingularField,
+    BitPacked, EnumVariant, FieldDeallocate, Inline, MessageCommon, Oneof, OneofDeallocate,
+    OneofEncodable, OneofGroup, PresenceBits, ProtoBool, ProtoInt32, ProtoMessage, ProtoString,
+    ProtoType, SingularField,
 };
 
 use crate::address::Address;
@@ -109,10 +109,14 @@ pub enum NotificationCase {
 type EmailAddressField<A> = SingularField<ProtoString<A>, Oneof, { super::FIELD_EMAIL_ADDRESS }>;
 type PhoneNumberField<A> = SingularField<ProtoString<A>, Oneof, { super::FIELD_PHONE_NUMBER }>;
 type WebhookIdField<A> =
-    SingularField<ProtoInt32<A>, Oneof, { super::FIELD_WEBHOOK_ID }, WebhookIdDefault>;
+    SingularField<ProtoInt32<A>, Oneof, { super::FIELD_WEBHOOK_ID }, Inline, WebhookIdDefault>;
 type PostalField<A> = SingularField<ProtoMessage<Address<A>, A>, Oneof, { super::FIELD_POSTAL }>;
-type UrgentField<A> =
-    SingularField<ProtoBool<A, { super::BIT_URGENT_VALUE }>, Oneof, { super::FIELD_URGENT }>;
+type UrgentField<A> = SingularField<
+    ProtoBool<A>,
+    Oneof,
+    { super::FIELD_URGENT },
+    BitPacked<{ super::BIT_URGENT_VALUE }>,
+>;
 
 /// Owned storage for `oneof notification` (crate-internal).
 pub(crate) type NotificationStorage<A> = Notification<
@@ -129,7 +133,7 @@ pub type NotificationRef<'a, A> = Notification<
     <ProtoString<A> as ProtoType>::Ref<'a>,
     <ProtoInt32<A> as ProtoType>::Ref<'a>,
     <ProtoMessage<Address<A>, A> as ProtoType>::Ref<'a>,
-    <ProtoBool<A, { super::BIT_URGENT_VALUE }> as ProtoType>::Ref<'a>,
+    <ProtoBool<A> as ProtoType>::Ref<'a>,
 >;
 
 /// Borrowed mutable projection of the active `notification` variant.
@@ -142,7 +146,7 @@ pub type NotificationMut<'a, A> = Notification<
     <ProtoString<A> as ProtoType>::Mut<'a>,
     <ProtoInt32<A> as ProtoType>::Mut<'a>,
     <ProtoMessage<Address<A>, A> as ProtoType>::Mut<'a>,
-    <ProtoBool<A, { super::BIT_URGENT_VALUE }> as ProtoType>::Mut<'a>,
+    <ProtoBool<A> as ProtoType>::Mut<'a>,
 >;
 
 // `A` must appear structurally (not only inside an associated-type projection)
@@ -153,7 +157,7 @@ impl<'a, A: Allocator + Clone> Clone
         <ProtoString<A> as ProtoType>::Ref<'a>,
         <ProtoInt32<A> as ProtoType>::Ref<'a>,
         &'a Address<A>,
-        <ProtoBool<A, { super::BIT_URGENT_VALUE }> as ProtoType>::Ref<'a>,
+        <ProtoBool<A> as ProtoType>::Ref<'a>,
     >
 {
     fn clone(&self) -> Self {
@@ -166,7 +170,7 @@ impl<'a, A: Allocator + Clone> Copy
         <ProtoString<A> as ProtoType>::Ref<'a>,
         <ProtoInt32<A> as ProtoType>::Ref<'a>,
         &'a Address<A>,
-        <ProtoBool<A, { super::BIT_URGENT_VALUE }> as ProtoType>::Ref<'a>,
+        <ProtoBool<A> as ProtoType>::Ref<'a>,
     >
 {
 }

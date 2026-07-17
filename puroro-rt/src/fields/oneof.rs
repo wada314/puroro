@@ -20,7 +20,7 @@ use ::unmanaged::UnmanagedBox;
 
 use crate::fields::enum_variant::EnumVariant;
 use crate::fields::shared::{
-    FieldDeallocate, MessageCommon, PresenceBits,
+    FieldDeallocate, MessageCommon, PresenceBits, ValueLayout,
     field_presence::{FieldPresence, Oneof},
     value_slot::ValueSlot,
 };
@@ -369,8 +369,15 @@ impl<'a, F, Pb: PresenceBits, A: Allocator> OneofVariantRef<'a, F, Pb, A> {
     }
 }
 
-impl<'a, T: ProtoType<Alloc = A>, const FIELD: u32, D, Pb: PresenceBits, A: Allocator>
-    OneofVariantRef<'a, SingularField<T, Oneof, FIELD, D>, Pb, A>
+impl<
+    'a,
+    T: ProtoType<Alloc = A>,
+    const FIELD: u32,
+    L: ValueLayout<T>,
+    D,
+    Pb: PresenceBits,
+    A: Allocator,
+> OneofVariantRef<'a, SingularField<T, Oneof, FIELD, L, D>, Pb, A>
 where
     T::Ref<'a>: Copy,
     D: HasDefault<T::Ref<'a>>,

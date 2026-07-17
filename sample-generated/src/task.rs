@@ -18,9 +18,9 @@ use ::core::ops::DerefMut;
 use ::puroro::{DecodeError, HasDefault, Message, Optional};
 use ::puroro_rt::decode::{decode_tag, skip_field_and_save};
 use ::puroro_rt::{
-    Closed, Expanded, Explicit, FieldDeallocate, Implicit, LegacyRequired, MessageCommon, NonOneof,
-    OneofSlot, Open, Packed, PresenceBits, ProtoBool, ProtoBytes, ProtoEnum, ProtoInt32,
-    ProtoMessage, ProtoString, RepeatedField, SingularField,
+    BitPacked, Closed, Expanded, Explicit, FieldDeallocate, Implicit, Inline, LegacyRequired,
+    MessageCommon, NonOneof, OneofSlot, Open, Packed, PresenceBits, ProtoBool, ProtoBytes,
+    ProtoEnum, ProtoInt32, ProtoMessage, ProtoString, RepeatedField, SingularField,
 };
 
 use defaults::MaxRetriesDefault;
@@ -116,6 +116,7 @@ pub struct Task<A: Allocator + Clone = Global> {
         ProtoInt32<A>,
         Explicit<{ BIT_MAX_RETRIES }>,
         { FIELD_MAX_RETRIES },
+        Inline,
         MaxRetriesDefault,
     >, // proto: int32 max_retries = 3;
     owner_id: SingularField<ProtoString<A>, LegacyRequired<{ BIT_OWNER_ID }>, { FIELD_OWNER_ID }>, // proto: string owner_id = 4;
@@ -134,8 +135,13 @@ pub struct Task<A: Allocator + Clone = Global> {
     //                             int32 webhook_id=14 [default=-1]; Address postal=15;
     //                             bool urgent=18; }
     notification: OneofSlot<NotificationStorage<A>>,
-    done: SingularField<ProtoBool<A, { BIT_DONE_VALUE }>, Implicit, { FIELD_DONE }>, // proto: bool done = 16;
-    flag: SingularField<ProtoBool<A, { BIT_FLAG_VALUE }>, Explicit<{ BIT_FLAG }>, { FIELD_FLAG }>, // proto: bool flag = 17;
+    done: SingularField<ProtoBool<A>, Implicit, { FIELD_DONE }, BitPacked<{ BIT_DONE_VALUE }>>, // proto: bool done = 16;
+    flag: SingularField<
+        ProtoBool<A>,
+        Explicit<{ BIT_FLAG }>,
+        { FIELD_FLAG },
+        BitPacked<{ BIT_FLAG_VALUE }>,
+    >, // proto: bool flag = 17;
 }
 
 impl<A: Allocator + Clone> Task<A> {

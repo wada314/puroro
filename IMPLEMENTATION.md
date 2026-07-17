@@ -122,7 +122,8 @@ protobuf-core           Varint, Tag, WireType
 | `FieldPresence` (`Implicit` / `Explicit` / `LegacyRequired` / `Oneof`) | **Done** |
 | `ValueSlot`, `SlotInitView` / `SlotInitMut`, `DefaultIn` / `DeallocateIn` / `ProtoEmpty` | **Done** |
 | `SingularField<T, P, FIELD>`  | **Done** |
-| `ProtoBool<VALUE_BIT>` on `SingularField` (bit-packed singular / oneof `bool`) | **Done** |
+| `ProtoBool` + `BitPacked<VALUE_BIT>` on `SingularField` (singular / oneof `bool`) | **Done** |
+| `ValueLayout` / `Inline` / `PayloadAccess` | **Done** |
 | Closed-enum unknown → `DecodeError::UnknownClosedEnum` → unknown fields, `validate_required` | **Done** |
 | Nested message via `SingularField<ProtoMessage<…>, …>` | **Done** |
 | [`sample-generated`](sample-generated/) (`Task` / `Address`) | **Done** |
@@ -145,7 +146,8 @@ protobuf-core           Varint, Tag, WireType
 | [`shared/field_deallocate.rs`](puroro-rt/src/fields/shared/field_deallocate.rs) | `FieldDeallocate` — uniform `deallocate(&common)` |
 | [`shared/slot_init.rs`](puroro-rt/src/fields/shared/slot_init.rs) | `SlotInitView` / `SlotInitMut` init-state handles |
 | [`wire.rs`](puroro-rt/src/fields/wire.rs) | Wire-family re-exports |
-| [`wire/proto_type.rs`](puroro-rt/src/fields/wire/proto_type.rs) | `ProtoType` (singular field type markers) |
+| [`wire/proto_type.rs`](puroro-rt/src/fields/wire/proto_type.rs) | `ProtoType` (wire) + `PayloadAccess` (inline storage) |
+| [`shared/value_layout.rs`](puroro-rt/src/fields/shared/value_layout.rs) | `ValueLayout`, `Inline`, `BitPacked` |
 | [`wire/repeated_items.rs`](puroro-rt/src/fields/wire/repeated_items.rs) | `RepeatedItems` (`Element` for repeated buffers) |
 | [`wire/proto_message.rs`](puroro-rt/src/fields/wire/proto_message.rs) | `ProtoMessage` (nested message marker) |
 | [`wire/varint.rs`](puroro-rt/src/fields/wire/varint.rs) | `VarintProtoType`, `ProtoInt32`, … |
@@ -212,7 +214,7 @@ pub trait ProtoType: Sized {
 // Implemented for ProtoInt32<A>, …, ProtoBool<A, BIT>, ProtoEnum<E, K, A>, ProtoString<A>, ProtoBytes<A>, ProtoMessage<M, A>
 ```
 
-**Interim:** [`ProtoBool<A, VALUE_BIT>`](puroro-rt/src/fields/wire/varint.rs) still carries the value-bit index as a const generic so generated spellings stay `SingularField<ProtoBool<A, { BIT_*_VALUE }>, …>`. The type/slot split is done (`Slot = Self`); a future cleanup should move `VALUE_BIT` to the field / layout side so the marker is bit-index-free.
+Singular / oneof `bool` uses bit-index-free [`ProtoBool<A>`](puroro-rt/src/fields/wire/varint.rs) plus [`BitPacked<VALUE_BIT>`](puroro-rt/src/fields/shared/value_layout.rs) as the field's [`ValueLayout`](puroro-rt/src/fields/shared/value_layout.rs) (orthogonal to presence `P`). Inline payloads use default `L = Inline` via [`PayloadAccess`](puroro-rt/src/fields/wire/proto_type.rs).
 ### Repeated elements (`RepeatedItems`)
 
 [`RepeatedItems`](puroro-rt/src/fields/wire/repeated_items.rs) extends [`ProtoType`](puroro-rt/src/fields/wire/proto_type.rs) with the physical element type stored in a repeated buffer (`Element`), plus per-element encode / decode / merge / deallocate. Singular fields store `Slot`; repeated fields store `Element` (not always the same — e.g. future nested-message repeated uses `Element = M` while singular keeps `Slot = UnmanagedBox<M, A>`).
@@ -222,7 +224,7 @@ pub trait ProtoType: Sized {
 | Addressable varint / enum | `VarintProtoType::Value` (`i32`, …) | yes (`PackableRepeatedItems`) |
 | `ProtoString` / `ProtoBytes` | `LenProtoType::Storage` | no (`RepeatedSlicePush` for `push_*`) |
 | `ProtoMessage<M, A>` (future) | `M` | no |
-| `ProtoBool<VALUE_BIT>` | — (no impl) | — |
+| `ProtoBool` | — (no `RepeatedItems`; use plain `bool` elements later) | — |
 
 ### Varint / LEN helpers
 
@@ -281,8 +283,8 @@ Varint and LEN singular scalars share one wrapper, parametrised by [`ProtoType`]
 
 | Wrapper | Module | Params | Aliases (ergonomics) |
 |---|---|---|---|
-| `SingularField<T, P, FIELD>` | [`singular/field.rs`](puroro-rt/src/fields/singular/field.rs) | `T: ProtoType`, stores `P::ValueSlot<T::Slot>` | — |
-| `SingularField<ProtoBool<A, VALUE_BIT>, P, FIELD>` | same | `Slot = Self` (ZST); value at `VALUE_BIT` in `_common.presence` | existing varint aliases |
+| `SingularField<T, P, FIELD, L, D>` | [`singular/field.rs`](puroro-rt/src/fields/singular/field.rs) | `T: ProtoType`, `L: ValueLayout<T>` (default `Inline`), stores `P::ValueSlot<T::Slot>` | — |
+| `SingularField<ProtoBool<A>, P, FIELD, BitPacked<VALUE_BIT>>` | same | `Slot = Self` (ZST); value at `VALUE_BIT` via layout | — |
 | `SingularField<ProtoMessage<M, A>, P, FIELD>` | same | `Slot = UnmanagedBox<M, A>`; `NonOneof` → `Option`; `Oneof` → always-present | — |
 | `RepeatedField<T, E, FIELD>` | [`repeated/field.rs`](puroro-rt/src/fields/repeated/field.rs) | `T: RepeatedItems`, `E: RepeatedEncoding<T>`, stores `T::Element` | `RepeatedPackedVarintField`, … |
 | Fixed-width singular | (planned via `ProtoType` + `SingularField`) | — | — |
@@ -303,10 +305,10 @@ Adding a singular wire type = one new `ProtoType` impl (and usually a `VarintPro
 | `IMPLICIT int32` | `SingularField<ProtoInt32, Implicit, FIELD>`  |
 | `EXPLICIT int32` | `SingularField<ProtoInt32, Explicit<BIT>, FIELD>` |
 | `IMPLICIT sint32` | `SingularField<ProtoSint32, Implicit, FIELD>` |
-| `IMPLICIT bool` | `SingularField<ProtoBool<VALUE_BIT>, Implicit, FIELD>` (value in `_common.presence`) |
-| `EXPLICIT bool` | `SingularField<ProtoBool<VALUE_BIT>, Explicit<PRESENCE_BIT>, FIELD>` |
-| `LEGACY_REQUIRED bool` | `SingularField<ProtoBool<VALUE_BIT>, LegacyRequired<PRESENCE_BIT>, FIELD>` |
-| oneof `bool` | `SingularField<ProtoBool<VALUE_BIT>, Oneof, FIELD>` inside the oneof storage enum |
+| `IMPLICIT bool` | `SingularField<ProtoBool, Implicit, FIELD, BitPacked<VALUE_BIT>>` |
+| `EXPLICIT bool` | `SingularField<ProtoBool, Explicit<PRESENCE_BIT>, FIELD, BitPacked<VALUE_BIT>>` |
+| `LEGACY_REQUIRED bool` | `SingularField<ProtoBool, LegacyRequired<PRESENCE_BIT>, FIELD, BitPacked<VALUE_BIT>>` |
+| oneof `bool` | `SingularField<ProtoBool, Oneof, FIELD, BitPacked<VALUE_BIT>>` inside the oneof storage enum |
 | `IMPLICIT open enum` | `SingularField<ProtoEnum<E, Open>, Implicit, FIELD>` |
 | `EXPLICIT closed enum` | `SingularField<ProtoEnum<E, Closed>, Explicit<BIT>, FIELD>` (same `.merge`) |
 | `IMPLICIT string` | `SingularField<ProtoString, Implicit, FIELD>`  |
@@ -341,12 +343,12 @@ pub struct Task<A: Allocator + Clone = Global> {
     priority: SingularField<ProtoEnum<Priority, Closed, A>, Explicit<{ BIT_PRIORITY }>, { FIELD_PRIORITY }>,
     assignee: SingularField<ProtoMessage<Address<A>, A>, NonOneof, { FIELD_ASSIGNEE }>,
     notification: OneofSlot<NotificationStorage<A>>,
-    done: SingularField<ProtoBool<A, { BIT_DONE_VALUE }>, Implicit, { FIELD_DONE }>,
-    flag: SingularField<ProtoBool<A, { BIT_FLAG_VALUE }>, Explicit<{ BIT_FLAG }>, { FIELD_FLAG }>,
+    done: SingularField<ProtoBool<A>, Implicit, { FIELD_DONE }, BitPacked<{ BIT_DONE_VALUE }>>,
+    flag: SingularField<ProtoBool<A>, Explicit<{ BIT_FLAG }>, { FIELD_FLAG }, BitPacked<{ BIT_FLAG_VALUE }>>,
 }
 ```
 
-The `A: Allocator + Clone` struct bound is what lets the generated `Drop` clone the allocator into nested children and free every field from one place. Heap payloads use `unmanaged` types parameterized by `A` plus `PhantomData<A>` (no allocator *instance* in the field). Protobuf markers (`ProtoString<A>`, …) carry the same `A` so `DefaultIn` / `DeallocateIn` associate `Alloc = A` against `MessageCommon<P, A>`. The only owned `A` value remains `_common.alloc`. Singular `bool` uses `SingularField<ProtoBool<A, VALUE_BIT>, …>` with ZST `Slot = Self`; the value lives in `_common.presence`.
+The `A: Allocator + Clone` struct bound is what lets the generated `Drop` clone the allocator into nested children and free every field from one place. Heap payloads use `unmanaged` types parameterized by `A` plus `PhantomData<A>` (no allocator *instance* in the field). Protobuf markers (`ProtoString<A>`, …) carry the same `A` so `DefaultIn` / `DeallocateIn` associate `Alloc = A` against `MessageCommon<P, A>`. The only owned `A` value remains `_common.alloc`. Singular `bool` uses `SingularField<ProtoBool<A>, …, BitPacked<VALUE_BIT>>` with ZST `Slot = Self`; the value lives in `_common.presence`.
 
 ### Storage summary
 
@@ -354,7 +356,7 @@ The `A: Allocator + Clone` struct bound is what lets the generated `Drop` clone 
 |---|---|---|
 | IMPLICIT varint / open enum / LEN | `ManuallyDrop<T>` (always initialized) | — |
 | EXPLICIT / LEGACY_REQUIRED scalar or LEN | `ManuallyDrop<MaybeUninit<T>>` | presence bit in `_common.presence` |
-| Singular / oneof `bool` | `SingularField` + `ProtoBool<VALUE_BIT>` (`Slot = Self`, ZST) | value bit (+ presence bit for EXPLICIT / LEGACY_REQUIRED) in `_common.presence` |
+| Singular / oneof `bool` | `SingularField` + `ProtoBool` + `BitPacked<VALUE_BIT>` (`Slot = Self`, ZST) | value bit (+ presence bit for EXPLICIT / LEGACY_REQUIRED) in `_common.presence` |
 | Repeated | `RepeatedField<T, E, FIELD>` (`UnmanagedVec<T::Element>`) | empty = absent |
 | Nested message | `Option<UnmanagedBox<M, A>>` (`NonOneof`) | `Option`, not bitfield |
 | Oneof (non-bool) | `Option<E>` in slot | `Option`, not bitfield |
@@ -599,7 +601,7 @@ In this catalog, **singular** means a **non-repeated** field — both `IMPLICIT`
 
 ### Unified wrapper (`SingularField<T, P, FIELD>`)
 
-Varint and LEN share [`SingularField`](puroro-rt/src/fields/singular/field.rs), parametrised by type marker `T: ProtoType`. Addressable scalars and bit-packed [`ProtoBool<VALUE_BIT>`](puroro-rt/src/fields/wire/varint.rs) share one encode/merge/accessor path via contextual `ProtoType` methods (`get` / `with_mut` / `is_proto_empty` / …). Ergonomic There are no wire-family aliases — generated code names `SingularField` directly.
+Varint and LEN share [`SingularField`](puroro-rt/src/fields/singular/field.rs), parametrised by type marker `T: ProtoType` and layout `L: ValueLayout<T>`. Addressable scalars use `L = Inline` ([`PayloadAccess`](puroro-rt/src/fields/wire/proto_type.rs)); bit-packed [`ProtoBool`](puroro-rt/src/fields/wire/varint.rs) uses `L = BitPacked<VALUE_BIT>`. There are no wire-family aliases — generated code names `SingularField` directly.
 
 Storage is `ManuallyDrop<P::ValueSlot<T::Slot>>` — `T` / `MaybeUninit<T>` (including ZST `ProtoBool`) depending on presence. Heap LEN payloads need an explicit [`FieldDeallocate::deallocate`](puroro-rt/src/fields/shared/field_deallocate.rs)(`&common`) from message / oneof teardown; copy scalars’ / unit-slot `DeallocateIn` is a no-op.
 
@@ -617,11 +619,11 @@ Storage is `ManuallyDrop<P::ValueSlot<T::Slot>>` — `T` / `MaybeUninit<T>` (inc
 
 Encode / `deallocate` / `validate_required` stay as plain field methods that take `&common` directly. Enum fields use `ProtoEnum<E, Open|Closed>`; closed-enum unknown values surface as `DecodeError::UnknownClosedEnum` and are diverted by singular `merge`. `Optional` is a concrete struct (DESIGN.md §3); no `Option<T>` conversion.
 
-### Bit-packed `bool` (`ProtoBool`)
+### Bit-packed `bool` (`ProtoBool` + `BitPacked`)
 
-Singular / oneof `bool` uses [`SingularField`](puroro-rt/src/fields/singular/field.rs) with type marker [`ProtoBool<VALUE_BIT>`](puroro-rt/src/fields/wire/varint.rs) (`ProtoType::Slot = Self`, ZST). The logical `bool` lives at `VALUE_BIT` in `_common.presence`; EXPLICIT / LEGACY_REQUIRED also use `P`'s presence bit. Bound views are the same `SingularFieldRef` / `SingularFieldMut`; `value_mut` returns bitvec's `BitRef<'_, Mut, …>` via [`MessageCommon::bit_mut`](puroro-rt/src/fields/shared.rs). Wire encode/decode goes through `ProtoType` (backed by `VarintProtoType` helpers). Implicit omit treats a clear value bit as absent; Explicit can encode an explicit `false`.
+Singular / oneof `bool` uses [`SingularField`](puroro-rt/src/fields/singular/field.rs) with type marker [`ProtoBool`](puroro-rt/src/fields/wire/varint.rs) (`ProtoType::Slot = Self`, ZST) and layout [`BitPacked<VALUE_BIT>`](puroro-rt/src/fields/shared/value_layout.rs). The logical `bool` lives at `VALUE_BIT` in `_common.presence`; EXPLICIT / LEGACY_REQUIRED also use `P`'s presence bit (orthogonal). Bound views are the same `SingularFieldRef` / `SingularFieldMut`; `value_mut` returns bitvec's `BitRef<'_, Mut, …>` via [`MessageCommon::bit_mut`](puroro-rt/src/fields/shared.rs). Wire encode/decode goes through `ProtoType`; storage access goes through `ValueLayout`. Implicit omit treats a clear value bit as absent; Explicit can encode an explicit `false`.
 
-**Interim / future split:** `VALUE_BIT` remains on `ProtoBool` for codegen stability of *singular / oneof* fields. Intended end state for singular: a bit-index-free type marker plus a field/layout-owned value-bit index. **`repeated bool` is a different shape** — elements are plain `bool` in the repeated buffer and do not need (and must not use) a MessageCommon bit index or `ProtoBool<VALUE_BIT>`. When repeated bool is wired up, keep scalar bit-packed bool and repeated element `bool` on distinct type paths; do not force one marker to serve both.
+**`repeated bool` is a different shape** — elements are plain `bool` in the repeated buffer and must not use `BitPacked` / a MessageCommon bit index.
 
 ### LEGACY_REQUIRED
 
@@ -640,7 +642,7 @@ Wire identical to EXPLICIT. Message `validate()` calls `validate_required` on ea
 
 Mutation uses the bound-view idiom: `field.bind_mut(&mut common)` → [`RepeatedFieldMut`](puroro-rt/src/fields/repeated/field.rs). Copy elements expose `values_mut()` → `Vec` guard; string / bytes use `push_in` via [`RepeatedSlicePush`](puroro-rt/src/fields/wire/repeated_items.rs) (allocator-less element storage is impractical to build through bare `DerefMut`). `clear` / `deallocate` drain and free heap elements first, then free the buffer. Read: `field.bind(&common)` → [`RepeatedFieldRef`](puroro-rt/src/fields/repeated/field.rs) (`as_slice` / `is_empty`).
 
-**`repeated bool`:** not wired yet. Elements should be plain `bool` with **no** MessageCommon bit index — do not use singular [`ProtoBool<VALUE_BIT>`](puroro-rt/src/fields/wire/varint.rs) (see [Bit-packed bool](#bit-packed-bool-protobool)).
+**`repeated bool`:** not wired yet. Elements should be plain `bool` with **no** MessageCommon bit index — do not use [`BitPacked`](puroro-rt/src/fields/shared/value_layout.rs) (see [Bit-packed bool](#bit-packed-bool-protobool)).
 
 **`repeated message` (future):** `RepeatedField<ProtoMessage<M, A>, Expanded, FIELD>` with `Element = M` (no per-element `UnmanagedBox`).
 

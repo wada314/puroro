@@ -9,9 +9,11 @@
 pub(crate) mod field_deallocate;
 pub(crate) mod field_presence;
 pub(crate) mod slot_init;
+pub(crate) mod value_layout;
 pub(crate) mod value_slot;
 
 pub use field_deallocate::FieldDeallocate;
+pub use value_layout::{BitPacked, Inline, ValueLayout};
 
 use ::core::mem::ManuallyDrop;
 
