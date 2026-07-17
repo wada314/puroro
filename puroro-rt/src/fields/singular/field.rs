@@ -92,6 +92,24 @@ where
         }
     }
 
+    /// Binds this field to `common` for read access.
+    #[inline]
+    pub fn bind<'a, Pb: PresenceBits>(
+        &'a self,
+        common: &'a MessageCommon<Pb, T::Alloc>,
+    ) -> SingularFieldRef<'a, T, P, FIELD, D, Pb, T::Alloc> {
+        SingularFieldRef::new(self, common)
+    }
+
+    /// Binds this field to `common` for mutation.
+    #[inline]
+    pub fn bind_mut<'f, 'c, Pb: PresenceBits>(
+        &'f mut self,
+        common: &'c mut MessageCommon<Pb, T::Alloc>,
+    ) -> SingularFieldMut<'f, 'c, T, P, FIELD, D, Pb, T::Alloc> {
+        SingularFieldMut::new(self, common)
+    }
+
     pub fn encoded_len<Pb>(&self, common: &MessageCommon<Pb, T::Alloc>) -> usize
     where
         Pb: PresenceBits,
@@ -253,7 +271,7 @@ where
 // ---------------------------------------------------------------------------
 
 /// Short-lived shared binding of a singular field to its message common state,
-/// produced by [`SingularAccess::bind`](crate::fields::singular::SingularAccess::bind).
+/// produced by [`SingularField::bind`].
 pub struct SingularFieldRef<
     'a,
     T: ProtoType,
@@ -350,7 +368,7 @@ where
 // ---------------------------------------------------------------------------
 
 /// Short-lived binding of a singular field to its message common state,
-/// produced by [`SingularAccess::bind_mut`](crate::fields::singular::SingularAccess::bind_mut).
+/// produced by [`SingularField::bind_mut`].
 pub struct SingularFieldMut<
     'f,
     'c,

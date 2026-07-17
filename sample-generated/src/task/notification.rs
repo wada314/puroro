@@ -14,8 +14,8 @@
 //! - [`NotificationRef`] / [`NotificationMut`] — safe projected aliases of the
 //!   *active* variant (`as_ref` / `as_mut` on [`OneofView`] /
 //!   [`OneofViewMut`](::puroro_rt::OneofViewMut)). Payloads come from
-//!   [`SingularAccess`](::puroro_rt::SingularAccess) on each variant's field
-//!   wrapper (no `StringGuard` / `BitRef` hard-coding in generated aliases).
+//!   [`ProtoType`](::puroro_rt::ProtoType) on each variant's type marker
+//!   (no `StringGuard` / `BitRef` hard-coding in generated aliases).
 //!
 //! Group bound views come from `puroro-rt` ([`OneofView`] /
 //! [`OneofViewMut`](::puroro_rt::OneofViewMut)), not per-oneof generated structs.
@@ -27,7 +27,7 @@
 //! | `email_address` / `phone_number` | `string` | [`SingularField`] (+ `ProtoDefault`) | `&str` | string guard |
 //! | `webhook_id` | `int32` `[default = -1]` | [`SingularField`] + [`WebhookIdDefault`] | `i32` (by value) | `&mut i32` |
 //! | `postal` | `Address` message | [`SingularField`] + [`ProtoMessage`] | `&Address<A>` | `&mut Address<A>` |
-//! | `urgent` | `bool` | [`SingularField`] + [`ProtoBool`] | `bool` | `SingularAccess::Mut` (named bit handle) |
+//! | `urgent` | `bool` | [`SingularField`] + [`ProtoBool`] | `bool` | `ProtoType::Mut` (named bit handle) |
 //!
 //! Per-variant **immutable** getters return [`Optional`](::puroro::Optional) whose
 //! `D` is the field wrapper's default marker: when the case is unset or another
@@ -45,8 +45,8 @@
 //! **Merge has no bespoke `merge_*` helpers on this enum.** Because each variant
 //! *is* a field wrapper, the parent message's `merge_from` dispatches on field
 //! number (one match arm per variant) and calls
-//! `slot.bind_mut(common).variant_mut::<V>().merge(...)` — uniformly for every
-//! variant kind.
+//! `slot.bind_mut(common).variant_mut::<V, _, _, _>().merge(...)` —
+//! uniformly for every variant kind.
 //!
 //! Per-variant dispatch uses [`EnumVariant`] on zero-sized marker types in
 //! [`variant`]; see that module for the type-parameter wiring.
@@ -59,7 +59,7 @@ use ::allocator_api2::alloc::Allocator;
 use ::bytes::BufMut;
 use ::puroro_rt::{
     EnumVariant, FieldDeallocate, MessageCommon, Oneof, OneofDeallocate, OneofEncodable,
-    OneofGroup, PresenceBits, ProtoBool, ProtoInt32, ProtoMessage, ProtoString, SingularAccess,
+    OneofGroup, PresenceBits, ProtoBool, ProtoInt32, ProtoMessage, ProtoString, ProtoType,
     SingularField,
 };
 
@@ -125,35 +125,35 @@ pub(crate) type NotificationStorage<A> = Notification<
 
 /// Borrowed read view of the active `notification` variant.
 pub type NotificationRef<'a, A> = Notification<
-    <EmailAddressField<A> as SingularAccess>::Ref<'a>,
-    <PhoneNumberField<A> as SingularAccess>::Ref<'a>,
-    <WebhookIdField<A> as SingularAccess>::Ref<'a>,
-    <PostalField<A> as SingularAccess>::Ref<'a>,
-    <UrgentField<A> as SingularAccess>::Ref<'a>,
+    <ProtoString<A> as ProtoType>::Ref<'a>,
+    <ProtoString<A> as ProtoType>::Ref<'a>,
+    <ProtoInt32<A> as ProtoType>::Ref<'a>,
+    <ProtoMessage<Address<A>, A> as ProtoType>::Ref<'a>,
+    <ProtoBool<A, { super::BIT_URGENT_VALUE }> as ProtoType>::Ref<'a>,
 >;
 
 /// Borrowed mutable projection of the active `notification` variant.
 ///
-/// Payload types come from [`SingularAccess::Mut`] on each field wrapper. Public
-/// `_mut` accessors may still return `impl Trait` (e.g. bool) where ergonomics
-/// prefer it; enum variants need the named associated type.
+/// Payload types come from [`ProtoType::Mut`] on each variant's type marker.
+/// Public `_mut` accessors may still return `impl Trait` (e.g. bool) where
+/// ergonomics prefer it; enum variants need the named associated type.
 pub type NotificationMut<'a, A> = Notification<
-    <EmailAddressField<A> as SingularAccess>::Mut<'a>,
-    <PhoneNumberField<A> as SingularAccess>::Mut<'a>,
-    <WebhookIdField<A> as SingularAccess>::Mut<'a>,
-    <PostalField<A> as SingularAccess>::Mut<'a>,
-    <UrgentField<A> as SingularAccess>::Mut<'a>,
+    <ProtoString<A> as ProtoType>::Mut<'a>,
+    <ProtoString<A> as ProtoType>::Mut<'a>,
+    <ProtoInt32<A> as ProtoType>::Mut<'a>,
+    <ProtoMessage<Address<A>, A> as ProtoType>::Mut<'a>,
+    <ProtoBool<A, { super::BIT_URGENT_VALUE }> as ProtoType>::Mut<'a>,
 >;
 
 // `A` must appear structurally (not only inside an associated-type projection)
-// for these impls — see rustc E0207. `PostalField`'s `Ref` is `&Address<A>`.
+// for these impls — see rustc E0207. `Postal`'s `Ref` is `&Address<A>`.
 impl<'a, A: Allocator + Clone> Clone
     for Notification<
-        <EmailAddressField<A> as SingularAccess>::Ref<'a>,
-        <PhoneNumberField<A> as SingularAccess>::Ref<'a>,
-        <WebhookIdField<A> as SingularAccess>::Ref<'a>,
+        <ProtoString<A> as ProtoType>::Ref<'a>,
+        <ProtoString<A> as ProtoType>::Ref<'a>,
+        <ProtoInt32<A> as ProtoType>::Ref<'a>,
         &'a Address<A>,
-        <UrgentField<A> as SingularAccess>::Ref<'a>,
+        <ProtoBool<A, { super::BIT_URGENT_VALUE }> as ProtoType>::Ref<'a>,
     >
 {
     fn clone(&self) -> Self {
@@ -162,11 +162,11 @@ impl<'a, A: Allocator + Clone> Clone
 }
 impl<'a, A: Allocator + Clone> Copy
     for Notification<
-        <EmailAddressField<A> as SingularAccess>::Ref<'a>,
-        <PhoneNumberField<A> as SingularAccess>::Ref<'a>,
-        <WebhookIdField<A> as SingularAccess>::Ref<'a>,
+        <ProtoString<A> as ProtoType>::Ref<'a>,
+        <ProtoString<A> as ProtoType>::Ref<'a>,
+        <ProtoInt32<A> as ProtoType>::Ref<'a>,
         &'a Address<A>,
-        <UrgentField<A> as SingularAccess>::Ref<'a>,
+        <ProtoBool<A, { super::BIT_URGENT_VALUE }> as ProtoType>::Ref<'a>,
     >
 {
 }

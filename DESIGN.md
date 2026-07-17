@@ -712,14 +712,15 @@ pub(crate) type NotificationStorage<A> = Notification<
 // (2) Payload-less case discriminant (unset is `None`, so no `NotSet` member).
 pub enum NotificationCase { EmailAddress, PhoneNumber, WebhookId, Postal, Urgent }
 
-// (3) Safe projected aliases — payloads from SingularAccess on each field wrapper
-//     (no StringGuard / BitRef hard-coding). Pattern-match with `Notification::…`.
+// (3) Safe projected aliases — payloads from ProtoType on each variant's type
+//     marker (no StringGuard / BitRef hard-coding). Pattern-match with
+//     `Notification::…`.
 pub type NotificationRef<'a, A> = Notification<
-    <EmailAddressField as SingularAccess>::Ref<'a>,
+    <ProtoString<A> as ProtoType>::Ref<'a>,
     /* … */,
 >;
 pub type NotificationMut<'a, A> = Notification<
-    <EmailAddressField as SingularAccess>::Mut<'a, A>,
+    <ProtoString<A> as ProtoType>::Mut<'a>,
     /* … */,
 >;
 
@@ -763,12 +764,12 @@ To keep generated code thin, each wrapper is driven with the **field's own** con
 
 | kind | `EnumVariant::new_value` | merge one occurrence | mut accessor |
 |---|---|---|---|
-| LEN | `SingularField::new_in(alloc)` | `slot.bind_mut(common).variant_mut::<V>().merge(…)` | `…variant_mut::<V>().value_mut()` |
+| LEN | `SingularField::new_in(alloc)` | `slot.bind_mut(common).variant_mut::<V, _, _, _>().merge(…)` | `…variant_mut::<V, _, _, _>().value_mut()` |
 | VARINT | `SingularField::new_in(alloc)` | same | same |
 | bool | `SingularField::<ProtoBool<BIT>>::new_in(alloc)` | same | same → `impl DerefMut<Target = bool>` |
 | message | `SingularField::with_message_in(alloc)` (`ProtoMessage`) | same | same → `&mut M` |
 
-Every variant merges through the **same** `slot.bind_mut(common).variant_mut::<V>().merge(wire, buf)` shape. The message variant merges *into* the present child rather than replacing it.
+Every variant merges through the **same** `slot.bind_mut(common).variant_mut::<V, _, _, _>().merge(wire, buf)` shape. The message variant merges *into* the present child rather than replacing it.
 
 The VARINT variant owns no heap: its `DeallocateIn` is a no-op.
 
@@ -776,11 +777,11 @@ The VARINT variant owns no heap: its `DeallocateIn` is a no-op.
 
 **Why these types, and why Storage is not public under the `Notification` name alone.** The storage alias's payloads are `unmanaged`-backed field wrappers, which panic on implicit drop and need the message allocator to free. Exposing that alias publicly would let a caller own one and hit that footgun, and would leak `unmanaged` into the API. So `NotificationStorage` is `pub(crate)`. The public surface is the shape `Notification`, `NotificationCase`, projected aliases `NotificationRef` / `NotificationMut`, and rt bound views `OneofView` / `OneofViewMut` (via RPIT `impl OneofGroup<…>` so Storage never appears in signatures). Shared getters live on `OneofView`; while holding a mut view, call `as_view()` (not a trait and not `Deref` — a by-value reborrowed view cannot be returned from `Deref::deref`).
 
-Group accessors follow the same bound-view idiom as other fields: `slot.bind(&common)` / `slot.bind_mut(&mut common)` yield [`OneofSlotRef`](puroro-rt/src/fields/oneof.rs) / [`OneofSlotMut`](puroro-rt/src/fields/oneof.rs). [`OneofView`](puroro-rt/src/fields/oneof.rs) / [`OneofViewMut`](puroro-rt/src/fields/oneof.rs) wrap that pair, keyed by [`OneofGroup`](puroro-rt/src/fields/oneof.rs) on the storage alias. `OneofSlotMut::variant_mut::<V>()` selects (or installs) variant `V` via [`EnumVariant::new_value`](puroro-rt/src/fields/enum_variant.rs) and returns the field's **`SingularAccess::ViewMut`** in one step — callers do not re-bind `common`. `set(value)` replaces the whole group, and `clear()` frees the active variant. Each of these releases the previously-active variant via `OneofDeallocate::deallocate` before overwriting the slot. The old `set_*` per-variant setters are removed.
+Group accessors follow the same bound-view idiom as other fields: `slot.bind(&common)` / `slot.bind_mut(&mut common)` yield [`OneofSlotRef`](puroro-rt/src/fields/oneof.rs) / [`OneofSlotMut`](puroro-rt/src/fields/oneof.rs). [`OneofView`](puroro-rt/src/fields/oneof.rs) / [`OneofViewMut`](puroro-rt/src/fields/oneof.rs) wrap that pair, keyed by [`OneofGroup`](puroro-rt/src/fields/oneof.rs) on the storage alias. `OneofSlotMut::variant_mut::<V, _, _, _>()` selects (or installs) variant `V` via [`EnumVariant::new_value`](puroro-rt/src/fields/enum_variant.rs) and returns [`SingularFieldMut`](puroro-rt/src/fields/singular/field.rs) in one step — callers do not re-bind `common`. Turbofish names the variant marker `V`; `T` / `FIELD` / `D` are inferred from [`EnumVariant::Value`](puroro-rt/src/fields/enum_variant.rs) (`_`). `set(value)` replaces the whole group, and `clear()` frees the active variant. Each of these releases the previously-active variant via `OneofDeallocate::deallocate` before overwriting the slot. The old `set_*` per-variant setters are removed.
 
 Parent `_mut` accessors and decode arms are then one-liners —
-`slot.bind_mut(common).variant_mut::<EmailAddress>().value_mut()`,
-`slot.bind_mut(common).variant_mut::<WebhookId>().merge(wire, buf)`, etc.
+`slot.bind_mut(common).variant_mut::<EmailAddress, _, _, _>().value_mut()`,
+`slot.bind_mut(common).variant_mut::<WebhookId, _, _, _>().merge(wire, buf)`, etc.
 
 The group's **encode** glue lives on the storage enum. Variant field-number constants sit at **module scope** so they remain usable as `match` patterns.
 
@@ -826,7 +827,7 @@ Concrete C++ codegen shapes (proto2 / editions):
 
 **puroro vs that contract.** The hand-written `Task` sample matches both halves:
 
-- Per-variant **`_mut`** (`email_address_mut`, …) goes through `slot.bind_mut(common).variant_mut::<V>()`, which force-switches the case and builds a fresh wrapper via [`EnumVariant::new_value`](puroro-rt/src/fields/enum_variant.rs) (**type** default). That matches official `mutable_*`.
+- Per-variant **`_mut`** (`email_address_mut`, …) goes through `slot.bind_mut(common).variant_mut::<V, _, _, _>()`, which force-switches the case and builds a fresh wrapper via [`EnumVariant::new_value`](puroro-rt/src/fields/enum_variant.rs) (**type** default). That matches official `mutable_*`.
 - Per-variant **getters** use `slot.bind(&common).variant_of::<V>().optional()`. The field wrapper's `D` type parameter is the proto default marker (`ProtoDefault`, or a message-local ZST such as `WebhookIdDefault` for `[default = -1]`). When the case is unset or another variant, `optional` returns `Optional::new(None)` so `is_set()` is false and `get()` yields `D::DEFAULT` — without selecting the variant. That matches official const getters.
 - When the variant **is** active, getters return the **stored** value (including type zero / empty string), same as official.
 
@@ -911,7 +912,7 @@ impl<A: Allocator + Clone + Default> Default for Task<A> { … }
 
 **Mutation API (`_mut`).** Mutation is unified under `_mut` accessors that return a guard implementing `impl DerefMut<Target = …>` (RPIT): `title_mut()` yields `impl DerefMut<Target = ::unmanaged::String<A>>`, `payload_mut()`/`tag_ids_mut()` yield `impl DerefMut<Target = Vec<_, A>>`, and scalar/enum `_mut` accessors also return `impl DerefMut<Target = T>` (today that is `&mut T`). The guard **owns** a clone of the message allocator when the payload is heap-backed. Acquiring an explicit-presence `_mut` sets the presence bit. The old `set_*` / `push_*` setters are removed; the one exception is repeated `string`/`bytes`, which keep a typed `push_*` helper because their element storage is allocator-less and impractical to construct through a bare `DerefMut`.
 
-**Bound-view accessors (`bind` / `bind_mut`).** Singular catalog fields bind through [`SingularAccess`](puroro-rt/src/fields/singular/access.rs) (`field.bind(&self._common)` / `field.bind_mut(&mut self._common)`). Repeated fields and [`OneofSlot`](puroro-rt/src/fields/oneof.rs) use the same call shape via inherent methods. Each returns a short-lived view (`SingularFieldRef` / `SingularFieldMut`, `Repeated*FieldRef` / `Repeated*FieldMut`, `OneofSlotRef` / `OneofSlotMut`) that carries `(field, common)` together. The actual operation (`optional` / `value` / `as_slice` / `get` / `value_mut` / `merge` / `clear` / …) is a consuming method on that view. This keeps the field struct a pure storage holder and collapses each generated accessor to a single call — e.g. `self.owner_id.bind(&self._common).optional()` or `self.priority.bind_mut(&mut self._common).clear()`. Binding happens even when a particular accessor does not consult `common` (e.g. `IMPLICIT` `value()`, repeated `as_slice()`), so read and write share one shape. The presence bit index for EXPLICIT / LEGACY_REQUIRED fields is a **const generic on the field type** (`Explicit<BIT>`), not a runtime argument to `bind` / `bind_mut`. Encode / `deallocate` / `validate_required` stay as plain field methods that take `&common` directly (they are not generated getters).
+**Bound-view accessors (`bind` / `bind_mut`).** Every field family — [`SingularField`](puroro-rt/src/fields/singular/field.rs), repeated wrappers, and [`OneofSlot`](puroro-rt/src/fields/oneof.rs) — uses the same inherent call shape (`field.bind(&self._common)` / `field.bind_mut(&mut self._common)`). Each returns a short-lived view (`SingularFieldRef` / `SingularFieldMut`, `Repeated*FieldRef` / `Repeated*FieldMut`, `OneofSlotRef` / `OneofSlotMut`) that carries `(field, common)` together. The actual operation (`optional` / `value` / `as_slice` / `get` / `value_mut` / `merge` / `clear` / …) is a consuming method on that view. This keeps the field struct a pure storage holder and collapses each generated accessor to a single call — e.g. `self.owner_id.bind(&self._common).optional()` or `self.priority.bind_mut(&mut self._common).clear()`. Binding happens even when a particular accessor does not consult `common` (e.g. `IMPLICIT` `value()`, repeated `as_slice()`), so read and write share one shape. The presence bit index for EXPLICIT / LEGACY_REQUIRED fields is a **const generic on the field type** (`Explicit<BIT>`), not a runtime argument to `bind` / `bind_mut`. Encode / `deallocate` / `validate_required` stay as plain field methods that take `&common` directly (they are not generated getters). Getter / `_mut` payload types (`Ref` / `Mut`) live on [`ProtoType`](puroro-rt/src/fields/wire/proto_type.rs), not on a separate singular-access trait.
 
 Varint and LEN singular fields share one runtime type, [`SingularField`](puroro-rt/src/fields/singular/field.rs), parametrised by [`ProtoType`](puroro-rt/src/fields/wire/proto_type.rs) type markers such as `ProtoInt32<A>` / `ProtoString<A>` / `ProtoBool<A, VALUE_BIT>` (see [IMPLEMENTATION.md §7](IMPLEMENTATION.md#7-field-wrappers) / [§14](IMPLEMENTATION.md#14-singular-fields)). The field stores `T::Slot` (`Self` for all markers — ZST for bool, with the logical value in `_common.presence`). **Interim:** `VALUE_BIT` remains on `ProtoBool` for singular/oneof codegen stability; a future cleanup should move it to the field / layout side. **`repeated bool` must not reuse this bit-packed marker** — store plain `bool` elements with no MessageCommon bit index (see [IMPLEMENTATION.md § Bit-packed bool](IMPLEMENTATION.md#bit-packed-bool-protobool)). Nested messages use the same wrapper with `T = ProtoMessage<M, A>` and `P = NonOneof` / `Oneof`.
 

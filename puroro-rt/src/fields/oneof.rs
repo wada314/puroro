@@ -24,8 +24,7 @@ use crate::fields::shared::{
     field_presence::{FieldPresence, Oneof},
     value_slot::ValueSlot,
 };
-use crate::fields::singular::SingularAccess;
-use crate::fields::singular::field::SingularField;
+use crate::fields::singular::field::{SingularField, SingularFieldMut};
 use crate::fields::wire::proto_message::ProtoMessage;
 use crate::fields::wire::proto_type::ProtoType;
 
@@ -279,14 +278,19 @@ impl<'f, 'c, E, Pb: PresenceBits, A: Allocator> OneofSlotMut<'f, 'c, E, Pb, A> {
     /// overwritten.
     ///
     /// Generated accessors and decode arms use
-    /// `slot.bind_mut(common).variant_mut::<V>().value_mut()` /
+    /// `slot.bind_mut(common).variant_mut::<V, _, _, _>().value_mut()` /
     /// `.merge(…)`.
-    pub fn variant_mut<V>(
+    ///
+    /// Turbofish names the variant marker `V`; `T` / `FIELD` / `D` are inferred
+    /// from [`EnumVariant::Value`] (`_`).
+    pub fn variant_mut<V, T, const FIELD: u32, D>(
         self,
-    ) -> <<E as EnumVariant<V>>::Value as SingularAccess>::ViewMut<'f, 'c, Pb>
+    ) -> SingularFieldMut<'f, 'c, T, Oneof, FIELD, D, Pb, A>
     where
-        E: EnumVariant<V, Alloc = A> + OneofDeallocate<Pb, A>,
-        <E as EnumVariant<V>>::Value: SingularAccess<Alloc = A>,
+        E: EnumVariant<V, Alloc = A, Value = SingularField<T, Oneof, FIELD, D>>
+            + OneofDeallocate<Pb, A>,
+        T: ProtoType<Alloc = A>,
+        <Oneof as FieldPresence>::ValueSlot<T::Slot>: ValueSlot<T::Slot>,
         A: Clone,
     {
         let slot = self.slot;

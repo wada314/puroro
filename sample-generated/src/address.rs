@@ -13,8 +13,7 @@ use ::core::ops::DerefMut;
 use ::puroro::{DecodeError, Message};
 use ::puroro_rt::decode::{decode_tag, skip_field_and_save};
 use ::puroro_rt::{
-    Explicit, FieldDeallocate, MessageCommon, PresenceBits, ProtoString, SingularAccess,
-    SingularField,
+    Explicit, FieldDeallocate, MessageCommon, PresenceBits, ProtoString, SingularField,
 };
 
 // ---------------------------------------------------------------------------
