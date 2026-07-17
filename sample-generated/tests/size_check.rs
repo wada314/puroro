@@ -1,5 +1,6 @@
 use ::allocator_api2::alloc::{AllocError, Allocator, Global};
 use ::core::alloc::Layout;
+use ::core::mem;
 use ::core::ptr::NonNull;
 
 use ::puroro_sample_generated::Task;
@@ -21,8 +22,8 @@ unsafe impl Allocator for Padded {
 
 #[test]
 fn allocator_is_stored_once() {
-    let global = ::core::mem::size_of::<Task<Global>>();
-    let padded = ::core::mem::size_of::<Task<Padded>>();
+    let global = mem::size_of::<Task<Global>>();
+    let padded = mem::size_of::<Task<Padded>>();
     let delta = padded - global;
     // With the single-allocator design the fat allocator is stored exactly once
     // (in `MessageCommon.alloc`). If each heap field embedded its own copy the

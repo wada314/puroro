@@ -14,6 +14,7 @@
 
 use ::allocator_api2::alloc::Allocator;
 use ::bytes::BufMut;
+use ::core::fmt::{self, Debug, Formatter, Result as FmtResult};
 use ::puroro::{HasDefault, Optional};
 use ::unmanaged::UnmanagedBox;
 
@@ -332,8 +333,8 @@ impl<E: Clone> Clone for OneofSlot<E> {
     }
 }
 
-impl<E: ::core::fmt::Debug> ::core::fmt::Debug for OneofSlot<E> {
-    fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
+impl<E: Debug> fmt::Debug for OneofSlot<E> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
         f.debug_struct("OneofSlot")
             .field("value", &self.value)
             .finish()
@@ -394,8 +395,7 @@ impl<'a, M, const FIELD: u32, A: Allocator + Clone, Pb: PresenceBits>
     OneofVariantRef<'a, SingularField<ProtoMessage<M, A>, Oneof, FIELD>, Pb, A>
 where
     M: ::puroro::Message<Alloc = A>,
-    <Oneof as FieldPresence>::ValueSlot<UnmanagedBox<M, A>>:
-        ValueSlot<UnmanagedBox<M, A>>,
+    <Oneof as FieldPresence>::ValueSlot<UnmanagedBox<M, A>>: ValueSlot<UnmanagedBox<M, A>>,
 {
     /// Returns the child when this message variant is active.
     pub fn get(self) -> Option<&'a M> {

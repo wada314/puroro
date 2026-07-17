@@ -3,7 +3,7 @@ members = [".", "puroro-rt", "protobuf-core", "sample-generated", "unmanaged"]
 resolver = "2"
 
 [workspace.lints.clippy]
-# Restriction lint (allow by default). Keep off for machine-generated crates.
+# Restriction lint (allow by default). Do not opt git submodules into this.
 absolute_paths = "warn"
 
 [package]

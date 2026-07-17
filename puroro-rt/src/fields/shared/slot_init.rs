@@ -18,10 +18,8 @@ use super::{MessageCommon, PresenceBits};
 /// Read-only view of whether a value slot is initialized.
 pub trait SlotInitView {
     /// `true` when the slot holds a valid value.
-    fn is_initialized<Pb: PresenceBits, A: Allocator>(
-        &self,
-        common: &MessageCommon<Pb, A>,
-    ) -> bool;
+    fn is_initialized<Pb: PresenceBits, A: Allocator>(&self, common: &MessageCommon<Pb, A>)
+    -> bool;
 }
 
 /// Mutable handle to a slot's initialization state.

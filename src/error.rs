@@ -1,3 +1,6 @@
+use ::core::fmt;
+use ::std::error::Error;
+
 use crate::wire_type::WireType;
 
 /// Errors that can occur while decoding a protobuf message from the wire format.
@@ -43,8 +46,8 @@ pub enum DecodeError {
     },
 }
 
-impl ::core::fmt::Display for DecodeError {
-    fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
+impl fmt::Display for DecodeError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             DecodeError::UnexpectedEof => write!(f, "unexpected end of input"),
             DecodeError::InvalidVarint => write!(f, "varint is too long (> 10 bytes)"),
@@ -70,7 +73,7 @@ impl ::core::fmt::Display for DecodeError {
     }
 }
 
-impl ::std::error::Error for DecodeError {}
+impl Error for DecodeError {}
 
 /// Errors that can occur while encoding a protobuf message to the wire format.
 ///
@@ -83,12 +86,12 @@ pub enum EncodeError {
     BufferFull,
 }
 
-impl ::core::fmt::Display for EncodeError {
-    fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
+impl fmt::Display for EncodeError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             EncodeError::BufferFull => write!(f, "output buffer is full"),
         }
     }
 }
 
-impl ::std::error::Error for EncodeError {}
+impl Error for EncodeError {}

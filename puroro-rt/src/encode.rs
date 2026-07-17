@@ -3,6 +3,8 @@
 //! Varint and tag encoding delegate to [`protobuf_core`] (`Varint`, `Tag`).
 //! `BufMut` adapters live here because generated code targets `bytes` buffers.
 
+use ::allocator_api2::alloc::Allocator;
+use ::allocator_api2::vec::Vec as AllocVec;
 use ::bytes::BufMut;
 use ::protobuf_core::{FieldNumber, Tag, Varint};
 use ::puroro::WireType;
@@ -79,7 +81,11 @@ pub(crate) fn encode_len_field<B: BufMut>(field_number: u32, payload: &[u8], buf
     buf.put_slice(payload);
 }
 
-pub(crate) fn encoded_len_packed_varint_field<T, F>(field_number: u32, values: &[T], to_u64: F) -> usize
+pub(crate) fn encoded_len_packed_varint_field<T, F>(
+    field_number: u32,
+    values: &[T],
+    to_u64: F,
+) -> usize
 where
     F: Fn(&T) -> u64,
 {
@@ -110,10 +116,7 @@ pub(crate) fn encode_packed_varint_field<B: BufMut, T, F>(
 }
 
 /// Writes a varint into an allocator-aware byte vector.
-pub(crate) fn write_varint_to_vec<A: ::allocator_api2::alloc::Allocator>(
-    v: u64,
-    buf: &mut ::allocator_api2::vec::Vec<u8, A>,
-) {
+pub(crate) fn write_varint_to_vec<A: Allocator>(v: u64, buf: &mut AllocVec<u8, A>) {
     let (bytes, count) = Varint::from_uint64(v).encode();
     buf.extend_from_slice(&bytes[..count]);
 }

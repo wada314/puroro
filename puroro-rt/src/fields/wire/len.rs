@@ -17,6 +17,8 @@
 
 use ::allocator_api2::alloc::Allocator;
 use ::bytes::Buf;
+use ::core::fmt;
+use ::core::str;
 use ::unmanaged::string::StringGuard;
 use ::unmanaged::vec::VecGuard;
 use ::unmanaged::{UnmanagedString, UnmanagedVec};
@@ -62,10 +64,7 @@ pub trait LenProtoType {
     fn as_bytes(value: &Self::Storage) -> &[u8];
 
     /// Borrows the storage together with `alloc`, yielding a growable guard.
-    fn with_alloc<'a>(
-        value: &'a mut Self::Storage,
-        alloc: Self::Alloc,
-    ) -> Self::Mut<'a>;
+    fn with_alloc<'a>(value: &'a mut Self::Storage, alloc: Self::Alloc) -> Self::Mut<'a>;
 
     /// Decodes one LEN payload (length varint + body consumed by helper).
     fn decode<B: Buf>(buf: &mut B, alloc: Self::Alloc) -> Result<Self::Storage, DecodeError>;
@@ -85,8 +84,8 @@ pub trait LenProtoType {
 #[repr(transparent)]
 pub struct ProtoString<A: Allocator>(pub UnmanagedString<A>);
 
-impl<A: Allocator> ::core::fmt::Debug for ProtoString<A> {
-    fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
+impl<A: Allocator> fmt::Debug for ProtoString<A> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_tuple("ProtoString").field(&&*self.0).finish()
     }
 }
@@ -145,10 +144,7 @@ impl<A: Allocator + Clone> LenProtoType for ProtoString<A> {
         value.as_bytes()
     }
 
-    fn with_alloc<'a>(
-        value: &'a mut Self::Storage,
-        alloc: A,
-    ) -> Self::Mut<'a> {
+    fn with_alloc<'a>(value: &'a mut Self::Storage, alloc: A) -> Self::Mut<'a> {
         // SAFETY: the caller always passes the same allocator that owns this
         // string's buffer.
         unsafe { value.with_alloc(alloc) }
@@ -159,7 +155,7 @@ impl<A: Allocator + Clone> LenProtoType for ProtoString<A> {
     }
 
     fn store_from_slice(v: &[u8], alloc: A) -> Result<Self::Storage, DecodeError> {
-        let s = ::core::str::from_utf8(v).map_err(|_| DecodeError::InvalidUtf8)?;
+        let s = str::from_utf8(v).map_err(|_| DecodeError::InvalidUtf8)?;
         Ok(decode::str_to_unmanaged_in(s, alloc))
     }
 
@@ -173,8 +169,8 @@ impl<A: Allocator + Clone> LenProtoType for ProtoString<A> {
 #[repr(transparent)]
 pub struct ProtoBytes<A: Allocator>(pub UnmanagedVec<u8, A>);
 
-impl<A: Allocator> ::core::fmt::Debug for ProtoBytes<A> {
-    fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
+impl<A: Allocator> fmt::Debug for ProtoBytes<A> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_tuple("ProtoBytes").field(&&*self.0).finish()
     }
 }
@@ -233,10 +229,7 @@ impl<A: Allocator + Clone> LenProtoType for ProtoBytes<A> {
         value
     }
 
-    fn with_alloc<'a>(
-        value: &'a mut Self::Storage,
-        alloc: A,
-    ) -> Self::Mut<'a> {
+    fn with_alloc<'a>(value: &'a mut Self::Storage, alloc: A) -> Self::Mut<'a> {
         // SAFETY: the caller always passes the same allocator that owns this
         // vector's buffer.
         unsafe { value.with_alloc(alloc) }

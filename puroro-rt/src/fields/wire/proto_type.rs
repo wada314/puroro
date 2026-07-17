@@ -20,6 +20,10 @@
 //! [`LenProtoType::Storage`] so public slices stay `&[i32]` / `&[UnmanagedString]`.
 
 use ::allocator_api2::alloc::Allocator;
+use ::bitvec::{
+    order::Lsb0,
+    ptr::{BitRef, Mut},
+};
 use ::bytes::{Buf, BufMut};
 use ::core::ops::{Deref, DerefMut};
 
@@ -248,11 +252,7 @@ where
     }
 
     #[inline]
-    fn clear<VS, I, Pb>(
-        slot: &mut VS,
-        init: I,
-        common: &mut MessageCommon<Pb, Self::Alloc>,
-    )
+    fn clear<VS, I, Pb>(slot: &mut VS, init: I, common: &mut MessageCommon<Pb, Self::Alloc>)
     where
         VS: ValueSlot<Self::Slot>,
         I: SlotInitMut,
@@ -310,10 +310,7 @@ impl<A: Allocator + Clone> ProtoType for ProtoString<A> {
     const WIRE_TYPE: WireType = WireType::Len;
 
     #[inline]
-    fn is_proto_empty<Pb: PresenceBits>(
-        slot: &Self::Slot,
-        _common: &MessageCommon<Pb, A>,
-    ) -> bool {
+    fn is_proto_empty<Pb: PresenceBits>(slot: &Self::Slot, _common: &MessageCommon<Pb, A>) -> bool {
         slot.is_proto_empty()
     }
 
@@ -412,10 +409,7 @@ impl<A: Allocator + Clone> ProtoType for ProtoBytes<A> {
     const WIRE_TYPE: WireType = WireType::Len;
 
     #[inline]
-    fn is_proto_empty<Pb: PresenceBits>(
-        slot: &Self::Slot,
-        _common: &MessageCommon<Pb, A>,
-    ) -> bool {
+    fn is_proto_empty<Pb: PresenceBits>(slot: &Self::Slot, _common: &MessageCommon<Pb, A>) -> bool {
         slot.is_proto_empty()
     }
 
@@ -503,9 +497,7 @@ impl<A: Allocator + Clone> ProtoType for ProtoBytes<A> {
 // Bit-packed bool (Slot = Self, ZST; value in MessageCommon)
 // ---------------------------------------------------------------------------
 
-impl<A: Allocator + Clone, const VALUE_BIT: usize> ProtoType
-    for ProtoBool<A, VALUE_BIT>
-{
+impl<A: Allocator + Clone, const VALUE_BIT: usize> ProtoType for ProtoBool<A, VALUE_BIT> {
     type Alloc = A;
     /// ZST slot: presence/init layout only. Logical `bool` lives at `VALUE_BIT`
     /// in [`MessageCommon`].
@@ -515,25 +507,19 @@ impl<A: Allocator + Clone, const VALUE_BIT: usize> ProtoType
     where
         Self: 'a;
     type Mut<'a>
-        = ::bitvec::ptr::BitRef<'a, ::bitvec::ptr::Mut, u8, ::bitvec::order::Lsb0>
+        = BitRef<'a, Mut, u8, Lsb0>
     where
         Self: 'a;
     type Written = bool;
     const WIRE_TYPE: WireType = WireType::Varint;
 
     #[inline]
-    fn is_proto_empty<Pb: PresenceBits>(
-        _slot: &Self::Slot,
-        common: &MessageCommon<Pb, A>,
-    ) -> bool {
+    fn is_proto_empty<Pb: PresenceBits>(_slot: &Self::Slot, common: &MessageCommon<Pb, A>) -> bool {
         !common.is_bit_set(VALUE_BIT)
     }
 
     #[inline]
-    fn get<'a, Pb: PresenceBits>(
-        _slot: &'a Self::Slot,
-        common: &'a MessageCommon<Pb, A>,
-    ) -> bool {
+    fn get<'a, Pb: PresenceBits>(_slot: &'a Self::Slot, common: &'a MessageCommon<Pb, A>) -> bool {
         common.is_bit_set(VALUE_BIT)
     }
 
@@ -554,12 +540,8 @@ impl<A: Allocator + Clone, const VALUE_BIT: usize> ProtoType
     }
 
     #[inline]
-    fn write<VS, I, Pb>(
-        slot: &mut VS,
-        init: I,
-        common: &mut MessageCommon<Pb, A>,
-        value: bool,
-    ) where
+    fn write<VS, I, Pb>(slot: &mut VS, init: I, common: &mut MessageCommon<Pb, A>, value: bool)
+    where
         VS: ValueSlot<Self::Slot>,
         I: SlotInitMut,
         Pb: PresenceBits,
@@ -596,11 +578,7 @@ impl<A: Allocator + Clone, const VALUE_BIT: usize> ProtoType
     }
 
     #[inline]
-    fn decode<B: Buf>(
-        wire_type: WireType,
-        buf: &mut B,
-        _alloc: A,
-    ) -> Result<bool, DecodeError> {
+    fn decode<B: Buf>(wire_type: WireType, buf: &mut B, _alloc: A) -> Result<bool, DecodeError> {
         if wire_type != WireType::Varint {
             return Err(DecodeError::InvalidTag);
         }

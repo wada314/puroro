@@ -8,12 +8,15 @@ mod defaults;
 mod notification;
 
 use ::allocator_api2::alloc::{Allocator, Global};
+use ::allocator_api2::vec::Vec as AllocVec;
 use ::bitvec::array::BitArray;
 use ::bitvec::order::Lsb0;
+use ::bitvec::ptr::{BitRef, Mut};
 use ::bytes::{Buf, BufMut};
 use ::core::ops::DerefMut;
 
 use ::puroro::{DecodeError, HasDefault, Message, Optional};
+use ::puroro_rt::decode::{decode_tag, skip_field_and_save};
 use ::puroro_rt::{
     Closed, Explicit, FieldDeallocate, Implicit, LegacyRequired, MessageCommon, NonOneof,
     OneofSlot, Open, PresenceBits, ProtoBool, ProtoBytes, ProtoEnum, ProtoInt32, ProtoMessage,
@@ -28,9 +31,7 @@ use crate::enums::{Priority, Status};
 
 use notification::NotificationStorage;
 use notification::variant::{EmailAddress, PhoneNumber, Postal, Urgent, WebhookId};
-pub use notification::{
-    Notification, NotificationCase, NotificationMut, NotificationRef,
-};
+pub use notification::{Notification, NotificationCase, NotificationMut, NotificationRef};
 
 // ---------------------------------------------------------------------------
 // Presence bitfield (presence + bool value bits)
@@ -45,10 +46,7 @@ impl TaskPresence {
     /// Concrete [`BitRef`] for projections that cannot hold `impl Trait`
     /// (e.g. [`NotificationMut`](notification::NotificationMut)).
     #[inline]
-    pub(crate) fn bit_ref_mut(
-        &mut self,
-        bit: usize,
-    ) -> ::bitvec::ptr::BitRef<'_, ::bitvec::ptr::Mut, u8, Lsb0> {
+    pub(crate) fn bit_ref_mut(&mut self, bit: usize) -> BitRef<'_, Mut, u8, Lsb0> {
         self.0
             .get_mut(bit)
             .expect("bool / presence bit index in range")
@@ -64,10 +62,7 @@ impl PresenceBits for TaskPresence {
         self.0.set(bit, present);
     }
 
-    fn bit_mut(
-        &mut self,
-        bit: usize,
-    ) -> ::bitvec::ptr::BitRef<'_, ::bitvec::ptr::Mut, u8, Lsb0> {
+    fn bit_mut(&mut self, bit: usize) -> BitRef<'_, Mut, u8, Lsb0> {
         self.bit_ref_mut(bit)
     }
 }
@@ -141,11 +136,7 @@ pub struct Task<A: Allocator + Clone = Global> {
     //                             bool urgent=18; }
     notification: OneofSlot<NotificationStorage<A>>,
     done: SingularField<ProtoBool<A, { BIT_DONE_VALUE }>, Implicit, { FIELD_DONE }>, // proto: bool done = 16;
-    flag: SingularField<
-        ProtoBool<A, { BIT_FLAG_VALUE }>,
-        Explicit<{ BIT_FLAG }>,
-        { FIELD_FLAG },
-    >, // proto: bool flag = 17;
+    flag: SingularField<ProtoBool<A, { BIT_FLAG_VALUE }>, Explicit<{ BIT_FLAG }>, { FIELD_FLAG }>, // proto: bool flag = 17;
 }
 
 impl<A: Allocator + Clone> Task<A> {
@@ -180,9 +171,7 @@ impl<A: Allocator + Clone> Task<A> {
         self.title.bind(&self._common).optional()
     }
 
-    pub fn title_mut<'s>(
-        &'s mut self,
-    ) -> impl DerefMut<Target = ::unmanaged::String<A>> + 's {
+    pub fn title_mut<'s>(&'s mut self) -> impl DerefMut<Target = ::unmanaged::String<A>> + 's {
         self.title.bind_mut(&mut self._common).value_mut()
     }
 
@@ -230,9 +219,7 @@ impl<A: Allocator + Clone> Task<A> {
         self.owner_id.bind(&self._common).optional()
     }
 
-    pub fn owner_id_mut<'s>(
-        &'s mut self,
-    ) -> impl DerefMut<Target = ::unmanaged::String<A>> + 's {
+    pub fn owner_id_mut<'s>(&'s mut self) -> impl DerefMut<Target = ::unmanaged::String<A>> + 's {
         self.owner_id.bind_mut(&mut self._common).value_mut()
     }
 
@@ -249,9 +236,7 @@ impl<A: Allocator + Clone> Task<A> {
         self.payload.bind(&self._common).optional()
     }
 
-    pub fn payload_mut<'s>(
-        &'s mut self,
-    ) -> impl DerefMut<Target = ::allocator_api2::vec::Vec<u8, A>> + 's {
+    pub fn payload_mut<'s>(&'s mut self) -> impl DerefMut<Target = AllocVec<u8, A>> + 's {
         self.payload.bind_mut(&mut self._common).value_mut()
     }
 
@@ -265,9 +250,7 @@ impl<A: Allocator + Clone> Task<A> {
         self.tag_ids.bind(&self._common).as_slice()
     }
 
-    pub fn tag_ids_mut<'s>(
-        &'s mut self,
-    ) -> impl DerefMut<Target = ::allocator_api2::vec::Vec<i32, A>> + 's {
+    pub fn tag_ids_mut<'s>(&'s mut self) -> impl DerefMut<Target = AllocVec<i32, A>> + 's {
         self.tag_ids.bind_mut(&mut self._common).values_mut()
     }
 
@@ -281,9 +264,7 @@ impl<A: Allocator + Clone> Task<A> {
         self.scores.bind(&self._common).as_slice()
     }
 
-    pub fn scores_mut<'s>(
-        &'s mut self,
-    ) -> impl DerefMut<Target = ::allocator_api2::vec::Vec<i32, A>> + 's {
+    pub fn scores_mut<'s>(&'s mut self) -> impl DerefMut<Target = AllocVec<i32, A>> + 's {
         self.scores.bind_mut(&mut self._common).values_mut()
     }
 
@@ -415,10 +396,7 @@ impl<A: Allocator + Clone> Task<A> {
         &'a mut self,
     ) -> ::puroro_rt::OneofViewMut<
         'a,
-        impl ::puroro_rt::OneofGroup<
-            Case = NotificationCase,
-            Mut<'a> = NotificationMut<'a, A>,
-        >,
+        impl ::puroro_rt::OneofGroup<Case = NotificationCase, Mut<'a> = NotificationMut<'a, A>>,
     > {
         ::puroro_rt::OneofViewMut::<NotificationStorage<A>>::new(
             &mut self.notification,
@@ -443,9 +421,7 @@ impl<A: Allocator + Clone> Task<A> {
             .optional()
     }
 
-    pub fn email_address_mut(
-        &mut self,
-    ) -> impl DerefMut<Target = ::unmanaged::String<A>> + '_ {
+    pub fn email_address_mut(&mut self) -> impl DerefMut<Target = ::unmanaged::String<A>> + '_ {
         self.notification
             .bind_mut(&mut self._common)
             .variant_mut::<EmailAddress>()
@@ -464,9 +440,7 @@ impl<A: Allocator + Clone> Task<A> {
             .optional()
     }
 
-    pub fn phone_number_mut(
-        &mut self,
-    ) -> impl DerefMut<Target = ::unmanaged::String<A>> + '_ {
+    pub fn phone_number_mut(&mut self) -> impl DerefMut<Target = ::unmanaged::String<A>> + '_ {
         self.notification
             .bind_mut(&mut self._common)
             .variant_mut::<PhoneNumber>()
@@ -534,7 +508,7 @@ impl<A: Allocator + Clone> Task<A> {
     }
 }
 
-impl Task<::allocator_api2::alloc::Global> {
+impl Task<Global> {
     pub fn new() -> Self {
         Self::new_in(Global)
     }
@@ -624,7 +598,7 @@ impl<A: Allocator + Clone> Message for Task<A> {
 
     fn merge_from<B: Buf>(&mut self, buf: &mut B) -> Result<(), DecodeError> {
         while buf.has_remaining() {
-            let (field_number, wire_type) = ::puroro_rt::decode::decode_tag(buf)?;
+            let (field_number, wire_type) = decode_tag(buf)?;
             match field_number {
                 FIELD_TITLE => {
                     // title = 1, EXPLICIT string
@@ -741,7 +715,7 @@ impl<A: Allocator + Clone> Message for Task<A> {
                 }
                 _ => {
                     // unknown field — preserve in _common.unknown_fields
-                    ::puroro_rt::decode::skip_field_and_save(
+                    skip_field_and_save(
                         field_number,
                         wire_type,
                         buf,

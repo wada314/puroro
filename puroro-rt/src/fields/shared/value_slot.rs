@@ -15,7 +15,7 @@
 //! [`ValueSlotRefAccess`] / [`ValueSlotMutAccess`] (RPIT).
 
 use ::core::marker::PhantomData;
-use ::core::mem::MaybeUninit;
+use ::core::mem::{self, MaybeUninit};
 
 use ::allocator_api2::alloc::Allocator;
 
@@ -38,16 +38,36 @@ pub trait AddressableSlot:
     type SlotAlloc: Allocator + Clone;
 }
 
-impl<A: Allocator + Clone> AddressableSlot for ProtoUInt32<A> { type SlotAlloc = A; }
-impl<A: Allocator + Clone> AddressableSlot for ProtoUInt64<A> { type SlotAlloc = A; }
-impl<A: Allocator + Clone> AddressableSlot for ProtoInt32<A> { type SlotAlloc = A; }
-impl<A: Allocator + Clone> AddressableSlot for ProtoInt64<A> { type SlotAlloc = A; }
-impl<A: Allocator + Clone> AddressableSlot for ProtoSint32<A> { type SlotAlloc = A; }
-impl<A: Allocator + Clone> AddressableSlot for ProtoSint64<A> { type SlotAlloc = A; }
-impl<A: Allocator + Clone> AddressableSlot for ProtoString<A> { type SlotAlloc = A; }
-impl<A: Allocator + Clone> AddressableSlot for ProtoBytes<A> { type SlotAlloc = A; }
-impl<E: ProtoEnumStorage, K, A: Allocator + Clone> AddressableSlot for ProtoEnum<E, K, A> { type SlotAlloc = A; }
-impl<A: Allocator + Clone, const VALUE_BIT: usize> AddressableSlot for ProtoBool<A, VALUE_BIT> { type SlotAlloc = A; }
+impl<A: Allocator + Clone> AddressableSlot for ProtoUInt32<A> {
+    type SlotAlloc = A;
+}
+impl<A: Allocator + Clone> AddressableSlot for ProtoUInt64<A> {
+    type SlotAlloc = A;
+}
+impl<A: Allocator + Clone> AddressableSlot for ProtoInt32<A> {
+    type SlotAlloc = A;
+}
+impl<A: Allocator + Clone> AddressableSlot for ProtoInt64<A> {
+    type SlotAlloc = A;
+}
+impl<A: Allocator + Clone> AddressableSlot for ProtoSint32<A> {
+    type SlotAlloc = A;
+}
+impl<A: Allocator + Clone> AddressableSlot for ProtoSint64<A> {
+    type SlotAlloc = A;
+}
+impl<A: Allocator + Clone> AddressableSlot for ProtoString<A> {
+    type SlotAlloc = A;
+}
+impl<A: Allocator + Clone> AddressableSlot for ProtoBytes<A> {
+    type SlotAlloc = A;
+}
+impl<E: ProtoEnumStorage, K, A: Allocator + Clone> AddressableSlot for ProtoEnum<E, K, A> {
+    type SlotAlloc = A;
+}
+impl<A: Allocator + Clone, const VALUE_BIT: usize> AddressableSlot for ProtoBool<A, VALUE_BIT> {
+    type SlotAlloc = A;
+}
 
 /// Storage construction / teardown and view binding for a singular field value slot.
 ///
@@ -159,14 +179,14 @@ impl<'a, T: AddressableSlot<SlotAlloc = A>, I: SlotInitMut, Pb: PresenceBits, A:
 
     #[inline]
     fn set(self, value: T) {
-        let old = ::core::mem::replace(self.slot, value);
+        let old = mem::replace(self.slot, value);
         // SAFETY: `common.alloc` owns `old`'s buffer.
         unsafe { old.deallocate_in(self.common.alloc.clone()) };
     }
 
     #[inline]
     fn clear(self) {
-        let old = ::core::mem::replace(self.slot, T::default_in(self.common.alloc.clone()));
+        let old = mem::replace(self.slot, T::default_in(self.common.alloc.clone()));
         // SAFETY: `common.alloc` owns `old`'s buffer.
         unsafe { old.deallocate_in(self.common.alloc.clone()) };
     }
@@ -189,7 +209,7 @@ impl<'a, T: AddressableSlot<SlotAlloc = A>, I: SlotInitMut, Pb: PresenceBits, A:
     fn set(self, value: T) {
         if self.init.is_initialized(self.common) {
             // SAFETY: init bit set implies a live payload.
-            let old = ::core::mem::replace(unsafe { self.slot.assume_init_mut() }, value);
+            let old = mem::replace(unsafe { self.slot.assume_init_mut() }, value);
             // SAFETY: `common.alloc` owns `old`'s buffer.
             unsafe { old.deallocate_in(self.common.alloc.clone()) };
         } else {

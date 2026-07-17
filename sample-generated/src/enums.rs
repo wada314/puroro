@@ -11,9 +11,7 @@
 use ::core::convert::TryFrom;
 
 use ::puroro::HasDefault;
-use ::puroro_rt::{
-    ClosedEnum, OpenEnum, ProtoDefault, ProtoEnumStorage,
-};
+use ::puroro_rt::{ClosedEnum, OpenEnum, ProtoDefault, ProtoEnumStorage};
 
 /// Open enum (`enum_type = OPEN`).
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]

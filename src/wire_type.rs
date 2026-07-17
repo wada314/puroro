@@ -4,8 +4,10 @@
 
 pub use ::protobuf_core::WireType;
 
+use crate::error::DecodeError;
+
 /// Decode a raw 3-bit value from a tag into a [`WireType`].
 #[inline]
-pub fn from_raw(raw: u8) -> Result<WireType, crate::error::DecodeError> {
+pub fn from_raw(raw: u8) -> Result<WireType, DecodeError> {
     WireType::try_from(raw).map_err(Into::into)
 }

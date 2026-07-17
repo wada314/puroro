@@ -4,6 +4,7 @@
 //! behaviour (no wire), and enum merge / unknown-field handling.
 
 use ::puroro::{Message, UnknownPayload};
+use ::puroro_rt::encode::encode_varint_field;
 use ::puroro_sample_generated::task::{Notification, NotificationCase};
 use ::puroro_sample_generated::{Address, Priority, Status, Task};
 
@@ -120,10 +121,7 @@ fn oneof_bool_variant_roundtrip() {
     let bytes = task.encode_to_vec();
     let decoded: Task = Task::decode(&bytes[..]).unwrap();
 
-    assert_eq!(
-        decoded.notification_case(),
-        Some(NotificationCase::Urgent)
-    );
+    assert_eq!(decoded.notification_case(), Some(NotificationCase::Urgent));
     assert!(matches!(
         decoded.notification().as_ref(),
         Some(Notification::Urgent(true))
@@ -135,10 +133,7 @@ fn oneof_bool_variant_roundtrip() {
     *task.urgent_mut() = false;
     let bytes = task.encode_to_vec();
     let decoded: Task = Task::decode(&bytes[..]).unwrap();
-    assert_eq!(
-        decoded.notification_case(),
-        Some(NotificationCase::Urgent)
-    );
+    assert_eq!(decoded.notification_case(), Some(NotificationCase::Urgent));
     assert!(matches!(
         decoded.notification().as_ref(),
         Some(Notification::Urgent(false))
@@ -298,7 +293,7 @@ fn closed_enum_unknown_goes_to_unknown_fields() {
 
     // field 10 (priority) = 99 (unknown closed enum value), wire: tag + varint
     let mut bytes = Vec::new();
-    ::puroro_rt::encode::encode_varint_field(10, 99, &mut bytes);
+    encode_varint_field(10, 99, &mut bytes);
 
     task.merge_from(&mut &bytes[..]).unwrap();
 
@@ -319,7 +314,7 @@ fn open_enum_unknown_stays_in_field() {
 
     // field 9 (status) = 99 (unknown open enum value)
     let mut bytes = Vec::new();
-    ::puroro_rt::encode::encode_varint_field(9, 99, &mut bytes);
+    encode_varint_field(9, 99, &mut bytes);
 
     task.merge_from(&mut &bytes[..]).unwrap();
 

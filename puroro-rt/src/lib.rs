@@ -22,14 +22,12 @@ pub use fields::repeated::{
     RepeatedPackedVarintField, RepeatedString, RepeatedVarint, RepeatedVarintEncoding,
     RepeatedVarintField, RepeatedVarintFieldMut, RepeatedVarintFieldRef,
 };
-pub use fields::shared::{FieldDeallocate, MessageCommon, PresenceBits};
 pub use fields::shared::field_presence::{
     Explicit, FieldPresence, Implicit, LegacyRequired, NonOneof, Oneof, RequiredFieldPresence,
 };
 pub use fields::shared::value_slot::ValueSlot;
-pub use fields::singular::{
-    SingularAccess, SingularField, SingularFieldMut, SingularFieldRef,
-};
+pub use fields::shared::{FieldDeallocate, MessageCommon, PresenceBits};
+pub use fields::singular::{SingularAccess, SingularField, SingularFieldMut, SingularFieldRef};
 pub use fields::wire::{
     Closed, ClosedEnum, LenProtoType, Open, OpenEnum, ProtoBool, ProtoBytes, ProtoEnum,
     ProtoEnumStorage, ProtoInt32, ProtoInt64, ProtoMessage, ProtoSint32, ProtoSint64, ProtoString,

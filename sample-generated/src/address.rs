@@ -6,10 +6,12 @@ mod defaults;
 use ::allocator_api2::alloc::{Allocator, Global};
 use ::bitvec::array::BitArray;
 use ::bitvec::order::Lsb0;
+use ::bitvec::ptr::{BitRef, Mut};
 use ::bytes::{Buf, BufMut};
 use ::core::ops::DerefMut;
 
 use ::puroro::{DecodeError, Message};
+use ::puroro_rt::decode::{decode_tag, skip_field_and_save};
 use ::puroro_rt::{
     Explicit, FieldDeallocate, MessageCommon, PresenceBits, ProtoString, SingularAccess,
     SingularField,
@@ -35,13 +37,8 @@ impl PresenceBits for AddressPresence {
         self.0.set(bit, present);
     }
 
-    fn bit_mut(
-        &mut self,
-        bit: usize,
-    ) -> ::bitvec::ptr::BitRef<'_, ::bitvec::ptr::Mut, u8, Lsb0> {
-        self.0
-            .get_mut(bit)
-            .expect("presence bit index in range")
+    fn bit_mut(&mut self, bit: usize) -> BitRef<'_, Mut, u8, Lsb0> {
+        self.0.get_mut(bit).expect("presence bit index in range")
     }
 }
 
@@ -89,9 +86,7 @@ impl<A: Allocator + Clone> Address<A> {
         self.street.bind(&self._common).optional()
     }
 
-    pub fn street_mut<'s>(
-        &'s mut self,
-    ) -> impl DerefMut<Target = ::unmanaged::String<A>> + 's {
+    pub fn street_mut<'s>(&'s mut self) -> impl DerefMut<Target = ::unmanaged::String<A>> + 's {
         self.street.bind_mut(&mut self._common).value_mut()
     }
 
@@ -108,9 +103,7 @@ impl<A: Allocator + Clone> Address<A> {
         self.city.bind(&self._common).optional()
     }
 
-    pub fn city_mut<'s>(
-        &'s mut self,
-    ) -> impl DerefMut<Target = ::unmanaged::String<A>> + 's {
+    pub fn city_mut<'s>(&'s mut self) -> impl DerefMut<Target = ::unmanaged::String<A>> + 's {
         self.city.bind_mut(&mut self._common).value_mut()
     }
 
@@ -119,7 +112,7 @@ impl<A: Allocator + Clone> Address<A> {
     }
 }
 
-impl Address<::allocator_api2::alloc::Global> {
+impl Address<Global> {
     pub fn new() -> Self {
         Self::new_in(Global)
     }
@@ -169,7 +162,7 @@ impl<A: Allocator + Clone> Message for Address<A> {
 
     fn merge_from<B: Buf>(&mut self, buf: &mut B) -> Result<(), DecodeError> {
         while buf.has_remaining() {
-            let (field_number, wire_type) = ::puroro_rt::decode::decode_tag(buf)?;
+            let (field_number, wire_type) = decode_tag(buf)?;
             match field_number {
                 FIELD_STREET => {
                     // street = 1, EXPLICIT string
@@ -185,7 +178,7 @@ impl<A: Allocator + Clone> Message for Address<A> {
                 }
                 _ => {
                     // unknown field — preserve in _common.unknown_fields
-                    ::puroro_rt::decode::skip_field_and_save(
+                    skip_field_and_save(
                         field_number,
                         wire_type,
                         buf,

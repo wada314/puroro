@@ -96,10 +96,7 @@ impl<M: Message<Alloc = A>, A: Allocator + Clone> ProtoType for ProtoMessage<M, 
     }
 
     #[inline]
-    fn get<'a, Pb: PresenceBits>(
-        slot: &'a Self::Slot,
-        _common: &'a MessageCommon<Pb, A>,
-    ) -> &'a M {
+    fn get<'a, Pb: PresenceBits>(slot: &'a Self::Slot, _common: &'a MessageCommon<Pb, A>) -> &'a M {
         Deref::deref(slot)
     }
 

@@ -106,23 +106,13 @@ pub enum NotificationCase {
     Urgent,
 }
 
-type EmailAddressField<A> =
-    SingularField<ProtoString<A>, Oneof, { super::FIELD_EMAIL_ADDRESS }>;
-type PhoneNumberField<A> =
-    SingularField<ProtoString<A>, Oneof, { super::FIELD_PHONE_NUMBER }>;
-type WebhookIdField<A> = SingularField<
-    ProtoInt32<A>,
-    Oneof,
-    { super::FIELD_WEBHOOK_ID },
-    WebhookIdDefault,
->;
-type PostalField<A> =
-    SingularField<ProtoMessage<Address<A>, A>, Oneof, { super::FIELD_POSTAL }>;
-type UrgentField<A> = SingularField<
-    ProtoBool<A, { super::BIT_URGENT_VALUE }>,
-    Oneof,
-    { super::FIELD_URGENT },
->;
+type EmailAddressField<A> = SingularField<ProtoString<A>, Oneof, { super::FIELD_EMAIL_ADDRESS }>;
+type PhoneNumberField<A> = SingularField<ProtoString<A>, Oneof, { super::FIELD_PHONE_NUMBER }>;
+type WebhookIdField<A> =
+    SingularField<ProtoInt32<A>, Oneof, { super::FIELD_WEBHOOK_ID }, WebhookIdDefault>;
+type PostalField<A> = SingularField<ProtoMessage<Address<A>, A>, Oneof, { super::FIELD_POSTAL }>;
+type UrgentField<A> =
+    SingularField<ProtoBool<A, { super::BIT_URGENT_VALUE }>, Oneof, { super::FIELD_URGENT }>;
 
 /// Owned storage for `oneof notification` (crate-internal).
 pub(crate) type NotificationStorage<A> = Notification<

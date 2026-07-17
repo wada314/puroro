@@ -14,6 +14,7 @@
 //! from `UnmanagedString` / `UnmanagedVec`. Copy scalars / ZST bool slots use the
 //! same layout; their `DeallocateIn` is a no-op.
 
+use ::core::fmt::{self, Debug, Formatter, Result as FmtResult};
 use ::core::marker::PhantomData;
 use ::core::mem::ManuallyDrop;
 
@@ -25,13 +26,15 @@ use ::puroro::DecodeError;
 use ::puroro::WireType;
 use ::puroro::{HasDefault, Optional};
 
+use crate::fields::shared::FieldDeallocate;
 use crate::fields::shared::{
     MessageCommon, PresenceBits,
-    field_presence::{FieldPresence, Implicit, LegacyRequired, NonOneof, Oneof, RequiredFieldPresence},
+    field_presence::{
+        FieldPresence, Implicit, LegacyRequired, NonOneof, Oneof, RequiredFieldPresence,
+    },
     slot_init::{AlwaysInitialized, SlotInitView},
     value_slot::{ValueSlot, ValueSlotRefAccess},
 };
-use crate::fields::shared::FieldDeallocate;
 use crate::fields::wire::proto_message::ProtoMessage;
 use crate::fields::wire::proto_type::ProtoType;
 use ::puroro::Message;
@@ -50,8 +53,7 @@ where
     _marker: PhantomData<(T, P, D)>,
 }
 
-impl<T: ProtoType, P: FieldPresence, const FIELD: u32, D> Clone
-    for SingularField<T, P, FIELD, D>
+impl<T: ProtoType, P: FieldPresence, const FIELD: u32, D> Clone for SingularField<T, P, FIELD, D>
 where
     P::ValueSlot<T::Slot>: ValueSlot<T::Slot> + Copy,
 {
@@ -60,19 +62,17 @@ where
     }
 }
 
-impl<T: ProtoType, P: FieldPresence, const FIELD: u32, D> Copy
-    for SingularField<T, P, FIELD, D>
-where
-    P::ValueSlot<T::Slot>: ValueSlot<T::Slot> + Copy,
+impl<T: ProtoType, P: FieldPresence, const FIELD: u32, D> Copy for SingularField<T, P, FIELD, D> where
+    P::ValueSlot<T::Slot>: ValueSlot<T::Slot> + Copy
 {
 }
 
-impl<T: ProtoType, P: FieldPresence, const FIELD: u32, D> ::core::fmt::Debug
+impl<T: ProtoType, P: FieldPresence, const FIELD: u32, D> fmt::Debug
     for SingularField<T, P, FIELD, D>
 where
-    P::ValueSlot<T::Slot>: ValueSlot<T::Slot> + ::core::fmt::Debug,
+    P::ValueSlot<T::Slot>: ValueSlot<T::Slot> + Debug,
 {
-    fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
+    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
         f.debug_struct("SingularField")
             .field("value", &*self.value)
             .finish()
@@ -367,15 +367,8 @@ pub struct SingularFieldMut<
     common: &'c mut MessageCommon<Pb, A>,
 }
 
-impl<
-    'f,
-    'c,
-    T: ProtoType,
-    P: FieldPresence,
-    const FIELD: u32,
-    D,
-    Pb: PresenceBits,
-> SingularFieldMut<'f, 'c, T, P, FIELD, D, Pb, T::Alloc>
+impl<'f, 'c, T: ProtoType, P: FieldPresence, const FIELD: u32, D, Pb: PresenceBits>
+    SingularFieldMut<'f, 'c, T, P, FIELD, D, Pb, T::Alloc>
 where
     P::ValueSlot<T::Slot>: ValueSlot<T::Slot>,
 {
@@ -393,11 +386,7 @@ where
     where
         'c: 'f,
     {
-        T::with_mut(
-            &mut *self.field.value,
-            P::slot_init_mut(),
-            self.common,
-        )
+        T::with_mut(&mut *self.field.value, P::slot_init_mut(), self.common)
     }
 
     /// Alias of [`value_mut`](Self::value_mut) for nested-message call sites.
@@ -410,20 +399,12 @@ where
     }
 
     #[inline]
-    pub fn set(self, v: T::Written)
-    where
-    {
-        T::write(
-            &mut *self.field.value,
-            P::slot_init_mut(),
-            self.common,
-            v,
-        );
+    pub fn set(self, v: T::Written) {
+        T::write(&mut *self.field.value, P::slot_init_mut(), self.common, v);
     }
 
     pub fn merge<B: Buf>(self, wire_type: WireType, buf: &mut B) -> Result<(), DecodeError>
-    where
-    {
+where {
         T::merge(
             &mut *self.field.value,
             P::slot_init_mut(),
@@ -435,13 +416,7 @@ where
     }
 
     /// Resets the value slot and clears explicit presence when applicable.
-    pub fn clear(self)
-    where
-    {
-        T::clear(
-            &mut *self.field.value,
-            P::slot_init_mut(),
-            self.common,
-        );
+    pub fn clear(self) {
+        T::clear(&mut *self.field.value, P::slot_init_mut(), self.common);
     }
 }

@@ -13,7 +13,9 @@
 
 use ::core::convert::TryFrom;
 use ::core::marker::PhantomData;
+use ::core::ops::{Deref, DerefMut};
 
+use ::allocator_api2::alloc::Allocator;
 use ::protobuf_core::Varint;
 
 use ::puroro::DecodeError;
@@ -83,16 +85,16 @@ pub trait ClosedEnum: ProtoEnumStorage + TryFrom<i32, Error = i32> {}
 /// `E` via [`VarintProtoType::Value`].
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 #[repr(transparent)]
-pub struct ProtoEnum<E, K, A: ::allocator_api2::alloc::Allocator>(pub E, PhantomData<(K, A)>);
+pub struct ProtoEnum<E, K, A: Allocator>(pub E, PhantomData<(K, A)>);
 
-impl<E, K, A: ::allocator_api2::alloc::Allocator> ProtoEnum<E, K, A> {
+impl<E, K, A: Allocator> ProtoEnum<E, K, A> {
     #[inline]
     pub const fn new(value: E) -> Self {
         Self(value, PhantomData)
     }
 }
 
-impl<E, K, A: ::allocator_api2::alloc::Allocator> ::core::ops::Deref for ProtoEnum<E, K, A> {
+impl<E, K, A: Allocator> Deref for ProtoEnum<E, K, A> {
     type Target = E;
 
     #[inline]
@@ -101,32 +103,28 @@ impl<E, K, A: ::allocator_api2::alloc::Allocator> ::core::ops::Deref for ProtoEn
     }
 }
 
-impl<E, K, A: ::allocator_api2::alloc::Allocator> ::core::ops::DerefMut
-    for ProtoEnum<E, K, A>
-{
+impl<E, K, A: Allocator> DerefMut for ProtoEnum<E, K, A> {
     #[inline]
     fn deref_mut(&mut self) -> &mut E {
         &mut self.0
     }
 }
 
-impl<E, K, A: ::allocator_api2::alloc::Allocator> From<E> for ProtoEnum<E, K, A> {
+impl<E, K, A: Allocator> From<E> for ProtoEnum<E, K, A> {
     #[inline]
     fn from(value: E) -> Self {
         Self::new(value)
     }
 }
 
-impl<E: Default, K, A: ::allocator_api2::alloc::Allocator> Default for ProtoEnum<E, K, A> {
+impl<E: Default, K, A: Allocator> Default for ProtoEnum<E, K, A> {
     #[inline]
     fn default() -> Self {
         Self::new(E::default())
     }
 }
 
-impl<E: ProtoEnumStorage, K, A: ::allocator_api2::alloc::Allocator + Clone> DefaultIn
-    for ProtoEnum<E, K, A>
-{
+impl<E: ProtoEnumStorage, K, A: Allocator + Clone> DefaultIn for ProtoEnum<E, K, A> {
     type Alloc = A;
 
     #[inline]
@@ -135,30 +133,28 @@ impl<E: ProtoEnumStorage, K, A: ::allocator_api2::alloc::Allocator + Clone> Defa
     }
 }
 
-impl<E: ProtoEnumStorage, K, A: ::allocator_api2::alloc::Allocator + Clone> DeallocateIn
-    for ProtoEnum<E, K, A>
-{
+impl<E: ProtoEnumStorage, K, A: Allocator + Clone> DeallocateIn for ProtoEnum<E, K, A> {
     type Alloc = A;
 
     #[inline]
     unsafe fn deallocate_in(self, _alloc: A) {}
 }
 
-impl<E: ProtoEnumStorage, K, A: ::allocator_api2::alloc::Allocator> ProtoEmpty
-    for ProtoEnum<E, K, A>
-{
+impl<E: ProtoEnumStorage, K, A: Allocator> ProtoEmpty for ProtoEnum<E, K, A> {
     #[inline]
     fn is_proto_empty(&self) -> bool {
         self.0 == E::proto_zero()
     }
 }
 
-impl<E: OpenEnum, A: ::allocator_api2::alloc::Allocator> VarintProtoType for ProtoEnum<E, Open, A> {
+impl<E: OpenEnum, A: Allocator> VarintProtoType for ProtoEnum<E, Open, A> {
     type Value = E;
 
     #[inline]
     fn decode_wire(raw: u64) -> Result<Self::Value, DecodeError> {
-        Ok(E::from(<ProtoInt32<A> as VarintProtoType>::decode_wire(raw)?))
+        Ok(E::from(<ProtoInt32<A> as VarintProtoType>::decode_wire(
+            raw,
+        )?))
     }
 
     #[inline]
@@ -167,9 +163,7 @@ impl<E: OpenEnum, A: ::allocator_api2::alloc::Allocator> VarintProtoType for Pro
     }
 }
 
-impl<E: ClosedEnum, A: ::allocator_api2::alloc::Allocator> VarintProtoType
-    for ProtoEnum<E, Closed, A>
-{
+impl<E: ClosedEnum, A: Allocator> VarintProtoType for ProtoEnum<E, Closed, A> {
     type Value = E;
 
     /// Known values succeed. Unknown values return
@@ -328,11 +322,9 @@ proto_varint_wrapper! {
 /// codegen stability; a later cleanup should move the index to the
 /// field / layout side so the singular marker can be bit-index-free too.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
-pub struct ProtoBool<A: ::allocator_api2::alloc::Allocator, const VALUE_BIT: usize>(PhantomData<A>);
+pub struct ProtoBool<A: Allocator, const VALUE_BIT: usize>(PhantomData<A>);
 
-impl<A: ::allocator_api2::alloc::Allocator + Clone, const VALUE_BIT: usize> DefaultIn
-    for ProtoBool<A, VALUE_BIT>
-{
+impl<A: Allocator + Clone, const VALUE_BIT: usize> DefaultIn for ProtoBool<A, VALUE_BIT> {
     type Alloc = A;
 
     #[inline]
@@ -341,18 +333,14 @@ impl<A: ::allocator_api2::alloc::Allocator + Clone, const VALUE_BIT: usize> Defa
     }
 }
 
-impl<A: ::allocator_api2::alloc::Allocator + Clone, const VALUE_BIT: usize> DeallocateIn
-    for ProtoBool<A, VALUE_BIT>
-{
+impl<A: Allocator + Clone, const VALUE_BIT: usize> DeallocateIn for ProtoBool<A, VALUE_BIT> {
     type Alloc = A;
 
     #[inline]
     unsafe fn deallocate_in(self, _alloc: A) {}
 }
 
-impl<A: ::allocator_api2::alloc::Allocator, const VALUE_BIT: usize> VarintProtoType
-    for ProtoBool<A, VALUE_BIT>
-{
+impl<A: Allocator, const VALUE_BIT: usize> VarintProtoType for ProtoBool<A, VALUE_BIT> {
     type Value = bool;
 
     #[inline]

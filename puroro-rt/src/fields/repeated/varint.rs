@@ -3,8 +3,8 @@
 //! Elements are stored in an allocator-less [`UnmanagedVec`] wrapped in
 //! [`ManuallyDrop`]. Growth and release borrow the message allocator.
 
-use ::core::mem::ManuallyDrop;
 use ::core::marker::PhantomData;
+use ::core::mem::ManuallyDrop;
 
 use ::allocator_api2::alloc::Allocator;
 use ::bytes::{Buf, BufMut};
@@ -157,7 +157,11 @@ impl<
         field: &'a RepeatedVarintField<T, E, FIELD, A>,
         common: &'a MessageCommon<Pb, A>,
     ) -> Self {
-        Self { field, common, _encoding: PhantomData }
+        Self {
+            field,
+            common,
+            _encoding: PhantomData,
+        }
     }
 
     #[inline]
@@ -211,7 +215,11 @@ impl<
         field: &'f mut RepeatedVarintField<T, E, FIELD, A>,
         common: &'c mut MessageCommon<Pb, A>,
     ) -> Self {
-        Self { field, common, _encoding: PhantomData }
+        Self {
+            field,
+            common,
+            _encoding: PhantomData,
+        }
     }
 
     /// Returns a growable handle over the elements, backed by an owned clone of

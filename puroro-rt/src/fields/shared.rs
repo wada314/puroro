@@ -16,7 +16,13 @@ pub use field_deallocate::FieldDeallocate;
 use ::core::mem::ManuallyDrop;
 
 use ::allocator_api2::alloc::Allocator;
+use ::bitvec::{
+    order::Lsb0,
+    ptr::{BitRef, Mut},
+};
 use ::unmanaged::UnmanagedVec;
+
+use crate::decode::{UnknownFieldsIter, iter_unknown_fields};
 
 // ---------------------------------------------------------------------------
 // Message bitfield (`PresenceBits`)
@@ -52,10 +58,7 @@ pub trait PresenceBits {
     /// # Panics
     ///
     /// Generated impls panic if `bit` is out of range for the message bitfield.
-    fn bit_mut(
-        &mut self,
-        bit: usize,
-    ) -> ::bitvec::ptr::BitRef<'_, ::bitvec::ptr::Mut, u8, ::bitvec::order::Lsb0>;
+    fn bit_mut(&mut self, bit: usize) -> BitRef<'_, Mut, u8, Lsb0>;
 }
 
 // ---------------------------------------------------------------------------
@@ -94,8 +97,8 @@ impl<P, A: Allocator + Clone> MessageCommon<P, A> {
     /// Storage remains a contiguous wire blob; this only parses it for the
     /// public accessor shape.
     #[inline]
-    pub fn iter_unknown_fields(&self) -> crate::decode::UnknownFieldsIter<'_> {
-        crate::decode::iter_unknown_fields(&self.unknown_fields)
+    pub fn iter_unknown_fields(&self) -> UnknownFieldsIter<'_> {
+        iter_unknown_fields(&self.unknown_fields)
     }
 }
 
@@ -126,10 +129,7 @@ impl<P: PresenceBits, A: Allocator> MessageCommon<P, A> {
 
     /// Returns a mutable handle to bit `bit` (`DerefMut<Target = bool>`).
     #[inline]
-    pub fn bit_mut(
-        &mut self,
-        bit: usize,
-    ) -> ::bitvec::ptr::BitRef<'_, ::bitvec::ptr::Mut, u8, ::bitvec::order::Lsb0> {
+    pub fn bit_mut(&mut self, bit: usize) -> BitRef<'_, Mut, u8, Lsb0> {
         self.presence.bit_mut(bit)
     }
 }

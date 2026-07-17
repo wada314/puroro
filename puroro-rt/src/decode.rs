@@ -4,7 +4,9 @@
 //! [`IteratorExtVarint`]). `bytes::Buf` adapters live here.
 
 use ::allocator_api2::alloc::Allocator;
+use ::allocator_api2::vec::Vec as AllocVec;
 use ::bytes::Buf;
+use ::core::str;
 use ::protobuf_core::{IteratorExtVarint, Tag, Varint};
 use ::puroro::{DecodeError, UnknownField, UnknownPayload, WireType};
 use ::unmanaged::{UnmanagedString, UnmanagedVec};
@@ -51,7 +53,7 @@ pub(crate) fn decode_bytes_in<B: Buf, A: Allocator>(
     if buf.remaining() < len {
         return Err(DecodeError::TruncatedMessage);
     }
-    let mut vec = ::allocator_api2::vec::Vec::<u8, A>::with_capacity_in(len, alloc);
+    let mut vec = AllocVec::<u8, A>::with_capacity_in(len, alloc);
     let mut remaining = len;
     while remaining > 0 {
         let chunk = buf.chunk();
@@ -73,7 +75,7 @@ pub(crate) fn decode_string_in<B: Buf, A: Allocator>(
         return Err(DecodeError::TruncatedMessage);
     }
     let bytes = buf.copy_to_bytes(len);
-    let s = ::core::str::from_utf8(&bytes).map_err(|_| DecodeError::InvalidUtf8)?;
+    let s = str::from_utf8(&bytes).map_err(|_| DecodeError::InvalidUtf8)?;
     Ok(str_to_unmanaged_in(s, alloc))
 }
 
@@ -86,7 +88,7 @@ pub(crate) fn str_to_unmanaged_in<A: Allocator>(s: &str, alloc: A) -> UnmanagedS
 /// Copies `v` into a freshly allocated [`UnmanagedVec<u8>`] backed by the owned
 /// `alloc` (its buffer is owned by allocator type `A`).
 pub(crate) fn bytes_to_unmanaged_in<A: Allocator>(v: &[u8], alloc: A) -> UnmanagedVec<u8, A> {
-    let mut vec = ::allocator_api2::vec::Vec::<u8, A>::with_capacity_in(v.len(), alloc);
+    let mut vec = AllocVec::<u8, A>::with_capacity_in(v.len(), alloc);
     vec.extend_from_slice(v);
     UnmanagedVec::from_vec(vec)
 }
