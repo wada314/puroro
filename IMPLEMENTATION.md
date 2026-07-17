@@ -190,40 +190,33 @@ One marker + trait per protobuf **wire family**. Semantic conversions delegate t
 
 ### Singular field type markers ([`wire/proto_type.rs`](puroro-rt/src/fields/wire/proto_type.rs))
 
-[`ProtoType`](puroro-rt/src/fields/wire/proto_type.rs) is the trait consumed by [`SingularField`](puroro-rt/src/fields/singular/field.rs) (including nested messages via [`ProtoMessage`](puroro-rt/src/fields/wire/proto_message.rs)). It unifies wire/storage semantics for **non-repeated** fields. Each implementor is a **protobuf type marker**; physical field storage is the associated `Slot` (`Self` for addressable markers / ZST [`ProtoBool`](puroro-rt/src/fields/wire/varint.rs); `UnmanagedBox<M, A>` for messages):
+[`ProtoType`](puroro-rt/src/fields/wire/proto_type.rs) is the trait consumed by [`SingularField`](puroro-rt/src/fields/singular/field.rs) (including nested messages via [`ProtoMessage`](puroro-rt/src/fields/wire/proto_message.rs)). Markers are **allocator-free**; physical storage / views are GATs over `A`. Singular slots use bare wire values (`i32`, `()`, …) / `UnmanagedString` / `UnmanagedBox<M, M::Alloc>`:
 
 ```rust
 pub trait ProtoType: Sized {
-    type Alloc: Allocator + Clone;
-    type Slot: AddressableSlot<SlotAlloc = Self::Alloc> + DefaultIn<Alloc = Self::Alloc>;
-    type Ref<'a> where Self: 'a;
-    type Mut<'a>: DerefMut where Self: 'a;
-    type Written;
+    type Slot<A: Allocator + Clone>;
+    type Ref<'a, A: Allocator + Clone> where Self: 'a, A: 'a;
+    type Mut<'a, A: Allocator + Clone>: DerefMut where Self: 'a, A: 'a;
+    type Written<A: Allocator + Clone>;
     const WIRE_TYPE: WireType;
-    // IMPLICIT omit: ProtoEmpty on addressable slots; bit read for ProtoBool
-    fn is_proto_empty<Pb>(slot: &Self::Slot, common: &MessageCommon<Pb, Self::Alloc>) -> bool;
-    fn get<'a, Pb>(slot: &'a Self::Slot, common: &'a MessageCommon<Pb, Self::Alloc>) -> Self::Ref<'a>;
-    fn with_mut / write / clear(/* ValueSlot + MessageCommon */);
-    // encoded_len / encode stay on the marker: int32 vs sint32 share Ref = i32
-    fn encoded_len<'a>(value: Self::Ref<'a>, field: u32) -> usize where Self: 'a;
-    fn encode<'a, B: BufMut>(value: Self::Ref<'a>, field: u32, buf: &mut B) where Self: 'a;
-    fn decode<B: Buf>(…) -> Result<Self::Written, DecodeError>;
-    // default: decode then write (last wins); ProtoMessage overrides for merge-into
-    fn merge(/* ValueSlot + MessageCommon + wire */) -> Result<(), DecodeError>;
+    fn encoded_len<'a, A>(value: Self::Ref<'a, A>, field: u32) -> usize;
+    fn encode<'a, A, B: BufMut>(value: Self::Ref<'a, A>, field: u32, buf: &mut B);
+    fn decode<A, B: Buf>(…) -> Result<Self::Written<A>, DecodeError>;
 }
-// Implemented for ProtoInt32<A>, …, ProtoBool<A, BIT>, ProtoEnum<E, K, A>, ProtoString<A>, ProtoBytes<A>, ProtoMessage<M, A>
+// PayloadAccess: get / with_mut / write / clear / merge (inline slots)
+// Implemented for ProtoInt32, …, ProtoEnum<E, K>, ProtoString, ProtoBytes, ProtoMessage<M>
 ```
 
-Singular / oneof `bool` uses bit-index-free [`ProtoBool<A>`](puroro-rt/src/fields/wire/varint.rs) plus [`BitPacked<VALUE_BIT>`](puroro-rt/src/fields/shared/value_layout.rs) as the field's [`ValueLayout`](puroro-rt/src/fields/shared/value_layout.rs) (orthogonal to presence `P`). Inline payloads use default `L = Inline` via [`PayloadAccess`](puroro-rt/src/fields/wire/proto_type.rs).
+Singular / oneof `bool` uses allocator-free [`ProtoBool`](puroro-rt/src/fields/wire/varint.rs) plus [`BitPacked<VALUE_BIT>`](puroro-rt/src/fields/shared/value_layout.rs) as the field's [`ValueLayout`](puroro-rt/src/fields/shared/value_layout.rs) (orthogonal to presence `P`). Inline payloads use default `L = Inline` via [`PayloadAccess`](puroro-rt/src/fields/wire/proto_type.rs). Allocator `A` lives on [`SingularField`](puroro-rt/src/fields/singular/field.rs) / [`RepeatedField`](puroro-rt/src/fields/repeated/field.rs). Slot construction uses [`DefaultIn<A>`](puroro-rt/src/fields/shared.rs) / [`DeallocateIn<A>`](puroro-rt/src/fields/shared.rs) (allocator as a **trait parameter**, not an associated type), so bare `i32` / `()` work without slot newtypes.
 ### Repeated elements (`RepeatedItems`)
 
-[`RepeatedItems`](puroro-rt/src/fields/wire/repeated_items.rs) extends [`ProtoType`](puroro-rt/src/fields/wire/proto_type.rs) with the physical element type stored in a repeated buffer (`Element`), plus per-element encode / decode / merge / deallocate. Singular fields store `Slot`; repeated fields store `Element` (not always the same — e.g. future nested-message repeated uses `Element = M` while singular keeps `Slot = UnmanagedBox<M, A>`).
+[`RepeatedItems`](puroro-rt/src/fields/wire/repeated_items.rs) extends [`ProtoType`](puroro-rt/src/fields/wire/proto_type.rs) with GAT `Element<A>`, plus per-element encode / decode / merge / deallocate. Singular fields store `Slot<A>`; repeated fields store `Element<A>` (not always the same — e.g. future nested-message repeated uses `Element = M` while singular keeps `Slot = UnmanagedBox<M, M::Alloc>`).
 
-| Marker | `Element` | Packable |
+| Marker | `Element<A>` | Packable |
 |---|---|---|
 | Addressable varint / enum | `VarintProtoType::Value` (`i32`, …) | yes (`PackableRepeatedItems`) |
-| `ProtoString` / `ProtoBytes` | `LenProtoType::Storage` | no (`RepeatedSlicePush` for `push_*`) |
-| `ProtoMessage<M, A>` (future) | `M` | no |
+| `ProtoString` / `ProtoBytes` | `UnmanagedString<A>` / `UnmanagedVec<u8, A>` | no (`RepeatedSlicePush` for `push_*`) |
+| `ProtoMessage<M>` (future) | `M` | no |
 | `ProtoBool` | — (no `RepeatedItems`; use plain `bool` elements later) | — |
 
 ### Varint / LEN helpers
@@ -279,14 +272,14 @@ Rust payload type alone does **not** identify protobuf encoding (`i32` can be in
 
 **“Singular” means non-repeated** — both presence-tracked (“optional” / `EXPLICIT`) and non-presence-tracked (`IMPLICIT`) fields. It is *not* limited to proto `optional`. Cardinality is singular vs repeated; presence is a separate axis (`FieldPresence`).
 
-Varint and LEN singular scalars share one wrapper, parametrised by [`ProtoType`](puroro-rt/src/fields/wire/proto_type.rs) `T` and presence `P`. `FIELD: u32` is a **struct** const generic; `BIT` lives on `Explicit<BIT>` / `LegacyRequired<BIT>`. Markers such as `ProtoString<A>` / `ProtoInt32<A>` carry allocator type `A` (and `PhantomData` on unmanaged payloads) so `T::Alloc` matches [`MessageCommon`](puroro-rt/src/fields/shared.rs); fields still do **not** store an allocator instance. Nested messages use the same wrapper: `SingularField<ProtoMessage<M, A>, NonOneof|Oneof, FIELD>`.
+Varint and LEN singular scalars share one wrapper, parametrised by [`ProtoType`](puroro-rt/src/fields/wire/proto_type.rs) `T`, presence `P`, and allocator `A`. `FIELD: u32` is a **struct** const generic; `BIT` lives on `Explicit<BIT>` / `LegacyRequired<BIT>`. Markers (`ProtoString`, `ProtoInt32`, …) are allocator-free; `A` sits on the field wrapper. Nested messages use the same wrapper: `SingularField<ProtoMessage<M>, NonOneof|Oneof, FIELD, A>` (typically `M = Address<A>`).
 
 | Wrapper | Module | Params | Aliases (ergonomics) |
 |---|---|---|---|
-| `SingularField<T, P, FIELD, L, D>` | [`singular/field.rs`](puroro-rt/src/fields/singular/field.rs) | `T: ProtoType`, `L: ValueLayout<T>` (default `Inline`), stores `P::ValueSlot<T::Slot>` | — |
-| `SingularField<ProtoBool<A>, P, FIELD, BitPacked<VALUE_BIT>>` | same | `Slot = Self` (ZST); value at `VALUE_BIT` via layout | — |
-| `SingularField<ProtoMessage<M, A>, P, FIELD>` | same | `Slot = UnmanagedBox<M, A>`; `NonOneof` → `Option`; `Oneof` → always-present | — |
-| `RepeatedField<T, E, FIELD>` | [`repeated/field.rs`](puroro-rt/src/fields/repeated/field.rs) | `T: RepeatedItems`, `E: RepeatedEncoding<T>`, stores `T::Element` | `RepeatedPackedVarintField`, … |
+| `SingularField<T, P, FIELD, A, L, D>` | [`singular/field.rs`](puroro-rt/src/fields/singular/field.rs) | `T: ProtoType`, `L: ValueLayout<T, A>` (default `Inline`), stores `P::ValueSlot<T::Slot<A>>` | — |
+| `SingularField<ProtoBool, P, FIELD, A, BitPacked<VALUE_BIT>>` | same | `Slot = ()`; value at `VALUE_BIT` via layout | — |
+| `SingularField<ProtoMessage<M>, P, FIELD, A>` | same | `Slot = UnmanagedBox<M, M::Alloc>`; `NonOneof` → `Option`; `Oneof` → always-present | — |
+| `RepeatedField<T, E, FIELD, A>` | [`repeated/field.rs`](puroro-rt/src/fields/repeated/field.rs) | `T: RepeatedItems`, `E: RepeatedEncoding<T, A>`, stores `T::Element<A>` | `RepeatedPackedVarintField`, … |
 | Fixed-width singular | (planned via `ProtoType` + `SingularField`) | — | — |
 | `OneofSlot<E>` | [`oneof.rs`](puroro-rt/src/fields/oneof.rs) | mutually exclusive variants | — |
 
@@ -302,16 +295,16 @@ Adding a singular wire type = one new `ProtoType` impl (and usually a `VarintPro
 
 | Proto field | Generated member type |
 |---|---|
-| `IMPLICIT int32` | `SingularField<ProtoInt32, Implicit, FIELD>`  |
-| `EXPLICIT int32` | `SingularField<ProtoInt32, Explicit<BIT>, FIELD>` |
-| `IMPLICIT sint32` | `SingularField<ProtoSint32, Implicit, FIELD>` |
-| `IMPLICIT bool` | `SingularField<ProtoBool, Implicit, FIELD, BitPacked<VALUE_BIT>>` |
-| `EXPLICIT bool` | `SingularField<ProtoBool, Explicit<PRESENCE_BIT>, FIELD, BitPacked<VALUE_BIT>>` |
-| `LEGACY_REQUIRED bool` | `SingularField<ProtoBool, LegacyRequired<PRESENCE_BIT>, FIELD, BitPacked<VALUE_BIT>>` |
-| oneof `bool` | `SingularField<ProtoBool, Oneof, FIELD, BitPacked<VALUE_BIT>>` inside the oneof storage enum |
-| `IMPLICIT open enum` | `SingularField<ProtoEnum<E, Open>, Implicit, FIELD>` |
-| `EXPLICIT closed enum` | `SingularField<ProtoEnum<E, Closed>, Explicit<BIT>, FIELD>` (same `.merge`) |
-| `IMPLICIT string` | `SingularField<ProtoString, Implicit, FIELD>`  |
+| `IMPLICIT int32` | `SingularField<ProtoInt32, Implicit, FIELD, A>`  |
+| `EXPLICIT int32` | `SingularField<ProtoInt32, Explicit<BIT>, FIELD, A>` |
+| `IMPLICIT sint32` | `SingularField<ProtoSint32, Implicit, FIELD, A>` |
+| `IMPLICIT bool` | `SingularField<ProtoBool, Implicit, FIELD, A, BitPacked<VALUE_BIT>>` |
+| `EXPLICIT bool` | `SingularField<ProtoBool, Explicit<PRESENCE_BIT>, FIELD, A, BitPacked<VALUE_BIT>>` |
+| `LEGACY_REQUIRED bool` | `SingularField<ProtoBool, LegacyRequired<PRESENCE_BIT>, FIELD, A, BitPacked<VALUE_BIT>>` |
+| oneof `bool` | `SingularField<ProtoBool, Oneof, FIELD, A, BitPacked<VALUE_BIT>>` inside the oneof storage enum |
+| `IMPLICIT open enum` | `SingularField<ProtoEnum<E, Open>, Implicit, FIELD, A>` |
+| `EXPLICIT closed enum` | `SingularField<ProtoEnum<E, Closed>, Explicit<BIT>, FIELD, A>` (same `.merge`) |
+| `IMPLICIT string` | `SingularField<ProtoString, Implicit, FIELD, A>`  |
 | `EXPLICIT string` | `SingularField<ProtoString, Explicit<BIT>, FIELD>` |
 | `LEGACY_REQUIRED string` | `SingularField<ProtoString, LegacyRequired<BIT>, FIELD>` |
 | `IMPLICIT` / `EXPLICIT bytes` | `SingularField<ProtoBytes, P, FIELD>` |
@@ -331,24 +324,24 @@ Adding a singular wire type = one new `ProtoType` impl (and usually a `VarintPro
 ```rust
 pub struct Task<A: Allocator + Clone = Global> {
     _common: MessageCommon<TaskPresence, A>,
-    title: SingularField<ProtoString<A>, Explicit<{ BIT_TITLE }>, { FIELD_TITLE }>,
-    score: SingularField<ProtoInt32<A>, Implicit, { FIELD_SCORE }>,
-    max_retries: SingularField<ProtoInt32<A>, Explicit<{ BIT_MAX_RETRIES }>, { FIELD_MAX_RETRIES }>,
-    owner_id: SingularField<ProtoString<A>, LegacyRequired<{ BIT_OWNER_ID }>, { FIELD_OWNER_ID }>,
-    payload: SingularField<ProtoBytes<A>, Explicit<{ BIT_PAYLOAD }>, { FIELD_PAYLOAD }>,
-    tag_ids: RepeatedField<ProtoInt32<A>, Packed, { FIELD_TAG_IDS }>,
-    scores: RepeatedField<ProtoInt32<A>, Expanded, { FIELD_SCORES }>,
-    labels: RepeatedField<ProtoString<A>, Expanded, { FIELD_LABELS }>,
-    status: SingularField<ProtoEnum<Status, Open, A>, Implicit, { FIELD_STATUS }>,
-    priority: SingularField<ProtoEnum<Priority, Closed, A>, Explicit<{ BIT_PRIORITY }>, { FIELD_PRIORITY }>,
-    assignee: SingularField<ProtoMessage<Address<A>, A>, NonOneof, { FIELD_ASSIGNEE }>,
+    title: SingularField<ProtoString, Explicit<{ BIT_TITLE }>, { FIELD_TITLE }, A>,
+    score: SingularField<ProtoInt32, Implicit, { FIELD_SCORE }, A>,
+    max_retries: SingularField<ProtoInt32, Explicit<{ BIT_MAX_RETRIES }>, { FIELD_MAX_RETRIES }, A>,
+    owner_id: SingularField<ProtoString, LegacyRequired<{ BIT_OWNER_ID }>, { FIELD_OWNER_ID }, A>,
+    payload: SingularField<ProtoBytes, Explicit<{ BIT_PAYLOAD }>, { FIELD_PAYLOAD }, A>,
+    tag_ids: RepeatedField<ProtoInt32, Packed, { FIELD_TAG_IDS }, A>,
+    scores: RepeatedField<ProtoInt32, Expanded, { FIELD_SCORES }, A>,
+    labels: RepeatedField<ProtoString, Expanded, { FIELD_LABELS }, A>,
+    status: SingularField<ProtoEnum<Status, Open>, Implicit, { FIELD_STATUS }, A>,
+    priority: SingularField<ProtoEnum<Priority, Closed>, Explicit<{ BIT_PRIORITY }>, { FIELD_PRIORITY }, A>,
+    assignee: SingularField<ProtoMessage<Address<A>>, NonOneof, { FIELD_ASSIGNEE }, A>,
     notification: OneofSlot<NotificationStorage<A>>,
-    done: SingularField<ProtoBool<A>, Implicit, { FIELD_DONE }, BitPacked<{ BIT_DONE_VALUE }>>,
-    flag: SingularField<ProtoBool<A>, Explicit<{ BIT_FLAG }>, { FIELD_FLAG }, BitPacked<{ BIT_FLAG_VALUE }>>,
+    done: SingularField<ProtoBool, Implicit, { FIELD_DONE }, A, BitPacked<{ BIT_DONE_VALUE }>>,
+    flag: SingularField<ProtoBool, Explicit<{ BIT_FLAG }>, { FIELD_FLAG }, A, BitPacked<{ BIT_FLAG_VALUE }>>,
 }
 ```
 
-The `A: Allocator + Clone` struct bound is what lets the generated `Drop` clone the allocator into nested children and free every field from one place. Heap payloads use `unmanaged` types parameterized by `A` plus `PhantomData<A>` (no allocator *instance* in the field). Protobuf markers (`ProtoString<A>`, …) carry the same `A` so `DefaultIn` / `DeallocateIn` associate `Alloc = A` against `MessageCommon<P, A>`. The only owned `A` value remains `_common.alloc`. Singular `bool` uses `SingularField<ProtoBool<A>, …, BitPacked<VALUE_BIT>>` with ZST `Slot = Self`; the value lives in `_common.presence`.
+The `A: Allocator + Clone` struct bound is what lets the generated `Drop` clone the allocator into nested children and free every field from one place. Heap payloads use `unmanaged` types parameterized by `A` plus `PhantomData<A>` (no allocator *instance* in the field). Protobuf markers are allocator-free; field wrappers carry `A` so slots/`DefaultIn<A>` / `DeallocateIn<A>` associate against `MessageCommon<P, A>`. The only owned `A` value remains `_common.alloc`. Singular `bool` uses `SingularField<ProtoBool, …, A, BitPacked<VALUE_BIT>>` with ZST `Slot = ()`; the value lives in `_common.presence`.
 
 ### Storage summary
 
@@ -356,8 +349,8 @@ The `A: Allocator + Clone` struct bound is what lets the generated `Drop` clone 
 |---|---|---|
 | IMPLICIT varint / open enum / LEN | `ManuallyDrop<T>` (always initialized) | — |
 | EXPLICIT / LEGACY_REQUIRED scalar or LEN | `ManuallyDrop<MaybeUninit<T>>` | presence bit in `_common.presence` |
-| Singular / oneof `bool` | `SingularField` + `ProtoBool` + `BitPacked<VALUE_BIT>` (`Slot = Self`, ZST) | value bit (+ presence bit for EXPLICIT / LEGACY_REQUIRED) in `_common.presence` |
-| Repeated | `RepeatedField<T, E, FIELD>` (`UnmanagedVec<T::Element>`) | empty = absent |
+| Singular / oneof `bool` | `SingularField` + `ProtoBool` + `BitPacked<VALUE_BIT>` (`Slot = ()`) | value bit (+ presence bit for EXPLICIT / LEGACY_REQUIRED) in `_common.presence` |
+| Repeated | `RepeatedField<T, E, FIELD, A>` (`UnmanagedVec<T::Element<A>>`) | empty = absent |
 | Nested message | `Option<UnmanagedBox<M, A>>` (`NonOneof`) | `Option`, not bitfield |
 | Oneof (non-bool) | `Option<E>` in slot | `Option`, not bitfield |
 

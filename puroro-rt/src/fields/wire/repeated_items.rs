@@ -11,193 +11,298 @@
 
 use ::allocator_api2::alloc::Allocator;
 use ::bytes::{Buf, BufMut};
-use ::core::ops::Deref;
+use ::unmanaged::{UnmanagedString, UnmanagedVec};
 
 use ::puroro::DecodeError;
 use ::puroro::WireType;
 
 use crate::decode;
 use crate::encode;
-use crate::fields::shared::value_slot::AddressableSlot;
-use crate::fields::shared::{DeallocateIn, ProtoEmpty};
+use crate::fields::shared::DeallocateIn;
 
 use super::len::{LenProtoType, ProtoBytes, ProtoString};
 use super::proto_type::ProtoType;
-use super::varint::VarintProtoType;
+use super::varint::{
+    Closed, ClosedEnum, Open, OpenEnum, ProtoEnum, ProtoInt32, ProtoInt64, ProtoSint32,
+    ProtoSint64, ProtoUInt32, ProtoUInt64, VarintProtoType,
+};
 
 /// Wire + storage for one element of a repeated field of marker `Self`.
 pub trait RepeatedItems: ProtoType {
     /// Physical element stored in the repeated buffer.
-    type Element;
+    type Element<A: Allocator + Clone>;
 
     /// Tagged wire length of one expanded element.
-    fn encoded_len_element(elem: &Self::Element, field: u32) -> usize;
+    fn encoded_len_element<A: Allocator + Clone>(elem: &Self::Element<A>, field: u32) -> usize;
 
     /// Encodes one expanded (per-element tagged) occurrence.
-    fn encode_element<B: BufMut>(elem: &Self::Element, field: u32, buf: &mut B);
+    fn encode_element<A: Allocator + Clone, B: BufMut>(
+        elem: &Self::Element<A>,
+        field: u32,
+        buf: &mut B,
+    );
 
     /// Decodes one expanded occurrence after the tag has been read.
-    fn decode_element<B: Buf>(
+    fn decode_element<A: Allocator + Clone, B: Buf>(
         wire_type: WireType,
         buf: &mut B,
-        alloc: Self::Alloc,
-    ) -> Result<Self::Element, DecodeError>;
+        alloc: A,
+    ) -> Result<Self::Element<A>, DecodeError>;
 
     /// Drops one element, freeing heap payload when applicable.
     ///
     /// # Safety
     ///
     /// `alloc` must own `elem`'s buffer when the element is heap-backed.
-    unsafe fn deallocate_element(elem: Self::Element, alloc: Self::Alloc);
+    unsafe fn deallocate_element<A: Allocator + Clone>(elem: Self::Element<A>, alloc: A);
 
     /// Merges one wire occurrence into `push` (append semantics).
-    ///
-    /// Packable types accept both packed LEN and expanded VARINT; others decode
-    /// a single expanded element.
-    fn merge_occurrence<B, F>(
+    fn merge_occurrence<A, B, F>(
         wire_type: WireType,
         buf: &mut B,
-        alloc: Self::Alloc,
+        alloc: A,
         push: F,
     ) -> Result<(), DecodeError>
     where
+        A: Allocator + Clone,
         B: Buf,
-        F: FnMut(Self::Element);
+        F: FnMut(Self::Element<A>);
 }
 
 /// Packable repeated numerics / enums — support packed encode and dual-form decode.
-pub trait PackableRepeatedItems: RepeatedItems
-where
-    Self::Element: Copy,
-{
-    fn encode_wire(value: Self::Element) -> u64;
-    fn decode_wire(raw: u64) -> Result<Self::Element, DecodeError>;
+pub trait PackableRepeatedItems: RepeatedItems {
+    fn encode_wire<A: Allocator + Clone>(value: Self::Element<A>) -> u64
+    where
+        Self::Element<A>: Copy;
+
+    fn decode_wire<A: Allocator + Clone>(raw: u64) -> Result<Self::Element<A>, DecodeError>
+    where
+        Self::Element<A>: Copy;
 }
 
 /// Repeated string / bytes — elements built from a byte slice (`push_*`).
 pub trait RepeatedSlicePush: RepeatedItems {
-    fn element_from_slice(v: &[u8], alloc: Self::Alloc) -> Result<Self::Element, DecodeError>;
+    fn element_from_slice<A: Allocator + Clone>(
+        v: &[u8],
+        alloc: A,
+    ) -> Result<Self::Element<A>, DecodeError>;
 }
 
 // ---------------------------------------------------------------------------
-// Addressable varint wrappers + enums (Element = wire Value)
+// Numeric / enum varint markers
 // ---------------------------------------------------------------------------
 
-impl<T> RepeatedItems for T
-where
-    T: VarintProtoType
-        + AddressableSlot
-        + From<T::Value>
-        + ProtoEmpty
-        + Deref<Target = T::Value>
-        + ProtoType,
-    T::Value: Copy,
-{
-    type Element = T::Value;
+macro_rules! impl_packable_varint_repeated {
+    ($marker:ty, $inner:ty) => {
+        impl RepeatedItems for $marker {
+            type Element<A: Allocator + Clone> = $inner;
 
-    #[inline]
-    fn encoded_len_element(elem: &Self::Element, field: u32) -> usize {
-        encode::encoded_len_varint_field(field, T::encode_wire(*elem))
-    }
-
-    #[inline]
-    fn encode_element<B: BufMut>(elem: &Self::Element, field: u32, buf: &mut B) {
-        encode::encode_varint_field(field, T::encode_wire(*elem), buf);
-    }
-
-    #[inline]
-    fn decode_element<B: Buf>(
-        wire_type: WireType,
-        buf: &mut B,
-        _alloc: Self::Alloc,
-    ) -> Result<Self::Element, DecodeError> {
-        if wire_type != WireType::Varint {
-            return Err(DecodeError::InvalidTag);
-        }
-        let raw = decode::decode_varint(buf)?;
-        T::decode_wire(raw)
-    }
-
-    #[inline]
-    unsafe fn deallocate_element(_elem: Self::Element, _alloc: Self::Alloc) {}
-
-    fn merge_occurrence<B, F>(
-        wire_type: WireType,
-        buf: &mut B,
-        _alloc: Self::Alloc,
-        mut push: F,
-    ) -> Result<(), DecodeError>
-    where
-        B: Buf,
-        F: FnMut(Self::Element),
-    {
-        match wire_type {
-            WireType::Len => {
-                let len = decode::decode_varint(buf)? as usize;
-                if buf.remaining() < len {
-                    return Err(DecodeError::TruncatedMessage);
-                }
-                let mut sub = buf.take(len);
-                while sub.has_remaining() {
-                    let raw = decode::decode_varint(&mut sub)?;
-                    push(T::decode_wire(raw)?);
-                }
+            #[inline]
+            fn encoded_len_element<A: Allocator + Clone>(elem: &$inner, field: u32) -> usize {
+                encode::encoded_len_varint_field(
+                    field,
+                    <$marker as VarintProtoType>::encode_wire(*elem),
+                )
             }
-            WireType::Varint => {
+
+            #[inline]
+            fn encode_element<A: Allocator + Clone, B: BufMut>(
+                elem: &$inner,
+                field: u32,
+                buf: &mut B,
+            ) {
+                encode::encode_varint_field(
+                    field,
+                    <$marker as VarintProtoType>::encode_wire(*elem),
+                    buf,
+                );
+            }
+
+            #[inline]
+            fn decode_element<A: Allocator + Clone, B: Buf>(
+                wire_type: WireType,
+                buf: &mut B,
+                _alloc: A,
+            ) -> Result<$inner, DecodeError> {
+                if wire_type != WireType::Varint {
+                    return Err(DecodeError::InvalidTag);
+                }
                 let raw = decode::decode_varint(buf)?;
-                push(T::decode_wire(raw)?);
+                <$marker as VarintProtoType>::decode_wire(raw)
             }
-            _ => return Err(DecodeError::InvalidTag),
+
+            #[inline]
+            unsafe fn deallocate_element<A: Allocator + Clone>(_elem: $inner, _alloc: A) {}
+
+            fn merge_occurrence<A, B, F>(
+                wire_type: WireType,
+                buf: &mut B,
+                _alloc: A,
+                mut push: F,
+            ) -> Result<(), DecodeError>
+            where
+                A: Allocator + Clone,
+                B: Buf,
+                F: FnMut($inner),
+            {
+                match wire_type {
+                    WireType::Len => {
+                        let len = decode::decode_varint(buf)? as usize;
+                        if buf.remaining() < len {
+                            return Err(DecodeError::TruncatedMessage);
+                        }
+                        let mut sub = buf.take(len);
+                        while sub.has_remaining() {
+                            let raw = decode::decode_varint(&mut sub)?;
+                            push(<$marker as VarintProtoType>::decode_wire(raw)?);
+                        }
+                    }
+                    WireType::Varint => {
+                        let raw = decode::decode_varint(buf)?;
+                        push(<$marker as VarintProtoType>::decode_wire(raw)?);
+                    }
+                    _ => return Err(DecodeError::InvalidTag),
+                }
+                Ok(())
+            }
         }
-        Ok(())
-    }
+
+        impl PackableRepeatedItems for $marker {
+            #[inline]
+            fn encode_wire<A: Allocator + Clone>(value: $inner) -> u64 {
+                <$marker as VarintProtoType>::encode_wire(value)
+            }
+
+            #[inline]
+            fn decode_wire<A: Allocator + Clone>(raw: u64) -> Result<$inner, DecodeError> {
+                <$marker as VarintProtoType>::decode_wire(raw)
+            }
+        }
+    };
 }
 
-impl<T> PackableRepeatedItems for T
-where
-    T: RepeatedItems<Element = <T as VarintProtoType>::Value>
-        + VarintProtoType
-        + AddressableSlot
-        + From<T::Value>
-        + ProtoEmpty
-        + Deref<Target = T::Value>
-        + ProtoType,
-    T::Value: Copy,
-{
-    #[inline]
-    fn encode_wire(value: Self::Element) -> u64 {
-        T::encode_wire(value)
-    }
+impl_packable_varint_repeated!(ProtoUInt32, u32);
+impl_packable_varint_repeated!(ProtoUInt64, u64);
+impl_packable_varint_repeated!(ProtoInt32, i32);
+impl_packable_varint_repeated!(ProtoInt64, i64);
+impl_packable_varint_repeated!(ProtoSint32, i32);
+impl_packable_varint_repeated!(ProtoSint64, i64);
 
-    #[inline]
-    fn decode_wire(raw: u64) -> Result<Self::Element, DecodeError> {
-        T::decode_wire(raw)
-    }
+macro_rules! impl_packable_enum_repeated {
+    ($kind:ty, $bound:ident) => {
+        impl<E: $bound> RepeatedItems for ProtoEnum<E, $kind> {
+            type Element<A: Allocator + Clone> = E;
+
+            #[inline]
+            fn encoded_len_element<A: Allocator + Clone>(elem: &E, field: u32) -> usize {
+                encode::encoded_len_varint_field(
+                    field,
+                    <ProtoEnum<E, $kind> as VarintProtoType>::encode_wire(*elem),
+                )
+            }
+
+            #[inline]
+            fn encode_element<A: Allocator + Clone, B: BufMut>(elem: &E, field: u32, buf: &mut B) {
+                encode::encode_varint_field(
+                    field,
+                    <ProtoEnum<E, $kind> as VarintProtoType>::encode_wire(*elem),
+                    buf,
+                );
+            }
+
+            #[inline]
+            fn decode_element<A: Allocator + Clone, B: Buf>(
+                wire_type: WireType,
+                buf: &mut B,
+                _alloc: A,
+            ) -> Result<E, DecodeError> {
+                if wire_type != WireType::Varint {
+                    return Err(DecodeError::InvalidTag);
+                }
+                let raw = decode::decode_varint(buf)?;
+                <ProtoEnum<E, $kind> as VarintProtoType>::decode_wire(raw)
+            }
+
+            #[inline]
+            unsafe fn deallocate_element<A: Allocator + Clone>(_elem: E, _alloc: A) {}
+
+            fn merge_occurrence<A, B, F>(
+                wire_type: WireType,
+                buf: &mut B,
+                _alloc: A,
+                mut push: F,
+            ) -> Result<(), DecodeError>
+            where
+                A: Allocator + Clone,
+                B: Buf,
+                F: FnMut(E),
+            {
+                match wire_type {
+                    WireType::Len => {
+                        let len = decode::decode_varint(buf)? as usize;
+                        if buf.remaining() < len {
+                            return Err(DecodeError::TruncatedMessage);
+                        }
+                        let mut sub = buf.take(len);
+                        while sub.has_remaining() {
+                            let raw = decode::decode_varint(&mut sub)?;
+                            push(<ProtoEnum<E, $kind> as VarintProtoType>::decode_wire(raw)?);
+                        }
+                    }
+                    WireType::Varint => {
+                        let raw = decode::decode_varint(buf)?;
+                        push(<ProtoEnum<E, $kind> as VarintProtoType>::decode_wire(raw)?);
+                    }
+                    _ => return Err(DecodeError::InvalidTag),
+                }
+                Ok(())
+            }
+        }
+
+        impl<E: $bound> PackableRepeatedItems for ProtoEnum<E, $kind> {
+            #[inline]
+            fn encode_wire<A: Allocator + Clone>(value: E) -> u64 {
+                <ProtoEnum<E, $kind> as VarintProtoType>::encode_wire(value)
+            }
+
+            #[inline]
+            fn decode_wire<A: Allocator + Clone>(raw: u64) -> Result<E, DecodeError> {
+                <ProtoEnum<E, $kind> as VarintProtoType>::decode_wire(raw)
+            }
+        }
+    };
 }
+
+impl_packable_enum_repeated!(Open, OpenEnum);
+impl_packable_enum_repeated!(Closed, ClosedEnum);
 
 // ---------------------------------------------------------------------------
 // LEN markers
 // ---------------------------------------------------------------------------
 
-impl<A: Allocator + Clone> RepeatedItems for ProtoString<A> {
-    type Element = <Self as LenProtoType>::Storage;
+impl RepeatedItems for ProtoString {
+    type Element<A: Allocator + Clone> = UnmanagedString<A>;
 
     #[inline]
-    fn encoded_len_element(elem: &Self::Element, field: u32) -> usize {
+    fn encoded_len_element<A: Allocator + Clone>(elem: &UnmanagedString<A>, field: u32) -> usize {
         encode::encoded_len_len_field(field, <Self as LenProtoType>::as_bytes(elem).len())
     }
 
     #[inline]
-    fn encode_element<B: BufMut>(elem: &Self::Element, field: u32, buf: &mut B) {
+    fn encode_element<A: Allocator + Clone, B: BufMut>(
+        elem: &UnmanagedString<A>,
+        field: u32,
+        buf: &mut B,
+    ) {
         encode::encode_len_field(field, <Self as LenProtoType>::as_bytes(elem), buf);
     }
 
     #[inline]
-    fn decode_element<B: Buf>(
+    fn decode_element<A: Allocator + Clone, B: Buf>(
         wire_type: WireType,
         buf: &mut B,
         alloc: A,
-    ) -> Result<Self::Element, DecodeError> {
+    ) -> Result<UnmanagedString<A>, DecodeError> {
         if wire_type != WireType::Len {
             return Err(DecodeError::InvalidTag);
         }
@@ -205,53 +310,61 @@ impl<A: Allocator + Clone> RepeatedItems for ProtoString<A> {
     }
 
     #[inline]
-    unsafe fn deallocate_element(elem: Self::Element, alloc: A) {
+    unsafe fn deallocate_element<A: Allocator + Clone>(elem: UnmanagedString<A>, alloc: A) {
         // SAFETY: forwarded to the caller's obligation on `alloc`.
         unsafe { DeallocateIn::deallocate_in(elem, alloc) };
     }
 
     #[inline]
-    fn merge_occurrence<B, F>(
+    fn merge_occurrence<A, B, F>(
         wire_type: WireType,
         buf: &mut B,
         alloc: A,
         mut push: F,
     ) -> Result<(), DecodeError>
     where
+        A: Allocator + Clone,
         B: Buf,
-        F: FnMut(Self::Element),
+        F: FnMut(UnmanagedString<A>),
     {
         push(Self::decode_element(wire_type, buf, alloc)?);
         Ok(())
     }
 }
 
-impl<A: Allocator + Clone> RepeatedSlicePush for ProtoString<A> {
+impl RepeatedSlicePush for ProtoString {
     #[inline]
-    fn element_from_slice(v: &[u8], alloc: A) -> Result<Self::Element, DecodeError> {
+    fn element_from_slice<A: Allocator + Clone>(
+        v: &[u8],
+        alloc: A,
+    ) -> Result<UnmanagedString<A>, DecodeError> {
         <Self as LenProtoType>::store_from_slice(v, alloc)
     }
 }
 
-impl<A: Allocator + Clone> RepeatedItems for ProtoBytes<A> {
-    type Element = <Self as LenProtoType>::Storage;
+impl RepeatedItems for ProtoBytes {
+    type Element<A: Allocator + Clone> = UnmanagedVec<u8, A>;
 
     #[inline]
-    fn encoded_len_element(elem: &Self::Element, field: u32) -> usize {
+    fn encoded_len_element<A: Allocator + Clone>(elem: &UnmanagedVec<u8, A>, field: u32) -> usize {
         encode::encoded_len_len_field(field, <Self as LenProtoType>::as_bytes(elem).len())
     }
 
     #[inline]
-    fn encode_element<B: BufMut>(elem: &Self::Element, field: u32, buf: &mut B) {
+    fn encode_element<A: Allocator + Clone, B: BufMut>(
+        elem: &UnmanagedVec<u8, A>,
+        field: u32,
+        buf: &mut B,
+    ) {
         encode::encode_len_field(field, <Self as LenProtoType>::as_bytes(elem), buf);
     }
 
     #[inline]
-    fn decode_element<B: Buf>(
+    fn decode_element<A: Allocator + Clone, B: Buf>(
         wire_type: WireType,
         buf: &mut B,
         alloc: A,
-    ) -> Result<Self::Element, DecodeError> {
+    ) -> Result<UnmanagedVec<u8, A>, DecodeError> {
         if wire_type != WireType::Len {
             return Err(DecodeError::InvalidTag);
         }
@@ -259,30 +372,34 @@ impl<A: Allocator + Clone> RepeatedItems for ProtoBytes<A> {
     }
 
     #[inline]
-    unsafe fn deallocate_element(elem: Self::Element, alloc: A) {
+    unsafe fn deallocate_element<A: Allocator + Clone>(elem: UnmanagedVec<u8, A>, alloc: A) {
         // SAFETY: forwarded to the caller's obligation on `alloc`.
         unsafe { DeallocateIn::deallocate_in(elem, alloc) };
     }
 
     #[inline]
-    fn merge_occurrence<B, F>(
+    fn merge_occurrence<A, B, F>(
         wire_type: WireType,
         buf: &mut B,
         alloc: A,
         mut push: F,
     ) -> Result<(), DecodeError>
     where
+        A: Allocator + Clone,
         B: Buf,
-        F: FnMut(Self::Element),
+        F: FnMut(UnmanagedVec<u8, A>),
     {
         push(Self::decode_element(wire_type, buf, alloc)?);
         Ok(())
     }
 }
 
-impl<A: Allocator + Clone> RepeatedSlicePush for ProtoBytes<A> {
+impl RepeatedSlicePush for ProtoBytes {
     #[inline]
-    fn element_from_slice(v: &[u8], alloc: A) -> Result<Self::Element, DecodeError> {
+    fn element_from_slice<A: Allocator + Clone>(
+        v: &[u8],
+        alloc: A,
+    ) -> Result<UnmanagedVec<u8, A>, DecodeError> {
         <Self as LenProtoType>::store_from_slice(v, alloc)
     }
 }

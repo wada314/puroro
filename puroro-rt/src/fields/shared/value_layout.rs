@@ -14,86 +14,87 @@ use ::bytes::Buf;
 use ::puroro::DecodeError;
 
 use super::{
-    MessageCommon, PresenceBits,
+    DeallocateIn, DefaultIn, MessageCommon, PresenceBits,
     slot_init::SlotInitMut,
-    value_slot::{ValueSlot, ValueSlotMutAccess},
+    value_slot::{AddressableSlot, ValueSlot, ValueSlotMutAccess},
 };
 use crate::decode;
 use crate::fields::wire::proto_type::{PayloadAccess, ProtoType};
 use crate::fields::wire::varint::ProtoBool;
 
 /// Where a singular field's logical value is stored.
-pub trait ValueLayout<T: ProtoType>: Copy {
-    fn is_proto_empty<Pb: PresenceBits>(
-        slot: &T::Slot,
-        common: &MessageCommon<Pb, T::Alloc>,
-    ) -> bool;
+pub trait ValueLayout<T: ProtoType, A: Allocator + Clone>: Copy
+where
+    T::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
+{
+    fn is_proto_empty<Pb: PresenceBits>(slot: &T::Slot<A>, common: &MessageCommon<Pb, A>) -> bool;
 
     fn get<'a, Pb: PresenceBits>(
-        slot: &'a T::Slot,
-        common: &'a MessageCommon<Pb, T::Alloc>,
-    ) -> T::Ref<'a>;
+        slot: &'a T::Slot<A>,
+        common: &'a MessageCommon<Pb, A>,
+    ) -> T::Ref<'a, A>;
 
     fn with_mut<'a, VS, I, Pb>(
         slot: &'a mut VS,
         init: I,
-        common: &'a mut MessageCommon<Pb, T::Alloc>,
-    ) -> T::Mut<'a>
+        common: &'a mut MessageCommon<Pb, A>,
+    ) -> T::Mut<'a, A>
     where
-        VS: ValueSlot<T::Slot>,
+        VS: ValueSlot<T::Slot<A>, A>,
         I: SlotInitMut,
         Pb: PresenceBits,
-        T: 'a;
+        T: 'a,
+        A: 'a;
 
     fn write<VS, I, Pb>(
         slot: &mut VS,
         init: I,
-        common: &mut MessageCommon<Pb, T::Alloc>,
-        value: T::Written,
+        common: &mut MessageCommon<Pb, A>,
+        value: T::Written<A>,
     ) where
-        VS: ValueSlot<T::Slot>,
+        VS: ValueSlot<T::Slot<A>, A>,
         I: SlotInitMut,
         Pb: PresenceBits;
 
-    fn clear<VS, I, Pb>(slot: &mut VS, init: I, common: &mut MessageCommon<Pb, T::Alloc>)
+    fn clear<VS, I, Pb>(slot: &mut VS, init: I, common: &mut MessageCommon<Pb, A>)
     where
-        VS: ValueSlot<T::Slot>,
+        VS: ValueSlot<T::Slot<A>, A>,
         I: SlotInitMut,
         Pb: PresenceBits;
 
     fn merge<VS, I, Pb, B>(
         slot: &mut VS,
         init: I,
-        common: &mut MessageCommon<Pb, T::Alloc>,
+        common: &mut MessageCommon<Pb, A>,
         wire_type: ::puroro::WireType,
         buf: &mut B,
         field: u32,
     ) -> Result<(), DecodeError>
     where
-        VS: ValueSlot<T::Slot>,
+        VS: ValueSlot<T::Slot<A>, A>,
         I: SlotInitMut,
         Pb: PresenceBits,
         B: Buf;
 }
 
-/// Value lives in the field slot payload (`T::Slot`).
+/// Value lives in the field slot payload (`T::Slot<A>`).
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
 pub struct Inline;
 
-impl<T: PayloadAccess> ValueLayout<T> for Inline {
+impl<T: PayloadAccess, A: Allocator + Clone> ValueLayout<T, A> for Inline
+where
+    T::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
+{
     #[inline]
-    fn is_proto_empty<Pb: PresenceBits>(
-        slot: &T::Slot,
-        common: &MessageCommon<Pb, T::Alloc>,
-    ) -> bool {
+    fn is_proto_empty<Pb: PresenceBits>(slot: &T::Slot<A>, common: &MessageCommon<Pb, A>) -> bool {
         T::is_proto_empty(slot, common)
     }
 
     #[inline]
     fn get<'a, Pb: PresenceBits>(
-        slot: &'a T::Slot,
-        common: &'a MessageCommon<Pb, T::Alloc>,
-    ) -> T::Ref<'a> {
+        slot: &'a T::Slot<A>,
+        common: &'a MessageCommon<Pb, A>,
+    ) -> T::Ref<'a, A> {
         T::get(slot, common)
     }
 
@@ -101,13 +102,14 @@ impl<T: PayloadAccess> ValueLayout<T> for Inline {
     fn with_mut<'a, VS, I, Pb>(
         slot: &'a mut VS,
         init: I,
-        common: &'a mut MessageCommon<Pb, T::Alloc>,
-    ) -> T::Mut<'a>
+        common: &'a mut MessageCommon<Pb, A>,
+    ) -> T::Mut<'a, A>
     where
-        VS: ValueSlot<T::Slot>,
+        VS: ValueSlot<T::Slot<A>, A>,
         I: SlotInitMut,
         Pb: PresenceBits,
         T: 'a,
+        A: 'a,
     {
         T::with_mut(slot, init, common)
     }
@@ -116,10 +118,10 @@ impl<T: PayloadAccess> ValueLayout<T> for Inline {
     fn write<VS, I, Pb>(
         slot: &mut VS,
         init: I,
-        common: &mut MessageCommon<Pb, T::Alloc>,
-        value: T::Written,
+        common: &mut MessageCommon<Pb, A>,
+        value: T::Written<A>,
     ) where
-        VS: ValueSlot<T::Slot>,
+        VS: ValueSlot<T::Slot<A>, A>,
         I: SlotInitMut,
         Pb: PresenceBits,
     {
@@ -127,9 +129,9 @@ impl<T: PayloadAccess> ValueLayout<T> for Inline {
     }
 
     #[inline]
-    fn clear<VS, I, Pb>(slot: &mut VS, init: I, common: &mut MessageCommon<Pb, T::Alloc>)
+    fn clear<VS, I, Pb>(slot: &mut VS, init: I, common: &mut MessageCommon<Pb, A>)
     where
-        VS: ValueSlot<T::Slot>,
+        VS: ValueSlot<T::Slot<A>, A>,
         I: SlotInitMut,
         Pb: PresenceBits,
     {
@@ -140,13 +142,13 @@ impl<T: PayloadAccess> ValueLayout<T> for Inline {
     fn merge<VS, I, Pb, B>(
         slot: &mut VS,
         init: I,
-        common: &mut MessageCommon<Pb, T::Alloc>,
+        common: &mut MessageCommon<Pb, A>,
         wire_type: ::puroro::WireType,
         buf: &mut B,
         field: u32,
     ) -> Result<(), DecodeError>
     where
-        VS: ValueSlot<T::Slot>,
+        VS: ValueSlot<T::Slot<A>, A>,
         I: SlotInitMut,
         Pb: PresenceBits,
         B: Buf,
@@ -161,22 +163,18 @@ impl<T: PayloadAccess> ValueLayout<T> for Inline {
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
 pub struct BitPacked<const VALUE_BIT: usize>;
 
-impl<A: Allocator + Clone, const VALUE_BIT: usize> ValueLayout<ProtoBool<A>>
+impl<A: Allocator + Clone, const VALUE_BIT: usize> ValueLayout<ProtoBool, A>
     for BitPacked<VALUE_BIT>
+where
+    (): AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
 {
     #[inline]
-    fn is_proto_empty<Pb: PresenceBits>(
-        _slot: &ProtoBool<A>,
-        common: &MessageCommon<Pb, A>,
-    ) -> bool {
+    fn is_proto_empty<Pb: PresenceBits>(_slot: &(), common: &MessageCommon<Pb, A>) -> bool {
         !common.is_bit_set(VALUE_BIT)
     }
 
     #[inline]
-    fn get<'a, Pb: PresenceBits>(
-        _slot: &'a ProtoBool<A>,
-        common: &'a MessageCommon<Pb, A>,
-    ) -> bool {
+    fn get<'a, Pb: PresenceBits>(_slot: &'a (), common: &'a MessageCommon<Pb, A>) -> bool {
         common.is_bit_set(VALUE_BIT)
     }
 
@@ -187,10 +185,11 @@ impl<A: Allocator + Clone, const VALUE_BIT: usize> ValueLayout<ProtoBool<A>>
         common: &'a mut MessageCommon<Pb, A>,
     ) -> BitRef<'a, Mut, u8, Lsb0>
     where
-        VS: ValueSlot<ProtoBool<A>>,
+        VS: ValueSlot<(), A>,
         I: SlotInitMut,
         Pb: PresenceBits,
-        ProtoBool<A>: 'a,
+        ProtoBool: 'a,
+        A: 'a,
     {
         let _ = ValueSlot::with_mut(slot, init, common).get_mut();
         common.bit_mut(VALUE_BIT)
@@ -199,7 +198,7 @@ impl<A: Allocator + Clone, const VALUE_BIT: usize> ValueLayout<ProtoBool<A>>
     #[inline]
     fn write<VS, I, Pb>(slot: &mut VS, init: I, common: &mut MessageCommon<Pb, A>, value: bool)
     where
-        VS: ValueSlot<ProtoBool<A>>,
+        VS: ValueSlot<(), A>,
         I: SlotInitMut,
         Pb: PresenceBits,
     {
@@ -210,7 +209,7 @@ impl<A: Allocator + Clone, const VALUE_BIT: usize> ValueLayout<ProtoBool<A>>
     #[inline]
     fn clear<VS, I, Pb>(slot: &mut VS, init: I, common: &mut MessageCommon<Pb, A>)
     where
-        VS: ValueSlot<ProtoBool<A>>,
+        VS: ValueSlot<(), A>,
         I: SlotInitMut,
         Pb: PresenceBits,
     {
@@ -228,12 +227,12 @@ impl<A: Allocator + Clone, const VALUE_BIT: usize> ValueLayout<ProtoBool<A>>
         field: u32,
     ) -> Result<(), DecodeError>
     where
-        VS: ValueSlot<ProtoBool<A>>,
+        VS: ValueSlot<(), A>,
         I: SlotInitMut,
         Pb: PresenceBits,
         B: Buf,
     {
-        match ProtoBool::<A>::decode(wire_type, buf, common.alloc.clone()) {
+        match ProtoBool::decode(wire_type, buf, common.alloc.clone()) {
             Ok(new) => {
                 Self::write(slot, init, common, new);
                 Ok(())

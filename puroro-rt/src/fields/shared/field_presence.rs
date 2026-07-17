@@ -14,8 +14,9 @@ use ::core::mem::MaybeUninit;
 use ::puroro::DecodeError;
 
 use super::{
-    DeallocateIn, DefaultIn, MessageCommon, PresenceBits, ProtoEmpty,
+    MessageCommon, PresenceBits, ProtoEmpty,
     slot_init::{AlwaysInitialized, BitInit, SlotInitMut, SlotInitView},
+    value_slot::AddressableSlot,
 };
 
 /// Encode / merge / clear behaviour for singular field presence.
@@ -28,7 +29,7 @@ pub trait FieldPresence: Copy {
     /// The `ValueSlot<T>` bound is enforced at use sites ([`SingularField`]).
     /// `T` here is the **slot** payload ([`ProtoType::Slot`](crate::ProtoType)),
     /// not the protobuf type marker.
-    type ValueSlot<T: DefaultIn + DeallocateIn>;
+    type ValueSlot<T: AddressableSlot>;
 
     /// Borrow-free mutable init-state marker.
     type SlotInitMut: SlotInitMut;
@@ -45,9 +46,7 @@ pub trait FieldPresence: Copy {
     /// `true` when the stored payload equals the protobuf empty / type-zero.
     ///
     /// Only [`Implicit`] consults the slot; bitfield-backed policies never call this.
-    fn payload_is_empty<T: DefaultIn + DeallocateIn + ProtoEmpty>(
-        slot: &Self::ValueSlot<T>,
-    ) -> bool;
+    fn payload_is_empty<T: AddressableSlot + ProtoEmpty>(slot: &Self::ValueSlot<T>) -> bool;
 
     /// `true` when this field should be written on the wire.
     ///
@@ -76,7 +75,7 @@ pub trait FieldPresence: Copy {
 pub struct Implicit;
 
 impl FieldPresence for Implicit {
-    type ValueSlot<T: DefaultIn + DeallocateIn> = T;
+    type ValueSlot<T: AddressableSlot> = T;
     type SlotInitMut = AlwaysInitialized;
     type SlotInitView = AlwaysInitialized;
 
@@ -88,7 +87,7 @@ impl FieldPresence for Implicit {
         AlwaysInitialized
     }
 
-    fn payload_is_empty<T: DefaultIn + DeallocateIn + ProtoEmpty>(slot: &T) -> bool {
+    fn payload_is_empty<T: AddressableSlot + ProtoEmpty>(slot: &T) -> bool {
         slot.is_proto_empty()
     }
 
@@ -119,7 +118,7 @@ impl FieldPresence for Implicit {
 pub struct NonOneof;
 
 impl FieldPresence for NonOneof {
-    type ValueSlot<T: DefaultIn + DeallocateIn> = Option<T>;
+    type ValueSlot<T: AddressableSlot> = Option<T>;
     type SlotInitMut = AlwaysInitialized;
     type SlotInitView = AlwaysInitialized;
 
@@ -131,7 +130,7 @@ impl FieldPresence for NonOneof {
         AlwaysInitialized
     }
 
-    fn payload_is_empty<T: DefaultIn + DeallocateIn + ProtoEmpty>(slot: &Option<T>) -> bool {
+    fn payload_is_empty<T: AddressableSlot + ProtoEmpty>(slot: &Option<T>) -> bool {
         slot.is_none()
     }
 
@@ -161,7 +160,7 @@ impl FieldPresence for NonOneof {
 pub struct Oneof;
 
 impl FieldPresence for Oneof {
-    type ValueSlot<T: DefaultIn + DeallocateIn> = T;
+    type ValueSlot<T: AddressableSlot> = T;
     type SlotInitMut = AlwaysInitialized;
     type SlotInitView = AlwaysInitialized;
 
@@ -173,7 +172,7 @@ impl FieldPresence for Oneof {
         AlwaysInitialized
     }
 
-    fn payload_is_empty<T: DefaultIn + DeallocateIn + ProtoEmpty>(_slot: &T) -> bool {
+    fn payload_is_empty<T: AddressableSlot + ProtoEmpty>(_slot: &T) -> bool {
         false
     }
 
@@ -207,7 +206,7 @@ impl<const BIT: usize> Default for Explicit<BIT> {
 }
 
 impl<const BIT: usize> FieldPresence for Explicit<BIT> {
-    type ValueSlot<T: DefaultIn + DeallocateIn> = MaybeUninit<T>;
+    type ValueSlot<T: AddressableSlot> = MaybeUninit<T>;
     type SlotInitMut = BitInit<BIT>;
     type SlotInitView = BitInit<BIT>;
 
@@ -219,7 +218,7 @@ impl<const BIT: usize> FieldPresence for Explicit<BIT> {
         BitInit
     }
 
-    fn payload_is_empty<T: DefaultIn + DeallocateIn + ProtoEmpty>(_slot: &MaybeUninit<T>) -> bool {
+    fn payload_is_empty<T: AddressableSlot + ProtoEmpty>(_slot: &MaybeUninit<T>) -> bool {
         false
     }
 
@@ -254,7 +253,7 @@ impl<const BIT: usize> Default for LegacyRequired<BIT> {
 }
 
 impl<const BIT: usize> FieldPresence for LegacyRequired<BIT> {
-    type ValueSlot<T: DefaultIn + DeallocateIn> = MaybeUninit<T>;
+    type ValueSlot<T: AddressableSlot> = MaybeUninit<T>;
     type SlotInitMut = BitInit<BIT>;
     type SlotInitView = BitInit<BIT>;
 
@@ -266,7 +265,7 @@ impl<const BIT: usize> FieldPresence for LegacyRequired<BIT> {
         BitInit
     }
 
-    fn payload_is_empty<T: DefaultIn + DeallocateIn + ProtoEmpty>(_slot: &MaybeUninit<T>) -> bool {
+    fn payload_is_empty<T: AddressableSlot + ProtoEmpty>(_slot: &MaybeUninit<T>) -> bool {
         false
     }
 

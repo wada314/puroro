@@ -1,11 +1,10 @@
 //! Wire semantics for singular (non-repeated) field type markers.
 //!
-//! Each implementor is a **protobuf type marker** (`ProtoInt32`, `ProtoBool`,
-//! [`ProtoMessage`](super::proto_message::ProtoMessage), …). The physical field
-//! slot is the associated [`Slot`](ProtoType::Slot).
+//! Markers (`ProtoInt32`, `ProtoBool`, [`ProtoMessage`](super::proto_message::ProtoMessage), …)
+//! are allocator-free. Physical storage / views are GATs parametrised by `A`.
 //!
-//! **Storage access** (get / write / clear / merge) lives on
-//! [`PayloadAccess`] for inline payloads, or on
+//! **Storage access** (get / write / clear / merge) lives on [`PayloadAccess`]
+//! for inline payloads, or on
 //! [`ValueLayout`](crate::fields::shared::value_layout::ValueLayout)
 //! (`BitPacked`) for singular / oneof `bool`. [`SingularField`](crate::fields::singular::field::SingularField)
 //! always goes through `ValueLayout`.
@@ -20,7 +19,10 @@ use ::bitvec::{
     ptr::{BitRef, Mut},
 };
 use ::bytes::{Buf, BufMut};
-use ::core::ops::{Deref, DerefMut};
+use ::core::ops::DerefMut;
+use ::unmanaged::string::StringGuard;
+use ::unmanaged::vec::VecGuard;
+use ::unmanaged::{UnmanagedString, UnmanagedVec};
 
 use ::puroro::DecodeError;
 use ::puroro::WireType;
@@ -28,61 +30,74 @@ use ::puroro::WireType;
 use crate::decode;
 use crate::encode;
 use crate::fields::shared::{
-    DefaultIn, MessageCommon, PresenceBits, ProtoEmpty,
+    DeallocateIn, DefaultIn, MessageCommon, PresenceBits, ProtoEmpty,
     slot_init::SlotInitMut,
     value_slot::{AddressableSlot, ValueSlot, ValueSlotMutAccess},
 };
 
 use super::len::{LenProtoType, ProtoBytes, ProtoString};
-use super::varint::{ProtoBool, VarintProtoType};
+use super::varint::{
+    Closed, ClosedEnum, Open, OpenEnum, ProtoBool, ProtoEnum, ProtoInt32, ProtoInt64, ProtoSint32,
+    ProtoSint64, ProtoUInt32, ProtoUInt64, VarintProtoType,
+};
 
 /// Wire + type-identity for a singular protobuf type marker.
 ///
-/// Physical storage is [`Slot`](Self::Slot):
-/// - addressable wrappers: `Slot = Self`
-/// - [`ProtoBool`]: `Slot = Self` (ZST; logical `bool` via [`BitPacked`](crate::fields::shared::value_layout::BitPacked))
-/// - nested messages: `Slot = UnmanagedBox<M, A>` via [`ProtoMessage`](super::proto_message::ProtoMessage)
+/// Physical storage is the GAT [`Slot`](Self::Slot):
+/// - numerics / enums: bare `i32` / `E` / …
+/// - [`ProtoBool`]: `()` (ZST; logical `bool` via [`BitPacked`](crate::fields::shared::value_layout::BitPacked))
+/// - string / bytes: `UnmanagedString` / `UnmanagedVec`
+/// - nested messages: `UnmanagedBox<M, A>` via [`ProtoMessage`](super::proto_message::ProtoMessage)
 pub trait ProtoType: Sized {
-    /// Allocator type retained by the marker and its physical slot.
-    type Alloc: Allocator + Clone;
-
     /// Physical value stored in the singular field slot (excluding
     /// [`MessageCommon`] bits).
-    type Slot: AddressableSlot<SlotAlloc = Self::Alloc> + DefaultIn<Alloc = Self::Alloc>;
+    ///
+    /// Call sites ([`SingularField`](crate::fields::singular::field::SingularField))
+    /// require `Slot<A>: AddressableSlot<SlotAlloc = A> + DefaultIn<Alloc = A>`.
+    /// Nested messages use `UnmanagedBox<M, M::Alloc>`; that unifies with the
+    /// field's `A` when `M = Msg<A>`.
+    type Slot<A: Allocator + Clone>;
 
     /// Borrowed / by-value view returned by getters (`i32`, `&str`, `bool`, …).
-    type Ref<'a>
+    type Ref<'a, A: Allocator + Clone>
     where
-        Self: 'a;
+        Self: 'a,
+        A: 'a;
 
     /// Mutable handle returned by `_mut` accessors (`&mut i32`, `StringGuard`,
     /// bit handle, …).
-    type Mut<'a>: DerefMut
+    type Mut<'a, A: Allocator + Clone>: DerefMut
     where
-        Self: 'a;
+        Self: 'a,
+        A: 'a;
 
     /// Value accepted by `set` / produced by [`decode`](Self::decode).
-    type Written;
+    type Written<A: Allocator + Clone>;
 
     /// Expected wire type for a singular occurrence of this field.
     const WIRE_TYPE: WireType;
 
     /// Wire byte length of one tagged occurrence for `value`.
-    fn encoded_len<'a>(value: Self::Ref<'a>, field: u32) -> usize
+    fn encoded_len<'a, A: Allocator + Clone>(value: Self::Ref<'a, A>, field: u32) -> usize
     where
-        Self: 'a;
+        Self: 'a,
+        A: 'a;
 
     /// Encodes one tagged occurrence for `value`.
-    fn encode<'a, B: BufMut>(value: Self::Ref<'a>, field: u32, buf: &mut B)
-    where
-        Self: 'a;
+    fn encode<'a, A: Allocator + Clone, B: BufMut>(
+        value: Self::Ref<'a, A>,
+        field: u32,
+        buf: &mut B,
+    ) where
+        Self: 'a,
+        A: 'a;
 
     /// Decodes one occurrence after the tag has been read (`wire_type` checked here).
-    fn decode<B: Buf>(
+    fn decode<A: Allocator + Clone, B: Buf>(
         wire_type: WireType,
         buf: &mut B,
-        alloc: Self::Alloc,
-    ) -> Result<Self::Written, DecodeError>;
+        alloc: A,
+    ) -> Result<Self::Written<A>, DecodeError>;
 }
 
 /// Inline payload access for markers whose value lives in [`ProtoType::Slot`].
@@ -91,44 +106,52 @@ pub trait ProtoType: Sized {
 /// [`BitPacked`](crate::fields::shared::value_layout::BitPacked) instead.
 pub trait PayloadAccess: ProtoType {
     /// `true` when the field holds protobuf empty / type-zero (IMPLICIT omit).
-    fn is_proto_empty<Pb: PresenceBits>(
-        slot: &Self::Slot,
-        common: &MessageCommon<Pb, Self::Alloc>,
+    fn is_proto_empty<A: Allocator + Clone, Pb: PresenceBits>(
+        slot: &Self::Slot<A>,
+        common: &MessageCommon<Pb, A>,
     ) -> bool;
 
     /// Reads the logical getter view from the slot and/or `common`.
-    fn get<'a, Pb: PresenceBits>(
-        slot: &'a Self::Slot,
-        common: &'a MessageCommon<Pb, Self::Alloc>,
-    ) -> Self::Ref<'a>;
+    fn get<'a, A: Allocator + Clone, Pb: PresenceBits>(
+        slot: &'a Self::Slot<A>,
+        common: &'a MessageCommon<Pb, A>,
+    ) -> Self::Ref<'a, A>
+    where
+        A: 'a;
 
     /// Ensures the slot is present and returns a mutable accessor handle.
-    fn with_mut<'a, VS, I, Pb>(
+    fn with_mut<'a, A, VS, I, Pb>(
         slot: &'a mut VS,
         init: I,
-        common: &'a mut MessageCommon<Pb, Self::Alloc>,
-    ) -> Self::Mut<'a>
+        common: &'a mut MessageCommon<Pb, A>,
+    ) -> Self::Mut<'a, A>
     where
-        VS: ValueSlot<Self::Slot>,
+        A: Allocator + Clone + 'a,
+        Self::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
+        VS: ValueSlot<Self::Slot<A>, A>,
         I: SlotInitMut,
         Pb: PresenceBits,
         Self: 'a;
 
     /// Writes `value`, ensuring slot presence when applicable.
-    fn write<VS, I, Pb>(
+    fn write<A, VS, I, Pb>(
         slot: &mut VS,
         init: I,
-        common: &mut MessageCommon<Pb, Self::Alloc>,
-        value: Self::Written,
+        common: &mut MessageCommon<Pb, A>,
+        value: Self::Written<A>,
     ) where
-        VS: ValueSlot<Self::Slot>,
+        A: Allocator + Clone,
+        Self::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
+        VS: ValueSlot<Self::Slot<A>, A>,
         I: SlotInitMut,
         Pb: PresenceBits;
 
     /// Clears the logical value and slot presence / payload.
-    fn clear<VS, I, Pb>(slot: &mut VS, init: I, common: &mut MessageCommon<Pb, Self::Alloc>)
+    fn clear<A, VS, I, Pb>(slot: &mut VS, init: I, common: &mut MessageCommon<Pb, A>)
     where
-        VS: ValueSlot<Self::Slot>,
+        A: Allocator + Clone,
+        Self::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
+        VS: ValueSlot<Self::Slot<A>, A>,
         I: SlotInitMut,
         Pb: PresenceBits;
 
@@ -137,16 +160,18 @@ pub trait PayloadAccess: ProtoType {
     /// Default: decode then [`write`](Self::write) (last wins). Closed-enum
     /// unknowns are parked in `common.unknown_fields`. Nested messages override
     /// this for recursive merge-into.
-    fn merge<VS, I, Pb, B>(
+    fn merge<A, VS, I, Pb, B>(
         slot: &mut VS,
         init: I,
-        common: &mut MessageCommon<Pb, Self::Alloc>,
+        common: &mut MessageCommon<Pb, A>,
         wire_type: WireType,
         buf: &mut B,
         field: u32,
     ) -> Result<(), DecodeError>
     where
-        VS: ValueSlot<Self::Slot>,
+        A: Allocator + Clone,
+        Self::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
+        VS: ValueSlot<Self::Slot<A>, A>,
         I: SlotInitMut,
         Pb: PresenceBits,
         B: Buf,
@@ -171,206 +196,367 @@ pub trait PayloadAccess: ProtoType {
 }
 
 // ---------------------------------------------------------------------------
-// Addressable varint wrappers (Slot = Self): numerics + ProtoEnum
+// Numeric varint markers (Slot = bare wire value)
 // ---------------------------------------------------------------------------
 
-impl<T> ProtoType for T
-where
-    T: VarintProtoType + AddressableSlot + From<T::Value> + ProtoEmpty,
-    T: Deref<Target = T::Value> + DerefMut,
-{
-    type Alloc = T::SlotAlloc;
-    type Slot = Self;
-    type Ref<'a>
-        = T::Value
-    where
-        Self: 'a;
-    type Mut<'a>
-        = &'a mut T::Value
-    where
-        Self: 'a;
-    type Written = Self;
-    const WIRE_TYPE: WireType = WireType::Varint;
+macro_rules! impl_varint_proto_type {
+    ($marker:ty, $inner:ty) => {
+        impl ProtoType for $marker {
+            type Slot<A: Allocator + Clone> = $inner;
+            type Ref<'a, A: Allocator + Clone>
+                = $inner
+            where
+                Self: 'a,
+                A: 'a;
+            type Mut<'a, A: Allocator + Clone>
+                = &'a mut $inner
+            where
+                Self: 'a,
+                A: 'a;
+            type Written<A: Allocator + Clone> = $inner;
+            const WIRE_TYPE: WireType = WireType::Varint;
 
-    #[inline]
-    fn encoded_len<'a>(value: Self::Ref<'a>, field: u32) -> usize
-    where
-        Self: 'a,
-    {
-        encode::encoded_len_varint_field(field, T::encode_wire(value))
-    }
+            #[inline]
+            fn encoded_len<'a, A: Allocator + Clone>(value: $inner, field: u32) -> usize
+            where
+                Self: 'a,
+                A: 'a,
+            {
+                encode::encoded_len_varint_field(
+                    field,
+                    <$marker as VarintProtoType>::encode_wire(value),
+                )
+            }
 
-    #[inline]
-    fn encode<'a, B: BufMut>(value: Self::Ref<'a>, field: u32, buf: &mut B)
-    where
-        Self: 'a,
-    {
-        encode::encode_varint_field(field, T::encode_wire(value), buf);
-    }
+            #[inline]
+            fn encode<'a, A: Allocator + Clone, B: BufMut>(value: $inner, field: u32, buf: &mut B)
+            where
+                Self: 'a,
+                A: 'a,
+            {
+                encode::encode_varint_field(
+                    field,
+                    <$marker as VarintProtoType>::encode_wire(value),
+                    buf,
+                );
+            }
 
-    #[inline]
-    fn decode<B: Buf>(
-        wire_type: WireType,
-        buf: &mut B,
-        _alloc: Self::Alloc,
-    ) -> Result<Self::Written, DecodeError> {
-        if wire_type != WireType::Varint {
-            return Err(DecodeError::InvalidTag);
+            #[inline]
+            fn decode<A: Allocator + Clone, B: Buf>(
+                wire_type: WireType,
+                buf: &mut B,
+                _alloc: A,
+            ) -> Result<$inner, DecodeError> {
+                if wire_type != WireType::Varint {
+                    return Err(DecodeError::InvalidTag);
+                }
+                let raw = decode::decode_varint(buf)?;
+                Ok(<$marker as VarintProtoType>::decode_wire(raw)?)
+            }
         }
-        let raw = decode::decode_varint(buf)?;
-        Ok(Self::from(T::decode_wire(raw)?))
-    }
+
+        impl PayloadAccess for $marker {
+            #[inline]
+            fn is_proto_empty<A: Allocator + Clone, Pb: PresenceBits>(
+                slot: &$inner,
+                _common: &MessageCommon<Pb, A>,
+            ) -> bool {
+                slot.is_proto_empty()
+            }
+
+            #[inline]
+            fn get<'a, A: Allocator + Clone, Pb: PresenceBits>(
+                slot: &'a $inner,
+                _common: &'a MessageCommon<Pb, A>,
+            ) -> $inner
+            where
+                A: 'a,
+            {
+                *slot
+            }
+
+            #[inline]
+            fn with_mut<'a, A, VS, I, Pb>(
+                slot: &'a mut VS,
+                init: I,
+                common: &'a mut MessageCommon<Pb, A>,
+            ) -> &'a mut $inner
+            where
+                A: Allocator + Clone + 'a,
+                $inner: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
+                VS: ValueSlot<$inner, A>,
+                I: SlotInitMut,
+                Pb: PresenceBits,
+                Self: 'a,
+            {
+                ValueSlot::with_mut(slot, init, common).get_mut()
+            }
+
+            #[inline]
+            fn write<A, VS, I, Pb>(
+                slot: &mut VS,
+                init: I,
+                common: &mut MessageCommon<Pb, A>,
+                value: $inner,
+            ) where
+                A: Allocator + Clone,
+                $inner: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
+                VS: ValueSlot<$inner, A>,
+                I: SlotInitMut,
+                Pb: PresenceBits,
+            {
+                ValueSlot::with_mut(slot, init, common).set(value);
+            }
+
+            #[inline]
+            fn clear<A, VS, I, Pb>(slot: &mut VS, init: I, common: &mut MessageCommon<Pb, A>)
+            where
+                A: Allocator + Clone,
+                $inner: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
+                VS: ValueSlot<$inner, A>,
+                I: SlotInitMut,
+                Pb: PresenceBits,
+            {
+                ValueSlot::with_mut(slot, init, common).clear();
+            }
+        }
+    };
 }
 
-impl<T> PayloadAccess for T
-where
-    T: VarintProtoType + AddressableSlot + From<T::Value> + ProtoEmpty,
-    T: Deref<Target = T::Value> + DerefMut,
-{
-    #[inline]
-    fn is_proto_empty<Pb: PresenceBits>(
-        slot: &Self::Slot,
-        _common: &MessageCommon<Pb, Self::Alloc>,
-    ) -> bool {
-        slot.is_proto_empty()
-    }
+impl_varint_proto_type!(ProtoUInt32, u32);
+impl_varint_proto_type!(ProtoUInt64, u64);
+impl_varint_proto_type!(ProtoInt32, i32);
+impl_varint_proto_type!(ProtoInt64, i64);
+impl_varint_proto_type!(ProtoSint32, i32);
+impl_varint_proto_type!(ProtoSint64, i64);
 
-    #[inline]
-    fn get<'a, Pb: PresenceBits>(
-        slot: &'a Self::Slot,
-        _common: &'a MessageCommon<Pb, Self::Alloc>,
-    ) -> Self::Ref<'a> {
-        *Deref::deref(slot)
-    }
+// ---------------------------------------------------------------------------
+// Enum markers
+// ---------------------------------------------------------------------------
 
-    #[inline]
-    fn with_mut<'a, VS, I, Pb>(
-        slot: &'a mut VS,
-        init: I,
-        common: &'a mut MessageCommon<Pb, Self::Alloc>,
-    ) -> Self::Mut<'a>
-    where
-        VS: ValueSlot<Self::Slot>,
-        I: SlotInitMut,
-        Pb: PresenceBits,
-        Self: 'a,
-    {
-        DerefMut::deref_mut(ValueSlot::with_mut(slot, init, common).get_mut())
-    }
+macro_rules! impl_enum_proto_type {
+    ($kind:ty, $bound:ident) => {
+        impl<E: $bound> ProtoType for ProtoEnum<E, $kind> {
+            type Slot<A: Allocator + Clone> = E;
+            type Ref<'a, A: Allocator + Clone>
+                = E
+            where
+                Self: 'a,
+                A: 'a;
+            type Mut<'a, A: Allocator + Clone>
+                = &'a mut E
+            where
+                Self: 'a,
+                A: 'a;
+            type Written<A: Allocator + Clone> = E;
+            const WIRE_TYPE: WireType = WireType::Varint;
 
-    #[inline]
-    fn write<VS, I, Pb>(
-        slot: &mut VS,
-        init: I,
-        common: &mut MessageCommon<Pb, Self::Alloc>,
-        value: Self::Written,
-    ) where
-        VS: ValueSlot<Self::Slot>,
-        I: SlotInitMut,
-        Pb: PresenceBits,
-    {
-        ValueSlot::with_mut(slot, init, common).set(value);
-    }
+            #[inline]
+            fn encoded_len<'a, A: Allocator + Clone>(value: E, field: u32) -> usize
+            where
+                Self: 'a,
+                A: 'a,
+            {
+                encode::encoded_len_varint_field(
+                    field,
+                    <ProtoEnum<E, $kind> as VarintProtoType>::encode_wire(value),
+                )
+            }
 
-    #[inline]
-    fn clear<VS, I, Pb>(slot: &mut VS, init: I, common: &mut MessageCommon<Pb, Self::Alloc>)
-    where
-        VS: ValueSlot<Self::Slot>,
-        I: SlotInitMut,
-        Pb: PresenceBits,
-    {
-        ValueSlot::with_mut(slot, init, common).clear();
-    }
+            #[inline]
+            fn encode<'a, A: Allocator + Clone, B: BufMut>(value: E, field: u32, buf: &mut B)
+            where
+                Self: 'a,
+                A: 'a,
+            {
+                encode::encode_varint_field(
+                    field,
+                    <ProtoEnum<E, $kind> as VarintProtoType>::encode_wire(value),
+                    buf,
+                );
+            }
+
+            #[inline]
+            fn decode<A: Allocator + Clone, B: Buf>(
+                wire_type: WireType,
+                buf: &mut B,
+                _alloc: A,
+            ) -> Result<E, DecodeError> {
+                if wire_type != WireType::Varint {
+                    return Err(DecodeError::InvalidTag);
+                }
+                let raw = decode::decode_varint(buf)?;
+                Ok(<ProtoEnum<E, $kind> as VarintProtoType>::decode_wire(raw)?)
+            }
+        }
+
+        impl<E: $bound> PayloadAccess for ProtoEnum<E, $kind> {
+            #[inline]
+            fn is_proto_empty<A: Allocator + Clone, Pb: PresenceBits>(
+                slot: &E,
+                _common: &MessageCommon<Pb, A>,
+            ) -> bool {
+                slot.is_proto_empty()
+            }
+
+            #[inline]
+            fn get<'a, A: Allocator + Clone, Pb: PresenceBits>(
+                slot: &'a E,
+                _common: &'a MessageCommon<Pb, A>,
+            ) -> E
+            where
+                A: 'a,
+            {
+                *slot
+            }
+
+            #[inline]
+            fn with_mut<'a, A, VS, I, Pb>(
+                slot: &'a mut VS,
+                init: I,
+                common: &'a mut MessageCommon<Pb, A>,
+            ) -> &'a mut E
+            where
+                A: Allocator + Clone + 'a,
+                E: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
+                VS: ValueSlot<E, A>,
+                I: SlotInitMut,
+                Pb: PresenceBits,
+                Self: 'a,
+            {
+                ValueSlot::with_mut(slot, init, common).get_mut()
+            }
+
+            #[inline]
+            fn write<A, VS, I, Pb>(
+                slot: &mut VS,
+                init: I,
+                common: &mut MessageCommon<Pb, A>,
+                value: E,
+            ) where
+                A: Allocator + Clone,
+                E: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
+                VS: ValueSlot<E, A>,
+                I: SlotInitMut,
+                Pb: PresenceBits,
+            {
+                ValueSlot::with_mut(slot, init, common).set(value);
+            }
+
+            #[inline]
+            fn clear<A, VS, I, Pb>(slot: &mut VS, init: I, common: &mut MessageCommon<Pb, A>)
+            where
+                A: Allocator + Clone,
+                E: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
+                VS: ValueSlot<E, A>,
+                I: SlotInitMut,
+                Pb: PresenceBits,
+            {
+                ValueSlot::with_mut(slot, init, common).clear();
+            }
+        }
+    };
 }
 
+impl_enum_proto_type!(Open, OpenEnum);
+impl_enum_proto_type!(Closed, ClosedEnum);
+
 // ---------------------------------------------------------------------------
-// LEN wrappers (Slot = Self)
+// LEN markers
 // ---------------------------------------------------------------------------
 
-impl<A: Allocator + Clone> ProtoType for ProtoString<A> {
-    type Alloc = A;
-    type Slot = Self;
-    type Ref<'a>
+impl ProtoType for ProtoString {
+    type Slot<A: Allocator + Clone> = UnmanagedString<A>;
+    type Ref<'a, A: Allocator + Clone>
         = &'a str
     where
-        Self: 'a;
-    type Mut<'a>
-        = <Self as LenProtoType>::Mut<'a>
+        Self: 'a,
+        A: 'a;
+    type Mut<'a, A: Allocator + Clone>
+        = StringGuard<'a, A>
     where
-        Self: 'a;
-    type Written = Self;
+        Self: 'a,
+        A: 'a;
+    type Written<A: Allocator + Clone> = UnmanagedString<A>;
     const WIRE_TYPE: WireType = WireType::Len;
 
     #[inline]
-    fn encoded_len<'a>(value: Self::Ref<'a>, field: u32) -> usize
+    fn encoded_len<'a, A: Allocator + Clone>(value: &'a str, field: u32) -> usize
     where
         Self: 'a,
+        A: 'a,
     {
         encode::encoded_len_len_field(field, value.len())
     }
 
     #[inline]
-    fn encode<'a, B: BufMut>(value: Self::Ref<'a>, field: u32, buf: &mut B)
+    fn encode<'a, A: Allocator + Clone, B: BufMut>(value: &'a str, field: u32, buf: &mut B)
     where
         Self: 'a,
+        A: 'a,
     {
         encode::encode_len_field(field, value.as_bytes(), buf);
     }
 
     #[inline]
-    fn decode<B: Buf>(
+    fn decode<A: Allocator + Clone, B: Buf>(
         wire_type: WireType,
         buf: &mut B,
         alloc: A,
-    ) -> Result<Self::Written, DecodeError> {
+    ) -> Result<UnmanagedString<A>, DecodeError> {
         if wire_type != WireType::Len {
             return Err(DecodeError::InvalidTag);
         }
-        Ok(Self(<Self as LenProtoType>::decode(buf, alloc)?))
+        <Self as LenProtoType>::decode(buf, alloc)
     }
 }
 
-impl<A: Allocator + Clone> PayloadAccess for ProtoString<A> {
+impl PayloadAccess for ProtoString {
     #[inline]
-    fn is_proto_empty<Pb: PresenceBits>(slot: &Self::Slot, _common: &MessageCommon<Pb, A>) -> bool {
+    fn is_proto_empty<A: Allocator + Clone, Pb: PresenceBits>(
+        slot: &UnmanagedString<A>,
+        _common: &MessageCommon<Pb, A>,
+    ) -> bool {
         slot.is_proto_empty()
     }
 
     #[inline]
-    fn get<'a, Pb: PresenceBits>(
-        slot: &'a Self::Slot,
+    fn get<'a, A: Allocator + Clone, Pb: PresenceBits>(
+        slot: &'a UnmanagedString<A>,
         _common: &'a MessageCommon<Pb, A>,
-    ) -> &'a str {
-        &slot.0
+    ) -> &'a str
+    where
+        A: 'a,
+    {
+        slot
     }
 
     #[inline]
-    fn with_mut<'a, VS, I, Pb>(
+    fn with_mut<'a, A, VS, I, Pb>(
         slot: &'a mut VS,
         init: I,
         common: &'a mut MessageCommon<Pb, A>,
-    ) -> Self::Mut<'a>
+    ) -> StringGuard<'a, A>
     where
-        VS: ValueSlot<Self::Slot>,
+        A: Allocator + Clone + 'a,
+        VS: ValueSlot<UnmanagedString<A>, A>,
         I: SlotInitMut,
         Pb: PresenceBits,
         Self: 'a,
     {
         let alloc = common.alloc.clone();
-        <Self as LenProtoType>::with_alloc(
-            &mut ValueSlot::with_mut(slot, init, common).get_mut().0,
-            alloc,
-        )
+        <Self as LenProtoType>::with_alloc(ValueSlot::with_mut(slot, init, common).get_mut(), alloc)
     }
 
     #[inline]
-    fn write<VS, I, Pb>(
+    fn write<A, VS, I, Pb>(
         slot: &mut VS,
         init: I,
         common: &mut MessageCommon<Pb, A>,
-        value: Self::Written,
+        value: UnmanagedString<A>,
     ) where
-        VS: ValueSlot<Self::Slot>,
+        A: Allocator + Clone,
+        VS: ValueSlot<UnmanagedString<A>, A>,
         I: SlotInitMut,
         Pb: PresenceBits,
     {
@@ -378,9 +564,10 @@ impl<A: Allocator + Clone> PayloadAccess for ProtoString<A> {
     }
 
     #[inline]
-    fn clear<VS, I, Pb>(slot: &mut VS, init: I, common: &mut MessageCommon<Pb, A>)
+    fn clear<A, VS, I, Pb>(slot: &mut VS, init: I, common: &mut MessageCommon<Pb, A>)
     where
-        VS: ValueSlot<Self::Slot>,
+        A: Allocator + Clone,
+        VS: ValueSlot<UnmanagedString<A>, A>,
         I: SlotInitMut,
         Pb: PresenceBits,
     {
@@ -388,90 +575,98 @@ impl<A: Allocator + Clone> PayloadAccess for ProtoString<A> {
     }
 }
 
-impl<A: Allocator + Clone> ProtoType for ProtoBytes<A> {
-    type Alloc = A;
-    type Slot = Self;
-    type Ref<'a>
+impl ProtoType for ProtoBytes {
+    type Slot<A: Allocator + Clone> = UnmanagedVec<u8, A>;
+    type Ref<'a, A: Allocator + Clone>
         = &'a [u8]
     where
-        Self: 'a;
-    type Mut<'a>
-        = <Self as LenProtoType>::Mut<'a>
+        Self: 'a,
+        A: 'a;
+    type Mut<'a, A: Allocator + Clone>
+        = VecGuard<'a, u8, A>
     where
-        Self: 'a;
-    type Written = Self;
+        Self: 'a,
+        A: 'a;
+    type Written<A: Allocator + Clone> = UnmanagedVec<u8, A>;
     const WIRE_TYPE: WireType = WireType::Len;
 
     #[inline]
-    fn encoded_len<'a>(value: Self::Ref<'a>, field: u32) -> usize
+    fn encoded_len<'a, A: Allocator + Clone>(value: &'a [u8], field: u32) -> usize
     where
         Self: 'a,
+        A: 'a,
     {
         encode::encoded_len_len_field(field, value.len())
     }
 
     #[inline]
-    fn encode<'a, B: BufMut>(value: Self::Ref<'a>, field: u32, buf: &mut B)
+    fn encode<'a, A: Allocator + Clone, B: BufMut>(value: &'a [u8], field: u32, buf: &mut B)
     where
         Self: 'a,
+        A: 'a,
     {
         encode::encode_len_field(field, value, buf);
     }
 
     #[inline]
-    fn decode<B: Buf>(
+    fn decode<A: Allocator + Clone, B: Buf>(
         wire_type: WireType,
         buf: &mut B,
         alloc: A,
-    ) -> Result<Self::Written, DecodeError> {
+    ) -> Result<UnmanagedVec<u8, A>, DecodeError> {
         if wire_type != WireType::Len {
             return Err(DecodeError::InvalidTag);
         }
-        Ok(Self(<Self as LenProtoType>::decode(buf, alloc)?))
+        <Self as LenProtoType>::decode(buf, alloc)
     }
 }
 
-impl<A: Allocator + Clone> PayloadAccess for ProtoBytes<A> {
+impl PayloadAccess for ProtoBytes {
     #[inline]
-    fn is_proto_empty<Pb: PresenceBits>(slot: &Self::Slot, _common: &MessageCommon<Pb, A>) -> bool {
+    fn is_proto_empty<A: Allocator + Clone, Pb: PresenceBits>(
+        slot: &UnmanagedVec<u8, A>,
+        _common: &MessageCommon<Pb, A>,
+    ) -> bool {
         slot.is_proto_empty()
     }
 
     #[inline]
-    fn get<'a, Pb: PresenceBits>(
-        slot: &'a Self::Slot,
+    fn get<'a, A: Allocator + Clone, Pb: PresenceBits>(
+        slot: &'a UnmanagedVec<u8, A>,
         _common: &'a MessageCommon<Pb, A>,
-    ) -> &'a [u8] {
-        &slot.0
+    ) -> &'a [u8]
+    where
+        A: 'a,
+    {
+        slot
     }
 
     #[inline]
-    fn with_mut<'a, VS, I, Pb>(
+    fn with_mut<'a, A, VS, I, Pb>(
         slot: &'a mut VS,
         init: I,
         common: &'a mut MessageCommon<Pb, A>,
-    ) -> Self::Mut<'a>
+    ) -> VecGuard<'a, u8, A>
     where
-        VS: ValueSlot<Self::Slot>,
+        A: Allocator + Clone + 'a,
+        VS: ValueSlot<UnmanagedVec<u8, A>, A>,
         I: SlotInitMut,
         Pb: PresenceBits,
         Self: 'a,
     {
         let alloc = common.alloc.clone();
-        <Self as LenProtoType>::with_alloc(
-            &mut ValueSlot::with_mut(slot, init, common).get_mut().0,
-            alloc,
-        )
+        <Self as LenProtoType>::with_alloc(ValueSlot::with_mut(slot, init, common).get_mut(), alloc)
     }
 
     #[inline]
-    fn write<VS, I, Pb>(
+    fn write<A, VS, I, Pb>(
         slot: &mut VS,
         init: I,
         common: &mut MessageCommon<Pb, A>,
-        value: Self::Written,
+        value: UnmanagedVec<u8, A>,
     ) where
-        VS: ValueSlot<Self::Slot>,
+        A: Allocator + Clone,
+        VS: ValueSlot<UnmanagedVec<u8, A>, A>,
         I: SlotInitMut,
         Pb: PresenceBits,
     {
@@ -479,9 +674,10 @@ impl<A: Allocator + Clone> PayloadAccess for ProtoBytes<A> {
     }
 
     #[inline]
-    fn clear<VS, I, Pb>(slot: &mut VS, init: I, common: &mut MessageCommon<Pb, A>)
+    fn clear<A, VS, I, Pb>(slot: &mut VS, init: I, common: &mut MessageCommon<Pb, A>)
     where
-        VS: ValueSlot<Self::Slot>,
+        A: Allocator + Clone,
+        VS: ValueSlot<UnmanagedVec<u8, A>, A>,
         I: SlotInitMut,
         Pb: PresenceBits,
     {
@@ -490,43 +686,48 @@ impl<A: Allocator + Clone> PayloadAccess for ProtoBytes<A> {
 }
 
 // ---------------------------------------------------------------------------
-// Bit-packed bool marker (Slot = Self, ZST; value via BitPacked layout)
+// Bit-packed bool marker (Slot = (); value via BitPacked layout)
 // ---------------------------------------------------------------------------
 
-impl<A: Allocator + Clone> ProtoType for ProtoBool<A> {
-    type Alloc = A;
-    /// ZST slot: presence/init layout only. Logical `bool` lives in
-    /// [`MessageCommon`] at the index carried by [`BitPacked`](crate::fields::shared::value_layout::BitPacked).
-    type Slot = Self;
-    type Ref<'a>
+impl ProtoType for ProtoBool {
+    type Slot<A: Allocator + Clone> = ();
+    type Ref<'a, A: Allocator + Clone>
         = bool
     where
-        Self: 'a;
-    type Mut<'a>
+        Self: 'a,
+        A: 'a;
+    type Mut<'a, A: Allocator + Clone>
         = BitRef<'a, Mut, u8, Lsb0>
     where
-        Self: 'a;
-    type Written = bool;
+        Self: 'a,
+        A: 'a;
+    type Written<A: Allocator + Clone> = bool;
     const WIRE_TYPE: WireType = WireType::Varint;
 
     #[inline]
-    fn encoded_len<'a>(value: bool, field: u32) -> usize
+    fn encoded_len<'a, A: Allocator + Clone>(value: bool, field: u32) -> usize
     where
         Self: 'a,
+        A: 'a,
     {
         encode::encoded_len_varint_field(field, Self::encode_wire(value))
     }
 
     #[inline]
-    fn encode<'a, B: BufMut>(value: bool, field: u32, buf: &mut B)
+    fn encode<'a, A: Allocator + Clone, B: BufMut>(value: bool, field: u32, buf: &mut B)
     where
         Self: 'a,
+        A: 'a,
     {
         encode::encode_varint_field(field, Self::encode_wire(value), buf);
     }
 
     #[inline]
-    fn decode<B: Buf>(wire_type: WireType, buf: &mut B, _alloc: A) -> Result<bool, DecodeError> {
+    fn decode<A: Allocator + Clone, B: Buf>(
+        wire_type: WireType,
+        buf: &mut B,
+        _alloc: A,
+    ) -> Result<bool, DecodeError> {
         if wire_type != WireType::Varint {
             return Err(DecodeError::InvalidTag);
         }

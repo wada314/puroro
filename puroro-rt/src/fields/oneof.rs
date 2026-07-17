@@ -20,9 +20,9 @@ use ::unmanaged::UnmanagedBox;
 
 use crate::fields::enum_variant::EnumVariant;
 use crate::fields::shared::{
-    FieldDeallocate, MessageCommon, PresenceBits, ValueLayout,
+    DeallocateIn, DefaultIn, FieldDeallocate, MessageCommon, PresenceBits, ValueLayout,
     field_presence::{FieldPresence, Oneof},
-    value_slot::ValueSlot,
+    value_slot::{AddressableSlot, ValueSlot},
 };
 use crate::fields::singular::field::SingularField;
 use crate::fields::wire::proto_message::ProtoMessage;
@@ -371,19 +371,20 @@ impl<'a, F, Pb: PresenceBits, A: Allocator> OneofVariantRef<'a, F, Pb, A> {
 
 impl<
     'a,
-    T: ProtoType<Alloc = A>,
+    T: ProtoType,
     const FIELD: u32,
-    L: ValueLayout<T>,
+    A: Allocator + Clone,
+    L: ValueLayout<T, A>,
     D,
     Pb: PresenceBits,
-    A: Allocator,
-> OneofVariantRef<'a, SingularField<T, Oneof, FIELD, L, D>, Pb, A>
+> OneofVariantRef<'a, SingularField<T, Oneof, FIELD, A, L, D>, Pb, A>
 where
-    T::Ref<'a>: Copy,
-    D: HasDefault<T::Ref<'a>>,
-    <Oneof as FieldPresence>::ValueSlot<T::Slot>: ValueSlot<T::Slot>,
+    T::Ref<'a, A>: Copy,
+    D: HasDefault<T::Ref<'a, A>>,
+    T::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
+    <Oneof as FieldPresence>::ValueSlot<T::Slot<A>>: ValueSlot<T::Slot<A>, A>,
 {
-    pub fn optional(self) -> Optional<T::Ref<'a>, D>
+    pub fn optional(self) -> Optional<T::Ref<'a, A>, D>
     where
         A: Clone,
     {
@@ -395,10 +396,10 @@ where
 }
 
 impl<'a, M, const FIELD: u32, A: Allocator + Clone, Pb: PresenceBits>
-    OneofVariantRef<'a, SingularField<ProtoMessage<M, A>, Oneof, FIELD>, Pb, A>
+    OneofVariantRef<'a, SingularField<ProtoMessage<M>, Oneof, FIELD, A>, Pb, A>
 where
     M: ::puroro::Message<Alloc = A>,
-    <Oneof as FieldPresence>::ValueSlot<UnmanagedBox<M, A>>: ValueSlot<UnmanagedBox<M, A>>,
+    <Oneof as FieldPresence>::ValueSlot<UnmanagedBox<M, A>>: ValueSlot<UnmanagedBox<M, A>, A>,
 {
     /// Returns the child when this message variant is active.
     pub fn get(self) -> Option<&'a M> {

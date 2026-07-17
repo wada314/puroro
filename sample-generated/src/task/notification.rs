@@ -106,15 +106,16 @@ pub enum NotificationCase {
     Urgent,
 }
 
-type EmailAddressField<A> = SingularField<ProtoString<A>, Oneof, { super::FIELD_EMAIL_ADDRESS }>;
-type PhoneNumberField<A> = SingularField<ProtoString<A>, Oneof, { super::FIELD_PHONE_NUMBER }>;
+type EmailAddressField<A> = SingularField<ProtoString, Oneof, { super::FIELD_EMAIL_ADDRESS }, A>;
+type PhoneNumberField<A> = SingularField<ProtoString, Oneof, { super::FIELD_PHONE_NUMBER }, A>;
 type WebhookIdField<A> =
-    SingularField<ProtoInt32<A>, Oneof, { super::FIELD_WEBHOOK_ID }, Inline, WebhookIdDefault>;
-type PostalField<A> = SingularField<ProtoMessage<Address<A>, A>, Oneof, { super::FIELD_POSTAL }>;
+    SingularField<ProtoInt32, Oneof, { super::FIELD_WEBHOOK_ID }, A, Inline, WebhookIdDefault>;
+type PostalField<A> = SingularField<ProtoMessage<Address<A>>, Oneof, { super::FIELD_POSTAL }, A>;
 type UrgentField<A> = SingularField<
-    ProtoBool<A>,
+    ProtoBool,
     Oneof,
     { super::FIELD_URGENT },
+    A,
     BitPacked<{ super::BIT_URGENT_VALUE }>,
 >;
 
@@ -129,11 +130,11 @@ pub(crate) type NotificationStorage<A> = Notification<
 
 /// Borrowed read view of the active `notification` variant.
 pub type NotificationRef<'a, A> = Notification<
-    <ProtoString<A> as ProtoType>::Ref<'a>,
-    <ProtoString<A> as ProtoType>::Ref<'a>,
-    <ProtoInt32<A> as ProtoType>::Ref<'a>,
-    <ProtoMessage<Address<A>, A> as ProtoType>::Ref<'a>,
-    <ProtoBool<A> as ProtoType>::Ref<'a>,
+    <ProtoString as ProtoType>::Ref<'a, A>,
+    <ProtoString as ProtoType>::Ref<'a, A>,
+    <ProtoInt32 as ProtoType>::Ref<'a, A>,
+    <ProtoMessage<Address<A>> as ProtoType>::Ref<'a, A>,
+    <ProtoBool as ProtoType>::Ref<'a, A>,
 >;
 
 /// Borrowed mutable projection of the active `notification` variant.
@@ -142,22 +143,22 @@ pub type NotificationRef<'a, A> = Notification<
 /// Public `_mut` accessors may still return `impl Trait` (e.g. bool) where
 /// ergonomics prefer it; enum variants need the named associated type.
 pub type NotificationMut<'a, A> = Notification<
-    <ProtoString<A> as ProtoType>::Mut<'a>,
-    <ProtoString<A> as ProtoType>::Mut<'a>,
-    <ProtoInt32<A> as ProtoType>::Mut<'a>,
-    <ProtoMessage<Address<A>, A> as ProtoType>::Mut<'a>,
-    <ProtoBool<A> as ProtoType>::Mut<'a>,
+    <ProtoString as ProtoType>::Mut<'a, A>,
+    <ProtoString as ProtoType>::Mut<'a, A>,
+    <ProtoInt32 as ProtoType>::Mut<'a, A>,
+    <ProtoMessage<Address<A>> as ProtoType>::Mut<'a, A>,
+    <ProtoBool as ProtoType>::Mut<'a, A>,
 >;
 
 // `A` must appear structurally (not only inside an associated-type projection)
 // for these impls — see rustc E0207. `Postal`'s `Ref` is `&Address<A>`.
 impl<'a, A: Allocator + Clone> Clone
     for Notification<
-        <ProtoString<A> as ProtoType>::Ref<'a>,
-        <ProtoString<A> as ProtoType>::Ref<'a>,
-        <ProtoInt32<A> as ProtoType>::Ref<'a>,
+        <ProtoString as ProtoType>::Ref<'a, A>,
+        <ProtoString as ProtoType>::Ref<'a, A>,
+        <ProtoInt32 as ProtoType>::Ref<'a, A>,
         &'a Address<A>,
-        <ProtoBool<A> as ProtoType>::Ref<'a>,
+        <ProtoBool as ProtoType>::Ref<'a, A>,
     >
 {
     fn clone(&self) -> Self {
@@ -166,11 +167,11 @@ impl<'a, A: Allocator + Clone> Clone
 }
 impl<'a, A: Allocator + Clone> Copy
     for Notification<
-        <ProtoString<A> as ProtoType>::Ref<'a>,
-        <ProtoString<A> as ProtoType>::Ref<'a>,
-        <ProtoInt32<A> as ProtoType>::Ref<'a>,
+        <ProtoString as ProtoType>::Ref<'a, A>,
+        <ProtoString as ProtoType>::Ref<'a, A>,
+        <ProtoInt32 as ProtoType>::Ref<'a, A>,
         &'a Address<A>,
-        <ProtoBool<A> as ProtoType>::Ref<'a>,
+        <ProtoBool as ProtoType>::Ref<'a, A>,
     >
 {
 }

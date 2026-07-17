@@ -140,34 +140,29 @@ impl<P: PresenceBits, A: Allocator> MessageCommon<P, A> {
 // Allocator-aware construction / release (`DefaultIn` / `DeallocateIn`)
 // ---------------------------------------------------------------------------
 
-/// Allocator-aware construction of the protobuf type-zero / empty value.
-///
-/// Generalizes [`Default`] for payloads whose empty form needs an allocator
+/// Generalizes [`Default`] for payloads whose empty form may need an allocator
 /// (`UnmanagedString`, `UnmanagedVec`). Allocator-less scalars ignore `alloc`.
-/// This lets [`ValueSlot`](value_slot::ValueSlot) construct any stored value
-/// uniformly, whether or not it is heap-backed.
-pub trait DefaultIn {
-    /// Allocator type used by this value's backing storage.
-    type Alloc: Allocator + Clone;
-
+///
+/// The allocator is a **trait parameter** chosen by the caller (not an
+/// associated type), matching the wg-allocators direction: scalars like `i32`
+/// can implement `DefaultIn<A>` for every `A`, while `UnmanagedString<A>` only
+/// implements `DefaultIn<A>` for its own `A`.
+pub trait DefaultIn<A: Allocator + Clone> {
     /// Builds the empty / type-zero value, using `alloc` when heap-backed.
-    fn default_in(alloc: Self::Alloc) -> Self;
+    fn default_in(alloc: A) -> Self;
 }
 
 /// Allocator-aware release of a stored value.
 ///
 /// Pairs with [`DefaultIn`] so [`ValueSlot`](value_slot::ValueSlot) can replace
 /// or clear a payload without leaking. Allocator-less scalars are a no-op.
-pub trait DeallocateIn {
-    /// Allocator type used by this value's backing storage.
-    type Alloc: Allocator + Clone;
-
+pub trait DeallocateIn<A: Allocator + Clone> {
     /// Drops the value and frees its backing allocation through `alloc`.
     ///
     /// # Safety
     ///
     /// `alloc` must be the allocator that owns this value's buffer.
-    unsafe fn deallocate_in(self, alloc: Self::Alloc);
+    unsafe fn deallocate_in(self, alloc: A);
 }
 
 /// Empty / type-zero predicate for IMPLICIT omit-on-encode.
@@ -178,18 +173,67 @@ pub trait ProtoEmpty {
     fn is_proto_empty(&self) -> bool;
 }
 
-impl<A: Allocator + Clone> DefaultIn for ::unmanaged::UnmanagedString<A> {
-    type Alloc = A;
+macro_rules! impl_scalar_default_in {
+    ($ty:ty, $zero:expr) => {
+        impl<A: Allocator + Clone> DefaultIn<A> for $ty {
+            #[inline]
+            fn default_in(_alloc: A) -> Self {
+                $zero
+            }
+        }
 
+        impl<A: Allocator + Clone> DeallocateIn<A> for $ty {
+            #[inline]
+            unsafe fn deallocate_in(self, _alloc: A) {}
+        }
+    };
+}
+
+impl_scalar_default_in!(u32, 0);
+impl_scalar_default_in!(u64, 0);
+impl_scalar_default_in!(i32, 0);
+impl_scalar_default_in!(i64, 0);
+impl_scalar_default_in!((), ());
+
+impl ProtoEmpty for u32 {
+    #[inline]
+    fn is_proto_empty(&self) -> bool {
+        *self == 0
+    }
+}
+impl ProtoEmpty for u64 {
+    #[inline]
+    fn is_proto_empty(&self) -> bool {
+        *self == 0
+    }
+}
+impl ProtoEmpty for i32 {
+    #[inline]
+    fn is_proto_empty(&self) -> bool {
+        *self == 0
+    }
+}
+impl ProtoEmpty for i64 {
+    #[inline]
+    fn is_proto_empty(&self) -> bool {
+        *self == 0
+    }
+}
+impl ProtoEmpty for () {
+    #[inline]
+    fn is_proto_empty(&self) -> bool {
+        true
+    }
+}
+
+impl<A: Allocator + Clone> DefaultIn<A> for ::unmanaged::UnmanagedString<A> {
     #[inline]
     fn default_in(alloc: A) -> Self {
         ::unmanaged::UnmanagedString::new(alloc)
     }
 }
 
-impl<A: Allocator + Clone> DeallocateIn for ::unmanaged::UnmanagedString<A> {
-    type Alloc = A;
-
+impl<A: Allocator + Clone> DeallocateIn<A> for ::unmanaged::UnmanagedString<A> {
     #[inline]
     unsafe fn deallocate_in(self, alloc: A) {
         // SAFETY: forwarded to the caller's obligation on `alloc`.
@@ -204,18 +248,14 @@ impl<A: Allocator> ProtoEmpty for ::unmanaged::UnmanagedString<A> {
     }
 }
 
-impl<A: Allocator + Clone> DefaultIn for ::unmanaged::UnmanagedVec<u8, A> {
-    type Alloc = A;
-
+impl<A: Allocator + Clone> DefaultIn<A> for ::unmanaged::UnmanagedVec<u8, A> {
     #[inline]
     fn default_in(alloc: A) -> Self {
         ::unmanaged::UnmanagedVec::new(alloc)
     }
 }
 
-impl<A: Allocator + Clone> DeallocateIn for ::unmanaged::UnmanagedVec<u8, A> {
-    type Alloc = A;
-
+impl<A: Allocator + Clone> DeallocateIn<A> for ::unmanaged::UnmanagedVec<u8, A> {
     #[inline]
     unsafe fn deallocate_in(self, alloc: A) {
         // SAFETY: forwarded to the caller's obligation on `alloc`.

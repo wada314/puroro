@@ -6,6 +6,7 @@
 use ::core::marker::PhantomData;
 use ::core::mem::ManuallyDrop;
 
+use ::allocator_api2::alloc::Allocator;
 use ::bytes::{Buf, BufMut};
 use ::unmanaged::UnmanagedVec;
 use ::unmanaged::vec::VecGuard;
@@ -20,19 +21,26 @@ use crate::fields::wire::varint;
 
 use super::encoding::{Expanded, Packed, RepeatedEncoding};
 
-/// Repeated field parametrised by type marker `T` and encode policy `E`.
+/// Repeated field parametrised by type marker `T`, encode policy `E`, and allocator `A`.
 ///
-/// [`Packed`] is only available when `T: PackableRepeatedItems`. [`Expanded`]
-/// covers packable and non-packable markers (string / bytes / future message).
-/// [`RepeatedFieldMut::merge`] accepts both packed and expanded wire forms for
-/// packable `T`.
-pub struct RepeatedField<T: RepeatedItems, E: RepeatedEncoding<T>, const FIELD: u32> {
-    values: ManuallyDrop<UnmanagedVec<T::Element, T::Alloc>>,
+/// Parameter order: `T`, `E`, `FIELD`, `A`.
+pub struct RepeatedField<T, E, const FIELD: u32, A>
+where
+    T: RepeatedItems,
+    E: RepeatedEncoding<T, A>,
+    A: Allocator + Clone,
+{
+    values: ManuallyDrop<UnmanagedVec<T::Element<A>, A>>,
     _encoding: PhantomData<E>,
 }
 
-impl<T: RepeatedItems, E: RepeatedEncoding<T>, const FIELD: u32> RepeatedField<T, E, FIELD> {
-    pub fn new_in(alloc: T::Alloc) -> Self {
+impl<T, E, const FIELD: u32, A> RepeatedField<T, E, FIELD, A>
+where
+    T: RepeatedItems,
+    E: RepeatedEncoding<T, A>,
+    A: Allocator + Clone,
+{
+    pub fn new_in(alloc: A) -> Self {
         Self {
             values: ManuallyDrop::new(UnmanagedVec::new(alloc)),
             _encoding: PhantomData,
@@ -40,7 +48,7 @@ impl<T: RepeatedItems, E: RepeatedEncoding<T>, const FIELD: u32> RepeatedField<T
     }
 
     #[inline]
-    pub fn as_slice(&self) -> &[T::Element] {
+    pub fn as_slice(&self) -> &[T::Element<A>] {
         &self.values
     }
 
@@ -49,7 +57,7 @@ impl<T: RepeatedItems, E: RepeatedEncoding<T>, const FIELD: u32> RepeatedField<T
         self.values.is_empty()
     }
 
-    pub fn encoded_len<Pb>(&self, _common: &MessageCommon<Pb, T::Alloc>) -> usize
+    pub fn encoded_len<Pb>(&self, _common: &MessageCommon<Pb, A>) -> usize
     where
         Pb: PresenceBits,
     {
@@ -60,7 +68,7 @@ impl<T: RepeatedItems, E: RepeatedEncoding<T>, const FIELD: u32> RepeatedField<T
         }
     }
 
-    pub fn encode_raw<Pb, B: BufMut>(&self, _common: &MessageCommon<Pb, T::Alloc>, buf: &mut B)
+    pub fn encode_raw<Pb, B: BufMut>(&self, _common: &MessageCommon<Pb, A>, buf: &mut B)
     where
         Pb: PresenceBits,
     {
@@ -73,11 +81,8 @@ impl<T: RepeatedItems, E: RepeatedEncoding<T>, const FIELD: u32> RepeatedField<T
     #[inline]
     pub fn bind<'a, Pb: PresenceBits>(
         &'a self,
-        common: &'a MessageCommon<Pb, T::Alloc>,
-    ) -> RepeatedFieldRef<'a, T, E, FIELD, Pb>
-    where
-        T::Alloc: Clone,
-    {
+        common: &'a MessageCommon<Pb, A>,
+    ) -> RepeatedFieldRef<'a, T, E, FIELD, A, Pb> {
         RepeatedFieldRef::new(self, common)
     }
 
@@ -85,25 +90,22 @@ impl<T: RepeatedItems, E: RepeatedEncoding<T>, const FIELD: u32> RepeatedField<T
     #[inline]
     pub fn bind_mut<'f, 'c, Pb: PresenceBits>(
         &'f mut self,
-        common: &'c mut MessageCommon<Pb, T::Alloc>,
-    ) -> RepeatedFieldMut<'f, 'c, T, E, FIELD, Pb>
-    where
-        T::Alloc: Clone,
-    {
+        common: &'c mut MessageCommon<Pb, A>,
+    ) -> RepeatedFieldMut<'f, 'c, T, E, FIELD, A, Pb> {
         RepeatedFieldMut::new(self, common)
     }
 }
 
-impl<T, E, const FIELD: u32, Pb> FieldDeallocate<Pb, T::Alloc> for RepeatedField<T, E, FIELD>
+impl<T, E, const FIELD: u32, A, Pb> FieldDeallocate<Pb, A> for RepeatedField<T, E, FIELD, A>
 where
     T: RepeatedItems,
-    E: RepeatedEncoding<T>,
+    E: RepeatedEncoding<T, A>,
+    A: Allocator + Clone,
     Pb: PresenceBits,
-    T::Alloc: Clone,
 {
     /// Releases every element (when heap-backed) and the backing buffer.
     #[inline]
-    fn deallocate(&mut self, common: &MessageCommon<Pb, T::Alloc>) {
+    fn deallocate(&mut self, common: &MessageCommon<Pb, A>) {
         // SAFETY: called once; owned clones of the message allocator own the
         // buffer and every element.
         let alloc = common.alloc.clone();
@@ -126,22 +128,27 @@ where
 pub struct RepeatedFieldRef<
     'a,
     T: RepeatedItems,
-    E: RepeatedEncoding<T>,
+    E: RepeatedEncoding<T, A>,
     const FIELD: u32,
+    A: Allocator + Clone,
     Pb: PresenceBits,
 > {
-    field: &'a RepeatedField<T, E, FIELD>,
+    field: &'a RepeatedField<T, E, FIELD, A>,
     /// Bound for symmetry with [`RepeatedFieldMut`]; unused by current getters.
     #[allow(dead_code)]
-    common: &'a MessageCommon<Pb, T::Alloc>,
+    common: &'a MessageCommon<Pb, A>,
     _encoding: PhantomData<E>,
 }
 
-impl<'a, T: RepeatedItems, E: RepeatedEncoding<T>, const FIELD: u32, Pb: PresenceBits>
-    RepeatedFieldRef<'a, T, E, FIELD, Pb>
+impl<'a, T, E, const FIELD: u32, A, Pb> RepeatedFieldRef<'a, T, E, FIELD, A, Pb>
+where
+    T: RepeatedItems,
+    E: RepeatedEncoding<T, A>,
+    A: Allocator + Clone,
+    Pb: PresenceBits,
 {
     #[inline]
-    fn new(field: &'a RepeatedField<T, E, FIELD>, common: &'a MessageCommon<Pb, T::Alloc>) -> Self {
+    fn new(field: &'a RepeatedField<T, E, FIELD, A>, common: &'a MessageCommon<Pb, A>) -> Self {
         Self {
             field,
             common,
@@ -150,7 +157,7 @@ impl<'a, T: RepeatedItems, E: RepeatedEncoding<T>, const FIELD: u32, Pb: Presenc
     }
 
     #[inline]
-    pub fn as_slice(self) -> &'a [T::Element] {
+    pub fn as_slice(self) -> &'a [T::Element<A>] {
         self.field.as_slice()
     }
 
@@ -165,29 +172,31 @@ impl<'a, T: RepeatedItems, E: RepeatedEncoding<T>, const FIELD: u32, Pb: Presenc
 // ---------------------------------------------------------------------------
 
 /// Short-lived binding of a repeated field to its message common state.
-///
-/// Repeated fields have no presence bit; the view carries `common` for the
-/// allocator. Every method consumes the view.
 pub struct RepeatedFieldMut<
     'f,
     'c,
     T: RepeatedItems,
-    E: RepeatedEncoding<T>,
+    E: RepeatedEncoding<T, A>,
     const FIELD: u32,
+    A: Allocator + Clone,
     Pb: PresenceBits,
 > {
-    field: &'f mut RepeatedField<T, E, FIELD>,
-    common: &'c mut MessageCommon<Pb, T::Alloc>,
+    field: &'f mut RepeatedField<T, E, FIELD, A>,
+    common: &'c mut MessageCommon<Pb, A>,
     _encoding: PhantomData<E>,
 }
 
-impl<'f, 'c, T: RepeatedItems, E: RepeatedEncoding<T>, const FIELD: u32, Pb: PresenceBits>
-    RepeatedFieldMut<'f, 'c, T, E, FIELD, Pb>
+impl<'f, 'c, T, E, const FIELD: u32, A, Pb> RepeatedFieldMut<'f, 'c, T, E, FIELD, A, Pb>
+where
+    T: RepeatedItems,
+    E: RepeatedEncoding<T, A>,
+    A: Allocator + Clone,
+    Pb: PresenceBits,
 {
     #[inline]
     fn new(
-        field: &'f mut RepeatedField<T, E, FIELD>,
-        common: &'c mut MessageCommon<Pb, T::Alloc>,
+        field: &'f mut RepeatedField<T, E, FIELD, A>,
+        common: &'c mut MessageCommon<Pb, A>,
     ) -> Self {
         Self {
             field,
@@ -197,10 +206,9 @@ impl<'f, 'c, T: RepeatedItems, E: RepeatedEncoding<T>, const FIELD: u32, Pb: Pre
     }
 
     /// Growable handle over copy elements (`repeated int32`, …).
-    pub fn values_mut(self) -> VecGuard<'f, T::Element, T::Alloc>
+    pub fn values_mut(self) -> VecGuard<'f, T::Element<A>, A>
     where
-        T::Alloc: Clone,
-        T::Element: Copy,
+        T::Element<A>: Copy,
     {
         let alloc = self.common.alloc.clone();
         // SAFETY: an owned clone of the message allocator owns this vector's
@@ -212,7 +220,6 @@ impl<'f, 'c, T: RepeatedItems, E: RepeatedEncoding<T>, const FIELD: u32, Pb: Pre
     pub fn push_in(self, v: impl AsRef<[u8]>) -> Result<(), DecodeError>
     where
         T: RepeatedSlicePush,
-        T::Alloc: Clone,
     {
         let alloc = self.common.alloc.clone();
         let stored = T::element_from_slice(v.as_ref(), alloc.clone())?;
@@ -223,10 +230,7 @@ impl<'f, 'c, T: RepeatedItems, E: RepeatedEncoding<T>, const FIELD: u32, Pb: Pre
     }
 
     /// Empties the vector (keeps capacity). Heap elements are freed first.
-    pub fn clear(self)
-    where
-        T::Alloc: Clone,
-    {
+    pub fn clear(self) {
         let alloc = self.common.alloc.clone();
         // SAFETY: owned clones of the message allocator own this vector's buffer
         // and every element.
@@ -237,10 +241,7 @@ impl<'f, 'c, T: RepeatedItems, E: RepeatedEncoding<T>, const FIELD: u32, Pb: Pre
     }
 
     /// Merges one wire occurrence — appends element(s).
-    pub fn merge<B: Buf>(self, wire_type: WireType, buf: &mut B) -> Result<(), DecodeError>
-    where
-        T::Alloc: Clone,
-    {
+    pub fn merge<B: Buf>(self, wire_type: WireType, buf: &mut B) -> Result<(), DecodeError> {
         let alloc = self.common.alloc.clone();
         // SAFETY: an owned clone of the message allocator owns this vector's
         // buffer.
@@ -255,13 +256,13 @@ impl<'f, 'c, T: RepeatedItems, E: RepeatedEncoding<T>, const FIELD: u32, Pb: Pre
 // Type aliases
 // ---------------------------------------------------------------------------
 
-pub type RepeatedPackedVarintField<T, const FIELD: u32> = RepeatedField<T, Packed, FIELD>;
-pub type RepeatedExpandedVarintField<T, const FIELD: u32> = RepeatedField<T, Expanded, FIELD>;
-pub type RepeatedLenField<T, const FIELD: u32> = RepeatedField<T, Expanded, FIELD>;
+pub type RepeatedPackedVarintField<T, const FIELD: u32, A> = RepeatedField<T, Packed, FIELD, A>;
+pub type RepeatedExpandedVarintField<T, const FIELD: u32, A> = RepeatedField<T, Expanded, FIELD, A>;
+pub type RepeatedLenField<T, const FIELD: u32, A> = RepeatedField<T, Expanded, FIELD, A>;
 
 pub type RepeatedPackedInt32<const FIELD: u32, A> =
-    RepeatedPackedVarintField<varint::ProtoInt32<A>, FIELD>;
+    RepeatedPackedVarintField<varint::ProtoInt32, FIELD, A>;
 pub type RepeatedExpandedInt32<const FIELD: u32, A> =
-    RepeatedExpandedVarintField<varint::ProtoInt32<A>, FIELD>;
-pub type RepeatedString<const FIELD: u32, A> = RepeatedLenField<ProtoString<A>, FIELD>;
-pub type RepeatedBytes<const FIELD: u32, A> = RepeatedLenField<ProtoBytes<A>, FIELD>;
+    RepeatedExpandedVarintField<varint::ProtoInt32, FIELD, A>;
+pub type RepeatedString<const FIELD: u32, A> = RepeatedLenField<ProtoString, FIELD, A>;
+pub type RepeatedBytes<const FIELD: u32, A> = RepeatedLenField<ProtoBytes, FIELD, A>;

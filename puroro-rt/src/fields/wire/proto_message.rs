@@ -1,8 +1,11 @@
 //! Nested-message type marker for [`ProtoType`](super::proto_type::ProtoType).
 //!
 //! [`ProtoMessage`] supplies merge-into wire semantics; physical storage is
-//! [`UnmanagedBox<M, A>`]. Presence policy (`NonOneof` / `Oneof`) lives on
+//! [`UnmanagedBox<M, M::Alloc>`]. Presence policy (`NonOneof` / `Oneof`) lives on
 //! [`FieldPresence`](crate::fields::shared::field_presence::FieldPresence).
+//!
+//! The marker is allocator-free; `M` typically still mentions `A` (e.g.
+//! `Address<A>`). Singular fields pass the same `A` so `M::Alloc = A`.
 
 use ::allocator_api2::alloc::Allocator;
 use ::bytes::{Buf, BufMut};
@@ -24,35 +27,31 @@ use crate::fields::wire::proto_type::{PayloadAccess, ProtoType};
 
 /// Type marker for a singular nested message `M`.
 ///
-/// Physical slot is [`UnmanagedBox<M, A>`]. Does not store a value itself.
-pub struct ProtoMessage<M, A>(PhantomData<fn() -> (M, A)>);
+/// Physical slot is [`UnmanagedBox<M, M::Alloc>`] via [`ProtoType::Slot`].
+pub struct ProtoMessage<M>(PhantomData<fn() -> M>);
 
-impl<M, A> Default for ProtoMessage<M, A> {
+impl<M> Default for ProtoMessage<M> {
     fn default() -> Self {
         Self(PhantomData)
     }
 }
 
-impl<M, A> Clone for ProtoMessage<M, A> {
+impl<M> Clone for ProtoMessage<M> {
     fn clone(&self) -> Self {
         *self
     }
 }
 
-impl<M, A> Copy for ProtoMessage<M, A> {}
+impl<M> Copy for ProtoMessage<M> {}
 
-impl<M: Message<Alloc = A>, A: Allocator + Clone> DefaultIn for UnmanagedBox<M, A> {
-    type Alloc = A;
-
+impl<M: Message<Alloc = A>, A: Allocator + Clone> DefaultIn<A> for UnmanagedBox<M, A> {
     #[inline]
     fn default_in(alloc: A) -> Self {
         UnmanagedBox::new_in(M::new_in(alloc.clone()), alloc)
     }
 }
 
-impl<M: Message<Alloc = A>, A: Allocator + Clone> DeallocateIn for UnmanagedBox<M, A> {
-    type Alloc = A;
-
+impl<M: Message<Alloc = A>, A: Allocator + Clone> DeallocateIn<A> for UnmanagedBox<M, A> {
     #[inline]
     unsafe fn deallocate_in(self, alloc: A) {
         // SAFETY: forwarded to the caller's obligation on `alloc`.
@@ -69,36 +68,41 @@ impl<M, A: Allocator> ProtoEmpty for UnmanagedBox<M, A> {
     }
 }
 
-impl<M: Message<Alloc = A>, A: Allocator + Clone> AddressableSlot for UnmanagedBox<M, A> {
-    type SlotAlloc = A;
-}
+impl<M, A: Allocator> AddressableSlot for UnmanagedBox<M, A> {}
 
-impl<M: Message<Alloc = A>, A: Allocator + Clone> ProtoType for ProtoMessage<M, A> {
-    type Alloc = A;
-    type Slot = UnmanagedBox<M, A>;
-    type Ref<'a>
+impl<M: Message> ProtoType for ProtoMessage<M>
+where
+    M::Alloc: Allocator + Clone,
+{
+    /// Ignores the GAT parameter; call sites unify `A` with [`Message::Alloc`].
+    type Slot<A: Allocator + Clone> = UnmanagedBox<M, M::Alloc>;
+    type Ref<'a, A: Allocator + Clone>
         = &'a M
     where
-        Self: 'a;
-    type Mut<'a>
+        Self: 'a,
+        A: 'a;
+    type Mut<'a, A: Allocator + Clone>
         = &'a mut M
     where
-        Self: 'a;
-    type Written = UnmanagedBox<M, A>;
+        Self: 'a,
+        A: 'a;
+    type Written<A: Allocator + Clone> = UnmanagedBox<M, M::Alloc>;
     const WIRE_TYPE: WireType = WireType::Len;
 
     #[inline]
-    fn encoded_len<'a>(value: Self::Ref<'a>, field: u32) -> usize
+    fn encoded_len<'a, A: Allocator + Clone>(value: &'a M, field: u32) -> usize
     where
         Self: 'a,
+        A: 'a,
     {
         encode::encoded_len_len_field(field, value.encoded_len())
     }
 
     #[inline]
-    fn encode<'a, B: BufMut>(value: Self::Ref<'a>, field: u32, buf: &mut B)
+    fn encode<'a, A: Allocator + Clone, B: BufMut>(value: &'a M, field: u32, buf: &mut B)
     where
         Self: 'a,
+        A: 'a,
     {
         let payload_len = value.encoded_len();
         encode::encode_tag(field, WireType::Len, buf);
@@ -107,47 +111,50 @@ impl<M: Message<Alloc = A>, A: Allocator + Clone> ProtoType for ProtoMessage<M, 
     }
 
     #[inline]
-    fn decode<B: Buf>(
-        wire_type: WireType,
-        buf: &mut B,
-        alloc: A,
-    ) -> Result<Self::Written, DecodeError> {
-        if wire_type != len::WIRE_TYPE {
-            return Err(DecodeError::InvalidTag);
-        }
-        let len = decode::decode_varint(buf)? as usize;
-        if buf.remaining() < len {
-            return Err(DecodeError::TruncatedMessage);
-        }
-        let mut sub = buf.take(len);
-        let mut child = M::new_in(alloc.clone());
-        child.merge_from(&mut sub)?;
-        Ok(UnmanagedBox::new_in(child, alloc))
+    fn decode<A: Allocator + Clone, B: Buf>(
+        _wire_type: WireType,
+        _buf: &mut B,
+        _alloc: A,
+    ) -> Result<UnmanagedBox<M, M::Alloc>, DecodeError> {
+        // Nested messages always decode via [`PayloadAccess::merge`] (merge-into).
+        // A free `A` cannot be proven equal to `M::Alloc` in this GAT signature.
+        Err(DecodeError::InvalidTag)
     }
 }
 
-impl<M: Message<Alloc = A>, A: Allocator + Clone> PayloadAccess for ProtoMessage<M, A> {
+impl<M: Message> PayloadAccess for ProtoMessage<M>
+where
+    M::Alloc: Allocator + Clone,
+{
     #[inline]
-    fn is_proto_empty<Pb: PresenceBits>(
-        _slot: &Self::Slot,
+    fn is_proto_empty<A: Allocator + Clone, Pb: PresenceBits>(
+        _slot: &UnmanagedBox<M, M::Alloc>,
         _common: &MessageCommon<Pb, A>,
     ) -> bool {
         false
     }
 
     #[inline]
-    fn get<'a, Pb: PresenceBits>(slot: &'a Self::Slot, _common: &'a MessageCommon<Pb, A>) -> &'a M {
+    fn get<'a, A: Allocator + Clone, Pb: PresenceBits>(
+        slot: &'a UnmanagedBox<M, M::Alloc>,
+        _common: &'a MessageCommon<Pb, A>,
+    ) -> &'a M
+    where
+        A: 'a,
+    {
         Deref::deref(slot)
     }
 
     #[inline]
-    fn with_mut<'a, VS, I, Pb>(
+    fn with_mut<'a, A, VS, I, Pb>(
         slot: &'a mut VS,
         init: I,
         common: &'a mut MessageCommon<Pb, A>,
-    ) -> Self::Mut<'a>
+    ) -> &'a mut M
     where
-        VS: ValueSlot<Self::Slot>,
+        A: Allocator + Clone + 'a,
+        UnmanagedBox<M, M::Alloc>: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
+        VS: ValueSlot<UnmanagedBox<M, M::Alloc>, A>,
         I: SlotInitMut,
         Pb: PresenceBits,
         Self: 'a,
@@ -156,13 +163,15 @@ impl<M: Message<Alloc = A>, A: Allocator + Clone> PayloadAccess for ProtoMessage
     }
 
     #[inline]
-    fn write<VS, I, Pb>(
+    fn write<A, VS, I, Pb>(
         slot: &mut VS,
         init: I,
         common: &mut MessageCommon<Pb, A>,
-        value: Self::Written,
+        value: UnmanagedBox<M, M::Alloc>,
     ) where
-        VS: ValueSlot<Self::Slot>,
+        A: Allocator + Clone,
+        UnmanagedBox<M, M::Alloc>: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
+        VS: ValueSlot<UnmanagedBox<M, M::Alloc>, A>,
         I: SlotInitMut,
         Pb: PresenceBits,
     {
@@ -170,16 +179,18 @@ impl<M: Message<Alloc = A>, A: Allocator + Clone> PayloadAccess for ProtoMessage
     }
 
     #[inline]
-    fn clear<VS, I, Pb>(slot: &mut VS, init: I, common: &mut MessageCommon<Pb, A>)
+    fn clear<A, VS, I, Pb>(slot: &mut VS, init: I, common: &mut MessageCommon<Pb, A>)
     where
-        VS: ValueSlot<Self::Slot>,
+        A: Allocator + Clone,
+        UnmanagedBox<M, M::Alloc>: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
+        VS: ValueSlot<UnmanagedBox<M, M::Alloc>, A>,
         I: SlotInitMut,
         Pb: PresenceBits,
     {
         ValueSlot::with_mut(slot, init, common).clear();
     }
 
-    fn merge<VS, I, Pb, B>(
+    fn merge<A, VS, I, Pb, B>(
         slot: &mut VS,
         init: I,
         common: &mut MessageCommon<Pb, A>,
@@ -188,7 +199,9 @@ impl<M: Message<Alloc = A>, A: Allocator + Clone> PayloadAccess for ProtoMessage
         _field: u32,
     ) -> Result<(), DecodeError>
     where
-        VS: ValueSlot<Self::Slot>,
+        A: Allocator + Clone,
+        UnmanagedBox<M, M::Alloc>: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
+        VS: ValueSlot<UnmanagedBox<M, M::Alloc>, A>,
         I: SlotInitMut,
         Pb: PresenceBits,
         B: Buf,

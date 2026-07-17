@@ -1,6 +1,6 @@
 //! Wire-encoding types (`VarintProtoType`, `LenProtoType`, `ProtoType`, …).
 //!
-//! Singular fields use thin type markers (`ProtoInt32(i32)`, …) and store
+//! Singular fields use allocator-free type markers (`ProtoInt32`, …) and store
 //! [`ProtoType::Slot`]. Repeated fields store [`RepeatedItems::Element`].
 
 pub(crate) mod fixed;

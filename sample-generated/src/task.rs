@@ -110,36 +110,39 @@ pub const FIELD_URGENT: u32 = 18; // notification.urgent (oneof bool)
 /// Reference `Task` message from `DESIGN.md`.
 pub struct Task<A: Allocator + Clone = Global> {
     _common: MessageCommon<TaskPresence, A>,
-    title: SingularField<ProtoString<A>, Explicit<{ BIT_TITLE }>, { FIELD_TITLE }>, // proto: string title = 1;
-    score: SingularField<ProtoInt32<A>, Implicit, { FIELD_SCORE }>, // proto: int32 score = 2;
+    title: SingularField<ProtoString, Explicit<{ BIT_TITLE }>, { FIELD_TITLE }, A>, // proto: string title = 1;
+    score: SingularField<ProtoInt32, Implicit, { FIELD_SCORE }, A>, // proto: int32 score = 2;
     max_retries: SingularField<
-        ProtoInt32<A>,
+        ProtoInt32,
         Explicit<{ BIT_MAX_RETRIES }>,
         { FIELD_MAX_RETRIES },
+        A,
         Inline,
         MaxRetriesDefault,
     >, // proto: int32 max_retries = 3;
-    owner_id: SingularField<ProtoString<A>, LegacyRequired<{ BIT_OWNER_ID }>, { FIELD_OWNER_ID }>, // proto: string owner_id = 4;
-    payload: SingularField<ProtoBytes<A>, Explicit<{ BIT_PAYLOAD }>, { FIELD_PAYLOAD }>, // proto: bytes payload = 5;
-    tag_ids: RepeatedField<ProtoInt32<A>, Packed, { FIELD_TAG_IDS }>, // proto: repeated int32 tag_ids = 6 [packed];
-    scores: RepeatedField<ProtoInt32<A>, Expanded, { FIELD_SCORES }>, // proto: repeated int32 scores = 7;
-    labels: RepeatedField<ProtoString<A>, Expanded, { FIELD_LABELS }>, // proto: repeated string labels = 8;
-    status: SingularField<ProtoEnum<Status, Open, A>, Implicit, { FIELD_STATUS }>, // proto: Status status = 9;
+    owner_id: SingularField<ProtoString, LegacyRequired<{ BIT_OWNER_ID }>, { FIELD_OWNER_ID }, A>, // proto: string owner_id = 4;
+    payload: SingularField<ProtoBytes, Explicit<{ BIT_PAYLOAD }>, { FIELD_PAYLOAD }, A>, // proto: bytes payload = 5;
+    tag_ids: RepeatedField<ProtoInt32, Packed, { FIELD_TAG_IDS }, A>, // proto: repeated int32 tag_ids = 6 [packed];
+    scores: RepeatedField<ProtoInt32, Expanded, { FIELD_SCORES }, A>, // proto: repeated int32 scores = 7;
+    labels: RepeatedField<ProtoString, Expanded, { FIELD_LABELS }, A>, // proto: repeated string labels = 8;
+    status: SingularField<ProtoEnum<Status, Open>, Implicit, { FIELD_STATUS }, A>, // proto: Status status = 9;
     priority: SingularField<
-        ProtoEnum<Priority, Closed, A>,
+        ProtoEnum<Priority, Closed>,
         Explicit<{ BIT_PRIORITY }>,
         { FIELD_PRIORITY },
+        A,
     >, // proto: Priority priority = 10;
-    assignee: SingularField<ProtoMessage<Address<A>, A>, NonOneof, { FIELD_ASSIGNEE }>, // proto: Address assignee = 11;
+    assignee: SingularField<ProtoMessage<Address<A>>, NonOneof, { FIELD_ASSIGNEE }, A>, // proto: Address assignee = 11;
     // proto: oneof notification { string email_address=12; string phone_number=13;
     //                             int32 webhook_id=14 [default=-1]; Address postal=15;
     //                             bool urgent=18; }
     notification: OneofSlot<NotificationStorage<A>>,
-    done: SingularField<ProtoBool<A>, Implicit, { FIELD_DONE }, BitPacked<{ BIT_DONE_VALUE }>>, // proto: bool done = 16;
+    done: SingularField<ProtoBool, Implicit, { FIELD_DONE }, A, BitPacked<{ BIT_DONE_VALUE }>>, // proto: bool done = 16;
     flag: SingularField<
-        ProtoBool<A>,
+        ProtoBool,
         Explicit<{ BIT_FLAG }>,
         { FIELD_FLAG },
+        A,
         BitPacked<{ BIT_FLAG_VALUE }>,
     >, // proto: bool flag = 17;
 }

@@ -5,33 +5,34 @@
 //! Encode follows `E`. Non-packable types (string / bytes / future message) only
 //! implement [`Expanded`].
 
+use ::allocator_api2::alloc::Allocator;
 use ::bytes::BufMut;
 
 use crate::encode;
 use crate::fields::wire::repeated_items::{PackableRepeatedItems, RepeatedItems};
 
 /// How a repeated field is written on encode.
-pub trait RepeatedEncoding<T: RepeatedItems>: Copy {
+pub trait RepeatedEncoding<T: RepeatedItems, A: Allocator + Clone>: Copy {
     /// Wire byte length when `values` is non-empty; `0` when empty.
-    fn encoded_len(field: u32, values: &[T::Element]) -> usize;
+    fn encoded_len(field: u32, values: &[T::Element<A>]) -> usize;
 
     /// Writes the field when `values` is non-empty.
-    fn encode<B: BufMut>(field: u32, values: &[T::Element], buf: &mut B);
+    fn encode<B: BufMut>(field: u32, values: &[T::Element<A>], buf: &mut B);
 }
 
 /// One tagged record per element (expanded varint, string, bytes, …).
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
 pub struct Expanded;
 
-impl<T: RepeatedItems> RepeatedEncoding<T> for Expanded {
-    fn encoded_len(field: u32, values: &[T::Element]) -> usize {
+impl<T: RepeatedItems, A: Allocator + Clone> RepeatedEncoding<T, A> for Expanded {
+    fn encoded_len(field: u32, values: &[T::Element<A>]) -> usize {
         values
             .iter()
             .map(|v| T::encoded_len_element(v, field))
             .sum()
     }
 
-    fn encode<B: BufMut>(field: u32, values: &[T::Element], buf: &mut B) {
+    fn encode<B: BufMut>(field: u32, values: &[T::Element<A>], buf: &mut B) {
         for v in values {
             T::encode_element(v, field, buf);
         }
@@ -42,15 +43,15 @@ impl<T: RepeatedItems> RepeatedEncoding<T> for Expanded {
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
 pub struct Packed;
 
-impl<T: PackableRepeatedItems> RepeatedEncoding<T> for Packed
+impl<T: PackableRepeatedItems, A: Allocator + Clone> RepeatedEncoding<T, A> for Packed
 where
-    T::Element: Copy,
+    T::Element<A>: Copy,
 {
-    fn encoded_len(field: u32, values: &[T::Element]) -> usize {
+    fn encoded_len(field: u32, values: &[T::Element<A>]) -> usize {
         encode::encoded_len_packed_varint_field(field, values, |v| T::encode_wire(*v))
     }
 
-    fn encode<B: BufMut>(field: u32, values: &[T::Element], buf: &mut B) {
+    fn encode<B: BufMut>(field: u32, values: &[T::Element<A>], buf: &mut B) {
         encode::encode_packed_varint_field(field, values, |v| T::encode_wire(*v), buf);
     }
 }
