@@ -18,7 +18,7 @@ use ::puroro_rt::{
     Closed, Explicit, FieldDeallocate, Implicit, LegacyRequired, MessageCommon,
     NestedMessageField, OneofSlot, Open, PresenceBits, ProtoBool, ProtoBytes, ProtoEnum,
     ProtoInt32, ProtoString, RepeatedExpandedVarintField, RepeatedLenField,
-    RepeatedPackedVarintField, Singular, SingularAccess, SingularLenField, SingularVarintField,
+    NonOneof, RepeatedPackedVarintField, SingularAccess, SingularLenField, SingularVarintField,
 };
 
 use defaults::MaxRetriesDefault;
@@ -135,7 +135,7 @@ pub struct Task<A: Allocator + Clone = Global> {
         Explicit<{ BIT_PRIORITY }>,
         { FIELD_PRIORITY },
     >, // proto: Priority priority = 10;
-    assignee: NestedMessageField<Address<A>, Singular, { FIELD_ASSIGNEE }, A>, // proto: Address assignee = 11;
+    assignee: NestedMessageField<Address<A>, NonOneof, { FIELD_ASSIGNEE }, A>, // proto: Address assignee = 11;
     // proto: oneof notification { string email_address=12; string phone_number=13;
     //                             int32 webhook_id=14 [default=-1]; Address postal=15;
     //                             bool urgent=18; }

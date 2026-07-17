@@ -5,7 +5,7 @@
 //! this type. Cardinality (singular vs repeated) is separate from presence
 //! ([`FieldPresence`](crate::fields::shared::field_presence::FieldPresence)).
 //!
-//! Parametrised by protobuf type marker `T: ScalarProtoType`, [`FieldPresence`],
+//! Parametrised by protobuf type marker `T: ProtoType`, [`FieldPresence`],
 //! proto field number `FIELD`, and compile-time default marker `D`. Physical
 //! storage is `P::ValueSlot<T::Slot>` (`T` itself — including ZST
 //! [`ProtoBool`](crate::ProtoBool)). Heap payloads are
@@ -20,7 +20,6 @@ use ::core::mem::ManuallyDrop;
 use ::allocator_api2::alloc::Allocator;
 use ::bytes::{Buf, BufMut};
 
-use crate::decode;
 use crate::defaults::ProtoDefault;
 use ::puroro::DecodeError;
 use ::puroro::WireType;
@@ -33,14 +32,14 @@ use crate::fields::shared::{
     value_slot::{ValueSlot, ValueSlotRefAccess},
 };
 use crate::fields::shared::FieldDeallocate;
-use crate::fields::wire::scalar::ScalarProtoType;
+use crate::fields::wire::proto_type::ProtoType;
 
 /// Singular (non-repeated) scalar field — varint or LEN, selected by type marker `T`.
 ///
-/// `T` is the protobuf type ([`ScalarProtoType`]); the field stores
+/// `T` is the protobuf type ([`ProtoType`]); the field stores
 /// `P::ValueSlot<T::Slot>`. Covers both `IMPLICIT` and `EXPLICIT` /
 /// `LEGACY_REQUIRED` presence via `P`.
-pub struct SingularField<T: ScalarProtoType, P: FieldPresence, const FIELD: u32, D = ProtoDefault>
+pub struct SingularField<T: ProtoType, P: FieldPresence, const FIELD: u32, D = ProtoDefault>
 where
     P::ValueSlot<T::Slot>: ValueSlot<T::Slot>,
 {
@@ -48,7 +47,7 @@ where
     _marker: PhantomData<(T, P, D)>,
 }
 
-impl<T: ScalarProtoType, P: FieldPresence, const FIELD: u32, D> Clone
+impl<T: ProtoType, P: FieldPresence, const FIELD: u32, D> Clone
     for SingularField<T, P, FIELD, D>
 where
     P::ValueSlot<T::Slot>: ValueSlot<T::Slot> + Copy,
@@ -58,14 +57,14 @@ where
     }
 }
 
-impl<T: ScalarProtoType, P: FieldPresence, const FIELD: u32, D> Copy
+impl<T: ProtoType, P: FieldPresence, const FIELD: u32, D> Copy
     for SingularField<T, P, FIELD, D>
 where
     P::ValueSlot<T::Slot>: ValueSlot<T::Slot> + Copy,
 {
 }
 
-impl<T: ScalarProtoType, P: FieldPresence, const FIELD: u32, D> ::core::fmt::Debug
+impl<T: ProtoType, P: FieldPresence, const FIELD: u32, D> ::core::fmt::Debug
     for SingularField<T, P, FIELD, D>
 where
     P::ValueSlot<T::Slot>: ValueSlot<T::Slot> + ::core::fmt::Debug,
@@ -77,7 +76,7 @@ where
     }
 }
 
-impl<T: ScalarProtoType, P: FieldPresence, const FIELD: u32, D> SingularField<T, P, FIELD, D>
+impl<T: ProtoType, P: FieldPresence, const FIELD: u32, D> SingularField<T, P, FIELD, D>
 where
     P::ValueSlot<T::Slot>: ValueSlot<T::Slot>,
 {
@@ -135,7 +134,7 @@ where
     }
 }
 
-impl<T: ScalarProtoType, P: FieldPresence, const FIELD: u32, D, Pb: PresenceBits>
+impl<T: ProtoType, P: FieldPresence, const FIELD: u32, D, Pb: PresenceBits>
     FieldDeallocate<Pb, T::Alloc> for SingularField<T, P, FIELD, D>
 where
     P::ValueSlot<T::Slot>: ValueSlot<T::Slot>,
@@ -154,7 +153,7 @@ where
     }
 }
 
-impl<T: ScalarProtoType, const FIELD: u32, D> SingularField<T, Implicit, FIELD, D>
+impl<T: ProtoType, const FIELD: u32, D> SingularField<T, Implicit, FIELD, D>
 where
     <Implicit as FieldPresence>::ValueSlot<T::Slot>: ValueSlot<T::Slot>,
 {
@@ -173,7 +172,7 @@ where
     }
 }
 
-impl<T: ScalarProtoType, const FIELD: u32, D> SingularField<T, Oneof, FIELD, D>
+impl<T: ProtoType, const FIELD: u32, D> SingularField<T, Oneof, FIELD, D>
 where
     <Oneof as FieldPresence>::ValueSlot<T::Slot>: ValueSlot<T::Slot>,
 {
@@ -200,7 +199,7 @@ where
     }
 }
 
-impl<T: ScalarProtoType, const BIT: usize, const FIELD: u32, D>
+impl<T: ProtoType, const BIT: usize, const FIELD: u32, D>
     SingularField<T, LegacyRequired<BIT>, FIELD, D>
 where
     <LegacyRequired<BIT> as FieldPresence>::ValueSlot<T::Slot>: ValueSlot<T::Slot>,
@@ -230,7 +229,7 @@ where
 /// produced by [`SingularAccess::bind`](crate::fields::singular::SingularAccess::bind).
 pub struct SingularFieldRef<
     'a,
-    T: ScalarProtoType,
+    T: ProtoType,
     P: FieldPresence,
     const FIELD: u32,
     D,
@@ -243,7 +242,7 @@ pub struct SingularFieldRef<
     common: &'a MessageCommon<Pb, A>,
 }
 
-impl<'a, T: ScalarProtoType, P: FieldPresence, const FIELD: u32, D, Pb: PresenceBits>
+impl<'a, T: ProtoType, P: FieldPresence, const FIELD: u32, D, Pb: PresenceBits>
     SingularFieldRef<'a, T, P, FIELD, D, Pb, T::Alloc>
 where
     P::ValueSlot<T::Slot>: ValueSlot<T::Slot>,
@@ -257,7 +256,7 @@ where
     }
 }
 
-impl<'a, T: ScalarProtoType, P: FieldPresence, const FIELD: u32, D, Pb: PresenceBits>
+impl<'a, T: ProtoType, P: FieldPresence, const FIELD: u32, D, Pb: PresenceBits>
     SingularFieldRef<'a, T, P, FIELD, D, Pb, T::Alloc>
 where
     P::ValueSlot<T::Slot>: ValueSlot<T::Slot>,
@@ -290,7 +289,7 @@ where
     }
 }
 
-impl<'a, T: ScalarProtoType, const FIELD: u32, D, Pb: PresenceBits>
+impl<'a, T: ProtoType, const FIELD: u32, D, Pb: PresenceBits>
     SingularFieldRef<'a, T, Implicit, FIELD, D, Pb, T::Alloc>
 where
     <Implicit as FieldPresence>::ValueSlot<T::Slot>: ValueSlot<T::Slot>,
@@ -301,7 +300,7 @@ where
     }
 }
 
-impl<'a, T: ScalarProtoType, const FIELD: u32, D, Pb: PresenceBits>
+impl<'a, T: ProtoType, const FIELD: u32, D, Pb: PresenceBits>
     SingularFieldRef<'a, T, Oneof, FIELD, D, Pb, T::Alloc>
 where
     <Oneof as FieldPresence>::ValueSlot<T::Slot>: ValueSlot<T::Slot>,
@@ -321,7 +320,7 @@ where
 pub struct SingularFieldMut<
     'f,
     'c,
-    T: ScalarProtoType,
+    T: ProtoType,
     P: FieldPresence,
     const FIELD: u32,
     D,
@@ -337,7 +336,7 @@ pub struct SingularFieldMut<
 impl<
     'f,
     'c,
-    T: ScalarProtoType,
+    T: ProtoType,
     P: FieldPresence,
     const FIELD: u32,
     D,
@@ -382,30 +381,14 @@ where
     pub fn merge<B: Buf>(self, wire_type: WireType, buf: &mut B) -> Result<(), DecodeError>
     where
     {
-        match T::decode(wire_type, buf, self.common.alloc.clone()) {
-            Ok(new) => {
-                T::write(
-                    &mut *self.field.value,
-                    P::slot_init_mut(),
-                    self.common,
-                    new,
-                );
-                Ok(())
-            }
-            // Closed enum, unrecognized value: park in unknown fields (not a
-            // decode failure). See https://protobuf.dev/programming-guides/enum/
-            // — field stays unset; accessors return the enum default.
-            Err(DecodeError::UnknownClosedEnum { raw }) => {
-                decode::save_unknown_varint_field(
-                    FIELD,
-                    raw,
-                    &mut self.common.unknown_fields,
-                    self.common.alloc.clone(),
-                );
-                Ok(())
-            }
-            Err(e) => Err(e),
-        }
+        T::merge(
+            &mut *self.field.value,
+            P::slot_init_mut(),
+            self.common,
+            wire_type,
+            buf,
+            FIELD,
+        )
     }
 
     /// Resets the value slot and clears explicit presence when applicable.

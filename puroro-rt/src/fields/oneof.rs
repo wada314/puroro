@@ -15,6 +15,7 @@
 use ::allocator_api2::alloc::Allocator;
 use ::bytes::BufMut;
 use ::puroro::{HasDefault, Optional};
+use ::unmanaged::UnmanagedBox;
 
 use crate::fields::enum_variant::EnumVariant;
 use crate::fields::shared::{
@@ -25,7 +26,7 @@ use crate::fields::shared::{
 use crate::fields::singular::SingularAccess;
 use crate::fields::singular::field::SingularField;
 use crate::fields::singular::message::NestedMessageField;
-use crate::fields::wire::scalar::ScalarProtoType;
+use crate::fields::wire::proto_type::ProtoType;
 
 /// Explicit release of a generated `oneof` storage enum.
 ///
@@ -371,7 +372,7 @@ impl<'a, F, Pb: PresenceBits, A: Allocator> OneofVariantRef<'a, F, Pb, A> {
     }
 }
 
-impl<'a, T: ScalarProtoType<Alloc = A>, const FIELD: u32, D, Pb: PresenceBits, A: Allocator>
+impl<'a, T: ProtoType<Alloc = A>, const FIELD: u32, D, Pb: PresenceBits, A: Allocator>
     OneofVariantRef<'a, SingularField<T, Oneof, FIELD, D>, Pb, A>
 where
     T::Ref<'a>: Copy,
@@ -391,9 +392,14 @@ where
 
 impl<'a, M, const FIELD: u32, A: Allocator + Clone, Pb: PresenceBits>
     OneofVariantRef<'a, NestedMessageField<M, Oneof, FIELD, A>, Pb, A>
+where
+    M: ::puroro::Message<Alloc = A>,
+    UnmanagedBox<M, A>: crate::fields::shared::DefaultIn<Alloc = A>
+        + crate::fields::shared::DeallocateIn<Alloc = A>,
+    <Oneof as FieldPresence>::ValueSlot<UnmanagedBox<M, A>>:
+        ValueSlot<UnmanagedBox<M, A>>,
 {
-    pub fn get(self) -> Option<&'a M>
-    {
+    pub fn get(self) -> Option<&'a M> {
         self.field.map(|f| f.bind(self.common).value())
     }
 }

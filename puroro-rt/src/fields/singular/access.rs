@@ -2,18 +2,19 @@
 //!
 //! [`SingularAccess`] names getter / `_mut` payload types (`Ref` / `Mut`) and
 //! pairs a field with [`MessageCommon`] via `bind` / `bind_mut` (`View` /
-//! `ViewMut`). [`SingularField`] forwards to [`ScalarProtoType`];
+//! `ViewMut`). [`SingularField`] forwards to [`ProtoType`];
 //! [`NestedMessageField`] supplies its own.
 
 use ::allocator_api2::alloc::Allocator;
+use ::unmanaged::UnmanagedBox;
 
 use crate::fields::shared::field_presence::FieldPresence;
 use crate::fields::shared::value_slot::ValueSlot;
 use crate::fields::shared::{MessageCommon, PresenceBits};
-use crate::fields::wire::scalar::ScalarProtoType;
+use crate::fields::wire::proto_type::ProtoType;
 
 use super::field::{SingularField, SingularFieldMut, SingularFieldRef};
-use super::message::{MessagePresence, NestedMessageField, NestedMessageFieldMut, NestedMessageFieldRef};
+use super::message::{NestedMessageField, NestedMessageFieldMut, NestedMessageFieldRef};
 
 /// Getter / mutable-accessor payloads and MessageCommon binding for a singular
 /// field wrapper.
@@ -61,7 +62,7 @@ pub trait SingularAccess {
     ) -> Self::ViewMut<'f, 'c, Pb>;
 }
 
-impl<T: ScalarProtoType, P: FieldPresence, const FIELD: u32, D> SingularAccess
+impl<T: ProtoType, P: FieldPresence, const FIELD: u32, D> SingularAccess
     for SingularField<T, P, FIELD, D>
 where
     P::ValueSlot<T::Slot>: ValueSlot<T::Slot>,
@@ -106,8 +107,11 @@ where
     }
 }
 
-impl<M, P: MessagePresence, const FIELD: u32, AField: Allocator + Clone> SingularAccess
+impl<M, P: FieldPresence, const FIELD: u32, AField: Allocator + Clone> SingularAccess
     for NestedMessageField<M, P, FIELD, AField>
+where
+    M: ::puroro::Message<Alloc = AField>,
+    P::ValueSlot<UnmanagedBox<M, AField>>: ValueSlot<UnmanagedBox<M, AField>>,
 {
     type Alloc = AField;
     type Ref<'a>

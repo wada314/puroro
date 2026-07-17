@@ -6,7 +6,7 @@
 //! # Singular vs repeated
 //!
 //! Each `Proto*` type is a **thin wrapper** over its payload (`ProtoInt32(i32)`,
-//! …). Singular fields ([`ScalarProtoType`](super::scalar::ScalarProtoType))
+//! …). Singular fields ([`ProtoType`](super::proto_type::ProtoType))
 //! store the wrapper itself. Repeated fields use [`VarintProtoType::Value`]
 //! (the inner primitive / enum) in the element buffer so `as_slice()` stays
 //! `&[i32]` / `&[E]`.
@@ -28,7 +28,7 @@ use crate::fields::shared::{DeallocateIn, DefaultIn, ProtoEmpty};
 ///
 /// [`Value`](Self::Value) is the **element type for repeated fields** and the
 /// inner payload of the thin wrapper. Singular fields store the wrapper type
-/// itself (see [`ScalarProtoType`](super::scalar::ScalarProtoType)).
+/// itself (see [`ProtoType`](super::proto_type::ProtoType)).
 pub trait VarintProtoType {
     /// Inner / repeated-element type (`i32`, `u64`, `bool`, enum newtype, …).
     type Value: Copy;
@@ -314,7 +314,7 @@ proto_varint_wrapper! {
 
 /// Protobuf `bool` type marker — varint 0 or 1.
 ///
-/// Implements [`ScalarProtoType`](super::scalar::ScalarProtoType) with
+/// Implements [`ProtoType`](super::proto_type::ProtoType) with
 /// `Slot = Self` (ZST). The logical `bool` is packed at `VALUE_BIT` in
 /// [`MessageCommon`](crate::MessageCommon)'s bitvec; the field struct only
 /// stores this marker for presence/init layout.

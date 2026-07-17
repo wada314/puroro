@@ -24,20 +24,19 @@ pub use fields::repeated::{
 };
 pub use fields::shared::{FieldDeallocate, MessageCommon, PresenceBits};
 pub use fields::shared::field_presence::{
-    Explicit, FieldPresence, Implicit, LegacyRequired, Oneof, RequiredFieldPresence,
+    Explicit, FieldPresence, Implicit, LegacyRequired, NonOneof, Oneof, RequiredFieldPresence,
 };
 pub use fields::shared::value_slot::ValueSlot;
 pub use fields::singular::{
     ExplicitBytes, ExplicitEnum, ExplicitInt32, ExplicitLenField, ExplicitString, ExplicitVarint,
     ExplicitVarintField, ImplicitBytes, ImplicitEnum, ImplicitInt32, ImplicitLenField,
-    ImplicitString, ImplicitVarint, ImplicitVarintField, MessagePresence, NestedMessageField,
-    NestedMessageFieldMut, NestedMessageFieldRef, Singular, SingularAccess,
-    SingularField, SingularFieldMut, SingularFieldRef, SingularLen, SingularLenField,
-    SingularLenFieldMut, SingularLenFieldRef, SingularVarint, SingularVarintField,
-    SingularVarintFieldMut, SingularVarintFieldRef,
+    ImplicitString, ImplicitVarint, ImplicitVarintField, NestedMessageField, NestedMessageFieldMut,
+    NestedMessageFieldRef, SingularAccess, SingularField, SingularFieldMut, SingularFieldRef,
+    SingularLen, SingularLenField, SingularLenFieldMut, SingularLenFieldRef, SingularVarint,
+    SingularVarintField, SingularVarintFieldMut, SingularVarintFieldRef,
 };
 pub use fields::wire::{
     Closed, ClosedEnum, LenProtoType, Open, OpenEnum, ProtoBool, ProtoBytes, ProtoEnum,
-    ProtoEnumStorage, ProtoInt32, ProtoInt64, ProtoSint32, ProtoSint64, ProtoString, ProtoUInt32,
-    ProtoUInt64, ScalarProtoType, VarintProtoType,
+    ProtoEnumStorage, ProtoInt32, ProtoInt64, ProtoMessage, ProtoSint32, ProtoSint64, ProtoString,
+    ProtoType, ProtoUInt32, ProtoUInt64, VarintProtoType,
 };

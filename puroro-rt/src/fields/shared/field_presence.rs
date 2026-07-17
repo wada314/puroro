@@ -1,10 +1,12 @@
-//! Field presence policy markers (`Implicit` / `Explicit<BIT>` / `LegacyRequired<BIT>` / [`Oneof`]).
+//! Field presence policy markers (`Implicit` / `Explicit<BIT>` / `LegacyRequired<BIT>` /
+//! [`NonOneof`] / [`Oneof`]).
 //!
-//! Composed with wire-encoding markers ([`VarintProtoType`](crate::fields::wire::varint::VarintProtoType),
-//! [`LenProtoType`](crate::fields::wire::len::LenProtoType)) in singular field wrappers.
+//! Composed with [`ProtoType`](crate::fields::wire::proto_type::ProtoType) markers in
+//! singular field wrappers.
 //!
-//! Only [`Explicit`] and [`LegacyRequired`] carry a presence bit index; [`Implicit`] and
-//! [`Oneof`] have none.
+//! Only [`Explicit`] and [`LegacyRequired`] carry a presence bit index; [`Implicit`],
+//! [`NonOneof`], and [`Oneof`] have none. [`NonOneof`] uses pointer presence
+//! (`Option` via [`ValueSlot`](super::value_slot::ValueSlot)).
 
 use ::allocator_api2::alloc::Allocator;
 use ::core::mem::MaybeUninit;
@@ -24,7 +26,7 @@ pub trait FieldPresence: Copy {
     /// [`LegacyRequired`] use [`MaybeUninit<T>`].
     ///
     /// The `ValueSlot<T>` bound is enforced at use sites ([`SingularField`]).
-    /// `T` here is the **slot** payload ([`ScalarProtoType::Slot`](crate::ScalarProtoType)),
+    /// `T` here is the **slot** payload ([`ProtoType::Slot`](crate::ProtoType)),
     /// not the protobuf type marker.
     type ValueSlot<T: DefaultIn + DeallocateIn>;
 
@@ -88,6 +90,49 @@ impl FieldPresence for Implicit {
 
     fn payload_is_empty<T: DefaultIn + DeallocateIn + ProtoEmpty>(slot: &T) -> bool {
         slot.is_proto_empty()
+    }
+
+    fn should_emit<P, A, F>(_: &MessageCommon<P, A>, is_payload_empty: F) -> bool
+    where
+        P: PresenceBits,
+        A: Allocator,
+        F: FnOnce() -> bool,
+    {
+        !is_payload_empty()
+    }
+
+    fn is_set<P, A, F>(_: &MessageCommon<P, A>, is_payload_empty: F) -> bool
+    where
+        P: PresenceBits,
+        A: Allocator,
+        F: FnOnce() -> bool,
+    {
+        !is_payload_empty()
+    }
+}
+
+/// Marker for a **non-oneof** nested-message field — presence is the slot itself
+/// ([`Option`](core::option::Option) via [`ValueSlot`](super::value_slot::ValueSlot)),
+/// not a message bitfield. Emit / `is_set` consult the caller callback (absent =
+/// empty). Used by [`NestedMessageField`](crate::fields::singular::NestedMessageField).
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
+pub struct NonOneof;
+
+impl FieldPresence for NonOneof {
+    type ValueSlot<T: DefaultIn + DeallocateIn> = Option<T>;
+    type SlotInitMut = AlwaysInitialized;
+    type SlotInitView = AlwaysInitialized;
+
+    fn slot_init_mut() -> AlwaysInitialized {
+        AlwaysInitialized
+    }
+
+    fn slot_init_view() -> AlwaysInitialized {
+        AlwaysInitialized
+    }
+
+    fn payload_is_empty<T: DefaultIn + DeallocateIn + ProtoEmpty>(slot: &Option<T>) -> bool {
+        slot.is_none()
     }
 
     fn should_emit<P, A, F>(_: &MessageCommon<P, A>, is_payload_empty: F) -> bool

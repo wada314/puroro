@@ -15,9 +15,7 @@ pub use len::{
     ExplicitBytes, ExplicitLenField, ExplicitString, ImplicitBytes, ImplicitLenField,
     ImplicitString, SingularLen, SingularLenField, SingularLenFieldMut, SingularLenFieldRef,
 };
-pub use message::{
-    MessagePresence, NestedMessageField, NestedMessageFieldMut, NestedMessageFieldRef, Singular,
-};
+pub use message::{NestedMessageField, NestedMessageFieldMut, NestedMessageFieldRef};
 pub use varint::{
     ExplicitEnum, ExplicitInt32, ExplicitVarint, ExplicitVarintField, ImplicitEnum, ImplicitInt32,
     ImplicitVarint, ImplicitVarintField, SingularVarint, SingularVarintField,

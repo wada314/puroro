@@ -1,14 +1,18 @@
-//! Unified wire/storage semantics for singular scalar fields (varint + LEN).
+//! Unified wire/storage semantics for singular (non-repeated) field type markers.
 //!
-//! Each implementor is a **protobuf type marker** (`ProtoInt32`, `ProtoBool`, …).
-//! The physical field slot is the associated [`Slot`](ScalarProtoType::Slot)
-//! (`Self` for addressable wrappers and bit-packed [`ProtoBool`]).
+//! Each implementor is a **protobuf type marker** (`ProtoInt32`, `ProtoBool`,
+//! [`ProtoMessage`](super::proto_message::ProtoMessage), …). The physical field
+//! slot is the associated [`Slot`](ProtoType::Slot) (`Self` for addressable
+//! wrappers and bit-packed [`ProtoBool`]; [`UnmanagedBox`] for messages).
 //!
-//! IMPLICIT omit uses [`is_proto_empty`](ScalarProtoType::is_proto_empty) on the
+//! IMPLICIT omit uses [`is_proto_empty`](ProtoType::is_proto_empty) on the
 //! type marker (slot [`ProtoEmpty`](crate::fields::shared::ProtoEmpty) for
 //! payload-bearing types; bit read for [`ProtoBool`]). Wire `encoded_len` /
 //! `encode` stay on the marker because multiple markers can share the same
 //! `Ref` type (e.g. [`ProtoInt32`] and [`ProtoSint32`] both use `i32`).
+//!
+//! [`merge`](ProtoType::merge) owns replace vs merge-into semantics: the default
+//! is decode-then-write (last wins); nested messages override to recursive merge.
 //!
 //! [`VarintProtoType`](super::varint::VarintProtoType) and
 //! [`LenProtoType`](super::len::LenProtoType) remain for **repeated** fields,
@@ -33,17 +37,18 @@ use crate::fields::shared::{
 use super::len::{LenProtoType, ProtoBytes, ProtoString};
 use super::varint::{ProtoBool, VarintProtoType};
 
-/// Wire + accessor semantics for a singular scalar protobuf type.
+/// Wire + accessor semantics for a singular (non-repeated) protobuf type.
 ///
 /// The implementor is the **type marker** (not necessarily what sits in the
 /// field struct). Physical storage is [`Slot`](Self::Slot):
 /// - addressable wrappers: `Slot = Self` (thin payload in the field)
 /// - [`ProtoBool`]: `Slot = Self` (ZST; logical `bool` in [`MessageCommon`] bitvec)
+/// - nested messages: `Slot = UnmanagedBox<M, A>` via [`ProtoMessage`](super::proto_message::ProtoMessage)
 ///
 /// Interim: [`ProtoBool`] still carries `VALUE_BIT` as a const generic for
 /// codegen stability; a future cleanup should move that index to the field /
 /// layout side so the type marker is bit-index-free.
-pub trait ScalarProtoType: Sized {
+pub trait ProtoType: Sized {
     /// Allocator type retained by the marker and its physical slot.
     type Alloc: Allocator + Clone;
 
@@ -134,13 +139,52 @@ pub trait ScalarProtoType: Sized {
         buf: &mut B,
         alloc: Self::Alloc,
     ) -> Result<Self::Written, DecodeError>;
+
+    /// Merges one wire occurrence into the slot after the tag has been read.
+    ///
+    /// Default: decode then [`write`](Self::write) (last wins). Closed-enum
+    /// unknowns are parked in `common.unknown_fields`. Nested messages override
+    /// this for recursive merge-into.
+    fn merge<VS, I, Pb, B>(
+        slot: &mut VS,
+        init: I,
+        common: &mut MessageCommon<Pb, Self::Alloc>,
+        wire_type: WireType,
+        buf: &mut B,
+        field: u32,
+    ) -> Result<(), DecodeError>
+    where
+        VS: ValueSlot<Self::Slot>,
+        I: SlotInitMut,
+        Pb: PresenceBits,
+        B: Buf,
+    {
+        match Self::decode(wire_type, buf, common.alloc.clone()) {
+            Ok(new) => {
+                Self::write(slot, init, common, new);
+                Ok(())
+            }
+            // Closed enum, unrecognized value: park in unknown fields (not a
+            // decode failure). See https://protobuf.dev/programming-guides/enum/
+            Err(DecodeError::UnknownClosedEnum { raw }) => {
+                decode::save_unknown_varint_field(
+                    field,
+                    raw,
+                    &mut common.unknown_fields,
+                    common.alloc.clone(),
+                );
+                Ok(())
+            }
+            Err(e) => Err(e),
+        }
+    }
 }
 
 // ---------------------------------------------------------------------------
 // Addressable varint wrappers (Slot = Self): numerics + ProtoEnum
 // ---------------------------------------------------------------------------
 
-impl<T> ScalarProtoType for T
+impl<T> ProtoType for T
 where
     T: VarintProtoType + AddressableSlot + From<T::Value> + ProtoEmpty,
     T: Deref<Target = T::Value> + DerefMut,
@@ -251,7 +295,7 @@ where
 // LEN wrappers (Slot = Self)
 // ---------------------------------------------------------------------------
 
-impl<A: Allocator + Clone> ScalarProtoType for ProtoString<A> {
+impl<A: Allocator + Clone> ProtoType for ProtoString<A> {
     type Alloc = A;
     type Slot = Self;
     type Ref<'a>
@@ -353,7 +397,7 @@ impl<A: Allocator + Clone> ScalarProtoType for ProtoString<A> {
     }
 }
 
-impl<A: Allocator + Clone> ScalarProtoType for ProtoBytes<A> {
+impl<A: Allocator + Clone> ProtoType for ProtoBytes<A> {
     type Alloc = A;
     type Slot = Self;
     type Ref<'a>
@@ -459,7 +503,7 @@ impl<A: Allocator + Clone> ScalarProtoType for ProtoBytes<A> {
 // Bit-packed bool (Slot = Self, ZST; value in MessageCommon)
 // ---------------------------------------------------------------------------
 
-impl<A: Allocator + Clone, const VALUE_BIT: usize> ScalarProtoType
+impl<A: Allocator + Clone, const VALUE_BIT: usize> ProtoType
     for ProtoBool<A, VALUE_BIT>
 {
     type Alloc = A;

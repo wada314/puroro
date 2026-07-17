@@ -1,10 +1,12 @@
-//! Value slot storage for singular fields — always-initialized (`T`) or
-//! presence-tracked ([`MaybeUninit<T>`]), selected by [`FieldPresence::ValueSlot`].
+//! Value slot storage for singular fields — always-initialized (`T`),
+//! bit-tracked ([`MaybeUninit<T>`]), or pointer-present ([`Option<T>`]),
+//! selected by [`FieldPresence::ValueSlot`].
 //!
-//! [`ValueSlot`] is implemented for raw `T` and [`MaybeUninit<T>`] when `T` is
-//! [`AddressableSlot`]. Slot payloads are physical storage (thin wrappers, or
-//! ZST [`ProtoBool`](crate::ProtoBool) for bit-packed bool); logical bit-packed
-//! values live in [`MessageCommon`](super::MessageCommon).
+//! [`ValueSlot`] is implemented for raw `T`, [`MaybeUninit<T>`], and [`Option<T>`]
+//! when `T` is [`AddressableSlot`]. Slot payloads are physical storage (thin
+//! wrappers, ZST [`ProtoBool`](crate::ProtoBool) for bit-packed bool, or
+//! [`UnmanagedBox`](::unmanaged::UnmanagedBox) for nested messages); logical
+//! bit-packed values live in [`MessageCommon`](super::MessageCommon).
 //!
 //! Construction and teardown thread an allocator (via
 //! [`DefaultIn`](super::DefaultIn) / [`DeallocateIn`](super::DeallocateIn)).
@@ -92,7 +94,7 @@ pub trait ValueSlotMutAccess<'a, T> {
     /// Lazy-initializes when uninitialized, then returns `&mut T`.
     ///
     /// Callers that need a logical accessor chain through
-    /// [`ScalarProtoType::with_mut`](crate::fields::wire::scalar::ScalarProtoType::with_mut).
+    /// [`ProtoType::with_mut`](crate::fields::wire::proto_type::ProtoType::with_mut).
     fn get_mut(self) -> &'a mut T;
 
     /// Assigns `value`, releasing any previously stored payload and updating
@@ -256,6 +258,82 @@ impl<T: AddressableSlot> ValueSlot<T> for MaybeUninit<T> {
         if initialized {
             // SAFETY: init bit set implies a live payload we now take ownership of.
             let value = unsafe { self.assume_init() };
+            // SAFETY: `alloc` owns `value`'s buffer.
+            unsafe { DeallocateIn::deallocate_in(value, alloc) };
+        }
+    }
+
+    #[inline]
+    fn with<'s, I: SlotInitView, Pb: PresenceBits>(
+        &'s self,
+        init: I,
+        common: &'s MessageCommon<Pb, T::SlotAlloc>,
+    ) -> impl ValueSlotRefAccess<'s, T> {
+        ValueSlotRef {
+            slot: self,
+            init,
+            common,
+            _t: PhantomData,
+        }
+    }
+
+    #[inline]
+    fn with_mut<'a, I: SlotInitMut, Pb: PresenceBits>(
+        &'a mut self,
+        init: I,
+        common: &'a mut MessageCommon<Pb, T::SlotAlloc>,
+    ) -> impl ValueSlotMutAccess<'a, T> {
+        ValueSlotMut {
+            slot: self,
+            init,
+            common,
+            _t: PhantomData,
+        }
+    }
+}
+
+impl<'s, T: AddressableSlot, I: SlotInitView, Pb: PresenceBits, A: Allocator>
+    ValueSlotRefAccess<'s, T> for ValueSlotRef<'s, Option<T>, T, I, Pb, A>
+{
+    #[inline]
+    fn get(self) -> Option<&'s T> {
+        self.slot.as_ref()
+    }
+}
+
+impl<'a, T: AddressableSlot<SlotAlloc = A>, I: SlotInitMut, Pb: PresenceBits, A: Allocator + Clone>
+    ValueSlotMutAccess<'a, T> for ValueSlotMut<'a, Option<T>, T, I, Pb, A>
+{
+    #[inline]
+    fn get_mut(self) -> &'a mut T {
+        self.slot
+            .get_or_insert_with(|| T::default_in(self.common.alloc.clone()))
+    }
+
+    #[inline]
+    fn set(self, value: T) {
+        if let Some(old) = self.slot.replace(value) {
+            // SAFETY: `common.alloc` owns `old`'s buffer.
+            unsafe { old.deallocate_in(self.common.alloc.clone()) };
+        }
+    }
+
+    #[inline]
+    fn clear(self) {
+        if let Some(old) = self.slot.take() {
+            // SAFETY: `common.alloc` owns `old`'s buffer.
+            unsafe { old.deallocate_in(self.common.alloc.clone()) };
+        }
+    }
+}
+
+impl<T: AddressableSlot> ValueSlot<T> for Option<T> {
+    fn new_in(_alloc: <T as DefaultIn>::Alloc) -> Self {
+        None
+    }
+
+    fn deallocate_in(self, _: bool, alloc: <T as DefaultIn>::Alloc) {
+        if let Some(value) = self {
             // SAFETY: `alloc` owns `value`'s buffer.
             unsafe { DeallocateIn::deallocate_in(value, alloc) };
         }
