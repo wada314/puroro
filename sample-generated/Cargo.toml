@@ -5,6 +5,9 @@ edition = "2024"
 publish = false
 description = "Hand-written sample of puroro protoc plugin output (Task / Address)"
 
+[lints]
+workspace = true
+
 [dependencies]
 allocator-api2 = "0.4"
 bitvec = "1"

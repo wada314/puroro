@@ -5,6 +5,9 @@ edition = "2024"
 description = "Runtime implementation for puroro-generated protobuf code (not for direct use)"
 publish = false
 
+[lints]
+workspace = true
+
 [dependencies]
 allocator-api2 = "0.4"
 bitvec = "1"

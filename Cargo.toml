@@ -2,10 +2,17 @@
 members = [".", "puroro-rt", "protobuf-core", "sample-generated", "unmanaged"]
 resolver = "2"
 
+[workspace.lints.clippy]
+# Restriction lint (allow by default). Keep off for machine-generated crates.
+absolute_paths = "warn"
+
 [package]
 name = "puroro"
 version = "0.1.0"
 edition = "2024"
+
+[lints]
+workspace = true
 
 [dependencies]
 allocator-api2 = "0.4"
