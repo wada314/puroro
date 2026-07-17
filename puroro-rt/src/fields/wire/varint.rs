@@ -7,8 +7,9 @@
 //!
 //! Each `Proto*` type is a **thin wrapper** over its payload (`ProtoInt32(i32)`,
 //! …). Singular fields ([`ProtoType`](super::proto_type::ProtoType))
-//! store the wrapper itself. Repeated fields use [`VarintProtoType::Value`]
-//! (the inner primitive / enum) in the element buffer so `as_slice()` stays
+//! store the wrapper itself (`Slot = Self`). Repeated fields
+//! ([`RepeatedItems`](super::repeated_items::RepeatedItems)) store
+//! [`VarintProtoType::Value`] in the element buffer so `as_slice()` stays
 //! `&[i32]` / `&[E]`.
 
 use ::core::convert::TryFrom;

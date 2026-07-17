@@ -17,10 +17,9 @@ pub use fields::oneof::{
     OneofVariantRef, OneofView, OneofViewMut,
 };
 pub use fields::repeated::{
-    Expanded, Packed, RepeatedBytes, RepeatedExpandedInt32, RepeatedExpandedVarintField,
-    RepeatedLen, RepeatedLenField, RepeatedLenFieldMut, RepeatedLenFieldRef, RepeatedPackedInt32,
-    RepeatedPackedVarintField, RepeatedString, RepeatedVarint, RepeatedVarintEncoding,
-    RepeatedVarintField, RepeatedVarintFieldMut, RepeatedVarintFieldRef,
+    Expanded, Packed, RepeatedBytes, RepeatedEncoding, RepeatedExpandedInt32,
+    RepeatedExpandedVarintField, RepeatedField, RepeatedFieldMut, RepeatedFieldRef,
+    RepeatedLenField, RepeatedPackedInt32, RepeatedPackedVarintField, RepeatedString,
 };
 pub use fields::shared::field_presence::{
     Explicit, FieldPresence, Implicit, LegacyRequired, NonOneof, Oneof, RequiredFieldPresence,
@@ -29,7 +28,8 @@ pub use fields::shared::value_slot::ValueSlot;
 pub use fields::shared::{FieldDeallocate, MessageCommon, PresenceBits};
 pub use fields::singular::{SingularField, SingularFieldMut, SingularFieldRef};
 pub use fields::wire::{
-    Closed, ClosedEnum, LenProtoType, Open, OpenEnum, ProtoBool, ProtoBytes, ProtoEnum,
-    ProtoEnumStorage, ProtoInt32, ProtoInt64, ProtoMessage, ProtoSint32, ProtoSint64, ProtoString,
-    ProtoType, ProtoUInt32, ProtoUInt64, VarintProtoType,
+    Closed, ClosedEnum, LenProtoType, Open, OpenEnum, PackableRepeatedItems, ProtoBool, ProtoBytes,
+    ProtoEnum, ProtoEnumStorage, ProtoInt32, ProtoInt64, ProtoMessage, ProtoSint32, ProtoSint64,
+    ProtoString, ProtoType, ProtoUInt32, ProtoUInt64, RepeatedItems, RepeatedSlicePush,
+    VarintProtoType,
 };

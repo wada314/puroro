@@ -1,16 +1,11 @@
 //! Repeated field wrappers.
 
 pub(crate) mod encoding;
-pub(crate) mod len;
-pub(crate) mod varint;
+pub(crate) mod field;
 
-pub use encoding::{Expanded, Packed, RepeatedVarintEncoding};
-pub use len::{
-    RepeatedBytes, RepeatedLen, RepeatedLenField, RepeatedLenFieldMut, RepeatedLenFieldRef,
-    RepeatedString,
-};
-pub use varint::{
-    RepeatedExpandedInt32, RepeatedExpandedVarintField, RepeatedPackedInt32,
-    RepeatedPackedVarintField, RepeatedVarint, RepeatedVarintField, RepeatedVarintFieldMut,
-    RepeatedVarintFieldRef,
+pub use encoding::{Expanded, Packed, RepeatedEncoding};
+pub use field::{
+    RepeatedBytes, RepeatedExpandedInt32, RepeatedExpandedVarintField, RepeatedField,
+    RepeatedFieldMut, RepeatedFieldRef, RepeatedLenField, RepeatedPackedInt32,
+    RepeatedPackedVarintField, RepeatedString,
 };

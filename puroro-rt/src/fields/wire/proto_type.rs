@@ -14,10 +14,10 @@
 //! [`merge`](ProtoType::merge) owns replace vs merge-into semantics: the default
 //! is decode-then-write (last wins); nested messages override to recursive merge.
 //!
-//! [`VarintProtoType`](super::varint::VarintProtoType) and
-//! [`LenProtoType`](super::len::LenProtoType) remain for **repeated** fields,
-//! which keep storing the inner [`VarintProtoType::Value`] /
-//! [`LenProtoType::Storage`] so public slices stay `&[i32]` / `&[UnmanagedString]`.
+//! Repeated fields use [`RepeatedItems`](super::repeated_items::RepeatedItems)
+//! (`Element` storage). [`VarintProtoType`](super::varint::VarintProtoType) and
+//! [`LenProtoType`](super::len::LenProtoType) remain as wire/storage helpers
+//! shared by singular and repeated marker impls.
 
 use ::allocator_api2::alloc::Allocator;
 use ::bitvec::{

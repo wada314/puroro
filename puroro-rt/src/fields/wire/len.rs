@@ -7,7 +7,8 @@
 //!
 //! [`ProtoString`] / [`ProtoBytes`] are thin wrappers over allocator-typed
 //! storage. Singular fields store the wrapper
-//! ([`ProtoType`](super::proto_type::ProtoType)). Repeated fields keep
+//! ([`ProtoType`](super::proto_type::ProtoType)). Repeated fields
+//! ([`RepeatedItems`](super::repeated_items::RepeatedItems)) keep
 //! [`LenProtoType::Storage`] (the inner `UnmanagedString` / `UnmanagedVec<u8>`)
 //! in the element buffer so `as_slice()` stays `&[UnmanagedString]` / …
 //!

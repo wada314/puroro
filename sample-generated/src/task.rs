@@ -18,10 +18,9 @@ use ::core::ops::DerefMut;
 use ::puroro::{DecodeError, HasDefault, Message, Optional};
 use ::puroro_rt::decode::{decode_tag, skip_field_and_save};
 use ::puroro_rt::{
-    Closed, Explicit, FieldDeallocate, Implicit, LegacyRequired, MessageCommon, NonOneof,
-    OneofSlot, Open, PresenceBits, ProtoBool, ProtoBytes, ProtoEnum, ProtoInt32, ProtoMessage,
-    ProtoString, RepeatedExpandedVarintField, RepeatedLenField, RepeatedPackedVarintField,
-    SingularField,
+    Closed, Expanded, Explicit, FieldDeallocate, Implicit, LegacyRequired, MessageCommon, NonOneof,
+    OneofSlot, Open, Packed, PresenceBits, ProtoBool, ProtoBytes, ProtoEnum, ProtoInt32,
+    ProtoMessage, ProtoString, RepeatedField, SingularField,
 };
 
 use defaults::MaxRetriesDefault;
@@ -121,9 +120,9 @@ pub struct Task<A: Allocator + Clone = Global> {
     >, // proto: int32 max_retries = 3;
     owner_id: SingularField<ProtoString<A>, LegacyRequired<{ BIT_OWNER_ID }>, { FIELD_OWNER_ID }>, // proto: string owner_id = 4;
     payload: SingularField<ProtoBytes<A>, Explicit<{ BIT_PAYLOAD }>, { FIELD_PAYLOAD }>, // proto: bytes payload = 5;
-    tag_ids: RepeatedPackedVarintField<ProtoInt32<A>, { FIELD_TAG_IDS }, A>, // proto: repeated int32 tag_ids = 6 [packed];
-    scores: RepeatedExpandedVarintField<ProtoInt32<A>, { FIELD_SCORES }, A>, // proto: repeated int32 scores = 7;
-    labels: RepeatedLenField<ProtoString<A>, { FIELD_LABELS }, A>, // proto: repeated string labels = 8;
+    tag_ids: RepeatedField<ProtoInt32<A>, Packed, { FIELD_TAG_IDS }>, // proto: repeated int32 tag_ids = 6 [packed];
+    scores: RepeatedField<ProtoInt32<A>, Expanded, { FIELD_SCORES }>, // proto: repeated int32 scores = 7;
+    labels: RepeatedField<ProtoString<A>, Expanded, { FIELD_LABELS }>, // proto: repeated string labels = 8;
     status: SingularField<ProtoEnum<Status, Open, A>, Implicit, { FIELD_STATUS }>, // proto: Status status = 9;
     priority: SingularField<
         ProtoEnum<Priority, Closed, A>,
@@ -150,9 +149,9 @@ impl<A: Allocator + Clone> Task<A> {
             max_retries: SingularField::new_in(alloc.clone()),
             owner_id: SingularField::new_in(alloc.clone()),
             payload: SingularField::new_in(alloc.clone()),
-            tag_ids: RepeatedPackedVarintField::new_in(alloc.clone()),
-            scores: RepeatedExpandedVarintField::new_in(alloc.clone()),
-            labels: RepeatedLenField::new_in(alloc.clone()),
+            tag_ids: RepeatedField::new_in(alloc.clone()),
+            scores: RepeatedField::new_in(alloc.clone()),
+            labels: RepeatedField::new_in(alloc.clone()),
             status: SingularField::new_in(alloc.clone()),
             priority: SingularField::new_in(alloc.clone()),
             assignee: SingularField::new_in(alloc.clone()),

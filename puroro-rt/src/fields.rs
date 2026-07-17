@@ -7,9 +7,11 @@
 //! 2. [`MessageCommon`](shared::MessageCommon) (presence bitfield, allocator, unknown-field buffer).
 //!
 //! Singular fields (non-repeated — both `IMPLICIT` and `EXPLICIT` presence) are
-//! parametrised by **wire type** (`ProtoInt32`, `ProtoString`, … — thin wrappers
-//! for singular fields; repeated fields use the inner `Value` / `Storage`)
-//! and **presence policy** ([`Implicit`](shared::field_presence::Implicit) / [`Explicit`](shared::field_presence::Explicit) / [`Oneof`](shared::field_presence::Oneof)).
+//! parametrised by **wire type** (`ProtoInt32`, `ProtoString`, …) and
+//! **presence policy** ([`Implicit`](shared::field_presence::Implicit) /
+//! [`Explicit`](shared::field_presence::Explicit) /
+//! [`Oneof`](shared::field_presence::Oneof)). Repeated fields use the same
+//! markers via [`RepeatedItems`](wire::RepeatedItems) (`Element` storage).
 //!
 //! Flat crate-root re-exports of the catalog live in [`crate`](crate) (`lib.rs`).
 //!
@@ -18,9 +20,9 @@
 //! | Submodule | Contents |
 //! |---|---|
 //! | [`shared`] | `MessageCommon`, `PresenceBits`, `FieldPresence`, `ValueSlot`, … |
-//! | [`wire`] | `ProtoType` (thin wrappers), `VarintProtoType` / `LenProtoType` (repeated inners), fixed-width stubs |
+//! | [`wire`] | `ProtoType`, `RepeatedItems`, `VarintProtoType` / `LenProtoType` helpers, fixed stubs |
 //! | [`singular`] | `SingularField` |
-//! | [`repeated`] | `RepeatedVarintField`, `RepeatedLenField` |
+//! | [`repeated`] | `RepeatedField` |
 //! | [`oneof`] | `OneofSlot` |
 
 pub(crate) mod enum_variant;
