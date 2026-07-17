@@ -12,7 +12,7 @@ use ::core::ops::DerefMut;
 use ::puroro::{DecodeError, Message};
 use ::puroro_rt::{
     Explicit, FieldDeallocate, MessageCommon, PresenceBits, ProtoString, SingularAccess,
-    SingularLenField,
+    SingularField,
 };
 
 // ---------------------------------------------------------------------------
@@ -65,8 +65,8 @@ pub const FIELD_CITY: u32 = 2; // city
 
 pub struct Address<A: Allocator + Clone = Global> {
     _common: MessageCommon<AddressPresence, A>,
-    street: SingularLenField<ProtoString<A>, Explicit<{ BIT_STREET }>, { FIELD_STREET }>, // proto: string street = 1;
-    city: SingularLenField<ProtoString<A>, Explicit<{ BIT_CITY }>, { FIELD_CITY }>, // proto: string city = 2;
+    street: SingularField<ProtoString<A>, Explicit<{ BIT_STREET }>, { FIELD_STREET }>, // proto: string street = 1;
+    city: SingularField<ProtoString<A>, Explicit<{ BIT_CITY }>, { FIELD_CITY }>, // proto: string city = 2;
 }
 
 impl<A: Allocator + Clone> Address<A> {
@@ -75,8 +75,8 @@ impl<A: Allocator + Clone> Address<A> {
         // heap field (`city`) takes the original by move.
         Self {
             _common: MessageCommon::new_in(AddressPresence::ZERO, alloc.clone()),
-            street: SingularLenField::new_in(alloc.clone()),
-            city: SingularLenField::new_in(alloc),
+            street: SingularField::new_in(alloc.clone()),
+            city: SingularField::new_in(alloc),
         }
     }
 

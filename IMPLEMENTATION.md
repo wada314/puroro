@@ -120,7 +120,7 @@ protobuf-core           Varint, Tag, WireType
 | `VarintProtoType` / `LenProtoType` (repeated + scalar helpers) | **Done** |
 | `FieldPresence` (`Implicit` / `Explicit` / `LegacyRequired` / `Oneof`) | **Done** |
 | `ValueSlot`, `SlotInitView` / `SlotInitMut`, `DefaultIn` / `DeallocateIn` / `ProtoEmpty` | **Done** |
-| `SingularField<T, P, FIELD>` (+ `SingularVarintField` / `SingularLenField` aliases) | **Done** |
+| `SingularField<T, P, FIELD>`  | **Done** |
 | `ProtoBool<VALUE_BIT>` on `SingularField` (bit-packed singular / oneof `bool`) | **Done** |
 | Closed-enum unknown → `DecodeError::UnknownClosedEnum` → unknown fields, `validate_required` | **Done** |
 | Nested message via `SingularField<ProtoMessage<…>, …>` | **Done** |
@@ -137,7 +137,7 @@ protobuf-core           Varint, Tag, WireType
 
 | Path | Contents |
 |---|---|
-| [`lib.rs`](puroro-rt/src/lib.rs) | Crate-root catalog re-exports (`::puroro_rt::SingularLenField`, …) |
+| [`lib.rs`](puroro-rt/src/lib.rs) | Crate-root catalog re-exports (`::puroro_rt::SingularField`, …) |
 | [`fields.rs`](puroro-rt/src/fields.rs) | Module root (`pub(crate)`; `pub mod` only) |
 | [`shared.rs`](puroro-rt/src/fields/shared.rs) | `MessageCommon`, `PresenceBits`, `DefaultIn`, `DeallocateIn`, `ProtoEmpty` |
 | [`shared/field_presence.rs`](puroro-rt/src/fields/shared/field_presence.rs) | `FieldPresence` markers |
@@ -151,8 +151,6 @@ protobuf-core           Varint, Tag, WireType
 | [`wire/fixed.rs`](puroro-rt/src/fields/wire/fixed.rs) | `Fixed32ProtoType` / `Fixed64ProtoType` (stub) |
 | [`singular.rs`](puroro-rt/src/fields/singular.rs) | Singular field re-exports |
 | [`singular/field.rs`](puroro-rt/src/fields/singular/field.rs) | `SingularField` — `T: ProtoType`, stores `T::Slot` |
-| [`singular/varint.rs`](puroro-rt/src/fields/singular/varint.rs) | `SingularVarintField` aliases |
-| [`singular/len.rs`](puroro-rt/src/fields/singular/len.rs) | `SingularLenField` aliases |
 | [`repeated.rs`](puroro-rt/src/fields/repeated.rs) | Repeated field re-exports |
 | [`repeated/encoding.rs`](puroro-rt/src/fields/repeated/encoding.rs) | `Packed` / `Expanded` |
 | [`repeated/varint.rs`](puroro-rt/src/fields/repeated/varint.rs) | `RepeatedVarintField` |
@@ -213,7 +211,7 @@ pub trait ProtoType: Sized {
 // Implemented for ProtoInt32<A>, …, ProtoBool<A, BIT>, ProtoEnum<E, K, A>, ProtoString<A>, ProtoBytes<A>, ProtoMessage<M, A>
 ```
 
-**Interim:** [`ProtoBool<A, VALUE_BIT>`](puroro-rt/src/fields/wire/varint.rs) still carries the value-bit index as a const generic so generated spellings stay `SingularVarintField<ProtoBool<A, { BIT_*_VALUE }>, …>`. The type/slot split is done (`Slot = Self`); a future cleanup should move `VALUE_BIT` to the field / layout side so the marker is bit-index-free.
+**Interim:** [`ProtoBool<A, VALUE_BIT>`](puroro-rt/src/fields/wire/varint.rs) still carries the value-bit index as a const generic so generated spellings stay `SingularField<ProtoBool<A, { BIT_*_VALUE }>, …>`. The type/slot split is done (`Slot = Self`); a future cleanup should move `VALUE_BIT` to the field / layout side so the marker is bit-index-free.
 ### Varint / LEN helpers (also used by repeated)
 
 [`VarintProtoType`](puroro-rt/src/fields/wire/varint.rs) and [`LenProtoType`](puroro-rt/src/fields/wire/len.rs) remain for **repeated** fields: `Value` / `Storage` are the **inner** element types so `as_slice()` stays `&[i32]` / `&[UnmanagedString<A>]`. Singular fields store the thin wrapper; repeated fields store the inner. `ProtoType` impls reuse the same wire helpers (`encode_wire` / `LenProtoType::decode`, …).
@@ -271,7 +269,7 @@ Varint and LEN singular scalars share one wrapper, parametrised by [`ProtoType`]
 
 | Wrapper | Module | Params | Aliases (ergonomics) |
 |---|---|---|---|
-| `SingularField<T, P, FIELD>` | [`singular/field.rs`](puroro-rt/src/fields/singular/field.rs) | `T: ProtoType`, stores `P::ValueSlot<T::Slot>` | `SingularVarintField`, `SingularLenField`, `ImplicitInt32`, `ExplicitString`, … |
+| `SingularField<T, P, FIELD>` | [`singular/field.rs`](puroro-rt/src/fields/singular/field.rs) | `T: ProtoType`, stores `P::ValueSlot<T::Slot>` | — |
 | `SingularField<ProtoBool<A, VALUE_BIT>, P, FIELD>` | same | `Slot = Self` (ZST); value at `VALUE_BIT` in `_common.presence` | existing varint aliases |
 | `SingularField<ProtoMessage<M, A>, P, FIELD>` | same | `Slot = UnmanagedBox<M, A>`; `NonOneof` → `Option`; `Oneof` → always-present | — |
 | Fixed-width singular | (planned via `ProtoType` + `SingularField`) | — | — |
@@ -289,16 +287,16 @@ Adding a singular wire type = one new `ProtoType` impl (and usually a `VarintPro
 
 | Proto field | Generated member type |
 |---|---|
-| `IMPLICIT int32` | `SingularField<ProtoInt32, Implicit, FIELD>` (= `SingularVarintField<…>`) |
+| `IMPLICIT int32` | `SingularField<ProtoInt32, Implicit, FIELD>`  |
 | `EXPLICIT int32` | `SingularField<ProtoInt32, Explicit<BIT>, FIELD>` |
 | `IMPLICIT sint32` | `SingularField<ProtoSint32, Implicit, FIELD>` |
-| `IMPLICIT bool` | `SingularVarintField<ProtoBool<VALUE_BIT>, Implicit, FIELD>` (value in `_common.presence`) |
-| `EXPLICIT bool` | `SingularVarintField<ProtoBool<VALUE_BIT>, Explicit<PRESENCE_BIT>, FIELD>` |
-| `LEGACY_REQUIRED bool` | `SingularVarintField<ProtoBool<VALUE_BIT>, LegacyRequired<PRESENCE_BIT>, FIELD>` |
-| oneof `bool` | `SingularVarintField<ProtoBool<VALUE_BIT>, Oneof, FIELD>` inside the oneof storage enum |
+| `IMPLICIT bool` | `SingularField<ProtoBool<VALUE_BIT>, Implicit, FIELD>` (value in `_common.presence`) |
+| `EXPLICIT bool` | `SingularField<ProtoBool<VALUE_BIT>, Explicit<PRESENCE_BIT>, FIELD>` |
+| `LEGACY_REQUIRED bool` | `SingularField<ProtoBool<VALUE_BIT>, LegacyRequired<PRESENCE_BIT>, FIELD>` |
+| oneof `bool` | `SingularField<ProtoBool<VALUE_BIT>, Oneof, FIELD>` inside the oneof storage enum |
 | `IMPLICIT open enum` | `SingularField<ProtoEnum<E, Open>, Implicit, FIELD>` |
 | `EXPLICIT closed enum` | `SingularField<ProtoEnum<E, Closed>, Explicit<BIT>, FIELD>` (same `.merge`) |
-| `IMPLICIT string` | `SingularField<ProtoString, Implicit, FIELD>` (= `SingularLenField<…>`) |
+| `IMPLICIT string` | `SingularField<ProtoString, Implicit, FIELD>`  |
 | `EXPLICIT string` | `SingularField<ProtoString, Explicit<BIT>, FIELD>` |
 | `LEGACY_REQUIRED string` | `SingularField<ProtoString, LegacyRequired<BIT>, FIELD>` |
 | `IMPLICIT` / `EXPLICIT bytes` | `SingularField<ProtoBytes, P, FIELD>` |
@@ -318,20 +316,20 @@ Adding a singular wire type = one new `ProtoType` impl (and usually a `VarintPro
 ```rust
 pub struct Task<A: Allocator + Clone = Global> {
     _common: MessageCommon<TaskPresence, A>,
-    title: SingularLenField<ProtoString<A>, Explicit<{ BIT_TITLE }>, { FIELD_TITLE }>,
-    score: SingularVarintField<ProtoInt32<A>, Implicit, { FIELD_SCORE }>,
-    max_retries: SingularVarintField<ProtoInt32<A>, Explicit<{ BIT_MAX_RETRIES }>, { FIELD_MAX_RETRIES }>,
-    owner_id: SingularLenField<ProtoString<A>, LegacyRequired<{ BIT_OWNER_ID }>, { FIELD_OWNER_ID }>,
-    payload: SingularLenField<ProtoBytes<A>, Explicit<{ BIT_PAYLOAD }>, { FIELD_PAYLOAD }>,
+    title: SingularField<ProtoString<A>, Explicit<{ BIT_TITLE }>, { FIELD_TITLE }>,
+    score: SingularField<ProtoInt32<A>, Implicit, { FIELD_SCORE }>,
+    max_retries: SingularField<ProtoInt32<A>, Explicit<{ BIT_MAX_RETRIES }>, { FIELD_MAX_RETRIES }>,
+    owner_id: SingularField<ProtoString<A>, LegacyRequired<{ BIT_OWNER_ID }>, { FIELD_OWNER_ID }>,
+    payload: SingularField<ProtoBytes<A>, Explicit<{ BIT_PAYLOAD }>, { FIELD_PAYLOAD }>,
     tag_ids: RepeatedPackedVarintField<ProtoInt32<A>, { FIELD_TAG_IDS }, A>,
     scores: RepeatedExpandedVarintField<ProtoInt32<A>, { FIELD_SCORES }, A>,
     labels: RepeatedLenField<ProtoString<A>, { FIELD_LABELS }, A>,
-    status: SingularVarintField<ProtoEnum<Status, Open, A>, Implicit, { FIELD_STATUS }>,
-    priority: SingularVarintField<ProtoEnum<Priority, Closed, A>, Explicit<{ BIT_PRIORITY }>, { FIELD_PRIORITY }>,
+    status: SingularField<ProtoEnum<Status, Open, A>, Implicit, { FIELD_STATUS }>,
+    priority: SingularField<ProtoEnum<Priority, Closed, A>, Explicit<{ BIT_PRIORITY }>, { FIELD_PRIORITY }>,
     assignee: SingularField<ProtoMessage<Address<A>, A>, NonOneof, { FIELD_ASSIGNEE }>,
     notification: OneofSlot<NotificationStorage<A>>,
-    done: SingularVarintField<ProtoBool<A, { BIT_DONE_VALUE }>, Implicit, { FIELD_DONE }>,
-    flag: SingularVarintField<ProtoBool<A, { BIT_FLAG_VALUE }>, Explicit<{ BIT_FLAG }>, { FIELD_FLAG }>,
+    done: SingularField<ProtoBool<A, { BIT_DONE_VALUE }>, Implicit, { FIELD_DONE }>,
+    flag: SingularField<ProtoBool<A, { BIT_FLAG_VALUE }>, Explicit<{ BIT_FLAG }>, { FIELD_FLAG }>,
 }
 ```
 
@@ -365,11 +363,11 @@ IR step: `ProtoField → FieldKind → catalog type + const args`.
 
 ### Path qualification (naming)
 
-**Real generated code must fully-qualify every path it emits** — leading-`::` absolute paths such as `::puroro_rt::SingularLenField`, `::puroro::Message`, `::core::ops::DerefMut`, `::allocator_api2::alloc::Allocator` — and must not depend on `use` imports for the items it references. A `.proto` file can name its packages, messages, and fields with almost any identifier, so any *unqualified* name in the generated output risks colliding with a user-defined type, module, or import that lands in the same scope. Fully-qualified paths are collision-proof. The only names exempt from this are the ones the generator introduces itself and reserves by convention — e.g. the `_common` field and other `_`-prefixed internals — which cannot clash with proto-derived names.
+**Real generated code must fully-qualify every path it emits** — leading-`::` absolute paths such as `::puroro_rt::SingularField`, `::puroro::Message`, `::core::ops::DerefMut`, `::allocator_api2::alloc::Allocator` — and must not depend on `use` imports for the items it references. A `.proto` file can name its packages, messages, and fields with almost any identifier, so any *unqualified* name in the generated output risks colliding with a user-defined type, module, or import that lands in the same scope. Fully-qualified paths are collision-proof. The only names exempt from this are the ones the generator introduces itself and reserves by convention — e.g. the `_common` field and other `_`-prefixed internals — which cannot clash with proto-derived names.
 
 **Crate split.** Items from [DESIGN.md §3](DESIGN.md#3-runtime-trait-api) (`Message`, `Optional`, `HasDefault`, `DecodeError`, …) are emitted as `::puroro::…`. Field catalog types, `MessageCommon`, wire helpers, and `ProtoDefault` are emitted as `::puroro_rt::…`. A generated crate's `Cargo.toml` lists both dependencies; end-user application code should not add `puroro-rt` directly.
 
-**The checked-in [`sample-generated/`](sample-generated/) deliberately breaks this rule for readability.** It pulls names in with `use` and refers to them by short name (`SingularLenField`, `Allocator`, `MessageCommon`, …) so the reference output stays easy to read and review. Read those short names as stand-ins for the fully-qualified paths the production protoc plugin would actually emit.
+**The checked-in [`sample-generated/`](sample-generated/) deliberately breaks this rule for readability.** It pulls names in with `use` and refers to them by short name (`SingularField`, `Allocator`, `MessageCommon`, …) so the reference output stays easy to read and review. Read those short names as stand-ins for the fully-qualified paths the production protoc plugin would actually emit.
 
 ### Generated code comments
 
@@ -417,7 +415,7 @@ Include **presence**, **wire/kind** (string, int32, repeated packed, nested, …
 **Struct members** — trailing comment tying storage to proto:
 
 ```rust
-title: SingularLenField<ProtoString, Explicit<{ BIT_TITLE }>, { FIELD_TITLE }>, // proto: string title = 1;
+title: SingularField<ProtoString, Explicit<{ BIT_TITLE }>, { FIELD_TITLE }>, // proto: string title = 1;
 ```
 
 **Constants** — associated constants on `impl Task<A>`. Use `Self::FIELD_*` / `Self::BIT_*` inside message impls; `Task::<A>::FIELD_*` in free helpers outside the type.
@@ -588,7 +586,7 @@ In this catalog, **singular** means a **non-repeated** field — both `IMPLICIT`
 
 ### Unified wrapper (`SingularField<T, P, FIELD>`)
 
-Varint and LEN share [`SingularField`](puroro-rt/src/fields/singular/field.rs), parametrised by type marker `T: ProtoType`. Addressable scalars and bit-packed [`ProtoBool<VALUE_BIT>`](puroro-rt/src/fields/wire/varint.rs) share one encode/merge/accessor path via contextual `ProtoType` methods (`get` / `with_mut` / `is_proto_empty` / …). Ergonomic aliases (`SingularVarintField`, `SingularLenField`, `ImplicitInt32`, `ExplicitString`, …) are type aliases of the same struct.
+Varint and LEN share [`SingularField`](puroro-rt/src/fields/singular/field.rs), parametrised by type marker `T: ProtoType`. Addressable scalars and bit-packed [`ProtoBool<VALUE_BIT>`](puroro-rt/src/fields/wire/varint.rs) share one encode/merge/accessor path via contextual `ProtoType` methods (`get` / `with_mut` / `is_proto_empty` / …). Ergonomic There are no wire-family aliases — generated code names `SingularField` directly.
 
 Storage is `ManuallyDrop<P::ValueSlot<T::Slot>>` — `T` / `MaybeUninit<T>` (including ZST `ProtoBool`) depending on presence. Heap LEN payloads need an explicit [`FieldDeallocate::deallocate`](puroro-rt/src/fields/shared/field_deallocate.rs)(`&common`) from message / oneof teardown; copy scalars’ / unit-slot `DeallocateIn` is a no-op.
 

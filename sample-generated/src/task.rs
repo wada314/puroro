@@ -18,7 +18,7 @@ use ::puroro_rt::{
     Closed, Explicit, FieldDeallocate, Implicit, LegacyRequired, MessageCommon, NonOneof,
     OneofSlot, Open, PresenceBits, ProtoBool, ProtoBytes, ProtoEnum, ProtoInt32, ProtoMessage,
     ProtoString, RepeatedExpandedVarintField, RepeatedLenField, RepeatedPackedVarintField,
-    SingularAccess, SingularField, SingularLenField, SingularVarintField,
+    SingularAccess, SingularField,
 };
 
 use defaults::MaxRetriesDefault;
@@ -116,21 +116,21 @@ pub const FIELD_URGENT: u32 = 18; // notification.urgent (oneof bool)
 /// Reference `Task` message from `DESIGN.md`.
 pub struct Task<A: Allocator + Clone = Global> {
     _common: MessageCommon<TaskPresence, A>,
-    title: SingularLenField<ProtoString<A>, Explicit<{ BIT_TITLE }>, { FIELD_TITLE }>, // proto: string title = 1;
-    score: SingularVarintField<ProtoInt32<A>, Implicit, { FIELD_SCORE }>, // proto: int32 score = 2;
-    max_retries: SingularVarintField<
+    title: SingularField<ProtoString<A>, Explicit<{ BIT_TITLE }>, { FIELD_TITLE }>, // proto: string title = 1;
+    score: SingularField<ProtoInt32<A>, Implicit, { FIELD_SCORE }>, // proto: int32 score = 2;
+    max_retries: SingularField<
         ProtoInt32<A>,
         Explicit<{ BIT_MAX_RETRIES }>,
         { FIELD_MAX_RETRIES },
         MaxRetriesDefault,
     >, // proto: int32 max_retries = 3;
-    owner_id: SingularLenField<ProtoString<A>, LegacyRequired<{ BIT_OWNER_ID }>, { FIELD_OWNER_ID }>, // proto: string owner_id = 4;
-    payload: SingularLenField<ProtoBytes<A>, Explicit<{ BIT_PAYLOAD }>, { FIELD_PAYLOAD }>, // proto: bytes payload = 5;
+    owner_id: SingularField<ProtoString<A>, LegacyRequired<{ BIT_OWNER_ID }>, { FIELD_OWNER_ID }>, // proto: string owner_id = 4;
+    payload: SingularField<ProtoBytes<A>, Explicit<{ BIT_PAYLOAD }>, { FIELD_PAYLOAD }>, // proto: bytes payload = 5;
     tag_ids: RepeatedPackedVarintField<ProtoInt32<A>, { FIELD_TAG_IDS }, A>, // proto: repeated int32 tag_ids = 6 [packed];
     scores: RepeatedExpandedVarintField<ProtoInt32<A>, { FIELD_SCORES }, A>, // proto: repeated int32 scores = 7;
     labels: RepeatedLenField<ProtoString<A>, { FIELD_LABELS }, A>, // proto: repeated string labels = 8;
-    status: SingularVarintField<ProtoEnum<Status, Open, A>, Implicit, { FIELD_STATUS }>, // proto: Status status = 9;
-    priority: SingularVarintField<
+    status: SingularField<ProtoEnum<Status, Open, A>, Implicit, { FIELD_STATUS }>, // proto: Status status = 9;
+    priority: SingularField<
         ProtoEnum<Priority, Closed, A>,
         Explicit<{ BIT_PRIORITY }>,
         { FIELD_PRIORITY },
@@ -140,8 +140,8 @@ pub struct Task<A: Allocator + Clone = Global> {
     //                             int32 webhook_id=14 [default=-1]; Address postal=15;
     //                             bool urgent=18; }
     notification: OneofSlot<NotificationStorage<A>>,
-    done: SingularVarintField<ProtoBool<A, { BIT_DONE_VALUE }>, Implicit, { FIELD_DONE }>, // proto: bool done = 16;
-    flag: SingularVarintField<
+    done: SingularField<ProtoBool<A, { BIT_DONE_VALUE }>, Implicit, { FIELD_DONE }>, // proto: bool done = 16;
+    flag: SingularField<
         ProtoBool<A, { BIT_FLAG_VALUE }>,
         Explicit<{ BIT_FLAG }>,
         { FIELD_FLAG },
@@ -154,20 +154,20 @@ impl<A: Allocator + Clone> Task<A> {
         // heap field (`labels`) takes the original by move.
         Self {
             _common: MessageCommon::new_in(TaskPresence::ZERO, alloc.clone()),
-            title: SingularLenField::new_in(alloc.clone()),
-            score: SingularVarintField::new_in(alloc.clone()),
-            max_retries: SingularVarintField::new_in(alloc.clone()),
-            owner_id: SingularLenField::new_in(alloc.clone()),
-            payload: SingularLenField::new_in(alloc.clone()),
+            title: SingularField::new_in(alloc.clone()),
+            score: SingularField::new_in(alloc.clone()),
+            max_retries: SingularField::new_in(alloc.clone()),
+            owner_id: SingularField::new_in(alloc.clone()),
+            payload: SingularField::new_in(alloc.clone()),
             tag_ids: RepeatedPackedVarintField::new_in(alloc.clone()),
             scores: RepeatedExpandedVarintField::new_in(alloc.clone()),
             labels: RepeatedLenField::new_in(alloc.clone()),
-            status: SingularVarintField::new_in(alloc.clone()),
-            priority: SingularVarintField::new_in(alloc.clone()),
+            status: SingularField::new_in(alloc.clone()),
+            priority: SingularField::new_in(alloc.clone()),
             assignee: SingularField::new_in(alloc.clone()),
             notification: OneofSlot::new_in(alloc.clone()),
-            done: SingularVarintField::new_in(alloc.clone()),
-            flag: SingularVarintField::new_in(alloc),
+            done: SingularField::new_in(alloc.clone()),
+            flag: SingularField::new_in(alloc),
         }
     }
 

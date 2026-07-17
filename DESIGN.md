@@ -657,7 +657,7 @@ Both open and closed enums produce a **newtype-over-`i32`** — not a Rust `enum
 - Traits [`OpenEnum`](puroro-rt/src/fields/wire/varint.rs) (`From<i32>`) / [`ClosedEnum`](puroro-rt/src/fields/wire/varint.rs) (`TryFrom<i32>`)
 - Field wrapper [`ProtoEnum<E, K>`](puroro-rt/src/fields/wire/varint.rs)
 
-[`SingularField`](puroro-rt/src/fields/singular/field.rs) (alias `SingularVarintField`) stores `ProtoEnum<E, K>` and reuses the same `optional()` / `value_mut()` paths as other singular scalars (getters still project to `E` / `&mut E`). Merge is a single decode-then-write path: closed enums signal unknowns via [`DecodeError::UnknownClosedEnum`](src/error.rs) from `decode_wire`, and `merge` catches that to append the raw varint to unknown fields (`TryFrom` is the single source of truth).
+[`SingularField`](puroro-rt/src/fields/singular/field.rs) (alias `SingularField`) stores `ProtoEnum<E, K>` and reuses the same `optional()` / `value_mut()` paths as other singular scalars (getters still project to `E` / `&mut E`). Merge is a single decode-then-write path: closed enums signal unknowns via [`DecodeError::UnknownClosedEnum`](src/error.rs) from `decode_wire`, and `merge` catches that to append the raw varint to unknown fields (`TryFrom` is the single source of truth).
 
 ```rust
 // Open — any wire value is valid storage
@@ -703,7 +703,7 @@ pub enum Notification<Ea, Pn, Wh, Po, Ur> {
 // (1) Owned storage — crate-internal alias; per-variant private field aliases
 //     are the single source of truth. Implements OneofGroup, OneofDeallocate,
 //     encode glue. Never public.
-type EmailAddressField = SingularLenField<ProtoString, Oneof, FIELD_EMAIL>;
+type EmailAddressField = SingularField<ProtoString, Oneof, FIELD_EMAIL>;
 // … PhoneNumberField, WebhookIdField, PostalField<A>, UrgentField
 pub(crate) type NotificationStorage<A> = Notification<
     EmailAddressField, PhoneNumberField, WebhookIdField, PostalField<A>, UrgentField,
@@ -763,9 +763,9 @@ To keep generated code thin, each wrapper is driven with the **field's own** con
 
 | kind | `EnumVariant::new_value` | merge one occurrence | mut accessor |
 |---|---|---|---|
-| LEN | `SingularLenField::new_in(alloc)` | `slot.bind_mut(common).variant_mut::<V>().merge(…)` | `…variant_mut::<V>().value_mut()` |
-| VARINT | `SingularVarintField::new_in(alloc)` | same | same |
-| bool | `SingularVarintField::<ProtoBool<BIT>>::new_in(alloc)` | same | same → `impl DerefMut<Target = bool>` |
+| LEN | `SingularField::new_in(alloc)` | `slot.bind_mut(common).variant_mut::<V>().merge(…)` | `…variant_mut::<V>().value_mut()` |
+| VARINT | `SingularField::new_in(alloc)` | same | same |
+| bool | `SingularField::<ProtoBool<BIT>>::new_in(alloc)` | same | same → `impl DerefMut<Target = bool>` |
 | message | `SingularField::with_message_in(alloc)` (`ProtoMessage`) | same | same → `&mut M` |
 
 Every variant merges through the **same** `slot.bind_mut(common).variant_mut::<V>().merge(wire, buf)` shape. The message variant merges *into* the present child rather than replacing it.

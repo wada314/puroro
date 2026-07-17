@@ -24,10 +24,10 @@
 //!
 //! | variant | proto | field wrapper | `Ref` payload | `Mut` payload |
 //! |---|---|---|---|---|
-//! | `email_address` / `phone_number` | `string` | [`SingularLenField`] (+ `ProtoDefault`) | `&str` | string guard |
-//! | `webhook_id` | `int32` `[default = -1]` | [`SingularVarintField`] + [`WebhookIdDefault`] | `i32` (by value) | `&mut i32` |
+//! | `email_address` / `phone_number` | `string` | [`SingularField`] (+ `ProtoDefault`) | `&str` | string guard |
+//! | `webhook_id` | `int32` `[default = -1]` | [`SingularField`] + [`WebhookIdDefault`] | `i32` (by value) | `&mut i32` |
 //! | `postal` | `Address` message | [`SingularField`] + [`ProtoMessage`] | `&Address<A>` | `&mut Address<A>` |
-//! | `urgent` | `bool` | [`SingularVarintField`] + [`ProtoBool`] | `bool` | `SingularAccess::Mut` (named bit handle) |
+//! | `urgent` | `bool` | [`SingularField`] + [`ProtoBool`] | `bool` | `SingularAccess::Mut` (named bit handle) |
 //!
 //! Per-variant **immutable** getters return [`Optional`](::puroro::Optional) whose
 //! `D` is the field wrapper's default marker: when the case is unset or another
@@ -60,7 +60,7 @@ use ::bytes::BufMut;
 use ::puroro_rt::{
     EnumVariant, FieldDeallocate, MessageCommon, Oneof, OneofDeallocate, OneofEncodable,
     OneofGroup, PresenceBits, ProtoBool, ProtoInt32, ProtoMessage, ProtoString, SingularAccess,
-    SingularField, SingularLenField, SingularVarintField,
+    SingularField,
 };
 
 use crate::address::Address;
@@ -107,10 +107,10 @@ pub enum NotificationCase {
 }
 
 type EmailAddressField<A> =
-    SingularLenField<ProtoString<A>, Oneof, { super::FIELD_EMAIL_ADDRESS }>;
+    SingularField<ProtoString<A>, Oneof, { super::FIELD_EMAIL_ADDRESS }>;
 type PhoneNumberField<A> =
-    SingularLenField<ProtoString<A>, Oneof, { super::FIELD_PHONE_NUMBER }>;
-type WebhookIdField<A> = SingularVarintField<
+    SingularField<ProtoString<A>, Oneof, { super::FIELD_PHONE_NUMBER }>;
+type WebhookIdField<A> = SingularField<
     ProtoInt32<A>,
     Oneof,
     { super::FIELD_WEBHOOK_ID },
@@ -118,7 +118,7 @@ type WebhookIdField<A> = SingularVarintField<
 >;
 type PostalField<A> =
     SingularField<ProtoMessage<Address<A>, A>, Oneof, { super::FIELD_POSTAL }>;
-type UrgentField<A> = SingularVarintField<
+type UrgentField<A> = SingularField<
     ProtoBool<A, { super::BIT_URGENT_VALUE }>,
     Oneof,
     { super::FIELD_URGENT },
@@ -239,7 +239,7 @@ impl<A: Allocator + Clone> EnumVariant<EmailAddress> for NotificationStorage<A> 
     type Alloc = A;
 
     fn new_value(alloc: A) -> Self::Value {
-        SingularLenField::new_in(alloc)
+        SingularField::new_in(alloc)
     }
 
     fn variant_ref(&self) -> Option<&Self::Value> {
@@ -266,7 +266,7 @@ impl<A: Allocator + Clone> EnumVariant<PhoneNumber> for NotificationStorage<A> {
     type Alloc = A;
 
     fn new_value(alloc: A) -> Self::Value {
-        SingularLenField::new_in(alloc)
+        SingularField::new_in(alloc)
     }
 
     fn variant_ref(&self) -> Option<&Self::Value> {
@@ -293,7 +293,7 @@ impl<A: Allocator + Clone> EnumVariant<WebhookId> for NotificationStorage<A> {
     type Alloc = A;
 
     fn new_value(alloc: A) -> Self::Value {
-        SingularVarintField::new_in(alloc)
+        SingularField::new_in(alloc)
     }
 
     fn variant_ref(&self) -> Option<&Self::Value> {
@@ -347,7 +347,7 @@ impl<A: Allocator + Clone> EnumVariant<Urgent> for NotificationStorage<A> {
     type Alloc = A;
 
     fn new_value(alloc: A) -> Self::Value {
-        SingularVarintField::new_in(alloc)
+        SingularField::new_in(alloc)
     }
 
     fn variant_ref(&self) -> Option<&Self::Value> {

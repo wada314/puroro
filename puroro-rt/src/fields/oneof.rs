@@ -59,8 +59,8 @@ pub trait OneofEncodable<A: Allocator> {
 ///
 /// `E` is the generated `enum` for the group: one unit-or-tuple variant per
 /// oneof member, each holding that member's **field wrapper** — the same type a
-/// singular field of that kind would use (`SingularLenField<_, _, A>`,
-/// `SingularVarintField<_, _>`, a nested-message field, …), minus presence
+/// singular field of that kind would use (`SingularField<ProtoString, …>`,
+/// `SingularField<ProtoInt32, …>`, `SingularField<ProtoMessage<…>, …>`, …), minus presence
 /// (which the slot itself tracks). At most one variant is active, so the slot is
 /// just an `Option<E>`. For the allocator-owning cases, `E` is expected to
 /// implement [`OneofDeallocate`] so a previously-active variant can be released
