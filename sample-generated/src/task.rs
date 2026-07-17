@@ -424,7 +424,8 @@ impl<A: Allocator + Clone> Task<A> {
     pub fn email_address_mut(&mut self) -> impl DerefMut<Target = ::unmanaged::String<A>> + '_ {
         self.notification
             .bind_mut(&mut self._common)
-            .variant_mut::<EmailAddress, _, _, _>()
+            .variant_mut::<EmailAddress>()
+            .bind_mut(&mut self._common)
             .value_mut()
     }
 
@@ -443,7 +444,8 @@ impl<A: Allocator + Clone> Task<A> {
     pub fn phone_number_mut(&mut self) -> impl DerefMut<Target = ::unmanaged::String<A>> + '_ {
         self.notification
             .bind_mut(&mut self._common)
-            .variant_mut::<PhoneNumber, _, _, _>()
+            .variant_mut::<PhoneNumber>()
+            .bind_mut(&mut self._common)
             .value_mut()
     }
 
@@ -466,7 +468,8 @@ impl<A: Allocator + Clone> Task<A> {
     pub fn webhook_id_mut(&mut self) -> impl DerefMut<Target = i32> + '_ {
         self.notification
             .bind_mut(&mut self._common)
-            .variant_mut::<WebhookId, _, _, _>()
+            .variant_mut::<WebhookId>()
+            .bind_mut(&mut self._common)
             .value_mut()
     }
 
@@ -484,7 +487,8 @@ impl<A: Allocator + Clone> Task<A> {
     pub fn postal_mut(&mut self) -> &mut Address<A> {
         self.notification
             .bind_mut(&mut self._common)
-            .variant_mut::<Postal, _, _, _>()
+            .variant_mut::<Postal>()
+            .bind_mut(&mut self._common)
             .value_mut()
     }
 
@@ -503,7 +507,8 @@ impl<A: Allocator + Clone> Task<A> {
     pub fn urgent_mut(&mut self) -> impl DerefMut<Target = bool> + '_ {
         self.notification
             .bind_mut(&mut self._common)
-            .variant_mut::<Urgent, _, _, _>()
+            .variant_mut::<Urgent>()
+            .bind_mut(&mut self._common)
             .value_mut()
     }
 }
@@ -670,28 +675,32 @@ impl<A: Allocator + Clone> Message for Task<A> {
                     // notification.email_address = 12, oneof LEN string
                     self.notification
                         .bind_mut(&mut self._common)
-                        .variant_mut::<EmailAddress, _, _, _>()
+                        .variant_mut::<EmailAddress>()
+                        .bind_mut(&mut self._common)
                         .merge(wire_type, buf)?;
                 }
                 FIELD_PHONE_NUMBER => {
                     // notification.phone_number = 13, oneof LEN string
                     self.notification
                         .bind_mut(&mut self._common)
-                        .variant_mut::<PhoneNumber, _, _, _>()
+                        .variant_mut::<PhoneNumber>()
+                        .bind_mut(&mut self._common)
                         .merge(wire_type, buf)?;
                 }
                 FIELD_WEBHOOK_ID => {
                     // notification.webhook_id = 14, oneof VARINT int32
                     self.notification
                         .bind_mut(&mut self._common)
-                        .variant_mut::<WebhookId, _, _, _>()
+                        .variant_mut::<WebhookId>()
+                        .bind_mut(&mut self._common)
                         .merge(wire_type, buf)?;
                 }
                 FIELD_POSTAL => {
                     // notification.postal = 15, oneof nested message
                     self.notification
                         .bind_mut(&mut self._common)
-                        .variant_mut::<Postal, _, _, _>()
+                        .variant_mut::<Postal>()
+                        .bind_mut(&mut self._common)
                         .merge(wire_type, buf)?;
                 }
                 FIELD_DONE => {
@@ -710,7 +719,8 @@ impl<A: Allocator + Clone> Message for Task<A> {
                     // notification.urgent = 18, oneof bool
                     self.notification
                         .bind_mut(&mut self._common)
-                        .variant_mut::<Urgent, _, _, _>()
+                        .variant_mut::<Urgent>()
+                        .bind_mut(&mut self._common)
                         .merge(wire_type, buf)?;
                 }
                 _ => {

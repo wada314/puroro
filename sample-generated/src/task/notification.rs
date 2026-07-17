@@ -45,8 +45,8 @@
 //! **Merge has no bespoke `merge_*` helpers on this enum.** Because each variant
 //! *is* a field wrapper, the parent message's `merge_from` dispatches on field
 //! number (one match arm per variant) and calls
-//! `slot.bind_mut(common).variant_mut::<V, _, _, _>().merge(...)` —
-//! uniformly for every variant kind.
+//! `slot.bind_mut(common).variant_mut::<V>().bind_mut(common).merge(...)`
+//! — uniformly for every variant kind.
 //!
 //! Per-variant dispatch uses [`EnumVariant`] on zero-sized marker types in
 //! [`variant`]; see that module for the type-parameter wiring.

@@ -24,7 +24,7 @@ use crate::fields::shared::{
     field_presence::{FieldPresence, Oneof},
     value_slot::ValueSlot,
 };
-use crate::fields::singular::field::{SingularField, SingularFieldMut};
+use crate::fields::singular::field::SingularField;
 use crate::fields::wire::proto_message::ProtoMessage;
 use crate::fields::wire::proto_type::ProtoType;
 
@@ -269,28 +269,21 @@ impl<'f, 'c, E, Pb: PresenceBits, A: Allocator> OneofSlotMut<'f, 'c, E, Pb, A> {
     }
 
     /// Ensures the active variant is `V`; otherwise frees any existing variant and
-    /// installs a fresh one via [`EnumVariant::new_value`]. Returns the field's
-    /// bound mutation view (so callers do not re-bind `common`).
+    /// installs a fresh one via [`EnumVariant::new_value`]. Returns a mutable
+    /// reference to the variant's field wrapper.
     ///
     /// Because `E` may own non-droppable storage, switching variants always goes
     /// through this method (or [`set`](Self::set) / [`clear`](Self::clear)) so the
     /// previous variant is released with the message allocator before the slot is
     /// overwritten.
     ///
-    /// Generated accessors and decode arms use
-    /// `slot.bind_mut(common).variant_mut::<V, _, _, _>().value_mut()` /
+    /// Consumes this view so `common` can be re-borrowed; generated accessors and
+    /// decode arms then bind the field themselves:
+    /// `slot.bind_mut(common).variant_mut::<V>().bind_mut(common).value_mut()` /
     /// `.merge(…)`.
-    ///
-    /// Turbofish names the variant marker `V`; `T` / `FIELD` / `D` are inferred
-    /// from [`EnumVariant::Value`] (`_`).
-    pub fn variant_mut<V, T, const FIELD: u32, D>(
-        self,
-    ) -> SingularFieldMut<'f, 'c, T, Oneof, FIELD, D, Pb, A>
+    pub fn variant_mut<V>(self) -> &'f mut <E as EnumVariant<V>>::Value
     where
-        E: EnumVariant<V, Alloc = A, Value = SingularField<T, Oneof, FIELD, D>>
-            + OneofDeallocate<Pb, A>,
-        T: ProtoType<Alloc = A>,
-        <Oneof as FieldPresence>::ValueSlot<T::Slot>: ValueSlot<T::Slot>,
+        E: EnumVariant<V, Alloc = A> + OneofDeallocate<Pb, A>,
         A: Clone,
     {
         let slot = self.slot;
@@ -311,9 +304,8 @@ impl<'f, 'c, E, Pb: PresenceBits, A: Allocator> OneofSlotMut<'f, 'c, E, Pb, A> {
             ));
         }
 
-        let field = <E as EnumVariant<V>>::variant_mut(slot.as_mut().unwrap())
-            .expect("from_variant must construct the variant that V selects");
-        field.bind_mut(common)
+        <E as EnumVariant<V>>::variant_mut(slot.as_mut().unwrap())
+            .expect("from_variant must construct the variant that V selects")
     }
 
     /// Frees the active variant (if any), leaving the slot empty.

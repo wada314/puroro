@@ -668,16 +668,16 @@ The sample `oneof notification` is deliberately **heterogeneous** — LEN, VARIN
 
 **Variants own field wrappers, not raw storage.** Each variant holds the same field wrapper an ordinary singular field of that kind uses (`SingularField` / aliases — including `ProtoBool<A, VALUE_BIT>` for `bool` and `ProtoMessage<M, A>` for messages), so `value` / `value_mut` / `deallocate` are reused. The wrapper's presence is inert here (`Oneof` / `FieldPresence::Oneof`), so presence-aware omit rules are never consulted; bool still packs its value into `_common.presence`. Markers and unmanaged payloads are parameterized by `A` (type only / `PhantomData`); the owned allocator instance stays on the message.
 
-The oneof drives each variant with the **field's own** primitives. Empty construction is [`EnumVariant::new_value`](puroro-rt/src/fields/enum_variant.rs) (`new_in` / `with_message_in`). Merging is `slot.bind_mut(common).variant_mut::<V, _, _, _>().merge(wire, buf)`. Read getters use `slot.bind(common).variant_of::<V>().optional()` / `.get()`.
+The oneof drives each variant with the **field's own** primitives. Empty construction is [`EnumVariant::new_value`](puroro-rt/src/fields/enum_variant.rs) (`new_in` / `with_message_in`). Merging is `slot.bind_mut(common).variant_mut::<V>().bind_mut(common).merge(wire, buf)`. Read getters use `slot.bind(common).variant_of::<V>().optional()` / `.get()`.
 
 **The message variant uses `SingularField<ProtoMessage<…>, Oneof, …>` — always-present `UnmanagedBox<M, A>`, not `Option`.**
 
-Parent `_mut` accessors are one-liners:
-`slot.bind_mut(common).variant_mut::<V, _, _, _>().value_mut()`.
+Parent `_mut` accessors are:
+`slot.bind_mut(common).variant_mut::<V>().bind_mut(common).value_mut()`.
 
 The storage alias implements [`OneofDeallocate`](puroro-rt/src/fields/oneof.rs) so the previously-active variant is freed through the message allocator before the slot is overwritten. Group accessors use the bound-view idiom: `slot.bind(&common)` / `slot.bind_mut(&mut common)` yield [`OneofSlotRef`](puroro-rt/src/fields/oneof.rs) / [`OneofSlotMut`](puroro-rt/src/fields/oneof.rs). `OneofView` / `OneofViewMut` hold that pair via `OneofGroup`. `OneofSlotMut` consuming methods:
 
-- `variant_mut::<V, _, _, _>() -> SingularFieldMut` — keeps the active variant if it is already `V`, else frees the previous variant and installs `from_variant(EnumVariant::new_value(alloc.clone()))`, then binds the field to `common` once. Turbofish names `V`; `T` / `FIELD` / `D` are inferred from [`EnumVariant::Value`](puroro-rt/src/fields/enum_variant.rs) (`_`). Callers chain `.value_mut()` / `.merge(…)`.
+- `variant_mut::<V>() -> &mut EnumVariant::Value` — keeps the active variant if it is already `V`, else frees the previous variant and installs `from_variant(EnumVariant::new_value(alloc.clone()))`. Consumes the slot view so callers can re-borrow `common` and `field.bind_mut(common)` for `.value_mut()` / `.merge(…)`.
 - `set(value)` — replaces the whole group (frees the old variant).
 - `clear()` — frees the active variant; backs `OneofViewMut::clear`, `clear_notification`, and the message `Drop`.
 
