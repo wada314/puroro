@@ -16,7 +16,10 @@ use ::puroro::WireType;
 
 use crate::fields::shared::{FieldDeallocate, MessageCommon, PresenceBits};
 use crate::fields::wire::len::{ProtoBytes, ProtoString};
-use crate::fields::wire::repeated_items::{RepeatedItems, RepeatedSlicePush};
+use crate::fields::wire::proto_message::ProtoMessage;
+use crate::fields::wire::repeated_element::{
+    RepeatedElement, RepeatedElementMerge, RepeatedSlicePush, RepeatedVecMut,
+};
 use crate::fields::wire::varint;
 
 use super::encoding::{Expanded, Packed, RepeatedEncoding};
@@ -26,7 +29,7 @@ use super::encoding::{Expanded, Packed, RepeatedEncoding};
 /// Parameter order: `T`, `E`, `FIELD`, `A`.
 pub struct RepeatedField<T, E, const FIELD: u32, A>
 where
-    T: RepeatedItems,
+    T: RepeatedElement,
     E: RepeatedEncoding<T, A>,
     A: Allocator + Clone,
 {
@@ -36,7 +39,7 @@ where
 
 impl<T, E, const FIELD: u32, A> RepeatedField<T, E, FIELD, A>
 where
-    T: RepeatedItems,
+    T: RepeatedElement,
     E: RepeatedEncoding<T, A>,
     A: Allocator + Clone,
 {
@@ -98,7 +101,7 @@ where
 
 impl<T, E, const FIELD: u32, A, Pb> FieldDeallocate<Pb, A> for RepeatedField<T, E, FIELD, A>
 where
-    T: RepeatedItems,
+    T: RepeatedElement,
     E: RepeatedEncoding<T, A>,
     A: Allocator + Clone,
     Pb: PresenceBits,
@@ -127,7 +130,7 @@ where
 /// Short-lived shared binding of a repeated field to its message common state.
 pub struct RepeatedFieldRef<
     'a,
-    T: RepeatedItems,
+    T: RepeatedElement,
     E: RepeatedEncoding<T, A>,
     const FIELD: u32,
     A: Allocator + Clone,
@@ -142,7 +145,7 @@ pub struct RepeatedFieldRef<
 
 impl<'a, T, E, const FIELD: u32, A, Pb> RepeatedFieldRef<'a, T, E, FIELD, A, Pb>
 where
-    T: RepeatedItems,
+    T: RepeatedElement,
     E: RepeatedEncoding<T, A>,
     A: Allocator + Clone,
     Pb: PresenceBits,
@@ -175,7 +178,7 @@ where
 pub struct RepeatedFieldMut<
     'f,
     'c,
-    T: RepeatedItems,
+    T: RepeatedElement,
     E: RepeatedEncoding<T, A>,
     const FIELD: u32,
     A: Allocator + Clone,
@@ -188,7 +191,7 @@ pub struct RepeatedFieldMut<
 
 impl<'f, 'c, T, E, const FIELD: u32, A, Pb> RepeatedFieldMut<'f, 'c, T, E, FIELD, A, Pb>
 where
-    T: RepeatedItems,
+    T: RepeatedElement,
     E: RepeatedEncoding<T, A>,
     A: Allocator + Clone,
     Pb: PresenceBits,
@@ -205,10 +208,10 @@ where
         }
     }
 
-    /// Growable handle over copy elements (`repeated int32`, …).
+    /// Growable handle over vec-mutable elements (`repeated int32`, message, …).
     pub fn values_mut(self) -> VecGuard<'f, T::Element<A>, A>
     where
-        T::Element<A>: Copy,
+        T: RepeatedVecMut,
     {
         let alloc = self.common.alloc.clone();
         // SAFETY: an owned clone of the message allocator owns this vector's
@@ -241,7 +244,10 @@ where
     }
 
     /// Merges one wire occurrence — appends element(s).
-    pub fn merge<B: Buf>(self, wire_type: WireType, buf: &mut B) -> Result<(), DecodeError> {
+    pub fn merge<B: Buf>(self, wire_type: WireType, buf: &mut B) -> Result<(), DecodeError>
+    where
+        T: RepeatedElementMerge<A>,
+    {
         let alloc = self.common.alloc.clone();
         // SAFETY: an owned clone of the message allocator owns this vector's
         // buffer.
@@ -266,3 +272,5 @@ pub type RepeatedExpandedInt32<const FIELD: u32, A> =
     RepeatedExpandedVarintField<varint::ProtoInt32, FIELD, A>;
 pub type RepeatedString<const FIELD: u32, A> = RepeatedLenField<ProtoString, FIELD, A>;
 pub type RepeatedBytes<const FIELD: u32, A> = RepeatedLenField<ProtoBytes, FIELD, A>;
+pub type RepeatedMessage<M, const FIELD: u32, A> =
+    RepeatedField<ProtoMessage<M>, Expanded, FIELD, A>;

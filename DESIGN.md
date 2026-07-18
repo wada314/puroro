@@ -419,14 +419,18 @@ message Task {
     // Field 11: Nested message (EXPLICIT presence)
     Address assignee = 11;
 
-    // Fields 12–15: Oneof (presence is intrinsic to oneof). Deliberately
-    // heterogeneous to show LEN, VARINT, and message variants.
+    // Fields 12–15 / 18: Oneof (presence is intrinsic to oneof). Deliberately
+    // heterogeneous to show LEN, VARINT, bool, and message variants.
     oneof notification {
         string  email_address = 12;
         string  phone_number  = 13;
         int32   webhook_id    = 14 [default = -1];  // VARINT + custom default
         Address postal        = 15;  // message variant
+        bool    urgent        = 18;  // bool variant
     }
+
+    // Field 19: Repeated nested message (cannot be packed; EXPANDED)
+    repeated Address watchers = 19;
 }
 ```
 
@@ -579,6 +583,16 @@ pub fn clear_labels(&mut self);
 ```
 
 The concrete element type is an implementation detail; callers rely on the `Deref<Target = str>` bound.
+
+**Repeated message (`watchers: repeated Address`, field 19):**
+
+```rust
+pub fn watchers(&self) -> &[Address<A>];
+pub fn watchers_mut(&mut self) -> impl DerefMut<Target = Vec<Address<A>, A>>;
+pub fn clear_watchers(&mut self);
+```
+
+Each wire occurrence **appends** a newly decoded message. Unlike singular nested messages, repeated elements are not merge-into at a list index. Messages cannot be packed; encode always uses one LEN record per element.
 
 #### Packed vs non-packed encoding
 

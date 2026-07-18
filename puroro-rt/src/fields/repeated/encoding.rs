@@ -9,10 +9,10 @@ use ::allocator_api2::alloc::Allocator;
 use ::bytes::BufMut;
 
 use crate::encode;
-use crate::fields::wire::repeated_items::{PackableRepeatedItems, RepeatedItems};
+use crate::fields::wire::repeated_element::{PackableRepeatedElement, RepeatedElement};
 
 /// How a repeated field is written on encode.
-pub trait RepeatedEncoding<T: RepeatedItems, A: Allocator + Clone>: Copy {
+pub trait RepeatedEncoding<T: RepeatedElement, A: Allocator + Clone>: Copy {
     /// Wire byte length when `values` is non-empty; `0` when empty.
     fn encoded_len(field: u32, values: &[T::Element<A>]) -> usize;
 
@@ -24,7 +24,7 @@ pub trait RepeatedEncoding<T: RepeatedItems, A: Allocator + Clone>: Copy {
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
 pub struct Expanded;
 
-impl<T: RepeatedItems, A: Allocator + Clone> RepeatedEncoding<T, A> for Expanded {
+impl<T: RepeatedElement, A: Allocator + Clone> RepeatedEncoding<T, A> for Expanded {
     fn encoded_len(field: u32, values: &[T::Element<A>]) -> usize {
         values
             .iter()
@@ -43,7 +43,7 @@ impl<T: RepeatedItems, A: Allocator + Clone> RepeatedEncoding<T, A> for Expanded
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
 pub struct Packed;
 
-impl<T: PackableRepeatedItems, A: Allocator + Clone> RepeatedEncoding<T, A> for Packed
+impl<T: PackableRepeatedElement, A: Allocator + Clone> RepeatedEncoding<T, A> for Packed
 where
     T::Element<A>: Copy,
 {

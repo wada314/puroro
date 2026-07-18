@@ -11,7 +11,7 @@
 //! **presence policy** ([`Implicit`](shared::field_presence::Implicit) /
 //! [`Explicit`](shared::field_presence::Explicit) /
 //! [`Oneof`](shared::field_presence::Oneof)). Repeated fields use the same
-//! markers via [`RepeatedItems`](wire::RepeatedItems) (`Element` storage).
+//! markers via [`RepeatedElement`](wire::RepeatedElement) (`Element` storage).
 //!
 //! Flat crate-root re-exports of the catalog live in [`crate`](crate) (`lib.rs`).
 //!
@@ -20,7 +20,7 @@
 //! | Submodule | Contents |
 //! |---|---|
 //! | [`shared`] | `MessageCommon`, `PresenceBits`, `FieldPresence`, `ValueSlot`, … |
-//! | [`wire`] | `ProtoType`, `RepeatedItems`, `VarintProtoType` / `LenProtoType` helpers, fixed stubs |
+//! | [`wire`] | `ProtoType`, `RepeatedElement`, `VarintProtoType` / `LenProtoType` helpers, fixed stubs |
 //! | [`singular`] | `SingularField` |
 //! | [`repeated`] | `RepeatedField` |
 //! | [`oneof`] | `OneofSlot` |

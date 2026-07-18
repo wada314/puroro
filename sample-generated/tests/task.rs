@@ -62,6 +62,11 @@ fn task_fields_roundtrip() {
     assignee.city_mut().push_str("Tokyo");
     *task.assignee_mut() = assignee;
 
+    let mut watcher = Address::new();
+    watcher.street_mut().push_str("2 Side Rd");
+    watcher.city_mut().push_str("Osaka");
+    task.watchers_mut().push(watcher);
+
     task.validate().unwrap();
 
     let bytes = task.encode_to_vec();
@@ -90,6 +95,9 @@ fn task_fields_roundtrip() {
     let a = decoded.assignee().unwrap();
     assert_eq!(a.street().get(), "1 Main St");
     assert_eq!(a.city().get(), "Tokyo");
+    assert_eq!(decoded.watchers().len(), 1);
+    assert_eq!(decoded.watchers()[0].street().get(), "2 Side Rd");
+    assert_eq!(decoded.watchers()[0].city().get(), "Osaka");
 }
 
 #[test]
@@ -264,12 +272,18 @@ fn repeated_merge_appends() {
     task.tag_ids_mut().push(1);
     task.scores_mut().push(10);
     task.push_label("a");
+    let mut w0 = Address::new();
+    w0.city_mut().push_str("A");
+    task.watchers_mut().push(w0);
 
     let mut other = Task::new();
     other.tag_ids_mut().push(2);
     other.tag_ids_mut().push(3);
     other.scores_mut().push(20);
     other.push_label("b");
+    let mut w1 = Address::new();
+    w1.city_mut().push_str("B");
+    other.watchers_mut().push(w1);
     let bytes = other.encode_to_vec();
 
     task.merge_from(&mut &bytes[..]).unwrap();
@@ -279,6 +293,9 @@ fn repeated_merge_appends() {
     assert_eq!(task.labels().len(), 2);
     assert_eq!(&*task.labels()[0], "a");
     assert_eq!(&*task.labels()[1], "b");
+    assert_eq!(task.watchers().len(), 2);
+    assert_eq!(task.watchers()[0].city().get(), "A");
+    assert_eq!(task.watchers()[1].city().get(), "B");
 }
 
 #[test]
@@ -288,20 +305,50 @@ fn repeated_clear_omits_from_wire() {
     task.tag_ids_mut().push(1);
     task.scores_mut().push(2);
     task.push_label("x");
+    let mut w = Address::new();
+    w.street_mut().push_str("gone");
+    task.watchers_mut().push(w);
 
     task.clear_tag_ids();
     task.clear_scores();
     task.clear_labels();
+    task.clear_watchers();
 
     assert!(task.tag_ids().is_empty());
     assert!(task.scores().is_empty());
     assert!(task.labels().is_empty());
+    assert!(task.watchers().is_empty());
 
     let bytes = task.encode_to_vec();
     let decoded: Task = Task::decode(&bytes[..]).unwrap();
     assert!(decoded.tag_ids().is_empty());
     assert!(decoded.scores().is_empty());
     assert!(decoded.labels().is_empty());
+    assert!(decoded.watchers().is_empty());
+}
+
+#[test]
+fn repeated_message_roundtrip() {
+    let mut task = Task::new();
+    task.owner_id_mut().push_str("user-1");
+
+    let mut a = Address::new();
+    a.street_mut().push_str("1 Main");
+    a.city_mut().push_str("Tokyo");
+    let mut b = Address::new();
+    b.street_mut().push_str("2 Oak");
+    b.city_mut().push_str("Kyoto");
+    task.watchers_mut().push(a);
+    task.watchers_mut().push(b);
+
+    let bytes = task.encode_to_vec();
+    let decoded: Task = Task::decode(&bytes[..]).unwrap();
+
+    assert_eq!(decoded.watchers().len(), 2);
+    assert_eq!(decoded.watchers()[0].street().get(), "1 Main");
+    assert_eq!(decoded.watchers()[0].city().get(), "Tokyo");
+    assert_eq!(decoded.watchers()[1].street().get(), "2 Oak");
+    assert_eq!(decoded.watchers()[1].city().get(), "Kyoto");
 }
 
 // ---------------------------------------------------------------------------

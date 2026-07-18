@@ -103,6 +103,7 @@ pub const FIELD_POSTAL: u32 = 15; // notification.postal
 pub const FIELD_DONE: u32 = 16; // done (IMPLICIT bool)
 pub const FIELD_FLAG: u32 = 17; // flag (EXPLICIT bool)
 pub const FIELD_URGENT: u32 = 18; // notification.urgent (oneof bool)
+pub const FIELD_WATCHERS: u32 = 19; // watchers (repeated Address)
 // ---------------------------------------------------------------------------
 // Message struct
 // ---------------------------------------------------------------------------
@@ -145,12 +146,13 @@ pub struct Task<A: Allocator + Clone = Global> {
         A,
         BitPacked<{ BIT_FLAG_VALUE }>,
     >, // proto: bool flag = 17;
+    watchers: RepeatedField<ProtoMessage<Address<A>>, Expanded, { FIELD_WATCHERS }, A>, // proto: repeated Address watchers = 19;
 }
 
 impl<A: Allocator + Clone> Task<A> {
     pub fn new_in(alloc: A) -> Self {
         // Each field initializer gets its own clone of the allocator; the last
-        // heap field (`labels`) takes the original by move.
+        // heap field (`watchers`) takes the original by move.
         Self {
             _common: MessageCommon::new_in(TaskPresence::ZERO, alloc.clone()),
             title: SingularField::new_in(alloc.clone()),
@@ -166,7 +168,8 @@ impl<A: Allocator + Clone> Task<A> {
             assignee: SingularField::new_in(alloc.clone()),
             notification: OneofSlot::new_in(alloc.clone()),
             done: SingularField::new_in(alloc.clone()),
-            flag: SingularField::new_in(alloc),
+            flag: SingularField::new_in(alloc.clone()),
+            watchers: RepeatedField::new_in(alloc),
         }
     }
 
@@ -375,6 +378,20 @@ impl<A: Allocator + Clone> Task<A> {
         self.flag.bind_mut(&mut self._common).clear();
     }
 
+    // -- watchers (repeated Address, proto field 19) -------------------------
+
+    pub fn watchers(&self) -> &[Address<A>] {
+        self.watchers.bind(&self._common).as_slice()
+    }
+
+    pub fn watchers_mut<'s>(&'s mut self) -> impl DerefMut<Target = AllocVec<Address<A>, A>> + 's {
+        self.watchers.bind_mut(&mut self._common).values_mut()
+    }
+
+    pub fn clear_watchers(&mut self) {
+        self.watchers.bind_mut(&mut self._common).clear();
+    }
+
     // -- oneof notification (proto fields 12 / 13 / 14 / 15 / 18) ------------
 
     /// Which variant is set (payload-less; `None` when the group is unset).
@@ -554,6 +571,7 @@ impl<A: Allocator + Clone> Drop for Task<A> {
         self.notification.deallocate(&self._common);
         self.done.deallocate(&self._common);
         self.flag.deallocate(&self._common);
+        self.watchers.deallocate(&self._common);
         self._common.deallocate();
     }
 }
@@ -586,6 +604,7 @@ impl<A: Allocator + Clone> Message for Task<A> {
         n += self.notification.encoded_len(c);
         n += self.done.encoded_len(c);
         n += self.flag.encoded_len(c);
+        n += self.watchers.encoded_len(c);
         n + c.unknown_fields.len()
     }
 
@@ -605,6 +624,7 @@ impl<A: Allocator + Clone> Message for Task<A> {
         self.notification.encode_raw(c, buf);
         self.done.encode_raw(c, buf);
         self.flag.encode_raw(c, buf);
+        self.watchers.encode_raw(c, buf);
         let unknown: &[u8] = &c.unknown_fields;
         buf.put_slice(unknown);
     }
@@ -728,6 +748,12 @@ impl<A: Allocator + Clone> Message for Task<A> {
                     self.notification
                         .bind_mut(&mut self._common)
                         .variant_mut::<Urgent>()
+                        .bind_mut(&mut self._common)
+                        .merge(wire_type, buf)?;
+                }
+                FIELD_WATCHERS => {
+                    // watchers = 19, repeated Address
+                    self.watchers
                         .bind_mut(&mut self._common)
                         .merge(wire_type, buf)?;
                 }

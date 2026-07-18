@@ -72,7 +72,7 @@ protoc plugin
 puroro_rt::fields       SingularField<T, P, FIELD> (T includes ProtoMessage), …
     │  shared/ — MessageCommon, FieldPresence, ValueSlot,
     │            DefaultIn / DeallocateIn / ProtoEmpty
-    │  wire/   — ProtoType (singular Slot); RepeatedItems (repeated Element);
+    │  wire/   — ProtoType (singular Slot); RepeatedElement (repeated Element);
     │            VarintProtoType / LenProtoType (helpers)
     │  singular/, repeated/, oneof/
     │  T: ProtoType thin wrapper (ProtoInt32(i32), ProtoString(…), …)
@@ -118,7 +118,7 @@ protobuf-core           Varint, Tag, WireType
 | `MessageCommon`, `PresenceBits`, `FieldDeallocate`, `OneofSlot` | **Done** |
 | `ProtoType` + thin wrappers (varint / LEN) + `ProtoMessage` | **Done** |
 | `VarintProtoType` / `LenProtoType` (scalar / repeated helpers) | **Done** |
-| `RepeatedItems` / `PackableRepeatedItems` / `RepeatedSlicePush` | **Done** |
+| `RepeatedElement` / `RepeatedElementMerge` / `PackableRepeatedElement` / `RepeatedSlicePush` / `RepeatedVecMut` | **Done** |
 | `FieldPresence` (`Implicit` / `Explicit` / `LegacyRequired` / `Oneof`) | **Done** |
 | `ValueSlot`, `SlotInitView` / `SlotInitMut`, `DefaultIn` / `DeallocateIn` / `ProtoEmpty` | **Done** |
 | `SingularField<T, P, FIELD>`  | **Done** |
@@ -148,7 +148,7 @@ protobuf-core           Varint, Tag, WireType
 | [`wire.rs`](puroro-rt/src/fields/wire.rs) | Wire-family re-exports |
 | [`wire/proto_type.rs`](puroro-rt/src/fields/wire/proto_type.rs) | `ProtoType` (wire) + `PayloadAccess` (inline storage) |
 | [`shared/value_layout.rs`](puroro-rt/src/fields/shared/value_layout.rs) | `ValueLayout`, `Inline`, `BitPacked` |
-| [`wire/repeated_items.rs`](puroro-rt/src/fields/wire/repeated_items.rs) | `RepeatedItems` (`Element` for repeated buffers) |
+| [`wire/repeated_element.rs`](puroro-rt/src/fields/wire/repeated_element.rs) | `RepeatedElement` / `RepeatedElementMerge` (`Element` for repeated buffers) |
 | [`wire/proto_message.rs`](puroro-rt/src/fields/wire/proto_message.rs) | `ProtoMessage` (nested message marker) |
 | [`wire/varint.rs`](puroro-rt/src/fields/wire/varint.rs) | `VarintProtoType`, `ProtoInt32`, … |
 | [`wire/len.rs`](puroro-rt/src/fields/wire/len.rs) | `LenProtoType`, `ProtoString`, … |
@@ -157,7 +157,7 @@ protobuf-core           Varint, Tag, WireType
 | [`singular/field.rs`](puroro-rt/src/fields/singular/field.rs) | `SingularField` — `T: ProtoType`, stores `T::Slot` |
 | [`repeated.rs`](puroro-rt/src/fields/repeated.rs) | Repeated field re-exports |
 | [`repeated/encoding.rs`](puroro-rt/src/fields/repeated/encoding.rs) | `Packed` / `Expanded` (`RepeatedEncoding`) |
-| [`repeated/field.rs`](puroro-rt/src/fields/repeated/field.rs) | `RepeatedField` — `T: RepeatedItems`, stores `T::Element` |
+| [`repeated/field.rs`](puroro-rt/src/fields/repeated/field.rs) | `RepeatedField` — `T: RepeatedElement`, stores `T::Element` |
 | [`oneof.rs`](puroro-rt/src/fields/oneof.rs) | `OneofSlot` |
 
 ---
@@ -210,20 +210,20 @@ pub trait ProtoType: Sized {
 Singular wire decode is **merge-into only** (`PayloadAccess::merge` / `BitPacked::merge`). There is no `ProtoType::decode → Written`; nested messages merge into the present child via `Message::merge_from`.
 
 Singular / oneof `bool` uses allocator-free [`ProtoBool`](puroro-rt/src/fields/wire/varint.rs) plus [`BitPacked<VALUE_BIT>`](puroro-rt/src/fields/shared/value_layout.rs) as the field's [`ValueLayout`](puroro-rt/src/fields/shared/value_layout.rs) (orthogonal to presence `P`). Inline payloads use default `L = Inline` via [`PayloadAccess`](puroro-rt/src/fields/wire/proto_type.rs). Allocator `A` lives on [`SingularField`](puroro-rt/src/fields/singular/field.rs) / [`RepeatedField`](puroro-rt/src/fields/repeated/field.rs). Slot construction uses [`DefaultIn<A>`](puroro-rt/src/fields/shared.rs) / [`DeallocateIn<A>`](puroro-rt/src/fields/shared.rs) (allocator as a **trait parameter**, not an associated type), so bare `i32` / `()` work without slot newtypes.
-### Repeated elements (`RepeatedItems`)
+### Repeated elements (`RepeatedElement`)
 
-[`RepeatedItems`](puroro-rt/src/fields/wire/repeated_items.rs) extends [`ProtoType`](puroro-rt/src/fields/wire/proto_type.rs) with GAT `Element<A>`, plus per-element encode / decode / merge / deallocate. Singular fields store `Slot<A>`; repeated fields store `Element<A>` (not always the same — e.g. future nested-message repeated uses `Element = M` while singular keeps `Slot = UnmanagedBox<M, A>`).
+[`RepeatedElement`](puroro-rt/src/fields/wire/repeated_element.rs) extends [`ProtoType`](puroro-rt/src/fields/wire/proto_type.rs) with GAT `Element<A>`, plus per-element encode / length / deallocate. Decode / merge live on [`RepeatedElementMerge<A>`](puroro-rt/src/fields/wire/repeated_element.rs) so nested messages can require `M: Message<Alloc = A>`. Singular fields store `Slot<A>`; repeated fields store `Element<A>` (not always the same — nested-message repeated uses `Element = M` while singular keeps `Slot = UnmanagedBox<M, A>`).
 
-| Marker | `Element<A>` | Packable |
-|---|---|---|
-| Addressable varint / enum | `VarintProtoType::Value` (`i32`, …) | yes (`PackableRepeatedItems`) |
-| `ProtoString` / `ProtoBytes` | `UnmanagedString<A>` / `UnmanagedVec<u8, A>` | no (`RepeatedSlicePush` for `push_*`) |
-| `ProtoMessage<M>` (future) | `M` | no |
-| `ProtoBool` | — (no `RepeatedItems`; use plain `bool` elements later) | — |
+| Marker | `Element<A>` | Packable | `values_mut` |
+|---|---|---|---|
+| Addressable varint / enum | `VarintProtoType::Value` (`i32`, …) | yes (`PackableRepeatedElement`) | yes (`RepeatedVecMut`) |
+| `ProtoString` / `ProtoBytes` | `UnmanagedString<A>` / `UnmanagedVec<u8, A>` | no (`RepeatedSlicePush` for `push_*`) | no |
+| `ProtoMessage<M>` | `M` (inline; use site `M::Alloc = A`) | no | yes (`RepeatedVecMut`) |
+| `ProtoBool` | — (no `RepeatedElement`; use plain `bool` elements later) | — | — |
 
 ### Varint / LEN helpers
 
-[`VarintProtoType`](puroro-rt/src/fields/wire/varint.rs) and [`LenProtoType`](puroro-rt/src/fields/wire/len.rs) are wire/storage helpers shared by singular `ProtoType` impls and `RepeatedItems` impls.
+[`VarintProtoType`](puroro-rt/src/fields/wire/varint.rs) and [`LenProtoType`](puroro-rt/src/fields/wire/len.rs) are wire/storage helpers shared by singular `ProtoType` impls and `RepeatedElement` impls.
 
 ```rust
 pub trait VarintProtoType {
@@ -281,7 +281,7 @@ Varint and LEN singular scalars share one wrapper, parametrised by [`ProtoType`]
 | `SingularField<T, P, FIELD, A, L, D>` | [`singular/field.rs`](puroro-rt/src/fields/singular/field.rs) | `T: ProtoType`, `L: ValueLayout<T, A>` (default `Inline`), stores `P::ValueSlot<T::Slot<A>>` | — |
 | `SingularField<ProtoBool, P, FIELD, A, BitPacked<VALUE_BIT>>` | same | `Slot = ()`; value at `VALUE_BIT` via layout | — |
 | `SingularField<ProtoMessage<M>, P, FIELD, A>` | same | `Slot = UnmanagedBox<M, A>`; `NonOneof` → `Option`; `Oneof` → always-present | — |
-| `RepeatedField<T, E, FIELD, A>` | [`repeated/field.rs`](puroro-rt/src/fields/repeated/field.rs) | `T: RepeatedItems`, `E: RepeatedEncoding<T, A>`, stores `T::Element<A>` | `RepeatedPackedVarintField`, … |
+| `RepeatedField<T, E, FIELD, A>` | [`repeated/field.rs`](puroro-rt/src/fields/repeated/field.rs) | `T: RepeatedElement`, `E: RepeatedEncoding<T, A>`, stores `T::Element<A>` | `RepeatedPackedVarintField`, `RepeatedMessage`, … |
 | Fixed-width singular | (planned via `ProtoType` + `SingularField`) | — | — |
 | `OneofSlot<E>` | [`oneof.rs`](puroro-rt/src/fields/oneof.rs) | mutually exclusive variants | — |
 
@@ -628,18 +628,18 @@ Wire identical to EXPLICIT. Message `validate()` calls `validate_required` on ea
 
 ## 15. Repeated fields
 
-**Catalog:** [`RepeatedField<T, E, FIELD>`](puroro-rt/src/fields/repeated/field.rs) where `T: RepeatedItems` and `E: RepeatedEncoding<T>` ([`Packed`](puroro-rt/src/fields/repeated/encoding.rs) / [`Expanded`](puroro-rt/src/fields/repeated/encoding.rs)). Empty vec = absent on encode. Storage is `ManuallyDrop<UnmanagedVec<T::Element, T::Alloc>>`.
+**Catalog:** [`RepeatedField<T, E, FIELD>`](puroro-rt/src/fields/repeated/field.rs) where `T: RepeatedElement` and `E: RepeatedEncoding<T>` ([`Packed`](puroro-rt/src/fields/repeated/encoding.rs) / [`Expanded`](puroro-rt/src/fields/repeated/encoding.rs)). Empty vec = absent on encode. Storage is `ManuallyDrop<UnmanagedVec<T::Element, T::Alloc>>`.
 
 | | Packed (`E = Packed`, packable `T` only) | Expanded (`E = Expanded`) |
 |---|---|---|
 | Encode | One LEN record (varint payload) | One tagged record per element |
-| Decode | Both packed + expanded (packable) | Per-element (string / bytes / …) |
+| Decode | Both packed + expanded (packable) | Per-element (string / bytes / message / …) |
 
-Mutation uses the bound-view idiom: `field.bind_mut(&mut common)` → [`RepeatedFieldMut`](puroro-rt/src/fields/repeated/field.rs). Copy elements expose `values_mut()` → `Vec` guard; string / bytes use `push_in` via [`RepeatedSlicePush`](puroro-rt/src/fields/wire/repeated_items.rs) (allocator-less element storage is impractical to build through bare `DerefMut`). `clear` / `deallocate` drain and free heap elements first, then free the buffer. Read: `field.bind(&common)` → [`RepeatedFieldRef`](puroro-rt/src/fields/repeated/field.rs) (`as_slice` / `is_empty`).
+Mutation uses the bound-view idiom: `field.bind_mut(&mut common)` → [`RepeatedFieldMut`](puroro-rt/src/fields/repeated/field.rs). Markers with [`RepeatedVecMut`](puroro-rt/src/fields/wire/repeated_element.rs) (copy scalars / enums / messages) expose `values_mut()` → `Vec` guard; string / bytes use `push_in` via [`RepeatedSlicePush`](puroro-rt/src/fields/wire/repeated_element.rs) (allocator-less element storage is impractical to build through bare `DerefMut`). `clear` / `deallocate` drain and free heap elements first, then free the buffer. Read: `field.bind(&common)` → [`RepeatedFieldRef`](puroro-rt/src/fields/repeated/field.rs) (`as_slice` / `is_empty`). Merge requires `T: RepeatedElementMerge<A>`.
+
+**`repeated message`:** `RepeatedField<ProtoMessage<M>, Expanded, FIELD, A>` (alias [`RepeatedMessage`](puroro-rt/src/fields/repeated/field.rs)) with `Element = M` (no per-element `UnmanagedBox`). Each wire occurrence constructs a new `M` via `Message::new_in` and appends — it does **not** merge into an existing list index. Sample: `Task.watchers` (`repeated Address`).
 
 **`repeated bool`:** not wired yet. Elements should be plain `bool` with **no** MessageCommon bit index — do not use [`BitPacked`](puroro-rt/src/fields/shared/value_layout.rs) (see [Bit-packed bool](#bit-packed-bool-protobool)).
-
-**`repeated message` (future):** `RepeatedField<ProtoMessage<M, A>, Expanded, FIELD>` with `Element = M` (no per-element `UnmanagedBox`).
 
 > Note: the bound-view idiom covers every field family — `SingularField`, `RepeatedField`, and `OneofSlot` — on both read and write paths. Terminal `deallocate` stays a direct field method (called from `Drop`).
 
@@ -703,7 +703,7 @@ The `set_*` per-variant setters are removed, matching the other field families.
 |---|---|---|
 | UTF-8 validation | Always `decode_string_in` (VERIFY) | Per-field `utf8_validation` feature |
 | Recursion limit | Not enforced | Depth counter in nested merge → `RecursionLimitExceeded` |
-| Repeated wrappers | `RepeatedField` + `RepeatedItems` | `repeated bool` / `repeated message` |
+| Repeated wrappers | `RepeatedField` + `RepeatedElement` (+ message) | `repeated bool` |
 | Fixed32/64 catalog | Trait stubs | `ProtoType` impls + `SingularField` |
 | `protoc` plugin | — | FieldKind → catalog emission |
 | Zero-copy views | — | `TaskView<'buf>` (DESIGN.md §8) |

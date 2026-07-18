@@ -11,7 +11,7 @@
 //! no `ProtoType::decode → Written`. [`SingularField`](crate::fields::singular::field::SingularField)
 //! always goes through `ValueLayout`.
 //!
-//! Repeated fields use [`RepeatedItems`](super::repeated_items::RepeatedItems)
+//! Repeated fields use [`RepeatedElement`](super::repeated_element::RepeatedElement)
 //! (`Element` storage). [`VarintProtoType`](super::varint::VarintProtoType) and
 //! [`LenProtoType`](super::len::LenProtoType) remain as wire/storage helpers.
 

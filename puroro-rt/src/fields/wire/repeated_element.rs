@@ -1,9 +1,9 @@
 //! Repeated-element semantics for protobuf type markers.
 //!
 //! Singular fields store [`ProtoType::Slot`](super::proto_type::ProtoType::Slot).
-//! Repeated fields store [`RepeatedItems::Element`] — often the inner payload
-//! (`i32`, `UnmanagedString`, …), and for a future nested-message repeated
-//! field the message type `M` itself (not [`UnmanagedBox`](::unmanaged::UnmanagedBox)).
+//! Repeated fields store [`RepeatedElement::Element`] — often the inner payload
+//! (`i32`, `UnmanagedString`, …), and for nested-message repeated fields the
+//! message type `M` itself (not [`UnmanagedBox`](::unmanaged::UnmanagedBox)).
 //!
 //! [`ProtoBool`](super::varint::ProtoBool) (singular bit-packed via
 //! [`BitPacked`](crate::fields::shared::value_layout::BitPacked)) does **not**
@@ -13,14 +13,14 @@ use ::allocator_api2::alloc::Allocator;
 use ::bytes::{Buf, BufMut};
 use ::unmanaged::{UnmanagedString, UnmanagedVec};
 
-use ::puroro::DecodeError;
-use ::puroro::WireType;
+use ::puroro::{DecodeError, Message, WireType};
 
 use crate::decode;
 use crate::encode;
 use crate::fields::shared::DeallocateIn;
 
 use super::len::{LenProtoType, ProtoBytes, ProtoString};
+use super::proto_message::ProtoMessage;
 use super::proto_type::ProtoType;
 use super::varint::{
     Closed, ClosedEnum, Open, OpenEnum, ProtoEnum, ProtoInt32, ProtoInt64, ProtoSint32,
@@ -28,7 +28,10 @@ use super::varint::{
 };
 
 /// Wire + storage for one element of a repeated field of marker `Self`.
-pub trait RepeatedItems: ProtoType {
+///
+/// Encode / length / deallocate live here. Decode / merge live on
+/// [`RepeatedElementMerge`] so nested messages can constrain `M::Alloc = A`.
+pub trait RepeatedElement: ProtoType {
     /// Physical element stored in the repeated buffer.
     type Element<A: Allocator + Clone>;
 
@@ -42,35 +45,33 @@ pub trait RepeatedItems: ProtoType {
         buf: &mut B,
     );
 
-    /// Decodes one expanded occurrence after the tag has been read.
-    fn decode_element<A: Allocator + Clone, B: Buf>(
-        wire_type: WireType,
-        buf: &mut B,
-        alloc: A,
-    ) -> Result<Self::Element<A>, DecodeError>;
-
     /// Drops one element, freeing heap payload when applicable.
     ///
     /// # Safety
     ///
     /// `alloc` must own `elem`'s buffer when the element is heap-backed.
     unsafe fn deallocate_element<A: Allocator + Clone>(elem: Self::Element<A>, alloc: A);
+}
 
+/// Decode / merge for a repeated element marker under allocator `A`.
+///
+/// Separated from [`RepeatedElement`] so `ProtoMessage<M>` can require
+/// `M: Message<Alloc = A>` (inline `Element = M`).
+pub trait RepeatedElementMerge<A: Allocator + Clone>: RepeatedElement {
     /// Merges one wire occurrence into `push` (append semantics).
-    fn merge_occurrence<A, B, F>(
+    fn merge_occurrence<B, F>(
         wire_type: WireType,
         buf: &mut B,
         alloc: A,
         push: F,
     ) -> Result<(), DecodeError>
     where
-        A: Allocator + Clone,
         B: Buf,
         F: FnMut(Self::Element<A>);
 }
 
 /// Packable repeated numerics / enums — support packed encode and dual-form decode.
-pub trait PackableRepeatedItems: RepeatedItems {
+pub trait PackableRepeatedElement: RepeatedElement {
     fn encode_wire<A: Allocator + Clone>(value: Self::Element<A>) -> u64
     where
         Self::Element<A>: Copy;
@@ -80,8 +81,14 @@ pub trait PackableRepeatedItems: RepeatedItems {
         Self::Element<A>: Copy;
 }
 
+/// Elements that may be mutated through a growable `Vec` (`values_mut`).
+///
+/// Implemented for copy scalars / enums and nested messages. Not implemented
+/// for string / bytes (those use [`RepeatedSlicePush::element_from_slice`]).
+pub trait RepeatedVecMut: RepeatedElement {}
+
 /// Repeated string / bytes — elements built from a byte slice (`push_*`).
-pub trait RepeatedSlicePush: RepeatedItems {
+pub trait RepeatedSlicePush: RepeatedElement {
     fn element_from_slice<A: Allocator + Clone>(
         v: &[u8],
         alloc: A,
@@ -94,7 +101,7 @@ pub trait RepeatedSlicePush: RepeatedItems {
 
 macro_rules! impl_packable_varint_repeated {
     ($marker:ty, $inner:ty) => {
-        impl RepeatedItems for $marker {
+        impl RepeatedElement for $marker {
             type Element<A: Allocator + Clone> = $inner;
 
             #[inline]
@@ -119,29 +126,17 @@ macro_rules! impl_packable_varint_repeated {
             }
 
             #[inline]
-            fn decode_element<A: Allocator + Clone, B: Buf>(
-                wire_type: WireType,
-                buf: &mut B,
-                _alloc: A,
-            ) -> Result<$inner, DecodeError> {
-                if wire_type != WireType::Varint {
-                    return Err(DecodeError::InvalidTag);
-                }
-                let raw = decode::decode_varint(buf)?;
-                <$marker as VarintProtoType>::decode_wire(raw)
-            }
-
-            #[inline]
             unsafe fn deallocate_element<A: Allocator + Clone>(_elem: $inner, _alloc: A) {}
+        }
 
-            fn merge_occurrence<A, B, F>(
+        impl<A: Allocator + Clone> RepeatedElementMerge<A> for $marker {
+            fn merge_occurrence<B, F>(
                 wire_type: WireType,
                 buf: &mut B,
                 _alloc: A,
                 mut push: F,
             ) -> Result<(), DecodeError>
             where
-                A: Allocator + Clone,
                 B: Buf,
                 F: FnMut($inner),
             {
@@ -167,7 +162,7 @@ macro_rules! impl_packable_varint_repeated {
             }
         }
 
-        impl PackableRepeatedItems for $marker {
+        impl PackableRepeatedElement for $marker {
             #[inline]
             fn encode_wire<A: Allocator + Clone>(value: $inner) -> u64 {
                 <$marker as VarintProtoType>::encode_wire(value)
@@ -178,6 +173,8 @@ macro_rules! impl_packable_varint_repeated {
                 <$marker as VarintProtoType>::decode_wire(raw)
             }
         }
+
+        impl RepeatedVecMut for $marker {}
     };
 }
 
@@ -190,7 +187,7 @@ impl_packable_varint_repeated!(ProtoSint64, i64);
 
 macro_rules! impl_packable_enum_repeated {
     ($kind:ty, $bound:ident) => {
-        impl<E: $bound> RepeatedItems for ProtoEnum<E, $kind> {
+        impl<E: $bound> RepeatedElement for ProtoEnum<E, $kind> {
             type Element<A: Allocator + Clone> = E;
 
             #[inline]
@@ -211,29 +208,17 @@ macro_rules! impl_packable_enum_repeated {
             }
 
             #[inline]
-            fn decode_element<A: Allocator + Clone, B: Buf>(
-                wire_type: WireType,
-                buf: &mut B,
-                _alloc: A,
-            ) -> Result<E, DecodeError> {
-                if wire_type != WireType::Varint {
-                    return Err(DecodeError::InvalidTag);
-                }
-                let raw = decode::decode_varint(buf)?;
-                <ProtoEnum<E, $kind> as VarintProtoType>::decode_wire(raw)
-            }
-
-            #[inline]
             unsafe fn deallocate_element<A: Allocator + Clone>(_elem: E, _alloc: A) {}
+        }
 
-            fn merge_occurrence<A, B, F>(
+        impl<A: Allocator + Clone, E: $bound> RepeatedElementMerge<A> for ProtoEnum<E, $kind> {
+            fn merge_occurrence<B, F>(
                 wire_type: WireType,
                 buf: &mut B,
                 _alloc: A,
                 mut push: F,
             ) -> Result<(), DecodeError>
             where
-                A: Allocator + Clone,
                 B: Buf,
                 F: FnMut(E),
             {
@@ -259,7 +244,7 @@ macro_rules! impl_packable_enum_repeated {
             }
         }
 
-        impl<E: $bound> PackableRepeatedItems for ProtoEnum<E, $kind> {
+        impl<E: $bound> PackableRepeatedElement for ProtoEnum<E, $kind> {
             #[inline]
             fn encode_wire<A: Allocator + Clone>(value: E) -> u64 {
                 <ProtoEnum<E, $kind> as VarintProtoType>::encode_wire(value)
@@ -270,6 +255,8 @@ macro_rules! impl_packable_enum_repeated {
                 <ProtoEnum<E, $kind> as VarintProtoType>::decode_wire(raw)
             }
         }
+
+        impl<E: $bound> RepeatedVecMut for ProtoEnum<E, $kind> {}
     };
 }
 
@@ -280,7 +267,7 @@ impl_packable_enum_repeated!(Closed, ClosedEnum);
 // LEN markers
 // ---------------------------------------------------------------------------
 
-impl RepeatedItems for ProtoString {
+impl RepeatedElement for ProtoString {
     type Element<A: Allocator + Clone> = UnmanagedString<A>;
 
     #[inline]
@@ -298,36 +285,28 @@ impl RepeatedItems for ProtoString {
     }
 
     #[inline]
-    fn decode_element<A: Allocator + Clone, B: Buf>(
-        wire_type: WireType,
-        buf: &mut B,
-        alloc: A,
-    ) -> Result<UnmanagedString<A>, DecodeError> {
-        if wire_type != WireType::Len {
-            return Err(DecodeError::InvalidTag);
-        }
-        <Self as LenProtoType>::decode(buf, alloc)
-    }
-
-    #[inline]
     unsafe fn deallocate_element<A: Allocator + Clone>(elem: UnmanagedString<A>, alloc: A) {
         // SAFETY: forwarded to the caller's obligation on `alloc`.
         unsafe { DeallocateIn::deallocate_in(elem, alloc) };
     }
+}
 
+impl<A: Allocator + Clone> RepeatedElementMerge<A> for ProtoString {
     #[inline]
-    fn merge_occurrence<A, B, F>(
+    fn merge_occurrence<B, F>(
         wire_type: WireType,
         buf: &mut B,
         alloc: A,
         mut push: F,
     ) -> Result<(), DecodeError>
     where
-        A: Allocator + Clone,
         B: Buf,
         F: FnMut(UnmanagedString<A>),
     {
-        push(Self::decode_element(wire_type, buf, alloc)?);
+        if wire_type != WireType::Len {
+            return Err(DecodeError::InvalidTag);
+        }
+        push(<Self as LenProtoType>::decode(buf, alloc)?);
         Ok(())
     }
 }
@@ -342,7 +321,7 @@ impl RepeatedSlicePush for ProtoString {
     }
 }
 
-impl RepeatedItems for ProtoBytes {
+impl RepeatedElement for ProtoBytes {
     type Element<A: Allocator + Clone> = UnmanagedVec<u8, A>;
 
     #[inline]
@@ -360,36 +339,28 @@ impl RepeatedItems for ProtoBytes {
     }
 
     #[inline]
-    fn decode_element<A: Allocator + Clone, B: Buf>(
-        wire_type: WireType,
-        buf: &mut B,
-        alloc: A,
-    ) -> Result<UnmanagedVec<u8, A>, DecodeError> {
-        if wire_type != WireType::Len {
-            return Err(DecodeError::InvalidTag);
-        }
-        <Self as LenProtoType>::decode(buf, alloc)
-    }
-
-    #[inline]
     unsafe fn deallocate_element<A: Allocator + Clone>(elem: UnmanagedVec<u8, A>, alloc: A) {
         // SAFETY: forwarded to the caller's obligation on `alloc`.
         unsafe { DeallocateIn::deallocate_in(elem, alloc) };
     }
+}
 
+impl<A: Allocator + Clone> RepeatedElementMerge<A> for ProtoBytes {
     #[inline]
-    fn merge_occurrence<A, B, F>(
+    fn merge_occurrence<B, F>(
         wire_type: WireType,
         buf: &mut B,
         alloc: A,
         mut push: F,
     ) -> Result<(), DecodeError>
     where
-        A: Allocator + Clone,
         B: Buf,
         F: FnMut(UnmanagedVec<u8, A>),
     {
-        push(Self::decode_element(wire_type, buf, alloc)?);
+        if wire_type != WireType::Len {
+            return Err(DecodeError::InvalidTag);
+        }
+        push(<Self as LenProtoType>::decode(buf, alloc)?);
         Ok(())
     }
 }
@@ -403,3 +374,64 @@ impl RepeatedSlicePush for ProtoBytes {
         <Self as LenProtoType>::store_from_slice(v, alloc)
     }
 }
+
+// ---------------------------------------------------------------------------
+// Nested message
+// ---------------------------------------------------------------------------
+
+impl<M: Message> RepeatedElement for ProtoMessage<M> {
+    /// Inline message value (not [`UnmanagedBox`](::unmanaged::UnmanagedBox)).
+    ///
+    /// Use sites must pair the same allocator: e.g.
+    /// `RepeatedField<ProtoMessage<Address<A>>, Expanded, FIELD, A>`.
+    type Element<A: Allocator + Clone> = M;
+
+    #[inline]
+    fn encoded_len_element<A: Allocator + Clone>(elem: &M, field: u32) -> usize {
+        <Self as ProtoType>::encoded_len::<A>(elem, field)
+    }
+
+    #[inline]
+    fn encode_element<A: Allocator + Clone, B: BufMut>(elem: &M, field: u32, buf: &mut B) {
+        <Self as ProtoType>::encode::<A, B>(elem, field, buf);
+    }
+
+    #[inline]
+    unsafe fn deallocate_element<A: Allocator + Clone>(elem: M, _alloc: A) {
+        // Generated messages free their own heap via `Drop` / `_common.alloc`.
+        drop(elem);
+    }
+}
+
+impl<A, M> RepeatedElementMerge<A> for ProtoMessage<M>
+where
+    A: Allocator + Clone,
+    M: Message<Alloc = A>,
+{
+    #[inline]
+    fn merge_occurrence<B, F>(
+        wire_type: WireType,
+        buf: &mut B,
+        alloc: A,
+        mut push: F,
+    ) -> Result<(), DecodeError>
+    where
+        B: Buf,
+        F: FnMut(M),
+    {
+        if wire_type != WireType::Len {
+            return Err(DecodeError::InvalidTag);
+        }
+        let len = decode::decode_varint(buf)? as usize;
+        if buf.remaining() < len {
+            return Err(DecodeError::TruncatedMessage);
+        }
+        let mut sub = buf.take(len);
+        let mut msg = M::new_in(alloc);
+        msg.merge_from(&mut sub)?;
+        push(msg);
+        Ok(())
+    }
+}
+
+impl<M: Message> RepeatedVecMut for ProtoMessage<M> {}
