@@ -26,9 +26,11 @@ use ::puroro::DecodeError;
 use ::puroro::WireType;
 use ::puroro::{HasDefault, Optional};
 
+use ::unmanaged::DeallocateIn;
+
 use crate::fields::shared::FieldDeallocate;
 use crate::fields::shared::{
-    DeallocateIn, DefaultIn, MessageCommon, PresenceBits,
+    DefaultIn, MessageCommon, PresenceBits,
     field_presence::{
         FieldPresence, Implicit, LegacyRequired, NonOneof, Oneof, RequiredFieldPresence,
     },
@@ -274,7 +276,7 @@ where
 
 impl<M, const FIELD: u32, A, L, D> SingularField<ProtoMessage<M>, Oneof, FIELD, A, L, D>
 where
-    M: Message<Alloc = A>,
+    M: Message<Alloc = A> + ::unmanaged::DeallocateIn<A>,
     A: Allocator + Clone,
     L: ValueLayout<ProtoMessage<M>, A>,
     <Oneof as FieldPresence>::ValueSlot<UnmanagedBox<M, A>>: ValueSlot<UnmanagedBox<M, A>, A>,

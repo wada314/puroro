@@ -13,8 +13,10 @@ use ::bytes::Buf;
 
 use ::puroro::{DecodeError, WireType};
 
+use ::unmanaged::DeallocateIn;
+
 use super::{
-    DeallocateIn, DefaultIn, MessageCommon, PresenceBits,
+    DefaultIn, MessageCommon, PresenceBits,
     slot_init::SlotInitMut,
     value_slot::{AddressableSlot, ValueSlot, ValueSlotMutAccess},
 };

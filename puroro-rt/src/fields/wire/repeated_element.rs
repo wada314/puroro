@@ -16,7 +16,7 @@ use ::puroro::{DecodeError, Message, WireType};
 
 use crate::decode;
 use crate::encode;
-use crate::fields::shared::DeallocateIn;
+use ::unmanaged::DeallocateIn;
 
 use super::fixed::{
     Fixed32ProtoType, Fixed64ProtoType, ProtoDouble, ProtoFixed32, ProtoFixed64, ProtoFloat,
@@ -606,7 +606,9 @@ impl<M: Message> RepeatedElement for ProtoMessage<M> {
 
     #[inline]
     unsafe fn deallocate_element<A: Allocator + Clone>(elem: M, _alloc: A) {
-        // Generated messages free their own heap via `Drop` / `_common.alloc`.
+        // Inline repeated elements are not behind `UnmanagedBox`; free via
+        // `Drop` / `_common.alloc` (same body as `unmanaged::DeallocateIn` on
+        // generated messages). The `alloc` parameter is unused here.
         drop(elem);
     }
 }
@@ -614,7 +616,7 @@ impl<M: Message> RepeatedElement for ProtoMessage<M> {
 impl<A, M> RepeatedElementMerge<A> for ProtoMessage<M>
 where
     A: Allocator + Clone,
-    M: Message<Alloc = A>,
+    M: Message<Alloc = A> + ::unmanaged::DeallocateIn<A>,
 {
     #[inline]
     fn merge_occurrence<B, F>(

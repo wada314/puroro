@@ -1,10 +1,10 @@
 //! Shared infrastructure for generated message fields.
 //!
 //! [`MessageCommon`] and [`PresenceBits`] are per-message state. [`DefaultIn`],
-//! [`DeallocateIn`], [`ProtoEmpty`], [`ValueSlot`](value_slot::ValueSlot),
+//! [`ProtoEmpty`], [`ValueSlot`](value_slot::ValueSlot),
 //! [`SlotInitView`](slot_init::SlotInitView) / [`SlotInitMut`](slot_init::SlotInitMut),
 //! and [`FieldPresence`](field_presence::FieldPresence) govern singular scalar
-//! storage and init state.
+//! storage and init state. Slot teardown uses [`unmanaged::DeallocateIn`].
 
 pub(crate) mod field_deallocate;
 pub(crate) mod field_presence;
@@ -137,7 +137,7 @@ impl<P: PresenceBits, A: Allocator> MessageCommon<P, A> {
 }
 
 // ---------------------------------------------------------------------------
-// Allocator-aware construction / release (`DefaultIn` / `DeallocateIn`)
+// Allocator-aware construction (`DefaultIn`) / empty check (`ProtoEmpty`)
 // ---------------------------------------------------------------------------
 
 /// Generalizes [`Default`] for payloads whose empty form may need an allocator
@@ -147,22 +147,11 @@ impl<P: PresenceBits, A: Allocator> MessageCommon<P, A> {
 /// associated type), matching the wg-allocators direction: scalars like `i32`
 /// can implement `DefaultIn<A>` for every `A`, while `UnmanagedString<A>` only
 /// implements `DefaultIn<A>` for its own `A`.
+///
+/// Teardown uses [`unmanaged::DeallocateIn`] directly (not a local trait).
 pub trait DefaultIn<A: Allocator + Clone> {
     /// Builds the empty / type-zero value, using `alloc` when heap-backed.
     fn default_in(alloc: A) -> Self;
-}
-
-/// Allocator-aware release of a stored value.
-///
-/// Pairs with [`DefaultIn`] so [`ValueSlot`](value_slot::ValueSlot) can replace
-/// or clear a payload without leaking. Allocator-less scalars are a no-op.
-pub trait DeallocateIn<A: Allocator + Clone> {
-    /// Drops the value and frees its backing allocation through `alloc`.
-    ///
-    /// # Safety
-    ///
-    /// `alloc` must be the allocator that owns this value's buffer.
-    unsafe fn deallocate_in(self, alloc: A);
 }
 
 /// Empty / type-zero predicate for IMPLICIT omit-on-encode.
@@ -180,11 +169,6 @@ macro_rules! impl_scalar_default_in {
             fn default_in(_alloc: A) -> Self {
                 $zero
             }
-        }
-
-        impl<A: Allocator + Clone> DeallocateIn<A> for $ty {
-            #[inline]
-            unsafe fn deallocate_in(self, _alloc: A) {}
         }
     };
 }
@@ -233,14 +217,6 @@ impl<A: Allocator + Clone> DefaultIn<A> for ::unmanaged::UnmanagedString<A> {
     }
 }
 
-impl<A: Allocator + Clone> DeallocateIn<A> for ::unmanaged::UnmanagedString<A> {
-    #[inline]
-    unsafe fn deallocate_in(self, alloc: A) {
-        // SAFETY: forwarded to the caller's obligation on `alloc`.
-        unsafe { self.deallocate(alloc) };
-    }
-}
-
 impl<A: Allocator> ProtoEmpty for ::unmanaged::UnmanagedString<A> {
     #[inline]
     fn is_proto_empty(&self) -> bool {
@@ -252,14 +228,6 @@ impl<A: Allocator + Clone> DefaultIn<A> for ::unmanaged::UnmanagedVec<u8, A> {
     #[inline]
     fn default_in(alloc: A) -> Self {
         ::unmanaged::UnmanagedVec::new(alloc)
-    }
-}
-
-impl<A: Allocator + Clone> DeallocateIn<A> for ::unmanaged::UnmanagedVec<u8, A> {
-    #[inline]
-    unsafe fn deallocate_in(self, alloc: A) {
-        // SAFETY: forwarded to the caller's obligation on `alloc`.
-        unsafe { self.deallocate(alloc) };
     }
 }
 

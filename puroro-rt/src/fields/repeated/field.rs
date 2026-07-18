@@ -116,7 +116,8 @@ where
                 unsafe { T::deallocate_element(elem, alloc.clone()) };
             }
         }
-        unsafe { v.deallocate(alloc) };
+        // Elements were already released above; free the empty buffer only.
+        unsafe { v.deallocate_buffer(alloc) };
     }
 }
 

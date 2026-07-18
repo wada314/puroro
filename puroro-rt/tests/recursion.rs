@@ -60,6 +60,13 @@ impl<A: Allocator + Clone> Drop for Nest<A> {
     }
 }
 
+impl<A: Allocator + Clone> ::unmanaged::DeallocateIn<A> for Nest<A> {
+    #[inline]
+    unsafe fn deallocate_in(self, _alloc: A) {
+        drop(self);
+    }
+}
+
 impl<A: Allocator + Clone> Message for Nest<A> {
     type Alloc = A;
 

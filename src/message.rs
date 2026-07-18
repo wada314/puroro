@@ -24,8 +24,11 @@ pub const RECURSION_LIMIT: usize = 100;
 ///
 /// The associated [`Alloc`](Self::Alloc) is the message's single allocator type
 /// parameter. Nested fields construct children with
-/// [`new_in`](Self::new_in) using the parent allocator (`M: Message<Alloc = A>`).
-/// An inherent `new()` for `Global` may still be provided on the concrete type.
+/// [`new_in`](Self::new_in) using the parent allocator
+/// (`M: Message<Alloc = A> + unmanaged::DeallocateIn<A>` at catalog use sites).
+/// Each concrete message must implement [`unmanaged::DeallocateIn`] for its
+/// `Alloc` (orphan rules forbid a blanket impl on this trait). An inherent
+/// `new()` for `Global` may still be provided on the concrete type.
 pub trait Message: Sized {
     /// Allocator that owns this message's heap allocations.
     type Alloc: Allocator + Clone;

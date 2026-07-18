@@ -8,6 +8,7 @@
 //! Unknown-value semantics follow
 //! [Enum Behavior](https://protobuf.dev/programming-guides/enum/).
 
+use ::allocator_api2::alloc::Allocator;
 use ::core::convert::TryFrom;
 
 use ::puroro::HasDefault;
@@ -59,6 +60,11 @@ impl ProtoEnumStorage for Status {
 
 impl OpenEnum for Status {}
 
+impl<A: Allocator> ::unmanaged::DeallocateIn<A> for Status {
+    #[inline]
+    unsafe fn deallocate_in(self, _alloc: A) {}
+}
+
 impl HasDefault<Status> for ProtoDefault {
     const DEFAULT: Status = Status::UNSPECIFIED;
 }
@@ -108,6 +114,11 @@ impl ProtoEnumStorage for Priority {
 }
 
 impl ClosedEnum for Priority {}
+
+impl<A: Allocator> ::unmanaged::DeallocateIn<A> for Priority {
+    #[inline]
+    unsafe fn deallocate_in(self, _alloc: A) {}
+}
 
 impl HasDefault<Priority> for ProtoDefault {
     const DEFAULT: Priority = Priority::UNSPECIFIED;

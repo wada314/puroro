@@ -29,10 +29,12 @@ use ::unmanaged::{UnmanagedString, UnmanagedVec};
 use ::puroro::DecodeError;
 use ::puroro::WireType;
 
+use ::unmanaged::DeallocateIn;
+
 use crate::decode;
 use crate::encode;
 use crate::fields::shared::{
-    DeallocateIn, DefaultIn, MessageCommon, PresenceBits, ProtoEmpty,
+    DefaultIn, MessageCommon, PresenceBits, ProtoEmpty,
     slot_init::SlotInitMut,
     value_slot::{AddressableSlot, ValueSlot, ValueSlotMutAccess},
 };
@@ -61,7 +63,8 @@ pub trait ProtoType: Sized {
     /// Call sites ([`SingularField`](crate::fields::singular::field::SingularField))
     /// require `Slot<A>: AddressableSlot<SlotAlloc = A> + DefaultIn<Alloc = A>`.
     /// Nested messages use `UnmanagedBox<M, A>`; call sites require
-    /// `M: Message<Alloc = A>` via `DefaultIn<A>` on that box.
+    /// `M: Message<Alloc = A> + unmanaged::DeallocateIn<A>` via `DefaultIn` /
+    /// `DeallocateIn` on that box.
     type Slot<A: Allocator + Clone>;
 
     /// Borrowed / by-value view returned by getters (`i32`, `&str`, `bool`, …).

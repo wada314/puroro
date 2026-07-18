@@ -12,7 +12,7 @@ use ::protobuf_core::{FIXED32_BYTES, FIXED64_BYTES};
 use ::puroro::DecodeError;
 
 use crate::fields::shared::value_slot::AddressableSlot;
-use crate::fields::shared::{DeallocateIn, DefaultIn, ProtoEmpty};
+use crate::fields::shared::{DefaultIn, ProtoEmpty};
 
 // ---------------------------------------------------------------------------
 // Core traits (wire helpers)
@@ -162,21 +162,11 @@ impl<A: Allocator + Clone> DefaultIn<A> for f32 {
     }
 }
 
-impl<A: Allocator + Clone> DeallocateIn<A> for f32 {
-    #[inline]
-    unsafe fn deallocate_in(self, _alloc: A) {}
-}
-
 impl<A: Allocator + Clone> DefaultIn<A> for f64 {
     #[inline]
     fn default_in(_alloc: A) -> Self {
         0.0
     }
-}
-
-impl<A: Allocator + Clone> DeallocateIn<A> for f64 {
-    #[inline]
-    unsafe fn deallocate_in(self, _alloc: A) {}
 }
 
 /// Float empty check uses Rust `== 0.0` (`-0.0` is empty; `NaN` is non-empty).

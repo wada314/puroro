@@ -17,8 +17,10 @@ use ::puroro::{DecodeError, Message, WireType};
 
 use crate::decode;
 use crate::encode;
+use ::unmanaged::DeallocateIn;
+
 use crate::fields::shared::{
-    DeallocateIn, DefaultIn, MessageCommon, PresenceBits, ProtoEmpty,
+    DefaultIn, MessageCommon, PresenceBits, ProtoEmpty,
     slot_init::SlotInitMut,
     value_slot::{AddressableSlot, ValueSlot, ValueSlotMutAccess},
 };
@@ -43,20 +45,19 @@ impl<M> Clone for ProtoMessage<M> {
 
 impl<M> Copy for ProtoMessage<M> {}
 
-impl<M: Message<Alloc = A>, A: Allocator + Clone> DefaultIn<A> for UnmanagedBox<M, A> {
+impl<M, A> DefaultIn<A> for UnmanagedBox<M, A>
+where
+    M: Message<Alloc = A>,
+    A: Allocator + Clone,
+{
     #[inline]
     fn default_in(alloc: A) -> Self {
         UnmanagedBox::new_in(M::new_in(alloc.clone()), alloc)
     }
 }
 
-impl<M: Message<Alloc = A>, A: Allocator + Clone> DeallocateIn<A> for UnmanagedBox<M, A> {
-    #[inline]
-    unsafe fn deallocate_in(self, alloc: A) {
-        // SAFETY: forwarded to the caller's obligation on `alloc`.
-        unsafe { self.deallocate(alloc) };
-    }
-}
+// `UnmanagedBox<M, A>: DeallocateIn<A>` comes from unmanaged's blanket when
+// `M: DeallocateIn<A>` (each generated message implements it; no local bridge).
 
 impl<M, A: Allocator> ProtoEmpty for UnmanagedBox<M, A> {
     /// A present nested message is never omitted for being "empty"; absence is

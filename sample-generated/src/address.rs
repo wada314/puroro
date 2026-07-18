@@ -233,6 +233,19 @@ impl<A: Allocator + Clone> Drop for Address<A> {
 }
 
 // ---------------------------------------------------------------------------
+// unmanaged::DeallocateIn — required for nested `UnmanagedBox` / catalog bounds
+// ---------------------------------------------------------------------------
+
+impl<A: Allocator + Clone> ::unmanaged::DeallocateIn<A> for Address<A> {
+    #[inline]
+    unsafe fn deallocate_in(self, _alloc: A) {
+        // Heap is owned by `self._common.alloc`; parent-passed `alloc` is only
+        // needed when freeing an enclosing `UnmanagedBox` slot.
+        drop(self);
+    }
+}
+
+// ---------------------------------------------------------------------------
 // Message
 // ---------------------------------------------------------------------------
 

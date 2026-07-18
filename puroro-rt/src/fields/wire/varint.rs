@@ -12,7 +12,7 @@ use ::protobuf_core::Varint;
 use ::puroro::DecodeError;
 
 use crate::fields::shared::value_slot::AddressableSlot;
-use crate::fields::shared::{DeallocateIn, DefaultIn, ProtoEmpty};
+use crate::fields::shared::{DefaultIn, ProtoEmpty};
 
 // ---------------------------------------------------------------------------
 // Core trait (wire helpers)
@@ -82,11 +82,6 @@ impl<E: ProtoEnumStorage, A: Allocator + Clone> DefaultIn<A> for E {
     fn default_in(_alloc: A) -> Self {
         E::proto_zero()
     }
-}
-
-impl<E: ProtoEnumStorage, A: Allocator + Clone> DeallocateIn<A> for E {
-    #[inline]
-    unsafe fn deallocate_in(self, _alloc: A) {}
 }
 
 impl<E: ProtoEnumStorage> ProtoEmpty for E {

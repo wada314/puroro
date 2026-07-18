@@ -3,13 +3,13 @@
 //! selected by [`FieldPresence::ValueSlot`].
 //!
 //! [`ValueSlot`] is implemented for raw `T`, [`MaybeUninit<T>`], and [`Option<T>`]
-//! when `T` implements [`DefaultIn`] / [`DeallocateIn`] for the message allocator
-//! `A`. Slot payloads are physical storage (`i32`, `()`, `UnmanagedString`,
-//! [`UnmanagedBox`](::unmanaged::UnmanagedBox), …); logical bit-packed bool
-//! values live in [`MessageCommon`](super::MessageCommon).
+//! when `T` implements [`DefaultIn`] / [`unmanaged::DeallocateIn`] for the
+//! message allocator `A`. Slot payloads are physical storage (`i32`, `()`,
+//! `UnmanagedString`, [`UnmanagedBox`](::unmanaged::UnmanagedBox), …); logical
+//! bit-packed bool values live in [`MessageCommon`](super::MessageCommon).
 //!
 //! Construction and teardown thread an allocator (via
-//! [`DefaultIn`](super::DefaultIn) / [`DeallocateIn`](super::DeallocateIn)).
+//! [`DefaultIn`](super::DefaultIn) / [`unmanaged::DeallocateIn`]).
 //! Read / mutation go through short-lived views from [`with`](ValueSlot::with) /
 //! [`with_mut`](ValueSlot::with_mut), which return
 //! [`ValueSlotRefAccess`] / [`ValueSlotMutAccess`] (RPIT).
@@ -18,9 +18,10 @@ use ::core::marker::PhantomData;
 use ::core::mem::{self, MaybeUninit};
 
 use ::allocator_api2::alloc::Allocator;
+use ::unmanaged::DeallocateIn;
 
 use super::{
-    DeallocateIn, DefaultIn, MessageCommon, PresenceBits,
+    DefaultIn, MessageCommon, PresenceBits,
     slot_init::{SlotInitMut, SlotInitView},
 };
 

@@ -74,6 +74,13 @@ impl<A: Allocator + Clone> Drop for FixedDemo<A> {
     }
 }
 
+impl<A: Allocator + Clone> ::unmanaged::DeallocateIn<A> for FixedDemo<A> {
+    #[inline]
+    unsafe fn deallocate_in(self, _alloc: A) {
+        drop(self);
+    }
+}
+
 impl<A: Allocator + Clone> Message for FixedDemo<A> {
     type Alloc = A;
 

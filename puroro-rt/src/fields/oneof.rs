@@ -18,9 +18,11 @@ use ::core::fmt::{self, Debug, Formatter, Result as FmtResult};
 use ::puroro::{HasDefault, Optional};
 use ::unmanaged::UnmanagedBox;
 
+use ::unmanaged::DeallocateIn;
+
 use crate::fields::enum_variant::EnumVariant;
 use crate::fields::shared::{
-    DeallocateIn, DefaultIn, FieldDeallocate, MessageCommon, PresenceBits, ValueLayout,
+    DefaultIn, FieldDeallocate, MessageCommon, PresenceBits, ValueLayout,
     field_presence::{FieldPresence, Oneof},
     value_slot::{AddressableSlot, ValueSlot},
 };
@@ -398,7 +400,7 @@ where
 impl<'a, M, const FIELD: u32, A: Allocator + Clone, Pb: PresenceBits>
     OneofVariantRef<'a, SingularField<ProtoMessage<M>, Oneof, FIELD, A>, Pb, A>
 where
-    M: ::puroro::Message<Alloc = A>,
+    M: ::puroro::Message<Alloc = A> + ::unmanaged::DeallocateIn<A>,
     <Oneof as FieldPresence>::ValueSlot<UnmanagedBox<M, A>>: ValueSlot<UnmanagedBox<M, A>, A>,
 {
     /// Returns the child when this message variant is active.
