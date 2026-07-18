@@ -181,5 +181,5 @@ Update [`IMPLEMENTATION.md`](IMPLEMENTATION.md) §5–9, §14–15 and [`DESIGN.
 
 - ~~Numerics use `CopySlot<V, A>`~~ → removed: `DefaultIn<A>` / `DeallocateIn<A>` are trait-parameterised, so bare `i32` / `()` work.
 - Bool singular slot is `()`; value via `BitPacked`.
-- `ProtoMessage<M>` is A-free; `Slot` is `UnmanagedBox<M, M::Alloc>` (call sites unify with field `A`).
+- `ProtoMessage<M>` is A-free; `Slot` is `UnmanagedBox<M, A>` (use sites require `M: Message<Alloc = A>` via `DefaultIn<A>`).
 - `ProtoType::decode` for messages is a stub; real decode is `PayloadAccess::merge`.

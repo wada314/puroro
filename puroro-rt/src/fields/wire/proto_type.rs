@@ -54,8 +54,8 @@ pub trait ProtoType: Sized {
     ///
     /// Call sites ([`SingularField`](crate::fields::singular::field::SingularField))
     /// require `Slot<A>: AddressableSlot<SlotAlloc = A> + DefaultIn<Alloc = A>`.
-    /// Nested messages use `UnmanagedBox<M, M::Alloc>`; that unifies with the
-    /// field's `A` when `M = Msg<A>`.
+    /// Nested messages use `UnmanagedBox<M, A>`; call sites require
+    /// `M: Message<Alloc = A>` via `DefaultIn<A>` on that box.
     type Slot<A: Allocator + Clone>;
 
     /// Borrowed / by-value view returned by getters (`i32`, `&str`, `bool`, …).

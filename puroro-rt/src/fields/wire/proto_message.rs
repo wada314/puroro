@@ -1,11 +1,11 @@
 //! Nested-message type marker for [`ProtoType`](super::proto_type::ProtoType).
 //!
 //! [`ProtoMessage`] supplies merge-into wire semantics; physical storage is
-//! [`UnmanagedBox<M, M::Alloc>`]. Presence policy (`NonOneof` / `Oneof`) lives on
+//! [`UnmanagedBox<M, A>`]. Presence policy (`NonOneof` / `Oneof`) lives on
 //! [`FieldPresence`](crate::fields::shared::field_presence::FieldPresence).
 //!
 //! The marker is allocator-free; `M` typically still mentions `A` (e.g.
-//! `Address<A>`). Singular fields pass the same `A` so `M::Alloc = A`.
+//! `Address<A>`). Singular fields pass the same `A` so the box allocator matches.
 
 use ::allocator_api2::alloc::Allocator;
 use ::bytes::{Buf, BufMut};
@@ -27,7 +27,7 @@ use crate::fields::wire::proto_type::{PayloadAccess, ProtoType};
 
 /// Type marker for a singular nested message `M`.
 ///
-/// Physical slot is [`UnmanagedBox<M, M::Alloc>`] via [`ProtoType::Slot`].
+/// Physical slot is [`UnmanagedBox<M, A>`] via [`ProtoType::Slot`].
 pub struct ProtoMessage<M>(PhantomData<fn() -> M>);
 
 impl<M> Default for ProtoMessage<M> {
@@ -70,12 +70,8 @@ impl<M, A: Allocator> ProtoEmpty for UnmanagedBox<M, A> {
 
 impl<M, A: Allocator> AddressableSlot for UnmanagedBox<M, A> {}
 
-impl<M: Message> ProtoType for ProtoMessage<M>
-where
-    M::Alloc: Allocator + Clone,
-{
-    /// Ignores the GAT parameter; call sites unify `A` with [`Message::Alloc`].
-    type Slot<A: Allocator + Clone> = UnmanagedBox<M, M::Alloc>;
+impl<M: Message> ProtoType for ProtoMessage<M> {
+    type Slot<A: Allocator + Clone> = UnmanagedBox<M, A>;
     type Ref<'a, A: Allocator + Clone>
         = &'a M
     where
@@ -86,7 +82,7 @@ where
     where
         Self: 'a,
         A: 'a;
-    type Written<A: Allocator + Clone> = UnmanagedBox<M, M::Alloc>;
+    type Written<A: Allocator + Clone> = UnmanagedBox<M, A>;
     const WIRE_TYPE: WireType = WireType::Len;
 
     #[inline]
@@ -115,20 +111,16 @@ where
         _wire_type: WireType,
         _buf: &mut B,
         _alloc: A,
-    ) -> Result<UnmanagedBox<M, M::Alloc>, DecodeError> {
+    ) -> Result<UnmanagedBox<M, A>, DecodeError> {
         // Nested messages always decode via [`PayloadAccess::merge`] (merge-into).
-        // A free `A` cannot be proven equal to `M::Alloc` in this GAT signature.
         Err(DecodeError::InvalidTag)
     }
 }
 
-impl<M: Message> PayloadAccess for ProtoMessage<M>
-where
-    M::Alloc: Allocator + Clone,
-{
+impl<M: Message> PayloadAccess for ProtoMessage<M> {
     #[inline]
     fn is_proto_empty<A: Allocator + Clone, Pb: PresenceBits>(
-        _slot: &UnmanagedBox<M, M::Alloc>,
+        _slot: &UnmanagedBox<M, A>,
         _common: &MessageCommon<Pb, A>,
     ) -> bool {
         false
@@ -136,7 +128,7 @@ where
 
     #[inline]
     fn get<'a, A: Allocator + Clone, Pb: PresenceBits>(
-        slot: &'a UnmanagedBox<M, M::Alloc>,
+        slot: &'a UnmanagedBox<M, A>,
         _common: &'a MessageCommon<Pb, A>,
     ) -> &'a M
     where
@@ -153,8 +145,8 @@ where
     ) -> &'a mut M
     where
         A: Allocator + Clone + 'a,
-        UnmanagedBox<M, M::Alloc>: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
-        VS: ValueSlot<UnmanagedBox<M, M::Alloc>, A>,
+        UnmanagedBox<M, A>: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
+        VS: ValueSlot<UnmanagedBox<M, A>, A>,
         I: SlotInitMut,
         Pb: PresenceBits,
         Self: 'a,
@@ -167,11 +159,11 @@ where
         slot: &mut VS,
         init: I,
         common: &mut MessageCommon<Pb, A>,
-        value: UnmanagedBox<M, M::Alloc>,
+        value: UnmanagedBox<M, A>,
     ) where
         A: Allocator + Clone,
-        UnmanagedBox<M, M::Alloc>: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
-        VS: ValueSlot<UnmanagedBox<M, M::Alloc>, A>,
+        UnmanagedBox<M, A>: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
+        VS: ValueSlot<UnmanagedBox<M, A>, A>,
         I: SlotInitMut,
         Pb: PresenceBits,
     {
@@ -182,8 +174,8 @@ where
     fn clear<A, VS, I, Pb>(slot: &mut VS, init: I, common: &mut MessageCommon<Pb, A>)
     where
         A: Allocator + Clone,
-        UnmanagedBox<M, M::Alloc>: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
-        VS: ValueSlot<UnmanagedBox<M, M::Alloc>, A>,
+        UnmanagedBox<M, A>: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
+        VS: ValueSlot<UnmanagedBox<M, A>, A>,
         I: SlotInitMut,
         Pb: PresenceBits,
     {
@@ -200,8 +192,8 @@ where
     ) -> Result<(), DecodeError>
     where
         A: Allocator + Clone,
-        UnmanagedBox<M, M::Alloc>: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
-        VS: ValueSlot<UnmanagedBox<M, M::Alloc>, A>,
+        UnmanagedBox<M, A>: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
+        VS: ValueSlot<UnmanagedBox<M, A>, A>,
         I: SlotInitMut,
         Pb: PresenceBits,
         B: Buf,
