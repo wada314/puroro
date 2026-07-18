@@ -1,12 +1,39 @@
 //! Integration tests for the sample `Task` / `Address` messages.
 //!
-//! Grouped by what they exercise: encode/decode roundtrips, oneof accessor
-//! behaviour (no wire), and enum merge / unknown-field handling.
+//! Grouped by what they exercise: encode/decode roundtrips, repeated-field
+//! wire/merge behaviour, oneof accessors (no wire), and enum merge /
+//! unknown-field handling.
 
 use ::puroro::{Message, UnknownPayload};
 use ::puroro_rt::encode::encode_varint_field;
 use ::puroro_sample_generated::task::{Notification, NotificationCase};
 use ::puroro_sample_generated::{Address, Priority, Status, Task};
+
+/// Appends `v` as a base-128 varint (test helper; mirrors wire encoding).
+fn encode_u64_varint(mut v: u64, buf: &mut Vec<u8>) {
+    loop {
+        let mut byte = (v & 0x7f) as u8;
+        v >>= 7;
+        if v != 0 {
+            byte |= 0x80;
+        }
+        buf.push(byte);
+        if v == 0 {
+            break;
+        }
+    }
+}
+
+/// Writes a packed repeated int32 LEN record (tag + length + concatenated varints).
+fn encode_packed_int32_field(field_number: u32, values: &[i32], buf: &mut Vec<u8>) {
+    let mut payload = Vec::new();
+    for &v in values {
+        encode_u64_varint(v as u64, &mut payload);
+    }
+    encode_u64_varint(u64::from(field_number) << 3 | 2, buf); // WireType::Len
+    encode_u64_varint(payload.len() as u64, buf);
+    buf.extend_from_slice(&payload);
+}
 
 // ---------------------------------------------------------------------------
 // Encode / decode roundtrips
@@ -190,6 +217,91 @@ fn explicit_bool_preserves_false() {
     let bytes = task.encode_to_vec();
     let decoded: Task = Task::decode(&bytes[..]).unwrap();
     assert!(!decoded.flag().is_set());
+}
+
+// ---------------------------------------------------------------------------
+// Repeated fields (dual-form decode, merge append, clear omit)
+// ---------------------------------------------------------------------------
+
+#[test]
+fn packed_declared_field_accepts_expanded_wire() {
+    // `tag_ids` is PACKED on encode, but must accept expanded (per-element) wire.
+    let mut bytes = Vec::new();
+    encode_varint_field(6, 10, &mut bytes);
+    encode_varint_field(6, 20, &mut bytes);
+
+    let task: Task = Task::decode(&bytes[..]).unwrap();
+    assert_eq!(task.tag_ids(), &[10, 20]);
+}
+
+#[test]
+fn expanded_declared_field_accepts_packed_wire() {
+    // `scores` is EXPANDED on encode, but must accept a packed LEN record.
+    let mut bytes = Vec::new();
+    encode_packed_int32_field(7, &[1, 2, 3], &mut bytes);
+
+    let task: Task = Task::decode(&bytes[..]).unwrap();
+    assert_eq!(task.scores(), &[1, 2, 3]);
+}
+
+#[test]
+fn packable_repeated_accepts_mixed_wire_forms() {
+    // Spec: multiple occurrences append; packed and expanded may be mixed.
+    let mut bytes = Vec::new();
+    encode_packed_int32_field(6, &[1, 2], &mut bytes);
+    encode_varint_field(6, 3, &mut bytes);
+    encode_varint_field(7, 10, &mut bytes);
+    encode_packed_int32_field(7, &[20, 30], &mut bytes);
+
+    let task: Task = Task::decode(&bytes[..]).unwrap();
+    assert_eq!(task.tag_ids(), &[1, 2, 3]);
+    assert_eq!(task.scores(), &[10, 20, 30]);
+}
+
+#[test]
+fn repeated_merge_appends() {
+    let mut task = Task::new();
+    task.tag_ids_mut().push(1);
+    task.scores_mut().push(10);
+    task.push_label("a");
+
+    let mut other = Task::new();
+    other.tag_ids_mut().push(2);
+    other.tag_ids_mut().push(3);
+    other.scores_mut().push(20);
+    other.push_label("b");
+    let bytes = other.encode_to_vec();
+
+    task.merge_from(&mut &bytes[..]).unwrap();
+
+    assert_eq!(task.tag_ids(), &[1, 2, 3]);
+    assert_eq!(task.scores(), &[10, 20]);
+    assert_eq!(task.labels().len(), 2);
+    assert_eq!(&*task.labels()[0], "a");
+    assert_eq!(&*task.labels()[1], "b");
+}
+
+#[test]
+fn repeated_clear_omits_from_wire() {
+    let mut task = Task::new();
+    task.owner_id_mut().push_str("user-1");
+    task.tag_ids_mut().push(1);
+    task.scores_mut().push(2);
+    task.push_label("x");
+
+    task.clear_tag_ids();
+    task.clear_scores();
+    task.clear_labels();
+
+    assert!(task.tag_ids().is_empty());
+    assert!(task.scores().is_empty());
+    assert!(task.labels().is_empty());
+
+    let bytes = task.encode_to_vec();
+    let decoded: Task = Task::decode(&bytes[..]).unwrap();
+    assert!(decoded.tag_ids().is_empty());
+    assert!(decoded.scores().is_empty());
+    assert!(decoded.labels().is_empty());
 }
 
 // ---------------------------------------------------------------------------
