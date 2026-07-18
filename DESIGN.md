@@ -1308,3 +1308,4 @@ Generic code that only reads fields can be written once against `TaskMessageFall
 - **Well-known types.** `google.protobuf.Timestamp`, `Duration`, `Any`, etc.
 - **Reflection / descriptors.** Runtime introspection of message schema.
 - **Extensions.** See §6.5.
+- **Field storage inlining (runtime).** Small non-repeated nested messages, and short `string` / `bytes`, may avoid heap allocation — see [IMPLEMENTATION.md §17.1–17.2](IMPLEMENTATION.md#171-submessage-inline-optimisation).

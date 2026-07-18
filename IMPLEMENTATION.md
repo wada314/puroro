@@ -41,6 +41,8 @@ Internal implementation of **generated** protobuf message code: storage, wire I/
 **Part V — Future work**
 
 17. [Planned optimisations & runtime gaps](#17-planned-optimisations--runtime-gaps)
+    - 17.1 [Submessage inline optimisation](#171-submessage-inline-optimisation)
+    - 17.2 [String / Bytes inline optimisation](#172-string--bytes-inline-optimisation)
 
 ---
 
@@ -709,3 +711,24 @@ The `set_*` per-variant setters are removed, matching the other field families.
 | Zero-copy views | — | `TaskView<'buf>` (DESIGN.md §8) |
 | `TaskLazy` | DESIGN only | Wire buffer + on-demand decode |
 | `Hash` / `serde` | Deferred | Opt-in features |
+| Submessage inline | Always `UnmanagedBox<M, A>` for nested messages | Inline small non-repeated messages in the parent struct ([§17.1](#171-submessage-inline-optimisation)) |
+| String / Bytes inline | Always heap-allocated LEN payload | Small-string (and maybe bytes) inline storage via union + common-bit tag ([§17.2](#172-string--bytes-inline-optimisation)) |
+
+### 17.1 Submessage inline optimisation
+
+**Idea.** For a **non-repeated** nested message that is small enough (roughly ≤ ~24 bytes of child payload / layout — exact threshold TBD), avoid allocating a separate heap box. Store the child message **inline** as a field of the parent message struct.
+
+**Sharing `MessageCommon`.** The inlined child must share the parent's [`MessageCommon`](#4-shared-infrastructure) (presence bits, allocator, unknown-field buffer) rather than owning its own. Concretely:
+
+1. The message struct type takes the common-field type as a **generic parameter**, bounded by a trait that exposes the bitfield / allocator / unknown buffer the child needs.
+2. The current common type gains a method to **scope in** to a particular submessage (e.g. reborrow / view the shared common through the child's bit-index offset or presence layout), so child field accessors keep the same `bind` / `bind_mut(common)` shape.
+
+**Notes / open questions.** Repeated and oneof message variants likely stay boxed (or need a separate design). Codegen must choose heap vs inline per nested type (size / field count). Public accessors (`Option<&M>`, merge-into, etc.) should stay stable — only the storage representation changes.
+
+### 17.2 String / Bytes inline optimisation
+
+**Idea.** Same motivation as §17.1: for a **non-repeated** `string` (and possibly `bytes`) that is short enough, avoid a heap allocation and store the payload **inline** in the field.
+
+**Sketch.** Represent the field storage as a **union** of a heap string/bytes and an inline buffer. Use **one bit in the parent's `MessageCommon` presence bitfield** as a tag indicating which union variant is live (similar in spirit to how [`BitPacked`](puroro-rt/src/fields/shared/value_layout.rs) parks a bool value bit in `_common.presence`).
+
+**Notes / open questions.** Threshold (e.g. SSO-style length that fits in the union without growing the field past a pointer-sized heap handle). Interaction with `utf8_validation`, clear / deallocate, and oneof string variants. Repeated string/bytes stay heap-backed unless a separate design is justified.
