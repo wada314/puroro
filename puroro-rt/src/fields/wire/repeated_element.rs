@@ -5,9 +5,8 @@
 //! (`i32`, `UnmanagedString`, …), and for nested-message repeated fields the
 //! message type `M` itself (not [`UnmanagedBox`](::unmanaged::UnmanagedBox)).
 //!
-//! [`ProtoBool`](super::varint::ProtoBool) (singular bit-packed via
-//! [`BitPacked`](crate::fields::shared::value_layout::BitPacked)) does **not**
-//! implement this trait; a future `repeated bool` will use plain `bool` elements.
+//! Singular [`ProtoBool`](super::varint::ProtoBool) uses bit-packed storage;
+//! repeated uses plain `bool` elements via this trait (no MessageCommon bit).
 
 use ::allocator_api2::alloc::Allocator;
 use ::bytes::{Buf, BufMut};
@@ -23,7 +22,7 @@ use super::len::{ProtoBytes, ProtoString};
 use super::proto_message::ProtoMessage;
 use super::proto_type::ProtoType;
 use super::varint::{
-    Closed, ClosedEnum, Open, OpenEnum, ProtoEnum, ProtoInt32, ProtoInt64, ProtoSint32,
+    Closed, ClosedEnum, Open, OpenEnum, ProtoBool, ProtoEnum, ProtoInt32, ProtoInt64, ProtoSint32,
     ProtoSint64, ProtoUInt32, ProtoUInt64, VarintProtoType,
 };
 
@@ -184,6 +183,7 @@ impl_packable_varint_repeated!(ProtoInt32, i32);
 impl_packable_varint_repeated!(ProtoInt64, i64);
 impl_packable_varint_repeated!(ProtoSint32, i32);
 impl_packable_varint_repeated!(ProtoSint64, i64);
+impl_packable_varint_repeated!(ProtoBool, bool);
 
 macro_rules! impl_packable_enum_repeated {
     ($kind:ty, $bound:ident) => {

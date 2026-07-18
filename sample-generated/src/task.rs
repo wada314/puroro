@@ -104,6 +104,7 @@ pub const FIELD_DONE: u32 = 16; // done (IMPLICIT bool)
 pub const FIELD_FLAG: u32 = 17; // flag (EXPLICIT bool)
 pub const FIELD_URGENT: u32 = 18; // notification.urgent (oneof bool)
 pub const FIELD_WATCHERS: u32 = 19; // watchers (repeated Address)
+pub const FIELD_VOTES: u32 = 20; // votes (repeated bool PACKED)
 // ---------------------------------------------------------------------------
 // Message struct
 // ---------------------------------------------------------------------------
@@ -147,6 +148,7 @@ pub struct Task<A: Allocator + Clone = Global> {
         BitPacked<{ BIT_FLAG_VALUE }>,
     >, // proto: bool flag = 17;
     watchers: RepeatedField<ProtoMessage<Address<A>>, Expanded, { FIELD_WATCHERS }, A>, // proto: repeated Address watchers = 19;
+    votes: RepeatedField<ProtoBool, Packed, { FIELD_VOTES }, A>, // proto: repeated bool votes = 20;
 }
 
 impl<A: Allocator + Clone> Task<A> {
@@ -169,7 +171,8 @@ impl<A: Allocator + Clone> Task<A> {
             notification: OneofSlot::new_in(alloc.clone()),
             done: SingularField::new_in(alloc.clone()),
             flag: SingularField::new_in(alloc.clone()),
-            watchers: RepeatedField::new_in(alloc),
+            watchers: RepeatedField::new_in(alloc.clone()),
+            votes: RepeatedField::new_in(alloc),
         }
     }
 
@@ -392,6 +395,20 @@ impl<A: Allocator + Clone> Task<A> {
         self.watchers.bind_mut(&mut self._common).clear();
     }
 
+    // -- votes (repeated bool PACKED, proto field 20) ------------------------
+
+    pub fn votes(&self) -> &[bool] {
+        self.votes.bind(&self._common).as_slice()
+    }
+
+    pub fn votes_mut<'s>(&'s mut self) -> impl DerefMut<Target = AllocVec<bool, A>> + 's {
+        self.votes.bind_mut(&mut self._common).values_mut()
+    }
+
+    pub fn clear_votes(&mut self) {
+        self.votes.bind_mut(&mut self._common).clear();
+    }
+
     // -- oneof notification (proto fields 12 / 13 / 14 / 15 / 18) ------------
 
     /// Which variant is set (payload-less; `None` when the group is unset).
@@ -572,6 +589,7 @@ impl<A: Allocator + Clone> Drop for Task<A> {
         self.done.deallocate(&self._common);
         self.flag.deallocate(&self._common);
         self.watchers.deallocate(&self._common);
+        self.votes.deallocate(&self._common);
         self._common.deallocate();
     }
 }
@@ -605,6 +623,7 @@ impl<A: Allocator + Clone> Message for Task<A> {
         n += self.done.encoded_len(c);
         n += self.flag.encoded_len(c);
         n += self.watchers.encoded_len(c);
+        n += self.votes.encoded_len(c);
         n + c.unknown_fields.len()
     }
 
@@ -625,6 +644,7 @@ impl<A: Allocator + Clone> Message for Task<A> {
         self.done.encode_raw(c, buf);
         self.flag.encode_raw(c, buf);
         self.watchers.encode_raw(c, buf);
+        self.votes.encode_raw(c, buf);
         let unknown: &[u8] = &c.unknown_fields;
         buf.put_slice(unknown);
     }
@@ -754,6 +774,12 @@ impl<A: Allocator + Clone> Message for Task<A> {
                 FIELD_WATCHERS => {
                     // watchers = 19, repeated Address
                     self.watchers
+                        .bind_mut(&mut self._common)
+                        .merge(wire_type, buf)?;
+                }
+                FIELD_VOTES => {
+                    // votes = 20, repeated bool PACKED
+                    self.votes
                         .bind_mut(&mut self._common)
                         .merge(wire_type, buf)?;
                 }

@@ -431,6 +431,9 @@ message Task {
 
     // Field 19: Repeated nested message (cannot be packed; EXPANDED)
     repeated Address watchers = 19;
+
+    // Field 20: Packed repeated bool (PACKED is the edition default for numeric)
+    repeated bool votes = 20;
 }
 ```
 
@@ -593,6 +596,16 @@ pub fn clear_watchers(&mut self);
 ```
 
 Each wire occurrence **appends** a newly decoded message. Unlike singular nested messages, repeated elements are not merge-into at a list index. Messages cannot be packed; encode always uses one LEN record per element.
+
+**Repeated bool (`votes: repeated bool`, field 20):**
+
+```rust
+pub fn votes(&self) -> &[bool];
+pub fn votes_mut(&mut self) -> impl DerefMut<Target = Vec<bool, A>>;
+pub fn clear_votes(&mut self);
+```
+
+Elements are plain `bool` in a growable vec — **not** bit-packed into `MessageCommon` (that layout is singular / oneof only). Packable: encode follows `PACKED` / `EXPANDED`; decode accepts both.
 
 #### Packed vs non-packed encoding
 

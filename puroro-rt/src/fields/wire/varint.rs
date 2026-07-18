@@ -169,7 +169,7 @@ proto_varint_marker! {
 /// Protobuf `bool` type marker — varint 0 or 1.
 ///
 /// Singular / oneof: slot is `()`; logical value via [`BitPacked`](crate::BitPacked).
-/// Repeated (future): plain `bool` elements, no bit index.
+/// Repeated: plain `bool` elements in the vec (no MessageCommon bit index).
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
 pub struct ProtoBool;
 

@@ -218,7 +218,7 @@ Singular / oneof `bool` uses allocator-free [`ProtoBool`](puroro-rt/src/fields/w
 | Addressable varint / enum | `VarintProtoType::Value` (`i32`, …) | yes (`PackableRepeatedElement`) | yes (`RepeatedVecMut`) |
 | `ProtoString` / `ProtoBytes` | `UnmanagedString<A>` / `UnmanagedVec<u8, A>` | no (`RepeatedSlicePush` for `push_*`) | no |
 | `ProtoMessage<M>` | `M` (inline; use site `M::Alloc = A`) | no | yes (`RepeatedVecMut`) |
-| `ProtoBool` | — (no `RepeatedElement`; use plain `bool` elements later) | — | — |
+| `ProtoBool` | `bool` (plain; not `BitPacked`) | yes (`PackableRepeatedElement`) | yes (`RepeatedVecMut`) |
 
 ### Varint helper
 
@@ -639,7 +639,7 @@ Mutation uses the bound-view idiom: `field.bind_mut(&mut common)` → [`Repeated
 
 **`repeated message`:** `RepeatedField<ProtoMessage<M>, Expanded, FIELD, A>` with `Element = M` (no per-element `UnmanagedBox`). Each wire occurrence constructs a new `M` via `Message::new_in` and appends — it does **not** merge into an existing list index. Sample: `Task.watchers` (`repeated Address`).
 
-**`repeated bool`:** not wired yet. Elements should be plain `bool` with **no** MessageCommon bit index — do not use [`BitPacked`](puroro-rt/src/fields/shared/value_layout.rs) (see [Bit-packed bool](#bit-packed-bool-protobool)).
+**`repeated bool`:** `RepeatedField<ProtoBool, Packed|Expanded, FIELD, A>` with plain `bool` elements — **no** [`BitPacked`](puroro-rt/src/fields/shared/value_layout.rs) / MessageCommon bit index (see [Bit-packed bool](#bit-packed-bool-protobool)). Sample: `Task.votes`.
 
 > Note: the bound-view idiom covers every field family — `SingularField`, `RepeatedField`, and `OneofSlot` — on both read and write paths. Terminal `deallocate` stays a direct field method (called from `Drop`).
 
@@ -703,7 +703,7 @@ The `set_*` per-variant setters are removed, matching the other field families.
 |---|---|---|
 | UTF-8 validation | Always `decode_string_in` (VERIFY) | Per-field `utf8_validation` feature |
 | Recursion limit | Not enforced | Depth counter in nested merge → `RecursionLimitExceeded` |
-| Repeated wrappers | `RepeatedField` + `RepeatedElement` (+ message) | `repeated bool` |
+| Repeated wrappers | `RepeatedField` + `RepeatedElement` (message / bool / scalar / LEN) | — |
 | Fixed32/64 catalog | Trait stubs | `ProtoType` impls + `SingularField` |
 | `protoc` plugin | — | FieldKind → catalog emission |
 | Zero-copy views | — | `TaskView<'buf>` (DESIGN.md §8) |

@@ -66,6 +66,8 @@ fn task_fields_roundtrip() {
     watcher.street_mut().push_str("2 Side Rd");
     watcher.city_mut().push_str("Osaka");
     task.watchers_mut().push(watcher);
+    task.votes_mut().push(true);
+    task.votes_mut().push(false);
 
     task.validate().unwrap();
 
@@ -98,6 +100,7 @@ fn task_fields_roundtrip() {
     assert_eq!(decoded.watchers().len(), 1);
     assert_eq!(decoded.watchers()[0].street().get(), "2 Side Rd");
     assert_eq!(decoded.watchers()[0].city().get(), "Osaka");
+    assert_eq!(decoded.votes(), &[true, false]);
 }
 
 #[test]
@@ -260,10 +263,14 @@ fn packable_repeated_accepts_mixed_wire_forms() {
     encode_varint_field(6, 3, &mut bytes);
     encode_varint_field(7, 10, &mut bytes);
     encode_packed_int32_field(7, &[20, 30], &mut bytes);
+    // votes = 20 (PACKED declared): expanded then packed
+    encode_varint_field(20, 1, &mut bytes);
+    encode_packed_int32_field(20, &[0, 1], &mut bytes);
 
     let task: Task = Task::decode(&bytes[..]).unwrap();
     assert_eq!(task.tag_ids(), &[1, 2, 3]);
     assert_eq!(task.scores(), &[10, 20, 30]);
+    assert_eq!(task.votes(), &[true, false, true]);
 }
 
 #[test]
@@ -275,6 +282,7 @@ fn repeated_merge_appends() {
     let mut w0 = Address::new();
     w0.city_mut().push_str("A");
     task.watchers_mut().push(w0);
+    task.votes_mut().push(true);
 
     let mut other = Task::new();
     other.tag_ids_mut().push(2);
@@ -284,6 +292,7 @@ fn repeated_merge_appends() {
     let mut w1 = Address::new();
     w1.city_mut().push_str("B");
     other.watchers_mut().push(w1);
+    other.votes_mut().push(false);
     let bytes = other.encode_to_vec();
 
     task.merge_from(&mut &bytes[..]).unwrap();
@@ -296,6 +305,7 @@ fn repeated_merge_appends() {
     assert_eq!(task.watchers().len(), 2);
     assert_eq!(task.watchers()[0].city().get(), "A");
     assert_eq!(task.watchers()[1].city().get(), "B");
+    assert_eq!(task.votes(), &[true, false]);
 }
 
 #[test]
@@ -308,16 +318,19 @@ fn repeated_clear_omits_from_wire() {
     let mut w = Address::new();
     w.street_mut().push_str("gone");
     task.watchers_mut().push(w);
+    task.votes_mut().push(true);
 
     task.clear_tag_ids();
     task.clear_scores();
     task.clear_labels();
     task.clear_watchers();
+    task.clear_votes();
 
     assert!(task.tag_ids().is_empty());
     assert!(task.scores().is_empty());
     assert!(task.labels().is_empty());
     assert!(task.watchers().is_empty());
+    assert!(task.votes().is_empty());
 
     let bytes = task.encode_to_vec();
     let decoded: Task = Task::decode(&bytes[..]).unwrap();
@@ -325,6 +338,20 @@ fn repeated_clear_omits_from_wire() {
     assert!(decoded.scores().is_empty());
     assert!(decoded.labels().is_empty());
     assert!(decoded.watchers().is_empty());
+    assert!(decoded.votes().is_empty());
+}
+
+#[test]
+fn repeated_bool_roundtrip() {
+    let mut task = Task::new();
+    task.owner_id_mut().push_str("user-1");
+    task.votes_mut().push(true);
+    task.votes_mut().push(false);
+    task.votes_mut().push(true);
+
+    let bytes = task.encode_to_vec();
+    let decoded: Task = Task::decode(&bytes[..]).unwrap();
+    assert_eq!(decoded.votes(), &[true, false, true]);
 }
 
 #[test]
