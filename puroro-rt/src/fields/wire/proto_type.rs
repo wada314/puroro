@@ -12,8 +12,8 @@
 //! always goes through `ValueLayout`.
 //!
 //! Repeated fields use [`RepeatedElement`](super::repeated_element::RepeatedElement)
-//! (`Element` storage). [`VarintProtoType`](super::varint::VarintProtoType) and
-//! [`LenProtoType`](super::len::LenProtoType) remain as wire/storage helpers.
+//! (`Element` storage). [`VarintProtoType`](super::varint::VarintProtoType) remains
+//! as a thin wire helper for packed / bit-packed paths.
 
 use ::allocator_api2::alloc::Allocator;
 use ::bitvec::{
@@ -37,7 +37,7 @@ use crate::fields::shared::{
     value_slot::{AddressableSlot, ValueSlot, ValueSlotMutAccess},
 };
 
-use super::len::{LenProtoType, ProtoBytes, ProtoString};
+use super::len::{ProtoBytes, ProtoString};
 use super::varint::{
     Closed, ClosedEnum, Open, OpenEnum, ProtoBool, ProtoEnum, ProtoInt32, ProtoInt64, ProtoSint32,
     ProtoSint64, ProtoUInt32, ProtoUInt64, VarintProtoType,
@@ -75,9 +75,6 @@ pub trait ProtoType: Sized {
 
     /// Value accepted by [`PayloadAccess::write`] / field `set`.
     type Written<A: Allocator + Clone>;
-
-    /// Expected wire type for a singular occurrence of this field.
-    const WIRE_TYPE: WireType;
 
     /// Wire byte length of one tagged occurrence for `value`.
     fn encoded_len<'a, A: Allocator + Clone>(value: Self::Ref<'a, A>, field: u32) -> usize
@@ -192,7 +189,6 @@ macro_rules! impl_varint_proto_type {
                 Self: 'a,
                 A: 'a;
             type Written<A: Allocator + Clone> = $inner;
-            const WIRE_TYPE: WireType = WireType::Varint;
 
             #[inline]
             fn encoded_len<'a, A: Allocator + Clone>(value: $inner, field: u32) -> usize
@@ -353,7 +349,6 @@ macro_rules! impl_enum_proto_type {
                 Self: 'a,
                 A: 'a;
             type Written<A: Allocator + Clone> = E;
-            const WIRE_TYPE: WireType = WireType::Varint;
 
             #[inline]
             fn encoded_len<'a, A: Allocator + Clone>(value: E, field: u32) -> usize
@@ -508,7 +503,6 @@ impl ProtoType for ProtoString {
         Self: 'a,
         A: 'a;
     type Written<A: Allocator + Clone> = UnmanagedString<A>;
-    const WIRE_TYPE: WireType = WireType::Len;
 
     #[inline]
     fn encoded_len<'a, A: Allocator + Clone>(value: &'a str, field: u32) -> usize
@@ -563,7 +557,12 @@ impl PayloadAccess for ProtoString {
         Self: 'a,
     {
         let alloc = common.alloc.clone();
-        <Self as LenProtoType>::with_alloc(ValueSlot::with_mut(slot, init, common).get_mut(), alloc)
+        // SAFETY: message allocator owns this string buffer.
+        unsafe {
+            ValueSlot::with_mut(slot, init, common)
+                .get_mut()
+                .with_alloc(alloc)
+        }
     }
 
     #[inline]
@@ -611,7 +610,7 @@ impl PayloadAccess for ProtoString {
         if wire_type != WireType::Len {
             return Err(DecodeError::InvalidTag);
         }
-        let new = <Self as LenProtoType>::decode(buf, common.alloc.clone())?;
+        let new = decode::decode_string_in(buf, common.alloc.clone())?;
         Self::write(slot, init, common, new);
         Ok(())
     }
@@ -630,7 +629,6 @@ impl ProtoType for ProtoBytes {
         Self: 'a,
         A: 'a;
     type Written<A: Allocator + Clone> = UnmanagedVec<u8, A>;
-    const WIRE_TYPE: WireType = WireType::Len;
 
     #[inline]
     fn encoded_len<'a, A: Allocator + Clone>(value: &'a [u8], field: u32) -> usize
@@ -685,7 +683,12 @@ impl PayloadAccess for ProtoBytes {
         Self: 'a,
     {
         let alloc = common.alloc.clone();
-        <Self as LenProtoType>::with_alloc(ValueSlot::with_mut(slot, init, common).get_mut(), alloc)
+        // SAFETY: message allocator owns this bytes buffer.
+        unsafe {
+            ValueSlot::with_mut(slot, init, common)
+                .get_mut()
+                .with_alloc(alloc)
+        }
     }
 
     #[inline]
@@ -733,7 +736,7 @@ impl PayloadAccess for ProtoBytes {
         if wire_type != WireType::Len {
             return Err(DecodeError::InvalidTag);
         }
-        let new = <Self as LenProtoType>::decode(buf, common.alloc.clone())?;
+        let new = decode::decode_bytes_in(buf, common.alloc.clone())?;
         Self::write(slot, init, common, new);
         Ok(())
     }
@@ -756,7 +759,6 @@ impl ProtoType for ProtoBool {
         Self: 'a,
         A: 'a;
     type Written<A: Allocator + Clone> = bool;
-    const WIRE_TYPE: WireType = WireType::Varint;
 
     #[inline]
     fn encoded_len<'a, A: Allocator + Clone>(value: bool, field: u32) -> usize

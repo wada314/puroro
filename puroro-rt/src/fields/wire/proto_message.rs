@@ -22,7 +22,6 @@ use crate::fields::shared::{
     slot_init::SlotInitMut,
     value_slot::{AddressableSlot, ValueSlot, ValueSlotMutAccess},
 };
-use crate::fields::wire::len;
 use crate::fields::wire::proto_type::{PayloadAccess, ProtoType};
 
 /// Type marker for a singular nested message `M`.
@@ -83,7 +82,6 @@ impl<M: Message> ProtoType for ProtoMessage<M> {
         Self: 'a,
         A: 'a;
     type Written<A: Allocator + Clone> = UnmanagedBox<M, A>;
-    const WIRE_TYPE: WireType = WireType::Len;
 
     #[inline]
     fn encoded_len<'a, A: Allocator + Clone>(value: &'a M, field: u32) -> usize
@@ -188,7 +186,7 @@ impl<M: Message> PayloadAccess for ProtoMessage<M> {
         Pb: PresenceBits,
         B: Buf,
     {
-        if wire_type != len::WIRE_TYPE {
+        if wire_type != WireType::Len {
             return Err(DecodeError::InvalidTag);
         }
         let len = decode::decode_varint(buf)? as usize;

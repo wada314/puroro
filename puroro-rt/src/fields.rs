@@ -20,7 +20,7 @@
 //! | Submodule | Contents |
 //! |---|---|
 //! | [`shared`] | `MessageCommon`, `PresenceBits`, `FieldPresence`, `ValueSlot`, … |
-//! | [`wire`] | `ProtoType`, `RepeatedElement`, `VarintProtoType` / `LenProtoType` helpers, fixed stubs |
+//! | [`wire`] | `ProtoType`, `RepeatedElement`, `VarintProtoType` helper, fixed stubs |
 //! | [`singular`] | `SingularField` |
 //! | [`repeated`] | `RepeatedField` |
 //! | [`oneof`] | `OneofSlot` |

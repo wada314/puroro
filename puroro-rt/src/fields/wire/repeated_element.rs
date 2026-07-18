@@ -19,7 +19,7 @@ use crate::decode;
 use crate::encode;
 use crate::fields::shared::DeallocateIn;
 
-use super::len::{LenProtoType, ProtoBytes, ProtoString};
+use super::len::{ProtoBytes, ProtoString};
 use super::proto_message::ProtoMessage;
 use super::proto_type::ProtoType;
 use super::varint::{
@@ -272,7 +272,7 @@ impl RepeatedElement for ProtoString {
 
     #[inline]
     fn encoded_len_element<A: Allocator + Clone>(elem: &UnmanagedString<A>, field: u32) -> usize {
-        encode::encoded_len_len_field(field, <Self as LenProtoType>::as_bytes(elem).len())
+        encode::encoded_len_len_field(field, elem.as_bytes().len())
     }
 
     #[inline]
@@ -281,7 +281,7 @@ impl RepeatedElement for ProtoString {
         field: u32,
         buf: &mut B,
     ) {
-        encode::encode_len_field(field, <Self as LenProtoType>::as_bytes(elem), buf);
+        encode::encode_len_field(field, elem.as_bytes(), buf);
     }
 
     #[inline]
@@ -306,7 +306,7 @@ impl<A: Allocator + Clone> RepeatedElementMerge<A> for ProtoString {
         if wire_type != WireType::Len {
             return Err(DecodeError::InvalidTag);
         }
-        push(<Self as LenProtoType>::decode(buf, alloc)?);
+        push(decode::decode_string_in(buf, alloc)?);
         Ok(())
     }
 }
@@ -317,7 +317,8 @@ impl RepeatedSlicePush for ProtoString {
         v: &[u8],
         alloc: A,
     ) -> Result<UnmanagedString<A>, DecodeError> {
-        <Self as LenProtoType>::store_from_slice(v, alloc)
+        let s = ::core::str::from_utf8(v).map_err(|_| DecodeError::InvalidUtf8)?;
+        Ok(decode::str_to_unmanaged_in(s, alloc))
     }
 }
 
@@ -326,7 +327,7 @@ impl RepeatedElement for ProtoBytes {
 
     #[inline]
     fn encoded_len_element<A: Allocator + Clone>(elem: &UnmanagedVec<u8, A>, field: u32) -> usize {
-        encode::encoded_len_len_field(field, <Self as LenProtoType>::as_bytes(elem).len())
+        encode::encoded_len_len_field(field, elem.len())
     }
 
     #[inline]
@@ -335,7 +336,7 @@ impl RepeatedElement for ProtoBytes {
         field: u32,
         buf: &mut B,
     ) {
-        encode::encode_len_field(field, <Self as LenProtoType>::as_bytes(elem), buf);
+        encode::encode_len_field(field, elem, buf);
     }
 
     #[inline]
@@ -360,7 +361,7 @@ impl<A: Allocator + Clone> RepeatedElementMerge<A> for ProtoBytes {
         if wire_type != WireType::Len {
             return Err(DecodeError::InvalidTag);
         }
-        push(<Self as LenProtoType>::decode(buf, alloc)?);
+        push(decode::decode_bytes_in(buf, alloc)?);
         Ok(())
     }
 }
@@ -371,7 +372,7 @@ impl RepeatedSlicePush for ProtoBytes {
         v: &[u8],
         alloc: A,
     ) -> Result<UnmanagedVec<u8, A>, DecodeError> {
-        <Self as LenProtoType>::store_from_slice(v, alloc)
+        Ok(decode::bytes_to_unmanaged_in(v, alloc))
     }
 }
 

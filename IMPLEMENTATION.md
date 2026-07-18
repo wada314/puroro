@@ -73,7 +73,7 @@ puroro_rt::fields       SingularField<T, P, FIELD> (T includes ProtoMessage), �
     │  shared/ — MessageCommon, FieldPresence, ValueSlot,
     │            DefaultIn / DeallocateIn / ProtoEmpty
     │  wire/   — ProtoType (singular Slot); RepeatedElement (repeated Element);
-    │            VarintProtoType / LenProtoType (helpers)
+    │            VarintProtoType (packed / bit-packed helper)
     │  singular/, repeated/, oneof/
     │  T: ProtoType thin wrapper (ProtoInt32(i32), ProtoString(…), …)
     │  P: FieldPresence (Implicit / Explicit<BIT> / LegacyRequired<BIT> / Oneof)
@@ -117,7 +117,7 @@ protobuf-core           Varint, Tag, WireType
 |---|---|
 | `MessageCommon`, `PresenceBits`, `FieldDeallocate`, `OneofSlot` | **Done** |
 | `ProtoType` + thin wrappers (varint / LEN) + `ProtoMessage` | **Done** |
-| `VarintProtoType` / `LenProtoType` (scalar / repeated helpers) | **Done** |
+| `VarintProtoType` (packed / bit-packed wire helper) | **Done** |
 | `RepeatedElement` / `RepeatedElementMerge` / `PackableRepeatedElement` / `RepeatedSlicePush` / `RepeatedVecMut` | **Done** |
 | `FieldPresence` (`Implicit` / `Explicit` / `LegacyRequired` / `Oneof`) | **Done** |
 | `ValueSlot`, `SlotInitView` / `SlotInitMut`, `DefaultIn` / `DeallocateIn` / `ProtoEmpty` | **Done** |
@@ -151,7 +151,7 @@ protobuf-core           Varint, Tag, WireType
 | [`wire/repeated_element.rs`](puroro-rt/src/fields/wire/repeated_element.rs) | `RepeatedElement` / `RepeatedElementMerge` (`Element` for repeated buffers) |
 | [`wire/proto_message.rs`](puroro-rt/src/fields/wire/proto_message.rs) | `ProtoMessage` (nested message marker) |
 | [`wire/varint.rs`](puroro-rt/src/fields/wire/varint.rs) | `VarintProtoType`, `ProtoInt32`, … |
-| [`wire/len.rs`](puroro-rt/src/fields/wire/len.rs) | `LenProtoType`, `ProtoString`, … |
+| [`wire/len.rs`](puroro-rt/src/fields/wire/len.rs) | `ProtoString`, `ProtoBytes` |
 | [`wire/fixed.rs`](puroro-rt/src/fields/wire/fixed.rs) | `Fixed32ProtoType` / `Fixed64ProtoType` (stub) |
 | [`singular.rs`](puroro-rt/src/fields/singular.rs) | Singular field re-exports |
 | [`singular/field.rs`](puroro-rt/src/fields/singular/field.rs) | `SingularField` — `T: ProtoType`, stores `T::Slot` |
@@ -198,7 +198,6 @@ pub trait ProtoType: Sized {
     type Ref<'a, A: Allocator + Clone> where Self: 'a, A: 'a;
     type Mut<'a, A: Allocator + Clone>: DerefMut where Self: 'a, A: 'a;
     type Written<A: Allocator + Clone>; // accepted by set / write
-    const WIRE_TYPE: WireType;
     fn encoded_len<'a, A>(value: Self::Ref<'a, A>, field: u32) -> usize;
     fn encode<'a, A, B: BufMut>(value: Self::Ref<'a, A>, field: u32, buf: &mut B);
 }
@@ -221,9 +220,9 @@ Singular / oneof `bool` uses allocator-free [`ProtoBool`](puroro-rt/src/fields/w
 | `ProtoMessage<M>` | `M` (inline; use site `M::Alloc = A`) | no | yes (`RepeatedVecMut`) |
 | `ProtoBool` | — (no `RepeatedElement`; use plain `bool` elements later) | — | — |
 
-### Varint / LEN helpers
+### Varint helper
 
-[`VarintProtoType`](puroro-rt/src/fields/wire/varint.rs) and [`LenProtoType`](puroro-rt/src/fields/wire/len.rs) are wire/storage helpers shared by singular `ProtoType` impls and `RepeatedElement` impls.
+[`VarintProtoType`](puroro-rt/src/fields/wire/varint.rs) is a thin wire helper shared by singular `ProtoType` impls, packed repeated encode/decode, and bit-packed bool. LEN scalars (`ProtoString` / `ProtoBytes`) go through `ProtoType` / `RepeatedElement` directly — there is no parallel `LenProtoType`.
 
 ```rust
 pub trait VarintProtoType {
@@ -235,9 +234,10 @@ pub trait VarintProtoType {
 
 ### Other families
 
-| Trait | Wire | Types | Status |
+| Trait / family | Wire | Types | Status |
 |---|---|---|---|
-| `LenProtoType` | LEN | `ProtoString`, `ProtoBytes` ([`wire/len.rs`](puroro-rt/src/fields/wire/len.rs)) | **Done** |
+| `VarintProtoType` | VARINT | numerics, enums, `ProtoBool` ([`wire/varint.rs`](puroro-rt/src/fields/wire/varint.rs)) | **Done** |
+| LEN scalars | LEN | `ProtoString`, `ProtoBytes` via `ProtoType` / `RepeatedElement` ([`wire/len.rs`](puroro-rt/src/fields/wire/len.rs)) | **Done** |
 | `Fixed32ProtoType` | I32 | `ProtoFixed32`, `ProtoFloat`, … ([`wire/fixed.rs`](puroro-rt/src/fields/wire/fixed.rs)) | Stub |
 | `Fixed64ProtoType` | I64 | `ProtoFixed64`, `ProtoDouble`, … ([`wire/fixed.rs`](puroro-rt/src/fields/wire/fixed.rs)) | Stub |
 
@@ -289,7 +289,7 @@ Varint and LEN singular scalars share one wrapper, parametrised by [`ProtoType`]
 
 **LEGACY_REQUIRED:** `SingularField<…, LegacyRequired<BIT>, FIELD>::validate_required`.
 
-Adding a singular wire type = one new `ProtoType` impl (and usually a `VarintProtoType` / `LenProtoType` / fixed helper). Adding a presence mode = one new `FieldPresence` impl.
+Adding a singular wire type = one new `ProtoType` impl (and usually a `VarintProtoType` / fixed helper). Adding a presence mode = one new `FieldPresence` impl.
 
 ---
 

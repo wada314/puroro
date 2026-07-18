@@ -10,7 +10,6 @@
 use ::bytes::{Buf, BufMut};
 
 use ::puroro::DecodeError;
-use ::puroro::WireType;
 
 /// Wire semantics for protobuf types encoded as 4 little-endian bytes (I32).
 pub(crate) trait Fixed32ProtoType {
@@ -23,9 +22,6 @@ pub(crate) trait Fixed32ProtoType {
     fn encode_wire(value: Self::Value, buf: &mut impl BufMut);
 }
 
-/// Always [`WireType::Int32`] for singular field merge/encode checks.
-pub(crate) const WIRE_TYPE_I32: WireType = WireType::Int32;
-
 /// Wire semantics for protobuf types encoded as 8 little-endian bytes (I64).
 pub(crate) trait Fixed64ProtoType {
     type Value: Copy + PartialEq;
@@ -36,8 +32,5 @@ pub(crate) trait Fixed64ProtoType {
 
     fn encode_wire(value: Self::Value, buf: &mut impl BufMut);
 }
-
-/// Always [`WireType::Int64`] for singular field merge/encode checks.
-pub(crate) const WIRE_TYPE_I64: WireType = WireType::Int64;
 
 // Fixed32ProtoType / Fixed64ProtoType implementations — planned.

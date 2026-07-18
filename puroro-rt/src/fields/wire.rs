@@ -1,4 +1,4 @@
-//! Wire-encoding types (`VarintProtoType`, `LenProtoType`, `ProtoType`, …).
+//! Wire-encoding types (`VarintProtoType`, `ProtoType`, …).
 //!
 //! Singular fields use allocator-free type markers (`ProtoInt32`, …) and store
 //! [`ProtoType::Slot`]. Repeated fields store [`RepeatedElement::Element`].
@@ -10,7 +10,7 @@ pub(crate) mod proto_type;
 pub(crate) mod repeated_element;
 pub(crate) mod varint;
 
-pub use len::{LenProtoType, ProtoBytes, ProtoString};
+pub use len::{ProtoBytes, ProtoString};
 pub use proto_message::ProtoMessage;
 pub use proto_type::{PayloadAccess, ProtoType};
 pub use repeated_element::{
