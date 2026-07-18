@@ -17,6 +17,7 @@ use ::puroro_rt::{
     Explicit, FieldDeallocate, MessageCommon, PresenceBits, ProtoDouble, ProtoFixed32, ProtoString,
     SingularField,
 };
+use ::unmanaged::CloneIn;
 
 // ---------------------------------------------------------------------------
 // Presence bitfield (4 tracked singular fields)
@@ -172,15 +173,22 @@ impl<A: Allocator + Clone + Default> Default for Address<A> {
 // Clone / PartialEq / Debug
 // ---------------------------------------------------------------------------
 
+impl<A: Allocator + Clone> ::unmanaged::CloneIn<A> for Address<A> {
+    fn clone_in(&self, alloc: A) -> Self {
+        Self {
+            _common: self._common.clone_in(alloc.clone()),
+            street: self.street.clone_in(&self._common, alloc.clone()),
+            city: self.city.clone_in(&self._common, alloc.clone()),
+            postal_code: self.postal_code.clone_in(&self._common, alloc.clone()),
+            latitude: self.latitude.clone_in(&self._common, alloc),
+        }
+    }
+}
+
 impl<A: Allocator + Clone> Clone for Address<A> {
+    #[inline]
     fn clone(&self) -> Self {
-        // Round-trip through the wire codec — preserves fields and unknowns
-        // without a field-catalog `clone_in` (planned for the protoc plugin).
-        let bytes = self.encode_to_vec();
-        let mut out = Self::new_in(self._common.alloc.clone());
-        out.merge_from(&mut bytes.as_slice())
-            .expect("encode/decode round-trip for Clone");
-        out
+        self.clone_in(self._common.alloc.clone())
     }
 }
 

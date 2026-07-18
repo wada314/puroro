@@ -26,7 +26,7 @@ use ::puroro::DecodeError;
 use ::puroro::WireType;
 use ::puroro::{HasDefault, Optional};
 
-use ::unmanaged::DeallocateIn;
+use ::unmanaged::{CloneIn, DeallocateIn};
 
 use crate::fields::shared::FieldDeallocate;
 use crate::fields::shared::{
@@ -179,6 +179,21 @@ where
                 .get()
                 .expect("should_emit implies initialized slot");
             T::encode(L::get(slot, common), FIELD, buf);
+        }
+    }
+
+    /// Deep-copies this field into `alloc`, reading init / presence from `common`.
+    #[inline]
+    pub fn clone_in<Pb>(&self, common: &MessageCommon<Pb, A>, alloc: A) -> Self
+    where
+        Pb: PresenceBits,
+        T::Slot<A>: CloneIn<A>,
+    {
+        let init = P::slot_init_view();
+        let initialized = init.is_initialized(common);
+        Self {
+            value: ManuallyDrop::new(self.value.clone_in(initialized, alloc)),
+            _marker: PhantomData,
         }
     }
 }

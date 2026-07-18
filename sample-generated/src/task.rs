@@ -23,6 +23,7 @@ use ::puroro_rt::{
     MessageCommon, NonOneof, OneofSlot, Open, Packed, PresenceBits, ProtoBool, ProtoBytes,
     ProtoEnum, ProtoInt32, ProtoMessage, ProtoString, RepeatedField, SingularField,
 };
+use ::unmanaged::CloneIn;
 
 use defaults::MaxRetriesDefault;
 
@@ -572,15 +573,34 @@ impl<A: Allocator + Clone + Default> Default for Task<A> {
 // Clone / PartialEq / Debug
 // ---------------------------------------------------------------------------
 
+impl<A: Allocator + Clone> ::unmanaged::CloneIn<A> for Task<A> {
+    fn clone_in(&self, alloc: A) -> Self {
+        Self {
+            _common: self._common.clone_in(alloc.clone()),
+            title: self.title.clone_in(&self._common, alloc.clone()),
+            score: self.score.clone_in(&self._common, alloc.clone()),
+            max_retries: self.max_retries.clone_in(&self._common, alloc.clone()),
+            owner_id: self.owner_id.clone_in(&self._common, alloc.clone()),
+            payload: self.payload.clone_in(&self._common, alloc.clone()),
+            tag_ids: self.tag_ids.clone_in(&self._common, alloc.clone()),
+            scores: self.scores.clone_in(&self._common, alloc.clone()),
+            labels: self.labels.clone_in(&self._common, alloc.clone()),
+            status: self.status.clone_in(&self._common, alloc.clone()),
+            priority: self.priority.clone_in(&self._common, alloc.clone()),
+            assignee: self.assignee.clone_in(&self._common, alloc.clone()),
+            notification: self.notification.clone_in(&self._common, alloc.clone()),
+            done: self.done.clone_in(&self._common, alloc.clone()),
+            flag: self.flag.clone_in(&self._common, alloc.clone()),
+            watchers: self.watchers.clone_in(&self._common, alloc.clone()),
+            votes: self.votes.clone_in(&self._common, alloc),
+        }
+    }
+}
+
 impl<A: Allocator + Clone> Clone for Task<A> {
+    #[inline]
     fn clone(&self) -> Self {
-        // Round-trip through the wire codec — preserves fields and unknowns
-        // without a field-catalog `clone_in` (planned for the protoc plugin).
-        let bytes = self.encode_to_vec();
-        let mut out = Self::new_in(self._common.alloc.clone());
-        out.merge_from(&mut bytes.as_slice())
-            .expect("encode/decode round-trip for Clone");
-        out
+        self.clone_in(self._common.alloc.clone())
     }
 }
 

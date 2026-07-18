@@ -94,6 +94,19 @@ impl<P, A: Allocator + Clone> MessageCommon<P, A> {
         }
     }
 
+    /// Deep-copies presence bits and unknown-field bytes into `alloc`.
+    #[inline]
+    pub fn clone_in(&self, alloc: A) -> Self
+    where
+        P: Clone,
+    {
+        Self {
+            presence: self.presence.clone(),
+            unknown_fields: ManuallyDrop::new(self.unknown_fields.clone_in(alloc.clone())),
+            alloc,
+        }
+    }
+
     /// Iterates preserved unknown fields as structured views.
     ///
     /// Storage remains a contiguous wire blob; this only parses it for the

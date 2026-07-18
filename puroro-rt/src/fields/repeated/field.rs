@@ -8,6 +8,7 @@ use ::core::mem::ManuallyDrop;
 
 use ::allocator_api2::alloc::Allocator;
 use ::bytes::{Buf, BufMut};
+use ::unmanaged::CloneIn;
 use ::unmanaged::UnmanagedVec;
 use ::unmanaged::vec::VecGuard;
 
@@ -93,6 +94,20 @@ where
         common: &'c mut MessageCommon<Pb, A>,
     ) -> RepeatedFieldMut<'f, 'c, T, E, FIELD, A, Pb> {
         RepeatedFieldMut::new(self, common)
+    }
+
+    /// Deep-copies elements into `alloc`. `common` is unused (kept for symmetry
+    /// with singular / oneof `clone_in`).
+    #[inline]
+    pub fn clone_in<Pb>(&self, _common: &MessageCommon<Pb, A>, alloc: A) -> Self
+    where
+        Pb: PresenceBits,
+        T::Element<A>: CloneIn<A>,
+    {
+        Self {
+            values: ManuallyDrop::new(self.values.clone_in(alloc)),
+            _encoding: PhantomData,
+        }
     }
 }
 

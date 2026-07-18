@@ -186,11 +186,10 @@ impl<A: Allocator + Clone> OneofGroup for NotificationStorage<A> {
         = NotificationMut<'a, A>
     where
         A: 'a;
-    type Storage = Self;
     type Presence = TaskPresence;
     type Alloc = A;
 
-    fn case(storage: &Self::Storage) -> Self::Case {
+    fn case(storage: &Self) -> Self::Case {
         match storage {
             Self::EmailAddress(_) => NotificationCase::EmailAddress,
             Self::PhoneNumber(_) => NotificationCase::PhoneNumber,
@@ -201,7 +200,7 @@ impl<A: Allocator + Clone> OneofGroup for NotificationStorage<A> {
     }
 
     fn to_ref<'a>(
-        storage: &'a Self::Storage,
+        storage: &'a Self,
         common: &'a MessageCommon<Self::Presence, Self::Alloc>,
     ) -> Self::Ref<'a> {
         match storage {
@@ -214,7 +213,7 @@ impl<A: Allocator + Clone> OneofGroup for NotificationStorage<A> {
     }
 
     fn to_mut<'a>(
-        storage: &'a mut Self::Storage,
+        storage: &'a mut Self,
         common: &'a mut MessageCommon<Self::Presence, Self::Alloc>,
     ) -> Self::Mut<'a> {
         match storage {
@@ -225,6 +224,20 @@ impl<A: Allocator + Clone> OneofGroup for NotificationStorage<A> {
             Self::Urgent(_) => {
                 Notification::Urgent(common.presence.bit_ref_mut(super::BIT_URGENT_VALUE))
             }
+        }
+    }
+
+    fn clone_storage_in(
+        storage: &Self,
+        common: &MessageCommon<Self::Presence, Self::Alloc>,
+        alloc: Self::Alloc,
+    ) -> Self {
+        match storage {
+            Self::EmailAddress(f) => Self::EmailAddress(f.clone_in(common, alloc)),
+            Self::PhoneNumber(f) => Self::PhoneNumber(f.clone_in(common, alloc)),
+            Self::WebhookId(f) => Self::WebhookId(f.clone_in(common, alloc)),
+            Self::Postal(f) => Self::Postal(f.clone_in(common, alloc)),
+            Self::Urgent(f) => Self::Urgent(f.clone_in(common, alloc)),
         }
     }
 }

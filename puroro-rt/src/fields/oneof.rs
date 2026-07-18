@@ -86,6 +86,12 @@ impl<E> OneofSlot<E> {
         Self { value: None }
     }
 
+    /// Builds a slot from an already-constructed active variant (or `None`).
+    #[inline]
+    pub fn from_option(value: Option<E>) -> Self {
+        Self { value }
+    }
+
     /// Returns the active variant, if any.
     #[inline]
     pub fn as_ref(&self) -> Option<&E> {
@@ -162,6 +168,15 @@ impl<E> OneofSlot<E> {
         common: &'c mut MessageCommon<Pb, A>,
     ) -> OneofSlotMut<'f, 'c, E, Pb, A> {
         OneofSlotMut::new(self, common)
+    }
+
+    /// Deep-copies the active variant via [`OneofGroup::clone_storage_in`].
+    #[inline]
+    pub fn clone_in(&self, common: &MessageCommon<E::Presence, E::Alloc>, alloc: E::Alloc) -> Self
+    where
+        E: OneofGroup,
+    {
+        Self::from_option(self.as_ref().map(|s| E::clone_storage_in(s, common, alloc)))
     }
 }
 
@@ -413,13 +428,17 @@ where
 // Group identity + public bound views
 // ---------------------------------------------------------------------------
 
-/// Generated oneof storage identity: case / projected Ref / Mut, plus the
-/// message presence and allocator types.
+/// Generated oneof storage: case / projected Ref / Mut, plus the message
+/// presence and allocator types.
 ///
-/// Implemented on the crate-internal storage alias (e.g. `NotificationStorage`).
-/// [`OneofView`] / [`OneofViewMut`] are parametrised by this trait so message
-/// accessors need not expose the storage type in their signatures (RPIT).
-pub trait OneofGroup {
+/// Implemented on the crate-internal storage alias (e.g. `NotificationStorage`),
+/// which is also the type held in [`OneofSlot`]. [`OneofView`] /
+/// [`OneofViewMut`] are parametrised by this trait so message accessors need
+/// not expose the storage type in their signatures (RPIT).
+pub trait OneofGroup
+where
+    Self: OneofDeallocate<Self::Presence, Self::Alloc>,
+{
     /// Payload-less discriminant of the active variant.
     type Case: Copy;
 
@@ -439,40 +458,47 @@ pub trait OneofGroup {
     /// Message allocator type.
     type Alloc: Allocator + Clone;
 
-    /// Owned storage enum type held in [`OneofSlot`]. Usually `Self`.
-    type Storage: OneofDeallocate<Self::Presence, Self::Alloc>;
-
     /// Discriminant for an active storage value.
-    fn case(storage: &Self::Storage) -> Self::Case;
+    fn case(storage: &Self) -> Self::Case;
 
     /// Project an active storage value to the shared view.
     fn to_ref<'a>(
-        storage: &'a Self::Storage,
+        storage: &'a Self,
         common: &'a MessageCommon<Self::Presence, Self::Alloc>,
     ) -> Self::Ref<'a>;
 
     /// Project an active storage value to the mutable view.
     fn to_mut<'a>(
-        storage: &'a mut Self::Storage,
+        storage: &'a mut Self,
         common: &'a mut MessageCommon<Self::Presence, Self::Alloc>,
     ) -> Self::Mut<'a>;
+
+    /// Deep-copies an active storage value into `alloc`.
+    fn clone_storage_in(
+        storage: &Self,
+        common: &MessageCommon<Self::Presence, Self::Alloc>,
+        alloc: Self::Alloc,
+    ) -> Self;
 }
 
 /// Shared bound view of a oneof group (slot + [`MessageCommon`]).
 ///
 /// Returned by generated `notification()`-style accessors even when unset.
-pub struct OneofView<'a, G: OneofGroup> {
-    slot: &'a OneofSlot<G::Storage>,
+pub struct OneofView<'a, G: OneofGroup>
+where
+    G: OneofDeallocate<G::Presence, G::Alloc>,
+{
+    slot: &'a OneofSlot<G>,
     common: &'a MessageCommon<G::Presence, G::Alloc>,
 }
 
-impl<'a, G: OneofGroup> OneofView<'a, G> {
+impl<'a, G: OneofGroup> OneofView<'a, G>
+where
+    G: OneofDeallocate<G::Presence, G::Alloc>,
+{
     /// Creates a shared group view from a slot and message common state.
     #[inline]
-    pub fn new(
-        slot: &'a OneofSlot<G::Storage>,
-        common: &'a MessageCommon<G::Presence, G::Alloc>,
-    ) -> Self {
+    pub fn new(slot: &'a OneofSlot<G>, common: &'a MessageCommon<G::Presence, G::Alloc>) -> Self {
         Self { slot, common }
     }
 
@@ -492,16 +518,22 @@ impl<'a, G: OneofGroup> OneofView<'a, G> {
 /// Mutable bound view of a oneof group (slot + [`MessageCommon`]).
 ///
 /// Returned by generated `notification_mut()`-style accessors even when unset.
-pub struct OneofViewMut<'a, G: OneofGroup> {
-    slot: &'a mut OneofSlot<G::Storage>,
+pub struct OneofViewMut<'a, G: OneofGroup>
+where
+    G: OneofDeallocate<G::Presence, G::Alloc>,
+{
+    slot: &'a mut OneofSlot<G>,
     common: &'a mut MessageCommon<G::Presence, G::Alloc>,
 }
 
-impl<'a, G: OneofGroup> OneofViewMut<'a, G> {
+impl<'a, G: OneofGroup> OneofViewMut<'a, G>
+where
+    G: OneofDeallocate<G::Presence, G::Alloc>,
+{
     /// Creates a mutable group view from a slot and message common state.
     #[inline]
     pub fn new(
-        slot: &'a mut OneofSlot<G::Storage>,
+        slot: &'a mut OneofSlot<G>,
         common: &'a mut MessageCommon<G::Presence, G::Alloc>,
     ) -> Self {
         Self { slot, common }

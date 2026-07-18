@@ -18,7 +18,7 @@ use ::core::marker::PhantomData;
 use ::core::mem::{self, MaybeUninit};
 
 use ::allocator_api2::alloc::Allocator;
-use ::unmanaged::DeallocateIn;
+use ::unmanaged::{CloneIn, DeallocateIn};
 
 use super::{
     DefaultIn, MessageCommon, PresenceBits,
@@ -60,6 +60,14 @@ where
     /// Used from message / oneof `Drop` paths. `initialized` is taken from the
     /// init marker + [`MessageCommon`] by the caller.
     fn deallocate_in(self, initialized: bool, alloc: A);
+
+    /// Deep-copies any live payload into `alloc`.
+    ///
+    /// `initialized` matches [`deallocate_in`](Self::deallocate_in): for
+    /// always-present / pointer-present slots it is ignored.
+    fn clone_in(&self, initialized: bool, alloc: A) -> Self
+    where
+        T: CloneIn<A>;
 
     /// Pairs this slot with an init marker and message common for read access.
     fn with<'s, I: SlotInitView, Pb: PresenceBits>(
@@ -223,6 +231,14 @@ where
     }
 
     #[inline]
+    fn clone_in(&self, _: bool, alloc: A) -> Self
+    where
+        T: CloneIn<A>,
+    {
+        CloneIn::clone_in(self, alloc)
+    }
+
+    #[inline]
     fn with<'s, I: SlotInitView, Pb: PresenceBits>(
         &'s self,
         init: I,
@@ -266,6 +282,19 @@ where
             let value = unsafe { self.assume_init() };
             // SAFETY: `alloc` owns `value`'s buffer.
             unsafe { DeallocateIn::deallocate_in(value, alloc) };
+        }
+    }
+
+    #[inline]
+    fn clone_in(&self, initialized: bool, alloc: A) -> Self
+    where
+        T: CloneIn<A>,
+    {
+        if initialized {
+            // SAFETY: init bit set implies a live payload.
+            MaybeUninit::new(unsafe { self.assume_init_ref() }.clone_in(alloc))
+        } else {
+            MaybeUninit::uninit()
         }
     }
 
@@ -351,6 +380,14 @@ where
             // SAFETY: `alloc` owns `value`'s buffer.
             unsafe { DeallocateIn::deallocate_in(value, alloc) };
         }
+    }
+
+    #[inline]
+    fn clone_in(&self, _: bool, alloc: A) -> Self
+    where
+        T: CloneIn<A>,
+    {
+        self.as_ref().map(|value| value.clone_in(alloc))
     }
 
     #[inline]
