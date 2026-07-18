@@ -197,15 +197,17 @@ pub trait ProtoType: Sized {
     type Slot<A: Allocator + Clone>;
     type Ref<'a, A: Allocator + Clone> where Self: 'a, A: 'a;
     type Mut<'a, A: Allocator + Clone>: DerefMut where Self: 'a, A: 'a;
-    type Written<A: Allocator + Clone>;
+    type Written<A: Allocator + Clone>; // accepted by set / write
     const WIRE_TYPE: WireType;
     fn encoded_len<'a, A>(value: Self::Ref<'a, A>, field: u32) -> usize;
     fn encode<'a, A, B: BufMut>(value: Self::Ref<'a, A>, field: u32, buf: &mut B);
-    fn decode<A, B: Buf>(…) -> Result<Self::Written<A>, DecodeError>;
 }
-// PayloadAccess: get / with_mut / write / clear / merge (inline slots)
+// PayloadAccess: get / with_mut / write / clear / merge (singular wire decode)
 // Implemented for ProtoInt32, …, ProtoEnum<E, K>, ProtoString, ProtoBytes, ProtoMessage<M>
+// ProtoBool uses BitPacked::merge instead of PayloadAccess
 ```
+
+Singular wire decode is **merge-into only** (`PayloadAccess::merge` / `BitPacked::merge`). There is no `ProtoType::decode → Written`; nested messages merge into the present child via `Message::merge_from`.
 
 Singular / oneof `bool` uses allocator-free [`ProtoBool`](puroro-rt/src/fields/wire/varint.rs) plus [`BitPacked<VALUE_BIT>`](puroro-rt/src/fields/shared/value_layout.rs) as the field's [`ValueLayout`](puroro-rt/src/fields/shared/value_layout.rs) (orthogonal to presence `P`). Inline payloads use default `L = Inline` via [`PayloadAccess`](puroro-rt/src/fields/wire/proto_type.rs). Allocator `A` lives on [`SingularField`](puroro-rt/src/fields/singular/field.rs) / [`RepeatedField`](puroro-rt/src/fields/repeated/field.rs). Slot construction uses [`DefaultIn<A>`](puroro-rt/src/fields/shared.rs) / [`DeallocateIn<A>`](puroro-rt/src/fields/shared.rs) (allocator as a **trait parameter**, not an associated type), so bare `i32` / `()` work without slot newtypes.
 ### Repeated elements (`RepeatedItems`)

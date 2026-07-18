@@ -6,7 +6,9 @@
 //! **Storage access** (get / write / clear / merge) lives on [`PayloadAccess`]
 //! for inline payloads, or on
 //! [`ValueLayout`](crate::fields::shared::value_layout::ValueLayout)
-//! (`BitPacked`) for singular / oneof `bool`. [`SingularField`](crate::fields::singular::field::SingularField)
+//! (`BitPacked`) for singular / oneof `bool`. Singular wire decode is
+//! **merge-into only** (`PayloadAccess::merge` / `BitPacked::merge`); there is
+//! no `ProtoType::decode → Written`. [`SingularField`](crate::fields::singular::field::SingularField)
 //! always goes through `ValueLayout`.
 //!
 //! Repeated fields use [`RepeatedItems`](super::repeated_items::RepeatedItems)
@@ -71,7 +73,7 @@ pub trait ProtoType: Sized {
         Self: 'a,
         A: 'a;
 
-    /// Value accepted by `set` / produced by [`decode`](Self::decode).
+    /// Value accepted by [`PayloadAccess::write`] / field `set`.
     type Written<A: Allocator + Clone>;
 
     /// Expected wire type for a singular occurrence of this field.
@@ -91,13 +93,6 @@ pub trait ProtoType: Sized {
     ) where
         Self: 'a,
         A: 'a;
-
-    /// Decodes one occurrence after the tag has been read (`wire_type` checked here).
-    fn decode<A: Allocator + Clone, B: Buf>(
-        wire_type: WireType,
-        buf: &mut B,
-        alloc: A,
-    ) -> Result<Self::Written<A>, DecodeError>;
 }
 
 /// Inline payload access for markers whose value lives in [`ProtoType::Slot`].
@@ -157,9 +152,10 @@ pub trait PayloadAccess: ProtoType {
 
     /// Merges one wire occurrence into the slot after the tag has been read.
     ///
-    /// Default: decode then [`write`](Self::write) (last wins). Closed-enum
-    /// unknowns are parked in `common.unknown_fields`. Nested messages override
-    /// this for recursive merge-into.
+    /// This is the **only** singular wire-decode entry for inline payloads.
+    /// Scalars / string / bytes typically last-win [`write`](Self::write);
+    /// nested messages merge recursively into the present child. Closed-enum
+    /// unknowns are parked in `common.unknown_fields`.
     fn merge<A, VS, I, Pb, B>(
         slot: &mut VS,
         init: I,
@@ -174,25 +170,7 @@ pub trait PayloadAccess: ProtoType {
         VS: ValueSlot<Self::Slot<A>, A>,
         I: SlotInitMut,
         Pb: PresenceBits,
-        B: Buf,
-    {
-        match Self::decode(wire_type, buf, common.alloc.clone()) {
-            Ok(new) => {
-                Self::write(slot, init, common, new);
-                Ok(())
-            }
-            Err(DecodeError::UnknownClosedEnum { raw }) => {
-                decode::save_unknown_varint_field(
-                    field,
-                    raw,
-                    &mut common.unknown_fields,
-                    common.alloc.clone(),
-                );
-                Ok(())
-            }
-            Err(e) => Err(e),
-        }
-    }
+        B: Buf;
 }
 
 // ---------------------------------------------------------------------------
@@ -239,19 +217,6 @@ macro_rules! impl_varint_proto_type {
                     <$marker as VarintProtoType>::encode_wire(value),
                     buf,
                 );
-            }
-
-            #[inline]
-            fn decode<A: Allocator + Clone, B: Buf>(
-                wire_type: WireType,
-                buf: &mut B,
-                _alloc: A,
-            ) -> Result<$inner, DecodeError> {
-                if wire_type != WireType::Varint {
-                    return Err(DecodeError::InvalidTag);
-                }
-                let raw = decode::decode_varint(buf)?;
-                Ok(<$marker as VarintProtoType>::decode_wire(raw)?)
             }
         }
 
@@ -319,6 +284,45 @@ macro_rules! impl_varint_proto_type {
             {
                 ValueSlot::with_mut(slot, init, common).clear();
             }
+
+            #[inline]
+            fn merge<A, VS, I, Pb, B>(
+                slot: &mut VS,
+                init: I,
+                common: &mut MessageCommon<Pb, A>,
+                wire_type: WireType,
+                buf: &mut B,
+                field: u32,
+            ) -> Result<(), DecodeError>
+            where
+                A: Allocator + Clone,
+                $inner: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
+                VS: ValueSlot<$inner, A>,
+                I: SlotInitMut,
+                Pb: PresenceBits,
+                B: Buf,
+            {
+                if wire_type != WireType::Varint {
+                    return Err(DecodeError::InvalidTag);
+                }
+                let raw = decode::decode_varint(buf)?;
+                match <$marker as VarintProtoType>::decode_wire(raw) {
+                    Ok(new) => {
+                        Self::write(slot, init, common, new);
+                        Ok(())
+                    }
+                    Err(DecodeError::UnknownClosedEnum { raw }) => {
+                        decode::save_unknown_varint_field(
+                            field,
+                            raw,
+                            &mut common.unknown_fields,
+                            common.alloc.clone(),
+                        );
+                        Ok(())
+                    }
+                    Err(e) => Err(e),
+                }
+            }
         }
     };
 }
@@ -374,19 +378,6 @@ macro_rules! impl_enum_proto_type {
                     <ProtoEnum<E, $kind> as VarintProtoType>::encode_wire(value),
                     buf,
                 );
-            }
-
-            #[inline]
-            fn decode<A: Allocator + Clone, B: Buf>(
-                wire_type: WireType,
-                buf: &mut B,
-                _alloc: A,
-            ) -> Result<E, DecodeError> {
-                if wire_type != WireType::Varint {
-                    return Err(DecodeError::InvalidTag);
-                }
-                let raw = decode::decode_varint(buf)?;
-                Ok(<ProtoEnum<E, $kind> as VarintProtoType>::decode_wire(raw)?)
             }
         }
 
@@ -454,6 +445,45 @@ macro_rules! impl_enum_proto_type {
             {
                 ValueSlot::with_mut(slot, init, common).clear();
             }
+
+            #[inline]
+            fn merge<A, VS, I, Pb, B>(
+                slot: &mut VS,
+                init: I,
+                common: &mut MessageCommon<Pb, A>,
+                wire_type: WireType,
+                buf: &mut B,
+                field: u32,
+            ) -> Result<(), DecodeError>
+            where
+                A: Allocator + Clone,
+                E: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
+                VS: ValueSlot<E, A>,
+                I: SlotInitMut,
+                Pb: PresenceBits,
+                B: Buf,
+            {
+                if wire_type != WireType::Varint {
+                    return Err(DecodeError::InvalidTag);
+                }
+                let raw = decode::decode_varint(buf)?;
+                match <ProtoEnum<E, $kind> as VarintProtoType>::decode_wire(raw) {
+                    Ok(new) => {
+                        Self::write(slot, init, common, new);
+                        Ok(())
+                    }
+                    Err(DecodeError::UnknownClosedEnum { raw }) => {
+                        decode::save_unknown_varint_field(
+                            field,
+                            raw,
+                            &mut common.unknown_fields,
+                            common.alloc.clone(),
+                        );
+                        Ok(())
+                    }
+                    Err(e) => Err(e),
+                }
+            }
         }
     };
 }
@@ -496,18 +526,6 @@ impl ProtoType for ProtoString {
         A: 'a,
     {
         encode::encode_len_field(field, value.as_bytes(), buf);
-    }
-
-    #[inline]
-    fn decode<A: Allocator + Clone, B: Buf>(
-        wire_type: WireType,
-        buf: &mut B,
-        alloc: A,
-    ) -> Result<UnmanagedString<A>, DecodeError> {
-        if wire_type != WireType::Len {
-            return Err(DecodeError::InvalidTag);
-        }
-        <Self as LenProtoType>::decode(buf, alloc)
     }
 }
 
@@ -573,6 +591,30 @@ impl PayloadAccess for ProtoString {
     {
         ValueSlot::with_mut(slot, init, common).clear();
     }
+
+    #[inline]
+    fn merge<A, VS, I, Pb, B>(
+        slot: &mut VS,
+        init: I,
+        common: &mut MessageCommon<Pb, A>,
+        wire_type: WireType,
+        buf: &mut B,
+        _field: u32,
+    ) -> Result<(), DecodeError>
+    where
+        A: Allocator + Clone,
+        VS: ValueSlot<UnmanagedString<A>, A>,
+        I: SlotInitMut,
+        Pb: PresenceBits,
+        B: Buf,
+    {
+        if wire_type != WireType::Len {
+            return Err(DecodeError::InvalidTag);
+        }
+        let new = <Self as LenProtoType>::decode(buf, common.alloc.clone())?;
+        Self::write(slot, init, common, new);
+        Ok(())
+    }
 }
 
 impl ProtoType for ProtoBytes {
@@ -606,18 +648,6 @@ impl ProtoType for ProtoBytes {
         A: 'a,
     {
         encode::encode_len_field(field, value, buf);
-    }
-
-    #[inline]
-    fn decode<A: Allocator + Clone, B: Buf>(
-        wire_type: WireType,
-        buf: &mut B,
-        alloc: A,
-    ) -> Result<UnmanagedVec<u8, A>, DecodeError> {
-        if wire_type != WireType::Len {
-            return Err(DecodeError::InvalidTag);
-        }
-        <Self as LenProtoType>::decode(buf, alloc)
     }
 }
 
@@ -683,6 +713,30 @@ impl PayloadAccess for ProtoBytes {
     {
         ValueSlot::with_mut(slot, init, common).clear();
     }
+
+    #[inline]
+    fn merge<A, VS, I, Pb, B>(
+        slot: &mut VS,
+        init: I,
+        common: &mut MessageCommon<Pb, A>,
+        wire_type: WireType,
+        buf: &mut B,
+        _field: u32,
+    ) -> Result<(), DecodeError>
+    where
+        A: Allocator + Clone,
+        VS: ValueSlot<UnmanagedVec<u8, A>, A>,
+        I: SlotInitMut,
+        Pb: PresenceBits,
+        B: Buf,
+    {
+        if wire_type != WireType::Len {
+            return Err(DecodeError::InvalidTag);
+        }
+        let new = <Self as LenProtoType>::decode(buf, common.alloc.clone())?;
+        Self::write(slot, init, common, new);
+        Ok(())
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -720,18 +774,5 @@ impl ProtoType for ProtoBool {
         A: 'a,
     {
         encode::encode_varint_field(field, Self::encode_wire(value), buf);
-    }
-
-    #[inline]
-    fn decode<A: Allocator + Clone, B: Buf>(
-        wire_type: WireType,
-        buf: &mut B,
-        _alloc: A,
-    ) -> Result<bool, DecodeError> {
-        if wire_type != WireType::Varint {
-            return Err(DecodeError::InvalidTag);
-        }
-        let raw = decode::decode_varint(buf)?;
-        Self::decode_wire(raw)
     }
 }

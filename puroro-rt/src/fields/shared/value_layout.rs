@@ -11,7 +11,7 @@ use ::bitvec::{
 };
 use ::bytes::Buf;
 
-use ::puroro::DecodeError;
+use ::puroro::{DecodeError, WireType};
 
 use super::{
     DeallocateIn, DefaultIn, MessageCommon, PresenceBits,
@@ -20,7 +20,7 @@ use super::{
 };
 use crate::decode;
 use crate::fields::wire::proto_type::{PayloadAccess, ProtoType};
-use crate::fields::wire::varint::ProtoBool;
+use crate::fields::wire::varint::{ProtoBool, VarintProtoType};
 
 /// Where a singular field's logical value is stored.
 pub trait ValueLayout<T: ProtoType, A: Allocator + Clone>: Copy
@@ -222,7 +222,7 @@ where
         slot: &mut VS,
         init: I,
         common: &mut MessageCommon<Pb, A>,
-        wire_type: ::puroro::WireType,
+        wire_type: WireType,
         buf: &mut B,
         field: u32,
     ) -> Result<(), DecodeError>
@@ -232,7 +232,11 @@ where
         Pb: PresenceBits,
         B: Buf,
     {
-        match ProtoBool::decode(wire_type, buf, common.alloc.clone()) {
+        if wire_type != WireType::Varint {
+            return Err(DecodeError::InvalidTag);
+        }
+        let raw = decode::decode_varint(buf)?;
+        match <ProtoBool as VarintProtoType>::decode_wire(raw) {
             Ok(new) => {
                 Self::write(slot, init, common, new);
                 Ok(())

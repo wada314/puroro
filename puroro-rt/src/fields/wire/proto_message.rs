@@ -105,16 +105,6 @@ impl<M: Message> ProtoType for ProtoMessage<M> {
         encode::encode_varint(payload_len as u64, buf);
         value.encode_raw(buf);
     }
-
-    #[inline]
-    fn decode<A: Allocator + Clone, B: Buf>(
-        _wire_type: WireType,
-        _buf: &mut B,
-        _alloc: A,
-    ) -> Result<UnmanagedBox<M, A>, DecodeError> {
-        // Nested messages always decode via [`PayloadAccess::merge`] (merge-into).
-        Err(DecodeError::InvalidTag)
-    }
 }
 
 impl<M: Message> PayloadAccess for ProtoMessage<M> {

@@ -51,11 +51,7 @@ pub trait ProtoType: Sized {
 
     fn encoded_len<'a, A: Allocator + Clone>(value: Self::Ref<'a, A>, field: u32) -> usize;
     fn encode<'a, A, B: BufMut>(value: Self::Ref<'a, A>, field: u32, buf: &mut B);
-    fn decode<A: Allocator + Clone, B: Buf>(
-        wire_type: WireType,
-        buf: &mut B,
-        alloc: A,
-    ) -> Result<Self::Written<A>, DecodeError>;
+    // Singular wire decode is PayloadAccess::merge / BitPacked::merge (no decode → Written).
 }
 ```
 
@@ -182,4 +178,4 @@ Update [`IMPLEMENTATION.md`](IMPLEMENTATION.md) §5–9, §14–15 and [`DESIGN.
 - ~~Numerics use `CopySlot<V, A>`~~ → removed: `DefaultIn<A>` / `DeallocateIn<A>` are trait-parameterised, so bare `i32` / `()` work.
 - Bool singular slot is `()`; value via `BitPacked`.
 - `ProtoMessage<M>` is A-free; `Slot` is `UnmanagedBox<M, A>` (use sites require `M: Message<Alloc = A>` via `DefaultIn<A>`).
-- `ProtoType::decode` for messages is a stub; real decode is `PayloadAccess::merge`.
+- Singular wire decode is merge-into only (`PayloadAccess::merge` / `BitPacked::merge`); no `ProtoType::decode → Written`.
