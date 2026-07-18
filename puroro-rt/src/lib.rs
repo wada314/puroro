@@ -17,10 +17,7 @@ pub use fields::oneof::{
     OneofVariantRef, OneofView, OneofViewMut,
 };
 pub use fields::repeated::{
-    Expanded, Packed, RepeatedBytes, RepeatedEncoding, RepeatedExpandedInt32,
-    RepeatedExpandedVarintField, RepeatedField, RepeatedFieldMut, RepeatedFieldRef,
-    RepeatedLenField, RepeatedMessage, RepeatedPackedInt32, RepeatedPackedVarintField,
-    RepeatedString,
+    Expanded, Packed, RepeatedEncoding, RepeatedField, RepeatedFieldMut, RepeatedFieldRef,
 };
 pub use fields::shared::field_presence::{
     Explicit, FieldPresence, Implicit, LegacyRequired, NonOneof, Oneof, RequiredFieldPresence,

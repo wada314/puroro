@@ -15,14 +15,11 @@ use ::puroro::DecodeError;
 use ::puroro::WireType;
 
 use crate::fields::shared::{FieldDeallocate, MessageCommon, PresenceBits};
-use crate::fields::wire::len::{ProtoBytes, ProtoString};
-use crate::fields::wire::proto_message::ProtoMessage;
 use crate::fields::wire::repeated_element::{
     RepeatedElement, RepeatedElementMerge, RepeatedSlicePush, RepeatedVecMut,
 };
-use crate::fields::wire::varint;
 
-use super::encoding::{Expanded, Packed, RepeatedEncoding};
+use super::encoding::RepeatedEncoding;
 
 /// Repeated field parametrised by type marker `T`, encode policy `E`, and allocator `A`.
 ///
@@ -257,20 +254,3 @@ where
         })
     }
 }
-
-// ---------------------------------------------------------------------------
-// Type aliases
-// ---------------------------------------------------------------------------
-
-pub type RepeatedPackedVarintField<T, const FIELD: u32, A> = RepeatedField<T, Packed, FIELD, A>;
-pub type RepeatedExpandedVarintField<T, const FIELD: u32, A> = RepeatedField<T, Expanded, FIELD, A>;
-pub type RepeatedLenField<T, const FIELD: u32, A> = RepeatedField<T, Expanded, FIELD, A>;
-
-pub type RepeatedPackedInt32<const FIELD: u32, A> =
-    RepeatedPackedVarintField<varint::ProtoInt32, FIELD, A>;
-pub type RepeatedExpandedInt32<const FIELD: u32, A> =
-    RepeatedExpandedVarintField<varint::ProtoInt32, FIELD, A>;
-pub type RepeatedString<const FIELD: u32, A> = RepeatedLenField<ProtoString, FIELD, A>;
-pub type RepeatedBytes<const FIELD: u32, A> = RepeatedLenField<ProtoBytes, FIELD, A>;
-pub type RepeatedMessage<M, const FIELD: u32, A> =
-    RepeatedField<ProtoMessage<M>, Expanded, FIELD, A>;

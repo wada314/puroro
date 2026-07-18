@@ -281,7 +281,7 @@ Varint and LEN singular scalars share one wrapper, parametrised by [`ProtoType`]
 | `SingularField<T, P, FIELD, A, L, D>` | [`singular/field.rs`](puroro-rt/src/fields/singular/field.rs) | `T: ProtoType`, `L: ValueLayout<T, A>` (default `Inline`), stores `P::ValueSlot<T::Slot<A>>` | — |
 | `SingularField<ProtoBool, P, FIELD, A, BitPacked<VALUE_BIT>>` | same | `Slot = ()`; value at `VALUE_BIT` via layout | — |
 | `SingularField<ProtoMessage<M>, P, FIELD, A>` | same | `Slot = UnmanagedBox<M, A>`; `NonOneof` → `Option`; `Oneof` → always-present | — |
-| `RepeatedField<T, E, FIELD, A>` | [`repeated/field.rs`](puroro-rt/src/fields/repeated/field.rs) | `T: RepeatedElement`, `E: RepeatedEncoding<T, A>`, stores `T::Element<A>` | `RepeatedPackedVarintField`, `RepeatedMessage`, … |
+| `RepeatedField<T, E, FIELD, A>` | [`repeated/field.rs`](puroro-rt/src/fields/repeated/field.rs) | `T: RepeatedElement`, `E: RepeatedEncoding<T, A>`, stores `T::Element<A>` | — |
 | Fixed-width singular | (planned via `ProtoType` + `SingularField`) | — | — |
 | `OneofSlot<E>` | [`oneof.rs`](puroro-rt/src/fields/oneof.rs) | mutually exclusive variants | — |
 
@@ -637,7 +637,7 @@ Wire identical to EXPLICIT. Message `validate()` calls `validate_required` on ea
 
 Mutation uses the bound-view idiom: `field.bind_mut(&mut common)` → [`RepeatedFieldMut`](puroro-rt/src/fields/repeated/field.rs). Markers with [`RepeatedVecMut`](puroro-rt/src/fields/wire/repeated_element.rs) (copy scalars / enums / messages) expose `values_mut()` → `Vec` guard; string / bytes use `push_in` via [`RepeatedSlicePush`](puroro-rt/src/fields/wire/repeated_element.rs) (allocator-less element storage is impractical to build through bare `DerefMut`). `clear` / `deallocate` drain and free heap elements first, then free the buffer. Read: `field.bind(&common)` → [`RepeatedFieldRef`](puroro-rt/src/fields/repeated/field.rs) (`as_slice` / `is_empty`). Merge requires `T: RepeatedElementMerge<A>`.
 
-**`repeated message`:** `RepeatedField<ProtoMessage<M>, Expanded, FIELD, A>` (alias [`RepeatedMessage`](puroro-rt/src/fields/repeated/field.rs)) with `Element = M` (no per-element `UnmanagedBox`). Each wire occurrence constructs a new `M` via `Message::new_in` and appends — it does **not** merge into an existing list index. Sample: `Task.watchers` (`repeated Address`).
+**`repeated message`:** `RepeatedField<ProtoMessage<M>, Expanded, FIELD, A>` with `Element = M` (no per-element `UnmanagedBox`). Each wire occurrence constructs a new `M` via `Message::new_in` and appends — it does **not** merge into an existing list index. Sample: `Task.watchers` (`repeated Address`).
 
 **`repeated bool`:** not wired yet. Elements should be plain `bool` with **no** MessageCommon bit index — do not use [`BitPacked`](puroro-rt/src/fields/shared/value_layout.rs) (see [Bit-packed bool](#bit-packed-bool-protobool)).
 
