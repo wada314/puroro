@@ -39,7 +39,7 @@ impl<T: RepeatedElement, A: Allocator + Clone> RepeatedEncoding<T, A> for Expand
     }
 }
 
-/// One LEN record containing concatenated varints (edition 2024 default for numeric).
+/// One LEN record containing concatenated packed elements (edition 2024 default for numeric).
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
 pub struct Packed;
 
@@ -48,10 +48,19 @@ where
     T::Element<A>: Copy,
 {
     fn encoded_len(field: u32, values: &[T::Element<A>]) -> usize {
-        encode::encoded_len_packed_varint_field(field, values, |v| T::encode_wire(*v))
+        if values.is_empty() {
+            return 0;
+        }
+        encode::encoded_len_len_field(field, T::packed_payload_len(values))
     }
 
     fn encode<B: BufMut>(field: u32, values: &[T::Element<A>], buf: &mut B) {
-        encode::encode_packed_varint_field(field, values, |v| T::encode_wire(*v), buf);
+        if values.is_empty() {
+            return;
+        }
+        let payload_len = T::packed_payload_len(values);
+        encode::encode_tag(field, ::puroro::WireType::Len, buf);
+        encode::encode_varint(payload_len as u64, buf);
+        T::encode_packed_payload(values, buf);
     }
 }

@@ -81,38 +81,30 @@ pub(crate) fn encode_len_field<B: BufMut>(field_number: u32, payload: &[u8], buf
     buf.put_slice(payload);
 }
 
-pub(crate) fn encoded_len_packed_varint_field<T, F>(
-    field_number: u32,
-    values: &[T],
-    to_u64: F,
-) -> usize
-where
-    F: Fn(&T) -> u64,
-{
-    if values.is_empty() {
-        return 0;
-    }
-    let payload_len: usize = values.iter().map(|v| encoded_len_varint(to_u64(v))).sum();
-    encoded_len_len_field(field_number, payload_len)
+/// Returns the encoded byte length of a fixed32 / float field (tag + 4 LE bytes).
+#[inline]
+pub(crate) fn encoded_len_fixed32_field(field_number: u32) -> usize {
+    encoded_len_tag(field_number, WireType::Int32) + ::protobuf_core::FIXED32_BYTES
 }
 
-pub(crate) fn encode_packed_varint_field<B: BufMut, T, F>(
-    field_number: u32,
-    values: &[T],
-    to_u64: F,
-    buf: &mut B,
-) where
-    F: Fn(&T) -> u64,
-{
-    if values.is_empty() {
-        return;
-    }
-    let payload_len: usize = values.iter().map(|v| encoded_len_varint(to_u64(v))).sum();
-    encode_tag(field_number, WireType::Len, buf);
-    encode_varint(payload_len as u64, buf);
-    for v in values {
-        encode_varint(to_u64(v), buf);
-    }
+/// Writes a fixed32 / float field (tag + 4 LE bytes) to `buf`.
+#[inline]
+pub(crate) fn encode_fixed32_field<B: BufMut>(field_number: u32, bytes: [u8; 4], buf: &mut B) {
+    encode_tag(field_number, WireType::Int32, buf);
+    buf.put_slice(&bytes);
+}
+
+/// Returns the encoded byte length of a fixed64 / double field (tag + 8 LE bytes).
+#[inline]
+pub(crate) fn encoded_len_fixed64_field(field_number: u32) -> usize {
+    encoded_len_tag(field_number, WireType::Int64) + ::protobuf_core::FIXED64_BYTES
+}
+
+/// Writes a fixed64 / double field (tag + 8 LE bytes) to `buf`.
+#[inline]
+pub(crate) fn encode_fixed64_field<B: BufMut>(field_number: u32, bytes: [u8; 8], buf: &mut B) {
+    encode_tag(field_number, WireType::Int64, buf);
+    buf.put_slice(&bytes);
 }
 
 /// Writes a varint into an allocator-aware byte vector.

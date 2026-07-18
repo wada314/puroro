@@ -8,16 +8,18 @@ use ::bitvec::array::BitArray;
 use ::bitvec::order::Lsb0;
 use ::bitvec::ptr::{BitRef, Mut};
 use ::bytes::{Buf, BufMut};
+use ::core::fmt;
 use ::core::ops::DerefMut;
 
 use ::puroro::{DecodeError, Message};
 use ::puroro_rt::decode::{decode_tag, skip_field_and_save};
 use ::puroro_rt::{
-    Explicit, FieldDeallocate, MessageCommon, PresenceBits, ProtoString, SingularField,
+    Explicit, FieldDeallocate, MessageCommon, PresenceBits, ProtoDouble, ProtoFixed32, ProtoString,
+    SingularField,
 };
 
 // ---------------------------------------------------------------------------
-// Presence bitfield (2 tracked singular fields)
+// Presence bitfield (4 tracked singular fields)
 // ---------------------------------------------------------------------------
 
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
@@ -42,11 +44,13 @@ impl PresenceBits for AddressPresence {
 }
 
 // ---------------------------------------------------------------------------
-// Presence bit indices (2 tracked singular fields)
+// Presence bit indices (4 tracked singular fields)
 // ---------------------------------------------------------------------------
 
 pub const BIT_STREET: usize = 0; // street (EXPLICIT)
 pub const BIT_CITY: usize = 1; // city (EXPLICIT)
+pub const BIT_POSTAL_CODE: usize = 2; // postal_code (EXPLICIT fixed32)
+pub const BIT_LATITUDE: usize = 3; // latitude (EXPLICIT double)
 
 // ---------------------------------------------------------------------------
 // Proto field numbers
@@ -54,6 +58,8 @@ pub const BIT_CITY: usize = 1; // city (EXPLICIT)
 
 pub const FIELD_STREET: u32 = 1; // street
 pub const FIELD_CITY: u32 = 2; // city
+pub const FIELD_POSTAL_CODE: u32 = 3; // postal_code
+pub const FIELD_LATITUDE: u32 = 4; // latitude
 
 // ---------------------------------------------------------------------------
 // Message struct
@@ -63,16 +69,21 @@ pub struct Address<A: Allocator + Clone = Global> {
     _common: MessageCommon<AddressPresence, A>,
     street: SingularField<ProtoString, Explicit<{ BIT_STREET }>, { FIELD_STREET }, A>, // proto: string street = 1;
     city: SingularField<ProtoString, Explicit<{ BIT_CITY }>, { FIELD_CITY }, A>, // proto: string city = 2;
+    postal_code:
+        SingularField<ProtoFixed32, Explicit<{ BIT_POSTAL_CODE }>, { FIELD_POSTAL_CODE }, A>, // proto: fixed32 postal_code = 3;
+    latitude: SingularField<ProtoDouble, Explicit<{ BIT_LATITUDE }>, { FIELD_LATITUDE }, A>, // proto: double latitude = 4;
 }
 
 impl<A: Allocator + Clone> Address<A> {
     pub fn new_in(alloc: A) -> Self {
         // Each field initializer gets its own clone of the allocator; the last
-        // heap field (`city`) takes the original by move.
+        // heap field takes the original by move.
         Self {
             _common: MessageCommon::new_in(AddressPresence::ZERO, alloc.clone()),
             street: SingularField::new_in(alloc.clone()),
-            city: SingularField::new_in(alloc),
+            city: SingularField::new_in(alloc.clone()),
+            postal_code: SingularField::new_in(alloc.clone()),
+            latitude: SingularField::new_in(alloc),
         }
     }
 
@@ -109,6 +120,40 @@ impl<A: Allocator + Clone> Address<A> {
     pub fn clear_city(&mut self) {
         self.city.bind_mut(&mut self._common).clear();
     }
+
+    // -- postal_code (EXPLICIT fixed32, proto field 3) ----------------------
+
+    pub fn postal_code<'a>(&'a self) -> ::puroro::Optional<u32, impl ::puroro::HasDefault<u32>>
+    where
+        A: 'a,
+    {
+        self.postal_code.bind(&self._common).optional()
+    }
+
+    pub fn postal_code_mut(&mut self) -> impl DerefMut<Target = u32> + '_ {
+        self.postal_code.bind_mut(&mut self._common).value_mut()
+    }
+
+    pub fn clear_postal_code(&mut self) {
+        self.postal_code.bind_mut(&mut self._common).clear();
+    }
+
+    // -- latitude (EXPLICIT double, proto field 4) --------------------------
+
+    pub fn latitude<'a>(&'a self) -> ::puroro::Optional<f64, impl ::puroro::HasDefault<f64>>
+    where
+        A: 'a,
+    {
+        self.latitude.bind(&self._common).optional()
+    }
+
+    pub fn latitude_mut(&mut self) -> impl DerefMut<Target = f64> + '_ {
+        self.latitude.bind_mut(&mut self._common).value_mut()
+    }
+
+    pub fn clear_latitude(&mut self) {
+        self.latitude.bind_mut(&mut self._common).clear();
+    }
 }
 
 impl Address<Global> {
@@ -124,6 +169,56 @@ impl<A: Allocator + Clone + Default> Default for Address<A> {
 }
 
 // ---------------------------------------------------------------------------
+// Clone / PartialEq / Debug
+// ---------------------------------------------------------------------------
+
+impl<A: Allocator + Clone> Clone for Address<A> {
+    fn clone(&self) -> Self {
+        // Round-trip through the wire codec — preserves fields and unknowns
+        // without a field-catalog `clone_in` (planned for the protoc plugin).
+        let bytes = self.encode_to_vec();
+        let mut out = Self::new_in(self._common.alloc.clone());
+        out.merge_from(&mut bytes.as_slice())
+            .expect("encode/decode round-trip for Clone");
+        out
+    }
+}
+
+impl<A: Allocator + Clone> PartialEq for Address<A> {
+    fn eq(&self, other: &Self) -> bool {
+        optional_eq(self.street(), other.street())
+            && optional_eq(self.city(), other.city())
+            && optional_eq(self.postal_code(), other.postal_code())
+            && optional_eq(self.latitude(), other.latitude())
+            && self._common.unknown_fields.as_ref() == other._common.unknown_fields.as_ref()
+    }
+}
+
+impl<A: Allocator + Clone> fmt::Debug for Address<A> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("Address")
+            .field("street", &debug_optional(self.street()))
+            .field("city", &debug_optional(self.city()))
+            .field("postal_code", &debug_optional(self.postal_code()))
+            .field("latitude", &debug_optional(self.latitude()))
+            .finish()
+    }
+}
+
+fn optional_eq<T: Copy + PartialEq, D: ::puroro::HasDefault<T>>(
+    a: ::puroro::Optional<T, D>,
+    b: ::puroro::Optional<T, D>,
+) -> bool {
+    a.is_set() == b.is_set() && (!a.is_set() || a.get() == b.get())
+}
+
+fn debug_optional<T: Copy + fmt::Debug, D: ::puroro::HasDefault<T>>(
+    v: ::puroro::Optional<T, D>,
+) -> Option<T> {
+    if v.is_set() { Some(v.get()) } else { None }
+}
+
+// ---------------------------------------------------------------------------
 // Drop — releases every unmanaged field through the single allocator
 // ---------------------------------------------------------------------------
 
@@ -131,6 +226,8 @@ impl<A: Allocator + Clone> Drop for Address<A> {
     fn drop(&mut self) {
         self.street.deallocate(&self._common);
         self.city.deallocate(&self._common);
+        self.postal_code.deallocate(&self._common);
+        self.latitude.deallocate(&self._common);
         self._common.deallocate();
     }
 }
@@ -148,18 +245,31 @@ impl<A: Allocator + Clone> Message for Address<A> {
 
     fn encoded_len(&self) -> usize {
         let c = &self._common;
-        self.street.encoded_len(c) + self.city.encoded_len(c) + c.unknown_fields.len()
+        self.street.encoded_len(c)
+            + self.city.encoded_len(c)
+            + self.postal_code.encoded_len(c)
+            + self.latitude.encoded_len(c)
+            + c.unknown_fields.len()
     }
 
     fn encode_raw<B: BufMut>(&self, buf: &mut B) {
         let c = &self._common;
         self.street.encode_raw(c, buf);
         self.city.encode_raw(c, buf);
+        self.postal_code.encode_raw(c, buf);
+        self.latitude.encode_raw(c, buf);
         let unknown: &[u8] = &c.unknown_fields;
         buf.put_slice(unknown);
     }
 
-    fn merge_from<B: Buf>(&mut self, buf: &mut B) -> Result<(), DecodeError> {
+    fn merge_from_with_depth<B: Buf>(
+        &mut self,
+        buf: &mut B,
+        depth: usize,
+    ) -> Result<(), DecodeError> {
+        if depth >= ::puroro::RECURSION_LIMIT {
+            return Err(DecodeError::RecursionLimitExceeded);
+        }
         while buf.has_remaining() {
             let (field_number, wire_type) = decode_tag(buf)?;
             match field_number {
@@ -167,13 +277,25 @@ impl<A: Allocator + Clone> Message for Address<A> {
                     // street = 1, EXPLICIT string
                     self.street
                         .bind_mut(&mut self._common)
-                        .merge(wire_type, buf)?;
+                        .merge(wire_type, buf, depth)?;
                 }
                 FIELD_CITY => {
                     // city = 2, EXPLICIT string
                     self.city
                         .bind_mut(&mut self._common)
-                        .merge(wire_type, buf)?;
+                        .merge(wire_type, buf, depth)?;
+                }
+                FIELD_POSTAL_CODE => {
+                    // postal_code = 3, EXPLICIT fixed32
+                    self.postal_code
+                        .bind_mut(&mut self._common)
+                        .merge(wire_type, buf, depth)?;
+                }
+                FIELD_LATITUDE => {
+                    // latitude = 4, EXPLICIT double
+                    self.latitude
+                        .bind_mut(&mut self._common)
+                        .merge(wire_type, buf, depth)?;
                 }
                 _ => {
                     // unknown field — preserve in _common.unknown_fields

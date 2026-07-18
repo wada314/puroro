@@ -40,6 +40,38 @@ fn encode_packed_int32_field(field_number: u32, values: &[i32], buf: &mut Vec<u8
 // ---------------------------------------------------------------------------
 
 #[test]
+fn task_clone_and_eq() {
+    let mut task = Task::new();
+    task.title_mut().push_str("Clone me");
+    *task.score_mut() = 7;
+    task.owner_id_mut().push_str("u");
+    *task.done_mut() = true;
+    let mut addr = Address::new();
+    addr.street_mut().push_str("St");
+    *addr.latitude_mut() = 1.5;
+    *task.assignee_mut() = addr;
+
+    let mut cloned = task.clone();
+    assert_eq!(task, cloned);
+    assert_eq!(format!("{:?}", task), format!("{:?}", cloned));
+
+    *cloned.score_mut() = 8;
+    assert_ne!(task, cloned);
+}
+
+#[test]
+fn address_clone_and_eq() {
+    let mut a = Address::new();
+    a.city_mut().push_str("Tokyo");
+    *a.postal_code_mut() = 100;
+    *a.latitude_mut() = 35.0;
+    let b = a.clone();
+    assert_eq!(a, b);
+    a.clear_city();
+    assert_ne!(a, b);
+}
+
+#[test]
 fn task_fields_roundtrip() {
     let mut task = Task::new();
     task.title_mut().push_str("Write docs");
@@ -60,11 +92,15 @@ fn task_fields_roundtrip() {
     let mut assignee = Address::new();
     assignee.street_mut().push_str("1 Main St");
     assignee.city_mut().push_str("Tokyo");
+    *assignee.postal_code_mut() = 1000001;
+    *assignee.latitude_mut() = 35.6812;
     *task.assignee_mut() = assignee;
 
     let mut watcher = Address::new();
     watcher.street_mut().push_str("2 Side Rd");
     watcher.city_mut().push_str("Osaka");
+    *watcher.postal_code_mut() = 5300001;
+    *watcher.latitude_mut() = 34.6937;
     task.watchers_mut().push(watcher);
     task.votes_mut().push(true);
     task.votes_mut().push(false);
@@ -97,6 +133,8 @@ fn task_fields_roundtrip() {
     let a = decoded.assignee().unwrap();
     assert_eq!(a.street().get(), "1 Main St");
     assert_eq!(a.city().get(), "Tokyo");
+    assert_eq!(a.postal_code().get(), 1000001);
+    assert!((a.latitude().get() - 35.6812).abs() < 1e-9);
     assert_eq!(decoded.watchers().len(), 1);
     assert_eq!(decoded.watchers()[0].street().get(), "2 Side Rd");
     assert_eq!(decoded.watchers()[0].city().get(), "Osaka");

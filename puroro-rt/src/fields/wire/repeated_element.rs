@@ -18,6 +18,10 @@ use crate::decode;
 use crate::encode;
 use crate::fields::shared::DeallocateIn;
 
+use super::fixed::{
+    Fixed32ProtoType, Fixed64ProtoType, ProtoDouble, ProtoFixed32, ProtoFixed64, ProtoFloat,
+    ProtoSFixed32, ProtoSFixed64,
+};
 use super::len::{ProtoBytes, ProtoString};
 use super::proto_message::ProtoMessage;
 use super::proto_type::ProtoType;
@@ -62,6 +66,7 @@ pub trait RepeatedElementMerge<A: Allocator + Clone>: RepeatedElement {
         wire_type: WireType,
         buf: &mut B,
         alloc: A,
+        depth: usize,
         push: F,
     ) -> Result<(), DecodeError>
     where
@@ -70,13 +75,20 @@ pub trait RepeatedElementMerge<A: Allocator + Clone>: RepeatedElement {
 }
 
 /// Packable repeated numerics / enums — support packed encode and dual-form decode.
+///
+/// Packed payload layout is type-specific (concatenated varints, or fixed-width
+/// LE bytes). Decode always accepts both packed (`Len`) and expanded forms.
 pub trait PackableRepeatedElement: RepeatedElement {
-    fn encode_wire<A: Allocator + Clone>(value: Self::Element<A>) -> u64
+    /// Byte length of the packed payload (excluding tag and length prefix).
+    fn packed_payload_len<A: Allocator + Clone>(values: &[Self::Element<A>]) -> usize
     where
         Self::Element<A>: Copy;
 
-    fn decode_wire<A: Allocator + Clone>(raw: u64) -> Result<Self::Element<A>, DecodeError>
-    where
+    /// Writes the packed payload bytes (no tag / length prefix).
+    fn encode_packed_payload<A: Allocator + Clone, B: BufMut>(
+        values: &[Self::Element<A>],
+        buf: &mut B,
+    ) where
         Self::Element<A>: Copy;
 }
 
@@ -133,6 +145,7 @@ macro_rules! impl_packable_varint_repeated {
                 wire_type: WireType,
                 buf: &mut B,
                 _alloc: A,
+                _depth: usize,
                 mut push: F,
             ) -> Result<(), DecodeError>
             where
@@ -163,13 +176,23 @@ macro_rules! impl_packable_varint_repeated {
 
         impl PackableRepeatedElement for $marker {
             #[inline]
-            fn encode_wire<A: Allocator + Clone>(value: $inner) -> u64 {
-                <$marker as VarintProtoType>::encode_wire(value)
+            fn packed_payload_len<A: Allocator + Clone>(values: &[$inner]) -> usize {
+                values
+                    .iter()
+                    .map(|v| {
+                        encode::encoded_len_varint(<$marker as VarintProtoType>::encode_wire(*v))
+                    })
+                    .sum()
             }
 
             #[inline]
-            fn decode_wire<A: Allocator + Clone>(raw: u64) -> Result<$inner, DecodeError> {
-                <$marker as VarintProtoType>::decode_wire(raw)
+            fn encode_packed_payload<A: Allocator + Clone, B: BufMut>(
+                values: &[$inner],
+                buf: &mut B,
+            ) {
+                for v in values {
+                    encode::encode_varint(<$marker as VarintProtoType>::encode_wire(*v), buf);
+                }
             }
         }
 
@@ -216,6 +239,7 @@ macro_rules! impl_packable_enum_repeated {
                 wire_type: WireType,
                 buf: &mut B,
                 _alloc: A,
+                _depth: usize,
                 mut push: F,
             ) -> Result<(), DecodeError>
             where
@@ -246,13 +270,25 @@ macro_rules! impl_packable_enum_repeated {
 
         impl<E: $bound> PackableRepeatedElement for ProtoEnum<E, $kind> {
             #[inline]
-            fn encode_wire<A: Allocator + Clone>(value: E) -> u64 {
-                <ProtoEnum<E, $kind> as VarintProtoType>::encode_wire(value)
+            fn packed_payload_len<A: Allocator + Clone>(values: &[E]) -> usize {
+                values
+                    .iter()
+                    .map(|v| {
+                        encode::encoded_len_varint(
+                            <ProtoEnum<E, $kind> as VarintProtoType>::encode_wire(*v),
+                        )
+                    })
+                    .sum()
             }
 
             #[inline]
-            fn decode_wire<A: Allocator + Clone>(raw: u64) -> Result<E, DecodeError> {
-                <ProtoEnum<E, $kind> as VarintProtoType>::decode_wire(raw)
+            fn encode_packed_payload<A: Allocator + Clone, B: BufMut>(values: &[E], buf: &mut B) {
+                for v in values {
+                    encode::encode_varint(
+                        <ProtoEnum<E, $kind> as VarintProtoType>::encode_wire(*v),
+                        buf,
+                    );
+                }
             }
         }
 
@@ -262,6 +298,175 @@ macro_rules! impl_packable_enum_repeated {
 
 impl_packable_enum_repeated!(Open, OpenEnum);
 impl_packable_enum_repeated!(Closed, ClosedEnum);
+
+// ---------------------------------------------------------------------------
+// Fixed-width markers
+// ---------------------------------------------------------------------------
+
+macro_rules! impl_packable_fixed32_repeated {
+    ($marker:ty, $inner:ty) => {
+        impl RepeatedElement for $marker {
+            type Element<A: Allocator + Clone> = $inner;
+
+            #[inline]
+            fn encoded_len_element<A: Allocator + Clone>(_elem: &$inner, field: u32) -> usize {
+                encode::encoded_len_fixed32_field(field)
+            }
+
+            #[inline]
+            fn encode_element<A: Allocator + Clone, B: BufMut>(
+                elem: &$inner,
+                field: u32,
+                buf: &mut B,
+            ) {
+                encode::encode_fixed32_field(field, elem.to_le_bytes(), buf);
+            }
+
+            #[inline]
+            unsafe fn deallocate_element<A: Allocator + Clone>(_elem: $inner, _alloc: A) {}
+        }
+
+        impl<A: Allocator + Clone> RepeatedElementMerge<A> for $marker {
+            fn merge_occurrence<B, F>(
+                wire_type: WireType,
+                buf: &mut B,
+                _alloc: A,
+                _depth: usize,
+                mut push: F,
+            ) -> Result<(), DecodeError>
+            where
+                B: Buf,
+                F: FnMut($inner),
+            {
+                match wire_type {
+                    WireType::Len => {
+                        let len = decode::decode_varint(buf)? as usize;
+                        if buf.remaining() < len {
+                            return Err(DecodeError::TruncatedMessage);
+                        }
+                        if len % ::protobuf_core::FIXED32_BYTES != 0 {
+                            return Err(DecodeError::TruncatedMessage);
+                        }
+                        let mut sub = buf.take(len);
+                        while sub.has_remaining() {
+                            push(<$marker as Fixed32ProtoType>::decode_wire(&mut sub)?);
+                        }
+                    }
+                    WireType::Int32 => {
+                        push(<$marker as Fixed32ProtoType>::decode_wire(buf)?);
+                    }
+                    _ => return Err(DecodeError::InvalidTag),
+                }
+                Ok(())
+            }
+        }
+
+        impl PackableRepeatedElement for $marker {
+            #[inline]
+            fn packed_payload_len<A: Allocator + Clone>(values: &[$inner]) -> usize {
+                values.len() * ::protobuf_core::FIXED32_BYTES
+            }
+
+            #[inline]
+            fn encode_packed_payload<A: Allocator + Clone, B: BufMut>(
+                values: &[$inner],
+                buf: &mut B,
+            ) {
+                for v in values {
+                    <$marker as Fixed32ProtoType>::encode_wire(*v, buf);
+                }
+            }
+        }
+
+        impl RepeatedVecMut for $marker {}
+    };
+}
+
+macro_rules! impl_packable_fixed64_repeated {
+    ($marker:ty, $inner:ty) => {
+        impl RepeatedElement for $marker {
+            type Element<A: Allocator + Clone> = $inner;
+
+            #[inline]
+            fn encoded_len_element<A: Allocator + Clone>(_elem: &$inner, field: u32) -> usize {
+                encode::encoded_len_fixed64_field(field)
+            }
+
+            #[inline]
+            fn encode_element<A: Allocator + Clone, B: BufMut>(
+                elem: &$inner,
+                field: u32,
+                buf: &mut B,
+            ) {
+                encode::encode_fixed64_field(field, elem.to_le_bytes(), buf);
+            }
+
+            #[inline]
+            unsafe fn deallocate_element<A: Allocator + Clone>(_elem: $inner, _alloc: A) {}
+        }
+
+        impl<A: Allocator + Clone> RepeatedElementMerge<A> for $marker {
+            fn merge_occurrence<B, F>(
+                wire_type: WireType,
+                buf: &mut B,
+                _alloc: A,
+                _depth: usize,
+                mut push: F,
+            ) -> Result<(), DecodeError>
+            where
+                B: Buf,
+                F: FnMut($inner),
+            {
+                match wire_type {
+                    WireType::Len => {
+                        let len = decode::decode_varint(buf)? as usize;
+                        if buf.remaining() < len {
+                            return Err(DecodeError::TruncatedMessage);
+                        }
+                        if len % ::protobuf_core::FIXED64_BYTES != 0 {
+                            return Err(DecodeError::TruncatedMessage);
+                        }
+                        let mut sub = buf.take(len);
+                        while sub.has_remaining() {
+                            push(<$marker as Fixed64ProtoType>::decode_wire(&mut sub)?);
+                        }
+                    }
+                    WireType::Int64 => {
+                        push(<$marker as Fixed64ProtoType>::decode_wire(buf)?);
+                    }
+                    _ => return Err(DecodeError::InvalidTag),
+                }
+                Ok(())
+            }
+        }
+
+        impl PackableRepeatedElement for $marker {
+            #[inline]
+            fn packed_payload_len<A: Allocator + Clone>(values: &[$inner]) -> usize {
+                values.len() * ::protobuf_core::FIXED64_BYTES
+            }
+
+            #[inline]
+            fn encode_packed_payload<A: Allocator + Clone, B: BufMut>(
+                values: &[$inner],
+                buf: &mut B,
+            ) {
+                for v in values {
+                    <$marker as Fixed64ProtoType>::encode_wire(*v, buf);
+                }
+            }
+        }
+
+        impl RepeatedVecMut for $marker {}
+    };
+}
+
+impl_packable_fixed32_repeated!(ProtoFixed32, u32);
+impl_packable_fixed32_repeated!(ProtoSFixed32, i32);
+impl_packable_fixed32_repeated!(ProtoFloat, f32);
+impl_packable_fixed64_repeated!(ProtoFixed64, u64);
+impl_packable_fixed64_repeated!(ProtoSFixed64, i64);
+impl_packable_fixed64_repeated!(ProtoDouble, f64);
 
 // ---------------------------------------------------------------------------
 // LEN markers
@@ -297,6 +502,7 @@ impl<A: Allocator + Clone> RepeatedElementMerge<A> for ProtoString {
         wire_type: WireType,
         buf: &mut B,
         alloc: A,
+        _depth: usize,
         mut push: F,
     ) -> Result<(), DecodeError>
     where
@@ -352,6 +558,7 @@ impl<A: Allocator + Clone> RepeatedElementMerge<A> for ProtoBytes {
         wire_type: WireType,
         buf: &mut B,
         alloc: A,
+        _depth: usize,
         mut push: F,
     ) -> Result<(), DecodeError>
     where
@@ -414,6 +621,7 @@ where
         wire_type: WireType,
         buf: &mut B,
         alloc: A,
+        depth: usize,
         mut push: F,
     ) -> Result<(), DecodeError>
     where
@@ -427,9 +635,12 @@ where
         if buf.remaining() < len {
             return Err(DecodeError::TruncatedMessage);
         }
-        let mut sub = buf.take(len);
+        // Concrete `&[u8]` avoids infinite `Take<…>` monomorphization for
+        // recursive message types (same rationale as singular `ProtoMessage`).
+        let payload = buf.copy_to_bytes(len);
+        let mut sub: &[u8] = payload.as_ref();
         let mut msg = M::new_in(alloc);
-        msg.merge_from(&mut sub)?;
+        msg.merge_from_with_depth(&mut sub, depth + 1)?;
         push(msg);
         Ok(())
     }

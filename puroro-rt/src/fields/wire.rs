@@ -10,6 +10,10 @@ pub(crate) mod proto_type;
 pub(crate) mod repeated_element;
 pub(crate) mod varint;
 
+pub use fixed::{
+    Fixed32ProtoType, Fixed64ProtoType, ProtoDouble, ProtoFixed32, ProtoFixed64, ProtoFloat,
+    ProtoSFixed32, ProtoSFixed64,
+};
 pub use len::{ProtoBytes, ProtoString};
 pub use proto_message::ProtoMessage;
 pub use proto_type::{PayloadAccess, ProtoType};

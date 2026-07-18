@@ -60,7 +60,7 @@ The puroro project comprises several crates and tools with distinct roles:
 | Feature | Design intent | Implementation status |
 |---|---|---|
 | `utf8_validation` (`VERIFY` / `NONE`) | Generated decode paths honour the per-field Editions setting. | Error type and `VERIFY` path exist; `NONE` bypass and per-field dispatch in generated code are **pending**. |
-| Recursion limit | Nested-message `merge_from` enforces a depth limit; excess depth → `DecodeError::RecursionLimitExceeded`. | Error variant exists; depth tracking in generated code / runtime helper is **not yet implemented** (stub). |
+| Recursion limit | Nested-message `merge_from` enforces a depth limit; excess depth → `DecodeError::RecursionLimitExceeded`. | **Done** — `Message::merge_from_with_depth` + `RECURSION_LIMIT` (100); nested catalog paths pass `depth + 1`. |
 | Deprecated groups (`SGroup` / `EGroup`) | Never generated; not preserved on decode. | Decoder may return `DecodeError::InvalidTag`, skip, or panic — round-trip fidelity for groups is **not** a goal. |
 
 ---
@@ -935,7 +935,7 @@ impl Task<Global> {
 impl<A: Allocator + Clone + Default> Default for Task<A> { … }
 ```
 
-**Derived traits.** Generated messages implement `Default` (for `A: Allocator + Clone + Default`) plus a custom `Drop` (for `A: Allocator + Clone`). Additional `Global`-only convenience (`Task::new()`) applies when `A = Global`. `Clone` / `PartialEq` / `Debug` cannot be `#[derive]`d because the allocator-less fields need an owned allocator to copy or format; a `clone_in(&self, alloc)`-style API is future work. Wire bytes are not deterministic across encodes; compare semantically via getters. Full matrix: [IMPLEMENTATION.md §13](IMPLEMENTATION.md#13-derived-traits).
+**Derived traits.** Generated messages implement `Default` (for `A: Allocator + Clone + Default`) plus a custom `Drop` (for `A: Allocator + Clone`). Additional `Global`-only convenience (`Task::new()`) applies when `A = Global`. `Clone` / `PartialEq` / `Debug` are hand-written (not `#[derive]`): sample `Clone` round-trips through the wire codec; `PartialEq` compares getters semantically; a catalog `clone_in` remains future work for the plugin. Wire bytes are not deterministic across encodes. Full matrix: [IMPLEMENTATION.md §13](IMPLEMENTATION.md#13-derived-traits).
 
 **Mutation API (`_mut`).** Mutation is unified under `_mut` accessors that return a guard implementing `impl DerefMut<Target = …>` (RPIT): `title_mut()` yields `impl DerefMut<Target = ::unmanaged::String<A>>`, `payload_mut()`/`tag_ids_mut()` yield `impl DerefMut<Target = Vec<_, A>>`, and scalar/enum `_mut` accessors also return `impl DerefMut<Target = T>` (today that is `&mut T`). The guard **owns** a clone of the message allocator when the payload is heap-backed. Acquiring an explicit-presence `_mut` sets the presence bit. The old `set_*` / `push_*` setters are removed; the one exception is repeated `string`/`bytes`, which keep a typed `push_*` helper because their element storage is allocator-less and impractical to construct through a bare `DerefMut`.
 

@@ -129,7 +129,7 @@ protobuf-core           Varint, Tag, WireType
 | Closed-enum unknown → `DecodeError::UnknownClosedEnum` → unknown fields, `validate_required` | **Done** |
 | Nested message via `SingularField<ProtoMessage<…>, …>` | **Done** |
 | [`sample-generated`](sample-generated/) (`Task` / `Address`) | **Done** |
-| `Fixed32ProtoType` / `Fixed64ProtoType` on `SingularField` | **Stub** |
+| `Fixed32ProtoType` / `Fixed64ProtoType` + markers on `SingularField` / `RepeatedField` | **Done** |
 | Repeated catalog (`RepeatedField<T, E, FIELD>`) | **Done** |
 | `protoc` plugin | **Planned** |
 
@@ -154,7 +154,7 @@ protobuf-core           Varint, Tag, WireType
 | [`wire/proto_message.rs`](puroro-rt/src/fields/wire/proto_message.rs) | `ProtoMessage` (nested message marker) |
 | [`wire/varint.rs`](puroro-rt/src/fields/wire/varint.rs) | `VarintProtoType`, `ProtoInt32`, … |
 | [`wire/len.rs`](puroro-rt/src/fields/wire/len.rs) | `ProtoString`, `ProtoBytes` |
-| [`wire/fixed.rs`](puroro-rt/src/fields/wire/fixed.rs) | `Fixed32ProtoType` / `Fixed64ProtoType` (stub) |
+| [`wire/fixed.rs`](puroro-rt/src/fields/wire/fixed.rs) | `Fixed32ProtoType` / `Fixed64ProtoType` + `ProtoFixed*` / `ProtoFloat` / `ProtoDouble` |
 | [`singular.rs`](puroro-rt/src/fields/singular.rs) | Singular field re-exports |
 | [`singular/field.rs`](puroro-rt/src/fields/singular/field.rs) | `SingularField` — `T: ProtoType`, stores `T::Slot` |
 | [`repeated.rs`](puroro-rt/src/fields/repeated.rs) | Repeated field re-exports |
@@ -240,8 +240,10 @@ pub trait VarintProtoType {
 |---|---|---|---|
 | `VarintProtoType` | VARINT | numerics, enums, `ProtoBool` ([`wire/varint.rs`](puroro-rt/src/fields/wire/varint.rs)) | **Done** |
 | LEN scalars | LEN | `ProtoString`, `ProtoBytes` via `ProtoType` / `RepeatedElement` ([`wire/len.rs`](puroro-rt/src/fields/wire/len.rs)) | **Done** |
-| `Fixed32ProtoType` | I32 | `ProtoFixed32`, `ProtoFloat`, … ([`wire/fixed.rs`](puroro-rt/src/fields/wire/fixed.rs)) | Stub |
-| `Fixed64ProtoType` | I64 | `ProtoFixed64`, `ProtoDouble`, … ([`wire/fixed.rs`](puroro-rt/src/fields/wire/fixed.rs)) | Stub |
+| `Fixed32ProtoType` | I32 | `ProtoFixed32`, `ProtoSFixed32`, `ProtoFloat` ([`wire/fixed.rs`](puroro-rt/src/fields/wire/fixed.rs)) | **Done** |
+| `Fixed64ProtoType` | I64 | `ProtoFixed64`, `ProtoSFixed64`, `ProtoDouble` ([`wire/fixed.rs`](puroro-rt/src/fields/wire/fixed.rs)) | **Done** |
+
+Float [`ProtoEmpty`](puroro-rt/src/fields/shared.rs) uses Rust `== 0.0` (`-0.0` is empty; `NaN` is non-empty).
 
 Rust payload type alone does **not** identify protobuf encoding (`i32` can be int32 or sint32). Distinct thin wrappers (`ProtoInt32` vs `ProtoSint32`) are the source of truth.
 
@@ -312,7 +314,10 @@ Adding a singular wire type = one new `ProtoType` impl (and usually a `VarintPro
 | `EXPLICIT string` | `SingularField<ProtoString, Explicit<BIT>, FIELD>` |
 | `LEGACY_REQUIRED string` | `SingularField<ProtoString, LegacyRequired<BIT>, FIELD>` |
 | `IMPLICIT` / `EXPLICIT bytes` | `SingularField<ProtoBytes, P, FIELD>` |
+| `EXPLICIT fixed32` | `SingularField<ProtoFixed32, Explicit<BIT>, FIELD, A>` |
+| `EXPLICIT float` / `double` | `SingularField<ProtoFloat, …>` / `SingularField<ProtoDouble, …>` |
 | `repeated int32 PACKED` | `RepeatedField<ProtoInt32, Packed, FIELD>` |
+| `repeated fixed32` / `double` PACKED | `RepeatedField<ProtoFixed32, Packed, FIELD>` / `RepeatedField<ProtoDouble, Packed, FIELD>` |
 | `repeated int32 EXPANDED` | `RepeatedField<ProtoInt32, Expanded, FIELD>` |
 | `repeated string` | `RepeatedField<ProtoString, Expanded, FIELD>` |
 | `repeated bytes` | `RepeatedField<ProtoBytes, Expanded, FIELD>` |
@@ -489,12 +494,14 @@ Gaps in field numbers do not create gaps in bit indices. Oneof non-bool variants
 | `flag` | 17 | EXPLICIT bool value | `7` (`BIT_FLAG_VALUE`) |
 | `urgent` | 18 | oneof bool value | `8` (`BIT_URGENT_VALUE`) |
 
-### `Address` — two bits → `BitArray<[u8; 1], Lsb0>`
+### `Address` — four bits → `BitArray<[u8; 1], Lsb0>`
 
 | Field | # | `BIT_*` |
 |---|---|---|
 | `street` | 1 | `0` |
 | `city` | 2 | `1` |
+| `postal_code` | 3 | `2` |
+| `latitude` | 4 | `3` |
 
 ### Newtype pattern
 
@@ -581,12 +588,15 @@ Nested LEN payloads use `Buf::take(len)` before child `merge_from`.
 |---|---|---|
 | `Default` | `A: Clone + Default` | Clears presence; empty heap fields |
 | `Drop` | `A: Clone` | Calls `deallocate(&_common)` on every direct child ([`FieldDeallocate`](puroro-rt/src/fields/shared/field_deallocate.rs)), then `_common.deallocate()` |
+| `Clone` | `A: Clone` | Sample: encode → `merge_from` round-trip (catalog `clone_in` still future work for the plugin) |
+| `PartialEq` | `A: Clone` | Semantic getter comparison (not wire bytes); float uses Rust `PartialEq` |
+| `Debug` | `A: Clone` | Field-name `debug_struct` (oneof shown as `notification_case`) |
 
-**Not currently generated:** `Clone`, `PartialEq`, `Eq`, `Debug`, `Copy`, `Ord`, `Hash`. `Clone`/`PartialEq`/`Debug` need `&A` to copy or format the allocator-less fields, so they require a `clone_in(&self, alloc)`-style API (future work) rather than `#[derive]`.
+**Not currently generated:** `Eq`, `Copy`, `Ord`, `Hash`. A field-catalog `clone_in` (avoiding encode/decode) remains future work for the `protoc` plugin.
 
 **`Global` extras:** `Task::new()`, `impl Default for Task`, `Task::decode(buf)`.
 
-Compare messages semantically via getters; deep copy (when added) will copy data into a second tree, so prefer `Arc<Task<A>>` for shared immutable messages.
+Prefer `Arc<Task<A>>` for shared immutable messages when clone cost matters.
 
 ---
 
@@ -704,9 +714,8 @@ The `set_*` per-variant setters are removed, matching the other field families.
 | Area | Current | Target |
 |---|---|---|
 | UTF-8 validation | Always `decode_string_in` (VERIFY) | Per-field `utf8_validation` feature |
-| Recursion limit | Not enforced | Depth counter in nested merge → `RecursionLimitExceeded` |
+| Recursion limit | Enforced (`RECURSION_LIMIT = 100`, `merge_from_with_depth`) | — |
 | Repeated wrappers | `RepeatedField` + `RepeatedElement` (message / bool / scalar / LEN) | — |
-| Fixed32/64 catalog | Trait stubs | `ProtoType` impls + `SingularField` |
 | `protoc` plugin | — | FieldKind → catalog emission |
 | Zero-copy views | — | `TaskView<'buf>` (DESIGN.md §8) |
 | `TaskLazy` | DESIGN only | Wire buffer + on-demand decode |

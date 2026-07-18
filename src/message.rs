@@ -6,6 +6,14 @@ use ::bytes::{Buf, BufMut};
 use crate::error::DecodeError;
 use crate::unknown::UnknownField;
 
+/// Maximum nesting depth for nested-message decode.
+///
+/// Root messages start at depth `0`. Entering a child increments depth; when
+/// `depth >= RECURSION_LIMIT`, decode returns
+/// [`DecodeError::RecursionLimitExceeded`]. Matches the common protobuf C++
+/// default of 100.
+pub const RECURSION_LIMIT: usize = 100;
+
 /// Implemented by every generated message type (C++ `MessageLite`-like surface).
 ///
 /// Field accessors stay as inherent methods on the generated struct so that
@@ -48,12 +56,29 @@ pub trait Message: Sized {
 
     /// Reads fields from `buf` and merges them into `self`.
     ///
+    /// Equivalent to [`merge_from_with_depth`](Self::merge_from_with_depth)
+    /// with `depth = 0`.
+    ///
     /// Merge semantics (identical across proto2, proto3, editions):
     /// - Singular scalar: last value seen wins.
     /// - Singular message: recursively merged.
     /// - Repeated: each occurrence appends to the list.
     /// - Unknown fields: accumulated for round-trip preservation.
-    fn merge_from<B: Buf>(&mut self, buf: &mut B) -> Result<(), DecodeError>;
+    fn merge_from<B: Buf>(&mut self, buf: &mut B) -> Result<(), DecodeError> {
+        self.merge_from_with_depth(buf, 0)
+    }
+
+    /// Like [`merge_from`](Self::merge_from), threading decode nesting `depth`.
+    ///
+    /// Generated / catalog code must pass `depth + 1` into nested
+    /// `merge_from_with_depth` calls. Returns
+    /// [`DecodeError::RecursionLimitExceeded`] when
+    /// `depth >= `[`RECURSION_LIMIT`].
+    fn merge_from_with_depth<B: Buf>(
+        &mut self,
+        buf: &mut B,
+        depth: usize,
+    ) -> Result<(), DecodeError>;
 
     /// Decodes a complete message. Provided; requires `Self: Default`.
     fn decode<B: Buf>(mut buf: B) -> Result<Self, DecodeError>

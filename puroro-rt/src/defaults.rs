@@ -31,6 +31,14 @@ impl HasDefault<bool> for ProtoDefault {
     const DEFAULT: bool = false;
 }
 
+impl HasDefault<f32> for ProtoDefault {
+    const DEFAULT: f32 = 0.0;
+}
+
+impl HasDefault<f64> for ProtoDefault {
+    const DEFAULT: f64 = 0.0;
+}
+
 impl<'a> HasDefault<&'a str> for ProtoDefault {
     const DEFAULT: &'a str = "";
 }

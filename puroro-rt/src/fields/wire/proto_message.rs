@@ -177,6 +177,7 @@ impl<M: Message> PayloadAccess for ProtoMessage<M> {
         wire_type: WireType,
         buf: &mut B,
         _field: u32,
+        depth: usize,
     ) -> Result<(), DecodeError>
     where
         A: Allocator + Clone,
@@ -193,8 +194,11 @@ impl<M: Message> PayloadAccess for ProtoMessage<M> {
         if buf.remaining() < len {
             return Err(DecodeError::TruncatedMessage);
         }
-        let mut sub = buf.take(len);
+        // Decode from a concrete `&[u8]` rather than `Buf::take`, so recursive
+        // message types do not infinitely monomorphize nested `Take<…>` adapters.
+        let payload = buf.copy_to_bytes(len);
+        let mut sub: &[u8] = payload.as_ref();
         let child = ValueSlot::with_mut(slot, init, common).get_mut();
-        DerefMut::deref_mut(child).merge_from(&mut sub)
+        DerefMut::deref_mut(child).merge_from_with_depth(&mut sub, depth + 1)
     }
 }

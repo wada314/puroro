@@ -241,7 +241,12 @@ where
     }
 
     /// Merges one wire occurrence — appends element(s).
-    pub fn merge<B: Buf>(self, wire_type: WireType, buf: &mut B) -> Result<(), DecodeError>
+    pub fn merge<B: Buf>(
+        self,
+        wire_type: WireType,
+        buf: &mut B,
+        depth: usize,
+    ) -> Result<(), DecodeError>
     where
         T: RepeatedElementMerge<A>,
     {
@@ -249,7 +254,7 @@ where
         // SAFETY: an owned clone of the message allocator owns this vector's
         // buffer.
         let mut g = unsafe { self.field.values.with_alloc(alloc.clone()) };
-        T::merge_occurrence(wire_type, buf, alloc, |elem| {
+        T::merge_occurrence(wire_type, buf, alloc, depth, |elem| {
             g.push(elem);
         })
     }

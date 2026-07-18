@@ -488,7 +488,12 @@ where
         L::write(&mut *self.field.value, P::slot_init_mut(), self.common, v);
     }
 
-    pub fn merge<B: Buf>(self, wire_type: WireType, buf: &mut B) -> Result<(), DecodeError> {
+    pub fn merge<B: Buf>(
+        self,
+        wire_type: WireType,
+        buf: &mut B,
+        depth: usize,
+    ) -> Result<(), DecodeError> {
         L::merge(
             &mut *self.field.value,
             P::slot_init_mut(),
@@ -496,6 +501,7 @@ where
             wire_type,
             buf,
             FIELD,
+            depth,
         )
     }
 

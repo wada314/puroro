@@ -16,7 +16,7 @@ pub mod unknown;
 pub mod wire_type;
 
 pub use error::{DecodeError, EncodeError};
-pub use message::Message;
+pub use message::{Message, RECURSION_LIMIT};
 pub use optional::{HasDefault, Optional};
 pub use unknown::{UnknownField, UnknownPayload};
 pub use wire_type::WireType;

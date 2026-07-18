@@ -37,6 +37,10 @@ use crate::fields::shared::{
     value_slot::{AddressableSlot, ValueSlot, ValueSlotMutAccess},
 };
 
+use super::fixed::{
+    Fixed32ProtoType, Fixed64ProtoType, ProtoDouble, ProtoFixed32, ProtoFixed64, ProtoFloat,
+    ProtoSFixed32, ProtoSFixed64,
+};
 use super::len::{ProtoBytes, ProtoString};
 use super::varint::{
     Closed, ClosedEnum, Open, OpenEnum, ProtoBool, ProtoEnum, ProtoInt32, ProtoInt64, ProtoSint32,
@@ -160,6 +164,7 @@ pub trait PayloadAccess: ProtoType {
         wire_type: WireType,
         buf: &mut B,
         field: u32,
+        depth: usize,
     ) -> Result<(), DecodeError>
     where
         A: Allocator + Clone,
@@ -289,6 +294,7 @@ macro_rules! impl_varint_proto_type {
                 wire_type: WireType,
                 buf: &mut B,
                 field: u32,
+                _depth: usize,
             ) -> Result<(), DecodeError>
             where
                 A: Allocator + Clone,
@@ -329,6 +335,275 @@ impl_varint_proto_type!(ProtoInt32, i32);
 impl_varint_proto_type!(ProtoInt64, i64);
 impl_varint_proto_type!(ProtoSint32, i32);
 impl_varint_proto_type!(ProtoSint64, i64);
+
+// ---------------------------------------------------------------------------
+// Fixed-width markers (Slot = bare wire value)
+// ---------------------------------------------------------------------------
+
+macro_rules! impl_fixed32_proto_type {
+    ($marker:ty, $inner:ty) => {
+        impl ProtoType for $marker {
+            type Slot<A: Allocator + Clone> = $inner;
+            type Ref<'a, A: Allocator + Clone>
+                = $inner
+            where
+                Self: 'a,
+                A: 'a;
+            type Mut<'a, A: Allocator + Clone>
+                = &'a mut $inner
+            where
+                Self: 'a,
+                A: 'a;
+            type Written<A: Allocator + Clone> = $inner;
+
+            #[inline]
+            fn encoded_len<'a, A: Allocator + Clone>(_value: $inner, field: u32) -> usize
+            where
+                Self: 'a,
+                A: 'a,
+            {
+                encode::encoded_len_fixed32_field(field)
+            }
+
+            #[inline]
+            fn encode<'a, A: Allocator + Clone, B: BufMut>(value: $inner, field: u32, buf: &mut B)
+            where
+                Self: 'a,
+                A: 'a,
+            {
+                encode::encode_fixed32_field(field, value.to_le_bytes(), buf);
+            }
+        }
+
+        impl PayloadAccess for $marker {
+            #[inline]
+            fn is_proto_empty<A: Allocator + Clone, Pb: PresenceBits>(
+                slot: &$inner,
+                _common: &MessageCommon<Pb, A>,
+            ) -> bool {
+                slot.is_proto_empty()
+            }
+
+            #[inline]
+            fn get<'a, A: Allocator + Clone, Pb: PresenceBits>(
+                slot: &'a $inner,
+                _common: &'a MessageCommon<Pb, A>,
+            ) -> $inner
+            where
+                A: 'a,
+            {
+                *slot
+            }
+
+            #[inline]
+            fn with_mut<'a, A, VS, I, Pb>(
+                slot: &'a mut VS,
+                init: I,
+                common: &'a mut MessageCommon<Pb, A>,
+            ) -> &'a mut $inner
+            where
+                A: Allocator + Clone + 'a,
+                $inner: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
+                VS: ValueSlot<$inner, A>,
+                I: SlotInitMut,
+                Pb: PresenceBits,
+                Self: 'a,
+            {
+                ValueSlot::with_mut(slot, init, common).get_mut()
+            }
+
+            #[inline]
+            fn write<A, VS, I, Pb>(
+                slot: &mut VS,
+                init: I,
+                common: &mut MessageCommon<Pb, A>,
+                value: $inner,
+            ) where
+                A: Allocator + Clone,
+                $inner: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
+                VS: ValueSlot<$inner, A>,
+                I: SlotInitMut,
+                Pb: PresenceBits,
+            {
+                ValueSlot::with_mut(slot, init, common).set(value);
+            }
+
+            #[inline]
+            fn clear<A, VS, I, Pb>(slot: &mut VS, init: I, common: &mut MessageCommon<Pb, A>)
+            where
+                A: Allocator + Clone,
+                $inner: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
+                VS: ValueSlot<$inner, A>,
+                I: SlotInitMut,
+                Pb: PresenceBits,
+            {
+                ValueSlot::with_mut(slot, init, common).clear();
+            }
+
+            #[inline]
+            fn merge<A, VS, I, Pb, B>(
+                slot: &mut VS,
+                init: I,
+                common: &mut MessageCommon<Pb, A>,
+                wire_type: WireType,
+                buf: &mut B,
+                _field: u32,
+                _depth: usize,
+            ) -> Result<(), DecodeError>
+            where
+                A: Allocator + Clone,
+                $inner: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
+                VS: ValueSlot<$inner, A>,
+                I: SlotInitMut,
+                Pb: PresenceBits,
+                B: Buf,
+            {
+                if wire_type != WireType::Int32 {
+                    return Err(DecodeError::InvalidTag);
+                }
+                let new = <$marker as Fixed32ProtoType>::decode_wire(buf)?;
+                Self::write(slot, init, common, new);
+                Ok(())
+            }
+        }
+    };
+}
+
+macro_rules! impl_fixed64_proto_type {
+    ($marker:ty, $inner:ty) => {
+        impl ProtoType for $marker {
+            type Slot<A: Allocator + Clone> = $inner;
+            type Ref<'a, A: Allocator + Clone>
+                = $inner
+            where
+                Self: 'a,
+                A: 'a;
+            type Mut<'a, A: Allocator + Clone>
+                = &'a mut $inner
+            where
+                Self: 'a,
+                A: 'a;
+            type Written<A: Allocator + Clone> = $inner;
+
+            #[inline]
+            fn encoded_len<'a, A: Allocator + Clone>(_value: $inner, field: u32) -> usize
+            where
+                Self: 'a,
+                A: 'a,
+            {
+                encode::encoded_len_fixed64_field(field)
+            }
+
+            #[inline]
+            fn encode<'a, A: Allocator + Clone, B: BufMut>(value: $inner, field: u32, buf: &mut B)
+            where
+                Self: 'a,
+                A: 'a,
+            {
+                encode::encode_fixed64_field(field, value.to_le_bytes(), buf);
+            }
+        }
+
+        impl PayloadAccess for $marker {
+            #[inline]
+            fn is_proto_empty<A: Allocator + Clone, Pb: PresenceBits>(
+                slot: &$inner,
+                _common: &MessageCommon<Pb, A>,
+            ) -> bool {
+                slot.is_proto_empty()
+            }
+
+            #[inline]
+            fn get<'a, A: Allocator + Clone, Pb: PresenceBits>(
+                slot: &'a $inner,
+                _common: &'a MessageCommon<Pb, A>,
+            ) -> $inner
+            where
+                A: 'a,
+            {
+                *slot
+            }
+
+            #[inline]
+            fn with_mut<'a, A, VS, I, Pb>(
+                slot: &'a mut VS,
+                init: I,
+                common: &'a mut MessageCommon<Pb, A>,
+            ) -> &'a mut $inner
+            where
+                A: Allocator + Clone + 'a,
+                $inner: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
+                VS: ValueSlot<$inner, A>,
+                I: SlotInitMut,
+                Pb: PresenceBits,
+                Self: 'a,
+            {
+                ValueSlot::with_mut(slot, init, common).get_mut()
+            }
+
+            #[inline]
+            fn write<A, VS, I, Pb>(
+                slot: &mut VS,
+                init: I,
+                common: &mut MessageCommon<Pb, A>,
+                value: $inner,
+            ) where
+                A: Allocator + Clone,
+                $inner: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
+                VS: ValueSlot<$inner, A>,
+                I: SlotInitMut,
+                Pb: PresenceBits,
+            {
+                ValueSlot::with_mut(slot, init, common).set(value);
+            }
+
+            #[inline]
+            fn clear<A, VS, I, Pb>(slot: &mut VS, init: I, common: &mut MessageCommon<Pb, A>)
+            where
+                A: Allocator + Clone,
+                $inner: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
+                VS: ValueSlot<$inner, A>,
+                I: SlotInitMut,
+                Pb: PresenceBits,
+            {
+                ValueSlot::with_mut(slot, init, common).clear();
+            }
+
+            #[inline]
+            fn merge<A, VS, I, Pb, B>(
+                slot: &mut VS,
+                init: I,
+                common: &mut MessageCommon<Pb, A>,
+                wire_type: WireType,
+                buf: &mut B,
+                _field: u32,
+                _depth: usize,
+            ) -> Result<(), DecodeError>
+            where
+                A: Allocator + Clone,
+                $inner: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
+                VS: ValueSlot<$inner, A>,
+                I: SlotInitMut,
+                Pb: PresenceBits,
+                B: Buf,
+            {
+                if wire_type != WireType::Int64 {
+                    return Err(DecodeError::InvalidTag);
+                }
+                let new = <$marker as Fixed64ProtoType>::decode_wire(buf)?;
+                Self::write(slot, init, common, new);
+                Ok(())
+            }
+        }
+    };
+}
+
+impl_fixed32_proto_type!(ProtoFixed32, u32);
+impl_fixed32_proto_type!(ProtoSFixed32, i32);
+impl_fixed32_proto_type!(ProtoFloat, f32);
+impl_fixed64_proto_type!(ProtoFixed64, u64);
+impl_fixed64_proto_type!(ProtoSFixed64, i64);
+impl_fixed64_proto_type!(ProtoDouble, f64);
 
 // ---------------------------------------------------------------------------
 // Enum markers
@@ -449,6 +724,7 @@ macro_rules! impl_enum_proto_type {
                 wire_type: WireType,
                 buf: &mut B,
                 field: u32,
+                _depth: usize,
             ) -> Result<(), DecodeError>
             where
                 A: Allocator + Clone,
@@ -599,6 +875,7 @@ impl PayloadAccess for ProtoString {
         wire_type: WireType,
         buf: &mut B,
         _field: u32,
+        _depth: usize,
     ) -> Result<(), DecodeError>
     where
         A: Allocator + Clone,
@@ -725,6 +1002,7 @@ impl PayloadAccess for ProtoBytes {
         wire_type: WireType,
         buf: &mut B,
         _field: u32,
+        _depth: usize,
     ) -> Result<(), DecodeError>
     where
         A: Allocator + Clone,

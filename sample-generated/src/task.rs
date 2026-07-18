@@ -13,6 +13,7 @@ use ::bitvec::array::BitArray;
 use ::bitvec::order::Lsb0;
 use ::bitvec::ptr::{BitRef, Mut};
 use ::bytes::{Buf, BufMut};
+use ::core::fmt;
 use ::core::ops::DerefMut;
 
 use ::puroro::{DecodeError, HasDefault, Message, Optional};
@@ -568,6 +569,101 @@ impl<A: Allocator + Clone + Default> Default for Task<A> {
 }
 
 // ---------------------------------------------------------------------------
+// Clone / PartialEq / Debug
+// ---------------------------------------------------------------------------
+
+impl<A: Allocator + Clone> Clone for Task<A> {
+    fn clone(&self) -> Self {
+        // Round-trip through the wire codec — preserves fields and unknowns
+        // without a field-catalog `clone_in` (planned for the protoc plugin).
+        let bytes = self.encode_to_vec();
+        let mut out = Self::new_in(self._common.alloc.clone());
+        out.merge_from(&mut bytes.as_slice())
+            .expect("encode/decode round-trip for Clone");
+        out
+    }
+}
+
+impl<A: Allocator + Clone> PartialEq for Task<A> {
+    fn eq(&self, other: &Self) -> bool {
+        fn opt_eq<T: Copy + PartialEq, D: HasDefault<T>>(
+            a: Optional<T, D>,
+            b: Optional<T, D>,
+        ) -> bool {
+            a.is_set() == b.is_set() && (!a.is_set() || a.get() == b.get())
+        }
+
+        opt_eq(self.title(), other.title())
+            && self.score() == other.score()
+            && opt_eq(self.max_retries(), other.max_retries())
+            && opt_eq(self.owner_id(), other.owner_id())
+            && opt_eq(self.payload(), other.payload())
+            && self.tag_ids() == other.tag_ids()
+            && self.scores() == other.scores()
+            && self.labels().len() == other.labels().len()
+            && self
+                .labels()
+                .iter()
+                .zip(other.labels())
+                .all(|(a, b)| **a == **b)
+            && opt_eq(self.status(), other.status())
+            && opt_eq(self.priority(), other.priority())
+            && self.assignee() == other.assignee()
+            && self.done() == other.done()
+            && opt_eq(self.flag(), other.flag())
+            && self.watchers() == other.watchers()
+            && self.votes() == other.votes()
+            && notification_eq(self.notification().as_ref(), other.notification().as_ref())
+            && self._common.unknown_fields.as_ref() == other._common.unknown_fields.as_ref()
+    }
+}
+
+fn notification_eq<'a, A: Allocator + Clone>(
+    a: Option<NotificationRef<'a, A>>,
+    b: Option<NotificationRef<'a, A>>,
+) -> bool {
+    match (a, b) {
+        (None, None) => true,
+        (Some(Notification::EmailAddress(x)), Some(Notification::EmailAddress(y))) => x == y,
+        (Some(Notification::PhoneNumber(x)), Some(Notification::PhoneNumber(y))) => x == y,
+        (Some(Notification::WebhookId(x)), Some(Notification::WebhookId(y))) => x == y,
+        (Some(Notification::Postal(x)), Some(Notification::Postal(y))) => x == y,
+        (Some(Notification::Urgent(x)), Some(Notification::Urgent(y))) => x == y,
+        _ => false,
+    }
+}
+
+impl<A: Allocator + Clone> fmt::Debug for Task<A> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        fn opt<T: Copy + fmt::Debug, D: HasDefault<T>>(v: Optional<T, D>) -> Option<T> {
+            if v.is_set() { Some(v.get()) } else { None }
+        }
+
+        f.debug_struct("Task")
+            .field("title", &opt(self.title()))
+            .field("score", &self.score())
+            .field("max_retries", &opt(self.max_retries()))
+            .field("owner_id", &opt(self.owner_id()))
+            .field("payload", &opt(self.payload()))
+            .field("tag_ids", &self.tag_ids())
+            .field("scores", &self.scores())
+            .field(
+                "labels",
+                &self.labels().iter().map(|s| &**s).collect::<Vec<_>>(),
+            )
+            .field("status", &opt(self.status()))
+            .field("priority", &opt(self.priority()))
+            .field("assignee", &self.assignee())
+            .field("notification_case", &self.notification_case())
+            .field("done", &self.done())
+            .field("flag", &opt(self.flag()))
+            .field("watchers", &self.watchers())
+            .field("votes", &self.votes())
+            .finish()
+    }
+}
+
+// ---------------------------------------------------------------------------
 // Drop — releases every unmanaged field through the single allocator
 // ---------------------------------------------------------------------------
 
@@ -649,7 +745,14 @@ impl<A: Allocator + Clone> Message for Task<A> {
         buf.put_slice(unknown);
     }
 
-    fn merge_from<B: Buf>(&mut self, buf: &mut B) -> Result<(), DecodeError> {
+    fn merge_from_with_depth<B: Buf>(
+        &mut self,
+        buf: &mut B,
+        depth: usize,
+    ) -> Result<(), DecodeError> {
+        if depth >= ::puroro::RECURSION_LIMIT {
+            return Err(DecodeError::RecursionLimitExceeded);
+        }
         while buf.has_remaining() {
             let (field_number, wire_type) = decode_tag(buf)?;
             match field_number {
@@ -657,67 +760,67 @@ impl<A: Allocator + Clone> Message for Task<A> {
                     // title = 1, EXPLICIT string
                     self.title
                         .bind_mut(&mut self._common)
-                        .merge(wire_type, buf)?;
+                        .merge(wire_type, buf, depth)?;
                 }
                 FIELD_SCORE => {
                     // score = 2, IMPLICIT int32
                     self.score
                         .bind_mut(&mut self._common)
-                        .merge(wire_type, buf)?;
+                        .merge(wire_type, buf, depth)?;
                 }
                 FIELD_MAX_RETRIES => {
                     // max_retries = 3, EXPLICIT int32
                     self.max_retries
                         .bind_mut(&mut self._common)
-                        .merge(wire_type, buf)?;
+                        .merge(wire_type, buf, depth)?;
                 }
                 FIELD_OWNER_ID => {
                     // owner_id = 4, LEGACY_REQUIRED string
                     self.owner_id
                         .bind_mut(&mut self._common)
-                        .merge(wire_type, buf)?;
+                        .merge(wire_type, buf, depth)?;
                 }
                 FIELD_PAYLOAD => {
                     // payload = 5, EXPLICIT bytes
                     self.payload
                         .bind_mut(&mut self._common)
-                        .merge(wire_type, buf)?;
+                        .merge(wire_type, buf, depth)?;
                 }
                 FIELD_TAG_IDS => {
                     // tag_ids = 6, repeated int32 PACKED
                     self.tag_ids
                         .bind_mut(&mut self._common)
-                        .merge(wire_type, buf)?;
+                        .merge(wire_type, buf, depth)?;
                 }
                 FIELD_SCORES => {
                     // scores = 7, repeated int32 EXPANDED
                     self.scores
                         .bind_mut(&mut self._common)
-                        .merge(wire_type, buf)?;
+                        .merge(wire_type, buf, depth)?;
                 }
                 FIELD_LABELS => {
                     // labels = 8, repeated string
                     self.labels
                         .bind_mut(&mut self._common)
-                        .merge(wire_type, buf)?;
+                        .merge(wire_type, buf, depth)?;
                 }
                 FIELD_STATUS => {
                     // status = 9, IMPLICIT open enum
                     self.status
                         .bind_mut(&mut self._common)
-                        .merge(wire_type, buf)?;
+                        .merge(wire_type, buf, depth)?;
                 }
                 FIELD_PRIORITY => {
                     // priority = 10, EXPLICIT closed enum
                     self.priority
                         .bind_mut(&mut self._common)
-                        .merge(wire_type, buf)?;
+                        .merge(wire_type, buf, depth)?;
                 }
                 FIELD_ASSIGNEE => {
                     // assignee = 11, nested message
                     self.assignee
                         .bind_mut(&mut self._common)
-                        .merge(wire_type, buf)?;
+                        .merge(wire_type, buf, depth)?;
                 }
                 FIELD_EMAIL_ADDRESS => {
                     // notification.email_address = 12, oneof LEN string
@@ -725,7 +828,7 @@ impl<A: Allocator + Clone> Message for Task<A> {
                         .bind_mut(&mut self._common)
                         .variant_mut::<EmailAddress>()
                         .bind_mut(&mut self._common)
-                        .merge(wire_type, buf)?;
+                        .merge(wire_type, buf, depth)?;
                 }
                 FIELD_PHONE_NUMBER => {
                     // notification.phone_number = 13, oneof LEN string
@@ -733,7 +836,7 @@ impl<A: Allocator + Clone> Message for Task<A> {
                         .bind_mut(&mut self._common)
                         .variant_mut::<PhoneNumber>()
                         .bind_mut(&mut self._common)
-                        .merge(wire_type, buf)?;
+                        .merge(wire_type, buf, depth)?;
                 }
                 FIELD_WEBHOOK_ID => {
                     // notification.webhook_id = 14, oneof VARINT int32
@@ -741,7 +844,7 @@ impl<A: Allocator + Clone> Message for Task<A> {
                         .bind_mut(&mut self._common)
                         .variant_mut::<WebhookId>()
                         .bind_mut(&mut self._common)
-                        .merge(wire_type, buf)?;
+                        .merge(wire_type, buf, depth)?;
                 }
                 FIELD_POSTAL => {
                     // notification.postal = 15, oneof nested message
@@ -749,19 +852,19 @@ impl<A: Allocator + Clone> Message for Task<A> {
                         .bind_mut(&mut self._common)
                         .variant_mut::<Postal>()
                         .bind_mut(&mut self._common)
-                        .merge(wire_type, buf)?;
+                        .merge(wire_type, buf, depth)?;
                 }
                 FIELD_DONE => {
                     // done = 16, IMPLICIT bool
                     self.done
                         .bind_mut(&mut self._common)
-                        .merge(wire_type, buf)?;
+                        .merge(wire_type, buf, depth)?;
                 }
                 FIELD_FLAG => {
                     // flag = 17, EXPLICIT bool
                     self.flag
                         .bind_mut(&mut self._common)
-                        .merge(wire_type, buf)?;
+                        .merge(wire_type, buf, depth)?;
                 }
                 FIELD_URGENT => {
                     // notification.urgent = 18, oneof bool
@@ -769,19 +872,19 @@ impl<A: Allocator + Clone> Message for Task<A> {
                         .bind_mut(&mut self._common)
                         .variant_mut::<Urgent>()
                         .bind_mut(&mut self._common)
-                        .merge(wire_type, buf)?;
+                        .merge(wire_type, buf, depth)?;
                 }
                 FIELD_WATCHERS => {
                     // watchers = 19, repeated Address
                     self.watchers
                         .bind_mut(&mut self._common)
-                        .merge(wire_type, buf)?;
+                        .merge(wire_type, buf, depth)?;
                 }
                 FIELD_VOTES => {
                     // votes = 20, repeated bool PACKED
                     self.votes
                         .bind_mut(&mut self._common)
-                        .merge(wire_type, buf)?;
+                        .merge(wire_type, buf, depth)?;
                 }
                 _ => {
                     // unknown field — preserve in _common.unknown_fields

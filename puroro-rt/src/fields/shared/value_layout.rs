@@ -69,6 +69,7 @@ where
         wire_type: ::puroro::WireType,
         buf: &mut B,
         field: u32,
+        depth: usize,
     ) -> Result<(), DecodeError>
     where
         VS: ValueSlot<T::Slot<A>, A>,
@@ -146,6 +147,7 @@ where
         wire_type: ::puroro::WireType,
         buf: &mut B,
         field: u32,
+        depth: usize,
     ) -> Result<(), DecodeError>
     where
         VS: ValueSlot<T::Slot<A>, A>,
@@ -153,7 +155,7 @@ where
         Pb: PresenceBits,
         B: Buf,
     {
-        T::merge(slot, init, common, wire_type, buf, field)
+        T::merge(slot, init, common, wire_type, buf, field, depth)
     }
 }
 
@@ -225,6 +227,7 @@ where
         wire_type: WireType,
         buf: &mut B,
         field: u32,
+        _depth: usize,
     ) -> Result<(), DecodeError>
     where
         VS: ValueSlot<(), A>,
