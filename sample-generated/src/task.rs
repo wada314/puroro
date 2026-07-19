@@ -16,17 +16,19 @@ use ::bytes::{Buf, BufMut};
 use ::core::fmt;
 use ::core::mem;
 use ::core::ops::ControlFlow;
-use ::core::ops::DerefMut;
+use ::core::ops::{Deref, DerefMut};
 
-use ::puroro::{DecodeError, HasDefault, Message, Optional};
+use ::puroro::{
+    DecodeError, HasDefault, MapMut, MapRef, Message, OneofView, OneofViewMut, Optional,
+    RepeatedStringMut,
+};
 use ::puroro_rt::decode::{decode_tag, skip_field_and_save};
 use ::puroro_rt::{
     BitPacked, CloneFieldsVisitor, CloneIn, Closed, DebugStructVisitor, EncodeRawVisitor,
     EncodedLenVisitor, Expanded, Explicit, FieldDeallocVisitor, FieldEqVisitor, FieldPairVisitor,
     FieldPairVisitorMut, FieldVisitor, FieldVisitorMut, Implicit, Inline, LegacyRequired, MapField,
-    MapFieldMut, MapFieldRef, MessageCommon, NonOneof, OneofSlot, Open, Packed, PresenceBits,
-    ProtoBool, ProtoBytes, ProtoEnum, ProtoInt32, ProtoMessage, ProtoString, RepeatedElementsMut,
-    RepeatedField, SingularField,
+    MessageCommon, NonOneof, OneofSlot, Open, Packed, PresenceBits, ProtoBool, ProtoBytes,
+    ProtoEnum, ProtoInt32, ProtoMessage, ProtoString, RepeatedField, SingularField,
 };
 
 use defaults::MaxRetriesDefault;
@@ -194,7 +196,7 @@ impl<A: Allocator + Clone> Task<A> {
         self.title.bind(&self._common).optional()
     }
 
-    pub fn title_mut<'s>(&'s mut self) -> impl DerefMut<Target = ::puroro_rt::String<A>> + 's {
+    pub fn title_mut<'s>(&'s mut self) -> impl DerefMut<Target = ::puroro::String<A>> + 's {
         self.title.bind_mut(&mut self._common).value_mut()
     }
 
@@ -242,7 +244,7 @@ impl<A: Allocator + Clone> Task<A> {
         self.owner_id.bind(&self._common).optional()
     }
 
-    pub fn owner_id_mut<'s>(&'s mut self) -> impl DerefMut<Target = ::puroro_rt::String<A>> + 's {
+    pub fn owner_id_mut<'s>(&'s mut self) -> impl DerefMut<Target = ::puroro::String<A>> + 's {
         self.owner_id.bind_mut(&mut self._common).value_mut()
     }
 
@@ -297,13 +299,13 @@ impl<A: Allocator + Clone> Task<A> {
 
     // -- labels (repeated string, proto field 8) -----------------------------
 
-    pub fn labels(&self) -> &[::puroro_rt::UnmanagedString<A>] {
+    pub fn labels(&self) -> &[impl Deref<Target = str>] {
         self.labels.bind(&self._common).as_slice()
     }
 
     /// Container mutator: `push()` appends an empty string and returns a
-    /// [`::puroro_rt::String`] handle ([`RepeatedContainerMut`](::puroro_rt::RepeatedContainerMut)).
-    pub fn labels_mut(&mut self) -> RepeatedElementsMut<'_, ProtoString, A> {
+    /// [`::puroro::String`] handle.
+    pub fn labels_mut(&mut self) -> impl RepeatedStringMut<A> + '_ {
         self.labels.bind_mut(&mut self._common).container_mut()
     }
 
@@ -420,15 +422,11 @@ impl<A: Allocator + Clone> Task<A> {
 
     // -- attributes (map<string, int32>, proto field 21) ---------------------
 
-    pub fn attributes(
-        &self,
-    ) -> MapFieldRef<'_, ProtoString, ProtoInt32, { FIELD_ATTRIBUTES }, A, TaskPresence> {
+    pub fn attributes(&self) -> impl MapRef<str, i32> + '_ {
         self.attributes.bind(&self._common)
     }
 
-    pub fn attributes_mut(
-        &mut self,
-    ) -> MapFieldMut<'_, '_, ProtoString, ProtoInt32, { FIELD_ATTRIBUTES }, A, TaskPresence> {
+    pub fn attributes_mut(&mut self) -> impl MapMut<str, i32> + '_ {
         self.attributes.bind_mut(&mut self._common)
     }
 
@@ -446,27 +444,17 @@ impl<A: Allocator + Clone> Task<A> {
     /// Bound shared view of the oneof group (always available, including when unset).
     pub fn notification<'a>(
         &'a self,
-    ) -> ::puroro_rt::OneofView<
-        'a,
-        impl ::puroro_rt::OneofGroup<
-            Case = NotificationCase,
-            Ref<'a> = NotificationRef<'a, A>,
-            Mut<'a> = NotificationMut<'a, A>,
-        >,
-    > {
+    ) -> impl OneofView<Case = NotificationCase, Ref = NotificationRef<'a, A>> + 'a {
         ::puroro_rt::OneofView::<NotificationStorage<A>>::new(&self.notification, &self._common)
     }
 
     /// Bound mutable view of the oneof group (always available, including when unset).
     ///
-    /// RPIT omits `Ref` so `as_view` reborrows stay short-lived; match shared
-    /// payloads via [`Self::notification`].
+    /// Use [`OneofViewMut::as_view`] to reborrow for `case` / `as_ref` while mutating;
+    /// match shared payloads via [`Self::notification`].
     pub fn notification_mut<'a>(
         &'a mut self,
-    ) -> ::puroro_rt::OneofViewMut<
-        'a,
-        impl ::puroro_rt::OneofGroup<Case = NotificationCase, Mut<'a> = NotificationMut<'a, A>>,
-    > {
+    ) -> impl OneofViewMut<Case = NotificationCase, Mut = NotificationMut<'a, A>> + 'a {
         ::puroro_rt::OneofViewMut::<NotificationStorage<A>>::new(
             &mut self.notification,
             &mut self._common,
@@ -490,7 +478,7 @@ impl<A: Allocator + Clone> Task<A> {
             .optional()
     }
 
-    pub fn email_address_mut(&mut self) -> impl DerefMut<Target = ::puroro_rt::String<A>> + '_ {
+    pub fn email_address_mut(&mut self) -> impl DerefMut<Target = ::puroro::String<A>> + '_ {
         self.notification
             .bind_mut(&mut self._common)
             .variant_mut::<EmailAddress>()
@@ -510,7 +498,7 @@ impl<A: Allocator + Clone> Task<A> {
             .optional()
     }
 
-    pub fn phone_number_mut(&mut self) -> impl DerefMut<Target = ::puroro_rt::String<A>> + '_ {
+    pub fn phone_number_mut(&mut self) -> impl DerefMut<Target = ::puroro::String<A>> + '_ {
         self.notification
             .bind_mut(&mut self._common)
             .variant_mut::<PhoneNumber>()

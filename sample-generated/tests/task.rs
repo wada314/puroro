@@ -4,7 +4,9 @@
 //! wire/merge behaviour, oneof accessors (no wire), and enum merge /
 //! unknown-field handling.
 
-use ::puroro::{Message, UnknownPayload};
+use ::puroro::{
+    MapMut, MapRef, Message, OneofView, OneofViewMut, RepeatedStringMut, UnknownPayload,
+};
 use ::puroro_rt::encode::encode_varint_field;
 use ::puroro_sample_generated::task::{Notification, NotificationCase};
 use ::puroro_sample_generated::{Address, Priority, Status, Task};
@@ -488,9 +490,11 @@ fn oneof_group_bound_views_when_unset() {
     task.owner_id_mut().push_str("user-1");
 
     // Bound views are always available, including when the group is unset.
-    let view = task.notification();
-    assert!(view.case().is_none());
-    assert!(view.as_ref().is_none());
+    {
+        let view = task.notification();
+        assert!(view.case().is_none());
+        assert!(view.as_ref().is_none());
+    }
 
     let view_mut = task.notification_mut();
     assert!(view_mut.as_view().case().is_none());

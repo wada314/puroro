@@ -16,6 +16,7 @@ use ::allocator_api2::alloc::Allocator;
 use ::bytes::BufMut;
 use ::core::fmt::{self, Debug, Formatter, Result as FmtResult};
 use ::puroro::{HasDefault, Optional};
+use ::puroro::{OneofView as OneofViewTrait, OneofViewMut as OneofViewMutTrait};
 use ::unmanaged::UnmanagedBox;
 
 use ::unmanaged::DeallocateIn;
@@ -583,6 +584,24 @@ where
     }
 }
 
+impl<'a, G: OneofGroup> OneofViewTrait for OneofView<'a, G>
+where
+    G: OneofDeallocate<G::Presence, G::Alloc>,
+{
+    type Case = G::Case;
+    type Ref = G::Ref<'a>;
+
+    #[inline]
+    fn case(&self) -> Option<Self::Case> {
+        OneofView::case(self)
+    }
+
+    #[inline]
+    fn as_ref(&self) -> Option<Self::Ref> {
+        OneofView::as_ref(self)
+    }
+}
+
 /// Mutable bound view of a oneof group (slot + [`MessageCommon`]).
 ///
 /// Returned by generated `notification_mut()`-style accessors even when unset.
@@ -640,5 +659,44 @@ where
     #[inline]
     pub fn clear(self) {
         self.slot.bind_mut(self.common).clear();
+    }
+}
+
+impl<'a, G: OneofGroup> OneofViewMutTrait for OneofViewMut<'a, G>
+where
+    G: OneofDeallocate<G::Presence, G::Alloc>,
+{
+    type Case = G::Case;
+
+    type Ref<'b>
+        = G::Ref<'b>
+    where
+        Self: 'b;
+
+    type Mut = G::Mut<'a>;
+
+    type Shared<'b>
+        = OneofView<'b, G>
+    where
+        Self: 'b;
+
+    #[inline]
+    fn as_view(&self) -> Self::Shared<'_> {
+        OneofViewMut::as_view(self)
+    }
+
+    #[inline]
+    fn case(&self) -> Option<Self::Case> {
+        OneofViewMut::case(self)
+    }
+
+    #[inline]
+    fn as_mut(self) -> Option<Self::Mut> {
+        OneofViewMut::as_mut(self)
+    }
+
+    #[inline]
+    fn clear(self) {
+        OneofViewMut::clear(self);
     }
 }

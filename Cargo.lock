@@ -106,6 +106,7 @@ dependencies = [
  "allocator-api2",
  "bytes",
  "protobuf-core",
+ "unmanaged",
 ]
 
 [[package]]

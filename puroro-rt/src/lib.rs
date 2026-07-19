@@ -10,10 +10,10 @@ pub mod encode;
 pub(crate) mod fields;
 
 pub use ::protobuf_core::FieldNumber;
-/// Allocator-less containers / traits used by generated messages.
+/// Generator-facing re-exports from `unmanaged`.
 ///
-/// Generated code should take these from `puroro_rt` rather than depending on
-/// the `unmanaged` crate directly.
+/// Library users of generated messages should prefer [`puroro::String`](::puroro::String)
+/// (and other `puroro` traits) in public signatures; these remain for catalog code.
 pub use ::unmanaged::{CloneIn, DeallocateIn, String, UnmanagedString};
 pub use defaults::ProtoDefault;
 pub use fields::enum_variant::EnumVariant;
@@ -24,7 +24,7 @@ pub use fields::oneof::{
 };
 pub use fields::repeated::{
     Expanded, Packed, RepeatedContainerMut, RepeatedElementsMut, RepeatedEncoding, RepeatedField,
-    RepeatedFieldMut, RepeatedFieldRef,
+    RepeatedFieldMut, RepeatedFieldRef, RepeatedStringMut,
 };
 pub use fields::shared::field_presence::{
     Explicit, FieldPresence, Implicit, LegacyRequired, NonOneof, Oneof, RequiredFieldPresence,

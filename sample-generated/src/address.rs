@@ -100,7 +100,7 @@ impl<A: Allocator + Clone> Address<A> {
         self.street.bind(&self._common).optional()
     }
 
-    pub fn street_mut<'s>(&'s mut self) -> impl DerefMut<Target = ::puroro_rt::String<A>> + 's {
+    pub fn street_mut<'s>(&'s mut self) -> impl DerefMut<Target = ::puroro::String<A>> + 's {
         self.street.bind_mut(&mut self._common).value_mut()
     }
 
@@ -117,7 +117,7 @@ impl<A: Allocator + Clone> Address<A> {
         self.city.bind(&self._common).optional()
     }
 
-    pub fn city_mut<'s>(&'s mut self) -> impl DerefMut<Target = ::puroro_rt::String<A>> + 's {
+    pub fn city_mut<'s>(&'s mut self) -> impl DerefMut<Target = ::puroro::String<A>> + 's {
         self.city.bind_mut(&mut self._common).value_mut()
     }
 

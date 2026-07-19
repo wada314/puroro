@@ -13,7 +13,7 @@ use ::bytes::{Buf, BufMut};
 use ::hashbrown::Equivalent;
 use ::unmanaged::CloneIn;
 
-use ::puroro::{DecodeError, WireType};
+use ::puroro::{DecodeError, MapMut, MapRef, WireType};
 
 use crate::decode;
 use crate::encode;
@@ -23,6 +23,7 @@ use crate::fields::wire::map_element::MapKey;
 use crate::fields::wire::repeated_element::{
     RepeatedElement, RepeatedElementMerge, RepeatedSlicePush,
 };
+use crate::fields::wire::{ProtoInt32, ProtoString};
 
 use super::entries::MapEntries;
 use super::entry::{decode_map_entry, encode_map_entry, entry_payload_len};
@@ -259,6 +260,23 @@ where
     }
 }
 
+impl<'a, const FIELD: u32, A, Pb> MapRef<str, i32>
+    for MapFieldRef<'a, ProtoString, ProtoInt32, FIELD, A, Pb>
+where
+    A: Allocator + Clone,
+    Pb: PresenceBits,
+{
+    #[inline]
+    fn len(&self) -> usize {
+        self.field.len()
+    }
+
+    #[inline]
+    fn get(&self, key: &str) -> Option<&i32> {
+        self.field.entries.get(key)
+    }
+}
+
 /// Short-lived binding of a map field to its message common state.
 pub struct MapFieldMut<'f, 'c, K, V, const FIELD: u32, A, Pb>
 where
@@ -350,6 +368,25 @@ where
         }
     }
 
+    #[inline]
+    pub fn len(&self) -> usize {
+        self.field.len()
+    }
+
+    #[inline]
+    pub fn is_empty(&self) -> bool {
+        self.field.is_empty()
+    }
+
+    #[inline]
+    pub fn get<Q>(&self, key: &Q) -> Option<&V::Element<A>>
+    where
+        K::Element<A>: Eq + Hash,
+        Q: ?Sized + Hash + Equivalent<K::Element<A>>,
+    {
+        self.field.entries.get(key)
+    }
+
     /// Merges one map-entry LEN occurrence (last-wins on duplicate keys).
     pub fn merge<B: Buf>(
         &mut self,
@@ -377,6 +414,43 @@ where
         let (key, value) = decode_map_entry::<K, V, A, _>(&mut sub, alloc, depth)?;
         self.insert(key, value);
         Ok(())
+    }
+}
+
+impl<'f, 'c, const FIELD: u32, A, Pb> MapMut<str, i32>
+    for MapFieldMut<'f, 'c, ProtoString, ProtoInt32, FIELD, A, Pb>
+where
+    A: Allocator + Clone,
+    Pb: PresenceBits,
+{
+    #[inline]
+    fn len(&self) -> usize {
+        self.field.len()
+    }
+
+    #[inline]
+    fn get(&self, key: &str) -> Option<&i32> {
+        self.field.entries.get(key)
+    }
+
+    #[inline]
+    fn get_mut(&mut self, key: &str) -> Option<&mut i32> {
+        self.field.entries.get_mut(key)
+    }
+
+    #[inline]
+    fn insert_in(&mut self, key: impl AsRef<[u8]>, value: i32) -> Result<(), DecodeError> {
+        MapFieldMut::insert_in(self, key, value)
+    }
+
+    #[inline]
+    fn remove(&mut self, key: &str) {
+        MapFieldMut::remove(self, key);
+    }
+
+    #[inline]
+    fn clear(&mut self) {
+        MapFieldMut::clear(self);
     }
 }
 
