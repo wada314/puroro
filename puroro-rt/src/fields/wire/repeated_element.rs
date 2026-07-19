@@ -10,6 +10,8 @@
 
 use ::allocator_api2::alloc::Allocator;
 use ::bytes::{Buf, BufMut};
+use ::core::ops::DerefMut;
+use ::core::str;
 use ::unmanaged::{UnmanagedString, UnmanagedVec};
 
 use ::puroro::{DecodeError, Message, WireType};
@@ -109,7 +111,8 @@ pub trait PackableRepeatedElement: RepeatedElement {
 /// Elements that may be mutated through a growable `Vec` (`values_mut`).
 ///
 /// Implemented for copy scalars / enums and nested messages. Not implemented
-/// for string / bytes (those use [`RepeatedSlicePush::element_from_slice`]).
+/// for string / bytes (those use [`RepeatedSlicePush::element_from_slice`] or
+/// [`RepeatedElementMut`] via [`RepeatedContainerMut`](crate::fields::repeated::container::RepeatedContainerMut)).
 pub trait RepeatedVecMut: RepeatedElement {}
 
 /// Repeated string / bytes — elements built from a byte slice (`push_*`).
@@ -118,6 +121,30 @@ pub trait RepeatedSlicePush: RepeatedElement {
         v: &[u8],
         alloc: A,
     ) -> Result<Self::Element<A>, DecodeError>;
+}
+
+/// How to obtain a mutable element handle for
+/// [`RepeatedContainerMut`](crate::fields::repeated::container::RepeatedContainerMut).
+///
+/// Usually matches singular [`ProtoType::Mut`], except [`ProtoBool`] (singular
+/// is bit-packed; repeated stores plain `bool`).
+pub trait RepeatedElementMut: RepeatedElement {
+    /// Mutable handle for one repeated element.
+    type ElementMut<'a, A: Allocator + Clone>: DerefMut
+    where
+        Self: 'a,
+        A: 'a;
+
+    /// # Safety
+    ///
+    /// `alloc` must own `elem`'s heap storage when the element is heap-backed
+    /// (string / bytes). Ignored for copy scalars and inline messages.
+    unsafe fn element_mut<'a, A: Allocator + Clone + 'a>(
+        elem: &'a mut Self::Element<A>,
+        alloc: A,
+    ) -> Self::ElementMut<'a, A>
+    where
+        Self: 'a;
 }
 
 // ---------------------------------------------------------------------------
@@ -232,6 +259,25 @@ macro_rules! impl_packable_varint_repeated {
         }
 
         impl RepeatedVecMut for $marker {}
+
+        impl RepeatedElementMut for $marker {
+            type ElementMut<'a, A: Allocator + Clone>
+                = &'a mut $inner
+            where
+                Self: 'a,
+                A: 'a;
+
+            #[inline]
+            unsafe fn element_mut<'a, A: Allocator + Clone + 'a>(
+                elem: &'a mut $inner,
+                _alloc: A,
+            ) -> &'a mut $inner
+            where
+                Self: 'a,
+            {
+                elem
+            }
+        }
     };
 }
 
@@ -349,6 +395,25 @@ macro_rules! impl_packable_enum_repeated {
         }
 
         impl<E: $bound> RepeatedVecMut for ProtoEnum<E, $kind> {}
+
+        impl<E: $bound> RepeatedElementMut for ProtoEnum<E, $kind> {
+            type ElementMut<'a, A: Allocator + Clone>
+                = &'a mut E
+            where
+                Self: 'a,
+                A: 'a;
+
+            #[inline]
+            unsafe fn element_mut<'a, A: Allocator + Clone + 'a>(
+                elem: &'a mut E,
+                _alloc: A,
+            ) -> &'a mut E
+            where
+                Self: 'a,
+            {
+                elem
+            }
+        }
     };
 }
 
@@ -453,6 +518,25 @@ macro_rules! impl_packable_fixed32_repeated {
         }
 
         impl RepeatedVecMut for $marker {}
+
+        impl RepeatedElementMut for $marker {
+            type ElementMut<'a, A: Allocator + Clone>
+                = &'a mut $inner
+            where
+                Self: 'a,
+                A: 'a;
+
+            #[inline]
+            unsafe fn element_mut<'a, A: Allocator + Clone + 'a>(
+                elem: &'a mut $inner,
+                _alloc: A,
+            ) -> &'a mut $inner
+            where
+                Self: 'a,
+            {
+                elem
+            }
+        }
     };
 }
 
@@ -550,6 +634,25 @@ macro_rules! impl_packable_fixed64_repeated {
         }
 
         impl RepeatedVecMut for $marker {}
+
+        impl RepeatedElementMut for $marker {
+            type ElementMut<'a, A: Allocator + Clone>
+                = &'a mut $inner
+            where
+                Self: 'a,
+                A: 'a;
+
+            #[inline]
+            unsafe fn element_mut<'a, A: Allocator + Clone + 'a>(
+                elem: &'a mut $inner,
+                _alloc: A,
+            ) -> &'a mut $inner
+            where
+                Self: 'a,
+            {
+                elem
+            }
+        }
     };
 }
 
@@ -569,7 +672,7 @@ impl RepeatedElement for ProtoString {
 
     #[inline]
     fn encoded_len_element<A: Allocator + Clone>(elem: &UnmanagedString<A>, field: u32) -> usize {
-        encode::encoded_len_len_field(field, elem.as_bytes().len())
+        encode::encoded_len_len_field(field, elem.len())
     }
 
     #[inline]
@@ -630,8 +733,28 @@ impl RepeatedSlicePush for ProtoString {
         v: &[u8],
         alloc: A,
     ) -> Result<UnmanagedString<A>, DecodeError> {
-        let s = ::core::str::from_utf8(v).map_err(|_| DecodeError::InvalidUtf8)?;
+        let s = str::from_utf8(v).map_err(|_| DecodeError::InvalidUtf8)?;
         Ok(decode::str_to_unmanaged_in(s, alloc))
+    }
+}
+
+impl RepeatedElementMut for ProtoString {
+    type ElementMut<'a, A: Allocator + Clone>
+        = <Self as ProtoType>::Mut<'a, A>
+    where
+        Self: 'a,
+        A: 'a;
+
+    #[inline]
+    unsafe fn element_mut<'a, A: Allocator + Clone + 'a>(
+        elem: &'a mut UnmanagedString<A>,
+        alloc: A,
+    ) -> Self::ElementMut<'a, A>
+    where
+        Self: 'a,
+    {
+        // SAFETY: caller guarantees `alloc` owns `elem`'s buffer.
+        unsafe { elem.with_alloc(alloc) }
     }
 }
 
@@ -702,6 +825,26 @@ impl RepeatedSlicePush for ProtoBytes {
         alloc: A,
     ) -> Result<UnmanagedVec<u8, A>, DecodeError> {
         Ok(decode::bytes_to_unmanaged_in(v, alloc))
+    }
+}
+
+impl RepeatedElementMut for ProtoBytes {
+    type ElementMut<'a, A: Allocator + Clone>
+        = <Self as ProtoType>::Mut<'a, A>
+    where
+        Self: 'a,
+        A: 'a;
+
+    #[inline]
+    unsafe fn element_mut<'a, A: Allocator + Clone + 'a>(
+        elem: &'a mut UnmanagedVec<u8, A>,
+        alloc: A,
+    ) -> Self::ElementMut<'a, A>
+    where
+        Self: 'a,
+    {
+        // SAFETY: caller guarantees `alloc` owns `elem`'s buffer.
+        unsafe { elem.with_alloc(alloc) }
     }
 }
 
@@ -786,3 +929,19 @@ where
 }
 
 impl<M: Message> RepeatedVecMut for ProtoMessage<M> {}
+
+impl<M: Message> RepeatedElementMut for ProtoMessage<M> {
+    type ElementMut<'a, A: Allocator + Clone>
+        = &'a mut M
+    where
+        Self: 'a,
+        A: 'a;
+
+    #[inline]
+    unsafe fn element_mut<'a, A: Allocator + Clone + 'a>(elem: &'a mut M, _alloc: A) -> &'a mut M
+    where
+        Self: 'a,
+    {
+        elem
+    }
+}

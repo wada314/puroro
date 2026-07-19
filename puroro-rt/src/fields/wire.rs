@@ -21,8 +21,8 @@ pub use map_element::MapKey;
 pub use proto_message::ProtoMessage;
 pub use proto_type::{PayloadAccess, ProtoType};
 pub use repeated_element::{
-    PackableRepeatedElement, RepeatedElement, RepeatedElementMerge, RepeatedSlicePush,
-    RepeatedVecMut,
+    PackableRepeatedElement, RepeatedElement, RepeatedElementMerge, RepeatedElementMut,
+    RepeatedSlicePush, RepeatedVecMut,
 };
 pub use varint::{
     Closed, ClosedEnum, Open, OpenEnum, ProtoBool, ProtoEnum, ProtoEnumStorage, ProtoInt32,

@@ -18,7 +18,8 @@ pub use fields::oneof::{
     OneofVariantRef, OneofView, OneofViewMut,
 };
 pub use fields::repeated::{
-    Expanded, Packed, RepeatedEncoding, RepeatedField, RepeatedFieldMut, RepeatedFieldRef,
+    Expanded, Packed, RepeatedContainerMut, RepeatedElementsMut, RepeatedEncoding, RepeatedField,
+    RepeatedFieldMut, RepeatedFieldRef,
 };
 pub use fields::shared::field_presence::{
     Explicit, FieldPresence, Implicit, LegacyRequired, NonOneof, Oneof, RequiredFieldPresence,
@@ -33,6 +34,6 @@ pub use fields::wire::{
     PackableRepeatedElement, PayloadAccess, ProtoBool, ProtoBytes, ProtoDouble, ProtoEnum,
     ProtoEnumStorage, ProtoFixed32, ProtoFixed64, ProtoFloat, ProtoInt32, ProtoInt64, ProtoMessage,
     ProtoSFixed32, ProtoSFixed64, ProtoSint32, ProtoSint64, ProtoString, ProtoType, ProtoUInt32,
-    ProtoUInt64, RepeatedElement, RepeatedElementMerge, RepeatedSlicePush, RepeatedVecMut,
-    VarintProtoType,
+    ProtoUInt64, RepeatedElement, RepeatedElementMerge, RepeatedElementMut, RepeatedSlicePush,
+    RepeatedVecMut, VarintProtoType,
 };

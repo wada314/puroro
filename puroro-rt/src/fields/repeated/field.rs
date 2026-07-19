@@ -17,9 +17,10 @@ use ::puroro::WireType;
 
 use crate::fields::shared::{FieldDeallocate, MessageCommon, PresenceBits};
 use crate::fields::wire::repeated_element::{
-    RepeatedElement, RepeatedElementMerge, RepeatedSlicePush, RepeatedVecMut,
+    RepeatedElement, RepeatedElementMerge, RepeatedElementMut, RepeatedSlicePush, RepeatedVecMut,
 };
 
+use super::container::RepeatedElementsMut;
 use super::encoding::RepeatedEncoding;
 
 /// Repeated field parametrised by type marker `T`, encode policy `E`, and allocator `A`.
@@ -230,6 +231,20 @@ where
         // SAFETY: an owned clone of the message allocator owns this vector's
         // buffer.
         unsafe { self.field.values.with_alloc(alloc) }
+    }
+
+    /// Minimal container mutator ([`RepeatedContainerMut`](super::container::RepeatedContainerMut)).
+    ///
+    /// Works for string / bytes as well as scalars and messages: [`push`](super::container::RepeatedContainerMut::push)
+    /// appends a default element and returns a singular-style mut handle.
+    pub fn container_mut(self) -> RepeatedElementsMut<'f, T, A>
+    where
+        T: RepeatedElementMut + RepeatedElementMerge<A>,
+    {
+        let alloc = self.common.alloc.clone();
+        // SAFETY: an owned clone of the message allocator owns this vector's
+        // buffer.
+        RepeatedElementsMut::new(unsafe { self.field.values.with_alloc(alloc) })
     }
 
     /// Appends an element built from a payload slice (`repeated string` / `bytes`).

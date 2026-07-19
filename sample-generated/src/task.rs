@@ -22,7 +22,7 @@ use ::puroro_rt::{
     BitPacked, Closed, Expanded, Explicit, FieldDeallocate, Implicit, Inline, LegacyRequired,
     MapField, MapFieldMut, MapFieldRef, MessageCommon, NonOneof, OneofSlot, Open, Packed,
     PresenceBits, ProtoBool, ProtoBytes, ProtoEnum, ProtoInt32, ProtoMessage, ProtoString,
-    RepeatedField, SingularField,
+    RepeatedElementsMut, RepeatedField, SingularField,
 };
 use ::unmanaged::CloneIn;
 
@@ -298,10 +298,10 @@ impl<A: Allocator + Clone> Task<A> {
         self.labels.bind(&self._common).as_slice()
     }
 
-    /// Typed append helper for repeated LEN fields (the `_mut` accessor would
-    /// expose allocator-less element storage, which is impractical to build).
-    pub fn push_label(&mut self, v: &str) {
-        self.labels.bind_mut(&mut self._common).push_in(v).ok();
+    /// Container mutator: `push()` appends an empty string and returns a
+    /// [`::unmanaged::String`] handle ([`RepeatedContainerMut`](::puroro_rt::RepeatedContainerMut)).
+    pub fn labels_mut(&mut self) -> RepeatedElementsMut<'_, ProtoString, A> {
+        self.labels.bind_mut(&mut self._common).container_mut()
     }
 
     pub fn clear_labels(&mut self) {

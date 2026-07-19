@@ -84,19 +84,17 @@ pub trait ProtoType: Sized {
     type Written<A: Allocator + Clone>;
 
     /// Wire byte length of one tagged occurrence for `value`.
-    fn encoded_len<'a, A: Allocator + Clone>(value: Self::Ref<'a, A>, field: u32) -> usize
+    fn encoded_len<'a, A: Allocator + Clone + 'a>(value: Self::Ref<'a, A>, field: u32) -> usize
     where
-        Self: 'a,
-        A: 'a;
+        Self: 'a;
 
     /// Encodes one tagged occurrence for `value`.
-    fn encode<'a, A: Allocator + Clone, B: BufMut>(
+    fn encode<'a, A: Allocator + Clone + 'a, B: BufMut>(
         value: Self::Ref<'a, A>,
         field: u32,
         buf: &mut B,
     ) where
-        Self: 'a,
-        A: 'a;
+        Self: 'a;
 }
 
 /// Inline payload access for markers whose value lives in [`ProtoType::Slot`].
@@ -111,12 +109,10 @@ pub trait PayloadAccess: ProtoType {
     ) -> bool;
 
     /// Reads the logical getter view from the slot and/or `common`.
-    fn get<'a, A: Allocator + Clone, Pb: PresenceBits>(
+    fn get<'a, A: Allocator + Clone + 'a, Pb: PresenceBits>(
         slot: &'a Self::Slot<A>,
         common: &'a MessageCommon<Pb, A>,
-    ) -> Self::Ref<'a, A>
-    where
-        A: 'a;
+    ) -> Self::Ref<'a, A>;
 
     /// Ensures the slot is present and returns a mutable accessor handle.
     fn with_mut<'a, A, VS, I, Pb>(
@@ -199,10 +195,9 @@ macro_rules! impl_varint_proto_type {
             type Written<A: Allocator + Clone> = $inner;
 
             #[inline]
-            fn encoded_len<'a, A: Allocator + Clone>(value: $inner, field: u32) -> usize
+            fn encoded_len<'a, A: Allocator + Clone + 'a>(value: $inner, field: u32) -> usize
             where
                 Self: 'a,
-                A: 'a,
             {
                 encode::encoded_len_varint_field(
                     field,
@@ -211,10 +206,12 @@ macro_rules! impl_varint_proto_type {
             }
 
             #[inline]
-            fn encode<'a, A: Allocator + Clone, B: BufMut>(value: $inner, field: u32, buf: &mut B)
-            where
+            fn encode<'a, A: Allocator + Clone + 'a, B: BufMut>(
+                value: $inner,
+                field: u32,
+                buf: &mut B,
+            ) where
                 Self: 'a,
-                A: 'a,
             {
                 encode::encode_varint_field(
                     field,
@@ -234,13 +231,10 @@ macro_rules! impl_varint_proto_type {
             }
 
             #[inline]
-            fn get<'a, A: Allocator + Clone, Pb: PresenceBits>(
+            fn get<'a, A: Allocator + Clone + 'a, Pb: PresenceBits>(
                 slot: &'a $inner,
                 _common: &'a MessageCommon<Pb, A>,
-            ) -> $inner
-            where
-                A: 'a,
-            {
+            ) -> $inner {
                 *slot
             }
 
@@ -360,19 +354,20 @@ macro_rules! impl_fixed32_proto_type {
             type Written<A: Allocator + Clone> = $inner;
 
             #[inline]
-            fn encoded_len<'a, A: Allocator + Clone>(_value: $inner, field: u32) -> usize
+            fn encoded_len<'a, A: Allocator + Clone + 'a>(_value: $inner, field: u32) -> usize
             where
                 Self: 'a,
-                A: 'a,
             {
                 encode::encoded_len_fixed32_field(field)
             }
 
             #[inline]
-            fn encode<'a, A: Allocator + Clone, B: BufMut>(value: $inner, field: u32, buf: &mut B)
-            where
+            fn encode<'a, A: Allocator + Clone + 'a, B: BufMut>(
+                value: $inner,
+                field: u32,
+                buf: &mut B,
+            ) where
                 Self: 'a,
-                A: 'a,
             {
                 encode::encode_fixed32_field(field, value.to_le_bytes(), buf);
             }
@@ -388,13 +383,10 @@ macro_rules! impl_fixed32_proto_type {
             }
 
             #[inline]
-            fn get<'a, A: Allocator + Clone, Pb: PresenceBits>(
+            fn get<'a, A: Allocator + Clone + 'a, Pb: PresenceBits>(
                 slot: &'a $inner,
                 _common: &'a MessageCommon<Pb, A>,
-            ) -> $inner
-            where
-                A: 'a,
-            {
+            ) -> $inner {
                 *slot
             }
 
@@ -489,19 +481,20 @@ macro_rules! impl_fixed64_proto_type {
             type Written<A: Allocator + Clone> = $inner;
 
             #[inline]
-            fn encoded_len<'a, A: Allocator + Clone>(_value: $inner, field: u32) -> usize
+            fn encoded_len<'a, A: Allocator + Clone + 'a>(_value: $inner, field: u32) -> usize
             where
                 Self: 'a,
-                A: 'a,
             {
                 encode::encoded_len_fixed64_field(field)
             }
 
             #[inline]
-            fn encode<'a, A: Allocator + Clone, B: BufMut>(value: $inner, field: u32, buf: &mut B)
-            where
+            fn encode<'a, A: Allocator + Clone + 'a, B: BufMut>(
+                value: $inner,
+                field: u32,
+                buf: &mut B,
+            ) where
                 Self: 'a,
-                A: 'a,
             {
                 encode::encode_fixed64_field(field, value.to_le_bytes(), buf);
             }
@@ -517,13 +510,10 @@ macro_rules! impl_fixed64_proto_type {
             }
 
             #[inline]
-            fn get<'a, A: Allocator + Clone, Pb: PresenceBits>(
+            fn get<'a, A: Allocator + Clone + 'a, Pb: PresenceBits>(
                 slot: &'a $inner,
                 _common: &'a MessageCommon<Pb, A>,
-            ) -> $inner
-            where
-                A: 'a,
-            {
+            ) -> $inner {
                 *slot
             }
 
@@ -629,10 +619,9 @@ macro_rules! impl_enum_proto_type {
             type Written<A: Allocator + Clone> = E;
 
             #[inline]
-            fn encoded_len<'a, A: Allocator + Clone>(value: E, field: u32) -> usize
+            fn encoded_len<'a, A: Allocator + Clone + 'a>(value: E, field: u32) -> usize
             where
                 Self: 'a,
-                A: 'a,
             {
                 encode::encoded_len_varint_field(
                     field,
@@ -641,10 +630,9 @@ macro_rules! impl_enum_proto_type {
             }
 
             #[inline]
-            fn encode<'a, A: Allocator + Clone, B: BufMut>(value: E, field: u32, buf: &mut B)
+            fn encode<'a, A: Allocator + Clone + 'a, B: BufMut>(value: E, field: u32, buf: &mut B)
             where
                 Self: 'a,
-                A: 'a,
             {
                 encode::encode_varint_field(
                     field,
@@ -664,13 +652,10 @@ macro_rules! impl_enum_proto_type {
             }
 
             #[inline]
-            fn get<'a, A: Allocator + Clone, Pb: PresenceBits>(
+            fn get<'a, A: Allocator + Clone + 'a, Pb: PresenceBits>(
                 slot: &'a E,
                 _common: &'a MessageCommon<Pb, A>,
-            ) -> E
-            where
-                A: 'a,
-            {
+            ) -> E {
                 *slot
             }
 
@@ -784,19 +769,17 @@ impl ProtoType for ProtoString {
     type Written<A: Allocator + Clone> = UnmanagedString<A>;
 
     #[inline]
-    fn encoded_len<'a, A: Allocator + Clone>(value: &'a str, field: u32) -> usize
+    fn encoded_len<'a, A: Allocator + Clone + 'a>(value: &'a str, field: u32) -> usize
     where
         Self: 'a,
-        A: 'a,
     {
         encode::encoded_len_len_field(field, value.len())
     }
 
     #[inline]
-    fn encode<'a, A: Allocator + Clone, B: BufMut>(value: &'a str, field: u32, buf: &mut B)
+    fn encode<'a, A: Allocator + Clone + 'a, B: BufMut>(value: &'a str, field: u32, buf: &mut B)
     where
         Self: 'a,
-        A: 'a,
     {
         encode::encode_len_field(field, value.as_bytes(), buf);
     }
@@ -812,13 +795,10 @@ impl PayloadAccess for ProtoString {
     }
 
     #[inline]
-    fn get<'a, A: Allocator + Clone, Pb: PresenceBits>(
+    fn get<'a, A: Allocator + Clone + 'a, Pb: PresenceBits>(
         slot: &'a UnmanagedString<A>,
         _common: &'a MessageCommon<Pb, A>,
-    ) -> &'a str
-    where
-        A: 'a,
-    {
+    ) -> &'a str {
         slot
     }
 
@@ -911,19 +891,17 @@ impl ProtoType for ProtoBytes {
     type Written<A: Allocator + Clone> = UnmanagedVec<u8, A>;
 
     #[inline]
-    fn encoded_len<'a, A: Allocator + Clone>(value: &'a [u8], field: u32) -> usize
+    fn encoded_len<'a, A: Allocator + Clone + 'a>(value: &'a [u8], field: u32) -> usize
     where
         Self: 'a,
-        A: 'a,
     {
         encode::encoded_len_len_field(field, value.len())
     }
 
     #[inline]
-    fn encode<'a, A: Allocator + Clone, B: BufMut>(value: &'a [u8], field: u32, buf: &mut B)
+    fn encode<'a, A: Allocator + Clone + 'a, B: BufMut>(value: &'a [u8], field: u32, buf: &mut B)
     where
         Self: 'a,
-        A: 'a,
     {
         encode::encode_len_field(field, value, buf);
     }
@@ -939,13 +917,10 @@ impl PayloadAccess for ProtoBytes {
     }
 
     #[inline]
-    fn get<'a, A: Allocator + Clone, Pb: PresenceBits>(
+    fn get<'a, A: Allocator + Clone + 'a, Pb: PresenceBits>(
         slot: &'a UnmanagedVec<u8, A>,
         _common: &'a MessageCommon<Pb, A>,
-    ) -> &'a [u8]
-    where
-        A: 'a,
-    {
+    ) -> &'a [u8] {
         slot
     }
 
@@ -1042,19 +1017,17 @@ impl ProtoType for ProtoBool {
     type Written<A: Allocator + Clone> = bool;
 
     #[inline]
-    fn encoded_len<'a, A: Allocator + Clone>(value: bool, field: u32) -> usize
+    fn encoded_len<'a, A: Allocator + Clone + 'a>(value: bool, field: u32) -> usize
     where
         Self: 'a,
-        A: 'a,
     {
         encode::encoded_len_varint_field(field, Self::encode_wire(value))
     }
 
     #[inline]
-    fn encode<'a, A: Allocator + Clone, B: BufMut>(value: bool, field: u32, buf: &mut B)
+    fn encode<'a, A: Allocator + Clone + 'a, B: BufMut>(value: bool, field: u32, buf: &mut B)
     where
         Self: 'a,
-        A: 'a,
     {
         encode::encode_varint_field(field, Self::encode_wire(value), buf);
     }

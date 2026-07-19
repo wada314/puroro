@@ -85,19 +85,17 @@ impl<M: Message> ProtoType for ProtoMessage<M> {
     type Written<A: Allocator + Clone> = UnmanagedBox<M, A>;
 
     #[inline]
-    fn encoded_len<'a, A: Allocator + Clone>(value: &'a M, field: u32) -> usize
+    fn encoded_len<'a, A: Allocator + Clone + 'a>(value: &'a M, field: u32) -> usize
     where
         Self: 'a,
-        A: 'a,
     {
         encode::encoded_len_len_field(field, value.encoded_len())
     }
 
     #[inline]
-    fn encode<'a, A: Allocator + Clone, B: BufMut>(value: &'a M, field: u32, buf: &mut B)
+    fn encode<'a, A: Allocator + Clone + 'a, B: BufMut>(value: &'a M, field: u32, buf: &mut B)
     where
         Self: 'a,
-        A: 'a,
     {
         let payload_len = value.encoded_len();
         encode::encode_tag(field, WireType::Len, buf);
@@ -116,13 +114,10 @@ impl<M: Message> PayloadAccess for ProtoMessage<M> {
     }
 
     #[inline]
-    fn get<'a, A: Allocator + Clone, Pb: PresenceBits>(
+    fn get<'a, A: Allocator + Clone + 'a, Pb: PresenceBits>(
         slot: &'a UnmanagedBox<M, A>,
         _common: &'a MessageCommon<Pb, A>,
-    ) -> &'a M
-    where
-        A: 'a,
-    {
+    ) -> &'a M {
         Deref::deref(slot)
     }
 

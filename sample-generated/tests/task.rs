@@ -82,7 +82,7 @@ fn task_fields_roundtrip() {
     task.tag_ids_mut().push(10);
     task.tag_ids_mut().push(20);
     task.scores_mut().push(1);
-    task.push_label("urgent");
+    task.labels_mut().push().push_str("urgent");
     *task.status_mut() = Status::PENDING;
     *task.priority_mut() = Priority::HIGH;
     *task.done_mut() = true;
@@ -339,7 +339,7 @@ fn repeated_merge_appends() {
     let mut task = Task::new();
     task.tag_ids_mut().push(1);
     task.scores_mut().push(10);
-    task.push_label("a");
+    task.labels_mut().push().push_str("a");
     let mut w0 = Address::new();
     w0.city_mut().push_str("A");
     task.watchers_mut().push(w0);
@@ -349,7 +349,7 @@ fn repeated_merge_appends() {
     other.tag_ids_mut().push(2);
     other.tag_ids_mut().push(3);
     other.scores_mut().push(20);
-    other.push_label("b");
+    other.labels_mut().push().push_str("b");
     let mut w1 = Address::new();
     w1.city_mut().push_str("B");
     other.watchers_mut().push(w1);
@@ -375,7 +375,7 @@ fn repeated_clear_omits_from_wire() {
     task.owner_id_mut().push_str("user-1");
     task.tag_ids_mut().push(1);
     task.scores_mut().push(2);
-    task.push_label("x");
+    task.labels_mut().push().push_str("x");
     let mut w = Address::new();
     w.street_mut().push_str("gone");
     task.watchers_mut().push(w);
