@@ -9,7 +9,7 @@ This document specifies the **public interface** of the `puroro` Protocol Buffer
 2. [Wire format overview](#2-wire-format-overview)
 3. [Runtime trait API](#3-runtime-trait-api)
 4. [Generated code specification](#4-generated-code-specification)
-   - 4.0 [Generated per-message traits](#40-generated-per-message-traits)
+   - 4.0 [Inherent accessors (current)](#40-inherent-accessors-current)
    - 4.1 [Scalar fields](#41-scalar-fields) — implicit vs explicit presence
    - 4.2 [String fields](#42-string-fields)
    - 4.3 [Bytes fields](#43-bytes-fields)
@@ -33,6 +33,7 @@ This document specifies the **public interface** of the `puroro` Protocol Buffer
    - 6.5 [Extensions (not yet implemented)](#65-extensions-not-yet-implemented)
 7. [Design decisions and trade-offs](#7-design-decisions-and-trade-offs)
 8. [Future work](#8-future-work)
+   - 8.0 [Per-message traits (not yet generated)](#per-message-traits-not-yet-generated)
    - 8.1 [Specialized message implementations](#specialized-message-implementations) (`TaskLazy<A>`, `TaskView<'buf>`) — includes [lazy parse timing](#tasklaya--lazy-parse-timing)
    - 8.2 [Other future work](#other-future-work)
 
@@ -109,7 +110,7 @@ The **`puroro`** crate exposes the shared [`Message`](#message) trait and the ac
 
 ```rust
 /// Implemented by a zero-sized struct that carries a compile-time default.
-/// The implementing struct is defined locally inside each accessor method.
+/// `D` is the field wrapper's default marker (`ProtoDefault` or a custom ZST).
 pub trait HasDefault<T: Copy> {
     const DEFAULT: T;
 }
@@ -146,8 +147,6 @@ if task.max_retries().is_set() {
 }
 ```
 
-The concrete `D` type is a private zero-sized struct defined locally inside the accessor method body.  The return type uses `impl HasDefault<T>` to keep `D` opaque:
-
 ```rust
 pub fn max_retries(&self) -> Optional<i32, impl HasDefault<i32>> { … }
 pub fn title<'s>(&'s self) -> Optional<&'s str, impl HasDefault<&'s str>> { … }
@@ -158,7 +157,9 @@ let s: &str = task.title().get();
 if task.max_retries().is_set() { … }
 ```
 
-**Lazy implementations (`TaskLazy`).** On the eager path, `Optional::new` receives `Some(value)` or `None` derived from the internal presence bitfield and value slot.  On the lazy path, getters **wire-scan** the stored buffer and semantically decode on demand; the `Optional` getter returns `Err` before constructing `Optional` if decode fails (e.g. `InvalidUtf8`).  `has_*()` may wire-scan for presence without semantic decode.  See [§8 — `TaskLazy` lazy parse timing](#tasklaya--lazy-parse-timing).
+**Lazy implementations (`TaskLazy`).** On the eager path, `Optional::new` receives `Some(value)` or `None` derived from the internal presence bitfield and value slot.  On the lazy path (future, [§8](#tasklaya--lazy-parse-timing)), getters **wire-scan** the stored buffer and semantically decode on demand; a fallible getter would return `Err` before constructing `Optional` if decode fails (e.g. `InvalidUtf8`). Presence checks via `optional().is_set()` may wire-scan without semantic decode.
+
+The concrete `D` type is the field wrapper's default marker (`ProtoDefault`, or a message-local ZST such as `MaxRetriesDefault` for `[default = 3]`). Callers never name it: accessors return `Optional<…, impl HasDefault<T>>`.
 
 ### `Message`
 
@@ -172,9 +173,14 @@ pub trait Message: Sized {
     // Codec (required)
     fn encoded_len(&self) -> usize;
     fn encode_raw<B: bytes::BufMut>(&self, buf: &mut B);
-    fn merge_from<B: bytes::Buf>(&mut self, buf: &mut B) -> Result<(), DecodeError>;
+    fn merge_from_with_depth<B: bytes::Buf>(
+        &mut self,
+        buf: &mut B,
+        depth: usize,
+    ) -> Result<(), DecodeError>;
 
     // Codec (provided)
+    fn merge_from<B: bytes::Buf>(&mut self, buf: &mut B) -> Result<(), DecodeError>; // depth = 0
     fn encode_to_vec(&self) -> Vec<u8>;
     fn encode_to_bytes(&self) -> bytes::Bytes;
     fn decode<B: bytes::Buf>(buf: B) -> Result<Self, DecodeError>
@@ -187,7 +193,7 @@ pub trait Message: Sized {
 }
 ```
 
-`encode_raw` / `merge_from` are generic over `BufMut` / `Buf` so the compiler can monomorphise; the trait is **non-object-safe** by design.
+`encode_raw` / `merge_from` / `merge_from_with_depth` are generic over `BufMut` / `Buf` so the compiler can monomorphise; the trait is **non-object-safe** by design. Generated `impl`s implement `merge_from_with_depth`; `merge_from` is the depth-0 default.
 
 **Merge semantics** (identical across proto2, proto3, editions): singular scalar — last wins; singular message — recursive merge; repeated — append; unknown fields — accumulated for round-trip.
 
@@ -203,154 +209,50 @@ pub trait Message: Sized {
 
 This section is the normative reference for what the code generator emits. All field patterns are illustrated using a single **editions** reference schema, since editions can express every variant (implicit/explicit presence, custom defaults, required-like semantics, open/closed enums, packed/expanded repeated) in one file.
 
-For each message type the code generator produces **three kinds of output**:
+For each message type the code generator currently produces:
 
-1. **Two traits** — a stable API contract that multiple implementations satisfy (§4.0).
-2. **The primary struct** — a full-featured owned implementation (§4.1–4.10), internally a product of **`puroro_rt::fields` catalog types** + shared `MessageCommon` (see [IMPLEMENTATION.md §2](IMPLEMENTATION.md#2-architecture-overview)).
-3. **(Future) Specialized structs** — alternative implementations for specific performance scenarios (§8).
+1. **The primary struct** — a full-featured owned implementation (§4.0–4.10), internally a product of **`puroro_rt::fields` catalog types** + shared `MessageCommon` (see [IMPLEMENTATION.md §2](IMPLEMENTATION.md#2-architecture-overview)). Field accessors are **inherent methods** on that struct.
+2. **(Future) Per-message traits + specialized structs** — `FooMessage` / `FooMessageFallible` and alternative layouts (`TaskLazy`, `TaskView`) for generic interoperability across implementations ([§8](#8-future-work)). They are **not** emitted today; [`sample-generated/`](sample-generated/) is the normative shape for the eager path.
 
 Generated Rust is not hand-edited; the plugin still emits **section banners, proto field labels, and `merge_from` dispatch comments** so build output is navigable when debugging. Convention: [IMPLEMENTATION.md §9 — Generated code comments](IMPLEMENTATION.md#generated-code-comments). Reference output: [`sample-generated/`](sample-generated/).
 
 ---
 
-### 4.0 Generated per-message traits
+### 4.0 Inherent accessors (current)
 
-For each message the generator emits two traits. User code that is generic over a message type depends on these traits, not on any concrete struct.
+The normative generated API is the concrete message struct's inherent `impl` block. There are **no** generated `FooMessage` / `FooMessageFallible` traits yet (planned in [§8](#8-future-work)). Callers use the concrete type (or [`Message`](#message) for codec / infrastructure).
 
-#### `FooMessage` — infallible, for eager implementations
+**Read / write shape (eager `Task<A>`):**
 
-All accessors succeed unconditionally.  The primary struct `Task<A>` implements this trait.
+| Field kind | Getter | Mutator | Clear |
+|---|---|---|---|
+| IMPLICIT scalar (`score`, `done`) | bare value (`i32`, `bool`, …) | `*_mut()` → `impl DerefMut<Target = T>` | `clear_*()` |
+| EXPLICIT / LEGACY_REQUIRED scalar, string, bytes, enum | `Optional<…, impl HasDefault<…>>` | `*_mut()` → `impl DerefMut<Target = …>` | `clear_*()` |
+| IMPLICIT open enum (`status`) | `Optional` (`is_set` when non-zero) | `*_mut()` → `impl DerefMut<Target = E>` | `clear_*()` |
+| Nested message (`assignee`) | `Option<&M<A>>` | `*_mut()` → `&mut M<A>` (creates if absent) | `clear_*()` |
+| Repeated packable / message | `&[T]` / `&[M<A>]` | `*_mut()` → `impl DerefMut<Target = Vec<T, A>>` (`allocator_api2`) | `clear_*()` |
+| Repeated string / bytes | `&[UnmanagedString<A>]` / `&[UnmanagedVec<u8, A>]` | `*_mut()` → `RepeatedElementsMut` (`push` then fill) | `clear_*()` |
+| Map | `MapFieldRef<…>` | `MapFieldMut<…>` | `clear_*()` (or `*_mut().clear()`) |
+| Oneof group | `OneofView` / `notification_case()` | `OneofViewMut` + per-variant `*_mut()` | `clear_notification()` |
 
-```rust
-// Generated for: message Task { … }
-pub trait TaskMessage {
-    // IMPLICIT scalar — always returns a value
-    fn score(&self) -> i32;
-
-    // EXPLICIT scalar — Optional is the required accessor; _raw / has_ are trait defaults
-    fn max_retries(&self) -> Optional<i32, impl HasDefault<i32>>;
-    fn max_retries_raw(&self) -> i32 { self.max_retries().get() }
-    fn has_max_retries(&self) -> bool { self.max_retries().is_set() }
-
-    // EXPLICIT string — same pattern
-    fn title<'s>(&'s self) -> Optional<&'s str, impl HasDefault<&'s str>>;
-    fn title_raw<'s>(&'s self) -> &'s str { self.title().get() }
-    fn has_title(&self) -> bool { self.title().is_set() }
-    fn set_title(&mut self, v: &str);
-    fn clear_title(&mut self);
-
-    // Repeated scalar — slice reference (O(1) random access)
-    fn tag_ids(&self) -> &[i32];
-    fn push_tag_id(&mut self, v: i32);
-    fn clear_tag_ids(&mut self);
-
-    // Repeated string — iterator of str references (implementation-agnostic)
-    fn labels(&self) -> impl Iterator<Item = &str> + '_;
-    fn push_label(&mut self, v: &str);
-    fn clear_labels(&mut self);
-
-    // Nested message
-    fn assignee(&self) -> Option<&impl AddressMessage>;
-    fn assignee_mut(&mut self) -> &mut impl AddressMessage;
-    fn has_assignee(&self) -> bool;
-
-    // Open enum (IMPLICIT) — Optional; `is_set` when wire value is non-zero
-    fn status(&self) -> Optional<Status, impl HasDefault<Status>>;
-
-    // Closed enum (EXPLICIT) — Optional; `has_` is a trait default
-    fn priority(&self) -> Optional<Priority, impl HasDefault<Priority>>;
-    fn has_priority(&self) -> bool {
-        self.priority().is_set()
-    }
-
-    // Oneof
-    fn notification(&self) -> Option<&task::Notification<impl Allocator>>;
-    fn set_notification(&mut self, v: Option<task::Notification<impl Allocator>>);
-
-    // Map — bound views (same idiom as other catalog fields)
-    fn attributes(&self) -> /* MapFieldRef<…> */;
-    fn attributes_mut(&mut self) -> /* MapFieldMut<…> */;
-    fn clear_attributes(&mut self);
-}
-```
-
-#### `FooMessageFallible` — Result-returning, for lazy implementations
-
-All accessors return `Result`; even presence checks may fail (e.g., if the field has not yet been parsed from the wire).  The primary struct `Task<A>` also implements this trait with `Error = Infallible`.
-
-Explicit-presence fields mirror [`TaskMessage`](#foomessage--infallible-for-eager-implementations): the **`Optional` accessor is the required method**; `_raw` and `has_` accessors are **provided as default implementations** that delegate to it.
+Presence for EXPLICIT fields is checked with `field().is_set()` / `field().get()` — there are **no** generated `has_*`, `*_raw`, `set_*`, or `push_*` helpers. Mutation is entirely via `_mut` (+ `clear_*`); see also [§5.1 Mutation API](#51-chosen-design-single-type-parameter).
 
 ```rust
-pub trait TaskMessageFallible {
-    type Error;
+// EXPLICIT string
+let s: &str = task.title().get();
+if task.title().is_set() { … }
+task.title_mut().push_str("Fix bug");
+task.clear_title();
 
-    fn score(&self) -> Result<i32, Self::Error>;
+// IMPLICIT scalar
+*task.score_mut() = 42;
 
-    // EXPLICIT scalar — Optional is the required accessor
-    fn max_retries(&self) -> Result<Optional<i32, impl HasDefault<i32>>, Self::Error>;
-    fn max_retries_raw(&self) -> Result<i32, Self::Error> {
-        Ok(self.max_retries()?.get())
-    }
-    fn has_max_retries(&self) -> Result<bool, Self::Error> {
-        Ok(self.max_retries()?.is_set())
-    }
+// Repeated packable
+task.tag_ids_mut().push(7);
 
-    // EXPLICIT string — same pattern
-    fn title<'s>(&'s self) -> Result<Optional<&'s str, impl HasDefault<&'s str>>, Self::Error>;
-    fn title_raw<'s>(&'s self) -> Result<&'s str, Self::Error> {
-        Ok(self.title()?.get())
-    }
-    fn has_title(&self) -> Result<bool, Self::Error> {
-        Ok(self.title()?.is_set())
-    }
-
-    // EXPLICIT bytes — same pattern (field 5: payload)
-    fn payload<'s>(&'s self) -> Result<Optional<&'s [u8], impl HasDefault<&'s [u8]>>, Self::Error>;
-    fn payload_raw<'s>(&'s self) -> Result<&'s [u8], Self::Error> {
-        Ok(self.payload()?.get())
-    }
-    fn has_payload(&self) -> Result<bool, Self::Error> {
-        Ok(self.payload()?.is_set())
-    }
-
-    // LEGACY_REQUIRED string — same Optional pattern as EXPLICIT (field 4: owner_id)
-    fn owner_id<'s>(&'s self) -> Result<Optional<&'s str, impl HasDefault<&'s str>>, Self::Error>;
-    fn owner_id_raw<'s>(&'s self) -> Result<&'s str, Self::Error> {
-        Ok(self.owner_id()?.get())
-    }
-    fn has_owner_id(&self) -> Result<bool, Self::Error> {
-        Ok(self.owner_id()?.is_set())
-    }
-
-    // Repeated: lazy iterator; early termination is possible
-    fn tag_ids(&self) -> impl Iterator<Item = Result<i32, Self::Error>> + '_;
-    fn labels(&self) -> impl Iterator<Item = Result<&str, Self::Error>> + '_;
-
-    // Nested message — the sub-message is also fallible
-    fn assignee(&self) -> Result<Option<impl AddressMessageFallible<Error = Self::Error>>, Self::Error>;
-
-    fn status(&self) -> Result<Optional<Status, impl HasDefault<Status>>, Self::Error>;
-    fn priority(&self) -> Result<Optional<Priority, impl HasDefault<Priority>>, Self::Error>;
-    fn has_priority(&self) -> Result<bool, Self::Error> {
-        Ok(self.priority()?.is_set())
-    }
-}
+// Repeated string — allocator-less elements
+task.labels_mut().push().push_str("urgent");
 ```
-
-> **Trait default methods for explicit presence.**  On both `TaskMessage` and `TaskMessageFallible`, generated traits emit `_raw` and `has_` as **default method bodies** that call the `Optional` accessor.  Concrete `impl` blocks only need to implement the `Optional`-returning method (plus any field-specific logic).  Native methods on the struct (§4.0 note below) may still expose all three names for ergonomics, but trait implementors inherit the defaults for free.
-
-#### Primary struct implements both
-
-For **`Task<A>`** (eager):
-
-- **`TaskMessage`** — implement required accessors; `_raw` / `has_` for explicit-presence fields inherit trait defaults.
-- **`TaskMessageFallible`** — `type Error = Infallible`; wrap each infallible accessor in `Ok(…)`. Explicit-presence fallible getters return `Ok(TaskMessage::field(self))` for the `Optional` accessor.
-
-Using `Infallible` signals at compile time that generic code over `TaskMessageFallible` never encounters a real error when given `Task<A>`.
-
-On **`TaskLazy<A>`**, the same trait signatures apply, but getters wire-scan `_wire` and decode on demand. Explicit-presence getters return `Err` before constructing `Optional` on semantic failure. `has_*()` wire-scans for presence only. See [§8 — `TaskLazy`](#tasklaya--lazy-parse-timing).
-
-> **Native methods vs trait methods.** Each concrete struct also has a native `impl` block. Traits are the interoperability contract; native methods may expose richer APIs (e.g. `&[i32]` instead of an iterator on the trait, mutation helpers not on the trait). Same pattern as `Vec<T>` implementing `Iterator` while also providing `push` and `sort`.
 
 ---
 
@@ -437,6 +339,12 @@ message Task {
         bool    urgent        = 18;  // bool variant
     }
 
+    // Field 16: IMPLICIT bool
+    bool done = 16 [features.field_presence = IMPLICIT];
+
+    // Field 17: EXPLICIT bool (edition default presence)
+    bool flag = 17;
+
     // Field 19: Repeated nested message (cannot be packed; EXPANDED)
     repeated Address watchers = 19;
 
@@ -462,33 +370,36 @@ The key variation for scalars is **field presence**.
 
 Equivalent to proto3's default singular scalar behaviour.
 
-- Value accessor: `fn score(&self) -> i32`
-- Setter: `fn set_score(&mut self, v: i32)`
-- Wire rule: field absent from the wire when value equals the type-zero (`0`, `false`, `0.0`).
+```rust
+pub fn score(&self) -> i32;
+pub fn score_mut(&mut self) -> impl DerefMut<Target = i32> + '_;
+pub fn clear_score(&mut self);
+```
+
+Wire rule: field absent from the wire when value equals the type-zero (`0`, `false`, `0.0`).
+
+Singular `bool` uses the same accessor shape; storage is bit-packed into the message presence bitfield (see [IMPLEMENTATION.md §10](IMPLEMENTATION.md#10-presence--bool-value-bit-indices)).
 
 #### Explicit presence (`features.field_presence = EXPLICIT`, edition 2024 default)
 
-Equivalent to proto2 `optional`. Presence is tracked independently of value.
-The **`Optional` accessor is the primary API**; `_raw` and `has_` are convenience accessors provided as **default methods on generated traits** (see [§4.0](#40-generated-per-message-traits)):
+Equivalent to proto2 `optional`. Presence is tracked independently of value. The **`Optional` accessor is the primary read API**; mutation uses `_mut` / `clear_*` (no generated `has_*`, `*_raw`, or `set_*`):
 
 | Method | Return type | Description |
 |---|---|---|
-| `max_retries()` | `Optional<i32, impl HasDefault<i32>>` | **Required** trait method — `get()` and `is_set()` |
-| `max_retries_raw()` | `i32` | Trait **default** — `self.max_retries().get()` |
-| `has_max_retries()` | `bool` | Trait **default** — `self.max_retries().is_set()` |
+| `max_retries()` | `Optional<i32, impl HasDefault<i32>>` | `get()` and `is_set()` |
+| `max_retries_mut()` | `impl DerefMut<Target = i32>` | Sets the presence bit on acquire |
+| `clear_max_retries()` | `()` | Clears the presence bit |
 
-- Setter: `fn set_max_retries(&mut self, v: i32)` — makes `has_max_retries()` true
-- Clearer: `fn clear_max_retries(&mut self)` — makes `has_max_retries()` false
-- Wire rule: field absent when `has_max_retries()` is `false`; present even when the value is zero.
+Wire rule: field absent when `max_retries().is_set()` is `false`; present even when the value is zero.
 
-The `[default = 3]` option means `max_retries().get()` and `max_retries_raw()` return `3` when unset.
+The `[default = 3]` option means `max_retries().get()` returns `3` when unset (field wrapper `D = MaxRetriesDefault`).
 
 Because `Optional` is a concrete struct with no custom `Drop`, chaining compiles directly:
 
 ```rust
 let n: i32 = task.max_retries().get();  // value or default
 if task.max_retries().is_set() { … }    // presence check
-let n: i32 = task.max_retries_raw();   // bypasses Optional
+*task.max_retries_mut() = 5;
 ```
 
 #### Scalar type mapping
@@ -509,34 +420,31 @@ Both presence modes apply uniformly across every entry in this table.
 
 ### 4.2 String fields
 
-String fields always yield a borrowed `&str`. The internal storage type is an implementation detail.
+String getters yield a borrowed `&str` (via `Optional::get` when presence-tracked). Mutation returns an allocator-aware string guard.
 
 **Implicit presence:**
 
-- Accessor: `fn name(&self) -> &str` — returns `""` when not set
-- Setter: `fn set_name(&mut self, v: &str)`
+```rust
+pub fn name(&self) -> &str; // "" when unset
+pub fn name_mut(&mut self) -> impl DerefMut<Target = ::unmanaged::String<A>> + '_;
+pub fn clear_name(&mut self);
+```
 
 **Explicit presence:**
 
-The **`Optional` accessor is the primary API**; `_raw` and `has_` are trait default methods (see [§4.0](#40-generated-per-message-traits)):
-
 | Method | Return type | Description |
 |---|---|---|
-| `title()` | `Optional<&'s str, impl HasDefault<&'s str>>` | **Required** trait method — `get()` and `is_set()` |
-| `title_raw()` | `&str` | Trait **default** — `self.title().get()` |
-| `has_title()` | `bool` | Trait **default** — `self.title().is_set()` |
-| `set_title(&mut self, v: &str)` | `()` | Copies string data; marks field as set |
-| `clear_title(&mut self)` | `()` | Marks field as unset |
-
-Because `Optional` is a concrete struct, chaining compiles directly for string fields too:
+| `title()` | `Optional<&'s str, impl HasDefault<&'s str>>` | `get()` and `is_set()` |
+| `title_mut()` | `impl DerefMut<Target = ::unmanaged::String<A>>` | Sets presence; copy via `push_str` / etc. |
+| `clear_title()` | `()` | Marks field as unset |
 
 ```rust
 let s: &str = task.title().get();   // value or default
-if task.title().is_set() { … }      // presence check
-let s: &str = task.title_raw();     // bypasses Optional
+if task.title().is_set() { … }
+task.title_mut().push_str("Fix bug");
 ```
 
-Wire rule: absent when `has_title()` is false (EXPLICIT) or `""` (IMPLICIT).
+Wire rule: absent when `title().is_set()` is false (EXPLICIT) or `""` (IMPLICIT).
 
 **UTF-8 validation** (Editions `utf8_validation` feature): when `VERIFY` (default), invalid UTF-8 in a string payload causes `DecodeError::InvalidUtf8` during decode. When `NONE`, bytes are copied without validation. Generated decode arms select the appropriate runtime helper per field; see [§0](#0-project-architecture) for implementation status.
 
@@ -548,32 +456,31 @@ Bytes fields follow the same pattern as strings with `&[u8]` as the value type.
 
 **Implicit presence:**
 
-- `fn payload(&self) -> &[u8]` — returns `&[]` when not set
-- `fn set_payload(&mut self, v: &[u8])` — copies data
+```rust
+pub fn payload(&self) -> &[u8]; // &[] when unset
+pub fn payload_mut(&mut self) -> impl DerefMut<Target = Vec<u8, A>> + '_; // allocator_api2::Vec
+pub fn clear_payload(&mut self);
+```
 
 **Explicit presence:**
 
-Same trait pattern as strings — `payload()` is the required `Optional` accessor; `_raw` / `has_` are trait defaults:
-
 | Method | Return type | Description |
 |---|---|---|
-| `payload()` | `Optional<&'s [u8], impl HasDefault<&'s [u8]>>` | **Required** trait method — `get()` and `is_set()` |
-| `payload_raw()` | `&[u8]` | Trait **default** — `self.payload().get()` |
-| `has_payload()` | `bool` | Trait **default** — `self.payload().is_set()` |
-| `set_payload(&mut self, v: &[u8])` | `()` | Copies data; marks field as set |
-| `clear_payload(&mut self)` | `()` | Marks field as unset |
+| `payload()` | `Optional<&'s [u8], impl HasDefault<&'s [u8]>>` | `get()` and `is_set()` |
+| `payload_mut()` | `impl DerefMut<Target = Vec<u8, A>>` | Sets presence |
+| `clear_payload()` | `()` | Marks field as unset |
 
 ---
 
 ### 4.4 Repeated fields
 
-Repeated fields expose a slice-like read API and append/clear mutation. The accessor returns a reference to a contiguous sequence, **not** a `Vec`, so callers get O(1) random access without allocation.
+Repeated fields expose a slice-like read API and `_mut` / `clear_*` mutation. The getter returns a reference to a contiguous sequence, **not** an owned `Vec`, so callers get O(1) random access without allocation. Mutation guards target `allocator_api2::vec::Vec<T, A>` (shown as `Vec<T, A>` below) except for string/bytes elements.
 
 **Packed repeated scalar (`tag_ids: repeated int32`, field 6):**
 
 ```rust
 pub fn tag_ids(&self) -> &[i32];
-pub fn push_tag_id(&mut self, v: i32);
+pub fn tag_ids_mut(&mut self) -> impl DerefMut<Target = Vec<i32, A>> + '_;
 pub fn clear_tag_ids(&mut self);
 ```
 
@@ -581,7 +488,7 @@ pub fn clear_tag_ids(&mut self);
 
 ```rust
 pub fn scores(&self) -> &[i32];
-pub fn push_score(&mut self, v: i32);
+pub fn scores_mut(&mut self) -> impl DerefMut<Target = Vec<i32, A>> + '_;
 pub fn clear_scores(&mut self);
 ```
 
@@ -590,19 +497,21 @@ The accessor API is identical for packed and non-packed; the difference is only 
 **Repeated string (`labels: repeated string`, field 8):**
 
 ```rust
-// Returns a slice whose elements deref to &str:
-pub fn labels(&self) -> &[impl Deref<Target = str>];
-pub fn push_label(&mut self, v: &str);
+pub fn labels(&self) -> &[::unmanaged::UnmanagedString<A>]; // elements Deref to str
+pub fn labels_mut(&mut self) -> RepeatedElementsMut<'_, ProtoString, A>;
 pub fn clear_labels(&mut self);
+
+// Append: push an empty element, then fill it
+task.labels_mut().push().push_str("urgent");
 ```
 
-The concrete element type is an implementation detail; callers rely on the `Deref<Target = str>` bound.
+Elements are allocator-less `UnmanagedString<A>`; callers typically write through `RepeatedElementsMut::push` rather than constructing elements by hand. There is no generated `push_label` helper.
 
 **Repeated message (`watchers: repeated Address`, field 19):**
 
 ```rust
 pub fn watchers(&self) -> &[Address<A>];
-pub fn watchers_mut(&mut self) -> impl DerefMut<Target = Vec<Address<A>, A>>;
+pub fn watchers_mut(&mut self) -> impl DerefMut<Target = Vec<Address<A>, A>> + '_;
 pub fn clear_watchers(&mut self);
 ```
 
@@ -612,7 +521,7 @@ Each wire occurrence **appends** a newly decoded message. Unlike singular nested
 
 ```rust
 pub fn votes(&self) -> &[bool];
-pub fn votes_mut(&mut self) -> impl DerefMut<Target = Vec<bool, A>>;
+pub fn votes_mut(&mut self) -> impl DerefMut<Target = Vec<bool, A>> + '_;
 pub fn clear_votes(&mut self);
 ```
 
@@ -641,7 +550,6 @@ pub fn assignee(&self) -> Option<&Address<A>>;
 /// Returns a mutable reference, creating a default value if absent.
 pub fn assignee_mut(&mut self) -> &mut Address<A>;
 
-pub fn set_assignee(&mut self, v: Address<A>);
 pub fn clear_assignee(&mut self);
 ```
 
@@ -651,7 +559,7 @@ pub fn clear_assignee(&mut self);
 
 ### 4.6 Enum fields
 
-The wire encoding is always VARINT. Open vs closed is reflected in the **generated enum newtype** (see [Generated enum type](#generated-enum-type) below); field accessors use the same [`Optional`](#hasdefault-and-optional) pattern as other singular fields — no `Result` wrapper and no `_raw` accessors.
+The wire encoding is always VARINT. Open vs closed is reflected in the **generated enum newtype** (see [Generated enum type](#generated-enum-type) below); field accessors use the same [`Optional`](#hasdefault-and-optional) pattern as other singular fields — no `Result` wrapper.
 
 **Spec reference:** [Enum Behavior](https://protobuf.dev/programming-guides/enum/) (and Editions [`features.enum_type`](https://protobuf.dev/editions/features/#enum_type)). For an unrecognized wire integer:
 
@@ -668,7 +576,8 @@ Unknown wire values are stored in the field. The generated type accepts any `i32
 pub fn status(&self) -> Optional<Status, impl HasDefault<Status>> {
     self.status.bind(&self._common).optional()
 }
-pub fn status_mut(&mut self) -> &mut Status;
+pub fn status_mut(&mut self) -> impl DerefMut<Target = Status> + '_;
+pub fn clear_status(&mut self);
 ```
 
 IMPLICIT presence: `is_set()` is `true` when the wire value is non-zero; `get()` returns `Status::UNSPECIFIED` when unset.
@@ -681,7 +590,7 @@ Unknown wire values are diverted to unknown fields on decode. The generated type
 pub fn priority(&self) -> Optional<Priority, impl HasDefault<Priority>> {
     self.priority.bind(&self._common).optional()
 }
-pub fn priority_mut(&mut self) -> &mut Priority;
+pub fn priority_mut(&mut self) -> impl DerefMut<Target = Priority> + '_;
 pub fn clear_priority(&mut self);
 ```
 
@@ -699,10 +608,10 @@ Both open and closed enums produce a **newtype-over-`i32`** — not a Rust `enum
 
 ```rust
 // Open — any wire value is valid storage
-status: SingularField<ProtoEnum<Status, Open>, Implicit, FIELD>,
+status: SingularField<ProtoEnum<Status, Open>, Implicit, FIELD, A>,
 
 // Closed — only known wire values are stored
-priority: SingularField<ProtoEnum<Priority, Closed>, Explicit<BIT>, FIELD>,
+priority: SingularField<ProtoEnum<Priority, Closed>, Explicit<BIT>, FIELD, A>,
 
 #[repr(transparent)]
 pub struct Status(i32);
@@ -726,7 +635,7 @@ Alias names with the same integer all map to the same `Self(v)`; equality is by 
 
 ### 4.7 Oneof fields
 
-Each `oneof` group generates types in a submodule named after the parent message (lower-snake-case), because the owned storage holds allocator-less `unmanaged` values (unsafe to drop implicitly) that must not leak into the public API.
+Each `oneof` group generates types in a submodule named after the **oneof** (lower-snake-case) under the parent message module (e.g. `task::notification`), because the owned storage holds allocator-less `unmanaged` values (unsafe to drop implicitly) that must not leak into the public API.
 
 Shape, storage, and projected views share **one** generic enum; Storage / Ref / Mut are type aliases. Group bound views live in `puroro-rt` (`OneofView` / `OneofViewMut`), parametrised by `OneofGroup` (implemented on the crate-internal storage alias):
 
@@ -741,10 +650,10 @@ pub enum Notification<Ea, Pn, Wh, Po, Ur> {
 // (1) Owned storage — crate-internal alias; per-variant private field aliases
 //     are the single source of truth. Implements OneofGroup, OneofDeallocate,
 //     encode glue. Never public.
-type EmailAddressField = SingularField<ProtoString, Oneof, FIELD_EMAIL>;
-// … PhoneNumberField, WebhookIdField, PostalField<A>, UrgentField
+type EmailAddressField<A> = SingularField<ProtoString, Oneof, { FIELD_EMAIL_ADDRESS }, A>;
+// … PhoneNumberField, WebhookIdField (+ custom D), PostalField, UrgentField (+ BitPacked)
 pub(crate) type NotificationStorage<A> = Notification<
-    EmailAddressField, PhoneNumberField, WebhookIdField, PostalField<A>, UrgentField,
+    EmailAddressField<A>, PhoneNumberField<A>, WebhookIdField<A>, PostalField<A>, UrgentField<A>,
 >;
 
 // (2) Payload-less case discriminant (unset is `None`, so no `NotSet` member).
@@ -789,6 +698,7 @@ pub fn email_address_mut(&mut self) -> impl DerefMut<Target = ::unmanaged::Strin
 pub fn phone_number_mut(&mut self) -> impl DerefMut<Target = ::unmanaged::String<A>> + '_;
 pub fn webhook_id_mut(&mut self) -> impl DerefMut<Target = i32> + '_; // VARINT variant
 pub fn postal_mut(&mut self) -> &mut Address<A>;       // message variant
+pub fn urgent_mut(&mut self) -> impl DerefMut<Target = bool> + '_; // bool variant
 
 // Clears whichever variant is active (freeing it):
 pub fn clear_notification(&mut self); // = notification_mut().clear()
@@ -879,7 +789,7 @@ Concrete C++ codegen shapes (proto2 / editions):
 
 On the wire, a `LEGACY_REQUIRED` field is indistinguishable from an `EXPLICIT` field; the constraint is schema-level only.
 
-**Accessor API** — same `Optional` pattern as `EXPLICIT`, plus [`Message::validate`](#message). On generated traits, `_raw` and `has_` are default methods (see [§4.0](#40-generated-per-message-traits)). Additionally:
+**Accessor API** — same `Optional` + `_mut` / `clear_*` pattern as `EXPLICIT`, plus [`Message::validate`](#message):
 
 - **`Message::validate() -> Result<(), DecodeError>`** — returns `MissingRequiredField` when a `LEGACY_REQUIRED` field is unset. Messages with no such fields still implement `Message` and return `Ok(())`.
 
@@ -975,7 +885,7 @@ pub struct Task<A: Allocator + Clone = Global> { /* … */ }
 
 **Owned allocator, never a borrow.** Operations pass the allocator **by value** rather than `&A`: the caller clones the canonical `MessageCommon.alloc` for each field operation. This keeps the allocator type consistently `A` for both a buffer's growth and its eventual free — mixing `&A` at allocation with `A` at deallocation is fragile and not obviously idempotent. Correctness relies on the `Allocator + Clone` contract that clones are interchangeable. (The one exception is building an *empty* `unmanaged` container, which never allocates, so it may borrow.)
 
-**Manual release via `Drop`.** Because `unmanaged` values cannot free themselves (they panic if dropped implicitly), each field wraps its payload in `ManuallyDrop` and exposes `deallocate(&mut self, alloc: A)`. Every generated message implements `Drop`, walking its fields and calling `deallocate` with an `alloc.clone()` of the single `MessageCommon.alloc`; nested messages are freed recursively by their own `Drop`. The `unsafe` boundary is confined to the `puroro-rt` runtime and the generated `Drop`.
+**Manual release via `Drop`.** Because `unmanaged` values cannot free themselves (they panic if dropped implicitly), each field wraps its payload in `ManuallyDrop` and implements [`FieldDeallocate`](puroro-rt/src/fields/shared/field_deallocate.rs) as `deallocate(&mut self, common: &MessageCommon<…>)`. Every generated message implements `Drop`, walking its direct children and calling `deallocate(&self._common)`; nested messages are freed recursively by their own `Drop` / `DeallocateIn`. The `unsafe` boundary is confined to the `puroro-rt` runtime and the generated `Drop`.
 
 **Constructor API:**
 
@@ -992,9 +902,9 @@ impl Task<Global> {
 impl<A: Allocator + Clone + Default> Default for Task<A> { … }
 ```
 
-**Derived traits.** Generated messages implement `Default` (for `A: Allocator + Clone + Default`) plus a custom `Drop` (for `A: Allocator + Clone`). Additional `Global`-only convenience (`Task::new()`) applies when `A = Global`. `Clone` / `PartialEq` / `Debug` are hand-written (not `#[derive]`): sample `Clone` round-trips through the wire codec; `PartialEq` compares getters semantically; a catalog `clone_in` remains future work for the plugin. Wire bytes are not deterministic across encodes. Full matrix: [IMPLEMENTATION.md §13](IMPLEMENTATION.md#13-derived-traits).
+**Derived traits.** Generated messages implement `Default` (for `A: Allocator + Clone + Default`) plus a custom `Drop` (for `A: Allocator + Clone`). Additional `Global`-only convenience (`Task::new()`) applies when `A = Global`. `Clone` / `PartialEq` / `Debug` are hand-written (not `#[derive]`): `Clone` delegates to field-wise [`CloneIn`](unmanaged/) (`field.clone_in(&common, alloc)`); `PartialEq` / `Debug` compare / format via semantic getters. Wire bytes are not deterministic across encodes. Full matrix: [IMPLEMENTATION.md §13](IMPLEMENTATION.md#13-derived-traits).
 
-**Mutation API (`_mut`).** Mutation is unified under `_mut` accessors that return a guard implementing `impl DerefMut<Target = …>` (RPIT): `title_mut()` yields `impl DerefMut<Target = ::unmanaged::String<A>>`, `payload_mut()`/`tag_ids_mut()` yield `impl DerefMut<Target = Vec<_, A>>`, and scalar/enum `_mut` accessors also return `impl DerefMut<Target = T>` (today that is `&mut T`). The guard **owns** a clone of the message allocator when the payload is heap-backed. Acquiring an explicit-presence `_mut` sets the presence bit. The old `set_*` / `push_*` setters are removed; the one exception is repeated `string`/`bytes`, which keep a typed `push_*` helper because their element storage is allocator-less and impractical to construct through a bare `DerefMut`.
+**Mutation API (`_mut`).** Mutation is unified under `_mut` accessors that return a guard implementing `impl DerefMut<Target = …>` (RPIT): `title_mut()` yields `impl DerefMut<Target = ::unmanaged::String<A>>`, `payload_mut()` / packable `*_mut()` yield `impl DerefMut<Target = Vec<_, A>>` (`allocator_api2`), and scalar/enum `_mut` accessors also return `impl DerefMut<Target = T>`. The guard **owns** a clone of the message allocator when the payload is heap-backed. Acquiring an explicit-presence `_mut` sets the presence bit. There are no generated `set_*` / `push_*` helpers: append packable elements with `tag_ids_mut().push(…)`; for repeated `string`/`bytes`, use `labels_mut()` → [`RepeatedElementsMut`](puroro-rt/src/fields/repeated/field.rs) (`push()` then fill the empty element).
 
 **Bound-view accessors (`bind` / `bind_mut`).** Every field family — [`SingularField`](puroro-rt/src/fields/singular/field.rs), [`RepeatedField`](puroro-rt/src/fields/repeated/field.rs), and [`OneofSlot`](puroro-rt/src/fields/oneof.rs) — uses the same inherent call shape (`field.bind(&self._common)` / `field.bind_mut(&mut self._common)`). Each returns a short-lived view (`SingularFieldRef` / `SingularFieldMut`, `RepeatedFieldRef` / `RepeatedFieldMut`, `OneofSlotRef` / `OneofSlotMut`) that carries `(field, common)` together. The actual operation (`optional` / `value` / `as_slice` / `get` / `value_mut` / `merge` / `clear` / …) is a consuming method on that view. This keeps the field struct a pure storage holder and collapses each generated accessor to a single call — e.g. `self.owner_id.bind(&self._common).optional()` or `self.priority.bind_mut(&mut self._common).clear()`. Binding happens even when a particular accessor does not consult `common` (e.g. `IMPLICIT` `value()`, repeated `as_slice()`), so read and write share one shape. The presence bit index for EXPLICIT / LEGACY_REQUIRED fields is a **const generic on the field type** (`Explicit<BIT>`), not a runtime argument to `bind` / `bind_mut`. Encode / `deallocate` / `validate_required` stay as plain field methods that take `&common` directly (they are not generated getters). Getter / `_mut` payload types (`Ref` / `Mut`) live on [`ProtoType`](puroro-rt/src/fields/wire/proto_type.rs), not on a separate singular-access trait.
 
@@ -1003,12 +913,17 @@ Varint and LEN singular fields share one runtime type, [`SingularField`](puroro-
 **Decode API:**
 
 ```rust
-impl<A: Allocator + Clone + Default> Message for Task<A> {
-    fn merge_from<B: Buf>(&mut self, buf: &mut B) -> Result<(), DecodeError>;
+impl<A: Allocator + Clone> Message for Task<A> {
+    fn merge_from_with_depth<B: Buf>(
+        &mut self,
+        buf: &mut B,
+        depth: usize,
+    ) -> Result<(), DecodeError>;
+    // merge_from → merge_from_with_depth(…, 0)  (provided default)
 }
 ```
 
-The `Default` bound is required because `Message::decode` calls `A::default()` to obtain the initial allocator.  Callers using a non-`Default` allocator must call `new_in(alloc)` followed by `merge_from` instead of `decode`.
+`Message` itself does **not** require `A: Default`. The provided `Message::decode` requires `Self: Default` (typically `A: Default` via the inherent `Default` impl). Callers using a non-`Default` allocator must call `new_in(alloc)` followed by `merge_from` instead of `decode`.
 
 **Arena allocator example:**
 
@@ -1019,9 +934,9 @@ t.title_mut().push_str("Fix bug");
 // All allocations (title, labels, nested messages) land in `bump`.
 // Here `A = &Bump`, which is `Copy`, so each op just re-uses the borrow; for an
 // owned arena handle the message would clone it per op instead.
-// When `t` drops, its `Drop` calls `deallocate((&bump).clone())` on each field.
+// When `t` drops, its `Drop` calls `deallocate(&t._common)` on each field.
 // For an arena that is effectively a no-op; the memory is reclaimed in bulk when
-// `bump` itself is dropped. (For `Global`, `deallocate` returns the blocks.)
+// `bump` itself is dropped. (For `Global`, deallocate returns the blocks.)
 ```
 
 ---
@@ -1152,7 +1067,7 @@ Generating both `Task<A>` and `TaskBuilder<A>` would double the generated code, 
 
 ### Accessor methods instead of public fields
 
-Public struct fields are simpler but prevent changing internal representations without a breaking API change. Accessor methods decouple the interface from the implementation — for example, presence tracking uses a per-message bitfield internally while exposing `has_X()` / `Optional` accessors unchanged.
+Public struct fields are simpler but prevent changing internal representations without a breaking API change. Accessor methods decouple the interface from the implementation — for example, presence tracking uses a per-message bitfield internally while exposing `Optional` / `is_set()` unchanged.
 
 ### `Optional<T, impl HasDefault<T>>` as a concrete struct
 
@@ -1161,20 +1076,16 @@ Explicit-presence field accessors return `Optional<T, D>` — a concrete struct 
 - **Default value as compile-time constant.** `D::DEFAULT` is a `const` expression, so the "return default when not set" branch has zero runtime overhead.
 - **No RPIT drop-check restriction.** Because the concrete struct's `Drop` is trivially visible to the borrow checker, `task.title().get()` chains directly without a `let` binding — even for string fields that return `&str`.
 - **No `Option<T>` conversion.** `Optional` provides only `get()` and `is_set()` — no `get_opt()` and no `From`/`Into` for `Option<T>`.  Proto explicit-presence fields always carry a meaningful value (explicit or default); converting to `Option<T>` would conflate "not set" with "no value" and make the declared default impossible to enforce.
-- **Private default provider.** The `D` type is a zero-sized struct defined locally inside the method body, then hidden behind `impl HasDefault<T>` in the return type.  Callers never need to name it.
+- **Private default provider.** The `D` type is a zero-sized marker on the field wrapper (`ProtoDefault`, or a message-local ZST for `[default = …]`), hidden behind `impl HasDefault<T>` in the accessor return type. Callers never need to name it.
 - **String defaults without unstable features.** `&'static str` cannot currently be a `const` generic parameter, but `const DEFAULT: &'a str` in a blanket `impl<'a> HasDefault<&'a str>` is fully stable on nightly.
 
 ### Slice-like return type for repeated fields
 
 Repeated field accessors return a reference to a contiguous sequence rather than a freshly allocated `Vec`. This allows O(1) random access without triggering allocation. The concrete element type is intentionally not part of the stable API.
 
-### Native methods alongside trait methods
+### Inherent accessors as the current public contract
 
-Each concrete struct provides its own `impl` block with native methods in addition to implementing the generated traits.  The traits define the minimum interoperability contract; native methods expose whatever that struct can do most efficiently.  Code that knows the concrete type uses native methods; generic code uses the trait.
-
-For explicit-presence fields, **both traits treat the `Optional` accessor as the single required method**; `_raw` and `has_` are default trait methods that wrap it.  Native methods on the struct may implement all three names directly (reading the internal presence bit and value) without calling through the trait defaults.
-
-This is the standard Rust pattern: `Vec<T>` implements `Iterator` but also has `push`, `sort`, and hundreds of other methods that the `Iterator` trait does not mandate.
+Today the generator emits only the concrete struct and its inherent accessors ([§4.0](#40-inherent-accessors-current)). Per-message traits (`FooMessage` / `FooMessageFallible`) are reserved for [§8](#8-future-work) so that eager, lazy, and view layouts can share one generic read API later. Until then, generic code over messages uses [`Message`](#message) for codec / infrastructure, or is monomorphised over the concrete type for field access.
 
 ### `Default` bound on `Message::decode`
 
@@ -1204,13 +1115,22 @@ Eager `Task<A>` stores decoded field data in allocator-less `unmanaged` containe
 
 ## 8. Future work
 
+### Per-message traits (not yet generated)
+
+Planned interoperability traits, emitted per message once specialized layouts land:
+
+- **`FooMessage`** — infallible getters matching the inherent shapes in [§4.0](#40-inherent-accessors-current) (for eager implementations).
+- **`FooMessageFallible`** — `Result`-returning getters for lazy / view layouts (`Error = DecodeError` or `Infallible` on eager).
+
+These traits are **not** part of the current generator output or [`sample-generated/`](sample-generated/). When added, explicit-presence fields should keep `Optional` as the primary read API; convenience `has_*` / `*_raw` wrappers (if any) would be trait defaults, not a second required surface on the concrete struct.
+
 ### Specialized message implementations
 
-In addition to the primary `Task<A>` struct, the following specialized implementations are planned.  Each implements `TaskMessageFallible` (and possibly `TaskMessage`) and is interchangeable with `Task<A>` in generic code that depends only on the trait.
+In addition to the primary `Task<A>` struct, the following specialized implementations are planned. Each would implement `TaskMessageFallible` (and possibly `TaskMessage`) and be interchangeable with `Task<A>` in generic code that depends only on the trait.
 
 #### `TaskLazy<A>` — lazy parse timing
 
-`TaskLazy<A>` implements the same accessor API as `Task<A>` via `TaskMessageFallible` (`Error = DecodeError`).  All decoding — wire scanning **and** semantic interpretation — is deferred until a getter runs.
+`TaskLazy<A>` would implement the same field surface as `Task<A>` via `TaskMessageFallible` (`Error = DecodeError`).  All decoding — wire scanning **and** semantic interpretation — is deferred until a getter runs.
 
 ##### Wire buffer: `bytes::Bytes` (shared, sliceable)
 
@@ -1264,7 +1184,7 @@ Failed          — decode error; subsequent getters return Err without re-parsi
 Typical transitions on getter access:
 
 1. **`Uninitialized` → scan `_wire`** (wire-level: read tags, match field number, skip or record payload bounds).
-2. **`has_*()`** stops after wire scan — sets `Absent` or `WireFound` / equivalent; **no semantic decode**.
+2. **Presence-only check** (`optional().is_set()` / a future `has_*` trait default) stops after wire scan — sets `Absent` or `WireFound` / equivalent; **no semantic decode**.
 3. **`Optional` getter** continues to **semantic decode** → `Parsed` (or `Failed` on error).
 4. Subsequent calls hit `Parsed` / `Absent` / `Failed` directly.
 
@@ -1289,11 +1209,10 @@ Explicit-presence fields expose `Result<Optional<T, impl HasDefault<T>>, DecodeE
 
 | Accessor | Wire scan | Semantic decode | Error timing |
 |---|---|---|---|
-| `has_*()` | **Yes** — scan `_wire` for field number; skip payloads | **No** | Wire errors (truncated tag, bad varint) → `Err`. Invalid UTF-8 in an unread payload → **not** detected |
+| Presence-only (`is_set` / optional future `has_*`) | **Yes** — scan `_wire` for field number; skip payloads | **No** | Wire errors (truncated tag, bad varint) → `Err`. Invalid UTF-8 in an unread payload → **not** detected |
 | `*_()` → `Result<Optional<…>>` | **Yes** — locate payload (or use cache) | **Yes** — full field decode | Semantic failure (e.g. `InvalidUtf8`) → **`Err` before `Optional` is built** |
-| `*_raw()` trait default | Via `Optional` getter | Via `Optional` getter | Same |
 
-Because `has_*()` performs wire scanning but not semantic validation, **`has_title() == true` does not guarantee `title()?` succeeds** — malformed UTF-8 surfaces only when the `Optional` getter runs.
+Because a presence-only check performs wire scanning but not semantic validation, **`title()?.is_set() == true` does not guarantee a later semantic read of the same field succeeds** if the cache was only at `WireFound` — malformed UTF-8 surfaces when the `Optional` getter runs the semantic decode.
 
 For **implicit-presence** scalars (`score`), the getter wire-scans for the last occurrence (or returns zero if absent), then semantically decodes.
 
@@ -1317,8 +1236,8 @@ There is no meaningful partial **semantic** decode within a singular string or s
 
 ##### Trait implementation
 
-- Implements `TaskMessageFallible` with `Error = DecodeError`.
-- Explicit-presence fields implement the `Optional` getter; `_raw` / `has_` use trait default methods (see [§4.0](#40-generated-per-message-traits)).
+- Implements `TaskMessageFallible` with `Error = DecodeError` (once that trait exists; see [Per-message traits](#per-message-traits-not-yet-generated)).
+- Explicit-presence fields implement the fallible `Optional` getter; any `has_*` / `*_raw` conveniences would be trait defaults only.
 - Does **not** implement `TaskMessage` (infallible) — all access goes through the fallible trait.
 
 **Native methods beyond the trait:**
