@@ -9,7 +9,7 @@ description = "Hand-written sample of puroro protoc plugin output (Task / Addres
 workspace = true
 
 [dependencies]
-allocator-api2 = "0.4"
+allocator-api2 = "0.2"
 bitvec = "1"
 bytes = "1"
 puroro = { path = ".." }

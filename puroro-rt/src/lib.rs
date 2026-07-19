@@ -12,6 +12,9 @@ pub(crate) mod fields;
 pub use ::protobuf_core::FieldNumber;
 pub use defaults::ProtoDefault;
 pub use fields::enum_variant::EnumVariant;
+pub use fields::map::{
+    MapEntries, MapEntriesConverter, MapEntriesIter, MapField, MapFieldMut, MapFieldRef,
+};
 pub use fields::oneof::{
     OneofDeallocate, OneofEncodable, OneofGroup, OneofSlot, OneofSlotMut, OneofSlotRef,
     OneofVariantRef, OneofView, OneofViewMut,
