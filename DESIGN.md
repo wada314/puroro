@@ -19,6 +19,7 @@ This document specifies the **public interface** of the `puroro` Protocol Buffer
    - 4.7 [Oneof fields](#47-oneof-fields)
    - 4.8 [Required fields (`LEGACY_REQUIRED`)](#48-required-fields-legacy_required)
    - 4.9 [Unknown fields](#49-unknown-fields)
+   - 4.10 [Map fields](#410-map-fields)
 5. [Allocator design](#5-allocator-design)
    - 5.1 [Chosen design: single type parameter](#51-chosen-design-single-type-parameter)
    - 5.2 [Alternative: per-field allocator type parameters](#52-alternative-per-field-allocator-type-parameters)
@@ -48,7 +49,7 @@ The puroro project comprises several crates and tools with distinct roles:
 | **`puroro-rt`** | **Generated-code runtime** — composable field catalog (`fields::*`, `MessageCommon`), wire encode/decode helpers (`encode` / `decode` modules), `ProtoDefault`, and allocator-aware string/bytes utilities. Emitted generated code imports this crate (transitively for end users). Semver is looser than `puroro`; do not depend on it directly from application code. See [IMPLEMENTATION.md §4](IMPLEMENTATION.md#4-shared-infrastructure). |
 | **Code generator** (`protoc` plugin) | Reads `.proto` input (via `protoc`) and emits Rust source implementing the API defined in this document. **Primary execution path:** register as a `protoc` plugin (`--puroro_out=…`). Other invocation styles (standalone CLI, `build.rs` wrapper, etc.) are permitted but not required. Emits fully-qualified paths into both `::puroro::…` (traits, `Optional`, errors) and `::puroro_rt::…` (field catalog, wire helpers). |
 
-**Reference schema.** The `Task` and `Address` messages in [§4 Reference schema](#reference-schema) are the **canonical examples** for describing and reviewing generated code. All field-pattern subsections (§4.1–4.9) and [IMPLEMENTATION.md](IMPLEMENTATION.md) use this same schema unless noted otherwise.
+**Reference schema.** The `Task` and `Address` messages in [§4 Reference schema](#reference-schema) are the **canonical examples** for describing and reviewing generated code. All field-pattern subsections (§4.1–4.10) and [IMPLEMENTATION.md](IMPLEMENTATION.md) use this same schema unless noted otherwise.
 
 **Non-goals.**
 
@@ -205,7 +206,7 @@ This section is the normative reference for what the code generator emits. All f
 For each message type the code generator produces **three kinds of output**:
 
 1. **Two traits** — a stable API contract that multiple implementations satisfy (§4.0).
-2. **The primary struct** — a full-featured owned implementation (§4.1–4.9), internally a product of **`puroro_rt::fields` catalog types** + shared `MessageCommon` (see [IMPLEMENTATION.md §2](IMPLEMENTATION.md#2-architecture-overview)).
+2. **The primary struct** — a full-featured owned implementation (§4.1–4.10), internally a product of **`puroro_rt::fields` catalog types** + shared `MessageCommon` (see [IMPLEMENTATION.md §2](IMPLEMENTATION.md#2-architecture-overview)).
 3. **(Future) Specialized structs** — alternative implementations for specific performance scenarios (§8).
 
 Generated Rust is not hand-edited; the plugin still emits **section banners, proto field labels, and `merge_from` dispatch comments** so build output is navigable when debugging. Convention: [IMPLEMENTATION.md §9 — Generated code comments](IMPLEMENTATION.md#generated-code-comments). Reference output: [`sample-generated/`](sample-generated/).
@@ -265,6 +266,11 @@ pub trait TaskMessage {
     // Oneof
     fn notification(&self) -> Option<&task::Notification<impl Allocator>>;
     fn set_notification(&mut self, v: Option<task::Notification<impl Allocator>>);
+
+    // Map — bound views (same idiom as other catalog fields)
+    fn attributes(&self) -> /* MapFieldRef<…> */;
+    fn attributes_mut(&mut self) -> /* MapFieldMut<…> */;
+    fn clear_attributes(&mut self);
 }
 ```
 
@@ -383,6 +389,8 @@ enum Priority {
 message Address {
     string street = 1;   // EXPLICIT presence (edition default)
     string city   = 2;
+    fixed32 postal_code = 3;
+    double latitude = 4;
 }
 
 message Task {
@@ -434,6 +442,9 @@ message Task {
 
     // Field 20: Packed repeated bool (PACKED is the edition default for numeric)
     repeated bool votes = 20;
+
+    // Field 21: Map (wire = repeated MapEntry message; last-wins on duplicate keys)
+    map<string, int32> attributes = 21;
 }
 ```
 
@@ -902,6 +913,50 @@ This shape is the **common public contract**: it does not require contiguous wir
 
 ---
 
+### 4.10 Map fields
+
+Protobuf `map<K, V>` is syntactic sugar for a repeated message entry:
+
+```protobuf
+message MapFieldEntry {
+  key_type key = 1;
+  value_type value = 2;
+}
+repeated MapFieldEntry map_field = N;  // always LEN on the wire
+```
+
+**Key types** are integral types, `bool`, or `string` (not floating-point, `bytes`, enum, or message). **Values** may be any non-map type. Duplicate keys use **last-wins** semantics; iteration / encode order is unspecified.
+
+Generated accessors follow the same bound-view idiom as other fields (`tag_ids` / `watchers`):
+
+```rust
+/// Shared view of the map (`get` / `iter` / `len` / `is_empty`).
+pub fn attributes(&self) -> MapFieldRef<'_, ProtoString, ProtoInt32, { FIELD_ATTRIBUTES }, A, TaskPresence>;
+
+/// Mutable view (`insert` / `insert_in` / `get_mut` / `remove` / `clear` / `merge`).
+pub fn attributes_mut(&mut self) -> MapFieldMut<'_, '_, ProtoString, ProtoInt32, { FIELD_ATTRIBUTES }, A, TaskPresence>;
+
+pub fn clear_attributes(&mut self);
+```
+
+Typical mutation:
+
+```rust
+task.attributes_mut().insert_in("region", 81)?;   // string / bytes keys
+*task.attributes_mut().get_mut("region").unwrap() = 99;
+assert_eq!(task.attributes().get("region"), Some(&99));
+```
+
+- `insert` takes owned key / value elements (`K::Element<A>`, `V::Element<A>`).
+- `insert_in` builds a string/bytes key from a slice (same role as repeated `push_in`).
+- Scalar keys use `insert(1_i32, value)` directly.
+- Missing `key` / `value` inside an entry decode as protobuf type defaults.
+- Map entry unknowns are skipped (not preserved).
+
+Catalog type: `MapField<K, V, FIELD, A>` with `K: MapKey`, `V: RepeatedElement` — see [IMPLEMENTATION.md §15.1](IMPLEMENTATION.md#151-map-fields).
+
+---
+
 ## 5. Allocator design
 
 ### 5.1 Chosen design: single type parameter
@@ -914,7 +969,9 @@ pub struct Task<A: Allocator + Clone = Global> { /* … */ }
 
 `A` defaults to `Global`, so `Task` (without a type argument) works identically to a version without allocator support. The `Clone` bound lets each message clone its allocator into nested children and free every field from a single `Drop` (see below).
 
-**Single canonical allocator (no per-field copies).** The allocator is stored *once*, in `MessageCommon.alloc`. Heap-backed fields do **not** embed an allocator *instance*: they use the private [`unmanaged`](unmanaged/) types — `UnmanagedBox<T, A>`, `UnmanagedVec<T, A>`, `UnmanagedString<A>` — which keep only `ptr`/`len`/`cap` (plus `PhantomData<A>`) inline and receive an owned allocator (an `alloc.clone()`) on each operation that (de)allocates. The allocator **type** `A` still appears on unmanaged buffers and on **field wrappers** (`SingularField<…, A>`, `RepeatedField<…, A>`); markers themselves are allocator-free. For a non-ZST allocator (e.g. `&bumpalo::Bump`) this removes the redundant *value* copy that a naive `Box<T, A>` / `Vec<T, A>` layout would embed in every field, so `size_of::<Task<A>>` grows by exactly one `A` regardless of field count.
+**Single canonical allocator (almost no per-field copies).** The allocator is stored in `MessageCommon.alloc`. Heap-backed singular / repeated / oneof fields do **not** embed an allocator *instance*: they use the private [`unmanaged`](unmanaged/) types — `UnmanagedBox<T, A>`, `UnmanagedVec<T, A>`, `UnmanagedString<A>` — which keep only `ptr`/`len`/`cap` (plus `PhantomData<A>`) inline and receive an owned allocator (an `alloc.clone()`) on each operation that (de)allocates. The allocator **type** `A` still appears on unmanaged buffers and on **field wrappers** (`SingularField<…, A>`, `RepeatedField<…, A>`, `MapField<…, A>`); markers themselves are allocator-free.
+
+**Exception — map fields.** Each `MapField` stores a `hashbrown::HashMap<…, A>` that **owns** its own `A` (hashbrown’s allocator-aware API embeds `A` in the table). Maps are uncommon, so the extra `A` per map field is accepted; `size_of::<Task<A>>` grows by roughly one `A` for `MessageCommon` plus one `A` per map field.
 
 **Owned allocator, never a borrow.** Operations pass the allocator **by value** rather than `&A`: the caller clones the canonical `MessageCommon.alloc` for each field operation. This keeps the allocator type consistently `A` for both a buffer's growth and its eventual free — mixing `&A` at allocation with `A` at deallocation is fragile and not obviously idempotent. Correctness relies on the `Allocator + Clone` contract that clones are interchangeable. (The one exception is building an *empty* `unmanaged` container, which never allocates, so it may borrow.)
 
@@ -1303,7 +1360,6 @@ Generic code that only reads fields can be written once against `TaskMessageFall
 - **UTF-8 validation (`NONE` path).** Expose an unchecked decode helper; wire per-field dispatch in generated code. (`VERIFY` path exists today.)
 - **Recursion limit enforcement.** Thread depth through nested `merge_from`; return `DecodeError::RecursionLimitExceeded`. (Error variant exists; enforcement is a stub.)
 - **Unknown-field preservation opt-out.** A per-message attribute to discard unknowns (`Discard` policy in §4.9); public accessor remains an empty iterator.
-- **Map fields.** Syntactic sugar for a repeated message entry; requires an allocator-aware map type.
 - **Service / RPC definitions.** Out of scope for the runtime library.
 - **Well-known types.** `google.protobuf.Timestamp`, `Duration`, `Any`, etc.
 - **Reflection / descriptors.** Runtime introspection of message schema.

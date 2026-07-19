@@ -36,6 +36,7 @@ Internal implementation of **generated** protobuf message code: storage, wire I/
 
 14. [Singular fields](#14-singular-fields)
 15. [Repeated fields](#15-repeated-fields)
+    - 15.1 [Map fields](#151-map-fields)
 16. [Nested messages, oneof, unknown fields](#16-nested-messages-oneof-unknown-fields)
 
 **Part V — Future work**
@@ -74,7 +75,7 @@ protoc plugin
 puroro_rt::fields       SingularField<T, P, FIELD> (T includes ProtoMessage), …
     │  shared/ — MessageCommon, FieldPresence, ValueSlot,
     │            DefaultIn / DeallocateIn / ProtoEmpty
-    │  wire/   — ProtoType (singular Slot); RepeatedElement (repeated Element);
+    │  wire/   — ProtoType (singular Slot); RepeatedElement; MapKey;
     │            VarintProtoType (packed / bit-packed helper)
     │  singular/, repeated/, oneof/
     │  T: ProtoType thin wrapper (ProtoInt32(i32), ProtoString(…), …)
@@ -103,6 +104,7 @@ protobuf-core           Varint, Tag, WireType
 |---|---|---|
 | Singular scalar / string / bytes | No | presence ± alloc |
 | Repeated | No | alloc |
+| Map | No | alloc (map also owns its own `A`) |
 | Nested message | No | alloc |
 | Closed enum | No | presence + unknown buffer |
 | Open enum (explicit) | No | presence |
@@ -121,6 +123,7 @@ protobuf-core           Varint, Tag, WireType
 | `ProtoType` + thin wrappers (varint / LEN) + `ProtoMessage` | **Done** |
 | `VarintProtoType` (packed / bit-packed wire helper) | **Done** |
 | `RepeatedElement` / `RepeatedElementMerge` / `PackableRepeatedElement` / `RepeatedSlicePush` / `RepeatedVecMut` | **Done** |
+| `MapKey` + `MapField` / `MapEntries` (map entry wire encode/merge) | **Done** |
 | `FieldPresence` (`Implicit` / `Explicit` / `LegacyRequired` / `Oneof`) | **Done** |
 | `ValueSlot`, `SlotInitView` / `SlotInitMut`, `DefaultIn` / `DeallocateIn` / `ProtoEmpty` | **Done** |
 | `SingularField<T, P, FIELD>`  | **Done** |
@@ -151,6 +154,7 @@ protobuf-core           Varint, Tag, WireType
 | [`wire/proto_type.rs`](puroro-rt/src/fields/wire/proto_type.rs) | `ProtoType` (wire) + `PayloadAccess` (inline storage) |
 | [`shared/value_layout.rs`](puroro-rt/src/fields/shared/value_layout.rs) | `ValueLayout`, `Inline`, `BitPacked` |
 | [`wire/repeated_element.rs`](puroro-rt/src/fields/wire/repeated_element.rs) | `RepeatedElement` / `RepeatedElementMerge` (`Element` for repeated buffers) |
+| [`wire/map_element.rs`](puroro-rt/src/fields/wire/map_element.rs) | `MapKey` (subset of `RepeatedElement`) |
 | [`wire/proto_message.rs`](puroro-rt/src/fields/wire/proto_message.rs) | `ProtoMessage` (nested message marker) |
 | [`wire/varint.rs`](puroro-rt/src/fields/wire/varint.rs) | `VarintProtoType`, `ProtoInt32`, … |
 | [`wire/len.rs`](puroro-rt/src/fields/wire/len.rs) | `ProtoString`, `ProtoBytes` |
@@ -160,6 +164,10 @@ protobuf-core           Varint, Tag, WireType
 | [`repeated.rs`](puroro-rt/src/fields/repeated.rs) | Repeated field re-exports |
 | [`repeated/encoding.rs`](puroro-rt/src/fields/repeated/encoding.rs) | `Packed` / `Expanded` (`RepeatedEncoding`) |
 | [`repeated/field.rs`](puroro-rt/src/fields/repeated/field.rs) | `RepeatedField` — `T: RepeatedElement`, stores `T::Element` |
+| [`map.rs`](puroro-rt/src/fields/map.rs) | Map field re-exports |
+| [`map/entries.rs`](puroro-rt/src/fields/map/entries.rs) | `MapEntries` — allocator-owning `HashMap` |
+| [`map/entry.rs`](puroro-rt/src/fields/map/entry.rs) | Map-entry wire encode / decode (`key=1`, `value=2`) |
+| [`map/field.rs`](puroro-rt/src/fields/map/field.rs) | `MapField` — `K: MapKey`, `V: RepeatedElement` |
 | [`oneof.rs`](puroro-rt/src/fields/oneof.rs) | `OneofSlot` |
 
 ---
@@ -213,7 +221,7 @@ Singular wire decode is **merge-into only** (`PayloadAccess::merge` / `BitPacked
 Singular / oneof `bool` uses allocator-free [`ProtoBool`](puroro-rt/src/fields/wire/varint.rs) plus [`BitPacked<VALUE_BIT>`](puroro-rt/src/fields/shared/value_layout.rs) as the field's [`ValueLayout`](puroro-rt/src/fields/shared/value_layout.rs) (orthogonal to presence `P`). Inline payloads use default `L = Inline` via [`PayloadAccess`](puroro-rt/src/fields/wire/proto_type.rs). Allocator `A` lives on [`SingularField`](puroro-rt/src/fields/singular/field.rs) / [`RepeatedField`](puroro-rt/src/fields/repeated/field.rs). Slot construction uses [`DefaultIn<A>`](puroro-rt/src/fields/shared.rs) / [`DeallocateIn<A>`](puroro-rt/src/fields/shared.rs) (allocator as a **trait parameter**, not an associated type), so bare `i32` / `()` work without slot newtypes.
 ### Repeated elements (`RepeatedElement`)
 
-[`RepeatedElement`](puroro-rt/src/fields/wire/repeated_element.rs) extends [`ProtoType`](puroro-rt/src/fields/wire/proto_type.rs) with GAT `Element<A>`, plus per-element encode / length / deallocate. Decode / merge live on [`RepeatedElementMerge<A>`](puroro-rt/src/fields/wire/repeated_element.rs) so nested messages can require `M: Message<Alloc = A>`. Singular fields store `Slot<A>`; repeated fields store `Element<A>` (not always the same — nested-message repeated uses `Element = M` while singular keeps `Slot = UnmanagedBox<M, A>`).
+[`RepeatedElement`](puroro-rt/src/fields/wire/repeated_element.rs) extends [`ProtoType`](puroro-rt/src/fields/wire/proto_type.rs) with GAT `Element<A>`, plus per-element encode / length / deallocate. Decode / merge live on [`RepeatedElementMerge<A>`](puroro-rt/src/fields/wire/repeated_element.rs) so nested messages can require `M: Message<Alloc = A>`. That trait also provides `default_element` / `decode_element` (singular occurrence; packed `Len` rejected) for map-entry interiors. Singular fields store `Slot<A>`; repeated fields store `Element<A>` (not always the same — nested-message repeated uses `Element = M` while singular keeps `Slot = UnmanagedBox<M, A>`).
 
 | Marker | `Element<A>` | Packable | `values_mut` |
 |---|---|---|---|
@@ -221,6 +229,8 @@ Singular / oneof `bool` uses allocator-free [`ProtoBool`](puroro-rt/src/fields/w
 | `ProtoString` / `ProtoBytes` | `UnmanagedString<A>` / `UnmanagedVec<u8, A>` | no (`RepeatedSlicePush` for `push_*`) | no |
 | `ProtoMessage<M>` | `M` (inline; use site `M::Alloc = A`) | no | yes (`RepeatedVecMut`) |
 | `ProtoBool` | `bool` (plain; not `BitPacked`) | yes (`PackableRepeatedElement`) | yes (`RepeatedVecMut`) |
+
+[`MapKey`](puroro-rt/src/fields/wire/map_element.rs) is an empty marker over `RepeatedElement` restricted to valid protobuf map keys (integrals / `bool` / `string`). Map **values** use `RepeatedElement` directly (anything except another map).
 
 ### Varint helper
 
@@ -286,7 +296,7 @@ Varint and LEN singular scalars share one wrapper, parametrised by [`ProtoType`]
 | `SingularField<ProtoBool, P, FIELD, A, BitPacked<VALUE_BIT>>` | same | `Slot = ()`; value at `VALUE_BIT` via layout | — |
 | `SingularField<ProtoMessage<M>, P, FIELD, A>` | same | `Slot = UnmanagedBox<M, A>`; `NonOneof` → `Option`; `Oneof` → always-present | — |
 | `RepeatedField<T, E, FIELD, A>` | [`repeated/field.rs`](puroro-rt/src/fields/repeated/field.rs) | `T: RepeatedElement`, `E: RepeatedEncoding<T, A>`, stores `T::Element<A>` | — |
-| Fixed-width singular | (planned via `ProtoType` + `SingularField`) | — | — |
+| `MapField<K, V, FIELD, A>` | [`map/field.rs`](puroro-rt/src/fields/map/field.rs) | `K: MapKey`, `V: RepeatedElement`, stores `HashMap<K::Element, V::Element, A>` | — |
 | `OneofSlot<E>` | [`oneof.rs`](puroro-rt/src/fields/oneof.rs) | mutually exclusive variants | — |
 
 **Closed enum:** `SingularField<ProtoEnum<E, Closed>, Explicit, FIELD>::bind(…).merge(…)` — `decode` yields `UnknownClosedEnum { raw }`, which `merge` diverts → `unknown_fields`, bit not set.
@@ -321,6 +331,8 @@ Adding a singular wire type = one new `ProtoType` impl (and usually a `VarintPro
 | `repeated int32 EXPANDED` | `RepeatedField<ProtoInt32, Expanded, FIELD>` |
 | `repeated string` | `RepeatedField<ProtoString, Expanded, FIELD>` |
 | `repeated bytes` | `RepeatedField<ProtoBytes, Expanded, FIELD>` |
+| `map<string, int32>` | `MapField<ProtoString, ProtoInt32, FIELD, A>` |
+| `map<int32, Address>` | `MapField<ProtoInt32, ProtoMessage<Address<A>>, FIELD, A>` |
 | nested message | `SingularField<ProtoMessage<M, A>, NonOneof, FIELD>` |
 | `oneof` | `OneofSlot<E>` — not a singular catalog entry |
 
@@ -347,10 +359,15 @@ pub struct Task<A: Allocator + Clone = Global> {
     notification: OneofSlot<NotificationStorage<A>>,
     done: SingularField<ProtoBool, Implicit, { FIELD_DONE }, A, BitPacked<{ BIT_DONE_VALUE }>>,
     flag: SingularField<ProtoBool, Explicit<{ BIT_FLAG }>, { FIELD_FLAG }, A, BitPacked<{ BIT_FLAG_VALUE }>>,
+    watchers: RepeatedField<ProtoMessage<Address<A>>, Expanded, { FIELD_WATCHERS }, A>,
+    votes: RepeatedField<ProtoBool, Packed, { FIELD_VOTES }, A>,
+    attributes: MapField<ProtoString, ProtoInt32, { FIELD_ATTRIBUTES }, A>,
 }
 ```
 
-The `A: Allocator + Clone` struct bound is what lets the generated `Drop` clone the allocator into nested children and free every field from one place. Heap payloads use `unmanaged` types parameterized by `A` plus `PhantomData<A>` (no allocator *instance* in the field). Protobuf markers are allocator-free; field wrappers carry `A` so slots/`DefaultIn<A>` / `DeallocateIn<A>` associate against `MessageCommon<P, A>`. The only owned `A` value remains `_common.alloc`. Singular `bool` uses `SingularField<ProtoBool, …, A, BitPacked<VALUE_BIT>>` with ZST `Slot = ()`; the value lives in `_common.presence`.
+The `A: Allocator + Clone` struct bound is what lets the generated `Drop` clone the allocator into nested children and free every field from one place. Heap payloads use `unmanaged` types parameterized by `A` plus `PhantomData<A>` (no allocator *instance* in the field, except maps — see below). Protobuf markers are allocator-free; field wrappers carry `A` so slots/`DefaultIn<A>` / `DeallocateIn<A>` associate against `MessageCommon<P, A>`. Singular `bool` uses `SingularField<ProtoBool, …, A, BitPacked<VALUE_BIT>>` with ZST `Slot = ()`; the value lives in `_common.presence`.
+
+**Owned `A` instances:** `_common.alloc`, plus one embedded `A` per `MapField` (`hashbrown::HashMap` owns its allocator).
 
 ### Storage summary
 
@@ -360,6 +377,7 @@ The `A: Allocator + Clone` struct bound is what lets the generated `Drop` clone 
 | EXPLICIT / LEGACY_REQUIRED scalar or LEN | `ManuallyDrop<MaybeUninit<T>>` | presence bit in `_common.presence` |
 | Singular / oneof `bool` | `SingularField` + `ProtoBool` + `BitPacked<VALUE_BIT>` (`Slot = ()`) | value bit (+ presence bit for EXPLICIT / LEGACY_REQUIRED) in `_common.presence` |
 | Repeated | `RepeatedField<T, E, FIELD, A>` (`UnmanagedVec<T::Element<A>>`) | empty = absent |
+| Map | `MapField<K, V, FIELD, A>` (`HashMap` of elements, owns `A`) | empty = absent |
 | Nested message | `Option<UnmanagedBox<M, A>>` (`NonOneof`) | `Option`, not bitfield |
 | Oneof (non-bool) | `Option<E>` in slot | `Option`, not bitfield |
 
@@ -563,7 +581,7 @@ fn encode_raw<B: BufMut>(&self, buf: &mut B) {
 1. Loop: `puroro_rt::decode::decode_tag` → `(field_number, wire_type)`.
 2. `match field_number` — one catalog `merge` per arm (closed-enum unknowns are diverted inside `merge` via `DecodeError::UnknownClosedEnum`).
 3. Unknown → `puroro_rt::decode::skip_field_and_save` into `_common.unknown_fields`.
-4. Singular: last wins. Repeated: append. Nested: merge sub-buffer.
+4. Singular: last wins. Repeated: append. Map: insert entry (last-wins on key). Nested: merge sub-buffer.
 
 ```rust
 Self::FIELD_PRIORITY => self
@@ -653,7 +671,33 @@ Mutation uses the bound-view idiom: `field.bind_mut(&mut common)` → [`Repeated
 
 **`repeated bool`:** `RepeatedField<ProtoBool, Packed|Expanded, FIELD, A>` with plain `bool` elements — **no** [`BitPacked`](puroro-rt/src/fields/shared/value_layout.rs) / MessageCommon bit index (see [Bit-packed bool](#bit-packed-bool-protobool)). Sample: `Task.votes`.
 
-> Note: the bound-view idiom covers every field family — `SingularField`, `RepeatedField`, and `OneofSlot` — on both read and write paths. Terminal `deallocate` stays a direct field method (called from `Drop`).
+> Note: the bound-view idiom covers every field family — `SingularField`, `RepeatedField`, `MapField`, and `OneofSlot` — on both read and write paths. Terminal `deallocate` stays a direct field method (called from `Drop`).
+
+### 15.1 Map fields
+
+**Catalog:** [`MapField<K, V, FIELD, A>`](puroro-rt/src/fields/map/field.rs) with `K: MapKey`, `V: RepeatedElement`. Storage is [`MapEntries`](puroro-rt/src/fields/map/entries.rs) — a thin `hashbrown::HashMap<K::Element<A>, V::Element<A>, …, A>` that **owns** allocator `A` (unlike `UnmanagedVec` fields). Wire order is unspecified; only the hash map is kept.
+
+**Wire:** each map occurrence is one LEN field `FIELD` whose payload is a synthetic entry message (`key = 1`, `value = 2`). Encode/decode helpers live in [`map/entry.rs`](puroro-rt/src/fields/map/entry.rs). Element tags use `K::encode_element` / `V::encode_element`. Decode uses `RepeatedElementMerge::{decode_element, default_element}` (singular wire types only; packed rejected inside the entry). Missing key/value → type default. Unknown tags inside the entry are skipped via [`skip_field`](puroro-rt/src/decode.rs) (not preserved).
+
+| | Behaviour |
+|---|---|
+| Encode | One LEN record per map entry (order unspecified) |
+| Merge | Decode one entry → `insert` (last-wins; frees replaced value + discarded key) |
+| Empty | Absent on the wire |
+
+**Bound views:** `bind` / `bind_mut` → [`MapFieldRef`](puroro-rt/src/fields/map/field.rs) / [`MapFieldMut`](puroro-rt/src/fields/map/field.rs). Mut methods take `&mut self` so a single handle supports multiple ops:
+
+| Method | Role |
+|---|---|
+| `get` / `get_mut` / `iter` / `len` | Lookup |
+| `insert` | Owned key + value elements |
+| `insert_in` | `RepeatedSlicePush` keys (`string` / `bytes`) from a slice — like repeated `push_in` |
+| `remove` / `clear` | Free key + value via `deallocate_element` |
+| `merge` | One wire occurrence |
+
+**Key collision safety:** `HashMap::insert` would drop a colliding incoming key; `MapEntries::insert` keeps the stored key and returns `(incoming_key, previous_value)` for explicit release (required for `UnmanagedString` keys).
+
+Sample: `Task.attributes` — `map<string, int32>` → `MapField<ProtoString, ProtoInt32, { FIELD_ATTRIBUTES }, A>` with accessors `attributes()` / `attributes_mut()` / `clear_attributes()` ([DESIGN.md §4.10](DESIGN.md#410-map-fields)).
 
 ---
 
@@ -716,6 +760,7 @@ The `set_*` per-variant setters are removed, matching the other field families.
 | UTF-8 validation | Always `decode_string_in` (VERIFY) | Per-field `utf8_validation` feature |
 | Recursion limit | Enforced (`RECURSION_LIMIT = 100`, `merge_from_with_depth`) | — |
 | Repeated wrappers | `RepeatedField` + `RepeatedElement` (message / bool / scalar / LEN) | — |
+| Map wrappers | `MapField` + `MapKey` / `RepeatedElement` (sample `attributes`) | — |
 | `protoc` plugin | — | FieldKind → catalog emission |
 | Zero-copy views | — | `TaskView<'buf>` (DESIGN.md §8) |
 | `TaskLazy` | DESIGN only | Wire buffer + on-demand decode |
