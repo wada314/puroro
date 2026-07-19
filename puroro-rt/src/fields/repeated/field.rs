@@ -3,6 +3,7 @@
 //! Elements are stored in an allocator-less [`UnmanagedVec`] wrapped in
 //! [`ManuallyDrop`]. Growth and release borrow the message allocator.
 
+use ::core::fmt::{Debug, Formatter, Result as FmtResult};
 use ::core::marker::PhantomData;
 use ::core::mem::ManuallyDrop;
 
@@ -15,6 +16,7 @@ use ::unmanaged::vec::VecGuard;
 use ::puroro::DecodeError;
 use ::puroro::WireType;
 
+use crate::fields::shared::field_inspect::{FieldDebug, FieldPartialEq};
 use crate::fields::shared::{FieldDeallocate, MessageCommon, PresenceBits};
 use crate::fields::wire::repeated_element::{
     RepeatedElement, RepeatedElementMerge, RepeatedElementMut, RepeatedSlicePush, RepeatedVecMut,
@@ -288,5 +290,38 @@ where
         T::merge_occurrence(wire_type, buf, alloc, depth, |elem| {
             g.push(elem);
         })
+    }
+}
+
+impl<T, E, const FIELD: u32, A, Pb> FieldPartialEq<Pb, A> for RepeatedField<T, E, FIELD, A>
+where
+    T: RepeatedElement,
+    E: RepeatedEncoding<T, A>,
+    A: Allocator + Clone,
+    Pb: PresenceBits,
+    T::Element<A>: PartialEq,
+{
+    #[inline]
+    fn field_eq(
+        &self,
+        _common: &MessageCommon<Pb, A>,
+        other: &Self,
+        _other_common: &MessageCommon<Pb, A>,
+    ) -> bool {
+        self.as_slice() == other.as_slice()
+    }
+}
+
+impl<T, E, const FIELD: u32, A, Pb> FieldDebug<Pb, A> for RepeatedField<T, E, FIELD, A>
+where
+    T: RepeatedElement,
+    E: RepeatedEncoding<T, A>,
+    A: Allocator + Clone,
+    Pb: PresenceBits,
+    T::Element<A>: Debug,
+{
+    #[inline]
+    fn fmt_debug(&self, _common: &MessageCommon<Pb, A>, f: &mut Formatter<'_>) -> FmtResult {
+        Debug::fmt(self.as_slice(), f)
     }
 }

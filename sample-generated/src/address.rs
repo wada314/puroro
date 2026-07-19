@@ -9,13 +9,15 @@ use ::bitvec::order::Lsb0;
 use ::bitvec::ptr::{BitRef, Mut};
 use ::bytes::{Buf, BufMut};
 use ::core::fmt;
+use ::core::ops::ControlFlow;
 use ::core::ops::DerefMut;
 
 use ::puroro::{DecodeError, Message};
 use ::puroro_rt::decode::{decode_tag, skip_field_and_save};
 use ::puroro_rt::{
-    Explicit, FieldDeallocate, MessageCommon, PresenceBits, ProtoDouble, ProtoFixed32, ProtoString,
-    SingularField,
+    DebugStructVisitor, Explicit, FieldDeallocVisitor, FieldEqVisitor, FieldPairVisitor,
+    FieldVisitor, FieldVisitorMut, MessageCommon, PresenceBits, ProtoDouble, ProtoFixed32,
+    ProtoString, SingularField,
 };
 use ::unmanaged::CloneIn;
 
@@ -155,6 +157,46 @@ impl<A: Allocator + Clone> Address<A> {
     pub fn clear_latitude(&mut self) {
         self.latitude.bind_mut(&mut self._common).clear();
     }
+
+    // -- field visitors (single enumeration for Eq / Debug / Drop) ----------
+
+    pub fn visit_fields<V: FieldVisitor<AddressPresence, A>>(
+        &self,
+        v: &mut V,
+    ) -> ControlFlow<V::Break> {
+        let c = &self._common;
+        v.visit("street", c, &self.street)?;
+        v.visit("city", c, &self.city)?;
+        v.visit("postal_code", c, &self.postal_code)?;
+        v.visit("latitude", c, &self.latitude)?;
+        ControlFlow::Continue(())
+    }
+
+    pub fn visit_fields_with<V: FieldPairVisitor<AddressPresence, A>>(
+        &self,
+        other: &Self,
+        v: &mut V,
+    ) -> ControlFlow<V::Break> {
+        let c = &self._common;
+        let o = &other._common;
+        v.visit("street", c, &self.street, o, &other.street)?;
+        v.visit("city", c, &self.city, o, &other.city)?;
+        v.visit("postal_code", c, &self.postal_code, o, &other.postal_code)?;
+        v.visit("latitude", c, &self.latitude, o, &other.latitude)?;
+        ControlFlow::Continue(())
+    }
+
+    pub fn visit_fields_mut<V: FieldVisitorMut<AddressPresence, A>>(
+        &mut self,
+        v: &mut V,
+    ) -> ControlFlow<V::Break> {
+        let c = &self._common;
+        v.visit_mut("street", c, &mut self.street)?;
+        v.visit_mut("city", c, &mut self.city)?;
+        v.visit_mut("postal_code", c, &mut self.postal_code)?;
+        v.visit_mut("latitude", c, &mut self.latitude)?;
+        ControlFlow::Continue(())
+    }
 }
 
 impl Address<Global> {
@@ -194,36 +236,19 @@ impl<A: Allocator + Clone> Clone for Address<A> {
 
 impl<A: Allocator + Clone> PartialEq for Address<A> {
     fn eq(&self, other: &Self) -> bool {
-        optional_eq(self.street(), other.street())
-            && optional_eq(self.city(), other.city())
-            && optional_eq(self.postal_code(), other.postal_code())
-            && optional_eq(self.latitude(), other.latitude())
-            && self._common.unknown_fields.as_ref() == other._common.unknown_fields.as_ref()
+        matches!(
+            self.visit_fields_with(other, &mut FieldEqVisitor),
+            ControlFlow::Continue(())
+        ) && self._common.unknown_fields_eq(&other._common)
     }
 }
 
 impl<A: Allocator + Clone> fmt::Debug for Address<A> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("Address")
-            .field("street", &debug_optional(self.street()))
-            .field("city", &debug_optional(self.city()))
-            .field("postal_code", &debug_optional(self.postal_code()))
-            .field("latitude", &debug_optional(self.latitude()))
-            .finish()
+        let mut v = DebugStructVisitor::new(f.debug_struct("Address"));
+        let _ = self.visit_fields(&mut v);
+        v.finish()
     }
-}
-
-fn optional_eq<T: Copy + PartialEq, D: ::puroro::HasDefault<T>>(
-    a: ::puroro::Optional<T, D>,
-    b: ::puroro::Optional<T, D>,
-) -> bool {
-    a.is_set() == b.is_set() && (!a.is_set() || a.get() == b.get())
-}
-
-fn debug_optional<T: Copy + fmt::Debug, D: ::puroro::HasDefault<T>>(
-    v: ::puroro::Optional<T, D>,
-) -> Option<T> {
-    if v.is_set() { Some(v.get()) } else { None }
 }
 
 // ---------------------------------------------------------------------------
@@ -232,10 +257,7 @@ fn debug_optional<T: Copy + fmt::Debug, D: ::puroro::HasDefault<T>>(
 
 impl<A: Allocator + Clone> Drop for Address<A> {
     fn drop(&mut self) {
-        self.street.deallocate(&self._common);
-        self.city.deallocate(&self._common);
-        self.postal_code.deallocate(&self._common);
-        self.latitude.deallocate(&self._common);
+        let _ = self.visit_fields_mut(&mut FieldDeallocVisitor);
         self._common.deallocate();
     }
 }

@@ -14,15 +14,17 @@ use ::bitvec::order::Lsb0;
 use ::bitvec::ptr::{BitRef, Mut};
 use ::bytes::{Buf, BufMut};
 use ::core::fmt;
+use ::core::ops::ControlFlow;
 use ::core::ops::DerefMut;
 
 use ::puroro::{DecodeError, HasDefault, Message, Optional};
 use ::puroro_rt::decode::{decode_tag, skip_field_and_save};
 use ::puroro_rt::{
-    BitPacked, Closed, Expanded, Explicit, FieldDeallocate, Implicit, Inline, LegacyRequired,
-    MapField, MapFieldMut, MapFieldRef, MessageCommon, NonOneof, OneofSlot, Open, Packed,
-    PresenceBits, ProtoBool, ProtoBytes, ProtoEnum, ProtoInt32, ProtoMessage, ProtoString,
-    RepeatedElementsMut, RepeatedField, SingularField,
+    BitPacked, Closed, DebugStructVisitor, Expanded, Explicit, FieldDeallocVisitor, FieldEqVisitor,
+    FieldPairVisitor, FieldVisitor, FieldVisitorMut, Implicit, Inline, LegacyRequired, MapField,
+    MapFieldMut, MapFieldRef, MessageCommon, NonOneof, OneofSlot, Open, Packed, PresenceBits,
+    ProtoBool, ProtoBytes, ProtoEnum, ProtoInt32, ProtoMessage, ProtoString, RepeatedElementsMut,
+    RepeatedField, SingularField,
 };
 use ::unmanaged::CloneIn;
 
@@ -577,6 +579,94 @@ impl<A: Allocator + Clone> Task<A> {
             .bind_mut(&mut self._common)
             .value_mut()
     }
+
+    // -- field visitors (single enumeration for Eq / Debug / Drop) ----------
+
+    /// Invokes `v` once per catalog field, in declaration order.
+    pub fn visit_fields<V: FieldVisitor<TaskPresence, A>>(
+        &self,
+        v: &mut V,
+    ) -> ControlFlow<V::Break> {
+        let c = &self._common;
+        v.visit("title", c, &self.title)?;
+        v.visit("score", c, &self.score)?;
+        v.visit("max_retries", c, &self.max_retries)?;
+        v.visit("owner_id", c, &self.owner_id)?;
+        v.visit("payload", c, &self.payload)?;
+        v.visit("tag_ids", c, &self.tag_ids)?;
+        v.visit("scores", c, &self.scores)?;
+        v.visit("labels", c, &self.labels)?;
+        v.visit("status", c, &self.status)?;
+        v.visit("priority", c, &self.priority)?;
+        v.visit("assignee", c, &self.assignee)?;
+        v.visit("notification", c, &self.notification)?;
+        v.visit("done", c, &self.done)?;
+        v.visit("flag", c, &self.flag)?;
+        v.visit("watchers", c, &self.watchers)?;
+        v.visit("votes", c, &self.votes)?;
+        v.visit("attributes", c, &self.attributes)?;
+        ControlFlow::Continue(())
+    }
+
+    /// Like [`visit_fields`](Self::visit_fields), pairing each field with `other`.
+    pub fn visit_fields_with<V: FieldPairVisitor<TaskPresence, A>>(
+        &self,
+        other: &Self,
+        v: &mut V,
+    ) -> ControlFlow<V::Break> {
+        let c = &self._common;
+        let o = &other._common;
+        v.visit("title", c, &self.title, o, &other.title)?;
+        v.visit("score", c, &self.score, o, &other.score)?;
+        v.visit("max_retries", c, &self.max_retries, o, &other.max_retries)?;
+        v.visit("owner_id", c, &self.owner_id, o, &other.owner_id)?;
+        v.visit("payload", c, &self.payload, o, &other.payload)?;
+        v.visit("tag_ids", c, &self.tag_ids, o, &other.tag_ids)?;
+        v.visit("scores", c, &self.scores, o, &other.scores)?;
+        v.visit("labels", c, &self.labels, o, &other.labels)?;
+        v.visit("status", c, &self.status, o, &other.status)?;
+        v.visit("priority", c, &self.priority, o, &other.priority)?;
+        v.visit("assignee", c, &self.assignee, o, &other.assignee)?;
+        v.visit(
+            "notification",
+            c,
+            &self.notification,
+            o,
+            &other.notification,
+        )?;
+        v.visit("done", c, &self.done, o, &other.done)?;
+        v.visit("flag", c, &self.flag, o, &other.flag)?;
+        v.visit("watchers", c, &self.watchers, o, &other.watchers)?;
+        v.visit("votes", c, &self.votes, o, &other.votes)?;
+        v.visit("attributes", c, &self.attributes, o, &other.attributes)?;
+        ControlFlow::Continue(())
+    }
+
+    /// Mutable field walk for [`Drop`] / bulk clear.
+    pub fn visit_fields_mut<V: FieldVisitorMut<TaskPresence, A>>(
+        &mut self,
+        v: &mut V,
+    ) -> ControlFlow<V::Break> {
+        let c = &self._common;
+        v.visit_mut("title", c, &mut self.title)?;
+        v.visit_mut("score", c, &mut self.score)?;
+        v.visit_mut("max_retries", c, &mut self.max_retries)?;
+        v.visit_mut("owner_id", c, &mut self.owner_id)?;
+        v.visit_mut("payload", c, &mut self.payload)?;
+        v.visit_mut("tag_ids", c, &mut self.tag_ids)?;
+        v.visit_mut("scores", c, &mut self.scores)?;
+        v.visit_mut("labels", c, &mut self.labels)?;
+        v.visit_mut("status", c, &mut self.status)?;
+        v.visit_mut("priority", c, &mut self.priority)?;
+        v.visit_mut("assignee", c, &mut self.assignee)?;
+        v.visit_mut("notification", c, &mut self.notification)?;
+        v.visit_mut("done", c, &mut self.done)?;
+        v.visit_mut("flag", c, &mut self.flag)?;
+        v.visit_mut("watchers", c, &mut self.watchers)?;
+        v.visit_mut("votes", c, &mut self.votes)?;
+        v.visit_mut("attributes", c, &mut self.attributes)?;
+        ControlFlow::Continue(())
+    }
 }
 
 impl Task<Global> {
@@ -629,100 +719,18 @@ impl<A: Allocator + Clone> Clone for Task<A> {
 
 impl<A: Allocator + Clone> PartialEq for Task<A> {
     fn eq(&self, other: &Self) -> bool {
-        fn opt_eq<T: Copy + PartialEq, D: HasDefault<T>>(
-            a: Optional<T, D>,
-            b: Optional<T, D>,
-        ) -> bool {
-            a.is_set() == b.is_set() && (!a.is_set() || a.get() == b.get())
-        }
-
-        opt_eq(self.title(), other.title())
-            && self.score() == other.score()
-            && opt_eq(self.max_retries(), other.max_retries())
-            && opt_eq(self.owner_id(), other.owner_id())
-            && opt_eq(self.payload(), other.payload())
-            && self.tag_ids() == other.tag_ids()
-            && self.scores() == other.scores()
-            && self.labels().len() == other.labels().len()
-            && self
-                .labels()
-                .iter()
-                .zip(other.labels())
-                .all(|(a, b)| **a == **b)
-            && opt_eq(self.status(), other.status())
-            && opt_eq(self.priority(), other.priority())
-            && self.assignee() == other.assignee()
-            && self.done() == other.done()
-            && opt_eq(self.flag(), other.flag())
-            && self.watchers() == other.watchers()
-            && self.votes() == other.votes()
-            && attributes_eq(self, other)
-            && notification_eq(self.notification().as_ref(), other.notification().as_ref())
-            && self._common.unknown_fields.as_ref() == other._common.unknown_fields.as_ref()
-    }
-}
-
-fn attributes_eq<A: Allocator + Clone>(a: &Task<A>, b: &Task<A>) -> bool {
-    if a.attributes.len() != b.attributes.len() {
-        return false;
-    }
-    a.attributes
-        .bind(&a._common)
-        .iter()
-        .all(|(k, v)| b.attributes.bind(&b._common).get(&**k) == Some(v))
-}
-
-fn notification_eq<'a, A: Allocator + Clone>(
-    a: Option<NotificationRef<'a, A>>,
-    b: Option<NotificationRef<'a, A>>,
-) -> bool {
-    match (a, b) {
-        (None, None) => true,
-        (Some(Notification::EmailAddress(x)), Some(Notification::EmailAddress(y))) => x == y,
-        (Some(Notification::PhoneNumber(x)), Some(Notification::PhoneNumber(y))) => x == y,
-        (Some(Notification::WebhookId(x)), Some(Notification::WebhookId(y))) => x == y,
-        (Some(Notification::Postal(x)), Some(Notification::Postal(y))) => x == y,
-        (Some(Notification::Urgent(x)), Some(Notification::Urgent(y))) => x == y,
-        _ => false,
+        matches!(
+            self.visit_fields_with(other, &mut FieldEqVisitor),
+            ControlFlow::Continue(())
+        ) && self._common.unknown_fields_eq(&other._common)
     }
 }
 
 impl<A: Allocator + Clone> fmt::Debug for Task<A> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        fn opt<T: Copy + fmt::Debug, D: HasDefault<T>>(v: Optional<T, D>) -> Option<T> {
-            if v.is_set() { Some(v.get()) } else { None }
-        }
-
-        f.debug_struct("Task")
-            .field("title", &opt(self.title()))
-            .field("score", &self.score())
-            .field("max_retries", &opt(self.max_retries()))
-            .field("owner_id", &opt(self.owner_id()))
-            .field("payload", &opt(self.payload()))
-            .field("tag_ids", &self.tag_ids())
-            .field("scores", &self.scores())
-            .field(
-                "labels",
-                &self.labels().iter().map(|s| &**s).collect::<Vec<_>>(),
-            )
-            .field("status", &opt(self.status()))
-            .field("priority", &opt(self.priority()))
-            .field("assignee", &self.assignee())
-            .field("notification_case", &self.notification_case())
-            .field("done", &self.done())
-            .field("flag", &opt(self.flag()))
-            .field("watchers", &self.watchers())
-            .field("votes", &self.votes())
-            .field(
-                "attributes",
-                &self
-                    .attributes
-                    .bind(&self._common)
-                    .iter()
-                    .map(|(k, v)| (&**k, *v))
-                    .collect::<Vec<_>>(),
-            )
-            .finish()
+        let mut v = DebugStructVisitor::new(f.debug_struct("Task"));
+        let _ = self.visit_fields(&mut v);
+        v.finish()
     }
 }
 
@@ -732,24 +740,7 @@ impl<A: Allocator + Clone> fmt::Debug for Task<A> {
 
 impl<A: Allocator + Clone> Drop for Task<A> {
     fn drop(&mut self) {
-        // Every direct child — same `deallocate(&common)` shape (FieldDeallocate).
-        self.title.deallocate(&self._common);
-        self.score.deallocate(&self._common);
-        self.max_retries.deallocate(&self._common);
-        self.owner_id.deallocate(&self._common);
-        self.payload.deallocate(&self._common);
-        self.tag_ids.deallocate(&self._common);
-        self.scores.deallocate(&self._common);
-        self.labels.deallocate(&self._common);
-        self.status.deallocate(&self._common);
-        self.priority.deallocate(&self._common);
-        self.assignee.deallocate(&self._common);
-        self.notification.deallocate(&self._common);
-        self.done.deallocate(&self._common);
-        self.flag.deallocate(&self._common);
-        self.watchers.deallocate(&self._common);
-        self.votes.deallocate(&self._common);
-        self.attributes.deallocate(&self._common);
+        let _ = self.visit_fields_mut(&mut FieldDeallocVisitor);
         self._common.deallocate();
     }
 }

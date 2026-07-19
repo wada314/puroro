@@ -176,6 +176,27 @@ impl<'a, A: Allocator + Clone> Copy
 {
 }
 
+impl<'a, A: Allocator + Clone> PartialEq
+    for Notification<
+        <ProtoString as ProtoType>::Ref<'a, A>,
+        <ProtoString as ProtoType>::Ref<'a, A>,
+        <ProtoInt32 as ProtoType>::Ref<'a, A>,
+        &'a Address<A>,
+        <ProtoBool as ProtoType>::Ref<'a, A>,
+    >
+{
+    fn eq(&self, other: &Self) -> bool {
+        match (self, other) {
+            (Self::EmailAddress(x), Self::EmailAddress(y)) => x == y,
+            (Self::PhoneNumber(x), Self::PhoneNumber(y)) => x == y,
+            (Self::WebhookId(x), Self::WebhookId(y)) => x == y,
+            (Self::Postal(x), Self::Postal(y)) => x == y,
+            (Self::Urgent(x), Self::Urgent(y)) => x == y,
+            _ => false,
+        }
+    }
+}
+
 impl<A: Allocator + Clone> OneofGroup for NotificationStorage<A> {
     type Case = NotificationCase;
     type Ref<'a>
@@ -210,6 +231,10 @@ impl<A: Allocator + Clone> OneofGroup for NotificationStorage<A> {
             Self::Postal(f) => Notification::Postal(f.value(common)),
             Self::Urgent(f) => Notification::Urgent(f.value(common)),
         }
+    }
+
+    fn ref_eq<'a>(lhs: &Self::Ref<'a>, rhs: &Self::Ref<'a>) -> bool {
+        lhs == rhs
     }
 
     fn to_mut<'a>(

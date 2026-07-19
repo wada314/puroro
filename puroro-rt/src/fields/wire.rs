@@ -8,6 +8,7 @@ pub(crate) mod fixed;
 pub(crate) mod len;
 pub(crate) mod map_element;
 pub(crate) mod proto_message;
+pub(crate) mod proto_ref_ops;
 pub(crate) mod proto_type;
 pub(crate) mod repeated_element;
 pub(crate) mod varint;

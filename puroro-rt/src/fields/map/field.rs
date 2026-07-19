@@ -5,6 +5,7 @@
 //!
 //! On the wire each entry is a LEN message with `key = 1` and `value = 2`.
 
+use ::core::fmt::{Debug, Formatter, Result as FmtResult};
 use ::core::hash::Hash;
 
 use ::allocator_api2::alloc::Allocator;
@@ -16,6 +17,7 @@ use ::puroro::{DecodeError, WireType};
 
 use crate::decode;
 use crate::encode;
+use crate::fields::shared::field_inspect::{FieldDebug, FieldPartialEq};
 use crate::fields::shared::{FieldDeallocate, MessageCommon, PresenceBits};
 use crate::fields::wire::map_element::MapKey;
 use crate::fields::wire::repeated_element::{
@@ -130,6 +132,46 @@ where
                 V::deallocate_element(v, alloc.clone());
             }
         }
+    }
+}
+
+impl<K, V, const FIELD: u32, A, Pb> FieldPartialEq<Pb, A> for MapField<K, V, FIELD, A>
+where
+    K: MapKey,
+    V: RepeatedElement,
+    A: Allocator + Clone,
+    Pb: PresenceBits,
+    K::Element<A>: Eq + Hash,
+    V::Element<A>: PartialEq,
+{
+    #[inline]
+    fn field_eq(
+        &self,
+        common: &MessageCommon<Pb, A>,
+        other: &Self,
+        other_common: &MessageCommon<Pb, A>,
+    ) -> bool {
+        if self.len() != other.len() {
+            return false;
+        }
+        self.bind(common)
+            .iter()
+            .all(|(k, v)| other.bind(other_common).get(k) == Some(v))
+    }
+}
+
+impl<K, V, const FIELD: u32, A, Pb> FieldDebug<Pb, A> for MapField<K, V, FIELD, A>
+where
+    K: MapKey,
+    V: RepeatedElement,
+    A: Allocator + Clone,
+    Pb: PresenceBits,
+    K::Element<A>: Eq + Hash + Debug,
+    V::Element<A>: Debug,
+{
+    #[inline]
+    fn fmt_debug(&self, _common: &MessageCommon<Pb, A>, f: &mut Formatter<'_>) -> FmtResult {
+        f.debug_map().entries(self.entries.iter()).finish()
     }
 }
 

@@ -21,6 +21,7 @@ use ::unmanaged::UnmanagedBox;
 use ::unmanaged::DeallocateIn;
 
 use crate::fields::enum_variant::EnumVariant;
+use crate::fields::shared::field_inspect::{FieldDebug, FieldPartialEq};
 use crate::fields::shared::{
     DefaultIn, FieldDeallocate, MessageCommon, PresenceBits, ValueLayout,
     field_presence::{FieldPresence, Oneof},
@@ -360,6 +361,41 @@ impl<E: PartialEq> PartialEq for OneofSlot<E> {
     }
 }
 
+impl<E, Pb, A> FieldPartialEq<Pb, A> for OneofSlot<E>
+where
+    E: OneofGroup<Presence = Pb, Alloc = A>,
+    Pb: PresenceBits,
+    A: Allocator + Clone,
+{
+    #[inline]
+    fn field_eq(
+        &self,
+        common: &MessageCommon<Pb, A>,
+        other: &Self,
+        other_common: &MessageCommon<Pb, A>,
+    ) -> bool {
+        match (self.as_ref(), other.as_ref()) {
+            (None, None) => true,
+            (Some(a), Some(b)) => E::ref_eq(&E::to_ref(a, common), &E::to_ref(b, other_common)),
+            _ => false,
+        }
+    }
+}
+
+impl<E, Pb, A> FieldDebug<Pb, A> for OneofSlot<E>
+where
+    E: OneofGroup<Presence = Pb, Alloc = A>,
+    Pb: PresenceBits,
+    A: Allocator + Clone,
+    E::Case: Debug,
+{
+    #[inline]
+    fn fmt_debug(&self, _common: &MessageCommon<Pb, A>, f: &mut Formatter<'_>) -> FmtResult {
+        // Discriminant only — matches the former `notification_case` Debug field.
+        Debug::fmt(&self.as_ref().map(E::case), f)
+    }
+}
+
 // ---------------------------------------------------------------------------
 // Per-variant read handles
 // ---------------------------------------------------------------------------
@@ -472,6 +508,9 @@ where
         storage: &'a mut Self,
         common: &'a mut MessageCommon<Self::Presence, Self::Alloc>,
     ) -> Self::Mut<'a>;
+
+    /// Semantic equality of two projected refs (for message `PartialEq`).
+    fn ref_eq<'a>(lhs: &Self::Ref<'a>, rhs: &Self::Ref<'a>) -> bool;
 
     /// Deep-copies an active storage value into `alloc`.
     fn clone_storage_in(

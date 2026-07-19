@@ -7,12 +7,17 @@
 //! storage and init state. Slot teardown uses [`unmanaged::DeallocateIn`].
 
 pub(crate) mod field_deallocate;
+pub(crate) mod field_inspect;
 pub(crate) mod field_presence;
 pub(crate) mod slot_init;
 pub(crate) mod value_layout;
 pub(crate) mod value_slot;
 
 pub use field_deallocate::FieldDeallocate;
+pub use field_inspect::{
+    DebugStructVisitor, FieldDeallocVisitor, FieldDebug, FieldEqVisitor, FieldPairVisitor,
+    FieldPartialEq, FieldVisitor, FieldVisitorMut,
+};
 pub use value_layout::{BitPacked, Inline, ValueLayout};
 
 use ::core::mem::ManuallyDrop;
@@ -114,6 +119,12 @@ impl<P, A: Allocator + Clone> MessageCommon<P, A> {
     #[inline]
     pub fn iter_unknown_fields(&self) -> UnknownFieldsIter<'_> {
         iter_unknown_fields(&self.unknown_fields)
+    }
+
+    /// Byte-equality of the preserved unknown-field blob (for message `PartialEq`).
+    #[inline]
+    pub fn unknown_fields_eq(&self, other: &Self) -> bool {
+        self.unknown_fields.as_ref() == other.unknown_fields.as_ref()
     }
 }
 

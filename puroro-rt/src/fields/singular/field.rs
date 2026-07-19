@@ -29,16 +29,18 @@ use ::puroro::{HasDefault, Optional};
 use ::unmanaged::{CloneIn, DeallocateIn};
 
 use crate::fields::shared::FieldDeallocate;
+use crate::fields::shared::field_inspect::{FieldDebug, FieldPartialEq};
 use crate::fields::shared::{
     DefaultIn, MessageCommon, PresenceBits,
     field_presence::{
-        FieldPresence, Implicit, LegacyRequired, NonOneof, Oneof, RequiredFieldPresence,
+        Explicit, FieldPresence, Implicit, LegacyRequired, NonOneof, Oneof, RequiredFieldPresence,
     },
     slot_init::{AlwaysInitialized, SlotInitView},
     value_layout::{Inline, ValueLayout},
     value_slot::{AddressableSlot, ValueSlot, ValueSlotRefAccess},
 };
 use crate::fields::wire::proto_message::ProtoMessage;
+use crate::fields::wire::proto_ref_ops::{ProtoRefDebug, ProtoRefEq};
 use crate::fields::wire::proto_type::ProtoType;
 use ::puroro::Message;
 use ::unmanaged::UnmanagedBox;
@@ -525,5 +527,96 @@ where
     /// Resets the value slot and clears explicit presence when applicable.
     pub fn clear(self) {
         L::clear(&mut *self.field.value, P::slot_init_mut(), self.common);
+    }
+}
+
+// ---------------------------------------------------------------------------
+// FieldPartialEq / FieldDebug (message visit_fields)
+// ---------------------------------------------------------------------------
+
+impl<T, P, const FIELD: u32, A, L, D, Pb> FieldPartialEq<Pb, A>
+    for SingularField<T, P, FIELD, A, L, D>
+where
+    T: ProtoType + ProtoRefEq<A>,
+    P: FieldPresence,
+    A: Allocator + Clone,
+    L: ValueLayout<T, A>,
+    Pb: PresenceBits,
+    T::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
+    P::ValueSlot<T::Slot<A>>: ValueSlot<T::Slot<A>, A>,
+{
+    #[inline]
+    fn field_eq(
+        &self,
+        common: &MessageCommon<Pb, A>,
+        other: &Self,
+        other_common: &MessageCommon<Pb, A>,
+    ) -> bool {
+        // Option equality matches getter semantics (IMPLICIT zero ≡ unset).
+        T::option_eq(self.bind(common).get(), other.bind(other_common).get())
+    }
+}
+
+impl<T, const FIELD: u32, A, L, D, Pb> FieldDebug<Pb, A>
+    for SingularField<T, Implicit, FIELD, A, L, D>
+where
+    T: ProtoType + ProtoRefDebug<A>,
+    A: Allocator + Clone,
+    L: ValueLayout<T, A>,
+    Pb: PresenceBits,
+    T::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
+    <Implicit as FieldPresence>::ValueSlot<T::Slot<A>>: ValueSlot<T::Slot<A>, A>,
+{
+    #[inline]
+    fn fmt_debug(&self, common: &MessageCommon<Pb, A>, f: &mut Formatter<'_>) -> FmtResult {
+        T::fmt_ref(&self.value(common), f)
+    }
+}
+
+impl<T, const BIT: usize, const FIELD: u32, A, L, D, Pb> FieldDebug<Pb, A>
+    for SingularField<T, Explicit<BIT>, FIELD, A, L, D>
+where
+    T: ProtoType + ProtoRefDebug<A>,
+    A: Allocator + Clone,
+    L: ValueLayout<T, A>,
+    Pb: PresenceBits,
+    T::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
+    <Explicit<BIT> as FieldPresence>::ValueSlot<T::Slot<A>>: ValueSlot<T::Slot<A>, A>,
+{
+    #[inline]
+    fn fmt_debug(&self, common: &MessageCommon<Pb, A>, f: &mut Formatter<'_>) -> FmtResult {
+        T::fmt_option(self.bind(common).get(), f)
+    }
+}
+
+impl<T, const BIT: usize, const FIELD: u32, A, L, D, Pb> FieldDebug<Pb, A>
+    for SingularField<T, LegacyRequired<BIT>, FIELD, A, L, D>
+where
+    T: ProtoType + ProtoRefDebug<A>,
+    A: Allocator + Clone,
+    L: ValueLayout<T, A>,
+    Pb: PresenceBits,
+    T::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
+    <LegacyRequired<BIT> as FieldPresence>::ValueSlot<T::Slot<A>>: ValueSlot<T::Slot<A>, A>,
+{
+    #[inline]
+    fn fmt_debug(&self, common: &MessageCommon<Pb, A>, f: &mut Formatter<'_>) -> FmtResult {
+        T::fmt_option(self.bind(common).get(), f)
+    }
+}
+
+impl<T, const FIELD: u32, A, L, D, Pb> FieldDebug<Pb, A>
+    for SingularField<T, NonOneof, FIELD, A, L, D>
+where
+    T: ProtoType + ProtoRefDebug<A>,
+    A: Allocator + Clone,
+    L: ValueLayout<T, A>,
+    Pb: PresenceBits,
+    T::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
+    <NonOneof as FieldPresence>::ValueSlot<T::Slot<A>>: ValueSlot<T::Slot<A>, A>,
+{
+    #[inline]
+    fn fmt_debug(&self, common: &MessageCommon<Pb, A>, f: &mut Formatter<'_>) -> FmtResult {
+        T::fmt_option(self.bind(common).get(), f)
     }
 }
