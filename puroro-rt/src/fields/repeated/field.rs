@@ -16,7 +16,7 @@ use ::unmanaged::vec::VecGuard;
 use ::puroro::DecodeError;
 use ::puroro::WireType;
 
-use crate::fields::shared::field_inspect::{FieldDebug, FieldPartialEq};
+use crate::fields::shared::field_inspect::{FieldCloneIn, FieldDebug, FieldEncode, FieldPartialEq};
 use crate::fields::shared::{FieldDeallocate, MessageCommon, PresenceBits};
 use crate::fields::wire::repeated_element::{
     RepeatedElement, RepeatedElementMerge, RepeatedElementMut, RepeatedSlicePush, RepeatedVecMut,
@@ -323,5 +323,37 @@ where
     #[inline]
     fn fmt_debug(&self, _common: &MessageCommon<Pb, A>, f: &mut Formatter<'_>) -> FmtResult {
         Debug::fmt(self.as_slice(), f)
+    }
+}
+
+impl<T, E, const FIELD: u32, A, Pb> FieldEncode<Pb, A> for RepeatedField<T, E, FIELD, A>
+where
+    T: RepeatedElement,
+    E: RepeatedEncoding<T, A>,
+    A: Allocator + Clone,
+    Pb: PresenceBits,
+{
+    #[inline]
+    fn wire_encoded_len(&self, common: &MessageCommon<Pb, A>) -> usize {
+        self.encoded_len(common)
+    }
+
+    #[inline]
+    fn wire_encode_raw<B: BufMut>(&self, common: &MessageCommon<Pb, A>, buf: &mut B) {
+        self.encode_raw(common, buf);
+    }
+}
+
+impl<T, E, const FIELD: u32, A, Pb> FieldCloneIn<Pb, A> for RepeatedField<T, E, FIELD, A>
+where
+    T: RepeatedElement,
+    E: RepeatedEncoding<T, A>,
+    A: Allocator + Clone,
+    Pb: PresenceBits,
+    T::Element<A>: CloneIn<A>,
+{
+    #[inline]
+    fn clone_field(&self, common: &MessageCommon<Pb, A>, alloc: A) -> Self {
+        self.clone_in(common, alloc)
     }
 }

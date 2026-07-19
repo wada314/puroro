@@ -17,7 +17,7 @@ use ::puroro::{DecodeError, WireType};
 
 use crate::decode;
 use crate::encode;
-use crate::fields::shared::field_inspect::{FieldDebug, FieldPartialEq};
+use crate::fields::shared::field_inspect::{FieldCloneIn, FieldDebug, FieldEncode, FieldPartialEq};
 use crate::fields::shared::{FieldDeallocate, MessageCommon, PresenceBits};
 use crate::fields::wire::map_element::MapKey;
 use crate::fields::wire::repeated_element::{
@@ -172,6 +172,40 @@ where
     #[inline]
     fn fmt_debug(&self, _common: &MessageCommon<Pb, A>, f: &mut Formatter<'_>) -> FmtResult {
         f.debug_map().entries(self.entries.iter()).finish()
+    }
+}
+
+impl<K, V, const FIELD: u32, A, Pb> FieldEncode<Pb, A> for MapField<K, V, FIELD, A>
+where
+    K: MapKey,
+    V: RepeatedElement,
+    A: Allocator + Clone,
+    Pb: PresenceBits,
+    K::Element<A>: Eq + Hash,
+{
+    #[inline]
+    fn wire_encoded_len(&self, common: &MessageCommon<Pb, A>) -> usize {
+        self.encoded_len(common)
+    }
+
+    #[inline]
+    fn wire_encode_raw<B: BufMut>(&self, common: &MessageCommon<Pb, A>, buf: &mut B) {
+        self.encode_raw(common, buf);
+    }
+}
+
+impl<K, V, const FIELD: u32, A, Pb> FieldCloneIn<Pb, A> for MapField<K, V, FIELD, A>
+where
+    K: MapKey,
+    V: RepeatedElement,
+    A: Allocator + Clone,
+    Pb: PresenceBits,
+    K::Element<A>: CloneIn<A> + Eq + Hash,
+    V::Element<A>: CloneIn<A>,
+{
+    #[inline]
+    fn clone_field(&self, common: &MessageCommon<Pb, A>, alloc: A) -> Self {
+        self.clone_in(common, alloc)
     }
 }
 

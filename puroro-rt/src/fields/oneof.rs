@@ -21,7 +21,7 @@ use ::unmanaged::UnmanagedBox;
 use ::unmanaged::DeallocateIn;
 
 use crate::fields::enum_variant::EnumVariant;
-use crate::fields::shared::field_inspect::{FieldDebug, FieldPartialEq};
+use crate::fields::shared::field_inspect::{FieldCloneIn, FieldDebug, FieldEncode, FieldPartialEq};
 use crate::fields::shared::{
     DefaultIn, FieldDeallocate, MessageCommon, PresenceBits, ValueLayout,
     field_presence::{FieldPresence, Oneof},
@@ -393,6 +393,35 @@ where
     fn fmt_debug(&self, _common: &MessageCommon<Pb, A>, f: &mut Formatter<'_>) -> FmtResult {
         // Discriminant only — matches the former `notification_case` Debug field.
         Debug::fmt(&self.as_ref().map(E::case), f)
+    }
+}
+
+impl<E, Pb, A> FieldEncode<Pb, A> for OneofSlot<E>
+where
+    E: OneofEncodable<A> + OneofGroup<Presence = Pb, Alloc = A>,
+    Pb: PresenceBits,
+    A: Allocator + Clone,
+{
+    #[inline]
+    fn wire_encoded_len(&self, common: &MessageCommon<Pb, A>) -> usize {
+        self.encoded_len(common)
+    }
+
+    #[inline]
+    fn wire_encode_raw<B: BufMut>(&self, common: &MessageCommon<Pb, A>, buf: &mut B) {
+        self.encode_raw(common, buf);
+    }
+}
+
+impl<E, Pb, A> FieldCloneIn<Pb, A> for OneofSlot<E>
+where
+    E: OneofGroup<Presence = Pb, Alloc = A>,
+    Pb: PresenceBits,
+    A: Allocator + Clone,
+{
+    #[inline]
+    fn clone_field(&self, common: &MessageCommon<Pb, A>, alloc: A) -> Self {
+        self.clone_in(common, alloc)
     }
 }
 

@@ -9,15 +9,17 @@ use ::bitvec::order::Lsb0;
 use ::bitvec::ptr::{BitRef, Mut};
 use ::bytes::{Buf, BufMut};
 use ::core::fmt;
+use ::core::mem;
 use ::core::ops::ControlFlow;
 use ::core::ops::DerefMut;
 
 use ::puroro::{DecodeError, Message};
 use ::puroro_rt::decode::{decode_tag, skip_field_and_save};
 use ::puroro_rt::{
-    DebugStructVisitor, Explicit, FieldDeallocVisitor, FieldEqVisitor, FieldPairVisitor,
-    FieldVisitor, FieldVisitorMut, MessageCommon, PresenceBits, ProtoDouble, ProtoFixed32,
-    ProtoString, SingularField,
+    CloneFieldsVisitor, DebugStructVisitor, EncodeRawVisitor, EncodedLenVisitor, Explicit,
+    FieldDeallocVisitor, FieldEqVisitor, FieldPairVisitor, FieldPairVisitorMut, FieldVisitor,
+    FieldVisitorMut, MessageCommon, PresenceBits, ProtoDouble, ProtoFixed32, ProtoString,
+    SingularField,
 };
 use ::unmanaged::CloneIn;
 
@@ -158,8 +160,9 @@ impl<A: Allocator + Clone> Address<A> {
         self.latitude.bind_mut(&mut self._common).clear();
     }
 
-    // -- field visitors (single enumeration for Eq / Debug / Drop) ----------
+    // -- field visitors (scalar/pair × shared/mut) --------------------------
 
+    /// Scalar / shared.
     pub fn visit_fields<V: FieldVisitor<AddressPresence, A>>(
         &self,
         v: &mut V,
@@ -172,7 +175,8 @@ impl<A: Allocator + Clone> Address<A> {
         ControlFlow::Continue(())
     }
 
-    pub fn visit_fields_with<V: FieldPairVisitor<AddressPresence, A>>(
+    /// Pair / shared.
+    pub fn visit_field_pairs<V: FieldPairVisitor<AddressPresence, A>>(
         &self,
         other: &Self,
         v: &mut V,
@@ -186,15 +190,42 @@ impl<A: Allocator + Clone> Address<A> {
         ControlFlow::Continue(())
     }
 
+    /// Pair / mut.
+    pub fn visit_field_pairs_mut<V: FieldPairVisitorMut<AddressPresence, A>>(
+        &self,
+        dst: &mut Self,
+        v: &mut V,
+    ) -> ControlFlow<V::Break> {
+        let c = &self._common;
+        v.visit("street", c, &self.street, &dst._common, &mut dst.street)?;
+        v.visit("city", c, &self.city, &dst._common, &mut dst.city)?;
+        v.visit(
+            "postal_code",
+            c,
+            &self.postal_code,
+            &dst._common,
+            &mut dst.postal_code,
+        )?;
+        v.visit(
+            "latitude",
+            c,
+            &self.latitude,
+            &dst._common,
+            &mut dst.latitude,
+        )?;
+        ControlFlow::Continue(())
+    }
+
+    /// Scalar / mut.
     pub fn visit_fields_mut<V: FieldVisitorMut<AddressPresence, A>>(
         &mut self,
         v: &mut V,
     ) -> ControlFlow<V::Break> {
         let c = &self._common;
-        v.visit_mut("street", c, &mut self.street)?;
-        v.visit_mut("city", c, &mut self.city)?;
-        v.visit_mut("postal_code", c, &mut self.postal_code)?;
-        v.visit_mut("latitude", c, &mut self.latitude)?;
+        v.visit("street", c, &mut self.street)?;
+        v.visit("city", c, &mut self.city)?;
+        v.visit("postal_code", c, &mut self.postal_code)?;
+        v.visit("latitude", c, &mut self.latitude)?;
         ControlFlow::Continue(())
     }
 }
@@ -217,13 +248,11 @@ impl<A: Allocator + Clone + Default> Default for Address<A> {
 
 impl<A: Allocator + Clone> ::unmanaged::CloneIn<A> for Address<A> {
     fn clone_in(&self, alloc: A) -> Self {
-        Self {
-            _common: self._common.clone_in(alloc.clone()),
-            street: self.street.clone_in(&self._common, alloc.clone()),
-            city: self.city.clone_in(&self._common, alloc.clone()),
-            postal_code: self.postal_code.clone_in(&self._common, alloc.clone()),
-            latitude: self.latitude.clone_in(&self._common, alloc),
-        }
+        let mut dst = Self::new_in(alloc.clone());
+        let _ = self.visit_field_pairs_mut(&mut dst, &mut CloneFieldsVisitor);
+        let mut old = mem::replace(&mut dst._common, self._common.clone_in(alloc));
+        old.deallocate();
+        dst
     }
 }
 
@@ -237,7 +266,7 @@ impl<A: Allocator + Clone> Clone for Address<A> {
 impl<A: Allocator + Clone> PartialEq for Address<A> {
     fn eq(&self, other: &Self) -> bool {
         matches!(
-            self.visit_fields_with(other, &mut FieldEqVisitor),
+            self.visit_field_pairs(other, &mut FieldEqVisitor),
             ControlFlow::Continue(())
         ) && self._common.unknown_fields_eq(&other._common)
     }
@@ -287,21 +316,14 @@ impl<A: Allocator + Clone> Message for Address<A> {
     }
 
     fn encoded_len(&self) -> usize {
-        let c = &self._common;
-        self.street.encoded_len(c)
-            + self.city.encoded_len(c)
-            + self.postal_code.encoded_len(c)
-            + self.latitude.encoded_len(c)
-            + c.unknown_fields.len()
+        let mut v = EncodedLenVisitor::default();
+        let _ = self.visit_fields(&mut v);
+        v.len + self._common.unknown_fields.len()
     }
 
     fn encode_raw<B: BufMut>(&self, buf: &mut B) {
-        let c = &self._common;
-        self.street.encode_raw(c, buf);
-        self.city.encode_raw(c, buf);
-        self.postal_code.encode_raw(c, buf);
-        self.latitude.encode_raw(c, buf);
-        let unknown: &[u8] = &c.unknown_fields;
+        let _ = self.visit_fields(&mut EncodeRawVisitor::new(buf));
+        let unknown: &[u8] = &self._common.unknown_fields;
         buf.put_slice(unknown);
     }
 

@@ -14,16 +14,18 @@ use ::bitvec::order::Lsb0;
 use ::bitvec::ptr::{BitRef, Mut};
 use ::bytes::{Buf, BufMut};
 use ::core::fmt;
+use ::core::mem;
 use ::core::ops::ControlFlow;
 use ::core::ops::DerefMut;
 
 use ::puroro::{DecodeError, HasDefault, Message, Optional};
 use ::puroro_rt::decode::{decode_tag, skip_field_and_save};
 use ::puroro_rt::{
-    BitPacked, Closed, DebugStructVisitor, Expanded, Explicit, FieldDeallocVisitor, FieldEqVisitor,
-    FieldPairVisitor, FieldVisitor, FieldVisitorMut, Implicit, Inline, LegacyRequired, MapField,
-    MapFieldMut, MapFieldRef, MessageCommon, NonOneof, OneofSlot, Open, Packed, PresenceBits,
-    ProtoBool, ProtoBytes, ProtoEnum, ProtoInt32, ProtoMessage, ProtoString, RepeatedElementsMut,
+    BitPacked, CloneFieldsVisitor, Closed, DebugStructVisitor, EncodeRawVisitor, EncodedLenVisitor,
+    Expanded, Explicit, FieldDeallocVisitor, FieldEqVisitor, FieldPairVisitor, FieldPairVisitorMut,
+    FieldVisitor, FieldVisitorMut, Implicit, Inline, LegacyRequired, MapField, MapFieldMut,
+    MapFieldRef, MessageCommon, NonOneof, OneofSlot, Open, Packed, PresenceBits, ProtoBool,
+    ProtoBytes, ProtoEnum, ProtoInt32, ProtoMessage, ProtoString, RepeatedElementsMut,
     RepeatedField, SingularField,
 };
 use ::unmanaged::CloneIn;
@@ -580,9 +582,9 @@ impl<A: Allocator + Clone> Task<A> {
             .value_mut()
     }
 
-    // -- field visitors (single enumeration for Eq / Debug / Drop) ----------
+    // -- field visitors (scalar/pair × shared/mut) --------------------------
 
-    /// Invokes `v` once per catalog field, in declaration order.
+    /// Scalar / shared: invoke `v` once per catalog field, in declaration order.
     pub fn visit_fields<V: FieldVisitor<TaskPresence, A>>(
         &self,
         v: &mut V,
@@ -608,8 +610,8 @@ impl<A: Allocator + Clone> Task<A> {
         ControlFlow::Continue(())
     }
 
-    /// Like [`visit_fields`](Self::visit_fields), pairing each field with `other`.
-    pub fn visit_fields_with<V: FieldPairVisitor<TaskPresence, A>>(
+    /// Pair / shared: walk matching fields of `self` and `other`.
+    pub fn visit_field_pairs<V: FieldPairVisitor<TaskPresence, A>>(
         &self,
         other: &Self,
         v: &mut V,
@@ -642,29 +644,102 @@ impl<A: Allocator + Clone> Task<A> {
         ControlFlow::Continue(())
     }
 
-    /// Mutable field walk for [`Drop`] / bulk clear.
+    /// Pair / mut: walk `self` fields against mutable `dst` fields.
+    ///
+    /// For [`CloneIn`], `dst` must start as [`Self::new_in`] so placeholders
+    /// match empty presence bits; install the cloned [`MessageCommon`] afterwards.
+    pub fn visit_field_pairs_mut<V: FieldPairVisitorMut<TaskPresence, A>>(
+        &self,
+        dst: &mut Self,
+        v: &mut V,
+    ) -> ControlFlow<V::Break> {
+        let c = &self._common;
+        // Reborrow `dst._common` per call so it does not overlap `&mut dst.<field>`.
+        v.visit("title", c, &self.title, &dst._common, &mut dst.title)?;
+        v.visit("score", c, &self.score, &dst._common, &mut dst.score)?;
+        v.visit(
+            "max_retries",
+            c,
+            &self.max_retries,
+            &dst._common,
+            &mut dst.max_retries,
+        )?;
+        v.visit(
+            "owner_id",
+            c,
+            &self.owner_id,
+            &dst._common,
+            &mut dst.owner_id,
+        )?;
+        v.visit("payload", c, &self.payload, &dst._common, &mut dst.payload)?;
+        v.visit("tag_ids", c, &self.tag_ids, &dst._common, &mut dst.tag_ids)?;
+        v.visit("scores", c, &self.scores, &dst._common, &mut dst.scores)?;
+        v.visit("labels", c, &self.labels, &dst._common, &mut dst.labels)?;
+        v.visit("status", c, &self.status, &dst._common, &mut dst.status)?;
+        v.visit(
+            "priority",
+            c,
+            &self.priority,
+            &dst._common,
+            &mut dst.priority,
+        )?;
+        v.visit(
+            "assignee",
+            c,
+            &self.assignee,
+            &dst._common,
+            &mut dst.assignee,
+        )?;
+        v.visit(
+            "notification",
+            c,
+            &self.notification,
+            &dst._common,
+            &mut dst.notification,
+        )?;
+        v.visit("done", c, &self.done, &dst._common, &mut dst.done)?;
+        v.visit("flag", c, &self.flag, &dst._common, &mut dst.flag)?;
+        v.visit(
+            "watchers",
+            c,
+            &self.watchers,
+            &dst._common,
+            &mut dst.watchers,
+        )?;
+        v.visit("votes", c, &self.votes, &dst._common, &mut dst.votes)?;
+        v.visit(
+            "attributes",
+            c,
+            &self.attributes,
+            &dst._common,
+            &mut dst.attributes,
+        )?;
+        ControlFlow::Continue(())
+    }
+
+    /// Scalar / mut: invoke `v` once per catalog field.
     pub fn visit_fields_mut<V: FieldVisitorMut<TaskPresence, A>>(
         &mut self,
         v: &mut V,
     ) -> ControlFlow<V::Break> {
         let c = &self._common;
-        v.visit_mut("title", c, &mut self.title)?;
-        v.visit_mut("score", c, &mut self.score)?;
-        v.visit_mut("max_retries", c, &mut self.max_retries)?;
-        v.visit_mut("owner_id", c, &mut self.owner_id)?;
-        v.visit_mut("payload", c, &mut self.payload)?;
-        v.visit_mut("tag_ids", c, &mut self.tag_ids)?;
-        v.visit_mut("scores", c, &mut self.scores)?;
-        v.visit_mut("labels", c, &mut self.labels)?;
-        v.visit_mut("status", c, &mut self.status)?;
-        v.visit_mut("priority", c, &mut self.priority)?;
-        v.visit_mut("assignee", c, &mut self.assignee)?;
-        v.visit_mut("notification", c, &mut self.notification)?;
-        v.visit_mut("done", c, &mut self.done)?;
-        v.visit_mut("flag", c, &mut self.flag)?;
-        v.visit_mut("watchers", c, &mut self.watchers)?;
-        v.visit_mut("votes", c, &mut self.votes)?;
-        v.visit_mut("attributes", c, &mut self.attributes)?;
+        v.visit("title", c, &mut self.title)?;
+        v.visit("score", c, &mut self.score)?;
+        v.visit("max_retries", c, &mut self.max_retries)?;
+        v.visit("owner_id", c, &mut self.owner_id)?;
+        v.visit("payload", c, &mut self.payload)?;
+        v.visit("tag_ids", c, &mut self.tag_ids)?;
+        v.visit("scores", c, &mut self.scores)?;
+        v.visit("labels", c, &mut self.labels)?;
+        v.visit("status", c, &mut self.status)?;
+        v.visit("priority", c, &mut self.priority)?;
+        v.visit("assignee", c, &mut self.assignee)?;
+        v.visit("notification", c, &mut self.notification)?;
+        v.visit("done", c, &mut self.done)?;
+        v.visit("flag", c, &mut self.flag)?;
+        v.visit("watchers", c, &mut self.watchers)?;
+        v.visit("votes", c, &mut self.votes)?;
+        v.visit("attributes", c, &mut self.attributes)?;
         ControlFlow::Continue(())
     }
 }
@@ -687,26 +762,13 @@ impl<A: Allocator + Clone + Default> Default for Task<A> {
 
 impl<A: Allocator + Clone> ::unmanaged::CloneIn<A> for Task<A> {
     fn clone_in(&self, alloc: A) -> Self {
-        Self {
-            _common: self._common.clone_in(alloc.clone()),
-            title: self.title.clone_in(&self._common, alloc.clone()),
-            score: self.score.clone_in(&self._common, alloc.clone()),
-            max_retries: self.max_retries.clone_in(&self._common, alloc.clone()),
-            owner_id: self.owner_id.clone_in(&self._common, alloc.clone()),
-            payload: self.payload.clone_in(&self._common, alloc.clone()),
-            tag_ids: self.tag_ids.clone_in(&self._common, alloc.clone()),
-            scores: self.scores.clone_in(&self._common, alloc.clone()),
-            labels: self.labels.clone_in(&self._common, alloc.clone()),
-            status: self.status.clone_in(&self._common, alloc.clone()),
-            priority: self.priority.clone_in(&self._common, alloc.clone()),
-            assignee: self.assignee.clone_in(&self._common, alloc.clone()),
-            notification: self.notification.clone_in(&self._common, alloc.clone()),
-            done: self.done.clone_in(&self._common, alloc.clone()),
-            flag: self.flag.clone_in(&self._common, alloc.clone()),
-            watchers: self.watchers.clone_in(&self._common, alloc.clone()),
-            votes: self.votes.clone_in(&self._common, alloc.clone()),
-            attributes: self.attributes.clone_in(&self._common, alloc),
-        }
+        // Empty placeholders first (presence still zero), then clone fields,
+        // then install cloned common (presence + unknown fields).
+        let mut dst = Self::new_in(alloc.clone());
+        let _ = self.visit_field_pairs_mut(&mut dst, &mut CloneFieldsVisitor);
+        let mut old = mem::replace(&mut dst._common, self._common.clone_in(alloc));
+        old.deallocate();
+        dst
     }
 }
 
@@ -720,7 +782,7 @@ impl<A: Allocator + Clone> Clone for Task<A> {
 impl<A: Allocator + Clone> PartialEq for Task<A> {
     fn eq(&self, other: &Self) -> bool {
         matches!(
-            self.visit_fields_with(other, &mut FieldEqVisitor),
+            self.visit_field_pairs(other, &mut FieldEqVisitor),
             ControlFlow::Continue(())
         ) && self._common.unknown_fields_eq(&other._common)
     }
@@ -770,48 +832,14 @@ impl<A: Allocator + Clone> Message for Task<A> {
     }
 
     fn encoded_len(&self) -> usize {
-        let c = &self._common;
-        let mut n = 0usize;
-        n += self.title.encoded_len(c);
-        n += self.score.encoded_len(c);
-        n += self.max_retries.encoded_len(c);
-        n += self.owner_id.encoded_len(c);
-        n += self.payload.encoded_len(c);
-        n += self.tag_ids.encoded_len(c);
-        n += self.scores.encoded_len(c);
-        n += self.labels.encoded_len(c);
-        n += self.status.encoded_len(c);
-        n += self.priority.encoded_len(c);
-        n += self.assignee.encoded_len(c);
-        n += self.notification.encoded_len(c);
-        n += self.done.encoded_len(c);
-        n += self.flag.encoded_len(c);
-        n += self.watchers.encoded_len(c);
-        n += self.votes.encoded_len(c);
-        n += self.attributes.encoded_len(c);
-        n + c.unknown_fields.len()
+        let mut v = EncodedLenVisitor::default();
+        let _ = self.visit_fields(&mut v);
+        v.len + self._common.unknown_fields.len()
     }
 
     fn encode_raw<B: BufMut>(&self, buf: &mut B) {
-        let c = &self._common;
-        self.title.encode_raw(c, buf);
-        self.score.encode_raw(c, buf);
-        self.max_retries.encode_raw(c, buf);
-        self.owner_id.encode_raw(c, buf);
-        self.payload.encode_raw(c, buf);
-        self.tag_ids.encode_raw(c, buf);
-        self.scores.encode_raw(c, buf);
-        self.labels.encode_raw(c, buf);
-        self.status.encode_raw(c, buf);
-        self.priority.encode_raw(c, buf);
-        self.assignee.encode_raw(c, buf);
-        self.notification.encode_raw(c, buf);
-        self.done.encode_raw(c, buf);
-        self.flag.encode_raw(c, buf);
-        self.watchers.encode_raw(c, buf);
-        self.votes.encode_raw(c, buf);
-        self.attributes.encode_raw(c, buf);
-        let unknown: &[u8] = &c.unknown_fields;
+        let _ = self.visit_fields(&mut EncodeRawVisitor::new(buf));
+        let unknown: &[u8] = &self._common.unknown_fields;
         buf.put_slice(unknown);
     }
 

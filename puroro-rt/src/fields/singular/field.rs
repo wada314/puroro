@@ -29,7 +29,7 @@ use ::puroro::{HasDefault, Optional};
 use ::unmanaged::{CloneIn, DeallocateIn};
 
 use crate::fields::shared::FieldDeallocate;
-use crate::fields::shared::field_inspect::{FieldDebug, FieldPartialEq};
+use crate::fields::shared::field_inspect::{FieldCloneIn, FieldDebug, FieldEncode, FieldPartialEq};
 use crate::fields::shared::{
     DefaultIn, MessageCommon, PresenceBits,
     field_presence::{
@@ -531,7 +531,7 @@ where
 }
 
 // ---------------------------------------------------------------------------
-// FieldPartialEq / FieldDebug (message visit_fields)
+// FieldPartialEq / FieldDebug / FieldEncode / FieldCloneIn (message field visitors)
 // ---------------------------------------------------------------------------
 
 impl<T, P, const FIELD: u32, A, L, D, Pb> FieldPartialEq<Pb, A>
@@ -554,6 +554,44 @@ where
     ) -> bool {
         // Option equality matches getter semantics (IMPLICIT zero ≡ unset).
         T::option_eq(self.bind(common).get(), other.bind(other_common).get())
+    }
+}
+
+impl<T, P, const FIELD: u32, A, L, D, Pb> FieldEncode<Pb, A> for SingularField<T, P, FIELD, A, L, D>
+where
+    T: ProtoType,
+    P: FieldPresence,
+    A: Allocator + Clone,
+    L: ValueLayout<T, A>,
+    Pb: PresenceBits,
+    T::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
+    P::ValueSlot<T::Slot<A>>: ValueSlot<T::Slot<A>, A>,
+{
+    #[inline]
+    fn wire_encoded_len(&self, common: &MessageCommon<Pb, A>) -> usize {
+        self.encoded_len(common)
+    }
+
+    #[inline]
+    fn wire_encode_raw<B: BufMut>(&self, common: &MessageCommon<Pb, A>, buf: &mut B) {
+        self.encode_raw(common, buf);
+    }
+}
+
+impl<T, P, const FIELD: u32, A, L, D, Pb> FieldCloneIn<Pb, A>
+    for SingularField<T, P, FIELD, A, L, D>
+where
+    T: ProtoType,
+    P: FieldPresence,
+    A: Allocator + Clone,
+    L: ValueLayout<T, A>,
+    Pb: PresenceBits,
+    T::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateIn<A> + CloneIn<A>,
+    P::ValueSlot<T::Slot<A>>: ValueSlot<T::Slot<A>, A>,
+{
+    #[inline]
+    fn clone_field(&self, common: &MessageCommon<Pb, A>, alloc: A) -> Self {
+        self.clone_in(common, alloc)
     }
 }
 

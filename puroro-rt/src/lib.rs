@@ -26,9 +26,10 @@ pub use fields::shared::field_presence::{
 };
 pub use fields::shared::value_slot::ValueSlot;
 pub use fields::shared::{
-    BitPacked, DebugStructVisitor, FieldDeallocVisitor, FieldDeallocate, FieldDebug,
-    FieldEqVisitor, FieldPairVisitor, FieldPartialEq, FieldVisitor, FieldVisitorMut, Inline,
-    MessageCommon, PresenceBits, ValueLayout,
+    BitPacked, CatalogField, CloneFieldsVisitor, DebugStructVisitor, EncodeRawVisitor,
+    EncodedLenVisitor, FieldCloneIn, FieldDeallocVisitor, FieldDeallocate, FieldDebug, FieldEncode,
+    FieldEqVisitor, FieldPairVisitor, FieldPairVisitorMut, FieldPartialEq, FieldVisitor,
+    FieldVisitorMut, Inline, MessageCommon, PresenceBits, ValueLayout,
 };
 pub use fields::singular::{SingularField, SingularFieldMut, SingularFieldRef};
 pub use fields::wire::{
