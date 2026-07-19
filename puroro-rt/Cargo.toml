@@ -12,7 +12,6 @@ workspace = true
 allocator-api2 = "0.2"
 bitvec = "1"
 bytes = "1"
-cached-pair = "0.14"
 derive_more = { version = "2.1", default-features = false, features = ["deref", "deref_mut", "from", "into"] }
 hashbrown = "0.17"
 protobuf-core = { path = "../protobuf-core" }

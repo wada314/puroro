@@ -33,12 +33,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8ae3f5d315924270530207e2a68396c3cc547f6dca3fbdca317cfb1a51edb593"
 
 [[package]]
-name = "cached-pair"
-version = "0.14.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f6d315a43ba3048ab525c6fc014c9d4444f45d13fd95082d2480bd019fbb92fd"
-
-[[package]]
 name = "derive_more"
 version = "2.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -121,7 +115,6 @@ dependencies = [
  "allocator-api2",
  "bitvec",
  "bytes",
- "cached-pair",
  "derive_more",
  "hashbrown",
  "protobuf-core",

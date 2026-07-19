@@ -104,6 +104,8 @@ fn task_fields_roundtrip() {
     task.watchers_mut().push(watcher);
     task.votes_mut().push(true);
     task.votes_mut().push(false);
+    task.attributes_mut().insert_in("region", 81).unwrap();
+    task.attributes_mut().insert_in("tier", 2).unwrap();
 
     task.validate().unwrap();
 
@@ -139,6 +141,27 @@ fn task_fields_roundtrip() {
     assert_eq!(decoded.watchers()[0].street().get(), "2 Side Rd");
     assert_eq!(decoded.watchers()[0].city().get(), "Osaka");
     assert_eq!(decoded.votes(), &[true, false]);
+    assert_eq!(decoded.attributes().len(), 2);
+    assert_eq!(decoded.attributes().get("region").copied(), Some(81));
+    assert_eq!(decoded.attributes().get("tier").copied(), Some(2));
+}
+
+#[test]
+fn map_attributes_last_wins_on_merge() {
+    let mut task = Task::new();
+    task.owner_id_mut().push_str("u");
+    {
+        let mut attrs = task.attributes_mut();
+        attrs.insert_in("k", 1).unwrap();
+        attrs.insert_in("k", 2).unwrap();
+        *attrs.get_mut("k").unwrap() = 3;
+    }
+    assert_eq!(task.attributes().get("k").copied(), Some(3));
+    assert_eq!(task.attributes().len(), 1);
+
+    let bytes = task.encode_to_vec();
+    let decoded: Task = Task::decode(&bytes[..]).unwrap();
+    assert_eq!(decoded.attributes().get("k").copied(), Some(3));
 }
 
 #[test]

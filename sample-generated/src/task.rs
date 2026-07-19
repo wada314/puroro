@@ -20,8 +20,9 @@ use ::puroro::{DecodeError, HasDefault, Message, Optional};
 use ::puroro_rt::decode::{decode_tag, skip_field_and_save};
 use ::puroro_rt::{
     BitPacked, Closed, Expanded, Explicit, FieldDeallocate, Implicit, Inline, LegacyRequired,
-    MessageCommon, NonOneof, OneofSlot, Open, Packed, PresenceBits, ProtoBool, ProtoBytes,
-    ProtoEnum, ProtoInt32, ProtoMessage, ProtoString, RepeatedField, SingularField,
+    MapField, MapFieldMut, MapFieldRef, MessageCommon, NonOneof, OneofSlot, Open, Packed,
+    PresenceBits, ProtoBool, ProtoBytes, ProtoEnum, ProtoInt32, ProtoMessage, ProtoString,
+    RepeatedField, SingularField,
 };
 use ::unmanaged::CloneIn;
 
@@ -107,6 +108,7 @@ pub const FIELD_FLAG: u32 = 17; // flag (EXPLICIT bool)
 pub const FIELD_URGENT: u32 = 18; // notification.urgent (oneof bool)
 pub const FIELD_WATCHERS: u32 = 19; // watchers (repeated Address)
 pub const FIELD_VOTES: u32 = 20; // votes (repeated bool PACKED)
+pub const FIELD_ATTRIBUTES: u32 = 21; // attributes (map<string, int32>)
 // ---------------------------------------------------------------------------
 // Message struct
 // ---------------------------------------------------------------------------
@@ -151,12 +153,13 @@ pub struct Task<A: Allocator + Clone = Global> {
     >, // proto: bool flag = 17;
     watchers: RepeatedField<ProtoMessage<Address<A>>, Expanded, { FIELD_WATCHERS }, A>, // proto: repeated Address watchers = 19;
     votes: RepeatedField<ProtoBool, Packed, { FIELD_VOTES }, A>, // proto: repeated bool votes = 20;
+    attributes: MapField<ProtoString, ProtoInt32, { FIELD_ATTRIBUTES }, A>, // proto: map<string, int32> attributes = 21;
 }
 
 impl<A: Allocator + Clone> Task<A> {
     pub fn new_in(alloc: A) -> Self {
         // Each field initializer gets its own clone of the allocator; the last
-        // heap field (`watchers`) takes the original by move.
+        // heap field (`attributes`) takes the original by move.
         Self {
             _common: MessageCommon::new_in(TaskPresence::ZERO, alloc.clone()),
             title: SingularField::new_in(alloc.clone()),
@@ -174,7 +177,8 @@ impl<A: Allocator + Clone> Task<A> {
             done: SingularField::new_in(alloc.clone()),
             flag: SingularField::new_in(alloc.clone()),
             watchers: RepeatedField::new_in(alloc.clone()),
-            votes: RepeatedField::new_in(alloc),
+            votes: RepeatedField::new_in(alloc.clone()),
+            attributes: MapField::new_in(alloc),
         }
     }
 
@@ -411,6 +415,24 @@ impl<A: Allocator + Clone> Task<A> {
         self.votes.bind_mut(&mut self._common).clear();
     }
 
+    // -- attributes (map<string, int32>, proto field 21) ---------------------
+
+    pub fn attributes(
+        &self,
+    ) -> MapFieldRef<'_, ProtoString, ProtoInt32, { FIELD_ATTRIBUTES }, A, TaskPresence> {
+        self.attributes.bind(&self._common)
+    }
+
+    pub fn attributes_mut(
+        &mut self,
+    ) -> MapFieldMut<'_, '_, ProtoString, ProtoInt32, { FIELD_ATTRIBUTES }, A, TaskPresence> {
+        self.attributes.bind_mut(&mut self._common)
+    }
+
+    pub fn clear_attributes(&mut self) {
+        self.attributes_mut().clear();
+    }
+
     // -- oneof notification (proto fields 12 / 13 / 14 / 15 / 18) ------------
 
     /// Which variant is set (payload-less; `None` when the group is unset).
@@ -592,7 +614,8 @@ impl<A: Allocator + Clone> ::unmanaged::CloneIn<A> for Task<A> {
             done: self.done.clone_in(&self._common, alloc.clone()),
             flag: self.flag.clone_in(&self._common, alloc.clone()),
             watchers: self.watchers.clone_in(&self._common, alloc.clone()),
-            votes: self.votes.clone_in(&self._common, alloc),
+            votes: self.votes.clone_in(&self._common, alloc.clone()),
+            attributes: self.attributes.clone_in(&self._common, alloc),
         }
     }
 }
@@ -633,9 +656,20 @@ impl<A: Allocator + Clone> PartialEq for Task<A> {
             && opt_eq(self.flag(), other.flag())
             && self.watchers() == other.watchers()
             && self.votes() == other.votes()
+            && attributes_eq(self, other)
             && notification_eq(self.notification().as_ref(), other.notification().as_ref())
             && self._common.unknown_fields.as_ref() == other._common.unknown_fields.as_ref()
     }
+}
+
+fn attributes_eq<A: Allocator + Clone>(a: &Task<A>, b: &Task<A>) -> bool {
+    if a.attributes.len() != b.attributes.len() {
+        return false;
+    }
+    a.attributes
+        .bind(&a._common)
+        .iter()
+        .all(|(k, v)| b.attributes.bind(&b._common).get(&**k) == Some(v))
 }
 
 fn notification_eq<'a, A: Allocator + Clone>(
@@ -679,6 +713,15 @@ impl<A: Allocator + Clone> fmt::Debug for Task<A> {
             .field("flag", &opt(self.flag()))
             .field("watchers", &self.watchers())
             .field("votes", &self.votes())
+            .field(
+                "attributes",
+                &self
+                    .attributes
+                    .bind(&self._common)
+                    .iter()
+                    .map(|(k, v)| (&**k, *v))
+                    .collect::<Vec<_>>(),
+            )
             .finish()
     }
 }
@@ -706,6 +749,7 @@ impl<A: Allocator + Clone> Drop for Task<A> {
         self.flag.deallocate(&self._common);
         self.watchers.deallocate(&self._common);
         self.votes.deallocate(&self._common);
+        self.attributes.deallocate(&self._common);
         self._common.deallocate();
     }
 }
@@ -753,6 +797,7 @@ impl<A: Allocator + Clone> Message for Task<A> {
         n += self.flag.encoded_len(c);
         n += self.watchers.encoded_len(c);
         n += self.votes.encoded_len(c);
+        n += self.attributes.encoded_len(c);
         n + c.unknown_fields.len()
     }
 
@@ -774,6 +819,7 @@ impl<A: Allocator + Clone> Message for Task<A> {
         self.flag.encode_raw(c, buf);
         self.watchers.encode_raw(c, buf);
         self.votes.encode_raw(c, buf);
+        self.attributes.encode_raw(c, buf);
         let unknown: &[u8] = &c.unknown_fields;
         buf.put_slice(unknown);
     }
@@ -916,6 +962,12 @@ impl<A: Allocator + Clone> Message for Task<A> {
                 FIELD_VOTES => {
                     // votes = 20, repeated bool PACKED
                     self.votes
+                        .bind_mut(&mut self._common)
+                        .merge(wire_type, buf, depth)?;
+                }
+                FIELD_ATTRIBUTES => {
+                    // attributes = 21, map<string, int32>
+                    self.attributes
                         .bind_mut(&mut self._common)
                         .merge(wire_type, buf, depth)?;
                 }

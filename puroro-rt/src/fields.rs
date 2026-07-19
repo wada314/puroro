@@ -23,7 +23,7 @@
 //! | [`wire`] | `ProtoType`, `RepeatedElement`, `VarintProtoType` helper, fixed stubs |
 //! | [`singular`] | `SingularField` |
 //! | [`repeated`] | `RepeatedField` |
-//! | [`map`] | `MapField` / `MapEntries` |
+//! | [`map`] | `MapField` (hash map entries) |
 //! | [`oneof`] | `OneofSlot` |
 
 pub(crate) mod enum_variant;

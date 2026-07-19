@@ -12,9 +12,7 @@ pub(crate) mod fields;
 pub use ::protobuf_core::FieldNumber;
 pub use defaults::ProtoDefault;
 pub use fields::enum_variant::EnumVariant;
-pub use fields::map::{
-    MapEntries, MapEntriesConverter, MapEntriesIter, MapField, MapFieldMut, MapFieldRef,
-};
+pub use fields::map::{MapEntries, MapEntriesIter, MapField, MapFieldMut, MapFieldRef};
 pub use fields::oneof::{
     OneofDeallocate, OneofEncodable, OneofGroup, OneofSlot, OneofSlotMut, OneofSlotRef,
     OneofVariantRef, OneofView, OneofViewMut,
@@ -31,7 +29,7 @@ pub use fields::shared::{
 };
 pub use fields::singular::{SingularField, SingularFieldMut, SingularFieldRef};
 pub use fields::wire::{
-    Closed, ClosedEnum, Fixed32ProtoType, Fixed64ProtoType, Open, OpenEnum,
+    Closed, ClosedEnum, Fixed32ProtoType, Fixed64ProtoType, MapKey, Open, OpenEnum,
     PackableRepeatedElement, PayloadAccess, ProtoBool, ProtoBytes, ProtoDouble, ProtoEnum,
     ProtoEnumStorage, ProtoFixed32, ProtoFixed64, ProtoFloat, ProtoInt32, ProtoInt64, ProtoMessage,
     ProtoSFixed32, ProtoSFixed64, ProtoSint32, ProtoSint64, ProtoString, ProtoType, ProtoUInt32,

@@ -93,6 +93,41 @@ pub(crate) fn bytes_to_unmanaged_in<A: Allocator>(v: &[u8], alloc: A) -> Unmanag
     UnmanagedVec::from_vec(vec)
 }
 
+/// Skips one field payload for `wire_type` without preserving unknowns.
+///
+/// Used for map-entry interiors (and similar ephemeral messages) where unknown
+/// fields are not round-tripped.
+pub(crate) fn skip_field<B: Buf>(wire_type: WireType, buf: &mut B) -> Result<(), DecodeError> {
+    match wire_type {
+        WireType::Varint => {
+            decode_varint(buf)?;
+        }
+        WireType::Int64 => {
+            if buf.remaining() < 8 {
+                return Err(DecodeError::UnexpectedEof);
+            }
+            buf.advance(8);
+        }
+        WireType::Len => {
+            let len = decode_varint(buf)? as usize;
+            if buf.remaining() < len {
+                return Err(DecodeError::TruncatedMessage);
+            }
+            buf.advance(len);
+        }
+        WireType::Int32 => {
+            if buf.remaining() < 4 {
+                return Err(DecodeError::UnexpectedEof);
+            }
+            buf.advance(4);
+        }
+        WireType::SGroup | WireType::EGroup => {
+            return Err(DecodeError::InvalidTag);
+        }
+    }
+    Ok(())
+}
+
 pub fn skip_field_and_save<B: Buf, A: Allocator>(
     field_number: u32,
     wire_type: WireType,

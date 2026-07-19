@@ -61,6 +61,20 @@ pub trait RepeatedElement: ProtoType {
 /// Separated from [`RepeatedElement`] so `ProtoMessage<M>` can require
 /// `M: Message<Alloc = A>` (inline `Element = M`).
 pub trait RepeatedElementMerge<A: Allocator + Clone>: RepeatedElement {
+    /// Protobuf empty / type-zero element (missing map-entry key or value).
+    fn default_element(alloc: A) -> Self::Element<A>;
+
+    /// Decodes one **singular** field occurrence into an element.
+    ///
+    /// Unlike [`merge_occurrence`], packed `Len` is rejected — map-entry key /
+    /// value fields are singular on the wire.
+    fn decode_element<B: Buf>(
+        wire_type: WireType,
+        buf: &mut B,
+        alloc: A,
+        depth: usize,
+    ) -> Result<Self::Element<A>, DecodeError>;
+
     /// Merges one wire occurrence into `push` (append semantics).
     fn merge_occurrence<B, F>(
         wire_type: WireType,
@@ -141,6 +155,27 @@ macro_rules! impl_packable_varint_repeated {
         }
 
         impl<A: Allocator + Clone> RepeatedElementMerge<A> for $marker {
+            #[inline]
+            fn default_element(_alloc: A) -> $inner {
+                ::core::default::Default::default()
+            }
+
+            #[inline]
+            fn decode_element<B: Buf>(
+                wire_type: WireType,
+                buf: &mut B,
+                _alloc: A,
+                _depth: usize,
+            ) -> Result<$inner, DecodeError> {
+                match wire_type {
+                    WireType::Varint => {
+                        let raw = decode::decode_varint(buf)?;
+                        <$marker as VarintProtoType>::decode_wire(raw)
+                    }
+                    _ => Err(DecodeError::InvalidTag),
+                }
+            }
+
             fn merge_occurrence<B, F>(
                 wire_type: WireType,
                 buf: &mut B,
@@ -235,6 +270,27 @@ macro_rules! impl_packable_enum_repeated {
         }
 
         impl<A: Allocator + Clone, E: $bound> RepeatedElementMerge<A> for ProtoEnum<E, $kind> {
+            #[inline]
+            fn default_element(_alloc: A) -> E {
+                E::proto_zero()
+            }
+
+            #[inline]
+            fn decode_element<B: Buf>(
+                wire_type: WireType,
+                buf: &mut B,
+                _alloc: A,
+                _depth: usize,
+            ) -> Result<E, DecodeError> {
+                match wire_type {
+                    WireType::Varint => {
+                        let raw = decode::decode_varint(buf)?;
+                        <ProtoEnum<E, $kind> as VarintProtoType>::decode_wire(raw)
+                    }
+                    _ => Err(DecodeError::InvalidTag),
+                }
+            }
+
             fn merge_occurrence<B, F>(
                 wire_type: WireType,
                 buf: &mut B,
@@ -327,6 +383,24 @@ macro_rules! impl_packable_fixed32_repeated {
         }
 
         impl<A: Allocator + Clone> RepeatedElementMerge<A> for $marker {
+            #[inline]
+            fn default_element(_alloc: A) -> $inner {
+                ::core::default::Default::default()
+            }
+
+            #[inline]
+            fn decode_element<B: Buf>(
+                wire_type: WireType,
+                buf: &mut B,
+                _alloc: A,
+                _depth: usize,
+            ) -> Result<$inner, DecodeError> {
+                match wire_type {
+                    WireType::Int32 => <$marker as Fixed32ProtoType>::decode_wire(buf),
+                    _ => Err(DecodeError::InvalidTag),
+                }
+            }
+
             fn merge_occurrence<B, F>(
                 wire_type: WireType,
                 buf: &mut B,
@@ -406,6 +480,24 @@ macro_rules! impl_packable_fixed64_repeated {
         }
 
         impl<A: Allocator + Clone> RepeatedElementMerge<A> for $marker {
+            #[inline]
+            fn default_element(_alloc: A) -> $inner {
+                ::core::default::Default::default()
+            }
+
+            #[inline]
+            fn decode_element<B: Buf>(
+                wire_type: WireType,
+                buf: &mut B,
+                _alloc: A,
+                _depth: usize,
+            ) -> Result<$inner, DecodeError> {
+                match wire_type {
+                    WireType::Int64 => <$marker as Fixed64ProtoType>::decode_wire(buf),
+                    _ => Err(DecodeError::InvalidTag),
+                }
+            }
+
             fn merge_occurrence<B, F>(
                 wire_type: WireType,
                 buf: &mut B,
@@ -498,6 +590,24 @@ impl RepeatedElement for ProtoString {
 
 impl<A: Allocator + Clone> RepeatedElementMerge<A> for ProtoString {
     #[inline]
+    fn default_element(alloc: A) -> UnmanagedString<A> {
+        UnmanagedString::new(alloc)
+    }
+
+    #[inline]
+    fn decode_element<B: Buf>(
+        wire_type: WireType,
+        buf: &mut B,
+        alloc: A,
+        _depth: usize,
+    ) -> Result<UnmanagedString<A>, DecodeError> {
+        if wire_type != WireType::Len {
+            return Err(DecodeError::InvalidTag);
+        }
+        decode::decode_string_in(buf, alloc)
+    }
+
+    #[inline]
     fn merge_occurrence<B, F>(
         wire_type: WireType,
         buf: &mut B,
@@ -509,10 +619,7 @@ impl<A: Allocator + Clone> RepeatedElementMerge<A> for ProtoString {
         B: Buf,
         F: FnMut(UnmanagedString<A>),
     {
-        if wire_type != WireType::Len {
-            return Err(DecodeError::InvalidTag);
-        }
-        push(decode::decode_string_in(buf, alloc)?);
+        push(Self::decode_element(wire_type, buf, alloc, _depth)?);
         Ok(())
     }
 }
@@ -554,6 +661,24 @@ impl RepeatedElement for ProtoBytes {
 
 impl<A: Allocator + Clone> RepeatedElementMerge<A> for ProtoBytes {
     #[inline]
+    fn default_element(alloc: A) -> UnmanagedVec<u8, A> {
+        UnmanagedVec::new(alloc)
+    }
+
+    #[inline]
+    fn decode_element<B: Buf>(
+        wire_type: WireType,
+        buf: &mut B,
+        alloc: A,
+        _depth: usize,
+    ) -> Result<UnmanagedVec<u8, A>, DecodeError> {
+        if wire_type != WireType::Len {
+            return Err(DecodeError::InvalidTag);
+        }
+        decode::decode_bytes_in(buf, alloc)
+    }
+
+    #[inline]
     fn merge_occurrence<B, F>(
         wire_type: WireType,
         buf: &mut B,
@@ -565,10 +690,7 @@ impl<A: Allocator + Clone> RepeatedElementMerge<A> for ProtoBytes {
         B: Buf,
         F: FnMut(UnmanagedVec<u8, A>),
     {
-        if wire_type != WireType::Len {
-            return Err(DecodeError::InvalidTag);
-        }
-        push(decode::decode_bytes_in(buf, alloc)?);
+        push(Self::decode_element(wire_type, buf, alloc, _depth)?);
         Ok(())
     }
 }
@@ -619,17 +741,17 @@ where
     M: Message<Alloc = A> + ::unmanaged::DeallocateIn<A>,
 {
     #[inline]
-    fn merge_occurrence<B, F>(
+    fn default_element(alloc: A) -> M {
+        M::new_in(alloc)
+    }
+
+    #[inline]
+    fn decode_element<B: Buf>(
         wire_type: WireType,
         buf: &mut B,
         alloc: A,
         depth: usize,
-        mut push: F,
-    ) -> Result<(), DecodeError>
-    where
-        B: Buf,
-        F: FnMut(M),
-    {
+    ) -> Result<M, DecodeError> {
         if wire_type != WireType::Len {
             return Err(DecodeError::InvalidTag);
         }
@@ -643,7 +765,22 @@ where
         let mut sub: &[u8] = payload.as_ref();
         let mut msg = M::new_in(alloc);
         msg.merge_from_with_depth(&mut sub, depth + 1)?;
-        push(msg);
+        Ok(msg)
+    }
+
+    #[inline]
+    fn merge_occurrence<B, F>(
+        wire_type: WireType,
+        buf: &mut B,
+        alloc: A,
+        depth: usize,
+        mut push: F,
+    ) -> Result<(), DecodeError>
+    where
+        B: Buf,
+        F: FnMut(M),
+    {
+        push(Self::decode_element(wire_type, buf, alloc, depth)?);
         Ok(())
     }
 }
