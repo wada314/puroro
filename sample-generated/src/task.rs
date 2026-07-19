@@ -583,30 +583,31 @@ impl<A: Allocator + Clone> Task<A> {
     }
 
     // -- field visitors (scalar/pair × shared/mut) --------------------------
+    // Visitors capture `MessageCommon` at construction; these methods only
+    // enumerate field slots.
 
     /// Scalar / shared: invoke `v` once per catalog field, in declaration order.
     pub fn visit_fields<V: FieldVisitor<TaskPresence, A>>(
         &self,
         v: &mut V,
     ) -> ControlFlow<V::Break> {
-        let c = &self._common;
-        v.visit("title", c, &self.title)?;
-        v.visit("score", c, &self.score)?;
-        v.visit("max_retries", c, &self.max_retries)?;
-        v.visit("owner_id", c, &self.owner_id)?;
-        v.visit("payload", c, &self.payload)?;
-        v.visit("tag_ids", c, &self.tag_ids)?;
-        v.visit("scores", c, &self.scores)?;
-        v.visit("labels", c, &self.labels)?;
-        v.visit("status", c, &self.status)?;
-        v.visit("priority", c, &self.priority)?;
-        v.visit("assignee", c, &self.assignee)?;
-        v.visit("notification", c, &self.notification)?;
-        v.visit("done", c, &self.done)?;
-        v.visit("flag", c, &self.flag)?;
-        v.visit("watchers", c, &self.watchers)?;
-        v.visit("votes", c, &self.votes)?;
-        v.visit("attributes", c, &self.attributes)?;
+        v.visit("title", &self.title)?;
+        v.visit("score", &self.score)?;
+        v.visit("max_retries", &self.max_retries)?;
+        v.visit("owner_id", &self.owner_id)?;
+        v.visit("payload", &self.payload)?;
+        v.visit("tag_ids", &self.tag_ids)?;
+        v.visit("scores", &self.scores)?;
+        v.visit("labels", &self.labels)?;
+        v.visit("status", &self.status)?;
+        v.visit("priority", &self.priority)?;
+        v.visit("assignee", &self.assignee)?;
+        v.visit("notification", &self.notification)?;
+        v.visit("done", &self.done)?;
+        v.visit("flag", &self.flag)?;
+        v.visit("watchers", &self.watchers)?;
+        v.visit("votes", &self.votes)?;
+        v.visit("attributes", &self.attributes)?;
         ControlFlow::Continue(())
     }
 
@@ -616,31 +617,23 @@ impl<A: Allocator + Clone> Task<A> {
         other: &Self,
         v: &mut V,
     ) -> ControlFlow<V::Break> {
-        let c = &self._common;
-        let o = &other._common;
-        v.visit("title", c, &self.title, o, &other.title)?;
-        v.visit("score", c, &self.score, o, &other.score)?;
-        v.visit("max_retries", c, &self.max_retries, o, &other.max_retries)?;
-        v.visit("owner_id", c, &self.owner_id, o, &other.owner_id)?;
-        v.visit("payload", c, &self.payload, o, &other.payload)?;
-        v.visit("tag_ids", c, &self.tag_ids, o, &other.tag_ids)?;
-        v.visit("scores", c, &self.scores, o, &other.scores)?;
-        v.visit("labels", c, &self.labels, o, &other.labels)?;
-        v.visit("status", c, &self.status, o, &other.status)?;
-        v.visit("priority", c, &self.priority, o, &other.priority)?;
-        v.visit("assignee", c, &self.assignee, o, &other.assignee)?;
-        v.visit(
-            "notification",
-            c,
-            &self.notification,
-            o,
-            &other.notification,
-        )?;
-        v.visit("done", c, &self.done, o, &other.done)?;
-        v.visit("flag", c, &self.flag, o, &other.flag)?;
-        v.visit("watchers", c, &self.watchers, o, &other.watchers)?;
-        v.visit("votes", c, &self.votes, o, &other.votes)?;
-        v.visit("attributes", c, &self.attributes, o, &other.attributes)?;
+        v.visit("title", &self.title, &other.title)?;
+        v.visit("score", &self.score, &other.score)?;
+        v.visit("max_retries", &self.max_retries, &other.max_retries)?;
+        v.visit("owner_id", &self.owner_id, &other.owner_id)?;
+        v.visit("payload", &self.payload, &other.payload)?;
+        v.visit("tag_ids", &self.tag_ids, &other.tag_ids)?;
+        v.visit("scores", &self.scores, &other.scores)?;
+        v.visit("labels", &self.labels, &other.labels)?;
+        v.visit("status", &self.status, &other.status)?;
+        v.visit("priority", &self.priority, &other.priority)?;
+        v.visit("assignee", &self.assignee, &other.assignee)?;
+        v.visit("notification", &self.notification, &other.notification)?;
+        v.visit("done", &self.done, &other.done)?;
+        v.visit("flag", &self.flag, &other.flag)?;
+        v.visit("watchers", &self.watchers, &other.watchers)?;
+        v.visit("votes", &self.votes, &other.votes)?;
+        v.visit("attributes", &self.attributes, &other.attributes)?;
         ControlFlow::Continue(())
     }
 
@@ -653,67 +646,23 @@ impl<A: Allocator + Clone> Task<A> {
         dst: &mut Self,
         v: &mut V,
     ) -> ControlFlow<V::Break> {
-        let c = &self._common;
-        // Reborrow `dst._common` per call so it does not overlap `&mut dst.<field>`.
-        v.visit("title", c, &self.title, &dst._common, &mut dst.title)?;
-        v.visit("score", c, &self.score, &dst._common, &mut dst.score)?;
-        v.visit(
-            "max_retries",
-            c,
-            &self.max_retries,
-            &dst._common,
-            &mut dst.max_retries,
-        )?;
-        v.visit(
-            "owner_id",
-            c,
-            &self.owner_id,
-            &dst._common,
-            &mut dst.owner_id,
-        )?;
-        v.visit("payload", c, &self.payload, &dst._common, &mut dst.payload)?;
-        v.visit("tag_ids", c, &self.tag_ids, &dst._common, &mut dst.tag_ids)?;
-        v.visit("scores", c, &self.scores, &dst._common, &mut dst.scores)?;
-        v.visit("labels", c, &self.labels, &dst._common, &mut dst.labels)?;
-        v.visit("status", c, &self.status, &dst._common, &mut dst.status)?;
-        v.visit(
-            "priority",
-            c,
-            &self.priority,
-            &dst._common,
-            &mut dst.priority,
-        )?;
-        v.visit(
-            "assignee",
-            c,
-            &self.assignee,
-            &dst._common,
-            &mut dst.assignee,
-        )?;
-        v.visit(
-            "notification",
-            c,
-            &self.notification,
-            &dst._common,
-            &mut dst.notification,
-        )?;
-        v.visit("done", c, &self.done, &dst._common, &mut dst.done)?;
-        v.visit("flag", c, &self.flag, &dst._common, &mut dst.flag)?;
-        v.visit(
-            "watchers",
-            c,
-            &self.watchers,
-            &dst._common,
-            &mut dst.watchers,
-        )?;
-        v.visit("votes", c, &self.votes, &dst._common, &mut dst.votes)?;
-        v.visit(
-            "attributes",
-            c,
-            &self.attributes,
-            &dst._common,
-            &mut dst.attributes,
-        )?;
+        v.visit("title", &self.title, &mut dst.title)?;
+        v.visit("score", &self.score, &mut dst.score)?;
+        v.visit("max_retries", &self.max_retries, &mut dst.max_retries)?;
+        v.visit("owner_id", &self.owner_id, &mut dst.owner_id)?;
+        v.visit("payload", &self.payload, &mut dst.payload)?;
+        v.visit("tag_ids", &self.tag_ids, &mut dst.tag_ids)?;
+        v.visit("scores", &self.scores, &mut dst.scores)?;
+        v.visit("labels", &self.labels, &mut dst.labels)?;
+        v.visit("status", &self.status, &mut dst.status)?;
+        v.visit("priority", &self.priority, &mut dst.priority)?;
+        v.visit("assignee", &self.assignee, &mut dst.assignee)?;
+        v.visit("notification", &self.notification, &mut dst.notification)?;
+        v.visit("done", &self.done, &mut dst.done)?;
+        v.visit("flag", &self.flag, &mut dst.flag)?;
+        v.visit("watchers", &self.watchers, &mut dst.watchers)?;
+        v.visit("votes", &self.votes, &mut dst.votes)?;
+        v.visit("attributes", &self.attributes, &mut dst.attributes)?;
         ControlFlow::Continue(())
     }
 
@@ -722,24 +671,23 @@ impl<A: Allocator + Clone> Task<A> {
         &mut self,
         v: &mut V,
     ) -> ControlFlow<V::Break> {
-        let c = &self._common;
-        v.visit("title", c, &mut self.title)?;
-        v.visit("score", c, &mut self.score)?;
-        v.visit("max_retries", c, &mut self.max_retries)?;
-        v.visit("owner_id", c, &mut self.owner_id)?;
-        v.visit("payload", c, &mut self.payload)?;
-        v.visit("tag_ids", c, &mut self.tag_ids)?;
-        v.visit("scores", c, &mut self.scores)?;
-        v.visit("labels", c, &mut self.labels)?;
-        v.visit("status", c, &mut self.status)?;
-        v.visit("priority", c, &mut self.priority)?;
-        v.visit("assignee", c, &mut self.assignee)?;
-        v.visit("notification", c, &mut self.notification)?;
-        v.visit("done", c, &mut self.done)?;
-        v.visit("flag", c, &mut self.flag)?;
-        v.visit("watchers", c, &mut self.watchers)?;
-        v.visit("votes", c, &mut self.votes)?;
-        v.visit("attributes", c, &mut self.attributes)?;
+        v.visit("title", &mut self.title)?;
+        v.visit("score", &mut self.score)?;
+        v.visit("max_retries", &mut self.max_retries)?;
+        v.visit("owner_id", &mut self.owner_id)?;
+        v.visit("payload", &mut self.payload)?;
+        v.visit("tag_ids", &mut self.tag_ids)?;
+        v.visit("scores", &mut self.scores)?;
+        v.visit("labels", &mut self.labels)?;
+        v.visit("status", &mut self.status)?;
+        v.visit("priority", &mut self.priority)?;
+        v.visit("assignee", &mut self.assignee)?;
+        v.visit("notification", &mut self.notification)?;
+        v.visit("done", &mut self.done)?;
+        v.visit("flag", &mut self.flag)?;
+        v.visit("watchers", &mut self.watchers)?;
+        v.visit("votes", &mut self.votes)?;
+        v.visit("attributes", &mut self.attributes)?;
         ControlFlow::Continue(())
     }
 }
@@ -765,7 +713,8 @@ impl<A: Allocator + Clone> ::unmanaged::CloneIn<A> for Task<A> {
         // Empty placeholders first (presence still zero), then clone fields,
         // then install cloned common (presence + unknown fields).
         let mut dst = Self::new_in(alloc.clone());
-        let _ = self.visit_field_pairs_mut(&mut dst, &mut CloneFieldsVisitor);
+        let mut v = CloneFieldsVisitor::new(&self._common, &dst._common);
+        let _ = self.visit_field_pairs_mut(&mut dst, &mut v);
         let mut old = mem::replace(&mut dst._common, self._common.clone_in(alloc));
         old.deallocate();
         dst
@@ -782,7 +731,10 @@ impl<A: Allocator + Clone> Clone for Task<A> {
 impl<A: Allocator + Clone> PartialEq for Task<A> {
     fn eq(&self, other: &Self) -> bool {
         matches!(
-            self.visit_field_pairs(other, &mut FieldEqVisitor),
+            self.visit_field_pairs(
+                other,
+                &mut FieldEqVisitor::new(&self._common, &other._common)
+            ),
             ControlFlow::Continue(())
         ) && self._common.unknown_fields_eq(&other._common)
     }
@@ -790,7 +742,7 @@ impl<A: Allocator + Clone> PartialEq for Task<A> {
 
 impl<A: Allocator + Clone> fmt::Debug for Task<A> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let mut v = DebugStructVisitor::new(f.debug_struct("Task"));
+        let mut v = DebugStructVisitor::new(f.debug_struct("Task"), &self._common);
         let _ = self.visit_fields(&mut v);
         v.finish()
     }
@@ -802,7 +754,8 @@ impl<A: Allocator + Clone> fmt::Debug for Task<A> {
 
 impl<A: Allocator + Clone> Drop for Task<A> {
     fn drop(&mut self) {
-        let _ = self.visit_fields_mut(&mut FieldDeallocVisitor);
+        let mut v = FieldDeallocVisitor::new(&self._common);
+        let _ = self.visit_fields_mut(&mut v);
         self._common.deallocate();
     }
 }
@@ -832,13 +785,13 @@ impl<A: Allocator + Clone> Message for Task<A> {
     }
 
     fn encoded_len(&self) -> usize {
-        let mut v = EncodedLenVisitor::default();
+        let mut v = EncodedLenVisitor::new(&self._common);
         let _ = self.visit_fields(&mut v);
         v.len + self._common.unknown_fields.len()
     }
 
     fn encode_raw<B: BufMut>(&self, buf: &mut B) {
-        let _ = self.visit_fields(&mut EncodeRawVisitor::new(buf));
+        let _ = self.visit_fields(&mut EncodeRawVisitor::new(&self._common, buf));
         let unknown: &[u8] = &self._common.unknown_fields;
         buf.put_slice(unknown);
     }
