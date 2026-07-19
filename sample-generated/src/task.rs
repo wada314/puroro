@@ -21,14 +21,13 @@ use ::core::ops::DerefMut;
 use ::puroro::{DecodeError, HasDefault, Message, Optional};
 use ::puroro_rt::decode::{decode_tag, skip_field_and_save};
 use ::puroro_rt::{
-    BitPacked, CloneFieldsVisitor, Closed, DebugStructVisitor, EncodeRawVisitor, EncodedLenVisitor,
-    Expanded, Explicit, FieldDeallocVisitor, FieldEqVisitor, FieldPairVisitor, FieldPairVisitorMut,
-    FieldVisitor, FieldVisitorMut, Implicit, Inline, LegacyRequired, MapField, MapFieldMut,
-    MapFieldRef, MessageCommon, NonOneof, OneofSlot, Open, Packed, PresenceBits, ProtoBool,
-    ProtoBytes, ProtoEnum, ProtoInt32, ProtoMessage, ProtoString, RepeatedElementsMut,
+    BitPacked, CloneFieldsVisitor, CloneIn, Closed, DebugStructVisitor, EncodeRawVisitor,
+    EncodedLenVisitor, Expanded, Explicit, FieldDeallocVisitor, FieldEqVisitor, FieldPairVisitor,
+    FieldPairVisitorMut, FieldVisitor, FieldVisitorMut, Implicit, Inline, LegacyRequired, MapField,
+    MapFieldMut, MapFieldRef, MessageCommon, NonOneof, OneofSlot, Open, Packed, PresenceBits,
+    ProtoBool, ProtoBytes, ProtoEnum, ProtoInt32, ProtoMessage, ProtoString, RepeatedElementsMut,
     RepeatedField, SingularField,
 };
-use ::unmanaged::CloneIn;
 
 use defaults::MaxRetriesDefault;
 
@@ -195,7 +194,7 @@ impl<A: Allocator + Clone> Task<A> {
         self.title.bind(&self._common).optional()
     }
 
-    pub fn title_mut<'s>(&'s mut self) -> impl DerefMut<Target = ::unmanaged::String<A>> + 's {
+    pub fn title_mut<'s>(&'s mut self) -> impl DerefMut<Target = ::puroro_rt::String<A>> + 's {
         self.title.bind_mut(&mut self._common).value_mut()
     }
 
@@ -243,7 +242,7 @@ impl<A: Allocator + Clone> Task<A> {
         self.owner_id.bind(&self._common).optional()
     }
 
-    pub fn owner_id_mut<'s>(&'s mut self) -> impl DerefMut<Target = ::unmanaged::String<A>> + 's {
+    pub fn owner_id_mut<'s>(&'s mut self) -> impl DerefMut<Target = ::puroro_rt::String<A>> + 's {
         self.owner_id.bind_mut(&mut self._common).value_mut()
     }
 
@@ -298,12 +297,12 @@ impl<A: Allocator + Clone> Task<A> {
 
     // -- labels (repeated string, proto field 8) -----------------------------
 
-    pub fn labels(&self) -> &[::unmanaged::UnmanagedString<A>] {
+    pub fn labels(&self) -> &[::puroro_rt::UnmanagedString<A>] {
         self.labels.bind(&self._common).as_slice()
     }
 
     /// Container mutator: `push()` appends an empty string and returns a
-    /// [`::unmanaged::String`] handle ([`RepeatedContainerMut`](::puroro_rt::RepeatedContainerMut)).
+    /// [`::puroro_rt::String`] handle ([`RepeatedContainerMut`](::puroro_rt::RepeatedContainerMut)).
     pub fn labels_mut(&mut self) -> RepeatedElementsMut<'_, ProtoString, A> {
         self.labels.bind_mut(&mut self._common).container_mut()
     }
@@ -491,7 +490,7 @@ impl<A: Allocator + Clone> Task<A> {
             .optional()
     }
 
-    pub fn email_address_mut(&mut self) -> impl DerefMut<Target = ::unmanaged::String<A>> + '_ {
+    pub fn email_address_mut(&mut self) -> impl DerefMut<Target = ::puroro_rt::String<A>> + '_ {
         self.notification
             .bind_mut(&mut self._common)
             .variant_mut::<EmailAddress>()
@@ -511,7 +510,7 @@ impl<A: Allocator + Clone> Task<A> {
             .optional()
     }
 
-    pub fn phone_number_mut(&mut self) -> impl DerefMut<Target = ::unmanaged::String<A>> + '_ {
+    pub fn phone_number_mut(&mut self) -> impl DerefMut<Target = ::puroro_rt::String<A>> + '_ {
         self.notification
             .bind_mut(&mut self._common)
             .variant_mut::<PhoneNumber>()
@@ -708,7 +707,7 @@ impl<A: Allocator + Clone + Default> Default for Task<A> {
 // Clone / PartialEq / Debug
 // ---------------------------------------------------------------------------
 
-impl<A: Allocator + Clone> ::unmanaged::CloneIn<A> for Task<A> {
+impl<A: Allocator + Clone> ::puroro_rt::CloneIn<A> for Task<A> {
     fn clone_in(&self, alloc: A) -> Self {
         // Empty placeholders first (presence still zero), then clone fields,
         // then install cloned common (presence + unknown fields).
@@ -761,10 +760,10 @@ impl<A: Allocator + Clone> Drop for Task<A> {
 }
 
 // ---------------------------------------------------------------------------
-// unmanaged::DeallocateIn — required for nested `UnmanagedBox` / catalog bounds
+// DeallocateIn — required for nested `UnmanagedBox` / catalog bounds
 // ---------------------------------------------------------------------------
 
-impl<A: Allocator + Clone> ::unmanaged::DeallocateIn<A> for Task<A> {
+impl<A: Allocator + Clone> ::puroro_rt::DeallocateIn<A> for Task<A> {
     #[inline]
     unsafe fn deallocate_in(self, _alloc: A) {
         // Heap is owned by `self._common.alloc`; parent-passed `alloc` is only

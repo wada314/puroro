@@ -131,7 +131,6 @@ dependencies = [
  "bytes",
  "puroro",
  "puroro-rt",
- "unmanaged",
 ]
 
 [[package]]

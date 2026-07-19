@@ -16,12 +16,11 @@ use ::core::ops::DerefMut;
 use ::puroro::{DecodeError, Message};
 use ::puroro_rt::decode::{decode_tag, skip_field_and_save};
 use ::puroro_rt::{
-    CloneFieldsVisitor, DebugStructVisitor, EncodeRawVisitor, EncodedLenVisitor, Explicit,
+    CloneFieldsVisitor, CloneIn, DebugStructVisitor, EncodeRawVisitor, EncodedLenVisitor, Explicit,
     FieldDeallocVisitor, FieldEqVisitor, FieldPairVisitor, FieldPairVisitorMut, FieldVisitor,
     FieldVisitorMut, MessageCommon, PresenceBits, ProtoDouble, ProtoFixed32, ProtoString,
     SingularField,
 };
-use ::unmanaged::CloneIn;
 
 // ---------------------------------------------------------------------------
 // Presence bitfield (4 tracked singular fields)
@@ -101,7 +100,7 @@ impl<A: Allocator + Clone> Address<A> {
         self.street.bind(&self._common).optional()
     }
 
-    pub fn street_mut<'s>(&'s mut self) -> impl DerefMut<Target = ::unmanaged::String<A>> + 's {
+    pub fn street_mut<'s>(&'s mut self) -> impl DerefMut<Target = ::puroro_rt::String<A>> + 's {
         self.street.bind_mut(&mut self._common).value_mut()
     }
 
@@ -118,7 +117,7 @@ impl<A: Allocator + Clone> Address<A> {
         self.city.bind(&self._common).optional()
     }
 
-    pub fn city_mut<'s>(&'s mut self) -> impl DerefMut<Target = ::unmanaged::String<A>> + 's {
+    pub fn city_mut<'s>(&'s mut self) -> impl DerefMut<Target = ::puroro_rt::String<A>> + 's {
         self.city.bind_mut(&mut self._common).value_mut()
     }
 
@@ -231,7 +230,7 @@ impl<A: Allocator + Clone + Default> Default for Address<A> {
 // Clone / PartialEq / Debug
 // ---------------------------------------------------------------------------
 
-impl<A: Allocator + Clone> ::unmanaged::CloneIn<A> for Address<A> {
+impl<A: Allocator + Clone> ::puroro_rt::CloneIn<A> for Address<A> {
     fn clone_in(&self, alloc: A) -> Self {
         let mut dst = Self::new_in(alloc.clone());
         let mut v = CloneFieldsVisitor::new(&self._common, &dst._common);
@@ -282,10 +281,10 @@ impl<A: Allocator + Clone> Drop for Address<A> {
 }
 
 // ---------------------------------------------------------------------------
-// unmanaged::DeallocateIn — required for nested `UnmanagedBox` / catalog bounds
+// DeallocateIn — required for nested `UnmanagedBox` / catalog bounds
 // ---------------------------------------------------------------------------
 
-impl<A: Allocator + Clone> ::unmanaged::DeallocateIn<A> for Address<A> {
+impl<A: Allocator + Clone> ::puroro_rt::DeallocateIn<A> for Address<A> {
     #[inline]
     unsafe fn deallocate_in(self, _alloc: A) {
         // Heap is owned by `self._common.alloc`; parent-passed `alloc` is only

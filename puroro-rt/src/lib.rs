@@ -10,6 +10,11 @@ pub mod encode;
 pub(crate) mod fields;
 
 pub use ::protobuf_core::FieldNumber;
+/// Allocator-less containers / traits used by generated messages.
+///
+/// Generated code should take these from `puroro_rt` rather than depending on
+/// the `unmanaged` crate directly.
+pub use ::unmanaged::{CloneIn, DeallocateIn, String, UnmanagedString};
 pub use defaults::ProtoDefault;
 pub use fields::enum_variant::EnumVariant;
 pub use fields::map::{MapEntries, MapEntriesIter, MapField, MapFieldMut, MapFieldRef};
