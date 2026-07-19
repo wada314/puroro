@@ -436,12 +436,9 @@ impl<A: Allocator + Clone> Task<A> {
 
     // -- oneof notification (proto fields 12 / 13 / 14 / 15 / 18) ------------
 
-    /// Which variant is set (payload-less; `None` when the group is unset).
-    pub fn notification_case(&self) -> Option<NotificationCase> {
-        self.notification().case()
-    }
-
     /// Bound shared view of the oneof group (always available, including when unset).
+    ///
+    /// Discriminant: `notification().case() -> Option<NotificationCase>`.
     pub fn notification<'a>(
         &'a self,
     ) -> impl OneofView<Case = NotificationCase, Ref = NotificationRef<'a, A>> + 'a {

@@ -233,7 +233,7 @@ The normative generated API is the concrete message struct's inherent `impl` blo
 | Repeated packable / message | `&[T]` / `&[M<A>]` | `*_mut()` → `impl DerefMut<Target = Vec<T, A>>` (`allocator_api2`) | `clear_*()` |
 | Repeated string / bytes | `&[impl Deref<Target = str>]` / (bytes TBD) | `*_mut()` → `impl RepeatedStringMut<A>` (`push` then fill) | `clear_*()` |
 | Map | `impl MapRef<K, V>` | `impl MapMut<K, V>` | `clear_*()` (or `*_mut().clear()`) |
-| Oneof group | `impl OneofView` / `notification_case()` | `impl OneofViewMut` + per-variant `*_mut()` | `clear_notification()` |
+| Oneof group | `impl OneofView` (`case()` / `as_ref()`) | `impl OneofViewMut` + per-variant `*_mut()` | `clear_notification()` |
 
 Presence for EXPLICIT fields is checked with `field().is_set()` / `field().get()` — there are **no** generated `has_*`, `*_raw`, `set_*`, or `push_*` helpers. Mutation is entirely via `_mut` (+ `clear_*`); see also [§5.1 Mutation API](#51-chosen-design-single-type-parameter).
 
@@ -672,7 +672,6 @@ pub type NotificationMut<'a, A> = Notification<
 >;
 
 // Accessors on Task — `puroro` traits so library users never name `puroro-rt`:
-pub fn notification_case(&self) -> Option<NotificationCase>; // = notification().case()
 pub fn notification(&self) -> impl ::puroro::OneofView<
     Case = NotificationCase,
     Ref = NotificationRef<'_, A>,

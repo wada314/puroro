@@ -94,9 +94,9 @@ pub enum Notification<Ea, Pn, Wh, Po, Ur> {
 
 /// Which variant of `oneof notification` is set — a payload-less discriminant.
 ///
-/// Backs `Task::notification_case`, which returns `Option<NotificationCase>`;
-/// the unset group is `None`, so this enum mirrors the real variants 1:1 (no
-/// `NotSet` sentinel).
+/// Returned by [`OneofView::case`](::puroro::OneofView::case) as
+/// `Option<NotificationCase>`; the unset group is `None`, so this enum mirrors
+/// the real variants 1:1 (no `NotSet` sentinel).
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum NotificationCase {
     EmailAddress,
@@ -150,40 +150,24 @@ pub type NotificationMut<'a, A> = Notification<
     <ProtoBool as ProtoType>::Mut<'a, A>,
 >;
 
-// `A` must appear structurally (not only inside an associated-type projection)
-// for these impls — see rustc E0207. `Postal`'s `Ref` is `&Address<A>`.
-impl<'a, A: Allocator + Clone> Clone
-    for Notification<
-        <ProtoString as ProtoType>::Ref<'a, A>,
-        <ProtoString as ProtoType>::Ref<'a, A>,
-        <ProtoInt32 as ProtoType>::Ref<'a, A>,
-        &'a Address<A>,
-        <ProtoBool as ProtoType>::Ref<'a, A>,
-    >
+impl<Ea: Clone, Pn: Clone, Wh: Clone, Po: Clone, Ur: Clone> Clone
+    for Notification<Ea, Pn, Wh, Po, Ur>
 {
     fn clone(&self) -> Self {
-        *self
+        match self {
+            Self::EmailAddress(x) => Self::EmailAddress(x.clone()),
+            Self::PhoneNumber(x) => Self::PhoneNumber(x.clone()),
+            Self::WebhookId(x) => Self::WebhookId(x.clone()),
+            Self::Postal(x) => Self::Postal(x.clone()),
+            Self::Urgent(x) => Self::Urgent(x.clone()),
+        }
     }
 }
-impl<'a, A: Allocator + Clone> Copy
-    for Notification<
-        <ProtoString as ProtoType>::Ref<'a, A>,
-        <ProtoString as ProtoType>::Ref<'a, A>,
-        <ProtoInt32 as ProtoType>::Ref<'a, A>,
-        &'a Address<A>,
-        <ProtoBool as ProtoType>::Ref<'a, A>,
-    >
-{
-}
 
-impl<'a, A: Allocator + Clone> PartialEq
-    for Notification<
-        <ProtoString as ProtoType>::Ref<'a, A>,
-        <ProtoString as ProtoType>::Ref<'a, A>,
-        <ProtoInt32 as ProtoType>::Ref<'a, A>,
-        &'a Address<A>,
-        <ProtoBool as ProtoType>::Ref<'a, A>,
-    >
+impl<Ea: Copy, Pn: Copy, Wh: Copy, Po: Copy, Ur: Copy> Copy for Notification<Ea, Pn, Wh, Po, Ur> {}
+
+impl<Ea: PartialEq, Pn: PartialEq, Wh: PartialEq, Po: PartialEq, Ur: PartialEq> PartialEq
+    for Notification<Ea, Pn, Wh, Po, Ur>
 {
     fn eq(&self, other: &Self) -> bool {
         match (self, other) {

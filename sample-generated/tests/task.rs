@@ -178,7 +178,7 @@ fn oneof_varint_variant_roundtrip() {
     let decoded: Task = Task::decode(&bytes[..]).unwrap();
 
     assert_eq!(
-        decoded.notification_case(),
+        decoded.notification().case(),
         Some(NotificationCase::WebhookId)
     );
     assert!(matches!(
@@ -204,7 +204,10 @@ fn oneof_message_variant_roundtrip() {
     let bytes = task.encode_to_vec();
     let decoded: Task = Task::decode(&bytes[..]).unwrap();
 
-    assert_eq!(decoded.notification_case(), Some(NotificationCase::Postal));
+    assert_eq!(
+        decoded.notification().case(),
+        Some(NotificationCase::Postal)
+    );
     let Some(Notification::Postal(addr)) = decoded.notification().as_ref() else {
         panic!("expected postal variant");
     };
@@ -222,7 +225,10 @@ fn oneof_bool_variant_roundtrip() {
     let bytes = task.encode_to_vec();
     let decoded: Task = Task::decode(&bytes[..]).unwrap();
 
-    assert_eq!(decoded.notification_case(), Some(NotificationCase::Urgent));
+    assert_eq!(
+        decoded.notification().case(),
+        Some(NotificationCase::Urgent)
+    );
     assert!(matches!(
         decoded.notification().as_ref(),
         Some(Notification::Urgent(true))
@@ -234,7 +240,10 @@ fn oneof_bool_variant_roundtrip() {
     *task.urgent_mut() = false;
     let bytes = task.encode_to_vec();
     let decoded: Task = Task::decode(&bytes[..]).unwrap();
-    assert_eq!(decoded.notification_case(), Some(NotificationCase::Urgent));
+    assert_eq!(
+        decoded.notification().case(),
+        Some(NotificationCase::Urgent)
+    );
     assert!(matches!(
         decoded.notification().as_ref(),
         Some(Notification::Urgent(false))
@@ -452,13 +461,13 @@ fn oneof_scalar_getter_uses_custom_default_when_unset() {
     let mut task = Task::new();
     task.owner_id_mut().push_str("user-1");
 
-    assert!(task.notification_case().is_none());
+    assert!(task.notification().case().is_none());
     assert!(!task.webhook_id().is_set());
     assert_eq!(task.webhook_id().get(), -1);
 
     task.email_address_mut().push_str("a@example.com");
     assert_eq!(
-        task.notification_case(),
+        task.notification().case(),
         Some(NotificationCase::EmailAddress)
     );
     assert!(!task.webhook_id().is_set());
@@ -527,7 +536,7 @@ fn oneof_group_view_mut_as_view_and_clear() {
     ));
 
     task.notification_mut().clear();
-    assert!(task.notification_case().is_none());
+    assert!(task.notification().case().is_none());
     assert!(task.notification().as_ref().is_none());
 }
 

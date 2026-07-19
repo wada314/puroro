@@ -621,7 +621,7 @@ Nested LEN payloads use `Buf::take(len)` before child `merge_from`.
 | `Drop` | `A: Clone` | Calls `deallocate(&_common)` on every direct child ([`FieldDeallocate`](puroro-rt/src/fields/shared/field_deallocate.rs)), then `_common.deallocate()` |
 | `Clone` / `CloneIn` | `A: Clone` | Field-wise `field.clone_in(&common, alloc)`; `Clone` clones `MessageCommon.alloc` and delegates |
 | `PartialEq` | `A: Clone` | Semantic getter comparison (not wire bytes); float uses Rust `PartialEq` |
-| `Debug` | `A: Clone` | Field-name `debug_struct` (oneof shown as `notification_case`) |
+| `Debug` | `A: Clone` | Field-name `debug_struct` (oneof shown as `notification` → `case`) |
 
 **Not currently generated:** `Eq`, `Copy`, `Ord`, `Hash`.
 
@@ -732,7 +732,7 @@ The sample `oneof notification` is deliberately **heterogeneous** — LEN, VARIN
 |---|---|---|---|
 | `Notification<…>` | `pub` | type params | canonical shape (shared by aliases) |
 | `NotificationStorage<A>` | `pub(crate)` | field wrappers | owned storage; `OneofGroup` + `OneofDeallocate`; encode glue |
-| `NotificationCase` | `pub` | — | `Copy` discriminant (variants only; unset is `None`) → `notification_case() -> Option<_>` |
+| `NotificationCase` | `pub` | — | `Copy` discriminant (variants only; unset is `None`) → `notification().case() -> Option<_>` |
 | `OneofView` / `OneofViewMut` | rt `pub` | — | group bind (slot + `MessageCommon`) → `notification()` / `notification_mut()` |
 | `NotificationRef<'a, A>` | `pub` alias | via [`ProtoType::Ref`](puroro-rt/src/fields/wire/proto_type.rs) | projected read → `view.as_ref()` |
 | `NotificationMut<'a, A>` | `pub` alias | via [`ProtoType::Mut`](puroro-rt/src/fields/wire/proto_type.rs) | projected mut → `view_mut.as_mut()` |

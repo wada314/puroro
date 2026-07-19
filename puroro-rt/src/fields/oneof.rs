@@ -392,7 +392,7 @@ where
 {
     #[inline]
     fn fmt_debug(&self, _common: &MessageCommon<Pb, A>, f: &mut Formatter<'_>) -> FmtResult {
-        // Discriminant only — matches the former `notification_case` Debug field.
+        // Discriminant only — matches `notification().case()` in Debug.
         Debug::fmt(&self.as_ref().map(E::case), f)
     }
 }
