@@ -367,7 +367,6 @@ where
     E: OneofGroup<Presence = Pb, Alloc = A>,
     Pb: PresenceBits,
     A: Allocator + Clone,
-    for<'a> E::Ref<'a>: PartialEq,
 {
     #[inline]
     fn field_eq(
@@ -378,7 +377,7 @@ where
     ) -> bool {
         match (self.as_ref(), other.as_ref()) {
             (None, None) => true,
-            (Some(a), Some(b)) => E::ref_eq(&E::to_ref(a, common), &E::to_ref(b, other_common)),
+            (Some(a), Some(b)) => E::to_ref(a, common) == E::to_ref(b, other_common),
             _ => false,
         }
     }
@@ -510,7 +509,12 @@ where
     type Case: Copy;
 
     /// Projected shared view of the active variant.
-    type Ref<'a>
+    ///
+    /// [`PartialEq`] is required so message equality can compare projected
+    /// views without a generated `ref_eq` hook. The bound is gated on
+    /// `Self: 'a` (not a blanket `for<'a>`), so reference allocators such as
+    /// `A = &Bump` remain usable.
+    type Ref<'a>: PartialEq
     where
         Self: 'a;
 
@@ -539,17 +543,6 @@ where
         storage: &'a mut Self,
         common: &'a mut MessageCommon<Self::Presence, Self::Alloc>,
     ) -> Self::Mut<'a>;
-
-    /// Semantic equality of two projected refs (for message `PartialEq`).
-    ///
-    /// Default: [`PartialEq`] on [`Self::Ref`]. Override only if the projected
-    /// view needs a non-structural comparison.
-    fn ref_eq<'a>(lhs: &Self::Ref<'a>, rhs: &Self::Ref<'a>) -> bool
-    where
-        Self::Ref<'a>: PartialEq,
-    {
-        lhs == rhs
-    }
 
     /// Deep-copies an active storage value into `alloc`.
     fn clone_storage_in(

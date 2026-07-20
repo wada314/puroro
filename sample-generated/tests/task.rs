@@ -4,6 +4,7 @@
 //! wire/merge behaviour, oneof accessors (no wire), and enum merge /
 //! unknown-field handling.
 
+use ::allocator_api2::alloc::Global;
 use ::puroro::{
     MapMut, MapRef, Message, OneofView, OneofViewMut, RepeatedStringMut, UnknownPayload,
 };
@@ -70,6 +71,24 @@ fn address_clone_and_eq() {
     let b = a.clone();
     assert_eq!(a, b);
     a.clear_city();
+    assert_ne!(a, b);
+}
+
+#[test]
+fn task_eq_with_reference_allocator_and_oneof_message() {
+    // `A = &Global` is a non-'static reference allocator (same shape as `&Bump`).
+    // Oneof `PartialEq` must not require `for<'a> Ref<'a>: PartialEq` / `A: 'static`.
+    let alloc = &Global;
+    let mut a = Task::new_in(alloc);
+    a.owner_id_mut().push_str("user-1");
+    a.postal_mut().street_mut().push_str("1 Ref St");
+
+    let mut b = Task::new_in(alloc);
+    b.owner_id_mut().push_str("user-1");
+    b.postal_mut().street_mut().push_str("1 Ref St");
+    assert_eq!(a, b);
+
+    b.postal_mut().street_mut().push_str("x");
     assert_ne!(a, b);
 }
 
