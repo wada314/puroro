@@ -45,11 +45,11 @@
 //! **Merge has no bespoke `merge_*` helpers on this enum.** Because each variant
 //! *is* a field wrapper, the parent message's `merge_from` dispatches on field
 //! number (one match arm per variant) and calls
-//! `slot.bind_mut(common).variant_mut::<V>().bind_mut(common).merge(...)`
+//! `slot.bind_mut(common).variant_mut::<FIELD_…>().bind_mut(common).merge(...)`
 //! — uniformly for every variant kind.
 //!
-//! Per-variant dispatch uses [`EnumVariant`] on zero-sized marker types in
-//! [`variant`]; see that module for the type-parameter wiring.
+//! Per-variant dispatch uses [`EnumVariant`] keyed by each variant's proto
+//! field number (`super::FIELD_*`).
 //!
 //! Note: this enum cannot carry unused lifetime/allocator parameters via
 //! `PhantomData` (unlike a struct). Integer-only oneofs therefore omit `'a` / `A`
@@ -67,17 +67,6 @@ use crate::address::Address;
 
 use super::TaskPresence;
 use super::defaults::WebhookIdDefault;
-
-/// Zero-sized markers for [`EnumVariant`] dispatch on [`NotificationStorage`].
-pub(crate) mod variant {
-    pub struct EmailAddress;
-    pub struct PhoneNumber;
-    pub struct WebhookId;
-    pub struct Postal;
-    pub struct Urgent;
-}
-
-use variant::{EmailAddress, PhoneNumber, Postal, Urgent, WebhookId};
 
 /// Canonical shape for `oneof notification`.
 ///
@@ -217,7 +206,7 @@ impl<A: Allocator + Clone> OneofGroup for NotificationStorage<A> {
     }
 }
 
-impl<A: Allocator + Clone> EnumVariant<EmailAddress> for NotificationStorage<A> {
+impl<A: Allocator + Clone> EnumVariant<{ super::FIELD_EMAIL_ADDRESS }> for NotificationStorage<A> {
     type Value = EmailAddressField<A>;
 
     fn variant_ref(&self) -> Option<&Self::Value> {
@@ -239,7 +228,7 @@ impl<A: Allocator + Clone> EnumVariant<EmailAddress> for NotificationStorage<A> 
     }
 }
 
-impl<A: Allocator + Clone> EnumVariant<PhoneNumber> for NotificationStorage<A> {
+impl<A: Allocator + Clone> EnumVariant<{ super::FIELD_PHONE_NUMBER }> for NotificationStorage<A> {
     type Value = PhoneNumberField<A>;
 
     fn variant_ref(&self) -> Option<&Self::Value> {
@@ -261,7 +250,7 @@ impl<A: Allocator + Clone> EnumVariant<PhoneNumber> for NotificationStorage<A> {
     }
 }
 
-impl<A: Allocator + Clone> EnumVariant<WebhookId> for NotificationStorage<A> {
+impl<A: Allocator + Clone> EnumVariant<{ super::FIELD_WEBHOOK_ID }> for NotificationStorage<A> {
     type Value = WebhookIdField<A>;
 
     fn variant_ref(&self) -> Option<&Self::Value> {
@@ -283,7 +272,7 @@ impl<A: Allocator + Clone> EnumVariant<WebhookId> for NotificationStorage<A> {
     }
 }
 
-impl<A: Allocator + Clone> EnumVariant<Postal> for NotificationStorage<A> {
+impl<A: Allocator + Clone> EnumVariant<{ super::FIELD_POSTAL }> for NotificationStorage<A> {
     type Value = PostalField<A>;
 
     fn variant_ref(&self) -> Option<&Self::Value> {
@@ -305,7 +294,7 @@ impl<A: Allocator + Clone> EnumVariant<Postal> for NotificationStorage<A> {
     }
 }
 
-impl<A: Allocator + Clone> EnumVariant<Urgent> for NotificationStorage<A> {
+impl<A: Allocator + Clone> EnumVariant<{ super::FIELD_URGENT }> for NotificationStorage<A> {
     type Value = UrgentField<A>;
 
     fn variant_ref(&self) -> Option<&Self::Value> {

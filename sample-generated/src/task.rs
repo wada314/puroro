@@ -37,7 +37,6 @@ use crate::address::Address;
 use crate::enums::{Priority, Status};
 
 use notification::NotificationStorage;
-use notification::variant::{EmailAddress, PhoneNumber, Postal, Urgent, WebhookId};
 pub use notification::{Notification, NotificationCase, NotificationMut, NotificationRef};
 
 // ---------------------------------------------------------------------------
@@ -471,14 +470,14 @@ impl<A: Allocator + Clone> Task<A> {
         // Unset / other variant → Optional::None → get() is ProtoDefault ("").
         self.notification
             .bind(&self._common)
-            .variant_of::<EmailAddress>()
+            .variant_of::<FIELD_EMAIL_ADDRESS>()
             .optional()
     }
 
     pub fn email_address_mut(&mut self) -> impl DerefMut<Target = ::puroro::String<A>> + '_ {
         self.notification
             .bind_mut(&mut self._common)
-            .variant_mut::<EmailAddress>()
+            .variant_mut::<FIELD_EMAIL_ADDRESS>()
             .bind_mut(&mut self._common)
             .value_mut()
     }
@@ -491,14 +490,14 @@ impl<A: Allocator + Clone> Task<A> {
     {
         self.notification
             .bind(&self._common)
-            .variant_of::<PhoneNumber>()
+            .variant_of::<FIELD_PHONE_NUMBER>()
             .optional()
     }
 
     pub fn phone_number_mut(&mut self) -> impl DerefMut<Target = ::puroro::String<A>> + '_ {
         self.notification
             .bind_mut(&mut self._common)
-            .variant_mut::<PhoneNumber>()
+            .variant_mut::<FIELD_PHONE_NUMBER>()
             .bind_mut(&mut self._common)
             .value_mut()
     }
@@ -513,7 +512,7 @@ impl<A: Allocator + Clone> Task<A> {
     {
         self.notification
             .bind(&self._common)
-            .variant_of::<WebhookId>()
+            .variant_of::<FIELD_WEBHOOK_ID>()
             .optional()
     }
 
@@ -522,7 +521,7 @@ impl<A: Allocator + Clone> Task<A> {
     pub fn webhook_id_mut(&mut self) -> impl DerefMut<Target = i32> + '_ {
         self.notification
             .bind_mut(&mut self._common)
-            .variant_mut::<WebhookId>()
+            .variant_mut::<FIELD_WEBHOOK_ID>()
             .bind_mut(&mut self._common)
             .value_mut()
     }
@@ -532,7 +531,7 @@ impl<A: Allocator + Clone> Task<A> {
     pub fn postal(&self) -> Option<&Address<A>> {
         self.notification
             .bind(&self._common)
-            .variant_of::<Postal>()
+            .variant_of::<FIELD_POSTAL>()
             .get()
     }
 
@@ -541,7 +540,7 @@ impl<A: Allocator + Clone> Task<A> {
     pub fn postal_mut(&mut self) -> &mut Address<A> {
         self.notification
             .bind_mut(&mut self._common)
-            .variant_mut::<Postal>()
+            .variant_mut::<FIELD_POSTAL>()
             .bind_mut(&mut self._common)
             .value_mut()
     }
@@ -554,14 +553,14 @@ impl<A: Allocator + Clone> Task<A> {
     {
         self.notification
             .bind(&self._common)
-            .variant_of::<Urgent>()
+            .variant_of::<FIELD_URGENT>()
             .optional()
     }
 
     pub fn urgent_mut(&mut self) -> impl DerefMut<Target = bool> + '_ {
         self.notification
             .bind_mut(&mut self._common)
-            .variant_mut::<Urgent>()
+            .variant_mut::<FIELD_URGENT>()
             .bind_mut(&mut self._common)
             .value_mut()
     }
@@ -861,7 +860,7 @@ impl<A: Allocator + Clone> Message for Task<A> {
                     // notification.email_address = 12, oneof LEN string
                     self.notification
                         .bind_mut(&mut self._common)
-                        .variant_mut::<EmailAddress>()
+                        .variant_mut::<FIELD_EMAIL_ADDRESS>()
                         .bind_mut(&mut self._common)
                         .merge(wire_type, buf, depth)?;
                 }
@@ -869,7 +868,7 @@ impl<A: Allocator + Clone> Message for Task<A> {
                     // notification.phone_number = 13, oneof LEN string
                     self.notification
                         .bind_mut(&mut self._common)
-                        .variant_mut::<PhoneNumber>()
+                        .variant_mut::<FIELD_PHONE_NUMBER>()
                         .bind_mut(&mut self._common)
                         .merge(wire_type, buf, depth)?;
                 }
@@ -877,7 +876,7 @@ impl<A: Allocator + Clone> Message for Task<A> {
                     // notification.webhook_id = 14, oneof VARINT int32
                     self.notification
                         .bind_mut(&mut self._common)
-                        .variant_mut::<WebhookId>()
+                        .variant_mut::<FIELD_WEBHOOK_ID>()
                         .bind_mut(&mut self._common)
                         .merge(wire_type, buf, depth)?;
                 }
@@ -885,7 +884,7 @@ impl<A: Allocator + Clone> Message for Task<A> {
                     // notification.postal = 15, oneof nested message
                     self.notification
                         .bind_mut(&mut self._common)
-                        .variant_mut::<Postal>()
+                        .variant_mut::<FIELD_POSTAL>()
                         .bind_mut(&mut self._common)
                         .merge(wire_type, buf, depth)?;
                 }
@@ -905,7 +904,7 @@ impl<A: Allocator + Clone> Message for Task<A> {
                     // notification.urgent = 18, oneof bool
                     self.notification
                         .bind_mut(&mut self._common)
-                        .variant_mut::<Urgent>()
+                        .variant_mut::<FIELD_URGENT>()
                         .bind_mut(&mut self._common)
                         .merge(wire_type, buf, depth)?;
                 }

@@ -232,19 +232,21 @@ impl<'a, E, Pb: PresenceBits, A: Allocator> OneofSlotRef<'a, E, Pb, A> {
 
     /// Projects the active storage enum onto one variant's field wrapper.
     ///
-    /// `V` is the zero-sized marker type for which the storage enum implements
+    /// `FIELD` is the protobuf field number for which the storage enum implements
     /// [`EnumVariant`]. Generated message getters use this so oneof members
     /// mirror ordinary fields:
-    /// `self.notification.bind(&common).variant_of::<EmailAddress>().optional()`.
+    /// `self.notification.bind(&common).variant_of::<FIELD_EMAIL_ADDRESS>().optional()`.
     #[inline]
-    pub fn variant_of<V>(self) -> OneofVariantRef<'a, <E as EnumVariant<V>>::Value, Pb, A>
+    pub fn variant_of<const FIELD: u32>(
+        self,
+    ) -> OneofVariantRef<'a, <E as EnumVariant<FIELD>>::Value, Pb, A>
     where
-        E: EnumVariant<V>,
+        E: EnumVariant<FIELD>,
     {
         OneofVariantRef::new(
             self.slot
                 .as_ref()
-                .and_then(|e| <E as EnumVariant<V>>::variant_ref(e)),
+                .and_then(|e| <E as EnumVariant<FIELD>>::variant_ref(e)),
             self.common,
         )
     }
@@ -287,9 +289,10 @@ impl<'f, 'c, E, Pb: PresenceBits, A: Allocator> OneofSlotMut<'f, 'c, E, Pb, A> {
         self.slot.set(value);
     }
 
-    /// Ensures the active variant is `V`; otherwise frees any existing variant and
-    /// installs a fresh one via [`DefaultIn`] on [`EnumVariant::Value`]. Returns a
-    /// mutable reference to the variant's field wrapper.
+    /// Ensures the active variant is `FIELD`; otherwise frees any existing
+    /// variant and installs a fresh one via [`DefaultIn`] on
+    /// [`EnumVariant::Value`]. Returns a mutable reference to the variant's
+    /// field wrapper.
     ///
     /// Because `E` may own non-droppable storage, switching variants always goes
     /// through this method (or [`set`](Self::set) / [`clear`](Self::clear)) so the
@@ -298,12 +301,12 @@ impl<'f, 'c, E, Pb: PresenceBits, A: Allocator> OneofSlotMut<'f, 'c, E, Pb, A> {
     ///
     /// Consumes this view so `common` can be re-borrowed; generated accessors and
     /// decode arms then bind the field themselves:
-    /// `slot.bind_mut(common).variant_mut::<V>().bind_mut(common).value_mut()` /
+    /// `slot.bind_mut(common).variant_mut::<FIELD_EMAIL_ADDRESS>().bind_mut(common).value_mut()` /
     /// `.merge(…)`.
-    pub fn variant_mut<V>(self) -> &'f mut <E as EnumVariant<V>>::Value
+    pub fn variant_mut<const FIELD: u32>(self) -> &'f mut <E as EnumVariant<FIELD>>::Value
     where
-        E: EnumVariant<V> + OneofDeallocate<Pb, A>,
-        <E as EnumVariant<V>>::Value: DefaultIn<A>,
+        E: EnumVariant<FIELD> + OneofDeallocate<Pb, A>,
+        <E as EnumVariant<FIELD>>::Value: DefaultIn<A>,
         A: Clone,
     {
         let slot = self.slot;
@@ -311,7 +314,7 @@ impl<'f, 'c, E, Pb: PresenceBits, A: Allocator> OneofSlotMut<'f, 'c, E, Pb, A> {
 
         let needs_install = !matches!(
             slot.as_ref(),
-            Some(e) if <E as EnumVariant<V>>::variant_ref(e).is_some()
+            Some(e) if <E as EnumVariant<FIELD>>::variant_ref(e).is_some()
         );
 
         if needs_install {
@@ -319,13 +322,13 @@ impl<'f, 'c, E, Pb: PresenceBits, A: Allocator> OneofSlotMut<'f, 'c, E, Pb, A> {
                 // SAFETY: `common.alloc` owns the previous variant's buffers.
                 unsafe { old.deallocate(common) };
             }
-            slot.set(<E as EnumVariant<V>>::from_variant(DefaultIn::default_in(
-                common.alloc.clone(),
-            )));
+            slot.set(<E as EnumVariant<FIELD>>::from_variant(
+                DefaultIn::default_in(common.alloc.clone()),
+            ));
         }
 
-        <E as EnumVariant<V>>::variant_mut(slot.as_mut().unwrap())
-            .expect("from_variant must construct the variant that V selects")
+        <E as EnumVariant<FIELD>>::variant_mut(slot.as_mut().unwrap())
+            .expect("from_variant must construct the variant that FIELD selects")
     }
 
     /// Frees the active variant (if any), leaving the slot empty.
@@ -435,7 +438,7 @@ where
 ///
 /// `None` when the slot is unset or holds a different variant. Produced by
 /// [`OneofSlotRef::variant_of`] so message getters can mirror ordinary fields
-/// (`self.notification.bind(&common).variant_of::<WebhookId>().optional()`).
+/// (`self.notification.bind(&common).variant_of::<FIELD_WEBHOOK_ID>().optional()`).
 ///
 /// [`optional`](Self::optional) threads the field wrapper's default marker `D`:
 /// when this handle is empty, the returned [`Optional`](::puroro::Optional) is

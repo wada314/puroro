@@ -709,12 +709,12 @@ To keep generated code thin, each wrapper is driven with the **field's own** con
 
 | kind | install empty variant | merge one occurrence | mut accessor |
 |---|---|---|---|
-| LEN | `SingularField::default_in(alloc)` | `slot.bind_mut(common).variant_mut::<V>().bind_mut(common).merge(…)` | `…variant_mut::<V>().bind_mut(common).value_mut()` |
+| LEN | `SingularField::default_in(alloc)` | `slot.bind_mut(common).variant_mut::<FIELD_…>().bind_mut(common).merge(…)` | `…variant_mut::<FIELD_…>().bind_mut(common).value_mut()` |
 | VARINT | same | same | same |
 | bool | same (`ProtoBool` + `BitPacked`) | same | same → `impl DerefMut<Target = bool>` |
 | message | same (`ProtoMessage`, always-present box) | same | same → `&mut M` |
 
-Every variant merges through the **same** `slot.bind_mut(common).variant_mut::<V>().bind_mut(common).merge(wire, buf)` shape. The message variant merges *into* the present child rather than replacing it.
+Every variant merges through the **same** `slot.bind_mut(common).variant_mut::<FIELD_…>().bind_mut(common).merge(wire, buf)` shape. The message variant merges *into* the present child rather than replacing it.
 
 The VARINT variant owns no heap: its `DeallocateIn` is a no-op.
 
@@ -722,11 +722,11 @@ The VARINT variant owns no heap: its `DeallocateIn` is a no-op.
 
 **Why these types, and why Storage is not public under the `Notification` name alone.** The storage alias's payloads are `unmanaged`-backed field wrappers, which panic on implicit drop and need the message allocator to free. Exposing that alias publicly would let a caller own one and hit that footgun, and would leak `unmanaged` / `puroro-rt` into the API. So `NotificationStorage` is `pub(crate)`. The public surface is the shape `Notification`, `NotificationCase`, projected aliases `NotificationRef` / `NotificationMut`, and [`puroro::OneofView`](src/oneof.rs) / [`puroro::OneofViewMut`](src/oneof.rs) (RPIT; runtime structs in `puroro-rt` implement those traits). Shared getters live on `OneofView`; while holding a mut view, call `as_view()` (not `Deref` — a by-value reborrowed view cannot be returned from `Deref::deref`).
 
-Group accessors follow the same bound-view idiom as other fields: `slot.bind(&common)` / `slot.bind_mut(&mut common)` yield [`OneofSlotRef`](puroro-rt/src/fields/oneof.rs) / [`OneofSlotMut`](puroro-rt/src/fields/oneof.rs). Runtime [`OneofView`](puroro-rt/src/fields/oneof.rs) / [`OneofViewMut`](puroro-rt/src/fields/oneof.rs) wrap that pair, keyed by [`OneofGroup`](puroro-rt/src/fields/oneof.rs) on the storage alias. `OneofSlotMut::variant_mut::<V>()` selects (or installs) variant `V` via [`DefaultIn`](puroro-rt/src/fields/shared.rs) on [`EnumVariant::Value`](puroro-rt/src/fields/enum_variant.rs) and returns `&mut` the field wrapper. That consumes the slot view so `common` can be re-borrowed; callers then `field.bind_mut(common)` for `.value_mut()` / `.merge(…)`. `set(value)` replaces the whole group, and `clear()` frees the active variant. Each of these releases the previously-active variant via `OneofDeallocate::deallocate` before overwriting the slot. The old `set_*` per-variant setters are removed.
+Group accessors follow the same bound-view idiom as other fields: `slot.bind(&common)` / `slot.bind_mut(&mut common)` yield [`OneofSlotRef`](puroro-rt/src/fields/oneof.rs) / [`OneofSlotMut`](puroro-rt/src/fields/oneof.rs). Runtime [`OneofView`](puroro-rt/src/fields/oneof.rs) / [`OneofViewMut`](puroro-rt/src/fields/oneof.rs) wrap that pair, keyed by [`OneofGroup`](puroro-rt/src/fields/oneof.rs) on the storage alias. `OneofSlotMut::variant_mut::<FIELD>()` selects (or installs) the variant for protobuf field number `FIELD` via [`DefaultIn`](puroro-rt/src/fields/shared.rs) on [`EnumVariant::Value`](puroro-rt/src/fields/enum_variant.rs) and returns `&mut` the field wrapper. That consumes the slot view so `common` can be re-borrowed; callers then `field.bind_mut(common)` for `.value_mut()` / `.merge(…)`. `set(value)` replaces the whole group, and `clear()` frees the active variant. Each of these releases the previously-active variant via `OneofDeallocate::deallocate` before overwriting the slot. The old `set_*` per-variant setters are removed.
 
 Parent `_mut` accessors and decode arms are then —
-`slot.bind_mut(common).variant_mut::<EmailAddress>().bind_mut(common).value_mut()`,
-`slot.bind_mut(common).variant_mut::<WebhookId>().bind_mut(common).merge(wire, buf)`, etc.
+`slot.bind_mut(common).variant_mut::<FIELD_EMAIL_ADDRESS>().bind_mut(common).value_mut()`,
+`slot.bind_mut(common).variant_mut::<FIELD_WEBHOOK_ID>().bind_mut(common).merge(wire, buf)`, etc.
 
 The group's **encode** glue lives on the storage enum. Variant field-number constants sit at **module scope** so they remain usable as `match` patterns.
 
@@ -772,8 +772,8 @@ Concrete C++ codegen shapes (proto2 / editions):
 
 **puroro vs that contract.** The hand-written `Task` sample matches both halves:
 
-- Per-variant **`_mut`** (`email_address_mut`, …) goes through `slot.bind_mut(common).variant_mut::<V>().bind_mut(common)`, which force-switches the case and builds a fresh wrapper via [`DefaultIn`](puroro-rt/src/fields/shared.rs) (**type** default). That matches official `mutable_*`.
-- Per-variant **getters** use `slot.bind(&common).variant_of::<V>().optional()`. The field wrapper's `D` type parameter is the proto default marker (`ProtoDefault`, or a message-local ZST such as `WebhookIdDefault` for `[default = -1]`). When the case is unset or another variant, `optional` returns `Optional::new(None)` so `is_set()` is false and `get()` yields `D::DEFAULT` — without selecting the variant. That matches official const getters.
+- Per-variant **`_mut`** (`email_address_mut`, …) goes through `slot.bind_mut(common).variant_mut::<FIELD_…>().bind_mut(common)`, which force-switches the case and builds a fresh wrapper via [`DefaultIn`](puroro-rt/src/fields/shared.rs) (**type** default). That matches official `mutable_*`.
+- Per-variant **getters** use `slot.bind(&common).variant_of::<FIELD_…>().optional()`. The field wrapper's `D` type parameter is the proto default marker (`ProtoDefault`, or a message-local ZST such as `WebhookIdDefault` for `[default = -1]`). When the case is unset or another variant, `optional` returns `Optional::new(None)` so `is_set()` is false and `get()` yields `D::DEFAULT` — without selecting the variant. That matches official const getters.
 - When the variant **is** active, getters return the **stored** value (including type zero / empty string), same as official.
 
 **Codegen rule.** `[default = X]` on a oneof scalar becomes the field wrapper's `D` (`Singular*Field<…, D>`), which flows into the read accessor (`Optional<…, D>`). It must **not** change `_mut` installation: mutators keep installing type-default storage; custom defaults must not be written into the slot merely because the caller asked for a mutable handle.
