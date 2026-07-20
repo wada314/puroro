@@ -37,7 +37,7 @@ use crate::address::Address;
 use crate::enums::{Priority, Status};
 
 use notification::NotificationStorage;
-pub use notification::{Notification, NotificationCase, NotificationMut, NotificationRef};
+pub use notification::{Notification, NotificationCase};
 
 // ---------------------------------------------------------------------------
 // Presence bitfield (presence + bool value bits)
@@ -49,8 +49,7 @@ pub struct TaskPresence(BitArray<[u8; 2], Lsb0>);
 impl TaskPresence {
     pub const ZERO: Self = Self(BitArray::ZERO);
 
-    /// Concrete [`BitRef`] for projections that cannot hold `impl Trait`
-    /// (e.g. [`NotificationMut`](notification::NotificationMut)).
+    /// Concrete [`BitRef`] for oneof bool projections that cannot hold `impl Trait`.
     #[inline]
     pub(crate) fn bit_ref_mut(&mut self, bit: usize) -> BitRef<'_, Mut, u8, Lsb0> {
         self.0
@@ -440,17 +439,21 @@ impl<A: Allocator + Clone> Task<A> {
     /// Discriminant: `notification().case() -> Option<NotificationCase>`.
     pub fn notification<'a>(
         &'a self,
-    ) -> impl OneofView<Case = NotificationCase, Ref = NotificationRef<'a, A>> + 'a {
+    ) -> impl OneofView<
+        Case = NotificationCase,
+        Ref = Notification<&'a str, &'a str, i32, &'a Address<A>, bool>,
+    > + 'a {
         ::puroro_rt::OneofView::<NotificationStorage<A>>::new(&self.notification, &self._common)
     }
 
     /// Bound mutable view of the oneof group (always available, including when unset).
     ///
     /// Use [`OneofViewMut::as_view`] to reborrow for `case` / `as_ref` while mutating;
-    /// match shared payloads via [`Self::notification`].
-    pub fn notification_mut<'a>(
-        &'a mut self,
-    ) -> impl OneofViewMut<Case = NotificationCase, Mut = NotificationMut<'a, A>> + 'a {
+    /// match shared payloads via [`Self::notification`]. Mutable projection from
+    /// [`OneofViewMut::as_mut`] is intentionally opaque (`impl` associated type) so
+    /// `puroro-rt` mut handles do not appear in this signature — prefer per-variant
+    /// `_mut` accessors for typed mutation.
+    pub fn notification_mut<'a>(&'a mut self) -> impl OneofViewMut<Case = NotificationCase> + 'a {
         ::puroro_rt::OneofViewMut::<NotificationStorage<A>>::new(
             &mut self.notification,
             &mut self._common,

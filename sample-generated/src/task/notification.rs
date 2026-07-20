@@ -5,17 +5,15 @@
 //! drop implicitly) and must not leak into the public API:
 //!
 //! - [`Notification`] — canonical **shape** enum; variant payloads are type
-//!   parameters. [`NotificationStorage`] / [`NotificationRef`] /
-//!   [`NotificationMut`] are aliases of this shape.
-//! - [`NotificationStorage`] — `pub(crate)` alias with field-wrapper payloads;
-//!   implements [`OneofGroup`], [`OneofDeallocate`], encode glue. Never public.
+//!   parameters. [`NotificationStorage`] is a `pub(crate)` alias of this shape.
+//! - [`NotificationStorage`] — field-wrapper payloads; implements [`OneofGroup`],
+//!   [`OneofDeallocate`], encode glue. Never public.
 //! - [`NotificationCase`] — a payload-less, `Copy` discriminant of which variant
 //!   is active.
-//! - [`NotificationRef`] / [`NotificationMut`] — safe projected aliases of the
-//!   *active* variant (`as_ref` / `as_mut` on [`OneofView`] /
-//!   [`OneofViewMut`](::puroro_rt::OneofViewMut)). Payloads come from
-//!   [`ProtoType`](::puroro_rt::ProtoType) on each variant's type marker
-//!   (no `StringGuard` / `BitRef` hard-coding in generated aliases).
+//!
+//! Shared projections (`OneofGroup::Ref` / `Mut`) are written inline on
+//! [`OneofGroup`] — Ref uses concrete user-facing types; Mut uses
+//! [`ProtoType::Mut`](::puroro_rt::ProtoType). There are no public Ref/Mut aliases.
 //!
 //! Group bound views come from `puroro-rt` ([`OneofView`] /
 //! [`OneofViewMut`](::puroro_rt::OneofViewMut)), not per-oneof generated structs.
@@ -53,7 +51,7 @@
 //!
 //! Note: this enum cannot carry unused lifetime/allocator parameters via
 //! `PhantomData` (unlike a struct). Integer-only oneofs therefore omit `'a` / `A`
-//! from the shape and from `Ref`/`Mut` aliases when no variant payload needs them.
+//! from the shape when no variant payload needs them.
 
 use ::allocator_api2::alloc::Allocator;
 use ::bytes::BufMut;
@@ -72,7 +70,7 @@ use super::defaults::WebhookIdDefault;
 ///
 /// Note: this enum cannot carry unused lifetime/allocator parameters via
 /// `PhantomData` (unlike a struct). Integer-only oneofs therefore omit `'a` / `A`
-/// from the shape and from `Ref`/`Mut` aliases when no variant payload needs them.
+/// from the shape when no variant payload needs them.
 #[derive(Clone, Copy, PartialEq)]
 pub enum Notification<Ea, Pn, Wh, Po, Ur> {
     EmailAddress(Ea),
@@ -118,36 +116,20 @@ pub(crate) type NotificationStorage<A> = Notification<
     UrgentField<A>,
 >;
 
-/// Borrowed read view of the active `notification` variant.
-pub type NotificationRef<'a, A> = Notification<
-    <ProtoString as ProtoType>::Ref<'a, A>,
-    <ProtoString as ProtoType>::Ref<'a, A>,
-    <ProtoInt32 as ProtoType>::Ref<'a, A>,
-    <ProtoMessage<Address<A>> as ProtoType>::Ref<'a, A>,
-    <ProtoBool as ProtoType>::Ref<'a, A>,
->;
-
-/// Borrowed mutable projection of the active `notification` variant.
-///
-/// Payload types come from [`ProtoType::Mut`] on each variant's type marker.
-/// Public `_mut` accessors may still return `impl Trait` (e.g. bool) where
-/// ergonomics prefer it; enum variants need the named associated type.
-pub type NotificationMut<'a, A> = Notification<
-    <ProtoString as ProtoType>::Mut<'a, A>,
-    <ProtoString as ProtoType>::Mut<'a, A>,
-    <ProtoInt32 as ProtoType>::Mut<'a, A>,
-    <ProtoMessage<Address<A>> as ProtoType>::Mut<'a, A>,
-    <ProtoBool as ProtoType>::Mut<'a, A>,
->;
-
 impl<A: Allocator + Clone> OneofGroup for NotificationStorage<A> {
     type Case = NotificationCase;
     type Ref<'a>
-        = NotificationRef<'a, A>
+        = Notification<&'a str, &'a str, i32, &'a Address<A>, bool>
     where
         A: 'a;
     type Mut<'a>
-        = NotificationMut<'a, A>
+        = Notification<
+        <ProtoString as ProtoType>::Mut<'a, A>,
+        <ProtoString as ProtoType>::Mut<'a, A>,
+        <ProtoInt32 as ProtoType>::Mut<'a, A>,
+        <ProtoMessage<Address<A>> as ProtoType>::Mut<'a, A>,
+        <ProtoBool as ProtoType>::Mut<'a, A>,
+    >
     where
         A: 'a;
     type Presence = TaskPresence;

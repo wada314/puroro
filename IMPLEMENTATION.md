@@ -613,7 +613,7 @@ Nested LEN payloads use `Buf::take(len)` before child `merge_from`.
 
 ## 13. Derived traits
 
-**Messages** (`Task<A>`, …): generated as below. **Scalar enums** (`Status`, `Priority`): `#[repr(transparent)]` newtypes over `i32` with associated constants (not Rust enums — proto value aliases may share an integer); `derive(Clone, Copy, Debug, PartialEq, Eq, Hash)`. **Oneof types**: the payload-less `NotificationCase` `derive`s `Clone, Copy, Debug, PartialEq, Eq`. The shared shape `Notification<…>` `derive`s `Clone, Copy, PartialEq` (available when all payload params satisfy the bounds — e.g. `NotificationRef` when every `ProtoType::Ref` is `Copy + PartialEq`). Group bound views are rt `OneofView` / `OneofViewMut` (no derives). `NotificationMut<'a, A>` holds guards / `&mut` and derives nothing via the alias; the internal `NotificationStorage` alias needs no trait derives (comparison/formatting happen on the safe views). Pattern matching uses `Notification::…` (aliases do not invent variant paths).
+**Messages** (`Task<A>`, …): generated as below. **Scalar enums** (`Status`, `Priority`): `#[repr(transparent)]` newtypes over `i32` with associated constants (not Rust enums — proto value aliases may share an integer); `derive(Clone, Copy, Debug, PartialEq, Eq, Hash)`. **Oneof types**: the payload-less `NotificationCase` `derive`s `Clone, Copy, Debug, PartialEq, Eq`. The shared shape `Notification<…>` `derive`s `Clone, Copy, PartialEq` (available when all payload params satisfy the bounds — e.g. the concrete shared Ref shape). Group bound views are rt `OneofView` / `OneofViewMut` (no derives). There are no public Ref/Mut aliases; `OneofGroup::{Ref,Mut}` are inline. The internal `NotificationStorage` alias needs no trait derives (comparison/formatting happen on the safe views). Pattern matching uses `Notification::…` on shared projections.
 
 | Trait | Bounds | Notes |
 |---|---|---|
@@ -734,8 +734,8 @@ The sample `oneof notification` is deliberately **heterogeneous** — LEN, VARIN
 | `NotificationStorage<A>` | `pub(crate)` | field wrappers | owned storage; `OneofGroup` + `OneofDeallocate`; encode glue |
 | `NotificationCase` | `pub` | — | `Copy` discriminant (variants only; unset is `None`) → `notification().case() -> Option<_>` |
 | `OneofView` / `OneofViewMut` | rt `pub` | — | group bind (slot + `MessageCommon`) → `notification()` / `notification_mut()` |
-| `NotificationRef<'a, A>` | `pub` alias | via [`ProtoType::Ref`](puroro-rt/src/fields/wire/proto_type.rs) | projected read → `view.as_ref()` |
-| `NotificationMut<'a, A>` | `pub` alias | via [`ProtoType::Mut`](puroro-rt/src/fields/wire/proto_type.rs) | projected mut → `view_mut.as_mut()` |
+| `OneofGroup::Ref` | inline | concrete (`&str`, `i32`, `&Address`, `bool`, …) | projected read → `view.as_ref()` |
+| `OneofGroup::Mut` | inline | via [`ProtoType::Mut`](puroro-rt/src/fields/wire/proto_type.rs) | opaque on `notification_mut()` RPIT; typed mut via per-variant `_mut` |
 
 **Ref/Mut payloads are not hard-coded in generated aliases.** They project from each variant's [`ProtoType`](puroro-rt/src/fields/wire/proto_type.rs) marker (`ProtoString`, `ProtoInt32`, `ProtoMessage`, `ProtoBool`, …). Per-variant private field type aliases remain the single source for Storage.
 

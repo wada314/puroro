@@ -544,10 +544,8 @@ fn oneof_group_view_mut_as_view_and_clear() {
             Some(NotificationCase::EmailAddress)
         );
         assert!(view_mut.as_view().as_ref().is_some());
-        assert!(matches!(
-            view_mut.as_mut(),
-            Some(Notification::EmailAddress(_))
-        ));
+        // `as_mut()` is opaque (no Mut in the RPIT bound); only presence is checked here.
+        assert!(view_mut.as_mut().is_some());
     }
     assert!(matches!(
         task.notification().as_ref(),
