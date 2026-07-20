@@ -84,6 +84,7 @@ use variant::{EmailAddress, PhoneNumber, Postal, Urgent, WebhookId};
 /// Note: this enum cannot carry unused lifetime/allocator parameters via
 /// `PhantomData` (unlike a struct). Integer-only oneofs therefore omit `'a` / `A`
 /// from the shape and from `Ref`/`Mut` aliases when no variant payload needs them.
+#[derive(Clone, Copy, PartialEq)]
 pub enum Notification<Ea, Pn, Wh, Po, Ur> {
     EmailAddress(Ea),
     PhoneNumber(Pn),
@@ -150,37 +151,6 @@ pub type NotificationMut<'a, A> = Notification<
     <ProtoBool as ProtoType>::Mut<'a, A>,
 >;
 
-impl<Ea: Clone, Pn: Clone, Wh: Clone, Po: Clone, Ur: Clone> Clone
-    for Notification<Ea, Pn, Wh, Po, Ur>
-{
-    fn clone(&self) -> Self {
-        match self {
-            Self::EmailAddress(x) => Self::EmailAddress(x.clone()),
-            Self::PhoneNumber(x) => Self::PhoneNumber(x.clone()),
-            Self::WebhookId(x) => Self::WebhookId(x.clone()),
-            Self::Postal(x) => Self::Postal(x.clone()),
-            Self::Urgent(x) => Self::Urgent(x.clone()),
-        }
-    }
-}
-
-impl<Ea: Copy, Pn: Copy, Wh: Copy, Po: Copy, Ur: Copy> Copy for Notification<Ea, Pn, Wh, Po, Ur> {}
-
-impl<Ea: PartialEq, Pn: PartialEq, Wh: PartialEq, Po: PartialEq, Ur: PartialEq> PartialEq
-    for Notification<Ea, Pn, Wh, Po, Ur>
-{
-    fn eq(&self, other: &Self) -> bool {
-        match (self, other) {
-            (Self::EmailAddress(x), Self::EmailAddress(y)) => x == y,
-            (Self::PhoneNumber(x), Self::PhoneNumber(y)) => x == y,
-            (Self::WebhookId(x), Self::WebhookId(y)) => x == y,
-            (Self::Postal(x), Self::Postal(y)) => x == y,
-            (Self::Urgent(x), Self::Urgent(y)) => x == y,
-            _ => false,
-        }
-    }
-}
-
 impl<A: Allocator + Clone> OneofGroup for NotificationStorage<A> {
     type Case = NotificationCase;
     type Ref<'a>
@@ -215,10 +185,6 @@ impl<A: Allocator + Clone> OneofGroup for NotificationStorage<A> {
             Self::Postal(f) => Notification::Postal(f.value(common)),
             Self::Urgent(f) => Notification::Urgent(f.value(common)),
         }
-    }
-
-    fn ref_eq<'a>(lhs: &Self::Ref<'a>, rhs: &Self::Ref<'a>) -> bool {
-        lhs == rhs
     }
 
     fn to_mut<'a>(

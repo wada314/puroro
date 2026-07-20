@@ -367,6 +367,7 @@ where
     E: OneofGroup<Presence = Pb, Alloc = A>,
     Pb: PresenceBits,
     A: Allocator + Clone,
+    for<'a> E::Ref<'a>: PartialEq,
 {
     #[inline]
     fn field_eq(
@@ -540,7 +541,15 @@ where
     ) -> Self::Mut<'a>;
 
     /// Semantic equality of two projected refs (for message `PartialEq`).
-    fn ref_eq<'a>(lhs: &Self::Ref<'a>, rhs: &Self::Ref<'a>) -> bool;
+    ///
+    /// Default: [`PartialEq`] on [`Self::Ref`]. Override only if the projected
+    /// view needs a non-structural comparison.
+    fn ref_eq<'a>(lhs: &Self::Ref<'a>, rhs: &Self::Ref<'a>) -> bool
+    where
+        Self::Ref<'a>: PartialEq,
+    {
+        lhs == rhs
+    }
 
     /// Deep-copies an active storage value into `alloc`.
     fn clone_storage_in(
