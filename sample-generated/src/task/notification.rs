@@ -219,11 +219,6 @@ impl<A: Allocator + Clone> OneofGroup for NotificationStorage<A> {
 
 impl<A: Allocator + Clone> EnumVariant<EmailAddress> for NotificationStorage<A> {
     type Value = EmailAddressField<A>;
-    type Alloc = A;
-
-    fn new_value(alloc: A) -> Self::Value {
-        SingularField::new_in(alloc)
-    }
 
     fn variant_ref(&self) -> Option<&Self::Value> {
         match self {
@@ -246,11 +241,6 @@ impl<A: Allocator + Clone> EnumVariant<EmailAddress> for NotificationStorage<A> 
 
 impl<A: Allocator + Clone> EnumVariant<PhoneNumber> for NotificationStorage<A> {
     type Value = PhoneNumberField<A>;
-    type Alloc = A;
-
-    fn new_value(alloc: A) -> Self::Value {
-        SingularField::new_in(alloc)
-    }
 
     fn variant_ref(&self) -> Option<&Self::Value> {
         match self {
@@ -273,11 +263,6 @@ impl<A: Allocator + Clone> EnumVariant<PhoneNumber> for NotificationStorage<A> {
 
 impl<A: Allocator + Clone> EnumVariant<WebhookId> for NotificationStorage<A> {
     type Value = WebhookIdField<A>;
-    type Alloc = A;
-
-    fn new_value(alloc: A) -> Self::Value {
-        SingularField::new_in(alloc)
-    }
 
     fn variant_ref(&self) -> Option<&Self::Value> {
         match self {
@@ -300,11 +285,6 @@ impl<A: Allocator + Clone> EnumVariant<WebhookId> for NotificationStorage<A> {
 
 impl<A: Allocator + Clone> EnumVariant<Postal> for NotificationStorage<A> {
     type Value = PostalField<A>;
-    type Alloc = A;
-
-    fn new_value(alloc: A) -> Self::Value {
-        SingularField::with_message_in(alloc)
-    }
 
     fn variant_ref(&self) -> Option<&Self::Value> {
         match self {
@@ -327,11 +307,6 @@ impl<A: Allocator + Clone> EnumVariant<Postal> for NotificationStorage<A> {
 
 impl<A: Allocator + Clone> EnumVariant<Urgent> for NotificationStorage<A> {
     type Value = UrgentField<A>;
-    type Alloc = A;
-
-    fn new_value(alloc: A) -> Self::Value {
-        SingularField::new_in(alloc)
-    }
 
     fn variant_ref(&self) -> Option<&Self::Value> {
         match self {

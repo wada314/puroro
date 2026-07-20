@@ -39,11 +39,8 @@ use crate::fields::shared::{
     value_layout::{Inline, ValueLayout},
     value_slot::{AddressableSlot, ValueSlot, ValueSlotRefAccess},
 };
-use crate::fields::wire::proto_message::ProtoMessage;
 use crate::fields::wire::proto_ref_ops::{ProtoRefDebug, ProtoRefEq};
 use crate::fields::wire::proto_type::ProtoType;
-use ::puroro::Message;
-use ::unmanaged::UnmanagedBox;
 
 /// Singular (non-repeated) scalar field — varint or LEN, selected by type marker `T`.
 ///
@@ -291,16 +288,17 @@ where
     }
 }
 
-impl<M, const FIELD: u32, A, L, D> SingularField<ProtoMessage<M>, Oneof, FIELD, A, L, D>
+impl<T, P, const FIELD: u32, A, L, D> DefaultIn<A> for SingularField<T, P, FIELD, A, L, D>
 where
-    M: Message<Alloc = A> + ::unmanaged::DeallocateIn<A>,
+    T: ProtoType,
+    P: FieldPresence,
     A: Allocator + Clone,
-    L: ValueLayout<ProtoMessage<M>, A>,
-    <Oneof as FieldPresence>::ValueSlot<UnmanagedBox<M, A>>: ValueSlot<UnmanagedBox<M, A>, A>,
+    L: ValueLayout<T, A>,
+    T::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
+    P::ValueSlot<T::Slot<A>>: ValueSlot<T::Slot<A>, A>,
 {
-    /// Builds an always-present nested-message oneof variant with an empty child.
     #[inline]
-    pub fn with_message_in(alloc: A) -> Self {
+    fn default_in(alloc: A) -> Self {
         Self::new_in(alloc)
     }
 }

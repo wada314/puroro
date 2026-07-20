@@ -288,8 +288,8 @@ impl<'f, 'c, E, Pb: PresenceBits, A: Allocator> OneofSlotMut<'f, 'c, E, Pb, A> {
     }
 
     /// Ensures the active variant is `V`; otherwise frees any existing variant and
-    /// installs a fresh one via [`EnumVariant::new_value`]. Returns a mutable
-    /// reference to the variant's field wrapper.
+    /// installs a fresh one via [`DefaultIn`] on [`EnumVariant::Value`]. Returns a
+    /// mutable reference to the variant's field wrapper.
     ///
     /// Because `E` may own non-droppable storage, switching variants always goes
     /// through this method (or [`set`](Self::set) / [`clear`](Self::clear)) so the
@@ -302,7 +302,8 @@ impl<'f, 'c, E, Pb: PresenceBits, A: Allocator> OneofSlotMut<'f, 'c, E, Pb, A> {
     /// `.merge(…)`.
     pub fn variant_mut<V>(self) -> &'f mut <E as EnumVariant<V>>::Value
     where
-        E: EnumVariant<V, Alloc = A> + OneofDeallocate<Pb, A>,
+        E: EnumVariant<V> + OneofDeallocate<Pb, A>,
+        <E as EnumVariant<V>>::Value: DefaultIn<A>,
         A: Clone,
     {
         let slot = self.slot;
@@ -318,9 +319,9 @@ impl<'f, 'c, E, Pb: PresenceBits, A: Allocator> OneofSlotMut<'f, 'c, E, Pb, A> {
                 // SAFETY: `common.alloc` owns the previous variant's buffers.
                 unsafe { old.deallocate(common) };
             }
-            slot.set(<E as EnumVariant<V>>::from_variant(
-                <E as EnumVariant<V>>::new_value(common.alloc.clone()),
-            ));
+            slot.set(<E as EnumVariant<V>>::from_variant(DefaultIn::default_in(
+                common.alloc.clone(),
+            )));
         }
 
         <E as EnumVariant<V>>::variant_mut(slot.as_mut().unwrap())
