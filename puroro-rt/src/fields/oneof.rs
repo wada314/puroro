@@ -21,7 +21,7 @@ use ::unmanaged::UnmanagedBox;
 
 use ::unmanaged::DeallocateIn;
 
-use crate::fields::enum_variant::EnumVariant;
+use crate::fields::oneof_variant::OneofVariant;
 use crate::fields::shared::field_inspect::{FieldCloneIn, FieldDebug, FieldEncode, FieldPartialEq};
 use crate::fields::shared::{
     DefaultIn, FieldDeallocate, MessageCommon, PresenceBits, ValueLayout,
@@ -233,20 +233,20 @@ impl<'a, E, Pb: PresenceBits, A: Allocator> OneofSlotRef<'a, E, Pb, A> {
     /// Projects the active storage enum onto one variant's field wrapper.
     ///
     /// `FIELD` is the protobuf field number for which the storage enum implements
-    /// [`EnumVariant`]. Generated message getters use this so oneof members
+    /// [`OneofVariant`]. Generated message getters use this so oneof members
     /// mirror ordinary fields:
     /// `self.notification.bind(&common).variant_of::<FIELD_EMAIL_ADDRESS>().optional()`.
     #[inline]
     pub fn variant_of<const FIELD: u32>(
         self,
-    ) -> OneofVariantRef<'a, <E as EnumVariant<FIELD>>::Value, Pb, A>
+    ) -> OneofVariantRef<'a, <E as OneofVariant<FIELD>>::Value, Pb, A>
     where
-        E: EnumVariant<FIELD>,
+        E: OneofVariant<FIELD>,
     {
         OneofVariantRef::new(
             self.slot
                 .as_ref()
-                .and_then(|e| <E as EnumVariant<FIELD>>::variant_ref(e)),
+                .and_then(|e| <E as OneofVariant<FIELD>>::variant_ref(e)),
             self.common,
         )
     }
@@ -291,7 +291,7 @@ impl<'f, 'c, E, Pb: PresenceBits, A: Allocator> OneofSlotMut<'f, 'c, E, Pb, A> {
 
     /// Ensures the active variant is `FIELD`; otherwise frees any existing
     /// variant and installs a fresh one via [`DefaultIn`] on
-    /// [`EnumVariant::Value`]. Returns a mutable reference to the variant's
+    /// [`OneofVariant::Value`]. Returns a mutable reference to the variant's
     /// field wrapper.
     ///
     /// Because `E` may own non-droppable storage, switching variants always goes
@@ -303,10 +303,10 @@ impl<'f, 'c, E, Pb: PresenceBits, A: Allocator> OneofSlotMut<'f, 'c, E, Pb, A> {
     /// decode arms then bind the field themselves:
     /// `slot.bind_mut(common).variant_mut::<FIELD_EMAIL_ADDRESS>().bind_mut(common).value_mut()` /
     /// `.merge(…)`.
-    pub fn variant_mut<const FIELD: u32>(self) -> &'f mut <E as EnumVariant<FIELD>>::Value
+    pub fn variant_mut<const FIELD: u32>(self) -> &'f mut <E as OneofVariant<FIELD>>::Value
     where
-        E: EnumVariant<FIELD> + OneofDeallocate<Pb, A>,
-        <E as EnumVariant<FIELD>>::Value: DefaultIn<A>,
+        E: OneofVariant<FIELD> + OneofDeallocate<Pb, A>,
+        <E as OneofVariant<FIELD>>::Value: DefaultIn<A>,
         A: Clone,
     {
         let slot = self.slot;
@@ -314,7 +314,7 @@ impl<'f, 'c, E, Pb: PresenceBits, A: Allocator> OneofSlotMut<'f, 'c, E, Pb, A> {
 
         let needs_install = !matches!(
             slot.as_ref(),
-            Some(e) if <E as EnumVariant<FIELD>>::variant_ref(e).is_some()
+            Some(e) if <E as OneofVariant<FIELD>>::variant_ref(e).is_some()
         );
 
         if needs_install {
@@ -322,12 +322,12 @@ impl<'f, 'c, E, Pb: PresenceBits, A: Allocator> OneofSlotMut<'f, 'c, E, Pb, A> {
                 // SAFETY: `common.alloc` owns the previous variant's buffers.
                 unsafe { old.deallocate(common) };
             }
-            slot.set(<E as EnumVariant<FIELD>>::from_variant(
+            slot.set(<E as OneofVariant<FIELD>>::from_variant(
                 DefaultIn::default_in(common.alloc.clone()),
             ));
         }
 
-        <E as EnumVariant<FIELD>>::variant_mut(slot.as_mut().unwrap())
+        <E as OneofVariant<FIELD>>::variant_mut(slot.as_mut().unwrap())
             .expect("from_variant must construct the variant that FIELD selects")
     }
 

@@ -25,10 +25,11 @@
 //! | [`repeated`] | `RepeatedField` |
 //! | [`map`] | `MapField` (hash map entries) |
 //! | [`oneof`] | `OneofSlot` |
+//! | [`oneof_variant`] | `OneofVariant` (field-number dispatch) |
 
-pub(crate) mod enum_variant;
 pub(crate) mod map;
 pub(crate) mod oneof;
+pub(crate) mod oneof_variant;
 pub(crate) mod repeated;
 pub(crate) mod shared;
 pub(crate) mod singular;
