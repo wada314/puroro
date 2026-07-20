@@ -9,6 +9,7 @@ This document specifies the **public interface** of the `puroro` Protocol Buffer
 2. [Wire format overview](#2-wire-format-overview)
 3. [Runtime trait API](#3-runtime-trait-api)
 4. [Generated code specification](#4-generated-code-specification)
+   - [Public signatures must not surface `puroro-rt`](#public-signatures-must-not-surface-puroro-rt)
    - 4.0 [Inherent accessors (current)](#40-inherent-accessors-current)
    - 4.1 [Scalar fields](#41-scalar-fields) — implicit vs explicit presence
    - 4.2 [String fields](#42-string-fields)
@@ -47,7 +48,7 @@ The puroro project comprises several crates and tools with distinct roles:
 |---|---|
 | **`protobuf-core`** (git submodule) | Wire-format **primitives** — `Varint`, `Tag`, `WireType`, field I/O traits, varint read/write. Used by `puroro` and `puroro-rt`; **generated code does not import it directly**. |
 | **`puroro`** | **Stable user-facing runtime API** — `Message`, `Optional`, `HasDefault`, `DecodeError` / `EncodeError`, `WireType`, `UnknownField` / `UnknownPayload`. Library users depend on this crate; generated message code imports it for traits, accessor return types, and error handling. |
-| **`puroro-rt`** | **Generated-code runtime** — composable field catalog (`fields::*`, `MessageCommon`), wire encode/decode helpers (`encode` / `decode` modules), `ProtoDefault`, and allocator-aware string/bytes utilities. Emitted generated code imports this crate (transitively for end users). Semver is looser than `puroro`; do not depend on it directly from application code. See [IMPLEMENTATION.md §4](IMPLEMENTATION.md#4-shared-infrastructure). |
+| **`puroro-rt`** | **Generated-code runtime** — composable field catalog (`fields::*`, `MessageCommon`), wire encode/decode helpers (`encode` / `decode` modules), `ProtoDefault`, and allocator-aware string/bytes utilities. Generated crates depend on it **internally**; library users of generated messages must not need to name or import it (see [§4](#public-signatures-must-not-surface-puroro-rt)). Semver is looser than `puroro`. See [IMPLEMENTATION.md §4](IMPLEMENTATION.md#4-shared-infrastructure). |
 | **Code generator** (`protoc` plugin) | Reads `.proto` input (via `protoc`) and emits Rust source implementing the API defined in this document. **Primary execution path:** register as a `protoc` plugin (`--puroro_out=…`). Other invocation styles (standalone CLI, `build.rs` wrapper, etc.) are permitted but not required. Emits fully-qualified paths into both `::puroro::…` (traits, `Optional`, errors) and `::puroro_rt::…` (field catalog, wire helpers). |
 
 **Reference schema.** The `Task` and `Address` messages in [§4 Reference schema](#reference-schema) are the **canonical examples** for describing and reviewing generated code. All field-pattern subsections (§4.1–4.10) and [IMPLEMENTATION.md](IMPLEMENTATION.md) use this same schema unless noted otherwise.
@@ -73,6 +74,7 @@ The puroro project comprises several crates and tools with distinct roles:
 - **Allocator support.** Every generated type is generic over `A: Allocator` using the `allocator-api2` crate. Arena allocators (e.g. `bumpalo`) and custom pools are first-class citizens.
 - **Performance-oriented interface.** Accessors return borrowed references (`&str`, `&[u8]`, `&[T]`), never freshly allocated containers. The `encode_to_vec` / `encode_to_bytes` convenience methods allocate, but `encode_raw` does not.
 - **Rust idioms.** Private fields accessed via generated accessor methods; `Optional<T, impl HasDefault<T>>` for explicit-presence scalar, string, and enum fields; `Option<&M<A>>` for optional message fields; no `unsafe` in user-visible APIs.
+- **`puroro` for users, `puroro-rt` for generators.** Library users of generated messages depend on the generated crate and **`puroro` only**. Generated code may use `puroro-rt` internally, but **must not surface `puroro-rt` types in public signatures** (see [§4](#public-signatures-must-not-surface-puroro-rt)).
 - **Implementation flexibility.** The public interface described here must remain stable even if internal storage representations change. Eager messages use a per-message presence bitfield (see [IMPLEMENTATION.md §10](IMPLEMENTATION.md#10-presence-bit-indices)); the accessor API is unchanged if storage layout evolves.
 - **Nightly toolchain, minimal unstable features.** The `rust-toolchain.toml` pins nightly; no `#![feature(…)]` flags are used in this crate itself.
 
@@ -215,6 +217,34 @@ For each message type the code generator currently produces:
 2. **(Future) Per-message traits + specialized structs** — `FooMessage` / `FooMessageFallible` and alternative layouts (`TaskLazy`, `TaskView`) for generic interoperability across implementations ([§8](#8-future-work)). They are **not** emitted today; [`sample-generated/`](sample-generated/) is the normative shape for the eager path.
 
 Generated Rust is not hand-edited; the plugin still emits **section banners, proto field labels, and `merge_from` dispatch comments** so build output is navigable when debugging. Convention: [IMPLEMENTATION.md §9 — Generated code comments](IMPLEMENTATION.md#generated-code-comments). Reference output: [`sample-generated/`](sample-generated/).
+
+### Public signatures must not surface `puroro-rt`
+
+**Normative.** Application code that uses a generated message crate must compile and type-check with dependencies on **that generated crate and `puroro` only**. It must not need to `use` / name any `puroro_rt::…` item.
+
+Generated crates **may** (and do) depend on `puroro-rt` for field storage, wire helpers, and other generator-facing machinery. That dependency is an implementation detail of the generated crate.
+
+**What “surface” means.** A `puroro-rt` type is surfaced if a **public** item in the generated crate requires the library user to name it — typically:
+
+- a `pub fn` / `pub` associated function **return type** or **parameter type** that mentions `puroro_rt::…` (including via a public type alias);
+- a `pub type` / `pub struct` / `pub enum` / `pub trait` bound whose definition exposes `puroro_rt::…` in its public API;
+- a trait object / RPIT bound that names a `puroro-rt` trait or associated type the user must mention to use the API.
+
+**Allowed.**
+
+- `puroro-rt` paths in **private** / `pub(crate)` fields, inherent helpers, and `impl` bodies.
+- Public accessors that return **`impl Trait` from `puroro`** (e.g. `impl ::puroro::OneofView<…>`, `impl ::puroro::RepeatedStringMut<A>`, `impl DerefMut<Target = ::puroro::String<A>>`) even when the hidden concrete type lives in `puroro-rt`.
+- Public return types that are **Rust / `puroro` / generated-message** types only (e.g. `&str`, `i32`, `&Address<A>`, `Optional<…>`, `Notification<&str, …>` with concrete payloads).
+
+**Not allowed (examples).**
+
+- Public aliases such as `pub type FooRef<'a, A> = … <ProtoString as ProtoType>::Ref<'a, A> …` (forces users/rustdoc to see `puroro-rt`).
+- Public method signatures that name `puroro_rt::OneofView`, `SingularField`, `ProtoType`, `StringGuard`, `BitRef`, field visitors, etc., when a `puroro` trait or RPIT / concrete user type would do.
+- Requiring `use puroro_rt::…` for method resolution on values returned from public accessors (put the trait in `puroro` instead).
+
+**Oneof illustration (current).** `notification()` names a concrete shared `Ref` shape (`Notification<&str, …>`). `notification_mut()` returns `impl ::puroro::OneofViewMut<Case = …>` without naming `Mut` (typed mutation goes through per-variant `_mut`). Catalog types stay on the `pub(crate)` storage alias / `OneofGroup` impl.
+
+If a new public API would need a `puroro-rt` name, **add or reexport a stable stand-in in `puroro` first**, then generate against that.
 
 ---
 
@@ -637,7 +667,7 @@ Alias names with the same integer all map to the same `Self(v)`; equality is by 
 
 Each `oneof` group generates types in a submodule named after the **oneof** (lower-snake-case) under the parent message module (e.g. `task::notification`), because the owned storage holds allocator-less `unmanaged` values (unsafe to drop implicitly) that must not leak into the public API.
 
-Shape, storage, and projected views share **one** generic enum; Storage / Ref / Mut are type aliases. Group bound views live in `puroro-rt` (`OneofView` / `OneofViewMut`), parametrised by `OneofGroup` (implemented on the crate-internal storage alias):
+Shape and storage share **one** generic enum; Storage is a `pub(crate)` alias. Ref / Mut projections are written inline on `OneofGroup` (no public Ref/Mut aliases). Group bound views are returned as `puroro` traits (`OneofView` / `OneofViewMut`); the concrete runtime structs live in `puroro-rt` and stay hidden behind RPIT:
 
 ```rust
 // In module `task` / `notification`:
@@ -1091,7 +1121,7 @@ The code generator is designed first as a `protoc` plugin. That is the expected 
 
 ### `protobuf-core`, `puroro`, and `puroro-rt`
 
-`protobuf-core` holds reusable wire-format primitives (varint, tags, field readers/writers). **`puroro`** holds the stable message-level API (`Message`, `Optional`, errors) that library users and generated `impl` blocks share. **`puroro-rt`** holds the composable field catalog, wire helpers, and other generator-facing runtime pieces. Generated crates list both `puroro` and `puroro-rt` as dependencies; application code should depend on the generated crate and `puroro` only — not on `puroro-rt` or `protobuf-core` directly.
+`protobuf-core` holds reusable wire-format primitives (varint, tags, field readers/writers). **`puroro`** holds the stable message-level API (`Message`, `Optional`, errors) that library users and generated `impl` blocks share. **`puroro-rt`** holds the composable field catalog, wire helpers, and other generator-facing runtime pieces. Generated crates list both `puroro` and `puroro-rt` as dependencies; application code should depend on the generated crate and `puroro` only — not on `puroro-rt` or `protobuf-core` directly. Generators must also keep **`puroro-rt` out of public generated signatures** ([§4](#public-signatures-must-not-surface-puroro-rt)).
 
 ### `Bytes` for lazy wire storage vs `A: Allocator` for decoded values
 

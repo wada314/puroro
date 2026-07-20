@@ -412,7 +412,9 @@ IR step: `ProtoField → FieldKind → catalog type + const args`.
 
 **Crate split.** Items from [DESIGN.md §3](DESIGN.md#3-runtime-trait-api) (`Message`, `Optional`, `HasDefault`, `DecodeError`, …) are emitted as `::puroro::…`. Field catalog types, `MessageCommon`, wire helpers, and `ProtoDefault` are emitted as `::puroro_rt::…`. A generated crate's `Cargo.toml` lists both dependencies; end-user application code should not add `puroro-rt` directly.
 
-**The checked-in [`sample-generated/`](sample-generated/) deliberately breaks this rule for readability.** It pulls names in with `use` and refers to them by short name (`SingularField`, `Allocator`, `MessageCommon`, …) so the reference output stays easy to read and review. Read those short names as stand-ins for the fully-qualified paths the production protoc plugin would actually emit.
+**Public signatures must not surface `puroro-rt`.** Fully-qualified `::puroro_rt::…` paths are fine in **private** / `pub(crate)` storage and `impl` bodies. They must **not** appear in public function signatures, public type aliases, or other API that forces library users to name `puroro-rt` (use `puroro` traits, RPIT, or concrete user-facing types instead). Normative rule: [DESIGN.md §4 — Public signatures must not surface `puroro-rt`](DESIGN.md#public-signatures-must-not-surface-puroro-rt).
+
+**The checked-in [`sample-generated/`](sample-generated/) deliberately relaxes path qualification for readability.** It pulls names in with `use` and refers to them by short name (`SingularField`, `Allocator`, `MessageCommon`, …) so the reference output stays easy to read and review. Read those short names as stand-ins for the fully-qualified paths the production protoc plugin would actually emit. The sample still aims to obey the **no public `puroro-rt` in signatures** rule above.
 
 ### Generated code comments
 
