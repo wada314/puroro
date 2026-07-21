@@ -54,6 +54,8 @@
 //! from the shape when no variant payload needs them.
 
 use ::allocator_api2::alloc::Allocator;
+use ::bitvec::array::BitArray;
+use ::bitvec::order::Lsb0;
 use ::bytes::BufMut;
 use ::puroro_rt::{
     BitPacked, FieldDeallocate, Inline, MessageCommon, Oneof, OneofDeallocate, OneofEncodable,
@@ -63,7 +65,6 @@ use ::puroro_rt::{
 
 use crate::address::Address;
 
-use super::TaskPresence;
 use super::defaults::WebhookIdDefault;
 
 /// Canonical shape for `oneof notification`.
@@ -132,7 +133,7 @@ impl<A: Allocator + Clone> OneofGroup for NotificationStorage<A> {
     >
     where
         A: 'a;
-    type Presence = TaskPresence;
+    type Presence = BitArray<[u8; 2], Lsb0>;
     type Alloc = A;
 
     fn case(storage: &Self) -> Self::Case {
@@ -167,9 +168,7 @@ impl<A: Allocator + Clone> OneofGroup for NotificationStorage<A> {
             Self::PhoneNumber(f) => Notification::PhoneNumber(f.value_mut(common)),
             Self::WebhookId(f) => Notification::WebhookId(f.value_mut(common)),
             Self::Postal(f) => Notification::Postal(f.value_mut(common)),
-            Self::Urgent(_) => {
-                Notification::Urgent(common.presence.bit_ref_mut(super::BIT_URGENT_VALUE))
-            }
+            Self::Urgent(_) => Notification::Urgent(common.bit_mut(super::BIT_URGENT_VALUE)),
         }
     }
 

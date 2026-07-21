@@ -7,41 +7,21 @@
 use ::allocator_api2::alloc::{Allocator, Global};
 use ::bitvec::array::BitArray;
 use ::bitvec::order::Lsb0;
-use ::bitvec::ptr::{BitRef, Mut};
 use ::bytes::{Buf, BufMut};
 use ::puroro::{DecodeError, Message, RECURSION_LIMIT};
 use ::puroro_rt::decode::{decode_tag, skip_field_and_save};
-use ::puroro_rt::{
-    FieldDeallocate, MessageCommon, NonOneof, PresenceBits, ProtoMessage, SingularField,
-};
-
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
-struct NestPresence(BitArray<[u8; 1], Lsb0>);
-
-impl PresenceBits for NestPresence {
-    fn is_set(&self, bit: usize) -> bool {
-        self.0[bit]
-    }
-
-    fn set(&mut self, bit: usize, present: bool) {
-        self.0.set(bit, present);
-    }
-
-    fn bit_mut(&mut self, bit: usize) -> BitRef<'_, Mut, u8, Lsb0> {
-        self.0.get_mut(bit).expect("presence bit index in range")
-    }
-}
+use ::puroro_rt::{FieldDeallocate, MessageCommon, NonOneof, ProtoMessage, SingularField};
 
 /// Self-referential message: optional `child` of the same type (field 1).
 struct Nest<A: Allocator + Clone = Global> {
-    _common: MessageCommon<NestPresence, A>,
+    _common: MessageCommon<BitArray<[u8; 1], Lsb0>, A>,
     child: SingularField<ProtoMessage<Nest<A>>, NonOneof, 1, A>,
 }
 
 impl<A: Allocator + Clone> Nest<A> {
     fn new_in(alloc: A) -> Self {
         Self {
-            _common: MessageCommon::new_in(NestPresence::default(), alloc.clone()),
+            _common: MessageCommon::new_in(BitArray::ZERO, alloc.clone()),
             child: SingularField::new_in(alloc),
         }
     }

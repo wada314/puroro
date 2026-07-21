@@ -6,7 +6,6 @@ mod defaults;
 use ::allocator_api2::alloc::{Allocator, Global};
 use ::bitvec::array::BitArray;
 use ::bitvec::order::Lsb0;
-use ::bitvec::ptr::{BitRef, Mut};
 use ::bytes::{Buf, BufMut};
 use ::core::fmt;
 use ::core::mem;
@@ -18,37 +17,11 @@ use ::puroro_rt::decode::{decode_tag, skip_field_and_save};
 use ::puroro_rt::{
     CloneFieldsVisitor, CloneIn, DebugStructVisitor, EncodeRawVisitor, EncodedLenVisitor, Explicit,
     FieldDeallocVisitor, FieldEqVisitor, FieldPairVisitor, FieldPairVisitorMut, FieldVisitor,
-    FieldVisitorMut, MessageCommon, PresenceBits, ProtoDouble, ProtoFixed32, ProtoString,
-    SingularField,
+    FieldVisitorMut, MessageCommon, ProtoDouble, ProtoFixed32, ProtoString, SingularField,
 };
 
 // ---------------------------------------------------------------------------
-// Presence bitfield (4 tracked singular fields)
-// ---------------------------------------------------------------------------
-
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
-pub struct AddressPresence(BitArray<[u8; 1], Lsb0>);
-
-impl AddressPresence {
-    pub const ZERO: Self = Self(BitArray::ZERO);
-}
-
-impl PresenceBits for AddressPresence {
-    fn is_set(&self, bit: usize) -> bool {
-        self.0[bit]
-    }
-
-    fn set(&mut self, bit: usize, present: bool) {
-        self.0.set(bit, present);
-    }
-
-    fn bit_mut(&mut self, bit: usize) -> BitRef<'_, Mut, u8, Lsb0> {
-        self.0.get_mut(bit).expect("presence bit index in range")
-    }
-}
-
-// ---------------------------------------------------------------------------
-// Presence bit indices (4 tracked singular fields)
+// Bit indices (4 tracked singular fields)
 // ---------------------------------------------------------------------------
 
 pub const BIT_STREET: usize = 0; // street (EXPLICIT)
@@ -70,7 +43,7 @@ pub const FIELD_LATITUDE: u32 = 4; // latitude
 // ---------------------------------------------------------------------------
 
 pub struct Address<A: Allocator + Clone = Global> {
-    _common: MessageCommon<AddressPresence, A>,
+    _common: MessageCommon<BitArray<[u8; 1], Lsb0>, A>,
     street: SingularField<ProtoString, Explicit<{ BIT_STREET }>, { FIELD_STREET }, A>, // proto: string street = 1;
     city: SingularField<ProtoString, Explicit<{ BIT_CITY }>, { FIELD_CITY }, A>, // proto: string city = 2;
     postal_code:
@@ -83,7 +56,7 @@ impl<A: Allocator + Clone> Address<A> {
         // Each field initializer gets its own clone of the allocator; the last
         // heap field takes the original by move.
         Self {
-            _common: MessageCommon::new_in(AddressPresence::ZERO, alloc.clone()),
+            _common: MessageCommon::new_in(BitArray::ZERO, alloc.clone()),
             street: SingularField::new_in(alloc.clone()),
             city: SingularField::new_in(alloc.clone()),
             postal_code: SingularField::new_in(alloc.clone()),
@@ -164,7 +137,7 @@ impl<A: Allocator + Clone> Address<A> {
     // enumerate field slots.
 
     /// Scalar / shared.
-    pub fn visit_fields<V: FieldVisitor<AddressPresence, A>>(
+    pub fn visit_fields<V: FieldVisitor<BitArray<[u8; 1], Lsb0>, A>>(
         &self,
         v: &mut V,
     ) -> ControlFlow<V::Break> {
@@ -176,7 +149,7 @@ impl<A: Allocator + Clone> Address<A> {
     }
 
     /// Pair / shared.
-    pub fn visit_field_pairs<V: FieldPairVisitor<AddressPresence, A>>(
+    pub fn visit_field_pairs<V: FieldPairVisitor<BitArray<[u8; 1], Lsb0>, A>>(
         &self,
         other: &Self,
         v: &mut V,
@@ -189,7 +162,7 @@ impl<A: Allocator + Clone> Address<A> {
     }
 
     /// Pair / mut.
-    pub fn visit_field_pairs_mut<V: FieldPairVisitorMut<AddressPresence, A>>(
+    pub fn visit_field_pairs_mut<V: FieldPairVisitorMut<BitArray<[u8; 1], Lsb0>, A>>(
         &self,
         dst: &mut Self,
         v: &mut V,
@@ -202,7 +175,7 @@ impl<A: Allocator + Clone> Address<A> {
     }
 
     /// Scalar / mut.
-    pub fn visit_fields_mut<V: FieldVisitorMut<AddressPresence, A>>(
+    pub fn visit_fields_mut<V: FieldVisitorMut<BitArray<[u8; 1], Lsb0>, A>>(
         &mut self,
         v: &mut V,
     ) -> ControlFlow<V::Break> {

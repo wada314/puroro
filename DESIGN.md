@@ -9,6 +9,7 @@ This document specifies the **public interface** of the `puroro` Protocol Buffer
 2. [Wire format overview](#2-wire-format-overview)
 3. [Runtime trait API](#3-runtime-trait-api)
 4. [Generated code specification](#4-generated-code-specification)
+   - [Module layout and naming](#module-layout-and-naming)
    - [Public signatures must not surface `puroro-rt`](#public-signatures-must-not-surface-puroro-rt)
    - 4.0 [Inherent accessors (current)](#40-inherent-accessors-current)
    - 4.1 [Scalar fields](#41-scalar-fields) — implicit vs explicit presence
@@ -217,6 +218,30 @@ For each message type the code generator currently produces:
 2. **(Future) Per-message traits + specialized structs** — `FooMessage` / `FooMessageFallible` and alternative layouts (`TaskLazy`, `TaskView`) for generic interoperability across implementations ([§8](#8-future-work)). They are **not** emitted today; [`sample-generated/`](sample-generated/) is the normative shape for the eager path.
 
 Generated Rust is not hand-edited; the plugin still emits **section banners, proto field labels, and `merge_from` dispatch comments** so build output is navigable when debugging. Convention: [IMPLEMENTATION.md §9 — Generated code comments](IMPLEMENTATION.md#generated-code-comments). Reference output: [`sample-generated/`](sample-generated/).
+
+### Module layout and naming
+
+**Package is the primary module tree.** A protobuf `package` (dot-separated) maps to nested Rust modules. Generated types and message/oneof submodules live under that tree. This is the default public layout users should rely on.
+
+**Default mapping (idiomatic Rust paths).**
+
+| Proto entity | Default Rust placement |
+|---|---|
+| `package example.v1` | `example::v1` |
+| Top-level `message Task` | Module `…::task` containing struct `Task` (and message-local items such as `FIELD_*` / `BIT_*`) |
+| Nested `message Inner` inside `Task` | Module `…::task::inner` containing `Inner` |
+| File-level `enum Status` | Type `Status` under the package module (exact file splitting is an implementation detail) |
+| `oneof notification` inside `Task` | Submodule `…::task::notification` (see [§4.7](#47-oneof-fields)) |
+
+Message-typed *fields* (e.g. `Address assignee`) reference sibling generated types by path; they do **not** by themselves create a nested module under the parent message.
+
+**Why collisions exist.** Protobuf simple names are case-sensitive and must be unique among entities in the same message scope ([language spec](https://protobuf.dev/reference/protobuf/proto3-spec/#message_definition)), but distinct names can still collapse after Rust mapping (e.g. nested `Notification` vs `oneof notification` → same PascalCase / snake_case). Separately, a package segment can collide with a message module (`package example.task` vs `message Task` in `package example` → both want `example::task`). Rust has no nested type definitions inside structs, so nesting is expressed with modules and shares that namespace with packages.
+
+**Policy: idiomatic paths by default; fail on collision.** The generator emits the default mapping above. If two distinct proto identities would occupy the same Rust module or type path, generation **errors** and reports the conflicting identities and the collided Rust path. The generator does **not** silently mangle names, does not use conditional `pub use` into a shared namespace, and does not make `_`-prefixed or other non-idiomatic modules the normal public API.
+
+**Generate-time renames.** Collisions (and other deliberate path choices) are resolved with **generator / plugin options supplied at generate time** — not with options embedded in the `.proto` file. A rename rule identifies a proto entity by a stable logical name (typically its protobuf FQN / path) and substitutes a Rust module or type-path segment. Initial scope is **module and type path elements**; field accessor renames are out of scope until needed.
+
+[`sample-generated/`](sample-generated/) currently keeps a flat module layout (no `example::` package prefix) for readability; production plugin output follows this section.
 
 ### Public signatures must not surface `puroro-rt`
 
@@ -665,7 +690,7 @@ Alias names with the same integer all map to the same `Self(v)`; equality is by 
 
 ### 4.7 Oneof fields
 
-Each `oneof` group generates types in a submodule named after the **oneof** (lower-snake-case) under the parent message module (e.g. `task::notification`), because the owned storage holds allocator-less `unmanaged` values (unsafe to drop implicitly) that must not leak into the public API.
+Each `oneof` group generates types in a submodule named after the **oneof** (lower-snake-case) under the parent message module (e.g. `task::notification`), because the owned storage holds allocator-less `unmanaged` values (unsafe to drop implicitly) that must not leak into the public API. Module placement and collision handling follow [Module layout and naming](#module-layout-and-naming).
 
 Shape and storage share **one** generic enum; Storage is a `pub(crate)` alias. Ref / Mut projections are written inline on `OneofGroup` (no public Ref/Mut aliases). Group bound views are returned as `puroro` traits (`OneofView` / `OneofViewMut`); the concrete runtime structs live in `puroro-rt` and stay hidden behind RPIT:
 
@@ -1114,6 +1139,10 @@ puroro is a greenfield design. Generated types, trait names, and module layout a
 ### Deprecated group wire types
 
 Groups (`SGroup` / `EGroup`) are not generated and are not stored in unknown fields. If a decoder encounters a group tag on the wire, it may return `DecodeError::InvalidTag`, skip the field, or panic — preserving group payloads for round-trip is explicitly out of scope.
+
+### Module layout: package-first, rename on collision
+
+Protobuf `package` is the primary Rust module hierarchy. Message and oneof nesting use idiomatic snake_case submodules under that tree. Case-folding and package-vs-message module clashes are rejected at generate time rather than papered over with non-idiomatic public names or conditional re-exports; users disambiguate with generate-time rename options (not `.proto` options). Details: [§4 Module layout and naming](#module-layout-and-naming).
 
 ### `protoc` plugin as the primary codegen path
 

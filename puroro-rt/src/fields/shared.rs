@@ -25,8 +25,10 @@ use ::core::mem::ManuallyDrop;
 
 use ::allocator_api2::alloc::Allocator;
 use ::bitvec::{
+    array::BitArray,
     order::Lsb0,
     ptr::{BitRef, Mut},
+    slice::BitSlice,
 };
 use ::unmanaged::UnmanagedVec;
 
@@ -43,8 +45,10 @@ use crate::decode::{UnknownFieldsIter, iter_unknown_fields};
 /// - singular / oneof **bool value** bits packed into the same array
 ///
 /// The historical name `PresenceBits` remains; the bits themselves are not
-/// presence-only. Generated newtypes typically wrap `bitvec::BitArray` and return
-/// bitvec's `BitRef<'_, Mut, …>` from [`bit_mut`](Self::bit_mut).
+/// presence-only. Generated messages store
+/// [`BitArray<[u8; N], Lsb0>`](::bitvec::array::BitArray) in
+/// [`MessageCommon::presence`](MessageCommon::presence); this crate provides
+/// the [`PresenceBits`] impl for that type.
 pub trait PresenceBits {
     /// Returns whether bit `bit` is set.
     fn is_set(&self, bit: usize) -> bool;
@@ -60,13 +64,28 @@ pub trait PresenceBits {
 
     /// Returns a mutable handle to bit `bit`.
     ///
-    /// Generated presence newtypes wrap `bitvec::BitArray<[u8; N], Lsb0>`, so
-    /// the handle is a concrete [`BitRef`](::bitvec::ptr::BitRef).
-    ///
     /// # Panics
     ///
-    /// Generated impls panic if `bit` is out of range for the message bitfield.
+    /// Panics if `bit` is out of range for the message bitfield.
     fn bit_mut(&mut self, bit: usize) -> BitRef<'_, Mut, u8, Lsb0>;
+}
+
+impl<const N: usize> PresenceBits for BitArray<[u8; N], Lsb0> {
+    #[inline]
+    fn is_set(&self, bit: usize) -> bool {
+        self[bit]
+    }
+
+    #[inline]
+    fn set(&mut self, bit: usize, value: bool) {
+        BitSlice::set(self, bit, value);
+    }
+
+    #[inline]
+    fn bit_mut(&mut self, bit: usize) -> BitRef<'_, Mut, u8, Lsb0> {
+        self.get_mut(bit)
+            .expect("bool / presence bit index in range")
+    }
 }
 
 // ---------------------------------------------------------------------------

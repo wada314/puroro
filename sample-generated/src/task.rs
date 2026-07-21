@@ -11,7 +11,6 @@ use ::allocator_api2::alloc::{Allocator, Global};
 use ::allocator_api2::vec::Vec as AllocVec;
 use ::bitvec::array::BitArray;
 use ::bitvec::order::Lsb0;
-use ::bitvec::ptr::{BitRef, Mut};
 use ::bytes::{Buf, BufMut};
 use ::core::fmt;
 use ::core::mem;
@@ -27,8 +26,8 @@ use ::puroro_rt::{
     BitPacked, CloneFieldsVisitor, CloneIn, Closed, DebugStructVisitor, EncodeRawVisitor,
     EncodedLenVisitor, Expanded, Explicit, FieldDeallocVisitor, FieldEqVisitor, FieldPairVisitor,
     FieldPairVisitorMut, FieldVisitor, FieldVisitorMut, Implicit, Inline, LegacyRequired, MapField,
-    MessageCommon, NonOneof, OneofSlot, Open, Packed, PresenceBits, ProtoBool, ProtoBytes,
-    ProtoEnum, ProtoInt32, ProtoMessage, ProtoString, RepeatedField, SingularField,
+    MessageCommon, NonOneof, OneofSlot, Open, Packed, ProtoBool, ProtoBytes, ProtoEnum, ProtoInt32,
+    ProtoMessage, ProtoString, RepeatedField, SingularField,
 };
 
 use defaults::MaxRetriesDefault;
@@ -38,39 +37,6 @@ use crate::enums::{Priority, Status};
 
 use notification::NotificationStorage;
 pub use notification::{Notification, NotificationCase};
-
-// ---------------------------------------------------------------------------
-// Presence bitfield (presence + bool value bits)
-// ---------------------------------------------------------------------------
-
-#[derive(Clone, Copy, Debug, Default)]
-pub struct TaskPresence(BitArray<[u8; 2], Lsb0>);
-
-impl TaskPresence {
-    pub const ZERO: Self = Self(BitArray::ZERO);
-
-    /// Concrete [`BitRef`] for oneof bool projections that cannot hold `impl Trait`.
-    #[inline]
-    pub(crate) fn bit_ref_mut(&mut self, bit: usize) -> BitRef<'_, Mut, u8, Lsb0> {
-        self.0
-            .get_mut(bit)
-            .expect("bool / presence bit index in range")
-    }
-}
-
-impl PresenceBits for TaskPresence {
-    fn is_set(&self, bit: usize) -> bool {
-        self.0[bit]
-    }
-
-    fn set(&mut self, bit: usize, present: bool) {
-        self.0.set(bit, present);
-    }
-
-    fn bit_mut(&mut self, bit: usize) -> BitRef<'_, Mut, u8, Lsb0> {
-        self.bit_ref_mut(bit)
-    }
-}
 
 // ---------------------------------------------------------------------------
 // Bit indices — presence (EXPLICIT/LEGACY_REQUIRED) then bool value bits,
@@ -118,7 +84,7 @@ pub const FIELD_ATTRIBUTES: u32 = 21; // attributes (map<string, int32>)
 
 /// Reference `Task` message from `DESIGN.md`.
 pub struct Task<A: Allocator + Clone = Global> {
-    _common: MessageCommon<TaskPresence, A>,
+    _common: MessageCommon<BitArray<[u8; 2], Lsb0>, A>,
     title: SingularField<ProtoString, Explicit<{ BIT_TITLE }>, { FIELD_TITLE }, A>, // proto: string title = 1;
     score: SingularField<ProtoInt32, Implicit, { FIELD_SCORE }, A>, // proto: int32 score = 2;
     max_retries: SingularField<
@@ -164,7 +130,7 @@ impl<A: Allocator + Clone> Task<A> {
         // Each field initializer gets its own clone of the allocator; the last
         // heap field (`attributes`) takes the original by move.
         Self {
-            _common: MessageCommon::new_in(TaskPresence::ZERO, alloc.clone()),
+            _common: MessageCommon::new_in(BitArray::ZERO, alloc.clone()),
             title: SingularField::new_in(alloc.clone()),
             score: SingularField::new_in(alloc.clone()),
             max_retries: SingularField::new_in(alloc.clone()),
@@ -573,7 +539,7 @@ impl<A: Allocator + Clone> Task<A> {
     // enumerate field slots.
 
     /// Scalar / shared: invoke `v` once per catalog field, in declaration order.
-    pub fn visit_fields<V: FieldVisitor<TaskPresence, A>>(
+    pub fn visit_fields<V: FieldVisitor<BitArray<[u8; 2], Lsb0>, A>>(
         &self,
         v: &mut V,
     ) -> ControlFlow<V::Break> {
@@ -598,7 +564,7 @@ impl<A: Allocator + Clone> Task<A> {
     }
 
     /// Pair / shared: walk matching fields of `self` and `other`.
-    pub fn visit_field_pairs<V: FieldPairVisitor<TaskPresence, A>>(
+    pub fn visit_field_pairs<V: FieldPairVisitor<BitArray<[u8; 2], Lsb0>, A>>(
         &self,
         other: &Self,
         v: &mut V,
@@ -627,7 +593,7 @@ impl<A: Allocator + Clone> Task<A> {
     ///
     /// For [`CloneIn`], `dst` must start as [`Self::new_in`] so placeholders
     /// match empty presence bits; install the cloned [`MessageCommon`] afterwards.
-    pub fn visit_field_pairs_mut<V: FieldPairVisitorMut<TaskPresence, A>>(
+    pub fn visit_field_pairs_mut<V: FieldPairVisitorMut<BitArray<[u8; 2], Lsb0>, A>>(
         &self,
         dst: &mut Self,
         v: &mut V,
@@ -653,7 +619,7 @@ impl<A: Allocator + Clone> Task<A> {
     }
 
     /// Scalar / mut: invoke `v` once per catalog field.
-    pub fn visit_fields_mut<V: FieldVisitorMut<TaskPresence, A>>(
+    pub fn visit_fields_mut<V: FieldVisitorMut<BitArray<[u8; 2], Lsb0>, A>>(
         &mut self,
         v: &mut V,
     ) -> ControlFlow<V::Break> {

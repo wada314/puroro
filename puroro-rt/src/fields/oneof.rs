@@ -40,7 +40,7 @@ use crate::fields::wire::proto_type::ProtoType;
 /// [`FieldDeallocate::deallocate`](crate::FieldDeallocate::deallocate).
 ///
 /// `Pb` and `A` are trait parameters because the storage enum pins the message's
-/// presence newtype and allocator type.
+/// presence bitfield type and allocator type.
 pub trait OneofDeallocate<Pb: PresenceBits, A: Allocator> {
     /// Drops the active variant and frees its storage through `common`.
     ///

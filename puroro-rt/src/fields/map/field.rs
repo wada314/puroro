@@ -460,34 +460,19 @@ mod tests {
     use super::MapField;
     use crate::decode::decode_tag;
     use crate::encode::{encode_tag, encode_varint, encode_varint_field};
-    use crate::fields::shared::{FieldDeallocate, MessageCommon, PresenceBits};
+    use crate::fields::shared::{FieldDeallocate, MessageCommon};
     use crate::fields::wire::{ProtoInt32, ProtoString};
     use ::allocator_api2::alloc::Global;
     use ::bitvec::array::BitArray;
     use ::bitvec::order::Lsb0;
-    use ::bitvec::ptr::{BitRef, Mut};
     use ::bytes::BytesMut;
     use ::puroro::WireType;
     use ::unmanaged::UnmanagedString;
 
-    #[derive(Clone, Default)]
-    struct NoBits(BitArray<[u8; 1], Lsb0>);
-
-    impl PresenceBits for NoBits {
-        fn is_set(&self, bit: usize) -> bool {
-            self.0[bit]
-        }
-        fn set(&mut self, bit: usize, value: bool) {
-            self.0.set(bit, value);
-        }
-        fn bit_mut(&mut self, bit: usize) -> BitRef<'_, Mut, u8, Lsb0> {
-            self.0.get_mut(bit).expect("bit in range")
-        }
-    }
-
     #[test]
     fn map_field_int_markers() {
-        let mut common = MessageCommon::<NoBits, _>::new_in(NoBits::default(), Global);
+        let mut common =
+            MessageCommon::<BitArray<[u8; 1], Lsb0>, _>::new_in(BitArray::ZERO, Global);
         let mut field = MapField::<ProtoInt32, ProtoInt32, 1, _>::new_in(Global);
         field.bind_mut(&mut common).insert(1, 10);
         field.bind_mut(&mut common).insert(1, 11);
@@ -500,7 +485,8 @@ mod tests {
 
     #[test]
     fn map_int_roundtrip_and_last_wins() {
-        let mut common = MessageCommon::<NoBits, _>::new_in(NoBits::default(), Global);
+        let mut common =
+            MessageCommon::<BitArray<[u8; 1], Lsb0>, _>::new_in(BitArray::ZERO, Global);
         let mut field = MapField::<ProtoInt32, ProtoInt32, 7, _>::new_in(Global);
         field.bind_mut(&mut common).insert(1, 10);
         field.bind_mut(&mut common).insert(2, 20);
@@ -540,7 +526,8 @@ mod tests {
 
     #[test]
     fn map_entry_missing_key_defaults_to_zero() {
-        let mut common = MessageCommon::<NoBits, _>::new_in(NoBits::default(), Global);
+        let mut common =
+            MessageCommon::<BitArray<[u8; 1], Lsb0>, _>::new_in(BitArray::ZERO, Global);
         let mut field = MapField::<ProtoInt32, ProtoInt32, 1, _>::new_in(Global);
 
         // Entry body: only value=2 with 42 (tag 0x10, varint 42).
@@ -561,7 +548,8 @@ mod tests {
 
     #[test]
     fn map_string_key_roundtrip() {
-        let mut common = MessageCommon::<NoBits, _>::new_in(NoBits::default(), Global);
+        let mut common =
+            MessageCommon::<BitArray<[u8; 1], Lsb0>, _>::new_in(BitArray::ZERO, Global);
         let mut field = MapField::<ProtoString, ProtoInt32, 3, _>::new_in(Global);
         let key = UnmanagedString::from_string(::unmanaged::String::from_str_in("ab", Global));
         field.bind_mut(&mut common).insert(key, 7);

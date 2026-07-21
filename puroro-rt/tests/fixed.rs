@@ -3,37 +3,19 @@
 use ::allocator_api2::alloc::{Allocator, Global};
 use ::bitvec::array::BitArray;
 use ::bitvec::order::Lsb0;
-use ::bitvec::ptr::{BitRef, Mut};
 use ::bytes::{Buf, BufMut};
 use ::puroro::DecodeError;
 use ::puroro::Message;
 use ::puroro_rt::FieldDeallocate;
 use ::puroro_rt::decode::{decode_tag, skip_field_and_save};
 use ::puroro_rt::{
-    Expanded, Explicit, MessageCommon, Packed, PresenceBits, ProtoDouble, ProtoFixed32, ProtoFloat,
+    Expanded, Explicit, MessageCommon, Packed, ProtoDouble, ProtoFixed32, ProtoFloat,
     RepeatedField, SingularField,
 };
 
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
-struct TestPresence(BitArray<[u8; 1], Lsb0>);
-
-impl PresenceBits for TestPresence {
-    fn is_set(&self, bit: usize) -> bool {
-        self.0[bit]
-    }
-
-    fn set(&mut self, bit: usize, present: bool) {
-        self.0.set(bit, present);
-    }
-
-    fn bit_mut(&mut self, bit: usize) -> BitRef<'_, Mut, u8, Lsb0> {
-        self.0.get_mut(bit).expect("presence bit index in range")
-    }
-}
-
 /// Minimal message exercising singular + packed + expanded fixed fields.
 struct FixedDemo<A: Allocator + Clone = Global> {
-    _common: MessageCommon<TestPresence, A>,
+    _common: MessageCommon<BitArray<[u8; 1], Lsb0>, A>,
     code: SingularField<ProtoFixed32, Explicit<0>, 1, A>,
     altitude: SingularField<ProtoFloat, Explicit<1>, 2, A>,
     samples: RepeatedField<ProtoDouble, Packed, 3, A>,
@@ -49,7 +31,7 @@ impl FixedDemo<Global> {
 impl<A: Allocator + Clone> FixedDemo<A> {
     fn new_in(alloc: A) -> Self {
         Self {
-            _common: MessageCommon::new_in(TestPresence::default(), alloc.clone()),
+            _common: MessageCommon::new_in(BitArray::ZERO, alloc.clone()),
             code: SingularField::new_in(alloc.clone()),
             altitude: SingularField::new_in(alloc.clone()),
             samples: RepeatedField::new_in(alloc.clone()),

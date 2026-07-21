@@ -178,7 +178,7 @@ protobuf-core           Varint, Tag, WireType
 
 | Member | Role |
 |---|---|
-| `presence: P` | Bitfield newtype (`TaskPresence`, …) for EXPLICIT / LEGACY_REQUIRED presence **and** packed bool value bits |
+| `presence: P` | `BitArray<[u8; N], Lsb0>` for EXPLICIT / LEGACY_REQUIRED presence **and** packed bool value bits |
 | `unknown_fields: ManuallyDrop<UnmanagedVec<u8, A>>` | Preserve policy: round-trip unknown wire blob; closed-enum unknowns. Public view via `iter_unknown_fields`. Freed by `MessageCommon::deallocate` |
 | `alloc: A` | The single canonical allocator instance; cloned (by value) into every field operation that (de)allocates |
 
@@ -186,7 +186,7 @@ Field catalog methods take `&MessageCommon` / `&mut MessageCommon`, not `&Task`,
 
 [`FieldDeallocate`](puroro-rt/src/fields/shared/field_deallocate.rs) — every catalog field (and [`OneofSlot`](puroro-rt/src/fields/oneof.rs)) implements `deallocate(&mut self, common: &MessageCommon<…>)`. Generated message `Drop` calls this on **each direct child** with the same shape. Copy / bit-packed fields are no-ops. Oneof **variants** are released inside the group's deallocate via [`OneofDeallocate`](puroro-rt/src/fields/oneof.rs) (`deallocate(self, common)`), which forwards to the same field `deallocate(common)`.
 
-[`PresenceBits`](puroro-rt/src/fields/shared.rs) — trait implemented on the message-specific bitfield **newtype** (not on raw `BitArray` — orphan rules). Bits cover EXPLICIT / LEGACY_REQUIRED **presence** and packed **bool values**. [`MessageCommon::is_bit_set`](puroro-rt/src/fields/shared.rs) / `set_bit` / `bit_mut` forward to it; `bit_mut` returns bitvec's `BitRef<'_, Mut, u8, Lsb0>` (generated presence newtypes wrap `BitArray<[u8; N], Lsb0>`).
+[`PresenceBits`](puroro-rt/src/fields/shared.rs) — trait implemented in `puroro-rt` for `BitArray<[u8; N], Lsb0>` (so generated code does not emit a per-message newtype). Bits cover EXPLICIT / LEGACY_REQUIRED **presence** and packed **bool values**. [`MessageCommon::is_bit_set`](puroro-rt/src/fields/shared.rs) / `set_bit` / `bit_mut` forward to it; `bit_mut` returns bitvec's `BitRef<'_, Mut, u8, Lsb0>`.
 
 [`ValueSlot<T>`](puroro-rt/src/fields/shared/value_slot.rs) — singular **slot** storage behind a GAT on [`FieldPresence`](puroro-rt/src/fields/shared/field_presence.rs): always-initialized `T` for `Implicit` / `Oneof`; `MaybeUninit<T>` for `Explicit` / `LegacyRequired`; `Option<T>` for `NonOneof` (pointer presence). Here `T` is [`ProtoType::Slot`](puroro-rt/src/fields/wire/proto_type.rs) (the type marker itself, ZST [`ProtoBool`](puroro-rt/src/fields/wire/varint.rs), or `UnmanagedBox<M, A>` for messages). Construction / teardown thread an allocator via [`DefaultIn<A>`](puroro-rt/src/fields/shared.rs) / [`unmanaged::DeallocateIn<A>`](unmanaged/) (allocator as a **trait parameter**, not an associated type). Reads and mutation go through short-lived views: `slot.with(init, common)` → [`ValueSlotRefAccess`](puroro-rt/src/fields/shared/value_slot.rs) / `slot.with_mut(init, common)` → [`ValueSlotMutAccess`](puroro-rt/src/fields/shared/value_slot.rs) (`get` / `get_mut` / `set` / `clear`). Init markers ([`AlwaysInitialized`](puroro-rt/src/fields/shared/slot_init.rs) / [`BitInit`](puroro-rt/src/fields/shared/slot_init.rs)) are borrow-free; they read/update state through the passed [`MessageCommon`](puroro-rt/src/fields/shared.rs). Slot payloads use [`AddressableSlot`](puroro-rt/src/fields/shared/value_slot.rs); logical bool values are read/written via [`ProtoType`](puroro-rt/src/fields/wire/proto_type.rs) against `_common.presence`. Singular IMPLICIT omit goes through [`ProtoType::is_proto_empty`](puroro-rt/src/fields/wire/proto_type.rs) (slot [`ProtoEmpty`](puroro-rt/src/fields/shared.rs) for addressable types; bit read for `ProtoBool`).
 
@@ -347,7 +347,7 @@ Full singular signature: `SingularField<T, P, FIELD, A, L = Inline, D = ProtoDef
 
 ```rust
 pub struct Task<A: Allocator + Clone = Global> {
-    _common: MessageCommon<TaskPresence, A>,
+    _common: MessageCommon<BitArray<[u8; 2], Lsb0>, A>,
     title: SingularField<ProtoString, Explicit<{ BIT_TITLE }>, { FIELD_TITLE }, A>,
     score: SingularField<ProtoInt32, Implicit, { FIELD_SCORE }, A>,
     max_retries: SingularField<
@@ -397,14 +397,15 @@ Public accessors are **one-line delegates** into catalog methods with `&self._co
 
 ### Codegen emission per message
 
-1. Presence **newtype** + `PresenceBits` impl
-2. Struct — `MessageCommon` + catalog members + `OneofSlot` per oneof
-3. **Module-level** `pub const FIELD_*` / `BIT_*` (usable as `match` patterns). `BIT_*` is baked into each `Explicit<BIT>` / `LegacyRequired<BIT>` / `BitPacked<BIT>` field type; `FIELD` is a struct const generic on the wrapper.
-4. Inherent accessor delegates ([DESIGN.md §4.0](DESIGN.md#40-inherent-accessors-current))
-5. Trait impls — `Message`, `Clone` / `PartialEq` / `Debug` / `Drop` / `DeallocateIn` as field sums
-6. Child modules — enums, oneof submodules named after the oneof
+1. Struct — `MessageCommon<BitArray<[u8; N], Lsb0>, A>` + catalog members + `OneofSlot` per oneof
+2. **Module-level** `pub const FIELD_*` / `BIT_*` (usable as `match` patterns). `BIT_*` is baked into each `Explicit<BIT>` / `LegacyRequired<BIT>` / `BitPacked<BIT>` field type; `FIELD` is a struct const generic on the wrapper.
+3. Inherent accessor delegates ([DESIGN.md §4.0](DESIGN.md#40-inherent-accessors-current))
+4. Trait impls — `Message`, `Clone` / `PartialEq` / `Debug` / `Drop` / `DeallocateIn` as field sums
+5. Child modules — nested types and oneof submodules named after the oneof (under the message module; package module tree is outer — see below)
 
 IR step: `ProtoField → FieldKind → catalog type + const args`.
+
+**Module tree.** Production layout follows [DESIGN.md §4 — Module layout and naming](DESIGN.md#module-layout-and-naming): `package` → nested Rust modules; each top-level message gets a snake_case submodule; oneofs get snake_case submodules under the parent message. On Rust-path collision, the plugin **errors** unless the user supplies a **generate-time rename** (plugin option / config — not a `.proto` option). [`sample-generated/`](sample-generated/) remains flat (no package prefix) as a readable stand-in.
 
 ### Path qualification (naming)
 
@@ -432,9 +433,6 @@ The `@generated` marker belongs on **real** plugin output (tooling uses it to co
 **Section banners** — major blocks inside the file:
 
 ```text
-// ---------------------------------------------------------------------------
-// Presence bitfield (presence + bool value bits)
-// ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 // Bit indices — …
 // ---------------------------------------------------------------------------
@@ -493,7 +491,7 @@ Every field kind merges through the same bound-view shape — `self.<field>.bind
 
 ## 10. Presence / bool-value bit indices
 
-Tracked bits use [`bitvec::BitArray`](https://docs.rs/bitvec) inline in the message (`BitVec` is heap-only and incompatible with custom `A`). Store them in `_common.presence` inside a message-specific newtype.
+Tracked bits use [`bitvec::BitArray`](https://docs.rs/bitvec) inline in the message (`BitVec` is heap-only and incompatible with custom `A`). Store them in `_common.presence` as `BitArray<[u8; N], Lsb0>`; `puroro-rt` implements [`PresenceBits`](puroro-rt/src/fields/shared.rs) for that type.
 
 **Assignment (one pass, ascending field number):**
 
@@ -532,35 +530,13 @@ Gaps in field numbers do not create gaps in bit indices. Oneof non-bool variants
 | `postal_code` | 3 | `2` |
 | `latitude` | 4 | `3` |
 
-### Newtype pattern
+Generated code indexes bits only through `PresenceBits` / `MessageCommon` helpers (`is_bit_set` / `set_bit` / `bit_mut`), not by reaching into raw `BitArray` APIs from accessors. `N` is `ceil(bit_count / 8)` for the message's assigned bits.
 
-```rust
-#[derive(Clone, Copy, Debug, Default)]
-pub struct TaskPresence(BitArray<[u8; 2], Lsb0>);
-
-impl TaskPresence {
-    pub const ZERO: Self = Self(BitArray::ZERO);
-
-    /// Concrete `BitRef` for projections that cannot hold `impl Trait`
-    /// (e.g. oneof bool `Mut` payloads).
-    pub(crate) fn bit_ref_mut(&mut self, bit: usize) -> BitRef<'_, Mut, u8, Lsb0> { … }
-}
-
-impl PresenceBits for TaskPresence {
-    fn is_set(&self, bit: usize) -> bool { self.0[bit] }
-    fn set(&mut self, bit: usize, present: bool) { self.0.set(bit, present); }
-    fn bit_mut(&mut self, bit: usize) -> BitRef<'_, Mut, u8, Lsb0> {
-        self.bit_ref_mut(bit)
-    }
-}
-```
-
-`AddressPresence` may also `derive(PartialEq, Eq)` when no oneof needs a named `BitRef` helper. Generated code indexes bits only through `PresenceBits` / the newtype helpers, never by reaching into raw `BitArray` from accessors.
 ---
 
 ## 11. Constructors & allocator
 
-- **`Task::new_in(alloc)`** — default every field; `_common.presence = TaskPresence::ZERO`; heap fields via `*_in(alloc.clone())`, with the last heap field taking the original by move. (Building an empty `unmanaged` container does not allocate, so the clone is only used to decompose an empty `Vec`.)
+- **`Task::new_in(alloc)`** — default every field; `_common.presence = BitArray::ZERO`; heap fields via `*_in(alloc.clone())`, with the last heap field taking the original by move. (Building an empty `unmanaged` container does not allocate, so the clone is only used to decompose an empty `Vec`.)
 - **`Task::new()`** — when `A = Global`.
 - **`Default`** — `A: Clone + Default` → `new_in(A::default())`.
 
