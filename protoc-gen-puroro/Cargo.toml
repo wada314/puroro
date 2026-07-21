@@ -1,0 +1,18 @@
+[package]
+name = "protoc-gen-puroro"
+version = "0.1.0"
+edition = "2024"
+publish = false
+description = "protoc plugin that emits puroro-compatible Rust code"
+
+[lints]
+workspace = true
+
+[dependencies]
+anyhow = "1"
+protobuf-core = { path = "../protobuf-core" }
+thiserror = "2"
+
+[[bin]]
+name = "protoc-gen-puroro"
+path = "src/main.rs"
