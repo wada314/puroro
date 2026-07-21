@@ -1,5 +1,5 @@
 [workspace]
-members = [".", "puroro-rt", "protobuf-core", "protoc-gen-puroro", "sample-generated", "unmanaged"]
+members = [".", "puroro-rt", "protobuf-core", "protoc-gen-puroro", "puroro-codegen-tests", "sample-generated", "unmanaged"]
 resolver = "2"
 
 [workspace.lints.clippy]

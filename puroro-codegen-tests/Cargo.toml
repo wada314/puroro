@@ -1,0 +1,19 @@
+[package]
+name = "puroro-codegen-tests"
+version = "0.0.0"
+edition = "2024"
+publish = false
+description = "Compile-time generation + runtime tests for protoc-gen-puroro"
+
+[lints]
+workspace = true
+
+[build-dependencies]
+protoc-gen-puroro = { path = "../protoc-gen-puroro" }
+
+[dependencies]
+allocator-api2 = "0.2"
+bitvec = "1"
+bytes = "1"
+puroro = { path = ".." }
+puroro-rt = { path = "../puroro-rt" }

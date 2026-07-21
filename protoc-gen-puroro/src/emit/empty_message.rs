@@ -15,6 +15,8 @@ pub(super) fn render(proto: &ProtoFile, message: &MessageDesc) -> String {
         out.push_str(&format!("//! Package `{}`\n", proto.package));
     }
     out.push('\n');
+    // Generated code intentionally uses fully-qualified `::` paths (DESIGN.md).
+    out.push_str("#![allow(clippy::absolute_paths)]\n\n");
     out.push_str(
         "// Fake empty-message output from protoc-gen-puroro.\n\
          // Field catalog emission is not implemented yet.\n\n",
