@@ -13,6 +13,9 @@ anyhow = "1"
 protobuf-core = { path = "../protobuf-core" }
 thiserror = "2"
 
+[dev-dependencies]
+tempfile = "3"
+
 [[bin]]
 name = "protoc-gen-puroro"
 path = "src/main.rs"
