@@ -35,13 +35,14 @@ fn register_file<'a>(
     proto: &ProtoFile,
     types_by_fqn: &mut HashMap<ProtoFqn, TypeItem<'a>>,
 ) -> Result<&'a File<'a>> {
+    let package_fqn = ProtoFqn::from_package(&proto.package);
+
     let mut messages = Vec::with_capacity(proto.messages.len());
     for desc in &proto.messages {
         messages.push(register_message(
             arena,
             desc,
-            &proto.package,
-            &[],
+            &package_fqn,
             None,
             types_by_fqn,
         )?);
@@ -52,8 +53,7 @@ fn register_file<'a>(
         enums.push(register_enum(
             arena,
             desc,
-            &proto.package,
-            &[],
+            &package_fqn,
             None,
             types_by_fqn,
         )?);
@@ -71,14 +71,12 @@ fn register_file<'a>(
 fn register_message<'a>(
     arena: &'a Arena,
     desc: &MessageDesc,
-    package: &str,
-    outer_path: &[&str],
-    parent: Option<&'a Message<'a>>,
+    // FQN of the enclosing package (possibly ".") or parent message.
+    parent_fqn: &ProtoFqn,
+    parent_message: Option<&'a Message<'a>>,
     types_by_fqn: &mut HashMap<ProtoFqn, TypeItem<'a>>,
 ) -> Result<&'a Message<'a>> {
-    let mut path = outer_path.to_vec();
-    path.push(desc.name.as_str());
-    let fqn = ProtoFqn::from_package_path(package, &path);
+    let fqn = parent_fqn.append(&desc.name);
 
     if types_by_fqn.contains_key(&fqn) {
         return Err(Error::Codegen(format!(
@@ -97,21 +95,20 @@ fn register_message<'a>(
     let message = arena.alloc(Message {
         name: desc.name.clone(),
         fqn: fqn.clone(),
-        parent,
+        parent: parent_message,
         fields: OnceCell::new(),
         nested_messages: OnceCell::new(),
         nested_enums: OnceCell::new(),
         oneofs,
     });
-    types_by_fqn.insert(fqn, TypeItem::Message(message));
+    types_by_fqn.insert(fqn.clone(), TypeItem::Message(message));
 
     let mut nested_messages = Vec::with_capacity(desc.nested_messages.len());
     for nested in &desc.nested_messages {
         nested_messages.push(register_message(
             arena,
             nested,
-            package,
-            &path,
+            &fqn,
             Some(message),
             types_by_fqn,
         )?);
@@ -119,15 +116,14 @@ fn register_message<'a>(
     message
         .nested_messages
         .set(nested_messages)
-        .map_err(|_| Error::Codegen(format!("nested messages set twice for `{path:?}`")))?;
+        .map_err(|_| Error::Codegen(format!("nested messages set twice for `{fqn}`")))?;
 
     let mut nested_enums = Vec::with_capacity(desc.nested_enums.len());
     for nested in &desc.nested_enums {
         nested_enums.push(register_enum(
             arena,
             nested,
-            package,
-            &path,
+            &fqn,
             Some(message),
             types_by_fqn,
         )?);
@@ -135,7 +131,7 @@ fn register_message<'a>(
     message
         .nested_enums
         .set(nested_enums)
-        .map_err(|_| Error::Codegen(format!("nested enums set twice for `{path:?}`")))?;
+        .map_err(|_| Error::Codegen(format!("nested enums set twice for `{fqn}`")))?;
 
     Ok(message)
 }
@@ -143,14 +139,12 @@ fn register_message<'a>(
 fn register_enum<'a>(
     arena: &'a Arena,
     desc: &EnumDesc,
-    package: &str,
-    outer_path: &[&str],
-    parent: Option<&'a Message<'a>>,
+    // FQN of the enclosing package (possibly ".") or parent message.
+    parent_fqn: &ProtoFqn,
+    parent_message: Option<&'a Message<'a>>,
     types_by_fqn: &mut HashMap<ProtoFqn, TypeItem<'a>>,
 ) -> Result<&'a Enum<'a>> {
-    let mut path = outer_path.to_vec();
-    path.push(desc.name.as_str());
-    let fqn = ProtoFqn::from_package_path(package, &path);
+    let fqn = parent_fqn.append(&desc.name);
 
     if types_by_fqn.contains_key(&fqn) {
         return Err(Error::Codegen(format!(
@@ -170,7 +164,7 @@ fn register_enum<'a>(
     let enum_ty = arena.alloc(Enum {
         name: desc.name.clone(),
         fqn: fqn.clone(),
-        parent,
+        parent: parent_message,
         values,
     });
     types_by_fqn.insert(fqn, TypeItem::Enum(enum_ty));
@@ -181,21 +175,19 @@ fn fill_file_fields<'a>(
     proto: &ProtoFile,
     types_by_fqn: &HashMap<ProtoFqn, TypeItem<'a>>,
 ) -> Result<()> {
+    let package_fqn = ProtoFqn::from_package(&proto.package);
     for desc in &proto.messages {
-        fill_message_fields(desc, &proto.package, &[], types_by_fqn)?;
+        fill_message_fields(desc, &package_fqn, types_by_fqn)?;
     }
     Ok(())
 }
 
 fn fill_message_fields<'a>(
     desc: &MessageDesc,
-    package: &str,
-    outer_path: &[&str],
+    parent_fqn: &ProtoFqn,
     types_by_fqn: &HashMap<ProtoFqn, TypeItem<'a>>,
 ) -> Result<()> {
-    let mut path = outer_path.to_vec();
-    path.push(desc.name.as_str());
-    let fqn = ProtoFqn::from_package_path(package, &path);
+    let fqn = parent_fqn.append(&desc.name);
 
     let TypeItem::Message(message) = types_by_fqn.get(&fqn).copied().ok_or_else(|| {
         Error::Codegen(format!(
@@ -218,7 +210,7 @@ fn fill_message_fields<'a>(
         .map_err(|_| Error::Codegen(format!("fields set twice for `{fqn}`")))?;
 
     for nested in &desc.nested_messages {
-        fill_message_fields(nested, package, &path, types_by_fqn)?;
+        fill_message_fields(nested, &fqn, types_by_fqn)?;
     }
     Ok(())
 }

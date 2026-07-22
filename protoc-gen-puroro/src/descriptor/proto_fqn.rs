@@ -23,26 +23,48 @@ impl ProtoFqn {
         }
     }
 
+    /// FQN of a protobuf `package` namespace (not a type).
+    ///
+    /// Empty package uses the synthetic root `"."`, so [`Self::append`] can build
+    /// top-level names like `.Empty` uniformly with nested names.
+    pub fn from_package(package: &str) -> Self {
+        if package.is_empty() {
+            Self(".".into())
+        } else {
+            Self(format!(".{package}"))
+        }
+    }
+
     /// Build an FQN from a protobuf `package` and nested simple-name path.
     ///
     /// `package` may be empty. `path_from_package` is e.g. `["Outer", "Inner"]`.
     pub fn from_package_path(package: &str, path_from_package: &[&str]) -> Self {
-        let mut out = String::from(".");
-        if !package.is_empty() {
-            out.push_str(package);
-            out.push('.');
+        let mut fqn = Self::from_package(package);
+        for segment in path_from_package {
+            fqn = fqn.append(segment);
         }
-        for (i, segment) in path_from_package.iter().enumerate() {
-            if i != 0 {
-                out.push('.');
-            }
-            out.push_str(segment);
+        fqn
+    }
+
+    /// Append a simple type name under this package or enclosing-type FQN.
+    ///
+    /// - parent `.example.v1` + `Task` → `.example.v1.Task`
+    /// - parent `.` (empty package) + `Empty` → `.Empty`
+    pub fn append(&self, simple_name: &str) -> Self {
+        if self.0 == "." {
+            Self(format!(".{simple_name}"))
+        } else {
+            Self(format!("{}.{}", self.0, simple_name))
         }
-        Self(out)
     }
 
     pub fn as_str(&self) -> &str {
         &self.0
+    }
+
+    /// Whether this is the synthetic empty-package root (`"."`), not a real type.
+    pub fn is_package_root(&self) -> bool {
+        self.0 == "."
     }
 }
 
@@ -92,6 +114,24 @@ mod tests {
     fn parse_adds_leading_dot() {
         assert_eq!(ProtoFqn::parse("example.Task").as_str(), ".example.Task");
         assert_eq!(ProtoFqn::parse(".example.Task").as_str(), ".example.Task");
+    }
+
+    #[test]
+    fn from_package_and_append() {
+        assert_eq!(ProtoFqn::from_package("").as_str(), ".");
+        assert!(ProtoFqn::from_package("").is_package_root());
+        assert_eq!(ProtoFqn::from_package("example.v1").as_str(), ".example.v1");
+        assert_eq!(
+            ProtoFqn::from_package("").append("Empty").as_str(),
+            ".Empty"
+        );
+        assert_eq!(
+            ProtoFqn::from_package("example.v1")
+                .append("Outer")
+                .append("Inner")
+                .as_str(),
+            ".example.v1.Outer.Inner"
+        );
     }
 
     #[test]
