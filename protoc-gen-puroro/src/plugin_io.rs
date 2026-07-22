@@ -1,13 +1,13 @@
 //! Minimal wire codec for `plugin.proto` / `descriptor.proto` subsets.
 //!
-//! Decodes only the fields needed to build [`crate::ir::CodegenRequest`], and
-//! encodes a minimal [`CodeGeneratorResponse`].
+//! Decodes only the fields needed to build [`crate::descriptor::CodegenRequest`],
+//! and encodes a minimal [`CodeGeneratorResponse`].
 
-use crate::error::{Error, Result};
-use crate::ir::{
-    CodegenRequest, EnumDesc, EnumValueDesc, FieldDesc, FieldLabel, FieldType, MessageDesc,
-    OneofDesc, ProtoFile,
+use crate::descriptor::{
+    CodegenMeta, CodegenRequest, EnumDesc, EnumValueDesc, FieldDesc, FieldLabel, FieldType,
+    MessageDesc, OneofDesc, ProtoFile,
 };
+use crate::error::{Error, Result};
 use ::protobuf_core::{AsRefExtProtobuf, Field, FieldNumber, FieldValue, WriteExtProtobuf};
 
 /// `CodeGeneratorResponse.FEATURE_PROTO3_OPTIONAL`
@@ -46,7 +46,7 @@ impl CodeGeneratorResponse {
     }
 }
 
-/// Decode `CodeGeneratorRequest` bytes into codegen IR.
+/// Decode `CodeGeneratorRequest` bytes into descriptor + metadata.
 pub fn decode_request(bytes: &[u8]) -> Result<CodegenRequest> {
     let mut file_to_generate = Vec::new();
     let mut parameter = None;
@@ -70,8 +70,10 @@ pub fn decode_request(bytes: &[u8]) -> Result<CodegenRequest> {
     }
 
     Ok(CodegenRequest {
-        file_to_generate,
-        parameter,
+        meta: CodegenMeta {
+            file_to_generate,
+            parameter,
+        },
         proto_files,
     })
 }
@@ -310,7 +312,7 @@ fn write_string_field(out: &mut Vec<u8>, field_number: u32, value: &str) -> Resu
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::ir::{FieldLabel, FieldType};
+    use crate::descriptor::{FieldLabel, FieldType};
 
     fn encode_string_field(field_number: u32, value: &str) -> Vec<u8> {
         let mut out = Vec::new();
@@ -365,8 +367,8 @@ mod tests {
         request.extend(encode_message_field(15, &file));
 
         let decoded = decode_request(&request).unwrap();
-        assert_eq!(decoded.file_to_generate, vec!["example.proto"]);
-        assert_eq!(decoded.parameter.as_deref(), Some("rename=foo"));
+        assert_eq!(decoded.meta.file_to_generate, vec!["example.proto"]);
+        assert_eq!(decoded.meta.parameter.as_deref(), Some("rename=foo"));
         assert_eq!(decoded.proto_files.len(), 1);
         assert_eq!(decoded.proto_files[0].name, "example.proto");
         assert_eq!(decoded.proto_files[0].package, "example");

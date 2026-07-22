@@ -1,6 +1,6 @@
 //! Fake emitter for a single field-less message's module body.
 
-use crate::ir::MessageDesc;
+use crate::descriptor::MessageDesc;
 use ::proc_macro2::{Ident, TokenStream};
 use ::quote::quote;
 

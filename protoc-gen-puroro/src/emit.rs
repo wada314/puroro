@@ -1,11 +1,11 @@
-//! Code emission from codegen IR.
+//! Code emission from descriptors.
 //!
 //! Current scope is a **fake** generator: only a single field-less root message
 //! is supported. That is enough to exercise the request → module forest →
 //! layout → compile → runtime pipeline before real catalog emission exists.
 
+use crate::descriptor::{CodegenRequest, MessageDesc, ProtoFile};
 use crate::error::{Error, Result};
-use crate::ir::{CodegenRequest, MessageDesc, ProtoFile};
 use crate::module_tree::layout::{ModuleLayout, render};
 use crate::module_tree::{ModuleForest, ModuleOrigin, proto_fqn, type_name_to_module_ident};
 use crate::plugin_io::{CodeGeneratorResponse, ResponseFile};
@@ -18,7 +18,7 @@ mod empty_message;
 pub fn emit(request: &CodegenRequest) -> Result<CodeGeneratorResponse> {
     let mut files = Vec::new();
 
-    for target in &request.file_to_generate {
+    for target in &request.meta.file_to_generate {
         let proto = request
             .proto_files
             .iter()
@@ -143,7 +143,9 @@ fn proto_path_to_rust_path(proto_name: &str) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::ir::{FieldDesc, FieldLabel, FieldType, MessageDesc, ProtoFile};
+    use crate::descriptor::{
+        CodegenMeta, CodegenRequest, FieldDesc, FieldLabel, FieldType, MessageDesc, ProtoFile,
+    };
 
     fn empty_request(message_name: &str) -> CodegenRequest {
         empty_request_with_package(message_name, "")
@@ -151,8 +153,10 @@ mod tests {
 
     fn empty_request_with_package(message_name: &str, package: &str) -> CodegenRequest {
         CodegenRequest {
-            file_to_generate: vec!["empty.proto".into()],
-            parameter: None,
+            meta: CodegenMeta {
+                file_to_generate: vec!["empty.proto".into()],
+                parameter: None,
+            },
             proto_files: vec![ProtoFile {
                 name: "empty.proto".into(),
                 package: package.into(),

@@ -1,16 +1,26 @@
-//! Codegen intermediate representation.
+//! Descriptor subset decoded from `CodeGeneratorRequest`.
 //!
-//! This is a **read-only schema view** for the generator — not a faithful
-//! reproduction of `google.protobuf.*` message types. Only fields the emitter
-//! needs are retained.
+//! This is a read-only view of the protobuf descriptors protoc sends — not a
+//! faithful reproduction of every `google.protobuf.*` field. Type names on
+//! fields are still strings here; resolve them into [`crate::resolved::FileSet`]
+//! via [`crate::resolved::resolve`].
 
-/// Top-level request derived from `CodeGeneratorRequest`.
+/// Plugin / generate-time metadata (not part of the type graph).
+///
+/// Passed by reference through the generator; kept separate from
+/// [`crate::resolved::FileSet`].
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct CodegenRequest {
+pub struct CodegenMeta {
     /// Proto file names that should be generated (`file_to_generate`).
     pub file_to_generate: Vec<String>,
     /// Raw plugin parameter string (`parameter`), if any.
     pub parameter: Option<String>,
+}
+
+/// Top-level request derived from `CodeGeneratorRequest`.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct CodegenRequest {
+    pub meta: CodegenMeta,
     /// Descriptor set (`proto_file`), in dependency order as provided by protoc.
     pub proto_files: Vec<ProtoFile>,
 }

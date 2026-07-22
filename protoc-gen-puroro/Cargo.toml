@@ -10,6 +10,7 @@ workspace = true
 
 [dependencies]
 anyhow = "1"
+bumpalo = "3"
 prettyplease = "0.2"
 proc-macro2 = "1"
 protobuf-core = { path = "../protobuf-core" }

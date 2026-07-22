@@ -9,7 +9,7 @@
 //! ```
 
 use ::protoc_gen_puroro::emit::emit;
-use ::protoc_gen_puroro::ir::{CodegenRequest, MessageDesc, ProtoFile};
+use ::protoc_gen_puroro::descriptor::{CodegenMeta, CodegenRequest, MessageDesc, ProtoFile};
 use ::std::env;
 use ::std::fs;
 use ::std::io::Write;
@@ -174,8 +174,10 @@ fn request_from_proto_file(proto_path: &Path) -> CodegenRequest {
         .collect();
 
     CodegenRequest {
-        file_to_generate: vec![file_name.clone()],
-        parameter: None,
+        meta: CodegenMeta {
+            file_to_generate: vec![file_name.clone()],
+            parameter: None,
+        },
         proto_files: vec![ProtoFile {
             name: file_name,
             package,

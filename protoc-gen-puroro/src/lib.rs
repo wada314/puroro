@@ -2,16 +2,17 @@
 //!
 //! The binary is a thin stdin/stdout wrapper around [`run_plugin`]. Tests and
 //! future `build.rs` / CLI wrappers should call [`generate_from_bytes`] (or the
-//! IR-level helpers) directly.
+//! descriptor / resolved helpers) directly.
 
+pub mod descriptor;
 pub mod emit;
 pub mod error;
-pub mod ir;
 pub mod module_tree;
 pub mod plugin_io;
+pub mod resolved;
 
+pub use crate::descriptor::{CodegenMeta, CodegenRequest};
 pub use crate::error::{Error, Result};
-pub use crate::ir::CodegenRequest;
 pub use crate::plugin_io::{CodeGeneratorResponse, ResponseFile};
 
 use crate::emit::emit;
