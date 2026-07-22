@@ -146,12 +146,16 @@ mod tests {
     use crate::ir::{FieldDesc, FieldLabel, FieldType, MessageDesc, ProtoFile};
 
     fn empty_request(message_name: &str) -> CodegenRequest {
+        empty_request_with_package(message_name, "")
+    }
+
+    fn empty_request_with_package(message_name: &str, package: &str) -> CodegenRequest {
         CodegenRequest {
             file_to_generate: vec!["empty.proto".into()],
             parameter: None,
             proto_files: vec![ProtoFile {
                 name: "empty.proto".into(),
-                package: String::new(),
+                package: package.into(),
                 dependency: vec![],
                 messages: vec![MessageDesc {
                     name: message_name.into(),
@@ -176,6 +180,24 @@ mod tests {
             response.files[0]
                 .content
                 .contains("@generated from empty.proto")
+        );
+    }
+
+    #[test]
+    fn emit_empty_message_nests_package_modules() {
+        let response = emit(&empty_request_with_package("Empty", "example.v1")).unwrap();
+        let content = &response.files[0].content;
+        assert!(content.contains("pub mod example"));
+        assert!(content.contains("pub mod v1"));
+        assert!(content.contains("pub mod empty"));
+        assert!(content.contains("pub use empty::Empty"));
+        assert!(content.contains("struct Empty"));
+        // Re-export should sit under the package leaf, not the forest root.
+        let example_idx = content.find("pub mod example").expect("example mod");
+        let use_idx = content.find("pub use empty::Empty").expect("pub use");
+        assert!(
+            use_idx > example_idx,
+            "pub use should appear inside the package module tree"
         );
     }
 
