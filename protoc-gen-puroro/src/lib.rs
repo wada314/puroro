@@ -7,6 +7,7 @@
 pub mod emit;
 pub mod error;
 pub mod ir;
+pub mod module_tree;
 pub mod plugin_io;
 
 pub use crate::error::{Error, Result};

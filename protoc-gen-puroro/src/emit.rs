@@ -1,12 +1,16 @@
 //! Code emission from codegen IR.
 //!
 //! Current scope is a **fake** generator: only a single field-less root message
-//! is supported. That is enough to exercise the request → IR → Rust → compile
-//! → runtime pipeline before real catalog emission exists.
+//! is supported. That is enough to exercise the request → module forest →
+//! layout → compile → runtime pipeline before real catalog emission exists.
 
 use crate::error::{Error, Result};
 use crate::ir::{CodegenRequest, MessageDesc, ProtoFile};
+use crate::module_tree::layout::{ModuleLayout, render};
+use crate::module_tree::{ModuleForest, ModuleOrigin, proto_fqn, type_name_to_module_ident};
 use crate::plugin_io::{CodeGeneratorResponse, ResponseFile};
+use ::proc_macro2::{Ident, Span};
+use ::quote::quote;
 
 mod empty_message;
 
@@ -33,12 +37,52 @@ pub fn emit(request: &CodegenRequest) -> Result<CodeGeneratorResponse> {
 fn emit_proto_file(proto: &ProtoFile) -> Result<ResponseFile> {
     validate_fake_proto(proto)?;
     let message = &proto.messages[0];
-    let content = empty_message::render(proto, message);
+    let forest = build_forest(proto, message);
 
-    Ok(ResponseFile {
-        name: proto_path_to_rust_path(&proto.name),
-        content,
-    })
+    let mut files = render(
+        &forest,
+        &ModuleLayout::SingleFile {
+            path: proto_path_to_rust_path(&proto.name),
+        },
+    )?;
+    files
+        .pop()
+        .ok_or_else(|| Error::Codegen("layout produced no files".into()))
+}
+
+fn build_forest(proto: &ProtoFile, message: &MessageDesc) -> ModuleForest {
+    let mut forest = ModuleForest::new();
+
+    // Root carries file-level docs / inner attributes.
+    let doc = format!("@generated from {} — do not edit", proto.name);
+    let mut root_items = quote! {
+        #![doc = #doc]
+        #![allow(clippy::absolute_paths)]
+    };
+    if !proto.package.is_empty() {
+        let package_doc = format!("Package `{}`", proto.package);
+        root_items.extend(quote! {
+            #![doc = #package_doc]
+        });
+    }
+    forest.root_mut().append_items(root_items);
+
+    let parent = forest.ensure_package(&proto.package);
+    let mod_name = type_name_to_module_ident(&message.name);
+    let type_name = Ident::new(&message.name, Span::call_site());
+
+    // Main message type is visible from the parent namespace.
+    parent.append_items(quote! {
+        pub use #mod_name::#type_name;
+    });
+
+    let child = parent.get_or_insert_child(mod_name);
+    child.add_origin(ModuleOrigin::Message {
+        proto_fqn: proto_fqn(&proto.package, &message.name),
+    });
+    child.append_items(empty_message::render_items(message));
+
+    forest
 }
 
 /// Fake generator limits: one root message, no fields / nested types / enums.
@@ -127,6 +171,7 @@ mod tests {
         assert_eq!(response.files.len(), 1);
         assert_eq!(response.files[0].name, "empty.rs");
         assert!(response.files[0].content.contains("struct Empty"));
+        assert!(response.files[0].content.contains("pub use empty"));
         assert!(
             response.files[0]
                 .content
