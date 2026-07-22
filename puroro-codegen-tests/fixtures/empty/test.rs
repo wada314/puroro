@@ -1,7 +1,7 @@
-//! Behavioural tests for the fake empty-message generator.
+//! Behavioural tests for the `empty` fixture (field-less message).
 
+use crate::empty::Empty;
 use ::puroro::Message;
-use ::puroro_codegen_tests::empty::Empty;
 
 #[test]
 fn default_encodes_to_empty() {
