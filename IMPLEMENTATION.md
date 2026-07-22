@@ -405,17 +405,33 @@ Public accessors are **one-line delegates** into catalog methods with `&self._co
 
 IR step: `ProtoField → FieldKind → catalog type + const args`.
 
-**Module tree.** Production layout follows [DESIGN.md §4 — Module layout and naming](DESIGN.md#module-layout-and-naming): `package` → nested Rust modules; each top-level message gets a snake_case submodule; oneofs get snake_case submodules under the parent message. On Rust-path collision, the plugin **errors** unless the user supplies a **generate-time rename** (plugin option / config — not a `.proto` option). [`sample-generated/`](sample-generated/) remains flat (no package prefix) as a readable stand-in.
+**Module tree.** Production layout follows [DESIGN.md §4 — Module layout and naming](DESIGN.md#module-layout-and-naming): `package` → nested Rust modules; each top-level message gets a snake_case submodule; oneofs get snake_case submodules under the parent message. Distinct proto identities that map to the same Rust path are **merged** into one module; item-level clashes are left to `rustc`. Deliberate path changes use a **generate-time rename** (plugin option / config — not a `.proto` option). Cross-forest references use `self::_root::…` ([Path qualification](DESIGN.md#path-qualification)). [`sample-generated/`](sample-generated/) remains flat (no package prefix) as a readable stand-in.
 
 ### Path qualification (naming)
 
-**Real generated code must fully-qualify every path it emits** — leading-`::` absolute paths such as `::puroro_rt::SingularField`, `::puroro::Message`, `::core::ops::DerefMut`, `::allocator_api2::alloc::Allocator` — and must not depend on `use` imports for the items it references. A `.proto` file can name its packages, messages, and fields with almost any identifier, so any *unqualified* name in the generated output risks colliding with a user-defined type, module, or import that lands in the same scope. Fully-qualified paths are collision-proof. The only names exempt from this are the ones the generator introduces itself and reserves by convention — e.g. the `_common` field and other `_`-prefixed internals — which cannot clash with proto-derived names.
+Generated code must not rely on ambient `use` imports for the items it references. A `.proto` schema can introduce almost any identifier, so short names risk colliding with user code in the same scope.
+
+**External crates** use leading-`::` absolute paths — `::puroro::Message`, `::puroro_rt::SingularField`, `::core::ops::DerefMut`, `::allocator_api2::alloc::Allocator`, … — and must not be pulled in with `use`.
+
+**Names inside the generated module forest** use `self::_root::…` (e.g. `self::_root::example::v1::address::Address`). They must **not** use leading `::` or `crate::`, because the forest may be embedded as a submodule of an application crate; those prefixes would resolve to the **host** crate root. Layout injects a private `mod _root` into every forest module so `self::_root` means the forest root at any depth:
+
+```rust
+// Forest root
+mod _root { pub(super) use super::*; }
+
+// Nested modules
+mod _root { pub(super) use super::super::_root::*; }
+```
+
+Nearby relatives in the same parent (e.g. `pub use empty::Empty`) may stay relative. Generator-reserved `_`-prefixed names (`_root`, `_common`, …) are exempt from proto-derived naming.
+
+Normative wording: [DESIGN.md — Path qualification](DESIGN.md#path-qualification).
 
 **Crate split.** Items from [DESIGN.md §3](DESIGN.md#3-runtime-trait-api) (`Message`, `Optional`, `HasDefault`, `DecodeError`, …) are emitted as `::puroro::…`. Field catalog types, `MessageCommon`, wire helpers, and `ProtoDefault` are emitted as `::puroro_rt::…`. A generated crate's `Cargo.toml` lists both dependencies; end-user application code should not add `puroro-rt` directly.
 
 **Public signatures must not surface `puroro-rt`.** Fully-qualified `::puroro_rt::…` paths are fine in **private** / `pub(crate)` storage and `impl` bodies. They must **not** appear in public function signatures, public type aliases, or other API that forces library users to name `puroro-rt` (use `puroro` traits, RPIT, or concrete user-facing types instead). Normative rule: [DESIGN.md §4 — Public signatures must not surface `puroro-rt`](DESIGN.md#public-signatures-must-not-surface-puroro-rt).
 
-**The checked-in [`sample-generated/`](sample-generated/) deliberately relaxes path qualification for readability.** It pulls names in with `use` and refers to them by short name (`SingularField`, `Allocator`, `MessageCommon`, …) so the reference output stays easy to read and review. Read those short names as stand-ins for the fully-qualified paths the production protoc plugin would actually emit. The sample still aims to obey the **no public `puroro-rt` in signatures** rule above.
+**The checked-in [`sample-generated/`](sample-generated/) deliberately relaxes path qualification for readability.** It pulls names in with `use` and refers to them by short name (`SingularField`, `Allocator`, `MessageCommon`, …) so the reference output stays easy to read and review. Read those short names as stand-ins for the production spellings (`::puroro_rt::…` / `self::_root::…`). The sample still aims to obey the **no public `puroro-rt` in signatures** rule above.
 
 ### Generated code comments
 

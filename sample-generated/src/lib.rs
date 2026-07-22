@@ -5,13 +5,15 @@
 //! [`puroro_rt`] field catalog against realistic generated accessors,
 //! encode/decode glue, and presence bit indices.
 //!
-//! **Naming vs. real generated code.** The production plugin must *fully-qualify*
-//! every path it emits (`::puroro_rt::SingularField`, `::puroro::Message`,
-//! `::core::ops::DerefMut`, …)
-//! because a `.proto` schema may name things that would collide with unqualified
-//! identifiers. This sample deliberately relaxes that: it uses `use` imports and
-//! short names for readability. Read the short names here as stand-ins for their
-//! fully-qualified forms. See `IMPLEMENTATION.md` § "Path qualification (naming)".
+//! **Naming vs. real generated code.** The production plugin qualifies paths as
+//! follows: external crates with leading `::` (`::puroro_rt::SingularField`,
+//! `::puroro::Message`, `::core::ops::DerefMut`, …); names inside the generated
+//! module forest as `self::_root::…`. A `.proto` schema may introduce identifiers
+//! that would collide with short names in the same scope. This sample
+//! deliberately relaxes that: it uses `use` imports and short names for
+//! readability. Read the short names here as stand-ins for their production
+//! forms. See `IMPLEMENTATION.md` § "Path qualification (naming)" and
+//! `DESIGN.md` § "Path qualification".
 //!
 //! These files are maintained by hand as a readable reference; in a real project
 //! the equivalent sources would come from the plugin instead. Comments here are

@@ -10,6 +10,7 @@ This document specifies the **public interface** of the `puroro` Protocol Buffer
 3. [Runtime trait API](#3-runtime-trait-api)
 4. [Generated code specification](#4-generated-code-specification)
    - [Module layout and naming](#module-layout-and-naming)
+   - [Path qualification](#path-qualification)
    - [Public signatures must not surface `puroro-rt`](#public-signatures-must-not-surface-puroro-rt)
    - 4.0 [Inherent accessors (current)](#40-inherent-accessors-current)
    - 4.1 [Scalar fields](#41-scalar-fields) — implicit vs explicit presence
@@ -50,7 +51,7 @@ The puroro project comprises several crates and tools with distinct roles:
 | **`protobuf-core`** (git submodule) | Wire-format **primitives** — `Varint`, `Tag`, `WireType`, field I/O traits, varint read/write. Used by `puroro` and `puroro-rt`; **generated code does not import it directly**. |
 | **`puroro`** | **Stable user-facing runtime API** — `Message`, `Optional`, `HasDefault`, `DecodeError` / `EncodeError`, `WireType`, `UnknownField` / `UnknownPayload`. Library users depend on this crate; generated message code imports it for traits, accessor return types, and error handling. |
 | **`puroro-rt`** | **Generated-code runtime** — composable field catalog (`fields::*`, `MessageCommon`), wire encode/decode helpers (`encode` / `decode` modules), `ProtoDefault`, and allocator-aware string/bytes utilities. Generated crates depend on it **internally**; library users of generated messages must not need to name or import it (see [§4](#public-signatures-must-not-surface-puroro-rt)). Semver is looser than `puroro`. See [IMPLEMENTATION.md §4](IMPLEMENTATION.md#4-shared-infrastructure). |
-| **Code generator** (`protoc` plugin) | Reads `.proto` input (via `protoc`) and emits Rust source implementing the API defined in this document. **Primary execution path:** register as a `protoc` plugin (`--puroro_out=…`). Other invocation styles (standalone CLI, `build.rs` wrapper, etc.) are permitted but not required. Emits fully-qualified paths into both `::puroro::…` (traits, `Optional`, errors) and `::puroro_rt::…` (field catalog, wire helpers). |
+| **Code generator** (`protoc` plugin) | Reads `.proto` input (via `protoc`) and emits Rust source implementing the API defined in this document. **Primary execution path:** register as a `protoc` plugin (`--puroro_out=…`). Other invocation styles (standalone CLI, `build.rs` wrapper, etc.) are permitted but not required. External crates are named with leading-`::` paths (`::puroro::…`, `::puroro_rt::…`); names inside the generated module forest use `self::_root::…` ([Path qualification](#path-qualification)). |
 
 **Reference schema.** The `Task` and `Address` messages in [§4 Reference schema](#reference-schema) are the **canonical examples** for describing and reviewing generated code. All field-pattern subsections (§4.1–4.10) and [IMPLEMENTATION.md](IMPLEMENTATION.md) use this same schema unless noted otherwise.
 
@@ -235,13 +236,45 @@ Generated Rust is not hand-edited; the plugin still emits **section banners, pro
 
 Message-typed *fields* (e.g. `Address assignee`) reference sibling generated types by path; they do **not** by themselves create a nested module under the parent message.
 
-**Why collisions exist.** Protobuf simple names are case-sensitive and must be unique among entities in the same message scope ([language spec](https://protobuf.dev/reference/protobuf/proto3-spec/#message_definition)), but distinct names can still collapse after Rust mapping (e.g. nested `Notification` vs `oneof notification` → same PascalCase / snake_case). Separately, a package segment can collide with a message module (`package example.task` vs `message Task` in `package example` → both want `example::task`). Rust has no nested type definitions inside structs, so nesting is expressed with modules and shares that namespace with packages.
+**Shared module paths.** Distinct proto identities may map to the same Rust module path (e.g. `package example.task` and `message Task` in `package example` both want `example::task`). The generator **merges** contributors into one module rather than rejecting the path up front. Item-level name clashes inside that module are left to `rustc` (and may later gain sharper generate-time diagnostics). The generator does **not** silently mangle names or make `_`-prefixed modules the normal public API — except the reserved private `_root` alias used for path qualification ([below](#path-qualification)).
 
-**Policy: idiomatic paths by default; fail on collision.** The generator emits the default mapping above. If two distinct proto identities would occupy the same Rust module or type path, generation **errors** and reports the conflicting identities and the collided Rust path. The generator does **not** silently mangle names, does not use conditional `pub use` into a shared namespace, and does not make `_`-prefixed or other non-idiomatic modules the normal public API.
-
-**Generate-time renames.** Collisions (and other deliberate path choices) are resolved with **generator / plugin options supplied at generate time** — not with options embedded in the `.proto` file. A rename rule identifies a proto entity by a stable logical name (typically its protobuf FQN / path) and substitutes a Rust module or type-path segment. Initial scope is **module and type path elements**; field accessor renames are out of scope until needed.
+**Generate-time renames.** Deliberate path choices (and disambiguation when a merge is undesirable) use **generator / plugin options supplied at generate time** — not options embedded in the `.proto` file. A rename rule identifies a proto entity by a stable logical name (typically its protobuf FQN / path) and substitutes a Rust module or type-path segment. Initial scope is **module and type path elements**; field accessor renames are out of scope until needed.
 
 [`sample-generated/`](sample-generated/) currently keeps a flat module layout (no `example::` package prefix) for readability; production plugin output follows this section.
+
+### Path qualification
+
+Generated code must not rely on ambient `use` imports for the items it references. A `.proto` schema can introduce almost any identifier, so short names in generated output risk colliding with user code in the same scope.
+
+**Two namespaces, two spellings.**
+
+| Referent | Spelling in generated code |
+|---|---|
+| External crates (`puroro`, `puroro-rt`, `core`, `alloc`, `bytes`, `allocator_api2`, `bitvec`, …) | Leading-`::` absolute path, e.g. `::puroro::Message`, `::puroro_rt::SingularField` |
+| Types / modules inside the **same generated forest** | `self::_root::…` from the forest root, e.g. `self::_root::example::v1::address::Address` |
+| Nearby relatives in the same parent (`pub use empty::Empty`, child `mod` names, …) | Ordinary relative paths are fine |
+
+**Why not `::` or `crate::` for generated names.** The forest may be the crate root (`lib.rs` of a generated crate) **or** an embedded submodule (`mod generated { include!(…) }` / a single `.rs` dropped into an app crate). Leading `::` / `crate::` always mean the **host** crate root, so they break under embedding. `self::_root` is stable in both layouts.
+
+**How `_root` is wired.** Layout injects a private `mod _root` into every forest module:
+
+```rust
+// Forest root
+mod _root {
+    pub(super) use super::*;
+}
+
+// Every nested module
+mod _root {
+    pub(super) use super::super::_root::*;
+}
+```
+
+From inside the nested `_root` submodule, `super::super::_root` always reaches the parent's alias (the extra `super` accounts for `_root` itself). Each module therefore spells the forest root as `self::_root`, at any depth.
+
+**Reserved `_`-prefixed names** introduced by the generator (`_root`, `_common`, …) are exempt from proto-derived naming and must not be treated as public API.
+
+**Crate split.** Items from [§3](#3-runtime-trait-api) (`Message`, `Optional`, `HasDefault`, `DecodeError`, …) are emitted as `::puroro::…`. Field catalog types, `MessageCommon`, wire helpers, and `ProtoDefault` are emitted as `::puroro_rt::…`. A generated crate's `Cargo.toml` lists both dependencies; end-user application code should not add `puroro-rt` directly.
 
 ### Public signatures must not surface `puroro-rt`
 
@@ -1140,9 +1173,9 @@ puroro is a greenfield design. Generated types, trait names, and module layout a
 
 Groups (`SGroup` / `EGroup`) are not generated and are not stored in unknown fields. If a decoder encounters a group tag on the wire, it may return `DecodeError::InvalidTag`, skip the field, or panic — preserving group payloads for round-trip is explicitly out of scope.
 
-### Module layout: package-first, rename on collision
+### Module layout: package-first, rename when needed
 
-Protobuf `package` is the primary Rust module hierarchy. Message and oneof nesting use idiomatic snake_case submodules under that tree. Case-folding and package-vs-message module clashes are rejected at generate time rather than papered over with non-idiomatic public names or conditional re-exports; users disambiguate with generate-time rename options (not `.proto` options). Details: [§4 Module layout and naming](#module-layout-and-naming).
+Protobuf `package` is the primary Rust module hierarchy. Message and oneof nesting use idiomatic snake_case submodules under that tree. Distinct proto identities that map to the same Rust module path are **merged**; item-level clashes are left to `rustc`. Users who want a different path use generate-time rename options (not `.proto` options). Cross-references inside the forest use `self::_root::…`. Details: [§4 Module layout and naming](#module-layout-and-naming), [Path qualification](#path-qualification).
 
 ### `protoc` plugin as the primary codegen path
 

@@ -2,6 +2,10 @@
 //!
 //! Layout never splits `mod` blocks that appear inside [`ModuleNode::items`](super::ModuleNode::items);
 //! only forest `children` are eligible for file splitting.
+//!
+//! Every emitted module also gets a private `_root` alias so generated code can
+//! name peers as `self::_root::…` regardless of nesting depth or whether the
+//! forest is the crate root or an embedded submodule.
 
 use super::ModuleForest;
 use super::ModuleNode;
@@ -30,19 +34,30 @@ pub fn render(forest: &ModuleForest, layout: &ModuleLayout) -> Result<Vec<Respon
 
 /// Expand `forest` into one source file with nested `pub mod` blocks.
 pub fn render_single_file(forest: &ModuleForest, path: &str) -> Result<ResponseFile> {
-    let tokens = render_node_body(forest.root());
+    let tokens = render_node_body(forest.root(), /* is_forest_root */ true);
     Ok(ResponseFile {
         name: path.to_owned(),
         content: tokens_to_source(tokens)?,
     })
 }
 
-fn render_node_body(node: &ModuleNode) -> TokenStream {
+fn render_node_body(node: &ModuleNode, is_forest_root: bool) -> TokenStream {
+    let root_alias = root_alias_mod(is_forest_root);
     let items = node.items().clone();
     let child_mods = node.children().iter().map(render_child_mod);
-    quote! {
-        #items
-        #(#child_mods)*
+    if is_forest_root {
+        // Inner attributes (`#![…]`) in `items` must stay at the top of the file.
+        quote! {
+            #items
+            #root_alias
+            #(#child_mods)*
+        }
+    } else {
+        quote! {
+            #root_alias
+            #items
+            #(#child_mods)*
+        }
     }
 }
 
@@ -50,10 +65,33 @@ fn render_child_mod(child: &ModuleNode) -> TokenStream {
     let name = child
         .name()
         .expect("layout-eligible child modules must be named");
-    let body = render_node_body(child);
+    let body = render_node_body(child, /* is_forest_root */ false);
     quote! {
         pub mod #name {
             #body
+        }
+    }
+}
+
+/// Private alias of the generated forest root, visible as `self::_root` everywhere.
+///
+/// - Forest root: re-exports the root module's public items.
+/// - Nested module: chains to the parent's `_root` via `super::super` (the extra
+///   `super` accounts for this `_root` submodule itself).
+fn root_alias_mod(is_forest_root: bool) -> TokenStream {
+    if is_forest_root {
+        quote! {
+            #[allow(unused_imports)]
+            mod _root {
+                pub(super) use super::*;
+            }
+        }
+    } else {
+        quote! {
+            #[allow(unused_imports)]
+            mod _root {
+                pub(super) use super::super::_root::*;
+            }
         }
     }
 }
@@ -98,6 +136,9 @@ mod tests {
         assert!(file.content.contains("pub mod empty"));
         assert!(file.content.contains("pub struct Empty"));
         assert!(file.content.contains("allow"));
+        assert!(file.content.contains("mod _root"));
+        assert!(file.content.contains("use super::*;"));
+        assert!(file.content.contains("use super::super::_root::*;"));
     }
 
     #[test]
@@ -122,5 +163,30 @@ mod tests {
         assert!(file.content.contains("pub struct Status"));
         assert!(file.content.contains("pub mod task"));
         assert!(file.content.contains("pub struct Task"));
+        // Nested modules chain `_root` upward.
+        assert!(file.content.contains("use super::super::_root::*;"));
+    }
+
+    #[test]
+    fn nested_module_can_name_peer_via_self_root() {
+        let mut forest = ModuleForest::new();
+        let parent = forest.ensure_package("example");
+        let address = parent.get_or_insert_child(type_name_to_module_ident("Address"));
+        address.append_items(quote! {
+            pub struct Address;
+        });
+        let task = parent.get_or_insert_child(type_name_to_module_ident("Task"));
+        // Simulate a cross-type reference the way real codegen will emit it.
+        task.append_items(quote! {
+            pub type Assignee = self::_root::example::address::Address;
+        });
+
+        let file = render_single_file(&forest, "lib.rs").unwrap();
+        assert!(
+            file.content
+                .contains("self::_root::example::address::Address")
+        );
+        // Compiles as a snippet when parsed: already validated by tokens_to_source.
+        let _ = file;
     }
 }
