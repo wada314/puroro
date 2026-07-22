@@ -11,7 +11,7 @@ pub mod module_tree;
 pub mod plugin_io;
 pub mod resolved;
 
-pub use crate::descriptor::{CodegenMeta, CodegenRequest};
+pub use crate::descriptor::{CodegenMeta, CodegenRequest, ProtoFqn};
 pub use crate::error::{Error, Result};
 pub use crate::plugin_io::{CodeGeneratorResponse, ResponseFile};
 

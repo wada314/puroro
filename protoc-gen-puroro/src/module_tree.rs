@@ -11,6 +11,7 @@
 
 pub mod layout;
 
+use crate::descriptor::ProtoFqn;
 use ::proc_macro2::{Ident, TokenStream};
 use ::std::mem;
 
@@ -45,12 +46,12 @@ pub enum ModuleOrigin {
     PackageSegment { package: String },
     /// Message implementation module (`struct` + `FIELD_*` / visitors / impls).
     Message {
-        /// Protobuf FQN, typically with a leading `.` (e.g. `.example.Task`).
-        proto_fqn: String,
+        /// Absolute protobuf FQN (e.g. `.example.Task`).
+        proto_fqn: ProtoFqn,
     },
     /// Oneof submodule under a message module.
     Oneof {
-        message_fqn: String,
+        message_fqn: ProtoFqn,
         oneof_name: String,
     },
 }
@@ -195,15 +196,6 @@ pub fn type_name_to_module_ident(type_name: &str) -> Ident {
     Ident::new(&to_snake_case(type_name), ::proc_macro2::Span::call_site())
 }
 
-/// Build a protobuf FQN with leading `.` (`package` may be empty).
-pub fn proto_fqn(package: &str, type_name: &str) -> String {
-    if package.is_empty() {
-        format!(".{type_name}")
-    } else {
-        format!(".{package}.{type_name}")
-    }
-}
-
 fn to_snake_case(input: &str) -> String {
     let mut out = String::new();
     for (i, c) in input.chars().enumerate() {
@@ -224,6 +216,7 @@ fn to_snake_case(input: &str) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::descriptor::ProtoFqn;
     use ::quote::quote;
 
     #[test]
@@ -256,7 +249,7 @@ mod tests {
         let task =
             example.get_or_insert_child(Ident::new("task", ::proc_macro2::Span::call_site()));
         task.add_origin(ModuleOrigin::Message {
-            proto_fqn: ".example.Task".into(),
+            proto_fqn: ProtoFqn::parse(".example.Task"),
         });
         task.append_items(quote! { pub struct Task; });
 
@@ -270,7 +263,7 @@ mod tests {
             package: "example.task".into(),
         }));
         assert!(task.origins().contains(&ModuleOrigin::Message {
-            proto_fqn: ".example.Task".into(),
+            proto_fqn: ProtoFqn::parse(".example.Task"),
         }));
         assert!(!task.items().is_empty());
     }
@@ -293,7 +286,5 @@ mod tests {
     fn snake_case_helpers() {
         assert_eq!(to_snake_case("Task"), "task");
         assert_eq!(to_snake_case("FooBar"), "foo_bar");
-        assert_eq!(proto_fqn("", "Empty"), ".Empty");
-        assert_eq!(proto_fqn("example.v1", "Task"), ".example.v1.Task");
     }
 }

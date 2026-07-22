@@ -1,9 +1,13 @@
 //! Descriptor subset decoded from `CodeGeneratorRequest`.
 //!
 //! This is a read-only view of the protobuf descriptors protoc sends — not a
-//! faithful reproduction of every `google.protobuf.*` field. Type names on
-//! fields are still strings here; resolve them into [`crate::resolved::FileSet`]
-//! via [`crate::resolved::resolve`].
+//! faithful reproduction of every `google.protobuf.*` field. Message/enum type
+//! names are absolute [`ProtoFqn`] values; resolve the full graph into
+//! [`crate::resolved::FileSet`] via [`crate::resolved::resolve`].
+
+mod proto_fqn;
+
+pub use proto_fqn::ProtoFqn;
 
 /// Plugin / generate-time metadata (not part of the type graph).
 ///
@@ -52,8 +56,8 @@ pub struct FieldDesc {
     pub number: i32,
     pub label: FieldLabel,
     pub type_: FieldType,
-    /// Set for `TYPE_MESSAGE` / `TYPE_ENUM` / `TYPE_GROUP` (protobuf FQN, often with leading `.`).
-    pub type_name: Option<String>,
+    /// Set for `TYPE_MESSAGE` / `TYPE_ENUM` / `TYPE_GROUP` (absolute FQN).
+    pub type_name: Option<ProtoFqn>,
     /// Index into the parent message's `oneofs`, when this field is a oneof member.
     pub oneof_index: Option<i32>,
     pub proto3_optional: bool,

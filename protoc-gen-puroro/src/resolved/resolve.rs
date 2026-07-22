@@ -1,10 +1,7 @@
 //! Build a [`FileSet`](super::FileSet) inside a caller-owned [`Arena`](super::Arena).
 
-use super::{
-    Arena, Enum, EnumValue, Field, File, FileSet, Message, Oneof, TypeItem, TypeRef, join_fqn,
-    normalise_fqn,
-};
-use crate::descriptor::{EnumDesc, FieldDesc, FieldType, MessageDesc, ProtoFile};
+use super::{Arena, Enum, EnumValue, Field, File, FileSet, Message, Oneof, TypeItem, TypeRef};
+use crate::descriptor::{EnumDesc, FieldDesc, FieldType, MessageDesc, ProtoFile, ProtoFqn};
 use crate::error::{Error, Result};
 use ::std::cell::OnceCell;
 use ::std::collections::HashMap;
@@ -14,7 +11,7 @@ use ::std::collections::HashMap;
 /// Plugin metadata ([`crate::descriptor::CodegenMeta`]) is intentionally unused
 /// here — keep it beside the returned `FileSet` and pass both by reference.
 pub fn resolve<'a>(arena: &'a Arena, proto_files: &[ProtoFile]) -> Result<FileSet<'a>> {
-    let mut types_by_fqn: HashMap<String, TypeItem<'a>> = HashMap::new();
+    let mut types_by_fqn: HashMap<ProtoFqn, TypeItem<'a>> = HashMap::new();
     let mut files = Vec::with_capacity(proto_files.len());
 
     // Pass 1: allocate every message/enum node and register by FQN.
@@ -36,7 +33,7 @@ pub fn resolve<'a>(arena: &'a Arena, proto_files: &[ProtoFile]) -> Result<FileSe
 fn register_file<'a>(
     arena: &'a Arena,
     proto: &ProtoFile,
-    types_by_fqn: &mut HashMap<String, TypeItem<'a>>,
+    types_by_fqn: &mut HashMap<ProtoFqn, TypeItem<'a>>,
 ) -> Result<&'a File<'a>> {
     let mut messages = Vec::with_capacity(proto.messages.len());
     for desc in &proto.messages {
@@ -77,11 +74,11 @@ fn register_message<'a>(
     package: &str,
     outer_path: &[&str],
     parent: Option<&'a Message<'a>>,
-    types_by_fqn: &mut HashMap<String, TypeItem<'a>>,
+    types_by_fqn: &mut HashMap<ProtoFqn, TypeItem<'a>>,
 ) -> Result<&'a Message<'a>> {
     let mut path = outer_path.to_vec();
     path.push(desc.name.as_str());
-    let fqn = join_fqn(package, &path);
+    let fqn = ProtoFqn::from_package_path(package, &path);
 
     if types_by_fqn.contains_key(&fqn) {
         return Err(Error::Codegen(format!(
@@ -149,11 +146,11 @@ fn register_enum<'a>(
     package: &str,
     outer_path: &[&str],
     parent: Option<&'a Message<'a>>,
-    types_by_fqn: &mut HashMap<String, TypeItem<'a>>,
+    types_by_fqn: &mut HashMap<ProtoFqn, TypeItem<'a>>,
 ) -> Result<&'a Enum<'a>> {
     let mut path = outer_path.to_vec();
     path.push(desc.name.as_str());
-    let fqn = join_fqn(package, &path);
+    let fqn = ProtoFqn::from_package_path(package, &path);
 
     if types_by_fqn.contains_key(&fqn) {
         return Err(Error::Codegen(format!(
@@ -182,7 +179,7 @@ fn register_enum<'a>(
 
 fn fill_file_fields<'a>(
     proto: &ProtoFile,
-    types_by_fqn: &HashMap<String, TypeItem<'a>>,
+    types_by_fqn: &HashMap<ProtoFqn, TypeItem<'a>>,
 ) -> Result<()> {
     for desc in &proto.messages {
         fill_message_fields(desc, &proto.package, &[], types_by_fqn)?;
@@ -194,11 +191,11 @@ fn fill_message_fields<'a>(
     desc: &MessageDesc,
     package: &str,
     outer_path: &[&str],
-    types_by_fqn: &HashMap<String, TypeItem<'a>>,
+    types_by_fqn: &HashMap<ProtoFqn, TypeItem<'a>>,
 ) -> Result<()> {
     let mut path = outer_path.to_vec();
     path.push(desc.name.as_str());
-    let fqn = join_fqn(package, &path);
+    let fqn = ProtoFqn::from_package_path(package, &path);
 
     let TypeItem::Message(message) = types_by_fqn.get(&fqn).copied().ok_or_else(|| {
         Error::Codegen(format!(
@@ -228,12 +225,12 @@ fn fill_message_fields<'a>(
 
 fn resolve_field<'a>(
     field: &FieldDesc,
-    owner_fqn: &str,
-    types_by_fqn: &HashMap<String, TypeItem<'a>>,
+    owner_fqn: &ProtoFqn,
+    types_by_fqn: &HashMap<ProtoFqn, TypeItem<'a>>,
 ) -> Result<Field<'a>> {
     let type_ref = match field.type_ {
         FieldType::Message | FieldType::Group => {
-            let type_name = field.type_name.as_deref().ok_or_else(|| {
+            let type_name = field.type_name.as_ref().ok_or_else(|| {
                 Error::Codegen(format!(
                     "field `{owner_fqn}.{}` has message type but no type_name",
                     field.name
@@ -248,7 +245,7 @@ fn resolve_field<'a>(
             TypeRef::Message(target)
         }
         FieldType::Enum => {
-            let type_name = field.type_name.as_deref().ok_or_else(|| {
+            let type_name = field.type_name.as_ref().ok_or_else(|| {
                 Error::Codegen(format!(
                     "field `{owner_fqn}.{}` has enum type but no type_name",
                     field.name
@@ -281,20 +278,20 @@ fn resolve_field<'a>(
 }
 
 fn lookup_message<'a>(
-    type_name: &str,
-    types_by_fqn: &HashMap<String, TypeItem<'a>>,
+    type_name: &ProtoFqn,
+    types_by_fqn: &HashMap<ProtoFqn, TypeItem<'a>>,
 ) -> Option<&'a Message<'a>> {
-    match types_by_fqn.get(&normalise_fqn(type_name))? {
+    match types_by_fqn.get(type_name)? {
         TypeItem::Message(m) => Some(*m),
         TypeItem::Enum(_) => None,
     }
 }
 
 fn lookup_enum<'a>(
-    type_name: &str,
-    types_by_fqn: &HashMap<String, TypeItem<'a>>,
+    type_name: &ProtoFqn,
+    types_by_fqn: &HashMap<ProtoFqn, TypeItem<'a>>,
 ) -> Option<&'a Enum<'a>> {
-    match types_by_fqn.get(&normalise_fqn(type_name))? {
+    match types_by_fqn.get(type_name)? {
         TypeItem::Enum(e) => Some(*e),
         TypeItem::Message(_) => None,
     }
@@ -304,7 +301,7 @@ fn lookup_enum<'a>(
 mod tests {
     use super::*;
     use crate::descriptor::{
-        EnumDesc, EnumValueDesc, FieldDesc, FieldLabel, FieldType, MessageDesc, ProtoFile,
+        EnumDesc, EnumValueDesc, FieldDesc, FieldLabel, FieldType, MessageDesc, ProtoFile, ProtoFqn,
     };
     use ::std::ptr;
 
@@ -351,7 +348,7 @@ mod tests {
                         number: 1,
                         label: FieldLabel::Optional,
                         type_: FieldType::Message,
-                        type_name: Some(".example.Address".into()),
+                        type_name: Some(ProtoFqn::parse(".example.Address")),
                         oneof_index: None,
                         proto3_optional: true,
                     }],
@@ -407,7 +404,7 @@ mod tests {
                     number: 1,
                     label: FieldLabel::Optional,
                     type_: FieldType::Enum,
-                    type_name: Some(".example.Status".into()),
+                    type_name: Some(ProtoFqn::parse(".example.Status")),
                     oneof_index: None,
                     proto3_optional: false,
                 }],
@@ -446,7 +443,7 @@ mod tests {
                     number: 1,
                     label: FieldLabel::Optional,
                     type_: FieldType::Message,
-                    type_name: Some(".Missing".into()),
+                    type_name: Some(ProtoFqn::parse(".Missing")),
                     oneof_index: None,
                     proto3_optional: false,
                 }],
@@ -475,7 +472,7 @@ mod tests {
                         number: 1,
                         label: FieldLabel::Optional,
                         type_: FieldType::Message,
-                        type_name: Some(".B".into()),
+                        type_name: Some(ProtoFqn::parse(".B")),
                         oneof_index: None,
                         proto3_optional: false,
                     }],
@@ -490,7 +487,7 @@ mod tests {
                         number: 1,
                         label: FieldLabel::Optional,
                         type_: FieldType::Message,
-                        type_name: Some(".A".into()),
+                        type_name: Some(ProtoFqn::parse(".A")),
                         oneof_index: None,
                         proto3_optional: false,
                     }],

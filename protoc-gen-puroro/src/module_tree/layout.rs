@@ -105,7 +105,8 @@ fn tokens_to_source(tokens: TokenStream) -> Result<String> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::module_tree::{ModuleForest, ModuleOrigin, proto_fqn, type_name_to_module_ident};
+    use crate::descriptor::ProtoFqn;
+    use crate::module_tree::{ModuleForest, ModuleOrigin, type_name_to_module_ident};
     use ::quote::quote;
 
     #[test]
@@ -124,7 +125,7 @@ mod tests {
 
         let child = parent.get_or_insert_child(mod_name.clone());
         child.add_origin(ModuleOrigin::Message {
-            proto_fqn: proto_fqn("", "Empty"),
+            proto_fqn: ProtoFqn::parse(".Empty"),
         });
         child.append_items(quote! {
             pub struct Empty;

@@ -4,10 +4,10 @@
 //! is supported. That is enough to exercise the request → module forest →
 //! layout → compile → runtime pipeline before real catalog emission exists.
 
-use crate::descriptor::{CodegenRequest, MessageDesc, ProtoFile};
+use crate::descriptor::{CodegenRequest, MessageDesc, ProtoFile, ProtoFqn};
 use crate::error::{Error, Result};
 use crate::module_tree::layout::{ModuleLayout, render};
-use crate::module_tree::{ModuleForest, ModuleOrigin, proto_fqn, type_name_to_module_ident};
+use crate::module_tree::{ModuleForest, ModuleOrigin, type_name_to_module_ident};
 use crate::plugin_io::{CodeGeneratorResponse, ResponseFile};
 use ::proc_macro2::{Ident, Span};
 use ::quote::quote;
@@ -78,7 +78,7 @@ fn build_forest(proto: &ProtoFile, message: &MessageDesc) -> ModuleForest {
 
     let child = parent.get_or_insert_child(mod_name);
     child.add_origin(ModuleOrigin::Message {
-        proto_fqn: proto_fqn(&proto.package, &message.name),
+        proto_fqn: ProtoFqn::from_package_path(&proto.package, &[message.name.as_str()]),
     });
     child.append_items(empty_message::render_items(message));
 

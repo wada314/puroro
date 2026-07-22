@@ -5,7 +5,7 @@
 
 use crate::descriptor::{
     CodegenMeta, CodegenRequest, EnumDesc, EnumValueDesc, FieldDesc, FieldLabel, FieldType,
-    MessageDesc, OneofDesc, ProtoFile,
+    MessageDesc, OneofDesc, ProtoFile, ProtoFqn,
 };
 use crate::error::{Error, Result};
 use ::protobuf_core::{AsRefExtProtobuf, Field, FieldNumber, FieldValue, WriteExtProtobuf};
@@ -227,7 +227,7 @@ fn decode_field(bytes: &[u8]) -> Result<FieldDesc> {
                     type_ = FieldType::from_i32(raw).ok_or(Error::unexpected_field(5))?;
                 }
                 // optional string type_name = 6;
-                6 => type_name = Some(expect_string(&field)?),
+                6 => type_name = Some(ProtoFqn::parse(expect_string(&field)?)),
                 // optional int32 oneof_index = 9;
                 9 => oneof_index = Some(expect_int32(&field)?),
                 // optional bool proto3_optional = 17;

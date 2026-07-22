@@ -12,7 +12,7 @@ mod resolve;
 pub use arena::Arena;
 pub use resolve::resolve;
 
-use crate::descriptor::{FieldLabel, FieldType};
+use crate::descriptor::{FieldLabel, FieldType, ProtoFqn};
 use ::std::cell::OnceCell;
 use ::std::collections::HashMap;
 use ::std::fmt;
@@ -21,8 +21,8 @@ use ::std::fmt;
 #[derive(Debug)]
 pub struct FileSet<'a> {
     pub files: Vec<&'a File<'a>>,
-    /// All messages and enums keyed by normalised protobuf FQN (leading `.`).
-    pub types_by_fqn: HashMap<String, TypeItem<'a>>,
+    /// All messages and enums keyed by absolute protobuf FQN.
+    pub types_by_fqn: HashMap<ProtoFqn, TypeItem<'a>>,
 }
 
 /// One `.proto` file after resolution.
@@ -38,8 +38,8 @@ pub struct File<'a> {
 /// A message type with resolved field type handles.
 pub struct Message<'a> {
     pub name: String,
-    /// Protobuf FQN with leading `.` (e.g. `.example.v1.Task`).
-    pub fqn: String,
+    /// Absolute protobuf FQN (e.g. `.example.v1.Task`).
+    pub fqn: ProtoFqn,
     /// Enclosing message, if nested.
     pub parent: Option<&'a Message<'a>>,
     fields: OnceCell<Vec<Field<'a>>>,
@@ -91,7 +91,7 @@ pub struct Oneof {
 #[derive(Debug)]
 pub struct Enum<'a> {
     pub name: String,
-    pub fqn: String,
+    pub fqn: ProtoFqn,
     pub parent: Option<&'a Message<'a>>,
     pub values: Vec<EnumValue>,
 }
@@ -111,15 +111,17 @@ pub enum TypeItem<'a> {
 }
 
 impl<'a> FileSet<'a> {
-    pub fn message(&self, fqn: &str) -> Option<&'a Message<'a>> {
-        match self.types_by_fqn.get(&normalise_fqn(fqn))? {
+    pub fn message(&self, fqn: impl AsRef<str>) -> Option<&'a Message<'a>> {
+        let fqn = ProtoFqn::parse(fqn.as_ref());
+        match self.types_by_fqn.get(&fqn)? {
             TypeItem::Message(m) => Some(*m),
             TypeItem::Enum(_) => None,
         }
     }
 
-    pub fn enum_ty(&self, fqn: &str) -> Option<&'a Enum<'a>> {
-        match self.types_by_fqn.get(&normalise_fqn(fqn))? {
+    pub fn enum_ty(&self, fqn: impl AsRef<str>) -> Option<&'a Enum<'a>> {
+        let fqn = ProtoFqn::parse(fqn.as_ref());
+        match self.types_by_fqn.get(&fqn)? {
             TypeItem::Enum(e) => Some(*e),
             TypeItem::Message(_) => None,
         }
@@ -187,10 +189,10 @@ impl<'a> TypeRef<'a> {
 }
 
 impl<'a> TypeItem<'a> {
-    pub fn fqn(self) -> &'a str {
+    pub fn fqn(self) -> &'a ProtoFqn {
         match self {
-            Self::Message(m) => m.fqn.as_str(),
-            Self::Enum(e) => e.fqn.as_str(),
+            Self::Message(m) => &m.fqn,
+            Self::Enum(e) => &e.fqn,
         }
     }
 }
@@ -199,21 +201,21 @@ impl fmt::Debug for Message<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("Message")
             .field("fqn", &self.fqn)
-            .field("parent", &self.parent.map(|m| m.fqn.as_str()))
+            .field("parent", &self.parent.map(|m| &m.fqn))
             .field("fields", &self.fields.get())
             .field(
                 "nested_messages",
                 &self
                     .nested_messages
                     .get()
-                    .map(|v| v.iter().map(|m| m.fqn.as_str()).collect::<Vec<_>>()),
+                    .map(|v| v.iter().map(|m| &m.fqn).collect::<Vec<_>>()),
             )
             .field(
                 "nested_enums",
                 &self
                     .nested_enums
                     .get()
-                    .map(|v| v.iter().map(|e| e.fqn.as_str()).collect::<Vec<_>>()),
+                    .map(|v| v.iter().map(|e| &e.fqn).collect::<Vec<_>>()),
             )
             .field("oneofs", &self.oneofs)
             .finish()
@@ -251,29 +253,4 @@ impl fmt::Debug for TypeItem<'_> {
             Self::Enum(e) => write!(f, "Enum({})", e.fqn),
         }
     }
-}
-
-/// Ensure a protobuf FQN uses a leading `.`.
-pub fn normalise_fqn(name: &str) -> String {
-    if name.starts_with('.') {
-        name.to_owned()
-    } else {
-        format!(".{name}")
-    }
-}
-
-/// Build a type FQN from package + nested name path segments.
-pub fn join_fqn(package: &str, path_from_package: &[&str]) -> String {
-    let mut out = String::from(".");
-    if !package.is_empty() {
-        out.push_str(package);
-        out.push('.');
-    }
-    for (i, segment) in path_from_package.iter().enumerate() {
-        if i != 0 {
-            out.push('.');
-        }
-        out.push_str(segment);
-    }
-    out
 }
