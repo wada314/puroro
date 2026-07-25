@@ -2,13 +2,81 @@
     "version": "2.0.0",
     "tasks": [
         {
+            "label": "cargo: build (workspace)",
             "type": "cargo",
             "command": "build",
+            "args": [
+                "--workspace",
+                "--all-targets"
+            ],
             "problemMatcher": [
                 "$rustc"
             ],
-            "group": "build",
-            "label": "rust: cargo build"
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "options": {
+                "env": {
+                    "PROTOC": "${env:HOME}/.local/protoc/bin/protoc",
+                    "PATH": "${env:HOME}/.local/protoc/bin:${env:PATH}"
+                }
+            }
+        },
+        {
+            "label": "cargo: test (workspace)",
+            "type": "cargo",
+            "command": "test",
+            "args": [
+                "--workspace",
+                "--all-targets"
+            ],
+            "problemMatcher": [
+                "$rustc"
+            ],
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "options": {
+                "env": {
+                    "PROTOC": "${env:HOME}/.local/protoc/bin/protoc",
+                    "PATH": "${env:HOME}/.local/protoc/bin:${env:PATH}"
+                }
+            }
+        },
+        {
+            "label": "cargo: clippy (workspace)",
+            "type": "cargo",
+            "command": "clippy",
+            "args": [
+                "--workspace",
+                "--all-targets",
+                "--",
+                "-D",
+                "warnings"
+            ],
+            "problemMatcher": [
+                "$rustc"
+            ],
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "options": {
+                "env": {
+                    "PROTOC": "${env:HOME}/.local/protoc/bin/protoc",
+                    "PATH": "${env:HOME}/.local/protoc/bin:${env:PATH}"
+                }
+            }
         }
     ]
 }
