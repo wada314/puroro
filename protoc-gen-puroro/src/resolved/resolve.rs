@@ -137,6 +137,7 @@ fn register_message<'a>(
         nested_messages,
         nested_enums,
         oneofs,
+        map_entry: desc.map_entry,
     });
     types_by_fqn.insert(fqn.clone(), TypeItem::Message(message));
 
@@ -358,10 +359,11 @@ fn resolve_field<'a>(
         })?,
     };
 
+    let occurrence = resolve_occurrence(field, syntax, editions_features.as_ref(), &type_ref);
     Ok(Field {
         name: field.name.clone(),
         number: field.number,
-        occurrence: resolve_occurrence(field, syntax, editions_features.as_ref()),
+        occurrence,
         type_ref,
         oneof_index: field.oneof_index,
         utf8_validation: resolve_utf8_validation(field, syntax, editions_features.as_ref()),
@@ -372,8 +374,14 @@ fn resolve_occurrence(
     field: &FieldDesc,
     syntax: Syntax,
     editions_features: Option<&FeatureSet>,
+    type_ref: &TypeRef<'_>,
 ) -> FieldOccurrence {
     if field.label == FieldLabel::Repeated {
+        if let TypeRef::Message(entry) = type_ref
+            && entry.is_map_entry()
+        {
+            return FieldOccurrence::Map;
+        }
         let encoding = match syntax {
             Syntax::Editions(_) => editions_features
                 .expect("Editions features computed above")
@@ -481,6 +489,7 @@ mod tests {
             nested_messages: vec![],
             nested_enums: vec![],
             oneofs: vec![],
+            map_entry: false,
         }
     }
 
@@ -565,6 +574,7 @@ mod tests {
                     nested_messages: vec![],
                     nested_enums: vec![],
                     oneofs: vec![],
+                    map_entry: false,
                 },
             ],
             vec![],
@@ -601,6 +611,7 @@ mod tests {
                 nested_messages: vec![empty_msg("Inner")],
                 nested_enums: vec![],
                 oneofs: vec![],
+                map_entry: false,
             }],
             vec![],
         )];
@@ -637,6 +648,7 @@ mod tests {
                 nested_messages: vec![],
                 nested_enums: vec![],
                 oneofs: vec![],
+                map_entry: false,
             }],
             vec![EnumDesc {
                 name: "Status".into(),
@@ -689,6 +701,7 @@ mod tests {
                 nested_messages: vec![],
                 nested_enums: vec![],
                 oneofs: vec![],
+                map_entry: false,
             }],
             vec![],
         )];
@@ -719,6 +732,7 @@ mod tests {
                     nested_messages: vec![],
                     nested_enums: vec![],
                     oneofs: vec![],
+                    map_entry: false,
                 },
                 MessageDesc {
                     name: "B".into(),
@@ -736,6 +750,7 @@ mod tests {
                     nested_messages: vec![],
                     nested_enums: vec![],
                     oneofs: vec![],
+                    map_entry: false,
                 },
             ],
             vec![],
@@ -822,6 +837,7 @@ mod tests {
                                 name: "which".into(),
                             },
                         ],
+                        map_entry: false,
                     },
                 ],
                 vec![],
@@ -838,6 +854,7 @@ mod tests {
                     nested_messages: vec![],
                     nested_enums: vec![],
                     oneofs: vec![],
+                    map_entry: false,
                 }],
                 vec![],
             ),
@@ -891,6 +908,7 @@ mod tests {
                 nested_messages: vec![],
                 nested_enums: vec![],
                 oneofs: vec![],
+                map_entry: false,
             }],
             vec![],
         )];
@@ -930,6 +948,7 @@ mod tests {
                 nested_messages: vec![],
                 nested_enums: vec![],
                 oneofs: vec![],
+                map_entry: false,
             }],
             vec![],
         );
@@ -996,6 +1015,7 @@ mod tests {
                 nested_messages: vec![],
                 nested_enums: vec![],
                 oneofs: vec![],
+                map_entry: false,
             }],
             enums: vec![],
         };
@@ -1096,6 +1116,7 @@ mod tests {
                     nested_messages: vec![],
                     nested_enums: vec![],
                     oneofs: vec![],
+                    map_entry: false,
                 },
             ],
             vec![],
@@ -1126,6 +1147,7 @@ mod tests {
                 nested_messages: vec![empty_msg("G")],
                 nested_enums: vec![],
                 oneofs: vec![],
+                map_entry: false,
             }],
             vec![],
         )];
@@ -1168,6 +1190,7 @@ mod tests {
                 nested_messages: vec![],
                 nested_enums: vec![],
                 oneofs: vec![],
+                map_entry: false,
             }],
             vec![],
         )];
@@ -1182,5 +1205,78 @@ mod tests {
             fields.next().unwrap().occurrence(),
             FieldOccurrence::Repeated(RepeatedFieldEncoding::Expanded)
         );
+    }
+
+    #[test]
+    fn resolve_map_field_occurrence() {
+        let arena = Arena::new();
+        let files = [proto_file(
+            "example",
+            Syntax::Proto3,
+            vec![MessageDesc {
+                name: "Holder".into(),
+                fields: vec![FieldDesc {
+                    name: "attributes".into(),
+                    number: 1,
+                    label: FieldLabel::Repeated,
+                    type_: FieldType::Message,
+                    type_name: Some(ProtoFqn::parse(".example.Holder.AttributesEntry")),
+                    oneof_index: None,
+                    proto3_optional: false,
+                    packed: None,
+                    features: FeatureSet::default(),
+                }],
+                nested_messages: vec![MessageDesc {
+                    name: "AttributesEntry".into(),
+                    fields: vec![
+                        FieldDesc {
+                            name: "key".into(),
+                            number: 1,
+                            label: FieldLabel::Optional,
+                            type_: FieldType::String,
+                            type_name: None,
+                            oneof_index: None,
+                            proto3_optional: false,
+                            packed: None,
+                            features: FeatureSet::default(),
+                        },
+                        FieldDesc {
+                            name: "value".into(),
+                            number: 2,
+                            label: FieldLabel::Optional,
+                            type_: FieldType::Int32,
+                            type_name: None,
+                            oneof_index: None,
+                            proto3_optional: false,
+                            packed: None,
+                            features: FeatureSet::default(),
+                        },
+                    ],
+                    nested_messages: vec![],
+                    nested_enums: vec![],
+                    oneofs: vec![],
+                    map_entry: true,
+                }],
+                nested_enums: vec![],
+                oneofs: vec![],
+                map_entry: false,
+            }],
+            vec![],
+        )];
+        let file_set = resolve(&arena, &files).unwrap();
+        let holder = file_set
+            .lookup(".example.Holder")
+            .unwrap()
+            .as_message()
+            .unwrap();
+        let entry = file_set
+            .lookup(".example.Holder.AttributesEntry")
+            .unwrap()
+            .as_message()
+            .unwrap();
+        assert!(entry.is_map_entry());
+        let field = holder.fields().next().unwrap();
+        assert_eq!(field.occurrence(), FieldOccurrence::Map);
+        assert!(ptr::eq(field.type_ref().as_message().unwrap(), entry));
     }
 }

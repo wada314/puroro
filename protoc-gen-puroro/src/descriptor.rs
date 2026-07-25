@@ -82,6 +82,8 @@ pub struct MessageDesc {
     pub nested_messages: Vec<MessageDesc>,
     pub nested_enums: Vec<EnumDesc>,
     pub oneofs: Vec<OneofDesc>,
+    /// `MessageOptions.map_entry` — synthetic map entry type (not user-facing).
+    pub map_entry: bool,
 }
 
 /// A field (`FieldDescriptorProto` subset).

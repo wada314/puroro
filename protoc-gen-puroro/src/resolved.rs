@@ -31,6 +31,8 @@ pub enum FieldOccurrence {
     /// Non-packable types (string / bytes / message) still carry a value, but
     /// codegen always emits expanded wire helpers for those.
     Repeated(RepeatedFieldEncoding),
+    /// `map<K, V>` — `type_ref` is the synthetic map-entry message.
+    Map,
 }
 
 /// Presence policy for a singular field (matches puroro-rt markers; no BIT yet).
@@ -76,6 +78,8 @@ pub struct Message<'a> {
     nested_messages: Vec<&'a Message<'a>>,
     nested_enums: Vec<&'a Enum<'a>>,
     oneofs: Vec<Oneof>,
+    /// Synthetic map entry (`MessageOptions.map_entry = true`).
+    map_entry: bool,
 }
 
 /// A field with a resolved [`TypeRef`].
@@ -222,6 +226,11 @@ impl<'a> Message<'a> {
 
     pub fn oneofs(&self) -> impl Iterator<Item = &Oneof> + '_ {
         self.oneofs.iter()
+    }
+
+    /// Whether this is a synthetic map-entry message (not emitted as a user type).
+    pub fn is_map_entry(&self) -> bool {
+        self.map_entry
     }
 }
 

@@ -5,7 +5,7 @@ use super::{
     field_number_const, value_bit_const,
 };
 use crate::error::{Error, Result};
-use crate::resolved::{Field, FieldOccurrence, Message, SingularPresence};
+use crate::resolved::{Field, FieldOccurrence, Message, SingularPresence, TypeRef};
 use ::std::collections::HashMap;
 
 /// Per-message catalog plan: members in struct order + total presence bits.
@@ -93,7 +93,8 @@ impl<'a> PlannedOneof<'a> {
 /// value bit. Struct member order places each oneof group at its lowest field
 /// number; remaining fields keep numeric order.
 ///
-/// Custom defaults and map entries are not represented yet. Editions
+/// Map fields become [`FieldKind::Map`]; synthetic map-entry nested messages are
+/// still present on the resolved graph but skipped at emit. Editions
 /// `enum_type`, `repeated_field_encoding`, and `utf8_validation` come from the
 /// resolved field / enum.
 pub fn plan_message<'a>(message: &'a Message<'a>) -> Result<MessagePlan<'a>> {
@@ -190,7 +191,6 @@ pub fn plan_message<'a>(message: &'a Message<'a>) -> Result<MessagePlan<'a>> {
 }
 
 fn plan_field<'a>(field: &'a Field<'a>, next_bit: &mut usize) -> Result<PlannedField<'a>> {
-    let wire = WireTypeKind::from_field(field);
     let field_const = field_number_const(field.name());
 
     if field.number() <= 0 {
@@ -202,7 +202,9 @@ fn plan_field<'a>(field: &'a Field<'a>, next_bit: &mut usize) -> Result<PlannedF
     }
 
     let kind = match field.occurrence() {
+        FieldOccurrence::Map => plan_map_field(field)?,
         FieldOccurrence::Repeated(encoding) => {
+            let wire = WireTypeKind::from_field(field);
             // Non-packable types cannot use packed wire form regardless of feature.
             let encoding = if wire.is_packable() {
                 RepeatedEncodingKind::from_resolved(encoding)
@@ -212,6 +214,7 @@ fn plan_field<'a>(field: &'a Field<'a>, next_bit: &mut usize) -> Result<PlannedF
             FieldKind::Repeated { wire, encoding }
         }
         FieldOccurrence::Singular(presence) => {
+            let wire = WireTypeKind::from_field(field);
             let catalog_presence = CatalogPresence::from_singular(presence, field.name(), next_bit);
             let layout = if wire.is_bool() {
                 let value_bit = *next_bit;
@@ -231,14 +234,60 @@ fn plan_field<'a>(field: &'a Field<'a>, next_bit: &mut usize) -> Result<PlannedF
         }
     };
 
-    // Map fields are not distinguished in the descriptor IR yet; they appear as
-    // singular messages. Emission must reject or special-case later.
-
     Ok(PlannedField {
         field,
         field_const,
         kind,
     })
+}
+
+fn plan_map_field<'a>(field: &'a Field<'a>) -> Result<FieldKind<'a>> {
+    let TypeRef::Message(entry) = field.type_ref() else {
+        return Err(Error::Codegen(format!(
+            "map field `{}` does not resolve to a message type",
+            field.name()
+        )));
+    };
+    if !entry.is_map_entry() {
+        return Err(Error::Codegen(format!(
+            "map field `{}` type `{}` is not a map_entry message",
+            field.name(),
+            entry.fqn()
+        )));
+    }
+
+    let mut key_field = None;
+    let mut value_field = None;
+    for f in entry.fields() {
+        match f.number() {
+            1 => key_field = Some(f),
+            2 => value_field = Some(f),
+            n => {
+                return Err(Error::Codegen(format!(
+                    "map entry `{}` has unexpected field number {n}",
+                    entry.fqn()
+                )));
+            }
+        }
+    }
+    let (Some(key_field), Some(value_field)) = (key_field, value_field) else {
+        return Err(Error::Codegen(format!(
+            "map entry `{}` must have fields key=1 and value=2",
+            entry.fqn()
+        )));
+    };
+
+    let key = WireTypeKind::from_field(key_field);
+    let value = WireTypeKind::from_field(value_field);
+    // Runtime user traits currently cover `map<string, int32>` only.
+    if !matches!(key, WireTypeKind::String { .. }) || !matches!(value, WireTypeKind::Int32) {
+        return Err(Error::Codegen(format!(
+            "map field `{}`: only `map<string, int32>` is supported for now (got key={key:?}, value={value:?})",
+            field.name()
+        )));
+    }
+
+    Ok(FieldKind::Map { key, value })
 }
 
 #[cfg(test)]
@@ -297,6 +346,7 @@ mod tests {
             nested_messages: vec![],
             nested_enums: vec![],
             oneofs: vec![],
+            map_entry: false,
         }])];
         let set = resolve(&arena, &files).unwrap();
         let msg = set.lookup(".example.Empty").unwrap().as_message().unwrap();
@@ -353,6 +403,7 @@ mod tests {
             nested_messages: vec![],
             nested_enums: vec![],
             oneofs: vec![],
+            map_entry: false,
         }])];
         let set = resolve(&arena, &files).unwrap();
         let msg = set
@@ -454,6 +505,7 @@ mod tests {
             oneofs: vec![OneofDesc {
                 name: "notification".into(),
             }],
+            map_entry: false,
         }])];
         let set = resolve(&arena, &files).unwrap();
         let msg = set.lookup(".example.Task").unwrap().as_message().unwrap();
@@ -561,6 +613,7 @@ mod tests {
             nested_messages: vec![],
             nested_enums: vec![],
             oneofs: vec![],
+            map_entry: false,
         }])];
         let set = resolve(&arena, &files).unwrap();
         let msg = set.lookup(".example.R").unwrap().as_message().unwrap();
@@ -646,6 +699,7 @@ mod tests {
                 nested_messages: vec![],
                 nested_enums: vec![],
                 oneofs: vec![],
+                map_entry: false,
             }],
             enums: vec![EnumDesc {
                 name: "Priority".into(),
@@ -723,6 +777,7 @@ mod tests {
             oneofs: vec![OneofDesc {
                 name: "_score".into(),
             }],
+            map_entry: false,
         }])];
         let set = resolve(&arena, &files).unwrap();
         let msg = set.lookup(".example.T").unwrap().as_message().unwrap();
@@ -767,6 +822,7 @@ mod tests {
                 nested_messages: vec![],
                 nested_enums: vec![],
                 oneofs: vec![],
+                map_entry: false,
             }],
             enums: vec![EnumDesc {
                 name: "Status".into(),
@@ -792,5 +848,117 @@ mod tests {
             } => assert_eq!(*openness, EnumType::Open),
             other => panic!("{other:?}"),
         }
+    }
+
+    #[test]
+    fn map_string_int32_plans_map_kind() {
+        let arena = Arena::new();
+        let files = [proto3_file(vec![MessageDesc {
+            name: "Holder".into(),
+            fields: vec![field(
+                "attributes",
+                1,
+                FieldType::Message,
+                FieldLabel::Repeated,
+                false,
+                None,
+                Some(ProtoFqn::parse(".example.Holder.AttributesEntry")),
+            )],
+            nested_messages: vec![MessageDesc {
+                name: "AttributesEntry".into(),
+                fields: vec![
+                    field(
+                        "key",
+                        1,
+                        FieldType::String,
+                        FieldLabel::Optional,
+                        false,
+                        None,
+                        None,
+                    ),
+                    field(
+                        "value",
+                        2,
+                        FieldType::Int32,
+                        FieldLabel::Optional,
+                        false,
+                        None,
+                        None,
+                    ),
+                ],
+                nested_messages: vec![],
+                nested_enums: vec![],
+                oneofs: vec![],
+                map_entry: true,
+            }],
+            nested_enums: vec![],
+            oneofs: vec![],
+            map_entry: false,
+        }])];
+        let set = resolve(&arena, &files).unwrap();
+        let msg = set.lookup(".example.Holder").unwrap().as_message().unwrap();
+        let plan = plan_message(msg).unwrap();
+        assert_eq!(plan.bit_count(), 0);
+        let MessageMember::Field(attrs) = &plan.members()[0] else {
+            panic!("map must be a top-level field");
+        };
+        match attrs.kind() {
+            FieldKind::Map {
+                key: WireTypeKind::String { .. },
+                value: WireTypeKind::Int32,
+            } => {}
+            other => panic!("{other:?}"),
+        }
+    }
+
+    #[test]
+    fn unsupported_map_value_is_rejected() {
+        let arena = Arena::new();
+        let files = [proto3_file(vec![MessageDesc {
+            name: "Holder".into(),
+            fields: vec![field(
+                "labels",
+                1,
+                FieldType::Message,
+                FieldLabel::Repeated,
+                false,
+                None,
+                Some(ProtoFqn::parse(".example.Holder.LabelsEntry")),
+            )],
+            nested_messages: vec![MessageDesc {
+                name: "LabelsEntry".into(),
+                fields: vec![
+                    field(
+                        "key",
+                        1,
+                        FieldType::String,
+                        FieldLabel::Optional,
+                        false,
+                        None,
+                        None,
+                    ),
+                    field(
+                        "value",
+                        2,
+                        FieldType::String,
+                        FieldLabel::Optional,
+                        false,
+                        None,
+                        None,
+                    ),
+                ],
+                nested_messages: vec![],
+                nested_enums: vec![],
+                oneofs: vec![],
+                map_entry: true,
+            }],
+            nested_enums: vec![],
+            oneofs: vec![],
+            map_entry: false,
+        }])];
+        let set = resolve(&arena, &files).unwrap();
+        let msg = set.lookup(".example.Holder").unwrap().as_message().unwrap();
+        let err = plan_message(msg).unwrap_err().to_string();
+        assert!(err.contains("map<string, int32>"), "{err}");
     }
 }

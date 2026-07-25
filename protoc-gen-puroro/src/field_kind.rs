@@ -25,6 +25,11 @@ pub enum FieldKind<'a> {
         wire: WireTypeKind<'a>,
         encoding: RepeatedEncodingKind,
     },
+    /// `map<K, V>` — key/value wires from the synthetic entry message.
+    Map {
+        key: WireTypeKind<'a>,
+        value: WireTypeKind<'a>,
+    },
 }
 
 /// Thin `puroro_rt` wire / element marker corresponding to a protobuf type.

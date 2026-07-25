@@ -169,6 +169,7 @@ mod tests {
                 nested_messages: vec![],
                 nested_enums: vec![],
                 oneofs: vec![],
+                map_entry: false,
             }],
             enums: vec![],
         }];
@@ -199,6 +200,7 @@ mod tests {
                     nested_messages: vec![],
                     nested_enums: vec![],
                     oneofs: vec![],
+                    map_entry: false,
                 }],
                 nested_enums: vec![EnumDesc {
                     name: "Kind".into(),
@@ -209,6 +211,7 @@ mod tests {
                     features: FeatureSet::default(),
                 }],
                 oneofs: vec![],
+                map_entry: false,
             }],
             enums: vec![],
         }];

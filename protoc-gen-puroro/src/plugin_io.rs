@@ -228,6 +228,7 @@ fn decode_descriptor(bytes: &[u8]) -> Result<MessageDesc> {
         let mut nested_messages = Vec::new();
         let mut nested_enums = Vec::new();
         let mut oneofs = Vec::new();
+        let mut map_entry = false;
 
         for field in AsRefExtProtobuf::read_protobuf_fields(&bytes) {
             let field = field?;
@@ -249,6 +250,11 @@ fn decode_descriptor(bytes: &[u8]) -> Result<MessageDesc> {
                     let nested = expect_len(&field)?;
                     nested_enums.push(decode_enum(nested)?);
                 }
+                // optional MessageOptions options = 7;
+                7 => {
+                    let nested = expect_len(&field)?;
+                    map_entry = decode_message_options_map_entry(nested)?;
+                }
                 // repeated OneofDescriptorProto oneof_decl = 8;
                 8 => {
                     let nested = expect_len(&field)?;
@@ -264,8 +270,22 @@ fn decode_descriptor(bytes: &[u8]) -> Result<MessageDesc> {
             nested_messages,
             nested_enums,
             oneofs,
+            map_entry,
         })
     })
+}
+
+/// `MessageOptions`: only `map_entry` (7) is consumed today.
+fn decode_message_options_map_entry(bytes: &[u8]) -> Result<bool> {
+    let mut map_entry = false;
+    for field in AsRefExtProtobuf::read_protobuf_fields(&bytes) {
+        let field = field?;
+        // optional bool map_entry = 7;
+        if field.field_number.as_u32() == 7 {
+            map_entry = expect_bool(&field)?;
+        }
+    }
+    Ok(map_entry)
 }
 
 fn decode_field(bytes: &[u8]) -> Result<FieldDesc> {

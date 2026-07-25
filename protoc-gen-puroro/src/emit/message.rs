@@ -2,7 +2,7 @@
 //!
 //! Singular and repeated scalar / string / bytes / bool / enum / message
 //! fields (including IMPLICIT / EXPLICIT / LEGACY_REQUIRED and bool
-//! `BitPacked`), plus real oneof groups.
+//! `BitPacked`), real oneof groups, and `map<string, int32>`.
 
 use super::ident::{is_simple_ident, rust_ident, to_pascal_case};
 use super::oneof::{self, OneofEmit, OneofVariantEmit};
@@ -19,6 +19,7 @@ use ::quote::quote;
 enum FieldEmit {
     Singular(ScalarEmit),
     Repeated(RepeatedEmit),
+    Map(MapEmit),
     Oneof(OneofEmit),
 }
 
@@ -55,6 +56,19 @@ struct RepeatedEmit {
     slice_elem_ty: TokenStream,
 }
 
+struct MapEmit {
+    name: Ident,
+    name_str: String,
+    field_const: Ident,
+    number: u32,
+    key_marker: TokenStream,
+    value_marker: TokenStream,
+    /// User-facing key type in `MapRef` / `MapMut` (`str`).
+    key_view: TokenStream,
+    /// User-facing value type in `MapRef` / `MapMut` (`i32`).
+    value_view: TokenStream,
+}
+
 #[derive(Clone, Copy)]
 enum RepeatedAccessorStyle {
     /// `&[T]` + `values_mut()` → `Vec<T, A>`.
@@ -79,6 +93,7 @@ impl FieldEmit {
         match self {
             Self::Singular(f) => &f.name,
             Self::Repeated(f) => &f.name,
+            Self::Map(f) => &f.name,
             Self::Oneof(o) => &o.name,
         }
     }
@@ -87,6 +102,7 @@ impl FieldEmit {
         match self {
             Self::Singular(f) => &f.name_str,
             Self::Repeated(f) => &f.name_str,
+            Self::Map(f) => &f.name_str,
             Self::Oneof(o) => &o.name_str,
         }
     }
@@ -393,6 +409,15 @@ fn collect_fields(plan: &MessagePlan<'_>) -> Result<Vec<FieldEmit>> {
                     )));
                 }
                 match field.kind() {
+                    FieldKind::Map { key, value } => {
+                        out.push(FieldEmit::Map(map_emit(
+                            field.name(),
+                            field.field_const(),
+                            field.number(),
+                            key,
+                            value,
+                        )?));
+                    }
                     FieldKind::Repeated { wire, encoding } => {
                         out.push(FieldEmit::Repeated(repeated_emit(
                             field.name(),
@@ -525,6 +550,31 @@ fn repeated_emit(
     })
 }
 
+fn map_emit(
+    name: &str,
+    field_const: &str,
+    number: i32,
+    key: &WireTypeKind<'_>,
+    value: &WireTypeKind<'_>,
+) -> Result<MapEmit> {
+    // Mirrors `plan_map_field` — widen when `MapRef` / `MapMut` cover more pairs.
+    if !matches!(key, WireTypeKind::String { .. }) || !matches!(value, WireTypeKind::Int32) {
+        return Err(Error::Codegen(format!(
+            "map field `{name}`: only `map<string, int32>` is supported for now"
+        )));
+    }
+    Ok(MapEmit {
+        name: rust_ident(name),
+        name_str: name.to_owned(),
+        field_const: Ident::new(field_const, Span::call_site()),
+        number: number as u32,
+        key_marker: wire_marker_path(key)?,
+        value_marker: wire_marker_path(value)?,
+        key_view: quote! { str },
+        value_view: quote! { i32 },
+    })
+}
+
 fn scalar_emit(
     name: &str,
     field_const: &str,
@@ -632,7 +682,7 @@ fn render_bit_consts(fields: &[FieldEmit]) -> TokenStream {
                 }
             }
             FieldEmit::Oneof(o) => items.extend(oneof::render_bit_consts(o)),
-            FieldEmit::Repeated(_) => {}
+            FieldEmit::Repeated(_) | FieldEmit::Map(_) => {}
         }
     }
     if items.is_empty() {
@@ -657,6 +707,13 @@ fn render_field_consts(fields: &[FieldEmit]) -> TokenStream {
                 });
             }
             FieldEmit::Repeated(f) => {
+                let ident = &f.field_const;
+                let number = f.number;
+                items.push(quote! {
+                    pub const #ident: u32 = #number;
+                });
+            }
+            FieldEmit::Map(f) => {
                 let ident = &f.field_const;
                 let number = f.number;
                 items.push(quote! {
@@ -701,6 +758,15 @@ fn render_struct_fields(fields: &[FieldEmit]) -> Vec<TokenStream> {
                 let field_const = &field.field_const;
                 quote! {
                     #name: ::puroro_rt::RepeatedField<#marker, #encoding_ty, { #field_const }, A>,
+                }
+            }
+            FieldEmit::Map(field) => {
+                let name = &field.name;
+                let key = &field.key_marker;
+                let value = &field.value_marker;
+                let field_const = &field.field_const;
+                quote! {
+                    #name: ::puroro_rt::MapField<#key, #value, { #field_const }, A>,
                 }
             }
             FieldEmit::Oneof(o) => {
@@ -766,6 +832,7 @@ fn render_new_in_fields(fields: &[FieldEmit]) -> Vec<TokenStream> {
             let ctor = match field {
                 FieldEmit::Singular(_) => quote! { ::puroro_rt::SingularField::new_in },
                 FieldEmit::Repeated(_) => quote! { ::puroro_rt::RepeatedField::new_in },
+                FieldEmit::Map(_) => quote! { ::puroro_rt::MapField::new_in },
                 FieldEmit::Oneof(_) => quote! { ::puroro_rt::OneofSlot::new_in },
             };
             if i == last {
@@ -783,9 +850,31 @@ fn render_accessors(fields: &[FieldEmit]) -> Vec<TokenStream> {
         .map(|field| match field {
             FieldEmit::Repeated(field) => render_repeated_accessors(field),
             FieldEmit::Singular(field) => render_singular_accessors(field),
+            FieldEmit::Map(field) => render_map_accessors(field),
             FieldEmit::Oneof(o) => oneof::render_accessors(o),
         })
         .collect()
+}
+
+fn render_map_accessors(field: &MapEmit) -> TokenStream {
+    let name = &field.name;
+    let name_mut = Ident::new(&format!("{}_mut", field.name_str), Span::call_site());
+    let clear_name = Ident::new(&format!("clear_{}", field.name_str), Span::call_site());
+    let key_view = &field.key_view;
+    let value_view = &field.value_view;
+    quote! {
+        pub fn #name(&self) -> impl ::puroro::MapRef<#key_view, #value_view> + '_ {
+            self.#name.bind(&self._common)
+        }
+
+        pub fn #name_mut(&mut self) -> impl ::puroro::MapMut<#key_view, #value_view> + '_ {
+            self.#name.bind_mut(&mut self._common)
+        }
+
+        pub fn #clear_name(&mut self) {
+            ::puroro::MapMut::clear(&mut self.#name_mut());
+        }
+    }
 }
 
 fn render_repeated_accessors(field: &RepeatedEmit) -> TokenStream {
@@ -1033,6 +1122,17 @@ fn render_merge_arms(fields: &[FieldEmit]) -> Vec<TokenStream> {
                 });
             }
             FieldEmit::Repeated(f) => {
+                let name = &f.name;
+                let field_const = &f.field_const;
+                arms.push(quote! {
+                    #field_const => {
+                        self.#name
+                            .bind_mut(&mut self._common)
+                            .merge(wire_type, buf, depth)?;
+                    }
+                });
+            }
+            FieldEmit::Map(f) => {
                 let name = &f.name;
                 let field_const = &f.field_const;
                 arms.push(quote! {

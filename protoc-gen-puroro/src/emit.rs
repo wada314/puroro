@@ -1,9 +1,9 @@
 //! Code emission from a resolved schema.
 //!
 //! Current scope: file-level and nested enums/messages with singular / repeated
-//! scalar / string / bytes / bool / enum / message fields, plus real oneofs.
-//! All `file_to_generate` entries share one [`ModuleForest`] so cross-file type
-//! refs use a single `self::_root`.
+//! scalar / string / bytes / bool / enum / message fields, real oneofs, and
+//! `map<string, int32>`. All `file_to_generate` entries share one
+//! [`ModuleForest`] so cross-file type refs use a single `self::_root`.
 
 use crate::descriptor::CodegenRequest;
 use crate::error::{Error, Result};
@@ -123,7 +123,10 @@ fn append_message(parent: &mut ModuleNode, plan: &MessagePlan<'_>) -> Result<()>
     });
 
     let nested_enums: Vec<_> = message.nested_enums().collect();
-    let nested_messages: Vec<_> = message.nested_messages().collect();
+    let nested_messages: Vec<_> = message
+        .nested_messages()
+        .filter(|m| !m.is_map_entry())
+        .collect();
     for nested in &nested_messages {
         validate_emit_message(nested)?;
     }
@@ -195,6 +198,7 @@ mod tests {
                     nested_messages: vec![],
                     nested_enums: vec![],
                     oneofs: vec![],
+                    map_entry: false,
                 }],
                 enums: vec![],
             }],
@@ -334,6 +338,7 @@ mod tests {
                     nested_messages: vec![],
                     nested_enums: vec![],
                     oneofs: vec![],
+                    map_entry: false,
                 }],
                 enums: vec![EnumDesc {
                     name: "Status".into(),
@@ -462,6 +467,7 @@ mod tests {
                         nested_messages: vec![],
                         nested_enums: vec![],
                         oneofs: vec![],
+                        map_entry: false,
                     }],
                     enums: vec![],
                 },
@@ -536,6 +542,7 @@ mod tests {
                         nested_messages: vec![],
                         nested_enums: vec![],
                         oneofs: vec![],
+                        map_entry: false,
                     }],
                     nested_enums: vec![EnumDesc {
                         name: "Kind".into(),
@@ -552,6 +559,7 @@ mod tests {
                         features: FeatureSet::default(),
                     }],
                     oneofs: vec![],
+                    map_entry: false,
                 }],
                 enums: vec![],
             }],
@@ -630,6 +638,7 @@ mod tests {
                         features: FeatureSet::default(),
                     }],
                     oneofs: vec![],
+                    map_entry: false,
                 }],
                 enums: vec![],
             }],
@@ -664,6 +673,7 @@ mod tests {
                         nested_messages: vec![],
                         nested_enums: vec![],
                         oneofs: vec![],
+                        map_entry: false,
                     },
                     MessageDesc {
                         name: "Task".into(),
@@ -681,6 +691,7 @@ mod tests {
                         nested_messages: vec![],
                         nested_enums: vec![],
                         oneofs: vec![],
+                        map_entry: false,
                     },
                 ],
                 enums: vec![],
@@ -738,6 +749,7 @@ mod tests {
                         nested_messages: vec![],
                         nested_enums: vec![],
                         oneofs: vec![],
+                        map_entry: false,
                     },
                     MessageDesc {
                         name: "Holder".into(),
@@ -792,6 +804,7 @@ mod tests {
                         oneofs: vec![OneofDesc {
                             name: "choice".into(),
                         }],
+                        map_entry: false,
                     },
                 ],
                 enums: vec![],
@@ -807,6 +820,84 @@ mod tests {
         assert!(content.contains("fn email"));
         assert!(content.contains("fn peer"));
         assert!(content.contains("fn choice"));
+    }
+
+    #[test]
+    fn emit_map_string_int32() {
+        let request = CodegenRequest {
+            meta: CodegenMeta {
+                file_to_generate: vec!["t.proto".into()],
+                parameter: None,
+            },
+            proto_files: vec![ProtoFile {
+                name: "t.proto".into(),
+                package: String::new(),
+                syntax: Syntax::Proto3,
+                features: FeatureSet::default(),
+                dependency: vec![],
+                messages: vec![MessageDesc {
+                    name: "Holder".into(),
+                    fields: vec![FieldDesc {
+                        name: "attributes".into(),
+                        number: 1,
+                        label: FieldLabel::Repeated,
+                        type_: FieldType::Message,
+                        type_name: Some(ProtoFqn::parse(".Holder.AttributesEntry")),
+                        oneof_index: None,
+                        proto3_optional: false,
+                        packed: None,
+                        features: FeatureSet::default(),
+                    }],
+                    nested_messages: vec![MessageDesc {
+                        name: "AttributesEntry".into(),
+                        fields: vec![
+                            FieldDesc {
+                                name: "key".into(),
+                                number: 1,
+                                label: FieldLabel::Optional,
+                                type_: FieldType::String,
+                                type_name: None,
+                                oneof_index: None,
+                                proto3_optional: false,
+                                packed: None,
+                                features: FeatureSet::default(),
+                            },
+                            FieldDesc {
+                                name: "value".into(),
+                                number: 2,
+                                label: FieldLabel::Optional,
+                                type_: FieldType::Int32,
+                                type_name: None,
+                                oneof_index: None,
+                                proto3_optional: false,
+                                packed: None,
+                                features: FeatureSet::default(),
+                            },
+                        ],
+                        nested_messages: vec![],
+                        nested_enums: vec![],
+                        oneofs: vec![],
+                        map_entry: true,
+                    }],
+                    nested_enums: vec![],
+                    oneofs: vec![],
+                    map_entry: false,
+                }],
+                enums: vec![],
+            }],
+        };
+        let response = emit(&request).unwrap();
+        let content = &response.files[0].content;
+        assert!(content.contains("MapField"));
+        assert!(content.contains("ProtoString"));
+        assert!(content.contains("ProtoInt32"));
+        assert!(content.contains("MapRef"));
+        assert!(content.contains("MapMut"));
+        assert!(content.contains("fn attributes"));
+        assert!(content.contains("clear_attributes"));
+        // Synthetic map-entry message must not be emitted as a user type.
+        assert!(!content.contains("struct AttributesEntry"));
+        assert!(!content.contains("RepeatedField"));
     }
 
     #[test]
@@ -844,6 +935,7 @@ mod tests {
                     nested_messages: vec![],
                     nested_enums: vec![],
                     oneofs: vec![],
+                    map_entry: false,
                 }],
                 enums: vec![],
             }],
