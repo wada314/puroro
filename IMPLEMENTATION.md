@@ -139,9 +139,10 @@ protobuf-core           Varint, Tag, WireType
 | Type resolve (`FileSet`, `TypeRef`, presence / occurrence) | **Done** — `emit` resolves the full request before generating |
 | Module forest + `ModuleLayout::SingleFile` | **Done** (`FileTree` deferred) |
 | Empty-message emission (no fields / nested types) | **Done** — compile-tested via [`puroro-codegen-tests`](puroro-codegen-tests/) |
-| FieldKind → catalog emission (scalars, repeated, enum, oneof, map, …) | **Not started** |
+| FieldKind IR (`plan_message`, bit assignment, catalog kind) | **Done** — scalars / repeated / enum / oneof planned; map_entry & custom defaults not in IR yet |
+| FieldKind → catalog emission (struct members, accessors, visitors) | **Not started** |
 
-Live plugin output is still a **fake** path: one field-less root message per file. Emission now goes through `resolved::resolve`, but does not yet map fields to the runtime catalog. Full-featured structs in this document and in [`sample-generated/`](sample-generated/) describe the **target** shape the emitter must reach.
+Live plugin output is still a **fake** path: one field-less root message per file. Emission goes through `resolved::resolve` and [`field_kind::plan_message`](protoc-gen-puroro/src/field_kind.rs), but does not yet emit catalog field members. Full-featured structs in this document and in [`sample-generated/`](sample-generated/) describe the **target** shape the emitter must reach.
 
 ---
 
@@ -410,7 +411,7 @@ Public accessors are **one-line delegates** into catalog methods with `&self._co
 4. Trait impls — `Message`, `Clone` / `PartialEq` / `Debug` / `Drop` / `DeallocateIn` as field sums
 5. Child modules — nested types and oneof submodules named after the oneof (under the message module; package module tree is outer — see below)
 
-IR step: `ProtoField → FieldKind → catalog type + const args`.
+IR step: `ProtoField → FieldKind → catalog type + const args` — implemented as [`protoc-gen-puroro::field_kind`](protoc-gen-puroro/src/field_kind.rs) (`plan_message` assigns `FIELD_*` / `BIT_*` and builds [`MessagePlan`](protoc-gen-puroro/src/field_kind/plan.rs)).
 
 **Module tree.** Production layout follows [DESIGN.md §4 — Module layout and naming](DESIGN.md#module-layout-and-naming): `package` → nested Rust modules; each top-level message gets a snake_case submodule; oneofs get snake_case submodules under the parent message. Distinct proto identities that map to the same Rust path are **merged** into one module; item-level clashes are left to `rustc`. Deliberate path changes use a **generate-time rename** (plugin option / config — not a `.proto` option). Cross-forest references use `self::_root::…` ([Path qualification](DESIGN.md#path-qualification)). [`sample-generated/`](sample-generated/) remains flat (no package prefix) as a readable stand-in.
 
@@ -775,7 +776,7 @@ The `set_*` per-variant setters are removed, matching the other field families.
 | Recursion limit | Enforced (`RECURSION_LIMIT = 100`, `merge_from_with_depth`) | — |
 | Repeated wrappers | `RepeatedField` + `RepeatedElement` (message / bool / scalar / LEN) | — |
 | Map wrappers | `MapField` + `MapKey` / `RepeatedElement` (sample `attributes`) | — |
-| `protoc-gen-puroro` field emission | Empty message + module forest; `emit` uses `resolve` | FieldKind → catalog (scalars → nested / enum / repeated / oneof / map) |
+| `protoc-gen-puroro` field emission | Empty message; `resolve` + FieldKind plan wired | Emit catalog from `MessagePlan` (scalars → nested / enum / repeated / oneof / map) |
 | Zero-copy views | — | `TaskView<'buf>` (DESIGN.md §8) |
 | `TaskLazy` | DESIGN only | Wire buffer + on-demand decode |
 | `Hash` / `serde` | Deferred | Opt-in features |

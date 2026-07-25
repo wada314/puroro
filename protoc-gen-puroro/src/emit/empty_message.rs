@@ -1,6 +1,6 @@
 //! Fake emitter for a single field-less message's module body.
 
-use crate::resolved::Message;
+use crate::field_kind::MessagePlan;
 use ::proc_macro2::{Ident, TokenStream};
 use ::quote::quote;
 
@@ -8,9 +8,10 @@ use ::quote::quote;
 ///
 /// File headers, `#![…]`, and `pub use` into the parent namespace are the caller's
 /// responsibility (forest root / package module).
-pub(super) fn render_items(message: &Message<'_>) -> TokenStream {
-    let name = Ident::new(message.name(), ::proc_macro2::Span::call_site());
-    let name_str = message.name();
+pub(super) fn render_items(plan: &MessagePlan<'_>) -> TokenStream {
+    debug_assert!(plan.members().is_empty());
+    let name = Ident::new(plan.message().name(), ::proc_macro2::Span::call_site());
+    let name_str = plan.message().name();
     quote! {
         // Fake empty-message output from protoc-gen-puroro.
         // Field catalog emission is not implemented yet.

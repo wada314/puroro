@@ -6,6 +6,7 @@
 
 use crate::descriptor::CodegenRequest;
 use crate::error::{Error, Result};
+use crate::field_kind::{MessagePlan, plan_message};
 use crate::module_tree::layout::{ModuleLayout, render};
 use crate::module_tree::{ModuleForest, ModuleOrigin, type_name_to_module_ident};
 use crate::plugin_io::{CodeGeneratorResponse, ResponseFile};
@@ -42,7 +43,12 @@ fn find_file<'a>(file_set: &FileSet<'a>, target: &str) -> Result<&'a File<'a>> {
 
 fn emit_resolved_file<'a>(file: &'a File<'a>) -> Result<ResponseFile> {
     let message = validate_fake_file(file)?;
-    let forest = build_forest(file, message);
+    let plan = plan_message(message)?;
+    debug_assert!(
+        plan.members().is_empty() && plan.bit_count() == 0,
+        "fake generator should only see field-less plans"
+    );
+    let forest = build_forest(file, &plan);
 
     let mut files = render(
         &forest,
@@ -55,7 +61,8 @@ fn emit_resolved_file<'a>(file: &'a File<'a>) -> Result<ResponseFile> {
         .ok_or_else(|| Error::Codegen("layout produced no files".into()))
 }
 
-fn build_forest(file: &File<'_>, message: &Message<'_>) -> ModuleForest {
+fn build_forest(file: &File<'_>, plan: &MessagePlan<'_>) -> ModuleForest {
+    let message = plan.message();
     let mut forest = ModuleForest::new();
 
     // Root carries file-level docs / inner attributes.
@@ -85,7 +92,7 @@ fn build_forest(file: &File<'_>, message: &Message<'_>) -> ModuleForest {
     child.add_origin(ModuleOrigin::Message {
         proto_fqn: message.fqn().clone(),
     });
-    child.append_items(empty_message::render_items(message));
+    child.append_items(empty_message::render_items(plan));
 
     forest
 }

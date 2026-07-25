@@ -7,6 +7,7 @@
 pub mod descriptor;
 pub mod emit;
 pub mod error;
+pub mod field_kind;
 pub mod module_tree;
 pub mod plugin_io;
 pub mod resolved;
