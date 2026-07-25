@@ -298,10 +298,14 @@ mod tests {
             enums: vec![],
         }];
         let file_set = resolve(&arena, &files).unwrap();
-        let msg = file_set.message(".example.v1.Empty").unwrap();
-        assert_eq!(msg.name, "Empty");
-        assert!(msg.fields.get().unwrap().is_empty());
-        assert!(msg.parent.get().is_none());
+        let msg = file_set
+            .lookup(".example.v1.Empty")
+            .unwrap()
+            .as_message()
+            .unwrap();
+        assert_eq!(msg.name(), "Empty");
+        assert!(msg.fields().next().is_none());
+        assert!(msg.parent().is_none());
     }
 
     #[test]
@@ -332,11 +336,19 @@ mod tests {
             enums: vec![],
         }];
         let file_set = resolve(&arena, &files).unwrap();
-        let task = file_set.message(".example.Task").unwrap();
-        let address = file_set.message(".example.Address").unwrap();
-        let fields = task.fields.get().unwrap();
-        assert_eq!(fields.len(), 1);
-        assert!(ptr::eq(fields[0].type_ref.as_message().unwrap(), address));
+        let task = file_set
+            .lookup(".example.Task")
+            .unwrap()
+            .as_message()
+            .unwrap();
+        let address = file_set
+            .lookup(".example.Address")
+            .unwrap()
+            .as_message()
+            .unwrap();
+        let field = task.fields().next().unwrap();
+        assert!(task.fields().nth(1).is_none());
+        assert!(ptr::eq(field.type_ref().as_message().unwrap(), address));
     }
 
     #[test]
@@ -356,10 +368,14 @@ mod tests {
             enums: vec![],
         }];
         let file_set = resolve(&arena, &files).unwrap();
-        let outer = file_set.message(".Outer").unwrap();
-        let inner = file_set.message(".Outer.Inner").unwrap();
-        assert!(ptr::eq(*inner.parent.get().unwrap(), outer));
-        assert!(ptr::eq(outer.nested_messages[0], inner));
+        let outer = file_set.lookup(".Outer").unwrap().as_message().unwrap();
+        let inner = file_set
+            .lookup(".Outer.Inner")
+            .unwrap()
+            .as_message()
+            .unwrap();
+        assert!(ptr::eq(inner.parent().unwrap(), outer));
+        assert!(ptr::eq(outer.nested_messages().next().unwrap(), inner));
     }
 
     #[test]
@@ -393,10 +409,18 @@ mod tests {
             }],
         }];
         let file_set = resolve(&arena, &files).unwrap();
-        let task = file_set.message(".example.Task").unwrap();
-        let status = file_set.enum_ty(".example.Status").unwrap();
+        let task = file_set
+            .lookup(".example.Task")
+            .unwrap()
+            .as_message()
+            .unwrap();
+        let status = file_set
+            .lookup(".example.Status")
+            .unwrap()
+            .as_enum()
+            .unwrap();
         assert!(ptr::eq(
-            task.fields.get().unwrap()[0].type_ref.as_enum().unwrap(),
+            task.fields().next().unwrap().type_ref().as_enum().unwrap(),
             status
         ));
     }
@@ -471,14 +495,14 @@ mod tests {
             enums: vec![],
         }];
         let file_set = resolve(&arena, &files).unwrap();
-        let a = file_set.message(".A").unwrap();
-        let b = file_set.message(".B").unwrap();
+        let a = file_set.lookup(".A").unwrap().as_message().unwrap();
+        let b = file_set.lookup(".B").unwrap().as_message().unwrap();
         assert!(ptr::eq(
-            a.fields.get().unwrap()[0].type_ref.as_message().unwrap(),
+            a.fields().next().unwrap().type_ref().as_message().unwrap(),
             b
         ));
         assert!(ptr::eq(
-            b.fields.get().unwrap()[0].type_ref.as_message().unwrap(),
+            b.fields().next().unwrap().type_ref().as_message().unwrap(),
             a
         ));
     }

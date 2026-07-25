@@ -4,9 +4,8 @@
 //! references tied to that arena's lifetime.
 //!
 //! Nested messages/enums are ordinary [`Vec`]s built while walking the descriptor
-//! tree (each node once). Only [`Message::fields`] uses
-//! [`OnceCell`](std::cell::OnceCell), because field [`TypeRef`]s may form cycles
-//! across the type graph and must be filled in a second pass.
+//! tree (each node once). Field [`TypeRef`]s may form cycles, so they are filled
+//! in a second resolve pass; that storage detail is not part of the public API.
 //!
 //! Plugin metadata ([`crate::descriptor::CodegenMeta`]) is intentionally **not**
 //! stored here — pass it alongside `&FileSet` by reference.
@@ -25,46 +24,45 @@ use ::std::fmt;
 /// Resolved root: the set of files and the type graph within one arena.
 #[derive(Debug)]
 pub struct FileSet<'a> {
-    pub files: Vec<&'a File<'a>>,
+    files: Vec<&'a File<'a>>,
     /// All messages and enums keyed by absolute protobuf FQN.
-    pub types_by_fqn: HashMap<ProtoFqn, TypeItem<'a>>,
+    types_by_fqn: HashMap<ProtoFqn, TypeItem<'a>>,
 }
 
 /// One `.proto` file after resolution.
 #[derive(Debug)]
 pub struct File<'a> {
-    pub name: String,
-    pub package: String,
-    pub dependency: Vec<String>,
-    pub messages: Vec<&'a Message<'a>>,
-    pub enums: Vec<&'a Enum<'a>>,
+    name: String,
+    package: String,
+    dependency: Vec<String>,
+    messages: Vec<&'a Message<'a>>,
+    enums: Vec<&'a Enum<'a>>,
 }
 
 /// A message type with resolved field type handles.
 pub struct Message<'a> {
-    pub name: String,
+    name: String,
     /// Absolute protobuf FQN (e.g. `.example.v1.Task`).
-    pub fqn: ProtoFqn,
-    /// Enclosing message, if nested. Empty for top-level types. Set once after
-    /// this node is allocated (children are built first so `nested_*` can be
-    /// plain [`Vec`]s).
-    pub parent: OnceCell<&'a Message<'a>>,
+    fqn: ProtoFqn,
+    /// Enclosing message, if nested. Set once after this node is allocated
+    /// (children are built first so `nested_*` can be plain [`Vec`]s).
+    parent: OnceCell<&'a Message<'a>>,
     /// Filled in resolve pass 2 (may reference peer / mutually recursive types).
-    pub fields: OnceCell<Vec<Field<'a>>>,
-    pub nested_messages: Vec<&'a Message<'a>>,
-    pub nested_enums: Vec<&'a Enum<'a>>,
-    pub oneofs: Vec<Oneof>,
+    fields: OnceCell<Vec<Field<'a>>>,
+    nested_messages: Vec<&'a Message<'a>>,
+    nested_enums: Vec<&'a Enum<'a>>,
+    oneofs: Vec<Oneof>,
 }
 
 /// A field with a resolved [`TypeRef`].
 #[derive(Debug, Clone)]
 pub struct Field<'a> {
-    pub name: String,
-    pub number: i32,
-    pub label: FieldLabel,
-    pub type_ref: TypeRef<'a>,
-    pub oneof_index: Option<i32>,
-    pub proto3_optional: bool,
+    name: String,
+    number: i32,
+    label: FieldLabel,
+    type_ref: TypeRef<'a>,
+    oneof_index: Option<i32>,
+    proto3_optional: bool,
 }
 
 /// Resolved type of a field.
@@ -92,26 +90,26 @@ pub enum TypeRef<'a> {
 /// A oneof declaration.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Oneof {
-    pub name: String,
+    name: String,
 }
 
 /// An enum type.
 pub struct Enum<'a> {
-    pub name: String,
-    pub fqn: ProtoFqn,
+    name: String,
+    fqn: ProtoFqn,
     /// Enclosing message, if nested. Empty for file-level enums.
-    pub parent: OnceCell<&'a Message<'a>>,
-    pub values: Vec<EnumValue>,
+    parent: OnceCell<&'a Message<'a>>,
+    values: Vec<EnumValue>,
 }
 
 /// An enum value.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct EnumValue {
-    pub name: String,
-    pub number: i32,
+    name: String,
+    number: i32,
 }
 
-/// Entry in [`FileSet::types_by_fqn`].
+/// Entry in [`FileSet`]'s type map.
 #[derive(Clone, Copy)]
 pub enum TypeItem<'a> {
     Message(&'a Message<'a>),
@@ -119,20 +117,141 @@ pub enum TypeItem<'a> {
 }
 
 impl<'a> FileSet<'a> {
-    pub fn message(&self, fqn: impl AsRef<str>) -> Option<&'a Message<'a>> {
-        let fqn = ProtoFqn::parse(fqn.as_ref());
-        match self.types_by_fqn.get(&fqn)? {
-            TypeItem::Message(m) => Some(*m),
-            TypeItem::Enum(_) => None,
-        }
+    pub fn files(&self) -> impl Iterator<Item = &'a File<'a>> + '_ {
+        self.files.iter().copied()
     }
 
-    pub fn enum_ty(&self, fqn: impl AsRef<str>) -> Option<&'a Enum<'a>> {
-        let fqn = ProtoFqn::parse(fqn.as_ref());
-        match self.types_by_fqn.get(&fqn)? {
-            TypeItem::Enum(e) => Some(*e),
-            TypeItem::Message(_) => None,
-        }
+    /// Look up a message or enum by absolute protobuf FQN.
+    ///
+    /// `fqn` must already be in canonical form (leading `.`), as stored in
+    /// [`ProtoFqn`]. Use [`ProtoFqn::parse`] at the boundary if you only have a
+    /// raw string. Lookup itself does not allocate — the map is keyed by
+    /// [`ProtoFqn`] and queried via [`Borrow<str>`](std::borrow::Borrow).
+    pub fn lookup(&self, fqn: impl AsRef<str>) -> Option<TypeItem<'a>> {
+        let fqn = fqn.as_ref();
+        debug_assert!(
+            fqn.starts_with('.'),
+            "lookup expects a canonical ProtoFqn (leading `.`), got {fqn:?}"
+        );
+        self.types_by_fqn.get(fqn).copied()
+    }
+}
+
+impl<'a> File<'a> {
+    pub fn name(&self) -> &str {
+        &self.name
+    }
+
+    pub fn package(&self) -> &str {
+        &self.package
+    }
+
+    pub fn dependencies(&self) -> impl Iterator<Item = &str> + '_ {
+        self.dependency.iter().map(String::as_str)
+    }
+
+    pub fn messages(&self) -> impl Iterator<Item = &'a Message<'a>> + '_ {
+        self.messages.iter().copied()
+    }
+
+    pub fn enums(&self) -> impl Iterator<Item = &'a Enum<'a>> + '_ {
+        self.enums.iter().copied()
+    }
+}
+
+impl<'a> Message<'a> {
+    pub fn name(&self) -> &str {
+        &self.name
+    }
+
+    pub fn fqn(&self) -> &ProtoFqn {
+        &self.fqn
+    }
+
+    /// Enclosing message, if this type is nested.
+    pub fn parent(&self) -> Option<&'a Message<'a>> {
+        self.parent.get().copied()
+    }
+
+    /// Fields after resolve has finished.
+    pub fn fields(&self) -> impl Iterator<Item = &Field<'a>> + '_ {
+        self.fields
+            .get()
+            .expect("message fields accessed before resolve finished")
+            .iter()
+    }
+
+    pub fn nested_messages(&self) -> impl Iterator<Item = &'a Message<'a>> + '_ {
+        self.nested_messages.iter().copied()
+    }
+
+    pub fn nested_enums(&self) -> impl Iterator<Item = &'a Enum<'a>> + '_ {
+        self.nested_enums.iter().copied()
+    }
+
+    pub fn oneofs(&self) -> impl Iterator<Item = &Oneof> + '_ {
+        self.oneofs.iter()
+    }
+}
+
+impl<'a> Field<'a> {
+    pub fn name(&self) -> &str {
+        &self.name
+    }
+
+    pub fn number(&self) -> i32 {
+        self.number
+    }
+
+    pub fn label(&self) -> FieldLabel {
+        self.label
+    }
+
+    pub fn type_ref(&self) -> &TypeRef<'a> {
+        &self.type_ref
+    }
+
+    pub fn oneof_index(&self) -> Option<i32> {
+        self.oneof_index
+    }
+
+    pub fn proto3_optional(&self) -> bool {
+        self.proto3_optional
+    }
+}
+
+impl Oneof {
+    pub fn name(&self) -> &str {
+        &self.name
+    }
+}
+
+impl<'a> Enum<'a> {
+    pub fn name(&self) -> &str {
+        &self.name
+    }
+
+    pub fn fqn(&self) -> &ProtoFqn {
+        &self.fqn
+    }
+
+    /// Enclosing message, if this enum is nested.
+    pub fn parent(&self) -> Option<&'a Message<'a>> {
+        self.parent.get().copied()
+    }
+
+    pub fn values(&self) -> impl Iterator<Item = &EnumValue> + '_ {
+        self.values.iter()
+    }
+}
+
+impl EnumValue {
+    pub fn name(&self) -> &str {
+        &self.name
+    }
+
+    pub fn number(&self) -> i32 {
+        self.number
     }
 }
 
@@ -176,8 +295,22 @@ impl<'a> TypeRef<'a> {
 impl<'a> TypeItem<'a> {
     pub fn fqn(self) -> &'a ProtoFqn {
         match self {
-            Self::Message(m) => &m.fqn,
-            Self::Enum(e) => &e.fqn,
+            Self::Message(m) => m.fqn(),
+            Self::Enum(e) => e.fqn(),
+        }
+    }
+
+    pub fn as_message(self) -> Option<&'a Message<'a>> {
+        match self {
+            Self::Message(m) => Some(m),
+            Self::Enum(_) => None,
+        }
+    }
+
+    pub fn as_enum(self) -> Option<&'a Enum<'a>> {
+        match self {
+            Self::Enum(e) => Some(e),
+            Self::Message(_) => None,
         }
     }
 }
@@ -186,19 +319,23 @@ impl fmt::Debug for Message<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("Message")
             .field("fqn", &self.fqn)
-            .field("parent", &self.parent.get().map(|m| &m.fqn))
+            .field("parent", &self.parent().map(|m| m.fqn()))
             .field("fields", &self.fields.get())
             .field(
                 "nested_messages",
                 &self
                     .nested_messages
                     .iter()
-                    .map(|m| &m.fqn)
+                    .map(|m| m.fqn())
                     .collect::<Vec<_>>(),
             )
             .field(
                 "nested_enums",
-                &self.nested_enums.iter().map(|e| &e.fqn).collect::<Vec<_>>(),
+                &self
+                    .nested_enums
+                    .iter()
+                    .map(|e| e.fqn())
+                    .collect::<Vec<_>>(),
             )
             .field("oneofs", &self.oneofs)
             .finish()
@@ -209,7 +346,7 @@ impl fmt::Debug for Enum<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("Enum")
             .field("fqn", &self.fqn)
-            .field("parent", &self.parent.get().map(|m| &m.fqn))
+            .field("parent", &self.parent().map(|m| m.fqn()))
             .field("values", &self.values)
             .finish()
     }
@@ -233,8 +370,8 @@ impl fmt::Debug for TypeRef<'_> {
             Self::Sfixed64 => write!(f, "Sfixed64"),
             Self::Sint32 => write!(f, "Sint32"),
             Self::Sint64 => write!(f, "Sint64"),
-            Self::Message(m) => write!(f, "Message({})", m.fqn),
-            Self::Enum(e) => write!(f, "Enum({})", e.fqn),
+            Self::Message(m) => write!(f, "Message({})", m.fqn()),
+            Self::Enum(e) => write!(f, "Enum({})", e.fqn()),
         }
     }
 }
@@ -242,8 +379,8 @@ impl fmt::Debug for TypeRef<'_> {
 impl fmt::Debug for TypeItem<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Self::Message(m) => write!(f, "Message({})", m.fqn),
-            Self::Enum(e) => write!(f, "Enum({})", e.fqn),
+            Self::Message(m) => write!(f, "Message({})", m.fqn()),
+            Self::Enum(e) => write!(f, "Enum({})", e.fqn()),
         }
     }
 }
