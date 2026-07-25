@@ -1,9 +1,20 @@
 syntax = "proto3";
 
+// One of each singular scalar / string / bytes wire type.
 message Scalars {
   int32 score = 1;
   optional string title = 2;
   bool done = 3;
   optional fixed32 postal_code = 4;
   optional double latitude = 5;
+  float ratio = 6;
+  int64 big_score = 7;
+  uint32 count = 8;
+  uint64 big_count = 9;
+  sint32 zigzag32 = 10;
+  sint64 zigzag64 = 11;
+  fixed64 fixed_id = 12;
+  optional sfixed32 sfixed32_val = 13;
+  optional sfixed64 sfixed64_val = 14;
+  optional bytes payload = 15;
 }

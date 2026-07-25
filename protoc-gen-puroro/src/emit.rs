@@ -274,6 +274,28 @@ mod tests {
                 packed: None,
                 features: FeatureSet::default(),
             },
+            FieldDesc {
+                name: "payload".into(),
+                number: 4,
+                label: FieldLabel::Optional,
+                type_: FieldType::Bytes,
+                type_name: None,
+                oneof_index: None,
+                proto3_optional: true,
+                packed: None,
+                features: FeatureSet::default(),
+            },
+            FieldDesc {
+                name: "zigzag".into(),
+                number: 5,
+                label: FieldLabel::Optional,
+                type_: FieldType::SInt32,
+                type_name: None,
+                oneof_index: None,
+                proto3_optional: false,
+                packed: None,
+                features: FeatureSet::default(),
+            },
         ];
         let response = emit(&request).unwrap();
         let content = &response.files[0].content;
@@ -285,6 +307,8 @@ mod tests {
         assert!(content.contains("ProtoInt32"));
         assert!(content.contains("ProtoString"));
         assert!(content.contains("ProtoBool"));
+        assert!(content.contains("ProtoBytes"));
+        assert!(content.contains("ProtoSint32"));
         assert!(content.contains("BitPacked"));
         assert!(content.contains("fn score("));
         assert!(content.contains(".optional()"));

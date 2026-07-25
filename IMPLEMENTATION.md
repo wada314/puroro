@@ -141,7 +141,7 @@ protobuf-core           Varint, Tag, WireType
 | Module forest + `ModuleLayout::SingleFile` | **Done** (`FileTree` deferred) |
 | Empty-message emission (no fields / nested types) | **Done** — compile-tested via [`puroro-codegen-tests`](puroro-codegen-tests/) (`protoc` + plugin) |
 | FieldKind IR (`plan_message`, bit assignment, catalog kind) | **Done** — scalars / repeated / enum / oneof planned; map_entry & custom defaults not in IR yet |
-| FieldKind → catalog emission (struct members, accessors, visitors) | **Partial** — singular scalar / string / bytes / bool (incl. `BitPacked`); repeated / oneof / enum / message not yet |
+| FieldKind → catalog emission (struct members, accessors, visitors) | **Partial** — all singular scalar / string / bytes / bool (incl. `BitPacked`; e2e in `scalars` fixture); repeated / oneof / enum / message not yet |
 
 Live plugin emits one root message per file with singular scalar fields via `resolved::resolve` + [`field_kind::plan_message`](protoc-gen-puroro/src/field_kind.rs). Nested types, enums, repeated, oneof, and message fields are still rejected. Full-featured structs in this document and in [`sample-generated/`](sample-generated/) remain the target for the remaining field families.
 
