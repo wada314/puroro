@@ -1,0 +1,6 @@
+syntax = "proto2";
+
+message RequiredOwner {
+  required string owner = 1;
+  optional int32 score = 2;
+}

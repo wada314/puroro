@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package demo;
+
+message L1 {
+  message L2 {
+    message L3 {
+      optional string name = 1;
+    }
+    L3 leaf = 1;
+  }
+  L2 mid = 1;
+}

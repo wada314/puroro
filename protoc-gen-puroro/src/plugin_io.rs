@@ -348,7 +348,7 @@ fn decode_options_features(bytes: &[u8]) -> Result<FeatureSet> {
     Ok(features)
 }
 
-/// `FieldOptions`: `packed` (2) and `features` (50).
+/// `FieldOptions`: `packed` (2) and `features` (21).
 fn decode_field_options(bytes: &[u8]) -> Result<(FeatureSet, Option<bool>)> {
     let mut features = FeatureSet::default();
     let mut packed = None;
@@ -357,8 +357,8 @@ fn decode_field_options(bytes: &[u8]) -> Result<(FeatureSet, Option<bool>)> {
         match field.field_number.as_u32() {
             // optional bool packed = 2;
             2 => packed = Some(expect_bool(&field)?),
-            // optional FeatureSet features = 50;
-            50 => {
+            // optional FeatureSet features = 21;
+            21 => {
                 let nested = expect_len(&field)?;
                 features = decode_feature_set(nested)?;
             }
@@ -623,6 +623,45 @@ mod tests {
         assert_eq!(
             decoded.proto_files[0].features.field_presence,
             Some(FieldPresence::Implicit)
+        );
+    }
+
+    #[test]
+    fn decode_field_options_features_field_number_21() {
+        use crate::descriptor::features::RepeatedFieldEncoding;
+
+        // FeatureSet { repeated_field_encoding: EXPANDED }
+        let feature_set = encode_varint_field(3, RepeatedFieldEncoding::Expanded as i32);
+        // FieldOptions { features = 21 }
+        let field_options = encode_message_field(21, &feature_set);
+
+        let mut field = Vec::new();
+        field.extend(encode_string_field(1, "ids"));
+        field.extend(encode_varint_field(3, 1));
+        field.extend(encode_varint_field(4, FieldLabel::Repeated as i32));
+        field.extend(encode_varint_field(5, FieldType::Int32 as i32));
+        field.extend(encode_message_field(8, &field_options));
+
+        let mut message = Vec::new();
+        message.extend(encode_string_field(1, "M"));
+        message.extend(encode_message_field(2, &field));
+
+        let mut file = Vec::new();
+        file.extend(encode_string_field(1, "ed.proto"));
+        file.extend(encode_string_field(12, "editions"));
+        file.extend(encode_varint_field(14, Edition::Edition2023 as i32));
+        file.extend(encode_message_field(4, &message));
+
+        let mut request = Vec::new();
+        request.extend(encode_string_field(1, "ed.proto"));
+        request.extend(encode_message_field(15, &file));
+
+        let decoded = decode_request(&request).unwrap();
+        assert_eq!(
+            decoded.proto_files[0].messages[0].fields[0]
+                .features
+                .repeated_field_encoding,
+            Some(RepeatedFieldEncoding::Expanded)
         );
     }
 

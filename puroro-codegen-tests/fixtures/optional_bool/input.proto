@@ -1,0 +1,6 @@
+syntax = "proto3";
+
+// EXPLICIT presence + BitPacked bool (distinct from IMPLICIT `bool` in scalars).
+message FlagHolder {
+  optional bool flag = 1;
+}

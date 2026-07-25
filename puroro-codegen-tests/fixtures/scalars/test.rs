@@ -109,3 +109,26 @@ fn unknown_field_preserved_with_knowns() {
     let reencoded = decoded.encode_to_vec();
     assert!(reencoded.windows(3).any(|w| w == [0xA0, 0x01, 0x01]));
 }
+
+#[test]
+fn optional_string_unset_vs_empty() {
+    let unset = Scalars::new();
+    assert!(!unset.title().is_set());
+    assert!(unset.encode_to_vec().is_empty());
+
+    let mut empty = Scalars::new();
+    empty.title_mut().clear(); // set presence with empty payload
+    assert!(empty.title().is_set());
+    assert_eq!(empty.title().get(), "");
+    assert!(!empty.encode_to_vec().is_empty());
+}
+
+#[test]
+fn scalar_last_wins_on_merge() {
+    let mut msg = Scalars::new();
+    *msg.score_mut() = 1;
+    // field 1 varint 2
+    let second = [0x08_u8, 2];
+    msg.merge_from(&mut &second[..]).expect("merge");
+    assert_eq!(msg.score(), 2);
+}

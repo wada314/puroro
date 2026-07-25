@@ -59,7 +59,7 @@ enum RepeatedAccessorStyle {
     Slice,
     /// `repeated string` — `RepeatedStringMut`.
     String,
-    /// `repeated bytes` — `RepeatedContainerMut`.
+    /// `repeated bytes` — `RepeatedBytesMut`.
     Bytes,
 }
 
@@ -699,7 +699,7 @@ fn render_repeated_accessors(field: &RepeatedEmit) -> TokenStream {
                 self.#name.bind(&self._common).as_slice()
             }
 
-            pub fn #name_mut(&mut self) -> impl ::puroro::RepeatedContainerMut + '_ {
+            pub fn #name_mut(&mut self) -> impl ::puroro::RepeatedBytesMut<A> + '_ {
                 self.#name.bind_mut(&mut self._common).container_mut()
             }
 

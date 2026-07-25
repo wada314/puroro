@@ -1,6 +1,7 @@
 //! User-facing mutator API for repeated fields.
 
 use ::allocator_api2::alloc::Allocator;
+use ::allocator_api2::vec::Vec;
 use ::core::ops::DerefMut;
 
 use crate::String;
@@ -9,7 +10,8 @@ use crate::String;
 ///
 /// Generated repeated `_mut` accessors may return `impl RepeatedContainerMut`
 /// when the element mutator target is a Rust scalar / `Vec` (known without
-/// naming catalog types). For `repeated string`, see [`RepeatedStringMut`].
+/// naming catalog types). For `repeated string` / `repeated bytes`, see
+/// [`RepeatedStringMut`] / [`RepeatedBytesMut`].
 ///
 /// No `IndexMut`: out-of-range access goes through [`get_mut`](Self::get_mut).
 /// [`push`](Self::push) appends a type-default empty element and returns a
@@ -47,6 +49,32 @@ pub trait RepeatedContainerMut {
 pub trait RepeatedStringMut<A: Allocator> {
     /// Mutable string handle (`DerefMut<Target = String<A>>`).
     type Mut<'a>: DerefMut<Target = String<A>>
+    where
+        Self: 'a;
+
+    fn len(&self) -> usize;
+
+    #[inline]
+    fn is_empty(&self) -> bool {
+        self.len() == 0
+    }
+
+    fn push(&mut self) -> Self::Mut<'_>;
+
+    fn get_mut(&mut self, index: usize) -> Option<Self::Mut<'_>>;
+
+    fn clear(&mut self);
+
+    fn pop(&mut self) -> bool;
+}
+
+/// Mutator API for a `repeated bytes` field.
+///
+/// [`Mut`](Self::Mut) is constrained to [`Vec`]`<u8, A>` so callers get
+/// `extend_from_slice` without naming runtime catalog types.
+pub trait RepeatedBytesMut<A: Allocator> {
+    /// Mutable bytes handle (`DerefMut<Target = Vec<u8, A>>`).
+    type Mut<'a>: DerefMut<Target = Vec<u8, A>>
     where
         Self: 'a;
 

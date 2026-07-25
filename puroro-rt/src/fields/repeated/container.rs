@@ -9,13 +9,13 @@
 use ::core::marker::PhantomData;
 
 use ::allocator_api2::alloc::Allocator;
-use ::puroro::{RepeatedContainerMut, RepeatedStringMut};
+use ::puroro::{RepeatedBytesMut, RepeatedContainerMut, RepeatedStringMut};
 use ::unmanaged::vec::VecGuard;
 
-use crate::fields::wire::ProtoString;
 use crate::fields::wire::repeated_element::{
     RepeatedElement, RepeatedElementMerge, RepeatedElementMut,
 };
+use crate::fields::wire::{ProtoBytes, ProtoString};
 
 /// Growable view over a repeated field's element storage.
 ///
@@ -149,6 +149,41 @@ where
 {
     type Mut<'m>
         = <ProtoString as RepeatedElementMut>::ElementMut<'m, A>
+    where
+        Self: 'm;
+
+    #[inline]
+    fn len(&self) -> usize {
+        RepeatedElementsMut::len(self)
+    }
+
+    #[inline]
+    fn push(&mut self) -> Self::Mut<'_> {
+        RepeatedElementsMut::push(self)
+    }
+
+    #[inline]
+    fn get_mut(&mut self, index: usize) -> Option<Self::Mut<'_>> {
+        RepeatedElementsMut::get_mut(self, index)
+    }
+
+    #[inline]
+    fn clear(&mut self) {
+        RepeatedElementsMut::clear(self);
+    }
+
+    #[inline]
+    fn pop(&mut self) -> bool {
+        RepeatedElementsMut::pop(self)
+    }
+}
+
+impl<'a, A> RepeatedBytesMut<A> for RepeatedElementsMut<'a, ProtoBytes, A>
+where
+    A: Allocator + Clone,
+{
+    type Mut<'m>
+        = <ProtoBytes as RepeatedElementMut>::ElementMut<'m, A>
     where
         Self: 'm;
 

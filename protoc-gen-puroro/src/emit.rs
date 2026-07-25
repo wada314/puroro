@@ -177,10 +177,10 @@ fn proto_path_to_rust_path(proto_name: &str) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::descriptor::features::EnumType;
+    use crate::descriptor::features::{EnumType, Utf8Validation};
     use crate::descriptor::{
         CodegenMeta, CodegenRequest, Edition, EnumDesc, EnumValueDesc, FeatureSet, FieldDesc,
-        FieldLabel, FieldType, MessageDesc, ProtoFile, ProtoFqn, Syntax,
+        FieldLabel, FieldType, MessageDesc, OneofDesc, ProtoFile, ProtoFqn, Syntax,
     };
 
     fn empty_request(message_name: &str) -> CodegenRequest {
@@ -709,5 +709,123 @@ mod tests {
         assert!(content.contains("fn assignee("));
         assert!(content.contains(".get()"));
         assert!(content.contains(".get_mut()"));
+    }
+
+    #[test]
+    fn empty_file_to_generate_yields_no_files() {
+        let mut request = empty_request("Empty");
+        request.meta.file_to_generate.clear();
+        let response = emit(&request).unwrap();
+        assert!(response.files.is_empty());
+    }
+
+    #[test]
+    fn unknown_parameter_is_ignored() {
+        let mut request = empty_request("Empty");
+        request.meta.parameter = Some("not_a_real_option=1".into());
+        let response = emit(&request).unwrap();
+        assert_eq!(response.files.len(), 1);
+        assert!(response.files[0].content.contains("struct Empty"));
+    }
+
+    #[test]
+    fn reject_real_oneof() {
+        let request = CodegenRequest {
+            meta: CodegenMeta {
+                file_to_generate: vec!["t.proto".into()],
+                parameter: None,
+            },
+            proto_files: vec![ProtoFile {
+                name: "t.proto".into(),
+                package: String::new(),
+                syntax: Syntax::Proto3,
+                features: FeatureSet::default(),
+                dependency: vec![],
+                messages: vec![MessageDesc {
+                    name: "Notify".into(),
+                    fields: vec![
+                        FieldDesc {
+                            name: "email".into(),
+                            number: 1,
+                            label: FieldLabel::Optional,
+                            type_: FieldType::String,
+                            type_name: None,
+                            oneof_index: Some(0),
+                            proto3_optional: false,
+                            packed: None,
+                            features: FeatureSet::default(),
+                        },
+                        FieldDesc {
+                            name: "sms".into(),
+                            number: 2,
+                            label: FieldLabel::Optional,
+                            type_: FieldType::String,
+                            type_name: None,
+                            oneof_index: Some(0),
+                            proto3_optional: false,
+                            packed: None,
+                            features: FeatureSet::default(),
+                        },
+                    ],
+                    nested_messages: vec![],
+                    nested_enums: vec![],
+                    oneofs: vec![OneofDesc {
+                        name: "channel".into(),
+                    }],
+                }],
+                enums: vec![],
+            }],
+        };
+        let err = emit(&request).unwrap_err();
+        let msg = err.to_string();
+        assert!(
+            msg.contains("oneof") && msg.contains("Notify"),
+            "unexpected error: {msg}"
+        );
+    }
+
+    #[test]
+    fn utf8_validation_none_still_emits_proto_string() {
+        // Contract: IR records utf8_validation=NONE, but the emitter always uses
+        // `ProtoString` (VERIFY semantics). Lock that until NONE is implemented
+        // or explicitly rejected.
+        let request = CodegenRequest {
+            meta: CodegenMeta {
+                file_to_generate: vec!["t.proto".into()],
+                parameter: None,
+            },
+            proto_files: vec![ProtoFile {
+                name: "t.proto".into(),
+                package: String::new(),
+                syntax: Syntax::Editions(Edition::Edition2023),
+                features: FeatureSet::default(),
+                dependency: vec![],
+                messages: vec![MessageDesc {
+                    name: "M".into(),
+                    fields: vec![FieldDesc {
+                        name: "title".into(),
+                        number: 1,
+                        label: FieldLabel::Optional,
+                        type_: FieldType::String,
+                        type_name: None,
+                        oneof_index: None,
+                        proto3_optional: false,
+                        packed: None,
+                        features: FeatureSet {
+                            utf8_validation: Some(Utf8Validation::None),
+                            ..FeatureSet::default()
+                        },
+                    }],
+                    nested_messages: vec![],
+                    nested_enums: vec![],
+                    oneofs: vec![],
+                }],
+                enums: vec![],
+            }],
+        };
+        let response = emit(&request).unwrap();
+        let content = &response.files[0].content;
+        assert!(content.contains("ProtoString"));
+        assert!(!content.contains("ProtoBytes"));
     }
 }

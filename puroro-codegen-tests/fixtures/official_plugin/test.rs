@@ -1,4 +1,10 @@
 //! Compile + smoke tests for official `descriptor.proto` / `plugin.proto`.
+//!
+//! The vendored schemas under this fixture intentionally contain **no real
+//! `oneof` declarations**. Real oneofs are still rejected by the emitter
+//! (see `protoc-gen-puroro` `emit::tests::reject_real_oneof`); this case only
+//! proves the generator can handle the subset of official protos checked in
+//! here (including proto2 required fields, nested types, and closed enums).
 
 use crate::official_plugin::google::protobuf::compiler::code_generator_response::File as ResponseFile;
 use crate::official_plugin::google::protobuf::compiler::{

@@ -1105,6 +1105,35 @@ mod tests {
     }
 
     #[test]
+    fn group_field_is_rejected() {
+        let arena = Arena::new();
+        let files = [proto_file(
+            "p2",
+            Syntax::Proto2,
+            vec![MessageDesc {
+                name: "M".into(),
+                fields: vec![FieldDesc {
+                    name: "g".into(),
+                    number: 1,
+                    label: FieldLabel::Optional,
+                    type_: FieldType::Group,
+                    type_name: Some(ProtoFqn::parse(".p2.G")),
+                    oneof_index: None,
+                    proto3_optional: false,
+                    packed: None,
+                    features: FeatureSet::default(),
+                }],
+                nested_messages: vec![empty_msg("G")],
+                nested_enums: vec![],
+                oneofs: vec![],
+            }],
+            vec![],
+        )];
+        let err = resolve(&arena, &files).unwrap_err();
+        assert!(err.to_string().contains("group"), "unexpected error: {err}");
+    }
+
+    #[test]
     fn proto2_packed_option() {
         let arena = Arena::new();
         let files = [proto_file(

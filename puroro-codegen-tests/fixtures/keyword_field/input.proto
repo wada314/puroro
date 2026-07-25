@@ -1,0 +1,6 @@
+syntax = "proto3";
+
+message KeywordFields {
+  optional int32 type = 1;
+  optional string match = 2;
+}

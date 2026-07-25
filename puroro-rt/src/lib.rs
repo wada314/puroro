@@ -23,8 +23,8 @@ pub use fields::oneof::{
 };
 pub use fields::oneof_variant::OneofVariant;
 pub use fields::repeated::{
-    Expanded, Packed, RepeatedContainerMut, RepeatedElementsMut, RepeatedEncoding, RepeatedField,
-    RepeatedFieldMut, RepeatedFieldRef, RepeatedStringMut,
+    Expanded, Packed, RepeatedBytesMut, RepeatedContainerMut, RepeatedElementsMut,
+    RepeatedEncoding, RepeatedField, RepeatedFieldMut, RepeatedFieldRef, RepeatedStringMut,
 };
 pub use fields::shared::field_presence::{
     Explicit, FieldPresence, Implicit, LegacyRequired, Message, Oneof, RequiredFieldPresence,
