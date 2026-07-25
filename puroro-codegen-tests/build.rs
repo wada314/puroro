@@ -9,7 +9,7 @@
 //! ```
 
 use ::protoc_gen_puroro::descriptor::{
-    CodegenMeta, CodegenRequest, MessageDesc, ProtoFile, Syntax,
+    CodegenMeta, CodegenRequest, Edition, FeatureSet, MessageDesc, ProtoFile, Syntax,
 };
 use ::protoc_gen_puroro::emit::emit;
 use ::std::env;
@@ -156,7 +156,7 @@ fn request_from_proto_file(proto_path: &Path) -> CodegenRequest {
         .to_owned();
 
     let package = parse_package(&contents).unwrap_or_default();
-    let syntax = parse_syntax(&contents).unwrap_or(Syntax::Proto2);
+    let syntax = parse_language_mode(&contents).unwrap_or(Syntax::Proto2);
     let message_names = parse_empty_message_names(&contents);
     if message_names.is_empty() {
         panic!(
@@ -185,6 +185,7 @@ fn request_from_proto_file(proto_path: &Path) -> CodegenRequest {
             name: file_name,
             package,
             syntax,
+            features: FeatureSet::default(),
             dependency: vec![],
             messages,
             enums: vec![],
@@ -192,20 +193,30 @@ fn request_from_proto_file(proto_path: &Path) -> CodegenRequest {
     }
 }
 
-/// Minimal `syntax = "proto3";` extractor (line-oriented; ignores `//` comments).
-fn parse_syntax(src: &str) -> Option<Syntax> {
+/// Minimal `syntax = "...";` / `edition = "...";` extractor.
+fn parse_language_mode(src: &str) -> Option<Syntax> {
     for raw_line in src.lines() {
         let line = strip_line_comment(raw_line).trim();
-        let Some(rest) = line.strip_prefix("syntax") else {
-            continue;
-        };
-        let rest = rest.trim_start().strip_prefix('=')?.trim_start();
-        let rest = rest.strip_suffix(';')?.trim();
-        let quoted = rest.strip_prefix('"')?.strip_suffix('"')?;
-        return Some(match quoted {
-            "proto3" => Syntax::Proto3,
-            _ => Syntax::Proto2,
-        });
+        if let Some(rest) = line.strip_prefix("edition") {
+            let rest = rest.trim_start().strip_prefix('=')?.trim_start();
+            let rest = rest.strip_suffix(';')?.trim();
+            let quoted = rest.strip_prefix('"')?.strip_suffix('"')?;
+            return Some(match quoted {
+                "2023" => Syntax::Editions(Edition::Edition2023),
+                "2024" => Syntax::Editions(Edition::Edition2024),
+                _ => return None,
+            });
+        }
+        if let Some(rest) = line.strip_prefix("syntax") {
+            let rest = rest.trim_start().strip_prefix('=')?.trim_start();
+            let rest = rest.strip_suffix(';')?.trim();
+            let quoted = rest.strip_prefix('"')?.strip_suffix('"')?;
+            return Some(match quoted {
+                "proto3" => Syntax::Proto3,
+                "proto2" => Syntax::Proto2,
+                _ => return None,
+            });
+        }
     }
     None
 }

@@ -144,8 +144,8 @@ fn proto_path_to_rust_path(proto_name: &str) -> String {
 mod tests {
     use super::*;
     use crate::descriptor::{
-        CodegenMeta, CodegenRequest, FieldDesc, FieldLabel, FieldType, MessageDesc, ProtoFile,
-        Syntax,
+        CodegenMeta, CodegenRequest, FeatureSet, FieldDesc, FieldLabel, FieldType, MessageDesc,
+        ProtoFile, Syntax,
     };
 
     fn empty_request(message_name: &str) -> CodegenRequest {
@@ -162,6 +162,7 @@ mod tests {
                 name: "empty.proto".into(),
                 package: package.into(),
                 syntax: Syntax::Proto3,
+                features: FeatureSet::default(),
                 dependency: vec![],
                 messages: vec![MessageDesc {
                     name: message_name.into(),
@@ -218,6 +219,7 @@ mod tests {
             type_name: None,
             oneof_index: None,
             proto3_optional: false,
+            features: FeatureSet::default(),
         });
         let err = emit(&request).unwrap_err();
         assert!(err.to_string().contains("field-less"));

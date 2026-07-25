@@ -4,6 +4,7 @@ use super::{
     Arena, Enum, EnumValue, Field, FieldOccurrence, File, FileSet, Message, Oneof,
     SingularPresence, TypeItem, TypeRef,
 };
+use crate::descriptor::features::{FeatureSet, FieldPresence};
 use crate::descriptor::{
     EnumDesc, FieldDesc, FieldLabel, FieldType, MessageDesc, ProtoFile, ProtoFqn, Syntax,
 };
@@ -163,7 +164,13 @@ fn fill_file_fields<'a>(
 ) -> Result<()> {
     let package_fqn = ProtoFqn::from_package(&proto.package);
     for desc in &proto.messages {
-        fill_message_fields(desc, &package_fqn, proto.syntax, types_by_fqn)?;
+        fill_message_fields(
+            desc,
+            &package_fqn,
+            proto.syntax,
+            proto.features,
+            types_by_fqn,
+        )?;
     }
     Ok(())
 }
@@ -172,6 +179,7 @@ fn fill_message_fields<'a>(
     desc: &MessageDesc,
     parent_fqn: &ProtoFqn,
     syntax: Syntax,
+    file_features: FeatureSet,
     types_by_fqn: &HashMap<ProtoFqn, TypeItem<'a>>,
 ) -> Result<()> {
     let fqn = parent_fqn.append(&desc.name);
@@ -189,7 +197,13 @@ fn fill_message_fields<'a>(
 
     let mut fields = Vec::with_capacity(desc.fields.len());
     for field in &desc.fields {
-        fields.push(resolve_field(field, &message.fqn, syntax, types_by_fqn)?);
+        fields.push(resolve_field(
+            field,
+            &message.fqn,
+            syntax,
+            file_features,
+            types_by_fqn,
+        )?);
     }
     message
         .fields
@@ -197,7 +211,7 @@ fn fill_message_fields<'a>(
         .map_err(|_| Error::Codegen(format!("fields set twice for `{fqn}`")))?;
 
     for nested in &desc.nested_messages {
-        fill_message_fields(nested, &fqn, syntax, types_by_fqn)?;
+        fill_message_fields(nested, &fqn, syntax, file_features, types_by_fqn)?;
     }
     Ok(())
 }
@@ -206,6 +220,7 @@ fn resolve_field<'a>(
     field: &FieldDesc,
     owner_fqn: &ProtoFqn,
     syntax: Syntax,
+    file_features: FeatureSet,
     types_by_fqn: &HashMap<ProtoFqn, TypeItem<'a>>,
 ) -> Result<Field<'a>> {
     let type_ref = match field.type_ {
@@ -250,13 +265,17 @@ fn resolve_field<'a>(
     Ok(Field {
         name: field.name.clone(),
         number: field.number,
-        occurrence: resolve_occurrence(field, syntax),
+        occurrence: resolve_occurrence(field, syntax, file_features),
         type_ref,
         oneof_index: field.oneof_index,
     })
 }
 
-fn resolve_occurrence(field: &FieldDesc, syntax: Syntax) -> FieldOccurrence {
+fn resolve_occurrence(
+    field: &FieldDesc,
+    syntax: Syntax,
+    file_features: FeatureSet,
+) -> FieldOccurrence {
     if field.label == FieldLabel::Repeated {
         return FieldOccurrence::Repeated;
     }
@@ -282,6 +301,19 @@ fn resolve_occurrence(field: &FieldDesc, syntax: Syntax) -> FieldOccurrence {
             } else {
                 FieldOccurrence::Singular(SingularPresence::Implicit)
             }
+        }
+        Syntax::Editions(edition) => {
+            let features = FeatureSet::defaults_for_edition(edition)
+                .overlay(&file_features)
+                .overlay(&field.features);
+            let feature = features
+                .field_presence
+                .expect("edition defaults always set field_presence");
+            FieldOccurrence::Singular(match feature {
+                FieldPresence::Explicit => SingularPresence::Explicit,
+                FieldPresence::Implicit => SingularPresence::Implicit,
+                FieldPresence::LegacyRequired => SingularPresence::LegacyRequired,
+            })
         }
     }
 }
@@ -309,8 +341,9 @@ fn lookup_enum<'a>(
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::descriptor::features::{FeatureSet, FieldPresence};
     use crate::descriptor::{
-        EnumDesc, EnumValueDesc, FieldDesc, FieldLabel, FieldType, MessageDesc, OneofDesc,
+        Edition, EnumDesc, EnumValueDesc, FieldDesc, FieldLabel, FieldType, MessageDesc, OneofDesc,
         ProtoFile, ProtoFqn, Syntax,
     };
     use ::std::ptr;
@@ -335,6 +368,7 @@ mod tests {
             name: "a.proto".into(),
             package: package.into(),
             syntax,
+            features: FeatureSet::default(),
             dependency: vec![],
             messages,
             enums,
@@ -355,6 +389,7 @@ mod tests {
             type_name: None,
             oneof_index,
             proto3_optional,
+            features: FeatureSet::default(),
         }
     }
 
@@ -397,6 +432,7 @@ mod tests {
                         type_name: Some(ProtoFqn::parse(".example.Address")),
                         oneof_index: None,
                         proto3_optional: true,
+                        features: FeatureSet::default(),
                     }],
                     nested_messages: vec![],
                     nested_enums: vec![],
@@ -467,6 +503,7 @@ mod tests {
                     type_name: Some(ProtoFqn::parse(".example.Status")),
                     oneof_index: None,
                     proto3_optional: false,
+                    features: FeatureSet::default(),
                 }],
                 nested_messages: vec![],
                 nested_enums: vec![],
@@ -515,6 +552,7 @@ mod tests {
                     type_name: Some(ProtoFqn::parse(".Missing")),
                     oneof_index: None,
                     proto3_optional: false,
+                    features: FeatureSet::default(),
                 }],
                 nested_messages: vec![],
                 nested_enums: vec![],
@@ -543,6 +581,7 @@ mod tests {
                         type_name: Some(ProtoFqn::parse(".B")),
                         oneof_index: None,
                         proto3_optional: false,
+                        features: FeatureSet::default(),
                     }],
                     nested_messages: vec![],
                     nested_enums: vec![],
@@ -558,6 +597,7 @@ mod tests {
                         type_name: Some(ProtoFqn::parse(".A")),
                         oneof_index: None,
                         proto3_optional: false,
+                        features: FeatureSet::default(),
                     }],
                     nested_messages: vec![],
                     nested_enums: vec![],
@@ -601,6 +641,7 @@ mod tests {
                                 // Synthetic oneof for proto3 optional.
                                 oneof_index: Some(0),
                                 proto3_optional: true,
+                                features: FeatureSet::default(),
                             },
                             FieldDesc {
                                 name: "addr".into(),
@@ -610,6 +651,7 @@ mod tests {
                                 type_name: Some(ProtoFqn::parse(".p3.Addr")),
                                 oneof_index: None,
                                 proto3_optional: false,
+                                features: FeatureSet::default(),
                             },
                             FieldDesc {
                                 name: "choice".into(),
@@ -619,6 +661,7 @@ mod tests {
                                 type_name: None,
                                 oneof_index: Some(1),
                                 proto3_optional: false,
+                                features: FeatureSet::default(),
                             },
                             FieldDesc {
                                 name: "tags".into(),
@@ -628,6 +671,7 @@ mod tests {
                                 type_name: None,
                                 oneof_index: None,
                                 proto3_optional: false,
+                                features: FeatureSet::default(),
                             },
                         ],
                         nested_messages: vec![],
@@ -694,6 +738,76 @@ mod tests {
         assert_eq!(
             p2_fields.next().unwrap().occurrence(),
             FieldOccurrence::Singular(SingularPresence::LegacyRequired)
+        );
+    }
+
+    #[test]
+    fn editions_default_presence_is_explicit() {
+        let arena = Arena::new();
+        let files = [proto_file(
+            "ed",
+            Syntax::Editions(Edition::Edition2023),
+            vec![MessageDesc {
+                name: "M".into(),
+                fields: vec![scalar_field("n", FieldLabel::Optional, None, false)],
+                nested_messages: vec![],
+                nested_enums: vec![],
+                oneofs: vec![],
+            }],
+            vec![],
+        )];
+        let file_set = resolve(&arena, &files).unwrap();
+        let m = file_set.lookup(".ed.M").unwrap().as_message().unwrap();
+        assert_eq!(
+            m.fields().next().unwrap().occurrence(),
+            FieldOccurrence::Singular(SingularPresence::Explicit)
+        );
+    }
+
+    #[test]
+    fn editions_file_feature_implicit() {
+        let arena = Arena::new();
+        let mut file = proto_file(
+            "ed",
+            Syntax::Editions(Edition::Edition2024),
+            vec![MessageDesc {
+                name: "M".into(),
+                fields: vec![
+                    scalar_field("n", FieldLabel::Optional, None, false),
+                    FieldDesc {
+                        name: "override_explicit".into(),
+                        number: 2,
+                        label: FieldLabel::Optional,
+                        type_: FieldType::Int32,
+                        type_name: None,
+                        oneof_index: None,
+                        proto3_optional: false,
+                        features: FeatureSet {
+                            field_presence: Some(FieldPresence::Explicit),
+                            ..FeatureSet::default()
+                        },
+                    },
+                ],
+                nested_messages: vec![],
+                nested_enums: vec![],
+                oneofs: vec![],
+            }],
+            vec![],
+        );
+        file.features = FeatureSet {
+            field_presence: Some(FieldPresence::Implicit),
+            ..FeatureSet::default()
+        };
+        let file_set = resolve(&arena, &[file]).unwrap();
+        let m = file_set.lookup(".ed.M").unwrap().as_message().unwrap();
+        let mut fields = m.fields();
+        assert_eq!(
+            fields.next().unwrap().occurrence(),
+            FieldOccurrence::Singular(SingularPresence::Implicit)
+        );
+        assert_eq!(
+            fields.next().unwrap().occurrence(),
+            FieldOccurrence::Singular(SingularPresence::Explicit)
         );
     }
 }

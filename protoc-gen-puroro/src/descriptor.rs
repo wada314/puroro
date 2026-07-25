@@ -5,8 +5,10 @@
 //! names are absolute [`ProtoFqn`] values; resolve the full graph into
 //! [`crate::resolved::FileSet`] via [`crate::resolved::resolve`].
 
+pub mod features;
 mod proto_fqn;
 
+pub use features::FeatureSet;
 pub use proto_fqn::ProtoFqn;
 
 /// Plugin / generate-time metadata (not part of the type graph).
@@ -29,11 +31,34 @@ pub struct CodegenRequest {
     pub proto_files: Vec<ProtoFile>,
 }
 
-/// Protobuf syntax of a `.proto` file (`FileDescriptorProto.syntax`).
+/// Language mode of a `.proto` file.
+///
+/// For Editions, `FileDescriptorProto.syntax` is `"editions"` and the year is
+/// in `FileDescriptorProto.edition` (see <https://protobuf.dev/editions/overview/>).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Syntax {
     Proto2,
     Proto3,
+    Editions(Edition),
+}
+
+/// Released protobuf edition (`google.protobuf.Edition`).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Edition {
+    /// `edition = "2023"` (`EDITION_2023 = 1000`).
+    Edition2023 = 1000,
+    /// `edition = "2024"` (`EDITION_2024 = 1001`).
+    Edition2024 = 1001,
+}
+
+impl Edition {
+    pub fn from_i32(value: i32) -> Option<Self> {
+        match value {
+            1000 => Some(Self::Edition2023),
+            1001 => Some(Self::Edition2024),
+            _ => None,
+        }
+    }
 }
 
 /// One `.proto` file (`FileDescriptorProto` subset).
@@ -42,6 +67,8 @@ pub struct ProtoFile {
     pub name: String,
     pub package: String,
     pub syntax: Syntax,
+    /// File-level `options.features` (`FeatureSet`), if any fields were set.
+    pub features: FeatureSet,
     pub dependency: Vec<String>,
     pub messages: Vec<MessageDesc>,
     pub enums: Vec<EnumDesc>,
@@ -69,6 +96,8 @@ pub struct FieldDesc {
     /// Index into the parent message's `oneofs`, when this field is a oneof member.
     pub oneof_index: Option<i32>,
     pub proto3_optional: bool,
+    /// Field-level `options.features` (`FeatureSet`), if any fields were set.
+    pub features: FeatureSet,
 }
 
 /// Field label (`FieldDescriptorProto.Label`).

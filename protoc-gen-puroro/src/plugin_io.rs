@@ -3,9 +3,13 @@
 //! Decodes only the fields needed to build [`crate::descriptor::CodegenRequest`],
 //! and encodes a minimal [`CodeGeneratorResponse`].
 
+use crate::descriptor::features::{
+    DefaultSymbolVisibility, EnforceNamingStyle, EnumType, FeatureSet, FieldPresence, JsonFormat,
+    MessageEncoding, RepeatedFieldEncoding, Utf8Validation,
+};
 use crate::descriptor::{
-    CodegenMeta, CodegenRequest, EnumDesc, EnumValueDesc, FieldDesc, FieldLabel, FieldType,
-    MessageDesc, OneofDesc, ProtoFile, ProtoFqn, Syntax,
+    CodegenMeta, CodegenRequest, Edition, EnumDesc, EnumValueDesc, FieldDesc, FieldLabel,
+    FieldType, MessageDesc, OneofDesc, ProtoFile, ProtoFqn, Syntax,
 };
 use crate::error::{Error, Result};
 use ::protobuf_core::{AsRefExtProtobuf, Field, FieldNumber, FieldValue, WriteExtProtobuf};
@@ -115,7 +119,9 @@ fn decode_file_descriptor(bytes: &[u8]) -> Result<ProtoFile> {
     with_decoding_context("FileDescriptorProto", || {
         let mut name = String::new();
         let mut package = String::new();
-        let mut syntax = Syntax::Proto2;
+        let mut syntax_raw: Option<String> = None;
+        let mut edition_raw: Option<i32> = None;
+        let mut features = FeatureSet::default();
         let mut dependency = Vec::new();
         let mut messages = Vec::new();
         let mut enums = Vec::new();
@@ -139,28 +145,52 @@ fn decode_file_descriptor(bytes: &[u8]) -> Result<ProtoFile> {
                     let nested = expect_len(&field)?;
                     enums.push(decode_enum(nested)?);
                 }
-                // optional string syntax = 12;
-                12 => {
-                    let raw = expect_string(&field)?;
-                    syntax = match raw.as_str() {
-                        "proto3" => Syntax::Proto3,
-                        // Missing / empty / "proto2" all mean proto2.
-                        _ => Syntax::Proto2,
-                    };
+                // optional FileOptions options = 8;
+                8 => {
+                    let nested = expect_len(&field)?;
+                    features = decode_options_features(nested)?;
                 }
+                // optional string syntax = 12;
+                12 => syntax_raw = Some(expect_string(&field)?),
+                // optional Edition edition = 14;
+                14 => edition_raw = Some(expect_int32(&field)?),
                 _ => {}
             }
         }
+
+        let syntax = resolve_syntax(syntax_raw.as_deref(), edition_raw)?;
 
         Ok(ProtoFile {
             name,
             package,
             syntax,
+            features,
             dependency,
             messages,
             enums,
         })
     })
+}
+
+fn resolve_syntax(syntax_raw: Option<&str>, edition_raw: Option<i32>) -> Result<Syntax> {
+    match syntax_raw {
+        None | Some("") | Some("proto2") => Ok(Syntax::Proto2),
+        Some("proto3") => Ok(Syntax::Proto3),
+        Some("editions") => {
+            let raw = edition_raw.ok_or_else(|| {
+                Error::Codegen(
+                    "FileDescriptorProto.syntax is \"editions\" but edition is missing".into(),
+                )
+            })?;
+            let edition = Edition::from_i32(raw).ok_or_else(|| {
+                Error::Codegen(format!("unsupported protobuf edition value `{raw}`"))
+            })?;
+            Ok(Syntax::Editions(edition))
+        }
+        Some(other) => Err(Error::Codegen(format!(
+            "unsupported FileDescriptorProto.syntax `{other}`"
+        ))),
+    }
 }
 
 fn decode_descriptor(bytes: &[u8]) -> Result<MessageDesc> {
@@ -219,6 +249,7 @@ fn decode_field(bytes: &[u8]) -> Result<FieldDesc> {
         let mut type_name = None;
         let mut oneof_index = None;
         let mut proto3_optional = false;
+        let mut features = FeatureSet::default();
 
         for field in AsRefExtProtobuf::read_protobuf_fields(&bytes) {
             let field = field?;
@@ -239,6 +270,11 @@ fn decode_field(bytes: &[u8]) -> Result<FieldDesc> {
                 }
                 // optional string type_name = 6;
                 6 => type_name = Some(ProtoFqn::parse(expect_string(&field)?)),
+                // optional FieldOptions options = 8;
+                8 => {
+                    let nested = expect_len(&field)?;
+                    features = decode_options_features(nested)?;
+                }
                 // optional int32 oneof_index = 9;
                 9 => oneof_index = Some(expect_int32(&field)?),
                 // optional bool proto3_optional = 17;
@@ -255,8 +291,75 @@ fn decode_field(bytes: &[u8]) -> Result<FieldDesc> {
             type_name,
             oneof_index,
             proto3_optional,
+            features,
         })
     })
+}
+
+/// `FileOptions` / `FieldOptions`: read `features` (50).
+fn decode_options_features(bytes: &[u8]) -> Result<FeatureSet> {
+    let mut features = FeatureSet::default();
+    for field in AsRefExtProtobuf::read_protobuf_fields(&bytes) {
+        let field = field?;
+        // optional FeatureSet features = 50;
+        if field.field_number.as_u32() == 50 {
+            let nested = expect_len(&field)?;
+            features = decode_feature_set(nested)?;
+        }
+    }
+    Ok(features)
+}
+
+fn decode_feature_set(bytes: &[u8]) -> Result<FeatureSet> {
+    let mut features = FeatureSet::default();
+    for field in AsRefExtProtobuf::read_protobuf_fields(&bytes) {
+        let field = field?;
+        let raw = expect_int32(&field)?;
+        match field.field_number.as_u32() {
+            // optional FieldPresence field_presence = 1;
+            1 => {
+                features.field_presence =
+                    Some(FieldPresence::from_i32(raw).ok_or(Error::unexpected_field(1))?);
+            }
+            // optional EnumType enum_type = 2;
+            2 => {
+                features.enum_type =
+                    Some(EnumType::from_i32(raw).ok_or(Error::unexpected_field(2))?);
+            }
+            // optional RepeatedFieldEncoding repeated_field_encoding = 3;
+            3 => {
+                features.repeated_field_encoding =
+                    Some(RepeatedFieldEncoding::from_i32(raw).ok_or(Error::unexpected_field(3))?);
+            }
+            // optional Utf8Validation utf8_validation = 4;
+            4 => {
+                features.utf8_validation =
+                    Some(Utf8Validation::from_i32(raw).ok_or(Error::unexpected_field(4))?);
+            }
+            // optional MessageEncoding message_encoding = 5;
+            5 => {
+                features.message_encoding =
+                    Some(MessageEncoding::from_i32(raw).ok_or(Error::unexpected_field(5))?);
+            }
+            // optional JsonFormat json_format = 6;
+            6 => {
+                features.json_format =
+                    Some(JsonFormat::from_i32(raw).ok_or(Error::unexpected_field(6))?);
+            }
+            // optional EnforceNamingStyle enforce_naming_style = 7;
+            7 => {
+                features.enforce_naming_style =
+                    Some(EnforceNamingStyle::from_i32(raw).ok_or(Error::unexpected_field(7))?);
+            }
+            // optional DefaultSymbolVisibility default_symbol_visibility = 8;
+            8 => {
+                features.default_symbol_visibility =
+                    Some(DefaultSymbolVisibility::from_i32(raw).ok_or(Error::unexpected_field(8))?);
+            }
+            _ => {}
+        }
+    }
+    Ok(features)
 }
 
 fn decode_oneof(bytes: &[u8]) -> Result<OneofDesc> {
@@ -416,6 +519,7 @@ mod tests {
         assert_eq!(decoded.proto_files[0].package, "example");
         // syntax field omitted → proto2 default
         assert_eq!(decoded.proto_files[0].syntax, Syntax::Proto2);
+        assert!(decoded.proto_files[0].features.is_empty());
         assert_eq!(decoded.proto_files[0].messages.len(), 1);
         assert_eq!(decoded.proto_files[0].messages[0].name, "Task");
         assert_eq!(decoded.proto_files[0].messages[0].fields.len(), 1);
@@ -424,6 +528,34 @@ mod tests {
         assert_eq!(f.number, 1);
         assert_eq!(f.label, FieldLabel::Optional);
         assert_eq!(f.type_, FieldType::String);
+    }
+
+    #[test]
+    fn decode_editions_file_with_field_presence_feature() {
+        // FeatureSet { field_presence: IMPLICIT }
+        let feature_set = encode_varint_field(1, FieldPresence::Implicit as i32);
+        // FileOptions { features: FeatureSet }
+        let file_options = encode_message_field(50, &feature_set);
+
+        let mut file = Vec::new();
+        file.extend(encode_string_field(1, "ed.proto"));
+        file.extend(encode_string_field(12, "editions"));
+        file.extend(encode_varint_field(14, Edition::Edition2023 as i32));
+        file.extend(encode_message_field(8, &file_options));
+
+        let mut request = Vec::new();
+        request.extend(encode_string_field(1, "ed.proto"));
+        request.extend(encode_message_field(15, &file));
+
+        let decoded = decode_request(&request).unwrap();
+        assert_eq!(
+            decoded.proto_files[0].syntax,
+            Syntax::Editions(Edition::Edition2023)
+        );
+        assert_eq!(
+            decoded.proto_files[0].features.field_presence,
+            Some(FieldPresence::Implicit)
+        );
     }
 
     #[test]
