@@ -539,7 +539,8 @@ impl<A: Allocator + Clone> Task<A> {
     // enumerate field slots.
 
     /// Scalar / shared: invoke `v` once per catalog field, in declaration order.
-    pub fn visit_fields<V: FieldVisitor<BitArray<[u8; 2], Lsb0>, A>>(
+    // Internal field walks for codec / Clone / Eq / Drop — not public API.
+    fn visit_fields<V: FieldVisitor<BitArray<[u8; 2], Lsb0>, A>>(
         &self,
         v: &mut V,
     ) -> ControlFlow<V::Break> {
@@ -564,7 +565,7 @@ impl<A: Allocator + Clone> Task<A> {
     }
 
     /// Pair / shared: walk matching fields of `self` and `other`.
-    pub fn visit_field_pairs<V: FieldPairVisitor<BitArray<[u8; 2], Lsb0>, A>>(
+    fn visit_field_pairs<V: FieldPairVisitor<BitArray<[u8; 2], Lsb0>, A>>(
         &self,
         other: &Self,
         v: &mut V,
@@ -593,7 +594,7 @@ impl<A: Allocator + Clone> Task<A> {
     ///
     /// For [`CloneIn`], `dst` must start as [`Self::new_in`] so placeholders
     /// match empty presence bits; install the cloned [`MessageCommon`] afterwards.
-    pub fn visit_field_pairs_mut<V: FieldPairVisitorMut<BitArray<[u8; 2], Lsb0>, A>>(
+    fn visit_field_pairs_mut<V: FieldPairVisitorMut<BitArray<[u8; 2], Lsb0>, A>>(
         &self,
         dst: &mut Self,
         v: &mut V,
@@ -619,7 +620,7 @@ impl<A: Allocator + Clone> Task<A> {
     }
 
     /// Scalar / mut: invoke `v` once per catalog field.
-    pub fn visit_fields_mut<V: FieldVisitorMut<BitArray<[u8; 2], Lsb0>, A>>(
+    fn visit_fields_mut<V: FieldVisitorMut<BitArray<[u8; 2], Lsb0>, A>>(
         &mut self,
         v: &mut V,
     ) -> ControlFlow<V::Break> {

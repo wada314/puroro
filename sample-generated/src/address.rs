@@ -137,7 +137,8 @@ impl<A: Allocator + Clone> Address<A> {
     // enumerate field slots.
 
     /// Scalar / shared.
-    pub fn visit_fields<V: FieldVisitor<BitArray<[u8; 1], Lsb0>, A>>(
+    // Internal field walks for codec / Clone / Eq / Drop — not public API.
+    fn visit_fields<V: FieldVisitor<BitArray<[u8; 1], Lsb0>, A>>(
         &self,
         v: &mut V,
     ) -> ControlFlow<V::Break> {
@@ -149,7 +150,7 @@ impl<A: Allocator + Clone> Address<A> {
     }
 
     /// Pair / shared.
-    pub fn visit_field_pairs<V: FieldPairVisitor<BitArray<[u8; 1], Lsb0>, A>>(
+    fn visit_field_pairs<V: FieldPairVisitor<BitArray<[u8; 1], Lsb0>, A>>(
         &self,
         other: &Self,
         v: &mut V,
@@ -162,7 +163,7 @@ impl<A: Allocator + Clone> Address<A> {
     }
 
     /// Pair / mut.
-    pub fn visit_field_pairs_mut<V: FieldPairVisitorMut<BitArray<[u8; 1], Lsb0>, A>>(
+    fn visit_field_pairs_mut<V: FieldPairVisitorMut<BitArray<[u8; 1], Lsb0>, A>>(
         &self,
         dst: &mut Self,
         v: &mut V,
@@ -175,7 +176,7 @@ impl<A: Allocator + Clone> Address<A> {
     }
 
     /// Scalar / mut.
-    pub fn visit_fields_mut<V: FieldVisitorMut<BitArray<[u8; 1], Lsb0>, A>>(
+    fn visit_fields_mut<V: FieldVisitorMut<BitArray<[u8; 1], Lsb0>, A>>(
         &mut self,
         v: &mut V,
     ) -> ControlFlow<V::Break> {
