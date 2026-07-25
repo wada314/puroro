@@ -51,7 +51,7 @@ The puroro project comprises several crates and tools with distinct roles:
 | **`protobuf-core`** (git submodule) | Wire-format **primitives** — `Varint`, `Tag`, `WireType`, field I/O traits, varint read/write. Used by `puroro` and `puroro-rt`; **generated code does not import it directly**. |
 | **`puroro`** | **Stable user-facing runtime API** — `Message`, `Optional`, `HasDefault`, `DecodeError` / `EncodeError`, `WireType`, `UnknownField` / `UnknownPayload`. Library users depend on this crate; generated message code imports it for traits, accessor return types, and error handling. |
 | **`puroro-rt`** | **Generated-code runtime** — composable field catalog (`fields::*`, `MessageCommon`), wire encode/decode helpers (`encode` / `decode` modules), `ProtoDefault`, and allocator-aware string/bytes utilities. Generated crates depend on it **internally**; library users of generated messages must not need to name or import it (see [§4](#public-signatures-must-not-surface-puroro-rt)). Semver is looser than `puroro`. See [IMPLEMENTATION.md §4](IMPLEMENTATION.md#4-shared-infrastructure). |
-| **Code generator** (`protoc` plugin) | Reads `.proto` input (via `protoc`) and emits Rust source implementing the API defined in this document. **Primary execution path:** register as a `protoc` plugin (`--puroro_out=…`). Other invocation styles (standalone CLI, `build.rs` wrapper, etc.) are permitted but not required. External crates are named with leading-`::` paths (`::puroro::…`, `::puroro_rt::…`); names inside the generated module forest use `self::_root::…` ([Path qualification](#path-qualification)). |
+| **Code generator** (`protoc-gen-puroro`) | `protoc` plugin that reads `.proto` input and emits Rust implementing the API in this document. **Primary execution path:** `--puroro_out=…`. Other invocation styles (standalone CLI, `build.rs` wrapper, etc.) are permitted but not required. External crates use leading-`::` paths (`::puroro::…`, `::puroro_rt::…`); names inside the generated module forest use `self::_root::…` ([Path qualification](#path-qualification)). **Implementation status** (pipeline vs field emission): [IMPLEMENTATION.md §3](IMPLEMENTATION.md#3-implementation-status). |
 
 **Reference schema.** The `Task` and `Address` messages in [§4 Reference schema](#reference-schema) are the **canonical examples** for describing and reviewing generated code. All field-pattern subsections (§4.1–4.10) and [IMPLEMENTATION.md](IMPLEMENTATION.md) use this same schema unless noted otherwise.
 
@@ -213,12 +213,12 @@ pub trait Message: Sized {
 
 This section is the normative reference for what the code generator emits. All field patterns are illustrated using a single **editions** reference schema, since editions can express every variant (implicit/explicit presence, custom defaults, required-like semantics, open/closed enums, packed/expanded repeated) in one file.
 
-For each message type the code generator currently produces:
+This section is the **normative** eager-path shape. Hand-written [`sample-generated/`](sample-generated/) is the reference implementation; the live `protoc-gen-puroro` plugin has not yet reached full field emission ([IMPLEMENTATION.md §3](IMPLEMENTATION.md#3-implementation-status)). For each message type the generator must emit:
 
 1. **The primary struct** — a full-featured owned implementation (§4.0–4.10), internally a product of **`puroro_rt::fields` catalog types** + shared `MessageCommon` (see [IMPLEMENTATION.md §2](IMPLEMENTATION.md#2-architecture-overview)). Field accessors are **inherent methods** on that struct.
-2. **(Future) Per-message traits + specialized structs** — `FooMessage` / `FooMessageFallible` and alternative layouts (`TaskLazy`, `TaskView`) for generic interoperability across implementations ([§8](#8-future-work)). They are **not** emitted today; [`sample-generated/`](sample-generated/) is the normative shape for the eager path.
+2. **(Future) Per-message traits + specialized structs** — `FooMessage` / `FooMessageFallible` and alternative layouts (`TaskLazy`, `TaskView`) for generic interoperability across implementations ([§8](#8-future-work)). They are **not** part of the eager path; [`sample-generated/`](sample-generated/) remains the normative shape until then.
 
-Generated Rust is not hand-edited; the plugin still emits **section banners, proto field labels, and `merge_from` dispatch comments** so build output is navigable when debugging. Convention: [IMPLEMENTATION.md §9 — Generated code comments](IMPLEMENTATION.md#generated-code-comments). Reference output: [`sample-generated/`](sample-generated/).
+Generated Rust is not hand-edited; production plugin output must include **section banners, proto field labels, and `merge_from` dispatch comments** so build output is navigable when debugging. Convention: [IMPLEMENTATION.md §9 — Generated code comments](IMPLEMENTATION.md#generated-code-comments). Reference: [`sample-generated/`](sample-generated/).
 
 ### Module layout and naming
 
@@ -1179,7 +1179,7 @@ Protobuf `package` is the primary Rust module hierarchy. Message and oneof nesti
 
 ### `protoc` plugin as the primary codegen path
 
-The code generator is designed first as a `protoc` plugin. That is the expected way users invoke generation (`protoc --puroro_out=…`). Wrapper scripts, `build.rs` integration, or a standalone binary may exist alongside the plugin, but the plugin interface is the reference integration point.
+The code generator is the `protoc-gen-puroro` crate, invoked as a `protoc` plugin (`protoc --puroro_out=…`). Wrapper scripts, `build.rs` integration, or a standalone binary may exist alongside it, but the plugin interface is the reference integration point. Pipeline and emission progress: [IMPLEMENTATION.md §3](IMPLEMENTATION.md#3-implementation-status).
 
 ### `protobuf-core`, `puroro`, and `puroro-rt`
 

@@ -56,7 +56,7 @@ Internal implementation of **generated** protobuf message code: storage, wire I/
 | **`protobuf-core`** | Wire primitives (`Varint`, `Tag`, `WireType`). Used by `puroro` and `puroro-rt`; generated code does not import it. |
 | **`puroro`** | Stable user API: `Message`, `Optional`, `HasDefault`, errors, `WireType`, `UnknownField`. |
 | **`puroro-rt`** | Generated-code runtime: [`fields`](puroro-rt/src/fields.rs), wire `encode` / `decode` helpers, `ProtoDefault`. Depends on `puroro` for shared types. |
-| **`protoc` plugin** | Emits Rust types and `impl` blocks described here ([DESIGN.md §0](DESIGN.md#0-project-architecture)). |
+| **`protoc-gen-puroro`** | `protoc` plugin: decode `CodeGeneratorRequest`, resolve types, emit Rust per [DESIGN.md §0](DESIGN.md#0-project-architecture). |
 
 ---
 
@@ -131,10 +131,17 @@ protobuf-core           Varint, Tag, WireType
 | `ValueLayout` / `Inline` / `PayloadAccess` | **Done** |
 | Closed-enum unknown → `DecodeError::UnknownClosedEnum` → unknown fields, `validate_required` | **Done** |
 | Nested message via `SingularField<ProtoMessage<…>, …>` | **Done** |
-| [`sample-generated`](sample-generated/) (`Task` / `Address`) | **Done** |
+| [`sample-generated`](sample-generated/) (`Task` / `Address`) | **Done** — hand-written normative eager output |
 | `Fixed32ProtoType` / `Fixed64ProtoType` + markers on `SingularField` / `RepeatedField` | **Done** |
 | Repeated catalog (`RepeatedField<T, E, FIELD>`) | **Done** |
-| `protoc` plugin | **Planned** |
+| `protoc-gen-puroro` plugin I/O (`CodeGeneratorRequest` / `Response`) | **Done** |
+| Descriptor decode (messages / fields / enums / oneofs / features subset) | **Done** (intentional subset; defaults / map_entry / services / extensions not in IR yet) |
+| Type resolve (`FileSet`, `TypeRef`, presence / occurrence) | **Done** (not yet wired into `emit`) |
+| Module forest + `ModuleLayout::SingleFile` | **Done** (`FileTree` deferred) |
+| Empty-message emission (no fields / nested types) | **Done** — compile-tested via [`puroro-codegen-tests`](puroro-codegen-tests/) |
+| FieldKind → catalog emission (scalars, repeated, enum, oneof, map, …) | **Not started** |
+
+Live plugin output is still a **fake** path: one field-less root message per file, built from raw descriptors (not `resolved::resolve`). Full-featured structs in this document and in [`sample-generated/`](sample-generated/) describe the **target** shape the emitter must reach.
 
 ---
 
@@ -435,7 +442,7 @@ Normative wording: [DESIGN.md — Path qualification](DESIGN.md#path-qualificati
 
 ### Generated code comments
 
-Generated Rust is not meant to be hand-edited, but **must be easy to navigate when debugging** (breakpoints, `merge_from` dispatch, diffing encode output). The protoc plugin emits comments from proto metadata; [`sample-generated/`](sample-generated/) demonstrates the convention.
+Generated Rust is not meant to be hand-edited, but **must be easy to navigate when debugging** (breakpoints, `merge_from` dispatch, diffing encode output). Production plugin output must emit comments from proto metadata; [`sample-generated/`](sample-generated/) demonstrates the convention (the live emitter currently only covers field-less messages and does not yet emit the full comment set).
 
 **File header** — every generated module carries a machine marker and the source message:
 
@@ -768,7 +775,7 @@ The `set_*` per-variant setters are removed, matching the other field families.
 | Recursion limit | Enforced (`RECURSION_LIMIT = 100`, `merge_from_with_depth`) | — |
 | Repeated wrappers | `RepeatedField` + `RepeatedElement` (message / bool / scalar / LEN) | — |
 | Map wrappers | `MapField` + `MapKey` / `RepeatedElement` (sample `attributes`) | — |
-| `protoc` plugin | — | FieldKind → catalog emission |
+| `protoc-gen-puroro` field emission | Empty message + module forest only; `emit` skips `resolve` | Wire `emit` through `resolve`; FieldKind → catalog (scalars → nested / enum / repeated / oneof / map) |
 | Zero-copy views | — | `TaskView<'buf>` (DESIGN.md §8) |
 | `TaskLazy` | DESIGN only | Wire buffer + on-demand decode |
 | `Hash` / `serde` | Deferred | Opt-in features |
