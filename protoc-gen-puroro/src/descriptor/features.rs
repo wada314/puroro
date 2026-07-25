@@ -70,6 +70,136 @@ impl FeatureSet {
         }
         features
     }
+
+    /// Trap explicit overrides of features we do not apply yet (everything except
+    /// [`FieldPresence`], which resolve already consumes).
+    pub fn reject_unimplemented_overrides(&self, context: &str) {
+        if self.enum_type.is_some() {
+            unimplemented!(
+                "editions features.enum_type override is not implemented yet ({context})"
+            );
+        }
+        if self.repeated_field_encoding.is_some() {
+            unimplemented!(
+                "editions features.repeated_field_encoding override is not implemented yet ({context})"
+            );
+        }
+        if self.utf8_validation.is_some() {
+            unimplemented!(
+                "editions features.utf8_validation override is not implemented yet ({context})"
+            );
+        }
+        if self.message_encoding.is_some() {
+            unimplemented!(
+                "editions features.message_encoding override is not implemented yet ({context})"
+            );
+        }
+        if self.json_format.is_some() {
+            unimplemented!(
+                "editions features.json_format override is not implemented yet ({context})"
+            );
+        }
+        if self.enforce_naming_style.is_some() {
+            unimplemented!(
+                "editions features.enforce_naming_style override is not implemented yet ({context})"
+            );
+        }
+        if self.default_symbol_visibility.is_some() {
+            unimplemented!(
+                "editions features.default_symbol_visibility override is not implemented yet ({context})"
+            );
+        }
+    }
+
+    /// Trap at the sites where effective (merged) features must be applied.
+    ///
+    /// Today only [`FieldPresence`] is consumed for singular occurrence. Other
+    /// features: edition-default values are asserted (codegen still hardcodes the
+    /// same behavior — replace the assert body when wiring emit); any other value
+    /// is [`unimplemented!`].
+    pub fn apply_or_trap_for_field(
+        &self,
+        field_label_repeated: bool,
+        field_type: super::FieldType,
+    ) {
+        // field_presence: applied by resolve_occurrence
+
+        if field_label_repeated {
+            assert!(
+                matches!(
+                    self.repeated_field_encoding,
+                    Some(RepeatedFieldEncoding::Packed)
+                ),
+                "editions features.repeated_field_encoding={:?}: only PACKED is assumed until codegen reads this feature",
+                self.repeated_field_encoding
+            );
+            // TODO: emit packed/expanded repeated wire helpers from this feature.
+        }
+
+        if field_type == super::FieldType::Enum {
+            assert!(
+                matches!(self.enum_type, Some(EnumType::Open)),
+                "editions features.enum_type={:?}: only OPEN is assumed until codegen reads this feature",
+                self.enum_type
+            );
+            // TODO: emit open/closed enum storage from this feature.
+        }
+
+        if matches!(
+            field_type,
+            super::FieldType::String | super::FieldType::Bytes
+        ) {
+            assert!(
+                matches!(self.utf8_validation, Some(Utf8Validation::Verify)),
+                "editions features.utf8_validation={:?}: only VERIFY is assumed until codegen reads this feature",
+                self.utf8_validation
+            );
+            // TODO: emit UTF-8 verification policy from this feature.
+        }
+
+        if matches!(
+            field_type,
+            super::FieldType::Message | super::FieldType::Group
+        ) {
+            assert!(
+                matches!(self.message_encoding, Some(MessageEncoding::LengthPrefixed)),
+                "editions features.message_encoding={:?}: only LENGTH_PREFIXED is assumed until codegen reads this feature",
+                self.message_encoding
+            );
+            // TODO: emit length-prefixed / delimited encoding from this feature.
+        }
+    }
+
+    /// File-scope features that are not applied anywhere in resolve/codegen yet.
+    pub fn apply_or_trap_for_file(&self) {
+        assert!(
+            matches!(self.json_format, Some(JsonFormat::Allow)),
+            "editions features.json_format={:?}: only ALLOW is assumed until codegen reads this feature",
+            self.json_format
+        );
+        // TODO: emit JSON mapping policy from this feature.
+
+        assert!(
+            matches!(
+                self.enforce_naming_style,
+                Some(EnforceNamingStyle::StyleLegacy) | Some(EnforceNamingStyle::Style2024)
+            ),
+            "editions features.enforce_naming_style={:?} is not implemented yet",
+            self.enforce_naming_style
+        );
+        // TODO: apply naming-style checks when validating / emitting idents.
+
+        assert!(
+            matches!(
+                self.default_symbol_visibility,
+                Some(DefaultSymbolVisibility::ExportAll)
+                    | Some(DefaultSymbolVisibility::ExportTopLevel)
+            ),
+            "editions features.default_symbol_visibility={:?} is not implemented yet",
+            self.default_symbol_visibility
+        );
+        // TODO: apply default symbol visibility when emitting modules.
+    }
 }
 
 /// `FeatureSet.field_presence`.

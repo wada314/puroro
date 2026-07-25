@@ -162,6 +162,14 @@ fn fill_file_fields<'a>(
     proto: &ProtoFile,
     types_by_fqn: &HashMap<ProtoFqn, TypeItem<'a>>,
 ) -> Result<()> {
+    if let Syntax::Editions(edition) = proto.syntax {
+        proto
+            .features
+            .reject_unimplemented_overrides(&format!("file `{}`", proto.name));
+        let file_features = FeatureSet::defaults_for_edition(edition).overlay(&proto.features);
+        file_features.apply_or_trap_for_file();
+    }
+
     let package_fqn = ProtoFqn::from_package(&proto.package);
     for desc in &proto.messages {
         fill_message_fields(
@@ -276,6 +284,20 @@ fn resolve_occurrence(
     syntax: Syntax,
     file_features: FeatureSet,
 ) -> FieldOccurrence {
+    let editions_features = match syntax {
+        Syntax::Editions(edition) => {
+            field
+                .features
+                .reject_unimplemented_overrides(&format!("field `{}`", field.name));
+            let features = FeatureSet::defaults_for_edition(edition)
+                .overlay(&file_features)
+                .overlay(&field.features);
+            features.apply_or_trap_for_field(field.label == FieldLabel::Repeated, field.type_);
+            Some(features)
+        }
+        Syntax::Proto2 | Syntax::Proto3 => None,
+    };
+
     if field.label == FieldLabel::Repeated {
         return FieldOccurrence::Repeated;
     }
@@ -302,10 +324,8 @@ fn resolve_occurrence(
                 FieldOccurrence::Singular(SingularPresence::Implicit)
             }
         }
-        Syntax::Editions(edition) => {
-            let features = FeatureSet::defaults_for_edition(edition)
-                .overlay(&file_features)
-                .overlay(&field.features);
+        Syntax::Editions(_) => {
+            let features = editions_features.expect("Editions features computed above");
             let feature = features
                 .field_presence
                 .expect("edition defaults always set field_presence");
