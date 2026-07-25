@@ -1,14 +1,15 @@
-//! Code emission from descriptors.
+//! Code emission from a resolved schema.
 //!
 //! Current scope is a **fake** generator: only a single field-less root message
-//! is supported. That is enough to exercise the request → module forest →
-//! layout → compile → runtime pipeline before real catalog emission exists.
+//! is supported. Emission goes through [`resolve`] so later field catalog work
+//! can share the same type / presence graph.
 
-use crate::descriptor::{CodegenRequest, MessageDesc, ProtoFile, ProtoFqn};
+use crate::descriptor::CodegenRequest;
 use crate::error::{Error, Result};
 use crate::module_tree::layout::{ModuleLayout, render};
 use crate::module_tree::{ModuleForest, ModuleOrigin, type_name_to_module_ident};
 use crate::plugin_io::{CodeGeneratorResponse, ResponseFile};
+use crate::resolved::{Arena, File, FileSet, Message, resolve};
 use ::proc_macro2::{Ident, Span};
 use ::quote::quote;
 
@@ -16,33 +17,37 @@ mod empty_message;
 
 /// Generate plugin response files from a decoded request.
 pub fn emit(request: &CodegenRequest) -> Result<CodeGeneratorResponse> {
-    let mut files = Vec::new();
+    let arena = Arena::new();
+    let file_set = resolve(&arena, &request.proto_files)?;
 
+    let mut files = Vec::new();
     for target in &request.meta.file_to_generate {
-        let proto = request
-            .proto_files
-            .iter()
-            .find(|f| f.name == *target)
-            .ok_or_else(|| {
-                Error::Codegen(format!(
-                    "file_to_generate `{target}` was not present in proto_file"
-                ))
-            })?;
-        files.push(emit_proto_file(proto)?);
+        let file = find_file(&file_set, target)?;
+        files.push(emit_resolved_file(file)?);
     }
 
     Ok(CodeGeneratorResponse::from_files(files))
 }
 
-fn emit_proto_file(proto: &ProtoFile) -> Result<ResponseFile> {
-    validate_fake_proto(proto)?;
-    let message = &proto.messages[0];
-    let forest = build_forest(proto, message);
+fn find_file<'a>(file_set: &FileSet<'a>, target: &str) -> Result<&'a File<'a>> {
+    file_set
+        .files()
+        .find(|f| f.name() == target)
+        .ok_or_else(|| {
+            Error::Codegen(format!(
+                "file_to_generate `{target}` was not present in proto_file"
+            ))
+        })
+}
+
+fn emit_resolved_file<'a>(file: &'a File<'a>) -> Result<ResponseFile> {
+    let message = validate_fake_file(file)?;
+    let forest = build_forest(file, message);
 
     let mut files = render(
         &forest,
         &ModuleLayout::SingleFile {
-            path: proto_path_to_rust_path(&proto.name),
+            path: proto_path_to_rust_path(file.name()),
         },
     )?;
     files
@@ -50,26 +55,26 @@ fn emit_proto_file(proto: &ProtoFile) -> Result<ResponseFile> {
         .ok_or_else(|| Error::Codegen("layout produced no files".into()))
 }
 
-fn build_forest(proto: &ProtoFile, message: &MessageDesc) -> ModuleForest {
+fn build_forest(file: &File<'_>, message: &Message<'_>) -> ModuleForest {
     let mut forest = ModuleForest::new();
 
     // Root carries file-level docs / inner attributes.
-    let doc = format!("@generated from {} — do not edit", proto.name);
+    let doc = format!("@generated from {} — do not edit", file.name());
     let mut root_items = quote! {
         #![doc = #doc]
         #![allow(clippy::absolute_paths)]
     };
-    if !proto.package.is_empty() {
-        let package_doc = format!("Package `{}`", proto.package);
+    if !file.package().is_empty() {
+        let package_doc = format!("Package `{}`", file.package());
         root_items.extend(quote! {
             #![doc = #package_doc]
         });
     }
     forest.root_mut().append_items(root_items);
 
-    let parent = forest.ensure_package(&proto.package);
-    let mod_name = type_name_to_module_ident(&message.name);
-    let type_name = Ident::new(&message.name, Span::call_site());
+    let parent = forest.ensure_package(file.package());
+    let mod_name = type_name_to_module_ident(message.name());
+    let type_name = Ident::new(message.name(), Span::call_site());
 
     // Main message type is visible from the parent namespace.
     parent.append_items(quote! {
@@ -78,7 +83,7 @@ fn build_forest(proto: &ProtoFile, message: &MessageDesc) -> ModuleForest {
 
     let child = parent.get_or_insert_child(mod_name);
     child.add_origin(ModuleOrigin::Message {
-        proto_fqn: ProtoFqn::from_package_path(&proto.package, &[message.name.as_str()]),
+        proto_fqn: message.fqn().clone(),
     });
     child.append_items(empty_message::render_items(message));
 
@@ -86,36 +91,46 @@ fn build_forest(proto: &ProtoFile, message: &MessageDesc) -> ModuleForest {
 }
 
 /// Fake generator limits: one root message, no fields / nested types / enums.
-fn validate_fake_proto(proto: &ProtoFile) -> Result<()> {
-    if !proto.enums.is_empty() {
+fn validate_fake_file<'a>(file: &'a File<'a>) -> Result<&'a Message<'a>> {
+    if file.enums().next().is_some() {
         return Err(Error::Codegen(
             "fake generator does not support file-level enums yet".into(),
         ));
     }
-    if proto.messages.len() != 1 {
+
+    let mut messages = file.messages();
+    let Some(message) = messages.next() else {
+        return Err(Error::Codegen(
+            "fake generator requires exactly one root message, found 0".into(),
+        ));
+    };
+    let extra = messages.count();
+    if extra > 0 {
         return Err(Error::Codegen(format!(
             "fake generator requires exactly one root message, found {}",
-            proto.messages.len()
+            extra + 1
         )));
     }
-    validate_empty_message(&proto.messages[0])
+
+    validate_empty_message(message)?;
+    Ok(message)
 }
 
-fn validate_empty_message(message: &MessageDesc) -> Result<()> {
-    if !is_simple_ident(&message.name) {
+fn validate_empty_message(message: &Message<'_>) -> Result<()> {
+    if !is_simple_ident(message.name()) {
         return Err(Error::Codegen(format!(
             "message name `{}` is not a simple Rust identifier",
-            message.name
+            message.name()
         )));
     }
-    if !message.fields.is_empty()
-        || !message.nested_messages.is_empty()
-        || !message.nested_enums.is_empty()
-        || !message.oneofs.is_empty()
+    if message.fields().next().is_some()
+        || message.nested_messages().next().is_some()
+        || message.nested_enums().next().is_some()
+        || message.oneofs().next().is_some()
     {
         return Err(Error::Codegen(format!(
             "fake generator only supports field-less message `{}`",
-            message.name
+            message.name()
         )));
     }
     Ok(())

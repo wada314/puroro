@@ -136,12 +136,12 @@ protobuf-core           Varint, Tag, WireType
 | Repeated catalog (`RepeatedField<T, E, FIELD>`) | **Done** |
 | `protoc-gen-puroro` plugin I/O (`CodeGeneratorRequest` / `Response`) | **Done** |
 | Descriptor decode (messages / fields / enums / oneofs / features subset) | **Done** (intentional subset; defaults / map_entry / services / extensions not in IR yet) |
-| Type resolve (`FileSet`, `TypeRef`, presence / occurrence) | **Done** (not yet wired into `emit`) |
+| Type resolve (`FileSet`, `TypeRef`, presence / occurrence) | **Done** — `emit` resolves the full request before generating |
 | Module forest + `ModuleLayout::SingleFile` | **Done** (`FileTree` deferred) |
 | Empty-message emission (no fields / nested types) | **Done** — compile-tested via [`puroro-codegen-tests`](puroro-codegen-tests/) |
 | FieldKind → catalog emission (scalars, repeated, enum, oneof, map, …) | **Not started** |
 
-Live plugin output is still a **fake** path: one field-less root message per file, built from raw descriptors (not `resolved::resolve`). Full-featured structs in this document and in [`sample-generated/`](sample-generated/) describe the **target** shape the emitter must reach.
+Live plugin output is still a **fake** path: one field-less root message per file. Emission now goes through `resolved::resolve`, but does not yet map fields to the runtime catalog. Full-featured structs in this document and in [`sample-generated/`](sample-generated/) describe the **target** shape the emitter must reach.
 
 ---
 
@@ -775,7 +775,7 @@ The `set_*` per-variant setters are removed, matching the other field families.
 | Recursion limit | Enforced (`RECURSION_LIMIT = 100`, `merge_from_with_depth`) | — |
 | Repeated wrappers | `RepeatedField` + `RepeatedElement` (message / bool / scalar / LEN) | — |
 | Map wrappers | `MapField` + `MapKey` / `RepeatedElement` (sample `attributes`) | — |
-| `protoc-gen-puroro` field emission | Empty message + module forest only; `emit` skips `resolve` | Wire `emit` through `resolve`; FieldKind → catalog (scalars → nested / enum / repeated / oneof / map) |
+| `protoc-gen-puroro` field emission | Empty message + module forest; `emit` uses `resolve` | FieldKind → catalog (scalars → nested / enum / repeated / oneof / map) |
 | Zero-copy views | — | `TaskView<'buf>` (DESIGN.md §8) |
 | `TaskLazy` | DESIGN only | Wire buffer + on-demand decode |
 | `Hash` / `serde` | Deferred | Opt-in features |
