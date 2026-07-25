@@ -1,8 +1,8 @@
 //! Code emission from a resolved schema.
 //!
-//! Current scope is a **fake** generator: only a single field-less root message
-//! is supported. Emission goes through [`resolve`] so later field catalog work
-//! can share the same type / presence graph.
+//! Current scope: one root message per file, singular scalar / string / bytes /
+//! bool fields. Nested types, enums, repeated, oneof, and message fields are
+//! still rejected. Emission goes through [`resolve`] + [`plan_message`].
 
 use crate::descriptor::CodegenRequest;
 use crate::error::{Error, Result};
@@ -10,11 +10,11 @@ use crate::field_kind::{MessagePlan, plan_message};
 use crate::module_tree::layout::{ModuleLayout, render};
 use crate::module_tree::{ModuleForest, ModuleOrigin, type_name_to_module_ident};
 use crate::plugin_io::{CodeGeneratorResponse, ResponseFile};
-use crate::resolved::{Arena, File, FileSet, Message, resolve};
+use crate::resolved::{Arena, FieldOccurrence, File, FileSet, Message, SingularPresence, resolve};
 use ::proc_macro2::{Ident, Span};
 use ::quote::quote;
 
-mod empty_message;
+mod message;
 
 /// Generate plugin response files from a decoded request.
 pub fn emit(request: &CodegenRequest) -> Result<CodeGeneratorResponse> {
@@ -42,13 +42,9 @@ fn find_file<'a>(file_set: &FileSet<'a>, target: &str) -> Result<&'a File<'a>> {
 }
 
 fn emit_resolved_file<'a>(file: &'a File<'a>) -> Result<ResponseFile> {
-    let message = validate_fake_file(file)?;
+    let message = validate_emit_file(file)?;
     let plan = plan_message(message)?;
-    debug_assert!(
-        plan.members().is_empty() && plan.bit_count() == 0,
-        "fake generator should only see field-less plans"
-    );
-    let forest = build_forest(file, &plan);
+    let forest = build_forest(file, &plan)?;
 
     let mut files = render(
         &forest,
@@ -61,7 +57,7 @@ fn emit_resolved_file<'a>(file: &'a File<'a>) -> Result<ResponseFile> {
         .ok_or_else(|| Error::Codegen("layout produced no files".into()))
 }
 
-fn build_forest(file: &File<'_>, plan: &MessagePlan<'_>) -> ModuleForest {
+fn build_forest(file: &File<'_>, plan: &MessagePlan<'_>) -> Result<ModuleForest> {
     let message = plan.message();
     let mut forest = ModuleForest::new();
 
@@ -70,6 +66,8 @@ fn build_forest(file: &File<'_>, plan: &MessagePlan<'_>) -> ModuleForest {
     let mut root_items = quote! {
         #![doc = #doc]
         #![allow(clippy::absolute_paths)]
+        // Empty messages emit a catch-all-only `match` until field arms exist.
+        #![allow(clippy::match_single_binding)]
     };
     if !file.package().is_empty() {
         let package_doc = format!("Package `{}`", file.package());
@@ -92,55 +90,61 @@ fn build_forest(file: &File<'_>, plan: &MessagePlan<'_>) -> ModuleForest {
     child.add_origin(ModuleOrigin::Message {
         proto_fqn: message.fqn().clone(),
     });
-    child.append_items(empty_message::render_items(plan));
+    child.append_items(message::render_items(plan)?);
 
-    forest
+    Ok(forest)
 }
 
-/// Fake generator limits: one root message, no fields / nested types / enums.
-fn validate_fake_file<'a>(file: &'a File<'a>) -> Result<&'a Message<'a>> {
+/// One root message; no nested types / file-level enums / real oneofs.
+///
+/// Proto3 `optional` synthetic oneofs are allowed — they appear in
+/// `message.oneofs()` but fields keep [`SingularPresence::Explicit`].
+/// Field support is enforced by [`message::render_items`].
+fn validate_emit_file<'a>(file: &'a File<'a>) -> Result<&'a Message<'a>> {
     if file.enums().next().is_some() {
         return Err(Error::Codegen(
-            "fake generator does not support file-level enums yet".into(),
+            "generator does not support file-level enums yet".into(),
         ));
     }
 
     let mut messages = file.messages();
     let Some(message) = messages.next() else {
         return Err(Error::Codegen(
-            "fake generator requires exactly one root message, found 0".into(),
+            "generator requires exactly one root message, found 0".into(),
         ));
     };
     let extra = messages.count();
     if extra > 0 {
         return Err(Error::Codegen(format!(
-            "fake generator requires exactly one root message, found {}",
+            "generator requires exactly one root message, found {}",
             extra + 1
         )));
     }
 
-    validate_empty_message(message)?;
-    Ok(message)
-}
-
-fn validate_empty_message(message: &Message<'_>) -> Result<()> {
     if !is_simple_ident(message.name()) {
         return Err(Error::Codegen(format!(
             "message name `{}` is not a simple Rust identifier",
             message.name()
         )));
     }
-    if message.fields().next().is_some()
-        || message.nested_messages().next().is_some()
-        || message.nested_enums().next().is_some()
-        || message.oneofs().next().is_some()
-    {
+    if message.nested_messages().next().is_some() || message.nested_enums().next().is_some() {
         return Err(Error::Codegen(format!(
-            "fake generator only supports field-less message `{}`",
+            "generator does not support nested types on message `{}` yet",
             message.name()
         )));
     }
-    Ok(())
+    if message.fields().any(|f| {
+        matches!(
+            f.occurrence(),
+            FieldOccurrence::Singular(SingularPresence::Oneof)
+        )
+    }) {
+        return Err(Error::Codegen(format!(
+            "generator does not support oneofs on message `{}` yet",
+            message.name()
+        )));
+    }
+    Ok(message)
 }
 
 fn is_simple_ident(name: &str) -> bool {
@@ -231,13 +235,71 @@ mod tests {
     }
 
     #[test]
-    fn reject_message_with_fields() {
+    fn emit_singular_scalar_fields() {
+        let mut request = empty_request("Scalars");
+        request.meta.file_to_generate = vec!["scalars.proto".into()];
+        request.proto_files[0].name = "scalars.proto".into();
+        request.proto_files[0].messages[0].name = "Scalars".into();
+        request.proto_files[0].messages[0].fields = vec![
+            FieldDesc {
+                name: "score".into(),
+                number: 1,
+                label: FieldLabel::Optional,
+                type_: FieldType::Int32,
+                type_name: None,
+                oneof_index: None,
+                proto3_optional: false,
+                packed: None,
+                features: FeatureSet::default(),
+            },
+            FieldDesc {
+                name: "title".into(),
+                number: 2,
+                label: FieldLabel::Optional,
+                type_: FieldType::String,
+                type_name: None,
+                oneof_index: None,
+                proto3_optional: true,
+                packed: None,
+                features: FeatureSet::default(),
+            },
+            FieldDesc {
+                name: "done".into(),
+                number: 3,
+                label: FieldLabel::Optional,
+                type_: FieldType::Bool,
+                type_name: None,
+                oneof_index: None,
+                proto3_optional: false,
+                packed: None,
+                features: FeatureSet::default(),
+            },
+        ];
+        let response = emit(&request).unwrap();
+        let content = &response.files[0].content;
+        assert!(content.contains("struct Scalars"));
+        assert!(content.contains("pub const FIELD_SCORE"));
+        assert!(content.contains("pub const FIELD_TITLE"));
+        assert!(content.contains("pub const BIT_TITLE"));
+        assert!(content.contains("pub const BIT_DONE_VALUE"));
+        assert!(content.contains("ProtoInt32"));
+        assert!(content.contains("ProtoString"));
+        assert!(content.contains("ProtoBool"));
+        assert!(content.contains("BitPacked"));
+        assert!(content.contains("fn score("));
+        assert!(content.contains(".optional()"));
+        assert!(content.contains("BIT_DONE_VALUE"));
+        assert!(content.contains("FIELD_SCORE =>"));
+    }
+
+    #[test]
+    fn reject_repeated_field() {
         let mut request = empty_request("Task");
         request.proto_files[0].messages[0].fields.push(FieldDesc {
-            name: "title".into(),
+            name: "tag_ids".into(),
             number: 1,
-            label: FieldLabel::Optional,
-            type_: FieldType::String,
+            label: FieldLabel::Repeated,
+            type_: FieldType::Int32,
             type_name: None,
             oneof_index: None,
             proto3_optional: false,
@@ -245,7 +307,7 @@ mod tests {
             features: FeatureSet::default(),
         });
         let err = emit(&request).unwrap_err();
-        assert!(err.to_string().contains("field-less"));
+        assert!(err.to_string().contains("repeated"));
     }
 
     #[test]

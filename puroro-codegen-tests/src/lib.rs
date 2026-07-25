@@ -1,7 +1,9 @@
-//! Runtime tests against code produced by `protoc-gen-puroro` at build time.
+//! Runtime tests against code produced by `protoc` + `protoc-gen-puroro` at
+//! build time.
 //!
 //! Each case lives under `fixtures/<case>/` (`*.proto` + `test.rs`). `build.rs`
-//! generates modules into `OUT_DIR` and wires the per-case tests as unit tests.
+//! invokes real `protoc` with the plugin, writes modules into `OUT_DIR`, and
+//! wires the per-case tests as unit tests.
 
 #![allow(dead_code)]
 

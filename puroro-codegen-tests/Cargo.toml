@@ -8,9 +8,6 @@ description = "Compile-time generation + runtime tests for protoc-gen-puroro"
 [lints]
 workspace = true
 
-[build-dependencies]
-protoc-gen-puroro = { path = "../protoc-gen-puroro" }
-
 [dependencies]
 allocator-api2 = "0.2"
 bitvec = "1"

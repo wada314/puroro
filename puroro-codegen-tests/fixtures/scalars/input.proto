@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+message Scalars {
+  int32 score = 1;
+  optional string title = 2;
+  bool done = 3;
+  optional fixed32 postal_code = 4;
+  optional double latitude = 5;
+}

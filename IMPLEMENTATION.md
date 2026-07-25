@@ -139,11 +139,11 @@ protobuf-core           Varint, Tag, WireType
 | Type resolve (`FileSet`, `TypeRef`, presence / occurrence) | **Done** — `emit` resolves the full request before generating |
 | Editions features in resolve / FieldKind | **Partial** — `field_presence`, `enum_type`, `repeated_field_encoding`, `utf8_validation` resolved; `message_encoding=DELIMITED` rejected; JSON / naming / visibility still traps |
 | Module forest + `ModuleLayout::SingleFile` | **Done** (`FileTree` deferred) |
-| Empty-message emission (no fields / nested types) | **Done** — compile-tested via [`puroro-codegen-tests`](puroro-codegen-tests/) |
+| Empty-message emission (no fields / nested types) | **Done** — compile-tested via [`puroro-codegen-tests`](puroro-codegen-tests/) (`protoc` + plugin) |
 | FieldKind IR (`plan_message`, bit assignment, catalog kind) | **Done** — scalars / repeated / enum / oneof planned; map_entry & custom defaults not in IR yet |
-| FieldKind → catalog emission (struct members, accessors, visitors) | **Not started** |
+| FieldKind → catalog emission (struct members, accessors, visitors) | **Partial** — singular scalar / string / bytes / bool (incl. `BitPacked`); repeated / oneof / enum / message not yet |
 
-Live plugin output is still a **fake** path: one field-less root message per file. Emission goes through `resolved::resolve` and [`field_kind::plan_message`](protoc-gen-puroro/src/field_kind.rs), but does not yet emit catalog field members. Full-featured structs in this document and in [`sample-generated/`](sample-generated/) describe the **target** shape the emitter must reach.
+Live plugin emits one root message per file with singular scalar fields via `resolved::resolve` + [`field_kind::plan_message`](protoc-gen-puroro/src/field_kind.rs). Nested types, enums, repeated, oneof, and message fields are still rejected. Full-featured structs in this document and in [`sample-generated/`](sample-generated/) remain the target for the remaining field families.
 
 ---
 
@@ -777,7 +777,7 @@ The `set_*` per-variant setters are removed, matching the other field families.
 | Recursion limit | Enforced (`RECURSION_LIMIT = 100`, `merge_from_with_depth`) | — |
 | Repeated wrappers | `RepeatedField` + `RepeatedElement` (message / bool / scalar / LEN) | — |
 | Map wrappers | `MapField` + `MapKey` / `RepeatedElement` (sample `attributes`) | — |
-| `protoc-gen-puroro` field emission | Empty message; `resolve` + FieldKind plan wired (editions presence / enum / packed / utf8 in IR) | Emit catalog from `MessagePlan` (scalars → nested / enum / repeated / oneof / map); honour `utf8_validation=NONE` in generated decode |
+| `protoc-gen-puroro` field emission | Singular scalars emitted; repeated / oneof / enum / message pending | Remaining field families from `MessagePlan`; honour `utf8_validation=NONE` in generated decode |
 | Zero-copy views | — | `TaskView<'buf>` (DESIGN.md §8) |
 | `TaskLazy` | DESIGN only | Wire buffer + on-demand decode |
 | `Hash` / `serde` | Deferred | Opt-in features |
