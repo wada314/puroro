@@ -137,6 +137,7 @@ protobuf-core           Varint, Tag, WireType
 | `protoc-gen-puroro` plugin I/O (`CodeGeneratorRequest` / `Response`) | **Done** |
 | Descriptor decode (messages / fields / enums / oneofs / features subset) | **Done** (intentional subset; defaults / map_entry / services / extensions not in IR yet) |
 | Type resolve (`FileSet`, `TypeRef`, presence / occurrence) | **Done** — `emit` resolves the full request before generating |
+| Editions features in resolve / FieldKind | **Partial** — `field_presence`, `enum_type`, `repeated_field_encoding`, `utf8_validation` resolved; `message_encoding=DELIMITED` rejected; JSON / naming / visibility still traps |
 | Module forest + `ModuleLayout::SingleFile` | **Done** (`FileTree` deferred) |
 | Empty-message emission (no fields / nested types) | **Done** — compile-tested via [`puroro-codegen-tests`](puroro-codegen-tests/) |
 | FieldKind IR (`plan_message`, bit assignment, catalog kind) | **Done** — scalars / repeated / enum / oneof planned; map_entry & custom defaults not in IR yet |
@@ -776,7 +777,7 @@ The `set_*` per-variant setters are removed, matching the other field families.
 | Recursion limit | Enforced (`RECURSION_LIMIT = 100`, `merge_from_with_depth`) | — |
 | Repeated wrappers | `RepeatedField` + `RepeatedElement` (message / bool / scalar / LEN) | — |
 | Map wrappers | `MapField` + `MapKey` / `RepeatedElement` (sample `attributes`) | — |
-| `protoc-gen-puroro` field emission | Empty message; `resolve` + FieldKind plan wired | Emit catalog from `MessagePlan` (scalars → nested / enum / repeated / oneof / map) |
+| `protoc-gen-puroro` field emission | Empty message; `resolve` + FieldKind plan wired (editions presence / enum / packed / utf8 in IR) | Emit catalog from `MessagePlan` (scalars → nested / enum / repeated / oneof / map); honour `utf8_validation=NONE` in generated decode |
 | Zero-copy views | — | `TaskView<'buf>` (DESIGN.md §8) |
 | `TaskLazy` | DESIGN only | Wire buffer + on-demand decode |
 | `Hash` / `serde` | Deferred | Opt-in features |

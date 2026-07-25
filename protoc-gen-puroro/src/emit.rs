@@ -241,6 +241,7 @@ mod tests {
             type_name: None,
             oneof_index: None,
             proto3_optional: false,
+            packed: None,
             features: FeatureSet::default(),
         });
         let err = emit(&request).unwrap_err();

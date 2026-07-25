@@ -64,7 +64,7 @@ The puroro project comprises several crates and tools with distinct roles:
 
 | Feature | Design intent | Implementation status |
 |---|---|---|
-| `utf8_validation` (`VERIFY` / `NONE`) | Generated decode paths honour the per-field Editions setting. | Error type and `VERIFY` path exist; `NONE` bypass and per-field dispatch in generated code are **pending**. |
+| `utf8_validation` (`VERIFY` / `NONE`) | Generated decode paths honour the per-field Editions setting. | Resolved into FieldKind (`WireTypeKind::String` / `Bytes`); runtime `NONE` bypass and generated decode dispatch are **pending**. |
 | Recursion limit | Nested-message `merge_from` enforces a depth limit; excess depth → `DecodeError::RecursionLimitExceeded`. | **Done** — `Message::merge_from_with_depth` + `RECURSION_LIMIT` (100); nested catalog paths pass `depth + 1`. |
 | Deprecated groups (`SGroup` / `EGroup`) | Never generated; not preserved on decode. | Decoder may return `DecodeError::InvalidTag`, skip, or panic — round-trip fidelity for groups is **not** a goal. |
 

@@ -249,6 +249,7 @@ fn decode_field(bytes: &[u8]) -> Result<FieldDesc> {
         let mut type_name = None;
         let mut oneof_index = None;
         let mut proto3_optional = false;
+        let mut packed = None;
         let mut features = FeatureSet::default();
 
         for field in AsRefExtProtobuf::read_protobuf_fields(&bytes) {
@@ -273,7 +274,9 @@ fn decode_field(bytes: &[u8]) -> Result<FieldDesc> {
                 // optional FieldOptions options = 8;
                 8 => {
                     let nested = expect_len(&field)?;
-                    features = decode_options_features(nested)?;
+                    let (opt_features, opt_packed) = decode_field_options(nested)?;
+                    features = opt_features;
+                    packed = opt_packed;
                 }
                 // optional int32 oneof_index = 9;
                 9 => oneof_index = Some(expect_int32(&field)?),
@@ -291,12 +294,13 @@ fn decode_field(bytes: &[u8]) -> Result<FieldDesc> {
             type_name,
             oneof_index,
             proto3_optional,
+            packed,
             features,
         })
     })
 }
 
-/// `FileOptions` / `FieldOptions`: read `features` (50).
+/// `FileOptions` / `EnumOptions`: read `features` (50).
 fn decode_options_features(bytes: &[u8]) -> Result<FeatureSet> {
     let mut features = FeatureSet::default();
     for field in AsRefExtProtobuf::read_protobuf_fields(&bytes) {
@@ -308,6 +312,26 @@ fn decode_options_features(bytes: &[u8]) -> Result<FeatureSet> {
         }
     }
     Ok(features)
+}
+
+/// `FieldOptions`: `packed` (2) and `features` (50).
+fn decode_field_options(bytes: &[u8]) -> Result<(FeatureSet, Option<bool>)> {
+    let mut features = FeatureSet::default();
+    let mut packed = None;
+    for field in AsRefExtProtobuf::read_protobuf_fields(&bytes) {
+        let field = field?;
+        match field.field_number.as_u32() {
+            // optional bool packed = 2;
+            2 => packed = Some(expect_bool(&field)?),
+            // optional FeatureSet features = 50;
+            50 => {
+                let nested = expect_len(&field)?;
+                features = decode_feature_set(nested)?;
+            }
+            _ => {}
+        }
+    }
+    Ok((features, packed))
 }
 
 fn decode_feature_set(bytes: &[u8]) -> Result<FeatureSet> {
@@ -380,6 +404,7 @@ fn decode_enum(bytes: &[u8]) -> Result<EnumDesc> {
     with_decoding_context("EnumDescriptorProto", || {
         let mut name = String::new();
         let mut values = Vec::new();
+        let mut features = FeatureSet::default();
         for field in AsRefExtProtobuf::read_protobuf_fields(&bytes) {
             let field = field?;
             match field.field_number.as_u32() {
@@ -390,10 +415,19 @@ fn decode_enum(bytes: &[u8]) -> Result<EnumDesc> {
                     let nested = expect_len(&field)?;
                     values.push(decode_enum_value(nested)?);
                 }
+                // optional EnumOptions options = 3;
+                3 => {
+                    let nested = expect_len(&field)?;
+                    features = decode_options_features(nested)?;
+                }
                 _ => {}
             }
         }
-        Ok(EnumDesc { name, values })
+        Ok(EnumDesc {
+            name,
+            values,
+            features,
+        })
     })
 }
 

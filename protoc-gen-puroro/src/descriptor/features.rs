@@ -1,8 +1,8 @@
 //! Editions [`FeatureSet`](https://protobuf.dev/editions/overview/) subset.
 //!
 //! Mirrors `google.protobuf.FeatureSet` fields that protoc may set on file /
-//! field options. Unset members are [`None`] (inherit from a parent scope or
-//! edition defaults during resolve).
+//! field / enum options. Unset members are [`None`] (inherit from a parent scope
+//! or edition defaults during resolve).
 
 /// Resolved / declared Editions features (`google.protobuf.FeatureSet`).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
@@ -71,29 +71,11 @@ impl FeatureSet {
         features
     }
 
-    /// Trap explicit overrides of features we do not apply yet (everything except
-    /// [`FieldPresence`], which resolve already consumes).
+    /// Trap explicit overrides of features resolve / codegen do not apply yet.
+    ///
+    /// Consumed today: `field_presence`, `enum_type`, `repeated_field_encoding`,
+    /// `utf8_validation`, and `message_encoding` (LENGTH_PREFIXED only).
     pub fn reject_unimplemented_overrides(&self, context: &str) {
-        if self.enum_type.is_some() {
-            unimplemented!(
-                "editions features.enum_type override is not implemented yet ({context})"
-            );
-        }
-        if self.repeated_field_encoding.is_some() {
-            unimplemented!(
-                "editions features.repeated_field_encoding override is not implemented yet ({context})"
-            );
-        }
-        if self.utf8_validation.is_some() {
-            unimplemented!(
-                "editions features.utf8_validation override is not implemented yet ({context})"
-            );
-        }
-        if self.message_encoding.is_some() {
-            unimplemented!(
-                "editions features.message_encoding override is not implemented yet ({context})"
-            );
-        }
         if self.json_format.is_some() {
             unimplemented!(
                 "editions features.json_format override is not implemented yet ({context})"
@@ -108,65 +90,6 @@ impl FeatureSet {
             unimplemented!(
                 "editions features.default_symbol_visibility override is not implemented yet ({context})"
             );
-        }
-    }
-
-    /// Trap at the sites where effective (merged) features must be applied.
-    ///
-    /// Today only [`FieldPresence`] is consumed for singular occurrence. Other
-    /// features: edition-default values are asserted (codegen still hardcodes the
-    /// same behavior — replace the assert body when wiring emit); any other value
-    /// is [`unimplemented!`].
-    pub fn apply_or_trap_for_field(
-        &self,
-        field_label_repeated: bool,
-        field_type: super::FieldType,
-    ) {
-        // field_presence: applied by resolve_occurrence
-
-        if field_label_repeated {
-            assert!(
-                matches!(
-                    self.repeated_field_encoding,
-                    Some(RepeatedFieldEncoding::Packed)
-                ),
-                "editions features.repeated_field_encoding={:?}: only PACKED is assumed until codegen reads this feature",
-                self.repeated_field_encoding
-            );
-            // TODO: emit packed/expanded repeated wire helpers from this feature.
-        }
-
-        if field_type == super::FieldType::Enum {
-            assert!(
-                matches!(self.enum_type, Some(EnumType::Open)),
-                "editions features.enum_type={:?}: only OPEN is assumed until codegen reads this feature",
-                self.enum_type
-            );
-            // TODO: emit open/closed enum storage from this feature.
-        }
-
-        if matches!(
-            field_type,
-            super::FieldType::String | super::FieldType::Bytes
-        ) {
-            assert!(
-                matches!(self.utf8_validation, Some(Utf8Validation::Verify)),
-                "editions features.utf8_validation={:?}: only VERIFY is assumed until codegen reads this feature",
-                self.utf8_validation
-            );
-            // TODO: emit UTF-8 verification policy from this feature.
-        }
-
-        if matches!(
-            field_type,
-            super::FieldType::Message | super::FieldType::Group
-        ) {
-            assert!(
-                matches!(self.message_encoding, Some(MessageEncoding::LengthPrefixed)),
-                "editions features.message_encoding={:?}: only LENGTH_PREFIXED is assumed until codegen reads this feature",
-                self.message_encoding
-            );
-            // TODO: emit length-prefixed / delimited encoding from this feature.
         }
     }
 
@@ -221,7 +144,7 @@ impl FieldPresence {
     }
 }
 
-/// `FeatureSet.enum_type`.
+/// `FeatureSet.enum_type` (targets: file, enum).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum EnumType {
     Open = 1,
@@ -238,7 +161,7 @@ impl EnumType {
     }
 }
 
-/// `FeatureSet.repeated_field_encoding`.
+/// `FeatureSet.repeated_field_encoding` (targets: file, field).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum RepeatedFieldEncoding {
     Packed = 1,
@@ -255,7 +178,7 @@ impl RepeatedFieldEncoding {
     }
 }
 
-/// `FeatureSet.utf8_validation` (wire value 1 is reserved).
+/// `FeatureSet.utf8_validation` (wire value 1 is reserved; targets: file, field).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Utf8Validation {
     Verify = 2,
@@ -272,7 +195,7 @@ impl Utf8Validation {
     }
 }
 
-/// `FeatureSet.message_encoding`.
+/// `FeatureSet.message_encoding` (targets: file, field).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum MessageEncoding {
     LengthPrefixed = 1,

@@ -10,7 +10,8 @@ mod plan;
 
 pub use plan::{MessageMember, MessagePlan, PlannedField, PlannedOneof, plan_message};
 
-use crate::resolved::{Enum, Message, SingularPresence, TypeRef};
+use crate::descriptor::features::{EnumType, RepeatedFieldEncoding, Utf8Validation};
+use crate::resolved::{Enum, Field, Message, SingularPresence, TypeRef};
 
 /// Catalog shape for one generated field (struct member or oneof variant).
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -37,8 +38,12 @@ pub enum WireTypeKind<'a> {
     Fixed64,
     Fixed32,
     Bool,
-    String,
-    Bytes,
+    String {
+        utf8: Utf8Validation,
+    },
+    Bytes {
+        utf8: Utf8Validation,
+    },
     UInt32,
     SFixed32,
     SFixed64,
@@ -47,8 +52,7 @@ pub enum WireTypeKind<'a> {
     Message(&'a Message<'a>),
     Enum {
         ty: &'a Enum<'a>,
-        /// Always [`EnumOpenness::Open`] until resolve stores `enum_type`.
-        openness: EnumOpenness,
+        openness: EnumType,
     },
 }
 
@@ -64,13 +68,13 @@ impl PartialEq for WireTypeKind<'_> {
             | (Self::Fixed64, Self::Fixed64)
             | (Self::Fixed32, Self::Fixed32)
             | (Self::Bool, Self::Bool)
-            | (Self::String, Self::String)
-            | (Self::Bytes, Self::Bytes)
             | (Self::UInt32, Self::UInt32)
             | (Self::SFixed32, Self::SFixed32)
             | (Self::SFixed64, Self::SFixed64)
             | (Self::SInt32, Self::SInt32)
             | (Self::SInt64, Self::SInt64) => true,
+            (Self::String { utf8: a }, Self::String { utf8: b })
+            | (Self::Bytes { utf8: a }, Self::Bytes { utf8: b }) => a == b,
             (Self::Message(a), Self::Message(b)) => ptr::eq(*a, *b),
             (
                 Self::Enum {
@@ -104,7 +108,7 @@ pub enum CatalogPresence {
     },
     /// Variant inside a [`PlannedOneof`] / `OneofSlot`.
     Oneof,
-    /// Singular message / group — pointer presence (`Message` marker).
+    /// Singular message — pointer presence (`Message` marker).
     Message,
 }
 
@@ -126,16 +130,19 @@ pub enum RepeatedEncodingKind {
     Expanded,
 }
 
-/// `ProtoEnum<E, Open|Closed>` openness parameter.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum EnumOpenness {
-    Open,
-    Closed,
+impl RepeatedEncodingKind {
+    pub fn from_resolved(encoding: RepeatedFieldEncoding) -> Self {
+        match encoding {
+            RepeatedFieldEncoding::Packed => Self::Packed,
+            RepeatedFieldEncoding::Expanded => Self::Expanded,
+        }
+    }
 }
 
 impl<'a> WireTypeKind<'a> {
-    pub fn from_type_ref(type_ref: &TypeRef<'a>) -> Self {
-        match type_ref {
+    pub fn from_field(field: &Field<'a>) -> Self {
+        let utf8 = field.utf8_validation();
+        match field.type_ref() {
             TypeRef::Double => Self::Double,
             TypeRef::Float => Self::Float,
             TypeRef::Int64 => Self::Int64,
@@ -144,8 +151,12 @@ impl<'a> WireTypeKind<'a> {
             TypeRef::Fixed64 => Self::Fixed64,
             TypeRef::Fixed32 => Self::Fixed32,
             TypeRef::Bool => Self::Bool,
-            TypeRef::String => Self::String,
-            TypeRef::Bytes => Self::Bytes,
+            TypeRef::String => Self::String {
+                utf8: utf8.unwrap_or(Utf8Validation::Verify),
+            },
+            TypeRef::Bytes => Self::Bytes {
+                utf8: utf8.unwrap_or(Utf8Validation::Verify),
+            },
             TypeRef::UInt32 => Self::UInt32,
             TypeRef::SFixed32 => Self::SFixed32,
             TypeRef::SFixed64 => Self::SFixed64,
@@ -154,9 +165,7 @@ impl<'a> WireTypeKind<'a> {
             TypeRef::Message(m) => Self::Message(m),
             TypeRef::Enum(e) => Self::Enum {
                 ty: e,
-                // Resolve does not yet surface editions `enum_type`; match the
-                // current feature trap (OPEN assumed).
-                openness: EnumOpenness::Open,
+                openness: e.openness(),
             },
         }
     }
@@ -168,7 +177,7 @@ impl<'a> WireTypeKind<'a> {
     /// Whether the type may use packed repeated wire encoding.
     pub fn is_packable(self) -> bool {
         match self {
-            Self::String | Self::Bytes | Self::Message(_) => false,
+            Self::String { .. } | Self::Bytes { .. } | Self::Message(_) => false,
             Self::Double
             | Self::Float
             | Self::Int64

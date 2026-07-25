@@ -96,6 +96,8 @@ pub struct FieldDesc {
     /// Index into the parent message's `oneofs`, when this field is a oneof member.
     pub oneof_index: Option<i32>,
     pub proto3_optional: bool,
+    /// proto2/proto3 `FieldOptions.packed` (editions uses `features.repeated_field_encoding`).
+    pub packed: Option<bool>,
     /// Field-level `options.features` (`FeatureSet`), if any fields were set.
     pub features: FeatureSet,
 }
@@ -142,6 +144,8 @@ pub struct OneofDesc {
 pub struct EnumDesc {
     pub name: String,
     pub values: Vec<EnumValueDesc>,
+    /// Enum-level `options.features` (`FeatureSet`), if any fields were set.
+    pub features: FeatureSet,
 }
 
 /// An enum value (`EnumValueDescriptorProto` subset).

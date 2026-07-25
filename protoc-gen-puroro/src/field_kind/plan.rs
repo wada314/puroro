@@ -93,9 +93,9 @@ impl<'a> PlannedOneof<'a> {
 /// value bit. Struct member order places each oneof group at its lowest field
 /// number; remaining fields keep numeric order.
 ///
-/// Custom defaults, map entries, and editions `enum_type` / packed overrides are
-/// not read yet (defaults: no `HasDefault` param, enums `Open`, packable
-/// repeated → `Packed`).
+/// Custom defaults and map entries are not represented yet. Editions
+/// `enum_type`, `repeated_field_encoding`, and `utf8_validation` come from the
+/// resolved field / enum.
 pub fn plan_message<'a>(message: &'a Message<'a>) -> Result<MessagePlan<'a>> {
     let mut fields: Vec<&'a Field<'a>> = message.fields().collect();
     fields.sort_by_key(|f| f.number());
@@ -190,7 +190,7 @@ pub fn plan_message<'a>(message: &'a Message<'a>) -> Result<MessagePlan<'a>> {
 }
 
 fn plan_field<'a>(field: &'a Field<'a>, next_bit: &mut usize) -> Result<PlannedField<'a>> {
-    let wire = WireTypeKind::from_type_ref(field.type_ref());
+    let wire = WireTypeKind::from_field(field);
     let field_const = field_number_const(field.name());
 
     if field.number() <= 0 {
@@ -202,11 +202,10 @@ fn plan_field<'a>(field: &'a Field<'a>, next_bit: &mut usize) -> Result<PlannedF
     }
 
     let kind = match field.occurrence() {
-        FieldOccurrence::Repeated => {
+        FieldOccurrence::Repeated(encoding) => {
+            // Non-packable types cannot use packed wire form regardless of feature.
             let encoding = if wire.is_packable() {
-                // Editions `repeated_field_encoding` is not on the resolved field
-                // yet; match the current feature trap (PACKED assumed).
-                RepeatedEncodingKind::Packed
+                RepeatedEncodingKind::from_resolved(encoding)
             } else {
                 RepeatedEncodingKind::Expanded
             };
@@ -245,11 +244,14 @@ fn plan_field<'a>(field: &'a Field<'a>, next_bit: &mut usize) -> Result<PlannedF
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::descriptor::features::FeatureSet;
-    use crate::descriptor::{
-        FieldDesc, FieldLabel, FieldType, MessageDesc, OneofDesc, ProtoFile, ProtoFqn, Syntax,
+    use crate::descriptor::features::{
+        EnumType, FeatureSet, RepeatedFieldEncoding, Utf8Validation,
     };
-    use crate::field_kind::{CatalogLayout, CatalogPresence, EnumOpenness, presence_byte_len};
+    use crate::descriptor::{
+        Edition, FieldDesc, FieldLabel, FieldType, MessageDesc, OneofDesc, ProtoFile, ProtoFqn,
+        Syntax,
+    };
+    use crate::field_kind::{CatalogLayout, CatalogPresence, presence_byte_len};
     use crate::resolved::{Arena, resolve};
 
     fn proto3_file(messages: Vec<MessageDesc>) -> ProtoFile {
@@ -281,6 +283,7 @@ mod tests {
             type_name,
             oneof_index,
             proto3_optional,
+            packed: None,
             features: FeatureSet::default(),
         }
     }
@@ -368,7 +371,10 @@ mod tests {
         assert_eq!(street.field_const(), "FIELD_STREET");
         match street.kind() {
             FieldKind::Singular {
-                wire: WireTypeKind::String,
+                wire:
+                    WireTypeKind::String {
+                        utf8: Utf8Validation::Verify,
+                    },
                 presence: CatalogPresence::Explicit { bit: 0, bit_const },
                 layout: CatalogLayout::Inline,
             } => assert_eq!(bit_const, "BIT_STREET"),
@@ -575,10 +581,127 @@ mod tests {
         assert_eq!(
             labels.kind(),
             &FieldKind::Repeated {
-                wire: WireTypeKind::String,
+                wire: WireTypeKind::String {
+                    utf8: Utf8Validation::Verify,
+                },
                 encoding: RepeatedEncodingKind::Expanded,
             }
         );
+    }
+
+    #[test]
+    fn editions_features_flow_into_plan() {
+        use crate::descriptor::{EnumDesc, EnumValueDesc};
+
+        let arena = Arena::new();
+        let file = ProtoFile {
+            name: "t.proto".into(),
+            package: "example".into(),
+            syntax: Syntax::Editions(Edition::Edition2023),
+            features: FeatureSet::default(),
+            dependency: vec![],
+            messages: vec![MessageDesc {
+                name: "T".into(),
+                fields: vec![
+                    FieldDesc {
+                        name: "scores".into(),
+                        number: 1,
+                        label: FieldLabel::Repeated,
+                        type_: FieldType::Int32,
+                        type_name: None,
+                        oneof_index: None,
+                        proto3_optional: false,
+                        packed: None,
+                        features: FeatureSet {
+                            repeated_field_encoding: Some(RepeatedFieldEncoding::Expanded),
+                            ..FeatureSet::default()
+                        },
+                    },
+                    FieldDesc {
+                        name: "title".into(),
+                        number: 2,
+                        label: FieldLabel::Optional,
+                        type_: FieldType::String,
+                        type_name: None,
+                        oneof_index: None,
+                        proto3_optional: false,
+                        packed: None,
+                        features: FeatureSet {
+                            utf8_validation: Some(Utf8Validation::None),
+                            ..FeatureSet::default()
+                        },
+                    },
+                    FieldDesc {
+                        name: "priority".into(),
+                        number: 3,
+                        label: FieldLabel::Optional,
+                        type_: FieldType::Enum,
+                        type_name: Some(ProtoFqn::parse(".example.Priority")),
+                        oneof_index: None,
+                        proto3_optional: false,
+                        packed: None,
+                        features: FeatureSet::default(),
+                    },
+                ],
+                nested_messages: vec![],
+                nested_enums: vec![],
+                oneofs: vec![],
+            }],
+            enums: vec![EnumDesc {
+                name: "Priority".into(),
+                values: vec![EnumValueDesc {
+                    name: "PRIORITY_UNSPECIFIED".into(),
+                    number: 0,
+                }],
+                features: FeatureSet {
+                    enum_type: Some(EnumType::Closed),
+                    ..FeatureSet::default()
+                },
+            }],
+        };
+        let set = resolve(&arena, &[file]).unwrap();
+        let msg = set.lookup(".example.T").unwrap().as_message().unwrap();
+        let plan = plan_message(msg).unwrap();
+
+        let MessageMember::Field(scores) = &plan.members()[0] else {
+            panic!();
+        };
+        assert_eq!(
+            scores.kind(),
+            &FieldKind::Repeated {
+                wire: WireTypeKind::Int32,
+                encoding: RepeatedEncodingKind::Expanded,
+            }
+        );
+
+        let MessageMember::Field(title) = &plan.members()[1] else {
+            panic!();
+        };
+        match title.kind() {
+            FieldKind::Singular {
+                wire:
+                    WireTypeKind::String {
+                        utf8: Utf8Validation::None,
+                    },
+                ..
+            } => {}
+            other => panic!("{other:?}"),
+        }
+
+        let MessageMember::Field(priority) = &plan.members()[2] else {
+            panic!();
+        };
+        match priority.kind() {
+            FieldKind::Singular {
+                wire:
+                    WireTypeKind::Enum {
+                        openness: EnumType::Closed,
+                        ..
+                    },
+                ..
+            } => {}
+            other => panic!("{other:?}"),
+        }
     }
 
     #[test]
@@ -651,6 +774,7 @@ mod tests {
                     name: "STATUS_UNSPECIFIED".into(),
                     number: 0,
                 }],
+                features: FeatureSet::default(),
             }],
         }];
         let set = resolve(&arena, &files).unwrap();
@@ -664,7 +788,8 @@ mod tests {
                 wire: WireTypeKind::Enum { openness, .. },
                 presence: CatalogPresence::Implicit,
                 layout: CatalogLayout::Inline,
-            } => assert_eq!(*openness, EnumOpenness::Open),
+                ..
+            } => assert_eq!(*openness, EnumType::Open),
             other => panic!("{other:?}"),
         }
     }

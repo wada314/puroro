@@ -16,6 +16,7 @@ mod resolve;
 pub use arena::Arena;
 pub use resolve::resolve;
 
+use crate::descriptor::features::{EnumType, RepeatedFieldEncoding, Utf8Validation};
 use crate::descriptor::{FieldType, ProtoFqn, Syntax};
 use ::std::cell::OnceCell;
 use ::std::collections::HashMap;
@@ -25,7 +26,11 @@ use ::std::fmt;
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum FieldOccurrence {
     Singular(SingularPresence),
-    Repeated,
+    /// Repeated field with resolved packed/expanded encoding preference.
+    ///
+    /// Non-packable types (string / bytes / message) still carry a value, but
+    /// codegen always emits expanded wire helpers for those.
+    Repeated(RepeatedFieldEncoding),
 }
 
 /// Presence policy for a singular field (matches puroro-rt markers; no BIT yet).
@@ -81,6 +86,8 @@ pub struct Field<'a> {
     occurrence: FieldOccurrence,
     type_ref: TypeRef<'a>,
     oneof_index: Option<i32>,
+    /// Set for `string` / `bytes` fields (`VERIFY` / `NONE`).
+    utf8_validation: Option<Utf8Validation>,
 }
 
 /// Resolved type of a field.
@@ -117,6 +124,8 @@ pub struct Enum<'a> {
     fqn: ProtoFqn,
     /// Enclosing message, if nested. Empty for file-level enums.
     parent: OnceCell<&'a Message<'a>>,
+    /// Open vs closed (`features.enum_type`, or proto2/proto3 defaults).
+    openness: EnumType,
     values: Vec<EnumValue>,
 }
 
@@ -236,6 +245,11 @@ impl<'a> Field<'a> {
     pub fn oneof_index(&self) -> Option<i32> {
         self.oneof_index
     }
+
+    /// UTF-8 policy for `string` / `bytes`; `None` for other types.
+    pub fn utf8_validation(&self) -> Option<Utf8Validation> {
+        self.utf8_validation
+    }
 }
 
 impl Oneof {
@@ -256,6 +270,10 @@ impl<'a> Enum<'a> {
     /// Enclosing message, if this enum is nested.
     pub fn parent(&self) -> Option<&'a Message<'a>> {
         self.parent.get().copied()
+    }
+
+    pub fn openness(&self) -> EnumType {
+        self.openness
     }
 
     pub fn values(&self) -> impl Iterator<Item = &EnumValue> + '_ {
@@ -365,6 +383,7 @@ impl fmt::Debug for Enum<'_> {
         f.debug_struct("Enum")
             .field("fqn", &self.fqn)
             .field("parent", &self.parent().map(|m| m.fqn()))
+            .field("openness", &self.openness)
             .field("values", &self.values)
             .finish()
     }
