@@ -1,21 +1,22 @@
 //! Code emission from a resolved schema.
 //!
-//! Current scope: file-level enums and root messages with singular scalar /
-//! string / bytes / bool / enum / message fields. Nested type declarations,
-//! repeated, and oneof are still rejected. All `file_to_generate` entries share
-//! one [`ModuleForest`] so cross-file type refs use a single `self::_root`.
+//! Current scope: file-level and nested enums/messages with singular and
+//! repeated scalar / string / bytes / bool / enum / message fields. Real oneofs
+//! are still rejected. All `file_to_generate` entries share one [`ModuleForest`]
+//! so cross-file type refs use a single `self::_root`.
 
 use crate::descriptor::CodegenRequest;
 use crate::error::{Error, Result};
 use crate::field_kind::{MessagePlan, plan_message};
 use crate::module_tree::layout::{ModuleLayout, render};
-use crate::module_tree::{ModuleForest, ModuleOrigin, type_name_to_module_ident};
+use crate::module_tree::{ModuleForest, ModuleNode, ModuleOrigin, type_name_to_module_ident};
 use crate::plugin_io::CodeGeneratorResponse;
 use crate::resolved::{Arena, FieldOccurrence, File, FileSet, Message, SingularPresence, resolve};
 use ::proc_macro2::{Ident, Span};
 use ::quote::quote;
 
 mod enumeration;
+mod ident;
 mod message;
 mod type_path;
 
@@ -106,18 +107,13 @@ fn append_file_to_forest(forest: &mut ModuleForest, file: &File<'_>) -> Result<(
     for message in file.messages() {
         let message = validate_emit_message(message)?;
         let plan = plan_message(message)?;
-        append_message(forest, file, &plan)?;
+        append_message(parent, &plan)?;
     }
     Ok(())
 }
 
-fn append_message(
-    forest: &mut ModuleForest,
-    file: &File<'_>,
-    plan: &MessagePlan<'_>,
-) -> Result<()> {
+fn append_message(parent: &mut ModuleNode, plan: &MessagePlan<'_>) -> Result<()> {
     let message = plan.message();
-    let parent = forest.ensure_package(file.package());
     let mod_name = type_name_to_module_ident(message.name());
     let type_name = Ident::new(message.name(), Span::call_site());
 
@@ -125,25 +121,33 @@ fn append_message(
         pub use #mod_name::#type_name;
     });
 
+    let nested_enums: Vec<_> = message.nested_enums().collect();
+    let nested_messages: Vec<_> = message.nested_messages().collect();
+    for nested in &nested_messages {
+        validate_emit_message(nested)?;
+    }
+
     let child = parent.get_or_insert_child(mod_name);
     child.add_origin(ModuleOrigin::Message {
         proto_fqn: message.fqn().clone(),
     });
+    for e in nested_enums {
+        child.append_items(enumeration::render_enum(e)?);
+    }
     child.append_items(message::render_items(plan)?);
+    for nested in nested_messages {
+        let nested_plan = plan_message(nested)?;
+        append_message(child, &nested_plan)?;
+    }
     Ok(())
 }
 
-/// Nested types / real oneofs rejected; proto3 optional synthetic oneofs OK.
+/// Real oneofs rejected; proto3 optional synthetic oneofs OK. Nested type
+/// declarations are emitted into this message's module.
 fn validate_emit_message<'a>(message: &'a Message<'a>) -> Result<&'a Message<'a>> {
-    if !is_simple_ident(message.name()) {
+    if !ident::is_simple_ident(message.name()) {
         return Err(Error::Codegen(format!(
             "message name `{}` is not a simple Rust identifier",
-            message.name()
-        )));
-    }
-    if message.nested_messages().next().is_some() || message.nested_enums().next().is_some() {
-        return Err(Error::Codegen(format!(
-            "generator does not support nested types on message `{}` yet",
             message.name()
         )));
     }
@@ -159,16 +163,6 @@ fn validate_emit_message<'a>(message: &'a Message<'a>) -> Result<&'a Message<'a>
         )));
     }
     Ok(message)
-}
-
-fn is_simple_ident(name: &str) -> bool {
-    let mut chars = name.chars();
-    match chars.next() {
-        Some(c) if c.is_ascii_alphabetic() || c == '_' => {
-            chars.all(|c| c.is_ascii_alphanumeric() || c == '_')
-        }
-        _ => false,
-    }
 }
 
 /// Map `foo/bar/baz.proto` → `foo/bar/baz.rs`.
@@ -497,21 +491,167 @@ mod tests {
     }
 
     #[test]
-    fn reject_repeated_field() {
-        let mut request = empty_request("Task");
+    fn emit_repeated_and_nested_types() {
+        let request = CodegenRequest {
+            meta: CodegenMeta {
+                file_to_generate: vec!["t.proto".into()],
+                parameter: None,
+            },
+            proto_files: vec![ProtoFile {
+                name: "t.proto".into(),
+                package: "demo".into(),
+                syntax: Syntax::Proto3,
+                features: FeatureSet::default(),
+                dependency: vec![],
+                messages: vec![MessageDesc {
+                    name: "Outer".into(),
+                    fields: vec![
+                        FieldDesc {
+                            name: "tag_ids".into(),
+                            number: 1,
+                            label: FieldLabel::Repeated,
+                            type_: FieldType::Int32,
+                            type_name: None,
+                            oneof_index: None,
+                            proto3_optional: false,
+                            packed: None,
+                            features: FeatureSet::default(),
+                        },
+                        FieldDesc {
+                            name: "inners".into(),
+                            number: 2,
+                            label: FieldLabel::Repeated,
+                            type_: FieldType::Message,
+                            type_name: Some(ProtoFqn::parse(".demo.Outer.Inner")),
+                            oneof_index: None,
+                            proto3_optional: false,
+                            packed: None,
+                            features: FeatureSet::default(),
+                        },
+                        FieldDesc {
+                            name: "kind".into(),
+                            number: 3,
+                            label: FieldLabel::Optional,
+                            type_: FieldType::Enum,
+                            type_name: Some(ProtoFqn::parse(".demo.Outer.Kind")),
+                            oneof_index: None,
+                            proto3_optional: false,
+                            packed: None,
+                            features: FeatureSet::default(),
+                        },
+                    ],
+                    nested_messages: vec![MessageDesc {
+                        name: "Inner".into(),
+                        fields: vec![],
+                        nested_messages: vec![],
+                        nested_enums: vec![],
+                        oneofs: vec![],
+                    }],
+                    nested_enums: vec![EnumDesc {
+                        name: "Kind".into(),
+                        values: vec![
+                            EnumValueDesc {
+                                name: "KIND_UNSPECIFIED".into(),
+                                number: 0,
+                            },
+                            EnumValueDesc {
+                                name: "KIND_A".into(),
+                                number: 1,
+                            },
+                        ],
+                        features: FeatureSet::default(),
+                    }],
+                    oneofs: vec![],
+                }],
+                enums: vec![],
+            }],
+        };
+        let response = emit(&request).unwrap();
+        let content = &response.files[0].content;
+        assert!(content.contains("RepeatedField"));
+        assert!(content.contains("::puroro_rt::Packed"));
+        assert!(content.contains("pub struct Inner"));
+        assert!(content.contains("pub struct Kind"));
+        assert!(
+            content.contains("self :: _root :: demo :: outer :: inner :: Inner")
+                || content.contains("self::_root::demo::outer::inner::Inner")
+        );
+        assert!(
+            content.contains("self :: _root :: demo :: outer :: Kind")
+                || content.contains("self::_root::demo::outer::Kind")
+        );
+    }
+
+    #[test]
+    fn reject_open_enum_without_leading_zero() {
+        let mut request = empty_request("Holder");
+        request.proto_files[0].enums.push(EnumDesc {
+            name: "Kind".into(),
+            values: vec![EnumValueDesc {
+                name: "KIND_A".into(),
+                number: 1,
+            }],
+            features: FeatureSet::default(),
+        });
         request.proto_files[0].messages[0].fields.push(FieldDesc {
-            name: "tag_ids".into(),
+            name: "kind".into(),
             number: 1,
-            label: FieldLabel::Repeated,
-            type_: FieldType::Int32,
-            type_name: None,
+            label: FieldLabel::Optional,
+            type_: FieldType::Enum,
+            type_name: Some(ProtoFqn::parse(".Kind")),
             oneof_index: None,
             proto3_optional: false,
             packed: None,
             features: FeatureSet::default(),
         });
         let err = emit(&request).unwrap_err();
-        assert!(err.to_string().contains("repeated"));
+        assert!(err.to_string().contains("must define 0 as its first value"));
+    }
+
+    #[test]
+    fn emit_zero_less_nested_enum() {
+        let request = CodegenRequest {
+            meta: CodegenMeta {
+                file_to_generate: vec!["t.proto".into()],
+                parameter: None,
+            },
+            proto_files: vec![ProtoFile {
+                name: "t.proto".into(),
+                package: "demo".into(),
+                syntax: Syntax::Proto2,
+                features: FeatureSet::default(),
+                dependency: vec![],
+                messages: vec![MessageDesc {
+                    name: "Field".into(),
+                    fields: vec![],
+                    nested_messages: vec![],
+                    nested_enums: vec![EnumDesc {
+                        name: "Type".into(),
+                        values: vec![
+                            EnumValueDesc {
+                                name: "TYPE_DOUBLE".into(),
+                                number: 1,
+                            },
+                            EnumValueDesc {
+                                name: "TYPE_FLOAT".into(),
+                                number: 2,
+                            },
+                        ],
+                        features: FeatureSet::default(),
+                    }],
+                    oneofs: vec![],
+                }],
+                enums: vec![],
+            }],
+        };
+        let response = emit(&request).unwrap();
+        let content = &response.files[0].content;
+        assert!(content.contains("pub struct Type"));
+        assert!(content.contains("pub const DOUBLE: Self = Self(1i32)"));
+        // proto2 default = first defined enumerator, not wire 0.
+        assert!(content.contains("Self :: DOUBLE") || content.contains("Self::DOUBLE"));
+        assert!(content.contains("Type :: DOUBLE") || content.contains("Type::DOUBLE"));
+        assert!(!content.contains("Self(0)"));
     }
 
     #[test]

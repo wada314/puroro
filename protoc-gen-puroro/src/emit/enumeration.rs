@@ -1,5 +1,6 @@
 //! Emit a protobuf enum as a newtype-over-`i32` (open or closed).
 
+use super::ident::{is_simple_ident, rust_ident};
 use crate::descriptor::features::EnumType;
 use crate::error::{Error, Result};
 use crate::resolved::Enum;
@@ -7,17 +8,15 @@ use ::proc_macro2::{Ident, Span, TokenStream};
 use ::quote::quote;
 use ::std::collections::BTreeSet;
 
-/// Render a file-level enum type into the package (or forest-root) module.
+/// Render an enum into its parent package or message module.
+///
+/// Defaults / `proto_zero` / `HasDefault` use the **first defined** enumerator
+/// (proto2 / proto3 / editions language guides). Open enums additionally require
+/// that first value to be `0`.
 pub(super) fn render_enum(e: &Enum<'_>) -> Result<TokenStream> {
     if !is_simple_ident(e.name()) {
         return Err(Error::Codegen(format!(
             "enum name `{}` is not a simple Rust identifier",
-            e.name()
-        )));
-    }
-    if e.parent().is_some() {
-        return Err(Error::Codegen(format!(
-            "nested enum `{}` is not supported yet",
             e.name()
         )));
     }
@@ -26,12 +25,6 @@ pub(super) fn render_enum(e: &Enum<'_>) -> Result<TokenStream> {
     if values.is_empty() {
         return Err(Error::Codegen(format!("enum `{}` has no values", e.name())));
     }
-    let zero = values.iter().find(|v| v.number() == 0).ok_or_else(|| {
-        Error::Codegen(format!(
-            "enum `{}` has no zero value (required for generated defaults)",
-            e.name()
-        ))
-    })?;
 
     for v in &values {
         if !is_simple_ident(v.name()) {
@@ -43,8 +36,20 @@ pub(super) fn render_enum(e: &Enum<'_>) -> Result<TokenStream> {
         }
     }
 
-    let name = Ident::new(e.name(), Span::call_site());
-    let zero_const = variant_const_ident(e.name(), zero.name())?;
+    let first = values[0];
+    if matches!(e.openness(), EnumType::Open) && first.number() != 0 {
+        return Err(Error::Codegen(format!(
+            "open enum `{}` must define 0 as its first value (got `{}` = {})",
+            e.name(),
+            first.name(),
+            first.number()
+        )));
+    }
+
+    let name = rust_ident(e.name());
+    let default_const = variant_const_ident(e.name(), first.name())?;
+    let default_self = quote! { Self::#default_const };
+    let default_path = quote! { #name::#default_const };
     let variant_consts: Vec<TokenStream> = values
         .iter()
         .map(|v| {
@@ -108,7 +113,14 @@ pub(super) fn render_enum(e: &Enum<'_>) -> Result<TokenStream> {
     };
 
     Ok(quote! {
-        #[derive(::core::clone::Clone, ::core::marker::Copy, ::core::fmt::Debug, ::core::cmp::PartialEq, ::core::cmp::Eq, ::core::hash::Hash)]
+        #[derive(
+            ::core::clone::Clone,
+            ::core::marker::Copy,
+            ::core::fmt::Debug,
+            ::core::cmp::PartialEq,
+            ::core::cmp::Eq,
+            ::core::hash::Hash
+        )]
         #[repr(transparent)]
         pub struct #name(i32);
 
@@ -118,7 +130,7 @@ pub(super) fn render_enum(e: &Enum<'_>) -> Result<TokenStream> {
 
         impl ::core::default::Default for #name {
             fn default() -> Self {
-                Self::#zero_const
+                #default_self
             }
         }
 
@@ -126,7 +138,7 @@ pub(super) fn render_enum(e: &Enum<'_>) -> Result<TokenStream> {
 
         impl ::puroro_rt::ProtoEnumStorage for #name {
             fn proto_zero() -> Self {
-                Self::#zero_const
+                #default_self
             }
 
             fn to_wire(self) -> i32 {
@@ -147,7 +159,7 @@ pub(super) fn render_enum(e: &Enum<'_>) -> Result<TokenStream> {
         }
 
         impl ::puroro::HasDefault<#name> for ::puroro_rt::ProtoDefault {
-            const DEFAULT: #name = #name::#zero_const;
+            const DEFAULT: #name = #default_path;
         }
     })
 }
@@ -173,16 +185,27 @@ fn contiguous_range(numbers: &[i32]) -> Option<(i32, i32)> {
 }
 
 /// `STATUS_UNSPECIFIED` on enum `Status` → `UNSPECIFIED`.
+///
+/// If stripping the enum-name prefix would leave a non-ident (e.g. `EDITION_2023`
+/// → `2023`), keep the full value name instead.
 fn variant_const_ident(enum_name: &str, value_name: &str) -> Result<Ident> {
     let prefix = format!("{}_", camel_to_screaming_snake(enum_name));
     let rest = value_name.strip_prefix(&prefix).unwrap_or(value_name);
-    if !is_simple_ident(rest) {
+    let candidate = if is_simple_ident(rest) && !starts_with_digit(rest) {
+        rest
+    } else if is_simple_ident(value_name) {
+        value_name
+    } else {
         return Err(Error::Codegen(format!(
             "enum value `{value_name}` on `{enum_name}` does not yield a simple Rust const \
              identifier after prefix strip (got `{rest}`)"
         )));
-    }
-    Ok(Ident::new(rest, Span::call_site()))
+    };
+    Ok(Ident::new(candidate, Span::call_site()))
+}
+
+fn starts_with_digit(name: &str) -> bool {
+    name.chars().next().is_some_and(|c| c.is_ascii_digit())
 }
 
 fn camel_to_screaming_snake(name: &str) -> String {
@@ -201,16 +224,6 @@ fn camel_to_screaming_snake(name: &str) -> String {
     out
 }
 
-fn is_simple_ident(name: &str) -> bool {
-    let mut chars = name.chars();
-    match chars.next() {
-        Some(c) if c.is_ascii_alphabetic() || c == '_' => {
-            chars.all(|c| c.is_ascii_alphanumeric() || c == '_')
-        }
-        _ => false,
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -227,5 +240,13 @@ mod tests {
     fn camel_to_screaming_handles_multi_word() {
         assert_eq!(camel_to_screaming_snake("Status"), "STATUS");
         assert_eq!(camel_to_screaming_snake("FooBar"), "FOO_BAR");
+    }
+
+    #[test]
+    fn keeps_full_name_when_strip_starts_with_digit() {
+        let ident = variant_const_ident("Edition", "EDITION_2023").unwrap();
+        assert_eq!(ident.to_string(), "EDITION_2023");
+        let ident = variant_const_ident("Edition", "EDITION_PROTO2").unwrap();
+        assert_eq!(ident.to_string(), "PROTO2");
     }
 }

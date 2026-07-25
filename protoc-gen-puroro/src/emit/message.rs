@@ -1,18 +1,24 @@
 //! Emit a message module body from a [`MessagePlan`].
 //!
-//! Current scope: singular scalar / string / bytes / bool / enum / message
+//! Singular and repeated scalar / string / bytes / bool / enum / message
 //! fields (including IMPLICIT / EXPLICIT / LEGACY_REQUIRED and bool
-//! `BitPacked`). Repeated and oneof fields are rejected.
+//! `BitPacked`). Real oneof fields are rejected.
 
-use super::type_path::{fqn_to_message_root_path, fqn_to_root_path};
+use super::ident::{is_simple_ident, rust_ident};
+use super::type_path::{fqn_to_enum_root_path, fqn_to_message_root_path};
 use crate::descriptor::features::EnumType;
 use crate::error::{Error, Result};
 use crate::field_kind::{
-    CatalogLayout, CatalogPresence, FieldKind, MessageMember, MessagePlan, WireTypeKind,
-    presence_byte_len,
+    CatalogLayout, CatalogPresence, FieldKind, MessageMember, MessagePlan, RepeatedEncodingKind,
+    WireTypeKind, presence_byte_len,
 };
 use ::proc_macro2::{Ident, Span, TokenStream};
 use ::quote::quote;
+
+enum FieldEmit {
+    Singular(ScalarEmit),
+    Repeated(RepeatedEmit),
+}
 
 /// Owned per-field facts needed for `quote!` (avoids borrowing `MessagePlan`).
 struct ScalarEmit {
@@ -35,6 +41,28 @@ struct ScalarEmit {
     optional_ty: TokenStream,
 }
 
+struct RepeatedEmit {
+    name: Ident,
+    name_str: String,
+    field_const: Ident,
+    number: u32,
+    marker: TokenStream,
+    encoding_ty: TokenStream,
+    style: RepeatedAccessorStyle,
+    /// `as_slice` element type for packable / message repeated fields.
+    slice_elem_ty: TokenStream,
+}
+
+#[derive(Clone, Copy)]
+enum RepeatedAccessorStyle {
+    /// `&[T]` + `values_mut()` → `Vec<T, A>`.
+    Slice,
+    /// `repeated string` — `RepeatedStringMut`.
+    String,
+    /// `repeated bytes` — `RepeatedContainerMut`.
+    Bytes,
+}
+
 #[derive(Clone, Copy)]
 enum AccessorStyle {
     Implicit,
@@ -44,10 +72,40 @@ enum AccessorStyle {
     Message,
 }
 
+impl FieldEmit {
+    fn name(&self) -> &Ident {
+        match self {
+            Self::Singular(f) => &f.name,
+            Self::Repeated(f) => &f.name,
+        }
+    }
+
+    fn name_str(&self) -> &str {
+        match self {
+            Self::Singular(f) => &f.name_str,
+            Self::Repeated(f) => &f.name_str,
+        }
+    }
+
+    fn field_const(&self) -> &Ident {
+        match self {
+            Self::Singular(f) => &f.field_const,
+            Self::Repeated(f) => &f.field_const,
+        }
+    }
+
+    fn number(&self) -> u32 {
+        match self {
+            Self::Singular(f) => f.number,
+            Self::Repeated(f) => f.number,
+        }
+    }
+}
+
 /// Render items that belong inside the message's implementation module.
 pub(super) fn render_items(plan: &MessagePlan<'_>) -> Result<TokenStream> {
-    let fields = collect_scalar_fields(plan)?;
-    let name = Ident::new(plan.message().name(), Span::call_site());
+    let fields = collect_fields(plan)?;
+    let name = rust_ident(plan.message().name());
     let name_str = plan.message().name();
     let presence_bytes = presence_byte_len(plan.bit_count());
 
@@ -300,7 +358,7 @@ pub(super) fn render_items(plan: &MessagePlan<'_>) -> Result<TokenStream> {
     })
 }
 
-fn collect_scalar_fields(plan: &MessagePlan<'_>) -> Result<Vec<ScalarEmit>> {
+fn collect_fields(plan: &MessagePlan<'_>) -> Result<Vec<FieldEmit>> {
     let mut out = Vec::new();
     for member in plan.members() {
         match member {
@@ -310,44 +368,80 @@ fn collect_scalar_fields(plan: &MessagePlan<'_>) -> Result<Vec<ScalarEmit>> {
                     o.name()
                 )));
             }
-            MessageMember::Field(field) => match field.kind() {
-                FieldKind::Repeated { .. } => {
+            MessageMember::Field(field) => {
+                if !is_simple_ident(field.name()) {
                     return Err(Error::Codegen(format!(
-                        "repeated field `{}` is not supported by the field emitter yet",
+                        "field name `{}` is not a simple Rust identifier",
                         field.name()
                     )));
                 }
-                FieldKind::Singular {
-                    wire,
-                    presence,
-                    layout,
-                } => {
-                    if matches!(presence, CatalogPresence::Oneof) {
-                        return Err(Error::Codegen(format!(
-                            "field `{}` presence {:?} is not supported by the field emitter yet",
+                match field.kind() {
+                    FieldKind::Repeated { wire, encoding } => {
+                        out.push(FieldEmit::Repeated(repeated_emit(
                             field.name(),
-                            presence
-                        )));
+                            field.field_const(),
+                            field.number(),
+                            wire,
+                            *encoding,
+                        )?));
                     }
-                    if !is_simple_ident(field.name()) {
-                        return Err(Error::Codegen(format!(
-                            "field name `{}` is not a simple Rust identifier",
-                            field.name()
-                        )));
-                    }
-                    out.push(scalar_emit(
-                        field.name(),
-                        field.field_const(),
-                        field.number(),
+                    FieldKind::Singular {
                         wire,
                         presence,
                         layout,
-                    )?);
+                    } => {
+                        if matches!(presence, CatalogPresence::Oneof) {
+                            return Err(Error::Codegen(format!(
+                                "field `{}` presence {:?} is not supported by the field emitter yet",
+                                field.name(),
+                                presence
+                            )));
+                        }
+                        out.push(FieldEmit::Singular(scalar_emit(
+                            field.name(),
+                            field.field_const(),
+                            field.number(),
+                            wire,
+                            presence,
+                            layout,
+                        )?));
+                    }
                 }
-            },
+            }
         }
     }
     Ok(out)
+}
+
+fn repeated_emit(
+    name: &str,
+    field_const: &str,
+    number: i32,
+    wire: &WireTypeKind<'_>,
+    encoding: RepeatedEncodingKind,
+) -> Result<RepeatedEmit> {
+    let encoding_ty = match encoding {
+        RepeatedEncodingKind::Packed => quote! { ::puroro_rt::Packed },
+        RepeatedEncodingKind::Expanded => quote! { ::puroro_rt::Expanded },
+    };
+    let (style, slice_elem_ty) = match wire {
+        WireTypeKind::String { .. } => (RepeatedAccessorStyle::String, TokenStream::new()),
+        WireTypeKind::Bytes { .. } => (RepeatedAccessorStyle::Bytes, TokenStream::new()),
+        _ => (
+            RepeatedAccessorStyle::Slice,
+            repeated_slice_elem_type(wire)?,
+        ),
+    };
+    Ok(RepeatedEmit {
+        name: rust_ident(name),
+        name_str: name.to_owned(),
+        field_const: Ident::new(field_const, Span::call_site()),
+        number: number as u32,
+        marker: wire_marker_path(wire)?,
+        encoding_ty,
+        style,
+        slice_elem_ty,
+    })
 }
 
 fn scalar_emit(
@@ -409,7 +503,7 @@ fn scalar_emit(
     let is_enum = matches!(wire, WireTypeKind::Enum { .. });
     let is_message = matches!(style, AccessorStyle::Message);
     Ok(ScalarEmit {
-        name: Ident::new(name, Span::call_site()),
+        name: rust_ident(name),
         name_str: name.to_owned(),
         field_const: Ident::new(field_const, Span::call_site()),
         number: number as u32,
@@ -440,9 +534,12 @@ fn scalar_emit(
     })
 }
 
-fn render_bit_consts(fields: &[ScalarEmit]) -> TokenStream {
+fn render_bit_consts(fields: &[FieldEmit]) -> TokenStream {
     let mut items = Vec::new();
     for field in fields {
+        let FieldEmit::Singular(field) = field else {
+            continue;
+        };
         if let Some((ident, bit)) = &field.presence_bit {
             items.push(quote! {
                 pub const #ident: usize = #bit;
@@ -464,15 +561,15 @@ fn render_bit_consts(fields: &[ScalarEmit]) -> TokenStream {
     }
 }
 
-fn render_field_consts(fields: &[ScalarEmit]) -> TokenStream {
+fn render_field_consts(fields: &[FieldEmit]) -> TokenStream {
     if fields.is_empty() {
         return TokenStream::new();
     }
     let items: Vec<_> = fields
         .iter()
         .map(|field| {
-            let ident = &field.field_const;
-            let number = field.number;
+            let ident = field.field_const();
+            let number = field.number();
             quote! {
                 pub const #ident: u32 = #number;
             }
@@ -484,21 +581,32 @@ fn render_field_consts(fields: &[ScalarEmit]) -> TokenStream {
     }
 }
 
-fn render_struct_fields(fields: &[ScalarEmit]) -> Vec<TokenStream> {
+fn render_struct_fields(fields: &[FieldEmit]) -> Vec<TokenStream> {
     fields
         .iter()
-        .map(|field| {
-            let name = &field.name;
-            let marker = &field.marker;
-            let presence_ty = &field.presence_ty;
-            let field_const = &field.field_const;
-            match &field.layout_ty {
-                None => quote! {
-                    #name: ::puroro_rt::SingularField<#marker, #presence_ty, { #field_const }, A>,
-                },
-                Some(layout_ty) => quote! {
-                    #name: ::puroro_rt::SingularField<#marker, #presence_ty, { #field_const }, A, #layout_ty>,
-                },
+        .map(|field| match field {
+            FieldEmit::Singular(field) => {
+                let name = &field.name;
+                let marker = &field.marker;
+                let presence_ty = &field.presence_ty;
+                let field_const = &field.field_const;
+                match &field.layout_ty {
+                    None => quote! {
+                        #name: ::puroro_rt::SingularField<#marker, #presence_ty, { #field_const }, A>,
+                    },
+                    Some(layout_ty) => quote! {
+                        #name: ::puroro_rt::SingularField<#marker, #presence_ty, { #field_const }, A, #layout_ty>,
+                    },
+                }
+            }
+            FieldEmit::Repeated(field) => {
+                let name = &field.name;
+                let marker = &field.marker;
+                let encoding_ty = &field.encoding_ty;
+                let field_const = &field.field_const;
+                quote! {
+                    #name: ::puroro_rt::RepeatedField<#marker, #encoding_ty, { #field_const }, A>,
+                }
             }
         })
         .collect()
@@ -522,7 +630,7 @@ fn wire_marker_path(wire: &WireTypeKind<'_>) -> Result<TokenStream> {
         WireTypeKind::SInt32 => quote! { ::puroro_rt::ProtoSint32 },
         WireTypeKind::SInt64 => quote! { ::puroro_rt::ProtoSint64 },
         WireTypeKind::Enum { ty, openness } => {
-            let path = fqn_to_root_path(ty.fqn())?;
+            let path = fqn_to_enum_root_path(ty)?;
             let kind = match openness {
                 EnumType::Open => quote! { ::puroro_rt::Open },
                 EnumType::Closed => quote! { ::puroro_rt::Closed },
@@ -536,90 +644,151 @@ fn wire_marker_path(wire: &WireTypeKind<'_>) -> Result<TokenStream> {
     })
 }
 
-fn render_new_in_fields(fields: &[ScalarEmit]) -> Vec<TokenStream> {
+fn render_new_in_fields(fields: &[FieldEmit]) -> Vec<TokenStream> {
     let last = fields.len().saturating_sub(1);
     fields
         .iter()
         .enumerate()
         .map(|(i, field)| {
-            let name = &field.name;
+            let name = field.name();
+            let ctor = match field {
+                FieldEmit::Singular(_) => quote! { ::puroro_rt::SingularField::new_in },
+                FieldEmit::Repeated(_) => quote! { ::puroro_rt::RepeatedField::new_in },
+            };
             if i == last {
-                quote! { #name: ::puroro_rt::SingularField::new_in(alloc), }
+                quote! { #name: #ctor(alloc), }
             } else {
-                quote! { #name: ::puroro_rt::SingularField::new_in(alloc.clone()), }
+                quote! { #name: #ctor(alloc.clone()), }
             }
         })
         .collect()
 }
 
-fn render_accessors(fields: &[ScalarEmit]) -> Vec<TokenStream> {
+fn render_accessors(fields: &[FieldEmit]) -> Vec<TokenStream> {
     fields
         .iter()
-        .map(|field| {
-            let name = &field.name;
-            let name_mut = Ident::new(&format!("{}_mut", field.name_str), Span::call_site());
-            let clear_name = Ident::new(&format!("clear_{}", field.name_str), Span::call_site());
-            let mut_target = &field.mut_target;
-            let implicit_ty = &field.implicit_ty;
-            let optional_ty = &field.optional_ty;
+        .map(|field| match field {
+            FieldEmit::Repeated(field) => render_repeated_accessors(field),
+            FieldEmit::Singular(field) => render_singular_accessors(field),
+        })
+        .collect()
+}
 
-            if matches!(field.style, AccessorStyle::Message) {
-                return quote! {
-                    pub fn #name(&self) -> ::core::option::Option<&#mut_target> {
-                        self.#name.bind(&self._common).get()
-                    }
-
-                    pub fn #name_mut(&mut self) -> &mut #mut_target {
-                        self.#name.bind_mut(&mut self._common).get_mut()
-                    }
-
-                    pub fn #clear_name(&mut self) {
-                        self.#name.bind_mut(&mut self._common).clear();
-                    }
-                };
+fn render_repeated_accessors(field: &RepeatedEmit) -> TokenStream {
+    let name = &field.name;
+    let name_mut = Ident::new(&format!("{}_mut", field.name_str), Span::call_site());
+    let clear_name = Ident::new(&format!("clear_{}", field.name_str), Span::call_site());
+    match field.style {
+        RepeatedAccessorStyle::String => quote! {
+            pub fn #name(&self) -> &[impl ::core::ops::Deref<Target = str>] {
+                self.#name.bind(&self._common).as_slice()
             }
 
-            let getter = if field.optional_getter {
-                quote! {
-                    pub fn #name<'a>(&'a self) -> ::puroro::Optional<#optional_ty, impl ::puroro::HasDefault<#optional_ty>>
-                    where
-                        A: 'a,
-                    {
-                        self.#name.bind(&self._common).optional()
-                    }
-                }
-            } else {
-                match field.style {
-                    AccessorStyle::Implicit => quote! {
-                        pub fn #name(&self) -> #implicit_ty {
-                            self.#name.bind(&self._common).value()
-                        }
-                    },
-                    AccessorStyle::Explicit | AccessorStyle::LegacyRequired => quote! {
-                        pub fn #name<'a>(&'a self) -> ::puroro::Optional<#optional_ty, impl ::puroro::HasDefault<#optional_ty>>
-                        where
-                            A: 'a,
-                        {
-                            self.#name.bind(&self._common).optional()
-                        }
-                    },
-                    AccessorStyle::Message => unreachable!("handled above"),
-                }
-            };
+            pub fn #name_mut(&mut self) -> impl ::puroro::RepeatedStringMut<A> + '_ {
+                self.#name.bind_mut(&mut self._common).container_mut()
+            }
 
+            pub fn #clear_name(&mut self) {
+                self.#name.bind_mut(&mut self._common).clear();
+            }
+        },
+        RepeatedAccessorStyle::Bytes => quote! {
+            pub fn #name(&self) -> &[impl ::core::ops::Deref<Target = [u8]>] {
+                self.#name.bind(&self._common).as_slice()
+            }
+
+            pub fn #name_mut(&mut self) -> impl ::puroro::RepeatedContainerMut + '_ {
+                self.#name.bind_mut(&mut self._common).container_mut()
+            }
+
+            pub fn #clear_name(&mut self) {
+                self.#name.bind_mut(&mut self._common).clear();
+            }
+        },
+        RepeatedAccessorStyle::Slice => {
+            let elem = &field.slice_elem_ty;
             quote! {
-                #getter
+                pub fn #name(&self) -> &[#elem] {
+                    self.#name.bind(&self._common).as_slice()
+                }
 
-                pub fn #name_mut<'s>(&'s mut self) -> impl ::core::ops::DerefMut<Target = #mut_target> + 's {
-                    self.#name.bind_mut(&mut self._common).value_mut()
+                pub fn #name_mut<'s>(
+                    &'s mut self,
+                ) -> impl ::core::ops::DerefMut<Target = ::allocator_api2::vec::Vec<#elem, A>> + 's {
+                    self.#name.bind_mut(&mut self._common).values_mut()
                 }
 
                 pub fn #clear_name(&mut self) {
                     self.#name.bind_mut(&mut self._common).clear();
                 }
             }
-        })
-        .collect()
+        }
+    }
+}
+
+fn render_singular_accessors(field: &ScalarEmit) -> TokenStream {
+    let name = &field.name;
+    let name_mut = Ident::new(&format!("{}_mut", field.name_str), Span::call_site());
+    let clear_name = Ident::new(&format!("clear_{}", field.name_str), Span::call_site());
+    let mut_target = &field.mut_target;
+    let implicit_ty = &field.implicit_ty;
+    let optional_ty = &field.optional_ty;
+
+    if matches!(field.style, AccessorStyle::Message) {
+        return quote! {
+            pub fn #name(&self) -> ::core::option::Option<&#mut_target> {
+                self.#name.bind(&self._common).get()
+            }
+
+            pub fn #name_mut(&mut self) -> &mut #mut_target {
+                self.#name.bind_mut(&mut self._common).get_mut()
+            }
+
+            pub fn #clear_name(&mut self) {
+                self.#name.bind_mut(&mut self._common).clear();
+            }
+        };
+    }
+
+    let getter = if field.optional_getter {
+        quote! {
+            pub fn #name<'a>(&'a self) -> ::puroro::Optional<#optional_ty, impl ::puroro::HasDefault<#optional_ty>>
+            where
+                A: 'a,
+            {
+                self.#name.bind(&self._common).optional()
+            }
+        }
+    } else {
+        match field.style {
+            AccessorStyle::Implicit => quote! {
+                pub fn #name(&self) -> #implicit_ty {
+                    self.#name.bind(&self._common).value()
+                }
+            },
+            AccessorStyle::Explicit | AccessorStyle::LegacyRequired => quote! {
+                pub fn #name<'a>(&'a self) -> ::puroro::Optional<#optional_ty, impl ::puroro::HasDefault<#optional_ty>>
+                where
+                    A: 'a,
+                {
+                    self.#name.bind(&self._common).optional()
+                }
+            },
+            AccessorStyle::Message => unreachable!("handled above"),
+        }
+    };
+
+    quote! {
+        #getter
+
+        pub fn #name_mut<'s>(&'s mut self) -> impl ::core::ops::DerefMut<Target = #mut_target> + 's {
+            self.#name.bind_mut(&mut self._common).value_mut()
+        }
+
+        pub fn #clear_name(&mut self) {
+            self.#name.bind_mut(&mut self._common).clear();
+        }
+    }
 }
 
 fn implicit_value_type(wire: &WireTypeKind<'_>) -> Result<TokenStream> {
@@ -633,7 +802,7 @@ fn implicit_value_type(wire: &WireTypeKind<'_>) -> Result<TokenStream> {
         WireTypeKind::Bool => quote! { bool },
         WireTypeKind::String { .. } => quote! { &str },
         WireTypeKind::Bytes { .. } => quote! { &[u8] },
-        WireTypeKind::Enum { ty, .. } => fqn_to_root_path(ty.fqn())?,
+        WireTypeKind::Enum { ty, .. } => fqn_to_enum_root_path(ty)?,
         WireTypeKind::Message(_) => {
             return Err(Error::Codegen(
                 "internal error: message in implicit_value_type".into(),
@@ -653,7 +822,7 @@ fn optional_value_type(wire: &WireTypeKind<'_>) -> Result<TokenStream> {
         WireTypeKind::Bool => quote! { bool },
         WireTypeKind::String { .. } => quote! { &'a str },
         WireTypeKind::Bytes { .. } => quote! { &'a [u8] },
-        WireTypeKind::Enum { ty, .. } => fqn_to_root_path(ty.fqn())?,
+        WireTypeKind::Enum { ty, .. } => fqn_to_enum_root_path(ty)?,
         WireTypeKind::Message(_) => {
             return Err(Error::Codegen(
                 "internal error: message in optional_value_type".into(),
@@ -673,10 +842,32 @@ fn mut_target_type(wire: &WireTypeKind<'_>) -> Result<TokenStream> {
         WireTypeKind::Bool => quote! { bool },
         WireTypeKind::String { .. } => quote! { ::puroro::String<A> },
         WireTypeKind::Bytes { .. } => quote! { ::allocator_api2::vec::Vec<u8, A> },
-        WireTypeKind::Enum { ty, .. } => fqn_to_root_path(ty.fqn())?,
+        WireTypeKind::Enum { ty, .. } => fqn_to_enum_root_path(ty)?,
         WireTypeKind::Message(m) => {
             let path = fqn_to_message_root_path(m)?;
             quote! { #path<A> }
+        }
+    })
+}
+
+fn repeated_slice_elem_type(wire: &WireTypeKind<'_>) -> Result<TokenStream> {
+    Ok(match wire {
+        WireTypeKind::Double => quote! { f64 },
+        WireTypeKind::Float => quote! { f32 },
+        WireTypeKind::Int64 | WireTypeKind::SInt64 | WireTypeKind::SFixed64 => quote! { i64 },
+        WireTypeKind::UInt64 | WireTypeKind::Fixed64 => quote! { u64 },
+        WireTypeKind::Int32 | WireTypeKind::SInt32 | WireTypeKind::SFixed32 => quote! { i32 },
+        WireTypeKind::UInt32 | WireTypeKind::Fixed32 => quote! { u32 },
+        WireTypeKind::Bool => quote! { bool },
+        WireTypeKind::Enum { ty, .. } => fqn_to_enum_root_path(ty)?,
+        WireTypeKind::Message(m) => {
+            let path = fqn_to_message_root_path(m)?;
+            quote! { #path<A> }
+        }
+        WireTypeKind::String { .. } | WireTypeKind::Bytes { .. } => {
+            return Err(Error::Codegen(
+                "internal error: string/bytes in repeated_slice_elem_type".into(),
+            ));
         }
     })
 }
@@ -688,12 +879,12 @@ enum VisitKind {
     Mut,
 }
 
-fn render_visit_calls(fields: &[ScalarEmit], kind: VisitKind) -> Vec<TokenStream> {
+fn render_visit_calls(fields: &[FieldEmit], kind: VisitKind) -> Vec<TokenStream> {
     fields
         .iter()
         .map(|field| {
-            let name = &field.name;
-            let name_str = &field.name_str;
+            let name = field.name();
+            let name_str = field.name_str();
             match kind {
                 VisitKind::Shared => quote! {
                     v.visit(#name_str, &self.#name)?;
@@ -712,12 +903,12 @@ fn render_visit_calls(fields: &[ScalarEmit], kind: VisitKind) -> Vec<TokenStream
         .collect()
 }
 
-fn render_merge_arms(fields: &[ScalarEmit]) -> Vec<TokenStream> {
+fn render_merge_arms(fields: &[FieldEmit]) -> Vec<TokenStream> {
     fields
         .iter()
         .map(|field| {
-            let name = &field.name;
-            let field_const = &field.field_const;
+            let name = field.name();
+            let field_const = field.field_const();
             quote! {
                 #field_const => {
                     self.#name
@@ -729,15 +920,17 @@ fn render_merge_arms(fields: &[ScalarEmit]) -> Vec<TokenStream> {
         .collect()
 }
 
-fn render_validate(fields: &[ScalarEmit]) -> TokenStream {
+fn render_validate(fields: &[FieldEmit]) -> TokenStream {
     let required: Vec<_> = fields
         .iter()
-        .filter(|f| matches!(f.style, AccessorStyle::LegacyRequired))
-        .map(|f| {
-            let name = &f.name;
-            quote! {
-                self.#name.validate_required(&self._common)?;
+        .filter_map(|f| match f {
+            FieldEmit::Singular(f) if matches!(f.style, AccessorStyle::LegacyRequired) => {
+                let name = &f.name;
+                Some(quote! {
+                    self.#name.validate_required(&self._common)?;
+                })
             }
+            _ => None,
         })
         .collect();
     if required.is_empty() {
@@ -747,15 +940,5 @@ fn render_validate(fields: &[ScalarEmit]) -> TokenStream {
             #(#required)*
             ::core::result::Result::Ok(())
         }
-    }
-}
-
-fn is_simple_ident(name: &str) -> bool {
-    let mut chars = name.chars();
-    match chars.next() {
-        Some(c) if c.is_ascii_alphabetic() || c == '_' => {
-            chars.all(|c| c.is_ascii_alphanumeric() || c == '_')
-        }
-        _ => false,
     }
 }

@@ -152,10 +152,8 @@ fn run_protoc(protoc: &Path, plugin: &Path, case: &FixtureCase, case_out: &Path)
         .arg(format!("--puroro_out={}", case_out.display()))
         .arg(format!("-I{}", case.dir.display()));
     for proto in &case.proto_paths {
-        let name = proto
-            .file_name()
-            .unwrap_or_else(|| panic!("proto path has no file name: {}", proto.display()));
-        cmd.arg(name);
+        let rel = proto.strip_prefix(&case.dir).unwrap_or(proto);
+        cmd.arg(rel);
     }
 
     let output = cmd
@@ -262,21 +260,27 @@ fn list_fixture_cases(fixtures_src: &Path) -> Vec<FixtureCase> {
 
 fn list_protos(case_dir: &Path) -> Vec<PathBuf> {
     let mut protos = Vec::new();
-    for entry in fs::read_dir(case_dir).expect("read fixture case dir") {
-        let entry = entry.expect("read fixture case entry");
-        let path = entry.path();
-        if path.extension().is_some_and(|ext| ext == "proto") && path.is_file() {
-            protos.push(path);
-        }
-    }
+    collect_protos(case_dir, &mut protos);
     if protos.is_empty() {
         panic!(
             "fixture `{}` must contain at least one `.proto` file",
             case_dir.display()
         );
     }
-    protos.sort_by(|a, b| a.file_name().cmp(&b.file_name()));
+    protos.sort();
     protos
+}
+
+fn collect_protos(dir: &Path, out: &mut Vec<PathBuf>) {
+    for entry in fs::read_dir(dir).expect("read fixture case dir") {
+        let entry = entry.expect("read fixture case entry");
+        let path = entry.path();
+        if path.is_dir() {
+            collect_protos(&path, out);
+        } else if path.extension().is_some_and(|ext| ext == "proto") && path.is_file() {
+            out.push(path);
+        }
+    }
 }
 
 fn is_simple_ident(name: &str) -> bool {
