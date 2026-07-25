@@ -1,10 +1,15 @@
 //! Resolved type graph built from [`crate::descriptor`].
 //!
 //! Nodes live in a caller-owned [`Arena`] and refer to each other with ordinary
-//! references tied to that arena's lifetime. Fields are filled once via
-//! [`OnceCell`](std::cell::OnceCell) during [`resolve`]. Plugin metadata
-//! ([`crate::descriptor::CodegenMeta`]) is intentionally **not** stored here —
-//! pass it alongside `&FileSet` by reference.
+//! references tied to that arena's lifetime.
+//!
+//! Nested messages/enums are ordinary [`Vec`]s built while walking the descriptor
+//! tree (each node once). Only [`Message::fields`] uses
+//! [`OnceCell`](std::cell::OnceCell), because field [`TypeRef`]s may form cycles
+//! across the type graph and must be filled in a second pass.
+//!
+//! Plugin metadata ([`crate::descriptor::CodegenMeta`]) is intentionally **not**
+//! stored here — pass it alongside `&FileSet` by reference.
 
 mod arena;
 mod resolve;
@@ -40,11 +45,14 @@ pub struct Message<'a> {
     pub name: String,
     /// Absolute protobuf FQN (e.g. `.example.v1.Task`).
     pub fqn: ProtoFqn,
-    /// Enclosing message, if nested.
-    pub parent: Option<&'a Message<'a>>,
-    fields: OnceCell<Vec<Field<'a>>>,
-    nested_messages: OnceCell<Vec<&'a Message<'a>>>,
-    nested_enums: OnceCell<Vec<&'a Enum<'a>>>,
+    /// Enclosing message, if nested. Empty for top-level types. Set once after
+    /// this node is allocated (children are built first so `nested_*` can be
+    /// plain [`Vec`]s).
+    pub parent: OnceCell<&'a Message<'a>>,
+    /// Filled in resolve pass 2 (may reference peer / mutually recursive types).
+    pub fields: OnceCell<Vec<Field<'a>>>,
+    pub nested_messages: Vec<&'a Message<'a>>,
+    pub nested_enums: Vec<&'a Enum<'a>>,
     pub oneofs: Vec<Oneof>,
 }
 
@@ -88,11 +96,11 @@ pub struct Oneof {
 }
 
 /// An enum type.
-#[derive(Debug)]
 pub struct Enum<'a> {
     pub name: String,
     pub fqn: ProtoFqn,
-    pub parent: Option<&'a Message<'a>>,
+    /// Enclosing message, if nested. Empty for file-level enums.
+    pub parent: OnceCell<&'a Message<'a>>,
     pub values: Vec<EnumValue>,
 }
 
@@ -125,29 +133,6 @@ impl<'a> FileSet<'a> {
             TypeItem::Enum(e) => Some(*e),
             TypeItem::Message(_) => None,
         }
-    }
-}
-
-impl<'a> Message<'a> {
-    pub fn fields(&self) -> &[Field<'a>] {
-        self.fields
-            .get()
-            .map(Vec::as_slice)
-            .expect("message fields accessed before resolve finished")
-    }
-
-    pub fn nested_messages(&self) -> &[&'a Message<'a>] {
-        self.nested_messages
-            .get()
-            .map(Vec::as_slice)
-            .expect("nested messages accessed before resolve finished")
-    }
-
-    pub fn nested_enums(&self) -> &[&'a Enum<'a>] {
-        self.nested_enums
-            .get()
-            .map(Vec::as_slice)
-            .expect("nested enums accessed before resolve finished")
     }
 }
 
@@ -201,23 +186,31 @@ impl fmt::Debug for Message<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("Message")
             .field("fqn", &self.fqn)
-            .field("parent", &self.parent.map(|m| &m.fqn))
+            .field("parent", &self.parent.get().map(|m| &m.fqn))
             .field("fields", &self.fields.get())
             .field(
                 "nested_messages",
                 &self
                     .nested_messages
-                    .get()
-                    .map(|v| v.iter().map(|m| &m.fqn).collect::<Vec<_>>()),
+                    .iter()
+                    .map(|m| &m.fqn)
+                    .collect::<Vec<_>>(),
             )
             .field(
                 "nested_enums",
-                &self
-                    .nested_enums
-                    .get()
-                    .map(|v| v.iter().map(|e| &e.fqn).collect::<Vec<_>>()),
+                &self.nested_enums.iter().map(|e| &e.fqn).collect::<Vec<_>>(),
             )
             .field("oneofs", &self.oneofs)
+            .finish()
+    }
+}
+
+impl fmt::Debug for Enum<'_> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("Enum")
+            .field("fqn", &self.fqn)
+            .field("parent", &self.parent.get().map(|m| &m.fqn))
+            .field("values", &self.values)
             .finish()
     }
 }

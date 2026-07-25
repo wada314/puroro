@@ -39,24 +39,12 @@ fn register_file<'a>(
 
     let mut messages = Vec::with_capacity(proto.messages.len());
     for desc in &proto.messages {
-        messages.push(register_message(
-            arena,
-            desc,
-            &package_fqn,
-            None,
-            types_by_fqn,
-        )?);
+        messages.push(register_message(arena, desc, &package_fqn, types_by_fqn)?);
     }
 
     let mut enums = Vec::with_capacity(proto.enums.len());
     for desc in &proto.enums {
-        enums.push(register_enum(
-            arena,
-            desc,
-            &package_fqn,
-            None,
-            types_by_fqn,
-        )?);
+        enums.push(register_enum(arena, desc, &package_fqn, types_by_fqn)?);
     }
 
     Ok(arena.alloc(File {
@@ -73,7 +61,6 @@ fn register_message<'a>(
     desc: &MessageDesc,
     // FQN of the enclosing package (possibly ".") or parent message.
     parent_fqn: &ProtoFqn,
-    parent_message: Option<&'a Message<'a>>,
     types_by_fqn: &mut HashMap<ProtoFqn, TypeItem<'a>>,
 ) -> Result<&'a Message<'a>> {
     let fqn = parent_fqn.append(&desc.name);
@@ -82,6 +69,17 @@ fn register_message<'a>(
         return Err(Error::Codegen(format!(
             "duplicate type FQN `{fqn}` while resolving schema"
         )));
+    }
+
+    // Build children first so `nested_*` can be plain Vecs on the parent.
+    let mut nested_messages = Vec::with_capacity(desc.nested_messages.len());
+    for nested in &desc.nested_messages {
+        nested_messages.push(register_message(arena, nested, &fqn, types_by_fqn)?);
+    }
+
+    let mut nested_enums = Vec::with_capacity(desc.nested_enums.len());
+    for nested in &desc.nested_enums {
+        nested_enums.push(register_enum(arena, nested, &fqn, types_by_fqn)?);
     }
 
     let oneofs = desc
@@ -95,43 +93,26 @@ fn register_message<'a>(
     let message = arena.alloc(Message {
         name: desc.name.clone(),
         fqn: fqn.clone(),
-        parent: parent_message,
+        parent: OnceCell::new(),
         fields: OnceCell::new(),
-        nested_messages: OnceCell::new(),
-        nested_enums: OnceCell::new(),
+        nested_messages,
+        nested_enums,
         oneofs,
     });
     types_by_fqn.insert(fqn.clone(), TypeItem::Message(message));
 
-    let mut nested_messages = Vec::with_capacity(desc.nested_messages.len());
-    for nested in &desc.nested_messages {
-        nested_messages.push(register_message(
-            arena,
-            nested,
-            &fqn,
-            Some(message),
-            types_by_fqn,
-        )?);
+    for child in &message.nested_messages {
+        child
+            .parent
+            .set(message)
+            .map_err(|_| Error::Codegen(format!("parent set twice for `{}`", child.fqn)))?;
     }
-    message
-        .nested_messages
-        .set(nested_messages)
-        .map_err(|_| Error::Codegen(format!("nested messages set twice for `{fqn}`")))?;
-
-    let mut nested_enums = Vec::with_capacity(desc.nested_enums.len());
-    for nested in &desc.nested_enums {
-        nested_enums.push(register_enum(
-            arena,
-            nested,
-            &fqn,
-            Some(message),
-            types_by_fqn,
-        )?);
+    for child in &message.nested_enums {
+        child
+            .parent
+            .set(message)
+            .map_err(|_| Error::Codegen(format!("parent set twice for `{}`", child.fqn)))?;
     }
-    message
-        .nested_enums
-        .set(nested_enums)
-        .map_err(|_| Error::Codegen(format!("nested enums set twice for `{fqn}`")))?;
 
     Ok(message)
 }
@@ -141,7 +122,6 @@ fn register_enum<'a>(
     desc: &EnumDesc,
     // FQN of the enclosing package (possibly ".") or parent message.
     parent_fqn: &ProtoFqn,
-    parent_message: Option<&'a Message<'a>>,
     types_by_fqn: &mut HashMap<ProtoFqn, TypeItem<'a>>,
 ) -> Result<&'a Enum<'a>> {
     let fqn = parent_fqn.append(&desc.name);
@@ -164,7 +144,7 @@ fn register_enum<'a>(
     let enum_ty = arena.alloc(Enum {
         name: desc.name.clone(),
         fqn: fqn.clone(),
-        parent: parent_message,
+        parent: OnceCell::new(),
         values,
     });
     types_by_fqn.insert(fqn, TypeItem::Enum(enum_ty));
@@ -320,8 +300,8 @@ mod tests {
         let file_set = resolve(&arena, &files).unwrap();
         let msg = file_set.message(".example.v1.Empty").unwrap();
         assert_eq!(msg.name, "Empty");
-        assert!(msg.fields().is_empty());
-        assert!(msg.parent.is_none());
+        assert!(msg.fields.get().unwrap().is_empty());
+        assert!(msg.parent.get().is_none());
     }
 
     #[test]
@@ -354,7 +334,7 @@ mod tests {
         let file_set = resolve(&arena, &files).unwrap();
         let task = file_set.message(".example.Task").unwrap();
         let address = file_set.message(".example.Address").unwrap();
-        let fields = task.fields();
+        let fields = task.fields.get().unwrap();
         assert_eq!(fields.len(), 1);
         assert!(ptr::eq(fields[0].type_ref.as_message().unwrap(), address));
     }
@@ -378,8 +358,8 @@ mod tests {
         let file_set = resolve(&arena, &files).unwrap();
         let outer = file_set.message(".Outer").unwrap();
         let inner = file_set.message(".Outer.Inner").unwrap();
-        assert!(ptr::eq(inner.parent.unwrap(), outer));
-        assert!(ptr::eq(outer.nested_messages()[0], inner));
+        assert!(ptr::eq(*inner.parent.get().unwrap(), outer));
+        assert!(ptr::eq(outer.nested_messages[0], inner));
     }
 
     #[test]
@@ -416,7 +396,7 @@ mod tests {
         let task = file_set.message(".example.Task").unwrap();
         let status = file_set.enum_ty(".example.Status").unwrap();
         assert!(ptr::eq(
-            task.fields()[0].type_ref.as_enum().unwrap(),
+            task.fields.get().unwrap()[0].type_ref.as_enum().unwrap(),
             status
         ));
     }
@@ -493,7 +473,13 @@ mod tests {
         let file_set = resolve(&arena, &files).unwrap();
         let a = file_set.message(".A").unwrap();
         let b = file_set.message(".B").unwrap();
-        assert!(ptr::eq(a.fields()[0].type_ref.as_message().unwrap(), b));
-        assert!(ptr::eq(b.fields()[0].type_ref.as_message().unwrap(), a));
+        assert!(ptr::eq(
+            a.fields.get().unwrap()[0].type_ref.as_message().unwrap(),
+            b
+        ));
+        assert!(ptr::eq(
+            b.fields.get().unwrap()[0].type_ref.as_message().unwrap(),
+            a
+        ));
     }
 }
