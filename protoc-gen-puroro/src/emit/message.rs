@@ -1,9 +1,11 @@
 //! Emit a message module body from a [`MessagePlan`].
 //!
-//! Current scope: singular scalar / string / bytes / bool fields (including
-//! IMPLICIT / EXPLICIT / LEGACY_REQUIRED and bool `BitPacked`). Repeated,
-//! oneof, enum, and message fields are rejected.
+//! Current scope: singular scalar / string / bytes / bool / enum fields
+//! (including IMPLICIT / EXPLICIT / LEGACY_REQUIRED and bool `BitPacked`).
+//! Repeated, oneof, and message fields are rejected.
 
+use super::type_path::fqn_to_root_path;
+use crate::descriptor::features::EnumType;
 use crate::error::{Error, Result};
 use crate::field_kind::{
     CatalogLayout, CatalogPresence, FieldKind, MessageMember, MessagePlan, WireTypeKind,
@@ -24,10 +26,12 @@ struct ScalarEmit {
     presence_bit: Option<(Ident, usize)>,
     value_bit: Option<(Ident, usize)>,
     style: AccessorStyle,
+    /// Enums always use `.optional()` even when presence is IMPLICIT (DESIGN §4.6).
+    optional_getter: bool,
     mut_target: TokenStream,
-    /// Return type for IMPLICIT getters (`i32`, `&str`, …).
+    /// Return type for IMPLICIT value getters (`i32`, `&str`, …).
     implicit_ty: TokenStream,
-    /// Payload type inside `Optional<…>` for EXPLICIT / LEGACY_REQUIRED (`i32`, `&'a str`, …).
+    /// Payload type inside `Optional<…>` (`i32`, `&'a str`, enum path, …).
     optional_ty: TokenStream,
 }
 
@@ -323,9 +327,9 @@ fn collect_scalar_fields(plan: &MessagePlan<'_>) -> Result<Vec<ScalarEmit>> {
                             presence
                         )));
                     }
-                    if matches!(wire, WireTypeKind::Message(_) | WireTypeKind::Enum { .. }) {
+                    if matches!(wire, WireTypeKind::Message(_)) {
                         return Err(Error::Codegen(format!(
-                            "field `{}` has non-scalar type (message/enum) — not supported yet",
+                            "field `{}` has message type — not supported yet",
                             field.name()
                         )));
                     }
@@ -401,6 +405,7 @@ fn scalar_emit(
         }
     };
 
+    let is_enum = matches!(wire, WireTypeKind::Enum { .. });
     Ok(ScalarEmit {
         name: Ident::new(name, Span::call_site()),
         name_str: name.to_owned(),
@@ -412,6 +417,12 @@ fn scalar_emit(
         presence_bit,
         value_bit,
         style,
+        // DESIGN §4.6: enum getters always project through Optional.
+        optional_getter: is_enum
+            || matches!(
+                style,
+                AccessorStyle::Explicit | AccessorStyle::LegacyRequired
+            ),
         mut_target: mut_target_type(wire)?,
         implicit_ty: implicit_value_type(wire)?,
         optional_ty: optional_value_type(wire)?,
@@ -499,9 +510,17 @@ fn wire_marker_path(wire: &WireTypeKind<'_>) -> Result<TokenStream> {
         WireTypeKind::SFixed64 => quote! { ::puroro_rt::ProtoSFixed64 },
         WireTypeKind::SInt32 => quote! { ::puroro_rt::ProtoSint32 },
         WireTypeKind::SInt64 => quote! { ::puroro_rt::ProtoSint64 },
-        WireTypeKind::Message(_) | WireTypeKind::Enum { .. } => {
+        WireTypeKind::Enum { ty, openness } => {
+            let path = fqn_to_root_path(ty.fqn())?;
+            let kind = match openness {
+                EnumType::Open => quote! { ::puroro_rt::Open },
+                EnumType::Closed => quote! { ::puroro_rt::Closed },
+            };
+            quote! { ::puroro_rt::ProtoEnum<#path, #kind> }
+        }
+        WireTypeKind::Message(_) => {
             return Err(Error::Codegen(
-                "internal error: non-scalar wire in wire_marker_path".into(),
+                "internal error: message wire in wire_marker_path".into(),
             ));
         }
     })
@@ -534,20 +553,31 @@ fn render_accessors(fields: &[ScalarEmit]) -> Vec<TokenStream> {
             let implicit_ty = &field.implicit_ty;
             let optional_ty = &field.optional_ty;
 
-            let getter = match field.style {
-                AccessorStyle::Implicit => quote! {
-                    pub fn #name(&self) -> #implicit_ty {
-                        self.#name.bind(&self._common).value()
-                    }
-                },
-                AccessorStyle::Explicit | AccessorStyle::LegacyRequired => quote! {
+            let getter = if field.optional_getter {
+                quote! {
                     pub fn #name<'a>(&'a self) -> ::puroro::Optional<#optional_ty, impl ::puroro::HasDefault<#optional_ty>>
                     where
                         A: 'a,
                     {
                         self.#name.bind(&self._common).optional()
                     }
-                },
+                }
+            } else {
+                match field.style {
+                    AccessorStyle::Implicit => quote! {
+                        pub fn #name(&self) -> #implicit_ty {
+                            self.#name.bind(&self._common).value()
+                        }
+                    },
+                    AccessorStyle::Explicit | AccessorStyle::LegacyRequired => quote! {
+                        pub fn #name<'a>(&'a self) -> ::puroro::Optional<#optional_ty, impl ::puroro::HasDefault<#optional_ty>>
+                        where
+                            A: 'a,
+                        {
+                            self.#name.bind(&self._common).optional()
+                        }
+                    },
+                }
             };
 
             quote! {
@@ -576,9 +606,10 @@ fn implicit_value_type(wire: &WireTypeKind<'_>) -> Result<TokenStream> {
         WireTypeKind::Bool => quote! { bool },
         WireTypeKind::String { .. } => quote! { &str },
         WireTypeKind::Bytes { .. } => quote! { &[u8] },
-        WireTypeKind::Message(_) | WireTypeKind::Enum { .. } => {
+        WireTypeKind::Enum { ty, .. } => fqn_to_root_path(ty.fqn())?,
+        WireTypeKind::Message(_) => {
             return Err(Error::Codegen(
-                "internal error: non-scalar in implicit_value_type".into(),
+                "internal error: message in implicit_value_type".into(),
             ));
         }
     })
@@ -595,9 +626,10 @@ fn optional_value_type(wire: &WireTypeKind<'_>) -> Result<TokenStream> {
         WireTypeKind::Bool => quote! { bool },
         WireTypeKind::String { .. } => quote! { &'a str },
         WireTypeKind::Bytes { .. } => quote! { &'a [u8] },
-        WireTypeKind::Message(_) | WireTypeKind::Enum { .. } => {
+        WireTypeKind::Enum { ty, .. } => fqn_to_root_path(ty.fqn())?,
+        WireTypeKind::Message(_) => {
             return Err(Error::Codegen(
-                "internal error: non-scalar in optional_value_type".into(),
+                "internal error: message in optional_value_type".into(),
             ));
         }
     })
@@ -614,9 +646,10 @@ fn mut_target_type(wire: &WireTypeKind<'_>) -> Result<TokenStream> {
         WireTypeKind::Bool => quote! { bool },
         WireTypeKind::String { .. } => quote! { ::puroro::String<A> },
         WireTypeKind::Bytes { .. } => quote! { ::allocator_api2::vec::Vec<u8, A> },
-        WireTypeKind::Message(_) | WireTypeKind::Enum { .. } => {
+        WireTypeKind::Enum { ty, .. } => fqn_to_root_path(ty.fqn())?,
+        WireTypeKind::Message(_) => {
             return Err(Error::Codegen(
-                "internal error: non-scalar in mut_target_type".into(),
+                "internal error: message in mut_target_type".into(),
             ));
         }
     })

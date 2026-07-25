@@ -16,6 +16,16 @@ use ::protobuf_core::{AsRefExtProtobuf, Field, FieldNumber, FieldValue, WriteExt
 
 /// `CodeGeneratorResponse.FEATURE_PROTO3_OPTIONAL`
 pub const FEATURE_PROTO3_OPTIONAL: u64 = 1;
+/// `CodeGeneratorResponse.FEATURE_SUPPORTS_EDITIONS`
+pub const FEATURE_SUPPORTS_EDITIONS: u64 = 2;
+
+/// Features this plugin always advertises to `protoc`.
+pub const SUPPORTED_FEATURES: u64 = FEATURE_PROTO3_OPTIONAL | FEATURE_SUPPORTS_EDITIONS;
+
+/// `google.protobuf.Edition.EDITION_PROTO2` — inclusive lower bound we accept.
+pub const MINIMUM_EDITION: i32 = 998;
+/// `google.protobuf.Edition.EDITION_2024` — inclusive upper bound we resolve today.
+pub const MAXIMUM_EDITION: i32 = 1001;
 
 /// One generated file entry for `CodeGeneratorResponse.File`.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -29,6 +39,8 @@ pub struct ResponseFile {
 pub struct CodeGeneratorResponse {
     pub error: Option<String>,
     pub supported_features: u64,
+    pub minimum_edition: Option<i32>,
+    pub maximum_edition: Option<i32>,
     pub files: Vec<ResponseFile>,
 }
 
@@ -36,7 +48,9 @@ impl CodeGeneratorResponse {
     pub fn from_files(files: Vec<ResponseFile>) -> Self {
         Self {
             error: None,
-            supported_features: FEATURE_PROTO3_OPTIONAL,
+            supported_features: SUPPORTED_FEATURES,
+            minimum_edition: Some(MINIMUM_EDITION),
+            maximum_edition: Some(MAXIMUM_EDITION),
             files,
         }
     }
@@ -44,7 +58,9 @@ impl CodeGeneratorResponse {
     pub fn from_error(message: impl Into<String>) -> Self {
         Self {
             error: Some(message.into()),
-            supported_features: FEATURE_PROTO3_OPTIONAL,
+            supported_features: SUPPORTED_FEATURES,
+            minimum_edition: Some(MINIMUM_EDITION),
+            maximum_edition: Some(MAXIMUM_EDITION),
             files: Vec::new(),
         }
     }
@@ -99,6 +115,18 @@ pub fn encode_response(response: &CodeGeneratorResponse) -> Result<Vec<u8>> {
             FieldNumber::try_from(2)?,
             FieldValue::from_uint64(response.supported_features),
         );
+        out.write_protobuf_field(&field)?;
+    }
+    if let Some(edition) = response.minimum_edition {
+        // optional int32 minimum_edition = 3;
+        let field: Field<&[u8]> =
+            Field::new(FieldNumber::try_from(3)?, FieldValue::from_int32(edition));
+        out.write_protobuf_field(&field)?;
+    }
+    if let Some(edition) = response.maximum_edition {
+        // optional int32 maximum_edition = 4;
+        let field: Field<&[u8]> =
+            Field::new(FieldNumber::try_from(4)?, FieldValue::from_int32(edition));
         out.write_protobuf_field(&field)?;
     }
     for file in &response.files {
@@ -300,15 +328,21 @@ fn decode_field(bytes: &[u8]) -> Result<FieldDesc> {
     })
 }
 
-/// `FileOptions` / `EnumOptions`: read `features` (50).
+/// `FileOptions` / `EnumOptions`: read `features`.
+///
+/// Field numbers differ by options message:
+/// - `FileOptions.features` = 50
+/// - `EnumOptions.features` = 7
 fn decode_options_features(bytes: &[u8]) -> Result<FeatureSet> {
     let mut features = FeatureSet::default();
     for field in AsRefExtProtobuf::read_protobuf_fields(&bytes) {
         let field = field?;
-        // optional FeatureSet features = 50;
-        if field.field_number.as_u32() == 50 {
-            let nested = expect_len(&field)?;
-            features = decode_feature_set(nested)?;
+        match field.field_number.as_u32() {
+            7 | 50 => {
+                let nested = expect_len(&field)?;
+                features = decode_feature_set(nested)?;
+            }
+            _ => {}
         }
     }
     Ok(features)
@@ -589,6 +623,33 @@ mod tests {
         assert_eq!(
             decoded.proto_files[0].features.field_presence,
             Some(FieldPresence::Implicit)
+        );
+    }
+
+    #[test]
+    fn decode_enum_options_features_field_number_7() {
+        // FeatureSet { enum_type: CLOSED }
+        let feature_set = encode_varint_field(2, EnumType::Closed as i32);
+        // EnumOptions { features = 7 }
+        let enum_options = encode_message_field(7, &feature_set);
+        let mut enum_desc = Vec::new();
+        enum_desc.extend(encode_string_field(1, "Priority"));
+        enum_desc.extend(encode_message_field(3, &enum_options));
+
+        let mut file = Vec::new();
+        file.extend(encode_string_field(1, "ed.proto"));
+        file.extend(encode_string_field(12, "editions"));
+        file.extend(encode_varint_field(14, Edition::Edition2023 as i32));
+        file.extend(encode_message_field(5, &enum_desc));
+
+        let mut request = Vec::new();
+        request.extend(encode_string_field(1, "ed.proto"));
+        request.extend(encode_message_field(15, &file));
+
+        let decoded = decode_request(&request).unwrap();
+        assert_eq!(
+            decoded.proto_files[0].enums[0].features.enum_type,
+            Some(EnumType::Closed)
         );
     }
 

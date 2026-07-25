@@ -1,7 +1,7 @@
 //! Behavioural tests for the `empty` fixture (field-less message).
 
 use crate::empty::Empty;
-use ::puroro::Message;
+use puroro::Message;
 
 #[test]
 fn default_encodes_to_empty() {

@@ -1,0 +1,15 @@
+edition = "2023";
+
+package demo;
+
+// Closed enum; file default field_presence is EXPLICIT.
+enum Priority {
+  option features.enum_type = CLOSED;
+  PRIORITY_UNSPECIFIED = 0;
+  PRIORITY_LOW = 1;
+  PRIORITY_HIGH = 2;
+}
+
+message Holder {
+  Priority priority = 1;
+}

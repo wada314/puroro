@@ -1,0 +1,16 @@
+edition = "2023";
+
+package demo;
+
+option features.field_presence = IMPLICIT;
+
+// Edition default enum_type is OPEN.
+enum Status {
+  STATUS_UNSPECIFIED = 0;
+  STATUS_PENDING = 1;
+  STATUS_DONE = 2;
+}
+
+message Holder {
+  Status status = 1;
+}

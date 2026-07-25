@@ -5,7 +5,7 @@
 //! Layout per case:
 //! ```text
 //! fixtures/<case>/
-//!   *.proto     # exactly one input schema
+//!   *.proto     # one or more schemas (all passed to protoc)
 //!   test.rs     # behavioural tests for the generated module `crate::<case>`
 //! ```
 //!
@@ -53,7 +53,9 @@ fn main() {
 
     for case in &cases {
         println!("cargo:rerun-if-changed={}", case.dir.display());
-        println!("cargo:rerun-if-changed={}", case.proto_path.display());
+        for proto in &case.proto_paths {
+            println!("cargo:rerun-if-changed={}", proto.display());
+        }
         println!("cargo:rerun-if-changed={}", case.test_path.display());
 
         let case_out = generated_dir.join(&case.module);
@@ -145,16 +147,16 @@ fn build_plugin_in_nested_target(manifest_dir: &Path, out_dir: &Path) -> PathBuf
 }
 
 fn run_protoc(protoc: &Path, plugin: &Path, case: &FixtureCase, case_out: &Path) {
-    let proto_name = case
-        .proto_path
-        .file_name()
-        .unwrap_or_else(|| panic!("proto path has no file name: {}", case.proto_path.display()));
-
     let mut cmd = Command::new(protoc);
     cmd.arg(format!("--plugin=protoc-gen-puroro={}", plugin.display()))
         .arg(format!("--puroro_out={}", case_out.display()))
-        .arg(format!("-I{}", case.dir.display()))
-        .arg(proto_name);
+        .arg(format!("-I{}", case.dir.display()));
+    for proto in &case.proto_paths {
+        let name = proto
+            .file_name()
+            .unwrap_or_else(|| panic!("proto path has no file name: {}", proto.display()));
+        cmd.arg(name);
+    }
 
     let output = cmd
         .output()
@@ -175,15 +177,7 @@ fn run_protoc(protoc: &Path, plugin: &Path, case: &FixtureCase, case_out: &Path)
 
 fn find_single_generated_rs(case_out: &Path, module: &str) -> PathBuf {
     let mut files = Vec::new();
-    for entry in fs::read_dir(case_out)
-        .unwrap_or_else(|e| panic!("failed to read generated dir `{}`: {e}", case_out.display()))
-    {
-        let entry = entry.expect("read generated dir entry");
-        let path = entry.path();
-        if path.extension().is_some_and(|ext| ext == "rs") && path.is_file() {
-            files.push(path);
-        }
-    }
+    collect_rs_files(case_out, &mut files);
     match files.len() {
         1 => files.pop().unwrap(),
         0 => panic!(
@@ -191,9 +185,24 @@ fn find_single_generated_rs(case_out: &Path, module: &str) -> PathBuf {
             case_out.display()
         ),
         n => panic!(
-            "protoc/plugin produced {n} `.rs` files for fixture `{module}` under {}; expected 1",
+            "protoc/plugin produced {n} `.rs` files for fixture `{module}` under {}; expected 1 \
+             (multi-file schemas should emit a single shared forest file)",
             case_out.display()
         ),
+    }
+}
+
+fn collect_rs_files(dir: &Path, out: &mut Vec<PathBuf>) {
+    for entry in fs::read_dir(dir)
+        .unwrap_or_else(|e| panic!("failed to read generated dir `{}`: {e}", dir.display()))
+    {
+        let entry = entry.expect("read generated dir entry");
+        let path = entry.path();
+        if path.is_dir() {
+            collect_rs_files(&path, out);
+        } else if path.extension().is_some_and(|ext| ext == "rs") {
+            out.push(path);
+        }
     }
 }
 
@@ -201,7 +210,8 @@ struct FixtureCase {
     /// Directory name → Rust module name (`crate::<module>`).
     module: String,
     dir: PathBuf,
-    proto_path: PathBuf,
+    /// All `.proto` files in the fixture, sorted by file name.
+    proto_paths: Vec<PathBuf>,
     test_path: PathBuf,
 }
 
@@ -234,7 +244,7 @@ fn list_fixture_cases(fixtures_src: &Path) -> Vec<FixtureCase> {
             );
         }
 
-        let proto_path = find_single_proto(&dir);
+        let proto_paths = list_protos(&dir);
         let test_path = dir.join("test.rs");
         if !test_path.is_file() {
             panic!("fixture `{}` is missing required `test.rs`", dir.display());
@@ -243,14 +253,14 @@ fn list_fixture_cases(fixtures_src: &Path) -> Vec<FixtureCase> {
         cases.push(FixtureCase {
             module,
             dir,
-            proto_path,
+            proto_paths,
             test_path,
         });
     }
     cases
 }
 
-fn find_single_proto(case_dir: &Path) -> PathBuf {
+fn list_protos(case_dir: &Path) -> Vec<PathBuf> {
     let mut protos = Vec::new();
     for entry in fs::read_dir(case_dir).expect("read fixture case dir") {
         let entry = entry.expect("read fixture case entry");
@@ -259,17 +269,14 @@ fn find_single_proto(case_dir: &Path) -> PathBuf {
             protos.push(path);
         }
     }
-    match protos.len() {
-        1 => protos.pop().unwrap(),
-        0 => panic!(
-            "fixture `{}` must contain exactly one `.proto` file",
+    if protos.is_empty() {
+        panic!(
+            "fixture `{}` must contain at least one `.proto` file",
             case_dir.display()
-        ),
-        n => panic!(
-            "fixture `{}` must contain exactly one `.proto` file, found {n}",
-            case_dir.display()
-        ),
+        );
     }
+    protos.sort_by(|a, b| a.file_name().cmp(&b.file_name()));
+    protos
 }
 
 fn is_simple_ident(name: &str) -> bool {

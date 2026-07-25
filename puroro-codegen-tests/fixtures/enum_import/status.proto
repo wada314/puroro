@@ -1,0 +1,9 @@
+edition = "2023";
+
+package demo;
+
+// Open enum (edition default) defined in edition 2023.
+enum Status {
+  STATUS_UNSPECIFIED = 0;
+  STATUS_PENDING = 1;
+}

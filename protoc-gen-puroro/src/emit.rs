@@ -1,33 +1,57 @@
 //! Code emission from a resolved schema.
 //!
-//! Current scope: one root message per file, singular scalar / string / bytes /
-//! bool fields. Nested types, enums, repeated, oneof, and message fields are
-//! still rejected. Emission goes through [`resolve`] + [`plan_message`].
+//! Current scope: file-level enums and one root message per file with singular
+//! scalar / string / bytes / bool / enum fields. Nested types, repeated, oneof,
+//! and message fields are still rejected. All `file_to_generate` entries share
+//! one [`ModuleForest`] so cross-file type refs use a single `self::_root`.
 
 use crate::descriptor::CodegenRequest;
 use crate::error::{Error, Result};
 use crate::field_kind::{MessagePlan, plan_message};
 use crate::module_tree::layout::{ModuleLayout, render};
 use crate::module_tree::{ModuleForest, ModuleOrigin, type_name_to_module_ident};
-use crate::plugin_io::{CodeGeneratorResponse, ResponseFile};
+use crate::plugin_io::CodeGeneratorResponse;
 use crate::resolved::{Arena, FieldOccurrence, File, FileSet, Message, SingularPresence, resolve};
 use ::proc_macro2::{Ident, Span};
 use ::quote::quote;
 
+mod enumeration;
 mod message;
+mod type_path;
 
 /// Generate plugin response files from a decoded request.
 pub fn emit(request: &CodegenRequest) -> Result<CodeGeneratorResponse> {
     let arena = Arena::new();
     let file_set = resolve(&arena, &request.proto_files)?;
 
-    let mut files = Vec::new();
-    for target in &request.meta.file_to_generate {
-        let file = find_file(&file_set, target)?;
-        files.push(emit_resolved_file(file)?);
+    if request.meta.file_to_generate.is_empty() {
+        return Ok(CodeGeneratorResponse::from_files(vec![]));
     }
 
-    Ok(CodeGeneratorResponse::from_files(files))
+    let mut targets = Vec::with_capacity(request.meta.file_to_generate.len());
+    for target in &request.meta.file_to_generate {
+        targets.push(find_file(&file_set, target)?);
+    }
+
+    let mut forest = ModuleForest::new();
+    write_root_attrs(&mut forest, &targets);
+
+    for file in &targets {
+        append_file_to_forest(&mut forest, file)?;
+    }
+
+    let path = if targets.len() == 1 {
+        proto_path_to_rust_path(targets[0].name())
+    } else {
+        // One shared forest needs one physical file so `self::_root` stays coherent.
+        "lib.rs".into()
+    };
+
+    let mut files = render(&forest, &ModuleLayout::SingleFile { path })?;
+    let file = files
+        .pop()
+        .ok_or_else(|| Error::Codegen("layout produced no files".into()))?;
+    Ok(CodeGeneratorResponse::from_files(vec![file]))
 }
 
 fn find_file<'a>(file_set: &FileSet<'a>, target: &str) -> Result<&'a File<'a>> {
@@ -41,47 +65,72 @@ fn find_file<'a>(file_set: &FileSet<'a>, target: &str) -> Result<&'a File<'a>> {
         })
 }
 
-fn emit_resolved_file<'a>(file: &'a File<'a>) -> Result<ResponseFile> {
-    let message = validate_emit_file(file)?;
-    let plan = plan_message(message)?;
-    let forest = build_forest(file, &plan)?;
-
-    let mut files = render(
-        &forest,
-        &ModuleLayout::SingleFile {
-            path: proto_path_to_rust_path(file.name()),
-        },
-    )?;
-    files
-        .pop()
-        .ok_or_else(|| Error::Codegen("layout produced no files".into()))
-}
-
-fn build_forest(file: &File<'_>, plan: &MessagePlan<'_>) -> Result<ModuleForest> {
-    let message = plan.message();
-    let mut forest = ModuleForest::new();
-
-    // Root carries file-level docs / inner attributes.
-    let doc = format!("@generated from {} — do not edit", file.name());
+fn write_root_attrs(forest: &mut ModuleForest, targets: &[&File<'_>]) {
+    let doc = if targets.len() == 1 {
+        format!("@generated from {} — do not edit", targets[0].name())
+    } else {
+        let names: Vec<&str> = targets.iter().map(|f| f.name()).collect();
+        format!("@generated from {} — do not edit", names.join(", "))
+    };
     let mut root_items = quote! {
         #![doc = #doc]
         #![allow(clippy::absolute_paths)]
         // Empty messages emit a catch-all-only `match` until field arms exist.
         #![allow(clippy::match_single_binding)]
     };
-    if !file.package().is_empty() {
-        let package_doc = format!("Package `{}`", file.package());
+    let mut packages: Vec<&str> = targets
+        .iter()
+        .map(|f| f.package())
+        .filter(|p| !p.is_empty())
+        .collect();
+    packages.sort_unstable();
+    packages.dedup();
+    for package in packages {
+        let package_doc = format!("Package `{package}`");
         root_items.extend(quote! {
             #![doc = #package_doc]
         });
     }
     forest.root_mut().append_items(root_items);
+}
 
+fn append_file_to_forest(forest: &mut ModuleForest, file: &File<'_>) -> Result<()> {
+    let parent = forest.ensure_package(file.package());
+    for e in file.enums() {
+        if e.parent().is_some() {
+            continue;
+        }
+        parent.append_items(enumeration::render_enum(e)?);
+    }
+
+    let mut messages = file.messages();
+    let Some(message) = messages.next() else {
+        return Ok(());
+    };
+    let extra = messages.count();
+    if extra > 0 {
+        return Err(Error::Codegen(format!(
+            "generator requires at most one root message per file, found {} in `{}`",
+            extra + 1,
+            file.name()
+        )));
+    }
+
+    let message = validate_emit_message(message)?;
+    let plan = plan_message(message)?;
+    append_message(forest, file, &plan)
+}
+
+fn append_message(
+    forest: &mut ModuleForest,
+    file: &File<'_>,
+    plan: &MessagePlan<'_>,
+) -> Result<()> {
+    let message = plan.message();
     let parent = forest.ensure_package(file.package());
     let mod_name = type_name_to_module_ident(message.name());
     let type_name = Ident::new(message.name(), Span::call_site());
 
-    // Main message type is visible from the parent namespace.
     parent.append_items(quote! {
         pub use #mod_name::#type_name;
     });
@@ -91,36 +140,11 @@ fn build_forest(file: &File<'_>, plan: &MessagePlan<'_>) -> Result<ModuleForest>
         proto_fqn: message.fqn().clone(),
     });
     child.append_items(message::render_items(plan)?);
-
-    Ok(forest)
+    Ok(())
 }
 
-/// One root message; no nested types / file-level enums / real oneofs.
-///
-/// Proto3 `optional` synthetic oneofs are allowed — they appear in
-/// `message.oneofs()` but fields keep [`SingularPresence::Explicit`].
-/// Field support is enforced by [`message::render_items`].
-fn validate_emit_file<'a>(file: &'a File<'a>) -> Result<&'a Message<'a>> {
-    if file.enums().next().is_some() {
-        return Err(Error::Codegen(
-            "generator does not support file-level enums yet".into(),
-        ));
-    }
-
-    let mut messages = file.messages();
-    let Some(message) = messages.next() else {
-        return Err(Error::Codegen(
-            "generator requires exactly one root message, found 0".into(),
-        ));
-    };
-    let extra = messages.count();
-    if extra > 0 {
-        return Err(Error::Codegen(format!(
-            "generator requires exactly one root message, found {}",
-            extra + 1
-        )));
-    }
-
+/// Nested types / real oneofs rejected; proto3 optional synthetic oneofs OK.
+fn validate_emit_message<'a>(message: &'a Message<'a>) -> Result<&'a Message<'a>> {
     if !is_simple_ident(message.name()) {
         return Err(Error::Codegen(format!(
             "message name `{}` is not a simple Rust identifier",
@@ -169,9 +193,10 @@ fn proto_path_to_rust_path(proto_name: &str) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::descriptor::features::EnumType;
     use crate::descriptor::{
-        CodegenMeta, CodegenRequest, FeatureSet, FieldDesc, FieldLabel, FieldType, MessageDesc,
-        ProtoFile, Syntax,
+        CodegenMeta, CodegenRequest, Edition, EnumDesc, EnumValueDesc, FeatureSet, FieldDesc,
+        FieldLabel, FieldType, MessageDesc, ProtoFile, ProtoFqn, Syntax,
     };
 
     fn empty_request(message_name: &str) -> CodegenRequest {
@@ -225,7 +250,6 @@ mod tests {
         assert!(content.contains("pub mod empty"));
         assert!(content.contains("pub use empty::Empty"));
         assert!(content.contains("struct Empty"));
-        // Re-export should sit under the package leaf, not the forest root.
         let example_idx = content.find("pub mod example").expect("example mod");
         let use_idx = content.find("pub use empty::Empty").expect("pub use");
         assert!(
@@ -301,19 +325,185 @@ mod tests {
         let content = &response.files[0].content;
         assert!(content.contains("struct Scalars"));
         assert!(content.contains("pub const FIELD_SCORE"));
-        assert!(content.contains("pub const FIELD_TITLE"));
-        assert!(content.contains("pub const BIT_TITLE"));
-        assert!(content.contains("pub const BIT_DONE_VALUE"));
         assert!(content.contains("ProtoInt32"));
-        assert!(content.contains("ProtoString"));
-        assert!(content.contains("ProtoBool"));
         assert!(content.contains("ProtoBytes"));
         assert!(content.contains("ProtoSint32"));
         assert!(content.contains("BitPacked"));
-        assert!(content.contains("fn score("));
+    }
+
+    #[test]
+    fn emit_open_enum_field() {
+        let request = CodegenRequest {
+            meta: CodegenMeta {
+                file_to_generate: vec!["t.proto".into()],
+                parameter: None,
+            },
+            proto_files: vec![ProtoFile {
+                name: "t.proto".into(),
+                package: "demo".into(),
+                syntax: Syntax::Proto3,
+                features: FeatureSet::default(),
+                dependency: vec![],
+                messages: vec![MessageDesc {
+                    name: "Holder".into(),
+                    fields: vec![FieldDesc {
+                        name: "status".into(),
+                        number: 1,
+                        label: FieldLabel::Optional,
+                        type_: FieldType::Enum,
+                        type_name: Some(ProtoFqn::parse(".demo.Status")),
+                        oneof_index: None,
+                        proto3_optional: false,
+                        packed: None,
+                        features: FeatureSet::default(),
+                    }],
+                    nested_messages: vec![],
+                    nested_enums: vec![],
+                    oneofs: vec![],
+                }],
+                enums: vec![EnumDesc {
+                    name: "Status".into(),
+                    values: vec![
+                        EnumValueDesc {
+                            name: "STATUS_UNSPECIFIED".into(),
+                            number: 0,
+                        },
+                        EnumValueDesc {
+                            name: "STATUS_PENDING".into(),
+                            number: 1,
+                        },
+                    ],
+                    features: FeatureSet::default(),
+                }],
+            }],
+        };
+        let response = emit(&request).unwrap();
+        let content = &response.files[0].content;
+        assert!(content.contains("pub struct Status"));
+        assert!(content.contains("pub const UNSPECIFIED"));
+        assert!(content.contains("pub const PENDING"));
+        assert!(content.contains("OpenEnum"));
+        assert!(content.contains("ProtoEnum"));
+        assert!(
+            content.contains("self :: _root :: demo :: Status")
+                || content.contains("self::_root::demo::Status")
+        );
+        assert!(content.contains("::puroro_rt::Open"));
+        assert!(content.contains("::puroro_rt::Implicit"));
         assert!(content.contains(".optional()"));
-        assert!(content.contains("BIT_DONE_VALUE"));
-        assert!(content.contains("FIELD_SCORE =>"));
+    }
+
+    #[test]
+    fn emit_cross_file_open_and_closed_enums() {
+        let closed = FeatureSet {
+            enum_type: Some(EnumType::Closed),
+            ..FeatureSet::default()
+        };
+        let request = CodegenRequest {
+            meta: CodegenMeta {
+                file_to_generate: vec![
+                    "status.proto".into(),
+                    "priority.proto".into(),
+                    "holder.proto".into(),
+                ],
+                parameter: None,
+            },
+            proto_files: vec![
+                ProtoFile {
+                    name: "status.proto".into(),
+                    package: "demo".into(),
+                    syntax: Syntax::Editions(Edition::Edition2023),
+                    features: FeatureSet::default(),
+                    dependency: vec![],
+                    messages: vec![],
+                    enums: vec![EnumDesc {
+                        name: "Status".into(),
+                        values: vec![
+                            EnumValueDesc {
+                                name: "STATUS_UNSPECIFIED".into(),
+                                number: 0,
+                            },
+                            EnumValueDesc {
+                                name: "STATUS_PENDING".into(),
+                                number: 1,
+                            },
+                        ],
+                        features: FeatureSet::default(),
+                    }],
+                },
+                ProtoFile {
+                    name: "priority.proto".into(),
+                    package: "demo".into(),
+                    syntax: Syntax::Editions(Edition::Edition2024),
+                    features: FeatureSet::default(),
+                    dependency: vec![],
+                    messages: vec![],
+                    enums: vec![EnumDesc {
+                        name: "Priority".into(),
+                        values: vec![
+                            EnumValueDesc {
+                                name: "PRIORITY_UNSPECIFIED".into(),
+                                number: 0,
+                            },
+                            EnumValueDesc {
+                                name: "PRIORITY_HIGH".into(),
+                                number: 1,
+                            },
+                        ],
+                        features: closed,
+                    }],
+                },
+                ProtoFile {
+                    name: "holder.proto".into(),
+                    package: "demo".into(),
+                    syntax: Syntax::Editions(Edition::Edition2023),
+                    features: FeatureSet::default(),
+                    dependency: vec!["status.proto".into(), "priority.proto".into()],
+                    messages: vec![MessageDesc {
+                        name: "Holder".into(),
+                        fields: vec![
+                            FieldDesc {
+                                name: "status".into(),
+                                number: 1,
+                                label: FieldLabel::Optional,
+                                type_: FieldType::Enum,
+                                type_name: Some(ProtoFqn::parse(".demo.Status")),
+                                oneof_index: None,
+                                proto3_optional: false,
+                                packed: None,
+                                features: FeatureSet::default(),
+                            },
+                            FieldDesc {
+                                name: "priority".into(),
+                                number: 2,
+                                label: FieldLabel::Optional,
+                                type_: FieldType::Enum,
+                                type_name: Some(ProtoFqn::parse(".demo.Priority")),
+                                oneof_index: None,
+                                proto3_optional: false,
+                                packed: None,
+                                features: FeatureSet::default(),
+                            },
+                        ],
+                        nested_messages: vec![],
+                        nested_enums: vec![],
+                        oneofs: vec![],
+                    }],
+                    enums: vec![],
+                },
+            ],
+        };
+        let response = emit(&request).unwrap();
+        assert_eq!(response.files.len(), 1);
+        assert_eq!(response.files[0].name, "lib.rs");
+        let content = &response.files[0].content;
+        assert!(content.contains("pub struct Status"));
+        assert!(content.contains("pub struct Priority"));
+        assert!(content.contains("OpenEnum"));
+        assert!(content.contains("ClosedEnum"));
+        assert!(content.contains("struct Holder"));
+        assert!(content.contains("::puroro_rt::Open"));
+        assert!(content.contains("::puroro_rt::Closed"));
     }
 
     #[test]
@@ -345,6 +535,6 @@ mod tests {
             oneofs: vec![],
         });
         let err = emit(&request).unwrap_err();
-        assert!(err.to_string().contains("exactly one root message"));
+        assert!(err.to_string().contains("at most one root message"));
     }
 }

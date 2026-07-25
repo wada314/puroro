@@ -1,0 +1,13 @@
+edition = "2023";
+
+package demo;
+
+import "status.proto";
+import "priority.proto";
+
+// Host message edition may differ from imported enums; openness still comes
+// from each enum's defining file (2023 open Status, 2024 closed Priority).
+message Holder {
+  Status status = 1;
+  Priority priority = 2;
+}

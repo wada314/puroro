@@ -1,0 +1,10 @@
+edition = "2024";
+
+package demo;
+
+// Closed enum defined in a different edition than Status / Holder.
+enum Priority {
+  option features.enum_type = CLOSED;
+  PRIORITY_UNSPECIFIED = 0;
+  PRIORITY_HIGH = 1;
+}

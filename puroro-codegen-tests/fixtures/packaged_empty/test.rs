@@ -4,7 +4,7 @@
 //! message type is re-exported from the package leaf (`example::v1::Empty`).
 
 use crate::packaged_empty::example::v1::Empty;
-use ::puroro::Message;
+use puroro::Message;
 
 #[test]
 fn package_path_resolves() {
