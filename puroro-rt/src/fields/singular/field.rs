@@ -33,7 +33,7 @@ use crate::fields::shared::field_inspect::{FieldCloneIn, FieldDebug, FieldEncode
 use crate::fields::shared::{
     DefaultIn, MessageCommon, PresenceBits,
     field_presence::{
-        Explicit, FieldPresence, Implicit, LegacyRequired, NonOneof, Oneof, RequiredFieldPresence,
+        Explicit, FieldPresence, Implicit, LegacyRequired, Message, Oneof, RequiredFieldPresence,
     },
     slot_init::{AlwaysInitialized, SlotInitView},
     value_layout::{Inline, ValueLayout},
@@ -273,13 +273,13 @@ where
     }
 }
 
-impl<T, const FIELD: u32, A, L, D> SingularField<T, NonOneof, FIELD, A, L, D>
+impl<T, const FIELD: u32, A, L, D> SingularField<T, Message, FIELD, A, L, D>
 where
     T: ProtoType,
     A: Allocator + Clone,
     L: ValueLayout<T, A>,
     T::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
-    <NonOneof as FieldPresence>::ValueSlot<T::Slot<A>>: ValueSlot<T::Slot<A>, A>,
+    <Message as FieldPresence>::ValueSlot<T::Slot<A>>: ValueSlot<T::Slot<A>, A>,
 {
     /// Returns whether the pointer-present slot holds a value.
     #[inline]
@@ -642,14 +642,14 @@ where
 }
 
 impl<T, const FIELD: u32, A, L, D, Pb> FieldDebug<Pb, A>
-    for SingularField<T, NonOneof, FIELD, A, L, D>
+    for SingularField<T, Message, FIELD, A, L, D>
 where
     T: ProtoType + ProtoRefDebug<A>,
     A: Allocator + Clone,
     L: ValueLayout<T, A>,
     Pb: PresenceBits,
     T::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
-    <NonOneof as FieldPresence>::ValueSlot<T::Slot<A>>: ValueSlot<T::Slot<A>, A>,
+    <Message as FieldPresence>::ValueSlot<T::Slot<A>>: ValueSlot<T::Slot<A>, A>,
 {
     #[inline]
     fn fmt_debug(&self, common: &MessageCommon<Pb, A>, f: &mut Formatter<'_>) -> FmtResult {

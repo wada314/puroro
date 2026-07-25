@@ -16,10 +16,28 @@ mod resolve;
 pub use arena::Arena;
 pub use resolve::resolve;
 
-use crate::descriptor::{FieldLabel, FieldType, ProtoFqn};
+use crate::descriptor::{FieldType, ProtoFqn, Syntax};
 use ::std::cell::OnceCell;
 use ::std::collections::HashMap;
 use ::std::fmt;
+
+/// Cardinality + singular presence after resolve.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum FieldOccurrence {
+    Singular(SingularPresence),
+    Repeated,
+}
+
+/// Presence policy for a singular field (matches puroro-rt markers; no BIT yet).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SingularPresence {
+    Implicit,
+    Explicit,
+    LegacyRequired,
+    Oneof,
+    /// Singular message / group (pointer presence); matches puroro-rt `Message`.
+    Message,
+}
 
 /// Resolved root: the set of files and the type graph within one arena.
 #[derive(Debug)]
@@ -34,6 +52,7 @@ pub struct FileSet<'a> {
 pub struct File<'a> {
     name: String,
     package: String,
+    syntax: Syntax,
     dependency: Vec<String>,
     messages: Vec<&'a Message<'a>>,
     enums: Vec<&'a Enum<'a>>,
@@ -59,10 +78,9 @@ pub struct Message<'a> {
 pub struct Field<'a> {
     name: String,
     number: i32,
-    label: FieldLabel,
+    occurrence: FieldOccurrence,
     type_ref: TypeRef<'a>,
     oneof_index: Option<i32>,
-    proto3_optional: bool,
 }
 
 /// Resolved type of a field.
@@ -146,6 +164,10 @@ impl<'a> File<'a> {
         &self.package
     }
 
+    pub fn syntax(&self) -> Syntax {
+        self.syntax
+    }
+
     pub fn dependencies(&self) -> impl Iterator<Item = &str> + '_ {
         self.dependency.iter().map(String::as_str)
     }
@@ -203,8 +225,8 @@ impl<'a> Field<'a> {
         self.number
     }
 
-    pub fn label(&self) -> FieldLabel {
-        self.label
+    pub fn occurrence(&self) -> FieldOccurrence {
+        self.occurrence
     }
 
     pub fn type_ref(&self) -> &TypeRef<'a> {
@@ -213,10 +235,6 @@ impl<'a> Field<'a> {
 
     pub fn oneof_index(&self) -> Option<i32> {
         self.oneof_index
-    }
-
-    pub fn proto3_optional(&self) -> bool {
-        self.proto3_optional
     }
 }
 

@@ -27,7 +27,7 @@ pub use fields::repeated::{
     RepeatedFieldMut, RepeatedFieldRef, RepeatedStringMut,
 };
 pub use fields::shared::field_presence::{
-    Explicit, FieldPresence, Implicit, LegacyRequired, NonOneof, Oneof, RequiredFieldPresence,
+    Explicit, FieldPresence, Implicit, LegacyRequired, Message, Oneof, RequiredFieldPresence,
 };
 pub use fields::shared::value_slot::ValueSlot;
 pub use fields::shared::{

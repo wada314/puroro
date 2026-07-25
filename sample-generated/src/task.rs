@@ -26,8 +26,8 @@ use ::puroro_rt::{
     BitPacked, CloneFieldsVisitor, CloneIn, Closed, DebugStructVisitor, EncodeRawVisitor,
     EncodedLenVisitor, Expanded, Explicit, FieldDeallocVisitor, FieldEqVisitor, FieldPairVisitor,
     FieldPairVisitorMut, FieldVisitor, FieldVisitorMut, Implicit, Inline, LegacyRequired, MapField,
-    MessageCommon, NonOneof, OneofSlot, Open, Packed, ProtoBool, ProtoBytes, ProtoEnum, ProtoInt32,
-    ProtoMessage, ProtoString, RepeatedField, SingularField,
+    Message as MessagePresence, MessageCommon, OneofSlot, Open, Packed, ProtoBool, ProtoBytes,
+    ProtoEnum, ProtoInt32, ProtoMessage, ProtoString, RepeatedField, SingularField,
 };
 
 use defaults::MaxRetriesDefault;
@@ -107,7 +107,7 @@ pub struct Task<A: Allocator + Clone = Global> {
         { FIELD_PRIORITY },
         A,
     >, // proto: Priority priority = 10;
-    assignee: SingularField<ProtoMessage<Address<A>>, NonOneof, { FIELD_ASSIGNEE }, A>, // proto: Address assignee = 11;
+    assignee: SingularField<ProtoMessage<Address<A>>, MessagePresence, { FIELD_ASSIGNEE }, A>, // proto: Address assignee = 11;
     // proto: oneof notification { string email_address=12; string phone_number=13;
     //                             int32 webhook_id=14 [default=-1]; Address postal=15;
     //                             bool urgent=18; }

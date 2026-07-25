@@ -1,7 +1,7 @@
 //! Nested-message type marker for [`ProtoType`](super::proto_type::ProtoType).
 //!
 //! [`ProtoMessage`] supplies merge-into wire semantics; physical storage is
-//! [`UnmanagedBox<M, A>`]. Presence policy (`NonOneof` / `Oneof`) lives on
+//! [`UnmanagedBox<M, A>`]. Presence policy (`Message` / `Oneof`) lives on
 //! [`FieldPresence`](crate::fields::shared::field_presence::FieldPresence).
 //!
 //! The marker is allocator-free; `M` typically still mentions `A` (e.g.

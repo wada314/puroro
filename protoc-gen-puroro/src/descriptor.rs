@@ -29,11 +29,19 @@ pub struct CodegenRequest {
     pub proto_files: Vec<ProtoFile>,
 }
 
+/// Protobuf syntax of a `.proto` file (`FileDescriptorProto.syntax`).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Syntax {
+    Proto2,
+    Proto3,
+}
+
 /// One `.proto` file (`FileDescriptorProto` subset).
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ProtoFile {
     pub name: String,
     pub package: String,
+    pub syntax: Syntax,
     pub dependency: Vec<String>,
     pub messages: Vec<MessageDesc>,
     pub enums: Vec<EnumDesc>,

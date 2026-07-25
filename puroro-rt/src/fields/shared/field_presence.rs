@@ -1,11 +1,11 @@
 //! Field presence policy markers (`Implicit` / `Explicit<BIT>` / `LegacyRequired<BIT>` /
-//! [`NonOneof`] / [`Oneof`]).
+//! [`Message`] / [`Oneof`]).
 //!
 //! Composed with [`ProtoType`](crate::fields::wire::proto_type::ProtoType) markers in
 //! singular field wrappers.
 //!
 //! Only [`Explicit`] and [`LegacyRequired`] carry a presence bit index; [`Implicit`],
-//! [`NonOneof`], and [`Oneof`] have none. [`NonOneof`] uses pointer presence
+//! [`Message`], and [`Oneof`] have none. [`Message`] uses pointer presence
 //! (`Option` via [`ValueSlot`](super::value_slot::ValueSlot)).
 
 use ::allocator_api2::alloc::Allocator;
@@ -110,14 +110,14 @@ impl FieldPresence for Implicit {
     }
 }
 
-/// Marker for a **non-oneof** nested-message field — presence is the slot itself
+/// Marker for a singular nested-message field — presence is the slot itself
 /// ([`Option`](core::option::Option) via [`ValueSlot`](super::value_slot::ValueSlot)),
 /// not a message bitfield. Emit / `is_set` consult the caller callback (absent =
 /// empty). Used for nested messages via [`ProtoMessage`](crate::ProtoMessage).
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
-pub struct NonOneof;
+pub struct Message;
 
-impl FieldPresence for NonOneof {
+impl FieldPresence for Message {
     type ValueSlot<T: AddressableSlot> = Option<T>;
     type SlotInitMut = AlwaysInitialized;
     type SlotInitView = AlwaysInitialized;

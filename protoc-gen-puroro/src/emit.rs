@@ -145,6 +145,7 @@ mod tests {
     use super::*;
     use crate::descriptor::{
         CodegenMeta, CodegenRequest, FieldDesc, FieldLabel, FieldType, MessageDesc, ProtoFile,
+        Syntax,
     };
 
     fn empty_request(message_name: &str) -> CodegenRequest {
@@ -160,6 +161,7 @@ mod tests {
             proto_files: vec![ProtoFile {
                 name: "empty.proto".into(),
                 package: package.into(),
+                syntax: Syntax::Proto3,
                 dependency: vec![],
                 messages: vec![MessageDesc {
                     name: message_name.into(),

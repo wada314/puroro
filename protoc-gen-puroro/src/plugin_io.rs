@@ -5,7 +5,7 @@
 
 use crate::descriptor::{
     CodegenMeta, CodegenRequest, EnumDesc, EnumValueDesc, FieldDesc, FieldLabel, FieldType,
-    MessageDesc, OneofDesc, ProtoFile, ProtoFqn,
+    MessageDesc, OneofDesc, ProtoFile, ProtoFqn, Syntax,
 };
 use crate::error::{Error, Result};
 use ::protobuf_core::{AsRefExtProtobuf, Field, FieldNumber, FieldValue, WriteExtProtobuf};
@@ -115,6 +115,7 @@ fn decode_file_descriptor(bytes: &[u8]) -> Result<ProtoFile> {
     with_decoding_context("FileDescriptorProto", || {
         let mut name = String::new();
         let mut package = String::new();
+        let mut syntax = Syntax::Proto2;
         let mut dependency = Vec::new();
         let mut messages = Vec::new();
         let mut enums = Vec::new();
@@ -138,6 +139,15 @@ fn decode_file_descriptor(bytes: &[u8]) -> Result<ProtoFile> {
                     let nested = expect_len(&field)?;
                     enums.push(decode_enum(nested)?);
                 }
+                // optional string syntax = 12;
+                12 => {
+                    let raw = expect_string(&field)?;
+                    syntax = match raw.as_str() {
+                        "proto3" => Syntax::Proto3,
+                        // Missing / empty / "proto2" all mean proto2.
+                        _ => Syntax::Proto2,
+                    };
+                }
                 _ => {}
             }
         }
@@ -145,6 +155,7 @@ fn decode_file_descriptor(bytes: &[u8]) -> Result<ProtoFile> {
         Ok(ProtoFile {
             name,
             package,
+            syntax,
             dependency,
             messages,
             enums,
@@ -403,6 +414,8 @@ mod tests {
         assert_eq!(decoded.proto_files.len(), 1);
         assert_eq!(decoded.proto_files[0].name, "example.proto");
         assert_eq!(decoded.proto_files[0].package, "example");
+        // syntax field omitted → proto2 default
+        assert_eq!(decoded.proto_files[0].syntax, Syntax::Proto2);
         assert_eq!(decoded.proto_files[0].messages.len(), 1);
         assert_eq!(decoded.proto_files[0].messages[0].name, "Task");
         assert_eq!(decoded.proto_files[0].messages[0].fields.len(), 1);

@@ -1,7 +1,12 @@
 //! Build a [`FileSet`](super::FileSet) inside a caller-owned [`Arena`](super::Arena).
 
-use super::{Arena, Enum, EnumValue, Field, File, FileSet, Message, Oneof, TypeItem, TypeRef};
-use crate::descriptor::{EnumDesc, FieldDesc, FieldType, MessageDesc, ProtoFile, ProtoFqn};
+use super::{
+    Arena, Enum, EnumValue, Field, FieldOccurrence, File, FileSet, Message, Oneof,
+    SingularPresence, TypeItem, TypeRef,
+};
+use crate::descriptor::{
+    EnumDesc, FieldDesc, FieldLabel, FieldType, MessageDesc, ProtoFile, ProtoFqn, Syntax,
+};
 use crate::error::{Error, Result};
 use ::std::cell::OnceCell;
 use ::std::collections::HashMap;
@@ -50,6 +55,7 @@ fn register_file<'a>(
     Ok(arena.alloc(File {
         name: proto.name.clone(),
         package: proto.package.clone(),
+        syntax: proto.syntax,
         dependency: proto.dependency.clone(),
         messages,
         enums,
@@ -157,7 +163,7 @@ fn fill_file_fields<'a>(
 ) -> Result<()> {
     let package_fqn = ProtoFqn::from_package(&proto.package);
     for desc in &proto.messages {
-        fill_message_fields(desc, &package_fqn, types_by_fqn)?;
+        fill_message_fields(desc, &package_fqn, proto.syntax, types_by_fqn)?;
     }
     Ok(())
 }
@@ -165,6 +171,7 @@ fn fill_file_fields<'a>(
 fn fill_message_fields<'a>(
     desc: &MessageDesc,
     parent_fqn: &ProtoFqn,
+    syntax: Syntax,
     types_by_fqn: &HashMap<ProtoFqn, TypeItem<'a>>,
 ) -> Result<()> {
     let fqn = parent_fqn.append(&desc.name);
@@ -182,7 +189,7 @@ fn fill_message_fields<'a>(
 
     let mut fields = Vec::with_capacity(desc.fields.len());
     for field in &desc.fields {
-        fields.push(resolve_field(field, &message.fqn, types_by_fqn)?);
+        fields.push(resolve_field(field, &message.fqn, syntax, types_by_fqn)?);
     }
     message
         .fields
@@ -190,7 +197,7 @@ fn fill_message_fields<'a>(
         .map_err(|_| Error::Codegen(format!("fields set twice for `{fqn}`")))?;
 
     for nested in &desc.nested_messages {
-        fill_message_fields(nested, &fqn, types_by_fqn)?;
+        fill_message_fields(nested, &fqn, syntax, types_by_fqn)?;
     }
     Ok(())
 }
@@ -198,6 +205,7 @@ fn fill_message_fields<'a>(
 fn resolve_field<'a>(
     field: &FieldDesc,
     owner_fqn: &ProtoFqn,
+    syntax: Syntax,
     types_by_fqn: &HashMap<ProtoFqn, TypeItem<'a>>,
 ) -> Result<Field<'a>> {
     let type_ref = match field.type_ {
@@ -242,11 +250,40 @@ fn resolve_field<'a>(
     Ok(Field {
         name: field.name.clone(),
         number: field.number,
-        label: field.label,
+        occurrence: resolve_occurrence(field, syntax),
         type_ref,
         oneof_index: field.oneof_index,
-        proto3_optional: field.proto3_optional,
     })
+}
+
+fn resolve_occurrence(field: &FieldDesc, syntax: Syntax) -> FieldOccurrence {
+    if field.label == FieldLabel::Repeated {
+        return FieldOccurrence::Repeated;
+    }
+
+    // Real oneof member (proto3 `optional` uses a synthetic oneof + proto3_optional).
+    if field.oneof_index.is_some() && !field.proto3_optional {
+        return FieldOccurrence::Singular(SingularPresence::Oneof);
+    }
+
+    if matches!(field.type_, FieldType::Message | FieldType::Group) {
+        return FieldOccurrence::Singular(SingularPresence::Message);
+    }
+
+    if field.label == FieldLabel::Required {
+        return FieldOccurrence::Singular(SingularPresence::LegacyRequired);
+    }
+
+    match syntax {
+        Syntax::Proto2 => FieldOccurrence::Singular(SingularPresence::Explicit),
+        Syntax::Proto3 => {
+            if field.proto3_optional {
+                FieldOccurrence::Singular(SingularPresence::Explicit)
+            } else {
+                FieldOccurrence::Singular(SingularPresence::Implicit)
+            }
+        }
+    }
 }
 
 fn lookup_message<'a>(
@@ -273,7 +310,8 @@ fn lookup_enum<'a>(
 mod tests {
     use super::*;
     use crate::descriptor::{
-        EnumDesc, EnumValueDesc, FieldDesc, FieldLabel, FieldType, MessageDesc, ProtoFile, ProtoFqn,
+        EnumDesc, EnumValueDesc, FieldDesc, FieldLabel, FieldType, MessageDesc, OneofDesc,
+        ProtoFile, ProtoFqn, Syntax,
     };
     use ::std::ptr;
 
@@ -287,16 +325,48 @@ mod tests {
         }
     }
 
+    fn proto_file(
+        package: &str,
+        syntax: Syntax,
+        messages: Vec<MessageDesc>,
+        enums: Vec<EnumDesc>,
+    ) -> ProtoFile {
+        ProtoFile {
+            name: "a.proto".into(),
+            package: package.into(),
+            syntax,
+            dependency: vec![],
+            messages,
+            enums,
+        }
+    }
+
+    fn scalar_field(
+        name: &str,
+        label: FieldLabel,
+        oneof_index: Option<i32>,
+        proto3_optional: bool,
+    ) -> FieldDesc {
+        FieldDesc {
+            name: name.into(),
+            number: 1,
+            label,
+            type_: FieldType::Int32,
+            type_name: None,
+            oneof_index,
+            proto3_optional,
+        }
+    }
+
     #[test]
     fn resolve_empty_message_under_package() {
         let arena = Arena::new();
-        let files = [ProtoFile {
-            name: "a.proto".into(),
-            package: "example.v1".into(),
-            dependency: vec![],
-            messages: vec![empty_msg("Empty")],
-            enums: vec![],
-        }];
+        let files = [proto_file(
+            "example.v1",
+            Syntax::Proto3,
+            vec![empty_msg("Empty")],
+            vec![],
+        )];
         let file_set = resolve(&arena, &files).unwrap();
         let msg = file_set
             .lookup(".example.v1.Empty")
@@ -306,16 +376,16 @@ mod tests {
         assert_eq!(msg.name(), "Empty");
         assert!(msg.fields().next().is_none());
         assert!(msg.parent().is_none());
+        assert_eq!(file_set.files().next().unwrap().syntax(), Syntax::Proto3);
     }
 
     #[test]
     fn resolve_message_field_to_peer() {
         let arena = Arena::new();
-        let files = [ProtoFile {
-            name: "a.proto".into(),
-            package: "example".into(),
-            dependency: vec![],
-            messages: vec![
+        let files = [proto_file(
+            "example",
+            Syntax::Proto3,
+            vec![
                 empty_msg("Address"),
                 MessageDesc {
                     name: "Task".into(),
@@ -333,8 +403,8 @@ mod tests {
                     oneofs: vec![],
                 },
             ],
-            enums: vec![],
-        }];
+            vec![],
+        )];
         let file_set = resolve(&arena, &files).unwrap();
         let task = file_set
             .lookup(".example.Task")
@@ -349,24 +419,27 @@ mod tests {
         let field = task.fields().next().unwrap();
         assert!(task.fields().nth(1).is_none());
         assert!(ptr::eq(field.type_ref().as_message().unwrap(), address));
+        assert_eq!(
+            field.occurrence(),
+            FieldOccurrence::Singular(SingularPresence::Message)
+        );
     }
 
     #[test]
     fn resolve_nested_message_and_parent() {
         let arena = Arena::new();
-        let files = [ProtoFile {
-            name: "a.proto".into(),
-            package: String::new(),
-            dependency: vec![],
-            messages: vec![MessageDesc {
+        let files = [proto_file(
+            "",
+            Syntax::Proto3,
+            vec![MessageDesc {
                 name: "Outer".into(),
                 fields: vec![],
                 nested_messages: vec![empty_msg("Inner")],
                 nested_enums: vec![],
                 oneofs: vec![],
             }],
-            enums: vec![],
-        }];
+            vec![],
+        )];
         let file_set = resolve(&arena, &files).unwrap();
         let outer = file_set.lookup(".Outer").unwrap().as_message().unwrap();
         let inner = file_set
@@ -381,11 +454,10 @@ mod tests {
     #[test]
     fn resolve_enum_field() {
         let arena = Arena::new();
-        let files = [ProtoFile {
-            name: "a.proto".into(),
-            package: "example".into(),
-            dependency: vec![],
-            messages: vec![MessageDesc {
+        let files = [proto_file(
+            "example",
+            Syntax::Proto3,
+            vec![MessageDesc {
                 name: "Task".into(),
                 fields: vec![FieldDesc {
                     name: "status".into(),
@@ -400,14 +472,14 @@ mod tests {
                 nested_enums: vec![],
                 oneofs: vec![],
             }],
-            enums: vec![EnumDesc {
+            vec![EnumDesc {
                 name: "Status".into(),
                 values: vec![EnumValueDesc {
                     name: "STATUS_UNSPECIFIED".into(),
                     number: 0,
                 }],
             }],
-        }];
+        )];
         let file_set = resolve(&arena, &files).unwrap();
         let task = file_set
             .lookup(".example.Task")
@@ -419,20 +491,21 @@ mod tests {
             .unwrap()
             .as_enum()
             .unwrap();
-        assert!(ptr::eq(
-            task.fields().next().unwrap().type_ref().as_enum().unwrap(),
-            status
-        ));
+        let field = task.fields().next().unwrap();
+        assert!(ptr::eq(field.type_ref().as_enum().unwrap(), status));
+        assert_eq!(
+            field.occurrence(),
+            FieldOccurrence::Singular(SingularPresence::Implicit)
+        );
     }
 
     #[test]
     fn missing_type_name_errors() {
         let arena = Arena::new();
-        let files = [ProtoFile {
-            name: "a.proto".into(),
-            package: String::new(),
-            dependency: vec![],
-            messages: vec![MessageDesc {
+        let files = [proto_file(
+            "",
+            Syntax::Proto3,
+            vec![MessageDesc {
                 name: "Task".into(),
                 fields: vec![FieldDesc {
                     name: "assignee".into(),
@@ -447,8 +520,8 @@ mod tests {
                 nested_enums: vec![],
                 oneofs: vec![],
             }],
-            enums: vec![],
-        }];
+            vec![],
+        )];
         let err = resolve(&arena, &files).unwrap_err();
         assert!(err.to_string().contains("unknown message type"));
     }
@@ -456,11 +529,10 @@ mod tests {
     #[test]
     fn mutual_message_refs() {
         let arena = Arena::new();
-        let files = [ProtoFile {
-            name: "a.proto".into(),
-            package: String::new(),
-            dependency: vec![],
-            messages: vec![
+        let files = [proto_file(
+            "",
+            Syntax::Proto3,
+            vec![
                 MessageDesc {
                     name: "A".into(),
                     fields: vec![FieldDesc {
@@ -492,8 +564,8 @@ mod tests {
                     oneofs: vec![],
                 },
             ],
-            enums: vec![],
-        }];
+            vec![],
+        )];
         let file_set = resolve(&arena, &files).unwrap();
         let a = file_set.lookup(".A").unwrap().as_message().unwrap();
         let b = file_set.lookup(".B").unwrap().as_message().unwrap();
@@ -505,5 +577,123 @@ mod tests {
             b.fields().next().unwrap().type_ref().as_message().unwrap(),
             a
         ));
+    }
+
+    #[test]
+    fn singular_presence_matrix() {
+        let arena = Arena::new();
+        let files = [
+            proto_file(
+                "p3",
+                Syntax::Proto3,
+                vec![
+                    empty_msg("Addr"),
+                    MessageDesc {
+                        name: "M".into(),
+                        fields: vec![
+                            scalar_field("implicit", FieldLabel::Optional, None, false),
+                            FieldDesc {
+                                name: "explicit".into(),
+                                number: 2,
+                                label: FieldLabel::Optional,
+                                type_: FieldType::Int32,
+                                type_name: None,
+                                // Synthetic oneof for proto3 optional.
+                                oneof_index: Some(0),
+                                proto3_optional: true,
+                            },
+                            FieldDesc {
+                                name: "addr".into(),
+                                number: 3,
+                                label: FieldLabel::Optional,
+                                type_: FieldType::Message,
+                                type_name: Some(ProtoFqn::parse(".p3.Addr")),
+                                oneof_index: None,
+                                proto3_optional: false,
+                            },
+                            FieldDesc {
+                                name: "choice".into(),
+                                number: 4,
+                                label: FieldLabel::Optional,
+                                type_: FieldType::Int32,
+                                type_name: None,
+                                oneof_index: Some(1),
+                                proto3_optional: false,
+                            },
+                            FieldDesc {
+                                name: "tags".into(),
+                                number: 5,
+                                label: FieldLabel::Repeated,
+                                type_: FieldType::Int32,
+                                type_name: None,
+                                oneof_index: None,
+                                proto3_optional: false,
+                            },
+                        ],
+                        nested_messages: vec![],
+                        nested_enums: vec![],
+                        oneofs: vec![
+                            OneofDesc {
+                                name: "_explicit".into(),
+                            },
+                            OneofDesc {
+                                name: "which".into(),
+                            },
+                        ],
+                    },
+                ],
+                vec![],
+            ),
+            proto_file(
+                "p2",
+                Syntax::Proto2,
+                vec![MessageDesc {
+                    name: "M".into(),
+                    fields: vec![
+                        scalar_field("optional", FieldLabel::Optional, None, false),
+                        scalar_field("required", FieldLabel::Required, None, false),
+                    ],
+                    nested_messages: vec![],
+                    nested_enums: vec![],
+                    oneofs: vec![],
+                }],
+                vec![],
+            ),
+        ];
+        let file_set = resolve(&arena, &files).unwrap();
+
+        let p3 = file_set.lookup(".p3.M").unwrap().as_message().unwrap();
+        let mut p3_fields = p3.fields();
+        assert_eq!(
+            p3_fields.next().unwrap().occurrence(),
+            FieldOccurrence::Singular(SingularPresence::Implicit)
+        );
+        assert_eq!(
+            p3_fields.next().unwrap().occurrence(),
+            FieldOccurrence::Singular(SingularPresence::Explicit)
+        );
+        assert_eq!(
+            p3_fields.next().unwrap().occurrence(),
+            FieldOccurrence::Singular(SingularPresence::Message)
+        );
+        assert_eq!(
+            p3_fields.next().unwrap().occurrence(),
+            FieldOccurrence::Singular(SingularPresence::Oneof)
+        );
+        assert_eq!(
+            p3_fields.next().unwrap().occurrence(),
+            FieldOccurrence::Repeated
+        );
+
+        let p2 = file_set.lookup(".p2.M").unwrap().as_message().unwrap();
+        let mut p2_fields = p2.fields();
+        assert_eq!(
+            p2_fields.next().unwrap().occurrence(),
+            FieldOccurrence::Singular(SingularPresence::Explicit)
+        );
+        assert_eq!(
+            p2_fields.next().unwrap().occurrence(),
+            FieldOccurrence::Singular(SingularPresence::LegacyRequired)
+        );
     }
 }

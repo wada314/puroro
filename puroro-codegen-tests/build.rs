@@ -8,8 +8,10 @@
 //!   test.rs     # behavioural tests for the generated module `crate::<case>`
 //! ```
 
+use ::protoc_gen_puroro::descriptor::{
+    CodegenMeta, CodegenRequest, MessageDesc, ProtoFile, Syntax,
+};
 use ::protoc_gen_puroro::emit::emit;
-use ::protoc_gen_puroro::descriptor::{CodegenMeta, CodegenRequest, MessageDesc, ProtoFile};
 use ::std::env;
 use ::std::fs;
 use ::std::io::Write;
@@ -154,6 +156,7 @@ fn request_from_proto_file(proto_path: &Path) -> CodegenRequest {
         .to_owned();
 
     let package = parse_package(&contents).unwrap_or_default();
+    let syntax = parse_syntax(&contents).unwrap_or(Syntax::Proto2);
     let message_names = parse_empty_message_names(&contents);
     if message_names.is_empty() {
         panic!(
@@ -181,11 +184,30 @@ fn request_from_proto_file(proto_path: &Path) -> CodegenRequest {
         proto_files: vec![ProtoFile {
             name: file_name,
             package,
+            syntax,
             dependency: vec![],
             messages,
             enums: vec![],
         }],
     }
+}
+
+/// Minimal `syntax = "proto3";` extractor (line-oriented; ignores `//` comments).
+fn parse_syntax(src: &str) -> Option<Syntax> {
+    for raw_line in src.lines() {
+        let line = strip_line_comment(raw_line).trim();
+        let Some(rest) = line.strip_prefix("syntax") else {
+            continue;
+        };
+        let rest = rest.trim_start().strip_prefix('=')?.trim_start();
+        let rest = rest.strip_suffix(';')?.trim();
+        let quoted = rest.strip_prefix('"')?.strip_suffix('"')?;
+        return Some(match quoted {
+            "proto3" => Syntax::Proto3,
+            _ => Syntax::Proto2,
+        });
+    }
+    None
 }
 
 /// Minimal `package foo.bar;` extractor (line-oriented; ignores `//` comments).
