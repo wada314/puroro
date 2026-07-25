@@ -1,10 +1,10 @@
 //! Emit a message module body from a [`MessagePlan`].
 //!
-//! Current scope: singular scalar / string / bytes / bool / enum fields
-//! (including IMPLICIT / EXPLICIT / LEGACY_REQUIRED and bool `BitPacked`).
-//! Repeated, oneof, and message fields are rejected.
+//! Current scope: singular scalar / string / bytes / bool / enum / message
+//! fields (including IMPLICIT / EXPLICIT / LEGACY_REQUIRED and bool
+//! `BitPacked`). Repeated and oneof fields are rejected.
 
-use super::type_path::fqn_to_root_path;
+use super::type_path::{fqn_to_message_root_path, fqn_to_root_path};
 use crate::descriptor::features::EnumType;
 use crate::error::{Error, Result};
 use crate::field_kind::{
@@ -40,6 +40,8 @@ enum AccessorStyle {
     Implicit,
     Explicit,
     LegacyRequired,
+    /// Nested message — `Option<&M>` / `&mut M` via pointer presence.
+    Message,
 }
 
 /// Render items that belong inside the message's implementation module.
@@ -320,17 +322,11 @@ fn collect_scalar_fields(plan: &MessagePlan<'_>) -> Result<Vec<ScalarEmit>> {
                     presence,
                     layout,
                 } => {
-                    if matches!(presence, CatalogPresence::Oneof | CatalogPresence::Message) {
+                    if matches!(presence, CatalogPresence::Oneof) {
                         return Err(Error::Codegen(format!(
                             "field `{}` presence {:?} is not supported by the field emitter yet",
                             field.name(),
                             presence
-                        )));
-                    }
-                    if matches!(wire, WireTypeKind::Message(_)) {
-                        return Err(Error::Codegen(format!(
-                            "field `{}` has message type — not supported yet",
-                            field.name()
                         )));
                     }
                     if !is_simple_ident(field.name()) {
@@ -384,7 +380,12 @@ fn scalar_emit(
                 Some((ident, *bit)),
             )
         }
-        CatalogPresence::Oneof | CatalogPresence::Message => {
+        CatalogPresence::Message => (
+            AccessorStyle::Message,
+            quote! { ::puroro_rt::Message },
+            None,
+        ),
+        CatalogPresence::Oneof => {
             return Err(Error::Codegen(
                 "internal error: unsupported presence in scalar_emit".into(),
             ));
@@ -406,6 +407,7 @@ fn scalar_emit(
     };
 
     let is_enum = matches!(wire, WireTypeKind::Enum { .. });
+    let is_message = matches!(style, AccessorStyle::Message);
     Ok(ScalarEmit {
         name: Ident::new(name, Span::call_site()),
         name_str: name.to_owned(),
@@ -418,14 +420,23 @@ fn scalar_emit(
         value_bit,
         style,
         // DESIGN §4.6: enum getters always project through Optional.
-        optional_getter: is_enum
-            || matches!(
-                style,
-                AccessorStyle::Explicit | AccessorStyle::LegacyRequired
-            ),
+        optional_getter: !is_message
+            && (is_enum
+                || matches!(
+                    style,
+                    AccessorStyle::Explicit | AccessorStyle::LegacyRequired
+                )),
         mut_target: mut_target_type(wire)?,
-        implicit_ty: implicit_value_type(wire)?,
-        optional_ty: optional_value_type(wire)?,
+        implicit_ty: if is_message {
+            TokenStream::new()
+        } else {
+            implicit_value_type(wire)?
+        },
+        optional_ty: if is_message {
+            TokenStream::new()
+        } else {
+            optional_value_type(wire)?
+        },
     })
 }
 
@@ -518,10 +529,9 @@ fn wire_marker_path(wire: &WireTypeKind<'_>) -> Result<TokenStream> {
             };
             quote! { ::puroro_rt::ProtoEnum<#path, #kind> }
         }
-        WireTypeKind::Message(_) => {
-            return Err(Error::Codegen(
-                "internal error: message wire in wire_marker_path".into(),
-            ));
+        WireTypeKind::Message(m) => {
+            let path = fqn_to_message_root_path(m)?;
+            quote! { ::puroro_rt::ProtoMessage<#path<A>> }
         }
     })
 }
@@ -553,6 +563,22 @@ fn render_accessors(fields: &[ScalarEmit]) -> Vec<TokenStream> {
             let implicit_ty = &field.implicit_ty;
             let optional_ty = &field.optional_ty;
 
+            if matches!(field.style, AccessorStyle::Message) {
+                return quote! {
+                    pub fn #name(&self) -> ::core::option::Option<&#mut_target> {
+                        self.#name.bind(&self._common).get()
+                    }
+
+                    pub fn #name_mut(&mut self) -> &mut #mut_target {
+                        self.#name.bind_mut(&mut self._common).get_mut()
+                    }
+
+                    pub fn #clear_name(&mut self) {
+                        self.#name.bind_mut(&mut self._common).clear();
+                    }
+                };
+            }
+
             let getter = if field.optional_getter {
                 quote! {
                     pub fn #name<'a>(&'a self) -> ::puroro::Optional<#optional_ty, impl ::puroro::HasDefault<#optional_ty>>
@@ -577,6 +603,7 @@ fn render_accessors(fields: &[ScalarEmit]) -> Vec<TokenStream> {
                             self.#name.bind(&self._common).optional()
                         }
                     },
+                    AccessorStyle::Message => unreachable!("handled above"),
                 }
             };
 
@@ -647,10 +674,9 @@ fn mut_target_type(wire: &WireTypeKind<'_>) -> Result<TokenStream> {
         WireTypeKind::String { .. } => quote! { ::puroro::String<A> },
         WireTypeKind::Bytes { .. } => quote! { ::allocator_api2::vec::Vec<u8, A> },
         WireTypeKind::Enum { ty, .. } => fqn_to_root_path(ty.fqn())?,
-        WireTypeKind::Message(_) => {
-            return Err(Error::Codegen(
-                "internal error: message in mut_target_type".into(),
-            ));
+        WireTypeKind::Message(m) => {
+            let path = fqn_to_message_root_path(m)?;
+            quote! { #path<A> }
         }
     })
 }

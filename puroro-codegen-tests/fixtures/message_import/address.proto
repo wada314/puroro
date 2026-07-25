@@ -1,0 +1,7 @@
+syntax = "proto3";
+
+package demo;
+
+message Address {
+  optional string street = 1;
+}

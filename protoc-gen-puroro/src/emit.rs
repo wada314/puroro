@@ -1,8 +1,8 @@
 //! Code emission from a resolved schema.
 //!
-//! Current scope: file-level enums and one root message per file with singular
-//! scalar / string / bytes / bool / enum fields. Nested types, repeated, oneof,
-//! and message fields are still rejected. All `file_to_generate` entries share
+//! Current scope: file-level enums and root messages with singular scalar /
+//! string / bytes / bool / enum / message fields. Nested type declarations,
+//! repeated, and oneof are still rejected. All `file_to_generate` entries share
 //! one [`ModuleForest`] so cross-file type refs use a single `self::_root`.
 
 use crate::descriptor::CodegenRequest;
@@ -103,22 +103,12 @@ fn append_file_to_forest(forest: &mut ModuleForest, file: &File<'_>) -> Result<(
         parent.append_items(enumeration::render_enum(e)?);
     }
 
-    let mut messages = file.messages();
-    let Some(message) = messages.next() else {
-        return Ok(());
-    };
-    let extra = messages.count();
-    if extra > 0 {
-        return Err(Error::Codegen(format!(
-            "generator requires at most one root message per file, found {} in `{}`",
-            extra + 1,
-            file.name()
-        )));
+    for message in file.messages() {
+        let message = validate_emit_message(message)?;
+        let plan = plan_message(message)?;
+        append_message(forest, file, &plan)?;
     }
-
-    let message = validate_emit_message(message)?;
-    let plan = plan_message(message)?;
-    append_message(forest, file, &plan)
+    Ok(())
 }
 
 fn append_message(
@@ -525,16 +515,59 @@ mod tests {
     }
 
     #[test]
-    fn reject_multiple_root_messages() {
-        let mut request = empty_request("Empty");
-        request.proto_files[0].messages.push(MessageDesc {
-            name: "Other".into(),
-            fields: vec![],
-            nested_messages: vec![],
-            nested_enums: vec![],
-            oneofs: vec![],
-        });
-        let err = emit(&request).unwrap_err();
-        assert!(err.to_string().contains("at most one root message"));
+    fn emit_peer_message_field() {
+        let request = CodegenRequest {
+            meta: CodegenMeta {
+                file_to_generate: vec!["t.proto".into()],
+                parameter: None,
+            },
+            proto_files: vec![ProtoFile {
+                name: "t.proto".into(),
+                package: "demo".into(),
+                syntax: Syntax::Proto3,
+                features: FeatureSet::default(),
+                dependency: vec![],
+                messages: vec![
+                    MessageDesc {
+                        name: "Address".into(),
+                        fields: vec![],
+                        nested_messages: vec![],
+                        nested_enums: vec![],
+                        oneofs: vec![],
+                    },
+                    MessageDesc {
+                        name: "Task".into(),
+                        fields: vec![FieldDesc {
+                            name: "assignee".into(),
+                            number: 1,
+                            label: FieldLabel::Optional,
+                            type_: FieldType::Message,
+                            type_name: Some(ProtoFqn::parse(".demo.Address")),
+                            oneof_index: None,
+                            proto3_optional: false,
+                            packed: None,
+                            features: FeatureSet::default(),
+                        }],
+                        nested_messages: vec![],
+                        nested_enums: vec![],
+                        oneofs: vec![],
+                    },
+                ],
+                enums: vec![],
+            }],
+        };
+        let response = emit(&request).unwrap();
+        let content = &response.files[0].content;
+        assert!(content.contains("pub struct Address"));
+        assert!(content.contains("pub struct Task"));
+        assert!(content.contains("ProtoMessage"));
+        assert!(content.contains("::puroro_rt::Message"));
+        assert!(
+            content.contains("self :: _root :: demo :: address :: Address")
+                || content.contains("self::_root::demo::address::Address")
+        );
+        assert!(content.contains("fn assignee("));
+        assert!(content.contains(".get()"));
+        assert!(content.contains(".get_mut()"));
     }
 }
