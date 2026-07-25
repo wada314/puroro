@@ -21,6 +21,27 @@ pub fn is_simple_ident(name: &str) -> bool {
     }
 }
 
+/// `email_address` / `EmailAddress` → `EmailAddress`.
+pub fn to_pascal_case(name: &str) -> String {
+    let mut out = String::new();
+    let mut capitalize = true;
+    for c in name.chars() {
+        if c == '_' {
+            capitalize = true;
+            continue;
+        }
+        if capitalize {
+            for upper in c.to_uppercase() {
+                out.push(upper);
+            }
+            capitalize = false;
+        } else {
+            out.push(c);
+        }
+    }
+    out
+}
+
 fn is_rust_keyword(name: &str) -> bool {
     matches!(
         name,
@@ -90,5 +111,12 @@ mod tests {
         assert_eq!(rust_ident("reserved").to_string(), "reserved");
         assert_eq!(rust_ident("repeated").to_string(), "repeated");
         assert_eq!(rust_ident("street").to_string(), "street");
+    }
+
+    #[test]
+    fn pascal_case_from_snake_and_camel() {
+        assert_eq!(to_pascal_case("email_address"), "EmailAddress");
+        assert_eq!(to_pascal_case("urgent"), "Urgent");
+        assert_eq!(to_pascal_case("EmailAddress"), "EmailAddress");
     }
 }

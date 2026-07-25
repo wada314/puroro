@@ -2,15 +2,16 @@
 //!
 //! Singular and repeated scalar / string / bytes / bool / enum / message
 //! fields (including IMPLICIT / EXPLICIT / LEGACY_REQUIRED and bool
-//! `BitPacked`). Real oneof fields are rejected.
+//! `BitPacked`), plus real oneof groups.
 
-use super::ident::{is_simple_ident, rust_ident};
+use super::ident::{is_simple_ident, rust_ident, to_pascal_case};
+use super::oneof::{self, OneofEmit, OneofVariantEmit};
 use super::type_path::{fqn_to_enum_root_path, fqn_to_message_root_path};
 use crate::descriptor::features::EnumType;
 use crate::error::{Error, Result};
 use crate::field_kind::{
-    CatalogLayout, CatalogPresence, FieldKind, MessageMember, MessagePlan, RepeatedEncodingKind,
-    WireTypeKind, presence_byte_len,
+    CatalogLayout, CatalogPresence, FieldKind, MessageMember, MessagePlan, PlannedField,
+    RepeatedEncodingKind, WireTypeKind, presence_byte_len,
 };
 use ::proc_macro2::{Ident, Span, TokenStream};
 use ::quote::quote;
@@ -18,6 +19,7 @@ use ::quote::quote;
 enum FieldEmit {
     Singular(ScalarEmit),
     Repeated(RepeatedEmit),
+    Oneof(OneofEmit),
 }
 
 /// Owned per-field facts needed for `quote!` (avoids borrowing `MessagePlan`).
@@ -77,6 +79,7 @@ impl FieldEmit {
         match self {
             Self::Singular(f) => &f.name,
             Self::Repeated(f) => &f.name,
+            Self::Oneof(o) => &o.name,
         }
     }
 
@@ -84,20 +87,7 @@ impl FieldEmit {
         match self {
             Self::Singular(f) => &f.name_str,
             Self::Repeated(f) => &f.name_str,
-        }
-    }
-
-    fn field_const(&self) -> &Ident {
-        match self {
-            Self::Singular(f) => &f.field_const,
-            Self::Repeated(f) => &f.field_const,
-        }
-    }
-
-    fn number(&self) -> u32 {
-        match self {
-            Self::Singular(f) => f.number,
-            Self::Repeated(f) => f.number,
+            Self::Oneof(o) => &o.name_str,
         }
     }
 }
@@ -120,6 +110,7 @@ pub(super) fn render_items(plan: &MessagePlan<'_>) -> Result<TokenStream> {
     let visit_mut = render_visit_calls(&fields, VisitKind::Mut);
     let merge_arms = render_merge_arms(&fields);
     let validate_body = render_validate(&fields);
+    let oneof_modules = render_oneof_modules(&fields)?;
     let empty_visit_sink = if fields.is_empty() {
         quote! { let _ = v; }
     } else {
@@ -160,6 +151,8 @@ pub(super) fn render_items(plan: &MessagePlan<'_>) -> Result<TokenStream> {
         #field_consts
 
         type __Presence = ::bitvec::array::BitArray<[u8; #presence_bytes], ::bitvec::order::Lsb0>;
+
+        #(#oneof_modules)*
 
         pub struct #name<
             A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone =
@@ -365,10 +358,32 @@ fn collect_fields(plan: &MessagePlan<'_>) -> Result<Vec<FieldEmit>> {
     for member in plan.members() {
         match member {
             MessageMember::Oneof(o) => {
-                return Err(Error::Codegen(format!(
-                    "oneof `{}` is not supported by the field emitter yet",
-                    o.name()
-                )));
+                if !is_simple_ident(o.name()) {
+                    return Err(Error::Codegen(format!(
+                        "oneof name `{}` is not a simple Rust identifier",
+                        o.name()
+                    )));
+                }
+                if o.variants().is_empty() {
+                    return Err(Error::Codegen(format!(
+                        "oneof `{}` has no variants",
+                        o.name()
+                    )));
+                }
+                let mut variants = Vec::with_capacity(o.variants().len());
+                for (i, field) in o.variants().iter().enumerate() {
+                    variants.push(oneof_variant_emit(field, i)?);
+                }
+                let pascal = to_pascal_case(o.name());
+                out.push(FieldEmit::Oneof(OneofEmit {
+                    name: rust_ident(o.name()),
+                    name_str: o.name().to_owned(),
+                    mod_name: rust_ident(o.name()),
+                    shape_name: Ident::new(&pascal, Span::call_site()),
+                    case_name: Ident::new(&format!("{pascal}Case"), Span::call_site()),
+                    storage_name: Ident::new(&format!("{pascal}Storage"), Span::call_site()),
+                    variants,
+                }));
             }
             MessageMember::Field(field) => {
                 if !is_simple_ident(field.name()) {
@@ -394,9 +409,8 @@ fn collect_fields(plan: &MessagePlan<'_>) -> Result<Vec<FieldEmit>> {
                     } => {
                         if matches!(presence, CatalogPresence::Oneof) {
                             return Err(Error::Codegen(format!(
-                                "field `{}` presence {:?} is not supported by the field emitter yet",
-                                field.name(),
-                                presence
+                                "internal error: oneof field `{}` escaped as a top-level member",
+                                field.name()
                             )));
                         }
                         out.push(FieldEmit::Singular(scalar_emit(
@@ -413,6 +427,71 @@ fn collect_fields(plan: &MessagePlan<'_>) -> Result<Vec<FieldEmit>> {
         }
     }
     Ok(out)
+}
+
+fn oneof_variant_emit(field: &PlannedField<'_>, index: usize) -> Result<OneofVariantEmit> {
+    if !is_simple_ident(field.name()) {
+        return Err(Error::Codegen(format!(
+            "oneof variant name `{}` is not a simple Rust identifier",
+            field.name()
+        )));
+    }
+    let FieldKind::Singular {
+        wire,
+        presence,
+        layout,
+    } = field.kind()
+    else {
+        return Err(Error::Codegen(format!(
+            "oneof variant `{}` must be singular",
+            field.name()
+        )));
+    };
+    if !matches!(presence, CatalogPresence::Oneof) {
+        return Err(Error::Codegen(format!(
+            "internal error: oneof variant `{}` has presence {presence:?}",
+            field.name()
+        )));
+    }
+
+    let (layout_ty, value_bit) = match layout {
+        CatalogLayout::Inline => (None, None),
+        CatalogLayout::BitPacked {
+            value_bit,
+            bit_const,
+        } => {
+            let ident = Ident::new(bit_const, Span::call_site());
+            (
+                // Const lives on the parent message module.
+                Some(quote! { ::puroro_rt::BitPacked<{ super::#ident }> }),
+                Some((ident, *value_bit)),
+            )
+        }
+    };
+
+    let is_message = matches!(wire, WireTypeKind::Message(_));
+    let is_bool = matches!(wire, WireTypeKind::Bool);
+    let variant_pascal = to_pascal_case(field.name());
+    Ok(OneofVariantEmit {
+        name: rust_ident(field.name()),
+        name_str: field.name().to_owned(),
+        variant_name: Ident::new(&variant_pascal, Span::call_site()),
+        type_param: Ident::new(&format!("T{index}"), Span::call_site()),
+        field_alias: Ident::new(&format!("{variant_pascal}Field"), Span::call_site()),
+        field_const: Ident::new(field.field_const(), Span::call_site()),
+        number: field.number() as u32,
+        marker: wire_marker_path(wire)?,
+        layout_ty,
+        value_bit,
+        is_message,
+        is_bool,
+        mut_target: mut_target_type(wire)?,
+        optional_ty: if is_message {
+            TokenStream::new()
+        } else {
+            optional_value_type(wire)?
+        },
+    })
 }
 
 fn repeated_emit(
@@ -483,7 +562,7 @@ fn scalar_emit(
         ),
         CatalogPresence::Oneof => {
             return Err(Error::Codegen(
-                "internal error: unsupported presence in scalar_emit".into(),
+                "internal error: oneof presence must use oneof_variant_emit".into(),
             ));
         }
     };
@@ -539,18 +618,21 @@ fn scalar_emit(
 fn render_bit_consts(fields: &[FieldEmit]) -> TokenStream {
     let mut items = Vec::new();
     for field in fields {
-        let FieldEmit::Singular(field) = field else {
-            continue;
-        };
-        if let Some((ident, bit)) = &field.presence_bit {
-            items.push(quote! {
-                pub const #ident: usize = #bit;
-            });
-        }
-        if let Some((ident, bit)) = &field.value_bit {
-            items.push(quote! {
-                pub const #ident: usize = #bit;
-            });
+        match field {
+            FieldEmit::Singular(field) => {
+                if let Some((ident, bit)) = &field.presence_bit {
+                    items.push(quote! {
+                        pub const #ident: usize = #bit;
+                    });
+                }
+                if let Some((ident, bit)) = &field.value_bit {
+                    items.push(quote! {
+                        pub const #ident: usize = #bit;
+                    });
+                }
+            }
+            FieldEmit::Oneof(o) => items.extend(oneof::render_bit_consts(o)),
+            FieldEmit::Repeated(_) => {}
         }
     }
     if items.is_empty() {
@@ -564,22 +646,33 @@ fn render_bit_consts(fields: &[FieldEmit]) -> TokenStream {
 }
 
 fn render_field_consts(fields: &[FieldEmit]) -> TokenStream {
-    if fields.is_empty() {
-        return TokenStream::new();
-    }
-    let items: Vec<_> = fields
-        .iter()
-        .map(|field| {
-            let ident = field.field_const();
-            let number = field.number();
-            quote! {
-                pub const #ident: u32 = #number;
+    let mut items = Vec::new();
+    for field in fields {
+        match field {
+            FieldEmit::Singular(f) => {
+                let ident = &f.field_const;
+                let number = f.number;
+                items.push(quote! {
+                    pub const #ident: u32 = #number;
+                });
             }
-        })
-        .collect();
-    quote! {
-        // Proto field numbers.
-        #(#items)*
+            FieldEmit::Repeated(f) => {
+                let ident = &f.field_const;
+                let number = f.number;
+                items.push(quote! {
+                    pub const #ident: u32 = #number;
+                });
+            }
+            FieldEmit::Oneof(o) => items.extend(oneof::render_field_consts(o)),
+        }
+    }
+    if items.is_empty() {
+        TokenStream::new()
+    } else {
+        quote! {
+            // Proto field numbers.
+            #(#items)*
+        }
     }
 }
 
@@ -610,6 +703,23 @@ fn render_struct_fields(fields: &[FieldEmit]) -> Vec<TokenStream> {
                     #name: ::puroro_rt::RepeatedField<#marker, #encoding_ty, { #field_const }, A>,
                 }
             }
+            FieldEmit::Oneof(o) => {
+                let name = &o.name;
+                let storage = &o.storage_name;
+                quote! {
+                    #name: ::puroro_rt::OneofSlot<#storage<A>>,
+                }
+            }
+        })
+        .collect()
+}
+
+fn render_oneof_modules(fields: &[FieldEmit]) -> Result<Vec<TokenStream>> {
+    fields
+        .iter()
+        .filter_map(|field| match field {
+            FieldEmit::Oneof(o) => Some(oneof::render_module_and_exports(o)),
+            _ => None,
         })
         .collect()
 }
@@ -656,6 +766,7 @@ fn render_new_in_fields(fields: &[FieldEmit]) -> Vec<TokenStream> {
             let ctor = match field {
                 FieldEmit::Singular(_) => quote! { ::puroro_rt::SingularField::new_in },
                 FieldEmit::Repeated(_) => quote! { ::puroro_rt::RepeatedField::new_in },
+                FieldEmit::Oneof(_) => quote! { ::puroro_rt::OneofSlot::new_in },
             };
             if i == last {
                 quote! { #name: #ctor(alloc), }
@@ -672,6 +783,7 @@ fn render_accessors(fields: &[FieldEmit]) -> Vec<TokenStream> {
         .map(|field| match field {
             FieldEmit::Repeated(field) => render_repeated_accessors(field),
             FieldEmit::Singular(field) => render_singular_accessors(field),
+            FieldEmit::Oneof(o) => oneof::render_accessors(o),
         })
         .collect()
 }
@@ -906,20 +1018,35 @@ fn render_visit_calls(fields: &[FieldEmit], kind: VisitKind) -> Vec<TokenStream>
 }
 
 fn render_merge_arms(fields: &[FieldEmit]) -> Vec<TokenStream> {
-    fields
-        .iter()
-        .map(|field| {
-            let name = field.name();
-            let field_const = field.field_const();
-            quote! {
-                #field_const => {
-                    self.#name
-                        .bind_mut(&mut self._common)
-                        .merge(wire_type, buf, depth)?;
-                }
+    let mut arms = Vec::new();
+    for field in fields {
+        match field {
+            FieldEmit::Singular(f) => {
+                let name = &f.name;
+                let field_const = &f.field_const;
+                arms.push(quote! {
+                    #field_const => {
+                        self.#name
+                            .bind_mut(&mut self._common)
+                            .merge(wire_type, buf, depth)?;
+                    }
+                });
             }
-        })
-        .collect()
+            FieldEmit::Repeated(f) => {
+                let name = &f.name;
+                let field_const = &f.field_const;
+                arms.push(quote! {
+                    #field_const => {
+                        self.#name
+                            .bind_mut(&mut self._common)
+                            .merge(wire_type, buf, depth)?;
+                    }
+                });
+            }
+            FieldEmit::Oneof(o) => arms.extend(oneof::render_merge_arms(o)),
+        }
+    }
+    arms
 }
 
 fn render_validate(fields: &[FieldEmit]) -> TokenStream {

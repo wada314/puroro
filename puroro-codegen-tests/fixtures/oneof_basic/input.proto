@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+message Peer {
+  optional string name = 1;
+}
+
+message Holder {
+  oneof choice {
+    string email = 1;
+    int32 code = 2;
+    bool urgent = 3;
+    Peer peer = 4;
+  }
+}

@@ -1,9 +1,9 @@
 //! Code emission from a resolved schema.
 //!
-//! Current scope: file-level and nested enums/messages with singular and
-//! repeated scalar / string / bytes / bool / enum / message fields. Real oneofs
-//! are still rejected. All `file_to_generate` entries share one [`ModuleForest`]
-//! so cross-file type refs use a single `self::_root`.
+//! Current scope: file-level and nested enums/messages with singular / repeated
+//! scalar / string / bytes / bool / enum / message fields, plus real oneofs.
+//! All `file_to_generate` entries share one [`ModuleForest`] so cross-file type
+//! refs use a single `self::_root`.
 
 use crate::descriptor::CodegenRequest;
 use crate::error::{Error, Result};
@@ -11,13 +11,14 @@ use crate::field_kind::{MessagePlan, plan_message};
 use crate::module_tree::layout::{ModuleLayout, render};
 use crate::module_tree::{ModuleForest, ModuleNode, ModuleOrigin, type_name_to_module_ident};
 use crate::plugin_io::CodeGeneratorResponse;
-use crate::resolved::{Arena, FieldOccurrence, File, FileSet, Message, SingularPresence, resolve};
+use crate::resolved::{Arena, File, FileSet, Message, resolve};
 use ::proc_macro2::{Ident, Span};
 use ::quote::quote;
 
 mod enumeration;
 mod ident;
 mod message;
+mod oneof;
 mod type_path;
 
 /// Generate plugin response files from a decoded request.
@@ -142,23 +143,12 @@ fn append_message(parent: &mut ModuleNode, plan: &MessagePlan<'_>) -> Result<()>
     Ok(())
 }
 
-/// Real oneofs rejected; proto3 optional synthetic oneofs OK. Nested type
-/// declarations are emitted into this message's module.
+/// Nested type declarations are emitted into this message's module.
+/// Proto3 optional synthetic oneofs resolve as Explicit and need no special case.
 fn validate_emit_message<'a>(message: &'a Message<'a>) -> Result<&'a Message<'a>> {
     if !ident::is_simple_ident(message.name()) {
         return Err(Error::Codegen(format!(
             "message name `{}` is not a simple Rust identifier",
-            message.name()
-        )));
-    }
-    if message.fields().any(|f| {
-        matches!(
-            f.occurrence(),
-            FieldOccurrence::Singular(SingularPresence::Oneof)
-        )
-    }) {
-        return Err(Error::Codegen(format!(
-            "generator does not support oneofs on message `{}` yet",
             message.name()
         )));
     }
@@ -729,7 +719,7 @@ mod tests {
     }
 
     #[test]
-    fn reject_real_oneof() {
+    fn emit_real_oneof_group() {
         let request = CodegenRequest {
             meta: CodegenMeta {
                 file_to_generate: vec!["t.proto".into()],
@@ -741,47 +731,82 @@ mod tests {
                 syntax: Syntax::Proto3,
                 features: FeatureSet::default(),
                 dependency: vec![],
-                messages: vec![MessageDesc {
-                    name: "Notify".into(),
-                    fields: vec![
-                        FieldDesc {
-                            name: "email".into(),
-                            number: 1,
-                            label: FieldLabel::Optional,
-                            type_: FieldType::String,
-                            type_name: None,
-                            oneof_index: Some(0),
-                            proto3_optional: false,
-                            packed: None,
-                            features: FeatureSet::default(),
-                        },
-                        FieldDesc {
-                            name: "sms".into(),
-                            number: 2,
-                            label: FieldLabel::Optional,
-                            type_: FieldType::String,
-                            type_name: None,
-                            oneof_index: Some(0),
-                            proto3_optional: false,
-                            packed: None,
-                            features: FeatureSet::default(),
-                        },
-                    ],
-                    nested_messages: vec![],
-                    nested_enums: vec![],
-                    oneofs: vec![OneofDesc {
-                        name: "channel".into(),
-                    }],
-                }],
+                messages: vec![
+                    MessageDesc {
+                        name: "Peer".into(),
+                        fields: vec![],
+                        nested_messages: vec![],
+                        nested_enums: vec![],
+                        oneofs: vec![],
+                    },
+                    MessageDesc {
+                        name: "Holder".into(),
+                        fields: vec![
+                            FieldDesc {
+                                name: "email".into(),
+                                number: 1,
+                                label: FieldLabel::Optional,
+                                type_: FieldType::String,
+                                type_name: None,
+                                oneof_index: Some(0),
+                                proto3_optional: false,
+                                packed: None,
+                                features: FeatureSet::default(),
+                            },
+                            FieldDesc {
+                                name: "code".into(),
+                                number: 2,
+                                label: FieldLabel::Optional,
+                                type_: FieldType::Int32,
+                                type_name: None,
+                                oneof_index: Some(0),
+                                proto3_optional: false,
+                                packed: None,
+                                features: FeatureSet::default(),
+                            },
+                            FieldDesc {
+                                name: "urgent".into(),
+                                number: 3,
+                                label: FieldLabel::Optional,
+                                type_: FieldType::Bool,
+                                type_name: None,
+                                oneof_index: Some(0),
+                                proto3_optional: false,
+                                packed: None,
+                                features: FeatureSet::default(),
+                            },
+                            FieldDesc {
+                                name: "peer".into(),
+                                number: 4,
+                                label: FieldLabel::Optional,
+                                type_: FieldType::Message,
+                                type_name: Some(ProtoFqn::parse(".Peer")),
+                                oneof_index: Some(0),
+                                proto3_optional: false,
+                                packed: None,
+                                features: FeatureSet::default(),
+                            },
+                        ],
+                        nested_messages: vec![],
+                        nested_enums: vec![],
+                        oneofs: vec![OneofDesc {
+                            name: "choice".into(),
+                        }],
+                    },
+                ],
                 enums: vec![],
             }],
         };
-        let err = emit(&request).unwrap_err();
-        let msg = err.to_string();
-        assert!(
-            msg.contains("oneof") && msg.contains("Notify"),
-            "unexpected error: {msg}"
-        );
+        let response = emit(&request).unwrap();
+        let content = &response.files[0].content;
+        assert!(content.contains("OneofSlot"));
+        assert!(content.contains("OneofGroup"));
+        assert!(content.contains("ChoiceCase"));
+        assert!(content.contains("ChoiceStorage"));
+        assert!(content.contains("BitPacked"));
+        assert!(content.contains("fn email"));
+        assert!(content.contains("fn peer"));
+        assert!(content.contains("fn choice"));
     }
 
     #[test]
