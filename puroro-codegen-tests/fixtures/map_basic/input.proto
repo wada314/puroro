@@ -2,4 +2,6 @@ syntax = "proto3";
 
 message Holder {
   map<string, int32> attributes = 1;
+  map<int32, bool> flags = 2;
+  map<bool, uint64> counters = 3;
 }

@@ -2,8 +2,9 @@
 //!
 //! Current scope: file-level and nested enums/messages with singular / repeated
 //! scalar / string / bytes / bool / enum / message fields, real oneofs, and
-//! `map<string, int32>`. All `file_to_generate` entries share one
-//! [`ModuleForest`] so cross-file type refs use a single `self::_root`.
+//! maps with legal keys and Copy scalar / bool values. All `file_to_generate`
+//! entries share one [`ModuleForest`] so cross-file type refs use a single
+//! `self::_root`.
 
 use crate::descriptor::CodegenRequest;
 use crate::error::{Error, Result};
@@ -898,6 +899,80 @@ mod tests {
         // Synthetic map-entry message must not be emitted as a user type.
         assert!(!content.contains("struct AttributesEntry"));
         assert!(!content.contains("RepeatedField"));
+    }
+
+    #[test]
+    fn emit_map_int32_bool_uses_entry_mut() {
+        let request = CodegenRequest {
+            meta: CodegenMeta {
+                file_to_generate: vec!["t.proto".into()],
+                parameter: None,
+            },
+            proto_files: vec![ProtoFile {
+                name: "t.proto".into(),
+                package: String::new(),
+                syntax: Syntax::Proto3,
+                features: FeatureSet::default(),
+                dependency: vec![],
+                messages: vec![MessageDesc {
+                    name: "Holder".into(),
+                    fields: vec![FieldDesc {
+                        name: "flags".into(),
+                        number: 1,
+                        label: FieldLabel::Repeated,
+                        type_: FieldType::Message,
+                        type_name: Some(ProtoFqn::parse(".Holder.FlagsEntry")),
+                        oneof_index: None,
+                        proto3_optional: false,
+                        packed: None,
+                        features: FeatureSet::default(),
+                    }],
+                    nested_messages: vec![MessageDesc {
+                        name: "FlagsEntry".into(),
+                        fields: vec![
+                            FieldDesc {
+                                name: "key".into(),
+                                number: 1,
+                                label: FieldLabel::Optional,
+                                type_: FieldType::Int32,
+                                type_name: None,
+                                oneof_index: None,
+                                proto3_optional: false,
+                                packed: None,
+                                features: FeatureSet::default(),
+                            },
+                            FieldDesc {
+                                name: "value".into(),
+                                number: 2,
+                                label: FieldLabel::Optional,
+                                type_: FieldType::Bool,
+                                type_name: None,
+                                oneof_index: None,
+                                proto3_optional: false,
+                                packed: None,
+                                features: FeatureSet::default(),
+                            },
+                        ],
+                        nested_messages: vec![],
+                        nested_enums: vec![],
+                        oneofs: vec![],
+                        map_entry: true,
+                    }],
+                    nested_enums: vec![],
+                    oneofs: vec![],
+                    map_entry: false,
+                }],
+                enums: vec![],
+            }],
+        };
+        let response = emit(&request).unwrap();
+        let content = &response.files[0].content;
+        assert!(content.contains("MapField"));
+        assert!(content.contains("MapEntryMut"));
+        assert!(content.contains("ProtoInt32"));
+        assert!(content.contains("ProtoBool"));
+        assert!(!content.contains("::puroro::MapMut"));
+        assert!(!content.contains("struct FlagsEntry"));
     }
 
     #[test]

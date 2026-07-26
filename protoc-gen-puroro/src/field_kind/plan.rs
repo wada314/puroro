@@ -279,15 +279,58 @@ fn plan_map_field<'a>(field: &'a Field<'a>) -> Result<FieldKind<'a>> {
 
     let key = WireTypeKind::from_field(key_field);
     let value = WireTypeKind::from_field(value_field);
-    // Runtime user traits currently cover `map<string, int32>` only.
-    if !matches!(key, WireTypeKind::String { .. }) || !matches!(value, WireTypeKind::Int32) {
-        return Err(Error::Codegen(format!(
-            "map field `{}`: only `map<string, int32>` is supported for now (got key={key:?}, value={value:?})",
-            field.name()
-        )));
-    }
+    validate_map_key_wire(&key, field.name())?;
+    validate_map_value_wire(&value, field.name())?;
 
     Ok(FieldKind::Map { key, value })
+}
+
+fn validate_map_key_wire(key: &WireTypeKind<'_>, field_name: &str) -> Result<()> {
+    // Protobuf: integral, bool, or string — not float / bytes / enum / message.
+    match key {
+        WireTypeKind::Int32
+        | WireTypeKind::Int64
+        | WireTypeKind::UInt32
+        | WireTypeKind::UInt64
+        | WireTypeKind::SInt32
+        | WireTypeKind::SInt64
+        | WireTypeKind::Fixed32
+        | WireTypeKind::Fixed64
+        | WireTypeKind::SFixed32
+        | WireTypeKind::SFixed64
+        | WireTypeKind::Bool
+        | WireTypeKind::String { .. } => Ok(()),
+        other => Err(Error::Codegen(format!(
+            "map field `{field_name}`: invalid map key type {other:?}"
+        ))),
+    }
+}
+
+fn validate_map_value_wire(value: &WireTypeKind<'_>, field_name: &str) -> Result<()> {
+    // Step-1 public traits cover Copy scalars + bool only. string / bytes /
+    // enum / message values need separate MapMut / get_mut APIs.
+    match value {
+        WireTypeKind::Double
+        | WireTypeKind::Float
+        | WireTypeKind::Int32
+        | WireTypeKind::Int64
+        | WireTypeKind::UInt32
+        | WireTypeKind::UInt64
+        | WireTypeKind::SInt32
+        | WireTypeKind::SInt64
+        | WireTypeKind::Fixed32
+        | WireTypeKind::Fixed64
+        | WireTypeKind::SFixed32
+        | WireTypeKind::SFixed64
+        | WireTypeKind::Bool => Ok(()),
+        WireTypeKind::String { .. }
+        | WireTypeKind::Bytes { .. }
+        | WireTypeKind::Enum { .. }
+        | WireTypeKind::Message(_) => Err(Error::Codegen(format!(
+            "map field `{field_name}`: map values of type {value:?} are not supported yet \
+             (Copy scalars and bool only)"
+        ))),
+    }
 }
 
 #[cfg(test)]
@@ -959,6 +1002,66 @@ mod tests {
         let set = resolve(&arena, &files).unwrap();
         let msg = set.lookup(".example.Holder").unwrap().as_message().unwrap();
         let err = plan_message(msg).unwrap_err().to_string();
-        assert!(err.contains("map<string, int32>"), "{err}");
+        assert!(err.contains("not supported yet"), "{err}");
+    }
+
+    #[test]
+    fn map_int32_bool_plans_map_kind() {
+        let arena = Arena::new();
+        let files = [proto3_file(vec![MessageDesc {
+            name: "Holder".into(),
+            fields: vec![field(
+                "flags",
+                1,
+                FieldType::Message,
+                FieldLabel::Repeated,
+                false,
+                None,
+                Some(ProtoFqn::parse(".example.Holder.FlagsEntry")),
+            )],
+            nested_messages: vec![MessageDesc {
+                name: "FlagsEntry".into(),
+                fields: vec![
+                    field(
+                        "key",
+                        1,
+                        FieldType::Int32,
+                        FieldLabel::Optional,
+                        false,
+                        None,
+                        None,
+                    ),
+                    field(
+                        "value",
+                        2,
+                        FieldType::Bool,
+                        FieldLabel::Optional,
+                        false,
+                        None,
+                        None,
+                    ),
+                ],
+                nested_messages: vec![],
+                nested_enums: vec![],
+                oneofs: vec![],
+                map_entry: true,
+            }],
+            nested_enums: vec![],
+            oneofs: vec![],
+            map_entry: false,
+        }])];
+        let set = resolve(&arena, &files).unwrap();
+        let msg = set.lookup(".example.Holder").unwrap().as_message().unwrap();
+        let plan = plan_message(msg).unwrap();
+        let MessageMember::Field(flags) = &plan.members()[0] else {
+            panic!("map must be a top-level field");
+        };
+        match flags.kind() {
+            FieldKind::Map {
+                key: WireTypeKind::Int32,
+                value: WireTypeKind::Bool,
+            } => {}
+            other => panic!("{other:?}"),
+        }
     }
 }
