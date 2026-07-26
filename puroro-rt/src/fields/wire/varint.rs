@@ -1,7 +1,7 @@
-//! Semantic protobuf types that share wire type [`WireType::Varint`].
+//! Varint family markers (`ProtoInt32`, enums, [`ProtoBool`], …).
 //!
-//! Markers (`ProtoInt32`, …) are allocator-free. Singular slots store bare
-//! [`VarintProtoType::Value`] (`i32`, `()`, …); repeated elements use the same.
+//! Numeric / enum wire codecs live on [`NumericalType`](super::numerical::NumericalType).
+//! [`ProtoBool`] keeps a small inherent wire API for bit-packed singular storage.
 
 use ::core::convert::TryFrom;
 use ::core::marker::PhantomData;
@@ -13,19 +13,6 @@ use ::puroro::DecodeError;
 
 use crate::fields::shared::value_slot::AddressableSlot;
 use crate::fields::shared::{DefaultIn, ProtoEmpty};
-
-// ---------------------------------------------------------------------------
-// Core trait (wire helpers)
-// ---------------------------------------------------------------------------
-
-/// Wire semantics for a protobuf type encoded as a base-128 varint.
-pub trait VarintProtoType {
-    /// Inner / repeated-element / singular-slot payload (`i32`, `u64`, `bool`, enum, …).
-    type Value: Copy;
-
-    fn decode_wire(raw: u64) -> Result<Self::Value, DecodeError>;
-    fn encode_wire(value: Self::Value) -> u64;
-}
 
 // ---------------------------------------------------------------------------
 // Enum markers
@@ -46,35 +33,6 @@ pub trait ClosedEnum: ProtoEnumStorage + TryFrom<i32, Error = i32> {}
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
 pub struct ProtoEnum<E, K>(PhantomData<(E, K)>);
 
-impl<E: OpenEnum> VarintProtoType for ProtoEnum<E, Open> {
-    type Value = E;
-
-    #[inline]
-    fn decode_wire(raw: u64) -> Result<Self::Value, DecodeError> {
-        Ok(E::from(ProtoInt32::decode_wire(raw)?))
-    }
-
-    #[inline]
-    fn encode_wire(value: Self::Value) -> u64 {
-        ProtoInt32::encode_wire(value.to_wire())
-    }
-}
-
-impl<E: ClosedEnum> VarintProtoType for ProtoEnum<E, Closed> {
-    type Value = E;
-
-    #[inline]
-    fn decode_wire(raw: u64) -> Result<Self::Value, DecodeError> {
-        let wire = ProtoInt32::decode_wire(raw)?;
-        E::try_from(wire).map_err(|_| DecodeError::UnknownClosedEnum { raw })
-    }
-
-    #[inline]
-    fn encode_wire(value: Self::Value) -> u64 {
-        ProtoInt32::encode_wire(value.to_wire())
-    }
-}
-
 impl<E: ProtoEnumStorage> AddressableSlot for E {}
 
 impl<E: ProtoEnumStorage, A: Allocator + Clone> DefaultIn<A> for E {
@@ -92,73 +50,31 @@ impl<E: ProtoEnumStorage> ProtoEmpty for E {
 }
 
 // ---------------------------------------------------------------------------
-// Numeric / bool markers
+// Numeric markers (wire via NumericalType)
 // ---------------------------------------------------------------------------
 
 macro_rules! proto_varint_marker {
-    (
-        $(#[$meta:meta])*
-        $name:ident($inner:ty),
-        decode = $decode:expr,
-        encode = $encode:expr $(,)?
-    ) => {
+    ($(#[$meta:meta])* $name:ident) => {
         $(#[$meta])*
         #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
         pub struct $name;
-
-        impl VarintProtoType for $name {
-            type Value = $inner;
-
-            #[inline]
-            fn decode_wire(raw: u64) -> Result<Self::Value, DecodeError> {
-                ($decode)(raw)
-            }
-
-            #[inline]
-            fn encode_wire(value: Self::Value) -> u64 {
-                ($encode)(value)
-            }
-        }
     };
 }
 
-proto_varint_marker! {
-    ProtoUInt32(u32),
-    decode = |raw| Varint::from_uint64(raw).try_to_uint32().map_err(DecodeError::from),
-    encode = |value| Varint::from_uint32(value).to_uint64(),
-}
-
-proto_varint_marker! {
-    ProtoUInt64(u64),
-    decode = |raw| Ok(Varint::from_uint64(raw).to_uint64()),
-    encode = |value| Varint::from_uint64(value).to_uint64(),
-}
-
+proto_varint_marker! { ProtoUInt32 }
+proto_varint_marker! { ProtoUInt64 }
 proto_varint_marker! {
     /// Protobuf `int32`.
-    ProtoInt32(i32),
-    decode = |raw| Varint::from_uint64(raw).try_to_int32().map_err(DecodeError::from),
-    encode = |value| Varint::from_int32(value).to_uint64(),
+    ProtoInt32
 }
-
-proto_varint_marker! {
-    ProtoInt64(i64),
-    decode = |raw| Ok(Varint::from_uint64(raw).to_int64()),
-    encode = |value| Varint::from_int64(value).to_uint64(),
-}
-
+proto_varint_marker! { ProtoInt64 }
 proto_varint_marker! {
     /// Protobuf `sint32` — varint with ZigZag encoding.
-    ProtoSint32(i32),
-    decode = |raw| Varint::from_uint64(raw).try_to_sint32().map_err(DecodeError::from),
-    encode = |value| Varint::from_sint32(value).to_uint64(),
+    ProtoSint32
 }
-
 proto_varint_marker! {
     /// Protobuf `sint64` — varint with ZigZag encoding.
-    ProtoSint64(i64),
-    decode = |raw| Ok(Varint::from_uint64(raw).to_sint64()),
-    encode = |value| Varint::from_sint64(value).to_uint64(),
+    ProtoSint64
 }
 
 /// Protobuf `bool` type marker — varint 0 or 1.
@@ -168,16 +84,14 @@ proto_varint_marker! {
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
 pub struct ProtoBool;
 
-impl VarintProtoType for ProtoBool {
-    type Value = bool;
-
+impl ProtoBool {
     #[inline]
-    fn decode_wire(raw: u64) -> Result<Self::Value, DecodeError> {
+    pub fn decode_wire(raw: u64) -> Result<bool, DecodeError> {
         Ok(Varint::from_uint64(raw).to_bool())
     }
 
     #[inline]
-    fn encode_wire(value: Self::Value) -> u64 {
+    pub fn encode_wire(value: bool) -> u64 {
         Varint::from_bool(value).to_uint64()
     }
 }

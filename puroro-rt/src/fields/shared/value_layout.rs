@@ -22,7 +22,7 @@ use super::{
 };
 use crate::decode;
 use crate::fields::wire::proto_type::{PayloadAccess, ProtoType};
-use crate::fields::wire::varint::{ProtoBool, VarintProtoType};
+use crate::fields::wire::varint::ProtoBool;
 
 /// Where a singular field's logical value is stored.
 pub trait ValueLayout<T: ProtoType, A: Allocator + Clone>: Copy
@@ -241,7 +241,7 @@ where
             return Err(DecodeError::InvalidTag);
         }
         let raw = decode::decode_varint(buf)?;
-        match <ProtoBool as VarintProtoType>::decode_wire(raw) {
+        match ProtoBool::decode_wire(raw) {
             Ok(new) => {
                 Self::write(slot, init, common, new);
                 Ok(())
