@@ -6,7 +6,7 @@
 
 use ::allocator_api2::alloc::Global;
 use ::puroro::{
-    MapMut, MapRef, MapStrInsert, Message, OneofView, OneofViewMut, RepeatedStringMut,
+    MapRef, MapStrInsert, Message, OneofView, OneofViewMut, RepeatedStringMut,
     UnknownPayload,
 };
 use ::puroro_rt::encode::encode_varint_field;

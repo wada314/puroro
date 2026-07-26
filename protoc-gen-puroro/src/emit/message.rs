@@ -68,7 +68,7 @@ struct MapEmit {
     key_view: TokenStream,
     /// Shared view type for `MapRef` (`i32`, `str`, `Address<A>`, …).
     value_view: TokenStream,
-    /// `MapMut` (string keys) vs `MapEntryMut` (sized keys).
+    /// `map<string, …>` — mutator is `MapStrInsert` / `MapEntryMut<str, …>`.
     string_key: bool,
     /// Sized view values expose `insert` / `insert_str` (`MapEntryInsert` / `MapStrInsert`).
     insertable: bool,
@@ -928,7 +928,7 @@ fn render_map_accessors(field: &MapEmit) -> TokenStream {
         let mut_trait = if field.insertable {
             quote! { ::puroro::MapStrInsert<#value_view> }
         } else {
-            quote! { ::puroro::MapMut<#value_view #mut_target_bound> }
+            quote! { ::puroro::MapEntryMut<str, #value_view #mut_target_bound> }
         };
         quote! {
             pub fn #name(&self) -> impl ::puroro::MapRef<str, #value_view> + '_ {
@@ -940,7 +940,7 @@ fn render_map_accessors(field: &MapEmit) -> TokenStream {
             }
 
             pub fn #clear_name(&mut self) {
-                ::puroro::MapMut::clear(&mut self.#name_mut());
+                ::puroro::MapEntryMut::clear(&mut self.#name_mut());
             }
         }
     } else {

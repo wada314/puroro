@@ -18,8 +18,8 @@ use ::core::ops::ControlFlow;
 use ::core::ops::{Deref, DerefMut};
 
 use ::puroro::{
-    DecodeError, HasDefault, MapRef, MapStrInsert, Message, OneofView, OneofViewMut, Optional,
-    RepeatedStringMut,
+    DecodeError, HasDefault, MapEntryMut, MapRef, MapStrInsert, Message, OneofView, OneofViewMut,
+    Optional, RepeatedStringMut,
 };
 use ::puroro_rt::decode::{decode_tag, skip_field_and_save};
 use ::puroro_rt::{
@@ -395,7 +395,7 @@ impl<A: Allocator + Clone> Task<A> {
     }
 
     pub fn clear_attributes(&mut self) {
-        ::puroro::MapMut::clear(&mut self.attributes_mut());
+        MapEntryMut::clear(&mut self.attributes_mut());
     }
 
     // -- oneof notification (proto fields 12 / 13 / 14 / 15 / 18) ------------

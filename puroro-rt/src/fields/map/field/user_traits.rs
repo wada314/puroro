@@ -1,10 +1,11 @@
-//! `puroro::{MapRef, MapEntryMut, MapMut, …}` impls for [`MapField`](super::MapField).
+//! `puroro::{MapRef, MapEntryMut, MapStrInsert, …}` impls for [`MapField`](super::MapField).
 
+use ::core::borrow::Borrow;
 use ::core::ops::Deref;
 
 use ::allocator_api2::alloc::Allocator;
 use ::allocator_api2::vec::Vec as AllocVec;
-use ::puroro::{MapEntryInsert, MapEntryMut, MapMut, MapRef, MapStrInsert, Message};
+use ::puroro::{MapEntryInsert, MapEntryMut, MapRef, MapStrInsert, Message};
 
 use crate::fields::shared::PresenceBits;
 use crate::fields::wire::repeated_element::RepeatedElementMut;
@@ -71,8 +72,8 @@ macro_rules! impl_map_entry_copy {
             }
 
             #[inline]
-            fn entry_mut(&mut self, key: $key_view) -> Self::Mut<'_> {
-                self.entry_element_mut(key)
+            fn entry_mut(&mut self, key: impl Borrow<$key_view>) -> Self::Mut<'_> {
+                self.entry_element_mut(*key.borrow())
             }
 
             #[inline]
@@ -104,7 +105,7 @@ macro_rules! impl_map_string_key_copy {
     ($val_marker:ty, $val_view:ty) => {
         impl_map_ref_copy!(ProtoString, str, $val_marker, $val_view);
 
-        impl<'f, 'c, const FIELD: u32, A, Pb> MapMut<$val_view>
+        impl<'f, 'c, const FIELD: u32, A, Pb> MapEntryMut<str, $val_view>
             for MapFieldMut<'f, 'c, ProtoString, $val_marker, FIELD, A, Pb>
         where
             A: Allocator + Clone,
@@ -132,8 +133,8 @@ macro_rules! impl_map_string_key_copy {
             }
 
             #[inline]
-            fn entry_mut(&mut self, key: &str) -> Self::Mut<'_> {
-                self.entry_element_mut_str(key)
+            fn entry_mut(&mut self, key: impl Borrow<str>) -> Self::Mut<'_> {
+                self.entry_element_mut_str(key.borrow())
             }
 
             #[inline]
@@ -263,8 +264,8 @@ macro_rules! impl_map_entry_string_val {
             }
 
             #[inline]
-            fn entry_mut(&mut self, key: $key_view) -> Self::Mut<'_> {
-                self.entry_element_mut(key)
+            fn entry_mut(&mut self, key: impl Borrow<$key_view>) -> Self::Mut<'_> {
+                self.entry_element_mut(*key.borrow())
             }
 
             #[inline]
@@ -312,8 +313,8 @@ macro_rules! impl_map_entry_bytes_val {
             }
 
             #[inline]
-            fn entry_mut(&mut self, key: $key_view) -> Self::Mut<'_> {
-                self.entry_element_mut(key)
+            fn entry_mut(&mut self, key: impl Borrow<$key_view>) -> Self::Mut<'_> {
+                self.entry_element_mut(*key.borrow())
             }
 
             #[inline]
@@ -351,7 +352,7 @@ for_each_sized_key!(impl_map_entry_bytes_val);
 impl_map_ref_len!(ProtoString, str, ProtoString, str);
 impl_map_ref_len!(ProtoString, str, ProtoBytes, [u8]);
 
-impl<'f, 'c, const FIELD: u32, A, Pb> MapMut<str>
+impl<'f, 'c, const FIELD: u32, A, Pb> MapEntryMut<str, str>
     for MapFieldMut<'f, 'c, ProtoString, ProtoString, FIELD, A, Pb>
 where
     A: Allocator + Clone,
@@ -379,8 +380,8 @@ where
     }
 
     #[inline]
-    fn entry_mut(&mut self, key: &str) -> Self::Mut<'_> {
-        self.entry_element_mut_str(key)
+    fn entry_mut(&mut self, key: impl Borrow<str>) -> Self::Mut<'_> {
+        self.entry_element_mut_str(key.borrow())
     }
 
     #[inline]
@@ -394,7 +395,7 @@ where
     }
 }
 
-impl<'f, 'c, const FIELD: u32, A, Pb> MapMut<[u8]>
+impl<'f, 'c, const FIELD: u32, A, Pb> MapEntryMut<str, [u8]>
     for MapFieldMut<'f, 'c, ProtoString, ProtoBytes, FIELD, A, Pb>
 where
     A: Allocator + Clone,
@@ -422,8 +423,8 @@ where
     }
 
     #[inline]
-    fn entry_mut(&mut self, key: &str) -> Self::Mut<'_> {
-        self.entry_element_mut_str(key)
+    fn entry_mut(&mut self, key: impl Borrow<str>) -> Self::Mut<'_> {
+        self.entry_element_mut_str(key.borrow())
     }
 
     #[inline]
@@ -490,8 +491,8 @@ macro_rules! impl_map_entry_enum {
             }
 
             #[inline]
-            fn entry_mut(&mut self, key: $key_view) -> Self::Mut<'_> {
-                self.entry_element_mut(key)
+            fn entry_mut(&mut self, key: impl Borrow<$key_view>) -> Self::Mut<'_> {
+                self.entry_element_mut(*key.borrow())
             }
 
             #[inline]
@@ -540,7 +541,7 @@ macro_rules! impl_map_string_key_enum {
             }
         }
 
-        impl<'f, 'c, E, const FIELD: u32, A, Pb> MapMut<E>
+        impl<'f, 'c, E, const FIELD: u32, A, Pb> MapEntryMut<str, E>
             for MapFieldMut<'f, 'c, ProtoString, ProtoEnum<E, $kind>, FIELD, A, Pb>
         where
             E: $bound,
@@ -569,8 +570,8 @@ macro_rules! impl_map_string_key_enum {
             }
 
             #[inline]
-            fn entry_mut(&mut self, key: &str) -> Self::Mut<'_> {
-                self.entry_element_mut_str(key)
+            fn entry_mut(&mut self, key: impl Borrow<str>) -> Self::Mut<'_> {
+                self.entry_element_mut_str(key.borrow())
             }
 
             #[inline]
@@ -663,8 +664,8 @@ macro_rules! impl_map_entry_message {
             }
 
             #[inline]
-            fn entry_mut(&mut self, key: $key_view) -> Self::Mut<'_> {
-                self.entry_element_mut(key)
+            fn entry_mut(&mut self, key: impl Borrow<$key_view>) -> Self::Mut<'_> {
+                self.entry_element_mut(*key.borrow())
             }
 
             #[inline]
@@ -713,7 +714,7 @@ where
     }
 }
 
-impl<'f, 'c, M, const FIELD: u32, A, Pb> MapMut<M>
+impl<'f, 'c, M, const FIELD: u32, A, Pb> MapEntryMut<str, M>
     for MapFieldMut<'f, 'c, ProtoString, ProtoMessage<M>, FIELD, A, Pb>
 where
     M: Message<Alloc = A> + ::unmanaged::DeallocateIn<A>,
@@ -742,8 +743,8 @@ where
     }
 
     #[inline]
-    fn entry_mut(&mut self, key: &str) -> Self::Mut<'_> {
-        self.entry_element_mut_str(key)
+    fn entry_mut(&mut self, key: impl Borrow<str>) -> Self::Mut<'_> {
+        self.entry_element_mut_str(key.borrow())
     }
 
     #[inline]

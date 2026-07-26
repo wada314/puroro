@@ -1,7 +1,7 @@
 //! Maps: all legal keys × scalar / string / bytes / enum / message values.
 
 use crate::map_basic::{Holder, Kind, Peer};
-use ::puroro::{MapEntryInsert, MapEntryMut, MapMut, MapRef, MapStrInsert, Message};
+use ::puroro::{MapEntryInsert, MapEntryMut, MapRef, MapStrInsert, Message};
 
 #[test]
 fn defaults_empty() {
