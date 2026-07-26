@@ -1,4 +1,4 @@
-//! Blanket `puroro::{MapRef, MapEntryMut}` impls for [`MapField`](super::MapField).
+//! Blanket `puroro::{MapRef, MapMut}` impls for [`MapField`](super::MapField).
 //!
 //! View types come from marker GATs ([`MapKey::KeyView`], [`MapValueView::View`]),
 //! matching the scalar pattern (`ProtoType::{Ref, Mut}` → generic field surface).
@@ -7,7 +7,7 @@ use ::core::borrow::Borrow;
 use ::core::hash::Hash;
 
 use ::allocator_api2::alloc::Allocator;
-use ::puroro::{MapEntryMut, MapRef};
+use ::puroro::{MapMut, MapRef};
 
 use crate::fields::shared::PresenceBits;
 use crate::fields::wire::map_element::{MapKey, MapKeyInsert, MapValueView};
@@ -35,7 +35,7 @@ where
     }
 }
 
-impl<'f, 'c, K, V, const FIELD: u32, A, Pb> MapEntryMut<K::KeyView, V::View>
+impl<'f, 'c, K, V, const FIELD: u32, A, Pb> MapMut<K::KeyView, V::View>
     for MapFieldMut<'f, 'c, K, V, FIELD, A, Pb>
 where
     K: MapKeyInsert<A>,

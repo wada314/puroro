@@ -19,7 +19,7 @@ pub trait MapRef<K: ?Sized, V: ?Sized> {
     fn get(&self, key: &K) -> Option<&V>;
 }
 
-/// Mutable view of a `map<K, V>` field (string or sized keys).
+/// Mutable view of a `map<K, V>` field (pairs with [`MapRef`]).
 ///
 /// - [`V`] is the shared value view (`i32`, `str`, `Address<A>`, …).
 /// - [`MutTarget`](Self::MutTarget) is the `_mut` target (`i32`, [`crate::String`]`<A>`, …).
@@ -28,7 +28,7 @@ pub trait MapRef<K: ?Sized, V: ?Sized> {
 /// (`*m.entry_mut("k") = 81`, `m.entry_mut(1).push_str("…")`).
 /// [`entry_mut`](Self::entry_mut) takes `impl Borrow<K>` so both `entry_mut(1)`
 /// and `entry_mut("k")` work.
-pub trait MapEntryMut<K: ?Sized, V: ?Sized> {
+pub trait MapMut<K: ?Sized, V: ?Sized> {
     type MutTarget: ?Sized;
 
     type Mut<'a>: DerefMut<Target = Self::MutTarget>

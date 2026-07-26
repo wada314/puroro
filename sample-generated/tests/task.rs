@@ -6,7 +6,7 @@
 
 use ::allocator_api2::alloc::Global;
 use ::puroro::{
-    MapEntryMut, MapRef, Message, OneofView, OneofViewMut, RepeatedStringMut, UnknownPayload,
+    MapMut, MapRef, Message, OneofView, OneofViewMut, RepeatedStringMut, UnknownPayload,
 };
 use ::puroro_rt::encode::encode_varint_field;
 use ::puroro_sample_generated::task::{Notification, NotificationCase};

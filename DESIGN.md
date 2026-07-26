@@ -320,7 +320,7 @@ The normative generated API is the concrete message struct's inherent `impl` blo
 | Nested message (`assignee`) | `Option<&M<A>>` | `*_mut()` → `&mut M<A>` (creates if absent) | `clear_*()` |
 | Repeated packable / message | `&[T]` / `&[M<A>]` | `*_mut()` → `impl DerefMut<Target = Vec<T, A>>` (`allocator_api2`) | `clear_*()` |
 | Repeated string / bytes | `&[impl Deref<Target = str>]` / (bytes TBD) | `*_mut()` → `impl RepeatedStringMut<A>` (`push` then fill) | `clear_*()` |
-| Map | `impl MapRef<K, V>` | `impl MapEntryMut<K, V>` (see [§4.10](#410-map-fields)) | `clear_*()` (or `*_mut().clear()`) |
+| Map | `impl MapRef<K, V>` | `impl MapMut<K, V>` (see [§4.10](#410-map-fields)) | `clear_*()` (or `*_mut().clear()`) |
 | Oneof group | `impl OneofView` (`case()` / `as_ref()`) | `impl OneofViewMut` + per-variant `*_mut()` | `clear_notification()` |
 
 Presence for EXPLICIT fields is checked with `field().is_set()` / `field().get()` — there are **no** generated `has_*`, `*_raw`, `set_*`, or `push_*` helpers. Mutation is entirely via `_mut` (+ `clear_*`); see also [§5.1 Mutation API](#51-chosen-design-single-type-parameter).
@@ -918,7 +918,7 @@ Same layering as singular fields (`ProtoType::{Ref, Mut}` → generic `SingularF
 | [`MapKey`](puroro-rt/src/fields/wire/map_element.rs) / [`MapKeyInsert`](puroro-rt/src/fields/wire/map_element.rs) | `KeyView` + `key_from_view` (sized copy vs string allocate) |
 | [`MapValueView`](puroro-rt/src/fields/wire/map_element.rs) | `View` + `as_view` (identity vs string/bytes `Deref`) |
 | [`RepeatedElementMut::MutTarget`](puroro-rt/src/fields/wire/repeated_element.rs) | `_mut` target (`i32`, `String<A>`, …) |
-| [`MapRef`](src/map.rs) / [`MapEntryMut`](src/map.rs) | User API: `get` / `entry_mut(impl Borrow<K>)` / … |
+| [`MapRef`](src/map.rs) / [`MapMut`](src/map.rs) | User API: `get` / `entry_mut(impl Borrow<K>)` / … |
 
 There is no separate `insert` API: set values with `entry_mut` then assign / fill. Codegen pins `MutTarget` on the mutator return type so those methods resolve through `impl Trait`.
 
@@ -930,9 +930,9 @@ pub fn attributes(&self) -> impl ::puroro::MapRef<str, i32> + '_;
 
 pub fn attributes_mut(
     &mut self,
-) -> impl ::puroro::MapEntryMut<str, i32, MutTarget = i32> + '_;
+) -> impl ::puroro::MapMut<str, i32, MutTarget = i32> + '_;
 
-pub fn clear_attributes(&mut self); // calls MapEntryMut::clear
+pub fn clear_attributes(&mut self); // calls MapMut::clear
 ```
 
 Catalog types (`MapFieldRef` / `ProtoString` / …) stay inside the generated crate / `puroro-rt`.

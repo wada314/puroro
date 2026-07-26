@@ -723,11 +723,11 @@ Catalog helpers on `MapFieldMut`:
 | `remove` / `clear` | Free key + value via `deallocate_element` |
 | `merge` | One wire occurrence |
 
-User-facing [`MapRef`](src/map.rs) / [`MapEntryMut`](src/map.rs) are **two blanket impls** over `MapFieldRef` / `MapFieldMut` in [`user_traits.rs`](puroro-rt/src/fields/map/field/user_traits.rs) (no K×V macro matrix). Mutation is `entry_mut` then assign / fill.
+User-facing [`MapRef`](src/map.rs) / [`MapMut`](src/map.rs) are **two blanket impls** over `MapFieldRef` / `MapFieldMut` in [`user_traits.rs`](puroro-rt/src/fields/map/field/user_traits.rs) (no K×V macro matrix). Mutation is `entry_mut` then assign / fill.
 
 **Key collision safety:** `HashMap::insert` would drop a colliding incoming key; `MapEntries::insert` keeps the stored key and returns `(incoming_key, previous_value)` for explicit release (required for `UnmanagedString` keys).
 
-Sample: `Task.attributes` — `map<string, int32>` → `MapField<ProtoString, ProtoInt32, { FIELD_ATTRIBUTES }, A>` with accessors `attributes()` → `MapRef<str, i32>`, `attributes_mut()` → `MapEntryMut<str, i32, MutTarget = i32>`, `clear_attributes()` via `MapEntryMut::clear`.
+Sample: `Task.attributes` — `map<string, int32>` → `MapField<ProtoString, ProtoInt32, { FIELD_ATTRIBUTES }, A>` with accessors `attributes()` → `MapRef<str, i32>`, `attributes_mut()` → `MapMut<str, i32, MutTarget = i32>`, `clear_attributes()` via `MapMut::clear`.
 
 ---
 

@@ -28,7 +28,7 @@ use ::puroro::Message;
 ///
 /// [`KeyView`](Self::KeyView) is the user-facing key type (`i32`, `str`, …).
 pub trait MapKey: RepeatedElement {
-    /// Shared key view for [`MapRef`](::puroro::MapRef) / [`MapEntryMut`](::puroro::MapEntryMut).
+    /// Shared key view for [`MapRef`](::puroro::MapRef) / [`MapMut`](::puroro::MapMut).
     type KeyView: ?Sized + Hash + Eq;
 }
 

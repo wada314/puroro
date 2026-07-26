@@ -925,12 +925,12 @@ fn render_map_accessors(field: &MapEmit) -> TokenStream {
 
             pub fn #name_mut(
                 &mut self,
-            ) -> impl ::puroro::MapEntryMut<str, #value_view, MutTarget = #mut_target> + '_ {
+            ) -> impl ::puroro::MapMut<str, #value_view, MutTarget = #mut_target> + '_ {
                 self.#name.bind_mut(&mut self._common)
             }
 
             pub fn #clear_name(&mut self) {
-                ::puroro::MapEntryMut::clear(&mut self.#name_mut());
+                ::puroro::MapMut::clear(&mut self.#name_mut());
             }
         }
     } else {
@@ -941,13 +941,13 @@ fn render_map_accessors(field: &MapEmit) -> TokenStream {
 
             pub fn #name_mut(
                 &mut self,
-            ) -> impl ::puroro::MapEntryMut<#key_view, #value_view, MutTarget = #mut_target> + '_
+            ) -> impl ::puroro::MapMut<#key_view, #value_view, MutTarget = #mut_target> + '_
             {
                 self.#name.bind_mut(&mut self._common)
             }
 
             pub fn #clear_name(&mut self) {
-                ::puroro::MapEntryMut::clear(&mut self.#name_mut());
+                ::puroro::MapMut::clear(&mut self.#name_mut());
             }
         }
     }
