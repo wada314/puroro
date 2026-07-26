@@ -30,8 +30,8 @@ where
     }
 
     #[inline]
-    fn get(&self, key: &K::KeyView) -> Option<&V::View> {
-        self.field.entries.get(key).map(V::as_view)
+    fn get(&self, key: impl Borrow<K::KeyView>) -> Option<&V::View> {
+        self.field.entries.get(key.borrow()).map(V::as_view)
     }
 }
 
@@ -57,13 +57,13 @@ where
     }
 
     #[inline]
-    fn get(&self, key: &K::KeyView) -> Option<&V::View> {
-        self.field.entries.get(key).map(V::as_view)
+    fn get(&self, key: impl Borrow<K::KeyView>) -> Option<&V::View> {
+        self.field.entries.get(key.borrow()).map(V::as_view)
     }
 
     #[inline]
-    fn get_mut(&mut self, key: &K::KeyView) -> Option<Self::Mut<'_>> {
-        self.get_element_mut(key)
+    fn get_mut(&mut self, key: impl Borrow<K::KeyView>) -> Option<Self::Mut<'_>> {
+        self.get_element_mut(key.borrow())
     }
 
     #[inline]
@@ -72,8 +72,8 @@ where
     }
 
     #[inline]
-    fn remove(&mut self, key: &K::KeyView) {
-        MapFieldMut::remove(self, key);
+    fn remove(&mut self, key: impl Borrow<K::KeyView>) {
+        MapFieldMut::remove(self, key.borrow());
     }
 
     #[inline]

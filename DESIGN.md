@@ -918,7 +918,7 @@ Same layering as singular fields (`ProtoType::{Ref, Mut}` → generic `SingularF
 | [`MapKey`](puroro-rt/src/fields/wire/map_element.rs) / [`MapKeyInsert`](puroro-rt/src/fields/wire/map_element.rs) | `KeyView` + `key_from_view` (sized copy vs string allocate) |
 | [`MapValueView`](puroro-rt/src/fields/wire/map_element.rs) | `View` + `as_view` (identity vs string/bytes `Deref`) |
 | [`RepeatedElementMut::MutTarget`](puroro-rt/src/fields/wire/repeated_element.rs) | `_mut` target (`i32`, `String<A>`, …) |
-| [`MapRef`](src/map.rs) / [`MapMut`](src/map.rs) | User API: `get` / `entry_mut(impl Borrow<K>)` / … |
+| [`MapRef`](src/map.rs) / [`MapMut`](src/map.rs) | User API: `get` / `get_mut` / `entry_mut` / `remove` take `impl Borrow<K>` |
 
 There is no separate `insert` API: set values with `entry_mut` then assign / fill. Codegen pins `MutTarget` on the mutator return type so those methods resolve through `impl Trait`.
 

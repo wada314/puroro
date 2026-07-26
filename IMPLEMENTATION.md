@@ -723,7 +723,7 @@ Catalog helpers on `MapFieldMut`:
 | `remove` / `clear` | Free key + value via `deallocate_element` |
 | `merge` | One wire occurrence |
 
-User-facing [`MapRef`](src/map.rs) / [`MapMut`](src/map.rs) are **two blanket impls** over `MapFieldRef` / `MapFieldMut` in [`user_traits.rs`](puroro-rt/src/fields/map/field/user_traits.rs) (no K×V macro matrix). Mutation is `entry_mut` then assign / fill.
+User-facing [`MapRef`](src/map.rs) / [`MapMut`](src/map.rs) are **two blanket impls** over `MapFieldRef` / `MapFieldMut` in [`user_traits.rs`](puroro-rt/src/fields/map/field/user_traits.rs) (no K×V macro matrix). Key methods take `impl Borrow<K>`; mutation is `entry_mut` then assign / fill.
 
 **Key collision safety:** `HashMap::insert` would drop a colliding incoming key; `MapEntries::insert` keeps the stored key and returns `(incoming_key, previous_value)` for explicit release (required for `UnmanagedString` keys).
 

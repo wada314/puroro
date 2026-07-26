@@ -8,6 +8,9 @@ use ::core::ops::DerefMut;
 /// `K` is the key view type (`str`, `i32`, …) — not an owned buffer type.
 /// [`get`](Self::get) returns [`None`] when the key is absent — not because the
 /// value is “unset” in the singular-presence sense.
+///
+/// Key arguments take [`Borrow`]`<K>` so both `get(1)` and `get(&1)` work for
+/// sized keys, and `get("k")` for `K = str`.
 pub trait MapRef<K: ?Sized, V: ?Sized> {
     fn len(&self) -> usize;
 
@@ -16,7 +19,7 @@ pub trait MapRef<K: ?Sized, V: ?Sized> {
         self.len() == 0
     }
 
-    fn get(&self, key: &K) -> Option<&V>;
+    fn get(&self, key: impl Borrow<K>) -> Option<&V>;
 }
 
 /// Mutable view of a `map<K, V>` field (pairs with [`MapRef`]).
@@ -26,8 +29,7 @@ pub trait MapRef<K: ?Sized, V: ?Sized> {
 ///
 /// Set values via [`entry_mut`](Self::entry_mut) then assign / fill
 /// (`*m.entry_mut("k") = 81`, `m.entry_mut(1).push_str("…")`).
-/// [`entry_mut`](Self::entry_mut) takes `impl Borrow<K>` so both `entry_mut(1)`
-/// and `entry_mut("k")` work.
+/// Key arguments take [`Borrow`]`<K>` (same as [`MapRef::get`]).
 pub trait MapMut<K: ?Sized, V: ?Sized> {
     type MutTarget: ?Sized;
 
@@ -42,14 +44,14 @@ pub trait MapMut<K: ?Sized, V: ?Sized> {
         self.len() == 0
     }
 
-    fn get(&self, key: &K) -> Option<&V>;
+    fn get(&self, key: impl Borrow<K>) -> Option<&V>;
 
-    fn get_mut(&mut self, key: &K) -> Option<Self::Mut<'_>>;
+    fn get_mut(&mut self, key: impl Borrow<K>) -> Option<Self::Mut<'_>>;
 
     /// Inserts a type-default value if `key` is absent, then returns a mut handle.
     fn entry_mut(&mut self, key: impl Borrow<K>) -> Self::Mut<'_>;
 
-    fn remove(&mut self, key: &K);
+    fn remove(&mut self, key: impl Borrow<K>);
 
     fn clear(&mut self);
 }
