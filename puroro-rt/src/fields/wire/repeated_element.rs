@@ -9,6 +9,7 @@
 //! repeated uses plain `bool` elements via this trait (no MessageCommon bit).
 
 use ::allocator_api2::alloc::Allocator;
+use ::allocator_api2::vec::Vec as AllocVec;
 use ::bytes::{Buf, BufMut};
 use ::core::ops::DerefMut;
 use ::core::str;
@@ -129,8 +130,11 @@ pub trait RepeatedSlicePush: RepeatedElement {
 /// Usually matches singular [`ProtoType::Mut`], except [`ProtoBool`] (singular
 /// is bit-packed; repeated stores plain `bool`).
 pub trait RepeatedElementMut: RepeatedElement {
+    /// Target of [`ElementMut`](Self::ElementMut) (`i32`, [`String`](::unmanaged::String), …).
+    type MutTarget<A: Allocator + Clone>: ?Sized;
+
     /// Mutable handle for one repeated element.
-    type ElementMut<'a, A: Allocator + Clone>: DerefMut
+    type ElementMut<'a, A: Allocator + Clone>: DerefMut<Target = Self::MutTarget<A>>
     where
         Self: 'a,
         A: 'a;
@@ -261,6 +265,8 @@ macro_rules! impl_packable_varint_repeated {
         impl RepeatedVecMut for $marker {}
 
         impl RepeatedElementMut for $marker {
+            type MutTarget<A: Allocator + Clone> = $inner;
+
             type ElementMut<'a, A: Allocator + Clone>
                 = &'a mut $inner
             where
@@ -397,6 +403,8 @@ macro_rules! impl_packable_enum_repeated {
         impl<E: $bound> RepeatedVecMut for ProtoEnum<E, $kind> {}
 
         impl<E: $bound> RepeatedElementMut for ProtoEnum<E, $kind> {
+            type MutTarget<A: Allocator + Clone> = E;
+
             type ElementMut<'a, A: Allocator + Clone>
                 = &'a mut E
             where
@@ -520,6 +528,8 @@ macro_rules! impl_packable_fixed32_repeated {
         impl RepeatedVecMut for $marker {}
 
         impl RepeatedElementMut for $marker {
+            type MutTarget<A: Allocator + Clone> = $inner;
+
             type ElementMut<'a, A: Allocator + Clone>
                 = &'a mut $inner
             where
@@ -636,6 +646,8 @@ macro_rules! impl_packable_fixed64_repeated {
         impl RepeatedVecMut for $marker {}
 
         impl RepeatedElementMut for $marker {
+            type MutTarget<A: Allocator + Clone> = $inner;
+
             type ElementMut<'a, A: Allocator + Clone>
                 = &'a mut $inner
             where
@@ -739,6 +751,8 @@ impl RepeatedSlicePush for ProtoString {
 }
 
 impl RepeatedElementMut for ProtoString {
+    type MutTarget<A: Allocator + Clone> = ::unmanaged::String<A>;
+
     type ElementMut<'a, A: Allocator + Clone>
         = <Self as ProtoType>::Mut<'a, A>
     where
@@ -829,6 +843,8 @@ impl RepeatedSlicePush for ProtoBytes {
 }
 
 impl RepeatedElementMut for ProtoBytes {
+    type MutTarget<A: Allocator + Clone> = AllocVec<u8, A>;
+
     type ElementMut<'a, A: Allocator + Clone>
         = <Self as ProtoType>::Mut<'a, A>
     where
@@ -931,6 +947,8 @@ where
 impl<M: Message> RepeatedVecMut for ProtoMessage<M> {}
 
 impl<M: Message> RepeatedElementMut for ProtoMessage<M> {
+    type MutTarget<A: Allocator + Clone> = M;
+
     type ElementMut<'a, A: Allocator + Clone>
         = &'a mut M
     where

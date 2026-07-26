@@ -29,7 +29,7 @@ pub trait MapRef<K: ?Sized, V: ?Sized> {
 /// [`entry_mut`](Self::entry_mut) takes `impl Borrow<K>` so both `entry_mut(1)`
 /// and `entry_mut("k")` work.
 pub trait MapEntryMut<K: ?Sized, V: ?Sized> {
-    type MutTarget;
+    type MutTarget: ?Sized;
 
     type Mut<'a>: DerefMut<Target = Self::MutTarget>
     where

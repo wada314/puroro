@@ -18,7 +18,7 @@ pub use fixed::{
     ProtoSFixed32, ProtoSFixed64,
 };
 pub use len::{ProtoBytes, ProtoString};
-pub use map_element::MapKey;
+pub use map_element::{MapKey, MapKeyInsert, MapValueView};
 pub use proto_message::ProtoMessage;
 pub use proto_type::{PayloadAccess, ProtoType};
 pub use repeated_element::{

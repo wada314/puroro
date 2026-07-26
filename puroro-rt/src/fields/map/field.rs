@@ -5,6 +5,7 @@
 //!
 //! On the wire each entry is a LEN message with `key = 1` and `value = 2`.
 
+use ::core::borrow::Borrow;
 use ::core::fmt::{Debug, Formatter, Result as FmtResult};
 use ::core::hash::Hash;
 
@@ -19,7 +20,7 @@ use crate::decode;
 use crate::encode;
 use crate::fields::shared::field_inspect::{FieldCloneIn, FieldDebug, FieldEncode, FieldPartialEq};
 use crate::fields::shared::{FieldDeallocate, MessageCommon, PresenceBits};
-use crate::fields::wire::map_element::MapKey;
+use crate::fields::wire::map_element::{MapKey, MapKeyInsert};
 use crate::fields::wire::repeated_element::{
     RepeatedElement, RepeatedElementMerge, RepeatedElementMut, RepeatedSlicePush,
 };
@@ -310,32 +311,15 @@ where
             .map(|elem| unsafe { V::element_mut(elem, alloc) })
     }
 
-    /// Ensures `key` exists (type-default value if vacant). Sized keys must be `Copy`.
-    pub fn entry_element_mut(&mut self, key: K::Element<A>) -> V::ElementMut<'_, A>
+    /// Ensures `key` exists (type-default value if vacant), then returns a value mut handle.
+    pub fn entry_element_mut_view(&mut self, key: &K::KeyView) -> V::ElementMut<'_, A>
     where
+        K: MapKeyInsert<A>,
         V: RepeatedElementMut + RepeatedElementMerge<A>,
-        K::Element<A>: Copy + Eq + Hash,
-    {
-        if self.field.entries.get(&key).is_none() {
-            let value = V::default_element(self.common.alloc.clone());
-            let _ = self.field.entries.insert(key, value);
-        }
-        self.get_element_mut(&key)
-            .expect("map entry present after insert")
-    }
-
-    /// Ensures a string key exists and returns a value mut handle.
-    pub fn entry_element_mut_str(&mut self, key: &str) -> V::ElementMut<'_, A>
-    where
-        K: RepeatedSlicePush,
-        V: RepeatedElementMut + RepeatedElementMerge<A>,
-        K::Element<A>: Eq + Hash,
-        str: Equivalent<K::Element<A>>,
+        K::Element<A>: Eq + Hash + Borrow<K::KeyView>,
     {
         if self.field.entries.get(key).is_none() {
-            // Key is already UTF-8; `element_from_slice` only fails on invalid UTF-8.
-            let owned_key = K::element_from_slice(key.as_bytes(), self.common.alloc.clone())
-                .expect("str is valid UTF-8");
+            let owned_key = K::key_from_view(key, self.common.alloc.clone());
             let value = V::default_element(self.common.alloc.clone());
             self.insert(owned_key, value);
         }

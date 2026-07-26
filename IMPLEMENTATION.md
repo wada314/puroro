@@ -693,6 +693,15 @@ Mutation uses the bound-view idiom: `field.bind_mut(&mut common)` → [`Repeated
 
 **Catalog:** [`MapField<K, V, FIELD, A>`](puroro-rt/src/fields/map/field.rs) with `K: MapKey`, `V: RepeatedElement`. Storage is [`MapEntries`](puroro-rt/src/fields/map/entries.rs) — a thin `hashbrown::HashMap<K::Element<A>, V::Element<A>, …, A>` that **owns** allocator `A` (unlike `UnmanagedVec` fields). Wire order is unspecified; only the hash map is kept.
 
+**Marker GATs** (same idea as singular `ProtoType::{Ref, Mut}`):
+
+| Trait | Assoc / method | Role |
+|---|---|---|
+| [`MapKey`](puroro-rt/src/fields/wire/map_element.rs) | `KeyView` | User key view (`i32`, `str`, …) |
+| [`MapKeyInsert`](puroro-rt/src/fields/wire/map_element.rs) | `key_from_view` | Materialize stored key (copy vs `RepeatedSlicePush`) |
+| [`MapValueView`](puroro-rt/src/fields/wire/map_element.rs) | `View` / `as_view` | Shared value view (not `ProtoType::Ref`) |
+| [`RepeatedElementMut`](puroro-rt/src/fields/wire/repeated_element.rs) | `MutTarget` / `ElementMut` | Mutable handle target |
+
 **Wire:** each map occurrence is one LEN field `FIELD` whose payload is a synthetic entry message (`key = 1`, `value = 2`). Encode/decode helpers live in [`map/entry.rs`](puroro-rt/src/fields/map/entry.rs). Element tags use `K::encode_element` / `V::encode_element`. Decode uses `RepeatedElementMerge::{decode_element, default_element}` (singular wire types only; packed rejected inside the entry). Missing key/value → type default. Unknown tags inside the entry are skipped via [`skip_field`](puroro-rt/src/decode.rs) (not preserved).
 
 | | Behaviour |
@@ -701,20 +710,20 @@ Mutation uses the bound-view idiom: `field.bind_mut(&mut common)` → [`Repeated
 | Merge | Decode one entry → `insert` (last-wins; frees replaced value + discarded key) |
 | Empty | Absent on the wire |
 
-**Bound views:** `bind` / `bind_mut` → [`MapFieldRef`](puroro-rt/src/fields/map/field.rs) / [`MapFieldMut`](puroro-rt/src/fields/map/field.rs). Mut methods take `&mut self` so a single handle supports multiple ops.
+**Bound views:** `bind` / `bind_mut` → [`MapFieldRef`](puroro-rt/src/fields/map/field.rs) / [`MapFieldMut`](puroro-rt/src/fields/map/field.rs).
 
 Catalog helpers on `MapFieldMut`:
 
 | Method | Role |
 |---|---|
-| `get` / `get_mut` / `iter` / `len` | Lookup (`Q: Equivalent` against stored key) |
-| `insert` | Owned key + value elements (catalog / merge; not a user trait) |
-| `insert_str` / `entry_element_mut_str` | `map<string, …>` from `&str` |
-| `entry_element_mut` | Sized / `Copy` keys — ensure default value |
+| `get` / `get_mut` / `get_element_mut` / `len` | Lookup (`Q: Equivalent` against stored key) |
+| `insert` | Owned key + value elements (catalog / merge) |
+| `insert_str` | `map<string, …>` convenience from `&str` |
+| `entry_element_mut_view` | Ensure via `MapKeyInsert::key_from_view` + default value |
 | `remove` / `clear` | Free key + value via `deallocate_element` |
 | `merge` | One wire occurrence |
 
-User-facing traits ([`src/map.rs`](src/map.rs), see [DESIGN.md §4.10](DESIGN.md#410-map-fields)): only `MapRef` + `MapEntryMut` (`K = str` for string maps). Mutation is `entry_mut` then assign / fill. Impls live in [`user_traits.rs`](puroro-rt/src/fields/map/field/user_traits.rs).
+User-facing [`MapRef`](src/map.rs) / [`MapEntryMut`](src/map.rs) are **two blanket impls** over `MapFieldRef` / `MapFieldMut` in [`user_traits.rs`](puroro-rt/src/fields/map/field/user_traits.rs) (no K×V macro matrix). Mutation is `entry_mut` then assign / fill.
 
 **Key collision safety:** `HashMap::insert` would drop a colliding incoming key; `MapEntries::insert` keeps the stored key and returns `(incoming_key, previous_value)` for explicit release (required for `UnmanagedString` keys).
 

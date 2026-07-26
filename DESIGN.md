@@ -909,14 +909,18 @@ repeated MapFieldEntry map_field = N;  // always LEN on the wire
 
 **Key types** are integral types, `bool`, or `string` (not floating-point, `bytes`, enum, or message). **Values** may be any non-map type. Duplicate keys use **last-wins** semantics; iteration / encode order is unspecified.
 
-Public map views live in [`src/map.rs`](src/map.rs) (re-exported from `puroro`). `K` is a **key view** (`str`, `i32`, …), not an owned buffer type — string maps use `K = str` so lookups take `&str` without bridging to `String<A>` / `UnmanagedString`.
+Public map views live in [`src/map.rs`](src/map.rs) (re-exported from `puroro`). `K` / `V` are **view** types (`str`, `i32`, …), not owned buffers — string maps use `K = str`.
 
-| Trait | Role |
+Same layering as singular fields (`ProtoType::{Ref, Mut}` → generic `SingularField`): wire markers carry the view GATs, and `MapFieldRef` / `MapFieldMut` implement the user traits with **blankets** (no K×V macro matrix).
+
+| Layer | Role |
 |---|---|
-| [`MapRef`](src/map.rs)`<K, V>` | Shared: `get` / `len` / `is_empty` |
-| [`MapEntryMut`](src/map.rs)`<K, V>` | Mutable for any key: `get` / `get_mut` / `entry_mut` / `remove` / `clear`. `MutTarget` + `Mut` mirror singular `_mut` (`DerefMut`). `entry_mut` takes `impl Borrow<K>` (`entry_mut(1)`, `entry_mut("k")`) |
+| [`MapKey`](puroro-rt/src/fields/wire/map_element.rs) / [`MapKeyInsert`](puroro-rt/src/fields/wire/map_element.rs) | `KeyView` + `key_from_view` (sized copy vs string allocate) |
+| [`MapValueView`](puroro-rt/src/fields/wire/map_element.rs) | `View` + `as_view` (identity vs string/bytes `Deref`) |
+| [`RepeatedElementMut::MutTarget`](puroro-rt/src/fields/wire/repeated_element.rs) | `_mut` target (`i32`, `String<A>`, …) |
+| [`MapRef`](src/map.rs) / [`MapEntryMut`](src/map.rs) | User API: `get` / `entry_mut(impl Borrow<K>)` / … |
 
-There is no separate `insert` API: set values with `entry_mut` then assign / fill. Codegen pins `MutTarget` on the mutator return type (`i32`, `String<A>`, …) so those methods resolve through `impl Trait`.
+There is no separate `insert` API: set values with `entry_mut` then assign / fill. Codegen pins `MutTarget` on the mutator return type so those methods resolve through `impl Trait`.
 
 Generated accessors (`tag_ids` / `watchers` idiom):
 
@@ -950,7 +954,7 @@ labels_mut().entry_mut(1).push_str("hello");
 - Missing `key` / `value` inside an entry decode as protobuf type defaults.
 - Map entry unknowns are skipped (not preserved).
 
-Catalog type: `MapField<K, V, FIELD, A>` with `K: MapKey`, `V: RepeatedElement` — see [IMPLEMENTATION.md §15.1](IMPLEMENTATION.md#151-map-fields).
+Catalog type: `MapField<K, V, FIELD, A>` with `K: MapKey`, `V: MapValueView` — see [IMPLEMENTATION.md §15.1](IMPLEMENTATION.md#151-map-fields).
 
 ---
 
