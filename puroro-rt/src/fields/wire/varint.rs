@@ -53,29 +53,26 @@ impl<E: ProtoEnumStorage> ProtoEmpty for E {
 // Numeric markers (wire via NumericalType)
 // ---------------------------------------------------------------------------
 
-macro_rules! proto_varint_marker {
-    ($(#[$meta:meta])* $name:ident) => {
-        $(#[$meta])*
-        #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
-        pub struct $name;
-    };
-}
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
+pub struct ProtoUInt32;
 
-proto_varint_marker! { ProtoUInt32 }
-proto_varint_marker! { ProtoUInt64 }
-proto_varint_marker! {
-    /// Protobuf `int32`.
-    ProtoInt32
-}
-proto_varint_marker! { ProtoInt64 }
-proto_varint_marker! {
-    /// Protobuf `sint32` — varint with ZigZag encoding.
-    ProtoSint32
-}
-proto_varint_marker! {
-    /// Protobuf `sint64` — varint with ZigZag encoding.
-    ProtoSint64
-}
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
+pub struct ProtoUInt64;
+
+/// Protobuf `int32`.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
+pub struct ProtoInt32;
+
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
+pub struct ProtoInt64;
+
+/// Protobuf `sint32` — varint with ZigZag encoding.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
+pub struct ProtoSint32;
+
+/// Protobuf `sint64` — varint with ZigZag encoding.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
+pub struct ProtoSint64;
 
 /// Protobuf `bool` type marker — varint 0 or 1.
 ///
