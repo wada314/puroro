@@ -10,7 +10,7 @@ use ::allocator_api2::alloc::Allocator;
 use ::puroro::{MapMut, MapRef};
 
 use crate::fields::shared::PresenceBits;
-use crate::fields::wire::map_element::{MapKey, MapKeyInsert, MapValueView};
+use crate::fields::wire::map_element::{MapKey, MapValueView};
 use crate::fields::wire::repeated_element::{RepeatedElementMerge, RepeatedElementMut};
 
 use super::{MapFieldMut, MapFieldRef};
@@ -38,7 +38,7 @@ where
 impl<'f, 'c, K, V, const FIELD: u32, A, Pb> MapMut<K::KeyView, V::View>
     for MapFieldMut<'f, 'c, K, V, FIELD, A, Pb>
 where
-    K: MapKeyInsert<A>,
+    K: MapKey,
     V: MapValueView + RepeatedElementMut + RepeatedElementMerge<A>,
     A: Allocator + Clone,
     Pb: PresenceBits,

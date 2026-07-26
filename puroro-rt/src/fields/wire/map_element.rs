@@ -27,17 +27,14 @@ use ::puroro::Message;
 /// enum, or message. Storage is [`RepeatedElement::Element`].
 ///
 /// [`KeyView`](Self::KeyView) is the user-facing key type (`i32`, `str`, …).
+/// Implementors must ensure `Element<A>: Eq + Hash + Borrow<KeyView>` so lookups
+/// via [`KeyView`] work with hashbrown `Equivalent`.
 pub trait MapKey: RepeatedElement {
     /// Shared key view for [`MapRef`](::puroro::MapRef) / [`MapMut`](::puroro::MapMut).
     type KeyView: ?Sized + Hash + Eq;
-}
 
-/// Build a stored key from a [`MapKey::KeyView`] (map `entry_mut` / insert path).
-///
-/// Implementors must ensure `Element<A>: Eq + Hash + Borrow<KeyView>` so lookups
-/// via [`KeyView`](MapKey::KeyView) work with hashbrown `Equivalent`.
-pub trait MapKeyInsert<A: Allocator + Clone>: MapKey {
-    fn key_from_view(view: &Self::KeyView, alloc: A) -> Self::Element<A>;
+    /// Build a stored key from a [`KeyView`](Self::KeyView) (`entry_mut` path).
+    fn key_from_view<A: Allocator + Clone>(view: &Self::KeyView, alloc: A) -> Self::Element<A>;
 }
 
 /// Shared map-value view projection (`Element` → user-facing [`View`](Self::View)).
@@ -51,18 +48,16 @@ pub trait MapValueView: RepeatedElement {
 }
 
 // ---------------------------------------------------------------------------
-// MapKey + MapKeyInsert
+// MapKey
 // ---------------------------------------------------------------------------
 
 macro_rules! impl_copy_map_key {
     ($marker:ty, $view:ty) => {
         impl MapKey for $marker {
             type KeyView = $view;
-        }
 
-        impl<A: Allocator + Clone> MapKeyInsert<A> for $marker {
             #[inline]
-            fn key_from_view(view: &$view, _alloc: A) -> $view {
+            fn key_from_view<A: Allocator + Clone>(view: &$view, _alloc: A) -> $view {
                 *view
             }
         }
@@ -83,11 +78,9 @@ impl_copy_map_key!(ProtoSFixed64, i64);
 
 impl MapKey for ProtoString {
     type KeyView = str;
-}
 
-impl<A: Allocator + Clone> MapKeyInsert<A> for ProtoString {
     #[inline]
-    fn key_from_view(view: &str, alloc: A) -> UnmanagedString<A> {
+    fn key_from_view<A: Allocator + Clone>(view: &str, alloc: A) -> UnmanagedString<A> {
         // Key is already UTF-8; `element_from_slice` only fails on invalid UTF-8.
         <ProtoString as RepeatedSlicePush>::element_from_slice(view.as_bytes(), alloc)
             .expect("str is valid UTF-8")

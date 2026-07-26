@@ -697,8 +697,7 @@ Mutation uses the bound-view idiom: `field.bind_mut(&mut common)` → [`Repeated
 
 | Trait | Assoc / method | Role |
 |---|---|---|
-| [`MapKey`](puroro-rt/src/fields/wire/map_element.rs) | `KeyView` | User key view (`i32`, `str`, …) |
-| [`MapKeyInsert`](puroro-rt/src/fields/wire/map_element.rs) | `key_from_view` | Materialize stored key (copy vs `RepeatedSlicePush`) |
+| [`MapKey`](puroro-rt/src/fields/wire/map_element.rs) | `KeyView` + `key_from_view` | User key view (`i32`, `str`, …); materialize stored key |
 | [`MapValueView`](puroro-rt/src/fields/wire/map_element.rs) | `View` / `as_view` | Shared value view (not `ProtoType::Ref`) |
 | [`RepeatedElementMut`](puroro-rt/src/fields/wire/repeated_element.rs) | `MutTarget` / `ElementMut` | Mutable handle target |
 
@@ -719,7 +718,7 @@ Catalog helpers on `MapFieldMut`:
 | `get` / `get_mut` / `get_element_mut` / `len` | Lookup (`Q: Equivalent` against stored key) |
 | `insert` | Owned key + value elements (catalog / merge) |
 | `insert_str` | `map<string, …>` convenience from `&str` |
-| `entry_element_mut_view` | Ensure via `MapKeyInsert::key_from_view` + default value |
+| `entry_element_mut_view` | Ensure via `MapKey::key_from_view` + default value |
 | `remove` / `clear` | Free key + value via `deallocate_element` |
 | `merge` | One wire occurrence |
 

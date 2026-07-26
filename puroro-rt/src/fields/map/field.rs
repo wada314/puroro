@@ -20,7 +20,7 @@ use crate::decode;
 use crate::encode;
 use crate::fields::shared::field_inspect::{FieldCloneIn, FieldDebug, FieldEncode, FieldPartialEq};
 use crate::fields::shared::{FieldDeallocate, MessageCommon, PresenceBits};
-use crate::fields::wire::map_element::{MapKey, MapKeyInsert};
+use crate::fields::wire::map_element::MapKey;
 use crate::fields::wire::repeated_element::{
     RepeatedElement, RepeatedElementMerge, RepeatedElementMut, RepeatedSlicePush,
 };
@@ -314,7 +314,6 @@ where
     /// Ensures `key` exists (type-default value if vacant), then returns a value mut handle.
     pub fn entry_element_mut_view(&mut self, key: &K::KeyView) -> V::ElementMut<'_, A>
     where
-        K: MapKeyInsert<A>,
         V: RepeatedElementMut + RepeatedElementMerge<A>,
         K::Element<A>: Eq + Hash + Borrow<K::KeyView>,
     {
