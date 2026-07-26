@@ -893,7 +893,7 @@ mod tests {
         assert!(content.contains("ProtoString"));
         assert!(content.contains("ProtoInt32"));
         assert!(content.contains("MapRef"));
-        assert!(content.contains("MapMut"));
+        assert!(content.contains("MapStrInsert"));
         assert!(content.contains("fn attributes"));
         assert!(content.contains("clear_attributes"));
         // Synthetic map-entry message must not be emitted as a user type.
@@ -968,7 +968,7 @@ mod tests {
         let response = emit(&request).unwrap();
         let content = &response.files[0].content;
         assert!(content.contains("MapField"));
-        assert!(content.contains("MapEntryMut"));
+        assert!(content.contains("MapEntryInsert"));
         assert!(content.contains("ProtoInt32"));
         assert!(content.contains("ProtoBool"));
         assert!(!content.contains("::puroro::MapMut"));

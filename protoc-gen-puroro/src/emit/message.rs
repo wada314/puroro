@@ -66,10 +66,14 @@ struct MapEmit {
     value_marker: TokenStream,
     /// User-facing key type in `MapRef` / mut traits (`str`, `i32`, …).
     key_view: TokenStream,
-    /// User-facing value type (`i32`, `bool`, …).
+    /// Shared view type for `MapRef` (`i32`, `str`, `Address<A>`, …).
     value_view: TokenStream,
     /// `MapMut` (string keys) vs `MapEntryMut` (sized keys).
     string_key: bool,
+    /// Sized view values expose `insert` / `insert_str` (`MapEntryInsert` / `MapStrInsert`).
+    insertable: bool,
+    /// When set, pin `MutTarget` on the mutator return type (string / bytes).
+    mut_target: Option<TokenStream>,
 }
 
 #[derive(Clone, Copy)]
@@ -561,7 +565,7 @@ fn map_emit(
     value: &WireTypeKind<'_>,
 ) -> Result<MapEmit> {
     let (key_view, string_key) = map_key_view(key, name)?;
-    let value_view = map_value_view(value, name)?;
+    let (value_view, insertable, mut_target) = map_value_view(value, name)?;
     Ok(MapEmit {
         name: rust_ident(name),
         name_str: name.to_owned(),
@@ -572,6 +576,8 @@ fn map_emit(
         key_view,
         value_view,
         string_key,
+        insertable,
+        mut_target,
     })
 }
 
@@ -595,19 +601,35 @@ fn map_key_view(key: &WireTypeKind<'_>, field_name: &str) -> Result<(TokenStream
     })
 }
 
-fn map_value_view(value: &WireTypeKind<'_>, field_name: &str) -> Result<TokenStream> {
+/// Returns `(shared view, insertable, optional MutTarget pin)`.
+fn map_value_view(
+    value: &WireTypeKind<'_>,
+    _field_name: &str,
+) -> Result<(TokenStream, bool, Option<TokenStream>)> {
     Ok(match value {
-        WireTypeKind::Double => quote! { f64 },
-        WireTypeKind::Float => quote! { f32 },
-        WireTypeKind::Bool => quote! { bool },
-        WireTypeKind::Int32 | WireTypeKind::SInt32 | WireTypeKind::SFixed32 => quote! { i32 },
-        WireTypeKind::Int64 | WireTypeKind::SInt64 | WireTypeKind::SFixed64 => quote! { i64 },
-        WireTypeKind::UInt32 | WireTypeKind::Fixed32 => quote! { u32 },
-        WireTypeKind::UInt64 | WireTypeKind::Fixed64 => quote! { u64 },
-        other => {
-            return Err(Error::Codegen(format!(
-                "map field `{field_name}`: map values of type {other:?} are not supported yet"
-            )));
+        WireTypeKind::Double => (quote! { f64 }, true, None),
+        WireTypeKind::Float => (quote! { f32 }, true, None),
+        WireTypeKind::Bool => (quote! { bool }, true, None),
+        WireTypeKind::Int32 | WireTypeKind::SInt32 | WireTypeKind::SFixed32 => {
+            (quote! { i32 }, true, None)
+        }
+        WireTypeKind::Int64 | WireTypeKind::SInt64 | WireTypeKind::SFixed64 => {
+            (quote! { i64 }, true, None)
+        }
+        WireTypeKind::UInt32 | WireTypeKind::Fixed32 => (quote! { u32 }, true, None),
+        WireTypeKind::UInt64 | WireTypeKind::Fixed64 => (quote! { u64 }, true, None),
+        WireTypeKind::String { .. } => {
+            (quote! { str }, false, Some(quote! { ::puroro::String<A> }))
+        }
+        WireTypeKind::Bytes { .. } => (
+            quote! { [u8] },
+            false,
+            Some(quote! { ::allocator_api2::vec::Vec<u8, A> }),
+        ),
+        WireTypeKind::Enum { ty, .. } => (fqn_to_enum_root_path(ty)?, true, None),
+        WireTypeKind::Message(m) => {
+            let path = fqn_to_message_root_path(m)?;
+            (quote! { #path<A> }, true, None)
         }
     })
 }
@@ -899,13 +921,21 @@ fn render_map_accessors(field: &MapEmit) -> TokenStream {
     let clear_name = Ident::new(&format!("clear_{}", field.name_str), Span::call_site());
     let key_view = &field.key_view;
     let value_view = &field.value_view;
+    let mut_target_bound = field.mut_target.as_ref().map(|t| {
+        quote! { , MutTarget = #t }
+    });
     if field.string_key {
+        let mut_trait = if field.insertable {
+            quote! { ::puroro::MapStrInsert<#value_view> }
+        } else {
+            quote! { ::puroro::MapMut<#value_view #mut_target_bound> }
+        };
         quote! {
-            pub fn #name(&self) -> impl ::puroro::MapRef<#key_view, #value_view> + '_ {
+            pub fn #name(&self) -> impl ::puroro::MapRef<str, #value_view> + '_ {
                 self.#name.bind(&self._common)
             }
 
-            pub fn #name_mut(&mut self) -> impl ::puroro::MapMut<#key_view, #value_view> + '_ {
+            pub fn #name_mut(&mut self) -> impl #mut_trait + '_ {
                 self.#name.bind_mut(&mut self._common)
             }
 
@@ -914,12 +944,17 @@ fn render_map_accessors(field: &MapEmit) -> TokenStream {
             }
         }
     } else {
+        let mut_trait = if field.insertable {
+            quote! { ::puroro::MapEntryInsert<#key_view, #value_view> }
+        } else {
+            quote! { ::puroro::MapEntryMut<#key_view, #value_view #mut_target_bound> }
+        };
         quote! {
             pub fn #name(&self) -> impl ::puroro::MapRef<#key_view, #value_view> + '_ {
                 self.#name.bind(&self._common)
             }
 
-            pub fn #name_mut(&mut self) -> impl ::puroro::MapEntryMut<#key_view, #value_view> + '_ {
+            pub fn #name_mut(&mut self) -> impl #mut_trait + '_ {
                 self.#name.bind_mut(&mut self._common)
             }
 

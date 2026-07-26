@@ -13,7 +13,7 @@ use ::bytes::{Buf, BufMut};
 use ::hashbrown::Equivalent;
 use ::unmanaged::CloneIn;
 
-use ::puroro::{DecodeError, MapEntryMut, MapMut, MapRef, WireType};
+use ::puroro::{DecodeError, WireType};
 
 use crate::decode;
 use crate::encode;
@@ -21,15 +21,13 @@ use crate::fields::shared::field_inspect::{FieldCloneIn, FieldDebug, FieldEncode
 use crate::fields::shared::{FieldDeallocate, MessageCommon, PresenceBits};
 use crate::fields::wire::map_element::MapKey;
 use crate::fields::wire::repeated_element::{
-    RepeatedElement, RepeatedElementMerge, RepeatedSlicePush,
-};
-use crate::fields::wire::{
-    ProtoBool, ProtoDouble, ProtoFixed32, ProtoFixed64, ProtoFloat, ProtoInt32, ProtoInt64,
-    ProtoSFixed32, ProtoSFixed64, ProtoSint32, ProtoSint64, ProtoString, ProtoUInt32, ProtoUInt64,
+    RepeatedElement, RepeatedElementMerge, RepeatedElementMut, RepeatedSlicePush,
 };
 
 use super::entries::MapEntries;
 use super::entry::{decode_map_entry, encode_map_entry, entry_payload_len};
+
+mod user_traits;
 
 /// Map field: key marker `K`, value marker `V`, field number `FIELD`, allocator `A`.
 ///
@@ -263,166 +261,6 @@ where
     }
 }
 
-macro_rules! impl_map_ref {
-    ($key_marker:ty, $key_view:ty, $val_marker:ty, $val_view:ty) => {
-        impl<'a, const FIELD: u32, A, Pb> MapRef<$key_view, $val_view>
-            for MapFieldRef<'a, $key_marker, $val_marker, FIELD, A, Pb>
-        where
-            A: Allocator + Clone,
-            Pb: PresenceBits,
-        {
-            #[inline]
-            fn len(&self) -> usize {
-                self.field.len()
-            }
-
-            #[inline]
-            fn get(&self, key: &$key_view) -> Option<&$val_view> {
-                self.field.entries.get(key)
-            }
-        }
-    };
-}
-
-macro_rules! impl_map_entry_mut {
-    ($key_marker:ty, $key_view:ty, $val_marker:ty, $val_view:ty) => {
-        impl<'f, 'c, const FIELD: u32, A, Pb> MapEntryMut<$key_view, $val_view>
-            for MapFieldMut<'f, 'c, $key_marker, $val_marker, FIELD, A, Pb>
-        where
-            A: Allocator + Clone,
-            Pb: PresenceBits,
-        {
-            #[inline]
-            fn len(&self) -> usize {
-                self.field.len()
-            }
-
-            #[inline]
-            fn get(&self, key: &$key_view) -> Option<&$val_view> {
-                self.field.entries.get(key)
-            }
-
-            #[inline]
-            fn get_mut(&mut self, key: &$key_view) -> Option<&mut $val_view> {
-                self.field.entries.get_mut(key)
-            }
-
-            #[inline]
-            fn insert(&mut self, key: $key_view, value: $val_view) {
-                MapFieldMut::insert(self, key, value);
-            }
-
-            #[inline]
-            fn remove(&mut self, key: &$key_view) {
-                MapFieldMut::remove(self, key);
-            }
-
-            #[inline]
-            fn clear(&mut self) {
-                MapFieldMut::clear(self);
-            }
-        }
-    };
-}
-
-macro_rules! impl_map_string_mut {
-    ($val_marker:ty, $val_view:ty) => {
-        impl<'f, 'c, const FIELD: u32, A, Pb> MapMut<str, $val_view>
-            for MapFieldMut<'f, 'c, ProtoString, $val_marker, FIELD, A, Pb>
-        where
-            A: Allocator + Clone,
-            Pb: PresenceBits,
-        {
-            #[inline]
-            fn len(&self) -> usize {
-                self.field.len()
-            }
-
-            #[inline]
-            fn get(&self, key: &str) -> Option<&$val_view> {
-                self.field.entries.get(key)
-            }
-
-            #[inline]
-            fn get_mut(&mut self, key: &str) -> Option<&mut $val_view> {
-                self.field.entries.get_mut(key)
-            }
-
-            #[inline]
-            fn insert_in(
-                &mut self,
-                key: impl AsRef<[u8]>,
-                value: $val_view,
-            ) -> Result<(), DecodeError> {
-                MapFieldMut::insert_in(self, key, value)
-            }
-
-            #[inline]
-            fn remove(&mut self, key: &str) {
-                MapFieldMut::remove(self, key);
-            }
-
-            #[inline]
-            fn clear(&mut self) {
-                MapFieldMut::clear(self);
-            }
-        }
-    };
-}
-
-/// Copy scalar / bool map values supported by the public map traits today.
-macro_rules! for_each_map_value {
-    ($callback:ident $($fixed:tt)*) => {
-        $callback!($($fixed)* ProtoDouble, f64);
-        $callback!($($fixed)* ProtoFloat, f32);
-        $callback!($($fixed)* ProtoInt64, i64);
-        $callback!($($fixed)* ProtoUInt64, u64);
-        $callback!($($fixed)* ProtoInt32, i32);
-        $callback!($($fixed)* ProtoFixed64, u64);
-        $callback!($($fixed)* ProtoFixed32, u32);
-        $callback!($($fixed)* ProtoBool, bool);
-        $callback!($($fixed)* ProtoUInt32, u32);
-        $callback!($($fixed)* ProtoSFixed32, i32);
-        $callback!($($fixed)* ProtoSFixed64, i64);
-        $callback!($($fixed)* ProtoSint32, i32);
-        $callback!($($fixed)* ProtoSint64, i64);
-    };
-}
-
-macro_rules! impl_sized_key_value_pair {
-    ($key_marker:ty, $key_view:ty, $val_marker:ty, $val_view:ty) => {
-        impl_map_ref!($key_marker, $key_view, $val_marker, $val_view);
-        impl_map_entry_mut!($key_marker, $key_view, $val_marker, $val_view);
-    };
-}
-
-macro_rules! impl_string_key_value_pair {
-    ($val_marker:ty, $val_view:ty) => {
-        impl_map_ref!(ProtoString, str, $val_marker, $val_view);
-        impl_map_string_mut!($val_marker, $val_view);
-    };
-}
-
-macro_rules! impl_all_values_for_sized_key {
-    ($key_marker:ty, $key_view:ty) => {
-        for_each_map_value!(impl_sized_key_value_pair $key_marker, $key_view,);
-    };
-}
-
-for_each_map_value!(impl_string_key_value_pair);
-
-impl_all_values_for_sized_key!(ProtoInt32, i32);
-impl_all_values_for_sized_key!(ProtoInt64, i64);
-impl_all_values_for_sized_key!(ProtoUInt32, u32);
-impl_all_values_for_sized_key!(ProtoUInt64, u64);
-impl_all_values_for_sized_key!(ProtoSint32, i32);
-impl_all_values_for_sized_key!(ProtoSint64, i64);
-impl_all_values_for_sized_key!(ProtoFixed32, u32);
-impl_all_values_for_sized_key!(ProtoFixed64, u64);
-impl_all_values_for_sized_key!(ProtoSFixed32, i32);
-impl_all_values_for_sized_key!(ProtoSFixed64, i64);
-impl_all_values_for_sized_key!(ProtoBool, bool);
-
 /// Short-lived binding of a map field to its message common state.
 pub struct MapFieldMut<'f, 'c, K, V, const FIELD: u32, A, Pb>
 where
@@ -456,6 +294,55 @@ where
         self.field.entries.get_mut(key)
     }
 
+    /// Mutable element handle (string/bytes → guard; scalars/messages → `&mut`).
+    #[inline]
+    pub fn get_element_mut<Q>(&mut self, key: &Q) -> Option<V::ElementMut<'_, A>>
+    where
+        V: RepeatedElementMut,
+        K::Element<A>: Eq + Hash,
+        Q: ?Sized + Hash + Equivalent<K::Element<A>>,
+    {
+        let alloc = self.common.alloc.clone();
+        self.field
+            .entries
+            .get_mut(key)
+            // SAFETY: message allocator owns heap-backed elements.
+            .map(|elem| unsafe { V::element_mut(elem, alloc) })
+    }
+
+    /// Ensures `key` exists (type-default value if vacant). Sized keys must be `Copy`.
+    pub fn entry_element_mut(&mut self, key: K::Element<A>) -> V::ElementMut<'_, A>
+    where
+        V: RepeatedElementMut + RepeatedElementMerge<A>,
+        K::Element<A>: Copy + Eq + Hash,
+    {
+        if self.field.entries.get(&key).is_none() {
+            let value = V::default_element(self.common.alloc.clone());
+            let _ = self.field.entries.insert(key, value);
+        }
+        self.get_element_mut(&key)
+            .expect("map entry present after insert")
+    }
+
+    /// Ensures a string key exists and returns a value mut handle.
+    pub fn entry_element_mut_str(&mut self, key: &str) -> V::ElementMut<'_, A>
+    where
+        K: RepeatedSlicePush,
+        V: RepeatedElementMut + RepeatedElementMerge<A>,
+        K::Element<A>: Eq + Hash,
+        str: Equivalent<K::Element<A>>,
+    {
+        if self.field.entries.get(key).is_none() {
+            // Key is already UTF-8; `element_from_slice` only fails on invalid UTF-8.
+            let owned_key = K::element_from_slice(key.as_bytes(), self.common.alloc.clone())
+                .expect("str is valid UTF-8");
+            let value = V::default_element(self.common.alloc.clone());
+            self.insert(owned_key, value);
+        }
+        self.get_element_mut(key)
+            .expect("map entry present after insert")
+    }
+
     /// Inserts with last-wins. Replaced value and discarded key are released.
     pub fn insert(&mut self, key: K::Element<A>, value: V::Element<A>)
     where
@@ -471,21 +358,15 @@ where
         }
     }
 
-    /// Builds a key from a byte slice (`map<string, …>` / `map<bytes, …>`) and inserts.
-    ///
-    /// Analogous to [`RepeatedFieldMut::push_in`](crate::fields::repeated::field::RepeatedFieldMut::push_in).
-    pub fn insert_in(
-        &mut self,
-        key: impl AsRef<[u8]>,
-        value: V::Element<A>,
-    ) -> Result<(), DecodeError>
+    /// Builds a `map<string, …>` key from `&str` and inserts.
+    pub fn insert_str(&mut self, key: &str, value: V::Element<A>)
     where
         K: RepeatedSlicePush,
         K::Element<A>: Eq + Hash,
     {
-        let key = K::element_from_slice(key.as_ref(), self.common.alloc.clone())?;
-        self.insert(key, value);
-        Ok(())
+        let owned_key = K::element_from_slice(key.as_bytes(), self.common.alloc.clone())
+            .expect("str is valid UTF-8");
+        self.insert(owned_key, value);
     }
 
     pub fn remove<Q>(&mut self, key: &Q)

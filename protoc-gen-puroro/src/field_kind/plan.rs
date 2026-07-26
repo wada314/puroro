@@ -306,9 +306,8 @@ fn validate_map_key_wire(key: &WireTypeKind<'_>, field_name: &str) -> Result<()>
     }
 }
 
-fn validate_map_value_wire(value: &WireTypeKind<'_>, field_name: &str) -> Result<()> {
-    // Step-1 public traits cover Copy scalars + bool only. string / bytes /
-    // enum / message values need separate MapMut / get_mut APIs.
+fn validate_map_value_wire(value: &WireTypeKind<'_>, _field_name: &str) -> Result<()> {
+    // Any non-map value is allowed (maps-of-maps do not appear in descriptors).
     match value {
         WireTypeKind::Double
         | WireTypeKind::Float
@@ -322,14 +321,11 @@ fn validate_map_value_wire(value: &WireTypeKind<'_>, field_name: &str) -> Result
         | WireTypeKind::Fixed64
         | WireTypeKind::SFixed32
         | WireTypeKind::SFixed64
-        | WireTypeKind::Bool => Ok(()),
-        WireTypeKind::String { .. }
+        | WireTypeKind::Bool
+        | WireTypeKind::String { .. }
         | WireTypeKind::Bytes { .. }
         | WireTypeKind::Enum { .. }
-        | WireTypeKind::Message(_) => Err(Error::Codegen(format!(
-            "map field `{field_name}`: map values of type {value:?} are not supported yet \
-             (Copy scalars and bool only)"
-        ))),
+        | WireTypeKind::Message(_) => Ok(()),
     }
 }
 
@@ -955,7 +951,7 @@ mod tests {
     }
 
     #[test]
-    fn unsupported_map_value_is_rejected() {
+    fn map_string_string_plans_map_kind() {
         let arena = Arena::new();
         let files = [proto3_file(vec![MessageDesc {
             name: "Holder".into(),
@@ -1001,8 +997,17 @@ mod tests {
         }])];
         let set = resolve(&arena, &files).unwrap();
         let msg = set.lookup(".example.Holder").unwrap().as_message().unwrap();
-        let err = plan_message(msg).unwrap_err().to_string();
-        assert!(err.contains("not supported yet"), "{err}");
+        let plan = plan_message(msg).unwrap();
+        let MessageMember::Field(labels) = &plan.members()[0] else {
+            panic!("map must be a top-level field");
+        };
+        match labels.kind() {
+            FieldKind::Map {
+                key: WireTypeKind::String { .. },
+                value: WireTypeKind::String { .. },
+            } => {}
+            other => panic!("{other:?}"),
+        }
     }
 
     #[test]

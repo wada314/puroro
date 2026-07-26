@@ -1,7 +1,22 @@
 syntax = "proto3";
 
+message Peer {
+  optional string name = 1;
+}
+
+enum Kind {
+  KIND_UNSPECIFIED = 0;
+  KIND_A = 1;
+  KIND_B = 2;
+}
+
 message Holder {
   map<string, int32> attributes = 1;
   map<int32, bool> flags = 2;
   map<bool, uint64> counters = 3;
+  map<int32, string> labels = 4;
+  map<int32, bytes> blobs = 5;
+  map<int32, Kind> kinds = 6;
+  map<int32, Peer> peers = 7;
+  map<string, string> aliases = 8;
 }

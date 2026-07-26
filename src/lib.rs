@@ -22,7 +22,7 @@ pub mod wire_type;
 /// Allocator-aware string buffer used as `Target` of generated string `_mut` accessors.
 pub use ::unmanaged::String;
 pub use error::{DecodeError, EncodeError};
-pub use map::{MapEntryMut, MapMut, MapRef};
+pub use map::{MapEntryInsert, MapEntryMut, MapMut, MapRef, MapStrInsert};
 pub use message::{Message, RECURSION_LIMIT};
 pub use oneof::{OneofView, OneofViewMut};
 pub use optional::{HasDefault, Optional};
