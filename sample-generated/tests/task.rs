@@ -6,8 +6,7 @@
 
 use ::allocator_api2::alloc::Global;
 use ::puroro::{
-    MapRef, MapStrInsert, Message, OneofView, OneofViewMut, RepeatedStringMut,
-    UnknownPayload,
+    MapEntryMut, MapRef, Message, OneofView, OneofViewMut, RepeatedStringMut, UnknownPayload,
 };
 use ::puroro_rt::encode::encode_varint_field;
 use ::puroro_sample_generated::task::{Notification, NotificationCase};
@@ -126,8 +125,8 @@ fn task_fields_roundtrip() {
     task.watchers_mut().push(watcher);
     task.votes_mut().push(true);
     task.votes_mut().push(false);
-    task.attributes_mut().insert_str("region", 81);
-    task.attributes_mut().insert_str("tier", 2);
+    *task.attributes_mut().entry_mut("region") = 81;
+    *task.attributes_mut().entry_mut("tier") = 2;
 
     task.validate().unwrap();
 
@@ -174,8 +173,8 @@ fn map_attributes_last_wins_on_merge() {
     task.owner_id_mut().push_str("u");
     {
         let mut attrs = task.attributes_mut();
-        attrs.insert_str("k", 1);
-        attrs.insert_str("k", 2);
+        *attrs.entry_mut("k") = 1;
+        *attrs.entry_mut("k") = 2;
         *attrs.get_mut("k").unwrap() = 3;
     }
     assert_eq!(task.attributes().get("k").copied(), Some(3));

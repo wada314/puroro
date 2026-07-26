@@ -320,7 +320,7 @@ The normative generated API is the concrete message struct's inherent `impl` blo
 | Nested message (`assignee`) | `Option<&M<A>>` | `*_mut()` → `&mut M<A>` (creates if absent) | `clear_*()` |
 | Repeated packable / message | `&[T]` / `&[M<A>]` | `*_mut()` → `impl DerefMut<Target = Vec<T, A>>` (`allocator_api2`) | `clear_*()` |
 | Repeated string / bytes | `&[impl Deref<Target = str>]` / (bytes TBD) | `*_mut()` → `impl RepeatedStringMut<A>` (`push` then fill) | `clear_*()` |
-| Map | `impl MapRef<K, V>` | `impl MapEntryMut` / `MapEntryInsert` / `MapStrInsert` (see [§4.10](#410-map-fields)) | `clear_*()` (or `*_mut().clear()`) |
+| Map | `impl MapRef<K, V>` | `impl MapEntryMut<K, V>` (see [§4.10](#410-map-fields)) | `clear_*()` (or `*_mut().clear()`) |
 | Oneof group | `impl OneofView` (`case()` / `as_ref()`) | `impl OneofViewMut` + per-variant `*_mut()` | `clear_notification()` |
 
 Presence for EXPLICIT fields is checked with `field().is_set()` / `field().get()` — there are **no** generated `has_*`, `*_raw`, `set_*`, or `push_*` helpers. Mutation is entirely via `_mut` (+ `clear_*`); see also [§5.1 Mutation API](#51-chosen-design-single-type-parameter).
@@ -915,10 +915,8 @@ Public map views live in [`src/map.rs`](src/map.rs) (re-exported from `puroro`).
 |---|---|
 | [`MapRef`](src/map.rs)`<K, V>` | Shared: `get` / `len` / `is_empty` |
 | [`MapEntryMut`](src/map.rs)`<K, V>` | Mutable for any key: `get` / `get_mut` / `entry_mut` / `remove` / `clear`. `MutTarget` + `Mut` mirror singular `_mut` (`DerefMut`). `entry_mut` takes `impl Borrow<K>` (`entry_mut(1)`, `entry_mut("k")`) |
-| [`MapEntryInsert`](src/map.rs)`<K, V>` | Extends `MapEntryMut` with `insert(K, V)` for **sized** keys when `MutTarget = V` |
-| [`MapStrInsert`](src/map.rs)`<V>` | Extends `MapEntryMut<str, V>` with `insert_str(&str, V)` for `map<string, …>` when the value view is sized |
 
-String / bytes **values** are not insertable as owned views; use `entry_mut(key)` then fill (`push_str`, `extend_from_slice`, …). Codegen pins `MutTarget = String<A>` / `Vec<u8, A>` on the mutator return type so those methods resolve through `impl Trait`.
+There is no separate `insert` API: set values with `entry_mut` then assign / fill. Codegen pins `MutTarget` on the mutator return type (`i32`, `String<A>`, …) so those methods resolve through `impl Trait`.
 
 Generated accessors (`tag_ids` / `watchers` idiom):
 
@@ -926,8 +924,9 @@ Generated accessors (`tag_ids` / `watchers` idiom):
 /// Shared view (`get` / `len` / `is_empty`).
 pub fn attributes(&self) -> impl ::puroro::MapRef<str, i32> + '_;
 
-/// Mutable view — `MapStrInsert` when insertable; else bare `MapEntryMut`.
-pub fn attributes_mut(&mut self) -> impl ::puroro::MapStrInsert<i32> + '_;
+pub fn attributes_mut(
+    &mut self,
+) -> impl ::puroro::MapEntryMut<str, i32, MutTarget = i32> + '_;
 
 pub fn clear_attributes(&mut self); // calls MapEntryMut::clear
 ```
@@ -937,13 +936,11 @@ Catalog types (`MapFieldRef` / `ProtoString` / …) stay inside the generated cr
 Typical mutation:
 
 ```rust
-task.attributes_mut().insert_str("region", 81);
+*task.attributes_mut().entry_mut("region") = 81;
 *task.attributes_mut().get_mut("region").unwrap() = 99;
 assert_eq!(task.attributes().get("region"), Some(&99));
 
-// sized key
-flags_mut().insert(1, true);
-*flags_mut().entry_mut(1) = false;
+*flags_mut().entry_mut(1) = true;
 
 // string / bytes value — ensure then fill
 labels_mut().entry_mut(1).push_str("hello");

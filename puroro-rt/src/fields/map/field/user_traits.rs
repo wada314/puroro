@@ -1,11 +1,11 @@
-//! `puroro::{MapRef, MapEntryMut, MapStrInsert, …}` impls for [`MapField`](super::MapField).
+//! `puroro::{MapRef, MapEntryMut}` impls for [`MapField`](super::MapField).
 
 use ::core::borrow::Borrow;
 use ::core::ops::Deref;
 
 use ::allocator_api2::alloc::Allocator;
 use ::allocator_api2::vec::Vec as AllocVec;
-use ::puroro::{MapEntryInsert, MapEntryMut, MapRef, MapStrInsert, Message};
+use ::puroro::{MapEntryMut, MapRef, Message};
 
 use crate::fields::shared::PresenceBits;
 use crate::fields::wire::repeated_element::RepeatedElementMut;
@@ -86,18 +86,6 @@ macro_rules! impl_map_entry_copy {
                 MapFieldMut::clear(self);
             }
         }
-
-        impl<'f, 'c, const FIELD: u32, A, Pb> MapEntryInsert<$key_view, $val_view>
-            for MapFieldMut<'f, 'c, $key_marker, $val_marker, FIELD, A, Pb>
-        where
-            A: Allocator + Clone,
-            Pb: PresenceBits,
-        {
-            #[inline]
-            fn insert(&mut self, key: $key_view, value: $val_view) {
-                MapFieldMut::insert(self, key, value);
-            }
-        }
     };
 }
 
@@ -145,18 +133,6 @@ macro_rules! impl_map_string_key_copy {
             #[inline]
             fn clear(&mut self) {
                 MapFieldMut::clear(self);
-            }
-        }
-
-        impl<'f, 'c, const FIELD: u32, A, Pb> MapStrInsert<$val_view>
-            for MapFieldMut<'f, 'c, ProtoString, $val_marker, FIELD, A, Pb>
-        where
-            A: Allocator + Clone,
-            Pb: PresenceBits,
-        {
-            #[inline]
-            fn insert_str(&mut self, key: &str, value: $val_view) {
-                MapFieldMut::insert_str(self, key, value)
             }
         }
     };
@@ -505,19 +481,6 @@ macro_rules! impl_map_entry_enum {
                 MapFieldMut::clear(self);
             }
         }
-
-        impl<'f, 'c, E, const FIELD: u32, A, Pb> MapEntryInsert<$key_view, E>
-            for MapFieldMut<'f, 'c, $key_marker, ProtoEnum<E, $kind>, FIELD, A, Pb>
-        where
-            E: $bound,
-            A: Allocator + Clone,
-            Pb: PresenceBits,
-        {
-            #[inline]
-            fn insert(&mut self, key: $key_view, value: E) {
-                MapFieldMut::insert(self, key, value);
-            }
-        }
     };
 }
 
@@ -582,19 +545,6 @@ macro_rules! impl_map_string_key_enum {
             #[inline]
             fn clear(&mut self) {
                 MapFieldMut::clear(self);
-            }
-        }
-
-        impl<'f, 'c, E, const FIELD: u32, A, Pb> MapStrInsert<E>
-            for MapFieldMut<'f, 'c, ProtoString, ProtoEnum<E, $kind>, FIELD, A, Pb>
-        where
-            E: $bound,
-            A: Allocator + Clone,
-            Pb: PresenceBits,
-        {
-            #[inline]
-            fn insert_str(&mut self, key: &str, value: E) {
-                MapFieldMut::insert_str(self, key, value)
             }
         }
     };
@@ -678,19 +628,6 @@ macro_rules! impl_map_entry_message {
                 MapFieldMut::clear(self);
             }
         }
-
-        impl<'f, 'c, M, const FIELD: u32, A, Pb> MapEntryInsert<$key_view, M>
-            for MapFieldMut<'f, 'c, $key_marker, ProtoMessage<M>, FIELD, A, Pb>
-        where
-            M: Message<Alloc = A> + ::unmanaged::DeallocateIn<A>,
-            A: Allocator + Clone,
-            Pb: PresenceBits,
-        {
-            #[inline]
-            fn insert(&mut self, key: $key_view, value: M) {
-                MapFieldMut::insert(self, key, value);
-            }
-        }
     };
 }
 
@@ -755,18 +692,5 @@ where
     #[inline]
     fn clear(&mut self) {
         MapFieldMut::clear(self);
-    }
-}
-
-impl<'f, 'c, M, const FIELD: u32, A, Pb> MapStrInsert<M>
-    for MapFieldMut<'f, 'c, ProtoString, ProtoMessage<M>, FIELD, A, Pb>
-where
-    M: Message<Alloc = A> + ::unmanaged::DeallocateIn<A>,
-    A: Allocator + Clone,
-    Pb: PresenceBits,
-{
-    #[inline]
-    fn insert_str(&mut self, key: &str, value: M) {
-        MapFieldMut::insert_str(self, key, value)
     }
 }

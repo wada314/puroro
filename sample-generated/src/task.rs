@@ -18,8 +18,8 @@ use ::core::ops::ControlFlow;
 use ::core::ops::{Deref, DerefMut};
 
 use ::puroro::{
-    DecodeError, HasDefault, MapEntryMut, MapRef, MapStrInsert, Message, OneofView, OneofViewMut,
-    Optional, RepeatedStringMut,
+    DecodeError, HasDefault, MapEntryMut, MapRef, Message, OneofView, OneofViewMut, Optional,
+    RepeatedStringMut,
 };
 use ::puroro_rt::decode::{decode_tag, skip_field_and_save};
 use ::puroro_rt::{
@@ -390,7 +390,7 @@ impl<A: Allocator + Clone> Task<A> {
         self.attributes.bind(&self._common)
     }
 
-    pub fn attributes_mut(&mut self) -> impl MapStrInsert<i32> + '_ {
+    pub fn attributes_mut(&mut self) -> impl MapEntryMut<str, i32, MutTarget = i32> + '_ {
         self.attributes.bind_mut(&mut self._common)
     }
 

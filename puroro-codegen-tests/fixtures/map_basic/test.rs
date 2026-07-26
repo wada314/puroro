@@ -1,7 +1,7 @@
 //! Maps: all legal keys × scalar / string / bytes / enum / message values.
 
 use crate::map_basic::{Holder, Kind, Peer};
-use ::puroro::{MapEntryInsert, MapEntryMut, MapRef, MapStrInsert, Message};
+use ::puroro::{MapEntryMut, MapRef, Message};
 
 #[test]
 fn defaults_empty() {
@@ -14,12 +14,12 @@ fn defaults_empty() {
 }
 
 #[test]
-fn string_key_insert_get_and_round_trip() {
+fn string_key_entry_mut_get_and_round_trip() {
     let mut msg = Holder::new();
     {
         let mut attrs = msg.attributes_mut();
-        attrs.insert_str("region", 81);
-        attrs.insert_str("tier", 2);
+        *attrs.entry_mut("region") = 81;
+        *attrs.entry_mut("tier") = 2;
     }
     assert_eq!(msg.attributes().get("region").copied(), Some(81));
 
@@ -29,12 +29,12 @@ fn string_key_insert_get_and_round_trip() {
 }
 
 #[test]
-fn string_key_insert_same_key_last_wins() {
+fn string_key_entry_mut_same_key_last_wins() {
     let mut msg = Holder::new();
     {
         let mut attrs = msg.attributes_mut();
-        attrs.insert_str("k", 1);
-        attrs.insert_str("k", 2);
+        *attrs.entry_mut("k") = 1;
+        *attrs.entry_mut("k") = 2;
         *attrs.get_mut("k").unwrap() = 3;
     }
     assert_eq!(msg.attributes().get("k").copied(), Some(3));
@@ -46,7 +46,7 @@ fn string_key_insert_same_key_last_wins() {
 #[test]
 fn clear_empties_string_map() {
     let mut msg = Holder::new();
-    msg.attributes_mut().insert_str("a", 1);
+    *msg.attributes_mut().entry_mut("a") = 1;
     msg.clear_attributes();
     assert!(msg.attributes().is_empty());
 }
@@ -54,9 +54,9 @@ fn clear_empties_string_map() {
 #[test]
 fn decode_merge_last_wins_for_duplicate_string_keys() {
     let mut first = Holder::new();
-    first.attributes_mut().insert_str("k", 1);
+    *first.attributes_mut().entry_mut("k") = 1;
     let mut second = Holder::new();
-    second.attributes_mut().insert_str("k", 9);
+    *second.attributes_mut().entry_mut("k") = 9;
 
     let mut bytes = first.encode_to_vec();
     bytes.extend_from_slice(&second.encode_to_vec());
@@ -66,13 +66,13 @@ fn decode_merge_last_wins_for_duplicate_string_keys() {
 }
 
 #[test]
-fn int32_key_insert_and_round_trip() {
+fn int32_key_entry_mut_and_round_trip() {
     let mut msg = Holder::new();
     {
         let mut flags = msg.flags_mut();
-        flags.insert(1, true);
-        flags.insert(2, false);
-        flags.insert(1, false);
+        *flags.entry_mut(1) = true;
+        *flags.entry_mut(2) = false;
+        *flags.entry_mut(1) = false;
     }
     let decoded: Holder = Holder::decode(&msg.encode_to_vec()[..]).expect("decode");
     assert_eq!(decoded.flags().get(&1).copied(), Some(false));
@@ -82,8 +82,8 @@ fn int32_key_insert_and_round_trip() {
 #[test]
 fn bool_key_uint64_value_round_trip() {
     let mut msg = Holder::new();
-    msg.counters_mut().insert(true, 99);
-    msg.counters_mut().insert(false, 7);
+    *msg.counters_mut().entry_mut(true) = 99;
+    *msg.counters_mut().entry_mut(false) = 7;
     let decoded: Holder = Holder::decode(&msg.encode_to_vec()[..]).expect("decode");
     assert_eq!(decoded.counters().get(&true).copied(), Some(99));
     assert_eq!(decoded.counters().get(&false).copied(), Some(7));
@@ -92,7 +92,7 @@ fn bool_key_uint64_value_round_trip() {
 #[test]
 fn clear_sized_key_map() {
     let mut msg = Holder::new();
-    msg.flags_mut().insert(3, true);
+    *msg.flags_mut().entry_mut(3) = true;
     msg.clear_flags();
     assert!(msg.flags().is_empty());
 }
@@ -118,10 +118,10 @@ fn bytes_value_entry_mut_round_trip() {
 }
 
 #[test]
-fn enum_value_insert_round_trip() {
+fn enum_value_entry_mut_round_trip() {
     let mut msg = Holder::new();
-    msg.kinds_mut().insert(1, Kind::A);
-    msg.kinds_mut().insert(2, Kind::B);
+    *msg.kinds_mut().entry_mut(1) = Kind::A;
+    *msg.kinds_mut().entry_mut(2) = Kind::B;
     let decoded: Holder = Holder::decode(&msg.encode_to_vec()[..]).expect("decode");
     assert_eq!(decoded.kinds().get(&1).copied(), Some(Kind::A));
     assert_eq!(decoded.kinds().get(&2).copied(), Some(Kind::B));

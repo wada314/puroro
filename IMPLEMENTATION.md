@@ -708,17 +708,17 @@ Catalog helpers on `MapFieldMut`:
 | Method | Role |
 |---|---|
 | `get` / `get_mut` / `iter` / `len` | Lookup (`Q: Equivalent` against stored key) |
-| `insert` | Owned key + value elements |
+| `insert` | Owned key + value elements (catalog / merge; not a user trait) |
 | `insert_str` / `entry_element_mut_str` | `map<string, …>` from `&str` |
 | `entry_element_mut` | Sized / `Copy` keys — ensure default value |
 | `remove` / `clear` | Free key + value via `deallocate_element` |
 | `merge` | One wire occurrence |
 
-User-facing traits ([`src/map.rs`](src/map.rs), see [DESIGN.md §4.10](DESIGN.md#410-map-fields)): `MapRef` / `MapEntryMut` (all keys, `K = str` for string maps) / `MapEntryInsert` (sized keys) / `MapStrInsert` (`insert_str`). Impls live in [`user_traits.rs`](puroro-rt/src/fields/map/field/user_traits.rs).
+User-facing traits ([`src/map.rs`](src/map.rs), see [DESIGN.md §4.10](DESIGN.md#410-map-fields)): only `MapRef` + `MapEntryMut` (`K = str` for string maps). Mutation is `entry_mut` then assign / fill. Impls live in [`user_traits.rs`](puroro-rt/src/fields/map/field/user_traits.rs).
 
 **Key collision safety:** `HashMap::insert` would drop a colliding incoming key; `MapEntries::insert` keeps the stored key and returns `(incoming_key, previous_value)` for explicit release (required for `UnmanagedString` keys).
 
-Sample: `Task.attributes` — `map<string, int32>` → `MapField<ProtoString, ProtoInt32, { FIELD_ATTRIBUTES }, A>` with accessors `attributes()` → `MapRef<str, i32>`, `attributes_mut()` → `MapStrInsert<i32>`, `clear_attributes()` via `MapEntryMut::clear`.
+Sample: `Task.attributes` — `map<string, int32>` → `MapField<ProtoString, ProtoInt32, { FIELD_ATTRIBUTES }, A>` with accessors `attributes()` → `MapRef<str, i32>`, `attributes_mut()` → `MapEntryMut<str, i32, MutTarget = i32>`, `clear_attributes()` via `MapEntryMut::clear`.
 
 ---
 

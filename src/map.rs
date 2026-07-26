@@ -24,8 +24,10 @@ pub trait MapRef<K: ?Sized, V: ?Sized> {
 /// - [`V`] is the shared value view (`i32`, `str`, `Address<A>`, …).
 /// - [`MutTarget`](Self::MutTarget) is the `_mut` target (`i32`, [`crate::String`]`<A>`, …).
 ///
+/// Set values via [`entry_mut`](Self::entry_mut) then assign / fill
+/// (`*m.entry_mut("k") = 81`, `m.entry_mut(1).push_str("…")`).
 /// [`entry_mut`](Self::entry_mut) takes `impl Borrow<K>` so both `entry_mut(1)`
-/// (sized / `Copy` keys) and `entry_mut("k")` (`K = str`) work.
+/// and `entry_mut("k")` work.
 pub trait MapEntryMut<K: ?Sized, V: ?Sized> {
     type MutTarget;
 
@@ -50,14 +52,4 @@ pub trait MapEntryMut<K: ?Sized, V: ?Sized> {
     fn remove(&mut self, key: &K);
 
     fn clear(&mut self);
-}
-
-/// Owned-key insert for sized keys (`i32`, `bool`, …).
-pub trait MapEntryInsert<K, V>: MapEntryMut<K, V, MutTarget = V> {
-    fn insert(&mut self, key: K, value: V);
-}
-
-/// `&str` insert for `map<string, …>` with a sized view value.
-pub trait MapStrInsert<V>: MapEntryMut<str, V, MutTarget = V> {
-    fn insert_str(&mut self, key: &str, value: V);
 }
