@@ -85,14 +85,6 @@ pub(crate) fn str_to_unmanaged_in<A: Allocator>(s: &str, alloc: A) -> UnmanagedS
     UnmanagedString::from_string(::unmanaged::String::from_str_in(s, alloc))
 }
 
-/// Copies `v` into a freshly allocated [`UnmanagedVec<u8>`] backed by the owned
-/// `alloc` (its buffer is owned by allocator type `A`).
-pub(crate) fn bytes_to_unmanaged_in<A: Allocator>(v: &[u8], alloc: A) -> UnmanagedVec<u8, A> {
-    let mut vec = AllocVec::<u8, A>::with_capacity_in(v.len(), alloc);
-    vec.extend_from_slice(v);
-    UnmanagedVec::from_vec(vec)
-}
-
 /// Skips one field payload for `wire_type` without preserving unknowns.
 ///
 /// Used for map-entry interiors (and similar ephemeral messages) where unknown

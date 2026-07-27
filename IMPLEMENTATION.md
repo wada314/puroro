@@ -122,7 +122,7 @@ protobuf-core           Varint, Tag, WireType
 | `MessageCommon`, `PresenceBits`, `FieldDeallocate`, `OneofSlot` | **Done** |
 | `ProtoType` + thin wrappers (varint / LEN) + `ProtoMessage` | **Done** |
 | `VarintProtoType` (packed / bit-packed wire helper) | **Done** |
-| `RepeatedElement` / `RepeatedElementMerge` / `PackableRepeatedElement` / `RepeatedSlicePush` / `RepeatedVecMut` | **Done** |
+| `RepeatedElement` / `RepeatedElementMerge` / `PackableRepeatedElement` / `RepeatedVecMut` | **Done** |
 | `MapKey` + `MapField` / `MapEntries` (map entry wire encode/merge) | **Done** |
 | `FieldPresence` (`Implicit` / `Explicit` / `LegacyRequired` / `Oneof`) | **Done** |
 | `ValueSlot`, `SlotInitView` / `SlotInitMut`, `DefaultIn` / `DeallocateIn` / `ProtoEmpty` | **Done** |
@@ -565,7 +565,7 @@ Generated code indexes bits only through `PresenceBits` / `MessageCommon` helper
 - **`Task::new()`** — when `A = Global`.
 - **`Default`** — `A: Clone + Default` → `new_in(A::default())`.
 
-Runtime **`str_to_unmanaged_in(s, alloc)`** — copy bytes into an `UnmanagedString`; **`bytes_to_unmanaged_in(v, alloc)`** for `UnmanagedVec<u8>` (`puroro_rt::decode`). The `unsafe` (raw-parts / `deallocate`) is confined to the `puroro-rt` runtime and the generated `Drop`, not to generated accessors.
+Runtime **`str_to_unmanaged_in(s, alloc)`** — copy bytes into an `UnmanagedString` (`puroro_rt::decode`). The `unsafe` (raw-parts / `deallocate`) is confined to the `puroro-rt` runtime and the generated `Drop`, not to generated accessors.
 
 ---
 
@@ -717,7 +717,6 @@ Catalog helpers on `MapFieldMut`:
 |---|---|
 | `get` / `get_mut` / `get_element_mut` / `len` | Lookup (`Q: Equivalent` against stored key) |
 | `insert` | Owned key + value elements (catalog / merge) |
-| `insert_str` | `map<string, …>` convenience from `&str` |
 | `entry_element_mut_view` | Ensure via `MapKey::key_from_view` + default value |
 | `remove` / `clear` | Free key + value via `deallocate_element` |
 | `merge` | One wire occurrence |

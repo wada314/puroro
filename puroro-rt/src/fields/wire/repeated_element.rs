@@ -12,7 +12,6 @@ use ::allocator_api2::alloc::Allocator;
 use ::allocator_api2::vec::Vec as AllocVec;
 use ::bytes::{Buf, BufMut};
 use ::core::ops::DerefMut;
-use ::core::str;
 use ::unmanaged::{UnmanagedString, UnmanagedVec};
 
 use ::puroro::{DecodeError, Message, WireType};
@@ -109,14 +108,6 @@ pub trait PackableRepeatedElement: RepeatedElement {
 /// for string / bytes (those use [`RepeatedElementMut`] via
 /// [`RepeatedContainerMut`](crate::fields::repeated::container::RepeatedContainerMut)).
 pub trait RepeatedVecMut: RepeatedElement {}
-
-/// Build an element from a byte slice (map string keys, …).
-pub trait RepeatedSlicePush: RepeatedElement {
-    fn element_from_slice<A: Allocator + Clone>(
-        v: &[u8],
-        alloc: A,
-    ) -> Result<Self::Element<A>, DecodeError>;
-}
 
 /// How to obtain a mutable element handle for
 /// [`RepeatedContainerMut`](crate::fields::repeated::container::RepeatedContainerMut).
@@ -419,17 +410,6 @@ impl<A: Allocator + Clone> RepeatedElementMerge<A> for ProtoString {
     }
 }
 
-impl RepeatedSlicePush for ProtoString {
-    #[inline]
-    fn element_from_slice<A: Allocator + Clone>(
-        v: &[u8],
-        alloc: A,
-    ) -> Result<UnmanagedString<A>, DecodeError> {
-        let s = str::from_utf8(v).map_err(|_| DecodeError::InvalidUtf8)?;
-        Ok(decode::str_to_unmanaged_in(s, alloc))
-    }
-}
-
 impl RepeatedElementMut for ProtoString {
     type MutTarget<A: Allocator + Clone> = ::unmanaged::String<A>;
 
@@ -509,16 +489,6 @@ impl<A: Allocator + Clone> RepeatedElementMerge<A> for ProtoBytes {
     {
         push(Self::decode_element(wire_type, buf, alloc, _depth)?);
         Ok(())
-    }
-}
-
-impl RepeatedSlicePush for ProtoBytes {
-    #[inline]
-    fn element_from_slice<A: Allocator + Clone>(
-        v: &[u8],
-        alloc: A,
-    ) -> Result<UnmanagedVec<u8, A>, DecodeError> {
-        Ok(decode::bytes_to_unmanaged_in(v, alloc))
     }
 }
 

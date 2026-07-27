@@ -14,11 +14,12 @@ use super::fixed::{
 };
 use super::len::{ProtoBytes, ProtoString};
 use super::proto_message::ProtoMessage;
-use super::repeated_element::{RepeatedElement, RepeatedSlicePush};
+use super::repeated_element::RepeatedElement;
 use super::varint::{
     Closed, ClosedEnum, Open, OpenEnum, ProtoBool, ProtoEnum, ProtoInt32, ProtoInt64, ProtoSint32,
     ProtoSint64, ProtoUInt32, ProtoUInt64,
 };
+use crate::decode;
 use ::puroro::Message;
 
 /// Marker: valid protobuf map **key**.
@@ -81,9 +82,7 @@ impl MapKey for ProtoString {
 
     #[inline]
     fn key_from_view<A: Allocator + Clone>(view: &str, alloc: A) -> UnmanagedString<A> {
-        // Key is already UTF-8; `element_from_slice` only fails on invalid UTF-8.
-        <ProtoString as RepeatedSlicePush>::element_from_slice(view.as_bytes(), alloc)
-            .expect("str is valid UTF-8")
+        decode::str_to_unmanaged_in(view, alloc)
     }
 }
 

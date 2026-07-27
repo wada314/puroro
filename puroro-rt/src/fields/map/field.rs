@@ -22,7 +22,7 @@ use crate::fields::shared::field_inspect::{FieldCloneIn, FieldDebug, FieldEncode
 use crate::fields::shared::{FieldDeallocate, MessageCommon, PresenceBits};
 use crate::fields::wire::map_element::MapKey;
 use crate::fields::wire::repeated_element::{
-    RepeatedElement, RepeatedElementMerge, RepeatedElementMut, RepeatedSlicePush,
+    RepeatedElement, RepeatedElementMerge, RepeatedElementMut,
 };
 
 use super::entries::MapEntries;
@@ -339,17 +339,6 @@ where
                 V::deallocate_element(old_value, alloc);
             }
         }
-    }
-
-    /// Builds a `map<string, …>` key from `&str` and inserts.
-    pub fn insert_str(&mut self, key: &str, value: V::Element<A>)
-    where
-        K: RepeatedSlicePush,
-        K::Element<A>: Eq + Hash,
-    {
-        let owned_key = K::element_from_slice(key.as_bytes(), self.common.alloc.clone())
-            .expect("str is valid UTF-8");
-        self.insert(owned_key, value);
     }
 
     pub fn remove<Q>(&mut self, key: &Q)
