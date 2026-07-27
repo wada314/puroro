@@ -74,6 +74,11 @@ pub trait FieldVisitor<Pb: PresenceBits, A: Allocator> {
 }
 
 /// Pair / shared visitor — generated `visit_field_pairs` (e.g. [`PartialEq`]).
+///
+/// Not part of the public message API. The [`FieldPartialEq`] bound on `F` is
+/// intentional: catalog field types are heterogeneous, so a generic walk needs
+/// the capability on the field argument (same pattern as
+/// [`FieldPairVisitorMut`] / [`FieldVisitor`]).
 pub trait FieldPairVisitor<Pb: PresenceBits, A: Allocator> {
     type Break;
 
