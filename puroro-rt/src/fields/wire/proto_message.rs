@@ -16,7 +16,6 @@ use ::unmanaged::UnmanagedBox;
 use ::puroro::{DecodeError, Message, WireType};
 
 use crate::decode;
-use crate::encode;
 use ::unmanaged::DeallocateIn;
 
 use crate::fields::shared::{
@@ -25,6 +24,7 @@ use crate::fields::shared::{
     value_slot::{AddressableSlot, ValueSlot, ValueSlotMutAccess},
 };
 use crate::fields::wire::proto_type::{PayloadAccess, ProtoType};
+use crate::fields::wire::wire_payload::{encode_field, encoded_len_field};
 
 /// Type marker for a singular nested message `M`.
 ///
@@ -89,7 +89,7 @@ impl<M: Message> ProtoType for ProtoMessage<M> {
     where
         Self: 'a,
     {
-        encode::encoded_len_len_field(field, value.encoded_len())
+        encoded_len_field::<Self, A>(value, field)
     }
 
     #[inline]
@@ -97,10 +97,7 @@ impl<M: Message> ProtoType for ProtoMessage<M> {
     where
         Self: 'a,
     {
-        let payload_len = value.encoded_len();
-        encode::encode_tag(field, WireType::Len, buf);
-        encode::encode_varint(payload_len as u64, buf);
-        value.encode_raw(buf);
+        encode_field::<Self, A, B>(value, field, buf);
     }
 }
 

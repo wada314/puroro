@@ -52,12 +52,6 @@ fn tag_to_u64(field_number: u32, wire_type: WireType) -> u64 {
     .to_uint64()
 }
 
-/// Returns the encoded byte length of a varint field (tag + value).
-#[inline]
-pub(crate) fn encoded_len_varint_field(field_number: u32, v: u64) -> usize {
-    encoded_len_tag(field_number, WireType::Varint) + encoded_len_varint(v)
-}
-
 /// Writes a varint field (tag + value) to `buf`.
 #[inline]
 pub fn encode_varint_field<B: BufMut>(field_number: u32, v: u64, buf: &mut B) {
@@ -71,40 +65,6 @@ pub(crate) fn encoded_len_len_field(field_number: u32, payload_len: usize) -> us
     encoded_len_tag(field_number, WireType::Len)
         + encoded_len_varint(payload_len as u64)
         + payload_len
-}
-
-/// Writes a LEN field (tag + length + payload bytes) to `buf`.
-#[inline]
-pub(crate) fn encode_len_field<B: BufMut>(field_number: u32, payload: &[u8], buf: &mut B) {
-    encode_tag(field_number, WireType::Len, buf);
-    encode_varint(payload.len() as u64, buf);
-    buf.put_slice(payload);
-}
-
-/// Returns the encoded byte length of a fixed32 / float field (tag + 4 LE bytes).
-#[inline]
-pub(crate) fn encoded_len_fixed32_field(field_number: u32) -> usize {
-    encoded_len_tag(field_number, WireType::Int32) + ::protobuf_core::FIXED32_BYTES
-}
-
-/// Writes a fixed32 / float field (tag + 4 LE bytes) to `buf`.
-#[inline]
-pub(crate) fn encode_fixed32_field<B: BufMut>(field_number: u32, bytes: [u8; 4], buf: &mut B) {
-    encode_tag(field_number, WireType::Int32, buf);
-    buf.put_slice(&bytes);
-}
-
-/// Returns the encoded byte length of a fixed64 / double field (tag + 8 LE bytes).
-#[inline]
-pub(crate) fn encoded_len_fixed64_field(field_number: u32) -> usize {
-    encoded_len_tag(field_number, WireType::Int64) + ::protobuf_core::FIXED64_BYTES
-}
-
-/// Writes a fixed64 / double field (tag + 8 LE bytes) to `buf`.
-#[inline]
-pub(crate) fn encode_fixed64_field<B: BufMut>(field_number: u32, bytes: [u8; 8], buf: &mut B) {
-    encode_tag(field_number, WireType::Int64, buf);
-    buf.put_slice(&bytes);
 }
 
 /// Writes a varint into an allocator-aware byte vector.

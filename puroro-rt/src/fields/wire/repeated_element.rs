@@ -7,17 +7,20 @@
 //!
 //! Singular [`ProtoBool`](super::varint::ProtoBool) uses bit-packed storage;
 //! repeated uses plain `bool` elements via this trait (no MessageCommon bit).
+//!
+//! Tagged encode uses [`wire_view`](Self::wire_view) +
+//! [`encode_field`](super::wire_payload::encode_field) (not a separate
+//! `encode_element` entry point).
 
 use ::allocator_api2::alloc::Allocator;
 use ::allocator_api2::vec::Vec as AllocVec;
 use ::bytes::{Buf, BufMut};
-use ::core::ops::DerefMut;
+use ::core::ops::{Deref, DerefMut};
 use ::unmanaged::{UnmanagedString, UnmanagedVec};
 
 use ::puroro::{DecodeError, Message, WireType};
 
 use crate::decode;
-use crate::encode;
 use ::unmanaged::DeallocateIn;
 
 use super::len::{ProtoBytes, ProtoString};
@@ -25,24 +28,23 @@ use super::numerical::NumericalType;
 use super::proto_message::ProtoMessage;
 use super::proto_type::ProtoType;
 use super::varint::ProtoBool;
+use super::wire_payload::WirePayload;
 
 /// Wire + storage for one element of a repeated field of marker `Self`.
 ///
-/// Encode / length / deallocate live here. Decode / merge live on
-/// [`RepeatedElementMerge`] so nested messages can constrain `M::Alloc = A`.
-pub trait RepeatedElement: ProtoType {
+/// Decode / merge live on [`RepeatedElementMerge`] so nested messages can
+/// constrain `M::Alloc = A`. Tagged encode goes through [`WirePayload`] via
+/// [`wire_view`](Self::wire_view).
+pub trait RepeatedElement: ProtoType + WirePayload {
     /// Physical element stored in the repeated buffer.
     type Element<A: Allocator + Clone>;
 
-    /// Tagged wire length of one expanded element.
-    fn encoded_len_element<A: Allocator + Clone>(elem: &Self::Element<A>, field: u32) -> usize;
-
-    /// Encodes one expanded (per-element tagged) occurrence.
-    fn encode_element<A: Allocator + Clone, B: BufMut>(
-        elem: &Self::Element<A>,
-        field: u32,
-        buf: &mut B,
-    );
+    /// Borrow / copy an element as a [`WirePayload::View`] for tagged encode.
+    fn wire_view<'a, A: Allocator + Clone>(
+        elem: &'a Self::Element<A>,
+    ) -> <Self as WirePayload>::View<'a, A>
+    where
+        Self: 'a;
 
     /// Drops one element, freeing heap payload when applicable.
     ///
@@ -144,13 +146,11 @@ impl<T: NumericalType> RepeatedElement for T {
     type Element<A: Allocator + Clone> = T::Value;
 
     #[inline]
-    fn encoded_len_element<A: Allocator + Clone>(elem: &T::Value, field: u32) -> usize {
-        T::encoded_len_field(*elem, field)
-    }
-
-    #[inline]
-    fn encode_element<A: Allocator + Clone, B: BufMut>(elem: &T::Value, field: u32, buf: &mut B) {
-        T::encode_field(*elem, field, buf);
+    fn wire_view<'a, A: Allocator + Clone>(elem: &'a T::Value) -> T::Value
+    where
+        Self: 'a,
+    {
+        *elem
     }
 
     #[inline]
@@ -238,13 +238,11 @@ impl RepeatedElement for ProtoBool {
     type Element<A: Allocator + Clone> = bool;
 
     #[inline]
-    fn encoded_len_element<A: Allocator + Clone>(elem: &bool, field: u32) -> usize {
-        encode::encoded_len_varint_field(field, Self::encode_wire(*elem))
-    }
-
-    #[inline]
-    fn encode_element<A: Allocator + Clone, B: BufMut>(elem: &bool, field: u32, buf: &mut B) {
-        encode::encode_varint_field(field, Self::encode_wire(*elem), buf);
+    fn wire_view<'a, A: Allocator + Clone>(elem: &'a bool) -> bool
+    where
+        Self: 'a,
+    {
+        *elem
     }
 
     #[inline]
@@ -311,14 +309,14 @@ impl PackableRepeatedElement for ProtoBool {
     fn packed_payload_len<A: Allocator + Clone>(values: &[bool]) -> usize {
         values
             .iter()
-            .map(|v| encode::encoded_len_varint(Self::encode_wire(*v)))
+            .map(|v| <Self as WirePayload>::payload_len::<A>(*v))
             .sum()
     }
 
     #[inline]
     fn encode_packed_payload<A: Allocator + Clone, B: BufMut>(values: &[bool], buf: &mut B) {
         for v in values {
-            encode::encode_varint(Self::encode_wire(*v), buf);
+            <Self as WirePayload>::encode_payload::<A, B>(*v, buf);
         }
     }
 }
@@ -354,17 +352,11 @@ impl RepeatedElement for ProtoString {
     type Element<A: Allocator + Clone> = UnmanagedString<A>;
 
     #[inline]
-    fn encoded_len_element<A: Allocator + Clone>(elem: &UnmanagedString<A>, field: u32) -> usize {
-        encode::encoded_len_len_field(field, elem.len())
-    }
-
-    #[inline]
-    fn encode_element<A: Allocator + Clone, B: BufMut>(
-        elem: &UnmanagedString<A>,
-        field: u32,
-        buf: &mut B,
-    ) {
-        encode::encode_len_field(field, elem.as_bytes(), buf);
+    fn wire_view<'a, A: Allocator + Clone>(elem: &'a UnmanagedString<A>) -> &'a str
+    where
+        Self: 'a,
+    {
+        Deref::deref(elem)
     }
 
     #[inline]
@@ -436,17 +428,11 @@ impl RepeatedElement for ProtoBytes {
     type Element<A: Allocator + Clone> = UnmanagedVec<u8, A>;
 
     #[inline]
-    fn encoded_len_element<A: Allocator + Clone>(elem: &UnmanagedVec<u8, A>, field: u32) -> usize {
-        encode::encoded_len_len_field(field, elem.len())
-    }
-
-    #[inline]
-    fn encode_element<A: Allocator + Clone, B: BufMut>(
-        elem: &UnmanagedVec<u8, A>,
-        field: u32,
-        buf: &mut B,
-    ) {
-        encode::encode_len_field(field, elem, buf);
+    fn wire_view<'a, A: Allocator + Clone>(elem: &'a UnmanagedVec<u8, A>) -> &'a [u8]
+    where
+        Self: 'a,
+    {
+        Deref::deref(elem)
     }
 
     #[inline]
@@ -526,13 +512,11 @@ impl<M: Message> RepeatedElement for ProtoMessage<M> {
     type Element<A: Allocator + Clone> = M;
 
     #[inline]
-    fn encoded_len_element<A: Allocator + Clone>(elem: &M, field: u32) -> usize {
-        <Self as ProtoType>::encoded_len::<A>(elem, field)
-    }
-
-    #[inline]
-    fn encode_element<A: Allocator + Clone, B: BufMut>(elem: &M, field: u32, buf: &mut B) {
-        <Self as ProtoType>::encode::<A, B>(elem, field, buf);
+    fn wire_view<'a, A: Allocator + Clone>(elem: &'a M) -> &'a M
+    where
+        Self: 'a,
+    {
+        elem
     }
 
     #[inline]

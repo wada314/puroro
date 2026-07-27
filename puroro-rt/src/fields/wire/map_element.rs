@@ -42,10 +42,12 @@ pub trait MapKey: RepeatedElement {
 ///
 /// Distinct from [`ProtoType::Ref`](super::proto_type::ProtoType::Ref): scalars use
 /// by-value `Ref = i32`, while maps need `&View` with `View = i32`.
+/// Distinct from [`WirePayload::View`](super::wire_payload::WirePayload::View)
+/// (encode payload view / GAT).
 pub trait MapValueView: RepeatedElement {
     type View: ?Sized;
 
-    fn as_view<A: Allocator + Clone>(elem: &Self::Element<A>) -> &Self::View;
+    fn as_view<A: Allocator + Clone>(elem: &Self::Element<A>) -> &<Self as MapValueView>::View;
 }
 
 // ---------------------------------------------------------------------------

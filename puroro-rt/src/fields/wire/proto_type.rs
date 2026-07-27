@@ -32,7 +32,6 @@ use ::puroro::WireType;
 use ::unmanaged::DeallocateIn;
 
 use crate::decode;
-use crate::encode;
 use crate::fields::shared::{
     DefaultIn, MessageCommon, PresenceBits, ProtoEmpty,
     slot_init::SlotInitMut,
@@ -42,6 +41,7 @@ use crate::fields::shared::{
 use super::len::{ProtoBytes, ProtoString};
 use super::numerical::NumericalType;
 use super::varint::ProtoBool;
+use super::wire_payload::{encode_field, encoded_len_field};
 
 /// Wire + type-identity for a singular protobuf type marker.
 ///
@@ -194,7 +194,7 @@ where
     where
         Self: 'a,
     {
-        T::encoded_len_field(value, field)
+        encoded_len_field::<Self, A>(value, field)
     }
 
     #[inline]
@@ -202,7 +202,7 @@ where
     where
         Self: 'a,
     {
-        T::encode_field(value, field, buf);
+        encode_field::<Self, A, B>(value, field, buf);
     }
 }
 
@@ -331,7 +331,7 @@ impl ProtoType for ProtoString {
     where
         Self: 'a,
     {
-        encode::encoded_len_len_field(field, value.len())
+        encoded_len_field::<Self, A>(value, field)
     }
 
     #[inline]
@@ -339,7 +339,7 @@ impl ProtoType for ProtoString {
     where
         Self: 'a,
     {
-        encode::encode_len_field(field, value.as_bytes(), buf);
+        encode_field::<Self, A, B>(value, field, buf);
     }
 }
 
@@ -453,7 +453,7 @@ impl ProtoType for ProtoBytes {
     where
         Self: 'a,
     {
-        encode::encoded_len_len_field(field, value.len())
+        encoded_len_field::<Self, A>(value, field)
     }
 
     #[inline]
@@ -461,7 +461,7 @@ impl ProtoType for ProtoBytes {
     where
         Self: 'a,
     {
-        encode::encode_len_field(field, value, buf);
+        encode_field::<Self, A, B>(value, field, buf);
     }
 }
 
@@ -579,7 +579,7 @@ impl ProtoType for ProtoBool {
     where
         Self: 'a,
     {
-        encode::encoded_len_varint_field(field, Self::encode_wire(value))
+        encoded_len_field::<Self, A>(value, field)
     }
 
     #[inline]
@@ -587,6 +587,6 @@ impl ProtoType for ProtoBool {
     where
         Self: 'a,
     {
-        encode::encode_varint_field(field, Self::encode_wire(value), buf);
+        encode_field::<Self, A, B>(value, field, buf);
     }
 }

@@ -2,7 +2,12 @@
 //!
 //! [`ProtoBool`](super::varint::ProtoBool), string, bytes, and message markers are
 //! intentionally outside this trait (different singular slot shapes).
+//!
+//! Tagged encode goes through [`WirePayload`](super::wire_payload::WirePayload) /
+//! [`encode_field`](super::wire_payload::encode_field); this trait owns decode,
+//! single-value payload, and packed slice helpers.
 
+use ::allocator_api2::alloc::Allocator;
 use ::bytes::{Buf, BufMut};
 use ::protobuf_core::{FIXED32_BYTES, FIXED64_BYTES, Varint};
 
@@ -20,6 +25,7 @@ use super::varint::{
     Closed, ClosedEnum, Open, OpenEnum, ProtoEnum, ProtoInt32, ProtoInt64, ProtoSint32,
     ProtoSint64, ProtoUInt32, ProtoUInt64,
 };
+use super::wire_payload::WirePayload;
 
 /// Wire family for a [`NumericalType`] marker.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -27,6 +33,15 @@ pub enum NumericalWireKind {
     Varint,
     Fixed32,
     Fixed64,
+}
+
+#[inline]
+const fn numerical_wire_type(kind: NumericalWireKind) -> WireType {
+    match kind {
+        NumericalWireKind::Varint => WireType::Varint,
+        NumericalWireKind::Fixed32 => WireType::Int32,
+        NumericalWireKind::Fixed64 => WireType::Int64,
+    }
 }
 
 /// Copy-inline numerical protobuf type marker (not bool / string / bytes / message).
@@ -48,11 +63,11 @@ pub trait NumericalType: Sized {
         buf: &mut impl Buf,
     ) -> Result<Self::Value, DecodeError>;
 
-    /// Tagged wire length of one occurrence.
-    fn encoded_len_field(value: Self::Value, field: u32) -> usize;
+    /// Bare payload length of one value (no tag).
+    fn payload_len(value: Self::Value) -> usize;
 
-    /// Encode one tagged occurrence.
-    fn encode_field(value: Self::Value, field: u32, buf: &mut impl BufMut);
+    /// Write bare payload bytes of one value (no tag).
+    fn encode_payload(value: Self::Value, buf: &mut impl BufMut);
 
     /// Packed payload length (no tag / length prefix).
     fn packed_payload_len(values: &[Self::Value]) -> usize;
@@ -183,27 +198,27 @@ macro_rules! impl_varint_numerical {
             }
 
             #[inline]
-            fn encoded_len_field(value: Self::Value, field: u32) -> usize {
-                encode::encoded_len_varint_field(field, ($encode)(value))
+            fn payload_len(value: Self::Value) -> usize {
+                encode::encoded_len_varint(($encode)(value))
             }
 
             #[inline]
-            fn encode_field(value: Self::Value, field: u32, buf: &mut impl BufMut) {
-                encode::encode_varint_field(field, ($encode)(value), buf);
+            fn encode_payload(value: Self::Value, buf: &mut impl BufMut) {
+                encode::encode_varint(($encode)(value), buf);
             }
 
             #[inline]
             fn packed_payload_len(values: &[Self::Value]) -> usize {
                 values
                     .iter()
-                    .map(|v| encode::encoded_len_varint(($encode)(*v)))
+                    .map(|v| <Self as NumericalType>::payload_len(*v))
                     .sum()
             }
 
             #[inline]
             fn encode_packed_payload(values: &[Self::Value], buf: &mut impl BufMut) {
                 for v in values {
-                    encode::encode_varint(($encode)(*v), buf);
+                    <Self as NumericalType>::encode_payload(*v, buf);
                 }
             }
         }
@@ -290,27 +305,27 @@ impl<E: OpenEnum> NumericalType for ProtoEnum<E, Open> {
     }
 
     #[inline]
-    fn encoded_len_field(value: Self::Value, field: u32) -> usize {
-        encode::encoded_len_varint_field(field, encode_enum_wire(value.to_wire()))
+    fn payload_len(value: Self::Value) -> usize {
+        encode::encoded_len_varint(encode_enum_wire(value.to_wire()))
     }
 
     #[inline]
-    fn encode_field(value: Self::Value, field: u32, buf: &mut impl BufMut) {
-        encode::encode_varint_field(field, encode_enum_wire(value.to_wire()), buf);
+    fn encode_payload(value: Self::Value, buf: &mut impl BufMut) {
+        encode::encode_varint(encode_enum_wire(value.to_wire()), buf);
     }
 
     #[inline]
     fn packed_payload_len(values: &[Self::Value]) -> usize {
         values
             .iter()
-            .map(|v| encode::encoded_len_varint(encode_enum_wire(v.to_wire())))
+            .map(|v| <Self as NumericalType>::payload_len(*v))
             .sum()
     }
 
     #[inline]
     fn encode_packed_payload(values: &[Self::Value], buf: &mut impl BufMut) {
         for v in values {
-            encode::encode_varint(encode_enum_wire(v.to_wire()), buf);
+            <Self as NumericalType>::encode_payload(*v, buf);
         }
     }
 }
@@ -338,27 +353,27 @@ impl<E: ClosedEnum> NumericalType for ProtoEnum<E, Closed> {
     }
 
     #[inline]
-    fn encoded_len_field(value: Self::Value, field: u32) -> usize {
-        encode::encoded_len_varint_field(field, encode_enum_wire(value.to_wire()))
+    fn payload_len(value: Self::Value) -> usize {
+        encode::encoded_len_varint(encode_enum_wire(value.to_wire()))
     }
 
     #[inline]
-    fn encode_field(value: Self::Value, field: u32, buf: &mut impl BufMut) {
-        encode::encode_varint_field(field, encode_enum_wire(value.to_wire()), buf);
+    fn encode_payload(value: Self::Value, buf: &mut impl BufMut) {
+        encode::encode_varint(encode_enum_wire(value.to_wire()), buf);
     }
 
     #[inline]
     fn packed_payload_len(values: &[Self::Value]) -> usize {
         values
             .iter()
-            .map(|v| encode::encoded_len_varint(encode_enum_wire(v.to_wire())))
+            .map(|v| <Self as NumericalType>::payload_len(*v))
             .sum()
     }
 
     #[inline]
     fn encode_packed_payload(values: &[Self::Value], buf: &mut impl BufMut) {
         for v in values {
-            encode::encode_varint(encode_enum_wire(v.to_wire()), buf);
+            <Self as NumericalType>::encode_payload(*v, buf);
         }
     }
 }
@@ -390,13 +405,13 @@ macro_rules! impl_fixed32_numerical {
             }
 
             #[inline]
-            fn encoded_len_field(_value: Self::Value, field: u32) -> usize {
-                encode::encoded_len_fixed32_field(field)
+            fn payload_len(_value: Self::Value) -> usize {
+                FIXED32_BYTES
             }
 
             #[inline]
-            fn encode_field(value: Self::Value, field: u32, buf: &mut impl BufMut) {
-                encode::encode_fixed32_field(field, value.to_le_bytes(), buf);
+            fn encode_payload(value: Self::Value, buf: &mut impl BufMut) {
+                buf.put_slice(&value.to_le_bytes());
             }
 
             #[inline]
@@ -407,7 +422,7 @@ macro_rules! impl_fixed32_numerical {
             #[inline]
             fn encode_packed_payload(values: &[Self::Value], buf: &mut impl BufMut) {
                 for v in values {
-                    buf.put_slice(&v.to_le_bytes());
+                    <Self as NumericalType>::encode_payload(*v, buf);
                 }
             }
         }
@@ -437,13 +452,13 @@ macro_rules! impl_fixed64_numerical {
             }
 
             #[inline]
-            fn encoded_len_field(_value: Self::Value, field: u32) -> usize {
-                encode::encoded_len_fixed64_field(field)
+            fn payload_len(_value: Self::Value) -> usize {
+                FIXED64_BYTES
             }
 
             #[inline]
-            fn encode_field(value: Self::Value, field: u32, buf: &mut impl BufMut) {
-                encode::encode_fixed64_field(field, value.to_le_bytes(), buf);
+            fn encode_payload(value: Self::Value, buf: &mut impl BufMut) {
+                buf.put_slice(&value.to_le_bytes());
             }
 
             #[inline]
@@ -454,7 +469,7 @@ macro_rules! impl_fixed64_numerical {
             #[inline]
             fn encode_packed_payload(values: &[Self::Value], buf: &mut impl BufMut) {
                 for v in values {
-                    buf.put_slice(&v.to_le_bytes());
+                    <Self as NumericalType>::encode_payload(*v, buf);
                 }
             }
         }
@@ -467,3 +482,31 @@ impl_fixed32_numerical!(ProtoFloat, f32);
 impl_fixed64_numerical!(ProtoFixed64, u64);
 impl_fixed64_numerical!(ProtoSFixed64, i64);
 impl_fixed64_numerical!(ProtoDouble, f64);
+
+impl<T: NumericalType> WirePayload for T {
+    type View<'a, A: Allocator + Clone>
+        = T::Value
+    where
+        Self: 'a,
+        A: 'a;
+
+    const WIRE_TYPE: WireType = numerical_wire_type(T::WIRE);
+
+    #[inline]
+    fn payload_len<'a, A: Allocator + Clone>(value: T::Value) -> usize
+    where
+        Self: 'a,
+    {
+        T::payload_len(value)
+    }
+
+    #[inline]
+    fn encode_payload<'a, A, B>(value: T::Value, buf: &mut B)
+    where
+        Self: 'a,
+        A: Allocator + Clone,
+        B: BufMut,
+    {
+        T::encode_payload(value, buf);
+    }
+}

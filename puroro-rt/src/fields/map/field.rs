@@ -369,7 +369,7 @@ where
 // Blanket `puroro::{MapRef, MapMut}` over catalog bind views (view types from
 // `MapKey::KeyView` / `MapValueView::View`).
 
-impl<'a, K, V, const FIELD: u32, A, Pb> MapRef<K::KeyView, V::View>
+impl<'a, K, V, const FIELD: u32, A, Pb> MapRef<K::KeyView, <V as MapValueView>::View>
     for MapFieldRef<'a, K, V, FIELD, A, Pb>
 where
     K: MapKey,
@@ -384,12 +384,12 @@ where
     }
 
     #[inline]
-    fn get(&self, key: impl Borrow<K::KeyView>) -> Option<&V::View> {
+    fn get(&self, key: impl Borrow<K::KeyView>) -> Option<&<V as MapValueView>::View> {
         self.field.entries.get(key.borrow()).map(V::as_view)
     }
 }
 
-impl<'f, 'c, K, V, const FIELD: u32, A, Pb> MapMut<K::KeyView, V::View>
+impl<'f, 'c, K, V, const FIELD: u32, A, Pb> MapMut<K::KeyView, <V as MapValueView>::View>
     for MapFieldMut<'f, 'c, K, V, FIELD, A, Pb>
 where
     K: MapKey,
@@ -411,7 +411,7 @@ where
     }
 
     #[inline]
-    fn get(&self, key: impl Borrow<K::KeyView>) -> Option<&V::View> {
+    fn get(&self, key: impl Borrow<K::KeyView>) -> Option<&<V as MapValueView>::View> {
         self.field.entries.get(key.borrow()).map(V::as_view)
     }
 

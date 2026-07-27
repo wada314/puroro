@@ -9,6 +9,7 @@ use crate::decode;
 use crate::encode;
 use crate::fields::wire::map_element::MapKey;
 use crate::fields::wire::repeated_element::{RepeatedElement, RepeatedElementMerge};
+use crate::fields::wire::wire_payload::{encode_field, encoded_len_field};
 
 const KEY_FIELD: u32 = 1;
 const VALUE_FIELD: u32 = 2;
@@ -26,7 +27,8 @@ where
     V: RepeatedElement,
     A: Allocator + Clone,
 {
-    K::encoded_len_element(key, KEY_FIELD) + V::encoded_len_element(value, VALUE_FIELD)
+    encoded_len_field::<K, A>(K::wire_view(key), KEY_FIELD)
+        + encoded_len_field::<V, A>(V::wire_view(value), VALUE_FIELD)
 }
 
 /// Encodes one map field occurrence: `tag(FIELD, Len) + len + entry body`.
@@ -45,8 +47,8 @@ pub(super) fn encode_map_entry<K, V, A, B>(
     let payload_len = entry_payload_len::<K, V, A>(key, value);
     encode::encode_tag(field, WireType::Len, buf);
     encode::encode_varint(payload_len as u64, buf);
-    K::encode_element(key, KEY_FIELD, buf);
-    V::encode_element(value, VALUE_FIELD, buf);
+    encode_field::<K, A, B>(K::wire_view(key), KEY_FIELD, buf);
+    encode_field::<V, A, B>(V::wire_view(value), VALUE_FIELD, buf);
 }
 
 fn discard_partial_entry<K, V, A>(

@@ -10,6 +10,7 @@ use ::bytes::BufMut;
 
 use crate::encode;
 use crate::fields::wire::repeated_element::{PackableRepeatedElement, RepeatedElement};
+use crate::fields::wire::wire_payload::{encode_field, encoded_len_field};
 
 /// How a repeated field is written on encode.
 pub trait RepeatedEncoding<T: RepeatedElement, A: Allocator + Clone>: Copy {
@@ -28,13 +29,13 @@ impl<T: RepeatedElement, A: Allocator + Clone> RepeatedEncoding<T, A> for Expand
     fn encoded_len(field: u32, values: &[T::Element<A>]) -> usize {
         values
             .iter()
-            .map(|v| T::encoded_len_element(v, field))
+            .map(|v| encoded_len_field::<T, A>(T::wire_view(v), field))
             .sum()
     }
 
     fn encode<B: BufMut>(field: u32, values: &[T::Element<A>], buf: &mut B) {
         for v in values {
-            T::encode_element(v, field, buf);
+            encode_field::<T, A, B>(T::wire_view(v), field, buf);
         }
     }
 }

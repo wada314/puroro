@@ -43,4 +43,5 @@ pub use fields::wire::{
     ProtoEnumStorage, ProtoFixed32, ProtoFixed64, ProtoFloat, ProtoInt32, ProtoInt64, ProtoMessage,
     ProtoSFixed32, ProtoSFixed64, ProtoSint32, ProtoSint64, ProtoString, ProtoType, ProtoUInt32,
     ProtoUInt64, RepeatedElement, RepeatedElementMerge, RepeatedElementMut, RepeatedVecMut,
+    WirePayload, encode_field, encoded_len_field,
 };
