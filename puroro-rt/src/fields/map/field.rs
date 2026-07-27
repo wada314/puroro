@@ -64,31 +64,6 @@ where
         self.entries.is_empty()
     }
 
-    /// Total wire length of all map entries (each as a LEN field `FIELD`).
-    pub fn encoded_len<Pb>(&self, _common: &MessageCommon<Pb, A>) -> usize
-    where
-        Pb: PresenceBits,
-        K::Element<A>: Eq + Hash,
-    {
-        let mut n = 0;
-        for (key, value) in &self.entries {
-            let payload = entry_payload_len::<K, V, A>(key, value);
-            n += encode::encoded_len_len_field(FIELD, payload);
-        }
-        n
-    }
-
-    /// Encodes all map entries (order unspecified).
-    pub fn encode_raw<Pb, B: BufMut>(&self, _common: &MessageCommon<Pb, A>, buf: &mut B)
-    where
-        Pb: PresenceBits,
-        K::Element<A>: Eq + Hash,
-    {
-        for (key, value) in &self.entries {
-            encode_map_entry::<K, V, A, B>(FIELD, key, value, buf);
-        }
-    }
-
     #[inline]
     pub fn bind<'a, Pb: PresenceBits>(
         &'a self,
@@ -103,26 +78,6 @@ where
         common: &'c mut MessageCommon<Pb, A>,
     ) -> MapFieldMut<'f, 'c, K, V, FIELD, A, Pb> {
         MapFieldMut::new(self, common)
-    }
-
-    #[inline]
-    pub fn clone_in<Pb>(&self, _common: &MessageCommon<Pb, A>, alloc: A) -> Self
-    where
-        Pb: PresenceBits,
-        K::Element<A>: CloneIn<A> + Eq + Hash,
-        V::Element<A>: CloneIn<A>,
-    {
-        let mut out = HashMap::with_capacity_and_hasher_in(
-            self.entries.len(),
-            DefaultHashBuilder::default(),
-            alloc.clone(),
-        );
-        out.extend(
-            self.entries
-                .iter()
-                .map(|(k, v)| (k.clone_in(alloc.clone()), v.clone_in(alloc.clone()))),
-        );
-        Self { entries: out }
     }
 }
 
@@ -194,14 +149,19 @@ where
     Pb: PresenceBits,
     K::Element<A>: Eq + Hash,
 {
-    #[inline]
-    fn wire_encoded_len(&self, common: &MessageCommon<Pb, A>) -> usize {
-        self.encoded_len(common)
+    fn wire_encoded_len(&self, _common: &MessageCommon<Pb, A>) -> usize {
+        let mut n = 0;
+        for (key, value) in &self.entries {
+            let payload = entry_payload_len::<K, V, A>(key, value);
+            n += encode::encoded_len_len_field(FIELD, payload);
+        }
+        n
     }
 
-    #[inline]
-    fn wire_encode_raw<B: BufMut>(&self, common: &MessageCommon<Pb, A>, buf: &mut B) {
-        self.encode_raw(common, buf);
+    fn wire_encode_raw<B: BufMut>(&self, _common: &MessageCommon<Pb, A>, buf: &mut B) {
+        for (key, value) in &self.entries {
+            encode_map_entry::<K, V, A, B>(FIELD, key, value, buf);
+        }
     }
 }
 
@@ -214,9 +174,18 @@ where
     K::Element<A>: CloneIn<A> + Eq + Hash,
     V::Element<A>: CloneIn<A>,
 {
-    #[inline]
-    fn clone_field(&self, common: &MessageCommon<Pb, A>, alloc: A) -> Self {
-        self.clone_in(common, alloc)
+    fn clone_field(&self, _common: &MessageCommon<Pb, A>, alloc: A) -> Self {
+        let mut out = HashMap::with_capacity_and_hasher_in(
+            self.entries.len(),
+            DefaultHashBuilder::default(),
+            alloc.clone(),
+        );
+        out.extend(
+            self.entries
+                .iter()
+                .map(|(k, v)| (k.clone_in(alloc.clone()), v.clone_in(alloc.clone()))),
+        );
+        Self { entries: out }
     }
 }
 
@@ -473,6 +442,7 @@ mod tests {
     use super::MapField;
     use crate::decode::decode_tag;
     use crate::encode::{encode_tag, encode_varint, encode_varint_field};
+    use crate::fields::shared::field_inspect::FieldEncode;
     use crate::fields::shared::{FieldDeallocate, MessageCommon};
     use crate::fields::wire::{ProtoInt32, ProtoString};
     use ::allocator_api2::alloc::Global;
@@ -505,8 +475,8 @@ mod tests {
         field.bind_mut(&mut common).insert(2, 20);
 
         let mut buf = BytesMut::new();
-        field.encode_raw(&common, &mut buf);
-        assert_eq!(field.encoded_len(&common), buf.len());
+        field.wire_encode_raw(&common, &mut buf);
+        assert_eq!(field.wire_encoded_len(&common), buf.len());
 
         let mut decoded = MapField::<ProtoInt32, ProtoInt32, 7, _>::new_in(Global);
         let mut rest = buf.as_ref();
@@ -571,7 +541,7 @@ mod tests {
         field.bind_mut(&mut common).insert(unmanaged_str("ab"), 7);
 
         let mut buf = BytesMut::new();
-        field.encode_raw(&common, &mut buf);
+        field.wire_encode_raw(&common, &mut buf);
 
         let mut decoded = MapField::<ProtoString, ProtoInt32, 3, _>::new_in(Global);
         let mut rest = buf.as_ref();
@@ -616,7 +586,7 @@ mod tests {
                 let mut src = MapField::<ProtoString, ProtoInt32, 1, _>::new_in(Global);
                 src.bind_mut(common).insert(unmanaged_str("k"), value);
                 let mut buf = BytesMut::new();
-                src.encode_raw(common, &mut buf);
+                src.wire_encode_raw(common, &mut buf);
                 src.deallocate(common);
                 buf
             };
