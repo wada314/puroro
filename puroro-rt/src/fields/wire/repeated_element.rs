@@ -35,7 +35,7 @@ use super::wire_payload::WirePayload;
 /// Decode / merge live on [`RepeatedElementMerge`] so nested messages can
 /// constrain `M::Alloc = A`. Tagged encode goes through [`WirePayload`] via
 /// [`wire_view`](Self::wire_view).
-pub trait RepeatedElement: ProtoType + WirePayload {
+pub trait RepeatedElement: ProtoType {
     /// Physical element stored in the repeated buffer.
     type Element<A: Allocator + Clone>;
 

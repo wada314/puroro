@@ -8,7 +8,7 @@
 //! `Address<A>`). Singular fields pass the same `A` so the box allocator matches.
 
 use ::allocator_api2::alloc::Allocator;
-use ::bytes::{Buf, BufMut};
+use ::bytes::Buf;
 use ::core::marker::PhantomData;
 use ::core::ops::{Deref, DerefMut};
 use ::unmanaged::UnmanagedBox;
@@ -24,7 +24,6 @@ use crate::fields::shared::{
     value_slot::{AddressableSlot, ValueSlot, ValueSlotMutAccess},
 };
 use crate::fields::wire::proto_type::{PayloadAccess, ProtoType};
-use crate::fields::wire::wire_payload::{encode_field, encoded_len_field};
 
 /// Type marker for a singular nested message `M`.
 ///
@@ -72,33 +71,12 @@ impl<M, A: Allocator> AddressableSlot for UnmanagedBox<M, A> {}
 
 impl<M: Message> ProtoType for ProtoMessage<M> {
     type Slot<A: Allocator + Clone> = UnmanagedBox<M, A>;
-    type Ref<'a, A: Allocator + Clone>
-        = &'a M
-    where
-        Self: 'a,
-        A: 'a;
     type Mut<'a, A: Allocator + Clone>
         = &'a mut M
     where
         Self: 'a,
         A: 'a;
     type Written<A: Allocator + Clone> = UnmanagedBox<M, A>;
-
-    #[inline]
-    fn encoded_len<'a, A: Allocator + Clone + 'a>(value: &'a M, field: u32) -> usize
-    where
-        Self: 'a,
-    {
-        encoded_len_field::<Self, A>(value, field)
-    }
-
-    #[inline]
-    fn encode<'a, A: Allocator + Clone + 'a, B: BufMut>(value: &'a M, field: u32, buf: &mut B)
-    where
-        Self: 'a,
-    {
-        encode_field::<Self, A, B>(value, field, buf);
-    }
 }
 
 impl<M: Message> PayloadAccess for ProtoMessage<M> {

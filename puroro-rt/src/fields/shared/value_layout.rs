@@ -34,7 +34,7 @@ where
     fn get<'a, Pb: PresenceBits>(
         slot: &'a T::Slot<A>,
         common: &'a MessageCommon<Pb, A>,
-    ) -> T::Ref<'a, A>;
+    ) -> T::View<'a, A>;
 
     fn with_mut<'a, VS, I, Pb>(
         slot: &'a mut VS,
@@ -97,7 +97,7 @@ where
     fn get<'a, Pb: PresenceBits>(
         slot: &'a T::Slot<A>,
         common: &'a MessageCommon<Pb, A>,
-    ) -> T::Ref<'a, A> {
+    ) -> T::View<'a, A> {
         T::get(slot, common)
     }
 

@@ -434,12 +434,12 @@ impl<
     Pb: PresenceBits,
 > OneofVariantRef<'a, SingularField<T, Oneof, FIELD, A, L, D>, Pb, A>
 where
-    T::Ref<'a, A>: Copy,
-    D: HasDefault<T::Ref<'a, A>>,
+    T::View<'a, A>: Copy,
+    D: HasDefault<T::View<'a, A>>,
     T::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
     <Oneof as FieldPresence>::ValueSlot<T::Slot<A>>: ValueSlot<T::Slot<A>, A>,
 {
-    pub fn optional(self) -> Optional<T::Ref<'a, A>, D>
+    pub fn optional(self) -> Optional<T::View<'a, A>, D>
     where
         A: Clone,
     {

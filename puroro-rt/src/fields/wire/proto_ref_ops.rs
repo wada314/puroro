@@ -1,5 +1,5 @@
-//! Per-marker [`PartialEq`] / [`Debug`] for [`ProtoType::Ref`] without
-//! `for<'a> Ref<'a, A>: …` HRTBs that force `A: 'static` on nested messages.
+//! Per-marker [`PartialEq`] / [`Debug`] for [`WirePayload::View`](super::wire_payload::WirePayload::View)
+//! without `for<'a> View<'a, A>: …` HRTBs that force `A: 'static` on nested messages.
 
 use ::allocator_api2::alloc::Allocator;
 use ::core::fmt::{Debug, Formatter, Result as FmtResult};
@@ -12,21 +12,23 @@ use super::proto_message::ProtoMessage;
 use super::proto_type::ProtoType;
 use super::varint::ProtoBool;
 
-/// Equality for [`ProtoType::Ref`] views (used by catalog [`FieldPartialEq`](crate::FieldPartialEq)).
+/// Equality for [`WirePayload::View`](super::wire_payload::WirePayload::View)
+/// (used by catalog [`FieldPartialEq`](crate::FieldPartialEq)).
 pub trait ProtoRefEq<A: Allocator + Clone>: ProtoType {
-    fn option_eq<'a>(lhs: Option<Self::Ref<'a, A>>, rhs: Option<Self::Ref<'a, A>>) -> bool
+    fn option_eq<'a>(lhs: Option<Self::View<'a, A>>, rhs: Option<Self::View<'a, A>>) -> bool
     where
         A: 'a;
 }
 
-/// [`Debug`] for [`ProtoType::Ref`] views (used by catalog [`FieldDebug`](crate::FieldDebug)).
+/// [`Debug`] for [`WirePayload::View`](super::wire_payload::WirePayload::View)
+/// (used by catalog [`FieldDebug`](crate::FieldDebug)).
 pub trait ProtoRefDebug<A: Allocator + Clone>: ProtoType {
-    fn fmt_ref<'a>(value: &Self::Ref<'a, A>, f: &mut Formatter<'_>) -> FmtResult
+    fn fmt_ref<'a>(value: &Self::View<'a, A>, f: &mut Formatter<'_>) -> FmtResult
     where
         A: 'a;
 
     #[inline]
-    fn fmt_option<'a>(value: Option<Self::Ref<'a, A>>, f: &mut Formatter<'_>) -> FmtResult
+    fn fmt_option<'a>(value: Option<Self::View<'a, A>>, f: &mut Formatter<'_>) -> FmtResult
     where
         A: 'a,
     {

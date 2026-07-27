@@ -41,6 +41,7 @@ use crate::fields::shared::{
 };
 use crate::fields::wire::proto_ref_ops::{ProtoRefDebug, ProtoRefEq};
 use crate::fields::wire::proto_type::ProtoType;
+use crate::fields::wire::wire_payload::{encode_field, encoded_len_field};
 
 /// Singular (non-repeated) scalar field — varint or LEN, selected by type marker `T`.
 ///
@@ -173,7 +174,7 @@ where
     pub fn value<'a, Pb: PresenceBits>(
         &'a self,
         common: &'a MessageCommon<Pb, A>,
-    ) -> T::Ref<'a, A> {
+    ) -> T::View<'a, A> {
         let slot = self
             .value
             .with(AlwaysInitialized, common)
@@ -196,7 +197,7 @@ where
     pub fn value<'a, Pb: PresenceBits>(
         &'a self,
         common: &'a MessageCommon<Pb, A>,
-    ) -> T::Ref<'a, A> {
+    ) -> T::View<'a, A> {
         let slot = self
             .value
             .with(AlwaysInitialized, common)
@@ -309,7 +310,7 @@ where
     }
 
     /// Returns the logical value when the field is present.
-    pub fn get(self) -> Option<T::Ref<'a, A>> {
+    pub fn get(self) -> Option<T::View<'a, A>> {
         if P::is_set(self.common, || {
             match self
                 .field
@@ -343,10 +344,10 @@ where
     Pb: PresenceBits,
     T::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
     P::ValueSlot<T::Slot<A>>: ValueSlot<T::Slot<A>, A>,
-    T::Ref<'a, A>: Copy,
-    D: HasDefault<T::Ref<'a, A>>,
+    T::View<'a, A>: Copy,
+    D: HasDefault<T::View<'a, A>>,
 {
-    pub fn optional(self) -> Optional<T::Ref<'a, A>, D> {
+    pub fn optional(self) -> Optional<T::View<'a, A>, D> {
         Optional::new(self.get())
     }
 }
@@ -361,7 +362,7 @@ where
     <Implicit as FieldPresence>::ValueSlot<T::Slot<A>>: ValueSlot<T::Slot<A>, A>,
 {
     #[inline]
-    pub fn value(self) -> T::Ref<'a, A> {
+    pub fn value(self) -> T::View<'a, A> {
         self.field.value(self.common)
     }
 }
@@ -376,7 +377,7 @@ where
     <Oneof as FieldPresence>::ValueSlot<T::Slot<A>>: ValueSlot<T::Slot<A>, A>,
 {
     #[inline]
-    pub fn value(self) -> T::Ref<'a, A> {
+    pub fn value(self) -> T::View<'a, A> {
         self.field.value(self.common)
     }
 }
@@ -520,7 +521,7 @@ where
                 .with(init, common)
                 .get()
                 .expect("should_emit implies initialized slot");
-            T::encoded_len(L::get(slot, common), FIELD)
+            encoded_len_field::<T, A>(L::get(slot, common), FIELD)
         } else {
             0
         }
@@ -540,7 +541,7 @@ where
                 .with(init, common)
                 .get()
                 .expect("should_emit implies initialized slot");
-            T::encode(L::get(slot, common), FIELD, buf);
+            encode_field::<T, A, B>(L::get(slot, common), FIELD, buf);
         }
     }
 }

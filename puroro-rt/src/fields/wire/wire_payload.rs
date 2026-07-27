@@ -21,7 +21,7 @@ use super::varint::ProtoBool;
 /// Markers remain the implementors so the same Rust value type can use
 /// different codecs (e.g. `i32` as int32 / sint32 / sfixed32).
 pub trait WirePayload {
-    /// View passed to payload / tagged encode (matches singular [`ProtoType::Ref`](super::proto_type::ProtoType::Ref)).
+    /// View passed to payload / tagged encode (also the singular getter view).
     ///
     /// Always `Copy` (by-value scalars or shared references) so LEN framing can
     /// measure then write the same view.

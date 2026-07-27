@@ -3,6 +3,10 @@
 //! Markers (`ProtoInt32`, `ProtoBool`, [`ProtoMessage`](super::proto_message::ProtoMessage), …)
 //! are allocator-free. Physical storage / views are GATs parametrised by `A`.
 //!
+//! Tagged encode is **not** on this trait — catalog code calls
+//! [`encode_field`](super::wire_payload::encode_field) with
+//! [`WirePayload::View`](super::wire_payload::WirePayload::View) after omit checks.
+//!
 //! **Storage access** (get / write / clear / merge) lives on [`PayloadAccess`]
 //! for inline payloads, or on
 //! [`ValueLayout`](crate::fields::shared::value_layout::ValueLayout)
@@ -20,7 +24,7 @@ use ::bitvec::{
     order::Lsb0,
     ptr::{BitRef, Mut},
 };
-use ::bytes::{Buf, BufMut};
+use ::bytes::Buf;
 use ::core::ops::DerefMut;
 use ::unmanaged::string::StringGuard;
 use ::unmanaged::vec::VecGuard;
@@ -41,16 +45,18 @@ use crate::fields::shared::{
 use super::len::{ProtoBytes, ProtoString};
 use super::numerical::NumericalType;
 use super::varint::ProtoBool;
-use super::wire_payload::{encode_field, encoded_len_field};
+use super::wire_payload::WirePayload;
 
-/// Wire + type-identity for a singular protobuf type marker.
+/// Singular protobuf type marker: storage GATs over [`WirePayload`].
 ///
 /// Physical storage is the GAT [`Slot`](Self::Slot):
 /// - numerics / enums: bare `i32` / `E` / …
 /// - [`ProtoBool`]: `()` (ZST; logical `bool` via [`BitPacked`](crate::fields::shared::value_layout::BitPacked))
 /// - string / bytes: `UnmanagedString` / `UnmanagedVec`
 /// - nested messages: `UnmanagedBox<M, A>` via [`ProtoMessage`](super::proto_message::ProtoMessage)
-pub trait ProtoType: Sized {
+///
+/// Getter views use [`WirePayload::View`] (same type as tagged encode).
+pub trait ProtoType: WirePayload {
     /// Physical value stored in the singular field slot (excluding
     /// [`MessageCommon`] bits).
     ///
@@ -61,12 +67,6 @@ pub trait ProtoType: Sized {
     /// `DeallocateIn` on that box.
     type Slot<A: Allocator + Clone>;
 
-    /// Borrowed / by-value view returned by getters (`i32`, `&str`, `bool`, …).
-    type Ref<'a, A: Allocator + Clone>
-    where
-        Self: 'a,
-        A: 'a;
-
     /// Mutable handle returned by `_mut` accessors (`&mut i32`, `StringGuard`,
     /// bit handle, …).
     type Mut<'a, A: Allocator + Clone>: DerefMut
@@ -76,19 +76,6 @@ pub trait ProtoType: Sized {
 
     /// Value accepted by [`PayloadAccess::write`] / field `set`.
     type Written<A: Allocator + Clone>;
-
-    /// Wire byte length of one tagged occurrence for `value`.
-    fn encoded_len<'a, A: Allocator + Clone + 'a>(value: Self::Ref<'a, A>, field: u32) -> usize
-    where
-        Self: 'a;
-
-    /// Encodes one tagged occurrence for `value`.
-    fn encode<'a, A: Allocator + Clone + 'a, B: BufMut>(
-        value: Self::Ref<'a, A>,
-        field: u32,
-        buf: &mut B,
-    ) where
-        Self: 'a;
 }
 
 /// Inline payload access for markers whose value lives in [`ProtoType::Slot`].
@@ -106,7 +93,7 @@ pub trait PayloadAccess: ProtoType {
     fn get<'a, A: Allocator + Clone + 'a, Pb: PresenceBits>(
         slot: &'a Self::Slot<A>,
         common: &'a MessageCommon<Pb, A>,
-    ) -> Self::Ref<'a, A>;
+    ) -> Self::View<'a, A>;
 
     /// Ensures the slot is present and returns a mutable accessor handle.
     fn with_mut<'a, A, VS, I, Pb>(
@@ -177,33 +164,12 @@ where
     T: NumericalType,
 {
     type Slot<A: Allocator + Clone> = T::Value;
-    type Ref<'a, A: Allocator + Clone>
-        = T::Value
-    where
-        Self: 'a,
-        A: 'a;
     type Mut<'a, A: Allocator + Clone>
         = &'a mut T::Value
     where
         Self: 'a,
         A: 'a;
     type Written<A: Allocator + Clone> = T::Value;
-
-    #[inline]
-    fn encoded_len<'a, A: Allocator + Clone + 'a>(value: T::Value, field: u32) -> usize
-    where
-        Self: 'a,
-    {
-        encoded_len_field::<Self, A>(value, field)
-    }
-
-    #[inline]
-    fn encode<'a, A: Allocator + Clone + 'a, B: BufMut>(value: T::Value, field: u32, buf: &mut B)
-    where
-        Self: 'a,
-    {
-        encode_field::<Self, A, B>(value, field, buf);
-    }
 }
 
 impl<T> PayloadAccess for T
@@ -314,33 +280,12 @@ where
 
 impl ProtoType for ProtoString {
     type Slot<A: Allocator + Clone> = UnmanagedString<A>;
-    type Ref<'a, A: Allocator + Clone>
-        = &'a str
-    where
-        Self: 'a,
-        A: 'a;
     type Mut<'a, A: Allocator + Clone>
         = StringGuard<'a, A>
     where
         Self: 'a,
         A: 'a;
     type Written<A: Allocator + Clone> = UnmanagedString<A>;
-
-    #[inline]
-    fn encoded_len<'a, A: Allocator + Clone + 'a>(value: &'a str, field: u32) -> usize
-    where
-        Self: 'a,
-    {
-        encoded_len_field::<Self, A>(value, field)
-    }
-
-    #[inline]
-    fn encode<'a, A: Allocator + Clone + 'a, B: BufMut>(value: &'a str, field: u32, buf: &mut B)
-    where
-        Self: 'a,
-    {
-        encode_field::<Self, A, B>(value, field, buf);
-    }
 }
 
 impl PayloadAccess for ProtoString {
@@ -436,33 +381,12 @@ impl PayloadAccess for ProtoString {
 
 impl ProtoType for ProtoBytes {
     type Slot<A: Allocator + Clone> = UnmanagedVec<u8, A>;
-    type Ref<'a, A: Allocator + Clone>
-        = &'a [u8]
-    where
-        Self: 'a,
-        A: 'a;
     type Mut<'a, A: Allocator + Clone>
         = VecGuard<'a, u8, A>
     where
         Self: 'a,
         A: 'a;
     type Written<A: Allocator + Clone> = UnmanagedVec<u8, A>;
-
-    #[inline]
-    fn encoded_len<'a, A: Allocator + Clone + 'a>(value: &'a [u8], field: u32) -> usize
-    where
-        Self: 'a,
-    {
-        encoded_len_field::<Self, A>(value, field)
-    }
-
-    #[inline]
-    fn encode<'a, A: Allocator + Clone + 'a, B: BufMut>(value: &'a [u8], field: u32, buf: &mut B)
-    where
-        Self: 'a,
-    {
-        encode_field::<Self, A, B>(value, field, buf);
-    }
 }
 
 impl PayloadAccess for ProtoBytes {
@@ -562,31 +486,10 @@ impl PayloadAccess for ProtoBytes {
 
 impl ProtoType for ProtoBool {
     type Slot<A: Allocator + Clone> = ();
-    type Ref<'a, A: Allocator + Clone>
-        = bool
-    where
-        Self: 'a,
-        A: 'a;
     type Mut<'a, A: Allocator + Clone>
         = BitRef<'a, Mut, u8, Lsb0>
     where
         Self: 'a,
         A: 'a;
     type Written<A: Allocator + Clone> = bool;
-
-    #[inline]
-    fn encoded_len<'a, A: Allocator + Clone + 'a>(value: bool, field: u32) -> usize
-    where
-        Self: 'a,
-    {
-        encoded_len_field::<Self, A>(value, field)
-    }
-
-    #[inline]
-    fn encode<'a, A: Allocator + Clone + 'a, B: BufMut>(value: bool, field: u32, buf: &mut B)
-    where
-        Self: 'a,
-    {
-        encode_field::<Self, A, B>(value, field, buf);
-    }
 }

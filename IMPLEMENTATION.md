@@ -200,7 +200,7 @@ Field catalog methods take `&MessageCommon` / `&mut MessageCommon`, not `&Task`,
 
 [`ValueSlot<T>`](puroro-rt/src/fields/shared/value_slot.rs) — singular **slot** storage behind a GAT on [`FieldPresence`](puroro-rt/src/fields/shared/field_presence.rs): always-initialized `T` for `Implicit` / `Oneof`; `MaybeUninit<T>` for `Explicit` / `LegacyRequired`; `Option<T>` for `Message` (pointer presence). Here `T` is [`ProtoType::Slot`](puroro-rt/src/fields/wire/proto_type.rs) (the type marker itself, ZST [`ProtoBool`](puroro-rt/src/fields/wire/varint.rs), or `UnmanagedBox<M, A>` for messages). Construction / teardown thread an allocator via [`DefaultIn<A>`](puroro-rt/src/fields/shared.rs) / [`unmanaged::DeallocateIn<A>`](unmanaged/) (allocator as a **trait parameter**, not an associated type). Reads and mutation go through short-lived views: `slot.with(init, common)` → [`ValueSlotRefAccess`](puroro-rt/src/fields/shared/value_slot.rs) / `slot.with_mut(init, common)` → [`ValueSlotMutAccess`](puroro-rt/src/fields/shared/value_slot.rs) (`get` / `get_mut` / `set` / `clear`). Init markers ([`AlwaysInitialized`](puroro-rt/src/fields/shared/slot_init.rs) / [`BitInit`](puroro-rt/src/fields/shared/slot_init.rs)) are borrow-free; they read/update state through the passed [`MessageCommon`](puroro-rt/src/fields/shared.rs). Slot payloads use [`AddressableSlot`](puroro-rt/src/fields/shared/value_slot.rs); logical bool values are read/written via [`ProtoType`](puroro-rt/src/fields/wire/proto_type.rs) against `_common.presence`. Singular IMPLICIT omit goes through [`ProtoType::is_proto_empty`](puroro-rt/src/fields/wire/proto_type.rs) (slot [`ProtoEmpty`](puroro-rt/src/fields/shared.rs) for addressable types; bit read for `ProtoBool`).
 
-[`SingularField::bind`](puroro-rt/src/fields/singular/field.rs) / [`bind_mut`](puroro-rt/src/fields/singular/field.rs) — inherent MessageCommon binding → [`SingularFieldRef`](puroro-rt/src/fields/singular/field.rs) / [`SingularFieldMut`](puroro-rt/src/fields/singular/field.rs). Repeated fields and [`OneofSlot`](puroro-rt/src/fields/oneof.rs) use the same inherent `bind` / `bind_mut` call shape. Getter / `_mut` payload types are [`ProtoType::Ref`](puroro-rt/src/fields/wire/proto_type.rs) / [`Mut`](puroro-rt/src/fields/wire/proto_type.rs).
+[`SingularField::bind`](puroro-rt/src/fields/singular/field.rs) / [`bind_mut`](puroro-rt/src/fields/singular/field.rs) — inherent MessageCommon binding → [`SingularFieldRef`](puroro-rt/src/fields/singular/field.rs) / [`SingularFieldMut`](puroro-rt/src/fields/singular/field.rs). Repeated fields and [`OneofSlot`](puroro-rt/src/fields/oneof.rs) use the same inherent `bind` / `bind_mut` call shape. Getter / `_mut` payload types are [`WirePayload::View`](puroro-rt/src/fields/wire/wire_payload.rs) / [`ProtoType::Mut`](puroro-rt/src/fields/wire/proto_type.rs).
 
 ---
 
@@ -221,23 +221,21 @@ One marker + trait per protobuf **wire family**. Semantic conversions delegate t
 
 ### Payload + tagged framing ([`wire/wire_payload.rs`](puroro-rt/src/fields/wire/wire_payload.rs))
 
-[`WirePayload`](puroro-rt/src/fields/wire/wire_payload.rs) is implemented by type markers (`ProtoInt32`, `ProtoString`, `ProtoMessage<M>`, …). `View` matches singular [`ProtoType::Ref`](puroro-rt/src/fields/wire/proto_type.rs) and is always `Copy` (by-value scalars or shared refs). `const WIRE_TYPE` selects varint / fixed / LEN framing. Free helpers [`encode_field`](puroro-rt/src/fields/wire/wire_payload.rs) / [`encoded_len_field`](puroro-rt/src/fields/wire/wire_payload.rs) always encode when called — they do **not** apply presence omit.
+[`WirePayload`](puroro-rt/src/fields/wire/wire_payload.rs) is implemented by type markers (`ProtoInt32`, `ProtoString`, `ProtoMessage<M>`, …). `View` is both the singular getter view and the tagged-encode input, and is always `Copy` (by-value scalars or shared refs). `const WIRE_TYPE` selects varint / fixed / LEN framing. Free helpers [`encode_field`](puroro-rt/src/fields/wire/wire_payload.rs) / [`encoded_len_field`](puroro-rt/src/fields/wire/wire_payload.rs) always encode when called — they do **not** apply presence omit. [`ProtoType`](puroro-rt/src/fields/wire/proto_type.rs) extends `WirePayload` with singular `Slot` / `Mut` / `Written` only (no encode methods).
 
 ### Singular field type markers ([`wire/proto_type.rs`](puroro-rt/src/fields/wire/proto_type.rs))
 
 [`ProtoType`](puroro-rt/src/fields/wire/proto_type.rs) is the trait consumed by [`SingularField`](puroro-rt/src/fields/singular/field.rs) (including nested messages via [`ProtoMessage`](puroro-rt/src/fields/wire/proto_message.rs)). Markers are **allocator-free**; physical storage / views are GATs over `A`. Singular slots use bare wire values (`i32`, `()`, …) / `UnmanagedString` / `UnmanagedBox<M, A>`:
 
 ```rust
-pub trait ProtoType: Sized {
+pub trait ProtoType: WirePayload {
     type Slot<A: Allocator + Clone>;
-    type Ref<'a, A: Allocator + Clone> where Self: 'a, A: 'a;
     type Mut<'a, A: Allocator + Clone>: DerefMut where Self: 'a, A: 'a;
     type Written<A: Allocator + Clone>; // accepted by set / write
-    fn encoded_len<'a, A>(value: Self::Ref<'a, A>, field: u32) -> usize;
-    fn encode<'a, A, B: BufMut>(value: Self::Ref<'a, A>, field: u32, buf: &mut B);
 }
-// encode / encoded_len delegate to wire::encode_field / encoded_len_field
+// Getter view = WirePayload::View
 // PayloadAccess: get / with_mut / write / clear / merge (singular wire decode)
+// SingularField::FieldEncode calls encode_field after FieldPresence::should_emit
 ```
 
 Singular wire decode is **merge-into only** (`PayloadAccess::merge` / `BitPacked::merge`). There is no `ProtoType::decode → Written`; nested messages merge into the present child via `Message::merge_from`.
@@ -246,7 +244,7 @@ Singular / oneof `bool` uses allocator-free [`ProtoBool`](puroro-rt/src/fields/w
 
 ### Repeated elements (`RepeatedElement`)
 
-[`RepeatedElement`](puroro-rt/src/fields/wire/repeated_element.rs) extends [`ProtoType`](puroro-rt/src/fields/wire/proto_type.rs) + [`WirePayload`](puroro-rt/src/fields/wire/wire_payload.rs) with GAT `Element<A>`, [`wire_view`](puroro-rt/src/fields/wire/repeated_element.rs) (`Element` → `WirePayload::View`), and deallocate. Expanded / map-entry tagged encode call `encode_field(T::wire_view(elem), …)`. Decode / merge live on [`RepeatedElementMerge<A>`](puroro-rt/src/fields/wire/repeated_element.rs) so nested messages can require `M: Message<Alloc = A>`. That trait also provides `default_element` / `decode_element` (singular occurrence; packed `Len` rejected) for map-entry interiors. Singular fields store `Slot<A>`; repeated fields store `Element<A>` (not always the same — nested-message repeated uses `Element = M` while singular keeps `Slot = UnmanagedBox<M, A>`).
+[`RepeatedElement`](puroro-rt/src/fields/wire/repeated_element.rs) extends [`ProtoType`](puroro-rt/src/fields/wire/proto_type.rs) (hence [`WirePayload`](puroro-rt/src/fields/wire/wire_payload.rs)) with GAT `Element<A>`, [`wire_view`](puroro-rt/src/fields/wire/repeated_element.rs) (`Element` → `View`), and deallocate. Expanded / map-entry tagged encode call `encode_field(T::wire_view(elem), …)`. Decode / merge live on [`RepeatedElementMerge<A>`](puroro-rt/src/fields/wire/repeated_element.rs) so nested messages can require `M: Message<Alloc = A>`. That trait also provides `default_element` / `decode_element` (singular occurrence; packed `Len` rejected) for map-entry interiors. Singular fields store `Slot<A>`; repeated fields store `Element<A>` (not always the same — nested-message repeated uses `Element = M` while singular keeps `Slot = UnmanagedBox<M, A>`).
 
 | Marker | `Element<A>` | Packable | Public mutation |
 |---|---|---|---|
