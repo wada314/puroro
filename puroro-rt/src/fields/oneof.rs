@@ -132,28 +132,6 @@ impl<E> OneofSlot<E> {
         self.value = None;
     }
 
-    /// Wire byte length when a variant is active.
-    pub fn encoded_len<Pb, A>(&self, common: &MessageCommon<Pb, A>) -> usize
-    where
-        E: OneofEncodable<A>,
-        Pb: PresenceBits,
-        A: Allocator,
-    {
-        self.as_ref().map(|v| v.encoded_len(common)).unwrap_or(0)
-    }
-
-    /// Encodes the active variant.
-    pub fn encode_raw<Pb, A, B: BufMut>(&self, common: &MessageCommon<Pb, A>, buf: &mut B)
-    where
-        E: OneofEncodable<A>,
-        Pb: PresenceBits,
-        A: Allocator,
-    {
-        if let Some(v) = self.as_ref() {
-            v.encode_raw(common, buf);
-        }
-    }
-
     /// Binds this slot to `common` for read access.
     #[inline]
     pub fn bind<'a, Pb: PresenceBits, A: Allocator + Clone>(
@@ -170,15 +148,6 @@ impl<E> OneofSlot<E> {
         common: &'c mut MessageCommon<Pb, A>,
     ) -> OneofSlotMut<'f, 'c, E, Pb, A> {
         OneofSlotMut::new(self, common)
-    }
-
-    /// Deep-copies the active variant via [`OneofGroup::clone_storage_in`].
-    #[inline]
-    pub fn clone_in(&self, common: &MessageCommon<E::Presence, E::Alloc>, alloc: E::Alloc) -> Self
-    where
-        E: OneofGroup,
-    {
-        Self::from_option(self.as_ref().map(|s| E::clone_storage_in(s, common, alloc)))
     }
 }
 
@@ -407,14 +376,14 @@ where
     Pb: PresenceBits,
     A: Allocator + Clone,
 {
-    #[inline]
     fn wire_encoded_len(&self, common: &MessageCommon<Pb, A>) -> usize {
-        self.encoded_len(common)
+        self.as_ref().map(|v| v.encoded_len(common)).unwrap_or(0)
     }
 
-    #[inline]
     fn wire_encode_raw<B: BufMut>(&self, common: &MessageCommon<Pb, A>, buf: &mut B) {
-        self.encode_raw(common, buf);
+        if let Some(v) = self.as_ref() {
+            v.encode_raw(common, buf);
+        }
     }
 }
 
@@ -424,9 +393,8 @@ where
     Pb: PresenceBits,
     A: Allocator + Clone,
 {
-    #[inline]
     fn clone_field(&self, common: &MessageCommon<Pb, A>, alloc: A) -> Self {
-        self.clone_in(common, alloc)
+        Self::from_option(self.as_ref().map(|s| E::clone_storage_in(s, common, alloc)))
     }
 }
 

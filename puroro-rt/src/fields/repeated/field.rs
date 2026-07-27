@@ -61,26 +61,6 @@ where
         self.values.is_empty()
     }
 
-    pub fn encoded_len<Pb>(&self, _common: &MessageCommon<Pb, A>) -> usize
-    where
-        Pb: PresenceBits,
-    {
-        if self.values.is_empty() {
-            0
-        } else {
-            E::encoded_len(FIELD, self.as_slice())
-        }
-    }
-
-    pub fn encode_raw<Pb, B: BufMut>(&self, _common: &MessageCommon<Pb, A>, buf: &mut B)
-    where
-        Pb: PresenceBits,
-    {
-        if !self.values.is_empty() {
-            E::encode(FIELD, self.as_slice(), buf);
-        }
-    }
-
     /// Binds this field to `common` for read access.
     #[inline]
     pub fn bind<'a, Pb: PresenceBits>(
@@ -97,20 +77,6 @@ where
         common: &'c mut MessageCommon<Pb, A>,
     ) -> RepeatedFieldMut<'f, 'c, T, E, FIELD, A, Pb> {
         RepeatedFieldMut::new(self, common)
-    }
-
-    /// Deep-copies elements into `alloc`. `common` is unused (kept for symmetry
-    /// with singular / oneof `clone_in`).
-    #[inline]
-    pub fn clone_in<Pb>(&self, _common: &MessageCommon<Pb, A>, alloc: A) -> Self
-    where
-        Pb: PresenceBits,
-        T::Element<A>: CloneIn<A>,
-    {
-        Self {
-            values: ManuallyDrop::new(self.values.clone_in(alloc)),
-            _encoding: PhantomData,
-        }
     }
 }
 
@@ -320,14 +286,18 @@ where
     A: Allocator + Clone,
     Pb: PresenceBits,
 {
-    #[inline]
-    fn wire_encoded_len(&self, common: &MessageCommon<Pb, A>) -> usize {
-        self.encoded_len(common)
+    fn wire_encoded_len(&self, _common: &MessageCommon<Pb, A>) -> usize {
+        if self.values.is_empty() {
+            0
+        } else {
+            E::encoded_len(FIELD, self.as_slice())
+        }
     }
 
-    #[inline]
-    fn wire_encode_raw<B: BufMut>(&self, common: &MessageCommon<Pb, A>, buf: &mut B) {
-        self.encode_raw(common, buf);
+    fn wire_encode_raw<B: BufMut>(&self, _common: &MessageCommon<Pb, A>, buf: &mut B) {
+        if !self.values.is_empty() {
+            E::encode(FIELD, self.as_slice(), buf);
+        }
     }
 }
 
@@ -339,8 +309,10 @@ where
     Pb: PresenceBits,
     T::Element<A>: CloneIn<A>,
 {
-    #[inline]
-    fn clone_field(&self, common: &MessageCommon<Pb, A>, alloc: A) -> Self {
-        self.clone_in(common, alloc)
+    fn clone_field(&self, _common: &MessageCommon<Pb, A>, alloc: A) -> Self {
+        Self {
+            values: ManuallyDrop::new(self.values.clone_in(alloc)),
+            _encoding: PhantomData,
+        }
     }
 }

@@ -6,11 +6,10 @@ use ::bitvec::order::Lsb0;
 use ::bytes::{Buf, BufMut};
 use ::puroro::DecodeError;
 use ::puroro::Message;
-use ::puroro_rt::FieldDeallocate;
 use ::puroro_rt::decode::{decode_tag, skip_field_and_save};
 use ::puroro_rt::{
-    Expanded, Explicit, MessageCommon, Packed, ProtoDouble, ProtoFixed32, ProtoFloat,
-    RepeatedField, SingularField,
+    Expanded, Explicit, FieldDeallocate, FieldEncode, MessageCommon, Packed, ProtoDouble,
+    ProtoFixed32, ProtoFloat, RepeatedField, SingularField,
 };
 
 /// Minimal message exercising singular + packed + expanded fixed fields.
@@ -72,19 +71,19 @@ impl<A: Allocator + Clone> Message for FixedDemo<A> {
 
     fn encoded_len(&self) -> usize {
         let c = &self._common;
-        self.code.encoded_len(c)
-            + self.altitude.encoded_len(c)
-            + self.samples.encoded_len(c)
-            + self.tags.encoded_len(c)
+        self.code.wire_encoded_len(c)
+            + self.altitude.wire_encoded_len(c)
+            + self.samples.wire_encoded_len(c)
+            + self.tags.wire_encoded_len(c)
             + c.unknown_fields.len()
     }
 
     fn encode_raw<B: BufMut>(&self, buf: &mut B) {
         let c = &self._common;
-        self.code.encode_raw(c, buf);
-        self.altitude.encode_raw(c, buf);
-        self.samples.encode_raw(c, buf);
-        self.tags.encode_raw(c, buf);
+        self.code.wire_encode_raw(c, buf);
+        self.altitude.wire_encode_raw(c, buf);
+        self.samples.wire_encode_raw(c, buf);
+        self.tags.wire_encode_raw(c, buf);
         buf.put_slice(&c.unknown_fields);
     }
 

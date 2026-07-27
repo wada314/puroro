@@ -572,22 +572,24 @@ Runtime **`str_to_unmanaged_in(s, alloc)`** — copy bytes into an `UnmanagedStr
 
 ### Encode
 
-1. Each field's `encoded_len` / `encode_raw` (catalog applies omit rules — [§14](#14-singular-fields)).
+1. `visit_fields` with [`EncodedLenVisitor`](puroro-rt/src/fields/shared/field_inspect.rs) / [`EncodeRawVisitor`](puroro-rt/src/fields/shared/field_inspect.rs) — each catalog field implements [`FieldEncode`](puroro-rt/src/fields/shared/field_inspect.rs) (`wire_encoded_len` / `wire_encode_raw`; omit rules in [§14](#14-singular-fields)).
 2. Append `_common.unknown_fields` verbatim.
-3. `encoded_len` must match bytes written.
+3. Message `encoded_len` must match bytes written.
 
 **Field order is not guaranteed.** Identical logical content may produce different wire bytes. Compare with `PartialEq`, not wire equality.
 
 Runtime (`puroro_rt::encode`): `encode_varint_field`, `encode_len_field`, `encode_packed_*`, `encoded_len_*`.
 
 ```rust
+fn encoded_len(&self) -> usize {
+    let mut v = EncodedLenVisitor::new(&self._common);
+    let _ = self.visit_fields(&mut v);
+    v.finish() + self._common.unknown_fields.len()
+}
+
 fn encode_raw<B: BufMut>(&self, buf: &mut B) {
-    let c = &self._common;
-    self.title.encode_raw(c, buf);
-    self.score.encode_raw(c, buf);
-    // …
-    let unknown: &[u8] = &c.unknown_fields;
-    buf.put_slice(unknown);
+    let _ = self.visit_fields(&mut EncodeRawVisitor::new(&self._common, buf));
+    buf.put_slice(&self._common.unknown_fields);
 }
 ```
 
@@ -621,7 +623,7 @@ Nested LEN payloads use `Buf::take(len)` before child `merge_from`.
 |---|---|---|
 | `Default` | `A: Clone + Default` | Clears presence; empty heap fields |
 | `Drop` | `A: Clone` | Calls `deallocate(&_common)` on every direct child ([`FieldDeallocate`](puroro-rt/src/fields/shared/field_deallocate.rs)), then `_common.deallocate()` |
-| `Clone` / `CloneIn` | `A: Clone` | Field-wise `field.clone_in(&common, alloc)`; `Clone` clones `MessageCommon.alloc` and delegates |
+| `Clone` / `CloneIn` | `A: Clone` | Field-wise [`FieldCloneIn::clone_field`](puroro-rt/src/fields/shared/field_inspect.rs); `Clone` clones `MessageCommon.alloc` and delegates |
 | `PartialEq` | `A: Clone` | Semantic getter comparison (not wire bytes); float uses Rust `PartialEq` |
 | `Debug` | `A: Clone` | Field-name `debug_struct` (oneof shown as `notification` → `case`) |
 

@@ -165,7 +165,9 @@ fn render_module_body(oneof: &OneofEmit) -> Result<TokenStream> {
         .map(|v| {
             let vn = &v.variant_name;
             quote! {
-                Self::#vn(f) => Self::#vn(f.clone_in(common, alloc)),
+                Self::#vn(f) => Self::#vn(::puroro_rt::FieldCloneIn::clone_field(
+                    f, common, alloc,
+                )),
             }
         })
         .collect();
@@ -233,7 +235,7 @@ fn render_module_body(oneof: &OneofEmit) -> Result<TokenStream> {
         .iter()
         .map(|v| {
             let vn = &v.variant_name;
-            quote! { Self::#vn(f) => f.encoded_len(common), }
+            quote! { Self::#vn(f) => ::puroro_rt::FieldEncode::wire_encoded_len(f, common), }
         })
         .collect();
 
@@ -242,7 +244,7 @@ fn render_module_body(oneof: &OneofEmit) -> Result<TokenStream> {
         .iter()
         .map(|v| {
             let vn = &v.variant_name;
-            quote! { Self::#vn(f) => f.encode_raw(common, buf), }
+            quote! { Self::#vn(f) => ::puroro_rt::FieldEncode::wire_encode_raw(f, common, buf), }
         })
         .collect();
 

@@ -136,65 +136,6 @@ where
     ) -> SingularFieldMut<'f, 'c, T, P, FIELD, A, L, D, Pb> {
         SingularFieldMut::new(self, common)
     }
-
-    pub fn encoded_len<Pb>(&self, common: &MessageCommon<Pb, A>) -> usize
-    where
-        Pb: PresenceBits,
-    {
-        if P::should_emit(common, || {
-            let init = P::slot_init_view();
-            match self.value.with(init, common).get() {
-                Some(slot) => L::is_proto_empty(slot, common),
-                None => true,
-            }
-        }) {
-            let init = P::slot_init_view();
-            let slot = self
-                .value
-                .with(init, common)
-                .get()
-                .expect("should_emit implies initialized slot");
-            T::encoded_len(L::get(slot, common), FIELD)
-        } else {
-            0
-        }
-    }
-
-    pub fn encode_raw<Pb, B: BufMut>(&self, common: &MessageCommon<Pb, A>, buf: &mut B)
-    where
-        Pb: PresenceBits,
-    {
-        if P::should_emit(common, || {
-            let init = P::slot_init_view();
-            match self.value.with(init, common).get() {
-                Some(slot) => L::is_proto_empty(slot, common),
-                None => true,
-            }
-        }) {
-            let init = P::slot_init_view();
-            let slot = self
-                .value
-                .with(init, common)
-                .get()
-                .expect("should_emit implies initialized slot");
-            T::encode(L::get(slot, common), FIELD, buf);
-        }
-    }
-
-    /// Deep-copies this field into `alloc`, reading init / presence from `common`.
-    #[inline]
-    pub fn clone_in<Pb>(&self, common: &MessageCommon<Pb, A>, alloc: A) -> Self
-    where
-        Pb: PresenceBits,
-        T::Slot<A>: CloneIn<A>,
-    {
-        let init = P::slot_init_view();
-        let initialized = init.is_initialized(common);
-        Self {
-            value: ManuallyDrop::new(self.value.clone_in(initialized, alloc)),
-            _marker: PhantomData,
-        }
-    }
 }
 
 impl<T, P, const FIELD: u32, A, L, D, Pb> FieldDeallocate<Pb, A>
@@ -565,14 +506,42 @@ where
     T::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
     P::ValueSlot<T::Slot<A>>: ValueSlot<T::Slot<A>, A>,
 {
-    #[inline]
     fn wire_encoded_len(&self, common: &MessageCommon<Pb, A>) -> usize {
-        self.encoded_len(common)
+        if P::should_emit(common, || {
+            let init = P::slot_init_view();
+            match self.value.with(init, common).get() {
+                Some(slot) => L::is_proto_empty(slot, common),
+                None => true,
+            }
+        }) {
+            let init = P::slot_init_view();
+            let slot = self
+                .value
+                .with(init, common)
+                .get()
+                .expect("should_emit implies initialized slot");
+            T::encoded_len(L::get(slot, common), FIELD)
+        } else {
+            0
+        }
     }
 
-    #[inline]
     fn wire_encode_raw<B: BufMut>(&self, common: &MessageCommon<Pb, A>, buf: &mut B) {
-        self.encode_raw(common, buf);
+        if P::should_emit(common, || {
+            let init = P::slot_init_view();
+            match self.value.with(init, common).get() {
+                Some(slot) => L::is_proto_empty(slot, common),
+                None => true,
+            }
+        }) {
+            let init = P::slot_init_view();
+            let slot = self
+                .value
+                .with(init, common)
+                .get()
+                .expect("should_emit implies initialized slot");
+            T::encode(L::get(slot, common), FIELD, buf);
+        }
     }
 }
 
@@ -587,9 +556,13 @@ where
     T::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateIn<A> + CloneIn<A>,
     P::ValueSlot<T::Slot<A>>: ValueSlot<T::Slot<A>, A>,
 {
-    #[inline]
     fn clone_field(&self, common: &MessageCommon<Pb, A>, alloc: A) -> Self {
-        self.clone_in(common, alloc)
+        let init = P::slot_init_view();
+        let initialized = init.is_initialized(common);
+        Self {
+            value: ManuallyDrop::new(self.value.clone_in(initialized, alloc)),
+            _marker: PhantomData,
+        }
     }
 }
 

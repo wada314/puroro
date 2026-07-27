@@ -58,9 +58,9 @@ use ::bitvec::array::BitArray;
 use ::bitvec::order::Lsb0;
 use ::bytes::BufMut;
 use ::puroro_rt::{
-    BitPacked, FieldDeallocate, Inline, MessageCommon, Oneof, OneofDeallocate, OneofEncodable,
-    OneofGroup, OneofVariant, PresenceBits, ProtoBool, ProtoInt32, ProtoMessage, ProtoString,
-    ProtoType, SingularField,
+    BitPacked, FieldCloneIn, FieldDeallocate, FieldEncode, Inline, MessageCommon, Oneof,
+    OneofDeallocate, OneofEncodable, OneofGroup, OneofVariant, PresenceBits, ProtoBool, ProtoInt32,
+    ProtoMessage, ProtoString, ProtoType, SingularField,
 };
 
 use crate::address::Address;
@@ -178,11 +178,13 @@ impl<A: Allocator + Clone> OneofGroup for NotificationStorage<A> {
         alloc: Self::Alloc,
     ) -> Self {
         match storage {
-            Self::EmailAddress(f) => Self::EmailAddress(f.clone_in(common, alloc)),
-            Self::PhoneNumber(f) => Self::PhoneNumber(f.clone_in(common, alloc)),
-            Self::WebhookId(f) => Self::WebhookId(f.clone_in(common, alloc)),
-            Self::Postal(f) => Self::Postal(f.clone_in(common, alloc)),
-            Self::Urgent(f) => Self::Urgent(f.clone_in(common, alloc)),
+            Self::EmailAddress(f) => {
+                Self::EmailAddress(FieldCloneIn::clone_field(f, common, alloc))
+            }
+            Self::PhoneNumber(f) => Self::PhoneNumber(FieldCloneIn::clone_field(f, common, alloc)),
+            Self::WebhookId(f) => Self::WebhookId(FieldCloneIn::clone_field(f, common, alloc)),
+            Self::Postal(f) => Self::Postal(FieldCloneIn::clone_field(f, common, alloc)),
+            Self::Urgent(f) => Self::Urgent(FieldCloneIn::clone_field(f, common, alloc)),
         }
     }
 }
@@ -300,21 +302,21 @@ impl<A: Allocator + Clone> OneofVariant<{ super::FIELD_URGENT }> for Notificatio
 impl<A: Allocator + Clone> OneofEncodable<A> for NotificationStorage<A> {
     fn encoded_len<Pb: PresenceBits>(&self, common: &MessageCommon<Pb, A>) -> usize {
         match self {
-            Self::EmailAddress(f) => f.encoded_len(common),
-            Self::PhoneNumber(f) => f.encoded_len(common),
-            Self::WebhookId(f) => f.encoded_len(common),
-            Self::Postal(f) => f.encoded_len(common),
-            Self::Urgent(f) => f.encoded_len(common),
+            Self::EmailAddress(f) => FieldEncode::wire_encoded_len(f, common),
+            Self::PhoneNumber(f) => FieldEncode::wire_encoded_len(f, common),
+            Self::WebhookId(f) => FieldEncode::wire_encoded_len(f, common),
+            Self::Postal(f) => FieldEncode::wire_encoded_len(f, common),
+            Self::Urgent(f) => FieldEncode::wire_encoded_len(f, common),
         }
     }
 
     fn encode_raw<Pb: PresenceBits, B: BufMut>(&self, common: &MessageCommon<Pb, A>, buf: &mut B) {
         match self {
-            Self::EmailAddress(f) => f.encode_raw(common, buf),
-            Self::PhoneNumber(f) => f.encode_raw(common, buf),
-            Self::WebhookId(f) => f.encode_raw(common, buf),
-            Self::Postal(f) => f.encode_raw(common, buf),
-            Self::Urgent(f) => f.encode_raw(common, buf),
+            Self::EmailAddress(f) => FieldEncode::wire_encode_raw(f, common, buf),
+            Self::PhoneNumber(f) => FieldEncode::wire_encode_raw(f, common, buf),
+            Self::WebhookId(f) => FieldEncode::wire_encode_raw(f, common, buf),
+            Self::Postal(f) => FieldEncode::wire_encode_raw(f, common, buf),
+            Self::Urgent(f) => FieldEncode::wire_encode_raw(f, common, buf),
         }
     }
 }
