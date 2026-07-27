@@ -16,20 +16,18 @@ use ::hashbrown::hash_map::Iter as HashMapIter;
 use ::hashbrown::{DefaultHashBuilder, Equivalent, HashMap};
 use ::unmanaged::CloneIn;
 
-use ::puroro::{DecodeError, WireType};
+use ::puroro::{DecodeError, MapMut, MapRef, WireType};
 
 use crate::decode;
 use crate::encode;
 use crate::fields::shared::field_inspect::{FieldCloneIn, FieldDebug, FieldEncode, FieldPartialEq};
 use crate::fields::shared::{FieldDeallocate, MessageCommon, PresenceBits};
-use crate::fields::wire::map_element::MapKey;
+use crate::fields::wire::map_element::{MapKey, MapValueView};
 use crate::fields::wire::repeated_element::{
     RepeatedElement, RepeatedElementMerge, RepeatedElementMut,
 };
 
 use super::entry::{decode_map_entry, encode_map_entry, entry_payload_len};
-
-mod user_traits;
 
 /// Map field: key marker `K`, value marker `V`, field number `FIELD`, allocator `A`.
 ///
@@ -248,16 +246,6 @@ where
     }
 
     #[inline]
-    pub fn len(self) -> usize {
-        self.field.len()
-    }
-
-    #[inline]
-    pub fn is_empty(self) -> bool {
-        self.field.is_empty()
-    }
-
-    #[inline]
     pub fn get<Q>(self, key: &Q) -> Option<&'a V::Element<A>>
     where
         K::Element<A>: Eq + Hash,
@@ -294,15 +282,6 @@ where
     #[inline]
     fn new(field: &'f mut MapField<K, V, FIELD, A>, common: &'c mut MessageCommon<Pb, A>) -> Self {
         Self { field, common }
-    }
-
-    #[inline]
-    pub fn get_mut<Q>(&mut self, key: &Q) -> Option<&mut V::Element<A>>
-    where
-        K::Element<A>: Eq + Hash,
-        Q: ?Sized + Hash + Equivalent<K::Element<A>>,
-    {
-        self.field.entries.get_mut(key)
     }
 
     /// Mutable element handle (string/bytes → guard; scalars/messages → `&mut`).
@@ -388,25 +367,6 @@ where
         }
     }
 
-    #[inline]
-    pub fn len(&self) -> usize {
-        self.field.len()
-    }
-
-    #[inline]
-    pub fn is_empty(&self) -> bool {
-        self.field.is_empty()
-    }
-
-    #[inline]
-    pub fn get<Q>(&self, key: &Q) -> Option<&V::Element<A>>
-    where
-        K::Element<A>: Eq + Hash,
-        Q: ?Sized + Hash + Equivalent<K::Element<A>>,
-    {
-        self.field.entries.get(key)
-    }
-
     /// Merges one map-entry LEN occurrence (last-wins on duplicate keys).
     pub fn merge<B: Buf>(
         &mut self,
@@ -437,6 +397,76 @@ where
     }
 }
 
+// Blanket `puroro::{MapRef, MapMut}` over catalog bind views (view types from
+// `MapKey::KeyView` / `MapValueView::View`).
+
+impl<'a, K, V, const FIELD: u32, A, Pb> MapRef<K::KeyView, V::View>
+    for MapFieldRef<'a, K, V, FIELD, A, Pb>
+where
+    K: MapKey,
+    V: MapValueView,
+    A: Allocator + Clone,
+    Pb: PresenceBits,
+    K::Element<A>: Hash + Eq + Borrow<K::KeyView>,
+{
+    #[inline]
+    fn len(&self) -> usize {
+        self.field.len()
+    }
+
+    #[inline]
+    fn get(&self, key: impl Borrow<K::KeyView>) -> Option<&V::View> {
+        self.field.entries.get(key.borrow()).map(V::as_view)
+    }
+}
+
+impl<'f, 'c, K, V, const FIELD: u32, A, Pb> MapMut<K::KeyView, V::View>
+    for MapFieldMut<'f, 'c, K, V, FIELD, A, Pb>
+where
+    K: MapKey,
+    V: MapValueView + RepeatedElementMut + RepeatedElementMerge<A>,
+    A: Allocator + Clone,
+    Pb: PresenceBits,
+    K::Element<A>: Hash + Eq + Borrow<K::KeyView>,
+{
+    type MutTarget = V::MutTarget<A>;
+
+    type Mut<'a>
+        = V::ElementMut<'a, A>
+    where
+        Self: 'a;
+
+    #[inline]
+    fn len(&self) -> usize {
+        self.field.len()
+    }
+
+    #[inline]
+    fn get(&self, key: impl Borrow<K::KeyView>) -> Option<&V::View> {
+        self.field.entries.get(key.borrow()).map(V::as_view)
+    }
+
+    #[inline]
+    fn get_mut(&mut self, key: impl Borrow<K::KeyView>) -> Option<Self::Mut<'_>> {
+        self.get_element_mut(key.borrow())
+    }
+
+    #[inline]
+    fn entry_mut(&mut self, key: impl Borrow<K::KeyView>) -> Self::Mut<'_> {
+        self.entry_element_mut_view(key.borrow())
+    }
+
+    #[inline]
+    fn remove(&mut self, key: impl Borrow<K::KeyView>) {
+        MapFieldMut::remove(self, key.borrow());
+    }
+
+    #[inline]
+    fn clear(&mut self) {
+        MapFieldMut::clear(self);
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::super::entry::encode_map_entry;
@@ -462,7 +492,7 @@ mod tests {
         assert_eq!(field.bind(&common).get(&1), Some(&11));
         assert_eq!(field.len(), 1);
         field.bind_mut(&mut common).clear();
-        assert!(field.is_empty());
+        assert_eq!(field.len(), 0);
         field.deallocate(&common);
     }
 

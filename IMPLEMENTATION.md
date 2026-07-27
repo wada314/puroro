@@ -714,13 +714,13 @@ Catalog helpers on `MapFieldMut`:
 
 | Method | Role |
 |---|---|
-| `get` / `get_mut` / `get_element_mut` / `len` | Lookup (`Q: Equivalent` against stored key) |
+| `get_element_mut` | Lookup → element mut handle (`MapMut::get_mut`) |
+| `entry_element_mut_view` | Ensure via `MapKey::key_from_view` + default (`MapMut::entry_mut`) |
 | `insert` | Owned key + value elements (catalog / merge) |
-| `entry_element_mut_view` | Ensure via `MapKey::key_from_view` + default value |
 | `remove` / `clear` | Free key + value via `deallocate_element` |
 | `merge` | One wire occurrence |
 
-User-facing [`MapRef`](src/map.rs) / [`MapMut`](src/map.rs) are **two blanket impls** over `MapFieldRef` / `MapFieldMut` in [`user_traits.rs`](puroro-rt/src/fields/map/field/user_traits.rs) (no K×V macro matrix). Key methods take `impl Borrow<K>`; mutation is `entry_mut` then assign / fill.
+User-facing [`MapRef`](src/map.rs) / [`MapMut`](src/map.rs) are **two blanket impls** over `MapFieldRef` / `MapFieldMut` in [`map/field.rs`](puroro-rt/src/fields/map/field.rs) (no K×V macro matrix). Key methods take `impl Borrow<K>`; mutation is `entry_mut` then assign / fill.
 
 **Key collision safety:** `HashMap::insert` would drop a colliding incoming key; `MapFieldMut::insert` keeps the stored key and explicitly releases `(incoming_key, previous_value)` (required for `UnmanagedString` keys).
 
