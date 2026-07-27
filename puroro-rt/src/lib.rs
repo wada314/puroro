@@ -16,7 +16,7 @@ pub use ::protobuf_core::FieldNumber;
 /// (and other `puroro` traits) in public signatures; these remain for catalog code.
 pub use ::unmanaged::{CloneIn, DeallocateIn, String, UnmanagedString};
 pub use defaults::ProtoDefault;
-pub use fields::map::{MapEntries, MapEntriesIter, MapField, MapFieldMut, MapFieldRef};
+pub use fields::map::{MapField, MapFieldMut, MapFieldRef};
 pub use fields::oneof::{
     OneofDeallocate, OneofEncodable, OneofGroup, OneofSlot, OneofSlotMut, OneofSlotRef,
     OneofVariantRef, OneofView, OneofViewMut,

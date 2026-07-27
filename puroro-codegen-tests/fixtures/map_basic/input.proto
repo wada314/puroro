@@ -2,6 +2,9 @@ syntax = "proto3";
 
 message Peer {
   optional string name = 1;
+  // Second field lets tests distinguish map last-wins *replace* from
+  // singular-message field-merge when the same map key appears twice.
+  optional int32 age = 2;
 }
 
 enum Kind {

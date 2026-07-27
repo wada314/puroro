@@ -130,15 +130,52 @@ fn enum_value_entry_mut_round_trip() {
 #[test]
 fn message_value_entry_mut_round_trip() {
     let mut msg = Holder::new();
-    msg.peers_mut()
-        .entry_mut(9)
-        .name_mut()
-        .push_str("alice");
+    {
+        let mut peers = msg.peers_mut();
+        let mut peer = peers.entry_mut(9);
+        peer.name_mut().push_str("alice");
+        *peer.age_mut() = 10;
+    }
     assert_eq!(msg.peers().get(&9).unwrap().name().get(), "alice");
+    assert_eq!(msg.peers().get(&9).unwrap().age().get(), 10);
 
     let decoded: Holder = Holder::decode(&msg.encode_to_vec()[..]).expect("decode");
     assert_eq!(decoded.peers().get(&9).unwrap().name().get(), "alice");
+    assert_eq!(decoded.peers().get(&9).unwrap().age().get(), 10);
     let _: Peer = Peer::new();
+}
+
+/// Duplicate map keys replace the whole value message (last-wins).
+///
+/// This must not field-merge like a singular message field: the second entry
+/// omits `name`, so `name` from the first entry must not survive.
+#[test]
+fn decode_merge_duplicate_message_value_replaces_entire_entry() {
+    let mut first = Holder::new();
+    {
+        let mut peers = first.peers_mut();
+        let mut peer = peers.entry_mut(9);
+        peer.name_mut().push_str("alice");
+        *peer.age_mut() = 10;
+    }
+    let mut second = Holder::new();
+    {
+        let mut peers = second.peers_mut();
+        *peers.entry_mut(9).age_mut() = 20;
+        // `name` intentionally left unset.
+    }
+
+    let mut bytes = first.encode_to_vec();
+    bytes.extend_from_slice(&second.encode_to_vec());
+
+    let decoded: Holder = Holder::decode(&bytes[..]).expect("decode");
+    let peers = decoded.peers();
+    let peer = peers.get(&9).expect("peer present");
+    assert!(
+        !peer.name().is_set(),
+        "map last-wins replaces the value; field-merge would keep name=alice"
+    );
+    assert_eq!(peer.age().get(), 20);
 }
 
 #[test]

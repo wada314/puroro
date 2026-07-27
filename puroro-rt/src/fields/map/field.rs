@@ -8,10 +8,12 @@
 use ::core::borrow::Borrow;
 use ::core::fmt::{Debug, Formatter, Result as FmtResult};
 use ::core::hash::Hash;
+use ::core::mem;
 
 use ::allocator_api2::alloc::Allocator;
 use ::bytes::{Buf, BufMut};
-use ::hashbrown::Equivalent;
+use ::hashbrown::hash_map::Iter as HashMapIter;
+use ::hashbrown::{DefaultHashBuilder, Equivalent, HashMap};
 use ::unmanaged::CloneIn;
 
 use ::puroro::{DecodeError, WireType};
@@ -25,21 +27,21 @@ use crate::fields::wire::repeated_element::{
     RepeatedElement, RepeatedElementMerge, RepeatedElementMut,
 };
 
-use super::entries::MapEntries;
 use super::entry::{decode_map_entry, encode_map_entry, entry_payload_len};
 
 mod user_traits;
 
 /// Map field: key marker `K`, value marker `V`, field number `FIELD`, allocator `A`.
 ///
-/// Stores `HashMap<K::Element<A>, V::Element<A>>`.
+/// Stores an allocator-owning `HashMap<K::Element<A>, V::Element<A>>` (unlike
+/// `UnmanagedVec` repeated fields). Wire order is unspecified.
 pub struct MapField<K, V, const FIELD: u32, A>
 where
     K: MapKey,
     V: RepeatedElement,
     A: Allocator + Clone,
 {
-    entries: MapEntries<K::Element<A>, V::Element<A>, A>,
+    entries: HashMap<K::Element<A>, V::Element<A>, DefaultHashBuilder, A>,
 }
 
 impl<K, V, const FIELD: u32, A> MapField<K, V, FIELD, A>
@@ -50,7 +52,7 @@ where
 {
     pub fn new_in(alloc: A) -> Self {
         Self {
-            entries: MapEntries::new_in(alloc),
+            entries: HashMap::with_hasher_in(DefaultHashBuilder::default(), alloc),
         }
     }
 
@@ -71,7 +73,7 @@ where
         K::Element<A>: Eq + Hash,
     {
         let mut n = 0;
-        for (key, value) in self.entries.iter() {
+        for (key, value) in &self.entries {
             let payload = entry_payload_len::<K, V, A>(key, value);
             n += encode::encoded_len_len_field(FIELD, payload);
         }
@@ -84,7 +86,7 @@ where
         Pb: PresenceBits,
         K::Element<A>: Eq + Hash,
     {
-        for (key, value) in self.entries.iter() {
+        for (key, value) in &self.entries {
             encode_map_entry::<K, V, A, B>(FIELD, key, value, buf);
         }
     }
@@ -112,9 +114,17 @@ where
         K::Element<A>: CloneIn<A> + Eq + Hash,
         V::Element<A>: CloneIn<A>,
     {
-        Self {
-            entries: self.entries.clone_in(alloc),
-        }
+        let mut out = HashMap::with_capacity_and_hasher_in(
+            self.entries.len(),
+            DefaultHashBuilder::default(),
+            alloc.clone(),
+        );
+        out.extend(
+            self.entries
+                .iter()
+                .map(|(k, v)| (k.clone_in(alloc.clone()), v.clone_in(alloc.clone()))),
+        );
+        Self { entries: out }
     }
 }
 
@@ -174,7 +184,7 @@ where
 {
     #[inline]
     fn fmt_debug(&self, _common: &MessageCommon<Pb, A>, f: &mut Formatter<'_>) -> FmtResult {
-        f.debug_map().entries(self.entries.iter()).finish()
+        f.debug_map().entries(&self.entries).finish()
     }
 }
 
@@ -257,7 +267,7 @@ where
     }
 
     #[inline]
-    pub fn iter(self) -> super::entries::MapEntriesIter<'a, K::Element<A>, V::Element<A>> {
+    pub fn iter(self) -> HashMapIter<'a, K::Element<A>, V::Element<A>> {
         self.field.entries.iter()
     }
 }
@@ -327,11 +337,22 @@ where
     }
 
     /// Inserts with last-wins. Replaced value and discarded key are released.
+    ///
+    /// On key collision, keeps the stored key and frees the incoming key —
+    /// [`HashMap::insert`] would drop the incoming key, which is unsafe for
+    /// `Unmanaged*` payloads.
     pub fn insert(&mut self, key: K::Element<A>, value: V::Element<A>)
     where
         K::Element<A>: Eq + Hash,
     {
-        if let Some((discarded_key, old_value)) = self.field.entries.insert(key, value) {
+        let discarded = if let Some(slot) = self.field.entries.get_mut(&key) {
+            let previous = mem::replace(slot, value);
+            Some((key, previous))
+        } else {
+            self.field.entries.insert(key, value);
+            None
+        };
+        if let Some((discarded_key, old_value)) = discarded {
             let alloc = self.common.alloc.clone();
             // SAFETY: message allocator owns discarded key / replaced value.
             unsafe {
@@ -346,7 +367,7 @@ where
         K::Element<A>: Eq + Hash,
         Q: ?Sized + Hash + Equivalent<K::Element<A>>,
     {
-        if let Some((old_key, old_value)) = self.field.entries.remove(key) {
+        if let Some((old_key, old_value)) = self.field.entries.remove_entry(key) {
             let alloc = self.common.alloc.clone();
             // SAFETY: message allocator owns removed key / value payloads.
             unsafe {
@@ -508,13 +529,16 @@ mod tests {
         field.deallocate(&common);
     }
 
+    fn unmanaged_str(s: &str) -> UnmanagedString<Global> {
+        UnmanagedString::from_string(::unmanaged::String::from_str_in(s, Global))
+    }
+
     #[test]
     fn map_string_key_roundtrip() {
         let mut common =
             MessageCommon::<BitArray<[u8; 1], Lsb0>, _>::new_in(BitArray::ZERO, Global);
         let mut field = MapField::<ProtoString, ProtoInt32, 3, _>::new_in(Global);
-        let key = UnmanagedString::from_string(::unmanaged::String::from_str_in("ab", Global));
-        field.bind_mut(&mut common).insert(key, 7);
+        field.bind_mut(&mut common).insert(unmanaged_str("ab"), 7);
 
         let mut buf = BytesMut::new();
         field.encode_raw(&common, &mut buf);
@@ -528,12 +552,75 @@ mod tests {
             .unwrap();
         assert_eq!(decoded.bind(&common).get("ab"), Some(&7));
 
-        // Duplicate string key: must not panic on discarded UnmanagedString key.
-        let key2 = UnmanagedString::from_string(::unmanaged::String::from_str_in("ab", Global));
-        decoded.bind_mut(&mut common).insert(key2, 8);
-        assert_eq!(decoded.bind(&common).get("ab"), Some(&8));
-
         field.deallocate(&common);
         decoded.deallocate(&common);
+    }
+
+    /// `HashMap::insert` would Drop the colliding incoming key — fatal for
+    /// `UnmanagedString`. Collision must keep the stored key and `deallocate`
+    /// the incoming one (and the replaced value).
+    #[test]
+    fn insert_duplicate_string_key_releases_incoming_key() {
+        let mut common =
+            MessageCommon::<BitArray<[u8; 1], Lsb0>, _>::new_in(BitArray::ZERO, Global);
+        let mut field = MapField::<ProtoString, ProtoInt32, 1, _>::new_in(Global);
+
+        field.bind_mut(&mut common).insert(unmanaged_str("k"), 1);
+        // Second insert with an equal key: would panic if the incoming
+        // `UnmanagedString` were dropped by `HashMap::insert`.
+        field.bind_mut(&mut common).insert(unmanaged_str("k"), 2);
+
+        assert_eq!(field.len(), 1);
+        assert_eq!(field.bind(&common).get("k"), Some(&2));
+        field.deallocate(&common);
+    }
+
+    /// Same collision path via wire merge (decode builds fresh `UnmanagedString` keys).
+    #[test]
+    fn merge_duplicate_string_key_releases_incoming_key() {
+        let mut common =
+            MessageCommon::<BitArray<[u8; 1], Lsb0>, _>::new_in(BitArray::ZERO, Global);
+
+        let encode_entry =
+            |common: &mut MessageCommon<BitArray<[u8; 1], Lsb0>, Global>, value: i32| -> BytesMut {
+                let mut src = MapField::<ProtoString, ProtoInt32, 1, _>::new_in(Global);
+                src.bind_mut(common).insert(unmanaged_str("k"), value);
+                let mut buf = BytesMut::new();
+                src.encode_raw(common, &mut buf);
+                src.deallocate(common);
+                buf
+            };
+        let first = encode_entry(&mut common, 1);
+        let second = encode_entry(&mut common, 9);
+
+        let mut field = MapField::<ProtoString, ProtoInt32, 1, _>::new_in(Global);
+        for framed in [first, second] {
+            let mut rest = framed.as_ref();
+            let (_, wt) = decode_tag(&mut rest).unwrap();
+            field.bind_mut(&mut common).merge(wt, &mut rest, 0).unwrap();
+        }
+
+        assert_eq!(field.len(), 1);
+        assert_eq!(field.bind(&common).get("k"), Some(&9));
+        field.deallocate(&common);
+    }
+
+    /// Collision must also release the previous `UnmanagedString` value (not only the key).
+    #[test]
+    fn insert_duplicate_string_key_releases_previous_string_value() {
+        let mut common =
+            MessageCommon::<BitArray<[u8; 1], Lsb0>, _>::new_in(BitArray::ZERO, Global);
+        let mut field = MapField::<ProtoString, ProtoString, 1, _>::new_in(Global);
+
+        field
+            .bind_mut(&mut common)
+            .insert(unmanaged_str("k"), unmanaged_str("old"));
+        field
+            .bind_mut(&mut common)
+            .insert(unmanaged_str("k"), unmanaged_str("new"));
+
+        assert_eq!(field.len(), 1);
+        assert_eq!(field.bind(&common).get("k").map(|s| &**s), Some("new"));
+        field.deallocate(&common);
     }
 }

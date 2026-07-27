@@ -123,7 +123,7 @@ protobuf-core           Varint, Tag, WireType
 | `ProtoType` + thin wrappers (varint / LEN) + `ProtoMessage` | **Done** |
 | `VarintProtoType` (packed / bit-packed wire helper) | **Done** |
 | `RepeatedElement` / `RepeatedElementMerge` / `PackableRepeatedElement` / `RepeatedVecMut` | **Done** |
-| `MapKey` + `MapField` / `MapEntries` (map entry wire encode/merge) | **Done** |
+| `MapKey` + `MapField` (map entry wire encode/merge) | **Done** |
 | `FieldPresence` (`Implicit` / `Explicit` / `LegacyRequired` / `Oneof`) | **Done** |
 | `ValueSlot`, `SlotInitView` / `SlotInitMut`, `DefaultIn` / `DeallocateIn` / `ProtoEmpty` | **Done** |
 | `SingularField<T, P, FIELD>`  | **Done** |
@@ -174,9 +174,8 @@ Live plugin emits nested and file-level messages/enums with singular and repeate
 | [`repeated/encoding.rs`](puroro-rt/src/fields/repeated/encoding.rs) | `Packed` / `Expanded` (`RepeatedEncoding`) |
 | [`repeated/field.rs`](puroro-rt/src/fields/repeated/field.rs) | `RepeatedField` — `T: RepeatedElement`, stores `T::Element` |
 | [`map.rs`](puroro-rt/src/fields/map.rs) | Map field re-exports |
-| [`map/entries.rs`](puroro-rt/src/fields/map/entries.rs) | `MapEntries` — allocator-owning `HashMap` |
 | [`map/entry.rs`](puroro-rt/src/fields/map/entry.rs) | Map-entry wire encode / decode (`key=1`, `value=2`) |
-| [`map/field.rs`](puroro-rt/src/fields/map/field.rs) | `MapField` — `K: MapKey`, `V: RepeatedElement` |
+| [`map/field.rs`](puroro-rt/src/fields/map/field.rs) | `MapField` — `K: MapKey`, `V: RepeatedElement`; owns `HashMap` of elements |
 | [`oneof.rs`](puroro-rt/src/fields/oneof.rs) | `OneofSlot` |
 
 ---
@@ -691,7 +690,7 @@ Mutation uses the bound-view idiom: `field.bind_mut(&mut common)` → [`Repeated
 
 ### 15.1 Map fields
 
-**Catalog:** [`MapField<K, V, FIELD, A>`](puroro-rt/src/fields/map/field.rs) with `K: MapKey`, `V: RepeatedElement`. Storage is [`MapEntries`](puroro-rt/src/fields/map/entries.rs) — a thin `hashbrown::HashMap<K::Element<A>, V::Element<A>, …, A>` that **owns** allocator `A` (unlike `UnmanagedVec` fields). Wire order is unspecified; only the hash map is kept.
+**Catalog:** [`MapField<K, V, FIELD, A>`](puroro-rt/src/fields/map/field.rs) with `K: MapKey`, `V: RepeatedElement`. Storage is an allocator-owning `hashbrown::HashMap<K::Element<A>, V::Element<A>, …, A>` (unlike `UnmanagedVec` fields). Wire order is unspecified; only the hash map is kept.
 
 **Marker GATs** (same idea as singular `ProtoType::{Ref, Mut}`):
 
@@ -723,7 +722,7 @@ Catalog helpers on `MapFieldMut`:
 
 User-facing [`MapRef`](src/map.rs) / [`MapMut`](src/map.rs) are **two blanket impls** over `MapFieldRef` / `MapFieldMut` in [`user_traits.rs`](puroro-rt/src/fields/map/field/user_traits.rs) (no K×V macro matrix). Key methods take `impl Borrow<K>`; mutation is `entry_mut` then assign / fill.
 
-**Key collision safety:** `HashMap::insert` would drop a colliding incoming key; `MapEntries::insert` keeps the stored key and returns `(incoming_key, previous_value)` for explicit release (required for `UnmanagedString` keys).
+**Key collision safety:** `HashMap::insert` would drop a colliding incoming key; `MapFieldMut::insert` keeps the stored key and explicitly releases `(incoming_key, previous_value)` (required for `UnmanagedString` keys).
 
 Sample: `Task.attributes` — `map<string, int32>` → `MapField<ProtoString, ProtoInt32, { FIELD_ATTRIBUTES }, A>` with accessors `attributes()` → `MapRef<str, i32>`, `attributes_mut()` → `MapMut<str, i32, MutTarget = i32>`, `clear_attributes()` via `MapMut::clear`.
 
