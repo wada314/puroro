@@ -21,11 +21,11 @@ use super::{
     value_slot::{AddressableSlot, ValueSlot, ValueSlotMutAccess},
 };
 use crate::decode;
-use crate::fields::wire::proto_type::{PayloadAccess, ProtoType};
+use crate::fields::wire::singular_type::{PayloadAccess, SingularType};
 use crate::fields::wire::varint::ProtoBool;
 
 /// Where a singular field's logical value is stored.
-pub trait ValueLayout<T: ProtoType, A: Allocator + Clone>: Copy
+pub trait ValueLayout<T: SingularType, A: Allocator + Clone>: Copy
 where
     T::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
 {

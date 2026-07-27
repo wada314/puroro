@@ -1,6 +1,6 @@
 //! Repeated-element semantics for protobuf type markers.
 //!
-//! Singular fields store [`ProtoType::Slot`](super::proto_type::ProtoType::Slot).
+//! Singular fields store [`SingularType::Slot`](super::singular_type::SingularType::Slot).
 //! Repeated fields store [`RepeatedElement::Element`] — often the inner payload
 //! (`i32`, `UnmanagedString`, …), and for nested-message repeated fields the
 //! message type `M` itself (not [`UnmanagedBox`](::unmanaged::UnmanagedBox)).
@@ -26,16 +26,20 @@ use ::unmanaged::DeallocateIn;
 use super::len::{ProtoBytes, ProtoString};
 use super::numerical::NumericalType;
 use super::proto_message::ProtoMessage;
-use super::proto_type::ProtoType;
+use super::singular_type::SingularType;
 use super::varint::ProtoBool;
 use super::wire_payload::WirePayload;
 
-/// Wire + storage for one element of a repeated field of marker `Self`.
+/// Wire + storage for one element of a repeated / map field of marker `Self`.
+///
+/// Independent of [`SingularType`](super::singular_type::SingularType) (singular
+/// `Slot` / `Mut`). Dual-use markers implement both traits and share only
+/// [`WirePayload`].
 ///
 /// Decode / merge live on [`RepeatedElementMerge`] so nested messages can
 /// constrain `M::Alloc = A`. Tagged encode goes through [`WirePayload`] via
 /// [`wire_view`](Self::wire_view).
-pub trait RepeatedElement: ProtoType {
+pub trait RepeatedElement: WirePayload {
     /// Physical element stored in the repeated buffer.
     type Element<A: Allocator + Clone>;
 
@@ -114,7 +118,7 @@ pub trait RepeatedVecMut: RepeatedElement {}
 /// How to obtain a mutable element handle for
 /// [`RepeatedContainerMut`](crate::fields::repeated::container::RepeatedContainerMut).
 ///
-/// Usually matches singular [`ProtoType::Mut`], except [`ProtoBool`] (singular
+/// Usually matches singular [`SingularType::Mut`], except [`ProtoBool`] (singular
 /// is bit-packed; repeated stores plain `bool`).
 pub trait RepeatedElementMut: RepeatedElement {
     /// Target of [`ElementMut`](Self::ElementMut) (`i32`, [`String`](::unmanaged::String), …).
@@ -406,7 +410,7 @@ impl RepeatedElementMut for ProtoString {
     type MutTarget<A: Allocator + Clone> = ::unmanaged::String<A>;
 
     type ElementMut<'a, A: Allocator + Clone>
-        = <Self as ProtoType>::Mut<'a, A>
+        = <Self as SingularType>::Mut<'a, A>
     where
         Self: 'a,
         A: 'a;
@@ -482,7 +486,7 @@ impl RepeatedElementMut for ProtoBytes {
     type MutTarget<A: Allocator + Clone> = AllocVec<u8, A>;
 
     type ElementMut<'a, A: Allocator + Clone>
-        = <Self as ProtoType>::Mut<'a, A>
+        = <Self as SingularType>::Mut<'a, A>
     where
         Self: 'a,
         A: 'a;

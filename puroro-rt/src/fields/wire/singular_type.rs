@@ -12,7 +12,7 @@
 //! [`ValueLayout`](crate::fields::shared::value_layout::ValueLayout)
 //! (`BitPacked`) for singular / oneof `bool`. Singular wire decode is
 //! **merge-into only** (`PayloadAccess::merge` / `BitPacked::merge`); there is
-//! no `ProtoType::decode → Written`. [`SingularField`](crate::fields::singular::field::SingularField)
+//! no `SingularType::decode → Written`. [`SingularField`](crate::fields::singular::field::SingularField)
 //! always goes through `ValueLayout`.
 //!
 //! Repeated fields use [`RepeatedElement`](super::repeated_element::RepeatedElement)
@@ -56,7 +56,7 @@ use super::wire_payload::WirePayload;
 /// - nested messages: `UnmanagedBox<M, A>` via [`ProtoMessage`](super::proto_message::ProtoMessage)
 ///
 /// Getter views use [`WirePayload::View`] (same type as tagged encode).
-pub trait ProtoType: WirePayload {
+pub trait SingularType: WirePayload {
     /// Physical value stored in the singular field slot (excluding
     /// [`MessageCommon`] bits).
     ///
@@ -78,11 +78,11 @@ pub trait ProtoType: WirePayload {
     type Written<A: Allocator + Clone>;
 }
 
-/// Inline payload access for markers whose value lives in [`ProtoType::Slot`].
+/// Inline payload access for markers whose value lives in [`SingularType::Slot`].
 ///
 /// Not implemented for [`ProtoBool`] — use
 /// [`BitPacked`](crate::fields::shared::value_layout::BitPacked) instead.
-pub trait PayloadAccess: ProtoType {
+pub trait PayloadAccess: SingularType {
     /// `true` when the field holds protobuf empty / type-zero (IMPLICIT omit).
     fn is_proto_empty<A: Allocator + Clone, Pb: PresenceBits>(
         slot: &Self::Slot<A>,
@@ -159,7 +159,7 @@ pub trait PayloadAccess: ProtoType {
 // Numerical markers (Slot = bare wire value) — one blanket for all families
 // ---------------------------------------------------------------------------
 
-impl<T> ProtoType for T
+impl<T> SingularType for T
 where
     T: NumericalType,
 {
@@ -278,7 +278,7 @@ where
 // LEN markers
 // ---------------------------------------------------------------------------
 
-impl ProtoType for ProtoString {
+impl SingularType for ProtoString {
     type Slot<A: Allocator + Clone> = UnmanagedString<A>;
     type Mut<'a, A: Allocator + Clone>
         = StringGuard<'a, A>
@@ -379,7 +379,7 @@ impl PayloadAccess for ProtoString {
     }
 }
 
-impl ProtoType for ProtoBytes {
+impl SingularType for ProtoBytes {
     type Slot<A: Allocator + Clone> = UnmanagedVec<u8, A>;
     type Mut<'a, A: Allocator + Clone>
         = VecGuard<'a, u8, A>
@@ -484,7 +484,7 @@ impl PayloadAccess for ProtoBytes {
 // Bit-packed bool marker (Slot = (); value via BitPacked layout)
 // ---------------------------------------------------------------------------
 
-impl ProtoType for ProtoBool {
+impl SingularType for ProtoBool {
     type Slot<A: Allocator + Clone> = ();
     type Mut<'a, A: Allocator + Clone>
         = BitRef<'a, Mut, u8, Lsb0>

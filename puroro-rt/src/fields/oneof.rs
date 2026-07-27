@@ -30,7 +30,7 @@ use crate::fields::shared::{
 };
 use crate::fields::singular::field::SingularField;
 use crate::fields::wire::proto_message::ProtoMessage;
-use crate::fields::wire::proto_type::ProtoType;
+use crate::fields::wire::singular_type::SingularType;
 
 /// Explicit release of a generated `oneof` storage enum.
 ///
@@ -426,7 +426,7 @@ impl<'a, F, Pb: PresenceBits, A: Allocator> OneofVariantRef<'a, F, Pb, A> {
 
 impl<
     'a,
-    T: ProtoType,
+    T: SingularType,
     const FIELD: u32,
     A: Allocator + Clone,
     L: ValueLayout<T, A>,

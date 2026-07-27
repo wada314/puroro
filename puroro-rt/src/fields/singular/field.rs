@@ -5,7 +5,7 @@
 //! this type. Cardinality (singular vs repeated) is separate from presence
 //! ([`FieldPresence`](crate::fields::shared::field_presence::FieldPresence)).
 //!
-//! Parametrised by protobuf type marker `T: ProtoType`, [`FieldPresence`],
+//! Parametrised by protobuf type marker `T: SingularType`, [`FieldPresence`],
 //! proto field number `FIELD`, allocator `A`, value [`ValueLayout`] `L`
 //! (`Inline` or [`BitPacked`] for bool), and compile-time default marker `D`.
 //! Physical storage is `P::ValueSlot<T::Slot<A>>`. Heap payloads are wrapped in
@@ -40,14 +40,14 @@ use crate::fields::shared::{
     value_slot::{AddressableSlot, ValueSlot, ValueSlotRefAccess},
 };
 use crate::fields::wire::proto_ref_ops::{ProtoRefDebug, ProtoRefEq};
-use crate::fields::wire::proto_type::ProtoType;
+use crate::fields::wire::singular_type::SingularType;
 use crate::fields::wire::wire_payload::{encode_field, encoded_len_field};
 
 /// Singular (non-repeated) scalar field — varint or LEN, selected by type marker `T`.
 ///
 /// Parameter order: `T`, `P`, `FIELD`, `A`, `L = Inline`, `D = ProtoDefault`.
 pub struct SingularField<
-    T: ProtoType,
+    T: SingularType,
     P: FieldPresence,
     const FIELD: u32,
     A: Allocator + Clone,
@@ -63,7 +63,7 @@ pub struct SingularField<
 
 impl<T, P, const FIELD: u32, A, L, D> Clone for SingularField<T, P, FIELD, A, L, D>
 where
-    T: ProtoType,
+    T: SingularType,
     P: FieldPresence,
     A: Allocator + Clone,
     L: ValueLayout<T, A>,
@@ -77,7 +77,7 @@ where
 
 impl<T, P, const FIELD: u32, A, L, D> Copy for SingularField<T, P, FIELD, A, L, D>
 where
-    T: ProtoType,
+    T: SingularType,
     P: FieldPresence,
     A: Allocator + Clone,
     L: ValueLayout<T, A>,
@@ -88,7 +88,7 @@ where
 
 impl<T, P, const FIELD: u32, A, L, D> fmt::Debug for SingularField<T, P, FIELD, A, L, D>
 where
-    T: ProtoType,
+    T: SingularType,
     P: FieldPresence,
     A: Allocator + Clone,
     L: ValueLayout<T, A>,
@@ -104,7 +104,7 @@ where
 
 impl<T, P, const FIELD: u32, A, L, D> SingularField<T, P, FIELD, A, L, D>
 where
-    T: ProtoType,
+    T: SingularType,
     P: FieldPresence,
     A: Allocator + Clone,
     L: ValueLayout<T, A>,
@@ -142,7 +142,7 @@ where
 impl<T, P, const FIELD: u32, A, L, D, Pb> FieldDeallocate<Pb, A>
     for SingularField<T, P, FIELD, A, L, D>
 where
-    T: ProtoType,
+    T: SingularType,
     P: FieldPresence,
     A: Allocator + Clone,
     L: ValueLayout<T, A>,
@@ -163,7 +163,7 @@ where
 
 impl<T, const FIELD: u32, A, L, D> SingularField<T, Implicit, FIELD, A, L, D>
 where
-    T: ProtoType,
+    T: SingularType,
     A: Allocator + Clone,
     L: ValueLayout<T, A>,
     T::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
@@ -186,7 +186,7 @@ where
 
 impl<T, const FIELD: u32, A, L, D> SingularField<T, Oneof, FIELD, A, L, D>
 where
-    T: ProtoType,
+    T: SingularType,
     A: Allocator + Clone,
     L: ValueLayout<T, A>,
     T::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
@@ -217,7 +217,7 @@ where
 
 impl<T, const FIELD: u32, A, L, D> SingularField<T, Message, FIELD, A, L, D>
 where
-    T: ProtoType,
+    T: SingularType,
     A: Allocator + Clone,
     L: ValueLayout<T, A>,
     T::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
@@ -232,7 +232,7 @@ where
 
 impl<T, P, const FIELD: u32, A, L, D> DefaultIn<A> for SingularField<T, P, FIELD, A, L, D>
 where
-    T: ProtoType,
+    T: SingularType,
     P: FieldPresence,
     A: Allocator + Clone,
     L: ValueLayout<T, A>,
@@ -248,7 +248,7 @@ where
 impl<T, const BIT: usize, const FIELD: u32, A, L, D>
     SingularField<T, LegacyRequired<BIT>, FIELD, A, L, D>
 where
-    T: ProtoType,
+    T: SingularType,
     A: Allocator + Clone,
     L: ValueLayout<T, A>,
     T::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
@@ -276,7 +276,7 @@ where
 /// produced by [`SingularField::bind`].
 pub struct SingularFieldRef<
     'a,
-    T: ProtoType,
+    T: SingularType,
     P: FieldPresence,
     const FIELD: u32,
     A: Allocator + Clone,
@@ -293,7 +293,7 @@ pub struct SingularFieldRef<
 
 impl<'a, T, P, const FIELD: u32, A, L, D, Pb> SingularFieldRef<'a, T, P, FIELD, A, L, D, Pb>
 where
-    T: ProtoType,
+    T: SingularType,
     P: FieldPresence,
     A: Allocator + Clone,
     L: ValueLayout<T, A>,
@@ -337,7 +337,7 @@ where
 
 impl<'a, T, P, const FIELD: u32, A, L, D, Pb> SingularFieldRef<'a, T, P, FIELD, A, L, D, Pb>
 where
-    T: ProtoType,
+    T: SingularType,
     P: FieldPresence,
     A: Allocator + Clone,
     L: ValueLayout<T, A>,
@@ -354,7 +354,7 @@ where
 
 impl<'a, T, const FIELD: u32, A, L, D, Pb> SingularFieldRef<'a, T, Implicit, FIELD, A, L, D, Pb>
 where
-    T: ProtoType,
+    T: SingularType,
     A: Allocator + Clone,
     L: ValueLayout<T, A>,
     Pb: PresenceBits,
@@ -369,7 +369,7 @@ where
 
 impl<'a, T, const FIELD: u32, A, L, D, Pb> SingularFieldRef<'a, T, Oneof, FIELD, A, L, D, Pb>
 where
-    T: ProtoType,
+    T: SingularType,
     A: Allocator + Clone,
     L: ValueLayout<T, A>,
     Pb: PresenceBits,
@@ -391,7 +391,7 @@ where
 pub struct SingularFieldMut<
     'f,
     'c,
-    T: ProtoType,
+    T: SingularType,
     P: FieldPresence,
     const FIELD: u32,
     A: Allocator + Clone,
@@ -408,7 +408,7 @@ pub struct SingularFieldMut<
 
 impl<'f, 'c, T, P, const FIELD: u32, A, L, D, Pb> SingularFieldMut<'f, 'c, T, P, FIELD, A, L, D, Pb>
 where
-    T: ProtoType,
+    T: SingularType,
     P: FieldPresence,
     A: Allocator + Clone,
     L: ValueLayout<T, A>,
@@ -477,7 +477,7 @@ where
 impl<T, P, const FIELD: u32, A, L, D, Pb> FieldPartialEq<Pb, A>
     for SingularField<T, P, FIELD, A, L, D>
 where
-    T: ProtoType + ProtoRefEq<A>,
+    T: SingularType + ProtoRefEq<A>,
     P: FieldPresence,
     A: Allocator + Clone,
     L: ValueLayout<T, A>,
@@ -499,7 +499,7 @@ where
 
 impl<T, P, const FIELD: u32, A, L, D, Pb> FieldEncode<Pb, A> for SingularField<T, P, FIELD, A, L, D>
 where
-    T: ProtoType,
+    T: SingularType,
     P: FieldPresence,
     A: Allocator + Clone,
     L: ValueLayout<T, A>,
@@ -549,7 +549,7 @@ where
 impl<T, P, const FIELD: u32, A, L, D, Pb> FieldCloneIn<Pb, A>
     for SingularField<T, P, FIELD, A, L, D>
 where
-    T: ProtoType,
+    T: SingularType,
     P: FieldPresence,
     A: Allocator + Clone,
     L: ValueLayout<T, A>,
@@ -570,7 +570,7 @@ where
 impl<T, const FIELD: u32, A, L, D, Pb> FieldDebug<Pb, A>
     for SingularField<T, Implicit, FIELD, A, L, D>
 where
-    T: ProtoType + ProtoRefDebug<A>,
+    T: SingularType + ProtoRefDebug<A>,
     A: Allocator + Clone,
     L: ValueLayout<T, A>,
     Pb: PresenceBits,
@@ -586,7 +586,7 @@ where
 impl<T, const BIT: usize, const FIELD: u32, A, L, D, Pb> FieldDebug<Pb, A>
     for SingularField<T, Explicit<BIT>, FIELD, A, L, D>
 where
-    T: ProtoType + ProtoRefDebug<A>,
+    T: SingularType + ProtoRefDebug<A>,
     A: Allocator + Clone,
     L: ValueLayout<T, A>,
     Pb: PresenceBits,
@@ -602,7 +602,7 @@ where
 impl<T, const BIT: usize, const FIELD: u32, A, L, D, Pb> FieldDebug<Pb, A>
     for SingularField<T, LegacyRequired<BIT>, FIELD, A, L, D>
 where
-    T: ProtoType + ProtoRefDebug<A>,
+    T: SingularType + ProtoRefDebug<A>,
     A: Allocator + Clone,
     L: ValueLayout<T, A>,
     Pb: PresenceBits,
@@ -618,7 +618,7 @@ where
 impl<T, const FIELD: u32, A, L, D, Pb> FieldDebug<Pb, A>
     for SingularField<T, Message, FIELD, A, L, D>
 where
-    T: ProtoType + ProtoRefDebug<A>,
+    T: SingularType + ProtoRefDebug<A>,
     A: Allocator + Clone,
     L: ValueLayout<T, A>,
     Pb: PresenceBits,

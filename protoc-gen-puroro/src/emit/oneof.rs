@@ -191,7 +191,7 @@ fn render_module_body(oneof: &OneofEmit) -> Result<TokenStream> {
         .iter()
         .map(|v| {
             let marker = &v.marker;
-            quote! { <#marker as ::puroro_rt::ProtoType>::Mut<'a, A> }
+            quote! { <#marker as ::puroro_rt::SingularType>::Mut<'a, A> }
         })
         .collect();
 

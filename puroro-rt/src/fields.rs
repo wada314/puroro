@@ -20,7 +20,7 @@
 //! | Submodule | Contents |
 //! |---|---|
 //! | [`shared`] | `MessageCommon`, `PresenceBits`, `FieldPresence`, `ValueSlot`, … |
-//! | [`wire`] | `ProtoType`, `RepeatedElement`, `NumericalType`, fixed / varint markers |
+//! | [`wire`] | `SingularType`, `RepeatedElement`, `NumericalType`, fixed / varint markers |
 //! | [`singular`] | `SingularField` |
 //! | [`repeated`] | `RepeatedField` |
 //! | [`map`] | `MapField` (hash map entries) |

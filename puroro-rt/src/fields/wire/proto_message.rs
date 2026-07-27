@@ -1,4 +1,4 @@
-//! Nested-message type marker for [`ProtoType`](super::proto_type::ProtoType).
+//! Nested-message type marker for [`SingularType`](super::singular_type::SingularType).
 //!
 //! [`ProtoMessage`] supplies merge-into wire semantics; physical storage is
 //! [`UnmanagedBox<M, A>`]. Presence policy (`Message` / `Oneof`) lives on
@@ -23,11 +23,11 @@ use crate::fields::shared::{
     slot_init::SlotInitMut,
     value_slot::{AddressableSlot, ValueSlot, ValueSlotMutAccess},
 };
-use crate::fields::wire::proto_type::{PayloadAccess, ProtoType};
+use crate::fields::wire::singular_type::{PayloadAccess, SingularType};
 
 /// Type marker for a singular nested message `M`.
 ///
-/// Physical slot is [`UnmanagedBox<M, A>`] via [`ProtoType::Slot`].
+/// Physical slot is [`UnmanagedBox<M, A>`] via [`SingularType::Slot`].
 pub struct ProtoMessage<M>(PhantomData<fn() -> M>);
 
 impl<M> Default for ProtoMessage<M> {
@@ -69,7 +69,7 @@ impl<M, A: Allocator> ProtoEmpty for UnmanagedBox<M, A> {
 
 impl<M, A: Allocator> AddressableSlot for UnmanagedBox<M, A> {}
 
-impl<M: Message> ProtoType for ProtoMessage<M> {
+impl<M: Message> SingularType for ProtoMessage<M> {
     type Slot<A: Allocator + Clone> = UnmanagedBox<M, A>;
     type Mut<'a, A: Allocator + Clone>
         = &'a mut M

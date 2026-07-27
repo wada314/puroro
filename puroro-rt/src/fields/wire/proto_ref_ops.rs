@@ -9,12 +9,12 @@ use ::puroro::Message;
 use super::len::{ProtoBytes, ProtoString};
 use super::numerical::NumericalType;
 use super::proto_message::ProtoMessage;
-use super::proto_type::ProtoType;
+use super::singular_type::SingularType;
 use super::varint::ProtoBool;
 
 /// Equality for [`WirePayload::View`](super::wire_payload::WirePayload::View)
 /// (used by catalog [`FieldPartialEq`](crate::FieldPartialEq)).
-pub trait ProtoRefEq<A: Allocator + Clone>: ProtoType {
+pub trait ProtoRefEq<A: Allocator + Clone>: SingularType {
     fn option_eq<'a>(lhs: Option<Self::View<'a, A>>, rhs: Option<Self::View<'a, A>>) -> bool
     where
         A: 'a;
@@ -22,7 +22,7 @@ pub trait ProtoRefEq<A: Allocator + Clone>: ProtoType {
 
 /// [`Debug`] for [`WirePayload::View`](super::wire_payload::WirePayload::View)
 /// (used by catalog [`FieldDebug`](crate::FieldDebug)).
-pub trait ProtoRefDebug<A: Allocator + Clone>: ProtoType {
+pub trait ProtoRefDebug<A: Allocator + Clone>: SingularType {
     fn fmt_ref<'a>(value: &Self::View<'a, A>, f: &mut Formatter<'_>) -> FmtResult
     where
         A: 'a;

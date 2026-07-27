@@ -1,7 +1,7 @@
 //! Field presence policy markers (`Implicit` / `Explicit<BIT>` / `LegacyRequired<BIT>` /
 //! [`Message`] / [`Oneof`]).
 //!
-//! Composed with [`ProtoType`](crate::fields::wire::proto_type::ProtoType) markers in
+//! Composed with [`SingularType`](crate::fields::wire::singular_type::SingularType) markers in
 //! singular field wrappers.
 //!
 //! Only [`Explicit`] and [`LegacyRequired`] carry a presence bit index; [`Implicit`],
@@ -27,7 +27,7 @@ pub trait FieldPresence: Copy {
     /// [`LegacyRequired`] use [`MaybeUninit<T>`].
     ///
     /// The `ValueSlot<T>` bound is enforced at use sites ([`SingularField`]).
-    /// `T` here is the **slot** payload ([`ProtoType::Slot`](crate::ProtoType)),
+    /// `T` here is the **slot** payload ([`SingularType::Slot`](crate::SingularType)),
     /// not the protobuf type marker.
     type ValueSlot<T: AddressableSlot>;
 
