@@ -106,11 +106,11 @@ pub trait PackableRepeatedElement: RepeatedElement {
 /// Elements that may be mutated through a growable `Vec` (`values_mut`).
 ///
 /// Implemented for copy scalars / enums and nested messages. Not implemented
-/// for string / bytes (those use [`RepeatedSlicePush::element_from_slice`] or
-/// [`RepeatedElementMut`] via [`RepeatedContainerMut`](crate::fields::repeated::container::RepeatedContainerMut)).
+/// for string / bytes (those use [`RepeatedElementMut`] via
+/// [`RepeatedContainerMut`](crate::fields::repeated::container::RepeatedContainerMut)).
 pub trait RepeatedVecMut: RepeatedElement {}
 
-/// Repeated string / bytes — elements built from a byte slice (`push_*`).
+/// Build an element from a byte slice (map string keys, …).
 pub trait RepeatedSlicePush: RepeatedElement {
     fn element_from_slice<A: Allocator + Clone>(
         v: &[u8],

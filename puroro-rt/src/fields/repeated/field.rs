@@ -19,7 +19,7 @@ use ::puroro::WireType;
 use crate::fields::shared::field_inspect::{FieldCloneIn, FieldDebug, FieldEncode, FieldPartialEq};
 use crate::fields::shared::{FieldDeallocate, MessageCommon, PresenceBits};
 use crate::fields::wire::repeated_element::{
-    RepeatedElement, RepeatedElementMerge, RepeatedElementMut, RepeatedSlicePush, RepeatedVecMut,
+    RepeatedElement, RepeatedElementMerge, RepeatedElementMut, RepeatedVecMut,
 };
 
 use super::container::RepeatedElementsMut;
@@ -247,19 +247,6 @@ where
         // SAFETY: an owned clone of the message allocator owns this vector's
         // buffer.
         RepeatedElementsMut::new(unsafe { self.field.values.with_alloc(alloc) })
-    }
-
-    /// Appends an element built from a payload slice (`repeated string` / `bytes`).
-    pub fn push_in(self, v: impl AsRef<[u8]>) -> Result<(), DecodeError>
-    where
-        T: RepeatedSlicePush,
-    {
-        let alloc = self.common.alloc.clone();
-        let stored = T::element_from_slice(v.as_ref(), alloc.clone())?;
-        // SAFETY: owned clones of the message allocator own this vector's buffer.
-        let mut g = unsafe { self.field.values.with_alloc(alloc) };
-        g.push(stored);
-        Ok(())
     }
 
     /// Empties the vector (keeps capacity). Heap elements are freed first.
