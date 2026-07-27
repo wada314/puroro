@@ -572,7 +572,7 @@ Runtime **`str_to_unmanaged_in(s, alloc)`** — copy bytes into an `UnmanagedStr
 
 ### Encode
 
-1. `visit_fields` with [`EncodedLenVisitor`](puroro-rt/src/fields/shared/field_inspect.rs) / [`EncodeRawVisitor`](puroro-rt/src/fields/shared/field_inspect.rs) — each catalog field implements [`FieldEncode`](puroro-rt/src/fields/shared/field_inspect.rs) (`wire_encoded_len` / `wire_encode_raw`; omit rules in [§14](#14-singular-fields)).
+1. `visit_fields` with [`EncodedLenVisitor`](puroro-rt/src/fields/shared/field_inspect.rs) / [`EncodeRawVisitor`](puroro-rt/src/fields/shared/field_inspect.rs) — each catalog field implements [`FieldEncode`](puroro-rt/src/fields/shared/field_inspect.rs) (`encoded_len` / `encode_raw`; omit rules in [§14](#14-singular-fields)).
 2. Append `_common.unknown_fields` verbatim.
 3. Message `encoded_len` must match bytes written.
 

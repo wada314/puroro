@@ -68,12 +68,12 @@ impl<A: Allocator + Clone> Message for Nest<A> {
 
     fn encoded_len(&self) -> usize {
         let c = &self._common;
-        self.child.wire_encoded_len(c) + c.unknown_fields.len()
+        self.child.encoded_len(c) + c.unknown_fields.len()
     }
 
     fn encode_raw<B: BufMut>(&self, buf: &mut B) {
         let c = &self._common;
-        self.child.wire_encode_raw(c, buf);
+        self.child.encode_raw(c, buf);
         buf.put_slice(&c.unknown_fields);
     }
 

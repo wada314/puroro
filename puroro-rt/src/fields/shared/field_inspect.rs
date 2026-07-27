@@ -33,9 +33,9 @@ pub trait FieldDebug<Pb: PresenceBits, A: Allocator> {
 
 /// Wire length / encode for one catalog field.
 pub trait FieldEncode<Pb: PresenceBits, A: Allocator> {
-    fn wire_encoded_len(&self, common: &MessageCommon<Pb, A>) -> usize;
+    fn encoded_len(&self, common: &MessageCommon<Pb, A>) -> usize;
 
-    fn wire_encode_raw<B: BufMut>(&self, common: &MessageCommon<Pb, A>, buf: &mut B);
+    fn encode_raw<B: BufMut>(&self, common: &MessageCommon<Pb, A>, buf: &mut B);
 }
 
 /// Deep-clone one catalog field through `common` / `alloc`.
@@ -198,7 +198,7 @@ impl<Pb: PresenceBits, A: Allocator> FieldVisitorMut<Pb, A> for FieldDeallocVisi
     }
 }
 
-/// Sums [`FieldEncode::wire_encoded_len`].
+/// Sums [`FieldEncode::encoded_len`].
 pub struct EncodedLenVisitor<'a, Pb: PresenceBits, A: Allocator> {
     common: &'a MessageCommon<Pb, A>,
     pub len: usize,
@@ -216,12 +216,12 @@ impl<'a, Pb: PresenceBits, A: Allocator> FieldVisitor<Pb, A> for EncodedLenVisit
 
     #[inline]
     fn visit<F: CatalogField<Pb, A>>(&mut self, _name: &'static str, field: &F) -> ControlFlow<()> {
-        self.len += field.wire_encoded_len(self.common);
+        self.len += field.encoded_len(self.common);
         ControlFlow::Continue(())
     }
 }
 
-/// Writes each field via [`FieldEncode::wire_encode_raw`].
+/// Writes each field via [`FieldEncode::encode_raw`].
 pub struct EncodeRawVisitor<'a, B: BufMut, Pb: PresenceBits, A: Allocator> {
     common: &'a MessageCommon<Pb, A>,
     pub buf: &'a mut B,
@@ -241,7 +241,7 @@ impl<'a, B: BufMut, Pb: PresenceBits, A: Allocator> FieldVisitor<Pb, A>
 
     #[inline]
     fn visit<F: CatalogField<Pb, A>>(&mut self, _name: &'static str, field: &F) -> ControlFlow<()> {
-        field.wire_encode_raw(self.common, self.buf);
+        field.encode_raw(self.common, self.buf);
         ControlFlow::Continue(())
     }
 }

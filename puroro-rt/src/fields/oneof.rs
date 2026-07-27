@@ -376,11 +376,11 @@ where
     Pb: PresenceBits,
     A: Allocator + Clone,
 {
-    fn wire_encoded_len(&self, common: &MessageCommon<Pb, A>) -> usize {
+    fn encoded_len(&self, common: &MessageCommon<Pb, A>) -> usize {
         self.as_ref().map(|v| v.encoded_len(common)).unwrap_or(0)
     }
 
-    fn wire_encode_raw<B: BufMut>(&self, common: &MessageCommon<Pb, A>, buf: &mut B) {
+    fn encode_raw<B: BufMut>(&self, common: &MessageCommon<Pb, A>, buf: &mut B) {
         if let Some(v) = self.as_ref() {
             v.encode_raw(common, buf);
         }

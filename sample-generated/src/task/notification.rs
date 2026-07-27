@@ -302,21 +302,21 @@ impl<A: Allocator + Clone> OneofVariant<{ super::FIELD_URGENT }> for Notificatio
 impl<A: Allocator + Clone> OneofEncodable<A> for NotificationStorage<A> {
     fn encoded_len<Pb: PresenceBits>(&self, common: &MessageCommon<Pb, A>) -> usize {
         match self {
-            Self::EmailAddress(f) => FieldEncode::wire_encoded_len(f, common),
-            Self::PhoneNumber(f) => FieldEncode::wire_encoded_len(f, common),
-            Self::WebhookId(f) => FieldEncode::wire_encoded_len(f, common),
-            Self::Postal(f) => FieldEncode::wire_encoded_len(f, common),
-            Self::Urgent(f) => FieldEncode::wire_encoded_len(f, common),
+            Self::EmailAddress(f) => FieldEncode::encoded_len(f, common),
+            Self::PhoneNumber(f) => FieldEncode::encoded_len(f, common),
+            Self::WebhookId(f) => FieldEncode::encoded_len(f, common),
+            Self::Postal(f) => FieldEncode::encoded_len(f, common),
+            Self::Urgent(f) => FieldEncode::encoded_len(f, common),
         }
     }
 
     fn encode_raw<Pb: PresenceBits, B: BufMut>(&self, common: &MessageCommon<Pb, A>, buf: &mut B) {
         match self {
-            Self::EmailAddress(f) => FieldEncode::wire_encode_raw(f, common, buf),
-            Self::PhoneNumber(f) => FieldEncode::wire_encode_raw(f, common, buf),
-            Self::WebhookId(f) => FieldEncode::wire_encode_raw(f, common, buf),
-            Self::Postal(f) => FieldEncode::wire_encode_raw(f, common, buf),
-            Self::Urgent(f) => FieldEncode::wire_encode_raw(f, common, buf),
+            Self::EmailAddress(f) => FieldEncode::encode_raw(f, common, buf),
+            Self::PhoneNumber(f) => FieldEncode::encode_raw(f, common, buf),
+            Self::WebhookId(f) => FieldEncode::encode_raw(f, common, buf),
+            Self::Postal(f) => FieldEncode::encode_raw(f, common, buf),
+            Self::Urgent(f) => FieldEncode::encode_raw(f, common, buf),
         }
     }
 }

@@ -149,7 +149,7 @@ where
     Pb: PresenceBits,
     K::Element<A>: Eq + Hash,
 {
-    fn wire_encoded_len(&self, _common: &MessageCommon<Pb, A>) -> usize {
+    fn encoded_len(&self, _common: &MessageCommon<Pb, A>) -> usize {
         let mut n = 0;
         for (key, value) in &self.entries {
             let payload = entry_payload_len::<K, V, A>(key, value);
@@ -158,7 +158,7 @@ where
         n
     }
 
-    fn wire_encode_raw<B: BufMut>(&self, _common: &MessageCommon<Pb, A>, buf: &mut B) {
+    fn encode_raw<B: BufMut>(&self, _common: &MessageCommon<Pb, A>, buf: &mut B) {
         for (key, value) in &self.entries {
             encode_map_entry::<K, V, A, B>(FIELD, key, value, buf);
         }
@@ -475,8 +475,8 @@ mod tests {
         field.bind_mut(&mut common).insert(2, 20);
 
         let mut buf = BytesMut::new();
-        field.wire_encode_raw(&common, &mut buf);
-        assert_eq!(field.wire_encoded_len(&common), buf.len());
+        field.encode_raw(&common, &mut buf);
+        assert_eq!(field.encoded_len(&common), buf.len());
 
         let mut decoded = MapField::<ProtoInt32, ProtoInt32, 7, _>::new_in(Global);
         let mut rest = buf.as_ref();
@@ -541,7 +541,7 @@ mod tests {
         field.bind_mut(&mut common).insert(unmanaged_str("ab"), 7);
 
         let mut buf = BytesMut::new();
-        field.wire_encode_raw(&common, &mut buf);
+        field.encode_raw(&common, &mut buf);
 
         let mut decoded = MapField::<ProtoString, ProtoInt32, 3, _>::new_in(Global);
         let mut rest = buf.as_ref();
@@ -586,7 +586,7 @@ mod tests {
                 let mut src = MapField::<ProtoString, ProtoInt32, 1, _>::new_in(Global);
                 src.bind_mut(common).insert(unmanaged_str("k"), value);
                 let mut buf = BytesMut::new();
-                src.wire_encode_raw(common, &mut buf);
+                src.encode_raw(common, &mut buf);
                 src.deallocate(common);
                 buf
             };

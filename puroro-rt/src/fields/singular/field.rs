@@ -506,7 +506,7 @@ where
     T::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
     P::ValueSlot<T::Slot<A>>: ValueSlot<T::Slot<A>, A>,
 {
-    fn wire_encoded_len(&self, common: &MessageCommon<Pb, A>) -> usize {
+    fn encoded_len(&self, common: &MessageCommon<Pb, A>) -> usize {
         if P::should_emit(common, || {
             let init = P::slot_init_view();
             match self.value.with(init, common).get() {
@@ -526,7 +526,7 @@ where
         }
     }
 
-    fn wire_encode_raw<B: BufMut>(&self, common: &MessageCommon<Pb, A>, buf: &mut B) {
+    fn encode_raw<B: BufMut>(&self, common: &MessageCommon<Pb, A>, buf: &mut B) {
         if P::should_emit(common, || {
             let init = P::slot_init_view();
             match self.value.with(init, common).get() {

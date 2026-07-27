@@ -71,19 +71,19 @@ impl<A: Allocator + Clone> Message for FixedDemo<A> {
 
     fn encoded_len(&self) -> usize {
         let c = &self._common;
-        self.code.wire_encoded_len(c)
-            + self.altitude.wire_encoded_len(c)
-            + self.samples.wire_encoded_len(c)
-            + self.tags.wire_encoded_len(c)
+        self.code.encoded_len(c)
+            + self.altitude.encoded_len(c)
+            + self.samples.encoded_len(c)
+            + self.tags.encoded_len(c)
             + c.unknown_fields.len()
     }
 
     fn encode_raw<B: BufMut>(&self, buf: &mut B) {
         let c = &self._common;
-        self.code.wire_encode_raw(c, buf);
-        self.altitude.wire_encode_raw(c, buf);
-        self.samples.wire_encode_raw(c, buf);
-        self.tags.wire_encode_raw(c, buf);
+        self.code.encode_raw(c, buf);
+        self.altitude.encode_raw(c, buf);
+        self.samples.encode_raw(c, buf);
+        self.tags.encode_raw(c, buf);
         buf.put_slice(&c.unknown_fields);
     }
 

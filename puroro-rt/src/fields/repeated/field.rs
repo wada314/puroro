@@ -286,7 +286,7 @@ where
     A: Allocator + Clone,
     Pb: PresenceBits,
 {
-    fn wire_encoded_len(&self, _common: &MessageCommon<Pb, A>) -> usize {
+    fn encoded_len(&self, _common: &MessageCommon<Pb, A>) -> usize {
         if self.values.is_empty() {
             0
         } else {
@@ -294,7 +294,7 @@ where
         }
     }
 
-    fn wire_encode_raw<B: BufMut>(&self, _common: &MessageCommon<Pb, A>, buf: &mut B) {
+    fn encode_raw<B: BufMut>(&self, _common: &MessageCommon<Pb, A>, buf: &mut B) {
         if !self.values.is_empty() {
             E::encode(FIELD, self.as_slice(), buf);
         }
