@@ -6,16 +6,11 @@ use ::core::fmt::{Debug, Formatter, Result as FmtResult};
 
 use ::puroro::Message;
 
-use super::fixed::{
-    ProtoDouble, ProtoFixed32, ProtoFixed64, ProtoFloat, ProtoSFixed32, ProtoSFixed64,
-};
 use super::len::{ProtoBytes, ProtoString};
+use super::numerical::NumericalType;
 use super::proto_message::ProtoMessage;
 use super::proto_type::ProtoType;
-use super::varint::{
-    Closed, ClosedEnum, Open, OpenEnum, ProtoBool, ProtoEnum, ProtoEnumStorage, ProtoInt32,
-    ProtoInt64, ProtoSint32, ProtoSint64, ProtoUInt32, ProtoUInt64,
-};
+use super::varint::ProtoBool;
 
 /// Equality for [`ProtoType::Ref`] views (used by catalog [`FieldPartialEq`](crate::FieldPartialEq)).
 pub trait ProtoRefEq<A: Allocator + Clone>: ProtoType {
@@ -46,56 +41,15 @@ pub trait ProtoRefDebug<A: Allocator + Clone>: ProtoType {
     }
 }
 
-macro_rules! impl_proto_ref_ops_copy {
-    ($($marker:ty),+ $(,)?) => {$(
-        impl<A: Allocator + Clone> ProtoRefEq<A> for $marker {
-            #[inline]
-            fn option_eq<'a>(
-                lhs: Option<Self::Ref<'a, A>>,
-                rhs: Option<Self::Ref<'a, A>>,
-            ) -> bool
-            where
-                A: 'a,
-            {
-                lhs == rhs
-            }
-        }
-
-        impl<A: Allocator + Clone> ProtoRefDebug<A> for $marker {
-            #[inline]
-            fn fmt_ref<'a>(value: &Self::Ref<'a, A>, f: &mut Formatter<'_>) -> FmtResult
-            where
-                A: 'a,
-            {
-                Debug::fmt(value, f)
-            }
-        }
-    )+};
-}
-
-impl_proto_ref_ops_copy!(
-    ProtoInt32,
-    ProtoInt64,
-    ProtoUInt32,
-    ProtoUInt64,
-    ProtoSint32,
-    ProtoSint64,
-    ProtoBool,
-    ProtoFixed32,
-    ProtoFixed64,
-    ProtoSFixed32,
-    ProtoSFixed64,
-    ProtoFloat,
-    ProtoDouble,
-    ProtoString,
-    ProtoBytes,
-);
-
-impl<A: Allocator + Clone, E: ProtoEnumStorage + OpenEnum + PartialEq> ProtoRefEq<A>
-    for ProtoEnum<E, Open>
+// Numerical markers (`Ref = Value`): int / fixed / float / enum.
+impl<T, A> ProtoRefEq<A> for T
+where
+    T: NumericalType,
+    T::Value: PartialEq,
+    A: Allocator + Clone,
 {
     #[inline]
-    fn option_eq<'a>(lhs: Option<Self::Ref<'a, A>>, rhs: Option<Self::Ref<'a, A>>) -> bool
+    fn option_eq<'a>(lhs: Option<T::Value>, rhs: Option<T::Value>) -> bool
     where
         A: 'a,
     {
@@ -103,23 +57,14 @@ impl<A: Allocator + Clone, E: ProtoEnumStorage + OpenEnum + PartialEq> ProtoRefE
     }
 }
 
-impl<A: Allocator + Clone, E: ProtoEnumStorage + ClosedEnum + PartialEq> ProtoRefEq<A>
-    for ProtoEnum<E, Closed>
+impl<T, A> ProtoRefDebug<A> for T
+where
+    T: NumericalType,
+    T::Value: Debug,
+    A: Allocator + Clone,
 {
     #[inline]
-    fn option_eq<'a>(lhs: Option<Self::Ref<'a, A>>, rhs: Option<Self::Ref<'a, A>>) -> bool
-    where
-        A: 'a,
-    {
-        lhs == rhs
-    }
-}
-
-impl<A: Allocator + Clone, E: ProtoEnumStorage + OpenEnum + Debug> ProtoRefDebug<A>
-    for ProtoEnum<E, Open>
-{
-    #[inline]
-    fn fmt_ref<'a>(value: &Self::Ref<'a, A>, f: &mut Formatter<'_>) -> FmtResult
+    fn fmt_ref<'a>(value: &T::Value, f: &mut Formatter<'_>) -> FmtResult
     where
         A: 'a,
     {
@@ -127,11 +72,59 @@ impl<A: Allocator + Clone, E: ProtoEnumStorage + OpenEnum + Debug> ProtoRefDebug
     }
 }
 
-impl<A: Allocator + Clone, E: ProtoEnumStorage + ClosedEnum + Debug> ProtoRefDebug<A>
-    for ProtoEnum<E, Closed>
-{
+impl<A: Allocator + Clone> ProtoRefEq<A> for ProtoBool {
     #[inline]
-    fn fmt_ref<'a>(value: &Self::Ref<'a, A>, f: &mut Formatter<'_>) -> FmtResult
+    fn option_eq<'a>(lhs: Option<bool>, rhs: Option<bool>) -> bool
+    where
+        A: 'a,
+    {
+        lhs == rhs
+    }
+}
+
+impl<A: Allocator + Clone> ProtoRefDebug<A> for ProtoBool {
+    #[inline]
+    fn fmt_ref<'a>(value: &bool, f: &mut Formatter<'_>) -> FmtResult
+    where
+        A: 'a,
+    {
+        Debug::fmt(value, f)
+    }
+}
+
+impl<A: Allocator + Clone> ProtoRefEq<A> for ProtoString {
+    #[inline]
+    fn option_eq<'a>(lhs: Option<&'a str>, rhs: Option<&'a str>) -> bool
+    where
+        A: 'a,
+    {
+        lhs == rhs
+    }
+}
+
+impl<A: Allocator + Clone> ProtoRefDebug<A> for ProtoString {
+    #[inline]
+    fn fmt_ref<'a>(value: &&'a str, f: &mut Formatter<'_>) -> FmtResult
+    where
+        A: 'a,
+    {
+        Debug::fmt(value, f)
+    }
+}
+
+impl<A: Allocator + Clone> ProtoRefEq<A> for ProtoBytes {
+    #[inline]
+    fn option_eq<'a>(lhs: Option<&'a [u8]>, rhs: Option<&'a [u8]>) -> bool
+    where
+        A: 'a,
+    {
+        lhs == rhs
+    }
+}
+
+impl<A: Allocator + Clone> ProtoRefDebug<A> for ProtoBytes {
+    #[inline]
+    fn fmt_ref<'a>(value: &&'a [u8], f: &mut Formatter<'_>) -> FmtResult
     where
         A: 'a,
     {
