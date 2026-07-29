@@ -16,8 +16,8 @@ use super::len::{ProtoBytes, ProtoString};
 use super::proto_message::ProtoMessage;
 use super::repeated_element::RepeatedElement;
 use super::varint::{
-    Closed, ClosedEnum, Open, OpenEnum, ProtoBool, ProtoEnum, ProtoInt32, ProtoInt64, ProtoSint32,
-    ProtoSint64, ProtoUInt32, ProtoUInt64,
+    Closed, ClosedEnum, Open, OpenEnum, ProtoBool, ProtoEnum, ProtoInt32, ProtoInt64, ProtoSInt32,
+    ProtoSInt64, ProtoUInt32, ProtoUInt64,
 };
 use crate::decode;
 use ::puroro::Message;
@@ -70,8 +70,8 @@ impl_copy_map_key!(ProtoInt32, i32);
 impl_copy_map_key!(ProtoInt64, i64);
 impl_copy_map_key!(ProtoUInt32, u32);
 impl_copy_map_key!(ProtoUInt64, u64);
-impl_copy_map_key!(ProtoSint32, i32);
-impl_copy_map_key!(ProtoSint64, i64);
+impl_copy_map_key!(ProtoSInt32, i32);
+impl_copy_map_key!(ProtoSInt64, i64);
 impl_copy_map_key!(ProtoBool, bool);
 impl_copy_map_key!(ProtoFixed32, u32);
 impl_copy_map_key!(ProtoFixed64, u64);
@@ -115,8 +115,8 @@ impl_identity_map_value_view!(ProtoBool, bool);
 impl_identity_map_value_view!(ProtoUInt32, u32);
 impl_identity_map_value_view!(ProtoSFixed32, i32);
 impl_identity_map_value_view!(ProtoSFixed64, i64);
-impl_identity_map_value_view!(ProtoSint32, i32);
-impl_identity_map_value_view!(ProtoSint64, i64);
+impl_identity_map_value_view!(ProtoSInt32, i32);
+impl_identity_map_value_view!(ProtoSInt64, i64);
 
 macro_rules! impl_enum_map_value_view {
     ($kind:ty, $bound:ident) => {

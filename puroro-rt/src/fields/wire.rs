@@ -29,6 +29,6 @@ pub use repeated_element::{
 pub use singular_type::{PayloadAccess, SingularType};
 pub use varint::{
     Closed, ClosedEnum, Open, OpenEnum, ProtoBool, ProtoEnum, ProtoEnumStorage, ProtoInt32,
-    ProtoInt64, ProtoSint32, ProtoSint64, ProtoUInt32, ProtoUInt64,
+    ProtoInt64, ProtoSInt32, ProtoSInt64, ProtoUInt32, ProtoUInt64,
 };
 pub use wire_payload::{WirePayload, encode_field, encoded_len_field};

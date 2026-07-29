@@ -68,11 +68,11 @@ pub struct ProtoInt64;
 
 /// Protobuf `sint32` — varint with ZigZag encoding.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
-pub struct ProtoSint32;
+pub struct ProtoSInt32;
 
 /// Protobuf `sint64` — varint with ZigZag encoding.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
-pub struct ProtoSint64;
+pub struct ProtoSInt64;
 
 /// Protobuf `bool` type marker — varint 0 or 1.
 ///

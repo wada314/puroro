@@ -22,8 +22,8 @@ use super::fixed::{
     ProtoDouble, ProtoFixed32, ProtoFixed64, ProtoFloat, ProtoSFixed32, ProtoSFixed64,
 };
 use super::varint::{
-    Closed, ClosedEnum, Open, OpenEnum, ProtoEnum, ProtoInt32, ProtoInt64, ProtoSint32,
-    ProtoSint64, ProtoUInt32, ProtoUInt64,
+    Closed, ClosedEnum, Open, OpenEnum, ProtoEnum, ProtoInt32, ProtoInt64, ProtoSInt32,
+    ProtoSInt64, ProtoUInt32, ProtoUInt64,
 };
 use super::wire_payload::WirePayload;
 
@@ -254,14 +254,14 @@ impl_varint_numerical! {
 }
 
 impl_varint_numerical! {
-    ProtoSint32,
+    ProtoSInt32,
     i32,
     decode = |raw| Varint::from_uint64(raw).try_to_sint32().map_err(DecodeError::from),
     encode = |value| Varint::from_sint32(value).to_uint64(),
 }
 
 impl_varint_numerical! {
-    ProtoSint64,
+    ProtoSInt64,
     i64,
     decode = |raw| Ok(Varint::from_uint64(raw).to_sint64()),
     encode = |value| Varint::from_sint64(value).to_uint64(),

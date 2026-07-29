@@ -858,8 +858,8 @@ fn wire_marker_path(wire: &WireTypeKind<'_>) -> Result<TokenStream> {
         WireTypeKind::UInt32 => quote! { ::puroro_rt::ProtoUInt32 },
         WireTypeKind::SFixed32 => quote! { ::puroro_rt::ProtoSFixed32 },
         WireTypeKind::SFixed64 => quote! { ::puroro_rt::ProtoSFixed64 },
-        WireTypeKind::SInt32 => quote! { ::puroro_rt::ProtoSint32 },
-        WireTypeKind::SInt64 => quote! { ::puroro_rt::ProtoSint64 },
+        WireTypeKind::SInt32 => quote! { ::puroro_rt::ProtoSInt32 },
+        WireTypeKind::SInt64 => quote! { ::puroro_rt::ProtoSInt64 },
         WireTypeKind::Enum { ty, openness } => {
             let path = fqn_to_enum_root_path(ty)?;
             let kind = match openness {

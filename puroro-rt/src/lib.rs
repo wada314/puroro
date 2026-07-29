@@ -41,7 +41,7 @@ pub use fields::wire::{
     Closed, ClosedEnum, MapKey, MapValueView, NumericalType, NumericalWireKind, Open, OpenEnum,
     PackableRepeatedElement, PayloadAccess, ProtoBool, ProtoBytes, ProtoDouble, ProtoEnum,
     ProtoEnumStorage, ProtoFixed32, ProtoFixed64, ProtoFloat, ProtoInt32, ProtoInt64, ProtoMessage,
-    ProtoSFixed32, ProtoSFixed64, ProtoSint32, ProtoSint64, ProtoString, ProtoUInt32, ProtoUInt64,
+    ProtoSFixed32, ProtoSFixed64, ProtoSInt32, ProtoSInt64, ProtoString, ProtoUInt32, ProtoUInt64,
     RepeatedElement, RepeatedElementMerge, RepeatedElementMut, RepeatedVecMut, SingularType,
     WirePayload, encode_field, encoded_len_field,
 };

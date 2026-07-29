@@ -9,38 +9,29 @@ use ::allocator_api2::alloc::Allocator;
 use crate::fields::shared::value_slot::AddressableSlot;
 use crate::fields::shared::{DefaultIn, ProtoEmpty};
 
-macro_rules! proto_fixed_marker {
-    ($(#[$meta:meta])* $name:ident) => {
-        $(#[$meta])*
-        #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
-        pub struct $name;
-    };
-}
+/// Protobuf `fixed32`.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
+pub struct ProtoFixed32;
 
-proto_fixed_marker! {
-    /// Protobuf `fixed32`.
-    ProtoFixed32
-}
-proto_fixed_marker! {
-    /// Protobuf `sfixed32`.
-    ProtoSFixed32
-}
-proto_fixed_marker! {
-    /// Protobuf `float`.
-    ProtoFloat
-}
-proto_fixed_marker! {
-    /// Protobuf `fixed64`.
-    ProtoFixed64
-}
-proto_fixed_marker! {
-    /// Protobuf `sfixed64`.
-    ProtoSFixed64
-}
-proto_fixed_marker! {
-    /// Protobuf `double`.
-    ProtoDouble
-}
+/// Protobuf `sfixed32`.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
+pub struct ProtoSFixed32;
+
+/// Protobuf `float`.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
+pub struct ProtoFloat;
+
+/// Protobuf `fixed64`.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
+pub struct ProtoFixed64;
+
+/// Protobuf `sfixed64`.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
+pub struct ProtoSFixed64;
+
+/// Protobuf `double`.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
+pub struct ProtoDouble;
 
 // ---------------------------------------------------------------------------
 // Slot infrastructure for f32 / f64

@@ -269,7 +269,7 @@ Singular / oneof `bool` uses allocator-free [`ProtoBool`](puroro-rt/src/fields/w
 
 Float [`ProtoEmpty`](puroro-rt/src/fields/shared.rs) uses Rust `== 0.0` (`-0.0` is empty; `NaN` is non-empty).
 
-Rust payload type alone does **not** identify protobuf encoding (`i32` can be int32 or sint32). Distinct thin wrappers (`ProtoInt32` vs `ProtoSint32`) are the source of truth.
+Rust payload type alone does **not** identify protobuf encoding (`i32` can be int32 or sint32). Distinct thin wrappers (`ProtoInt32` vs `ProtoSInt32`) are the source of truth.
 
 ---
 
@@ -328,7 +328,7 @@ Adding a singular wire type = one new `SingularType` + `WirePayload` impl (and u
 | `IMPLICIT int32` | `SingularField<ProtoInt32, Implicit, FIELD, A>` |
 | `EXPLICIT int32` | `SingularField<ProtoInt32, Explicit<BIT>, FIELD, A>` |
 | `EXPLICIT int32` + `[default = N]` | `SingularField<ProtoInt32, Explicit<BIT>, FIELD, A, Inline, D>` (`D: HasDefault`) |
-| `IMPLICIT sint32` | `SingularField<ProtoSint32, Implicit, FIELD, A>` |
+| `IMPLICIT sint32` | `SingularField<ProtoSInt32, Implicit, FIELD, A>` |
 | `IMPLICIT bool` | `SingularField<ProtoBool, Implicit, FIELD, A, BitPacked<VALUE_BIT>>` |
 | `EXPLICIT bool` | `SingularField<ProtoBool, Explicit<PRESENCE_BIT>, FIELD, A, BitPacked<VALUE_BIT>>` |
 | `LEGACY_REQUIRED bool` | `SingularField<ProtoBool, LegacyRequired<PRESENCE_BIT>, FIELD, A, BitPacked<VALUE_BIT>>` |

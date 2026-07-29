@@ -306,7 +306,7 @@ mod tests {
         assert!(content.contains("pub const FIELD_SCORE"));
         assert!(content.contains("ProtoInt32"));
         assert!(content.contains("ProtoBytes"));
-        assert!(content.contains("ProtoSint32"));
+        assert!(content.contains("ProtoSInt32"));
         assert!(content.contains("BitPacked"));
     }
 
