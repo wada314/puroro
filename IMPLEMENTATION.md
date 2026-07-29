@@ -280,22 +280,23 @@ Singular / oneof `bool` uses allocator-free [`ProtoBool`](puroro-rt/src/fields/w
 ### Numerical helper
 
 [`NumericalType`](puroro-rt/src/fields/wire/numerical.rs) maps numerical proto **types**
-(e.g. `ProtoInt32`, enums) to [`CopyWirePayload`](puroro-rt/src/fields/wire/wire_payload.rs) via
+(e.g. `ProtoInt32`, `ProtoBool`, enums) to [`CopyWirePayload`](puroro-rt/src/fields/wire/wire_payload.rs) via
 `to_raw` / `from_raw`. [`Value`](puroro-rt/src/fields/wire/numerical.rs) is the **logical**
 copy value for encode/decode and field get/set — not a storage contract.
-Inline singular storage (`AddressableSlot`, `Slot = Value` for current markers) lives on
-[`PayloadAccess`](puroro-rt/src/fields/wire/singular_type.rs). Tagged encode is
-[`EncodeType`](puroro-rt/src/fields/wire/encode_type.rs) (blanket over `NumericalType`);
-packed repeated merge / encode live on `RepeatedElementMerge` / `PackableRepeatedElement`.
-LEN scalars (`ProtoString` / `ProtoBytes`) and
-[`ProtoBool`](puroro-rt/src/fields/wire/varint.rs) implement `EncodeType` directly
-(`ProtoBool` is not on `NumericalType` yet: singular bit-pack; repeated is handwritten).
+Inline singular storage (`AddressableSlot`, `Slot = Value` for addressable markers) lives on
+[`PayloadAccess`](puroro-rt/src/fields/wire/singular_type.rs); singular
+[`ProtoBool`](puroro-rt/src/fields/wire/varint.rs) keeps `Slot = ()` +
+[`BitPacked`](puroro-rt/src/fields/shared/value_layout.rs) (no `PayloadAccess`).
+Tagged encode is [`EncodeType`](puroro-rt/src/fields/wire/encode_type.rs) (blanket over
+`NumericalType`); packed repeated merge / encode live on `RepeatedElementMerge` /
+`PackableRepeatedElement`. LEN scalars (`ProtoString` / `ProtoBytes`) implement
+`EncodeType` directly.
 
 | Helper | Wire | Markers | Status |
 |---|---|---|---|
 | `WirePayload` | VARINT / I32 / I64 / LEN | [`wire/wire_payload.rs`](puroro-rt/src/fields/wire/wire_payload.rs) | **Done** |
-| `NumericalType` | VARINT / I32 / I64 | numerics, enums ([`wire/numerical.rs`](puroro-rt/src/fields/wire/numerical.rs)) | **Done** |
-| `EncodeType` (`ProtoBool`) | VARINT | [`wire/varint.rs`](puroro-rt/src/fields/wire/varint.rs) + [`encode_type.rs`](puroro-rt/src/fields/wire/encode_type.rs) | **Done** |
+| `NumericalType` | VARINT / I32 / I64 | numerics, bool, enums ([`wire/numerical.rs`](puroro-rt/src/fields/wire/numerical.rs)) | **Done** |
+| `EncodeType` (blanket) | same | via `NumericalType` | **Done** |
 | LEN scalars | LEN | `ProtoString`, `ProtoBytes` via `EncodeType` / `SingularType` | **Done** |
 | Fixed (via `NumericalType`) | I32 / I64 | `ProtoFixed*` / `ProtoFloat` / `ProtoDouble` | **Done** |
 

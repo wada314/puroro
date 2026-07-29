@@ -1,18 +1,16 @@
 //! Codec for numerical protobuf **types** (`int32` / `ProtoInt32`,
-//! `fixed64` / `ProtoFixed64`, open/closed enums, … — not Len types such as
-//! string / bytes / message, and not [`ProtoBool`](super::varint::ProtoBool)).
+//! `bool` / [`ProtoBool`](super::varint::ProtoBool), `fixed64` / `ProtoFixed64`,
+//! open/closed enums, … — not Len types such as string / bytes / message).
 //!
 //! [`Value`](NumericalType::Value) is the **logical** copy value used for
 //! encode/decode and field get/set — not necessarily the singular struct slot
-//! type (`AddressableSlot` lives on [`PayloadAccess`](super::singular_type::PayloadAccess)).
+//! type (`AddressableSlot` lives on [`PayloadAccess`](super::singular_type::PayloadAccess);
+//! singular [`ProtoBool`](super::varint::ProtoBool) uses [`BitPacked`](crate::BitPacked)).
 //! Maps `Value` ↔ [`CopyWirePayload`](super::wire_payload::CopyWirePayload).
 //! Tagged encode goes through [`EncodeType`](super::encode_type::EncodeType).
 //! Packed repeated merge / encode live on
 //! [`RepeatedElementMerge`](super::repeated_element::RepeatedElementMerge) /
 //! [`PackableRepeatedElement`](super::repeated_element::PackableRepeatedElement).
-//!
-//! [`ProtoBool`](super::varint::ProtoBool) stays outside this trait for now
-//! (singular bit-pack; repeated / encode are handwritten).
 
 use ::allocator_api2::alloc::Allocator;
 use ::bytes::BufMut;
@@ -27,15 +25,15 @@ use super::fixed::{
     ProtoDouble, ProtoFixed32, ProtoFixed64, ProtoFloat, ProtoSFixed32, ProtoSFixed64,
 };
 use super::varint::{
-    Closed, ClosedEnum, Open, OpenEnum, ProtoEnum, ProtoInt32, ProtoInt64, ProtoSInt32,
+    Closed, ClosedEnum, Open, OpenEnum, ProtoBool, ProtoEnum, ProtoInt32, ProtoInt64, ProtoSInt32,
     ProtoSInt64, ProtoUInt32, ProtoUInt64,
 };
 use super::wire_payload::{
     CopyWirePayload, Fixed32Payload, Fixed64Payload, VarintPayload, WirePayload,
 };
 
-/// Numerical protobuf **type** marker (e.g. `ProtoInt32`, `ProtoFixed64`,
-/// `ProtoEnum<…>` — not `bool` / `string` / `bytes` / message).
+/// Numerical protobuf **type** marker (e.g. `ProtoInt32`, `ProtoBool`,
+/// `ProtoFixed64`, `ProtoEnum<…>` — not `string` / `bytes` / message).
 pub trait NumericalType: Sized {
     /// Logical value for encode/decode and field get/set (not necessarily the
     /// singular struct slot type).
@@ -112,6 +110,13 @@ impl_varint_numerical! {
     i64,
     decode = |raw: Varint| Ok(raw.to_sint64()),
     encode = Varint::from_sint64,
+}
+
+impl_varint_numerical! {
+    ProtoBool,
+    bool,
+    decode = |raw: Varint| Ok(raw.to_bool()),
+    encode = Varint::from_bool,
 }
 
 // ---------------------------------------------------------------------------

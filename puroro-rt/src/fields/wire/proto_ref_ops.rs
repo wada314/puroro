@@ -12,6 +12,7 @@ use super::numerical::NumericalType;
 use super::proto_message::ProtoMessage;
 use super::singular_type::SingularType;
 use super::varint::ProtoBool;
+use crate::fields::shared::value_slot::AddressableSlot;
 
 /// Equality for [`EncodeType::View`](super::encode_type::EncodeType::View)
 /// (used by catalog [`FieldPartialEq`](crate::FieldPartialEq)).
@@ -44,11 +45,12 @@ pub trait ProtoRefDebug<A: Allocator + Clone>: SingularType {
     }
 }
 
-// Numerical markers (`Ref = Value`): int / fixed / float / enum.
+// Addressable numerical markers (`Ref = Value`): int / fixed / float / enum.
+// `ProtoBool` is separate (logical `bool`, singular `Slot = ()`).
 impl<T, A> ProtoRefEq<A> for T
 where
     T: NumericalType,
-    T::Value: PartialEq,
+    T::Value: PartialEq + AddressableSlot,
     A: Allocator + Clone,
 {
     #[inline]
@@ -63,7 +65,7 @@ where
 impl<T, A> ProtoRefDebug<A> for T
 where
     T: NumericalType,
-    T::Value: Debug,
+    T::Value: Debug + AddressableSlot,
     A: Allocator + Clone,
 {
     #[inline]

@@ -17,9 +17,10 @@
 //! always goes through `ValueLayout`.
 //!
 //! Repeated fields use [`RepeatedElement`](super::repeated_element::RepeatedElement)
-//! (`Element` storage). Numerical / enum markers share
+//! (`Element` storage). Numerical markers (including `ProtoBool`) share
 //! [`NumericalType`](super::numerical::NumericalType) for logical `Value` ↔ wire
-//! mapping; inline slot storage stays on [`PayloadAccess`].
+//! mapping; inline slot storage stays on [`PayloadAccess`] (`Value: AddressableSlot`).
+//! Singular [`ProtoBool`](super::varint::ProtoBool) uses `Slot = ()` + [`BitPacked`].
 
 use ::allocator_api2::alloc::Allocator;
 use ::bitvec::{
@@ -166,6 +167,7 @@ pub trait PayloadAccess: SingularType {
 impl<T> SingularType for T
 where
     T: NumericalType,
+    T::Value: AddressableSlot,
 {
     type Slot<A: Allocator + Clone> = T::Value;
     type Mut<'a, A: Allocator + Clone>
@@ -179,6 +181,7 @@ where
 impl<T> PayloadAccess for T
 where
     T: NumericalType,
+    T::Value: AddressableSlot,
 {
     #[inline]
     fn is_proto_empty<A: Allocator + Clone, Pb: PresenceBits>(

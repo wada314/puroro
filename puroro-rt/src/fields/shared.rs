@@ -247,6 +247,12 @@ impl ProtoEmpty for i64 {
         *self == 0
     }
 }
+impl ProtoEmpty for bool {
+    #[inline]
+    fn is_proto_empty(&self) -> bool {
+        !*self
+    }
+}
 impl ProtoEmpty for () {
     #[inline]
     fn is_proto_empty(&self) -> bool {

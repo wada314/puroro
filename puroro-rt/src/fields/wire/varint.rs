@@ -1,6 +1,6 @@
 //! Varint family markers (`ProtoInt32`, enums, [`ProtoBool`], …).
 //!
-//! Numeric / enum wire codecs live on [`NumericalType`](super::numerical::NumericalType).
+//! Numeric / enum / bool wire codecs live on [`NumericalType`](super::numerical::NumericalType).
 //! [`ProtoBool`] keeps a small inherent wire API for bit-packed singular storage.
 
 use ::core::convert::TryFrom;

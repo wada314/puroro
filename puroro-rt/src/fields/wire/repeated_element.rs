@@ -7,7 +7,8 @@
 //! message type `M` itself (not [`UnmanagedBox`](::unmanaged::UnmanagedBox)).
 //!
 //! Singular [`ProtoBool`](super::varint::ProtoBool) uses bit-packed storage;
-//! repeated uses plain `bool` elements via this trait (no MessageCommon bit).
+//! repeated uses plain `bool` elements via [`NumericalType`](super::numerical::NumericalType)
+//! blankets (no MessageCommon bit).
 //!
 //! Tagged encode uses [`wire_view`](Self::wire_view) +
 //! [`encode_field`](super::encode_type::encode_field) (not a separate
@@ -31,7 +32,6 @@ use super::len::{ProtoBytes, ProtoString};
 use super::numerical::NumericalType;
 use super::proto_message::ProtoMessage;
 use super::singular_type::SingularType;
-use super::varint::ProtoBool;
 use super::wire_payload::{CopyWirePayload, WirePayload};
 
 /// Wire + storage for one element of a repeated / map field of marker `Self`.
@@ -299,120 +299,6 @@ impl<T: NumericalType> RepeatedElementMut for T {
         elem: &'a mut T::Value,
         _alloc: A,
     ) -> &'a mut T::Value
-    where
-        Self: 'a,
-    {
-        elem
-    }
-}
-
-// ---------------------------------------------------------------------------
-// ProtoBool repeated (plain bool elements; singular uses BitPacked)
-// ---------------------------------------------------------------------------
-
-impl RepeatedElement for ProtoBool {
-    type Element<A: Allocator + Clone> = bool;
-
-    #[inline]
-    fn wire_view<'a, A: Allocator + Clone>(elem: &'a bool) -> bool
-    where
-        Self: 'a,
-    {
-        *elem
-    }
-
-    #[inline]
-    unsafe fn deallocate_element<A: Allocator + Clone>(_elem: bool, _alloc: A) {}
-}
-
-impl<A: Allocator + Clone> RepeatedElementMerge<A> for ProtoBool {
-    #[inline]
-    fn default_element(_alloc: A) -> bool {
-        false
-    }
-
-    #[inline]
-    fn decode_element<B: Buf>(
-        wire_type: WireType,
-        buf: &mut B,
-        _alloc: A,
-        _depth: usize,
-    ) -> Result<bool, DecodeError> {
-        match wire_type {
-            WireType::Varint => {
-                let raw = decode::decode_varint(buf)?;
-                Self::decode_wire(raw)
-            }
-            _ => Err(DecodeError::InvalidTag),
-        }
-    }
-
-    fn merge_occurrence<B, F>(
-        wire_type: WireType,
-        buf: &mut B,
-        _alloc: A,
-        _depth: usize,
-        mut push: F,
-    ) -> Result<(), DecodeError>
-    where
-        B: Buf,
-        F: FnMut(bool),
-    {
-        match wire_type {
-            WireType::Len => {
-                let len = decode::decode_varint(buf)? as usize;
-                if buf.remaining() < len {
-                    return Err(DecodeError::TruncatedMessage);
-                }
-                let mut sub = buf.take(len);
-                while sub.has_remaining() {
-                    let raw = decode::decode_varint(&mut sub)?;
-                    push(Self::decode_wire(raw)?);
-                }
-            }
-            WireType::Varint => {
-                let raw = decode::decode_varint(buf)?;
-                push(Self::decode_wire(raw)?);
-            }
-            _ => return Err(DecodeError::InvalidTag),
-        }
-        Ok(())
-    }
-}
-
-impl PackableRepeatedElement for ProtoBool {
-    #[inline]
-    fn packed_payload_len<A: Allocator + Clone>(values: &[bool]) -> usize {
-        values
-            .iter()
-            .map(|v| <Self as EncodeType>::payload_len::<A>(*v))
-            .sum()
-    }
-
-    #[inline]
-    fn encode_packed_payload<A: Allocator + Clone, B: BufMut>(values: &[bool], buf: &mut B) {
-        for v in values {
-            <Self as EncodeType>::encode_payload::<A, B>(*v, buf);
-        }
-    }
-}
-
-impl RepeatedVecMut for ProtoBool {}
-
-impl RepeatedElementMut for ProtoBool {
-    type MutTarget<A: Allocator + Clone> = bool;
-
-    type ElementMut<'a, A: Allocator + Clone>
-        = &'a mut bool
-    where
-        Self: 'a,
-        A: 'a;
-
-    #[inline]
-    unsafe fn element_mut<'a, A: Allocator + Clone + 'a>(
-        elem: &'a mut bool,
-        _alloc: A,
-    ) -> &'a mut bool
     where
         Self: 'a,
     {

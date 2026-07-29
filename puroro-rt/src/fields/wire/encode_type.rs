@@ -20,9 +20,7 @@ use crate::encode;
 
 use super::len::{ProtoBytes, ProtoString};
 use super::proto_message::ProtoMessage;
-use super::varint::ProtoBool;
-use super::wire_payload::{LenPayloadRef, MessageLenRef, VarintPayload, WirePayload};
-use ::protobuf_core::Varint;
+use super::wire_payload::{LenPayloadRef, MessageLenRef, WirePayload};
 
 /// Encode facet of a protobuf **type** marker (`ProtoInt32`, `ProtoString`, …).
 ///
@@ -94,34 +92,6 @@ where
         WireType::SGroup | WireType::EGroup => {
             unreachable!("generated markers never use group wire types")
         }
-    }
-}
-
-impl EncodeType for ProtoBool {
-    type View<'a, A: Allocator + Clone>
-        = bool
-    where
-        Self: 'a,
-        A: 'a;
-
-    const WIRE_TYPE: WireType = WireType::Varint;
-
-    #[inline]
-    fn payload_len<'a, A: Allocator + Clone>(value: bool) -> usize
-    where
-        Self: 'a,
-    {
-        VarintPayload(Varint::from_bool(value)).encoded_len()
-    }
-
-    #[inline]
-    fn encode_payload<'a, A, B>(value: bool, buf: &mut B)
-    where
-        Self: 'a,
-        A: Allocator + Clone,
-        B: BufMut,
-    {
-        VarintPayload(Varint::from_bool(value)).encode(buf);
     }
 }
 
