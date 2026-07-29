@@ -1,13 +1,15 @@
 //! Proto-type marker encode facet + tagged-field framing.
 //!
 //! [`EncodeType`] is implemented by protobuf **types** (e.g. `int32` /
-//! `ProtoInt32`, `string` / `ProtoString`, not wire shapes like Varint / Len
-//! alone). It writes the **untagged** payload body (for Len types such as
-//! string / bytes / message: raw contents only — no length prefix).
+//! `ProtoInt32`, `string` / `ProtoString` — not wire shapes like `Varint` / `Len`
+//! alone). [`payload_len`](EncodeType::payload_len) /
+//! [`encode_payload`](EncodeType::encode_payload) write the **complete untagged
+//! wire body** for [`WIRE_TYPE`](EncodeType::WIRE_TYPE) (for `Len` types such as
+//! string / bytes / message: length varint + content, via
+//! [`WirePayload`](super::wire_payload::WirePayload)).
 //!
-//! [`encode_field`] / [`encoded_len_field`] add the tag and, for Len, the
-//! length varint. Presence omit stays on
-//! [`FieldEncode`](crate::fields::shared::FieldEncode).
+//! [`encode_field`] / [`encoded_len_field`] add only the tag. Presence omit stays
+//! on [`FieldEncode`](crate::fields::shared::FieldEncode).
 
 use ::allocator_api2::alloc::Allocator;
 use ::bytes::BufMut;
@@ -19,6 +21,7 @@ use crate::encode;
 use super::len::{ProtoBytes, ProtoString};
 use super::proto_message::ProtoMessage;
 use super::varint::ProtoBool;
+use super::wire_payload::{LenPayloadRef, MessageLenRef, VarintPayload, WirePayload};
 
 /// Encode facet of a protobuf **type** marker (`ProtoInt32`, `ProtoString`, …).
 ///
@@ -26,7 +29,7 @@ use super::varint::ProtoBool;
 /// same Rust value (e.g. `i32`) can be `int32`, `sint32`, or `sfixed32`, each
 /// with its own marker and codec.
 ///
-/// Markers remain the implementors so that typed view → payload mapping stays
+/// Markers remain the implementors so that typed view → wire-body mapping stays
 /// with the proto type.
 pub trait EncodeType {
     /// View passed to payload / tagged encode (also the singular getter view).
@@ -42,12 +45,14 @@ pub trait EncodeType {
     /// fixed64-family, or `Len`).
     const WIRE_TYPE: WireType;
 
-    /// Byte length of the untagged payload (no tag; for Len, no length prefix).
+    /// Byte length of the complete untagged wire body (no tag; for `Len`,
+    /// includes the length varint).
     fn payload_len<'a, A: Allocator + Clone>(value: Self::View<'a, A>) -> usize
     where
         Self: 'a;
 
-    /// Writes the untagged payload bytes (no tag; for Len, no length prefix).
+    /// Writes the complete untagged wire body (no tag; for `Len`, includes the
+    /// length varint).
     fn encode_payload<'a, A, B>(value: Self::View<'a, A>, buf: &mut B)
     where
         Self: 'a,
@@ -55,7 +60,7 @@ pub trait EncodeType {
         B: BufMut;
 }
 
-/// Tagged occurrence length: tag (+ Len length prefix) + payload. No omit.
+/// Tagged occurrence length: tag + untagged wire body. No omit.
 #[inline]
 pub fn encoded_len_field<'a, T, A>(value: T::View<'a, A>, field: u32) -> usize
 where
@@ -63,17 +68,16 @@ where
     A: Allocator + Clone + 'a,
 {
     match T::WIRE_TYPE {
-        WireType::Varint | WireType::Int32 | WireType::Int64 => {
+        WireType::Varint | WireType::Int32 | WireType::Int64 | WireType::Len => {
             encode::encoded_len_tag(field, T::WIRE_TYPE) + T::payload_len::<A>(value)
         }
-        WireType::Len => encode::encoded_len_len_field(field, T::payload_len::<A>(value)),
         WireType::SGroup | WireType::EGroup => {
             unreachable!("generated markers never use group wire types")
         }
     }
 }
 
-/// Tagged occurrence: tag (+ Len length prefix) + payload. No omit.
+/// Tagged occurrence: tag + untagged wire body. No omit.
 #[inline]
 pub fn encode_field<'a, T, A, B>(value: T::View<'a, A>, field: u32, buf: &mut B)
 where
@@ -82,14 +86,8 @@ where
     B: BufMut,
 {
     match T::WIRE_TYPE {
-        WireType::Varint | WireType::Int32 | WireType::Int64 => {
+        WireType::Varint | WireType::Int32 | WireType::Int64 | WireType::Len => {
             encode::encode_tag(field, T::WIRE_TYPE, buf);
-            T::encode_payload::<A, B>(value, buf);
-        }
-        WireType::Len => {
-            let payload_len = T::payload_len::<A>(value);
-            encode::encode_tag(field, WireType::Len, buf);
-            encode::encode_varint(payload_len as u64, buf);
             T::encode_payload::<A, B>(value, buf);
         }
         WireType::SGroup | WireType::EGroup => {
@@ -112,7 +110,7 @@ impl EncodeType for ProtoBool {
     where
         Self: 'a,
     {
-        encode::encoded_len_varint(Self::encode_wire(value))
+        VarintPayload(Self::encode_wire(value)).encoded_len()
     }
 
     #[inline]
@@ -122,7 +120,7 @@ impl EncodeType for ProtoBool {
         A: Allocator + Clone,
         B: BufMut,
     {
-        encode::encode_varint(Self::encode_wire(value), buf);
+        VarintPayload(Self::encode_wire(value)).encode(buf);
     }
 }
 
@@ -140,7 +138,10 @@ impl EncodeType for ProtoString {
     where
         Self: 'a,
     {
-        value.len()
+        LenPayloadRef {
+            content: value.as_bytes(),
+        }
+        .encoded_len()
     }
 
     #[inline]
@@ -150,7 +151,10 @@ impl EncodeType for ProtoString {
         A: Allocator + Clone,
         B: BufMut,
     {
-        buf.put_slice(value.as_bytes());
+        LenPayloadRef {
+            content: value.as_bytes(),
+        }
+        .encode(buf);
     }
 }
 
@@ -168,7 +172,7 @@ impl EncodeType for ProtoBytes {
     where
         Self: 'a,
     {
-        value.len()
+        LenPayloadRef { content: value }.encoded_len()
     }
 
     #[inline]
@@ -178,7 +182,7 @@ impl EncodeType for ProtoBytes {
         A: Allocator + Clone,
         B: BufMut,
     {
-        buf.put_slice(value);
+        LenPayloadRef { content: value }.encode(buf);
     }
 }
 
@@ -196,7 +200,7 @@ impl<M: Message> EncodeType for ProtoMessage<M> {
     where
         Self: 'a,
     {
-        value.encoded_len()
+        MessageLenRef { message: value }.encoded_len()
     }
 
     #[inline]
@@ -206,6 +210,6 @@ impl<M: Message> EncodeType for ProtoMessage<M> {
         A: Allocator + Clone,
         B: BufMut,
     {
-        value.encode_raw(buf);
+        MessageLenRef { message: value }.encode(buf);
     }
 }

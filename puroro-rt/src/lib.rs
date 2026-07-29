@@ -38,10 +38,11 @@ pub use fields::shared::{
 };
 pub use fields::singular::{SingularField, SingularFieldMut, SingularFieldRef};
 pub use fields::wire::{
-    Closed, ClosedEnum, EncodeType, MapKey, MapValueView, NumericalType, NumericalWireKind, Open,
-    OpenEnum, PackableRepeatedElement, PayloadAccess, ProtoBool, ProtoBytes, ProtoDouble,
-    ProtoEnum, ProtoEnumStorage, ProtoFixed32, ProtoFixed64, ProtoFloat, ProtoInt32, ProtoInt64,
-    ProtoMessage, ProtoSFixed32, ProtoSFixed64, ProtoSInt32, ProtoSInt64, ProtoString, ProtoUInt32,
-    ProtoUInt64, RepeatedElement, RepeatedElementMerge, RepeatedElementMut, RepeatedVecMut,
-    SingularType, encode_field, encoded_len_field,
+    Closed, ClosedEnum, CopyWirePayload, EncodeType, Fixed32Payload, Fixed64Payload, LenPayload,
+    LenPayloadRef, MapKey, MapValueView, MessageLenRef, NumericalType, Open, OpenEnum,
+    PackableRepeatedElement, PayloadAccess, ProtoBool, ProtoBytes, ProtoDouble, ProtoEnum,
+    ProtoEnumStorage, ProtoFixed32, ProtoFixed64, ProtoFloat, ProtoInt32, ProtoInt64, ProtoMessage,
+    ProtoSFixed32, ProtoSFixed64, ProtoSInt32, ProtoSInt64, ProtoString, ProtoUInt32, ProtoUInt64,
+    RepeatedElement, RepeatedElementMerge, RepeatedElementMut, RepeatedVecMut, SingularType,
+    VarintPayload, WirePayload, encode_field, encoded_len_field,
 };

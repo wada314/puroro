@@ -75,8 +75,8 @@ protoc plugin
 puroro_rt::fields       SingularField<T, P, FIELD> (T includes ProtoMessage), …
     │  shared/ — MessageCommon, FieldPresence, ValueSlot,
     │            DefaultIn / DeallocateIn / ProtoEmpty
-    │  wire/   — EncodeType + encode_field; SingularType; RepeatedElement; MapKey;
-    │            NumericalType (scalar payload)
+    │  wire/   — WirePayload (wire shape); EncodeType + encode_field;
+    │            SingularType; RepeatedElement; MapKey; NumericalType
     │  singular/, repeated/, oneof/
     │  T: SingularType thin wrapper (ProtoInt32(i32), ProtoString(…), …)
     │  P: FieldPresence (Implicit / Explicit<BIT> / LegacyRequired<BIT> / Oneof)
@@ -161,12 +161,13 @@ Live plugin emits nested and file-level messages/enums with singular and repeate
 | [`shared/slot_init.rs`](puroro-rt/src/fields/shared/slot_init.rs) | `SlotInitView` / `SlotInitMut` init-state handles |
 | [`wire.rs`](puroro-rt/src/fields/wire.rs) | Wire-family re-exports |
 | [`wire/encode_type.rs`](puroro-rt/src/fields/wire/encode_type.rs) | `EncodeType` + `encode_field` / `encoded_len_field` (tagged framing) |
+| [`wire/wire_payload.rs`](puroro-rt/src/fields/wire/wire_payload.rs) | `WirePayload` / `CopyWirePayload` (Varint / Fixed32 / Fixed64 / Len bodies) |
 | [`wire/singular_type.rs`](puroro-rt/src/fields/wire/singular_type.rs) | `SingularType` (singular `Slot` / `Mut` / `Written`) + `PayloadAccess` |
 | [`shared/value_layout.rs`](puroro-rt/src/fields/shared/value_layout.rs) | `ValueLayout`, `Inline`, `BitPacked` |
 | [`wire/repeated_element.rs`](puroro-rt/src/fields/wire/repeated_element.rs) | `RepeatedElement` / `RepeatedElementMerge` (`Element` for repeated buffers) |
 | [`wire/map_element.rs`](puroro-rt/src/fields/wire/map_element.rs) | `MapKey` (subset of `RepeatedElement`) |
 | [`wire/proto_message.rs`](puroro-rt/src/fields/wire/proto_message.rs) | `ProtoMessage` (nested message marker) |
-| [`wire/numerical.rs`](puroro-rt/src/fields/wire/numerical.rs) | `NumericalType` (varint / fixed / enum scalar payload) |
+| [`wire/numerical.rs`](puroro-rt/src/fields/wire/numerical.rs) | `NumericalType` (`to_raw` / `from_raw` over `CopyWirePayload`) |
 | [`wire/varint.rs`](puroro-rt/src/fields/wire/varint.rs) | `ProtoInt32`, …, `ProtoBool`, `ProtoEnum` |
 | [`wire/len.rs`](puroro-rt/src/fields/wire/len.rs) | `ProtoString`, `ProtoBytes` |
 | [`wire/fixed.rs`](puroro-rt/src/fields/wire/fixed.rs) | `ProtoFixed*` / `ProtoFloat` / `ProtoDouble` |
@@ -211,17 +212,37 @@ Encode responsibilities are layered (omit stays at the catalog):
 ```text
 Message encode
   → FieldEncode / OneofEncodable   (omit / empty / oneof match)
-       → encode_field / encoded_len_field   (tag + optional LEN length + payload)
-            → EncodeType                   (bare payload bytes)
+       → encode_field / encoded_len_field   (tag + untagged wire body)
+            → EncodeType                   (proto type → complete wire body)
+                 → WirePayload             (wire shape: Varint / Fixed32 / Fixed64 / Len)
 ```
 
-Packed repeated fields concatenate [`EncodeType::encode_payload`](puroro-rt/src/fields/wire/encode_type.rs) (via [`NumericalType`](puroro-rt/src/fields/wire/numerical.rs) / [`PackableRepeatedElement`](puroro-rt/src/fields/wire/repeated_element.rs) slice helpers), then wrap once with LEN framing.
+Packed repeated fields concatenate scalar [`NumericalType`](puroro-rt/src/fields/wire/numerical.rs) /
+[`EncodeType`](puroro-rt/src/fields/wire/encode_type.rs) bodies (via
+[`PackableRepeatedElement`](puroro-rt/src/fields/wire/repeated_element.rs)), then wrap once with
+Len framing in the repeated encoder (not via per-element `Len` `WirePayload`).
 
-One marker + trait per protobuf **wire family**. Semantic conversions delegate to **`protobuf-core`** (`puroro-rt` does not reimplement zigzag/varint). Singular scalar types are thin wrappers over their payload; repeated fields keep the inner `Value` / `Storage`.
+One marker + trait per protobuf **type** (e.g. `int32`, `string`). Wire-shape read/write lives on
+[`WirePayload`](puroro-rt/src/fields/wire/wire_payload.rs). Semantic conversions delegate to
+**`protobuf-core`** (`puroro-rt` does not reimplement zigzag/varint).
 
-### Payload + tagged framing ([`wire/encode_type.rs`](puroro-rt/src/fields/wire/encode_type.rs))
+### Wire shape ([`wire/wire_payload.rs`](puroro-rt/src/fields/wire/wire_payload.rs))
 
-[`EncodeType`](puroro-rt/src/fields/wire/encode_type.rs) is implemented by type markers (`ProtoInt32`, `ProtoString`, `ProtoMessage<M>`, …). `View` is both the singular getter view and the tagged-encode input, and is always `Copy` (by-value scalars or shared refs). `const WIRE_TYPE` selects varint / fixed / LEN framing. Free helpers [`encode_field`](puroro-rt/src/fields/wire/encode_type.rs) / [`encoded_len_field`](puroro-rt/src/fields/wire/encode_type.rs) always encode when called — they do **not** apply presence omit. [`SingularType`](puroro-rt/src/fields/wire/singular_type.rs) extends `EncodeType` with singular `Slot` / `Mut` / `Written` only (no encode methods).
+[`WirePayload`](puroro-rt/src/fields/wire/wire_payload.rs) is the complete **tag-free** body for a
+**wire type** (`Varint` / `Int32` / `Int64` / `Len`). For `Len`, that includes the length varint plus
+content (`LenPayloadRef`, `MessageLenRef`). Copy numericals also implement
+[`CopyWirePayload`](puroro-rt/src/fields/wire/wire_payload.rs) (`decode` without an allocator).
+
+### Proto-type encode + tagged framing ([`wire/encode_type.rs`](puroro-rt/src/fields/wire/encode_type.rs))
+
+[`EncodeType`](puroro-rt/src/fields/wire/encode_type.rs) is implemented by proto **type** markers
+(`ProtoInt32`, `ProtoString`, `ProtoMessage<M>`, …). `View` is both the singular getter view and the
+tagged-encode input, and is always `Copy`. `payload_len` / `encode_payload` emit the complete
+untagged [`WirePayload`](puroro-rt/src/fields/wire/wire_payload.rs) body (for `Len`: length + content).
+Free helpers [`encode_field`](puroro-rt/src/fields/wire/encode_type.rs) /
+[`encoded_len_field`](puroro-rt/src/fields/wire/encode_type.rs) add only the tag — they do **not**
+apply presence omit. [`SingularType`](puroro-rt/src/fields/wire/singular_type.rs) extends
+`EncodeType` with singular `Slot` / `Mut` / `Written` only (no encode methods).
 
 ### Singular field type markers ([`wire/singular_type.rs`](puroro-rt/src/fields/wire/singular_type.rs))
 
@@ -258,10 +279,17 @@ Singular / oneof `bool` uses allocator-free [`ProtoBool`](puroro-rt/src/fields/w
 
 ### Numerical helper
 
-[`NumericalType`](puroro-rt/src/fields/wire/numerical.rs) owns decode and single-value payload for copy-inline numerics / enums. Packed repeated encode is derived from those scalar helpers in [`PackableRepeatedElement`](puroro-rt/src/fields/wire/repeated_element.rs). Tagged encode is [`EncodeType`](puroro-rt/src/fields/wire/encode_type.rs) (blanket over `NumericalType`). LEN scalars (`ProtoString` / `ProtoBytes`) and [`ProtoBool`](puroro-rt/src/fields/wire/varint.rs) implement `EncodeType` directly.
+[`NumericalType`](puroro-rt/src/fields/wire/numerical.rs) maps copy-inline numerical proto **types**
+(e.g. `ProtoInt32`, enums) to [`CopyWirePayload`](puroro-rt/src/fields/wire/wire_payload.rs) via
+`to_raw` / `from_raw`. Decode / single-value encode / packed merge are derived from that.
+Tagged encode is [`EncodeType`](puroro-rt/src/fields/wire/encode_type.rs) (blanket over
+`NumericalType`). LEN scalars (`ProtoString` / `ProtoBytes`) and
+[`ProtoBool`](puroro-rt/src/fields/wire/varint.rs) implement `EncodeType` via `LenPayloadRef` /
+`VarintPayload` directly.
 
 | Helper | Wire | Markers | Status |
 |---|---|---|---|
+| `WirePayload` | VARINT / I32 / I64 / LEN | [`wire/wire_payload.rs`](puroro-rt/src/fields/wire/wire_payload.rs) | **Done** |
 | `NumericalType` | VARINT / I32 / I64 | numerics, enums ([`wire/numerical.rs`](puroro-rt/src/fields/wire/numerical.rs)) | **Done** |
 | `EncodeType` (`ProtoBool`) | VARINT | [`wire/varint.rs`](puroro-rt/src/fields/wire/varint.rs) + [`encode_type.rs`](puroro-rt/src/fields/wire/encode_type.rs) | **Done** |
 | LEN scalars | LEN | `ProtoString`, `ProtoBytes` via `EncodeType` / `SingularType` | **Done** |

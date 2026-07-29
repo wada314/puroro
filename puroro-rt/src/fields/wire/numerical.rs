@@ -2,9 +2,9 @@
 //! `fixed64` / `ProtoFixed64`, open/closed enums, … — not Len types such as
 //! string / bytes / message, and not [`ProtoBool`](super::varint::ProtoBool)).
 //!
-//! Tagged encode goes through [`EncodeType`](super::encode_type::EncodeType) /
-//! [`encode_field`](super::encode_type::encode_field); this trait owns decode and
-//! single-value payload. Packed repeated encode is derived in
+//! Maps [`Value`](NumericalType::Value) ↔ [`CopyWirePayload`](super::wire_payload::CopyWirePayload).
+//! Tagged encode goes through [`EncodeType`](super::encode_type::EncodeType).
+//! Packed repeated encode is derived in
 //! [`PackableRepeatedElement`](super::repeated_element::PackableRepeatedElement).
 
 use ::allocator_api2::alloc::Allocator;
@@ -14,7 +14,6 @@ use ::protobuf_core::{FIXED32_BYTES, FIXED64_BYTES, Varint};
 use ::puroro::{DecodeError, WireType};
 
 use crate::decode;
-use crate::encode;
 use crate::fields::shared::ProtoEmpty;
 use crate::fields::shared::value_slot::AddressableSlot;
 
@@ -26,25 +25,9 @@ use super::varint::{
     Closed, ClosedEnum, Open, OpenEnum, ProtoEnum, ProtoInt32, ProtoInt64, ProtoSInt32,
     ProtoSInt64, ProtoUInt32, ProtoUInt64,
 };
-
-/// Wire-type family for a [`NumericalType`] marker: `Varint` (e.g. `int32` /
-/// `sint32`), `Fixed32` (e.g. `fixed32` / `float`), or `Fixed64` (e.g. `fixed64` /
-/// `double`).
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub enum NumericalWireKind {
-    Varint,
-    Fixed32,
-    Fixed64,
-}
-
-#[inline]
-const fn numerical_wire_type(kind: NumericalWireKind) -> WireType {
-    match kind {
-        NumericalWireKind::Varint => WireType::Varint,
-        NumericalWireKind::Fixed32 => WireType::Int32,
-        NumericalWireKind::Fixed64 => WireType::Int64,
-    }
-}
+use super::wire_payload::{
+    CopyWirePayload, Fixed32Payload, Fixed64Payload, VarintPayload, WirePayload,
+};
 
 /// Copy-inline numerical protobuf **type** marker (e.g. `ProtoInt32`,
 /// `ProtoFixed64`, `ProtoEnum<…>` — not `bool` / `string` / `bytes` / message).
@@ -52,22 +35,36 @@ pub trait NumericalType: Sized {
     /// Singular slot / repeated element / written value.
     type Value: Copy + Default + ProtoEmpty + AddressableSlot;
 
-    const WIRE: NumericalWireKind;
+    /// Wire-shape body for this proto type (e.g. [`VarintPayload`] for `int32`).
+    type Raw: CopyWirePayload;
+
+    fn to_raw(value: Self::Value) -> Self::Raw;
+
+    fn from_raw(raw: Self::Raw) -> Result<Self::Value, DecodeError>;
 
     /// Decode one singular occurrence after the tag has been read.
     ///
     /// For varint markers, [`DecodeError::UnknownClosedEnum`] may be returned
     /// (singular merge parks it; repeated merge propagates the error).
+    #[inline]
     fn decode_wire_value(
         wire_type: WireType,
         buf: &mut impl Buf,
-    ) -> Result<Self::Value, DecodeError>;
+    ) -> Result<Self::Value, DecodeError> {
+        Self::from_raw(Self::Raw::decode(wire_type, buf)?)
+    }
 
-    /// Bare payload length of one value (no tag).
-    fn payload_len(value: Self::Value) -> usize;
+    /// Untagged wire-body length of one value (no tag).
+    #[inline]
+    fn payload_len(value: Self::Value) -> usize {
+        Self::to_raw(value).encoded_len()
+    }
 
-    /// Write bare payload bytes of one value (no tag).
-    fn encode_payload(value: Self::Value, buf: &mut impl BufMut);
+    /// Write untagged wire-body bytes of one value (no tag).
+    #[inline]
+    fn encode_payload(value: Self::Value, buf: &mut impl BufMut) {
+        Self::to_raw(value).encode(buf);
+    }
 
     /// Merge one wire occurrence into `push` (expanded or packed).
     fn merge_occurrence(
@@ -75,8 +72,8 @@ pub trait NumericalType: Sized {
         buf: &mut impl Buf,
         mut push: impl FnMut(Self::Value),
     ) -> Result<(), DecodeError> {
-        match Self::WIRE {
-            NumericalWireKind::Varint => match wire_type {
+        match Self::Raw::WIRE_TYPE {
+            WireType::Varint => match wire_type {
                 WireType::Len => {
                     let len = decode::decode_varint(buf)? as usize;
                     if buf.remaining() < len {
@@ -94,7 +91,7 @@ pub trait NumericalType: Sized {
                 }
                 _ => Err(DecodeError::InvalidTag),
             },
-            NumericalWireKind::Fixed32 => match wire_type {
+            WireType::Int32 => match wire_type {
                 WireType::Len => {
                     let len = decode::decode_varint(buf)? as usize;
                     if buf.remaining() < len {
@@ -115,7 +112,7 @@ pub trait NumericalType: Sized {
                 }
                 _ => Err(DecodeError::InvalidTag),
             },
-            NumericalWireKind::Fixed64 => match wire_type {
+            WireType::Int64 => match wire_type {
                 WireType::Len => {
                     let len = decode::decode_varint(buf)? as usize;
                     if buf.remaining() < len {
@@ -136,32 +133,11 @@ pub trait NumericalType: Sized {
                 }
                 _ => Err(DecodeError::InvalidTag),
             },
+            WireType::Len | WireType::SGroup | WireType::EGroup => {
+                unreachable!("numerical Raw is never Len or group")
+            }
         }
     }
-}
-
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
-
-#[inline]
-fn read_fixed32(buf: &mut impl Buf) -> Result<[u8; FIXED32_BYTES], DecodeError> {
-    if buf.remaining() < FIXED32_BYTES {
-        return Err(DecodeError::TruncatedMessage);
-    }
-    let mut bytes = [0u8; FIXED32_BYTES];
-    buf.copy_to_slice(&mut bytes);
-    Ok(bytes)
-}
-
-#[inline]
-fn read_fixed64(buf: &mut impl Buf) -> Result<[u8; FIXED64_BYTES], DecodeError> {
-    if buf.remaining() < FIXED64_BYTES {
-        return Err(DecodeError::TruncatedMessage);
-    }
-    let mut bytes = [0u8; FIXED64_BYTES];
-    buf.copy_to_slice(&mut bytes);
-    Ok(bytes)
 }
 
 // ---------------------------------------------------------------------------
@@ -172,28 +148,16 @@ macro_rules! impl_varint_numerical {
     ($marker:ty, $inner:ty, decode = $decode:expr, encode = $encode:expr $(,)?) => {
         impl NumericalType for $marker {
             type Value = $inner;
-            const WIRE: NumericalWireKind = NumericalWireKind::Varint;
+            type Raw = VarintPayload;
 
             #[inline]
-            fn decode_wire_value(
-                wire_type: WireType,
-                buf: &mut impl Buf,
-            ) -> Result<Self::Value, DecodeError> {
-                if wire_type != WireType::Varint {
-                    return Err(DecodeError::InvalidTag);
-                }
-                let raw = decode::decode_varint(buf)?;
-                ($decode)(raw)
+            fn to_raw(value: $inner) -> VarintPayload {
+                VarintPayload(($encode)(value))
             }
 
             #[inline]
-            fn payload_len(value: Self::Value) -> usize {
-                encode::encoded_len_varint(($encode)(value))
-            }
-
-            #[inline]
-            fn encode_payload(value: Self::Value, buf: &mut impl BufMut) {
-                encode::encode_varint(($encode)(value), buf);
+            fn from_raw(raw: VarintPayload) -> Result<$inner, DecodeError> {
+                ($decode)(raw.0)
             }
         }
     };
@@ -245,70 +209,39 @@ impl_varint_numerical! {
 // Enums
 // ---------------------------------------------------------------------------
 
-#[inline]
-fn encode_enum_wire(value: i32) -> u64 {
-    Varint::from_int32(value).to_uint64()
-}
-
-#[inline]
-fn decode_enum_i32(raw: u64) -> Result<i32, DecodeError> {
-    Varint::from_uint64(raw)
-        .try_to_int32()
-        .map_err(DecodeError::from)
-}
-
 impl<E: OpenEnum> NumericalType for ProtoEnum<E, Open> {
     type Value = E;
-    const WIRE: NumericalWireKind = NumericalWireKind::Varint;
+    type Raw = VarintPayload;
 
     #[inline]
-    fn decode_wire_value(
-        wire_type: WireType,
-        buf: &mut impl Buf,
-    ) -> Result<Self::Value, DecodeError> {
-        if wire_type != WireType::Varint {
-            return Err(DecodeError::InvalidTag);
-        }
-        let raw = decode::decode_varint(buf)?;
-        Ok(E::from(decode_enum_i32(raw)?))
+    fn to_raw(value: E) -> VarintPayload {
+        VarintPayload(Varint::from_int32(value.to_wire()).to_uint64())
     }
 
     #[inline]
-    fn payload_len(value: Self::Value) -> usize {
-        encode::encoded_len_varint(encode_enum_wire(value.to_wire()))
-    }
-
-    #[inline]
-    fn encode_payload(value: Self::Value, buf: &mut impl BufMut) {
-        encode::encode_varint(encode_enum_wire(value.to_wire()), buf);
+    fn from_raw(raw: VarintPayload) -> Result<E, DecodeError> {
+        let i = Varint::from_uint64(raw.0)
+            .try_to_int32()
+            .map_err(DecodeError::from)?;
+        Ok(E::from(i))
     }
 }
 
 impl<E: ClosedEnum> NumericalType for ProtoEnum<E, Closed> {
     type Value = E;
-    const WIRE: NumericalWireKind = NumericalWireKind::Varint;
+    type Raw = VarintPayload;
 
     #[inline]
-    fn decode_wire_value(
-        wire_type: WireType,
-        buf: &mut impl Buf,
-    ) -> Result<Self::Value, DecodeError> {
-        if wire_type != WireType::Varint {
-            return Err(DecodeError::InvalidTag);
-        }
-        let raw = decode::decode_varint(buf)?;
-        let wire = decode_enum_i32(raw)?;
-        E::try_from(wire).map_err(|_| DecodeError::UnknownClosedEnum { raw })
+    fn to_raw(value: E) -> VarintPayload {
+        VarintPayload(Varint::from_int32(value.to_wire()).to_uint64())
     }
 
     #[inline]
-    fn payload_len(value: Self::Value) -> usize {
-        encode::encoded_len_varint(encode_enum_wire(value.to_wire()))
-    }
-
-    #[inline]
-    fn encode_payload(value: Self::Value, buf: &mut impl BufMut) {
-        encode::encode_varint(encode_enum_wire(value.to_wire()), buf);
+    fn from_raw(raw: VarintPayload) -> Result<E, DecodeError> {
+        let wire = Varint::from_uint64(raw.0)
+            .try_to_int32()
+            .map_err(DecodeError::from)?;
+        E::try_from(wire).map_err(|_| DecodeError::UnknownClosedEnum { raw: raw.0 })
     }
 }
 
@@ -320,27 +253,16 @@ macro_rules! impl_fixed32_numerical {
     ($marker:ty, $inner:ty) => {
         impl NumericalType for $marker {
             type Value = $inner;
-            const WIRE: NumericalWireKind = NumericalWireKind::Fixed32;
+            type Raw = Fixed32Payload;
 
             #[inline]
-            fn decode_wire_value(
-                wire_type: WireType,
-                buf: &mut impl Buf,
-            ) -> Result<Self::Value, DecodeError> {
-                if wire_type != WireType::Int32 {
-                    return Err(DecodeError::InvalidTag);
-                }
-                Ok(<$inner>::from_le_bytes(read_fixed32(buf)?))
+            fn to_raw(value: $inner) -> Fixed32Payload {
+                Fixed32Payload(value.to_le_bytes())
             }
 
             #[inline]
-            fn payload_len(_value: Self::Value) -> usize {
-                FIXED32_BYTES
-            }
-
-            #[inline]
-            fn encode_payload(value: Self::Value, buf: &mut impl BufMut) {
-                buf.put_slice(&value.to_le_bytes());
+            fn from_raw(raw: Fixed32Payload) -> Result<$inner, DecodeError> {
+                Ok(<$inner>::from_le_bytes(raw.0))
             }
         }
     };
@@ -350,27 +272,16 @@ macro_rules! impl_fixed64_numerical {
     ($marker:ty, $inner:ty) => {
         impl NumericalType for $marker {
             type Value = $inner;
-            const WIRE: NumericalWireKind = NumericalWireKind::Fixed64;
+            type Raw = Fixed64Payload;
 
             #[inline]
-            fn decode_wire_value(
-                wire_type: WireType,
-                buf: &mut impl Buf,
-            ) -> Result<Self::Value, DecodeError> {
-                if wire_type != WireType::Int64 {
-                    return Err(DecodeError::InvalidTag);
-                }
-                Ok(<$inner>::from_le_bytes(read_fixed64(buf)?))
+            fn to_raw(value: $inner) -> Fixed64Payload {
+                Fixed64Payload(value.to_le_bytes())
             }
 
             #[inline]
-            fn payload_len(_value: Self::Value) -> usize {
-                FIXED64_BYTES
-            }
-
-            #[inline]
-            fn encode_payload(value: Self::Value, buf: &mut impl BufMut) {
-                buf.put_slice(&value.to_le_bytes());
+            fn from_raw(raw: Fixed64Payload) -> Result<$inner, DecodeError> {
+                Ok(<$inner>::from_le_bytes(raw.0))
             }
         }
     };
@@ -390,7 +301,7 @@ impl<T: NumericalType> EncodeType for T {
         Self: 'a,
         A: 'a;
 
-    const WIRE_TYPE: WireType = numerical_wire_type(T::WIRE);
+    const WIRE_TYPE: WireType = <T::Raw as WirePayload>::WIRE_TYPE;
 
     #[inline]
     fn payload_len<'a, A: Allocator + Clone>(value: T::Value) -> usize

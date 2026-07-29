@@ -4,7 +4,6 @@
 //! [`IteratorExtVarint`]). `bytes::Buf` adapters live here.
 
 use ::allocator_api2::alloc::Allocator;
-use ::allocator_api2::vec::Vec as AllocVec;
 use ::bytes::Buf;
 use ::core::str;
 use ::protobuf_core::{IteratorExtVarint, Tag, Varint};
@@ -49,34 +48,27 @@ pub(crate) fn decode_bytes_in<B: Buf, A: Allocator>(
     buf: &mut B,
     alloc: A,
 ) -> Result<UnmanagedVec<u8, A>, DecodeError> {
-    let len = decode_varint(buf)? as usize;
-    if buf.remaining() < len {
-        return Err(DecodeError::TruncatedMessage);
-    }
-    let mut vec = AllocVec::<u8, A>::with_capacity_in(len, alloc);
-    let mut remaining = len;
-    while remaining > 0 {
-        let chunk = buf.chunk();
-        let to_copy = chunk.len().min(remaining);
-        vec.extend_from_slice(&chunk[..to_copy]);
-        buf.advance(to_copy);
-        remaining -= to_copy;
-    }
-    Ok(UnmanagedVec::from_vec(vec))
+    use crate::fields::wire::wire_payload::LenPayload;
+
+    Ok(LenPayload::decode_in(WireType::Len, buf, alloc)?.into_vec())
 }
 
 /// Decodes one LEN payload as UTF-8 into an [`UnmanagedString<A>`].
-pub(crate) fn decode_string_in<B: Buf, A: Allocator>(
+pub(crate) fn decode_string_in<B: Buf, A: Allocator + Clone>(
     buf: &mut B,
     alloc: A,
 ) -> Result<UnmanagedString<A>, DecodeError> {
-    let len = decode_varint(buf)? as usize;
-    if buf.remaining() < len {
-        return Err(DecodeError::TruncatedMessage);
+    use crate::fields::wire::wire_payload::LenPayload;
+
+    let payload = LenPayload::decode_in(WireType::Len, buf, alloc.clone())?;
+    match UnmanagedString::from_utf8(payload.into_vec()) {
+        Ok(s) => Ok(s),
+        Err(bytes) => {
+            // SAFETY: `alloc` owns the buffer produced by `decode_in`.
+            unsafe { bytes.deallocate(alloc) };
+            Err(DecodeError::InvalidUtf8)
+        }
     }
-    let bytes = buf.copy_to_bytes(len);
-    let s = str::from_utf8(&bytes).map_err(|_| DecodeError::InvalidUtf8)?;
-    Ok(str_to_unmanaged_in(s, alloc))
 }
 
 /// Copies `s` into a freshly allocated [`UnmanagedString`] backed by the owned
