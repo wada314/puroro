@@ -9,15 +9,14 @@
 //!   test.rs     # behavioural tests for the generated module `crate::<case>`
 //! ```
 //!
-//! The plugin binary is built into a nested `CARGO_TARGET_DIR` under `OUT_DIR`
-//! so this script never re-enters the parent cargo lock.
+//! The plugin binary comes from a Cargo artifact build-dependency
+//! (`artifact = "bin"`, nightly `-Z bindeps`).
 
-use std::env;
-use std::ffi::OsString;
-use std::fs;
-use std::io::Write;
-use std::path::{Path, PathBuf};
-use std::process::Command;
+use ::std::env;
+use ::std::fs;
+use ::std::io::Write;
+use ::std::path::{Path, PathBuf};
+use ::std::process::Command;
 
 fn main() {
     let manifest_dir =
@@ -29,21 +28,11 @@ fn main() {
 
     println!("cargo:rerun-if-changed=build.rs");
     println!("cargo:rerun-if-changed={}", fixtures_src.display());
-    println!(
-        "cargo:rerun-if-changed={}",
-        manifest_dir.join("../protoc-gen-puroro/src").display()
-    );
-    println!(
-        "cargo:rerun-if-changed={}",
-        manifest_dir
-            .join("../protoc-gen-puroro/Cargo.toml")
-            .display()
-    );
     println!("cargo:rerun-if-env-changed=PROTOC");
     println!("cargo:rerun-if-env-changed=PROTOC_GEN_PURORO");
 
     let protoc = resolve_protoc();
-    let plugin = resolve_plugin_bin(&manifest_dir, &out_dir);
+    let plugin = resolve_plugin_bin();
 
     let mut cases = list_fixture_cases(&fixtures_src);
     cases.sort_by(|a, b| a.module.cmp(&b.module));
@@ -95,7 +84,7 @@ fn resolve_protoc() -> PathBuf {
     PathBuf::from("protoc")
 }
 
-fn resolve_plugin_bin(manifest_dir: &Path, out_dir: &Path) -> PathBuf {
+fn resolve_plugin_bin() -> PathBuf {
     if let Some(p) = env::var_os("PROTOC_GEN_PURORO") {
         let path = PathBuf::from(p);
         if !path.is_file() {
@@ -107,43 +96,19 @@ fn resolve_plugin_bin(manifest_dir: &Path, out_dir: &Path) -> PathBuf {
         return path;
     }
 
-    // Nested target dir avoids re-entering the parent cargo lock. Incremental
-    // builds keep this cheap when the plugin is already up to date.
-    build_plugin_in_nested_target(manifest_dir, out_dir)
-}
-
-fn build_plugin_in_nested_target(manifest_dir: &Path, out_dir: &Path) -> PathBuf {
-    let profile = env::var("PROFILE").unwrap_or_else(|_| "debug".into());
-    let nested_target = out_dir.join("plugin-target");
-    let cargo = env::var_os("CARGO").unwrap_or_else(|| OsString::from("cargo"));
-    let workspace_root = manifest_dir
-        .parent()
-        .unwrap_or_else(|| panic!("expected workspace member under {}", manifest_dir.display()));
-
-    let mut cmd = Command::new(&cargo);
-    cmd.arg("build")
-        .args(["-p", "protoc-gen-puroro", "--bin", "protoc-gen-puroro"])
-        .env("CARGO_TARGET_DIR", &nested_target)
-        .current_dir(workspace_root);
-    if profile == "release" {
-        cmd.arg("--release");
+    // Set by Cargo for the `protoc-gen-puroro` artifact build-dependency.
+    let path = PathBuf::from(
+        env::var_os("CARGO_BIN_FILE_PROTOC_GEN_PURORO").unwrap_or_else(|| {
+            panic!(
+                "CARGO_BIN_FILE_PROTOC_GEN_PURORO unset; need nightly Cargo `-Z bindeps` \
+                 (see `.cargo/config.toml`) or set PROTOC_GEN_PURORO"
+            )
+        }),
+    );
+    if !path.is_file() {
+        panic!("artifact dependency binary missing: {}", path.display());
     }
-
-    let status = cmd
-        .status()
-        .unwrap_or_else(|e| panic!("failed to spawn cargo to build protoc-gen-puroro: {e}"));
-    if !status.success() {
-        panic!("failed to build protoc-gen-puroro plugin (status {status})");
-    }
-
-    let bin = nested_target.join(&profile).join("protoc-gen-puroro");
-    if !bin.is_file() {
-        panic!(
-            "protoc-gen-puroro binary missing after nested cargo build: {}",
-            bin.display()
-        );
-    }
-    bin
+    path
 }
 
 fn run_protoc(protoc: &Path, plugin: &Path, case: &FixtureCase, case_out: &Path) {

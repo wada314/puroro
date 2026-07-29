@@ -152,6 +152,7 @@ dependencies = [
  "allocator-api2",
  "bitvec",
  "bytes",
+ "protoc-gen-puroro",
  "puroro",
  "puroro-rt",
 ]

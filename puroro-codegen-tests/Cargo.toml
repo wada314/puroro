@@ -14,3 +14,8 @@ bitvec = "1"
 bytes = "1"
 puroro = { path = ".." }
 puroro-rt = { path = "../puroro-rt" }
+
+# Host plugin binary for the build script (`CARGO_BIN_FILE_PROTOC_GEN_PURORO`).
+# Requires nightly Cargo `-Z bindeps` (enabled via `.cargo/config.toml`).
+[build-dependencies]
+protoc-gen-puroro = { path = "../protoc-gen-puroro", artifact = "bin" }

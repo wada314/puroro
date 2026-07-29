@@ -1,0 +1,4 @@
+# Unstable Cargo features for this nightly workspace.
+# `bindeps`: artifact dependencies (used by puroro-codegen-tests build.rs).
+[unstable]
+bindeps = true
