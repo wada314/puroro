@@ -17,8 +17,9 @@
 //! always goes through `ValueLayout`.
 //!
 //! Repeated fields use [`RepeatedElement`](super::repeated_element::RepeatedElement)
-//! (`Element` storage). Copy-inline numerics / enums share
-//! [`NumericalType`](super::numerical::NumericalType).
+//! (`Element` storage). Numerical / enum markers share
+//! [`NumericalType`](super::numerical::NumericalType) for logical `Value` ↔ wire
+//! mapping; inline slot storage stays on [`PayloadAccess`].
 
 use ::allocator_api2::alloc::Allocator;
 use ::bitvec::{
@@ -47,6 +48,7 @@ use super::encode_type::EncodeType;
 use super::len::{ProtoBytes, ProtoString};
 use super::numerical::NumericalType;
 use super::varint::ProtoBool;
+use super::wire_payload::CopyWirePayload;
 
 /// Singular protobuf **type** marker (e.g. `ProtoInt32`, `ProtoString`) with
 /// storage GATs on top of [`EncodeType`].
@@ -158,7 +160,7 @@ pub trait PayloadAccess: SingularType {
 }
 
 // ---------------------------------------------------------------------------
-// Numerical markers (Slot = bare wire value) — one blanket for all families
+// Numerical markers (Slot = logical Value; storage via AddressableSlot on methods)
 // ---------------------------------------------------------------------------
 
 impl<T> SingularType for T
@@ -257,7 +259,7 @@ where
         Pb: PresenceBits,
         B: Buf,
     {
-        match T::decode_wire_value(wire_type, buf) {
+        match T::from_raw(T::Raw::decode(wire_type, buf)?) {
             Ok(new) => {
                 Self::write(slot, init, common, new);
                 Ok(())

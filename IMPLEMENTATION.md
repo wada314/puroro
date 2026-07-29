@@ -279,13 +279,17 @@ Singular / oneof `bool` uses allocator-free [`ProtoBool`](puroro-rt/src/fields/w
 
 ### Numerical helper
 
-[`NumericalType`](puroro-rt/src/fields/wire/numerical.rs) maps copy-inline numerical proto **types**
+[`NumericalType`](puroro-rt/src/fields/wire/numerical.rs) maps numerical proto **types**
 (e.g. `ProtoInt32`, enums) to [`CopyWirePayload`](puroro-rt/src/fields/wire/wire_payload.rs) via
-`to_raw` / `from_raw`. Decode / single-value encode / packed merge are derived from that.
-Tagged encode is [`EncodeType`](puroro-rt/src/fields/wire/encode_type.rs) (blanket over
-`NumericalType`). LEN scalars (`ProtoString` / `ProtoBytes`) and
-[`ProtoBool`](puroro-rt/src/fields/wire/varint.rs) implement `EncodeType` via `LenPayloadRef` /
-`VarintPayload` directly.
+`to_raw` / `from_raw`. [`Value`](puroro-rt/src/fields/wire/numerical.rs) is the **logical**
+copy value for encode/decode and field get/set — not a storage contract.
+Inline singular storage (`AddressableSlot`, `Slot = Value` for current markers) lives on
+[`PayloadAccess`](puroro-rt/src/fields/wire/singular_type.rs). Tagged encode is
+[`EncodeType`](puroro-rt/src/fields/wire/encode_type.rs) (blanket over `NumericalType`);
+packed repeated merge / encode live on `RepeatedElementMerge` / `PackableRepeatedElement`.
+LEN scalars (`ProtoString` / `ProtoBytes`) and
+[`ProtoBool`](puroro-rt/src/fields/wire/varint.rs) implement `EncodeType` directly
+(`ProtoBool` is not on `NumericalType` yet: singular bit-pack; repeated is handwritten).
 
 | Helper | Wire | Markers | Status |
 |---|---|---|---|

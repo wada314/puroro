@@ -24,12 +24,15 @@ use ::puroro::{DecodeError, Message, WireType};
 use crate::decode;
 use ::unmanaged::DeallocateIn;
 
+use ::protobuf_core::{FIXED32_BYTES, FIXED64_BYTES};
+
 use super::encode_type::EncodeType;
 use super::len::{ProtoBytes, ProtoString};
 use super::numerical::NumericalType;
 use super::proto_message::ProtoMessage;
 use super::singular_type::SingularType;
 use super::varint::ProtoBool;
+use super::wire_payload::{CopyWirePayload, WirePayload};
 
 /// Wire + storage for one element of a repeated / map field of marker `Self`.
 ///
@@ -175,22 +178,85 @@ impl<A: Allocator + Clone, T: NumericalType> RepeatedElementMerge<A> for T {
         _alloc: A,
         _depth: usize,
     ) -> Result<T::Value, DecodeError> {
-        T::decode_wire_value(wire_type, buf)
+        T::from_raw(T::Raw::decode(wire_type, buf)?)
     }
 
-    #[inline]
     fn merge_occurrence<B, F>(
         wire_type: WireType,
         buf: &mut B,
         _alloc: A,
         _depth: usize,
-        push: F,
+        mut push: F,
     ) -> Result<(), DecodeError>
     where
         B: Buf,
         F: FnMut(T::Value),
     {
-        T::merge_occurrence(wire_type, buf, push)
+        match <T::Raw as WirePayload>::WIRE_TYPE {
+            WireType::Varint => match wire_type {
+                WireType::Len => {
+                    let len = decode::decode_varint(buf)? as usize;
+                    if buf.remaining() < len {
+                        return Err(DecodeError::TruncatedMessage);
+                    }
+                    let mut sub = buf.take(len);
+                    while sub.has_remaining() {
+                        push(T::from_raw(T::Raw::decode(WireType::Varint, &mut sub)?)?);
+                    }
+                    Ok(())
+                }
+                WireType::Varint => {
+                    push(T::from_raw(T::Raw::decode(WireType::Varint, buf)?)?);
+                    Ok(())
+                }
+                _ => Err(DecodeError::InvalidTag),
+            },
+            WireType::Int32 => match wire_type {
+                WireType::Len => {
+                    let len = decode::decode_varint(buf)? as usize;
+                    if buf.remaining() < len {
+                        return Err(DecodeError::TruncatedMessage);
+                    }
+                    if !len.is_multiple_of(FIXED32_BYTES) {
+                        return Err(DecodeError::TruncatedMessage);
+                    }
+                    let mut sub = buf.take(len);
+                    while sub.has_remaining() {
+                        push(T::from_raw(T::Raw::decode(WireType::Int32, &mut sub)?)?);
+                    }
+                    Ok(())
+                }
+                WireType::Int32 => {
+                    push(T::from_raw(T::Raw::decode(WireType::Int32, buf)?)?);
+                    Ok(())
+                }
+                _ => Err(DecodeError::InvalidTag),
+            },
+            WireType::Int64 => match wire_type {
+                WireType::Len => {
+                    let len = decode::decode_varint(buf)? as usize;
+                    if buf.remaining() < len {
+                        return Err(DecodeError::TruncatedMessage);
+                    }
+                    if !len.is_multiple_of(FIXED64_BYTES) {
+                        return Err(DecodeError::TruncatedMessage);
+                    }
+                    let mut sub = buf.take(len);
+                    while sub.has_remaining() {
+                        push(T::from_raw(T::Raw::decode(WireType::Int64, &mut sub)?)?);
+                    }
+                    Ok(())
+                }
+                WireType::Int64 => {
+                    push(T::from_raw(T::Raw::decode(WireType::Int64, buf)?)?);
+                    Ok(())
+                }
+                _ => Err(DecodeError::InvalidTag),
+            },
+            WireType::Len | WireType::SGroup | WireType::EGroup => {
+                unreachable!("numerical Raw is never Len or group")
+            }
+        }
     }
 }
 
@@ -200,7 +266,10 @@ impl<T: NumericalType> PackableRepeatedElement for T {
     where
         T::Value: Copy,
     {
-        values.iter().map(|v| T::payload_len(*v)).sum()
+        values
+            .iter()
+            .map(|v| <T as EncodeType>::payload_len::<A>(*v))
+            .sum()
     }
 
     #[inline]
@@ -209,7 +278,7 @@ impl<T: NumericalType> PackableRepeatedElement for T {
         T::Value: Copy,
     {
         for v in values {
-            T::encode_payload(*v, buf);
+            <T as EncodeType>::encode_payload::<A, B>(*v, buf);
         }
     }
 }

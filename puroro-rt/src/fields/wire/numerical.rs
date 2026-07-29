@@ -1,21 +1,26 @@
-//! Codec for copy-inline numerical protobuf **types** (`int32` / `ProtoInt32`,
+//! Codec for numerical protobuf **types** (`int32` / `ProtoInt32`,
 //! `fixed64` / `ProtoFixed64`, open/closed enums, … — not Len types such as
 //! string / bytes / message, and not [`ProtoBool`](super::varint::ProtoBool)).
 //!
-//! Maps [`Value`](NumericalType::Value) ↔ [`CopyWirePayload`](super::wire_payload::CopyWirePayload).
+//! [`Value`](NumericalType::Value) is the **logical** copy value used for
+//! encode/decode and field get/set — not necessarily the singular struct slot
+//! type (`AddressableSlot` lives on [`PayloadAccess`](super::singular_type::PayloadAccess)).
+//! Maps `Value` ↔ [`CopyWirePayload`](super::wire_payload::CopyWirePayload).
 //! Tagged encode goes through [`EncodeType`](super::encode_type::EncodeType).
-//! Packed repeated encode is derived in
+//! Packed repeated merge / encode live on
+//! [`RepeatedElementMerge`](super::repeated_element::RepeatedElementMerge) /
 //! [`PackableRepeatedElement`](super::repeated_element::PackableRepeatedElement).
+//!
+//! [`ProtoBool`](super::varint::ProtoBool) stays outside this trait for now
+//! (singular bit-pack; repeated / encode are handwritten).
 
 use ::allocator_api2::alloc::Allocator;
-use ::bytes::{Buf, BufMut};
-use ::protobuf_core::{FIXED32_BYTES, FIXED64_BYTES, Varint};
+use ::bytes::BufMut;
+use ::protobuf_core::Varint;
 
 use ::puroro::{DecodeError, WireType};
 
-use crate::decode;
 use crate::fields::shared::ProtoEmpty;
-use crate::fields::shared::value_slot::AddressableSlot;
 
 use super::encode_type::EncodeType;
 use super::fixed::{
@@ -29,11 +34,12 @@ use super::wire_payload::{
     CopyWirePayload, Fixed32Payload, Fixed64Payload, VarintPayload, WirePayload,
 };
 
-/// Copy-inline numerical protobuf **type** marker (e.g. `ProtoInt32`,
-/// `ProtoFixed64`, `ProtoEnum<…>` — not `bool` / `string` / `bytes` / message).
+/// Numerical protobuf **type** marker (e.g. `ProtoInt32`, `ProtoFixed64`,
+/// `ProtoEnum<…>` — not `bool` / `string` / `bytes` / message).
 pub trait NumericalType: Sized {
-    /// Singular slot / repeated element / written value.
-    type Value: Copy + Default + ProtoEmpty + AddressableSlot;
+    /// Logical value for encode/decode and field get/set (not necessarily the
+    /// singular struct slot type).
+    type Value: Copy + Default + ProtoEmpty;
 
     /// Wire-shape body for this proto type (e.g. [`VarintPayload`] for `int32`).
     type Raw: CopyWirePayload;
@@ -41,103 +47,6 @@ pub trait NumericalType: Sized {
     fn to_raw(value: Self::Value) -> Self::Raw;
 
     fn from_raw(raw: Self::Raw) -> Result<Self::Value, DecodeError>;
-
-    /// Decode one singular occurrence after the tag has been read.
-    ///
-    /// For varint markers, [`DecodeError::UnknownClosedEnum`] may be returned
-    /// (singular merge parks it; repeated merge propagates the error).
-    #[inline]
-    fn decode_wire_value(
-        wire_type: WireType,
-        buf: &mut impl Buf,
-    ) -> Result<Self::Value, DecodeError> {
-        Self::from_raw(Self::Raw::decode(wire_type, buf)?)
-    }
-
-    /// Untagged wire-body length of one value (no tag).
-    #[inline]
-    fn payload_len(value: Self::Value) -> usize {
-        Self::to_raw(value).encoded_len()
-    }
-
-    /// Write untagged wire-body bytes of one value (no tag).
-    #[inline]
-    fn encode_payload(value: Self::Value, buf: &mut impl BufMut) {
-        Self::to_raw(value).encode(buf);
-    }
-
-    /// Merge one wire occurrence into `push` (expanded or packed).
-    fn merge_occurrence(
-        wire_type: WireType,
-        buf: &mut impl Buf,
-        mut push: impl FnMut(Self::Value),
-    ) -> Result<(), DecodeError> {
-        match Self::Raw::WIRE_TYPE {
-            WireType::Varint => match wire_type {
-                WireType::Len => {
-                    let len = decode::decode_varint(buf)? as usize;
-                    if buf.remaining() < len {
-                        return Err(DecodeError::TruncatedMessage);
-                    }
-                    let mut sub = buf.take(len);
-                    while sub.has_remaining() {
-                        push(Self::decode_wire_value(WireType::Varint, &mut sub)?);
-                    }
-                    Ok(())
-                }
-                WireType::Varint => {
-                    push(Self::decode_wire_value(WireType::Varint, buf)?);
-                    Ok(())
-                }
-                _ => Err(DecodeError::InvalidTag),
-            },
-            WireType::Int32 => match wire_type {
-                WireType::Len => {
-                    let len = decode::decode_varint(buf)? as usize;
-                    if buf.remaining() < len {
-                        return Err(DecodeError::TruncatedMessage);
-                    }
-                    if !len.is_multiple_of(FIXED32_BYTES) {
-                        return Err(DecodeError::TruncatedMessage);
-                    }
-                    let mut sub = buf.take(len);
-                    while sub.has_remaining() {
-                        push(Self::decode_wire_value(WireType::Int32, &mut sub)?);
-                    }
-                    Ok(())
-                }
-                WireType::Int32 => {
-                    push(Self::decode_wire_value(WireType::Int32, buf)?);
-                    Ok(())
-                }
-                _ => Err(DecodeError::InvalidTag),
-            },
-            WireType::Int64 => match wire_type {
-                WireType::Len => {
-                    let len = decode::decode_varint(buf)? as usize;
-                    if buf.remaining() < len {
-                        return Err(DecodeError::TruncatedMessage);
-                    }
-                    if !len.is_multiple_of(FIXED64_BYTES) {
-                        return Err(DecodeError::TruncatedMessage);
-                    }
-                    let mut sub = buf.take(len);
-                    while sub.has_remaining() {
-                        push(Self::decode_wire_value(WireType::Int64, &mut sub)?);
-                    }
-                    Ok(())
-                }
-                WireType::Int64 => {
-                    push(Self::decode_wire_value(WireType::Int64, buf)?);
-                    Ok(())
-                }
-                _ => Err(DecodeError::InvalidTag),
-            },
-            WireType::Len | WireType::SGroup | WireType::EGroup => {
-                unreachable!("numerical Raw is never Len or group")
-            }
-        }
-    }
 }
 
 // ---------------------------------------------------------------------------
@@ -306,7 +215,7 @@ impl<T: NumericalType> EncodeType for T {
     where
         Self: 'a,
     {
-        T::payload_len(value)
+        T::to_raw(value).encoded_len()
     }
 
     #[inline]
@@ -316,6 +225,6 @@ impl<T: NumericalType> EncodeType for T {
         A: Allocator + Clone,
         B: BufMut,
     {
-        T::encode_payload(value, buf);
+        T::to_raw(value).encode(buf);
     }
 }
