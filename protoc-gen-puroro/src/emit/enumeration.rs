@@ -10,7 +10,7 @@ use ::std::collections::BTreeSet;
 
 /// Render an enum into its parent package or message module.
 ///
-/// Defaults / `proto_zero` / `HasDefault` use the **first defined** enumerator
+/// Defaults / `proto_default` / `HasDefault` use the **first defined** enumerator
 /// (proto2 / proto3 / editions language guides). Open enums additionally require
 /// that first value to be `0`.
 pub(super) fn render_enum(e: &Enum<'_>) -> Result<TokenStream> {
@@ -137,7 +137,7 @@ pub(super) fn render_enum(e: &Enum<'_>) -> Result<TokenStream> {
         #convert_impls
 
         impl ::puroro_rt::ProtoEnumStorage for #name {
-            fn proto_zero() -> Self {
+            fn proto_default() -> Self {
                 #default_self
             }
 

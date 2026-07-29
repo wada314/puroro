@@ -199,7 +199,7 @@ impl<T: NumericalType> PackableRepeatedElement for T {
     where
         T::Value: Copy,
     {
-        T::packed_payload_len(values)
+        values.iter().map(|v| T::payload_len(*v)).sum()
     }
 
     #[inline]
@@ -207,7 +207,9 @@ impl<T: NumericalType> PackableRepeatedElement for T {
     where
         T::Value: Copy,
     {
-        T::encode_packed_payload(values, buf);
+        for v in values {
+            T::encode_payload(*v, buf);
+        }
     }
 }
 

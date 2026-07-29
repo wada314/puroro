@@ -705,7 +705,7 @@ priority: SingularField<ProtoEnum<Priority, Closed>, Explicit<BIT>, FIELD, A>,
 pub struct Status(i32);
 
 impl ProtoEnumStorage for Status {
-    fn proto_zero() -> Self { … }
+    fn proto_default() -> Self { … }
     fn to_wire(self) -> i32 { … }
 }
 impl OpenEnum for Status {}

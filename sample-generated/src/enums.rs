@@ -49,7 +49,7 @@ impl TryFrom<Status> for i32 {
 }
 
 impl ProtoEnumStorage for Status {
-    fn proto_zero() -> Self {
+    fn proto_default() -> Self {
         Self::UNSPECIFIED
     }
 
@@ -111,7 +111,7 @@ impl From<Priority> for i32 {
 }
 
 impl ProtoEnumStorage for Priority {
-    fn proto_zero() -> Self {
+    fn proto_default() -> Self {
         Self::UNSPECIFIED
     }
 

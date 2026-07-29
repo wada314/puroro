@@ -76,7 +76,7 @@ puroro_rt::fields       SingularField<T, P, FIELD> (T includes ProtoMessage), �
     │  shared/ — MessageCommon, FieldPresence, ValueSlot,
     │            DefaultIn / DeallocateIn / ProtoEmpty
     │  wire/   — WirePayload + encode_field; SingularType; RepeatedElement; MapKey;
-    │            NumericalType (packed / scalar payload)
+    │            NumericalType (scalar payload)
     │  singular/, repeated/, oneof/
     │  T: SingularType thin wrapper (ProtoInt32(i32), ProtoString(…), …)
     │  P: FieldPresence (Implicit / Explicit<BIT> / LegacyRequired<BIT> / Oneof)
@@ -121,7 +121,7 @@ protobuf-core           Varint, Tag, WireType
 |---|---|
 | `MessageCommon`, `PresenceBits`, `FieldDeallocate`, `OneofSlot` | **Done** |
 | `SingularType` + thin wrappers (varint / LEN) + `ProtoMessage` | **Done** |
-| `NumericalType` (varint / fixed / enum payload + packed) | **Done** |
+| `NumericalType` (varint / fixed / enum scalar payload) | **Done** |
 | `RepeatedElement` / `RepeatedElementMerge` / `PackableRepeatedElement` / `RepeatedVecMut` | **Done** |
 | `MapKey` + `MapField` (map entry wire encode/merge) | **Done** |
 | `FieldPresence` (`Implicit` / `Explicit` / `LegacyRequired` / `Oneof`) | **Done** |
@@ -166,7 +166,7 @@ Live plugin emits nested and file-level messages/enums with singular and repeate
 | [`wire/repeated_element.rs`](puroro-rt/src/fields/wire/repeated_element.rs) | `RepeatedElement` / `RepeatedElementMerge` (`Element` for repeated buffers) |
 | [`wire/map_element.rs`](puroro-rt/src/fields/wire/map_element.rs) | `MapKey` (subset of `RepeatedElement`) |
 | [`wire/proto_message.rs`](puroro-rt/src/fields/wire/proto_message.rs) | `ProtoMessage` (nested message marker) |
-| [`wire/numerical.rs`](puroro-rt/src/fields/wire/numerical.rs) | `NumericalType` (varint / fixed / enum payload + packed) |
+| [`wire/numerical.rs`](puroro-rt/src/fields/wire/numerical.rs) | `NumericalType` (varint / fixed / enum scalar payload) |
 | [`wire/varint.rs`](puroro-rt/src/fields/wire/varint.rs) | `ProtoInt32`, …, `ProtoBool`, `ProtoEnum` |
 | [`wire/len.rs`](puroro-rt/src/fields/wire/len.rs) | `ProtoString`, `ProtoBytes` |
 | [`wire/fixed.rs`](puroro-rt/src/fields/wire/fixed.rs) | `ProtoFixed*` / `ProtoFloat` / `ProtoDouble` |
@@ -258,7 +258,7 @@ Singular / oneof `bool` uses allocator-free [`ProtoBool`](puroro-rt/src/fields/w
 
 ### Numerical helper
 
-[`NumericalType`](puroro-rt/src/fields/wire/numerical.rs) owns decode, single-value payload, and packed slice helpers for copy-inline numerics / enums. Tagged encode is [`WirePayload`](puroro-rt/src/fields/wire/wire_payload.rs) (blanket over `NumericalType`). LEN scalars (`ProtoString` / `ProtoBytes`) and [`ProtoBool`](puroro-rt/src/fields/wire/varint.rs) implement `WirePayload` directly.
+[`NumericalType`](puroro-rt/src/fields/wire/numerical.rs) owns decode and single-value payload for copy-inline numerics / enums. Packed repeated encode is derived from those scalar helpers in [`PackableRepeatedElement`](puroro-rt/src/fields/wire/repeated_element.rs). Tagged encode is [`WirePayload`](puroro-rt/src/fields/wire/wire_payload.rs) (blanket over `NumericalType`). LEN scalars (`ProtoString` / `ProtoBytes`) and [`ProtoBool`](puroro-rt/src/fields/wire/varint.rs) implement `WirePayload` directly.
 
 | Helper | Wire | Markers | Status |
 |---|---|---|---|

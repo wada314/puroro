@@ -4,8 +4,9 @@
 //! intentionally outside this trait (different singular slot shapes).
 //!
 //! Tagged encode goes through [`WirePayload`](super::wire_payload::WirePayload) /
-//! [`encode_field`](super::wire_payload::encode_field); this trait owns decode,
-//! single-value payload, and packed slice helpers.
+//! [`encode_field`](super::wire_payload::encode_field); this trait owns decode and
+//! single-value payload. Packed repeated encode is derived in
+//! [`PackableRepeatedElement`](super::repeated_element::PackableRepeatedElement).
 
 use ::allocator_api2::alloc::Allocator;
 use ::bytes::{Buf, BufMut};
@@ -51,7 +52,7 @@ pub trait NumericalType: Sized {
 
     const WIRE: NumericalWireKind;
 
-    /// Protobuf empty / type-zero value.
+    /// Protobuf type-default value (0 / first enum enumerator / …).
     fn default_value() -> Self::Value;
 
     /// Decode one singular occurrence after the tag has been read.
@@ -68,12 +69,6 @@ pub trait NumericalType: Sized {
 
     /// Write bare payload bytes of one value (no tag).
     fn encode_payload(value: Self::Value, buf: &mut impl BufMut);
-
-    /// Packed payload length (no tag / length prefix).
-    fn packed_payload_len(values: &[Self::Value]) -> usize;
-
-    /// Write packed payload bytes (no tag / length prefix).
-    fn encode_packed_payload(values: &[Self::Value], buf: &mut impl BufMut);
 
     /// Merge one wire occurrence into `push` (expanded or packed).
     fn merge_occurrence(
@@ -206,21 +201,6 @@ macro_rules! impl_varint_numerical {
             fn encode_payload(value: Self::Value, buf: &mut impl BufMut) {
                 encode::encode_varint(($encode)(value), buf);
             }
-
-            #[inline]
-            fn packed_payload_len(values: &[Self::Value]) -> usize {
-                values
-                    .iter()
-                    .map(|v| <Self as NumericalType>::payload_len(*v))
-                    .sum()
-            }
-
-            #[inline]
-            fn encode_packed_payload(values: &[Self::Value], buf: &mut impl BufMut) {
-                for v in values {
-                    <Self as NumericalType>::encode_payload(*v, buf);
-                }
-            }
         }
     };
 }
@@ -289,7 +269,7 @@ impl<E: OpenEnum> NumericalType for ProtoEnum<E, Open> {
 
     #[inline]
     fn default_value() -> Self::Value {
-        E::proto_zero()
+        E::proto_default()
     }
 
     #[inline]
@@ -313,21 +293,6 @@ impl<E: OpenEnum> NumericalType for ProtoEnum<E, Open> {
     fn encode_payload(value: Self::Value, buf: &mut impl BufMut) {
         encode::encode_varint(encode_enum_wire(value.to_wire()), buf);
     }
-
-    #[inline]
-    fn packed_payload_len(values: &[Self::Value]) -> usize {
-        values
-            .iter()
-            .map(|v| <Self as NumericalType>::payload_len(*v))
-            .sum()
-    }
-
-    #[inline]
-    fn encode_packed_payload(values: &[Self::Value], buf: &mut impl BufMut) {
-        for v in values {
-            <Self as NumericalType>::encode_payload(*v, buf);
-        }
-    }
 }
 
 impl<E: ClosedEnum> NumericalType for ProtoEnum<E, Closed> {
@@ -336,7 +301,7 @@ impl<E: ClosedEnum> NumericalType for ProtoEnum<E, Closed> {
 
     #[inline]
     fn default_value() -> Self::Value {
-        E::proto_zero()
+        E::proto_default()
     }
 
     #[inline]
@@ -360,21 +325,6 @@ impl<E: ClosedEnum> NumericalType for ProtoEnum<E, Closed> {
     #[inline]
     fn encode_payload(value: Self::Value, buf: &mut impl BufMut) {
         encode::encode_varint(encode_enum_wire(value.to_wire()), buf);
-    }
-
-    #[inline]
-    fn packed_payload_len(values: &[Self::Value]) -> usize {
-        values
-            .iter()
-            .map(|v| <Self as NumericalType>::payload_len(*v))
-            .sum()
-    }
-
-    #[inline]
-    fn encode_packed_payload(values: &[Self::Value], buf: &mut impl BufMut) {
-        for v in values {
-            <Self as NumericalType>::encode_payload(*v, buf);
-        }
     }
 }
 
@@ -413,18 +363,6 @@ macro_rules! impl_fixed32_numerical {
             fn encode_payload(value: Self::Value, buf: &mut impl BufMut) {
                 buf.put_slice(&value.to_le_bytes());
             }
-
-            #[inline]
-            fn packed_payload_len(values: &[Self::Value]) -> usize {
-                values.len() * FIXED32_BYTES
-            }
-
-            #[inline]
-            fn encode_packed_payload(values: &[Self::Value], buf: &mut impl BufMut) {
-                for v in values {
-                    <Self as NumericalType>::encode_payload(*v, buf);
-                }
-            }
         }
     };
 }
@@ -459,18 +397,6 @@ macro_rules! impl_fixed64_numerical {
             #[inline]
             fn encode_payload(value: Self::Value, buf: &mut impl BufMut) {
                 buf.put_slice(&value.to_le_bytes());
-            }
-
-            #[inline]
-            fn packed_payload_len(values: &[Self::Value]) -> usize {
-                values.len() * FIXED64_BYTES
-            }
-
-            #[inline]
-            fn encode_packed_payload(values: &[Self::Value], buf: &mut impl BufMut) {
-                for v in values {
-                    <Self as NumericalType>::encode_payload(*v, buf);
-                }
             }
         }
     };
