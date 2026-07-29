@@ -9,8 +9,8 @@ use ::allocator_api2::alloc::Allocator;
 use ::bytes::BufMut;
 
 use crate::encode;
+use crate::fields::wire::encode_type::{encode_field, encoded_len_field};
 use crate::fields::wire::repeated_element::{PackableRepeatedElement, RepeatedElement};
-use crate::fields::wire::wire_payload::{encode_field, encoded_len_field};
 
 /// How a repeated field is written on encode.
 pub trait RepeatedEncoding<T: RepeatedElement, A: Allocator + Clone>: Copy {

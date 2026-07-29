@@ -296,7 +296,7 @@ Generated crates **may** (and do) depend on `puroro-rt` for field storage, wire 
 
 **Not allowed (examples).**
 
-- Public aliases such as `pub type FooRef<'a, A> = … <ProtoString as ::puroro_rt::WirePayload>::View<'a, A> …` (forces users/rustdoc to see `puroro-rt`).
+- Public aliases such as `pub type FooRef<'a, A> = … <ProtoString as ::puroro_rt::EncodeType>::View<'a, A> …` (forces users/rustdoc to see `puroro-rt`).
 - Public method signatures that name `puroro_rt::OneofView`, `SingularField`, `SingularType`, `StringGuard`, `BitRef`, field visitors, etc., when a `puroro` trait or RPIT / concrete user type would do.
 - Requiring `use puroro_rt::…` for method resolution on values returned from public accessors (put the trait in `puroro` instead).
 
@@ -910,7 +910,7 @@ repeated MapFieldEntry map_field = N;  // always LEN on the wire
 
 Public map views live in [`src/map.rs`](src/map.rs) (re-exported from `puroro`). `K` / `V` are **view** types (`str`, `i32`, …), not owned buffers — string maps use `K = str`.
 
-Same layering as singular fields (`WirePayload::View` / `SingularType::Mut` → generic `SingularField`): wire markers carry the view GATs, and `MapFieldRef` / `MapFieldMut` implement the user traits with **blankets** (no K×V macro matrix).
+Same layering as singular fields (`EncodeType::View` / `SingularType::Mut` → generic `SingularField`): wire markers carry the view GATs, and `MapFieldRef` / `MapFieldMut` implement the user traits with **blankets** (no K×V macro matrix).
 
 | Layer | Role |
 |---|---|

@@ -40,9 +40,9 @@ pub trait MapKey: RepeatedElement {
 
 /// Shared map-value view projection (`Element` → user-facing [`View`](Self::View)).
 ///
-/// Distinct from [`WirePayload::View`](super::wire_payload::WirePayload::View)
-/// (encode / singular getter): scalars use by-value `View = i32` there, while
-/// maps need `&MapValueView::View` with `View = i32`.
+/// Distinct from [`EncodeType::View`](super::encode_type::EncodeType::View)
+/// (encode / singular getter, e.g. by-value `i32` for `ProtoInt32`): maps need
+/// `&MapValueView::View` with `View = i32` for hashbrown lookups.
 pub trait MapValueView: RepeatedElement {
     type View: ?Sized;
 

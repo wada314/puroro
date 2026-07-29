@@ -7,9 +7,9 @@ use ::puroro::{DecodeError, WireType};
 
 use crate::decode;
 use crate::encode;
+use crate::fields::wire::encode_type::{encode_field, encoded_len_field};
 use crate::fields::wire::map_element::MapKey;
 use crate::fields::wire::repeated_element::{RepeatedElement, RepeatedElementMerge};
-use crate::fields::wire::wire_payload::{encode_field, encoded_len_field};
 
 const KEY_FIELD: u32 = 1;
 const VALUE_FIELD: u32 = 2;

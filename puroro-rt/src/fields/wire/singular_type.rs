@@ -1,11 +1,12 @@
-//! Wire semantics for singular (non-repeated) field type markers.
+//! Singular (non-repeated) field semantics for protobuf **type** markers
+//! (e.g. `int32` / [`ProtoInt32`](super::varint::ProtoInt32), `string` /
+//! [`ProtoString`](super::len::ProtoString) — not wire shapes like Varint / Len).
 //!
-//! Markers (`ProtoInt32`, `ProtoBool`, [`ProtoMessage`](super::proto_message::ProtoMessage), …)
-//! are allocator-free. Physical storage / views are GATs parametrised by `A`.
+//! Markers are allocator-free. Physical storage / views are GATs parametrised by `A`.
 //!
 //! Tagged encode is **not** on this trait — catalog code calls
-//! [`encode_field`](super::wire_payload::encode_field) with
-//! [`WirePayload::View`](super::wire_payload::WirePayload::View) after omit checks.
+//! [`encode_field`](super::encode_type::encode_field) with
+//! [`EncodeType::View`](super::encode_type::EncodeType::View) after omit checks.
 //!
 //! **Storage access** (get / write / clear / merge) lives on [`PayloadAccess`]
 //! for inline payloads, or on
@@ -42,12 +43,13 @@ use crate::fields::shared::{
     value_slot::{AddressableSlot, ValueSlot, ValueSlotMutAccess},
 };
 
+use super::encode_type::EncodeType;
 use super::len::{ProtoBytes, ProtoString};
 use super::numerical::NumericalType;
 use super::varint::ProtoBool;
-use super::wire_payload::WirePayload;
 
-/// Singular protobuf type marker: storage GATs over [`WirePayload`].
+/// Singular protobuf **type** marker (e.g. `ProtoInt32`, `ProtoString`) with
+/// storage GATs on top of [`EncodeType`].
 ///
 /// Physical storage is the GAT [`Slot`](Self::Slot):
 /// - numerics / enums: bare `i32` / `E` / …
@@ -55,8 +57,8 @@ use super::wire_payload::WirePayload;
 /// - string / bytes: `UnmanagedString` / `UnmanagedVec`
 /// - nested messages: `UnmanagedBox<M, A>` via [`ProtoMessage`](super::proto_message::ProtoMessage)
 ///
-/// Getter views use [`WirePayload::View`] (same type as tagged encode).
-pub trait SingularType: WirePayload {
+/// Getter views use [`EncodeType::View`] (same type as tagged encode).
+pub trait SingularType: EncodeType {
     /// Physical value stored in the singular field slot (excluding
     /// [`MessageCommon`] bits).
     ///

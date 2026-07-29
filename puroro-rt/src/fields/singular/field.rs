@@ -39,9 +39,9 @@ use crate::fields::shared::{
     value_layout::{Inline, ValueLayout},
     value_slot::{AddressableSlot, ValueSlot, ValueSlotRefAccess},
 };
+use crate::fields::wire::encode_type::{encode_field, encoded_len_field};
 use crate::fields::wire::proto_ref_ops::{ProtoRefDebug, ProtoRefEq};
 use crate::fields::wire::singular_type::SingularType;
-use crate::fields::wire::wire_payload::{encode_field, encoded_len_field};
 
 /// Singular (non-repeated) scalar field — varint or LEN, selected by type marker `T`.
 ///

@@ -1,10 +1,9 @@
-//! Unified wire codec for copy-inline numerical markers (varint / fixed32 / fixed64 / enum).
+//! Codec for copy-inline numerical protobuf **types** (`int32` / `ProtoInt32`,
+//! `fixed64` / `ProtoFixed64`, open/closed enums, … — not Len types such as
+//! string / bytes / message, and not [`ProtoBool`](super::varint::ProtoBool)).
 //!
-//! [`ProtoBool`](super::varint::ProtoBool), string, bytes, and message markers are
-//! intentionally outside this trait (different singular slot shapes).
-//!
-//! Tagged encode goes through [`WirePayload`](super::wire_payload::WirePayload) /
-//! [`encode_field`](super::wire_payload::encode_field); this trait owns decode and
+//! Tagged encode goes through [`EncodeType`](super::encode_type::EncodeType) /
+//! [`encode_field`](super::encode_type::encode_field); this trait owns decode and
 //! single-value payload. Packed repeated encode is derived in
 //! [`PackableRepeatedElement`](super::repeated_element::PackableRepeatedElement).
 
@@ -19,6 +18,7 @@ use crate::encode;
 use crate::fields::shared::ProtoEmpty;
 use crate::fields::shared::value_slot::AddressableSlot;
 
+use super::encode_type::EncodeType;
 use super::fixed::{
     ProtoDouble, ProtoFixed32, ProtoFixed64, ProtoFloat, ProtoSFixed32, ProtoSFixed64,
 };
@@ -26,9 +26,10 @@ use super::varint::{
     Closed, ClosedEnum, Open, OpenEnum, ProtoEnum, ProtoInt32, ProtoInt64, ProtoSInt32,
     ProtoSInt64, ProtoUInt32, ProtoUInt64,
 };
-use super::wire_payload::WirePayload;
 
-/// Wire family for a [`NumericalType`] marker.
+/// Wire-type family for a [`NumericalType`] marker: `Varint` (e.g. `int32` /
+/// `sint32`), `Fixed32` (e.g. `fixed32` / `float`), or `Fixed64` (e.g. `fixed64` /
+/// `double`).
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum NumericalWireKind {
     Varint,
@@ -45,7 +46,8 @@ const fn numerical_wire_type(kind: NumericalWireKind) -> WireType {
     }
 }
 
-/// Copy-inline numerical protobuf type marker (not bool / string / bytes / message).
+/// Copy-inline numerical protobuf **type** marker (e.g. `ProtoInt32`,
+/// `ProtoFixed64`, `ProtoEnum<…>` — not `bool` / `string` / `bytes` / message).
 pub trait NumericalType: Sized {
     /// Singular slot / repeated element / written value.
     type Value: Copy + Default + ProtoEmpty + AddressableSlot;
@@ -381,7 +383,7 @@ impl_fixed64_numerical!(ProtoFixed64, u64);
 impl_fixed64_numerical!(ProtoSFixed64, i64);
 impl_fixed64_numerical!(ProtoDouble, f64);
 
-impl<T: NumericalType> WirePayload for T {
+impl<T: NumericalType> EncodeType for T {
     type View<'a, A: Allocator + Clone>
         = T::Value
     where

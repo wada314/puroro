@@ -1,4 +1,5 @@
-//! Repeated-element semantics for protobuf type markers.
+//! Repeated-element semantics for protobuf **type** markers (e.g. `ProtoInt32`,
+//! `ProtoString`, [`ProtoMessage`](super::proto_message::ProtoMessage)).
 //!
 //! Singular fields store [`SingularType::Slot`](super::singular_type::SingularType::Slot).
 //! Repeated fields store [`RepeatedElement::Element`] — often the inner payload
@@ -9,7 +10,7 @@
 //! repeated uses plain `bool` elements via this trait (no MessageCommon bit).
 //!
 //! Tagged encode uses [`wire_view`](Self::wire_view) +
-//! [`encode_field`](super::wire_payload::encode_field) (not a separate
+//! [`encode_field`](super::encode_type::encode_field) (not a separate
 //! `encode_element` entry point).
 
 use ::allocator_api2::alloc::Allocator;
@@ -23,30 +24,30 @@ use ::puroro::{DecodeError, Message, WireType};
 use crate::decode;
 use ::unmanaged::DeallocateIn;
 
+use super::encode_type::EncodeType;
 use super::len::{ProtoBytes, ProtoString};
 use super::numerical::NumericalType;
 use super::proto_message::ProtoMessage;
 use super::singular_type::SingularType;
 use super::varint::ProtoBool;
-use super::wire_payload::WirePayload;
 
 /// Wire + storage for one element of a repeated / map field of marker `Self`.
 ///
 /// Independent of [`SingularType`](super::singular_type::SingularType) (singular
 /// `Slot` / `Mut`). Dual-use markers implement both traits and share only
-/// [`WirePayload`].
+/// [`EncodeType`].
 ///
 /// Decode / merge live on [`RepeatedElementMerge`] so nested messages can
-/// constrain `M::Alloc = A`. Tagged encode goes through [`WirePayload`] via
+/// constrain `M::Alloc = A`. Tagged encode goes through [`EncodeType`] via
 /// [`wire_view`](Self::wire_view).
-pub trait RepeatedElement: WirePayload {
+pub trait RepeatedElement: EncodeType {
     /// Physical element stored in the repeated buffer.
     type Element<A: Allocator + Clone>;
 
-    /// Borrow / copy an element as a [`WirePayload::View`] for tagged encode.
+    /// Borrow / copy an element as a [`EncodeType::View`] for tagged encode.
     fn wire_view<'a, A: Allocator + Clone>(
         elem: &'a Self::Element<A>,
-    ) -> <Self as WirePayload>::View<'a, A>
+    ) -> <Self as EncodeType>::View<'a, A>
     where
         Self: 'a;
 
@@ -315,14 +316,14 @@ impl PackableRepeatedElement for ProtoBool {
     fn packed_payload_len<A: Allocator + Clone>(values: &[bool]) -> usize {
         values
             .iter()
-            .map(|v| <Self as WirePayload>::payload_len::<A>(*v))
+            .map(|v| <Self as EncodeType>::payload_len::<A>(*v))
             .sum()
     }
 
     #[inline]
     fn encode_packed_payload<A: Allocator + Clone, B: BufMut>(values: &[bool], buf: &mut B) {
         for v in values {
-            <Self as WirePayload>::encode_payload::<A, B>(*v, buf);
+            <Self as EncodeType>::encode_payload::<A, B>(*v, buf);
         }
     }
 }
