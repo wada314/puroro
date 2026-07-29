@@ -22,6 +22,7 @@ use super::len::{ProtoBytes, ProtoString};
 use super::proto_message::ProtoMessage;
 use super::varint::ProtoBool;
 use super::wire_payload::{LenPayloadRef, MessageLenRef, VarintPayload, WirePayload};
+use ::protobuf_core::Varint;
 
 /// Encode facet of a protobuf **type** marker (`ProtoInt32`, `ProtoString`, …).
 ///
@@ -110,7 +111,7 @@ impl EncodeType for ProtoBool {
     where
         Self: 'a,
     {
-        VarintPayload(Self::encode_wire(value)).encoded_len()
+        VarintPayload(Varint::from_bool(value)).encoded_len()
     }
 
     #[inline]
@@ -120,7 +121,7 @@ impl EncodeType for ProtoBool {
         A: Allocator + Clone,
         B: BufMut,
     {
-        VarintPayload(Self::encode_wire(value)).encode(buf);
+        VarintPayload(Varint::from_bool(value)).encode(buf);
     }
 }
 

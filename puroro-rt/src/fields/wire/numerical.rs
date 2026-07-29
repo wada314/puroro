@@ -166,43 +166,43 @@ macro_rules! impl_varint_numerical {
 impl_varint_numerical! {
     ProtoUInt32,
     u32,
-    decode = |raw| Varint::from_uint64(raw).try_to_uint32().map_err(DecodeError::from),
-    encode = |value| Varint::from_uint32(value).to_uint64(),
+    decode = |raw: Varint| raw.try_to_uint32().map_err(DecodeError::from),
+    encode = Varint::from_uint32,
 }
 
 impl_varint_numerical! {
     ProtoUInt64,
     u64,
-    decode = |raw| Ok(Varint::from_uint64(raw).to_uint64()),
-    encode = |value| Varint::from_uint64(value).to_uint64(),
+    decode = |raw: Varint| Ok(raw.to_uint64()),
+    encode = Varint::from_uint64,
 }
 
 impl_varint_numerical! {
     ProtoInt32,
     i32,
-    decode = |raw| Varint::from_uint64(raw).try_to_int32().map_err(DecodeError::from),
-    encode = |value| Varint::from_int32(value).to_uint64(),
+    decode = |raw: Varint| raw.try_to_int32().map_err(DecodeError::from),
+    encode = Varint::from_int32,
 }
 
 impl_varint_numerical! {
     ProtoInt64,
     i64,
-    decode = |raw| Ok(Varint::from_uint64(raw).to_int64()),
-    encode = |value| Varint::from_int64(value).to_uint64(),
+    decode = |raw: Varint| Ok(raw.to_int64()),
+    encode = Varint::from_int64,
 }
 
 impl_varint_numerical! {
     ProtoSInt32,
     i32,
-    decode = |raw| Varint::from_uint64(raw).try_to_sint32().map_err(DecodeError::from),
-    encode = |value| Varint::from_sint32(value).to_uint64(),
+    decode = |raw: Varint| raw.try_to_sint32().map_err(DecodeError::from),
+    encode = Varint::from_sint32,
 }
 
 impl_varint_numerical! {
     ProtoSInt64,
     i64,
-    decode = |raw| Ok(Varint::from_uint64(raw).to_sint64()),
-    encode = |value| Varint::from_sint64(value).to_uint64(),
+    decode = |raw: Varint| Ok(raw.to_sint64()),
+    encode = Varint::from_sint64,
 }
 
 // ---------------------------------------------------------------------------
@@ -215,14 +215,12 @@ impl<E: OpenEnum> NumericalType for ProtoEnum<E, Open> {
 
     #[inline]
     fn to_raw(value: E) -> VarintPayload {
-        VarintPayload(Varint::from_int32(value.to_wire()).to_uint64())
+        VarintPayload(Varint::from_int32(value.to_wire()))
     }
 
     #[inline]
     fn from_raw(raw: VarintPayload) -> Result<E, DecodeError> {
-        let i = Varint::from_uint64(raw.0)
-            .try_to_int32()
-            .map_err(DecodeError::from)?;
+        let i = raw.0.try_to_int32().map_err(DecodeError::from)?;
         Ok(E::from(i))
     }
 }
@@ -233,15 +231,15 @@ impl<E: ClosedEnum> NumericalType for ProtoEnum<E, Closed> {
 
     #[inline]
     fn to_raw(value: E) -> VarintPayload {
-        VarintPayload(Varint::from_int32(value.to_wire()).to_uint64())
+        VarintPayload(Varint::from_int32(value.to_wire()))
     }
 
     #[inline]
     fn from_raw(raw: VarintPayload) -> Result<E, DecodeError> {
-        let wire = Varint::from_uint64(raw.0)
-            .try_to_int32()
-            .map_err(DecodeError::from)?;
-        E::try_from(wire).map_err(|_| DecodeError::UnknownClosedEnum { raw: raw.0 })
+        let wire = raw.0.try_to_int32().map_err(DecodeError::from)?;
+        E::try_from(wire).map_err(|_| DecodeError::UnknownClosedEnum {
+            raw: raw.0.to_uint64(),
+        })
     }
 }
 

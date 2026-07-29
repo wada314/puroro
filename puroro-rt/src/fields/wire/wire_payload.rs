@@ -10,7 +10,7 @@
 use ::allocator_api2::alloc::Allocator;
 use ::allocator_api2::vec::Vec as AllocVec;
 use ::bytes::{Buf, BufMut};
-use ::protobuf_core::{FIXED32_BYTES, FIXED64_BYTES};
+use ::protobuf_core::{FIXED32_BYTES, FIXED64_BYTES, Varint};
 use ::puroro::{DecodeError, Message, WireType};
 use ::unmanaged::UnmanagedVec;
 
@@ -35,22 +35,23 @@ pub trait CopyWirePayload: WirePayload + Copy + Sized {
     fn decode(wire_type: WireType, buf: &mut impl Buf) -> Result<Self, DecodeError>;
 }
 
-/// Varint wire body (`WireType::Varint`) — raw `u64` before proto-type mapping
+/// Varint wire body (`WireType::Varint`) — [`Varint`] before proto-type mapping
 /// (e.g. `int32` / `sint32` / `bool`).
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub struct VarintPayload(pub u64);
+pub struct VarintPayload(pub Varint);
 
 impl WirePayload for VarintPayload {
     const WIRE_TYPE: WireType = WireType::Varint;
 
     #[inline]
     fn encoded_len(&self) -> usize {
-        encode::encoded_len_varint(self.0)
+        self.0.varint_size()
     }
 
     #[inline]
     fn encode(&self, buf: &mut impl BufMut) {
-        encode::encode_varint(self.0, buf);
+        let (bytes, count) = self.0.encode();
+        buf.put_slice(&bytes[..count]);
     }
 }
 
@@ -60,7 +61,7 @@ impl CopyWirePayload for VarintPayload {
         if wire_type != WireType::Varint {
             return Err(DecodeError::InvalidTag);
         }
-        Ok(Self(decode::decode_varint(buf)?))
+        Ok(Self(Varint::from_uint64(decode::decode_varint(buf)?)))
     }
 }
 
