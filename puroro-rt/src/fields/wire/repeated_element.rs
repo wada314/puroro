@@ -164,7 +164,7 @@ impl<T: NumericalType> RepeatedElement for T {
 impl<A: Allocator + Clone, T: NumericalType> RepeatedElementMerge<A> for T {
     #[inline]
     fn default_element(_alloc: A) -> T::Value {
-        T::default_value()
+        T::Value::default()
     }
 
     #[inline]

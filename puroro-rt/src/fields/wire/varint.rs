@@ -21,9 +21,7 @@ use crate::fields::shared::{DefaultIn, ProtoEmpty};
 pub struct Open;
 pub struct Closed;
 
-pub trait ProtoEnumStorage: Copy + PartialEq + 'static {
-    /// Type default: the **first defined** enumerator (not necessarily wire 0).
-    fn proto_default() -> Self;
+pub trait ProtoEnumStorage: Copy + PartialEq + Default + 'static {
     fn to_wire(self) -> i32;
 }
 
@@ -39,14 +37,14 @@ impl<E: ProtoEnumStorage> AddressableSlot for E {}
 impl<E: ProtoEnumStorage, A: Allocator + Clone> DefaultIn<A> for E {
     #[inline]
     fn default_in(_alloc: A) -> Self {
-        E::proto_default()
+        E::default()
     }
 }
 
 impl<E: ProtoEnumStorage> ProtoEmpty for E {
     #[inline]
     fn is_proto_empty(&self) -> bool {
-        *self == E::proto_default()
+        *self == E::default()
     }
 }
 

@@ -49,10 +49,6 @@ impl TryFrom<Status> for i32 {
 }
 
 impl ProtoEnumStorage for Status {
-    fn proto_default() -> Self {
-        Self::UNSPECIFIED
-    }
-
     fn to_wire(self) -> i32 {
         self.0
     }
@@ -111,10 +107,6 @@ impl From<Priority> for i32 {
 }
 
 impl ProtoEnumStorage for Priority {
-    fn proto_default() -> Self {
-        Self::UNSPECIFIED
-    }
-
     fn to_wire(self) -> i32 {
         self.0
     }

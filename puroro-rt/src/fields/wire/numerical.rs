@@ -48,12 +48,9 @@ const fn numerical_wire_type(kind: NumericalWireKind) -> WireType {
 /// Copy-inline numerical protobuf type marker (not bool / string / bytes / message).
 pub trait NumericalType: Sized {
     /// Singular slot / repeated element / written value.
-    type Value: Copy + ProtoEmpty + AddressableSlot;
+    type Value: Copy + Default + ProtoEmpty + AddressableSlot;
 
     const WIRE: NumericalWireKind;
-
-    /// Protobuf type-default value (0 / first enum enumerator / …).
-    fn default_value() -> Self::Value;
 
     /// Decode one singular occurrence after the tag has been read.
     ///
@@ -176,11 +173,6 @@ macro_rules! impl_varint_numerical {
             const WIRE: NumericalWireKind = NumericalWireKind::Varint;
 
             #[inline]
-            fn default_value() -> Self::Value {
-                ::core::default::Default::default()
-            }
-
-            #[inline]
             fn decode_wire_value(
                 wire_type: WireType,
                 buf: &mut impl Buf,
@@ -268,11 +260,6 @@ impl<E: OpenEnum> NumericalType for ProtoEnum<E, Open> {
     const WIRE: NumericalWireKind = NumericalWireKind::Varint;
 
     #[inline]
-    fn default_value() -> Self::Value {
-        E::proto_default()
-    }
-
-    #[inline]
     fn decode_wire_value(
         wire_type: WireType,
         buf: &mut impl Buf,
@@ -298,11 +285,6 @@ impl<E: OpenEnum> NumericalType for ProtoEnum<E, Open> {
 impl<E: ClosedEnum> NumericalType for ProtoEnum<E, Closed> {
     type Value = E;
     const WIRE: NumericalWireKind = NumericalWireKind::Varint;
-
-    #[inline]
-    fn default_value() -> Self::Value {
-        E::proto_default()
-    }
 
     #[inline]
     fn decode_wire_value(
@@ -339,11 +321,6 @@ macro_rules! impl_fixed32_numerical {
             const WIRE: NumericalWireKind = NumericalWireKind::Fixed32;
 
             #[inline]
-            fn default_value() -> Self::Value {
-                ::core::default::Default::default()
-            }
-
-            #[inline]
             fn decode_wire_value(
                 wire_type: WireType,
                 buf: &mut impl Buf,
@@ -372,11 +349,6 @@ macro_rules! impl_fixed64_numerical {
         impl NumericalType for $marker {
             type Value = $inner;
             const WIRE: NumericalWireKind = NumericalWireKind::Fixed64;
-
-            #[inline]
-            fn default_value() -> Self::Value {
-                ::core::default::Default::default()
-            }
 
             #[inline]
             fn decode_wire_value(
