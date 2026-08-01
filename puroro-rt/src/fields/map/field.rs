@@ -22,7 +22,7 @@ use crate::decode;
 use crate::encode;
 use crate::fields::shared::field_inspect::{FieldCloneIn, FieldDebug, FieldEncode, FieldPartialEq};
 use crate::fields::shared::{FieldDeallocate, MessageCommon};
-use crate::fields::wire::map_element::{MapKey, MapValueView};
+use crate::fields::wire::map_element::MapKey;
 use crate::fields::wire::repeated_element::{
     RepeatedElement, RepeatedElementMerge, RepeatedElementMut,
 };
@@ -261,10 +261,11 @@ where
     }
 
     /// Ensures `key` exists (type-default value if vacant), then returns a value mut handle.
-    pub fn entry_element_mut_view(&mut self, key: &K::KeyView) -> V::ElementMut<'_, A>
+    pub fn entry_element_mut_view(&mut self, key: &K::RefView) -> V::ElementMut<'_, A>
     where
         V: RepeatedElementMut + RepeatedElementMerge<A>,
-        K::Element<A>: Eq + Hash + Borrow<K::KeyView>,
+        K::RefView: Hash + Eq,
+        K::Element<A>: Eq + Hash + Borrow<K::RefView>,
     {
         if self.field.entries.get(key).is_none() {
             let owned_key = K::key_from_view(key, self.common.alloc.clone());
@@ -357,16 +358,17 @@ where
     }
 }
 
-// Blanket `puroro::{MapRef, MapMut}` over catalog bind views (view types from
-// `MapKey::KeyView` / `MapValueView::View`).
+// Blanket `puroro::{MapRef, MapMut}` over catalog bind views (`RefView` for key
+// and value markers).
 
-impl<'a, K, V, const FIELD: u32, A, Pb> MapRef<K::KeyView, <V as MapValueView>::View>
+impl<'a, K, V, const FIELD: u32, A, Pb> MapRef<K::RefView, V::RefView>
     for MapFieldRef<'a, K, V, FIELD, A, Pb>
 where
     K: MapKey,
-    V: MapValueView,
+    V: RepeatedElement,
     A: Allocator + Clone,
-    K::Element<A>: Hash + Eq + Borrow<K::KeyView>,
+    K::RefView: Hash + Eq,
+    K::Element<A>: Hash + Eq + Borrow<K::RefView>,
 {
     #[inline]
     fn len(&self) -> usize {
@@ -374,18 +376,19 @@ where
     }
 
     #[inline]
-    fn get(&self, key: impl Borrow<K::KeyView>) -> Option<&<V as MapValueView>::View> {
-        self.field.entries.get(key.borrow()).map(V::as_view)
+    fn get(&self, key: impl Borrow<K::RefView>) -> Option<&V::RefView> {
+        self.field.entries.get(key.borrow()).map(V::as_ref_view)
     }
 }
 
-impl<'f, 'c, K, V, const FIELD: u32, A, Pb> MapMut<K::KeyView, <V as MapValueView>::View>
+impl<'f, 'c, K, V, const FIELD: u32, A, Pb> MapMut<K::RefView, V::RefView>
     for MapFieldMut<'f, 'c, K, V, FIELD, A, Pb>
 where
     K: MapKey,
-    V: MapValueView + RepeatedElementMut + RepeatedElementMerge<A>,
+    V: RepeatedElementMut + RepeatedElementMerge<A>,
     A: Allocator + Clone,
-    K::Element<A>: Hash + Eq + Borrow<K::KeyView>,
+    K::RefView: Hash + Eq,
+    K::Element<A>: Hash + Eq + Borrow<K::RefView>,
 {
     type MutTarget = V::MutTarget<A>;
 
@@ -400,22 +403,22 @@ where
     }
 
     #[inline]
-    fn get(&self, key: impl Borrow<K::KeyView>) -> Option<&<V as MapValueView>::View> {
-        self.field.entries.get(key.borrow()).map(V::as_view)
+    fn get(&self, key: impl Borrow<K::RefView>) -> Option<&V::RefView> {
+        self.field.entries.get(key.borrow()).map(V::as_ref_view)
     }
 
     #[inline]
-    fn get_mut(&mut self, key: impl Borrow<K::KeyView>) -> Option<Self::Mut<'_>> {
+    fn get_mut(&mut self, key: impl Borrow<K::RefView>) -> Option<Self::Mut<'_>> {
         self.get_element_mut(key.borrow())
     }
 
     #[inline]
-    fn entry_mut(&mut self, key: impl Borrow<K::KeyView>) -> Self::Mut<'_> {
+    fn entry_mut(&mut self, key: impl Borrow<K::RefView>) -> Self::Mut<'_> {
         self.entry_element_mut_view(key.borrow())
     }
 
     #[inline]
-    fn remove(&mut self, key: impl Borrow<K::KeyView>) {
+    fn remove(&mut self, key: impl Borrow<K::RefView>) {
         MapFieldMut::remove(self, key.borrow());
     }
 

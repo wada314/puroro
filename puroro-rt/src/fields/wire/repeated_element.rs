@@ -2,9 +2,14 @@
 //! `ProtoString`, [`ProtoMessage`](super::proto_message::ProtoMessage)).
 //!
 //! Singular fields store [`SingularType::Slot`](super::singular_type::SingularType::Slot).
-//! Repeated fields store [`RepeatedElement::Element`] — often the inner payload
-//! (`i32`, `UnmanagedString`, …), and for nested-message repeated fields the
-//! message type `M` itself (not [`UnmanagedBox`](::unmanaged::UnmanagedBox)).
+//! Repeated / map fields store [`RepeatedElement::Element`] — often the inner
+//! payload (`i32`, `UnmanagedString`, …), and for nested-message repeated fields
+//! the message type `M` itself (not [`UnmanagedBox`](::unmanaged::UnmanagedBox)).
+//!
+//! [`RefView`](RepeatedElement::RefView) is the shared borrow projection of one
+//! element (`i32`, `str`, …) used by map getters and (future) element-wise
+//! repeated getters. Distinct from [`EncodeType::View`](super::encode_type::EncodeType::View)
+//! (encode / singular getter; numerics are by-value).
 //!
 //! Singular [`ProtoBool`](super::varint::ProtoBool) uses bit-packed storage;
 //! repeated uses plain `bool` elements via [`NumericalType`](super::numerical::NumericalType)
@@ -40,12 +45,26 @@ use super::wire_payload::{CopyWirePayload, WirePayload};
 /// `Slot` / `Mut`). Dual-use markers implement both traits and share only
 /// [`EncodeType`].
 ///
+/// - [`Element`](Self::Element): physical storage / `as_slice` element
+/// - [`RefView`](Self::RefView): shared borrow projection (`&RefView`) for map
+///   getters and element-wise reads
+///
 /// Decode / merge live on [`RepeatedElementMerge`] so nested messages can
 /// constrain `M::Alloc = A`. Tagged encode goes through [`EncodeType`] via
 /// [`wire_view`](Self::wire_view).
 pub trait RepeatedElement: EncodeType {
-    /// Physical element stored in the repeated buffer.
+    /// Physical element stored in the repeated / map buffer.
     type Element<A: Allocator + Clone>;
+
+    /// User-facing shared view of one element (`i32`, `str`, `M`, …).
+    ///
+    /// Map [`MapRef`](::puroro::MapRef) / [`MapMut`](::puroro::MapMut) use
+    /// `&RefView`. Not the same as [`EncodeType::View`] (numerics are by-value
+    /// there).
+    type RefView: ?Sized;
+
+    /// Borrows `elem` as [`RefView`](Self::RefView).
+    fn as_ref_view<A: Allocator + Clone>(elem: &Self::Element<A>) -> &Self::RefView;
 
     /// Borrow / copy an element as a [`EncodeType::View`] for tagged encode.
     fn wire_view<'a, A: Allocator + Clone>(
@@ -152,6 +171,12 @@ pub trait RepeatedElementMut: RepeatedElement {
 
 impl<T: NumericalType> RepeatedElement for T {
     type Element<A: Allocator + Clone> = T::NativeType;
+    type RefView = T::NativeType;
+
+    #[inline]
+    fn as_ref_view<A: Allocator + Clone>(elem: &T::NativeType) -> &T::NativeType {
+        elem
+    }
 
     #[inline]
     fn wire_view<'a, A: Allocator + Clone>(elem: &'a T::NativeType) -> T::NativeType
@@ -330,6 +355,12 @@ impl<T: NumericalType> RepeatedElementMut for T {
 
 impl RepeatedElement for ProtoString {
     type Element<A: Allocator + Clone> = UnmanagedString<A>;
+    type RefView = str;
+
+    #[inline]
+    fn as_ref_view<A: Allocator + Clone>(elem: &UnmanagedString<A>) -> &str {
+        Deref::deref(elem)
+    }
 
     #[inline]
     fn wire_view<'a, A: Allocator + Clone>(elem: &'a UnmanagedString<A>) -> &'a str
@@ -406,6 +437,12 @@ impl RepeatedElementMut for ProtoString {
 
 impl RepeatedElement for ProtoBytes {
     type Element<A: Allocator + Clone> = UnmanagedVec<u8, A>;
+    type RefView = [u8];
+
+    #[inline]
+    fn as_ref_view<A: Allocator + Clone>(elem: &UnmanagedVec<u8, A>) -> &[u8] {
+        Deref::deref(elem)
+    }
 
     #[inline]
     fn wire_view<'a, A: Allocator + Clone>(elem: &'a UnmanagedVec<u8, A>) -> &'a [u8]
@@ -490,6 +527,12 @@ impl<M: Message> RepeatedElement for ProtoMessage<M> {
     /// Use sites must pair the same allocator: e.g.
     /// `RepeatedField<ProtoMessage<Address<A>>, Expanded, FIELD, A>`.
     type Element<A: Allocator + Clone> = M;
+    type RefView = M;
+
+    #[inline]
+    fn as_ref_view<A: Allocator + Clone>(elem: &M) -> &M {
+        elem
+    }
 
     #[inline]
     fn wire_view<'a, A: Allocator + Clone>(elem: &'a M) -> &'a M

@@ -737,8 +737,8 @@ Mutation uses the bound-view idiom: `field.bind_mut(&mut common)` → [`Repeated
 
 | Trait | Assoc / method | Role |
 |---|---|---|
-| [`MapKey`](puroro-rt/src/fields/wire/map_element.rs) | `KeyView` + `key_from_view` | User key view (`i32`, `str`, …); materialize stored key |
-| [`MapValueView`](puroro-rt/src/fields/wire/map_element.rs) | `View` / `as_view` | Shared value view (not `SingularType::Ref`) |
+| [`MapKey`](puroro-rt/src/fields/wire/map_element.rs) | `key_from_view` | Materialize stored key from [`RepeatedElement::RefView`](puroro-rt/src/fields/wire/repeated_element.rs) |
+| [`RepeatedElement`](puroro-rt/src/fields/wire/repeated_element.rs) | `RefView` / `as_ref_view` | Shared key/value view (`i32`, `str`, …); also for repeated element-wise reads |
 | [`RepeatedElementMut`](puroro-rt/src/fields/wire/repeated_element.rs) | `MutTarget` / `ElementMut` | Mutable handle target |
 
 **Wire:** each map occurrence is one LEN field `FIELD` whose payload is a synthetic entry message (`key = 1`, `value = 2`). Encode/decode helpers live in [`map/entry.rs`](puroro-rt/src/fields/map/entry.rs). Element tags use [`encode_field`](puroro-rt/src/fields/wire/encode_type.rs) after [`RepeatedElement::wire_view`](puroro-rt/src/fields/wire/repeated_element.rs). Decode uses `RepeatedElementMerge::{decode_element, default_element}` (singular wire types only; packed rejected inside the entry). Missing key/value → type default. Unknown tags inside the entry are skipped via [`skip_field`](puroro-rt/src/decode.rs) (not preserved).

@@ -1,52 +1,34 @@
-//! Map key / value view projection over [`RepeatedElement`].
+//! Map key marker over [`RepeatedElement`].
 //!
-//! Protobuf map keys are a subset of scalar types. Values use
-//! [`MapValueView`] (almost any element type except another map).
-
-use ::core::hash::Hash;
-use ::core::ops::Deref;
+//! Protobuf map keys are a subset of scalar types. Values use any
+//! [`RepeatedElement`] (except another map). Shared key / value views are
+//! [`RepeatedElement::RefView`].
 
 use ::allocator_api2::alloc::Allocator;
-use ::unmanaged::{UnmanagedString, UnmanagedVec};
+use ::unmanaged::UnmanagedString;
 
-use super::fixed::{
-    ProtoDouble, ProtoFixed32, ProtoFixed64, ProtoFloat, ProtoSFixed32, ProtoSFixed64,
-};
-use super::len::{ProtoBytes, ProtoString};
-use super::proto_message::ProtoMessage;
+use super::fixed::{ProtoFixed32, ProtoFixed64, ProtoSFixed32, ProtoSFixed64};
+use super::len::ProtoString;
 use super::repeated_element::RepeatedElement;
 use super::varint::{
-    Closed, ClosedEnum, Open, OpenEnum, ProtoBool, ProtoEnum, ProtoInt32, ProtoInt64, ProtoSInt32,
-    ProtoSInt64, ProtoUInt32, ProtoUInt64,
+    ProtoBool, ProtoInt32, ProtoInt64, ProtoSInt32, ProtoSInt64, ProtoUInt32, ProtoUInt64,
 };
 use crate::decode;
-use ::puroro::Message;
 
 /// Marker: valid protobuf map **key**.
 ///
 /// Spec: integral types, `bool`, or `string` — not floating-point, `bytes`,
-/// enum, or message. Storage is [`RepeatedElement::Element`].
+/// enum, or message. Storage is [`RepeatedElement::Element`]; the user-facing
+/// key type is [`RepeatedElement::RefView`] (`i32`, `str`, …).
 ///
-/// [`KeyView`](Self::KeyView) is the user-facing key type (`i32`, `str`, …).
-/// Implementors must ensure `Element<A>: Eq + Hash + Borrow<KeyView>` so lookups
-/// via [`KeyView`] work with hashbrown `Equivalent`.
+/// Implementors must ensure:
+/// - `RefView: Hash + Eq` (enforced at map lookup / `entry_mut` sites)
+/// - `Element<A>: Eq + Hash + Borrow<RefView>` so lookups work with hashbrown
+///   `Equivalent`
 pub trait MapKey: RepeatedElement {
-    /// Shared key view for [`MapRef`](::puroro::MapRef) / [`MapMut`](::puroro::MapMut).
-    type KeyView: ?Sized + Hash + Eq;
-
-    /// Build a stored key from a [`KeyView`](Self::KeyView) (`entry_mut` path).
-    fn key_from_view<A: Allocator + Clone>(view: &Self::KeyView, alloc: A) -> Self::Element<A>;
-}
-
-/// Shared map-value view projection (`Element` → user-facing [`View`](Self::View)).
-///
-/// Distinct from [`EncodeType::View`](super::encode_type::EncodeType::View)
-/// (encode / singular getter, e.g. by-value `i32` for `ProtoInt32`): maps need
-/// `&MapValueView::View` with `View = i32` for hashbrown lookups.
-pub trait MapValueView: RepeatedElement {
-    type View: ?Sized;
-
-    fn as_view<A: Allocator + Clone>(elem: &Self::Element<A>) -> &<Self as MapValueView>::View;
+    /// Build a stored key from a [`RefView`](RepeatedElement::RefView)
+    /// (`entry_mut` path).
+    fn key_from_view<A: Allocator + Clone>(view: &Self::RefView, alloc: A) -> Self::Element<A>;
 }
 
 // ---------------------------------------------------------------------------
@@ -56,8 +38,6 @@ pub trait MapValueView: RepeatedElement {
 macro_rules! impl_copy_map_key {
     ($marker:ty, $view:ty) => {
         impl MapKey for $marker {
-            type KeyView = $view;
-
             #[inline]
             fn key_from_view<A: Allocator + Clone>(view: &$view, _alloc: A) -> $view {
                 *view
@@ -79,84 +59,8 @@ impl_copy_map_key!(ProtoSFixed32, i32);
 impl_copy_map_key!(ProtoSFixed64, i64);
 
 impl MapKey for ProtoString {
-    type KeyView = str;
-
     #[inline]
     fn key_from_view<A: Allocator + Clone>(view: &str, alloc: A) -> UnmanagedString<A> {
         decode::str_to_unmanaged_in(view, alloc)
-    }
-}
-
-// ---------------------------------------------------------------------------
-// MapValueView
-// ---------------------------------------------------------------------------
-
-macro_rules! impl_identity_map_value_view {
-    ($marker:ty, $view:ty) => {
-        impl MapValueView for $marker {
-            type View = $view;
-
-            #[inline]
-            fn as_view<A: Allocator + Clone>(elem: &$view) -> &$view {
-                elem
-            }
-        }
-    };
-}
-
-impl_identity_map_value_view!(ProtoDouble, f64);
-impl_identity_map_value_view!(ProtoFloat, f32);
-impl_identity_map_value_view!(ProtoInt64, i64);
-impl_identity_map_value_view!(ProtoUInt64, u64);
-impl_identity_map_value_view!(ProtoInt32, i32);
-impl_identity_map_value_view!(ProtoFixed64, u64);
-impl_identity_map_value_view!(ProtoFixed32, u32);
-impl_identity_map_value_view!(ProtoBool, bool);
-impl_identity_map_value_view!(ProtoUInt32, u32);
-impl_identity_map_value_view!(ProtoSFixed32, i32);
-impl_identity_map_value_view!(ProtoSFixed64, i64);
-impl_identity_map_value_view!(ProtoSInt32, i32);
-impl_identity_map_value_view!(ProtoSInt64, i64);
-
-macro_rules! impl_enum_map_value_view {
-    ($kind:ty, $bound:ident) => {
-        impl<E: $bound> MapValueView for ProtoEnum<E, $kind> {
-            type View = E;
-
-            #[inline]
-            fn as_view<A: Allocator + Clone>(elem: &E) -> &E {
-                elem
-            }
-        }
-    };
-}
-
-impl_enum_map_value_view!(Open, OpenEnum);
-impl_enum_map_value_view!(Closed, ClosedEnum);
-
-impl MapValueView for ProtoString {
-    type View = str;
-
-    #[inline]
-    fn as_view<A: Allocator + Clone>(elem: &UnmanagedString<A>) -> &str {
-        elem.deref()
-    }
-}
-
-impl MapValueView for ProtoBytes {
-    type View = [u8];
-
-    #[inline]
-    fn as_view<A: Allocator + Clone>(elem: &UnmanagedVec<u8, A>) -> &[u8] {
-        elem.deref()
-    }
-}
-
-impl<M: Message> MapValueView for ProtoMessage<M> {
-    type View = M;
-
-    #[inline]
-    fn as_view<A: Allocator + Clone>(elem: &M) -> &M {
-        elem
     }
 }

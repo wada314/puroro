@@ -914,8 +914,8 @@ Same layering as singular fields (`EncodeType::View` / `SingularType::Mut` → g
 
 | Layer | Role |
 |---|---|
-| [`MapKey`](puroro-rt/src/fields/wire/map_element.rs) | `KeyView` + `key_from_view` (sized copy vs string allocate) |
-| [`MapValueView`](puroro-rt/src/fields/wire/map_element.rs) | `View` + `as_view` (identity vs string/bytes `Deref`) |
+| [`MapKey`](puroro-rt/src/fields/wire/map_element.rs) | `key_from_view` (sized copy vs string allocate) |
+| [`RepeatedElement::RefView`](puroro-rt/src/fields/wire/repeated_element.rs) | Shared key/value view + `as_ref_view` (identity vs string/bytes `Deref`) |
 | [`RepeatedElementMut::MutTarget`](puroro-rt/src/fields/wire/repeated_element.rs) | `_mut` target (`i32`, `String<A>`, …) |
 | [`MapRef`](src/map.rs) / [`MapMut`](src/map.rs) | User API: `get` / `get_mut` / `entry_mut` / `remove` take `impl Borrow<K>` |
 
@@ -953,7 +953,7 @@ labels_mut().entry_mut(1).push_str("hello");
 - Missing `key` / `value` inside an entry decode as protobuf type defaults.
 - Map entry unknowns are skipped (not preserved).
 
-Catalog type: `MapField<K, V, FIELD, A>` with `K: MapKey`, `V: MapValueView` — see [IMPLEMENTATION.md §15.1](IMPLEMENTATION.md#151-map-fields).
+Catalog type: `MapField<K, V, FIELD, A>` with `K: MapKey`, `V: RepeatedElement` — see [IMPLEMENTATION.md §15.1](IMPLEMENTATION.md#151-map-fields).
 
 ---
 
