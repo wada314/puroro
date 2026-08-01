@@ -1,15 +1,12 @@
 //! Varint family markers (`ProtoInt32`, enums, [`ProtoBool`], …).
 //!
 //! Numeric / enum / bool wire codecs live on [`NumericalType`](super::numerical::NumericalType).
-//! [`ProtoBool`] keeps a small inherent wire API for bit-packed singular storage.
+//! Singular [`ProtoBool`] storage is bit-packed via [`BitPacked`](crate::BitPacked).
 
 use ::core::convert::TryFrom;
 use ::core::marker::PhantomData;
 
 use ::allocator_api2::alloc::Allocator;
-use ::protobuf_core::Varint;
-
-use ::puroro::DecodeError;
 
 use crate::fields::shared::value_slot::AddressableSlot;
 use crate::fields::shared::{DefaultIn, ProtoEmpty};
@@ -77,17 +74,6 @@ pub struct ProtoSInt64;
 ///
 /// Singular / oneof: slot is `()`; logical value via [`BitPacked`](crate::BitPacked).
 /// Repeated: plain `bool` elements in the vec (no MessageCommon bit index).
+/// Wire codec: [`NumericalType`](super::numerical::NumericalType).
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
 pub struct ProtoBool;
-
-impl ProtoBool {
-    #[inline]
-    pub fn decode_wire(raw: u64) -> Result<bool, DecodeError> {
-        Ok(Varint::from_uint64(raw).to_bool())
-    }
-
-    #[inline]
-    pub fn encode_wire(value: bool) -> u64 {
-        Varint::from_bool(value).to_uint64()
-    }
-}

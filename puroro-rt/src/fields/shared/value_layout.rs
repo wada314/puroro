@@ -21,8 +21,10 @@ use super::{
     value_slot::{AddressableSlot, ValueSlot, ValueSlotMutAccess},
 };
 use crate::decode;
+use crate::fields::wire::numerical::NumericalType;
 use crate::fields::wire::singular_type::{PayloadAccess, SingularType};
 use crate::fields::wire::varint::ProtoBool;
+use crate::fields::wire::wire_payload::{CopyWirePayload, VarintPayload};
 
 /// Where a singular field's logical value is stored.
 pub trait ValueLayout<T: SingularType, A: Allocator + Clone>: Copy
@@ -237,11 +239,7 @@ where
         Pb: PresenceBits,
         B: Buf,
     {
-        if wire_type != WireType::Varint {
-            return Err(DecodeError::InvalidTag);
-        }
-        let raw = decode::decode_varint(buf)?;
-        match ProtoBool::decode_wire(raw) {
+        match ProtoBool::from_raw(VarintPayload::decode(wire_type, buf)?) {
             Ok(new) => {
                 Self::write(slot, init, common, new);
                 Ok(())
