@@ -8,20 +8,17 @@
 //! singular [`ProtoBool`](super::varint::ProtoBool) uses [`BitPacked`](crate::BitPacked)).
 //! Maps `NativeType` ↔ [`WireBody`](NumericalType::WireBody)
 //! ([`CopyWirePayload`](super::wire_payload::CopyWirePayload)).
-//! Tagged encode goes through [`EncodeType`](super::encode_type::EncodeType).
-//! Packed repeated merge / encode live on
+//! Tagged encode is the [`EncodeType`](super::encode_type::EncodeType) blanket
+//! over `NumericalType`. Packed repeated merge / encode live on
 //! [`RepeatedElementMerge`](super::repeated_element::RepeatedElementMerge) /
 //! [`PackableRepeatedElement`](super::repeated_element::PackableRepeatedElement).
 
-use ::allocator_api2::alloc::Allocator;
-use ::bytes::BufMut;
 use ::protobuf_core::Varint;
 
-use ::puroro::{DecodeError, WireType};
+use ::puroro::DecodeError;
 
 use crate::fields::shared::ProtoEmpty;
 
-use super::encode_type::EncodeType;
 use super::fixed::{
     ProtoDouble, ProtoFixed32, ProtoFixed64, ProtoFloat, ProtoSFixed32, ProtoSFixed64,
 };
@@ -29,9 +26,7 @@ use super::varint::{
     Closed, ClosedEnum, Open, OpenEnum, ProtoBool, ProtoEnum, ProtoInt32, ProtoInt64, ProtoSInt32,
     ProtoSInt64, ProtoUInt32, ProtoUInt64,
 };
-use super::wire_payload::{
-    CopyWirePayload, Fixed32Payload, Fixed64Payload, VarintPayload, WirePayload,
-};
+use super::wire_payload::{CopyWirePayload, Fixed32Payload, Fixed64Payload, VarintPayload};
 
 /// Numerical protobuf **type** marker (e.g. `ProtoInt32`, `ProtoBool`,
 /// `ProtoFixed64`, `ProtoEnum<…>` — not `string` / `bytes` / message).
@@ -206,31 +201,3 @@ impl_fixed32_numerical!(ProtoFloat, f32);
 impl_fixed64_numerical!(ProtoFixed64, u64);
 impl_fixed64_numerical!(ProtoSFixed64, i64);
 impl_fixed64_numerical!(ProtoDouble, f64);
-
-impl<T: NumericalType> EncodeType for T {
-    type View<'a, A: Allocator + Clone>
-        = T::NativeType
-    where
-        Self: 'a,
-        A: 'a;
-
-    const WIRE_TYPE: WireType = <T::WireBody as WirePayload>::WIRE_TYPE;
-
-    #[inline]
-    fn payload_len<'a, A: Allocator + Clone>(value: T::NativeType) -> usize
-    where
-        Self: 'a,
-    {
-        T::to_wire_body(value).encoded_len()
-    }
-
-    #[inline]
-    fn encode_payload<'a, A, B>(value: T::NativeType, buf: &mut B)
-    where
-        Self: 'a,
-        A: Allocator + Clone,
-        B: BufMut,
-    {
-        T::to_wire_body(value).encode(buf);
-    }
-}

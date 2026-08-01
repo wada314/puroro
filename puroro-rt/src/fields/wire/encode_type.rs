@@ -19,6 +19,7 @@ use ::puroro::{Message, WireType};
 use crate::encode;
 
 use super::len::{ProtoBytes, ProtoString};
+use super::numerical::NumericalType;
 use super::proto_message::ProtoMessage;
 use super::wire_payload::{LenPayloadRef, MessageLenRef, WirePayload};
 
@@ -92,6 +93,34 @@ where
         WireType::SGroup | WireType::EGroup => {
             unreachable!("generated markers never use group wire types")
         }
+    }
+}
+
+impl<T: NumericalType> EncodeType for T {
+    type View<'a, A: Allocator + Clone>
+        = T::NativeType
+    where
+        Self: 'a,
+        A: 'a;
+
+    const WIRE_TYPE: WireType = <T::WireBody as WirePayload>::WIRE_TYPE;
+
+    #[inline]
+    fn payload_len<'a, A: Allocator + Clone>(value: T::NativeType) -> usize
+    where
+        Self: 'a,
+    {
+        T::to_wire_body(value).encoded_len()
+    }
+
+    #[inline]
+    fn encode_payload<'a, A, B>(value: T::NativeType, buf: &mut B)
+    where
+        Self: 'a,
+        A: Allocator + Clone,
+        B: BufMut,
+    {
+        T::to_wire_body(value).encode(buf);
     }
 }
 
