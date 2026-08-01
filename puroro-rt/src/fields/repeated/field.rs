@@ -17,7 +17,7 @@ use ::puroro::DecodeError;
 use ::puroro::WireType;
 
 use crate::fields::shared::field_inspect::{FieldCloneIn, FieldDebug, FieldEncode, FieldPartialEq};
-use crate::fields::shared::{FieldDeallocate, MessageCommon, PresenceBits};
+use crate::fields::shared::{FieldDeallocate, MessageCommon};
 use crate::fields::wire::repeated_element::{
     RepeatedElement, RepeatedElementMerge, RepeatedElementMut, RepeatedVecMut,
 };
@@ -63,7 +63,7 @@ where
 
     /// Binds this field to `common` for read access.
     #[inline]
-    pub fn bind<'a, Pb: PresenceBits>(
+    pub fn bind<'a, Pb>(
         &'a self,
         common: &'a MessageCommon<Pb, A>,
     ) -> RepeatedFieldRef<'a, T, E, FIELD, A, Pb> {
@@ -72,7 +72,7 @@ where
 
     /// Binds this field to `common` for mutation.
     #[inline]
-    pub fn bind_mut<'f, 'c, Pb: PresenceBits>(
+    pub fn bind_mut<'f, 'c, Pb>(
         &'f mut self,
         common: &'c mut MessageCommon<Pb, A>,
     ) -> RepeatedFieldMut<'f, 'c, T, E, FIELD, A, Pb> {
@@ -85,7 +85,6 @@ where
     T: RepeatedElement,
     E: RepeatedEncoding<T, A>,
     A: Allocator + Clone,
-    Pb: PresenceBits,
 {
     /// Releases every element (when heap-backed) and the backing buffer.
     #[inline]
@@ -116,7 +115,7 @@ pub struct RepeatedFieldRef<
     E: RepeatedEncoding<T, A>,
     const FIELD: u32,
     A: Allocator + Clone,
-    Pb: PresenceBits,
+    Pb,
 > {
     field: &'a RepeatedField<T, E, FIELD, A>,
     /// Bound for symmetry with [`RepeatedFieldMut`]; unused by current getters.
@@ -130,7 +129,6 @@ where
     T: RepeatedElement,
     E: RepeatedEncoding<T, A>,
     A: Allocator + Clone,
-    Pb: PresenceBits,
 {
     #[inline]
     fn new(field: &'a RepeatedField<T, E, FIELD, A>, common: &'a MessageCommon<Pb, A>) -> Self {
@@ -164,7 +162,7 @@ pub struct RepeatedFieldMut<
     E: RepeatedEncoding<T, A>,
     const FIELD: u32,
     A: Allocator + Clone,
-    Pb: PresenceBits,
+    Pb,
 > {
     field: &'f mut RepeatedField<T, E, FIELD, A>,
     common: &'c mut MessageCommon<Pb, A>,
@@ -176,7 +174,6 @@ where
     T: RepeatedElement,
     E: RepeatedEncoding<T, A>,
     A: Allocator + Clone,
-    Pb: PresenceBits,
 {
     #[inline]
     fn new(
@@ -251,7 +248,6 @@ where
     T: RepeatedElement,
     E: RepeatedEncoding<T, A>,
     A: Allocator + Clone,
-    Pb: PresenceBits,
     T::Element<A>: PartialEq,
 {
     #[inline]
@@ -270,7 +266,6 @@ where
     T: RepeatedElement,
     E: RepeatedEncoding<T, A>,
     A: Allocator + Clone,
-    Pb: PresenceBits,
     T::Element<A>: Debug,
 {
     #[inline]
@@ -284,7 +279,6 @@ where
     T: RepeatedElement,
     E: RepeatedEncoding<T, A>,
     A: Allocator + Clone,
-    Pb: PresenceBits,
 {
     fn encoded_len(&self, _common: &MessageCommon<Pb, A>) -> usize {
         if self.values.is_empty() {
@@ -306,7 +300,6 @@ where
     T: RepeatedElement,
     E: RepeatedEncoding<T, A>,
     A: Allocator + Clone,
-    Pb: PresenceBits,
     T::Element<A>: CloneIn<A>,
 {
     fn clone_field(&self, _common: &MessageCommon<Pb, A>, alloc: A) -> Self {

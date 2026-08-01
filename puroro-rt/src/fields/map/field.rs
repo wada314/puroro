@@ -21,7 +21,7 @@ use ::puroro::{DecodeError, MapMut, MapRef, WireType};
 use crate::decode;
 use crate::encode;
 use crate::fields::shared::field_inspect::{FieldCloneIn, FieldDebug, FieldEncode, FieldPartialEq};
-use crate::fields::shared::{FieldDeallocate, MessageCommon, PresenceBits};
+use crate::fields::shared::{FieldDeallocate, MessageCommon};
 use crate::fields::wire::map_element::{MapKey, MapValueView};
 use crate::fields::wire::repeated_element::{
     RepeatedElement, RepeatedElementMerge, RepeatedElementMut,
@@ -65,7 +65,7 @@ where
     }
 
     #[inline]
-    pub fn bind<'a, Pb: PresenceBits>(
+    pub fn bind<'a, Pb>(
         &'a self,
         common: &'a MessageCommon<Pb, A>,
     ) -> MapFieldRef<'a, K, V, FIELD, A, Pb> {
@@ -73,7 +73,7 @@ where
     }
 
     #[inline]
-    pub fn bind_mut<'f, 'c, Pb: PresenceBits>(
+    pub fn bind_mut<'f, 'c, Pb>(
         &'f mut self,
         common: &'c mut MessageCommon<Pb, A>,
     ) -> MapFieldMut<'f, 'c, K, V, FIELD, A, Pb> {
@@ -86,7 +86,6 @@ where
     K: MapKey,
     V: RepeatedElement,
     A: Allocator + Clone,
-    Pb: PresenceBits,
 {
     #[inline]
     fn deallocate(&mut self, common: &MessageCommon<Pb, A>) {
@@ -106,7 +105,6 @@ where
     K: MapKey,
     V: RepeatedElement,
     A: Allocator + Clone,
-    Pb: PresenceBits,
     K::Element<A>: Eq + Hash,
     V::Element<A>: PartialEq,
 {
@@ -131,7 +129,6 @@ where
     K: MapKey,
     V: RepeatedElement,
     A: Allocator + Clone,
-    Pb: PresenceBits,
     K::Element<A>: Eq + Hash + Debug,
     V::Element<A>: Debug,
 {
@@ -146,7 +143,6 @@ where
     K: MapKey,
     V: RepeatedElement,
     A: Allocator + Clone,
-    Pb: PresenceBits,
     K::Element<A>: Eq + Hash,
 {
     fn encoded_len(&self, _common: &MessageCommon<Pb, A>) -> usize {
@@ -170,7 +166,6 @@ where
     K: MapKey,
     V: RepeatedElement,
     A: Allocator + Clone,
-    Pb: PresenceBits,
     K::Element<A>: CloneIn<A> + Eq + Hash,
     V::Element<A>: CloneIn<A>,
 {
@@ -195,7 +190,6 @@ where
     K: MapKey,
     V: RepeatedElement,
     A: Allocator + Clone,
-    Pb: PresenceBits,
 {
     field: &'a MapField<K, V, FIELD, A>,
     #[allow(dead_code)]
@@ -207,7 +201,6 @@ where
     K: MapKey,
     V: RepeatedElement,
     A: Allocator + Clone,
-    Pb: PresenceBits,
 {
     #[inline]
     fn new(field: &'a MapField<K, V, FIELD, A>, common: &'a MessageCommon<Pb, A>) -> Self {
@@ -235,7 +228,6 @@ where
     K: MapKey,
     V: RepeatedElement,
     A: Allocator + Clone,
-    Pb: PresenceBits,
 {
     field: &'f mut MapField<K, V, FIELD, A>,
     common: &'c mut MessageCommon<Pb, A>,
@@ -246,7 +238,6 @@ where
     K: MapKey,
     V: RepeatedElement,
     A: Allocator + Clone,
-    Pb: PresenceBits,
 {
     #[inline]
     fn new(field: &'f mut MapField<K, V, FIELD, A>, common: &'c mut MessageCommon<Pb, A>) -> Self {
@@ -375,7 +366,6 @@ where
     K: MapKey,
     V: MapValueView,
     A: Allocator + Clone,
-    Pb: PresenceBits,
     K::Element<A>: Hash + Eq + Borrow<K::KeyView>,
 {
     #[inline]
@@ -395,7 +385,6 @@ where
     K: MapKey,
     V: MapValueView + RepeatedElementMut + RepeatedElementMerge<A>,
     A: Allocator + Clone,
-    Pb: PresenceBits,
     K::Element<A>: Hash + Eq + Borrow<K::KeyView>,
 {
     type MutTarget = V::MutTarget<A>;

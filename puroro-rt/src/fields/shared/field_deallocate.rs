@@ -3,7 +3,7 @@
 
 use ::allocator_api2::alloc::Allocator;
 
-use super::{MessageCommon, PresenceBits};
+use super::MessageCommon;
 
 /// Releases a field's owned payloads through the message allocator in `common`.
 ///
@@ -18,7 +18,11 @@ use super::{MessageCommon, PresenceBits};
 ///
 /// After `deallocate`, `self` must not be used again (except as part of the
 /// enclosing message / enum going out of scope).
-pub trait FieldDeallocate<Pb: PresenceBits, A: Allocator> {
+///
+/// `Pb` is unconstrained here: only impls that read presence / value bits
+/// (e.g. explicit singular fields) add a [`PresenceBits`](super::PresenceBits)
+/// bound.
+pub trait FieldDeallocate<Pb, A: Allocator> {
     /// Frees heap payloads (if any) using `common.alloc`.
     fn deallocate(&mut self, common: &MessageCommon<Pb, A>);
 }

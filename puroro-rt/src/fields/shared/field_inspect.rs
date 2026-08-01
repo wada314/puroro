@@ -6,6 +6,9 @@
 //! ordinary references. Walks that also mutably borrow field slots of the same
 //! message store `MessageCommon` as a raw pointer so the borrow checker does
 //! not see an overlap — field payloads are disjoint from `MessageCommon`.
+//!
+//! `Pb` is unconstrained on these traits; impls that touch presence / value
+//! bits add [`PresenceBits`](super::PresenceBits) on their own `where` clauses.
 
 use ::allocator_api2::alloc::Allocator;
 use ::bytes::BufMut;
@@ -13,10 +16,10 @@ use ::core::fmt::{self, Debug, Formatter, Result as FmtResult};
 use ::core::mem;
 use ::core::ops::ControlFlow;
 
-use super::{FieldDeallocate, MessageCommon, PresenceBits};
+use super::{FieldDeallocate, MessageCommon};
 
 /// Semantic equality for one catalog field (getter-level, not raw slots).
-pub trait FieldPartialEq<Pb: PresenceBits, A: Allocator> {
+pub trait FieldPartialEq<Pb, A: Allocator> {
     fn field_eq(
         &self,
         common: &MessageCommon<Pb, A>,
@@ -26,33 +29,29 @@ pub trait FieldPartialEq<Pb: PresenceBits, A: Allocator> {
 }
 
 /// Semantic [`Debug`] view for one catalog field.
-pub trait FieldDebug<Pb: PresenceBits, A: Allocator> {
+pub trait FieldDebug<Pb, A: Allocator> {
     /// Formats like the public getter (presence-aware).
     fn fmt_debug(&self, common: &MessageCommon<Pb, A>, f: &mut Formatter<'_>) -> FmtResult;
 }
 
 /// Wire length / encode for one catalog field.
-pub trait FieldEncode<Pb: PresenceBits, A: Allocator> {
+pub trait FieldEncode<Pb, A: Allocator> {
     fn encoded_len(&self, common: &MessageCommon<Pb, A>) -> usize;
 
     fn encode_raw<B: BufMut>(&self, common: &MessageCommon<Pb, A>, buf: &mut B);
 }
 
 /// Deep-clone one catalog field through `common` / `alloc`.
-pub trait FieldCloneIn<Pb: PresenceBits, A: Allocator>: Sized {
+pub trait FieldCloneIn<Pb, A: Allocator>: Sized {
     fn clone_field(&self, common: &MessageCommon<Pb, A>, alloc: A) -> Self;
 }
 
 /// Capabilities required of every field passed to [`FieldVisitor`].
-pub trait CatalogField<Pb: PresenceBits, A: Allocator>:
-    FieldDebug<Pb, A> + FieldEncode<Pb, A>
-{
-}
+pub trait CatalogField<Pb, A: Allocator>: FieldDebug<Pb, A> + FieldEncode<Pb, A> {}
 
 impl<T, Pb, A> CatalogField<Pb, A> for T
 where
     T: FieldDebug<Pb, A> + FieldEncode<Pb, A>,
-    Pb: PresenceBits,
     A: Allocator,
 {
 }
@@ -62,7 +61,7 @@ where
 /// `name` is the proto field / oneof group name (`"title"`, `"notification"`, …).
 /// Call sites that ignore it (e.g. encode length) still pass it; LLVM typically
 /// drops the unused `&'static str` after inlining.
-pub trait FieldVisitor<Pb: PresenceBits, A: Allocator> {
+pub trait FieldVisitor<Pb, A: Allocator> {
     /// Stop early when `Break` is returned (unused by most visitors).
     type Break;
 
@@ -79,7 +78,7 @@ pub trait FieldVisitor<Pb: PresenceBits, A: Allocator> {
 /// intentional: catalog field types are heterogeneous, so a generic walk needs
 /// the capability on the field argument (same pattern as
 /// [`FieldPairVisitorMut`] / [`FieldVisitor`]).
-pub trait FieldPairVisitor<Pb: PresenceBits, A: Allocator> {
+pub trait FieldPairVisitor<Pb, A: Allocator> {
     type Break;
 
     fn visit<F: FieldPartialEq<Pb, A>>(
@@ -93,7 +92,7 @@ pub trait FieldPairVisitor<Pb: PresenceBits, A: Allocator> {
 /// Pair / mutable visitor — generated `visit_field_pairs_mut` (e.g. [`CloneIn`](unmanaged::CloneIn)).
 ///
 /// The destination field is `&mut`; source stays shared.
-pub trait FieldPairVisitorMut<Pb: PresenceBits, A: Allocator> {
+pub trait FieldPairVisitorMut<Pb, A: Allocator> {
     type Break;
 
     fn visit<F>(
@@ -107,7 +106,7 @@ pub trait FieldPairVisitorMut<Pb: PresenceBits, A: Allocator> {
 }
 
 /// Scalar / mutable visitor — generated `visit_fields_mut` (e.g. `Drop` / clear-all).
-pub trait FieldVisitorMut<Pb: PresenceBits, A: Allocator> {
+pub trait FieldVisitorMut<Pb, A: Allocator> {
     type Break;
 
     fn visit<F: FieldDeallocate<Pb, A>>(
@@ -122,12 +121,12 @@ pub trait FieldVisitorMut<Pb: PresenceBits, A: Allocator> {
 // ---------------------------------------------------------------------------
 
 /// [`FieldPairVisitor`] that breaks on the first unequal field.
-pub struct FieldEqVisitor<'a, Pb: PresenceBits, A: Allocator> {
+pub struct FieldEqVisitor<'a, Pb, A: Allocator> {
     common: &'a MessageCommon<Pb, A>,
     other_common: &'a MessageCommon<Pb, A>,
 }
 
-impl<'a, Pb: PresenceBits, A: Allocator> FieldEqVisitor<'a, Pb, A> {
+impl<'a, Pb, A: Allocator> FieldEqVisitor<'a, Pb, A> {
     #[inline]
     pub fn new(common: &'a MessageCommon<Pb, A>, other_common: &'a MessageCommon<Pb, A>) -> Self {
         Self {
@@ -137,7 +136,7 @@ impl<'a, Pb: PresenceBits, A: Allocator> FieldEqVisitor<'a, Pb, A> {
     }
 }
 
-impl<'a, Pb: PresenceBits, A: Allocator> FieldPairVisitor<Pb, A> for FieldEqVisitor<'a, Pb, A> {
+impl<'a, Pb, A: Allocator> FieldPairVisitor<Pb, A> for FieldEqVisitor<'a, Pb, A> {
     type Break = ();
 
     #[inline]
@@ -159,11 +158,11 @@ impl<'a, Pb: PresenceBits, A: Allocator> FieldPairVisitor<Pb, A> for FieldEqVisi
 ///
 /// Stores [`MessageCommon`] as a raw pointer so it can be built from
 /// `&message._common` before [`visit_fields_mut`] mutably borrows field slots.
-pub struct FieldDeallocVisitor<Pb: PresenceBits, A: Allocator> {
+pub struct FieldDeallocVisitor<Pb, A: Allocator> {
     common: *const MessageCommon<Pb, A>,
 }
 
-impl<Pb: PresenceBits, A: Allocator> FieldDeallocVisitor<Pb, A> {
+impl<Pb, A: Allocator> FieldDeallocVisitor<Pb, A> {
     /// Captures `common` for a subsequent mutable field walk.
     ///
     /// The pointed-to value must outlive the walk and must not be mutated for
@@ -184,7 +183,7 @@ impl<Pb: PresenceBits, A: Allocator> FieldDeallocVisitor<Pb, A> {
     }
 }
 
-impl<Pb: PresenceBits, A: Allocator> FieldVisitorMut<Pb, A> for FieldDeallocVisitor<Pb, A> {
+impl<Pb, A: Allocator> FieldVisitorMut<Pb, A> for FieldDeallocVisitor<Pb, A> {
     type Break = ();
 
     #[inline]
@@ -199,19 +198,19 @@ impl<Pb: PresenceBits, A: Allocator> FieldVisitorMut<Pb, A> for FieldDeallocVisi
 }
 
 /// Sums [`FieldEncode::encoded_len`].
-pub struct EncodedLenVisitor<'a, Pb: PresenceBits, A: Allocator> {
+pub struct EncodedLenVisitor<'a, Pb, A: Allocator> {
     common: &'a MessageCommon<Pb, A>,
     pub len: usize,
 }
 
-impl<'a, Pb: PresenceBits, A: Allocator> EncodedLenVisitor<'a, Pb, A> {
+impl<'a, Pb, A: Allocator> EncodedLenVisitor<'a, Pb, A> {
     #[inline]
     pub fn new(common: &'a MessageCommon<Pb, A>) -> Self {
         Self { common, len: 0 }
     }
 }
 
-impl<'a, Pb: PresenceBits, A: Allocator> FieldVisitor<Pb, A> for EncodedLenVisitor<'a, Pb, A> {
+impl<'a, Pb, A: Allocator> FieldVisitor<Pb, A> for EncodedLenVisitor<'a, Pb, A> {
     type Break = ();
 
     #[inline]
@@ -222,21 +221,19 @@ impl<'a, Pb: PresenceBits, A: Allocator> FieldVisitor<Pb, A> for EncodedLenVisit
 }
 
 /// Writes each field via [`FieldEncode::encode_raw`].
-pub struct EncodeRawVisitor<'a, B: BufMut, Pb: PresenceBits, A: Allocator> {
+pub struct EncodeRawVisitor<'a, B: BufMut, Pb, A: Allocator> {
     common: &'a MessageCommon<Pb, A>,
     pub buf: &'a mut B,
 }
 
-impl<'a, B: BufMut, Pb: PresenceBits, A: Allocator> EncodeRawVisitor<'a, B, Pb, A> {
+impl<'a, B: BufMut, Pb, A: Allocator> EncodeRawVisitor<'a, B, Pb, A> {
     #[inline]
     pub fn new(common: &'a MessageCommon<Pb, A>, buf: &'a mut B) -> Self {
         Self { common, buf }
     }
 }
 
-impl<'a, B: BufMut, Pb: PresenceBits, A: Allocator> FieldVisitor<Pb, A>
-    for EncodeRawVisitor<'a, B, Pb, A>
-{
+impl<'a, B: BufMut, Pb, A: Allocator> FieldVisitor<Pb, A> for EncodeRawVisitor<'a, B, Pb, A> {
     type Break = ();
 
     #[inline]
@@ -254,12 +251,12 @@ impl<'a, B: BufMut, Pb: PresenceBits, A: Allocator> FieldVisitor<Pb, A>
 ///
 /// Destination `MessageCommon` is stored as a raw pointer so the visitor can be
 /// built before mutably borrowing `dst`'s field slots.
-pub struct CloneFieldsVisitor<Pb: PresenceBits, A: Allocator> {
+pub struct CloneFieldsVisitor<Pb, A: Allocator> {
     src_common: *const MessageCommon<Pb, A>,
     dst_common: *const MessageCommon<Pb, A>,
 }
 
-impl<Pb: PresenceBits, A: Allocator> CloneFieldsVisitor<Pb, A> {
+impl<Pb, A: Allocator> CloneFieldsVisitor<Pb, A> {
     /// Captures source / destination commons for a clone-into walk.
     ///
     /// Both pointees must outlive the walk. Destination `MessageCommon` must
@@ -286,9 +283,7 @@ impl<Pb: PresenceBits, A: Allocator> CloneFieldsVisitor<Pb, A> {
     }
 }
 
-impl<Pb: PresenceBits, A: Allocator + Clone> FieldPairVisitorMut<Pb, A>
-    for CloneFieldsVisitor<Pb, A>
-{
+impl<Pb, A: Allocator + Clone> FieldPairVisitorMut<Pb, A> for CloneFieldsVisitor<Pb, A> {
     type Break = ();
 
     #[inline]
@@ -308,12 +303,12 @@ impl<Pb: PresenceBits, A: Allocator + Clone> FieldPairVisitorMut<Pb, A>
 ///
 /// Owns the [`DebugStruct`] so generated `Debug` can call [`finish`](Self::finish)
 /// without overlapping borrows.
-pub struct DebugStructVisitor<'a, 'b, 'c, Pb: PresenceBits, A: Allocator> {
+pub struct DebugStructVisitor<'a, 'b, 'c, Pb, A: Allocator> {
     ds: fmt::DebugStruct<'a, 'b>,
     common: &'c MessageCommon<Pb, A>,
 }
 
-impl<'a, 'b, 'c, Pb: PresenceBits, A: Allocator> DebugStructVisitor<'a, 'b, 'c, Pb, A> {
+impl<'a, 'b, 'c, Pb, A: Allocator> DebugStructVisitor<'a, 'b, 'c, Pb, A> {
     #[inline]
     pub fn new(ds: fmt::DebugStruct<'a, 'b>, common: &'c MessageCommon<Pb, A>) -> Self {
         Self { ds, common }
@@ -325,9 +320,7 @@ impl<'a, 'b, 'c, Pb: PresenceBits, A: Allocator> DebugStructVisitor<'a, 'b, 'c, 
     }
 }
 
-impl<'a, 'b, 'c, Pb: PresenceBits, A: Allocator> FieldVisitor<Pb, A>
-    for DebugStructVisitor<'a, 'b, 'c, Pb, A>
-{
+impl<'a, 'b, 'c, Pb, A: Allocator> FieldVisitor<Pb, A> for DebugStructVisitor<'a, 'b, 'c, Pb, A> {
     type Break = ();
 
     #[inline]
@@ -344,7 +337,7 @@ impl<'a, 'b, 'c, Pb: PresenceBits, A: Allocator> FieldVisitor<Pb, A>
     }
 }
 
-struct FieldDebugAdapter<'a, F, Pb: PresenceBits, A: Allocator> {
+struct FieldDebugAdapter<'a, F, Pb, A: Allocator> {
     field: &'a F,
     common: &'a MessageCommon<Pb, A>,
 }
@@ -352,7 +345,6 @@ struct FieldDebugAdapter<'a, F, Pb: PresenceBits, A: Allocator> {
 impl<'a, F, Pb, A> Debug for FieldDebugAdapter<'a, F, Pb, A>
 where
     F: FieldDebug<Pb, A>,
-    Pb: PresenceBits,
     A: Allocator,
 {
     #[inline]

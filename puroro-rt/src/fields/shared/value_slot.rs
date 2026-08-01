@@ -142,7 +142,7 @@ where
 {
     #[inline]
     fn get(self) -> Option<&'s T> {
-        if self.init.is_initialized(self.common) {
+        if self.init.is_initialized(|b| self.common.is_bit_set(b)) {
             // SAFETY: init bit set implies a live payload.
             Some(unsafe { self.slot.assume_init_ref() })
         } else {
@@ -183,9 +183,10 @@ where
 {
     #[inline]
     fn get_mut(self) -> &'a mut T {
-        if !self.init.is_initialized(self.common) {
+        if !self.init.is_initialized(|b| self.common.is_bit_set(b)) {
             self.slot.write(T::default_in(self.common.alloc.clone()));
-            self.init.set_initialized(self.common, true);
+            self.init
+                .set_initialized(|b, v| self.common.set_bit(b, v), true);
         }
         // SAFETY: just ensured the slot is initialized.
         unsafe { self.slot.assume_init_mut() }
@@ -193,25 +194,27 @@ where
 
     #[inline]
     fn set(self, value: T) {
-        if self.init.is_initialized(self.common) {
+        if self.init.is_initialized(|b| self.common.is_bit_set(b)) {
             // SAFETY: init bit set implies a live payload.
             let old = mem::replace(unsafe { self.slot.assume_init_mut() }, value);
             // SAFETY: `common.alloc` owns `old`'s buffer.
             unsafe { old.deallocate_in(self.common.alloc.clone()) };
         } else {
             self.slot.write(value);
-            self.init.set_initialized(self.common, true);
+            self.init
+                .set_initialized(|b, v| self.common.set_bit(b, v), true);
         }
     }
 
     #[inline]
     fn clear(self) {
-        if self.init.is_initialized(self.common) {
+        if self.init.is_initialized(|b| self.common.is_bit_set(b)) {
             // SAFETY: init bit set implies a live payload we now take ownership of.
             let old = unsafe { self.slot.assume_init_read() };
             // SAFETY: `common.alloc` owns `old`'s buffer.
             unsafe { old.deallocate_in(self.common.alloc.clone()) };
-            self.init.set_initialized(self.common, false);
+            self.init
+                .set_initialized(|b, v| self.common.set_bit(b, v), false);
         }
     }
 }

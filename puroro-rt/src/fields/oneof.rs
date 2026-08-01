@@ -40,8 +40,9 @@ use crate::fields::wire::singular_type::SingularType;
 /// [`FieldDeallocate::deallocate`](crate::FieldDeallocate::deallocate).
 ///
 /// `Pb` and `A` are trait parameters because the storage enum pins the message's
-/// presence bitfield type and allocator type.
-pub trait OneofDeallocate<Pb: PresenceBits, A: Allocator> {
+/// presence / common type and allocator type. Oneof teardown itself does not
+/// require [`PresenceBits`] — only allocator access.
+pub trait OneofDeallocate<Pb, A: Allocator> {
     /// Drops the active variant and frees its storage through `common`.
     ///
     /// # Safety
@@ -51,6 +52,9 @@ pub trait OneofDeallocate<Pb: PresenceBits, A: Allocator> {
 }
 
 /// Wire encode behaviour for a generated oneof storage enum variant.
+///
+/// Methods keep a [`PresenceBits`] bound because a variant may be a bit-packed
+/// `bool` whose value lives in the message bitfield.
 pub trait OneofEncodable<A: Allocator> {
     /// Wire byte length of this active variant.
     fn encoded_len<Pb: PresenceBits>(&self, common: &MessageCommon<Pb, A>) -> usize;
@@ -134,7 +138,7 @@ impl<E> OneofSlot<E> {
 
     /// Binds this slot to `common` for read access.
     #[inline]
-    pub fn bind<'a, Pb: PresenceBits, A: Allocator + Clone>(
+    pub fn bind<'a, Pb, A: Allocator + Clone>(
         &'a self,
         common: &'a MessageCommon<Pb, A>,
     ) -> OneofSlotRef<'a, E, Pb, A> {
@@ -143,7 +147,7 @@ impl<E> OneofSlot<E> {
 
     /// Binds this slot to `common` for mutation.
     #[inline]
-    pub fn bind_mut<'f, 'c, Pb: PresenceBits, A: Allocator + Clone>(
+    pub fn bind_mut<'f, 'c, Pb, A: Allocator + Clone>(
         &'f mut self,
         common: &'c mut MessageCommon<Pb, A>,
     ) -> OneofSlotMut<'f, 'c, E, Pb, A> {
@@ -151,7 +155,7 @@ impl<E> OneofSlot<E> {
     }
 }
 
-impl<E, Pb: PresenceBits, A: Allocator> FieldDeallocate<Pb, A> for OneofSlot<E>
+impl<E, Pb, A: Allocator> FieldDeallocate<Pb, A> for OneofSlot<E>
 where
     E: OneofDeallocate<Pb, A>,
 {
@@ -182,12 +186,12 @@ impl<E> Default for OneofSlot<E> {
 /// (or hold the same pair of references) so `notification()`-style accessors
 /// always return a handle, including when the group is unset. Per-variant
 /// getters go through [`variant_of`](Self::variant_of).
-pub struct OneofSlotRef<'a, E, Pb: PresenceBits, A: Allocator> {
+pub struct OneofSlotRef<'a, E, Pb, A: Allocator> {
     slot: &'a OneofSlot<E>,
     common: &'a MessageCommon<Pb, A>,
 }
 
-impl<'a, E, Pb: PresenceBits, A: Allocator> OneofSlotRef<'a, E, Pb, A> {
+impl<'a, E, Pb, A: Allocator> OneofSlotRef<'a, E, Pb, A> {
     #[inline]
     fn new(slot: &'a OneofSlot<E>, common: &'a MessageCommon<Pb, A>) -> Self {
         Self { slot, common }
@@ -233,12 +237,12 @@ impl<'a, E, Pb: PresenceBits, A: Allocator> OneofSlotRef<'a, E, Pb, A> {
 /// consistently (via [`OneofDeallocate`]). A oneof has no presence bit, so the view
 /// carries only `common` (for the allocator). Every method consumes the view, so
 /// a fresh `bind_mut` precedes each mutation.
-pub struct OneofSlotMut<'f, 'c, E, Pb: PresenceBits, A: Allocator> {
+pub struct OneofSlotMut<'f, 'c, E, Pb, A: Allocator> {
     slot: &'f mut OneofSlot<E>,
     common: &'c mut MessageCommon<Pb, A>,
 }
 
-impl<'f, 'c, E, Pb: PresenceBits, A: Allocator> OneofSlotMut<'f, 'c, E, Pb, A> {
+impl<'f, 'c, E, Pb, A: Allocator> OneofSlotMut<'f, 'c, E, Pb, A> {
     #[inline]
     fn new(slot: &'f mut OneofSlot<E>, common: &'c mut MessageCommon<Pb, A>) -> Self {
         Self { slot, common }
@@ -338,7 +342,6 @@ impl<E: PartialEq> PartialEq for OneofSlot<E> {
 impl<E, Pb, A> FieldPartialEq<Pb, A> for OneofSlot<E>
 where
     E: OneofGroup<Presence = Pb, Alloc = A>,
-    Pb: PresenceBits,
     A: Allocator + Clone,
 {
     #[inline]
@@ -359,7 +362,6 @@ where
 impl<E, Pb, A> FieldDebug<Pb, A> for OneofSlot<E>
 where
     E: OneofGroup<Presence = Pb, Alloc = A>,
-    Pb: PresenceBits,
     A: Allocator + Clone,
     E::Case: Debug,
 {
@@ -390,7 +392,6 @@ where
 impl<E, Pb, A> FieldCloneIn<Pb, A> for OneofSlot<E>
 where
     E: OneofGroup<Presence = Pb, Alloc = A>,
-    Pb: PresenceBits,
     A: Allocator + Clone,
 {
     fn clone_field(&self, common: &MessageCommon<Pb, A>, alloc: A) -> Self {
@@ -412,12 +413,12 @@ where
 /// when this handle is empty, the returned [`Optional`](::puroro::Optional) is
 /// unset and `get()` yields `D::DEFAULT` (proto custom default or type zero)
 /// without activating the variant — matching official const oneof getters.
-pub struct OneofVariantRef<'a, F, Pb: PresenceBits, A: Allocator> {
+pub struct OneofVariantRef<'a, F, Pb, A: Allocator> {
     field: Option<&'a F>,
     common: &'a MessageCommon<Pb, A>,
 }
 
-impl<'a, F, Pb: PresenceBits, A: Allocator> OneofVariantRef<'a, F, Pb, A> {
+impl<'a, F, Pb, A: Allocator> OneofVariantRef<'a, F, Pb, A> {
     #[inline]
     pub fn new(field: Option<&'a F>, common: &'a MessageCommon<Pb, A>) -> Self {
         Self { field, common }
@@ -495,8 +496,8 @@ where
     where
         Self: 'a;
 
-    /// Per-message presence bitfield type.
-    type Presence: PresenceBits;
+    /// Per-message presence / common bitfield type (may be unused by the group).
+    type Presence;
 
     /// Message allocator type.
     type Alloc: Allocator + Clone;

@@ -358,9 +358,7 @@ fn render_module_body(oneof: &OneofEmit) -> Result<TokenStream> {
             }
         }
 
-        impl<A: Allocator + ::core::clone::Clone, Pb: PresenceBits> OneofDeallocate<Pb, A>
-            for #storage_name<A>
-        {
+        impl<A: Allocator + ::core::clone::Clone, Pb> OneofDeallocate<Pb, A> for #storage_name<A> {
             unsafe fn deallocate(self, common: &MessageCommon<Pb, A>) {
                 match self {
                     #(#dealloc_arms)*

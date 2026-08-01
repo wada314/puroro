@@ -321,7 +321,7 @@ impl<A: Allocator + Clone> OneofEncodable<A> for NotificationStorage<A> {
     }
 }
 
-impl<A: Allocator + Clone, Pb: PresenceBits> OneofDeallocate<Pb, A> for NotificationStorage<A> {
+impl<A: Allocator + Clone, Pb> OneofDeallocate<Pb, A> for NotificationStorage<A> {
     /// # Safety
     ///
     /// `common.alloc` must be the allocator that owns the variant's buffer.
