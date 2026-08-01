@@ -16,7 +16,7 @@ use ::puroro::{DecodeError, WireType};
 use ::unmanaged::DeallocateIn;
 
 use super::{
-    DefaultIn, MessageCommon, PresenceBits,
+    DefaultIn, MessageCommon, MessageCommonBits,
     slot_init::SlotInitMut,
     value_slot::{AddressableSlot, ValueSlot, ValueSlotMutAccess},
 };
@@ -31,12 +31,13 @@ pub trait ValueLayout<T: SingularType, A: Allocator + Clone>: Copy
 where
     T::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
 {
-    fn is_proto_empty<Pb: PresenceBits>(slot: &T::Slot<A>, common: &MessageCommon<Pb, A>) -> bool;
+    fn is_proto_empty<Pb>(slot: &T::Slot<A>, common: &MessageCommon<Pb, A>) -> bool
+    where
+        MessageCommon<Pb, A>: MessageCommonBits;
 
-    fn get<'a, Pb: PresenceBits>(
-        slot: &'a T::Slot<A>,
-        common: &'a MessageCommon<Pb, A>,
-    ) -> T::View<'a, A>;
+    fn get<'a, Pb>(slot: &'a T::Slot<A>, common: &'a MessageCommon<Pb, A>) -> T::View<'a, A>
+    where
+        MessageCommon<Pb, A>: MessageCommonBits;
 
     fn with_mut<'a, VS, I, Pb>(
         slot: &'a mut VS,
@@ -46,7 +47,7 @@ where
     where
         VS: ValueSlot<T::Slot<A>, A>,
         I: SlotInitMut,
-        Pb: PresenceBits,
+        MessageCommon<Pb, A>: MessageCommonBits,
         T: 'a,
         A: 'a;
 
@@ -58,13 +59,13 @@ where
     ) where
         VS: ValueSlot<T::Slot<A>, A>,
         I: SlotInitMut,
-        Pb: PresenceBits;
+        MessageCommon<Pb, A>: MessageCommonBits;
 
     fn clear<VS, I, Pb>(slot: &mut VS, init: I, common: &mut MessageCommon<Pb, A>)
     where
         VS: ValueSlot<T::Slot<A>, A>,
         I: SlotInitMut,
-        Pb: PresenceBits;
+        MessageCommon<Pb, A>: MessageCommonBits;
 
     fn merge<VS, I, Pb, B>(
         slot: &mut VS,
@@ -78,7 +79,7 @@ where
     where
         VS: ValueSlot<T::Slot<A>, A>,
         I: SlotInitMut,
-        Pb: PresenceBits,
+        MessageCommon<Pb, A>: MessageCommonBits,
         B: Buf;
 }
 
@@ -91,15 +92,18 @@ where
     T::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
 {
     #[inline]
-    fn is_proto_empty<Pb: PresenceBits>(slot: &T::Slot<A>, common: &MessageCommon<Pb, A>) -> bool {
+    fn is_proto_empty<Pb>(slot: &T::Slot<A>, common: &MessageCommon<Pb, A>) -> bool
+    where
+        MessageCommon<Pb, A>: MessageCommonBits,
+    {
         T::is_proto_empty(slot, common)
     }
 
     #[inline]
-    fn get<'a, Pb: PresenceBits>(
-        slot: &'a T::Slot<A>,
-        common: &'a MessageCommon<Pb, A>,
-    ) -> T::View<'a, A> {
+    fn get<'a, Pb>(slot: &'a T::Slot<A>, common: &'a MessageCommon<Pb, A>) -> T::View<'a, A>
+    where
+        MessageCommon<Pb, A>: MessageCommonBits,
+    {
         T::get(slot, common)
     }
 
@@ -112,7 +116,7 @@ where
     where
         VS: ValueSlot<T::Slot<A>, A>,
         I: SlotInitMut,
-        Pb: PresenceBits,
+        MessageCommon<Pb, A>: MessageCommonBits,
         T: 'a,
         A: 'a,
     {
@@ -128,7 +132,7 @@ where
     ) where
         VS: ValueSlot<T::Slot<A>, A>,
         I: SlotInitMut,
-        Pb: PresenceBits,
+        MessageCommon<Pb, A>: MessageCommonBits,
     {
         T::write(slot, init, common, value);
     }
@@ -138,7 +142,7 @@ where
     where
         VS: ValueSlot<T::Slot<A>, A>,
         I: SlotInitMut,
-        Pb: PresenceBits,
+        MessageCommon<Pb, A>: MessageCommonBits,
     {
         T::clear(slot, init, common);
     }
@@ -156,7 +160,7 @@ where
     where
         VS: ValueSlot<T::Slot<A>, A>,
         I: SlotInitMut,
-        Pb: PresenceBits,
+        MessageCommon<Pb, A>: MessageCommonBits,
         B: Buf,
     {
         T::merge(slot, init, common, wire_type, buf, field, depth)
@@ -175,12 +179,18 @@ where
     (): AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
 {
     #[inline]
-    fn is_proto_empty<Pb: PresenceBits>(_slot: &(), common: &MessageCommon<Pb, A>) -> bool {
+    fn is_proto_empty<Pb>(_slot: &(), common: &MessageCommon<Pb, A>) -> bool
+    where
+        MessageCommon<Pb, A>: MessageCommonBits,
+    {
         !common.is_bit_set(VALUE_BIT)
     }
 
     #[inline]
-    fn get<'a, Pb: PresenceBits>(_slot: &'a (), common: &'a MessageCommon<Pb, A>) -> bool {
+    fn get<'a, Pb>(_slot: &'a (), common: &'a MessageCommon<Pb, A>) -> bool
+    where
+        MessageCommon<Pb, A>: MessageCommonBits,
+    {
         common.is_bit_set(VALUE_BIT)
     }
 
@@ -193,7 +203,7 @@ where
     where
         VS: ValueSlot<(), A>,
         I: SlotInitMut,
-        Pb: PresenceBits,
+        MessageCommon<Pb, A>: MessageCommonBits,
         ProtoBool: 'a,
         A: 'a,
     {
@@ -206,7 +216,7 @@ where
     where
         VS: ValueSlot<(), A>,
         I: SlotInitMut,
-        Pb: PresenceBits,
+        MessageCommon<Pb, A>: MessageCommonBits,
     {
         let _ = ValueSlot::with_mut(slot, init, common).get_mut();
         common.set_bit(VALUE_BIT, value);
@@ -217,7 +227,7 @@ where
     where
         VS: ValueSlot<(), A>,
         I: SlotInitMut,
-        Pb: PresenceBits,
+        MessageCommon<Pb, A>: MessageCommonBits,
     {
         common.set_bit(VALUE_BIT, false);
         ValueSlot::with_mut(slot, init, common).clear();
@@ -236,7 +246,7 @@ where
     where
         VS: ValueSlot<(), A>,
         I: SlotInitMut,
-        Pb: PresenceBits,
+        MessageCommon<Pb, A>: MessageCommonBits,
         B: Buf,
     {
         match ProtoBool::from_wire_body(VarintPayload::decode(wire_type, buf)?) {

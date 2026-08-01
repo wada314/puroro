@@ -21,7 +21,7 @@ use ::allocator_api2::alloc::Allocator;
 use ::unmanaged::{CloneIn, DeallocateIn};
 
 use super::{
-    DefaultIn, MessageCommon, PresenceBits,
+    DefaultIn, MessageCommon, MessageCommonBits,
     slot_init::{SlotInitMut, SlotInitView},
 };
 
@@ -70,18 +70,22 @@ where
         T: CloneIn<A>;
 
     /// Pairs this slot with an init marker and message common for read access.
-    fn with<'s, I: SlotInitView, Pb: PresenceBits>(
+    fn with<'s, I: SlotInitView, Pb>(
         &'s self,
         init: I,
         common: &'s MessageCommon<Pb, A>,
-    ) -> impl ValueSlotRefAccess<'s, T>;
+    ) -> impl ValueSlotRefAccess<'s, T>
+    where
+        MessageCommon<Pb, A>: MessageCommonBits;
 
     /// Pairs this slot with an init marker and message common for mutation.
-    fn with_mut<'a, I: SlotInitMut, Pb: PresenceBits>(
+    fn with_mut<'a, I: SlotInitMut, Pb>(
         &'a mut self,
         init: I,
         common: &'a mut MessageCommon<Pb, A>,
-    ) -> impl ValueSlotMutAccess<'a, T, A>;
+    ) -> impl ValueSlotMutAccess<'a, T, A>
+    where
+        MessageCommon<Pb, A>: MessageCommonBits;
 }
 
 /// Read ops on a value-slot view whose physical payload type is `T`.
@@ -109,7 +113,7 @@ pub trait ValueSlotMutAccess<'a, T, A: Allocator + Clone> {
 // ---------------------------------------------------------------------------
 
 /// Short-lived read view of an addressable value slot.
-pub struct ValueSlotRef<'s, S: ?Sized, T, I: SlotInitView, Pb: PresenceBits, A: Allocator> {
+pub struct ValueSlotRef<'s, S: ?Sized, T, I: SlotInitView, Pb, A: Allocator> {
     slot: &'s S,
     init: I,
     common: &'s MessageCommon<Pb, A>,
@@ -117,14 +121,14 @@ pub struct ValueSlotRef<'s, S: ?Sized, T, I: SlotInitView, Pb: PresenceBits, A: 
 }
 
 /// Short-lived mutation view of an addressable value slot.
-pub struct ValueSlotMut<'a, S: ?Sized, T, I: SlotInitMut, Pb: PresenceBits, A: Allocator> {
+pub struct ValueSlotMut<'a, S: ?Sized, T, I: SlotInitMut, Pb, A: Allocator> {
     slot: &'a mut S,
     init: I,
     common: &'a mut MessageCommon<Pb, A>,
     _t: PhantomData<T>,
 }
 
-impl<'s, T, I: SlotInitView, Pb: PresenceBits, A: Allocator> ValueSlotRefAccess<'s, T>
+impl<'s, T, I: SlotInitView, Pb, A: Allocator> ValueSlotRefAccess<'s, T>
     for ValueSlotRef<'s, T, T, I, Pb, A>
 where
     T: AddressableSlot,
@@ -135,10 +139,11 @@ where
     }
 }
 
-impl<'s, T, I: SlotInitView, Pb: PresenceBits, A: Allocator> ValueSlotRefAccess<'s, T>
+impl<'s, T, I: SlotInitView, Pb, A: Allocator> ValueSlotRefAccess<'s, T>
     for ValueSlotRef<'s, MaybeUninit<T>, T, I, Pb, A>
 where
     T: AddressableSlot,
+    MessageCommon<Pb, A>: MessageCommonBits,
 {
     #[inline]
     fn get(self) -> Option<&'s T> {
@@ -151,7 +156,7 @@ where
     }
 }
 
-impl<'a, T, I: SlotInitMut, Pb: PresenceBits, A: Allocator + Clone> ValueSlotMutAccess<'a, T, A>
+impl<'a, T, I: SlotInitMut, Pb, A: Allocator + Clone> ValueSlotMutAccess<'a, T, A>
     for ValueSlotMut<'a, T, T, I, Pb, A>
 where
     T: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
@@ -176,10 +181,11 @@ where
     }
 }
 
-impl<'a, T, I: SlotInitMut, Pb: PresenceBits, A: Allocator + Clone> ValueSlotMutAccess<'a, T, A>
+impl<'a, T, I: SlotInitMut, Pb, A: Allocator + Clone> ValueSlotMutAccess<'a, T, A>
     for ValueSlotMut<'a, MaybeUninit<T>, T, I, Pb, A>
 where
     T: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
+    MessageCommon<Pb, A>: MessageCommonBits,
 {
     #[inline]
     fn get_mut(self) -> &'a mut T {
@@ -242,11 +248,14 @@ where
     }
 
     #[inline]
-    fn with<'s, I: SlotInitView, Pb: PresenceBits>(
+    fn with<'s, I: SlotInitView, Pb>(
         &'s self,
         init: I,
         common: &'s MessageCommon<Pb, A>,
-    ) -> impl ValueSlotRefAccess<'s, T> {
+    ) -> impl ValueSlotRefAccess<'s, T>
+    where
+        MessageCommon<Pb, A>: MessageCommonBits,
+    {
         ValueSlotRef {
             slot: self,
             init,
@@ -256,11 +265,14 @@ where
     }
 
     #[inline]
-    fn with_mut<'a, I: SlotInitMut, Pb: PresenceBits>(
+    fn with_mut<'a, I: SlotInitMut, Pb>(
         &'a mut self,
         init: I,
         common: &'a mut MessageCommon<Pb, A>,
-    ) -> impl ValueSlotMutAccess<'a, T, A> {
+    ) -> impl ValueSlotMutAccess<'a, T, A>
+    where
+        MessageCommon<Pb, A>: MessageCommonBits,
+    {
         ValueSlotMut {
             slot: self,
             init,
@@ -302,11 +314,14 @@ where
     }
 
     #[inline]
-    fn with<'s, I: SlotInitView, Pb: PresenceBits>(
+    fn with<'s, I: SlotInitView, Pb>(
         &'s self,
         init: I,
         common: &'s MessageCommon<Pb, A>,
-    ) -> impl ValueSlotRefAccess<'s, T> {
+    ) -> impl ValueSlotRefAccess<'s, T>
+    where
+        MessageCommon<Pb, A>: MessageCommonBits,
+    {
         ValueSlotRef {
             slot: self,
             init,
@@ -316,11 +331,14 @@ where
     }
 
     #[inline]
-    fn with_mut<'a, I: SlotInitMut, Pb: PresenceBits>(
+    fn with_mut<'a, I: SlotInitMut, Pb>(
         &'a mut self,
         init: I,
         common: &'a mut MessageCommon<Pb, A>,
-    ) -> impl ValueSlotMutAccess<'a, T, A> {
+    ) -> impl ValueSlotMutAccess<'a, T, A>
+    where
+        MessageCommon<Pb, A>: MessageCommonBits,
+    {
         ValueSlotMut {
             slot: self,
             init,
@@ -330,7 +348,7 @@ where
     }
 }
 
-impl<'s, T, I: SlotInitView, Pb: PresenceBits, A: Allocator> ValueSlotRefAccess<'s, T>
+impl<'s, T, I: SlotInitView, Pb, A: Allocator> ValueSlotRefAccess<'s, T>
     for ValueSlotRef<'s, Option<T>, T, I, Pb, A>
 where
     T: AddressableSlot,
@@ -341,7 +359,7 @@ where
     }
 }
 
-impl<'a, T, I: SlotInitMut, Pb: PresenceBits, A: Allocator + Clone> ValueSlotMutAccess<'a, T, A>
+impl<'a, T, I: SlotInitMut, Pb, A: Allocator + Clone> ValueSlotMutAccess<'a, T, A>
     for ValueSlotMut<'a, Option<T>, T, I, Pb, A>
 where
     T: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
@@ -394,11 +412,14 @@ where
     }
 
     #[inline]
-    fn with<'s, I: SlotInitView, Pb: PresenceBits>(
+    fn with<'s, I: SlotInitView, Pb>(
         &'s self,
         init: I,
         common: &'s MessageCommon<Pb, A>,
-    ) -> impl ValueSlotRefAccess<'s, T> {
+    ) -> impl ValueSlotRefAccess<'s, T>
+    where
+        MessageCommon<Pb, A>: MessageCommonBits,
+    {
         ValueSlotRef {
             slot: self,
             init,
@@ -408,11 +429,14 @@ where
     }
 
     #[inline]
-    fn with_mut<'a, I: SlotInitMut, Pb: PresenceBits>(
+    fn with_mut<'a, I: SlotInitMut, Pb>(
         &'a mut self,
         init: I,
         common: &'a mut MessageCommon<Pb, A>,
-    ) -> impl ValueSlotMutAccess<'a, T, A> {
+    ) -> impl ValueSlotMutAccess<'a, T, A>
+    where
+        MessageCommon<Pb, A>: MessageCommonBits,
+    {
         ValueSlotMut {
             slot: self,
             init,

@@ -31,7 +31,7 @@ use ::unmanaged::{CloneIn, DeallocateIn};
 use crate::fields::shared::FieldDeallocate;
 use crate::fields::shared::field_inspect::{FieldCloneIn, FieldDebug, FieldEncode, FieldPartialEq};
 use crate::fields::shared::{
-    DefaultIn, MessageCommon, PresenceBits,
+    DefaultIn, MessageCommon, MessageCommonAlloc, MessageCommonBits,
     field_presence::{
         Explicit, FieldPresence, Implicit, LegacyRequired, Message, Oneof, RequiredFieldPresence,
     },
@@ -122,7 +122,7 @@ where
 
     /// Binds this field to `common` for read access.
     #[inline]
-    pub fn bind<'a, Pb: PresenceBits>(
+    pub fn bind<'a, Pb>(
         &'a self,
         common: &'a MessageCommon<Pb, A>,
     ) -> SingularFieldRef<'a, T, P, FIELD, A, L, D, Pb> {
@@ -131,7 +131,7 @@ where
 
     /// Binds this field to `common` for mutation.
     #[inline]
-    pub fn bind_mut<'f, 'c, Pb: PresenceBits>(
+    pub fn bind_mut<'f, 'c, Pb>(
         &'f mut self,
         common: &'c mut MessageCommon<Pb, A>,
     ) -> SingularFieldMut<'f, 'c, T, P, FIELD, A, L, D, Pb> {
@@ -142,7 +142,7 @@ where
 /// Always-initialized presence policies do not read the bitfield.
 macro_rules! impl_singular_deallocate_always {
     ($presence:ty) => {
-        impl<T, const FIELD: u32, A, L, D, Pb> FieldDeallocate<Pb, A>
+        impl<T, const FIELD: u32, A, L, D, P> FieldDeallocate<MessageCommon<P, A>>
             for SingularField<T, $presence, FIELD, A, L, D>
         where
             T: SingularType,
@@ -152,7 +152,7 @@ macro_rules! impl_singular_deallocate_always {
             <$presence as FieldPresence>::ValueSlot<T::Slot<A>>: ValueSlot<T::Slot<A>, A>,
         {
             #[inline]
-            fn deallocate(&mut self, common: &MessageCommon<Pb, A>) {
+            fn deallocate(&mut self, common: &MessageCommon<P, A>) {
                 let alloc = common.alloc.clone();
                 let slot = unsafe { ManuallyDrop::take(&mut self.value) };
                 ValueSlot::deallocate_in(slot, true, alloc);
@@ -168,18 +168,18 @@ impl_singular_deallocate_always!(Message);
 /// Bit-tracked presence policies consult the init bit via a probe.
 macro_rules! impl_singular_deallocate_bit {
     ($presence:ty) => {
-        impl<T, const BIT: usize, const FIELD: u32, A, L, D, Pb> FieldDeallocate<Pb, A>
+        impl<T, const BIT: usize, const FIELD: u32, A, L, D, P> FieldDeallocate<MessageCommon<P, A>>
             for SingularField<T, $presence, FIELD, A, L, D>
         where
             T: SingularType,
             A: Allocator + Clone,
             L: ValueLayout<T, A>,
-            Pb: PresenceBits,
+            MessageCommon<P, A>: MessageCommonBits,
             T::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
             <$presence as FieldPresence>::ValueSlot<T::Slot<A>>: ValueSlot<T::Slot<A>, A>,
         {
             #[inline]
-            fn deallocate(&mut self, common: &MessageCommon<Pb, A>) {
+            fn deallocate(&mut self, common: &MessageCommon<P, A>) {
                 let init = <$presence as FieldPresence>::slot_init_view();
                 let initialized = init.is_initialized(|b| common.is_bit_set(b));
                 let alloc = common.alloc.clone();
@@ -203,10 +203,10 @@ where
 {
     /// Low-level borrow of the always-initialized slot's logical value.
     #[inline]
-    pub fn value<'a, Pb: PresenceBits>(
-        &'a self,
-        common: &'a MessageCommon<Pb, A>,
-    ) -> T::View<'a, A> {
+    pub fn value<'a, Pb>(&'a self, common: &'a MessageCommon<Pb, A>) -> T::View<'a, A>
+    where
+        MessageCommon<Pb, A>: MessageCommonBits,
+    {
         let slot = self
             .value
             .with(AlwaysInitialized, common)
@@ -226,10 +226,10 @@ where
 {
     /// Low-level borrow of the always-initialized oneof-variant slot's logical value.
     #[inline]
-    pub fn value<'a, Pb: PresenceBits>(
-        &'a self,
-        common: &'a MessageCommon<Pb, A>,
-    ) -> T::View<'a, A> {
+    pub fn value<'a, Pb>(&'a self, common: &'a MessageCommon<Pb, A>) -> T::View<'a, A>
+    where
+        MessageCommon<Pb, A>: MessageCommonBits,
+    {
         let slot = self
             .value
             .with(AlwaysInitialized, common)
@@ -239,10 +239,10 @@ where
     }
 
     /// Mutable accessor for a oneof variant (slot is always initialized).
-    pub fn value_mut<'a, Pb: PresenceBits>(
-        &'a mut self,
-        common: &'a mut MessageCommon<Pb, A>,
-    ) -> T::Mut<'a, A> {
+    pub fn value_mut<'a, Pb>(&'a mut self, common: &'a mut MessageCommon<Pb, A>) -> T::Mut<'a, A>
+    where
+        MessageCommon<Pb, A>: MessageCommonBits,
+    {
         L::with_mut(&mut *self.value, AlwaysInitialized, common)
     }
 }
@@ -288,7 +288,7 @@ where
 {
     pub fn validate_required<Pb>(&self, common: &MessageCommon<Pb, A>) -> Result<(), DecodeError>
     where
-        Pb: PresenceBits,
+        MessageCommon<Pb, A>: MessageCommonBits,
     {
         LegacyRequired::<BIT>::validate_present(common, FIELD, || {
             let init = <LegacyRequired<BIT> as FieldPresence>::slot_init_view();
@@ -314,7 +314,7 @@ pub struct SingularFieldRef<
     A: Allocator + Clone,
     L: ValueLayout<T, A>,
     D,
-    Pb: PresenceBits,
+    Pb,
 > where
     T::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
     P::ValueSlot<T::Slot<A>>: ValueSlot<T::Slot<A>, A>,
@@ -329,7 +329,6 @@ where
     P: FieldPresence,
     A: Allocator + Clone,
     L: ValueLayout<T, A>,
-    Pb: PresenceBits,
     T::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
     P::ValueSlot<T::Slot<A>>: ValueSlot<T::Slot<A>, A>,
 {
@@ -340,7 +339,18 @@ where
     ) -> Self {
         Self { field, common }
     }
+}
 
+impl<'a, T, P, const FIELD: u32, A, L, D, Pb> SingularFieldRef<'a, T, P, FIELD, A, L, D, Pb>
+where
+    T: SingularType,
+    P: FieldPresence,
+    A: Allocator + Clone,
+    L: ValueLayout<T, A>,
+    MessageCommon<Pb, A>: MessageCommonBits,
+    T::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
+    P::ValueSlot<T::Slot<A>>: ValueSlot<T::Slot<A>, A>,
+{
     /// Returns the logical value when the field is present.
     pub fn get(self) -> Option<T::View<'a, A>> {
         if P::is_set(self.common, || {
@@ -373,7 +383,7 @@ where
     P: FieldPresence,
     A: Allocator + Clone,
     L: ValueLayout<T, A>,
-    Pb: PresenceBits,
+    MessageCommon<Pb, A>: MessageCommonBits,
     T::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
     P::ValueSlot<T::Slot<A>>: ValueSlot<T::Slot<A>, A>,
     T::View<'a, A>: Copy,
@@ -389,7 +399,7 @@ where
     T: SingularType,
     A: Allocator + Clone,
     L: ValueLayout<T, A>,
-    Pb: PresenceBits,
+    MessageCommon<Pb, A>: MessageCommonBits,
     T::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
     <Implicit as FieldPresence>::ValueSlot<T::Slot<A>>: ValueSlot<T::Slot<A>, A>,
 {
@@ -404,7 +414,7 @@ where
     T: SingularType,
     A: Allocator + Clone,
     L: ValueLayout<T, A>,
-    Pb: PresenceBits,
+    MessageCommon<Pb, A>: MessageCommonBits,
     T::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
     <Oneof as FieldPresence>::ValueSlot<T::Slot<A>>: ValueSlot<T::Slot<A>, A>,
 {
@@ -429,7 +439,7 @@ pub struct SingularFieldMut<
     A: Allocator + Clone,
     L: ValueLayout<T, A>,
     D,
-    Pb: PresenceBits,
+    Pb,
 > where
     T::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
     P::ValueSlot<T::Slot<A>>: ValueSlot<T::Slot<A>, A>,
@@ -444,7 +454,6 @@ where
     P: FieldPresence,
     A: Allocator + Clone,
     L: ValueLayout<T, A>,
-    Pb: PresenceBits,
     T::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
     P::ValueSlot<T::Slot<A>>: ValueSlot<T::Slot<A>, A>,
 {
@@ -455,7 +464,18 @@ where
     ) -> Self {
         Self { field, common }
     }
+}
 
+impl<'f, 'c, T, P, const FIELD: u32, A, L, D, Pb> SingularFieldMut<'f, 'c, T, P, FIELD, A, L, D, Pb>
+where
+    T: SingularType,
+    P: FieldPresence,
+    A: Allocator + Clone,
+    L: ValueLayout<T, A>,
+    MessageCommon<Pb, A>: MessageCommonBits,
+    T::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
+    P::ValueSlot<T::Slot<A>>: ValueSlot<T::Slot<A>, A>,
+{
     /// Returns a mutable accessor, lazy-initializing the slot when needed.
     #[inline]
     pub fn value_mut(self) -> T::Mut<'f, A>
@@ -506,14 +526,14 @@ where
 // FieldPartialEq / FieldDebug / FieldEncode / FieldCloneIn (message field visitors)
 // ---------------------------------------------------------------------------
 
-impl<T, P, const FIELD: u32, A, L, D, Pb> FieldPartialEq<Pb, A>
+impl<T, P, const FIELD: u32, A, L, D, Pb> FieldPartialEq<MessageCommon<Pb, A>>
     for SingularField<T, P, FIELD, A, L, D>
 where
     T: SingularType + ProtoRefEq<A>,
     P: FieldPresence,
     A: Allocator + Clone,
     L: ValueLayout<T, A>,
-    Pb: PresenceBits,
+    MessageCommon<Pb, A>: MessageCommonBits,
     T::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
     P::ValueSlot<T::Slot<A>>: ValueSlot<T::Slot<A>, A>,
 {
@@ -529,13 +549,14 @@ where
     }
 }
 
-impl<T, P, const FIELD: u32, A, L, D, Pb> FieldEncode<Pb, A> for SingularField<T, P, FIELD, A, L, D>
+impl<T, P, const FIELD: u32, A, L, D, Pb> FieldEncode<MessageCommon<Pb, A>>
+    for SingularField<T, P, FIELD, A, L, D>
 where
     T: SingularType,
     P: FieldPresence,
     A: Allocator + Clone,
     L: ValueLayout<T, A>,
-    Pb: PresenceBits,
+    MessageCommon<Pb, A>: MessageCommonBits + MessageCommonAlloc,
     T::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
     P::ValueSlot<T::Slot<A>>: ValueSlot<T::Slot<A>, A>,
 {
@@ -580,7 +601,7 @@ where
 
 macro_rules! impl_singular_clone_always {
     ($presence:ty) => {
-        impl<T, const FIELD: u32, A, L, D, Pb> FieldCloneIn<Pb, A>
+        impl<T, const FIELD: u32, A, L, D, P> FieldCloneIn<MessageCommon<P, A>>
             for SingularField<T, $presence, FIELD, A, L, D>
         where
             T: SingularType,
@@ -589,7 +610,7 @@ macro_rules! impl_singular_clone_always {
             T::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateIn<A> + CloneIn<A>,
             <$presence as FieldPresence>::ValueSlot<T::Slot<A>>: ValueSlot<T::Slot<A>, A>,
         {
-            fn clone_field(&self, _common: &MessageCommon<Pb, A>, alloc: A) -> Self {
+            fn clone_field(&self, _common: &MessageCommon<P, A>, alloc: A) -> Self {
                 Self {
                     value: ManuallyDrop::new(ValueSlot::clone_in(&*self.value, true, alloc)),
                     _marker: PhantomData,
@@ -605,17 +626,17 @@ impl_singular_clone_always!(Message);
 
 macro_rules! impl_singular_clone_bit {
     ($presence:ty) => {
-        impl<T, const BIT: usize, const FIELD: u32, A, L, D, Pb> FieldCloneIn<Pb, A>
+        impl<T, const BIT: usize, const FIELD: u32, A, L, D, P> FieldCloneIn<MessageCommon<P, A>>
             for SingularField<T, $presence, FIELD, A, L, D>
         where
             T: SingularType,
             A: Allocator + Clone,
             L: ValueLayout<T, A>,
-            Pb: PresenceBits,
+            MessageCommon<P, A>: MessageCommonBits,
             T::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateIn<A> + CloneIn<A>,
             <$presence as FieldPresence>::ValueSlot<T::Slot<A>>: ValueSlot<T::Slot<A>, A>,
         {
-            fn clone_field(&self, common: &MessageCommon<Pb, A>, alloc: A) -> Self {
+            fn clone_field(&self, common: &MessageCommon<P, A>, alloc: A) -> Self {
                 let init = <$presence as FieldPresence>::slot_init_view();
                 let initialized = init.is_initialized(|b| common.is_bit_set(b));
                 Self {
@@ -630,13 +651,13 @@ macro_rules! impl_singular_clone_bit {
 impl_singular_clone_bit!(Explicit<BIT>);
 impl_singular_clone_bit!(LegacyRequired<BIT>);
 
-impl<T, const FIELD: u32, A, L, D, Pb> FieldDebug<Pb, A>
+impl<T, const FIELD: u32, A, L, D, Pb> FieldDebug<MessageCommon<Pb, A>>
     for SingularField<T, Implicit, FIELD, A, L, D>
 where
     T: SingularType + ProtoRefDebug<A>,
     A: Allocator + Clone,
     L: ValueLayout<T, A>,
-    Pb: PresenceBits,
+    MessageCommon<Pb, A>: MessageCommonBits,
     T::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
     <Implicit as FieldPresence>::ValueSlot<T::Slot<A>>: ValueSlot<T::Slot<A>, A>,
 {
@@ -646,13 +667,13 @@ where
     }
 }
 
-impl<T, const BIT: usize, const FIELD: u32, A, L, D, Pb> FieldDebug<Pb, A>
+impl<T, const BIT: usize, const FIELD: u32, A, L, D, Pb> FieldDebug<MessageCommon<Pb, A>>
     for SingularField<T, Explicit<BIT>, FIELD, A, L, D>
 where
     T: SingularType + ProtoRefDebug<A>,
     A: Allocator + Clone,
     L: ValueLayout<T, A>,
-    Pb: PresenceBits,
+    MessageCommon<Pb, A>: MessageCommonBits,
     T::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
     <Explicit<BIT> as FieldPresence>::ValueSlot<T::Slot<A>>: ValueSlot<T::Slot<A>, A>,
 {
@@ -662,13 +683,13 @@ where
     }
 }
 
-impl<T, const BIT: usize, const FIELD: u32, A, L, D, Pb> FieldDebug<Pb, A>
+impl<T, const BIT: usize, const FIELD: u32, A, L, D, Pb> FieldDebug<MessageCommon<Pb, A>>
     for SingularField<T, LegacyRequired<BIT>, FIELD, A, L, D>
 where
     T: SingularType + ProtoRefDebug<A>,
     A: Allocator + Clone,
     L: ValueLayout<T, A>,
-    Pb: PresenceBits,
+    MessageCommon<Pb, A>: MessageCommonBits,
     T::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
     <LegacyRequired<BIT> as FieldPresence>::ValueSlot<T::Slot<A>>: ValueSlot<T::Slot<A>, A>,
 {
@@ -678,13 +699,13 @@ where
     }
 }
 
-impl<T, const FIELD: u32, A, L, D, Pb> FieldDebug<Pb, A>
+impl<T, const FIELD: u32, A, L, D, Pb> FieldDebug<MessageCommon<Pb, A>>
     for SingularField<T, Message, FIELD, A, L, D>
 where
     T: SingularType + ProtoRefDebug<A>,
     A: Allocator + Clone,
     L: ValueLayout<T, A>,
-    Pb: PresenceBits,
+    MessageCommon<Pb, A>: MessageCommonBits,
     T::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
     <Message as FieldPresence>::ValueSlot<T::Slot<A>>: ValueSlot<T::Slot<A>, A>,
 {

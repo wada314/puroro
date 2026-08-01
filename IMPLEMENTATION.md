@@ -119,7 +119,7 @@ protobuf-core           Varint, Tag, WireType
 
 | Component | Status |
 |---|---|
-| `MessageCommon`, `PresenceBits`, `FieldDeallocate`, `OneofSlot` | **Done** |
+| `MessageCommon`, `MessageCommonBits`, `MessageCommonAlloc`, `FieldDeallocate`, `OneofSlot` | **Done** |
 | `SingularType` + thin wrappers (varint / LEN) + `ProtoMessage` | **Done** |
 | `NumericalType` (varint / fixed / enum scalar payload) | **Done** |
 | `RepeatedElement` / `RepeatedElementMerge` / `PackableRepeatedElement` / `RepeatedVecMut` | **Done** |
@@ -155,7 +155,7 @@ Live plugin emits nested and file-level messages/enums with singular and repeate
 |---|---|
 | [`lib.rs`](puroro-rt/src/lib.rs) | Crate-root catalog re-exports (`::puroro_rt::SingularField`, …) |
 | [`fields.rs`](puroro-rt/src/fields.rs) | Module root (`pub(crate)`; `pub mod` only) |
-| [`shared.rs`](puroro-rt/src/fields/shared.rs) | `MessageCommon`, `PresenceBits`, `DefaultIn`, `DeallocateIn`, `ProtoEmpty` |
+| [`shared.rs`](puroro-rt/src/fields/shared.rs) | `MessageCommon`, `MessageCommonBits`, `MessageCommonAlloc`, `DefaultIn`, `DeallocateIn`, `ProtoEmpty` |
 | [`shared/field_presence.rs`](puroro-rt/src/fields/shared/field_presence.rs) | `FieldPresence` markers |
 | [`shared/field_deallocate.rs`](puroro-rt/src/fields/shared/field_deallocate.rs) | `FieldDeallocate` — uniform `deallocate(&common)` |
 | [`shared/slot_init.rs`](puroro-rt/src/fields/shared/slot_init.rs) | `SlotInitView` / `SlotInitMut` init-state handles |
@@ -197,7 +197,7 @@ Field catalog methods take `&MessageCommon` / `&mut MessageCommon`, not `&Task`,
 
 [`FieldDeallocate`](puroro-rt/src/fields/shared/field_deallocate.rs) — every catalog field (and [`OneofSlot`](puroro-rt/src/fields/oneof.rs)) implements `deallocate(&mut self, common: &MessageCommon<…>)`. Generated message `Drop` calls this on **each direct child** with the same shape. Copy / bit-packed fields are no-ops. Oneof **variants** are released inside the group's deallocate via [`OneofDeallocate`](puroro-rt/src/fields/oneof.rs) (`deallocate(self, common)`), which forwards to the same field `deallocate(common)`.
 
-[`PresenceBits`](puroro-rt/src/fields/shared.rs) — trait implemented in `puroro-rt` for `BitArray<[u8; N], Lsb0>` (so generated code does not emit a per-message newtype). Bits cover EXPLICIT / LEGACY_REQUIRED **presence** and packed **bool values**. [`MessageCommon::is_bit_set`](puroro-rt/src/fields/shared.rs) / `set_bit` / `bit_mut` forward to it; `bit_mut` returns bitvec's `BitRef<'_, Mut, u8, Lsb0>`.
+[`MessageCommonBits`](puroro-rt/src/fields/shared.rs) / [`MessageCommonAlloc`](puroro-rt/src/fields/shared.rs) — catalog bounds on the common context (not on the bit-storage type). Bits cover EXPLICIT / LEGACY_REQUIRED **presence** and packed **bool values**. `MessageCommon` implements both; inherent `is_bit_set` / `set_bit` / `bit_mut` forward to `MessageCommonBits` (`bit_mut` returns bitvec's `BitRef<'_, Mut, u8, Lsb0>`). Generated messages store `BitArray<[u8; N], Lsb0>` in `_common.presence` with no per-message newtype.
 
 [`ValueSlot<T>`](puroro-rt/src/fields/shared/value_slot.rs) — singular **slot** storage behind a GAT on [`FieldPresence`](puroro-rt/src/fields/shared/field_presence.rs): always-initialized `T` for `Implicit` / `Oneof`; `MaybeUninit<T>` for `Explicit` / `LegacyRequired`; `Option<T>` for `Message` (pointer presence). Here `T` is [`SingularType::Slot`](puroro-rt/src/fields/wire/singular_type.rs) (the type marker itself, ZST [`ProtoBool`](puroro-rt/src/fields/wire/varint.rs), or `UnmanagedBox<M, A>` for messages). Construction / teardown thread an allocator via [`DefaultIn<A>`](puroro-rt/src/fields/shared.rs) / [`unmanaged::DeallocateIn<A>`](unmanaged/) (allocator as a **trait parameter**, not an associated type). Reads and mutation go through short-lived views: `slot.with(init, common)` → [`ValueSlotRefAccess`](puroro-rt/src/fields/shared/value_slot.rs) / `slot.with_mut(init, common)` → [`ValueSlotMutAccess`](puroro-rt/src/fields/shared/value_slot.rs) (`get` / `get_mut` / `set` / `clear`). Init markers ([`AlwaysInitialized`](puroro-rt/src/fields/shared/slot_init.rs) / [`BitInit`](puroro-rt/src/fields/shared/slot_init.rs)) are borrow-free; they read/update state through the passed [`MessageCommon`](puroro-rt/src/fields/shared.rs). Slot payloads use [`AddressableSlot`](puroro-rt/src/fields/shared/value_slot.rs); logical bool values are read/written via [`SingularType`](puroro-rt/src/fields/wire/singular_type.rs) against `_common.presence`. Singular IMPLICIT omit goes through [`SingularType::is_proto_empty`](puroro-rt/src/fields/wire/singular_type.rs) (slot [`ProtoEmpty`](puroro-rt/src/fields/shared.rs) for addressable types; bit read for `ProtoBool`).
 
@@ -554,7 +554,7 @@ Every field kind merges through the same bound-view shape — `self.<field>.bind
 
 ## 10. Presence / bool-value bit indices
 
-Tracked bits use [`bitvec::BitArray`](https://docs.rs/bitvec) inline in the message (`BitVec` is heap-only and incompatible with custom `A`). Store them in `_common.presence` as `BitArray<[u8; N], Lsb0>`; `puroro-rt` implements [`PresenceBits`](puroro-rt/src/fields/shared.rs) for that type.
+Tracked bits use [`bitvec::BitArray`](https://docs.rs/bitvec) inline in the message (`BitVec` is heap-only and incompatible with custom `A`). Store them in `_common.presence` as `BitArray<[u8; N], Lsb0>`; catalog code indexes them through [`MessageCommonBits`](puroro-rt/src/fields/shared.rs) on [`MessageCommon`](puroro-rt/src/fields/shared.rs).
 
 **Assignment (one pass, ascending field number):**
 
@@ -593,7 +593,7 @@ Gaps in field numbers do not create gaps in bit indices. Oneof non-bool variants
 | `postal_code` | 3 | `2` |
 | `latitude` | 4 | `3` |
 
-Generated code indexes bits only through `PresenceBits` / `MessageCommon` helpers (`is_bit_set` / `set_bit` / `bit_mut`), not by reaching into raw `BitArray` APIs from accessors. `N` is `ceil(bit_count / 8)` for the message's assigned bits.
+Generated code indexes bits only through `MessageCommonBits` / inherent `MessageCommon` helpers (`is_bit_set` / `set_bit` / `bit_mut`), not by reaching into raw `BitArray` APIs from accessors. `N` is `ceil(bit_count / 8)` for the message's assigned bits.
 
 ---
 

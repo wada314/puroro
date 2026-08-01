@@ -195,7 +195,7 @@ pub(super) fn render_items(plan: &MessagePlan<'_>) -> Result<TokenStream> {
 
             // Internal field walks for codec / Clone / Eq / Drop — not part of the
             // public message API (must not surface `puroro_rt` in pub signatures).
-            fn visit_fields<V: ::puroro_rt::FieldVisitor<__Presence, A>>(
+            fn visit_fields<V: ::puroro_rt::FieldVisitor<::puroro_rt::MessageCommon<__Presence, A>>>(
                 &self,
                 v: &mut V,
             ) -> ::core::ops::ControlFlow<V::Break> {
@@ -204,7 +204,9 @@ pub(super) fn render_items(plan: &MessagePlan<'_>) -> Result<TokenStream> {
                 ::core::ops::ControlFlow::Continue(())
             }
 
-            fn visit_field_pairs<V: ::puroro_rt::FieldPairVisitor<__Presence, A>>(
+            fn visit_field_pairs<
+                V: ::puroro_rt::FieldPairVisitor<::puroro_rt::MessageCommon<__Presence, A>>,
+            >(
                 &self,
                 other: &Self,
                 v: &mut V,
@@ -214,7 +216,9 @@ pub(super) fn render_items(plan: &MessagePlan<'_>) -> Result<TokenStream> {
                 ::core::ops::ControlFlow::Continue(())
             }
 
-            fn visit_field_pairs_mut<V: ::puroro_rt::FieldPairVisitorMut<__Presence, A>>(
+            fn visit_field_pairs_mut<
+                V: ::puroro_rt::FieldPairVisitorMut<::puroro_rt::MessageCommon<__Presence, A>>,
+            >(
                 &self,
                 dst: &mut Self,
                 v: &mut V,
@@ -224,7 +228,9 @@ pub(super) fn render_items(plan: &MessagePlan<'_>) -> Result<TokenStream> {
                 ::core::ops::ControlFlow::Continue(())
             }
 
-            fn visit_fields_mut<V: ::puroro_rt::FieldVisitorMut<__Presence, A>>(
+            fn visit_fields_mut<
+                V: ::puroro_rt::FieldVisitorMut<::puroro_rt::MessageCommon<__Presence, A>>,
+            >(
                 &mut self,
                 v: &mut V,
             ) -> ::core::ops::ControlFlow<V::Break> {

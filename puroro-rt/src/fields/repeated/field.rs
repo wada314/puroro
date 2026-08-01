@@ -80,7 +80,8 @@ where
     }
 }
 
-impl<T, E, const FIELD: u32, A, Pb> FieldDeallocate<Pb, A> for RepeatedField<T, E, FIELD, A>
+impl<T, E, const FIELD: u32, A, P> FieldDeallocate<MessageCommon<P, A>>
+    for RepeatedField<T, E, FIELD, A>
 where
     T: RepeatedElement,
     E: RepeatedEncoding<T, A>,
@@ -88,7 +89,7 @@ where
 {
     /// Releases every element (when heap-backed) and the backing buffer.
     #[inline]
-    fn deallocate(&mut self, common: &MessageCommon<Pb, A>) {
+    fn deallocate(&mut self, common: &MessageCommon<P, A>) {
         // SAFETY: called once; owned clones of the message allocator own the
         // buffer and every element.
         let alloc = common.alloc.clone();
@@ -243,7 +244,8 @@ where
     }
 }
 
-impl<T, E, const FIELD: u32, A, Pb> FieldPartialEq<Pb, A> for RepeatedField<T, E, FIELD, A>
+impl<T, E, const FIELD: u32, A, P> FieldPartialEq<MessageCommon<P, A>>
+    for RepeatedField<T, E, FIELD, A>
 where
     T: RepeatedElement,
     E: RepeatedEncoding<T, A>,
@@ -253,15 +255,15 @@ where
     #[inline]
     fn field_eq(
         &self,
-        _common: &MessageCommon<Pb, A>,
+        _common: &MessageCommon<P, A>,
         other: &Self,
-        _other_common: &MessageCommon<Pb, A>,
+        _other_common: &MessageCommon<P, A>,
     ) -> bool {
         self.as_slice() == other.as_slice()
     }
 }
 
-impl<T, E, const FIELD: u32, A, Pb> FieldDebug<Pb, A> for RepeatedField<T, E, FIELD, A>
+impl<T, E, const FIELD: u32, A, P> FieldDebug<MessageCommon<P, A>> for RepeatedField<T, E, FIELD, A>
 where
     T: RepeatedElement,
     E: RepeatedEncoding<T, A>,
@@ -269,18 +271,19 @@ where
     T::Element<A>: Debug,
 {
     #[inline]
-    fn fmt_debug(&self, _common: &MessageCommon<Pb, A>, f: &mut Formatter<'_>) -> FmtResult {
+    fn fmt_debug(&self, _common: &MessageCommon<P, A>, f: &mut Formatter<'_>) -> FmtResult {
         Debug::fmt(self.as_slice(), f)
     }
 }
 
-impl<T, E, const FIELD: u32, A, Pb> FieldEncode<Pb, A> for RepeatedField<T, E, FIELD, A>
+impl<T, E, const FIELD: u32, A, P> FieldEncode<MessageCommon<P, A>>
+    for RepeatedField<T, E, FIELD, A>
 where
     T: RepeatedElement,
     E: RepeatedEncoding<T, A>,
     A: Allocator + Clone,
 {
-    fn encoded_len(&self, _common: &MessageCommon<Pb, A>) -> usize {
+    fn encoded_len(&self, _common: &MessageCommon<P, A>) -> usize {
         if self.values.is_empty() {
             0
         } else {
@@ -288,21 +291,22 @@ where
         }
     }
 
-    fn encode_raw<B: BufMut>(&self, _common: &MessageCommon<Pb, A>, buf: &mut B) {
+    fn encode_raw<B: BufMut>(&self, _common: &MessageCommon<P, A>, buf: &mut B) {
         if !self.values.is_empty() {
             E::encode(FIELD, self.as_slice(), buf);
         }
     }
 }
 
-impl<T, E, const FIELD: u32, A, Pb> FieldCloneIn<Pb, A> for RepeatedField<T, E, FIELD, A>
+impl<T, E, const FIELD: u32, A, P> FieldCloneIn<MessageCommon<P, A>>
+    for RepeatedField<T, E, FIELD, A>
 where
     T: RepeatedElement,
     E: RepeatedEncoding<T, A>,
     A: Allocator + Clone,
     T::Element<A>: CloneIn<A>,
 {
-    fn clone_field(&self, _common: &MessageCommon<Pb, A>, alloc: A) -> Self {
+    fn clone_field(&self, _common: &MessageCommon<P, A>, alloc: A) -> Self {
         Self {
             values: ManuallyDrop::new(self.values.clone_in(alloc)),
             _encoding: PhantomData,

@@ -58,9 +58,9 @@ use ::bitvec::array::BitArray;
 use ::bitvec::order::Lsb0;
 use ::bytes::BufMut;
 use ::puroro_rt::{
-    BitPacked, FieldCloneIn, FieldDeallocate, FieldEncode, Inline, MessageCommon, Oneof,
-    OneofDeallocate, OneofEncodable, OneofGroup, OneofVariant, PresenceBits, ProtoBool, ProtoInt32,
-    ProtoMessage, ProtoString, SingularField, SingularType,
+    BitPacked, FieldCloneIn, FieldDeallocate, FieldEncode, Inline, MessageCommon,
+    MessageCommonAlloc, MessageCommonBits, Oneof, OneofDeallocate, OneofEncodable, OneofGroup,
+    OneofVariant, ProtoBool, ProtoInt32, ProtoMessage, ProtoString, SingularField, SingularType,
 };
 
 use crate::address::Address;
@@ -300,7 +300,10 @@ impl<A: Allocator + Clone> OneofVariant<{ super::FIELD_URGENT }> for Notificatio
 }
 
 impl<A: Allocator + Clone> OneofEncodable<A> for NotificationStorage<A> {
-    fn encoded_len<Pb: PresenceBits>(&self, common: &MessageCommon<Pb, A>) -> usize {
+    fn encoded_len<P>(&self, common: &MessageCommon<P, A>) -> usize
+    where
+        MessageCommon<P, A>: MessageCommonBits + MessageCommonAlloc<Alloc = A>,
+    {
         match self {
             Self::EmailAddress(f) => FieldEncode::encoded_len(f, common),
             Self::PhoneNumber(f) => FieldEncode::encoded_len(f, common),
@@ -310,7 +313,10 @@ impl<A: Allocator + Clone> OneofEncodable<A> for NotificationStorage<A> {
         }
     }
 
-    fn encode_raw<Pb: PresenceBits, B: BufMut>(&self, common: &MessageCommon<Pb, A>, buf: &mut B) {
+    fn encode_raw<P, B: BufMut>(&self, common: &MessageCommon<P, A>, buf: &mut B)
+    where
+        MessageCommon<P, A>: MessageCommonBits + MessageCommonAlloc<Alloc = A>,
+    {
         match self {
             Self::EmailAddress(f) => FieldEncode::encode_raw(f, common, buf),
             Self::PhoneNumber(f) => FieldEncode::encode_raw(f, common, buf),
@@ -321,11 +327,11 @@ impl<A: Allocator + Clone> OneofEncodable<A> for NotificationStorage<A> {
     }
 }
 
-impl<A: Allocator + Clone, Pb> OneofDeallocate<Pb, A> for NotificationStorage<A> {
+impl<A: Allocator + Clone, P> OneofDeallocate<MessageCommon<P, A>> for NotificationStorage<A> {
     /// # Safety
     ///
     /// `common.alloc` must be the allocator that owns the variant's buffer.
-    unsafe fn deallocate(self, common: &MessageCommon<Pb, A>) {
+    unsafe fn deallocate(self, common: &MessageCommon<P, A>) {
         match self {
             Self::EmailAddress(mut f) => f.deallocate(common),
             Self::PhoneNumber(mut f) => f.deallocate(common),

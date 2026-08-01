@@ -1,71 +1,63 @@
 //! Semantic [`PartialEq`] / [`Debug`] / encode / clone for catalog fields, plus
 //! message-level field visitors so generated code enumerates fields once.
 //!
-//! Visitors hold [`MessageCommon`] from construction time; generated
+//! Visitors hold the message common context from construction time; generated
 //! `visit_*` methods only pass field names and field slots. Shared walks use
 //! ordinary references. Walks that also mutably borrow field slots of the same
-//! message store `MessageCommon` as a raw pointer so the borrow checker does
-//! not see an overlap — field payloads are disjoint from `MessageCommon`.
+//! message store the common as a raw pointer so the borrow checker does not see
+//! an overlap — field payloads are disjoint from the common context.
 //!
-//! `Pb` is unconstrained on these traits; impls that touch presence / value
-//! bits add [`PresenceBits`](super::PresenceBits) on their own `where` clauses.
+//! `C` is the common context type (typically
+//! [`MessageCommon`](super::MessageCommon)). Impls add
+//! [`MessageCommonBits`](super::MessageCommonBits) /
+//! [`MessageCommonAlloc`](super::MessageCommonAlloc) as needed.
 
-use ::allocator_api2::alloc::Allocator;
 use ::bytes::BufMut;
 use ::core::fmt::{self, Debug, Formatter, Result as FmtResult};
 use ::core::mem;
 use ::core::ops::ControlFlow;
 
-use super::{FieldDeallocate, MessageCommon};
+use super::FieldDeallocate;
+use super::MessageCommonAlloc;
 
 /// Semantic equality for one catalog field (getter-level, not raw slots).
-pub trait FieldPartialEq<Pb, A: Allocator> {
-    fn field_eq(
-        &self,
-        common: &MessageCommon<Pb, A>,
-        other: &Self,
-        other_common: &MessageCommon<Pb, A>,
-    ) -> bool;
+pub trait FieldPartialEq<C> {
+    fn field_eq(&self, common: &C, other: &Self, other_common: &C) -> bool;
 }
 
 /// Semantic [`Debug`] view for one catalog field.
-pub trait FieldDebug<Pb, A: Allocator> {
+pub trait FieldDebug<C> {
     /// Formats like the public getter (presence-aware).
-    fn fmt_debug(&self, common: &MessageCommon<Pb, A>, f: &mut Formatter<'_>) -> FmtResult;
+    fn fmt_debug(&self, common: &C, f: &mut Formatter<'_>) -> FmtResult;
 }
 
 /// Wire length / encode for one catalog field.
-pub trait FieldEncode<Pb, A: Allocator> {
-    fn encoded_len(&self, common: &MessageCommon<Pb, A>) -> usize;
+pub trait FieldEncode<C> {
+    fn encoded_len(&self, common: &C) -> usize;
 
-    fn encode_raw<B: BufMut>(&self, common: &MessageCommon<Pb, A>, buf: &mut B);
+    fn encode_raw<B: BufMut>(&self, common: &C, buf: &mut B);
 }
 
-/// Deep-clone one catalog field through `common` / `alloc`.
-pub trait FieldCloneIn<Pb, A: Allocator>: Sized {
-    fn clone_field(&self, common: &MessageCommon<Pb, A>, alloc: A) -> Self;
+/// Deep-clone one catalog field through `common` / allocator.
+pub trait FieldCloneIn<C: MessageCommonAlloc>: Sized {
+    fn clone_field(&self, common: &C, alloc: C::Alloc) -> Self;
 }
 
 /// Capabilities required of every field passed to [`FieldVisitor`].
-pub trait CatalogField<Pb, A: Allocator>: FieldDebug<Pb, A> + FieldEncode<Pb, A> {}
+pub trait CatalogField<C>: FieldDebug<C> + FieldEncode<C> {}
 
-impl<T, Pb, A> CatalogField<Pb, A> for T
-where
-    T: FieldDebug<Pb, A> + FieldEncode<Pb, A>,
-    A: Allocator,
-{
-}
+impl<T, C> CatalogField<C> for T where T: FieldDebug<C> + FieldEncode<C> {}
 
 /// Scalar / shared visitor — generated `visit_fields` walks one message immutably.
 ///
 /// `name` is the proto field / oneof group name (`"title"`, `"notification"`, …).
 /// Call sites that ignore it (e.g. encode length) still pass it; LLVM typically
 /// drops the unused `&'static str` after inlining.
-pub trait FieldVisitor<Pb, A: Allocator> {
+pub trait FieldVisitor<C> {
     /// Stop early when `Break` is returned (unused by most visitors).
     type Break;
 
-    fn visit<F: CatalogField<Pb, A>>(
+    fn visit<F: CatalogField<C>>(
         &mut self,
         name: &'static str,
         field: &F,
@@ -78,10 +70,10 @@ pub trait FieldVisitor<Pb, A: Allocator> {
 /// intentional: catalog field types are heterogeneous, so a generic walk needs
 /// the capability on the field argument (same pattern as
 /// [`FieldPairVisitorMut`] / [`FieldVisitor`]).
-pub trait FieldPairVisitor<Pb, A: Allocator> {
+pub trait FieldPairVisitor<C> {
     type Break;
 
-    fn visit<F: FieldPartialEq<Pb, A>>(
+    fn visit<F: FieldPartialEq<C>>(
         &mut self,
         name: &'static str,
         field: &F,
@@ -92,7 +84,7 @@ pub trait FieldPairVisitor<Pb, A: Allocator> {
 /// Pair / mutable visitor — generated `visit_field_pairs_mut` (e.g. [`CloneIn`](unmanaged::CloneIn)).
 ///
 /// The destination field is `&mut`; source stays shared.
-pub trait FieldPairVisitorMut<Pb, A: Allocator> {
+pub trait FieldPairVisitorMut<C> {
     type Break;
 
     fn visit<F>(
@@ -102,14 +94,15 @@ pub trait FieldPairVisitorMut<Pb, A: Allocator> {
         dst_field: &mut F,
     ) -> ControlFlow<Self::Break>
     where
-        F: FieldCloneIn<Pb, A> + FieldDeallocate<Pb, A>;
+        C: MessageCommonAlloc,
+        F: FieldCloneIn<C> + FieldDeallocate<C>;
 }
 
 /// Scalar / mutable visitor — generated `visit_fields_mut` (e.g. `Drop` / clear-all).
-pub trait FieldVisitorMut<Pb, A: Allocator> {
+pub trait FieldVisitorMut<C> {
     type Break;
 
-    fn visit<F: FieldDeallocate<Pb, A>>(
+    fn visit<F: FieldDeallocate<C>>(
         &mut self,
         name: &'static str,
         field: &mut F,
@@ -121,14 +114,14 @@ pub trait FieldVisitorMut<Pb, A: Allocator> {
 // ---------------------------------------------------------------------------
 
 /// [`FieldPairVisitor`] that breaks on the first unequal field.
-pub struct FieldEqVisitor<'a, Pb, A: Allocator> {
-    common: &'a MessageCommon<Pb, A>,
-    other_common: &'a MessageCommon<Pb, A>,
+pub struct FieldEqVisitor<'a, C> {
+    common: &'a C,
+    other_common: &'a C,
 }
 
-impl<'a, Pb, A: Allocator> FieldEqVisitor<'a, Pb, A> {
+impl<'a, C> FieldEqVisitor<'a, C> {
     #[inline]
-    pub fn new(common: &'a MessageCommon<Pb, A>, other_common: &'a MessageCommon<Pb, A>) -> Self {
+    pub fn new(common: &'a C, other_common: &'a C) -> Self {
         Self {
             common,
             other_common,
@@ -136,11 +129,11 @@ impl<'a, Pb, A: Allocator> FieldEqVisitor<'a, Pb, A> {
     }
 }
 
-impl<'a, Pb, A: Allocator> FieldPairVisitor<Pb, A> for FieldEqVisitor<'a, Pb, A> {
+impl<'a, C> FieldPairVisitor<C> for FieldEqVisitor<'a, C> {
     type Break = ();
 
     #[inline]
-    fn visit<F: FieldPartialEq<Pb, A>>(
+    fn visit<F: FieldPartialEq<C>>(
         &mut self,
         _name: &'static str,
         field: &F,
@@ -156,38 +149,38 @@ impl<'a, Pb, A: Allocator> FieldPairVisitor<Pb, A> for FieldEqVisitor<'a, Pb, A>
 
 /// [`FieldVisitorMut`] that [`FieldDeallocate::deallocate`]s every field.
 ///
-/// Stores [`MessageCommon`] as a raw pointer so it can be built from
+/// Stores the common context as a raw pointer so it can be built from
 /// `&message._common` before [`visit_fields_mut`] mutably borrows field slots.
-pub struct FieldDeallocVisitor<Pb, A: Allocator> {
-    common: *const MessageCommon<Pb, A>,
+pub struct FieldDeallocVisitor<C> {
+    common: *const C,
 }
 
-impl<Pb, A: Allocator> FieldDeallocVisitor<Pb, A> {
+impl<C> FieldDeallocVisitor<C> {
     /// Captures `common` for a subsequent mutable field walk.
     ///
     /// The pointed-to value must outlive the walk and must not be mutated for
     /// that duration. Mutating disjoint catalog field slots on the same message
     /// is intended and sound.
     #[inline]
-    pub fn new(common: &MessageCommon<Pb, A>) -> Self {
+    pub fn new(common: &C) -> Self {
         Self {
-            common: common as *const MessageCommon<Pb, A>,
+            common: common as *const C,
         }
     }
 
     #[inline]
-    fn common(&self) -> &MessageCommon<Pb, A> {
+    fn common(&self) -> &C {
         // SAFETY: `new` requires `common` stay valid and immutable for the walk;
         // only disjoint field slots are mutated meanwhile.
         unsafe { &*self.common }
     }
 }
 
-impl<Pb, A: Allocator> FieldVisitorMut<Pb, A> for FieldDeallocVisitor<Pb, A> {
+impl<C> FieldVisitorMut<C> for FieldDeallocVisitor<C> {
     type Break = ();
 
     #[inline]
-    fn visit<F: FieldDeallocate<Pb, A>>(
+    fn visit<F: FieldDeallocate<C>>(
         &mut self,
         _name: &'static str,
         field: &mut F,
@@ -198,46 +191,46 @@ impl<Pb, A: Allocator> FieldVisitorMut<Pb, A> for FieldDeallocVisitor<Pb, A> {
 }
 
 /// Sums [`FieldEncode::encoded_len`].
-pub struct EncodedLenVisitor<'a, Pb, A: Allocator> {
-    common: &'a MessageCommon<Pb, A>,
+pub struct EncodedLenVisitor<'a, C> {
+    common: &'a C,
     pub len: usize,
 }
 
-impl<'a, Pb, A: Allocator> EncodedLenVisitor<'a, Pb, A> {
+impl<'a, C> EncodedLenVisitor<'a, C> {
     #[inline]
-    pub fn new(common: &'a MessageCommon<Pb, A>) -> Self {
+    pub fn new(common: &'a C) -> Self {
         Self { common, len: 0 }
     }
 }
 
-impl<'a, Pb, A: Allocator> FieldVisitor<Pb, A> for EncodedLenVisitor<'a, Pb, A> {
+impl<'a, C> FieldVisitor<C> for EncodedLenVisitor<'a, C> {
     type Break = ();
 
     #[inline]
-    fn visit<F: CatalogField<Pb, A>>(&mut self, _name: &'static str, field: &F) -> ControlFlow<()> {
+    fn visit<F: CatalogField<C>>(&mut self, _name: &'static str, field: &F) -> ControlFlow<()> {
         self.len += field.encoded_len(self.common);
         ControlFlow::Continue(())
     }
 }
 
 /// Writes each field via [`FieldEncode::encode_raw`].
-pub struct EncodeRawVisitor<'a, B: BufMut, Pb, A: Allocator> {
-    common: &'a MessageCommon<Pb, A>,
+pub struct EncodeRawVisitor<'a, B: BufMut, C> {
+    common: &'a C,
     pub buf: &'a mut B,
 }
 
-impl<'a, B: BufMut, Pb, A: Allocator> EncodeRawVisitor<'a, B, Pb, A> {
+impl<'a, B: BufMut, C> EncodeRawVisitor<'a, B, C> {
     #[inline]
-    pub fn new(common: &'a MessageCommon<Pb, A>, buf: &'a mut B) -> Self {
+    pub fn new(common: &'a C, buf: &'a mut B) -> Self {
         Self { common, buf }
     }
 }
 
-impl<'a, B: BufMut, Pb, A: Allocator> FieldVisitor<Pb, A> for EncodeRawVisitor<'a, B, Pb, A> {
+impl<'a, B: BufMut, C> FieldVisitor<C> for EncodeRawVisitor<'a, B, C> {
     type Break = ();
 
     #[inline]
-    fn visit<F: CatalogField<Pb, A>>(&mut self, _name: &'static str, field: &F) -> ControlFlow<()> {
+    fn visit<F: CatalogField<C>>(&mut self, _name: &'static str, field: &F) -> ControlFlow<()> {
         field.encode_raw(self.common, self.buf);
         ControlFlow::Continue(())
     }
@@ -249,50 +242,50 @@ impl<'a, B: BufMut, Pb, A: Allocator> FieldVisitor<Pb, A> for EncodeRawVisitor<'
 /// `src.visit_field_pairs_mut(&mut dst, &mut CloneFieldsVisitor::new(...))` —
 /// empty placeholders are deallocated as they are replaced.
 ///
-/// Destination `MessageCommon` is stored as a raw pointer so the visitor can be
-/// built before mutably borrowing `dst`'s field slots.
-pub struct CloneFieldsVisitor<Pb, A: Allocator> {
-    src_common: *const MessageCommon<Pb, A>,
-    dst_common: *const MessageCommon<Pb, A>,
+/// Destination common is stored as a raw pointer so the visitor can be built
+/// before mutably borrowing `dst`'s field slots.
+pub struct CloneFieldsVisitor<C> {
+    src_common: *const C,
+    dst_common: *const C,
 }
 
-impl<Pb, A: Allocator> CloneFieldsVisitor<Pb, A> {
+impl<C> CloneFieldsVisitor<C> {
     /// Captures source / destination commons for a clone-into walk.
     ///
-    /// Both pointees must outlive the walk. Destination `MessageCommon` must
-    /// not be mutated during the walk (field slots may be). Presence on `dst`
-    /// should still be empty when used after [`Self::new_in`].
+    /// Both pointees must outlive the walk. Destination common must not be
+    /// mutated during the walk (field slots may be). Presence on `dst` should
+    /// still be empty when used after [`MessageCommon::new_in`](super::MessageCommon::new_in).
     #[inline]
-    pub fn new(src_common: &MessageCommon<Pb, A>, dst_common: &MessageCommon<Pb, A>) -> Self {
+    pub fn new(src_common: &C, dst_common: &C) -> Self {
         Self {
-            src_common: src_common as *const MessageCommon<Pb, A>,
-            dst_common: dst_common as *const MessageCommon<Pb, A>,
+            src_common: src_common as *const C,
+            dst_common: dst_common as *const C,
         }
     }
 
     #[inline]
-    fn src_common(&self) -> &MessageCommon<Pb, A> {
+    fn src_common(&self) -> &C {
         // SAFETY: see [`Self::new`].
         unsafe { &*self.src_common }
     }
 
     #[inline]
-    fn dst_common(&self) -> &MessageCommon<Pb, A> {
+    fn dst_common(&self) -> &C {
         // SAFETY: see [`Self::new`].
         unsafe { &*self.dst_common }
     }
 }
 
-impl<Pb, A: Allocator + Clone> FieldPairVisitorMut<Pb, A> for CloneFieldsVisitor<Pb, A> {
+impl<C: MessageCommonAlloc> FieldPairVisitorMut<C> for CloneFieldsVisitor<C> {
     type Break = ();
 
     #[inline]
     fn visit<F>(&mut self, _name: &'static str, src_field: &F, dst_field: &mut F) -> ControlFlow<()>
     where
-        F: FieldCloneIn<Pb, A> + FieldDeallocate<Pb, A>,
+        F: FieldCloneIn<C> + FieldDeallocate<C>,
     {
         let dst_common = self.dst_common();
-        let new = src_field.clone_field(self.src_common(), dst_common.alloc.clone());
+        let new = src_field.clone_field(self.src_common(), dst_common.clone_alloc());
         let mut old = mem::replace(dst_field, new);
         old.deallocate(dst_common);
         ControlFlow::Continue(())
@@ -303,14 +296,14 @@ impl<Pb, A: Allocator + Clone> FieldPairVisitorMut<Pb, A> for CloneFieldsVisitor
 ///
 /// Owns the [`DebugStruct`] so generated `Debug` can call [`finish`](Self::finish)
 /// without overlapping borrows.
-pub struct DebugStructVisitor<'a, 'b, 'c, Pb, A: Allocator> {
+pub struct DebugStructVisitor<'a, 'b, 'c, C> {
     ds: fmt::DebugStruct<'a, 'b>,
-    common: &'c MessageCommon<Pb, A>,
+    common: &'c C,
 }
 
-impl<'a, 'b, 'c, Pb, A: Allocator> DebugStructVisitor<'a, 'b, 'c, Pb, A> {
+impl<'a, 'b, 'c, C> DebugStructVisitor<'a, 'b, 'c, C> {
     #[inline]
-    pub fn new(ds: fmt::DebugStruct<'a, 'b>, common: &'c MessageCommon<Pb, A>) -> Self {
+    pub fn new(ds: fmt::DebugStruct<'a, 'b>, common: &'c C) -> Self {
         Self { ds, common }
     }
 
@@ -320,11 +313,11 @@ impl<'a, 'b, 'c, Pb, A: Allocator> DebugStructVisitor<'a, 'b, 'c, Pb, A> {
     }
 }
 
-impl<'a, 'b, 'c, Pb, A: Allocator> FieldVisitor<Pb, A> for DebugStructVisitor<'a, 'b, 'c, Pb, A> {
+impl<'a, 'b, 'c, C> FieldVisitor<C> for DebugStructVisitor<'a, 'b, 'c, C> {
     type Break = ();
 
     #[inline]
-    fn visit<F: CatalogField<Pb, A>>(&mut self, name: &'static str, field: &F) -> ControlFlow<()> {
+    fn visit<F: CatalogField<C>>(&mut self, name: &'static str, field: &F) -> ControlFlow<()> {
         // `field` must format through `FieldDebug` (not `fmt::Debug` on the wrapper).
         self.ds.field(
             name,
@@ -337,15 +330,14 @@ impl<'a, 'b, 'c, Pb, A: Allocator> FieldVisitor<Pb, A> for DebugStructVisitor<'a
     }
 }
 
-struct FieldDebugAdapter<'a, F, Pb, A: Allocator> {
+struct FieldDebugAdapter<'a, F, C> {
     field: &'a F,
-    common: &'a MessageCommon<Pb, A>,
+    common: &'a C,
 }
 
-impl<'a, F, Pb, A> Debug for FieldDebugAdapter<'a, F, Pb, A>
+impl<'a, F, C> Debug for FieldDebugAdapter<'a, F, C>
 where
-    F: FieldDebug<Pb, A>,
-    A: Allocator,
+    F: FieldDebug<C>,
 {
     #[inline]
     fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {

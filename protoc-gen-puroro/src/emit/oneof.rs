@@ -266,8 +266,8 @@ fn render_module_body(oneof: &OneofEmit) -> Result<TokenStream> {
         use ::allocator_api2::alloc::Allocator;
         use ::bytes::BufMut;
         use ::puroro_rt::{
-            FieldDeallocate, MessageCommon, OneofDeallocate, OneofEncodable, OneofGroup,
-            PresenceBits,
+            FieldDeallocate, MessageCommon, MessageCommonAlloc, MessageCommonBits, OneofDeallocate,
+            OneofEncodable, OneofGroup,
         };
 
         #[derive(::core::clone::Clone, ::core::marker::Copy, ::core::cmp::PartialEq)]
@@ -341,25 +341,29 @@ fn render_module_body(oneof: &OneofEmit) -> Result<TokenStream> {
         #(#oneof_variant_impls)*
 
         impl<A: Allocator + ::core::clone::Clone> OneofEncodable<A> for #storage_name<A> {
-            fn encoded_len<Pb: PresenceBits>(&self, common: &MessageCommon<Pb, A>) -> usize {
+            fn encoded_len<P>(&self, common: &MessageCommon<P, A>) -> usize
+            where
+                MessageCommon<P, A>: MessageCommonBits + MessageCommonAlloc<Alloc = A>,
+            {
                 match self {
                     #(#encode_len_arms)*
                 }
             }
 
-            fn encode_raw<Pb: PresenceBits, B: BufMut>(
-                &self,
-                common: &MessageCommon<Pb, A>,
-                buf: &mut B,
-            ) {
+            fn encode_raw<P, B: BufMut>(&self, common: &MessageCommon<P, A>, buf: &mut B)
+            where
+                MessageCommon<P, A>: MessageCommonBits + MessageCommonAlloc<Alloc = A>,
+            {
                 match self {
                     #(#encode_raw_arms)*
                 }
             }
         }
 
-        impl<A: Allocator + ::core::clone::Clone, Pb> OneofDeallocate<Pb, A> for #storage_name<A> {
-            unsafe fn deallocate(self, common: &MessageCommon<Pb, A>) {
+        impl<A: Allocator + ::core::clone::Clone, P> OneofDeallocate<MessageCommon<P, A>>
+            for #storage_name<A>
+        {
+            unsafe fn deallocate(self, common: &MessageCommon<P, A>) {
                 match self {
                     #(#dealloc_arms)*
                 }

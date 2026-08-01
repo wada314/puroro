@@ -19,7 +19,7 @@ use crate::decode;
 use ::unmanaged::DeallocateIn;
 
 use crate::fields::shared::{
-    DefaultIn, MessageCommon, PresenceBits, ProtoEmpty,
+    DefaultIn, MessageCommon, MessageCommonBits, ProtoEmpty,
     slot_init::SlotInitMut,
     value_slot::{AddressableSlot, ValueSlot, ValueSlotMutAccess},
 };
@@ -81,18 +81,24 @@ impl<M: Message> SingularType for ProtoMessage<M> {
 
 impl<M: Message> PayloadAccess for ProtoMessage<M> {
     #[inline]
-    fn is_proto_empty<A: Allocator + Clone, Pb: PresenceBits>(
+    fn is_proto_empty<A: Allocator + Clone, Pb>(
         _slot: &UnmanagedBox<M, A>,
         _common: &MessageCommon<Pb, A>,
-    ) -> bool {
+    ) -> bool
+    where
+        MessageCommon<Pb, A>: MessageCommonBits,
+    {
         false
     }
 
     #[inline]
-    fn get<'a, A: Allocator + Clone + 'a, Pb: PresenceBits>(
+    fn get<'a, A: Allocator + Clone + 'a, Pb>(
         slot: &'a UnmanagedBox<M, A>,
         _common: &'a MessageCommon<Pb, A>,
-    ) -> &'a M {
+    ) -> &'a M
+    where
+        MessageCommon<Pb, A>: MessageCommonBits,
+    {
         Deref::deref(slot)
     }
 
@@ -107,7 +113,7 @@ impl<M: Message> PayloadAccess for ProtoMessage<M> {
         UnmanagedBox<M, A>: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
         VS: ValueSlot<UnmanagedBox<M, A>, A>,
         I: SlotInitMut,
-        Pb: PresenceBits,
+        MessageCommon<Pb, A>: MessageCommonBits,
         Self: 'a,
     {
         DerefMut::deref_mut(ValueSlot::with_mut(slot, init, common).get_mut())
@@ -124,7 +130,7 @@ impl<M: Message> PayloadAccess for ProtoMessage<M> {
         UnmanagedBox<M, A>: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
         VS: ValueSlot<UnmanagedBox<M, A>, A>,
         I: SlotInitMut,
-        Pb: PresenceBits,
+        MessageCommon<Pb, A>: MessageCommonBits,
     {
         ValueSlot::with_mut(slot, init, common).set(value);
     }
@@ -136,7 +142,7 @@ impl<M: Message> PayloadAccess for ProtoMessage<M> {
         UnmanagedBox<M, A>: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
         VS: ValueSlot<UnmanagedBox<M, A>, A>,
         I: SlotInitMut,
-        Pb: PresenceBits,
+        MessageCommon<Pb, A>: MessageCommonBits,
     {
         ValueSlot::with_mut(slot, init, common).clear();
     }
@@ -155,7 +161,7 @@ impl<M: Message> PayloadAccess for ProtoMessage<M> {
         UnmanagedBox<M, A>: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
         VS: ValueSlot<UnmanagedBox<M, A>, A>,
         I: SlotInitMut,
-        Pb: PresenceBits,
+        MessageCommon<Pb, A>: MessageCommonBits,
         B: Buf,
     {
         if wire_type != WireType::Len {

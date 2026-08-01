@@ -1,9 +1,5 @@
-//! Explicit field release through [`MessageCommon`] — shared by message `Drop`
-//! and oneof variant teardown.
-
-use ::allocator_api2::alloc::Allocator;
-
-use super::MessageCommon;
+//! Explicit field release through message common context — shared by message
+//! `Drop` and oneof variant teardown.
 
 /// Releases a field's owned payloads through the message allocator in `common`.
 ///
@@ -19,10 +15,10 @@ use super::MessageCommon;
 /// After `deallocate`, `self` must not be used again (except as part of the
 /// enclosing message / enum going out of scope).
 ///
-/// `Pb` is unconstrained here: only impls that read presence / value bits
-/// (e.g. explicit singular fields) add a [`PresenceBits`](super::PresenceBits)
-/// bound.
-pub trait FieldDeallocate<Pb, A: Allocator> {
-    /// Frees heap payloads (if any) using `common.alloc`.
-    fn deallocate(&mut self, common: &MessageCommon<Pb, A>);
+/// `C` is the message common context (typically [`MessageCommon`](super::MessageCommon)).
+/// Impls that need the allocator bound [`MessageCommonAlloc`](super::MessageCommonAlloc);
+/// bit-tracked singular teardown also needs [`MessageCommonBits`](super::MessageCommonBits).
+pub trait FieldDeallocate<C> {
+    /// Frees heap payloads (if any) using `common`'s allocator.
+    fn deallocate(&mut self, common: &C);
 }

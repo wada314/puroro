@@ -19,7 +19,7 @@
 //!
 //! | Submodule | Contents |
 //! |---|---|
-//! | [`shared`] | `MessageCommon`, `PresenceBits`, `FieldPresence`, `ValueSlot`, … |
+//! | [`shared`] | `MessageCommon`, `MessageCommonBits`, `MessageCommonAlloc`, `FieldPresence`, `ValueSlot`, … |
 //! | [`wire`] | `SingularType`, `RepeatedElement`, `NumericalType`, fixed / varint markers |
 //! | [`singular`] | `SingularField` |
 //! | [`repeated`] | `RepeatedField` |

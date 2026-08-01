@@ -7,7 +7,7 @@
 //!
 //! Init handles are **borrow-free markers** ([`AlwaysInitialized`] / [`BitInit`]).
 //! Bit-tracked adapters learn the bit state through caller-supplied probes so
-//! [`AlwaysInitialized`] does not require [`PresenceBits`](super::PresenceBits).
+//! [`AlwaysInitialized`] does not require [`MessageCommonBits`](super::MessageCommonBits).
 
 /// Read-only view of whether a value slot is initialized.
 pub trait SlotInitView {

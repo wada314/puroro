@@ -40,7 +40,7 @@ use ::unmanaged::DeallocateIn;
 
 use crate::decode;
 use crate::fields::shared::{
-    DefaultIn, MessageCommon, PresenceBits, ProtoEmpty,
+    DefaultIn, MessageCommon, MessageCommonBits, ProtoEmpty,
     slot_init::SlotInitMut,
     value_slot::{AddressableSlot, ValueSlot, ValueSlotMutAccess},
 };
@@ -89,16 +89,20 @@ pub trait SingularType: EncodeType {
 /// [`BitPacked`](crate::fields::shared::value_layout::BitPacked) instead.
 pub trait PayloadAccess: SingularType {
     /// `true` when the field holds protobuf empty / type-zero (IMPLICIT omit).
-    fn is_proto_empty<A: Allocator + Clone, Pb: PresenceBits>(
+    fn is_proto_empty<A: Allocator + Clone, Pb>(
         slot: &Self::Slot<A>,
         common: &MessageCommon<Pb, A>,
-    ) -> bool;
+    ) -> bool
+    where
+        MessageCommon<Pb, A>: MessageCommonBits;
 
     /// Reads the logical getter view from the slot and/or `common`.
-    fn get<'a, A: Allocator + Clone + 'a, Pb: PresenceBits>(
+    fn get<'a, A: Allocator + Clone + 'a, Pb>(
         slot: &'a Self::Slot<A>,
         common: &'a MessageCommon<Pb, A>,
-    ) -> Self::View<'a, A>;
+    ) -> Self::View<'a, A>
+    where
+        MessageCommon<Pb, A>: MessageCommonBits;
 
     /// Ensures the slot is present and returns a mutable accessor handle.
     fn with_mut<'a, A, VS, I, Pb>(
@@ -111,7 +115,7 @@ pub trait PayloadAccess: SingularType {
         Self::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
         VS: ValueSlot<Self::Slot<A>, A>,
         I: SlotInitMut,
-        Pb: PresenceBits,
+        MessageCommon<Pb, A>: MessageCommonBits,
         Self: 'a;
 
     /// Writes `value`, ensuring slot presence when applicable.
@@ -125,7 +129,7 @@ pub trait PayloadAccess: SingularType {
         Self::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
         VS: ValueSlot<Self::Slot<A>, A>,
         I: SlotInitMut,
-        Pb: PresenceBits;
+        MessageCommon<Pb, A>: MessageCommonBits;
 
     /// Clears the logical value and slot presence / payload.
     fn clear<A, VS, I, Pb>(slot: &mut VS, init: I, common: &mut MessageCommon<Pb, A>)
@@ -134,7 +138,7 @@ pub trait PayloadAccess: SingularType {
         Self::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
         VS: ValueSlot<Self::Slot<A>, A>,
         I: SlotInitMut,
-        Pb: PresenceBits;
+        MessageCommon<Pb, A>: MessageCommonBits;
 
     /// Merges one wire occurrence into the slot after the tag has been read.
     ///
@@ -156,7 +160,7 @@ pub trait PayloadAccess: SingularType {
         Self::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
         VS: ValueSlot<Self::Slot<A>, A>,
         I: SlotInitMut,
-        Pb: PresenceBits,
+        MessageCommon<Pb, A>: MessageCommonBits,
         B: Buf;
 }
 
@@ -184,18 +188,24 @@ where
     T::NativeType: AddressableSlot,
 {
     #[inline]
-    fn is_proto_empty<A: Allocator + Clone, Pb: PresenceBits>(
+    fn is_proto_empty<A: Allocator + Clone, Pb>(
         slot: &T::NativeType,
         _common: &MessageCommon<Pb, A>,
-    ) -> bool {
+    ) -> bool
+    where
+        MessageCommon<Pb, A>: MessageCommonBits,
+    {
         slot.is_proto_empty()
     }
 
     #[inline]
-    fn get<'a, A: Allocator + Clone + 'a, Pb: PresenceBits>(
+    fn get<'a, A: Allocator + Clone + 'a, Pb>(
         slot: &'a T::NativeType,
         _common: &'a MessageCommon<Pb, A>,
-    ) -> T::NativeType {
+    ) -> T::NativeType
+    where
+        MessageCommon<Pb, A>: MessageCommonBits,
+    {
         *slot
     }
 
@@ -210,7 +220,7 @@ where
         T::NativeType: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
         VS: ValueSlot<T::NativeType, A>,
         I: SlotInitMut,
-        Pb: PresenceBits,
+        MessageCommon<Pb, A>: MessageCommonBits,
         Self: 'a,
     {
         ValueSlot::with_mut(slot, init, common).get_mut()
@@ -227,7 +237,7 @@ where
         T::NativeType: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
         VS: ValueSlot<T::NativeType, A>,
         I: SlotInitMut,
-        Pb: PresenceBits,
+        MessageCommon<Pb, A>: MessageCommonBits,
     {
         ValueSlot::with_mut(slot, init, common).set(value);
     }
@@ -239,7 +249,7 @@ where
         T::NativeType: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
         VS: ValueSlot<T::NativeType, A>,
         I: SlotInitMut,
-        Pb: PresenceBits,
+        MessageCommon<Pb, A>: MessageCommonBits,
     {
         ValueSlot::with_mut(slot, init, common).clear();
     }
@@ -259,7 +269,7 @@ where
         T::NativeType: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
         VS: ValueSlot<T::NativeType, A>,
         I: SlotInitMut,
-        Pb: PresenceBits,
+        MessageCommon<Pb, A>: MessageCommonBits,
         B: Buf,
     {
         match T::from_wire_body(T::WireBody::decode(wire_type, buf)?) {
@@ -297,18 +307,24 @@ impl SingularType for ProtoString {
 
 impl PayloadAccess for ProtoString {
     #[inline]
-    fn is_proto_empty<A: Allocator + Clone, Pb: PresenceBits>(
+    fn is_proto_empty<A: Allocator + Clone, Pb>(
         slot: &UnmanagedString<A>,
         _common: &MessageCommon<Pb, A>,
-    ) -> bool {
+    ) -> bool
+    where
+        MessageCommon<Pb, A>: MessageCommonBits,
+    {
         slot.is_proto_empty()
     }
 
     #[inline]
-    fn get<'a, A: Allocator + Clone + 'a, Pb: PresenceBits>(
+    fn get<'a, A: Allocator + Clone + 'a, Pb>(
         slot: &'a UnmanagedString<A>,
         _common: &'a MessageCommon<Pb, A>,
-    ) -> &'a str {
+    ) -> &'a str
+    where
+        MessageCommon<Pb, A>: MessageCommonBits,
+    {
         slot
     }
 
@@ -322,7 +338,7 @@ impl PayloadAccess for ProtoString {
         A: Allocator + Clone + 'a,
         VS: ValueSlot<UnmanagedString<A>, A>,
         I: SlotInitMut,
-        Pb: PresenceBits,
+        MessageCommon<Pb, A>: MessageCommonBits,
         Self: 'a,
     {
         let alloc = common.alloc.clone();
@@ -344,7 +360,7 @@ impl PayloadAccess for ProtoString {
         A: Allocator + Clone,
         VS: ValueSlot<UnmanagedString<A>, A>,
         I: SlotInitMut,
-        Pb: PresenceBits,
+        MessageCommon<Pb, A>: MessageCommonBits,
     {
         ValueSlot::with_mut(slot, init, common).set(value);
     }
@@ -355,7 +371,7 @@ impl PayloadAccess for ProtoString {
         A: Allocator + Clone,
         VS: ValueSlot<UnmanagedString<A>, A>,
         I: SlotInitMut,
-        Pb: PresenceBits,
+        MessageCommon<Pb, A>: MessageCommonBits,
     {
         ValueSlot::with_mut(slot, init, common).clear();
     }
@@ -374,7 +390,7 @@ impl PayloadAccess for ProtoString {
         A: Allocator + Clone,
         VS: ValueSlot<UnmanagedString<A>, A>,
         I: SlotInitMut,
-        Pb: PresenceBits,
+        MessageCommon<Pb, A>: MessageCommonBits,
         B: Buf,
     {
         if wire_type != WireType::Len {
@@ -398,18 +414,24 @@ impl SingularType for ProtoBytes {
 
 impl PayloadAccess for ProtoBytes {
     #[inline]
-    fn is_proto_empty<A: Allocator + Clone, Pb: PresenceBits>(
+    fn is_proto_empty<A: Allocator + Clone, Pb>(
         slot: &UnmanagedVec<u8, A>,
         _common: &MessageCommon<Pb, A>,
-    ) -> bool {
+    ) -> bool
+    where
+        MessageCommon<Pb, A>: MessageCommonBits,
+    {
         slot.is_proto_empty()
     }
 
     #[inline]
-    fn get<'a, A: Allocator + Clone + 'a, Pb: PresenceBits>(
+    fn get<'a, A: Allocator + Clone + 'a, Pb>(
         slot: &'a UnmanagedVec<u8, A>,
         _common: &'a MessageCommon<Pb, A>,
-    ) -> &'a [u8] {
+    ) -> &'a [u8]
+    where
+        MessageCommon<Pb, A>: MessageCommonBits,
+    {
         slot
     }
 
@@ -423,7 +445,7 @@ impl PayloadAccess for ProtoBytes {
         A: Allocator + Clone + 'a,
         VS: ValueSlot<UnmanagedVec<u8, A>, A>,
         I: SlotInitMut,
-        Pb: PresenceBits,
+        MessageCommon<Pb, A>: MessageCommonBits,
         Self: 'a,
     {
         let alloc = common.alloc.clone();
@@ -445,7 +467,7 @@ impl PayloadAccess for ProtoBytes {
         A: Allocator + Clone,
         VS: ValueSlot<UnmanagedVec<u8, A>, A>,
         I: SlotInitMut,
-        Pb: PresenceBits,
+        MessageCommon<Pb, A>: MessageCommonBits,
     {
         ValueSlot::with_mut(slot, init, common).set(value);
     }
@@ -456,7 +478,7 @@ impl PayloadAccess for ProtoBytes {
         A: Allocator + Clone,
         VS: ValueSlot<UnmanagedVec<u8, A>, A>,
         I: SlotInitMut,
-        Pb: PresenceBits,
+        MessageCommon<Pb, A>: MessageCommonBits,
     {
         ValueSlot::with_mut(slot, init, common).clear();
     }
@@ -475,7 +497,7 @@ impl PayloadAccess for ProtoBytes {
         A: Allocator + Clone,
         VS: ValueSlot<UnmanagedVec<u8, A>, A>,
         I: SlotInitMut,
-        Pb: PresenceBits,
+        MessageCommon<Pb, A>: MessageCommonBits,
         B: Buf,
     {
         if wire_type != WireType::Len {

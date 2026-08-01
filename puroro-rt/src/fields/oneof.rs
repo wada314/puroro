@@ -24,7 +24,7 @@ use ::unmanaged::DeallocateIn;
 use crate::fields::oneof_variant::OneofVariant;
 use crate::fields::shared::field_inspect::{FieldCloneIn, FieldDebug, FieldEncode, FieldPartialEq};
 use crate::fields::shared::{
-    DefaultIn, FieldDeallocate, MessageCommon, PresenceBits, ValueLayout,
+    DefaultIn, FieldDeallocate, MessageCommon, MessageCommonAlloc, MessageCommonBits, ValueLayout,
     field_presence::{FieldPresence, Oneof},
     value_slot::{AddressableSlot, ValueSlot},
 };
@@ -39,28 +39,32 @@ use crate::fields::wire::singular_type::SingularType;
 /// the same [`MessageCommon`] message `Drop` uses so each arm can call
 /// [`FieldDeallocate::deallocate`](crate::FieldDeallocate::deallocate).
 ///
-/// `Pb` and `A` are trait parameters because the storage enum pins the message's
-/// presence / common type and allocator type. Oneof teardown itself does not
-/// require [`PresenceBits`] — only allocator access.
-pub trait OneofDeallocate<Pb, A: Allocator> {
+/// `C` is the message common context (typically [`MessageCommon`]). Impls that
+/// free heap payloads bound [`MessageCommonAlloc`].
+pub trait OneofDeallocate<C> {
     /// Drops the active variant and frees its storage through `common`.
     ///
     /// # Safety
     ///
-    /// `common.alloc` must be the allocator that owns the variant's buffers.
-    unsafe fn deallocate(self, common: &MessageCommon<Pb, A>);
+    /// `common`'s allocator must own the variant's buffers.
+    unsafe fn deallocate(self, common: &C);
 }
 
 /// Wire encode behaviour for a generated oneof storage enum variant.
 ///
-/// Methods keep a [`PresenceBits`] bound because a variant may be a bit-packed
-/// `bool` whose value lives in the message bitfield.
+/// Methods take [`MessageCommon`] so arms can call [`FieldEncode`] on singular
+/// wrappers. A [`MessageCommonBits`] bound is required because a variant may be
+/// a bit-packed `bool` whose value lives in the message bitfield.
 pub trait OneofEncodable<A: Allocator> {
     /// Wire byte length of this active variant.
-    fn encoded_len<Pb: PresenceBits>(&self, common: &MessageCommon<Pb, A>) -> usize;
+    fn encoded_len<P>(&self, common: &MessageCommon<P, A>) -> usize
+    where
+        MessageCommon<P, A>: MessageCommonBits + MessageCommonAlloc<Alloc = A>;
 
     /// Encodes this active variant.
-    fn encode_raw<Pb: PresenceBits, B: BufMut>(&self, common: &MessageCommon<Pb, A>, buf: &mut B);
+    fn encode_raw<P, B: BufMut>(&self, common: &MessageCommon<P, A>, buf: &mut B)
+    where
+        MessageCommon<P, A>: MessageCommonBits + MessageCommonAlloc<Alloc = A>;
 }
 
 /// Storage for a protobuf `oneof` group.
@@ -155,13 +159,13 @@ impl<E> OneofSlot<E> {
     }
 }
 
-impl<E, Pb, A: Allocator> FieldDeallocate<Pb, A> for OneofSlot<E>
+impl<E, P, A: Allocator> FieldDeallocate<MessageCommon<P, A>> for OneofSlot<E>
 where
-    E: OneofDeallocate<Pb, A>,
+    E: OneofDeallocate<MessageCommon<P, A>>,
 {
     /// Releases the active variant through `common` (no-op when unset).
     #[inline]
-    fn deallocate(&mut self, common: &MessageCommon<Pb, A>) {
+    fn deallocate(&mut self, common: &MessageCommon<P, A>) {
         if let Some(old) = self.take() {
             // SAFETY: `common.alloc` owns the active variant's buffers.
             unsafe { old.deallocate(common) };
@@ -252,7 +256,7 @@ impl<'f, 'c, E, Pb, A: Allocator> OneofSlotMut<'f, 'c, E, Pb, A> {
     /// variant first (last wins on the wire). Backs the decode arms.
     pub fn set(self, value: E)
     where
-        E: OneofDeallocate<Pb, A>,
+        E: OneofDeallocate<MessageCommon<Pb, A>>,
         A: Clone,
     {
         if let Some(old) = self.slot.take() {
@@ -278,7 +282,7 @@ impl<'f, 'c, E, Pb, A: Allocator> OneofSlotMut<'f, 'c, E, Pb, A> {
     /// `.merge(…)`.
     pub fn variant_mut<const FIELD: u32>(self) -> &'f mut <E as OneofVariant<FIELD>>::Value
     where
-        E: OneofVariant<FIELD> + OneofDeallocate<Pb, A>,
+        E: OneofVariant<FIELD> + OneofDeallocate<MessageCommon<Pb, A>>,
         <E as OneofVariant<FIELD>>::Value: DefaultIn<A>,
         A: Clone,
     {
@@ -307,7 +311,7 @@ impl<'f, 'c, E, Pb, A: Allocator> OneofSlotMut<'f, 'c, E, Pb, A> {
     /// Frees the active variant (if any), leaving the slot empty.
     pub fn clear(self)
     where
-        E: OneofDeallocate<Pb, A>,
+        E: OneofDeallocate<MessageCommon<Pb, A>>,
         A: Clone,
     {
         if let Some(old) = self.slot.take() {
@@ -339,7 +343,7 @@ impl<E: PartialEq> PartialEq for OneofSlot<E> {
     }
 }
 
-impl<E, Pb, A> FieldPartialEq<Pb, A> for OneofSlot<E>
+impl<E, Pb, A> FieldPartialEq<MessageCommon<Pb, A>> for OneofSlot<E>
 where
     E: OneofGroup<Presence = Pb, Alloc = A>,
     A: Allocator + Clone,
@@ -359,7 +363,7 @@ where
     }
 }
 
-impl<E, Pb, A> FieldDebug<Pb, A> for OneofSlot<E>
+impl<E, Pb, A> FieldDebug<MessageCommon<Pb, A>> for OneofSlot<E>
 where
     E: OneofGroup<Presence = Pb, Alloc = A>,
     A: Allocator + Clone,
@@ -372,10 +376,10 @@ where
     }
 }
 
-impl<E, Pb, A> FieldEncode<Pb, A> for OneofSlot<E>
+impl<E, Pb, A> FieldEncode<MessageCommon<Pb, A>> for OneofSlot<E>
 where
     E: OneofEncodable<A> + OneofGroup<Presence = Pb, Alloc = A>,
-    Pb: PresenceBits,
+    MessageCommon<Pb, A>: MessageCommonBits + MessageCommonAlloc<Alloc = A>,
     A: Allocator + Clone,
 {
     fn encoded_len(&self, common: &MessageCommon<Pb, A>) -> usize {
@@ -389,7 +393,7 @@ where
     }
 }
 
-impl<E, Pb, A> FieldCloneIn<Pb, A> for OneofSlot<E>
+impl<E, Pb, A> FieldCloneIn<MessageCommon<Pb, A>> for OneofSlot<E>
 where
     E: OneofGroup<Presence = Pb, Alloc = A>,
     A: Allocator + Clone,
@@ -425,18 +429,12 @@ impl<'a, F, Pb, A: Allocator> OneofVariantRef<'a, F, Pb, A> {
     }
 }
 
-impl<
-    'a,
-    T: SingularType,
-    const FIELD: u32,
-    A: Allocator + Clone,
-    L: ValueLayout<T, A>,
-    D,
-    Pb: PresenceBits,
-> OneofVariantRef<'a, SingularField<T, Oneof, FIELD, A, L, D>, Pb, A>
+impl<'a, T: SingularType, const FIELD: u32, A: Allocator + Clone, L: ValueLayout<T, A>, D, Pb>
+    OneofVariantRef<'a, SingularField<T, Oneof, FIELD, A, L, D>, Pb, A>
 where
     T::View<'a, A>: Copy,
     D: HasDefault<T::View<'a, A>>,
+    MessageCommon<Pb, A>: MessageCommonBits,
     T::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
     <Oneof as FieldPresence>::ValueSlot<T::Slot<A>>: ValueSlot<T::Slot<A>, A>,
 {
@@ -451,10 +449,11 @@ where
     }
 }
 
-impl<'a, M, const FIELD: u32, A: Allocator + Clone, Pb: PresenceBits>
+impl<'a, M, const FIELD: u32, A: Allocator + Clone, Pb>
     OneofVariantRef<'a, SingularField<ProtoMessage<M>, Oneof, FIELD, A>, Pb, A>
 where
     M: ::puroro::Message<Alloc = A> + ::unmanaged::DeallocateIn<A>,
+    MessageCommon<Pb, A>: MessageCommonBits,
     <Oneof as FieldPresence>::ValueSlot<UnmanagedBox<M, A>>: ValueSlot<UnmanagedBox<M, A>, A>,
 {
     /// Returns the child when this message variant is active.
@@ -476,7 +475,7 @@ where
 /// not expose the storage type in their signatures (RPIT).
 pub trait OneofGroup
 where
-    Self: OneofDeallocate<Self::Presence, Self::Alloc>,
+    Self: OneofDeallocate<MessageCommon<Self::Presence, Self::Alloc>>,
 {
     /// Payload-less discriminant of the active variant.
     type Case: Copy;
@@ -530,7 +529,7 @@ where
 /// Returned by generated `notification()`-style accessors even when unset.
 pub struct OneofView<'a, G: OneofGroup>
 where
-    G: OneofDeallocate<G::Presence, G::Alloc>,
+    G: OneofDeallocate<MessageCommon<G::Presence, G::Alloc>>,
 {
     slot: &'a OneofSlot<G>,
     common: &'a MessageCommon<G::Presence, G::Alloc>,
@@ -538,7 +537,7 @@ where
 
 impl<'a, G: OneofGroup> OneofView<'a, G>
 where
-    G: OneofDeallocate<G::Presence, G::Alloc>,
+    G: OneofDeallocate<MessageCommon<G::Presence, G::Alloc>>,
 {
     /// Creates a shared group view from a slot and message common state.
     #[inline]
@@ -561,7 +560,7 @@ where
 
 impl<'a, G: OneofGroup> OneofViewTrait for OneofView<'a, G>
 where
-    G: OneofDeallocate<G::Presence, G::Alloc>,
+    G: OneofDeallocate<MessageCommon<G::Presence, G::Alloc>>,
 {
     type Case = G::Case;
     type Ref = G::Ref<'a>;
@@ -582,7 +581,7 @@ where
 /// Returned by generated `notification_mut()`-style accessors even when unset.
 pub struct OneofViewMut<'a, G: OneofGroup>
 where
-    G: OneofDeallocate<G::Presence, G::Alloc>,
+    G: OneofDeallocate<MessageCommon<G::Presence, G::Alloc>>,
 {
     slot: &'a mut OneofSlot<G>,
     common: &'a mut MessageCommon<G::Presence, G::Alloc>,
@@ -590,7 +589,7 @@ where
 
 impl<'a, G: OneofGroup> OneofViewMut<'a, G>
 where
-    G: OneofDeallocate<G::Presence, G::Alloc>,
+    G: OneofDeallocate<MessageCommon<G::Presence, G::Alloc>>,
 {
     /// Creates a mutable group view from a slot and message common state.
     #[inline]
@@ -639,7 +638,7 @@ where
 
 impl<'a, G: OneofGroup> OneofViewMutTrait for OneofViewMut<'a, G>
 where
-    G: OneofDeallocate<G::Presence, G::Alloc>,
+    G: OneofDeallocate<MessageCommon<G::Presence, G::Alloc>>,
 {
     type Case = G::Case;
 

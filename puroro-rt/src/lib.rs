@@ -38,7 +38,7 @@ pub use fields::shared::{
     BitPacked, CatalogField, CloneFieldsVisitor, DebugStructVisitor, EncodeRawVisitor,
     EncodedLenVisitor, FieldCloneIn, FieldDeallocVisitor, FieldDeallocate, FieldDebug, FieldEncode,
     FieldEqVisitor, FieldPairVisitor, FieldPairVisitorMut, FieldPartialEq, FieldVisitor,
-    FieldVisitorMut, Inline, MessageCommon, PresenceBits, ValueLayout,
+    FieldVisitorMut, Inline, MessageCommon, MessageCommonAlloc, MessageCommonBits, ValueLayout,
 };
 pub use fields::singular::{SingularField, SingularFieldMut, SingularFieldRef};
 pub use fields::wire::{

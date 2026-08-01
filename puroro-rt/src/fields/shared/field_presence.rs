@@ -8,13 +8,12 @@
 //! [`Message`], and [`Oneof`] have none. [`Message`] uses pointer presence
 //! (`Option` via [`ValueSlot`](super::value_slot::ValueSlot)).
 
-use ::allocator_api2::alloc::Allocator;
 use ::core::mem::MaybeUninit;
 
 use ::puroro::DecodeError;
 
 use super::{
-    MessageCommon, PresenceBits, ProtoEmpty,
+    MessageCommonBits, ProtoEmpty,
     slot_init::{AlwaysInitialized, BitInit, SlotInitMut, SlotInitView},
     value_slot::AddressableSlot,
 };
@@ -52,20 +51,16 @@ pub trait FieldPresence: Copy {
     ///
     /// `is_payload_empty` is evaluated only when the policy depends on the stored
     /// value (e.g. [`Implicit`]); bitfield-backed policies ignore it.
-    fn should_emit<P, A, F>(common: &MessageCommon<P, A>, is_payload_empty: F) -> bool
+    fn should_emit<C: MessageCommonBits, F>(common: &C, is_payload_empty: F) -> bool
     where
-        P: PresenceBits,
-        A: Allocator,
         F: FnOnce() -> bool;
 
     /// `true` when the field is considered present for accessor APIs (`has_*`, `Optional`).
     ///
     /// `is_payload_empty` is evaluated only when the policy depends on the stored
     /// value (e.g. [`Implicit`]); bitfield-backed policies ignore it.
-    fn is_set<P, A, F>(common: &MessageCommon<P, A>, is_payload_empty: F) -> bool
+    fn is_set<C: MessageCommonBits, F>(common: &C, is_payload_empty: F) -> bool
     where
-        P: PresenceBits,
-        A: Allocator,
         F: FnOnce() -> bool;
 }
 
@@ -91,19 +86,15 @@ impl FieldPresence for Implicit {
         slot.is_proto_empty()
     }
 
-    fn should_emit<P, A, F>(_: &MessageCommon<P, A>, is_payload_empty: F) -> bool
+    fn should_emit<C: MessageCommonBits, F>(_: &C, is_payload_empty: F) -> bool
     where
-        P: PresenceBits,
-        A: Allocator,
         F: FnOnce() -> bool,
     {
         !is_payload_empty()
     }
 
-    fn is_set<P, A, F>(_: &MessageCommon<P, A>, is_payload_empty: F) -> bool
+    fn is_set<C: MessageCommonBits, F>(_: &C, is_payload_empty: F) -> bool
     where
-        P: PresenceBits,
-        A: Allocator,
         F: FnOnce() -> bool,
     {
         !is_payload_empty()
@@ -134,19 +125,15 @@ impl FieldPresence for Message {
         slot.is_none()
     }
 
-    fn should_emit<P, A, F>(_: &MessageCommon<P, A>, is_payload_empty: F) -> bool
+    fn should_emit<C: MessageCommonBits, F>(_: &C, is_payload_empty: F) -> bool
     where
-        P: PresenceBits,
-        A: Allocator,
         F: FnOnce() -> bool,
     {
         !is_payload_empty()
     }
 
-    fn is_set<P, A, F>(_: &MessageCommon<P, A>, is_payload_empty: F) -> bool
+    fn is_set<C: MessageCommonBits, F>(_: &C, is_payload_empty: F) -> bool
     where
-        P: PresenceBits,
-        A: Allocator,
         F: FnOnce() -> bool,
     {
         !is_payload_empty()
@@ -176,19 +163,15 @@ impl FieldPresence for Oneof {
         false
     }
 
-    fn should_emit<P, A, F>(_: &MessageCommon<P, A>, _: F) -> bool
+    fn should_emit<C: MessageCommonBits, F>(_: &C, _: F) -> bool
     where
-        P: PresenceBits,
-        A: Allocator,
         F: FnOnce() -> bool,
     {
         true
     }
 
-    fn is_set<P, A, F>(_: &MessageCommon<P, A>, _: F) -> bool
+    fn is_set<C: MessageCommonBits, F>(_: &C, _: F) -> bool
     where
-        P: PresenceBits,
-        A: Allocator,
         F: FnOnce() -> bool,
     {
         true
@@ -222,19 +205,15 @@ impl<const BIT: usize> FieldPresence for Explicit<BIT> {
         false
     }
 
-    fn should_emit<P, A, F>(common: &MessageCommon<P, A>, _: F) -> bool
+    fn should_emit<C: MessageCommonBits, F>(common: &C, _: F) -> bool
     where
-        P: PresenceBits,
-        A: Allocator,
         F: FnOnce() -> bool,
     {
         common.is_bit_set(BIT)
     }
 
-    fn is_set<P, A, F>(common: &MessageCommon<P, A>, _: F) -> bool
+    fn is_set<C: MessageCommonBits, F>(common: &C, _: F) -> bool
     where
-        P: PresenceBits,
-        A: Allocator,
         F: FnOnce() -> bool,
     {
         common.is_bit_set(BIT)
@@ -269,19 +248,15 @@ impl<const BIT: usize> FieldPresence for LegacyRequired<BIT> {
         false
     }
 
-    fn should_emit<P, A, F>(common: &MessageCommon<P, A>, _: F) -> bool
+    fn should_emit<C: MessageCommonBits, F>(common: &C, _: F) -> bool
     where
-        P: PresenceBits,
-        A: Allocator,
         F: FnOnce() -> bool,
     {
         common.is_bit_set(BIT)
     }
 
-    fn is_set<P, A, F>(common: &MessageCommon<P, A>, _: F) -> bool
+    fn is_set<C: MessageCommonBits, F>(common: &C, _: F) -> bool
     where
-        P: PresenceBits,
-        A: Allocator,
         F: FnOnce() -> bool,
     {
         common.is_bit_set(BIT)
@@ -291,14 +266,12 @@ impl<const BIT: usize> FieldPresence for LegacyRequired<BIT> {
 /// Sub-trait for LEGACY_REQUIRED fields — adds presence validation for `validate()`.
 pub trait RequiredFieldPresence: FieldPresence {
     /// Returns `MissingRequiredField` when the field is not present.
-    fn validate_present<P, A, F>(
-        common: &MessageCommon<P, A>,
+    fn validate_present<C: MessageCommonBits, F>(
+        common: &C,
         field_number: u32,
         is_payload_empty: F,
     ) -> Result<(), DecodeError>
     where
-        P: PresenceBits,
-        A: Allocator,
         F: FnOnce() -> bool,
     {
         if Self::is_set(common, is_payload_empty) {
