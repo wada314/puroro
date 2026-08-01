@@ -3,6 +3,10 @@
 //! Library users should depend on [`puroro`] only. This crate exists so the
 //! field catalog, wire helpers, and other generator-facing types can evolve on
 //! a separate semver track from the stable user API.
+//!
+//! Crate-root re-exports are the generator-facing surface (markers, field
+//! wrappers, presence, visitors). Wire-shape payloads (`WirePayload`, …) are
+//! not re-exported; see `fields::wire::wire_payload`.
 
 pub mod decode;
 pub(crate) mod defaults;
@@ -38,11 +42,10 @@ pub use fields::shared::{
 };
 pub use fields::singular::{SingularField, SingularFieldMut, SingularFieldRef};
 pub use fields::wire::{
-    Closed, ClosedEnum, CopyWirePayload, EncodeType, Fixed32Payload, Fixed64Payload, LenPayload,
-    LenPayloadRef, MapKey, MapValueView, MessageLenRef, NumericalType, Open, OpenEnum,
+    Closed, ClosedEnum, EncodeType, MapKey, MapValueView, NumericalType, Open, OpenEnum,
     PackableRepeatedElement, PayloadAccess, ProtoBool, ProtoBytes, ProtoDouble, ProtoEnum,
     ProtoEnumStorage, ProtoFixed32, ProtoFixed64, ProtoFloat, ProtoInt32, ProtoInt64, ProtoMessage,
     ProtoSFixed32, ProtoSFixed64, ProtoSInt32, ProtoSInt64, ProtoString, ProtoUInt32, ProtoUInt64,
     RepeatedElement, RepeatedElementMerge, RepeatedElementMut, RepeatedVecMut, SingularType,
-    VarintPayload, WirePayload, encode_field, encoded_len_field,
+    encode_field, encoded_len_field,
 };

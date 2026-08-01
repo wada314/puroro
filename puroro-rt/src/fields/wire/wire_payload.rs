@@ -6,6 +6,12 @@
 //!
 //! A [`WirePayload`] is the complete tag-free body for its [`WIRE_TYPE`](WirePayload::WIRE_TYPE):
 //! for `Len`, that includes the length varint plus content bytes.
+//!
+//! # Visibility
+//!
+//! Len helpers are `pub(crate)`. Copy numerical payloads stay `pub` (but are not
+//! re-exported from the crate root) because [`NumericalType::Raw`](super::numerical::NumericalType::Raw)
+//! names them in a public trait — `pub(crate)` there is E0446.
 
 use ::allocator_api2::alloc::Allocator;
 use ::allocator_api2::vec::Vec as AllocVec;
@@ -18,6 +24,7 @@ use crate::decode;
 use crate::encode;
 
 /// Untagged body for a wire type (`Varint`, `Int32`, `Int64`, or `Len`).
+#[doc(hidden)]
 pub trait WirePayload {
     /// Wire type of this body (e.g. `WireType::Varint`, `WireType::Len`).
     const WIRE_TYPE: WireType;
@@ -30,6 +37,7 @@ pub trait WirePayload {
 }
 
 /// Copy numerical wire bodies that decode without an allocator.
+#[doc(hidden)]
 pub trait CopyWirePayload: WirePayload + Copy + Sized {
     /// Reads one body after the tag has been consumed.
     fn decode(wire_type: WireType, buf: &mut impl Buf) -> Result<Self, DecodeError>;
@@ -37,6 +45,7 @@ pub trait CopyWirePayload: WirePayload + Copy + Sized {
 
 /// Varint wire body (`WireType::Varint`) — [`Varint`] before proto-type mapping
 /// (e.g. `int32` / `sint32` / `bool`).
+#[doc(hidden)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct VarintPayload(pub Varint);
 
@@ -66,6 +75,7 @@ impl CopyWirePayload for VarintPayload {
 }
 
 /// Fixed32-family wire body (`WireType::Int32`) — 4 LE bytes (`fixed32` / `float` / …).
+#[doc(hidden)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct Fixed32Payload(pub [u8; FIXED32_BYTES]);
 
@@ -99,6 +109,7 @@ impl CopyWirePayload for Fixed32Payload {
 }
 
 /// Fixed64-family wire body (`WireType::Int64`) — 8 LE bytes (`fixed64` / `double` / …).
+#[doc(hidden)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct Fixed64Payload(pub [u8; FIXED64_BYTES]);
 
@@ -134,7 +145,7 @@ impl CopyWirePayload for Fixed64Payload {
 /// Borrowed Len wire body for encode: length varint + `content`
 /// (e.g. UTF-8 bytes of a `string`, or raw `bytes`).
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub struct LenPayloadRef<'a> {
+pub(crate) struct LenPayloadRef<'a> {
     pub content: &'a [u8],
 }
 
@@ -156,7 +167,7 @@ impl WirePayload for LenPayloadRef<'_> {
 /// Len wire body for encode from a nested message: length varint + `Message::encode_raw`
 /// (no temporary buffer).
 #[derive(Clone, Copy, Debug)]
-pub struct MessageLenRef<'a, M: Message> {
+pub(crate) struct MessageLenRef<'a, M: Message> {
     pub message: &'a M,
 }
 
@@ -178,13 +189,13 @@ impl<M: Message> WirePayload for MessageLenRef<'_, M> {
 }
 
 /// Owned Len content after decode (length prefix already consumed).
-pub struct LenPayload<A: Allocator> {
+pub(crate) struct LenPayload<A: Allocator> {
     content: UnmanagedVec<u8, A>,
 }
 
 impl<A: Allocator> LenPayload<A> {
     /// Reads a `Len` wire body into owned bytes.
-    pub fn decode_in(
+    pub(crate) fn decode_in(
         wire_type: WireType,
         buf: &mut impl Buf,
         alloc: A,
@@ -211,12 +222,7 @@ impl<A: Allocator> LenPayload<A> {
     }
 
     #[inline]
-    pub fn content(&self) -> &[u8] {
-        &self.content
-    }
-
-    #[inline]
-    pub fn into_vec(self) -> UnmanagedVec<u8, A> {
+    pub(crate) fn into_vec(self) -> UnmanagedVec<u8, A> {
         self.content
     }
 }

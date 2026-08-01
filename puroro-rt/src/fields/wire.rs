@@ -33,7 +33,3 @@ pub use varint::{
     Closed, ClosedEnum, Open, OpenEnum, ProtoBool, ProtoEnum, ProtoEnumStorage, ProtoInt32,
     ProtoInt64, ProtoSInt32, ProtoSInt64, ProtoUInt32, ProtoUInt64,
 };
-pub use wire_payload::{
-    CopyWirePayload, Fixed32Payload, Fixed64Payload, LenPayload, LenPayloadRef, MessageLenRef,
-    VarintPayload, WirePayload,
-};
