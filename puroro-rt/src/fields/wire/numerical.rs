@@ -2,11 +2,12 @@
 //! `bool` / [`ProtoBool`](super::varint::ProtoBool), `fixed64` / `ProtoFixed64`,
 //! open/closed enums, … — not Len types such as string / bytes / message).
 //!
-//! [`Value`](NumericalType::Value) is the **logical** copy value used for
+//! [`NativeType`](NumericalType::NativeType) is the host-language copy value used for
 //! encode/decode and field get/set — not necessarily the singular struct slot
 //! type (`AddressableSlot` lives on [`PayloadAccess`](super::singular_type::PayloadAccess);
 //! singular [`ProtoBool`](super::varint::ProtoBool) uses [`BitPacked`](crate::BitPacked)).
-//! Maps `Value` ↔ [`CopyWirePayload`](super::wire_payload::CopyWirePayload).
+//! Maps `NativeType` ↔ [`WireBody`](NumericalType::WireBody)
+//! ([`CopyWirePayload`](super::wire_payload::CopyWirePayload)).
 //! Tagged encode goes through [`EncodeType`](super::encode_type::EncodeType).
 //! Packed repeated merge / encode live on
 //! [`RepeatedElementMerge`](super::repeated_element::RepeatedElementMerge) /
@@ -35,16 +36,16 @@ use super::wire_payload::{
 /// Numerical protobuf **type** marker (e.g. `ProtoInt32`, `ProtoBool`,
 /// `ProtoFixed64`, `ProtoEnum<…>` — not `string` / `bytes` / message).
 pub trait NumericalType: Sized {
-    /// Logical value for encode/decode and field get/set (not necessarily the
-    /// singular struct slot type).
-    type Value: Copy + Default + ProtoEmpty;
+    /// Host-language value for encode/decode and field get/set (not necessarily
+    /// the singular struct slot type).
+    type NativeType: Copy + Default + ProtoEmpty;
 
     /// Wire-shape body for this proto type (e.g. [`VarintPayload`] for `int32`).
-    type Raw: CopyWirePayload;
+    type WireBody: CopyWirePayload;
 
-    fn to_raw(value: Self::Value) -> Self::Raw;
+    fn to_wire_body(value: Self::NativeType) -> Self::WireBody;
 
-    fn from_raw(raw: Self::Raw) -> Result<Self::Value, DecodeError>;
+    fn from_wire_body(wire_body: Self::WireBody) -> Result<Self::NativeType, DecodeError>;
 }
 
 // ---------------------------------------------------------------------------
@@ -54,17 +55,17 @@ pub trait NumericalType: Sized {
 macro_rules! impl_varint_numerical {
     ($marker:ty, $inner:ty, decode = $decode:expr, encode = $encode:expr $(,)?) => {
         impl NumericalType for $marker {
-            type Value = $inner;
-            type Raw = VarintPayload;
+            type NativeType = $inner;
+            type WireBody = VarintPayload;
 
             #[inline]
-            fn to_raw(value: $inner) -> VarintPayload {
+            fn to_wire_body(value: $inner) -> VarintPayload {
                 VarintPayload(($encode)(value))
             }
 
             #[inline]
-            fn from_raw(raw: VarintPayload) -> Result<$inner, DecodeError> {
-                ($decode)(raw.0)
+            fn from_wire_body(wire_body: VarintPayload) -> Result<$inner, DecodeError> {
+                ($decode)(wire_body.0)
             }
         }
     };
@@ -124,35 +125,35 @@ impl_varint_numerical! {
 // ---------------------------------------------------------------------------
 
 impl<E: OpenEnum> NumericalType for ProtoEnum<E, Open> {
-    type Value = E;
-    type Raw = VarintPayload;
+    type NativeType = E;
+    type WireBody = VarintPayload;
 
     #[inline]
-    fn to_raw(value: E) -> VarintPayload {
+    fn to_wire_body(value: E) -> VarintPayload {
         VarintPayload(Varint::from_int32(value.to_wire()))
     }
 
     #[inline]
-    fn from_raw(raw: VarintPayload) -> Result<E, DecodeError> {
-        let i = raw.0.try_to_int32().map_err(DecodeError::from)?;
+    fn from_wire_body(wire_body: VarintPayload) -> Result<E, DecodeError> {
+        let i = wire_body.0.try_to_int32().map_err(DecodeError::from)?;
         Ok(E::from(i))
     }
 }
 
 impl<E: ClosedEnum> NumericalType for ProtoEnum<E, Closed> {
-    type Value = E;
-    type Raw = VarintPayload;
+    type NativeType = E;
+    type WireBody = VarintPayload;
 
     #[inline]
-    fn to_raw(value: E) -> VarintPayload {
+    fn to_wire_body(value: E) -> VarintPayload {
         VarintPayload(Varint::from_int32(value.to_wire()))
     }
 
     #[inline]
-    fn from_raw(raw: VarintPayload) -> Result<E, DecodeError> {
-        let wire = raw.0.try_to_int32().map_err(DecodeError::from)?;
+    fn from_wire_body(wire_body: VarintPayload) -> Result<E, DecodeError> {
+        let wire = wire_body.0.try_to_int32().map_err(DecodeError::from)?;
         E::try_from(wire).map_err(|_| DecodeError::UnknownClosedEnum {
-            raw: raw.0.to_uint64(),
+            raw: wire_body.0.to_uint64(),
         })
     }
 }
@@ -164,17 +165,17 @@ impl<E: ClosedEnum> NumericalType for ProtoEnum<E, Closed> {
 macro_rules! impl_fixed32_numerical {
     ($marker:ty, $inner:ty) => {
         impl NumericalType for $marker {
-            type Value = $inner;
-            type Raw = Fixed32Payload;
+            type NativeType = $inner;
+            type WireBody = Fixed32Payload;
 
             #[inline]
-            fn to_raw(value: $inner) -> Fixed32Payload {
+            fn to_wire_body(value: $inner) -> Fixed32Payload {
                 Fixed32Payload(value.to_le_bytes())
             }
 
             #[inline]
-            fn from_raw(raw: Fixed32Payload) -> Result<$inner, DecodeError> {
-                Ok(<$inner>::from_le_bytes(raw.0))
+            fn from_wire_body(wire_body: Fixed32Payload) -> Result<$inner, DecodeError> {
+                Ok(<$inner>::from_le_bytes(wire_body.0))
             }
         }
     };
@@ -183,17 +184,17 @@ macro_rules! impl_fixed32_numerical {
 macro_rules! impl_fixed64_numerical {
     ($marker:ty, $inner:ty) => {
         impl NumericalType for $marker {
-            type Value = $inner;
-            type Raw = Fixed64Payload;
+            type NativeType = $inner;
+            type WireBody = Fixed64Payload;
 
             #[inline]
-            fn to_raw(value: $inner) -> Fixed64Payload {
+            fn to_wire_body(value: $inner) -> Fixed64Payload {
                 Fixed64Payload(value.to_le_bytes())
             }
 
             #[inline]
-            fn from_raw(raw: Fixed64Payload) -> Result<$inner, DecodeError> {
-                Ok(<$inner>::from_le_bytes(raw.0))
+            fn from_wire_body(wire_body: Fixed64Payload) -> Result<$inner, DecodeError> {
+                Ok(<$inner>::from_le_bytes(wire_body.0))
             }
         }
     };
@@ -208,28 +209,28 @@ impl_fixed64_numerical!(ProtoDouble, f64);
 
 impl<T: NumericalType> EncodeType for T {
     type View<'a, A: Allocator + Clone>
-        = T::Value
+        = T::NativeType
     where
         Self: 'a,
         A: 'a;
 
-    const WIRE_TYPE: WireType = <T::Raw as WirePayload>::WIRE_TYPE;
+    const WIRE_TYPE: WireType = <T::WireBody as WirePayload>::WIRE_TYPE;
 
     #[inline]
-    fn payload_len<'a, A: Allocator + Clone>(value: T::Value) -> usize
+    fn payload_len<'a, A: Allocator + Clone>(value: T::NativeType) -> usize
     where
         Self: 'a,
     {
-        T::to_raw(value).encoded_len()
+        T::to_wire_body(value).encoded_len()
     }
 
     #[inline]
-    fn encode_payload<'a, A, B>(value: T::Value, buf: &mut B)
+    fn encode_payload<'a, A, B>(value: T::NativeType, buf: &mut B)
     where
         Self: 'a,
         A: Allocator + Clone,
         B: BufMut,
     {
-        T::to_raw(value).encode(buf);
+        T::to_wire_body(value).encode(buf);
     }
 }

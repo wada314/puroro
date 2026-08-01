@@ -45,16 +45,16 @@ pub trait ProtoRefDebug<A: Allocator + Clone>: SingularType {
     }
 }
 
-// Addressable numerical markers (`Ref = Value`): int / fixed / float / enum.
-// `ProtoBool` is separate (logical `bool`, singular `Slot = ()`).
+// Addressable numerical markers (`Ref = NativeType`): int / fixed / float / enum.
+// `ProtoBool` is separate (native `bool`, singular `Slot = ()`).
 impl<T, A> ProtoRefEq<A> for T
 where
     T: NumericalType,
-    T::Value: PartialEq + AddressableSlot,
+    T::NativeType: PartialEq + AddressableSlot,
     A: Allocator + Clone,
 {
     #[inline]
-    fn option_eq<'a>(lhs: Option<T::Value>, rhs: Option<T::Value>) -> bool
+    fn option_eq<'a>(lhs: Option<T::NativeType>, rhs: Option<T::NativeType>) -> bool
     where
         A: 'a,
     {
@@ -65,11 +65,11 @@ where
 impl<T, A> ProtoRefDebug<A> for T
 where
     T: NumericalType,
-    T::Value: Debug + AddressableSlot,
+    T::NativeType: Debug + AddressableSlot,
     A: Allocator + Clone,
 {
     #[inline]
-    fn fmt_ref<'a>(value: &T::Value, f: &mut Formatter<'_>) -> FmtResult
+    fn fmt_ref<'a>(value: &T::NativeType, f: &mut Formatter<'_>) -> FmtResult
     where
         A: 'a,
     {

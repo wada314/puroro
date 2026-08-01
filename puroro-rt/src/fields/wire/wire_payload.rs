@@ -10,7 +10,7 @@
 //! # Visibility
 //!
 //! Len helpers are `pub(crate)`. Copy numerical payloads stay `pub` (but are not
-//! re-exported from the crate root) because [`NumericalType::Raw`](super::numerical::NumericalType::Raw)
+//! re-exported from the crate root) because [`NumericalType::WireBody`](super::numerical::NumericalType::WireBody)
 //! names them in a public trait — `pub(crate)` there is E0446.
 
 use ::allocator_api2::alloc::Allocator;

@@ -18,8 +18,8 @@
 //!
 //! Repeated fields use [`RepeatedElement`](super::repeated_element::RepeatedElement)
 //! (`Element` storage). Numerical markers (including `ProtoBool`) share
-//! [`NumericalType`](super::numerical::NumericalType) for logical `Value` ↔ wire
-//! mapping; inline slot storage stays on [`PayloadAccess`] (`Value: AddressableSlot`).
+//! [`NumericalType`](super::numerical::NumericalType) for `NativeType` ↔ `WireBody`
+//! mapping; inline slot storage stays on [`PayloadAccess`] (`NativeType: AddressableSlot`).
 //! Singular [`ProtoBool`](super::varint::ProtoBool) uses `Slot = ()` + [`BitPacked`].
 
 use ::allocator_api2::alloc::Allocator;
@@ -161,31 +161,31 @@ pub trait PayloadAccess: SingularType {
 }
 
 // ---------------------------------------------------------------------------
-// Numerical markers (Slot = logical Value; storage via AddressableSlot on methods)
+// Numerical markers (Slot = NativeType; storage via AddressableSlot on methods)
 // ---------------------------------------------------------------------------
 
 impl<T> SingularType for T
 where
     T: NumericalType,
-    T::Value: AddressableSlot,
+    T::NativeType: AddressableSlot,
 {
-    type Slot<A: Allocator + Clone> = T::Value;
+    type Slot<A: Allocator + Clone> = T::NativeType;
     type Mut<'a, A: Allocator + Clone>
-        = &'a mut T::Value
+        = &'a mut T::NativeType
     where
         Self: 'a,
         A: 'a;
-    type Written<A: Allocator + Clone> = T::Value;
+    type Written<A: Allocator + Clone> = T::NativeType;
 }
 
 impl<T> PayloadAccess for T
 where
     T: NumericalType,
-    T::Value: AddressableSlot,
+    T::NativeType: AddressableSlot,
 {
     #[inline]
     fn is_proto_empty<A: Allocator + Clone, Pb: PresenceBits>(
-        slot: &T::Value,
+        slot: &T::NativeType,
         _common: &MessageCommon<Pb, A>,
     ) -> bool {
         slot.is_proto_empty()
@@ -193,9 +193,9 @@ where
 
     #[inline]
     fn get<'a, A: Allocator + Clone + 'a, Pb: PresenceBits>(
-        slot: &'a T::Value,
+        slot: &'a T::NativeType,
         _common: &'a MessageCommon<Pb, A>,
-    ) -> T::Value {
+    ) -> T::NativeType {
         *slot
     }
 
@@ -204,11 +204,11 @@ where
         slot: &'a mut VS,
         init: I,
         common: &'a mut MessageCommon<Pb, A>,
-    ) -> &'a mut T::Value
+    ) -> &'a mut T::NativeType
     where
         A: Allocator + Clone + 'a,
-        T::Value: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
-        VS: ValueSlot<T::Value, A>,
+        T::NativeType: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
+        VS: ValueSlot<T::NativeType, A>,
         I: SlotInitMut,
         Pb: PresenceBits,
         Self: 'a,
@@ -221,11 +221,11 @@ where
         slot: &mut VS,
         init: I,
         common: &mut MessageCommon<Pb, A>,
-        value: T::Value,
+        value: T::NativeType,
     ) where
         A: Allocator + Clone,
-        T::Value: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
-        VS: ValueSlot<T::Value, A>,
+        T::NativeType: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
+        VS: ValueSlot<T::NativeType, A>,
         I: SlotInitMut,
         Pb: PresenceBits,
     {
@@ -236,8 +236,8 @@ where
     fn clear<A, VS, I, Pb>(slot: &mut VS, init: I, common: &mut MessageCommon<Pb, A>)
     where
         A: Allocator + Clone,
-        T::Value: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
-        VS: ValueSlot<T::Value, A>,
+        T::NativeType: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
+        VS: ValueSlot<T::NativeType, A>,
         I: SlotInitMut,
         Pb: PresenceBits,
     {
@@ -256,13 +256,13 @@ where
     ) -> Result<(), DecodeError>
     where
         A: Allocator + Clone,
-        T::Value: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
-        VS: ValueSlot<T::Value, A>,
+        T::NativeType: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
+        VS: ValueSlot<T::NativeType, A>,
         I: SlotInitMut,
         Pb: PresenceBits,
         B: Buf,
     {
-        match T::from_raw(T::Raw::decode(wire_type, buf)?) {
+        match T::from_wire_body(T::WireBody::decode(wire_type, buf)?) {
             Ok(new) => {
                 Self::write(slot, init, common, new);
                 Ok(())

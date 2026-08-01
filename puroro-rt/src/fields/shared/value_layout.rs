@@ -239,7 +239,7 @@ where
         Pb: PresenceBits,
         B: Buf,
     {
-        match ProtoBool::from_raw(VarintPayload::decode(wire_type, buf)?) {
+        match ProtoBool::from_wire_body(VarintPayload::decode(wire_type, buf)?) {
             Ok(new) => {
                 Self::write(slot, init, common, new);
                 Ok(())
