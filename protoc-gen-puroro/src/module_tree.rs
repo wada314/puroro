@@ -11,6 +11,7 @@
 
 pub mod layout;
 
+use crate::case::to_snake_case;
 use crate::descriptor::ProtoFqn;
 use ::proc_macro2::{Ident, TokenStream};
 use ::std::mem;
@@ -196,23 +197,6 @@ pub fn type_name_to_module_ident(type_name: &str) -> Ident {
     Ident::new(&to_snake_case(type_name), ::proc_macro2::Span::call_site())
 }
 
-fn to_snake_case(input: &str) -> String {
-    let mut out = String::new();
-    for (i, c) in input.chars().enumerate() {
-        if c.is_uppercase() {
-            if i != 0 {
-                out.push('_');
-            }
-            for lower in c.to_lowercase() {
-                out.push(lower);
-            }
-        } else {
-            out.push(c);
-        }
-    }
-    out
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -283,8 +267,8 @@ mod tests {
     }
 
     #[test]
-    fn snake_case_helpers() {
-        assert_eq!(to_snake_case("Task"), "task");
-        assert_eq!(to_snake_case("FooBar"), "foo_bar");
+    fn type_name_to_module_uses_snake_case() {
+        assert_eq!(type_name_to_module_ident("Task").to_string(), "task");
+        assert_eq!(type_name_to_module_ident("FooBar").to_string(), "foo_bar");
     }
 }

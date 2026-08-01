@@ -2,6 +2,8 @@
 
 use ::proc_macro2::{Ident, Span};
 
+pub use crate::case::to_pascal_case;
+
 /// Protobuf name → Rust `Ident`, using `r#…` for keywords (`type`, `self`, …).
 pub fn rust_ident(name: &str) -> Ident {
     if is_rust_keyword(name) {
@@ -19,27 +21,6 @@ pub fn is_simple_ident(name: &str) -> bool {
         }
         _ => false,
     }
-}
-
-/// `email_address` / `EmailAddress` → `EmailAddress`.
-pub fn to_pascal_case(name: &str) -> String {
-    let mut out = String::new();
-    let mut capitalize = true;
-    for c in name.chars() {
-        if c == '_' {
-            capitalize = true;
-            continue;
-        }
-        if capitalize {
-            for upper in c.to_uppercase() {
-                out.push(upper);
-            }
-            capitalize = false;
-        } else {
-            out.push(c);
-        }
-    }
-    out
 }
 
 fn is_rust_keyword(name: &str) -> bool {
@@ -114,9 +95,8 @@ mod tests {
     }
 
     #[test]
-    fn pascal_case_from_snake_and_camel() {
+    fn pascal_case_reexport() {
+        // Smoke check that emit code can keep importing `to_pascal_case` here.
         assert_eq!(to_pascal_case("email_address"), "EmailAddress");
-        assert_eq!(to_pascal_case("urgent"), "Urgent");
-        assert_eq!(to_pascal_case("EmailAddress"), "EmailAddress");
     }
 }

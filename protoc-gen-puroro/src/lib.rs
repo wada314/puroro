@@ -4,6 +4,7 @@
 //! future `build.rs` / CLI wrappers should call [`generate_from_bytes`] (or the
 //! descriptor / resolved helpers) directly.
 
+pub mod case;
 pub mod default_value;
 pub mod descriptor;
 pub mod emit;

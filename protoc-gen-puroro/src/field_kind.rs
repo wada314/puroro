@@ -10,6 +10,7 @@ mod plan;
 
 pub use plan::{MessageMember, MessagePlan, PlannedField, PlannedOneof, plan_message};
 
+use crate::case::to_upper_snake;
 use crate::default_value::CustomDefault;
 use crate::descriptor::features::{EnumType, RepeatedFieldEncoding, Utf8Validation};
 use crate::resolved::{Enum, Field, Message, SingularPresence, TypeRef};
@@ -236,21 +237,17 @@ impl CatalogPresence {
 
 /// `FIELD_TITLE` from proto field name `title`.
 pub fn field_number_const(proto_name: &str) -> String {
-    format!("FIELD_{}", screaming_snake(proto_name))
+    format!("FIELD_{}", to_upper_snake(proto_name))
 }
 
 /// `BIT_TITLE` — presence bit for EXPLICIT / LEGACY_REQUIRED.
 pub fn presence_bit_const(proto_name: &str) -> String {
-    format!("BIT_{}", screaming_snake(proto_name))
+    format!("BIT_{}", to_upper_snake(proto_name))
 }
 
 /// `BIT_DONE_VALUE` — bool value bit in `BitPacked`.
 pub fn value_bit_const(proto_name: &str) -> String {
-    format!("BIT_{}_VALUE", screaming_snake(proto_name))
-}
-
-fn screaming_snake(proto_name: &str) -> String {
-    proto_name.to_ascii_uppercase()
+    format!("BIT_{}_VALUE", to_upper_snake(proto_name))
 }
 
 /// Byte length of `BitArray<[u8; N], Lsb0>` for `bit_count` bits (`N == 0` allowed).

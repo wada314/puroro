@@ -3,6 +3,7 @@
 //! Formats follow the comments on `default_value` in `descriptor.proto`:
 //! numeric / bool / string (already decoded) / bytes (C-escaped) / enum name.
 
+use crate::case::to_pascal_case;
 use crate::error::{Error, Result};
 use crate::field_kind::WireTypeKind;
 use crate::resolved::Enum;
@@ -49,31 +50,9 @@ pub fn interpret_custom_default(
         return Ok(None);
     }
     Ok(Some(CustomDefault {
-        marker_name: format!("{}Default", crate_to_pascal(field_name)),
+        marker_name: format!("{}Default", to_pascal_case(field_name)),
         lit,
     }))
-}
-
-fn crate_to_pascal(field_name: &str) -> String {
-    // Keep naming aligned with `emit::ident::to_pascal_case` without a cyclic
-    // dependency (field_kind → default_value; emit → field_kind).
-    let mut out = String::new();
-    let mut capitalize = true;
-    for c in field_name.chars() {
-        if c == '_' {
-            capitalize = true;
-            continue;
-        }
-        if capitalize {
-            for upper in c.to_uppercase() {
-                out.push(upper);
-            }
-            capitalize = false;
-        } else {
-            out.push(c);
-        }
-    }
-    out
 }
 
 fn parse_default_lit(field_name: &str, raw: &str, wire: &WireTypeKind<'_>) -> Result<DefaultLit> {

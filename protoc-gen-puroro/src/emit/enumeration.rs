@@ -1,6 +1,7 @@
 //! Emit a protobuf enum as a newtype-over-`i32` (open or closed).
 
 use super::ident::{is_simple_ident, rust_ident};
+use crate::case::to_upper_snake;
 use crate::descriptor::features::EnumType;
 use crate::error::{Error, Result};
 use crate::resolved::Enum;
@@ -185,7 +186,7 @@ fn contiguous_range(numbers: &[i32]) -> Option<(i32, i32)> {
 /// If stripping the enum-name prefix would leave a non-ident (e.g. `EDITION_2023`
 /// → `2023`), keep the full value name instead.
 pub(super) fn variant_const_ident(enum_name: &str, value_name: &str) -> Result<Ident> {
-    let prefix = format!("{}_", camel_to_screaming_snake(enum_name));
+    let prefix = format!("{}_", to_upper_snake(enum_name));
     let rest = value_name.strip_prefix(&prefix).unwrap_or(value_name);
     let candidate = if is_simple_ident(rest) && !starts_with_digit(rest) {
         rest
@@ -204,22 +205,6 @@ fn starts_with_digit(name: &str) -> bool {
     name.chars().next().is_some_and(|c| c.is_ascii_digit())
 }
 
-fn camel_to_screaming_snake(name: &str) -> String {
-    let chars: Vec<char> = name.chars().collect();
-    let mut out = String::new();
-    for (i, &c) in chars.iter().enumerate() {
-        if c.is_ascii_uppercase() && i > 0 {
-            let prev_lower = chars[i - 1].is_ascii_lowercase();
-            let next_lower = chars.get(i + 1).is_some_and(|n| n.is_ascii_lowercase());
-            if prev_lower || next_lower {
-                out.push('_');
-            }
-        }
-        out.push(c.to_ascii_uppercase());
-    }
-    out
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -230,12 +215,6 @@ mod tests {
         assert_eq!(ident.to_string(), "UNSPECIFIED");
         let ident = variant_const_ident("Priority", "PRIORITY_HIGH").unwrap();
         assert_eq!(ident.to_string(), "HIGH");
-    }
-
-    #[test]
-    fn camel_to_screaming_handles_multi_word() {
-        assert_eq!(camel_to_screaming_snake("Status"), "STATUS");
-        assert_eq!(camel_to_screaming_snake("FooBar"), "FOO_BAR");
     }
 
     #[test]
