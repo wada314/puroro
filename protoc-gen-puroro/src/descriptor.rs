@@ -98,6 +98,8 @@ pub struct FieldDesc {
     /// Index into the parent message's `oneofs`, when this field is a oneof member.
     pub oneof_index: Option<i32>,
     pub proto3_optional: bool,
+    /// `FieldDescriptorProto.default_value` — textual form from protoc (see descriptor.proto).
+    pub default_value: Option<String>,
     /// proto2/proto3 `FieldOptions.packed` (editions uses `features.repeated_field_encoding`).
     pub packed: Option<bool>,
     /// Field-level `options.features` (`FeatureSet`), if any fields were set.

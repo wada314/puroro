@@ -1,5 +1,7 @@
 //! Emit a oneof submodule (`shape` / `Case` / `Storage` + trait impls).
 
+use super::defaults;
+use crate::default_value::CustomDefault;
 use crate::error::Result;
 use ::proc_macro2::{Ident, TokenStream};
 use ::quote::quote;
@@ -31,6 +33,8 @@ pub(super) struct OneofVariantEmit {
     pub is_bool: bool,
     pub mut_target: TokenStream,
     pub optional_ty: TokenStream,
+    /// Non-type-zero `[default = …]` plus pre-rendered `HasDefault` impl item.
+    pub custom_default: Option<(CustomDefault, TokenStream)>,
 }
 
 /// Render `mod <oneof> { … }` plus `use` / `pub use` for the parent message module.
@@ -77,6 +81,16 @@ fn render_module_body(oneof: &OneofEmit) -> Result<TokenStream> {
         })
         .collect();
 
+    let default_uses: Vec<_> = oneof
+        .variants
+        .iter()
+        .filter_map(|v| {
+            let (custom, _) = v.custom_default.as_ref()?;
+            let marker = defaults::marker_ident(custom);
+            Some(quote! { use super::defaults::#marker; })
+        })
+        .collect();
+
     let field_alias_defs: Vec<_> = oneof
         .variants
         .iter()
@@ -84,24 +98,19 @@ fn render_module_body(oneof: &OneofEmit) -> Result<TokenStream> {
             let alias = &v.field_alias;
             let marker = &v.marker;
             let field_const = &v.field_const;
-            match &v.layout_ty {
-                None => quote! {
-                    type #alias<A> = ::puroro_rt::SingularField<
-                        #marker,
-                        ::puroro_rt::Oneof,
-                        { super::#field_const },
-                        A,
-                    >;
-                },
-                Some(layout_ty) => quote! {
-                    type #alias<A> = ::puroro_rt::SingularField<
-                        #marker,
-                        ::puroro_rt::Oneof,
-                        { super::#field_const },
-                        A,
-                        #layout_ty,
-                    >;
-                },
+            let default_marker = v
+                .custom_default
+                .as_ref()
+                .map(|(c, _)| defaults::marker_ident(c));
+            let tail = defaults::layout_and_default_args(&v.layout_ty, default_marker.as_ref());
+            quote! {
+                type #alias<A> = ::puroro_rt::SingularField<
+                    #marker,
+                    ::puroro_rt::Oneof,
+                    { super::#field_const },
+                    A
+                    #tail
+                >;
             }
         })
         .collect();
@@ -285,6 +294,8 @@ fn render_module_body(oneof: &OneofEmit) -> Result<TokenStream> {
         pub enum #case_name {
             #(#case_variants)*
         }
+
+        #(#default_uses)*
 
         #(#field_alias_defs)*
 

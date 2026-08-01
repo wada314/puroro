@@ -297,6 +297,7 @@ fn decode_field(bytes: &[u8]) -> Result<FieldDesc> {
         let mut type_name = None;
         let mut oneof_index = None;
         let mut proto3_optional = false;
+        let mut default_value = None;
         let mut packed = None;
         let mut features = FeatureSet::default();
 
@@ -319,6 +320,8 @@ fn decode_field(bytes: &[u8]) -> Result<FieldDesc> {
                 }
                 // optional string type_name = 6;
                 6 => type_name = Some(ProtoFqn::parse(expect_string(&field)?)),
+                // optional string default_value = 7;
+                7 => default_value = Some(expect_string(&field)?),
                 // optional FieldOptions options = 8;
                 8 => {
                     let nested = expect_len(&field)?;
@@ -342,6 +345,7 @@ fn decode_field(bytes: &[u8]) -> Result<FieldDesc> {
             type_name,
             oneof_index,
             proto3_optional,
+            default_value,
             packed,
             features,
         })

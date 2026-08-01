@@ -4,6 +4,7 @@ use super::{
     CatalogLayout, CatalogPresence, FieldKind, RepeatedEncodingKind, WireTypeKind,
     field_number_const, value_bit_const,
 };
+use crate::default_value::interpret_custom_default;
 use crate::error::{Error, Result};
 use crate::resolved::{Field, FieldOccurrence, Message, SingularPresence, TypeRef};
 use ::std::collections::HashMap;
@@ -202,8 +203,22 @@ fn plan_field<'a>(field: &'a Field<'a>, next_bit: &mut usize) -> Result<PlannedF
     }
 
     let kind = match field.occurrence() {
-        FieldOccurrence::Map => plan_map_field(field)?,
+        FieldOccurrence::Map => {
+            if field.default_value().is_some() {
+                return Err(Error::Codegen(format!(
+                    "field `{}`: map fields cannot have default values",
+                    field.name()
+                )));
+            }
+            plan_map_field(field)?
+        }
         FieldOccurrence::Repeated(encoding) => {
+            if field.default_value().is_some() {
+                return Err(Error::Codegen(format!(
+                    "field `{}`: repeated fields cannot have default values",
+                    field.name()
+                )));
+            }
             let wire = WireTypeKind::from_field(field);
             // Non-packable types cannot use packed wire form regardless of feature.
             let encoding = if wire.is_packable() {
@@ -226,10 +241,15 @@ fn plan_field<'a>(field: &'a Field<'a>, next_bit: &mut usize) -> Result<PlannedF
             } else {
                 CatalogLayout::Inline
             };
+            let custom_default = match field.default_value() {
+                Some(raw) => interpret_custom_default(field.name(), raw, &wire)?,
+                None => None,
+            };
             FieldKind::Singular {
                 wire,
                 presence: catalog_presence,
                 layout,
+                custom_default,
             }
         }
     };
@@ -371,6 +391,7 @@ mod tests {
             type_name,
             oneof_index,
             proto3_optional,
+            default_value: None,
             packed: None,
             features: FeatureSet::default(),
         }
@@ -467,6 +488,7 @@ mod tests {
                     },
                 presence: CatalogPresence::Explicit { bit: 0, bit_const },
                 layout: CatalogLayout::Inline,
+                custom_default: None,
             } => assert_eq!(bit_const, "BIT_STREET"),
             other => panic!("unexpected kind: {other:?}"),
         }
@@ -480,6 +502,7 @@ mod tests {
                 wire: WireTypeKind::Fixed32,
                 presence: CatalogPresence::Explicit { bit: 2, bit_const },
                 layout: CatalogLayout::Inline,
+                custom_default: None,
             } => assert_eq!(bit_const, "BIT_POSTAL_CODE"),
             other => panic!("unexpected kind: {other:?}"),
         }
@@ -580,6 +603,7 @@ mod tests {
                         value_bit: 3,
                         bit_const,
                     },
+                custom_default: None,
             } => assert_eq!(bit_const, "BIT_URGENT_VALUE"),
             other => panic!("unexpected urgent kind: {other:?}"),
         }
@@ -596,6 +620,7 @@ mod tests {
                         value_bit: 0,
                         bit_const,
                     },
+                custom_default: None,
             } => assert_eq!(bit_const, "BIT_DONE_VALUE"),
             other => panic!("unexpected done kind: {other:?}"),
         }
@@ -616,6 +641,7 @@ mod tests {
                         value_bit: 2,
                         bit_const: value_const,
                     },
+                custom_default: None,
             } => {
                 assert_eq!(presence_const, "BIT_FLAG");
                 assert_eq!(value_const, "BIT_FLAG_VALUE");
@@ -703,6 +729,7 @@ mod tests {
                         type_name: None,
                         oneof_index: None,
                         proto3_optional: false,
+                        default_value: None,
                         packed: None,
                         features: FeatureSet {
                             repeated_field_encoding: Some(RepeatedFieldEncoding::Expanded),
@@ -717,6 +744,7 @@ mod tests {
                         type_name: None,
                         oneof_index: None,
                         proto3_optional: false,
+                        default_value: None,
                         packed: None,
                         features: FeatureSet {
                             utf8_validation: Some(Utf8Validation::None),
@@ -731,6 +759,7 @@ mod tests {
                         type_name: Some(ProtoFqn::parse(".example.Priority")),
                         oneof_index: None,
                         proto3_optional: false,
+                        default_value: None,
                         packed: None,
                         features: FeatureSet::default(),
                     },

@@ -5,9 +5,11 @@
 //! `BitPacked`), real oneof groups, and maps (legal keys × Copy scalar /
 //! bool values).
 
+use super::defaults;
 use super::ident::{is_simple_ident, rust_ident, to_pascal_case};
 use super::oneof::{self, OneofEmit, OneofVariantEmit};
 use super::type_path::{fqn_to_enum_root_path, fqn_to_message_root_path};
+use crate::default_value::{CustomDefault, DefaultLit};
 use crate::descriptor::features::EnumType;
 use crate::error::{Error, Result};
 use crate::field_kind::{
@@ -43,6 +45,8 @@ struct ScalarEmit {
     implicit_ty: TokenStream,
     /// Payload type inside `Optional<…>` (`i32`, `&'a str`, enum path, …).
     optional_ty: TokenStream,
+    /// Non-type-zero `[default = …]` marker (emitted into `mod defaults`).
+    custom_default: Option<(CustomDefault, TokenStream /* HasDefault impl item */)>,
 }
 
 struct RepeatedEmit {
@@ -122,6 +126,7 @@ pub(super) fn render_items(plan: &MessagePlan<'_>) -> Result<TokenStream> {
 
     let bit_consts = render_bit_consts(&fields);
     let field_consts = render_field_consts(&fields);
+    let defaults_module = render_defaults_module(&fields)?;
     let struct_fields = render_struct_fields(&fields);
     let new_in_fields = render_new_in_fields(&fields);
     let accessors = render_accessors(&fields);
@@ -170,6 +175,8 @@ pub(super) fn render_items(plan: &MessagePlan<'_>) -> Result<TokenStream> {
         #bit_consts
 
         #field_consts
+
+        #defaults_module
 
         type __Presence = ::bitvec::array::BitArray<[u8; #presence_bytes], ::bitvec::order::Lsb0>;
 
@@ -442,6 +449,7 @@ fn collect_fields(plan: &MessagePlan<'_>) -> Result<Vec<FieldEmit>> {
                         wire,
                         presence,
                         layout,
+                        custom_default,
                     } => {
                         if matches!(presence, CatalogPresence::Oneof) {
                             return Err(Error::Codegen(format!(
@@ -456,6 +464,7 @@ fn collect_fields(plan: &MessagePlan<'_>) -> Result<Vec<FieldEmit>> {
                             wire,
                             presence,
                             layout,
+                            custom_default.as_ref(),
                         )?));
                     }
                 }
@@ -476,6 +485,7 @@ fn oneof_variant_emit(field: &PlannedField<'_>, index: usize) -> Result<OneofVar
         wire,
         presence,
         layout,
+        custom_default,
     } = field.kind()
     else {
         return Err(Error::Codegen(format!(
@@ -526,6 +536,10 @@ fn oneof_variant_emit(field: &PlannedField<'_>, index: usize) -> Result<OneofVar
             TokenStream::new()
         } else {
             optional_value_type(wire)?
+        },
+        custom_default: match custom_default {
+            Some(custom) => Some((custom.clone(), defaults::render_marker_item(custom, wire)?)),
+            None => None,
         },
     })
 }
@@ -641,6 +655,7 @@ fn scalar_emit(
     wire: &WireTypeKind<'_>,
     presence: &CatalogPresence,
     layout: &CatalogLayout,
+    custom_default: Option<&CustomDefault>,
 ) -> Result<ScalarEmit> {
     let (style, presence_ty, presence_bit) = match presence {
         CatalogPresence::Implicit => (
@@ -721,6 +736,61 @@ fn scalar_emit(
         } else {
             optional_value_type(wire)?
         },
+        custom_default: match custom_default {
+            Some(custom) => Some((custom.clone(), defaults::render_marker_item(custom, wire)?)),
+            None => None,
+        },
+    })
+}
+
+fn render_defaults_module(fields: &[FieldEmit]) -> Result<TokenStream> {
+    let mut items = Vec::new();
+    let mut uses = Vec::new();
+    let mut needs_root = false;
+    for field in fields {
+        match field {
+            FieldEmit::Singular(f) => {
+                if let Some((custom, impl_item)) = &f.custom_default {
+                    let marker = defaults::marker_ident(custom);
+                    if matches!(custom.lit, DefaultLit::Enum { .. }) {
+                        needs_root = true;
+                    }
+                    items.push(impl_item.clone());
+                    uses.push(quote! { use defaults::#marker; });
+                }
+            }
+            FieldEmit::Oneof(o) => {
+                for v in &o.variants {
+                    if let Some((custom, impl_item)) = &v.custom_default {
+                        if matches!(custom.lit, DefaultLit::Enum { .. }) {
+                            needs_root = true;
+                        }
+                        items.push(impl_item.clone());
+                    }
+                }
+            }
+            FieldEmit::Repeated(_) | FieldEmit::Map(_) => {}
+        }
+    }
+    if items.is_empty() {
+        return Ok(TokenStream::new());
+    }
+    let root_shim = if needs_root {
+        quote! {
+            // Same `_root` chain as oneof submodules so `self::_root::…` enum paths work.
+            mod _root {
+                pub(super) use super::super::_root::*;
+            }
+        }
+    } else {
+        TokenStream::new()
+    };
+    Ok(quote! {
+        mod defaults {
+            #root_shim
+            #(#items)*
+        }
+        #(#uses)*
     })
 }
 
@@ -801,13 +871,14 @@ fn render_struct_fields(fields: &[FieldEmit]) -> Vec<TokenStream> {
                 let marker = &field.marker;
                 let presence_ty = &field.presence_ty;
                 let field_const = &field.field_const;
-                match &field.layout_ty {
-                    None => quote! {
-                        #name: ::puroro_rt::SingularField<#marker, #presence_ty, { #field_const }, A>,
-                    },
-                    Some(layout_ty) => quote! {
-                        #name: ::puroro_rt::SingularField<#marker, #presence_ty, { #field_const }, A, #layout_ty>,
-                    },
+                let default_marker = field
+                    .custom_default
+                    .as_ref()
+                    .map(|(c, _)| defaults::marker_ident(c));
+                let tail =
+                    defaults::layout_and_default_args(&field.layout_ty, default_marker.as_ref());
+                quote! {
+                    #name: ::puroro_rt::SingularField<#marker, #presence_ty, { #field_const }, A #tail>,
                 }
             }
             FieldEmit::Repeated(field) => {

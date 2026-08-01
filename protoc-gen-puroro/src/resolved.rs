@@ -90,6 +90,8 @@ pub struct Field<'a> {
     occurrence: FieldOccurrence,
     type_ref: TypeRef<'a>,
     oneof_index: Option<i32>,
+    /// Raw `FieldDescriptorProto.default_value` from protoc, if any.
+    default_value: Option<String>,
     /// Set for `string` / `bytes` fields (`VERIFY` / `NONE`).
     utf8_validation: Option<Utf8Validation>,
 }
@@ -253,6 +255,11 @@ impl<'a> Field<'a> {
 
     pub fn oneof_index(&self) -> Option<i32> {
         self.oneof_index
+    }
+
+    /// Raw proto default text from the descriptor, if `[default = …]` was set.
+    pub fn default_value(&self) -> Option<&str> {
+        self.default_value.as_deref()
     }
 
     /// UTF-8 policy for `string` / `bytes`; `None` for other types.

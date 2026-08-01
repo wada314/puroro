@@ -16,6 +16,7 @@ use crate::resolved::{Arena, File, FileSet, Message, resolve};
 use ::proc_macro2::{Ident, Span};
 use ::quote::quote;
 
+mod defaults;
 mod enumeration;
 mod ident;
 mod message;
@@ -252,6 +253,7 @@ mod tests {
                 type_name: None,
                 oneof_index: None,
                 proto3_optional: false,
+                default_value: None,
                 packed: None,
                 features: FeatureSet::default(),
             },
@@ -263,6 +265,7 @@ mod tests {
                 type_name: None,
                 oneof_index: None,
                 proto3_optional: true,
+                default_value: None,
                 packed: None,
                 features: FeatureSet::default(),
             },
@@ -274,6 +277,7 @@ mod tests {
                 type_name: None,
                 oneof_index: None,
                 proto3_optional: false,
+                default_value: None,
                 packed: None,
                 features: FeatureSet::default(),
             },
@@ -285,6 +289,7 @@ mod tests {
                 type_name: None,
                 oneof_index: None,
                 proto3_optional: true,
+                default_value: None,
                 packed: None,
                 features: FeatureSet::default(),
             },
@@ -296,6 +301,7 @@ mod tests {
                 type_name: None,
                 oneof_index: None,
                 proto3_optional: false,
+                default_value: None,
                 packed: None,
                 features: FeatureSet::default(),
             },
@@ -333,6 +339,7 @@ mod tests {
                         type_name: Some(ProtoFqn::parse(".demo.Status")),
                         oneof_index: None,
                         proto3_optional: false,
+                        default_value: None,
                         packed: None,
                         features: FeatureSet::default(),
                     }],
@@ -450,6 +457,7 @@ mod tests {
                                 type_name: Some(ProtoFqn::parse(".demo.Status")),
                                 oneof_index: None,
                                 proto3_optional: false,
+                                default_value: None,
                                 packed: None,
                                 features: FeatureSet::default(),
                             },
@@ -461,6 +469,7 @@ mod tests {
                                 type_name: Some(ProtoFqn::parse(".demo.Priority")),
                                 oneof_index: None,
                                 proto3_optional: false,
+                                default_value: None,
                                 packed: None,
                                 features: FeatureSet::default(),
                             },
@@ -511,6 +520,7 @@ mod tests {
                             type_name: None,
                             oneof_index: None,
                             proto3_optional: false,
+                            default_value: None,
                             packed: None,
                             features: FeatureSet::default(),
                         },
@@ -522,6 +532,7 @@ mod tests {
                             type_name: Some(ProtoFqn::parse(".demo.Outer.Inner")),
                             oneof_index: None,
                             proto3_optional: false,
+                            default_value: None,
                             packed: None,
                             features: FeatureSet::default(),
                         },
@@ -533,6 +544,7 @@ mod tests {
                             type_name: Some(ProtoFqn::parse(".demo.Outer.Kind")),
                             oneof_index: None,
                             proto3_optional: false,
+                            default_value: None,
                             packed: None,
                             features: FeatureSet::default(),
                         },
@@ -600,6 +612,7 @@ mod tests {
             type_name: Some(ProtoFqn::parse(".Kind")),
             oneof_index: None,
             proto3_optional: false,
+            default_value: None,
             packed: None,
             features: FeatureSet::default(),
         });
@@ -686,6 +699,7 @@ mod tests {
                             type_name: Some(ProtoFqn::parse(".demo.Address")),
                             oneof_index: None,
                             proto3_optional: false,
+                            default_value: None,
                             packed: None,
                             features: FeatureSet::default(),
                         }],
@@ -763,6 +777,7 @@ mod tests {
                                 type_name: None,
                                 oneof_index: Some(0),
                                 proto3_optional: false,
+                                default_value: None,
                                 packed: None,
                                 features: FeatureSet::default(),
                             },
@@ -774,6 +789,7 @@ mod tests {
                                 type_name: None,
                                 oneof_index: Some(0),
                                 proto3_optional: false,
+                                default_value: None,
                                 packed: None,
                                 features: FeatureSet::default(),
                             },
@@ -785,6 +801,7 @@ mod tests {
                                 type_name: None,
                                 oneof_index: Some(0),
                                 proto3_optional: false,
+                                default_value: None,
                                 packed: None,
                                 features: FeatureSet::default(),
                             },
@@ -796,6 +813,7 @@ mod tests {
                                 type_name: Some(ProtoFqn::parse(".Peer")),
                                 oneof_index: Some(0),
                                 proto3_optional: false,
+                                default_value: None,
                                 packed: None,
                                 features: FeatureSet::default(),
                             },
@@ -846,6 +864,7 @@ mod tests {
                         type_name: Some(ProtoFqn::parse(".Holder.AttributesEntry")),
                         oneof_index: None,
                         proto3_optional: false,
+                        default_value: None,
                         packed: None,
                         features: FeatureSet::default(),
                     }],
@@ -860,6 +879,7 @@ mod tests {
                                 type_name: None,
                                 oneof_index: None,
                                 proto3_optional: false,
+                                default_value: None,
                                 packed: None,
                                 features: FeatureSet::default(),
                             },
@@ -871,6 +891,7 @@ mod tests {
                                 type_name: None,
                                 oneof_index: None,
                                 proto3_optional: false,
+                                default_value: None,
                                 packed: None,
                                 features: FeatureSet::default(),
                             },
@@ -927,6 +948,7 @@ mod tests {
                         type_name: Some(ProtoFqn::parse(".Holder.FlagsEntry")),
                         oneof_index: None,
                         proto3_optional: false,
+                        default_value: None,
                         packed: None,
                         features: FeatureSet::default(),
                     }],
@@ -941,6 +963,7 @@ mod tests {
                                 type_name: None,
                                 oneof_index: None,
                                 proto3_optional: false,
+                                default_value: None,
                                 packed: None,
                                 features: FeatureSet::default(),
                             },
@@ -952,6 +975,7 @@ mod tests {
                                 type_name: None,
                                 oneof_index: None,
                                 proto3_optional: false,
+                                default_value: None,
                                 packed: None,
                                 features: FeatureSet::default(),
                             },
@@ -1006,6 +1030,7 @@ mod tests {
                         type_name: None,
                         oneof_index: None,
                         proto3_optional: false,
+                        default_value: None,
                         packed: None,
                         features: FeatureSet {
                             utf8_validation: Some(Utf8Validation::None),
@@ -1024,5 +1049,77 @@ mod tests {
         let content = &response.files[0].content;
         assert!(content.contains("ProtoString"));
         assert!(!content.contains("ProtoBytes"));
+    }
+
+    #[test]
+    fn emit_custom_defaults_on_singular_and_oneof() {
+        let mut request = empty_request("Holder");
+        request.meta.file_to_generate = vec!["defaults.proto".into()];
+        request.proto_files[0].name = "defaults.proto".into();
+        request.proto_files[0].syntax = Syntax::Proto2;
+        request.proto_files[0].messages[0].name = "Holder".into();
+        request.proto_files[0].messages[0].oneofs = vec![OneofDesc {
+            name: "choice".into(),
+        }];
+        request.proto_files[0].messages[0].fields = vec![
+            FieldDesc {
+                name: "max_retries".into(),
+                number: 1,
+                label: FieldLabel::Optional,
+                type_: FieldType::Int32,
+                type_name: None,
+                oneof_index: None,
+                proto3_optional: false,
+                default_value: Some("3".into()),
+                packed: None,
+                features: FeatureSet::default(),
+            },
+            FieldDesc {
+                name: "zero_int".into(),
+                number: 2,
+                label: FieldLabel::Optional,
+                type_: FieldType::Int32,
+                type_name: None,
+                oneof_index: None,
+                proto3_optional: false,
+                default_value: Some("0".into()),
+                packed: None,
+                features: FeatureSet::default(),
+            },
+            FieldDesc {
+                name: "webhook_id".into(),
+                number: 3,
+                label: FieldLabel::Optional,
+                type_: FieldType::Int32,
+                type_name: None,
+                oneof_index: Some(0),
+                proto3_optional: false,
+                default_value: Some("-1".into()),
+                packed: None,
+                features: FeatureSet::default(),
+            },
+            FieldDesc {
+                name: "note".into(),
+                number: 4,
+                label: FieldLabel::Optional,
+                type_: FieldType::String,
+                type_name: None,
+                oneof_index: Some(0),
+                proto3_optional: false,
+                default_value: None,
+                packed: None,
+                features: FeatureSet::default(),
+            },
+        ];
+        let response = emit(&request).unwrap();
+        let content = &response.files[0].content;
+        assert!(content.contains("mod defaults"));
+        assert!(content.contains("struct MaxRetriesDefault"));
+        assert!(content.contains("const DEFAULT: i32 = 3i32"));
+        assert!(content.contains("MaxRetriesDefault"));
+        assert!(content.contains("struct WebhookIdDefault"));
+        assert!(content.contains("WebhookIdDefault"));
+        // Type-zero `[default = 0]` must not invent a custom marker.
+        assert!(!content.contains("ZeroIntDefault"));
     }
 }

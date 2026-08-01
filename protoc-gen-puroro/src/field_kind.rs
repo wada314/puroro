@@ -10,6 +10,7 @@ mod plan;
 
 pub use plan::{MessageMember, MessagePlan, PlannedField, PlannedOneof, plan_message};
 
+use crate::default_value::CustomDefault;
 use crate::descriptor::features::{EnumType, RepeatedFieldEncoding, Utf8Validation};
 use crate::resolved::{Enum, Field, Message, SingularPresence, TypeRef};
 
@@ -20,6 +21,8 @@ pub enum FieldKind<'a> {
         wire: WireTypeKind<'a>,
         presence: CatalogPresence,
         layout: CatalogLayout,
+        /// Non-type-zero `[default = …]`; `None` keeps `ProtoDefault`.
+        custom_default: Option<CustomDefault>,
     },
     Repeated {
         wire: WireTypeKind<'a>,

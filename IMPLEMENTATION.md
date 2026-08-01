@@ -135,15 +135,15 @@ protobuf-core           Varint, Tag, WireType
 | `Fixed*` / float / double markers on `SingularField` / `RepeatedField` (via `NumericalType`) | **Done** |
 | Repeated catalog (`RepeatedField<T, E, FIELD>`) | **Done** |
 | `protoc-gen-puroro` plugin I/O (`CodeGeneratorRequest` / `Response`) | **Done** |
-| Descriptor decode (messages / fields / enums / oneofs / features subset) | **Done** (intentional subset; defaults / map_entry / services / extensions not in IR yet) |
+| Descriptor decode (messages / fields / enums / oneofs / features subset) | **Done** (intentional subset; `default_value` decoded; map_entry / services / extensions not in IR yet) |
 | Type resolve (`FileSet`, `TypeRef`, presence / occurrence) | **Done** — `emit` resolves the full request before generating |
 | Editions features in resolve / FieldKind | **Partial** — `field_presence`, `enum_type`, `repeated_field_encoding`, `utf8_validation` resolved; `message_encoding=DELIMITED` rejected; JSON / naming / visibility still traps |
 | Module forest + `ModuleLayout::SingleFile` | **Done** (`FileTree` deferred) |
 | Empty-message emission (no fields / nested types) | **Done** — compile-tested via [`puroro-codegen-tests`](puroro-codegen-tests/) (`protoc` + plugin) |
-| FieldKind IR (`plan_message`, bit assignment, catalog kind) | **Done** — scalars / repeated / enum / oneof planned; map_entry & custom defaults not in IR yet |
-| FieldKind → catalog emission (struct members, accessors, visitors) | **Partial** — singular + repeated scalar / string / bytes / bool / enum / message; real oneof groups; nested message/enum decls; zero-less enums (`Type`/`Label`); official `descriptor.proto`+`plugin.proto` compile-tested. Map / typed extensions not yet |
+| FieldKind IR (`plan_message`, bit assignment, catalog kind) | **Done** — scalars / repeated / enum / oneof / custom defaults planned; map_entry not in IR yet |
+| FieldKind → catalog emission (struct members, accessors, visitors) | **Partial** — singular + repeated scalar / string / bytes / bool / enum / message; real oneof groups; `[default = …]` markers (`mod defaults` + `SingularField` `D`); nested message/enum decls; zero-less enums (`Type`/`Label`); official `descriptor.proto`+`plugin.proto` compile-tested. Map / typed extensions not yet |
 
-Live plugin emits nested and file-level messages/enums with singular, repeated, and real oneof catalog fields via `resolved::resolve` + [`field_kind::plan_message`](protoc-gen-puroro/src/field_kind.rs). Real oneof is covered by [`puroro-codegen-tests`](puroro-codegen-tests/) (`oneof_basic`); official `descriptor.proto` / `plugin.proto` by `official_plugin`. Map and typed extensions remain rejected. Full-featured structs in this document and in [`sample-generated/`](sample-generated/) remain the target for those families (and for oneof custom defaults, which are not in the descriptor IR yet).
+Live plugin emits nested and file-level messages/enums with singular, repeated, and real oneof catalog fields via `resolved::resolve` + [`field_kind::plan_message`](protoc-gen-puroro/src/field_kind.rs). Real oneof is covered by [`puroro-codegen-tests`](puroro-codegen-tests/) (`oneof_basic`); custom defaults by `custom_defaults`; official `descriptor.proto` / `plugin.proto` by `official_plugin`. Map and typed extensions remain rejected. Full-featured structs in this document and in [`sample-generated/`](sample-generated/) remain the target for remaining families.
 
 ---
 

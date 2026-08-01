@@ -184,7 +184,7 @@ fn contiguous_range(numbers: &[i32]) -> Option<(i32, i32)> {
 ///
 /// If stripping the enum-name prefix would leave a non-ident (e.g. `EDITION_2023`
 /// → `2023`), keep the full value name instead.
-fn variant_const_ident(enum_name: &str, value_name: &str) -> Result<Ident> {
+pub(super) fn variant_const_ident(enum_name: &str, value_name: &str) -> Result<Ident> {
     let prefix = format!("{}_", camel_to_screaming_snake(enum_name));
     let rest = value_name.strip_prefix(&prefix).unwrap_or(value_name);
     let candidate = if is_simple_ident(rest) && !starts_with_digit(rest) {

@@ -474,6 +474,20 @@ fn repeated_message_roundtrip() {
 // ---------------------------------------------------------------------------
 
 #[test]
+fn max_retries_uses_custom_default_when_unset() {
+    let mut task = Task::new();
+    task.owner_id_mut().push_str("user-1");
+    assert!(!task.max_retries().is_set());
+    assert_eq!(task.max_retries().get(), 3);
+    *task.max_retries_mut() = 0;
+    assert!(task.max_retries().is_set());
+    assert_eq!(task.max_retries().get(), 0);
+    task.clear_max_retries();
+    assert!(!task.max_retries().is_set());
+    assert_eq!(task.max_retries().get(), 3);
+}
+
+#[test]
 fn oneof_scalar_getter_uses_custom_default_when_unset() {
     // Official const-getter contract: unset / other variant → custom default,
     // without selecting the variant. `webhook_id = 14 [default = -1]`.
