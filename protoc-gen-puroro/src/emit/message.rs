@@ -356,8 +356,8 @@ pub(super) fn render_items(plan: &MessagePlan<'_>) -> Result<TokenStream> {
                 Self::new_in(alloc)
             }
 
-            fn encode_to_vec(&self) -> ::std::vec::Vec<u8> {
-                ::puroro_rt::encode_message_to_vec(self)
+            fn encode<B: ::bytes::BufMut>(&self, buf: &mut B) {
+                ::puroro_rt::encode_message(self, buf)
             }
 
             fn merge_from_with_depth<B: ::puroro::DecodeBuf>(

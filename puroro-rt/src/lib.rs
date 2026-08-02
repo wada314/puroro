@@ -50,4 +50,4 @@ pub use fields::wire::{
     RepeatedElementMerge, RepeatedElementMut, RepeatedVecMut, SingularType, encode_field,
     encoded_len_field,
 };
-pub use message_encode::{EncodeCtx, MessageEncode, encode_message_to_vec};
+pub use message_encode::{EncodeCtx, MessageEncode, encode_message};

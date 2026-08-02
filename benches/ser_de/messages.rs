@@ -126,8 +126,8 @@ impl<A: Allocator + Clone> Message for FlatScalars<A> {
         Self::new_in(alloc)
     }
 
-    fn encode_to_vec(&self) -> Vec<u8> {
-        ::puroro_rt::encode_message_to_vec(self)
+    fn encode<B: BufMut>(&self, buf: &mut B) {
+        ::puroro_rt::encode_message(self, buf)
     }
 
     fn merge_from_with_depth<B: DecodeBuf>(
@@ -271,8 +271,8 @@ impl<A: Allocator + Clone> Message for Nest<A> {
         Self::new_in(alloc)
     }
 
-    fn encode_to_vec(&self) -> Vec<u8> {
-        ::puroro_rt::encode_message_to_vec(self)
+    fn encode<B: BufMut>(&self, buf: &mut B) {
+        ::puroro_rt::encode_message(self, buf)
     }
 
     fn merge_from_with_depth<B: DecodeBuf>(
@@ -389,8 +389,8 @@ impl<A: Allocator + Clone> Message for PackedInts<A> {
         Self::new_in(alloc)
     }
 
-    fn encode_to_vec(&self) -> Vec<u8> {
-        ::puroro_rt::encode_message_to_vec(self)
+    fn encode<B: BufMut>(&self, buf: &mut B) {
+        ::puroro_rt::encode_message(self, buf)
     }
 
     fn merge_from_with_depth<B: DecodeBuf>(
@@ -530,8 +530,8 @@ impl<A: Allocator + Clone> Message for StringHeavy<A> {
         Self::new_in(alloc)
     }
 
-    fn encode_to_vec(&self) -> Vec<u8> {
-        ::puroro_rt::encode_message_to_vec(self)
+    fn encode<B: BufMut>(&self, buf: &mut B) {
+        ::puroro_rt::encode_message(self, buf)
     }
 
     fn merge_from_with_depth<B: DecodeBuf>(

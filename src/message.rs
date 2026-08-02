@@ -1,7 +1,7 @@
 //! The [`Message`] trait shared by every generated protobuf message.
 
 use ::allocator_api2::alloc::Allocator;
-use ::bytes::Buf;
+use ::bytes::{Buf, BufMut};
 
 use crate::error::DecodeError;
 use crate::scoped_buf::{DecodeBuf, ScopedBuf};
@@ -25,7 +25,9 @@ pub const RECURSION_LIMIT: usize = 100;
 ///
 /// Wire body sizing / writing (`encoded_len` / `encode_raw` with an encode
 /// context) lives on [`puroro_rt::MessageEncode`] — not on this trait. Generated
-/// [`encode_to_vec`](Self::encode_to_vec) impls are thin wrappers around that.
+/// code implements [`encode`](Self::encode) as a thin wrapper;
+/// [`encode_to_vec`](Self::encode_to_vec) / [`encode_to_bytes`](Self::encode_to_bytes)
+/// are convenience defaults on top of that.
 ///
 /// The associated [`Alloc`](Self::Alloc) is the message's single allocator type
 /// parameter. Nested fields construct children with
@@ -43,12 +45,21 @@ pub trait Message: Sized {
 
     // -- codec --------------------------------------------------------------
 
-    /// Encodes into a new `Vec<u8>`.
+    /// Appends the encoded message body to `buf`.
     ///
-    /// Generated impls forward to [`puroro_rt::encode_message_to_vec`].
-    fn encode_to_vec(&self) -> Vec<u8>;
+    /// The caller owns the destination buffer (and thus its allocator /
+    /// capacity strategy). Generated impls forward to
+    /// [`puroro_rt::encode_message`].
+    fn encode<B: BufMut>(&self, buf: &mut B);
 
-    /// Encodes into [`bytes::Bytes`].
+    /// Convenience: encodes into a new `Vec<u8>` via [`encode`](Self::encode).
+    fn encode_to_vec(&self) -> Vec<u8> {
+        let mut v = Vec::new();
+        self.encode(&mut v);
+        v
+    }
+
+    /// Convenience: encodes into [`bytes::Bytes`] via [`encode_to_vec`](Self::encode_to_vec).
     fn encode_to_bytes(&self) -> ::bytes::Bytes {
         ::bytes::Bytes::from(self.encode_to_vec())
     }
