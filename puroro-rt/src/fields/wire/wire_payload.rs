@@ -17,7 +17,7 @@ use ::allocator_api2::alloc::Allocator;
 use ::allocator_api2::vec::Vec as AllocVec;
 use ::bytes::{Buf, BufMut};
 use ::protobuf_core::{FIXED32_BYTES, FIXED64_BYTES, Varint};
-use ::puroro::{DecodeError, Message, WireType};
+use ::puroro::{DecodeError, WireType};
 use ::unmanaged::UnmanagedVec;
 
 use crate::decode;
@@ -161,30 +161,6 @@ impl WirePayload for LenPayloadRef<'_> {
     fn encode(&self, buf: &mut impl BufMut) {
         encode::encode_varint(self.content.len() as u64, buf);
         buf.put_slice(self.content);
-    }
-}
-
-/// Len wire body for encode from a nested message: length varint + `Message::encode_raw`
-/// (no temporary buffer).
-#[derive(Clone, Copy, Debug)]
-pub(crate) struct MessageLenRef<'a, M: Message> {
-    pub message: &'a M,
-}
-
-impl<M: Message> WirePayload for MessageLenRef<'_, M> {
-    const WIRE_TYPE: WireType = WireType::Len;
-
-    #[inline]
-    fn encoded_len(&self) -> usize {
-        let n = self.message.encoded_len();
-        encode::encoded_len_varint(n as u64) + n
-    }
-
-    #[inline]
-    fn encode(&self, buf: &mut impl BufMut) {
-        let n = self.message.encoded_len();
-        encode::encode_varint(n as u64, buf);
-        self.message.encode_raw(buf);
     }
 }
 

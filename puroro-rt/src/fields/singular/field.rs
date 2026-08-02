@@ -26,6 +26,8 @@ use ::puroro::{DecodeBuf, DecodeError, HasDefault, Optional, WireType};
 
 use ::unmanaged::{CloneIn, DeallocateIn};
 
+use crate::message_encode::EncodeCtx;
+
 use crate::fields::shared::FieldDeallocate;
 use crate::fields::shared::field_inspect::{FieldCloneIn, FieldDebug, FieldEncode, FieldPartialEq};
 use crate::fields::shared::{
@@ -558,7 +560,7 @@ where
     T::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
     P::ValueSlot<T::Slot<A>>: ValueSlot<T::Slot<A>, A>,
 {
-    fn encoded_len(&self, common: &MessageCommon<Pb, A>) -> usize {
+    fn encoded_len(&self, common: &MessageCommon<Pb, A>, ctx: &mut EncodeCtx) -> usize {
         if P::should_emit(common, || {
             let init = P::slot_init_view();
             match self.value.with(init, common).get() {
@@ -572,13 +574,18 @@ where
                 .with(init, common)
                 .get()
                 .expect("should_emit implies initialized slot");
-            encoded_len_field::<T, A>(L::get(slot, common), FIELD)
+            encoded_len_field::<T, A>(L::get(slot, common), FIELD, ctx)
         } else {
             0
         }
     }
 
-    fn encode_raw<B: BufMut>(&self, common: &MessageCommon<Pb, A>, buf: &mut B) {
+    fn encode_raw<B: BufMut>(
+        &self,
+        common: &MessageCommon<Pb, A>,
+        ctx: &mut EncodeCtx,
+        buf: &mut B,
+    ) {
         if P::should_emit(common, || {
             let init = P::slot_init_view();
             match self.value.with(init, common).get() {
@@ -592,7 +599,7 @@ where
                 .with(init, common)
                 .get()
                 .expect("should_emit implies initialized slot");
-            encode_field::<T, A, B>(L::get(slot, common), FIELD, buf);
+            encode_field::<T, A, B>(L::get(slot, common), FIELD, ctx, buf);
         }
     }
 }

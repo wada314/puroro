@@ -13,15 +13,15 @@
 
 use ::allocator_api2::alloc::Allocator;
 use ::bytes::BufMut;
-
 use ::puroro::{Message, WireType};
 
 use crate::encode;
+use crate::message_encode::{EncodeCtx, MessageEncode};
 
 use super::len::{ProtoBytes, ProtoString};
 use super::numerical::NumericalType;
 use super::proto_message::ProtoMessage;
-use super::wire_payload::{LenPayloadRef, MessageLenRef, WirePayload};
+use super::wire_payload::{LenPayloadRef, WirePayload};
 
 /// Encode facet of a protobuf **type** marker (`ProtoInt32`, `ProtoString`, …).
 ///
@@ -47,13 +47,16 @@ pub trait EncodeType {
 
     /// Byte length of the complete untagged wire body (no tag; for `Len`,
     /// includes the length varint).
-    fn payload_len<'a, A: Allocator + Clone>(value: Self::View<'a, A>) -> usize
+    fn payload_len<'a, A: Allocator + Clone>(
+        value: Self::View<'a, A>,
+        ctx: &mut EncodeCtx,
+    ) -> usize
     where
         Self: 'a;
 
     /// Writes the complete untagged wire body (no tag; for `Len`, includes the
     /// length varint).
-    fn encode_payload<'a, A, B>(value: Self::View<'a, A>, buf: &mut B)
+    fn encode_payload<'a, A, B>(value: Self::View<'a, A>, ctx: &mut EncodeCtx, buf: &mut B)
     where
         Self: 'a,
         A: Allocator + Clone,
@@ -62,14 +65,14 @@ pub trait EncodeType {
 
 /// Tagged occurrence length: tag + untagged wire body. No omit.
 #[inline]
-pub fn encoded_len_field<'a, T, A>(value: T::View<'a, A>, field: u32) -> usize
+pub fn encoded_len_field<'a, T, A>(value: T::View<'a, A>, field: u32, ctx: &mut EncodeCtx) -> usize
 where
     T: EncodeType + 'a,
     A: Allocator + Clone + 'a,
 {
     match T::WIRE_TYPE {
         WireType::Varint | WireType::Int32 | WireType::Int64 | WireType::Len => {
-            encode::encoded_len_tag(field, T::WIRE_TYPE) + T::payload_len::<A>(value)
+            encode::encoded_len_tag(field, T::WIRE_TYPE) + T::payload_len::<A>(value, ctx)
         }
         WireType::SGroup | WireType::EGroup => {
             unreachable!("generated markers never use group wire types")
@@ -79,8 +82,12 @@ where
 
 /// Tagged occurrence: tag + untagged wire body. No omit.
 #[inline]
-pub fn encode_field<'a, T, A, B>(value: T::View<'a, A>, field: u32, buf: &mut B)
-where
+pub fn encode_field<'a, T, A, B>(
+    value: T::View<'a, A>,
+    field: u32,
+    ctx: &mut EncodeCtx,
+    buf: &mut B,
+) where
     T: EncodeType + 'a,
     A: Allocator + Clone + 'a,
     B: BufMut,
@@ -88,7 +95,7 @@ where
     match T::WIRE_TYPE {
         WireType::Varint | WireType::Int32 | WireType::Int64 | WireType::Len => {
             encode::encode_tag(field, T::WIRE_TYPE, buf);
-            T::encode_payload::<A, B>(value, buf);
+            T::encode_payload::<A, B>(value, ctx, buf);
         }
         WireType::SGroup | WireType::EGroup => {
             unreachable!("generated markers never use group wire types")
@@ -106,7 +113,7 @@ impl<T: NumericalType> EncodeType for T {
     const WIRE_TYPE: WireType = <T::WireBody as WirePayload>::WIRE_TYPE;
 
     #[inline]
-    fn payload_len<'a, A: Allocator + Clone>(value: T::NativeType) -> usize
+    fn payload_len<'a, A: Allocator + Clone>(value: T::NativeType, _ctx: &mut EncodeCtx) -> usize
     where
         Self: 'a,
     {
@@ -114,7 +121,7 @@ impl<T: NumericalType> EncodeType for T {
     }
 
     #[inline]
-    fn encode_payload<'a, A, B>(value: T::NativeType, buf: &mut B)
+    fn encode_payload<'a, A, B>(value: T::NativeType, _ctx: &mut EncodeCtx, buf: &mut B)
     where
         Self: 'a,
         A: Allocator + Clone,
@@ -134,7 +141,7 @@ impl EncodeType for ProtoString {
     const WIRE_TYPE: WireType = WireType::Len;
 
     #[inline]
-    fn payload_len<'a, A: Allocator + Clone>(value: &'a str) -> usize
+    fn payload_len<'a, A: Allocator + Clone>(value: &'a str, _ctx: &mut EncodeCtx) -> usize
     where
         Self: 'a,
     {
@@ -145,7 +152,7 @@ impl EncodeType for ProtoString {
     }
 
     #[inline]
-    fn encode_payload<'a, A, B>(value: &'a str, buf: &mut B)
+    fn encode_payload<'a, A, B>(value: &'a str, _ctx: &mut EncodeCtx, buf: &mut B)
     where
         Self: 'a,
         A: Allocator + Clone,
@@ -168,7 +175,7 @@ impl EncodeType for ProtoBytes {
     const WIRE_TYPE: WireType = WireType::Len;
 
     #[inline]
-    fn payload_len<'a, A: Allocator + Clone>(value: &'a [u8]) -> usize
+    fn payload_len<'a, A: Allocator + Clone>(value: &'a [u8], _ctx: &mut EncodeCtx) -> usize
     where
         Self: 'a,
     {
@@ -176,7 +183,7 @@ impl EncodeType for ProtoBytes {
     }
 
     #[inline]
-    fn encode_payload<'a, A, B>(value: &'a [u8], buf: &mut B)
+    fn encode_payload<'a, A, B>(value: &'a [u8], _ctx: &mut EncodeCtx, buf: &mut B)
     where
         Self: 'a,
         A: Allocator + Clone,
@@ -186,7 +193,7 @@ impl EncodeType for ProtoBytes {
     }
 }
 
-impl<M: Message> EncodeType for ProtoMessage<M> {
+impl<M: Message + MessageEncode> EncodeType for ProtoMessage<M> {
     type View<'a, A: Allocator + Clone>
         = &'a M
     where
@@ -196,20 +203,23 @@ impl<M: Message> EncodeType for ProtoMessage<M> {
     const WIRE_TYPE: WireType = WireType::Len;
 
     #[inline]
-    fn payload_len<'a, A: Allocator + Clone>(value: &'a M) -> usize
+    fn payload_len<'a, A: Allocator + Clone>(value: &'a M, ctx: &mut EncodeCtx) -> usize
     where
         Self: 'a,
     {
-        MessageLenRef { message: value }.encoded_len()
+        let n = ctx.body_len_for(value);
+        encode::encoded_len_varint(n as u64) + n
     }
 
     #[inline]
-    fn encode_payload<'a, A, B>(value: &'a M, buf: &mut B)
+    fn encode_payload<'a, A, B>(value: &'a M, ctx: &mut EncodeCtx, buf: &mut B)
     where
         Self: 'a,
         A: Allocator + Clone,
         B: BufMut,
     {
-        MessageLenRef { message: value }.encode(buf);
+        let n = ctx.body_len_for(value);
+        encode::encode_varint(n as u64, buf);
+        value.encode_raw(ctx, buf);
     }
 }

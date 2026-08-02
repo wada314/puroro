@@ -11,8 +11,8 @@ use ::bytes::BufMut;
 use ::puroro::{DecodeBuf, DecodeError, Message, RECURSION_LIMIT};
 use ::puroro_rt::decode::{decode_tag, skip_field_and_save};
 use ::puroro_rt::{
-    FieldCloneIn, FieldDeallocate, FieldEncode, Message as MessagePresence, MessageCommon,
-    ProtoMessage, SingularField,
+    EncodeCtx, FieldCloneIn, FieldDeallocate, FieldEncode, Message as MessagePresence,
+    MessageCommon, MessageEncode, ProtoMessage, SingularField,
 };
 
 /// Self-referential message: optional `child` of the same type (field 1).
@@ -59,6 +59,19 @@ impl<A: Allocator + Clone> ::unmanaged::DeallocateIn<A> for Nest<A> {
     }
 }
 
+impl<A: Allocator + Clone> MessageEncode for Nest<A> {
+    fn encoded_len(&self, ctx: &mut EncodeCtx) -> usize {
+        let c = &self._common;
+        self.child.encoded_len(c, ctx) + c.unknown_fields.len()
+    }
+
+    fn encode_raw<B: BufMut>(&self, ctx: &mut EncodeCtx, buf: &mut B) {
+        let c = &self._common;
+        self.child.encode_raw(c, ctx, buf);
+        buf.put_slice(&c.unknown_fields);
+    }
+}
+
 impl<A: Allocator + Clone> Message for Nest<A> {
     type Alloc = A;
 
@@ -66,15 +79,8 @@ impl<A: Allocator + Clone> Message for Nest<A> {
         Self::new_in(alloc)
     }
 
-    fn encoded_len(&self) -> usize {
-        let c = &self._common;
-        self.child.encoded_len(c) + c.unknown_fields.len()
-    }
-
-    fn encode_raw<B: BufMut>(&self, buf: &mut B) {
-        let c = &self._common;
-        self.child.encode_raw(c, buf);
-        buf.put_slice(&c.unknown_fields);
+    fn encode_to_vec(&self) -> Vec<u8> {
+        ::puroro_rt::encode_message_to_vec(self)
     }
 
     fn merge_from_with_depth<B: DecodeBuf>(

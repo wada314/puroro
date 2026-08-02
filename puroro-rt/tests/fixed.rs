@@ -7,8 +7,8 @@ use ::bytes::BufMut;
 use ::puroro::{DecodeBuf, DecodeError, Message};
 use ::puroro_rt::decode::{decode_tag, skip_field_and_save};
 use ::puroro_rt::{
-    Expanded, Explicit, FieldDeallocate, FieldEncode, MessageCommon, Packed, ProtoDouble,
-    ProtoFixed32, ProtoFloat, RepeatedField, SingularField,
+    EncodeCtx, Expanded, Explicit, FieldDeallocate, FieldEncode, MessageCommon, MessageEncode,
+    Packed, ProtoDouble, ProtoFixed32, ProtoFloat, RepeatedField, SingularField,
 };
 
 /// Minimal message exercising singular + packed + expanded fixed fields.
@@ -61,6 +61,26 @@ impl<A: Allocator + Clone> ::unmanaged::DeallocateIn<A> for FixedDemo<A> {
     }
 }
 
+impl<A: Allocator + Clone> MessageEncode for FixedDemo<A> {
+    fn encoded_len(&self, ctx: &mut EncodeCtx) -> usize {
+        let c = &self._common;
+        self.code.encoded_len(c, ctx)
+            + self.altitude.encoded_len(c, ctx)
+            + self.samples.encoded_len(c, ctx)
+            + self.tags.encoded_len(c, ctx)
+            + c.unknown_fields.len()
+    }
+
+    fn encode_raw<B: BufMut>(&self, ctx: &mut EncodeCtx, buf: &mut B) {
+        let c = &self._common;
+        self.code.encode_raw(c, ctx, buf);
+        self.altitude.encode_raw(c, ctx, buf);
+        self.samples.encode_raw(c, ctx, buf);
+        self.tags.encode_raw(c, ctx, buf);
+        buf.put_slice(&c.unknown_fields);
+    }
+}
+
 impl<A: Allocator + Clone> Message for FixedDemo<A> {
     type Alloc = A;
 
@@ -68,22 +88,8 @@ impl<A: Allocator + Clone> Message for FixedDemo<A> {
         Self::new_in(alloc)
     }
 
-    fn encoded_len(&self) -> usize {
-        let c = &self._common;
-        self.code.encoded_len(c)
-            + self.altitude.encoded_len(c)
-            + self.samples.encoded_len(c)
-            + self.tags.encoded_len(c)
-            + c.unknown_fields.len()
-    }
-
-    fn encode_raw<B: BufMut>(&self, buf: &mut B) {
-        let c = &self._common;
-        self.code.encode_raw(c, buf);
-        self.altitude.encode_raw(c, buf);
-        self.samples.encode_raw(c, buf);
-        self.tags.encode_raw(c, buf);
-        buf.put_slice(&c.unknown_fields);
+    fn encode_to_vec(&self) -> Vec<u8> {
+        ::puroro_rt::encode_message_to_vec(self)
     }
 
     fn merge_from_with_depth<B: DecodeBuf>(

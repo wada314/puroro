@@ -12,6 +12,7 @@
 //! [`MessageCommonBits`](super::MessageCommonBits) /
 //! [`MessageCommonAlloc`](super::MessageCommonAlloc) as needed.
 
+use crate::message_encode::EncodeCtx;
 use ::bytes::BufMut;
 use ::core::fmt::{self, Debug, Formatter, Result as FmtResult};
 use ::core::mem;
@@ -33,9 +34,9 @@ pub trait FieldDebug<C> {
 
 /// Wire length / encode for one catalog field.
 pub trait FieldEncode<C> {
-    fn encoded_len(&self, common: &C) -> usize;
+    fn encoded_len(&self, common: &C, ctx: &mut EncodeCtx) -> usize;
 
-    fn encode_raw<B: BufMut>(&self, common: &C, buf: &mut B);
+    fn encode_raw<B: BufMut>(&self, common: &C, ctx: &mut EncodeCtx, buf: &mut B);
 }
 
 /// Deep-clone one catalog field through `common` / allocator.
@@ -193,13 +194,18 @@ impl<C> FieldVisitorMut<C> for FieldDeallocVisitor<C> {
 /// Sums [`FieldEncode::encoded_len`].
 pub struct EncodedLenVisitor<'a, C> {
     common: &'a C,
+    ctx: &'a mut EncodeCtx,
     pub len: usize,
 }
 
 impl<'a, C> EncodedLenVisitor<'a, C> {
     #[inline]
-    pub fn new(common: &'a C) -> Self {
-        Self { common, len: 0 }
+    pub fn new(common: &'a C, ctx: &'a mut EncodeCtx) -> Self {
+        Self {
+            common,
+            ctx,
+            len: 0,
+        }
     }
 }
 
@@ -208,7 +214,7 @@ impl<'a, C> FieldVisitor<C> for EncodedLenVisitor<'a, C> {
 
     #[inline]
     fn visit<F: CatalogField<C>>(&mut self, _name: &'static str, field: &F) -> ControlFlow<()> {
-        self.len += field.encoded_len(self.common);
+        self.len += field.encoded_len(self.common, self.ctx);
         ControlFlow::Continue(())
     }
 }
@@ -216,13 +222,14 @@ impl<'a, C> FieldVisitor<C> for EncodedLenVisitor<'a, C> {
 /// Writes each field via [`FieldEncode::encode_raw`].
 pub struct EncodeRawVisitor<'a, B: BufMut, C> {
     common: &'a C,
+    ctx: &'a mut EncodeCtx,
     pub buf: &'a mut B,
 }
 
 impl<'a, B: BufMut, C> EncodeRawVisitor<'a, B, C> {
     #[inline]
-    pub fn new(common: &'a C, buf: &'a mut B) -> Self {
-        Self { common, buf }
+    pub fn new(common: &'a C, ctx: &'a mut EncodeCtx, buf: &'a mut B) -> Self {
+        Self { common, ctx, buf }
     }
 }
 
@@ -231,7 +238,7 @@ impl<'a, B: BufMut, C> FieldVisitor<C> for EncodeRawVisitor<'a, B, C> {
 
     #[inline]
     fn visit<F: CatalogField<C>>(&mut self, _name: &'static str, field: &F) -> ControlFlow<()> {
-        field.encode_raw(self.common, self.buf);
+        field.encode_raw(self.common, self.ctx, self.buf);
         ControlFlow::Continue(())
     }
 }

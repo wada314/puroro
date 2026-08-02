@@ -9,17 +9,17 @@ use ::core::mem::ManuallyDrop;
 
 use ::allocator_api2::alloc::Allocator;
 use ::bytes::BufMut;
+use ::puroro::{DecodeBuf, DecodeError, WireType};
 use ::unmanaged::CloneIn;
 use ::unmanaged::UnmanagedVec;
 use ::unmanaged::vec::VecGuard;
-
-use ::puroro::{DecodeBuf, DecodeError, WireType};
 
 use crate::fields::shared::field_inspect::{FieldCloneIn, FieldDebug, FieldEncode, FieldPartialEq};
 use crate::fields::shared::{FieldDeallocate, MessageCommon};
 use crate::fields::wire::repeated_element::{
     RepeatedElement, RepeatedElementMerge, RepeatedElementMut, RepeatedVecMut,
 };
+use crate::message_encode::EncodeCtx;
 
 use super::container::RepeatedElementsMut;
 use super::encoding::RepeatedEncoding;
@@ -282,17 +282,22 @@ where
     E: RepeatedEncoding<T, A>,
     A: Allocator + Clone,
 {
-    fn encoded_len(&self, _common: &MessageCommon<P, A>) -> usize {
+    fn encoded_len(&self, _common: &MessageCommon<P, A>, ctx: &mut EncodeCtx) -> usize {
         if self.values.is_empty() {
             0
         } else {
-            E::encoded_len(FIELD, self.as_slice())
+            E::encoded_len(FIELD, self.as_slice(), ctx)
         }
     }
 
-    fn encode_raw<B: BufMut>(&self, _common: &MessageCommon<P, A>, buf: &mut B) {
+    fn encode_raw<B: BufMut>(
+        &self,
+        _common: &MessageCommon<P, A>,
+        ctx: &mut EncodeCtx,
+        buf: &mut B,
+    ) {
         if !self.values.is_empty() {
-            E::encode(FIELD, self.as_slice(), buf);
+            E::encode(FIELD, self.as_slice(), ctx, buf);
         }
     }
 }

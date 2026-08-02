@@ -1,7 +1,7 @@
 //! The [`Message`] trait shared by every generated protobuf message.
 
 use ::allocator_api2::alloc::Allocator;
-use ::bytes::{Buf, BufMut};
+use ::bytes::Buf;
 
 use crate::error::DecodeError;
 use crate::scoped_buf::{DecodeBuf, ScopedBuf};
@@ -19,9 +19,13 @@ pub const RECURSION_LIMIT: usize = 100;
 ///
 /// Field accessors stay as inherent methods on the generated struct so that
 /// proto field names do not collide with these helpers. If a proto field is
-/// named `validate`, `unknown_fields`, `encoded_len`, etc., the inherent getter
-/// wins method resolution; call the trait method via UFCS
+/// named `validate`, `unknown_fields`, `encode_to_vec`, etc., the inherent
+/// getter wins method resolution; call the trait method via UFCS
 /// (e.g. [`Message::validate`]).
+///
+/// Wire body sizing / writing (`encoded_len` / `encode_raw` with an encode
+/// context) lives on [`puroro_rt::MessageEncode`] — not on this trait. Generated
+/// [`encode_to_vec`](Self::encode_to_vec) impls are thin wrappers around that.
 ///
 /// The associated [`Alloc`](Self::Alloc) is the message's single allocator type
 /// parameter. Nested fields construct children with
@@ -39,19 +43,10 @@ pub trait Message: Sized {
 
     // -- codec --------------------------------------------------------------
 
-    /// Exact number of bytes this message occupies on the wire.
-    /// Must be consistent with [`encode_raw`](Self::encode_raw).
-    fn encoded_len(&self) -> usize;
-
-    /// Writes the message body to `buf` without a framing length prefix.
-    fn encode_raw<B: BufMut>(&self, buf: &mut B);
-
     /// Encodes into a new `Vec<u8>`.
-    fn encode_to_vec(&self) -> Vec<u8> {
-        let mut v = Vec::with_capacity(self.encoded_len());
-        self.encode_raw(&mut v);
-        v
-    }
+    ///
+    /// Generated impls forward to [`puroro_rt::encode_message_to_vec`].
+    fn encode_to_vec(&self) -> Vec<u8>;
 
     /// Encodes into [`bytes::Bytes`].
     fn encode_to_bytes(&self) -> ::bytes::Bytes {

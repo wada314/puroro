@@ -327,6 +327,26 @@ pub(super) fn render_items(plan: &MessagePlan<'_>) -> Result<TokenStream> {
             }
         }
 
+        impl<A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone> ::puroro_rt::MessageEncode
+            for #name<A>
+        {
+            fn encoded_len(&self, ctx: &mut ::puroro_rt::EncodeCtx) -> usize {
+                let mut v = ::puroro_rt::EncodedLenVisitor::new(&self._common, ctx);
+                let _ = self.visit_fields(&mut v);
+                v.len + self._common.unknown_fields.len()
+            }
+
+            fn encode_raw<B: ::bytes::BufMut>(&self, ctx: &mut ::puroro_rt::EncodeCtx, buf: &mut B) {
+                let _ = self.visit_fields(&mut ::puroro_rt::EncodeRawVisitor::new(
+                    &self._common,
+                    ctx,
+                    buf,
+                ));
+                let unknown: &[u8] = &self._common.unknown_fields;
+                ::bytes::BufMut::put_slice(buf, unknown);
+            }
+        }
+
         impl<A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone> ::puroro::Message
             for #name<A>
         {
@@ -336,16 +356,8 @@ pub(super) fn render_items(plan: &MessagePlan<'_>) -> Result<TokenStream> {
                 Self::new_in(alloc)
             }
 
-            fn encoded_len(&self) -> usize {
-                let mut v = ::puroro_rt::EncodedLenVisitor::new(&self._common);
-                let _ = self.visit_fields(&mut v);
-                v.len + self._common.unknown_fields.len()
-            }
-
-            fn encode_raw<B: ::bytes::BufMut>(&self, buf: &mut B) {
-                let _ = self.visit_fields(&mut ::puroro_rt::EncodeRawVisitor::new(&self._common, buf));
-                let unknown: &[u8] = &self._common.unknown_fields;
-                ::bytes::BufMut::put_slice(buf, unknown);
+            fn encode_to_vec(&self) -> ::std::vec::Vec<u8> {
+                ::puroro_rt::encode_message_to_vec(self)
             }
 
             fn merge_from_with_depth<B: ::puroro::DecodeBuf>(

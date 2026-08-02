@@ -21,7 +21,6 @@ fn default_scalars_are_zeroish() {
     assert!(!msg.sfixed32_val().is_set());
     assert!(!msg.sfixed64_val().is_set());
     assert!(!msg.payload().is_set());
-    assert_eq!(Message::encoded_len(&msg), 0);
     assert!(msg.encode_to_vec().is_empty());
 }
 

@@ -15,8 +15,9 @@
 use ::allocator_api2::alloc::Allocator;
 use ::bytes::BufMut;
 use ::core::fmt::{self, Debug, Formatter, Result as FmtResult};
-use ::puroro::{HasDefault, Optional};
-use ::puroro::{OneofView as OneofViewTrait, OneofViewMut as OneofViewMutTrait};
+use ::puroro::{
+    HasDefault, OneofView as OneofViewTrait, OneofViewMut as OneofViewMutTrait, Optional,
+};
 use ::unmanaged::UnmanagedBox;
 
 use ::unmanaged::DeallocateIn;
@@ -31,6 +32,7 @@ use crate::fields::shared::{
 use crate::fields::singular::field::SingularField;
 use crate::fields::wire::proto_message::ProtoMessage;
 use crate::fields::wire::singular_type::SingularType;
+use crate::message_encode::{EncodeCtx, MessageEncode};
 
 /// Explicit release of a generated `oneof` storage enum.
 ///
@@ -57,13 +59,17 @@ pub trait OneofDeallocate<C> {
 /// a bit-packed `bool` whose value lives in the message bitfield.
 pub trait OneofEncodable<A: Allocator> {
     /// Wire byte length of this active variant.
-    fn encoded_len<P>(&self, common: &MessageCommon<P, A>) -> usize
+    fn encoded_len<P>(&self, common: &MessageCommon<P, A>, ctx: &mut EncodeCtx) -> usize
     where
         MessageCommon<P, A>: MessageCommonBits + MessageCommonAlloc<Alloc = A>;
 
     /// Encodes this active variant.
-    fn encode_raw<P, B: BufMut>(&self, common: &MessageCommon<P, A>, buf: &mut B)
-    where
+    fn encode_raw<P, B: BufMut>(
+        &self,
+        common: &MessageCommon<P, A>,
+        ctx: &mut EncodeCtx,
+        buf: &mut B,
+    ) where
         MessageCommon<P, A>: MessageCommonBits + MessageCommonAlloc<Alloc = A>;
 }
 
@@ -382,13 +388,20 @@ where
     MessageCommon<Pb, A>: MessageCommonBits + MessageCommonAlloc<Alloc = A>,
     A: Allocator + Clone,
 {
-    fn encoded_len(&self, common: &MessageCommon<Pb, A>) -> usize {
-        self.as_ref().map(|v| v.encoded_len(common)).unwrap_or(0)
+    fn encoded_len(&self, common: &MessageCommon<Pb, A>, ctx: &mut EncodeCtx) -> usize {
+        self.as_ref()
+            .map(|v| v.encoded_len(common, ctx))
+            .unwrap_or(0)
     }
 
-    fn encode_raw<B: BufMut>(&self, common: &MessageCommon<Pb, A>, buf: &mut B) {
+    fn encode_raw<B: BufMut>(
+        &self,
+        common: &MessageCommon<Pb, A>,
+        ctx: &mut EncodeCtx,
+        buf: &mut B,
+    ) {
         if let Some(v) = self.as_ref() {
-            v.encode_raw(common, buf);
+            v.encode_raw(common, ctx, buf);
         }
     }
 }
@@ -452,7 +465,7 @@ where
 impl<'a, M, const FIELD: u32, A: Allocator + Clone, Pb>
     OneofVariantRef<'a, SingularField<ProtoMessage<M>, Oneof, FIELD, A>, Pb, A>
 where
-    M: ::puroro::Message<Alloc = A> + ::unmanaged::DeallocateIn<A>,
+    M: ::puroro::Message<Alloc = A> + MessageEncode + ::unmanaged::DeallocateIn<A>,
     MessageCommon<Pb, A>: MessageCommonBits,
     <Oneof as FieldPresence>::ValueSlot<UnmanagedBox<M, A>>: ValueSlot<UnmanagedBox<M, A>, A>,
 {

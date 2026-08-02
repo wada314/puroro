@@ -14,8 +14,23 @@ edition = "2024"
 [lints]
 workspace = true
 
+# Do not run the default libtest bench harness on the library target
+# (`cargo bench` should only run Criterion targets below).
+[lib]
+bench = false
+
 [dependencies]
 allocator-api2 = "0.2"
 bytes = "1"
 protobuf-core = { path = "protobuf-core" }
 unmanaged = { path = "unmanaged" }
+
+[dev-dependencies]
+bitvec = "1"
+# Same stack as the historical `puroro/benches/variant.rs` setup.
+criterion = { version = "0.5.1", features = ["html_reports"] }
+puroro-rt = { path = "puroro-rt" }
+
+[[bench]]
+name = "ser_de"
+harness = false

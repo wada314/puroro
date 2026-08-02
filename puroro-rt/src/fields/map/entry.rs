@@ -2,7 +2,6 @@
 
 use ::allocator_api2::alloc::Allocator;
 use ::bytes::BufMut;
-
 use ::puroro::{DecodeBuf, DecodeError, WireType};
 
 use crate::decode;
@@ -10,6 +9,7 @@ use crate::encode;
 use crate::fields::wire::encode_type::{encode_field, encoded_len_field};
 use crate::fields::wire::map_element::MapKey;
 use crate::fields::wire::repeated_element::{RepeatedElement, RepeatedElementMerge};
+use crate::message_encode::EncodeCtx;
 
 const KEY_FIELD: u32 = 1;
 const VALUE_FIELD: u32 = 2;
@@ -21,14 +21,18 @@ type DecodedEntry<K, V, A> = (
 
 /// Tagged wire length of one map-entry message body (fields 1 and 2 only).
 #[inline]
-pub(super) fn entry_payload_len<K, V, A>(key: &K::Element<A>, value: &V::Element<A>) -> usize
+pub(super) fn entry_payload_len<K, V, A>(
+    key: &K::Element<A>,
+    value: &V::Element<A>,
+    ctx: &mut EncodeCtx,
+) -> usize
 where
     K: MapKey,
     V: RepeatedElement,
     A: Allocator + Clone,
 {
-    encoded_len_field::<K, A>(K::wire_view(key), KEY_FIELD)
-        + encoded_len_field::<V, A>(V::wire_view(value), VALUE_FIELD)
+    encoded_len_field::<K, A>(K::wire_view(key), KEY_FIELD, ctx)
+        + encoded_len_field::<V, A>(V::wire_view(value), VALUE_FIELD, ctx)
 }
 
 /// Encodes one map field occurrence: `tag(FIELD, Len) + len + entry body`.
@@ -37,6 +41,7 @@ pub(super) fn encode_map_entry<K, V, A, B>(
     field: u32,
     key: &K::Element<A>,
     value: &V::Element<A>,
+    ctx: &mut EncodeCtx,
     buf: &mut B,
 ) where
     K: MapKey,
@@ -44,11 +49,11 @@ pub(super) fn encode_map_entry<K, V, A, B>(
     A: Allocator + Clone,
     B: BufMut,
 {
-    let payload_len = entry_payload_len::<K, V, A>(key, value);
+    let payload_len = entry_payload_len::<K, V, A>(key, value, ctx);
     encode::encode_tag(field, WireType::Len, buf);
     encode::encode_varint(payload_len as u64, buf);
-    encode_field::<K, A, B>(K::wire_view(key), KEY_FIELD, buf);
-    encode_field::<V, A, B>(V::wire_view(value), VALUE_FIELD, buf);
+    encode_field::<K, A, B>(K::wire_view(key), KEY_FIELD, ctx, buf);
+    encode_field::<V, A, B>(V::wire_view(value), VALUE_FIELD, ctx, buf);
 }
 
 fn discard_partial_entry<K, V, A>(

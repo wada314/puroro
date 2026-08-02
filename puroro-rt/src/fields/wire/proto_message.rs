@@ -15,6 +15,7 @@ use ::unmanaged::UnmanagedBox;
 use ::puroro::{DecodeBuf, DecodeError, Message, WireType};
 
 use crate::decode;
+use crate::message_encode::MessageEncode;
 use ::unmanaged::DeallocateIn;
 
 use crate::fields::shared::{
@@ -68,7 +69,7 @@ impl<M, A: Allocator> ProtoEmpty for UnmanagedBox<M, A> {
 
 impl<M, A: Allocator> AddressableSlot for UnmanagedBox<M, A> {}
 
-impl<M: Message> SingularType for ProtoMessage<M> {
+impl<M: Message + MessageEncode> SingularType for ProtoMessage<M> {
     type Slot<A: Allocator + Clone> = UnmanagedBox<M, A>;
     type Mut<'a, A: Allocator + Clone>
         = &'a mut M
@@ -78,7 +79,7 @@ impl<M: Message> SingularType for ProtoMessage<M> {
     type Written<A: Allocator + Clone> = UnmanagedBox<M, A>;
 }
 
-impl<M: Message> PayloadAccess for ProtoMessage<M> {
+impl<M: Message + MessageEncode> PayloadAccess for ProtoMessage<M> {
     #[inline]
     fn is_proto_empty<A: Allocator + Clone, Pb>(
         _slot: &UnmanagedBox<M, A>,

@@ -15,9 +15,10 @@ use ::core::ops::DerefMut;
 use ::puroro::{DecodeBuf, DecodeError, Message};
 use ::puroro_rt::decode::{decode_tag, skip_field_and_save};
 use ::puroro_rt::{
-    CloneFieldsVisitor, CloneIn, DebugStructVisitor, EncodeRawVisitor, EncodedLenVisitor, Explicit,
-    FieldDeallocVisitor, FieldEqVisitor, FieldPairVisitor, FieldPairVisitorMut, FieldVisitor,
-    FieldVisitorMut, MessageCommon, ProtoDouble, ProtoFixed32, ProtoString, SingularField,
+    CloneFieldsVisitor, CloneIn, DebugStructVisitor, EncodeCtx, EncodeRawVisitor,
+    EncodedLenVisitor, Explicit, FieldDeallocVisitor, FieldEqVisitor, FieldPairVisitor,
+    FieldPairVisitorMut, FieldVisitor, FieldVisitorMut, MessageCommon, MessageEncode, ProtoDouble,
+    ProtoFixed32, ProtoString, SingularField,
 };
 
 // ---------------------------------------------------------------------------
@@ -271,6 +272,20 @@ impl<A: Allocator + Clone> ::puroro_rt::DeallocateIn<A> for Address<A> {
 // Message
 // ---------------------------------------------------------------------------
 
+impl<A: Allocator + Clone> MessageEncode for Address<A> {
+    fn encoded_len(&self, ctx: &mut EncodeCtx) -> usize {
+        let mut v = EncodedLenVisitor::new(&self._common, ctx);
+        let _ = self.visit_fields(&mut v);
+        v.len + self._common.unknown_fields.len()
+    }
+
+    fn encode_raw<B: BufMut>(&self, ctx: &mut EncodeCtx, buf: &mut B) {
+        let _ = self.visit_fields(&mut EncodeRawVisitor::new(&self._common, ctx, buf));
+        let unknown: &[u8] = &self._common.unknown_fields;
+        buf.put_slice(unknown);
+    }
+}
+
 impl<A: Allocator + Clone> Message for Address<A> {
     type Alloc = A;
 
@@ -278,16 +293,8 @@ impl<A: Allocator + Clone> Message for Address<A> {
         Self::new_in(alloc)
     }
 
-    fn encoded_len(&self) -> usize {
-        let mut v = EncodedLenVisitor::new(&self._common);
-        let _ = self.visit_fields(&mut v);
-        v.len + self._common.unknown_fields.len()
-    }
-
-    fn encode_raw<B: BufMut>(&self, buf: &mut B) {
-        let _ = self.visit_fields(&mut EncodeRawVisitor::new(&self._common, buf));
-        let unknown: &[u8] = &self._common.unknown_fields;
-        buf.put_slice(unknown);
+    fn encode_to_vec(&self) -> Vec<u8> {
+        ::puroro_rt::encode_message_to_vec(self)
     }
 
     fn merge_from_with_depth<B: DecodeBuf>(

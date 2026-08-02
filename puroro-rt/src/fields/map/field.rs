@@ -14,9 +14,8 @@ use ::allocator_api2::alloc::Allocator;
 use ::bytes::BufMut;
 use ::hashbrown::hash_map::Iter as HashMapIter;
 use ::hashbrown::{DefaultHashBuilder, Equivalent, HashMap};
-use ::unmanaged::CloneIn;
-
 use ::puroro::{DecodeBuf, DecodeError, MapMut, MapRef, WireType};
+use ::unmanaged::CloneIn;
 
 use crate::decode;
 use crate::encode;
@@ -26,6 +25,7 @@ use crate::fields::wire::map_element::MapKey;
 use crate::fields::wire::repeated_element::{
     RepeatedElement, RepeatedElementMerge, RepeatedElementMut,
 };
+use crate::message_encode::EncodeCtx;
 
 use super::entry::{decode_map_entry, encode_map_entry, entry_payload_len};
 
@@ -150,18 +150,23 @@ where
     A: Allocator + Clone,
     K::Element<A>: Eq + Hash,
 {
-    fn encoded_len(&self, _common: &MessageCommon<P, A>) -> usize {
+    fn encoded_len(&self, _common: &MessageCommon<P, A>, ctx: &mut EncodeCtx) -> usize {
         let mut n = 0;
         for (key, value) in &self.entries {
-            let payload = entry_payload_len::<K, V, A>(key, value);
+            let payload = entry_payload_len::<K, V, A>(key, value, ctx);
             n += encode::encoded_len_len_field(FIELD, payload);
         }
         n
     }
 
-    fn encode_raw<B: BufMut>(&self, _common: &MessageCommon<P, A>, buf: &mut B) {
+    fn encode_raw<B: BufMut>(
+        &self,
+        _common: &MessageCommon<P, A>,
+        ctx: &mut EncodeCtx,
+        buf: &mut B,
+    ) {
         for (key, value) in &self.entries {
-            encode_map_entry::<K, V, A, B>(FIELD, key, value, buf);
+            encode_map_entry::<K, V, A, B>(FIELD, key, value, ctx, buf);
         }
     }
 }
@@ -438,6 +443,7 @@ mod tests {
     use crate::fields::shared::field_inspect::FieldEncode;
     use crate::fields::shared::{FieldDeallocate, MessageCommon};
     use crate::fields::wire::{ProtoInt32, ProtoString};
+    use crate::message_encode::EncodeCtx;
     use ::allocator_api2::alloc::Global;
     use ::bitvec::array::BitArray;
     use ::bitvec::order::Lsb0;
@@ -468,8 +474,9 @@ mod tests {
         field.bind_mut(&mut common).insert(2, 20);
 
         let mut buf = BytesMut::new();
-        field.encode_raw(&common, &mut buf);
-        assert_eq!(field.encoded_len(&common), buf.len());
+        let mut ctx = EncodeCtx::new();
+        field.encode_raw(&common, &mut ctx, &mut buf);
+        assert_eq!(field.encoded_len(&common, &mut EncodeCtx::new()), buf.len());
 
         let mut decoded = MapField::<ProtoInt32, ProtoInt32, 7, _>::new_in(Global);
         let mut rest = buf.as_ref();
@@ -487,7 +494,13 @@ mod tests {
 
         // Second merge of key=1 overwrites.
         let mut one = BytesMut::new();
-        encode_map_entry::<ProtoInt32, ProtoInt32, Global, _>(7, &1, &99, &mut one);
+        encode_map_entry::<ProtoInt32, ProtoInt32, Global, _>(
+            7,
+            &1,
+            &99,
+            &mut EncodeCtx::new(),
+            &mut one,
+        );
         let mut rest = one.as_ref();
         let (_, wt) = decode_tag(&mut rest).unwrap();
         let mut scoped = ScopedBuf::new(&mut rest);
@@ -540,7 +553,7 @@ mod tests {
         field.bind_mut(&mut common).insert(unmanaged_str("ab"), 7);
 
         let mut buf = BytesMut::new();
-        field.encode_raw(&common, &mut buf);
+        field.encode_raw(&common, &mut EncodeCtx::new(), &mut buf);
 
         let mut decoded = MapField::<ProtoString, ProtoInt32, 3, _>::new_in(Global);
         let mut rest = buf.as_ref();
@@ -586,7 +599,7 @@ mod tests {
                 let mut src = MapField::<ProtoString, ProtoInt32, 1, _>::new_in(Global);
                 src.bind_mut(common).insert(unmanaged_str("k"), value);
                 let mut buf = BytesMut::new();
-                src.encode_raw(common, &mut buf);
+                src.encode_raw(common, &mut EncodeCtx::new(), &mut buf);
                 src.deallocate(common);
                 buf
             };

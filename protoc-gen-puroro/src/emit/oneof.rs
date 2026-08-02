@@ -244,7 +244,7 @@ fn render_module_body(oneof: &OneofEmit) -> Result<TokenStream> {
         .iter()
         .map(|v| {
             let vn = &v.variant_name;
-            quote! { Self::#vn(f) => ::puroro_rt::FieldEncode::encoded_len(f, common), }
+            quote! { Self::#vn(f) => ::puroro_rt::FieldEncode::encoded_len(f, common, ctx), }
         })
         .collect();
 
@@ -253,7 +253,7 @@ fn render_module_body(oneof: &OneofEmit) -> Result<TokenStream> {
         .iter()
         .map(|v| {
             let vn = &v.variant_name;
-            quote! { Self::#vn(f) => ::puroro_rt::FieldEncode::encode_raw(f, common, buf), }
+            quote! { Self::#vn(f) => ::puroro_rt::FieldEncode::encode_raw(f, common, ctx, buf), }
         })
         .collect();
 
@@ -352,7 +352,11 @@ fn render_module_body(oneof: &OneofEmit) -> Result<TokenStream> {
         #(#oneof_variant_impls)*
 
         impl<A: Allocator + ::core::clone::Clone> OneofEncodable<A> for #storage_name<A> {
-            fn encoded_len<P>(&self, common: &MessageCommon<P, A>) -> usize
+            fn encoded_len<P>(
+                &self,
+                common: &MessageCommon<P, A>,
+                ctx: &mut ::puroro_rt::EncodeCtx,
+            ) -> usize
             where
                 MessageCommon<P, A>: MessageCommonBits + MessageCommonAlloc<Alloc = A>,
             {
@@ -361,8 +365,12 @@ fn render_module_body(oneof: &OneofEmit) -> Result<TokenStream> {
                 }
             }
 
-            fn encode_raw<P, B: BufMut>(&self, common: &MessageCommon<P, A>, buf: &mut B)
-            where
+            fn encode_raw<P, B: BufMut>(
+                &self,
+                common: &MessageCommon<P, A>,
+                ctx: &mut ::puroro_rt::EncodeCtx,
+                buf: &mut B,
+            ) where
                 MessageCommon<P, A>: MessageCommonBits + MessageCommonAlloc<Alloc = A>,
             {
                 match self {

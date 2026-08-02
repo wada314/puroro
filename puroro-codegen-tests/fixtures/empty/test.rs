@@ -6,14 +6,12 @@ use puroro::Message;
 #[test]
 fn default_encodes_to_empty() {
     let msg: Empty = Empty::new();
-    assert_eq!(Message::encoded_len(&msg), 0);
     assert!(msg.encode_to_vec().is_empty());
 }
 
 #[test]
 fn decode_empty_bytes() {
     let msg: Empty = Empty::decode(&[][..]).expect("decode empty");
-    assert_eq!(Message::encoded_len(&msg), 0);
     assert!(msg.encode_to_vec().is_empty());
 }
 

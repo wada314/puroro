@@ -28,6 +28,7 @@ use ::unmanaged::{UnmanagedString, UnmanagedVec};
 use ::puroro::{DecodeBuf, DecodeError, Message, WireType};
 
 use crate::decode;
+use crate::message_encode::MessageEncode;
 use ::unmanaged::DeallocateIn;
 
 use ::protobuf_core::{FIXED32_BYTES, FIXED64_BYTES};
@@ -309,9 +310,10 @@ impl<T: NumericalType> PackableRepeatedElement for T {
     where
         T::NativeType: Copy,
     {
+        // Packed numerics never need nested-length memoization.
         values
             .iter()
-            .map(|v| <T as EncodeType>::payload_len::<A>(*v))
+            .map(|v| T::to_wire_body(*v).encoded_len())
             .sum()
     }
 
@@ -321,7 +323,7 @@ impl<T: NumericalType> PackableRepeatedElement for T {
         T::NativeType: Copy,
     {
         for v in values {
-            <T as EncodeType>::encode_payload::<A, B>(*v, buf);
+            T::to_wire_body(*v).encode(buf);
         }
     }
 }
@@ -521,7 +523,7 @@ impl RepeatedElementMut for ProtoBytes {
 // Nested message
 // ---------------------------------------------------------------------------
 
-impl<M: Message> RepeatedElement for ProtoMessage<M> {
+impl<M: Message + MessageEncode> RepeatedElement for ProtoMessage<M> {
     /// Inline message value (not [`UnmanagedBox`](::unmanaged::UnmanagedBox)).
     ///
     /// Use sites must pair the same allocator: e.g.
@@ -554,7 +556,7 @@ impl<M: Message> RepeatedElement for ProtoMessage<M> {
 impl<A, M> RepeatedElementMerge<A> for ProtoMessage<M>
 where
     A: Allocator + Clone,
-    M: Message<Alloc = A> + ::unmanaged::DeallocateIn<A>,
+    M: Message<Alloc = A> + MessageEncode + ::unmanaged::DeallocateIn<A>,
 {
     #[inline]
     fn default_element(alloc: A) -> M {
@@ -595,9 +597,9 @@ where
     }
 }
 
-impl<M: Message> RepeatedVecMut for ProtoMessage<M> {}
+impl<M: Message + MessageEncode> RepeatedVecMut for ProtoMessage<M> {}
 
-impl<M: Message> RepeatedElementMut for ProtoMessage<M> {
+impl<M: Message + MessageEncode> RepeatedElementMut for ProtoMessage<M> {
     type MutTarget<A: Allocator + Clone> = M;
 
     type ElementMut<'a, A: Allocator + Clone>

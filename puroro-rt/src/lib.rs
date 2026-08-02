@@ -12,6 +12,7 @@ pub mod decode;
 pub(crate) mod defaults;
 pub mod encode;
 pub(crate) mod fields;
+pub mod message_encode;
 
 pub use ::protobuf_core::FieldNumber;
 /// Generator-facing re-exports from `unmanaged`.
@@ -49,3 +50,4 @@ pub use fields::wire::{
     RepeatedElementMerge, RepeatedElementMut, RepeatedVecMut, SingularType, encode_field,
     encoded_len_field,
 };
+pub use message_encode::{EncodeCtx, MessageEncode, encode_message_to_vec};

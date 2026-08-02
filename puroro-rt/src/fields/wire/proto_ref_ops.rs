@@ -13,6 +13,7 @@ use super::proto_message::ProtoMessage;
 use super::singular_type::SingularType;
 use super::varint::ProtoBool;
 use crate::fields::shared::value_slot::AddressableSlot;
+use crate::message_encode::MessageEncode;
 
 /// Equality for [`EncodeType::View`](super::encode_type::EncodeType::View)
 /// (used by catalog [`FieldPartialEq`](crate::FieldPartialEq)).
@@ -140,7 +141,7 @@ impl<A: Allocator + Clone> ProtoRefDebug<A> for ProtoBytes {
 /// Nested messages: bound is `M: PartialEq` / `Debug` (no `A: 'static` HRTB).
 impl<M, A> ProtoRefEq<A> for ProtoMessage<M>
 where
-    M: Message<Alloc = A> + PartialEq,
+    M: Message<Alloc = A> + MessageEncode + PartialEq,
     A: Allocator + Clone,
 {
     #[inline]
@@ -154,7 +155,7 @@ where
 
 impl<M, A> ProtoRefDebug<A> for ProtoMessage<M>
 where
-    M: Message<Alloc = A> + Debug,
+    M: Message<Alloc = A> + MessageEncode + Debug,
     A: Allocator + Clone,
 {
     #[inline]

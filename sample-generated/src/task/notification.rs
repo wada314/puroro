@@ -300,29 +300,37 @@ impl<A: Allocator + Clone> OneofVariant<{ super::FIELD_URGENT }> for Notificatio
 }
 
 impl<A: Allocator + Clone> OneofEncodable<A> for NotificationStorage<A> {
-    fn encoded_len<P>(&self, common: &MessageCommon<P, A>) -> usize
+    fn encoded_len<P>(
+        &self,
+        common: &MessageCommon<P, A>,
+        ctx: &mut ::puroro_rt::EncodeCtx,
+    ) -> usize
     where
         MessageCommon<P, A>: MessageCommonBits + MessageCommonAlloc<Alloc = A>,
     {
         match self {
-            Self::EmailAddress(f) => FieldEncode::encoded_len(f, common),
-            Self::PhoneNumber(f) => FieldEncode::encoded_len(f, common),
-            Self::WebhookId(f) => FieldEncode::encoded_len(f, common),
-            Self::Postal(f) => FieldEncode::encoded_len(f, common),
-            Self::Urgent(f) => FieldEncode::encoded_len(f, common),
+            Self::EmailAddress(f) => FieldEncode::encoded_len(f, common, ctx),
+            Self::PhoneNumber(f) => FieldEncode::encoded_len(f, common, ctx),
+            Self::WebhookId(f) => FieldEncode::encoded_len(f, common, ctx),
+            Self::Postal(f) => FieldEncode::encoded_len(f, common, ctx),
+            Self::Urgent(f) => FieldEncode::encoded_len(f, common, ctx),
         }
     }
 
-    fn encode_raw<P, B: BufMut>(&self, common: &MessageCommon<P, A>, buf: &mut B)
-    where
+    fn encode_raw<P, B: BufMut>(
+        &self,
+        common: &MessageCommon<P, A>,
+        ctx: &mut ::puroro_rt::EncodeCtx,
+        buf: &mut B,
+    ) where
         MessageCommon<P, A>: MessageCommonBits + MessageCommonAlloc<Alloc = A>,
     {
         match self {
-            Self::EmailAddress(f) => FieldEncode::encode_raw(f, common, buf),
-            Self::PhoneNumber(f) => FieldEncode::encode_raw(f, common, buf),
-            Self::WebhookId(f) => FieldEncode::encode_raw(f, common, buf),
-            Self::Postal(f) => FieldEncode::encode_raw(f, common, buf),
-            Self::Urgent(f) => FieldEncode::encode_raw(f, common, buf),
+            Self::EmailAddress(f) => FieldEncode::encode_raw(f, common, ctx, buf),
+            Self::PhoneNumber(f) => FieldEncode::encode_raw(f, common, ctx, buf),
+            Self::WebhookId(f) => FieldEncode::encode_raw(f, common, ctx, buf),
+            Self::Postal(f) => FieldEncode::encode_raw(f, common, ctx, buf),
+            Self::Urgent(f) => FieldEncode::encode_raw(f, common, ctx, buf),
         }
     }
 }

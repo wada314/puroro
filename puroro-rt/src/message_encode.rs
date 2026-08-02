@@ -1,0 +1,68 @@
+//! Message-body encode surface used by the field catalog and generated code.
+//!
+//! This is intentionally **not** part of the user-facing [`puroro::Message`](::puroro::Message)
+//! trait. Library users call [`Message::encode_to_vec`](::puroro::Message::encode_to_vec);
+//! generated impls forward that to [`MessageEncode::encode_to_vec`].
+
+use ::bytes::BufMut;
+use ::core::ptr;
+use ::std::collections::HashMap;
+
+/// Scratch state for one root encode (`encode_to_vec` / equivalent).
+///
+/// Nested LEN encode needs each child's [`MessageEncode::encoded_len`] both when
+/// sizing a parent and when writing that child's length prefix. Passing this
+/// context down the encode stack avoids O(depth²) re-walks without TLS / globals.
+#[derive(Debug, Default)]
+pub struct EncodeCtx {
+    /// `message as *const ()` → body wire length (no LEN prefix).
+    body_lens: HashMap<*const (), usize>,
+}
+
+impl EncodeCtx {
+    /// Empty context with a modest map capacity for typical nesting.
+    #[inline]
+    pub fn new() -> Self {
+        Self {
+            body_lens: HashMap::with_capacity(32),
+        }
+    }
+
+    /// Cached `message.encoded_len(self)`, inserting on miss.
+    #[inline]
+    pub fn body_len_for<M: MessageEncode>(&mut self, message: &M) -> usize {
+        let key = ptr::from_ref(message).cast::<()>();
+        if let Some(&n) = self.body_lens.get(&key) {
+            return n;
+        }
+        let n = message.encoded_len(self);
+        self.body_lens.insert(key, n);
+        n
+    }
+}
+
+/// Wire encode for a message body (tag-free fields + unknown bytes).
+///
+/// Implemented by generated messages and hand-written test / bench messages.
+/// Nested-message catalog code ([`ProtoMessage`](crate::ProtoMessage)) bounds on
+/// this trait, not on [`puroro::Message`](::puroro::Message).
+///
+/// User-facing [`Message::encode_to_vec`](::puroro::Message::encode_to_vec) is a
+/// thin wrapper around [`encode_message_to_vec`].
+pub trait MessageEncode {
+    /// Exact number of bytes this message body occupies on the wire.
+    /// Must be consistent with [`encode_raw`](Self::encode_raw).
+    fn encoded_len(&self, ctx: &mut EncodeCtx) -> usize;
+
+    /// Writes the message body to `buf` without a framing length prefix.
+    fn encode_raw<B: BufMut>(&self, ctx: &mut EncodeCtx, buf: &mut B);
+}
+
+/// Encodes `message` into a new `Vec<u8>` (creates a fresh [`EncodeCtx`]).
+#[inline]
+pub fn encode_message_to_vec<M: MessageEncode>(message: &M) -> Vec<u8> {
+    let mut ctx = EncodeCtx::new();
+    let mut v = Vec::with_capacity(message.encoded_len(&mut ctx));
+    message.encode_raw(&mut ctx, &mut v);
+    v
+}

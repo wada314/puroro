@@ -9,7 +9,6 @@ use puroro::Message;
 #[test]
 fn package_path_resolves() {
     let msg = Empty::new();
-    assert_eq!(Message::encoded_len(&msg), 0);
     assert!(msg.encode_to_vec().is_empty());
 }
 

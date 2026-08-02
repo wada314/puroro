@@ -5,6 +5,7 @@
 //! Encode follows `E`. Non-packable types (string / bytes / future message) only
 //! implement [`Expanded`].
 
+use crate::message_encode::EncodeCtx;
 use ::allocator_api2::alloc::Allocator;
 use ::bytes::BufMut;
 
@@ -15,10 +16,10 @@ use crate::fields::wire::repeated_element::{PackableRepeatedElement, RepeatedEle
 /// How a repeated field is written on encode.
 pub trait RepeatedEncoding<T: RepeatedElement, A: Allocator + Clone>: Copy {
     /// Wire byte length when `values` is non-empty; `0` when empty.
-    fn encoded_len(field: u32, values: &[T::Element<A>]) -> usize;
+    fn encoded_len(field: u32, values: &[T::Element<A>], ctx: &mut EncodeCtx) -> usize;
 
     /// Writes the field when `values` is non-empty.
-    fn encode<B: BufMut>(field: u32, values: &[T::Element<A>], buf: &mut B);
+    fn encode<B: BufMut>(field: u32, values: &[T::Element<A>], ctx: &mut EncodeCtx, buf: &mut B);
 }
 
 /// One tagged record per element (expanded varint, string, bytes, …).
@@ -26,16 +27,16 @@ pub trait RepeatedEncoding<T: RepeatedElement, A: Allocator + Clone>: Copy {
 pub struct Expanded;
 
 impl<T: RepeatedElement, A: Allocator + Clone> RepeatedEncoding<T, A> for Expanded {
-    fn encoded_len(field: u32, values: &[T::Element<A>]) -> usize {
+    fn encoded_len(field: u32, values: &[T::Element<A>], ctx: &mut EncodeCtx) -> usize {
         values
             .iter()
-            .map(|v| encoded_len_field::<T, A>(T::wire_view(v), field))
+            .map(|v| encoded_len_field::<T, A>(T::wire_view(v), field, ctx))
             .sum()
     }
 
-    fn encode<B: BufMut>(field: u32, values: &[T::Element<A>], buf: &mut B) {
+    fn encode<B: BufMut>(field: u32, values: &[T::Element<A>], ctx: &mut EncodeCtx, buf: &mut B) {
         for v in values {
-            encode_field::<T, A, B>(T::wire_view(v), field, buf);
+            encode_field::<T, A, B>(T::wire_view(v), field, ctx, buf);
         }
     }
 }
@@ -48,14 +49,14 @@ impl<T: PackableRepeatedElement, A: Allocator + Clone> RepeatedEncoding<T, A> fo
 where
     T::Element<A>: Copy,
 {
-    fn encoded_len(field: u32, values: &[T::Element<A>]) -> usize {
+    fn encoded_len(field: u32, values: &[T::Element<A>], _ctx: &mut EncodeCtx) -> usize {
         if values.is_empty() {
             return 0;
         }
         encode::encoded_len_len_field(field, T::packed_payload_len(values))
     }
 
-    fn encode<B: BufMut>(field: u32, values: &[T::Element<A>], buf: &mut B) {
+    fn encode<B: BufMut>(field: u32, values: &[T::Element<A>], _ctx: &mut EncodeCtx, buf: &mut B) {
         if values.is_empty() {
             return;
         }
