@@ -25,7 +25,7 @@ use ::bytes::{Buf, BufMut};
 use ::core::ops::{Deref, DerefMut};
 use ::unmanaged::{UnmanagedString, UnmanagedVec};
 
-use ::puroro::{DecodeError, Message, WireType};
+use ::puroro::{DecodeBuf, DecodeError, Message, WireType};
 
 use crate::decode;
 use ::unmanaged::DeallocateIn;
@@ -93,7 +93,7 @@ pub trait RepeatedElementMerge<A: Allocator + Clone>: RepeatedElement {
     ///
     /// Unlike [`merge_occurrence`], packed `Len` is rejected — map-entry key /
     /// value fields are singular on the wire.
-    fn decode_element<B: Buf>(
+    fn decode_element<B: DecodeBuf>(
         wire_type: WireType,
         buf: &mut B,
         alloc: A,
@@ -109,7 +109,7 @@ pub trait RepeatedElementMerge<A: Allocator + Clone>: RepeatedElement {
         push: F,
     ) -> Result<(), DecodeError>
     where
-        B: Buf,
+        B: DecodeBuf,
         F: FnMut(Self::Element<A>);
 }
 
@@ -197,7 +197,7 @@ impl<A: Allocator + Clone, T: NumericalType> RepeatedElementMerge<A> for T {
     }
 
     #[inline]
-    fn decode_element<B: Buf>(
+    fn decode_element<B: DecodeBuf>(
         wire_type: WireType,
         buf: &mut B,
         _alloc: A,
@@ -214,7 +214,7 @@ impl<A: Allocator + Clone, T: NumericalType> RepeatedElementMerge<A> for T {
         mut push: F,
     ) -> Result<(), DecodeError>
     where
-        B: Buf,
+        B: DecodeBuf,
         F: FnMut(T::NativeType),
     {
         match <T::WireBody as WirePayload>::WIRE_TYPE {
@@ -384,7 +384,7 @@ impl<A: Allocator + Clone> RepeatedElementMerge<A> for ProtoString {
     }
 
     #[inline]
-    fn decode_element<B: Buf>(
+    fn decode_element<B: DecodeBuf>(
         wire_type: WireType,
         buf: &mut B,
         alloc: A,
@@ -405,7 +405,7 @@ impl<A: Allocator + Clone> RepeatedElementMerge<A> for ProtoString {
         mut push: F,
     ) -> Result<(), DecodeError>
     where
-        B: Buf,
+        B: DecodeBuf,
         F: FnMut(UnmanagedString<A>),
     {
         push(Self::decode_element(wire_type, buf, alloc, _depth)?);
@@ -466,7 +466,7 @@ impl<A: Allocator + Clone> RepeatedElementMerge<A> for ProtoBytes {
     }
 
     #[inline]
-    fn decode_element<B: Buf>(
+    fn decode_element<B: DecodeBuf>(
         wire_type: WireType,
         buf: &mut B,
         alloc: A,
@@ -487,7 +487,7 @@ impl<A: Allocator + Clone> RepeatedElementMerge<A> for ProtoBytes {
         mut push: F,
     ) -> Result<(), DecodeError>
     where
-        B: Buf,
+        B: DecodeBuf,
         F: FnMut(UnmanagedVec<u8, A>),
     {
         push(Self::decode_element(wire_type, buf, alloc, _depth)?);
@@ -562,7 +562,7 @@ where
     }
 
     #[inline]
-    fn decode_element<B: Buf>(
+    fn decode_element<B: DecodeBuf>(
         wire_type: WireType,
         buf: &mut B,
         alloc: A,
@@ -572,15 +572,9 @@ where
             return Err(DecodeError::InvalidTag);
         }
         let len = decode::decode_varint(buf)? as usize;
-        if buf.remaining() < len {
-            return Err(DecodeError::TruncatedMessage);
-        }
-        // Concrete `&[u8]` avoids infinite `Take<…>` monomorphization for
-        // recursive message types (same rationale as singular `ProtoMessage`).
-        let payload = buf.copy_to_bytes(len);
-        let mut sub: &[u8] = payload.as_ref();
+        let mut guard = buf.push_limit_guard(len)?;
         let mut msg = M::new_in(alloc);
-        msg.merge_from_with_depth(&mut sub, depth + 1)?;
+        msg.merge_from_with_depth(&mut *guard, depth + 1)?;
         Ok(msg)
     }
 
@@ -593,7 +587,7 @@ where
         mut push: F,
     ) -> Result<(), DecodeError>
     where
-        B: Buf,
+        B: DecodeBuf,
         F: FnMut(M),
     {
         push(Self::decode_element(wire_type, buf, alloc, depth)?);

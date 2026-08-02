@@ -4,6 +4,7 @@ use ::allocator_api2::alloc::Allocator;
 use ::bytes::{Buf, BufMut};
 
 use crate::error::DecodeError;
+use crate::scoped_buf::{DecodeBuf, ScopedBuf};
 use crate::unknown::UnknownField;
 
 /// Maximum nesting depth for nested-message decode.
@@ -59,8 +60,8 @@ pub trait Message: Sized {
 
     /// Reads fields from `buf` and merges them into `self`.
     ///
-    /// Equivalent to [`merge_from_with_depth`](Self::merge_from_with_depth)
-    /// with `depth = 0`.
+    /// Wraps `buf` in a [`ScopedBuf`] and delegates to
+    /// [`merge_from_with_depth`](Self::merge_from_with_depth) with `depth = 0`.
     ///
     /// Merge semantics (identical across proto2, proto3, editions):
     /// - Singular scalar: last value seen wins.
@@ -68,16 +69,22 @@ pub trait Message: Sized {
     /// - Repeated: each occurrence appends to the list.
     /// - Unknown fields: accumulated for round-trip preservation.
     fn merge_from<B: Buf>(&mut self, buf: &mut B) -> Result<(), DecodeError> {
-        self.merge_from_with_depth(buf, 0)
+        let mut scoped = ScopedBuf::new(buf);
+        self.merge_from_with_depth(&mut scoped, 0)
     }
 
     /// Like [`merge_from`](Self::merge_from), threading decode nesting `depth`.
+    ///
+    /// `buf` must be a [`DecodeBuf`] (normally a [`ScopedBuf`] created by
+    /// [`merge_from`](Self::merge_from)). Nested LEN frames call
+    /// [`DecodeBuf::push_limit`] / [`DecodeBuf::pop_limit`] on the same buffer
+    /// so the concrete type does not change across recursion depths.
     ///
     /// Generated / catalog code must pass `depth + 1` into nested
     /// `merge_from_with_depth` calls. Returns
     /// [`DecodeError::RecursionLimitExceeded`] when
     /// `depth >= `[`RECURSION_LIMIT`].
-    fn merge_from_with_depth<B: Buf>(
+    fn merge_from_with_depth<B: DecodeBuf>(
         &mut self,
         buf: &mut B,
         depth: usize,

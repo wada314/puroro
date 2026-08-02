@@ -11,14 +11,14 @@ use ::allocator_api2::alloc::{Allocator, Global};
 use ::allocator_api2::vec::Vec as AllocVec;
 use ::bitvec::array::BitArray;
 use ::bitvec::order::Lsb0;
-use ::bytes::{Buf, BufMut};
+use ::bytes::BufMut;
 use ::core::fmt;
 use ::core::mem;
 use ::core::ops::ControlFlow;
 use ::core::ops::{Deref, DerefMut};
 
 use ::puroro::{
-    DecodeError, HasDefault, MapMut, MapRef, Message, OneofView, OneofViewMut, Optional,
+    DecodeBuf, DecodeError, HasDefault, MapMut, MapRef, Message, OneofView, OneofViewMut, Optional,
     RepeatedStringMut,
 };
 use ::puroro_rt::decode::{decode_tag, skip_field_and_save};
@@ -749,7 +749,7 @@ impl<A: Allocator + Clone> Message for Task<A> {
         buf.put_slice(unknown);
     }
 
-    fn merge_from_with_depth<B: Buf>(
+    fn merge_from_with_depth<B: DecodeBuf>(
         &mut self,
         buf: &mut B,
         depth: usize,

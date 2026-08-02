@@ -1,9 +1,9 @@
 //! Wire encode / decode for one protobuf map entry (`key = 1`, `value = 2`).
 
 use ::allocator_api2::alloc::Allocator;
-use ::bytes::{Buf, BufMut};
+use ::bytes::BufMut;
 
-use ::puroro::{DecodeError, WireType};
+use ::puroro::{DecodeBuf, DecodeError, WireType};
 
 use crate::decode;
 use crate::encode;
@@ -80,7 +80,7 @@ where
     K: MapKey + RepeatedElementMerge<A>,
     V: RepeatedElementMerge<A>,
     A: Allocator + Clone,
-    B: Buf,
+    B: DecodeBuf,
 {
     let mut key: Option<K::Element<A>> = None;
     let mut value: Option<V::Element<A>> = None;

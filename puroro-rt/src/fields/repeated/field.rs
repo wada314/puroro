@@ -8,13 +8,12 @@ use ::core::marker::PhantomData;
 use ::core::mem::ManuallyDrop;
 
 use ::allocator_api2::alloc::Allocator;
-use ::bytes::{Buf, BufMut};
+use ::bytes::BufMut;
 use ::unmanaged::CloneIn;
 use ::unmanaged::UnmanagedVec;
 use ::unmanaged::vec::VecGuard;
 
-use ::puroro::DecodeError;
-use ::puroro::WireType;
+use ::puroro::{DecodeBuf, DecodeError, WireType};
 
 use crate::fields::shared::field_inspect::{FieldCloneIn, FieldDebug, FieldEncode, FieldPartialEq};
 use crate::fields::shared::{FieldDeallocate, MessageCommon};
@@ -225,7 +224,7 @@ where
     }
 
     /// Merges one wire occurrence — appends element(s).
-    pub fn merge<B: Buf>(
+    pub fn merge<B: DecodeBuf>(
         self,
         wire_type: WireType,
         buf: &mut B,

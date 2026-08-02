@@ -40,6 +40,7 @@ pub mod oneof;
 pub mod optional;
 mod protobuf_error;
 pub mod repeated;
+pub mod scoped_buf;
 pub mod unknown;
 pub mod wire_type;
 
@@ -51,5 +52,6 @@ pub use message::{Message, RECURSION_LIMIT};
 pub use oneof::{OneofView, OneofViewMut};
 pub use optional::{HasDefault, Optional};
 pub use repeated::{RepeatedBytesMut, RepeatedContainerMut, RepeatedStringMut};
+pub use scoped_buf::{DecodeBuf, LimitGuard, ScopedBuf};
 pub use unknown::{UnknownField, UnknownPayload};
 pub use wire_type::WireType;

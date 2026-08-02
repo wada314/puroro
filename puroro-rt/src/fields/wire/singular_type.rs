@@ -27,14 +27,12 @@ use ::bitvec::{
     order::Lsb0,
     ptr::{BitRef, Mut},
 };
-use ::bytes::Buf;
 use ::core::ops::DerefMut;
 use ::unmanaged::string::StringGuard;
 use ::unmanaged::vec::VecGuard;
 use ::unmanaged::{UnmanagedString, UnmanagedVec};
 
-use ::puroro::DecodeError;
-use ::puroro::WireType;
+use ::puroro::{DecodeBuf, DecodeError, WireType};
 
 use ::unmanaged::DeallocateIn;
 
@@ -161,7 +159,7 @@ pub trait PayloadAccess: SingularType {
         VS: ValueSlot<Self::Slot<A>, A>,
         I: SlotInitMut,
         MessageCommon<Pb, A>: MessageCommonBits,
-        B: Buf;
+        B: DecodeBuf;
 }
 
 // ---------------------------------------------------------------------------
@@ -270,7 +268,7 @@ where
         VS: ValueSlot<T::NativeType, A>,
         I: SlotInitMut,
         MessageCommon<Pb, A>: MessageCommonBits,
-        B: Buf,
+        B: DecodeBuf,
     {
         match T::from_wire_body(T::WireBody::decode(wire_type, buf)?) {
             Ok(new) => {
@@ -391,7 +389,7 @@ impl PayloadAccess for ProtoString {
         VS: ValueSlot<UnmanagedString<A>, A>,
         I: SlotInitMut,
         MessageCommon<Pb, A>: MessageCommonBits,
-        B: Buf,
+        B: DecodeBuf,
     {
         if wire_type != WireType::Len {
             return Err(DecodeError::InvalidTag);
@@ -498,7 +496,7 @@ impl PayloadAccess for ProtoBytes {
         VS: ValueSlot<UnmanagedVec<u8, A>, A>,
         I: SlotInitMut,
         MessageCommon<Pb, A>: MessageCommonBits,
-        B: Buf,
+        B: DecodeBuf,
     {
         if wire_type != WireType::Len {
             return Err(DecodeError::InvalidTag);

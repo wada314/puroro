@@ -348,7 +348,7 @@ pub(super) fn render_items(plan: &MessagePlan<'_>) -> Result<TokenStream> {
                 ::bytes::BufMut::put_slice(buf, unknown);
             }
 
-            fn merge_from_with_depth<B: ::bytes::Buf>(
+            fn merge_from_with_depth<B: ::puroro::DecodeBuf>(
                 &mut self,
                 buf: &mut B,
                 depth: usize,

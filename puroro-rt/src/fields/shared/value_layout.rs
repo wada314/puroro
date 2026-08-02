@@ -9,9 +9,7 @@ use ::bitvec::{
     order::Lsb0,
     ptr::{BitRef, Mut},
 };
-use ::bytes::Buf;
-
-use ::puroro::{DecodeError, WireType};
+use ::puroro::{DecodeBuf, DecodeError, WireType};
 
 use ::unmanaged::DeallocateIn;
 
@@ -80,7 +78,7 @@ where
         VS: ValueSlot<T::Slot<A>, A>,
         I: SlotInitMut,
         MessageCommon<Pb, A>: MessageCommonBits,
-        B: Buf;
+        B: DecodeBuf;
 }
 
 /// Value lives in the field slot payload (`T::Slot<A>`).
@@ -161,7 +159,7 @@ where
         VS: ValueSlot<T::Slot<A>, A>,
         I: SlotInitMut,
         MessageCommon<Pb, A>: MessageCommonBits,
-        B: Buf,
+        B: DecodeBuf,
     {
         T::merge(slot, init, common, wire_type, buf, field, depth)
     }
@@ -247,7 +245,7 @@ where
         VS: ValueSlot<(), A>,
         I: SlotInitMut,
         MessageCommon<Pb, A>: MessageCommonBits,
-        B: Buf,
+        B: DecodeBuf,
     {
         match ProtoBool::from_wire_body(VarintPayload::decode(wire_type, buf)?) {
             Ok(new) => {

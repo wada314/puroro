@@ -6,13 +6,13 @@ mod defaults;
 use ::allocator_api2::alloc::{Allocator, Global};
 use ::bitvec::array::BitArray;
 use ::bitvec::order::Lsb0;
-use ::bytes::{Buf, BufMut};
+use ::bytes::BufMut;
 use ::core::fmt;
 use ::core::mem;
 use ::core::ops::ControlFlow;
 use ::core::ops::DerefMut;
 
-use ::puroro::{DecodeError, Message};
+use ::puroro::{DecodeBuf, DecodeError, Message};
 use ::puroro_rt::decode::{decode_tag, skip_field_and_save};
 use ::puroro_rt::{
     CloneFieldsVisitor, CloneIn, DebugStructVisitor, EncodeRawVisitor, EncodedLenVisitor, Explicit,
@@ -290,7 +290,7 @@ impl<A: Allocator + Clone> Message for Address<A> {
         buf.put_slice(unknown);
     }
 
-    fn merge_from_with_depth<B: Buf>(
+    fn merge_from_with_depth<B: DecodeBuf>(
         &mut self,
         buf: &mut B,
         depth: usize,

@@ -3,9 +3,8 @@
 use ::allocator_api2::alloc::{Allocator, Global};
 use ::bitvec::array::BitArray;
 use ::bitvec::order::Lsb0;
-use ::bytes::{Buf, BufMut};
-use ::puroro::DecodeError;
-use ::puroro::Message;
+use ::bytes::BufMut;
+use ::puroro::{DecodeBuf, DecodeError, Message};
 use ::puroro_rt::decode::{decode_tag, skip_field_and_save};
 use ::puroro_rt::{
     Expanded, Explicit, FieldDeallocate, FieldEncode, MessageCommon, Packed, ProtoDouble,
@@ -87,7 +86,7 @@ impl<A: Allocator + Clone> Message for FixedDemo<A> {
         buf.put_slice(&c.unknown_fields);
     }
 
-    fn merge_from_with_depth<B: Buf>(
+    fn merge_from_with_depth<B: DecodeBuf>(
         &mut self,
         buf: &mut B,
         depth: usize,

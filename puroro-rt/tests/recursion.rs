@@ -7,8 +7,8 @@
 use ::allocator_api2::alloc::{Allocator, Global};
 use ::bitvec::array::BitArray;
 use ::bitvec::order::Lsb0;
-use ::bytes::{Buf, BufMut};
-use ::puroro::{DecodeError, Message, RECURSION_LIMIT};
+use ::bytes::BufMut;
+use ::puroro::{DecodeBuf, DecodeError, Message, RECURSION_LIMIT};
 use ::puroro_rt::decode::{decode_tag, skip_field_and_save};
 use ::puroro_rt::{
     FieldCloneIn, FieldDeallocate, FieldEncode, Message as MessagePresence, MessageCommon,
@@ -77,7 +77,7 @@ impl<A: Allocator + Clone> Message for Nest<A> {
         buf.put_slice(&c.unknown_fields);
     }
 
-    fn merge_from_with_depth<B: Buf>(
+    fn merge_from_with_depth<B: DecodeBuf>(
         &mut self,
         buf: &mut B,
         depth: usize,

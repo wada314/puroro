@@ -11,12 +11,12 @@ use ::core::hash::Hash;
 use ::core::mem;
 
 use ::allocator_api2::alloc::Allocator;
-use ::bytes::{Buf, BufMut};
+use ::bytes::BufMut;
 use ::hashbrown::hash_map::Iter as HashMapIter;
 use ::hashbrown::{DefaultHashBuilder, Equivalent, HashMap};
 use ::unmanaged::CloneIn;
 
-use ::puroro::{DecodeError, MapMut, MapRef, WireType};
+use ::puroro::{DecodeBuf, DecodeError, MapMut, MapRef, WireType};
 
 use crate::decode;
 use crate::encode;
@@ -336,7 +336,7 @@ where
     }
 
     /// Merges one map-entry LEN occurrence (last-wins on duplicate keys).
-    pub fn merge<B: Buf>(
+    pub fn merge<B: DecodeBuf>(
         &mut self,
         wire_type: WireType,
         buf: &mut B,
@@ -351,15 +351,9 @@ where
             return Err(DecodeError::InvalidTag);
         }
         let len = decode::decode_varint(buf)? as usize;
-        if buf.remaining() < len {
-            return Err(DecodeError::TruncatedMessage);
-        }
-        // Concrete `&[u8]` avoids `Take<…>` monomorphization blow-up (same as
-        // nested `ProtoMessage` merge).
-        let payload = buf.copy_to_bytes(len);
-        let mut sub: &[u8] = payload.as_ref();
+        let mut guard = buf.push_limit_guard(len)?;
         let alloc = self.common.alloc.clone();
-        let (key, value) = decode_map_entry::<K, V, A, _>(&mut sub, alloc, depth)?;
+        let (key, value) = decode_map_entry::<K, V, A, _>(&mut *guard, alloc, depth)?;
         self.insert(key, value);
         Ok(())
     }
@@ -448,7 +442,7 @@ mod tests {
     use ::bitvec::array::BitArray;
     use ::bitvec::order::Lsb0;
     use ::bytes::BytesMut;
-    use ::puroro::WireType;
+    use ::puroro::{ScopedBuf, WireType};
     use ::unmanaged::UnmanagedString;
 
     #[test]
@@ -482,9 +476,10 @@ mod tests {
         while !rest.is_empty() {
             let (field_number, wire_type) = decode_tag(&mut rest).unwrap();
             assert_eq!(field_number, 7);
+            let mut scoped = ScopedBuf::new(&mut rest);
             decoded
                 .bind_mut(&mut common)
-                .merge(wire_type, &mut rest, 0)
+                .merge(wire_type, &mut scoped, 0)
                 .unwrap();
         }
         assert_eq!(decoded.bind(&common).get(&1), Some(&10));
@@ -495,9 +490,10 @@ mod tests {
         encode_map_entry::<ProtoInt32, ProtoInt32, Global, _>(7, &1, &99, &mut one);
         let mut rest = one.as_ref();
         let (_, wt) = decode_tag(&mut rest).unwrap();
+        let mut scoped = ScopedBuf::new(&mut rest);
         decoded
             .bind_mut(&mut common)
-            .merge(wt, &mut rest, 0)
+            .merge(wt, &mut scoped, 0)
             .unwrap();
         assert_eq!(decoded.bind(&common).get(&1), Some(&99));
         assert_eq!(decoded.len(), 2);
@@ -523,7 +519,11 @@ mod tests {
 
         let mut rest = framed.as_ref();
         let (_, wt) = decode_tag(&mut rest).unwrap();
-        field.bind_mut(&mut common).merge(wt, &mut rest, 0).unwrap();
+        let mut scoped = ScopedBuf::new(&mut rest);
+        field
+            .bind_mut(&mut common)
+            .merge(wt, &mut scoped, 0)
+            .unwrap();
         assert_eq!(field.bind(&common).get(&0), Some(&42));
         field.deallocate(&common);
     }
@@ -545,9 +545,10 @@ mod tests {
         let mut decoded = MapField::<ProtoString, ProtoInt32, 3, _>::new_in(Global);
         let mut rest = buf.as_ref();
         let (_, wt) = decode_tag(&mut rest).unwrap();
+        let mut scoped = ScopedBuf::new(&mut rest);
         decoded
             .bind_mut(&mut common)
-            .merge(wt, &mut rest, 0)
+            .merge(wt, &mut scoped, 0)
             .unwrap();
         assert_eq!(decoded.bind(&common).get("ab"), Some(&7));
 
@@ -596,7 +597,11 @@ mod tests {
         for framed in [first, second] {
             let mut rest = framed.as_ref();
             let (_, wt) = decode_tag(&mut rest).unwrap();
-            field.bind_mut(&mut common).merge(wt, &mut rest, 0).unwrap();
+            let mut scoped = ScopedBuf::new(&mut rest);
+            field
+                .bind_mut(&mut common)
+                .merge(wt, &mut scoped, 0)
+                .unwrap();
         }
 
         assert_eq!(field.len(), 1);

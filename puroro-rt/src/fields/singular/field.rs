@@ -19,12 +19,10 @@ use ::core::marker::PhantomData;
 use ::core::mem::ManuallyDrop;
 
 use ::allocator_api2::alloc::Allocator;
-use ::bytes::{Buf, BufMut};
+use ::bytes::BufMut;
 
 use crate::defaults::ProtoDefault;
-use ::puroro::DecodeError;
-use ::puroro::WireType;
-use ::puroro::{HasDefault, Optional};
+use ::puroro::{DecodeBuf, DecodeError, HasDefault, Optional, WireType};
 
 use ::unmanaged::{CloneIn, DeallocateIn};
 
@@ -499,7 +497,7 @@ where
         L::write(&mut *self.field.value, P::slot_init_mut(), self.common, v);
     }
 
-    pub fn merge<B: Buf>(
+    pub fn merge<B: DecodeBuf>(
         self,
         wire_type: WireType,
         buf: &mut B,

@@ -8,12 +8,11 @@
 //! `Address<A>`). Singular fields pass the same `A` so the box allocator matches.
 
 use ::allocator_api2::alloc::Allocator;
-use ::bytes::Buf;
 use ::core::marker::PhantomData;
 use ::core::ops::{Deref, DerefMut};
 use ::unmanaged::UnmanagedBox;
 
-use ::puroro::{DecodeError, Message, WireType};
+use ::puroro::{DecodeBuf, DecodeError, Message, WireType};
 
 use crate::decode;
 use ::unmanaged::DeallocateIn;
@@ -162,20 +161,16 @@ impl<M: Message> PayloadAccess for ProtoMessage<M> {
         VS: ValueSlot<UnmanagedBox<M, A>, A>,
         I: SlotInitMut,
         MessageCommon<Pb, A>: MessageCommonBits,
-        B: Buf,
+        B: DecodeBuf,
     {
         if wire_type != WireType::Len {
             return Err(DecodeError::InvalidTag);
         }
         let len = decode::decode_varint(buf)? as usize;
-        if buf.remaining() < len {
-            return Err(DecodeError::TruncatedMessage);
-        }
-        // Decode from a concrete `&[u8]` rather than `Buf::take`, so recursive
-        // message types do not infinitely monomorphize nested `Take<…>` adapters.
-        let payload = buf.copy_to_bytes(len);
-        let mut sub: &[u8] = payload.as_ref();
+        // Same `DecodeBuf` type at every depth: push a LEN scope instead of
+        // `Take<…>` monomorphization or `copy_to_bytes`.
+        let mut guard = buf.push_limit_guard(len)?;
         let child = ValueSlot::with_mut(slot, init, common).get_mut();
-        DerefMut::deref_mut(child).merge_from_with_depth(&mut sub, depth + 1)
+        DerefMut::deref_mut(child).merge_from_with_depth(&mut *guard, depth + 1)
     }
 }
