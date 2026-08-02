@@ -8,7 +8,7 @@
 //! - [`MapRef`] / [`MapMut`], [`RepeatedContainerMut`] / [`RepeatedStringMut`] /
 //!   [`RepeatedBytesMut`] — map and repeated mutators
 //! - [`OneofView`] / [`OneofViewMut`] — oneof group views
-//! - [`DecodeError`] / [`EncodeError`], [`UnknownField`], [`WireType`]
+//! - [`DecodeError`], [`UnknownField`], [`WireType`]
 //!
 //! Generated messages expose proto fields as **inherent methods** on the concrete
 //! type (`title()`, `title_mut()`, `has_title()`, `clear_title()`, …). Codec
@@ -45,7 +45,7 @@ pub mod wire_type;
 
 /// Allocator-aware string buffer used as `Target` of generated string `_mut` accessors.
 pub use ::unmanaged::String;
-pub use error::{DecodeError, EncodeError};
+pub use error::DecodeError;
 pub use map::{MapMut, MapRef};
 pub use message::{Message, RECURSION_LIMIT};
 pub use oneof::{OneofView, OneofViewMut};

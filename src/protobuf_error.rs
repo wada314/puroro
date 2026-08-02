@@ -2,29 +2,18 @@
 
 use ::protobuf_core::ProtobufError;
 
-use crate::error::{DecodeError, EncodeError};
+use crate::error::DecodeError;
 
 impl From<ProtobufError> for DecodeError {
     fn from(err: ProtobufError) -> Self {
         match err {
-            ProtobufError::UnexpectedEof => DecodeError::UnexpectedEof,
-            ProtobufError::VarintTooLong => DecodeError::InvalidVarint,
-            ProtobufError::InvalidWireType { .. } | ProtobufError::MalformedTag { .. } => {
+            ProtobufError::UnexpectedEof | ProtobufError::IoError(_) => DecodeError::UnexpectedEof,
+            ProtobufError::VarintTooLong | ProtobufError::VarintDowncastOutOfRange { .. } => {
+                DecodeError::InvalidVarint
+            }
+            ProtobufError::InvalidWireType { .. } | ProtobufError::FieldNumberOutOfRange { .. } => {
                 DecodeError::InvalidTag
             }
-            ProtobufError::VarintDowncastOutOfRange { .. } => DecodeError::InvalidVarint,
-            ProtobufError::FieldTypeDowncastError { .. } => DecodeError::InvalidTag,
-            ProtobufError::FieldNumberOutOfRange { .. } => DecodeError::InvalidTag,
-            ProtobufError::IoError(_) => DecodeError::UnexpectedEof,
-        }
-    }
-}
-
-impl From<ProtobufError> for EncodeError {
-    fn from(err: ProtobufError) -> Self {
-        match err {
-            ProtobufError::IoError(_) => EncodeError::BufferFull,
-            _ => EncodeError::BufferFull,
         }
     }
 }
