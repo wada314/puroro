@@ -3,12 +3,12 @@
 use ::allocator_api2::alloc::{Allocator, Global};
 use ::bitvec::array::BitArray;
 use ::bitvec::order::Lsb0;
-use ::bytes::BufMut;
+use ::bytes::{Buf, BufMut};
 use ::puroro::{DecodeBuf, DecodeError, Message};
 use ::puroro_rt::decode::{decode_tag, skip_field_and_save};
 use ::puroro_rt::{
     EncodeCtx, Expanded, Explicit, FieldDeallocate, FieldEncode, MessageCommon, MessageEncode,
-    Packed, ProtoDouble, ProtoFixed32, ProtoFloat, RepeatedField, SingularField,
+    MessageMerge, Packed, ProtoDouble, ProtoFixed32, ProtoFloat, RepeatedField, SingularField,
 };
 
 /// Minimal message exercising singular + packed + expanded fixed fields.
@@ -81,17 +81,7 @@ impl<A: Allocator + Clone> MessageEncode for FixedDemo<A> {
     }
 }
 
-impl<A: Allocator + Clone> Message for FixedDemo<A> {
-    type Alloc = A;
-
-    fn new_in(alloc: A) -> Self {
-        Self::new_in(alloc)
-    }
-
-    fn encode<B: BufMut>(&self, buf: &mut B) {
-        ::puroro_rt::encode_message(self, buf)
-    }
-
+impl<A: Allocator + Clone> MessageMerge for FixedDemo<A> {
     fn merge_from_with_depth<B: DecodeBuf>(
         &mut self,
         buf: &mut B,
@@ -129,6 +119,22 @@ impl<A: Allocator + Clone> Message for FixedDemo<A> {
             }
         }
         Ok(())
+    }
+}
+
+impl<A: Allocator + Clone> Message for FixedDemo<A> {
+    type Alloc = A;
+
+    fn new_in(alloc: A) -> Self {
+        Self::new_in(alloc)
+    }
+
+    fn encode<B: BufMut>(&self, buf: &mut B) {
+        ::puroro_rt::encode_message(self, buf)
+    }
+
+    fn merge_from<B: Buf>(&mut self, buf: &mut B) -> Result<(), DecodeError> {
+        ::puroro_rt::merge_message(self, buf)
     }
 
     fn unknown_fields(&self) -> impl Iterator<Item = ::puroro::UnknownField<'_>> + '_ {

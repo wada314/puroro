@@ -11,7 +11,7 @@ use ::allocator_api2::alloc::{Allocator, Global};
 use ::allocator_api2::vec::Vec as AllocVec;
 use ::bitvec::array::BitArray;
 use ::bitvec::order::Lsb0;
-use ::bytes::BufMut;
+use ::bytes::{Buf, BufMut};
 use ::core::fmt;
 use ::core::mem;
 use ::core::ops::ControlFlow;
@@ -26,9 +26,9 @@ use ::puroro_rt::{
     BitPacked, CloneFieldsVisitor, CloneIn, Closed, DebugStructVisitor, EncodeCtx,
     EncodeRawVisitor, EncodedLenVisitor, Expanded, Explicit, FieldDeallocVisitor, FieldEqVisitor,
     FieldPairVisitor, FieldPairVisitorMut, FieldVisitor, FieldVisitorMut, Implicit, Inline,
-    LegacyRequired, MapField, Message as MessagePresence, MessageCommon, MessageEncode, OneofSlot,
-    Open, Packed, ProtoBool, ProtoBytes, ProtoEnum, ProtoInt32, ProtoMessage, ProtoString,
-    RepeatedField, SingularField,
+    LegacyRequired, MapField, Message as MessagePresence, MessageCommon, MessageEncode,
+    MessageMerge, OneofSlot, Open, Packed, ProtoBool, ProtoBytes, ProtoEnum, ProtoInt32,
+    ProtoMessage, ProtoString, RepeatedField, SingularField,
 };
 
 use defaults::MaxRetriesDefault;
@@ -745,17 +745,7 @@ impl<A: Allocator + Clone> MessageEncode for Task<A> {
     }
 }
 
-impl<A: Allocator + Clone> Message for Task<A> {
-    type Alloc = A;
-
-    fn new_in(alloc: A) -> Self {
-        Self::new_in(alloc)
-    }
-
-    fn encode<B: BufMut>(&self, buf: &mut B) {
-        ::puroro_rt::encode_message(self, buf)
-    }
-
+impl<A: Allocator + Clone> MessageMerge for Task<A> {
     fn merge_from_with_depth<B: DecodeBuf>(
         &mut self,
         buf: &mut B,
@@ -916,6 +906,22 @@ impl<A: Allocator + Clone> Message for Task<A> {
             }
         }
         Ok(())
+    }
+}
+
+impl<A: Allocator + Clone> Message for Task<A> {
+    type Alloc = A;
+
+    fn new_in(alloc: A) -> Self {
+        Self::new_in(alloc)
+    }
+
+    fn encode<B: BufMut>(&self, buf: &mut B) {
+        ::puroro_rt::encode_message(self, buf)
+    }
+
+    fn merge_from<B: Buf>(&mut self, buf: &mut B) -> Result<(), DecodeError> {
+        ::puroro_rt::merge_message(self, buf)
     }
 
     fn unknown_fields(&self) -> impl Iterator<Item = ::puroro::UnknownField<'_>> + '_ {

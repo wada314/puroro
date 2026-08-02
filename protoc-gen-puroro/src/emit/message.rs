@@ -347,19 +347,9 @@ pub(super) fn render_items(plan: &MessagePlan<'_>) -> Result<TokenStream> {
             }
         }
 
-        impl<A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone> ::puroro::Message
+        impl<A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone> ::puroro_rt::MessageMerge
             for #name<A>
         {
-            type Alloc = A;
-
-            fn new_in(alloc: A) -> Self {
-                Self::new_in(alloc)
-            }
-
-            fn encode<B: ::bytes::BufMut>(&self, buf: &mut B) {
-                ::puroro_rt::encode_message(self, buf)
-            }
-
             fn merge_from_with_depth<B: ::puroro::DecodeBuf>(
                 &mut self,
                 buf: &mut B,
@@ -384,6 +374,27 @@ pub(super) fn render_items(plan: &MessagePlan<'_>) -> Result<TokenStream> {
                     }
                 }
                 ::core::result::Result::Ok(())
+            }
+        }
+
+        impl<A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone> ::puroro::Message
+            for #name<A>
+        {
+            type Alloc = A;
+
+            fn new_in(alloc: A) -> Self {
+                Self::new_in(alloc)
+            }
+
+            fn encode<B: ::bytes::BufMut>(&self, buf: &mut B) {
+                ::puroro_rt::encode_message(self, buf)
+            }
+
+            fn merge_from<B: ::bytes::Buf>(
+                &mut self,
+                buf: &mut B,
+            ) -> ::core::result::Result<(), ::puroro::DecodeError> {
+                ::puroro_rt::merge_message(self, buf)
             }
 
             fn unknown_fields(

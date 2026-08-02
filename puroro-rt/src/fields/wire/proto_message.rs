@@ -16,6 +16,7 @@ use ::puroro::{DecodeBuf, DecodeError, Message, WireType};
 
 use crate::decode;
 use crate::message_encode::MessageEncode;
+use crate::message_merge::MessageMerge;
 use ::unmanaged::DeallocateIn;
 
 use crate::fields::shared::{
@@ -79,7 +80,7 @@ impl<M: Message + MessageEncode> SingularType for ProtoMessage<M> {
     type Written<A: Allocator + Clone> = UnmanagedBox<M, A>;
 }
 
-impl<M: Message + MessageEncode> PayloadAccess for ProtoMessage<M> {
+impl<M: Message + MessageEncode + MessageMerge> PayloadAccess for ProtoMessage<M> {
     #[inline]
     fn is_proto_empty<A: Allocator + Clone, Pb>(
         _slot: &UnmanagedBox<M, A>,
@@ -172,6 +173,6 @@ impl<M: Message + MessageEncode> PayloadAccess for ProtoMessage<M> {
         // `Take<…>` monomorphization or `copy_to_bytes`.
         let mut guard = buf.push_limit_guard(len)?;
         let child = ValueSlot::with_mut(slot, init, common).get_mut();
-        DerefMut::deref_mut(child).merge_from_with_depth(&mut *guard, depth + 1)
+        MessageMerge::merge_from_with_depth(DerefMut::deref_mut(child), &mut *guard, depth + 1)
     }
 }

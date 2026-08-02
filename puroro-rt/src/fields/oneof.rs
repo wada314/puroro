@@ -33,6 +33,7 @@ use crate::fields::singular::field::SingularField;
 use crate::fields::wire::proto_message::ProtoMessage;
 use crate::fields::wire::singular_type::SingularType;
 use crate::message_encode::{EncodeCtx, MessageEncode};
+use crate::message_merge::MessageMerge;
 
 /// Explicit release of a generated `oneof` storage enum.
 ///
@@ -465,7 +466,7 @@ where
 impl<'a, M, const FIELD: u32, A: Allocator + Clone, Pb>
     OneofVariantRef<'a, SingularField<ProtoMessage<M>, Oneof, FIELD, A>, Pb, A>
 where
-    M: ::puroro::Message<Alloc = A> + MessageEncode + ::unmanaged::DeallocateIn<A>,
+    M: ::puroro::Message<Alloc = A> + MessageEncode + MessageMerge + ::unmanaged::DeallocateIn<A>,
     MessageCommon<Pb, A>: MessageCommonBits,
     <Oneof as FieldPresence>::ValueSlot<UnmanagedBox<M, A>>: ValueSlot<UnmanagedBox<M, A>, A>,
 {

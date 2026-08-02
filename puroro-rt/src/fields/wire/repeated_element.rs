@@ -29,6 +29,7 @@ use ::puroro::{DecodeBuf, DecodeError, Message, WireType};
 
 use crate::decode;
 use crate::message_encode::MessageEncode;
+use crate::message_merge::MessageMerge;
 use ::unmanaged::DeallocateIn;
 
 use ::protobuf_core::{FIXED32_BYTES, FIXED64_BYTES};
@@ -556,7 +557,7 @@ impl<M: Message + MessageEncode> RepeatedElement for ProtoMessage<M> {
 impl<A, M> RepeatedElementMerge<A> for ProtoMessage<M>
 where
     A: Allocator + Clone,
-    M: Message<Alloc = A> + MessageEncode + ::unmanaged::DeallocateIn<A>,
+    M: Message<Alloc = A> + MessageEncode + MessageMerge + ::unmanaged::DeallocateIn<A>,
 {
     #[inline]
     fn default_element(alloc: A) -> M {
@@ -576,7 +577,7 @@ where
         let len = decode::decode_varint(buf)? as usize;
         let mut guard = buf.push_limit_guard(len)?;
         let mut msg = M::new_in(alloc);
-        msg.merge_from_with_depth(&mut *guard, depth + 1)?;
+        MessageMerge::merge_from_with_depth(&mut msg, &mut *guard, depth + 1)?;
         Ok(msg)
     }
 

@@ -3,13 +3,13 @@
 use ::allocator_api2::alloc::{Allocator, Global};
 use ::bitvec::array::BitArray;
 use ::bitvec::order::Lsb0;
-use ::bytes::BufMut;
+use ::bytes::{Buf, BufMut};
 use ::puroro::{DecodeBuf, DecodeError, Message};
 use ::puroro_rt::decode::{decode_tag, skip_field_and_save};
 use ::puroro_rt::{
     EncodeCtx, Explicit, FieldDeallocate, FieldEncode, Implicit, Message as MessagePresence,
-    MessageCommon, MessageEncode, Packed, ProtoBytes, ProtoInt32, ProtoMessage, ProtoString,
-    ProtoUInt64, RepeatedField, SingularField,
+    MessageCommon, MessageEncode, MessageMerge, Packed, ProtoBytes, ProtoInt32, ProtoMessage,
+    ProtoString, ProtoUInt64, RepeatedField, SingularField,
 };
 
 macro_rules! drop_fields {
@@ -119,17 +119,7 @@ impl<A: Allocator + Clone> MessageEncode for FlatScalars<A> {
     }
 }
 
-impl<A: Allocator + Clone> Message for FlatScalars<A> {
-    type Alloc = A;
-
-    fn new_in(alloc: A) -> Self {
-        Self::new_in(alloc)
-    }
-
-    fn encode<B: BufMut>(&self, buf: &mut B) {
-        ::puroro_rt::encode_message(self, buf)
-    }
-
+impl<A: Allocator + Clone> MessageMerge for FlatScalars<A> {
     fn merge_from_with_depth<B: DecodeBuf>(
         &mut self,
         buf: &mut B,
@@ -183,6 +173,22 @@ impl<A: Allocator + Clone> Message for FlatScalars<A> {
             }
         }
         Ok(())
+    }
+}
+
+impl<A: Allocator + Clone> Message for FlatScalars<A> {
+    type Alloc = A;
+
+    fn new_in(alloc: A) -> Self {
+        Self::new_in(alloc)
+    }
+
+    fn encode<B: BufMut>(&self, buf: &mut B) {
+        ::puroro_rt::encode_message(self, buf)
+    }
+
+    fn merge_from<B: Buf>(&mut self, buf: &mut B) -> Result<(), DecodeError> {
+        ::puroro_rt::merge_message(self, buf)
     }
 
     fn unknown_fields(&self) -> impl Iterator<Item = ::puroro::UnknownField<'_>> + '_ {
@@ -264,17 +270,7 @@ impl<A: Allocator + Clone> MessageEncode for Nest<A> {
     }
 }
 
-impl<A: Allocator + Clone> Message for Nest<A> {
-    type Alloc = A;
-
-    fn new_in(alloc: A) -> Self {
-        Self::new_in(alloc)
-    }
-
-    fn encode<B: BufMut>(&self, buf: &mut B) {
-        ::puroro_rt::encode_message(self, buf)
-    }
-
+impl<A: Allocator + Clone> MessageMerge for Nest<A> {
     fn merge_from_with_depth<B: DecodeBuf>(
         &mut self,
         buf: &mut B,
@@ -304,6 +300,22 @@ impl<A: Allocator + Clone> Message for Nest<A> {
             }
         }
         Ok(())
+    }
+}
+
+impl<A: Allocator + Clone> Message for Nest<A> {
+    type Alloc = A;
+
+    fn new_in(alloc: A) -> Self {
+        Self::new_in(alloc)
+    }
+
+    fn encode<B: BufMut>(&self, buf: &mut B) {
+        ::puroro_rt::encode_message(self, buf)
+    }
+
+    fn merge_from<B: Buf>(&mut self, buf: &mut B) -> Result<(), DecodeError> {
+        ::puroro_rt::merge_message(self, buf)
     }
 
     fn unknown_fields(&self) -> impl Iterator<Item = ::puroro::UnknownField<'_>> + '_ {
@@ -382,17 +394,7 @@ impl<A: Allocator + Clone> MessageEncode for PackedInts<A> {
     }
 }
 
-impl<A: Allocator + Clone> Message for PackedInts<A> {
-    type Alloc = A;
-
-    fn new_in(alloc: A) -> Self {
-        Self::new_in(alloc)
-    }
-
-    fn encode<B: BufMut>(&self, buf: &mut B) {
-        ::puroro_rt::encode_message(self, buf)
-    }
-
+impl<A: Allocator + Clone> MessageMerge for PackedInts<A> {
     fn merge_from_with_depth<B: DecodeBuf>(
         &mut self,
         buf: &mut B,
@@ -418,6 +420,22 @@ impl<A: Allocator + Clone> Message for PackedInts<A> {
             }
         }
         Ok(())
+    }
+}
+
+impl<A: Allocator + Clone> Message for PackedInts<A> {
+    type Alloc = A;
+
+    fn new_in(alloc: A) -> Self {
+        Self::new_in(alloc)
+    }
+
+    fn encode<B: BufMut>(&self, buf: &mut B) {
+        ::puroro_rt::encode_message(self, buf)
+    }
+
+    fn merge_from<B: Buf>(&mut self, buf: &mut B) -> Result<(), DecodeError> {
+        ::puroro_rt::merge_message(self, buf)
     }
 
     fn unknown_fields(&self) -> impl Iterator<Item = ::puroro::UnknownField<'_>> + '_ {
@@ -523,17 +541,7 @@ impl<A: Allocator + Clone> MessageEncode for StringHeavy<A> {
     }
 }
 
-impl<A: Allocator + Clone> Message for StringHeavy<A> {
-    type Alloc = A;
-
-    fn new_in(alloc: A) -> Self {
-        Self::new_in(alloc)
-    }
-
-    fn encode<B: BufMut>(&self, buf: &mut B) {
-        ::puroro_rt::encode_message(self, buf)
-    }
-
+impl<A: Allocator + Clone> MessageMerge for StringHeavy<A> {
     fn merge_from_with_depth<B: DecodeBuf>(
         &mut self,
         buf: &mut B,
@@ -575,6 +583,22 @@ impl<A: Allocator + Clone> Message for StringHeavy<A> {
             }
         }
         Ok(())
+    }
+}
+
+impl<A: Allocator + Clone> Message for StringHeavy<A> {
+    type Alloc = A;
+
+    fn new_in(alloc: A) -> Self {
+        Self::new_in(alloc)
+    }
+
+    fn encode<B: BufMut>(&self, buf: &mut B) {
+        ::puroro_rt::encode_message(self, buf)
+    }
+
+    fn merge_from<B: Buf>(&mut self, buf: &mut B) -> Result<(), DecodeError> {
+        ::puroro_rt::merge_message(self, buf)
     }
 
     fn unknown_fields(&self) -> impl Iterator<Item = ::puroro::UnknownField<'_>> + '_ {
