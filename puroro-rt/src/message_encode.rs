@@ -1,8 +1,9 @@
 //! Message-body encode surface used by the field catalog and generated code.
 //!
 //! This is intentionally **not** part of the user-facing [`puroro::Message`](::puroro::Message)
-//! trait. Library users call [`Message::encode`](::puroro::Message::encode);
-//! generated impls forward that to [`encode_message`].
+//! trait. Library users call [`Message::encode`](::puroro::Message::encode) /
+//! [`Message::encode_to_vec`](::puroro::Message::encode_to_vec); generated
+//! impls forward those to [`encode_message`] / [`encode_message_to_vec`].
 
 use ::bytes::BufMut;
 use ::core::ptr;
@@ -47,8 +48,9 @@ impl EncodeCtx {
 /// Nested-message catalog code ([`ProtoMessage`](crate::ProtoMessage)) bounds on
 /// this trait, not on [`puroro::Message`](::puroro::Message).
 ///
-/// User-facing [`Message::encode`](::puroro::Message::encode) is a thin wrapper
-/// around [`encode_message`].
+/// User-facing [`Message::encode`](::puroro::Message::encode) /
+/// [`Message::encode_to_vec`](::puroro::Message::encode_to_vec) are thin
+/// wrappers around [`encode_message`] / [`encode_message_to_vec`].
 pub trait MessageEncode {
     /// Exact number of bytes this message body occupies on the wire.
     /// Must be consistent with [`encode_raw`](Self::encode_raw).
@@ -59,8 +61,23 @@ pub trait MessageEncode {
 }
 
 /// Appends the encoded message body to `buf` (creates a fresh [`EncodeCtx`]).
+///
+/// Does not reserve capacity on `buf`; the caller owns allocation strategy.
+/// Prefer [`encode_message_to_vec`] when allocating a fresh `Vec`.
 #[inline]
 pub fn encode_message<M: MessageEncode, B: BufMut>(message: &M, buf: &mut B) {
     let mut ctx = EncodeCtx::new();
     message.encode_raw(&mut ctx, buf);
+}
+
+/// Encodes `message` into a new `Vec<u8>`, sized with [`MessageEncode::encoded_len`].
+///
+/// The length walk fills [`EncodeCtx`] so nested LEN prefixes reuse cached body
+/// lengths during [`MessageEncode::encode_raw`].
+#[inline]
+pub fn encode_message_to_vec<M: MessageEncode>(message: &M) -> Vec<u8> {
+    let mut ctx = EncodeCtx::new();
+    let mut v = Vec::with_capacity(message.encoded_len(&mut ctx));
+    message.encode_raw(&mut ctx, &mut v);
+    v
 }

@@ -349,6 +349,10 @@ impl<A: Allocator + Clone> Message for Address<A> {
         ::puroro_rt::encode_message(self, buf)
     }
 
+    fn encode_to_vec(&self) -> Vec<u8> {
+        ::puroro_rt::encode_message_to_vec(self)
+    }
+
     fn merge_from<B: Buf>(&mut self, buf: &mut B) -> Result<(), DecodeError> {
         ::puroro_rt::merge_message(self, buf)
     }

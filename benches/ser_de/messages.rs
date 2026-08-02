@@ -187,6 +187,10 @@ impl<A: Allocator + Clone> Message for FlatScalars<A> {
         ::puroro_rt::encode_message(self, buf)
     }
 
+    fn encode_to_vec(&self) -> Vec<u8> {
+        ::puroro_rt::encode_message_to_vec(self)
+    }
+
     fn merge_from<B: Buf>(&mut self, buf: &mut B) -> Result<(), DecodeError> {
         ::puroro_rt::merge_message(self, buf)
     }
@@ -314,6 +318,10 @@ impl<A: Allocator + Clone> Message for Nest<A> {
         ::puroro_rt::encode_message(self, buf)
     }
 
+    fn encode_to_vec(&self) -> Vec<u8> {
+        ::puroro_rt::encode_message_to_vec(self)
+    }
+
     fn merge_from<B: Buf>(&mut self, buf: &mut B) -> Result<(), DecodeError> {
         ::puroro_rt::merge_message(self, buf)
     }
@@ -432,6 +440,10 @@ impl<A: Allocator + Clone> Message for PackedInts<A> {
 
     fn encode<B: BufMut>(&self, buf: &mut B) {
         ::puroro_rt::encode_message(self, buf)
+    }
+
+    fn encode_to_vec(&self) -> Vec<u8> {
+        ::puroro_rt::encode_message_to_vec(self)
     }
 
     fn merge_from<B: Buf>(&mut self, buf: &mut B) -> Result<(), DecodeError> {
@@ -595,6 +607,10 @@ impl<A: Allocator + Clone> Message for StringHeavy<A> {
 
     fn encode<B: BufMut>(&self, buf: &mut B) {
         ::puroro_rt::encode_message(self, buf)
+    }
+
+    fn encode_to_vec(&self) -> Vec<u8> {
+        ::puroro_rt::encode_message_to_vec(self)
     }
 
     fn merge_from<B: Buf>(&mut self, buf: &mut B) -> Result<(), DecodeError> {
