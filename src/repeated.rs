@@ -22,8 +22,10 @@ pub trait RepeatedContainerMut {
     where
         Self: 'a;
 
+    /// Number of elements.
     fn len(&self) -> usize;
 
+    /// `true` when there are no elements.
     #[inline]
     fn is_empty(&self) -> bool {
         self.len() == 0
@@ -52,19 +54,25 @@ pub trait RepeatedStringMut<A: Allocator> {
     where
         Self: 'a;
 
+    /// Number of elements.
     fn len(&self) -> usize;
 
+    /// `true` when there are no elements.
     #[inline]
     fn is_empty(&self) -> bool {
         self.len() == 0
     }
 
+    /// Appends an empty string and returns a mutator for it.
     fn push(&mut self) -> Self::Mut<'_>;
 
+    /// Mutable handle for the element at `index`, or `None` if out of range.
     fn get_mut(&mut self, index: usize) -> Option<Self::Mut<'_>>;
 
+    /// Removes all elements (heap payloads are released).
     fn clear(&mut self);
 
+    /// Removes the last element (and releases it). Returns whether one existed.
     fn pop(&mut self) -> bool;
 }
 
@@ -78,18 +86,24 @@ pub trait RepeatedBytesMut<A: Allocator> {
     where
         Self: 'a;
 
+    /// Number of elements.
     fn len(&self) -> usize;
 
+    /// `true` when there are no elements.
     #[inline]
     fn is_empty(&self) -> bool {
         self.len() == 0
     }
 
+    /// Appends an empty bytes value and returns a mutator for it.
     fn push(&mut self) -> Self::Mut<'_>;
 
+    /// Mutable handle for the element at `index`, or `None` if out of range.
     fn get_mut(&mut self, index: usize) -> Option<Self::Mut<'_>>;
 
+    /// Removes all elements (heap payloads are released).
     fn clear(&mut self);
 
+    /// Removes the last element (and releases it). Returns whether one existed.
     fn pop(&mut self) -> bool;
 }

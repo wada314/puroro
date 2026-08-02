@@ -10,6 +10,7 @@ use ::core::marker::PhantomData;
 /// proto field has `[default = …]`. Otherwise the field type's default `D`
 /// parameter is [`puroro_rt::ProtoDefault`].
 pub trait HasDefault<T: Copy> {
+    /// Proto default for this field (`[default = …]` or the type default).
     const DEFAULT: T;
 }
 

@@ -1,13 +1,37 @@
 //! **puroro** — A performance-oriented Protocol Buffers runtime for Rust.
 //!
-//! This crate provides the stable public API that library users and generated
-//! message code share: the [`Message`] trait (codec + shared helpers),
-//! explicit-presence accessors, unknown-field views, and error types.  The
-//! composable field catalog and wire helpers live in the sibling
-//! **`puroro-rt`** crate, which generated code depends on (library users of
-//! generated messages should not need to import `puroro-rt` directly).
+//! This crate is the stable public API shared by library users and generated
+//! message code:
+//!
+//! - [`Message`] — encode / decode / merge / validate / unknown fields
+//! - [`Optional`] / [`HasDefault`] — explicit-presence singular accessors
+//! - [`MapRef`] / [`MapMut`], [`RepeatedContainerMut`] / [`RepeatedStringMut`] /
+//!   [`RepeatedBytesMut`] — map and repeated mutators
+//! - [`OneofView`] / [`OneofViewMut`] — oneof group views
+//! - [`DecodeError`] / [`EncodeError`], [`UnknownField`], [`WireType`]
+//!
+//! Generated messages expose proto fields as **inherent methods** on the concrete
+//! type (`title()`, `title_mut()`, `has_title()`, `clear_title()`, …). Codec
+//! helpers stay on [`Message`] so proto names do not collide; call them via UFCS
+//! when needed (`Message::validate(&msg)`).
+//!
+//! The composable field catalog and wire helpers live in the sibling
+//! **`puroro-rt`** crate. Generated code depends on it; application code that
+//! only uses generated messages should not need to import `puroro-rt` directly.
 //!
 //! See [`DESIGN.md`](DESIGN.md) for the interface specification.
+//!
+//! # Example
+//!
+//! ```ignore
+//! use ::puroro::Message;
+//!
+//! let mut task = Task::decode(bytes.as_slice())?;
+//! task.title_mut().push_str("hello");
+//! assert_eq!(task.title(), "hello");
+//! let out = task.encode_to_vec();
+//! # Ok::<(), puroro::DecodeError>(())
+//! ```
 
 pub mod error;
 pub mod map;

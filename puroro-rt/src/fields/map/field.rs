@@ -48,22 +48,26 @@ where
     V: RepeatedElement,
     A: Allocator + Clone,
 {
+    /// Creates an empty map using `alloc` as the `HashMap` allocator.
     pub fn new_in(alloc: A) -> Self {
         Self {
             entries: HashMap::with_hasher_in(DefaultHashBuilder::default(), alloc),
         }
     }
 
+    /// Number of entries.
     #[inline]
     pub fn len(&self) -> usize {
         self.entries.len()
     }
 
+    /// `true` when the map has no entries.
     #[inline]
     pub fn is_empty(&self) -> bool {
         self.entries.is_empty()
     }
 
+    /// Shared bound view (pairs this field with message common state).
     #[inline]
     pub fn bind<'a, Pb>(
         &'a self,
@@ -72,6 +76,7 @@ where
         MapFieldRef::new(self, common)
     }
 
+    /// Mutable bound view (pairs this field with message common state).
     #[inline]
     pub fn bind_mut<'f, 'c, Pb>(
         &'f mut self,
@@ -207,6 +212,7 @@ where
         Self { field, common }
     }
 
+    /// Shared reference to the stored value for `key`, if present.
     #[inline]
     pub fn get<Q>(self, key: &Q) -> Option<&'a V::Element<A>>
     where
@@ -216,6 +222,7 @@ where
         self.field.entries.get(key)
     }
 
+    /// Iterator over stored `(key, value)` element pairs.
     #[inline]
     pub fn iter(self) -> HashMapIter<'a, K::Element<A>, V::Element<A>> {
         self.field.entries.iter()

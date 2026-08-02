@@ -19,6 +19,10 @@ pub trait OneofView {
 }
 
 /// Mutable bound view of a oneof group (available even when unset).
+///
+/// Prefer per-variant `_mut` accessors on the message when switching or
+/// initializing a variant. [`as_mut`](Self::as_mut) only projects the
+/// *currently* active variant (no switch); [`clear`](Self::clear) drops it.
 pub trait OneofViewMut {
     /// Payload-less discriminant of the active variant.
     type Case;

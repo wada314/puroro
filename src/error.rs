@@ -1,3 +1,14 @@
+//! Decode and encode error types for the public [`Message`](crate::Message) API.
+//!
+//! [`DecodeError`] covers wire parsing, UTF-8 checks, recursion limits, and
+//! post-decode [`Message::validate`](crate::Message::validate) failures
+//! ([`DecodeError::MissingRequiredField`]). Closed-enum unknowns use
+//! [`DecodeError::UnknownClosedEnum`] internally and are diverted into the
+//! message unknown-field set rather than aborting `merge_from`.
+//!
+//! [`EncodeError`] is reserved for fallible sinks (e.g. fixed-capacity buffers);
+//! encoding into a growing `Vec` / `BytesMut` is effectively infallible.
+
 use ::core::fmt;
 use ::std::error::Error;
 

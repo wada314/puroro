@@ -122,8 +122,11 @@ pub trait MessageCommonAlloc {
 /// Catalog bounds use [`MessageCommonBits`] / [`MessageCommonAlloc`] on `&Self`
 /// rather than constraining the storage type parameter `P` directly.
 pub struct MessageCommon<P, A: Allocator> {
+    /// Presence / packed-bool bit storage (`BitArray` sized by codegen).
     pub presence: P,
+    /// Contiguous unknown-field wire blob (`ManuallyDrop` — freed by the message).
     pub unknown_fields: ManuallyDrop<UnmanagedVec<u8, A>>,
+    /// Canonical allocator for the whole message (cloned into field ops).
     pub alloc: A,
 }
 

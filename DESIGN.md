@@ -213,12 +213,12 @@ pub trait Message: Sized {
 
 This section is the normative reference for what the code generator emits. All field patterns are illustrated using a single **editions** reference schema, since editions can express every variant (implicit/explicit presence, custom defaults, required-like semantics, open/closed enums, packed/expanded repeated) in one file.
 
-This section is the **normative** eager-path shape. Hand-written [`sample-generated/`](sample-generated/) is the reference implementation; the live `protoc-gen-puroro` plugin has not yet reached full field emission ([IMPLEMENTATION.md §3](IMPLEMENTATION.md#3-implementation-status)). For each message type the generator must emit:
+This section is the **normative** eager-path shape. Hand-written [`sample-generated/`](sample-generated/) is the reference implementation of that shape; the live `protoc-gen-puroro` plugin emits the same eager-path field families (status: [IMPLEMENTATION.md §3](IMPLEMENTATION.md#3-implementation-status)). Deliberate sample-vs-production differences — flat modules, short-name `use`s, no `@generated` header — are documented there and in [IMPLEMENTATION.md §9](IMPLEMENTATION.md#9-struct-layout). For each message type the generator must emit:
 
 1. **The primary struct** — a full-featured owned implementation (§4.0–4.10), internally a product of **`puroro_rt::fields` catalog types** + shared `MessageCommon` (see [IMPLEMENTATION.md §2](IMPLEMENTATION.md#2-architecture-overview)). Field accessors are **inherent methods** on that struct.
 2. **(Future) Per-message traits + specialized structs** — `FooMessage` / `FooMessageFallible` and alternative layouts (`TaskLazy`, `TaskView`) for generic interoperability across implementations ([§8](#8-future-work)). They are **not** part of the eager path; [`sample-generated/`](sample-generated/) remains the normative shape until then.
 
-Generated Rust is not hand-edited; production plugin output must include **section banners, proto field labels, and `merge_from` dispatch comments** so build output is navigable when debugging. Convention: [IMPLEMENTATION.md §9 — Generated code comments](IMPLEMENTATION.md#generated-code-comments). Reference: [`sample-generated/`](sample-generated/).
+Generated Rust is not hand-edited. Navigational comments in generated output are **not required**; semantics and usage are documented on the library API (`puroro` / `puroro-rt` rustdoc) and in this document / [IMPLEMENTATION.md](IMPLEMENTATION.md). Production modules still carry an `@generated` file header ([IMPLEMENTATION.md §9](IMPLEMENTATION.md#generated-headers)). Reference shape: [`sample-generated/`](sample-generated/).
 
 ### Module layout and naming
 

@@ -112,6 +112,9 @@ pub(crate) fn skip_field<B: Buf>(wire_type: WireType, buf: &mut B) -> Result<(),
     Ok(())
 }
 
+/// Skips one field payload and appends its tag + wire bytes to `unknown_fields`.
+///
+/// Used by message `merge` unknown arms so unrecognized tags round-trip on encode.
 pub fn skip_field_and_save<B: Buf, A: Allocator>(
     field_number: u32,
     wire_type: WireType,

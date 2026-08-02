@@ -135,15 +135,15 @@ protobuf-core           Varint, Tag, WireType
 | `Fixed*` / float / double markers on `SingularField` / `RepeatedField` (via `NumericalType`) | **Done** |
 | Repeated catalog (`RepeatedField<T, E, FIELD>`) | **Done** |
 | `protoc-gen-puroro` plugin I/O (`CodeGeneratorRequest` / `Response`) | **Done** |
-| Descriptor decode (messages / fields / enums / oneofs / features subset) | **Done** (intentional subset; `default_value` decoded; map_entry / services / extensions not in IR yet) |
+| Descriptor decode (messages / fields / enums / oneofs / features subset) | **Done** (intentional subset; `default_value` and `map_entry` decoded; services / extensions not in IR yet) |
 | Type resolve (`FileSet`, `TypeRef`, presence / occurrence) | **Done** — `emit` resolves the full request before generating |
 | Editions features in resolve / FieldKind | **Partial** — `field_presence`, `enum_type`, `repeated_field_encoding`, `utf8_validation` resolved; `message_encoding=DELIMITED` rejected; JSON / naming / visibility still traps |
 | Module forest + `ModuleLayout::SingleFile` | **Done** (`FileTree` deferred) |
 | Empty-message emission (no fields / nested types) | **Done** — compile-tested via [`puroro-codegen-tests`](puroro-codegen-tests/) (`protoc` + plugin) |
-| FieldKind IR (`plan_message`, bit assignment, catalog kind) | **Done** — scalars / repeated / enum / oneof / custom defaults planned; map_entry not in IR yet |
-| FieldKind → catalog emission (struct members, accessors, visitors) | **Partial** — singular + repeated scalar / string / bytes / bool / enum / message; real oneof groups; `[default = …]` markers (`mod defaults` + `SingularField` `D`); nested message/enum decls; zero-less enums (`Type`/`Label`); official `descriptor.proto`+`plugin.proto` compile-tested. Map / typed extensions not yet |
+| FieldKind IR (`plan_message`, bit assignment, catalog kind) | **Done** — scalars / repeated / enum / oneof / map / custom defaults; synthetic `map_entry` messages planned as `FieldKind::Map` (not emitted as structs) |
+| FieldKind → catalog emission (struct members, accessors, visitors) | **Done** — singular + repeated scalar / string / bytes / bool / enum / message; real oneof groups; maps; `[default = …]` markers (`mod defaults` + `SingularField` `D`); nested message/enum decls; zero-less enums (`Type`/`Label`); official `descriptor.proto`+`plugin.proto` compile-tested. Typed extensions / services not yet |
 
-Live plugin emits nested and file-level messages/enums with singular, repeated, and real oneof catalog fields via `resolved::resolve` + [`field_kind::plan_message`](protoc-gen-puroro/src/field_kind.rs). Real oneof is covered by [`puroro-codegen-tests`](puroro-codegen-tests/) (`oneof_basic`); custom defaults by `custom_defaults`; official `descriptor.proto` / `plugin.proto` by `official_plugin`. Map and typed extensions remain rejected. Full-featured structs in this document and in [`sample-generated/`](sample-generated/) remain the target for remaining families.
+Live plugin emits the eager-path field families shown by [`sample-generated/`](sample-generated/) (`Task` / `Address`) via `resolved::resolve` + [`field_kind::plan_message`](protoc-gen-puroro/src/field_kind.rs): singular / repeated / enum / message / real oneof / map / custom defaults. Coverage is split across [`puroro-codegen-tests`](puroro-codegen-tests/) fixtures (`scalars`, `oneof_basic`, `map_basic`, `custom_defaults`, …; official `descriptor.proto` / `plugin.proto` by `official_plugin`). Deliberate differences from the hand-written sample — flat module layout, short-name `use`s, omitted `@generated` headers — are documented in [§9](#9-struct-layout); they are not missing field features. Remaining generator gaps outside the sample surface: typed extensions, services, `utf8_validation=NONE` decode honouring, `FileTree` layout.
 
 ---
 
@@ -480,75 +480,22 @@ Normative wording: [DESIGN.md — Path qualification](DESIGN.md#path-qualificati
 
 **The checked-in [`sample-generated/`](sample-generated/) deliberately relaxes path qualification for readability.** It pulls names in with `use` and refers to them by short name (`SingularField`, `Allocator`, `MessageCommon`, …) so the reference output stays easy to read and review. Read those short names as stand-ins for the production spellings (`::puroro_rt::…` / `self::_root::…`). The sample still aims to obey the **no public `puroro-rt` in signatures** rule above.
 
-### Generated code comments
+### Generated headers
 
-Generated Rust is not meant to be hand-edited, but **must be easy to navigate when debugging** (breakpoints, `merge_from` dispatch, diffing encode output). Production plugin output must emit comments from proto metadata; [`sample-generated/`](sample-generated/) demonstrates the convention (the live emitter currently only covers field-less messages and does not yet emit the full comment set).
+Navigational comments in generated Rust (section banners, per-field `// proto: …` labels, merge-arm notes, synthesized accessor docs) are **not required**. Semantics live in `puroro` / `puroro-rt` rustdoc and in DESIGN / this document. The hand-written [`sample-generated/`](sample-generated/) may keep informal comments for human review of the reference shape; that is not a codegen contract.
 
-**File header** — every generated module carries a machine marker and the source message:
+**File header** — every **real** plugin module carries a machine marker and the source message:
 
 ```rust
 //! @generated from example.proto — do not edit
 //! Message `example.Task`
 ```
 
-The `@generated` marker belongs on **real** plugin output (tooling uses it to collapse/skip generated files). The checked-in [`sample-generated/`](sample-generated/) intentionally **omits** it — those files are a hand-maintained reference, and an `@generated`/`do not edit` banner there would wrongly imply they are tool-generated. Sample headers instead describe what the module illustrates in plain prose.
+Tooling uses `@generated` to collapse/skip generated files. The checked-in [`sample-generated/`](sample-generated/) intentionally **omits** it — those files are a hand-maintained reference, and an `@generated`/`do not edit` banner there would wrongly imply they are tool-generated.
 
-**Section banners** — major blocks inside the file:
+**Constants** — `FIELD_*` / `BIT_*` are **module-level** `pub const` (not associated constants). Module-level consts are valid `match` patterns; associated consts are not. Inside the message module, arms use the bare name (`FIELD_TITLE => …`).
 
-```text
-// ---------------------------------------------------------------------------
-// Bit indices — …
-// ---------------------------------------------------------------------------
-// Proto field numbers
-// ---------------------------------------------------------------------------
-
-pub const FIELD_TITLE: u32 = 1;   // title
-pub const BIT_TITLE: usize = 0;   // title (EXPLICIT)
-
-// ---------------------------------------------------------------------------
-// Message struct
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// Message
-// ---------------------------------------------------------------------------
-```
-
-**Per-field accessor block** — before each field’s `impl` methods:
-
-```text
-// -- title (EXPLICIT string, proto field 1) --
-```
-
-Include **presence**, **wire/kind** (string, int32, repeated packed, nested, …), and **proto field number**.
-
-**Struct members** — trailing comment tying storage to proto:
-
-```rust
-title: SingularField<ProtoString, Explicit<{ BIT_TITLE }>, { FIELD_TITLE }, A>, // proto: string title = 1;
-```
-
-**Constants** — **module-level** `pub const` (not associated constants). Module-level consts are valid `match` patterns; associated consts are not. Inside the message module, arms use the bare name (`FIELD_TITLE => …`).
-
-```rust
-pub const FIELD_TITLE: u32 = 1;   // title
-pub const BIT_TITLE: usize = 0;   // title (EXPLICIT)
-```
-
-**Wire I/O** — `merge_from_with_depth` match arms label the proto field:
-
-```rust
-FIELD_TITLE => { // title = 1, EXPLICIT string
-    self.title
-        .bind_mut(&mut self._common)
-        .merge(wire_type, buf, depth)?;
-}
-```
-
-Every field kind merges through the same bound-view shape — `self.<field>.bind_mut(&mut self._common).merge(wire_type, buf, depth)?` (repeated and nested-message fields likewise; oneof uses `OneofSlotMut`) — so the code generator emits one form. Oneof variant arms use the **variant field name** and number. The `_ =>` unknown-field arm gets a short comment (`// unknown field — preserve in _common`).
-
-**What not to comment** — avoid restating obvious one-line delegates (`title().is_set()`). Section + struct + dispatch comments are enough.
-
-**Proto doc comments** — when the `.proto` field has `///` documentation, emit a Rust `///` doc comment on the **public accessor methods** (not on private struct fields unless the proto doc is part of the public API story).
+Every field kind merges through the same bound-view shape — `self.<field>.bind_mut(&mut self._common).merge(wire_type, buf, depth)?` (repeated and nested-message fields likewise; oneof uses `OneofSlotMut`) — so the code generator emits one form. Oneof variant arms use the **variant field name** and number.
 
 ---
 
@@ -829,7 +776,7 @@ The `set_*` per-variant setters are removed, matching the other field families.
 | Recursion limit | Enforced (`RECURSION_LIMIT = 100`, `merge_from_with_depth`) | — |
 | Repeated wrappers | `RepeatedField` + `RepeatedElement` (message / bool / scalar / LEN) | — |
 | Map wrappers | `MapField` + `MapKey` / `RepeatedElement` (sample `attributes`) | — |
-| `protoc-gen-puroro` field emission | Singular scalars emitted; repeated / oneof / enum / message pending | Remaining field families from `MessagePlan`; honour `utf8_validation=NONE` in generated decode |
+| `protoc-gen-puroro` field emission | Eager-path families done (singular / repeated / enum / message / oneof / map / defaults); see [§3](#3-implementation-status) | Honour `utf8_validation=NONE` in generated decode; typed extensions / services |
 | Zero-copy views | — | `TaskView<'buf>` (DESIGN.md §8) |
 | `TaskLazy` | DESIGN only | Wire buffer + on-demand decode |
 | `Hash` / `serde` | Deferred | Opt-in features |

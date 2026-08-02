@@ -15,14 +15,22 @@ use crate::fields::shared::{DefaultIn, ProtoEmpty};
 // Enum markers
 // ---------------------------------------------------------------------------
 
+/// Open-enum kind marker for [`ProtoEnum`] (`enum_type = OPEN`).
 pub struct Open;
+
+/// Closed-enum kind marker for [`ProtoEnum`] (`enum_type = CLOSED`).
 pub struct Closed;
 
+/// Generated enum newtype storage: wire `i32` plus a known default.
 pub trait ProtoEnumStorage: Copy + PartialEq + Default + 'static {
+    /// Numeric value written on the wire.
     fn to_wire(self) -> i32;
 }
 
+/// Open enum: unknown wire values are retained via [`From`]`<i32>`.
 pub trait OpenEnum: ProtoEnumStorage + From<i32> {}
+
+/// Closed enum: unknown wire values fail [`TryFrom`]`<i32>` and become unknowns.
 pub trait ClosedEnum: ProtoEnumStorage + TryFrom<i32, Error = i32> {}
 
 /// Allocator-free enum type marker (`Open` / `Closed`).
@@ -49,9 +57,11 @@ impl<E: ProtoEnumStorage> ProtoEmpty for E {
 // Numeric markers (wire via NumericalType)
 // ---------------------------------------------------------------------------
 
+/// Protobuf `uint32`.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
 pub struct ProtoUInt32;
 
+/// Protobuf `uint64`.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
 pub struct ProtoUInt64;
 
@@ -59,6 +69,7 @@ pub struct ProtoUInt64;
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
 pub struct ProtoInt32;
 
+/// Protobuf `int64`.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
 pub struct ProtoInt64;
 
