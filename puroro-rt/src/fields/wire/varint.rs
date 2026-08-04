@@ -37,8 +37,7 @@ pub struct ProtoEnum<E, K>(PhantomData<(E, K)>);
 impl<E: ProtoEnumStorage> AddressableSlot for E {}
 
 // Enum storage types are `Copy` + `Default`; `CloneIn` / `DefaultIn` /
-// `DeallocateIn` come from `unmanaged` blankets. [`ProtoEmpty`] lives in
-// `shared`.
+// `DeallocateIn` come from `unmanaged` blankets.
 
 // ---------------------------------------------------------------------------
 // Numeric markers (wire via NumericalType)

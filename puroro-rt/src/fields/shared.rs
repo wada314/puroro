@@ -2,11 +2,14 @@
 //!
 //! [`MessageCommon`] holds per-message state. Catalog bounds use
 //! [`MessageCommonBits`] / [`MessageCommonAlloc`] on that context.
-//! [`DefaultIn`](::unmanaged::DefaultIn), [`ProtoEmpty`],
+//! [`DefaultIn`](::unmanaged::DefaultIn),
 //! [`ValueSlot`](value_slot::ValueSlot),
 //! [`SlotInitView`](slot_init::SlotInitView) / [`SlotInitMut`](slot_init::SlotInitMut),
 //! and [`FieldPresence`](field_presence::FieldPresence) govern singular scalar
 //! storage and init state. Slot teardown uses [`unmanaged::DeallocateIn`].
+//! IMPLICIT empty / type-zero checks live on
+//! [`PayloadAccess`](crate::fields::wire::singular_type::PayloadAccess) /
+//! [`ValueLayout`](value_layout::ValueLayout).
 
 pub(crate) mod field_deallocate;
 pub(crate) mod field_inspect;
@@ -36,7 +39,6 @@ use ::bitvec::{
 use ::unmanaged::UnmanagedVec;
 
 use crate::decode::{UnknownFieldsIter, iter_unknown_fields};
-use crate::fields::wire::varint::ProtoEnumStorage;
 
 // ---------------------------------------------------------------------------
 // Private bit-storage helper (not a catalog bound)
@@ -239,100 +241,5 @@ impl<P, A: Allocator> MessageCommon<P, A> {
         Self: MessageCommonBits,
     {
         MessageCommonBits::bit_mut(self, bit)
-    }
-}
-
-// ---------------------------------------------------------------------------
-// Empty check (`ProtoEmpty`) — protobuf omit-on-encode (stays in puroro-rt)
-// ---------------------------------------------------------------------------
-
-/// Empty / type-zero predicate for IMPLICIT omit-on-encode.
-///
-/// Copy scalars compare to `0` / `false` / `0.0` (floats: `-0.0` is empty,
-/// `NaN` is non-empty); enums compare to [`Default`]; LEN payloads use
-/// `is_empty`. A present nested message is never empty (absence is the
-/// [`Option`] / init layer).
-/// Allocator-aware construction is [`DefaultIn`](::unmanaged::DefaultIn).
-pub trait ProtoEmpty {
-    /// `true` when the value equals the protobuf empty / type-zero.
-    fn is_proto_empty(&self) -> bool;
-}
-
-impl ProtoEmpty for u32 {
-    #[inline]
-    fn is_proto_empty(&self) -> bool {
-        *self == 0
-    }
-}
-impl ProtoEmpty for u64 {
-    #[inline]
-    fn is_proto_empty(&self) -> bool {
-        *self == 0
-    }
-}
-impl ProtoEmpty for i32 {
-    #[inline]
-    fn is_proto_empty(&self) -> bool {
-        *self == 0
-    }
-}
-impl ProtoEmpty for i64 {
-    #[inline]
-    fn is_proto_empty(&self) -> bool {
-        *self == 0
-    }
-}
-impl ProtoEmpty for f32 {
-    #[inline]
-    fn is_proto_empty(&self) -> bool {
-        *self == 0.0
-    }
-}
-impl ProtoEmpty for f64 {
-    #[inline]
-    fn is_proto_empty(&self) -> bool {
-        *self == 0.0
-    }
-}
-impl ProtoEmpty for bool {
-    #[inline]
-    fn is_proto_empty(&self) -> bool {
-        !*self
-    }
-}
-impl ProtoEmpty for () {
-    #[inline]
-    fn is_proto_empty(&self) -> bool {
-        true
-    }
-}
-
-impl<E: ProtoEnumStorage> ProtoEmpty for E {
-    #[inline]
-    fn is_proto_empty(&self) -> bool {
-        *self == E::default()
-    }
-}
-
-impl<A: Allocator> ProtoEmpty for ::unmanaged::UnmanagedString<A> {
-    #[inline]
-    fn is_proto_empty(&self) -> bool {
-        self.is_empty()
-    }
-}
-
-impl<A: Allocator> ProtoEmpty for ::unmanaged::UnmanagedVec<u8, A> {
-    #[inline]
-    fn is_proto_empty(&self) -> bool {
-        self.is_empty()
-    }
-}
-
-impl<M, A: Allocator> ProtoEmpty for ::unmanaged::UnmanagedBox<M, A> {
-    /// A present nested message is never omitted for being "empty"; absence is
-    /// expressed by the [`Option`] / init layer.
-    #[inline]
-    fn is_proto_empty(&self) -> bool {
-        false
     }
 }

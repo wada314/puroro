@@ -47,7 +47,6 @@ impl<M> Copy for ProtoMessage<M> {}
 
 // `UnmanagedBox<M, A>: DefaultIn<A>` / `DeallocateIn<A>` come from unmanaged
 // when `M: DefaultIn<A>` / `DeallocateIn<A>` (generated messages impl both).
-// `ProtoEmpty` for `UnmanagedBox` lives in `shared`.
 
 impl<M, A: Allocator> AddressableSlot for UnmanagedBox<M, A> {}
 impl<M: Message + MessageEncode> SingularType for ProtoMessage<M> {

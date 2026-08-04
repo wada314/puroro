@@ -17,8 +17,6 @@ use ::protobuf_core::Varint;
 
 use ::puroro::DecodeError;
 
-use crate::fields::shared::ProtoEmpty;
-
 use super::fixed::{
     ProtoDouble, ProtoFixed32, ProtoFixed64, ProtoFloat, ProtoSFixed32, ProtoSFixed64,
 };
@@ -33,7 +31,7 @@ use super::wire_payload::{CopyWirePayload, Fixed32Payload, Fixed64Payload, Varin
 pub trait NumericalType: Sized {
     /// Host-language value for encode/decode and field get/set (not necessarily
     /// the singular struct slot type).
-    type NativeType: Copy + Default + ProtoEmpty;
+    type NativeType: Copy + Default + PartialEq;
 
     /// Wire-shape body for this proto type (e.g. [`VarintPayload`] for `int32`).
     type WireBody: CopyWirePayload;

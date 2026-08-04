@@ -38,7 +38,7 @@ use ::unmanaged::DeallocateIn;
 
 use crate::decode;
 use crate::fields::shared::{
-    DefaultIn, MessageCommon, MessageCommonBits, ProtoEmpty,
+    DefaultIn, MessageCommon, MessageCommonBits,
     slot_init::SlotInitMut,
     value_slot::{AddressableSlot, ValueSlot, ValueSlotMutAccess},
 };
@@ -87,6 +87,9 @@ pub trait SingularType: EncodeType {
 /// [`BitPacked`](crate::fields::shared::value_layout::BitPacked) instead.
 pub trait PayloadAccess: SingularType {
     /// `true` when the field holds protobuf empty / type-zero (IMPLICIT omit).
+    ///
+    /// Numerics / enums compare to [`Default`]; string / bytes use `is_empty`;
+    /// a present nested message is never empty (absence is the presence layer).
     fn is_proto_empty<A: Allocator + Clone, Pb>(
         slot: &Self::Slot<A>,
         common: &MessageCommon<Pb, A>,
@@ -193,7 +196,8 @@ where
     where
         MessageCommon<Pb, A>: MessageCommonBits,
     {
-        slot.is_proto_empty()
+        // Type-zero / default: floats treat `-0.0` as empty and `NaN` as non-empty.
+        *slot == T::NativeType::default()
     }
 
     #[inline]
@@ -312,7 +316,7 @@ impl PayloadAccess for ProtoString {
     where
         MessageCommon<Pb, A>: MessageCommonBits,
     {
-        slot.is_proto_empty()
+        slot.is_empty()
     }
 
     #[inline]
@@ -419,7 +423,7 @@ impl PayloadAccess for ProtoBytes {
     where
         MessageCommon<Pb, A>: MessageCommonBits,
     {
-        slot.is_proto_empty()
+        slot.is_empty()
     }
 
     #[inline]
