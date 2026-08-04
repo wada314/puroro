@@ -13,7 +13,7 @@ use ::core::mem::MaybeUninit;
 use ::puroro::DecodeError;
 
 use super::{
-    MessageCommonBits, ProtoEmpty,
+    MessageCommonBits,
     slot_init::{AlwaysInitialized, BitInit, SlotInitMut, SlotInitView},
     value_slot::AddressableSlot,
 };
@@ -42,15 +42,11 @@ pub trait FieldPresence: Copy {
     /// Returns a read-only init-state marker.
     fn slot_init_view() -> Self::SlotInitView;
 
-    /// `true` when the stored payload equals the protobuf empty / type-zero.
-    ///
-    /// Only [`Implicit`] consults the slot; bitfield-backed policies never call this.
-    fn payload_is_empty<T: AddressableSlot + ProtoEmpty>(slot: &Self::ValueSlot<T>) -> bool;
-
     /// `true` when this field should be written on the wire.
     ///
     /// `is_payload_empty` is evaluated only when the policy depends on the stored
     /// value (e.g. [`Implicit`]); bitfield-backed policies ignore it.
+    /// Callers supply emptiness via [`ValueLayout::is_proto_empty`](super::value_layout::ValueLayout).
     fn should_emit<C: MessageCommonBits, F>(common: &C, is_payload_empty: F) -> bool
     where
         F: FnOnce() -> bool;
@@ -59,6 +55,7 @@ pub trait FieldPresence: Copy {
     ///
     /// `is_payload_empty` is evaluated only when the policy depends on the stored
     /// value (e.g. [`Implicit`]); bitfield-backed policies ignore it.
+    /// Callers supply emptiness via [`ValueLayout::is_proto_empty`](super::value_layout::ValueLayout).
     fn is_set<C: MessageCommonBits, F>(common: &C, is_payload_empty: F) -> bool
     where
         F: FnOnce() -> bool;
@@ -80,10 +77,6 @@ impl FieldPresence for Implicit {
 
     fn slot_init_view() -> AlwaysInitialized {
         AlwaysInitialized
-    }
-
-    fn payload_is_empty<T: AddressableSlot + ProtoEmpty>(slot: &T) -> bool {
-        slot.is_proto_empty()
     }
 
     fn should_emit<C: MessageCommonBits, F>(_: &C, is_payload_empty: F) -> bool
@@ -121,10 +114,6 @@ impl FieldPresence for Message {
         AlwaysInitialized
     }
 
-    fn payload_is_empty<T: AddressableSlot + ProtoEmpty>(slot: &Option<T>) -> bool {
-        slot.is_none()
-    }
-
     fn should_emit<C: MessageCommonBits, F>(_: &C, is_payload_empty: F) -> bool
     where
         F: FnOnce() -> bool,
@@ -157,10 +146,6 @@ impl FieldPresence for Oneof {
 
     fn slot_init_view() -> AlwaysInitialized {
         AlwaysInitialized
-    }
-
-    fn payload_is_empty<T: AddressableSlot + ProtoEmpty>(_slot: &T) -> bool {
-        false
     }
 
     fn should_emit<C: MessageCommonBits, F>(_: &C, _: F) -> bool
@@ -201,10 +186,6 @@ impl<const BIT: usize> FieldPresence for Explicit<BIT> {
         BitInit
     }
 
-    fn payload_is_empty<T: AddressableSlot + ProtoEmpty>(_slot: &MaybeUninit<T>) -> bool {
-        false
-    }
-
     fn should_emit<C: MessageCommonBits, F>(common: &C, _: F) -> bool
     where
         F: FnOnce() -> bool,
@@ -242,10 +223,6 @@ impl<const BIT: usize> FieldPresence for LegacyRequired<BIT> {
 
     fn slot_init_view() -> BitInit<BIT> {
         BitInit
-    }
-
-    fn payload_is_empty<T: AddressableSlot + ProtoEmpty>(_slot: &MaybeUninit<T>) -> bool {
-        false
     }
 
     fn should_emit<C: MessageCommonBits, F>(common: &C, _: F) -> bool
