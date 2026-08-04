@@ -20,7 +20,7 @@ pub use ::protobuf_core::FieldNumber;
 ///
 /// Library users of generated messages should prefer [`puroro::String`](::puroro::String)
 /// (and other `puroro` traits) in public signatures; these remain for catalog code.
-pub use ::unmanaged::{CloneIn, DeallocateIn, String, UnmanagedString};
+pub use ::unmanaged::{CloneIn, DeallocateIn, String, ToOwnedIn, UnmanagedString};
 pub use defaults::ProtoDefault;
 pub use fields::map::{MapField, MapFieldMut, MapFieldRef};
 pub use fields::oneof::{

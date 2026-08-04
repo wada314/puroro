@@ -15,7 +15,7 @@ use ::bytes::BufMut;
 use ::hashbrown::hash_map::Iter as HashMapIter;
 use ::hashbrown::{DefaultHashBuilder, Equivalent, HashMap};
 use ::puroro::{DecodeBuf, DecodeError, MapMut, MapRef, WireType};
-use ::unmanaged::CloneIn;
+use ::unmanaged::{CloneIn, ToOwnedIn};
 
 use crate::decode;
 use crate::encode;
@@ -276,11 +276,11 @@ where
     pub fn entry_element_mut_view(&mut self, key: &K::RefView) -> V::ElementMut<'_, A>
     where
         V: RepeatedElementMut + RepeatedElementMerge<A>,
-        K::RefView: Hash + Eq,
+        K::RefView: Hash + Eq + ToOwnedIn<A, Owned = K::Element<A>>,
         K::Element<A>: Eq + Hash + Borrow<K::RefView>,
     {
         if self.field.entries.get(key).is_none() {
-            let owned_key = K::key_from_view(key, self.common.alloc.clone());
+            let owned_key = key.to_owned_in(self.common.alloc.clone());
             let value = V::default_element(self.common.alloc.clone());
             self.insert(owned_key, value);
         }
@@ -393,7 +393,7 @@ where
     K: MapKey,
     V: RepeatedElementMut + RepeatedElementMerge<A>,
     A: Allocator + Clone,
-    K::RefView: Hash + Eq,
+    K::RefView: Hash + Eq + ToOwnedIn<A, Owned = K::Element<A>>,
     K::Element<A>: Hash + Eq + Borrow<K::RefView>,
 {
     type MutTarget = V::MutTarget<A>;

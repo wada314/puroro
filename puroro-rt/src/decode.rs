@@ -5,7 +5,6 @@
 
 use ::allocator_api2::alloc::Allocator;
 use ::bytes::Buf;
-use ::core::str;
 use ::protobuf_core::{IteratorExtVarint, Tag, Varint};
 use ::puroro::{DecodeError, UnknownField, UnknownPayload, WireType};
 use ::unmanaged::{UnmanagedString, UnmanagedVec};
@@ -69,12 +68,6 @@ pub(crate) fn decode_string_in<B: Buf, A: Allocator + Clone>(
             Err(DecodeError::InvalidUtf8)
         }
     }
-}
-
-/// Copies `s` into a freshly allocated [`UnmanagedString`] backed by the owned
-/// `alloc` (its buffer is owned by allocator type `A`).
-pub(crate) fn str_to_unmanaged_in<A: Allocator>(s: &str, alloc: A) -> UnmanagedString<A> {
-    UnmanagedString::from_string(::unmanaged::String::from_str_in(s, alloc))
 }
 
 /// Skips one field payload for `wire_type` without preserving unknowns.
