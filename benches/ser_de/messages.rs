@@ -176,6 +176,13 @@ impl<A: Allocator + Clone> MessageMerge for FlatScalars<A> {
     }
 }
 
+impl<A: Allocator + Clone> ::unmanaged::DefaultIn<A> for FlatScalars<A> {
+    #[inline]
+    fn default_in(alloc: A) -> Self {
+        Self::new_in(alloc)
+    }
+}
+
 impl<A: Allocator + Clone> Message for FlatScalars<A> {
     type Alloc = A;
 
@@ -307,6 +314,13 @@ impl<A: Allocator + Clone> MessageMerge for Nest<A> {
     }
 }
 
+impl<A: Allocator + Clone> ::unmanaged::DefaultIn<A> for Nest<A> {
+    #[inline]
+    fn default_in(alloc: A) -> Self {
+        Self::new_in(alloc)
+    }
+}
+
 impl<A: Allocator + Clone> Message for Nest<A> {
     type Alloc = A;
 
@@ -428,6 +442,13 @@ impl<A: Allocator + Clone> MessageMerge for PackedInts<A> {
             }
         }
         Ok(())
+    }
+}
+
+impl<A: Allocator + Clone> ::unmanaged::DefaultIn<A> for PackedInts<A> {
+    #[inline]
+    fn default_in(alloc: A) -> Self {
+        Self::new_in(alloc)
     }
 }
 
@@ -595,6 +616,13 @@ impl<A: Allocator + Clone> MessageMerge for StringHeavy<A> {
             }
         }
         Ok(())
+    }
+}
+
+impl<A: Allocator + Clone> ::unmanaged::DefaultIn<A> for StringHeavy<A> {
+    #[inline]
+    fn default_in(alloc: A) -> Self {
+        Self::new_in(alloc)
     }
 }
 

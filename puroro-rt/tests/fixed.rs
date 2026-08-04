@@ -122,6 +122,13 @@ impl<A: Allocator + Clone> MessageMerge for FixedDemo<A> {
     }
 }
 
+impl<A: Allocator + Clone> ::unmanaged::DefaultIn<A> for FixedDemo<A> {
+    #[inline]
+    fn default_in(alloc: A) -> Self {
+        Self::new_in(alloc)
+    }
+}
+
 impl<A: Allocator + Clone> Message for FixedDemo<A> {
     type Alloc = A;
 

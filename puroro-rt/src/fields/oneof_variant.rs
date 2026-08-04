@@ -6,7 +6,7 @@
 //! [`OneofSlotMut`](super::oneof::OneofSlotMut) select a variant without
 //! per-call-site closure boilerplate or zero-sized marker types.
 //!
-//! Empty payload construction uses [`DefaultIn`](super::shared::DefaultIn) on
+//! Empty payload construction uses [`DefaultIn`](::unmanaged::DefaultIn) on
 //! [`Value`](Self::Value) (e.g. [`SingularField::default_in`](super::singular::SingularField)),
 //! not a per-variant `new_value` hook.
 
@@ -17,7 +17,7 @@
 pub trait OneofVariant<const FIELD: u32> {
     /// The payload type stored in the variant numbered `FIELD`.
     ///
-    /// Installing a fresh variant uses [`DefaultIn`](super::shared::DefaultIn)
+    /// Installing a fresh variant uses [`DefaultIn`](::unmanaged::DefaultIn)
     /// on this type at the [`OneofSlotMut::variant_mut`](super::oneof::OneofSlotMut::variant_mut)
     /// call site.
     type Value;

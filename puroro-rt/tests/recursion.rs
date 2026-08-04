@@ -102,6 +102,13 @@ impl<A: Allocator + Clone> MessageMerge for Nest<A> {
     }
 }
 
+impl<A: Allocator + Clone> ::unmanaged::DefaultIn<A> for Nest<A> {
+    #[inline]
+    fn default_in(alloc: A) -> Self {
+        Self::new_in(alloc)
+    }
+}
+
 impl<A: Allocator + Clone> Message for Nest<A> {
     type Alloc = A;
 

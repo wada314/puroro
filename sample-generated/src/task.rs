@@ -909,6 +909,13 @@ impl<A: Allocator + Clone> MessageMerge for Task<A> {
     }
 }
 
+impl<A: Allocator + Clone> ::puroro_rt::DefaultIn<A> for Task<A> {
+    #[inline]
+    fn default_in(alloc: A) -> Self {
+        Self::new_in(alloc)
+    }
+}
+
 impl<A: Allocator + Clone> Message for Task<A> {
     type Alloc = A;
 

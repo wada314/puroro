@@ -338,6 +338,13 @@ impl<A: Allocator + Clone> MessageMerge for Address<A> {
     }
 }
 
+impl<A: Allocator + Clone> ::puroro_rt::DefaultIn<A> for Address<A> {
+    #[inline]
+    fn default_in(alloc: A) -> Self {
+        Self::new_in(alloc)
+    }
+}
+
 impl<A: Allocator + Clone> Message for Address<A> {
     type Alloc = A;
 

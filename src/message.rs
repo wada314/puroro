@@ -2,6 +2,7 @@
 
 use ::allocator_api2::alloc::Allocator;
 use ::bytes::{Buf, BufMut};
+use ::unmanaged::DefaultIn;
 
 use crate::error::DecodeError;
 use crate::unknown::UnknownField;
@@ -35,16 +36,23 @@ pub const RECURSION_LIMIT: usize = 100;
 ///
 /// The associated [`Alloc`](Self::Alloc) is the message's single allocator type
 /// parameter. Nested fields construct children with
-/// [`new_in`](Self::new_in) using the parent allocator
+/// [`new_in`](Self::new_in) / [`DefaultIn`] using the parent allocator
 /// (`M: Message<Alloc = A> + unmanaged::DeallocateIn<A>` at catalog use sites).
-/// Each concrete message must implement [`unmanaged::DeallocateIn`] for its
-/// `Alloc` (orphan rules forbid a blanket impl on this trait). An inherent
-/// `new()` for `Global` may still be provided on the concrete type.
-pub trait Message: Sized {
+/// Each concrete message must implement [`unmanaged::DeallocateIn`] and
+/// [`DefaultIn`]`<Self::Alloc>` for its `Alloc` (orphan rules forbid blanket
+/// impls on this trait). An inherent `new()` for `Global` may still be provided
+/// on the concrete type.
+pub trait Message: Sized
+where
+    Self: DefaultIn<Self::Alloc>,
+{
     /// Allocator that owns this message's heap allocations.
     type Alloc: Allocator + Clone;
 
     /// Creates an empty message with the given allocator.
+    ///
+    /// Typically forwards to the inherent `new_in`; [`DefaultIn::default_in`]
+    /// should do the same so nested `UnmanagedBox` construction stays consistent.
     fn new_in(alloc: Self::Alloc) -> Self;
 
     // -- codec --------------------------------------------------------------

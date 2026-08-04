@@ -377,6 +377,15 @@ pub(super) fn render_items(plan: &MessagePlan<'_>) -> Result<TokenStream> {
             }
         }
 
+        impl<A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone> ::puroro_rt::DefaultIn<A>
+            for #name<A>
+        {
+            #[inline]
+            fn default_in(alloc: A) -> Self {
+                Self::new_in(alloc)
+            }
+        }
+
         impl<A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone> ::puroro::Message
             for #name<A>
         {

@@ -2,7 +2,8 @@
 //!
 //! [`MessageCommon`] holds per-message state. Catalog bounds use
 //! [`MessageCommonBits`] / [`MessageCommonAlloc`] on that context.
-//! [`DefaultIn`], [`ProtoEmpty`], [`ValueSlot`](value_slot::ValueSlot),
+//! [`DefaultIn`](::unmanaged::DefaultIn), [`ProtoEmpty`],
+//! [`ValueSlot`](value_slot::ValueSlot),
 //! [`SlotInitView`](slot_init::SlotInitView) / [`SlotInitMut`](slot_init::SlotInitMut),
 //! and [`FieldPresence`](field_presence::FieldPresence) govern singular scalar
 //! storage and init state. Slot teardown uses [`unmanaged::DeallocateIn`].
@@ -14,6 +15,7 @@ pub(crate) mod slot_init;
 pub(crate) mod value_layout;
 pub(crate) mod value_slot;
 
+pub use ::unmanaged::DefaultIn;
 pub use field_deallocate::FieldDeallocate;
 pub use field_inspect::{
     CatalogField, CloneFieldsVisitor, DebugStructVisitor, EncodeRawVisitor, EncodedLenVisitor,
@@ -240,47 +242,17 @@ impl<P, A: Allocator> MessageCommon<P, A> {
 }
 
 // ---------------------------------------------------------------------------
-// Allocator-aware construction (`DefaultIn`) / empty check (`ProtoEmpty`)
+// Empty check (`ProtoEmpty`) — protobuf omit-on-encode (stays in puroro-rt)
 // ---------------------------------------------------------------------------
-
-/// Generalizes [`Default`] for payloads whose empty form may need an allocator
-/// (`UnmanagedString`, `UnmanagedVec`). Allocator-less scalars ignore `alloc`.
-///
-/// The allocator is a **trait parameter** chosen by the caller (not an
-/// associated type), matching the wg-allocators direction: scalars like `i32`
-/// can implement `DefaultIn<A>` for every `A`, while `UnmanagedString<A>` only
-/// implements `DefaultIn<A>` for its own `A`.
-///
-/// Teardown uses [`unmanaged::DeallocateIn`] directly (not a local trait).
-pub trait DefaultIn<A: Allocator + Clone> {
-    /// Builds the empty / type-zero value, using `alloc` when heap-backed.
-    fn default_in(alloc: A) -> Self;
-}
 
 /// Empty / type-zero predicate for IMPLICIT omit-on-encode.
 ///
 /// Copy scalars compare to `0` / `false`; LEN payloads use `is_empty`.
+/// Allocator-aware construction is [`DefaultIn`](::unmanaged::DefaultIn).
 pub trait ProtoEmpty {
     /// `true` when the value equals the protobuf empty / type-zero.
     fn is_proto_empty(&self) -> bool;
 }
-
-macro_rules! impl_scalar_default_in {
-    ($ty:ty, $zero:expr) => {
-        impl<A: Allocator + Clone> DefaultIn<A> for $ty {
-            #[inline]
-            fn default_in(_alloc: A) -> Self {
-                $zero
-            }
-        }
-    };
-}
-
-impl_scalar_default_in!(u32, 0);
-impl_scalar_default_in!(u64, 0);
-impl_scalar_default_in!(i32, 0);
-impl_scalar_default_in!(i64, 0);
-impl_scalar_default_in!((), ());
 
 impl ProtoEmpty for u32 {
     #[inline]
@@ -319,24 +291,10 @@ impl ProtoEmpty for () {
     }
 }
 
-impl<A: Allocator + Clone> DefaultIn<A> for ::unmanaged::UnmanagedString<A> {
-    #[inline]
-    fn default_in(alloc: A) -> Self {
-        ::unmanaged::UnmanagedString::new(alloc)
-    }
-}
-
 impl<A: Allocator> ProtoEmpty for ::unmanaged::UnmanagedString<A> {
     #[inline]
     fn is_proto_empty(&self) -> bool {
         self.is_empty()
-    }
-}
-
-impl<A: Allocator + Clone> DefaultIn<A> for ::unmanaged::UnmanagedVec<u8, A> {
-    #[inline]
-    fn default_in(alloc: A) -> Self {
-        ::unmanaged::UnmanagedVec::new(alloc)
     }
 }
 

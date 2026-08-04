@@ -143,17 +143,8 @@ pub(super) fn render_enum(e: &Enum<'_>) -> Result<TokenStream> {
             }
         }
 
-        impl<A: ::allocator_api2::alloc::Allocator> ::puroro_rt::CloneIn<A> for #name {
-            #[inline]
-            fn clone_in(&self, _alloc: A) -> Self {
-                *self
-            }
-        }
-
-        impl<A: ::allocator_api2::alloc::Allocator> ::puroro_rt::DeallocateIn<A> for #name {
-            #[inline]
-            unsafe fn deallocate_in(self, _alloc: A) {}
-        }
+        // `CloneIn` / `DefaultIn` / `DeallocateIn`: `Copy` (+ `Default`) blankets
+        // in `unmanaged`.
 
         impl ::puroro::HasDefault<#name> for ::puroro_rt::ProtoDefault {
             const DEFAULT: #name = #default_path;

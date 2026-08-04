@@ -45,19 +45,8 @@ impl<M> Clone for ProtoMessage<M> {
 
 impl<M> Copy for ProtoMessage<M> {}
 
-impl<M, A> DefaultIn<A> for UnmanagedBox<M, A>
-where
-    M: Message<Alloc = A>,
-    A: Allocator + Clone,
-{
-    #[inline]
-    fn default_in(alloc: A) -> Self {
-        UnmanagedBox::new_in(M::new_in(alloc.clone()), alloc)
-    }
-}
-
-// `UnmanagedBox<M, A>: DeallocateIn<A>` comes from unmanaged's blanket when
-// `M: DeallocateIn<A>` (each generated message implements it; no local bridge).
+// `UnmanagedBox<M, A>: DefaultIn<A>` / `DeallocateIn<A>` come from unmanaged
+// when `M: DefaultIn<A>` / `DeallocateIn<A>` (generated messages impl both).
 
 impl<M, A: Allocator> ProtoEmpty for UnmanagedBox<M, A> {
     /// A present nested message is never omitted for being "empty"; absence is

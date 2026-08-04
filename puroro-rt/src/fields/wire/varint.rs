@@ -6,10 +6,8 @@
 use ::core::convert::TryFrom;
 use ::core::marker::PhantomData;
 
-use ::allocator_api2::alloc::Allocator;
-
+use crate::fields::shared::ProtoEmpty;
 use crate::fields::shared::value_slot::AddressableSlot;
-use crate::fields::shared::{DefaultIn, ProtoEmpty};
 
 // ---------------------------------------------------------------------------
 // Enum markers
@@ -39,12 +37,8 @@ pub struct ProtoEnum<E, K>(PhantomData<(E, K)>);
 
 impl<E: ProtoEnumStorage> AddressableSlot for E {}
 
-impl<E: ProtoEnumStorage, A: Allocator + Clone> DefaultIn<A> for E {
-    #[inline]
-    fn default_in(_alloc: A) -> Self {
-        E::default()
-    }
-}
+// Enum storage types are `Copy` + `Default`; `CloneIn` / `DefaultIn` /
+// `DeallocateIn` come from `unmanaged` blankets.
 
 impl<E: ProtoEnumStorage> ProtoEmpty for E {
     #[inline]

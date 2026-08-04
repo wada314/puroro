@@ -4,10 +4,8 @@
 //!
 //! Float [`ProtoEmpty`] uses Rust `== 0.0` (`-0.0` is empty; `NaN` is non-empty).
 
-use ::allocator_api2::alloc::Allocator;
-
+use crate::fields::shared::ProtoEmpty;
 use crate::fields::shared::value_slot::AddressableSlot;
-use crate::fields::shared::{DefaultIn, ProtoEmpty};
 
 /// Protobuf `fixed32`.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
@@ -39,20 +37,6 @@ pub struct ProtoDouble;
 
 impl AddressableSlot for f32 {}
 impl AddressableSlot for f64 {}
-
-impl<A: Allocator + Clone> DefaultIn<A> for f32 {
-    #[inline]
-    fn default_in(_alloc: A) -> Self {
-        0.0
-    }
-}
-
-impl<A: Allocator + Clone> DefaultIn<A> for f64 {
-    #[inline]
-    fn default_in(_alloc: A) -> Self {
-        0.0
-    }
-}
 
 /// Float empty check uses Rust `== 0.0` (`-0.0` is empty; `NaN` is non-empty).
 impl ProtoEmpty for f32 {
