@@ -4,12 +4,13 @@
 //! or `string` / [`ProtoString`](super::len::ProtoString). Proto types map onto these
 //! shapes via [`NumericalType`](super::numerical::NumericalType) / [`EncodeType`](super::encode_type::EncodeType).
 //!
-//! A [`WirePayload`] is the complete tag-free body for its [`WIRE_TYPE`](WirePayload::WIRE_TYPE):
-//! for `Len`, that includes the length varint plus content bytes.
+//! A [`WirePayload`] is the complete tag-free body for its [`WIRE_TYPE`](WirePayload::WIRE_TYPE).
+//! `Len` encode is inlined on [`EncodeType`](super::encode_type::EncodeType); this module only
+//! keeps owned [`LenPayload`] for decode.
 //!
 //! # Visibility
 //!
-//! Len helpers are `pub(crate)`. Copy numerical payloads stay `pub` (but are not
+//! [`LenPayload`] is `pub(crate)`. Copy numerical payloads stay `pub` (but are not
 //! re-exported from the crate root) because [`NumericalType::WireBody`](super::numerical::NumericalType::WireBody)
 //! names them in a public trait — `pub(crate)` there is E0446.
 
@@ -21,7 +22,6 @@ use ::puroro::{DecodeError, WireType};
 use ::unmanaged::UnmanagedVec;
 
 use crate::decode;
-use crate::encode;
 
 /// Untagged body for a wire type (`Varint`, `Int32`, `Int64`, or `Len`).
 #[doc(hidden)]
@@ -139,28 +139,6 @@ impl CopyWirePayload for Fixed64Payload {
         let mut bytes = [0u8; FIXED64_BYTES];
         buf.copy_to_slice(&mut bytes);
         Ok(Self(bytes))
-    }
-}
-
-/// Borrowed Len wire body for encode: length varint + `content`
-/// (e.g. UTF-8 bytes of a `string`, or raw `bytes`).
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub(crate) struct LenPayloadRef<'a> {
-    pub content: &'a [u8],
-}
-
-impl WirePayload for LenPayloadRef<'_> {
-    const WIRE_TYPE: WireType = WireType::Len;
-
-    #[inline]
-    fn encoded_len(&self) -> usize {
-        encode::encoded_len_varint(self.content.len() as u64) + self.content.len()
-    }
-
-    #[inline]
-    fn encode(&self, buf: &mut impl BufMut) {
-        encode::encode_varint(self.content.len() as u64, buf);
-        buf.put_slice(self.content);
     }
 }
 

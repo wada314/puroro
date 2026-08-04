@@ -5,8 +5,7 @@
 //! alone). [`payload_len`](EncodeType::payload_len) /
 //! [`encode_payload`](EncodeType::encode_payload) write the **complete untagged
 //! wire body** for [`WIRE_TYPE`](EncodeType::WIRE_TYPE) (for `Len` types such as
-//! string / bytes / message: length varint + content, via
-//! [`WirePayload`](super::wire_payload::WirePayload)).
+//! string / bytes / message: length varint + content).
 //!
 //! [`encode_field`] / [`encoded_len_field`] add only the tag. Presence omit stays
 //! on [`FieldEncode`](crate::fields::shared::FieldEncode).
@@ -21,7 +20,7 @@ use crate::message_encode::{EncodeCtx, MessageEncode};
 use super::len::{ProtoBytes, ProtoString};
 use super::numerical::NumericalType;
 use super::proto_message::ProtoMessage;
-use super::wire_payload::{LenPayloadRef, WirePayload};
+use super::wire_payload::WirePayload;
 
 /// Encode facet of a protobuf **type** marker (`ProtoInt32`, `ProtoString`, …).
 ///
@@ -145,10 +144,8 @@ impl EncodeType for ProtoString {
     where
         Self: 'a,
     {
-        LenPayloadRef {
-            content: value.as_bytes(),
-        }
-        .encoded_len()
+        let n = value.len();
+        encode::encoded_len_varint(n as u64) + n
     }
 
     #[inline]
@@ -158,10 +155,8 @@ impl EncodeType for ProtoString {
         A: Allocator + Clone,
         B: BufMut,
     {
-        LenPayloadRef {
-            content: value.as_bytes(),
-        }
-        .encode(buf);
+        encode::encode_varint(value.len() as u64, buf);
+        buf.put_slice(value.as_bytes());
     }
 }
 
@@ -179,7 +174,8 @@ impl EncodeType for ProtoBytes {
     where
         Self: 'a,
     {
-        LenPayloadRef { content: value }.encoded_len()
+        let n = value.len();
+        encode::encoded_len_varint(n as u64) + n
     }
 
     #[inline]
@@ -189,7 +185,8 @@ impl EncodeType for ProtoBytes {
         A: Allocator + Clone,
         B: BufMut,
     {
-        LenPayloadRef { content: value }.encode(buf);
+        encode::encode_varint(value.len() as u64, buf);
+        buf.put_slice(value);
     }
 }
 

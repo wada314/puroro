@@ -229,16 +229,18 @@ One marker + trait per protobuf **type** (e.g. `int32`, `string`). Wire-shape re
 ### Wire shape ([`wire/wire_payload.rs`](puroro-rt/src/fields/wire/wire_payload.rs))
 
 [`WirePayload`](puroro-rt/src/fields/wire/wire_payload.rs) is the complete **tag-free** body for a
-**wire type** (`Varint` / `Int32` / `Int64` / `Len`). For `Len`, that includes the length varint plus
-content (`LenPayloadRef`, `MessageLenRef`). Copy numericals also implement
-[`CopyWirePayload`](puroro-rt/src/fields/wire/wire_payload.rs) (`decode` without an allocator).
+**wire type** (`Varint` / `Int32` / `Int64` / `Len`). `Len` encode (length varint + content) lives on
+[`EncodeType`](puroro-rt/src/fields/wire/encode_type.rs) for string / bytes / message; this module
+keeps owned [`LenPayload`](puroro-rt/src/fields/wire/wire_payload.rs) for decode. Copy numericals also
+implement [`CopyWirePayload`](puroro-rt/src/fields/wire/wire_payload.rs) (`decode` without an
+allocator).
 
 ### Proto-type encode + tagged framing ([`wire/encode_type.rs`](puroro-rt/src/fields/wire/encode_type.rs))
 
 [`EncodeType`](puroro-rt/src/fields/wire/encode_type.rs) is implemented by proto **type** markers
 (`ProtoInt32`, `ProtoString`, `ProtoMessage<M>`, …). `View` is both the singular getter view and the
 tagged-encode input, and is always `Copy`. `payload_len` / `encode_payload` emit the complete
-untagged [`WirePayload`](puroro-rt/src/fields/wire/wire_payload.rs) body (for `Len`: length + content).
+untagged wire body (for `Len`: length + content; numericals via [`WirePayload`](puroro-rt/src/fields/wire/wire_payload.rs)).
 Free helpers [`encode_field`](puroro-rt/src/fields/wire/encode_type.rs) /
 [`encoded_len_field`](puroro-rt/src/fields/wire/encode_type.rs) add only the tag — they do **not**
 apply presence omit. [`SingularType`](puroro-rt/src/fields/wire/singular_type.rs) extends
