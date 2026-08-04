@@ -604,57 +604,26 @@ where
     }
 }
 
-macro_rules! impl_singular_clone_always {
-    ($presence:ty) => {
-        impl<T, const FIELD: u32, A, L, D, P> FieldCloneIn<MessageCommon<P, A>>
-            for SingularField<T, $presence, FIELD, A, L, D>
-        where
-            T: SingularType,
-            A: Allocator + Clone,
-            L: ValueLayout<T, A>,
-            T::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateIn<A> + CloneIn<A>,
-            <$presence as FieldPresence>::ValueSlot<T::Slot<A>>: ValueSlot<T::Slot<A>, A>,
-        {
-            fn clone_field(&self, _common: &MessageCommon<P, A>, alloc: A) -> Self {
-                Self {
-                    value: ManuallyDrop::new(ValueSlot::clone_in(&*self.value, true, alloc)),
-                    _marker: PhantomData,
-                }
-            }
+impl<T, P, const FIELD: u32, A, L, D, Pb> FieldCloneIn<MessageCommon<Pb, A>>
+    for SingularField<T, P, FIELD, A, L, D>
+where
+    T: SingularType,
+    P: FieldPresence,
+    A: Allocator + Clone,
+    L: ValueLayout<T, A>,
+    MessageCommon<Pb, A>: MessageCommonBits,
+    T::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateIn<A> + CloneIn<A>,
+    P::ValueSlot<T::Slot<A>>: ValueSlot<T::Slot<A>, A>,
+{
+    fn clone_field(&self, common: &MessageCommon<Pb, A>, alloc: A) -> Self {
+        let init = P::slot_init_view();
+        let initialized = init.is_initialized(|b| common.is_bit_set(b));
+        Self {
+            value: ManuallyDrop::new(ValueSlot::clone_in(&*self.value, initialized, alloc)),
+            _marker: PhantomData,
         }
-    };
+    }
 }
-
-impl_singular_clone_always!(Implicit);
-impl_singular_clone_always!(Oneof);
-impl_singular_clone_always!(Message);
-
-macro_rules! impl_singular_clone_bit {
-    ($presence:ty) => {
-        impl<T, const BIT: usize, const FIELD: u32, A, L, D, P> FieldCloneIn<MessageCommon<P, A>>
-            for SingularField<T, $presence, FIELD, A, L, D>
-        where
-            T: SingularType,
-            A: Allocator + Clone,
-            L: ValueLayout<T, A>,
-            MessageCommon<P, A>: MessageCommonBits,
-            T::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateIn<A> + CloneIn<A>,
-            <$presence as FieldPresence>::ValueSlot<T::Slot<A>>: ValueSlot<T::Slot<A>, A>,
-        {
-            fn clone_field(&self, common: &MessageCommon<P, A>, alloc: A) -> Self {
-                let init = <$presence as FieldPresence>::slot_init_view();
-                let initialized = init.is_initialized(|b| common.is_bit_set(b));
-                Self {
-                    value: ManuallyDrop::new(ValueSlot::clone_in(&*self.value, initialized, alloc)),
-                    _marker: PhantomData,
-                }
-            }
-        }
-    };
-}
-
-impl_singular_clone_bit!(Explicit<BIT>);
-impl_singular_clone_bit!(LegacyRequired<BIT>);
 
 impl<T, const FIELD: u32, A, L, D, Pb> FieldDebug<MessageCommon<Pb, A>>
     for SingularField<T, Implicit, FIELD, A, L, D>
