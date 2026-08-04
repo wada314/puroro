@@ -4,10 +4,10 @@ use ::allocator_api2::alloc::Allocator;
 use ::bytes::BufMut;
 use ::puroro::{DecodeBuf, DecodeError, WireType};
 
+use super::MapKey;
 use crate::decode;
 use crate::encode;
 use crate::fields::wire::encode_type::{encode_field, encoded_len_field};
-use crate::fields::wire::map_element::MapKey;
 use crate::fields::wire::repeated_element::{RepeatedElement, RepeatedElementMerge};
 use crate::message_encode::EncodeCtx;
 

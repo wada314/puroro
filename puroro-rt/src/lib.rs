@@ -22,7 +22,7 @@ pub use ::protobuf_core::FieldNumber;
 /// (and other `puroro` traits) in public signatures; these remain for catalog code.
 pub use ::unmanaged::{CloneIn, DeallocateIn, String, ToOwnedIn, UnmanagedString};
 pub use defaults::ProtoDefault;
-pub use fields::map::{MapField, MapFieldMut, MapFieldRef};
+pub use fields::map::{MapField, MapFieldMut, MapFieldRef, MapKey};
 pub use fields::oneof::{
     OneofDeallocate, OneofEncodable, OneofGroup, OneofSlot, OneofSlotMut, OneofSlotRef,
     OneofVariantRef, OneofView, OneofViewMut,
@@ -44,7 +44,7 @@ pub use fields::shared::{
 };
 pub use fields::singular::{SingularField, SingularFieldMut, SingularFieldRef};
 pub use fields::wire::{
-    Closed, ClosedEnum, EncodeType, MapKey, NumericalType, Open, OpenEnum, PackableRepeatedElement,
+    Closed, ClosedEnum, EncodeType, NumericalType, Open, OpenEnum, PackableRepeatedElement,
     PayloadAccess, ProtoBool, ProtoBytes, ProtoDouble, ProtoEnum, ProtoEnumStorage, ProtoFixed32,
     ProtoFixed64, ProtoFloat, ProtoInt32, ProtoInt64, ProtoMessage, ProtoSFixed32, ProtoSFixed64,
     ProtoSInt32, ProtoSInt64, ProtoString, ProtoUInt32, ProtoUInt64, RepeatedElement,

@@ -17,11 +17,11 @@ use ::hashbrown::{DefaultHashBuilder, Equivalent, HashMap};
 use ::puroro::{DecodeBuf, DecodeError, MapMut, MapRef, WireType};
 use ::unmanaged::{CloneIn, ToOwnedIn};
 
+use super::MapKey;
 use crate::decode;
 use crate::encode;
 use crate::fields::shared::field_inspect::{FieldCloneIn, FieldDebug, FieldEncode, FieldPartialEq};
 use crate::fields::shared::{FieldDeallocate, MessageCommon};
-use crate::fields::wire::map_element::MapKey;
 use crate::fields::wire::repeated_element::{
     RepeatedElement, RepeatedElementMerge, RepeatedElementMut,
 };

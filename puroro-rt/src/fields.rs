@@ -23,7 +23,7 @@
 //! | [`wire`] | `SingularType`, `RepeatedElement`, `NumericalType`, fixed / varint markers |
 //! | [`singular`] | `SingularField` |
 //! | [`repeated`] | `RepeatedField` |
-//! | [`map`] | `MapField` (hash map entries) |
+//! | [`map`] | `MapKey`, `MapField` (hash map entries) |
 //! | [`oneof`] | `OneofSlot` |
 //! | [`oneof_variant`] | `OneofVariant` (field-number dispatch) |
 
