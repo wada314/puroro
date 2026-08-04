@@ -20,7 +20,7 @@ use crate::message_merge::MessageMerge;
 use ::unmanaged::DeallocateIn;
 
 use crate::fields::shared::{
-    DefaultIn, MessageCommon, MessageCommonBits, ProtoEmpty,
+    DefaultIn, MessageCommon, MessageCommonBits,
     slot_init::SlotInitMut,
     value_slot::{AddressableSlot, ValueSlot, ValueSlotMutAccess},
 };
@@ -47,18 +47,9 @@ impl<M> Copy for ProtoMessage<M> {}
 
 // `UnmanagedBox<M, A>: DefaultIn<A>` / `DeallocateIn<A>` come from unmanaged
 // when `M: DefaultIn<A>` / `DeallocateIn<A>` (generated messages impl both).
-
-impl<M, A: Allocator> ProtoEmpty for UnmanagedBox<M, A> {
-    /// A present nested message is never omitted for being "empty"; absence is
-    /// expressed by the [`Option`](core::option::Option) / init layer.
-    #[inline]
-    fn is_proto_empty(&self) -> bool {
-        false
-    }
-}
+// `ProtoEmpty` for `UnmanagedBox` lives in `shared`.
 
 impl<M, A: Allocator> AddressableSlot for UnmanagedBox<M, A> {}
-
 impl<M: Message + MessageEncode> SingularType for ProtoMessage<M> {
     type Slot<A: Allocator + Clone> = UnmanagedBox<M, A>;
     type Mut<'a, A: Allocator + Clone>

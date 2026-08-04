@@ -6,7 +6,6 @@
 use ::core::convert::TryFrom;
 use ::core::marker::PhantomData;
 
-use crate::fields::shared::ProtoEmpty;
 use crate::fields::shared::value_slot::AddressableSlot;
 
 // ---------------------------------------------------------------------------
@@ -38,14 +37,8 @@ pub struct ProtoEnum<E, K>(PhantomData<(E, K)>);
 impl<E: ProtoEnumStorage> AddressableSlot for E {}
 
 // Enum storage types are `Copy` + `Default`; `CloneIn` / `DefaultIn` /
-// `DeallocateIn` come from `unmanaged` blankets.
-
-impl<E: ProtoEnumStorage> ProtoEmpty for E {
-    #[inline]
-    fn is_proto_empty(&self) -> bool {
-        *self == E::default()
-    }
-}
+// `DeallocateIn` come from `unmanaged` blankets. [`ProtoEmpty`] lives in
+// `shared`.
 
 // ---------------------------------------------------------------------------
 // Numeric markers (wire via NumericalType)

@@ -36,6 +36,7 @@ use ::bitvec::{
 use ::unmanaged::UnmanagedVec;
 
 use crate::decode::{UnknownFieldsIter, iter_unknown_fields};
+use crate::fields::wire::varint::ProtoEnumStorage;
 
 // ---------------------------------------------------------------------------
 // Private bit-storage helper (not a catalog bound)
@@ -247,7 +248,10 @@ impl<P, A: Allocator> MessageCommon<P, A> {
 
 /// Empty / type-zero predicate for IMPLICIT omit-on-encode.
 ///
-/// Copy scalars compare to `0` / `false`; LEN payloads use `is_empty`.
+/// Copy scalars compare to `0` / `false` / `0.0` (floats: `-0.0` is empty,
+/// `NaN` is non-empty); enums compare to [`Default`]; LEN payloads use
+/// `is_empty`. A present nested message is never empty (absence is the
+/// [`Option`] / init layer).
 /// Allocator-aware construction is [`DefaultIn`](::unmanaged::DefaultIn).
 pub trait ProtoEmpty {
     /// `true` when the value equals the protobuf empty / type-zero.
@@ -278,6 +282,18 @@ impl ProtoEmpty for i64 {
         *self == 0
     }
 }
+impl ProtoEmpty for f32 {
+    #[inline]
+    fn is_proto_empty(&self) -> bool {
+        *self == 0.0
+    }
+}
+impl ProtoEmpty for f64 {
+    #[inline]
+    fn is_proto_empty(&self) -> bool {
+        *self == 0.0
+    }
+}
 impl ProtoEmpty for bool {
     #[inline]
     fn is_proto_empty(&self) -> bool {
@@ -288,6 +304,13 @@ impl ProtoEmpty for () {
     #[inline]
     fn is_proto_empty(&self) -> bool {
         true
+    }
+}
+
+impl<E: ProtoEnumStorage> ProtoEmpty for E {
+    #[inline]
+    fn is_proto_empty(&self) -> bool {
+        *self == E::default()
     }
 }
 
@@ -302,5 +325,14 @@ impl<A: Allocator> ProtoEmpty for ::unmanaged::UnmanagedVec<u8, A> {
     #[inline]
     fn is_proto_empty(&self) -> bool {
         self.is_empty()
+    }
+}
+
+impl<M, A: Allocator> ProtoEmpty for ::unmanaged::UnmanagedBox<M, A> {
+    /// A present nested message is never omitted for being "empty"; absence is
+    /// expressed by the [`Option`] / init layer.
+    #[inline]
+    fn is_proto_empty(&self) -> bool {
+        false
     }
 }

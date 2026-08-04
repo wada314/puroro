@@ -33,6 +33,8 @@ impl AddressableSlot for u32 {}
 impl AddressableSlot for u64 {}
 impl AddressableSlot for i32 {}
 impl AddressableSlot for i64 {}
+impl AddressableSlot for f32 {}
+impl AddressableSlot for f64 {}
 impl AddressableSlot for () {}
 
 impl<A: Allocator> AddressableSlot for ::unmanaged::UnmanagedString<A> {}
