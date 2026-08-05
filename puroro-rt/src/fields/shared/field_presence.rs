@@ -241,7 +241,7 @@ impl<const BIT: usize> FieldPresence for LegacyRequired<BIT> {
 }
 
 /// Sub-trait for LEGACY_REQUIRED fields — adds presence validation for `validate()`.
-pub trait RequiredFieldPresence: FieldPresence {
+pub(crate) trait RequiredFieldPresence: FieldPresence {
     /// Returns `MissingRequiredField` when the field is not present.
     fn validate_present<C: MessageCommonBits, F>(
         common: &C,

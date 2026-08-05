@@ -153,7 +153,7 @@ Live plugin emits the eager-path field families shown by [`sample-generated/`](s
 
 | Path | Contents |
 |---|---|
-| [`lib.rs`](puroro-rt/src/lib.rs) | Crate-root catalog re-exports (`::puroro_rt::SingularField`, …) |
+| [`lib.rs`](puroro-rt/src/lib.rs) | Crate-root re-exports: symbols the generator names as `::puroro_rt::…` |
 | [`fields.rs`](puroro-rt/src/fields.rs) | Module root (`pub(crate)`; `pub mod` only) |
 | [`shared.rs`](puroro-rt/src/fields/shared.rs) | `MessageCommon`, `MessageCommonBits`, `MessageCommonAlloc`, `DefaultIn`, `DeallocateIn`, `ProtoEmpty` |
 | [`shared/field_presence.rs`](puroro-rt/src/fields/shared/field_presence.rs) | `FieldPresence` markers |

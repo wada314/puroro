@@ -115,7 +115,7 @@ pub trait ValueSlotMutAccess<'a, T, A: Allocator + Clone> {
 // ---------------------------------------------------------------------------
 
 /// Short-lived read view of an addressable value slot.
-pub struct ValueSlotRef<'s, S: ?Sized, T, I: SlotInitView, Pb, A: Allocator> {
+pub(crate) struct ValueSlotRef<'s, S: ?Sized, T, I: SlotInitView, Pb, A: Allocator> {
     slot: &'s S,
     init: I,
     common: &'s MessageCommon<Pb, A>,
@@ -123,7 +123,7 @@ pub struct ValueSlotRef<'s, S: ?Sized, T, I: SlotInitView, Pb, A: Allocator> {
 }
 
 /// Short-lived mutation view of an addressable value slot.
-pub struct ValueSlotMut<'a, S: ?Sized, T, I: SlotInitMut, Pb, A: Allocator> {
+pub(crate) struct ValueSlotMut<'a, S: ?Sized, T, I: SlotInitMut, Pb, A: Allocator> {
     slot: &'a mut S,
     init: I,
     common: &'a mut MessageCommon<Pb, A>,

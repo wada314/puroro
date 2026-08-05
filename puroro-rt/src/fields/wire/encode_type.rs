@@ -64,7 +64,11 @@ pub trait EncodeType {
 
 /// Tagged occurrence length: tag + untagged wire body. No omit.
 #[inline]
-pub fn encoded_len_field<'a, T, A>(value: T::View<'a, A>, field: u32, ctx: &mut EncodeCtx) -> usize
+pub(crate) fn encoded_len_field<'a, T, A>(
+    value: T::View<'a, A>,
+    field: u32,
+    ctx: &mut EncodeCtx,
+) -> usize
 where
     T: EncodeType + 'a,
     A: Allocator + Clone + 'a,
@@ -81,7 +85,7 @@ where
 
 /// Tagged occurrence: tag + untagged wire body. No omit.
 #[inline]
-pub fn encode_field<'a, T, A, B>(
+pub(crate) fn encode_field<'a, T, A, B>(
     value: T::View<'a, A>,
     field: u32,
     ctx: &mut EncodeCtx,

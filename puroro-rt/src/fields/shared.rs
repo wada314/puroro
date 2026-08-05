@@ -21,9 +21,9 @@ pub(crate) mod value_slot;
 pub use ::unmanaged::DefaultIn;
 pub use field_deallocate::FieldDeallocate;
 pub use field_inspect::{
-    CatalogField, CloneFieldsVisitor, DebugStructVisitor, EncodeRawVisitor, EncodedLenVisitor,
-    FieldCloneIn, FieldDeallocVisitor, FieldDebug, FieldEncode, FieldEqVisitor, FieldPairVisitor,
-    FieldPairVisitorMut, FieldPartialEq, FieldVisitor, FieldVisitorMut,
+    CloneFieldsVisitor, DebugStructVisitor, EncodeRawVisitor, EncodedLenVisitor, FieldCloneIn,
+    FieldDeallocVisitor, FieldEncode, FieldEqVisitor, FieldPairVisitor, FieldPairVisitorMut,
+    FieldVisitor, FieldVisitorMut,
 };
 pub use value_layout::{BitPacked, Inline, ValueLayout};
 

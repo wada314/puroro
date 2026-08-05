@@ -16,16 +16,16 @@ use crate::fields::shared::value_slot::AddressableSlot;
 use crate::message_encode::MessageEncode;
 
 /// Equality for [`EncodeType::View`](super::encode_type::EncodeType::View)
-/// (used by catalog [`FieldPartialEq`](crate::FieldPartialEq)).
-pub trait ProtoRefEq<A: Allocator + Clone>: SingularType {
+/// (used by catalog [`FieldPartialEq`](crate::fields::shared::field_inspect::FieldPartialEq)).
+pub(crate) trait ProtoRefEq<A: Allocator + Clone>: SingularType {
     fn option_eq<'a>(lhs: Option<Self::View<'a, A>>, rhs: Option<Self::View<'a, A>>) -> bool
     where
         A: 'a;
 }
 
 /// [`Debug`] for [`EncodeType::View`](super::encode_type::EncodeType::View)
-/// (used by catalog [`FieldDebug`](crate::FieldDebug)).
-pub trait ProtoRefDebug<A: Allocator + Clone>: SingularType {
+/// (used by catalog [`FieldDebug`](crate::fields::shared::field_inspect::FieldDebug)).
+pub(crate) trait ProtoRefDebug<A: Allocator + Clone>: SingularType {
     fn fmt_ref<'a>(value: &Self::View<'a, A>, f: &mut Formatter<'_>) -> FmtResult
     where
         A: 'a;

@@ -85,7 +85,7 @@ pub trait SingularType: EncodeType {
 ///
 /// Not implemented for [`ProtoBool`] — use
 /// [`BitPacked`](crate::fields::shared::value_layout::BitPacked) instead.
-pub trait PayloadAccess: SingularType {
+pub(crate) trait PayloadAccess: SingularType {
     /// `true` when the field holds protobuf empty / type-zero (IMPLICIT omit).
     ///
     /// Numerics / enums compare to [`Default`]; string / bytes use `is_empty`;

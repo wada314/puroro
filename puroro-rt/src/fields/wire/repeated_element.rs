@@ -119,7 +119,7 @@ pub trait RepeatedElementMerge<A: Allocator + Clone>: RepeatedElement {
 ///
 /// Packed payload layout is type-specific (concatenated varints, or fixed-width
 /// LE bytes). Decode always accepts both packed (`Len`) and expanded forms.
-pub trait PackableRepeatedElement: RepeatedElement {
+pub(crate) trait PackableRepeatedElement: RepeatedElement {
     /// Byte length of the packed payload (excluding tag and length prefix).
     fn packed_payload_len<A: Allocator + Clone>(values: &[Self::Element<A>]) -> usize
     where
@@ -137,11 +137,11 @@ pub trait PackableRepeatedElement: RepeatedElement {
 ///
 /// Implemented for copy scalars / enums and nested messages. Not implemented
 /// for string / bytes (those use [`RepeatedElementMut`] via
-/// [`RepeatedContainerMut`](crate::fields::repeated::container::RepeatedContainerMut)).
+/// [`RepeatedContainerMut`](::puroro::RepeatedContainerMut)).
 pub trait RepeatedVecMut: RepeatedElement {}
 
 /// How to obtain a mutable element handle for
-/// [`RepeatedContainerMut`](crate::fields::repeated::container::RepeatedContainerMut).
+/// [`RepeatedContainerMut`](::puroro::RepeatedContainerMut).
 ///
 /// Usually matches singular [`SingularType::Mut`], except [`ProtoBool`] (singular
 /// is bit-packed; repeated stores plain `bool`).

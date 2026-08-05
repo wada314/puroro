@@ -19,12 +19,12 @@
 //!
 //! | Submodule | Contents |
 //! |---|---|
-//! | [`shared`] | `MessageCommon`, `MessageCommonBits`, `MessageCommonAlloc`, `FieldPresence`, `ValueSlot`, … |
-//! | [`wire`] | `SingularType`, `RepeatedElement`, `NumericalType`, fixed / varint markers |
-//! | [`singular`] | `SingularField` |
-//! | [`repeated`] | `RepeatedField` |
-//! | [`map`] | `MapKey`, `MapField` (hash map entries) |
-//! | [`oneof`] | `OneofSlot` |
+//! | [`shared`] | `MessageCommon`, presence / visitors / value layout |
+//! | [`wire`] | `SingularType`, markers, repeated-element traits |
+//! | [`singular`] | `SingularField` (+ bound views) |
+//! | [`repeated`] | `RepeatedField`, `Packed` / `Expanded` |
+//! | [`map`] | `MapField`, `MapKey` |
+//! | [`oneof`] | `OneofSlot`, `OneofView` |
 //! | [`oneof_variant`] | `OneofVariant` (field-number dispatch) |
 
 pub(crate) mod map;
