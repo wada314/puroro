@@ -1,27 +1,8 @@
 //! Fixed-width markers (`ProtoFixed32`, `ProtoFloat`, `ProtoDouble`, …).
 //!
-//! Wire codecs live on [`NumericalType`](super::numerical::NumericalType).
+//! Defined as [`Numerical`](super::numerical::Numerical) aliases in
+//! [`numerical`](super::numerical).
 
-/// Protobuf `fixed32`.
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
-pub struct ProtoFixed32;
-
-/// Protobuf `sfixed32`.
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
-pub struct ProtoSFixed32;
-
-/// Protobuf `float`.
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
-pub struct ProtoFloat;
-
-/// Protobuf `fixed64`.
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
-pub struct ProtoFixed64;
-
-/// Protobuf `sfixed64`.
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
-pub struct ProtoSFixed64;
-
-/// Protobuf `double`.
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
-pub struct ProtoDouble;
+pub use super::numerical::{
+    ProtoDouble, ProtoFixed32, ProtoFixed64, ProtoFloat, ProtoSFixed32, ProtoSFixed64,
+};

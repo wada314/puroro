@@ -1,33 +1,43 @@
-//! Codec for numerical protobuf **types** (`int32` / `ProtoInt32`,
-//! `bool` / [`ProtoBool`](super::varint::ProtoBool), `fixed64` / `ProtoFixed64`,
-//! open/closed enums, … — not Len types such as string / bytes / message).
+//! Numerical protobuf **types** via [`Numerical`]`<C>` ([`NumericalType`] codec).
 //!
-//! [`NativeType`](NumericalType::NativeType) is the host-language copy value used for
-//! encode/decode and field get/set — not necessarily the singular struct slot
-//! type (`AddressableSlot` lives on [`PayloadAccess`](super::singular_type::PayloadAccess);
-//! singular [`ProtoBool`](super::varint::ProtoBool) uses [`BitPacked`](crate::BitPacked)).
+//! Covers `int32` / [`ProtoInt32`], `bool` / [`ProtoBool`], `fixed64` /
+//! [`ProtoFixed64`], open/closed enums, … — not Len types such as string /
+//! bytes / message.
+//!
+//! Method 1 style: blankets go on [`Numerical`]`<C>`, so they do not collide
+//! with [`LenScalar`](super::len::LenScalar) blankets. [`NumericalType`] is the
+//! codec (parallel to [`LenCodec`](super::len::LenCodec)); prefer the
+//! [`ProtoInt32`] / … aliases in generated code.
+//!
+//! [`NativeType`](NumericalType::NativeType) is the host-language copy value used
+//! for encode/decode and field get/set — not necessarily the singular struct
+//! slot type (`AddressableSlot` lives on
+//! [`PayloadAccess`](super::singular_type::PayloadAccess); singular
+//! [`ProtoBool`] uses [`BitPacked`](crate::BitPacked)).
 //! Maps `NativeType` ↔ [`WireBody`](NumericalType::WireBody)
 //! ([`CopyWirePayload`](super::wire_payload::CopyWirePayload)).
-//! Tagged encode is the [`EncodeType`](super::encode_type::EncodeType) blanket
-//! over `NumericalType`. Packed repeated merge / encode live on
-//! [`RepeatedElementMerge`](super::repeated_element::RepeatedElementMerge) /
-//! [`PackableRepeatedElement`](super::repeated_element::PackableRepeatedElement).
+
+use ::core::marker::PhantomData;
 
 use ::protobuf_core::Varint;
 
 use ::puroro::DecodeError;
 
-use super::fixed::{
-    ProtoDouble, ProtoFixed32, ProtoFixed64, ProtoFloat, ProtoSFixed32, ProtoSFixed64,
-};
-use super::varint::{
-    Closed, ClosedEnum, Open, OpenEnum, ProtoBool, ProtoEnum, ProtoInt32, ProtoInt64, ProtoSInt32,
-    ProtoSInt64, ProtoUInt32, ProtoUInt64,
-};
+use super::varint::{Closed, ClosedEnum, Open, OpenEnum};
 use super::wire_payload::{CopyWirePayload, Fixed32Payload, Fixed64Payload, VarintPayload};
 
-/// Numerical protobuf **type** marker (e.g. `ProtoInt32`, `ProtoBool`,
-/// `ProtoFixed64`, `ProtoEnum<…>` — not `string` / `bytes` / message).
+/// Numerical protobuf type marker, parametrised by [`NumericalType`] codec.
+///
+/// Public so [`ProtoInt32`] / … aliases can be crate-root re-exports; prefer
+/// those aliases in generated code. Not re-exported from the crate root.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
+pub struct Numerical<C>(PhantomData<C>);
+
+/// Codec for a numerical protobuf type (`int32`, `bool`, open enum, …).
+///
+/// `pub` because it appears in bounds of public trait impls on [`Numerical`]
+/// (same reason [`LenCodec`](super::len::LenCodec) is public). Not re-exported
+/// from the crate root.
 pub trait NumericalType: Sized {
     /// Host-language value for encode/decode and field get/set (not necessarily
     /// the singular struct slot type).
@@ -42,12 +52,18 @@ pub trait NumericalType: Sized {
 }
 
 // ---------------------------------------------------------------------------
-// Varint numerics
+// Varint codecs + aliases
 // ---------------------------------------------------------------------------
 
-macro_rules! impl_varint_numerical {
-    ($marker:ty, $inner:ty, decode = $decode:expr, encode = $encode:expr $(,)?) => {
-        impl NumericalType for $marker {
+macro_rules! varint_numerical {
+    ($codec:ident, $alias:ident, $inner:ty, decode = $decode:expr, encode = $encode:expr $(,)?) => {
+        #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
+        pub struct $codec;
+
+        /// Protobuf type marker (see [`Numerical`] visibility note).
+        pub type $alias = Numerical<$codec>;
+
+        impl NumericalType for $codec {
             type NativeType = $inner;
             type WireBody = VarintPayload;
 
@@ -64,49 +80,56 @@ macro_rules! impl_varint_numerical {
     };
 }
 
-impl_varint_numerical! {
+varint_numerical! {
+    UInt32Codec,
     ProtoUInt32,
     u32,
     decode = |raw: Varint| raw.try_to_uint32().map_err(DecodeError::from),
     encode = Varint::from_uint32,
 }
 
-impl_varint_numerical! {
+varint_numerical! {
+    UInt64Codec,
     ProtoUInt64,
     u64,
     decode = |raw: Varint| Ok(raw.to_uint64()),
     encode = Varint::from_uint64,
 }
 
-impl_varint_numerical! {
+varint_numerical! {
+    Int32Codec,
     ProtoInt32,
     i32,
     decode = |raw: Varint| raw.try_to_int32().map_err(DecodeError::from),
     encode = Varint::from_int32,
 }
 
-impl_varint_numerical! {
+varint_numerical! {
+    Int64Codec,
     ProtoInt64,
     i64,
     decode = |raw: Varint| Ok(raw.to_int64()),
     encode = Varint::from_int64,
 }
 
-impl_varint_numerical! {
+varint_numerical! {
+    SInt32Codec,
     ProtoSInt32,
     i32,
     decode = |raw: Varint| raw.try_to_sint32().map_err(DecodeError::from),
     encode = Varint::from_sint32,
 }
 
-impl_varint_numerical! {
+varint_numerical! {
+    SInt64Codec,
     ProtoSInt64,
     i64,
     decode = |raw: Varint| Ok(raw.to_sint64()),
     encode = Varint::from_sint64,
 }
 
-impl_varint_numerical! {
+varint_numerical! {
+    BoolCodec,
     ProtoBool,
     bool,
     decode = |raw: Varint| Ok(raw.to_bool()),
@@ -114,10 +137,17 @@ impl_varint_numerical! {
 }
 
 // ---------------------------------------------------------------------------
-// Enums
+// Enum codec + alias
 // ---------------------------------------------------------------------------
 
-impl<E: OpenEnum> NumericalType for ProtoEnum<E, Open> {
+/// Open/closed enum codec for [`ProtoEnum`].
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
+pub struct EnumCodec<E, K>(PhantomData<(E, K)>);
+
+/// Allocator-free enum type marker (`Open` / `Closed`).
+pub type ProtoEnum<E, K> = Numerical<EnumCodec<E, K>>;
+
+impl<E: OpenEnum> NumericalType for EnumCodec<E, Open> {
     type NativeType = E;
     type WireBody = VarintPayload;
 
@@ -133,7 +163,7 @@ impl<E: OpenEnum> NumericalType for ProtoEnum<E, Open> {
     }
 }
 
-impl<E: ClosedEnum> NumericalType for ProtoEnum<E, Closed> {
+impl<E: ClosedEnum> NumericalType for EnumCodec<E, Closed> {
     type NativeType = E;
     type WireBody = VarintPayload;
 
@@ -152,12 +182,18 @@ impl<E: ClosedEnum> NumericalType for ProtoEnum<E, Closed> {
 }
 
 // ---------------------------------------------------------------------------
-// Fixed32 / Fixed64
+// Fixed32 / Fixed64 codecs + aliases
 // ---------------------------------------------------------------------------
 
-macro_rules! impl_fixed32_numerical {
-    ($marker:ty, $inner:ty) => {
-        impl NumericalType for $marker {
+macro_rules! fixed32_numerical {
+    ($codec:ident, $alias:ident, $inner:ty) => {
+        #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
+        pub struct $codec;
+
+        /// Protobuf type marker (see [`Numerical`] visibility note).
+        pub type $alias = Numerical<$codec>;
+
+        impl NumericalType for $codec {
             type NativeType = $inner;
             type WireBody = Fixed32Payload;
 
@@ -174,9 +210,15 @@ macro_rules! impl_fixed32_numerical {
     };
 }
 
-macro_rules! impl_fixed64_numerical {
-    ($marker:ty, $inner:ty) => {
-        impl NumericalType for $marker {
+macro_rules! fixed64_numerical {
+    ($codec:ident, $alias:ident, $inner:ty) => {
+        #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
+        pub struct $codec;
+
+        /// Protobuf type marker (see [`Numerical`] visibility note).
+        pub type $alias = Numerical<$codec>;
+
+        impl NumericalType for $codec {
             type NativeType = $inner;
             type WireBody = Fixed64Payload;
 
@@ -193,9 +235,9 @@ macro_rules! impl_fixed64_numerical {
     };
 }
 
-impl_fixed32_numerical!(ProtoFixed32, u32);
-impl_fixed32_numerical!(ProtoSFixed32, i32);
-impl_fixed32_numerical!(ProtoFloat, f32);
-impl_fixed64_numerical!(ProtoFixed64, u64);
-impl_fixed64_numerical!(ProtoSFixed64, i64);
-impl_fixed64_numerical!(ProtoDouble, f64);
+fixed32_numerical!(Fixed32Codec, ProtoFixed32, u32);
+fixed32_numerical!(SFixed32Codec, ProtoSFixed32, i32);
+fixed32_numerical!(FloatCodec, ProtoFloat, f32);
+fixed64_numerical!(Fixed64Codec, ProtoFixed64, u64);
+fixed64_numerical!(SFixed64Codec, ProtoSFixed64, i64);
+fixed64_numerical!(DoubleCodec, ProtoDouble, f64);

@@ -19,7 +19,7 @@ use super::{
     value_slot::{AddressableSlot, ValueSlot, ValueSlotMutAccess},
 };
 use crate::decode;
-use crate::fields::wire::numerical::NumericalType;
+use crate::fields::wire::numerical::{BoolCodec, NumericalType};
 use crate::fields::wire::singular_type::{PayloadAccess, SingularType};
 use crate::fields::wire::varint::ProtoBool;
 use crate::fields::wire::wire_payload::{CopyWirePayload, VarintPayload};
@@ -247,7 +247,7 @@ where
         MessageCommon<Pb, A>: MessageCommonBits,
         B: DecodeBuf,
     {
-        match ProtoBool::from_wire_body(VarintPayload::decode(wire_type, buf)?) {
+        match BoolCodec::from_wire_body(VarintPayload::decode(wire_type, buf)?) {
             Ok(new) => {
                 Self::write(slot, init, common, new);
                 Ok(())

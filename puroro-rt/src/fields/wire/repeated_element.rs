@@ -20,10 +20,8 @@
 //! `encode_element` entry point).
 
 use ::allocator_api2::alloc::Allocator;
-use ::allocator_api2::vec::Vec as AllocVec;
 use ::bytes::{Buf, BufMut};
 use ::core::ops::{Deref, DerefMut};
-use ::unmanaged::{UnmanagedString, UnmanagedVec};
 
 use ::puroro::{DecodeBuf, DecodeError, Message, WireType};
 
@@ -35,10 +33,9 @@ use ::unmanaged::DeallocateIn;
 use ::protobuf_core::{FIXED32_BYTES, FIXED64_BYTES};
 
 use super::encode_type::EncodeType;
-use super::len::{ProtoBytes, ProtoString};
-use super::numerical::NumericalType;
+use super::len::{LenCodec, LenScalar};
+use super::numerical::{Numerical, NumericalType};
 use super::proto_message::ProtoMessage;
-use super::singular_type::SingularType;
 use super::wire_payload::{CopyWirePayload, WirePayload};
 
 /// Wire + storage for one element of a repeated / map field of marker `Self`.
@@ -171,17 +168,17 @@ pub trait RepeatedElementMut: RepeatedElement {
 // Numerical markers (varint / fixed / enum) — one blanket for all families
 // ---------------------------------------------------------------------------
 
-impl<T: NumericalType> RepeatedElement for T {
-    type Element<A: Allocator + Clone> = T::NativeType;
-    type RefView = T::NativeType;
+impl<C: NumericalType> RepeatedElement for Numerical<C> {
+    type Element<A: Allocator + Clone> = C::NativeType;
+    type RefView = C::NativeType;
 
     #[inline]
-    fn as_ref_view<A: Allocator + Clone>(elem: &T::NativeType) -> &T::NativeType {
+    fn as_ref_view<A: Allocator + Clone>(elem: &C::NativeType) -> &C::NativeType {
         elem
     }
 
     #[inline]
-    fn wire_view<'a, A: Allocator + Clone>(elem: &'a T::NativeType) -> T::NativeType
+    fn wire_view<'a, A: Allocator + Clone>(elem: &'a C::NativeType) -> C::NativeType
     where
         Self: 'a,
     {
@@ -189,13 +186,13 @@ impl<T: NumericalType> RepeatedElement for T {
     }
 
     #[inline]
-    unsafe fn deallocate_element<A: Allocator + Clone>(_elem: T::NativeType, _alloc: A) {}
+    unsafe fn deallocate_element<A: Allocator + Clone>(_elem: C::NativeType, _alloc: A) {}
 }
 
-impl<A: Allocator + Clone, T: NumericalType> RepeatedElementMerge<A> for T {
+impl<A: Allocator + Clone, C: NumericalType> RepeatedElementMerge<A> for Numerical<C> {
     #[inline]
-    fn default_element(_alloc: A) -> T::NativeType {
-        T::NativeType::default()
+    fn default_element(_alloc: A) -> C::NativeType {
+        C::NativeType::default()
     }
 
     #[inline]
@@ -204,8 +201,8 @@ impl<A: Allocator + Clone, T: NumericalType> RepeatedElementMerge<A> for T {
         buf: &mut B,
         _alloc: A,
         _depth: usize,
-    ) -> Result<T::NativeType, DecodeError> {
-        T::from_wire_body(T::WireBody::decode(wire_type, buf)?)
+    ) -> Result<C::NativeType, DecodeError> {
+        C::from_wire_body(C::WireBody::decode(wire_type, buf)?)
     }
 
     fn merge_occurrence<B, F>(
@@ -217,9 +214,9 @@ impl<A: Allocator + Clone, T: NumericalType> RepeatedElementMerge<A> for T {
     ) -> Result<(), DecodeError>
     where
         B: DecodeBuf,
-        F: FnMut(T::NativeType),
+        F: FnMut(C::NativeType),
     {
-        match <T::WireBody as WirePayload>::WIRE_TYPE {
+        match <C::WireBody as WirePayload>::WIRE_TYPE {
             WireType::Varint => match wire_type {
                 WireType::Len => {
                     let len = decode::decode_varint(buf)? as usize;
@@ -228,7 +225,7 @@ impl<A: Allocator + Clone, T: NumericalType> RepeatedElementMerge<A> for T {
                     }
                     let mut sub = buf.take(len);
                     while sub.has_remaining() {
-                        push(T::from_wire_body(T::WireBody::decode(
+                        push(C::from_wire_body(C::WireBody::decode(
                             WireType::Varint,
                             &mut sub,
                         )?)?);
@@ -236,7 +233,7 @@ impl<A: Allocator + Clone, T: NumericalType> RepeatedElementMerge<A> for T {
                     Ok(())
                 }
                 WireType::Varint => {
-                    push(T::from_wire_body(T::WireBody::decode(
+                    push(C::from_wire_body(C::WireBody::decode(
                         WireType::Varint,
                         buf,
                     )?)?);
@@ -255,7 +252,7 @@ impl<A: Allocator + Clone, T: NumericalType> RepeatedElementMerge<A> for T {
                     }
                     let mut sub = buf.take(len);
                     while sub.has_remaining() {
-                        push(T::from_wire_body(T::WireBody::decode(
+                        push(C::from_wire_body(C::WireBody::decode(
                             WireType::Int32,
                             &mut sub,
                         )?)?);
@@ -263,7 +260,7 @@ impl<A: Allocator + Clone, T: NumericalType> RepeatedElementMerge<A> for T {
                     Ok(())
                 }
                 WireType::Int32 => {
-                    push(T::from_wire_body(T::WireBody::decode(
+                    push(C::from_wire_body(C::WireBody::decode(
                         WireType::Int32,
                         buf,
                     )?)?);
@@ -282,7 +279,7 @@ impl<A: Allocator + Clone, T: NumericalType> RepeatedElementMerge<A> for T {
                     }
                     let mut sub = buf.take(len);
                     while sub.has_remaining() {
-                        push(T::from_wire_body(T::WireBody::decode(
+                        push(C::from_wire_body(C::WireBody::decode(
                             WireType::Int64,
                             &mut sub,
                         )?)?);
@@ -290,7 +287,7 @@ impl<A: Allocator + Clone, T: NumericalType> RepeatedElementMerge<A> for T {
                     Ok(())
                 }
                 WireType::Int64 => {
-                    push(T::from_wire_body(T::WireBody::decode(
+                    push(C::from_wire_body(C::WireBody::decode(
                         WireType::Int64,
                         buf,
                     )?)?);
@@ -305,46 +302,46 @@ impl<A: Allocator + Clone, T: NumericalType> RepeatedElementMerge<A> for T {
     }
 }
 
-impl<T: NumericalType> PackableRepeatedElement for T {
+impl<C: NumericalType> PackableRepeatedElement for Numerical<C> {
     #[inline]
-    fn packed_payload_len<A: Allocator + Clone>(values: &[T::NativeType]) -> usize
+    fn packed_payload_len<A: Allocator + Clone>(values: &[C::NativeType]) -> usize
     where
-        T::NativeType: Copy,
+        C::NativeType: Copy,
     {
         // Packed numerics never need nested-length memoization.
         values
             .iter()
-            .map(|v| T::to_wire_body(*v).encoded_len())
+            .map(|v| C::to_wire_body(*v).encoded_len())
             .sum()
     }
 
     #[inline]
-    fn encode_packed_payload<A: Allocator + Clone, B: BufMut>(values: &[T::NativeType], buf: &mut B)
+    fn encode_packed_payload<A: Allocator + Clone, B: BufMut>(values: &[C::NativeType], buf: &mut B)
     where
-        T::NativeType: Copy,
+        C::NativeType: Copy,
     {
         for v in values {
-            T::to_wire_body(*v).encode(buf);
+            C::to_wire_body(*v).encode(buf);
         }
     }
 }
 
-impl<T: NumericalType> RepeatedVecMut for T {}
+impl<C: NumericalType> RepeatedVecMut for Numerical<C> {}
 
-impl<T: NumericalType> RepeatedElementMut for T {
-    type MutTarget<A: Allocator + Clone> = T::NativeType;
+impl<C: NumericalType> RepeatedElementMut for Numerical<C> {
+    type MutTarget<A: Allocator + Clone> = C::NativeType;
 
     type ElementMut<'a, A: Allocator + Clone>
-        = &'a mut T::NativeType
+        = &'a mut C::NativeType
     where
         Self: 'a,
         A: 'a;
 
     #[inline]
     unsafe fn element_mut<'a, A: Allocator + Clone + 'a>(
-        elem: &'a mut T::NativeType,
+        elem: &'a mut C::NativeType,
         _alloc: A,
-    ) -> &'a mut T::NativeType
+    ) -> &'a mut C::NativeType
     where
         Self: 'a,
     {
@@ -353,20 +350,20 @@ impl<T: NumericalType> RepeatedElementMut for T {
 }
 
 // ---------------------------------------------------------------------------
-// LEN markers
+// LEN scalars (`LenScalar<C>`)
 // ---------------------------------------------------------------------------
 
-impl RepeatedElement for ProtoString {
-    type Element<A: Allocator + Clone> = UnmanagedString<A>;
-    type RefView = str;
+impl<C: LenCodec> RepeatedElement for LenScalar<C> {
+    type Element<A: Allocator + Clone> = C::Slot<A>;
+    type RefView = C::RefView;
 
     #[inline]
-    fn as_ref_view<A: Allocator + Clone>(elem: &UnmanagedString<A>) -> &str {
+    fn as_ref_view<A: Allocator + Clone>(elem: &C::Slot<A>) -> &C::RefView {
         Deref::deref(elem)
     }
 
     #[inline]
-    fn wire_view<'a, A: Allocator + Clone>(elem: &'a UnmanagedString<A>) -> &'a str
+    fn wire_view<'a, A: Allocator + Clone>(elem: &'a C::Slot<A>) -> &'a C::RefView
     where
         Self: 'a,
     {
@@ -374,16 +371,16 @@ impl RepeatedElement for ProtoString {
     }
 
     #[inline]
-    unsafe fn deallocate_element<A: Allocator + Clone>(elem: UnmanagedString<A>, alloc: A) {
+    unsafe fn deallocate_element<A: Allocator + Clone>(elem: C::Slot<A>, alloc: A) {
         // SAFETY: forwarded to the caller's obligation on `alloc`.
         unsafe { DeallocateIn::deallocate_in(elem, alloc) };
     }
 }
 
-impl<A: Allocator + Clone> RepeatedElementMerge<A> for ProtoString {
+impl<A: Allocator + Clone, C: LenCodec> RepeatedElementMerge<A> for LenScalar<C> {
     #[inline]
-    fn default_element(alloc: A) -> UnmanagedString<A> {
-        UnmanagedString::new(alloc)
+    fn default_element(alloc: A) -> C::Slot<A> {
+        C::new_slot(alloc)
     }
 
     #[inline]
@@ -392,11 +389,11 @@ impl<A: Allocator + Clone> RepeatedElementMerge<A> for ProtoString {
         buf: &mut B,
         alloc: A,
         _depth: usize,
-    ) -> Result<UnmanagedString<A>, DecodeError> {
+    ) -> Result<C::Slot<A>, DecodeError> {
         if wire_type != WireType::Len {
             return Err(DecodeError::InvalidTag);
         }
-        decode::decode_string_in(buf, alloc)
+        C::decode_in(buf, alloc)
     }
 
     #[inline]
@@ -409,114 +406,32 @@ impl<A: Allocator + Clone> RepeatedElementMerge<A> for ProtoString {
     ) -> Result<(), DecodeError>
     where
         B: DecodeBuf,
-        F: FnMut(UnmanagedString<A>),
+        F: FnMut(C::Slot<A>),
     {
         push(Self::decode_element(wire_type, buf, alloc, _depth)?);
         Ok(())
     }
 }
 
-impl RepeatedElementMut for ProtoString {
-    type MutTarget<A: Allocator + Clone> = ::unmanaged::String<A>;
+impl<C: LenCodec> RepeatedElementMut for LenScalar<C> {
+    type MutTarget<A: Allocator + Clone> = C::MutTarget<A>;
 
     type ElementMut<'a, A: Allocator + Clone>
-        = <Self as SingularType>::Mut<'a, A>
+        = C::Mut<'a, A>
     where
         Self: 'a,
         A: 'a;
 
     #[inline]
     unsafe fn element_mut<'a, A: Allocator + Clone + 'a>(
-        elem: &'a mut UnmanagedString<A>,
+        elem: &'a mut C::Slot<A>,
         alloc: A,
     ) -> Self::ElementMut<'a, A>
     where
         Self: 'a,
     {
         // SAFETY: caller guarantees `alloc` owns `elem`'s buffer.
-        unsafe { elem.with_alloc(alloc) }
-    }
-}
-
-impl RepeatedElement for ProtoBytes {
-    type Element<A: Allocator + Clone> = UnmanagedVec<u8, A>;
-    type RefView = [u8];
-
-    #[inline]
-    fn as_ref_view<A: Allocator + Clone>(elem: &UnmanagedVec<u8, A>) -> &[u8] {
-        Deref::deref(elem)
-    }
-
-    #[inline]
-    fn wire_view<'a, A: Allocator + Clone>(elem: &'a UnmanagedVec<u8, A>) -> &'a [u8]
-    where
-        Self: 'a,
-    {
-        Deref::deref(elem)
-    }
-
-    #[inline]
-    unsafe fn deallocate_element<A: Allocator + Clone>(elem: UnmanagedVec<u8, A>, alloc: A) {
-        // SAFETY: forwarded to the caller's obligation on `alloc`.
-        unsafe { DeallocateIn::deallocate_in(elem, alloc) };
-    }
-}
-
-impl<A: Allocator + Clone> RepeatedElementMerge<A> for ProtoBytes {
-    #[inline]
-    fn default_element(alloc: A) -> UnmanagedVec<u8, A> {
-        UnmanagedVec::new(alloc)
-    }
-
-    #[inline]
-    fn decode_element<B: DecodeBuf>(
-        wire_type: WireType,
-        buf: &mut B,
-        alloc: A,
-        _depth: usize,
-    ) -> Result<UnmanagedVec<u8, A>, DecodeError> {
-        if wire_type != WireType::Len {
-            return Err(DecodeError::InvalidTag);
-        }
-        decode::decode_bytes_in(buf, alloc)
-    }
-
-    #[inline]
-    fn merge_occurrence<B, F>(
-        wire_type: WireType,
-        buf: &mut B,
-        alloc: A,
-        _depth: usize,
-        mut push: F,
-    ) -> Result<(), DecodeError>
-    where
-        B: DecodeBuf,
-        F: FnMut(UnmanagedVec<u8, A>),
-    {
-        push(Self::decode_element(wire_type, buf, alloc, _depth)?);
-        Ok(())
-    }
-}
-
-impl RepeatedElementMut for ProtoBytes {
-    type MutTarget<A: Allocator + Clone> = AllocVec<u8, A>;
-
-    type ElementMut<'a, A: Allocator + Clone>
-        = <Self as SingularType>::Mut<'a, A>
-    where
-        Self: 'a,
-        A: 'a;
-
-    #[inline]
-    unsafe fn element_mut<'a, A: Allocator + Clone + 'a>(
-        elem: &'a mut UnmanagedVec<u8, A>,
-        alloc: A,
-    ) -> Self::ElementMut<'a, A>
-    where
-        Self: 'a,
-    {
-        // SAFETY: caller guarantees `alloc` owns `elem`'s buffer.
-        unsafe { elem.with_alloc(alloc) }
+        unsafe { C::slot_with_alloc(elem, alloc) }
     }
 }
 

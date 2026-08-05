@@ -17,8 +17,8 @@ use ::puroro::{Message, WireType};
 use crate::encode;
 use crate::message_encode::{EncodeCtx, MessageEncode};
 
-use super::len::{ProtoBytes, ProtoString};
-use super::numerical::NumericalType;
+use super::len::{LenCodec, LenScalar};
+use super::numerical::{Numerical, NumericalType};
 use super::proto_message::ProtoMessage;
 use super::wire_payload::WirePayload;
 
@@ -106,37 +106,37 @@ pub(crate) fn encode_field<'a, T, A, B>(
     }
 }
 
-impl<T: NumericalType> EncodeType for T {
+impl<C: NumericalType> EncodeType for Numerical<C> {
     type View<'a, A: Allocator + Clone>
-        = T::NativeType
+        = C::NativeType
     where
         Self: 'a,
         A: 'a;
 
-    const WIRE_TYPE: WireType = <T::WireBody as WirePayload>::WIRE_TYPE;
+    const WIRE_TYPE: WireType = <C::WireBody as WirePayload>::WIRE_TYPE;
 
     #[inline]
-    fn payload_len<'a, A: Allocator + Clone>(value: T::NativeType, _ctx: &mut EncodeCtx) -> usize
+    fn payload_len<'a, A: Allocator + Clone>(value: C::NativeType, _ctx: &mut EncodeCtx) -> usize
     where
         Self: 'a,
     {
-        T::to_wire_body(value).encoded_len()
+        C::to_wire_body(value).encoded_len()
     }
 
     #[inline]
-    fn encode_payload<'a, A, B>(value: T::NativeType, _ctx: &mut EncodeCtx, buf: &mut B)
+    fn encode_payload<'a, A, B>(value: C::NativeType, _ctx: &mut EncodeCtx, buf: &mut B)
     where
         Self: 'a,
         A: Allocator + Clone,
         B: BufMut,
     {
-        T::to_wire_body(value).encode(buf);
+        C::to_wire_body(value).encode(buf);
     }
 }
 
-impl EncodeType for ProtoString {
+impl<C: LenCodec> EncodeType for LenScalar<C> {
     type View<'a, A: Allocator + Clone>
-        = &'a str
+        = &'a C::RefView
     where
         Self: 'a,
         A: 'a;
@@ -144,53 +144,24 @@ impl EncodeType for ProtoString {
     const WIRE_TYPE: WireType = WireType::Len;
 
     #[inline]
-    fn payload_len<'a, A: Allocator + Clone>(value: &'a str, _ctx: &mut EncodeCtx) -> usize
+    fn payload_len<'a, A: Allocator + Clone>(value: &'a C::RefView, _ctx: &mut EncodeCtx) -> usize
     where
         Self: 'a,
     {
-        let n = value.len();
+        let n = C::as_wire_bytes(value).len();
         encode::encoded_len_varint(n as u64) + n
     }
 
     #[inline]
-    fn encode_payload<'a, A, B>(value: &'a str, _ctx: &mut EncodeCtx, buf: &mut B)
+    fn encode_payload<'a, A, B>(value: &'a C::RefView, _ctx: &mut EncodeCtx, buf: &mut B)
     where
         Self: 'a,
         A: Allocator + Clone,
         B: BufMut,
     {
-        encode::encode_varint(value.len() as u64, buf);
-        buf.put_slice(value.as_bytes());
-    }
-}
-
-impl EncodeType for ProtoBytes {
-    type View<'a, A: Allocator + Clone>
-        = &'a [u8]
-    where
-        Self: 'a,
-        A: 'a;
-
-    const WIRE_TYPE: WireType = WireType::Len;
-
-    #[inline]
-    fn payload_len<'a, A: Allocator + Clone>(value: &'a [u8], _ctx: &mut EncodeCtx) -> usize
-    where
-        Self: 'a,
-    {
-        let n = value.len();
-        encode::encoded_len_varint(n as u64) + n
-    }
-
-    #[inline]
-    fn encode_payload<'a, A, B>(value: &'a [u8], _ctx: &mut EncodeCtx, buf: &mut B)
-    where
-        Self: 'a,
-        A: Allocator + Clone,
-        B: BufMut,
-    {
-        encode::encode_varint(value.len() as u64, buf);
-        buf.put_slice(value);
+        let bytes = C::as_wire_bytes(value);
+        encode::encode_varint(bytes.len() as u64, buf);
+        buf.put_slice(bytes);
     }
 }
 

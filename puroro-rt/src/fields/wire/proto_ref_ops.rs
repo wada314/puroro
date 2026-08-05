@@ -7,8 +7,8 @@ use ::core::fmt::{Debug, Formatter, Result as FmtResult};
 
 use ::puroro::Message;
 
-use super::len::{ProtoBytes, ProtoString};
-use super::numerical::NumericalType;
+use super::len::{LenCodec, LenScalar};
+use super::numerical::{Numerical, NumericalType};
 use super::proto_message::ProtoMessage;
 use super::singular_type::SingularType;
 use super::varint::ProtoBool;
@@ -48,14 +48,14 @@ pub(crate) trait ProtoRefDebug<A: Allocator + Clone>: SingularType {
 
 // Addressable numerical markers (`Ref = NativeType`): int / fixed / float / enum.
 // `ProtoBool` is separate (native `bool`, singular `Slot = ()`).
-impl<T, A> ProtoRefEq<A> for T
+impl<C, A> ProtoRefEq<A> for Numerical<C>
 where
-    T: NumericalType,
-    T::NativeType: PartialEq + AddressableSlot,
+    C: NumericalType,
+    C::NativeType: PartialEq + AddressableSlot,
     A: Allocator + Clone,
 {
     #[inline]
-    fn option_eq<'a>(lhs: Option<T::NativeType>, rhs: Option<T::NativeType>) -> bool
+    fn option_eq<'a>(lhs: Option<C::NativeType>, rhs: Option<C::NativeType>) -> bool
     where
         A: 'a,
     {
@@ -63,14 +63,14 @@ where
     }
 }
 
-impl<T, A> ProtoRefDebug<A> for T
+impl<C, A> ProtoRefDebug<A> for Numerical<C>
 where
-    T: NumericalType,
-    T::NativeType: Debug + AddressableSlot,
+    C: NumericalType,
+    C::NativeType: Debug + AddressableSlot,
     A: Allocator + Clone,
 {
     #[inline]
-    fn fmt_ref<'a>(value: &T::NativeType, f: &mut Formatter<'_>) -> FmtResult
+    fn fmt_ref<'a>(value: &C::NativeType, f: &mut Formatter<'_>) -> FmtResult
     where
         A: 'a,
     {
@@ -98,9 +98,9 @@ impl<A: Allocator + Clone> ProtoRefDebug<A> for ProtoBool {
     }
 }
 
-impl<A: Allocator + Clone> ProtoRefEq<A> for ProtoString {
+impl<A: Allocator + Clone, C: LenCodec> ProtoRefEq<A> for LenScalar<C> {
     #[inline]
-    fn option_eq<'a>(lhs: Option<&'a str>, rhs: Option<&'a str>) -> bool
+    fn option_eq<'a>(lhs: Option<&'a C::RefView>, rhs: Option<&'a C::RefView>) -> bool
     where
         A: 'a,
     {
@@ -108,29 +108,9 @@ impl<A: Allocator + Clone> ProtoRefEq<A> for ProtoString {
     }
 }
 
-impl<A: Allocator + Clone> ProtoRefDebug<A> for ProtoString {
+impl<A: Allocator + Clone, C: LenCodec> ProtoRefDebug<A> for LenScalar<C> {
     #[inline]
-    fn fmt_ref<'a>(value: &&'a str, f: &mut Formatter<'_>) -> FmtResult
-    where
-        A: 'a,
-    {
-        Debug::fmt(value, f)
-    }
-}
-
-impl<A: Allocator + Clone> ProtoRefEq<A> for ProtoBytes {
-    #[inline]
-    fn option_eq<'a>(lhs: Option<&'a [u8]>, rhs: Option<&'a [u8]>) -> bool
-    where
-        A: 'a,
-    {
-        lhs == rhs
-    }
-}
-
-impl<A: Allocator + Clone> ProtoRefDebug<A> for ProtoBytes {
-    #[inline]
-    fn fmt_ref<'a>(value: &&'a [u8], f: &mut Formatter<'_>) -> FmtResult
+    fn fmt_ref<'a>(value: &&'a C::RefView, f: &mut Formatter<'_>) -> FmtResult
     where
         A: 'a,
     {

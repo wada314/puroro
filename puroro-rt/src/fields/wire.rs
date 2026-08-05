@@ -1,4 +1,4 @@
-//! Wire-encoding types (`NumericalType`, `SingularType`, …).
+//! Wire-encoding types (`Numerical` / `LenScalar`, `SingularType`, …).
 //!
 //! Singular fields use allocator-free type markers (`ProtoInt32`, …) and store
 //! [`SingularType::Slot`]. Repeated fields store [`RepeatedElement::Element`]
