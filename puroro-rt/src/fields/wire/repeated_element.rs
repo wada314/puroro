@@ -11,7 +11,7 @@
 //! repeated getters. Distinct from [`EncodeType::View`](super::encode_type::EncodeType::View)
 //! (encode / singular getter; numerics are by-value).
 //!
-//! Singular [`ProtoBool`](super::varint::ProtoBool) uses bit-packed storage;
+//! Singular [`ProtoBool`](super::numerical::ProtoBool) uses bit-packed storage;
 //! repeated uses plain `bool` elements via [`NumericalType`](super::numerical::NumericalType)
 //! blankets (no MessageCommon bit).
 //!

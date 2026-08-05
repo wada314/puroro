@@ -1,5 +1,5 @@
 //! Singular (non-repeated) field semantics for protobuf **type** markers
-//! (e.g. `int32` / [`ProtoInt32`](super::varint::ProtoInt32), `string` /
+//! (e.g. `int32` / [`ProtoInt32`](super::numerical::ProtoInt32), `string` /
 //! [`ProtoString`](super::len::ProtoString) — not wire shapes like Varint / Len).
 //!
 //! Markers are allocator-free. Physical storage / views are GATs parametrised by `A`.
@@ -20,7 +20,7 @@
 //! (`Element` storage). Numerical markers (including `ProtoBool`) share
 //! [`NumericalType`](super::numerical::NumericalType) for `NativeType` ↔ `WireBody`
 //! mapping; inline slot storage stays on [`PayloadAccess`] (`NativeType: AddressableSlot`).
-//! Singular [`ProtoBool`](super::varint::ProtoBool) uses `Slot = ()` + [`BitPacked`].
+//! Singular [`ProtoBool`](super::numerical::ProtoBool) uses `Slot = ()` + [`BitPacked`].
 
 use ::allocator_api2::alloc::Allocator;
 use ::bitvec::{
@@ -42,8 +42,7 @@ use crate::fields::shared::{
 
 use super::encode_type::EncodeType;
 use super::len::{LenCodec, LenScalar};
-use super::numerical::{Numerical, NumericalType};
-use super::varint::ProtoBool;
+use super::numerical::{Numerical, NumericalType, ProtoBool};
 use super::wire_payload::CopyWirePayload;
 
 /// Singular protobuf **type** marker (e.g. `ProtoInt32`, `ProtoString`) with

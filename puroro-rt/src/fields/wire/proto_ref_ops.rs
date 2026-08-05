@@ -8,10 +8,9 @@ use ::core::fmt::{Debug, Formatter, Result as FmtResult};
 use ::puroro::Message;
 
 use super::len::{LenCodec, LenScalar};
-use super::numerical::{Numerical, NumericalType};
+use super::numerical::{Numerical, NumericalType, ProtoBool};
 use super::proto_message::ProtoMessage;
 use super::singular_type::SingularType;
-use super::varint::ProtoBool;
 use crate::fields::shared::value_slot::AddressableSlot;
 use crate::message_encode::MessageEncode;
 

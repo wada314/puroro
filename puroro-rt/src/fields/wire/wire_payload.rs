@@ -1,6 +1,6 @@
 //! Untagged body for a protobuf **wire type** (e.g. `Varint`, `Len`).
 //!
-//! This is not a protobuf **type** such as `int32` / [`ProtoInt32`](super::varint::ProtoInt32)
+//! This is not a protobuf **type** such as `int32` / [`ProtoInt32`](super::numerical::ProtoInt32)
 //! or `string` / [`ProtoString`](super::len::ProtoString). Proto types map onto these
 //! shapes via [`NumericalType`](super::numerical::NumericalType) / [`EncodeType`](super::encode_type::EncodeType).
 //!

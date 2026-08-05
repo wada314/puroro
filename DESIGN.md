@@ -688,9 +688,9 @@ EXPLICIT presence: `is_set()` tracks the presence bit; `get()` returns `Priority
 
 Both open and closed enums produce a **newtype-over-`i32`** — not a Rust `enum`. Openness is a **type-level** distinction:
 
-- Markers [`Open`](puroro-rt/src/fields/wire/varint.rs) / [`Closed`](puroro-rt/src/fields/wire/varint.rs)
-- Traits [`OpenEnum`](puroro-rt/src/fields/wire/varint.rs) (`From<i32>`) / [`ClosedEnum`](puroro-rt/src/fields/wire/varint.rs) (`TryFrom<i32>`)
-- Field wrapper [`ProtoEnum<E, K>`](puroro-rt/src/fields/wire/varint.rs)
+- Markers [`Open`](puroro-rt/src/fields/wire/numerical.rs) / [`Closed`](puroro-rt/src/fields/wire/numerical.rs)
+- Traits [`OpenEnum`](puroro-rt/src/fields/wire/numerical.rs) (`From<i32>`) / [`ClosedEnum`](puroro-rt/src/fields/wire/numerical.rs) (`TryFrom<i32>`)
+- Field wrapper [`ProtoEnum<E, K>`](puroro-rt/src/fields/wire/numerical.rs)
 
 [`SingularField`](puroro-rt/src/fields/singular/field.rs) (alias `SingularField`) stores `ProtoEnum<E, K>` and reuses the same `optional()` / `value_mut()` paths as other singular scalars (getters still project to `E` / `&mut E`). Merge is a single decode-then-write path: closed enums signal unknowns via [`DecodeError::UnknownClosedEnum`](src/error.rs) from `decode_wire`, and `merge` catches that to append the raw varint to unknown fields (`TryFrom` is the single source of truth).
 
@@ -777,7 +777,7 @@ pub fn clear_notification(&mut self); // = notification_mut().clear()
 
 Note: enums cannot carry unused lifetime/allocator parameters via `PhantomData` (unlike a struct). Integer-only oneofs therefore omit `'a` / `A` from the shape and from `Ref`/`Mut` aliases when no variant payload needs them.
 
-**Variants own field wrappers, not raw storage.** A oneof member of a given kind reuses the exact field wrapper an ordinary singular field of that kind uses (`SingularField` / aliases — including [`ProtoBool`](puroro-rt/src/fields/wire/varint.rs) for `bool` and [`ProtoMessage`](puroro-rt/src/fields/wire/proto_message.rs) for messages), so the storage / `value` / `value_mut` / `deallocate` machinery is shared rather than reimplemented. The wrapper's *presence* is inert for a oneof — presence is tracked by the enclosing `OneofSlot` — so `FieldPresence::Oneof` is used (omit rules never consulted; bool still reads/writes its value bit).
+**Variants own field wrappers, not raw storage.** A oneof member of a given kind reuses the exact field wrapper an ordinary singular field of that kind uses (`SingularField` / aliases — including [`ProtoBool`](puroro-rt/src/fields/wire/numerical.rs) for `bool` and [`ProtoMessage`](puroro-rt/src/fields/wire/proto_message.rs) for messages), so the storage / `value` / `value_mut` / `deallocate` machinery is shared rather than reimplemented. The wrapper's *presence* is inert for a oneof — presence is tracked by the enclosing `OneofSlot` — so `FieldPresence::Oneof` is used (omit rules never consulted; bool still reads/writes its value bit).
 
 To keep generated code thin, each wrapper is driven with the **field's own** construction, merge, and access primitives — no bespoke helpers on the oneof enum. Empty construction uses [`DefaultIn`](puroro-rt/src/fields/shared.rs) on the variant's field wrapper (`SingularField::default_in` / `new_in`); mut paths use a single bind:
 

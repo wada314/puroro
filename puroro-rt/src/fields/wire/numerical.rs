@@ -17,14 +17,43 @@
 //! Maps `NativeType` ↔ [`WireBody`](NumericalType::WireBody)
 //! ([`CopyWirePayload`](super::wire_payload::CopyWirePayload)).
 
+use ::core::convert::TryFrom;
 use ::core::marker::PhantomData;
 
 use ::protobuf_core::Varint;
 
 use ::puroro::DecodeError;
 
-use super::varint::{Closed, ClosedEnum, Open, OpenEnum};
+use crate::fields::shared::value_slot::AddressableSlot;
+
 use super::wire_payload::{CopyWirePayload, Fixed32Payload, Fixed64Payload, VarintPayload};
+
+// ---------------------------------------------------------------------------
+// Enum kind markers
+// ---------------------------------------------------------------------------
+
+/// Open-enum kind marker for [`ProtoEnum`] (`enum_type = OPEN`).
+pub struct Open;
+
+/// Closed-enum kind marker for [`ProtoEnum`] (`enum_type = CLOSED`).
+pub struct Closed;
+
+/// Generated enum newtype storage: wire `i32` plus a known default.
+pub trait ProtoEnumStorage: Copy + PartialEq + Default + 'static {
+    /// Numeric value written on the wire.
+    fn to_wire(self) -> i32;
+}
+
+/// Open enum: unknown wire values are retained via [`From`]`<i32>`.
+pub trait OpenEnum: ProtoEnumStorage + From<i32> {}
+
+/// Closed enum: unknown wire values fail [`TryFrom`]`<i32>` and become unknowns.
+pub trait ClosedEnum: ProtoEnumStorage + TryFrom<i32, Error = i32> {}
+
+impl<E: ProtoEnumStorage> AddressableSlot for E {}
+
+// Enum storage types are `Copy` + `Default`; `CloneIn` / `DefaultIn` /
+// `DeallocateIn` come from `unmanaged` blankets.
 
 /// Numerical protobuf type marker, parametrised by [`NumericalType`] codec.
 ///

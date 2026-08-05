@@ -10,10 +10,7 @@ Context: Qiita-style Method 1 — blankets on `Numerical<C>` / `LenScalar<C>`, p
    - Numeric: `NumericalType` + `Numerical<C>` (`NumericalType` is the codec, despite the old name)
    - Consider renaming `NumericalType` → `NumericalCodec` (or similar) for parallel naming. Touch docs/comments that still say “marker implements NumericalType”.
 
-2. **Module layout**
-   - Concrete aliases / codecs live mainly in `puroro-rt/src/fields/wire/numerical.rs` and `len.rs`.
-   - `varint.rs` / `fixed.rs` mostly re-export aliases; enum kind traits (`Open` / `Closed` / `OpenEnum` / `ClosedEnum`) stay in `varint.rs`.
-   - Optional: flatten re-exports or document the split in `wire.rs` / `IMPLEMENTATION.md` so readers don’t hunt unit structs in `varint.rs`.
+2. **Module layout** — done: deleted `varint.rs` / `fixed.rs` re-export shells; enum kinds live in `numerical.rs`.
 
 3. **Diagnostics / rustdoc**
    - Errors and rustdoc may show `Numerical<Int32Codec>` / `LenScalar<StringCodec>` instead of `ProtoInt32` / `ProtoString`.

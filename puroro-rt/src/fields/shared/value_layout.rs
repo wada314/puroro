@@ -19,9 +19,9 @@ use super::{
     value_slot::{AddressableSlot, ValueSlot, ValueSlotMutAccess},
 };
 use crate::decode;
+use crate::fields::wire::numerical::ProtoBool;
 use crate::fields::wire::numerical::{BoolCodec, NumericalType};
 use crate::fields::wire::singular_type::{PayloadAccess, SingularType};
-use crate::fields::wire::varint::ProtoBool;
 use crate::fields::wire::wire_payload::{CopyWirePayload, VarintPayload};
 
 /// Where a singular field's logical value is stored.
