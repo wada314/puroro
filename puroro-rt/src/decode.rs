@@ -5,11 +5,15 @@
 
 use ::allocator_api2::alloc::Allocator;
 use ::bytes::Buf;
-use ::protobuf_core::{IteratorExtVarint, Tag, Varint};
+use ::protobuf_core::IteratorExtVarint;
+use ::puroro::wire_type;
 use ::puroro::{DecodeError, UnknownField, UnknownPayload, WireType};
 use ::unmanaged::{UnmanagedString, UnmanagedVec};
 
 use crate::encode;
+
+/// Maximum protobuf field number (`2^29 - 1`).
+const MAX_FIELD_NUMBER: u32 = 0x1FFF_FFFF;
 
 struct BufVarintReader<'a, B: Buf> {
     buf: &'a mut B,
@@ -36,10 +40,23 @@ pub(crate) fn decode_varint<B: Buf>(buf: &mut B) -> Result<u64, DecodeError> {
 }
 
 /// Decodes a tag and returns `(field_number, wire_type)`.
+///
+/// Validates wire type and field-number range without building intermediate
+/// [`protobuf_core::Tag`] / [`protobuf_core::FieldNumber`] wrappers.
 pub fn decode_tag<B: Buf>(buf: &mut B) -> Result<(u32, WireType), DecodeError> {
     let raw = decode_varint(buf)?;
-    let tag = Tag::try_from(Varint::from_uint64(raw))?;
-    Ok((u32::from(tag.field_number), tag.wire_type))
+    // Tag values are u32 on the wire; preserve the previous InvalidVarint mapping
+    // used when going through `Varint::try_to_uint32`.
+    if raw > u64::from(u32::MAX) {
+        return Err(DecodeError::InvalidVarint);
+    }
+    let raw = raw as u32;
+    let field_number = raw >> 3;
+    if field_number == 0 || field_number > MAX_FIELD_NUMBER {
+        return Err(DecodeError::InvalidTag);
+    }
+    let wire_type = wire_type::from_raw((raw & 0b111) as u8)?;
+    Ok((field_number, wire_type))
 }
 
 /// Decodes one LEN payload into an [`UnmanagedVec<u8, A>`].

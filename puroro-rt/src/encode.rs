@@ -1,12 +1,14 @@
 //! Wire-format encoding helpers used by generated field types.
 //!
-//! Varint and tag encoding delegate to [`protobuf_core`] (`Varint`, `Tag`).
-//! `BufMut` adapters live here because generated code targets `bytes` buffers.
+//! Varint encoding delegates to [`protobuf_core::Varint`]. Tags are packed as
+//! `(field_number << 3) | wire_type` without re-validating field numbers that
+//! the catalog / generated code already constrains. `BufMut` adapters live here
+//! because generated code targets `bytes` buffers.
 
 use ::allocator_api2::alloc::Allocator;
 use ::allocator_api2::vec::Vec as AllocVec;
 use ::bytes::BufMut;
-use ::protobuf_core::{FieldNumber, Tag, Varint};
+use ::protobuf_core::Varint;
 use ::puroro::WireType;
 
 /// Encoded tag as a raw varint numeric value (used when re-serialising unknown fields).
@@ -40,16 +42,17 @@ pub(crate) fn encode_tag<B: BufMut>(field_number: u32, wire_type: WireType, buf:
     encode_varint(tag_to_u64(field_number, wire_type), buf);
 }
 
+/// Pack a tag without `FieldNumber` / `Tag` validation.
+///
+/// Callers must pass a field number in `[1, 2^29 - 1]` (catalog constants and
+/// previously decoded tags). Debug builds assert the range.
 #[inline]
 fn tag_to_u64(field_number: u32, wire_type: WireType) -> u64 {
-    let field_number =
-        FieldNumber::try_new(field_number).expect("generated code uses valid field numbers");
-    Tag {
-        field_number,
-        wire_type,
-    }
-    .to_encoded()
-    .to_uint64()
+    debug_assert!(
+        (1..=0x1FFF_FFFF).contains(&field_number),
+        "field number out of protobuf range: {field_number}"
+    );
+    (u64::from(field_number) << 3) | u64::from(u8::from(wire_type))
 }
 
 /// Writes a varint field (tag + value) to `buf`.

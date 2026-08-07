@@ -6,6 +6,7 @@
 //! impls forward those to [`encode_message`] / [`encode_message_to_vec`].
 
 use ::bytes::BufMut;
+use ::core::cell::OnceCell;
 use ::core::ptr;
 use ::std::collections::HashMap;
 
@@ -14,18 +15,21 @@ use ::std::collections::HashMap;
 /// Nested LEN encode needs each child's [`MessageEncode::encoded_len`] both when
 /// sizing a parent and when writing that child's length prefix. Passing this
 /// context down the encode stack avoids O(depth²) re-walks without TLS / globals.
+///
+/// The body-length map is allocated lazily on first nested encode so flat
+/// messages pay only for an empty [`OnceCell`].
 #[derive(Debug, Default)]
 pub struct EncodeCtx {
     /// `message as *const ()` → body wire length (no LEN prefix).
-    body_lens: HashMap<*const (), usize>,
+    body_lens: OnceCell<HashMap<*const (), usize>>,
 }
 
 impl EncodeCtx {
-    /// Empty context with a modest map capacity for typical nesting.
+    /// Empty context; the length cache is created on first nested encode.
     #[inline]
     pub fn new() -> Self {
         Self {
-            body_lens: HashMap::with_capacity(32),
+            body_lens: OnceCell::new(),
         }
     }
 
@@ -33,11 +37,12 @@ impl EncodeCtx {
     #[inline]
     pub fn body_len_for<M: MessageEncode>(&mut self, message: &M) -> usize {
         let key = ptr::from_ref(message).cast::<()>();
-        if let Some(&n) = self.body_lens.get(&key) {
+        if let Some(&n) = self.body_lens.get().and_then(|m| m.get(&key)) {
             return n;
         }
         let n = message.encoded_len(self);
-        self.body_lens.insert(key, n);
+        self.body_lens.get_or_init(|| HashMap::with_capacity(32));
+        self.body_lens.get_mut().unwrap().insert(key, n);
         n
     }
 }
