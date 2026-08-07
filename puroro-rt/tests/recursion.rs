@@ -84,13 +84,13 @@ impl<A: Allocator + Clone> MessageMerge for Nest<A> {
         }
         while buf.has_remaining() {
             let (field_number, wire_type) = decode_tag(buf)?;
-            match field_number {
+            match field_number.as_u32() {
                 1 => self
                     .child
                     .bind_mut(&mut self._common)
                     .merge(wire_type, buf, depth)?,
                 _ => skip_field_and_save(
-                    field_number,
+                    field_number.as_u32(),
                     wire_type,
                     buf,
                     &mut self._common.unknown_fields,

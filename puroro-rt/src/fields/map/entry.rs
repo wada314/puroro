@@ -98,7 +98,7 @@ where
                 return Err(e);
             }
         };
-        match field_number {
+        match field_number.as_u32() {
             KEY_FIELD => match K::decode_element(wire_type, buf, alloc.clone(), depth) {
                 Ok(next) => {
                     if let Some(old) = key.replace(next) {

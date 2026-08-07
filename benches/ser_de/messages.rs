@@ -130,7 +130,7 @@ impl<A: Allocator + Clone> MessageMerge for FlatScalars<A> {
         }
         while buf.has_remaining() {
             let (field_number, wire_type) = decode_tag(buf)?;
-            match field_number {
+            match field_number.as_u32() {
                 1 => self
                     .a
                     .bind_mut(&mut self._common)
@@ -164,7 +164,7 @@ impl<A: Allocator + Clone> MessageMerge for FlatScalars<A> {
                     .bind_mut(&mut self._common)
                     .merge(wire_type, buf, depth)?,
                 _ => skip_field_and_save(
-                    field_number,
+                    field_number.as_u32(),
                     wire_type,
                     buf,
                     &mut self._common.unknown_fields,
@@ -292,7 +292,7 @@ impl<A: Allocator + Clone> MessageMerge for Nest<A> {
         }
         while buf.has_remaining() {
             let (field_number, wire_type) = decode_tag(buf)?;
-            match field_number {
+            match field_number.as_u32() {
                 1 => self
                     .child
                     .bind_mut(&mut self._common)
@@ -302,7 +302,7 @@ impl<A: Allocator + Clone> MessageMerge for Nest<A> {
                     .bind_mut(&mut self._common)
                     .merge(wire_type, buf, depth)?,
                 _ => skip_field_and_save(
-                    field_number,
+                    field_number.as_u32(),
                     wire_type,
                     buf,
                     &mut self._common.unknown_fields,
@@ -427,13 +427,13 @@ impl<A: Allocator + Clone> MessageMerge for PackedInts<A> {
         }
         while buf.has_remaining() {
             let (field_number, wire_type) = decode_tag(buf)?;
-            match field_number {
+            match field_number.as_u32() {
                 1 => self
                     .values
                     .bind_mut(&mut self._common)
                     .merge(wire_type, buf, depth)?,
                 _ => skip_field_and_save(
-                    field_number,
+                    field_number.as_u32(),
                     wire_type,
                     buf,
                     &mut self._common.unknown_fields,
@@ -585,7 +585,7 @@ impl<A: Allocator + Clone> MessageMerge for StringHeavy<A> {
         }
         while buf.has_remaining() {
             let (field_number, wire_type) = decode_tag(buf)?;
-            match field_number {
+            match field_number.as_u32() {
                 1 => self
                     .s0
                     .bind_mut(&mut self._common)
@@ -607,7 +607,7 @@ impl<A: Allocator + Clone> MessageMerge for StringHeavy<A> {
                     .bind_mut(&mut self._common)
                     .merge(wire_type, buf, depth)?,
                 _ => skip_field_and_save(
-                    field_number,
+                    field_number.as_u32(),
                     wire_type,
                     buf,
                     &mut self._common.unknown_fields,

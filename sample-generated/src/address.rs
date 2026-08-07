@@ -297,7 +297,7 @@ impl<A: Allocator + Clone> MessageMerge for Address<A> {
         }
         while buf.has_remaining() {
             let (field_number, wire_type) = decode_tag(buf)?;
-            match field_number {
+            match field_number.as_u32() {
                 FIELD_STREET => {
                     // street = 1, EXPLICIT string
                     self.street
@@ -325,7 +325,7 @@ impl<A: Allocator + Clone> MessageMerge for Address<A> {
                 _ => {
                     // unknown field — preserve in _common.unknown_fields
                     skip_field_and_save(
-                        field_number,
+                        field_number.as_u32(),
                         wire_type,
                         buf,
                         &mut self._common.unknown_fields,

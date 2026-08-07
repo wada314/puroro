@@ -482,7 +482,7 @@ mod tests {
         let mut rest = buf.as_ref();
         while !rest.is_empty() {
             let (field_number, wire_type) = decode_tag(&mut rest).unwrap();
-            assert_eq!(field_number, 7);
+            assert_eq!(field_number.as_u32(), 7);
             let mut scoped = ScopedBuf::new(&mut rest);
             decoded
                 .bind_mut(&mut common)

@@ -1,19 +1,17 @@
 //! Wire-format decoding helpers used by generated field types.
 //!
-//! Varint and tag decoding delegate to [`protobuf_core`] (`Varint`, `Tag`,
-//! [`IteratorExtVarint`]). `bytes::Buf` adapters live here.
+//! Varint decoding delegates to [`protobuf_core::IteratorExtVarint`]. Tags are
+//! unpacked here into a validated [`FieldNumber`] plus [`WireType`].
+//! `bytes::Buf` adapters live here.
 
 use ::allocator_api2::alloc::Allocator;
 use ::bytes::Buf;
-use ::protobuf_core::IteratorExtVarint;
+use ::protobuf_core::{FieldNumber, IteratorExtVarint};
 use ::puroro::wire_type;
 use ::puroro::{DecodeError, UnknownField, UnknownPayload, WireType};
 use ::unmanaged::{UnmanagedString, UnmanagedVec};
 
 use crate::encode;
-
-/// Maximum protobuf field number (`2^29 - 1`).
-const MAX_FIELD_NUMBER: u32 = 0x1FFF_FFFF;
 
 struct BufVarintReader<'a, B: Buf> {
     buf: &'a mut B,
@@ -41,9 +39,9 @@ pub(crate) fn decode_varint<B: Buf>(buf: &mut B) -> Result<u64, DecodeError> {
 
 /// Decodes a tag and returns `(field_number, wire_type)`.
 ///
-/// Validates wire type and field-number range without building intermediate
-/// [`protobuf_core::Tag`] / [`protobuf_core::FieldNumber`] wrappers.
-pub fn decode_tag<B: Buf>(buf: &mut B) -> Result<(u32, WireType), DecodeError> {
+/// Field-number range is validated via [`FieldNumber::try_new`]; wire type via
+/// [`wire_type::from_raw`]. Does not build a [`protobuf_core::Tag`] intermediate.
+pub fn decode_tag<B: Buf>(buf: &mut B) -> Result<(FieldNumber, WireType), DecodeError> {
     let raw = decode_varint(buf)?;
     // Tag values are u32 on the wire; preserve the previous InvalidVarint mapping
     // used when going through `Varint::try_to_uint32`.
@@ -51,10 +49,7 @@ pub fn decode_tag<B: Buf>(buf: &mut B) -> Result<(u32, WireType), DecodeError> {
         return Err(DecodeError::InvalidVarint);
     }
     let raw = raw as u32;
-    let field_number = raw >> 3;
-    if field_number == 0 || field_number > MAX_FIELD_NUMBER {
-        return Err(DecodeError::InvalidTag);
-    }
+    let field_number = FieldNumber::try_new(raw >> 3).map_err(|_| DecodeError::InvalidTag)?;
     let wire_type = wire_type::from_raw((raw & 0b111) as u8)?;
     Ok((field_number, wire_type))
 }
@@ -221,6 +216,7 @@ impl<'a> Iterator for UnknownFieldsIter<'a> {
                 return None;
             }
         };
+        let number = number.as_u32();
 
         let payload = match wire_type {
             WireType::Varint => {
