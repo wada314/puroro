@@ -12,7 +12,9 @@ use crate::descriptor::{
     FieldType, MessageDesc, OneofDesc, ProtoFile, ProtoFqn, Syntax,
 };
 use crate::error::{Error, Result};
-use ::protobuf_core::{AsRefExtProtobuf, Field, FieldNumber, FieldValue, WriteExtProtobuf};
+use ::protobuf_core::{
+    AsRefExtProtobuf, Field, FieldNumber, FieldValue, ProtobufError, WriteExtProtobuf,
+};
 
 /// `CodeGeneratorResponse.FEATURE_PROTO3_OPTIONAL`
 pub const FEATURE_PROTO3_OPTIONAL: u64 = 1;
@@ -112,21 +114,19 @@ pub fn encode_response(response: &CodeGeneratorResponse) -> Result<Vec<u8>> {
     if response.supported_features != 0 {
         // optional uint64 supported_features = 2;
         let field: Field<&[u8]> = Field::new(
-            FieldNumber::try_from(2)?,
+            to_field_number(2)?,
             FieldValue::from_uint64(response.supported_features),
         );
         out.write_protobuf_field(&field)?;
     }
     if let Some(edition) = response.minimum_edition {
         // optional int32 minimum_edition = 3;
-        let field: Field<&[u8]> =
-            Field::new(FieldNumber::try_from(3)?, FieldValue::from_int32(edition));
+        let field: Field<&[u8]> = Field::new(to_field_number(3)?, FieldValue::from_int32(edition));
         out.write_protobuf_field(&field)?;
     }
     if let Some(edition) = response.maximum_edition {
         // optional int32 maximum_edition = 4;
-        let field: Field<&[u8]> =
-            Field::new(FieldNumber::try_from(4)?, FieldValue::from_int32(edition));
+        let field: Field<&[u8]> = Field::new(to_field_number(4)?, FieldValue::from_int32(edition));
         out.write_protobuf_field(&field)?;
     }
     for file in &response.files {
@@ -136,7 +136,7 @@ pub fn encode_response(response: &CodeGeneratorResponse) -> Result<Vec<u8>> {
         // CodeGeneratorResponse.File.content = 15;
         write_string_field(&mut nested, 15, &file.content)?;
         // repeated File file = 15;
-        let field = Field::new(FieldNumber::try_from(15)?, FieldValue::Len(nested));
+        let field = Field::new(to_field_number(15)?, FieldValue::Len(nested));
         out.write_protobuf_field(&field)?;
     }
 
@@ -537,11 +537,17 @@ fn expect_bool(field: &Field<&[u8]>) -> Result<bool> {
     }
 }
 
-fn write_string_field(out: &mut Vec<u8>, field_number: u32, value: &str) -> Result<()> {
-    let field = Field::new(
-        FieldNumber::try_from(field_number)?,
-        FieldValue::Len(value.as_bytes()),
-    );
+fn to_field_number(value: u32) -> Result<FieldNumber> {
+    FieldNumber::try_new(value).map_err(|value| {
+        ProtobufError::FieldNumberOutOfRange {
+            value: i64::from(value),
+        }
+        .into()
+    })
+}
+
+fn write_string_field(out: &mut Vec<u8>, number: u32, value: &str) -> Result<()> {
+    let field = Field::new(to_field_number(number)?, FieldValue::Len(value.as_bytes()));
     out.write_protobuf_field(&field)?;
     Ok(())
 }
@@ -560,7 +566,7 @@ mod tests {
     fn encode_message_field(field_number: u32, nested: &[u8]) -> Vec<u8> {
         let mut out = Vec::new();
         let field = Field::new(
-            FieldNumber::try_from(field_number).unwrap(),
+            to_field_number(field_number).unwrap(),
             FieldValue::Len(nested),
         );
         out.write_protobuf_field(&field).unwrap();
@@ -570,7 +576,7 @@ mod tests {
     fn encode_varint_field(field_number: u32, value: i32) -> Vec<u8> {
         let mut out = Vec::new();
         let field: Field<&[u8]> = Field::new(
-            FieldNumber::try_from(field_number).unwrap(),
+            to_field_number(field_number).unwrap(),
             FieldValue::from_int32(value),
         );
         out.write_protobuf_field(&field).unwrap();

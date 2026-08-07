@@ -121,7 +121,7 @@ pub(crate) fn skip_field<B: Buf>(wire_type: WireType, buf: &mut B) -> Result<(),
 ///
 /// Used by message `merge` unknown arms so unrecognized tags round-trip on encode.
 pub fn skip_field_and_save<B: Buf, A: Allocator>(
-    field_number: u32,
+    field_number: FieldNumber,
     wire_type: WireType,
     buf: &mut B,
     unknown_fields: &mut UnmanagedVec<u8, A>,
@@ -169,7 +169,7 @@ pub fn skip_field_and_save<B: Buf, A: Allocator>(
 }
 
 pub(crate) fn save_unknown_varint_field<A: Allocator>(
-    field_number: u32,
+    field_number: FieldNumber,
     value: u64,
     unknown_fields: &mut UnmanagedVec<u8, A>,
     alloc: A,

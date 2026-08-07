@@ -9,6 +9,7 @@ use ::bitvec::{
     order::Lsb0,
     ptr::{BitRef, Mut},
 };
+use ::protobuf_core::FieldNumber;
 use ::puroro::{DecodeBuf, DecodeError, WireType};
 
 use ::unmanaged::DeallocateIn;
@@ -71,7 +72,7 @@ where
         common: &mut MessageCommon<Pb, A>,
         wire_type: ::puroro::WireType,
         buf: &mut B,
-        field: u32,
+        field: FieldNumber,
         depth: usize,
     ) -> Result<(), DecodeError>
     where
@@ -152,7 +153,7 @@ where
         common: &mut MessageCommon<Pb, A>,
         wire_type: ::puroro::WireType,
         buf: &mut B,
-        field: u32,
+        field: FieldNumber,
         depth: usize,
     ) -> Result<(), DecodeError>
     where
@@ -238,7 +239,7 @@ where
         common: &mut MessageCommon<Pb, A>,
         wire_type: WireType,
         buf: &mut B,
-        field: u32,
+        field: FieldNumber,
         _depth: usize,
     ) -> Result<(), DecodeError>
     where

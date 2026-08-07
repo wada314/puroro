@@ -1,19 +1,30 @@
 //! Wire-format encoding helpers used by generated field types.
 //!
 //! Varint encoding delegates to [`protobuf_core::Varint`]. Tags are packed as
-//! `(field_number << 3) | wire_type` without re-validating field numbers that
-//! the catalog / generated code already constrains. `BufMut` adapters live here
-//! because generated code targets `bytes` buffers.
+//! `(field_number << 3) | wire_type` from a validated [`FieldNumber`].
+//! `BufMut` adapters live here because generated code targets `bytes` buffers.
 
 use ::allocator_api2::alloc::Allocator;
 use ::allocator_api2::vec::Vec as AllocVec;
 use ::bytes::BufMut;
-use ::protobuf_core::Varint;
+use ::protobuf_core::{FieldNumber, Varint};
 use ::puroro::WireType;
+
+/// Validated [`FieldNumber`] from a catalog / const-generic field number.
+///
+/// Catalog `const FIELD: u32` values are in range by construction; invalid
+/// `FIELD` fails at compile time when this is evaluated in a const context.
+#[inline]
+pub const fn field_number_const<const FIELD: u32>() -> FieldNumber {
+    match FieldNumber::try_new(FIELD) {
+        Ok(n) => n,
+        Err(_) => panic!("catalog field number out of protobuf range"),
+    }
+}
 
 /// Encoded tag as a raw varint numeric value (used when re-serialising unknown fields).
 #[inline]
-pub(crate) fn tag_to_u64_for_unknown(field_number: u32, wire_type: WireType) -> u64 {
+pub(crate) fn tag_to_u64_for_unknown(field_number: FieldNumber, wire_type: WireType) -> u64 {
     tag_to_u64(field_number, wire_type)
 }
 
@@ -32,39 +43,32 @@ pub(crate) fn encode_varint<B: BufMut>(v: u64, buf: &mut B) {
 
 /// Returns the number of bytes needed to encode a tag for the given field number.
 #[inline]
-pub(crate) fn encoded_len_tag(field_number: u32, wire_type: WireType) -> usize {
+pub(crate) fn encoded_len_tag(field_number: FieldNumber, wire_type: WireType) -> usize {
     encoded_len_varint(tag_to_u64(field_number, wire_type))
 }
 
 /// Writes the tag (field_number + wire_type pair) to `buf`.
 #[inline]
-pub(crate) fn encode_tag<B: BufMut>(field_number: u32, wire_type: WireType, buf: &mut B) {
+pub(crate) fn encode_tag<B: BufMut>(field_number: FieldNumber, wire_type: WireType, buf: &mut B) {
     encode_varint(tag_to_u64(field_number, wire_type), buf);
 }
 
-/// Pack a tag without `FieldNumber` / `Tag` validation.
-///
-/// Callers must pass a field number in `[1, 2^29 - 1]` (catalog constants and
-/// previously decoded tags). Debug builds assert the range.
+/// Pack a tag from a validated field number.
 #[inline]
-fn tag_to_u64(field_number: u32, wire_type: WireType) -> u64 {
-    debug_assert!(
-        (1..=0x1FFF_FFFF).contains(&field_number),
-        "field number out of protobuf range: {field_number}"
-    );
-    (u64::from(field_number) << 3) | u64::from(u8::from(wire_type))
+fn tag_to_u64(field_number: FieldNumber, wire_type: WireType) -> u64 {
+    (u64::from(field_number.as_u32()) << 3) | u64::from(u8::from(wire_type))
 }
 
 /// Writes a varint field (tag + value) to `buf`.
 #[inline]
-pub fn encode_varint_field<B: BufMut>(field_number: u32, v: u64, buf: &mut B) {
+pub fn encode_varint_field<B: BufMut>(field_number: FieldNumber, v: u64, buf: &mut B) {
     encode_tag(field_number, WireType::Varint, buf);
     encode_varint(v, buf);
 }
 
 /// Returns the encoded byte length of a LEN field (tag + length varint + payload).
 #[inline]
-pub(crate) fn encoded_len_len_field(field_number: u32, payload_len: usize) -> usize {
+pub(crate) fn encoded_len_len_field(field_number: FieldNumber, payload_len: usize) -> usize {
     encoded_len_tag(field_number, WireType::Len)
         + encoded_len_varint(payload_len as u64)
         + payload_len

@@ -2,11 +2,12 @@
 
 use ::allocator_api2::alloc::Allocator;
 use ::bytes::BufMut;
+use ::protobuf_core::FieldNumber;
 use ::puroro::{DecodeBuf, DecodeError, WireType};
 
 use super::MapKey;
 use crate::decode;
-use crate::encode;
+use crate::encode::{self, field_number_const};
 use crate::fields::wire::encode_type::{encode_field, encoded_len_field};
 use crate::fields::wire::repeated_element::{RepeatedElement, RepeatedElementMerge};
 use crate::message_encode::EncodeCtx;
@@ -31,14 +32,18 @@ where
     V: RepeatedElement,
     A: Allocator + Clone,
 {
-    encoded_len_field::<K, A>(K::wire_view(key), KEY_FIELD, ctx)
-        + encoded_len_field::<V, A>(V::wire_view(value), VALUE_FIELD, ctx)
+    encoded_len_field::<K, A>(K::wire_view(key), field_number_const::<KEY_FIELD>(), ctx)
+        + encoded_len_field::<V, A>(
+            V::wire_view(value),
+            field_number_const::<VALUE_FIELD>(),
+            ctx,
+        )
 }
 
 /// Encodes one map field occurrence: `tag(FIELD, Len) + len + entry body`.
 #[inline]
 pub(super) fn encode_map_entry<K, V, A, B>(
-    field: u32,
+    field: FieldNumber,
     key: &K::Element<A>,
     value: &V::Element<A>,
     ctx: &mut EncodeCtx,
@@ -52,8 +57,18 @@ pub(super) fn encode_map_entry<K, V, A, B>(
     let payload_len = entry_payload_len::<K, V, A>(key, value, ctx);
     encode::encode_tag(field, WireType::Len, buf);
     encode::encode_varint(payload_len as u64, buf);
-    encode_field::<K, A, B>(K::wire_view(key), KEY_FIELD, ctx, buf);
-    encode_field::<V, A, B>(V::wire_view(value), VALUE_FIELD, ctx, buf);
+    encode_field::<K, A, B>(
+        K::wire_view(key),
+        field_number_const::<KEY_FIELD>(),
+        ctx,
+        buf,
+    );
+    encode_field::<V, A, B>(
+        V::wire_view(value),
+        field_number_const::<VALUE_FIELD>(),
+        ctx,
+        buf,
+    );
 }
 
 fn discard_partial_entry<K, V, A>(

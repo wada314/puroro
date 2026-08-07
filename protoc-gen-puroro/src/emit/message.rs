@@ -364,7 +364,7 @@ pub(super) fn render_items(plan: &MessagePlan<'_>) -> Result<TokenStream> {
                         #(#merge_arms)*
                         _ => {
                             ::puroro_rt::decode::skip_field_and_save(
-                                field_number.as_u32(),
+                                field_number,
                                 wire_type,
                                 buf,
                                 &mut self._common.unknown_fields,

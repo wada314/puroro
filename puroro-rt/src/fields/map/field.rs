@@ -19,7 +19,7 @@ use ::unmanaged::{CloneIn, ToOwnedIn};
 
 use super::MapKey;
 use crate::decode;
-use crate::encode;
+use crate::encode::{self, field_number_const};
 use crate::fields::shared::field_inspect::{FieldCloneIn, FieldDebug, FieldEncode, FieldPartialEq};
 use crate::fields::shared::{FieldDeallocate, MessageCommon};
 use crate::fields::wire::repeated_element::{
@@ -154,7 +154,7 @@ where
         let mut n = 0;
         for (key, value) in &self.entries {
             let payload = entry_payload_len::<K, V, A>(key, value, ctx);
-            n += encode::encoded_len_len_field(FIELD, payload);
+            n += encode::encoded_len_len_field(field_number_const::<FIELD>(), payload);
         }
         n
     }
@@ -166,7 +166,7 @@ where
         buf: &mut B,
     ) {
         for (key, value) in &self.entries {
-            encode_map_entry::<K, V, A, B>(FIELD, key, value, ctx, buf);
+            encode_map_entry::<K, V, A, B>(field_number_const::<FIELD>(), key, value, ctx, buf);
         }
     }
 }
@@ -439,7 +439,7 @@ mod tests {
     use super::super::entry::encode_map_entry;
     use super::MapField;
     use crate::decode::decode_tag;
-    use crate::encode::{encode_tag, encode_varint, encode_varint_field};
+    use crate::encode::{encode_tag, encode_varint, encode_varint_field, field_number_const};
     use crate::fields::shared::field_inspect::FieldEncode;
     use crate::fields::shared::{FieldDeallocate, MessageCommon};
     use crate::fields::wire::{ProtoInt32, ProtoString};
@@ -495,7 +495,7 @@ mod tests {
         // Second merge of key=1 overwrites.
         let mut one = BytesMut::new();
         encode_map_entry::<ProtoInt32, ProtoInt32, Global, _>(
-            7,
+            field_number_const::<7>(),
             &1,
             &99,
             &mut EncodeCtx::new(),
@@ -523,10 +523,10 @@ mod tests {
 
         // Entry body: only value=2 with 42 (tag 0x10, varint 42).
         let mut entry_body = BytesMut::new();
-        encode_varint_field(2, 42, &mut entry_body);
+        encode_varint_field(field_number_const::<2>(), 42, &mut entry_body);
 
         let mut framed = BytesMut::new();
-        encode_tag(1, WireType::Len, &mut framed);
+        encode_tag(field_number_const::<1>(), WireType::Len, &mut framed);
         encode_varint(entry_body.len() as u64, &mut framed);
         framed.extend_from_slice(&entry_body);
 

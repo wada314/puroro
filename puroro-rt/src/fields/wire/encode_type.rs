@@ -12,6 +12,7 @@
 
 use ::allocator_api2::alloc::Allocator;
 use ::bytes::BufMut;
+use ::protobuf_core::FieldNumber;
 use ::puroro::{Message, WireType};
 
 use crate::encode;
@@ -66,7 +67,7 @@ pub trait EncodeType {
 #[inline]
 pub(crate) fn encoded_len_field<'a, T, A>(
     value: T::View<'a, A>,
-    field: u32,
+    field: FieldNumber,
     ctx: &mut EncodeCtx,
 ) -> usize
 where
@@ -87,7 +88,7 @@ where
 #[inline]
 pub(crate) fn encode_field<'a, T, A, B>(
     value: T::View<'a, A>,
-    field: u32,
+    field: FieldNumber,
     ctx: &mut EncodeCtx,
     buf: &mut B,
 ) where

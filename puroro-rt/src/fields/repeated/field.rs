@@ -14,6 +14,7 @@ use ::unmanaged::CloneIn;
 use ::unmanaged::UnmanagedVec;
 use ::unmanaged::vec::VecGuard;
 
+use crate::encode::field_number_const;
 use crate::fields::shared::field_inspect::{FieldCloneIn, FieldDebug, FieldEncode, FieldPartialEq};
 use crate::fields::shared::{FieldDeallocate, MessageCommon};
 use crate::fields::wire::repeated_element::{
@@ -286,7 +287,7 @@ where
         if self.values.is_empty() {
             0
         } else {
-            E::encoded_len(FIELD, self.as_slice(), ctx)
+            E::encoded_len(field_number_const::<FIELD>(), self.as_slice(), ctx)
         }
     }
 
@@ -297,7 +298,7 @@ where
         buf: &mut B,
     ) {
         if !self.values.is_empty() {
-            E::encode(FIELD, self.as_slice(), ctx, buf);
+            E::encode(field_number_const::<FIELD>(), self.as_slice(), ctx, buf);
         }
     }
 }

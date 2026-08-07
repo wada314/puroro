@@ -325,7 +325,7 @@ impl<A: Allocator + Clone> MessageMerge for Address<A> {
                 _ => {
                     // unknown field — preserve in _common.unknown_fields
                     skip_field_and_save(
-                        field_number.as_u32(),
+                        field_number,
                         wire_type,
                         buf,
                         &mut self._common.unknown_fields,

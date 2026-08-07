@@ -20,9 +20,11 @@ pub(crate) mod fields;
 pub mod message_encode;
 pub mod message_merge;
 
+pub use ::protobuf_core::FieldNumber;
 /// Generator-facing re-exports from `unmanaged`.
 pub use ::unmanaged::{CloneIn, DeallocateIn, DefaultIn};
 pub use defaults::ProtoDefault;
+pub use encode::field_number_const;
 pub use fields::map::{MapField, MapFieldMut, MapFieldRef};
 pub use fields::oneof::{
     OneofDeallocate, OneofEncodable, OneofGroup, OneofSlot, OneofSlotMut, OneofSlotRef,

@@ -28,6 +28,7 @@ use ::bitvec::{
     ptr::{BitRef, Mut},
 };
 use ::core::ops::{Deref, DerefMut};
+use ::protobuf_core::FieldNumber;
 
 use ::puroro::{DecodeBuf, DecodeError, WireType};
 
@@ -149,7 +150,7 @@ pub(crate) trait PayloadAccess: SingularType {
         common: &mut MessageCommon<Pb, A>,
         wire_type: WireType,
         buf: &mut B,
-        field: u32,
+        field: FieldNumber,
         depth: usize,
     ) -> Result<(), DecodeError>
     where
@@ -259,7 +260,7 @@ where
         common: &mut MessageCommon<Pb, A>,
         wire_type: WireType,
         buf: &mut B,
-        field: u32,
+        field: FieldNumber,
         _depth: usize,
     ) -> Result<(), DecodeError>
     where
@@ -377,7 +378,7 @@ impl<C: LenCodec> PayloadAccess for LenScalar<C> {
         common: &mut MessageCommon<Pb, A>,
         wire_type: WireType,
         buf: &mut B,
-        _field: u32,
+        _field: FieldNumber,
         _depth: usize,
     ) -> Result<(), DecodeError>
     where

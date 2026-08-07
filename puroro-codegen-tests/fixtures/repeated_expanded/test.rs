@@ -2,7 +2,7 @@
 
 use crate::repeated_expanded::demo::ExpandedIds;
 use ::puroro::Message;
-use ::puroro_rt::encode::encode_varint_field;
+use ::puroro_rt::encode::{encode_varint_field, field_number_const};
 
 fn encode_u64_varint(mut v: u64, buf: &mut Vec<u8>) {
     loop {
@@ -56,9 +56,9 @@ fn accepts_packed_wire_on_decode() {
 #[test]
 fn accepts_mixed_wire_forms() {
     let mut bytes = Vec::new();
-    encode_varint_field(1, 1, &mut bytes);
+    encode_varint_field(field_number_const::<1>(), 1, &mut bytes);
     encode_packed_int32_field(1, &[2, 3], &mut bytes);
-    encode_varint_field(1, 4, &mut bytes);
+    encode_varint_field(field_number_const::<1>(), 4, &mut bytes);
     let msg: ExpandedIds = ExpandedIds::decode(&bytes[..]).expect("decode mixed");
     assert_eq!(msg.ids(), &[1, 2, 3, 4]);
 }

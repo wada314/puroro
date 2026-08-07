@@ -28,6 +28,7 @@ use ::unmanaged::{CloneIn, DeallocateIn};
 
 use crate::message_encode::EncodeCtx;
 
+use crate::encode::field_number_const;
 use crate::fields::shared::FieldDeallocate;
 use crate::fields::shared::field_inspect::{FieldCloneIn, FieldDebug, FieldEncode, FieldPartialEq};
 use crate::fields::shared::{
@@ -511,7 +512,7 @@ where
             self.common,
             wire_type,
             buf,
-            FIELD,
+            field_number_const::<FIELD>(),
             depth,
         )
     }
@@ -574,7 +575,7 @@ where
                 .with(init, common)
                 .get()
                 .expect("should_emit implies initialized slot");
-            encoded_len_field::<T, A>(L::get(slot, common), FIELD, ctx)
+            encoded_len_field::<T, A>(L::get(slot, common), field_number_const::<FIELD>(), ctx)
         } else {
             0
         }
@@ -599,7 +600,12 @@ where
                 .with(init, common)
                 .get()
                 .expect("should_emit implies initialized slot");
-            encode_field::<T, A, B>(L::get(slot, common), FIELD, ctx, buf);
+            encode_field::<T, A, B>(
+                L::get(slot, common),
+                field_number_const::<FIELD>(),
+                ctx,
+                buf,
+            );
         }
     }
 }

@@ -10,6 +10,7 @@
 use ::allocator_api2::alloc::Allocator;
 use ::core::marker::PhantomData;
 use ::core::ops::{Deref, DerefMut};
+use ::protobuf_core::FieldNumber;
 use ::unmanaged::UnmanagedBox;
 
 use ::puroro::{DecodeBuf, DecodeError, Message, WireType};
@@ -133,7 +134,7 @@ impl<M: Message + MessageEncode + MessageMerge> PayloadAccess for ProtoMessage<M
         common: &mut MessageCommon<Pb, A>,
         wire_type: WireType,
         buf: &mut B,
-        _field: u32,
+        _field: FieldNumber,
         depth: usize,
     ) -> Result<(), DecodeError>
     where
