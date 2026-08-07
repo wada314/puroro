@@ -20,7 +20,7 @@ pub(crate) mod fields;
 pub mod message_encode;
 pub mod message_merge;
 
-pub use ::protobuf_core::FieldNumber;
+pub use ::protobuf_core::{FieldNumber, Varint};
 /// Generator-facing re-exports from `unmanaged`.
 pub use ::unmanaged::{CloneIn, DeallocateIn, DefaultIn};
 pub use defaults::ProtoDefault;

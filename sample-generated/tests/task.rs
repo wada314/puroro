@@ -8,6 +8,7 @@ use ::allocator_api2::alloc::Global;
 use ::puroro::{
     MapMut, MapRef, Message, OneofView, OneofViewMut, RepeatedStringMut, UnknownPayload,
 };
+use ::puroro_rt::Varint;
 use ::puroro_rt::encode::{encode_varint_field, field_number_const};
 use ::puroro_sample_generated::task::{Notification, NotificationCase};
 use ::puroro_sample_generated::{Address, Priority, Status, Task};
@@ -329,8 +330,16 @@ fn explicit_bool_preserves_false() {
 fn packed_declared_field_accepts_expanded_wire() {
     // `tag_ids` is PACKED on encode, but must accept expanded (per-element) wire.
     let mut bytes = Vec::new();
-    encode_varint_field(field_number_const::<6>(), 10, &mut bytes);
-    encode_varint_field(field_number_const::<6>(), 20, &mut bytes);
+    encode_varint_field(
+        field_number_const::<6>(),
+        Varint::from_uint64(10),
+        &mut bytes,
+    );
+    encode_varint_field(
+        field_number_const::<6>(),
+        Varint::from_uint64(20),
+        &mut bytes,
+    );
 
     let task: Task = Task::decode(&bytes[..]).unwrap();
     assert_eq!(task.tag_ids(), &[10, 20]);
@@ -351,11 +360,23 @@ fn packable_repeated_accepts_mixed_wire_forms() {
     // Spec: multiple occurrences append; packed and expanded may be mixed.
     let mut bytes = Vec::new();
     encode_packed_int32_field(6, &[1, 2], &mut bytes);
-    encode_varint_field(field_number_const::<6>(), 3, &mut bytes);
-    encode_varint_field(field_number_const::<7>(), 10, &mut bytes);
+    encode_varint_field(
+        field_number_const::<6>(),
+        Varint::from_uint64(3),
+        &mut bytes,
+    );
+    encode_varint_field(
+        field_number_const::<7>(),
+        Varint::from_uint64(10),
+        &mut bytes,
+    );
     encode_packed_int32_field(7, &[20, 30], &mut bytes);
     // votes = 20 (PACKED declared): expanded then packed
-    encode_varint_field(field_number_const::<20>(), 1, &mut bytes);
+    encode_varint_field(
+        field_number_const::<20>(),
+        Varint::from_uint64(1),
+        &mut bytes,
+    );
     encode_packed_int32_field(20, &[0, 1], &mut bytes);
 
     let task: Task = Task::decode(&bytes[..]).unwrap();
@@ -584,7 +605,11 @@ fn closed_enum_unknown_goes_to_unknown_fields() {
 
     // field 10 (priority) = 99 (unknown closed enum value), wire: tag + varint
     let mut bytes = Vec::new();
-    encode_varint_field(field_number_const::<10>(), 99, &mut bytes);
+    encode_varint_field(
+        field_number_const::<10>(),
+        Varint::from_uint64(99),
+        &mut bytes,
+    );
 
     task.merge_from(&mut &bytes[..]).unwrap();
 
@@ -605,7 +630,11 @@ fn open_enum_unknown_stays_in_field() {
 
     // field 9 (status) = 99 (unknown open enum value)
     let mut bytes = Vec::new();
-    encode_varint_field(field_number_const::<9>(), 99, &mut bytes);
+    encode_varint_field(
+        field_number_const::<9>(),
+        Varint::from_uint64(99),
+        &mut bytes,
+    );
 
     task.merge_from(&mut &bytes[..]).unwrap();
 

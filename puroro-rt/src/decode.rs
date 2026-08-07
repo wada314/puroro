@@ -6,7 +6,7 @@
 
 use ::allocator_api2::alloc::Allocator;
 use ::bytes::Buf;
-use ::protobuf_core::{FieldNumber, IteratorExtVarint};
+use ::protobuf_core::{FieldNumber, IteratorExtVarint, Varint};
 use ::puroro::wire_type;
 use ::puroro::{DecodeError, UnknownField, UnknownPayload, WireType};
 use ::unmanaged::{UnmanagedString, UnmanagedVec};
@@ -130,13 +130,12 @@ pub fn skip_field_and_save<B: Buf, A: Allocator>(
     // SAFETY: the owned `alloc` (an `alloc.clone()` from the caller) is
     // interchangeable with the allocator that owns this vector's buffer.
     let mut g = unsafe { unknown_fields.with_alloc(alloc) };
-    let tag = encode::tag_to_u64_for_unknown(field_number, wire_type);
-    encode::write_varint_to_vec(tag, &mut *g);
+    encode::write_tag_to_vec(field_number, wire_type, &mut *g);
 
     match wire_type {
         WireType::Varint => {
             let v = decode_varint(buf)?;
-            encode::write_varint_to_vec(v, &mut *g);
+            encode::write_varint_to_vec(Varint::from_uint64(v), &mut *g);
         }
         WireType::Int64 => {
             if buf.remaining() < 8 {
@@ -150,7 +149,7 @@ pub fn skip_field_and_save<B: Buf, A: Allocator>(
             if buf.remaining() < len as usize {
                 return Err(DecodeError::TruncatedMessage);
             }
-            encode::write_varint_to_vec(len, &mut *g);
+            encode::write_varint_to_vec(Varint::from_uint64(len), &mut *g);
             let bytes = buf.copy_to_bytes(len as usize);
             g.extend_from_slice(&bytes);
         }
@@ -177,9 +176,8 @@ pub(crate) fn save_unknown_varint_field<A: Allocator>(
     // SAFETY: the owned `alloc` (an `alloc.clone()` from the caller) is
     // interchangeable with the allocator that owns this vector's buffer.
     let mut g = unsafe { unknown_fields.with_alloc(alloc) };
-    let tag = encode::tag_to_u64_for_unknown(field_number, WireType::Varint);
-    encode::write_varint_to_vec(tag, &mut *g);
-    encode::write_varint_to_vec(value, &mut *g);
+    encode::write_tag_to_vec(field_number, WireType::Varint, &mut *g);
+    encode::write_varint_to_vec(Varint::from_uint64(value), &mut *g);
 }
 
 /// Iterates unknown fields stored as a contiguous partial protobuf stream.

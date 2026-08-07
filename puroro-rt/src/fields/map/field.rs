@@ -448,6 +448,7 @@ mod tests {
     use ::bitvec::array::BitArray;
     use ::bitvec::order::Lsb0;
     use ::bytes::BytesMut;
+    use ::protobuf_core::Varint;
     use ::puroro::{ScopedBuf, WireType};
     use ::unmanaged::UnmanagedString;
 
@@ -523,11 +524,15 @@ mod tests {
 
         // Entry body: only value=2 with 42 (tag 0x10, varint 42).
         let mut entry_body = BytesMut::new();
-        encode_varint_field(field_number_const::<2>(), 42, &mut entry_body);
+        encode_varint_field(
+            field_number_const::<2>(),
+            Varint::from_uint64(42),
+            &mut entry_body,
+        );
 
         let mut framed = BytesMut::new();
         encode_tag(field_number_const::<1>(), WireType::Len, &mut framed);
-        encode_varint(entry_body.len() as u64, &mut framed);
+        encode_varint(Varint::from_uint64(entry_body.len() as u64), &mut framed);
         framed.extend_from_slice(&entry_body);
 
         let mut rest = framed.as_ref();

@@ -12,7 +12,7 @@
 
 use ::allocator_api2::alloc::Allocator;
 use ::bytes::BufMut;
-use ::protobuf_core::FieldNumber;
+use ::protobuf_core::{FieldNumber, Varint};
 use ::puroro::{Message, WireType};
 
 use crate::encode;
@@ -150,7 +150,7 @@ impl<C: LenCodec> EncodeType for LenScalar<C> {
         Self: 'a,
     {
         let n = C::as_wire_bytes(value).len();
-        encode::encoded_len_varint(n as u64) + n
+        encode::encoded_len_varint(Varint::from_uint64(n as u64)) + n
     }
 
     #[inline]
@@ -161,7 +161,7 @@ impl<C: LenCodec> EncodeType for LenScalar<C> {
         B: BufMut,
     {
         let bytes = C::as_wire_bytes(value);
-        encode::encode_varint(bytes.len() as u64, buf);
+        encode::encode_varint(Varint::from_uint64(bytes.len() as u64), buf);
         buf.put_slice(bytes);
     }
 }
@@ -181,7 +181,7 @@ impl<M: Message + MessageEncode> EncodeType for ProtoMessage<M> {
         Self: 'a,
     {
         let n = ctx.body_len_for(value);
-        encode::encoded_len_varint(n as u64) + n
+        encode::encoded_len_varint(Varint::from_uint64(n as u64)) + n
     }
 
     #[inline]
@@ -192,7 +192,7 @@ impl<M: Message + MessageEncode> EncodeType for ProtoMessage<M> {
         B: BufMut,
     {
         let n = ctx.body_len_for(value);
-        encode::encode_varint(n as u64, buf);
+        encode::encode_varint(Varint::from_uint64(n as u64), buf);
         value.encode_raw(ctx, buf);
     }
 }

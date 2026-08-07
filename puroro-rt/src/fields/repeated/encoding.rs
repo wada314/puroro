@@ -8,7 +8,7 @@
 use crate::message_encode::EncodeCtx;
 use ::allocator_api2::alloc::Allocator;
 use ::bytes::BufMut;
-use ::protobuf_core::FieldNumber;
+use ::protobuf_core::{FieldNumber, Varint};
 
 use crate::encode;
 use crate::fields::wire::encode_type::{encode_field, encoded_len_field};
@@ -78,7 +78,7 @@ where
         }
         let payload_len = T::packed_payload_len(values);
         encode::encode_tag(field, ::puroro::WireType::Len, buf);
-        encode::encode_varint(payload_len as u64, buf);
+        encode::encode_varint(Varint::from_uint64(payload_len as u64), buf);
         T::encode_packed_payload(values, buf);
     }
 }

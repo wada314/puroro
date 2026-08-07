@@ -2,7 +2,7 @@
 
 use ::allocator_api2::alloc::Allocator;
 use ::bytes::BufMut;
-use ::protobuf_core::FieldNumber;
+use ::protobuf_core::{FieldNumber, Varint};
 use ::puroro::{DecodeBuf, DecodeError, WireType};
 
 use super::MapKey;
@@ -56,7 +56,7 @@ pub(super) fn encode_map_entry<K, V, A, B>(
 {
     let payload_len = entry_payload_len::<K, V, A>(key, value, ctx);
     encode::encode_tag(field, WireType::Len, buf);
-    encode::encode_varint(payload_len as u64, buf);
+    encode::encode_varint(Varint::from_uint64(payload_len as u64), buf);
     encode_field::<K, A, B>(
         K::wire_view(key),
         field_number_const::<KEY_FIELD>(),
