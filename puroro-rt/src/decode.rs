@@ -1,12 +1,17 @@
 //! Wire-format decoding helpers used by generated field types.
 //!
-//! Varint decoding is pluggable via [`VarintDecoder`]; production entry points
-//! use [`ChunkScan`]. Tags are unpacked here into a validated [`FieldNumber`]
+//! Varint decoding is pluggable via [`VarintDecoder`]. [`decode_varint`] uses
+//! [`ChunkScanHot4`]; [`decode_tag`] uses [`decode_varint_with`] with
+//! [`ChunkScanLikely1`]. Tags are unpacked here into a validated [`FieldNumber`]
 //! plus [`WireType`].
 
 mod varint;
 
-pub use self::varint::{ByteIterator, ChunkScan, VarintDecoder};
+pub use self::varint::{
+    ByteIterator, BytePair, ByteQuad, ChunkScan, ChunkScan1, ChunkScan2, ChunkScan4, ChunkScanHot2,
+    ChunkScanHot4, ChunkScanHot8, ChunkScanHot10, ChunkScanHotAdapt, ChunkScanLikely1,
+    ChunkScanMsb, VarintDecoder,
+};
 
 use ::allocator_api2::alloc::Allocator;
 use ::bytes::Buf;
@@ -17,17 +22,29 @@ use ::unmanaged::{UnmanagedString, UnmanagedVec};
 
 use crate::encode;
 
-/// Decodes a base-128 varint from `buf` using the production decoder ([`ChunkScan`]).
+/// Decodes a base-128 varint from `buf` with [`ChunkScanHot4`].
+#[inline]
 pub fn decode_varint<B: Buf>(buf: &mut B) -> Result<u64, DecodeError> {
-    ChunkScan::decode_varint(buf)
+    decode_varint_with::<ChunkScanHot4, _>(buf)
+}
+
+/// Decodes a base-128 varint from `buf` using algorithm `D`.
+///
+/// Prefer [`decode_varint`] for ordinary values; use this when a different
+/// decoder is appropriate (e.g. tags via [`ChunkScanLikely1`]).
+#[inline]
+pub fn decode_varint_with<D: VarintDecoder, B: Buf>(buf: &mut B) -> Result<u64, DecodeError> {
+    D::decode_varint(buf)
 }
 
 /// Decodes a tag and returns `(field_number, wire_type)`.
 ///
+/// Uses [`ChunkScanLikely1`] for the tag varint (mostly 1-byte field numbers).
 /// Field-number range is validated via [`FieldNumber::try_new`]; wire type via
 /// [`wire_type::from_raw`]. Does not build a [`protobuf_core::Tag`] intermediate.
+#[inline]
 pub fn decode_tag<B: Buf>(buf: &mut B) -> Result<(FieldNumber, WireType), DecodeError> {
-    let raw = decode_varint(buf)?;
+    let raw = decode_varint_with::<ChunkScanLikely1, _>(buf)?;
     // Tag values are u32 on the wire; preserve the previous InvalidVarint mapping
     // used when going through `Varint::try_to_uint32`.
     if raw > u64::from(u32::MAX) {
