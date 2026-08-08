@@ -1,7 +1,9 @@
 //! Varint encode / decode microbenchmarks (baseline before fast-path work).
 //!
 //! Encode uses the same shape as `puroro-rt` (`Varint::encode` + `put_slice`).
-//! Decode calls [`puroro_rt::decode::decode_varint`] directly.
+//! Decode benches monomorphize over each [`puroro_rt::decode::VarintDecoder`]
+//! (via [`puroro_rt::for_each_varint_decoder`]) so algorithms can be compared in
+//! one run.
 //!
 //! Inputs are generated once before the benches. Skewed cases sample from an
 //! exponential distribution calibrated so that
@@ -15,10 +17,11 @@
 //! cargo bench -p puroro --bench varint -- --test   # smoke only
 //! ```
 
-use ::bytes::{Buf, BufMut};
+use ::bytes::BufMut;
 use ::criterion::{BenchmarkId, Criterion, Throughput, black_box};
 use ::protobuf_core::Varint;
-use ::puroro_rt::decode::decode_varint;
+use ::puroro_rt::decode::VarintDecoder;
+use ::puroro_rt::for_each_varint_decoder;
 use ::rand::rngs::SmallRng;
 use ::rand::{Rng, SeedableRng};
 use ::rand_distr::{Distribution, Exp};
@@ -96,10 +99,6 @@ fn encode_one_to(value: u64, buf: &mut impl BufMut) {
     buf.put_slice(&bytes[..count]);
 }
 
-fn decode_one(buf: &mut impl Buf) -> u64 {
-    decode_varint(buf).expect("varint decode")
-}
-
 fn encode_batch(values: &[u64]) -> Vec<u8> {
     let mut out = Vec::with_capacity(values.len() * 10);
     for &v in values {
@@ -108,9 +107,9 @@ fn encode_batch(values: &[u64]) -> Vec<u8> {
     out
 }
 
-fn decode_batch(mut input: &[u8], out: &mut [u64]) {
+fn decode_batch_with<D: VarintDecoder>(mut input: &[u8], out: &mut [u64]) {
     for slot in out.iter_mut() {
-        *slot = decode_one(&mut input);
+        *slot = D::decode_varint(&mut input).expect("varint decode");
     }
 }
 
@@ -156,14 +155,18 @@ fn prepare_inputs() -> Vec<PreparedCase> {
 
 fn validate_roundtrip(cases: &[PreparedCase]) {
     let mut decoded = vec![0u64; BATCH_LEN];
-    for case in cases {
-        decode_batch(&case.batch_wire, &mut decoded);
-        assert_eq!(
-            decoded, case.values,
-            "{}: decode roundtrip failed",
-            case.label
-        );
-    }
+    for_each_varint_decoder!(D => {
+        for case in cases {
+            decode_batch_with::<D>(&case.batch_wire, &mut decoded);
+            assert_eq!(
+                decoded,
+                case.values,
+                "{} / {}: decode roundtrip failed",
+                D::NAME,
+                case.label
+            );
+        }
+    });
 }
 
 fn bench_encode_single(c: &mut Criterion, cases: &[PreparedCase]) {
@@ -186,31 +189,33 @@ fn bench_encode_single(c: &mut Criterion, cases: &[PreparedCase]) {
 
 fn bench_decode_single(c: &mut Criterion, cases: &[PreparedCase]) {
     let mut group = c.benchmark_group("varint_decode_single");
-    for case in cases {
-        let wires: Vec<Vec<u8>> = case
-            .values
-            .iter()
-            .map(|&v| {
-                let (bytes, count) = encode_one(v);
-                bytes[..count].to_vec()
-            })
-            .collect();
-        let avg_bytes = case.batch_wire.len() as u64 / BATCH_LEN as u64;
-        group.throughput(Throughput::Bytes(avg_bytes.max(1)));
-        group.bench_with_input(
-            BenchmarkId::from_parameter(case.label),
-            &wires,
-            |b, wires| {
-                let mut i = 0usize;
-                b.iter(|| {
-                    let wire = &wires[i % wires.len()];
-                    i = i.wrapping_add(1);
-                    let mut cursor = black_box(wire.as_slice());
-                    black_box(decode_one(&mut cursor))
+    for_each_varint_decoder!(D => {
+        for case in cases {
+            let wires: Vec<Vec<u8>> = case
+                .values
+                .iter()
+                .map(|&v| {
+                    let (bytes, count) = encode_one(v);
+                    bytes[..count].to_vec()
                 })
-            },
-        );
-    }
+                .collect();
+            let avg_bytes = case.batch_wire.len() as u64 / BATCH_LEN as u64;
+            group.throughput(Throughput::Bytes(avg_bytes.max(1)));
+            group.bench_with_input(
+                BenchmarkId::new(D::NAME, case.label),
+                &wires,
+                |b, wires| {
+                    let mut i = 0usize;
+                    b.iter(|| {
+                        let wire = &wires[i % wires.len()];
+                        i = i.wrapping_add(1);
+                        let mut cursor = black_box(wire.as_slice());
+                        black_box(D::decode_varint(&mut cursor).expect("varint decode"))
+                    })
+                },
+            );
+        }
+    });
     group.finish();
 }
 
@@ -231,19 +236,21 @@ fn bench_decode_batch(c: &mut Criterion, cases: &[PreparedCase]) {
     let mut group = c.benchmark_group("varint_decode_batch");
     let mut out = vec![0u64; BATCH_LEN];
 
-    for case in cases {
-        group.throughput(Throughput::Bytes(case.batch_wire.len() as u64));
-        group.bench_with_input(
-            BenchmarkId::from_parameter(case.label),
-            &case.batch_wire,
-            |b, wire| {
-                b.iter(|| {
-                    decode_batch(black_box(wire.as_slice()), black_box(&mut out));
-                    black_box(&out);
-                })
-            },
-        );
-    }
+    for_each_varint_decoder!(D => {
+        for case in cases {
+            group.throughput(Throughput::Bytes(case.batch_wire.len() as u64));
+            group.bench_with_input(
+                BenchmarkId::new(D::NAME, case.label),
+                &case.batch_wire,
+                |b, wire| {
+                    b.iter(|| {
+                        decode_batch_with::<D>(black_box(wire.as_slice()), black_box(&mut out));
+                        black_box(&out);
+                    })
+                },
+            );
+        }
+    });
     group.finish();
 }
 
