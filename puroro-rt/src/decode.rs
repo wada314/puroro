@@ -1,12 +1,15 @@
 //! Wire-format decoding helpers used by generated field types.
 //!
-//! Varint decoding delegates to [`protobuf_core::IteratorExtVarint`]. Tags are
-//! unpacked here into a validated [`FieldNumber`] plus [`WireType`].
-//! `bytes::Buf` adapters live here.
+//! Varint decoding prefers a contiguous [`Buf::chunk`] scan; when a varint
+//! spans chunk boundaries it falls back to [`protobuf_core::IteratorExtVarint`].
+//! Tags are unpacked here into a validated [`FieldNumber`] plus [`WireType`].
 
 use ::allocator_api2::alloc::Allocator;
 use ::bytes::Buf;
-use ::protobuf_core::{FieldNumber, IteratorExtVarint, Varint};
+use ::protobuf_core::{
+    FieldNumber, IteratorExtVarint, MAX_VARINT_BYTES, VARINT_CONTINUATION_BIT, VARINT_PAYLOAD_MASK,
+    Varint,
+};
 use ::puroro::wire_type;
 use ::puroro::{DecodeError, UnknownField, UnknownPayload, WireType};
 use ::unmanaged::{UnmanagedString, UnmanagedVec};
@@ -29,11 +32,41 @@ impl<B: Buf> Iterator for BufVarintReader<'_, B> {
     }
 }
 
+/// Try to decode a full varint from a contiguous slice.
+///
+/// - `Ok(Some((value, len)))` — complete varint of `len` bytes (1..=10)
+/// - `Ok(None)` — not enough bytes in `chunk` (caller should use another source)
+/// - `Err(InvalidVarint)` — 10 continuation bytes (too long)
+fn try_decode_varint_from_slice(chunk: &[u8]) -> Result<Option<(u64, usize)>, DecodeError> {
+    let mut value = 0u64;
+    let mut shift = 0u32;
+
+    for (i, &byte) in chunk.iter().take(MAX_VARINT_BYTES).enumerate() {
+        value |= u64::from(byte & VARINT_PAYLOAD_MASK) << shift;
+        if byte & VARINT_CONTINUATION_BIT == 0 {
+            return Ok(Some((value, i + 1)));
+        }
+        shift += 7;
+    }
+
+    if chunk.len() >= MAX_VARINT_BYTES {
+        Err(DecodeError::InvalidVarint)
+    } else {
+        Ok(None)
+    }
+}
+
 /// Decodes a base-128 varint from `buf`.
-pub(crate) fn decode_varint<B: Buf>(buf: &mut B) -> Result<u64, DecodeError> {
-    match (BufVarintReader { buf }).read_varint()? {
-        Some(v) => Ok(v.to_uint64()),
-        None => Err(DecodeError::UnexpectedEof),
+pub fn decode_varint<B: Buf>(buf: &mut B) -> Result<u64, DecodeError> {
+    match try_decode_varint_from_slice(buf.chunk())? {
+        Some((value, len)) => {
+            buf.advance(len);
+            Ok(value)
+        }
+        None => match (BufVarintReader { buf }).read_varint()? {
+            Some(v) => Ok(v.to_uint64()),
+            None => Err(DecodeError::UnexpectedEof),
+        },
     }
 }
 
@@ -277,5 +310,97 @@ impl<'a> Iterator for UnknownFieldsIter<'a> {
 
         self.rest = buf;
         Some(UnknownField::new(number, payload))
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use ::bytes::Buf;
+
+    /// `Buf` that exposes `first` and `rest` as separate chunks.
+    struct SplitBuf<'a> {
+        first: &'a [u8],
+        rest: &'a [u8],
+    }
+
+    impl Buf for SplitBuf<'_> {
+        fn remaining(&self) -> usize {
+            self.first.len() + self.rest.len()
+        }
+
+        fn chunk(&self) -> &[u8] {
+            if self.first.is_empty() {
+                self.rest
+            } else {
+                self.first
+            }
+        }
+
+        fn advance(&mut self, cnt: usize) {
+            assert!(cnt <= self.remaining());
+            if cnt <= self.first.len() {
+                self.first = &self.first[cnt..];
+            } else {
+                let into_rest = cnt - self.first.len();
+                self.first = &[];
+                self.rest = &self.rest[into_rest..];
+            }
+        }
+    }
+
+    fn encode_u64(value: u64) -> Vec<u8> {
+        let (bytes, count) = Varint::from_uint64(value).encode();
+        bytes[..count].to_vec()
+    }
+
+    #[test]
+    fn decode_varint_lengths() {
+        for value in [0u64, 1, 127, 150, 1 << 28, u64::from(u32::MAX), u64::MAX] {
+            let wire = encode_u64(value);
+            let mut cursor = wire.as_slice();
+            assert_eq!(decode_varint(&mut cursor).unwrap(), value);
+            assert!(!cursor.has_remaining());
+        }
+    }
+
+    #[test]
+    fn decode_varint_too_long() {
+        let wire = [0x80u8; 10];
+        let mut cursor = wire.as_slice();
+        assert!(matches!(
+            decode_varint(&mut cursor),
+            Err(DecodeError::InvalidVarint)
+        ));
+    }
+
+    #[test]
+    fn decode_varint_empty() {
+        let mut cursor = [].as_slice();
+        assert!(matches!(
+            decode_varint(&mut cursor),
+            Err(DecodeError::UnexpectedEof)
+        ));
+    }
+
+    #[test]
+    fn decode_varint_split_across_chunks() {
+        // 150 == [0x96, 0x01], split after the first byte.
+        let mut buf = SplitBuf {
+            first: &[0x96],
+            rest: &[0x01],
+        };
+        assert_eq!(decode_varint(&mut buf).unwrap(), 150);
+        assert_eq!(buf.remaining(), 0);
+    }
+
+    #[test]
+    fn decode_varint_split_then_more_data() {
+        let mut buf = SplitBuf {
+            first: &[0x96],
+            rest: &[0x01, 0x07],
+        };
+        assert_eq!(decode_varint(&mut buf).unwrap(), 150);
+        assert_eq!(decode_varint(&mut buf).unwrap(), 7);
     }
 }

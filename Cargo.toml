@@ -30,7 +30,13 @@ bitvec = "1"
 # Same stack as the historical `puroro/benches/variant.rs` setup.
 criterion = { version = "0.5.1", features = ["html_reports"] }
 puroro-rt = { path = "puroro-rt" }
+rand = { version = "0.9", features = ["small_rng"] }
+rand_distr = "0.5"
 
 [[bench]]
 name = "ser_de"
+harness = false
+
+[[bench]]
+name = "varint"
 harness = false
