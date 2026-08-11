@@ -16,6 +16,7 @@ pub(crate) mod proto_message;
 pub(crate) mod proto_ref_ops;
 pub(crate) mod repeated_element;
 pub(crate) mod singular_type;
+pub(crate) mod sso_string;
 pub(crate) mod wire_payload;
 
 pub use len::{ProtoBytes, ProtoString};
@@ -27,3 +28,4 @@ pub use numerical::{
 pub use proto_message::ProtoMessage;
 pub use repeated_element::RepeatedElement;
 pub use singular_type::SingularType;
+pub use sso_string::{INLINE_CAP, SsoString, SsoStringMut};

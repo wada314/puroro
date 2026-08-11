@@ -1,6 +1,7 @@
 //! Emit a oneof submodule (`shape` / `Case` / `Storage` + trait impls).
 
 use super::defaults;
+use super::message::SingularMutStyle;
 use crate::default_value::CustomDefault;
 use crate::error::Result;
 use ::proc_macro2::{Ident, TokenStream};
@@ -31,6 +32,7 @@ pub(super) struct OneofVariantEmit {
     pub value_bit: Option<(Ident, usize)>,
     pub is_message: bool,
     pub is_bool: bool,
+    pub mut_style: SingularMutStyle,
     pub mut_target: TokenStream,
     pub optional_ty: TokenStream,
     /// Non-type-zero `[default = …]` plus pre-rendered `HasDefault` impl item.
@@ -381,6 +383,8 @@ fn render_module_body(oneof: &OneofEmit) -> Result<TokenStream> {
 
         impl<A: Allocator + ::core::clone::Clone, P> OneofDeallocate<MessageCommon<P, A>>
             for #storage_name<A>
+        where
+            MessageCommon<P, A>: MessageCommonBits,
         {
             unsafe fn deallocate(self, common: &MessageCommon<P, A>) {
                 match self {
@@ -443,6 +447,16 @@ pub(super) fn render_accessors(oneof: &OneofEmit) -> TokenStream {
                 }
             });
         } else {
+            let mut_ret = v.mut_style.return_ty(&quote! { 's }, mut_target);
+            let mutator = quote! {
+                pub fn #vname_mut<'s>(&'s mut self) -> #mut_ret {
+                    self.#group
+                        .bind_mut(&mut self._common)
+                        .variant_mut::<#field_const>()
+                        .bind_mut(&mut self._common)
+                        .value_mut()
+                }
+            };
             variant_accessors.push(quote! {
                 pub fn #vname<'a>(
                     &'a self,
@@ -456,15 +470,7 @@ pub(super) fn render_accessors(oneof: &OneofEmit) -> TokenStream {
                         .optional()
                 }
 
-                pub fn #vname_mut<'s>(
-                    &'s mut self,
-                ) -> impl ::core::ops::DerefMut<Target = #mut_target> + 's {
-                    self.#group
-                        .bind_mut(&mut self._common)
-                        .variant_mut::<#field_const>()
-                        .bind_mut(&mut self._common)
-                        .value_mut()
-                }
+                #mutator
             });
         }
     }

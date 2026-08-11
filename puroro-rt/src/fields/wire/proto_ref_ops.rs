@@ -7,7 +7,7 @@ use ::core::fmt::{Debug, Formatter, Result as FmtResult};
 
 use ::puroro::Message;
 
-use super::len::{LenCodec, LenScalar};
+use super::len::{BytesCodec, LenScalar, StringCodec};
 use super::numerical::{Numerical, NumericalType, ProtoBool};
 use super::proto_message::ProtoMessage;
 use super::singular_type::SingularType;
@@ -97,9 +97,9 @@ impl<A: Allocator + Clone> ProtoRefDebug<A> for ProtoBool {
     }
 }
 
-impl<A: Allocator + Clone, C: LenCodec> ProtoRefEq<A> for LenScalar<C> {
+impl<A: Allocator + Clone> ProtoRefEq<A> for LenScalar<StringCodec> {
     #[inline]
-    fn option_eq<'a>(lhs: Option<&'a C::RefView>, rhs: Option<&'a C::RefView>) -> bool
+    fn option_eq<'a>(lhs: Option<&'a str>, rhs: Option<&'a str>) -> bool
     where
         A: 'a,
     {
@@ -107,9 +107,29 @@ impl<A: Allocator + Clone, C: LenCodec> ProtoRefEq<A> for LenScalar<C> {
     }
 }
 
-impl<A: Allocator + Clone, C: LenCodec> ProtoRefDebug<A> for LenScalar<C> {
+impl<A: Allocator + Clone> ProtoRefDebug<A> for LenScalar<StringCodec> {
     #[inline]
-    fn fmt_ref<'a>(value: &&'a C::RefView, f: &mut Formatter<'_>) -> FmtResult
+    fn fmt_ref<'a>(value: &&'a str, f: &mut Formatter<'_>) -> FmtResult
+    where
+        A: 'a,
+    {
+        Debug::fmt(value, f)
+    }
+}
+
+impl<A: Allocator + Clone> ProtoRefEq<A> for LenScalar<BytesCodec> {
+    #[inline]
+    fn option_eq<'a>(lhs: Option<&'a [u8]>, rhs: Option<&'a [u8]>) -> bool
+    where
+        A: 'a,
+    {
+        lhs == rhs
+    }
+}
+
+impl<A: Allocator + Clone> ProtoRefDebug<A> for LenScalar<BytesCodec> {
+    #[inline]
+    fn fmt_ref<'a>(value: &&'a [u8], f: &mut Formatter<'_>) -> FmtResult
     where
         A: 'a,
     {

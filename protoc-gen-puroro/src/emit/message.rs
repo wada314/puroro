@@ -47,6 +47,8 @@ struct ScalarEmit {
     optional_ty: TokenStream,
     /// Non-type-zero `[default = …]` marker (emitted into `mod defaults`).
     custom_default: Option<(CustomDefault, TokenStream /* HasDefault impl item */)>,
+    /// Shape of the generated `_mut` accessor return type.
+    mut_style: SingularMutStyle,
 }
 
 struct RepeatedEmit {
@@ -86,6 +88,35 @@ enum RepeatedAccessorStyle {
     String,
     /// `repeated bytes` — `RepeatedBytesMut`.
     Bytes,
+}
+
+/// How a singular (non-message) `_mut` accessor is typed in generated code.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub(super) enum SingularMutStyle {
+    /// `impl DerefMut<Target = …>` using [`ScalarEmit::mut_target`] / variant `mut_target`.
+    DerefMut,
+    /// `impl ::puroro::StringMut<A>` (hides `puroro-rt` SSO mutator).
+    SsoString,
+}
+
+impl SingularMutStyle {
+    pub(super) fn from_wire(wire: &WireTypeKind<'_>) -> Self {
+        if wire.is_string() {
+            Self::SsoString
+        } else {
+            Self::DerefMut
+        }
+    }
+
+    /// Return type of `_mut` for lifetime `lt` (e.g. `'s`) and `mut_target`.
+    pub(super) fn return_ty(self, lt: &TokenStream, mut_target: &TokenStream) -> TokenStream {
+        match self {
+            Self::SsoString => quote! { impl ::puroro::StringMut<A> + #lt },
+            Self::DerefMut => {
+                quote! { impl ::core::ops::DerefMut<Target = #mut_target> + #lt }
+            }
+        }
+    }
 }
 
 #[derive(Clone, Copy)]
@@ -549,10 +580,21 @@ fn oneof_variant_emit(field: &PlannedField<'_>, index: usize) -> Result<OneofVar
                 Some((ident, *value_bit)),
             )
         }
+        CatalogLayout::InlineOrHeap {
+            heap_bit,
+            bit_const,
+        } => {
+            let ident = Ident::new(bit_const, Span::call_site());
+            (
+                Some(quote! { ::puroro_rt::InlineOrHeap<{ super::#ident }> }),
+                Some((ident, *heap_bit)),
+            )
+        }
     };
 
     let is_message = matches!(wire, WireTypeKind::Message(_));
     let is_bool = matches!(wire, WireTypeKind::Bool);
+    let mut_style = SingularMutStyle::from_wire(wire);
     let variant_pascal = to_pascal_case(field.name());
     Ok(OneofVariantEmit {
         name: rust_ident(field.name()),
@@ -567,6 +609,7 @@ fn oneof_variant_emit(field: &PlannedField<'_>, index: usize) -> Result<OneofVar
         value_bit,
         is_message,
         is_bool,
+        mut_style,
         mut_target: mut_target_type(wire)?,
         optional_ty: if is_message {
             TokenStream::new()
@@ -739,6 +782,16 @@ fn scalar_emit(
                 Some((ident, *value_bit)),
             )
         }
+        CatalogLayout::InlineOrHeap {
+            heap_bit,
+            bit_const,
+        } => {
+            let ident = Ident::new(bit_const, Span::call_site());
+            (
+                Some(quote! { ::puroro_rt::InlineOrHeap<{ #ident }> }),
+                Some((ident, *heap_bit)),
+            )
+        }
     };
 
     let is_enum = matches!(wire, WireTypeKind::Enum { .. });
@@ -776,6 +829,7 @@ fn scalar_emit(
             Some(custom) => Some((custom.clone(), defaults::render_marker_item(custom, wire)?)),
             None => None,
         },
+        mut_style: SingularMutStyle::from_wire(wire),
     })
 }
 
@@ -854,7 +908,8 @@ fn render_bit_consts(fields: &[FieldEmit]) -> TokenStream {
         TokenStream::new()
     } else {
         quote! {
-            // Bit indices — presence then bool value bits (field-number order).
+            // Bit indices — presence, string SSO heap bits (1 = heap), then bool
+            // value bits (field-number order).
             #(#items)*
         }
     }
@@ -1170,12 +1225,18 @@ fn render_singular_accessors(field: &ScalarEmit) -> TokenStream {
         }
     };
 
+    // RPIT `StringMut` so public signatures do not name `puroro-rt`.
+    let mut_ret = field.mut_style.return_ty(&quote! { 's }, mut_target);
+    let mutator = quote! {
+        pub fn #name_mut<'s>(&'s mut self) -> #mut_ret {
+            self.#name.bind_mut(&mut self._common).value_mut()
+        }
+    };
+
     quote! {
         #getter
 
-        pub fn #name_mut<'s>(&'s mut self) -> impl ::core::ops::DerefMut<Target = #mut_target> + 's {
-            self.#name.bind_mut(&mut self._common).value_mut()
-        }
+        #mutator
 
         pub fn #clear_name(&mut self) {
             self.#name.bind_mut(&mut self._common).clear();

@@ -121,13 +121,20 @@ pub enum CatalogPresence {
     Message,
 }
 
-/// `ValueLayout` on `SingularField` (`Inline` default vs `BitPacked` for bool).
+/// `ValueLayout` on `SingularField` (`Inline` default vs `BitPacked` / SSO).
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum CatalogLayout {
     Inline,
     BitPacked {
         value_bit: usize,
         /// e.g. `BIT_DONE_VALUE`
+        bit_const: String,
+    },
+    /// Singular `string` — heap/inline bit for [`InlineOrHeap`] (`true` = heap).
+    InlineOrHeap {
+        /// Index of the `MessageCommon` bit (`1` = heap arm, `0` = inline).
+        heap_bit: usize,
+        /// e.g. `BIT_TITLE_SSO`
         bit_const: String,
     },
 }
@@ -181,6 +188,10 @@ impl<'a> WireTypeKind<'a> {
 
     pub fn is_bool(self) -> bool {
         matches!(self, Self::Bool)
+    }
+
+    pub fn is_string(self) -> bool {
+        matches!(self, Self::String { .. })
     }
 
     /// Whether the type may use packed repeated wire encoding.
@@ -248,6 +259,11 @@ pub fn presence_bit_const(proto_name: &str) -> String {
 /// `BIT_DONE_VALUE` — bool value bit in `BitPacked`.
 pub fn value_bit_const(proto_name: &str) -> String {
     format!("BIT_{}_VALUE", to_upper_snake(proto_name))
+}
+
+/// `BIT_TITLE_SSO` — singular string heap bit in `InlineOrHeap` (`1` = heap).
+pub fn sso_bit_const(proto_name: &str) -> String {
+    format!("BIT_{}_SSO", to_upper_snake(proto_name))
 }
 
 /// Byte length of `BitArray<[u8; N], Lsb0>` for `bit_count` bits (`N == 0` allowed).

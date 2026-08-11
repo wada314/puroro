@@ -10,7 +10,7 @@
 //! [`AlwaysInitialized`] does not require [`MessageCommonBits`](super::MessageCommonBits).
 
 /// Read-only view of whether a value slot is initialized.
-pub trait SlotInitView {
+pub trait SlotInitView: Copy {
     /// `true` when the slot holds a valid value.
     ///
     /// `probe` is invoked with a bit index only when this adapter tracks init

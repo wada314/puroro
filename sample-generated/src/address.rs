@@ -17,18 +17,21 @@ use ::puroro_rt::decode::{decode_tag, skip_field_and_save};
 use ::puroro_rt::{
     CloneFieldsVisitor, CloneIn, DebugStructVisitor, EncodeCtx, EncodeRawVisitor,
     EncodedLenVisitor, Explicit, FieldDeallocVisitor, FieldEqVisitor, FieldPairVisitor,
-    FieldPairVisitorMut, FieldVisitor, FieldVisitorMut, MessageCommon, MessageEncode, MessageMerge,
-    ProtoDouble, ProtoFixed32, ProtoString, SingularField,
+    FieldPairVisitorMut, FieldVisitor, FieldVisitorMut, InlineOrHeap, MessageCommon, MessageEncode,
+    MessageMerge, ProtoDouble, ProtoFixed32, ProtoString, SingularField,
 };
 
 // ---------------------------------------------------------------------------
-// Bit indices (4 tracked singular fields)
+// Bit indices — presence then string SSO heap bits (1 = heap / 0 = inline),
+// by ascending field number.
 // ---------------------------------------------------------------------------
 
-pub const BIT_STREET: usize = 0; // street (EXPLICIT)
-pub const BIT_CITY: usize = 1; // city (EXPLICIT)
-pub const BIT_POSTAL_CODE: usize = 2; // postal_code (EXPLICIT fixed32)
-pub const BIT_LATITUDE: usize = 3; // latitude (EXPLICIT double)
+pub const BIT_STREET: usize = 0; // street (EXPLICIT presence)
+pub const BIT_STREET_SSO: usize = 1; // street (SSO: 1 = heap)
+pub const BIT_CITY: usize = 2; // city (EXPLICIT presence)
+pub const BIT_CITY_SSO: usize = 3; // city (SSO: 1 = heap)
+pub const BIT_POSTAL_CODE: usize = 4; // postal_code (EXPLICIT fixed32)
+pub const BIT_LATITUDE: usize = 5; // latitude (EXPLICIT double)
 
 // ---------------------------------------------------------------------------
 // Proto field numbers
@@ -45,8 +48,20 @@ pub const FIELD_LATITUDE: u32 = 4; // latitude
 
 pub struct Address<A: Allocator + Clone = Global> {
     _common: MessageCommon<BitArray<[u8; 1], Lsb0>, A>,
-    street: SingularField<ProtoString, Explicit<{ BIT_STREET }>, { FIELD_STREET }, A>, // proto: string street = 1;
-    city: SingularField<ProtoString, Explicit<{ BIT_CITY }>, { FIELD_CITY }, A>, // proto: string city = 2;
+    street: SingularField<
+        ProtoString,
+        Explicit<{ BIT_STREET }>,
+        { FIELD_STREET },
+        A,
+        InlineOrHeap<{ BIT_STREET_SSO }>,
+    >, // proto: string street = 1;
+    city: SingularField<
+        ProtoString,
+        Explicit<{ BIT_CITY }>,
+        { FIELD_CITY },
+        A,
+        InlineOrHeap<{ BIT_CITY_SSO }>,
+    >, // proto: string city = 2;
     postal_code:
         SingularField<ProtoFixed32, Explicit<{ BIT_POSTAL_CODE }>, { FIELD_POSTAL_CODE }, A>, // proto: fixed32 postal_code = 3;
     latitude: SingularField<ProtoDouble, Explicit<{ BIT_LATITUDE }>, { FIELD_LATITUDE }, A>, // proto: double latitude = 4;
@@ -74,7 +89,7 @@ impl<A: Allocator + Clone> Address<A> {
         self.street.bind(&self._common).optional()
     }
 
-    pub fn street_mut<'s>(&'s mut self) -> impl DerefMut<Target = ::puroro::String<A>> + 's {
+    pub fn street_mut(&mut self) -> impl ::puroro::StringMut<A> + '_ {
         self.street.bind_mut(&mut self._common).value_mut()
     }
 
@@ -91,7 +106,7 @@ impl<A: Allocator + Clone> Address<A> {
         self.city.bind(&self._common).optional()
     }
 
-    pub fn city_mut<'s>(&'s mut self) -> impl DerefMut<Target = ::puroro::String<A>> + 's {
+    pub fn city_mut(&mut self) -> impl ::puroro::StringMut<A> + '_ {
         self.city.bind_mut(&mut self._common).value_mut()
     }
 

@@ -14,7 +14,8 @@ use ::std::collections::HashMap;
 pub struct MessagePlan<'a> {
     message: &'a Message<'a>,
     members: Vec<MessageMember<'a>>,
-    /// Bits consumed in `MessageCommon` presence storage (presence + bool values).
+    /// Bits consumed in `MessageCommon` (presence + bool values + string SSO
+    /// heap bits; SSO bit set means heap arm).
     bit_count: usize,
 }
 
@@ -237,6 +238,13 @@ fn plan_field<'a>(field: &'a Field<'a>, next_bit: &mut usize) -> Result<PlannedF
                 CatalogLayout::BitPacked {
                     value_bit,
                     bit_const: value_bit_const(field.name()),
+                }
+            } else if wire.is_string() {
+                let heap_bit = *next_bit;
+                *next_bit += 1;
+                CatalogLayout::InlineOrHeap {
+                    heap_bit,
+                    bit_const: super::sso_bit_const(field.name()),
                 }
             } else {
                 CatalogLayout::Inline
@@ -472,8 +480,9 @@ mod tests {
             .as_message()
             .unwrap();
         let plan = plan_message(msg).unwrap();
-        assert_eq!(plan.bit_count(), 4);
-        assert_eq!(presence_byte_len(4), 1);
+        // street/city: presence + SSO heap bit each; postal_code/latitude: presence only.
+        assert_eq!(plan.bit_count(), 6);
+        assert_eq!(presence_byte_len(6), 1);
         assert_eq!(plan.members().len(), 4);
 
         let MessageMember::Field(street) = &plan.members()[0] else {
@@ -487,9 +496,16 @@ mod tests {
                         utf8: Utf8Validation::Verify,
                     },
                 presence: CatalogPresence::Explicit { bit: 0, bit_const },
-                layout: CatalogLayout::Inline,
+                layout:
+                    CatalogLayout::InlineOrHeap {
+                        heap_bit: 1,
+                        bit_const: sso_const,
+                    },
                 custom_default: None,
-            } => assert_eq!(bit_const, "BIT_STREET"),
+            } => {
+                assert_eq!(bit_const, "BIT_STREET");
+                assert_eq!(sso_const, "BIT_STREET_SSO");
+            }
             other => panic!("unexpected kind: {other:?}"),
         }
 
@@ -500,7 +516,7 @@ mod tests {
         match postal.kind() {
             FieldKind::Singular {
                 wire: WireTypeKind::Fixed32,
-                presence: CatalogPresence::Explicit { bit: 2, bit_const },
+                presence: CatalogPresence::Explicit { bit: 4, bit_const },
                 layout: CatalogLayout::Inline,
                 custom_default: None,
             } => assert_eq!(bit_const, "BIT_POSTAL_CODE"),
@@ -574,11 +590,11 @@ mod tests {
         let plan = plan_message(msg).unwrap();
 
         // score: no bits
-        // email_address (oneof string): no bits
-        // done: value bit 0
-        // flag: presence 1 + value 2
-        // urgent (oneof bool): value bit 3
-        assert_eq!(plan.bit_count(), 4);
+        // email_address (oneof string): SSO heap bit 0
+        // done: value bit 1
+        // flag: presence 2 + value 3
+        // urgent (oneof bool): value bit 4
+        assert_eq!(plan.bit_count(), 5);
 
         assert_eq!(plan.members().len(), 4);
         assert!(matches!(plan.members()[0], MessageMember::Field(_)));
@@ -594,13 +610,26 @@ mod tests {
         assert_eq!(notification.variants().len(), 2);
         assert_eq!(notification.variants()[0].name(), "email_address");
         assert_eq!(notification.variants()[1].name(), "urgent");
+        match notification.variants()[0].kind() {
+            FieldKind::Singular {
+                wire: WireTypeKind::String { .. },
+                presence: CatalogPresence::Oneof,
+                layout:
+                    CatalogLayout::InlineOrHeap {
+                        heap_bit: 0,
+                        bit_const,
+                    },
+                custom_default: None,
+            } => assert_eq!(bit_const, "BIT_EMAIL_ADDRESS_SSO"),
+            other => panic!("unexpected email_address kind: {other:?}"),
+        }
         match notification.variants()[1].kind() {
             FieldKind::Singular {
                 wire: WireTypeKind::Bool,
                 presence: CatalogPresence::Oneof,
                 layout:
                     CatalogLayout::BitPacked {
-                        value_bit: 3,
+                        value_bit: 4,
                         bit_const,
                     },
                 custom_default: None,
@@ -617,7 +646,7 @@ mod tests {
                 presence: CatalogPresence::Implicit,
                 layout:
                     CatalogLayout::BitPacked {
-                        value_bit: 0,
+                        value_bit: 1,
                         bit_const,
                     },
                 custom_default: None,
@@ -633,12 +662,12 @@ mod tests {
                 wire: WireTypeKind::Bool,
                 presence:
                     CatalogPresence::Explicit {
-                        bit: 1,
+                        bit: 2,
                         bit_const: presence_const,
                     },
                 layout:
                     CatalogLayout::BitPacked {
-                        value_bit: 2,
+                        value_bit: 3,
                         bit_const: value_const,
                     },
                 custom_default: None,

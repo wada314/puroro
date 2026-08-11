@@ -8,8 +8,12 @@
 //! `UnmanagedString`, [`UnmanagedBox`](::unmanaged::UnmanagedBox), …); logical
 //! bit-packed bool values live in [`MessageCommon`](super::MessageCommon).
 //!
-//! Construction and teardown thread an allocator (via
-//! [`DefaultIn`](super::DefaultIn) / [`unmanaged::DeallocateIn`]).
+//! Construction uses [`DefaultIn`](super::DefaultIn). Message Drop / clone of a
+//! slot go through [`take_value`](ValueSlot::take_value) /
+//! [`get_value`](ValueSlot::get_value) / [`from_optional`](ValueSlot::from_optional);
+//! how the live payload is freed or deep-copied is decided by
+//! [`ValueLayout`](super::value_layout::ValueLayout). Mut views still release
+//! replaced payloads via [`unmanaged::DeallocateIn`].
 //! Read / mutation go through short-lived views from [`with`](ValueSlot::with) /
 //! [`with_mut`](ValueSlot::with_mut), which return
 //! [`ValueSlotRefAccess`] / [`ValueSlotMutAccess`] (RPIT).
@@ -18,12 +22,13 @@ use ::core::marker::PhantomData;
 use ::core::mem::{self, MaybeUninit};
 
 use ::allocator_api2::alloc::Allocator;
-use ::unmanaged::{CloneIn, DeallocateIn};
+use ::unmanaged::DeallocateIn;
 
 use super::{
     DefaultIn, MessageCommon, MessageCommonBits,
     slot_init::{SlotInitMut, SlotInitView},
 };
+use crate::fields::wire::sso_string::SsoString;
 
 /// Marker for payloads stored as addressable `T` / [`MaybeUninit<T>`] in the
 /// field slot.
@@ -39,12 +44,16 @@ impl AddressableSlot for () {}
 
 impl<A: Allocator> AddressableSlot for ::unmanaged::UnmanagedString<A> {}
 impl<A: Allocator> AddressableSlot for ::unmanaged::UnmanagedVec<u8, A> {}
+impl<A: Allocator> AddressableSlot for SsoString<A> {}
 
-/// Storage construction / teardown and view binding for a singular field value slot.
+/// Storage construction, live-payload extract/rebuild, and view binding for a
+/// singular field value slot.
 ///
 /// Prefer [`with`](Self::with) / [`with_mut`](Self::with_mut) for reads and
-/// mutation. [`new_in`](Self::new_in) / [`deallocate_in`](Self::deallocate_in)
-/// cover construction and message / oneof teardown.
+/// mutation. Message Drop / field clone use [`take_value`](Self::take_value) /
+/// [`get_value`](Self::get_value) / [`from_optional`](Self::from_optional);
+/// [`ValueLayout`](super::value_layout::ValueLayout) decides how to free or
+/// deep-copy the extracted `T`.
 pub trait ValueSlot<T, A>: Sized
 where
     T: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
@@ -57,19 +66,19 @@ where
     /// ignores `alloc` — the slot starts absent.
     fn new_in(alloc: A) -> Self;
 
-    /// Consumes the slot and frees any live payload through `alloc`.
+    /// Extracts a live payload, if any.
     ///
-    /// Used from message / oneof `Drop` paths. `initialized` is taken from the
-    /// init marker + [`MessageCommon`] by the caller.
-    fn deallocate_in(self, initialized: bool, alloc: A);
+    /// `initialized` is ignored for always-present / pointer-present slots
+    /// (`T`, [`Option<T>`]). Callers obtain it from the presence init marker +
+    /// [`MessageCommon`] when the slot is bit-tracked ([`MaybeUninit<T>`]).
+    fn take_value(self, initialized: bool) -> Option<T>;
 
-    /// Deep-copies any live payload into `alloc`.
-    ///
-    /// `initialized` matches [`deallocate_in`](Self::deallocate_in): for
-    /// always-present / pointer-present slots it is ignored.
-    fn clone_in(&self, initialized: bool, alloc: A) -> Self
-    where
-        T: CloneIn<A>;
+    /// Borrows a live payload, if any. Same `initialized` rules as
+    /// [`take_value`](Self::take_value).
+    fn get_value(&self, initialized: bool) -> Option<&T>;
+
+    /// Rebuilds slot storage from an optional live payload (clone path).
+    fn from_optional(value: Option<T>) -> Self;
 
     /// Pairs this slot with an init marker and message common for read access.
     fn with<'s, I: SlotInitView, Pb>(
@@ -236,17 +245,19 @@ where
         T::default_in(alloc)
     }
 
-    fn deallocate_in(self, _: bool, alloc: A) {
-        // SAFETY: `alloc` owns this value's buffer.
-        unsafe { DeallocateIn::deallocate_in(self, alloc) };
+    #[inline]
+    fn take_value(self, _: bool) -> Option<T> {
+        Some(self)
     }
 
     #[inline]
-    fn clone_in(&self, _: bool, alloc: A) -> Self
-    where
-        T: CloneIn<A>,
-    {
-        CloneIn::clone_in(self, alloc)
+    fn get_value(&self, _: bool) -> Option<&T> {
+        Some(self)
+    }
+
+    #[inline]
+    fn from_optional(value: Option<T>) -> Self {
+        value.expect("always-initialized ValueSlot cannot be rebuilt from None")
     }
 
     #[inline]
@@ -293,25 +304,31 @@ where
         MaybeUninit::uninit()
     }
 
-    fn deallocate_in(self, initialized: bool, alloc: A) {
+    #[inline]
+    fn take_value(self, initialized: bool) -> Option<T> {
         if initialized {
             // SAFETY: init bit set implies a live payload we now take ownership of.
-            let value = unsafe { self.assume_init() };
-            // SAFETY: `alloc` owns `value`'s buffer.
-            unsafe { DeallocateIn::deallocate_in(value, alloc) };
+            Some(unsafe { self.assume_init() })
+        } else {
+            None
         }
     }
 
     #[inline]
-    fn clone_in(&self, initialized: bool, alloc: A) -> Self
-    where
-        T: CloneIn<A>,
-    {
+    fn get_value(&self, initialized: bool) -> Option<&T> {
         if initialized {
             // SAFETY: init bit set implies a live payload.
-            MaybeUninit::new(unsafe { self.assume_init_ref() }.clone_in(alloc))
+            Some(unsafe { self.assume_init_ref() })
         } else {
-            MaybeUninit::uninit()
+            None
+        }
+    }
+
+    #[inline]
+    fn from_optional(value: Option<T>) -> Self {
+        match value {
+            Some(v) => MaybeUninit::new(v),
+            None => MaybeUninit::uninit(),
         }
     }
 
@@ -398,19 +415,19 @@ where
         None
     }
 
-    fn deallocate_in(self, _: bool, alloc: A) {
-        if let Some(value) = self {
-            // SAFETY: `alloc` owns `value`'s buffer.
-            unsafe { DeallocateIn::deallocate_in(value, alloc) };
-        }
+    #[inline]
+    fn take_value(self, _: bool) -> Option<T> {
+        self
     }
 
     #[inline]
-    fn clone_in(&self, _: bool, alloc: A) -> Self
-    where
-        T: CloneIn<A>,
-    {
-        self.as_ref().map(|value| value.clone_in(alloc))
+    fn get_value(&self, _: bool) -> Option<&T> {
+        self.as_ref()
+    }
+
+    #[inline]
+    fn from_optional(value: Option<T>) -> Self {
+        value
     }
 
     #[inline]

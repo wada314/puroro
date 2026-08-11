@@ -4,9 +4,9 @@
 //! blankets go on `LenScalar<C>`, so they do not collide with
 //! [`Numerical`](super::numerical::Numerical)`<C>` blankets.
 //!
-//! Singular and repeated storage is
-//! [`UnmanagedString`](::unmanaged::UnmanagedString) /
-//! [`UnmanagedVec`](::unmanaged::UnmanagedVec).
+//! Repeated / map storage uses [`UnmanagedString`](::unmanaged::UnmanagedString)
+//! / [`UnmanagedVec`](::unmanaged::UnmanagedVec). Singular `string` uses
+//! [`SsoString`](super::sso_string::SsoString) via [`SingularType`].
 
 use ::allocator_api2::alloc::Allocator;
 use ::allocator_api2::vec::Vec as AllocVec;

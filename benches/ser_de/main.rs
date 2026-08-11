@@ -12,8 +12,11 @@ mod payloads;
 use ::criterion::{BenchmarkId, Criterion, Throughput, black_box, criterion_group};
 use ::puroro::Message;
 
-use messages::{FlatScalars, Nest, PackedInts, StringHeavy};
-use payloads::{FLAT_BYTES, NEST_BYTES, NEST_DEPTH, PACKED_BYTES, PACKED_LEN, STRINGS_BYTES};
+use messages::{FlatScalars, Nest, PackedInts, ShortStrings, StringHeavy};
+use payloads::{
+    FLAT_BYTES, NEST_BYTES, NEST_DEPTH, PACKED_BYTES, PACKED_LEN, SHORT_STRINGS_BYTES,
+    STRINGS_BYTES,
+};
 
 fn bench_encode(c: &mut Criterion) {
     let mut group = c.benchmark_group("encode");
@@ -41,6 +44,13 @@ fn bench_encode(c: &mut Criterion) {
     group.bench_function(BenchmarkId::new("strings", STRINGS_BYTES.len()), |b| {
         b.iter(|| black_box(&strings).encode_to_vec())
     });
+
+    let short = ShortStrings::sample();
+    group.throughput(Throughput::Bytes(SHORT_STRINGS_BYTES.len() as u64));
+    group.bench_function(
+        BenchmarkId::new("short_strings", SHORT_STRINGS_BYTES.len()),
+        |b| b.iter(|| black_box(&short).encode_to_vec()),
+    );
     group.finish();
 }
 
@@ -70,6 +80,15 @@ fn bench_decode(c: &mut Criterion) {
         let bytes = STRINGS_BYTES.as_slice();
         b.iter(|| StringHeavy::decode(black_box(bytes)).unwrap())
     });
+
+    group.throughput(Throughput::Bytes(SHORT_STRINGS_BYTES.len() as u64));
+    group.bench_function(
+        BenchmarkId::new("short_strings", SHORT_STRINGS_BYTES.len()),
+        |b| {
+            let bytes = SHORT_STRINGS_BYTES.as_slice();
+            b.iter(|| ShortStrings::decode(black_box(bytes)).unwrap())
+        },
+    );
     group.finish();
 }
 

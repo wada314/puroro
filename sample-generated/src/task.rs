@@ -26,9 +26,9 @@ use ::puroro_rt::{
     BitPacked, CloneFieldsVisitor, CloneIn, Closed, DebugStructVisitor, EncodeCtx,
     EncodeRawVisitor, EncodedLenVisitor, Expanded, Explicit, FieldDeallocVisitor, FieldEqVisitor,
     FieldPairVisitor, FieldPairVisitorMut, FieldVisitor, FieldVisitorMut, Implicit, Inline,
-    LegacyRequired, MapField, Message as MessagePresence, MessageCommon, MessageEncode,
-    MessageMerge, OneofSlot, Open, Packed, ProtoBool, ProtoBytes, ProtoEnum, ProtoInt32,
-    ProtoMessage, ProtoString, RepeatedField, SingularField,
+    InlineOrHeap, LegacyRequired, MapField, Message as MessagePresence, MessageCommon,
+    MessageEncode, MessageMerge, OneofSlot, Open, Packed, ProtoBool, ProtoBytes, ProtoEnum,
+    ProtoInt32, ProtoMessage, ProtoString, RepeatedField, SingularField,
 };
 
 use defaults::MaxRetriesDefault;
@@ -40,19 +40,23 @@ use notification::NotificationStorage;
 pub use notification::{Notification, NotificationCase};
 
 // ---------------------------------------------------------------------------
-// Bit indices — presence (EXPLICIT/LEGACY_REQUIRED) then bool value bits,
-// assigned by ascending field number in one pass.
+// Bit indices — presence, string SSO heap bits (1 = heap / 0 = inline), then
+// bool value bits, assigned by ascending field number in one pass.
 // ---------------------------------------------------------------------------
 
 pub const BIT_TITLE: usize = 0; // title (EXPLICIT presence)
-pub const BIT_MAX_RETRIES: usize = 1; // max_retries (EXPLICIT presence)
-pub const BIT_OWNER_ID: usize = 2; // owner_id (LEGACY_REQUIRED presence)
-pub const BIT_PAYLOAD: usize = 3; // payload (EXPLICIT presence)
-pub const BIT_PRIORITY: usize = 4; // priority (EXPLICIT presence)
-pub const BIT_DONE_VALUE: usize = 5; // done (IMPLICIT bool value)
-pub const BIT_FLAG: usize = 6; // flag (EXPLICIT presence)
-pub const BIT_FLAG_VALUE: usize = 7; // flag (EXPLICIT bool value)
-pub const BIT_URGENT_VALUE: usize = 8; // notification.urgent (oneof bool value)
+pub const BIT_TITLE_SSO: usize = 1; // title (SSO: 1 = heap)
+pub const BIT_MAX_RETRIES: usize = 2; // max_retries (EXPLICIT presence)
+pub const BIT_OWNER_ID: usize = 3; // owner_id (LEGACY_REQUIRED presence)
+pub const BIT_OWNER_ID_SSO: usize = 4; // owner_id (SSO: 1 = heap)
+pub const BIT_PAYLOAD: usize = 5; // payload (EXPLICIT presence)
+pub const BIT_PRIORITY: usize = 6; // priority (EXPLICIT presence)
+pub const BIT_EMAIL_ADDRESS_SSO: usize = 7; // notification.email_address (SSO: 1 = heap)
+pub const BIT_PHONE_NUMBER_SSO: usize = 8; // notification.phone_number (SSO: 1 = heap)
+pub const BIT_DONE_VALUE: usize = 9; // done (IMPLICIT bool value)
+pub const BIT_FLAG: usize = 10; // flag (EXPLICIT presence)
+pub const BIT_FLAG_VALUE: usize = 11; // flag (EXPLICIT bool value)
+pub const BIT_URGENT_VALUE: usize = 12; // notification.urgent (oneof bool value)
 
 // ---------------------------------------------------------------------------
 // Proto field numbers
@@ -86,7 +90,13 @@ pub const FIELD_ATTRIBUTES: u32 = 21; // attributes (map<string, int32>)
 /// Reference `Task` message from `DESIGN.md`.
 pub struct Task<A: Allocator + Clone = Global> {
     _common: MessageCommon<BitArray<[u8; 2], Lsb0>, A>,
-    title: SingularField<ProtoString, Explicit<{ BIT_TITLE }>, { FIELD_TITLE }, A>, // proto: string title = 1;
+    title: SingularField<
+        ProtoString,
+        Explicit<{ BIT_TITLE }>,
+        { FIELD_TITLE },
+        A,
+        InlineOrHeap<{ BIT_TITLE_SSO }>,
+    >, // proto: string title = 1;
     score: SingularField<ProtoInt32, Implicit, { FIELD_SCORE }, A>, // proto: int32 score = 2;
     max_retries: SingularField<
         ProtoInt32,
@@ -96,7 +106,13 @@ pub struct Task<A: Allocator + Clone = Global> {
         Inline,
         MaxRetriesDefault,
     >, // proto: int32 max_retries = 3;
-    owner_id: SingularField<ProtoString, LegacyRequired<{ BIT_OWNER_ID }>, { FIELD_OWNER_ID }, A>, // proto: string owner_id = 4;
+    owner_id: SingularField<
+        ProtoString,
+        LegacyRequired<{ BIT_OWNER_ID }>,
+        { FIELD_OWNER_ID },
+        A,
+        InlineOrHeap<{ BIT_OWNER_ID_SSO }>,
+    >, // proto: string owner_id = 4;
     payload: SingularField<ProtoBytes, Explicit<{ BIT_PAYLOAD }>, { FIELD_PAYLOAD }, A>, // proto: bytes payload = 5;
     tag_ids: RepeatedField<ProtoInt32, Packed, { FIELD_TAG_IDS }, A>, // proto: repeated int32 tag_ids = 6 [packed];
     scores: RepeatedField<ProtoInt32, Expanded, { FIELD_SCORES }, A>, // proto: repeated int32 scores = 7;
@@ -161,7 +177,7 @@ impl<A: Allocator + Clone> Task<A> {
         self.title.bind(&self._common).optional()
     }
 
-    pub fn title_mut<'s>(&'s mut self) -> impl DerefMut<Target = ::puroro::String<A>> + 's {
+    pub fn title_mut(&mut self) -> impl ::puroro::StringMut<A> + '_ {
         self.title.bind_mut(&mut self._common).value_mut()
     }
 
@@ -209,7 +225,7 @@ impl<A: Allocator + Clone> Task<A> {
         self.owner_id.bind(&self._common).optional()
     }
 
-    pub fn owner_id_mut<'s>(&'s mut self) -> impl DerefMut<Target = ::puroro::String<A>> + 's {
+    pub fn owner_id_mut(&mut self) -> impl ::puroro::StringMut<A> + '_ {
         self.owner_id.bind_mut(&mut self._common).value_mut()
     }
 
@@ -444,7 +460,7 @@ impl<A: Allocator + Clone> Task<A> {
             .optional()
     }
 
-    pub fn email_address_mut(&mut self) -> impl DerefMut<Target = ::puroro::String<A>> + '_ {
+    pub fn email_address_mut(&mut self) -> impl ::puroro::StringMut<A> + '_ {
         self.notification
             .bind_mut(&mut self._common)
             .variant_mut::<FIELD_EMAIL_ADDRESS>()
@@ -464,7 +480,7 @@ impl<A: Allocator + Clone> Task<A> {
             .optional()
     }
 
-    pub fn phone_number_mut(&mut self) -> impl DerefMut<Target = ::puroro::String<A>> + '_ {
+    pub fn phone_number_mut(&mut self) -> impl ::puroro::StringMut<A> + '_ {
         self.notification
             .bind_mut(&mut self._common)
             .variant_mut::<FIELD_PHONE_NUMBER>()

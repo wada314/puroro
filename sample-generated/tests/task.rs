@@ -6,8 +6,10 @@
 
 use ::allocator_api2::alloc::Global;
 use ::puroro::{
-    MapMut, MapRef, Message, OneofView, OneofViewMut, RepeatedStringMut, UnknownPayload,
+    MapMut, MapRef, Message, OneofView, OneofViewMut, RepeatedStringMut, String as AllocString,
+    StringMut, UnknownPayload,
 };
+use ::puroro_rt::INLINE_CAP;
 use ::puroro_rt::Varint;
 use ::puroro_rt::encode::{encode_varint_field, field_number_const};
 use ::puroro_sample_generated::task::{Notification, NotificationCase};
@@ -46,12 +48,12 @@ fn encode_packed_int32_field(field_number: u32, values: &[i32], buf: &mut Vec<u8
 #[test]
 fn task_clone_and_eq() {
     let mut task = Task::new();
-    task.title_mut().push_str("Clone me");
+    task.title_mut().set("Clone me");
     *task.score_mut() = 7;
-    task.owner_id_mut().push_str("u");
+    task.owner_id_mut().set("u");
     *task.done_mut() = true;
     let mut addr = Address::new();
-    addr.street_mut().push_str("St");
+    addr.street_mut().set("St");
     *addr.latitude_mut() = 1.5;
     *task.assignee_mut() = addr;
 
@@ -66,7 +68,7 @@ fn task_clone_and_eq() {
 #[test]
 fn address_clone_and_eq() {
     let mut a = Address::new();
-    a.city_mut().push_str("Tokyo");
+    a.city_mut().set("Tokyo");
     *a.postal_code_mut() = 100;
     *a.latitude_mut() = 35.0;
     let b = a.clone();
@@ -76,30 +78,47 @@ fn address_clone_and_eq() {
 }
 
 #[test]
+fn string_set_and_set_string() {
+    let mut addr = Address::new();
+    addr.street_mut().set("short");
+    assert_eq!(addr.street().get(), "short");
+
+    let long = "x".repeat(INLINE_CAP + 8);
+    addr.street_mut()
+        .set_string(AllocString::from_str_in(&long, Global));
+    assert_eq!(addr.street().get(), long);
+
+    // Moving a short `AllocString` still works (may demote to inline).
+    addr.city_mut()
+        .set_string(AllocString::from_str_in("Osaka", Global));
+    assert_eq!(addr.city().get(), "Osaka");
+}
+
+#[test]
 fn task_eq_with_reference_allocator_and_oneof_message() {
     // `A = &Global` is a non-'static reference allocator (same shape as `&Bump`).
     // Oneof `PartialEq` must not require `for<'a> Ref<'a>: PartialEq` / `A: 'static`.
     let alloc = &Global;
     let mut a = Task::new_in(alloc);
-    a.owner_id_mut().push_str("user-1");
-    a.postal_mut().street_mut().push_str("1 Ref St");
+    a.owner_id_mut().set("user-1");
+    a.postal_mut().street_mut().set("1 Ref St");
 
     let mut b = Task::new_in(alloc);
-    b.owner_id_mut().push_str("user-1");
-    b.postal_mut().street_mut().push_str("1 Ref St");
+    b.owner_id_mut().set("user-1");
+    b.postal_mut().street_mut().set("1 Ref St");
     assert_eq!(a, b);
 
-    b.postal_mut().street_mut().push_str("x");
+    b.postal_mut().street_mut().set("x");
     assert_ne!(a, b);
 }
 
 #[test]
 fn task_fields_roundtrip() {
     let mut task = Task::new();
-    task.title_mut().push_str("Write docs");
+    task.title_mut().set("Write docs");
     *task.score_mut() = 42;
     *task.max_retries_mut() = 5;
-    task.owner_id_mut().push_str("user-1");
+    task.owner_id_mut().set("user-1");
     task.payload_mut().extend_from_slice(b"data");
     task.tag_ids_mut().push(10);
     task.tag_ids_mut().push(20);
@@ -109,18 +128,18 @@ fn task_fields_roundtrip() {
     *task.priority_mut() = Priority::HIGH;
     *task.done_mut() = true;
     *task.flag_mut() = false;
-    task.email_address_mut().push_str("a@example.com");
+    task.email_address_mut().set("a@example.com");
 
     let mut assignee = Address::new();
-    assignee.street_mut().push_str("1 Main St");
-    assignee.city_mut().push_str("Tokyo");
+    assignee.street_mut().set("1 Main St");
+    assignee.city_mut().set("Tokyo");
     *assignee.postal_code_mut() = 1000001;
     *assignee.latitude_mut() = 35.6812;
     *task.assignee_mut() = assignee;
 
     let mut watcher = Address::new();
-    watcher.street_mut().push_str("2 Side Rd");
-    watcher.city_mut().push_str("Osaka");
+    watcher.street_mut().set("2 Side Rd");
+    watcher.city_mut().set("Osaka");
     *watcher.postal_code_mut() = 5300001;
     *watcher.latitude_mut() = 34.6937;
     task.watchers_mut().push(watcher);

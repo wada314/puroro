@@ -8,7 +8,7 @@ use ::std::sync::LazyLock;
 
 use ::puroro::Message;
 
-use crate::messages::{FlatScalars, Nest, PackedInts, StringHeavy};
+use crate::messages::{FlatScalars, Nest, PackedInts, ShortStrings, StringHeavy};
 
 /// Nesting depth exercised by the nested-message benches.
 pub const NEST_DEPTH: usize = 16;
@@ -27,12 +27,16 @@ pub static PACKED_BYTES: LazyLock<Vec<u8>> =
 pub static STRINGS_BYTES: LazyLock<Vec<u8>> =
     LazyLock::new(|| StringHeavy::sample().encode_to_vec());
 
+pub static SHORT_STRINGS_BYTES: LazyLock<Vec<u8>> =
+    LazyLock::new(|| ShortStrings::sample().encode_to_vec());
+
 /// Sanity check used by unit tests and as a bench warm-up aid.
 pub fn assert_roundtrips() {
     assert!(!FLAT_BYTES.is_empty());
     assert!(!NEST_BYTES.is_empty());
     assert!(!PACKED_BYTES.is_empty());
     assert!(!STRINGS_BYTES.is_empty());
+    assert!(!SHORT_STRINGS_BYTES.is_empty());
 
     let flat = FlatScalars::decode(FLAT_BYTES.as_slice()).expect("flat decode");
     assert_eq!(flat.encode_to_vec(), *FLAT_BYTES);
@@ -45,4 +49,7 @@ pub fn assert_roundtrips() {
 
     let strings = StringHeavy::decode(STRINGS_BYTES.as_slice()).expect("strings decode");
     assert_eq!(strings.encode_to_vec(), *STRINGS_BYTES);
+
+    let short = ShortStrings::decode(SHORT_STRINGS_BYTES.as_slice()).expect("short strings decode");
+    assert_eq!(short.encode_to_vec(), *SHORT_STRINGS_BYTES);
 }

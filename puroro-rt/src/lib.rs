@@ -36,15 +36,15 @@ pub use fields::shared::field_presence::{Explicit, Implicit, LegacyRequired, Mes
 pub use fields::shared::{
     BitPacked, CloneFieldsVisitor, DebugStructVisitor, EncodeRawVisitor, EncodedLenVisitor,
     FieldCloneIn, FieldDeallocVisitor, FieldDeallocate, FieldEncode, FieldEqVisitor,
-    FieldPairVisitor, FieldPairVisitorMut, FieldVisitor, FieldVisitorMut, Inline, MessageCommon,
-    MessageCommonAlloc, MessageCommonBits,
+    FieldPairVisitor, FieldPairVisitorMut, FieldVisitor, FieldVisitorMut, Inline, InlineOrHeap,
+    MessageCommon, MessageCommonAlloc, MessageCommonBits, SSO_HEAP, SSO_INLINE,
 };
 pub use fields::singular::{SingularField, SingularFieldMut, SingularFieldRef};
 pub use fields::wire::{
-    Closed, ClosedEnum, Open, OpenEnum, ProtoBool, ProtoBytes, ProtoDouble, ProtoEnum,
+    Closed, ClosedEnum, INLINE_CAP, Open, OpenEnum, ProtoBool, ProtoBytes, ProtoDouble, ProtoEnum,
     ProtoEnumStorage, ProtoFixed32, ProtoFixed64, ProtoFloat, ProtoInt32, ProtoInt64, ProtoMessage,
     ProtoSFixed32, ProtoSFixed64, ProtoSInt32, ProtoSInt64, ProtoString, ProtoUInt32, ProtoUInt64,
-    SingularType,
+    SingularType, SsoString, SsoStringMut,
 };
 pub use message_encode::{EncodeCtx, MessageEncode, encode_message, encode_message_to_vec};
 pub use message_merge::{MessageMerge, merge_message};

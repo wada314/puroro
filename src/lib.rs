@@ -41,10 +41,11 @@ pub mod optional;
 mod protobuf_error;
 pub mod repeated;
 pub mod scoped_buf;
+mod string_mut;
 pub mod unknown;
 pub mod wire_type;
 
-/// Allocator-aware string buffer used as `Target` of generated string `_mut` accessors.
+/// Allocator-aware string buffer used as element mutator target for `repeated string`.
 pub use ::unmanaged::String;
 pub use error::DecodeError;
 pub use map::{MapMut, MapRef};
@@ -53,5 +54,6 @@ pub use oneof::{OneofView, OneofViewMut};
 pub use optional::{HasDefault, Optional};
 pub use repeated::{RepeatedBytesMut, RepeatedContainerMut, RepeatedStringMut};
 pub use scoped_buf::{DecodeBuf, LimitGuard, ScopedBuf};
+pub use string_mut::StringMut;
 pub use unknown::{UnknownField, UnknownPayload};
 pub use wire_type::WireType;

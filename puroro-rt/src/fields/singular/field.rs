@@ -149,14 +149,14 @@ macro_rules! impl_singular_deallocate_always {
             T: SingularType,
             A: Allocator + Clone,
             L: ValueLayout<T, A>,
+            MessageCommon<P, A>: MessageCommonBits,
             T::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
             <$presence as FieldPresence>::ValueSlot<T::Slot<A>>: ValueSlot<T::Slot<A>, A>,
         {
             #[inline]
             fn deallocate(&mut self, common: &MessageCommon<P, A>) {
-                let alloc = common.alloc.clone();
                 let slot = unsafe { ManuallyDrop::take(&mut self.value) };
-                ValueSlot::deallocate_in(slot, true, alloc);
+                L::deallocate_slot(slot, true, common);
             }
         }
     };
@@ -183,9 +183,8 @@ macro_rules! impl_singular_deallocate_bit {
             fn deallocate(&mut self, common: &MessageCommon<P, A>) {
                 let init = <$presence as FieldPresence>::slot_init_view();
                 let initialized = init.is_initialized(|b| common.is_bit_set(b));
-                let alloc = common.alloc.clone();
                 let slot = unsafe { ManuallyDrop::take(&mut self.value) };
-                ValueSlot::deallocate_in(slot, initialized, alloc);
+                L::deallocate_slot(slot, initialized, common);
             }
         }
     };
@@ -495,11 +494,6 @@ where
         self.value_mut()
     }
 
-    #[inline]
-    pub fn set(self, v: T::Written<A>) {
-        L::write(&mut *self.field.value, P::slot_init_mut(), self.common, v);
-    }
-
     pub fn merge<B: DecodeBuf>(
         self,
         wire_type: WireType,
@@ -625,7 +619,7 @@ where
         let init = P::slot_init_view();
         let initialized = init.is_initialized(|b| common.is_bit_set(b));
         Self {
-            value: ManuallyDrop::new(ValueSlot::clone_in(&*self.value, initialized, alloc)),
+            value: ManuallyDrop::new(L::clone_slot(&*self.value, initialized, common, alloc)),
             _marker: PhantomData,
         }
     }

@@ -247,7 +247,7 @@ apply presence omit. [`SingularType`](puroro-rt/src/fields/wire/singular_type.rs
 
 ### Singular field type markers ([`wire/singular_type.rs`](puroro-rt/src/fields/wire/singular_type.rs))
 
-[`SingularType`](puroro-rt/src/fields/wire/singular_type.rs) is the trait consumed by [`SingularField`](puroro-rt/src/fields/singular/field.rs) (including nested messages via [`ProtoMessage`](puroro-rt/src/fields/wire/proto_message.rs)). Markers are **allocator-free**; physical storage / views are GATs over `A`. Singular slots use bare wire values (`i32`, `()`, …) / `UnmanagedString` / `UnmanagedBox<M, A>`:
+[`SingularType`](puroro-rt/src/fields/wire/singular_type.rs) is the trait consumed by [`SingularField`](puroro-rt/src/fields/singular/field.rs) (including nested messages via [`ProtoMessage`](puroro-rt/src/fields/wire/proto_message.rs)). Markers are **allocator-free**; physical storage / views are GATs over `A`. Singular slots use bare wire values (`i32`, `()`, …) / `SsoString` (singular string) / `UnmanagedString` (repeated string) / `UnmanagedBox<M, A>`:
 
 ```rust
 pub trait SingularType: EncodeType {
@@ -375,9 +375,9 @@ Adding a singular wire type = one new codec + `Numerical` / `LenScalar` alias (b
 | oneof `bool` | `SingularField<ProtoBool, Oneof, FIELD, A, BitPacked<VALUE_BIT>>` inside the oneof storage enum |
 | `IMPLICIT open enum` | `SingularField<ProtoEnum<E, Open>, Implicit, FIELD, A>` |
 | `EXPLICIT closed enum` | `SingularField<ProtoEnum<E, Closed>, Explicit<BIT>, FIELD, A>` (same `.merge`) |
-| `IMPLICIT string` | `SingularField<ProtoString, Implicit, FIELD, A>` |
-| `EXPLICIT string` | `SingularField<ProtoString, Explicit<BIT>, FIELD, A>` |
-| `LEGACY_REQUIRED string` | `SingularField<ProtoString, LegacyRequired<BIT>, FIELD, A>` |
+| `IMPLICIT string` | `SingularField<ProtoString, Implicit, FIELD, A, InlineOrHeap<SSO_BIT>>` |
+| `EXPLICIT string` | `SingularField<ProtoString, Explicit<BIT>, FIELD, A, InlineOrHeap<SSO_BIT>>` |
+| `LEGACY_REQUIRED string` | `SingularField<ProtoString, LegacyRequired<BIT>, FIELD, A, InlineOrHeap<SSO_BIT>>` |
 | `IMPLICIT` / `EXPLICIT bytes` | `SingularField<ProtoBytes, P, FIELD, A>` |
 | `EXPLICIT fixed32` | `SingularField<ProtoFixed32, Explicit<BIT>, FIELD, A>` |
 | `EXPLICIT float` / `double` | `SingularField<ProtoFloat, …, A>` / `SingularField<ProtoDouble, …, A>` |
@@ -445,7 +445,7 @@ The `A: Allocator + Clone` struct bound is what lets the generated `Drop` clone 
 | Nested message | `Option<UnmanagedBox<M, A>>` (`Message`) | `Option`, not bitfield |
 | Oneof (non-bool) | `Option<E>` in slot | `Option`, not bitfield |
 
-Unset EXPLICIT slots are uninitialized (`MaybeUninit`); **only the bit** means "set". LEN storage is `UnmanagedString` / `UnmanagedVec<u8>`.
+Unset EXPLICIT slots are uninitialized (`MaybeUninit`); **only the bit** means "set". Singular string storage is `SsoString` (+ `InlineOrHeap` tag bit); repeated string / bytes use `UnmanagedString` / `UnmanagedVec<u8>`.
 
 Public accessors are **one-line delegates** into catalog methods with `&self._common` / `&mut self._common`. `Message` (encode / merge / unknown / validate) sums the same delegates; the generated `Drop` walks heap fields calling `deallocate(&self._common)` (or oneof `clear`).
 
@@ -788,7 +788,7 @@ The `set_*` per-variant setters are removed, matching the other field families.
 | `TaskLazy` | DESIGN only | Wire buffer + on-demand decode |
 | `Hash` / `serde` | Deferred | Opt-in features |
 | Submessage inline | Always `UnmanagedBox<M, A>` for nested messages | Inline small non-repeated messages in the parent struct ([§17.1](#171-submessage-inline-optimisation)) |
-| String / Bytes inline | Always heap-allocated LEN payload | Small-string (and maybe bytes) inline storage via union + common-bit tag ([§17.2](#172-string--bytes-inline-optimisation)) |
+| String / Bytes inline | Singular `string` uses SSO (`SsoString` + `InlineOrHeap`); `bytes` / repeated / map still heap | Bytes SSO deferred ([§17.2](#172-string--bytes-inline-optimisation)) |
 
 ### 17.1 Submessage inline optimisation
 
@@ -803,8 +803,15 @@ The `set_*` per-variant setters are removed, matching the other field families.
 
 ### 17.2 String / Bytes inline optimisation
 
-**Idea.** Same motivation as §17.1: for a **non-repeated** `string` (and possibly `bytes`) that is short enough, avoid a heap allocation and store the payload **inline** in the field.
+**Status (string): done.** Singular `string` (IMPLICIT / EXPLICIT / LEGACY_REQUIRED / oneof) uses [`SsoString`](puroro-rt/src/fields/wire/sso_string.rs) as `SingularType::Slot` and [`InlineOrHeap<TAG_BIT>`](puroro-rt/src/fields/shared/value_layout.rs) as `ValueLayout`.
 
-**Sketch.** Represent the field storage as a **union** of a heap string/bytes and an inline buffer. Use **one bit in the parent's `MessageCommon` presence bitfield** as a tag indicating which union variant is live (similar in spirit to how [`BitPacked`](puroro-rt/src/fields/shared/value_layout.rs) parks a bool value bit in `_common.presence`).
+**Layout.** The slot stays **3 words** (same as [`UnmanagedString`](unmanaged/src/string.rs)):
 
-**Notes / open questions.** Threshold (e.g. SSO-style length that fits in the union without growing the field past a pointer-sized heap handle). Interaction with `utf8_validation`, clear / deallocate, and oneof string variants. Repeated string/bytes stay heap-backed unless a separate design is justified.
+- **heap arm:** `UnmanagedString` (any length, including short/empty — allowed when packed as heap; not an in-slot tag)
+- **inline arm:** `[u8; INLINE_CAP]` + length byte (`INLINE_CAP = 3*usize - 1`, 23 on 64-bit). Length lives in the **last byte** of the slot (`0..=INLINE_CAP`)
+- **MessageCommon heap bit** (`BIT_*_SSO` / `InlineOrHeap<HEAP_BIT>`; [`SSO_HEAP`](puroro-rt/src/fields/shared/value_layout.rs) = `true`, [`SSO_INLINE`](puroro-rt/src/fields/shared/value_layout.rs) = `false`) is the **sole** arm discriminant. The slot is an untagged union and does not inspect `UnmanagedString`'s memory layout
+- **Arm choice is layout-internal:** crate-private pack helpers / decode `merge` decide inline vs heap. Hot paths (`StringMut::set(&str)`, short decode) pack without a heap allocation
+
+**Mutator.** Generated `_mut` returns `impl ::puroro::StringMut<A>` (concrete [`SsoStringMut`](puroro-rt/src/fields/wire/sso_string.rs) stays in `puroro-rt`). Methods: `set(&str)` / `set_string(unmanaged::String)` / `clear` / `push_str` / `push` / `truncate`; stays inline while the result fits; overflow promotes to heap. `set_string` reuses the moved buffer when the value stays on the heap.
+
+**Still open / deferred.** `bytes` SSO (symmetric union). Repeated / map string elements stay `UnmanagedString`. `utf8_validation=NONE` still unwired.

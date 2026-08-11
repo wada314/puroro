@@ -7,9 +7,9 @@ use ::bytes::{Buf, BufMut};
 use ::puroro::{DecodeBuf, DecodeError, Message};
 use ::puroro_rt::decode::{decode_tag, skip_field_and_save};
 use ::puroro_rt::{
-    EncodeCtx, Explicit, FieldDeallocate, FieldEncode, Implicit, Message as MessagePresence,
-    MessageCommon, MessageEncode, MessageMerge, Packed, ProtoBytes, ProtoInt32, ProtoMessage,
-    ProtoString, ProtoUInt64, RepeatedField, SingularField,
+    EncodeCtx, Explicit, FieldDeallocate, FieldEncode, Implicit, InlineOrHeap,
+    Message as MessagePresence, MessageCommon, MessageEncode, MessageMerge, Packed, ProtoBytes,
+    ProtoInt32, ProtoMessage, ProtoString, ProtoUInt64, RepeatedField, SingularField,
 };
 
 macro_rules! drop_fields {
@@ -485,12 +485,25 @@ impl<A: Allocator + Clone> Message for PackedInts<A> {
 // ---------------------------------------------------------------------------
 
 pub struct StringHeavy<A: Allocator + Clone = Global> {
-    _common: MessageCommon<BitArray<[u8; 1], Lsb0>, A>,
-    s0: SingularField<ProtoString, Explicit<0>, 1, A>,
-    s1: SingularField<ProtoString, Explicit<1>, 2, A>,
-    s2: SingularField<ProtoString, Explicit<2>, 3, A>,
-    s3: SingularField<ProtoString, Explicit<3>, 4, A>,
-    blob: SingularField<ProtoBytes, Explicit<4>, 5, A>,
+    _common: MessageCommon<BitArray<[u8; 2], Lsb0>, A>,
+    s0: SingularField<ProtoString, Explicit<0>, 1, A, InlineOrHeap<1>>,
+    s1: SingularField<ProtoString, Explicit<2>, 2, A, InlineOrHeap<3>>,
+    s2: SingularField<ProtoString, Explicit<4>, 3, A, InlineOrHeap<5>>,
+    s3: SingularField<ProtoString, Explicit<6>, 4, A, InlineOrHeap<7>>,
+    blob: SingularField<ProtoBytes, Explicit<8>, 5, A>,
+}
+
+/// Eight short singular strings (SSO-friendly decode path).
+pub struct ShortStrings<A: Allocator + Clone = Global> {
+    _common: MessageCommon<BitArray<[u8; 2], Lsb0>, A>,
+    s0: SingularField<ProtoString, Explicit<0>, 1, A, InlineOrHeap<1>>,
+    s1: SingularField<ProtoString, Explicit<2>, 2, A, InlineOrHeap<3>>,
+    s2: SingularField<ProtoString, Explicit<4>, 3, A, InlineOrHeap<5>>,
+    s3: SingularField<ProtoString, Explicit<6>, 4, A, InlineOrHeap<7>>,
+    s4: SingularField<ProtoString, Explicit<8>, 5, A, InlineOrHeap<9>>,
+    s5: SingularField<ProtoString, Explicit<10>, 6, A, InlineOrHeap<11>>,
+    s6: SingularField<ProtoString, Explicit<12>, 7, A, InlineOrHeap<13>>,
+    s7: SingularField<ProtoString, Explicit<14>, 8, A, InlineOrHeap<15>>,
 }
 
 impl StringHeavy<Global> {
@@ -627,6 +640,180 @@ impl<A: Allocator + Clone> ::unmanaged::DefaultIn<A> for StringHeavy<A> {
 }
 
 impl<A: Allocator + Clone> Message for StringHeavy<A> {
+    type Alloc = A;
+
+    fn new_in(alloc: A) -> Self {
+        Self::new_in(alloc)
+    }
+
+    fn encode<B: BufMut>(&self, buf: &mut B) {
+        ::puroro_rt::encode_message(self, buf)
+    }
+
+    fn encode_to_vec(&self) -> Vec<u8> {
+        ::puroro_rt::encode_message_to_vec(self)
+    }
+
+    fn merge_from<B: Buf>(&mut self, buf: &mut B) -> Result<(), DecodeError> {
+        ::puroro_rt::merge_message(self, buf)
+    }
+
+    fn unknown_fields(&self) -> impl Iterator<Item = ::puroro::UnknownField<'_>> + '_ {
+        self._common.iter_unknown_fields()
+    }
+
+    fn validate(&self) -> Result<(), DecodeError> {
+        Ok(())
+    }
+}
+
+impl ShortStrings<Global> {
+    pub fn new() -> Self {
+        Self::new_in(Global)
+    }
+
+    pub fn sample() -> Self {
+        let mut m = Self::new();
+        m.s0.bind_mut(&mut m._common).value_mut().set("id");
+        m.s1.bind_mut(&mut m._common).value_mut().set("ok");
+        m.s2.bind_mut(&mut m._common).value_mut().set("us");
+        m.s3.bind_mut(&mut m._common).value_mut().set("v1");
+        m.s4.bind_mut(&mut m._common).value_mut().set("name");
+        m.s5.bind_mut(&mut m._common).value_mut().set("code");
+        m.s6.bind_mut(&mut m._common).value_mut().set("short");
+        m.s7.bind_mut(&mut m._common).value_mut().set("label");
+        m
+    }
+}
+
+impl Default for ShortStrings<Global> {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl<A: Allocator + Clone> ShortStrings<A> {
+    pub fn new_in(alloc: A) -> Self {
+        Self {
+            _common: MessageCommon::new_in(BitArray::ZERO, alloc.clone()),
+            s0: SingularField::new_in(alloc.clone()),
+            s1: SingularField::new_in(alloc.clone()),
+            s2: SingularField::new_in(alloc.clone()),
+            s3: SingularField::new_in(alloc.clone()),
+            s4: SingularField::new_in(alloc.clone()),
+            s5: SingularField::new_in(alloc.clone()),
+            s6: SingularField::new_in(alloc.clone()),
+            s7: SingularField::new_in(alloc),
+        }
+    }
+}
+
+impl<A: Allocator + Clone> Drop for ShortStrings<A> {
+    fn drop(&mut self) {
+        drop_fields!(self, s0, s1, s2, s3, s4, s5, s6, s7);
+    }
+}
+
+impl<A: Allocator + Clone> ::unmanaged::DeallocateIn<A> for ShortStrings<A> {
+    #[inline]
+    unsafe fn deallocate_in(self, _alloc: A) {
+        drop(self);
+    }
+}
+
+impl<A: Allocator + Clone> MessageEncode for ShortStrings<A> {
+    fn encoded_len(&self, ctx: &mut EncodeCtx) -> usize {
+        let c = &self._common;
+        self.s0.encoded_len(c, ctx)
+            + self.s1.encoded_len(c, ctx)
+            + self.s2.encoded_len(c, ctx)
+            + self.s3.encoded_len(c, ctx)
+            + self.s4.encoded_len(c, ctx)
+            + self.s5.encoded_len(c, ctx)
+            + self.s6.encoded_len(c, ctx)
+            + self.s7.encoded_len(c, ctx)
+            + c.unknown_fields.len()
+    }
+
+    fn encode_raw<B: BufMut>(&self, ctx: &mut EncodeCtx, buf: &mut B) {
+        let c = &self._common;
+        self.s0.encode_raw(c, ctx, buf);
+        self.s1.encode_raw(c, ctx, buf);
+        self.s2.encode_raw(c, ctx, buf);
+        self.s3.encode_raw(c, ctx, buf);
+        self.s4.encode_raw(c, ctx, buf);
+        self.s5.encode_raw(c, ctx, buf);
+        self.s6.encode_raw(c, ctx, buf);
+        self.s7.encode_raw(c, ctx, buf);
+        buf.put_slice(&c.unknown_fields);
+    }
+}
+
+impl<A: Allocator + Clone> MessageMerge for ShortStrings<A> {
+    fn merge_from_with_depth<B: DecodeBuf>(
+        &mut self,
+        buf: &mut B,
+        depth: usize,
+    ) -> Result<(), DecodeError> {
+        if depth >= ::puroro::RECURSION_LIMIT {
+            return Err(DecodeError::RecursionLimitExceeded);
+        }
+        while buf.has_remaining() {
+            let (field_number, wire_type) = decode_tag(buf)?;
+            match field_number.as_u32() {
+                1 => self
+                    .s0
+                    .bind_mut(&mut self._common)
+                    .merge(wire_type, buf, depth)?,
+                2 => self
+                    .s1
+                    .bind_mut(&mut self._common)
+                    .merge(wire_type, buf, depth)?,
+                3 => self
+                    .s2
+                    .bind_mut(&mut self._common)
+                    .merge(wire_type, buf, depth)?,
+                4 => self
+                    .s3
+                    .bind_mut(&mut self._common)
+                    .merge(wire_type, buf, depth)?,
+                5 => self
+                    .s4
+                    .bind_mut(&mut self._common)
+                    .merge(wire_type, buf, depth)?,
+                6 => self
+                    .s5
+                    .bind_mut(&mut self._common)
+                    .merge(wire_type, buf, depth)?,
+                7 => self
+                    .s6
+                    .bind_mut(&mut self._common)
+                    .merge(wire_type, buf, depth)?,
+                8 => self
+                    .s7
+                    .bind_mut(&mut self._common)
+                    .merge(wire_type, buf, depth)?,
+                _ => skip_field_and_save(
+                    field_number,
+                    wire_type,
+                    buf,
+                    &mut self._common.unknown_fields,
+                    self._common.alloc.clone(),
+                )?,
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<A: Allocator + Clone> ::unmanaged::DefaultIn<A> for ShortStrings<A> {
+    #[inline]
+    fn default_in(alloc: A) -> Self {
+        Self::new_in(alloc)
+    }
+}
+
+impl<A: Allocator + Clone> Message for ShortStrings<A> {
     type Alloc = A;
 
     fn new_in(alloc: A) -> Self {

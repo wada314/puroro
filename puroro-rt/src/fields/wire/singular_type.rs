@@ -27,12 +27,12 @@ use ::bitvec::{
     order::Lsb0,
     ptr::{BitRef, Mut},
 };
-use ::core::ops::{Deref, DerefMut};
+use ::core::ops::Deref;
 use ::protobuf_core::FieldNumber;
 
 use ::puroro::{DecodeBuf, DecodeError, WireType};
 
-use ::unmanaged::DeallocateIn;
+use ::unmanaged::{DeallocateIn, UnmanagedString};
 
 use crate::decode;
 use crate::fields::shared::{
@@ -42,8 +42,9 @@ use crate::fields::shared::{
 };
 
 use super::encode_type::EncodeType;
-use super::len::{LenCodec, LenScalar};
+use super::len::{BytesCodec, LenCodec, LenScalar, StringCodec};
 use super::numerical::{Numerical, NumericalType, ProtoBool};
+use super::sso_string::{SsoString, SsoStringMut};
 use super::wire_payload::CopyWirePayload;
 
 /// Singular protobuf **type** marker (e.g. `ProtoInt32`, `ProtoString`) with
@@ -52,7 +53,8 @@ use super::wire_payload::CopyWirePayload;
 /// Physical storage is the GAT [`Slot`](Self::Slot):
 /// - numerics / enums: bare `i32` / `E` / …
 /// - [`ProtoBool`]: `()` (ZST; logical `bool` via [`BitPacked`](crate::fields::shared::value_layout::BitPacked))
-/// - string / bytes: `UnmanagedString` / `UnmanagedVec`
+/// - string: [`SsoString`](super::sso_string::SsoString) slot (`Written` = `UnmanagedString`)
+/// - bytes: `UnmanagedVec`
 /// - nested messages: `UnmanagedBox<M, A>` via [`ProtoMessage`](super::proto_message::ProtoMessage)
 ///
 /// Getter views use [`EncodeType::View`] (same type as tagged encode).
@@ -67,14 +69,18 @@ pub trait SingularType: EncodeType {
     /// `DeallocateIn` on that box.
     type Slot<A: Allocator + Clone>;
 
-    /// Mutable handle returned by `_mut` accessors (`&mut i32`, `StringGuard`,
+    /// Mutable handle returned by `_mut` accessors (`&mut i32`, SSO string mut,
     /// bit handle, …).
-    type Mut<'a, A: Allocator + Clone>: DerefMut
+    ///
+    /// Bound is [`Deref`] only so SSO string mutators need not expose
+    /// `DerefMut` (edits go through inherent / trait methods). Concrete handles
+    /// such as `&mut T` / `BitRef` still implement `DerefMut`.
+    type Mut<'a, A: Allocator + Clone>: Deref
     where
         Self: 'a,
         A: 'a;
 
-    /// Value accepted by [`PayloadAccess::write`] / field `set`.
+    /// Value accepted by [`PayloadAccess::write`].
     type Written<A: Allocator + Clone>;
 }
 
@@ -291,36 +297,47 @@ where
 }
 
 // ---------------------------------------------------------------------------
-// LEN scalars (`LenScalar<C>`)
+// LEN scalars — `string` uses SSO (`SsoString` + `InlineOrHeap`); `bytes` stays
+// heap `UnmanagedVec` via [`PayloadAccess`] + [`Inline`].
 // ---------------------------------------------------------------------------
 
-impl<C: LenCodec> SingularType for LenScalar<C> {
-    type Slot<A: Allocator + Clone> = C::Slot<A>;
+impl SingularType for LenScalar<StringCodec> {
+    type Slot<A: Allocator + Clone> = SsoString<A>;
     type Mut<'a, A: Allocator + Clone>
-        = C::Mut<'a, A>
+        = SsoStringMut<'a, A>
     where
         Self: 'a,
         A: 'a;
-    type Written<A: Allocator + Clone> = C::Slot<A>;
+    type Written<A: Allocator + Clone> = UnmanagedString<A>;
 }
 
-impl<C: LenCodec> PayloadAccess for LenScalar<C> {
+impl SingularType for LenScalar<BytesCodec> {
+    type Slot<A: Allocator + Clone> = <BytesCodec as LenCodec>::Slot<A>;
+    type Mut<'a, A: Allocator + Clone>
+        = <BytesCodec as LenCodec>::Mut<'a, A>
+    where
+        Self: 'a,
+        A: 'a;
+    type Written<A: Allocator + Clone> = <BytesCodec as LenCodec>::Slot<A>;
+}
+
+impl PayloadAccess for LenScalar<BytesCodec> {
     #[inline]
     fn is_proto_empty<A: Allocator + Clone, Pb>(
-        slot: &C::Slot<A>,
+        slot: &<BytesCodec as LenCodec>::Slot<A>,
         _common: &MessageCommon<Pb, A>,
     ) -> bool
     where
         MessageCommon<Pb, A>: MessageCommonBits,
     {
-        C::as_wire_bytes(Deref::deref(slot)).is_empty()
+        BytesCodec::as_wire_bytes(Deref::deref(slot)).is_empty()
     }
 
     #[inline]
     fn get<'a, A: Allocator + Clone + 'a, Pb>(
-        slot: &'a C::Slot<A>,
+        slot: &'a <BytesCodec as LenCodec>::Slot<A>,
         _common: &'a MessageCommon<Pb, A>,
-    ) -> &'a C::RefView
+    ) -> &'a [u8]
     where
         MessageCommon<Pb, A>: MessageCommonBits,
     {
@@ -332,17 +349,19 @@ impl<C: LenCodec> PayloadAccess for LenScalar<C> {
         slot: &'a mut VS,
         init: I,
         common: &'a mut MessageCommon<Pb, A>,
-    ) -> C::Mut<'a, A>
+    ) -> <BytesCodec as LenCodec>::Mut<'a, A>
     where
         A: Allocator + Clone + 'a,
-        VS: ValueSlot<C::Slot<A>, A>,
+        VS: ValueSlot<<BytesCodec as LenCodec>::Slot<A>, A>,
         I: SlotInitMut,
         MessageCommon<Pb, A>: MessageCommonBits,
         Self: 'a,
     {
         let alloc = common.alloc.clone();
         // SAFETY: message allocator owns this LEN scalar buffer.
-        unsafe { C::slot_with_alloc(ValueSlot::with_mut(slot, init, common).get_mut(), alloc) }
+        unsafe {
+            BytesCodec::slot_with_alloc(ValueSlot::with_mut(slot, init, common).get_mut(), alloc)
+        }
     }
 
     #[inline]
@@ -350,10 +369,10 @@ impl<C: LenCodec> PayloadAccess for LenScalar<C> {
         slot: &mut VS,
         init: I,
         common: &mut MessageCommon<Pb, A>,
-        value: C::Slot<A>,
+        value: <BytesCodec as LenCodec>::Slot<A>,
     ) where
         A: Allocator + Clone,
-        VS: ValueSlot<C::Slot<A>, A>,
+        VS: ValueSlot<<BytesCodec as LenCodec>::Slot<A>, A>,
         I: SlotInitMut,
         MessageCommon<Pb, A>: MessageCommonBits,
     {
@@ -364,7 +383,7 @@ impl<C: LenCodec> PayloadAccess for LenScalar<C> {
     fn clear<A, VS, I, Pb>(slot: &mut VS, init: I, common: &mut MessageCommon<Pb, A>)
     where
         A: Allocator + Clone,
-        VS: ValueSlot<C::Slot<A>, A>,
+        VS: ValueSlot<<BytesCodec as LenCodec>::Slot<A>, A>,
         I: SlotInitMut,
         MessageCommon<Pb, A>: MessageCommonBits,
     {
@@ -383,7 +402,7 @@ impl<C: LenCodec> PayloadAccess for LenScalar<C> {
     ) -> Result<(), DecodeError>
     where
         A: Allocator + Clone,
-        VS: ValueSlot<C::Slot<A>, A>,
+        VS: ValueSlot<<BytesCodec as LenCodec>::Slot<A>, A>,
         I: SlotInitMut,
         MessageCommon<Pb, A>: MessageCommonBits,
         B: DecodeBuf,
@@ -391,7 +410,7 @@ impl<C: LenCodec> PayloadAccess for LenScalar<C> {
         if wire_type != WireType::Len {
             return Err(DecodeError::InvalidTag);
         }
-        let new = C::decode_in(buf, common.alloc.clone())?;
+        let new = BytesCodec::decode_in(buf, common.alloc.clone())?;
         Self::write(slot, init, common, new);
         Ok(())
     }

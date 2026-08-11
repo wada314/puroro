@@ -58,7 +58,7 @@ use ::bitvec::array::BitArray;
 use ::bitvec::order::Lsb0;
 use ::bytes::BufMut;
 use ::puroro_rt::{
-    BitPacked, FieldCloneIn, FieldDeallocate, FieldEncode, Inline, MessageCommon,
+    BitPacked, FieldCloneIn, FieldDeallocate, FieldEncode, Inline, InlineOrHeap, MessageCommon,
     MessageCommonAlloc, MessageCommonBits, Oneof, OneofDeallocate, OneofEncodable, OneofGroup,
     OneofVariant, ProtoBool, ProtoInt32, ProtoMessage, ProtoString, SingularField, SingularType,
 };
@@ -95,8 +95,20 @@ pub enum NotificationCase {
     Urgent,
 }
 
-type EmailAddressField<A> = SingularField<ProtoString, Oneof, { super::FIELD_EMAIL_ADDRESS }, A>;
-type PhoneNumberField<A> = SingularField<ProtoString, Oneof, { super::FIELD_PHONE_NUMBER }, A>;
+type EmailAddressField<A> = SingularField<
+    ProtoString,
+    Oneof,
+    { super::FIELD_EMAIL_ADDRESS },
+    A,
+    InlineOrHeap<{ super::BIT_EMAIL_ADDRESS_SSO }>,
+>;
+type PhoneNumberField<A> = SingularField<
+    ProtoString,
+    Oneof,
+    { super::FIELD_PHONE_NUMBER },
+    A,
+    InlineOrHeap<{ super::BIT_PHONE_NUMBER_SSO }>,
+>;
 type WebhookIdField<A> =
     SingularField<ProtoInt32, Oneof, { super::FIELD_WEBHOOK_ID }, A, Inline, WebhookIdDefault>;
 type PostalField<A> = SingularField<ProtoMessage<Address<A>>, Oneof, { super::FIELD_POSTAL }, A>;
@@ -335,7 +347,10 @@ impl<A: Allocator + Clone> OneofEncodable<A> for NotificationStorage<A> {
     }
 }
 
-impl<A: Allocator + Clone, P> OneofDeallocate<MessageCommon<P, A>> for NotificationStorage<A> {
+impl<A: Allocator + Clone, P> OneofDeallocate<MessageCommon<P, A>> for NotificationStorage<A>
+where
+    MessageCommon<P, A>: MessageCommonBits,
+{
     /// # Safety
     ///
     /// `common.alloc` must be the allocator that owns the variant's buffer.

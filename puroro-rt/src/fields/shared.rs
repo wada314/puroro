@@ -25,7 +25,7 @@ pub use field_inspect::{
     FieldDeallocVisitor, FieldEncode, FieldEqVisitor, FieldPairVisitor, FieldPairVisitorMut,
     FieldVisitor, FieldVisitorMut,
 };
-pub use value_layout::{BitPacked, Inline, ValueLayout};
+pub use value_layout::{BitPacked, Inline, InlineOrHeap, SSO_HEAP, SSO_INLINE, ValueLayout};
 
 use ::core::mem::ManuallyDrop;
 
