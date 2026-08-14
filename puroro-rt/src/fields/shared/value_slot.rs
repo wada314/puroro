@@ -3,17 +3,17 @@
 //! selected by [`FieldPresence::ValueSlot`].
 //!
 //! [`ValueSlot`] is implemented for raw `T`, [`MaybeUninit<T>`], and [`Option<T>`]
-//! when `T` implements [`DefaultIn`] / [`unmanaged::DeallocateIn`] for the
-//! message allocator `A`. Slot payloads are physical storage (`i32`, `()`,
-//! `UnmanagedString`, [`UnmanagedBox`](::unmanaged::UnmanagedBox), …); logical
-//! bit-packed bool values live in [`MessageCommon`](super::MessageCommon).
+//! when `T` implements [`DefaultIn`] for the message allocator `A`. Slot payloads
+//! are physical storage (`i32`, `()`, `SsoString`, [`UnmanagedBox`](::unmanaged::UnmanagedBox),
+//! …); logical bit-packed bool values live in [`MessageCommon`](super::MessageCommon).
 //!
 //! Construction uses [`DefaultIn`](super::DefaultIn). Message Drop / clone of a
 //! slot go through [`take_value`](ValueSlot::take_value) /
 //! [`get_value`](ValueSlot::get_value) / [`from_optional`](ValueSlot::from_optional);
 //! how the live payload is freed or deep-copied is decided by
-//! [`ValueLayout`](super::value_layout::ValueLayout). Mut views still release
-//! replaced payloads via [`unmanaged::DeallocateIn`].
+//! [`ValueLayout`](super::value_layout::ValueLayout). Mut views
+//! ([`replace`](ValueSlotMutAccess::replace) / [`take_clear`](ValueSlotMutAccess::take_clear))
+//! only extract the previous payload — callers release it.
 //! Read / mutation go through short-lived views from [`with`](ValueSlot::with) /
 //! [`with_mut`](ValueSlot::with_mut), which return
 //! [`ValueSlotRefAccess`] / [`ValueSlotMutAccess`] (RPIT).
@@ -22,7 +22,6 @@ use ::core::marker::PhantomData;
 use ::core::mem::{self, MaybeUninit};
 
 use ::allocator_api2::alloc::Allocator;
-use ::unmanaged::DeallocateIn;
 
 use super::{
     DefaultIn, MessageCommon, MessageCommonBits,
@@ -56,7 +55,7 @@ impl<A: Allocator> AddressableSlot for SsoString<A> {}
 /// deep-copy the extracted `T`.
 pub trait ValueSlot<T, A>: Sized
 where
-    T: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
+    T: AddressableSlot + DefaultIn<A>,
     A: Allocator + Clone,
 {
     /// Creates value storage when the parent message is constructed.
@@ -110,13 +109,18 @@ pub trait ValueSlotMutAccess<'a, T, A: Allocator + Clone> {
     /// Lazy-initializes when uninitialized, then returns `&mut T`.
     fn get_mut(self) -> &'a mut T;
 
-    /// Assigns `value`, releasing any previously stored payload and updating
-    /// init state when the slot was uninitialized.
-    fn set(self, value: T);
+    /// Installs `value` and returns the previous live payload, if any.
+    ///
+    /// The caller must release the returned value (typically
+    /// [`DeallocateIn::deallocate_in`](::unmanaged::DeallocateIn::deallocate_in))
+    /// with the **parent** message allocator that owned the previous payload.
+    fn replace(self, value: T) -> Option<T>;
 
-    /// Drops an initialized payload and clears init state; the always-initialized
-    /// variant reinstalls an empty value.
-    fn clear(self);
+    /// Clears init state and returns the previous live payload, if any.
+    ///
+    /// Always-initialized slots reinstall [`DefaultIn::default_in`] and still
+    /// return the old value. The caller must release it.
+    fn take_clear(self) -> Option<T>;
 }
 
 // ---------------------------------------------------------------------------
@@ -170,7 +174,7 @@ where
 impl<'a, T, I: SlotInitMut, Pb, A: Allocator + Clone> ValueSlotMutAccess<'a, T, A>
     for ValueSlotMut<'a, T, T, I, Pb, A>
 where
-    T: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
+    T: AddressableSlot + DefaultIn<A>,
 {
     #[inline]
     fn get_mut(self) -> &'a mut T {
@@ -178,24 +182,23 @@ where
     }
 
     #[inline]
-    fn set(self, value: T) {
-        let old = mem::replace(self.slot, value);
-        // SAFETY: `common.alloc` owns `old`'s buffer.
-        unsafe { old.deallocate_in(self.common.alloc.clone()) };
+    fn replace(self, value: T) -> Option<T> {
+        Some(mem::replace(self.slot, value))
     }
 
     #[inline]
-    fn clear(self) {
-        let old = mem::replace(self.slot, T::default_in(self.common.alloc.clone()));
-        // SAFETY: `common.alloc` owns `old`'s buffer.
-        unsafe { old.deallocate_in(self.common.alloc.clone()) };
+    fn take_clear(self) -> Option<T> {
+        Some(mem::replace(
+            self.slot,
+            T::default_in(self.common.alloc.clone()),
+        ))
     }
 }
 
 impl<'a, T, I: SlotInitMut, Pb, A: Allocator + Clone> ValueSlotMutAccess<'a, T, A>
     for ValueSlotMut<'a, MaybeUninit<T>, T, I, Pb, A>
 where
-    T: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
+    T: AddressableSlot + DefaultIn<A>,
     MessageCommon<Pb, A>: MessageCommonBits,
 {
     #[inline]
@@ -210,35 +213,35 @@ where
     }
 
     #[inline]
-    fn set(self, value: T) {
+    fn replace(self, value: T) -> Option<T> {
         if self.init.is_initialized(|b| self.common.is_bit_set(b)) {
             // SAFETY: init bit set implies a live payload.
-            let old = mem::replace(unsafe { self.slot.assume_init_mut() }, value);
-            // SAFETY: `common.alloc` owns `old`'s buffer.
-            unsafe { old.deallocate_in(self.common.alloc.clone()) };
+            Some(mem::replace(unsafe { self.slot.assume_init_mut() }, value))
         } else {
             self.slot.write(value);
             self.init
                 .set_initialized(|b, v| self.common.set_bit(b, v), true);
+            None
         }
     }
 
     #[inline]
-    fn clear(self) {
+    fn take_clear(self) -> Option<T> {
         if self.init.is_initialized(|b| self.common.is_bit_set(b)) {
             // SAFETY: init bit set implies a live payload we now take ownership of.
             let old = unsafe { self.slot.assume_init_read() };
-            // SAFETY: `common.alloc` owns `old`'s buffer.
-            unsafe { old.deallocate_in(self.common.alloc.clone()) };
             self.init
                 .set_initialized(|b, v| self.common.set_bit(b, v), false);
+            Some(old)
+        } else {
+            None
         }
     }
 }
 
 impl<T, A> ValueSlot<T, A> for T
 where
-    T: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
+    T: AddressableSlot + DefaultIn<A>,
     A: Allocator + Clone,
 {
     fn new_in(alloc: A) -> Self {
@@ -297,7 +300,7 @@ where
 
 impl<T, A> ValueSlot<T, A> for MaybeUninit<T>
 where
-    T: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
+    T: AddressableSlot + DefaultIn<A>,
     A: Allocator + Clone,
 {
     fn new_in(_alloc: A) -> Self {
@@ -381,7 +384,7 @@ where
 impl<'a, T, I: SlotInitMut, Pb, A: Allocator + Clone> ValueSlotMutAccess<'a, T, A>
     for ValueSlotMut<'a, Option<T>, T, I, Pb, A>
 where
-    T: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
+    T: AddressableSlot + DefaultIn<A>,
 {
     #[inline]
     fn get_mut(self) -> &'a mut T {
@@ -390,25 +393,19 @@ where
     }
 
     #[inline]
-    fn set(self, value: T) {
-        if let Some(old) = self.slot.replace(value) {
-            // SAFETY: `common.alloc` owns `old`'s buffer.
-            unsafe { old.deallocate_in(self.common.alloc.clone()) };
-        }
+    fn replace(self, value: T) -> Option<T> {
+        self.slot.replace(value)
     }
 
     #[inline]
-    fn clear(self) {
-        if let Some(old) = self.slot.take() {
-            // SAFETY: `common.alloc` owns `old`'s buffer.
-            unsafe { old.deallocate_in(self.common.alloc.clone()) };
-        }
+    fn take_clear(self) -> Option<T> {
+        self.slot.take()
     }
 }
 
 impl<T, A> ValueSlot<T, A> for Option<T>
 where
-    T: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
+    T: AddressableSlot + DefaultIn<A>,
     A: Allocator + Clone,
 {
     fn new_in(_alloc: A) -> Self {

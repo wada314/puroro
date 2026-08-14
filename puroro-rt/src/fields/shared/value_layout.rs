@@ -33,7 +33,7 @@ use crate::fields::wire::wire_payload::{CopyWirePayload, VarintPayload};
 /// Where a singular field's logical value is stored.
 pub trait ValueLayout<T: SingularType, A: Allocator + Clone>: Copy
 where
-    T::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
+    T::Slot<A>: AddressableSlot + DefaultIn<A>,
 {
     fn is_proto_empty<Pb>(slot: &T::Slot<A>, common: &MessageCommon<Pb, A>) -> bool
     where
@@ -55,6 +55,10 @@ where
         T: 'a,
         A: 'a;
 
+    /// Clears the logical value and slot presence / payload.
+    ///
+    /// `common` must be this field's parent [`MessageCommon`] (same pairing as
+    /// [`deallocate_slot`](Self::deallocate_slot)).
     fn clear<VS, I, Pb>(slot: &mut VS, init: I, common: &mut MessageCommon<Pb, A>)
     where
         VS: ValueSlot<T::Slot<A>, A>,
@@ -77,18 +81,31 @@ where
         B: DecodeBuf;
 
     /// Message / oneof teardown for this field's value slot.
+    ///
+    /// `common` must be the parent [`MessageCommon`] that allocated `slot`
+    /// (same instance generated `Drop` passes as `&self._common`). The type
+    /// system does not prove this pairing; a different message's common is
+    /// unsound. SSO layouts also read the heap bit from this `common`.
     fn deallocate_slot<VS, Pb>(slot: VS, initialized: bool, common: &MessageCommon<Pb, A>)
     where
         VS: ValueSlot<T::Slot<A>, A>,
-        MessageCommon<Pb, A>: MessageCommonBits,
-    {
-        if let Some(v) = slot.take_value(initialized) {
-            // SAFETY: message allocator owns `v`.
-            unsafe { DeallocateIn::deallocate_in(v, common.alloc.clone()) };
-        }
-    }
+        MessageCommon<Pb, A>: MessageCommonBits;
+}
 
+/// Slot deep-copy for layouts whose payload can be cloned.
+///
+/// Kept off [`ValueLayout`] so getter paths do not require [`CloneIn`] (nested
+/// messages) and SSO can clone via the heap bit instead of a blind `CloneIn`.
+pub trait ValueLayoutClone<T: SingularType, A: Allocator + Clone>: ValueLayout<T, A>
+where
+    T::Slot<A>: AddressableSlot + DefaultIn<A>,
+{
     /// Deep-copies this field's value slot into `alloc`.
+    ///
+    /// `common` must be the **source** field's parent [`MessageCommon`] (bits /
+    /// heap-vs-inline tag). `alloc` is the **destination** allocator and need
+    /// not be `common.alloc`. The type system does not prove that `slot`
+    /// belongs to `common`.
     fn clone_slot<VS, Pb>(
         slot: &VS,
         initialized: bool,
@@ -97,15 +114,7 @@ where
     ) -> VS
     where
         VS: ValueSlot<T::Slot<A>, A>,
-        T::Slot<A>: CloneIn<A>,
-        MessageCommon<Pb, A>: MessageCommonBits,
-    {
-        let _ = common;
-        VS::from_optional(
-            slot.get_value(initialized)
-                .map(|v| CloneIn::clone_in(v, alloc)),
-        )
-    }
+        MessageCommon<Pb, A>: MessageCommonBits;
 }
 
 /// Value lives in the field slot payload (`T::Slot<A>`).
@@ -176,6 +185,41 @@ where
     {
         T::merge(slot, init, common, wire_type, buf, field, depth)
     }
+
+    #[inline]
+    fn deallocate_slot<VS, Pb>(slot: VS, initialized: bool, common: &MessageCommon<Pb, A>)
+    where
+        VS: ValueSlot<T::Slot<A>, A>,
+        MessageCommon<Pb, A>: MessageCommonBits,
+    {
+        if let Some(v) = slot.take_value(initialized) {
+            // SAFETY: `deallocate_slot` contract — `common` is this field's parent.
+            unsafe { DeallocateIn::deallocate_in(v, common.alloc.clone()) };
+        }
+    }
+}
+
+impl<T: PayloadAccess, A: Allocator + Clone> ValueLayoutClone<T, A> for Inline
+where
+    T::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateIn<A> + CloneIn<A>,
+{
+    #[inline]
+    fn clone_slot<VS, Pb>(
+        slot: &VS,
+        initialized: bool,
+        common: &MessageCommon<Pb, A>,
+        alloc: A,
+    ) -> VS
+    where
+        VS: ValueSlot<T::Slot<A>, A>,
+        MessageCommon<Pb, A>: MessageCommonBits,
+    {
+        let _ = common;
+        VS::from_optional(
+            slot.get_value(initialized)
+                .map(|v| CloneIn::clone_in(v, alloc)),
+        )
+    }
 }
 
 /// Logical `bool` packed at `VALUE_BIT` in [`MessageCommon`]'s bitvec.
@@ -228,7 +272,7 @@ impl<A: Allocator + Clone, const VALUE_BIT: usize> ValueLayout<ProtoBool, A>
         MessageCommon<Pb, A>: MessageCommonBits,
     {
         common.set_bit(VALUE_BIT, false);
-        ValueSlot::with_mut(slot, init, common).clear();
+        let _ = ValueSlot::with_mut(slot, init, common).take_clear();
     }
 
     #[inline]
@@ -264,6 +308,33 @@ impl<A: Allocator + Clone, const VALUE_BIT: usize> ValueLayout<ProtoBool, A>
             }
             Err(e) => Err(e),
         }
+    }
+
+    #[inline]
+    fn deallocate_slot<VS, Pb>(slot: VS, initialized: bool, _common: &MessageCommon<Pb, A>)
+    where
+        VS: ValueSlot<(), A>,
+        MessageCommon<Pb, A>: MessageCommonBits,
+    {
+        let _ = slot.take_value(initialized);
+    }
+}
+
+impl<A: Allocator + Clone, const VALUE_BIT: usize> ValueLayoutClone<ProtoBool, A>
+    for BitPacked<VALUE_BIT>
+{
+    #[inline]
+    fn clone_slot<VS, Pb>(
+        slot: &VS,
+        initialized: bool,
+        _common: &MessageCommon<Pb, A>,
+        _alloc: A,
+    ) -> VS
+    where
+        VS: ValueSlot<(), A>,
+        MessageCommon<Pb, A>: MessageCommonBits,
+    {
+        VS::from_optional(slot.get_value(initialized).copied())
     }
 }
 
@@ -411,11 +482,15 @@ impl<A: Allocator + Clone, const HEAP_BIT: usize> ValueLayout<ProtoString, A>
         let is_heap = Self::is_heap(common);
         let alloc = common.alloc.clone();
         if let Some(s) = slot.take_value(initialized) {
-            // SAFETY: HEAP_BIT is the sole discriminant for this field.
+            // SAFETY: HEAP_BIT / `alloc` come from this field's parent `common`.
             unsafe { s.deallocate(is_heap, alloc) };
         }
     }
+}
 
+impl<A: Allocator + Clone, const HEAP_BIT: usize> ValueLayoutClone<ProtoString, A>
+    for InlineOrHeap<HEAP_BIT>
+{
     #[inline]
     fn clone_slot<VS, Pb>(
         slot: &VS,
@@ -425,7 +500,6 @@ impl<A: Allocator + Clone, const HEAP_BIT: usize> ValueLayout<ProtoString, A>
     ) -> VS
     where
         VS: ValueSlot<SsoString<A>, A>,
-        SsoString<A>: CloneIn<A>,
         MessageCommon<Pb, A>: MessageCommonBits,
     {
         let is_heap = Self::is_heap(common);

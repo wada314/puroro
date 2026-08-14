@@ -91,7 +91,7 @@ impl<M: Message + MessageEncode + MessageMerge> PayloadAccess for ProtoMessage<M
     ) -> &'a mut M
     where
         A: Allocator + Clone + 'a,
-        UnmanagedBox<M, A>: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
+        UnmanagedBox<M, A>: AddressableSlot + DefaultIn<A>,
         VS: ValueSlot<UnmanagedBox<M, A>, A>,
         I: SlotInitMut,
         MessageCommon<Pb, A>: MessageCommonBits,
@@ -113,7 +113,11 @@ impl<M: Message + MessageEncode + MessageMerge> PayloadAccess for ProtoMessage<M
         I: SlotInitMut,
         MessageCommon<Pb, A>: MessageCommonBits,
     {
-        ValueSlot::with_mut(slot, init, common).set(value);
+        let alloc = common.alloc.clone();
+        if let Some(old) = ValueSlot::with_mut(slot, init, common).replace(value) {
+            // SAFETY: `write` contract — `common` is this field's parent.
+            unsafe { DeallocateIn::deallocate_in(old, alloc) };
+        }
     }
 
     #[inline]
@@ -125,7 +129,11 @@ impl<M: Message + MessageEncode + MessageMerge> PayloadAccess for ProtoMessage<M
         I: SlotInitMut,
         MessageCommon<Pb, A>: MessageCommonBits,
     {
-        ValueSlot::with_mut(slot, init, common).clear();
+        let alloc = common.alloc.clone();
+        if let Some(old) = ValueSlot::with_mut(slot, init, common).take_clear() {
+            // SAFETY: `clear` contract — `common` is this field's parent.
+            unsafe { DeallocateIn::deallocate_in(old, alloc) };
+        }
     }
 
     fn merge<A, VS, I, Pb, B>(

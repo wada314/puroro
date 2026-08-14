@@ -6,7 +6,8 @@
 //! [`ValueSlot`](value_slot::ValueSlot),
 //! [`SlotInitView`](slot_init::SlotInitView) / [`SlotInitMut`](slot_init::SlotInitMut),
 //! and [`FieldPresence`](field_presence::FieldPresence) govern singular scalar
-//! storage and init state. Slot teardown uses [`unmanaged::DeallocateIn`].
+//! storage and init state. Slot teardown goes through
+//! [`ValueLayout`](value_layout::ValueLayout) (`take_value` + payload release).
 //! IMPLICIT empty / type-zero checks live on
 //! [`PayloadAccess`](crate::fields::wire::singular_type::PayloadAccess) /
 //! [`ValueLayout`](value_layout::ValueLayout).

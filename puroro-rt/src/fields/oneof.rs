@@ -20,8 +20,6 @@ use ::puroro::{
 };
 use ::unmanaged::UnmanagedBox;
 
-use ::unmanaged::DeallocateIn;
-
 use crate::fields::oneof_variant::OneofVariant;
 use crate::fields::shared::field_inspect::{FieldCloneIn, FieldDebug, FieldEncode, FieldPartialEq};
 use crate::fields::shared::{
@@ -49,7 +47,9 @@ pub trait OneofDeallocate<C> {
     ///
     /// # Safety
     ///
-    /// `common`'s allocator must own the variant's buffers.
+    /// `common` must be the parent message's [`MessageCommon`] — the same
+    /// instance message `Drop` uses. Its allocator must own the variant's
+    /// buffers; a different message's common is unsound.
     unsafe fn deallocate(self, common: &C);
 }
 
@@ -449,7 +449,7 @@ where
     T::View<'a, A>: Copy,
     D: HasDefault<T::View<'a, A>>,
     MessageCommon<Pb, A>: MessageCommonBits,
-    T::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
+    T::Slot<A>: AddressableSlot + DefaultIn<A>,
     <Oneof as FieldPresence>::ValueSlot<T::Slot<A>>: ValueSlot<T::Slot<A>, A>,
 {
     pub fn optional(self) -> Optional<T::View<'a, A>, D>

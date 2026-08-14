@@ -18,7 +18,7 @@ use ::bitvec::{
 use ::core::mem::{self, ManuallyDrop};
 use ::core::ops::Deref;
 use ::core::str;
-use ::unmanaged::{CloneIn, DeallocateIn, DefaultIn, String as AllocString, UnmanagedString};
+use ::unmanaged::{CloneIn, DefaultIn, String as AllocString, UnmanagedString};
 
 /// Max inline UTF-8 byte length (one byte of the 3-word slot is the length).
 pub const INLINE_CAP: usize = mem::size_of::<usize>() * 3 - 1;
@@ -243,26 +243,6 @@ impl<A: Allocator> DefaultIn<A> for SsoString<A> {
     #[inline]
     fn default_in(_alloc: A) -> Self {
         Self::empty_inline()
-    }
-}
-
-/// Blind `DeallocateIn` / `CloneIn` are not meaningful for an untagged SSO slot.
-///
-/// Message Drop / field clone must go through [`InlineOrHeap`] via
-/// [`SsoString::deallocate`] / [`SsoString::clone_packed`] with the heap bit.
-/// These impls exist only to satisfy [`ValueSlot`](crate::fields::shared::value_slot::ValueSlot)
-/// bounds used by mut views (SSO mutators bypass `DeallocateIn` on the slot).
-impl<A: Allocator + Clone> DeallocateIn<A> for SsoString<A> {
-    #[inline]
-    unsafe fn deallocate_in(self, _alloc: A) {
-        panic!("SsoString must be deallocated with is_heap from MessageCommon HEAP_BIT");
-    }
-}
-
-impl<A: Allocator + Clone> CloneIn<A> for SsoString<A> {
-    #[inline]
-    fn clone_in(&self, _alloc: A) -> Self {
-        panic!("SsoString must be cloned with is_heap from MessageCommon HEAP_BIT");
     }
 }
 

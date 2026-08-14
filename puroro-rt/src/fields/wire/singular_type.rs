@@ -116,13 +116,17 @@ pub(crate) trait PayloadAccess: SingularType {
     ) -> Self::Mut<'a, A>
     where
         A: Allocator + Clone + 'a,
-        Self::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
+        Self::Slot<A>: AddressableSlot + DefaultIn<A>,
         VS: ValueSlot<Self::Slot<A>, A>,
         I: SlotInitMut,
         MessageCommon<Pb, A>: MessageCommonBits,
         Self: 'a;
 
     /// Writes `value`, ensuring slot presence when applicable.
+    ///
+    /// Any previous payload is released with `common.alloc`. `common` must be
+    /// the parent [`MessageCommon`] that owns the existing slot (same pairing
+    /// as [`ValueLayout::deallocate_slot`](crate::fields::shared::value_layout::ValueLayout::deallocate_slot)).
     fn write<A, VS, I, Pb>(
         slot: &mut VS,
         init: I,
@@ -136,6 +140,9 @@ pub(crate) trait PayloadAccess: SingularType {
         MessageCommon<Pb, A>: MessageCommonBits;
 
     /// Clears the logical value and slot presence / payload.
+    ///
+    /// Releases the previous payload with `common.alloc`. `common` must be the
+    /// parent [`MessageCommon`] that owns the slot.
     fn clear<A, VS, I, Pb>(slot: &mut VS, init: I, common: &mut MessageCommon<Pb, A>)
     where
         A: Allocator + Clone,
@@ -222,7 +229,7 @@ where
     ) -> &'a mut C::NativeType
     where
         A: Allocator + Clone + 'a,
-        C::NativeType: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
+        C::NativeType: AddressableSlot + DefaultIn<A>,
         VS: ValueSlot<C::NativeType, A>,
         I: SlotInitMut,
         MessageCommon<Pb, A>: MessageCommonBits,
@@ -244,7 +251,11 @@ where
         I: SlotInitMut,
         MessageCommon<Pb, A>: MessageCommonBits,
     {
-        ValueSlot::with_mut(slot, init, common).set(value);
+        let alloc = common.alloc.clone();
+        if let Some(old) = ValueSlot::with_mut(slot, init, common).replace(value) {
+            // SAFETY: `write` contract — `common` is this field's parent.
+            unsafe { DeallocateIn::deallocate_in(old, alloc) };
+        }
     }
 
     #[inline]
@@ -256,7 +267,11 @@ where
         I: SlotInitMut,
         MessageCommon<Pb, A>: MessageCommonBits,
     {
-        ValueSlot::with_mut(slot, init, common).clear();
+        let alloc = common.alloc.clone();
+        if let Some(old) = ValueSlot::with_mut(slot, init, common).take_clear() {
+            // SAFETY: `clear` contract — `common` is this field's parent.
+            unsafe { DeallocateIn::deallocate_in(old, alloc) };
+        }
     }
 
     #[inline]
@@ -376,7 +391,11 @@ impl PayloadAccess for LenScalar<BytesCodec> {
         I: SlotInitMut,
         MessageCommon<Pb, A>: MessageCommonBits,
     {
-        ValueSlot::with_mut(slot, init, common).set(value);
+        let alloc = common.alloc.clone();
+        if let Some(old) = ValueSlot::with_mut(slot, init, common).replace(value) {
+            // SAFETY: `write` contract — `common` is this field's parent.
+            unsafe { DeallocateIn::deallocate_in(old, alloc) };
+        }
     }
 
     #[inline]
@@ -387,7 +406,11 @@ impl PayloadAccess for LenScalar<BytesCodec> {
         I: SlotInitMut,
         MessageCommon<Pb, A>: MessageCommonBits,
     {
-        ValueSlot::with_mut(slot, init, common).clear();
+        let alloc = common.alloc.clone();
+        if let Some(old) = ValueSlot::with_mut(slot, init, common).take_clear() {
+            // SAFETY: `clear` contract — `common` is this field's parent.
+            unsafe { DeallocateIn::deallocate_in(old, alloc) };
+        }
     }
 
     #[inline]
