@@ -1,7 +1,7 @@
 //! Repeated-element semantics for protobuf **type** markers (e.g. `ProtoInt32`,
 //! `ProtoString`, [`ProtoMessage`](super::proto_message::ProtoMessage)).
 //!
-//! Singular fields store [`SingularType::Slot`](super::singular_type::SingularType::Slot).
+//! Singular fields store [`ValueLayout::Slot`](crate::fields::shared::value_layout::ValueLayout).
 //! Repeated / map fields store [`RepeatedElement::Element`] — often the inner
 //! payload (`i32`, `UnmanagedString`, …), and for nested-message repeated fields
 //! the message type `M` itself (not [`UnmanagedBox`](::unmanaged::UnmanagedBox)).
@@ -140,7 +140,7 @@ pub trait RepeatedVecMut: RepeatedElement {}
 /// How to obtain a mutable element handle for
 /// [`RepeatedContainerMut`](::puroro::RepeatedContainerMut).
 ///
-/// Usually matches singular [`SingularType::Mut`], except [`ProtoBool`] (singular
+/// Usually matches singular [`ValueLayout::Mut`](crate::fields::shared::value_layout::ValueLayout::Mut), except [`ProtoBool`] (singular
 /// is bit-packed; repeated stores plain `bool`).
 pub trait RepeatedElementMut: RepeatedElement {
     /// Target of [`ElementMut`](Self::ElementMut) (`i32`, [`String`](::unmanaged::String), …).

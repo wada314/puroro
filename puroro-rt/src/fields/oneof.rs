@@ -449,8 +449,8 @@ where
     T::View<'a, A>: Copy,
     D: HasDefault<T::View<'a, A>>,
     MessageCommon<Pb, A>: MessageCommonBits,
-    T::Slot<A>: AddressableSlot + DefaultIn<A>,
-    <Oneof as FieldPresence>::ValueSlot<T::Slot<A>>: ValueSlot<T::Slot<A>, A>,
+    L::Slot: AddressableSlot + DefaultIn<A>,
+    <Oneof as FieldPresence>::ValueSlot<L::Slot>: ValueSlot<L::Slot, A>,
 {
     pub fn optional(self) -> Optional<T::View<'a, A>, D>
     where

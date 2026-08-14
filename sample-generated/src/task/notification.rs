@@ -13,7 +13,8 @@
 //!
 //! Shared projections (`OneofGroup::Ref` / `Mut`) are written inline on
 //! [`OneofGroup`] — Ref uses concrete user-facing types; Mut uses
-//! [`SingularType::Mut`](::puroro_rt::SingularType). There are no public Ref/Mut aliases.
+//! [`SingularFieldAccess::Mut`](::puroro_rt::SingularFieldAccess) on each
+//! variant field alias. There are no public Ref/Mut aliases.
 //!
 //! Group bound views come from `puroro-rt` ([`OneofView`] /
 //! [`OneofViewMut`](::puroro_rt::OneofViewMut)), not per-oneof generated structs.
@@ -25,7 +26,7 @@
 //! | `email_address` / `phone_number` | `string` | [`SingularField`] (+ `ProtoDefault`) | `&str` | string guard |
 //! | `webhook_id` | `int32` `[default = -1]` | [`SingularField`] + [`WebhookIdDefault`] | `i32` (by value) | `&mut i32` |
 //! | `postal` | `Address` message | [`SingularField`] + [`ProtoMessage`] | `&Address<A>` | `&mut Address<A>` |
-//! | `urgent` | `bool` | [`SingularField`] + [`ProtoBool`] | `bool` | `SingularType::Mut` (named bit handle) |
+//! | `urgent` | `bool` | [`SingularField`] + [`ProtoBool`] | `bool` | `SingularFieldAccess::Mut` (named bit handle) |
 //!
 //! Per-variant **immutable** getters return [`Optional`](::puroro::Optional) whose
 //! `D` is the field wrapper's default marker: when the case is unset or another
@@ -60,7 +61,8 @@ use ::bytes::BufMut;
 use ::puroro_rt::{
     BitPacked, FieldCloneIn, FieldDeallocate, FieldEncode, Inline, InlineOrHeap, MessageCommon,
     MessageCommonAlloc, MessageCommonBits, Oneof, OneofDeallocate, OneofEncodable, OneofGroup,
-    OneofVariant, ProtoBool, ProtoInt32, ProtoMessage, ProtoString, SingularField, SingularType,
+    OneofVariant, ProtoBool, ProtoInt32, ProtoMessage, ProtoString, SingularField,
+    SingularFieldAccess,
 };
 
 use crate::address::Address;
@@ -137,11 +139,11 @@ impl<A: Allocator + Clone> OneofGroup for NotificationStorage<A> {
         A: 'a;
     type Mut<'a>
         = Notification<
-        <ProtoString as SingularType>::Mut<'a, A>,
-        <ProtoString as SingularType>::Mut<'a, A>,
-        <ProtoInt32 as SingularType>::Mut<'a, A>,
-        <ProtoMessage<Address<A>> as SingularType>::Mut<'a, A>,
-        <ProtoBool as SingularType>::Mut<'a, A>,
+        <EmailAddressField<A> as SingularFieldAccess>::Mut<'a>,
+        <PhoneNumberField<A> as SingularFieldAccess>::Mut<'a>,
+        <WebhookIdField<A> as SingularFieldAccess>::Mut<'a>,
+        <PostalField<A> as SingularFieldAccess>::Mut<'a>,
+        <UrgentField<A> as SingularFieldAccess>::Mut<'a>,
     >
     where
         A: 'a;

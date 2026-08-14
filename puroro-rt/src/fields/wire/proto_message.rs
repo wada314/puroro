@@ -1,7 +1,9 @@
 //! Nested-message type marker for [`SingularType`](super::singular_type::SingularType).
 //!
 //! [`ProtoMessage`] supplies merge-into wire semantics; physical storage is
-//! [`UnmanagedBox<M, A>`]. Presence policy (`Message` / `Oneof`) lives on
+//! [`UnmanagedBox<M, A>`] via [`PayloadAccess`](super::singular_type::PayloadAccess)
+//! / [`Inline`](crate::fields::shared::value_layout::Inline). Presence policy
+//! (`Message` / `Oneof`) lives on
 //! [`FieldPresence`](crate::fields::shared::field_presence::FieldPresence).
 //!
 //! The marker is allocator-free; `M` typically still mentions `A` (e.g.
@@ -29,7 +31,7 @@ use crate::fields::wire::singular_type::{PayloadAccess, SingularType};
 
 /// Type marker for a singular nested message `M`.
 ///
-/// Physical slot is [`UnmanagedBox<M, A>`] via [`SingularType::Slot`].
+/// Physical slot is [`UnmanagedBox<M, A>`] via [`PayloadAccess`].
 pub struct ProtoMessage<M>(PhantomData<fn() -> M>);
 
 impl<M> Default for ProtoMessage<M> {
@@ -50,7 +52,9 @@ impl<M> Copy for ProtoMessage<M> {}
 // when `M: DefaultIn<A>` / `DeallocateIn<A>` (generated messages impl both).
 
 impl<M, A: Allocator> AddressableSlot for UnmanagedBox<M, A> {}
-impl<M: Message + MessageEncode> SingularType for ProtoMessage<M> {
+impl<M: Message + MessageEncode> SingularType for ProtoMessage<M> {}
+
+impl<M: Message + MessageEncode + MessageMerge> PayloadAccess for ProtoMessage<M> {
     type Slot<A: Allocator + Clone> = UnmanagedBox<M, A>;
     type Mut<'a, A: Allocator + Clone>
         = &'a mut M
@@ -58,9 +62,7 @@ impl<M: Message + MessageEncode> SingularType for ProtoMessage<M> {
         Self: 'a,
         A: 'a;
     type Written<A: Allocator + Clone> = UnmanagedBox<M, A>;
-}
 
-impl<M: Message + MessageEncode + MessageMerge> PayloadAccess for ProtoMessage<M> {
     #[inline]
     fn is_proto_empty<A: Allocator + Clone, Pb>(
         _slot: &UnmanagedBox<M, A>,

@@ -1,7 +1,7 @@
 //! Wire-encoding types (`Numerical` / `LenScalar`, `SingularType`, …).
 //!
 //! Singular fields use allocator-free type markers (`ProtoInt32`, …) and store
-//! [`SingularType::Slot`]. Repeated fields store [`RepeatedElement::Element`]
+//! [`ValueLayout::Slot`](crate::fields::shared::value_layout::ValueLayout). Repeated fields store [`RepeatedElement::Element`]
 //! (slice / storage) and project [`RepeatedElement::RefView`] for shared reads.
 //! Map fields use [`MapKey`](crate::fields::map::MapKey) for keys and
 //! [`RepeatedElement`] for values (both share `RefView`).
@@ -27,5 +27,5 @@ pub use numerical::{
 };
 pub use proto_message::ProtoMessage;
 pub use repeated_element::RepeatedElement;
-pub use singular_type::SingularType;
+pub use singular_type::{PayloadAccess, SingularType};
 pub use sso_string::{INLINE_CAP, SsoString, SsoStringMut};

@@ -26,7 +26,7 @@ pub trait FieldPresence: Copy {
     /// [`LegacyRequired`] use [`MaybeUninit<T>`].
     ///
     /// The `ValueSlot<T>` bound is enforced at use sites ([`SingularField`]).
-    /// `T` here is the **slot** payload ([`SingularType::Slot`](crate::SingularType)),
+    /// `T` here is the **slot** payload ([`ValueLayout::Slot`](crate::ValueLayout)),
     /// not the protobuf type marker.
     type ValueSlot<T: AddressableSlot>;
 

@@ -6,7 +6,8 @@
 //!
 //! Repeated / map storage uses [`UnmanagedString`](::unmanaged::UnmanagedString)
 //! / [`UnmanagedVec`](::unmanaged::UnmanagedVec). Singular `string` uses
-//! [`SsoString`](super::sso_string::SsoString) via [`SingularType`].
+//! [`SsoString`](super::sso_string::SsoString) via [`InlineOrHeap`](crate::fields::shared::value_layout::InlineOrHeap)
+//! (`ProtoString` + [`Inline`](crate::fields::shared::value_layout::Inline) keeps the heap [`UnmanagedString`] slot).
 
 use ::allocator_api2::alloc::Allocator;
 use ::allocator_api2::vec::Vec as AllocVec;

@@ -46,7 +46,7 @@ pub(crate) trait ProtoRefDebug<A: Allocator + Clone>: SingularType {
 }
 
 // Addressable numerical markers (`Ref = NativeType`): int / fixed / float / enum.
-// `ProtoBool` is separate (native `bool`, singular `Slot = ()`).
+// `ProtoBool` is separate (native `bool`, bit-packed singular slot).
 impl<C, A> ProtoRefEq<A> for Numerical<C>
 where
     C: NumericalType,

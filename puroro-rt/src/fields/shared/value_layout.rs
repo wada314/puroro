@@ -11,6 +11,7 @@ use ::bitvec::{
     ptr::{BitRef, Mut},
 };
 use ::bytes::Buf;
+use ::core::ops::Deref;
 use ::protobuf_core::FieldNumber;
 use ::puroro::{DecodeBuf, DecodeError, WireType};
 use ::unmanaged::{CloneIn, DeallocateIn, UnmanagedString, UnmanagedVec};
@@ -31,15 +32,31 @@ use crate::fields::wire::sso_string::{
 use crate::fields::wire::wire_payload::{CopyWirePayload, VarintPayload};
 
 /// Where a singular field's logical value is stored.
-pub trait ValueLayout<T: SingularType, A: Allocator + Clone>: Copy
-where
-    T::Slot<A>: AddressableSlot + DefaultIn<A>,
-{
-    fn is_proto_empty<Pb>(slot: &T::Slot<A>, common: &MessageCommon<Pb, A>) -> bool
+///
+/// Associated [`Slot`](Self::Slot) / [`Mut`](Self::Mut) are the physical storage
+/// and `_mut` handle for this `(T, L)` pair — not properties of `T` alone.
+pub trait ValueLayout<T: SingularType, A: Allocator + Clone>: Copy {
+    /// Physical value stored in the singular field slot (excluding
+    /// [`MessageCommon`] bits).
+    type Slot: AddressableSlot + DefaultIn<A>;
+
+    /// Mutable handle returned by `_mut` accessors (`&mut i32`, SSO mutator,
+    /// bit handle, …).
+    ///
+    /// Bound is [`Deref`] only so SSO string mutators need not expose
+    /// `DerefMut` (edits go through inherent / trait methods). Concrete handles
+    /// such as `&mut T` / `BitRef` still implement `DerefMut`.
+    type Mut<'a>: Deref
+    where
+        T: 'a,
+        A: 'a,
+        Self: 'a;
+
+    fn is_proto_empty<Pb>(slot: &Self::Slot, common: &MessageCommon<Pb, A>) -> bool
     where
         MessageCommon<Pb, A>: MessageCommonBits;
 
-    fn get<'a, Pb>(slot: &'a T::Slot<A>, common: &'a MessageCommon<Pb, A>) -> T::View<'a, A>
+    fn get<'a, Pb>(slot: &'a Self::Slot, common: &'a MessageCommon<Pb, A>) -> T::View<'a, A>
     where
         MessageCommon<Pb, A>: MessageCommonBits;
 
@@ -47,9 +64,9 @@ where
         slot: &'a mut VS,
         init: I,
         common: &'a mut MessageCommon<Pb, A>,
-    ) -> T::Mut<'a, A>
+    ) -> Self::Mut<'a>
     where
-        VS: ValueSlot<T::Slot<A>, A>,
+        VS: ValueSlot<Self::Slot, A>,
         I: SlotInitMut,
         MessageCommon<Pb, A>: MessageCommonBits,
         T: 'a,
@@ -61,7 +78,7 @@ where
     /// [`deallocate_slot`](Self::deallocate_slot)).
     fn clear<VS, I, Pb>(slot: &mut VS, init: I, common: &mut MessageCommon<Pb, A>)
     where
-        VS: ValueSlot<T::Slot<A>, A>,
+        VS: ValueSlot<Self::Slot, A>,
         I: SlotInitMut,
         MessageCommon<Pb, A>: MessageCommonBits;
 
@@ -75,7 +92,7 @@ where
         depth: usize,
     ) -> Result<(), DecodeError>
     where
-        VS: ValueSlot<T::Slot<A>, A>,
+        VS: ValueSlot<Self::Slot, A>,
         I: SlotInitMut,
         MessageCommon<Pb, A>: MessageCommonBits,
         B: DecodeBuf;
@@ -88,7 +105,7 @@ where
     /// unsound. SSO layouts also read the heap bit from this `common`.
     fn deallocate_slot<VS, Pb>(slot: VS, initialized: bool, common: &MessageCommon<Pb, A>)
     where
-        VS: ValueSlot<T::Slot<A>, A>,
+        VS: ValueSlot<Self::Slot, A>,
         MessageCommon<Pb, A>: MessageCommonBits;
 }
 
@@ -96,10 +113,7 @@ where
 ///
 /// Kept off [`ValueLayout`] so getter paths do not require [`CloneIn`] (nested
 /// messages) and SSO can clone via the heap bit instead of a blind `CloneIn`.
-pub trait ValueLayoutClone<T: SingularType, A: Allocator + Clone>: ValueLayout<T, A>
-where
-    T::Slot<A>: AddressableSlot + DefaultIn<A>,
-{
+pub trait ValueLayoutClone<T: SingularType, A: Allocator + Clone>: ValueLayout<T, A> {
     /// Deep-copies this field's value slot into `alloc`.
     ///
     /// `common` must be the **source** field's parent [`MessageCommon`] (bits /
@@ -113,11 +127,11 @@ where
         alloc: A,
     ) -> VS
     where
-        VS: ValueSlot<T::Slot<A>, A>,
+        VS: ValueSlot<Self::Slot, A>,
         MessageCommon<Pb, A>: MessageCommonBits;
 }
 
-/// Value lives in the field slot payload (`T::Slot<A>`).
+/// Value lives in the field slot payload ([`PayloadAccess::Slot`]).
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
 pub struct Inline;
 
@@ -125,6 +139,13 @@ impl<T: PayloadAccess, A: Allocator + Clone> ValueLayout<T, A> for Inline
 where
     T::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
 {
+    type Slot = T::Slot<A>;
+    type Mut<'a>
+        = T::Mut<'a, A>
+    where
+        T: 'a,
+        A: 'a;
+
     #[inline]
     fn is_proto_empty<Pb>(slot: &T::Slot<A>, common: &MessageCommon<Pb, A>) -> bool
     where
@@ -231,6 +252,12 @@ pub struct BitPacked<const VALUE_BIT: usize>;
 impl<A: Allocator + Clone, const VALUE_BIT: usize> ValueLayout<ProtoBool, A>
     for BitPacked<VALUE_BIT>
 {
+    type Slot = ();
+    type Mut<'a>
+        = BitRef<'a, Mut, u8, Lsb0>
+    where
+        A: 'a;
+
     #[inline]
     fn is_proto_empty<Pb>(_slot: &(), common: &MessageCommon<Pb, A>) -> bool
     where
@@ -378,6 +405,12 @@ impl<const HEAP_BIT: usize> InlineOrHeap<HEAP_BIT> {
 impl<A: Allocator + Clone, const HEAP_BIT: usize> ValueLayout<ProtoString, A>
     for InlineOrHeap<HEAP_BIT>
 {
+    type Slot = SsoString<A>;
+    type Mut<'a>
+        = SsoStringMut<'a, A>
+    where
+        A: 'a;
+
     #[inline]
     fn is_proto_empty<Pb>(slot: &SsoString<A>, common: &MessageCommon<Pb, A>) -> bool
     where

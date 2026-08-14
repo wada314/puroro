@@ -5,4 +5,4 @@
 
 pub(crate) mod field;
 
-pub use field::{SingularField, SingularFieldMut, SingularFieldRef};
+pub use field::{SingularField, SingularFieldAccess, SingularFieldMut, SingularFieldRef};

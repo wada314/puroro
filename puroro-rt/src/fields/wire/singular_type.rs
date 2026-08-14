@@ -2,7 +2,10 @@
 //! (e.g. `int32` / [`ProtoInt32`](super::numerical::ProtoInt32), `string` /
 //! [`ProtoString`](super::len::ProtoString) — not wire shapes like Varint / Len).
 //!
-//! Markers are allocator-free. Physical storage / views are GATs parametrised by `A`.
+//! Markers are allocator-free. Getter views stay on [`EncodeType`]. Physical
+//! slot / mutator types live on [`ValueLayout`](crate::fields::shared::value_layout::ValueLayout)
+//! (`Inline` aliases [`PayloadAccess`]; `BitPacked` / `InlineOrHeap` choose
+//! their own).
 //!
 //! Tagged encode is **not** on this trait — catalog code calls
 //! [`encode_field`](super::encode_type::encode_field) with
@@ -11,28 +14,24 @@
 //! **Storage access** (get / write / clear / merge) lives on [`PayloadAccess`]
 //! for inline payloads, or on
 //! [`ValueLayout`](crate::fields::shared::value_layout::ValueLayout)
-//! (`BitPacked`) for singular / oneof `bool`. Singular wire decode is
-//! **merge-into only** (`PayloadAccess::merge` / `BitPacked::merge`); there is
-//! no `SingularType::decode → Written`. [`SingularField`](crate::fields::singular::field::SingularField)
+//! (`BitPacked` / `InlineOrHeap`) for packed bool and SSO string. Singular wire
+//! decode is **merge-into only** (`PayloadAccess::merge` / layout `merge`);
+//! there is no `decode → Written`. [`SingularField`](crate::fields::singular::field::SingularField)
 //! always goes through `ValueLayout`.
 //!
 //! Repeated fields use [`RepeatedElement`](super::repeated_element::RepeatedElement)
 //! (`Element` storage). Numerical markers (including `ProtoBool`) share
 //! [`NumericalType`](super::numerical::NumericalType) for `NativeType` ↔ `WireBody`
 //! mapping; inline slot storage stays on [`PayloadAccess`] (`NativeType: AddressableSlot`).
-//! Singular [`ProtoBool`](super::numerical::ProtoBool) uses `Slot = ()` + [`BitPacked`].
+//! Singular [`ProtoBool`](super::numerical::ProtoBool) uses `BitPacked` (`Slot = ()`).
 
 use ::allocator_api2::alloc::Allocator;
-use ::bitvec::{
-    order::Lsb0,
-    ptr::{BitRef, Mut},
-};
 use ::core::ops::Deref;
 use ::protobuf_core::FieldNumber;
 
 use ::puroro::{DecodeBuf, DecodeError, WireType};
 
-use ::unmanaged::{DeallocateIn, UnmanagedString};
+use ::unmanaged::DeallocateIn;
 
 use crate::decode;
 use crate::fields::shared::{
@@ -42,53 +41,49 @@ use crate::fields::shared::{
 };
 
 use super::encode_type::EncodeType;
-use super::len::{BytesCodec, LenCodec, LenScalar, StringCodec};
-use super::numerical::{Numerical, NumericalType, ProtoBool};
-use super::sso_string::{SsoString, SsoStringMut};
+use super::len::{LenCodec, LenScalar};
+use super::numerical::{Numerical, NumericalType};
 use super::wire_payload::CopyWirePayload;
 
-/// Singular protobuf **type** marker (e.g. `ProtoInt32`, `ProtoString`) with
-/// storage GATs on top of [`EncodeType`].
+/// Singular protobuf **type** marker (e.g. `ProtoInt32`, `ProtoString`).
 ///
-/// Physical storage is the GAT [`Slot`](Self::Slot):
-/// - numerics / enums: bare `i32` / `E` / …
-/// - [`ProtoBool`]: `()` (ZST; logical `bool` via [`BitPacked`](crate::fields::shared::value_layout::BitPacked))
-/// - string: [`SsoString`](super::sso_string::SsoString) slot (`Written` = `UnmanagedString`)
-/// - bytes: `UnmanagedVec`
-/// - nested messages: `UnmanagedBox<M, A>` via [`ProtoMessage`](super::proto_message::ProtoMessage)
+/// Extends [`EncodeType`] so [`SingularField`](crate::fields::singular::field::SingularField)
+/// can require a proto type without taking a storage layout. Slot / mutator
+/// types are on [`ValueLayout`](crate::fields::shared::value_layout::ValueLayout):
+/// - [`Inline`](crate::fields::shared::value_layout::Inline) + [`PayloadAccess`]:
+///   numerics / enums (`i32` / `E`), heap string (`UnmanagedString`), bytes
+///   (`UnmanagedVec`), nested messages (`UnmanagedBox<M, A>`)
+/// - [`BitPacked`](crate::fields::shared::value_layout::BitPacked): `()` + bit handle
+/// - [`InlineOrHeap`](crate::fields::shared::value_layout::InlineOrHeap):
+///   [`SsoString`](super::sso_string::SsoString)
 ///
 /// Getter views use [`EncodeType::View`] (same type as tagged encode).
-pub trait SingularType: EncodeType {
+pub trait SingularType: EncodeType {}
+
+/// Inline payload access for markers whose value lives in the field slot.
+///
+/// Public because [`Inline`](crate::fields::shared::value_layout::Inline) aliases
+/// these associated types on the public [`ValueLayout`](crate::ValueLayout)
+/// impl. Not intended for generated code — prefer `ValueLayout::Slot` /
+/// `ValueLayout::Mut`. Not implemented for
+/// [`ProtoBool`](super::numerical::ProtoBool) — use
+/// [`BitPacked`](crate::fields::shared::value_layout::BitPacked) instead.
+pub trait PayloadAccess: SingularType {
     /// Physical value stored in the singular field slot (excluding
     /// [`MessageCommon`] bits).
-    ///
-    /// Call sites ([`SingularField`](crate::fields::singular::field::SingularField))
-    /// require `Slot<A>: AddressableSlot<SlotAlloc = A> + DefaultIn<Alloc = A>`.
-    /// Nested messages use `UnmanagedBox<M, A>`; call sites require
-    /// `M: Message<Alloc = A> + unmanaged::DeallocateIn<A>` via `DefaultIn` /
-    /// `DeallocateIn` on that box.
-    type Slot<A: Allocator + Clone>;
+    type Slot<A: Allocator + Clone>: AddressableSlot;
 
-    /// Mutable handle returned by `_mut` accessors (`&mut i32`, SSO string mut,
-    /// bit handle, …).
+    /// Mutable handle returned by `_mut` accessors (`&mut i32`, `StringGuard`, …).
     ///
-    /// Bound is [`Deref`] only so SSO string mutators need not expose
-    /// `DerefMut` (edits go through inherent / trait methods). Concrete handles
-    /// such as `&mut T` / `BitRef` still implement `DerefMut`.
+    /// Bound is [`Deref`] only so mutators need not expose `DerefMut`.
     type Mut<'a, A: Allocator + Clone>: Deref
     where
         Self: 'a,
         A: 'a;
 
-    /// Value accepted by [`PayloadAccess::write`].
+    /// Value accepted by [`write`](Self::write).
     type Written<A: Allocator + Clone>;
-}
 
-/// Inline payload access for markers whose value lives in [`SingularType::Slot`].
-///
-/// Not implemented for [`ProtoBool`] — use
-/// [`BitPacked`](crate::fields::shared::value_layout::BitPacked) instead.
-pub(crate) trait PayloadAccess: SingularType {
     /// `true` when the field holds protobuf empty / type-zero (IMPLICIT omit).
     ///
     /// Numerics / enums compare to [`Default`]; string / bytes use `is_empty`;
@@ -179,7 +174,9 @@ pub(crate) trait PayloadAccess: SingularType {
 // Numerical markers (Slot = NativeType; storage via AddressableSlot on methods)
 // ---------------------------------------------------------------------------
 
-impl<C> SingularType for Numerical<C>
+impl<C: NumericalType> SingularType for Numerical<C> {}
+
+impl<C> PayloadAccess for Numerical<C>
 where
     C: NumericalType,
     C::NativeType: AddressableSlot,
@@ -191,13 +188,7 @@ where
         Self: 'a,
         A: 'a;
     type Written<A: Allocator + Clone> = C::NativeType;
-}
 
-impl<C> PayloadAccess for Numerical<C>
-where
-    C: NumericalType,
-    C::NativeType: AddressableSlot,
-{
     #[inline]
     fn is_proto_empty<A: Allocator + Clone, Pb>(
         slot: &C::NativeType,
@@ -312,47 +303,37 @@ where
 }
 
 // ---------------------------------------------------------------------------
-// LEN scalars — `string` uses SSO (`SsoString` + `InlineOrHeap`); `bytes` stays
-// heap `UnmanagedVec` via [`PayloadAccess`] + [`Inline`].
+// LEN scalars — heap `UnmanagedString` / `UnmanagedVec` via [`PayloadAccess`] +
+// [`Inline`]. Singular `string` SSO uses [`InlineOrHeap`] instead.
 // ---------------------------------------------------------------------------
 
-impl SingularType for LenScalar<StringCodec> {
-    type Slot<A: Allocator + Clone> = SsoString<A>;
+impl<C: LenCodec> SingularType for LenScalar<C> {}
+
+impl<C: LenCodec> PayloadAccess for LenScalar<C> {
+    type Slot<A: Allocator + Clone> = C::Slot<A>;
     type Mut<'a, A: Allocator + Clone>
-        = SsoStringMut<'a, A>
+        = C::Mut<'a, A>
     where
         Self: 'a,
         A: 'a;
-    type Written<A: Allocator + Clone> = UnmanagedString<A>;
-}
+    type Written<A: Allocator + Clone> = C::Slot<A>;
 
-impl SingularType for LenScalar<BytesCodec> {
-    type Slot<A: Allocator + Clone> = <BytesCodec as LenCodec>::Slot<A>;
-    type Mut<'a, A: Allocator + Clone>
-        = <BytesCodec as LenCodec>::Mut<'a, A>
-    where
-        Self: 'a,
-        A: 'a;
-    type Written<A: Allocator + Clone> = <BytesCodec as LenCodec>::Slot<A>;
-}
-
-impl PayloadAccess for LenScalar<BytesCodec> {
     #[inline]
     fn is_proto_empty<A: Allocator + Clone, Pb>(
-        slot: &<BytesCodec as LenCodec>::Slot<A>,
+        slot: &C::Slot<A>,
         _common: &MessageCommon<Pb, A>,
     ) -> bool
     where
         MessageCommon<Pb, A>: MessageCommonBits,
     {
-        BytesCodec::as_wire_bytes(Deref::deref(slot)).is_empty()
+        C::as_wire_bytes(Deref::deref(slot)).is_empty()
     }
 
     #[inline]
     fn get<'a, A: Allocator + Clone + 'a, Pb>(
-        slot: &'a <BytesCodec as LenCodec>::Slot<A>,
+        slot: &'a C::Slot<A>,
         _common: &'a MessageCommon<Pb, A>,
-    ) -> &'a [u8]
+    ) -> &'a C::RefView
     where
         MessageCommon<Pb, A>: MessageCommonBits,
     {
@@ -364,19 +345,17 @@ impl PayloadAccess for LenScalar<BytesCodec> {
         slot: &'a mut VS,
         init: I,
         common: &'a mut MessageCommon<Pb, A>,
-    ) -> <BytesCodec as LenCodec>::Mut<'a, A>
+    ) -> C::Mut<'a, A>
     where
         A: Allocator + Clone + 'a,
-        VS: ValueSlot<<BytesCodec as LenCodec>::Slot<A>, A>,
+        VS: ValueSlot<C::Slot<A>, A>,
         I: SlotInitMut,
         MessageCommon<Pb, A>: MessageCommonBits,
         Self: 'a,
     {
         let alloc = common.alloc.clone();
         // SAFETY: message allocator owns this LEN scalar buffer.
-        unsafe {
-            BytesCodec::slot_with_alloc(ValueSlot::with_mut(slot, init, common).get_mut(), alloc)
-        }
+        unsafe { C::slot_with_alloc(ValueSlot::with_mut(slot, init, common).get_mut(), alloc) }
     }
 
     #[inline]
@@ -384,10 +363,10 @@ impl PayloadAccess for LenScalar<BytesCodec> {
         slot: &mut VS,
         init: I,
         common: &mut MessageCommon<Pb, A>,
-        value: <BytesCodec as LenCodec>::Slot<A>,
+        value: C::Slot<A>,
     ) where
         A: Allocator + Clone,
-        VS: ValueSlot<<BytesCodec as LenCodec>::Slot<A>, A>,
+        VS: ValueSlot<C::Slot<A>, A>,
         I: SlotInitMut,
         MessageCommon<Pb, A>: MessageCommonBits,
     {
@@ -402,7 +381,7 @@ impl PayloadAccess for LenScalar<BytesCodec> {
     fn clear<A, VS, I, Pb>(slot: &mut VS, init: I, common: &mut MessageCommon<Pb, A>)
     where
         A: Allocator + Clone,
-        VS: ValueSlot<<BytesCodec as LenCodec>::Slot<A>, A>,
+        VS: ValueSlot<C::Slot<A>, A>,
         I: SlotInitMut,
         MessageCommon<Pb, A>: MessageCommonBits,
     {
@@ -425,7 +404,7 @@ impl PayloadAccess for LenScalar<BytesCodec> {
     ) -> Result<(), DecodeError>
     where
         A: Allocator + Clone,
-        VS: ValueSlot<<BytesCodec as LenCodec>::Slot<A>, A>,
+        VS: ValueSlot<C::Slot<A>, A>,
         I: SlotInitMut,
         MessageCommon<Pb, A>: MessageCommonBits,
         B: DecodeBuf,
@@ -433,22 +412,8 @@ impl PayloadAccess for LenScalar<BytesCodec> {
         if wire_type != WireType::Len {
             return Err(DecodeError::InvalidTag);
         }
-        let new = BytesCodec::decode_in(buf, common.alloc.clone())?;
+        let new = C::decode_in(buf, common.alloc.clone())?;
         Self::write(slot, init, common, new);
         Ok(())
     }
-}
-
-// ---------------------------------------------------------------------------
-// Bit-packed bool marker (Slot = (); value via BitPacked layout)
-// ---------------------------------------------------------------------------
-
-impl SingularType for ProtoBool {
-    type Slot<A: Allocator + Clone> = ();
-    type Mut<'a, A: Allocator + Clone>
-        = BitRef<'a, Mut, u8, Lsb0>
-    where
-        Self: 'a,
-        A: 'a;
-    type Written<A: Allocator + Clone> = bool;
 }

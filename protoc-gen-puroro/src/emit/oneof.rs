@@ -201,8 +201,8 @@ fn render_module_body(oneof: &OneofEmit) -> Result<TokenStream> {
         .variants
         .iter()
         .map(|v| {
-            let marker = &v.marker;
-            quote! { <#marker as ::puroro_rt::SingularType>::Mut<'a, A> }
+            let alias = &v.field_alias;
+            quote! { <#alias<A> as ::puroro_rt::SingularFieldAccess>::Mut<'a> }
         })
         .collect();
 
