@@ -40,3 +40,7 @@ harness = false
 [[bench]]
 name = "varint"
 harness = false
+
+[[bench]]
+name = "string_layout"
+harness = false

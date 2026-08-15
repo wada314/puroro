@@ -40,8 +40,8 @@ use notification::NotificationStorage;
 pub use notification::{Notification, NotificationCase};
 
 // ---------------------------------------------------------------------------
-// Bit indices — presence, string SSO heap bits (1 = heap / 0 = inline), then
-// bool value bits, assigned by ascending field number in one pass.
+// Bit indices — presence, string / bytes SSO heap bits (1 = heap / 0 = inline),
+// then bool value bits, assigned by ascending field number in one pass.
 // ---------------------------------------------------------------------------
 
 pub const BIT_TITLE: usize = 0; // title (EXPLICIT presence)
@@ -50,13 +50,14 @@ pub const BIT_MAX_RETRIES: usize = 2; // max_retries (EXPLICIT presence)
 pub const BIT_OWNER_ID: usize = 3; // owner_id (LEGACY_REQUIRED presence)
 pub const BIT_OWNER_ID_SSO: usize = 4; // owner_id (SSO: 1 = heap)
 pub const BIT_PAYLOAD: usize = 5; // payload (EXPLICIT presence)
-pub const BIT_PRIORITY: usize = 6; // priority (EXPLICIT presence)
-pub const BIT_EMAIL_ADDRESS_SSO: usize = 7; // notification.email_address (SSO: 1 = heap)
-pub const BIT_PHONE_NUMBER_SSO: usize = 8; // notification.phone_number (SSO: 1 = heap)
-pub const BIT_DONE_VALUE: usize = 9; // done (IMPLICIT bool value)
-pub const BIT_FLAG: usize = 10; // flag (EXPLICIT presence)
-pub const BIT_FLAG_VALUE: usize = 11; // flag (EXPLICIT bool value)
-pub const BIT_URGENT_VALUE: usize = 12; // notification.urgent (oneof bool value)
+pub const BIT_PAYLOAD_SSO: usize = 6; // payload (SSO: 1 = heap)
+pub const BIT_PRIORITY: usize = 7; // priority (EXPLICIT presence)
+pub const BIT_EMAIL_ADDRESS_SSO: usize = 8; // notification.email_address (SSO: 1 = heap)
+pub const BIT_PHONE_NUMBER_SSO: usize = 9; // notification.phone_number (SSO: 1 = heap)
+pub const BIT_DONE_VALUE: usize = 10; // done (IMPLICIT bool value)
+pub const BIT_FLAG: usize = 11; // flag (EXPLICIT presence)
+pub const BIT_FLAG_VALUE: usize = 12; // flag (EXPLICIT bool value)
+pub const BIT_URGENT_VALUE: usize = 13; // notification.urgent (oneof bool value)
 
 // ---------------------------------------------------------------------------
 // Proto field numbers
@@ -113,7 +114,13 @@ pub struct Task<A: Allocator + Clone = Global> {
         A,
         InlineOrHeap<{ BIT_OWNER_ID_SSO }>,
     >, // proto: string owner_id = 4;
-    payload: SingularField<ProtoBytes, Explicit<{ BIT_PAYLOAD }>, { FIELD_PAYLOAD }, A>, // proto: bytes payload = 5;
+    payload: SingularField<
+        ProtoBytes,
+        Explicit<{ BIT_PAYLOAD }>,
+        { FIELD_PAYLOAD },
+        A,
+        InlineOrHeap<{ BIT_PAYLOAD_SSO }>,
+    >, // proto: bytes payload = 5;
     tag_ids: RepeatedField<ProtoInt32, Packed, { FIELD_TAG_IDS }, A>, // proto: repeated int32 tag_ids = 6 [packed];
     scores: RepeatedField<ProtoInt32, Expanded, { FIELD_SCORES }, A>, // proto: repeated int32 scores = 7;
     labels: RepeatedField<ProtoString, Expanded, { FIELD_LABELS }, A>, // proto: repeated string labels = 8;
@@ -242,7 +249,7 @@ impl<A: Allocator + Clone> Task<A> {
         self.payload.bind(&self._common).optional()
     }
 
-    pub fn payload_mut<'s>(&'s mut self) -> impl DerefMut<Target = AllocVec<u8, A>> + 's {
+    pub fn payload_mut(&mut self) -> impl ::puroro::BytesMut<A> + '_ {
         self.payload.bind_mut(&mut self._common).value_mut()
     }
 

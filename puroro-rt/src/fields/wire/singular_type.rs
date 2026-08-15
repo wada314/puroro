@@ -14,7 +14,7 @@
 //! **Storage access** (get / write / clear / merge) lives on [`PayloadAccess`]
 //! for inline payloads, or on
 //! [`ValueLayout`](crate::fields::shared::value_layout::ValueLayout)
-//! (`BitPacked` / `InlineOrHeap`) for packed bool and SSO string. Singular wire
+//! (`BitPacked` / `InlineOrHeap`) for packed bool and SSO string / bytes. Singular wire
 //! decode is **merge-into only** (`PayloadAccess::merge` / layout `merge`);
 //! there is no `decode → Written`. [`SingularField`](crate::fields::singular::field::SingularField)
 //! always goes through `ValueLayout`.
@@ -57,7 +57,7 @@ use super::wire_payload::CopyWirePayload;
 /// - [`BitPacked`](crate::fields::shared::value_layout::BitPacked): `()` + bit handle
 ///   (packed singular / oneof `bool`)
 /// - [`InlineOrHeap`](crate::fields::shared::value_layout::InlineOrHeap):
-///   [`SsoString`](super::sso_string::SsoString)
+///   [`SsoString`](super::sso_string::SsoString) / [`SsoBytes`](super::sso_bytes::SsoBytes)
 ///
 /// Getter views use [`EncodeType::View`] (same type as tagged encode).
 pub trait SingularType: EncodeType {}

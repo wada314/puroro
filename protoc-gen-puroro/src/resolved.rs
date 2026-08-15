@@ -17,7 +17,7 @@ pub use arena::Arena;
 pub use resolve::resolve;
 
 use crate::descriptor::features::{EnumType, RepeatedFieldEncoding, Utf8Validation};
-use crate::descriptor::{FieldType, ProtoFqn, StringLayout, Syntax};
+use crate::descriptor::{BytesLayout, FieldType, ProtoFqn, StringLayout, Syntax};
 use ::std::cell::OnceCell;
 use ::std::collections::HashMap;
 use ::std::fmt;
@@ -96,6 +96,8 @@ pub struct Field<'a> {
     utf8_validation: Option<Utf8Validation>,
     /// `(puroro.string_layout)`, if set.
     string_layout: Option<StringLayout>,
+    /// `(puroro.bytes_layout)`, if set.
+    bytes_layout: Option<BytesLayout>,
 }
 
 /// Resolved type of a field.
@@ -272,6 +274,11 @@ impl<'a> Field<'a> {
     /// `(puroro.string_layout)`, if set on the descriptor.
     pub fn string_layout(&self) -> Option<StringLayout> {
         self.string_layout
+    }
+
+    /// `(puroro.bytes_layout)`, if set on the descriptor.
+    pub fn bytes_layout(&self) -> Option<BytesLayout> {
+        self.bytes_layout
     }
 }
 

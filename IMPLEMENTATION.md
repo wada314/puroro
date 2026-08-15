@@ -198,7 +198,7 @@ Field catalog methods take `&MessageCommon` / `&mut MessageCommon`, not `&Task`,
 
 [`MessageCommonBits`](puroro-rt/src/fields/shared.rs) / [`MessageCommonAlloc`](puroro-rt/src/fields/shared.rs) — catalog bounds on the common context (not on the bit-storage type). Bits cover EXPLICIT / LEGACY_REQUIRED **presence** and packed **bool values**. `MessageCommon` implements both; inherent `is_bit_set` / `set_bit` / `bit_mut` forward to `MessageCommonBits` (`bit_mut` returns bitvec's `BitRef<'_, Mut, u8, Lsb0>`). Generated messages store `BitArray<[u8; N], Lsb0>` in `_common.presence` with no per-message newtype.
 
-[`ValueSlot<T>`](puroro-rt/src/fields/shared/value_slot.rs) — singular **slot** storage behind a GAT on [`FieldPresence`](puroro-rt/src/fields/shared/field_presence.rs): always-initialized `T` for `Implicit` / `Oneof`; `MaybeUninit<T>` for `Explicit` / `LegacyRequired`; `Option<T>` for `Message` (pointer presence). Here `T` is [`ValueLayout::Slot`](puroro-rt/src/fields/shared/value_layout.rs) (bare `i32` / `()`, [`SsoString`](puroro-rt/src/fields/wire/sso_string.rs), heap `UnmanagedString`, or `UnmanagedBox<M, A>` for messages). Construction uses [`DefaultIn<A>`](puroro-rt/src/fields/shared.rs). Drop / clone extract a live payload via `take_value` / `get_value` / `from_optional`; [`ValueLayout`](puroro-rt/src/fields/shared/value_layout.rs) frees it (`DeallocateIn` for inline payloads, heap bit + `SsoString::deallocate` for SSO) and [`ValueLayoutClone`](puroro-rt/src/fields/shared/value_layout.rs) deep-copies it. Reads and mutation go through short-lived views: `slot.with(init, common)` → [`ValueSlotRefAccess`](puroro-rt/src/fields/shared/value_slot.rs) / `slot.with_mut(init, common)` → [`ValueSlotMutAccess`](puroro-rt/src/fields/shared/value_slot.rs) (`get` / `get_mut` / `replace` / `take_clear`). Init markers ([`AlwaysInitialized`](puroro-rt/src/fields/shared/slot_init.rs) / [`BitInit`](puroro-rt/src/fields/shared/slot_init.rs)) are borrow-free; they read/update state through the passed [`MessageCommon`](puroro-rt/src/fields/shared.rs). Slot payloads use [`AddressableSlot`](puroro-rt/src/fields/shared/value_slot.rs); logical bool values are read/written via [`SingularType`](puroro-rt/src/fields/wire/singular_type.rs) against `_common.presence`. Singular IMPLICIT omit goes through [`ValueLayout::is_proto_empty`](puroro-rt/src/fields/shared/value_layout.rs).
+[`ValueSlot<T>`](puroro-rt/src/fields/shared/value_slot.rs) — singular **slot** storage behind a GAT on [`FieldPresence`](puroro-rt/src/fields/shared/field_presence.rs): always-initialized `T` for `Implicit` / `Oneof`; `MaybeUninit<T>` for `Explicit` / `LegacyRequired`; `Option<T>` for `Message` (pointer presence). Here `T` is [`ValueLayout::Slot`](puroro-rt/src/fields/shared/value_layout.rs) (bare `i32` / `()`, [`SsoString`](puroro-rt/src/fields/wire/sso_string.rs) / [`SsoBytes`](puroro-rt/src/fields/wire/sso_bytes.rs), heap `UnmanagedString` / `UnmanagedVec`, or `UnmanagedBox<M, A>` for messages). Construction uses [`DefaultIn<A>`](puroro-rt/src/fields/shared.rs). Drop / clone extract a live payload via `take_value` / `get_value` / `from_optional`; [`ValueLayout`](puroro-rt/src/fields/shared/value_layout.rs) frees it (`DeallocateIn` for inline payloads, heap bit + SSO `deallocate` for SSO) and [`ValueLayoutClone`](puroro-rt/src/fields/shared/value_layout.rs) deep-copies it. Reads and mutation go through short-lived views: `slot.with(init, common)` → [`ValueSlotRefAccess`](puroro-rt/src/fields/shared/value_slot.rs) / `slot.with_mut(init, common)` → [`ValueSlotMutAccess`](puroro-rt/src/fields/shared/value_slot.rs) (`get` / `get_mut` / `replace` / `take_clear`). Init markers ([`AlwaysInitialized`](puroro-rt/src/fields/shared/slot_init.rs) / [`BitInit`](puroro-rt/src/fields/shared/slot_init.rs)) are borrow-free; they read/update state through the passed [`MessageCommon`](puroro-rt/src/fields/shared.rs). Slot payloads use [`AddressableSlot`](puroro-rt/src/fields/shared/value_slot.rs); logical bool values are read/written via [`SingularType`](puroro-rt/src/fields/wire/singular_type.rs) against `_common.presence`. Singular IMPLICIT omit goes through [`ValueLayout::is_proto_empty`](puroro-rt/src/fields/shared/value_layout.rs).
 
 [`SingularField::bind`](puroro-rt/src/fields/singular/field.rs) / [`bind_mut`](puroro-rt/src/fields/singular/field.rs) — inherent MessageCommon binding → [`SingularFieldRef`](puroro-rt/src/fields/singular/field.rs) / [`SingularFieldMut`](puroro-rt/src/fields/singular/field.rs). Repeated fields and [`OneofSlot`](puroro-rt/src/fields/oneof.rs) use the same inherent `bind` / `bind_mut` call shape. Getter / `_mut` payload types are [`EncodeType::View`](puroro-rt/src/fields/wire/encode_type.rs) / [`ValueLayout::Mut`](puroro-rt/src/fields/shared/value_layout.rs).
 
@@ -250,7 +250,7 @@ live on [`ValueLayout`](puroro-rt/src/fields/shared/value_layout.rs);
 
 ### Singular field type markers ([`wire/singular_type.rs`](puroro-rt/src/fields/wire/singular_type.rs))
 
-[`SingularType`](puroro-rt/src/fields/wire/singular_type.rs) is the trait consumed by [`SingularField`](puroro-rt/src/fields/singular/field.rs) (including nested messages via [`ProtoMessage`](puroro-rt/src/fields/wire/proto_message.rs)). Markers are **allocator-free**; physical storage / views are GATs over `A`. Singular slots use bare wire values (`i32`, `()`, …) / `SsoString` (singular string) / `UnmanagedString` (repeated string) / `UnmanagedBox<M, A>`:
+[`SingularType`](puroro-rt/src/fields/wire/singular_type.rs) is the trait consumed by [`SingularField`](puroro-rt/src/fields/singular/field.rs) (including nested messages via [`ProtoMessage`](puroro-rt/src/fields/wire/proto_message.rs)). Markers are **allocator-free**; physical storage / views are GATs over `A`. Singular slots use bare wire values (`i32`, `()`, …) / `SsoString` / `SsoBytes` (singular string / bytes) / `UnmanagedString` (repeated string) / `UnmanagedBox<M, A>`:
 
 ```rust
 pub trait SingularType: EncodeType {}
@@ -379,7 +379,7 @@ Adding a singular wire type = one new codec + `Numerical` / `LenScalar` alias (b
 | `IMPLICIT string` | `SingularField<ProtoString, Implicit, FIELD, A, InlineOrHeap<SSO_BIT>>` |
 | `EXPLICIT string` | `SingularField<ProtoString, Explicit<BIT>, FIELD, A, InlineOrHeap<SSO_BIT>>` |
 | `LEGACY_REQUIRED string` | `SingularField<ProtoString, LegacyRequired<BIT>, FIELD, A, InlineOrHeap<SSO_BIT>>` |
-| `IMPLICIT` / `EXPLICIT bytes` | `SingularField<ProtoBytes, P, FIELD, A>` |
+| `IMPLICIT` / `EXPLICIT bytes` | `SingularField<ProtoBytes, P, FIELD, A, InlineOrHeap<SSO_BIT>>` |
 | `EXPLICIT fixed32` | `SingularField<ProtoFixed32, Explicit<BIT>, FIELD, A>` |
 | `EXPLICIT float` / `double` | `SingularField<ProtoFloat, …, A>` / `SingularField<ProtoDouble, …, A>` |
 | `repeated int32 PACKED` | `RepeatedField<ProtoInt32, Packed, FIELD, A>` |
@@ -414,7 +414,7 @@ pub struct Task<A: Allocator + Clone = Global> {
         MaxRetriesDefault,
     >,
     owner_id: SingularField<ProtoString, LegacyRequired<{ BIT_OWNER_ID }>, { FIELD_OWNER_ID }, A>,
-    payload: SingularField<ProtoBytes, Explicit<{ BIT_PAYLOAD }>, { FIELD_PAYLOAD }, A>,
+    payload: SingularField<ProtoBytes, Explicit<{ BIT_PAYLOAD }>, { FIELD_PAYLOAD }, A, InlineOrHeap<{ BIT_PAYLOAD_SSO }>>,
     tag_ids: RepeatedField<ProtoInt32, Packed, { FIELD_TAG_IDS }, A>,
     scores: RepeatedField<ProtoInt32, Expanded, { FIELD_SCORES }, A>,
     labels: RepeatedField<ProtoString, Expanded, { FIELD_LABELS }, A>,
@@ -446,7 +446,7 @@ The `A: Allocator + Clone` struct bound is what lets the generated `Drop` clone 
 | Nested message | `Option<UnmanagedBox<M, A>>` (`Message`) | `Option`, not bitfield |
 | Oneof (non-bool) | `Option<E>` in slot | `Option`, not bitfield |
 
-Unset EXPLICIT slots are uninitialized (`MaybeUninit`); **only the bit** means "set". Singular string storage is `SsoString` (+ `InlineOrHeap` tag bit); repeated string / bytes use `UnmanagedString` / `UnmanagedVec<u8>`.
+Unset EXPLICIT slots are uninitialized (`MaybeUninit`); **only the bit** means "set". Singular string / bytes storage is `SsoString` / `SsoBytes` (+ `InlineOrHeap` tag bit); repeated string / bytes use `UnmanagedString` / `UnmanagedVec<u8>`.
 
 Public accessors are **one-line delegates** into catalog methods with `&self._common` / `&mut self._common`. `Message` (encode / merge / unknown / validate) sums the same delegates; the generated `Drop` walks heap fields calling `deallocate(&self._common)` (or oneof `clear`).
 
@@ -514,9 +514,10 @@ Tracked bits use [`bitvec::BitArray`](https://docs.rs/bitvec) inline in the mess
 **Assignment (one pass, ascending field number):**
 
 1. For each `EXPLICIT` / `LEGACY_REQUIRED` singular field (including `bool`), allocate one **presence** bit.
-2. For each singular or oneof `bool` field, allocate one **value** bit.
+2. For each singular or oneof `string` / `bytes` field that uses SSO (the default; not `(puroro.*_layout) = HEAP`), allocate one **heap-arm** bit (`BIT_*_SSO`).
+3. For each singular or oneof `bool` field, allocate one **value** bit.
 
-Gaps in field numbers do not create gaps in bit indices. Oneof non-bool variants do not take bits (presence stays on `OneofSlot`).
+Gaps in field numbers do not create gaps in bit indices. Oneof non-bool variants do not take a presence bit (presence stays on `OneofSlot`) but string / bytes variants still take an SSO heap bit.
 
 | Kind | Bits |
 |---|---|
@@ -524,20 +525,26 @@ Gaps in field numbers do not create gaps in bit indices. Oneof non-bool variants
 | Explicit / LegacyRequired bool | presence 1 + value 1 |
 | Oneof bool | value 1 |
 | Explicit non-bool | presence 1 |
+| Singular / oneof SSO `string` / `bytes` | heap-arm 1 |
 
-### `Task` — nine bits → `BitArray<[u8; 2], Lsb0>`
+### `Task` — fourteen bits → `BitArray<[u8; 2], Lsb0>`
 
 | Field | # | Role | `BIT_*` |
 |---|---|---|---|
 | `title` | 1 | EXPLICIT presence | `0` |
-| `max_retries` | 3 | EXPLICIT presence | `1` |
-| `owner_id` | 4 | LEGACY_REQUIRED presence | `2` |
-| `payload` | 5 | EXPLICIT presence | `3` |
-| `priority` | 10 | EXPLICIT presence | `4` |
-| `done` | 16 | IMPLICIT bool value | `5` (`BIT_DONE_VALUE`) |
-| `flag` | 17 | EXPLICIT presence | `6` |
-| `flag` | 17 | EXPLICIT bool value | `7` (`BIT_FLAG_VALUE`) |
-| `urgent` | 18 | oneof bool value | `8` (`BIT_URGENT_VALUE`) |
+| `title` | 1 | SSO heap | `1` (`BIT_TITLE_SSO`) |
+| `max_retries` | 3 | EXPLICIT presence | `2` |
+| `owner_id` | 4 | LEGACY_REQUIRED presence | `3` |
+| `owner_id` | 4 | SSO heap | `4` (`BIT_OWNER_ID_SSO`) |
+| `payload` | 5 | EXPLICIT presence | `5` |
+| `payload` | 5 | SSO heap | `6` (`BIT_PAYLOAD_SSO`) |
+| `priority` | 10 | EXPLICIT presence | `7` |
+| `email_address` | 12 | SSO heap | `8` (`BIT_EMAIL_ADDRESS_SSO`) |
+| `phone_number` | 13 | SSO heap | `9` (`BIT_PHONE_NUMBER_SSO`) |
+| `done` | 16 | IMPLICIT bool value | `10` (`BIT_DONE_VALUE`) |
+| `flag` | 17 | EXPLICIT presence | `11` |
+| `flag` | 17 | EXPLICIT bool value | `12` (`BIT_FLAG_VALUE`) |
+| `urgent` | 18 | oneof bool value | `13` (`BIT_URGENT_VALUE`) |
 
 ### `Address` — four bits → `BitArray<[u8; 1], Lsb0>`
 
@@ -789,7 +796,7 @@ The `set_*` per-variant setters are removed, matching the other field families.
 | `TaskLazy` | DESIGN only | Wire buffer + on-demand decode |
 | `Hash` / `serde` | Deferred | Opt-in features |
 | Submessage inline | Always `UnmanagedBox<M, A>` for nested messages | Inline small non-repeated messages in the parent struct ([§17.1](#171-submessage-inline-optimisation)) |
-| String / Bytes inline | Singular `string` uses SSO (`SsoString` + `InlineOrHeap`); `bytes` / repeated / map still heap | Bytes SSO deferred ([§17.2](#172-string--bytes-inline-optimisation)) |
+| String / Bytes inline | Singular `string` / `bytes` use SSO (`SsoString` / `SsoBytes` + `InlineOrHeap`); repeated / map stay heap | Repeated / map SSO deferred ([§17.2](#172-string--bytes-inline-optimisation)) |
 
 ### 17.1 Submessage inline optimisation
 
@@ -804,15 +811,15 @@ The `set_*` per-variant setters are removed, matching the other field families.
 
 ### 17.2 String / Bytes inline optimisation
 
-**Status (string): done.** Singular `string` (IMPLICIT / EXPLICIT / LEGACY_REQUIRED / oneof) defaults to [`SsoString`](puroro-rt/src/fields/wire/sso_string.rs) + [`InlineOrHeap`](puroro-rt/src/fields/shared/value_layout.rs). The puroro field option [`(puroro.string_layout)`](proto/puroro/options.proto) (`UNSPECIFIED` / unset) uses that generator default; `SSO` pins SSO; `HEAP` selects heap [`UnmanagedString`](unmanaged/src/string.rs) via `ProtoString` + [`Inline`](puroro-rt/src/fields/shared/value_layout.rs) (`PayloadAccess`). Heap `_mut` is `impl DerefMut<Target = puroro::String<A>>`; SSO `_mut` stays `impl StringMut<A>`. This is independent of C++ `FieldOptions.ctype`.
+**Status (string / bytes): done.** Singular `string` and `bytes` (IMPLICIT / EXPLICIT / LEGACY_REQUIRED / oneof) default to the shared 3-word SSO slot ([`SsoBuf`](puroro-rt/src/fields/wire/sso_buf.rs) → [`SsoString`](puroro-rt/src/fields/wire/sso_string.rs) / [`SsoBytes`](puroro-rt/src/fields/wire/sso_bytes.rs)) + [`InlineOrHeap`](puroro-rt/src/fields/shared/value_layout.rs). The puroro field options [`(puroro.string_layout)`](proto/puroro/options.proto) and [`(puroro.bytes_layout)`](proto/puroro/options.proto) (`UNSPECIFIED` / unset) use that generator default; `SSO` pins SSO; `HEAP` selects heap [`UnmanagedString`](unmanaged/src/string.rs) / [`UnmanagedVec`](unmanaged/src/vec.rs) via `ProtoString` / `ProtoBytes` + [`Inline`](puroro-rt/src/fields/shared/value_layout.rs) (`PayloadAccess`). Heap `_mut` is `impl DerefMut<Target = puroro::String<A>>` / `impl DerefMut<Target = Vec<u8, A>>`; SSO `_mut` is `impl StringMut<A>` / `impl BytesMut<A>`. This is independent of C++ `FieldOptions.ctype`. Do not reuse `string_layout` on `bytes` fields.
 
-**Layout.** The slot stays **3 words** (same as [`UnmanagedString`](unmanaged/src/string.rs)):
+**Layout.** The slot stays **3 words** (same as [`UnmanagedString`](unmanaged/src/string.rs) / [`UnmanagedVec`](unmanaged/src/vec.rs)):
 
-- **heap arm:** `UnmanagedString` (any length, including short/empty — allowed when packed as heap; not an in-slot tag)
+- **heap arm:** `UnmanagedString` or `UnmanagedVec<u8>` (any length, including short/empty — allowed when packed as heap; not an in-slot tag)
 - **inline arm:** `[u8; INLINE_CAP]` + length byte (`INLINE_CAP = 3*usize - 1`, 23 on 64-bit). Length lives in the **last byte** of the slot (`0..=INLINE_CAP`)
-- **MessageCommon heap bit** (`BIT_*_SSO` / `InlineOrHeap<HEAP_BIT>`; [`SSO_HEAP`](puroro-rt/src/fields/shared/value_layout.rs) = `true`, [`SSO_INLINE`](puroro-rt/src/fields/shared/value_layout.rs) = `false`) is the **sole** arm discriminant. The slot is an untagged union and does not inspect `UnmanagedString`'s memory layout
-- **Arm choice is layout-internal:** crate-private pack helpers / decode `merge` decide inline vs heap. Hot paths (`StringMut::set(&str)`, short decode) pack without a heap allocation
+- **MessageCommon heap bit** (`BIT_*_SSO` / `InlineOrHeap<HEAP_BIT>`; [`SSO_HEAP`](puroro-rt/src/fields/shared/value_layout.rs) = `true`, [`SSO_INLINE`](puroro-rt/src/fields/shared/value_layout.rs) = `false`) is the **sole** arm discriminant. The slot is an untagged union and does not inspect the heap type's memory layout
+- **Arm choice is layout-internal:** crate-private pack helpers / decode `merge` decide inline vs heap. Hot paths (`StringMut::set(&str)`, `BytesMut::set(&[u8])`, short decode) pack without a heap allocation
 
-**Mutator.** Generated `_mut` returns `impl ::puroro::StringMut<A>` (concrete [`SsoStringMut`](puroro-rt/src/fields/wire/sso_string.rs) stays in `puroro-rt`). Methods: `set(&str)` / `set_string(unmanaged::String)` / `clear` / `push_str` / `push` / `truncate`; stays inline while the result fits; overflow promotes to heap. `set_string` reuses the moved buffer when the value stays on the heap.
+**Mutator.** Generated string `_mut` returns `impl ::puroro::StringMut<A>` (concrete [`SsoStringMut`](puroro-rt/src/fields/wire/sso_string.rs) stays in `puroro-rt`). Methods: `set(&str)` / `set_string(unmanaged::String)` / `clear` / `push_str` / `push` / `truncate`. Generated bytes `_mut` returns `impl ::puroro::BytesMut<A>` ([`SsoBytesMut`](puroro-rt/src/fields/wire/sso_bytes.rs)): `set(&[u8])` / `set_vec(Vec<u8, A>)` / `clear` / `extend_from_slice` / `push` / `truncate`. Both stay inline while the result fits; overflow promotes to heap.
 
-**Still open / deferred.** `bytes` SSO (symmetric union). Repeated / map string elements stay `UnmanagedString`. `utf8_validation=NONE` still unwired.
+**Still open / deferred.** Repeated / map string and bytes elements stay `UnmanagedString` / `UnmanagedVec`. `utf8_validation=NONE` still unwired.

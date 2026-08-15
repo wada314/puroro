@@ -5,7 +5,7 @@ use super::{
     field_number_const, value_bit_const,
 };
 use crate::default_value::interpret_custom_default;
-use crate::descriptor::StringLayout;
+use crate::descriptor::{BytesLayout, StringLayout};
 use crate::error::{Error, Result};
 use crate::resolved::{Field, FieldOccurrence, Message, SingularPresence, TypeRef};
 use ::std::collections::HashMap;
@@ -15,8 +15,8 @@ use ::std::collections::HashMap;
 pub struct MessagePlan<'a> {
     message: &'a Message<'a>,
     members: Vec<MessageMember<'a>>,
-    /// Bits consumed in `MessageCommon` (presence + bool values + string SSO
-    /// heap bits; SSO bit set means heap arm).
+    /// Bits consumed in `MessageCommon` (presence + bool values + string / bytes
+    /// SSO heap bits; SSO bit set means heap arm).
     bit_count: usize,
 }
 
@@ -240,7 +240,9 @@ fn plan_field<'a>(field: &'a Field<'a>, next_bit: &mut usize) -> Result<PlannedF
                     value_bit,
                     bit_const: value_bit_const(field.name()),
                 }
-            } else if wire.is_string() && !field.string_layout().is_some_and(StringLayout::is_heap)
+            } else if (wire.is_string()
+                && !field.string_layout().is_some_and(StringLayout::is_heap))
+                || (wire.is_bytes() && !field.bytes_layout().is_some_and(BytesLayout::is_heap))
             {
                 let heap_bit = *next_bit;
                 *next_bit += 1;
@@ -366,8 +368,8 @@ mod tests {
         EnumType, FeatureSet, RepeatedFieldEncoding, Utf8Validation,
     };
     use crate::descriptor::{
-        Edition, FieldDesc, FieldLabel, FieldType, MessageDesc, OneofDesc, ProtoFile, ProtoFqn,
-        StringLayout, Syntax,
+        BytesLayout, Edition, FieldDesc, FieldLabel, FieldType, MessageDesc, OneofDesc, ProtoFile,
+        ProtoFqn, StringLayout, Syntax,
     };
     use crate::field_kind::{CatalogLayout, CatalogPresence, presence_byte_len};
     use crate::resolved::{Arena, resolve};
@@ -404,6 +406,7 @@ mod tests {
             default_value: None,
             packed: None,
             string_layout: None,
+            bytes_layout: None,
             features: FeatureSet::default(),
         }
     }
@@ -600,6 +603,80 @@ mod tests {
                 ..
             } => {}
             other => panic!("expected Inline heap string, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn bytes_layout_unspecified_uses_sso_default() {
+        let arena = Arena::new();
+        let mut body = field(
+            "body",
+            1,
+            FieldType::Bytes,
+            FieldLabel::Optional,
+            true,
+            None,
+            None,
+        );
+        body.bytes_layout = Some(BytesLayout::Unspecified);
+        let files = [proto3_file(vec![MessageDesc {
+            name: "M".into(),
+            fields: vec![body],
+            nested_messages: vec![],
+            nested_enums: vec![],
+            oneofs: vec![],
+            map_entry: false,
+        }])];
+        let set = resolve(&arena, &files).unwrap();
+        let msg = set.lookup(".example.M").unwrap().as_message().unwrap();
+        let plan = plan_message(msg).unwrap();
+        assert_eq!(plan.bit_count(), 2);
+        let MessageMember::Field(body) = &plan.members()[0] else {
+            panic!("expected field");
+        };
+        match body.kind() {
+            FieldKind::Singular {
+                layout: CatalogLayout::InlineOrHeap { heap_bit: 1, .. },
+                ..
+            } => {}
+            other => panic!("expected SSO InlineOrHeap, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn bytes_layout_heap_uses_inline_heap_layout() {
+        let arena = Arena::new();
+        let mut body = field(
+            "body",
+            1,
+            FieldType::Bytes,
+            FieldLabel::Optional,
+            true,
+            None,
+            None,
+        );
+        body.bytes_layout = Some(BytesLayout::Heap);
+        let files = [proto3_file(vec![MessageDesc {
+            name: "M".into(),
+            fields: vec![body],
+            nested_messages: vec![],
+            nested_enums: vec![],
+            oneofs: vec![],
+            map_entry: false,
+        }])];
+        let set = resolve(&arena, &files).unwrap();
+        let msg = set.lookup(".example.M").unwrap().as_message().unwrap();
+        let plan = plan_message(msg).unwrap();
+        assert_eq!(plan.bit_count(), 1);
+        let MessageMember::Field(body) = &plan.members()[0] else {
+            panic!("expected field");
+        };
+        match body.kind() {
+            FieldKind::Singular {
+                layout: CatalogLayout::Inline,
+                ..
+            } => {}
+            other => panic!("expected Inline heap bytes, got {other:?}"),
         }
     }
 
@@ -840,6 +917,7 @@ mod tests {
                         default_value: None,
                         packed: None,
                         string_layout: None,
+                        bytes_layout: None,
                         features: FeatureSet {
                             repeated_field_encoding: Some(RepeatedFieldEncoding::Expanded),
                             ..FeatureSet::default()
@@ -856,6 +934,7 @@ mod tests {
                         default_value: None,
                         packed: None,
                         string_layout: None,
+                        bytes_layout: None,
                         features: FeatureSet {
                             utf8_validation: Some(Utf8Validation::None),
                             ..FeatureSet::default()
@@ -872,6 +951,7 @@ mod tests {
                         default_value: None,
                         packed: None,
                         string_layout: None,
+                        bytes_layout: None,
                         features: FeatureSet::default(),
                     },
                 ],

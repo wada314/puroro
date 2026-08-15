@@ -11,7 +11,7 @@
 //! Physical storage is `P::ValueSlot<L::Slot>`. Heap payloads are wrapped in
 //! [`ManuallyDrop`] so message / oneof `Drop` can release them through
 //! [`deallocate`](SingularField::deallocate) without an implicit panic from
-//! `UnmanagedString` / `UnmanagedVec` / [`SsoString`](crate::fields::wire::sso_string::SsoString).
+//! `UnmanagedString` / `UnmanagedVec` / [`SsoString`](crate::fields::wire::sso_string::SsoString) / [`SsoBytes`](crate::fields::wire::sso_bytes::SsoBytes).
 //! Copy scalars / ZST bool slots use the same layout; their layout teardown is a no-op.
 
 use ::core::fmt::{self, Debug, Formatter, Result as FmtResult};
@@ -720,7 +720,8 @@ mod tests {
     use crate::fields::shared::FieldDeallocate;
     use crate::fields::shared::MessageCommon;
     use crate::fields::shared::field_presence::{Explicit, Implicit};
-    use crate::fields::shared::value_layout::{BitPacked, Inline};
+    use crate::fields::shared::value_layout::{BitPacked, Inline, InlineOrHeap};
+    use crate::fields::wire::len::ProtoBytes;
     use crate::fields::wire::numerical::ProtoBool;
     use ::allocator_api2::alloc::Global;
     use ::bitvec::array::BitArray;
@@ -777,6 +778,27 @@ mod tests {
         *field.bind_mut(&mut common).value_mut() = true;
         assert!(common.is_bit_set(0));
         assert_eq!(field.bind(&common).get(), Some(true));
+        field.deallocate(&common);
+        common.deallocate();
+    }
+
+    #[test]
+    fn proto_bytes_sso_set_and_promote() {
+        let mut common = MessageCommon::new_in(Bits1::ZERO, Global);
+        let mut field =
+            SingularField::<ProtoBytes, Explicit<0>, 1, Global, InlineOrHeap<1>>::new_in(Global);
+        assert_eq!(field.bind(&common).get(), None);
+        field.bind_mut(&mut common).value_mut().set(b"hi");
+        assert_eq!(field.bind(&common).get(), Some(&b"hi"[..]));
+        assert!(!common.is_bit_set(1));
+
+        let long = vec![b'x'; crate::INLINE_CAP + 1];
+        field.bind_mut(&mut common).value_mut().set(&long);
+        assert_eq!(field.bind(&common).get(), Some(long.as_slice()));
+        assert!(common.is_bit_set(1));
+
+        field.bind_mut(&mut common).clear();
+        assert_eq!(field.bind(&common).get(), None);
         field.deallocate(&common);
         common.deallocate();
     }

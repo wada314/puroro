@@ -369,6 +369,7 @@ fn resolve_field<'a>(
         default_value: field.default_value.clone(),
         utf8_validation: resolve_utf8_validation(field, syntax, editions_features.as_ref()),
         string_layout: field.string_layout,
+        bytes_layout: field.bytes_layout,
     })
 }
 
@@ -529,6 +530,7 @@ mod tests {
             default_value: None,
             packed: None,
             string_layout: None,
+            bytes_layout: None,
             features: FeatureSet::default(),
         }
     }
@@ -575,6 +577,7 @@ mod tests {
                         default_value: None,
                         packed: None,
                         string_layout: None,
+                        bytes_layout: None,
                         features: FeatureSet::default(),
                     }],
                     nested_messages: vec![],
@@ -651,6 +654,7 @@ mod tests {
                     default_value: None,
                     packed: None,
                     string_layout: None,
+                    bytes_layout: None,
                     features: FeatureSet::default(),
                 }],
                 nested_messages: vec![],
@@ -706,6 +710,7 @@ mod tests {
                     default_value: None,
                     packed: None,
                     string_layout: None,
+                    bytes_layout: None,
                     features: FeatureSet::default(),
                 }],
                 nested_messages: vec![],
@@ -739,6 +744,7 @@ mod tests {
                         default_value: None,
                         packed: None,
                         string_layout: None,
+                        bytes_layout: None,
                         features: FeatureSet::default(),
                     }],
                     nested_messages: vec![],
@@ -759,6 +765,7 @@ mod tests {
                         default_value: None,
                         packed: None,
                         string_layout: None,
+                        bytes_layout: None,
                         features: FeatureSet::default(),
                     }],
                     nested_messages: vec![],
@@ -807,6 +814,7 @@ mod tests {
                                 default_value: None,
                                 packed: None,
                                 string_layout: None,
+                                bytes_layout: None,
                                 features: FeatureSet::default(),
                             },
                             FieldDesc {
@@ -820,6 +828,7 @@ mod tests {
                                 default_value: None,
                                 packed: None,
                                 string_layout: None,
+                                bytes_layout: None,
                                 features: FeatureSet::default(),
                             },
                             FieldDesc {
@@ -833,6 +842,7 @@ mod tests {
                                 default_value: None,
                                 packed: None,
                                 string_layout: None,
+                                bytes_layout: None,
                                 features: FeatureSet::default(),
                             },
                             FieldDesc {
@@ -846,6 +856,7 @@ mod tests {
                                 default_value: None,
                                 packed: None,
                                 string_layout: None,
+                                bytes_layout: None,
                                 features: FeatureSet::default(),
                             },
                         ],
@@ -963,6 +974,7 @@ mod tests {
                         default_value: None,
                         packed: None,
                         string_layout: None,
+                        bytes_layout: None,
                         features: FeatureSet {
                             field_presence: Some(FieldPresence::Explicit),
                             ..FeatureSet::default()
@@ -1018,6 +1030,7 @@ mod tests {
                         default_value: None,
                         packed: None,
                         string_layout: None,
+                        bytes_layout: None,
                         features: FeatureSet {
                             repeated_field_encoding: Some(RepeatedFieldEncoding::Expanded),
                             ..FeatureSet::default()
@@ -1034,6 +1047,7 @@ mod tests {
                         default_value: None,
                         packed: None,
                         string_layout: None,
+                        bytes_layout: None,
                         features: FeatureSet {
                             utf8_validation: Some(Utf8Validation::None),
                             ..FeatureSet::default()
@@ -1138,6 +1152,7 @@ mod tests {
                         default_value: None,
                         packed: None,
                         string_layout: None,
+                        bytes_layout: None,
                         features: FeatureSet {
                             message_encoding: Some(MessageEncoding::Delimited),
                             ..FeatureSet::default()
@@ -1174,6 +1189,7 @@ mod tests {
                     default_value: None,
                     packed: None,
                     string_layout: None,
+                    bytes_layout: None,
                     features: FeatureSet::default(),
                 }],
                 nested_messages: vec![empty_msg("G")],
@@ -1207,6 +1223,7 @@ mod tests {
                         default_value: None,
                         packed: Some(true),
                         string_layout: None,
+                        bytes_layout: None,
                         features: FeatureSet::default(),
                     },
                     FieldDesc {
@@ -1220,6 +1237,7 @@ mod tests {
                         default_value: None,
                         packed: None,
                         string_layout: None,
+                        bytes_layout: None,
                         features: FeatureSet::default(),
                     },
                 ],
@@ -1262,6 +1280,7 @@ mod tests {
                     default_value: None,
                     packed: None,
                     string_layout: None,
+                    bytes_layout: None,
                     features: FeatureSet::default(),
                 }],
                 nested_messages: vec![MessageDesc {
@@ -1278,6 +1297,7 @@ mod tests {
                             default_value: None,
                             packed: None,
                             string_layout: None,
+                            bytes_layout: None,
                             features: FeatureSet::default(),
                         },
                         FieldDesc {
@@ -1291,6 +1311,7 @@ mod tests {
                             default_value: None,
                             packed: None,
                             string_layout: None,
+                            bytes_layout: None,
                             features: FeatureSet::default(),
                         },
                     ],

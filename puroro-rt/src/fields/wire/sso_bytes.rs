@@ -1,102 +1,76 @@
-//! Small-string (SSO) slot for singular `string` fields.
+//! Small-bytes (SSO) slot for singular `bytes` fields.
 //!
 //! Physical storage is the shared [`SsoBuf`](super::sso_buf::SsoBuf) union
-//! ([`SsoString`] = heap [`UnmanagedString`]). Short payloads live inline;
+//! ([`SsoBytes`] = heap [`UnmanagedVec<u8>`]). Short payloads live inline;
 //! longer ones use the heap arm. Which arm is live is recorded **only** in a
 //! [`MessageCommon`](crate::fields::shared::MessageCommon) heap bit via
 //! [`InlineOrHeap`](crate::fields::shared::value_layout::InlineOrHeap)
 //! (`true` = heap, `false` = inline).
-//!
-//! Packing (inline vs heap) is done by crate-private helpers; callers of
-//! [`SsoStringMut`] / [`InlineOrHeap`] pass logical UTF-8 and do not see arms.
 
 use ::allocator_api2::alloc::Allocator;
+use ::allocator_api2::vec::Vec as AllocVec;
 use ::bitvec::{
     order::Lsb0,
     ptr::{BitRef, Mut},
 };
 use ::core::ops::Deref;
-use ::core::str;
-use ::unmanaged::{String as AllocString, UnmanagedString};
+use ::unmanaged::UnmanagedVec;
 
 use super::sso_buf::{
     SsoBuf, pack_heap as pack_heap_buf, pack_inline, pack_written as pack_written_buf,
 };
+use super::sso_string::INLINE_CAP;
 
-pub use super::sso_buf::INLINE_CAP;
-
-/// Untagged 24-byte singular `string` slot (inline buffer or heap [`UnmanagedString`]).
+/// Untagged 24-byte singular `bytes` slot (inline buffer or heap [`UnmanagedVec`]).
 ///
 /// Arm selection requires an external `is_heap` flag ([`InlineOrHeap`] heap bit).
 ///
 /// [`InlineOrHeap`]: crate::fields::shared::value_layout::InlineOrHeap
-pub type SsoString<A> = SsoBuf<UnmanagedString<A>>;
+pub type SsoBytes<A> = SsoBuf<UnmanagedVec<u8, A>>;
 
-/// Packs `s` into a slot, using inline storage when it fits.
+/// Packs `bytes` into a slot, using inline storage when it fits.
 #[inline]
-pub(crate) fn pack_str<A: Allocator + Clone>(s: &str, alloc: A) -> (SsoString<A>, bool) {
-    if s.len() <= INLINE_CAP {
-        (pack_inline_utf8(s.as_bytes()), false)
+pub(crate) fn pack_bytes<A: Allocator + Clone>(bytes: &[u8], alloc: A) -> (SsoBytes<A>, bool) {
+    if bytes.len() <= INLINE_CAP {
+        (pack_inline(bytes), false)
     } else {
-        (
-            pack_heap(UnmanagedString::from_string(AllocString::from_str_in(
-                s, alloc,
-            ))),
-            true,
-        )
+        let mut vec = AllocVec::with_capacity_in(bytes.len(), alloc);
+        vec.extend_from_slice(bytes);
+        (pack_heap(UnmanagedVec::from_vec(vec)), true)
     }
 }
 
-/// Inline arm from already-validated UTF-8 bytes (`len <= INLINE_CAP`).
+/// Heap arm from an [`UnmanagedVec`] (any length, including short/empty).
 #[inline]
-pub(crate) fn pack_inline_utf8<A: Allocator>(bytes: &[u8]) -> SsoString<A> {
-    pack_inline(bytes)
-}
-
-/// Heap arm from an [`UnmanagedString`] (any length, including short/empty).
-#[inline]
-pub(crate) fn pack_heap<A: Allocator>(heap: UnmanagedString<A>) -> SsoString<A> {
+pub(crate) fn pack_heap<A: Allocator>(heap: UnmanagedVec<u8, A>) -> SsoBytes<A> {
     pack_heap_buf(heap)
 }
 
-/// Packs a written [`UnmanagedString`], demoting to inline when short.
-///
-/// On demote, `value` is deallocated after copying bytes into the inline arm.
+/// Packs a written [`UnmanagedVec`], demoting to inline when short.
 pub(crate) fn pack_written<A: Allocator + Clone>(
-    value: UnmanagedString<A>,
+    value: UnmanagedVec<u8, A>,
     alloc: A,
-) -> (SsoString<A>, bool) {
+) -> (SsoBytes<A>, bool) {
     pack_written_buf(value, alloc)
 }
 
-impl<A: Allocator> SsoBuf<UnmanagedString<A>> {
-    pub fn as_str(&self, is_heap: bool) -> &str {
-        // SAFETY: constructors / mutators keep the live arm as UTF-8.
-        unsafe { str::from_utf8_unchecked(self.as_bytes::<A>(is_heap)) }
-    }
-}
-
-/// Mutable handle for a singular SSO string field (`_mut` accessors).
+/// Mutable handle for a singular SSO bytes field (`_mut` accessors).
 ///
 /// Edits stay inline while the result fits in [`INLINE_CAP`]; overflow promotes
-/// to a heap [`UnmanagedString`]. The [`BitRef`] heap bit
+/// to a heap [`UnmanagedVec`]. The [`BitRef`] heap bit
 /// ([`SSO_HEAP`](crate::fields::shared::value_layout::SSO_HEAP) /
 /// [`SSO_INLINE`](crate::fields::shared::value_layout::SSO_INLINE)) is the sole
 /// arm discriminant.
-pub struct SsoStringMut<'a, A: Allocator> {
-    slot: &'a mut SsoString<A>,
+pub struct SsoBytesMut<'a, A: Allocator> {
+    slot: &'a mut SsoBytes<A>,
     /// `MessageCommon` heap bit (`true` = [`SSO_HEAP`](crate::fields::shared::value_layout::SSO_HEAP)).
     tag: BitRef<'a, Mut, u8, Lsb0>,
     alloc: A,
 }
 
-impl<'a, A: Allocator + Clone> SsoStringMut<'a, A> {
+impl<'a, A: Allocator + Clone> SsoBytesMut<'a, A> {
     #[inline]
-    pub(crate) fn new(
-        slot: &'a mut SsoString<A>,
-        tag: BitRef<'a, Mut, u8, Lsb0>,
-        alloc: A,
-    ) -> Self {
+    pub(crate) fn new(slot: &'a mut SsoBytes<A>, tag: BitRef<'a, Mut, u8, Lsb0>, alloc: A) -> Self {
         Self { slot, tag, alloc }
     }
 
@@ -110,10 +84,10 @@ impl<'a, A: Allocator + Clone> SsoStringMut<'a, A> {
         *self.tag = is_heap;
     }
 
-    /// Replaces the contents by copying from `s`.
-    pub fn set(&mut self, s: &str) {
+    /// Replaces the contents by copying from `bytes`.
+    pub fn set(&mut self, bytes: &[u8]) {
         let alloc = self.alloc.clone();
-        let (new, new_is_heap) = pack_str(s, alloc.clone());
+        let (new, new_is_heap) = pack_bytes(bytes, alloc.clone());
         let old_is_heap = self.is_heap();
         // SAFETY: message allocator owns any previous heap buffer; tag matches arm.
         unsafe {
@@ -123,12 +97,12 @@ impl<'a, A: Allocator + Clone> SsoStringMut<'a, A> {
         self.set_heap(new_is_heap);
     }
 
-    /// Replaces the contents by taking ownership of `s`.
+    /// Replaces the contents by taking ownership of `v`.
     ///
-    /// Long values keep `s`'s heap buffer; short values may be stored inline.
-    pub fn set_string(&mut self, s: AllocString<A>) {
+    /// Long values keep `v`'s heap buffer; short values may be stored inline.
+    pub fn set_vec(&mut self, v: AllocVec<u8, A>) {
         let alloc = self.alloc.clone();
-        let (new, new_is_heap) = pack_written(UnmanagedString::from_string(s), alloc.clone());
+        let (new, new_is_heap) = pack_written(UnmanagedVec::from_vec(v), alloc.clone());
         let old_is_heap = self.is_heap();
         // SAFETY: message allocator owns any previous heap buffer; tag matches arm.
         unsafe {
@@ -138,7 +112,7 @@ impl<'a, A: Allocator + Clone> SsoStringMut<'a, A> {
         self.set_heap(new_is_heap);
     }
 
-    /// Clears to an empty inline string.
+    /// Clears to empty inline bytes.
     pub fn clear(&mut self) {
         use crate::fields::shared::value_layout::SSO_INLINE;
 
@@ -147,23 +121,23 @@ impl<'a, A: Allocator + Clone> SsoStringMut<'a, A> {
         // SAFETY: message allocator owns any previous heap buffer; tag matches arm.
         unsafe {
             self.slot
-                .replace_packed(SsoString::empty_inline(), SSO_INLINE, old_is_heap, alloc)
+                .replace_packed(SsoBytes::empty_inline(), SSO_INLINE, old_is_heap, alloc)
         };
         self.set_heap(SSO_INLINE);
     }
 
-    /// Appends `s`, promoting to heap when the result would exceed [`INLINE_CAP`].
-    pub fn push_str(&mut self, s: &str) {
-        if s.is_empty() {
+    /// Appends `bytes`, promoting to heap when the result would exceed [`INLINE_CAP`].
+    pub fn extend_from_slice(&mut self, bytes: &[u8]) {
+        if bytes.is_empty() {
             return;
         }
         if !self.is_heap() {
             let cur_len = self.slot.len::<A>(false);
-            if cur_len + s.len() <= INLINE_CAP {
+            if cur_len + bytes.len() <= INLINE_CAP {
                 // SAFETY: tag says inline arm is live.
                 let inline = unsafe { &mut self.slot.inline };
-                inline.data[cur_len..cur_len + s.len()].copy_from_slice(s.as_bytes());
-                inline.len = (cur_len + s.len()) as u8;
+                inline.data[cur_len..cur_len + bytes.len()].copy_from_slice(bytes);
+                inline.len = (cur_len + bytes.len()) as u8;
                 return;
             }
             // SAFETY: heap bit says inline; promote then mark heap.
@@ -176,22 +150,17 @@ impl<'a, A: Allocator + Clone> SsoStringMut<'a, A> {
             let heap = unsafe { self.slot.heap_mut() };
             // SAFETY: message allocator owns the heap buffer.
             let mut guard = unsafe { heap.with_alloc(self.alloc.clone()) };
-            guard.push_str(s);
+            guard.extend_from_slice(bytes);
         }
     }
 
-    /// Appends a Unicode scalar value.
-    pub fn push(&mut self, ch: char) {
-        let mut buf = [0u8; 4];
-        self.push_str(ch.encode_utf8(&mut buf));
+    /// Appends a single byte.
+    pub fn push(&mut self, b: u8) {
+        self.extend_from_slice(&[b]);
     }
 
-    /// Shortens to `new_len` bytes (must be on a char boundary).
+    /// Shortens to `new_len` bytes.
     pub fn truncate(&mut self, new_len: usize) {
-        assert!(
-            self.slot.as_str(self.is_heap()).is_char_boundary(new_len),
-            "new_len does not lie on a char boundary"
-        );
         if !self.is_heap() {
             // SAFETY: tag says inline arm is live.
             let inline = unsafe { &mut self.slot.inline };
@@ -211,44 +180,44 @@ impl<'a, A: Allocator + Clone> SsoStringMut<'a, A> {
     }
 }
 
-impl<A: Allocator> Deref for SsoStringMut<'_, A> {
-    type Target = str;
+impl<A: Allocator> Deref for SsoBytesMut<'_, A> {
+    type Target = [u8];
 
     #[inline]
-    fn deref(&self) -> &str {
-        self.slot.as_str(*self.tag)
+    fn deref(&self) -> &[u8] {
+        self.slot.as_bytes::<A>(*self.tag)
     }
 }
 
-impl<A: Allocator + Clone> ::puroro::StringMut<A> for SsoStringMut<'_, A> {
+impl<A: Allocator + Clone> ::puroro::BytesMut<A> for SsoBytesMut<'_, A> {
     #[inline]
-    fn set(&mut self, s: &str) {
-        SsoStringMut::set(self, s);
+    fn set(&mut self, bytes: &[u8]) {
+        SsoBytesMut::set(self, bytes);
     }
 
     #[inline]
-    fn set_string(&mut self, s: AllocString<A>) {
-        SsoStringMut::set_string(self, s);
+    fn set_vec(&mut self, v: AllocVec<u8, A>) {
+        SsoBytesMut::set_vec(self, v);
     }
 
     #[inline]
     fn clear(&mut self) {
-        SsoStringMut::clear(self);
+        SsoBytesMut::clear(self);
     }
 
     #[inline]
-    fn push_str(&mut self, s: &str) {
-        SsoStringMut::push_str(self, s);
+    fn extend_from_slice(&mut self, bytes: &[u8]) {
+        SsoBytesMut::extend_from_slice(self, bytes);
     }
 
     #[inline]
-    fn push(&mut self, ch: char) {
-        SsoStringMut::push(self, ch);
+    fn push(&mut self, b: u8) {
+        SsoBytesMut::push(self, b);
     }
 
     #[inline]
     fn truncate(&mut self, new_len: usize) {
-        SsoStringMut::truncate(self, new_len);
+        SsoBytesMut::truncate(self, new_len);
     }
 }
 
@@ -259,64 +228,58 @@ mod tests {
 
     #[test]
     fn empty_and_short_are_inline() {
-        let (s, is_heap) = pack_str::<Global>("", Global);
+        let (s, is_heap) = pack_bytes::<Global>(b"", Global);
         assert!(!is_heap);
-        assert_eq!(s.as_str(false), "");
+        assert_eq!(s.as_bytes::<Global>(false), b"");
         unsafe { s.deallocate(false, Global) };
 
-        let (s, is_heap) = pack_str("hi", Global);
+        let (s, is_heap) = pack_bytes(b"hi", Global);
         assert!(!is_heap);
-        assert_eq!(s.as_str(false), "hi");
+        assert_eq!(s.as_bytes::<Global>(false), b"hi");
         unsafe { s.deallocate(false, Global) };
     }
 
     #[test]
     fn boundary_lengths() {
-        let max_inline = "a".repeat(INLINE_CAP);
-        let (s, is_heap) = pack_str(&max_inline, Global);
+        let max_inline = vec![b'a'; INLINE_CAP];
+        let (s, is_heap) = pack_bytes(&max_inline, Global);
         assert!(!is_heap);
-        assert_eq!(s.as_str(false).len(), INLINE_CAP);
+        assert_eq!(s.as_bytes::<Global>(false).len(), INLINE_CAP);
         unsafe { s.deallocate(false, Global) };
 
-        let needs_heap = "a".repeat(INLINE_CAP + 1);
-        let (s, is_heap) = pack_str(&needs_heap, Global);
+        let needs_heap = vec![b'a'; INLINE_CAP + 1];
+        let (s, is_heap) = pack_bytes(&needs_heap, Global);
         assert!(is_heap);
-        assert_eq!(s.as_str(true), needs_heap);
-        unsafe { s.deallocate(true, Global) };
-    }
-
-    #[test]
-    fn short_heap_is_allowed() {
-        let heap = UnmanagedString::from_string(AllocString::from_str_in("xy", Global));
-        let s = pack_heap(heap);
-        assert_eq!(s.as_str(true), "xy");
+        assert_eq!(s.as_bytes::<Global>(true), needs_heap);
         unsafe { s.deallocate(true, Global) };
     }
 
     #[test]
     fn pack_written_demotes_short() {
-        let heap = UnmanagedString::from_string(AllocString::from_str_in("xy", Global));
-        let (s, is_heap) = pack_written(heap, Global);
+        let mut vec = AllocVec::new_in(Global);
+        vec.extend_from_slice(b"xy");
+        let (s, is_heap) = pack_written(UnmanagedVec::from_vec(vec), Global);
         assert!(!is_heap);
-        assert_eq!(s.as_str(false), "xy");
+        assert_eq!(s.as_bytes::<Global>(false), b"xy");
         unsafe { s.deallocate(false, Global) };
     }
 
     #[test]
     fn clone_packed_preserves_arm() {
-        let (inline, _) = pack_str("ab", Global);
+        let (inline, _) = pack_bytes(b"ab", Global);
         let (c, is_heap) = inline.clone_packed(false, Global);
         assert!(!is_heap);
-        assert_eq!(c.as_str(false), "ab");
+        assert_eq!(c.as_bytes::<Global>(false), b"ab");
         unsafe {
             inline.deallocate(false, Global);
             c.deallocate(false, Global);
         }
 
-        let (heap, _) = pack_str(&"z".repeat(INLINE_CAP + 2), Global);
+        let long = vec![b'z'; INLINE_CAP + 2];
+        let (heap, _) = pack_bytes(&long, Global);
         let (c, is_heap) = heap.clone_packed(true, Global);
         assert!(is_heap);
-        assert_eq!(c.as_str(true), heap.as_str(true));
+        assert_eq!(c.as_bytes::<Global>(true), heap.as_bytes::<Global>(true));
         unsafe {
             heap.deallocate(true, Global);
             c.deallocate(true, Global);

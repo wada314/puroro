@@ -97,12 +97,16 @@ pub(super) enum SingularMutStyle {
     DerefMut,
     /// `impl ::puroro::StringMut<A>` (SSO layout; hides `puroro-rt` mutator).
     SsoString,
+    /// `impl ::puroro::BytesMut<A>` (SSO layout; hides `puroro-rt` mutator).
+    SsoBytes,
 }
 
 impl SingularMutStyle {
     pub(super) fn from_layout(wire: &WireTypeKind<'_>, layout: &CatalogLayout) -> Self {
         if wire.is_string() && matches!(layout, CatalogLayout::InlineOrHeap { .. }) {
             Self::SsoString
+        } else if wire.is_bytes() && matches!(layout, CatalogLayout::InlineOrHeap { .. }) {
+            Self::SsoBytes
         } else {
             Self::DerefMut
         }
@@ -112,6 +116,7 @@ impl SingularMutStyle {
     pub(super) fn return_ty(self, lt: &TokenStream, mut_target: &TokenStream) -> TokenStream {
         match self {
             Self::SsoString => quote! { impl ::puroro::StringMut<A> + #lt },
+            Self::SsoBytes => quote! { impl ::puroro::BytesMut<A> + #lt },
             Self::DerefMut => {
                 quote! { impl ::core::ops::DerefMut<Target = #mut_target> + #lt }
             }

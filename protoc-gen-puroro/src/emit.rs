@@ -174,8 +174,9 @@ mod tests {
     use super::*;
     use crate::descriptor::features::{EnumType, Utf8Validation};
     use crate::descriptor::{
-        CodegenMeta, CodegenRequest, Edition, EnumDesc, EnumValueDesc, FeatureSet, FieldDesc,
-        FieldLabel, FieldType, MessageDesc, OneofDesc, ProtoFile, ProtoFqn, StringLayout, Syntax,
+        BytesLayout, CodegenMeta, CodegenRequest, Edition, EnumDesc, EnumValueDesc, FeatureSet,
+        FieldDesc, FieldLabel, FieldType, MessageDesc, OneofDesc, ProtoFile, ProtoFqn,
+        StringLayout, Syntax,
     };
 
     fn empty_request(message_name: &str) -> CodegenRequest {
@@ -256,6 +257,7 @@ mod tests {
                 default_value: None,
                 packed: None,
                 string_layout: None,
+                bytes_layout: None,
                 features: FeatureSet::default(),
             },
             FieldDesc {
@@ -269,6 +271,7 @@ mod tests {
                 default_value: None,
                 packed: None,
                 string_layout: None,
+                bytes_layout: None,
                 features: FeatureSet::default(),
             },
             FieldDesc {
@@ -282,6 +285,7 @@ mod tests {
                 default_value: None,
                 packed: None,
                 string_layout: None,
+                bytes_layout: None,
                 features: FeatureSet::default(),
             },
             FieldDesc {
@@ -295,6 +299,7 @@ mod tests {
                 default_value: None,
                 packed: None,
                 string_layout: None,
+                bytes_layout: None,
                 features: FeatureSet::default(),
             },
             FieldDesc {
@@ -308,6 +313,7 @@ mod tests {
                 default_value: None,
                 packed: None,
                 string_layout: None,
+                bytes_layout: None,
                 features: FeatureSet::default(),
             },
         ];
@@ -319,6 +325,8 @@ mod tests {
         assert!(content.contains("ProtoBytes"));
         assert!(content.contains("ProtoSInt32"));
         assert!(content.contains("BitPacked"));
+        assert!(content.contains("BIT_PAYLOAD_SSO"));
+        assert!(content.contains("impl ::puroro::BytesMut<A>"));
     }
 
     #[test]
@@ -338,6 +346,7 @@ mod tests {
             default_value: None,
             packed: None,
             string_layout: Some(StringLayout::Heap),
+            bytes_layout: None,
             features: FeatureSet::default(),
         }];
         let response = emit(&request).unwrap();
@@ -352,6 +361,43 @@ mod tests {
             "string_layout=HEAP must not allocate an SSO bit: {content}"
         );
         assert!(content.contains("impl ::core::ops::DerefMut<Target = ::puroro::String<A>>"));
+    }
+
+    #[test]
+    fn emit_bytes_layout_heap_uses_inline_not_sso() {
+        let mut request = empty_request("HeapBytes");
+        request.meta.file_to_generate = vec!["t.proto".into()];
+        request.proto_files[0].name = "t.proto".into();
+        request.proto_files[0].messages[0].name = "HeapBytes".into();
+        request.proto_files[0].messages[0].fields = vec![FieldDesc {
+            name: "body".into(),
+            number: 1,
+            label: FieldLabel::Optional,
+            type_: FieldType::Bytes,
+            type_name: None,
+            oneof_index: None,
+            proto3_optional: true,
+            default_value: None,
+            packed: None,
+            string_layout: None,
+            bytes_layout: Some(BytesLayout::Heap),
+            features: FeatureSet::default(),
+        }];
+        let response = emit(&request).unwrap();
+        let content = &response.files[0].content;
+        assert!(content.contains("ProtoBytes"));
+        assert!(
+            !content.contains("InlineOrHeap"),
+            "bytes_layout=HEAP must not emit SSO layout: {content}"
+        );
+        assert!(
+            !content.contains("BIT_BODY_SSO"),
+            "bytes_layout=HEAP must not allocate an SSO bit: {content}"
+        );
+        assert!(
+            content.contains("DerefMut") && content.contains("::allocator_api2::vec::Vec<u8, A>"),
+            "bytes_layout=HEAP must emit DerefMut to Vec: {content}"
+        );
     }
 
     #[test]
@@ -380,6 +426,7 @@ mod tests {
                         default_value: None,
                         packed: None,
                         string_layout: None,
+                        bytes_layout: None,
                         features: FeatureSet::default(),
                     }],
                     nested_messages: vec![],
@@ -499,6 +546,7 @@ mod tests {
                                 default_value: None,
                                 packed: None,
                                 string_layout: None,
+                                bytes_layout: None,
                                 features: FeatureSet::default(),
                             },
                             FieldDesc {
@@ -512,6 +560,7 @@ mod tests {
                                 default_value: None,
                                 packed: None,
                                 string_layout: None,
+                                bytes_layout: None,
                                 features: FeatureSet::default(),
                             },
                         ],
@@ -564,6 +613,7 @@ mod tests {
                             default_value: None,
                             packed: None,
                             string_layout: None,
+                            bytes_layout: None,
                             features: FeatureSet::default(),
                         },
                         FieldDesc {
@@ -577,6 +627,7 @@ mod tests {
                             default_value: None,
                             packed: None,
                             string_layout: None,
+                            bytes_layout: None,
                             features: FeatureSet::default(),
                         },
                         FieldDesc {
@@ -590,6 +641,7 @@ mod tests {
                             default_value: None,
                             packed: None,
                             string_layout: None,
+                            bytes_layout: None,
                             features: FeatureSet::default(),
                         },
                     ],
@@ -659,6 +711,7 @@ mod tests {
             default_value: None,
             packed: None,
             string_layout: None,
+            bytes_layout: None,
             features: FeatureSet::default(),
         });
         let err = emit(&request).unwrap_err();
@@ -747,6 +800,7 @@ mod tests {
                             default_value: None,
                             packed: None,
                             string_layout: None,
+                            bytes_layout: None,
                             features: FeatureSet::default(),
                         }],
                         nested_messages: vec![],
@@ -826,6 +880,7 @@ mod tests {
                                 default_value: None,
                                 packed: None,
                                 string_layout: None,
+                                bytes_layout: None,
                                 features: FeatureSet::default(),
                             },
                             FieldDesc {
@@ -839,6 +894,7 @@ mod tests {
                                 default_value: None,
                                 packed: None,
                                 string_layout: None,
+                                bytes_layout: None,
                                 features: FeatureSet::default(),
                             },
                             FieldDesc {
@@ -852,6 +908,7 @@ mod tests {
                                 default_value: None,
                                 packed: None,
                                 string_layout: None,
+                                bytes_layout: None,
                                 features: FeatureSet::default(),
                             },
                             FieldDesc {
@@ -865,6 +922,7 @@ mod tests {
                                 default_value: None,
                                 packed: None,
                                 string_layout: None,
+                                bytes_layout: None,
                                 features: FeatureSet::default(),
                             },
                         ],
@@ -917,6 +975,7 @@ mod tests {
                         default_value: None,
                         packed: None,
                         string_layout: None,
+                        bytes_layout: None,
                         features: FeatureSet::default(),
                     }],
                     nested_messages: vec![MessageDesc {
@@ -933,6 +992,7 @@ mod tests {
                                 default_value: None,
                                 packed: None,
                                 string_layout: None,
+                                bytes_layout: None,
                                 features: FeatureSet::default(),
                             },
                             FieldDesc {
@@ -946,6 +1006,7 @@ mod tests {
                                 default_value: None,
                                 packed: None,
                                 string_layout: None,
+                                bytes_layout: None,
                                 features: FeatureSet::default(),
                             },
                         ],
@@ -1004,6 +1065,7 @@ mod tests {
                         default_value: None,
                         packed: None,
                         string_layout: None,
+                        bytes_layout: None,
                         features: FeatureSet::default(),
                     }],
                     nested_messages: vec![MessageDesc {
@@ -1020,6 +1082,7 @@ mod tests {
                                 default_value: None,
                                 packed: None,
                                 string_layout: None,
+                                bytes_layout: None,
                                 features: FeatureSet::default(),
                             },
                             FieldDesc {
@@ -1033,6 +1096,7 @@ mod tests {
                                 default_value: None,
                                 packed: None,
                                 string_layout: None,
+                                bytes_layout: None,
                                 features: FeatureSet::default(),
                             },
                         ],
@@ -1089,6 +1153,7 @@ mod tests {
                         default_value: None,
                         packed: None,
                         string_layout: None,
+                        bytes_layout: None,
                         features: FeatureSet {
                             utf8_validation: Some(Utf8Validation::None),
                             ..FeatureSet::default()
@@ -1130,6 +1195,7 @@ mod tests {
                 default_value: Some("3".into()),
                 packed: None,
                 string_layout: None,
+                bytes_layout: None,
                 features: FeatureSet::default(),
             },
             FieldDesc {
@@ -1143,6 +1209,7 @@ mod tests {
                 default_value: Some("0".into()),
                 packed: None,
                 string_layout: None,
+                bytes_layout: None,
                 features: FeatureSet::default(),
             },
             FieldDesc {
@@ -1156,6 +1223,7 @@ mod tests {
                 default_value: Some("-1".into()),
                 packed: None,
                 string_layout: None,
+                bytes_layout: None,
                 features: FeatureSet::default(),
             },
             FieldDesc {
@@ -1169,6 +1237,7 @@ mod tests {
                 default_value: None,
                 packed: None,
                 string_layout: None,
+                bytes_layout: None,
                 features: FeatureSet::default(),
             },
         ];

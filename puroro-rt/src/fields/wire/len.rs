@@ -5,9 +5,10 @@
 //! [`Numerical`](super::numerical::Numerical)`<C>` blankets.
 //!
 //! Repeated / map storage uses [`UnmanagedString`](::unmanaged::UnmanagedString)
-//! / [`UnmanagedVec`](::unmanaged::UnmanagedVec). Singular `string` uses
-//! [`SsoString`](super::sso_string::SsoString) via [`InlineOrHeap`](crate::fields::shared::value_layout::InlineOrHeap)
-//! (`ProtoString` + [`Inline`](crate::fields::shared::value_layout::Inline) keeps the heap [`UnmanagedString`] slot).
+//! / [`UnmanagedVec`](::unmanaged::UnmanagedVec). Singular `string` / `bytes` use
+//! SSO via [`InlineOrHeap`](crate::fields::shared::value_layout::InlineOrHeap)
+//! (`ProtoString` / `ProtoBytes` + [`Inline`](crate::fields::shared::value_layout::Inline)
+//! keep the heap [`UnmanagedString`] / [`UnmanagedVec`] slot).
 
 use ::allocator_api2::alloc::Allocator;
 use ::allocator_api2::vec::Vec as AllocVec;

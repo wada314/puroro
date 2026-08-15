@@ -5,6 +5,7 @@
 //!
 //! - [`Message`] — encode / decode / merge / validate / unknown fields
 //! - [`Optional`] / [`HasDefault`] — explicit-presence singular accessors
+//! - [`StringMut`] / [`BytesMut`] — singular `string` / `bytes` mutators
 //! - [`MapRef`] / [`MapMut`], [`RepeatedContainerMut`] / [`RepeatedStringMut`] /
 //!   [`RepeatedBytesMut`] — map and repeated mutators
 //! - [`OneofView`] / [`OneofViewMut`] — oneof group views
@@ -33,6 +34,7 @@
 //! # Ok::<(), puroro::DecodeError>(())
 //! ```
 
+mod bytes_mut;
 pub mod error;
 pub mod map;
 pub mod message;
@@ -47,6 +49,7 @@ pub mod wire_type;
 
 /// Allocator-aware string buffer used as element mutator target for `repeated string`.
 pub use ::unmanaged::String;
+pub use bytes_mut::BytesMut;
 pub use error::DecodeError;
 pub use map::{MapMut, MapRef};
 pub use message::{Message, RECURSION_LIMIT};

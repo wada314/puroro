@@ -15,7 +15,19 @@ enum StringLayout {
   STRING_LAYOUT_HEAP = 2;
 }
 
+// Layout of a singular `bytes` field in generated Rust.
+//
+// Unset and `BYTES_LAYOUT_UNSPECIFIED` let the generator pick the default
+// (currently SSO / `InlineOrHeap`). `BYTES_LAYOUT_SSO` and
+// `BYTES_LAYOUT_HEAP` pin the layout. Non-`bytes` fields ignore this option.
+enum BytesLayout {
+  BYTES_LAYOUT_UNSPECIFIED = 0;
+  BYTES_LAYOUT_SSO = 1;
+  BYTES_LAYOUT_HEAP = 2;
+}
+
 extend google.protobuf.FieldOptions {
   // Custom-option numbers 50000–99999 are for internal use.
   optional StringLayout string_layout = 51400;
+  optional BytesLayout bytes_layout = 51401;
 }

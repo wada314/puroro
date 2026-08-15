@@ -1,4 +1,4 @@
-//! Value-storage layout for singular fields (`Inline`, bit-packed bool, SSO string).
+//! Value-storage layout for singular fields (`Inline`, bit-packed bool, SSO string / bytes).
 //!
 //! Orthogonal to [`FieldPresence`](super::field_presence::FieldPresence):
 //! presence decides *whether* a field is set; layout decides *where the value
@@ -22,10 +22,12 @@ use super::{
     value_slot::{AddressableSlot, ValueSlot, ValueSlotMutAccess},
 };
 use crate::decode;
-use crate::fields::wire::len::ProtoString;
+use crate::fields::wire::len::{ProtoBytes, ProtoString};
 use crate::fields::wire::numerical::ProtoBool;
 use crate::fields::wire::numerical::{BoolCodec, NumericalType};
 use crate::fields::wire::singular_type::{PayloadAccess, SingularType};
+use crate::fields::wire::sso_buf::pack_inline;
+use crate::fields::wire::sso_bytes::{SsoBytes, SsoBytesMut, pack_written as pack_written_bytes};
 use crate::fields::wire::sso_string::{
     INLINE_CAP, SsoString, SsoStringMut, pack_inline_utf8, pack_written,
 };
@@ -375,7 +377,7 @@ pub const SSO_HEAP: bool = true;
 /// See [`SSO_HEAP`].
 pub const SSO_INLINE: bool = false;
 
-/// Singular `string` layout: [`SsoString`] slot + heap/inline bit at `HEAP_BIT`.
+/// Singular `string` / `bytes` layout: SSO slot + heap/inline bit at `HEAP_BIT`.
 ///
 /// `MessageCommon` bit `HEAP_BIT` is the sole arm discriminant for the untagged
 /// slot: [`SSO_HEAP`] when the heap arm is live, [`SSO_INLINE`] when inline.
@@ -545,35 +547,173 @@ impl<A: Allocator + Clone, const HEAP_BIT: usize> ValueLayoutClone<ProtoString, 
     }
 }
 
-/// Decodes one LEN string into a packed SSO slot, preferring inline when short.
-fn decode_sso_packed<B: Buf, A: Allocator + Clone>(
+impl<A: Allocator + Clone, const HEAP_BIT: usize> ValueLayout<ProtoBytes, A>
+    for InlineOrHeap<HEAP_BIT>
+{
+    type Slot = SsoBytes<A>;
+    type Mut<'a>
+        = SsoBytesMut<'a, A>
+    where
+        A: 'a;
+
+    #[inline]
+    fn is_proto_empty<Pb>(slot: &SsoBytes<A>, common: &MessageCommon<Pb, A>) -> bool
+    where
+        MessageCommon<Pb, A>: MessageCommonBits,
+    {
+        slot.is_empty(Self::is_heap(common))
+    }
+
+    #[inline]
+    fn get<'a, Pb>(slot: &'a SsoBytes<A>, common: &'a MessageCommon<Pb, A>) -> &'a [u8]
+    where
+        MessageCommon<Pb, A>: MessageCommonBits,
+    {
+        slot.as_bytes(Self::is_heap(common))
+    }
+
+    #[inline]
+    fn with_mut<'a, VS, I, Pb>(
+        slot: &'a mut VS,
+        init: I,
+        common: &'a mut MessageCommon<Pb, A>,
+    ) -> SsoBytesMut<'a, A>
+    where
+        VS: ValueSlot<SsoBytes<A>, A>,
+        I: SlotInitMut,
+        MessageCommon<Pb, A>: MessageCommonBits,
+        ProtoBytes: 'a,
+        A: 'a,
+    {
+        let alloc = common.alloc.clone();
+        let slot_ptr: *mut SsoBytes<A> = ValueSlot::with_mut(slot, init, common).get_mut();
+        let tag = common.bit_mut(HEAP_BIT);
+        // SAFETY: `tag` borrows only the bitfield in `common`; `slot_ptr` is the
+        // distinct field payload and remains valid for `'a`.
+        SsoBytesMut::new(unsafe { &mut *slot_ptr }, tag, alloc)
+    }
+
+    #[inline]
+    fn clear<VS, I, Pb>(slot: &mut VS, init: I, common: &mut MessageCommon<Pb, A>)
+    where
+        VS: ValueSlot<SsoBytes<A>, A>,
+        I: SlotInitMut,
+        MessageCommon<Pb, A>: MessageCommonBits,
+    {
+        if !init.is_initialized(|b| common.is_bit_set(b)) {
+            Self::set_heap(common, SSO_INLINE);
+            return;
+        }
+        let old_is_heap = Self::is_heap(common);
+        let alloc = common.alloc.clone();
+        {
+            let s = ValueSlot::with_mut(slot, init, common).get_mut();
+            // SAFETY: HEAP_BIT matches the live arm.
+            unsafe {
+                s.replace_packed(SsoBytes::empty_inline(), SSO_INLINE, old_is_heap, alloc);
+            }
+        }
+        Self::set_heap(common, SSO_INLINE);
+        init.set_initialized(|b, v| common.set_bit(b, v), false);
+    }
+
+    #[inline]
+    fn merge<VS, I, Pb, B>(
+        slot: &mut VS,
+        init: I,
+        common: &mut MessageCommon<Pb, A>,
+        wire_type: WireType,
+        buf: &mut B,
+        _field: FieldNumber,
+        _depth: usize,
+    ) -> Result<(), DecodeError>
+    where
+        VS: ValueSlot<SsoBytes<A>, A>,
+        I: SlotInitMut,
+        MessageCommon<Pb, A>: MessageCommonBits,
+        B: DecodeBuf,
+    {
+        if wire_type != WireType::Len {
+            return Err(DecodeError::InvalidTag);
+        }
+        let (new, new_is_heap) = decode_sso_bytes_packed(buf, common.alloc.clone())?;
+        let old_is_heap = Self::is_heap(common);
+        let alloc = common.alloc.clone();
+        {
+            let s = ValueSlot::with_mut(slot, init, common).get_mut();
+            // SAFETY: message allocator owns any previous heap buffer; bit matches arm.
+            unsafe { s.replace_packed(new, new_is_heap, old_is_heap, alloc) };
+        }
+        Self::set_heap(common, new_is_heap);
+        Ok(())
+    }
+
+    #[inline]
+    fn deallocate_slot<VS, Pb>(slot: VS, initialized: bool, common: &MessageCommon<Pb, A>)
+    where
+        VS: ValueSlot<SsoBytes<A>, A>,
+        MessageCommon<Pb, A>: MessageCommonBits,
+    {
+        let is_heap = Self::is_heap(common);
+        let alloc = common.alloc.clone();
+        if let Some(s) = slot.take_value(initialized) {
+            // SAFETY: HEAP_BIT / `alloc` come from this field's parent `common`.
+            unsafe { s.deallocate(is_heap, alloc) };
+        }
+    }
+}
+
+impl<A: Allocator + Clone, const HEAP_BIT: usize> ValueLayoutClone<ProtoBytes, A>
+    for InlineOrHeap<HEAP_BIT>
+{
+    #[inline]
+    fn clone_slot<VS, Pb>(
+        slot: &VS,
+        initialized: bool,
+        common: &MessageCommon<Pb, A>,
+        alloc: A,
+    ) -> VS
+    where
+        VS: ValueSlot<SsoBytes<A>, A>,
+        MessageCommon<Pb, A>: MessageCommonBits,
+    {
+        let is_heap = Self::is_heap(common);
+        VS::from_optional(
+            slot.get_value(initialized)
+                .map(|s| s.clone_packed(is_heap, alloc).0),
+        )
+    }
+}
+
+/// Bytes read from one LEN payload, still untyped (string vs bytes).
+enum SsoLenRead<A: Allocator> {
+    Inline { data: [u8; INLINE_CAP], len: usize },
+    Heap(UnmanagedVec<u8, A>),
+}
+
+fn read_sso_len<B: Buf, A: Allocator + Clone>(
     buf: &mut B,
     alloc: A,
-) -> Result<(SsoString<A>, bool), DecodeError> {
-    use ::core::str;
-
+) -> Result<SsoLenRead<A>, DecodeError> {
     let len = decode::decode_varint(buf)? as usize;
     if buf.remaining() < len {
         return Err(DecodeError::TruncatedMessage);
     }
     if len <= INLINE_CAP {
-        let mut tmp = [0u8; INLINE_CAP];
+        let mut data = [0u8; INLINE_CAP];
         let mut remaining = len;
         let mut filled = 0usize;
         while remaining > 0 {
             let chunk = buf.chunk();
             let to_copy = chunk.len().min(remaining);
-            tmp[filled..filled + to_copy].copy_from_slice(&chunk[..to_copy]);
+            data[filled..filled + to_copy].copy_from_slice(&chunk[..to_copy]);
             buf.advance(to_copy);
             filled += to_copy;
             remaining -= to_copy;
         }
-        match str::from_utf8(&tmp[..len]) {
-            Ok(s) => Ok((pack_inline_utf8(s.as_bytes()), false)),
-            Err(_) => Err(DecodeError::InvalidUtf8),
-        }
+        Ok(SsoLenRead::Inline { data, len })
     } else {
-        let mut vec = AllocVec::<u8, A>::with_capacity_in(len, alloc.clone());
+        let mut vec = AllocVec::<u8, A>::with_capacity_in(len, alloc);
         let mut remaining = len;
         while remaining > 0 {
             let chunk = buf.chunk();
@@ -582,14 +722,40 @@ fn decode_sso_packed<B: Buf, A: Allocator + Clone>(
             buf.advance(to_copy);
             remaining -= to_copy;
         }
-        let bytes = UnmanagedVec::from_vec(vec);
-        match UnmanagedString::from_utf8(bytes) {
+        Ok(SsoLenRead::Heap(UnmanagedVec::from_vec(vec)))
+    }
+}
+
+/// Decodes one LEN string into a packed SSO slot, preferring inline when short.
+fn decode_sso_packed<B: Buf, A: Allocator + Clone>(
+    buf: &mut B,
+    alloc: A,
+) -> Result<(SsoString<A>, bool), DecodeError> {
+    use ::core::str;
+
+    match read_sso_len(buf, alloc.clone())? {
+        SsoLenRead::Inline { data, len } => match str::from_utf8(&data[..len]) {
+            Ok(s) => Ok((pack_inline_utf8(s.as_bytes()), false)),
+            Err(_) => Err(DecodeError::InvalidUtf8),
+        },
+        SsoLenRead::Heap(bytes) => match UnmanagedString::from_utf8(bytes) {
             Ok(s) => Ok(pack_written(s, alloc)),
             Err(bytes) => {
                 // SAFETY: `alloc` owns the buffer we just built.
                 unsafe { bytes.deallocate(alloc) };
                 Err(DecodeError::InvalidUtf8)
             }
-        }
+        },
+    }
+}
+
+/// Decodes one LEN bytes payload into a packed SSO slot, preferring inline when short.
+fn decode_sso_bytes_packed<B: Buf, A: Allocator + Clone>(
+    buf: &mut B,
+    alloc: A,
+) -> Result<(SsoBytes<A>, bool), DecodeError> {
+    match read_sso_len(buf, alloc.clone())? {
+        SsoLenRead::Inline { data, len } => Ok((pack_inline(&data[..len]), false)),
+        SsoLenRead::Heap(bytes) => Ok(pack_written_bytes(bytes, alloc)),
     }
 }

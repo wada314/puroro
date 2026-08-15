@@ -1,7 +1,7 @@
 //! Behavioural tests for singular scalar / string / bytes fields.
 
 use crate::scalars::Scalars;
-use puroro::{Message, StringMut};
+use puroro::{BytesMut, Message, StringMut};
 
 #[test]
 fn default_scalars_are_zeroish() {

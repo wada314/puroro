@@ -4,7 +4,7 @@
 //!
 //! [`ValueSlot`] is implemented for raw `T`, [`MaybeUninit<T>`], and [`Option<T>`]
 //! when `T` implements [`DefaultIn`] for the message allocator `A`. Slot payloads
-//! are physical storage (`i32`, `()`, `SsoString`, [`UnmanagedBox`](::unmanaged::UnmanagedBox),
+//! are physical storage (`i32`, `()`, SSO slots, [`UnmanagedBox`](::unmanaged::UnmanagedBox),
 //! …); logical bit-packed bool values live in [`MessageCommon`](super::MessageCommon).
 //!
 //! Construction uses [`DefaultIn`](super::DefaultIn). Message Drop / clone of a
@@ -27,7 +27,7 @@ use super::{
     DefaultIn, MessageCommon, MessageCommonBits,
     slot_init::{SlotInitMut, SlotInitView},
 };
-use crate::fields::wire::sso_string::SsoString;
+use crate::fields::wire::sso_buf::SsoBuf;
 
 /// Marker for payloads stored as addressable `T` / [`MaybeUninit<T>`] in the
 /// field slot.
@@ -44,7 +44,7 @@ impl AddressableSlot for () {}
 
 impl<A: Allocator> AddressableSlot for ::unmanaged::UnmanagedString<A> {}
 impl<A: Allocator> AddressableSlot for ::unmanaged::UnmanagedVec<u8, A> {}
-impl<A: Allocator> AddressableSlot for SsoString<A> {}
+impl<H> AddressableSlot for SsoBuf<H> {}
 
 /// Storage construction, live-payload extract/rebuild, and view binding for a
 /// singular field value slot.

@@ -130,7 +130,7 @@ pub enum CatalogLayout {
         /// e.g. `BIT_DONE_VALUE`
         bit_const: String,
     },
-    /// Singular `string` — heap/inline bit for [`InlineOrHeap`] (`true` = heap).
+    /// Singular `string` / `bytes` — heap/inline bit for [`InlineOrHeap`] (`true` = heap).
     InlineOrHeap {
         /// Index of the `MessageCommon` bit (`1` = heap arm, `0` = inline).
         heap_bit: usize,
@@ -192,6 +192,10 @@ impl<'a> WireTypeKind<'a> {
 
     pub fn is_string(self) -> bool {
         matches!(self, Self::String { .. })
+    }
+
+    pub fn is_bytes(self) -> bool {
+        matches!(self, Self::Bytes { .. })
     }
 
     /// Whether the type may use packed repeated wire encoding.
@@ -261,7 +265,7 @@ pub fn value_bit_const(proto_name: &str) -> String {
     format!("BIT_{}_VALUE", to_upper_snake(proto_name))
 }
 
-/// `BIT_TITLE_SSO` — singular string heap bit in `InlineOrHeap` (`1` = heap).
+/// `BIT_TITLE_SSO` — singular string / bytes heap bit in `InlineOrHeap` (`1` = heap).
 pub fn sso_bit_const(proto_name: &str) -> String {
     format!("BIT_{}_SSO", to_upper_snake(proto_name))
 }

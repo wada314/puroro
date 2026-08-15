@@ -8,9 +8,9 @@ use crate::descriptor::features::{
     MessageEncoding, RepeatedFieldEncoding, Utf8Validation,
 };
 use crate::descriptor::{
-    CodegenMeta, CodegenRequest, Edition, EnumDesc, EnumValueDesc, FieldDesc, FieldLabel,
-    FieldType, MessageDesc, OneofDesc, ProtoFile, ProtoFqn, STRING_LAYOUT_OPTION_NUMBER,
-    StringLayout, Syntax,
+    BYTES_LAYOUT_OPTION_NUMBER, BytesLayout, CodegenMeta, CodegenRequest, Edition, EnumDesc,
+    EnumValueDesc, FieldDesc, FieldLabel, FieldType, MessageDesc, OneofDesc, ProtoFile, ProtoFqn,
+    STRING_LAYOUT_OPTION_NUMBER, StringLayout, Syntax,
 };
 use crate::error::{Error, Result};
 use ::protobuf_core::{
@@ -301,6 +301,7 @@ fn decode_field(bytes: &[u8]) -> Result<FieldDesc> {
         let mut default_value = None;
         let mut packed = None;
         let mut string_layout = None;
+        let mut bytes_layout = None;
         let mut features = FeatureSet::default();
 
         for field in AsRefExtProtobuf::read_protobuf_fields(&bytes) {
@@ -327,10 +328,11 @@ fn decode_field(bytes: &[u8]) -> Result<FieldDesc> {
                 // optional FieldOptions options = 8;
                 8 => {
                     let nested = expect_len(&field)?;
-                    let (opt_features, opt_packed, opt_layout) = decode_field_options(nested)?;
-                    features = opt_features;
-                    packed = opt_packed;
-                    string_layout = opt_layout;
+                    let decoded = decode_field_options(nested)?;
+                    features = decoded.features;
+                    packed = decoded.packed;
+                    string_layout = decoded.string_layout;
+                    bytes_layout = decoded.bytes_layout;
                 }
                 // optional int32 oneof_index = 9;
                 9 => oneof_index = Some(expect_int32(&field)?),
@@ -351,6 +353,7 @@ fn decode_field(bytes: &[u8]) -> Result<FieldDesc> {
             default_value,
             packed,
             string_layout,
+            bytes_layout,
             features,
         })
     })
@@ -376,11 +379,19 @@ fn decode_options_features(bytes: &[u8]) -> Result<FeatureSet> {
     Ok(features)
 }
 
-/// `FieldOptions`: `packed` (2), `features` (21), and `(puroro.string_layout)`.
-fn decode_field_options(bytes: &[u8]) -> Result<(FeatureSet, Option<bool>, Option<StringLayout>)> {
+struct DecodedFieldOptions {
+    features: FeatureSet,
+    packed: Option<bool>,
+    string_layout: Option<StringLayout>,
+    bytes_layout: Option<BytesLayout>,
+}
+
+/// `FieldOptions`: `packed` (2), `features` (21), and puroro layout extensions.
+fn decode_field_options(bytes: &[u8]) -> Result<DecodedFieldOptions> {
     let mut features = FeatureSet::default();
     let mut packed = None;
     let mut string_layout = None;
+    let mut bytes_layout = None;
     for field in AsRefExtProtobuf::read_protobuf_fields(&bytes) {
         let field = field?;
         match field.field_number.as_u32() {
@@ -399,10 +410,23 @@ fn decode_field_options(bytes: &[u8]) -> Result<(FeatureSet, Option<bool>, Optio
                         .ok_or(Error::unexpected_field(STRING_LAYOUT_OPTION_NUMBER))?,
                 );
             }
+            // extend FieldOptions { optional BytesLayout bytes_layout = 51401; }
+            BYTES_LAYOUT_OPTION_NUMBER => {
+                let raw = expect_int32(&field)?;
+                bytes_layout = Some(
+                    BytesLayout::from_i32(raw)
+                        .ok_or(Error::unexpected_field(BYTES_LAYOUT_OPTION_NUMBER))?,
+                );
+            }
             _ => {}
         }
     }
-    Ok((features, packed, string_layout))
+    Ok(DecodedFieldOptions {
+        features,
+        packed,
+        string_layout,
+        bytes_layout,
+    })
 }
 
 fn decode_feature_set(bytes: &[u8]) -> Result<FeatureSet> {
@@ -739,6 +763,40 @@ mod tests {
         assert_eq!(
             decoded.proto_files[0].messages[0].fields[0].string_layout,
             Some(StringLayout::Heap)
+        );
+    }
+
+    #[test]
+    fn decode_field_options_bytes_layout_extension() {
+        use crate::descriptor::{BYTES_LAYOUT_OPTION_NUMBER, BytesLayout};
+
+        // FieldOptions { (puroro.bytes_layout) = BYTES_LAYOUT_HEAP }
+        let field_options =
+            encode_varint_field(BYTES_LAYOUT_OPTION_NUMBER, BytesLayout::Heap as i32);
+
+        let mut field = Vec::new();
+        field.extend(encode_string_field(1, "body"));
+        field.extend(encode_varint_field(3, 1));
+        field.extend(encode_varint_field(4, FieldLabel::Optional as i32));
+        field.extend(encode_varint_field(5, FieldType::Bytes as i32));
+        field.extend(encode_message_field(8, &field_options));
+
+        let mut message = Vec::new();
+        message.extend(encode_string_field(1, "M"));
+        message.extend(encode_message_field(2, &field));
+
+        let mut file = Vec::new();
+        file.extend(encode_string_field(1, "t.proto"));
+        file.extend(encode_message_field(4, &message));
+
+        let mut request = Vec::new();
+        request.extend(encode_string_field(1, "t.proto"));
+        request.extend(encode_message_field(15, &file));
+
+        let decoded = decode_request(&request).unwrap();
+        assert_eq!(
+            decoded.proto_files[0].messages[0].fields[0].bytes_layout,
+            Some(BytesLayout::Heap)
         );
     }
 

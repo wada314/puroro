@@ -6,8 +6,8 @@
 
 use ::allocator_api2::alloc::Global;
 use ::puroro::{
-    MapMut, MapRef, Message, OneofView, OneofViewMut, RepeatedStringMut, String as AllocString,
-    StringMut, UnknownPayload,
+    BytesMut, MapMut, MapRef, Message, OneofView, OneofViewMut, RepeatedStringMut,
+    String as AllocString, StringMut, UnknownPayload,
 };
 use ::puroro_rt::INLINE_CAP;
 use ::puroro_rt::Varint;

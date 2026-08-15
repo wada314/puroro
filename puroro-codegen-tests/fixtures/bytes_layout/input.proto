@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+import "puroro/options.proto";
+
+// `(puroro.bytes_layout) = BYTES_LAYOUT_HEAP` selects heap `UnmanagedVec` (`Inline`).
+message HeapBytes {
+  optional bytes body = 1 [(puroro.bytes_layout) = BYTES_LAYOUT_HEAP];
+  optional bytes title = 2;
+}
