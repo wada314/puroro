@@ -501,17 +501,24 @@ fn expect_bool(field: &Field<&[u8]>) -> Result<bool> {
     }
 }
 
-fn to_field_number(value: u32) -> Result<FieldNumber> {
-    FieldNumber::try_new(value).map_err(|value| {
-        ProtobufError::FieldNumberOutOfRange {
-            value: i64::from(value),
-        }
-        .into()
-    })
+/// Maps [`FieldNumber::try_new`]'s bare `u32` error into [`Error`].
+trait FieldNumberExt: Sized {
+    fn try_from_u32(value: u32) -> Result<Self>;
+}
+
+impl FieldNumberExt for FieldNumber {
+    fn try_from_u32(value: u32) -> Result<Self> {
+        Self::try_new(value).map_err(|value| {
+            ProtobufError::FieldNumberOutOfRange {
+                value: i64::from(value),
+            }
+            .into()
+        })
+    }
 }
 
 fn write_len_field(out: &mut Vec<u8>, number: u32, value: &[u8]) -> Result<()> {
-    let field = Field::new(to_field_number(number)?, FieldValue::Len(value));
+    let field = Field::new(FieldNumber::try_from_u32(number)?, FieldValue::Len(value));
     out.write_protobuf_field(&field)?;
     Ok(())
 }
@@ -521,13 +528,19 @@ fn write_string_field(out: &mut Vec<u8>, number: u32, value: &str) -> Result<()>
 }
 
 fn write_int32_field(out: &mut Vec<u8>, number: u32, value: i32) -> Result<()> {
-    let field: Field<&[u8]> = Field::new(to_field_number(number)?, FieldValue::from_int32(value));
+    let field: Field<&[u8]> = Field::new(
+        FieldNumber::try_from_u32(number)?,
+        FieldValue::from_int32(value),
+    );
     out.write_protobuf_field(&field)?;
     Ok(())
 }
 
 fn write_uint64_field(out: &mut Vec<u8>, number: u32, value: u64) -> Result<()> {
-    let field: Field<&[u8]> = Field::new(to_field_number(number)?, FieldValue::from_uint64(value));
+    let field: Field<&[u8]> = Field::new(
+        FieldNumber::try_from_u32(number)?,
+        FieldValue::from_uint64(value),
+    );
     out.write_protobuf_field(&field)?;
     Ok(())
 }
