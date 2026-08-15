@@ -3,10 +3,7 @@
 //! Decodes only the fields needed to build [`crate::descriptor::CodegenRequest`],
 //! and encodes a minimal [`CodeGeneratorResponse`].
 
-use crate::descriptor::features::{
-    DefaultSymbolVisibility, EnforceNamingStyle, EnumType, FeatureSet, FieldPresence, JsonFormat,
-    MessageEncoding, RepeatedFieldEncoding, Utf8Validation,
-};
+use crate::descriptor::features::FeatureSet;
 use crate::descriptor::{
     BYTES_LAYOUT_OPTION_NUMBER, BytesLayout, CodegenMeta, CodegenRequest, Edition, EnumDesc,
     EnumValueDesc, FieldDesc, FieldLabel, FieldType, MessageDesc, OneofDesc, ProtoFile, ProtoFqn,
@@ -16,6 +13,7 @@ use crate::error::{Error, Result};
 use ::protobuf_core::{
     AsRefExtProtobuf, Field, FieldNumber, FieldValue, ProtobufError, WriteExtProtobuf,
 };
+use ::std::convert::TryFrom;
 
 /// `CodeGeneratorResponse.FEATURE_PROTO3_OPTIONAL`
 pub const FEATURE_PROTO3_OPTIONAL: u64 = 1;
@@ -202,7 +200,7 @@ fn resolve_syntax(syntax_raw: Option<&str>, edition_raw: Option<i32>) -> Result<
                     "FileDescriptorProto.syntax is \"editions\" but edition is missing".into(),
                 )
             })?;
-            let edition = Edition::from_i32(raw).ok_or_else(|| {
+            let edition = Edition::try_from(raw).map_err(|_| {
                 Error::Codegen(format!("unsupported protobuf edition value `{raw}`"))
             })?;
             Ok(Syntax::Editions(edition))
@@ -305,9 +303,9 @@ fn decode_field(bytes: &[u8]) -> Result<FieldDesc> {
                 // optional int32 number = 3;
                 3 => number = expect_int32(&field)?,
                 // optional Label label = 4;
-                4 => label = expect_enum(&field, FieldLabel::from_i32)?,
+                4 => label = expect_enum(&field)?,
                 // optional Type type = 5;
-                5 => type_ = expect_enum(&field, FieldType::from_i32)?,
+                5 => type_ = expect_enum(&field)?,
                 // optional string type_name = 6;
                 6 => type_name = Some(ProtoFqn::parse(expect_string(&field)?)),
                 // optional string default_value = 7;
@@ -395,11 +393,11 @@ fn decode_field_options(bytes: &[u8]) -> Result<DecodedFieldOptions> {
                 }
                 // extend FieldOptions { optional StringLayout string_layout = 51400; }
                 STRING_LAYOUT_OPTION_NUMBER => {
-                    string_layout = Some(expect_enum(&field, StringLayout::from_i32)?);
+                    string_layout = Some(expect_enum(&field)?);
                 }
                 // extend FieldOptions { optional BytesLayout bytes_layout = 51401; }
                 BYTES_LAYOUT_OPTION_NUMBER => {
-                    bytes_layout = Some(expect_enum(&field, BytesLayout::from_i32)?);
+                    bytes_layout = Some(expect_enum(&field)?);
                 }
                 _ => {}
             }
@@ -420,35 +418,21 @@ fn decode_feature_set(bytes: &[u8]) -> Result<FeatureSet> {
             let field = field?;
             match field.field_number.as_u32() {
                 // optional FieldPresence field_presence = 1;
-                1 => features.field_presence = Some(expect_enum(&field, FieldPresence::from_i32)?),
+                1 => features.field_presence = Some(expect_enum(&field)?),
                 // optional EnumType enum_type = 2;
-                2 => features.enum_type = Some(expect_enum(&field, EnumType::from_i32)?),
+                2 => features.enum_type = Some(expect_enum(&field)?),
                 // optional RepeatedFieldEncoding repeated_field_encoding = 3;
-                3 => {
-                    features.repeated_field_encoding =
-                        Some(expect_enum(&field, RepeatedFieldEncoding::from_i32)?);
-                }
+                3 => features.repeated_field_encoding = Some(expect_enum(&field)?),
                 // optional Utf8Validation utf8_validation = 4;
-                4 => {
-                    features.utf8_validation = Some(expect_enum(&field, Utf8Validation::from_i32)?);
-                }
+                4 => features.utf8_validation = Some(expect_enum(&field)?),
                 // optional MessageEncoding message_encoding = 5;
-                5 => {
-                    features.message_encoding =
-                        Some(expect_enum(&field, MessageEncoding::from_i32)?);
-                }
+                5 => features.message_encoding = Some(expect_enum(&field)?),
                 // optional JsonFormat json_format = 6;
-                6 => features.json_format = Some(expect_enum(&field, JsonFormat::from_i32)?),
+                6 => features.json_format = Some(expect_enum(&field)?),
                 // optional EnforceNamingStyle enforce_naming_style = 7;
-                7 => {
-                    features.enforce_naming_style =
-                        Some(expect_enum(&field, EnforceNamingStyle::from_i32)?);
-                }
+                7 => features.enforce_naming_style = Some(expect_enum(&field)?),
                 // optional DefaultSymbolVisibility default_symbol_visibility = 8;
-                8 => {
-                    features.default_symbol_visibility =
-                        Some(expect_enum(&field, DefaultSymbolVisibility::from_i32)?);
-                }
+                8 => features.default_symbol_visibility = Some(expect_enum(&field)?),
                 // Language-specific FeatureSet extensions (e.g. 1000+) are LEN.
                 _ => {}
             }
@@ -543,9 +527,9 @@ fn expect_int32(field: &Field<&[u8]>) -> Result<i32> {
     }
 }
 
-fn expect_enum<T>(field: &Field<&[u8]>, from_i32: impl FnOnce(i32) -> Option<T>) -> Result<T> {
+fn expect_enum<T: TryFrom<i32>>(field: &Field<&[u8]>) -> Result<T> {
     let raw = expect_int32(field)?;
-    from_i32(raw).ok_or(Error::unexpected_field(field.field_number.as_u32()))
+    T::try_from(raw).map_err(|_| Error::unexpected_field(field.field_number.as_u32()))
 }
 
 fn expect_bool(field: &Field<&[u8]>) -> Result<bool> {
@@ -589,6 +573,7 @@ fn write_uint64_field(out: &mut Vec<u8>, number: u32, value: u64) -> Result<()> 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::descriptor::features::{EnumType, FieldPresence};
     use crate::descriptor::{FieldLabel, FieldType};
 
     fn encode_string_field(field_number: u32, value: &str) -> Vec<u8> {

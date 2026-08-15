@@ -473,6 +473,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "bumpalo",
+ "derive_more",
  "itertools 0.14.0",
  "prettyplease",
  "proc-macro2",

@@ -11,6 +11,8 @@ mod proto_fqn;
 pub use features::FeatureSet;
 pub use proto_fqn::ProtoFqn;
 
+use ::derive_more::TryFrom;
+
 /// Plugin / generate-time metadata (not part of the type graph).
 ///
 /// Passed by reference through the generator; kept separate from
@@ -43,22 +45,14 @@ pub enum Syntax {
 }
 
 /// Released protobuf edition (`google.protobuf.Edition`).
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, TryFrom)]
+#[try_from(repr)]
+#[repr(i32)]
 pub enum Edition {
     /// `edition = "2023"` (`EDITION_2023 = 1000`).
     Edition2023 = 1000,
     /// `edition = "2024"` (`EDITION_2024 = 1001`).
     Edition2024 = 1001,
-}
-
-impl Edition {
-    pub fn from_i32(value: i32) -> Option<Self> {
-        match value {
-            1000 => Some(Self::Edition2023),
-            1001 => Some(Self::Edition2024),
-            _ => None,
-        }
-    }
 }
 
 /// One `.proto` file (`FileDescriptorProto` subset).
@@ -111,7 +105,9 @@ pub struct FieldDesc {
 }
 
 /// Field label (`FieldDescriptorProto.Label`).
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, TryFrom)]
+#[try_from(repr)]
+#[repr(i32)]
 pub enum FieldLabel {
     Optional = 1,
     Required = 2,
@@ -119,7 +115,9 @@ pub enum FieldLabel {
 }
 
 /// Field type (`FieldDescriptorProto.Type`).
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, TryFrom)]
+#[try_from(repr)]
+#[repr(i32)]
 pub enum FieldType {
     Double = 1,
     Float = 2,
@@ -152,7 +150,9 @@ pub const STRING_LAYOUT_OPTION_NUMBER: u32 = 51400;
 /// [`Unspecified`](Self::Unspecified) (and an absent option) uses the generator
 /// default, currently SSO (`InlineOrHeap`). [`Sso`](Self::Sso) and
 /// [`Heap`](Self::Heap) pin the layout (`Inline` + `UnmanagedString` for heap).
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, TryFrom)]
+#[try_from(repr)]
+#[repr(i32)]
 pub enum StringLayout {
     Unspecified = 0,
     Sso = 1,
@@ -160,15 +160,6 @@ pub enum StringLayout {
 }
 
 impl StringLayout {
-    pub fn from_i32(value: i32) -> Option<Self> {
-        match value {
-            0 => Some(Self::Unspecified),
-            1 => Some(Self::Sso),
-            2 => Some(Self::Heap),
-            _ => None,
-        }
-    }
-
     /// `true` when this layout opts a singular string out of SSO.
     pub fn is_heap(self) -> bool {
         matches!(self, Self::Heap)
@@ -186,7 +177,9 @@ pub const BYTES_LAYOUT_OPTION_NUMBER: u32 = 51401;
 /// [`Unspecified`](Self::Unspecified) (and an absent option) uses the generator
 /// default, currently SSO (`InlineOrHeap`). [`Sso`](Self::Sso) and
 /// [`Heap`](Self::Heap) pin the layout (`Inline` + `UnmanagedVec` for heap).
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, TryFrom)]
+#[try_from(repr)]
+#[repr(i32)]
 pub enum BytesLayout {
     Unspecified = 0,
     Sso = 1,
@@ -194,15 +187,6 @@ pub enum BytesLayout {
 }
 
 impl BytesLayout {
-    pub fn from_i32(value: i32) -> Option<Self> {
-        match value {
-            0 => Some(Self::Unspecified),
-            1 => Some(Self::Sso),
-            2 => Some(Self::Heap),
-            _ => None,
-        }
-    }
-
     /// `true` when this layout opts a singular bytes field out of SSO.
     pub fn is_heap(self) -> bool {
         matches!(self, Self::Heap)
@@ -229,41 +213,4 @@ pub struct EnumDesc {
 pub struct EnumValueDesc {
     pub name: String,
     pub number: i32,
-}
-
-impl FieldLabel {
-    pub fn from_i32(value: i32) -> Option<Self> {
-        match value {
-            1 => Some(Self::Optional),
-            2 => Some(Self::Required),
-            3 => Some(Self::Repeated),
-            _ => None,
-        }
-    }
-}
-
-impl FieldType {
-    pub fn from_i32(value: i32) -> Option<Self> {
-        match value {
-            1 => Some(Self::Double),
-            2 => Some(Self::Float),
-            3 => Some(Self::Int64),
-            4 => Some(Self::UInt64),
-            5 => Some(Self::Int32),
-            6 => Some(Self::Fixed64),
-            7 => Some(Self::Fixed32),
-            8 => Some(Self::Bool),
-            9 => Some(Self::String),
-            10 => Some(Self::Group),
-            11 => Some(Self::Message),
-            12 => Some(Self::Bytes),
-            13 => Some(Self::UInt32),
-            14 => Some(Self::Enum),
-            15 => Some(Self::SFixed32),
-            16 => Some(Self::SFixed64),
-            17 => Some(Self::SInt32),
-            18 => Some(Self::SInt64),
-            _ => None,
-        }
-    }
 }

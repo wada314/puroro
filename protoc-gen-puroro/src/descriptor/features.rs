@@ -4,6 +4,8 @@
 //! field / enum options. Unset members are [`None`] (inherit from a parent scope
 //! or edition defaults during resolve).
 
+use ::derive_more::TryFrom;
+
 /// Resolved / declared Editions features (`google.protobuf.FeatureSet`).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct FeatureSet {
@@ -126,143 +128,76 @@ impl FeatureSet {
 }
 
 /// `FeatureSet.field_presence`.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, TryFrom)]
+#[try_from(repr)]
+#[repr(i32)]
 pub enum FieldPresence {
     Explicit = 1,
     Implicit = 2,
     LegacyRequired = 3,
 }
 
-impl FieldPresence {
-    pub fn from_i32(value: i32) -> Option<Self> {
-        match value {
-            1 => Some(Self::Explicit),
-            2 => Some(Self::Implicit),
-            3 => Some(Self::LegacyRequired),
-            _ => None,
-        }
-    }
-}
-
 /// `FeatureSet.enum_type` (targets: file, enum).
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, TryFrom)]
+#[try_from(repr)]
+#[repr(i32)]
 pub enum EnumType {
     Open = 1,
     Closed = 2,
 }
 
-impl EnumType {
-    pub fn from_i32(value: i32) -> Option<Self> {
-        match value {
-            1 => Some(Self::Open),
-            2 => Some(Self::Closed),
-            _ => None,
-        }
-    }
-}
-
 /// `FeatureSet.repeated_field_encoding` (targets: file, field).
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, TryFrom)]
+#[try_from(repr)]
+#[repr(i32)]
 pub enum RepeatedFieldEncoding {
     Packed = 1,
     Expanded = 2,
 }
 
-impl RepeatedFieldEncoding {
-    pub fn from_i32(value: i32) -> Option<Self> {
-        match value {
-            1 => Some(Self::Packed),
-            2 => Some(Self::Expanded),
-            _ => None,
-        }
-    }
-}
-
 /// `FeatureSet.utf8_validation` (wire value 1 is reserved; targets: file, field).
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, TryFrom)]
+#[try_from(repr)]
+#[repr(i32)]
 pub enum Utf8Validation {
     Verify = 2,
     None = 3,
 }
 
-impl Utf8Validation {
-    pub fn from_i32(value: i32) -> Option<Self> {
-        match value {
-            2 => Some(Self::Verify),
-            3 => Some(Self::None),
-            _ => None,
-        }
-    }
-}
-
 /// `FeatureSet.message_encoding` (targets: file, field).
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, TryFrom)]
+#[try_from(repr)]
+#[repr(i32)]
 pub enum MessageEncoding {
     LengthPrefixed = 1,
     Delimited = 2,
 }
 
-impl MessageEncoding {
-    pub fn from_i32(value: i32) -> Option<Self> {
-        match value {
-            1 => Some(Self::LengthPrefixed),
-            2 => Some(Self::Delimited),
-            _ => None,
-        }
-    }
-}
-
 /// `FeatureSet.json_format`.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, TryFrom)]
+#[try_from(repr)]
+#[repr(i32)]
 pub enum JsonFormat {
     Allow = 1,
     LegacyBestEffort = 2,
 }
 
-impl JsonFormat {
-    pub fn from_i32(value: i32) -> Option<Self> {
-        match value {
-            1 => Some(Self::Allow),
-            2 => Some(Self::LegacyBestEffort),
-            _ => None,
-        }
-    }
-}
-
 /// `FeatureSet.enforce_naming_style` (edition 2024+).
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, TryFrom)]
+#[try_from(repr)]
+#[repr(i32)]
 pub enum EnforceNamingStyle {
     Style2024 = 1,
     StyleLegacy = 2,
 }
 
-impl EnforceNamingStyle {
-    pub fn from_i32(value: i32) -> Option<Self> {
-        match value {
-            1 => Some(Self::Style2024),
-            2 => Some(Self::StyleLegacy),
-            _ => None,
-        }
-    }
-}
-
 /// `FeatureSet.default_symbol_visibility` (edition 2024+).
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, TryFrom)]
+#[try_from(repr)]
+#[repr(i32)]
 pub enum DefaultSymbolVisibility {
     ExportAll = 1,
     ExportTopLevel = 2,
     LocalAll = 3,
     Strict = 4,
-}
-
-impl DefaultSymbolVisibility {
-    pub fn from_i32(value: i32) -> Option<Self> {
-        match value {
-            1 => Some(Self::ExportAll),
-            2 => Some(Self::ExportTopLevel),
-            3 => Some(Self::LocalAll),
-            4 => Some(Self::Strict),
-            _ => None,
-        }
-    }
 }
