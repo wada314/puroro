@@ -13,211 +13,331 @@ use crate::descriptor::{
 use crate::error::{Error, Result};
 use ::std::cell::OnceCell;
 use ::std::collections::HashMap;
+use ::std::mem;
+
+/// Message + defining descriptor, queued while registering so the link pass
+/// does not re-walk the tree or re-derive FQNs.
+struct PendingFields<'a, 'd> {
+    message: &'a Message<'a>,
+    desc: &'d MessageDesc,
+    file: &'d ProtoFile,
+}
+
+/// Name map + pending field edges for one [`resolve`] call.
+struct ResolveCtx<'a, 'd> {
+    arena: &'a Arena,
+    types_by_fqn: HashMap<ProtoFqn, TypeItem<'a>>,
+    pending: Vec<PendingFields<'a, 'd>>,
+}
 
 /// Resolve descriptor type names into an arena-local [`FileSet`].
 ///
 /// Plugin metadata ([`crate::descriptor::CodegenMeta`]) is intentionally unused
 /// here — keep it beside the returned `FileSet` and pass both by reference.
 pub fn resolve<'a>(arena: &'a Arena, proto_files: &[ProtoFile]) -> Result<FileSet<'a>> {
-    let mut types_by_fqn: HashMap<ProtoFqn, TypeItem<'a>> = HashMap::new();
+    let mut ctx = ResolveCtx {
+        arena,
+        types_by_fqn: HashMap::new(),
+        pending: Vec::new(),
+    };
     let mut files = Vec::with_capacity(proto_files.len());
 
     // Pass 1: allocate every message/enum node and register by FQN.
     for proto in proto_files {
-        files.push(register_file(arena, proto, &mut types_by_fqn)?);
+        files.push(ctx.register_file(proto)?);
     }
 
-    // Pass 2: fill fields with resolved TypeRefs.
+    // Pass 2: file-level feature traps, then link queued field edges.
     for proto in proto_files {
-        fill_file_fields(proto, &types_by_fqn)?;
+        check_file_features(proto);
     }
+    ctx.link_pending()?;
 
     Ok(FileSet {
         files,
-        types_by_fqn,
+        types_by_fqn: ctx.types_by_fqn,
     })
 }
 
-fn register_file<'a>(
-    arena: &'a Arena,
-    proto: &ProtoFile,
-    types_by_fqn: &mut HashMap<ProtoFqn, TypeItem<'a>>,
-) -> Result<&'a File<'a>> {
-    let package_fqn = ProtoFqn::from_package(&proto.package);
+impl<'a, 'd> ResolveCtx<'a, 'd> {
+    fn register_file(&mut self, proto: &'d ProtoFile) -> Result<&'a File<'a>> {
+        let package_fqn = ProtoFqn::from_package(&proto.package);
 
-    let mut messages = Vec::with_capacity(proto.messages.len());
-    for desc in &proto.messages {
-        messages.push(register_message(
-            arena,
+        let mut messages = Vec::with_capacity(proto.messages.len());
+        for desc in &proto.messages {
+            messages.push(self.register_message(desc, &package_fqn, proto)?);
+        }
+
+        let mut enums = Vec::with_capacity(proto.enums.len());
+        for desc in &proto.enums {
+            enums.push(self.register_enum(desc, &package_fqn, proto)?);
+        }
+
+        Ok(self.arena.alloc(File {
+            name: proto.name.clone(),
+            package: proto.package.clone(),
+            syntax: proto.syntax,
+            dependency: proto.dependency.clone(),
+            messages,
+            enums,
+        }))
+    }
+
+    fn register_message(
+        &mut self,
+        desc: &'d MessageDesc,
+        // FQN of the enclosing package (possibly ".") or parent message.
+        parent_fqn: &ProtoFqn,
+        file: &'d ProtoFile,
+    ) -> Result<&'a Message<'a>> {
+        let fqn = parent_fqn.append(&desc.name);
+
+        if self.types_by_fqn.contains_key(&fqn) {
+            return Err(Error::Codegen(format!(
+                "duplicate type FQN `{fqn}` while resolving schema"
+            )));
+        }
+
+        // Build children first so `nested_*` can be plain Vecs on the parent.
+        let mut nested_messages = Vec::with_capacity(desc.nested_messages.len());
+        for nested in &desc.nested_messages {
+            nested_messages.push(self.register_message(nested, &fqn, file)?);
+        }
+
+        let mut nested_enums = Vec::with_capacity(desc.nested_enums.len());
+        for nested in &desc.nested_enums {
+            nested_enums.push(self.register_enum(nested, &fqn, file)?);
+        }
+
+        let oneofs = desc
+            .oneofs
+            .iter()
+            .map(|o| Oneof {
+                name: o.name.clone(),
+            })
+            .collect();
+
+        let message = self.arena.alloc(Message {
+            name: desc.name.clone(),
+            fqn: fqn.clone(),
+            parent: OnceCell::new(),
+            fields: OnceCell::new(),
+            nested_messages,
+            nested_enums,
+            oneofs,
+            map_entry: desc.map_entry,
+        });
+        self.types_by_fqn
+            .insert(fqn.clone(), TypeItem::Message(message));
+        self.pending.push(PendingFields {
+            message,
             desc,
-            &package_fqn,
-            proto.syntax,
-            proto.features,
-            types_by_fqn,
-        )?);
+            file,
+        });
+
+        for child in &message.nested_messages {
+            child
+                .parent
+                .set(message)
+                .map_err(|_| Error::Codegen(format!("parent set twice for `{}`", child.fqn)))?;
+        }
+        for child in &message.nested_enums {
+            child
+                .parent
+                .set(message)
+                .map_err(|_| Error::Codegen(format!("parent set twice for `{}`", child.fqn)))?;
+        }
+
+        Ok(message)
     }
 
-    let mut enums = Vec::with_capacity(proto.enums.len());
-    for desc in &proto.enums {
-        enums.push(register_enum(
-            arena,
-            desc,
-            &package_fqn,
-            proto.syntax,
-            proto.features,
-            types_by_fqn,
-        )?);
+    fn register_enum(
+        &mut self,
+        desc: &EnumDesc,
+        // FQN of the enclosing package (possibly ".") or parent message.
+        parent_fqn: &ProtoFqn,
+        file: &ProtoFile,
+    ) -> Result<&'a Enum<'a>> {
+        let fqn = parent_fqn.append(&desc.name);
+
+        if self.types_by_fqn.contains_key(&fqn) {
+            return Err(Error::Codegen(format!(
+                "duplicate type FQN `{fqn}` while resolving schema"
+            )));
+        }
+
+        desc.features
+            .reject_unimplemented_overrides(&format!("enum `{fqn}`"));
+
+        let values = desc
+            .values
+            .iter()
+            .map(|v| EnumValue {
+                name: v.name.clone(),
+                number: v.number,
+            })
+            .collect();
+
+        let enum_ty = self.arena.alloc(Enum {
+            name: desc.name.clone(),
+            fqn: fqn.clone(),
+            parent: OnceCell::new(),
+            openness: resolve_enum_openness(file.syntax, &file.features, &desc.features),
+            values,
+        });
+        self.types_by_fqn.insert(fqn, TypeItem::Enum(enum_ty));
+        Ok(enum_ty)
     }
 
-    Ok(arena.alloc(File {
-        name: proto.name.clone(),
-        package: proto.package.clone(),
-        syntax: proto.syntax,
-        dependency: proto.dependency.clone(),
-        messages,
-        enums,
-    }))
-}
-
-fn register_message<'a>(
-    arena: &'a Arena,
-    desc: &MessageDesc,
-    // FQN of the enclosing package (possibly ".") or parent message.
-    parent_fqn: &ProtoFqn,
-    syntax: Syntax,
-    file_features: FeatureSet,
-    types_by_fqn: &mut HashMap<ProtoFqn, TypeItem<'a>>,
-) -> Result<&'a Message<'a>> {
-    let fqn = parent_fqn.append(&desc.name);
-
-    if types_by_fqn.contains_key(&fqn) {
-        return Err(Error::Codegen(format!(
-            "duplicate type FQN `{fqn}` while resolving schema"
-        )));
+    fn link_pending(&mut self) -> Result<()> {
+        let pending = mem::take(&mut self.pending);
+        for item in pending {
+            self.link_message_fields(item)?;
+        }
+        Ok(())
     }
 
-    // Build children first so `nested_*` can be plain Vecs on the parent.
-    let mut nested_messages = Vec::with_capacity(desc.nested_messages.len());
-    for nested in &desc.nested_messages {
-        nested_messages.push(register_message(
-            arena,
-            nested,
-            &fqn,
-            syntax,
-            file_features,
-            types_by_fqn,
-        )?);
+    fn link_message_fields(&self, pending: PendingFields<'a, 'd>) -> Result<()> {
+        let mut fields = Vec::with_capacity(pending.desc.fields.len());
+        for field in &pending.desc.fields {
+            fields.push(self.resolve_field(field, &pending.message.fqn, pending.file)?);
+        }
+        pending.message.fields.set(fields).map_err(|_| {
+            Error::Codegen(format!("fields set twice for `{}`", pending.message.fqn))
+        })?;
+        Ok(())
     }
 
-    let mut nested_enums = Vec::with_capacity(desc.nested_enums.len());
-    for nested in &desc.nested_enums {
-        nested_enums.push(register_enum(
-            arena,
-            nested,
-            &fqn,
-            syntax,
-            file_features,
-            types_by_fqn,
-        )?);
-    }
+    fn resolve_field(
+        &self,
+        field: &FieldDesc,
+        owner_fqn: &ProtoFqn,
+        file: &ProtoFile,
+    ) -> Result<Field<'a>> {
+        if field.type_ == FieldType::Group {
+            return Err(Error::Codegen(format!(
+                "field `{owner_fqn}.{}`: deprecated group fields are not supported",
+                field.name
+            )));
+        }
 
-    let oneofs = desc
-        .oneofs
-        .iter()
-        .map(|o| Oneof {
-            name: o.name.clone(),
+        let editions_features = match file.syntax {
+            Syntax::Editions(edition) => {
+                field
+                    .features
+                    .reject_unimplemented_overrides(&format!("field `{owner_fqn}.{}`", field.name));
+                Some(
+                    FeatureSet::defaults_for_edition(edition)
+                        .overlay(&file.features)
+                        .overlay(&field.features),
+                )
+            }
+            Syntax::Proto2 | Syntax::Proto3 => None,
+        };
+
+        if matches!(field.type_, FieldType::Message)
+            && editions_features
+                .map(|f| f.message_encoding == Some(MessageEncoding::Delimited))
+                .unwrap_or(false)
+        {
+            return Err(Error::Codegen(format!(
+                "field `{owner_fqn}.{}`: features.message_encoding=DELIMITED is not supported",
+                field.name
+            )));
+        }
+
+        let type_ref = match field.type_ {
+            FieldType::Message => {
+                let type_name = field.type_name.as_ref().ok_or_else(|| {
+                    Error::Codegen(format!(
+                        "field `{owner_fqn}.{}` has message type but no type_name",
+                        field.name
+                    ))
+                })?;
+                let target = self.lookup_message(type_name).ok_or_else(|| {
+                    Error::Codegen(format!(
+                        "field `{owner_fqn}.{}` references unknown message type `{type_name}`",
+                        field.name
+                    ))
+                })?;
+                TypeRef::Message(target)
+            }
+            FieldType::Enum => {
+                let type_name = field.type_name.as_ref().ok_or_else(|| {
+                    Error::Codegen(format!(
+                        "field `{owner_fqn}.{}` has enum type but no type_name",
+                        field.name
+                    ))
+                })?;
+                let target = self.lookup_enum(type_name).ok_or_else(|| {
+                    Error::Codegen(format!(
+                        "field `{owner_fqn}.{}` references unknown enum type `{type_name}`",
+                        field.name
+                    ))
+                })?;
+                TypeRef::Enum(target)
+            }
+            FieldType::Group => unreachable!("rejected above"),
+            scalar => TypeRef::from_scalar(scalar).ok_or_else(|| {
+                Error::Codegen(format!(
+                    "field `{owner_fqn}.{}` has unexpected type {:?}",
+                    field.name, scalar
+                ))
+            })?,
+        };
+
+        let occurrence =
+            resolve_occurrence(field, file.syntax, editions_features.as_ref(), &type_ref);
+        Ok(Field {
+            name: field.name.clone(),
+            number: field.number,
+            occurrence,
+            type_ref,
+            oneof_index: field.oneof_index,
+            default_value: field.default_value.clone(),
+            utf8_validation: resolve_utf8_validation(
+                field,
+                file.syntax,
+                editions_features.as_ref(),
+            ),
+            string_layout: field.string_layout,
+            bytes_layout: field.bytes_layout,
         })
-        .collect();
-
-    let message = arena.alloc(Message {
-        name: desc.name.clone(),
-        fqn: fqn.clone(),
-        parent: OnceCell::new(),
-        fields: OnceCell::new(),
-        nested_messages,
-        nested_enums,
-        oneofs,
-        map_entry: desc.map_entry,
-    });
-    types_by_fqn.insert(fqn.clone(), TypeItem::Message(message));
-
-    for child in &message.nested_messages {
-        child
-            .parent
-            .set(message)
-            .map_err(|_| Error::Codegen(format!("parent set twice for `{}`", child.fqn)))?;
-    }
-    for child in &message.nested_enums {
-        child
-            .parent
-            .set(message)
-            .map_err(|_| Error::Codegen(format!("parent set twice for `{}`", child.fqn)))?;
     }
 
-    Ok(message)
-}
-
-fn register_enum<'a>(
-    arena: &'a Arena,
-    desc: &EnumDesc,
-    // FQN of the enclosing package (possibly ".") or parent message.
-    parent_fqn: &ProtoFqn,
-    syntax: Syntax,
-    file_features: FeatureSet,
-    types_by_fqn: &mut HashMap<ProtoFqn, TypeItem<'a>>,
-) -> Result<&'a Enum<'a>> {
-    let fqn = parent_fqn.append(&desc.name);
-
-    if types_by_fqn.contains_key(&fqn) {
-        return Err(Error::Codegen(format!(
-            "duplicate type FQN `{fqn}` while resolving schema"
-        )));
+    fn lookup_message(&self, type_name: &ProtoFqn) -> Option<&'a Message<'a>> {
+        match self.types_by_fqn.get(type_name)? {
+            TypeItem::Message(m) => Some(*m),
+            TypeItem::Enum(_) => None,
+        }
     }
 
-    desc.features
-        .reject_unimplemented_overrides(&format!("enum `{fqn}`"));
-
-    let values = desc
-        .values
-        .iter()
-        .map(|v| EnumValue {
-            name: v.name.clone(),
-            number: v.number,
-        })
-        .collect();
-
-    let enum_ty = arena.alloc(Enum {
-        name: desc.name.clone(),
-        fqn: fqn.clone(),
-        parent: OnceCell::new(),
-        openness: resolve_enum_openness(syntax, file_features, desc.features),
-        values,
-    });
-    types_by_fqn.insert(fqn, TypeItem::Enum(enum_ty));
-    Ok(enum_ty)
+    fn lookup_enum(&self, type_name: &ProtoFqn) -> Option<&'a Enum<'a>> {
+        match self.types_by_fqn.get(type_name)? {
+            TypeItem::Enum(e) => Some(*e),
+            TypeItem::Message(_) => None,
+        }
+    }
 }
 
 fn resolve_enum_openness(
     syntax: Syntax,
-    file_features: FeatureSet,
-    enum_features: FeatureSet,
+    file_features: &FeatureSet,
+    enum_features: &FeatureSet,
 ) -> EnumType {
     match syntax {
         // Historical defaults (editions features are not used for proto2/proto3).
         Syntax::Proto2 => EnumType::Closed,
         Syntax::Proto3 => EnumType::Open,
         Syntax::Editions(edition) => FeatureSet::defaults_for_edition(edition)
-            .overlay(&file_features)
-            .overlay(&enum_features)
+            .overlay(file_features)
+            .overlay(enum_features)
             .enum_type
             .expect("edition defaults always set enum_type"),
     }
 }
 
-fn fill_file_fields<'a>(
-    proto: &ProtoFile,
-    types_by_fqn: &HashMap<ProtoFqn, TypeItem<'a>>,
-) -> Result<()> {
+fn check_file_features(proto: &ProtoFile) {
     if let Syntax::Editions(edition) = proto.syntax {
         proto
             .features
@@ -225,152 +345,6 @@ fn fill_file_fields<'a>(
         let file_features = FeatureSet::defaults_for_edition(edition).overlay(&proto.features);
         file_features.apply_or_trap_for_file();
     }
-
-    let package_fqn = ProtoFqn::from_package(&proto.package);
-    for desc in &proto.messages {
-        fill_message_fields(
-            desc,
-            &package_fqn,
-            proto.syntax,
-            proto.features,
-            types_by_fqn,
-        )?;
-    }
-    Ok(())
-}
-
-fn fill_message_fields<'a>(
-    desc: &MessageDesc,
-    parent_fqn: &ProtoFqn,
-    syntax: Syntax,
-    file_features: FeatureSet,
-    types_by_fqn: &HashMap<ProtoFqn, TypeItem<'a>>,
-) -> Result<()> {
-    let fqn = parent_fqn.append(&desc.name);
-
-    let TypeItem::Message(message) = types_by_fqn.get(&fqn).copied().ok_or_else(|| {
-        Error::Codegen(format!(
-            "internal error: message `{fqn}` missing after registration"
-        ))
-    })?
-    else {
-        return Err(Error::Codegen(format!(
-            "internal error: FQN `{fqn}` registered as non-message"
-        )));
-    };
-
-    let mut fields = Vec::with_capacity(desc.fields.len());
-    for field in &desc.fields {
-        fields.push(resolve_field(
-            field,
-            &message.fqn,
-            syntax,
-            file_features,
-            types_by_fqn,
-        )?);
-    }
-    message
-        .fields
-        .set(fields)
-        .map_err(|_| Error::Codegen(format!("fields set twice for `{fqn}`")))?;
-
-    for nested in &desc.nested_messages {
-        fill_message_fields(nested, &fqn, syntax, file_features, types_by_fqn)?;
-    }
-    Ok(())
-}
-
-fn resolve_field<'a>(
-    field: &FieldDesc,
-    owner_fqn: &ProtoFqn,
-    syntax: Syntax,
-    file_features: FeatureSet,
-    types_by_fqn: &HashMap<ProtoFqn, TypeItem<'a>>,
-) -> Result<Field<'a>> {
-    if field.type_ == FieldType::Group {
-        return Err(Error::Codegen(format!(
-            "field `{owner_fqn}.{}`: deprecated group fields are not supported",
-            field.name
-        )));
-    }
-
-    let editions_features = match syntax {
-        Syntax::Editions(edition) => {
-            field
-                .features
-                .reject_unimplemented_overrides(&format!("field `{owner_fqn}.{}`", field.name));
-            Some(
-                FeatureSet::defaults_for_edition(edition)
-                    .overlay(&file_features)
-                    .overlay(&field.features),
-            )
-        }
-        Syntax::Proto2 | Syntax::Proto3 => None,
-    };
-
-    if matches!(field.type_, FieldType::Message)
-        && editions_features
-            .map(|f| f.message_encoding == Some(MessageEncoding::Delimited))
-            .unwrap_or(false)
-    {
-        return Err(Error::Codegen(format!(
-            "field `{owner_fqn}.{}`: features.message_encoding=DELIMITED is not supported",
-            field.name
-        )));
-    }
-
-    let type_ref = match field.type_ {
-        FieldType::Message => {
-            let type_name = field.type_name.as_ref().ok_or_else(|| {
-                Error::Codegen(format!(
-                    "field `{owner_fqn}.{}` has message type but no type_name",
-                    field.name
-                ))
-            })?;
-            let target = lookup_message(type_name, types_by_fqn).ok_or_else(|| {
-                Error::Codegen(format!(
-                    "field `{owner_fqn}.{}` references unknown message type `{type_name}`",
-                    field.name
-                ))
-            })?;
-            TypeRef::Message(target)
-        }
-        FieldType::Enum => {
-            let type_name = field.type_name.as_ref().ok_or_else(|| {
-                Error::Codegen(format!(
-                    "field `{owner_fqn}.{}` has enum type but no type_name",
-                    field.name
-                ))
-            })?;
-            let target = lookup_enum(type_name, types_by_fqn).ok_or_else(|| {
-                Error::Codegen(format!(
-                    "field `{owner_fqn}.{}` references unknown enum type `{type_name}`",
-                    field.name
-                ))
-            })?;
-            TypeRef::Enum(target)
-        }
-        FieldType::Group => unreachable!("rejected above"),
-        scalar => TypeRef::from_scalar(scalar).ok_or_else(|| {
-            Error::Codegen(format!(
-                "field `{owner_fqn}.{}` has unexpected type {:?}",
-                field.name, scalar
-            ))
-        })?,
-    };
-
-    let occurrence = resolve_occurrence(field, syntax, editions_features.as_ref(), &type_ref);
-    Ok(Field {
-        name: field.name.clone(),
-        number: field.number,
-        occurrence,
-        type_ref,
-        oneof_index: field.oneof_index,
-        default_value: field.default_value.clone(),
-        utf8_validation: resolve_utf8_validation(field, syntax, editions_features.as_ref()),
-        string_layout: field.string_layout,
-        bytes_layout: field.bytes_layout,
-    })
 }
 
 fn resolve_occurrence(
@@ -453,26 +427,6 @@ fn resolve_utf8_validation(
             .expect("edition defaults always set utf8_validation"),
         Syntax::Proto2 | Syntax::Proto3 => Utf8Validation::Verify,
     })
-}
-
-fn lookup_message<'a>(
-    type_name: &ProtoFqn,
-    types_by_fqn: &HashMap<ProtoFqn, TypeItem<'a>>,
-) -> Option<&'a Message<'a>> {
-    match types_by_fqn.get(type_name)? {
-        TypeItem::Message(m) => Some(*m),
-        TypeItem::Enum(_) => None,
-    }
-}
-
-fn lookup_enum<'a>(
-    type_name: &ProtoFqn,
-    types_by_fqn: &HashMap<ProtoFqn, TypeItem<'a>>,
-) -> Option<&'a Enum<'a>> {
-    match types_by_fqn.get(type_name)? {
-        TypeItem::Enum(e) => Some(*e),
-        TypeItem::Message(_) => None,
-    }
 }
 
 #[cfg(test)]

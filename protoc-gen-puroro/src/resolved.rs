@@ -4,8 +4,9 @@
 //! references tied to that arena's lifetime.
 //!
 //! Nested messages/enums are ordinary [`Vec`]s built while walking the descriptor
-//! tree (each node once). Field [`TypeRef`]s may form cycles, so they are filled
-//! in a second resolve pass; that storage detail is not part of the public API.
+//! tree (each node once). Field [`TypeRef`]s may form cycles, so registration
+//! queues each message and a later link pass writes fields; that storage detail
+//! is not part of the public API.
 //!
 //! Plugin metadata ([`crate::descriptor::CodegenMeta`]) is intentionally **not**
 //! stored here — pass it alongside `&FileSet` by reference.
@@ -73,7 +74,7 @@ pub struct Message<'a> {
     /// Enclosing message, if nested. Set once after this node is allocated
     /// (children are built first so `nested_*` can be plain [`Vec`]s).
     parent: OnceCell<&'a Message<'a>>,
-    /// Filled in resolve pass 2 (may reference peer / mutually recursive types).
+    /// Filled in the link pass (may reference peer / mutually recursive types).
     fields: OnceCell<Vec<Field<'a>>>,
     nested_messages: Vec<&'a Message<'a>>,
     nested_enums: Vec<&'a Enum<'a>>,
