@@ -1,7 +1,7 @@
 //! Same-file peer message field (`Task.assignee: Address`).
 
 use crate::message_peer::demo::{Address, Task};
-use ::puroro::Message;
+use ::puroro::{Message, StringMut};
 
 #[test]
 fn assignee_starts_unset() {

@@ -1,7 +1,7 @@
 //! proto2 `required` → `LegacyRequired` / `Message::validate`.
 
 use crate::proto2_required::RequiredOwner;
-use ::puroro::{DecodeError, Message};
+use ::puroro::{DecodeError, Message, StringMut};
 
 #[test]
 fn unset_fails_validate() {

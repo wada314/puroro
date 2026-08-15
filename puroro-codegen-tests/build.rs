@@ -31,6 +31,11 @@ fn main() {
     println!("cargo:rerun-if-env-changed=PROTOC");
     println!("cargo:rerun-if-env-changed=PROTOC_GEN_PURORO");
 
+    let extra_includes = extra_proto_include_dirs(&manifest_dir);
+    for dir in &extra_includes {
+        println!("cargo:rerun-if-changed={}", dir.display());
+    }
+
     let protoc = resolve_protoc();
     let plugin = resolve_plugin_bin();
 
@@ -53,7 +58,7 @@ fn main() {
         }
         fs::create_dir_all(&case_out).expect("create case out dir");
 
-        run_protoc(&protoc, &plugin, case, &case_out);
+        run_protoc(&protoc, &plugin, case, &case_out, &extra_includes);
 
         let rs_path = find_single_generated_rs(&case_out, &case.module);
         let gen_path = rs_path.to_str().expect("OUT_DIR path must be UTF-8");
@@ -111,11 +116,38 @@ fn resolve_plugin_bin() -> PathBuf {
     path
 }
 
-fn run_protoc(protoc: &Path, plugin: &Path, case: &FixtureCase, case_out: &Path) {
+fn extra_proto_include_dirs(manifest_dir: &Path) -> Vec<PathBuf> {
+    let workspace_root = manifest_dir
+        .parent()
+        .expect("puroro-codegen-tests is a workspace member");
+    let mut dirs = vec![workspace_root.join("proto")];
+    let system_wkt = PathBuf::from("/usr/include");
+    if system_wkt
+        .join("google/protobuf/descriptor.proto")
+        .is_file()
+    {
+        dirs.push(system_wkt);
+    } else {
+        // Vendored well-known types used by the official_plugin fixture.
+        dirs.push(manifest_dir.join("fixtures/official_plugin"));
+    }
+    dirs
+}
+
+fn run_protoc(
+    protoc: &Path,
+    plugin: &Path,
+    case: &FixtureCase,
+    case_out: &Path,
+    extra_includes: &[PathBuf],
+) {
     let mut cmd = Command::new(protoc);
     cmd.arg(format!("--plugin=protoc-gen-puroro={}", plugin.display()))
         .arg(format!("--puroro_out={}", case_out.display()))
         .arg(format!("-I{}", case.dir.display()));
+    for dir in extra_includes {
+        cmd.arg(format!("-I{}", dir.display()));
+    }
     for proto in &case.proto_paths {
         let rel = proto.strip_prefix(&case.dir).unwrap_or(proto);
         cmd.arg(rel);

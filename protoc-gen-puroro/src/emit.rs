@@ -175,7 +175,7 @@ mod tests {
     use crate::descriptor::features::{EnumType, Utf8Validation};
     use crate::descriptor::{
         CodegenMeta, CodegenRequest, Edition, EnumDesc, EnumValueDesc, FeatureSet, FieldDesc,
-        FieldLabel, FieldType, MessageDesc, OneofDesc, ProtoFile, ProtoFqn, Syntax,
+        FieldLabel, FieldType, MessageDesc, OneofDesc, ProtoFile, ProtoFqn, StringLayout, Syntax,
     };
 
     fn empty_request(message_name: &str) -> CodegenRequest {
@@ -255,6 +255,7 @@ mod tests {
                 proto3_optional: false,
                 default_value: None,
                 packed: None,
+                string_layout: None,
                 features: FeatureSet::default(),
             },
             FieldDesc {
@@ -267,6 +268,7 @@ mod tests {
                 proto3_optional: true,
                 default_value: None,
                 packed: None,
+                string_layout: None,
                 features: FeatureSet::default(),
             },
             FieldDesc {
@@ -279,6 +281,7 @@ mod tests {
                 proto3_optional: false,
                 default_value: None,
                 packed: None,
+                string_layout: None,
                 features: FeatureSet::default(),
             },
             FieldDesc {
@@ -291,6 +294,7 @@ mod tests {
                 proto3_optional: true,
                 default_value: None,
                 packed: None,
+                string_layout: None,
                 features: FeatureSet::default(),
             },
             FieldDesc {
@@ -303,6 +307,7 @@ mod tests {
                 proto3_optional: false,
                 default_value: None,
                 packed: None,
+                string_layout: None,
                 features: FeatureSet::default(),
             },
         ];
@@ -314,6 +319,39 @@ mod tests {
         assert!(content.contains("ProtoBytes"));
         assert!(content.contains("ProtoSInt32"));
         assert!(content.contains("BitPacked"));
+    }
+
+    #[test]
+    fn emit_string_layout_heap_uses_inline_not_sso() {
+        let mut request = empty_request("HeapString");
+        request.meta.file_to_generate = vec!["t.proto".into()];
+        request.proto_files[0].name = "t.proto".into();
+        request.proto_files[0].messages[0].name = "HeapString".into();
+        request.proto_files[0].messages[0].fields = vec![FieldDesc {
+            name: "body".into(),
+            number: 1,
+            label: FieldLabel::Optional,
+            type_: FieldType::String,
+            type_name: None,
+            oneof_index: None,
+            proto3_optional: true,
+            default_value: None,
+            packed: None,
+            string_layout: Some(StringLayout::Heap),
+            features: FeatureSet::default(),
+        }];
+        let response = emit(&request).unwrap();
+        let content = &response.files[0].content;
+        assert!(content.contains("ProtoString"));
+        assert!(
+            !content.contains("InlineOrHeap"),
+            "string_layout=HEAP must not emit SSO layout: {content}"
+        );
+        assert!(
+            !content.contains("BIT_BODY_SSO"),
+            "string_layout=HEAP must not allocate an SSO bit: {content}"
+        );
+        assert!(content.contains("impl ::core::ops::DerefMut<Target = ::puroro::String<A>>"));
     }
 
     #[test]
@@ -341,6 +379,7 @@ mod tests {
                         proto3_optional: false,
                         default_value: None,
                         packed: None,
+                        string_layout: None,
                         features: FeatureSet::default(),
                     }],
                     nested_messages: vec![],
@@ -459,6 +498,7 @@ mod tests {
                                 proto3_optional: false,
                                 default_value: None,
                                 packed: None,
+                                string_layout: None,
                                 features: FeatureSet::default(),
                             },
                             FieldDesc {
@@ -471,6 +511,7 @@ mod tests {
                                 proto3_optional: false,
                                 default_value: None,
                                 packed: None,
+                                string_layout: None,
                                 features: FeatureSet::default(),
                             },
                         ],
@@ -522,6 +563,7 @@ mod tests {
                             proto3_optional: false,
                             default_value: None,
                             packed: None,
+                            string_layout: None,
                             features: FeatureSet::default(),
                         },
                         FieldDesc {
@@ -534,6 +576,7 @@ mod tests {
                             proto3_optional: false,
                             default_value: None,
                             packed: None,
+                            string_layout: None,
                             features: FeatureSet::default(),
                         },
                         FieldDesc {
@@ -546,6 +589,7 @@ mod tests {
                             proto3_optional: false,
                             default_value: None,
                             packed: None,
+                            string_layout: None,
                             features: FeatureSet::default(),
                         },
                     ],
@@ -614,6 +658,7 @@ mod tests {
             proto3_optional: false,
             default_value: None,
             packed: None,
+            string_layout: None,
             features: FeatureSet::default(),
         });
         let err = emit(&request).unwrap_err();
@@ -701,6 +746,7 @@ mod tests {
                             proto3_optional: false,
                             default_value: None,
                             packed: None,
+                            string_layout: None,
                             features: FeatureSet::default(),
                         }],
                         nested_messages: vec![],
@@ -779,6 +825,7 @@ mod tests {
                                 proto3_optional: false,
                                 default_value: None,
                                 packed: None,
+                                string_layout: None,
                                 features: FeatureSet::default(),
                             },
                             FieldDesc {
@@ -791,6 +838,7 @@ mod tests {
                                 proto3_optional: false,
                                 default_value: None,
                                 packed: None,
+                                string_layout: None,
                                 features: FeatureSet::default(),
                             },
                             FieldDesc {
@@ -803,6 +851,7 @@ mod tests {
                                 proto3_optional: false,
                                 default_value: None,
                                 packed: None,
+                                string_layout: None,
                                 features: FeatureSet::default(),
                             },
                             FieldDesc {
@@ -815,6 +864,7 @@ mod tests {
                                 proto3_optional: false,
                                 default_value: None,
                                 packed: None,
+                                string_layout: None,
                                 features: FeatureSet::default(),
                             },
                         ],
@@ -866,6 +916,7 @@ mod tests {
                         proto3_optional: false,
                         default_value: None,
                         packed: None,
+                        string_layout: None,
                         features: FeatureSet::default(),
                     }],
                     nested_messages: vec![MessageDesc {
@@ -881,6 +932,7 @@ mod tests {
                                 proto3_optional: false,
                                 default_value: None,
                                 packed: None,
+                                string_layout: None,
                                 features: FeatureSet::default(),
                             },
                             FieldDesc {
@@ -893,6 +945,7 @@ mod tests {
                                 proto3_optional: false,
                                 default_value: None,
                                 packed: None,
+                                string_layout: None,
                                 features: FeatureSet::default(),
                             },
                         ],
@@ -950,6 +1003,7 @@ mod tests {
                         proto3_optional: false,
                         default_value: None,
                         packed: None,
+                        string_layout: None,
                         features: FeatureSet::default(),
                     }],
                     nested_messages: vec![MessageDesc {
@@ -965,6 +1019,7 @@ mod tests {
                                 proto3_optional: false,
                                 default_value: None,
                                 packed: None,
+                                string_layout: None,
                                 features: FeatureSet::default(),
                             },
                             FieldDesc {
@@ -977,6 +1032,7 @@ mod tests {
                                 proto3_optional: false,
                                 default_value: None,
                                 packed: None,
+                                string_layout: None,
                                 features: FeatureSet::default(),
                             },
                         ],
@@ -1032,6 +1088,7 @@ mod tests {
                         proto3_optional: false,
                         default_value: None,
                         packed: None,
+                        string_layout: None,
                         features: FeatureSet {
                             utf8_validation: Some(Utf8Validation::None),
                             ..FeatureSet::default()
@@ -1072,6 +1129,7 @@ mod tests {
                 proto3_optional: false,
                 default_value: Some("3".into()),
                 packed: None,
+                string_layout: None,
                 features: FeatureSet::default(),
             },
             FieldDesc {
@@ -1084,6 +1142,7 @@ mod tests {
                 proto3_optional: false,
                 default_value: Some("0".into()),
                 packed: None,
+                string_layout: None,
                 features: FeatureSet::default(),
             },
             FieldDesc {
@@ -1096,6 +1155,7 @@ mod tests {
                 proto3_optional: false,
                 default_value: Some("-1".into()),
                 packed: None,
+                string_layout: None,
                 features: FeatureSet::default(),
             },
             FieldDesc {
@@ -1108,6 +1168,7 @@ mod tests {
                 proto3_optional: false,
                 default_value: None,
                 packed: None,
+                string_layout: None,
                 features: FeatureSet::default(),
             },
         ];

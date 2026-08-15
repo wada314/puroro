@@ -803,7 +803,7 @@ The `set_*` per-variant setters are removed, matching the other field families.
 
 ### 17.2 String / Bytes inline optimisation
 
-**Status (string): done.** Singular `string` (IMPLICIT / EXPLICIT / LEGACY_REQUIRED / oneof) uses [`SsoString`](puroro-rt/src/fields/wire/sso_string.rs) as [`InlineOrHeap`](puroro-rt/src/fields/shared/value_layout.rs)'s `Slot`. `ProtoString` + [`Inline`](puroro-rt/src/fields/shared/value_layout.rs) keeps the heap [`UnmanagedString`](unmanaged/src/string.rs) path via [`PayloadAccess`](puroro-rt/src/fields/wire/singular_type.rs).
+**Status (string): done.** Singular `string` (IMPLICIT / EXPLICIT / LEGACY_REQUIRED / oneof) defaults to [`SsoString`](puroro-rt/src/fields/wire/sso_string.rs) + [`InlineOrHeap`](puroro-rt/src/fields/shared/value_layout.rs). The puroro field option [`(puroro.string_layout)`](proto/puroro/options.proto) (`UNSPECIFIED` / unset) uses that generator default; `SSO` pins SSO; `HEAP` selects heap [`UnmanagedString`](unmanaged/src/string.rs) via `ProtoString` + [`Inline`](puroro-rt/src/fields/shared/value_layout.rs) (`PayloadAccess`). Heap `_mut` is `impl DerefMut<Target = puroro::String<A>>`; SSO `_mut` stays `impl StringMut<A>`. This is independent of C++ `FieldOptions.ctype`.
 
 **Layout.** The slot stays **3 words** (same as [`UnmanagedString`](unmanaged/src/string.rs)):
 

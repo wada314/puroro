@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+import "puroro/options.proto";
+
+// `(puroro.string_layout) = STRING_LAYOUT_HEAP` selects heap `UnmanagedString` (`Inline`).
+message HeapString {
+  optional string body = 1 [(puroro.string_layout) = STRING_LAYOUT_HEAP];
+  optional string title = 2;
+}

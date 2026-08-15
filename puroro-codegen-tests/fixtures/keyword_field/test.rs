@@ -1,7 +1,7 @@
 //! Proto field names that are Rust keywords → raw idents.
 
 use crate::keyword_field::KeywordFields;
-use ::puroro::Message;
+use ::puroro::{Message, StringMut};
 
 #[test]
 fn keyword_accessors_round_trip() {

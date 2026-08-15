@@ -1,7 +1,7 @@
 //! Custom `[default = …]` on singular fields and oneof members (proto2).
 
 use crate::custom_defaults::{Holder, Kind};
-use ::puroro::{Message, OneofView};
+use ::puroro::{Message, OneofView, StringMut};
 
 #[test]
 fn singular_custom_defaults_when_unset() {

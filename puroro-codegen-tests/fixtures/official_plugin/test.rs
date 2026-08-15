@@ -13,7 +13,7 @@ use crate::official_plugin::google::protobuf::field_descriptor_proto::{Label, Ty
 use crate::official_plugin::google::protobuf::{
     DescriptorProto, FieldDescriptorProto, FileDescriptorProto,
 };
-use ::puroro::Message;
+use ::puroro::{Message, StringMut};
 
 #[test]
 fn constructs_core_types() {

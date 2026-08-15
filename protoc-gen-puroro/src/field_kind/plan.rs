@@ -5,6 +5,7 @@ use super::{
     field_number_const, value_bit_const,
 };
 use crate::default_value::interpret_custom_default;
+use crate::descriptor::StringLayout;
 use crate::error::{Error, Result};
 use crate::resolved::{Field, FieldOccurrence, Message, SingularPresence, TypeRef};
 use ::std::collections::HashMap;
@@ -239,7 +240,8 @@ fn plan_field<'a>(field: &'a Field<'a>, next_bit: &mut usize) -> Result<PlannedF
                     value_bit,
                     bit_const: value_bit_const(field.name()),
                 }
-            } else if wire.is_string() {
+            } else if wire.is_string() && !field.string_layout().is_some_and(StringLayout::is_heap)
+            {
                 let heap_bit = *next_bit;
                 *next_bit += 1;
                 CatalogLayout::InlineOrHeap {
@@ -365,7 +367,7 @@ mod tests {
     };
     use crate::descriptor::{
         Edition, FieldDesc, FieldLabel, FieldType, MessageDesc, OneofDesc, ProtoFile, ProtoFqn,
-        Syntax,
+        StringLayout, Syntax,
     };
     use crate::field_kind::{CatalogLayout, CatalogPresence, presence_byte_len};
     use crate::resolved::{Arena, resolve};
@@ -401,6 +403,7 @@ mod tests {
             proto3_optional,
             default_value: None,
             packed: None,
+            string_layout: None,
             features: FeatureSet::default(),
         }
     }
@@ -521,6 +524,82 @@ mod tests {
                 custom_default: None,
             } => assert_eq!(bit_const, "BIT_POSTAL_CODE"),
             other => panic!("unexpected kind: {other:?}"),
+        }
+    }
+
+    #[test]
+    fn string_layout_unspecified_uses_sso_default() {
+        let arena = Arena::new();
+        let mut body = field(
+            "body",
+            1,
+            FieldType::String,
+            FieldLabel::Optional,
+            true,
+            None,
+            None,
+        );
+        body.string_layout = Some(StringLayout::Unspecified);
+        let files = [proto3_file(vec![MessageDesc {
+            name: "M".into(),
+            fields: vec![body],
+            nested_messages: vec![],
+            nested_enums: vec![],
+            oneofs: vec![],
+            map_entry: false,
+        }])];
+        let set = resolve(&arena, &files).unwrap();
+        let msg = set.lookup(".example.M").unwrap().as_message().unwrap();
+        let plan = plan_message(msg).unwrap();
+        // Presence + SSO heap bit — same as an absent option.
+        assert_eq!(plan.bit_count(), 2);
+        let MessageMember::Field(body) = &plan.members()[0] else {
+            panic!("expected field");
+        };
+        match body.kind() {
+            FieldKind::Singular {
+                layout: CatalogLayout::InlineOrHeap { heap_bit: 1, .. },
+                ..
+            } => {}
+            other => panic!("expected SSO InlineOrHeap, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn string_layout_heap_uses_inline_heap_layout() {
+        let arena = Arena::new();
+        let mut body = field(
+            "body",
+            1,
+            FieldType::String,
+            FieldLabel::Optional,
+            true,
+            None,
+            None,
+        );
+        body.string_layout = Some(StringLayout::Heap);
+        let files = [proto3_file(vec![MessageDesc {
+            name: "M".into(),
+            fields: vec![body],
+            nested_messages: vec![],
+            nested_enums: vec![],
+            oneofs: vec![],
+            map_entry: false,
+        }])];
+        let set = resolve(&arena, &files).unwrap();
+        let msg = set.lookup(".example.M").unwrap().as_message().unwrap();
+        let plan = plan_message(msg).unwrap();
+        // Presence bit only — no SSO heap bit.
+        assert_eq!(plan.bit_count(), 1);
+        let MessageMember::Field(body) = &plan.members()[0] else {
+            panic!("expected field");
+        };
+        match body.kind() {
+            FieldKind::Singular {
+                layout: CatalogLayout::Inline,
+                ..
+            } => {}
+            other => panic!("expected Inline heap string, got {other:?}"),
         }
     }
 
@@ -760,6 +839,7 @@ mod tests {
                         proto3_optional: false,
                         default_value: None,
                         packed: None,
+                        string_layout: None,
                         features: FeatureSet {
                             repeated_field_encoding: Some(RepeatedFieldEncoding::Expanded),
                             ..FeatureSet::default()
@@ -775,6 +855,7 @@ mod tests {
                         proto3_optional: false,
                         default_value: None,
                         packed: None,
+                        string_layout: None,
                         features: FeatureSet {
                             utf8_validation: Some(Utf8Validation::None),
                             ..FeatureSet::default()
@@ -790,6 +871,7 @@ mod tests {
                         proto3_optional: false,
                         default_value: None,
                         packed: None,
+                        string_layout: None,
                         features: FeatureSet::default(),
                     },
                 ],

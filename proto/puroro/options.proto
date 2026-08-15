@@ -1,0 +1,21 @@
+syntax = "proto2";
+
+package puroro;
+
+import "google/protobuf/descriptor.proto";
+
+// Layout of a singular `string` field in generated Rust.
+//
+// Unset and `STRING_LAYOUT_UNSPECIFIED` let the generator pick the default
+// (currently SSO / `InlineOrHeap`). `STRING_LAYOUT_SSO` and
+// `STRING_LAYOUT_HEAP` pin the layout. Non-`string` fields ignore this option.
+enum StringLayout {
+  STRING_LAYOUT_UNSPECIFIED = 0;
+  STRING_LAYOUT_SSO = 1;
+  STRING_LAYOUT_HEAP = 2;
+}
+
+extend google.protobuf.FieldOptions {
+  // Custom-option numbers 50000–99999 are for internal use.
+  optional StringLayout string_layout = 51400;
+}

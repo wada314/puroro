@@ -102,6 +102,8 @@ pub struct FieldDesc {
     pub default_value: Option<String>,
     /// proto2/proto3 `FieldOptions.packed` (editions uses `features.repeated_field_encoding`).
     pub packed: Option<bool>,
+    /// `(puroro.string_layout)`, if set. Singular `string` uses this to pick SSO vs heap.
+    pub string_layout: Option<StringLayout>,
     /// Field-level `options.features` (`FeatureSet`), if any fields were set.
     pub features: FeatureSet,
 }
@@ -135,6 +137,40 @@ pub enum FieldType {
     SFixed64 = 16,
     SInt32 = 17,
     SInt64 = 18,
+}
+
+/// Field number of `(puroro.string_layout)` on `google.protobuf.FieldOptions`.
+///
+/// Matches `proto/puroro/options.proto`. Numbers 50000–99999 are the internal
+/// custom-option range.
+pub const STRING_LAYOUT_OPTION_NUMBER: u32 = 51400;
+
+/// `(puroro.string_layout)` — singular `string` value layout in generated Rust.
+///
+/// [`Unspecified`](Self::Unspecified) (and an absent option) uses the generator
+/// default, currently SSO (`InlineOrHeap`). [`Sso`](Self::Sso) and
+/// [`Heap`](Self::Heap) pin the layout (`Inline` + `UnmanagedString` for heap).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum StringLayout {
+    Unspecified = 0,
+    Sso = 1,
+    Heap = 2,
+}
+
+impl StringLayout {
+    pub fn from_i32(value: i32) -> Option<Self> {
+        match value {
+            0 => Some(Self::Unspecified),
+            1 => Some(Self::Sso),
+            2 => Some(Self::Heap),
+            _ => None,
+        }
+    }
+
+    /// `true` when this layout opts a singular string out of SSO.
+    pub fn is_heap(self) -> bool {
+        matches!(self, Self::Heap)
+    }
 }
 
 /// A oneof declaration (`OneofDescriptorProto` subset).

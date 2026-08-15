@@ -2,7 +2,7 @@
 
 use crate::deep_nesting::demo::l1::l2::L3;
 use crate::deep_nesting::demo::L1;
-use ::puroro::Message;
+use ::puroro::{Message, StringMut};
 
 #[test]
 fn nested_path_round_trip() {

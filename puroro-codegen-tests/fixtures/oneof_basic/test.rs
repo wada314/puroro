@@ -2,7 +2,7 @@
 
 use crate::oneof_basic::holder::{Alt, AltCase, Choice, ChoiceCase};
 use crate::oneof_basic::{Holder, Kind, Peer};
-use ::puroro::{Message, OneofView, OneofViewMut};
+use ::puroro::{Message, OneofView, OneofViewMut, StringMut};
 
 #[test]
 fn unset_encodes_empty() {

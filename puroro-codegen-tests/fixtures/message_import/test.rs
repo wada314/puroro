@@ -1,7 +1,7 @@
 //! Cross-file message import (`task.proto` → `address.proto`).
 
 use crate::message_import::demo::{Address, Task};
-use ::puroro::Message;
+use ::puroro::{Message, StringMut};
 
 #[test]
 fn imported_address_round_trip() {

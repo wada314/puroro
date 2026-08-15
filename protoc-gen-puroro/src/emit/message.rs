@@ -95,13 +95,13 @@ enum RepeatedAccessorStyle {
 pub(super) enum SingularMutStyle {
     /// `impl DerefMut<Target = …>` using [`ScalarEmit::mut_target`] / variant `mut_target`.
     DerefMut,
-    /// `impl ::puroro::StringMut<A>` (hides `puroro-rt` SSO mutator).
+    /// `impl ::puroro::StringMut<A>` (SSO layout; hides `puroro-rt` mutator).
     SsoString,
 }
 
 impl SingularMutStyle {
-    pub(super) fn from_wire(wire: &WireTypeKind<'_>) -> Self {
-        if wire.is_string() {
+    pub(super) fn from_layout(wire: &WireTypeKind<'_>, layout: &CatalogLayout) -> Self {
+        if wire.is_string() && matches!(layout, CatalogLayout::InlineOrHeap { .. }) {
             Self::SsoString
         } else {
             Self::DerefMut
@@ -594,7 +594,7 @@ fn oneof_variant_emit(field: &PlannedField<'_>, index: usize) -> Result<OneofVar
 
     let is_message = matches!(wire, WireTypeKind::Message(_));
     let is_bool = matches!(wire, WireTypeKind::Bool);
-    let mut_style = SingularMutStyle::from_wire(wire);
+    let mut_style = SingularMutStyle::from_layout(wire, layout);
     let variant_pascal = to_pascal_case(field.name());
     Ok(OneofVariantEmit {
         name: rust_ident(field.name()),
@@ -829,7 +829,7 @@ fn scalar_emit(
             Some(custom) => Some((custom.clone(), defaults::render_marker_item(custom, wire)?)),
             None => None,
         },
-        mut_style: SingularMutStyle::from_wire(wire),
+        mut_style: SingularMutStyle::from_layout(wire, layout),
     })
 }
 

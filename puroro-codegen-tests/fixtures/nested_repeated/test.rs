@@ -2,7 +2,7 @@
 
 use crate::nested_repeated::demo::outer::{Inner, Kind};
 use crate::nested_repeated::demo::Outer;
-use ::puroro::Message;
+use ::puroro::{Message, StringMut};
 
 #[test]
 fn defaults() {
