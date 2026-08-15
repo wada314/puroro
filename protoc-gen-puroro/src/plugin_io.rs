@@ -114,10 +114,7 @@ pub fn decode_request(bytes: &[u8]) -> Result<CodegenRequest> {
                 2 => parameter = Some(expect_string(&field)?),
                 // optional Version compiler_version = 3; (ignored)
                 // repeated FileDescriptorProto proto_file = 15;
-                15 => {
-                    let nested = expect_len(&field)?;
-                    proto_files.push(decode_file_descriptor(nested)?);
-                }
+                15 => proto_files.push(decode_file_descriptor(expect_len(&field)?)?),
                 // repeated FileDescriptorProto source_file_descriptors = 17; (ignored)
                 _ => {}
             }
@@ -154,20 +151,11 @@ fn decode_file_descriptor(bytes: &[u8]) -> Result<ProtoFile> {
                 // repeated string dependency = 3;
                 3 => dependency.push(expect_string(&field)?),
                 // repeated DescriptorProto message_type = 4;
-                4 => {
-                    let nested = expect_len(&field)?;
-                    messages.push(decode_descriptor(nested)?);
-                }
+                4 => messages.push(decode_descriptor(expect_len(&field)?)?),
                 // repeated EnumDescriptorProto enum_type = 5;
-                5 => {
-                    let nested = expect_len(&field)?;
-                    enums.push(decode_enum(nested)?);
-                }
+                5 => enums.push(decode_enum(expect_len(&field)?)?),
                 // optional FileOptions options = 8;
-                8 => {
-                    let nested = expect_len(&field)?;
-                    features = decode_options_features("FileOptions", 50, nested)?;
-                }
+                8 => features = decode_options_features("FileOptions", 50, expect_len(&field)?)?,
                 // optional string syntax = 12;
                 12 => syntax_raw = Some(expect_string(&field)?),
                 // optional Edition edition = 14;
@@ -226,30 +214,15 @@ fn decode_descriptor(bytes: &[u8]) -> Result<MessageDesc> {
                 // optional string name = 1;
                 1 => name = expect_string(&field)?,
                 // repeated FieldDescriptorProto field = 2;
-                2 => {
-                    let nested = expect_len(&field)?;
-                    fields.push(decode_field(nested)?);
-                }
+                2 => fields.push(decode_field(expect_len(&field)?)?),
                 // repeated DescriptorProto nested_type = 3;
-                3 => {
-                    let nested = expect_len(&field)?;
-                    nested_messages.push(decode_descriptor(nested)?);
-                }
+                3 => nested_messages.push(decode_descriptor(expect_len(&field)?)?),
                 // repeated EnumDescriptorProto enum_type = 4;
-                4 => {
-                    let nested = expect_len(&field)?;
-                    nested_enums.push(decode_enum(nested)?);
-                }
+                4 => nested_enums.push(decode_enum(expect_len(&field)?)?),
                 // optional MessageOptions options = 7;
-                7 => {
-                    let nested = expect_len(&field)?;
-                    map_entry = decode_message_options_map_entry(nested)?;
-                }
+                7 => map_entry = decode_message_options_map_entry(expect_len(&field)?)?,
                 // repeated OneofDescriptorProto oneof_decl = 8;
-                8 => {
-                    let nested = expect_len(&field)?;
-                    oneofs.push(decode_oneof(nested)?);
-                }
+                8 => oneofs.push(decode_oneof(expect_len(&field)?)?),
                 _ => {}
             }
         }
@@ -312,8 +285,7 @@ fn decode_field(bytes: &[u8]) -> Result<FieldDesc> {
                 7 => default_value = Some(expect_string(&field)?),
                 // optional FieldOptions options = 8;
                 8 => {
-                    let nested = expect_len(&field)?;
-                    let decoded = decode_field_options(nested)?;
+                    let decoded = decode_field_options(expect_len(&field)?)?;
                     features = decoded.features;
                     packed = decoded.packed;
                     string_layout = decoded.string_layout;
@@ -359,8 +331,7 @@ fn decode_options_features(
         for field in AsRefExtProtobuf::read_protobuf_fields(&bytes) {
             let field = field?;
             if field.field_number.as_u32() == features_field {
-                let nested = expect_len(&field)?;
-                features = decode_feature_set(nested)?;
+                features = decode_feature_set(expect_len(&field)?)?;
             }
         }
         Ok(features)
@@ -387,10 +358,7 @@ fn decode_field_options(bytes: &[u8]) -> Result<DecodedFieldOptions> {
                 // optional bool packed = 2;
                 2 => packed = Some(expect_bool(&field)?),
                 // optional FeatureSet features = 21;
-                21 => {
-                    let nested = expect_len(&field)?;
-                    features = decode_feature_set(nested)?;
-                }
+                21 => features = decode_feature_set(expect_len(&field)?)?,
                 // extend FieldOptions { optional StringLayout string_layout = 51400; }
                 STRING_LAYOUT_OPTION_NUMBER => {
                     string_layout = Some(expect_enum(&field)?);
@@ -466,15 +434,9 @@ fn decode_enum(bytes: &[u8]) -> Result<EnumDesc> {
                 // optional string name = 1;
                 1 => name = expect_string(&field)?,
                 // repeated EnumValueDescriptorProto value = 2;
-                2 => {
-                    let nested = expect_len(&field)?;
-                    values.push(decode_enum_value(nested)?);
-                }
+                2 => values.push(decode_enum_value(expect_len(&field)?)?),
                 // optional EnumOptions options = 3;
-                3 => {
-                    let nested = expect_len(&field)?;
-                    features = decode_options_features("EnumOptions", 7, nested)?;
-                }
+                3 => features = decode_options_features("EnumOptions", 7, expect_len(&field)?)?,
                 _ => {}
             }
         }
