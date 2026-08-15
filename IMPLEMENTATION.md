@@ -170,6 +170,9 @@ Live plugin emits the eager-path field families shown by [`sample-generated/`](s
 | [`wire/proto_message.rs`](puroro-rt/src/fields/wire/proto_message.rs) | `ProtoMessage` (nested message marker) |
 | [`wire/numerical.rs`](puroro-rt/src/fields/wire/numerical.rs) | `Numerical<C>`, `NumericalType` codecs, `ProtoInt32` / … / fixed / `ProtoEnum` + enum kind traits |
 | [`wire/len.rs`](puroro-rt/src/fields/wire/len.rs) | `LenScalar<C>`, `LenCodec`, `ProtoString`, `ProtoBytes` |
+| [`wire/sso_buf.rs`](puroro-rt/src/fields/wire/sso_buf.rs) | Shared 3-word untagged SSO union (`SsoBuf`) |
+| [`wire/sso_string.rs`](puroro-rt/src/fields/wire/sso_string.rs) | `SsoString` / `SsoStringMut` |
+| [`wire/sso_bytes.rs`](puroro-rt/src/fields/wire/sso_bytes.rs) | `SsoBytes` / `SsoBytesMut` |
 | [`singular.rs`](puroro-rt/src/fields/singular.rs) | Singular field re-exports |
 | [`singular/field.rs`](puroro-rt/src/fields/singular/field.rs) | `SingularField` — `T: SingularType`, stores `L::Slot` |
 | [`repeated.rs`](puroro-rt/src/fields/repeated.rs) | Repeated field re-exports |
@@ -403,7 +406,7 @@ Full singular signature: `SingularField<T, P, FIELD, A, L = Inline, D = ProtoDef
 ```rust
 pub struct Task<A: Allocator + Clone = Global> {
     _common: MessageCommon<BitArray<[u8; 2], Lsb0>, A>,
-    title: SingularField<ProtoString, Explicit<{ BIT_TITLE }>, { FIELD_TITLE }, A>,
+    title: SingularField<ProtoString, Explicit<{ BIT_TITLE }>, { FIELD_TITLE }, A, InlineOrHeap<{ BIT_TITLE_SSO }>>,
     score: SingularField<ProtoInt32, Implicit, { FIELD_SCORE }, A>,
     max_retries: SingularField<
         ProtoInt32,
@@ -413,7 +416,7 @@ pub struct Task<A: Allocator + Clone = Global> {
         Inline,
         MaxRetriesDefault,
     >,
-    owner_id: SingularField<ProtoString, LegacyRequired<{ BIT_OWNER_ID }>, { FIELD_OWNER_ID }, A>,
+    owner_id: SingularField<ProtoString, LegacyRequired<{ BIT_OWNER_ID }>, { FIELD_OWNER_ID }, A, InlineOrHeap<{ BIT_OWNER_ID_SSO }>>,
     payload: SingularField<ProtoBytes, Explicit<{ BIT_PAYLOAD }>, { FIELD_PAYLOAD }, A, InlineOrHeap<{ BIT_PAYLOAD_SSO }>>,
     tag_ids: RepeatedField<ProtoInt32, Packed, { FIELD_TAG_IDS }, A>,
     scores: RepeatedField<ProtoInt32, Expanded, { FIELD_SCORES }, A>,
@@ -546,14 +549,16 @@ Gaps in field numbers do not create gaps in bit indices. Oneof non-bool variants
 | `flag` | 17 | EXPLICIT bool value | `12` (`BIT_FLAG_VALUE`) |
 | `urgent` | 18 | oneof bool value | `13` (`BIT_URGENT_VALUE`) |
 
-### `Address` — four bits → `BitArray<[u8; 1], Lsb0>`
+### `Address` — six bits → `BitArray<[u8; 1], Lsb0>`
 
-| Field | # | `BIT_*` |
-|---|---|---|
-| `street` | 1 | `0` |
-| `city` | 2 | `1` |
-| `postal_code` | 3 | `2` |
-| `latitude` | 4 | `3` |
+| Field | # | Role | `BIT_*` |
+|---|---|---|---|
+| `street` | 1 | EXPLICIT presence | `0` |
+| `street` | 1 | SSO heap | `1` (`BIT_STREET_SSO`) |
+| `city` | 2 | EXPLICIT presence | `2` |
+| `city` | 2 | SSO heap | `3` (`BIT_CITY_SSO`) |
+| `postal_code` | 3 | EXPLICIT presence | `4` |
+| `latitude` | 4 | EXPLICIT presence | `5` |
 
 Generated code indexes bits only through `MessageCommonBits` / inherent `MessageCommon` helpers (`is_bit_set` / `set_bit` / `bit_mut`), not by reaching into raw `BitArray` APIs from accessors. `N` is `ceil(bit_count / 8)` for the message's assigned bits.
 
@@ -648,7 +653,7 @@ Varint and LEN share [`SingularField`](puroro-rt/src/fields/singular/field.rs), 
 
 Storage is `ManuallyDrop<P::ValueSlot<L::Slot>>` — `T` / `MaybeUninit<T>` (including ZST `ProtoBool`) depending on presence. Heap LEN payloads need an explicit [`FieldDeallocate::deallocate`](puroro-rt/src/fields/shared/field_deallocate.rs)(`&common`) from message / oneof teardown; copy scalars’ / unit-slot `DeallocateIn` is a no-op.
 
-**Mutation goes through a bound view:** `field.bind_mut(&mut common)` yields [`SingularFieldMut`](puroro-rt/src/fields/singular/field.rs). `value_mut` returns `L::Mut` (e.g. `&mut i32`, `SsoStringMut` / heap `StringGuard`, or bitvec `BitRef` for `ProtoBool`).
+**Mutation goes through a bound view:** `field.bind_mut(&mut common)` yields [`SingularFieldMut`](puroro-rt/src/fields/singular/field.rs). `value_mut` returns `L::Mut` (e.g. `&mut i32`, `SsoStringMut` / `SsoBytesMut`, heap `StringGuard` / `VecGuard`, or bitvec `BitRef` for `ProtoBool`).
 **Read accessors also go through a bound view:** `field.bind(&common)` yields [`SingularFieldRef`](puroro-rt/src/fields/singular/field.rs). Generated getters always bind first — even for `IMPLICIT` `value()` which does not consult `common` — so read and write share one shape.
 
 | | IMPLICIT | EXPLICIT / LEGACY_REQUIRED |
