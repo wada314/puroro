@@ -240,9 +240,8 @@ fn plan_field<'a>(field: &'a Field<'a>, next_bit: &mut usize) -> Result<PlannedF
                     value_bit,
                     bit_const: value_bit_const(field.name()),
                 }
-            } else if (wire.is_string()
-                && !field.string_layout().is_some_and(StringLayout::is_heap))
-                || (wire.is_bytes() && !field.bytes_layout().is_some_and(BytesLayout::is_heap))
+            } else if (wire.is_string() && field.string_layout() != Some(StringLayout::Heap))
+                || (wire.is_bytes() && field.bytes_layout() != Some(BytesLayout::Heap))
             {
                 let heap_bit = *next_bit;
                 *next_bit += 1;

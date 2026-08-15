@@ -159,13 +159,6 @@ pub enum StringLayout {
     Heap = 2,
 }
 
-impl StringLayout {
-    /// `true` when this layout opts a singular string out of SSO.
-    pub fn is_heap(self) -> bool {
-        matches!(self, Self::Heap)
-    }
-}
-
 /// Field number of `(puroro.bytes_layout)` on `google.protobuf.FieldOptions`.
 ///
 /// Matches `proto/puroro/options.proto`. Numbers 50000–99999 are the internal
@@ -184,13 +177,6 @@ pub enum BytesLayout {
     Unspecified = 0,
     Sso = 1,
     Heap = 2,
-}
-
-impl BytesLayout {
-    /// `true` when this layout opts a singular bytes field out of SSO.
-    pub fn is_heap(self) -> bool {
-        matches!(self, Self::Heap)
-    }
 }
 
 /// A oneof declaration (`OneofDescriptorProto` subset).
