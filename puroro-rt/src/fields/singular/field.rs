@@ -7,7 +7,7 @@
 //!
 //! Parametrised by protobuf type marker `T: SingularType`, [`FieldPresence`],
 //! proto field number `FIELD`, allocator `A`, value [`ValueLayout`] `L`
-//! (`Inline` or [`BitPacked`] for bool), and compile-time default marker `D`.
+//! (`Inline`, or [`BitPacked`] for packed bool), and compile-time default marker `D`.
 //! Physical storage is `P::ValueSlot<L::Slot>`. Heap payloads are wrapped in
 //! [`ManuallyDrop`] so message / oneof `Drop` can release them through
 //! [`deallocate`](SingularField::deallocate) without an implicit panic from
@@ -711,5 +711,73 @@ where
     #[inline]
     fn fmt_debug(&self, common: &MessageCommon<Pb, A>, f: &mut Formatter<'_>) -> FmtResult {
         T::fmt_option(self.bind(common).get(), f)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::fields::shared::FieldDeallocate;
+    use crate::fields::shared::MessageCommon;
+    use crate::fields::shared::field_presence::{Explicit, Implicit};
+    use crate::fields::shared::value_layout::{BitPacked, Inline};
+    use crate::fields::wire::numerical::ProtoBool;
+    use ::allocator_api2::alloc::Global;
+    use ::bitvec::array::BitArray;
+    use ::bitvec::order::Lsb0;
+    use ::puroro::{ScopedBuf, WireType};
+
+    type Bits1 = BitArray<[u8; 1], Lsb0>;
+
+    #[test]
+    fn proto_bool_inline_implicit_set_and_omit() {
+        let mut common = MessageCommon::new_in(Bits1::ZERO, Global);
+        let mut field = SingularField::<ProtoBool, Implicit, 1, Global, Inline>::new_in(Global);
+        assert_eq!(field.bind(&common).get(), None);
+        *field.bind_mut(&mut common).value_mut() = true;
+        assert_eq!(field.bind(&common).get(), Some(true));
+        field.bind_mut(&mut common).clear();
+        assert_eq!(field.bind(&common).get(), None);
+        field.deallocate(&common);
+        common.deallocate();
+    }
+
+    #[test]
+    fn proto_bool_inline_explicit_can_store_false() {
+        let mut common = MessageCommon::new_in(Bits1::ZERO, Global);
+        let mut field = SingularField::<ProtoBool, Explicit<0>, 1, Global, Inline>::new_in(Global);
+        assert_eq!(field.bind(&common).get(), None);
+        *field.bind_mut(&mut common).value_mut() = false;
+        assert_eq!(field.bind(&common).get(), Some(false));
+        field.deallocate(&common);
+        common.deallocate();
+    }
+
+    #[test]
+    fn proto_bool_inline_merges_varint_true() {
+        let mut common = MessageCommon::new_in(Bits1::ZERO, Global);
+        let mut field = SingularField::<ProtoBool, Implicit, 1, Global, Inline>::new_in(Global);
+        let mut data: &[u8] = &[1];
+        let mut buf = ScopedBuf::new(&mut data);
+        field
+            .bind_mut(&mut common)
+            .merge(WireType::Varint, &mut buf, 0)
+            .expect("merge true");
+        assert_eq!(field.bind(&common).get(), Some(true));
+        field.deallocate(&common);
+        common.deallocate();
+    }
+
+    #[test]
+    fn proto_bool_bitpacked_still_uses_value_bit() {
+        let mut common = MessageCommon::new_in(Bits1::ZERO, Global);
+        let mut field =
+            SingularField::<ProtoBool, Implicit, 1, Global, BitPacked<0>>::new_in(Global);
+        assert_eq!(field.bind(&common).get(), None);
+        *field.bind_mut(&mut common).value_mut() = true;
+        assert!(common.is_bit_set(0));
+        assert_eq!(field.bind(&common).get(), Some(true));
+        field.deallocate(&common);
+        common.deallocate();
     }
 }

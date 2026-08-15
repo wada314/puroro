@@ -245,7 +245,9 @@ where
 
 /// Logical `bool` packed at `VALUE_BIT` in [`MessageCommon`]'s bitvec.
 ///
-/// Used only with [`ProtoBool`]. The field slot remains a ZST for presence/init.
+/// Used only with [`ProtoBool`]. The field slot remains a ZST; the value lives
+/// in bits. [`Inline`](Inline) + [`ProtoBool`] stores a plain `bool` in the slot
+/// instead (same [`PayloadAccess`] path as other numerics).
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
 pub struct BitPacked<const VALUE_BIT: usize>;
 

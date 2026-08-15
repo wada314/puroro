@@ -23,7 +23,8 @@
 //! (`Element` storage). Numerical markers (including `ProtoBool`) share
 //! [`NumericalType`](super::numerical::NumericalType) for `NativeType` ↔ `WireBody`
 //! mapping; inline slot storage stays on [`PayloadAccess`] (`NativeType: AddressableSlot`).
-//! Singular [`ProtoBool`](super::numerical::ProtoBool) uses `BitPacked` (`Slot = ()`).
+//! Singular [`ProtoBool`](super::numerical::ProtoBool) uses `Inline` (`Slot = bool`)
+//! or [`BitPacked`](crate::fields::shared::value_layout::BitPacked) (`Slot = ()`).
 
 use ::allocator_api2::alloc::Allocator;
 use ::core::ops::Deref;
@@ -51,9 +52,10 @@ use super::wire_payload::CopyWirePayload;
 /// can require a proto type without taking a storage layout. Slot / mutator
 /// types are on [`ValueLayout`](crate::fields::shared::value_layout::ValueLayout):
 /// - [`Inline`](crate::fields::shared::value_layout::Inline) + [`PayloadAccess`]:
-///   numerics / enums (`i32` / `E`), heap string (`UnmanagedString`), bytes
-///   (`UnmanagedVec`), nested messages (`UnmanagedBox<M, A>`)
+///   numerics / enums / bool (`i32` / `E` / `bool`), heap string (`UnmanagedString`),
+///   bytes (`UnmanagedVec`), nested messages (`UnmanagedBox<M, A>`)
 /// - [`BitPacked`](crate::fields::shared::value_layout::BitPacked): `()` + bit handle
+///   (packed singular / oneof `bool`)
 /// - [`InlineOrHeap`](crate::fields::shared::value_layout::InlineOrHeap):
 ///   [`SsoString`](super::sso_string::SsoString)
 ///
@@ -65,8 +67,9 @@ pub trait SingularType: EncodeType {}
 /// Public because [`Inline`](crate::fields::shared::value_layout::Inline) aliases
 /// these associated types on the public [`ValueLayout`](crate::ValueLayout)
 /// impl. Not intended for generated code — prefer `ValueLayout::Slot` /
-/// `ValueLayout::Mut`. Not implemented for
-/// [`ProtoBool`](super::numerical::ProtoBool) — use
+/// `ValueLayout::Mut`. [`ProtoBool`](super::numerical::ProtoBool) implements
+/// this for [`Inline`](crate::fields::shared::value_layout::Inline) (`Slot = bool`);
+/// packed singular / oneof bool uses
 /// [`BitPacked`](crate::fields::shared::value_layout::BitPacked) instead.
 pub trait PayloadAccess: SingularType {
     /// Physical value stored in the singular field slot (excluding

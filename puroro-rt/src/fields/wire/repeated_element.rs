@@ -11,9 +11,11 @@
 //! repeated getters. Distinct from [`EncodeType::View`](super::encode_type::EncodeType::View)
 //! (encode / singular getter; numerics are by-value).
 //!
-//! Singular [`ProtoBool`](super::numerical::ProtoBool) uses bit-packed storage;
-//! repeated uses plain `bool` elements via [`NumericalType`](super::numerical::NumericalType)
-//! blankets (no MessageCommon bit).
+//! Singular [`ProtoBool`](super::numerical::ProtoBool) defaults to bit-packed
+//! storage; [`Inline`](crate::fields::shared::value_layout::Inline) stores a
+//! plain `bool` in the slot. Repeated always uses plain `bool` elements via
+//! [`NumericalType`](super::numerical::NumericalType) blankets (no MessageCommon
+//! bit).
 //!
 //! Tagged encode uses [`wire_view`](Self::wire_view) +
 //! [`encode_field`](super::encode_type::encode_field) (not a separate
@@ -140,8 +142,9 @@ pub trait RepeatedVecMut: RepeatedElement {}
 /// How to obtain a mutable element handle for
 /// [`RepeatedContainerMut`](::puroro::RepeatedContainerMut).
 ///
-/// Usually matches singular [`ValueLayout::Mut`](crate::fields::shared::value_layout::ValueLayout::Mut), except [`ProtoBool`] (singular
-/// is bit-packed; repeated stores plain `bool`).
+/// Usually matches singular [`ValueLayout::Mut`](crate::fields::shared::value_layout::ValueLayout::Mut).
+/// Packed singular [`ProtoBool`](super::numerical::ProtoBool) uses a bit handle;
+/// repeated (and inline singular) store plain `bool`.
 pub trait RepeatedElementMut: RepeatedElement {
     /// Target of [`ElementMut`](Self::ElementMut) (`i32`, [`String`](::unmanaged::String), …).
     type MutTarget<A: Allocator + Clone>: ?Sized;

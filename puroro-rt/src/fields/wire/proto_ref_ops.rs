@@ -8,7 +8,7 @@ use ::core::fmt::{Debug, Formatter, Result as FmtResult};
 use ::puroro::Message;
 
 use super::len::{BytesCodec, LenScalar, StringCodec};
-use super::numerical::{Numerical, NumericalType, ProtoBool};
+use super::numerical::{Numerical, NumericalType};
 use super::proto_message::ProtoMessage;
 use super::singular_type::SingularType;
 use crate::fields::shared::value_slot::AddressableSlot;
@@ -45,8 +45,7 @@ pub(crate) trait ProtoRefDebug<A: Allocator + Clone>: SingularType {
     }
 }
 
-// Addressable numerical markers (`Ref = NativeType`): int / fixed / float / enum.
-// `ProtoBool` is separate (native `bool`, bit-packed singular slot).
+// Addressable numerical markers (`Ref = NativeType`): int / fixed / float / bool / enum.
 impl<C, A> ProtoRefEq<A> for Numerical<C>
 where
     C: NumericalType,
@@ -70,26 +69,6 @@ where
 {
     #[inline]
     fn fmt_ref<'a>(value: &C::NativeType, f: &mut Formatter<'_>) -> FmtResult
-    where
-        A: 'a,
-    {
-        Debug::fmt(value, f)
-    }
-}
-
-impl<A: Allocator + Clone> ProtoRefEq<A> for ProtoBool {
-    #[inline]
-    fn option_eq<'a>(lhs: Option<bool>, rhs: Option<bool>) -> bool
-    where
-        A: 'a,
-    {
-        lhs == rhs
-    }
-}
-
-impl<A: Allocator + Clone> ProtoRefDebug<A> for ProtoBool {
-    #[inline]
-    fn fmt_ref<'a>(value: &bool, f: &mut Formatter<'_>) -> FmtResult
     where
         A: 'a,
     {

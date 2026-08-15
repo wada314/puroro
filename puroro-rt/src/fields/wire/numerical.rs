@@ -13,7 +13,7 @@
 //! for encode/decode and field get/set — not necessarily the singular struct
 //! slot type (`AddressableSlot` lives on
 //! [`PayloadAccess`](super::singular_type::PayloadAccess); singular
-//! [`ProtoBool`] uses [`BitPacked`](crate::BitPacked)).
+//! [`ProtoBool`] may also use [`BitPacked`](crate::BitPacked)).
 //! Maps `NativeType` ↔ [`WireBody`](NumericalType::WireBody)
 //! ([`CopyWirePayload`](super::wire_payload::CopyWirePayload)).
 
