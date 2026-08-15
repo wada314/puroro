@@ -48,9 +48,9 @@ pub struct CodeGeneratorResponse {
 }
 
 impl CodeGeneratorResponse {
-    pub fn from_files(files: Vec<ResponseFile>) -> Self {
+    fn advertised(error: Option<String>, files: Vec<ResponseFile>) -> Self {
         Self {
-            error: None,
+            error,
             supported_features: SUPPORTED_FEATURES,
             minimum_edition: Some(MINIMUM_EDITION),
             maximum_edition: Some(MAXIMUM_EDITION),
@@ -58,14 +58,45 @@ impl CodeGeneratorResponse {
         }
     }
 
+    pub fn from_files(files: Vec<ResponseFile>) -> Self {
+        Self::advertised(None, files)
+    }
+
     pub fn from_error(message: impl Into<String>) -> Self {
-        Self {
-            error: Some(message.into()),
-            supported_features: SUPPORTED_FEATURES,
-            minimum_edition: Some(MINIMUM_EDITION),
-            maximum_edition: Some(MAXIMUM_EDITION),
-            files: Vec::new(),
+        Self::advertised(Some(message.into()), Vec::new())
+    }
+
+    /// Encode this response to `CodeGeneratorResponse` wire bytes.
+    pub fn encode(&self) -> Result<Vec<u8>> {
+        let mut out = Vec::new();
+
+        if let Some(error) = &self.error {
+            // optional string error = 1;
+            write_string_field(&mut out, 1, error)?;
         }
+        if self.supported_features != 0 {
+            // optional uint64 supported_features = 2;
+            write_uint64_field(&mut out, 2, self.supported_features)?;
+        }
+        if let Some(edition) = self.minimum_edition {
+            // optional int32 minimum_edition = 3;
+            write_int32_field(&mut out, 3, edition)?;
+        }
+        if let Some(edition) = self.maximum_edition {
+            // optional int32 maximum_edition = 4;
+            write_int32_field(&mut out, 4, edition)?;
+        }
+        for file in &self.files {
+            let mut nested = Vec::new();
+            // CodeGeneratorResponse.File.name = 1;
+            write_string_field(&mut nested, 1, &file.name)?;
+            // CodeGeneratorResponse.File.content = 15;
+            write_string_field(&mut nested, 15, &file.content)?;
+            // repeated File file = 15;
+            write_len_field(&mut out, 15, &nested)?;
+        }
+
+        Ok(out)
     }
 }
 
@@ -104,46 +135,6 @@ pub fn decode_request(bytes: &[u8]) -> Result<CodegenRequest> {
     })
 }
 
-/// Encode a [`CodeGeneratorResponse`] to wire bytes.
-pub fn encode_response(response: &CodeGeneratorResponse) -> Result<Vec<u8>> {
-    let mut out = Vec::new();
-
-    if let Some(error) = &response.error {
-        // optional string error = 1;
-        write_string_field(&mut out, 1, error)?;
-    }
-    if response.supported_features != 0 {
-        // optional uint64 supported_features = 2;
-        let field: Field<&[u8]> = Field::new(
-            to_field_number(2)?,
-            FieldValue::from_uint64(response.supported_features),
-        );
-        out.write_protobuf_field(&field)?;
-    }
-    if let Some(edition) = response.minimum_edition {
-        // optional int32 minimum_edition = 3;
-        let field: Field<&[u8]> = Field::new(to_field_number(3)?, FieldValue::from_int32(edition));
-        out.write_protobuf_field(&field)?;
-    }
-    if let Some(edition) = response.maximum_edition {
-        // optional int32 maximum_edition = 4;
-        let field: Field<&[u8]> = Field::new(to_field_number(4)?, FieldValue::from_int32(edition));
-        out.write_protobuf_field(&field)?;
-    }
-    for file in &response.files {
-        let mut nested = Vec::new();
-        // CodeGeneratorResponse.File.name = 1;
-        write_string_field(&mut nested, 1, &file.name)?;
-        // CodeGeneratorResponse.File.content = 15;
-        write_string_field(&mut nested, 15, &file.content)?;
-        // repeated File file = 15;
-        let field = Field::new(to_field_number(15)?, FieldValue::Len(nested));
-        out.write_protobuf_field(&field)?;
-    }
-
-    Ok(out)
-}
-
 fn decode_file_descriptor(bytes: &[u8]) -> Result<ProtoFile> {
     with_decoding_context("FileDescriptorProto", || {
         let mut name = String::new();
@@ -177,7 +168,7 @@ fn decode_file_descriptor(bytes: &[u8]) -> Result<ProtoFile> {
                 // optional FileOptions options = 8;
                 8 => {
                     let nested = expect_len(&field)?;
-                    features = decode_options_features(nested)?;
+                    features = decode_options_features("FileOptions", 50, nested)?;
                 }
                 // optional string syntax = 12;
                 12 => syntax_raw = Some(expect_string(&field)?),
@@ -278,15 +269,17 @@ fn decode_descriptor(bytes: &[u8]) -> Result<MessageDesc> {
 
 /// `MessageOptions`: only `map_entry` (7) is consumed today.
 fn decode_message_options_map_entry(bytes: &[u8]) -> Result<bool> {
-    let mut map_entry = false;
-    for field in AsRefExtProtobuf::read_protobuf_fields(&bytes) {
-        let field = field?;
-        // optional bool map_entry = 7;
-        if field.field_number.as_u32() == 7 {
-            map_entry = expect_bool(&field)?;
+    with_decoding_context("MessageOptions", || {
+        let mut map_entry = false;
+        for field in AsRefExtProtobuf::read_protobuf_fields(&bytes) {
+            let field = field?;
+            // optional bool map_entry = 7;
+            if field.field_number.as_u32() == 7 {
+                map_entry = expect_bool(&field)?;
+            }
         }
-    }
-    Ok(map_entry)
+        Ok(map_entry)
+    })
 }
 
 fn decode_field(bytes: &[u8]) -> Result<FieldDesc> {
@@ -312,15 +305,9 @@ fn decode_field(bytes: &[u8]) -> Result<FieldDesc> {
                 // optional int32 number = 3;
                 3 => number = expect_int32(&field)?,
                 // optional Label label = 4;
-                4 => {
-                    let raw = expect_int32(&field)?;
-                    label = FieldLabel::from_i32(raw).ok_or(Error::unexpected_field(4))?;
-                }
+                4 => label = expect_enum(&field, FieldLabel::from_i32)?,
                 // optional Type type = 5;
-                5 => {
-                    let raw = expect_int32(&field)?;
-                    type_ = FieldType::from_i32(raw).ok_or(Error::unexpected_field(5))?;
-                }
+                5 => type_ = expect_enum(&field, FieldType::from_i32)?,
                 // optional string type_name = 6;
                 6 => type_name = Some(ProtoFqn::parse(expect_string(&field)?)),
                 // optional string default_value = 7;
@@ -359,24 +346,27 @@ fn decode_field(bytes: &[u8]) -> Result<FieldDesc> {
     })
 }
 
-/// `FileOptions` / `EnumOptions`: read `features`.
+/// `FileOptions` / `EnumOptions`: read `features` at `features_field`.
 ///
 /// Field numbers differ by options message:
 /// - `FileOptions.features` = 50
 /// - `EnumOptions.features` = 7
-fn decode_options_features(bytes: &[u8]) -> Result<FeatureSet> {
-    let mut features = FeatureSet::default();
-    for field in AsRefExtProtobuf::read_protobuf_fields(&bytes) {
-        let field = field?;
-        match field.field_number.as_u32() {
-            7 | 50 => {
+fn decode_options_features(
+    message: &'static str,
+    features_field: u32,
+    bytes: &[u8],
+) -> Result<FeatureSet> {
+    with_decoding_context(message, || {
+        let mut features = FeatureSet::default();
+        for field in AsRefExtProtobuf::read_protobuf_fields(&bytes) {
+            let field = field?;
+            if field.field_number.as_u32() == features_field {
                 let nested = expect_len(&field)?;
                 features = decode_feature_set(nested)?;
             }
-            _ => {}
         }
-    }
-    Ok(features)
+        Ok(features)
+    })
 }
 
 struct DecodedFieldOptions {
@@ -388,97 +378,83 @@ struct DecodedFieldOptions {
 
 /// `FieldOptions`: `packed` (2), `features` (21), and puroro layout extensions.
 fn decode_field_options(bytes: &[u8]) -> Result<DecodedFieldOptions> {
-    let mut features = FeatureSet::default();
-    let mut packed = None;
-    let mut string_layout = None;
-    let mut bytes_layout = None;
-    for field in AsRefExtProtobuf::read_protobuf_fields(&bytes) {
-        let field = field?;
-        match field.field_number.as_u32() {
-            // optional bool packed = 2;
-            2 => packed = Some(expect_bool(&field)?),
-            // optional FeatureSet features = 21;
-            21 => {
-                let nested = expect_len(&field)?;
-                features = decode_feature_set(nested)?;
+    with_decoding_context("FieldOptions", || {
+        let mut features = FeatureSet::default();
+        let mut packed = None;
+        let mut string_layout = None;
+        let mut bytes_layout = None;
+        for field in AsRefExtProtobuf::read_protobuf_fields(&bytes) {
+            let field = field?;
+            match field.field_number.as_u32() {
+                // optional bool packed = 2;
+                2 => packed = Some(expect_bool(&field)?),
+                // optional FeatureSet features = 21;
+                21 => {
+                    let nested = expect_len(&field)?;
+                    features = decode_feature_set(nested)?;
+                }
+                // extend FieldOptions { optional StringLayout string_layout = 51400; }
+                STRING_LAYOUT_OPTION_NUMBER => {
+                    string_layout = Some(expect_enum(&field, StringLayout::from_i32)?);
+                }
+                // extend FieldOptions { optional BytesLayout bytes_layout = 51401; }
+                BYTES_LAYOUT_OPTION_NUMBER => {
+                    bytes_layout = Some(expect_enum(&field, BytesLayout::from_i32)?);
+                }
+                _ => {}
             }
-            // extend FieldOptions { optional StringLayout string_layout = 51400; }
-            STRING_LAYOUT_OPTION_NUMBER => {
-                let raw = expect_int32(&field)?;
-                string_layout = Some(
-                    StringLayout::from_i32(raw)
-                        .ok_or(Error::unexpected_field(STRING_LAYOUT_OPTION_NUMBER))?,
-                );
-            }
-            // extend FieldOptions { optional BytesLayout bytes_layout = 51401; }
-            BYTES_LAYOUT_OPTION_NUMBER => {
-                let raw = expect_int32(&field)?;
-                bytes_layout = Some(
-                    BytesLayout::from_i32(raw)
-                        .ok_or(Error::unexpected_field(BYTES_LAYOUT_OPTION_NUMBER))?,
-                );
-            }
-            _ => {}
         }
-    }
-    Ok(DecodedFieldOptions {
-        features,
-        packed,
-        string_layout,
-        bytes_layout,
+        Ok(DecodedFieldOptions {
+            features,
+            packed,
+            string_layout,
+            bytes_layout,
+        })
     })
 }
 
 fn decode_feature_set(bytes: &[u8]) -> Result<FeatureSet> {
-    let mut features = FeatureSet::default();
-    for field in AsRefExtProtobuf::read_protobuf_fields(&bytes) {
-        let field = field?;
-        let raw = expect_int32(&field)?;
-        match field.field_number.as_u32() {
-            // optional FieldPresence field_presence = 1;
-            1 => {
-                features.field_presence =
-                    Some(FieldPresence::from_i32(raw).ok_or(Error::unexpected_field(1))?);
+    with_decoding_context("FeatureSet", || {
+        let mut features = FeatureSet::default();
+        for field in AsRefExtProtobuf::read_protobuf_fields(&bytes) {
+            let field = field?;
+            match field.field_number.as_u32() {
+                // optional FieldPresence field_presence = 1;
+                1 => features.field_presence = Some(expect_enum(&field, FieldPresence::from_i32)?),
+                // optional EnumType enum_type = 2;
+                2 => features.enum_type = Some(expect_enum(&field, EnumType::from_i32)?),
+                // optional RepeatedFieldEncoding repeated_field_encoding = 3;
+                3 => {
+                    features.repeated_field_encoding =
+                        Some(expect_enum(&field, RepeatedFieldEncoding::from_i32)?);
+                }
+                // optional Utf8Validation utf8_validation = 4;
+                4 => {
+                    features.utf8_validation = Some(expect_enum(&field, Utf8Validation::from_i32)?);
+                }
+                // optional MessageEncoding message_encoding = 5;
+                5 => {
+                    features.message_encoding =
+                        Some(expect_enum(&field, MessageEncoding::from_i32)?);
+                }
+                // optional JsonFormat json_format = 6;
+                6 => features.json_format = Some(expect_enum(&field, JsonFormat::from_i32)?),
+                // optional EnforceNamingStyle enforce_naming_style = 7;
+                7 => {
+                    features.enforce_naming_style =
+                        Some(expect_enum(&field, EnforceNamingStyle::from_i32)?);
+                }
+                // optional DefaultSymbolVisibility default_symbol_visibility = 8;
+                8 => {
+                    features.default_symbol_visibility =
+                        Some(expect_enum(&field, DefaultSymbolVisibility::from_i32)?);
+                }
+                // Language-specific FeatureSet extensions (e.g. 1000+) are LEN.
+                _ => {}
             }
-            // optional EnumType enum_type = 2;
-            2 => {
-                features.enum_type =
-                    Some(EnumType::from_i32(raw).ok_or(Error::unexpected_field(2))?);
-            }
-            // optional RepeatedFieldEncoding repeated_field_encoding = 3;
-            3 => {
-                features.repeated_field_encoding =
-                    Some(RepeatedFieldEncoding::from_i32(raw).ok_or(Error::unexpected_field(3))?);
-            }
-            // optional Utf8Validation utf8_validation = 4;
-            4 => {
-                features.utf8_validation =
-                    Some(Utf8Validation::from_i32(raw).ok_or(Error::unexpected_field(4))?);
-            }
-            // optional MessageEncoding message_encoding = 5;
-            5 => {
-                features.message_encoding =
-                    Some(MessageEncoding::from_i32(raw).ok_or(Error::unexpected_field(5))?);
-            }
-            // optional JsonFormat json_format = 6;
-            6 => {
-                features.json_format =
-                    Some(JsonFormat::from_i32(raw).ok_or(Error::unexpected_field(6))?);
-            }
-            // optional EnforceNamingStyle enforce_naming_style = 7;
-            7 => {
-                features.enforce_naming_style =
-                    Some(EnforceNamingStyle::from_i32(raw).ok_or(Error::unexpected_field(7))?);
-            }
-            // optional DefaultSymbolVisibility default_symbol_visibility = 8;
-            8 => {
-                features.default_symbol_visibility =
-                    Some(DefaultSymbolVisibility::from_i32(raw).ok_or(Error::unexpected_field(8))?);
-            }
-            _ => {}
         }
-    }
-    Ok(features)
+        Ok(features)
+    })
 }
 
 fn decode_oneof(bytes: &[u8]) -> Result<OneofDesc> {
@@ -513,7 +489,7 @@ fn decode_enum(bytes: &[u8]) -> Result<EnumDesc> {
                 // optional EnumOptions options = 3;
                 3 => {
                     let nested = expect_len(&field)?;
-                    features = decode_options_features(nested)?;
+                    features = decode_options_features("EnumOptions", 7, nested)?;
                 }
                 _ => {}
             }
@@ -567,6 +543,11 @@ fn expect_int32(field: &Field<&[u8]>) -> Result<i32> {
     }
 }
 
+fn expect_enum<T>(field: &Field<&[u8]>, from_i32: impl FnOnce(i32) -> Option<T>) -> Result<T> {
+    let raw = expect_int32(field)?;
+    from_i32(raw).ok_or(Error::unexpected_field(field.field_number.as_u32()))
+}
+
 fn expect_bool(field: &Field<&[u8]>) -> Result<bool> {
     match &field.value {
         FieldValue::Varint(v) => Ok(v.to_bool()),
@@ -583,8 +564,24 @@ fn to_field_number(value: u32) -> Result<FieldNumber> {
     })
 }
 
+fn write_len_field(out: &mut Vec<u8>, number: u32, value: &[u8]) -> Result<()> {
+    let field = Field::new(to_field_number(number)?, FieldValue::Len(value));
+    out.write_protobuf_field(&field)?;
+    Ok(())
+}
+
 fn write_string_field(out: &mut Vec<u8>, number: u32, value: &str) -> Result<()> {
-    let field = Field::new(to_field_number(number)?, FieldValue::Len(value.as_bytes()));
+    write_len_field(out, number, value.as_bytes())
+}
+
+fn write_int32_field(out: &mut Vec<u8>, number: u32, value: i32) -> Result<()> {
+    let field: Field<&[u8]> = Field::new(to_field_number(number)?, FieldValue::from_int32(value));
+    out.write_protobuf_field(&field)?;
+    Ok(())
+}
+
+fn write_uint64_field(out: &mut Vec<u8>, number: u32, value: u64) -> Result<()> {
+    let field: Field<&[u8]> = Field::new(to_field_number(number)?, FieldValue::from_uint64(value));
     out.write_protobuf_field(&field)?;
     Ok(())
 }
@@ -602,21 +599,13 @@ mod tests {
 
     fn encode_message_field(field_number: u32, nested: &[u8]) -> Vec<u8> {
         let mut out = Vec::new();
-        let field = Field::new(
-            to_field_number(field_number).unwrap(),
-            FieldValue::Len(nested),
-        );
-        out.write_protobuf_field(&field).unwrap();
+        write_len_field(&mut out, field_number, nested).unwrap();
         out
     }
 
     fn encode_varint_field(field_number: u32, value: i32) -> Vec<u8> {
         let mut out = Vec::new();
-        let field: Field<&[u8]> = Field::new(
-            to_field_number(field_number).unwrap(),
-            FieldValue::from_int32(value),
-        );
-        out.write_protobuf_field(&field).unwrap();
+        write_int32_field(&mut out, field_number, value).unwrap();
         out
     }
 
@@ -687,6 +676,51 @@ mod tests {
             decoded.proto_files[0].syntax,
             Syntax::Editions(Edition::Edition2023)
         );
+        assert_eq!(
+            decoded.proto_files[0].features.field_presence,
+            Some(FieldPresence::Implicit)
+        );
+    }
+
+    #[test]
+    fn file_options_field_7_is_not_features() {
+        // EnumOptions.features = 7; FileOptions.features = 50. A FeatureSet
+        // sitting on FileOptions field 7 must not be treated as file features.
+        let feature_set = encode_varint_field(1, FieldPresence::Implicit as i32);
+        let file_options = encode_message_field(7, &feature_set);
+
+        let mut file = Vec::new();
+        file.extend(encode_string_field(1, "ed.proto"));
+        file.extend(encode_string_field(12, "editions"));
+        file.extend(encode_varint_field(14, Edition::Edition2023 as i32));
+        file.extend(encode_message_field(8, &file_options));
+
+        let mut request = Vec::new();
+        request.extend(encode_string_field(1, "ed.proto"));
+        request.extend(encode_message_field(15, &file));
+
+        let decoded = decode_request(&request).unwrap();
+        assert!(decoded.proto_files[0].features.field_presence.is_none());
+    }
+
+    #[test]
+    fn decode_feature_set_skips_unknown_len_extension() {
+        // FeatureSet { field_presence: IMPLICIT, (unknown LEN extension) = 1000 }
+        let mut feature_set = encode_varint_field(1, FieldPresence::Implicit as i32);
+        feature_set.extend(encode_message_field(1000, b"lang-ext"));
+        let file_options = encode_message_field(50, &feature_set);
+
+        let mut file = Vec::new();
+        file.extend(encode_string_field(1, "ed.proto"));
+        file.extend(encode_string_field(12, "editions"));
+        file.extend(encode_varint_field(14, Edition::Edition2023 as i32));
+        file.extend(encode_message_field(8, &file_options));
+
+        let mut request = Vec::new();
+        request.extend(encode_string_field(1, "ed.proto"));
+        request.extend(encode_message_field(15, &file));
+
+        let decoded = decode_request(&request).unwrap();
         assert_eq!(
             decoded.proto_files[0].features.field_presence,
             Some(FieldPresence::Implicit)
@@ -833,7 +867,7 @@ mod tests {
             name: "example.rs".into(),
             content: "// hello\n".into(),
         }]);
-        let bytes = encode_response(&response).unwrap();
+        let bytes = response.encode().unwrap();
 
         let mut names = Vec::new();
         let mut contents = Vec::new();
@@ -867,6 +901,49 @@ mod tests {
         assert!(
             err.to_string()
                 .contains("unexpected field 1 while decoding CodeGeneratorRequest")
+        );
+    }
+
+    #[test]
+    fn bad_field_options_packed_gets_field_options_context() {
+        // FieldOptions.packed = 2 must be a bool (varint), not LEN.
+        let field_options = encode_string_field(2, "nope");
+        let mut field = Vec::new();
+        field.extend(encode_string_field(1, "ids"));
+        field.extend(encode_message_field(8, &field_options));
+        let mut message = Vec::new();
+        message.extend(encode_string_field(1, "M"));
+        message.extend(encode_message_field(2, &field));
+        let mut file = Vec::new();
+        file.extend(encode_string_field(1, "t.proto"));
+        file.extend(encode_message_field(4, &message));
+        let mut request = Vec::new();
+        request.extend(encode_string_field(1, "t.proto"));
+        request.extend(encode_message_field(15, &file));
+
+        let err = decode_request(&request).unwrap_err();
+        assert!(
+            err.to_string()
+                .contains("unexpected field 2 while decoding FieldOptions")
+        );
+    }
+
+    #[test]
+    fn bad_feature_set_field_gets_feature_set_context() {
+        // FeatureSet.field_presence = 1 must be a varint, not LEN.
+        let feature_set = encode_string_field(1, "nope");
+        let file_options = encode_message_field(50, &feature_set);
+        let mut file = Vec::new();
+        file.extend(encode_string_field(1, "ed.proto"));
+        file.extend(encode_message_field(8, &file_options));
+        let mut request = Vec::new();
+        request.extend(encode_string_field(1, "ed.proto"));
+        request.extend(encode_message_field(15, &file));
+
+        let err = decode_request(&request).unwrap_err();
+        assert!(
+            err.to_string()
+                .contains("unexpected field 1 while decoding FeatureSet")
         );
     }
 }

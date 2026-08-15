@@ -19,7 +19,7 @@ pub use crate::error::{Error, Result};
 pub use crate::plugin_io::{CodeGeneratorResponse, ResponseFile};
 
 use crate::emit::emit;
-use crate::plugin_io::{decode_request, encode_response};
+use crate::plugin_io::decode_request;
 use ::std::io::{self, Read, Write};
 
 /// Decode a `CodeGeneratorRequest`, emit files, and return response wire bytes.
@@ -29,7 +29,7 @@ pub fn generate_from_bytes(request_bytes: &[u8]) -> Result<Vec<u8>> {
         Ok(response) => response,
         Err(e) => CodeGeneratorResponse::from_error(e.to_string()),
     };
-    encode_response(&response)
+    response.encode()
 }
 
 /// Read a `CodeGeneratorRequest` from `stdin` and write the response to `stdout`.
