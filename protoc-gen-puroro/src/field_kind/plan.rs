@@ -124,8 +124,8 @@ pub fn plan_message<'a>(message: &'a Message<'a>) -> Result<MessagePlan<'a>> {
     let mut members = Vec::new();
 
     for field in &fields {
-        // Real oneof members only — proto3 `optional` uses a synthetic oneof
-        // index but resolves to Explicit presence, not Oneof.
+        // Real oneof members only. Proto3 `optional` is stripped in resolve
+        // (Explicit presence, no oneof_index).
         if matches!(
             field.occurrence(),
             FieldOccurrence::Singular(SingularPresence::Oneof)

@@ -21,6 +21,9 @@ struct PendingFields<'a, 'd> {
     message: &'a Message<'a>,
     desc: &'d MessageDesc,
     file: &'d ProtoFile,
+    /// Descriptor `oneof_index` → index in the resolved [`Message::oneofs`]
+    /// list (synthetic proto3-optional oneofs are dropped).
+    oneof_remap: Vec<Option<i32>>,
 }
 
 /// Name map + pending field edges for one [`resolve`] call.
@@ -109,13 +112,7 @@ impl<'a, 'd> ResolveCtx<'a, 'd> {
             nested_enums.push(self.register_enum(nested, &fqn, file)?);
         }
 
-        let oneofs = desc
-            .oneofs
-            .iter()
-            .map(|o| Oneof {
-                name: o.name.clone(),
-            })
-            .collect();
+        let (oneofs, oneof_remap) = real_oneofs(desc);
 
         let message = self.arena.alloc(Message {
             name: desc.name.clone(),
@@ -133,6 +130,7 @@ impl<'a, 'd> ResolveCtx<'a, 'd> {
             message,
             desc,
             file,
+            oneof_remap,
         });
 
         for child in &message.nested_messages {
@@ -200,7 +198,12 @@ impl<'a, 'd> ResolveCtx<'a, 'd> {
     fn link_message_fields(&self, pending: PendingFields<'a, 'd>) -> Result<()> {
         let mut fields = Vec::with_capacity(pending.desc.fields.len());
         for field in &pending.desc.fields {
-            fields.push(self.resolve_field(field, &pending.message.fqn, pending.file)?);
+            fields.push(self.resolve_field(
+                field,
+                &pending.message.fqn,
+                pending.file,
+                &pending.oneof_remap,
+            )?);
         }
         pending.message.fields.set(fields).map_err(|_| {
             Error::Codegen(format!("fields set twice for `{}`", pending.message.fqn))
@@ -213,6 +216,7 @@ impl<'a, 'd> ResolveCtx<'a, 'd> {
         field: &FieldDesc,
         owner_fqn: &ProtoFqn,
         file: &ProtoFile,
+        oneof_remap: &[Option<i32>],
     ) -> Result<Field<'a>> {
         if field.type_ == FieldType::Group {
             return Err(Error::Codegen(format!(
@@ -293,7 +297,7 @@ impl<'a, 'd> ResolveCtx<'a, 'd> {
             number: field.number,
             occurrence,
             type_ref,
-            oneof_index: field.oneof_index,
+            oneof_index: resolved_oneof_index(field, owner_fqn, oneof_remap)?,
             default_value: field.default_value.clone(),
             utf8_validation: resolve_utf8_validation(
                 field,
@@ -334,6 +338,71 @@ fn resolve_enum_openness(
             .overlay(enum_features)
             .enum_type
             .expect("edition defaults always set enum_type"),
+    }
+}
+
+/// Keep oneofs that have at least one real member. Proto3 `optional` fields
+/// are stored as a synthetic single-field oneof in the descriptor; those
+/// groups are dropped and remaining indices are remapped.
+fn real_oneofs(desc: &MessageDesc) -> (Vec<Oneof>, Vec<Option<i32>>) {
+    let n = desc.oneofs.len();
+    let mut is_real = vec![false; n];
+    for field in &desc.fields {
+        if field.proto3_optional {
+            continue;
+        }
+        let Some(idx) = field.oneof_index else {
+            continue;
+        };
+        let Ok(idx) = usize::try_from(idx) else {
+            continue;
+        };
+        if let Some(slot) = is_real.get_mut(idx) {
+            *slot = true;
+        }
+    }
+
+    let mut remap = vec![None; n];
+    let mut oneofs = Vec::new();
+    for (i, oneof) in desc.oneofs.iter().enumerate() {
+        if is_real[i] {
+            remap[i] = Some(i32::try_from(oneofs.len()).expect("oneof count fits i32"));
+            oneofs.push(Oneof {
+                name: oneof.name.clone(),
+            });
+        }
+    }
+    (oneofs, remap)
+}
+
+fn resolved_oneof_index(
+    field: &FieldDesc,
+    owner_fqn: &ProtoFqn,
+    remap: &[Option<i32>],
+) -> Result<Option<i32>> {
+    if field.proto3_optional {
+        return Ok(None);
+    }
+    let Some(idx) = field.oneof_index else {
+        return Ok(None);
+    };
+    let Ok(idx) = usize::try_from(idx) else {
+        return Err(Error::Codegen(format!(
+            "field `{owner_fqn}.{}` has negative oneof_index",
+            field.name
+        )));
+    };
+    match remap.get(idx).copied() {
+        Some(Some(mapped)) => Ok(Some(mapped)),
+        Some(None) => Err(Error::Codegen(format!(
+            "field `{owner_fqn}.{}` oneof_index {idx} is not a real oneof",
+            field.name
+        ))),
+        None => Err(Error::Codegen(format!(
+            "field `{owner_fqn}.{}` oneof_index {idx} out of range ({} oneofs)",
+            field.name,
+            remap.len()
+        ))),
     }
 }
 
@@ -849,23 +918,34 @@ mod tests {
         let file_set = resolve(&arena, &files).unwrap();
 
         let p3 = file_set.lookup(".p3.M").unwrap().as_message().unwrap();
+        let p3_oneofs: Vec<_> = p3.oneofs().map(|o| o.name()).collect();
+        assert_eq!(p3_oneofs, ["which"]);
         let mut p3_fields = p3.fields();
+        let implicit = p3_fields.next().unwrap();
         assert_eq!(
-            p3_fields.next().unwrap().occurrence(),
+            implicit.occurrence(),
             FieldOccurrence::Singular(SingularPresence::Implicit)
         );
+        assert!(implicit.oneof_index().is_none());
+        let explicit = p3_fields.next().unwrap();
         assert_eq!(
-            p3_fields.next().unwrap().occurrence(),
+            explicit.occurrence(),
             FieldOccurrence::Singular(SingularPresence::Explicit)
+        );
+        assert!(
+            explicit.oneof_index().is_none(),
+            "proto3 optional synthetic oneof is stripped"
         );
         assert_eq!(
             p3_fields.next().unwrap().occurrence(),
             FieldOccurrence::Singular(SingularPresence::Message)
         );
+        let choice = p3_fields.next().unwrap();
         assert_eq!(
-            p3_fields.next().unwrap().occurrence(),
+            choice.occurrence(),
             FieldOccurrence::Singular(SingularPresence::Oneof)
         );
+        assert_eq!(choice.oneof_index(), Some(0));
         assert_eq!(
             p3_fields.next().unwrap().occurrence(),
             FieldOccurrence::Repeated(RepeatedFieldEncoding::Packed)

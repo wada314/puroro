@@ -78,6 +78,7 @@ pub struct Message<'a> {
     fields: OnceCell<Vec<Field<'a>>>,
     nested_messages: Vec<&'a Message<'a>>,
     nested_enums: Vec<&'a Enum<'a>>,
+    /// Real oneofs only; proto3 `optional` synthetic groups are dropped.
     oneofs: Vec<Oneof>,
     /// Synthetic map entry (`MessageOptions.map_entry = true`).
     map_entry: bool,
@@ -90,6 +91,8 @@ pub struct Field<'a> {
     number: i32,
     occurrence: FieldOccurrence,
     type_ref: TypeRef<'a>,
+    /// Index into the parent [`Message`]'s real [`oneofs`](Message::oneofs).
+    /// `None` for proto3 `optional` (descriptor synthetic oneof is stripped).
     oneof_index: Option<i32>,
     /// Raw `FieldDescriptorProto.default_value` from protoc, if any.
     default_value: Option<String>,
