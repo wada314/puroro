@@ -20,8 +20,8 @@ use crate::resolved::{Enum, Field, Message, SingularPresence, TypeRef};
 pub enum FieldKind<'a> {
     Singular {
         wire: WireTypeKind<'a>,
-        presence: CatalogPresence,
-        layout: CatalogLayout,
+        presence: PlannedPresence,
+        layout: PlannedLayout,
         /// Non-type-zero `[default = …]`; `None` keeps `ProtoDefault`.
         custom_default: Option<CustomDefault>,
     },
@@ -67,7 +67,7 @@ pub enum WireTypeKind<'a> {
 
 /// `FieldPresence` marker baked into `SingularField<…, P, …>`.
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub enum CatalogPresence {
+pub enum PlannedPresence {
     Implicit,
     Explicit {
         bit: usize,
@@ -86,7 +86,7 @@ pub enum CatalogPresence {
 
 /// `ValueLayout` on `SingularField` (`Inline` default vs `BitPacked` / SSO).
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub enum CatalogLayout {
+pub enum PlannedLayout {
     Inline,
     BitPacked {
         value_bit: usize,
@@ -183,7 +183,7 @@ impl<'a> WireTypeKind<'a> {
     }
 }
 
-impl CatalogPresence {
+impl PlannedPresence {
     pub fn from_singular(
         presence: SingularPresence,
         proto_name: &str,

@@ -1,7 +1,7 @@
 //! Build a [`MessagePlan`] from a resolved message.
 
 use super::{
-    CatalogLayout, CatalogPresence, FieldKind, RepeatedEncodingKind, WireTypeKind,
+    FieldKind, PlannedLayout, PlannedPresence, RepeatedEncodingKind, WireTypeKind,
     field_number_const, value_bit_const,
 };
 use crate::default_value::interpret_custom_default;
@@ -36,7 +36,7 @@ pub struct PlannedField<'a> {
     kind: FieldKind<'a>,
 }
 
-/// `OneofSlot` group: variants keep individual [`FieldKind`]s with [`CatalogPresence::Oneof`].
+/// `OneofSlot` group: variants keep individual [`FieldKind`]s with [`PlannedPresence::Oneof`].
 #[derive(Debug)]
 pub struct PlannedOneof<'a> {
     name: String,
@@ -232,11 +232,11 @@ fn plan_field<'a>(field: &'a Field<'a>, next_bit: &mut usize) -> Result<PlannedF
         }
         FieldOccurrence::Singular(presence) => {
             let wire = WireTypeKind::from_field(field);
-            let catalog_presence = CatalogPresence::from_singular(presence, field.name(), next_bit);
+            let planned_presence = PlannedPresence::from_singular(presence, field.name(), next_bit);
             let layout = if wire.is_bool() {
                 let value_bit = *next_bit;
                 *next_bit += 1;
-                CatalogLayout::BitPacked {
+                PlannedLayout::BitPacked {
                     value_bit,
                     bit_const: value_bit_const(field.name()),
                 }
@@ -245,12 +245,12 @@ fn plan_field<'a>(field: &'a Field<'a>, next_bit: &mut usize) -> Result<PlannedF
             {
                 let heap_bit = *next_bit;
                 *next_bit += 1;
-                CatalogLayout::InlineOrHeap {
+                PlannedLayout::InlineOrHeap {
                     heap_bit,
                     bit_const: super::sso_bit_const(field.name()),
                 }
             } else {
-                CatalogLayout::Inline
+                PlannedLayout::Inline
             };
             let custom_default = match field.default_value() {
                 Some(raw) => interpret_custom_default(field.name(), raw, &wire)?,
@@ -258,7 +258,7 @@ fn plan_field<'a>(field: &'a Field<'a>, next_bit: &mut usize) -> Result<PlannedF
             };
             FieldKind::Singular {
                 wire,
-                presence: catalog_presence,
+                presence: planned_presence,
                 layout,
                 custom_default,
             }
@@ -370,7 +370,7 @@ mod tests {
         BytesLayout, Edition, FieldDesc, FieldLabel, FieldType, MessageDesc, OneofDesc, ProtoFile,
         ProtoFqn, StringLayout, Syntax,
     };
-    use crate::field_kind::{CatalogLayout, CatalogPresence, presence_byte_len};
+    use crate::field_kind::{PlannedLayout, PlannedPresence, presence_byte_len};
     use crate::resolved::{Arena, FileSet, resolve};
 
     fn message<'a>(set: &FileSet<'a>, name: &str) -> &'a Message<'a> {
@@ -509,9 +509,9 @@ mod tests {
                     WireTypeKind::String {
                         utf8: Utf8Validation::Verify,
                     },
-                presence: CatalogPresence::Explicit { bit: 0, bit_const },
+                presence: PlannedPresence::Explicit { bit: 0, bit_const },
                 layout:
-                    CatalogLayout::InlineOrHeap {
+                    PlannedLayout::InlineOrHeap {
                         heap_bit: 1,
                         bit_const: sso_const,
                     },
@@ -530,8 +530,8 @@ mod tests {
         match postal.kind() {
             FieldKind::Singular {
                 wire: WireTypeKind::Fixed32,
-                presence: CatalogPresence::Explicit { bit: 4, bit_const },
-                layout: CatalogLayout::Inline,
+                presence: PlannedPresence::Explicit { bit: 4, bit_const },
+                layout: PlannedLayout::Inline,
                 custom_default: None,
             } => assert_eq!(bit_const, "BIT_POSTAL_CODE"),
             other => panic!("unexpected kind: {other:?}"),
@@ -569,7 +569,7 @@ mod tests {
         };
         match body.kind() {
             FieldKind::Singular {
-                layout: CatalogLayout::InlineOrHeap { heap_bit: 1, .. },
+                layout: PlannedLayout::InlineOrHeap { heap_bit: 1, .. },
                 ..
             } => {}
             other => panic!("expected SSO InlineOrHeap, got {other:?}"),
@@ -607,7 +607,7 @@ mod tests {
         };
         match body.kind() {
             FieldKind::Singular {
-                layout: CatalogLayout::Inline,
+                layout: PlannedLayout::Inline,
                 ..
             } => {}
             other => panic!("expected Inline heap string, got {other:?}"),
@@ -644,7 +644,7 @@ mod tests {
         };
         match body.kind() {
             FieldKind::Singular {
-                layout: CatalogLayout::InlineOrHeap { heap_bit: 1, .. },
+                layout: PlannedLayout::InlineOrHeap { heap_bit: 1, .. },
                 ..
             } => {}
             other => panic!("expected SSO InlineOrHeap, got {other:?}"),
@@ -681,7 +681,7 @@ mod tests {
         };
         match body.kind() {
             FieldKind::Singular {
-                layout: CatalogLayout::Inline,
+                layout: PlannedLayout::Inline,
                 ..
             } => {}
             other => panic!("expected Inline heap bytes, got {other:?}"),
@@ -777,9 +777,9 @@ mod tests {
         match notification.variants()[0].kind() {
             FieldKind::Singular {
                 wire: WireTypeKind::String { .. },
-                presence: CatalogPresence::Oneof,
+                presence: PlannedPresence::Oneof,
                 layout:
-                    CatalogLayout::InlineOrHeap {
+                    PlannedLayout::InlineOrHeap {
                         heap_bit: 0,
                         bit_const,
                     },
@@ -790,9 +790,9 @@ mod tests {
         match notification.variants()[1].kind() {
             FieldKind::Singular {
                 wire: WireTypeKind::Bool,
-                presence: CatalogPresence::Oneof,
+                presence: PlannedPresence::Oneof,
                 layout:
-                    CatalogLayout::BitPacked {
+                    PlannedLayout::BitPacked {
                         value_bit: 4,
                         bit_const,
                     },
@@ -807,9 +807,9 @@ mod tests {
         match done.kind() {
             FieldKind::Singular {
                 wire: WireTypeKind::Bool,
-                presence: CatalogPresence::Implicit,
+                presence: PlannedPresence::Implicit,
                 layout:
-                    CatalogLayout::BitPacked {
+                    PlannedLayout::BitPacked {
                         value_bit: 1,
                         bit_const,
                     },
@@ -825,12 +825,12 @@ mod tests {
             FieldKind::Singular {
                 wire: WireTypeKind::Bool,
                 presence:
-                    CatalogPresence::Explicit {
+                    PlannedPresence::Explicit {
                         bit: 2,
                         bit_const: presence_const,
                     },
                 layout:
-                    CatalogLayout::BitPacked {
+                    PlannedLayout::BitPacked {
                         value_bit: 3,
                         bit_const: value_const,
                     },
@@ -1056,8 +1056,8 @@ mod tests {
         };
         match score.kind() {
             FieldKind::Singular {
-                presence: CatalogPresence::Explicit { bit: 0, .. },
-                layout: CatalogLayout::Inline,
+                presence: PlannedPresence::Explicit { bit: 0, .. },
+                layout: PlannedLayout::Inline,
                 ..
             } => {}
             other => panic!("{other:?}"),
@@ -1110,8 +1110,8 @@ mod tests {
         match status.kind() {
             FieldKind::Singular {
                 wire: WireTypeKind::Enum { openness, .. },
-                presence: CatalogPresence::Implicit,
-                layout: CatalogLayout::Inline,
+                presence: PlannedPresence::Implicit,
+                layout: PlannedLayout::Inline,
                 ..
             } => assert_eq!(*openness, EnumType::Open),
             other => panic!("{other:?}"),

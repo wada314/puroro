@@ -13,7 +13,7 @@ use crate::default_value::{CustomDefault, DefaultLit};
 use crate::descriptor::features::EnumType;
 use crate::error::{Error, Result};
 use crate::field_kind::{
-    CatalogLayout, CatalogPresence, FieldKind, MessageMember, MessagePlan, PlannedField,
+    FieldKind, MessageMember, MessagePlan, PlannedField, PlannedLayout, PlannedPresence,
     RepeatedEncodingKind, WireTypeKind, presence_byte_len,
 };
 use ::proc_macro2::{Ident, Span, TokenStream};
@@ -102,10 +102,10 @@ pub(super) enum SingularMutStyle {
 }
 
 impl SingularMutStyle {
-    pub(super) fn from_layout(wire: &WireTypeKind<'_>, layout: &CatalogLayout) -> Self {
-        if wire.is_string() && matches!(layout, CatalogLayout::InlineOrHeap { .. }) {
+    pub(super) fn from_layout(wire: &WireTypeKind<'_>, layout: &PlannedLayout) -> Self {
+        if wire.is_string() && matches!(layout, PlannedLayout::InlineOrHeap { .. }) {
             Self::SsoString
-        } else if wire.is_bytes() && matches!(layout, CatalogLayout::InlineOrHeap { .. }) {
+        } else if wire.is_bytes() && matches!(layout, PlannedLayout::InlineOrHeap { .. }) {
             Self::SsoBytes
         } else {
             Self::DerefMut
@@ -523,7 +523,7 @@ fn collect_fields(plan: &MessagePlan<'_>) -> Result<Vec<FieldEmit>> {
                         layout,
                         custom_default,
                     } => {
-                        if matches!(presence, CatalogPresence::Oneof) {
+                        if matches!(presence, PlannedPresence::Oneof) {
                             return Err(Error::Codegen(format!(
                                 "internal error: oneof field `{}` escaped as a top-level member",
                                 field.name()
@@ -565,7 +565,7 @@ fn oneof_variant_emit(field: &PlannedField<'_>, index: usize) -> Result<OneofVar
             field.name()
         )));
     };
-    if !matches!(presence, CatalogPresence::Oneof) {
+    if !matches!(presence, PlannedPresence::Oneof) {
         return Err(Error::Codegen(format!(
             "internal error: oneof variant `{}` has presence {presence:?}",
             field.name()
@@ -573,8 +573,8 @@ fn oneof_variant_emit(field: &PlannedField<'_>, index: usize) -> Result<OneofVar
     }
 
     let (layout_ty, value_bit) = match layout {
-        CatalogLayout::Inline => (None, None),
-        CatalogLayout::BitPacked {
+        PlannedLayout::Inline => (None, None),
+        PlannedLayout::BitPacked {
             value_bit,
             bit_const,
         } => {
@@ -585,7 +585,7 @@ fn oneof_variant_emit(field: &PlannedField<'_>, index: usize) -> Result<OneofVar
                 Some((ident, *value_bit)),
             )
         }
-        CatalogLayout::InlineOrHeap {
+        PlannedLayout::InlineOrHeap {
             heap_bit,
             bit_const,
         } => {
@@ -737,17 +737,17 @@ fn scalar_emit(
     field_const: &str,
     number: i32,
     wire: &WireTypeKind<'_>,
-    presence: &CatalogPresence,
-    layout: &CatalogLayout,
+    presence: &PlannedPresence,
+    layout: &PlannedLayout,
     custom_default: Option<&CustomDefault>,
 ) -> Result<ScalarEmit> {
     let (style, presence_ty, presence_bit) = match presence {
-        CatalogPresence::Implicit => (
+        PlannedPresence::Implicit => (
             AccessorStyle::Implicit,
             quote! { ::puroro_rt::Implicit },
             None,
         ),
-        CatalogPresence::Explicit { bit, bit_const } => {
+        PlannedPresence::Explicit { bit, bit_const } => {
             let ident = Ident::new(bit_const, Span::call_site());
             (
                 AccessorStyle::Explicit,
@@ -755,7 +755,7 @@ fn scalar_emit(
                 Some((ident, *bit)),
             )
         }
-        CatalogPresence::LegacyRequired { bit, bit_const } => {
+        PlannedPresence::LegacyRequired { bit, bit_const } => {
             let ident = Ident::new(bit_const, Span::call_site());
             (
                 AccessorStyle::LegacyRequired,
@@ -763,12 +763,12 @@ fn scalar_emit(
                 Some((ident, *bit)),
             )
         }
-        CatalogPresence::Message => (
+        PlannedPresence::Message => (
             AccessorStyle::Message,
             quote! { ::puroro_rt::Message },
             None,
         ),
-        CatalogPresence::Oneof => {
+        PlannedPresence::Oneof => {
             return Err(Error::Codegen(
                 "internal error: oneof presence must use oneof_variant_emit".into(),
             ));
@@ -776,8 +776,8 @@ fn scalar_emit(
     };
 
     let (layout_ty, value_bit) = match layout {
-        CatalogLayout::Inline => (None, None),
-        CatalogLayout::BitPacked {
+        PlannedLayout::Inline => (None, None),
+        PlannedLayout::BitPacked {
             value_bit,
             bit_const,
         } => {
@@ -787,7 +787,7 @@ fn scalar_emit(
                 Some((ident, *value_bit)),
             )
         }
-        CatalogLayout::InlineOrHeap {
+        PlannedLayout::InlineOrHeap {
             heap_bit,
             bit_const,
         } => {
