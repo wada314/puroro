@@ -879,25 +879,26 @@ mod tests {
         let MessageMember::Field(tags) = &plan.members()[0] else {
             panic!();
         };
-        assert_eq!(
-            tags.kind(),
-            &FieldKind::Repeated {
+        match tags.kind() {
+            FieldKind::Repeated {
                 wire: WireTypeKind::Int32,
                 encoding: RepeatedEncodingKind::Packed,
-            }
-        );
+            } => {}
+            other => panic!("{other:?}"),
+        }
         let MessageMember::Field(labels) = &plan.members()[1] else {
             panic!();
         };
-        assert_eq!(
-            labels.kind(),
-            &FieldKind::Repeated {
-                wire: WireTypeKind::String {
-                    utf8: Utf8Validation::Verify,
-                },
+        match labels.kind() {
+            FieldKind::Repeated {
+                wire:
+                    WireTypeKind::String {
+                        utf8: Utf8Validation::Verify,
+                    },
                 encoding: RepeatedEncodingKind::Expanded,
-            }
-        );
+            } => {}
+            other => panic!("{other:?}"),
+        }
     }
 
     #[test]
@@ -987,13 +988,13 @@ mod tests {
         let MessageMember::Field(scores) = &plan.members()[0] else {
             panic!();
         };
-        assert_eq!(
-            scores.kind(),
-            &FieldKind::Repeated {
+        match scores.kind() {
+            FieldKind::Repeated {
                 wire: WireTypeKind::Int32,
                 encoding: RepeatedEncodingKind::Expanded,
-            }
-        );
+            } => {}
+            other => panic!("{other:?}"),
+        }
 
         let MessageMember::Field(title) = &plan.members()[1] else {
             panic!();

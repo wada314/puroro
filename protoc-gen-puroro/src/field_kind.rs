@@ -16,7 +16,7 @@ use crate::descriptor::features::{EnumType, RepeatedFieldEncoding, Utf8Validatio
 use crate::resolved::{Enum, Field, Message, SingularPresence, TypeRef};
 
 /// Catalog shape for one generated field (struct member or oneof variant).
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone)]
 pub enum FieldKind<'a> {
     Singular {
         wire: WireTypeKind<'a>,
@@ -64,43 +64,6 @@ pub enum WireTypeKind<'a> {
         openness: EnumType,
     },
 }
-
-impl PartialEq for WireTypeKind<'_> {
-    fn eq(&self, other: &Self) -> bool {
-        use ::std::ptr;
-        match (self, other) {
-            (Self::Double, Self::Double)
-            | (Self::Float, Self::Float)
-            | (Self::Int64, Self::Int64)
-            | (Self::UInt64, Self::UInt64)
-            | (Self::Int32, Self::Int32)
-            | (Self::Fixed64, Self::Fixed64)
-            | (Self::Fixed32, Self::Fixed32)
-            | (Self::Bool, Self::Bool)
-            | (Self::UInt32, Self::UInt32)
-            | (Self::SFixed32, Self::SFixed32)
-            | (Self::SFixed64, Self::SFixed64)
-            | (Self::SInt32, Self::SInt32)
-            | (Self::SInt64, Self::SInt64) => true,
-            (Self::String { utf8: a }, Self::String { utf8: b })
-            | (Self::Bytes { utf8: a }, Self::Bytes { utf8: b }) => a == b,
-            (Self::Message(a), Self::Message(b)) => ptr::eq(*a, *b),
-            (
-                Self::Enum {
-                    ty: a,
-                    openness: oa,
-                },
-                Self::Enum {
-                    ty: b,
-                    openness: ob,
-                },
-            ) => ptr::eq(*a, *b) && oa == ob,
-            _ => false,
-        }
-    }
-}
-
-impl Eq for WireTypeKind<'_> {}
 
 /// `FieldPresence` marker baked into `SingularField<…, P, …>`.
 #[derive(Debug, Clone, PartialEq, Eq)]
