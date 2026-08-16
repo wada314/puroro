@@ -12,8 +12,8 @@ use ::derive_more::TryFrom;
 
 /// Declared Editions features (`google.protobuf.FeatureSet`).
 ///
-/// Unset members are [`None`] (inherit from a parent scope). After overlaying
-/// syntax defaults, use [`FinalizedFeatureSet`].
+/// Unset members are [`None`] (inherit from a parent scope). Resolve overlays
+/// syntax defaults to produce a finalized set with every member present.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct FeatureSet {
     pub field_presence: Option<FieldPresence>,
@@ -27,29 +27,11 @@ pub struct FeatureSet {
 }
 
 impl FeatureSet {
-    /// Overlay `over` onto `self`: each `Some` in `over` wins.
-    pub fn overlay(self, over: &Self) -> Self {
-        Self {
-            field_presence: over.field_presence.or(self.field_presence),
-            enum_type: over.enum_type.or(self.enum_type),
-            repeated_field_encoding: over
-                .repeated_field_encoding
-                .or(self.repeated_field_encoding),
-            utf8_validation: over.utf8_validation.or(self.utf8_validation),
-            message_encoding: over.message_encoding.or(self.message_encoding),
-            json_format: over.json_format.or(self.json_format),
-            enforce_naming_style: over.enforce_naming_style.or(self.enforce_naming_style),
-            default_symbol_visibility: over
-                .default_symbol_visibility
-                .or(self.default_symbol_visibility),
-        }
-    }
-
     /// Trap explicit overrides of features resolve / codegen do not apply yet.
     ///
     /// Consumed today: `field_presence`, `enum_type`, `repeated_field_encoding`,
     /// `utf8_validation`, and `message_encoding` (LENGTH_PREFIXED only).
-    pub fn reject_unimplemented_overrides(&self, context: &str) {
+    pub(crate) fn reject_unimplemented_overrides(&self, context: &str) {
         if self.json_format.is_some() {
             unimplemented!(
                 "editions features.json_format override is not implemented yet ({context})"
@@ -72,7 +54,7 @@ impl FeatureSet {
 ///
 /// Every member is set. Declared (sparse) overlays stay on [`FeatureSet`].
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct FinalizedFeatureSet {
+pub(crate) struct FinalizedFeatureSet {
     pub field_presence: FieldPresence,
     pub enum_type: EnumType,
     pub repeated_field_encoding: RepeatedFieldEncoding,
@@ -85,7 +67,7 @@ pub struct FinalizedFeatureSet {
 
 impl FinalizedFeatureSet {
     /// Proto2 / proto3 use a fixed set; editions use [`Self::defaults_for_edition`].
-    pub fn defaults_for_syntax(syntax: super::Syntax) -> Self {
+    pub(crate) fn defaults_for_syntax(syntax: super::Syntax) -> Self {
         match syntax {
             super::Syntax::Proto2 => Self {
                 field_presence: FieldPresence::Explicit,
@@ -136,7 +118,7 @@ impl FinalizedFeatureSet {
     }
 
     /// Each `Some` in `over` replaces the corresponding field.
-    pub fn overlay(self, over: &FeatureSet) -> Self {
+    pub(crate) fn overlay(self, over: &FeatureSet) -> Self {
         Self {
             field_presence: over.field_presence.unwrap_or(self.field_presence),
             enum_type: over.enum_type.unwrap_or(self.enum_type),
@@ -156,7 +138,7 @@ impl FinalizedFeatureSet {
     }
 
     /// File-scope features that are not applied anywhere in resolve/codegen yet.
-    pub fn apply_or_trap_for_file(&self) {
+    pub(crate) fn apply_or_trap_for_file(&self) {
         assert!(
             matches!(self.json_format, JsonFormat::Allow),
             "editions features.json_format={:?}: only ALLOW is assumed until codegen reads this feature",
