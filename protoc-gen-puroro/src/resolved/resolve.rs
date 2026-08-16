@@ -13,26 +13,9 @@ use crate::descriptor::{
 };
 use crate::error::{Error, Result};
 use ::std::collections::HashMap;
-use ::std::fmt;
 use ::std::iter::IntoIterator;
 use ::std::mem;
 use ::std::ptr;
-
-/// Name-map entry while registering and linking types.
-#[derive(Clone, Copy)]
-enum TypeItem<'a> {
-    Message(&'a Message<'a>),
-    Enum(&'a Enum<'a>),
-}
-
-impl fmt::Debug for TypeItem<'_> {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Self::Message(m) => write!(f, "Message({})", m.fqn()),
-            Self::Enum(e) => write!(f, "Enum({})", e.fqn()),
-        }
-    }
-}
 
 /// Descriptor `oneof_index` → index in the resolved [`Message::oneofs`] list.
 ///
@@ -113,7 +96,8 @@ struct PendingFields<'a, 'd> {
 /// Name map + pending field edges for one [`resolve`] call.
 struct ResolveCtx<'a, 'd> {
     arena: &'a Arena,
-    types_by_fqn: HashMap<ProtoFqn, TypeItem<'a>>,
+    messages_by_fqn: HashMap<ProtoFqn, &'a Message<'a>>,
+    enums_by_fqn: HashMap<ProtoFqn, &'a Enum<'a>>,
     pending: Vec<PendingFields<'a, 'd>>,
 }
 
@@ -124,7 +108,8 @@ struct ResolveCtx<'a, 'd> {
 pub fn resolve<'a>(arena: &'a Arena, proto_files: &[ProtoFile]) -> Result<FileSet<'a>> {
     let mut ctx = ResolveCtx {
         arena,
-        types_by_fqn: HashMap::new(),
+        messages_by_fqn: HashMap::new(),
+        enums_by_fqn: HashMap::new(),
         pending: Vec::new(),
     };
     let mut files = Vec::with_capacity(proto_files.len());
@@ -177,11 +162,7 @@ impl<'a, 'd> ResolveCtx<'a, 'd> {
     ) -> Result<&'a Message<'a>> {
         let fqn = parent_fqn.append(&desc.name);
 
-        if self.types_by_fqn.contains_key(&fqn) {
-            return Err(Error::Codegen(format!(
-                "duplicate type FQN `{fqn}` while resolving schema"
-            )));
-        }
+        self.check_unique_fqn(&fqn)?;
 
         let (oneofs, oneof_remap) = OneofRemap::from_message(desc);
 
@@ -195,8 +176,7 @@ impl<'a, 'd> ResolveCtx<'a, 'd> {
             oneofs,
             map_entry: desc.map_entry,
         });
-        self.types_by_fqn
-            .insert(fqn.clone(), TypeItem::Message(message));
+        self.messages_by_fqn.insert(fqn.clone(), message);
         self.pending.push(PendingFields {
             message,
             desc,
@@ -229,11 +209,7 @@ impl<'a, 'd> ResolveCtx<'a, 'd> {
     ) -> Result<&'a Enum<'a>> {
         let fqn = parent_fqn.append(&desc.name);
 
-        if self.types_by_fqn.contains_key(&fqn) {
-            return Err(Error::Codegen(format!(
-                "duplicate type FQN `{fqn}` while resolving schema"
-            )));
-        }
+        self.check_unique_fqn(&fqn)?;
 
         desc.features
             .reject_unimplemented_overrides(&format!("enum `{fqn}`"));
@@ -254,7 +230,7 @@ impl<'a, 'd> ResolveCtx<'a, 'd> {
             openness: EnumType::resolve(file, &desc.features),
             values,
         });
-        self.types_by_fqn.insert(fqn, TypeItem::Enum(enum_ty));
+        self.enums_by_fqn.insert(fqn, enum_ty);
         Ok(enum_ty)
     }
 
@@ -378,17 +354,20 @@ impl<'a, 'd> ResolveCtx<'a, 'd> {
     }
 
     fn lookup_message(&self, type_name: &ProtoFqn) -> Option<&'a Message<'a>> {
-        match self.types_by_fqn.get(type_name)? {
-            TypeItem::Message(m) => Some(*m),
-            TypeItem::Enum(_) => None,
-        }
+        self.messages_by_fqn.get(type_name).copied()
     }
 
     fn lookup_enum(&self, type_name: &ProtoFqn) -> Option<&'a Enum<'a>> {
-        match self.types_by_fqn.get(type_name)? {
-            TypeItem::Enum(e) => Some(*e),
-            TypeItem::Message(_) => None,
+        self.enums_by_fqn.get(type_name).copied()
+    }
+
+    fn check_unique_fqn(&self, fqn: &ProtoFqn) -> Result<()> {
+        if self.messages_by_fqn.contains_key(fqn) || self.enums_by_fqn.contains_key(fqn) {
+            return Err(Error::Codegen(format!(
+                "duplicate type FQN `{fqn}` while resolving schema"
+            )));
         }
+        Ok(())
     }
 }
 
@@ -498,6 +477,12 @@ mod tests {
         ProtoFile, ProtoFqn, Syntax,
     };
     use ::std::ptr;
+
+    #[derive(Clone, Copy)]
+    enum TypeItem<'a> {
+        Message(&'a Message<'a>),
+        Enum(&'a Enum<'a>),
+    }
 
     fn lookup_message<'a>(file_set: &FileSet<'a>, fqn: impl AsRef<str>) -> Option<&'a Message<'a>> {
         lookup_item(file_set, fqn.as_ref()).and_then(TypeItem::as_message)
