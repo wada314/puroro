@@ -144,7 +144,37 @@ fn split_fqn_file_level(fqn: &ProtoFqn) -> Result<(Vec<&str>, &str)> {
 mod tests {
     use super::*;
     use crate::descriptor::{EnumDesc, EnumValueDesc, FeatureSet, MessageDesc, ProtoFile, Syntax};
-    use crate::resolved::{Arena, resolve};
+    use crate::resolved::{Arena, FileSet, resolve};
+
+    fn message<'a>(set: &FileSet<'a>, name: &str) -> &'a Message<'a> {
+        fn walk<'a>(m: &'a Message<'a>, name: &str) -> Option<&'a Message<'a>> {
+            if m.name() == name {
+                return Some(m);
+            }
+            m.nested_messages().find_map(|n| walk(n, name))
+        }
+        set.files()
+            .flat_map(|f| f.messages())
+            .find_map(|m| walk(m, name))
+            .unwrap_or_else(|| panic!("missing message {name}"))
+    }
+
+    fn enumeration<'a>(set: &FileSet<'a>, name: &str) -> &'a Enum<'a> {
+        fn walk_msg<'a>(m: &'a Message<'a>, name: &str) -> Option<&'a Enum<'a>> {
+            m.nested_enums()
+                .find(|e| e.name() == name)
+                .or_else(|| m.nested_messages().find_map(|n| walk_msg(n, name)))
+        }
+        set.files()
+            .flat_map(|f| f.enums())
+            .find(|e| e.name() == name)
+            .or_else(|| {
+                set.files()
+                    .flat_map(|f| f.messages())
+                    .find_map(|m| walk_msg(m, name))
+            })
+            .unwrap_or_else(|| panic!("missing enum {name}"))
+    }
 
     #[test]
     fn maps_packaged_and_top_level_enums() {
@@ -174,7 +204,7 @@ mod tests {
             enums: vec![],
         }];
         let set = resolve(&arena, &files).unwrap();
-        let msg = set.lookup(".demo.Address").unwrap().as_message().unwrap();
+        let msg = message(&set, "Address");
         let path = fqn_to_message_root_path(msg).unwrap();
         assert_eq!(
             path.to_string(),
@@ -216,16 +246,12 @@ mod tests {
             enums: vec![],
         }];
         let set = resolve(&arena, &files).unwrap();
-        let inner = set
-            .lookup(".demo.Outer.Inner")
-            .unwrap()
-            .as_message()
-            .unwrap();
+        let inner = message(&set, "Inner");
         assert_eq!(
             fqn_to_message_root_path(inner).unwrap().to_string(),
             "self :: _root :: demo :: outer :: inner :: Inner"
         );
-        let kind = set.lookup(".demo.Outer.Kind").unwrap().as_enum().unwrap();
+        let kind = enumeration(&set, "Kind");
         assert_eq!(
             fqn_to_enum_root_path(kind).unwrap().to_string(),
             "self :: _root :: demo :: outer :: Kind"

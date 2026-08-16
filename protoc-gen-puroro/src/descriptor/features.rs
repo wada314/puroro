@@ -2,7 +2,11 @@
 //!
 //! Mirrors `google.protobuf.FeatureSet` fields that protoc may set on file /
 //! field / enum options. Unset members are [`None`] (inherit from a parent scope
-//! or edition defaults during resolve).
+//! or syntax / edition defaults during resolve).
+//!
+//! Proto2 and proto3 are treated as fixed default sets (the same idea as
+//! `EDITION_PROTO2` / `EDITION_PROTO3`). Feature option overlays apply only to
+//! editions files.
 
 use ::derive_more::TryFrom;
 
@@ -46,6 +50,34 @@ impl FeatureSet {
             default_symbol_visibility: over
                 .default_symbol_visibility
                 .or(self.default_symbol_visibility),
+        }
+    }
+
+    /// Effective defaults for a file's syntax. Proto2 / proto3 use a fixed set;
+    /// editions use [`Self::defaults_for_edition`].
+    pub fn defaults_for_syntax(syntax: super::Syntax) -> Self {
+        match syntax {
+            super::Syntax::Proto2 => Self {
+                field_presence: Some(FieldPresence::Explicit),
+                enum_type: Some(EnumType::Closed),
+                repeated_field_encoding: Some(RepeatedFieldEncoding::Expanded),
+                utf8_validation: Some(Utf8Validation::None),
+                message_encoding: Some(MessageEncoding::LengthPrefixed),
+                json_format: Some(JsonFormat::LegacyBestEffort),
+                enforce_naming_style: Some(EnforceNamingStyle::StyleLegacy),
+                default_symbol_visibility: Some(DefaultSymbolVisibility::ExportAll),
+            },
+            super::Syntax::Proto3 => Self {
+                field_presence: Some(FieldPresence::Implicit),
+                enum_type: Some(EnumType::Open),
+                repeated_field_encoding: Some(RepeatedFieldEncoding::Packed),
+                utf8_validation: Some(Utf8Validation::Verify),
+                message_encoding: Some(MessageEncoding::LengthPrefixed),
+                json_format: Some(JsonFormat::Allow),
+                enforce_naming_style: Some(EnforceNamingStyle::StyleLegacy),
+                default_symbol_visibility: Some(DefaultSymbolVisibility::ExportAll),
+            },
+            super::Syntax::Editions(edition) => Self::defaults_for_edition(edition),
         }
     }
 

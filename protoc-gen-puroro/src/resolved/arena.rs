@@ -17,7 +17,7 @@ impl Arena {
     }
 
     /// Allocate `value` in this arena and return a stable reference.
-    pub fn alloc<T>(&self, value: T) -> &mut T {
+    pub(crate) fn alloc<T>(&self, value: T) -> &mut T {
         self.bump.alloc(value)
     }
 }

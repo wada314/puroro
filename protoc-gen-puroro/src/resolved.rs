@@ -18,8 +18,7 @@ pub use arena::Arena;
 pub use resolve::resolve;
 
 use crate::descriptor::features::{EnumType, RepeatedFieldEncoding, Utf8Validation};
-use crate::descriptor::{BytesLayout, FieldType, ProtoFqn, StringLayout, Syntax};
-use ::std::collections::HashMap;
+use crate::descriptor::{BytesLayout, ProtoFqn, StringLayout, Syntax};
 use ::std::fmt;
 
 /// Cardinality + singular presence after resolve.
@@ -50,8 +49,6 @@ pub enum SingularPresence {
 #[derive(Debug)]
 pub struct FileSet<'a> {
     files: Vec<&'a File<'a>>,
-    /// All messages and enums keyed by absolute protobuf FQN.
-    types_by_fqn: HashMap<ProtoFqn, TypeItem<'a>>,
 }
 
 /// One `.proto` file after resolution.
@@ -148,31 +145,9 @@ pub struct EnumValue {
     number: i32,
 }
 
-/// Entry in [`FileSet`]'s type map.
-#[derive(Clone, Copy)]
-pub enum TypeItem<'a> {
-    Message(&'a Message<'a>),
-    Enum(&'a Enum<'a>),
-}
-
 impl<'a> FileSet<'a> {
     pub fn files(&self) -> impl Iterator<Item = &'a File<'a>> + '_ {
         self.files.iter().copied()
-    }
-
-    /// Look up a message or enum by absolute protobuf FQN.
-    ///
-    /// `fqn` must already be in canonical form (leading `.`), as stored in
-    /// [`ProtoFqn`]. Use [`ProtoFqn::parse`] at the boundary if you only have a
-    /// raw string. Lookup itself does not allocate — the map is keyed by
-    /// [`ProtoFqn`] and queried via [`Borrow<str>`](std::borrow::Borrow).
-    pub fn lookup(&self, fqn: impl AsRef<str>) -> Option<TypeItem<'a>> {
-        let fqn = fqn.as_ref();
-        debug_assert!(
-            fqn.starts_with('.'),
-            "lookup expects a canonical ProtoFqn (leading `.`), got {fqn:?}"
-        );
-        self.types_by_fqn.get(fqn).copied()
     }
 }
 
@@ -333,50 +308,6 @@ impl<'a> TypeRef<'a> {
             _ => None,
         }
     }
-
-    pub fn from_scalar(type_: FieldType) -> Option<Self> {
-        Some(match type_ {
-            FieldType::Double => Self::Double,
-            FieldType::Float => Self::Float,
-            FieldType::Int64 => Self::Int64,
-            FieldType::UInt64 => Self::UInt64,
-            FieldType::Int32 => Self::Int32,
-            FieldType::Fixed64 => Self::Fixed64,
-            FieldType::Fixed32 => Self::Fixed32,
-            FieldType::Bool => Self::Bool,
-            FieldType::String => Self::String,
-            FieldType::Bytes => Self::Bytes,
-            FieldType::UInt32 => Self::UInt32,
-            FieldType::SFixed32 => Self::SFixed32,
-            FieldType::SFixed64 => Self::SFixed64,
-            FieldType::SInt32 => Self::SInt32,
-            FieldType::SInt64 => Self::SInt64,
-            FieldType::Message | FieldType::Enum | FieldType::Group => return None,
-        })
-    }
-}
-
-impl<'a> TypeItem<'a> {
-    pub fn fqn(self) -> &'a ProtoFqn {
-        match self {
-            Self::Message(m) => m.fqn(),
-            Self::Enum(e) => e.fqn(),
-        }
-    }
-
-    pub fn as_message(self) -> Option<&'a Message<'a>> {
-        match self {
-            Self::Message(m) => Some(m),
-            Self::Enum(_) => None,
-        }
-    }
-
-    pub fn as_enum(self) -> Option<&'a Enum<'a>> {
-        match self {
-            Self::Enum(e) => Some(e),
-            Self::Message(_) => None,
-        }
-    }
 }
 
 impl fmt::Debug for Message<'_> {
@@ -435,15 +366,6 @@ impl fmt::Debug for TypeRef<'_> {
             Self::SFixed64 => write!(f, "SFixed64"),
             Self::SInt32 => write!(f, "SInt32"),
             Self::SInt64 => write!(f, "SInt64"),
-            Self::Message(m) => write!(f, "Message({})", m.fqn()),
-            Self::Enum(e) => write!(f, "Enum({})", e.fqn()),
-        }
-    }
-}
-
-impl fmt::Debug for TypeItem<'_> {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
             Self::Message(m) => write!(f, "Message({})", m.fqn()),
             Self::Enum(e) => write!(f, "Enum({})", e.fqn()),
         }

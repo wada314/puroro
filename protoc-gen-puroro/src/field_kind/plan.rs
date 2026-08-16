@@ -371,7 +371,20 @@ mod tests {
         ProtoFqn, StringLayout, Syntax,
     };
     use crate::field_kind::{CatalogLayout, CatalogPresence, presence_byte_len};
-    use crate::resolved::{Arena, resolve};
+    use crate::resolved::{Arena, FileSet, resolve};
+
+    fn message<'a>(set: &FileSet<'a>, name: &str) -> &'a Message<'a> {
+        fn walk<'a>(m: &'a Message<'a>, name: &str) -> Option<&'a Message<'a>> {
+            if m.name() == name {
+                return Some(m);
+            }
+            m.nested_messages().find_map(|n| walk(n, name))
+        }
+        set.files()
+            .flat_map(|f| f.messages())
+            .find_map(|m| walk(m, name))
+            .unwrap_or_else(|| panic!("missing message {name}"))
+    }
 
     fn proto3_file(messages: Vec<MessageDesc>) -> ProtoFile {
         ProtoFile {
@@ -422,7 +435,7 @@ mod tests {
             map_entry: false,
         }])];
         let set = resolve(&arena, &files).unwrap();
-        let msg = set.lookup(".example.Empty").unwrap().as_message().unwrap();
+        let msg = message(&set, "Empty");
         let plan = plan_message(msg).unwrap();
         assert!(plan.members().is_empty());
         assert_eq!(plan.bit_count(), 0);
@@ -479,11 +492,7 @@ mod tests {
             map_entry: false,
         }])];
         let set = resolve(&arena, &files).unwrap();
-        let msg = set
-            .lookup(".example.Address")
-            .unwrap()
-            .as_message()
-            .unwrap();
+        let msg = message(&set, "Address");
         let plan = plan_message(msg).unwrap();
         // street/city: presence + SSO heap bit each; postal_code/latitude: presence only.
         assert_eq!(plan.bit_count(), 6);
@@ -551,7 +560,7 @@ mod tests {
             map_entry: false,
         }])];
         let set = resolve(&arena, &files).unwrap();
-        let msg = set.lookup(".example.M").unwrap().as_message().unwrap();
+        let msg = message(&set, "M");
         let plan = plan_message(msg).unwrap();
         // Presence + SSO heap bit — same as an absent option.
         assert_eq!(plan.bit_count(), 2);
@@ -589,7 +598,7 @@ mod tests {
             map_entry: false,
         }])];
         let set = resolve(&arena, &files).unwrap();
-        let msg = set.lookup(".example.M").unwrap().as_message().unwrap();
+        let msg = message(&set, "M");
         let plan = plan_message(msg).unwrap();
         // Presence bit only — no SSO heap bit.
         assert_eq!(plan.bit_count(), 1);
@@ -627,7 +636,7 @@ mod tests {
             map_entry: false,
         }])];
         let set = resolve(&arena, &files).unwrap();
-        let msg = set.lookup(".example.M").unwrap().as_message().unwrap();
+        let msg = message(&set, "M");
         let plan = plan_message(msg).unwrap();
         assert_eq!(plan.bit_count(), 2);
         let MessageMember::Field(body) = &plan.members()[0] else {
@@ -664,7 +673,7 @@ mod tests {
             map_entry: false,
         }])];
         let set = resolve(&arena, &files).unwrap();
-        let msg = set.lookup(".example.M").unwrap().as_message().unwrap();
+        let msg = message(&set, "M");
         let plan = plan_message(msg).unwrap();
         assert_eq!(plan.bit_count(), 1);
         let MessageMember::Field(body) = &plan.members()[0] else {
@@ -741,7 +750,7 @@ mod tests {
             map_entry: false,
         }])];
         let set = resolve(&arena, &files).unwrap();
-        let msg = set.lookup(".example.Task").unwrap().as_message().unwrap();
+        let msg = message(&set, "Task");
         let plan = plan_message(msg).unwrap();
 
         // score: no bits
@@ -865,7 +874,7 @@ mod tests {
             map_entry: false,
         }])];
         let set = resolve(&arena, &files).unwrap();
-        let msg = set.lookup(".example.R").unwrap().as_message().unwrap();
+        let msg = message(&set, "R");
         let plan = plan_message(msg).unwrap();
         let MessageMember::Field(tags) = &plan.members()[0] else {
             panic!();
@@ -972,7 +981,7 @@ mod tests {
             }],
         };
         let set = resolve(&arena, &[file]).unwrap();
-        let msg = set.lookup(".example.T").unwrap().as_message().unwrap();
+        let msg = message(&set, "T");
         let plan = plan_message(msg).unwrap();
 
         let MessageMember::Field(scores) = &plan.members()[0] else {
@@ -1038,7 +1047,7 @@ mod tests {
             map_entry: false,
         }])];
         let set = resolve(&arena, &files).unwrap();
-        let msg = set.lookup(".example.T").unwrap().as_message().unwrap();
+        let msg = message(&set, "T");
         let plan = plan_message(msg).unwrap();
         assert_eq!(plan.members().len(), 1);
         let MessageMember::Field(score) = &plan.members()[0] else {
@@ -1092,7 +1101,7 @@ mod tests {
             }],
         }];
         let set = resolve(&arena, &files).unwrap();
-        let msg = set.lookup(".example.T").unwrap().as_message().unwrap();
+        let msg = message(&set, "T");
         let plan = plan_message(msg).unwrap();
         let MessageMember::Field(status) = &plan.members()[0] else {
             panic!();
@@ -1154,7 +1163,7 @@ mod tests {
             map_entry: false,
         }])];
         let set = resolve(&arena, &files).unwrap();
-        let msg = set.lookup(".example.Holder").unwrap().as_message().unwrap();
+        let msg = message(&set, "Holder");
         let plan = plan_message(msg).unwrap();
         assert_eq!(plan.bit_count(), 0);
         let MessageMember::Field(attrs) = &plan.members()[0] else {
@@ -1215,7 +1224,7 @@ mod tests {
             map_entry: false,
         }])];
         let set = resolve(&arena, &files).unwrap();
-        let msg = set.lookup(".example.Holder").unwrap().as_message().unwrap();
+        let msg = message(&set, "Holder");
         let plan = plan_message(msg).unwrap();
         let MessageMember::Field(labels) = &plan.members()[0] else {
             panic!("map must be a top-level field");
@@ -1275,7 +1284,7 @@ mod tests {
             map_entry: false,
         }])];
         let set = resolve(&arena, &files).unwrap();
-        let msg = set.lookup(".example.Holder").unwrap().as_message().unwrap();
+        let msg = message(&set, "Holder");
         let plan = plan_message(msg).unwrap();
         let MessageMember::Field(flags) = &plan.members()[0] else {
             panic!("map must be a top-level field");
