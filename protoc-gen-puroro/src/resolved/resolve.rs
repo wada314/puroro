@@ -5,7 +5,8 @@ use super::{
     SingularPresence, TypeRef,
 };
 use crate::descriptor::features::{
-    EnumType, FeatureSet, FieldPresence, MessageEncoding, RepeatedFieldEncoding, Utf8Validation,
+    EnumType, FeatureSet, FieldPresence, FinalizedFeatureSet, MessageEncoding,
+    RepeatedFieldEncoding, Utf8Validation,
 };
 use crate::descriptor::{
     EnumDesc, FieldDesc, FieldLabel, FieldType, MessageDesc, ProtoFile, ProtoFqn, Syntax,
@@ -234,10 +235,10 @@ impl<'a, 'd> ResolveCtx<'a, 'd> {
                 .reject_unimplemented_overrides(&format!("field `{owner_fqn}.{}`", field.name));
         }
 
-        let features = FeatureSet::resolve_field(file, field);
+        let features = FinalizedFeatureSet::resolve_field(file, field);
 
         if matches!(field.type_, FieldType::Message)
-            && features.message_encoding == Some(MessageEncoding::Delimited)
+            && features.message_encoding == MessageEncoding::Delimited
         {
             return Err(Error::Codegen(format!(
                 "field `{owner_fqn}.{}`: features.message_encoding=DELIMITED is not supported",
@@ -338,10 +339,10 @@ fn write_shared<T>(slot: &T, value: T) {
     }
 }
 
-impl FeatureSet {
+impl FinalizedFeatureSet {
     /// Syntax defaults, then `file.features`, then each of `inner` in order
     /// (later `Some` wins). Classic proto ignores every overlay.
-    fn resolve<'a>(file: &ProtoFile, inner: impl IntoIterator<Item = &'a Self>) -> Self {
+    fn resolve<'a>(file: &ProtoFile, inner: impl IntoIterator<Item = &'a FeatureSet>) -> Self {
         let mut features = Self::defaults_for_syntax(file.syntax);
         if matches!(file.syntax, Syntax::Editions(_)) {
             features = features.overlay(&file.features);
@@ -357,14 +358,14 @@ impl FeatureSet {
     fn resolve_field(file: &ProtoFile, field: &FieldDesc) -> Self {
         let mut features = Self::resolve(file, [&field.features]);
         if field.proto3_optional {
-            features.field_presence = Some(FieldPresence::Explicit);
+            features.field_presence = FieldPresence::Explicit;
         }
         if field.label == FieldLabel::Required {
-            features.field_presence = Some(FieldPresence::LegacyRequired);
+            features.field_presence = FieldPresence::LegacyRequired;
         }
         match field.packed {
-            Some(true) => features.repeated_field_encoding = Some(RepeatedFieldEncoding::Packed),
-            Some(false) => features.repeated_field_encoding = Some(RepeatedFieldEncoding::Expanded),
+            Some(true) => features.repeated_field_encoding = RepeatedFieldEncoding::Packed,
+            Some(false) => features.repeated_field_encoding = RepeatedFieldEncoding::Expanded,
             None => {}
         }
         features
@@ -373,9 +374,7 @@ impl FeatureSet {
 
 impl EnumType {
     fn resolve(file: &ProtoFile, enum_features: &FeatureSet) -> Self {
-        FeatureSet::resolve(file, [enum_features])
-            .enum_type
-            .expect("syntax defaults always set enum_type")
+        FinalizedFeatureSet::resolve(file, [enum_features]).enum_type
     }
 }
 
@@ -449,23 +448,19 @@ fn check_file_features(proto: &ProtoFile) {
         proto
             .features
             .reject_unimplemented_overrides(&format!("file `{}`", proto.name));
-        FeatureSet::resolve(proto, None).apply_or_trap_for_file();
+        FinalizedFeatureSet::resolve(proto, None).apply_or_trap_for_file();
     }
 }
 
 impl FieldOccurrence {
-    fn resolve(field: &FieldDesc, features: &FeatureSet, type_ref: &TypeRef<'_>) -> Self {
+    fn resolve(field: &FieldDesc, features: &FinalizedFeatureSet, type_ref: &TypeRef<'_>) -> Self {
         if field.label == FieldLabel::Repeated {
             if let TypeRef::Message(entry) = type_ref
                 && entry.is_map_entry()
             {
                 return Self::Map;
             }
-            return Self::Repeated(
-                features
-                    .repeated_field_encoding
-                    .expect("syntax defaults always set repeated_field_encoding"),
-            );
+            return Self::Repeated(features.repeated_field_encoding);
         }
 
         // Real oneof member (proto3 `optional` uses a synthetic oneof + proto3_optional).
@@ -477,29 +472,20 @@ impl FieldOccurrence {
             return Self::Singular(SingularPresence::Message);
         }
 
-        Self::Singular(
-            match features
-                .field_presence
-                .expect("syntax defaults always set field_presence")
-            {
-                FieldPresence::Explicit => SingularPresence::Explicit,
-                FieldPresence::Implicit => SingularPresence::Implicit,
-                FieldPresence::LegacyRequired => SingularPresence::LegacyRequired,
-            },
-        )
+        Self::Singular(match features.field_presence {
+            FieldPresence::Explicit => SingularPresence::Explicit,
+            FieldPresence::Implicit => SingularPresence::Implicit,
+            FieldPresence::LegacyRequired => SingularPresence::LegacyRequired,
+        })
     }
 }
 
 impl Utf8Validation {
-    fn resolve(field: &FieldDesc, features: &FeatureSet) -> Option<Self> {
+    fn resolve(field: &FieldDesc, features: &FinalizedFeatureSet) -> Option<Self> {
         if !matches!(field.type_, FieldType::String | FieldType::Bytes) {
             return None;
         }
-        Some(
-            features
-                .utf8_validation
-                .expect("syntax defaults always set utf8_validation"),
-        )
+        Some(features.utf8_validation)
     }
 }
 

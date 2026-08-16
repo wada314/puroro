@@ -603,7 +603,7 @@ mod tests {
         assert_eq!(decoded.proto_files[0].package, "example");
         // syntax field omitted → proto2 default
         assert_eq!(decoded.proto_files[0].syntax, Syntax::Proto2);
-        assert!(decoded.proto_files[0].features.is_empty());
+        assert_eq!(decoded.proto_files[0].features, FeatureSet::default());
         assert_eq!(decoded.proto_files[0].messages.len(), 1);
         assert_eq!(decoded.proto_files[0].messages[0].name, "Task");
         assert_eq!(decoded.proto_files[0].messages[0].fields.len(), 1);
