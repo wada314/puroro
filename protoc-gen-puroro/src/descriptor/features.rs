@@ -114,7 +114,7 @@ impl FinalizedFeatureSet {
     /// Edition defaults after applying the cumulative `edition_defaults` chain
     /// up through the given edition (proto3-like open enums / packed / …, then
     /// edition-2023+ explicit presence, then 2024 naming / visibility).
-    pub fn defaults_for_edition(edition: super::Edition) -> Self {
+    fn defaults_for_edition(edition: super::Edition) -> Self {
         let mut features = Self {
             field_presence: FieldPresence::Explicit,
             enum_type: EnumType::Open,
