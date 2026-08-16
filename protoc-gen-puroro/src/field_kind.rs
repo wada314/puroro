@@ -149,18 +149,6 @@ impl<'a> WireTypeKind<'a> {
         }
     }
 
-    pub fn is_bool(self) -> bool {
-        matches!(self, Self::Bool)
-    }
-
-    pub fn is_string(self) -> bool {
-        matches!(self, Self::String { .. })
-    }
-
-    pub fn is_bytes(self) -> bool {
-        matches!(self, Self::Bytes { .. })
-    }
-
     /// Whether the type may use packed repeated wire encoding.
     pub fn is_packable(self) -> bool {
         match self {

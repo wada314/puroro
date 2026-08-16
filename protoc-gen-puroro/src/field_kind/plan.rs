@@ -233,15 +233,17 @@ fn plan_field<'a>(field: &'a Field<'a>, next_bit: &mut usize) -> Result<PlannedF
         FieldOccurrence::Singular(presence) => {
             let wire = WireTypeKind::from_field(field);
             let planned_presence = PlannedPresence::from_singular(presence, field.name(), next_bit);
-            let layout = if wire.is_bool() {
+            let layout = if matches!(wire, WireTypeKind::Bool) {
                 let value_bit = *next_bit;
                 *next_bit += 1;
                 PlannedLayout::BitPacked {
                     value_bit,
                     bit_const: value_bit_const(field.name()),
                 }
-            } else if (wire.is_string() && field.string_layout() != Some(StringLayout::Heap))
-                || (wire.is_bytes() && field.bytes_layout() != Some(BytesLayout::Heap))
+            } else if (matches!(wire, WireTypeKind::String { .. })
+                && field.string_layout() != Some(StringLayout::Heap))
+                || (matches!(wire, WireTypeKind::Bytes { .. })
+                    && field.bytes_layout() != Some(BytesLayout::Heap))
             {
                 let heap_bit = *next_bit;
                 *next_bit += 1;
