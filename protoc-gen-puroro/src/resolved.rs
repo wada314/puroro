@@ -3,10 +3,10 @@
 //! Nodes live in a caller-owned [`Arena`] and refer to each other with ordinary
 //! references tied to that arena's lifetime.
 //!
-//! Nested messages/enums are ordinary [`Vec`]s built while walking the descriptor
-//! tree (each node once). Field [`TypeRef`]s may form cycles, so registration
-//! queues each message and a later link pass writes fields; that storage detail
-//! is not part of the public API.
+//! Parent pointers are ordinary references: each node is allocated before its
+//! children. Nested message/enum lists and field [`TypeRef`]s are filled after
+//! (children after the parent exists; fields in a later link pass because they
+//! may form cycles). Those storage details are not part of the public API.
 //!
 //! Plugin metadata ([`crate::descriptor::CodegenMeta`]) is intentionally **not**
 //! stored here — pass it alongside `&FileSet` by reference.
@@ -19,7 +19,6 @@ pub use resolve::resolve;
 
 use crate::descriptor::features::{EnumType, RepeatedFieldEncoding, Utf8Validation};
 use crate::descriptor::{BytesLayout, FieldType, ProtoFqn, StringLayout, Syntax};
-use ::std::cell::OnceCell;
 use ::std::collections::HashMap;
 use ::std::fmt;
 
@@ -71,11 +70,10 @@ pub struct Message<'a> {
     name: String,
     /// Absolute protobuf FQN (e.g. `.example.v1.Task`).
     fqn: ProtoFqn,
-    /// Enclosing message, if nested. Set once after this node is allocated
-    /// (children are built first so `nested_*` can be plain [`Vec`]s).
-    parent: OnceCell<&'a Message<'a>>,
-    /// Filled in the link pass (may reference peer / mutually recursive types).
-    fields: OnceCell<Vec<Field<'a>>>,
+    /// Enclosing message, if nested. Known when this node is allocated
+    /// (parent is created first).
+    parent: Option<&'a Message<'a>>,
+    fields: Vec<Field<'a>>,
     nested_messages: Vec<&'a Message<'a>>,
     nested_enums: Vec<&'a Enum<'a>>,
     /// Real oneofs only; proto3 `optional` synthetic groups are dropped.
@@ -136,8 +134,8 @@ pub struct Oneof {
 pub struct Enum<'a> {
     name: String,
     fqn: ProtoFqn,
-    /// Enclosing message, if nested. Empty for file-level enums.
-    parent: OnceCell<&'a Message<'a>>,
+    /// Enclosing message, if nested. `None` for file-level enums.
+    parent: Option<&'a Message<'a>>,
     /// Open vs closed (`features.enum_type`, or proto2/proto3 defaults).
     openness: EnumType,
     values: Vec<EnumValue>,
@@ -215,15 +213,11 @@ impl<'a> Message<'a> {
 
     /// Enclosing message, if this type is nested.
     pub fn parent(&self) -> Option<&'a Message<'a>> {
-        self.parent.get().copied()
+        self.parent
     }
 
-    /// Fields after resolve has finished.
     pub fn fields(&self) -> impl Iterator<Item = &Field<'a>> + '_ {
-        self.fields
-            .get()
-            .expect("message fields accessed before resolve finished")
-            .iter()
+        self.fields.iter()
     }
 
     pub fn nested_messages(&self) -> impl Iterator<Item = &'a Message<'a>> + '_ {
@@ -303,7 +297,7 @@ impl<'a> Enum<'a> {
 
     /// Enclosing message, if this enum is nested.
     pub fn parent(&self) -> Option<&'a Message<'a>> {
-        self.parent.get().copied()
+        self.parent
     }
 
     pub fn openness(&self) -> EnumType {
@@ -390,7 +384,7 @@ impl fmt::Debug for Message<'_> {
         f.debug_struct("Message")
             .field("fqn", &self.fqn)
             .field("parent", &self.parent().map(|m| m.fqn()))
-            .field("fields", &self.fields.get())
+            .field("fields", &self.fields)
             .field(
                 "nested_messages",
                 &self

@@ -11,9 +11,9 @@ use crate::descriptor::{
     EnumDesc, FieldDesc, FieldLabel, FieldType, MessageDesc, ProtoFile, ProtoFqn, Syntax,
 };
 use crate::error::{Error, Result};
-use ::std::cell::OnceCell;
 use ::std::collections::HashMap;
 use ::std::mem;
+use ::std::ptr;
 
 /// Message + defining descriptor, queued while registering so the link pass
 /// does not re-walk the tree or re-derive FQNs.
@@ -68,12 +68,12 @@ impl<'a, 'd> ResolveCtx<'a, 'd> {
 
         let mut messages = Vec::with_capacity(proto.messages.len());
         for desc in &proto.messages {
-            messages.push(self.register_message(desc, &package_fqn, proto)?);
+            messages.push(self.register_message(desc, &package_fqn, proto, None)?);
         }
 
         let mut enums = Vec::with_capacity(proto.enums.len());
         for desc in &proto.enums {
-            enums.push(self.register_enum(desc, &package_fqn, proto)?);
+            enums.push(self.register_enum(desc, &package_fqn, proto, None)?);
         }
 
         Ok(self.arena.alloc(File {
@@ -92,6 +92,7 @@ impl<'a, 'd> ResolveCtx<'a, 'd> {
         // FQN of the enclosing package (possibly ".") or parent message.
         parent_fqn: &ProtoFqn,
         file: &'d ProtoFile,
+        parent: Option<&'a Message<'a>>,
     ) -> Result<&'a Message<'a>> {
         let fqn = parent_fqn.append(&desc.name);
 
@@ -101,26 +102,15 @@ impl<'a, 'd> ResolveCtx<'a, 'd> {
             )));
         }
 
-        // Build children first so `nested_*` can be plain Vecs on the parent.
-        let mut nested_messages = Vec::with_capacity(desc.nested_messages.len());
-        for nested in &desc.nested_messages {
-            nested_messages.push(self.register_message(nested, &fqn, file)?);
-        }
-
-        let mut nested_enums = Vec::with_capacity(desc.nested_enums.len());
-        for nested in &desc.nested_enums {
-            nested_enums.push(self.register_enum(nested, &fqn, file)?);
-        }
-
         let (oneofs, oneof_remap) = real_oneofs(desc);
 
         let message = self.arena.alloc(Message {
             name: desc.name.clone(),
             fqn: fqn.clone(),
-            parent: OnceCell::new(),
-            fields: OnceCell::new(),
-            nested_messages,
-            nested_enums,
+            parent,
+            fields: Vec::new(),
+            nested_messages: Vec::new(),
+            nested_enums: Vec::new(),
             oneofs,
             map_entry: desc.map_entry,
         });
@@ -133,18 +123,17 @@ impl<'a, 'd> ResolveCtx<'a, 'd> {
             oneof_remap,
         });
 
-        for child in &message.nested_messages {
-            child
-                .parent
-                .set(message)
-                .map_err(|_| Error::Codegen(format!("parent set twice for `{}`", child.fqn)))?;
+        let mut nested_messages = Vec::with_capacity(desc.nested_messages.len());
+        for nested in &desc.nested_messages {
+            nested_messages.push(self.register_message(nested, &fqn, file, Some(message))?);
         }
-        for child in &message.nested_enums {
-            child
-                .parent
-                .set(message)
-                .map_err(|_| Error::Codegen(format!("parent set twice for `{}`", child.fqn)))?;
+        write_shared(&message.nested_messages, nested_messages);
+
+        let mut nested_enums = Vec::with_capacity(desc.nested_enums.len());
+        for nested in &desc.nested_enums {
+            nested_enums.push(self.register_enum(nested, &fqn, file, Some(message))?);
         }
+        write_shared(&message.nested_enums, nested_enums);
 
         Ok(message)
     }
@@ -155,6 +144,7 @@ impl<'a, 'd> ResolveCtx<'a, 'd> {
         // FQN of the enclosing package (possibly ".") or parent message.
         parent_fqn: &ProtoFqn,
         file: &ProtoFile,
+        parent: Option<&'a Message<'a>>,
     ) -> Result<&'a Enum<'a>> {
         let fqn = parent_fqn.append(&desc.name);
 
@@ -179,7 +169,7 @@ impl<'a, 'd> ResolveCtx<'a, 'd> {
         let enum_ty = self.arena.alloc(Enum {
             name: desc.name.clone(),
             fqn: fqn.clone(),
-            parent: OnceCell::new(),
+            parent,
             openness: resolve_enum_openness(file.syntax, &file.features, &desc.features),
             values,
         });
@@ -205,9 +195,7 @@ impl<'a, 'd> ResolveCtx<'a, 'd> {
                 &pending.oneof_remap,
             )?);
         }
-        pending.message.fields.set(fields).map_err(|_| {
-            Error::Codegen(format!("fields set twice for `{}`", pending.message.fqn))
-        })?;
+        write_shared(&pending.message.fields, fields);
         Ok(())
     }
 
@@ -321,6 +309,18 @@ impl<'a, 'd> ResolveCtx<'a, 'd> {
             TypeItem::Enum(e) => Some(*e),
             TypeItem::Message(_) => None,
         }
+    }
+}
+
+/// Overwrite a field of an arena node that is already shared by `&`.
+///
+/// Only used during [`resolve`], before [`FileSet`] is returned. There must be
+/// no outstanding borrow of `slot`'s contents.
+fn write_shared<T>(slot: &T, value: T) {
+    // Safety: `resolve` is single-threaded and does not read these slots until
+    // after the matching write. The arena allocation outlives both.
+    unsafe {
+        let _dropped = ptr::replace(ptr::from_ref(slot).cast_mut(), value);
     }
 }
 
