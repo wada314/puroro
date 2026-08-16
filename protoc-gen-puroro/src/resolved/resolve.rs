@@ -34,15 +34,80 @@ impl fmt::Debug for TypeItem<'_> {
     }
 }
 
+/// Descriptor `oneof_index` → index in the resolved [`Message::oneofs`] list.
+///
+/// Synthetic proto3-optional oneofs are dropped; remaining indices are remapped.
+struct OneofRemap {
+    remap: Vec<Option<i32>>,
+}
+
+impl OneofRemap {
+    fn from_message(desc: &MessageDesc) -> (Vec<Oneof>, Self) {
+        let n = desc.oneofs.len();
+        let mut is_real = vec![false; n];
+        for field in &desc.fields {
+            if field.proto3_optional {
+                continue;
+            }
+            let Some(idx) = field.oneof_index else {
+                continue;
+            };
+            let Ok(idx) = usize::try_from(idx) else {
+                continue;
+            };
+            if let Some(slot) = is_real.get_mut(idx) {
+                *slot = true;
+            }
+        }
+
+        let mut remap = vec![None; n];
+        let mut oneofs = Vec::new();
+        for (i, oneof) in desc.oneofs.iter().enumerate() {
+            if is_real[i] {
+                remap[i] = Some(i32::try_from(oneofs.len()).expect("oneof count fits i32"));
+                oneofs.push(Oneof {
+                    name: oneof.name.clone(),
+                });
+            }
+        }
+        (oneofs, Self { remap })
+    }
+
+    fn index(&self, field: &FieldDesc, owner_fqn: &ProtoFqn) -> Result<Option<i32>> {
+        if field.proto3_optional {
+            return Ok(None);
+        }
+        let Some(idx) = field.oneof_index else {
+            return Ok(None);
+        };
+        let Ok(idx) = usize::try_from(idx) else {
+            return Err(Error::Codegen(format!(
+                "field `{owner_fqn}.{}` has negative oneof_index",
+                field.name
+            )));
+        };
+        match self.remap.get(idx).copied() {
+            Some(Some(mapped)) => Ok(Some(mapped)),
+            Some(None) => Err(Error::Codegen(format!(
+                "field `{owner_fqn}.{}` oneof_index {idx} is not a real oneof",
+                field.name
+            ))),
+            None => Err(Error::Codegen(format!(
+                "field `{owner_fqn}.{}` oneof_index {idx} out of range ({} oneofs)",
+                field.name,
+                self.remap.len()
+            ))),
+        }
+    }
+}
+
 /// Message + defining descriptor, queued while registering so the link pass
 /// does not re-walk the tree or re-derive FQNs.
 struct PendingFields<'a, 'd> {
     message: &'a Message<'a>,
     desc: &'d MessageDesc,
     file: &'d ProtoFile,
-    /// Descriptor `oneof_index` → index in the resolved [`Message::oneofs`]
-    /// list (synthetic proto3-optional oneofs are dropped).
-    oneof_remap: Vec<Option<i32>>,
+    oneof_remap: OneofRemap,
 }
 
 /// Name map + pending field edges for one [`resolve`] call.
@@ -118,7 +183,7 @@ impl<'a, 'd> ResolveCtx<'a, 'd> {
             )));
         }
 
-        let (oneofs, oneof_remap) = real_oneofs(desc);
+        let (oneofs, oneof_remap) = OneofRemap::from_message(desc);
 
         let message = self.arena.alloc(Message {
             name: desc.name.clone(),
@@ -220,7 +285,7 @@ impl<'a, 'd> ResolveCtx<'a, 'd> {
         field: &FieldDesc,
         owner_fqn: &ProtoFqn,
         file: &ProtoFile,
-        oneof_remap: &[Option<i32>],
+        oneof_remap: &OneofRemap,
     ) -> Result<Field<'a>> {
         if field.type_ == FieldType::Group {
             return Err(Error::Codegen(format!(
@@ -253,7 +318,7 @@ impl<'a, 'd> ResolveCtx<'a, 'd> {
             number: field.number,
             occurrence: FieldOccurrence::resolve(field, &features, &type_ref),
             type_ref,
-            oneof_index: resolved_oneof_index(field, owner_fqn, oneof_remap)?,
+            oneof_index: oneof_remap.index(field, owner_fqn)?,
             default_value: field.default_value.clone(),
             utf8_validation: Utf8Validation::resolve(field, &features),
             string_layout: field.string_layout,
@@ -375,71 +440,6 @@ impl FinalizedFeatureSet {
 impl EnumType {
     fn resolve(file: &ProtoFile, enum_features: &FeatureSet) -> Self {
         FinalizedFeatureSet::resolve(file, [enum_features]).enum_type
-    }
-}
-
-/// Keep oneofs that have at least one real member. Proto3 `optional` fields
-/// are stored as a synthetic single-field oneof in the descriptor; those
-/// groups are dropped and remaining indices are remapped.
-fn real_oneofs(desc: &MessageDesc) -> (Vec<Oneof>, Vec<Option<i32>>) {
-    let n = desc.oneofs.len();
-    let mut is_real = vec![false; n];
-    for field in &desc.fields {
-        if field.proto3_optional {
-            continue;
-        }
-        let Some(idx) = field.oneof_index else {
-            continue;
-        };
-        let Ok(idx) = usize::try_from(idx) else {
-            continue;
-        };
-        if let Some(slot) = is_real.get_mut(idx) {
-            *slot = true;
-        }
-    }
-
-    let mut remap = vec![None; n];
-    let mut oneofs = Vec::new();
-    for (i, oneof) in desc.oneofs.iter().enumerate() {
-        if is_real[i] {
-            remap[i] = Some(i32::try_from(oneofs.len()).expect("oneof count fits i32"));
-            oneofs.push(Oneof {
-                name: oneof.name.clone(),
-            });
-        }
-    }
-    (oneofs, remap)
-}
-
-fn resolved_oneof_index(
-    field: &FieldDesc,
-    owner_fqn: &ProtoFqn,
-    remap: &[Option<i32>],
-) -> Result<Option<i32>> {
-    if field.proto3_optional {
-        return Ok(None);
-    }
-    let Some(idx) = field.oneof_index else {
-        return Ok(None);
-    };
-    let Ok(idx) = usize::try_from(idx) else {
-        return Err(Error::Codegen(format!(
-            "field `{owner_fqn}.{}` has negative oneof_index",
-            field.name
-        )));
-    };
-    match remap.get(idx).copied() {
-        Some(Some(mapped)) => Ok(Some(mapped)),
-        Some(None) => Err(Error::Codegen(format!(
-            "field `{owner_fqn}.{}` oneof_index {idx} is not a real oneof",
-            field.name
-        ))),
-        None => Err(Error::Codegen(format!(
-            "field `{owner_fqn}.{}` oneof_index {idx} out of range ({} oneofs)",
-            field.name,
-            remap.len()
-        ))),
     }
 }
 
