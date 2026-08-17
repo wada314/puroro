@@ -149,6 +149,11 @@ impl<'a> FileSet<'a> {
     pub fn files(&self) -> impl Iterator<Item = &'a File<'a>> + '_ {
         self.files.iter().copied()
     }
+
+    /// First file whose [`File::name`] equals `name`, if any.
+    pub fn file(&self, name: &str) -> Option<&'a File<'a>> {
+        self.files().find(|f| f.name() == name)
+    }
 }
 
 impl<'a> File<'a> {

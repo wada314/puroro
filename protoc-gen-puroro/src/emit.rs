@@ -12,7 +12,7 @@ use crate::field_kind::{MessagePlan, plan_message};
 use crate::module_tree::layout::{ModuleLayout, render};
 use crate::module_tree::{ModuleForest, ModuleNode, ModuleOrigin, type_name_to_module_ident};
 use crate::plugin_io::CodeGeneratorResponse;
-use crate::resolved::{Arena, File, FileSet, Message, resolve};
+use crate::resolved::{Arena, File, Message, resolve};
 use ::proc_macro2::{Ident, Span};
 use ::quote::quote;
 
@@ -34,7 +34,12 @@ pub fn emit(request: &CodegenRequest) -> Result<CodeGeneratorResponse> {
 
     let mut targets = Vec::with_capacity(request.meta.file_to_generate.len());
     for target in &request.meta.file_to_generate {
-        targets.push(find_file(&file_set, target)?);
+        let file = file_set.file(target).ok_or_else(|| {
+            Error::Codegen(format!(
+                "file_to_generate `{target}` was not present in proto_file"
+            ))
+        })?;
+        targets.push(file);
     }
 
     let mut forest = ModuleForest::new();
@@ -56,17 +61,6 @@ pub fn emit(request: &CodegenRequest) -> Result<CodeGeneratorResponse> {
         .pop()
         .ok_or_else(|| Error::Codegen("layout produced no files".into()))?;
     Ok(CodeGeneratorResponse::from_files(vec![file]))
-}
-
-fn find_file<'a>(file_set: &FileSet<'a>, target: &str) -> Result<&'a File<'a>> {
-    file_set
-        .files()
-        .find(|f| f.name() == target)
-        .ok_or_else(|| {
-            Error::Codegen(format!(
-                "file_to_generate `{target}` was not present in proto_file"
-            ))
-        })
 }
 
 fn write_root_attrs(forest: &mut ModuleForest, targets: &[&File<'_>]) {
@@ -178,6 +172,59 @@ mod tests {
         FieldDesc, FieldLabel, FieldType, MessageDesc, OneofDesc, ProtoFile, ProtoFqn,
         StringLayout, Syntax,
     };
+    use crate::plugin_io::decode_request;
+    use ::protobuf_core::{AsRefExtProtobuf, Field, FieldNumber, FieldValue, WriteExtProtobuf};
+    use ::std::env;
+    use ::std::fs;
+    use ::std::path::PathBuf;
+    use ::std::process::{self, Command};
+    use ::std::thread;
+
+    /// Successful `emit` results are also written under `generated-preview/`
+    /// (gitignored) so the pretty-printed Rust can be inspected. Overwritten
+    /// whenever that test runs.
+    fn emit(request: &CodegenRequest) -> Result<CodeGeneratorResponse> {
+        let result = super::emit(request);
+        if let Ok(response) = &result {
+            write_generated_preview(response);
+        }
+        result
+    }
+
+    fn write_generated_preview(response: &CodeGeneratorResponse) {
+        if response.files.is_empty() {
+            return;
+        }
+        let Some(thread_name) = thread::current().name().map(str::to_owned) else {
+            return;
+        };
+        let test = thread_name
+            .strip_prefix("emit::tests::")
+            .unwrap_or(&thread_name);
+        let dir = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            .join("generated-preview")
+            .join(test);
+        fs::create_dir_all(&dir).unwrap_or_else(|e| {
+            panic!(
+                "failed to create generated preview dir {}: {e}",
+                dir.display()
+            )
+        });
+        for file in &response.files {
+            let path = dir.join(&file.name);
+            if let Some(parent) = path.parent() {
+                fs::create_dir_all(parent).unwrap_or_else(|e| {
+                    panic!(
+                        "failed to create generated preview parent {}: {e}",
+                        parent.display()
+                    )
+                });
+            }
+            fs::write(&path, &file.content).unwrap_or_else(|e| {
+                panic!("failed to write generated preview {}: {e}", path.display())
+            });
+        }
+    }
 
     fn empty_request(message_name: &str) -> CodegenRequest {
         empty_request_with_package(message_name, "")
@@ -1251,5 +1298,112 @@ mod tests {
         assert!(content.contains("WebhookIdDefault"));
         // Type-zero `[default = 0]` must not invent a custom marker.
         assert!(!content.contains("ZeroIntDefault"));
+    }
+
+    const DESCRIPTOR_PROTO: &str = "google/protobuf/descriptor.proto";
+    const PLUGIN_PROTO: &str = "google/protobuf/compiler/plugin.proto";
+
+    fn official_plugin_fixture_dir() -> PathBuf {
+        PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            .join("../puroro-codegen-tests/fixtures/official_plugin")
+    }
+
+    fn resolve_protoc() -> PathBuf {
+        env::var_os("PROTOC")
+            .map(PathBuf::from)
+            .unwrap_or_else(|| PathBuf::from("protoc"))
+    }
+
+    /// Compile the vendored official schemas to a `FileDescriptorSet`.
+    fn official_file_descriptor_set() -> Vec<u8> {
+        let fixture = official_plugin_fixture_dir();
+        let out = env::temp_dir().join(format!("puroro-official-fds-{}.bin", process::id()));
+        let protoc = resolve_protoc();
+        let mut cmd = Command::new(&protoc);
+        cmd.arg(format!("-I{}", fixture.display()))
+            .arg(format!("--descriptor_set_out={}", out.display()))
+            .arg(DESCRIPTOR_PROTO)
+            .arg(PLUGIN_PROTO);
+        let output = cmd
+            .output()
+            .unwrap_or_else(|e| panic!("failed to spawn `{}`: {e}", protoc.display()));
+        if !output.status.success() {
+            let _ = fs::remove_file(&out);
+            panic!(
+                "protoc --descriptor_set_out failed (status {}):\n\
+                 command: {cmd:?}\n\
+                 stdout:\n{}\n\
+                 stderr:\n{}",
+                output.status,
+                String::from_utf8_lossy(&output.stdout),
+                String::from_utf8_lossy(&output.stderr),
+            );
+        }
+        let bytes = fs::read(&out)
+            .unwrap_or_else(|e| panic!("failed to read descriptor set {}: {e}", out.display()));
+        let _ = fs::remove_file(&out);
+        bytes
+    }
+
+    /// Wrap `FileDescriptorSet.file` blobs as `CodeGeneratorRequest.proto_file`.
+    fn request_from_descriptor_set(
+        descriptor_set: &[u8],
+        file_to_generate: &[&str],
+    ) -> CodegenRequest {
+        let mut request = Vec::new();
+        for name in file_to_generate {
+            let field = Field::new(
+                FieldNumber::try_new(1).expect("file_to_generate field number"),
+                FieldValue::Len(name.as_bytes()),
+            );
+            request
+                .write_protobuf_field(&field)
+                .expect("write file_to_generate");
+        }
+        for field in AsRefExtProtobuf::read_protobuf_fields(&descriptor_set) {
+            let field = field.expect("FileDescriptorSet field");
+            if field.field_number.as_u32() != 1 {
+                continue;
+            }
+            let FieldValue::Len(bytes) = field.value else {
+                panic!("FileDescriptorSet.file must be length-delimited");
+            };
+            let wrapped = Field::new(
+                FieldNumber::try_new(15).expect("proto_file field number"),
+                FieldValue::Len(bytes),
+            );
+            request
+                .write_protobuf_field(&wrapped)
+                .expect("write proto_file");
+        }
+        decode_request(&request).expect("decode CodeGeneratorRequest from descriptor set")
+    }
+
+    #[test]
+    fn emit_official_descriptor_and_plugin_proto() {
+        let fds = official_file_descriptor_set();
+        let request = request_from_descriptor_set(&fds, &[DESCRIPTOR_PROTO, PLUGIN_PROTO]);
+        assert_eq!(
+            request.meta.file_to_generate,
+            vec![DESCRIPTOR_PROTO, PLUGIN_PROTO]
+        );
+        assert_eq!(request.proto_files.len(), 2);
+
+        let response = emit(&request).unwrap();
+        assert_eq!(response.files.len(), 1);
+        assert_eq!(response.files[0].name, "lib.rs");
+        let content = &response.files[0].content;
+        assert!(
+            content.contains("struct FileDescriptorProto"),
+            "descriptor.proto types missing: {content}"
+        );
+        assert!(
+            content.contains("struct CodeGeneratorRequest"),
+            "plugin.proto types missing: {content}"
+        );
+        assert!(
+            content.contains("struct CodeGeneratorResponse"),
+            "plugin.proto types missing: {content}"
+        );
     }
 }
