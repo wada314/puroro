@@ -352,7 +352,7 @@ impl<E: PartialEq> PartialEq for OneofSlot<E> {
 
 impl<E, Pb, A> FieldPartialEq<MessageCommon<Pb, A>> for OneofSlot<E>
 where
-    E: OneofGroup<Presence = Pb, Alloc = A>,
+    E: OneofGroup<Bits = Pb, Alloc = A>,
     A: Allocator + Clone,
 {
     #[inline]
@@ -372,7 +372,7 @@ where
 
 impl<E, Pb, A> FieldDebug<MessageCommon<Pb, A>> for OneofSlot<E>
 where
-    E: OneofGroup<Presence = Pb, Alloc = A>,
+    E: OneofGroup<Bits = Pb, Alloc = A>,
     A: Allocator + Clone,
     E::Case: Debug,
 {
@@ -385,7 +385,7 @@ where
 
 impl<E, Pb, A> FieldEncode<MessageCommon<Pb, A>> for OneofSlot<E>
 where
-    E: OneofEncodable<A> + OneofGroup<Presence = Pb, Alloc = A>,
+    E: OneofEncodable<A> + OneofGroup<Bits = Pb, Alloc = A>,
     MessageCommon<Pb, A>: MessageCommonBits + MessageCommonAlloc<Alloc = A>,
     A: Allocator + Clone,
 {
@@ -409,7 +409,7 @@ where
 
 impl<E, Pb, A> FieldCloneIn<MessageCommon<Pb, A>> for OneofSlot<E>
 where
-    E: OneofGroup<Presence = Pb, Alloc = A>,
+    E: OneofGroup<Bits = Pb, Alloc = A>,
     A: Allocator + Clone,
 {
     fn clone_field(&self, common: &MessageCommon<Pb, A>, alloc: A) -> Self {
@@ -481,7 +481,7 @@ where
 // ---------------------------------------------------------------------------
 
 /// Generated oneof storage: case / projected Ref / Mut, plus the message
-/// presence and allocator types.
+/// common-bits and allocator types.
 ///
 /// Implemented on the crate-internal storage alias (e.g. `NotificationStorage`),
 /// which is also the type held in [`OneofSlot`]. [`OneofView`] /
@@ -489,7 +489,7 @@ where
 /// not expose the storage type in their signatures (RPIT).
 pub trait OneofGroup
 where
-    Self: OneofDeallocate<MessageCommon<Self::Presence, Self::Alloc>>,
+    Self: OneofDeallocate<MessageCommon<Self::Bits, Self::Alloc>>,
 {
     /// Payload-less discriminant of the active variant.
     type Case: Copy;
@@ -509,8 +509,8 @@ where
     where
         Self: 'a;
 
-    /// Per-message presence / common bitfield type (may be unused by the group).
-    type Presence;
+    /// Per-message common-bits type (may be unused by the group).
+    type Bits;
 
     /// Message allocator type.
     type Alloc: Allocator + Clone;
@@ -521,19 +521,19 @@ where
     /// Project an active storage value to the shared view.
     fn to_ref<'a>(
         storage: &'a Self,
-        common: &'a MessageCommon<Self::Presence, Self::Alloc>,
+        common: &'a MessageCommon<Self::Bits, Self::Alloc>,
     ) -> Self::Ref<'a>;
 
     /// Project an active storage value to the mutable view.
     fn to_mut<'a>(
         storage: &'a mut Self,
-        common: &'a mut MessageCommon<Self::Presence, Self::Alloc>,
+        common: &'a mut MessageCommon<Self::Bits, Self::Alloc>,
     ) -> Self::Mut<'a>;
 
     /// Deep-copies an active storage value into `alloc`.
     fn clone_storage_in(
         storage: &Self,
-        common: &MessageCommon<Self::Presence, Self::Alloc>,
+        common: &MessageCommon<Self::Bits, Self::Alloc>,
         alloc: Self::Alloc,
     ) -> Self;
 }
@@ -543,19 +543,19 @@ where
 /// Returned by generated `notification()`-style accessors even when unset.
 pub struct OneofView<'a, G: OneofGroup>
 where
-    G: OneofDeallocate<MessageCommon<G::Presence, G::Alloc>>,
+    G: OneofDeallocate<MessageCommon<G::Bits, G::Alloc>>,
 {
     slot: &'a OneofSlot<G>,
-    common: &'a MessageCommon<G::Presence, G::Alloc>,
+    common: &'a MessageCommon<G::Bits, G::Alloc>,
 }
 
 impl<'a, G: OneofGroup> OneofView<'a, G>
 where
-    G: OneofDeallocate<MessageCommon<G::Presence, G::Alloc>>,
+    G: OneofDeallocate<MessageCommon<G::Bits, G::Alloc>>,
 {
     /// Creates a shared group view from a slot and message common state.
     #[inline]
-    pub fn new(slot: &'a OneofSlot<G>, common: &'a MessageCommon<G::Presence, G::Alloc>) -> Self {
+    pub fn new(slot: &'a OneofSlot<G>, common: &'a MessageCommon<G::Bits, G::Alloc>) -> Self {
         Self { slot, common }
     }
 
@@ -574,7 +574,7 @@ where
 
 impl<'a, G: OneofGroup> OneofViewTrait for OneofView<'a, G>
 where
-    G: OneofDeallocate<MessageCommon<G::Presence, G::Alloc>>,
+    G: OneofDeallocate<MessageCommon<G::Bits, G::Alloc>>,
 {
     type Case = G::Case;
     type Ref = G::Ref<'a>;
@@ -595,21 +595,21 @@ where
 /// Returned by generated `notification_mut()`-style accessors even when unset.
 pub struct OneofViewMut<'a, G: OneofGroup>
 where
-    G: OneofDeallocate<MessageCommon<G::Presence, G::Alloc>>,
+    G: OneofDeallocate<MessageCommon<G::Bits, G::Alloc>>,
 {
     slot: &'a mut OneofSlot<G>,
-    common: &'a mut MessageCommon<G::Presence, G::Alloc>,
+    common: &'a mut MessageCommon<G::Bits, G::Alloc>,
 }
 
 impl<'a, G: OneofGroup> OneofViewMut<'a, G>
 where
-    G: OneofDeallocate<MessageCommon<G::Presence, G::Alloc>>,
+    G: OneofDeallocate<MessageCommon<G::Bits, G::Alloc>>,
 {
     /// Creates a mutable group view from a slot and message common state.
     #[inline]
     pub fn new(
         slot: &'a mut OneofSlot<G>,
-        common: &'a mut MessageCommon<G::Presence, G::Alloc>,
+        common: &'a mut MessageCommon<G::Bits, G::Alloc>,
     ) -> Self {
         Self { slot, common }
     }
@@ -652,7 +652,7 @@ where
 
 impl<'a, G: OneofGroup> OneofViewMutTrait for OneofViewMut<'a, G>
 where
-    G: OneofDeallocate<MessageCommon<G::Presence, G::Alloc>>,
+    G: OneofDeallocate<MessageCommon<G::Bits, G::Alloc>>,
 {
     type Case = G::Case;
 

@@ -1,7 +1,7 @@
 //! Proto field → catalog [`FieldKind`] IR.
 //!
 //! [`plan::plan_message`] walks a resolved [`Message`](crate::resolved::Message),
-//! assigns presence / bool-value bit indices (ascending field number, one pass),
+//! assigns common bit indices (ascending field number, one pass),
 //! and produces a [`MessagePlan`] ready for catalog emission.
 //!
 //! Mapping table: [IMPLEMENTATION.md §8](../../IMPLEMENTATION.md#8-proto-field--catalog-mapping).
@@ -222,6 +222,6 @@ pub fn sso_bit_const(proto_name: &str) -> String {
 }
 
 /// Byte length of `BitArray<[u8; N], Lsb0>` for `bit_count` bits (`N == 0` allowed).
-pub fn presence_byte_len(bit_count: usize) -> usize {
+pub fn bit_array_byte_len(bit_count: usize) -> usize {
     bit_count.div_ceil(8)
 }

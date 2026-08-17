@@ -313,7 +313,7 @@ fn render_module_body(oneof: &OneofEmit) -> Result<TokenStream> {
                 = #shape_name<#(#mut_tys),*>
             where
                 A: 'a;
-            type Presence = super::__Presence;
+            type Bits = super::__Bits;
             type Alloc = A;
 
             fn case(storage: &Self) -> Self::Case {
@@ -324,7 +324,7 @@ fn render_module_body(oneof: &OneofEmit) -> Result<TokenStream> {
 
             fn to_ref<'a>(
                 storage: &'a Self,
-                common: &'a MessageCommon<Self::Presence, Self::Alloc>,
+                common: &'a MessageCommon<Self::Bits, Self::Alloc>,
             ) -> Self::Ref<'a> {
                 match storage {
                     #(#to_ref_arms)*
@@ -333,7 +333,7 @@ fn render_module_body(oneof: &OneofEmit) -> Result<TokenStream> {
 
             fn to_mut<'a>(
                 storage: &'a mut Self,
-                common: &'a mut MessageCommon<Self::Presence, Self::Alloc>,
+                common: &'a mut MessageCommon<Self::Bits, Self::Alloc>,
             ) -> Self::Mut<'a> {
                 match storage {
                     #(#to_mut_arms)*
@@ -342,7 +342,7 @@ fn render_module_body(oneof: &OneofEmit) -> Result<TokenStream> {
 
             fn clone_storage_in(
                 storage: &Self,
-                common: &MessageCommon<Self::Presence, Self::Alloc>,
+                common: &MessageCommon<Self::Bits, Self::Alloc>,
                 alloc: Self::Alloc,
             ) -> Self {
                 match storage {

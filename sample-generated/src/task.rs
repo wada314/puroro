@@ -617,7 +617,7 @@ impl<A: Allocator + Clone> Task<A> {
     /// Pair / mut: walk `self` fields against mutable `dst` fields.
     ///
     /// For [`CloneIn`], `dst` must start as [`Self::new_in`] so placeholders
-    /// match empty presence bits; install the cloned [`MessageCommon`] afterwards.
+    /// match empty common bits; install the cloned [`MessageCommon`] afterwards.
     fn visit_field_pairs_mut<V: FieldPairVisitorMut<MessageCommon<BitArray<[u8; 2], Lsb0>, A>>>(
         &self,
         dst: &mut Self,

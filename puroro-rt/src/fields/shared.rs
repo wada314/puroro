@@ -48,13 +48,13 @@ use crate::decode::{UnknownFieldsIter, iter_unknown_fields};
 /// Read/write interface to the packed bit array stored in [`MessageCommon`].
 ///
 /// Catalog code bounds [`MessageCommonBits`] on the common context instead.
-pub(crate) trait PresenceBits {
+pub(crate) trait BitStorage {
     fn is_set(&self, bit: usize) -> bool;
     fn set(&mut self, bit: usize, value: bool);
     fn bit_mut(&mut self, bit: usize) -> BitRef<'_, Mut, u8, Lsb0>;
 }
 
-impl<const N: usize> PresenceBits for BitArray<[u8; N], Lsb0> {
+impl<const N: usize> BitStorage for BitArray<[u8; N], Lsb0> {
     #[inline]
     fn is_set(&self, bit: usize) -> bool {
         self[bit]
@@ -67,8 +67,7 @@ impl<const N: usize> PresenceBits for BitArray<[u8; N], Lsb0> {
 
     #[inline]
     fn bit_mut(&mut self, bit: usize) -> BitRef<'_, Mut, u8, Lsb0> {
-        self.get_mut(bit)
-            .expect("bool / presence bit index in range")
+        self.get_mut(bit).expect("common bit index in range")
     }
 }
 
@@ -76,10 +75,11 @@ impl<const N: usize> PresenceBits for BitArray<[u8; N], Lsb0> {
 // MessageCommon capabilities (catalog bounds)
 // ---------------------------------------------------------------------------
 
-/// Bitfield access through a [`MessageCommon`] (presence + packed bool values).
+/// Access to a message's common bits (presence, packed bool values, SSO heap).
 ///
-/// Codegen assigns stable `bit` indices for EXPLICIT / LEGACY_REQUIRED presence
-/// and singular / oneof bool value bits in the same array.
+/// Codegen assigns stable `bit` indices in one array for EXPLICIT /
+/// LEGACY_REQUIRED presence, singular / oneof bool values, and string / bytes
+/// SSO heap-arm bits.
 pub trait MessageCommonBits {
     /// Returns whether bit `bit` is set.
     fn is_bit_set(&self, bit: usize) -> bool;
@@ -126,35 +126,36 @@ pub trait MessageCommonAlloc {
 /// releases it via [`deallocate`](Self::deallocate) in its `Drop`.
 ///
 /// Catalog bounds use [`MessageCommonBits`] / [`MessageCommonAlloc`] on `&Self`
-/// rather than constraining the storage type parameter `P` directly.
-pub struct MessageCommon<P, A: Allocator> {
-    /// Presence / packed-bool bit storage (`BitArray` sized by codegen).
-    pub presence: P,
+/// rather than constraining the storage type parameter `B` directly.
+pub struct MessageCommon<B, A: Allocator> {
+    /// Common bits (`BitArray` sized by codegen): presence, packed bool values,
+    /// and string / bytes SSO heap-arm bits.
+    pub bits: B,
     /// Contiguous unknown-field wire blob (`ManuallyDrop` — freed by the message).
     pub unknown_fields: ManuallyDrop<UnmanagedVec<u8, A>>,
     /// Canonical allocator for the whole message (cloned into field ops).
     pub alloc: A,
 }
 
-impl<P, A: Allocator + Clone> MessageCommon<P, A> {
-    /// Creates common state with the given presence bitfield and allocator.
-    pub fn new_in(presence: P, alloc: A) -> Self {
+impl<B, A: Allocator + Clone> MessageCommon<B, A> {
+    /// Creates common state with the given common bits and allocator.
+    pub fn new_in(bits: B, alloc: A) -> Self {
         let unknown_fields = ManuallyDrop::new(UnmanagedVec::new(alloc.clone()));
         Self {
-            presence,
+            bits,
             unknown_fields,
             alloc,
         }
     }
 
-    /// Deep-copies presence bits and unknown-field bytes into `alloc`.
+    /// Deep-copies common bits and unknown-field bytes into `alloc`.
     #[inline]
     pub fn clone_in(&self, alloc: A) -> Self
     where
-        P: Clone,
+        B: Clone,
     {
         Self {
-            presence: self.presence.clone(),
+            bits: self.bits.clone(),
             unknown_fields: ManuallyDrop::new(self.unknown_fields.clone_in(alloc.clone())),
             alloc,
         }
@@ -176,7 +177,7 @@ impl<P, A: Allocator + Clone> MessageCommon<P, A> {
     }
 }
 
-impl<P, A: Allocator + Clone> MessageCommon<P, A> {
+impl<B, A: Allocator + Clone> MessageCommon<B, A> {
     /// Releases the unknown-field buffer. Must be called exactly once from the
     /// owning message's `Drop`; afterwards `self` must not be used.
     pub fn deallocate(&mut self) {
@@ -188,24 +189,24 @@ impl<P, A: Allocator + Clone> MessageCommon<P, A> {
     }
 }
 
-impl<P: PresenceBits, A: Allocator> MessageCommonBits for MessageCommon<P, A> {
+impl<B: BitStorage, A: Allocator> MessageCommonBits for MessageCommon<B, A> {
     #[inline]
     fn is_bit_set(&self, bit: usize) -> bool {
-        self.presence.is_set(bit)
+        self.bits.is_set(bit)
     }
 
     #[inline]
     fn set_bit(&mut self, bit: usize, value: bool) {
-        self.presence.set(bit, value);
+        self.bits.set(bit, value);
     }
 
     #[inline]
     fn bit_mut(&mut self, bit: usize) -> BitRef<'_, Mut, u8, Lsb0> {
-        self.presence.bit_mut(bit)
+        self.bits.bit_mut(bit)
     }
 }
 
-impl<P, A: Allocator + Clone> MessageCommonAlloc for MessageCommon<P, A> {
+impl<B, A: Allocator + Clone> MessageCommonAlloc for MessageCommon<B, A> {
     type Alloc = A;
 
     #[inline]
@@ -216,7 +217,7 @@ impl<P, A: Allocator + Clone> MessageCommonAlloc for MessageCommon<P, A> {
 
 /// Inherent bit helpers — same as [`MessageCommonBits`], for call sites that
 /// already have a concrete [`MessageCommon`].
-impl<P, A: Allocator> MessageCommon<P, A> {
+impl<B, A: Allocator> MessageCommon<B, A> {
     /// Returns whether bit `bit` is set.
     #[inline]
     pub fn is_bit_set(&self, bit: usize) -> bool

@@ -14,7 +14,7 @@ use crate::descriptor::features::EnumType;
 use crate::error::{Error, Result};
 use crate::field_kind::{
     FieldKind, MessageMember, MessagePlan, PlannedField, PlannedLayout, PlannedPresence,
-    RepeatedEncodingKind, WireTypeKind, presence_byte_len,
+    RepeatedEncodingKind, WireTypeKind, bit_array_byte_len,
 };
 use ::proc_macro2::{Ident, Span, TokenStream};
 use ::quote::quote;
@@ -162,7 +162,7 @@ pub(super) fn render_items(plan: &MessagePlan<'_>) -> Result<TokenStream> {
     let fields = collect_fields(plan)?;
     let name = rust_ident(plan.message().name());
     let name_str = plan.message().name();
-    let presence_bytes = presence_byte_len(plan.bit_count());
+    let bits_bytes = bit_array_byte_len(plan.bit_count());
 
     let bit_consts = render_bit_consts(&fields);
     let field_consts = render_field_consts(&fields);
@@ -218,7 +218,7 @@ pub(super) fn render_items(plan: &MessagePlan<'_>) -> Result<TokenStream> {
 
         #defaults_module
 
-        type __Presence = ::bitvec::array::BitArray<[u8; #presence_bytes], ::bitvec::order::Lsb0>;
+        type __Bits = ::bitvec::array::BitArray<[u8; #bits_bytes], ::bitvec::order::Lsb0>;
 
         #(#oneof_modules)*
 
@@ -226,7 +226,7 @@ pub(super) fn render_items(plan: &MessagePlan<'_>) -> Result<TokenStream> {
             A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone =
                 ::allocator_api2::alloc::Global,
         > {
-            _common: ::puroro_rt::MessageCommon<__Presence, A>,
+            _common: ::puroro_rt::MessageCommon<__Bits, A>,
             #(#struct_fields)*
         }
 
@@ -242,7 +242,7 @@ pub(super) fn render_items(plan: &MessagePlan<'_>) -> Result<TokenStream> {
 
             // Internal field walks for codec / Clone / Eq / Drop — not part of the
             // public message API (must not surface `puroro_rt` in pub signatures).
-            fn visit_fields<V: ::puroro_rt::FieldVisitor<::puroro_rt::MessageCommon<__Presence, A>>>(
+            fn visit_fields<V: ::puroro_rt::FieldVisitor<::puroro_rt::MessageCommon<__Bits, A>>>(
                 &self,
                 v: &mut V,
             ) -> ::core::ops::ControlFlow<V::Break> {
@@ -252,7 +252,7 @@ pub(super) fn render_items(plan: &MessagePlan<'_>) -> Result<TokenStream> {
             }
 
             fn visit_field_pairs<
-                V: ::puroro_rt::FieldPairVisitor<::puroro_rt::MessageCommon<__Presence, A>>,
+                V: ::puroro_rt::FieldPairVisitor<::puroro_rt::MessageCommon<__Bits, A>>,
             >(
                 &self,
                 other: &Self,
@@ -264,7 +264,7 @@ pub(super) fn render_items(plan: &MessagePlan<'_>) -> Result<TokenStream> {
             }
 
             fn visit_field_pairs_mut<
-                V: ::puroro_rt::FieldPairVisitorMut<::puroro_rt::MessageCommon<__Presence, A>>,
+                V: ::puroro_rt::FieldPairVisitorMut<::puroro_rt::MessageCommon<__Bits, A>>,
             >(
                 &self,
                 dst: &mut Self,
@@ -276,7 +276,7 @@ pub(super) fn render_items(plan: &MessagePlan<'_>) -> Result<TokenStream> {
             }
 
             fn visit_fields_mut<
-                V: ::puroro_rt::FieldVisitorMut<::puroro_rt::MessageCommon<__Presence, A>>,
+                V: ::puroro_rt::FieldVisitorMut<::puroro_rt::MessageCommon<__Bits, A>>,
             >(
                 &mut self,
                 v: &mut V,

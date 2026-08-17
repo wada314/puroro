@@ -77,7 +77,7 @@ The puroro project comprises several crates and tools with distinct roles:
 - **Performance-oriented interface.** Accessors return borrowed references (`&str`, `&[u8]`, `&[T]`), never freshly allocated containers. The `encode_to_vec` / `encode_to_bytes` convenience methods allocate, but `encode_raw` does not.
 - **Rust idioms.** Private fields accessed via generated accessor methods; `Optional<T, impl HasDefault<T>>` for explicit-presence scalar, string, and enum fields; `Option<&M<A>>` for optional message fields; no `unsafe` in user-visible APIs.
 - **`puroro` for users, `puroro-rt` for generators.** Library users of generated messages depend on the generated crate and **`puroro` only**. Generated code may use `puroro-rt` internally, but **must not surface `puroro-rt` types in public signatures** (see [§4](#public-signatures-must-not-surface-puroro-rt)).
-- **Implementation flexibility.** The public interface described here must remain stable even if internal storage representations change. Eager messages use a per-message presence bitfield (see [IMPLEMENTATION.md §10](IMPLEMENTATION.md#10-presence-bit-indices)); the accessor API is unchanged if storage layout evolves.
+- **Implementation flexibility.** The public interface described here must remain stable even if internal storage representations change. Eager messages use per-message common bits (see [IMPLEMENTATION.md §10](IMPLEMENTATION.md#10-common-bit-indices)); the accessor API is unchanged if storage layout evolves.
 - **Nightly toolchain, minimal unstable features.** The `rust-toolchain.toml` pins nightly; no `#![feature(…)]` flags are used in this crate itself.
 
 ---
@@ -161,7 +161,7 @@ let s: &str = task.title().get();
 if task.max_retries().is_set() { … }
 ```
 
-**Lazy implementations (`TaskLazy`).** On the eager path, `Optional::new` receives `Some(value)` or `None` derived from the internal presence bitfield and value slot.  On the lazy path (future, [§8](#tasklaya--lazy-parse-timing)), getters **wire-scan** the stored buffer and semantically decode on demand; a fallible getter would return `Err` before constructing `Optional` if decode fails (e.g. `InvalidUtf8`). Presence checks via `optional().is_set()` may wire-scan without semantic decode.
+**Lazy implementations (`TaskLazy`).** On the eager path, `Optional::new` receives `Some(value)` or `None` derived from the field's presence bit (in the message common bits) and value slot.  On the lazy path (future, [§8](#tasklaya--lazy-parse-timing)), getters **wire-scan** the stored buffer and semantically decode on demand; a fallible getter would return `Err` before constructing `Optional` if decode fails (e.g. `InvalidUtf8`). Presence checks via `optional().is_set()` may wire-scan without semantic decode.
 
 The concrete `D` type is the field wrapper's default marker (`ProtoDefault`, or a message-local ZST such as `MaxRetriesDefault` for `[default = 3]`). Callers never name it: accessors return `Optional<…, impl HasDefault<T>>`.
 
@@ -468,7 +468,7 @@ pub fn clear_score(&mut self);
 
 Wire rule: field absent from the wire when value equals the type-zero (`0`, `false`, `0.0`).
 
-Singular `bool` uses the same accessor shape; storage is bit-packed into the message presence bitfield (see [IMPLEMENTATION.md §10](IMPLEMENTATION.md#10-presence--bool-value-bit-indices)).
+Singular `bool` uses the same accessor shape; storage is bit-packed into the message common bits (see [IMPLEMENTATION.md §10](IMPLEMENTATION.md#10-common-bit-indices)).
 
 #### Explicit presence (`features.field_presence = EXPLICIT`, edition 2024 default)
 

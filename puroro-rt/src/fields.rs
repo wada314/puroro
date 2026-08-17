@@ -4,7 +4,7 @@
 //! type in this module. Field getters/setters/encode/decode only touch:
 //!
 //! 1. The field's own struct member, and
-//! 2. [`MessageCommon`](shared::MessageCommon) (presence bitfield, allocator, unknown-field buffer).
+//! 2. [`MessageCommon`](shared::MessageCommon) (common bits, allocator, unknown-field buffer).
 //!
 //! Singular fields (non-repeated — both `IMPLICIT` and `EXPLICIT` presence) are
 //! parametrised by **wire type** (`ProtoInt32`, `ProtoString`, …) and

@@ -10,7 +10,7 @@ use crate::error::{Error, Result};
 use crate::resolved::{Field, FieldOccurrence, Message, SingularPresence, TypeRef};
 use ::std::collections::HashMap;
 
-/// Per-message catalog plan: members in struct order + total presence bits.
+/// Per-message catalog plan: members in struct order + total common bits.
 #[derive(Debug)]
 pub struct MessagePlan<'a> {
     message: &'a Message<'a>,
@@ -372,7 +372,7 @@ mod tests {
         BytesLayout, Edition, FieldDesc, FieldLabel, FieldType, MessageDesc, OneofDesc, ProtoFile,
         ProtoFqn, StringLayout, Syntax,
     };
-    use crate::field_kind::{PlannedLayout, PlannedPresence, presence_byte_len};
+    use crate::field_kind::{PlannedLayout, PlannedPresence, bit_array_byte_len};
     use crate::resolved::{Arena, FileSet, resolve};
 
     fn message<'a>(set: &FileSet<'a>, name: &str) -> &'a Message<'a> {
@@ -441,7 +441,7 @@ mod tests {
         let plan = plan_message(msg).unwrap();
         assert!(plan.members().is_empty());
         assert_eq!(plan.bit_count(), 0);
-        assert_eq!(presence_byte_len(plan.bit_count()), 0);
+        assert_eq!(bit_array_byte_len(plan.bit_count()), 0);
     }
 
     #[test]
@@ -498,7 +498,7 @@ mod tests {
         let plan = plan_message(msg).unwrap();
         // street/city: presence + SSO heap bit each; postal_code/latitude: presence only.
         assert_eq!(plan.bit_count(), 6);
-        assert_eq!(presence_byte_len(6), 1);
+        assert_eq!(bit_array_byte_len(6), 1);
         assert_eq!(plan.members().len(), 4);
 
         let MessageMember::Field(street) = &plan.members()[0] else {
