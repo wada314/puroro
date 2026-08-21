@@ -12,7 +12,7 @@ use ::syn::{Item, LitByteStr, LitStr, Type, parse_quote};
 /// `, L, D` type-argument tail for `SingularField<…, A, …>` (may be empty).
 pub(super) fn layout_and_default_args(
     layout_ty: &Option<Type>,
-    default_marker: Option<&Ident>,
+    default_marker: Option<&Type>,
 ) -> TokenStream {
     match (layout_ty, default_marker) {
         (None, None) => TokenStream::new(),

@@ -158,28 +158,38 @@ impl FieldEmit {
     }
 }
 
-/// Render items that belong inside the message's implementation module.
+/// Items for the parent module (struct + impls) and the snake_case companion.
+pub(super) struct RenderedMessageItems {
+    pub type_items: Vec<Item>,
+    pub companion_items: Vec<Item>,
+}
+
+/// Render the message struct (parent) and companion (`FIELD_*`, defaults, oneofs).
 pub(super) fn render_items(
     field_plan: &MessageFieldPlan<'_>,
     name: &Ident,
     name_str: &str,
-) -> Result<Vec<Item>> {
-    let fields = collect_fields(field_plan)?;
+    companion: &Ident,
+) -> Result<RenderedMessageItems> {
+    let fields = collect_fields(field_plan, companion)?;
     let bits_bytes = bit_array_byte_len(field_plan.bit_count());
+    let bits_ty = quote! {
+        ::bitvec::array::BitArray<[u8; #bits_bytes], ::bitvec::order::Lsb0>
+    };
 
     let bit_consts = render_bit_consts(&fields);
     let field_consts = render_field_consts(&fields);
     let defaults_module = render_defaults_module(&fields)?;
-    let struct_fields = render_struct_fields(&fields);
+    let struct_fields = render_struct_fields(&fields, companion);
     let new_in_fields = render_new_in_fields(&fields);
-    let accessors = render_accessors(&fields);
+    let accessors = render_accessors(&fields, companion);
     let visit_shared = render_visit_calls(&fields, VisitKind::Shared);
     let visit_pair = render_visit_calls(&fields, VisitKind::Pair);
     let visit_pair_mut = render_visit_calls(&fields, VisitKind::PairMut);
     let visit_mut = render_visit_calls(&fields, VisitKind::Mut);
-    let merge_arms = render_merge_arms(&fields);
+    let merge_arms = render_merge_arms(&fields, companion);
     let validate_body = render_validate(&fields);
-    let oneof_modules = render_oneof_modules(&fields)?;
+    let oneof_modules = render_oneof_modules(&fields, &bits_ty)?;
     let empty_visit_sink = if fields.is_empty() {
         quote! { let _ = v; }
     } else {
@@ -212,24 +222,21 @@ pub(super) fn render_items(
         }
     };
 
-    super::parse::parse_items(quote! {
-        // @generated message body from protoc-gen-puroro.
-
+    let companion_items = super::parse::parse_items(quote! {
         #bit_consts
-
         #field_consts
-
         #defaults_module
-
-        type __Bits = ::bitvec::array::BitArray<[u8; #bits_bytes], ::bitvec::order::Lsb0>;
-
         #(#oneof_modules)*
+    })?;
+
+    let type_items = super::parse::parse_items(quote! {
+        // @generated message body from protoc-gen-puroro.
 
         pub struct #name<
             A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone =
                 ::allocator_api2::alloc::Global,
         > {
-            _common: ::puroro_rt::MessageCommon<__Bits, A>,
+            _common: ::puroro_rt::MessageCommon<#bits_ty, A>,
             #(#struct_fields)*
         }
 
@@ -245,7 +252,7 @@ pub(super) fn render_items(
 
             // Internal field walks for codec / Clone / Eq / Drop — not part of the
             // public message API (must not surface `puroro_rt` in pub signatures).
-            fn visit_fields<V: ::puroro_rt::FieldVisitor<::puroro_rt::MessageCommon<__Bits, A>>>(
+            fn visit_fields<V: ::puroro_rt::FieldVisitor<::puroro_rt::MessageCommon<#bits_ty, A>>>(
                 &self,
                 v: &mut V,
             ) -> ::core::ops::ControlFlow<V::Break> {
@@ -255,7 +262,7 @@ pub(super) fn render_items(
             }
 
             fn visit_field_pairs<
-                V: ::puroro_rt::FieldPairVisitor<::puroro_rt::MessageCommon<__Bits, A>>,
+                V: ::puroro_rt::FieldPairVisitor<::puroro_rt::MessageCommon<#bits_ty, A>>,
             >(
                 &self,
                 other: &Self,
@@ -267,7 +274,7 @@ pub(super) fn render_items(
             }
 
             fn visit_field_pairs_mut<
-                V: ::puroro_rt::FieldPairVisitorMut<::puroro_rt::MessageCommon<__Bits, A>>,
+                V: ::puroro_rt::FieldPairVisitorMut<::puroro_rt::MessageCommon<#bits_ty, A>>,
             >(
                 &self,
                 dst: &mut Self,
@@ -279,7 +286,7 @@ pub(super) fn render_items(
             }
 
             fn visit_fields_mut<
-                V: ::puroro_rt::FieldVisitorMut<::puroro_rt::MessageCommon<__Bits, A>>,
+                V: ::puroro_rt::FieldVisitorMut<::puroro_rt::MessageCommon<#bits_ty, A>>,
             >(
                 &mut self,
                 v: &mut V,
@@ -463,10 +470,15 @@ pub(super) fn render_items(
                 #validate_body
             }
         }
+    })?;
+
+    Ok(RenderedMessageItems {
+        type_items,
+        companion_items,
     })
 }
 
-fn collect_fields(field_plan: &MessageFieldPlan<'_>) -> Result<Vec<FieldEmit>> {
+fn collect_fields(field_plan: &MessageFieldPlan<'_>, companion: &Ident) -> Result<Vec<FieldEmit>> {
     let mut out = Vec::new();
     for member in field_plan.members() {
         match member {
@@ -524,12 +536,7 @@ fn collect_fields(field_plan: &MessageFieldPlan<'_>) -> Result<Vec<FieldEmit>> {
                             *encoding,
                         )?)));
                     }
-                    FieldKind::Singular {
-                        wire,
-                        presence,
-                        layout,
-                        custom_default,
-                    } => {
+                    FieldKind::Singular { presence, .. } => {
                         if matches!(presence, PlannedPresence::Oneof) {
                             return Err(Error::Codegen(format!(
                                 "internal error: oneof field `{}` escaped as a top-level member",
@@ -537,13 +544,7 @@ fn collect_fields(field_plan: &MessageFieldPlan<'_>) -> Result<Vec<FieldEmit>> {
                             )));
                         }
                         out.push(FieldEmit::Singular(Box::new(scalar_emit(
-                            field.name(),
-                            field.field_const(),
-                            field.number(),
-                            wire,
-                            presence,
-                            layout,
-                            custom_default.as_ref(),
+                            field, companion,
                         )?)));
                     }
                 }
@@ -742,15 +743,23 @@ fn map_value_view(value: &WireTypeKind<'_>, _field_name: &str) -> Result<(Type, 
     })
 }
 
-fn scalar_emit(
-    name: &str,
-    field_const: &str,
-    number: i32,
-    wire: &WireTypeKind<'_>,
-    presence: &PlannedPresence,
-    layout: &PlannedLayout,
-    custom_default: Option<&CustomDefault>,
-) -> Result<ScalarEmit> {
+fn scalar_emit(field: &PlannedField<'_>, companion: &Ident) -> Result<ScalarEmit> {
+    let FieldKind::Singular {
+        wire,
+        presence,
+        layout,
+        custom_default,
+    } = field.kind()
+    else {
+        return Err(Error::Codegen(format!(
+            "internal error: scalar_emit on non-singular field `{}`",
+            field.name()
+        )));
+    };
+    let name = field.name();
+    let field_const = field.field_const();
+    let number = field.number();
+    let custom_default = custom_default.as_ref();
     let (style, presence_ty, presence_bit) = match presence {
         PlannedPresence::Implicit => (
             AccessorStyle::Implicit,
@@ -761,7 +770,7 @@ fn scalar_emit(
             let ident = Ident::new(bit_const, Span::call_site());
             (
                 AccessorStyle::Explicit,
-                parse_quote! { ::puroro_rt::Explicit<{ #ident }> },
+                parse_quote! { ::puroro_rt::Explicit<{ #companion::#ident }> },
                 Some((ident, *bit)),
             )
         }
@@ -769,7 +778,7 @@ fn scalar_emit(
             let ident = Ident::new(bit_const, Span::call_site());
             (
                 AccessorStyle::LegacyRequired,
-                parse_quote! { ::puroro_rt::LegacyRequired<{ #ident }> },
+                parse_quote! { ::puroro_rt::LegacyRequired<{ #companion::#ident }> },
                 Some((ident, *bit)),
             )
         }
@@ -793,7 +802,7 @@ fn scalar_emit(
         } => {
             let ident = Ident::new(bit_const, Span::call_site());
             (
-                Some(parse_quote! { ::puroro_rt::BitPacked<{ #ident }> }),
+                Some(parse_quote! { ::puroro_rt::BitPacked<{ #companion::#ident }> }),
                 Some((ident, *value_bit)),
             )
         }
@@ -803,7 +812,7 @@ fn scalar_emit(
         } => {
             let ident = Ident::new(bit_const, Span::call_site());
             (
-                Some(parse_quote! { ::puroro_rt::InlineOrHeap<{ #ident }> }),
+                Some(parse_quote! { ::puroro_rt::InlineOrHeap<{ #companion::#ident }> }),
                 Some((ident, *heap_bit)),
             )
         }
@@ -850,18 +859,15 @@ fn scalar_emit(
 
 fn render_defaults_module(fields: &[FieldEmit]) -> Result<TokenStream> {
     let mut items: Vec<Item> = Vec::new();
-    let mut uses = Vec::new();
     let mut needs_root = false;
     for field in fields {
         match field {
             FieldEmit::Singular(f) => {
                 if let Some((custom, marker_items)) = &f.custom_default {
-                    let marker = defaults::marker_ident(custom);
                     if matches!(custom.lit, DefaultLit::Enum { .. }) {
                         needs_root = true;
                     }
                     items.extend(marker_items.iter().cloned());
-                    uses.push(quote! { use defaults::#marker; });
                 }
             }
             FieldEmit::Oneof(o) => {
@@ -891,11 +897,10 @@ fn render_defaults_module(fields: &[FieldEmit]) -> Result<TokenStream> {
         TokenStream::new()
     };
     Ok(quote! {
-        mod defaults {
+        pub(crate) mod defaults {
             #root_shim
             #(#items)*
         }
-        #(#uses)*
     })
 }
 
@@ -968,7 +973,7 @@ fn render_field_consts(fields: &[FieldEmit]) -> TokenStream {
     }
 }
 
-fn render_struct_fields(fields: &[FieldEmit]) -> Vec<TokenStream> {
+fn render_struct_fields(fields: &[FieldEmit], companion: &Ident) -> Vec<TokenStream> {
     fields
         .iter()
         .map(|field| match field {
@@ -977,14 +982,14 @@ fn render_struct_fields(fields: &[FieldEmit]) -> Vec<TokenStream> {
                 let marker = &field.marker;
                 let presence_ty = &field.presence_ty;
                 let field_const = &field.field_const;
-                let default_marker = field
-                    .custom_default
-                    .as_ref()
-                    .map(|(c, _)| defaults::marker_ident(c));
+                let default_ty = field.custom_default.as_ref().map(|(c, _)| {
+                    let marker = defaults::marker_ident(c);
+                    parse_quote! { #companion::defaults::#marker }
+                });
                 let tail =
-                    defaults::layout_and_default_args(&field.layout_ty, default_marker.as_ref());
+                    defaults::layout_and_default_args(&field.layout_ty, default_ty.as_ref());
                 quote! {
-                    #name: ::puroro_rt::SingularField<#marker, #presence_ty, { #field_const }, A #tail>,
+                    #name: ::puroro_rt::SingularField<#marker, #presence_ty, { #companion::#field_const }, A #tail>,
                 }
             }
             FieldEmit::Repeated(field) => {
@@ -993,7 +998,7 @@ fn render_struct_fields(fields: &[FieldEmit]) -> Vec<TokenStream> {
                 let encoding_ty = &field.encoding_ty;
                 let field_const = &field.field_const;
                 quote! {
-                    #name: ::puroro_rt::RepeatedField<#marker, #encoding_ty, { #field_const }, A>,
+                    #name: ::puroro_rt::RepeatedField<#marker, #encoding_ty, { #companion::#field_const }, A>,
                 }
             }
             FieldEmit::Map(field) => {
@@ -1002,25 +1007,25 @@ fn render_struct_fields(fields: &[FieldEmit]) -> Vec<TokenStream> {
                 let value = &field.value_marker;
                 let field_const = &field.field_const;
                 quote! {
-                    #name: ::puroro_rt::MapField<#key, #value, { #field_const }, A>,
+                    #name: ::puroro_rt::MapField<#key, #value, { #companion::#field_const }, A>,
                 }
             }
             FieldEmit::Oneof(o) => {
                 let name = &o.name;
                 let storage = &o.storage_name;
                 quote! {
-                    #name: ::puroro_rt::OneofSlot<#storage<A>>,
+                    #name: ::puroro_rt::OneofSlot<#companion::#storage<A>>,
                 }
             }
         })
         .collect()
 }
 
-fn render_oneof_modules(fields: &[FieldEmit]) -> Result<Vec<Item>> {
+fn render_oneof_modules(fields: &[FieldEmit], bits_ty: &TokenStream) -> Result<Vec<Item>> {
     let mut out = Vec::new();
     for field in fields {
         if let FieldEmit::Oneof(o) = field {
-            out.extend(oneof::render_module_and_exports(o)?);
+            out.extend(oneof::render_module_and_exports(o, bits_ty)?);
         }
     }
     Ok(out)
@@ -1080,14 +1085,14 @@ fn render_new_in_fields(fields: &[FieldEmit]) -> Vec<TokenStream> {
         .collect()
 }
 
-fn render_accessors(fields: &[FieldEmit]) -> Vec<TokenStream> {
+fn render_accessors(fields: &[FieldEmit], companion: &Ident) -> Vec<TokenStream> {
     fields
         .iter()
         .map(|field| match field {
             FieldEmit::Repeated(field) => render_repeated_accessors(field),
             FieldEmit::Singular(field) => render_singular_accessors(field),
             FieldEmit::Map(field) => render_map_accessors(field),
-            FieldEmit::Oneof(o) => oneof::render_accessors(o),
+            FieldEmit::Oneof(o) => oneof::render_accessors(o, companion),
         })
         .collect()
 }
@@ -1383,7 +1388,7 @@ fn render_visit_calls(fields: &[FieldEmit], kind: VisitKind) -> Vec<TokenStream>
         .collect()
 }
 
-fn render_merge_arms(fields: &[FieldEmit]) -> Vec<TokenStream> {
+fn render_merge_arms(fields: &[FieldEmit], companion: &Ident) -> Vec<TokenStream> {
     let mut arms = Vec::new();
     for field in fields {
         match field {
@@ -1391,7 +1396,7 @@ fn render_merge_arms(fields: &[FieldEmit]) -> Vec<TokenStream> {
                 let name = &f.name;
                 let field_const = &f.field_const;
                 arms.push(quote! {
-                    #field_const => {
+                    #companion::#field_const => {
                         self.#name
                             .bind_mut(&mut self._common)
                             .merge(wire_type, buf, depth)?;
@@ -1402,7 +1407,7 @@ fn render_merge_arms(fields: &[FieldEmit]) -> Vec<TokenStream> {
                 let name = &f.name;
                 let field_const = &f.field_const;
                 arms.push(quote! {
-                    #field_const => {
+                    #companion::#field_const => {
                         self.#name
                             .bind_mut(&mut self._common)
                             .merge(wire_type, buf, depth)?;
@@ -1413,14 +1418,14 @@ fn render_merge_arms(fields: &[FieldEmit]) -> Vec<TokenStream> {
                 let name = &f.name;
                 let field_const = &f.field_const;
                 arms.push(quote! {
-                    #field_const => {
+                    #companion::#field_const => {
                         self.#name
                             .bind_mut(&mut self._common)
                             .merge(wire_type, buf, depth)?;
                     }
                 });
             }
-            FieldEmit::Oneof(o) => arms.extend(oneof::render_merge_arms(o)),
+            FieldEmit::Oneof(o) => arms.extend(oneof::render_merge_arms(o, companion)),
         }
     }
     arms

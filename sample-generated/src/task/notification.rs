@@ -65,7 +65,7 @@ use ::puroro_rt::{
     SingularFieldAccess,
 };
 
-use crate::address::Address;
+use crate::Address;
 
 use super::defaults::WebhookIdDefault;
 

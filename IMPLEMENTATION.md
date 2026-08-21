@@ -459,11 +459,11 @@ Public accessors are **one-line delegates** into catalog methods with `&self._co
 2. **Module-level** `pub const FIELD_*` / `BIT_*` (usable as `match` patterns). `BIT_*` is baked into each `Explicit<BIT>` / `LegacyRequired<BIT>` / `BitPacked<BIT>` field type; `FIELD` is a struct const generic on the wrapper.
 3. Inherent accessor delegates ([DESIGN.md §4.0](DESIGN.md#40-inherent-accessors-current))
 4. Trait impls — `Message`, `Clone` / `PartialEq` / `Debug` / `Drop` / `DeallocateIn` as field sums
-5. Child modules — nested types and oneof submodules named after the oneof (under the message module; package module tree is outer — see below)
+5. Child modules — nested types and oneof submodules named after the oneof (under the message **companion** module; the struct itself lives in the parent package / enclosing companion — see below)
 
 IR step: `ProtoField → FieldKind → catalog type + const args` — implemented as [`protoc-gen-puroro::field_kind`](protoc-gen-puroro/src/field_kind.rs) (`plan_fields` assigns `FIELD_*` / `BIT_*` and builds [`MessageFieldPlan`](protoc-gen-puroro/src/field_kind/plan.rs)).
 
-**Module tree.** Production layout follows [DESIGN.md §4 — Module layout and naming](DESIGN.md#module-layout-and-naming): `package` → nested Rust modules; each top-level message gets a snake_case submodule; oneofs get snake_case submodules under the parent message. Distinct proto identities that map to the same Rust path are **merged** into one module; item-level clashes are left to `rustc`. Deliberate path changes use a **generate-time rename** (plugin option / config — not a `.proto` option). Cross-forest references use `self::_root::…` ([Path qualification](DESIGN.md#path-qualification)). [`sample-generated/`](sample-generated/) remains flat (no package prefix) as a readable stand-in.
+**Module tree.** Production layout follows [DESIGN.md §4 — Module layout and naming](DESIGN.md#module-layout-and-naming): `package` → nested Rust modules; each message struct is defined in that parent module; a snake_case companion holds `FIELD_*` / `BIT_*`, nested types, and oneofs (omitted when empty). Distinct proto identities that map to the same companion path are **merged**; item-level clashes are left to `rustc`. Deliberate path changes use a **generate-time rename** (plugin option / config — not a `.proto` option). Cross-forest references use `self::_root::…` ([Path qualification](DESIGN.md#path-qualification)). [`sample-generated/`](sample-generated/) remains flat (no package prefix) as a readable stand-in.
 
 ### Path qualification (naming)
 
@@ -471,7 +471,7 @@ Generated code must not rely on ambient `use` imports for the items it reference
 
 **External crates** use leading-`::` absolute paths — `::puroro::Message`, `::puroro_rt::SingularField`, `::core::ops::DerefMut`, `::allocator_api2::alloc::Allocator`, … — and must not be pulled in with `use`.
 
-**Names inside the generated module forest** use `self::_root::…` (e.g. `self::_root::example::v1::address::Address`). They must **not** use leading `::` or `crate::`, because the forest may be embedded as a submodule of an application crate; those prefixes would resolve to the **host** crate root. Layout injects a private `mod _root` into every forest module so `self::_root` means the forest root at any depth:
+**Names inside the generated module forest** use `self::_root::…` (e.g. `self::_root::example::v1::Address`). They must **not** use leading `::` or `crate::`, because the forest may be embedded as a submodule of an application crate; those prefixes would resolve to the **host** crate root. Layout injects a private `mod _root` into every forest module so `self::_root` means the forest root at any depth:
 
 ```rust
 // Forest root
@@ -481,7 +481,7 @@ mod _root { pub(super) use super::*; }
 mod _root { pub(super) use super::super::_root::*; }
 ```
 
-Nearby relatives in the same parent (e.g. `pub use empty::Empty`) may stay relative. Generator-reserved `_`-prefixed names (`_root`, `_common`, …) are exempt from proto-derived naming.
+Nearby relatives in the same parent (sibling structs, child `mod` names) may stay relative. Generator-reserved `_`-prefixed names (`_root`, `_common`, …) are exempt from proto-derived naming.
 
 Normative wording: [DESIGN.md — Path qualification](DESIGN.md#path-qualification).
 
@@ -506,7 +506,7 @@ Navigational comments in generated Rust (section banners, per-field `// proto: �
 
 Tooling uses `@generated` to collapse/skip generated files. The checked-in [`sample-generated/`](sample-generated/) intentionally **omits** it — those files are a hand-maintained reference, and an `@generated`/`do not edit` banner there would wrongly imply they are tool-generated.
 
-**Constants** — `FIELD_*` / `BIT_*` are **module-level** `pub const` (not associated constants). Module-level consts are valid `match` patterns; associated consts are not. Inside the message module, arms use the bare name (`FIELD_TITLE => …`).
+**Constants** — `FIELD_*` / `BIT_*` are **module-level** `pub const` on the message companion (not associated constants). Module-level consts are valid `match` patterns; associated consts are not. Inside the message `impl` (in the parent module), arms qualify them (`task::FIELD_TITLE => …`) or `use` the companion.
 
 Every field kind merges through the same bound-view shape — `self.<field>.bind_mut(&mut self._common).merge(wire_type, buf, depth)?` (repeated and nested-message fields likewise; oneof uses `OneofSlotMut`) — so the code generator emits one form. Oneof variant arms use the **variant field name** and number.
 

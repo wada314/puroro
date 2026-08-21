@@ -104,8 +104,7 @@ fn root_alias_item(is_forest_root: bool) -> Item {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::descriptor::ProtoFqn;
-    use crate::module_tree::{ModuleForest, ModuleOrigin, type_name_to_module_ident};
+    use crate::module_tree::{ModuleForest, type_name_to_module_ident};
     use ::syn::parse_quote;
 
     #[test]
@@ -117,29 +116,16 @@ mod tests {
         forest.root_mut().append_inner_attrs(file.attrs);
 
         let parent = forest.ensure_package("");
-        let mod_name = type_name_to_module_ident("Empty");
-        let type_name = ::proc_macro2::Ident::new("Empty", ::proc_macro2::Span::call_site());
         parent.append_items([parse_quote! {
-            pub use #mod_name::#type_name;
-        }]);
-
-        let child = parent.get_or_insert_child(mod_name.clone());
-        child.add_origin(ModuleOrigin::Message {
-            proto_fqn: ProtoFqn::parse(".Empty"),
-        });
-        child.append_items([parse_quote! {
             pub struct Empty;
         }]);
 
         let file = render_single_file(&forest, "empty.rs");
         assert_eq!(file.name, "empty.rs");
-        assert!(file.content.contains("pub use empty::Empty"));
-        assert!(file.content.contains("pub mod empty"));
         assert!(file.content.contains("pub struct Empty"));
         assert!(file.content.contains("allow"));
         assert!(file.content.contains("mod _root"));
         assert!(file.content.contains("use super::*;"));
-        assert!(file.content.contains("use super::super::_root::*;"));
     }
 
     #[test]
@@ -150,13 +136,12 @@ mod tests {
             pub struct Status(pub i32);
         }]);
         let mod_name = type_name_to_module_ident("Task");
-        let type_name = ::proc_macro2::Ident::new("Task", ::proc_macro2::Span::call_site());
         parent.append_items([parse_quote! {
-            pub use #mod_name::#type_name;
+            pub struct Task;
         }]);
         let task = parent.get_or_insert_child(mod_name);
         task.append_items([parse_quote! {
-            pub struct Task;
+            pub const FIELD_TITLE: u32 = 1;
         }]);
 
         let file = render_single_file(&forest, "lib.rs");
@@ -172,21 +157,17 @@ mod tests {
     fn nested_module_can_name_peer_via_self_root() {
         let mut forest = ModuleForest::new();
         let parent = forest.ensure_package("example");
-        let address = parent.get_or_insert_child(type_name_to_module_ident("Address"));
-        address.append_items([parse_quote! {
+        parent.append_items([parse_quote! {
             pub struct Address;
         }]);
         let task = parent.get_or_insert_child(type_name_to_module_ident("Task"));
         // Simulate a cross-type reference the way real codegen will emit it.
         task.append_items([parse_quote! {
-            pub type Assignee = self::_root::example::address::Address;
+            pub type Assignee = self::_root::example::Address;
         }]);
 
         let file = render_single_file(&forest, "lib.rs");
-        assert!(
-            file.content
-                .contains("self::_root::example::address::Address")
-        );
+        assert!(file.content.contains("self::_root::example::Address"));
         let _ = file;
     }
 }

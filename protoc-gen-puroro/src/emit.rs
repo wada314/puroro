@@ -15,7 +15,7 @@ use crate::plugin_io::CodeGeneratorResponse;
 use crate::resolved::{Arena, File, Message, resolve};
 use ::proc_macro2::Ident;
 use ::quote::quote;
-use ::syn::{Attribute, Item, parse_quote};
+use ::syn::{Attribute, Item};
 
 mod defaults;
 mod enumeration;
@@ -88,12 +88,12 @@ fn generated_file_attrs(targets: &[&File<'_>]) -> Result<Vec<Attribute>> {
     Ok(parse::parse_file(root_tokens)?.attrs)
 }
 
-/// Constructed message module ready to install into a package or enclosing message module.
+/// Constructed message type + companion module, ready to install into a parent.
 struct EmittedMessage {
-    pub_use: Item,
+    type_items: Vec<Item>,
     module_name: Ident,
     origin: ModuleOrigin,
-    items: Vec<Item>,
+    companion_items: Vec<Item>,
     nested: Vec<EmittedMessage>,
 }
 
@@ -107,19 +107,13 @@ fn emit_message(message: &Message<'_>) -> Result<EmittedMessage> {
     let module_name = type_name_to_module_ident(message.name());
     let type_name = ident::rust_ident(message.name());
     let field_plan = plan_fields(message)?;
-    let pub_use = parse_quote! {
-        pub use #module_name::#type_name;
-    };
 
-    let mut items = Vec::new();
+    let mut companion_items = Vec::new();
     for e in message.nested_enums() {
-        items.extend(enumeration::render_enum(e)?);
+        companion_items.extend(enumeration::render_enum(e)?);
     }
-    items.extend(message::render_items(
-        &field_plan,
-        &type_name,
-        message.name(),
-    )?);
+    let rendered = message::render_items(&field_plan, &type_name, message.name(), &module_name)?;
+    companion_items.extend(rendered.companion_items);
 
     let nested = message
         .nested_messages()
@@ -128,12 +122,12 @@ fn emit_message(message: &Message<'_>) -> Result<EmittedMessage> {
         .collect::<Result<Vec<_>>>()?;
 
     Ok(EmittedMessage {
-        pub_use,
+        type_items: rendered.type_items,
         module_name,
         origin: ModuleOrigin::Message {
             proto_fqn: message.fqn().clone(),
         },
-        items,
+        companion_items,
         nested,
     })
 }
@@ -155,12 +149,15 @@ fn install_file(forest: &mut ModuleForest, file: &File<'_>) -> Result<()> {
 }
 
 fn install_message(module: &mut ModuleNode, emitted: EmittedMessage) {
-    module.append_items([emitted.pub_use]);
-    let message_mod = module.get_or_insert_child(emitted.module_name);
-    message_mod.add_origin(emitted.origin);
-    message_mod.append_items(emitted.items);
+    module.append_items(emitted.type_items);
+    if emitted.companion_items.is_empty() && emitted.nested.is_empty() {
+        return;
+    }
+    let companion = module.get_or_insert_child(emitted.module_name);
+    companion.add_origin(emitted.origin);
+    companion.append_items(emitted.companion_items);
     for nested in emitted.nested {
-        install_message(message_mod, nested);
+        install_message(companion, nested);
     }
 }
 
@@ -271,7 +268,6 @@ mod tests {
         assert_eq!(response.files.len(), 1);
         assert_eq!(response.files[0].name, "empty.rs");
         assert!(response.files[0].content.contains("struct Empty"));
-        assert!(response.files[0].content.contains("pub use empty"));
         assert!(response.files[0].content.contains("@generated"));
         assert!(response.files[0].content.contains("- `empty.proto`"));
     }
@@ -282,14 +278,14 @@ mod tests {
         let content = &response.files[0].content;
         assert!(content.contains("pub mod example"));
         assert!(content.contains("pub mod v1"));
-        assert!(content.contains("pub mod empty"));
-        assert!(content.contains("pub use empty::Empty"));
+        assert!(!content.contains("pub mod empty"));
+        assert!(!content.contains("pub use empty::Empty"));
         assert!(content.contains("struct Empty"));
         let example_idx = content.find("pub mod example").expect("example mod");
-        let use_idx = content.find("pub use empty::Empty").expect("pub use");
+        let struct_idx = content.find("struct Empty").expect("struct Empty");
         assert!(
-            use_idx > example_idx,
-            "pub use should appear inside the package module tree"
+            struct_idx > example_idx,
+            "struct Empty should appear inside the package module tree"
         );
     }
 
@@ -734,8 +730,8 @@ mod tests {
         assert!(content.contains("pub struct Inner"));
         assert!(content.contains("pub struct Kind"));
         assert!(
-            content.contains("self :: _root :: demo :: outer :: inner :: Inner")
-                || content.contains("self::_root::demo::outer::inner::Inner")
+            content.contains("self :: _root :: demo :: outer :: Inner")
+                || content.contains("self::_root::demo::outer::Inner")
         );
         assert!(
             content.contains("self :: _root :: demo :: outer :: Kind")
@@ -873,8 +869,8 @@ mod tests {
         assert!(content.contains("ProtoMessage"));
         assert!(content.contains("::puroro_rt::Message"));
         assert!(
-            content.contains("self :: _root :: demo :: address :: Address")
-                || content.contains("self::_root::demo::address::Address")
+            content.contains("self :: _root :: demo :: Address")
+                || content.contains("self::_root::demo::Address")
         );
         assert!(content.contains("fn assignee("));
         assert!(content.contains(".get()"));

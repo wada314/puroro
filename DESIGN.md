@@ -222,21 +222,25 @@ Generated Rust is not hand-edited. Navigational comments in generated output are
 
 ### Module layout and naming
 
-**Package is the primary module tree.** A protobuf `package` (dot-separated) maps to nested Rust modules. Generated types and message/oneof submodules live under that tree. This is the default public layout users should rely on.
+**Package is the primary module tree.** A protobuf `package` (dot-separated) maps to nested Rust modules. Generated types live under that tree. Each message also gets a snake_case **companion module** (same parent) for message-local items; the struct itself is **not** nested inside that companion.
 
 **Default mapping (idiomatic Rust paths).**
 
 | Proto entity | Default Rust placement |
 |---|---|
 | `package example.v1` | `example::v1` |
-| Top-level `message Task` | Module `…::task` containing struct `Task` (and message-local items such as `FIELD_*` / `BIT_*`) |
-| Nested `message Inner` inside `Task` | Module `…::task::inner` containing `Inner` |
+| Top-level `message Task` | Struct `Task` in the package module (`example::v1::Task`). Companion `example::v1::task` holds `FIELD_*` / `BIT_*`, nested types, and oneofs. Omit the companion when it would be empty. |
+| Nested `message Inner` inside `Task` | Struct `Inner` in Task's companion (`example::v1::task::Inner`). Companion `example::v1::task::inner` for Inner's own locals. |
+| Nested `message Foo` inside `message Foo` | Outer `…::Foo` and inner `…::foo::Foo` — same-named nesting does not collide. |
 | File-level `enum Status` | Type `Status` under the package module (exact file splitting is an implementation detail) |
-| `oneof notification` inside `Task` | Submodule `…::task::notification` (see [§4.7](#47-oneof-fields)) |
+| Nested `enum Kind` inside `Task` | Type `Kind` in Task's companion (`example::v1::task::Kind`) |
+| `oneof notification` inside `Task` | Submodule `example::v1::task::notification` (see [§4.7](#47-oneof-fields)) |
+
+Do **not** `pub use` a nested type into the same module as its parent struct. That is what would make `message Foo { message Foo {} }` (and `message Foo { enum Foo {} }`) collide.
 
 Message-typed *fields* (e.g. `Address assignee`) reference sibling generated types by path; they do **not** by themselves create a nested module under the parent message.
 
-**Shared module paths.** Distinct proto identities may map to the same Rust module path (e.g. `package example.task` and `message Task` in `package example` both want `example::task`). The generator **merges** contributors into one module rather than rejecting the path up front. Item-level name clashes inside that module are left to `rustc` (and may later gain sharper generate-time diagnostics). The generator does **not** silently mangle names or make `_`-prefixed modules the normal public API — except the reserved private `_root` alias used for path qualification ([below](#path-qualification)).
+**Shared module paths.** Distinct proto identities may map to the same Rust module path (e.g. `package example.task` and the companion module for `message Task` in `package example` both want `example::task`). The generator **merges** contributors into one module rather than rejecting the path up front. The struct `Task` lives in `example` and is not part of that merge. Item-level name clashes inside a merged module are left to `rustc` (and may later gain sharper generate-time diagnostics). The generator does **not** silently mangle names or make `_`-prefixed modules the normal public API — except the reserved private `_root` alias used for path qualification ([below](#path-qualification)).
 
 **Generate-time renames.** Deliberate path choices (and disambiguation when a merge is undesirable) use **generator / plugin options supplied at generate time** — not options embedded in the `.proto` file. A rename rule identifies a proto entity by a stable logical name (typically its protobuf FQN / path) and substitutes a Rust module or type-path segment. Initial scope is **module and type path elements**; field accessor renames are out of scope until needed.
 
@@ -251,8 +255,8 @@ Generated code must not rely on ambient `use` imports for the items it reference
 | Referent | Spelling in generated code |
 |---|---|
 | External crates (`puroro`, `puroro-rt`, `core`, `alloc`, `bytes`, `allocator_api2`, `bitvec`, …) | Leading-`::` absolute path, e.g. `::puroro::Message`, `::puroro_rt::SingularField` |
-| Types / modules inside the **same generated forest** | `self::_root::…` from the forest root, e.g. `self::_root::example::v1::address::Address` |
-| Nearby relatives in the same parent (`pub use empty::Empty`, child `mod` names, …) | Ordinary relative paths are fine |
+| Types / modules inside the **same generated forest** | `self::_root::…` from the forest root, e.g. `self::_root::example::v1::Address` |
+| Nearby relatives in the same parent (sibling structs, child `mod` names, …) | Ordinary relative paths are fine |
 
 **Why not `::` or `crate::` for generated names.** The forest may be the crate root (`lib.rs` of a generated crate) **or** an embedded submodule (`mod generated { include!(…) }` / a single `.rs` dropped into an app crate). Leading `::` / `crate::` always mean the **host** crate root, so they break under embedding. `self::_root` is stable in both layouts.
 
@@ -724,7 +728,7 @@ Alias names with the same integer all map to the same `Self(v)`; equality is by 
 
 ### 4.7 Oneof fields
 
-Each `oneof` group generates types in a submodule named after the **oneof** (lower-snake-case) under the parent message module (e.g. `task::notification`), because the owned storage holds allocator-less `unmanaged` values (unsafe to drop implicitly) that must not leak into the public API. Module placement and collision handling follow [Module layout and naming](#module-layout-and-naming).
+Each `oneof` group generates types in a submodule named after the **oneof** (lower-snake-case) under the parent message's companion module (e.g. `task::notification`), because the owned storage holds allocator-less `unmanaged` values (unsafe to drop implicitly) that must not leak into the public API. Module placement and collision handling follow [Module layout and naming](#module-layout-and-naming).
 
 Shape and storage share **one** generic enum; Storage is a `pub(crate)` alias. Ref / Mut projections are written inline on `OneofGroup` (no public Ref/Mut aliases). Group bound views are returned as `puroro` traits (`OneofView` / `OneofViewMut`); the concrete runtime structs live in `puroro-rt` and stay hidden behind RPIT:
 
@@ -1193,7 +1197,7 @@ Groups (`SGroup` / `EGroup`) are not generated and are not stored in unknown fie
 
 ### Module layout: package-first, rename when needed
 
-Protobuf `package` is the primary Rust module hierarchy. Message and oneof nesting use idiomatic snake_case submodules under that tree. Distinct proto identities that map to the same Rust module path are **merged**; item-level clashes are left to `rustc`. Users who want a different path use generate-time rename options (not `.proto` options). Cross-references inside the forest use `self::_root::…`. Details: [§4 Module layout and naming](#module-layout-and-naming), [Path qualification](#path-qualification).
+Protobuf `package` is the primary Rust module hierarchy. Message structs live in the package module (or a parent message's companion). Snake_case submodules are companions for `FIELD_*` / nested types / oneofs, and are merged when distinct proto identities map to the same path; item-level clashes are left to `rustc`. Users who want a different path use generate-time rename options (not `.proto` options). Cross-references inside the forest use `self::_root::…`. Details: [§4 Module layout and naming](#module-layout-and-naming), [Path qualification](#path-qualification).
 
 ### `protoc` plugin as the primary codegen path
 

@@ -40,12 +40,12 @@ pub fn fqn_to_enum_root_path<'a>(enumeration: &'a Enum<'a>) -> Result<Path> {
     }
 }
 
-/// Message path including snake_case modules for every enclosing message.
+/// Message type path: the struct lives in the parent module.
 ///
-/// - `.demo.Address` → `self::_root::demo::address::Address`
-/// - `.demo.Outer.Inner` → `self::_root::demo::outer::inner::Inner`
+/// - `.demo.Address` → `self::_root::demo::Address`
+/// - `.demo.Outer.Inner` → `self::_root::demo::outer::Inner`
 pub fn fqn_to_message_root_path<'a>(message: &'a Message<'a>) -> Result<Path> {
-    let mut path = message_module_path(message)?;
+    let mut path = parent_module_path(message)?;
     path.segments
         .push(PathSegment::from(rust_ident(message.name())));
     Ok(path)
@@ -55,29 +55,42 @@ fn root_path() -> Path {
     parse_quote!(self::_root)
 }
 
-/// `self::_root::pkg…::outer::inner` (message modules only; no trailing type).
+/// Module that contains this message's struct (`package` or parent companion).
+fn parent_module_path<'a>(message: &'a Message<'a>) -> Result<Path> {
+    match message.parent() {
+        Some(parent) => message_module_path(parent),
+        None => {
+            let (package, _) = package_and_message_chain(message)?;
+            module_path_from_package(package, message.fqn().as_str())
+        }
+    }
+}
+
+/// Companion module: `self::_root::pkg…::outer::inner` (includes this message).
 fn message_module_path<'a>(message: &'a Message<'a>) -> Result<Path> {
-    let (package, type_names) = package_and_message_chain(message)?;
+    let mut path = parent_module_path(message)?;
+    let name = message.name();
+    if !is_simple_ident(name) {
+        return Err(Error::Codegen(format!(
+            "message name `{name}` in `{}` is not a simple Rust identifier",
+            message.fqn()
+        )));
+    }
+    path.segments
+        .push(PathSegment::from(type_name_to_module_ident(name)));
+    Ok(path)
+}
+
+fn module_path_from_package(package: Vec<&str>, fqn: &str) -> Result<Path> {
     let mut path = root_path();
     for seg in package {
         if !is_simple_ident(seg) {
             return Err(Error::Codegen(format!(
-                "package segment `{seg}` in `{}` is not a simple Rust identifier",
-                message.fqn()
+                "package segment `{seg}` in `{fqn}` is not a simple Rust identifier"
             )));
         }
         path.segments
             .push(PathSegment::from(Ident::new(seg, Span::call_site())));
-    }
-    for name in type_names {
-        if !is_simple_ident(name) {
-            return Err(Error::Codegen(format!(
-                "message name `{name}` in `{}` is not a simple Rust identifier",
-                message.fqn()
-            )));
-        }
-        path.segments
-            .push(PathSegment::from(type_name_to_module_ident(name)));
     }
     Ok(path)
 }
@@ -196,7 +209,7 @@ mod tests {
     }
 
     #[test]
-    fn maps_file_level_message_through_snake_module() {
+    fn maps_file_level_message_in_package_module() {
         let arena = Arena::new();
         let files = [ProtoFile {
             name: "t.proto".into(),
@@ -219,7 +232,7 @@ mod tests {
         let path = fqn_to_message_root_path(msg).unwrap();
         assert_eq!(
             path.to_token_stream().to_string(),
-            "self :: _root :: demo :: address :: Address"
+            "self :: _root :: demo :: Address"
         );
     }
 
@@ -263,7 +276,7 @@ mod tests {
                 .unwrap()
                 .to_token_stream()
                 .to_string(),
-            "self :: _root :: demo :: outer :: inner :: Inner"
+            "self :: _root :: demo :: outer :: Inner"
         );
         let kind = enumeration(&set, "Kind");
         assert_eq!(

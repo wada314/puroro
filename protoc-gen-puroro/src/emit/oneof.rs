@@ -6,7 +6,7 @@ use crate::default_value::CustomDefault;
 use crate::error::Result;
 use ::proc_macro2::{Ident, TokenStream};
 use ::quote::quote;
-use ::syn::{Item, Type};
+use ::syn::{Item, Type, parse_quote};
 
 /// Owned facts for one generated oneof group.
 pub(super) struct OneofEmit {
@@ -41,24 +41,27 @@ pub(super) struct OneofVariantEmit {
 }
 
 /// Render `mod <oneof> { … }` plus `use` / `pub use` for the parent message module.
-pub(super) fn render_module_and_exports(oneof: &OneofEmit) -> Result<Vec<Item>> {
+pub(super) fn render_module_and_exports(
+    oneof: &OneofEmit,
+    bits_ty: &TokenStream,
+) -> Result<Vec<Item>> {
     let mod_name = &oneof.mod_name;
     let shape_name = &oneof.shape_name;
     let case_name = &oneof.case_name;
     let storage_name = &oneof.storage_name;
 
-    let module_body = render_module_body(oneof)?;
+    let module_body = render_module_body(oneof, bits_ty)?;
     super::parse::parse_items(quote! {
         mod #mod_name {
             #module_body
         }
 
-        use #mod_name::#storage_name;
+        pub(crate) use #mod_name::#storage_name;
         pub use #mod_name::{#shape_name, #case_name};
     })
 }
 
-fn render_module_body(oneof: &OneofEmit) -> Result<TokenStream> {
+fn render_module_body(oneof: &OneofEmit, bits_ty: &TokenStream) -> Result<TokenStream> {
     let shape_name = &oneof.shape_name;
     let case_name = &oneof.case_name;
     let storage_name = &oneof.storage_name;
@@ -101,10 +104,10 @@ fn render_module_body(oneof: &OneofEmit) -> Result<TokenStream> {
             let alias = &v.field_alias;
             let marker = &v.marker;
             let field_const = &v.field_const;
-            let default_marker = v
-                .custom_default
-                .as_ref()
-                .map(|(c, _)| defaults::marker_ident(c));
+            let default_marker = v.custom_default.as_ref().map(|(c, _)| {
+                let marker = defaults::marker_ident(c);
+                parse_quote! { #marker }
+            });
             let tail = defaults::layout_and_default_args(&v.layout_ty, default_marker.as_ref());
             quote! {
                 type #alias<A> = ::puroro_rt::SingularField<
@@ -314,7 +317,7 @@ fn render_module_body(oneof: &OneofEmit) -> Result<TokenStream> {
                 = #shape_name<#(#mut_tys),*>
             where
                 A: 'a;
-            type Bits = super::__Bits;
+            type Bits = #bits_ty;
             type Alloc = A;
 
             fn case(storage: &Self) -> Self::Case {
@@ -397,7 +400,7 @@ fn render_module_body(oneof: &OneofEmit) -> Result<TokenStream> {
 }
 
 /// Group getter / clear + per-variant accessors for the parent message.
-pub(super) fn render_accessors(oneof: &OneofEmit) -> TokenStream {
+pub(super) fn render_accessors(oneof: &OneofEmit, companion: &Ident) -> TokenStream {
     let name = &oneof.name;
     let name_str = &oneof.name_str;
     let name_mut = Ident::new(&format!("{name_str}_mut"), name.span());
@@ -435,14 +438,14 @@ pub(super) fn render_accessors(oneof: &OneofEmit) -> TokenStream {
                 pub fn #vname(&self) -> ::core::option::Option<&#mut_target> {
                     self.#group
                         .bind(&self._common)
-                        .variant_of::<#field_const>()
+                        .variant_of::<{ #companion::#field_const }>()
                         .get()
                 }
 
                 pub fn #vname_mut(&mut self) -> &mut #mut_target {
                     self.#group
                         .bind_mut(&mut self._common)
-                        .variant_mut::<#field_const>()
+                        .variant_mut::<{ #companion::#field_const }>()
                         .bind_mut(&mut self._common)
                         .value_mut()
                 }
@@ -453,7 +456,7 @@ pub(super) fn render_accessors(oneof: &OneofEmit) -> TokenStream {
                 pub fn #vname_mut<'s>(&'s mut self) -> #mut_ret {
                     self.#group
                         .bind_mut(&mut self._common)
-                        .variant_mut::<#field_const>()
+                        .variant_mut::<{ #companion::#field_const }>()
                         .bind_mut(&mut self._common)
                         .value_mut()
                 }
@@ -467,7 +470,7 @@ pub(super) fn render_accessors(oneof: &OneofEmit) -> TokenStream {
                 {
                     self.#group
                         .bind(&self._common)
-                        .variant_of::<#field_const>()
+                        .variant_of::<{ #companion::#field_const }>()
                         .optional()
                 }
 
@@ -480,14 +483,14 @@ pub(super) fn render_accessors(oneof: &OneofEmit) -> TokenStream {
         pub fn #name<'a>(
             &'a self,
         ) -> impl ::puroro::OneofView<
-            Case = #case_name,
-            Ref = #shape_name<#(#ref_tys),*>,
+            Case = #companion::#case_name,
+            Ref = #companion::#shape_name<#(#ref_tys),*>,
         > + 'a {
-            ::puroro_rt::OneofView::<#storage_name<A>>::new(&self.#name, &self._common)
+            ::puroro_rt::OneofView::<#companion::#storage_name<A>>::new(&self.#name, &self._common)
         }
 
-        pub fn #name_mut<'a>(&'a mut self) -> impl ::puroro::OneofViewMut<Case = #case_name> + 'a {
-            ::puroro_rt::OneofViewMut::<#storage_name<A>>::new(
+        pub fn #name_mut<'a>(&'a mut self) -> impl ::puroro::OneofViewMut<Case = #companion::#case_name> + 'a {
+            ::puroro_rt::OneofViewMut::<#companion::#storage_name<A>>::new(
                 &mut self.#name,
                 &mut self._common,
             )
@@ -502,7 +505,7 @@ pub(super) fn render_accessors(oneof: &OneofEmit) -> TokenStream {
 }
 
 /// Merge arms for every variant field number.
-pub(super) fn render_merge_arms(oneof: &OneofEmit) -> Vec<TokenStream> {
+pub(super) fn render_merge_arms(oneof: &OneofEmit, companion: &Ident) -> Vec<TokenStream> {
     let group = &oneof.name;
     oneof
         .variants
@@ -510,10 +513,10 @@ pub(super) fn render_merge_arms(oneof: &OneofEmit) -> Vec<TokenStream> {
         .map(|v| {
             let field_const = &v.field_const;
             quote! {
-                #field_const => {
+                #companion::#field_const => {
                     self.#group
                         .bind_mut(&mut self._common)
-                        .variant_mut::<#field_const>()
+                        .variant_mut::<{ #companion::#field_const }>()
                         .bind_mut(&mut self._common)
                         .merge(wire_type, buf, depth)?;
                 }

@@ -47,7 +47,7 @@ pub enum ModuleOrigin {
     GeneratedRoot,
     /// One segment of a protobuf `package` (accumulated path, e.g. `example.v1`).
     PackageSegment { package: String },
-    /// Message implementation module (`struct` + `FIELD_*` / visitors / impls).
+    /// Message companion module (`FIELD_*`, nested types, oneofs).
     Message {
         /// Absolute protobuf FQN (e.g. `.example.Task`).
         proto_fqn: ProtoFqn,

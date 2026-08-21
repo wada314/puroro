@@ -1,4 +1,4 @@
-//! Compile-time default markers for [`super::Task`] fields with non-zero proto defaults.
+//! Compile-time default markers for [`crate::Task`] fields with non-zero proto defaults.
 
 use ::puroro::HasDefault;
 
