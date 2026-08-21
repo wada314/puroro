@@ -1,14 +1,14 @@
 //! Proto field → catalog [`FieldKind`] IR.
 //!
-//! [`plan::plan_message`] walks a resolved [`Message`](crate::resolved::Message),
+//! [`plan::plan_fields`] walks a resolved [`Message`](crate::resolved::Message),
 //! assigns common bit indices (ascending field number, one pass),
-//! and produces a [`MessagePlan`] ready for catalog emission.
+//! and produces a [`MessageFieldPlan`] ready for catalog emission.
 //!
 //! Mapping table: [IMPLEMENTATION.md §8](../../IMPLEMENTATION.md#8-proto-field--catalog-mapping).
 
 mod plan;
 
-pub use plan::{MessageMember, MessagePlan, PlannedField, PlannedOneof, plan_message};
+pub use plan::{MessageFieldPlan, MessageMember, PlannedField, PlannedOneof, plan_fields};
 
 use crate::case::to_upper_snake;
 use crate::default_value::CustomDefault;

@@ -8,12 +8,12 @@
 
 use crate::descriptor::CodegenRequest;
 use crate::error::{Error, Result};
-use crate::field_kind::plan_message;
+use crate::field_kind::plan_fields;
 use crate::module_tree::layout::{ModuleLayout, render};
 use crate::module_tree::{ModuleForest, ModuleNode, ModuleOrigin, type_name_to_module_ident};
 use crate::plugin_io::CodeGeneratorResponse;
 use crate::resolved::{Arena, File, Message, resolve};
-use ::proc_macro2::{Ident, Span};
+use ::proc_macro2::Ident;
 use ::quote::quote;
 use ::syn::{Attribute, Item, parse_quote};
 
@@ -104,9 +104,9 @@ fn emit_message(message: &Message<'_>) -> Result<EmittedMessage> {
             message.name()
         )));
     }
-    let plan = plan_message(message)?;
     let module_name = type_name_to_module_ident(message.name());
-    let type_name = Ident::new(message.name(), Span::call_site());
+    let type_name = ident::rust_ident(message.name());
+    let field_plan = plan_fields(message)?;
     let pub_use = parse_quote! {
         pub use #module_name::#type_name;
     };
@@ -115,7 +115,11 @@ fn emit_message(message: &Message<'_>) -> Result<EmittedMessage> {
     for e in message.nested_enums() {
         items.extend(enumeration::render_enum(e)?);
     }
-    items.extend(message::render_items(&plan)?);
+    items.extend(message::render_items(
+        &field_plan,
+        &type_name,
+        message.name(),
+    )?);
 
     let nested = message
         .nested_messages()

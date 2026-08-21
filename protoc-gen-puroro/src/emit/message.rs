@@ -1,4 +1,4 @@
-//! Emit a message module body from a [`MessagePlan`].
+//! Emit a message module body from a [`MessageFieldPlan`].
 //!
 //! Singular and repeated scalar / string / bytes / bool / enum / message
 //! fields (including IMPLICIT / EXPLICIT / LEGACY_REQUIRED and bool
@@ -13,7 +13,7 @@ use crate::default_value::{CustomDefault, DefaultLit};
 use crate::descriptor::features::EnumType;
 use crate::error::{Error, Result};
 use crate::field_kind::{
-    FieldKind, MessageMember, MessagePlan, PlannedField, PlannedLayout, PlannedPresence,
+    FieldKind, MessageFieldPlan, MessageMember, PlannedField, PlannedLayout, PlannedPresence,
     RepeatedEncodingKind, WireTypeKind, bit_array_byte_len,
 };
 use ::proc_macro2::{Ident, Span, TokenStream};
@@ -27,7 +27,7 @@ enum FieldEmit {
     Oneof(Box<OneofEmit>),
 }
 
-/// Owned per-field facts needed for `quote!` (avoids borrowing `MessagePlan`).
+/// Owned per-field facts needed for `quote!` (avoids borrowing `MessageFieldPlan`).
 struct ScalarEmit {
     name: Ident,
     name_str: String,
@@ -159,11 +159,13 @@ impl FieldEmit {
 }
 
 /// Render items that belong inside the message's implementation module.
-pub(super) fn render_items(plan: &MessagePlan<'_>) -> Result<Vec<Item>> {
-    let fields = collect_fields(plan)?;
-    let name = rust_ident(plan.message().name());
-    let name_str = plan.message().name();
-    let bits_bytes = bit_array_byte_len(plan.bit_count());
+pub(super) fn render_items(
+    field_plan: &MessageFieldPlan<'_>,
+    name: &Ident,
+    name_str: &str,
+) -> Result<Vec<Item>> {
+    let fields = collect_fields(field_plan)?;
+    let bits_bytes = bit_array_byte_len(field_plan.bit_count());
 
     let bit_consts = render_bit_consts(&fields);
     let field_consts = render_field_consts(&fields);
@@ -464,9 +466,9 @@ pub(super) fn render_items(plan: &MessagePlan<'_>) -> Result<Vec<Item>> {
     })
 }
 
-fn collect_fields(plan: &MessagePlan<'_>) -> Result<Vec<FieldEmit>> {
+fn collect_fields(field_plan: &MessageFieldPlan<'_>) -> Result<Vec<FieldEmit>> {
     let mut out = Vec::new();
-    for member in plan.members() {
+    for member in field_plan.members() {
         match member {
             MessageMember::Oneof(o) => {
                 if !is_simple_ident(o.name()) {

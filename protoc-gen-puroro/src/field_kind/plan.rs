@@ -1,4 +1,4 @@
-//! Build a [`MessagePlan`] from a resolved message.
+//! Build a [`MessageFieldPlan`] from a resolved message.
 
 use super::{
     FieldKind, PlannedLayout, PlannedPresence, RepeatedEncodingKind, WireTypeKind,
@@ -10,10 +10,9 @@ use crate::error::{Error, Result};
 use crate::resolved::{Field, FieldOccurrence, Message, SingularPresence, TypeRef};
 use ::std::collections::HashMap;
 
-/// Per-message catalog plan: members in struct order + total common bits.
+/// Per-message field catalog: members in struct order + total common bits.
 #[derive(Debug)]
-pub struct MessagePlan<'a> {
-    message: &'a Message<'a>,
+pub struct MessageFieldPlan<'a> {
     members: Vec<MessageMember<'a>>,
     /// Bits consumed in `MessageCommon` (presence + bool values + string / bytes
     /// SSO heap bits; SSO bit set means heap arm).
@@ -43,11 +42,7 @@ pub struct PlannedOneof<'a> {
     variants: Vec<PlannedField<'a>>,
 }
 
-impl<'a> MessagePlan<'a> {
-    pub fn message(&self) -> &'a Message<'a> {
-        self.message
-    }
-
+impl<'a> MessageFieldPlan<'a> {
     pub fn members(&self) -> &[MessageMember<'a>] {
         &self.members
     }
@@ -100,7 +95,7 @@ impl<'a> PlannedOneof<'a> {
 /// still present on the resolved graph but skipped at emit. Editions
 /// `enum_type`, `repeated_field_encoding`, and `utf8_validation` come from the
 /// resolved field / enum.
-pub fn plan_message<'a>(message: &'a Message<'a>) -> Result<MessagePlan<'a>> {
+pub fn plan_fields<'a>(message: &'a Message<'a>) -> Result<MessageFieldPlan<'a>> {
     let mut fields: Vec<&'a Field<'a>> = message.fields().collect();
     fields.sort_by_key(|f| f.number());
 
@@ -186,8 +181,7 @@ pub fn plan_message<'a>(message: &'a Message<'a>) -> Result<MessagePlan<'a>> {
 
     debug_assert!(planned_by_number.is_empty());
 
-    Ok(MessagePlan {
-        message,
+    Ok(MessageFieldPlan {
         members,
         bit_count: next_bit,
     })
@@ -438,7 +432,7 @@ mod tests {
         }])];
         let set = resolve(&arena, &files).unwrap();
         let msg = message(&set, "Empty");
-        let plan = plan_message(msg).unwrap();
+        let plan = plan_fields(msg).unwrap();
         assert!(plan.members().is_empty());
         assert_eq!(plan.bit_count(), 0);
         assert_eq!(bit_array_byte_len(plan.bit_count()), 0);
@@ -495,7 +489,7 @@ mod tests {
         }])];
         let set = resolve(&arena, &files).unwrap();
         let msg = message(&set, "Address");
-        let plan = plan_message(msg).unwrap();
+        let plan = plan_fields(msg).unwrap();
         // street/city: presence + SSO heap bit each; postal_code/latitude: presence only.
         assert_eq!(plan.bit_count(), 6);
         assert_eq!(bit_array_byte_len(6), 1);
@@ -563,7 +557,7 @@ mod tests {
         }])];
         let set = resolve(&arena, &files).unwrap();
         let msg = message(&set, "M");
-        let plan = plan_message(msg).unwrap();
+        let plan = plan_fields(msg).unwrap();
         // Presence + SSO heap bit — same as an absent option.
         assert_eq!(plan.bit_count(), 2);
         let MessageMember::Field(body) = &plan.members()[0] else {
@@ -601,7 +595,7 @@ mod tests {
         }])];
         let set = resolve(&arena, &files).unwrap();
         let msg = message(&set, "M");
-        let plan = plan_message(msg).unwrap();
+        let plan = plan_fields(msg).unwrap();
         // Presence bit only — no SSO heap bit.
         assert_eq!(plan.bit_count(), 1);
         let MessageMember::Field(body) = &plan.members()[0] else {
@@ -639,7 +633,7 @@ mod tests {
         }])];
         let set = resolve(&arena, &files).unwrap();
         let msg = message(&set, "M");
-        let plan = plan_message(msg).unwrap();
+        let plan = plan_fields(msg).unwrap();
         assert_eq!(plan.bit_count(), 2);
         let MessageMember::Field(body) = &plan.members()[0] else {
             panic!("expected field");
@@ -676,7 +670,7 @@ mod tests {
         }])];
         let set = resolve(&arena, &files).unwrap();
         let msg = message(&set, "M");
-        let plan = plan_message(msg).unwrap();
+        let plan = plan_fields(msg).unwrap();
         assert_eq!(plan.bit_count(), 1);
         let MessageMember::Field(body) = &plan.members()[0] else {
             panic!("expected field");
@@ -753,7 +747,7 @@ mod tests {
         }])];
         let set = resolve(&arena, &files).unwrap();
         let msg = message(&set, "Task");
-        let plan = plan_message(msg).unwrap();
+        let plan = plan_fields(msg).unwrap();
 
         // score: no bits
         // email_address (oneof string): SSO heap bit 0
@@ -877,7 +871,7 @@ mod tests {
         }])];
         let set = resolve(&arena, &files).unwrap();
         let msg = message(&set, "R");
-        let plan = plan_message(msg).unwrap();
+        let plan = plan_fields(msg).unwrap();
         let MessageMember::Field(tags) = &plan.members()[0] else {
             panic!();
         };
@@ -985,7 +979,7 @@ mod tests {
         };
         let set = resolve(&arena, &[file]).unwrap();
         let msg = message(&set, "T");
-        let plan = plan_message(msg).unwrap();
+        let plan = plan_fields(msg).unwrap();
 
         let MessageMember::Field(scores) = &plan.members()[0] else {
             panic!();
@@ -1051,7 +1045,7 @@ mod tests {
         }])];
         let set = resolve(&arena, &files).unwrap();
         let msg = message(&set, "T");
-        let plan = plan_message(msg).unwrap();
+        let plan = plan_fields(msg).unwrap();
         assert_eq!(plan.members().len(), 1);
         let MessageMember::Field(score) = &plan.members()[0] else {
             panic!("proto3 optional must stay a top-level field, not OneofSlot");
@@ -1105,7 +1099,7 @@ mod tests {
         }];
         let set = resolve(&arena, &files).unwrap();
         let msg = message(&set, "T");
-        let plan = plan_message(msg).unwrap();
+        let plan = plan_fields(msg).unwrap();
         let MessageMember::Field(status) = &plan.members()[0] else {
             panic!();
         };
@@ -1167,7 +1161,7 @@ mod tests {
         }])];
         let set = resolve(&arena, &files).unwrap();
         let msg = message(&set, "Holder");
-        let plan = plan_message(msg).unwrap();
+        let plan = plan_fields(msg).unwrap();
         assert_eq!(plan.bit_count(), 0);
         let MessageMember::Field(attrs) = &plan.members()[0] else {
             panic!("map must be a top-level field");
@@ -1228,7 +1222,7 @@ mod tests {
         }])];
         let set = resolve(&arena, &files).unwrap();
         let msg = message(&set, "Holder");
-        let plan = plan_message(msg).unwrap();
+        let plan = plan_fields(msg).unwrap();
         let MessageMember::Field(labels) = &plan.members()[0] else {
             panic!("map must be a top-level field");
         };
@@ -1288,7 +1282,7 @@ mod tests {
         }])];
         let set = resolve(&arena, &files).unwrap();
         let msg = message(&set, "Holder");
-        let plan = plan_message(msg).unwrap();
+        let plan = plan_fields(msg).unwrap();
         let MessageMember::Field(flags) = &plan.members()[0] else {
             panic!("map must be a top-level field");
         };
