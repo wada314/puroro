@@ -88,19 +88,7 @@ fn generated_file_attrs(targets: &[&File<'_>]) -> Result<Vec<Attribute>> {
     Ok(parse::parse_file(root_tokens)?.attrs)
 }
 
-/// File-level enums (not nested under a message).
-fn file_level_enum_items(file: &File<'_>) -> Result<Vec<Item>> {
-    let mut items = Vec::new();
-    for e in file.enums() {
-        if e.parent().is_some() {
-            continue;
-        }
-        items.extend(enumeration::render_enum(e)?);
-    }
-    Ok(items)
-}
-
-/// Constructed message module ready to install under a parent forest node.
+/// Constructed message module ready to install into a package or enclosing message module.
 struct EmittedMessage {
     pub_use: Item,
     module_name: Ident,
@@ -148,22 +136,29 @@ fn emit_message(plan: &MessagePlan<'_>) -> Result<EmittedMessage> {
 }
 
 fn install_file(forest: &mut ModuleForest, file: &File<'_>) -> Result<()> {
-    let parent = forest.ensure_package(file.package());
-    parent.append_items(file_level_enum_items(file)?);
+    let package = forest.ensure_package(file.package());
+    package.append_items(
+        file.enums()
+            .filter(|e| e.parent().is_none())
+            .map(enumeration::render_enum)
+            .collect::<Result<Vec<_>>>()?
+            .into_iter()
+            .flatten(),
+    );
     for message in file.messages() {
         let message = validate_emit_message(message)?;
-        install_message(parent, emit_message(&plan_message(message)?)?);
+        install_message(package, emit_message(&plan_message(message)?)?);
     }
     Ok(())
 }
 
-fn install_message(parent: &mut ModuleNode, emitted: EmittedMessage) {
-    parent.append_items([emitted.pub_use]);
-    let child = parent.get_or_insert_child(emitted.module_name);
-    child.add_origin(emitted.origin);
-    child.append_items(emitted.items);
+fn install_message(module: &mut ModuleNode, emitted: EmittedMessage) {
+    module.append_items([emitted.pub_use]);
+    let message_mod = module.get_or_insert_child(emitted.module_name);
+    message_mod.add_origin(emitted.origin);
+    message_mod.append_items(emitted.items);
     for nested in emitted.nested {
-        install_message(child, nested);
+        install_message(message_mod, nested);
     }
 }
 
