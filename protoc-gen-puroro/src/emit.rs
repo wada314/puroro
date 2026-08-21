@@ -15,7 +15,7 @@ use crate::plugin_io::CodeGeneratorResponse;
 use crate::resolved::{Arena, File, Message, resolve};
 use ::proc_macro2::{Ident, Span};
 use ::quote::quote;
-use ::syn::parse_quote;
+use ::syn::{Attribute, Item, parse_quote};
 
 mod defaults;
 mod enumeration;
@@ -45,10 +45,12 @@ pub fn emit(request: &CodegenRequest) -> Result<CodeGeneratorResponse> {
     }
 
     let mut forest = ModuleForest::new();
-    write_root_attrs(&mut forest, &targets)?;
+    forest
+        .root_mut()
+        .append_inner_attrs(generated_file_attrs(&targets)?);
 
     for file in &targets {
-        append_file_to_forest(&mut forest, file)?;
+        install_file(&mut forest, file)?;
     }
 
     let path = if targets.len() == 1 {
@@ -65,7 +67,8 @@ pub fn emit(request: &CodegenRequest) -> Result<CodeGeneratorResponse> {
     Ok(CodeGeneratorResponse::from_files(vec![file]))
 }
 
-fn write_root_attrs(forest: &mut ModuleForest, targets: &[&File<'_>]) -> Result<()> {
+/// Crate-level inner attributes (`//! @generated …`, clippy allows, package docs).
+fn generated_file_attrs(targets: &[&File<'_>]) -> Result<Vec<Attribute>> {
     let doc = if targets.len() == 1 {
         format!("@generated from {} — do not edit", targets[0].name())
     } else {
@@ -91,38 +94,38 @@ fn write_root_attrs(forest: &mut ModuleForest, targets: &[&File<'_>]) -> Result<
             #![doc = #package_doc]
         });
     }
-    let file = parse::parse_file(root_tokens)?;
-    forest.root_mut().append_inner_attrs(file.attrs);
-    Ok(())
+    Ok(parse::parse_file(root_tokens)?.attrs)
 }
 
-fn append_file_to_forest(forest: &mut ModuleForest, file: &File<'_>) -> Result<()> {
-    let parent = forest.ensure_package(file.package());
+/// File-level enums (not nested under a message).
+fn file_level_enum_items(file: &File<'_>) -> Result<Vec<Item>> {
+    let mut items = Vec::new();
     for e in file.enums() {
         if e.parent().is_some() {
             continue;
         }
-        parent.append_items(enumeration::render_enum(e)?);
+        items.extend(enumeration::render_enum(e)?);
     }
-
-    for message in file.messages() {
-        let message = validate_emit_message(message)?;
-        let plan = plan_message(message)?;
-        append_message(parent, &plan)?;
-    }
-    Ok(())
+    Ok(items)
 }
 
-fn append_message(parent: &mut ModuleNode, plan: &MessagePlan<'_>) -> Result<()> {
+/// Constructed message module ready to install under a parent forest node.
+struct EmittedMessage {
+    pub_use: Item,
+    module_name: Ident,
+    origin: ModuleOrigin,
+    items: Vec<Item>,
+    nested: Vec<EmittedMessage>,
+}
+
+fn emit_message(plan: &MessagePlan<'_>) -> Result<EmittedMessage> {
     let message = plan.message();
-    let mod_name = type_name_to_module_ident(message.name());
+    let module_name = type_name_to_module_ident(message.name());
     let type_name = Ident::new(message.name(), Span::call_site());
+    let pub_use = parse_quote! {
+        pub use #module_name::#type_name;
+    };
 
-    parent.append_items([parse_quote! {
-        pub use #mod_name::#type_name;
-    }]);
-
-    let nested_enums: Vec<_> = message.nested_enums().collect();
     let nested_messages: Vec<_> = message
         .nested_messages()
         .filter(|m| !m.is_map_entry())
@@ -131,19 +134,46 @@ fn append_message(parent: &mut ModuleNode, plan: &MessagePlan<'_>) -> Result<()>
         validate_emit_message(nested)?;
     }
 
-    let child = parent.get_or_insert_child(mod_name);
-    child.add_origin(ModuleOrigin::Message {
-        proto_fqn: message.fqn().clone(),
-    });
-    for e in nested_enums {
-        child.append_items(enumeration::render_enum(e)?);
+    let mut items = Vec::new();
+    for e in message.nested_enums() {
+        items.extend(enumeration::render_enum(e)?);
     }
-    child.append_items(message::render_items(plan)?);
-    for nested in nested_messages {
-        let nested_plan = plan_message(nested)?;
-        append_message(child, &nested_plan)?;
+    items.extend(message::render_items(plan)?);
+
+    let mut nested = Vec::with_capacity(nested_messages.len());
+    for nested_msg in nested_messages {
+        nested.push(emit_message(&plan_message(nested_msg)?)?);
+    }
+
+    Ok(EmittedMessage {
+        pub_use,
+        module_name,
+        origin: ModuleOrigin::Message {
+            proto_fqn: message.fqn().clone(),
+        },
+        items,
+        nested,
+    })
+}
+
+fn install_file(forest: &mut ModuleForest, file: &File<'_>) -> Result<()> {
+    let parent = forest.ensure_package(file.package());
+    parent.append_items(file_level_enum_items(file)?);
+    for message in file.messages() {
+        let message = validate_emit_message(message)?;
+        install_message(parent, emit_message(&plan_message(message)?)?);
     }
     Ok(())
+}
+
+fn install_message(parent: &mut ModuleNode, emitted: EmittedMessage) {
+    parent.append_items([emitted.pub_use]);
+    let child = parent.get_or_insert_child(emitted.module_name);
+    child.add_origin(emitted.origin);
+    child.append_items(emitted.items);
+    for nested in emitted.nested {
+        install_message(child, nested);
+    }
 }
 
 /// Nested type declarations are emitted into this message's module.
