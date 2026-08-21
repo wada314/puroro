@@ -67,33 +67,24 @@ pub fn emit(request: &CodegenRequest) -> Result<CodeGeneratorResponse> {
     Ok(CodeGeneratorResponse::from_files(vec![file]))
 }
 
-/// Crate-level inner attributes (`//! @generated …`, clippy allows, package docs).
+/// Crate-level inner attributes (`//!` / `/*!` header and clippy allows).
+///
+/// Tooling only needs the `@generated` substring near the top of the file.
+/// Source `.proto` paths go in the same doc string so they stay one attribute;
+/// prettyplease prints a multiline doc as `/*! … */`.
 fn generated_file_attrs(targets: &[&File<'_>]) -> Result<Vec<Attribute>> {
-    let doc = if targets.len() == 1 {
-        format!("@generated from {} — do not edit", targets[0].name())
-    } else {
-        let names: Vec<&str> = targets.iter().map(|f| f.name()).collect();
-        format!("@generated from {} — do not edit", names.join(", "))
-    };
-    let mut root_tokens = quote! {
+    let files = targets
+        .iter()
+        .map(|file| format!("- `{}`", file.name()))
+        .collect::<Vec<_>>()
+        .join("\n");
+    let doc = format!("\n@generated — do not edit\n{files}\n");
+    let root_tokens = quote! {
         #![doc = #doc]
         #![allow(clippy::absolute_paths)]
         // Empty messages emit a catch-all-only `match` until field arms exist.
         #![allow(clippy::match_single_binding)]
     };
-    let mut packages: Vec<&str> = targets
-        .iter()
-        .map(|f| f.package())
-        .filter(|p| !p.is_empty())
-        .collect();
-    packages.sort_unstable();
-    packages.dedup();
-    for package in packages {
-        let package_doc = format!("Package `{package}`");
-        root_tokens.extend(quote! {
-            #![doc = #package_doc]
-        });
-    }
     Ok(parse::parse_file(root_tokens)?.attrs)
 }
 
@@ -296,11 +287,8 @@ mod tests {
         assert_eq!(response.files[0].name, "empty.rs");
         assert!(response.files[0].content.contains("struct Empty"));
         assert!(response.files[0].content.contains("pub use empty"));
-        assert!(
-            response.files[0]
-                .content
-                .contains("@generated from empty.proto")
-        );
+        assert!(response.files[0].content.contains("@generated"));
+        assert!(response.files[0].content.contains("- `empty.proto`"));
     }
 
     #[test]

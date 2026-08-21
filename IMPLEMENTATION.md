@@ -498,8 +498,10 @@ Navigational comments in generated Rust (section banners, per-field `// proto: �
 **File header** — every **real** plugin module carries a machine marker and the source message:
 
 ```rust
-//! @generated from example.proto — do not edit
-//! Message `example.Task`
+/*!
+@generated — do not edit
+- `example.proto`
+*/
 ```
 
 Tooling uses `@generated` to collapse/skip generated files. The checked-in [`sample-generated/`](sample-generated/) intentionally **omits** it — those files are a hand-maintained reference, and an `@generated`/`do not edit` banner there would wrongly imply they are tool-generated.
