@@ -50,7 +50,7 @@ pub fn emit(request: &CodegenRequest) -> Result<CodeGeneratorResponse> {
         .append_inner_attrs(generated_file_attrs(&targets)?);
 
     for file in &targets {
-        install_file(&mut forest, emit_file(file)?);
+        forest.install_file(emit_file(file)?);
     }
 
     let mut files = render(
@@ -174,39 +174,43 @@ fn emit_file(file: &File<'_>) -> Result<EmittedFile> {
     })
 }
 
-fn install_file(forest: &mut ModuleForest, emitted: EmittedFile) {
-    let package = forest.ensure_package(&emitted.package);
-    for e in emitted.enums {
-        install_enum(package, e);
-    }
-    for message in emitted.messages {
-        install_message(package, message);
-    }
-}
-
-fn install_message(module: &mut ModuleNode, emitted: EmittedMessage) {
-    module.append_items(emitted.type_items);
-    if emitted.companion_items.is_empty()
-        && emitted.nested_enums.is_empty()
-        && emitted.nested.is_empty()
-    {
-        return;
-    }
-    let companion = module.get_or_insert_child(emitted.module_name);
-    companion.add_origin(ModuleOrigin::Message {
-        proto_fqn: emitted.proto_fqn,
-    });
-    companion.append_items(emitted.companion_items);
-    for nested_enum in emitted.nested_enums {
-        install_enum(companion, nested_enum);
-    }
-    for nested in emitted.nested {
-        install_message(companion, nested);
+impl ModuleForest {
+    fn install_file(&mut self, emitted: EmittedFile) {
+        let package = self.ensure_package(&emitted.package);
+        for e in emitted.enums {
+            package.install_enum(e);
+        }
+        for message in emitted.messages {
+            package.install_message(message);
+        }
     }
 }
 
-fn install_enum(module: &mut ModuleNode, emitted: EmittedEnum) {
-    module.append_items(emitted.items);
+impl ModuleNode {
+    fn install_message(&mut self, emitted: EmittedMessage) {
+        self.append_items(emitted.type_items);
+        if emitted.companion_items.is_empty()
+            && emitted.nested_enums.is_empty()
+            && emitted.nested.is_empty()
+        {
+            return;
+        }
+        let companion = self.get_or_insert_child(emitted.module_name);
+        companion.add_origin(ModuleOrigin::Message {
+            proto_fqn: emitted.proto_fqn,
+        });
+        companion.append_items(emitted.companion_items);
+        for nested_enum in emitted.nested_enums {
+            companion.install_enum(nested_enum);
+        }
+        for nested in emitted.nested {
+            companion.install_message(nested);
+        }
+    }
+
+    fn install_enum(&mut self, emitted: EmittedEnum) {
+        self.append_items(emitted.items);
+    }
 }
 
 #[cfg(test)]
