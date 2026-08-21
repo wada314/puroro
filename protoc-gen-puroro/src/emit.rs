@@ -8,7 +8,7 @@
 
 use crate::descriptor::CodegenRequest;
 use crate::error::{Error, Result};
-use crate::field_kind::{MessagePlan, plan_message};
+use crate::field_kind::plan_message;
 use crate::module_tree::layout::{ModuleLayout, render};
 use crate::module_tree::{ModuleForest, ModuleNode, ModuleOrigin, type_name_to_module_ident};
 use crate::plugin_io::CodeGeneratorResponse;
@@ -97,32 +97,31 @@ struct EmittedMessage {
     nested: Vec<EmittedMessage>,
 }
 
-fn emit_message(plan: &MessagePlan<'_>) -> Result<EmittedMessage> {
-    let message = plan.message();
+fn emit_message(message: &Message<'_>) -> Result<EmittedMessage> {
+    if !ident::is_simple_ident(message.name()) {
+        return Err(Error::Codegen(format!(
+            "message name `{}` is not a simple Rust identifier",
+            message.name()
+        )));
+    }
+    let plan = plan_message(message)?;
     let module_name = type_name_to_module_ident(message.name());
     let type_name = Ident::new(message.name(), Span::call_site());
     let pub_use = parse_quote! {
         pub use #module_name::#type_name;
     };
 
-    let nested_messages: Vec<_> = message
-        .nested_messages()
-        .filter(|m| !m.is_map_entry())
-        .collect();
-    for nested in &nested_messages {
-        validate_emit_message(nested)?;
-    }
-
     let mut items = Vec::new();
     for e in message.nested_enums() {
         items.extend(enumeration::render_enum(e)?);
     }
-    items.extend(message::render_items(plan)?);
+    items.extend(message::render_items(&plan)?);
 
-    let mut nested = Vec::with_capacity(nested_messages.len());
-    for nested_msg in nested_messages {
-        nested.push(emit_message(&plan_message(nested_msg)?)?);
-    }
+    let nested = message
+        .nested_messages()
+        .filter(|m| !m.is_map_entry())
+        .map(emit_message)
+        .collect::<Result<Vec<_>>>()?;
 
     Ok(EmittedMessage {
         pub_use,
@@ -146,8 +145,7 @@ fn install_file(forest: &mut ModuleForest, file: &File<'_>) -> Result<()> {
             .flatten(),
     );
     for message in file.messages() {
-        validate_emit_message(message)?;
-        install_message(package, emit_message(&plan_message(message)?)?);
+        install_message(package, emit_message(message)?);
     }
     Ok(())
 }
@@ -160,18 +158,6 @@ fn install_message(module: &mut ModuleNode, emitted: EmittedMessage) {
     for nested in emitted.nested {
         install_message(message_mod, nested);
     }
-}
-
-/// Nested type declarations are emitted into this message's module.
-/// Proto3 optional synthetic oneofs resolve as Explicit and need no special case.
-fn validate_emit_message(message: &Message<'_>) -> Result<()> {
-    if !ident::is_simple_ident(message.name()) {
-        return Err(Error::Codegen(format!(
-            "message name `{}` is not a simple Rust identifier",
-            message.name()
-        )));
-    }
-    Ok(())
 }
 
 /// Map `foo/bar/baz.proto` → `foo/bar/baz.rs`.
