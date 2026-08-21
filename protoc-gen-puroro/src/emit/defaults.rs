@@ -7,11 +7,11 @@ use crate::error::{Error, Result};
 use crate::field_kind::WireTypeKind;
 use ::proc_macro2::{Ident, Span, TokenStream};
 use ::quote::quote;
-use ::syn::{LitByteStr, LitStr};
+use ::syn::{Item, LitByteStr, LitStr, Type, parse_quote};
 
 /// `, L, D` type-argument tail for `SingularField<…, A, …>` (may be empty).
 pub(super) fn layout_and_default_args(
-    layout_ty: &Option<TokenStream>,
+    layout_ty: &Option<Type>,
     default_marker: Option<&Ident>,
 ) -> TokenStream {
     match (layout_ty, default_marker) {
@@ -30,18 +30,18 @@ pub(super) fn marker_ident(custom: &CustomDefault) -> Ident {
 pub(super) fn render_marker_item(
     custom: &CustomDefault,
     wire: &WireTypeKind<'_>,
-) -> Result<TokenStream> {
+) -> Result<Vec<Item>> {
     let marker = marker_ident(custom);
     let (ty, expr, lifetime) = has_default_ty_and_expr(&custom.lit, wire)?;
     if lifetime {
-        Ok(quote! {
+        super::parse::parse_items(quote! {
             pub struct #marker;
             impl<'a> ::puroro::HasDefault<#ty> for #marker {
                 const DEFAULT: #ty = #expr;
             }
         })
     } else {
-        Ok(quote! {
+        super::parse::parse_items(quote! {
             pub struct #marker;
             impl ::puroro::HasDefault<#ty> for #marker {
                 const DEFAULT: #ty = #expr;
@@ -53,28 +53,36 @@ pub(super) fn render_marker_item(
 fn has_default_ty_and_expr(
     lit: &DefaultLit,
     wire: &WireTypeKind<'_>,
-) -> Result<(TokenStream, TokenStream, bool)> {
+) -> Result<(Type, TokenStream, bool)> {
     Ok(match lit {
-        DefaultLit::Bool(v) => (quote! { bool }, quote! { #v }, false),
-        DefaultLit::I32(v) => (quote! { i32 }, quote! { #v }, false),
-        DefaultLit::I64(v) => (quote! { i64 }, quote! { #v }, false),
-        DefaultLit::U32(v) => (quote! { u32 }, quote! { #v }, false),
-        DefaultLit::U64(v) => (quote! { u64 }, quote! { #v }, false),
+        DefaultLit::Bool(v) => (parse_quote! { bool }, quote! { #v }, false),
+        DefaultLit::I32(v) => (parse_quote! { i32 }, quote! { #v }, false),
+        DefaultLit::I64(v) => (parse_quote! { i64 }, quote! { #v }, false),
+        DefaultLit::U32(v) => (parse_quote! { u32 }, quote! { #v }, false),
+        DefaultLit::U64(v) => (parse_quote! { u64 }, quote! { #v }, false),
         DefaultLit::F32Bits(bits) => {
             let bits = *bits;
-            (quote! { f32 }, quote! { f32::from_bits(#bits) }, false)
+            (
+                parse_quote! { f32 },
+                quote! { f32::from_bits(#bits) },
+                false,
+            )
         }
         DefaultLit::F64Bits(bits) => {
             let bits = *bits;
-            (quote! { f64 }, quote! { f64::from_bits(#bits) }, false)
+            (
+                parse_quote! { f64 },
+                quote! { f64::from_bits(#bits) },
+                false,
+            )
         }
         DefaultLit::Str(s) => {
             let lit = LitStr::new(s, Span::call_site());
-            (quote! { &'a str }, quote! { #lit }, true)
+            (parse_quote! { &'a str }, quote! { #lit }, true)
         }
         DefaultLit::Bytes(b) => {
             let lit = LitByteStr::new(b, Span::call_site());
-            (quote! { &'a [u8] }, quote! { #lit }, true)
+            (parse_quote! { &'a [u8] }, quote! { #lit }, true)
         }
         DefaultLit::Enum { value_name, .. } => {
             let WireTypeKind::Enum { ty, .. } = wire else {
@@ -84,7 +92,7 @@ fn has_default_ty_and_expr(
             };
             let path = fqn_to_enum_root_path(ty)?;
             let variant = enumeration::variant_const_ident(ty.name(), value_name)?;
-            (quote! { #path }, quote! { #path::#variant }, false)
+            (parse_quote! { #path }, quote! { #path::#variant }, false)
         }
     })
 }

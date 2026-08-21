@@ -6,6 +6,7 @@ use crate::default_value::CustomDefault;
 use crate::error::Result;
 use ::proc_macro2::{Ident, TokenStream};
 use ::quote::quote;
+use ::syn::{Item, Type};
 
 /// Owned facts for one generated oneof group.
 pub(super) struct OneofEmit {
@@ -27,27 +28,27 @@ pub(super) struct OneofVariantEmit {
     pub field_alias: Ident,
     pub field_const: Ident,
     pub number: u32,
-    pub marker: TokenStream,
-    pub layout_ty: Option<TokenStream>,
+    pub marker: Type,
+    pub layout_ty: Option<Type>,
     pub value_bit: Option<(Ident, usize)>,
     pub is_message: bool,
     pub is_bool: bool,
     pub mut_style: SingularMutStyle,
-    pub mut_target: TokenStream,
-    pub optional_ty: TokenStream,
-    /// Non-type-zero `[default = …]` plus pre-rendered `HasDefault` impl item.
-    pub custom_default: Option<(CustomDefault, TokenStream)>,
+    pub mut_target: Type,
+    pub optional_ty: Type,
+    /// Non-type-zero `[default = …]` plus pre-rendered `HasDefault` items.
+    pub custom_default: Option<(CustomDefault, Vec<Item>)>,
 }
 
 /// Render `mod <oneof> { … }` plus `use` / `pub use` for the parent message module.
-pub(super) fn render_module_and_exports(oneof: &OneofEmit) -> Result<TokenStream> {
+pub(super) fn render_module_and_exports(oneof: &OneofEmit) -> Result<Vec<Item>> {
     let mod_name = &oneof.mod_name;
     let shape_name = &oneof.shape_name;
     let case_name = &oneof.case_name;
     let storage_name = &oneof.storage_name;
 
     let module_body = render_module_body(oneof)?;
-    Ok(quote! {
+    super::parse::parse_items(quote! {
         mod #mod_name {
             #module_body
         }

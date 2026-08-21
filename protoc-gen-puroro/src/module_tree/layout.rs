@@ -9,10 +9,10 @@
 
 use super::ModuleForest;
 use super::ModuleNode;
-use crate::error::{Error, Result};
+use crate::error::Result;
 use crate::plugin_io::ResponseFile;
-use ::proc_macro2::TokenStream;
-use ::quote::quote;
+use ::syn::parse_quote;
+use ::syn::{File, Item};
 
 /// How to materialise a [`ModuleForest`] as `CodeGeneratorResponse` files.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -28,47 +28,52 @@ pub enum ModuleLayout {
 /// Render a forest according to `layout`.
 pub fn render(forest: &ModuleForest, layout: &ModuleLayout) -> Result<Vec<ResponseFile>> {
     match layout {
-        ModuleLayout::SingleFile { path } => Ok(vec![render_single_file(forest, path)?]),
+        ModuleLayout::SingleFile { path } => Ok(vec![render_single_file(forest, path)]),
     }
 }
 
 /// Expand `forest` into one source file with nested `pub mod` blocks.
-pub fn render_single_file(forest: &ModuleForest, path: &str) -> Result<ResponseFile> {
-    let tokens = render_node_body(forest.root(), /* is_forest_root */ true);
-    Ok(ResponseFile {
+pub fn render_single_file(forest: &ModuleForest, path: &str) -> ResponseFile {
+    let file = render_file(forest.root());
+    ResponseFile {
         name: path.to_owned(),
-        content: tokens_to_source(tokens)?,
-    })
-}
-
-fn render_node_body(node: &ModuleNode, is_forest_root: bool) -> TokenStream {
-    let root_alias = root_alias_mod(is_forest_root);
-    let items = node.items().clone();
-    let child_mods = node.children().iter().map(render_child_mod);
-    if is_forest_root {
-        // Inner attributes (`#![…]`) in `items` must stay at the top of the file.
-        quote! {
-            #items
-            #root_alias
-            #(#child_mods)*
-        }
-    } else {
-        quote! {
-            #root_alias
-            #items
-            #(#child_mods)*
-        }
+        content: ::prettyplease::unparse(&file),
     }
 }
 
-fn render_child_mod(child: &ModuleNode) -> TokenStream {
+fn render_file(root: &ModuleNode) -> File {
+    File {
+        shebang: None,
+        attrs: root.inner_attrs().to_vec(),
+        items: render_node_items(root, /* is_forest_root */ true),
+    }
+}
+
+fn render_node_items(node: &ModuleNode, is_forest_root: bool) -> Vec<Item> {
+    let mut items = Vec::new();
+    if is_forest_root {
+        items.extend(node.items().iter().cloned());
+        items.push(root_alias_item(true));
+        items.extend(node.children().iter().map(render_child_mod));
+    } else {
+        items.push(root_alias_item(false));
+        items.extend(node.items().iter().cloned());
+        items.extend(node.children().iter().map(render_child_mod));
+    }
+    items
+}
+
+fn render_child_mod(child: &ModuleNode) -> Item {
     let name = child
         .name()
-        .expect("layout-eligible child modules must be named");
-    let body = render_node_body(child, /* is_forest_root */ false);
-    quote! {
+        .expect("layout-eligible child modules must be named")
+        .clone();
+    let inner_attrs = child.inner_attrs();
+    let items = render_node_items(child, /* is_forest_root */ false);
+    parse_quote! {
         pub mod #name {
-            #body
+            #(#inner_attrs)*
+            #(#items)*
         }
     }
 }
@@ -78,16 +83,16 @@ fn render_child_mod(child: &ModuleNode) -> TokenStream {
 /// - Forest root: re-exports the root module's public items.
 /// - Nested module: chains to the parent's `_root` via `super::super` (the extra
 ///   `super` accounts for this `_root` submodule itself).
-fn root_alias_mod(is_forest_root: bool) -> TokenStream {
+fn root_alias_item(is_forest_root: bool) -> Item {
     if is_forest_root {
-        quote! {
+        parse_quote! {
             #[allow(unused_imports)]
             mod _root {
                 pub(super) use super::*;
             }
         }
     } else {
-        quote! {
+        parse_quote! {
             #[allow(unused_imports)]
             mod _root {
                 pub(super) use super::super::_root::*;
@@ -96,42 +101,37 @@ fn root_alias_mod(is_forest_root: bool) -> TokenStream {
     }
 }
 
-fn tokens_to_source(tokens: TokenStream) -> Result<String> {
-    let file = ::syn::parse2::<::syn::File>(tokens)
-        .map_err(|e| Error::Codegen(format!("generated token stream is not valid Rust: {e}")))?;
-    Ok(::prettyplease::unparse(&file))
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
     use crate::descriptor::ProtoFqn;
     use crate::module_tree::{ModuleForest, ModuleOrigin, type_name_to_module_ident};
-    use ::quote::quote;
+    use ::syn::parse_quote;
 
     #[test]
     fn single_file_inlines_message_under_root() {
         let mut forest = ModuleForest::new();
-        forest.root_mut().append_items(quote! {
+        let file: File = parse_quote! {
             #![allow(clippy::absolute_paths)]
-        });
+        };
+        forest.root_mut().append_inner_attrs(file.attrs);
 
         let parent = forest.ensure_package("");
         let mod_name = type_name_to_module_ident("Empty");
         let type_name = ::proc_macro2::Ident::new("Empty", ::proc_macro2::Span::call_site());
-        parent.append_items(quote! {
+        parent.append_items([parse_quote! {
             pub use #mod_name::#type_name;
-        });
+        }]);
 
         let child = parent.get_or_insert_child(mod_name.clone());
         child.add_origin(ModuleOrigin::Message {
             proto_fqn: ProtoFqn::parse(".Empty"),
         });
-        child.append_items(quote! {
+        child.append_items([parse_quote! {
             pub struct Empty;
-        });
+        }]);
 
-        let file = render_single_file(&forest, "empty.rs").unwrap();
+        let file = render_single_file(&forest, "empty.rs");
         assert_eq!(file.name, "empty.rs");
         assert!(file.content.contains("pub use empty::Empty"));
         assert!(file.content.contains("pub mod empty"));
@@ -146,20 +146,20 @@ mod tests {
     fn single_file_nests_package_modules() {
         let mut forest = ModuleForest::new();
         let parent = forest.ensure_package("example");
-        parent.append_items(quote! {
+        parent.append_items([parse_quote! {
             pub struct Status(pub i32);
-        });
+        }]);
         let mod_name = type_name_to_module_ident("Task");
         let type_name = ::proc_macro2::Ident::new("Task", ::proc_macro2::Span::call_site());
-        parent.append_items(quote! {
+        parent.append_items([parse_quote! {
             pub use #mod_name::#type_name;
-        });
+        }]);
         let task = parent.get_or_insert_child(mod_name);
-        task.append_items(quote! {
+        task.append_items([parse_quote! {
             pub struct Task;
-        });
+        }]);
 
-        let file = render_single_file(&forest, "lib.rs").unwrap();
+        let file = render_single_file(&forest, "lib.rs");
         assert!(file.content.contains("pub mod example"));
         assert!(file.content.contains("pub struct Status"));
         assert!(file.content.contains("pub mod task"));
@@ -173,21 +173,20 @@ mod tests {
         let mut forest = ModuleForest::new();
         let parent = forest.ensure_package("example");
         let address = parent.get_or_insert_child(type_name_to_module_ident("Address"));
-        address.append_items(quote! {
+        address.append_items([parse_quote! {
             pub struct Address;
-        });
+        }]);
         let task = parent.get_or_insert_child(type_name_to_module_ident("Task"));
         // Simulate a cross-type reference the way real codegen will emit it.
-        task.append_items(quote! {
+        task.append_items([parse_quote! {
             pub type Assignee = self::_root::example::address::Address;
-        });
+        }]);
 
-        let file = render_single_file(&forest, "lib.rs").unwrap();
+        let file = render_single_file(&forest, "lib.rs");
         assert!(
             file.content
                 .contains("self::_root::example::address::Address")
         );
-        // Compiles as a snippet when parsed: already validated by tokens_to_source.
         let _ = file;
     }
 }

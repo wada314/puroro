@@ -8,13 +8,14 @@ use crate::resolved::Enum;
 use ::proc_macro2::{Ident, Span, TokenStream};
 use ::quote::quote;
 use ::std::collections::BTreeSet;
+use ::syn::Item;
 
 /// Render an enum into its parent package or message module.
 ///
 /// Defaults / `Default` / `HasDefault` use the **first defined** enumerator
 /// (proto2 / proto3 / editions language guides). Open enums additionally require
 /// that first value to be `0`.
-pub(super) fn render_enum(e: &Enum<'_>) -> Result<TokenStream> {
+pub(super) fn render_enum(e: &Enum<'_>) -> Result<Vec<Item>> {
     if !is_simple_ident(e.name()) {
         return Err(Error::Codegen(format!(
             "enum name `{}` is not a simple Rust identifier",
@@ -113,7 +114,7 @@ pub(super) fn render_enum(e: &Enum<'_>) -> Result<TokenStream> {
         },
     };
 
-    Ok(quote! {
+    super::parse::parse_items(quote! {
         #[derive(
             ::core::clone::Clone,
             ::core::marker::Copy,

@@ -5,35 +5,37 @@ use crate::descriptor::ProtoFqn;
 use crate::error::{Error, Result};
 use crate::module_tree::type_name_to_module_ident;
 use crate::resolved::{Enum, Message};
-use ::proc_macro2::{Ident, Span, TokenStream};
-use ::quote::quote;
+use ::proc_macro2::{Ident, Span};
+use ::syn::parse_quote;
+use ::syn::{Path, PathSegment};
 
 /// File-level enum `.example.v1.Status` → `self::_root::example::v1::Status`.
 ///
 /// Prefer [`fqn_to_enum_root_path`] when an [`Enum`] handle is available (nested
 /// enums need the parent message module chain).
-pub fn fqn_to_root_path(fqn: &ProtoFqn) -> Result<TokenStream> {
+pub fn fqn_to_root_path(fqn: &ProtoFqn) -> Result<Path> {
     let (package_segments, type_name) = split_fqn_file_level(fqn)?;
-    let type_ident = rust_ident(type_name);
-    let mut path = quote! { self::_root };
+    let mut path = root_path();
     for seg in package_segments {
-        let ident = Ident::new(seg, Span::call_site());
-        path = quote! { #path::#ident };
+        path.segments
+            .push(PathSegment::from(Ident::new(seg, Span::call_site())));
     }
-    Ok(quote! { #path::#type_ident })
+    path.segments.push(PathSegment::from(rust_ident(type_name)));
+    Ok(path)
 }
 
 /// Enum path: file-level or nested under parent message modules.
 ///
 /// - `.demo.Status` → `self::_root::demo::Status`
 /// - `.demo.Task.Kind` → `self::_root::demo::task::Kind`
-pub fn fqn_to_enum_root_path<'a>(enumeration: &'a Enum<'a>) -> Result<TokenStream> {
-    let type_ident = rust_ident(enumeration.name());
+pub fn fqn_to_enum_root_path<'a>(enumeration: &'a Enum<'a>) -> Result<Path> {
     match enumeration.parent() {
         None => fqn_to_root_path(enumeration.fqn()),
         Some(parent) => {
-            let parent_mod = message_module_path(parent)?;
-            Ok(quote! { #parent_mod::#type_ident })
+            let mut path = message_module_path(parent)?;
+            path.segments
+                .push(PathSegment::from(rust_ident(enumeration.name())));
+            Ok(path)
         }
     }
 }
@@ -42,16 +44,21 @@ pub fn fqn_to_enum_root_path<'a>(enumeration: &'a Enum<'a>) -> Result<TokenStrea
 ///
 /// - `.demo.Address` → `self::_root::demo::address::Address`
 /// - `.demo.Outer.Inner` → `self::_root::demo::outer::inner::Inner`
-pub fn fqn_to_message_root_path<'a>(message: &'a Message<'a>) -> Result<TokenStream> {
-    let type_ident = rust_ident(message.name());
-    let module_path = message_module_path(message)?;
-    Ok(quote! { #module_path::#type_ident })
+pub fn fqn_to_message_root_path<'a>(message: &'a Message<'a>) -> Result<Path> {
+    let mut path = message_module_path(message)?;
+    path.segments
+        .push(PathSegment::from(rust_ident(message.name())));
+    Ok(path)
+}
+
+fn root_path() -> Path {
+    parse_quote!(self::_root)
 }
 
 /// `self::_root::pkg…::outer::inner` (message modules only; no trailing type).
-fn message_module_path<'a>(message: &'a Message<'a>) -> Result<TokenStream> {
+fn message_module_path<'a>(message: &'a Message<'a>) -> Result<Path> {
     let (package, type_names) = package_and_message_chain(message)?;
-    let mut path = quote! { self::_root };
+    let mut path = root_path();
     for seg in package {
         if !is_simple_ident(seg) {
             return Err(Error::Codegen(format!(
@@ -59,8 +66,8 @@ fn message_module_path<'a>(message: &'a Message<'a>) -> Result<TokenStream> {
                 message.fqn()
             )));
         }
-        let ident = Ident::new(seg, Span::call_site());
-        path = quote! { #path::#ident };
+        path.segments
+            .push(PathSegment::from(Ident::new(seg, Span::call_site())));
     }
     for name in type_names {
         if !is_simple_ident(name) {
@@ -69,8 +76,8 @@ fn message_module_path<'a>(message: &'a Message<'a>) -> Result<TokenStream> {
                 message.fqn()
             )));
         }
-        let mod_ident = type_name_to_module_ident(name);
-        path = quote! { #path::#mod_ident };
+        path.segments
+            .push(PathSegment::from(type_name_to_module_ident(name)));
     }
     Ok(path)
 }
@@ -145,6 +152,7 @@ mod tests {
     use super::*;
     use crate::descriptor::{EnumDesc, EnumValueDesc, FeatureSet, MessageDesc, ProtoFile, Syntax};
     use crate::resolved::{Arena, FileSet, resolve};
+    use ::quote::ToTokens;
 
     fn message<'a>(set: &FileSet<'a>, name: &str) -> &'a Message<'a> {
         fn walk<'a>(m: &'a Message<'a>, name: &str) -> Option<&'a Message<'a>> {
@@ -179,9 +187,12 @@ mod tests {
     #[test]
     fn maps_packaged_and_top_level_enums() {
         let packaged = fqn_to_root_path(&ProtoFqn::parse(".demo.Status")).unwrap();
-        assert_eq!(packaged.to_string(), "self :: _root :: demo :: Status");
+        assert_eq!(
+            packaged.to_token_stream().to_string(),
+            "self :: _root :: demo :: Status"
+        );
         let top = fqn_to_root_path(&ProtoFqn::parse(".Status")).unwrap();
-        assert_eq!(top.to_string(), "self :: _root :: Status");
+        assert_eq!(top.to_token_stream().to_string(), "self :: _root :: Status");
     }
 
     #[test]
@@ -207,7 +218,7 @@ mod tests {
         let msg = message(&set, "Address");
         let path = fqn_to_message_root_path(msg).unwrap();
         assert_eq!(
-            path.to_string(),
+            path.to_token_stream().to_string(),
             "self :: _root :: demo :: address :: Address"
         );
     }
@@ -248,12 +259,18 @@ mod tests {
         let set = resolve(&arena, &files).unwrap();
         let inner = message(&set, "Inner");
         assert_eq!(
-            fqn_to_message_root_path(inner).unwrap().to_string(),
+            fqn_to_message_root_path(inner)
+                .unwrap()
+                .to_token_stream()
+                .to_string(),
             "self :: _root :: demo :: outer :: inner :: Inner"
         );
         let kind = enumeration(&set, "Kind");
         assert_eq!(
-            fqn_to_enum_root_path(kind).unwrap().to_string(),
+            fqn_to_enum_root_path(kind)
+                .unwrap()
+                .to_token_stream()
+                .to_string(),
             "self :: _root :: demo :: outer :: Kind"
         );
     }

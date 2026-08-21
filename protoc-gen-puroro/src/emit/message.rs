@@ -18,12 +18,13 @@ use crate::field_kind::{
 };
 use ::proc_macro2::{Ident, Span, TokenStream};
 use ::quote::quote;
+use ::syn::{Item, Type, parse_quote};
 
 enum FieldEmit {
-    Singular(ScalarEmit),
-    Repeated(RepeatedEmit),
-    Map(MapEmit),
-    Oneof(OneofEmit),
+    Singular(Box<ScalarEmit>),
+    Repeated(Box<RepeatedEmit>),
+    Map(Box<MapEmit>),
+    Oneof(Box<OneofEmit>),
 }
 
 /// Owned per-field facts needed for `quote!` (avoids borrowing `MessagePlan`).
@@ -32,21 +33,21 @@ struct ScalarEmit {
     name_str: String,
     field_const: Ident,
     number: u32,
-    marker: TokenStream,
-    presence_ty: TokenStream,
-    layout_ty: Option<TokenStream>,
+    marker: Type,
+    presence_ty: Type,
+    layout_ty: Option<Type>,
     presence_bit: Option<(Ident, usize)>,
     value_bit: Option<(Ident, usize)>,
     style: AccessorStyle,
     /// Enums always use `.optional()` even when presence is IMPLICIT (DESIGN §4.6).
     optional_getter: bool,
-    mut_target: TokenStream,
+    mut_target: Type,
     /// Return type for IMPLICIT value getters (`i32`, `&str`, …).
-    implicit_ty: TokenStream,
+    implicit_ty: Type,
     /// Payload type inside `Optional<…>` (`i32`, `&'a str`, enum path, …).
-    optional_ty: TokenStream,
+    optional_ty: Type,
     /// Non-type-zero `[default = …]` marker (emitted into `mod defaults`).
-    custom_default: Option<(CustomDefault, TokenStream /* HasDefault impl item */)>,
+    custom_default: Option<(CustomDefault, Vec<Item>)>,
     /// Shape of the generated `_mut` accessor return type.
     mut_style: SingularMutStyle,
 }
@@ -56,11 +57,11 @@ struct RepeatedEmit {
     name_str: String,
     field_const: Ident,
     number: u32,
-    marker: TokenStream,
-    encoding_ty: TokenStream,
+    marker: Type,
+    encoding_ty: Type,
     style: RepeatedAccessorStyle,
     /// `as_slice` element type for packable / message repeated fields.
-    slice_elem_ty: TokenStream,
+    slice_elem_ty: Type,
 }
 
 struct MapEmit {
@@ -68,16 +69,16 @@ struct MapEmit {
     name_str: String,
     field_const: Ident,
     number: u32,
-    key_marker: TokenStream,
-    value_marker: TokenStream,
+    key_marker: Type,
+    value_marker: Type,
     /// User-facing key type in `MapRef` / mut traits (`str`, `i32`, …).
-    key_view: TokenStream,
+    key_view: Type,
     /// Shared view type for `MapRef` (`i32`, `str`, `Address<A>`, …).
-    value_view: TokenStream,
+    value_view: Type,
     /// `map<string, …>` — key view is `str`.
     string_key: bool,
     /// When set, pin `MutTarget` on the mutator return type (string / bytes).
-    mut_target: Option<TokenStream>,
+    mut_target: Option<Type>,
 }
 
 #[derive(Clone, Copy)]
@@ -117,12 +118,12 @@ impl SingularMutStyle {
     }
 
     /// Return type of `_mut` for lifetime `lt` (e.g. `'s`) and `mut_target`.
-    pub(super) fn return_ty(self, lt: &TokenStream, mut_target: &TokenStream) -> TokenStream {
+    pub(super) fn return_ty(self, lt: &TokenStream, mut_target: &Type) -> Type {
         match self {
-            Self::SsoString => quote! { impl ::puroro::StringMut<A> + #lt },
-            Self::SsoBytes => quote! { impl ::puroro::BytesMut<A> + #lt },
+            Self::SsoString => parse_quote! { impl ::puroro::StringMut<A> + #lt },
+            Self::SsoBytes => parse_quote! { impl ::puroro::BytesMut<A> + #lt },
             Self::DerefMut => {
-                quote! { impl ::core::ops::DerefMut<Target = #mut_target> + #lt }
+                parse_quote! { impl ::core::ops::DerefMut<Target = #mut_target> + #lt }
             }
         }
     }
@@ -158,7 +159,7 @@ impl FieldEmit {
 }
 
 /// Render items that belong inside the message's implementation module.
-pub(super) fn render_items(plan: &MessagePlan<'_>) -> Result<TokenStream> {
+pub(super) fn render_items(plan: &MessagePlan<'_>) -> Result<Vec<Item>> {
     let fields = collect_fields(plan)?;
     let name = rust_ident(plan.message().name());
     let name_str = plan.message().name();
@@ -209,7 +210,7 @@ pub(super) fn render_items(plan: &MessagePlan<'_>) -> Result<TokenStream> {
         }
     };
 
-    Ok(quote! {
+    super::parse::parse_items(quote! {
         // @generated message body from protoc-gen-puroro.
 
         #bit_consts
@@ -485,7 +486,7 @@ fn collect_fields(plan: &MessagePlan<'_>) -> Result<Vec<FieldEmit>> {
                     variants.push(oneof_variant_emit(field, i)?);
                 }
                 let pascal = to_pascal_case(o.name());
-                out.push(FieldEmit::Oneof(OneofEmit {
+                out.push(FieldEmit::Oneof(Box::new(OneofEmit {
                     name: rust_ident(o.name()),
                     name_str: o.name().to_owned(),
                     mod_name: rust_ident(o.name()),
@@ -493,7 +494,7 @@ fn collect_fields(plan: &MessagePlan<'_>) -> Result<Vec<FieldEmit>> {
                     case_name: Ident::new(&format!("{pascal}Case"), Span::call_site()),
                     storage_name: Ident::new(&format!("{pascal}Storage"), Span::call_site()),
                     variants,
-                }));
+                })));
             }
             MessageMember::Field(field) => {
                 if !is_simple_ident(field.name()) {
@@ -504,22 +505,22 @@ fn collect_fields(plan: &MessagePlan<'_>) -> Result<Vec<FieldEmit>> {
                 }
                 match field.kind() {
                     FieldKind::Map { key, value } => {
-                        out.push(FieldEmit::Map(map_emit(
+                        out.push(FieldEmit::Map(Box::new(map_emit(
                             field.name(),
                             field.field_const(),
                             field.number(),
                             key,
                             value,
-                        )?));
+                        )?)));
                     }
                     FieldKind::Repeated { wire, encoding } => {
-                        out.push(FieldEmit::Repeated(repeated_emit(
+                        out.push(FieldEmit::Repeated(Box::new(repeated_emit(
                             field.name(),
                             field.field_const(),
                             field.number(),
                             wire,
                             *encoding,
-                        )?));
+                        )?)));
                     }
                     FieldKind::Singular {
                         wire,
@@ -533,7 +534,7 @@ fn collect_fields(plan: &MessagePlan<'_>) -> Result<Vec<FieldEmit>> {
                                 field.name()
                             )));
                         }
-                        out.push(FieldEmit::Singular(scalar_emit(
+                        out.push(FieldEmit::Singular(Box::new(scalar_emit(
                             field.name(),
                             field.field_const(),
                             field.number(),
@@ -541,7 +542,7 @@ fn collect_fields(plan: &MessagePlan<'_>) -> Result<Vec<FieldEmit>> {
                             presence,
                             layout,
                             custom_default.as_ref(),
-                        )?));
+                        )?)));
                     }
                 }
             }
@@ -585,7 +586,7 @@ fn oneof_variant_emit(field: &PlannedField<'_>, index: usize) -> Result<OneofVar
             let ident = Ident::new(bit_const, Span::call_site());
             (
                 // Const lives on the parent message module.
-                Some(quote! { ::puroro_rt::BitPacked<{ super::#ident }> }),
+                Some(parse_quote! { ::puroro_rt::BitPacked<{ super::#ident }> }),
                 Some((ident, *value_bit)),
             )
         }
@@ -595,7 +596,7 @@ fn oneof_variant_emit(field: &PlannedField<'_>, index: usize) -> Result<OneofVar
         } => {
             let ident = Ident::new(bit_const, Span::call_site());
             (
-                Some(quote! { ::puroro_rt::InlineOrHeap<{ super::#ident }> }),
+                Some(parse_quote! { ::puroro_rt::InlineOrHeap<{ super::#ident }> }),
                 Some((ident, *heap_bit)),
             )
         }
@@ -621,7 +622,7 @@ fn oneof_variant_emit(field: &PlannedField<'_>, index: usize) -> Result<OneofVar
         mut_style,
         mut_target: mut_target_type(wire)?,
         optional_ty: if is_message {
-            TokenStream::new()
+            parse_quote! { () }
         } else {
             optional_value_type(wire)?
         },
@@ -640,12 +641,12 @@ fn repeated_emit(
     encoding: RepeatedEncodingKind,
 ) -> Result<RepeatedEmit> {
     let encoding_ty = match encoding {
-        RepeatedEncodingKind::Packed => quote! { ::puroro_rt::Packed },
-        RepeatedEncodingKind::Expanded => quote! { ::puroro_rt::Expanded },
+        RepeatedEncodingKind::Packed => parse_quote! { ::puroro_rt::Packed },
+        RepeatedEncodingKind::Expanded => parse_quote! { ::puroro_rt::Expanded },
     };
     let (style, slice_elem_ty) = match wire {
-        WireTypeKind::String { .. } => (RepeatedAccessorStyle::String, TokenStream::new()),
-        WireTypeKind::Bytes { .. } => (RepeatedAccessorStyle::Bytes, TokenStream::new()),
+        WireTypeKind::String { .. } => (RepeatedAccessorStyle::String, parse_quote! { () }),
+        WireTypeKind::Bytes { .. } => (RepeatedAccessorStyle::Bytes, parse_quote! { () }),
         _ => (
             RepeatedAccessorStyle::Slice,
             repeated_slice_elem_type(wire)?,
@@ -686,18 +687,18 @@ fn map_emit(
     })
 }
 
-fn map_key_view(key: &WireTypeKind<'_>, field_name: &str) -> Result<(TokenStream, bool)> {
+fn map_key_view(key: &WireTypeKind<'_>, field_name: &str) -> Result<(Type, bool)> {
     Ok(match key {
-        WireTypeKind::String { .. } => (quote! { str }, true),
-        WireTypeKind::Bool => (quote! { bool }, false),
+        WireTypeKind::String { .. } => (parse_quote! { str }, true),
+        WireTypeKind::Bool => (parse_quote! { bool }, false),
         WireTypeKind::Int32 | WireTypeKind::SInt32 | WireTypeKind::SFixed32 => {
-            (quote! { i32 }, false)
+            (parse_quote! { i32 }, false)
         }
         WireTypeKind::Int64 | WireTypeKind::SInt64 | WireTypeKind::SFixed64 => {
-            (quote! { i64 }, false)
+            (parse_quote! { i64 }, false)
         }
-        WireTypeKind::UInt32 | WireTypeKind::Fixed32 => (quote! { u32 }, false),
-        WireTypeKind::UInt64 | WireTypeKind::Fixed64 => (quote! { u64 }, false),
+        WireTypeKind::UInt32 | WireTypeKind::Fixed32 => (parse_quote! { u32 }, false),
+        WireTypeKind::UInt64 | WireTypeKind::Fixed64 => (parse_quote! { u64 }, false),
         other => {
             return Err(Error::Codegen(format!(
                 "map field `{field_name}`: invalid map key type {other:?}"
@@ -707,31 +708,34 @@ fn map_key_view(key: &WireTypeKind<'_>, field_name: &str) -> Result<(TokenStream
 }
 
 /// Returns `(shared view, optional MutTarget pin)`.
-fn map_value_view(
-    value: &WireTypeKind<'_>,
-    _field_name: &str,
-) -> Result<(TokenStream, Option<TokenStream>)> {
+fn map_value_view(value: &WireTypeKind<'_>, _field_name: &str) -> Result<(Type, Option<Type>)> {
     Ok(match value {
-        WireTypeKind::Double => (quote! { f64 }, None),
-        WireTypeKind::Float => (quote! { f32 }, None),
-        WireTypeKind::Bool => (quote! { bool }, None),
+        WireTypeKind::Double => (parse_quote! { f64 }, None),
+        WireTypeKind::Float => (parse_quote! { f32 }, None),
+        WireTypeKind::Bool => (parse_quote! { bool }, None),
         WireTypeKind::Int32 | WireTypeKind::SInt32 | WireTypeKind::SFixed32 => {
-            (quote! { i32 }, None)
+            (parse_quote! { i32 }, None)
         }
         WireTypeKind::Int64 | WireTypeKind::SInt64 | WireTypeKind::SFixed64 => {
-            (quote! { i64 }, None)
+            (parse_quote! { i64 }, None)
         }
-        WireTypeKind::UInt32 | WireTypeKind::Fixed32 => (quote! { u32 }, None),
-        WireTypeKind::UInt64 | WireTypeKind::Fixed64 => (quote! { u64 }, None),
-        WireTypeKind::String { .. } => (quote! { str }, Some(quote! { ::puroro::String<A> })),
-        WireTypeKind::Bytes { .. } => (
-            quote! { [u8] },
-            Some(quote! { ::allocator_api2::vec::Vec<u8, A> }),
+        WireTypeKind::UInt32 | WireTypeKind::Fixed32 => (parse_quote! { u32 }, None),
+        WireTypeKind::UInt64 | WireTypeKind::Fixed64 => (parse_quote! { u64 }, None),
+        WireTypeKind::String { .. } => (
+            parse_quote! { str },
+            Some(parse_quote! { ::puroro::String<A> }),
         ),
-        WireTypeKind::Enum { ty, .. } => (fqn_to_enum_root_path(ty)?, None),
+        WireTypeKind::Bytes { .. } => (
+            parse_quote! { [u8] },
+            Some(parse_quote! { ::allocator_api2::vec::Vec<u8, A> }),
+        ),
+        WireTypeKind::Enum { ty, .. } => {
+            let path = fqn_to_enum_root_path(ty)?;
+            (parse_quote! { #path }, None)
+        }
         WireTypeKind::Message(m) => {
             let path = fqn_to_message_root_path(m)?;
-            (quote! { #path<A> }, None)
+            (parse_quote! { #path<A> }, None)
         }
     })
 }
@@ -748,14 +752,14 @@ fn scalar_emit(
     let (style, presence_ty, presence_bit) = match presence {
         PlannedPresence::Implicit => (
             AccessorStyle::Implicit,
-            quote! { ::puroro_rt::Implicit },
+            parse_quote! { ::puroro_rt::Implicit },
             None,
         ),
         PlannedPresence::Explicit { bit, bit_const } => {
             let ident = Ident::new(bit_const, Span::call_site());
             (
                 AccessorStyle::Explicit,
-                quote! { ::puroro_rt::Explicit<{ #ident }> },
+                parse_quote! { ::puroro_rt::Explicit<{ #ident }> },
                 Some((ident, *bit)),
             )
         }
@@ -763,13 +767,13 @@ fn scalar_emit(
             let ident = Ident::new(bit_const, Span::call_site());
             (
                 AccessorStyle::LegacyRequired,
-                quote! { ::puroro_rt::LegacyRequired<{ #ident }> },
+                parse_quote! { ::puroro_rt::LegacyRequired<{ #ident }> },
                 Some((ident, *bit)),
             )
         }
         PlannedPresence::Message => (
             AccessorStyle::Message,
-            quote! { ::puroro_rt::Message },
+            parse_quote! { ::puroro_rt::Message },
             None,
         ),
         PlannedPresence::Oneof => {
@@ -787,7 +791,7 @@ fn scalar_emit(
         } => {
             let ident = Ident::new(bit_const, Span::call_site());
             (
-                Some(quote! { ::puroro_rt::BitPacked<{ #ident }> }),
+                Some(parse_quote! { ::puroro_rt::BitPacked<{ #ident }> }),
                 Some((ident, *value_bit)),
             )
         }
@@ -797,7 +801,7 @@ fn scalar_emit(
         } => {
             let ident = Ident::new(bit_const, Span::call_site());
             (
-                Some(quote! { ::puroro_rt::InlineOrHeap<{ #ident }> }),
+                Some(parse_quote! { ::puroro_rt::InlineOrHeap<{ #ident }> }),
                 Some((ident, *heap_bit)),
             )
         }
@@ -825,12 +829,12 @@ fn scalar_emit(
                 )),
         mut_target: mut_target_type(wire)?,
         implicit_ty: if is_message {
-            TokenStream::new()
+            parse_quote! { () }
         } else {
             implicit_value_type(wire)?
         },
         optional_ty: if is_message {
-            TokenStream::new()
+            parse_quote! { () }
         } else {
             optional_value_type(wire)?
         },
@@ -843,28 +847,28 @@ fn scalar_emit(
 }
 
 fn render_defaults_module(fields: &[FieldEmit]) -> Result<TokenStream> {
-    let mut items = Vec::new();
+    let mut items: Vec<Item> = Vec::new();
     let mut uses = Vec::new();
     let mut needs_root = false;
     for field in fields {
         match field {
             FieldEmit::Singular(f) => {
-                if let Some((custom, impl_item)) = &f.custom_default {
+                if let Some((custom, marker_items)) = &f.custom_default {
                     let marker = defaults::marker_ident(custom);
                     if matches!(custom.lit, DefaultLit::Enum { .. }) {
                         needs_root = true;
                     }
-                    items.push(impl_item.clone());
+                    items.extend(marker_items.iter().cloned());
                     uses.push(quote! { use defaults::#marker; });
                 }
             }
             FieldEmit::Oneof(o) => {
                 for v in &o.variants {
-                    if let Some((custom, impl_item)) = &v.custom_default {
+                    if let Some((custom, marker_items)) = &v.custom_default {
                         if matches!(custom.lit, DefaultLit::Enum { .. }) {
                             needs_root = true;
                         }
-                        items.push(impl_item.clone());
+                        items.extend(marker_items.iter().cloned());
                     }
                 }
             }
@@ -1010,44 +1014,44 @@ fn render_struct_fields(fields: &[FieldEmit]) -> Vec<TokenStream> {
         .collect()
 }
 
-fn render_oneof_modules(fields: &[FieldEmit]) -> Result<Vec<TokenStream>> {
-    fields
-        .iter()
-        .filter_map(|field| match field {
-            FieldEmit::Oneof(o) => Some(oneof::render_module_and_exports(o)),
-            _ => None,
-        })
-        .collect()
+fn render_oneof_modules(fields: &[FieldEmit]) -> Result<Vec<Item>> {
+    let mut out = Vec::new();
+    for field in fields {
+        if let FieldEmit::Oneof(o) = field {
+            out.extend(oneof::render_module_and_exports(o)?);
+        }
+    }
+    Ok(out)
 }
 
-fn wire_marker_path(wire: &WireTypeKind<'_>) -> Result<TokenStream> {
+fn wire_marker_path(wire: &WireTypeKind<'_>) -> Result<Type> {
     Ok(match wire {
-        WireTypeKind::Double => quote! { ::puroro_rt::ProtoDouble },
-        WireTypeKind::Float => quote! { ::puroro_rt::ProtoFloat },
-        WireTypeKind::Int64 => quote! { ::puroro_rt::ProtoInt64 },
-        WireTypeKind::UInt64 => quote! { ::puroro_rt::ProtoUInt64 },
-        WireTypeKind::Int32 => quote! { ::puroro_rt::ProtoInt32 },
-        WireTypeKind::Fixed64 => quote! { ::puroro_rt::ProtoFixed64 },
-        WireTypeKind::Fixed32 => quote! { ::puroro_rt::ProtoFixed32 },
-        WireTypeKind::Bool => quote! { ::puroro_rt::ProtoBool },
-        WireTypeKind::String { .. } => quote! { ::puroro_rt::ProtoString },
-        WireTypeKind::Bytes { .. } => quote! { ::puroro_rt::ProtoBytes },
-        WireTypeKind::UInt32 => quote! { ::puroro_rt::ProtoUInt32 },
-        WireTypeKind::SFixed32 => quote! { ::puroro_rt::ProtoSFixed32 },
-        WireTypeKind::SFixed64 => quote! { ::puroro_rt::ProtoSFixed64 },
-        WireTypeKind::SInt32 => quote! { ::puroro_rt::ProtoSInt32 },
-        WireTypeKind::SInt64 => quote! { ::puroro_rt::ProtoSInt64 },
+        WireTypeKind::Double => parse_quote! { ::puroro_rt::ProtoDouble },
+        WireTypeKind::Float => parse_quote! { ::puroro_rt::ProtoFloat },
+        WireTypeKind::Int64 => parse_quote! { ::puroro_rt::ProtoInt64 },
+        WireTypeKind::UInt64 => parse_quote! { ::puroro_rt::ProtoUInt64 },
+        WireTypeKind::Int32 => parse_quote! { ::puroro_rt::ProtoInt32 },
+        WireTypeKind::Fixed64 => parse_quote! { ::puroro_rt::ProtoFixed64 },
+        WireTypeKind::Fixed32 => parse_quote! { ::puroro_rt::ProtoFixed32 },
+        WireTypeKind::Bool => parse_quote! { ::puroro_rt::ProtoBool },
+        WireTypeKind::String { .. } => parse_quote! { ::puroro_rt::ProtoString },
+        WireTypeKind::Bytes { .. } => parse_quote! { ::puroro_rt::ProtoBytes },
+        WireTypeKind::UInt32 => parse_quote! { ::puroro_rt::ProtoUInt32 },
+        WireTypeKind::SFixed32 => parse_quote! { ::puroro_rt::ProtoSFixed32 },
+        WireTypeKind::SFixed64 => parse_quote! { ::puroro_rt::ProtoSFixed64 },
+        WireTypeKind::SInt32 => parse_quote! { ::puroro_rt::ProtoSInt32 },
+        WireTypeKind::SInt64 => parse_quote! { ::puroro_rt::ProtoSInt64 },
         WireTypeKind::Enum { ty, openness } => {
             let path = fqn_to_enum_root_path(ty)?;
-            let kind = match openness {
-                EnumType::Open => quote! { ::puroro_rt::Open },
-                EnumType::Closed => quote! { ::puroro_rt::Closed },
+            let kind: Type = match openness {
+                EnumType::Open => parse_quote! { ::puroro_rt::Open },
+                EnumType::Closed => parse_quote! { ::puroro_rt::Closed },
             };
-            quote! { ::puroro_rt::ProtoEnum<#path, #kind> }
+            parse_quote! { ::puroro_rt::ProtoEnum<#path, #kind> }
         }
         WireTypeKind::Message(m) => {
             let path = fqn_to_message_root_path(m)?;
-            quote! { ::puroro_rt::ProtoMessage<#path<A>> }
+            parse_quote! { ::puroro_rt::ProtoMessage<#path<A>> }
         }
     })
 }
@@ -1253,18 +1257,21 @@ fn render_singular_accessors(field: &ScalarEmit) -> TokenStream {
     }
 }
 
-fn implicit_value_type(wire: &WireTypeKind<'_>) -> Result<TokenStream> {
+fn implicit_value_type(wire: &WireTypeKind<'_>) -> Result<Type> {
     Ok(match wire {
-        WireTypeKind::Double => quote! { f64 },
-        WireTypeKind::Float => quote! { f32 },
-        WireTypeKind::Int64 | WireTypeKind::SInt64 | WireTypeKind::SFixed64 => quote! { i64 },
-        WireTypeKind::UInt64 | WireTypeKind::Fixed64 => quote! { u64 },
-        WireTypeKind::Int32 | WireTypeKind::SInt32 | WireTypeKind::SFixed32 => quote! { i32 },
-        WireTypeKind::UInt32 | WireTypeKind::Fixed32 => quote! { u32 },
-        WireTypeKind::Bool => quote! { bool },
-        WireTypeKind::String { .. } => quote! { &str },
-        WireTypeKind::Bytes { .. } => quote! { &[u8] },
-        WireTypeKind::Enum { ty, .. } => fqn_to_enum_root_path(ty)?,
+        WireTypeKind::Double => parse_quote! { f64 },
+        WireTypeKind::Float => parse_quote! { f32 },
+        WireTypeKind::Int64 | WireTypeKind::SInt64 | WireTypeKind::SFixed64 => parse_quote! { i64 },
+        WireTypeKind::UInt64 | WireTypeKind::Fixed64 => parse_quote! { u64 },
+        WireTypeKind::Int32 | WireTypeKind::SInt32 | WireTypeKind::SFixed32 => parse_quote! { i32 },
+        WireTypeKind::UInt32 | WireTypeKind::Fixed32 => parse_quote! { u32 },
+        WireTypeKind::Bool => parse_quote! { bool },
+        WireTypeKind::String { .. } => parse_quote! { &str },
+        WireTypeKind::Bytes { .. } => parse_quote! { &[u8] },
+        WireTypeKind::Enum { ty, .. } => {
+            let path = fqn_to_enum_root_path(ty)?;
+            parse_quote! { #path }
+        }
         WireTypeKind::Message(_) => {
             return Err(Error::Codegen(
                 "internal error: message in implicit_value_type".into(),
@@ -1273,18 +1280,21 @@ fn implicit_value_type(wire: &WireTypeKind<'_>) -> Result<TokenStream> {
     })
 }
 
-fn optional_value_type(wire: &WireTypeKind<'_>) -> Result<TokenStream> {
+fn optional_value_type(wire: &WireTypeKind<'_>) -> Result<Type> {
     Ok(match wire {
-        WireTypeKind::Double => quote! { f64 },
-        WireTypeKind::Float => quote! { f32 },
-        WireTypeKind::Int64 | WireTypeKind::SInt64 | WireTypeKind::SFixed64 => quote! { i64 },
-        WireTypeKind::UInt64 | WireTypeKind::Fixed64 => quote! { u64 },
-        WireTypeKind::Int32 | WireTypeKind::SInt32 | WireTypeKind::SFixed32 => quote! { i32 },
-        WireTypeKind::UInt32 | WireTypeKind::Fixed32 => quote! { u32 },
-        WireTypeKind::Bool => quote! { bool },
-        WireTypeKind::String { .. } => quote! { &'a str },
-        WireTypeKind::Bytes { .. } => quote! { &'a [u8] },
-        WireTypeKind::Enum { ty, .. } => fqn_to_enum_root_path(ty)?,
+        WireTypeKind::Double => parse_quote! { f64 },
+        WireTypeKind::Float => parse_quote! { f32 },
+        WireTypeKind::Int64 | WireTypeKind::SInt64 | WireTypeKind::SFixed64 => parse_quote! { i64 },
+        WireTypeKind::UInt64 | WireTypeKind::Fixed64 => parse_quote! { u64 },
+        WireTypeKind::Int32 | WireTypeKind::SInt32 | WireTypeKind::SFixed32 => parse_quote! { i32 },
+        WireTypeKind::UInt32 | WireTypeKind::Fixed32 => parse_quote! { u32 },
+        WireTypeKind::Bool => parse_quote! { bool },
+        WireTypeKind::String { .. } => parse_quote! { &'a str },
+        WireTypeKind::Bytes { .. } => parse_quote! { &'a [u8] },
+        WireTypeKind::Enum { ty, .. } => {
+            let path = fqn_to_enum_root_path(ty)?;
+            parse_quote! { #path }
+        }
         WireTypeKind::Message(_) => {
             return Err(Error::Codegen(
                 "internal error: message in optional_value_type".into(),
@@ -1293,38 +1303,44 @@ fn optional_value_type(wire: &WireTypeKind<'_>) -> Result<TokenStream> {
     })
 }
 
-fn mut_target_type(wire: &WireTypeKind<'_>) -> Result<TokenStream> {
+fn mut_target_type(wire: &WireTypeKind<'_>) -> Result<Type> {
     Ok(match wire {
-        WireTypeKind::Double => quote! { f64 },
-        WireTypeKind::Float => quote! { f32 },
-        WireTypeKind::Int64 | WireTypeKind::SInt64 | WireTypeKind::SFixed64 => quote! { i64 },
-        WireTypeKind::UInt64 | WireTypeKind::Fixed64 => quote! { u64 },
-        WireTypeKind::Int32 | WireTypeKind::SInt32 | WireTypeKind::SFixed32 => quote! { i32 },
-        WireTypeKind::UInt32 | WireTypeKind::Fixed32 => quote! { u32 },
-        WireTypeKind::Bool => quote! { bool },
-        WireTypeKind::String { .. } => quote! { ::puroro::String<A> },
-        WireTypeKind::Bytes { .. } => quote! { ::allocator_api2::vec::Vec<u8, A> },
-        WireTypeKind::Enum { ty, .. } => fqn_to_enum_root_path(ty)?,
+        WireTypeKind::Double => parse_quote! { f64 },
+        WireTypeKind::Float => parse_quote! { f32 },
+        WireTypeKind::Int64 | WireTypeKind::SInt64 | WireTypeKind::SFixed64 => parse_quote! { i64 },
+        WireTypeKind::UInt64 | WireTypeKind::Fixed64 => parse_quote! { u64 },
+        WireTypeKind::Int32 | WireTypeKind::SInt32 | WireTypeKind::SFixed32 => parse_quote! { i32 },
+        WireTypeKind::UInt32 | WireTypeKind::Fixed32 => parse_quote! { u32 },
+        WireTypeKind::Bool => parse_quote! { bool },
+        WireTypeKind::String { .. } => parse_quote! { ::puroro::String<A> },
+        WireTypeKind::Bytes { .. } => parse_quote! { ::allocator_api2::vec::Vec<u8, A> },
+        WireTypeKind::Enum { ty, .. } => {
+            let path = fqn_to_enum_root_path(ty)?;
+            parse_quote! { #path }
+        }
         WireTypeKind::Message(m) => {
             let path = fqn_to_message_root_path(m)?;
-            quote! { #path<A> }
+            parse_quote! { #path<A> }
         }
     })
 }
 
-fn repeated_slice_elem_type(wire: &WireTypeKind<'_>) -> Result<TokenStream> {
+fn repeated_slice_elem_type(wire: &WireTypeKind<'_>) -> Result<Type> {
     Ok(match wire {
-        WireTypeKind::Double => quote! { f64 },
-        WireTypeKind::Float => quote! { f32 },
-        WireTypeKind::Int64 | WireTypeKind::SInt64 | WireTypeKind::SFixed64 => quote! { i64 },
-        WireTypeKind::UInt64 | WireTypeKind::Fixed64 => quote! { u64 },
-        WireTypeKind::Int32 | WireTypeKind::SInt32 | WireTypeKind::SFixed32 => quote! { i32 },
-        WireTypeKind::UInt32 | WireTypeKind::Fixed32 => quote! { u32 },
-        WireTypeKind::Bool => quote! { bool },
-        WireTypeKind::Enum { ty, .. } => fqn_to_enum_root_path(ty)?,
+        WireTypeKind::Double => parse_quote! { f64 },
+        WireTypeKind::Float => parse_quote! { f32 },
+        WireTypeKind::Int64 | WireTypeKind::SInt64 | WireTypeKind::SFixed64 => parse_quote! { i64 },
+        WireTypeKind::UInt64 | WireTypeKind::Fixed64 => parse_quote! { u64 },
+        WireTypeKind::Int32 | WireTypeKind::SInt32 | WireTypeKind::SFixed32 => parse_quote! { i32 },
+        WireTypeKind::UInt32 | WireTypeKind::Fixed32 => parse_quote! { u32 },
+        WireTypeKind::Bool => parse_quote! { bool },
+        WireTypeKind::Enum { ty, .. } => {
+            let path = fqn_to_enum_root_path(ty)?;
+            parse_quote! { #path }
+        }
         WireTypeKind::Message(m) => {
             let path = fqn_to_message_root_path(m)?;
-            quote! { #path<A> }
+            parse_quote! { #path<A> }
         }
         WireTypeKind::String { .. } | WireTypeKind::Bytes { .. } => {
             return Err(Error::Codegen(

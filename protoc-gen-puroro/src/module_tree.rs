@@ -13,13 +13,13 @@ pub mod layout;
 
 use crate::case::to_snake_case;
 use crate::descriptor::ProtoFqn;
-use ::proc_macro2::{Ident, TokenStream};
-use ::std::mem;
+use ::proc_macro2::Ident;
+use ::syn::{Attribute, Item};
 
 /// One codegen invocation's logical module tree.
 ///
 /// Always has a root: empty protobuf packages hang messages/enums there, and
-/// crate/module inner attributes (`#![…]`) live on the root `items`.
+/// crate/module inner attributes (`#![…]`) live on the root [`ModuleNode::inner_attrs`].
 #[derive(Debug, Clone)]
 pub struct ModuleForest {
     root: ModuleNode,
@@ -32,8 +32,10 @@ pub struct ModuleNode {
     name: Option<Ident>,
     /// Why this module exists. Multiple entries are allowed after merges.
     origins: Vec<ModuleOrigin>,
+    /// Inner attributes (`#![…]`). On the forest root these become file attrs.
+    inner_attrs: Vec<Attribute>,
     /// Items that belong directly in this module (may include private `mod`).
-    items: TokenStream,
+    items: Vec<Item>,
     /// Child modules that Layout may split into files.
     children: Vec<ModuleNode>,
 }
@@ -64,7 +66,8 @@ impl ModuleForest {
             root: ModuleNode {
                 name: None,
                 origins: vec![ModuleOrigin::GeneratedRoot],
-                items: TokenStream::new(),
+                inner_attrs: Vec::new(),
+                items: Vec::new(),
                 children: Vec::new(),
             },
         }
@@ -118,7 +121,8 @@ impl ModuleNode {
         Self {
             name: Some(name),
             origins: Vec::new(),
-            items: TokenStream::new(),
+            inner_attrs: Vec::new(),
+            items: Vec::new(),
             children: Vec::new(),
         }
     }
@@ -131,7 +135,11 @@ impl ModuleNode {
         &self.origins
     }
 
-    pub fn items(&self) -> &TokenStream {
+    pub fn inner_attrs(&self) -> &[Attribute] {
+        &self.inner_attrs
+    }
+
+    pub fn items(&self) -> &[Item] {
         &self.items
     }
 
@@ -146,14 +154,14 @@ impl ModuleNode {
         }
     }
 
-    /// Append tokens to this module's item list.
-    pub fn append_items(&mut self, tokens: TokenStream) {
-        self.items.extend(tokens);
+    /// Append inner attributes (`#![…]`) to this module.
+    pub fn append_inner_attrs(&mut self, attrs: impl IntoIterator<Item = Attribute>) {
+        self.inner_attrs.extend(attrs);
     }
 
-    /// Take the item token stream, leaving this node empty of items.
-    pub fn take_items(&mut self) -> TokenStream {
-        mem::take(&mut self.items)
+    /// Append items to this module's item list.
+    pub fn append_items(&mut self, items: impl IntoIterator<Item = Item>) {
+        self.items.extend(items);
     }
 
     /// Get or create a layout-eligible child with the given Rust module name.
@@ -201,7 +209,7 @@ pub fn type_name_to_module_ident(type_name: &str) -> Ident {
 mod tests {
     use super::*;
     use crate::descriptor::ProtoFqn;
-    use ::quote::quote;
+    use ::syn::parse_quote;
 
     #[test]
     fn ensure_package_builds_segments() {
@@ -235,7 +243,7 @@ mod tests {
         task.add_origin(ModuleOrigin::Message {
             proto_fqn: ProtoFqn::parse(".example.Task"),
         });
-        task.append_items(quote! { pub struct Task; });
+        task.append_items([parse_quote! { pub struct Task; }]);
 
         let task = forest
             .root()
@@ -256,7 +264,10 @@ mod tests {
     fn empty_package_is_root() {
         let mut forest = ModuleForest::new();
         let parent = forest.ensure_package("");
-        parent.append_items(quote! { #![allow(dead_code)] });
+        let file: ::syn::File = parse_quote! {
+            #![allow(dead_code)]
+        };
+        parent.append_inner_attrs(file.attrs);
         assert!(forest.root().name().is_none());
         assert!(
             forest
@@ -264,6 +275,7 @@ mod tests {
                 .origins()
                 .contains(&ModuleOrigin::GeneratedRoot)
         );
+        assert!(!forest.root().inner_attrs().is_empty());
     }
 
     #[test]

@@ -15,12 +15,14 @@ use crate::plugin_io::CodeGeneratorResponse;
 use crate::resolved::{Arena, File, Message, resolve};
 use ::proc_macro2::{Ident, Span};
 use ::quote::quote;
+use ::syn::parse_quote;
 
 mod defaults;
 mod enumeration;
 mod ident;
 mod message;
 mod oneof;
+mod parse;
 mod type_path;
 
 /// Generate plugin response files from a decoded request.
@@ -43,7 +45,7 @@ pub fn emit(request: &CodegenRequest) -> Result<CodeGeneratorResponse> {
     }
 
     let mut forest = ModuleForest::new();
-    write_root_attrs(&mut forest, &targets);
+    write_root_attrs(&mut forest, &targets)?;
 
     for file in &targets {
         append_file_to_forest(&mut forest, file)?;
@@ -63,14 +65,14 @@ pub fn emit(request: &CodegenRequest) -> Result<CodeGeneratorResponse> {
     Ok(CodeGeneratorResponse::from_files(vec![file]))
 }
 
-fn write_root_attrs(forest: &mut ModuleForest, targets: &[&File<'_>]) {
+fn write_root_attrs(forest: &mut ModuleForest, targets: &[&File<'_>]) -> Result<()> {
     let doc = if targets.len() == 1 {
         format!("@generated from {} — do not edit", targets[0].name())
     } else {
         let names: Vec<&str> = targets.iter().map(|f| f.name()).collect();
         format!("@generated from {} — do not edit", names.join(", "))
     };
-    let mut root_items = quote! {
+    let mut root_tokens = quote! {
         #![doc = #doc]
         #![allow(clippy::absolute_paths)]
         // Empty messages emit a catch-all-only `match` until field arms exist.
@@ -85,11 +87,13 @@ fn write_root_attrs(forest: &mut ModuleForest, targets: &[&File<'_>]) {
     packages.dedup();
     for package in packages {
         let package_doc = format!("Package `{package}`");
-        root_items.extend(quote! {
+        root_tokens.extend(quote! {
             #![doc = #package_doc]
         });
     }
-    forest.root_mut().append_items(root_items);
+    let file = parse::parse_file(root_tokens)?;
+    forest.root_mut().append_inner_attrs(file.attrs);
+    Ok(())
 }
 
 fn append_file_to_forest(forest: &mut ModuleForest, file: &File<'_>) -> Result<()> {
@@ -114,9 +118,9 @@ fn append_message(parent: &mut ModuleNode, plan: &MessagePlan<'_>) -> Result<()>
     let mod_name = type_name_to_module_ident(message.name());
     let type_name = Ident::new(message.name(), Span::call_site());
 
-    parent.append_items(quote! {
+    parent.append_items([parse_quote! {
         pub use #mod_name::#type_name;
-    });
+    }]);
 
     let nested_enums: Vec<_> = message.nested_enums().collect();
     let nested_messages: Vec<_> = message
