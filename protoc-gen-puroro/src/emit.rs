@@ -6,7 +6,7 @@
 //! entries share one [`ModuleForest`] so cross-file type refs use a single
 //! `self::_root`.
 
-use crate::descriptor::CodegenRequest;
+use crate::descriptor::{CodegenRequest, ProtoFqn};
 use crate::error::{Error, Result};
 use crate::field_kind::plan_fields;
 use crate::module_tree::layout::{ModuleLayout, render};
@@ -88,12 +88,23 @@ fn generated_file_attrs(targets: &[&File<'_>]) -> Result<Vec<Attribute>> {
     Ok(parse::parse_file(root_tokens)?.attrs)
 }
 
-/// Constructed message type + companion module, ready to install into a parent.
+/// One message, ready to install into a parent module.
+///
+/// The struct (and its impls) go on the parent. A snake_case companion holds
+/// `FIELD_*` / `BIT_*`, nested types, and oneofs. Nested messages install into
+/// that companion the same way. Empty companions are omitted.
 struct EmittedMessage {
+    /// Items appended to the parent — e.g. `[pub struct Foo, impl Foo { … }]`.
     type_items: Vec<Item>,
+    /// Companion module ident — e.g. `foo` for `message Foo`. Unused when omitted.
     module_name: Ident,
-    origin: ModuleOrigin,
+    /// Protobuf FQN of this message — e.g. `.example.Foo`. Used at install to
+    /// mark the companion with [`ModuleOrigin::Message`].
+    proto_fqn: ProtoFqn,
+    /// Items in the companion — e.g. `[pub const FIELD_TITLE, pub enum Kind, …]`.
+    /// Empty together with [`Self::nested`] means no companion.
     companion_items: Vec<Item>,
+    /// Nested messages installed into this companion — e.g. `[EmittedMessage` for `Bar]`.
     nested: Vec<EmittedMessage>,
 }
 
@@ -124,9 +135,7 @@ fn emit_message(message: &Message<'_>) -> Result<EmittedMessage> {
     Ok(EmittedMessage {
         type_items: rendered.type_items,
         module_name,
-        origin: ModuleOrigin::Message {
-            proto_fqn: message.fqn().clone(),
-        },
+        proto_fqn: message.fqn().clone(),
         companion_items,
         nested,
     })
@@ -154,7 +163,9 @@ fn install_message(module: &mut ModuleNode, emitted: EmittedMessage) {
         return;
     }
     let companion = module.get_or_insert_child(emitted.module_name);
-    companion.add_origin(emitted.origin);
+    companion.add_origin(ModuleOrigin::Message {
+        proto_fqn: emitted.proto_fqn,
+    });
     companion.append_items(emitted.companion_items);
     for nested in emitted.nested {
         install_message(companion, nested);
