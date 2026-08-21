@@ -157,7 +157,7 @@ fn emit_enum(enumeration: &Enum<'_>) -> Result<EmittedEnum> {
 
 fn install_file(forest: &mut ModuleForest, file: &File<'_>) -> Result<()> {
     let package = forest.ensure_package(file.package());
-    for e in file.enums().filter(|e| e.parent().is_none()) {
+    for e in file.enums() {
         install_enum(package, emit_enum(e)?);
     }
     for message in file.messages() {

@@ -173,10 +173,12 @@ impl<'a> File<'a> {
         self.dependency.iter().map(String::as_str)
     }
 
+    /// File-level messages. Nested types are on the enclosing [`Message`].
     pub fn messages(&self) -> impl Iterator<Item = &'a Message<'a>> + '_ {
         self.messages.iter().copied()
     }
 
+    /// File-level enums. Nested enums are on the enclosing [`Message`].
     pub fn enums(&self) -> impl Iterator<Item = &'a Enum<'a>> + '_ {
         self.enums.iter().copied()
     }
