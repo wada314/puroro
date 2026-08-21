@@ -50,7 +50,7 @@ pub fn emit(request: &CodegenRequest) -> Result<CodeGeneratorResponse> {
         .append_inner_attrs(generated_file_attrs(&targets)?);
 
     for file in &targets {
-        install_file(&mut forest, file)?;
+        install_file(&mut forest, emit_file(file)?);
     }
 
     let path = if targets.len() == 1 {
@@ -117,6 +117,16 @@ struct EmittedEnum {
     items: Vec<Item>,
 }
 
+/// One `.proto` file, ready to install into a package module.
+struct EmittedFile {
+    /// Protobuf package — e.g. `example.v1`. Empty string is the forest root.
+    package: String,
+    /// File-level enums — e.g. `[EmittedEnum` for `Status]`.
+    enums: Vec<EmittedEnum>,
+    /// File-level messages — e.g. `[EmittedMessage` for `Foo]`.
+    messages: Vec<EmittedMessage>,
+}
+
 fn emit_message(message: &Message<'_>) -> Result<EmittedMessage> {
     if !ident::is_simple_ident(message.name()) {
         return Err(Error::Codegen(format!(
@@ -155,15 +165,25 @@ fn emit_enum(enumeration: &Enum<'_>) -> Result<EmittedEnum> {
     })
 }
 
-fn install_file(forest: &mut ModuleForest, file: &File<'_>) -> Result<()> {
-    let package = forest.ensure_package(file.package());
-    for e in file.enums() {
-        install_enum(package, emit_enum(e)?);
+fn emit_file(file: &File<'_>) -> Result<EmittedFile> {
+    Ok(EmittedFile {
+        package: file.package().to_owned(),
+        enums: file.enums().map(emit_enum).collect::<Result<Vec<_>>>()?,
+        messages: file
+            .messages()
+            .map(emit_message)
+            .collect::<Result<Vec<_>>>()?,
+    })
+}
+
+fn install_file(forest: &mut ModuleForest, emitted: EmittedFile) {
+    let package = forest.ensure_package(&emitted.package);
+    for e in emitted.enums {
+        install_enum(package, e);
     }
-    for message in file.messages() {
-        install_message(package, emit_message(message)?);
+    for message in emitted.messages {
+        install_message(package, message);
     }
-    Ok(())
 }
 
 fn install_message(module: &mut ModuleNode, emitted: EmittedMessage) {
