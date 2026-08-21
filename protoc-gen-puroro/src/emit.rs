@@ -146,7 +146,7 @@ fn install_file(forest: &mut ModuleForest, file: &File<'_>) -> Result<()> {
             .flatten(),
     );
     for message in file.messages() {
-        let message = validate_emit_message(message)?;
+        validate_emit_message(message)?;
         install_message(package, emit_message(&plan_message(message)?)?);
     }
     Ok(())
@@ -164,14 +164,14 @@ fn install_message(module: &mut ModuleNode, emitted: EmittedMessage) {
 
 /// Nested type declarations are emitted into this message's module.
 /// Proto3 optional synthetic oneofs resolve as Explicit and need no special case.
-fn validate_emit_message<'a>(message: &'a Message<'a>) -> Result<&'a Message<'a>> {
+fn validate_emit_message(message: &Message<'_>) -> Result<()> {
     if !ident::is_simple_ident(message.name()) {
         return Err(Error::Codegen(format!(
             "message name `{}` is not a simple Rust identifier",
             message.name()
         )));
     }
-    Ok(message)
+    Ok(())
 }
 
 /// Map `foo/bar/baz.proto` → `foo/bar/baz.rs`.
