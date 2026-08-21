@@ -1,6 +1,6 @@
 //! Map protobuf FQNs to generated Rust paths via `self::_root::…`.
 
-use super::ident::{is_simple_ident, rust_ident};
+use super::ident::{escape_ident, is_simple_ident};
 use crate::descriptor::ProtoFqn;
 use crate::error::{Error, Result};
 use crate::module_tree::type_name_to_module_ident;
@@ -20,7 +20,8 @@ pub fn fqn_to_root_path(fqn: &ProtoFqn) -> Result<Path> {
         path.segments
             .push(PathSegment::from(Ident::new(seg, Span::call_site())));
     }
-    path.segments.push(PathSegment::from(rust_ident(type_name)));
+    path.segments
+        .push(PathSegment::from(escape_ident(type_name)));
     Ok(path)
 }
 
@@ -34,7 +35,7 @@ pub fn fqn_to_enum_root_path<'a>(enumeration: &'a Enum<'a>) -> Result<Path> {
         Some(parent) => {
             let mut path = message_module_path(parent)?;
             path.segments
-                .push(PathSegment::from(rust_ident(enumeration.name())));
+                .push(PathSegment::from(escape_ident(enumeration.name())));
             Ok(path)
         }
     }
@@ -47,7 +48,7 @@ pub fn fqn_to_enum_root_path<'a>(enumeration: &'a Enum<'a>) -> Result<Path> {
 pub fn fqn_to_message_root_path<'a>(message: &'a Message<'a>) -> Result<Path> {
     let mut path = parent_module_path(message)?;
     path.segments
-        .push(PathSegment::from(rust_ident(message.name())));
+        .push(PathSegment::from(escape_ident(message.name())));
     Ok(path)
 }
 

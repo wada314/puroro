@@ -4,8 +4,8 @@ use ::proc_macro2::{Ident, Span};
 
 pub use crate::case::to_pascal_case;
 
-/// Protobuf name → Rust `Ident`, using `r#…` for keywords (`type`, `self`, …).
-pub fn rust_ident(name: &str) -> Ident {
+/// Escape `name` as a Rust identifier, using a raw ident (`r#…`) for keywords.
+pub fn escape_ident(name: &str) -> Ident {
     if is_rust_keyword(name) {
         Ident::new_raw(name, Span::call_site())
     } else {
@@ -13,6 +13,13 @@ pub fn rust_ident(name: &str) -> Ident {
     }
 }
 
+/// True if `name` is a simple ASCII identifier: starts with `A–Z` / `a–z` / `_`,
+/// and the rest is only those plus `0–9`.
+///
+/// This is a character-class check only. Keywords such as `type` still pass;
+/// [`escape_ident`] turns those into raw idents. Empty strings, leading digits,
+/// hyphens, dots, and non-ASCII are rejected (`""`, `"2foo"`, `"foo-bar"`,
+/// `"pkg.name"`, `"café"`).
 pub fn is_simple_ident(name: &str) -> bool {
     let mut chars = name.chars();
     match chars.next() {
@@ -86,12 +93,12 @@ mod tests {
 
     #[test]
     fn keywords_use_raw_idents() {
-        assert_eq!(rust_ident("type").to_string(), "r#type");
-        assert_eq!(rust_ident("match").to_string(), "r#match");
+        assert_eq!(escape_ident("type").to_string(), "r#type");
+        assert_eq!(escape_ident("match").to_string(), "r#match");
         // Proto field names that are not Rust keywords stay plain.
-        assert_eq!(rust_ident("reserved").to_string(), "reserved");
-        assert_eq!(rust_ident("repeated").to_string(), "repeated");
-        assert_eq!(rust_ident("street").to_string(), "street");
+        assert_eq!(escape_ident("reserved").to_string(), "reserved");
+        assert_eq!(escape_ident("repeated").to_string(), "repeated");
+        assert_eq!(escape_ident("street").to_string(), "street");
     }
 
     #[test]

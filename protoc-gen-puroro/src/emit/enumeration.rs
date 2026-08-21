@@ -1,6 +1,6 @@
 //! Emit a protobuf enum as a newtype-over-`i32` (open or closed).
 
-use super::ident::{is_simple_ident, rust_ident};
+use super::ident::{escape_ident, is_simple_ident};
 use crate::case::to_upper_snake;
 use crate::descriptor::features::EnumType;
 use crate::error::{Error, Result};
@@ -48,7 +48,7 @@ pub(super) fn render_enum(e: &Enum<'_>) -> Result<Vec<Item>> {
         )));
     }
 
-    let name = rust_ident(e.name());
+    let name = escape_ident(e.name());
     let default_const = variant_const_ident(e.name(), first.name())?;
     let default_self = quote! { Self::#default_const };
     let default_path = quote! { #name::#default_const };

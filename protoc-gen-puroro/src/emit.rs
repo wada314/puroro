@@ -133,7 +133,7 @@ fn emit_message(message: &Message<'_>) -> Result<EmittedMessage> {
         )));
     }
     let module_name = type_name_to_module_ident(message.name());
-    let type_name = ident::rust_ident(message.name());
+    let type_name = ident::escape_ident(message.name());
     let field_plan = plan_fields(message)?;
     let rendered = message::render_items(&field_plan, &type_name, message.name(), &module_name)?;
 

@@ -6,7 +6,7 @@
 //! bool values).
 
 use super::defaults;
-use super::ident::{is_simple_ident, rust_ident, to_pascal_case};
+use super::ident::{escape_ident, is_simple_ident, to_pascal_case};
 use super::oneof::{self, OneofEmit, OneofVariantEmit};
 use super::type_path::{fqn_to_enum_root_path, fqn_to_message_root_path};
 use crate::default_value::{CustomDefault, DefaultLit};
@@ -501,9 +501,9 @@ fn collect_fields(field_plan: &MessageFieldPlan<'_>, companion: &Ident) -> Resul
                 }
                 let pascal = to_pascal_case(o.name());
                 out.push(FieldEmit::Oneof(Box::new(OneofEmit {
-                    name: rust_ident(o.name()),
+                    name: escape_ident(o.name()),
                     name_str: o.name().to_owned(),
-                    mod_name: rust_ident(o.name()),
+                    mod_name: escape_ident(o.name()),
                     shape_name: Ident::new(&pascal, Span::call_site()),
                     case_name: Ident::new(&format!("{pascal}Case"), Span::call_site()),
                     storage_name: Ident::new(&format!("{pascal}Storage"), Span::call_site()),
@@ -610,7 +610,7 @@ fn oneof_variant_emit(field: &PlannedField<'_>, index: usize) -> Result<OneofVar
     let mut_style = SingularMutStyle::from_layout(wire, layout);
     let variant_pascal = to_pascal_case(field.name());
     Ok(OneofVariantEmit {
-        name: rust_ident(field.name()),
+        name: escape_ident(field.name()),
         name_str: field.name().to_owned(),
         variant_name: Ident::new(&variant_pascal, Span::call_site()),
         type_param: Ident::new(&format!("T{index}"), Span::call_site()),
@@ -656,7 +656,7 @@ fn repeated_emit(
         ),
     };
     Ok(RepeatedEmit {
-        name: rust_ident(name),
+        name: escape_ident(name),
         name_str: name.to_owned(),
         field_const: Ident::new(field_const, Span::call_site()),
         number: number as u32,
@@ -677,7 +677,7 @@ fn map_emit(
     let (key_view, string_key) = map_key_view(key, name)?;
     let (value_view, mut_target) = map_value_view(value, name)?;
     Ok(MapEmit {
-        name: rust_ident(name),
+        name: escape_ident(name),
         name_str: name.to_owned(),
         field_const: Ident::new(field_const, Span::call_site()),
         number: number as u32,
@@ -821,7 +821,7 @@ fn scalar_emit(field: &PlannedField<'_>, companion: &Ident) -> Result<ScalarEmit
     let is_enum = matches!(wire, WireTypeKind::Enum { .. });
     let is_message = matches!(style, AccessorStyle::Message);
     Ok(ScalarEmit {
-        name: rust_ident(name),
+        name: escape_ident(name),
         name_str: name.to_owned(),
         field_const: Ident::new(field_const, Span::call_site()),
         number: number as u32,
