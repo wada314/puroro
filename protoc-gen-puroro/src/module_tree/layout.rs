@@ -19,7 +19,7 @@ use ::syn::{File, Item};
 pub enum ModuleLayout {
     /// Expand the whole forest into one `.rs` file (`mod child { … }` inline).
     SingleFile {
-        /// Path relative to the plugin output directory (e.g. `lib.rs`, `empty.rs`).
+        /// Path relative to the plugin output directory (e.g. `lib.rs`).
         path: String,
     },
     // FileTree { … } — deferred until split policies are needed.

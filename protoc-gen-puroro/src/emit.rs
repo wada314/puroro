@@ -53,14 +53,12 @@ pub fn emit(request: &CodegenRequest) -> Result<CodeGeneratorResponse> {
         install_file(&mut forest, emit_file(file)?);
     }
 
-    let path = if targets.len() == 1 {
-        proto_path_to_rust_path(targets[0].name())
-    } else {
-        // One shared forest needs one physical file so `self::_root` stays coherent.
-        "lib.rs".into()
-    };
-
-    let mut files = render(&forest, &ModuleLayout::SingleFile { path })?;
+    let mut files = render(
+        &forest,
+        &ModuleLayout::SingleFile {
+            path: "lib.rs".into(),
+        },
+    )?;
     let file = files
         .pop()
         .ok_or_else(|| Error::Codegen("layout produced no files".into()))?;
@@ -211,15 +209,6 @@ fn install_enum(module: &mut ModuleNode, emitted: EmittedEnum) {
     module.append_items(emitted.items);
 }
 
-/// Map `foo/bar/baz.proto` → `foo/bar/baz.rs`.
-fn proto_path_to_rust_path(proto_name: &str) -> String {
-    if let Some(stem) = proto_name.strip_suffix(".proto") {
-        format!("{stem}.rs")
-    } else {
-        format!("{proto_name}.rs")
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -316,7 +305,7 @@ mod tests {
     fn emit_empty_message_mentions_type_name() {
         let response = emit(&empty_request("Empty")).unwrap();
         assert_eq!(response.files.len(), 1);
-        assert_eq!(response.files[0].name, "empty.rs");
+        assert_eq!(response.files[0].name, "lib.rs");
         assert!(response.files[0].content.contains("struct Empty"));
         assert!(response.files[0].content.contains("@generated"));
         assert!(response.files[0].content.contains("- `empty.proto`"));
