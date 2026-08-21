@@ -12,7 +12,7 @@ use crate::field_kind::plan_fields;
 use crate::module_tree::layout::{ModuleLayout, render};
 use crate::module_tree::{ModuleForest, ModuleNode, ModuleOrigin, type_name_to_module_ident};
 use crate::plugin_io::CodeGeneratorResponse;
-use crate::resolved::{Arena, File, Message, resolve};
+use crate::resolved::{Arena, Enum, File, Message, resolve};
 use ::proc_macro2::Ident;
 use ::quote::quote;
 use ::syn::{Attribute, Item};
@@ -101,11 +101,20 @@ struct EmittedMessage {
     /// Protobuf FQN of this message — e.g. `.example.Foo`. Used at install to
     /// mark the companion with [`ModuleOrigin::Message`].
     proto_fqn: ProtoFqn,
-    /// Items in the companion — e.g. `[pub const FIELD_TITLE, pub enum Kind, …]`.
-    /// Empty together with [`Self::nested`] means no companion.
+    /// Items in the companion — e.g. `[pub const FIELD_TITLE, …]`.
+    /// Empty together with [`Self::nested_enums`] and [`Self::nested`] means no
+    /// companion.
     companion_items: Vec<Item>,
+    /// Nested enums installed into this companion — e.g. `[EmittedEnum` for `Kind]`.
+    nested_enums: Vec<EmittedEnum>,
     /// Nested messages installed into this companion — e.g. `[EmittedMessage` for `Bar]`.
     nested: Vec<EmittedMessage>,
+}
+
+/// One enum, ready to install into a parent module.
+struct EmittedEnum {
+    /// Items appended to the parent — e.g. `[pub struct Status, impl Status { … }]`.
+    items: Vec<Item>,
 }
 
 fn emit_message(message: &Message<'_>) -> Result<EmittedMessage> {
@@ -118,14 +127,12 @@ fn emit_message(message: &Message<'_>) -> Result<EmittedMessage> {
     let module_name = type_name_to_module_ident(message.name());
     let type_name = ident::rust_ident(message.name());
     let field_plan = plan_fields(message)?;
-
-    let mut companion_items = Vec::new();
-    for e in message.nested_enums() {
-        companion_items.extend(enumeration::render_enum(e)?);
-    }
     let rendered = message::render_items(&field_plan, &type_name, message.name(), &module_name)?;
-    companion_items.extend(rendered.companion_items);
 
+    let nested_enums = message
+        .nested_enums()
+        .map(emit_enum)
+        .collect::<Result<Vec<_>>>()?;
     let nested = message
         .nested_messages()
         .filter(|m| !m.is_map_entry())
@@ -136,21 +143,23 @@ fn emit_message(message: &Message<'_>) -> Result<EmittedMessage> {
         type_items: rendered.type_items,
         module_name,
         proto_fqn: message.fqn().clone(),
-        companion_items,
+        companion_items: rendered.companion_items,
+        nested_enums,
         nested,
+    })
+}
+
+fn emit_enum(enumeration: &Enum<'_>) -> Result<EmittedEnum> {
+    Ok(EmittedEnum {
+        items: enumeration::render_enum(enumeration)?,
     })
 }
 
 fn install_file(forest: &mut ModuleForest, file: &File<'_>) -> Result<()> {
     let package = forest.ensure_package(file.package());
-    package.append_items(
-        file.enums()
-            .filter(|e| e.parent().is_none())
-            .map(enumeration::render_enum)
-            .collect::<Result<Vec<_>>>()?
-            .into_iter()
-            .flatten(),
-    );
+    for e in file.enums().filter(|e| e.parent().is_none()) {
+        install_enum(package, emit_enum(e)?);
+    }
     for message in file.messages() {
         install_message(package, emit_message(message)?);
     }
@@ -159,7 +168,10 @@ fn install_file(forest: &mut ModuleForest, file: &File<'_>) -> Result<()> {
 
 fn install_message(module: &mut ModuleNode, emitted: EmittedMessage) {
     module.append_items(emitted.type_items);
-    if emitted.companion_items.is_empty() && emitted.nested.is_empty() {
+    if emitted.companion_items.is_empty()
+        && emitted.nested_enums.is_empty()
+        && emitted.nested.is_empty()
+    {
         return;
     }
     let companion = module.get_or_insert_child(emitted.module_name);
@@ -167,9 +179,16 @@ fn install_message(module: &mut ModuleNode, emitted: EmittedMessage) {
         proto_fqn: emitted.proto_fqn,
     });
     companion.append_items(emitted.companion_items);
+    for nested_enum in emitted.nested_enums {
+        install_enum(companion, nested_enum);
+    }
     for nested in emitted.nested {
         install_message(companion, nested);
     }
+}
+
+fn install_enum(module: &mut ModuleNode, emitted: EmittedEnum) {
+    module.append_items(emitted.items);
 }
 
 /// Map `foo/bar/baz.proto` → `foo/bar/baz.rs`.
