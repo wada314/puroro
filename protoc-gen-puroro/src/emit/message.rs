@@ -13,8 +13,8 @@ use crate::default_value::{CustomDefault, DefaultLit};
 use crate::descriptor::features::EnumType;
 use crate::error::{Error, Result};
 use crate::field_kind::{
-    FieldKind, MessageFieldPlan, MessageMember, PlannedField, PlannedLayout, PlannedPresence,
-    RepeatedEncodingKind, WireTypeKind, bit_array_byte_len,
+    FieldKind, MessageFieldPlan, MessageMember, PlannedField, PlannedLayout, PlannedOneof,
+    PlannedPresence, RepeatedEncodingKind, WireTypeKind, bit_array_byte_len,
 };
 use ::proc_macro2::{Ident, Span, TokenStream};
 use ::quote::quote;
@@ -194,7 +194,11 @@ pub(super) fn render_items(
     name_str: &str,
     companion: &Ident,
 ) -> Result<RenderedMessageItems> {
-    let fields = collect_fields(field_plan, companion)?;
+    let fields = field_plan
+        .members()
+        .iter()
+        .map(|member| emit_member(member, companion))
+        .collect::<Result<Vec<_>>>()?;
     let bits_bytes = bit_array_byte_len(field_plan.bit_count());
     let bits_ty = quote! {
         ::bitvec::array::BitArray<[u8; #bits_bytes], ::bitvec::order::Lsb0>
@@ -467,80 +471,76 @@ pub(super) fn render_items(
     })
 }
 
-fn collect_fields(field_plan: &MessageFieldPlan<'_>, companion: &Ident) -> Result<Vec<FieldEmit>> {
-    let mut out = Vec::new();
-    for member in field_plan.members() {
-        match member {
-            MessageMember::Oneof(o) => {
-                if !is_simple_ident(o.name()) {
-                    return Err(Error::Codegen(format!(
-                        "oneof name `{}` is not a simple Rust identifier",
-                        o.name()
-                    )));
-                }
-                if o.variants().is_empty() {
-                    return Err(Error::Codegen(format!(
-                        "oneof `{}` has no variants",
-                        o.name()
-                    )));
-                }
-                let mut variants = Vec::with_capacity(o.variants().len());
-                for (i, field) in o.variants().iter().enumerate() {
-                    variants.push(oneof_variant_emit(field, i)?);
-                }
-                let pascal = to_pascal_case(o.name());
-                out.push(FieldEmit::Oneof(Box::new(OneofEmit {
-                    name: escape_ident(o.name()),
-                    name_str: o.name().to_owned(),
-                    mod_name: escape_ident(o.name()),
-                    shape_name: Ident::new(&pascal, Span::call_site()),
-                    case_name: Ident::new(&format!("{pascal}Case"), Span::call_site()),
-                    storage_name: Ident::new(&format!("{pascal}Storage"), Span::call_site()),
-                    variants,
-                })));
-            }
-            MessageMember::Field(field) => {
-                if !is_simple_ident(field.name()) {
-                    return Err(Error::Codegen(format!(
-                        "field name `{}` is not a simple Rust identifier",
-                        field.name()
-                    )));
-                }
-                match field.kind() {
-                    FieldKind::Map { key, value } => {
-                        out.push(FieldEmit::Map(Box::new(map_emit(
-                            field.name(),
-                            field.field_const(),
-                            field.number(),
-                            key,
-                            value,
-                        )?)));
-                    }
-                    FieldKind::Repeated { wire, encoding } => {
-                        out.push(FieldEmit::Repeated(Box::new(repeated_emit(
-                            field.name(),
-                            field.field_const(),
-                            field.number(),
-                            wire,
-                            *encoding,
-                        )?)));
-                    }
-                    FieldKind::Singular { presence, .. } => {
-                        if matches!(presence, PlannedPresence::Oneof) {
-                            return Err(Error::Codegen(format!(
-                                "internal error: oneof field `{}` escaped as a top-level member",
-                                field.name()
-                            )));
-                        }
-                        out.push(FieldEmit::Singular(Box::new(scalar_emit(
-                            field, companion,
-                        )?)));
-                    }
-                }
-            }
-        }
+fn emit_member(member: &MessageMember<'_>, companion: &Ident) -> Result<FieldEmit> {
+    match member {
+        MessageMember::Oneof(o) => Ok(FieldEmit::Oneof(Box::new(oneof_emit(o)?))),
+        MessageMember::Field(field) => emit_field(field, companion),
     }
-    Ok(out)
+}
+
+fn oneof_emit(o: &PlannedOneof<'_>) -> Result<OneofEmit> {
+    if !is_simple_ident(o.name()) {
+        return Err(Error::Codegen(format!(
+            "oneof name `{}` is not a simple Rust identifier",
+            o.name()
+        )));
+    }
+    if o.variants().is_empty() {
+        return Err(Error::Codegen(format!(
+            "oneof `{}` has no variants",
+            o.name()
+        )));
+    }
+    let variants = o
+        .variants()
+        .iter()
+        .enumerate()
+        .map(|(i, field)| oneof_variant_emit(field, i))
+        .collect::<Result<Vec<_>>>()?;
+    let pascal = to_pascal_case(o.name());
+    Ok(OneofEmit {
+        name: escape_ident(o.name()),
+        name_str: o.name().to_owned(),
+        mod_name: escape_ident(o.name()),
+        shape_name: Ident::new(&pascal, Span::call_site()),
+        case_name: Ident::new(&format!("{pascal}Case"), Span::call_site()),
+        storage_name: Ident::new(&format!("{pascal}Storage"), Span::call_site()),
+        variants,
+    })
+}
+
+fn emit_field(field: &PlannedField<'_>, companion: &Ident) -> Result<FieldEmit> {
+    if !is_simple_ident(field.name()) {
+        return Err(Error::Codegen(format!(
+            "field name `{}` is not a simple Rust identifier",
+            field.name()
+        )));
+    }
+    Ok(match field.kind() {
+        FieldKind::Map { key, value } => FieldEmit::Map(Box::new(map_emit(
+            field.name(),
+            field.field_const(),
+            field.number(),
+            key,
+            value,
+        )?)),
+        FieldKind::Repeated { wire, encoding } => FieldEmit::Repeated(Box::new(repeated_emit(
+            field.name(),
+            field.field_const(),
+            field.number(),
+            wire,
+            *encoding,
+        )?)),
+        FieldKind::Singular { presence, .. } => {
+            if matches!(presence, PlannedPresence::Oneof) {
+                return Err(Error::Codegen(format!(
+                    "internal error: oneof field `{}` escaped as a top-level member",
+                    field.name()
+                )));
+            }
+            FieldEmit::Singular(Box::new(scalar_emit(field, companion)?))
+        }
+    })
 }
 
 fn oneof_variant_emit(field: &PlannedField<'_>, index: usize) -> Result<OneofVariantEmit> {
