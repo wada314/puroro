@@ -144,24 +144,40 @@ pub(super) fn render_enum(e: &Enum<'_>) -> Result<Vec<Item>> {
     })
 }
 
-/// Contiguous known values → `lo..=hi`; otherwise an `|` pattern.
+/// Sorted unique numbers → `lo..=hi` runs and singleton `n`, joined by `|`.
 fn known_value_pattern(numbers: &[i32]) -> TokenStream {
-    if let Some((lo, hi)) = contiguous_range(numbers) {
-        quote! { #lo..=#hi }
-    } else {
-        quote! { #(#numbers)|* }
-    }
+    let parts: Vec<TokenStream> = contiguous_groups(numbers)
+        .into_iter()
+        .map(|(lo, hi)| {
+            if lo == hi {
+                quote! { #lo }
+            } else {
+                quote! { #lo..=#hi }
+            }
+        })
+        .collect();
+    quote! { #(#parts)|* }
 }
 
-fn contiguous_range(numbers: &[i32]) -> Option<(i32, i32)> {
-    let (&lo, &hi) = (numbers.first()?, numbers.last()?);
-    for (i, &n) in numbers.iter().enumerate() {
-        let expected = lo.checked_add(i as i32)?;
-        if n != expected {
-            return None;
+/// Inclusive `[lo, hi]` runs of consecutive values (`hi - lo + 1` members).
+fn contiguous_groups(numbers: &[i32]) -> Vec<(i32, i32)> {
+    let mut groups = Vec::new();
+    let mut iter = numbers.iter().copied();
+    let Some(mut lo) = iter.next() else {
+        return groups;
+    };
+    let mut hi = lo;
+    for n in iter {
+        if hi.checked_add(1) == Some(n) {
+            hi = n;
+        } else {
+            groups.push((lo, hi));
+            lo = n;
+            hi = n;
         }
     }
-    Some((lo, hi))
+    groups.push((lo, hi));
+    groups
 }
 
 /// `STATUS_UNSPECIFIED` on enum `Status` → `UNSPECIFIED`.
@@ -190,6 +206,23 @@ fn starts_with_digit(name: &str) -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use ::quote::ToTokens;
+
+    #[test]
+    fn known_value_pattern_groups_runs() {
+        let pat = |nums: &[i32]| known_value_pattern(nums).to_token_stream().to_string();
+        assert_eq!(pat(&[]), "");
+        assert_eq!(pat(&[7]), "7i32");
+        assert_eq!(pat(&[0, 1, 2]), "0i32 ..= 2i32");
+        assert_eq!(
+            pat(&[0, 1, 2, 5, 10, 11]),
+            "0i32 ..= 2i32 | 5i32 | 10i32 ..= 11i32"
+        );
+        assert_eq!(
+            pat(&[i32::MAX - 1, i32::MAX]),
+            format!("{}i32 ..= {}i32", i32::MAX - 1, i32::MAX)
+        );
+    }
 
     #[test]
     fn strips_enum_name_prefix() {
