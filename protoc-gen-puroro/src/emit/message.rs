@@ -544,22 +544,16 @@ fn emit_oneof_variant(field: &PlannedField<'_>, index: usize) -> Result<OneofVar
     }
     let FieldKind::Singular {
         wire,
-        presence,
+        presence: PlannedPresence::Oneof,
         layout,
         custom_default,
     } = field.kind()
     else {
         return Err(Error::internal(format!(
-            "oneof variant `{}` must be singular",
+            "oneof variant `{}` is not a oneof singular",
             field.name()
         )));
     };
-    if !matches!(presence, PlannedPresence::Oneof) {
-        return Err(Error::internal(format!(
-            "oneof variant `{}` has presence {presence:?}",
-            field.name()
-        )));
-    }
 
     let (layout_ty, value_bit) = match layout {
         PlannedLayout::Inline => (
