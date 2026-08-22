@@ -22,12 +22,10 @@ pub fn escape_ident(name: &str) -> Ident {
 /// `"pkg.name"`, `"café"`).
 pub fn is_simple_ident(name: &str) -> bool {
     let mut chars = name.chars();
-    match chars.next() {
-        Some(c) if c.is_ascii_alphabetic() || c == '_' => {
-            chars.all(|c| c.is_ascii_alphanumeric() || c == '_')
-        }
-        _ => false,
-    }
+    let Some(c) = chars.next() else {
+        return false;
+    };
+    (c.is_ascii_alphabetic() || c == '_') && chars.all(|c| c.is_ascii_alphanumeric() || c == '_')
 }
 
 fn is_rust_keyword(name: &str) -> bool {

@@ -146,48 +146,30 @@ pub(super) fn render_enum(e: &Enum<'_>) -> Result<Vec<Item>> {
 
 /// Sorted unique numbers → `lo..=hi` runs and singleton `n`, joined by `|`.
 fn known_value_pattern(numbers: &[i32]) -> TokenStream {
-    let parts: Vec<TokenStream> = contiguous_groups(numbers)
-        .into_iter()
-        .map(|(lo, hi)| {
-            if lo == hi {
-                quote! { #lo }
-            } else {
-                quote! { #lo..=#hi }
-            }
+    let parts: Vec<TokenStream> = numbers
+        .chunk_by(|a, b| a.checked_add(1) == Some(*b))
+        .map(|chunk| match chunk {
+            [n] => quote! { #n },
+            [lo, .., hi] => quote! { #lo..=#hi },
+            [] => unreachable!("chunk_by yields nonempty chunks"),
         })
         .collect();
     quote! { #(#parts)|* }
 }
 
-/// Inclusive `[lo, hi]` runs of consecutive values (`hi - lo + 1` members).
-fn contiguous_groups(numbers: &[i32]) -> Vec<(i32, i32)> {
-    let mut groups = Vec::new();
-    let mut iter = numbers.iter().copied();
-    let Some(mut lo) = iter.next() else {
-        return groups;
-    };
-    let mut hi = lo;
-    for n in iter {
-        if hi.checked_add(1) == Some(n) {
-            hi = n;
-        } else {
-            groups.push((lo, hi));
-            lo = n;
-            hi = n;
-        }
-    }
-    groups.push((lo, hi));
-    groups
-}
-
-/// `STATUS_UNSPECIFIED` on enum `Status` → `UNSPECIFIED`.
+/// Associated const for a protobuf enumerator, with the enum-name prefix stripped.
 ///
-/// If stripping the enum-name prefix would leave a non-ident (e.g. `EDITION_2023`
-/// → `2023`), keep the full value name instead.
+/// Classic C++ (and the protobuf C++ generator) put enumerators in the enclosing
+/// namespace, not inside the enum type. Schemas therefore prefix each value with
+/// the enum name so `STATUS_UNSPECIFIED` does not collide with another enum's
+/// `UNSPECIFIED`. In generated Rust the const lives on the enum type
+/// (`Status::UNSPECIFIED`), so that prefix is redundant and we drop it when the
+/// remainder is still a simple identifier. If stripping would leave a non-ident
+/// (`EDITION_2023` → `2023`), keep the full value name.
 pub(super) fn variant_const_ident(enum_name: &str, value_name: &str) -> Result<Ident> {
     let prefix = format!("{}_", to_upper_snake(enum_name));
     let rest = value_name.strip_prefix(&prefix).unwrap_or(value_name);
-    let candidate = if is_simple_ident(rest) && !starts_with_digit(rest) {
+    let candidate = if is_simple_ident(rest) {
         rest
     } else if is_simple_ident(value_name) {
         value_name
@@ -197,10 +179,6 @@ pub(super) fn variant_const_ident(enum_name: &str, value_name: &str) -> Result<I
         )));
     };
     Ok(Ident::new(candidate, Span::call_site()))
-}
-
-fn starts_with_digit(name: &str) -> bool {
-    name.chars().next().is_some_and(|c| c.is_ascii_digit())
 }
 
 #[cfg(test)]
