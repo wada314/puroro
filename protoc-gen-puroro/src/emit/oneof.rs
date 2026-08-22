@@ -448,7 +448,7 @@ pub(super) fn render_accessors(oneof: &OneofEmit, companion: &Ident) -> TokenStr
                 }
             });
         } else {
-            let mut_ret = v.mut_style.return_ty(&quote! { 's }, mut_target);
+            let mut_ret = v.mut_style.return_ty(&parse_quote! { 's }, mut_target);
             let mutator = quote! {
                 pub fn #vname_mut<'s>(&'s mut self) -> #mut_ret {
                     self.#group

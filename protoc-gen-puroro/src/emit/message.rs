@@ -18,7 +18,7 @@ use crate::field_kind::{
 };
 use ::proc_macro2::{Ident, Span, TokenStream};
 use ::quote::quote;
-use ::syn::{Item, Type, parse_quote};
+use ::syn::{Item, Lifetime, Type, parse_quote};
 
 enum FieldEmit {
     Singular(Box<ScalarEmit>),
@@ -114,7 +114,7 @@ impl SingularMutStyle {
     }
 
     /// Return type of `_mut` for lifetime `lt` (e.g. `'s`) and `mut_target`.
-    pub(super) fn return_ty(self, lt: &TokenStream, mut_target: &Type) -> Type {
+    pub(super) fn return_ty(self, lt: &Lifetime, mut_target: &Type) -> Type {
         match self {
             Self::SsoString => parse_quote! { impl ::puroro::StringMut<A> + #lt },
             Self::SsoBytes => parse_quote! { impl ::puroro::BytesMut<A> + #lt },
@@ -1210,7 +1210,7 @@ fn render_singular_accessors(field: &ScalarEmit) -> TokenStream {
     };
 
     // RPIT `StringMut` so public signatures do not name `puroro-rt`.
-    let mut_ret = field.mut_style.return_ty(&quote! { 's }, mut_target);
+    let mut_ret = field.mut_style.return_ty(&parse_quote! { 's }, mut_target);
     let mutator = quote! {
         pub fn #name_mut<'s>(&'s mut self) -> #mut_ret {
             self.#name.bind_mut(&mut self._common).value_mut()
