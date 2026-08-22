@@ -62,7 +62,7 @@ struct RepeatedEmit {
     marker: Type,
     encoding_ty: Type,
     style: RepeatedAccessorStyle,
-    /// `as_slice` element type for packable / message repeated fields.
+    /// Element type of the `as_slice` getter (`i32`, `impl Deref<Target = str>`, …).
     slice_elem_ty: Type,
 }
 
@@ -625,17 +625,10 @@ fn emit_repeated(
         RepeatedEncodingKind::Expanded => parse_quote! { ::puroro_rt::Expanded },
     };
     let views = wire_views(wire)?;
-    let (style, slice_elem_ty) = match wire {
-        WireTypeKind::String { .. } => (RepeatedAccessorStyle::String, parse_quote! { () }),
-        WireTypeKind::Bytes { .. } => (RepeatedAccessorStyle::Bytes, parse_quote! { () }),
-        _ => {
-            let Some(elem) = views.slice_elem else {
-                return Err(Error::internal(format!(
-                    "missing slice elem for repeated `{name}`"
-                )));
-            };
-            (RepeatedAccessorStyle::Slice, elem)
-        }
+    let style = match wire {
+        WireTypeKind::String { .. } => RepeatedAccessorStyle::String,
+        WireTypeKind::Bytes { .. } => RepeatedAccessorStyle::Bytes,
+        _ => RepeatedAccessorStyle::Slice,
     };
     Ok(RepeatedEmit {
         name: escape_ident(name),
@@ -645,7 +638,7 @@ fn emit_repeated(
         marker: wire_marker_path(wire)?,
         encoding_ty,
         style,
-        slice_elem_ty,
+        slice_elem_ty: views.slice_elem,
     })
 }
 
@@ -1057,50 +1050,38 @@ fn render_repeated_accessors(field: &RepeatedEmit) -> TokenStream {
     let name = &field.name;
     let name_mut = Ident::new(&format!("{}_mut", field.name_str), Span::call_site());
     let clear_name = Ident::new(&format!("clear_{}", field.name_str), Span::call_site());
-    match field.style {
+    let elem = &field.slice_elem_ty;
+    let getter = quote! {
+        pub fn #name(&self) -> &[#elem] {
+            self.#name.bind(&self._common).as_slice()
+        }
+    };
+    let mutator = match field.style {
         RepeatedAccessorStyle::String => quote! {
-            pub fn #name(&self) -> &[impl ::core::ops::Deref<Target = str>] {
-                self.#name.bind(&self._common).as_slice()
-            }
-
             pub fn #name_mut(&mut self) -> impl ::puroro::RepeatedStringMut<A> + '_ {
                 self.#name.bind_mut(&mut self._common).container_mut()
             }
-
-            pub fn #clear_name(&mut self) {
-                self.#name.bind_mut(&mut self._common).clear();
-            }
         },
         RepeatedAccessorStyle::Bytes => quote! {
-            pub fn #name(&self) -> &[impl ::core::ops::Deref<Target = [u8]>] {
-                self.#name.bind(&self._common).as_slice()
-            }
-
             pub fn #name_mut(&mut self) -> impl ::puroro::RepeatedBytesMut<A> + '_ {
                 self.#name.bind_mut(&mut self._common).container_mut()
             }
-
-            pub fn #clear_name(&mut self) {
-                self.#name.bind_mut(&mut self._common).clear();
+        },
+        RepeatedAccessorStyle::Slice => quote! {
+            pub fn #name_mut<'s>(
+                &'s mut self,
+            ) -> impl ::core::ops::DerefMut<Target = ::allocator_api2::vec::Vec<#elem, A>> + 's {
+                self.#name.bind_mut(&mut self._common).values_mut()
             }
         },
-        RepeatedAccessorStyle::Slice => {
-            let elem = &field.slice_elem_ty;
-            quote! {
-                pub fn #name(&self) -> &[#elem] {
-                    self.#name.bind(&self._common).as_slice()
-                }
+    };
+    quote! {
+        #getter
 
-                pub fn #name_mut<'s>(
-                    &'s mut self,
-                ) -> impl ::core::ops::DerefMut<Target = ::allocator_api2::vec::Vec<#elem, A>> + 's {
-                    self.#name.bind_mut(&mut self._common).values_mut()
-                }
+        #mutator
 
-                pub fn #clear_name(&mut self) {
-                    self.#name.bind_mut(&mut self._common).clear();
-                }
-            }
+        pub fn #clear_name(&mut self) {
+            self.#name.bind_mut(&mut self._common).clear();
         }
     }
 }
@@ -1170,7 +1151,8 @@ struct WireViews {
     implicit: Type,
     optional: Type,
     mut_target: Type,
-    slice_elem: Option<Type>,
+    /// Repeated `as_slice` element (`i32`, `impl Deref<Target = str>`, …).
+    slice_elem: Type,
     /// Map value view (`i32`, `str`, `Address<A>`, …).
     map_value: Type,
     /// `MutTarget` pin for map string / bytes values.
@@ -1182,7 +1164,7 @@ fn copy_views(ty: Type) -> WireViews {
         implicit: ty.clone(),
         optional: ty.clone(),
         mut_target: ty.clone(),
-        slice_elem: Some(ty.clone()),
+        slice_elem: ty.clone(),
         map_value: ty,
         map_value_mut: None,
     }
@@ -1207,7 +1189,7 @@ fn wire_views(wire: &WireTypeKind<'_>) -> Result<WireViews> {
                 implicit: parse_quote! { &str },
                 optional: parse_quote! { &'a str },
                 mut_target: owned.clone(),
-                slice_elem: None,
+                slice_elem: parse_quote! { impl ::core::ops::Deref<Target = str> },
                 map_value: parse_quote! { str },
                 map_value_mut: Some(owned),
             }
@@ -1218,7 +1200,7 @@ fn wire_views(wire: &WireTypeKind<'_>) -> Result<WireViews> {
                 implicit: parse_quote! { &[u8] },
                 optional: parse_quote! { &'a [u8] },
                 mut_target: owned.clone(),
-                slice_elem: None,
+                slice_elem: parse_quote! { impl ::core::ops::Deref<Target = [u8]> },
                 map_value: parse_quote! { [u8] },
                 map_value_mut: Some(owned),
             }
@@ -1234,7 +1216,7 @@ fn wire_views(wire: &WireTypeKind<'_>) -> Result<WireViews> {
                 implicit: parse_quote! { () },
                 optional: parse_quote! { () },
                 mut_target: ty.clone(),
-                slice_elem: Some(ty.clone()),
+                slice_elem: ty.clone(),
                 map_value: ty,
                 map_value_mut: None,
             }
