@@ -218,10 +218,10 @@ pub(super) fn render_items(
     let empty_pair_sink = empty.then(|| quote! { let _ = (other, v); });
     let empty_pair_mut_sink = empty.then(|| quote! { let _ = (dst, v); });
 
-    let mut companion_items = bit_consts;
-    companion_items.extend(field_consts);
-    companion_items.extend(defaults_module);
-    companion_items.extend(oneof_modules);
+    let companion_items = [bit_consts, field_consts, defaults_module, oneof_modules]
+        .into_iter()
+        .flatten()
+        .collect();
 
     let type_items = super::parse::parse_items(quote! {
         // @generated message body from protoc-gen-puroro.
