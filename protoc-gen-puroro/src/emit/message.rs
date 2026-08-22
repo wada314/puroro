@@ -77,8 +77,6 @@ struct MapEmit {
     key_view: Type,
     /// Shared view type for `MapRef` (`i32`, `str`, `Address<A>`, …).
     value_view: Type,
-    /// `map<string, …>` — key view is `str`.
-    string_key: bool,
     /// When set, pin `MutTarget` on the mutator return type (string / bytes).
     mut_target: Option<Type>,
 }
@@ -649,7 +647,7 @@ fn emit_map(
     key: &WireTypeKind<'_>,
     value: &WireTypeKind<'_>,
 ) -> Result<MapEmit> {
-    let (key_view, string_key) = map_key_view(key, name)?;
+    let key_view = map_key_view(key, name)?;
     let value_views = wire_views(value)?;
     Ok(MapEmit {
         name: escape_ident(name),
@@ -660,14 +658,13 @@ fn emit_map(
         value_marker: wire_marker_path(value)?,
         key_view,
         value_view: value_views.map_value,
-        string_key,
         mut_target: value_views.map_value_mut,
     })
 }
 
-fn map_key_view(key: &WireTypeKind<'_>, field_name: &str) -> Result<(Type, bool)> {
+fn map_key_view(key: &WireTypeKind<'_>, field_name: &str) -> Result<Type> {
     match key {
-        WireTypeKind::String { .. } => Ok((parse_quote! { str }, true)),
+        WireTypeKind::String { .. } => Ok(parse_quote! { str }),
         WireTypeKind::Bool
         | WireTypeKind::Int32
         | WireTypeKind::SInt32
@@ -678,7 +675,7 @@ fn map_key_view(key: &WireTypeKind<'_>, field_name: &str) -> Result<(Type, bool)
         | WireTypeKind::UInt32
         | WireTypeKind::Fixed32
         | WireTypeKind::UInt64
-        | WireTypeKind::Fixed64 => Ok((wire_views(key)?.map_value, false)),
+        | WireTypeKind::Fixed64 => Ok(wire_views(key)?.map_value),
         other => Err(Error::internal(format!(
             "map field `{field_name}`: invalid map key type {other:?}"
         ))),
@@ -1010,38 +1007,19 @@ fn render_map_accessors(field: &MapEmit) -> TokenStream {
     let value_view = &field.value_view;
     // Pin MutTarget so `*entry_mut(…) = …` / `push_str` resolve through `impl Trait`.
     let mut_target = field.mut_target.as_ref().unwrap_or(value_view);
-    if field.string_key {
-        quote! {
-            pub fn #name(&self) -> impl ::puroro::MapRef<str, #value_view> + '_ {
-                self.#name.bind(&self._common)
-            }
-
-            pub fn #name_mut(
-                &mut self,
-            ) -> impl ::puroro::MapMut<str, #value_view, MutTarget = #mut_target> + '_ {
-                self.#name.bind_mut(&mut self._common)
-            }
-
-            pub fn #clear_name(&mut self) {
-                ::puroro::MapMut::clear(&mut self.#name_mut());
-            }
+    quote! {
+        pub fn #name(&self) -> impl ::puroro::MapRef<#key_view, #value_view> + '_ {
+            self.#name.bind(&self._common)
         }
-    } else {
-        quote! {
-            pub fn #name(&self) -> impl ::puroro::MapRef<#key_view, #value_view> + '_ {
-                self.#name.bind(&self._common)
-            }
 
-            pub fn #name_mut(
-                &mut self,
-            ) -> impl ::puroro::MapMut<#key_view, #value_view, MutTarget = #mut_target> + '_
-            {
-                self.#name.bind_mut(&mut self._common)
-            }
+        pub fn #name_mut(
+            &mut self,
+        ) -> impl ::puroro::MapMut<#key_view, #value_view, MutTarget = #mut_target> + '_ {
+            self.#name.bind_mut(&mut self._common)
+        }
 
-            pub fn #clear_name(&mut self) {
-                ::puroro::MapMut::clear(&mut self.#name_mut());
-            }
+        pub fn #clear_name(&mut self) {
+            ::puroro::MapMut::clear(&mut self.#name_mut());
         }
     }
 }
