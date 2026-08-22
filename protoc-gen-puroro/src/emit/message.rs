@@ -106,16 +106,10 @@ pub(super) enum SingularMutStyle {
 
 impl SingularMutStyle {
     pub(super) fn from_layout(wire: &WireTypeKind<'_>, layout: &PlannedLayout) -> Self {
-        if matches!(wire, WireTypeKind::String { .. })
-            && matches!(layout, PlannedLayout::InlineOrHeap { .. })
-        {
-            Self::SsoString
-        } else if matches!(wire, WireTypeKind::Bytes { .. })
-            && matches!(layout, PlannedLayout::InlineOrHeap { .. })
-        {
-            Self::SsoBytes
-        } else {
-            Self::DerefMut
+        match (wire, layout) {
+            (WireTypeKind::String { .. }, PlannedLayout::InlineOrHeap { .. }) => Self::SsoString,
+            (WireTypeKind::Bytes { .. }, PlannedLayout::InlineOrHeap { .. }) => Self::SsoBytes,
+            _ => Self::DerefMut,
         }
     }
 
