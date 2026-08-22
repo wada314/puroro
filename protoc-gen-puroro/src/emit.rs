@@ -128,7 +128,7 @@ struct EmittedFile {
 fn emit_message(message: &Message<'_>) -> Result<EmittedMessage> {
     if !ident::is_simple_ident(message.name()) {
         return Err(Error::Codegen(format!(
-            "message name `{}` is not a simple Rust identifier",
+            "cannot use message name `{}` as a Rust identifier",
             message.name()
         )));
     }

@@ -73,7 +73,7 @@ fn message_module_path<'a>(message: &'a Message<'a>) -> Result<Path> {
     let name = message.name();
     if !is_simple_ident(name) {
         return Err(Error::Codegen(format!(
-            "message name `{name}` in `{}` is not a simple Rust identifier",
+            "cannot use message name `{name}` in `{}` as a Rust identifier",
             message.fqn()
         )));
     }
@@ -87,7 +87,7 @@ fn module_path_from_package(package: Vec<&str>, fqn: &str) -> Result<Path> {
     for seg in package {
         if !is_simple_ident(seg) {
             return Err(Error::Codegen(format!(
-                "package segment `{seg}` in `{fqn}` is not a simple Rust identifier"
+                "cannot use package segment `{seg}` in `{fqn}` as a Rust identifier"
             )));
         }
         path.segments
@@ -148,13 +148,13 @@ fn split_fqn_file_level(fqn: &ProtoFqn) -> Result<(Vec<&str>, &str)> {
     let type_name = segments.pop().expect("non-empty raw has a last segment");
     if !is_simple_ident(type_name) {
         return Err(Error::Codegen(format!(
-            "type name `{type_name}` in `{fqn}` is not a simple Rust identifier"
+            "cannot use type name `{type_name}` in `{fqn}` as a Rust identifier"
         )));
     }
     for seg in &segments {
         if !is_simple_ident(seg) {
             return Err(Error::Codegen(format!(
-                "package segment `{seg}` in `{fqn}` is not a simple Rust identifier"
+                "cannot use package segment `{seg}` in `{fqn}` as a Rust identifier"
             )));
         }
     }

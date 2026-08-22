@@ -481,7 +481,7 @@ fn emit_member(member: &MessageMember<'_>, companion: &Ident) -> Result<FieldEmi
 fn oneof_emit(o: &PlannedOneof<'_>) -> Result<OneofEmit> {
     if !is_simple_ident(o.name()) {
         return Err(Error::Codegen(format!(
-            "oneof name `{}` is not a simple Rust identifier",
+            "cannot use oneof name `{}` as a Rust identifier",
             o.name()
         )));
     }
@@ -512,7 +512,7 @@ fn oneof_emit(o: &PlannedOneof<'_>) -> Result<OneofEmit> {
 fn emit_field(field: &PlannedField<'_>, companion: &Ident) -> Result<FieldEmit> {
     if !is_simple_ident(field.name()) {
         return Err(Error::Codegen(format!(
-            "field name `{}` is not a simple Rust identifier",
+            "cannot use field name `{}` as a Rust identifier",
             field.name()
         )));
     }
@@ -546,7 +546,7 @@ fn emit_field(field: &PlannedField<'_>, companion: &Ident) -> Result<FieldEmit> 
 fn oneof_variant_emit(field: &PlannedField<'_>, index: usize) -> Result<OneofVariantEmit> {
     if !is_simple_ident(field.name()) {
         return Err(Error::Codegen(format!(
-            "oneof variant name `{}` is not a simple Rust identifier",
+            "cannot use oneof variant name `{}` as a Rust identifier",
             field.name()
         )));
     }
