@@ -105,19 +105,20 @@ fn render_module_body(oneof: &OneofEmit, bits_ty: &TokenStream) -> Result<TokenS
             let alias = &v.field_alias;
             let marker = &v.marker;
             let field_const = &v.field_const;
-            let layout_ty = v.layout_ty.as_ref();
+            let layout_ty = v.layout_ty.iter();
             let default_ty: Option<Type> = v.custom_default.as_ref().map(|(c, _)| {
                 let marker = Ident::new(&c.marker_name, Span::call_site());
                 parse_quote! { #marker }
             });
+            let default_ty = default_ty.iter();
             quote! {
                 type #alias<A> = ::puroro_rt::SingularField<
                     #marker,
                     ::puroro_rt::Oneof,
                     { super::#field_const },
                     A
-                    #(, #layout_ty)?
-                    #(, #default_ty)?
+                    #(, #layout_ty)*
+                    #(, #default_ty)*
                 >;
             }
         })

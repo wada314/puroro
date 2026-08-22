@@ -16,9 +16,10 @@ pub(super) fn render_marker_item(
 ) -> Result<Vec<Item>> {
     let marker = Ident::new(&custom.marker_name, Span::call_site());
     let (ty, expr, lifetime) = has_default_ty_and_expr(&custom.lit, wire)?;
+    let lifetime = lifetime.iter();
     super::parse::parse_items(quote! {
         pub struct #marker;
-        impl #(<#lifetime>)? ::puroro::HasDefault<#ty> for #marker {
+        impl #(<#lifetime>)* ::puroro::HasDefault<#ty> for #marker {
             const DEFAULT: #ty = #expr;
         }
     })
