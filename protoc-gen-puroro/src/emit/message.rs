@@ -664,8 +664,8 @@ fn emit_map(
 
 fn map_key_view(key: &WireTypeKind<'_>, field_name: &str) -> Result<Type> {
     match key {
-        WireTypeKind::String { .. } => Ok(parse_quote! { str }),
-        WireTypeKind::Bool
+        WireTypeKind::String { .. }
+        | WireTypeKind::Bool
         | WireTypeKind::Int32
         | WireTypeKind::SInt32
         | WireTypeKind::SFixed32
@@ -685,22 +685,20 @@ fn map_key_view(key: &WireTypeKind<'_>, field_name: &str) -> Result<Type> {
 fn emit_scalar(field: &PlannedField<'_>, companion: &Ident) -> Result<ScalarEmit> {
     let FieldKind::Singular {
         wire,
-        presence,
+        presence:
+            presence @ (PlannedPresence::Implicit
+            | PlannedPresence::Explicit { .. }
+            | PlannedPresence::LegacyRequired { .. }
+            | PlannedPresence::Message),
         layout,
         custom_default,
     } = field.kind()
     else {
         return Err(Error::internal(format!(
-            "emit_scalar on non-singular field `{}`",
+            "emit_scalar on oneof or non-singular field `{}`",
             field.name()
         )));
     };
-    if matches!(presence, PlannedPresence::Oneof) {
-        return Err(Error::internal(format!(
-            "oneof variant `{}` must use emit_oneof_variant",
-            field.name()
-        )));
-    }
     let name = field.name();
     let field_const = field.field_const();
     let number = field.number();
