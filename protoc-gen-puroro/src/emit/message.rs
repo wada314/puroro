@@ -216,9 +216,11 @@ pub(super) fn render_items(
     let validate_body = render_validate(&fields);
     let oneof_modules = render_oneof_modules(&fields, &bits_ty)?;
 
-    let companion_items = [bit_consts, field_consts, defaults_module, oneof_modules]
+    let companion_items = bit_consts
         .into_iter()
-        .flatten()
+        .chain(field_consts)
+        .chain(defaults_module)
+        .chain(oneof_modules)
         .collect();
 
     let type_items = super::parse::parse_items(quote! {
@@ -794,7 +796,7 @@ fn emit_scalar(field: &PlannedField<'_>, companion: &Ident) -> Result<ScalarEmit
     })
 }
 
-fn render_defaults_module(fields: &[FieldEmit]) -> Vec<Item> {
+fn render_defaults_module(fields: &[FieldEmit]) -> Option<Item> {
     let mut items: Vec<Item> = Vec::new();
     for field in fields {
         match field {
@@ -814,9 +816,9 @@ fn render_defaults_module(fields: &[FieldEmit]) -> Vec<Item> {
         }
     }
     if items.is_empty() {
-        return Vec::new();
+        return None;
     }
-    vec![parse_quote! {
+    Some(parse_quote! {
         pub(crate) mod defaults {
             // Same `_root` chain as oneof submodules so `self::_root::…` enum paths work.
             #[allow(unused)]
@@ -825,7 +827,7 @@ fn render_defaults_module(fields: &[FieldEmit]) -> Vec<Item> {
             }
             #(#items)*
         }
-    }]
+    })
 }
 
 fn render_bit_consts(fields: &[FieldEmit]) -> Vec<Item> {
