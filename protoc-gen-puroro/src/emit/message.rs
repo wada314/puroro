@@ -213,21 +213,10 @@ pub(super) fn render_items(
     let merge_arms = render_merge_arms(&fields, companion);
     let validate_body = render_validate(&fields);
     let oneof_modules = render_oneof_modules(&fields, &bits_ty)?;
-    let empty_visit_sink = if fields.is_empty() {
-        quote! { let _ = v; }
-    } else {
-        TokenStream::new()
-    };
-    let empty_pair_sink = if fields.is_empty() {
-        quote! { let _ = (other, v); }
-    } else {
-        TokenStream::new()
-    };
-    let empty_pair_mut_sink = if fields.is_empty() {
-        quote! { let _ = (dst, v); }
-    } else {
-        TokenStream::new()
-    };
+    let empty = fields.is_empty();
+    let empty_visit_sink = empty.then(|| quote! { let _ = v; });
+    let empty_pair_sink = empty.then(|| quote! { let _ = (other, v); });
+    let empty_pair_mut_sink = empty.then(|| quote! { let _ = (dst, v); });
 
     let common_init = if fields.is_empty() {
         quote! {
