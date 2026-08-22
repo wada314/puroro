@@ -874,12 +874,17 @@ fn render_struct_fields(fields: &[FieldEmit], companion: &Ident) -> Vec<TokenStr
         .iter()
         .map(|field| match field {
             FieldEmit::Singular(field) => {
-                let name = &field.name;
-                let marker = &field.marker;
-                let presence_ty = &field.presence_ty;
-                let field_const = &field.field_const;
-                let layout_ty = field.layout_ty.iter();
-                let default_ty: Option<Type> = field.custom_default.as_ref().map(|(c, _)| {
+                let ScalarEmit {
+                    name,
+                    marker,
+                    presence_ty,
+                    field_const,
+                    layout_ty,
+                    custom_default,
+                    ..
+                } = field.as_ref();
+                let layout_ty = layout_ty.iter();
+                let default_ty: Option<Type> = custom_default.as_ref().map(|(c, _)| {
                     let marker = Ident::new(&c.marker_name, Span::call_site());
                     parse_quote! { #companion::defaults::#marker }
                 });
@@ -889,28 +894,37 @@ fn render_struct_fields(fields: &[FieldEmit], companion: &Ident) -> Vec<TokenStr
                 }
             }
             FieldEmit::Repeated(field) => {
-                let name = &field.name;
-                let marker = &field.marker;
-                let encoding_ty = &field.encoding_ty;
-                let field_const = &field.field_const;
+                let RepeatedEmit {
+                    name,
+                    marker,
+                    encoding_ty,
+                    field_const,
+                    ..
+                } = field.as_ref();
                 quote! {
                     #name: ::puroro_rt::RepeatedField<#marker, #encoding_ty, { #companion::#field_const }, A>,
                 }
             }
             FieldEmit::Map(field) => {
-                let name = &field.name;
-                let key = &field.key_marker;
-                let value = &field.value_marker;
-                let field_const = &field.field_const;
+                let MapEmit {
+                    name,
+                    key_marker,
+                    value_marker,
+                    field_const,
+                    ..
+                } = field.as_ref();
                 quote! {
-                    #name: ::puroro_rt::MapField<#key, #value, { #companion::#field_const }, A>,
+                    #name: ::puroro_rt::MapField<#key_marker, #value_marker, { #companion::#field_const }, A>,
                 }
             }
             FieldEmit::Oneof(o) => {
-                let name = &o.name;
-                let storage = &o.storage_name;
+                let OneofEmit {
+                    name,
+                    storage_name,
+                    ..
+                } = o.as_ref();
                 quote! {
-                    #name: ::puroro_rt::OneofSlot<#companion::#storage<A>>,
+                    #name: ::puroro_rt::OneofSlot<#companion::#storage_name<A>>,
                 }
             }
         })
