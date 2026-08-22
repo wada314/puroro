@@ -213,10 +213,6 @@ pub(super) fn render_items(
     let merge_arms = render_merge_arms(&fields, companion);
     let validate_body = render_validate(&fields);
     let oneof_modules = render_oneof_modules(&fields, &bits_ty)?;
-    let empty = fields.is_empty();
-    let empty_visit_sink = empty.then(|| quote! { let _ = v; });
-    let empty_pair_sink = empty.then(|| quote! { let _ = (other, v); });
-    let empty_pair_mut_sink = empty.then(|| quote! { let _ = (dst, v); });
 
     let companion_items = [bit_consts, field_consts, defaults_module, oneof_modules]
         .into_iter()
@@ -251,9 +247,8 @@ pub(super) fn render_items(
             // public message API (must not surface `puroro_rt` in pub signatures).
             fn visit_fields<V: ::puroro_rt::FieldVisitor<::puroro_rt::MessageCommon<#bits_ty, A>>>(
                 &self,
-                v: &mut V,
+                #[allow(unused)] v: &mut V,
             ) -> ::core::ops::ControlFlow<V::Break> {
-                #empty_visit_sink
                 #(#visit_shared)*
                 ::core::ops::ControlFlow::Continue(())
             }
@@ -262,10 +257,9 @@ pub(super) fn render_items(
                 V: ::puroro_rt::FieldPairVisitor<::puroro_rt::MessageCommon<#bits_ty, A>>,
             >(
                 &self,
-                other: &Self,
-                v: &mut V,
+                #[allow(unused)] other: &Self,
+                #[allow(unused)] v: &mut V,
             ) -> ::core::ops::ControlFlow<V::Break> {
-                #empty_pair_sink
                 #(#visit_pair)*
                 ::core::ops::ControlFlow::Continue(())
             }
@@ -274,10 +268,9 @@ pub(super) fn render_items(
                 V: ::puroro_rt::FieldPairVisitorMut<::puroro_rt::MessageCommon<#bits_ty, A>>,
             >(
                 &self,
-                dst: &mut Self,
-                v: &mut V,
+                #[allow(unused)] dst: &mut Self,
+                #[allow(unused)] v: &mut V,
             ) -> ::core::ops::ControlFlow<V::Break> {
-                #empty_pair_mut_sink
                 #(#visit_pair_mut)*
                 ::core::ops::ControlFlow::Continue(())
             }
@@ -286,9 +279,8 @@ pub(super) fn render_items(
                 V: ::puroro_rt::FieldVisitorMut<::puroro_rt::MessageCommon<#bits_ty, A>>,
             >(
                 &mut self,
-                v: &mut V,
+                #[allow(unused)] v: &mut V,
             ) -> ::core::ops::ControlFlow<V::Break> {
-                #empty_visit_sink
                 #(#visit_mut)*
                 ::core::ops::ControlFlow::Continue(())
             }
