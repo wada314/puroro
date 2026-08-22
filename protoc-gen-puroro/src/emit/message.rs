@@ -218,22 +218,6 @@ pub(super) fn render_items(
     let empty_pair_sink = empty.then(|| quote! { let _ = (other, v); });
     let empty_pair_mut_sink = empty.then(|| quote! { let _ = (dst, v); });
 
-    let common_init = if fields.is_empty() {
-        quote! {
-            _common: ::puroro_rt::MessageCommon::new_in(
-                ::bitvec::array::BitArray::ZERO,
-                alloc,
-            ),
-        }
-    } else {
-        quote! {
-            _common: ::puroro_rt::MessageCommon::new_in(
-                ::bitvec::array::BitArray::ZERO,
-                alloc.clone(),
-            ),
-        }
-    };
-
     let companion_items = super::parse::parse_items(quote! {
         #bit_consts
         #field_consts
@@ -255,7 +239,10 @@ pub(super) fn render_items(
         impl<A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone> #name<A> {
             pub fn new_in(alloc: A) -> Self {
                 Self {
-                    #common_init
+                    _common: ::puroro_rt::MessageCommon::new_in(
+                        ::bitvec::array::BitArray::ZERO,
+                        alloc.clone(),
+                    ),
                     #(#new_in_fields)*
                 }
             }
