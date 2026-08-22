@@ -473,12 +473,12 @@ pub(super) fn render_items(
 
 fn emit_member(member: &MessageMember<'_>, companion: &Ident) -> Result<FieldEmit> {
     match member {
-        MessageMember::Oneof(o) => Ok(FieldEmit::Oneof(Box::new(oneof_emit(o)?))),
+        MessageMember::Oneof(o) => Ok(FieldEmit::Oneof(Box::new(emit_oneof(o)?))),
         MessageMember::Field(field) => emit_field(field, companion),
     }
 }
 
-fn oneof_emit(o: &PlannedOneof<'_>) -> Result<OneofEmit> {
+fn emit_oneof(o: &PlannedOneof<'_>) -> Result<OneofEmit> {
     if !is_simple_ident(o.name()) {
         return Err(Error::Codegen(format!(
             "cannot use oneof name `{}` as a Rust identifier",
@@ -495,7 +495,7 @@ fn oneof_emit(o: &PlannedOneof<'_>) -> Result<OneofEmit> {
         .variants()
         .iter()
         .enumerate()
-        .map(|(i, field)| oneof_variant_emit(field, i))
+        .map(|(i, field)| emit_oneof_variant(field, i))
         .collect::<Result<Vec<_>>>()?;
     let pascal = to_pascal_case(o.name());
     Ok(OneofEmit {
@@ -517,33 +517,25 @@ fn emit_field(field: &PlannedField<'_>, companion: &Ident) -> Result<FieldEmit> 
         )));
     }
     Ok(match field.kind() {
-        FieldKind::Map { key, value } => FieldEmit::Map(Box::new(map_emit(
+        FieldKind::Map { key, value } => FieldEmit::Map(Box::new(emit_map(
             field.name(),
             field.field_const(),
             field.number(),
             key,
             value,
         )?)),
-        FieldKind::Repeated { wire, encoding } => FieldEmit::Repeated(Box::new(repeated_emit(
+        FieldKind::Repeated { wire, encoding } => FieldEmit::Repeated(Box::new(emit_repeated(
             field.name(),
             field.field_const(),
             field.number(),
             wire,
             *encoding,
         )?)),
-        FieldKind::Singular { presence, .. } => {
-            if matches!(presence, PlannedPresence::Oneof) {
-                return Err(Error::Codegen(format!(
-                    "internal error: oneof field `{}` escaped as a top-level member",
-                    field.name()
-                )));
-            }
-            FieldEmit::Singular(Box::new(scalar_emit(field, companion)?))
-        }
+        FieldKind::Singular { .. } => FieldEmit::Singular(Box::new(emit_scalar(field, companion)?)),
     })
 }
 
-fn oneof_variant_emit(field: &PlannedField<'_>, index: usize) -> Result<OneofVariantEmit> {
+fn emit_oneof_variant(field: &PlannedField<'_>, index: usize) -> Result<OneofVariantEmit> {
     if !is_simple_ident(field.name()) {
         return Err(Error::Codegen(format!(
             "cannot use oneof variant name `{}` as a Rust identifier",
@@ -552,9 +544,9 @@ fn oneof_variant_emit(field: &PlannedField<'_>, index: usize) -> Result<OneofVar
     }
     let FieldKind::Singular {
         wire,
-        presence,
         layout,
         custom_default,
+        ..
     } = field.kind()
     else {
         return Err(Error::Codegen(format!(
@@ -562,12 +554,6 @@ fn oneof_variant_emit(field: &PlannedField<'_>, index: usize) -> Result<OneofVar
             field.name()
         )));
     };
-    if !matches!(presence, PlannedPresence::Oneof) {
-        return Err(Error::Codegen(format!(
-            "internal error: oneof variant `{}` has presence {presence:?}",
-            field.name()
-        )));
-    }
 
     let (layout_ty, value_bit) = match layout {
         PlannedLayout::Inline => (
@@ -627,7 +613,7 @@ fn oneof_variant_emit(field: &PlannedField<'_>, index: usize) -> Result<OneofVar
     })
 }
 
-fn repeated_emit(
+fn emit_repeated(
     name: &str,
     field_const: &str,
     number: i32,
@@ -663,7 +649,7 @@ fn repeated_emit(
     })
 }
 
-fn map_emit(
+fn emit_map(
     name: &str,
     field_const: &str,
     number: i32,
@@ -706,7 +692,7 @@ fn map_key_view(key: &WireTypeKind<'_>, field_name: &str) -> Result<(Type, bool)
     }
 }
 
-fn scalar_emit(field: &PlannedField<'_>, companion: &Ident) -> Result<ScalarEmit> {
+fn emit_scalar(field: &PlannedField<'_>, companion: &Ident) -> Result<ScalarEmit> {
     let FieldKind::Singular {
         wire,
         presence,
@@ -715,7 +701,7 @@ fn scalar_emit(field: &PlannedField<'_>, companion: &Ident) -> Result<ScalarEmit
     } = field.kind()
     else {
         return Err(Error::Codegen(format!(
-            "internal error: scalar_emit on non-singular field `{}`",
+            "internal error: emit_scalar on non-singular field `{}`",
             field.name()
         )));
     };
@@ -751,9 +737,10 @@ fn scalar_emit(field: &PlannedField<'_>, companion: &Ident) -> Result<ScalarEmit
             None,
         ),
         PlannedPresence::Oneof => {
-            return Err(Error::Codegen(
-                "internal error: oneof presence must use oneof_variant_emit".into(),
-            ));
+            return Err(Error::Codegen(format!(
+                "internal error: oneof variant `{}` must use emit_oneof_variant",
+                field.name()
+            )));
         }
     };
 
