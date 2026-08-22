@@ -9,7 +9,7 @@ use super::defaults;
 use super::ident::{escape_ident, is_simple_ident, to_pascal_case};
 use super::oneof::{self, OneofEmit, OneofVariantEmit};
 use super::type_path::{fqn_to_enum_root_path, fqn_to_message_root_path};
-use crate::default_value::{CustomDefault, DefaultLit};
+use crate::default_value::CustomDefault;
 use crate::descriptor::features::EnumType;
 use crate::error::{Error, Result};
 use crate::field_kind::{
@@ -796,23 +796,16 @@ fn emit_scalar(field: &PlannedField<'_>, companion: &Ident) -> Result<ScalarEmit
 
 fn render_defaults_module(fields: &[FieldEmit]) -> Vec<Item> {
     let mut items: Vec<Item> = Vec::new();
-    let mut needs_root = false;
     for field in fields {
         match field {
             FieldEmit::Singular(f) => {
-                if let Some((custom, marker_items)) = &f.custom_default {
-                    if matches!(custom.lit, DefaultLit::Enum { .. }) {
-                        needs_root = true;
-                    }
+                if let Some((_, marker_items)) = &f.custom_default {
                     items.extend(marker_items.iter().cloned());
                 }
             }
             FieldEmit::Oneof(o) => {
                 for v in &o.variants {
-                    if let Some((custom, marker_items)) = &v.custom_default {
-                        if matches!(custom.lit, DefaultLit::Enum { .. }) {
-                            needs_root = true;
-                        }
+                    if let Some((_, marker_items)) = &v.custom_default {
                         items.extend(marker_items.iter().cloned());
                     }
                 }
@@ -823,17 +816,13 @@ fn render_defaults_module(fields: &[FieldEmit]) -> Vec<Item> {
     if items.is_empty() {
         return Vec::new();
     }
-    let root_shim: Option<Item> = needs_root.then(|| {
-        parse_quote! {
+    vec![parse_quote! {
+        pub(crate) mod defaults {
             // Same `_root` chain as oneof submodules so `self::_root::…` enum paths work.
+            #[allow(unused)]
             mod _root {
                 pub(super) use super::super::_root::*;
             }
-        }
-    });
-    vec![parse_quote! {
-        pub(crate) mod defaults {
-            #root_shim
             #(#items)*
         }
     }]
