@@ -523,14 +523,14 @@ pub(super) fn render_merge_arms(oneof: &OneofEmit, companion: &Ident) -> Vec<Tok
 }
 
 /// `FIELD_*` constants for each variant.
-pub(super) fn render_field_consts(oneof: &OneofEmit) -> Vec<TokenStream> {
+pub(super) fn render_field_consts(oneof: &OneofEmit) -> Vec<Item> {
     oneof
         .variants
         .iter()
         .map(|v| {
             let ident = &v.field_const;
             let number = v.number;
-            quote! {
+            parse_quote! {
                 pub const #ident: u32 = #number;
             }
         })
@@ -538,13 +538,13 @@ pub(super) fn render_field_consts(oneof: &OneofEmit) -> Vec<TokenStream> {
 }
 
 /// Bool value-bit constants for oneof variants.
-pub(super) fn render_bit_consts(oneof: &OneofEmit) -> Vec<TokenStream> {
+pub(super) fn render_bit_consts(oneof: &OneofEmit) -> Vec<Item> {
     oneof
         .variants
         .iter()
         .filter_map(|v| {
             let (ident, bit) = v.value_bit.as_ref()?;
-            Some(quote! {
+            Some(parse_quote! {
                 pub const #ident: usize = #bit;
             })
         })

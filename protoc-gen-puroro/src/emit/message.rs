@@ -202,7 +202,7 @@ pub(super) fn render_items(
 
     let bit_consts = render_bit_consts(&fields);
     let field_consts = render_field_consts(&fields);
-    let defaults_module = render_defaults_module(&fields)?;
+    let defaults_module = render_defaults_module(&fields);
     let struct_fields = render_struct_fields(&fields, companion);
     let new_in_fields = render_new_in_fields(&fields);
     let accessors = render_accessors(&fields, companion);
@@ -218,12 +218,10 @@ pub(super) fn render_items(
     let empty_pair_sink = empty.then(|| quote! { let _ = (other, v); });
     let empty_pair_mut_sink = empty.then(|| quote! { let _ = (dst, v); });
 
-    let companion_items = super::parse::parse_items(quote! {
-        #bit_consts
-        #field_consts
-        #defaults_module
-        #(#oneof_modules)*
-    })?;
+    let mut companion_items = bit_consts;
+    companion_items.extend(field_consts);
+    companion_items.extend(defaults_module);
+    companion_items.extend(oneof_modules);
 
     let type_items = super::parse::parse_items(quote! {
         // @generated message body from protoc-gen-puroro.
@@ -828,7 +826,7 @@ fn scalar_emit(field: &PlannedField<'_>, companion: &Ident) -> Result<ScalarEmit
     })
 }
 
-fn render_defaults_module(fields: &[FieldEmit]) -> Result<TokenStream> {
+fn render_defaults_module(fields: &[FieldEmit]) -> Vec<Item> {
     let mut items: Vec<Item> = Vec::new();
     let mut needs_root = false;
     for field in fields {
@@ -855,38 +853,36 @@ fn render_defaults_module(fields: &[FieldEmit]) -> Result<TokenStream> {
         }
     }
     if items.is_empty() {
-        return Ok(TokenStream::new());
+        return Vec::new();
     }
-    let root_shim = if needs_root {
-        quote! {
+    let root_shim: Option<Item> = needs_root.then(|| {
+        parse_quote! {
             // Same `_root` chain as oneof submodules so `self::_root::…` enum paths work.
             mod _root {
                 pub(super) use super::super::_root::*;
             }
         }
-    } else {
-        TokenStream::new()
-    };
-    Ok(quote! {
+    });
+    vec![parse_quote! {
         pub(crate) mod defaults {
             #root_shim
             #(#items)*
         }
-    })
+    }]
 }
 
-fn render_bit_consts(fields: &[FieldEmit]) -> TokenStream {
+fn render_bit_consts(fields: &[FieldEmit]) -> Vec<Item> {
     let mut items = Vec::new();
     for field in fields {
         match field {
             FieldEmit::Singular(field) => {
                 if let Some((ident, bit)) = &field.presence_bit {
-                    items.push(quote! {
+                    items.push(parse_quote! {
                         pub const #ident: usize = #bit;
                     });
                 }
                 if let Some((ident, bit)) = &field.value_bit {
-                    items.push(quote! {
+                    items.push(parse_quote! {
                         pub const #ident: usize = #bit;
                     });
                 }
@@ -895,18 +891,10 @@ fn render_bit_consts(fields: &[FieldEmit]) -> TokenStream {
             FieldEmit::Repeated(_) | FieldEmit::Map(_) => {}
         }
     }
-    if items.is_empty() {
-        TokenStream::new()
-    } else {
-        quote! {
-            // Bit indices — presence, string SSO heap bits (1 = heap), then bool
-            // value bits (field-number order).
-            #(#items)*
-        }
-    }
+    items
 }
 
-fn render_field_consts(fields: &[FieldEmit]) -> TokenStream {
+fn render_field_consts(fields: &[FieldEmit]) -> Vec<Item> {
     let mut items = Vec::new();
     for field in fields {
         if let FieldEmit::Oneof(o) = field {
@@ -915,18 +903,11 @@ fn render_field_consts(fields: &[FieldEmit]) -> TokenStream {
         }
         let ident = field.field_const();
         let number = field.number();
-        items.push(quote! {
+        items.push(parse_quote! {
             pub const #ident: u32 = #number;
         });
     }
-    if items.is_empty() {
-        TokenStream::new()
-    } else {
-        quote! {
-            // Proto field numbers.
-            #(#items)*
-        }
-    }
+    items
 }
 
 fn render_struct_fields(fields: &[FieldEmit], companion: &Ident) -> Vec<TokenStream> {
