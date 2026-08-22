@@ -24,15 +24,26 @@ pub enum Error {
     /// A length-delimited string was not valid UTF-8.
     #[error("invalid UTF-8 in protobuf string: {0}")]
     InvalidUtf8(#[from] FromUtf8Error),
-    /// Code generation failed for a logical reason (missing file, bad option, …).
+    /// Code generation failed because of the input schema or request
+    /// (unsupported feature, illegal identifier, missing file, …).
     #[error("codegen error: {0}")]
     Codegen(String),
+    /// A plugin invariant was broken (planner / emit IR mismatch, …).
+    ///
+    /// Not used for bad `.proto` input; that stays [`Error::Codegen`].
+    #[error("internal error: {0}")]
+    Internal(String),
     /// Stdin / stdout / filesystem I/O.
     #[error("I/O error: {0}")]
     Io(#[from] io::Error),
 }
 
 impl Error {
+    /// Bug in this plugin rather than in the user's schema or request.
+    pub fn internal(msg: impl Into<String>) -> Self {
+        Self::Internal(msg.into())
+    }
+
     /// Bare unexpected-field error (no protobuf message context yet).
     pub fn unexpected_field(field_number: u32) -> Self {
         Self::UnexpectedField {

@@ -112,14 +112,14 @@ fn package_and_message_chain<'a>(message: &'a Message<'a>) -> Result<(Vec<&'a st
         .strip_prefix('.')
         .unwrap_or_else(|| message.fqn().as_str());
     if raw.is_empty() {
-        return Err(Error::Codegen(format!(
+        return Err(Error::internal(format!(
             "cannot map package-root FQN `{}` to a Rust type path",
             message.fqn()
         )));
     }
     let segments: Vec<&str> = raw.split('.').collect();
     if segments.len() < type_names.len() {
-        return Err(Error::Codegen(format!(
+        return Err(Error::internal(format!(
             "FQN `{}` is shorter than message nesting chain",
             message.fqn()
         )));
@@ -127,7 +127,7 @@ fn package_and_message_chain<'a>(message: &'a Message<'a>) -> Result<(Vec<&'a st
     let type_start = segments.len() - type_names.len();
     for (i, expected) in type_names.iter().enumerate() {
         if segments[type_start + i] != *expected {
-            return Err(Error::Codegen(format!(
+            return Err(Error::internal(format!(
                 "FQN `{}` does not end with message chain {:?}",
                 message.fqn(),
                 type_names
@@ -140,7 +140,7 @@ fn package_and_message_chain<'a>(message: &'a Message<'a>) -> Result<(Vec<&'a st
 fn split_fqn_file_level(fqn: &ProtoFqn) -> Result<(Vec<&str>, &str)> {
     let raw = fqn.as_str().strip_prefix('.').unwrap_or(fqn.as_str());
     if raw.is_empty() {
-        return Err(Error::Codegen(format!(
+        return Err(Error::internal(format!(
             "cannot map package-root FQN `{fqn}` to a Rust type path"
         )));
     }

@@ -61,7 +61,7 @@ pub fn emit(request: &CodegenRequest) -> Result<CodeGeneratorResponse> {
     )?;
     let file = files
         .pop()
-        .ok_or_else(|| Error::Codegen("layout produced no files".into()))?;
+        .ok_or_else(|| Error::internal("layout produced no files"))?;
     Ok(CodeGeneratorResponse::from_files(vec![file]))
 }
 

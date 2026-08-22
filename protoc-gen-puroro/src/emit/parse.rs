@@ -7,7 +7,7 @@ use ::syn::{File, Item};
 
 pub(super) fn parse_file(tokens: TokenStream) -> Result<File> {
     ::syn::parse2(tokens)
-        .map_err(|e| Error::Codegen(format!("generated tokens are not a valid Rust file: {e}")))
+        .map_err(|e| Error::internal(format!("generated tokens are not a valid Rust file: {e}")))
 }
 
 pub(super) fn parse_items(tokens: TokenStream) -> Result<Vec<Item>> {
@@ -19,5 +19,5 @@ pub(super) fn parse_items(tokens: TokenStream) -> Result<Vec<Item>> {
         Ok(items)
     })
     .parse2(tokens)
-    .map_err(|e| Error::Codegen(format!("generated tokens are not valid items: {e}")))
+    .map_err(|e| Error::internal(format!("generated tokens are not valid items: {e}")))
 }

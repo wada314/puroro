@@ -61,9 +61,7 @@ fn has_default_ty_and_expr(
         }
         DefaultLit::Enum { value_name, .. } => {
             let WireTypeKind::Enum { ty, .. } = wire else {
-                return Err(Error::Codegen(
-                    "internal error: enum default lit without enum wire type".into(),
-                ));
+                return Err(Error::internal("enum default lit without enum wire type"));
             };
             let path = fqn_to_enum_root_path(ty)?;
             let variant = enumeration::variant_const_ident(ty.name(), value_name)?;

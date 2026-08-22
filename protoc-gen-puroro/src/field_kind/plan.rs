@@ -126,21 +126,21 @@ pub fn plan_fields<'a>(message: &'a Message<'a>) -> Result<MessageFieldPlan<'a>>
             FieldOccurrence::Singular(SingularPresence::Oneof)
         ) {
             let idx = field.oneof_index().ok_or_else(|| {
-                Error::Codegen(format!(
+                Error::internal(format!(
                     "field `{}.{}` has Oneof presence but no oneof_index",
                     message.fqn(),
                     field.name()
                 ))
             })?;
             let idx = usize::try_from(idx).map_err(|_| {
-                Error::Codegen(format!(
+                Error::internal(format!(
                     "field `{}.{}` has negative oneof_index",
                     message.fqn(),
                     field.name()
                 ))
             })?;
             if idx >= oneof_names.len() {
-                return Err(Error::Codegen(format!(
+                return Err(Error::internal(format!(
                     "field `{}.{}` oneof_index {idx} out of range ({} oneofs)",
                     message.fqn(),
                     field.name(),
@@ -270,13 +270,13 @@ fn plan_field<'a>(field: &'a Field<'a>, next_bit: &mut usize) -> Result<PlannedF
 
 fn plan_map_field<'a>(field: &'a Field<'a>) -> Result<FieldKind<'a>> {
     let TypeRef::Message(entry) = field.type_ref() else {
-        return Err(Error::Codegen(format!(
+        return Err(Error::internal(format!(
             "map field `{}` does not resolve to a message type",
             field.name()
         )));
     };
     if !entry.is_map_entry() {
-        return Err(Error::Codegen(format!(
+        return Err(Error::internal(format!(
             "map field `{}` type `{}` is not a map_entry message",
             field.name(),
             entry.fqn()

@@ -544,16 +544,22 @@ fn emit_oneof_variant(field: &PlannedField<'_>, index: usize) -> Result<OneofVar
     }
     let FieldKind::Singular {
         wire,
+        presence,
         layout,
         custom_default,
-        ..
     } = field.kind()
     else {
-        return Err(Error::Codegen(format!(
+        return Err(Error::internal(format!(
             "oneof variant `{}` must be singular",
             field.name()
         )));
     };
+    if !matches!(presence, PlannedPresence::Oneof) {
+        return Err(Error::internal(format!(
+            "oneof variant `{}` has presence {presence:?}",
+            field.name()
+        )));
+    }
 
     let (layout_ty, value_bit) = match layout {
         PlannedLayout::Inline => (
@@ -630,8 +636,8 @@ fn emit_repeated(
         WireTypeKind::Bytes { .. } => (RepeatedAccessorStyle::Bytes, parse_quote! { () }),
         _ => {
             let Some(elem) = views.slice_elem else {
-                return Err(Error::Codegen(format!(
-                    "internal error: missing slice elem for repeated `{name}`"
+                return Err(Error::internal(format!(
+                    "missing slice elem for repeated `{name}`"
                 )));
             };
             (RepeatedAccessorStyle::Slice, elem)
@@ -686,7 +692,7 @@ fn map_key_view(key: &WireTypeKind<'_>, field_name: &str) -> Result<(Type, bool)
         | WireTypeKind::Fixed32
         | WireTypeKind::UInt64
         | WireTypeKind::Fixed64 => Ok((wire_views(key)?.map_value, false)),
-        other => Err(Error::Codegen(format!(
+        other => Err(Error::internal(format!(
             "map field `{field_name}`: invalid map key type {other:?}"
         ))),
     }
@@ -700,11 +706,17 @@ fn emit_scalar(field: &PlannedField<'_>, companion: &Ident) -> Result<ScalarEmit
         custom_default,
     } = field.kind()
     else {
-        return Err(Error::Codegen(format!(
-            "internal error: emit_scalar on non-singular field `{}`",
+        return Err(Error::internal(format!(
+            "emit_scalar on non-singular field `{}`",
             field.name()
         )));
     };
+    if matches!(presence, PlannedPresence::Oneof) {
+        return Err(Error::internal(format!(
+            "oneof variant `{}` must use emit_oneof_variant",
+            field.name()
+        )));
+    }
     let name = field.name();
     let field_const = field.field_const();
     let number = field.number();
@@ -736,12 +748,7 @@ fn emit_scalar(field: &PlannedField<'_>, companion: &Ident) -> Result<ScalarEmit
             parse_quote! { ::puroro_rt::Message },
             None,
         ),
-        PlannedPresence::Oneof => {
-            return Err(Error::Codegen(format!(
-                "internal error: oneof variant `{}` must use emit_oneof_variant",
-                field.name()
-            )));
-        }
+        PlannedPresence::Oneof => unreachable!("rejected above"),
     };
 
     let (layout_ty, value_bit) = match layout {
