@@ -996,7 +996,7 @@ fn render_struct_fields(fields: &[FieldEmit], companion: &Ident) -> Vec<TokenStr
                 let field_const = &field.field_const;
                 let layout_ty = field.layout_ty.as_ref();
                 let default_ty: Option<Type> = field.custom_default.as_ref().map(|(c, _)| {
-                    let marker = defaults::marker_ident(c);
+                    let marker = Ident::new(&c.marker_name, Span::call_site());
                     parse_quote! { #companion::defaults::#marker }
                 });
                 quote! {

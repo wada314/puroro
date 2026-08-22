@@ -9,16 +9,12 @@ use ::proc_macro2::{Ident, Span, TokenStream};
 use ::quote::quote;
 use ::syn::{Item, LitByteStr, LitStr, Type, parse_quote};
 
-pub(super) fn marker_ident(custom: &CustomDefault) -> Ident {
-    Ident::new(&custom.marker_name, Span::call_site())
-}
-
 /// `pub struct …; impl HasDefault<…> for … { … }`
 pub(super) fn render_marker_item(
     custom: &CustomDefault,
     wire: &WireTypeKind<'_>,
 ) -> Result<Vec<Item>> {
-    let marker = marker_ident(custom);
+    let marker = Ident::new(&custom.marker_name, Span::call_site());
     let (ty, expr, lifetime) = has_default_ty_and_expr(&custom.lit, wire)?;
     if lifetime {
         super::parse::parse_items(quote! {

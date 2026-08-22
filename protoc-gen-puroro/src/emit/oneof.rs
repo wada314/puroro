@@ -1,10 +1,9 @@
 //! Emit a oneof submodule (`shape` / `Case` / `Storage` + trait impls).
 
-use super::defaults;
 use super::message::SingularMutStyle;
 use crate::default_value::CustomDefault;
 use crate::error::Result;
-use ::proc_macro2::{Ident, TokenStream};
+use ::proc_macro2::{Ident, Span, TokenStream};
 use ::quote::quote;
 use ::syn::{Item, Type, parse_quote};
 
@@ -94,7 +93,7 @@ fn render_module_body(oneof: &OneofEmit, bits_ty: &TokenStream) -> Result<TokenS
         .iter()
         .filter_map(|v| {
             let (custom, _) = v.custom_default.as_ref()?;
-            let marker = defaults::marker_ident(custom);
+            let marker = Ident::new(&custom.marker_name, Span::call_site());
             Some(quote! { use super::defaults::#marker; })
         })
         .collect();
@@ -108,7 +107,7 @@ fn render_module_body(oneof: &OneofEmit, bits_ty: &TokenStream) -> Result<TokenS
             let field_const = &v.field_const;
             let layout_ty = v.layout_ty.as_ref();
             let default_ty: Option<Type> = v.custom_default.as_ref().map(|(c, _)| {
-                let marker = defaults::marker_ident(c);
+                let marker = Ident::new(&c.marker_name, Span::call_site());
                 parse_quote! { #marker }
             });
             quote! {
