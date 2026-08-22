@@ -29,6 +29,8 @@ pub(super) struct OneofVariantEmit {
     pub field_const: Ident,
     pub number: u32,
     pub marker: Type,
+    /// `L` type arg to emit. `None` omits it (`Inline` default). `Some(Inline)`
+    /// when a custom `D` must follow (positional type args).
     pub layout_ty: Option<Type>,
     pub value_bit: Option<(Ident, usize)>,
     pub is_message: bool,
@@ -104,18 +106,19 @@ fn render_module_body(oneof: &OneofEmit, bits_ty: &TokenStream) -> Result<TokenS
             let alias = &v.field_alias;
             let marker = &v.marker;
             let field_const = &v.field_const;
-            let default_marker = v.custom_default.as_ref().map(|(c, _)| {
+            let layout_ty = v.layout_ty.as_ref();
+            let default_ty: Option<Type> = v.custom_default.as_ref().map(|(c, _)| {
                 let marker = defaults::marker_ident(c);
                 parse_quote! { #marker }
             });
-            let tail = defaults::layout_and_default_args(&v.layout_ty, default_marker.as_ref());
             quote! {
                 type #alias<A> = ::puroro_rt::SingularField<
                     #marker,
                     ::puroro_rt::Oneof,
                     { super::#field_const },
                     A
-                    #tail
+                    #(, #layout_ty)?
+                    #(, #default_ty)?
                 >;
             }
         })

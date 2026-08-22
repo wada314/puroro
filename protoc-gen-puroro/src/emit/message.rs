@@ -35,6 +35,8 @@ struct ScalarEmit {
     number: u32,
     marker: Type,
     presence_ty: Type,
+    /// `L` type arg to emit. `None` omits it (`Inline` default). `Some(Inline)`
+    /// when a custom `D` must follow (positional type args).
     layout_ty: Option<Type>,
     presence_bit: Option<(Ident, usize)>,
     value_bit: Option<(Ident, usize)>,
@@ -581,7 +583,12 @@ fn oneof_variant_emit(field: &PlannedField<'_>, index: usize) -> Result<OneofVar
     }
 
     let (layout_ty, value_bit) = match layout {
-        PlannedLayout::Inline => (None, None),
+        PlannedLayout::Inline => (
+            custom_default
+                .is_some()
+                .then(|| parse_quote! { ::puroro_rt::Inline }),
+            None,
+        ),
         PlannedLayout::BitPacked {
             value_bit,
             bit_const,
@@ -795,7 +802,12 @@ fn scalar_emit(field: &PlannedField<'_>, companion: &Ident) -> Result<ScalarEmit
     };
 
     let (layout_ty, value_bit) = match layout {
-        PlannedLayout::Inline => (None, None),
+        PlannedLayout::Inline => (
+            custom_default
+                .is_some()
+                .then(|| parse_quote! { ::puroro_rt::Inline }),
+            None,
+        ),
         PlannedLayout::BitPacked {
             value_bit,
             bit_const,
@@ -982,14 +994,13 @@ fn render_struct_fields(fields: &[FieldEmit], companion: &Ident) -> Vec<TokenStr
                 let marker = &field.marker;
                 let presence_ty = &field.presence_ty;
                 let field_const = &field.field_const;
-                let default_ty = field.custom_default.as_ref().map(|(c, _)| {
+                let layout_ty = field.layout_ty.as_ref();
+                let default_ty: Option<Type> = field.custom_default.as_ref().map(|(c, _)| {
                     let marker = defaults::marker_ident(c);
                     parse_quote! { #companion::defaults::#marker }
                 });
-                let tail =
-                    defaults::layout_and_default_args(&field.layout_ty, default_ty.as_ref());
                 quote! {
-                    #name: ::puroro_rt::SingularField<#marker, #presence_ty, { #companion::#field_const }, A #tail>,
+                    #name: ::puroro_rt::SingularField<#marker, #presence_ty, { #companion::#field_const }, A #(, #layout_ty)? #(, #default_ty)?>,
                 }
             }
             FieldEmit::Repeated(field) => {

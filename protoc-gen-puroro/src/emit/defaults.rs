@@ -1,4 +1,4 @@
-//! Emit message-local `[default = …]` marker ZSTs and `SingularField` `D` args.
+//! Emit message-local `[default = …]` marker ZSTs.
 
 use super::enumeration;
 use super::type_path::fqn_to_enum_root_path;
@@ -8,19 +8,6 @@ use crate::field_kind::WireTypeKind;
 use ::proc_macro2::{Ident, Span, TokenStream};
 use ::quote::quote;
 use ::syn::{Item, LitByteStr, LitStr, Type, parse_quote};
-
-/// `, L, D` type-argument tail for `SingularField<…, A, …>` (may be empty).
-pub(super) fn layout_and_default_args(
-    layout_ty: &Option<Type>,
-    default_marker: Option<&Type>,
-) -> TokenStream {
-    match (layout_ty, default_marker) {
-        (None, None) => TokenStream::new(),
-        (Some(layout), None) => quote! { , #layout },
-        (None, Some(default_ty)) => quote! { , ::puroro_rt::Inline, #default_ty },
-        (Some(layout), Some(default_ty)) => quote! { , #layout, #default_ty },
-    }
-}
 
 pub(super) fn marker_ident(custom: &CustomDefault) -> Ident {
     Ident::new(&custom.marker_name, Span::call_site())
