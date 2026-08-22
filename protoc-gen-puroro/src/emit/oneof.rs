@@ -285,18 +285,12 @@ fn render_module_body(oneof: &OneofEmit, bits_ty: &TokenStream) -> Result<TokenS
             OneofEncodable, OneofGroup,
         };
 
-        #[derive(::core::clone::Clone, ::core::marker::Copy, ::core::cmp::PartialEq)]
+        #[derive(Clone, Copy, PartialEq)]
         pub enum #shape_name<#(#type_params),*> {
             #(#shape_variants)*
         }
 
-        #[derive(
-            ::core::clone::Clone,
-            ::core::marker::Copy,
-            ::core::fmt::Debug,
-            ::core::cmp::PartialEq,
-            ::core::cmp::Eq,
-        )]
+        #[derive(Clone, Copy, Debug, PartialEq, Eq)]
         pub enum #case_name {
             #(#case_variants)*
         }

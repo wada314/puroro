@@ -18,27 +18,25 @@ use ::syn::Item;
 pub(super) fn render_enum(e: &Enum<'_>) -> Result<Vec<Item>> {
     if !is_simple_ident(e.name()) {
         return Err(Error::Codegen(format!(
-            "enum name `{}` is not a simple Rust identifier",
+            "cannot use enum name `{}` as a Rust identifier",
             e.name()
         )));
     }
 
-    let values: Vec<_> = e.values().collect();
-    if values.is_empty() {
-        return Err(Error::Codegen(format!("enum `{}` has no values", e.name())));
-    }
+    let first = e
+        .values()
+        .next()
+        .ok_or_else(|| Error::Codegen(format!("enum `{}` has no values", e.name())))?;
 
-    for v in &values {
+    for v in e.values() {
         if !is_simple_ident(v.name()) {
             return Err(Error::Codegen(format!(
-                "enum value `{}` on `{}` is not a simple Rust identifier",
+                "cannot use enum value `{}` on `{}` as a Rust identifier",
                 v.name(),
                 e.name()
             )));
         }
     }
-
-    let first = values[0];
     if matches!(e.openness(), EnumType::Open) && first.number() != 0 {
         return Err(Error::Codegen(format!(
             "open enum `{}` must define 0 as its first value (got `{}` = {})",
@@ -52,8 +50,8 @@ pub(super) fn render_enum(e: &Enum<'_>) -> Result<Vec<Item>> {
     let default_const = variant_const_ident(e.name(), first.name())?;
     let default_self = quote! { Self::#default_const };
     let default_path = quote! { #name::#default_const };
-    let variant_consts: Vec<TokenStream> = values
-        .iter()
+    let variant_consts: Vec<TokenStream> = e
+        .values()
         .map(|v| {
             let ident = variant_const_ident(e.name(), v.name())?;
             let number = v.number();
@@ -63,8 +61,8 @@ pub(super) fn render_enum(e: &Enum<'_>) -> Result<Vec<Item>> {
         })
         .collect::<Result<_>>()?;
 
-    let known_numbers: Vec<i32> = values
-        .iter()
+    let known_numbers: Vec<i32> = e
+        .values()
         .map(|v| v.number())
         .collect::<BTreeSet<_>>()
         .into_iter()
@@ -115,14 +113,7 @@ pub(super) fn render_enum(e: &Enum<'_>) -> Result<Vec<Item>> {
     };
 
     super::parse::parse_items(quote! {
-        #[derive(
-            ::core::clone::Clone,
-            ::core::marker::Copy,
-            ::core::fmt::Debug,
-            ::core::cmp::PartialEq,
-            ::core::cmp::Eq,
-            ::core::hash::Hash
-        )]
+        #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
         #[repr(transparent)]
         pub struct #name(i32);
 
@@ -186,8 +177,7 @@ pub(super) fn variant_const_ident(enum_name: &str, value_name: &str) -> Result<I
         value_name
     } else {
         return Err(Error::Codegen(format!(
-            "enum value `{value_name}` on `{enum_name}` does not yield a simple Rust const \
-             identifier after prefix strip (got `{rest}`)"
+            "cannot derive a Rust constant name from enum value `{value_name}` on `{enum_name}`"
         )));
     };
     Ok(Ident::new(candidate, Span::call_site()))
