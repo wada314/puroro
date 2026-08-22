@@ -151,20 +151,13 @@ impl FieldEmit {
         }
     }
 
+    /// Companion `FIELD_*` ident. `None` for a oneof slot — the slot has no
+    /// field number; each variant has its own const (see [`render_field_consts`]).
     fn field_const(&self) -> Option<&Ident> {
         match self {
             Self::Singular(f) => Some(&f.field_const),
             Self::Repeated(f) => Some(&f.field_const),
             Self::Map(f) => Some(&f.field_const),
-            Self::Oneof(_) => None,
-        }
-    }
-
-    fn number(&self) -> Option<u32> {
-        match self {
-            Self::Singular(f) => Some(f.number),
-            Self::Repeated(f) => Some(f.number),
-            Self::Map(f) => Some(f.number),
             Self::Oneof(_) => None,
         }
     }
@@ -853,20 +846,27 @@ fn render_bit_consts(fields: &[FieldEmit]) -> Vec<Item> {
     items
 }
 
+/// Companion `FIELD_*` consts (`pub const FIELD_TITLE: u32 = 1`).
+///
+/// A oneof is one struct member but each variant is its own proto field, so
+/// those consts are emitted here (the oneof module names them `super::FIELD_*`).
 fn render_field_consts(fields: &[FieldEmit]) -> Vec<Item> {
     let mut items = Vec::new();
     for field in fields {
-        if let FieldEmit::Oneof(o) = field {
-            items.extend(oneof::render_field_consts(o));
-            continue;
+        match field {
+            FieldEmit::Singular(f) => items.push(field_const_item(&f.field_const, f.number)),
+            FieldEmit::Repeated(f) => items.push(field_const_item(&f.field_const, f.number)),
+            FieldEmit::Map(f) => items.push(field_const_item(&f.field_const, f.number)),
+            FieldEmit::Oneof(o) => items.extend(oneof::render_field_consts(o)),
         }
-        let ident = field.field_const();
-        let number = field.number();
-        items.push(parse_quote! {
-            pub const #ident: u32 = #number;
-        });
     }
     items
+}
+
+fn field_const_item(ident: &Ident, number: u32) -> Item {
+    parse_quote! {
+        pub const #ident: u32 = #number;
+    }
 }
 
 fn render_struct_fields(fields: &[FieldEmit], companion: &Ident) -> Vec<TokenStream> {
