@@ -9,35 +9,57 @@ use ::syn::{Item, Type, parse_quote};
 
 /// Owned facts for one generated oneof group.
 pub(super) struct OneofEmit {
+    /// Struct / accessor ident — `kind`.
     pub name: Ident,
+    /// Raw proto oneof name — `"kind"` (visit key, `kind_mut`).
     pub name_str: String,
+    /// Companion submodule — `kind` (`mod kind { … }`).
     pub mod_name: Ident,
+    /// Shared / mut shape enum — `Kind`.
     pub shape_name: Ident,
+    /// Discriminant enum — `KindCase`.
     pub case_name: Ident,
+    /// `OneofSlot` storage type — `KindStorage`.
     pub storage_name: Ident,
+    /// Proto fields in this oneof, in field-number order.
     pub variants: Vec<OneofVariantEmit>,
 }
 
 /// One variant inside a oneof group.
 pub(super) struct OneofVariantEmit {
+    /// Accessor ident — `email`.
     pub name: Ident,
+    /// Raw proto field name — `"email"`.
     pub name_str: String,
+    /// Enum variant ident — `Email` (`Kind::Email`, `KindCase::Email`).
     pub variant_name: Ident,
+    /// Shape type parameter — `T0`, `T1`.
     pub type_param: Ident,
+    /// `SingularField` alias in the oneof module — `EmailField`.
     pub field_alias: Ident,
+    /// Parent companion const — `FIELD_EMAIL`.
     pub field_const: Ident,
+    /// Proto field number — `3`.
     pub number: u32,
+    /// `T` type arg — `::puroro_rt::ProtoString`, `ProtoInt32`, `ProtoMessage<Address<A>>`.
     pub marker: Type,
-    /// `L` type arg to emit. `None` omits it (`Inline` default). `Some(Inline)`
-    /// when a custom `D` must follow (positional type args).
+    /// `L` type arg. `None` omits it (`Inline` default). `Some(Inline)` when a
+    /// custom `D` must follow. Also `BitPacked<{ super::BIT_DONE_VALUE }>`,
+    /// `InlineOrHeap<{ super::BIT_EMAIL_SSO }>`.
     pub layout_ty: Option<Type>,
+    /// Bool value bit — `Some((BIT_FLAG_VALUE, 4))`; `None` otherwise.
     pub value_bit: Option<(Ident, usize)>,
+    /// Message variant — `get()` / `get_mut()` instead of scalar optional.
     pub is_message: bool,
+    /// Bool variant — value lives in a bit, not in the payload word.
     pub is_bool: bool,
+    /// `_mut` return: `DerefMut` vs `StringMut` / `BytesMut` (SSO).
     pub mut_style: SingularMutStyle,
+    /// `_mut` `DerefMut` target — `i32`, `::puroro::String<A>`, `Address<A>`.
     pub mut_target: Type,
+    /// Optional view — `i32`, `&'a str`, `Status`.
     pub optional_ty: Type,
-    /// Non-type-zero `[default = …]` plus pre-rendered `HasDefault` items.
+    /// Non-type-zero `[default = …]` (`EmailDefault` + `HasDefault` items).
     pub custom_default: Option<(CustomDefault, Vec<Item>)>,
 }
 

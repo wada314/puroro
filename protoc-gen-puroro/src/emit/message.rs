@@ -29,55 +29,80 @@ enum FieldEmit {
 
 /// Owned per-field facts needed for `quote!` (avoids borrowing `MessageFieldPlan`).
 struct ScalarEmit {
+    /// Struct / accessor ident — `title`, `r#type`.
     name: Ident,
+    /// Raw proto name — `"title"` (for `title_mut`, visit keys).
     name_str: String,
+    /// Companion const ident — `FIELD_TITLE`.
     field_const: Ident,
+    /// Proto field number — `1`.
     number: u32,
+    /// `T` type arg — `::puroro_rt::ProtoInt32`, `ProtoString`, `ProtoEnum<Status, Open>`.
     marker: Type,
+    /// `P` type arg — `Implicit`, `Explicit<{ task::BIT_TITLE }>`, `Message`.
     presence_ty: Type,
-    /// `L` type arg to emit. `None` omits it (`Inline` default). `Some(Inline)`
-    /// when a custom `D` must follow (positional type args).
+    /// `L` type arg. `None` omits it (`Inline` default). `Some(Inline)` when a
+    /// custom `D` must follow. Also `BitPacked<{ task::BIT_DONE_VALUE }>`,
+    /// `InlineOrHeap<{ task::BIT_TITLE_SSO }>`.
     layout_ty: Option<Type>,
+    /// Presence-bit const and index — `Some((BIT_TITLE, 0))`; `None` if Implicit / Message.
     presence_bit: Option<(Ident, usize)>,
+    /// Value / SSO-heap bit — `Some((BIT_DONE_VALUE, 1))`, `Some((BIT_TITLE_SSO, 2))`;
+    /// `None` if the payload is a normal `Inline` field.
     value_bit: Option<(Ident, usize)>,
+    /// Which getter / mutator shape to emit.
     style: AccessorStyle,
-    /// Enums always use `.optional()` even when presence is IMPLICIT (DESIGN §4.6).
+    /// Use `.optional()` instead of `.value()`. Enums always do (DESIGN §4.6).
     optional_getter: bool,
+    /// `_mut` `DerefMut` target — `i32`, `::puroro::String<A>`, `Address<A>`.
     mut_target: Type,
-    /// Return type for IMPLICIT value getters (`i32`, `&str`, …).
+    /// IMPLICIT `.value()` return — `i32`, `&str`, `&[u8]`.
     implicit_ty: Type,
-    /// Payload type inside `Optional<…>` (`i32`, `&'a str`, enum path, …).
+    /// Payload inside `Optional<…>` — `i32`, `&'a str`, `Status`.
     optional_ty: Type,
-    /// Non-type-zero `[default = …]` marker (emitted into `mod defaults`).
+    /// Non-type-zero `[default = …]` (`MaxRetriesDefault` + `HasDefault` items).
     custom_default: Option<(CustomDefault, Vec<Item>)>,
-    /// Shape of the generated `_mut` accessor return type.
+    /// `_mut` return: `DerefMut` vs `StringMut` / `BytesMut` (SSO).
     mut_style: SingularMutStyle,
 }
 
 struct RepeatedEmit {
+    /// Struct / accessor ident — `tag_ids`, `labels`.
     name: Ident,
+    /// Raw proto name — `"tag_ids"`.
     name_str: String,
+    /// Companion const ident — `FIELD_TAG_IDS`.
     field_const: Ident,
+    /// Proto field number — `6`.
     number: u32,
+    /// Element marker — `::puroro_rt::ProtoInt32`, `ProtoString`, `ProtoMessage<Address<A>>`.
     marker: Type,
+    /// Encoding param — `::puroro_rt::Packed` or `Expanded`.
     encoding_ty: Type,
+    /// Slice vs `RepeatedStringMut` / `RepeatedBytesMut`.
     style: RepeatedAccessorStyle,
-    /// Element type of the `as_slice` getter (`i32`, `impl Deref<Target = str>`, …).
+    /// `as_slice` element — `i32`, `Address<A>`, `impl Deref<Target = str>`.
     slice_elem_ty: Type,
 }
 
 struct MapEmit {
+    /// Struct / accessor ident — `attrs`.
     name: Ident,
+    /// Raw proto name — `"attrs"`.
     name_str: String,
+    /// Companion const ident — `FIELD_ATTRS`.
     field_const: Ident,
+    /// Proto field number — `10`.
     number: u32,
+    /// Key marker — `::puroro_rt::ProtoString`, `ProtoInt32`.
     key_marker: Type,
+    /// Value marker — `::puroro_rt::ProtoInt32`, `ProtoMessage<Address<A>>`.
     value_marker: Type,
-    /// User-facing key type in `MapRef` / mut traits (`str`, `i32`, …).
+    /// `MapRef` / `MapMut` key — `str`, `i32`, `bool`.
     key_view: Type,
-    /// Shared view type for `MapRef` (`i32`, `str`, `Address<A>`, …).
+    /// `MapRef` value view — `i32`, `str`, `Address<A>`.
     value_view: Type,
-    /// When set, pin `MutTarget` on the mutator return type (string / bytes).
+    /// Pin `MutTarget` for string / bytes values — `::puroro::String<A>`, `Vec<u8, A>`.
     mut_target: Option<Type>,
 }
 
