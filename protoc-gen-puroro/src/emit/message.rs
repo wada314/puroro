@@ -310,7 +310,7 @@ pub(super) fn render_items(
 
         impl #name<::allocator_api2::alloc::Global> {
             pub fn new() -> Self {
-                Self::new_in(::allocator_api2::alloc::Global)
+                <Self as ::core::default::Default>::default()
             }
         }
 

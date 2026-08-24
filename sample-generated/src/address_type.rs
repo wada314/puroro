@@ -189,7 +189,7 @@ impl<A: Allocator + Clone> Address<A> {
 
 impl Address<Global> {
     pub fn new() -> Self {
-        Self::new_in(Global)
+        <Self as Default>::default()
     }
 }
 

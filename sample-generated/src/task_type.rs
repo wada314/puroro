@@ -630,7 +630,7 @@ impl<A: Allocator + Clone> Task<A> {
 
 impl Task<Global> {
     pub fn new() -> Self {
-        Self::new_in(Global)
+        <Self as Default>::default()
     }
 }
 

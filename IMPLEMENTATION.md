@@ -569,7 +569,7 @@ Generated code indexes bits only through `MessageCommonBits` / inherent `Message
 ## 11. Constructors & allocator
 
 - **`Task::new_in(alloc)`** — default every field; `_common.bits = BitArray::ZERO`; heap fields via `*_in(alloc.clone())`, with the last heap field taking the original by move. (Building an empty `unmanaged` container does not allocate, so the clone is only used to decompose an empty `Vec`.)
-- **`Task::new()`** — when `A = Global`.
+- **`Task::new()`** — `A = Global` only, so `Task::new()` infers. Delegates to `Default`.
 - **`Default`** — `A: Clone + Default` → `new_in(A::default())`.
 
 Runtime **`str_to_unmanaged_in(s, alloc)`** — copy bytes into an `UnmanagedString` (`puroro_rt::decode`). The `unsafe` (raw-parts / `deallocate`) is confined to the `puroro-rt` runtime and the generated `Drop`, not to generated accessors.
@@ -637,7 +637,7 @@ Nested LEN payloads use `Buf::take(len)` before child `merge_from`.
 
 **Not currently generated:** `Eq`, `Copy`, `Ord`, `Hash`.
 
-**`Global` extras:** `Task::new()`, `impl Default for Task` when `A: Default`, `Message::decode(buf)` when `Self: Default`.
+**`Global` extras:** `Task::new()` (`Default` for `Task<Global>`). `Message::decode(buf)` when `Self: Default`.
 
 Prefer `Arc<Task<A>>` for shared immutable messages when clone cost matters.
 
