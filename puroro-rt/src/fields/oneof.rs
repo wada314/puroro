@@ -31,7 +31,6 @@ use crate::fields::singular::field::SingularField;
 use crate::fields::wire::proto_message::ProtoMessage;
 use crate::fields::wire::singular_type::SingularType;
 use crate::message_encode::{EncodeCtx, MessageEncode};
-use crate::message_merge::MessageMerge;
 
 /// Explicit release of a generated `oneof` storage enum.
 ///
@@ -447,7 +446,7 @@ where
     T::View<'a, A>: Copy,
     D: HasDefault<T::View<'a, A>>,
     MessageCommon<Pb, A>: MessageCommonBits,
-    L::Slot: AddressableSlot + DefaultIn<A>,
+    L::Slot: AddressableSlot,
     <Oneof as FieldPresence>::ValueSlot<L::Slot>: ValueSlot<L::Slot, A>,
 {
     pub fn optional(self) -> Optional<T::View<'a, A>, D> {
@@ -461,7 +460,7 @@ where
 impl<'a, M, const FIELD: u32, A: Allocator, Pb>
     OneofVariantRef<'a, SingularField<ProtoMessage<M>, Oneof, FIELD, A>, Pb, A>
 where
-    M: ::puroro::Message<Alloc = A> + MessageEncode + MessageMerge + ::unmanaged::DeallocateIn<A>,
+    M: MessageEncode + ::unmanaged::DeallocateIn<A>,
     MessageCommon<Pb, A>: MessageCommonBits,
     <Oneof as FieldPresence>::ValueSlot<UnmanagedBox<M, A>>: ValueSlot<UnmanagedBox<M, A>, A>,
 {
@@ -502,8 +501,7 @@ where
     /// Projected mutable view of the active variant.
     type Mut<'a>
     where
-        Self: 'a,
-        Self::Alloc: Clone;
+        Self: 'a;
 
     /// Per-message common-bits type (may be unused by the group).
     type Bits;

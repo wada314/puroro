@@ -11,11 +11,11 @@
 //! [`encode_field`](super::encode_type::encode_field) with
 //! [`EncodeType::View`](super::encode_type::EncodeType::View) after omit checks.
 //!
-//! **Storage access** (get / write / clear / merge) lives on [`PayloadAccess`]
+//! **Storage access** (get / write / clear) lives on [`PayloadAccess`]
 //! for inline payloads, or on
 //! [`ValueLayout`](crate::fields::shared::value_layout::ValueLayout)
 //! (`BitPacked` / `InlineOrHeap`) for packed bool and SSO string / bytes. Singular wire
-//! decode is **merge-into only** (`PayloadAccess::merge` / layout `merge`);
+//! decode is **merge-into only** ([`PayloadMerge`] / layout merge);
 //! there is no `decode → Written`. [`SingularField`](crate::fields::singular::field::SingularField)
 //! always goes through `ValueLayout`.
 //!
@@ -148,11 +148,15 @@ pub trait PayloadAccess: SingularType {
         VS: ValueSlot<Self::Slot<A>, A>,
         I: SlotInitMut,
         MessageCommon<Pb, A>: MessageCommonBits;
+}
 
+/// Wire-decode merge for inline payloads. Kept off [`PayloadAccess`] so nested
+/// messages can be *named* as [`PayloadAccess`] without [`crate::MessageMerge`].
+pub trait PayloadMerge: PayloadAccess {
     /// Merges one wire occurrence into the slot after the tag has been read.
     ///
     /// This is the **only** singular wire-decode entry for inline payloads.
-    /// Scalars / string / bytes typically last-win [`write`](Self::write);
+    /// Scalars / string / bytes typically last-win [`PayloadAccess::write`];
     /// nested messages merge recursively into the present child. Closed-enum
     /// unknowns are parked in `common.unknown_fields`.
     fn merge<A, VS, I, Pb, B>(
@@ -267,7 +271,13 @@ where
             unsafe { DeallocateIn::deallocate_in(old, &alloc) };
         }
     }
+}
 
+impl<C> PayloadMerge for Numerical<C>
+where
+    C: NumericalType,
+    C::NativeType: AddressableSlot,
+{
     #[inline]
     fn merge<A, VS, I, Pb, B>(
         slot: &mut VS,
@@ -280,8 +290,8 @@ where
     ) -> Result<(), DecodeError>
     where
         A: Allocator + Clone,
-        C::NativeType: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
-        VS: ValueSlot<C::NativeType, A>,
+        Self::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
+        VS: ValueSlot<Self::Slot<A>, A>,
         I: SlotInitMut,
         MessageCommon<Pb, A>: MessageCommonBits,
         B: DecodeBuf,
@@ -391,7 +401,9 @@ impl<C: LenCodec> PayloadAccess for LenScalar<C> {
             unsafe { DeallocateIn::deallocate_in(old, &alloc) };
         }
     }
+}
 
+impl<C: LenCodec> PayloadMerge for LenScalar<C> {
     #[inline]
     fn merge<A, VS, I, Pb, B>(
         slot: &mut VS,
@@ -404,7 +416,8 @@ impl<C: LenCodec> PayloadAccess for LenScalar<C> {
     ) -> Result<(), DecodeError>
     where
         A: Allocator + Clone,
-        VS: ValueSlot<C::Slot<A>, A>,
+        Self::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
+        VS: ValueSlot<Self::Slot<A>, A>,
         I: SlotInitMut,
         MessageCommon<Pb, A>: MessageCommonBits,
         B: DecodeBuf,

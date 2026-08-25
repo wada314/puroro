@@ -15,7 +15,7 @@ use ::core::ops::{Deref, DerefMut};
 use ::protobuf_core::FieldNumber;
 use ::unmanaged::UnmanagedBox;
 
-use ::puroro::{DecodeBuf, DecodeError, Message, WireType};
+use ::puroro::{DecodeBuf, DecodeError, WireType};
 
 use crate::decode;
 use crate::message_encode::MessageEncode;
@@ -27,7 +27,7 @@ use crate::fields::shared::{
     slot_init::SlotInitMut,
     value_slot::{AddressableSlot, ValueSlot, ValueSlotMutAccess},
 };
-use crate::fields::wire::singular_type::{PayloadAccess, SingularType};
+use crate::fields::wire::singular_type::{PayloadAccess, PayloadMerge, SingularType};
 
 /// Type marker for a singular nested message `M`.
 ///
@@ -52,9 +52,9 @@ impl<M> Copy for ProtoMessage<M> {}
 // when `M: DefaultIn<A>` / `DeallocateIn<A>` (generated messages impl both).
 
 impl<M, A: Allocator> AddressableSlot for UnmanagedBox<M, A> {}
-impl<M: Message + MessageEncode> SingularType for ProtoMessage<M> {}
+impl<M: MessageEncode> SingularType for ProtoMessage<M> {}
 
-impl<M: Message + MessageEncode + MessageMerge> PayloadAccess for ProtoMessage<M> {
+impl<M: MessageEncode> PayloadAccess for ProtoMessage<M> {
     type Slot<A: Allocator> = UnmanagedBox<M, A>;
     type Mut<'a, A: Allocator>
         = &'a mut M
@@ -137,7 +137,9 @@ impl<M: Message + MessageEncode + MessageMerge> PayloadAccess for ProtoMessage<M
             unsafe { DeallocateIn::deallocate_in(old, &alloc) };
         }
     }
+}
 
+impl<M: MessageEncode + MessageMerge> PayloadMerge for ProtoMessage<M> {
     fn merge<A, VS, I, Pb, B>(
         slot: &mut VS,
         init: I,
@@ -149,8 +151,8 @@ impl<M: Message + MessageEncode + MessageMerge> PayloadAccess for ProtoMessage<M
     ) -> Result<(), DecodeError>
     where
         A: Allocator + Clone,
-        UnmanagedBox<M, A>: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
-        VS: ValueSlot<UnmanagedBox<M, A>, A>,
+        Self::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
+        VS: ValueSlot<Self::Slot<A>, A>,
         I: SlotInitMut,
         MessageCommon<Pb, A>: MessageCommonBits,
         B: DecodeBuf,

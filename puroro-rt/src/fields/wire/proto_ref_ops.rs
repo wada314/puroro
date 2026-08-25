@@ -5,8 +5,6 @@
 use ::allocator_api2::alloc::Allocator;
 use ::core::fmt::{Debug, Formatter, Result as FmtResult};
 
-use ::puroro::Message;
-
 use super::len::{BytesCodec, LenScalar, StringCodec};
 use super::numerical::{Numerical, NumericalType};
 use super::proto_message::ProtoMessage;
@@ -119,7 +117,7 @@ impl<A: Allocator> ProtoRefDebug<A> for LenScalar<BytesCodec> {
 /// Nested messages: bound is `M: PartialEq` / `Debug` (no `A: 'static` HRTB).
 impl<M, A> ProtoRefEq<A> for ProtoMessage<M>
 where
-    M: Message<Alloc = A> + MessageEncode + PartialEq,
+    M: MessageEncode + PartialEq,
     A: Allocator,
 {
     #[inline]
@@ -133,7 +131,7 @@ where
 
 impl<M, A> ProtoRefDebug<A> for ProtoMessage<M>
 where
-    M: Message<Alloc = A> + MessageEncode + Debug,
+    M: MessageEncode + Debug,
     A: Allocator,
 {
     #[inline]

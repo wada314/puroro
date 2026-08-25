@@ -165,7 +165,9 @@ impl<B, A: Allocator + Clone> MessageCommon<B, A> {
             alloc,
         }
     }
+}
 
+impl<B, A: Allocator> MessageCommon<B, A> {
     /// Iterates preserved unknown fields as structured views.
     ///
     /// Storage remains a contiguous wire blob; this only parses it for the
@@ -180,9 +182,7 @@ impl<B, A: Allocator + Clone> MessageCommon<B, A> {
     pub fn unknown_fields_eq(&self, other: &Self) -> bool {
         self.unknown_fields.as_ref() == other.unknown_fields.as_ref()
     }
-}
 
-impl<B, A: Allocator> MessageCommon<B, A> {
     /// Releases the unknown-field buffer. Must be called exactly once from the
     /// owning message's `Drop`; afterwards `self` must not be used.
     pub fn deallocate(&mut self) {

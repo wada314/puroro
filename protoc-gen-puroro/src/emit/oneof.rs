@@ -243,7 +243,7 @@ fn render_module_body(oneof: &OneofEmit, bits_ty: &TokenStream) -> Result<TokenS
             let alias = &v.field_alias;
             let field_const = &v.field_const;
             quote! {
-                impl<A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone>
+                impl<A: ::allocator_api2::alloc::Allocator>
                     ::puroro_rt::OneofVariant<{ super::#field_const }> for #storage_name<A>
                 {
                     type Value = #alias<A>;
@@ -326,7 +326,7 @@ fn render_module_body(oneof: &OneofEmit, bits_ty: &TokenStream) -> Result<TokenS
 
         pub(crate) type #storage_name<A> = #shape_name<#(#storage_args),*>;
 
-        impl<A: Allocator + ::core::clone::Clone> OneofGroup for #storage_name<A> {
+        impl<A: Allocator> OneofGroup for #storage_name<A> {
             type Case = #case_name;
             type Ref<'a>
                 = #shape_name<#(#ref_tys),*>
@@ -357,7 +357,10 @@ fn render_module_body(oneof: &OneofEmit, bits_ty: &TokenStream) -> Result<TokenS
             fn to_mut<'a>(
                 storage: &'a mut Self,
                 common: &'a mut MessageCommon<Self::Bits, Self::Alloc>,
-            ) -> Self::Mut<'a> {
+            ) -> Self::Mut<'a>
+            where
+                A: ::core::clone::Clone,
+            {
                 match storage {
                     #(#to_mut_arms)*
                 }
@@ -367,7 +370,10 @@ fn render_module_body(oneof: &OneofEmit, bits_ty: &TokenStream) -> Result<TokenS
                 storage: &Self,
                 common: &MessageCommon<Self::Bits, Self::Alloc>,
                 alloc: Self::Alloc,
-            ) -> Self {
+            ) -> Self
+            where
+                A: ::core::clone::Clone,
+            {
                 match storage {
                     #(#clone_arms)*
                 }
@@ -376,7 +382,7 @@ fn render_module_body(oneof: &OneofEmit, bits_ty: &TokenStream) -> Result<TokenS
 
         #(#oneof_variant_impls)*
 
-        impl<A: Allocator + ::core::clone::Clone> OneofEncodable<A> for #storage_name<A> {
+        impl<A: Allocator> OneofEncodable<A> for #storage_name<A> {
             fn encoded_len<P>(
                 &self,
                 common: &MessageCommon<P, A>,
@@ -404,7 +410,7 @@ fn render_module_body(oneof: &OneofEmit, bits_ty: &TokenStream) -> Result<TokenS
             }
         }
 
-        impl<A: Allocator + ::core::clone::Clone, P> OneofDeallocate<MessageCommon<P, A>>
+        impl<A: Allocator, P> OneofDeallocate<MessageCommon<P, A>>
             for #storage_name<A>
         where
             MessageCommon<P, A>: MessageCommonBits,
@@ -419,7 +425,7 @@ fn render_module_body(oneof: &OneofEmit, bits_ty: &TokenStream) -> Result<TokenS
 }
 
 /// Group getter / clear + per-variant accessors for the parent message.
-pub(super) fn render_accessors(oneof: &OneofEmit, companion: &Ident) -> TokenStream {
+pub(super) fn render_accessors(oneof: &OneofEmit, companion: &Ident) -> (TokenStream, TokenStream) {
     let name = &oneof.name;
     let name_str = &oneof.name_str;
     let name_mut = Ident::new(&format!("{name_str}_mut"), name.span());
@@ -442,7 +448,8 @@ pub(super) fn render_accessors(oneof: &OneofEmit, companion: &Ident) -> TokenStr
         })
         .collect();
 
-    let mut variant_accessors = Vec::new();
+    let mut variant_getters = Vec::new();
+    let mut variant_mutators = Vec::new();
     for v in &oneof.variants {
         let vname = &v.name;
         let vname_str = &v.name_str;
@@ -453,14 +460,15 @@ pub(super) fn render_accessors(oneof: &OneofEmit, companion: &Ident) -> TokenStr
         let group = name;
 
         if v.is_message {
-            variant_accessors.push(quote! {
+            variant_getters.push(quote! {
                 pub fn #vname(&self) -> ::core::option::Option<&#mut_target> {
                     self.#group
                         .bind(&self._common)
                         .variant_of::<{ #companion::#field_const }>()
                         .get()
                 }
-
+            });
+            variant_mutators.push(quote! {
                 pub fn #vname_mut(&mut self) -> &mut #mut_target {
                     self.#group
                         .bind_mut(&mut self._common)
@@ -470,17 +478,7 @@ pub(super) fn render_accessors(oneof: &OneofEmit, companion: &Ident) -> TokenStr
                 }
             });
         } else {
-            let mut_ret = v.mut_style.return_ty(&parse_quote! { 's }, mut_target);
-            let mutator = quote! {
-                pub fn #vname_mut<'s>(&'s mut self) -> #mut_ret {
-                    self.#group
-                        .bind_mut(&mut self._common)
-                        .variant_mut::<{ #companion::#field_const }>()
-                        .bind_mut(&mut self._common)
-                        .value_mut()
-                }
-            };
-            variant_accessors.push(quote! {
+            variant_getters.push(quote! {
                 pub fn #vname<'a>(
                     &'a self,
                 ) -> ::puroro::Optional<#optional_ty, impl ::puroro::HasDefault<#optional_ty>>
@@ -492,13 +490,21 @@ pub(super) fn render_accessors(oneof: &OneofEmit, companion: &Ident) -> TokenStr
                         .variant_of::<{ #companion::#field_const }>()
                         .optional()
                 }
-
-                #mutator
+            });
+            let mut_ret = v.mut_style.return_ty(&parse_quote! { 's }, mut_target);
+            variant_mutators.push(quote! {
+                pub fn #vname_mut<'s>(&'s mut self) -> #mut_ret {
+                    self.#group
+                        .bind_mut(&mut self._common)
+                        .variant_mut::<{ #companion::#field_const }>()
+                        .bind_mut(&mut self._common)
+                        .value_mut()
+                }
             });
         }
     }
 
-    quote! {
+    let getters = quote! {
         pub fn #name<'a>(
             &'a self,
         ) -> impl ::puroro::OneofView<
@@ -508,6 +514,9 @@ pub(super) fn render_accessors(oneof: &OneofEmit, companion: &Ident) -> TokenStr
             ::puroro_rt::OneofView::<#companion::#storage_name<A>>::new(&self.#name, &self._common)
         }
 
+        #(#variant_getters)*
+    };
+    let mutators = quote! {
         pub fn #name_mut<'a>(&'a mut self) -> impl ::puroro::OneofViewMut<Case = #companion::#case_name> + 'a {
             ::puroro_rt::OneofViewMut::<#companion::#storage_name<A>>::new(
                 &mut self.#name,
@@ -519,8 +528,9 @@ pub(super) fn render_accessors(oneof: &OneofEmit, companion: &Ident) -> TokenStr
             ::puroro::OneofViewMut::clear(self.#name_mut());
         }
 
-        #(#variant_accessors)*
-    }
+        #(#variant_mutators)*
+    };
+    (getters, mutators)
 }
 
 /// Merge arms for every variant field number.

@@ -131,7 +131,7 @@ pub(crate) type NotificationStorage<A> = Notification<
     UrgentField<A>,
 >;
 
-impl<A: Allocator + Clone> OneofGroup for NotificationStorage<A> {
+impl<A: Allocator> OneofGroup for NotificationStorage<A> {
     type Case = NotificationCase;
     type Ref<'a>
         = Notification<&'a str, &'a str, i32, &'a Address<A>, bool>
@@ -176,7 +176,10 @@ impl<A: Allocator + Clone> OneofGroup for NotificationStorage<A> {
     fn to_mut<'a>(
         storage: &'a mut Self,
         common: &'a mut MessageCommon<Self::Bits, Self::Alloc>,
-    ) -> Self::Mut<'a> {
+    ) -> Self::Mut<'a>
+    where
+        A: Clone,
+    {
         match storage {
             Self::EmailAddress(f) => Notification::EmailAddress(f.value_mut(common)),
             Self::PhoneNumber(f) => Notification::PhoneNumber(f.value_mut(common)),
@@ -190,7 +193,10 @@ impl<A: Allocator + Clone> OneofGroup for NotificationStorage<A> {
         storage: &Self,
         common: &MessageCommon<Self::Bits, Self::Alloc>,
         alloc: Self::Alloc,
-    ) -> Self {
+    ) -> Self
+    where
+        A: Clone,
+    {
         match storage {
             Self::EmailAddress(f) => {
                 Self::EmailAddress(FieldCloneIn::clone_field(f, common, alloc))
@@ -203,7 +209,7 @@ impl<A: Allocator + Clone> OneofGroup for NotificationStorage<A> {
     }
 }
 
-impl<A: Allocator + Clone> OneofVariant<{ super::FIELD_EMAIL_ADDRESS }> for NotificationStorage<A> {
+impl<A: Allocator> OneofVariant<{ super::FIELD_EMAIL_ADDRESS }> for NotificationStorage<A> {
     type Value = EmailAddressField<A>;
 
     fn variant_ref(&self) -> Option<&Self::Value> {
@@ -225,7 +231,7 @@ impl<A: Allocator + Clone> OneofVariant<{ super::FIELD_EMAIL_ADDRESS }> for Noti
     }
 }
 
-impl<A: Allocator + Clone> OneofVariant<{ super::FIELD_PHONE_NUMBER }> for NotificationStorage<A> {
+impl<A: Allocator> OneofVariant<{ super::FIELD_PHONE_NUMBER }> for NotificationStorage<A> {
     type Value = PhoneNumberField<A>;
 
     fn variant_ref(&self) -> Option<&Self::Value> {
@@ -247,7 +253,7 @@ impl<A: Allocator + Clone> OneofVariant<{ super::FIELD_PHONE_NUMBER }> for Notif
     }
 }
 
-impl<A: Allocator + Clone> OneofVariant<{ super::FIELD_WEBHOOK_ID }> for NotificationStorage<A> {
+impl<A: Allocator> OneofVariant<{ super::FIELD_WEBHOOK_ID }> for NotificationStorage<A> {
     type Value = WebhookIdField<A>;
 
     fn variant_ref(&self) -> Option<&Self::Value> {
@@ -269,7 +275,7 @@ impl<A: Allocator + Clone> OneofVariant<{ super::FIELD_WEBHOOK_ID }> for Notific
     }
 }
 
-impl<A: Allocator + Clone> OneofVariant<{ super::FIELD_POSTAL }> for NotificationStorage<A> {
+impl<A: Allocator> OneofVariant<{ super::FIELD_POSTAL }> for NotificationStorage<A> {
     type Value = PostalField<A>;
 
     fn variant_ref(&self) -> Option<&Self::Value> {
@@ -291,7 +297,7 @@ impl<A: Allocator + Clone> OneofVariant<{ super::FIELD_POSTAL }> for Notificatio
     }
 }
 
-impl<A: Allocator + Clone> OneofVariant<{ super::FIELD_URGENT }> for NotificationStorage<A> {
+impl<A: Allocator> OneofVariant<{ super::FIELD_URGENT }> for NotificationStorage<A> {
     type Value = UrgentField<A>;
 
     fn variant_ref(&self) -> Option<&Self::Value> {
@@ -313,7 +319,7 @@ impl<A: Allocator + Clone> OneofVariant<{ super::FIELD_URGENT }> for Notificatio
     }
 }
 
-impl<A: Allocator + Clone> OneofEncodable<A> for NotificationStorage<A> {
+impl<A: Allocator> OneofEncodable<A> for NotificationStorage<A> {
     fn encoded_len<P>(
         &self,
         common: &MessageCommon<P, A>,
@@ -349,7 +355,7 @@ impl<A: Allocator + Clone> OneofEncodable<A> for NotificationStorage<A> {
     }
 }
 
-impl<A: Allocator + Clone, P> OneofDeallocate<MessageCommon<P, A>> for NotificationStorage<A>
+impl<A: Allocator, P> OneofDeallocate<MessageCommon<P, A>> for NotificationStorage<A>
 where
     MessageCommon<P, A>: MessageCommonBits,
 {

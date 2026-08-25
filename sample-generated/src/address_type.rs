@@ -29,7 +29,7 @@ use crate::address::{
 // Message struct
 // ---------------------------------------------------------------------------
 
-pub struct Address<A: Allocator + Clone = Global> {
+pub struct Address<A: Allocator = Global> {
     _common: MessageCommon<BitArray<[u8; 1], Lsb0>, A>,
     street: SingularField<
         ProtoString,
@@ -50,37 +50,13 @@ pub struct Address<A: Allocator + Clone = Global> {
     latitude: SingularField<ProtoDouble, Explicit<{ BIT_LATITUDE }>, { FIELD_LATITUDE }, A>, // proto: double latitude = 4;
 }
 
-impl<A: Allocator + Clone> Address<A> {
-    pub fn new_in(alloc: A) -> Self {
-        // Each field initializer gets its own clone of the allocator; the last
-        // heap field takes the original by move.
-        Self {
-            _common: MessageCommon::new_in(BitArray::ZERO, alloc.clone()),
-            street: SingularField::new_in(alloc.clone()),
-            city: SingularField::new_in(alloc.clone()),
-            postal_code: SingularField::new_in(alloc.clone()),
-            latitude: SingularField::new_in(alloc),
-        }
-    }
-
-    // -- street (EXPLICIT string, proto field 1) ----------------------------
-
+impl<A: Allocator> Address<A> {
     pub fn street<'a>(&'a self) -> ::puroro::Optional<&'a str, impl ::puroro::HasDefault<&'a str>>
     where
         A: 'a,
     {
         self.street.bind(&self._common).optional()
     }
-
-    pub fn street_mut(&mut self) -> impl ::puroro::StringMut<A> + '_ {
-        self.street.bind_mut(&mut self._common).value_mut()
-    }
-
-    pub fn clear_street(&mut self) {
-        self.street.bind_mut(&mut self._common).clear();
-    }
-
-    // -- city (EXPLICIT string, proto field 2) ------------------------------
 
     pub fn city<'a>(&'a self) -> ::puroro::Optional<&'a str, impl ::puroro::HasDefault<&'a str>>
     where
@@ -89,32 +65,12 @@ impl<A: Allocator + Clone> Address<A> {
         self.city.bind(&self._common).optional()
     }
 
-    pub fn city_mut(&mut self) -> impl ::puroro::StringMut<A> + '_ {
-        self.city.bind_mut(&mut self._common).value_mut()
-    }
-
-    pub fn clear_city(&mut self) {
-        self.city.bind_mut(&mut self._common).clear();
-    }
-
-    // -- postal_code (EXPLICIT fixed32, proto field 3) ----------------------
-
     pub fn postal_code<'a>(&'a self) -> ::puroro::Optional<u32, impl ::puroro::HasDefault<u32>>
     where
         A: 'a,
     {
         self.postal_code.bind(&self._common).optional()
     }
-
-    pub fn postal_code_mut(&mut self) -> impl DerefMut<Target = u32> + '_ {
-        self.postal_code.bind_mut(&mut self._common).value_mut()
-    }
-
-    pub fn clear_postal_code(&mut self) {
-        self.postal_code.bind_mut(&mut self._common).clear();
-    }
-
-    // -- latitude (EXPLICIT double, proto field 4) --------------------------
 
     pub fn latitude<'a>(&'a self) -> ::puroro::Optional<f64, impl ::puroro::HasDefault<f64>>
     where
@@ -123,20 +79,6 @@ impl<A: Allocator + Clone> Address<A> {
         self.latitude.bind(&self._common).optional()
     }
 
-    pub fn latitude_mut(&mut self) -> impl DerefMut<Target = f64> + '_ {
-        self.latitude.bind_mut(&mut self._common).value_mut()
-    }
-
-    pub fn clear_latitude(&mut self) {
-        self.latitude.bind_mut(&mut self._common).clear();
-    }
-
-    // -- field visitors (scalar/pair × shared/mut) --------------------------
-    // Visitors capture `MessageCommon` at construction; these methods only
-    // enumerate field slots.
-
-    /// Scalar / shared.
-    // Internal field walks for codec / Clone / Eq / Drop — not public API.
     fn visit_fields<V: FieldVisitor<MessageCommon<BitArray<[u8; 1], Lsb0>, A>>>(
         &self,
         v: &mut V,
@@ -166,7 +108,10 @@ impl<A: Allocator + Clone> Address<A> {
         &self,
         dst: &mut Self,
         v: &mut V,
-    ) -> ControlFlow<V::Break> {
+    ) -> ControlFlow<V::Break>
+    where
+        A: Clone,
+    {
         v.visit("street", &self.street, &mut dst.street)?;
         v.visit("city", &self.city, &mut dst.city)?;
         v.visit("postal_code", &self.postal_code, &mut dst.postal_code)?;
@@ -184,6 +129,60 @@ impl<A: Allocator + Clone> Address<A> {
         v.visit("postal_code", &mut self.postal_code)?;
         v.visit("latitude", &mut self.latitude)?;
         ControlFlow::Continue(())
+    }
+}
+
+impl<A: Allocator + Clone> Address<A> {
+    pub fn new_in(alloc: A) -> Self {
+        // Each field initializer gets its own clone of the allocator; the last
+        // heap field takes the original by move.
+        Self {
+            _common: MessageCommon::new_in(BitArray::ZERO, alloc.clone()),
+            street: SingularField::new_in(alloc.clone()),
+            city: SingularField::new_in(alloc.clone()),
+            postal_code: SingularField::new_in(alloc.clone()),
+            latitude: SingularField::new_in(alloc),
+        }
+    }
+
+    // -- street (EXPLICIT string, proto field 1) ----------------------------
+
+    pub fn street_mut(&mut self) -> impl ::puroro::StringMut<A> + '_ {
+        self.street.bind_mut(&mut self._common).value_mut()
+    }
+
+    pub fn clear_street(&mut self) {
+        self.street.bind_mut(&mut self._common).clear();
+    }
+
+    // -- city (EXPLICIT string, proto field 2) ------------------------------
+
+    pub fn city_mut(&mut self) -> impl ::puroro::StringMut<A> + '_ {
+        self.city.bind_mut(&mut self._common).value_mut()
+    }
+
+    pub fn clear_city(&mut self) {
+        self.city.bind_mut(&mut self._common).clear();
+    }
+
+    // -- postal_code (EXPLICIT fixed32, proto field 3) ----------------------
+
+    pub fn postal_code_mut(&mut self) -> impl DerefMut<Target = u32> + '_ {
+        self.postal_code.bind_mut(&mut self._common).value_mut()
+    }
+
+    pub fn clear_postal_code(&mut self) {
+        self.postal_code.bind_mut(&mut self._common).clear();
+    }
+
+    // -- latitude (EXPLICIT double, proto field 4) --------------------------
+
+    pub fn latitude_mut(&mut self) -> impl DerefMut<Target = f64> + '_ {
+        self.latitude.bind_mut(&mut self._common).value_mut()
+    }
+
+    pub fn clear_latitude(&mut self) {
+        self.latitude.bind_mut(&mut self._common).clear();
     }
 }
 
@@ -221,7 +220,7 @@ impl<A: Allocator + Clone> Clone for Address<A> {
     }
 }
 
-impl<A: Allocator + Clone> PartialEq for Address<A> {
+impl<A: Allocator> PartialEq for Address<A> {
     fn eq(&self, other: &Self) -> bool {
         matches!(
             self.visit_field_pairs(
@@ -233,7 +232,7 @@ impl<A: Allocator + Clone> PartialEq for Address<A> {
     }
 }
 
-impl<A: Allocator + Clone> fmt::Debug for Address<A> {
+impl<A: Allocator> fmt::Debug for Address<A> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut v = DebugStructVisitor::new(f.debug_struct("Address"), &self._common);
         let _ = self.visit_fields(&mut v);
@@ -245,7 +244,7 @@ impl<A: Allocator + Clone> fmt::Debug for Address<A> {
 // Drop — releases every unmanaged field through the single allocator
 // ---------------------------------------------------------------------------
 
-impl<A: Allocator + Clone> Drop for Address<A> {
+impl<A: Allocator> Drop for Address<A> {
     fn drop(&mut self) {
         let mut v = FieldDeallocVisitor::new(&self._common);
         let _ = self.visit_fields_mut(&mut v);
@@ -257,7 +256,7 @@ impl<A: Allocator + Clone> Drop for Address<A> {
 // DeallocateIn — required for nested `UnmanagedBox` / catalog bounds
 // ---------------------------------------------------------------------------
 
-impl<A: Allocator + Clone> ::puroro_rt::DeallocateIn<A> for Address<A> {
+impl<A: Allocator> ::puroro_rt::DeallocateIn<A> for Address<A> {
     #[inline]
     unsafe fn deallocate_in(self, _alloc: &A) {
         // Heap is owned by `self._common.alloc`; parent-passed `alloc` is only
@@ -270,7 +269,7 @@ impl<A: Allocator + Clone> ::puroro_rt::DeallocateIn<A> for Address<A> {
 // Message
 // ---------------------------------------------------------------------------
 
-impl<A: Allocator + Clone> MessageEncode for Address<A> {
+impl<A: Allocator> MessageEncode for Address<A> {
     fn encoded_len(&self, ctx: &mut EncodeCtx) -> usize {
         let mut v = EncodedLenVisitor::new(&self._common, ctx);
         let _ = self.visit_fields(&mut v);

@@ -3,11 +3,12 @@
 //! selected by [`FieldPresence::ValueSlot`].
 //!
 //! [`ValueSlot`] is implemented for raw `T`, [`MaybeUninit<T>`], and [`Option<T>`]
-//! when `T` implements [`DefaultIn`] for the message allocator `A`. Slot payloads
+//! when `T: AddressableSlot`. Always-init construction ([`ValueSlotNew`]) needs
+//! [`DefaultIn`] for raw `T` only. Slot payloads
 //! are physical storage (`i32`, `()`, SSO slots, [`UnmanagedBox`](::unmanaged::UnmanagedBox),
 //! …); logical bit-packed bool values live in [`MessageCommon`](super::MessageCommon).
 //!
-//! Construction uses [`DefaultIn`](super::DefaultIn). Message Drop / clone of a
+//! Construction uses [`ValueSlotNew::new_in`](ValueSlotNew::new_in). Message Drop / clone of a
 //! slot go through [`take_value`](ValueSlot::take_value) /
 //! [`get_value`](ValueSlot::get_value) / [`from_optional`](ValueSlot::from_optional);
 //! how the live payload is freed or deep-copied is decided by
@@ -59,13 +60,6 @@ where
     T: AddressableSlot,
     A: Allocator,
 {
-    /// Creates value storage when the parent message is constructed.
-    ///
-    /// For raw `T`, returns [`DefaultIn::default_in`] — the slot is always
-    /// initialized. For [`MaybeUninit`], returns [`MaybeUninit::uninit`] and
-    /// ignores `alloc` — the slot starts absent.
-    fn new_in(alloc: A) -> Self;
-
     /// Extracts a live payload, if any.
     ///
     /// `initialized` is ignored for always-present / pointer-present slots
@@ -97,6 +91,21 @@ where
     ) -> impl ValueSlotMutAccess<'a, T, A>
     where
         MessageCommon<Pb, A>: MessageCommonBits;
+}
+
+/// Allocator-aware slot construction. Separate from [`ValueSlot`] so always-init
+/// `T` can be *named* without [`DefaultIn`] (oneof nested messages).
+pub trait ValueSlotNew<T, A>: ValueSlot<T, A>
+where
+    T: AddressableSlot,
+    A: Allocator,
+{
+    /// Creates value storage when the parent message is constructed.
+    ///
+    /// For raw `T`, returns [`DefaultIn::default_in`] — the slot is always
+    /// initialized. For [`MaybeUninit`], returns [`MaybeUninit::uninit`] and
+    /// ignores `alloc` — the slot starts absent.
+    fn new_in(alloc: A) -> Self;
 }
 
 /// Read ops on a value-slot view whose physical payload type is `T`.
@@ -264,13 +273,9 @@ where
 
 impl<T, A> ValueSlot<T, A> for T
 where
-    T: AddressableSlot + DefaultIn<A>,
+    T: AddressableSlot,
     A: Allocator,
 {
-    fn new_in(alloc: A) -> Self {
-        T::default_in(alloc)
-    }
-
     #[inline]
     fn take_value(self, _: bool) -> Option<T> {
         Some(self)
@@ -321,15 +326,21 @@ where
     }
 }
 
+impl<T, A> ValueSlotNew<T, A> for T
+where
+    T: AddressableSlot + DefaultIn<A>,
+    A: Allocator,
+{
+    fn new_in(alloc: A) -> Self {
+        T::default_in(alloc)
+    }
+}
+
 impl<T, A> ValueSlot<T, A> for MaybeUninit<T>
 where
     T: AddressableSlot,
     A: Allocator,
 {
-    fn new_in(_alloc: A) -> Self {
-        MaybeUninit::uninit()
-    }
-
     #[inline]
     fn take_value(self, initialized: bool) -> Option<T> {
         if initialized {
@@ -393,6 +404,16 @@ where
     }
 }
 
+impl<T, A> ValueSlotNew<T, A> for MaybeUninit<T>
+where
+    T: AddressableSlot,
+    A: Allocator,
+{
+    fn new_in(_alloc: A) -> Self {
+        MaybeUninit::uninit()
+    }
+}
+
 impl<'s, T, I: SlotInitView, Pb, A: Allocator> ValueSlotRefAccess<'s, T>
     for ValueSlotRef<'s, Option<T>, T, I, Pb, A>
 where
@@ -439,10 +460,6 @@ where
     T: AddressableSlot,
     A: Allocator,
 {
-    fn new_in(_alloc: A) -> Self {
-        None
-    }
-
     #[inline]
     fn take_value(self, _: bool) -> Option<T> {
         self
@@ -490,5 +507,15 @@ where
             common,
             _t: PhantomData,
         }
+    }
+}
+
+impl<T, A> ValueSlotNew<T, A> for Option<T>
+where
+    T: AddressableSlot,
+    A: Allocator,
+{
+    fn new_in(_alloc: A) -> Self {
+        None
     }
 }

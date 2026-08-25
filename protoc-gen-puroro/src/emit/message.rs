@@ -226,6 +226,8 @@ pub(super) fn render_items(
     let struct_fields = render_struct_fields(&fields, companion);
     let new_in_fields = render_new_in_fields(&fields);
     let accessors = render_accessors(&fields, companion);
+    let getters = &accessors.getters;
+    let mutators = &accessors.mutators;
     let visit_shared = render_visit_calls(&fields, VisitKind::Shared);
     let visit_pair = render_visit_calls(&fields, VisitKind::Pair);
     let visit_pair_mut = render_visit_calls(&fields, VisitKind::PairMut);
@@ -245,25 +247,14 @@ pub(super) fn render_items(
         // @generated message body from protoc-gen-puroro.
 
         pub struct #name<
-            A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone =
-                ::allocator_api2::alloc::Global,
+            A: ::allocator_api2::alloc::Allocator = ::allocator_api2::alloc::Global,
         > {
             _common: ::puroro_rt::MessageCommon<#bits_ty, A>,
             #(#struct_fields)*
         }
 
-        impl<A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone> #name<A> {
-            pub fn new_in(alloc: A) -> Self {
-                Self {
-                    _common: ::puroro_rt::MessageCommon::new_in(
-                        ::bitvec::array::BitArray::ZERO,
-                        alloc.clone(),
-                    ),
-                    #(#new_in_fields)*
-                }
-            }
-
-            #(#accessors)*
+        impl<A: ::allocator_api2::alloc::Allocator> #name<A> {
+            #(#getters)*
 
             // Internal field walks for codec / Clone / Eq / Drop — not part of the
             // public message API (must not surface `puroro_rt` in pub signatures).
@@ -292,7 +283,10 @@ pub(super) fn render_items(
                 &self,
                 #[allow(unused)] dst: &mut Self,
                 #[allow(unused)] v: &mut V,
-            ) -> ::core::ops::ControlFlow<V::Break> {
+            ) -> ::core::ops::ControlFlow<V::Break>
+            where
+                A: ::core::clone::Clone,
+            {
                 #(#visit_pair_mut)*
                 ::core::ops::ControlFlow::Continue(())
             }
@@ -306,6 +300,20 @@ pub(super) fn render_items(
                 #(#visit_mut)*
                 ::core::ops::ControlFlow::Continue(())
             }
+        }
+
+        impl<A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone> #name<A> {
+            pub fn new_in(alloc: A) -> Self {
+                Self {
+                    _common: ::puroro_rt::MessageCommon::new_in(
+                        ::bitvec::array::BitArray::ZERO,
+                        alloc.clone(),
+                    ),
+                    #(#new_in_fields)*
+                }
+            }
+
+            #(#mutators)*
         }
 
         impl #name<::allocator_api2::alloc::Global> {
@@ -344,7 +352,7 @@ pub(super) fn render_items(
             }
         }
 
-        impl<A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone> ::core::cmp::PartialEq
+        impl<A: ::allocator_api2::alloc::Allocator> ::core::cmp::PartialEq
             for #name<A>
         {
             fn eq(&self, other: &Self) -> bool {
@@ -358,7 +366,7 @@ pub(super) fn render_items(
             }
         }
 
-        impl<A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone> ::core::fmt::Debug
+        impl<A: ::allocator_api2::alloc::Allocator> ::core::fmt::Debug
             for #name<A>
         {
             fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
@@ -369,7 +377,7 @@ pub(super) fn render_items(
             }
         }
 
-        impl<A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone> ::core::ops::Drop
+        impl<A: ::allocator_api2::alloc::Allocator> ::core::ops::Drop
             for #name<A>
         {
             fn drop(&mut self) {
@@ -379,7 +387,7 @@ pub(super) fn render_items(
             }
         }
 
-        impl<A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone> ::puroro_rt::DeallocateIn<A>
+        impl<A: ::allocator_api2::alloc::Allocator> ::puroro_rt::DeallocateIn<A>
             for #name<A>
         {
             #[inline]
@@ -388,7 +396,7 @@ pub(super) fn render_items(
             }
         }
 
-        impl<A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone> ::puroro_rt::MessageEncode
+        impl<A: ::allocator_api2::alloc::Allocator> ::puroro_rt::MessageEncode
             for #name<A>
         {
             fn encoded_len(&self, ctx: &mut ::puroro_rt::EncodeCtx) -> usize {
@@ -1015,19 +1023,42 @@ fn render_new_in_fields(fields: &[FieldEmit]) -> Vec<TokenStream> {
         .collect()
 }
 
-fn render_accessors(fields: &[FieldEmit], companion: &Ident) -> Vec<TokenStream> {
-    fields
-        .iter()
-        .map(|field| match field {
-            FieldEmit::Repeated(field) => render_repeated_accessors(field),
-            FieldEmit::Singular(field) => render_singular_accessors(field),
-            FieldEmit::Map(field) => render_map_accessors(field),
-            FieldEmit::Oneof(o) => oneof::render_accessors(o, companion),
-        })
-        .collect()
+struct FieldAccessors {
+    getters: Vec<TokenStream>,
+    mutators: Vec<TokenStream>,
 }
 
-fn render_map_accessors(field: &MapEmit) -> TokenStream {
+fn render_accessors(fields: &[FieldEmit], companion: &Ident) -> FieldAccessors {
+    let mut getters = Vec::new();
+    let mut mutators = Vec::new();
+    for field in fields {
+        match field {
+            FieldEmit::Repeated(field) => {
+                let (g, m) = render_repeated_accessors(field);
+                getters.push(g);
+                mutators.push(m);
+            }
+            FieldEmit::Singular(field) => {
+                let (g, m) = render_singular_accessors(field);
+                getters.push(g);
+                mutators.push(m);
+            }
+            FieldEmit::Map(field) => {
+                let (g, m) = render_map_accessors(field);
+                getters.push(g);
+                mutators.push(m);
+            }
+            FieldEmit::Oneof(o) => {
+                let (g, m) = oneof::render_accessors(o, companion);
+                getters.push(g);
+                mutators.push(m);
+            }
+        }
+    }
+    FieldAccessors { getters, mutators }
+}
+
+fn render_map_accessors(field: &MapEmit) -> (TokenStream, TokenStream) {
     let name = &field.name;
     let name_mut = Ident::new(&format!("{}_mut", field.name_str), Span::call_site());
     let clear_name = Ident::new(&format!("clear_{}", field.name_str), Span::call_site());
@@ -1035,11 +1066,12 @@ fn render_map_accessors(field: &MapEmit) -> TokenStream {
     let value_view = &field.value_view;
     // Pin MutTarget so `*entry_mut(…) = …` / `push_str` resolve through `impl Trait`.
     let mut_target = field.mut_target.as_ref().unwrap_or(value_view);
-    quote! {
+    let getter = quote! {
         pub fn #name(&self) -> impl ::puroro::MapRef<#key_view, #value_view> + '_ {
             self.#name.bind(&self._common)
         }
-
+    };
+    let mutator = quote! {
         pub fn #name_mut(
             &mut self,
         ) -> impl ::puroro::MapMut<#key_view, #value_view, MutTarget = #mut_target> + '_ {
@@ -1049,10 +1081,11 @@ fn render_map_accessors(field: &MapEmit) -> TokenStream {
         pub fn #clear_name(&mut self) {
             ::puroro::MapMut::clear(&mut self.#name_mut());
         }
-    }
+    };
+    (getter, mutator)
 }
 
-fn render_repeated_accessors(field: &RepeatedEmit) -> TokenStream {
+fn render_repeated_accessors(field: &RepeatedEmit) -> (TokenStream, TokenStream) {
     let name = &field.name;
     let name_mut = Ident::new(&format!("{}_mut", field.name_str), Span::call_site());
     let clear_name = Ident::new(&format!("clear_{}", field.name_str), Span::call_site());
@@ -1062,7 +1095,7 @@ fn render_repeated_accessors(field: &RepeatedEmit) -> TokenStream {
             self.#name.bind(&self._common).as_slice()
         }
     };
-    let mutator = match field.style {
+    let mutator_body = match field.style {
         RepeatedAccessorStyle::String => quote! {
             pub fn #name_mut(&mut self) -> impl ::puroro::RepeatedStringMut<A> + '_ {
                 self.#name.bind_mut(&mut self._common).container_mut()
@@ -1081,18 +1114,17 @@ fn render_repeated_accessors(field: &RepeatedEmit) -> TokenStream {
             }
         },
     };
-    quote! {
-        #getter
-
-        #mutator
+    let mutator = quote! {
+        #mutator_body
 
         pub fn #clear_name(&mut self) {
             self.#name.bind_mut(&mut self._common).clear();
         }
-    }
+    };
+    (getter, mutator)
 }
 
-fn render_singular_accessors(field: &ScalarEmit) -> TokenStream {
+fn render_singular_accessors(field: &ScalarEmit) -> (TokenStream, TokenStream) {
     let name = &field.name;
     let name_mut = Ident::new(&format!("{}_mut", field.name_str), Span::call_site());
     let clear_name = Ident::new(&format!("clear_{}", field.name_str), Span::call_site());
@@ -1101,11 +1133,12 @@ fn render_singular_accessors(field: &ScalarEmit) -> TokenStream {
     let optional_ty = &field.optional_ty;
 
     if matches!(field.style, AccessorStyle::Message) {
-        return quote! {
+        let getter = quote! {
             pub fn #name(&self) -> ::core::option::Option<&#mut_target> {
                 self.#name.bind(&self._common).get()
             }
-
+        };
+        let mutator = quote! {
             pub fn #name_mut(&mut self) -> &mut #mut_target {
                 self.#name.bind_mut(&mut self._common).get_mut()
             }
@@ -1114,6 +1147,7 @@ fn render_singular_accessors(field: &ScalarEmit) -> TokenStream {
                 self.#name.bind_mut(&mut self._common).clear();
             }
         };
+        return (getter, mutator);
     }
 
     let getter = if field.optional_getter {
@@ -1139,17 +1173,12 @@ fn render_singular_accessors(field: &ScalarEmit) -> TokenStream {
         pub fn #name_mut<'s>(&'s mut self) -> #mut_ret {
             self.#name.bind_mut(&mut self._common).value_mut()
         }
-    };
-
-    quote! {
-        #getter
-
-        #mutator
 
         pub fn #clear_name(&mut self) {
             self.#name.bind_mut(&mut self._common).clear();
         }
-    }
+    };
+    (getter, mutator)
 }
 
 /// Rust types projected from a proto wire kind for generated signatures.

@@ -25,7 +25,7 @@ use crate::decode;
 use crate::fields::wire::len::{ProtoBytes, ProtoString};
 use crate::fields::wire::numerical::ProtoBool;
 use crate::fields::wire::numerical::{BoolCodec, NumericalType};
-use crate::fields::wire::singular_type::{PayloadAccess, SingularType};
+use crate::fields::wire::singular_type::{PayloadAccess, PayloadMerge, SingularType};
 use crate::fields::wire::sso_buf::pack_inline;
 use crate::fields::wire::sso_bytes::{SsoBytes, SsoBytesMut, pack_written as pack_written_bytes};
 use crate::fields::wire::sso_string::{
@@ -87,6 +87,21 @@ pub trait ValueLayout<T: SingularType, A: Allocator>: Copy {
         A: Clone,
         Self::Slot: DefaultIn<A>;
 
+    /// Message / oneof teardown for this field's value slot.
+    ///
+    /// `common` must be the parent [`MessageCommon`] that allocated `slot`
+    /// (same instance generated `Drop` passes as `&self._common`). The type
+    /// system does not prove this pairing; a different message's common is
+    /// unsound. SSO layouts also read the heap bit from this `common`.
+    fn deallocate_slot<VS, Pb>(slot: VS, initialized: bool, common: &MessageCommon<Pb, A>)
+    where
+        VS: ValueSlot<Self::Slot, A>,
+        MessageCommon<Pb, A>: MessageCommonBits;
+}
+
+/// Wire-decode merge for a layout. Kept off [`ValueLayout`] so nested-message
+/// [`Inline`] naming does not require [`crate::MessageMerge`].
+pub trait ValueLayoutMerge<T: SingularType, A: Allocator>: ValueLayout<T, A> {
     fn merge<VS, I, Pb, B>(
         slot: &mut VS,
         init: I,
@@ -103,17 +118,6 @@ pub trait ValueLayout<T: SingularType, A: Allocator>: Copy {
         B: DecodeBuf,
         A: Clone,
         Self::Slot: DefaultIn<A>;
-
-    /// Message / oneof teardown for this field's value slot.
-    ///
-    /// `common` must be the parent [`MessageCommon`] that allocated `slot`
-    /// (same instance generated `Drop` passes as `&self._common`). The type
-    /// system does not prove this pairing; a different message's common is
-    /// unsound. SSO layouts also read the heap bit from this `common`.
-    fn deallocate_slot<VS, Pb>(slot: VS, initialized: bool, common: &MessageCommon<Pb, A>)
-    where
-        VS: ValueSlot<Self::Slot, A>,
-        MessageCommon<Pb, A>: MessageCommonBits;
 }
 
 /// Slot deep-copy for layouts whose payload can be cloned.
@@ -199,27 +203,6 @@ where
     }
 
     #[inline]
-    fn merge<VS, I, Pb, B>(
-        slot: &mut VS,
-        init: I,
-        common: &mut MessageCommon<Pb, A>,
-        wire_type: ::puroro::WireType,
-        buf: &mut B,
-        field: FieldNumber,
-        depth: usize,
-    ) -> Result<(), DecodeError>
-    where
-        VS: ValueSlot<T::Slot<A>, A>,
-        I: SlotInitMut,
-        MessageCommon<Pb, A>: MessageCommonBits,
-        B: DecodeBuf,
-        A: Clone,
-        T::Slot<A>: DefaultIn<A>,
-    {
-        T::merge(slot, init, common, wire_type, buf, field, depth)
-    }
-
-    #[inline]
     fn deallocate_slot<VS, Pb>(slot: VS, initialized: bool, common: &MessageCommon<Pb, A>)
     where
         VS: ValueSlot<T::Slot<A>, A>,
@@ -252,6 +235,32 @@ where
             slot.get_value(initialized)
                 .map(|v| CloneIn::clone_in(v, alloc)),
         )
+    }
+}
+
+impl<T: PayloadMerge, A: Allocator> ValueLayoutMerge<T, A> for Inline
+where
+    T::Slot<A>: AddressableSlot + DeallocateIn<A>,
+{
+    #[inline]
+    fn merge<VS, I, Pb, B>(
+        slot: &mut VS,
+        init: I,
+        common: &mut MessageCommon<Pb, A>,
+        wire_type: ::puroro::WireType,
+        buf: &mut B,
+        field: FieldNumber,
+        depth: usize,
+    ) -> Result<(), DecodeError>
+    where
+        VS: ValueSlot<T::Slot<A>, A>,
+        I: SlotInitMut,
+        MessageCommon<Pb, A>: MessageCommonBits,
+        B: DecodeBuf,
+        A: Clone,
+        T::Slot<A>: DefaultIn<A>,
+    {
+        T::merge(slot, init, common, wire_type, buf, field, depth)
     }
 }
 
@@ -318,6 +327,17 @@ impl<A: Allocator, const VALUE_BIT: usize> ValueLayout<ProtoBool, A> for BitPack
     }
 
     #[inline]
+    fn deallocate_slot<VS, Pb>(slot: VS, initialized: bool, _common: &MessageCommon<Pb, A>)
+    where
+        VS: ValueSlot<(), A>,
+        MessageCommon<Pb, A>: MessageCommonBits,
+    {
+        let _ = slot.take_value(initialized);
+    }
+}
+
+impl<A: Allocator, const VALUE_BIT: usize> ValueLayoutMerge<ProtoBool, A> for BitPacked<VALUE_BIT> {
+    #[inline]
     fn merge<VS, I, Pb, B>(
         slot: &mut VS,
         init: I,
@@ -352,15 +372,6 @@ impl<A: Allocator, const VALUE_BIT: usize> ValueLayout<ProtoBool, A> for BitPack
             }
             Err(e) => Err(e),
         }
-    }
-
-    #[inline]
-    fn deallocate_slot<VS, Pb>(slot: VS, initialized: bool, _common: &MessageCommon<Pb, A>)
-    where
-        VS: ValueSlot<(), A>,
-        MessageCommon<Pb, A>: MessageCommonBits,
-    {
-        let _ = slot.take_value(initialized);
     }
 }
 
@@ -494,6 +505,23 @@ impl<A: Allocator, const HEAP_BIT: usize> ValueLayout<ProtoString, A> for Inline
     }
 
     #[inline]
+    fn deallocate_slot<VS, Pb>(slot: VS, initialized: bool, common: &MessageCommon<Pb, A>)
+    where
+        VS: ValueSlot<SsoString<A>, A>,
+        MessageCommon<Pb, A>: MessageCommonBits,
+    {
+        let is_heap = Self::is_heap(common);
+        if let Some(s) = slot.take_value(initialized) {
+            // SAFETY: HEAP_BIT / `alloc` come from this field's parent `common`.
+            unsafe { s.deallocate(is_heap, &common.alloc) };
+        }
+    }
+}
+
+impl<A: Allocator, const HEAP_BIT: usize> ValueLayoutMerge<ProtoString, A>
+    for InlineOrHeap<HEAP_BIT>
+{
+    #[inline]
     fn merge<VS, I, Pb, B>(
         slot: &mut VS,
         init: I,
@@ -524,19 +552,6 @@ impl<A: Allocator, const HEAP_BIT: usize> ValueLayout<ProtoString, A> for Inline
         }
         Self::set_heap(common, new_is_heap);
         Ok(())
-    }
-
-    #[inline]
-    fn deallocate_slot<VS, Pb>(slot: VS, initialized: bool, common: &MessageCommon<Pb, A>)
-    where
-        VS: ValueSlot<SsoString<A>, A>,
-        MessageCommon<Pb, A>: MessageCommonBits,
-    {
-        let is_heap = Self::is_heap(common);
-        if let Some(s) = slot.take_value(initialized) {
-            // SAFETY: HEAP_BIT / `alloc` come from this field's parent `common`.
-            unsafe { s.deallocate(is_heap, &common.alloc) };
-        }
     }
 }
 
@@ -634,6 +649,23 @@ impl<A: Allocator, const HEAP_BIT: usize> ValueLayout<ProtoBytes, A> for InlineO
     }
 
     #[inline]
+    fn deallocate_slot<VS, Pb>(slot: VS, initialized: bool, common: &MessageCommon<Pb, A>)
+    where
+        VS: ValueSlot<SsoBytes<A>, A>,
+        MessageCommon<Pb, A>: MessageCommonBits,
+    {
+        let is_heap = Self::is_heap(common);
+        if let Some(s) = slot.take_value(initialized) {
+            // SAFETY: HEAP_BIT / `alloc` come from this field's parent `common`.
+            unsafe { s.deallocate(is_heap, &common.alloc) };
+        }
+    }
+}
+
+impl<A: Allocator, const HEAP_BIT: usize> ValueLayoutMerge<ProtoBytes, A>
+    for InlineOrHeap<HEAP_BIT>
+{
+    #[inline]
     fn merge<VS, I, Pb, B>(
         slot: &mut VS,
         init: I,
@@ -664,19 +696,6 @@ impl<A: Allocator, const HEAP_BIT: usize> ValueLayout<ProtoBytes, A> for InlineO
         }
         Self::set_heap(common, new_is_heap);
         Ok(())
-    }
-
-    #[inline]
-    fn deallocate_slot<VS, Pb>(slot: VS, initialized: bool, common: &MessageCommon<Pb, A>)
-    where
-        VS: ValueSlot<SsoBytes<A>, A>,
-        MessageCommon<Pb, A>: MessageCommonBits,
-    {
-        let is_heap = Self::is_heap(common);
-        if let Some(s) = slot.take_value(initialized) {
-            // SAFETY: HEAP_BIT / `alloc` come from this field's parent `common`.
-            unsafe { s.deallocate(is_heap, &common.alloc) };
-        }
     }
 }
 

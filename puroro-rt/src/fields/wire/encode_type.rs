@@ -13,7 +13,7 @@
 use ::allocator_api2::alloc::Allocator;
 use ::bytes::BufMut;
 use ::protobuf_core::{FieldNumber, Varint};
-use ::puroro::{Message, WireType};
+use ::puroro::WireType;
 
 use crate::encode;
 use crate::message_encode::{EncodeCtx, MessageEncode};
@@ -163,7 +163,7 @@ impl<C: LenCodec> EncodeType for LenScalar<C> {
     }
 }
 
-impl<M: Message + MessageEncode> EncodeType for ProtoMessage<M> {
+impl<M: MessageEncode> EncodeType for ProtoMessage<M> {
     type View<'a, A: Allocator>
         = &'a M
     where

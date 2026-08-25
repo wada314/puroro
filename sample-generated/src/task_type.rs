@@ -48,7 +48,7 @@ use crate::task::{
 // ---------------------------------------------------------------------------
 
 /// Reference `Task` message from `DESIGN.md`.
-pub struct Task<A: Allocator + Clone = Global> {
+pub struct Task<A: Allocator = Global> {
     _common: MessageCommon<BitArray<[u8; 2], Lsb0>, A>,
     title: SingularField<
         ProtoString,
@@ -108,34 +108,7 @@ pub struct Task<A: Allocator + Clone = Global> {
     attributes: MapField<ProtoString, ProtoInt32, { FIELD_ATTRIBUTES }, A>, // proto: map<string, int32> attributes = 21;
 }
 
-impl<A: Allocator + Clone> Task<A> {
-    pub fn new_in(alloc: A) -> Self {
-        // Each field initializer gets its own clone of the allocator; the last
-        // heap field (`attributes`) takes the original by move.
-        Self {
-            _common: MessageCommon::new_in(BitArray::ZERO, alloc.clone()),
-            title: SingularField::new_in(alloc.clone()),
-            score: SingularField::new_in(alloc.clone()),
-            max_retries: SingularField::new_in(alloc.clone()),
-            owner_id: SingularField::new_in(alloc.clone()),
-            payload: SingularField::new_in(alloc.clone()),
-            tag_ids: RepeatedField::new_in(alloc.clone()),
-            scores: RepeatedField::new_in(alloc.clone()),
-            labels: RepeatedField::new_in(alloc.clone()),
-            status: SingularField::new_in(alloc.clone()),
-            priority: SingularField::new_in(alloc.clone()),
-            assignee: SingularField::new_in(alloc.clone()),
-            notification: OneofSlot::new_in(alloc.clone()),
-            done: SingularField::new_in(alloc.clone()),
-            flag: SingularField::new_in(alloc.clone()),
-            watchers: RepeatedField::new_in(alloc.clone()),
-            votes: RepeatedField::new_in(alloc.clone()),
-            attributes: MapField::new_in(alloc),
-        }
-    }
-
-    // -- title (EXPLICIT string, proto field 1) ----------------------------
-
+impl<A: Allocator> Task<A> {
     pub fn title<'a>(&'a self) -> Optional<&'a str, impl HasDefault<&'a str>>
     where
         A: 'a,
@@ -143,29 +116,9 @@ impl<A: Allocator + Clone> Task<A> {
         self.title.bind(&self._common).optional()
     }
 
-    pub fn title_mut(&mut self) -> impl ::puroro::StringMut<A> + '_ {
-        self.title.bind_mut(&mut self._common).value_mut()
-    }
-
-    pub fn clear_title(&mut self) {
-        self.title.bind_mut(&mut self._common).clear();
-    }
-
-    // -- score (IMPLICIT int32, proto field 2) ------------------------------
-
     pub fn score(&self) -> i32 {
         self.score.bind(&self._common).value()
     }
-
-    pub fn score_mut(&mut self) -> impl DerefMut<Target = i32> + '_ {
-        self.score.bind_mut(&mut self._common).value_mut()
-    }
-
-    pub fn clear_score(&mut self) {
-        self.score.bind_mut(&mut self._common).clear();
-    }
-
-    // -- max_retries (EXPLICIT int32, default = 3, proto field 3) ------------
 
     pub fn max_retries<'a>(&'a self) -> Optional<i32, impl HasDefault<i32>>
     where
@@ -174,32 +127,12 @@ impl<A: Allocator + Clone> Task<A> {
         self.max_retries.bind(&self._common).optional()
     }
 
-    pub fn max_retries_mut(&mut self) -> impl DerefMut<Target = i32> + '_ {
-        self.max_retries.bind_mut(&mut self._common).value_mut()
-    }
-
-    pub fn clear_max_retries(&mut self) {
-        self.max_retries.bind_mut(&mut self._common).clear();
-    }
-
-    // -- owner_id (LEGACY_REQUIRED string, proto field 4) --------------------
-
     pub fn owner_id<'a>(&'a self) -> Optional<&'a str, impl HasDefault<&'a str>>
     where
         A: 'a,
     {
         self.owner_id.bind(&self._common).optional()
     }
-
-    pub fn owner_id_mut(&mut self) -> impl ::puroro::StringMut<A> + '_ {
-        self.owner_id.bind_mut(&mut self._common).value_mut()
-    }
-
-    pub fn clear_owner_id(&mut self) {
-        self.owner_id.bind_mut(&mut self._common).clear();
-    }
-
-    // -- payload (EXPLICIT bytes, proto field 5) -----------------------------
 
     pub fn payload<'a>(&'a self) -> Optional<&'a [u8], impl HasDefault<&'a [u8]>>
     where
@@ -208,59 +141,17 @@ impl<A: Allocator + Clone> Task<A> {
         self.payload.bind(&self._common).optional()
     }
 
-    pub fn payload_mut(&mut self) -> impl ::puroro::BytesMut<A> + '_ {
-        self.payload.bind_mut(&mut self._common).value_mut()
-    }
-
-    pub fn clear_payload(&mut self) {
-        self.payload.bind_mut(&mut self._common).clear();
-    }
-
-    // -- tag_ids (repeated int32 PACKED, proto field 6) ----------------------
-
     pub fn tag_ids(&self) -> &[i32] {
         self.tag_ids.bind(&self._common).as_slice()
     }
-
-    pub fn tag_ids_mut<'s>(&'s mut self) -> impl DerefMut<Target = AllocVec<i32, A>> + 's {
-        self.tag_ids.bind_mut(&mut self._common).values_mut()
-    }
-
-    pub fn clear_tag_ids(&mut self) {
-        self.tag_ids.bind_mut(&mut self._common).clear();
-    }
-
-    // -- scores (repeated int32 EXPANDED, proto field 7) ---------------------
 
     pub fn scores(&self) -> &[i32] {
         self.scores.bind(&self._common).as_slice()
     }
 
-    pub fn scores_mut<'s>(&'s mut self) -> impl DerefMut<Target = AllocVec<i32, A>> + 's {
-        self.scores.bind_mut(&mut self._common).values_mut()
-    }
-
-    pub fn clear_scores(&mut self) {
-        self.scores.bind_mut(&mut self._common).clear();
-    }
-
-    // -- labels (repeated string, proto field 8) -----------------------------
-
     pub fn labels(&self) -> &[impl Deref<Target = str>] {
         self.labels.bind(&self._common).as_slice()
     }
-
-    /// Container mutator: `push()` appends an empty string and returns a
-    /// [`::puroro::String`] handle.
-    pub fn labels_mut(&mut self) -> impl RepeatedStringMut<A> + '_ {
-        self.labels.bind_mut(&mut self._common).container_mut()
-    }
-
-    pub fn clear_labels(&mut self) {
-        self.labels.bind_mut(&mut self._common).clear();
-    }
-
-    // -- status (IMPLICIT open enum, proto field 9) -------------------------
 
     pub fn status<'a>(&'a self) -> Optional<Status, impl HasDefault<Status>>
     where
@@ -269,16 +160,6 @@ impl<A: Allocator + Clone> Task<A> {
         self.status.bind(&self._common).optional()
     }
 
-    pub fn status_mut(&mut self) -> impl DerefMut<Target = Status> + '_ {
-        self.status.bind_mut(&mut self._common).value_mut()
-    }
-
-    pub fn clear_status(&mut self) {
-        self.status.bind_mut(&mut self._common).clear();
-    }
-
-    // -- priority (EXPLICIT closed enum, proto field 10) ---------------------
-
     pub fn priority<'a>(&'a self) -> Optional<Priority, impl HasDefault<Priority>>
     where
         A: 'a,
@@ -286,43 +167,13 @@ impl<A: Allocator + Clone> Task<A> {
         self.priority.bind(&self._common).optional()
     }
 
-    pub fn priority_mut(&mut self) -> impl DerefMut<Target = Priority> + '_ {
-        self.priority.bind_mut(&mut self._common).value_mut()
-    }
-
-    pub fn clear_priority(&mut self) {
-        self.priority.bind_mut(&mut self._common).clear();
-    }
-
-    // -- assignee (nested message, proto field 11) --------------------------
-
     pub fn assignee(&self) -> Option<&Address<A>> {
         self.assignee.bind(&self._common).get()
     }
 
-    pub fn assignee_mut(&mut self) -> &mut Address<A> {
-        self.assignee.bind_mut(&mut self._common).get_mut()
-    }
-
-    pub fn clear_assignee(&mut self) {
-        self.assignee.bind_mut(&mut self._common).clear();
-    }
-
-    // -- done (IMPLICIT bool, proto field 16) --------------------------------
-
     pub fn done(&self) -> bool {
         self.done.bind(&self._common).value()
     }
-
-    pub fn done_mut(&mut self) -> impl DerefMut<Target = bool> + '_ {
-        self.done.bind_mut(&mut self._common).value_mut()
-    }
-
-    pub fn clear_done(&mut self) {
-        self.done.bind_mut(&mut self._common).clear();
-    }
-
-    // -- flag (EXPLICIT bool, proto field 17) --------------------------------
 
     pub fn flag<'a>(&'a self) -> Optional<bool, impl HasDefault<bool>>
     where
@@ -331,57 +182,17 @@ impl<A: Allocator + Clone> Task<A> {
         self.flag.bind(&self._common).optional()
     }
 
-    pub fn flag_mut(&mut self) -> impl DerefMut<Target = bool> + '_ {
-        self.flag.bind_mut(&mut self._common).value_mut()
-    }
-
-    pub fn clear_flag(&mut self) {
-        self.flag.bind_mut(&mut self._common).clear();
-    }
-
-    // -- watchers (repeated Address, proto field 19) -------------------------
-
     pub fn watchers(&self) -> &[Address<A>] {
         self.watchers.bind(&self._common).as_slice()
     }
-
-    pub fn watchers_mut<'s>(&'s mut self) -> impl DerefMut<Target = AllocVec<Address<A>, A>> + 's {
-        self.watchers.bind_mut(&mut self._common).values_mut()
-    }
-
-    pub fn clear_watchers(&mut self) {
-        self.watchers.bind_mut(&mut self._common).clear();
-    }
-
-    // -- votes (repeated bool PACKED, proto field 20) ------------------------
 
     pub fn votes(&self) -> &[bool] {
         self.votes.bind(&self._common).as_slice()
     }
 
-    pub fn votes_mut<'s>(&'s mut self) -> impl DerefMut<Target = AllocVec<bool, A>> + 's {
-        self.votes.bind_mut(&mut self._common).values_mut()
-    }
-
-    pub fn clear_votes(&mut self) {
-        self.votes.bind_mut(&mut self._common).clear();
-    }
-
-    // -- attributes (map<string, int32>, proto field 21) ---------------------
-
     pub fn attributes(&self) -> impl MapRef<str, i32> + '_ {
         self.attributes.bind(&self._common)
     }
-
-    pub fn attributes_mut(&mut self) -> impl MapMut<str, i32, MutTarget = i32> + '_ {
-        self.attributes.bind_mut(&mut self._common)
-    }
-
-    pub fn clear_attributes(&mut self) {
-        MapMut::clear(&mut self.attributes_mut());
-    }
-
-    // -- oneof notification (proto fields 12 / 13 / 14 / 15 / 18) ------------
 
     /// Bound shared view of the oneof group (always available, including when unset).
     ///
@@ -395,26 +206,6 @@ impl<A: Allocator + Clone> Task<A> {
         ::puroro_rt::OneofView::<NotificationStorage<A>>::new(&self.notification, &self._common)
     }
 
-    /// Bound mutable view of the oneof group (always available, including when unset).
-    ///
-    /// Use [`OneofViewMut::as_view`] to reborrow for `case` / `as_ref` while mutating;
-    /// match shared payloads via [`Self::notification`]. Mutable projection from
-    /// [`OneofViewMut::as_mut`] is intentionally opaque (`impl` associated type) so
-    /// `puroro-rt` mut handles do not appear in this signature — prefer per-variant
-    /// `_mut` accessors for typed mutation.
-    pub fn notification_mut<'a>(&'a mut self) -> impl OneofViewMut<Case = NotificationCase> + 'a {
-        ::puroro_rt::OneofViewMut::<NotificationStorage<A>>::new(
-            &mut self.notification,
-            &mut self._common,
-        )
-    }
-
-    pub fn clear_notification(&mut self) {
-        self.notification_mut().clear();
-    }
-
-    // -- notification.email_address (string, proto field 12) ----------------
-
     pub fn email_address<'a>(&'a self) -> Optional<&'a str, impl HasDefault<&'a str>>
     where
         A: 'a,
@@ -426,16 +217,6 @@ impl<A: Allocator + Clone> Task<A> {
             .optional()
     }
 
-    pub fn email_address_mut(&mut self) -> impl ::puroro::StringMut<A> + '_ {
-        self.notification
-            .bind_mut(&mut self._common)
-            .variant_mut::<FIELD_EMAIL_ADDRESS>()
-            .bind_mut(&mut self._common)
-            .value_mut()
-    }
-
-    // -- notification.phone_number (string, proto field 13) -----------------
-
     pub fn phone_number<'a>(&'a self) -> Optional<&'a str, impl HasDefault<&'a str>>
     where
         A: 'a,
@@ -446,18 +227,6 @@ impl<A: Allocator + Clone> Task<A> {
             .optional()
     }
 
-    pub fn phone_number_mut(&mut self) -> impl ::puroro::StringMut<A> + '_ {
-        self.notification
-            .bind_mut(&mut self._common)
-            .variant_mut::<FIELD_PHONE_NUMBER>()
-            .bind_mut(&mut self._common)
-            .value_mut()
-    }
-
-    // -- notification.webhook_id (int32, default = -1, proto field 14) ------
-
-    /// `[default = -1]`: when this variant is not active, `get()` returns `-1`
-    /// and `is_set()` is false (does not select the variant).
     pub fn webhook_id<'a>(&'a self) -> Optional<i32, impl HasDefault<i32>>
     where
         A: 'a,
@@ -468,36 +237,12 @@ impl<A: Allocator + Clone> Task<A> {
             .optional()
     }
 
-    /// Switches the group to `webhook_id` (freeing any other variant) and returns
-    /// a mutable handle to the scalar.
-    pub fn webhook_id_mut(&mut self) -> impl DerefMut<Target = i32> + '_ {
-        self.notification
-            .bind_mut(&mut self._common)
-            .variant_mut::<FIELD_WEBHOOK_ID>()
-            .bind_mut(&mut self._common)
-            .value_mut()
-    }
-
-    // -- notification.postal (Address message, proto field 15) --------------
-
     pub fn postal(&self) -> Option<&Address<A>> {
         self.notification
             .bind(&self._common)
             .variant_of::<FIELD_POSTAL>()
             .get()
     }
-
-    /// Switches the group to `postal` (freeing any other variant) and returns a
-    /// mutable handle to the nested message, creating an empty one if needed.
-    pub fn postal_mut(&mut self) -> &mut Address<A> {
-        self.notification
-            .bind_mut(&mut self._common)
-            .variant_mut::<FIELD_POSTAL>()
-            .bind_mut(&mut self._common)
-            .value_mut()
-    }
-
-    // -- notification.urgent (bool, proto field 18) -------------------------
 
     pub fn urgent<'a>(&'a self) -> Optional<bool, impl HasDefault<bool>>
     where
@@ -509,20 +254,6 @@ impl<A: Allocator + Clone> Task<A> {
             .optional()
     }
 
-    pub fn urgent_mut(&mut self) -> impl DerefMut<Target = bool> + '_ {
-        self.notification
-            .bind_mut(&mut self._common)
-            .variant_mut::<FIELD_URGENT>()
-            .bind_mut(&mut self._common)
-            .value_mut()
-    }
-
-    // -- field visitors (scalar/pair × shared/mut) --------------------------
-    // Visitors capture `MessageCommon` at construction; these methods only
-    // enumerate field slots.
-
-    /// Scalar / shared: invoke `v` once per catalog field, in declaration order.
-    // Internal field walks for codec / Clone / Eq / Drop — not public API.
     fn visit_fields<V: FieldVisitor<MessageCommon<BitArray<[u8; 2], Lsb0>, A>>>(
         &self,
         v: &mut V,
@@ -581,7 +312,10 @@ impl<A: Allocator + Clone> Task<A> {
         &self,
         dst: &mut Self,
         v: &mut V,
-    ) -> ControlFlow<V::Break> {
+    ) -> ControlFlow<V::Break>
+    where
+        A: Clone,
+    {
         v.visit("title", &self.title, &mut dst.title)?;
         v.visit("score", &self.score, &mut dst.score)?;
         v.visit("max_retries", &self.max_retries, &mut dst.max_retries)?;
@@ -628,6 +362,269 @@ impl<A: Allocator + Clone> Task<A> {
     }
 }
 
+impl<A: Allocator + Clone> Task<A> {
+    pub fn new_in(alloc: A) -> Self {
+        // Each field initializer gets its own clone of the allocator; the last
+        // heap field (`attributes`) takes the original by move.
+        Self {
+            _common: MessageCommon::new_in(BitArray::ZERO, alloc.clone()),
+            title: SingularField::new_in(alloc.clone()),
+            score: SingularField::new_in(alloc.clone()),
+            max_retries: SingularField::new_in(alloc.clone()),
+            owner_id: SingularField::new_in(alloc.clone()),
+            payload: SingularField::new_in(alloc.clone()),
+            tag_ids: RepeatedField::new_in(alloc.clone()),
+            scores: RepeatedField::new_in(alloc.clone()),
+            labels: RepeatedField::new_in(alloc.clone()),
+            status: SingularField::new_in(alloc.clone()),
+            priority: SingularField::new_in(alloc.clone()),
+            assignee: SingularField::new_in(alloc.clone()),
+            notification: OneofSlot::new_in(alloc.clone()),
+            done: SingularField::new_in(alloc.clone()),
+            flag: SingularField::new_in(alloc.clone()),
+            watchers: RepeatedField::new_in(alloc.clone()),
+            votes: RepeatedField::new_in(alloc.clone()),
+            attributes: MapField::new_in(alloc),
+        }
+    }
+
+    // -- title (EXPLICIT string, proto field 1) ----------------------------
+
+    pub fn title_mut(&mut self) -> impl ::puroro::StringMut<A> + '_ {
+        self.title.bind_mut(&mut self._common).value_mut()
+    }
+
+    pub fn clear_title(&mut self) {
+        self.title.bind_mut(&mut self._common).clear();
+    }
+
+    // -- score (IMPLICIT int32, proto field 2) ------------------------------
+
+    pub fn score_mut(&mut self) -> impl DerefMut<Target = i32> + '_ {
+        self.score.bind_mut(&mut self._common).value_mut()
+    }
+
+    pub fn clear_score(&mut self) {
+        self.score.bind_mut(&mut self._common).clear();
+    }
+
+    // -- max_retries (EXPLICIT int32, default = 3, proto field 3) ------------
+
+    pub fn max_retries_mut(&mut self) -> impl DerefMut<Target = i32> + '_ {
+        self.max_retries.bind_mut(&mut self._common).value_mut()
+    }
+
+    pub fn clear_max_retries(&mut self) {
+        self.max_retries.bind_mut(&mut self._common).clear();
+    }
+
+    // -- owner_id (LEGACY_REQUIRED string, proto field 4) --------------------
+
+    pub fn owner_id_mut(&mut self) -> impl ::puroro::StringMut<A> + '_ {
+        self.owner_id.bind_mut(&mut self._common).value_mut()
+    }
+
+    pub fn clear_owner_id(&mut self) {
+        self.owner_id.bind_mut(&mut self._common).clear();
+    }
+
+    // -- payload (EXPLICIT bytes, proto field 5) -----------------------------
+
+    pub fn payload_mut(&mut self) -> impl ::puroro::BytesMut<A> + '_ {
+        self.payload.bind_mut(&mut self._common).value_mut()
+    }
+
+    pub fn clear_payload(&mut self) {
+        self.payload.bind_mut(&mut self._common).clear();
+    }
+
+    // -- tag_ids (repeated int32 PACKED, proto field 6) ----------------------
+
+    pub fn tag_ids_mut<'s>(&'s mut self) -> impl DerefMut<Target = AllocVec<i32, A>> + 's {
+        self.tag_ids.bind_mut(&mut self._common).values_mut()
+    }
+
+    pub fn clear_tag_ids(&mut self) {
+        self.tag_ids.bind_mut(&mut self._common).clear();
+    }
+
+    // -- scores (repeated int32 EXPANDED, proto field 7) ---------------------
+
+    pub fn scores_mut<'s>(&'s mut self) -> impl DerefMut<Target = AllocVec<i32, A>> + 's {
+        self.scores.bind_mut(&mut self._common).values_mut()
+    }
+
+    pub fn clear_scores(&mut self) {
+        self.scores.bind_mut(&mut self._common).clear();
+    }
+
+    // -- labels (repeated string, proto field 8) -----------------------------
+
+    /// Container mutator: `push()` appends an empty string and returns a
+    /// [`::puroro::String`] handle.
+    pub fn labels_mut(&mut self) -> impl RepeatedStringMut<A> + '_ {
+        self.labels.bind_mut(&mut self._common).container_mut()
+    }
+
+    pub fn clear_labels(&mut self) {
+        self.labels.bind_mut(&mut self._common).clear();
+    }
+
+    // -- status (IMPLICIT open enum, proto field 9) -------------------------
+
+    pub fn status_mut(&mut self) -> impl DerefMut<Target = Status> + '_ {
+        self.status.bind_mut(&mut self._common).value_mut()
+    }
+
+    pub fn clear_status(&mut self) {
+        self.status.bind_mut(&mut self._common).clear();
+    }
+
+    // -- priority (EXPLICIT closed enum, proto field 10) ---------------------
+
+    pub fn priority_mut(&mut self) -> impl DerefMut<Target = Priority> + '_ {
+        self.priority.bind_mut(&mut self._common).value_mut()
+    }
+
+    pub fn clear_priority(&mut self) {
+        self.priority.bind_mut(&mut self._common).clear();
+    }
+
+    // -- assignee (nested message, proto field 11) --------------------------
+
+    pub fn assignee_mut(&mut self) -> &mut Address<A> {
+        self.assignee.bind_mut(&mut self._common).get_mut()
+    }
+
+    pub fn clear_assignee(&mut self) {
+        self.assignee.bind_mut(&mut self._common).clear();
+    }
+
+    // -- done (IMPLICIT bool, proto field 16) --------------------------------
+
+    pub fn done_mut(&mut self) -> impl DerefMut<Target = bool> + '_ {
+        self.done.bind_mut(&mut self._common).value_mut()
+    }
+
+    pub fn clear_done(&mut self) {
+        self.done.bind_mut(&mut self._common).clear();
+    }
+
+    // -- flag (EXPLICIT bool, proto field 17) --------------------------------
+
+    pub fn flag_mut(&mut self) -> impl DerefMut<Target = bool> + '_ {
+        self.flag.bind_mut(&mut self._common).value_mut()
+    }
+
+    pub fn clear_flag(&mut self) {
+        self.flag.bind_mut(&mut self._common).clear();
+    }
+
+    // -- watchers (repeated Address, proto field 19) -------------------------
+
+    pub fn watchers_mut<'s>(&'s mut self) -> impl DerefMut<Target = AllocVec<Address<A>, A>> + 's {
+        self.watchers.bind_mut(&mut self._common).values_mut()
+    }
+
+    pub fn clear_watchers(&mut self) {
+        self.watchers.bind_mut(&mut self._common).clear();
+    }
+
+    // -- votes (repeated bool PACKED, proto field 20) ------------------------
+
+    pub fn votes_mut<'s>(&'s mut self) -> impl DerefMut<Target = AllocVec<bool, A>> + 's {
+        self.votes.bind_mut(&mut self._common).values_mut()
+    }
+
+    pub fn clear_votes(&mut self) {
+        self.votes.bind_mut(&mut self._common).clear();
+    }
+
+    // -- attributes (map<string, int32>, proto field 21) ---------------------
+
+    pub fn attributes_mut(&mut self) -> impl MapMut<str, i32, MutTarget = i32> + '_ {
+        self.attributes.bind_mut(&mut self._common)
+    }
+
+    pub fn clear_attributes(&mut self) {
+        MapMut::clear(&mut self.attributes_mut());
+    }
+
+    // -- oneof notification (proto fields 12 / 13 / 14 / 15 / 18) ------------
+
+    /// Bound mutable view of the oneof group (always available, including when unset).
+    ///
+    /// Use [`OneofViewMut::as_view`] to reborrow for `case` / `as_ref` while mutating;
+    /// match shared payloads via [`Self::notification`]. Mutable projection from
+    /// [`OneofViewMut::as_mut`] is intentionally opaque (`impl` associated type) so
+    /// `puroro-rt` mut handles do not appear in this signature — prefer per-variant
+    /// `_mut` accessors for typed mutation.
+    pub fn notification_mut<'a>(&'a mut self) -> impl OneofViewMut<Case = NotificationCase> + 'a {
+        ::puroro_rt::OneofViewMut::<NotificationStorage<A>>::new(
+            &mut self.notification,
+            &mut self._common,
+        )
+    }
+
+    pub fn clear_notification(&mut self) {
+        self.notification_mut().clear();
+    }
+
+    // -- notification.email_address (string, proto field 12) ----------------
+
+    pub fn email_address_mut(&mut self) -> impl ::puroro::StringMut<A> + '_ {
+        self.notification
+            .bind_mut(&mut self._common)
+            .variant_mut::<FIELD_EMAIL_ADDRESS>()
+            .bind_mut(&mut self._common)
+            .value_mut()
+    }
+
+    // -- notification.phone_number (string, proto field 13) -----------------
+
+    pub fn phone_number_mut(&mut self) -> impl ::puroro::StringMut<A> + '_ {
+        self.notification
+            .bind_mut(&mut self._common)
+            .variant_mut::<FIELD_PHONE_NUMBER>()
+            .bind_mut(&mut self._common)
+            .value_mut()
+    }
+
+    // -- notification.webhook_id (int32, default = -1, proto field 14) ------
+
+    /// `[default = -1]`: when this variant is not active, `get()` returns `-1`
+    /// and `is_set()` is false (does not select the variant).
+    pub fn webhook_id_mut(&mut self) -> impl DerefMut<Target = i32> + '_ {
+        self.notification
+            .bind_mut(&mut self._common)
+            .variant_mut::<FIELD_WEBHOOK_ID>()
+            .bind_mut(&mut self._common)
+            .value_mut()
+    }
+
+    // -- notification.postal (Address message, proto field 15) --------------
+
+    /// Switches the group to `postal` (freeing any other variant) and returns a
+    /// mutable handle to the nested message, creating an empty one if needed.
+    pub fn postal_mut(&mut self) -> &mut Address<A> {
+        self.notification
+            .bind_mut(&mut self._common)
+            .variant_mut::<FIELD_POSTAL>()
+            .bind_mut(&mut self._common)
+            .value_mut()
+    }
+
+    // -- notification.urgent (bool, proto field 18) -------------------------
+
+    pub fn urgent_mut(&mut self) -> impl DerefMut<Target = bool> + '_ {
+        self.notification
+            .bind_mut(&mut self._common)
+            .variant_mut::<FIELD_URGENT>()
+            .bind_mut(&mut self._common)
+            .value_mut()
+    }
+}
+
 impl Task<Global> {
     pub fn new() -> Self {
         <Self as Default>::default()
@@ -664,7 +661,7 @@ impl<A: Allocator + Clone> Clone for Task<A> {
     }
 }
 
-impl<A: Allocator + Clone> PartialEq for Task<A> {
+impl<A: Allocator> PartialEq for Task<A> {
     fn eq(&self, other: &Self) -> bool {
         matches!(
             self.visit_field_pairs(
@@ -676,7 +673,7 @@ impl<A: Allocator + Clone> PartialEq for Task<A> {
     }
 }
 
-impl<A: Allocator + Clone> fmt::Debug for Task<A> {
+impl<A: Allocator> fmt::Debug for Task<A> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut v = DebugStructVisitor::new(f.debug_struct("Task"), &self._common);
         let _ = self.visit_fields(&mut v);
@@ -688,7 +685,7 @@ impl<A: Allocator + Clone> fmt::Debug for Task<A> {
 // Drop — releases every unmanaged field through the single allocator
 // ---------------------------------------------------------------------------
 
-impl<A: Allocator + Clone> Drop for Task<A> {
+impl<A: Allocator> Drop for Task<A> {
     fn drop(&mut self) {
         let mut v = FieldDeallocVisitor::new(&self._common);
         let _ = self.visit_fields_mut(&mut v);
@@ -700,7 +697,7 @@ impl<A: Allocator + Clone> Drop for Task<A> {
 // DeallocateIn — required for nested `UnmanagedBox` / catalog bounds
 // ---------------------------------------------------------------------------
 
-impl<A: Allocator + Clone> ::puroro_rt::DeallocateIn<A> for Task<A> {
+impl<A: Allocator> ::puroro_rt::DeallocateIn<A> for Task<A> {
     #[inline]
     unsafe fn deallocate_in(self, _alloc: &A) {
         // Heap is owned by `self._common.alloc`; parent-passed `alloc` is only
@@ -713,7 +710,7 @@ impl<A: Allocator + Clone> ::puroro_rt::DeallocateIn<A> for Task<A> {
 // Message
 // ---------------------------------------------------------------------------
 
-impl<A: Allocator + Clone> MessageEncode for Task<A> {
+impl<A: Allocator> MessageEncode for Task<A> {
     fn encoded_len(&self, ctx: &mut EncodeCtx) -> usize {
         let mut v = EncodedLenVisitor::new(&self._common, ctx);
         let _ = self.visit_fields(&mut v);

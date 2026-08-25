@@ -438,7 +438,7 @@ impl<C: LenCodec> RepeatedElementMut for LenScalar<C> {
 // Nested message
 // ---------------------------------------------------------------------------
 
-impl<M: Message + MessageEncode> RepeatedElement for ProtoMessage<M> {
+impl<M: MessageEncode> RepeatedElement for ProtoMessage<M> {
     /// Inline message value (not [`UnmanagedBox`](::unmanaged::UnmanagedBox)).
     ///
     /// Use sites must pair the same allocator: e.g.
@@ -512,9 +512,9 @@ where
     }
 }
 
-impl<M: Message + MessageEncode> RepeatedVecMut for ProtoMessage<M> {}
+impl<M: MessageEncode> RepeatedVecMut for ProtoMessage<M> {}
 
-impl<M: Message + MessageEncode> RepeatedElementMut for ProtoMessage<M> {
+impl<M: MessageEncode> RepeatedElementMut for ProtoMessage<M> {
     type MutTarget<A: Allocator> = M;
 
     type ElementMut<'a, A: Allocator>

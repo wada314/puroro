@@ -34,8 +34,8 @@ use crate::fields::shared::{
         Explicit, FieldPresence, Implicit, LegacyRequired, Message, Oneof, RequiredFieldPresence,
     },
     slot_init::{AlwaysInitialized, SlotInitView},
-    value_layout::{Inline, ValueLayout, ValueLayoutClone},
-    value_slot::{AddressableSlot, ValueSlot, ValueSlotRefAccess},
+    value_layout::{Inline, ValueLayout, ValueLayoutClone, ValueLayoutMerge},
+    value_slot::{AddressableSlot, ValueSlot, ValueSlotNew, ValueSlotRefAccess},
 };
 use crate::fields::wire::encode_type::{encode_field, encoded_len_field};
 use crate::fields::wire::proto_ref_ops::{ProtoRefDebug, ProtoRefEq};
@@ -139,9 +139,12 @@ where
 {
     /// Creates a field with an empty value slot.
     #[inline]
-    pub fn new_in(alloc: A) -> Self {
+    pub fn new_in(alloc: A) -> Self
+    where
+        P::ValueSlot<L::Slot>: ValueSlotNew<L::Slot, A>,
+    {
         Self {
-            value: ManuallyDrop::new(ValueSlot::new_in(alloc)),
+            value: ManuallyDrop::new(ValueSlotNew::new_in(alloc)),
             _marker: PhantomData,
         }
     }
@@ -296,7 +299,7 @@ where
     A: Allocator,
     L: ValueLayout<T, A>,
     L::Slot: AddressableSlot,
-    P::ValueSlot<L::Slot>: ValueSlot<L::Slot, A>,
+    P::ValueSlot<L::Slot>: ValueSlotNew<L::Slot, A>,
 {
     #[inline]
     fn default_in(alloc: A) -> Self {
@@ -533,6 +536,7 @@ where
     ) -> Result<(), DecodeError>
     where
         A: Clone,
+        L: ValueLayoutMerge<T, A>,
         L::Slot: DefaultIn<A>,
     {
         L::merge(
