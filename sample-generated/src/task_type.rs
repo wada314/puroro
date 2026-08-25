@@ -895,10 +895,13 @@ impl<A: Allocator + Clone> ::puroro_rt::DefaultIn<A> for Task<A> {
     }
 }
 
-impl<A: Allocator + Clone> Message for Task<A> {
+impl<A: Allocator> Message for Task<A> {
     type Alloc = A;
 
-    fn new_in(alloc: A) -> Self {
+    fn new_in(alloc: A) -> Self
+    where
+        A: Clone,
+    {
         Self::new_in(alloc)
     }
 
@@ -910,7 +913,10 @@ impl<A: Allocator + Clone> Message for Task<A> {
         ::puroro_rt::encode_message_to_vec(self)
     }
 
-    fn merge_from<B: Buf>(&mut self, buf: &mut B) -> Result<(), DecodeError> {
+    fn merge_from<B: Buf>(&mut self, buf: &mut B) -> Result<(), DecodeError>
+    where
+        A: Clone,
+    {
         ::puroro_rt::merge_message(self, buf)
     }
 

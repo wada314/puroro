@@ -455,12 +455,13 @@ pub(super) fn render_items(
             }
         }
 
-        impl<A: ::allocator_api2::alloc::Allocator + ::core::clone::Clone> ::puroro::Message
-            for #name<A>
-        {
+        impl<A: ::allocator_api2::alloc::Allocator> ::puroro::Message for #name<A> {
             type Alloc = A;
 
-            fn new_in(alloc: A) -> Self {
+            fn new_in(alloc: A) -> Self
+            where
+                A: ::core::clone::Clone,
+            {
                 Self::new_in(alloc)
             }
 
@@ -475,7 +476,10 @@ pub(super) fn render_items(
             fn merge_from<B: ::bytes::Buf>(
                 &mut self,
                 buf: &mut B,
-            ) -> ::core::result::Result<(), ::puroro::DecodeError> {
+            ) -> ::core::result::Result<(), ::puroro::DecodeError>
+            where
+                A: ::core::clone::Clone,
+            {
                 ::puroro_rt::merge_message(self, buf)
             }
 

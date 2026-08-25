@@ -2,7 +2,6 @@
 
 use ::allocator_api2::alloc::Allocator;
 use ::bytes::{Buf, BufMut};
-use ::unmanaged::DefaultIn;
 
 use crate::error::DecodeError;
 use crate::unknown::UnknownField;
@@ -35,25 +34,26 @@ pub const RECURSION_LIMIT: usize = 100;
 /// convenience defaults on top of that.
 ///
 /// The associated [`Alloc`](Self::Alloc) is the message's single allocator type
-/// parameter. Nested fields construct children with
-/// [`new_in`](Self::new_in) / [`DefaultIn`] using the parent allocator
+/// parameter. Construction / merge clone it ([`new_in`](Self::new_in) /
+/// [`merge_from`](Self::merge_from)); encode / validate do not.
+/// Nested fields construct children with [`new_in`](Self::new_in) /
+/// [`DefaultIn`](::unmanaged::DefaultIn) using the parent allocator
 /// (`M: Message<Alloc = A> + unmanaged::DeallocateIn<A>` at catalog use sites).
-/// Each concrete message must implement [`unmanaged::DeallocateIn`] and
-/// [`DefaultIn`]`<Self::Alloc>` for its `Alloc` (orphan rules forbid blanket
+/// Each concrete message must implement [`unmanaged::DeallocateIn`] and, when
+/// `Alloc: Clone`, [`DefaultIn`](::unmanaged::DefaultIn)`<Self::Alloc>` (orphan rules forbid blanket
 /// impls on this trait). An inherent `new()` for `Global` may still be provided
 /// on the concrete type.
-pub trait Message: Sized
-where
-    Self: DefaultIn<Self::Alloc>,
-{
+pub trait Message: Sized {
     /// Allocator that owns this message's heap allocations.
-    type Alloc: Allocator + Clone;
+    type Alloc: Allocator;
 
     /// Creates an empty message with the given allocator.
     ///
-    /// Typically forwards to the inherent `new_in`; [`DefaultIn::default_in`]
+    /// Typically forwards to the inherent `new_in`; [`DefaultIn::default_in`](::unmanaged::DefaultIn::default_in)
     /// should do the same so nested `UnmanagedBox` construction stays consistent.
-    fn new_in(alloc: Self::Alloc) -> Self;
+    fn new_in(alloc: Self::Alloc) -> Self
+    where
+        Self::Alloc: Clone;
 
     // -- codec --------------------------------------------------------------
 
@@ -85,12 +85,15 @@ where
     /// - Singular message: recursively merged.
     /// - Repeated: each occurrence appends to the list.
     /// - Unknown fields: accumulated for round-trip preservation.
-    fn merge_from<B: Buf>(&mut self, buf: &mut B) -> Result<(), DecodeError>;
+    fn merge_from<B: Buf>(&mut self, buf: &mut B) -> Result<(), DecodeError>
+    where
+        Self::Alloc: Clone;
 
     /// Decodes a complete message. Provided; requires `Self: Default`.
     fn decode<B: Buf>(mut buf: B) -> Result<Self, DecodeError>
     where
         Self: Default,
+        Self::Alloc: Clone,
     {
         let mut msg = Self::default();
         msg.merge_from(&mut buf)?;
