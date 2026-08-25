@@ -55,7 +55,7 @@ use super::wire_payload::{CopyWirePayload, WirePayload};
 /// [`wire_view`](Self::wire_view).
 pub trait RepeatedElement: EncodeType {
     /// Physical element stored in the repeated / map buffer.
-    type Element<A: Allocator + Clone>;
+    type Element<A: Allocator>;
 
     /// User-facing shared view of one element (`i32`, `str`, `M`, …).
     ///
@@ -65,12 +65,10 @@ pub trait RepeatedElement: EncodeType {
     type RefView: ?Sized;
 
     /// Borrows `elem` as [`RefView`](Self::RefView).
-    fn as_ref_view<A: Allocator + Clone>(elem: &Self::Element<A>) -> &Self::RefView;
+    fn as_ref_view<A: Allocator>(elem: &Self::Element<A>) -> &Self::RefView;
 
     /// Borrow / copy an element as a [`EncodeType::View`] for tagged encode.
-    fn wire_view<'a, A: Allocator + Clone>(
-        elem: &'a Self::Element<A>,
-    ) -> <Self as EncodeType>::View<'a, A>
+    fn wire_view<'a, A: Allocator>(elem: &'a Self::Element<A>) -> <Self as EncodeType>::View<'a, A>
     where
         Self: 'a;
 
@@ -79,7 +77,7 @@ pub trait RepeatedElement: EncodeType {
     /// # Safety
     ///
     /// `alloc` must own `elem`'s buffer when the element is heap-backed.
-    unsafe fn deallocate_element<A: Allocator + Clone>(elem: Self::Element<A>, alloc: &A);
+    unsafe fn deallocate_element<A: Allocator>(elem: Self::Element<A>, alloc: &A);
 }
 
 /// Decode / merge for a repeated element marker under allocator `A`.
@@ -120,15 +118,13 @@ pub trait RepeatedElementMerge<A: Allocator + Clone>: RepeatedElement {
 /// LE bytes). Decode always accepts both packed (`Len`) and expanded forms.
 pub(crate) trait PackableRepeatedElement: RepeatedElement {
     /// Byte length of the packed payload (excluding tag and length prefix).
-    fn packed_payload_len<A: Allocator + Clone>(values: &[Self::Element<A>]) -> usize
+    fn packed_payload_len<A: Allocator>(values: &[Self::Element<A>]) -> usize
     where
         Self::Element<A>: Copy;
 
     /// Writes the packed payload bytes (no tag / length prefix).
-    fn encode_packed_payload<A: Allocator + Clone, B: BufMut>(
-        values: &[Self::Element<A>],
-        buf: &mut B,
-    ) where
+    fn encode_packed_payload<A: Allocator, B: BufMut>(values: &[Self::Element<A>], buf: &mut B)
+    where
         Self::Element<A>: Copy;
 }
 
@@ -147,10 +143,10 @@ pub trait RepeatedVecMut: RepeatedElement {}
 /// repeated (and inline singular) store plain `bool`.
 pub trait RepeatedElementMut: RepeatedElement {
     /// Target of [`ElementMut`](Self::ElementMut) (`i32`, [`String`](::unmanaged::String), …).
-    type MutTarget<A: Allocator + Clone>: ?Sized;
+    type MutTarget<A: Allocator>: ?Sized;
 
     /// Mutable handle for one repeated element.
-    type ElementMut<'a, A: Allocator + Clone>: DerefMut<Target = Self::MutTarget<A>>
+    type ElementMut<'a, A: Allocator>: DerefMut<Target = Self::MutTarget<A>>
     where
         Self: 'a,
         A: 'a;
@@ -172,16 +168,16 @@ pub trait RepeatedElementMut: RepeatedElement {
 // ---------------------------------------------------------------------------
 
 impl<C: NumericalType> RepeatedElement for Numerical<C> {
-    type Element<A: Allocator + Clone> = C::NativeType;
+    type Element<A: Allocator> = C::NativeType;
     type RefView = C::NativeType;
 
     #[inline]
-    fn as_ref_view<A: Allocator + Clone>(elem: &C::NativeType) -> &C::NativeType {
+    fn as_ref_view<A: Allocator>(elem: &C::NativeType) -> &C::NativeType {
         elem
     }
 
     #[inline]
-    fn wire_view<'a, A: Allocator + Clone>(elem: &'a C::NativeType) -> C::NativeType
+    fn wire_view<'a, A: Allocator>(elem: &'a C::NativeType) -> C::NativeType
     where
         Self: 'a,
     {
@@ -189,7 +185,7 @@ impl<C: NumericalType> RepeatedElement for Numerical<C> {
     }
 
     #[inline]
-    unsafe fn deallocate_element<A: Allocator + Clone>(_elem: C::NativeType, _alloc: &A) {}
+    unsafe fn deallocate_element<A: Allocator>(_elem: C::NativeType, _alloc: &A) {}
 }
 
 impl<A: Allocator + Clone, C: NumericalType> RepeatedElementMerge<A> for Numerical<C> {
@@ -307,7 +303,7 @@ impl<A: Allocator + Clone, C: NumericalType> RepeatedElementMerge<A> for Numeric
 
 impl<C: NumericalType> PackableRepeatedElement for Numerical<C> {
     #[inline]
-    fn packed_payload_len<A: Allocator + Clone>(values: &[C::NativeType]) -> usize
+    fn packed_payload_len<A: Allocator>(values: &[C::NativeType]) -> usize
     where
         C::NativeType: Copy,
     {
@@ -319,7 +315,7 @@ impl<C: NumericalType> PackableRepeatedElement for Numerical<C> {
     }
 
     #[inline]
-    fn encode_packed_payload<A: Allocator + Clone, B: BufMut>(values: &[C::NativeType], buf: &mut B)
+    fn encode_packed_payload<A: Allocator, B: BufMut>(values: &[C::NativeType], buf: &mut B)
     where
         C::NativeType: Copy,
     {
@@ -332,9 +328,9 @@ impl<C: NumericalType> PackableRepeatedElement for Numerical<C> {
 impl<C: NumericalType> RepeatedVecMut for Numerical<C> {}
 
 impl<C: NumericalType> RepeatedElementMut for Numerical<C> {
-    type MutTarget<A: Allocator + Clone> = C::NativeType;
+    type MutTarget<A: Allocator> = C::NativeType;
 
-    type ElementMut<'a, A: Allocator + Clone>
+    type ElementMut<'a, A: Allocator>
         = &'a mut C::NativeType
     where
         Self: 'a,
@@ -357,16 +353,16 @@ impl<C: NumericalType> RepeatedElementMut for Numerical<C> {
 // ---------------------------------------------------------------------------
 
 impl<C: LenCodec> RepeatedElement for LenScalar<C> {
-    type Element<A: Allocator + Clone> = C::Slot<A>;
+    type Element<A: Allocator> = C::Slot<A>;
     type RefView = C::RefView;
 
     #[inline]
-    fn as_ref_view<A: Allocator + Clone>(elem: &C::Slot<A>) -> &C::RefView {
+    fn as_ref_view<A: Allocator>(elem: &C::Slot<A>) -> &C::RefView {
         Deref::deref(elem)
     }
 
     #[inline]
-    fn wire_view<'a, A: Allocator + Clone>(elem: &'a C::Slot<A>) -> &'a C::RefView
+    fn wire_view<'a, A: Allocator>(elem: &'a C::Slot<A>) -> &'a C::RefView
     where
         Self: 'a,
     {
@@ -374,7 +370,7 @@ impl<C: LenCodec> RepeatedElement for LenScalar<C> {
     }
 
     #[inline]
-    unsafe fn deallocate_element<A: Allocator + Clone>(elem: C::Slot<A>, alloc: &A) {
+    unsafe fn deallocate_element<A: Allocator>(elem: C::Slot<A>, alloc: &A) {
         // SAFETY: forwarded to the caller's obligation on `alloc`.
         unsafe { DeallocateIn::deallocate_in(elem, alloc) };
     }
@@ -417,9 +413,9 @@ impl<A: Allocator + Clone, C: LenCodec> RepeatedElementMerge<A> for LenScalar<C>
 }
 
 impl<C: LenCodec> RepeatedElementMut for LenScalar<C> {
-    type MutTarget<A: Allocator + Clone> = C::MutTarget<A>;
+    type MutTarget<A: Allocator> = C::MutTarget<A>;
 
-    type ElementMut<'a, A: Allocator + Clone>
+    type ElementMut<'a, A: Allocator>
         = C::Mut<'a, A>
     where
         Self: 'a,
@@ -447,16 +443,16 @@ impl<M: Message + MessageEncode> RepeatedElement for ProtoMessage<M> {
     ///
     /// Use sites must pair the same allocator: e.g.
     /// `RepeatedField<ProtoMessage<Address<A>>, Expanded, FIELD, A>`.
-    type Element<A: Allocator + Clone> = M;
+    type Element<A: Allocator> = M;
     type RefView = M;
 
     #[inline]
-    fn as_ref_view<A: Allocator + Clone>(elem: &M) -> &M {
+    fn as_ref_view<A: Allocator>(elem: &M) -> &M {
         elem
     }
 
     #[inline]
-    fn wire_view<'a, A: Allocator + Clone>(elem: &'a M) -> &'a M
+    fn wire_view<'a, A: Allocator>(elem: &'a M) -> &'a M
     where
         Self: 'a,
     {
@@ -464,7 +460,7 @@ impl<M: Message + MessageEncode> RepeatedElement for ProtoMessage<M> {
     }
 
     #[inline]
-    unsafe fn deallocate_element<A: Allocator + Clone>(elem: M, _alloc: &A) {
+    unsafe fn deallocate_element<A: Allocator>(elem: M, _alloc: &A) {
         // Inline repeated elements are not behind `UnmanagedBox`; free via
         // `Drop` / `_common.alloc` (same body as `unmanaged::DeallocateIn` on
         // generated messages). The `alloc` parameter is unused here.
@@ -519,9 +515,9 @@ where
 impl<M: Message + MessageEncode> RepeatedVecMut for ProtoMessage<M> {}
 
 impl<M: Message + MessageEncode> RepeatedElementMut for ProtoMessage<M> {
-    type MutTarget<A: Allocator + Clone> = M;
+    type MutTarget<A: Allocator> = M;
 
-    type ElementMut<'a, A: Allocator + Clone>
+    type ElementMut<'a, A: Allocator>
         = &'a mut M
     where
         Self: 'a,

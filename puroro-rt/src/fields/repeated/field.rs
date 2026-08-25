@@ -33,7 +33,7 @@ pub struct RepeatedField<T, E, const FIELD: u32, A>
 where
     T: RepeatedElement,
     E: RepeatedEncoding<T, A>,
-    A: Allocator + Clone,
+    A: Allocator,
 {
     values: ManuallyDrop<UnmanagedVec<T::Element<A>, A>>,
     _encoding: PhantomData<E>,
@@ -43,7 +43,7 @@ impl<T, E, const FIELD: u32, A> RepeatedField<T, E, FIELD, A>
 where
     T: RepeatedElement,
     E: RepeatedEncoding<T, A>,
-    A: Allocator + Clone,
+    A: Allocator,
 {
     pub fn new_in(alloc: A) -> Self {
         Self {
@@ -86,7 +86,7 @@ impl<T, E, const FIELD: u32, A, P> FieldDeallocate<MessageCommon<P, A>>
 where
     T: RepeatedElement,
     E: RepeatedEncoding<T, A>,
-    A: Allocator + Clone,
+    A: Allocator,
     T::Element<A>: DeallocateIn<A>,
 {
     /// Releases every element (when heap-backed) and the backing buffer.
@@ -109,7 +109,7 @@ pub struct RepeatedFieldRef<
     T: RepeatedElement,
     E: RepeatedEncoding<T, A>,
     const FIELD: u32,
-    A: Allocator + Clone,
+    A: Allocator,
     Pb,
 > {
     field: &'a RepeatedField<T, E, FIELD, A>,
@@ -123,7 +123,7 @@ impl<'a, T, E, const FIELD: u32, A, Pb> RepeatedFieldRef<'a, T, E, FIELD, A, Pb>
 where
     T: RepeatedElement,
     E: RepeatedEncoding<T, A>,
-    A: Allocator + Clone,
+    A: Allocator,
 {
     #[inline]
     fn new(field: &'a RepeatedField<T, E, FIELD, A>, common: &'a MessageCommon<Pb, A>) -> Self {
@@ -156,7 +156,7 @@ pub struct RepeatedFieldMut<
     T: RepeatedElement,
     E: RepeatedEncoding<T, A>,
     const FIELD: u32,
-    A: Allocator + Clone,
+    A: Allocator,
     Pb,
 > {
     field: &'f mut RepeatedField<T, E, FIELD, A>,
@@ -168,7 +168,7 @@ impl<'f, 'c, T, E, const FIELD: u32, A, Pb> RepeatedFieldMut<'f, 'c, T, E, FIELD
 where
     T: RepeatedElement,
     E: RepeatedEncoding<T, A>,
-    A: Allocator + Clone,
+    A: Allocator,
 {
     #[inline]
     fn new(
@@ -186,6 +186,7 @@ where
     pub fn values_mut(self) -> VecGuard<'f, T::Element<A>, A>
     where
         T: RepeatedVecMut,
+        A: Clone,
     {
         let alloc = self.common.alloc.clone();
         // SAFETY: an owned clone of the message allocator owns this vector's
@@ -200,6 +201,7 @@ where
     pub fn container_mut(self) -> RepeatedElementsMut<'f, T, A>
     where
         T: RepeatedElementMut + RepeatedElementMerge<A>,
+        A: Clone,
     {
         let alloc = self.common.alloc.clone();
         // SAFETY: an owned clone of the message allocator owns this vector's
@@ -208,7 +210,10 @@ where
     }
 
     /// Empties the vector (keeps capacity). Heap elements are freed first.
-    pub fn clear(self) {
+    pub fn clear(self)
+    where
+        A: Clone,
+    {
         let alloc = self.common.alloc.clone();
         // SAFETY: owned clones of the message allocator own this vector's buffer
         // and every element.
@@ -227,6 +232,7 @@ where
     ) -> Result<(), DecodeError>
     where
         T: RepeatedElementMerge<A>,
+        A: Clone,
     {
         let alloc = self.common.alloc.clone();
         // SAFETY: an owned clone of the message allocator owns this vector's
@@ -243,7 +249,7 @@ impl<T, E, const FIELD: u32, A, P> FieldPartialEq<MessageCommon<P, A>>
 where
     T: RepeatedElement,
     E: RepeatedEncoding<T, A>,
-    A: Allocator + Clone,
+    A: Allocator,
     T::Element<A>: PartialEq,
 {
     #[inline]
@@ -261,7 +267,7 @@ impl<T, E, const FIELD: u32, A, P> FieldDebug<MessageCommon<P, A>> for RepeatedF
 where
     T: RepeatedElement,
     E: RepeatedEncoding<T, A>,
-    A: Allocator + Clone,
+    A: Allocator,
     T::Element<A>: Debug,
 {
     #[inline]
@@ -275,7 +281,7 @@ impl<T, E, const FIELD: u32, A, P> FieldEncode<MessageCommon<P, A>>
 where
     T: RepeatedElement,
     E: RepeatedEncoding<T, A>,
-    A: Allocator + Clone,
+    A: Allocator,
 {
     fn encoded_len(&self, _common: &MessageCommon<P, A>, ctx: &mut EncodeCtx) -> usize {
         if self.values.is_empty() {

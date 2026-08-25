@@ -149,7 +149,7 @@ impl<E> OneofSlot<E> {
 
     /// Binds this slot to `common` for read access.
     #[inline]
-    pub fn bind<'a, Pb, A: Allocator + Clone>(
+    pub fn bind<'a, Pb, A: Allocator>(
         &'a self,
         common: &'a MessageCommon<Pb, A>,
     ) -> OneofSlotRef<'a, E, Pb, A> {
@@ -158,7 +158,7 @@ impl<E> OneofSlot<E> {
 
     /// Binds this slot to `common` for mutation.
     #[inline]
-    pub fn bind_mut<'f, 'c, Pb, A: Allocator + Clone>(
+    pub fn bind_mut<'f, 'c, Pb, A: Allocator>(
         &'f mut self,
         common: &'c mut MessageCommon<Pb, A>,
     ) -> OneofSlotMut<'f, 'c, E, Pb, A> {
@@ -264,7 +264,6 @@ impl<'f, 'c, E, Pb, A: Allocator> OneofSlotMut<'f, 'c, E, Pb, A> {
     pub fn set(self, value: E)
     where
         E: OneofDeallocate<MessageCommon<Pb, A>>,
-        A: Clone,
     {
         if let Some(old) = self.slot.take() {
             // SAFETY: `common.alloc` owns the previous variant's buffers.
@@ -319,7 +318,6 @@ impl<'f, 'c, E, Pb, A: Allocator> OneofSlotMut<'f, 'c, E, Pb, A> {
     pub fn clear(self)
     where
         E: OneofDeallocate<MessageCommon<Pb, A>>,
-        A: Clone,
     {
         if let Some(old) = self.slot.take() {
             // SAFETY: `common.alloc` owns the active variant's buffers.
@@ -353,7 +351,7 @@ impl<E: PartialEq> PartialEq for OneofSlot<E> {
 impl<E, Pb, A> FieldPartialEq<MessageCommon<Pb, A>> for OneofSlot<E>
 where
     E: OneofGroup<Bits = Pb, Alloc = A>,
-    A: Allocator + Clone,
+    A: Allocator,
 {
     #[inline]
     fn field_eq(
@@ -373,7 +371,7 @@ where
 impl<E, Pb, A> FieldDebug<MessageCommon<Pb, A>> for OneofSlot<E>
 where
     E: OneofGroup<Bits = Pb, Alloc = A>,
-    A: Allocator + Clone,
+    A: Allocator,
     E::Case: Debug,
 {
     #[inline]
@@ -387,7 +385,7 @@ impl<E, Pb, A> FieldEncode<MessageCommon<Pb, A>> for OneofSlot<E>
 where
     E: OneofEncodable<A> + OneofGroup<Bits = Pb, Alloc = A>,
     MessageCommon<Pb, A>: MessageCommonBits + MessageCommonAlloc<Alloc = A>,
-    A: Allocator + Clone,
+    A: Allocator,
 {
     fn encoded_len(&self, common: &MessageCommon<Pb, A>, ctx: &mut EncodeCtx) -> usize {
         self.as_ref()
@@ -443,7 +441,7 @@ impl<'a, F, Pb, A: Allocator> OneofVariantRef<'a, F, Pb, A> {
     }
 }
 
-impl<'a, T: SingularType, const FIELD: u32, A: Allocator + Clone, L: ValueLayout<T, A>, D, Pb>
+impl<'a, T: SingularType, const FIELD: u32, A: Allocator, L: ValueLayout<T, A>, D, Pb>
     OneofVariantRef<'a, SingularField<T, Oneof, FIELD, A, L, D>, Pb, A>
 where
     T::View<'a, A>: Copy,
@@ -452,10 +450,7 @@ where
     L::Slot: AddressableSlot + DefaultIn<A>,
     <Oneof as FieldPresence>::ValueSlot<L::Slot>: ValueSlot<L::Slot, A>,
 {
-    pub fn optional(self) -> Optional<T::View<'a, A>, D>
-    where
-        A: Clone,
-    {
+    pub fn optional(self) -> Optional<T::View<'a, A>, D> {
         match self.field {
             Some(f) => f.bind(self.common).optional(),
             None => Optional::new(None),
@@ -463,7 +458,7 @@ where
     }
 }
 
-impl<'a, M, const FIELD: u32, A: Allocator + Clone, Pb>
+impl<'a, M, const FIELD: u32, A: Allocator, Pb>
     OneofVariantRef<'a, SingularField<ProtoMessage<M>, Oneof, FIELD, A>, Pb, A>
 where
     M: ::puroro::Message<Alloc = A> + MessageEncode + MessageMerge + ::unmanaged::DeallocateIn<A>,
@@ -507,13 +502,14 @@ where
     /// Projected mutable view of the active variant.
     type Mut<'a>
     where
-        Self: 'a;
+        Self: 'a,
+        Self::Alloc: Clone;
 
     /// Per-message common-bits type (may be unused by the group).
     type Bits;
 
     /// Message allocator type.
-    type Alloc: Allocator + Clone;
+    type Alloc: Allocator;
 
     /// Discriminant for an active storage value.
     fn case(storage: &Self) -> Self::Case;
@@ -528,14 +524,18 @@ where
     fn to_mut<'a>(
         storage: &'a mut Self,
         common: &'a mut MessageCommon<Self::Bits, Self::Alloc>,
-    ) -> Self::Mut<'a>;
+    ) -> Self::Mut<'a>
+    where
+        Self::Alloc: Clone;
 
     /// Deep-copies an active storage value into `alloc`.
     fn clone_storage_in(
         storage: &Self,
         common: &MessageCommon<Self::Bits, Self::Alloc>,
         alloc: Self::Alloc,
-    ) -> Self;
+    ) -> Self
+    where
+        Self::Alloc: Clone;
 }
 
 /// Shared bound view of a oneof group (slot + [`MessageCommon`]).
@@ -639,7 +639,10 @@ where
     ///
     /// Consumes this bound view. Returns `None` when the group is unset.
     #[inline]
-    pub fn as_mut(self) -> Option<G::Mut<'a>> {
+    pub fn as_mut(self) -> Option<G::Mut<'a>>
+    where
+        G::Alloc: Clone,
+    {
         self.slot.as_mut().map(|s| G::to_mut(s, self.common))
     }
 
@@ -653,6 +656,7 @@ where
 impl<'a, G: OneofGroup> OneofViewMutTrait for OneofViewMut<'a, G>
 where
     G: OneofDeallocate<MessageCommon<G::Bits, G::Alloc>>,
+    G::Alloc: Clone,
 {
     type Case = G::Case;
 

@@ -27,7 +27,7 @@ use crate::fields::wire::{ProtoBytes, ProtoString};
 pub struct RepeatedElementsMut<'a, T, A>
 where
     T: RepeatedElement,
-    A: Allocator + Clone,
+    A: Allocator,
 {
     values: VecGuard<'a, T::Element<A>, A>,
     _marker: PhantomData<T>,
@@ -36,7 +36,7 @@ where
 impl<'a, T, A> RepeatedElementsMut<'a, T, A>
 where
     T: RepeatedElement,
-    A: Allocator + Clone,
+    A: Allocator,
 {
     #[inline]
     pub(super) fn new(values: VecGuard<'a, T::Element<A>, A>) -> Self {

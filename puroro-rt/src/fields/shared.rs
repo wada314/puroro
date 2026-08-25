@@ -98,14 +98,17 @@ pub trait MessageCommonBits {
 /// Allocator access through a [`MessageCommon`].
 pub trait MessageCommonAlloc {
     /// Message allocator type.
-    type Alloc: Allocator + Clone;
+    type Alloc: Allocator;
 
     /// Borrow the canonical message allocator.
     fn alloc(&self) -> &Self::Alloc;
 
     /// Clone the canonical message allocator.
     #[inline]
-    fn clone_alloc(&self) -> Self::Alloc {
+    fn clone_alloc(&self) -> Self::Alloc
+    where
+        Self::Alloc: Clone,
+    {
         self.alloc().clone()
     }
 }
@@ -209,7 +212,7 @@ impl<B: BitStorage, A: Allocator> MessageCommonBits for MessageCommon<B, A> {
     }
 }
 
-impl<B, A: Allocator + Clone> MessageCommonAlloc for MessageCommon<B, A> {
+impl<B, A: Allocator> MessageCommonAlloc for MessageCommon<B, A> {
     type Alloc = A;
 
     #[inline]

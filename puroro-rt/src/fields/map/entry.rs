@@ -30,7 +30,7 @@ pub(super) fn entry_payload_len<K, V, A>(
 where
     K: MapKey,
     V: RepeatedElement,
-    A: Allocator + Clone,
+    A: Allocator,
 {
     encoded_len_field::<K, A>(K::wire_view(key), field_number_const::<KEY_FIELD>(), ctx)
         + encoded_len_field::<V, A>(
@@ -51,7 +51,7 @@ pub(super) fn encode_map_entry<K, V, A, B>(
 ) where
     K: MapKey,
     V: RepeatedElement,
-    A: Allocator + Clone,
+    A: Allocator,
     B: BufMut,
 {
     let payload_len = entry_payload_len::<K, V, A>(key, value, ctx);
@@ -74,19 +74,19 @@ pub(super) fn encode_map_entry<K, V, A, B>(
 fn discard_partial_entry<K, V, A>(
     key: Option<K::Element<A>>,
     value: Option<V::Element<A>>,
-    alloc: A,
+    alloc: &A,
 ) where
-    K: MapKey + RepeatedElementMerge<A>,
-    V: RepeatedElementMerge<A>,
-    A: Allocator + Clone,
+    K: MapKey,
+    V: RepeatedElement,
+    A: Allocator,
 {
     if let Some(k) = key {
         // SAFETY: message allocator owns decoded key payloads.
-        unsafe { K::deallocate_element(k, &alloc) };
+        unsafe { K::deallocate_element(k, alloc) };
     }
     if let Some(v) = value {
         // SAFETY: message allocator owns decoded value payloads.
-        unsafe { V::deallocate_element(v, &alloc) };
+        unsafe { V::deallocate_element(v, alloc) };
     }
 }
 
@@ -109,7 +109,7 @@ where
         let (field_number, wire_type) = match decode::decode_tag(buf) {
             Ok(t) => t,
             Err(e) => {
-                discard_partial_entry::<K, V, A>(key, value, alloc);
+                discard_partial_entry::<K, V, A>(key, value, &alloc);
                 return Err(e);
             }
         };
@@ -122,7 +122,7 @@ where
                     }
                 }
                 Err(e) => {
-                    discard_partial_entry::<K, V, A>(key, value, alloc);
+                    discard_partial_entry::<K, V, A>(key, value, &alloc);
                     return Err(e);
                 }
             },
@@ -134,13 +134,13 @@ where
                     }
                 }
                 Err(e) => {
-                    discard_partial_entry::<K, V, A>(key, value, alloc);
+                    discard_partial_entry::<K, V, A>(key, value, &alloc);
                     return Err(e);
                 }
             },
             _ => {
                 if let Err(e) = decode::skip_field(wire_type, buf) {
-                    discard_partial_entry::<K, V, A>(key, value, alloc);
+                    discard_partial_entry::<K, V, A>(key, value, &alloc);
                     return Err(e);
                 }
             }

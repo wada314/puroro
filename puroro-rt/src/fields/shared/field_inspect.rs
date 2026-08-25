@@ -283,7 +283,10 @@ impl<C> CloneFieldsVisitor<C> {
     }
 }
 
-impl<C: MessageCommonAlloc> FieldPairVisitorMut<C> for CloneFieldsVisitor<C> {
+impl<C: MessageCommonAlloc> FieldPairVisitorMut<C> for CloneFieldsVisitor<C>
+where
+    C::Alloc: Clone,
+{
     type Break = ();
 
     #[inline]

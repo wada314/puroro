@@ -37,7 +37,7 @@ pub struct MapField<K, V, const FIELD: u32, A>
 where
     K: MapKey,
     V: RepeatedElement,
-    A: Allocator + Clone,
+    A: Allocator,
 {
     entries: HashMap<K::Element<A>, V::Element<A>, DefaultHashBuilder, A>,
 }
@@ -46,7 +46,7 @@ impl<K, V, const FIELD: u32, A> MapField<K, V, FIELD, A>
 where
     K: MapKey,
     V: RepeatedElement,
-    A: Allocator + Clone,
+    A: Allocator,
 {
     /// Creates an empty map using `alloc` as the `HashMap` allocator.
     pub fn new_in(alloc: A) -> Self {
@@ -90,7 +90,7 @@ impl<K, V, const FIELD: u32, A, P> FieldDeallocate<MessageCommon<P, A>> for MapF
 where
     K: MapKey,
     V: RepeatedElement,
-    A: Allocator + Clone,
+    A: Allocator,
 {
     #[inline]
     fn deallocate(&mut self, common: &MessageCommon<P, A>) {
@@ -109,7 +109,7 @@ impl<K, V, const FIELD: u32, A, P> FieldPartialEq<MessageCommon<P, A>> for MapFi
 where
     K: MapKey,
     V: RepeatedElement,
-    A: Allocator + Clone,
+    A: Allocator,
     K::Element<A>: Eq + Hash,
     V::Element<A>: PartialEq,
 {
@@ -133,7 +133,7 @@ impl<K, V, const FIELD: u32, A, P> FieldDebug<MessageCommon<P, A>> for MapField<
 where
     K: MapKey,
     V: RepeatedElement,
-    A: Allocator + Clone,
+    A: Allocator,
     K::Element<A>: Eq + Hash + Debug,
     V::Element<A>: Debug,
 {
@@ -147,7 +147,7 @@ impl<K, V, const FIELD: u32, A, P> FieldEncode<MessageCommon<P, A>> for MapField
 where
     K: MapKey,
     V: RepeatedElement,
-    A: Allocator + Clone,
+    A: Allocator,
     K::Element<A>: Eq + Hash,
 {
     fn encoded_len(&self, _common: &MessageCommon<P, A>, ctx: &mut EncodeCtx) -> usize {
@@ -199,7 +199,7 @@ pub struct MapFieldRef<'a, K, V, const FIELD: u32, A, Pb>
 where
     K: MapKey,
     V: RepeatedElement,
-    A: Allocator + Clone,
+    A: Allocator,
 {
     field: &'a MapField<K, V, FIELD, A>,
     #[allow(dead_code)]
@@ -210,7 +210,7 @@ impl<'a, K, V, const FIELD: u32, A, Pb> MapFieldRef<'a, K, V, FIELD, A, Pb>
 where
     K: MapKey,
     V: RepeatedElement,
-    A: Allocator + Clone,
+    A: Allocator,
 {
     #[inline]
     fn new(field: &'a MapField<K, V, FIELD, A>, common: &'a MessageCommon<Pb, A>) -> Self {
@@ -239,7 +239,7 @@ pub struct MapFieldMut<'f, 'c, K, V, const FIELD: u32, A, Pb>
 where
     K: MapKey,
     V: RepeatedElement,
-    A: Allocator + Clone,
+    A: Allocator,
 {
     field: &'f mut MapField<K, V, FIELD, A>,
     common: &'c mut MessageCommon<Pb, A>,
@@ -249,7 +249,7 @@ impl<'f, 'c, K, V, const FIELD: u32, A, Pb> MapFieldMut<'f, 'c, K, V, FIELD, A, 
 where
     K: MapKey,
     V: RepeatedElement,
-    A: Allocator + Clone,
+    A: Allocator,
 {
     #[inline]
     fn new(field: &'f mut MapField<K, V, FIELD, A>, common: &'c mut MessageCommon<Pb, A>) -> Self {
@@ -261,6 +261,7 @@ where
     pub fn get_element_mut<Q>(&mut self, key: &Q) -> Option<V::ElementMut<'_, A>>
     where
         V: RepeatedElementMut,
+        A: Clone,
         K::Element<A>: Eq + Hash,
         Q: ?Sized + Hash + Equivalent<K::Element<A>>,
     {
@@ -276,6 +277,7 @@ where
     pub fn entry_element_mut_view(&mut self, key: &K::RefView) -> V::ElementMut<'_, A>
     where
         V: RepeatedElementMut + RepeatedElementMerge<A>,
+        A: Clone,
         K::RefView: Hash + Eq + ToOwnedIn<A, Owned = K::Element<A>>,
         K::Element<A>: Eq + Hash + Borrow<K::RefView>,
     {
@@ -350,6 +352,7 @@ where
     where
         K: RepeatedElementMerge<A>,
         V: RepeatedElementMerge<A>,
+        A: Clone,
         K::Element<A>: Eq + Hash,
     {
         if wire_type != WireType::Len {
@@ -372,7 +375,7 @@ impl<'a, K, V, const FIELD: u32, A, Pb> MapRef<K::RefView, V::RefView>
 where
     K: MapKey,
     V: RepeatedElement,
-    A: Allocator + Clone,
+    A: Allocator,
     K::RefView: Hash + Eq,
     K::Element<A>: Hash + Eq + Borrow<K::RefView>,
 {
