@@ -36,17 +36,17 @@ pub trait LenCodec: Sized {
     type RefView: ?Sized + Debug + PartialEq;
 
     /// Singular / repeated physical slot.
-    type Slot<A: Allocator + Clone>: AddressableSlot
+    type Slot<A: Allocator>: AddressableSlot
         + DefaultIn<A>
         + DeallocateIn<A>
         + Deref<Target = Self::RefView>;
 
     /// Target of [`Mut`](Self::Mut) / repeated element mut
     /// ([`unmanaged::String`](::unmanaged::String) / `Vec<u8, A>`).
-    type MutTarget<A: Allocator + Clone>: ?Sized;
+    type MutTarget<A: Allocator>: ?Sized;
 
     /// Singular / repeated mutable handle (`StringGuard` / `VecGuard`).
-    type Mut<'a, A: Allocator + Clone>: DerefMut<Target = Self::MutTarget<A>>
+    type Mut<'a, A: Allocator>: DerefMut<Target = Self::MutTarget<A>>
     where
         Self: 'a,
         A: 'a;
@@ -96,9 +96,9 @@ pub type ProtoBytes = LenScalar<BytesCodec>;
 
 impl LenCodec for StringCodec {
     type RefView = str;
-    type Slot<A: Allocator + Clone> = UnmanagedString<A>;
-    type MutTarget<A: Allocator + Clone> = ::unmanaged::String<A>;
-    type Mut<'a, A: Allocator + Clone>
+    type Slot<A: Allocator> = UnmanagedString<A>;
+    type MutTarget<A: Allocator> = ::unmanaged::String<A>;
+    type Mut<'a, A: Allocator>
         = StringGuard<'a, A>
     where
         Self: 'a,
@@ -137,9 +137,9 @@ impl LenCodec for StringCodec {
 
 impl LenCodec for BytesCodec {
     type RefView = [u8];
-    type Slot<A: Allocator + Clone> = UnmanagedVec<u8, A>;
-    type MutTarget<A: Allocator + Clone> = AllocVec<u8, A>;
-    type Mut<'a, A: Allocator + Clone>
+    type Slot<A: Allocator> = UnmanagedVec<u8, A>;
+    type MutTarget<A: Allocator> = AllocVec<u8, A>;
+    type Mut<'a, A: Allocator>
         = VecGuard<'a, u8, A>
     where
         Self: 'a,

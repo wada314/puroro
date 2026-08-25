@@ -37,10 +37,10 @@ use crate::fields::wire::wire_payload::{CopyWirePayload, VarintPayload};
 ///
 /// Associated [`Slot`](Self::Slot) / [`Mut`](Self::Mut) are the physical storage
 /// and `_mut` handle for this `(T, L)` pair — not properties of `T` alone.
-pub trait ValueLayout<T: SingularType, A: Allocator + Clone>: Copy {
+pub trait ValueLayout<T: SingularType, A: Allocator>: Copy {
     /// Physical value stored in the singular field slot (excluding
     /// [`MessageCommon`] bits).
-    type Slot: AddressableSlot + DefaultIn<A>;
+    type Slot: AddressableSlot;
 
     /// Mutable handle returned by `_mut` accessors (`&mut i32`, SSO mutator,
     /// bit handle, …).
@@ -72,7 +72,8 @@ pub trait ValueLayout<T: SingularType, A: Allocator + Clone>: Copy {
         I: SlotInitMut,
         MessageCommon<Pb, A>: MessageCommonBits,
         T: 'a,
-        A: 'a;
+        A: 'a + Clone,
+        Self::Slot: DefaultIn<A>;
 
     /// Clears the logical value and slot presence / payload.
     ///
@@ -82,7 +83,9 @@ pub trait ValueLayout<T: SingularType, A: Allocator + Clone>: Copy {
     where
         VS: ValueSlot<Self::Slot, A>,
         I: SlotInitMut,
-        MessageCommon<Pb, A>: MessageCommonBits;
+        MessageCommon<Pb, A>: MessageCommonBits,
+        A: Clone,
+        Self::Slot: DefaultIn<A>;
 
     fn merge<VS, I, Pb, B>(
         slot: &mut VS,
@@ -97,7 +100,9 @@ pub trait ValueLayout<T: SingularType, A: Allocator + Clone>: Copy {
         VS: ValueSlot<Self::Slot, A>,
         I: SlotInitMut,
         MessageCommon<Pb, A>: MessageCommonBits,
-        B: DecodeBuf;
+        B: DecodeBuf,
+        A: Clone,
+        Self::Slot: DefaultIn<A>;
 
     /// Message / oneof teardown for this field's value slot.
     ///
@@ -137,9 +142,9 @@ pub trait ValueLayoutClone<T: SingularType, A: Allocator + Clone>: ValueLayout<T
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
 pub struct Inline;
 
-impl<T: PayloadAccess, A: Allocator + Clone> ValueLayout<T, A> for Inline
+impl<T: PayloadAccess, A: Allocator> ValueLayout<T, A> for Inline
 where
-    T::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
+    T::Slot<A>: AddressableSlot + DeallocateIn<A>,
 {
     type Slot = T::Slot<A>;
     type Mut<'a>
@@ -175,7 +180,8 @@ where
         I: SlotInitMut,
         MessageCommon<Pb, A>: MessageCommonBits,
         T: 'a,
-        A: 'a,
+        A: 'a + Clone,
+        T::Slot<A>: DefaultIn<A>,
     {
         T::with_mut(slot, init, common)
     }
@@ -186,6 +192,8 @@ where
         VS: ValueSlot<T::Slot<A>, A>,
         I: SlotInitMut,
         MessageCommon<Pb, A>: MessageCommonBits,
+        A: Clone,
+        T::Slot<A>: DefaultIn<A>,
     {
         T::clear(slot, init, common);
     }
@@ -205,6 +213,8 @@ where
         I: SlotInitMut,
         MessageCommon<Pb, A>: MessageCommonBits,
         B: DecodeBuf,
+        A: Clone,
+        T::Slot<A>: DefaultIn<A>,
     {
         T::merge(slot, init, common, wire_type, buf, field, depth)
     }
@@ -253,9 +263,7 @@ where
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
 pub struct BitPacked<const VALUE_BIT: usize>;
 
-impl<A: Allocator + Clone, const VALUE_BIT: usize> ValueLayout<ProtoBool, A>
-    for BitPacked<VALUE_BIT>
-{
+impl<A: Allocator, const VALUE_BIT: usize> ValueLayout<ProtoBool, A> for BitPacked<VALUE_BIT> {
     type Slot = ();
     type Mut<'a>
         = BitRef<'a, Mut, u8, Lsb0>
@@ -289,7 +297,8 @@ impl<A: Allocator + Clone, const VALUE_BIT: usize> ValueLayout<ProtoBool, A>
         I: SlotInitMut,
         MessageCommon<Pb, A>: MessageCommonBits,
         ProtoBool: 'a,
-        A: 'a,
+        A: 'a + Clone,
+        Self::Slot: DefaultIn<A>,
     {
         let _ = ValueSlot::with_mut(slot, init, common).get_mut();
         common.bit_mut(VALUE_BIT)
@@ -301,6 +310,8 @@ impl<A: Allocator + Clone, const VALUE_BIT: usize> ValueLayout<ProtoBool, A>
         VS: ValueSlot<(), A>,
         I: SlotInitMut,
         MessageCommon<Pb, A>: MessageCommonBits,
+        A: Clone,
+        Self::Slot: DefaultIn<A>,
     {
         common.set_bit(VALUE_BIT, false);
         let _ = ValueSlot::with_mut(slot, init, common).take_clear();
@@ -321,6 +332,8 @@ impl<A: Allocator + Clone, const VALUE_BIT: usize> ValueLayout<ProtoBool, A>
         I: SlotInitMut,
         MessageCommon<Pb, A>: MessageCommonBits,
         B: DecodeBuf,
+        A: Clone,
+        Self::Slot: DefaultIn<A>,
     {
         match BoolCodec::from_wire_body(VarintPayload::decode(wire_type, buf)?) {
             Ok(new) => {
@@ -389,7 +402,7 @@ pub struct InlineOrHeap<const HEAP_BIT: usize>;
 impl<const HEAP_BIT: usize> InlineOrHeap<HEAP_BIT> {
     /// `true` when `HEAP_BIT` selects the heap arm ([`SSO_HEAP`]).
     #[inline]
-    fn is_heap<Pb, A: Allocator + Clone>(common: &MessageCommon<Pb, A>) -> bool
+    fn is_heap<Pb, A: Allocator>(common: &MessageCommon<Pb, A>) -> bool
     where
         MessageCommon<Pb, A>: MessageCommonBits,
     {
@@ -398,7 +411,7 @@ impl<const HEAP_BIT: usize> InlineOrHeap<HEAP_BIT> {
 
     /// Writes `HEAP_BIT` (`is_heap == `[`SSO_HEAP`] / [`SSO_INLINE`]).
     #[inline]
-    fn set_heap<Pb, A: Allocator + Clone>(common: &mut MessageCommon<Pb, A>, is_heap: bool)
+    fn set_heap<Pb, A: Allocator>(common: &mut MessageCommon<Pb, A>, is_heap: bool)
     where
         MessageCommon<Pb, A>: MessageCommonBits,
     {
@@ -406,9 +419,7 @@ impl<const HEAP_BIT: usize> InlineOrHeap<HEAP_BIT> {
     }
 }
 
-impl<A: Allocator + Clone, const HEAP_BIT: usize> ValueLayout<ProtoString, A>
-    for InlineOrHeap<HEAP_BIT>
-{
+impl<A: Allocator, const HEAP_BIT: usize> ValueLayout<ProtoString, A> for InlineOrHeap<HEAP_BIT> {
     type Slot = SsoString<A>;
     type Mut<'a>
         = SsoStringMut<'a, A>
@@ -442,7 +453,8 @@ impl<A: Allocator + Clone, const HEAP_BIT: usize> ValueLayout<ProtoString, A>
         I: SlotInitMut,
         MessageCommon<Pb, A>: MessageCommonBits,
         ProtoString: 'a,
-        A: 'a,
+        A: 'a + Clone,
+        Self::Slot: DefaultIn<A>,
     {
         let alloc = common.alloc.clone();
         // Ensure presence/init, then split the slot pointer from `common` so we
@@ -460,6 +472,8 @@ impl<A: Allocator + Clone, const HEAP_BIT: usize> ValueLayout<ProtoString, A>
         VS: ValueSlot<SsoString<A>, A>,
         I: SlotInitMut,
         MessageCommon<Pb, A>: MessageCommonBits,
+        A: Clone,
+        Self::Slot: DefaultIn<A>,
     {
         if !init.is_initialized(|b| common.is_bit_set(b)) {
             Self::set_heap(common, SSO_INLINE);
@@ -494,6 +508,8 @@ impl<A: Allocator + Clone, const HEAP_BIT: usize> ValueLayout<ProtoString, A>
         I: SlotInitMut,
         MessageCommon<Pb, A>: MessageCommonBits,
         B: DecodeBuf,
+        A: Clone,
+        Self::Slot: DefaultIn<A>,
     {
         if wire_type != WireType::Len {
             return Err(DecodeError::InvalidTag);
@@ -546,9 +562,7 @@ impl<A: Allocator + Clone, const HEAP_BIT: usize> ValueLayoutClone<ProtoString, 
     }
 }
 
-impl<A: Allocator + Clone, const HEAP_BIT: usize> ValueLayout<ProtoBytes, A>
-    for InlineOrHeap<HEAP_BIT>
-{
+impl<A: Allocator, const HEAP_BIT: usize> ValueLayout<ProtoBytes, A> for InlineOrHeap<HEAP_BIT> {
     type Slot = SsoBytes<A>;
     type Mut<'a>
         = SsoBytesMut<'a, A>
@@ -582,7 +596,8 @@ impl<A: Allocator + Clone, const HEAP_BIT: usize> ValueLayout<ProtoBytes, A>
         I: SlotInitMut,
         MessageCommon<Pb, A>: MessageCommonBits,
         ProtoBytes: 'a,
-        A: 'a,
+        A: 'a + Clone,
+        Self::Slot: DefaultIn<A>,
     {
         let alloc = common.alloc.clone();
         let slot_ptr: *mut SsoBytes<A> = ValueSlot::with_mut(slot, init, common).get_mut();
@@ -598,6 +613,8 @@ impl<A: Allocator + Clone, const HEAP_BIT: usize> ValueLayout<ProtoBytes, A>
         VS: ValueSlot<SsoBytes<A>, A>,
         I: SlotInitMut,
         MessageCommon<Pb, A>: MessageCommonBits,
+        A: Clone,
+        Self::Slot: DefaultIn<A>,
     {
         if !init.is_initialized(|b| common.is_bit_set(b)) {
             Self::set_heap(common, SSO_INLINE);
@@ -631,6 +648,8 @@ impl<A: Allocator + Clone, const HEAP_BIT: usize> ValueLayout<ProtoBytes, A>
         I: SlotInitMut,
         MessageCommon<Pb, A>: MessageCommonBits,
         B: DecodeBuf,
+        A: Clone,
+        Self::Slot: DefaultIn<A>,
     {
         if wire_type != WireType::Len {
             return Err(DecodeError::InvalidTag);

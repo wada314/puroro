@@ -74,24 +74,24 @@ pub trait SingularType: EncodeType {}
 pub trait PayloadAccess: SingularType {
     /// Physical value stored in the singular field slot (excluding
     /// [`MessageCommon`] bits).
-    type Slot<A: Allocator + Clone>: AddressableSlot;
+    type Slot<A: Allocator>: AddressableSlot;
 
     /// Mutable handle returned by `_mut` accessors (`&mut i32`, `StringGuard`, …).
     ///
     /// Bound is [`Deref`] only so mutators need not expose `DerefMut`.
-    type Mut<'a, A: Allocator + Clone>: Deref
+    type Mut<'a, A: Allocator>: Deref
     where
         Self: 'a,
         A: 'a;
 
     /// Value accepted by [`write`](Self::write).
-    type Written<A: Allocator + Clone>;
+    type Written<A: Allocator>;
 
     /// `true` when the field holds protobuf empty / type-zero (IMPLICIT omit).
     ///
     /// Numerics / enums compare to [`Default`]; string / bytes use `is_empty`;
     /// a present nested message is never empty (absence is the presence layer).
-    fn is_proto_empty<A: Allocator + Clone, Pb>(
+    fn is_proto_empty<A: Allocator, Pb>(
         slot: &Self::Slot<A>,
         common: &MessageCommon<Pb, A>,
     ) -> bool
@@ -99,7 +99,7 @@ pub trait PayloadAccess: SingularType {
         MessageCommon<Pb, A>: MessageCommonBits;
 
     /// Reads the logical getter view from the slot and/or `common`.
-    fn get<'a, A: Allocator + Clone + 'a, Pb>(
+    fn get<'a, A: Allocator + 'a, Pb>(
         slot: &'a Self::Slot<A>,
         common: &'a MessageCommon<Pb, A>,
     ) -> Self::View<'a, A>
@@ -184,16 +184,16 @@ where
     C: NumericalType,
     C::NativeType: AddressableSlot,
 {
-    type Slot<A: Allocator + Clone> = C::NativeType;
-    type Mut<'a, A: Allocator + Clone>
+    type Slot<A: Allocator> = C::NativeType;
+    type Mut<'a, A: Allocator>
         = &'a mut C::NativeType
     where
         Self: 'a,
         A: 'a;
-    type Written<A: Allocator + Clone> = C::NativeType;
+    type Written<A: Allocator> = C::NativeType;
 
     #[inline]
-    fn is_proto_empty<A: Allocator + Clone, Pb>(
+    fn is_proto_empty<A: Allocator, Pb>(
         slot: &C::NativeType,
         _common: &MessageCommon<Pb, A>,
     ) -> bool
@@ -205,7 +205,7 @@ where
     }
 
     #[inline]
-    fn get<'a, A: Allocator + Clone + 'a, Pb>(
+    fn get<'a, A: Allocator + 'a, Pb>(
         slot: &'a C::NativeType,
         _common: &'a MessageCommon<Pb, A>,
     ) -> C::NativeType
@@ -313,19 +313,16 @@ where
 impl<C: LenCodec> SingularType for LenScalar<C> {}
 
 impl<C: LenCodec> PayloadAccess for LenScalar<C> {
-    type Slot<A: Allocator + Clone> = C::Slot<A>;
-    type Mut<'a, A: Allocator + Clone>
+    type Slot<A: Allocator> = C::Slot<A>;
+    type Mut<'a, A: Allocator>
         = C::Mut<'a, A>
     where
         Self: 'a,
         A: 'a;
-    type Written<A: Allocator + Clone> = C::Slot<A>;
+    type Written<A: Allocator> = C::Slot<A>;
 
     #[inline]
-    fn is_proto_empty<A: Allocator + Clone, Pb>(
-        slot: &C::Slot<A>,
-        _common: &MessageCommon<Pb, A>,
-    ) -> bool
+    fn is_proto_empty<A: Allocator, Pb>(slot: &C::Slot<A>, _common: &MessageCommon<Pb, A>) -> bool
     where
         MessageCommon<Pb, A>: MessageCommonBits,
     {
@@ -333,7 +330,7 @@ impl<C: LenCodec> PayloadAccess for LenScalar<C> {
     }
 
     #[inline]
-    fn get<'a, A: Allocator + Clone + 'a, Pb>(
+    fn get<'a, A: Allocator + 'a, Pb>(
         slot: &'a C::Slot<A>,
         _common: &'a MessageCommon<Pb, A>,
     ) -> &'a C::RefView

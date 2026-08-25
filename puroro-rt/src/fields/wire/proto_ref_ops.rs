@@ -16,7 +16,7 @@ use crate::message_encode::MessageEncode;
 
 /// Equality for [`EncodeType::View`](super::encode_type::EncodeType::View)
 /// (used by catalog [`FieldPartialEq`](crate::fields::shared::field_inspect::FieldPartialEq)).
-pub(crate) trait ProtoRefEq<A: Allocator + Clone>: SingularType {
+pub(crate) trait ProtoRefEq<A: Allocator>: SingularType {
     fn option_eq<'a>(lhs: Option<Self::View<'a, A>>, rhs: Option<Self::View<'a, A>>) -> bool
     where
         A: 'a;
@@ -24,7 +24,7 @@ pub(crate) trait ProtoRefEq<A: Allocator + Clone>: SingularType {
 
 /// [`Debug`] for [`EncodeType::View`](super::encode_type::EncodeType::View)
 /// (used by catalog [`FieldDebug`](crate::fields::shared::field_inspect::FieldDebug)).
-pub(crate) trait ProtoRefDebug<A: Allocator + Clone>: SingularType {
+pub(crate) trait ProtoRefDebug<A: Allocator>: SingularType {
     fn fmt_ref<'a>(value: &Self::View<'a, A>, f: &mut Formatter<'_>) -> FmtResult
     where
         A: 'a;
@@ -50,7 +50,7 @@ impl<C, A> ProtoRefEq<A> for Numerical<C>
 where
     C: NumericalType,
     C::NativeType: PartialEq + AddressableSlot,
-    A: Allocator + Clone,
+    A: Allocator,
 {
     #[inline]
     fn option_eq<'a>(lhs: Option<C::NativeType>, rhs: Option<C::NativeType>) -> bool
@@ -65,7 +65,7 @@ impl<C, A> ProtoRefDebug<A> for Numerical<C>
 where
     C: NumericalType,
     C::NativeType: Debug + AddressableSlot,
-    A: Allocator + Clone,
+    A: Allocator,
 {
     #[inline]
     fn fmt_ref<'a>(value: &C::NativeType, f: &mut Formatter<'_>) -> FmtResult
@@ -76,7 +76,7 @@ where
     }
 }
 
-impl<A: Allocator + Clone> ProtoRefEq<A> for LenScalar<StringCodec> {
+impl<A: Allocator> ProtoRefEq<A> for LenScalar<StringCodec> {
     #[inline]
     fn option_eq<'a>(lhs: Option<&'a str>, rhs: Option<&'a str>) -> bool
     where
@@ -86,7 +86,7 @@ impl<A: Allocator + Clone> ProtoRefEq<A> for LenScalar<StringCodec> {
     }
 }
 
-impl<A: Allocator + Clone> ProtoRefDebug<A> for LenScalar<StringCodec> {
+impl<A: Allocator> ProtoRefDebug<A> for LenScalar<StringCodec> {
     #[inline]
     fn fmt_ref<'a>(value: &&'a str, f: &mut Formatter<'_>) -> FmtResult
     where
@@ -96,7 +96,7 @@ impl<A: Allocator + Clone> ProtoRefDebug<A> for LenScalar<StringCodec> {
     }
 }
 
-impl<A: Allocator + Clone> ProtoRefEq<A> for LenScalar<BytesCodec> {
+impl<A: Allocator> ProtoRefEq<A> for LenScalar<BytesCodec> {
     #[inline]
     fn option_eq<'a>(lhs: Option<&'a [u8]>, rhs: Option<&'a [u8]>) -> bool
     where
@@ -106,7 +106,7 @@ impl<A: Allocator + Clone> ProtoRefEq<A> for LenScalar<BytesCodec> {
     }
 }
 
-impl<A: Allocator + Clone> ProtoRefDebug<A> for LenScalar<BytesCodec> {
+impl<A: Allocator> ProtoRefDebug<A> for LenScalar<BytesCodec> {
     #[inline]
     fn fmt_ref<'a>(value: &&'a [u8], f: &mut Formatter<'_>) -> FmtResult
     where
@@ -120,7 +120,7 @@ impl<A: Allocator + Clone> ProtoRefDebug<A> for LenScalar<BytesCodec> {
 impl<M, A> ProtoRefEq<A> for ProtoMessage<M>
 where
     M: Message<Alloc = A> + MessageEncode + PartialEq,
-    A: Allocator + Clone,
+    A: Allocator,
 {
     #[inline]
     fn option_eq<'a>(lhs: Option<&'a M>, rhs: Option<&'a M>) -> bool
@@ -134,7 +134,7 @@ where
 impl<M, A> ProtoRefDebug<A> for ProtoMessage<M>
 where
     M: Message<Alloc = A> + MessageEncode + Debug,
-    A: Allocator + Clone,
+    A: Allocator,
 {
     #[inline]
     fn fmt_ref<'a>(value: &&'a M, f: &mut Formatter<'_>) -> FmtResult

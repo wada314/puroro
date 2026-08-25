@@ -56,8 +56,8 @@ impl<H> AddressableSlot for SsoBuf<H> {}
 /// deep-copy the extracted `T`.
 pub trait ValueSlot<T, A>: Sized
 where
-    T: AddressableSlot + DefaultIn<A>,
-    A: Allocator + Clone,
+    T: AddressableSlot,
+    A: Allocator,
 {
     /// Creates value storage when the parent message is constructed.
     ///
@@ -106,9 +106,12 @@ pub trait ValueSlotRefAccess<'s, T> {
 }
 
 /// Mutation ops on a value-slot view whose physical payload type is `T`.
-pub trait ValueSlotMutAccess<'a, T, A: Allocator + Clone> {
+pub trait ValueSlotMutAccess<'a, T, A: Allocator> {
     /// Lazy-initializes when uninitialized, then returns `&mut T`.
-    fn get_mut(self) -> &'a mut T;
+    fn get_mut(self) -> &'a mut T
+    where
+        A: Clone,
+        T: DefaultIn<A>;
 
     /// Installs `value` and returns the previous live payload, if any.
     ///
@@ -121,7 +124,10 @@ pub trait ValueSlotMutAccess<'a, T, A: Allocator + Clone> {
     ///
     /// Always-initialized slots reinstall [`DefaultIn::default_in`] and still
     /// return the old value. The caller must release it.
-    fn take_clear(self) -> Option<T>;
+    fn take_clear(self) -> Option<T>
+    where
+        A: Clone,
+        T: DefaultIn<A>;
 }
 
 // ---------------------------------------------------------------------------
@@ -172,13 +178,17 @@ where
     }
 }
 
-impl<'a, T, I: SlotInitMut, Pb, A: Allocator + Clone> ValueSlotMutAccess<'a, T, A>
+impl<'a, T, I: SlotInitMut, Pb, A: Allocator> ValueSlotMutAccess<'a, T, A>
     for ValueSlotMut<'a, T, T, I, Pb, A>
 where
-    T: AddressableSlot + DefaultIn<A>,
+    T: AddressableSlot,
 {
     #[inline]
-    fn get_mut(self) -> &'a mut T {
+    fn get_mut(self) -> &'a mut T
+    where
+        A: Clone,
+        T: DefaultIn<A>,
+    {
         self.slot
     }
 
@@ -188,7 +198,11 @@ where
     }
 
     #[inline]
-    fn take_clear(self) -> Option<T> {
+    fn take_clear(self) -> Option<T>
+    where
+        A: Clone,
+        T: DefaultIn<A>,
+    {
         Some(mem::replace(
             self.slot,
             T::default_in(self.common.alloc.clone()),
@@ -196,14 +210,18 @@ where
     }
 }
 
-impl<'a, T, I: SlotInitMut, Pb, A: Allocator + Clone> ValueSlotMutAccess<'a, T, A>
+impl<'a, T, I: SlotInitMut, Pb, A: Allocator> ValueSlotMutAccess<'a, T, A>
     for ValueSlotMut<'a, MaybeUninit<T>, T, I, Pb, A>
 where
-    T: AddressableSlot + DefaultIn<A>,
+    T: AddressableSlot,
     MessageCommon<Pb, A>: MessageCommonBits,
 {
     #[inline]
-    fn get_mut(self) -> &'a mut T {
+    fn get_mut(self) -> &'a mut T
+    where
+        A: Clone,
+        T: DefaultIn<A>,
+    {
         if !self.init.is_initialized(|b| self.common.is_bit_set(b)) {
             self.slot.write(T::default_in(self.common.alloc.clone()));
             self.init
@@ -227,7 +245,11 @@ where
     }
 
     #[inline]
-    fn take_clear(self) -> Option<T> {
+    fn take_clear(self) -> Option<T>
+    where
+        A: Clone,
+        T: DefaultIn<A>,
+    {
         if self.init.is_initialized(|b| self.common.is_bit_set(b)) {
             // SAFETY: init bit set implies a live payload we now take ownership of.
             let old = unsafe { self.slot.assume_init_read() };
@@ -243,7 +265,7 @@ where
 impl<T, A> ValueSlot<T, A> for T
 where
     T: AddressableSlot + DefaultIn<A>,
-    A: Allocator + Clone,
+    A: Allocator,
 {
     fn new_in(alloc: A) -> Self {
         T::default_in(alloc)
@@ -301,8 +323,8 @@ where
 
 impl<T, A> ValueSlot<T, A> for MaybeUninit<T>
 where
-    T: AddressableSlot + DefaultIn<A>,
-    A: Allocator + Clone,
+    T: AddressableSlot,
+    A: Allocator,
 {
     fn new_in(_alloc: A) -> Self {
         MaybeUninit::uninit()
@@ -382,13 +404,17 @@ where
     }
 }
 
-impl<'a, T, I: SlotInitMut, Pb, A: Allocator + Clone> ValueSlotMutAccess<'a, T, A>
+impl<'a, T, I: SlotInitMut, Pb, A: Allocator> ValueSlotMutAccess<'a, T, A>
     for ValueSlotMut<'a, Option<T>, T, I, Pb, A>
 where
-    T: AddressableSlot + DefaultIn<A>,
+    T: AddressableSlot,
 {
     #[inline]
-    fn get_mut(self) -> &'a mut T {
+    fn get_mut(self) -> &'a mut T
+    where
+        A: Clone,
+        T: DefaultIn<A>,
+    {
         self.slot
             .get_or_insert_with(|| T::default_in(self.common.alloc.clone()))
     }
@@ -399,15 +425,19 @@ where
     }
 
     #[inline]
-    fn take_clear(self) -> Option<T> {
+    fn take_clear(self) -> Option<T>
+    where
+        A: Clone,
+        T: DefaultIn<A>,
+    {
         self.slot.take()
     }
 }
 
 impl<T, A> ValueSlot<T, A> for Option<T>
 where
-    T: AddressableSlot + DefaultIn<A>,
-    A: Allocator + Clone,
+    T: AddressableSlot,
+    A: Allocator,
 {
     fn new_in(_alloc: A) -> Self {
         None

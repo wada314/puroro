@@ -61,11 +61,11 @@ pub struct SingularField<
     T: SingularType,
     P: FieldPresence,
     const FIELD: u32,
-    A: Allocator + Clone,
+    A: Allocator,
     L: ValueLayout<T, A> = Inline,
     D = ProtoDefault,
 > where
-    L::Slot: AddressableSlot + DefaultIn<A>,
+    L::Slot: AddressableSlot,
     P::ValueSlot<L::Slot>: ValueSlot<L::Slot, A>,
 {
     value: ManuallyDrop<P::ValueSlot<L::Slot>>,
@@ -76,9 +76,9 @@ impl<T, P, const FIELD: u32, A, L, D> SingularFieldAccess for SingularField<T, P
 where
     T: SingularType,
     P: FieldPresence,
-    A: Allocator + Clone,
+    A: Allocator,
     L: ValueLayout<T, A>,
-    L::Slot: AddressableSlot + DefaultIn<A>,
+    L::Slot: AddressableSlot,
     P::ValueSlot<L::Slot>: ValueSlot<L::Slot, A>,
 {
     type Mut<'a>
@@ -91,9 +91,9 @@ impl<T, P, const FIELD: u32, A, L, D> Clone for SingularField<T, P, FIELD, A, L,
 where
     T: SingularType,
     P: FieldPresence,
-    A: Allocator + Clone,
+    A: Allocator,
     L: ValueLayout<T, A>,
-    L::Slot: AddressableSlot + DefaultIn<A>,
+    L::Slot: AddressableSlot,
     P::ValueSlot<L::Slot>: ValueSlot<L::Slot, A> + Copy,
 {
     fn clone(&self) -> Self {
@@ -105,9 +105,9 @@ impl<T, P, const FIELD: u32, A, L, D> Copy for SingularField<T, P, FIELD, A, L, 
 where
     T: SingularType,
     P: FieldPresence,
-    A: Allocator + Clone,
+    A: Allocator,
     L: ValueLayout<T, A>,
-    L::Slot: AddressableSlot + DefaultIn<A>,
+    L::Slot: AddressableSlot,
     P::ValueSlot<L::Slot>: ValueSlot<L::Slot, A> + Copy,
 {
 }
@@ -116,9 +116,9 @@ impl<T, P, const FIELD: u32, A, L, D> fmt::Debug for SingularField<T, P, FIELD, 
 where
     T: SingularType,
     P: FieldPresence,
-    A: Allocator + Clone,
+    A: Allocator,
     L: ValueLayout<T, A>,
-    L::Slot: AddressableSlot + DefaultIn<A>,
+    L::Slot: AddressableSlot,
     P::ValueSlot<L::Slot>: ValueSlot<L::Slot, A> + Debug,
 {
     fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
@@ -132,9 +132,9 @@ impl<T, P, const FIELD: u32, A, L, D> SingularField<T, P, FIELD, A, L, D>
 where
     T: SingularType,
     P: FieldPresence,
-    A: Allocator + Clone,
+    A: Allocator,
     L: ValueLayout<T, A>,
-    L::Slot: AddressableSlot + DefaultIn<A>,
+    L::Slot: AddressableSlot,
     P::ValueSlot<L::Slot>: ValueSlot<L::Slot, A>,
 {
     /// Creates a field with an empty value slot.
@@ -172,10 +172,10 @@ macro_rules! impl_singular_deallocate_always {
             for SingularField<T, $presence, FIELD, A, L, D>
         where
             T: SingularType,
-            A: Allocator + Clone,
+            A: Allocator,
             L: ValueLayout<T, A>,
             MessageCommon<P, A>: MessageCommonBits,
-            L::Slot: AddressableSlot + DefaultIn<A>,
+            L::Slot: AddressableSlot,
             <$presence as FieldPresence>::ValueSlot<L::Slot>: ValueSlot<L::Slot, A>,
         {
             #[inline]
@@ -198,10 +198,10 @@ macro_rules! impl_singular_deallocate_bit {
             for SingularField<T, $presence, FIELD, A, L, D>
         where
             T: SingularType,
-            A: Allocator + Clone,
+            A: Allocator,
             L: ValueLayout<T, A>,
             MessageCommon<P, A>: MessageCommonBits,
-            L::Slot: AddressableSlot + DefaultIn<A>,
+            L::Slot: AddressableSlot,
             <$presence as FieldPresence>::ValueSlot<L::Slot>: ValueSlot<L::Slot, A>,
         {
             #[inline]
@@ -221,9 +221,9 @@ impl_singular_deallocate_bit!(LegacyRequired<BIT>);
 impl<T, const FIELD: u32, A, L, D> SingularField<T, Implicit, FIELD, A, L, D>
 where
     T: SingularType,
-    A: Allocator + Clone,
+    A: Allocator,
     L: ValueLayout<T, A>,
-    L::Slot: AddressableSlot + DefaultIn<A>,
+    L::Slot: AddressableSlot,
     <Implicit as FieldPresence>::ValueSlot<L::Slot>: ValueSlot<L::Slot, A>,
 {
     /// Low-level borrow of the always-initialized slot's logical value.
@@ -244,9 +244,9 @@ where
 impl<T, const FIELD: u32, A, L, D> SingularField<T, Oneof, FIELD, A, L, D>
 where
     T: SingularType,
-    A: Allocator + Clone,
+    A: Allocator,
     L: ValueLayout<T, A>,
-    L::Slot: AddressableSlot + DefaultIn<A>,
+    L::Slot: AddressableSlot,
     <Oneof as FieldPresence>::ValueSlot<L::Slot>: ValueSlot<L::Slot, A>,
 {
     /// Low-level borrow of the always-initialized oneof-variant slot's logical value.
@@ -267,6 +267,8 @@ where
     pub fn value_mut<'a, Pb>(&'a mut self, common: &'a mut MessageCommon<Pb, A>) -> L::Mut<'a>
     where
         MessageCommon<Pb, A>: MessageCommonBits,
+        A: Clone,
+        L::Slot: DefaultIn<A>,
     {
         L::with_mut(&mut *self.value, AlwaysInitialized, common)
     }
@@ -275,9 +277,9 @@ where
 impl<T, const FIELD: u32, A, L, D> SingularField<T, Message, FIELD, A, L, D>
 where
     T: SingularType,
-    A: Allocator + Clone,
+    A: Allocator,
     L: ValueLayout<T, A>,
-    L::Slot: AddressableSlot + DefaultIn<A>,
+    L::Slot: AddressableSlot,
     <Message as FieldPresence>::ValueSlot<L::Slot>: ValueSlot<L::Slot, A>,
 {
     /// Returns whether the pointer-present slot holds a value.
@@ -291,9 +293,9 @@ impl<T, P, const FIELD: u32, A, L, D> DefaultIn<A> for SingularField<T, P, FIELD
 where
     T: SingularType,
     P: FieldPresence,
-    A: Allocator + Clone,
+    A: Allocator,
     L: ValueLayout<T, A>,
-    L::Slot: AddressableSlot + DefaultIn<A>,
+    L::Slot: AddressableSlot,
     P::ValueSlot<L::Slot>: ValueSlot<L::Slot, A>,
 {
     #[inline]
@@ -306,9 +308,9 @@ impl<T, const BIT: usize, const FIELD: u32, A, L, D>
     SingularField<T, LegacyRequired<BIT>, FIELD, A, L, D>
 where
     T: SingularType,
-    A: Allocator + Clone,
+    A: Allocator,
     L: ValueLayout<T, A>,
-    L::Slot: AddressableSlot + DefaultIn<A>,
+    L::Slot: AddressableSlot,
     <LegacyRequired<BIT> as FieldPresence>::ValueSlot<L::Slot>: ValueSlot<L::Slot, A>,
 {
     pub fn validate_required<Pb>(&self, common: &MessageCommon<Pb, A>) -> Result<(), DecodeError>
@@ -336,12 +338,12 @@ pub struct SingularFieldRef<
     T: SingularType,
     P: FieldPresence,
     const FIELD: u32,
-    A: Allocator + Clone,
+    A: Allocator,
     L: ValueLayout<T, A>,
     D,
     Pb,
 > where
-    L::Slot: AddressableSlot + DefaultIn<A>,
+    L::Slot: AddressableSlot,
     P::ValueSlot<L::Slot>: ValueSlot<L::Slot, A>,
 {
     field: &'a SingularField<T, P, FIELD, A, L, D>,
@@ -352,9 +354,9 @@ impl<'a, T, P, const FIELD: u32, A, L, D, Pb> SingularFieldRef<'a, T, P, FIELD, 
 where
     T: SingularType,
     P: FieldPresence,
-    A: Allocator + Clone,
+    A: Allocator,
     L: ValueLayout<T, A>,
-    L::Slot: AddressableSlot + DefaultIn<A>,
+    L::Slot: AddressableSlot,
     P::ValueSlot<L::Slot>: ValueSlot<L::Slot, A>,
 {
     #[inline]
@@ -370,10 +372,10 @@ impl<'a, T, P, const FIELD: u32, A, L, D, Pb> SingularFieldRef<'a, T, P, FIELD, 
 where
     T: SingularType,
     P: FieldPresence,
-    A: Allocator + Clone,
+    A: Allocator,
     L: ValueLayout<T, A>,
     MessageCommon<Pb, A>: MessageCommonBits,
-    L::Slot: AddressableSlot + DefaultIn<A>,
+    L::Slot: AddressableSlot,
     P::ValueSlot<L::Slot>: ValueSlot<L::Slot, A>,
 {
     /// Returns the logical value when the field is present.
@@ -406,10 +408,10 @@ impl<'a, T, P, const FIELD: u32, A, L, D, Pb> SingularFieldRef<'a, T, P, FIELD, 
 where
     T: SingularType,
     P: FieldPresence,
-    A: Allocator + Clone,
+    A: Allocator,
     L: ValueLayout<T, A>,
     MessageCommon<Pb, A>: MessageCommonBits,
-    L::Slot: AddressableSlot + DefaultIn<A>,
+    L::Slot: AddressableSlot,
     P::ValueSlot<L::Slot>: ValueSlot<L::Slot, A>,
     T::View<'a, A>: Copy,
     D: HasDefault<T::View<'a, A>>,
@@ -422,10 +424,10 @@ where
 impl<'a, T, const FIELD: u32, A, L, D, Pb> SingularFieldRef<'a, T, Implicit, FIELD, A, L, D, Pb>
 where
     T: SingularType,
-    A: Allocator + Clone,
+    A: Allocator,
     L: ValueLayout<T, A>,
     MessageCommon<Pb, A>: MessageCommonBits,
-    L::Slot: AddressableSlot + DefaultIn<A>,
+    L::Slot: AddressableSlot,
     <Implicit as FieldPresence>::ValueSlot<L::Slot>: ValueSlot<L::Slot, A>,
 {
     #[inline]
@@ -437,10 +439,10 @@ where
 impl<'a, T, const FIELD: u32, A, L, D, Pb> SingularFieldRef<'a, T, Oneof, FIELD, A, L, D, Pb>
 where
     T: SingularType,
-    A: Allocator + Clone,
+    A: Allocator,
     L: ValueLayout<T, A>,
     MessageCommon<Pb, A>: MessageCommonBits,
-    L::Slot: AddressableSlot + DefaultIn<A>,
+    L::Slot: AddressableSlot,
     <Oneof as FieldPresence>::ValueSlot<L::Slot>: ValueSlot<L::Slot, A>,
 {
     #[inline]
@@ -461,12 +463,12 @@ pub struct SingularFieldMut<
     T: SingularType,
     P: FieldPresence,
     const FIELD: u32,
-    A: Allocator + Clone,
+    A: Allocator,
     L: ValueLayout<T, A>,
     D,
     Pb,
 > where
-    L::Slot: AddressableSlot + DefaultIn<A>,
+    L::Slot: AddressableSlot,
     P::ValueSlot<L::Slot>: ValueSlot<L::Slot, A>,
 {
     field: &'f mut SingularField<T, P, FIELD, A, L, D>,
@@ -477,9 +479,9 @@ impl<'f, 'c, T, P, const FIELD: u32, A, L, D, Pb> SingularFieldMut<'f, 'c, T, P,
 where
     T: SingularType,
     P: FieldPresence,
-    A: Allocator + Clone,
+    A: Allocator,
     L: ValueLayout<T, A>,
-    L::Slot: AddressableSlot + DefaultIn<A>,
+    L::Slot: AddressableSlot,
     P::ValueSlot<L::Slot>: ValueSlot<L::Slot, A>,
 {
     #[inline]
@@ -495,10 +497,10 @@ impl<'f, 'c, T, P, const FIELD: u32, A, L, D, Pb> SingularFieldMut<'f, 'c, T, P,
 where
     T: SingularType,
     P: FieldPresence,
-    A: Allocator + Clone,
+    A: Allocator,
     L: ValueLayout<T, A>,
     MessageCommon<Pb, A>: MessageCommonBits,
-    L::Slot: AddressableSlot + DefaultIn<A>,
+    L::Slot: AddressableSlot,
     P::ValueSlot<L::Slot>: ValueSlot<L::Slot, A>,
 {
     /// Returns a mutable accessor, lazy-initializing the slot when needed.
@@ -506,6 +508,8 @@ where
     pub fn value_mut(self) -> L::Mut<'f>
     where
         'c: 'f,
+        A: Clone,
+        L::Slot: DefaultIn<A>,
     {
         L::with_mut(&mut *self.field.value, P::slot_init_mut(), self.common)
     }
@@ -515,6 +519,8 @@ where
     pub fn get_mut(self) -> L::Mut<'f>
     where
         'c: 'f,
+        A: Clone,
+        L::Slot: DefaultIn<A>,
     {
         self.value_mut()
     }
@@ -524,7 +530,11 @@ where
         wire_type: WireType,
         buf: &mut B,
         depth: usize,
-    ) -> Result<(), DecodeError> {
+    ) -> Result<(), DecodeError>
+    where
+        A: Clone,
+        L::Slot: DefaultIn<A>,
+    {
         L::merge(
             &mut *self.field.value,
             P::slot_init_mut(),
@@ -537,7 +547,11 @@ where
     }
 
     /// Resets the value slot and clears explicit presence when applicable.
-    pub fn clear(self) {
+    pub fn clear(self)
+    where
+        A: Clone,
+        L::Slot: DefaultIn<A>,
+    {
         L::clear(&mut *self.field.value, P::slot_init_mut(), self.common);
     }
 }
@@ -551,10 +565,10 @@ impl<T, P, const FIELD: u32, A, L, D, Pb> FieldPartialEq<MessageCommon<Pb, A>>
 where
     T: SingularType + ProtoRefEq<A>,
     P: FieldPresence,
-    A: Allocator + Clone,
+    A: Allocator,
     L: ValueLayout<T, A>,
     MessageCommon<Pb, A>: MessageCommonBits,
-    L::Slot: AddressableSlot + DefaultIn<A>,
+    L::Slot: AddressableSlot,
     P::ValueSlot<L::Slot>: ValueSlot<L::Slot, A>,
 {
     #[inline]
@@ -574,10 +588,10 @@ impl<T, P, const FIELD: u32, A, L, D, Pb> FieldEncode<MessageCommon<Pb, A>>
 where
     T: SingularType,
     P: FieldPresence,
-    A: Allocator + Clone,
+    A: Allocator,
     L: ValueLayout<T, A>,
     MessageCommon<Pb, A>: MessageCommonBits + MessageCommonAlloc,
-    L::Slot: AddressableSlot + DefaultIn<A>,
+    L::Slot: AddressableSlot,
     P::ValueSlot<L::Slot>: ValueSlot<L::Slot, A>,
 {
     fn encoded_len(&self, common: &MessageCommon<Pb, A>, ctx: &mut EncodeCtx) -> usize {
@@ -637,7 +651,7 @@ where
     A: Allocator + Clone,
     L: ValueLayoutClone<T, A>,
     MessageCommon<Pb, A>: MessageCommonBits,
-    L::Slot: AddressableSlot + DefaultIn<A>,
+    L::Slot: AddressableSlot,
     P::ValueSlot<L::Slot>: ValueSlot<L::Slot, A>,
 {
     fn clone_field(&self, common: &MessageCommon<Pb, A>, alloc: A) -> Self {
@@ -654,10 +668,10 @@ impl<T, const FIELD: u32, A, L, D, Pb> FieldDebug<MessageCommon<Pb, A>>
     for SingularField<T, Implicit, FIELD, A, L, D>
 where
     T: SingularType + ProtoRefDebug<A>,
-    A: Allocator + Clone,
+    A: Allocator,
     L: ValueLayout<T, A>,
     MessageCommon<Pb, A>: MessageCommonBits,
-    L::Slot: AddressableSlot + DefaultIn<A>,
+    L::Slot: AddressableSlot,
     <Implicit as FieldPresence>::ValueSlot<L::Slot>: ValueSlot<L::Slot, A>,
 {
     #[inline]
@@ -670,10 +684,10 @@ impl<T, const BIT: usize, const FIELD: u32, A, L, D, Pb> FieldDebug<MessageCommo
     for SingularField<T, Explicit<BIT>, FIELD, A, L, D>
 where
     T: SingularType + ProtoRefDebug<A>,
-    A: Allocator + Clone,
+    A: Allocator,
     L: ValueLayout<T, A>,
     MessageCommon<Pb, A>: MessageCommonBits,
-    L::Slot: AddressableSlot + DefaultIn<A>,
+    L::Slot: AddressableSlot,
     <Explicit<BIT> as FieldPresence>::ValueSlot<L::Slot>: ValueSlot<L::Slot, A>,
 {
     #[inline]
@@ -686,10 +700,10 @@ impl<T, const BIT: usize, const FIELD: u32, A, L, D, Pb> FieldDebug<MessageCommo
     for SingularField<T, LegacyRequired<BIT>, FIELD, A, L, D>
 where
     T: SingularType + ProtoRefDebug<A>,
-    A: Allocator + Clone,
+    A: Allocator,
     L: ValueLayout<T, A>,
     MessageCommon<Pb, A>: MessageCommonBits,
-    L::Slot: AddressableSlot + DefaultIn<A>,
+    L::Slot: AddressableSlot,
     <LegacyRequired<BIT> as FieldPresence>::ValueSlot<L::Slot>: ValueSlot<L::Slot, A>,
 {
     #[inline]
@@ -702,10 +716,10 @@ impl<T, const FIELD: u32, A, L, D, Pb> FieldDebug<MessageCommon<Pb, A>>
     for SingularField<T, Message, FIELD, A, L, D>
 where
     T: SingularType + ProtoRefDebug<A>,
-    A: Allocator + Clone,
+    A: Allocator,
     L: ValueLayout<T, A>,
     MessageCommon<Pb, A>: MessageCommonBits,
-    L::Slot: AddressableSlot + DefaultIn<A>,
+    L::Slot: AddressableSlot,
     <Message as FieldPresence>::ValueSlot<L::Slot>: ValueSlot<L::Slot, A>,
 {
     #[inline]

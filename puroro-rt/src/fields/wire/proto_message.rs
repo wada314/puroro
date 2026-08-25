@@ -55,16 +55,16 @@ impl<M, A: Allocator> AddressableSlot for UnmanagedBox<M, A> {}
 impl<M: Message + MessageEncode> SingularType for ProtoMessage<M> {}
 
 impl<M: Message + MessageEncode + MessageMerge> PayloadAccess for ProtoMessage<M> {
-    type Slot<A: Allocator + Clone> = UnmanagedBox<M, A>;
-    type Mut<'a, A: Allocator + Clone>
+    type Slot<A: Allocator> = UnmanagedBox<M, A>;
+    type Mut<'a, A: Allocator>
         = &'a mut M
     where
         Self: 'a,
         A: 'a;
-    type Written<A: Allocator + Clone> = UnmanagedBox<M, A>;
+    type Written<A: Allocator> = UnmanagedBox<M, A>;
 
     #[inline]
-    fn is_proto_empty<A: Allocator + Clone, Pb>(
+    fn is_proto_empty<A: Allocator, Pb>(
         _slot: &UnmanagedBox<M, A>,
         _common: &MessageCommon<Pb, A>,
     ) -> bool
@@ -75,7 +75,7 @@ impl<M: Message + MessageEncode + MessageMerge> PayloadAccess for ProtoMessage<M
     }
 
     #[inline]
-    fn get<'a, A: Allocator + Clone + 'a, Pb>(
+    fn get<'a, A: Allocator + 'a, Pb>(
         slot: &'a UnmanagedBox<M, A>,
         _common: &'a MessageCommon<Pb, A>,
     ) -> &'a M

@@ -36,7 +36,7 @@ pub trait EncodeType {
     ///
     /// Always `Copy` (by-value scalars such as `i32`, or shared references such
     /// as `&str`) so Len framing can measure then write the same view.
-    type View<'a, A: Allocator + Clone>: Copy
+    type View<'a, A: Allocator>: Copy
     where
         Self: 'a,
         A: 'a;
@@ -47,10 +47,7 @@ pub trait EncodeType {
 
     /// Byte length of the complete untagged wire body (no tag; for `Len`,
     /// includes the length varint).
-    fn payload_len<'a, A: Allocator + Clone>(
-        value: Self::View<'a, A>,
-        ctx: &mut EncodeCtx,
-    ) -> usize
+    fn payload_len<'a, A: Allocator>(value: Self::View<'a, A>, ctx: &mut EncodeCtx) -> usize
     where
         Self: 'a;
 
@@ -59,7 +56,7 @@ pub trait EncodeType {
     fn encode_payload<'a, A, B>(value: Self::View<'a, A>, ctx: &mut EncodeCtx, buf: &mut B)
     where
         Self: 'a,
-        A: Allocator + Clone,
+        A: Allocator,
         B: BufMut;
 }
 
@@ -72,7 +69,7 @@ pub(crate) fn encoded_len_field<'a, T, A>(
 ) -> usize
 where
     T: EncodeType + 'a,
-    A: Allocator + Clone + 'a,
+    A: Allocator + 'a,
 {
     match T::WIRE_TYPE {
         WireType::Varint | WireType::Int32 | WireType::Int64 | WireType::Len => {
@@ -93,7 +90,7 @@ pub(crate) fn encode_field<'a, T, A, B>(
     buf: &mut B,
 ) where
     T: EncodeType + 'a,
-    A: Allocator + Clone + 'a,
+    A: Allocator + 'a,
     B: BufMut,
 {
     match T::WIRE_TYPE {
@@ -108,7 +105,7 @@ pub(crate) fn encode_field<'a, T, A, B>(
 }
 
 impl<C: NumericalType> EncodeType for Numerical<C> {
-    type View<'a, A: Allocator + Clone>
+    type View<'a, A: Allocator>
         = C::NativeType
     where
         Self: 'a,
@@ -117,7 +114,7 @@ impl<C: NumericalType> EncodeType for Numerical<C> {
     const WIRE_TYPE: WireType = <C::WireBody as WirePayload>::WIRE_TYPE;
 
     #[inline]
-    fn payload_len<'a, A: Allocator + Clone>(value: C::NativeType, _ctx: &mut EncodeCtx) -> usize
+    fn payload_len<'a, A: Allocator>(value: C::NativeType, _ctx: &mut EncodeCtx) -> usize
     where
         Self: 'a,
     {
@@ -128,7 +125,7 @@ impl<C: NumericalType> EncodeType for Numerical<C> {
     fn encode_payload<'a, A, B>(value: C::NativeType, _ctx: &mut EncodeCtx, buf: &mut B)
     where
         Self: 'a,
-        A: Allocator + Clone,
+        A: Allocator,
         B: BufMut,
     {
         C::to_wire_body(value).encode(buf);
@@ -136,7 +133,7 @@ impl<C: NumericalType> EncodeType for Numerical<C> {
 }
 
 impl<C: LenCodec> EncodeType for LenScalar<C> {
-    type View<'a, A: Allocator + Clone>
+    type View<'a, A: Allocator>
         = &'a C::RefView
     where
         Self: 'a,
@@ -145,7 +142,7 @@ impl<C: LenCodec> EncodeType for LenScalar<C> {
     const WIRE_TYPE: WireType = WireType::Len;
 
     #[inline]
-    fn payload_len<'a, A: Allocator + Clone>(value: &'a C::RefView, _ctx: &mut EncodeCtx) -> usize
+    fn payload_len<'a, A: Allocator>(value: &'a C::RefView, _ctx: &mut EncodeCtx) -> usize
     where
         Self: 'a,
     {
@@ -157,7 +154,7 @@ impl<C: LenCodec> EncodeType for LenScalar<C> {
     fn encode_payload<'a, A, B>(value: &'a C::RefView, _ctx: &mut EncodeCtx, buf: &mut B)
     where
         Self: 'a,
-        A: Allocator + Clone,
+        A: Allocator,
         B: BufMut,
     {
         let bytes = C::as_wire_bytes(value);
@@ -167,7 +164,7 @@ impl<C: LenCodec> EncodeType for LenScalar<C> {
 }
 
 impl<M: Message + MessageEncode> EncodeType for ProtoMessage<M> {
-    type View<'a, A: Allocator + Clone>
+    type View<'a, A: Allocator>
         = &'a M
     where
         Self: 'a,
@@ -176,7 +173,7 @@ impl<M: Message + MessageEncode> EncodeType for ProtoMessage<M> {
     const WIRE_TYPE: WireType = WireType::Len;
 
     #[inline]
-    fn payload_len<'a, A: Allocator + Clone>(value: &'a M, ctx: &mut EncodeCtx) -> usize
+    fn payload_len<'a, A: Allocator>(value: &'a M, ctx: &mut EncodeCtx) -> usize
     where
         Self: 'a,
     {
@@ -188,7 +185,7 @@ impl<M: Message + MessageEncode> EncodeType for ProtoMessage<M> {
     fn encode_payload<'a, A, B>(value: &'a M, ctx: &mut EncodeCtx, buf: &mut B)
     where
         Self: 'a,
-        A: Allocator + Clone,
+        A: Allocator,
         B: BufMut,
     {
         let n = ctx.body_len_for(value);
