@@ -78,7 +78,7 @@ pub(crate) fn decode_string_in<B: Buf, A: Allocator + Clone>(
         Ok(s) => Ok(s),
         Err(bytes) => {
             // SAFETY: `alloc` owns the buffer produced by `decode_in`.
-            unsafe { bytes.deallocate(alloc) };
+            unsafe { bytes.deallocate(&alloc) };
             Err(DecodeError::InvalidUtf8)
         }
     }

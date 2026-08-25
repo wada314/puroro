@@ -118,7 +118,7 @@ impl<M: Message + MessageEncode + MessageMerge> PayloadAccess for ProtoMessage<M
         let alloc = common.alloc.clone();
         if let Some(old) = ValueSlot::with_mut(slot, init, common).replace(value) {
             // SAFETY: `write` contract — `common` is this field's parent.
-            unsafe { DeallocateIn::deallocate_in(old, alloc) };
+            unsafe { DeallocateIn::deallocate_in(old, &alloc) };
         }
     }
 
@@ -134,7 +134,7 @@ impl<M: Message + MessageEncode + MessageMerge> PayloadAccess for ProtoMessage<M
         let alloc = common.alloc.clone();
         if let Some(old) = ValueSlot::with_mut(slot, init, common).take_clear() {
             // SAFETY: `clear` contract — `common` is this field's parent.
-            unsafe { DeallocateIn::deallocate_in(old, alloc) };
+            unsafe { DeallocateIn::deallocate_in(old, &alloc) };
         }
     }
 

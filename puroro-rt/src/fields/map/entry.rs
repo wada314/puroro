@@ -82,11 +82,11 @@ fn discard_partial_entry<K, V, A>(
 {
     if let Some(k) = key {
         // SAFETY: message allocator owns decoded key payloads.
-        unsafe { K::deallocate_element(k, alloc.clone()) };
+        unsafe { K::deallocate_element(k, &alloc) };
     }
     if let Some(v) = value {
         // SAFETY: message allocator owns decoded value payloads.
-        unsafe { V::deallocate_element(v, alloc) };
+        unsafe { V::deallocate_element(v, &alloc) };
     }
 }
 
@@ -118,7 +118,7 @@ where
                 Ok(next) => {
                     if let Some(old) = key.replace(next) {
                         // SAFETY: message allocator owns replaced key payloads.
-                        unsafe { K::deallocate_element(old, alloc.clone()) };
+                        unsafe { K::deallocate_element(old, &alloc) };
                     }
                 }
                 Err(e) => {
@@ -130,7 +130,7 @@ where
                 Ok(next) => {
                     if let Some(old) = value.replace(next) {
                         // SAFETY: message allocator owns replaced value payloads.
-                        unsafe { V::deallocate_element(old, alloc.clone()) };
+                        unsafe { V::deallocate_element(old, &alloc) };
                     }
                 }
                 Err(e) => {

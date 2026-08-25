@@ -92,7 +92,7 @@ impl<'a, A: Allocator + Clone> SsoBytesMut<'a, A> {
         // SAFETY: message allocator owns any previous heap buffer; tag matches arm.
         unsafe {
             self.slot
-                .replace_packed(new, new_is_heap, old_is_heap, alloc)
+                .replace_packed(new, new_is_heap, old_is_heap, &alloc)
         };
         self.set_heap(new_is_heap);
     }
@@ -107,7 +107,7 @@ impl<'a, A: Allocator + Clone> SsoBytesMut<'a, A> {
         // SAFETY: message allocator owns any previous heap buffer; tag matches arm.
         unsafe {
             self.slot
-                .replace_packed(new, new_is_heap, old_is_heap, alloc)
+                .replace_packed(new, new_is_heap, old_is_heap, &alloc)
         };
         self.set_heap(new_is_heap);
     }
@@ -121,7 +121,7 @@ impl<'a, A: Allocator + Clone> SsoBytesMut<'a, A> {
         // SAFETY: message allocator owns any previous heap buffer; tag matches arm.
         unsafe {
             self.slot
-                .replace_packed(SsoBytes::empty_inline(), SSO_INLINE, old_is_heap, alloc)
+                .replace_packed(SsoBytes::empty_inline(), SSO_INLINE, old_is_heap, &alloc)
         };
         self.set_heap(SSO_INLINE);
     }
@@ -231,12 +231,12 @@ mod tests {
         let (s, is_heap) = pack_bytes::<Global>(b"", Global);
         assert!(!is_heap);
         assert_eq!(s.as_bytes::<Global>(false), b"");
-        unsafe { s.deallocate(false, Global) };
+        unsafe { s.deallocate(false, &Global) };
 
         let (s, is_heap) = pack_bytes(b"hi", Global);
         assert!(!is_heap);
         assert_eq!(s.as_bytes::<Global>(false), b"hi");
-        unsafe { s.deallocate(false, Global) };
+        unsafe { s.deallocate(false, &Global) };
     }
 
     #[test]
@@ -245,13 +245,13 @@ mod tests {
         let (s, is_heap) = pack_bytes(&max_inline, Global);
         assert!(!is_heap);
         assert_eq!(s.as_bytes::<Global>(false).len(), INLINE_CAP);
-        unsafe { s.deallocate(false, Global) };
+        unsafe { s.deallocate(false, &Global) };
 
         let needs_heap = vec![b'a'; INLINE_CAP + 1];
         let (s, is_heap) = pack_bytes(&needs_heap, Global);
         assert!(is_heap);
         assert_eq!(s.as_bytes::<Global>(true), needs_heap);
-        unsafe { s.deallocate(true, Global) };
+        unsafe { s.deallocate(true, &Global) };
     }
 
     #[test]
@@ -261,7 +261,7 @@ mod tests {
         let (s, is_heap) = pack_written(UnmanagedVec::from_vec(vec), Global);
         assert!(!is_heap);
         assert_eq!(s.as_bytes::<Global>(false), b"xy");
-        unsafe { s.deallocate(false, Global) };
+        unsafe { s.deallocate(false, &Global) };
     }
 
     #[test]
@@ -271,8 +271,8 @@ mod tests {
         assert!(!is_heap);
         assert_eq!(c.as_bytes::<Global>(false), b"ab");
         unsafe {
-            inline.deallocate(false, Global);
-            c.deallocate(false, Global);
+            inline.deallocate(false, &Global);
+            c.deallocate(false, &Global);
         }
 
         let long = vec![b'z'; INLINE_CAP + 2];
@@ -281,8 +281,8 @@ mod tests {
         assert!(is_heap);
         assert_eq!(c.as_bytes::<Global>(true), heap.as_bytes::<Global>(true));
         unsafe {
-            heap.deallocate(true, Global);
-            c.deallocate(true, Global);
+            heap.deallocate(true, &Global);
+            c.deallocate(true, &Global);
         }
     }
 }

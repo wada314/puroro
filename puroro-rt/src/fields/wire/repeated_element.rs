@@ -79,7 +79,7 @@ pub trait RepeatedElement: EncodeType {
     /// # Safety
     ///
     /// `alloc` must own `elem`'s buffer when the element is heap-backed.
-    unsafe fn deallocate_element<A: Allocator + Clone>(elem: Self::Element<A>, alloc: A);
+    unsafe fn deallocate_element<A: Allocator + Clone>(elem: Self::Element<A>, alloc: &A);
 }
 
 /// Decode / merge for a repeated element marker under allocator `A`.
@@ -189,7 +189,7 @@ impl<C: NumericalType> RepeatedElement for Numerical<C> {
     }
 
     #[inline]
-    unsafe fn deallocate_element<A: Allocator + Clone>(_elem: C::NativeType, _alloc: A) {}
+    unsafe fn deallocate_element<A: Allocator + Clone>(_elem: C::NativeType, _alloc: &A) {}
 }
 
 impl<A: Allocator + Clone, C: NumericalType> RepeatedElementMerge<A> for Numerical<C> {
@@ -374,7 +374,7 @@ impl<C: LenCodec> RepeatedElement for LenScalar<C> {
     }
 
     #[inline]
-    unsafe fn deallocate_element<A: Allocator + Clone>(elem: C::Slot<A>, alloc: A) {
+    unsafe fn deallocate_element<A: Allocator + Clone>(elem: C::Slot<A>, alloc: &A) {
         // SAFETY: forwarded to the caller's obligation on `alloc`.
         unsafe { DeallocateIn::deallocate_in(elem, alloc) };
     }
@@ -464,7 +464,7 @@ impl<M: Message + MessageEncode> RepeatedElement for ProtoMessage<M> {
     }
 
     #[inline]
-    unsafe fn deallocate_element<A: Allocator + Clone>(elem: M, _alloc: A) {
+    unsafe fn deallocate_element<A: Allocator + Clone>(elem: M, _alloc: &A) {
         // Inline repeated elements are not behind `UnmanagedBox`; free via
         // `Drop` / `_common.alloc` (same body as `unmanaged::DeallocateIn` on
         // generated messages). The `alloc` parameter is unused here.

@@ -217,7 +217,7 @@ where
     {
         if let Some(v) = slot.take_value(initialized) {
             // SAFETY: `deallocate_slot` contract — `common` is this field's parent.
-            unsafe { DeallocateIn::deallocate_in(v, common.alloc.clone()) };
+            unsafe { DeallocateIn::deallocate_in(v, &common.alloc) };
         }
     }
 }
@@ -471,7 +471,7 @@ impl<A: Allocator + Clone, const HEAP_BIT: usize> ValueLayout<ProtoString, A>
             let s = ValueSlot::with_mut(slot, init, common).get_mut();
             // SAFETY: HEAP_BIT matches the live arm.
             unsafe {
-                s.replace_packed(SsoString::empty_inline(), SSO_INLINE, old_is_heap, alloc);
+                s.replace_packed(SsoString::empty_inline(), SSO_INLINE, old_is_heap, &alloc);
             }
         }
         Self::set_heap(common, SSO_INLINE);
@@ -504,7 +504,7 @@ impl<A: Allocator + Clone, const HEAP_BIT: usize> ValueLayout<ProtoString, A>
         {
             let s = ValueSlot::with_mut(slot, init, common).get_mut();
             // SAFETY: message allocator owns any previous heap buffer; bit matches arm.
-            unsafe { s.replace_packed(new, new_is_heap, old_is_heap, alloc) };
+            unsafe { s.replace_packed(new, new_is_heap, old_is_heap, &alloc) };
         }
         Self::set_heap(common, new_is_heap);
         Ok(())
@@ -517,10 +517,9 @@ impl<A: Allocator + Clone, const HEAP_BIT: usize> ValueLayout<ProtoString, A>
         MessageCommon<Pb, A>: MessageCommonBits,
     {
         let is_heap = Self::is_heap(common);
-        let alloc = common.alloc.clone();
         if let Some(s) = slot.take_value(initialized) {
             // SAFETY: HEAP_BIT / `alloc` come from this field's parent `common`.
-            unsafe { s.deallocate(is_heap, alloc) };
+            unsafe { s.deallocate(is_heap, &common.alloc) };
         }
     }
 }
@@ -610,7 +609,7 @@ impl<A: Allocator + Clone, const HEAP_BIT: usize> ValueLayout<ProtoBytes, A>
             let s = ValueSlot::with_mut(slot, init, common).get_mut();
             // SAFETY: HEAP_BIT matches the live arm.
             unsafe {
-                s.replace_packed(SsoBytes::empty_inline(), SSO_INLINE, old_is_heap, alloc);
+                s.replace_packed(SsoBytes::empty_inline(), SSO_INLINE, old_is_heap, &alloc);
             }
         }
         Self::set_heap(common, SSO_INLINE);
@@ -642,7 +641,7 @@ impl<A: Allocator + Clone, const HEAP_BIT: usize> ValueLayout<ProtoBytes, A>
         {
             let s = ValueSlot::with_mut(slot, init, common).get_mut();
             // SAFETY: message allocator owns any previous heap buffer; bit matches arm.
-            unsafe { s.replace_packed(new, new_is_heap, old_is_heap, alloc) };
+            unsafe { s.replace_packed(new, new_is_heap, old_is_heap, &alloc) };
         }
         Self::set_heap(common, new_is_heap);
         Ok(())
@@ -655,10 +654,9 @@ impl<A: Allocator + Clone, const HEAP_BIT: usize> ValueLayout<ProtoBytes, A>
         MessageCommon<Pb, A>: MessageCommonBits,
     {
         let is_heap = Self::is_heap(common);
-        let alloc = common.alloc.clone();
         if let Some(s) = slot.take_value(initialized) {
             // SAFETY: HEAP_BIT / `alloc` come from this field's parent `common`.
-            unsafe { s.deallocate(is_heap, alloc) };
+            unsafe { s.deallocate(is_heap, &common.alloc) };
         }
     }
 }
@@ -742,7 +740,7 @@ fn decode_sso_packed<B: Buf, A: Allocator + Clone>(
             Ok(s) => Ok(pack_written(s, alloc)),
             Err(bytes) => {
                 // SAFETY: `alloc` owns the buffer we just built.
-                unsafe { bytes.deallocate(alloc) };
+                unsafe { bytes.deallocate(&alloc) };
                 Err(DecodeError::InvalidUtf8)
             }
         },

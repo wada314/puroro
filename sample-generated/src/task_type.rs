@@ -6,22 +6,22 @@
 //! it uses short imported names instead of fully-qualified paths (see the crate
 //! root docs).
 
-use ::allocator_api2::alloc::{Allocator, Global};
-use ::allocator_api2::vec::Vec as AllocVec;
-use ::bitvec::array::BitArray;
-use ::bitvec::order::Lsb0;
-use ::bytes::{Buf, BufMut};
-use ::core::fmt;
-use ::core::mem;
-use ::core::ops::ControlFlow;
-use ::core::ops::{Deref, DerefMut};
+use allocator_api2::alloc::{Allocator, Global};
+use allocator_api2::vec::Vec as AllocVec;
+use bitvec::array::BitArray;
+use bitvec::order::Lsb0;
+use bytes::{Buf, BufMut};
+use core::fmt;
+use core::mem;
+use core::ops::ControlFlow;
+use core::ops::{Deref, DerefMut};
 
-use ::puroro::{
+use puroro::{
     DecodeBuf, DecodeError, HasDefault, MapMut, MapRef, Message, OneofView, OneofViewMut, Optional,
     RepeatedStringMut,
 };
-use ::puroro_rt::decode::{decode_tag, skip_field_and_save};
-use ::puroro_rt::{
+use puroro_rt::decode::{decode_tag, skip_field_and_save};
+use puroro_rt::{
     BitPacked, CloneFieldsVisitor, CloneIn, Closed, DebugStructVisitor, EncodeCtx,
     EncodeRawVisitor, EncodedLenVisitor, Expanded, Explicit, FieldDeallocVisitor, FieldEqVisitor,
     FieldPairVisitor, FieldPairVisitorMut, FieldVisitor, FieldVisitorMut, Implicit, Inline,
@@ -30,18 +30,18 @@ use ::puroro_rt::{
     ProtoInt32, ProtoMessage, ProtoString, RepeatedField, SingularField,
 };
 
-use crate::Address;
 use crate::enums::{Priority, Status};
 use crate::task::defaults::MaxRetriesDefault;
 use crate::task::notification::NotificationStorage;
 use crate::task::{
-    BIT_DONE_VALUE, BIT_FLAG, BIT_FLAG_VALUE, BIT_MAX_RETRIES, BIT_OWNER_ID, BIT_OWNER_ID_SSO,
-    BIT_PAYLOAD, BIT_PAYLOAD_SSO, BIT_PRIORITY, BIT_TITLE, BIT_TITLE_SSO, FIELD_ASSIGNEE,
-    FIELD_ATTRIBUTES, FIELD_DONE, FIELD_EMAIL_ADDRESS, FIELD_FLAG, FIELD_LABELS, FIELD_MAX_RETRIES,
-    FIELD_OWNER_ID, FIELD_PAYLOAD, FIELD_PHONE_NUMBER, FIELD_POSTAL, FIELD_PRIORITY, FIELD_SCORE,
-    FIELD_SCORES, FIELD_STATUS, FIELD_TAG_IDS, FIELD_TITLE, FIELD_URGENT, FIELD_VOTES,
-    FIELD_WATCHERS, FIELD_WEBHOOK_ID, Notification, NotificationCase,
+    Notification, NotificationCase, BIT_DONE_VALUE, BIT_FLAG, BIT_FLAG_VALUE, BIT_MAX_RETRIES,
+    BIT_OWNER_ID, BIT_OWNER_ID_SSO, BIT_PAYLOAD, BIT_PAYLOAD_SSO, BIT_PRIORITY, BIT_TITLE,
+    BIT_TITLE_SSO, FIELD_ASSIGNEE, FIELD_ATTRIBUTES, FIELD_DONE, FIELD_EMAIL_ADDRESS, FIELD_FLAG,
+    FIELD_LABELS, FIELD_MAX_RETRIES, FIELD_OWNER_ID, FIELD_PAYLOAD, FIELD_PHONE_NUMBER,
+    FIELD_POSTAL, FIELD_PRIORITY, FIELD_SCORE, FIELD_SCORES, FIELD_STATUS, FIELD_TAG_IDS,
+    FIELD_TITLE, FIELD_URGENT, FIELD_VOTES, FIELD_WATCHERS, FIELD_WEBHOOK_ID,
 };
+use crate::Address;
 
 // ---------------------------------------------------------------------------
 // Message struct
@@ -702,7 +702,7 @@ impl<A: Allocator + Clone> Drop for Task<A> {
 
 impl<A: Allocator + Clone> ::puroro_rt::DeallocateIn<A> for Task<A> {
     #[inline]
-    unsafe fn deallocate_in(self, _alloc: A) {
+    unsafe fn deallocate_in(self, _alloc: &A) {
         // Heap is owned by `self._common.alloc`; parent-passed `alloc` is only
         // needed when freeing an enclosing `UnmanagedBox` slot.
         drop(self);

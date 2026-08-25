@@ -404,7 +404,7 @@ Full singular signature: `SingularField<T, P, FIELD, A, L = Inline, D = ProtoDef
 ## 9. Struct layout
 
 ```rust
-pub struct Task<A: Allocator + Clone = Global> {
+pub struct Task<A: Allocator = Global> {
     _common: MessageCommon<BitArray<[u8; 2], Lsb0>, A>,
     title: SingularField<ProtoString, Explicit<{ BIT_TITLE }>, { FIELD_TITLE }, A, InlineOrHeap<{ BIT_TITLE_SSO }>>,
     score: SingularField<ProtoInt32, Implicit, { FIELD_SCORE }, A>,

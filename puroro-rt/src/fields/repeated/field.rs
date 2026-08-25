@@ -11,6 +11,7 @@ use ::allocator_api2::alloc::Allocator;
 use ::bytes::BufMut;
 use ::puroro::{DecodeBuf, DecodeError, WireType};
 use ::unmanaged::CloneIn;
+use ::unmanaged::DeallocateIn;
 use ::unmanaged::UnmanagedVec;
 use ::unmanaged::vec::VecGuard;
 
@@ -86,22 +87,15 @@ where
     T: RepeatedElement,
     E: RepeatedEncoding<T, A>,
     A: Allocator + Clone,
+    T::Element<A>: DeallocateIn<A>,
 {
     /// Releases every element (when heap-backed) and the backing buffer.
     #[inline]
     fn deallocate(&mut self, common: &MessageCommon<P, A>) {
-        // SAFETY: called once; owned clones of the message allocator own the
-        // buffer and every element.
-        let alloc = common.alloc.clone();
-        let mut v = unsafe { ManuallyDrop::take(&mut self.values) };
-        {
-            let mut g = unsafe { v.with_alloc(alloc.clone()) };
-            while let Some(elem) = g.pop() {
-                unsafe { T::deallocate_element(elem, alloc.clone()) };
-            }
-        }
-        // Elements were already released above; free the empty buffer only.
-        unsafe { v.deallocate_buffer(alloc) };
+        // SAFETY: called once; `&common.alloc` is interchangeable with the
+        // clones that grew the buffer. Reconstructs `Vec<T, &A>` for the free.
+        let v = unsafe { ManuallyDrop::take(&mut self.values) };
+        unsafe { v.deallocate(&common.alloc) };
     }
 }
 
@@ -220,7 +214,7 @@ where
         // and every element.
         let mut g = unsafe { self.field.values.with_alloc(alloc.clone()) };
         while let Some(elem) = g.pop() {
-            unsafe { T::deallocate_element(elem, alloc.clone()) };
+            unsafe { T::deallocate_element(elem, &alloc) };
         }
     }
 

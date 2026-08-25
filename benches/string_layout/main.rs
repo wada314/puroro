@@ -116,7 +116,7 @@ macro_rules! impl_eight_string_message {
 
         impl<A: Allocator + Clone> ::unmanaged::DeallocateIn<A> for $ty<A> {
             #[inline]
-            unsafe fn deallocate_in(self, _alloc: A) {
+            unsafe fn deallocate_in(self, _alloc: &A) {
                 drop(self);
             }
         }

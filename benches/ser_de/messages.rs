@@ -86,7 +86,7 @@ impl<A: Allocator + Clone> Drop for FlatScalars<A> {
 
 impl<A: Allocator + Clone> ::unmanaged::DeallocateIn<A> for FlatScalars<A> {
     #[inline]
-    unsafe fn deallocate_in(self, _alloc: A) {
+    unsafe fn deallocate_in(self, _alloc: &A) {
         drop(self);
     }
 }
@@ -262,7 +262,7 @@ impl<A: Allocator + Clone> Drop for Nest<A> {
 
 impl<A: Allocator + Clone> ::unmanaged::DeallocateIn<A> for Nest<A> {
     #[inline]
-    unsafe fn deallocate_in(self, _alloc: A) {
+    unsafe fn deallocate_in(self, _alloc: &A) {
         drop(self);
     }
 }
@@ -398,7 +398,7 @@ impl<A: Allocator + Clone> Drop for PackedInts<A> {
 
 impl<A: Allocator + Clone> ::unmanaged::DeallocateIn<A> for PackedInts<A> {
     #[inline]
-    unsafe fn deallocate_in(self, _alloc: A) {
+    unsafe fn deallocate_in(self, _alloc: &A) {
         drop(self);
     }
 }
@@ -560,7 +560,7 @@ impl<A: Allocator + Clone> Drop for StringHeavy<A> {
 
 impl<A: Allocator + Clone> ::unmanaged::DeallocateIn<A> for StringHeavy<A> {
     #[inline]
-    unsafe fn deallocate_in(self, _alloc: A) {
+    unsafe fn deallocate_in(self, _alloc: &A) {
         drop(self);
     }
 }
@@ -716,7 +716,7 @@ impl<A: Allocator + Clone> Drop for ShortStrings<A> {
 
 impl<A: Allocator + Clone> ::unmanaged::DeallocateIn<A> for ShortStrings<A> {
     #[inline]
-    unsafe fn deallocate_in(self, _alloc: A) {
+    unsafe fn deallocate_in(self, _alloc: &A) {
         drop(self);
     }
 }

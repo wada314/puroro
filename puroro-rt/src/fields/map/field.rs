@@ -94,12 +94,12 @@ where
 {
     #[inline]
     fn deallocate(&mut self, common: &MessageCommon<P, A>) {
-        let alloc = common.alloc.clone();
+        let alloc = &common.alloc;
         for (k, v) in self.entries.drain() {
             // SAFETY: message allocator owns key / value payloads.
             unsafe {
-                K::deallocate_element(k, alloc.clone());
-                V::deallocate_element(v, alloc.clone());
+                K::deallocate_element(k, alloc);
+                V::deallocate_element(v, alloc);
             }
         }
     }
@@ -305,10 +305,10 @@ where
             None
         };
         if let Some((discarded_key, old_value)) = discarded {
-            let alloc = self.common.alloc.clone();
+            let alloc = &self.common.alloc;
             // SAFETY: message allocator owns discarded key / replaced value.
             unsafe {
-                K::deallocate_element(discarded_key, alloc.clone());
+                K::deallocate_element(discarded_key, alloc);
                 V::deallocate_element(old_value, alloc);
             }
         }
@@ -320,22 +320,22 @@ where
         Q: ?Sized + Hash + Equivalent<K::Element<A>>,
     {
         if let Some((old_key, old_value)) = self.field.entries.remove_entry(key) {
-            let alloc = self.common.alloc.clone();
+            let alloc = &self.common.alloc;
             // SAFETY: message allocator owns removed key / value payloads.
             unsafe {
-                K::deallocate_element(old_key, alloc.clone());
+                K::deallocate_element(old_key, alloc);
                 V::deallocate_element(old_value, alloc);
             }
         }
     }
 
     pub fn clear(&mut self) {
-        let alloc = self.common.alloc.clone();
+        let alloc = &self.common.alloc;
         for (k, v) in self.field.entries.drain() {
             // SAFETY: message allocator owns key / value payloads.
             unsafe {
-                K::deallocate_element(k, alloc.clone());
-                V::deallocate_element(v, alloc.clone());
+                K::deallocate_element(k, alloc);
+                V::deallocate_element(v, alloc);
             }
         }
     }

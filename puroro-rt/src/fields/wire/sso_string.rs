@@ -118,7 +118,7 @@ impl<'a, A: Allocator + Clone> SsoStringMut<'a, A> {
         // SAFETY: message allocator owns any previous heap buffer; tag matches arm.
         unsafe {
             self.slot
-                .replace_packed(new, new_is_heap, old_is_heap, alloc)
+                .replace_packed(new, new_is_heap, old_is_heap, &alloc)
         };
         self.set_heap(new_is_heap);
     }
@@ -133,7 +133,7 @@ impl<'a, A: Allocator + Clone> SsoStringMut<'a, A> {
         // SAFETY: message allocator owns any previous heap buffer; tag matches arm.
         unsafe {
             self.slot
-                .replace_packed(new, new_is_heap, old_is_heap, alloc)
+                .replace_packed(new, new_is_heap, old_is_heap, &alloc)
         };
         self.set_heap(new_is_heap);
     }
@@ -147,7 +147,7 @@ impl<'a, A: Allocator + Clone> SsoStringMut<'a, A> {
         // SAFETY: message allocator owns any previous heap buffer; tag matches arm.
         unsafe {
             self.slot
-                .replace_packed(SsoString::empty_inline(), SSO_INLINE, old_is_heap, alloc)
+                .replace_packed(SsoString::empty_inline(), SSO_INLINE, old_is_heap, &alloc)
         };
         self.set_heap(SSO_INLINE);
     }
@@ -262,12 +262,12 @@ mod tests {
         let (s, is_heap) = pack_str::<Global>("", Global);
         assert!(!is_heap);
         assert_eq!(s.as_str(false), "");
-        unsafe { s.deallocate(false, Global) };
+        unsafe { s.deallocate(false, &Global) };
 
         let (s, is_heap) = pack_str("hi", Global);
         assert!(!is_heap);
         assert_eq!(s.as_str(false), "hi");
-        unsafe { s.deallocate(false, Global) };
+        unsafe { s.deallocate(false, &Global) };
     }
 
     #[test]
@@ -276,13 +276,13 @@ mod tests {
         let (s, is_heap) = pack_str(&max_inline, Global);
         assert!(!is_heap);
         assert_eq!(s.as_str(false).len(), INLINE_CAP);
-        unsafe { s.deallocate(false, Global) };
+        unsafe { s.deallocate(false, &Global) };
 
         let needs_heap = "a".repeat(INLINE_CAP + 1);
         let (s, is_heap) = pack_str(&needs_heap, Global);
         assert!(is_heap);
         assert_eq!(s.as_str(true), needs_heap);
-        unsafe { s.deallocate(true, Global) };
+        unsafe { s.deallocate(true, &Global) };
     }
 
     #[test]
@@ -290,7 +290,7 @@ mod tests {
         let heap = UnmanagedString::from_string(AllocString::from_str_in("xy", Global));
         let s = pack_heap(heap);
         assert_eq!(s.as_str(true), "xy");
-        unsafe { s.deallocate(true, Global) };
+        unsafe { s.deallocate(true, &Global) };
     }
 
     #[test]
@@ -299,7 +299,7 @@ mod tests {
         let (s, is_heap) = pack_written(heap, Global);
         assert!(!is_heap);
         assert_eq!(s.as_str(false), "xy");
-        unsafe { s.deallocate(false, Global) };
+        unsafe { s.deallocate(false, &Global) };
     }
 
     #[test]
@@ -309,8 +309,8 @@ mod tests {
         assert!(!is_heap);
         assert_eq!(c.as_str(false), "ab");
         unsafe {
-            inline.deallocate(false, Global);
-            c.deallocate(false, Global);
+            inline.deallocate(false, &Global);
+            c.deallocate(false, &Global);
         }
 
         let (heap, _) = pack_str(&"z".repeat(INLINE_CAP + 2), Global);
@@ -318,8 +318,8 @@ mod tests {
         assert!(is_heap);
         assert_eq!(c.as_str(true), heap.as_str(true));
         unsafe {
-            heap.deallocate(true, Global);
-            c.deallocate(true, Global);
+            heap.deallocate(true, &Global);
+            c.deallocate(true, &Global);
         }
     }
 }

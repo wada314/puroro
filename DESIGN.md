@@ -970,10 +970,10 @@ Catalog type: `MapField<K, V, FIELD, A>` with `K: MapKey`, `V: RepeatedElement` 
 Every generated type carries a single allocator type parameter `A` that applies to all heap allocations within that message and its nested messages:
 
 ```rust
-pub struct Task<A: Allocator + Clone = Global> { /* … */ }
+pub struct Task<A: Allocator = Global> { /* … */ }
 ```
 
-`A` defaults to `Global`, so `Task` (without a type argument) works identically to a version without allocator support. The `Clone` bound lets each message clone its allocator into nested children and free every field from a single `Drop` (see below).
+`A` defaults to `Global`, so `Task` (without a type argument) works identically to a version without allocator support. The struct itself only requires `Allocator` (same as `Vec` / `HashMap`). `Clone` is an impl bound: each message clones its allocator into nested children and frees every field from a single `Drop` (see below).
 
 **Single canonical allocator (almost no per-field copies).** The allocator is stored in `MessageCommon.alloc`. Heap-backed singular / repeated / oneof fields do **not** embed an allocator *instance*: they use the private [`unmanaged`](unmanaged/) types — `UnmanagedBox<T, A>`, `UnmanagedVec<T, A>`, `UnmanagedString<A>` — which keep only `ptr`/`len`/`cap` (plus `PhantomData<A>`) inline and receive an owned allocator (an `alloc.clone()`) on each operation that (de)allocates. The allocator **type** `A` still appears on unmanaged buffers and on **field wrappers** (`SingularField<…, A>`, `RepeatedField<…, A>`, `MapField<…, A>`); markers themselves are allocator-free.
 

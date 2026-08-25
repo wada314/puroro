@@ -88,7 +88,7 @@ where
         let alloc = self.values.allocator().clone();
         while let Some(elem) = self.values.pop() {
             // SAFETY: same allocator ownership as `RepeatedFieldMut::clear`.
-            unsafe { T::deallocate_element(elem, alloc.clone()) };
+            unsafe { T::deallocate_element(elem, &alloc) };
         }
     }
 
@@ -99,7 +99,7 @@ where
         match self.values.pop() {
             Some(elem) => {
                 // SAFETY: same allocator ownership as `clear`.
-                unsafe { T::deallocate_element(elem, alloc) };
+                unsafe { T::deallocate_element(elem, &alloc) };
                 true
             }
             None => false,

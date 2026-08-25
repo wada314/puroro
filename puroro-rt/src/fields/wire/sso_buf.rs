@@ -58,9 +58,7 @@ pub(crate) trait SsoHeap<A: Allocator>: Sized {
     /// # Safety
     ///
     /// `alloc` must own this value's buffer.
-    unsafe fn deallocate_heap(self, alloc: A)
-    where
-        A: Clone;
+    unsafe fn deallocate_heap(self, alloc: &A);
 
     fn clone_heap(&self, alloc: A) -> Self
     where
@@ -78,10 +76,7 @@ impl<A: Allocator> SsoHeap<A> for UnmanagedString<A> {
     }
 
     #[inline]
-    unsafe fn deallocate_heap(self, alloc: A)
-    where
-        A: Clone,
-    {
+    unsafe fn deallocate_heap(self, alloc: &A) {
         // SAFETY: forwarded to the caller's `alloc` obligation.
         unsafe { self.deallocate(alloc) };
     }
@@ -112,10 +107,7 @@ impl<A: Allocator> SsoHeap<A> for UnmanagedVec<u8, A> {
     }
 
     #[inline]
-    unsafe fn deallocate_heap(self, alloc: A)
-    where
-        A: Clone,
-    {
+    unsafe fn deallocate_heap(self, alloc: &A) {
         // SAFETY: forwarded to the caller's `alloc` obligation.
         unsafe { self.deallocate(alloc) };
     }
@@ -183,7 +175,7 @@ where
     if value.as_slice().len() <= INLINE_CAP {
         let packed = pack_inline::<H>(value.as_slice());
         // SAFETY: `alloc` owns `value`'s buffer.
-        unsafe { value.deallocate_heap(alloc) };
+        unsafe { value.deallocate_heap(&alloc) };
         (packed, false)
     } else {
         (pack_heap(value), true)
@@ -245,7 +237,7 @@ impl<H> SsoBuf<H> {
     /// # Safety
     ///
     /// `is_heap` must match the live arm. `alloc` must own any live heap buffer.
-    pub(crate) unsafe fn deallocate<A: Allocator + Clone>(mut self, is_heap: bool, alloc: A)
+    pub(crate) unsafe fn deallocate<A: Allocator>(mut self, is_heap: bool, alloc: &A)
     where
         H: SsoHeap<A>,
     {
@@ -265,12 +257,12 @@ impl<H> SsoBuf<H> {
     ///
     /// `old_is_heap` must match the live arm of `self`. `alloc` must own any
     /// live heap buffer in `self`.
-    pub(crate) unsafe fn replace_packed<A: Allocator + Clone>(
+    pub(crate) unsafe fn replace_packed<A: Allocator>(
         &mut self,
         new: Self,
         _new_is_heap: bool,
         old_is_heap: bool,
-        alloc: A,
+        alloc: &A,
     ) where
         H: SsoHeap<A>,
     {

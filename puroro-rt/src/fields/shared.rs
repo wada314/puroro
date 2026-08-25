@@ -120,8 +120,9 @@ pub trait MessageCommonAlloc {
 /// parent message struct.
 ///
 /// The allocator `alloc` is the single canonical copy for the whole message:
-/// unmanaged field payloads retain only its type and receive cloned instances
-/// for operations that (de)allocate. `unknown_fields` is wrapped in
+/// unmanaged field payloads retain only its type. Growth / clone paths receive
+/// cloned instances; teardown borrows `&self.alloc` (`Allocator::deallocate`
+/// is `&self`). `unknown_fields` is wrapped in
 /// [`ManuallyDrop`], so it never frees itself implicitly; the owning message
 /// releases it via [`deallocate`](Self::deallocate) in its `Drop`.
 ///
@@ -133,7 +134,8 @@ pub struct MessageCommon<B, A: Allocator> {
     pub bits: B,
     /// Contiguous unknown-field wire blob (`ManuallyDrop` — freed by the message).
     pub unknown_fields: ManuallyDrop<UnmanagedVec<u8, A>>,
-    /// Canonical allocator for the whole message (cloned into field ops).
+    /// Canonical allocator for the whole message (cloned for growth / clone;
+    /// teardown borrows `&self.alloc`).
     pub alloc: A,
 }
 
@@ -177,15 +179,16 @@ impl<B, A: Allocator + Clone> MessageCommon<B, A> {
     }
 }
 
-impl<B, A: Allocator + Clone> MessageCommon<B, A> {
+impl<B, A: Allocator> MessageCommon<B, A> {
     /// Releases the unknown-field buffer. Must be called exactly once from the
     /// owning message's `Drop`; afterwards `self` must not be used.
     pub fn deallocate(&mut self) {
         // SAFETY: called once from the message `Drop`; `unknown_fields` is not
-        // touched again, and an owned clone of `self.alloc` is interchangeable
-        // with the clones that grew the buffer (`Allocator + Clone` contract).
+        // touched again. Reconstructs `Vec<u8, &A>` so teardown does not clone
+        // `self.alloc`; clones used at growth must be interchangeable with this
+        // borrow (`Allocator::deallocate` is `&self`).
         let uf = unsafe { ManuallyDrop::take(&mut self.unknown_fields) };
-        unsafe { uf.deallocate(self.alloc.clone()) };
+        unsafe { uf.deallocate(&self.alloc) };
     }
 }
 

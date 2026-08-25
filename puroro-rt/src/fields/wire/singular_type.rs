@@ -248,7 +248,7 @@ where
         let alloc = common.alloc.clone();
         if let Some(old) = ValueSlot::with_mut(slot, init, common).replace(value) {
             // SAFETY: `write` contract — `common` is this field's parent.
-            unsafe { DeallocateIn::deallocate_in(old, alloc) };
+            unsafe { DeallocateIn::deallocate_in(old, &alloc) };
         }
     }
 
@@ -264,7 +264,7 @@ where
         let alloc = common.alloc.clone();
         if let Some(old) = ValueSlot::with_mut(slot, init, common).take_clear() {
             // SAFETY: `clear` contract — `common` is this field's parent.
-            unsafe { DeallocateIn::deallocate_in(old, alloc) };
+            unsafe { DeallocateIn::deallocate_in(old, &alloc) };
         }
     }
 
@@ -376,7 +376,7 @@ impl<C: LenCodec> PayloadAccess for LenScalar<C> {
         let alloc = common.alloc.clone();
         if let Some(old) = ValueSlot::with_mut(slot, init, common).replace(value) {
             // SAFETY: `write` contract — `common` is this field's parent.
-            unsafe { DeallocateIn::deallocate_in(old, alloc) };
+            unsafe { DeallocateIn::deallocate_in(old, &alloc) };
         }
     }
 
@@ -391,7 +391,7 @@ impl<C: LenCodec> PayloadAccess for LenScalar<C> {
         let alloc = common.alloc.clone();
         if let Some(old) = ValueSlot::with_mut(slot, init, common).take_clear() {
             // SAFETY: `clear` contract — `common` is this field's parent.
-            unsafe { DeallocateIn::deallocate_in(old, alloc) };
+            unsafe { DeallocateIn::deallocate_in(old, &alloc) };
         }
     }
 

@@ -383,7 +383,7 @@ pub(super) fn render_items(
             for #name<A>
         {
             #[inline]
-            unsafe fn deallocate_in(self, _alloc: A) {
+            unsafe fn deallocate_in(self, _alloc: &A) {
                 ::core::mem::drop(self);
             }
         }

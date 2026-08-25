@@ -2,18 +2,18 @@
 //! (from `example.proto`). The public type is re-exported at the crate root so
 //! it sits beside companion module [`crate::address`].
 
-use ::allocator_api2::alloc::{Allocator, Global};
-use ::bitvec::array::BitArray;
-use ::bitvec::order::Lsb0;
-use ::bytes::{Buf, BufMut};
-use ::core::fmt;
-use ::core::mem;
-use ::core::ops::ControlFlow;
-use ::core::ops::DerefMut;
+use allocator_api2::alloc::{Allocator, Global};
+use bitvec::array::BitArray;
+use bitvec::order::Lsb0;
+use bytes::{Buf, BufMut};
+use core::fmt;
+use core::mem;
+use core::ops::ControlFlow;
+use core::ops::DerefMut;
 
-use ::puroro::{DecodeBuf, DecodeError, Message};
-use ::puroro_rt::decode::{decode_tag, skip_field_and_save};
-use ::puroro_rt::{
+use puroro::{DecodeBuf, DecodeError, Message};
+use puroro_rt::decode::{decode_tag, skip_field_and_save};
+use puroro_rt::{
     CloneFieldsVisitor, CloneIn, DebugStructVisitor, EncodeCtx, EncodeRawVisitor,
     EncodedLenVisitor, Explicit, FieldDeallocVisitor, FieldEqVisitor, FieldPairVisitor,
     FieldPairVisitorMut, FieldVisitor, FieldVisitorMut, InlineOrHeap, MessageCommon, MessageEncode,
@@ -259,7 +259,7 @@ impl<A: Allocator + Clone> Drop for Address<A> {
 
 impl<A: Allocator + Clone> ::puroro_rt::DeallocateIn<A> for Address<A> {
     #[inline]
-    unsafe fn deallocate_in(self, _alloc: A) {
+    unsafe fn deallocate_in(self, _alloc: &A) {
         // Heap is owned by `self._common.alloc`; parent-passed `alloc` is only
         // needed when freeing an enclosing `UnmanagedBox` slot.
         drop(self);

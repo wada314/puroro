@@ -55,7 +55,7 @@ impl<A: Allocator + Clone> ::unmanaged::CloneIn<A> for Nest<A> {
 
 impl<A: Allocator + Clone> ::unmanaged::DeallocateIn<A> for Nest<A> {
     #[inline]
-    unsafe fn deallocate_in(self, _alloc: A) {
+    unsafe fn deallocate_in(self, _alloc: &A) {
         drop(self);
     }
 }
