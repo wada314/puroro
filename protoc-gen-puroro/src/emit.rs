@@ -50,7 +50,7 @@ pub fn emit(request: &CodegenRequest) -> Result<CodeGeneratorResponse> {
         .append_inner_attrs(generated_file_attrs(&targets)?);
 
     for file in &targets {
-        forest.install_file(emit_file(file)?);
+        forest.install_file(prepare_file(file)?);
     }
 
     let mut files = render(
@@ -86,12 +86,12 @@ fn generated_file_attrs(targets: &[&File<'_>]) -> Result<Vec<Attribute>> {
     Ok(parse::parse_file(root_tokens)?.attrs)
 }
 
-/// One message, ready to install into a parent module.
+/// One message, prepared to install into a parent module.
 ///
 /// The struct (and its impls) go on the parent. A snake_case companion holds
 /// `FIELD_*` / `BIT_*`, nested types, and oneofs. Nested messages install into
 /// that companion the same way. Empty companions are omitted.
-struct EmittedMessage {
+struct PreparedMessage {
     /// Items appended to the parent — e.g. `[pub struct Foo, impl Foo { … }]`.
     type_items: Vec<Item>,
     /// Companion module ident — e.g. `foo` for `message Foo`. Unused when omitted.
@@ -103,29 +103,29 @@ struct EmittedMessage {
     /// Empty together with [`Self::nested_enums`] and [`Self::nested`] means no
     /// companion.
     companion_items: Vec<Item>,
-    /// Nested enums installed into this companion — e.g. `[EmittedEnum` for `Kind]`.
-    nested_enums: Vec<EmittedEnum>,
-    /// Nested messages installed into this companion — e.g. `[EmittedMessage` for `Bar]`.
-    nested: Vec<EmittedMessage>,
+    /// Nested enums installed into this companion — e.g. `[PreparedEnum` for `Kind]`.
+    nested_enums: Vec<PreparedEnum>,
+    /// Nested messages installed into this companion — e.g. `[PreparedMessage` for `Bar]`.
+    nested: Vec<PreparedMessage>,
 }
 
-/// One enum, ready to install into a parent module.
-struct EmittedEnum {
+/// One enum, prepared to install into a parent module.
+struct PreparedEnum {
     /// Items appended to the parent — e.g. `[pub struct Status, impl Status { … }]`.
     items: Vec<Item>,
 }
 
-/// One `.proto` file, ready to install into a package module.
-struct EmittedFile {
+/// One `.proto` file, prepared to install into a package module.
+struct PreparedFile {
     /// Protobuf package — e.g. `example.v1`. Empty string is the forest root.
     package: String,
-    /// File-level enums — e.g. `[EmittedEnum` for `Status]`.
-    enums: Vec<EmittedEnum>,
-    /// File-level messages — e.g. `[EmittedMessage` for `Foo]`.
-    messages: Vec<EmittedMessage>,
+    /// File-level enums — e.g. `[PreparedEnum` for `Status]`.
+    enums: Vec<PreparedEnum>,
+    /// File-level messages — e.g. `[PreparedMessage` for `Foo]`.
+    messages: Vec<PreparedMessage>,
 }
 
-fn emit_message(message: &Message<'_>) -> Result<EmittedMessage> {
+fn prepare_message(message: &Message<'_>) -> Result<PreparedMessage> {
     if !ident::is_simple_ident(message.name()) {
         return Err(Error::Codegen(format!(
             "cannot use message name `{}` as a Rust identifier",
@@ -139,15 +139,15 @@ fn emit_message(message: &Message<'_>) -> Result<EmittedMessage> {
 
     let nested_enums = message
         .nested_enums()
-        .map(emit_enum)
+        .map(prepare_enum)
         .collect::<Result<Vec<_>>>()?;
     let nested = message
         .nested_messages()
         .filter(|m| !m.is_map_entry())
-        .map(emit_message)
+        .map(prepare_message)
         .collect::<Result<Vec<_>>>()?;
 
-    Ok(EmittedMessage {
+    Ok(PreparedMessage {
         type_items: rendered.type_items,
         module_name,
         proto_fqn: message.fqn().clone(),
@@ -157,59 +157,59 @@ fn emit_message(message: &Message<'_>) -> Result<EmittedMessage> {
     })
 }
 
-fn emit_enum(enumeration: &Enum<'_>) -> Result<EmittedEnum> {
-    Ok(EmittedEnum {
+fn prepare_enum(enumeration: &Enum<'_>) -> Result<PreparedEnum> {
+    Ok(PreparedEnum {
         items: enumeration::render_enum(enumeration)?,
     })
 }
 
-fn emit_file(file: &File<'_>) -> Result<EmittedFile> {
-    Ok(EmittedFile {
+fn prepare_file(file: &File<'_>) -> Result<PreparedFile> {
+    Ok(PreparedFile {
         package: file.package().to_owned(),
-        enums: file.enums().map(emit_enum).collect::<Result<Vec<_>>>()?,
+        enums: file.enums().map(prepare_enum).collect::<Result<Vec<_>>>()?,
         messages: file
             .messages()
-            .map(emit_message)
+            .map(prepare_message)
             .collect::<Result<Vec<_>>>()?,
     })
 }
 
 impl ModuleForest {
-    fn install_file(&mut self, emitted: EmittedFile) {
-        let package = self.ensure_package(&emitted.package);
-        for e in emitted.enums {
+    fn install_file(&mut self, prepared: PreparedFile) {
+        let package = self.ensure_package(&prepared.package);
+        for e in prepared.enums {
             package.install_enum(e);
         }
-        for message in emitted.messages {
+        for message in prepared.messages {
             package.install_message(message);
         }
     }
 }
 
 impl ModuleNode {
-    fn install_message(&mut self, emitted: EmittedMessage) {
-        self.append_items(emitted.type_items);
-        if emitted.companion_items.is_empty()
-            && emitted.nested_enums.is_empty()
-            && emitted.nested.is_empty()
+    fn install_message(&mut self, prepared: PreparedMessage) {
+        self.append_items(prepared.type_items);
+        if prepared.companion_items.is_empty()
+            && prepared.nested_enums.is_empty()
+            && prepared.nested.is_empty()
         {
             return;
         }
-        let companion = self.get_or_insert_child(emitted.module_name);
+        let companion = self.get_or_insert_child(prepared.module_name);
         companion.add_origin(ModuleOrigin::Message {
-            proto_fqn: emitted.proto_fqn,
+            proto_fqn: prepared.proto_fqn,
         });
-        companion.append_items(emitted.companion_items);
-        for nested_enum in emitted.nested_enums {
+        companion.append_items(prepared.companion_items);
+        for nested_enum in prepared.nested_enums {
             companion.install_enum(nested_enum);
         }
-        for nested in emitted.nested {
+        for nested in prepared.nested {
             companion.install_message(nested);
         }
     }
 
-    fn install_enum(&mut self, emitted: EmittedEnum) {
-        self.append_items(emitted.items);
+    fn install_enum(&mut self, prepared: PreparedEnum) {
+        self.append_items(prepared.items);
     }
 }
 
