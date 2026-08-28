@@ -299,6 +299,7 @@ fn render_module_body(oneof: &OneofEmit, bits_ty: &TokenStream) -> Result<TokenS
 
     Ok(quote! {
         // Same `_root` chain as forest modules so `self::_root::…` type paths work.
+        #[allow(unused)]
         mod _root {
             pub(super) use super::super::_root::*;
         }
