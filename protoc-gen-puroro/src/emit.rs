@@ -217,10 +217,10 @@ impl ModuleNode {
 mod tests {
     use super::*;
     use crate::descriptor::features::{EnumType, Utf8Validation};
+    use crate::descriptor::test_helpers as desc;
     use crate::descriptor::{
-        BytesLayout, CodegenMeta, CodegenRequest, Edition, EnumDesc, EnumValueDesc, FeatureSet,
-        FieldDesc, FieldLabel, FieldType, MessageDesc, OneofDesc, ProtoFile, ProtoFqn,
-        StringLayout, Syntax,
+        BytesLayout, CodegenRequest, Edition, EnumDesc, FeatureSet, FieldDesc, FieldLabel,
+        FieldType, MessageDesc, ProtoFile, ProtoFqn, StringLayout, Syntax,
     };
     use crate::plugin_io::decode_request;
     use ::protobuf_core::{AsRefExtProtobuf, Field, FieldNumber, FieldValue, WriteExtProtobuf};
@@ -281,28 +281,10 @@ mod tests {
     }
 
     fn empty_request_with_package(message_name: &str, package: &str) -> CodegenRequest {
-        CodegenRequest {
-            meta: CodegenMeta {
-                file_to_generate: vec!["empty.proto".into()],
-                parameter: None,
-            },
-            proto_files: vec![ProtoFile {
-                name: "empty.proto".into(),
-                package: package.into(),
-                syntax: Syntax::Proto3,
-                features: FeatureSet::default(),
-                dependency: vec![],
-                messages: vec![MessageDesc {
-                    name: message_name.into(),
-                    fields: vec![],
-                    nested_messages: vec![],
-                    nested_enums: vec![],
-                    oneofs: vec![],
-                    map_entry: false,
-                }],
-                enums: vec![],
-            }],
-        }
+        desc::request(vec![ProtoFile {
+            messages: vec![desc::message(message_name)],
+            ..desc::proto_file("empty.proto", package)
+        }])
     }
 
     #[test]
@@ -339,76 +321,17 @@ mod tests {
         request.proto_files[0].name = "scalars.proto".into();
         request.proto_files[0].messages[0].name = "Scalars".into();
         request.proto_files[0].messages[0].fields = vec![
+            desc::field("score", 1, FieldType::Int32),
             FieldDesc {
-                name: "score".into(),
-                number: 1,
-                label: FieldLabel::Optional,
-                type_: FieldType::Int32,
-                type_name: None,
-                oneof_index: None,
-                proto3_optional: false,
-                default_value: None,
-                packed: None,
-                string_layout: None,
-                bytes_layout: None,
-                features: FeatureSet::default(),
-            },
-            FieldDesc {
-                name: "title".into(),
-                number: 2,
-                label: FieldLabel::Optional,
-                type_: FieldType::String,
-                type_name: None,
-                oneof_index: None,
                 proto3_optional: true,
-                default_value: None,
-                packed: None,
-                string_layout: None,
-                bytes_layout: None,
-                features: FeatureSet::default(),
+                ..desc::field("title", 2, FieldType::String)
             },
+            desc::field("done", 3, FieldType::Bool),
             FieldDesc {
-                name: "done".into(),
-                number: 3,
-                label: FieldLabel::Optional,
-                type_: FieldType::Bool,
-                type_name: None,
-                oneof_index: None,
-                proto3_optional: false,
-                default_value: None,
-                packed: None,
-                string_layout: None,
-                bytes_layout: None,
-                features: FeatureSet::default(),
-            },
-            FieldDesc {
-                name: "payload".into(),
-                number: 4,
-                label: FieldLabel::Optional,
-                type_: FieldType::Bytes,
-                type_name: None,
-                oneof_index: None,
                 proto3_optional: true,
-                default_value: None,
-                packed: None,
-                string_layout: None,
-                bytes_layout: None,
-                features: FeatureSet::default(),
+                ..desc::field("payload", 4, FieldType::Bytes)
             },
-            FieldDesc {
-                name: "zigzag".into(),
-                number: 5,
-                label: FieldLabel::Optional,
-                type_: FieldType::SInt32,
-                type_name: None,
-                oneof_index: None,
-                proto3_optional: false,
-                default_value: None,
-                packed: None,
-                string_layout: None,
-                bytes_layout: None,
-                features: FeatureSet::default(),
-            },
+            desc::field("zigzag", 5, FieldType::SInt32),
         ];
         let response = emit(&request).unwrap();
         let content = &response.files[0].content;
@@ -429,18 +352,9 @@ mod tests {
         request.proto_files[0].name = "t.proto".into();
         request.proto_files[0].messages[0].name = "HeapString".into();
         request.proto_files[0].messages[0].fields = vec![FieldDesc {
-            name: "body".into(),
-            number: 1,
-            label: FieldLabel::Optional,
-            type_: FieldType::String,
-            type_name: None,
-            oneof_index: None,
             proto3_optional: true,
-            default_value: None,
-            packed: None,
             string_layout: Some(StringLayout::Heap),
-            bytes_layout: None,
-            features: FeatureSet::default(),
+            ..desc::field("body", 1, FieldType::String)
         }];
         let response = emit(&request).unwrap();
         let content = &response.files[0].content;
@@ -463,18 +377,9 @@ mod tests {
         request.proto_files[0].name = "t.proto".into();
         request.proto_files[0].messages[0].name = "HeapBytes".into();
         request.proto_files[0].messages[0].fields = vec![FieldDesc {
-            name: "body".into(),
-            number: 1,
-            label: FieldLabel::Optional,
-            type_: FieldType::Bytes,
-            type_name: None,
-            oneof_index: None,
             proto3_optional: true,
-            default_value: None,
-            packed: None,
-            string_layout: None,
             bytes_layout: Some(BytesLayout::Heap),
-            features: FeatureSet::default(),
+            ..desc::field("body", 1, FieldType::Bytes)
         }];
         let response = emit(&request).unwrap();
         let content = &response.files[0].content;
@@ -495,54 +400,23 @@ mod tests {
 
     #[test]
     fn emit_open_enum_field() {
-        let request = CodegenRequest {
-            meta: CodegenMeta {
-                file_to_generate: vec!["t.proto".into()],
-                parameter: None,
-            },
-            proto_files: vec![ProtoFile {
-                name: "t.proto".into(),
-                package: "demo".into(),
-                syntax: Syntax::Proto3,
-                features: FeatureSet::default(),
-                dependency: vec![],
-                messages: vec![MessageDesc {
-                    name: "Holder".into(),
-                    fields: vec![FieldDesc {
-                        name: "status".into(),
-                        number: 1,
-                        label: FieldLabel::Optional,
-                        type_: FieldType::Enum,
-                        type_name: Some(ProtoFqn::parse(".demo.Status")),
-                        oneof_index: None,
-                        proto3_optional: false,
-                        default_value: None,
-                        packed: None,
-                        string_layout: None,
-                        bytes_layout: None,
-                        features: FeatureSet::default(),
-                    }],
-                    nested_messages: vec![],
-                    nested_enums: vec![],
-                    oneofs: vec![],
-                    map_entry: false,
+        let request = desc::request(vec![ProtoFile {
+            messages: vec![MessageDesc {
+                fields: vec![FieldDesc {
+                    type_name: Some(ProtoFqn::parse(".demo.Status")),
+                    ..desc::field("status", 1, FieldType::Enum)
                 }],
-                enums: vec![EnumDesc {
-                    name: "Status".into(),
-                    values: vec![
-                        EnumValueDesc {
-                            name: "STATUS_UNSPECIFIED".into(),
-                            number: 0,
-                        },
-                        EnumValueDesc {
-                            name: "STATUS_PENDING".into(),
-                            number: 1,
-                        },
-                    ],
-                    features: FeatureSet::default(),
-                }],
+                ..desc::message("Holder")
             }],
-        };
+            enums: vec![desc::enumeration(
+                "Status",
+                vec![
+                    desc::enum_value("STATUS_UNSPECIFIED", 0),
+                    desc::enum_value("STATUS_PENDING", 1),
+                ],
+            )],
+            ..desc::proto_file("t.proto", "demo")
+        }]);
         let response = emit(&request).unwrap();
         let content = &response.files[0].content;
         assert!(content.contains("pub struct Status"));
@@ -565,107 +439,51 @@ mod tests {
             enum_type: Some(EnumType::Closed),
             ..FeatureSet::default()
         };
-        let request = CodegenRequest {
-            meta: CodegenMeta {
-                file_to_generate: vec![
-                    "status.proto".into(),
-                    "priority.proto".into(),
-                    "holder.proto".into(),
-                ],
-                parameter: None,
+        let request = desc::request(vec![
+            ProtoFile {
+                syntax: Syntax::Editions(Edition::Edition2023),
+                enums: vec![desc::enumeration(
+                    "Status",
+                    vec![
+                        desc::enum_value("STATUS_UNSPECIFIED", 0),
+                        desc::enum_value("STATUS_PENDING", 1),
+                    ],
+                )],
+                ..desc::proto_file("status.proto", "demo")
             },
-            proto_files: vec![
-                ProtoFile {
-                    name: "status.proto".into(),
-                    package: "demo".into(),
-                    syntax: Syntax::Editions(Edition::Edition2023),
-                    features: FeatureSet::default(),
-                    dependency: vec![],
-                    messages: vec![],
-                    enums: vec![EnumDesc {
-                        name: "Status".into(),
-                        values: vec![
-                            EnumValueDesc {
-                                name: "STATUS_UNSPECIFIED".into(),
-                                number: 0,
-                            },
-                            EnumValueDesc {
-                                name: "STATUS_PENDING".into(),
-                                number: 1,
-                            },
+            ProtoFile {
+                syntax: Syntax::Editions(Edition::Edition2024),
+                enums: vec![EnumDesc {
+                    features: closed,
+                    ..desc::enumeration(
+                        "Priority",
+                        vec![
+                            desc::enum_value("PRIORITY_UNSPECIFIED", 0),
+                            desc::enum_value("PRIORITY_HIGH", 1),
                         ],
-                        features: FeatureSet::default(),
-                    }],
-                },
-                ProtoFile {
-                    name: "priority.proto".into(),
-                    package: "demo".into(),
-                    syntax: Syntax::Editions(Edition::Edition2024),
-                    features: FeatureSet::default(),
-                    dependency: vec![],
-                    messages: vec![],
-                    enums: vec![EnumDesc {
-                        name: "Priority".into(),
-                        values: vec![
-                            EnumValueDesc {
-                                name: "PRIORITY_UNSPECIFIED".into(),
-                                number: 0,
-                            },
-                            EnumValueDesc {
-                                name: "PRIORITY_HIGH".into(),
-                                number: 1,
-                            },
-                        ],
-                        features: closed,
-                    }],
-                },
-                ProtoFile {
-                    name: "holder.proto".into(),
-                    package: "demo".into(),
-                    syntax: Syntax::Editions(Edition::Edition2023),
-                    features: FeatureSet::default(),
-                    dependency: vec!["status.proto".into(), "priority.proto".into()],
-                    messages: vec![MessageDesc {
-                        name: "Holder".into(),
-                        fields: vec![
-                            FieldDesc {
-                                name: "status".into(),
-                                number: 1,
-                                label: FieldLabel::Optional,
-                                type_: FieldType::Enum,
-                                type_name: Some(ProtoFqn::parse(".demo.Status")),
-                                oneof_index: None,
-                                proto3_optional: false,
-                                default_value: None,
-                                packed: None,
-                                string_layout: None,
-                                bytes_layout: None,
-                                features: FeatureSet::default(),
-                            },
-                            FieldDesc {
-                                name: "priority".into(),
-                                number: 2,
-                                label: FieldLabel::Optional,
-                                type_: FieldType::Enum,
-                                type_name: Some(ProtoFqn::parse(".demo.Priority")),
-                                oneof_index: None,
-                                proto3_optional: false,
-                                default_value: None,
-                                packed: None,
-                                string_layout: None,
-                                bytes_layout: None,
-                                features: FeatureSet::default(),
-                            },
-                        ],
-                        nested_messages: vec![],
-                        nested_enums: vec![],
-                        oneofs: vec![],
-                        map_entry: false,
-                    }],
-                    enums: vec![],
-                },
-            ],
-        };
+                    )
+                }],
+                ..desc::proto_file("priority.proto", "demo")
+            },
+            ProtoFile {
+                syntax: Syntax::Editions(Edition::Edition2023),
+                dependency: vec!["status.proto".into(), "priority.proto".into()],
+                messages: vec![MessageDesc {
+                    fields: vec![
+                        FieldDesc {
+                            type_name: Some(ProtoFqn::parse(".demo.Status")),
+                            ..desc::field("status", 1, FieldType::Enum)
+                        },
+                        FieldDesc {
+                            type_name: Some(ProtoFqn::parse(".demo.Priority")),
+                            ..desc::field("priority", 2, FieldType::Enum)
+                        },
+                    ],
+                    ..desc::message("Holder")
+                }],
+                ..desc::proto_file("holder.proto", "demo")
+            },
+        ]);
         let response = emit(&request).unwrap();
         assert_eq!(response.files.len(), 1);
         assert_eq!(response.files[0].name, "lib.rs");
@@ -681,91 +499,35 @@ mod tests {
 
     #[test]
     fn emit_repeated_and_nested_types() {
-        let request = CodegenRequest {
-            meta: CodegenMeta {
-                file_to_generate: vec!["t.proto".into()],
-                parameter: None,
-            },
-            proto_files: vec![ProtoFile {
-                name: "t.proto".into(),
-                package: "demo".into(),
-                syntax: Syntax::Proto3,
-                features: FeatureSet::default(),
-                dependency: vec![],
-                messages: vec![MessageDesc {
-                    name: "Outer".into(),
-                    fields: vec![
-                        FieldDesc {
-                            name: "tag_ids".into(),
-                            number: 1,
-                            label: FieldLabel::Repeated,
-                            type_: FieldType::Int32,
-                            type_name: None,
-                            oneof_index: None,
-                            proto3_optional: false,
-                            default_value: None,
-                            packed: None,
-                            string_layout: None,
-                            bytes_layout: None,
-                            features: FeatureSet::default(),
-                        },
-                        FieldDesc {
-                            name: "inners".into(),
-                            number: 2,
-                            label: FieldLabel::Repeated,
-                            type_: FieldType::Message,
-                            type_name: Some(ProtoFqn::parse(".demo.Outer.Inner")),
-                            oneof_index: None,
-                            proto3_optional: false,
-                            default_value: None,
-                            packed: None,
-                            string_layout: None,
-                            bytes_layout: None,
-                            features: FeatureSet::default(),
-                        },
-                        FieldDesc {
-                            name: "kind".into(),
-                            number: 3,
-                            label: FieldLabel::Optional,
-                            type_: FieldType::Enum,
-                            type_name: Some(ProtoFqn::parse(".demo.Outer.Kind")),
-                            oneof_index: None,
-                            proto3_optional: false,
-                            default_value: None,
-                            packed: None,
-                            string_layout: None,
-                            bytes_layout: None,
-                            features: FeatureSet::default(),
-                        },
+        let request = desc::request(vec![ProtoFile {
+            messages: vec![MessageDesc {
+                fields: vec![
+                    FieldDesc {
+                        label: FieldLabel::Repeated,
+                        ..desc::field("tag_ids", 1, FieldType::Int32)
+                    },
+                    FieldDesc {
+                        label: FieldLabel::Repeated,
+                        type_name: Some(ProtoFqn::parse(".demo.Outer.Inner")),
+                        ..desc::field("inners", 2, FieldType::Message)
+                    },
+                    FieldDesc {
+                        type_name: Some(ProtoFqn::parse(".demo.Outer.Kind")),
+                        ..desc::field("kind", 3, FieldType::Enum)
+                    },
+                ],
+                nested_messages: vec![desc::message("Inner")],
+                nested_enums: vec![desc::enumeration(
+                    "Kind",
+                    vec![
+                        desc::enum_value("KIND_UNSPECIFIED", 0),
+                        desc::enum_value("KIND_A", 1),
                     ],
-                    nested_messages: vec![MessageDesc {
-                        name: "Inner".into(),
-                        fields: vec![],
-                        nested_messages: vec![],
-                        nested_enums: vec![],
-                        oneofs: vec![],
-                        map_entry: false,
-                    }],
-                    nested_enums: vec![EnumDesc {
-                        name: "Kind".into(),
-                        values: vec![
-                            EnumValueDesc {
-                                name: "KIND_UNSPECIFIED".into(),
-                                number: 0,
-                            },
-                            EnumValueDesc {
-                                name: "KIND_A".into(),
-                                number: 1,
-                            },
-                        ],
-                        features: FeatureSet::default(),
-                    }],
-                    oneofs: vec![],
-                    map_entry: false,
-                }],
-                enums: vec![],
+                )],
+                ..desc::message("Outer")
             }],
-        };
+            ..desc::proto_file("t.proto", "demo")
+        }]);
         let response = emit(&request).unwrap();
         let content = &response.files[0].content;
         assert!(content.contains("RepeatedField"));
@@ -785,27 +547,13 @@ mod tests {
     #[test]
     fn reject_open_enum_without_leading_zero() {
         let mut request = empty_request("Holder");
-        request.proto_files[0].enums.push(EnumDesc {
-            name: "Kind".into(),
-            values: vec![EnumValueDesc {
-                name: "KIND_A".into(),
-                number: 1,
-            }],
-            features: FeatureSet::default(),
-        });
+        request.proto_files[0].enums.push(desc::enumeration(
+            "Kind",
+            vec![desc::enum_value("KIND_A", 1)],
+        ));
         request.proto_files[0].messages[0].fields.push(FieldDesc {
-            name: "kind".into(),
-            number: 1,
-            label: FieldLabel::Optional,
-            type_: FieldType::Enum,
             type_name: Some(ProtoFqn::parse(".Kind")),
-            oneof_index: None,
-            proto3_optional: false,
-            default_value: None,
-            packed: None,
-            string_layout: None,
-            bytes_layout: None,
-            features: FeatureSet::default(),
+            ..desc::field("kind", 1, FieldType::Enum)
         });
         let err = emit(&request).unwrap_err();
         assert!(err.to_string().contains("must define 0 as its first value"));
@@ -813,41 +561,20 @@ mod tests {
 
     #[test]
     fn emit_zero_less_nested_enum() {
-        let request = CodegenRequest {
-            meta: CodegenMeta {
-                file_to_generate: vec!["t.proto".into()],
-                parameter: None,
-            },
-            proto_files: vec![ProtoFile {
-                name: "t.proto".into(),
-                package: "demo".into(),
-                syntax: Syntax::Proto2,
-                features: FeatureSet::default(),
-                dependency: vec![],
-                messages: vec![MessageDesc {
-                    name: "Field".into(),
-                    fields: vec![],
-                    nested_messages: vec![],
-                    nested_enums: vec![EnumDesc {
-                        name: "Type".into(),
-                        values: vec![
-                            EnumValueDesc {
-                                name: "TYPE_DOUBLE".into(),
-                                number: 1,
-                            },
-                            EnumValueDesc {
-                                name: "TYPE_FLOAT".into(),
-                                number: 2,
-                            },
-                        ],
-                        features: FeatureSet::default(),
-                    }],
-                    oneofs: vec![],
-                    map_entry: false,
-                }],
-                enums: vec![],
+        let request = desc::request(vec![ProtoFile {
+            syntax: Syntax::Proto2,
+            messages: vec![MessageDesc {
+                nested_enums: vec![desc::enumeration(
+                    "Type",
+                    vec![
+                        desc::enum_value("TYPE_DOUBLE", 1),
+                        desc::enum_value("TYPE_FLOAT", 2),
+                    ],
+                )],
+                ..desc::message("Field")
             }],
-        };
+            ..desc::proto_file("t.proto", "demo")
+        }]);
         let response = emit(&request).unwrap();
         let content = &response.files[0].content;
         assert!(content.contains("pub struct Type"));
@@ -860,51 +587,19 @@ mod tests {
 
     #[test]
     fn emit_peer_message_field() {
-        let request = CodegenRequest {
-            meta: CodegenMeta {
-                file_to_generate: vec!["t.proto".into()],
-                parameter: None,
-            },
-            proto_files: vec![ProtoFile {
-                name: "t.proto".into(),
-                package: "demo".into(),
-                syntax: Syntax::Proto3,
-                features: FeatureSet::default(),
-                dependency: vec![],
-                messages: vec![
-                    MessageDesc {
-                        name: "Address".into(),
-                        fields: vec![],
-                        nested_messages: vec![],
-                        nested_enums: vec![],
-                        oneofs: vec![],
-                        map_entry: false,
-                    },
-                    MessageDesc {
-                        name: "Task".into(),
-                        fields: vec![FieldDesc {
-                            name: "assignee".into(),
-                            number: 1,
-                            label: FieldLabel::Optional,
-                            type_: FieldType::Message,
-                            type_name: Some(ProtoFqn::parse(".demo.Address")),
-                            oneof_index: None,
-                            proto3_optional: false,
-                            default_value: None,
-                            packed: None,
-                            string_layout: None,
-                            bytes_layout: None,
-                            features: FeatureSet::default(),
-                        }],
-                        nested_messages: vec![],
-                        nested_enums: vec![],
-                        oneofs: vec![],
-                        map_entry: false,
-                    },
-                ],
-                enums: vec![],
-            }],
-        };
+        let request = desc::request(vec![ProtoFile {
+            messages: vec![
+                desc::message("Address"),
+                MessageDesc {
+                    fields: vec![FieldDesc {
+                        type_name: Some(ProtoFqn::parse(".demo.Address")),
+                        ..desc::field("assignee", 1, FieldType::Message)
+                    }],
+                    ..desc::message("Task")
+                },
+            ],
+            ..desc::proto_file("t.proto", "demo")
+        }]);
         let response = emit(&request).unwrap();
         let content = &response.files[0].content;
         assert!(content.contains("pub struct Address"));
@@ -939,97 +634,35 @@ mod tests {
 
     #[test]
     fn emit_real_oneof_group() {
-        let request = CodegenRequest {
-            meta: CodegenMeta {
-                file_to_generate: vec!["t.proto".into()],
-                parameter: None,
-            },
-            proto_files: vec![ProtoFile {
-                name: "t.proto".into(),
-                package: String::new(),
-                syntax: Syntax::Proto3,
-                features: FeatureSet::default(),
-                dependency: vec![],
-                messages: vec![
-                    MessageDesc {
-                        name: "Peer".into(),
-                        fields: vec![],
-                        nested_messages: vec![],
-                        nested_enums: vec![],
-                        oneofs: vec![],
-                        map_entry: false,
-                    },
-                    MessageDesc {
-                        name: "Holder".into(),
-                        fields: vec![
-                            FieldDesc {
-                                name: "email".into(),
-                                number: 1,
-                                label: FieldLabel::Optional,
-                                type_: FieldType::String,
-                                type_name: None,
-                                oneof_index: Some(0),
-                                proto3_optional: false,
-                                default_value: None,
-                                packed: None,
-                                string_layout: None,
-                                bytes_layout: None,
-                                features: FeatureSet::default(),
-                            },
-                            FieldDesc {
-                                name: "code".into(),
-                                number: 2,
-                                label: FieldLabel::Optional,
-                                type_: FieldType::Int32,
-                                type_name: None,
-                                oneof_index: Some(0),
-                                proto3_optional: false,
-                                default_value: None,
-                                packed: None,
-                                string_layout: None,
-                                bytes_layout: None,
-                                features: FeatureSet::default(),
-                            },
-                            FieldDesc {
-                                name: "urgent".into(),
-                                number: 3,
-                                label: FieldLabel::Optional,
-                                type_: FieldType::Bool,
-                                type_name: None,
-                                oneof_index: Some(0),
-                                proto3_optional: false,
-                                default_value: None,
-                                packed: None,
-                                string_layout: None,
-                                bytes_layout: None,
-                                features: FeatureSet::default(),
-                            },
-                            FieldDesc {
-                                name: "peer".into(),
-                                number: 4,
-                                label: FieldLabel::Optional,
-                                type_: FieldType::Message,
-                                type_name: Some(ProtoFqn::parse(".Peer")),
-                                oneof_index: Some(0),
-                                proto3_optional: false,
-                                default_value: None,
-                                packed: None,
-                                string_layout: None,
-                                bytes_layout: None,
-                                features: FeatureSet::default(),
-                            },
-                        ],
-                        nested_messages: vec![],
-                        nested_enums: vec![],
-                        oneofs: vec![OneofDesc {
-                            name: "choice".into(),
-                        }],
-                        map_entry: false,
-                    },
-                ],
-                enums: vec![],
-            }],
-        };
+        let request = desc::request(vec![ProtoFile {
+            messages: vec![
+                desc::message("Peer"),
+                MessageDesc {
+                    fields: vec![
+                        FieldDesc {
+                            oneof_index: Some(0),
+                            ..desc::field("email", 1, FieldType::String)
+                        },
+                        FieldDesc {
+                            oneof_index: Some(0),
+                            ..desc::field("code", 2, FieldType::Int32)
+                        },
+                        FieldDesc {
+                            oneof_index: Some(0),
+                            ..desc::field("urgent", 3, FieldType::Bool)
+                        },
+                        FieldDesc {
+                            type_name: Some(ProtoFqn::parse(".Peer")),
+                            oneof_index: Some(0),
+                            ..desc::field("peer", 4, FieldType::Message)
+                        },
+                    ],
+                    oneofs: vec![desc::oneof("choice")],
+                    ..desc::message("Holder")
+                },
+            ],
+            ..desc::proto_file("t.proto", "")
+        }]);
         let response = emit(&request).unwrap();
         let content = &response.files[0].content;
         assert!(content.contains("OneofSlot"));
@@ -1044,77 +677,22 @@ mod tests {
 
     #[test]
     fn emit_map_string_int32() {
-        let request = CodegenRequest {
-            meta: CodegenMeta {
-                file_to_generate: vec!["t.proto".into()],
-                parameter: None,
-            },
-            proto_files: vec![ProtoFile {
-                name: "t.proto".into(),
-                package: String::new(),
-                syntax: Syntax::Proto3,
-                features: FeatureSet::default(),
-                dependency: vec![],
-                messages: vec![MessageDesc {
-                    name: "Holder".into(),
-                    fields: vec![FieldDesc {
-                        name: "attributes".into(),
-                        number: 1,
-                        label: FieldLabel::Repeated,
-                        type_: FieldType::Message,
-                        type_name: Some(ProtoFqn::parse(".Holder.AttributesEntry")),
-                        oneof_index: None,
-                        proto3_optional: false,
-                        default_value: None,
-                        packed: None,
-                        string_layout: None,
-                        bytes_layout: None,
-                        features: FeatureSet::default(),
-                    }],
-                    nested_messages: vec![MessageDesc {
-                        name: "AttributesEntry".into(),
-                        fields: vec![
-                            FieldDesc {
-                                name: "key".into(),
-                                number: 1,
-                                label: FieldLabel::Optional,
-                                type_: FieldType::String,
-                                type_name: None,
-                                oneof_index: None,
-                                proto3_optional: false,
-                                default_value: None,
-                                packed: None,
-                                string_layout: None,
-                                bytes_layout: None,
-                                features: FeatureSet::default(),
-                            },
-                            FieldDesc {
-                                name: "value".into(),
-                                number: 2,
-                                label: FieldLabel::Optional,
-                                type_: FieldType::Int32,
-                                type_name: None,
-                                oneof_index: None,
-                                proto3_optional: false,
-                                default_value: None,
-                                packed: None,
-                                string_layout: None,
-                                bytes_layout: None,
-                                features: FeatureSet::default(),
-                            },
-                        ],
-                        nested_messages: vec![],
-                        nested_enums: vec![],
-                        oneofs: vec![],
-                        map_entry: true,
-                    }],
-                    nested_enums: vec![],
-                    oneofs: vec![],
-                    map_entry: false,
+        let request = desc::request(vec![ProtoFile {
+            messages: vec![MessageDesc {
+                fields: vec![FieldDesc {
+                    label: FieldLabel::Repeated,
+                    type_name: Some(ProtoFqn::parse(".Holder.AttributesEntry")),
+                    ..desc::field("attributes", 1, FieldType::Message)
                 }],
-                enums: vec![],
+                nested_messages: vec![desc::map_entry(
+                    "AttributesEntry",
+                    desc::field("key", 1, FieldType::String),
+                    desc::field("value", 2, FieldType::Int32),
+                )],
+                ..desc::message("Holder")
             }],
-        };
+            ..desc::proto_file("t.proto", "")
+        }]);
         let response = emit(&request).unwrap();
         let content = &response.files[0].content;
         assert!(content.contains("MapField"));
@@ -1134,77 +712,22 @@ mod tests {
 
     #[test]
     fn emit_map_int32_bool_uses_entry_mut() {
-        let request = CodegenRequest {
-            meta: CodegenMeta {
-                file_to_generate: vec!["t.proto".into()],
-                parameter: None,
-            },
-            proto_files: vec![ProtoFile {
-                name: "t.proto".into(),
-                package: String::new(),
-                syntax: Syntax::Proto3,
-                features: FeatureSet::default(),
-                dependency: vec![],
-                messages: vec![MessageDesc {
-                    name: "Holder".into(),
-                    fields: vec![FieldDesc {
-                        name: "flags".into(),
-                        number: 1,
-                        label: FieldLabel::Repeated,
-                        type_: FieldType::Message,
-                        type_name: Some(ProtoFqn::parse(".Holder.FlagsEntry")),
-                        oneof_index: None,
-                        proto3_optional: false,
-                        default_value: None,
-                        packed: None,
-                        string_layout: None,
-                        bytes_layout: None,
-                        features: FeatureSet::default(),
-                    }],
-                    nested_messages: vec![MessageDesc {
-                        name: "FlagsEntry".into(),
-                        fields: vec![
-                            FieldDesc {
-                                name: "key".into(),
-                                number: 1,
-                                label: FieldLabel::Optional,
-                                type_: FieldType::Int32,
-                                type_name: None,
-                                oneof_index: None,
-                                proto3_optional: false,
-                                default_value: None,
-                                packed: None,
-                                string_layout: None,
-                                bytes_layout: None,
-                                features: FeatureSet::default(),
-                            },
-                            FieldDesc {
-                                name: "value".into(),
-                                number: 2,
-                                label: FieldLabel::Optional,
-                                type_: FieldType::Bool,
-                                type_name: None,
-                                oneof_index: None,
-                                proto3_optional: false,
-                                default_value: None,
-                                packed: None,
-                                string_layout: None,
-                                bytes_layout: None,
-                                features: FeatureSet::default(),
-                            },
-                        ],
-                        nested_messages: vec![],
-                        nested_enums: vec![],
-                        oneofs: vec![],
-                        map_entry: true,
-                    }],
-                    nested_enums: vec![],
-                    oneofs: vec![],
-                    map_entry: false,
+        let request = desc::request(vec![ProtoFile {
+            messages: vec![MessageDesc {
+                fields: vec![FieldDesc {
+                    label: FieldLabel::Repeated,
+                    type_name: Some(ProtoFqn::parse(".Holder.FlagsEntry")),
+                    ..desc::field("flags", 1, FieldType::Message)
                 }],
-                enums: vec![],
+                nested_messages: vec![desc::map_entry(
+                    "FlagsEntry",
+                    desc::field("key", 1, FieldType::Int32),
+                    desc::field("value", 2, FieldType::Bool),
+                )],
+                ..desc::message("Holder")
             }],
-        };
+            ..desc::proto_file("t.proto", "")
+        }]);
         let response = emit(&request).unwrap();
         let content = &response.files[0].content;
         assert!(content.contains("MapField"));
@@ -1222,44 +745,20 @@ mod tests {
         // Contract: IR records utf8_validation=NONE, but the emitter always uses
         // `ProtoString` (VERIFY semantics). Lock that until NONE is implemented
         // or explicitly rejected.
-        let request = CodegenRequest {
-            meta: CodegenMeta {
-                file_to_generate: vec!["t.proto".into()],
-                parameter: None,
-            },
-            proto_files: vec![ProtoFile {
-                name: "t.proto".into(),
-                package: String::new(),
-                syntax: Syntax::Editions(Edition::Edition2023),
-                features: FeatureSet::default(),
-                dependency: vec![],
-                messages: vec![MessageDesc {
-                    name: "M".into(),
-                    fields: vec![FieldDesc {
-                        name: "title".into(),
-                        number: 1,
-                        label: FieldLabel::Optional,
-                        type_: FieldType::String,
-                        type_name: None,
-                        oneof_index: None,
-                        proto3_optional: false,
-                        default_value: None,
-                        packed: None,
-                        string_layout: None,
-                        bytes_layout: None,
-                        features: FeatureSet {
-                            utf8_validation: Some(Utf8Validation::None),
-                            ..FeatureSet::default()
-                        },
-                    }],
-                    nested_messages: vec![],
-                    nested_enums: vec![],
-                    oneofs: vec![],
-                    map_entry: false,
+        let request = desc::request(vec![ProtoFile {
+            syntax: Syntax::Editions(Edition::Edition2023),
+            messages: vec![MessageDesc {
+                fields: vec![FieldDesc {
+                    features: FeatureSet {
+                        utf8_validation: Some(Utf8Validation::None),
+                        ..FeatureSet::default()
+                    },
+                    ..desc::field("title", 1, FieldType::String)
                 }],
-                enums: vec![],
+                ..desc::message("M")
             }],
-        };
+            ..desc::proto_file("t.proto", "")
+        }]);
         let response = emit(&request).unwrap();
         let content = &response.files[0].content;
         assert!(content.contains("ProtoString"));
@@ -1273,65 +772,24 @@ mod tests {
         request.proto_files[0].name = "defaults.proto".into();
         request.proto_files[0].syntax = Syntax::Proto2;
         request.proto_files[0].messages[0].name = "Holder".into();
-        request.proto_files[0].messages[0].oneofs = vec![OneofDesc {
-            name: "choice".into(),
-        }];
+        request.proto_files[0].messages[0].oneofs = vec![desc::oneof("choice")];
         request.proto_files[0].messages[0].fields = vec![
             FieldDesc {
-                name: "max_retries".into(),
-                number: 1,
-                label: FieldLabel::Optional,
-                type_: FieldType::Int32,
-                type_name: None,
-                oneof_index: None,
-                proto3_optional: false,
                 default_value: Some("3".into()),
-                packed: None,
-                string_layout: None,
-                bytes_layout: None,
-                features: FeatureSet::default(),
+                ..desc::field("max_retries", 1, FieldType::Int32)
             },
             FieldDesc {
-                name: "zero_int".into(),
-                number: 2,
-                label: FieldLabel::Optional,
-                type_: FieldType::Int32,
-                type_name: None,
-                oneof_index: None,
-                proto3_optional: false,
                 default_value: Some("0".into()),
-                packed: None,
-                string_layout: None,
-                bytes_layout: None,
-                features: FeatureSet::default(),
+                ..desc::field("zero_int", 2, FieldType::Int32)
             },
             FieldDesc {
-                name: "webhook_id".into(),
-                number: 3,
-                label: FieldLabel::Optional,
-                type_: FieldType::Int32,
-                type_name: None,
                 oneof_index: Some(0),
-                proto3_optional: false,
                 default_value: Some("-1".into()),
-                packed: None,
-                string_layout: None,
-                bytes_layout: None,
-                features: FeatureSet::default(),
+                ..desc::field("webhook_id", 3, FieldType::Int32)
             },
             FieldDesc {
-                name: "note".into(),
-                number: 4,
-                label: FieldLabel::Optional,
-                type_: FieldType::String,
-                type_name: None,
                 oneof_index: Some(0),
-                proto3_optional: false,
-                default_value: None,
-                packed: None,
-                string_layout: None,
-                bytes_layout: None,
-                features: FeatureSet::default(),
+                ..desc::field("note", 4, FieldType::String)
             },
         ];
         let response = emit(&request).unwrap();

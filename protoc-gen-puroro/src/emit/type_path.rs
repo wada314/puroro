@@ -164,7 +164,8 @@ fn split_fqn_file_level(fqn: &ProtoFqn) -> Result<(Vec<&str>, &str)> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::descriptor::{EnumDesc, EnumValueDesc, FeatureSet, MessageDesc, ProtoFile, Syntax};
+    use crate::descriptor::test_helpers as desc;
+    use crate::descriptor::{MessageDesc, ProtoFile};
     use crate::resolved::{Arena, FileSet, resolve};
     use ::quote::ToTokens;
 
@@ -213,20 +214,8 @@ mod tests {
     fn maps_file_level_message_in_package_module() {
         let arena = Arena::new();
         let files = [ProtoFile {
-            name: "t.proto".into(),
-            package: "demo".into(),
-            syntax: Syntax::Proto3,
-            features: FeatureSet::default(),
-            dependency: vec![],
-            messages: vec![MessageDesc {
-                name: "Address".into(),
-                fields: vec![],
-                nested_messages: vec![],
-                nested_enums: vec![],
-                oneofs: vec![],
-                map_entry: false,
-            }],
-            enums: vec![],
+            messages: vec![desc::message("Address")],
+            ..desc::proto_file("t.proto", "demo")
         }];
         let set = resolve(&arena, &files).unwrap();
         let msg = message(&set, "Address");
@@ -241,34 +230,15 @@ mod tests {
     fn maps_nested_message_and_nested_enum() {
         let arena = Arena::new();
         let files = [ProtoFile {
-            name: "t.proto".into(),
-            package: "demo".into(),
-            syntax: Syntax::Proto3,
-            features: FeatureSet::default(),
-            dependency: vec![],
             messages: vec![MessageDesc {
-                name: "Outer".into(),
-                fields: vec![],
-                nested_messages: vec![MessageDesc {
-                    name: "Inner".into(),
-                    fields: vec![],
-                    nested_messages: vec![],
-                    nested_enums: vec![],
-                    oneofs: vec![],
-                    map_entry: false,
-                }],
-                nested_enums: vec![EnumDesc {
-                    name: "Kind".into(),
-                    values: vec![EnumValueDesc {
-                        name: "KIND_UNSPECIFIED".into(),
-                        number: 0,
-                    }],
-                    features: FeatureSet::default(),
-                }],
-                oneofs: vec![],
-                map_entry: false,
+                nested_messages: vec![desc::message("Inner")],
+                nested_enums: vec![desc::enumeration(
+                    "Kind",
+                    vec![desc::enum_value("KIND_UNSPECIFIED", 0)],
+                )],
+                ..desc::message("Outer")
             }],
-            enums: vec![],
+            ..desc::proto_file("t.proto", "demo")
         }];
         let set = resolve(&arena, &files).unwrap();
         let inner = message(&set, "Inner");

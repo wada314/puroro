@@ -362,8 +362,9 @@ mod tests {
     use crate::descriptor::features::{
         EnumType, FeatureSet, RepeatedFieldEncoding, Utf8Validation,
     };
+    use crate::descriptor::test_helpers as desc;
     use crate::descriptor::{
-        BytesLayout, Edition, FieldDesc, FieldLabel, FieldType, MessageDesc, OneofDesc, ProtoFile,
+        BytesLayout, Edition, EnumDesc, FieldDesc, FieldLabel, FieldType, MessageDesc, ProtoFile,
         ProtoFqn, StringLayout, Syntax,
     };
     use crate::field_kind::{PlannedLayout, PlannedPresence, bit_array_byte_len};
@@ -384,52 +385,15 @@ mod tests {
 
     fn proto3_file(messages: Vec<MessageDesc>) -> ProtoFile {
         ProtoFile {
-            name: "t.proto".into(),
-            package: "example".into(),
-            syntax: Syntax::Proto3,
-            features: FeatureSet::default(),
-            dependency: vec![],
             messages,
-            enums: vec![],
-        }
-    }
-
-    fn field(
-        name: &str,
-        number: i32,
-        type_: FieldType,
-        label: FieldLabel,
-        proto3_optional: bool,
-        oneof_index: Option<i32>,
-        type_name: Option<ProtoFqn>,
-    ) -> FieldDesc {
-        FieldDesc {
-            name: name.into(),
-            number,
-            label,
-            type_,
-            type_name,
-            oneof_index,
-            proto3_optional,
-            default_value: None,
-            packed: None,
-            string_layout: None,
-            bytes_layout: None,
-            features: FeatureSet::default(),
+            ..desc::proto_file("t.proto", "example")
         }
     }
 
     #[test]
     fn empty_message_plan() {
         let arena = Arena::new();
-        let files = [proto3_file(vec![MessageDesc {
-            name: "Empty".into(),
-            fields: vec![],
-            nested_messages: vec![],
-            nested_enums: vec![],
-            oneofs: vec![],
-            map_entry: false,
-        }])];
+        let files = [proto3_file(vec![desc::message("Empty")])];
         let set = resolve(&arena, &files).unwrap();
         let msg = message(&set, "Empty");
         let plan = plan_fields(msg).unwrap();
@@ -443,49 +407,25 @@ mod tests {
         // Matches sample-generated Address bit / field consts.
         let arena = Arena::new();
         let files = [proto3_file(vec![MessageDesc {
-            name: "Address".into(),
             fields: vec![
-                field(
-                    "street",
-                    1,
-                    FieldType::String,
-                    FieldLabel::Optional,
-                    true,
-                    None,
-                    None,
-                ),
-                field(
-                    "city",
-                    2,
-                    FieldType::String,
-                    FieldLabel::Optional,
-                    true,
-                    None,
-                    None,
-                ),
-                field(
-                    "postal_code",
-                    3,
-                    FieldType::Fixed32,
-                    FieldLabel::Optional,
-                    true,
-                    None,
-                    None,
-                ),
-                field(
-                    "latitude",
-                    4,
-                    FieldType::Double,
-                    FieldLabel::Optional,
-                    true,
-                    None,
-                    None,
-                ),
+                FieldDesc {
+                    proto3_optional: true,
+                    ..desc::field("street", 1, FieldType::String)
+                },
+                FieldDesc {
+                    proto3_optional: true,
+                    ..desc::field("city", 2, FieldType::String)
+                },
+                FieldDesc {
+                    proto3_optional: true,
+                    ..desc::field("postal_code", 3, FieldType::Fixed32)
+                },
+                FieldDesc {
+                    proto3_optional: true,
+                    ..desc::field("latitude", 4, FieldType::Double)
+                },
             ],
-            nested_messages: vec![],
-            nested_enums: vec![],
-            oneofs: vec![],
-            map_entry: false,
+            ..desc::message("Address")
         }])];
         let set = resolve(&arena, &files).unwrap();
         let msg = message(&set, "Address");
@@ -537,23 +477,14 @@ mod tests {
     #[test]
     fn string_layout_unspecified_uses_sso_default() {
         let arena = Arena::new();
-        let mut body = field(
-            "body",
-            1,
-            FieldType::String,
-            FieldLabel::Optional,
-            true,
-            None,
-            None,
-        );
-        body.string_layout = Some(StringLayout::Unspecified);
+        let body = FieldDesc {
+            proto3_optional: true,
+            string_layout: Some(StringLayout::Unspecified),
+            ..desc::field("body", 1, FieldType::String)
+        };
         let files = [proto3_file(vec![MessageDesc {
-            name: "M".into(),
             fields: vec![body],
-            nested_messages: vec![],
-            nested_enums: vec![],
-            oneofs: vec![],
-            map_entry: false,
+            ..desc::message("M")
         }])];
         let set = resolve(&arena, &files).unwrap();
         let msg = message(&set, "M");
@@ -575,23 +506,14 @@ mod tests {
     #[test]
     fn string_layout_heap_uses_inline_heap_layout() {
         let arena = Arena::new();
-        let mut body = field(
-            "body",
-            1,
-            FieldType::String,
-            FieldLabel::Optional,
-            true,
-            None,
-            None,
-        );
-        body.string_layout = Some(StringLayout::Heap);
+        let body = FieldDesc {
+            proto3_optional: true,
+            string_layout: Some(StringLayout::Heap),
+            ..desc::field("body", 1, FieldType::String)
+        };
         let files = [proto3_file(vec![MessageDesc {
-            name: "M".into(),
             fields: vec![body],
-            nested_messages: vec![],
-            nested_enums: vec![],
-            oneofs: vec![],
-            map_entry: false,
+            ..desc::message("M")
         }])];
         let set = resolve(&arena, &files).unwrap();
         let msg = message(&set, "M");
@@ -613,23 +535,14 @@ mod tests {
     #[test]
     fn bytes_layout_unspecified_uses_sso_default() {
         let arena = Arena::new();
-        let mut body = field(
-            "body",
-            1,
-            FieldType::Bytes,
-            FieldLabel::Optional,
-            true,
-            None,
-            None,
-        );
-        body.bytes_layout = Some(BytesLayout::Unspecified);
+        let body = FieldDesc {
+            proto3_optional: true,
+            bytes_layout: Some(BytesLayout::Unspecified),
+            ..desc::field("body", 1, FieldType::Bytes)
+        };
         let files = [proto3_file(vec![MessageDesc {
-            name: "M".into(),
             fields: vec![body],
-            nested_messages: vec![],
-            nested_enums: vec![],
-            oneofs: vec![],
-            map_entry: false,
+            ..desc::message("M")
         }])];
         let set = resolve(&arena, &files).unwrap();
         let msg = message(&set, "M");
@@ -650,23 +563,14 @@ mod tests {
     #[test]
     fn bytes_layout_heap_uses_inline_heap_layout() {
         let arena = Arena::new();
-        let mut body = field(
-            "body",
-            1,
-            FieldType::Bytes,
-            FieldLabel::Optional,
-            true,
-            None,
-            None,
-        );
-        body.bytes_layout = Some(BytesLayout::Heap);
+        let body = FieldDesc {
+            proto3_optional: true,
+            bytes_layout: Some(BytesLayout::Heap),
+            ..desc::field("body", 1, FieldType::Bytes)
+        };
         let files = [proto3_file(vec![MessageDesc {
-            name: "M".into(),
             fields: vec![body],
-            nested_messages: vec![],
-            nested_enums: vec![],
-            oneofs: vec![],
-            map_entry: false,
+            ..desc::message("M")
         }])];
         let set = resolve(&arena, &files).unwrap();
         let msg = message(&set, "M");
@@ -690,60 +594,24 @@ mod tests {
         // plus a string oneof variant before done — checks bit order and oneof slot.
         let arena = Arena::new();
         let files = [proto3_file(vec![MessageDesc {
-            name: "Task".into(),
             fields: vec![
-                field(
-                    "score",
-                    2,
-                    FieldType::Int32,
-                    FieldLabel::Optional,
-                    false,
-                    None,
-                    None,
-                ),
-                field(
-                    "email_address",
-                    12,
-                    FieldType::String,
-                    FieldLabel::Optional,
-                    false,
-                    Some(0),
-                    None,
-                ),
-                field(
-                    "done",
-                    16,
-                    FieldType::Bool,
-                    FieldLabel::Optional,
-                    false,
-                    None,
-                    None,
-                ),
-                field(
-                    "flag",
-                    17,
-                    FieldType::Bool,
-                    FieldLabel::Optional,
-                    true,
-                    None,
-                    None,
-                ),
-                field(
-                    "urgent",
-                    18,
-                    FieldType::Bool,
-                    FieldLabel::Optional,
-                    false,
-                    Some(0),
-                    None,
-                ),
+                desc::field("score", 2, FieldType::Int32),
+                FieldDesc {
+                    oneof_index: Some(0),
+                    ..desc::field("email_address", 12, FieldType::String)
+                },
+                desc::field("done", 16, FieldType::Bool),
+                FieldDesc {
+                    proto3_optional: true,
+                    ..desc::field("flag", 17, FieldType::Bool)
+                },
+                FieldDesc {
+                    oneof_index: Some(0),
+                    ..desc::field("urgent", 18, FieldType::Bool)
+                },
             ],
-            nested_messages: vec![],
-            nested_enums: vec![],
-            oneofs: vec![OneofDesc {
-                name: "notification".into(),
-            }],
-            map_entry: false,
+            oneofs: vec![desc::oneof("notification")],
+            ..desc::message("Task")
         }])];
         let set = resolve(&arena, &files).unwrap();
         let msg = message(&set, "Task");
@@ -843,31 +711,17 @@ mod tests {
     fn repeated_packable_defaults_to_packed() {
         let arena = Arena::new();
         let files = [proto3_file(vec![MessageDesc {
-            name: "R".into(),
             fields: vec![
-                field(
-                    "tag_ids",
-                    1,
-                    FieldType::Int32,
-                    FieldLabel::Repeated,
-                    false,
-                    None,
-                    None,
-                ),
-                field(
-                    "labels",
-                    2,
-                    FieldType::String,
-                    FieldLabel::Repeated,
-                    false,
-                    None,
-                    None,
-                ),
+                FieldDesc {
+                    label: FieldLabel::Repeated,
+                    ..desc::field("tag_ids", 1, FieldType::Int32)
+                },
+                FieldDesc {
+                    label: FieldLabel::Repeated,
+                    ..desc::field("labels", 2, FieldType::String)
+                },
             ],
-            nested_messages: vec![],
-            nested_enums: vec![],
-            oneofs: vec![],
-            map_entry: false,
+            ..desc::message("R")
         }])];
         let set = resolve(&arena, &files).unwrap();
         let msg = message(&set, "R");
@@ -899,83 +753,44 @@ mod tests {
 
     #[test]
     fn editions_features_flow_into_plan() {
-        use crate::descriptor::{EnumDesc, EnumValueDesc};
-
         let arena = Arena::new();
         let file = ProtoFile {
-            name: "t.proto".into(),
-            package: "example".into(),
             syntax: Syntax::Editions(Edition::Edition2023),
-            features: FeatureSet::default(),
-            dependency: vec![],
             messages: vec![MessageDesc {
-                name: "T".into(),
                 fields: vec![
                     FieldDesc {
-                        name: "scores".into(),
-                        number: 1,
                         label: FieldLabel::Repeated,
-                        type_: FieldType::Int32,
-                        type_name: None,
-                        oneof_index: None,
-                        proto3_optional: false,
-                        default_value: None,
-                        packed: None,
-                        string_layout: None,
-                        bytes_layout: None,
                         features: FeatureSet {
                             repeated_field_encoding: Some(RepeatedFieldEncoding::Expanded),
                             ..FeatureSet::default()
                         },
+                        ..desc::field("scores", 1, FieldType::Int32)
                     },
                     FieldDesc {
-                        name: "title".into(),
-                        number: 2,
-                        label: FieldLabel::Optional,
-                        type_: FieldType::String,
-                        type_name: None,
-                        oneof_index: None,
-                        proto3_optional: false,
-                        default_value: None,
-                        packed: None,
-                        string_layout: None,
-                        bytes_layout: None,
                         features: FeatureSet {
                             utf8_validation: Some(Utf8Validation::None),
                             ..FeatureSet::default()
                         },
+                        ..desc::field("title", 2, FieldType::String)
                     },
                     FieldDesc {
-                        name: "priority".into(),
-                        number: 3,
-                        label: FieldLabel::Optional,
-                        type_: FieldType::Enum,
                         type_name: Some(ProtoFqn::parse(".example.Priority")),
-                        oneof_index: None,
-                        proto3_optional: false,
-                        default_value: None,
-                        packed: None,
-                        string_layout: None,
-                        bytes_layout: None,
-                        features: FeatureSet::default(),
+                        ..desc::field("priority", 3, FieldType::Enum)
                     },
                 ],
-                nested_messages: vec![],
-                nested_enums: vec![],
-                oneofs: vec![],
-                map_entry: false,
+                ..desc::message("T")
             }],
             enums: vec![EnumDesc {
-                name: "Priority".into(),
-                values: vec![EnumValueDesc {
-                    name: "PRIORITY_UNSPECIFIED".into(),
-                    number: 0,
-                }],
                 features: FeatureSet {
                     enum_type: Some(EnumType::Closed),
                     ..FeatureSet::default()
                 },
+                ..desc::enumeration(
+                    "Priority",
+                    vec![desc::enum_value("PRIORITY_UNSPECIFIED", 0)],
+                )
             }],
+            ..desc::proto_file("t.proto", "example")
         };
         let set = resolve(&arena, &[file]).unwrap();
         let msg = message(&set, "T");
@@ -1026,22 +841,13 @@ mod tests {
     fn proto3_optional_synthetic_oneof_is_not_a_group() {
         let arena = Arena::new();
         let files = [proto3_file(vec![MessageDesc {
-            name: "T".into(),
-            fields: vec![field(
-                "score",
-                1,
-                FieldType::Int32,
-                FieldLabel::Optional,
-                true,
-                Some(0),
-                None,
-            )],
-            nested_messages: vec![],
-            nested_enums: vec![],
-            oneofs: vec![OneofDesc {
-                name: "_score".into(),
+            fields: vec![FieldDesc {
+                proto3_optional: true,
+                oneof_index: Some(0),
+                ..desc::field("score", 1, FieldType::Int32)
             }],
-            map_entry: false,
+            oneofs: vec![desc::oneof("_score")],
+            ..desc::message("T")
         }])];
         let set = resolve(&arena, &files).unwrap();
         let msg = message(&set, "T");
@@ -1063,39 +869,20 @@ mod tests {
 
     #[test]
     fn enum_field_assumes_open() {
-        use crate::descriptor::{EnumDesc, EnumValueDesc};
-
         let arena = Arena::new();
         let files = [ProtoFile {
-            name: "t.proto".into(),
-            package: "example".into(),
-            syntax: Syntax::Proto3,
-            features: FeatureSet::default(),
-            dependency: vec![],
             messages: vec![MessageDesc {
-                name: "T".into(),
-                fields: vec![field(
-                    "status",
-                    1,
-                    FieldType::Enum,
-                    FieldLabel::Optional,
-                    false,
-                    None,
-                    Some(ProtoFqn::parse(".example.Status")),
-                )],
-                nested_messages: vec![],
-                nested_enums: vec![],
-                oneofs: vec![],
-                map_entry: false,
-            }],
-            enums: vec![EnumDesc {
-                name: "Status".into(),
-                values: vec![EnumValueDesc {
-                    name: "STATUS_UNSPECIFIED".into(),
-                    number: 0,
+                fields: vec![FieldDesc {
+                    type_name: Some(ProtoFqn::parse(".example.Status")),
+                    ..desc::field("status", 1, FieldType::Enum)
                 }],
-                features: FeatureSet::default(),
+                ..desc::message("T")
             }],
+            enums: vec![desc::enumeration(
+                "Status",
+                vec![desc::enum_value("STATUS_UNSPECIFIED", 0)],
+            )],
+            ..desc::proto_file("t.proto", "example")
         }];
         let set = resolve(&arena, &files).unwrap();
         let msg = message(&set, "T");
@@ -1118,46 +905,17 @@ mod tests {
     fn map_string_int32_plans_map_kind() {
         let arena = Arena::new();
         let files = [proto3_file(vec![MessageDesc {
-            name: "Holder".into(),
-            fields: vec![field(
-                "attributes",
-                1,
-                FieldType::Message,
-                FieldLabel::Repeated,
-                false,
-                None,
-                Some(ProtoFqn::parse(".example.Holder.AttributesEntry")),
-            )],
-            nested_messages: vec![MessageDesc {
-                name: "AttributesEntry".into(),
-                fields: vec![
-                    field(
-                        "key",
-                        1,
-                        FieldType::String,
-                        FieldLabel::Optional,
-                        false,
-                        None,
-                        None,
-                    ),
-                    field(
-                        "value",
-                        2,
-                        FieldType::Int32,
-                        FieldLabel::Optional,
-                        false,
-                        None,
-                        None,
-                    ),
-                ],
-                nested_messages: vec![],
-                nested_enums: vec![],
-                oneofs: vec![],
-                map_entry: true,
+            fields: vec![FieldDesc {
+                label: FieldLabel::Repeated,
+                type_name: Some(ProtoFqn::parse(".example.Holder.AttributesEntry")),
+                ..desc::field("attributes", 1, FieldType::Message)
             }],
-            nested_enums: vec![],
-            oneofs: vec![],
-            map_entry: false,
+            nested_messages: vec![desc::map_entry(
+                "AttributesEntry",
+                desc::field("key", 1, FieldType::String),
+                desc::field("value", 2, FieldType::Int32),
+            )],
+            ..desc::message("Holder")
         }])];
         let set = resolve(&arena, &files).unwrap();
         let msg = message(&set, "Holder");
@@ -1179,46 +937,17 @@ mod tests {
     fn map_string_string_plans_map_kind() {
         let arena = Arena::new();
         let files = [proto3_file(vec![MessageDesc {
-            name: "Holder".into(),
-            fields: vec![field(
-                "labels",
-                1,
-                FieldType::Message,
-                FieldLabel::Repeated,
-                false,
-                None,
-                Some(ProtoFqn::parse(".example.Holder.LabelsEntry")),
-            )],
-            nested_messages: vec![MessageDesc {
-                name: "LabelsEntry".into(),
-                fields: vec![
-                    field(
-                        "key",
-                        1,
-                        FieldType::String,
-                        FieldLabel::Optional,
-                        false,
-                        None,
-                        None,
-                    ),
-                    field(
-                        "value",
-                        2,
-                        FieldType::String,
-                        FieldLabel::Optional,
-                        false,
-                        None,
-                        None,
-                    ),
-                ],
-                nested_messages: vec![],
-                nested_enums: vec![],
-                oneofs: vec![],
-                map_entry: true,
+            fields: vec![FieldDesc {
+                label: FieldLabel::Repeated,
+                type_name: Some(ProtoFqn::parse(".example.Holder.LabelsEntry")),
+                ..desc::field("labels", 1, FieldType::Message)
             }],
-            nested_enums: vec![],
-            oneofs: vec![],
-            map_entry: false,
+            nested_messages: vec![desc::map_entry(
+                "LabelsEntry",
+                desc::field("key", 1, FieldType::String),
+                desc::field("value", 2, FieldType::String),
+            )],
+            ..desc::message("Holder")
         }])];
         let set = resolve(&arena, &files).unwrap();
         let msg = message(&set, "Holder");
@@ -1239,46 +968,17 @@ mod tests {
     fn map_int32_bool_plans_map_kind() {
         let arena = Arena::new();
         let files = [proto3_file(vec![MessageDesc {
-            name: "Holder".into(),
-            fields: vec![field(
-                "flags",
-                1,
-                FieldType::Message,
-                FieldLabel::Repeated,
-                false,
-                None,
-                Some(ProtoFqn::parse(".example.Holder.FlagsEntry")),
-            )],
-            nested_messages: vec![MessageDesc {
-                name: "FlagsEntry".into(),
-                fields: vec![
-                    field(
-                        "key",
-                        1,
-                        FieldType::Int32,
-                        FieldLabel::Optional,
-                        false,
-                        None,
-                        None,
-                    ),
-                    field(
-                        "value",
-                        2,
-                        FieldType::Bool,
-                        FieldLabel::Optional,
-                        false,
-                        None,
-                        None,
-                    ),
-                ],
-                nested_messages: vec![],
-                nested_enums: vec![],
-                oneofs: vec![],
-                map_entry: true,
+            fields: vec![FieldDesc {
+                label: FieldLabel::Repeated,
+                type_name: Some(ProtoFqn::parse(".example.Holder.FlagsEntry")),
+                ..desc::field("flags", 1, FieldType::Message)
             }],
-            nested_enums: vec![],
-            oneofs: vec![],
-            map_entry: false,
+            nested_messages: vec![desc::map_entry(
+                "FlagsEntry",
+                desc::field("key", 1, FieldType::Int32),
+                desc::field("value", 2, FieldType::Bool),
+            )],
+            ..desc::message("Holder")
         }])];
         let set = resolve(&arena, &files).unwrap();
         let msg = message(&set, "Holder");

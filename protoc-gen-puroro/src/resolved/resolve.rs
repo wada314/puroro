@@ -472,9 +472,10 @@ impl Utf8Validation {
 mod tests {
     use super::*;
     use crate::descriptor::features::{EnumType, FeatureSet, FieldPresence, RepeatedFieldEncoding};
+    use crate::descriptor::test_helpers as desc;
     use crate::descriptor::{
-        Edition, EnumDesc, EnumValueDesc, FieldDesc, FieldLabel, FieldType, MessageDesc, OneofDesc,
-        ProtoFile, ProtoFqn, Syntax,
+        Edition, EnumDesc, FieldDesc, FieldLabel, FieldType, MessageDesc, ProtoFile, ProtoFqn,
+        Syntax,
     };
     use ::std::ptr;
 
@@ -545,17 +546,6 @@ mod tests {
         }
     }
 
-    fn empty_msg(name: &str) -> MessageDesc {
-        MessageDesc {
-            name: name.into(),
-            fields: vec![],
-            nested_messages: vec![],
-            nested_enums: vec![],
-            oneofs: vec![],
-            map_entry: false,
-        }
-    }
-
     fn proto_file(
         package: &str,
         syntax: Syntax,
@@ -563,13 +553,10 @@ mod tests {
         enums: Vec<EnumDesc>,
     ) -> ProtoFile {
         ProtoFile {
-            name: "a.proto".into(),
-            package: package.into(),
             syntax,
-            features: FeatureSet::default(),
-            dependency: vec![],
             messages,
             enums,
+            ..desc::proto_file("a.proto", package)
         }
     }
 
@@ -580,18 +567,10 @@ mod tests {
         proto3_optional: bool,
     ) -> FieldDesc {
         FieldDesc {
-            name: name.into(),
-            number: 1,
             label,
-            type_: FieldType::Int32,
-            type_name: None,
             oneof_index,
             proto3_optional,
-            default_value: None,
-            packed: None,
-            string_layout: None,
-            bytes_layout: None,
-            features: FeatureSet::default(),
+            ..desc::field(name, 1, FieldType::Int32)
         }
     }
 
@@ -601,7 +580,7 @@ mod tests {
         let files = [proto_file(
             "example.v1",
             Syntax::Proto3,
-            vec![empty_msg("Empty")],
+            vec![desc::message("Empty")],
             vec![],
         )];
         let file_set = resolve(&arena, &files).unwrap();
@@ -619,27 +598,14 @@ mod tests {
             "example",
             Syntax::Proto3,
             vec![
-                empty_msg("Address"),
+                desc::message("Address"),
                 MessageDesc {
-                    name: "Task".into(),
                     fields: vec![FieldDesc {
-                        name: "assignee".into(),
-                        number: 1,
-                        label: FieldLabel::Optional,
-                        type_: FieldType::Message,
-                        type_name: Some(ProtoFqn::parse(".example.Address")),
-                        oneof_index: None,
                         proto3_optional: true,
-                        default_value: None,
-                        packed: None,
-                        string_layout: None,
-                        bytes_layout: None,
-                        features: FeatureSet::default(),
+                        type_name: Some(ProtoFqn::parse(".example.Address")),
+                        ..desc::field("assignee", 1, FieldType::Message)
                     }],
-                    nested_messages: vec![],
-                    nested_enums: vec![],
-                    oneofs: vec![],
-                    map_entry: false,
+                    ..desc::message("Task")
                 },
             ],
             vec![],
@@ -663,12 +629,8 @@ mod tests {
             "",
             Syntax::Proto3,
             vec![MessageDesc {
-                name: "Outer".into(),
-                fields: vec![],
-                nested_messages: vec![empty_msg("Inner")],
-                nested_enums: vec![],
-                oneofs: vec![],
-                map_entry: false,
+                nested_messages: vec![desc::message("Inner")],
+                ..desc::message("Outer")
             }],
             vec![],
         )];
@@ -686,34 +648,16 @@ mod tests {
             "example",
             Syntax::Proto3,
             vec![MessageDesc {
-                name: "Task".into(),
                 fields: vec![FieldDesc {
-                    name: "status".into(),
-                    number: 1,
-                    label: FieldLabel::Optional,
-                    type_: FieldType::Enum,
                     type_name: Some(ProtoFqn::parse(".example.Status")),
-                    oneof_index: None,
-                    proto3_optional: false,
-                    default_value: None,
-                    packed: None,
-                    string_layout: None,
-                    bytes_layout: None,
-                    features: FeatureSet::default(),
+                    ..desc::field("status", 1, FieldType::Enum)
                 }],
-                nested_messages: vec![],
-                nested_enums: vec![],
-                oneofs: vec![],
-                map_entry: false,
+                ..desc::message("Task")
             }],
-            vec![EnumDesc {
-                name: "Status".into(),
-                values: vec![EnumValueDesc {
-                    name: "STATUS_UNSPECIFIED".into(),
-                    number: 0,
-                }],
-                features: FeatureSet::default(),
-            }],
+            vec![desc::enumeration(
+                "Status",
+                vec![desc::enum_value("STATUS_UNSPECIFIED", 0)],
+            )],
         )];
         let file_set = resolve(&arena, &files).unwrap();
         let task = lookup_message(&file_set, ".example.Task").unwrap();
@@ -734,25 +678,11 @@ mod tests {
             "",
             Syntax::Proto3,
             vec![MessageDesc {
-                name: "Task".into(),
                 fields: vec![FieldDesc {
-                    name: "assignee".into(),
-                    number: 1,
-                    label: FieldLabel::Optional,
-                    type_: FieldType::Message,
                     type_name: Some(ProtoFqn::parse(".Missing")),
-                    oneof_index: None,
-                    proto3_optional: false,
-                    default_value: None,
-                    packed: None,
-                    string_layout: None,
-                    bytes_layout: None,
-                    features: FeatureSet::default(),
+                    ..desc::field("assignee", 1, FieldType::Message)
                 }],
-                nested_messages: vec![],
-                nested_enums: vec![],
-                oneofs: vec![],
-                map_entry: false,
+                ..desc::message("Task")
             }],
             vec![],
         )];
@@ -768,46 +698,18 @@ mod tests {
             Syntax::Proto3,
             vec![
                 MessageDesc {
-                    name: "A".into(),
                     fields: vec![FieldDesc {
-                        name: "b".into(),
-                        number: 1,
-                        label: FieldLabel::Optional,
-                        type_: FieldType::Message,
                         type_name: Some(ProtoFqn::parse(".B")),
-                        oneof_index: None,
-                        proto3_optional: false,
-                        default_value: None,
-                        packed: None,
-                        string_layout: None,
-                        bytes_layout: None,
-                        features: FeatureSet::default(),
+                        ..desc::field("b", 1, FieldType::Message)
                     }],
-                    nested_messages: vec![],
-                    nested_enums: vec![],
-                    oneofs: vec![],
-                    map_entry: false,
+                    ..desc::message("A")
                 },
                 MessageDesc {
-                    name: "B".into(),
                     fields: vec![FieldDesc {
-                        name: "a".into(),
-                        number: 1,
-                        label: FieldLabel::Optional,
-                        type_: FieldType::Message,
                         type_name: Some(ProtoFqn::parse(".A")),
-                        oneof_index: None,
-                        proto3_optional: false,
-                        default_value: None,
-                        packed: None,
-                        string_layout: None,
-                        bytes_layout: None,
-                        features: FeatureSet::default(),
+                        ..desc::field("a", 1, FieldType::Message)
                     }],
-                    nested_messages: vec![],
-                    nested_enums: vec![],
-                    oneofs: vec![],
-                    map_entry: false,
+                    ..desc::message("B")
                 },
             ],
             vec![],
@@ -833,80 +735,31 @@ mod tests {
                 "p3",
                 Syntax::Proto3,
                 vec![
-                    empty_msg("Addr"),
+                    desc::message("Addr"),
                     MessageDesc {
-                        name: "M".into(),
                         fields: vec![
                             scalar_field("implicit", FieldLabel::Optional, None, false),
                             FieldDesc {
-                                name: "explicit".into(),
-                                number: 2,
-                                label: FieldLabel::Optional,
-                                type_: FieldType::Int32,
-                                type_name: None,
                                 // Synthetic oneof for proto3 optional.
                                 oneof_index: Some(0),
                                 proto3_optional: true,
-                                default_value: None,
-                                packed: None,
-                                string_layout: None,
-                                bytes_layout: None,
-                                features: FeatureSet::default(),
+                                ..desc::field("explicit", 2, FieldType::Int32)
                             },
                             FieldDesc {
-                                name: "addr".into(),
-                                number: 3,
-                                label: FieldLabel::Optional,
-                                type_: FieldType::Message,
                                 type_name: Some(ProtoFqn::parse(".p3.Addr")),
-                                oneof_index: None,
-                                proto3_optional: false,
-                                default_value: None,
-                                packed: None,
-                                string_layout: None,
-                                bytes_layout: None,
-                                features: FeatureSet::default(),
+                                ..desc::field("addr", 3, FieldType::Message)
                             },
                             FieldDesc {
-                                name: "choice".into(),
-                                number: 4,
-                                label: FieldLabel::Optional,
-                                type_: FieldType::Int32,
-                                type_name: None,
                                 oneof_index: Some(1),
-                                proto3_optional: false,
-                                default_value: None,
-                                packed: None,
-                                string_layout: None,
-                                bytes_layout: None,
-                                features: FeatureSet::default(),
+                                ..desc::field("choice", 4, FieldType::Int32)
                             },
                             FieldDesc {
-                                name: "tags".into(),
-                                number: 5,
                                 label: FieldLabel::Repeated,
-                                type_: FieldType::Int32,
-                                type_name: None,
-                                oneof_index: None,
-                                proto3_optional: false,
-                                default_value: None,
-                                packed: None,
-                                string_layout: None,
-                                bytes_layout: None,
-                                features: FeatureSet::default(),
+                                ..desc::field("tags", 5, FieldType::Int32)
                             },
                         ],
-                        nested_messages: vec![],
-                        nested_enums: vec![],
-                        oneofs: vec![
-                            OneofDesc {
-                                name: "_explicit".into(),
-                            },
-                            OneofDesc {
-                                name: "which".into(),
-                            },
-                        ],
-                        map_entry: false,
+                        oneofs: vec![desc::oneof("_explicit"), desc::oneof("which")],
+                        ..desc::message("M")
                     },
                 ],
                 vec![],
@@ -915,15 +768,11 @@ mod tests {
                 "p2",
                 Syntax::Proto2,
                 vec![MessageDesc {
-                    name: "M".into(),
                     fields: vec![
                         scalar_field("optional", FieldLabel::Optional, None, false),
                         scalar_field("required", FieldLabel::Required, None, false),
                     ],
-                    nested_messages: vec![],
-                    nested_enums: vec![],
-                    oneofs: vec![],
-                    map_entry: false,
+                    ..desc::message("M")
                 }],
                 vec![],
             ),
@@ -983,12 +832,8 @@ mod tests {
             "ed",
             Syntax::Editions(Edition::Edition2023),
             vec![MessageDesc {
-                name: "M".into(),
                 fields: vec![scalar_field("n", FieldLabel::Optional, None, false)],
-                nested_messages: vec![],
-                nested_enums: vec![],
-                oneofs: vec![],
-                map_entry: false,
+                ..desc::message("M")
             }],
             vec![],
         )];
@@ -1007,31 +852,17 @@ mod tests {
             "ed",
             Syntax::Editions(Edition::Edition2024),
             vec![MessageDesc {
-                name: "M".into(),
                 fields: vec![
                     scalar_field("n", FieldLabel::Optional, None, false),
                     FieldDesc {
-                        name: "override_explicit".into(),
-                        number: 2,
-                        label: FieldLabel::Optional,
-                        type_: FieldType::Int32,
-                        type_name: None,
-                        oneof_index: None,
-                        proto3_optional: false,
-                        default_value: None,
-                        packed: None,
-                        string_layout: None,
-                        bytes_layout: None,
                         features: FeatureSet {
                             field_presence: Some(FieldPresence::Explicit),
                             ..FeatureSet::default()
                         },
+                        ..desc::field("override_explicit", 2, FieldType::Int32)
                     },
                 ],
-                nested_messages: vec![],
-                nested_enums: vec![],
-                oneofs: vec![],
-                map_entry: false,
+                ..desc::message("M")
             }],
             vec![],
         );
@@ -1058,55 +889,28 @@ mod tests {
 
         let arena = Arena::new();
         let file = ProtoFile {
-            name: "a.proto".into(),
-            package: "ed".into(),
             syntax: Syntax::Editions(Edition::Edition2023),
-            features: FeatureSet::default(),
-            dependency: vec![],
             messages: vec![MessageDesc {
-                name: "M".into(),
                 fields: vec![
                     FieldDesc {
-                        name: "scores".into(),
-                        number: 1,
                         label: FieldLabel::Repeated,
-                        type_: FieldType::Int32,
-                        type_name: None,
-                        oneof_index: None,
-                        proto3_optional: false,
-                        default_value: None,
-                        packed: None,
-                        string_layout: None,
-                        bytes_layout: None,
                         features: FeatureSet {
                             repeated_field_encoding: Some(RepeatedFieldEncoding::Expanded),
                             ..FeatureSet::default()
                         },
+                        ..desc::field("scores", 1, FieldType::Int32)
                     },
                     FieldDesc {
-                        name: "title".into(),
-                        number: 2,
-                        label: FieldLabel::Optional,
-                        type_: FieldType::String,
-                        type_name: None,
-                        oneof_index: None,
-                        proto3_optional: false,
-                        default_value: None,
-                        packed: None,
-                        string_layout: None,
-                        bytes_layout: None,
                         features: FeatureSet {
                             utf8_validation: Some(Utf8Validation::None),
                             ..FeatureSet::default()
                         },
+                        ..desc::field("title", 2, FieldType::String)
                     },
                 ],
-                nested_messages: vec![],
-                nested_enums: vec![],
-                oneofs: vec![],
-                map_entry: false,
+                ..desc::message("M")
             }],
-            enums: vec![],
+            ..desc::proto_file("a.proto", "ed")
         };
         let file_set = resolve(&arena, &[file]).unwrap();
         let m = lookup_message(&file_set, ".ed.M").unwrap();
@@ -1124,36 +928,22 @@ mod tests {
     fn editions_enum_type_on_enum_and_file() {
         let arena = Arena::new();
         let file = ProtoFile {
-            name: "a.proto".into(),
-            package: "ed".into(),
             syntax: Syntax::Editions(Edition::Edition2023),
             features: FeatureSet {
                 enum_type: Some(EnumType::Closed),
                 ..FeatureSet::default()
             },
-            dependency: vec![],
-            messages: vec![],
             enums: vec![
+                desc::enumeration("ClosedByFile", vec![desc::enum_value("A", 0)]),
                 EnumDesc {
-                    name: "ClosedByFile".into(),
-                    values: vec![EnumValueDesc {
-                        name: "A".into(),
-                        number: 0,
-                    }],
-                    features: FeatureSet::default(),
-                },
-                EnumDesc {
-                    name: "OpenOverride".into(),
-                    values: vec![EnumValueDesc {
-                        name: "B".into(),
-                        number: 0,
-                    }],
                     features: FeatureSet {
                         enum_type: Some(EnumType::Open),
                         ..FeatureSet::default()
                     },
+                    ..desc::enumeration("OpenOverride", vec![desc::enum_value("B", 0)])
                 },
             ],
+            ..desc::proto_file("a.proto", "ed")
         };
         let file_set = resolve(&arena, &[file]).unwrap();
         assert_eq!(
@@ -1179,30 +969,17 @@ mod tests {
             "ed",
             Syntax::Editions(Edition::Edition2023),
             vec![
-                empty_msg("Inner"),
+                desc::message("Inner"),
                 MessageDesc {
-                    name: "Outer".into(),
                     fields: vec![FieldDesc {
-                        name: "inner".into(),
-                        number: 1,
-                        label: FieldLabel::Optional,
-                        type_: FieldType::Message,
                         type_name: Some(ProtoFqn::parse(".ed.Inner")),
-                        oneof_index: None,
-                        proto3_optional: false,
-                        default_value: None,
-                        packed: None,
-                        string_layout: None,
-                        bytes_layout: None,
                         features: FeatureSet {
                             message_encoding: Some(MessageEncoding::Delimited),
                             ..FeatureSet::default()
                         },
+                        ..desc::field("inner", 1, FieldType::Message)
                     }],
-                    nested_messages: vec![],
-                    nested_enums: vec![],
-                    oneofs: vec![],
-                    map_entry: false,
+                    ..desc::message("Outer")
                 },
             ],
             vec![],
@@ -1218,25 +995,12 @@ mod tests {
             "p2",
             Syntax::Proto2,
             vec![MessageDesc {
-                name: "M".into(),
                 fields: vec![FieldDesc {
-                    name: "g".into(),
-                    number: 1,
-                    label: FieldLabel::Optional,
-                    type_: FieldType::Group,
                     type_name: Some(ProtoFqn::parse(".p2.G")),
-                    oneof_index: None,
-                    proto3_optional: false,
-                    default_value: None,
-                    packed: None,
-                    string_layout: None,
-                    bytes_layout: None,
-                    features: FeatureSet::default(),
+                    ..desc::field("g", 1, FieldType::Group)
                 }],
-                nested_messages: vec![empty_msg("G")],
-                nested_enums: vec![],
-                oneofs: vec![],
-                map_entry: false,
+                nested_messages: vec![desc::message("G")],
+                ..desc::message("M")
             }],
             vec![],
         )];
@@ -1251,41 +1015,18 @@ mod tests {
             "p2",
             Syntax::Proto2,
             vec![MessageDesc {
-                name: "M".into(),
                 fields: vec![
                     FieldDesc {
-                        name: "packed_nums".into(),
-                        number: 1,
                         label: FieldLabel::Repeated,
-                        type_: FieldType::Int32,
-                        type_name: None,
-                        oneof_index: None,
-                        proto3_optional: false,
-                        default_value: None,
                         packed: Some(true),
-                        string_layout: None,
-                        bytes_layout: None,
-                        features: FeatureSet::default(),
+                        ..desc::field("packed_nums", 1, FieldType::Int32)
                     },
                     FieldDesc {
-                        name: "expanded_nums".into(),
-                        number: 2,
                         label: FieldLabel::Repeated,
-                        type_: FieldType::Int32,
-                        type_name: None,
-                        oneof_index: None,
-                        proto3_optional: false,
-                        default_value: None,
-                        packed: None,
-                        string_layout: None,
-                        bytes_layout: None,
-                        features: FeatureSet::default(),
+                        ..desc::field("expanded_nums", 2, FieldType::Int32)
                     },
                 ],
-                nested_messages: vec![],
-                nested_enums: vec![],
-                oneofs: vec![],
-                map_entry: false,
+                ..desc::message("M")
             }],
             vec![],
         )];
@@ -1309,61 +1050,17 @@ mod tests {
             "example",
             Syntax::Proto3,
             vec![MessageDesc {
-                name: "Holder".into(),
                 fields: vec![FieldDesc {
-                    name: "attributes".into(),
-                    number: 1,
                     label: FieldLabel::Repeated,
-                    type_: FieldType::Message,
                     type_name: Some(ProtoFqn::parse(".example.Holder.AttributesEntry")),
-                    oneof_index: None,
-                    proto3_optional: false,
-                    default_value: None,
-                    packed: None,
-                    string_layout: None,
-                    bytes_layout: None,
-                    features: FeatureSet::default(),
+                    ..desc::field("attributes", 1, FieldType::Message)
                 }],
-                nested_messages: vec![MessageDesc {
-                    name: "AttributesEntry".into(),
-                    fields: vec![
-                        FieldDesc {
-                            name: "key".into(),
-                            number: 1,
-                            label: FieldLabel::Optional,
-                            type_: FieldType::String,
-                            type_name: None,
-                            oneof_index: None,
-                            proto3_optional: false,
-                            default_value: None,
-                            packed: None,
-                            string_layout: None,
-                            bytes_layout: None,
-                            features: FeatureSet::default(),
-                        },
-                        FieldDesc {
-                            name: "value".into(),
-                            number: 2,
-                            label: FieldLabel::Optional,
-                            type_: FieldType::Int32,
-                            type_name: None,
-                            oneof_index: None,
-                            proto3_optional: false,
-                            default_value: None,
-                            packed: None,
-                            string_layout: None,
-                            bytes_layout: None,
-                            features: FeatureSet::default(),
-                        },
-                    ],
-                    nested_messages: vec![],
-                    nested_enums: vec![],
-                    oneofs: vec![],
-                    map_entry: true,
-                }],
-                nested_enums: vec![],
-                oneofs: vec![],
-                map_entry: false,
+                nested_messages: vec![desc::map_entry(
+                    "AttributesEntry",
+                    desc::field("key", 1, FieldType::String),
+                    desc::field("value", 2, FieldType::Int32),
+                )],
+                ..desc::message("Holder")
             }],
             vec![],
         )];

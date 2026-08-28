@@ -8,6 +8,9 @@
 pub mod features;
 mod proto_fqn;
 
+#[cfg(test)]
+pub(crate) mod test_helpers;
+
 pub use features::FeatureSet;
 pub use proto_fqn::ProtoFqn;
 
