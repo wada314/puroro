@@ -21,7 +21,7 @@ pub(crate) mod sso_bytes;
 pub(crate) mod sso_string;
 pub(crate) mod wire_payload;
 
-pub use len::{ProtoBytes, ProtoString};
+pub use len::{ProtoBytes, ProtoString, ProtoStringUnchecked};
 pub use numerical::{
     Closed, ClosedEnum, Open, OpenEnum, ProtoBool, ProtoDouble, ProtoEnum, ProtoEnumStorage,
     ProtoFixed32, ProtoFixed64, ProtoFloat, ProtoInt32, ProtoInt64, ProtoSFixed32, ProtoSFixed64,

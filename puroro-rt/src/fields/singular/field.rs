@@ -739,12 +739,12 @@ mod tests {
     use crate::fields::shared::MessageCommon;
     use crate::fields::shared::field_presence::{Explicit, Implicit};
     use crate::fields::shared::value_layout::{BitPacked, Inline, InlineOrHeap};
-    use crate::fields::wire::len::ProtoBytes;
+    use crate::fields::wire::len::{ProtoBytes, ProtoString, ProtoStringUnchecked};
     use crate::fields::wire::numerical::ProtoBool;
     use ::allocator_api2::alloc::Global;
     use ::bitvec::array::BitArray;
     use ::bitvec::order::Lsb0;
-    use ::puroro::{ScopedBuf, WireType};
+    use ::puroro::{DecodeError, ScopedBuf, WireType};
 
     type Bits1 = BitArray<[u8; 1], Lsb0>;
 
@@ -817,6 +817,82 @@ mod tests {
 
         field.bind_mut(&mut common).clear();
         assert_eq!(field.bind(&common).get(), None);
+        field.deallocate(&common);
+        common.deallocate();
+    }
+
+    #[test]
+    fn proto_string_sso_rejects_invalid_utf8() {
+        let mut common = MessageCommon::new_in(Bits1::ZERO, Global);
+        let mut field =
+            SingularField::<ProtoString, Explicit<0>, 1, Global, InlineOrHeap<1>>::new_in(Global);
+        let mut data: &[u8] = &[1, 0xff];
+        let mut buf = ScopedBuf::new(&mut data);
+        let err = field
+            .bind_mut(&mut common)
+            .merge(WireType::Len, &mut buf, 0)
+            .unwrap_err();
+        assert_eq!(err, DecodeError::InvalidUtf8);
+        field.deallocate(&common);
+        common.deallocate();
+    }
+
+    #[test]
+    fn proto_string_unchecked_sso_accepts_invalid_utf8() {
+        let mut common = MessageCommon::new_in(Bits1::ZERO, Global);
+        let mut field =
+            SingularField::<ProtoStringUnchecked, Explicit<0>, 1, Global, InlineOrHeap<1>>::new_in(
+                Global,
+            );
+        let mut data: &[u8] = &[1, 0xff];
+        let mut buf = ScopedBuf::new(&mut data);
+        field
+            .bind_mut(&mut common)
+            .merge(WireType::Len, &mut buf, 0)
+            .expect("NONE accepts invalid UTF-8");
+        let got = field.bind(&common).get().expect("set");
+        assert_eq!(got, &[0xff]);
+        field.deallocate(&common);
+        common.deallocate();
+    }
+
+    #[test]
+    fn proto_string_unchecked_inline_accepts_invalid_utf8() {
+        let mut common = MessageCommon::new_in(Bits1::ZERO, Global);
+        let mut field =
+            SingularField::<ProtoStringUnchecked, Explicit<0>, 1, Global, Inline>::new_in(Global);
+        let mut data: &[u8] = &[1, 0xff];
+        let mut buf = ScopedBuf::new(&mut data);
+        field
+            .bind_mut(&mut common)
+            .merge(WireType::Len, &mut buf, 0)
+            .expect("NONE heap layout");
+        let got = field.bind(&common).get().expect("set");
+        assert_eq!(got, &[0xff]);
+        field.deallocate(&common);
+        common.deallocate();
+    }
+
+    #[test]
+    fn proto_string_unchecked_sso_heap_arm_accepts_invalid_utf8() {
+        let mut common = MessageCommon::new_in(Bits1::ZERO, Global);
+        let mut field =
+            SingularField::<ProtoStringUnchecked, Explicit<0>, 1, Global, InlineOrHeap<1>>::new_in(
+                Global,
+            );
+        let n = crate::INLINE_CAP + 1;
+        let mut payload = vec![n as u8];
+        payload.extend(vec![0xff; n]);
+        let mut data: &[u8] = payload.as_slice();
+        let mut buf = ScopedBuf::new(&mut data);
+        field
+            .bind_mut(&mut common)
+            .merge(WireType::Len, &mut buf, 0)
+            .expect("NONE heap-arm SSO");
+        let got = field.bind(&common).get().expect("set");
+        assert_eq!(got.len(), n);
+        assert!(got.iter().all(|&b| b == 0xff));
+        assert!(common.is_bit_set(1));
         field.deallocate(&common);
         common.deallocate();
     }

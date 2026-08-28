@@ -131,7 +131,12 @@ pub(super) enum SingularMutStyle {
 impl SingularMutStyle {
     pub(super) fn from_layout(wire: &WireTypeKind<'_>, layout: &PlannedLayout) -> Self {
         match (wire, layout) {
-            (WireTypeKind::String { .. }, PlannedLayout::InlineOrHeap { .. }) => Self::SsoString,
+            (WireTypeKind::String { utf8 }, PlannedLayout::InlineOrHeap { .. }) => {
+                match StringCatalogMarker::from_utf8(*utf8) {
+                    StringCatalogMarker::ProtoString => Self::SsoString,
+                    StringCatalogMarker::ProtoStringUnchecked => Self::SsoBytes,
+                }
+            }
             (WireTypeKind::Bytes { .. }, PlannedLayout::InlineOrHeap { .. }) => Self::SsoBytes,
             _ => Self::DerefMut,
         }
@@ -657,7 +662,10 @@ fn emit_repeated(
     };
     let views = wire_views(wire)?;
     let style = match wire {
-        WireTypeKind::String { .. } => RepeatedAccessorStyle::String,
+        WireTypeKind::String { utf8 } => match StringCatalogMarker::from_utf8(*utf8) {
+            StringCatalogMarker::ProtoString => RepeatedAccessorStyle::String,
+            StringCatalogMarker::ProtoStringUnchecked => RepeatedAccessorStyle::Bytes,
+        },
         WireTypeKind::Bytes { .. } => RepeatedAccessorStyle::Bytes,
         _ => RepeatedAccessorStyle::Slice,
     };
@@ -988,6 +996,9 @@ fn wire_marker_path(wire: &WireTypeKind<'_>) -> Result<Type> {
         WireTypeKind::Bool => parse_quote! { ::puroro_rt::ProtoBool },
         WireTypeKind::String { utf8 } => match StringCatalogMarker::from_utf8(*utf8) {
             StringCatalogMarker::ProtoString => parse_quote! { ::puroro_rt::ProtoString },
+            StringCatalogMarker::ProtoStringUnchecked => {
+                parse_quote! { ::puroro_rt::ProtoStringUnchecked }
+            }
         },
         WireTypeKind::Bytes { .. } => parse_quote! { ::puroro_rt::ProtoBytes },
         WireTypeKind::UInt32 => parse_quote! { ::puroro_rt::ProtoUInt32 },
@@ -1209,6 +1220,18 @@ fn copy_views(ty: Type) -> WireViews {
     }
 }
 
+fn len_bytes_views() -> WireViews {
+    let owned: Type = parse_quote! { ::allocator_api2::vec::Vec<u8, A> };
+    WireViews {
+        implicit: parse_quote! { &[u8] },
+        optional: parse_quote! { &'a [u8] },
+        mut_target: owned.clone(),
+        slice_elem: parse_quote! { impl ::core::ops::Deref<Target = [u8]> },
+        map_value: parse_quote! { [u8] },
+        map_value_mut: Some(owned),
+    }
+}
+
 fn wire_views(wire: &WireTypeKind<'_>) -> Result<WireViews> {
     Ok(match wire {
         WireTypeKind::Double => copy_views(parse_quote! { f64 }),
@@ -1222,28 +1245,21 @@ fn wire_views(wire: &WireTypeKind<'_>) -> Result<WireViews> {
         }
         WireTypeKind::UInt32 | WireTypeKind::Fixed32 => copy_views(parse_quote! { u32 }),
         WireTypeKind::Bool => copy_views(parse_quote! { bool }),
-        WireTypeKind::String { .. } => {
-            let owned: Type = parse_quote! { ::puroro::String<A> };
-            WireViews {
-                implicit: parse_quote! { &str },
-                optional: parse_quote! { &'a str },
-                mut_target: owned.clone(),
-                slice_elem: parse_quote! { impl ::core::ops::Deref<Target = str> },
-                map_value: parse_quote! { str },
-                map_value_mut: Some(owned),
+        WireTypeKind::String { utf8 } => match StringCatalogMarker::from_utf8(*utf8) {
+            StringCatalogMarker::ProtoString => {
+                let owned: Type = parse_quote! { ::puroro::String<A> };
+                WireViews {
+                    implicit: parse_quote! { &str },
+                    optional: parse_quote! { &'a str },
+                    mut_target: owned.clone(),
+                    slice_elem: parse_quote! { impl ::core::ops::Deref<Target = str> },
+                    map_value: parse_quote! { str },
+                    map_value_mut: Some(owned),
+                }
             }
-        }
-        WireTypeKind::Bytes { .. } => {
-            let owned: Type = parse_quote! { ::allocator_api2::vec::Vec<u8, A> };
-            WireViews {
-                implicit: parse_quote! { &[u8] },
-                optional: parse_quote! { &'a [u8] },
-                mut_target: owned.clone(),
-                slice_elem: parse_quote! { impl ::core::ops::Deref<Target = [u8]> },
-                map_value: parse_quote! { [u8] },
-                map_value_mut: Some(owned),
-            }
-        }
+            StringCatalogMarker::ProtoStringUnchecked => len_bytes_views(),
+        },
+        WireTypeKind::Bytes { .. } => len_bytes_views(),
         WireTypeKind::Enum { ty, .. } => {
             let path = fqn_to_enum_root_path(ty)?;
             copy_views(parse_quote! { #path })

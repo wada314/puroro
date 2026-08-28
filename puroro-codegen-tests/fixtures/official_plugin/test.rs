@@ -13,7 +13,7 @@ use crate::official_plugin::google::protobuf::field_descriptor_proto::{Label, Ty
 use crate::official_plugin::google::protobuf::{
     DescriptorProto, FieldDescriptorProto, FileDescriptorProto,
 };
-use ::puroro::{Message, StringMut};
+use ::puroro::{BytesMut, Message};
 
 #[test]
 fn constructs_core_types() {
@@ -33,35 +33,35 @@ fn constructs_core_types() {
 #[test]
 fn code_generator_response_round_trip() {
     let mut resp = CodeGeneratorResponse::new();
-    resp.error_mut().push_str("boom");
+    resp.error_mut().set(b"boom");
     *resp.supported_features_mut() = 3;
     let mut file = ResponseFile::new();
-    file.name_mut().push_str("out.rs");
-    file.content_mut().push_str("fn main() {}");
+    file.name_mut().set(b"out.rs");
+    file.content_mut().set(b"fn main() {}");
     resp.file_mut().push(file);
 
     let decoded: CodeGeneratorResponse =
         CodeGeneratorResponse::decode(&resp.encode_to_vec()[..]).expect("decode");
-    assert_eq!(decoded.error().get(), "boom");
+    assert_eq!(decoded.error().get(), b"boom");
     assert_eq!(decoded.supported_features().get(), 3);
     assert_eq!(decoded.file().len(), 1);
-    assert_eq!(decoded.file()[0].name().get(), "out.rs");
-    assert_eq!(decoded.file()[0].content().get(), "fn main() {}");
+    assert_eq!(decoded.file()[0].name().get(), b"out.rs");
+    assert_eq!(decoded.file()[0].content().get(), b"fn main() {}");
 }
 
 #[test]
 fn file_descriptor_proto_name_round_trip() {
     let mut file = FileDescriptorProto::new();
-    file.name_mut().push_str("demo.proto");
-    file.package_mut().push_str("demo");
+    file.name_mut().set(b"demo.proto");
+    file.package_mut().set(b"demo");
     let mut msg = DescriptorProto::new();
-    msg.name_mut().push_str("Task");
+    msg.name_mut().set(b"Task");
     file.message_type_mut().push(msg);
 
     let decoded: FileDescriptorProto =
         FileDescriptorProto::decode(&file.encode_to_vec()[..]).expect("decode");
-    assert_eq!(decoded.name().get(), "demo.proto");
-    assert_eq!(decoded.package().get(), "demo");
+    assert_eq!(decoded.name().get(), b"demo.proto");
+    assert_eq!(decoded.package().get(), b"demo");
     assert_eq!(decoded.message_type().len(), 1);
-    assert_eq!(decoded.message_type()[0].name().get(), "Task");
+    assert_eq!(decoded.message_type()[0].name().get(), b"Task");
 }

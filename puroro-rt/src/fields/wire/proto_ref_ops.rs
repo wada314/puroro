@@ -5,7 +5,7 @@
 use ::allocator_api2::alloc::Allocator;
 use ::core::fmt::{Debug, Formatter, Result as FmtResult};
 
-use super::len::{BytesCodec, LenScalar, StringCodec};
+use super::len::{BytesLikeLenCodec, LenScalar, StringCodec};
 use super::numerical::{Numerical, NumericalType};
 use super::proto_message::ProtoMessage;
 use super::singular_type::SingularType;
@@ -94,7 +94,7 @@ impl<A: Allocator> ProtoRefDebug<A> for LenScalar<StringCodec> {
     }
 }
 
-impl<A: Allocator> ProtoRefEq<A> for LenScalar<BytesCodec> {
+impl<A: Allocator, C: BytesLikeLenCodec> ProtoRefEq<A> for LenScalar<C> {
     #[inline]
     fn option_eq<'a>(lhs: Option<&'a [u8]>, rhs: Option<&'a [u8]>) -> bool
     where
@@ -104,7 +104,7 @@ impl<A: Allocator> ProtoRefEq<A> for LenScalar<BytesCodec> {
     }
 }
 
-impl<A: Allocator> ProtoRefDebug<A> for LenScalar<BytesCodec> {
+impl<A: Allocator, C: BytesLikeLenCodec> ProtoRefDebug<A> for LenScalar<C> {
     #[inline]
     fn fmt_ref<'a>(value: &&'a [u8], f: &mut Formatter<'_>) -> FmtResult
     where

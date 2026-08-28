@@ -64,7 +64,7 @@ The puroro project comprises several crates and tools with distinct roles:
 
 | Feature | Design intent | Implementation status |
 |---|---|---|
-| `utf8_validation` (`VERIFY` / `NONE`) | Generated decode paths honour the per-field Editions setting. | Resolved into FieldKind (`WireTypeKind::String` / `Bytes`); runtime `NONE` bypass and generated decode dispatch are **pending**. |
+| `utf8_validation` (`VERIFY` / `NONE`) | Generated decode paths honour the per-field Editions setting. `NONE` uses bytes views (`&[u8]`), not `&str`. | **Done** — `ProtoString` (`VERIFY`, `&str`) vs `ProtoStringUnchecked` (`NONE`, `&[u8]`). proto2 default is `NONE`; overlay with `proto2_utf8=verify`. |
 | Recursion limit | Nested-message `merge_from` enforces a depth limit; excess depth → `DecodeError::RecursionLimitExceeded`. | **Done** — `Message::merge_from_with_depth` + `RECURSION_LIMIT` (100); nested catalog paths pass `depth + 1`. |
 | Deprecated groups (`SGroup` / `EGroup`) | Never generated; not preserved on decode. | Decoder may return `DecodeError::InvalidTag`, skip, or panic — round-trip fidelity for groups is **not** a goal. |
 
@@ -320,12 +320,14 @@ The normative generated API is the concrete message struct's inherent `impl` blo
 |---|---|---|---|
 | IMPLICIT scalar (`score`, `done`) | bare value (`i32`, `bool`, …) | `*_mut()` → `impl DerefMut<Target = T>` | `clear_*()` |
 | EXPLICIT / LEGACY_REQUIRED scalar, enum | `Optional<…, impl HasDefault<…>>` | `*_mut()` → `impl DerefMut<Target = …>` | `clear_*()` |
-| Singular string (default SSO) | `Optional<&str, …>` or `&str` | `*_mut()` → `impl StringMut<A>` | `clear_*()` |
+| Singular string (VERIFY, default SSO) | `Optional<&str, …>` or `&str` | `*_mut()` → `impl StringMut<A>` | `clear_*()` |
+| Singular string (`utf8_validation=NONE`) | same views as bytes (`&[u8]`) | `*_mut()` → `impl BytesMut<A>` | `clear_*()` |
 | Singular bytes (default SSO) | `Optional<&[u8], …>` or `&[u8]` | `*_mut()` → `impl BytesMut<A>` | `clear_*()` |
 | IMPLICIT open enum (`status`) | `Optional` (`is_set` when non-zero) | `*_mut()` → `impl DerefMut<Target = E>` | `clear_*()` |
 | Nested message (`assignee`) | `Option<&M<A>>` | `*_mut()` → `&mut M<A>` (creates if absent) | `clear_*()` |
 | Repeated packable / message | `&[T]` / `&[M<A>]` | `*_mut()` → `impl DerefMut<Target = Vec<T, A>>` (`allocator_api2`) | `clear_*()` |
-| Repeated string / bytes | `&[impl Deref<Target = str>]` / `&[impl Deref<Target = [u8]>]` | `*_mut()` → `impl RepeatedStringMut<A>` / `impl RepeatedBytesMut<A>` (`push` then fill) | `clear_*()` |
+| Repeated string (VERIFY) / bytes | `&[impl Deref<Target = str>]` / `&[impl Deref<Target = [u8]>]` | `*_mut()` → `impl RepeatedStringMut<A>` / `impl RepeatedBytesMut<A>` (`push` then fill) | `clear_*()` |
+| Repeated string (`utf8_validation=NONE`) | `&[impl Deref<Target = [u8]>]` | `*_mut()` → `impl RepeatedBytesMut<A>` | `clear_*()` |
 | Map | `impl MapRef<K, V>` | `impl MapMut<K, V>` (see [§4.10](#410-map-fields)) | `clear_*()` (or `*_mut().clear()`) |
 | Oneof group | `impl OneofView` (`case()` / `as_ref()`) | `impl OneofViewMut` + per-variant `*_mut()` | `clear_notification()` |
 
@@ -514,7 +516,7 @@ Both presence modes apply uniformly across every entry in this table.
 
 ### 4.2 String fields
 
-String getters yield a borrowed `&str` (via `Optional::get` when presence-tracked). The default singular layout is SSO ([`InlineOrHeap`](IMPLEMENTATION.md#172-string--bytes-inline-optimisation)); `_mut` returns [`StringMut`](src/string_mut.rs) (`set` / `set_string` / `clear` / `push_str` / `push` / `truncate`). Callers need `use puroro::StringMut` for those methods. `(puroro.string_layout) = STRING_LAYOUT_HEAP` selects heap `UnmanagedString` and `impl DerefMut<Target = ::puroro::String<A>>` instead.
+String getters yield a borrowed `&str` (via `Optional::get` when presence-tracked) when `utf8_validation=VERIFY`. The default singular layout is SSO ([`InlineOrHeap`](IMPLEMENTATION.md#172-string--bytes-inline-optimisation)); `_mut` returns [`StringMut`](src/string_mut.rs) (`set` / `set_string` / `clear` / `push_str` / `push` / `truncate`). Callers need `use puroro::StringMut` for those methods. `(puroro.string_layout) = STRING_LAYOUT_HEAP` selects heap `UnmanagedString` and `impl DerefMut<Target = ::puroro::String<A>>` instead.
 
 **Implicit presence:**
 
@@ -540,7 +542,11 @@ task.title_mut().push_str("Fix bug");
 
 Wire rule: absent when `title().is_set()` is false (EXPLICIT) or `""` (IMPLICIT).
 
-**UTF-8 validation** (Editions `utf8_validation` feature): when `VERIFY` (default), invalid UTF-8 in a string payload causes `DecodeError::InvalidUtf8` during decode. When `NONE`, bytes are copied without validation. Generated decode arms select the appropriate runtime helper per field; see [§0](#0-project-architecture) for implementation status.
+**UTF-8 validation** (Editions `utf8_validation` feature): when `VERIFY` (proto3 / edition 2023–2024 default), invalid UTF-8 in a string payload causes `DecodeError::InvalidUtf8` during decode. Generated fields use `ProtoString` and the `&str` / `StringMut` accessors above.
+
+When `NONE` (proto2 syntax default; also settable per-field in editions), wire bytes are copied without validation. Generated fields use `ProtoStringUnchecked` and the **bytes** accessor surface (`&[u8]`, `BytesMut`, `RepeatedBytesMut`) so invalid UTF-8 is never presented as `&str`. The marker stays distinct from `ProtoBytes` because a protobuf `string` may be a map key and `bytes` may not.
+
+To keep proto2 strings as `&str` without changing the `.proto` files, pass the plugin option `proto2_utf8=verify` (`--puroro_opt=proto2_utf8=verify`). That overlays only the proto2 syntax default; editions `features.utf8_validation = NONE` stays bytes.
 
 ---
 
@@ -914,7 +920,7 @@ repeated MapFieldEntry map_field = N;  // always LEN on the wire
 
 **Key types** are integral types, `bool`, or `string` (not floating-point, `bytes`, enum, or message). **Values** may be any non-map type. Duplicate keys use **last-wins** semantics; iteration / encode order is unspecified.
 
-Public map views live in [`src/map.rs`](src/map.rs) (re-exported from `puroro`). `K` / `V` are **view** types (`str`, `i32`, …), not owned buffers — string maps use `K = str`.
+Public map views live in [`src/map.rs`](src/map.rs) (re-exported from `puroro`). `K` / `V` are **view** types (`str`, `i32`, …), not owned buffers — `utf8_validation=VERIFY` string maps use `K = str`; `NONE` string maps use `K = [u8]`.
 
 Same layering as singular fields (`EncodeType::View` / `ValueLayout::Mut` → generic `SingularField`): wire markers carry the view GATs, and `MapFieldRef` / `MapFieldMut` implement the user traits with **blankets** (no K×V macro matrix).
 
@@ -1124,13 +1130,13 @@ Note: **edition 2024 defaults to `EXPLICIT` field presence**, which is the oppos
 | `repeated_field_encoding` | `PACKED` / `EXPANDED` | Affects encode format (decode always accepts both) |
 | `enum_type` | `OPEN` / `CLOSED` | Generated newtype implements `OpenEnum` vs `ClosedEnum`; field is `ProtoEnum<E, Open>` vs `ProtoEnum<E, Closed>` (unknown closed values → unknown fields) |
 | `message_encoding` | `LENGTH_PREFIXED` / `DELIMITED` | `DELIMITED` (groups) is deprecated; not generated |
-| `utf8_validation` | `VERIFY` / `NONE` | `VERIFY`: `decode_string_in` returns `DecodeError::InvalidUtf8` on bad UTF-8 (default). `NONE`: copy bytes without validation (generated code uses an unchecked conversion). Runtime support for per-field dispatch is **pending** — see [§0](#0-project-architecture). |
+| `utf8_validation` | `VERIFY` / `NONE` | `VERIFY`: `ProtoString`; getters `&str` / `StringMut`; invalid UTF-8 → `DecodeError::InvalidUtf8`. `NONE`: `ProtoStringUnchecked`; getters `&[u8]` / `BytesMut` (proto2 syntax default). Overlay proto2 with plugin option `proto2_utf8=verify`. |
 
 ### 6.4 Migration from proto2 / proto3
 
 Editions are a **superset** of both proto2 and proto3: any valid proto2 or proto3 schema can be mechanically translated into an equivalent editions schema (the official Prototiller tool does this). The wire format is unchanged by such a migration.
 
-The generated Rust accessor API after migration is identical — the same accessor names, presence semantics, and enum handling — because the generated code pattern is determined by the field's feature settings, not by whether the source was proto2, proto3, or editions.
+The generated Rust accessor API after migration is identical for presence, enums, and packing — those follow the field's feature settings, not whether the source was proto2, proto3, or editions. **Exception:** proto2's default `utf8_validation=NONE` uses bytes views for `string`; proto3 / editions default to `VERIFY` (`&str`). After a Prototiller migration the editions file typically gets explicit `VERIFY`, matching proto3. To keep proto2 `.proto` files on `&str` without editing them, pass `proto2_utf8=verify`.
 
 ### 6.5 Extensions (not yet implemented)
 

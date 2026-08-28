@@ -4,7 +4,7 @@ use super::enumeration;
 use super::type_path::fqn_to_enum_root_path;
 use crate::default_value::{CustomDefault, DefaultLit};
 use crate::error::{Error, Result};
-use crate::field_kind::WireTypeKind;
+use crate::field_kind::{StringCatalogMarker, WireTypeKind};
 use ::proc_macro2::{Ident, Span, TokenStream};
 use ::quote::quote;
 use ::syn::{Item, Lifetime, LitByteStr, LitStr, Type, parse_quote};
@@ -43,14 +43,27 @@ fn has_default_ty_and_expr(
             let bits = *bits;
             (parse_quote! { f64 }, quote! { f64::from_bits(#bits) }, None)
         }
-        DefaultLit::Str(s) => {
-            let lit = LitStr::new(s, Span::call_site());
-            (
-                parse_quote! { &'a str },
-                quote! { #lit },
-                Some(parse_quote! { 'a }),
-            )
-        }
+        DefaultLit::Str(s) => match wire {
+            WireTypeKind::String { utf8 }
+                if StringCatalogMarker::from_utf8(*utf8)
+                    == StringCatalogMarker::ProtoStringUnchecked =>
+            {
+                let lit = LitByteStr::new(s.as_bytes(), Span::call_site());
+                (
+                    parse_quote! { &'a [u8] },
+                    quote! { #lit },
+                    Some(parse_quote! { 'a }),
+                )
+            }
+            _ => {
+                let lit = LitStr::new(s, Span::call_site());
+                (
+                    parse_quote! { &'a str },
+                    quote! { #lit },
+                    Some(parse_quote! { 'a }),
+                )
+            }
+        },
         DefaultLit::Bytes(b) => {
             let lit = LitByteStr::new(b, Span::call_site());
             (

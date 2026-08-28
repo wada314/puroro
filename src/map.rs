@@ -5,12 +5,12 @@ use ::core::ops::DerefMut;
 
 /// Shared view of a `map<K, V>` field.
 ///
-/// `K` is the key view type (`str`, `i32`, …) — not an owned buffer type.
+/// `K` is the key view type (`str`, `[u8]`, `i32`, …) — not an owned buffer type.
 /// [`get`](Self::get) returns [`None`] when the key is absent — not because the
 /// value is “unset” in the singular-presence sense.
 ///
 /// Key arguments take [`Borrow`]`<K>` so both `get(1)` and `get(&1)` work for
-/// sized keys, and `get("k")` for `K = str`.
+/// sized keys, `get("k")` for `K = str`, and `get(b"k")` for `K = [u8]`.
 pub trait MapRef<K: ?Sized, V: ?Sized> {
     /// Number of entries in the map.
     fn len(&self) -> usize;

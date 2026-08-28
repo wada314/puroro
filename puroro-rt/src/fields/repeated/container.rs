@@ -12,10 +12,11 @@ use ::allocator_api2::alloc::Allocator;
 use ::puroro::{RepeatedBytesMut, RepeatedContainerMut, RepeatedStringMut};
 use ::unmanaged::vec::VecGuard;
 
+use crate::fields::wire::len::{LenScalar, StringCodec};
 use crate::fields::wire::repeated_element::{
     RepeatedElement, RepeatedElementMerge, RepeatedElementMut,
 };
-use crate::fields::wire::{ProtoBytes, ProtoString};
+use crate::fields::wire::{ProtoBytes, ProtoStringUnchecked};
 
 /// Growable view over a repeated field's element storage.
 ///
@@ -143,12 +144,12 @@ where
     }
 }
 
-impl<'a, A> RepeatedStringMut<A> for RepeatedElementsMut<'a, ProtoString, A>
+impl<'a, A> RepeatedStringMut<A> for RepeatedElementsMut<'a, LenScalar<StringCodec>, A>
 where
     A: Allocator + Clone,
 {
     type Mut<'m>
-        = <ProtoString as RepeatedElementMut>::ElementMut<'m, A>
+        = <LenScalar<StringCodec> as RepeatedElementMut>::ElementMut<'m, A>
     where
         Self: 'm;
 
@@ -178,37 +179,44 @@ where
     }
 }
 
-impl<'a, A> RepeatedBytesMut<A> for RepeatedElementsMut<'a, ProtoBytes, A>
-where
-    A: Allocator + Clone,
-{
-    type Mut<'m>
-        = <ProtoBytes as RepeatedElementMut>::ElementMut<'m, A>
-    where
-        Self: 'm;
+macro_rules! impl_repeated_bytes_mut {
+    ($marker:ty) => {
+        impl<'a, A> RepeatedBytesMut<A> for RepeatedElementsMut<'a, $marker, A>
+        where
+            A: Allocator + Clone,
+        {
+            type Mut<'m>
+                = <$marker as RepeatedElementMut>::ElementMut<'m, A>
+            where
+                Self: 'm;
 
-    #[inline]
-    fn len(&self) -> usize {
-        RepeatedElementsMut::len(self)
-    }
+            #[inline]
+            fn len(&self) -> usize {
+                RepeatedElementsMut::len(self)
+            }
 
-    #[inline]
-    fn push(&mut self) -> Self::Mut<'_> {
-        RepeatedElementsMut::push(self)
-    }
+            #[inline]
+            fn push(&mut self) -> Self::Mut<'_> {
+                RepeatedElementsMut::push(self)
+            }
 
-    #[inline]
-    fn get_mut(&mut self, index: usize) -> Option<Self::Mut<'_>> {
-        RepeatedElementsMut::get_mut(self, index)
-    }
+            #[inline]
+            fn get_mut(&mut self, index: usize) -> Option<Self::Mut<'_>> {
+                RepeatedElementsMut::get_mut(self, index)
+            }
 
-    #[inline]
-    fn clear(&mut self) {
-        RepeatedElementsMut::clear(self);
-    }
+            #[inline]
+            fn clear(&mut self) {
+                RepeatedElementsMut::clear(self);
+            }
 
-    #[inline]
-    fn pop(&mut self) -> bool {
-        RepeatedElementsMut::pop(self)
-    }
+            #[inline]
+            fn pop(&mut self) -> bool {
+                RepeatedElementsMut::pop(self)
+            }
+        }
+    };
 }
+
+impl_repeated_bytes_mut!(ProtoBytes);
+impl_repeated_bytes_mut!(ProtoStringUnchecked);

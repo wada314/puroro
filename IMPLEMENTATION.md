@@ -66,7 +66,7 @@ Protobuf fields (except **oneof**) are **independent**: each getter/setter/encod
 
 ### Generator layer stack
 
-`generate()` orchestrates; `emit` only prepares `syn::Item` / `Prepared*` and installs them into the forest.
+`generate()` orchestrates (including plugin `parameter` knobs such as `proto2_utf8`); `emit` only prepares `syn::Item` / `Prepared*` and installs them into the forest.
 
 ```
 plugin_io          CodeGeneratorRequest / Response (wire)
@@ -155,14 +155,14 @@ protobuf-core           Varint, Tag, WireType
 | Repeated catalog (`RepeatedField<T, E, FIELD>`) | **Done** |
 | `protoc-gen-puroro` plugin I/O (`CodeGeneratorRequest` / `Response`) | **Done** |
 | Descriptor decode (messages / fields / enums / oneofs / features subset) | **Done** (intentional subset; `default_value` and `map_entry` decoded; services / extensions not in IR yet) |
-| Type resolve (`FileSet`, `TypeRef`, presence / occurrence) | **Done** — `emit` resolves the full request before generating |
-| Editions features in resolve / FieldKind | **Partial** — `field_presence`, `enum_type`, `repeated_field_encoding`, `utf8_validation` resolved; `message_encoding=DELIMITED` rejected; JSON / naming / visibility still traps |
+| Type resolve (`FileSet`, `TypeRef`, presence / occurrence) | **Done** — [`generate()`](protoc-gen-puroro/src/generate.rs) resolves the full request, then prepare / forest / layout |
+| Editions features in resolve / FieldKind | **Partial** — `field_presence`, `enum_type`, `repeated_field_encoding`, `utf8_validation` resolved and emitted (`ProtoString` / `ProtoStringUnchecked`); `message_encoding=DELIMITED` rejected; JSON / naming / visibility still traps |
 | Module forest + `ModuleLayout::SingleFile` | **Done** (`FileTree` deferred) |
 | Empty-message emission (no fields / nested types) | **Done** — compile-tested via [`puroro-codegen-tests`](puroro-codegen-tests/) (`protoc` + plugin) |
 | FieldKind IR (`plan_fields`, bit assignment, catalog kind) | **Done** — scalars / repeated / enum / oneof / map / custom defaults; synthetic `map_entry` messages planned as `FieldKind::Map` (not emitted as structs) |
 | FieldKind → catalog emission (struct members, accessors, visitors) | **Done** — singular + repeated scalar / string / bytes / bool / enum / message; real oneof groups; maps; `[default = …]` markers (`mod defaults` + `SingularField` `D`); nested message/enum decls; zero-less enums (`Type`/`Label`); official `descriptor.proto`+`plugin.proto` compile-tested. Typed extensions / services not yet |
 
-Live plugin emits the eager-path field families shown by [`sample-generated/`](sample-generated/) (`Task` / `Address`) via `resolved::resolve` + [`field_kind::plan_fields`](protoc-gen-puroro/src/field_kind.rs): singular / repeated / enum / message / real oneof / map / custom defaults. Coverage is split across [`puroro-codegen-tests`](puroro-codegen-tests/) fixtures (`scalars`, `oneof_basic`, `map_basic`, `custom_defaults`, …; official `descriptor.proto` / `plugin.proto` by `official_plugin`). Deliberate differences from the hand-written sample — flat module layout, short-name `use`s, omitted `@generated` headers — are documented in [§9](#9-struct-layout); they are not missing field features. Remaining generator gaps outside the sample surface: typed extensions, services, `utf8_validation=NONE` decode honouring, `FileTree` layout.
+Live plugin emits the eager-path field families shown by [`sample-generated/`](sample-generated/) (`Task` / `Address`) via `resolved::resolve` + [`field_kind::plan_fields`](protoc-gen-puroro/src/field_kind.rs): singular / repeated / enum / message / real oneof / map / custom defaults. Coverage is split across [`puroro-codegen-tests`](puroro-codegen-tests/) fixtures (`scalars`, `oneof_basic`, `map_basic`, `custom_defaults`, `utf8_validation`, …; official `descriptor.proto` / `plugin.proto` by `official_plugin`). Deliberate differences from the hand-written sample — flat module layout, short-name `use`s, omitted `@generated` headers — are documented in [§9](#9-struct-layout); they are not missing field features. Remaining generator gaps outside the sample surface: typed extensions, services, `FileTree` layout.
 
 ---
 
@@ -397,7 +397,8 @@ Adding a singular wire type = one new codec + `Numerical` / `LenScalar` alias (b
 | oneof `bool` | `SingularField<ProtoBool, Oneof, FIELD, A, BitPacked<VALUE_BIT>>` inside the oneof storage enum |
 | `IMPLICIT open enum` | `SingularField<ProtoEnum<E, Open>, Implicit, FIELD, A>` |
 | `EXPLICIT closed enum` | `SingularField<ProtoEnum<E, Closed>, Explicit<BIT>, FIELD, A>` (same `.merge`) |
-| `IMPLICIT string` | `SingularField<ProtoString, Implicit, FIELD, A, InlineOrHeap<SSO_BIT>>` |
+| `IMPLICIT string` | `SingularField<ProtoString, Implicit, FIELD, A, InlineOrHeap<SSO_BIT>>` (`VERIFY`) |
+| `IMPLICIT string` + `utf8_validation=NONE` | `SingularField<ProtoStringUnchecked, Implicit, FIELD, A, InlineOrHeap<SSO_BIT>>` (bytes views / `BytesMut`) |
 | `EXPLICIT string` | `SingularField<ProtoString, Explicit<BIT>, FIELD, A, InlineOrHeap<SSO_BIT>>` |
 | `LEGACY_REQUIRED string` | `SingularField<ProtoString, LegacyRequired<BIT>, FIELD, A, InlineOrHeap<SSO_BIT>>` |
 | `IMPLICIT` / `EXPLICIT bytes` | `SingularField<ProtoBytes, P, FIELD, A, InlineOrHeap<SSO_BIT>>` |
@@ -406,7 +407,7 @@ Adding a singular wire type = one new codec + `Numerical` / `LenScalar` alias (b
 | `repeated int32 PACKED` | `RepeatedField<ProtoInt32, Packed, FIELD, A>` |
 | `repeated fixed32` / `double` PACKED | `RepeatedField<ProtoFixed32, Packed, FIELD, A>` / `RepeatedField<ProtoDouble, Packed, FIELD, A>` |
 | `repeated int32 EXPANDED` | `RepeatedField<ProtoInt32, Expanded, FIELD, A>` |
-| `repeated string` | `RepeatedField<ProtoString, Expanded, FIELD, A>` |
+| `repeated string` | `RepeatedField<ProtoString, Expanded, FIELD, A>` (`VERIFY`; `NONE` uses `ProtoStringUnchecked` + `RepeatedBytesMut`) |
 | `repeated bytes` | `RepeatedField<ProtoBytes, Expanded, FIELD, A>` |
 | `map<string, int32>` | `MapField<ProtoString, ProtoInt32, FIELD, A>` |
 | `map<int32, Address>` | `MapField<ProtoInt32, ProtoMessage<Address<A>>, FIELD, A>` |
@@ -812,11 +813,11 @@ The `set_*` per-variant setters are removed, matching the other field families.
 
 | Area | Current | Target |
 |---|---|---|
-| UTF-8 validation | Always `decode_string_in` (VERIFY) | Per-field `utf8_validation` feature |
+| UTF-8 validation | Per-field `utf8_validation` (`ProtoString` / `&str` vs `ProtoStringUnchecked` / `&[u8]`) | — |
 | Recursion limit | Enforced (`RECURSION_LIMIT = 100`, `merge_from_with_depth`) | — |
 | Repeated wrappers | `RepeatedField` + `RepeatedElement` (message / bool / scalar / LEN) | — |
 | Map wrappers | `MapField` + `MapKey` / `RepeatedElement` (sample `attributes`) | — |
-| `protoc-gen-puroro` field emission | Eager-path families done (singular / repeated / enum / message / oneof / map / defaults); see [§3](#3-implementation-status) | Honour `utf8_validation=NONE` in generated decode; typed extensions / services |
+| `protoc-gen-puroro` field emission | Eager-path families done (singular / repeated / enum / message / oneof / map / defaults); see [§3](#3-implementation-status) | Typed extensions / services |
 | Zero-copy views | — | `TaskView<'buf>` (DESIGN.md §8) |
 | `TaskLazy` | DESIGN only | Wire buffer + on-demand decode |
 | `Hash` / `serde` | Deferred | Opt-in features |
@@ -845,6 +846,6 @@ The `set_*` per-variant setters are removed, matching the other field families.
 - **MessageCommon heap bit** (`BIT_*_SSO` / `InlineOrHeap<HEAP_BIT>`; [`SSO_HEAP`](puroro-rt/src/fields/shared/value_layout.rs) = `true`, [`SSO_INLINE`](puroro-rt/src/fields/shared/value_layout.rs) = `false`) is the **sole** arm discriminant. The slot is an untagged union and does not inspect the heap type's memory layout
 - **Arm choice is layout-internal:** crate-private pack helpers / decode `merge` decide inline vs heap. Hot paths (`StringMut::set(&str)`, `BytesMut::set(&[u8])`, short decode) pack without a heap allocation
 
-**Mutator.** Generated string `_mut` returns `impl ::puroro::StringMut<A>` (concrete [`SsoStringMut`](puroro-rt/src/fields/wire/sso_string.rs) stays in `puroro-rt`). Methods: `set(&str)` / `set_string(unmanaged::String)` / `clear` / `push_str` / `push` / `truncate`. Generated bytes `_mut` returns `impl ::puroro::BytesMut<A>` ([`SsoBytesMut`](puroro-rt/src/fields/wire/sso_bytes.rs)): `set(&[u8])` / `set_vec(Vec<u8, A>)` / `clear` / `extend_from_slice` / `push` / `truncate`. Both stay inline while the result fits; overflow promotes to heap.
+**Mutator.** Generated `utf8_validation=VERIFY` string `_mut` returns `impl ::puroro::StringMut<A>` (concrete [`SsoStringMut`](puroro-rt/src/fields/wire/sso_string.rs) stays in `puroro-rt`). Methods: `set(&str)` / `set_string(unmanaged::String)` / `clear` / `push_str` / `push` / `truncate`. Generated bytes `_mut` and `utf8_validation=NONE` string `_mut` return `impl ::puroro::BytesMut<A>` ([`SsoBytesMut`](puroro-rt/src/fields/wire/sso_bytes.rs)): `set(&[u8])` / `set_vec(Vec<u8, A>)` / `clear` / `extend_from_slice` / `push` / `truncate`. Both stay inline while the result fits; overflow promotes to heap.
 
-**Still open / deferred.** Repeated / map string and bytes elements stay `UnmanagedString` / `UnmanagedVec`. `utf8_validation=NONE` still unwired.
+**Still open / deferred.** Repeated / map string and bytes elements stay `UnmanagedString` / `UnmanagedVec`.

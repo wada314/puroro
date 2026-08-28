@@ -6,7 +6,8 @@
 //!
 //! Proto2 and proto3 are treated as fixed default sets (the same idea as
 //! `EDITION_PROTO2` / `EDITION_PROTO3`). Feature option overlays apply only to
-//! editions files.
+//! editions files. Generate-time `proto2_utf8=verify` may overlay proto2's
+//! `utf8_validation` default without changing the schema.
 
 use ::derive_more::TryFrom;
 

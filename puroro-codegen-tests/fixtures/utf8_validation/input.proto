@@ -1,0 +1,7 @@
+edition = "2023";
+
+message Utf8Fields {
+  string verified = 1;
+  string raw = 2 [features.utf8_validation = NONE];
+  repeated string raw_list = 3 [features.utf8_validation = NONE];
+}

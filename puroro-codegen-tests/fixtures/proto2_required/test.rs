@@ -1,7 +1,7 @@
 //! proto2 `required` → `LegacyRequired` / `Message::validate`.
 
 use crate::proto2_required::RequiredOwner;
-use ::puroro::{DecodeError, Message, StringMut};
+use ::puroro::{BytesMut, DecodeError, Message};
 
 #[test]
 fn unset_fails_validate() {
@@ -18,12 +18,12 @@ fn unset_fails_validate() {
 #[test]
 fn set_passes_validate_and_round_trips() {
     let mut msg = RequiredOwner::new();
-    msg.owner_mut().push_str("alice");
+    msg.owner_mut().set(b"alice");
     *msg.score_mut() = 7;
     msg.validate().expect("required set");
 
     let decoded: RequiredOwner = RequiredOwner::decode(&msg.encode_to_vec()[..]).expect("decode");
-    assert_eq!(decoded.owner().get(), "alice");
+    assert_eq!(decoded.owner().get(), b"alice");
     assert_eq!(decoded.score().get(), 7);
     decoded.validate().expect("decoded still valid");
 }
@@ -31,7 +31,7 @@ fn set_passes_validate_and_round_trips() {
 #[test]
 fn clear_fails_validate_again() {
     let mut msg = RequiredOwner::new();
-    msg.owner_mut().push_str("alice");
+    msg.owner_mut().set(b"alice");
     msg.validate().expect("set");
     msg.clear_owner();
     assert!(!msg.owner().is_set());

@@ -15,7 +15,7 @@ mod arena;
 mod resolve;
 
 pub use arena::Arena;
-pub use resolve::resolve;
+pub use resolve::{resolve, resolve_with};
 
 use crate::descriptor::features::{EnumType, RepeatedFieldEncoding, Utf8Validation};
 use crate::descriptor::{BytesLayout, ProtoFqn, StringLayout, Syntax};

@@ -71,7 +71,8 @@ pub(crate) fn pack_written<A: Allocator + Clone>(
 
 impl<A: Allocator> SsoBuf<UnmanagedString<A>> {
     pub fn as_str(&self, is_heap: bool) -> &str {
-        // SAFETY: constructors / mutators keep the live arm as UTF-8.
+        // SAFETY: VERIFY constructors / mutators keep UTF-8. `utf8_validation=NONE`
+        // decode may store non-UTF-8 bytes and still present them as `&str`.
         unsafe { str::from_utf8_unchecked(self.as_bytes::<A>(is_heap)) }
     }
 }

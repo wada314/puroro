@@ -67,6 +67,9 @@ pub(crate) fn decode_bytes_in<B: Buf, A: Allocator>(
 }
 
 /// Decodes one LEN payload as UTF-8 into an [`UnmanagedString<A>`].
+///
+/// Invalid UTF-8 returns [`DecodeError::InvalidUtf8`]. Used for
+/// `utf8_validation=VERIFY` (`ProtoString`). `NONE` strings decode as bytes.
 pub(crate) fn decode_string_in<B: Buf, A: Allocator + Clone>(
     buf: &mut B,
     alloc: A,
@@ -74,7 +77,8 @@ pub(crate) fn decode_string_in<B: Buf, A: Allocator + Clone>(
     use crate::fields::wire::wire_payload::LenPayload;
 
     let payload = LenPayload::decode_in(WireType::Len, buf, alloc.clone())?;
-    match UnmanagedString::from_utf8(payload.into_vec()) {
+    let bytes = payload.into_vec();
+    match UnmanagedString::from_utf8(bytes) {
         Ok(s) => Ok(s),
         Err(bytes) => {
             // SAFETY: `alloc` owns the buffer produced by `decode_in`.

@@ -22,7 +22,7 @@ use super::{
     value_slot::{AddressableSlot, ValueSlot, ValueSlotMutAccess},
 };
 use crate::decode;
-use crate::fields::wire::len::{ProtoBytes, ProtoString};
+use crate::fields::wire::len::{BytesLikeLenCodec, LenScalar, ProtoString};
 use crate::fields::wire::numerical::ProtoBool;
 use crate::fields::wire::numerical::{BoolCodec, NumericalType};
 use crate::fields::wire::singular_type::{PayloadAccess, PayloadMerge, SingularType};
@@ -577,12 +577,15 @@ impl<A: Allocator + Clone, const HEAP_BIT: usize> ValueLayoutClone<ProtoString, 
     }
 }
 
-impl<A: Allocator, const HEAP_BIT: usize> ValueLayout<ProtoBytes, A> for InlineOrHeap<HEAP_BIT> {
+impl<A: Allocator, const HEAP_BIT: usize, C: BytesLikeLenCodec> ValueLayout<LenScalar<C>, A>
+    for InlineOrHeap<HEAP_BIT>
+{
     type Slot = SsoBytes<A>;
     type Mut<'a>
         = SsoBytesMut<'a, A>
     where
-        A: 'a;
+        A: 'a,
+        C: 'a;
 
     #[inline]
     fn is_proto_empty<Pb>(slot: &SsoBytes<A>, common: &MessageCommon<Pb, A>) -> bool
@@ -610,7 +613,7 @@ impl<A: Allocator, const HEAP_BIT: usize> ValueLayout<ProtoBytes, A> for InlineO
         VS: ValueSlot<SsoBytes<A>, A>,
         I: SlotInitMut,
         MessageCommon<Pb, A>: MessageCommonBits,
-        ProtoBytes: 'a,
+        LenScalar<C>: 'a,
         A: 'a + Clone,
         Self::Slot: DefaultIn<A>,
     {
@@ -662,7 +665,7 @@ impl<A: Allocator, const HEAP_BIT: usize> ValueLayout<ProtoBytes, A> for InlineO
     }
 }
 
-impl<A: Allocator, const HEAP_BIT: usize> ValueLayoutMerge<ProtoBytes, A>
+impl<A: Allocator, const HEAP_BIT: usize, C: BytesLikeLenCodec> ValueLayoutMerge<LenScalar<C>, A>
     for InlineOrHeap<HEAP_BIT>
 {
     #[inline]
@@ -699,8 +702,8 @@ impl<A: Allocator, const HEAP_BIT: usize> ValueLayoutMerge<ProtoBytes, A>
     }
 }
 
-impl<A: Allocator + Clone, const HEAP_BIT: usize> ValueLayoutClone<ProtoBytes, A>
-    for InlineOrHeap<HEAP_BIT>
+impl<A: Allocator + Clone, const HEAP_BIT: usize, C: BytesLikeLenCodec>
+    ValueLayoutClone<LenScalar<C>, A> for InlineOrHeap<HEAP_BIT>
 {
     #[inline]
     fn clone_slot<VS, Pb>(

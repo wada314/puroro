@@ -1,7 +1,7 @@
 //! Custom `[default = …]` on singular fields and oneof members (proto2).
 
 use crate::custom_defaults::{Holder, Kind};
-use ::puroro::{Message, OneofView, StringMut};
+use ::puroro::{BytesMut, Message, OneofView};
 
 #[test]
 fn singular_custom_defaults_when_unset() {
@@ -16,7 +16,7 @@ fn singular_custom_defaults_when_unset() {
     assert!(msg.flag().get());
 
     assert!(!msg.title().is_set());
-    assert_eq!(msg.title().get(), "hi");
+    assert_eq!(msg.title().get(), b"hi");
 
     assert!(!msg.payload().is_set());
     assert_eq!(msg.payload().get(), b"a\0b");
@@ -48,7 +48,7 @@ fn oneof_custom_default_when_unset_or_other_variant() {
     assert!(!msg.webhook_id().is_set());
     assert_eq!(msg.webhook_id().get(), -1);
 
-    msg.note_mut().push_str("hello");
+    msg.note_mut().set(b"hello");
     assert!(!msg.webhook_id().is_set());
     assert_eq!(msg.webhook_id().get(), -1);
 

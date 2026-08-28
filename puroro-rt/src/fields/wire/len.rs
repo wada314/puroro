@@ -1,4 +1,5 @@
-//! Length-delimited scalar markers ([`ProtoString`] / [`ProtoBytes`]).
+//! Length-delimited scalar markers ([`ProtoString`] / [`ProtoBytes`] /
+//! [`ProtoStringUnchecked`]).
 //!
 //! Markers are [`LenScalar`] wrappers around a [`LenCodec`] (Method 1 style):
 //! blankets go on `LenScalar<C>`, so they do not collide with
@@ -7,8 +8,10 @@
 //! Repeated / map storage uses [`UnmanagedString`](::unmanaged::UnmanagedString)
 //! / [`UnmanagedVec`](::unmanaged::UnmanagedVec). Singular `string` / `bytes` use
 //! SSO via [`InlineOrHeap`](crate::fields::shared::value_layout::InlineOrHeap)
-//! (`ProtoString` / `ProtoBytes` + [`Inline`](crate::fields::shared::value_layout::Inline)
-//! keep the heap [`UnmanagedString`] / [`UnmanagedVec`] slot).
+//! (`ProtoString` → [`SsoString`](crate::fields::wire::sso_string::SsoString);
+//! `ProtoBytes` / `ProtoStringUnchecked` → [`SsoBytes`](crate::fields::wire::sso_bytes::SsoBytes).
+//! [`Inline`](crate::fields::shared::value_layout::Inline) keeps the heap
+//! [`UnmanagedString`] / [`UnmanagedVec`] slot).
 
 use ::allocator_api2::alloc::Allocator;
 use ::allocator_api2::vec::Vec as AllocVec;
@@ -80,16 +83,36 @@ pub trait LenCodec: Sized {
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
 pub struct LenScalar<C>(PhantomData<C>);
 
-/// Protobuf `string` codec (see [`LenScalar`] visibility note).
+/// Protobuf `string` codec (`utf8_validation=VERIFY`; see [`LenScalar`] note).
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
 pub struct StringCodec;
+
+/// Protobuf `string` codec (`utf8_validation=NONE`; bytes view, map-key capable).
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
+pub struct UncheckedStringCodec;
 
 /// Protobuf `bytes` codec (see [`LenScalar`] visibility note).
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
 pub struct BytesCodec;
 
-/// Protobuf `string` type marker.
+/// LEN codecs whose borrowed view is `[u8]` (`bytes` and `utf8_validation=NONE` strings).
+///
+/// `pub` because it appears in bounds of public [`LenScalar`] impls. Not
+/// re-exported from the crate root.
+pub trait BytesLikeLenCodec: LenCodec<RefView = [u8]> {}
+
+impl BytesLikeLenCodec for BytesCodec {}
+impl BytesLikeLenCodec for UncheckedStringCodec {}
+
+/// Protobuf `string` type marker (`utf8_validation=VERIFY`).
 pub type ProtoString = LenScalar<StringCodec>;
+
+/// Protobuf `string` type marker (`utf8_validation=NONE`).
+///
+/// Decode copies wire bytes without UTF-8 checks. Accessors yield `&[u8]`
+/// (same views as [`ProtoBytes`]) so invalid UTF-8 is never presented as
+/// `&str`. Distinct from [`ProtoBytes`] because `string` may be a map key.
+pub type ProtoStringUnchecked = LenScalar<UncheckedStringCodec>;
 
 /// Protobuf `bytes` type marker.
 pub type ProtoBytes = LenScalar<BytesCodec>;
@@ -132,6 +155,47 @@ impl LenCodec for StringCodec {
     #[inline]
     fn as_wire_bytes(view: &str) -> &[u8] {
         view.as_bytes()
+    }
+}
+
+impl LenCodec for UncheckedStringCodec {
+    type RefView = [u8];
+    type Slot<A: Allocator> = UnmanagedVec<u8, A>;
+    type MutTarget<A: Allocator> = AllocVec<u8, A>;
+    type Mut<'a, A: Allocator>
+        = VecGuard<'a, u8, A>
+    where
+        Self: 'a,
+        A: 'a;
+
+    #[inline]
+    fn new_slot<A: Allocator + Clone>(alloc: A) -> UnmanagedVec<u8, A> {
+        BytesCodec::new_slot(alloc)
+    }
+
+    #[inline]
+    fn decode_in<B: DecodeBuf, A: Allocator + Clone>(
+        buf: &mut B,
+        alloc: A,
+    ) -> Result<UnmanagedVec<u8, A>, DecodeError> {
+        BytesCodec::decode_in(buf, alloc)
+    }
+
+    #[inline]
+    unsafe fn slot_with_alloc<'a, A: Allocator + Clone + 'a>(
+        slot: &'a mut UnmanagedVec<u8, A>,
+        alloc: A,
+    ) -> VecGuard<'a, u8, A>
+    where
+        Self: 'a,
+    {
+        // SAFETY: forwarded to the caller's obligation on `alloc`.
+        unsafe { BytesCodec::slot_with_alloc(slot, alloc) }
+    }
+
+    #[inline]
+    fn as_wire_bytes(view: &[u8]) -> &[u8] {
+        BytesCodec::as_wire_bytes(view)
     }
 }
 

@@ -15,14 +15,16 @@ pub use field::{MapField, MapFieldMut, MapFieldRef};
 
 use crate::fields::wire::{
     ProtoBool, ProtoFixed32, ProtoFixed64, ProtoInt32, ProtoInt64, ProtoSFixed32, ProtoSFixed64,
-    ProtoSInt32, ProtoSInt64, ProtoString, ProtoUInt32, ProtoUInt64, RepeatedElement,
+    ProtoSInt32, ProtoSInt64, ProtoString, ProtoStringUnchecked, ProtoUInt32, ProtoUInt64,
+    RepeatedElement,
 };
 
 /// Marker: valid protobuf map **key**.
 ///
-/// Spec: integral types, `bool`, or `string` — not floating-point, `bytes`,
+/// Key types are integral types, `bool`, or `string` — not floating-point, `bytes`,
 /// enum, or message. Storage is [`RepeatedElement::Element`]; the user-facing
-/// key type is [`RepeatedElement::RefView`] (`i32`, `str`, …).
+/// key type is [`RepeatedElement::RefView`] (`i32`, `str`, or `[u8]` for
+/// `utf8_validation=NONE` strings).
 ///
 /// Implementors must ensure:
 /// - `RefView: Hash + Eq` (enforced at map lookup / `entry_mut` sites)
@@ -44,3 +46,4 @@ impl MapKey for ProtoFixed64 {}
 impl MapKey for ProtoSFixed32 {}
 impl MapKey for ProtoSFixed64 {}
 impl MapKey for ProtoString {}
+impl MapKey for ProtoStringUnchecked {}

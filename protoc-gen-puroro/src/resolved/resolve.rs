@@ -96,6 +96,8 @@ struct PendingFields<'a, 'd> {
 /// Name map + pending field edges for one [`resolve`] call.
 struct ResolveCtx<'a, 'd> {
     arena: &'a Arena,
+    /// proto2 syntax default for `utf8_validation` (spec is `NONE`).
+    proto2_utf8: Utf8Validation,
     messages_by_fqn: HashMap<ProtoFqn, &'a Message<'a>>,
     enums_by_fqn: HashMap<ProtoFqn, &'a Enum<'a>>,
     pending: Vec<PendingFields<'a, 'd>>,
@@ -105,9 +107,24 @@ struct ResolveCtx<'a, 'd> {
 ///
 /// Plugin metadata ([`crate::descriptor::CodegenMeta`]) is intentionally unused
 /// here — keep it beside the returned `FileSet` and pass both by reference.
+/// Proto2 `utf8_validation` defaults to [`Utf8Validation::None`]; use
+/// [`resolve_with`] to overlay `VERIFY`.
 pub fn resolve<'a>(arena: &'a Arena, proto_files: &[ProtoFile]) -> Result<FileSet<'a>> {
+    resolve_with(arena, proto_files, Utf8Validation::None)
+}
+
+/// Like [`resolve`], with a proto2-only overlay for the `utf8_validation`
+/// syntax default.
+///
+/// Editions files (and their explicit field features) are unchanged.
+pub fn resolve_with<'a>(
+    arena: &'a Arena,
+    proto_files: &[ProtoFile],
+    proto2_utf8: Utf8Validation,
+) -> Result<FileSet<'a>> {
     let mut ctx = ResolveCtx {
         arena,
+        proto2_utf8,
         messages_by_fqn: HashMap::new(),
         enums_by_fqn: HashMap::new(),
         pending: Vec::new(),
@@ -227,7 +244,7 @@ impl<'a, 'd> ResolveCtx<'a, 'd> {
             name: desc.name.clone(),
             fqn: fqn.clone(),
             parent,
-            openness: EnumType::resolve(file, &desc.features),
+            openness: EnumType::resolve(file, &desc.features, self.proto2_utf8),
             values,
         });
         self.enums_by_fqn.insert(fqn, enum_ty);
@@ -276,7 +293,7 @@ impl<'a, 'd> ResolveCtx<'a, 'd> {
                 .reject_unimplemented_overrides(&format!("field `{owner_fqn}.{}`", field.name));
         }
 
-        let features = FinalizedFeatureSet::resolve_field(file, field);
+        let features = FinalizedFeatureSet::resolve_field(file, field, self.proto2_utf8);
 
         if matches!(field.type_, FieldType::Message)
             && features.message_encoding == MessageEncoding::Delimited
@@ -385,9 +402,17 @@ fn write_shared<T>(slot: &T, value: T) {
 
 impl FinalizedFeatureSet {
     /// Syntax defaults, then `file.features`, then each of `inner` in order
-    /// (later `Some` wins). Classic proto ignores every overlay.
-    fn resolve<'a>(file: &ProtoFile, inner: impl IntoIterator<Item = &'a FeatureSet>) -> Self {
+    /// (later `Some` wins). Classic proto ignores every overlay except the
+    /// generate-time proto2 `utf8_validation` default (`proto2_utf8`).
+    fn resolve<'a>(
+        file: &ProtoFile,
+        inner: impl IntoIterator<Item = &'a FeatureSet>,
+        proto2_utf8: Utf8Validation,
+    ) -> Self {
         let mut features = Self::defaults_for_syntax(file.syntax);
+        if matches!(file.syntax, Syntax::Proto2) {
+            features.utf8_validation = proto2_utf8;
+        }
         if matches!(file.syntax, Syntax::Editions(_)) {
             features = features.overlay(&file.features);
             for over in inner {
@@ -399,8 +424,8 @@ impl FinalizedFeatureSet {
 
     /// [`Self::resolve`] plus proto2/proto3 descriptor knobs that editions
     /// express as feature overrides (`packed`, `required`, `proto3_optional`).
-    fn resolve_field(file: &ProtoFile, field: &FieldDesc) -> Self {
-        let mut features = Self::resolve(file, [&field.features]);
+    fn resolve_field(file: &ProtoFile, field: &FieldDesc, proto2_utf8: Utf8Validation) -> Self {
+        let mut features = Self::resolve(file, [&field.features], proto2_utf8);
         if field.proto3_optional {
             features.field_presence = FieldPresence::Explicit;
         }
@@ -417,8 +442,8 @@ impl FinalizedFeatureSet {
 }
 
 impl EnumType {
-    fn resolve(file: &ProtoFile, enum_features: &FeatureSet) -> Self {
-        FinalizedFeatureSet::resolve(file, [enum_features]).enum_type
+    fn resolve(file: &ProtoFile, enum_features: &FeatureSet, proto2_utf8: Utf8Validation) -> Self {
+        FinalizedFeatureSet::resolve(file, [enum_features], proto2_utf8).enum_type
     }
 }
 
@@ -427,7 +452,7 @@ fn check_file_features(proto: &ProtoFile) {
         proto
             .features
             .reject_unimplemented_overrides(&format!("file `{}`", proto.name));
-        FinalizedFeatureSet::resolve(proto, None).apply_or_trap_for_file();
+        FinalizedFeatureSet::resolve(proto, None, Utf8Validation::None).apply_or_trap_for_file();
     }
 }
 
@@ -921,6 +946,75 @@ mod tests {
             FieldOccurrence::Repeated(RepeatedFieldEncoding::Expanded)
         );
         let title = fields.next().unwrap();
+        assert_eq!(title.utf8_validation(), Some(Utf8Validation::None));
+    }
+
+    #[test]
+    fn proto2_string_utf8_defaults_to_none_unless_overlaid() {
+        use crate::descriptor::features::Utf8Validation;
+
+        let arena = Arena::new();
+        let file = proto_file(
+            "p2",
+            Syntax::Proto2,
+            vec![MessageDesc {
+                fields: vec![desc::field("title", 1, FieldType::String)],
+                ..desc::message("M")
+            }],
+            vec![],
+        );
+        let file_set = resolve(&arena, &[file]).unwrap();
+        let title = lookup_message(&file_set, ".p2.M")
+            .unwrap()
+            .fields()
+            .next()
+            .unwrap();
+        assert_eq!(title.utf8_validation(), Some(Utf8Validation::None));
+
+        let arena = Arena::new();
+        let file = proto_file(
+            "p2",
+            Syntax::Proto2,
+            vec![MessageDesc {
+                fields: vec![desc::field("title", 1, FieldType::String)],
+                ..desc::message("M")
+            }],
+            vec![],
+        );
+        let file_set = resolve_with(&arena, &[file], Utf8Validation::Verify).unwrap();
+        let title = lookup_message(&file_set, ".p2.M")
+            .unwrap()
+            .fields()
+            .next()
+            .unwrap();
+        assert_eq!(title.utf8_validation(), Some(Utf8Validation::Verify));
+    }
+
+    #[test]
+    fn proto2_utf8_overlay_does_not_change_editions_none() {
+        use crate::descriptor::features::Utf8Validation;
+
+        let arena = Arena::new();
+        let file = ProtoFile {
+            syntax: Syntax::Editions(Edition::Edition2023),
+            messages: vec![MessageDesc {
+                fields: vec![FieldDesc {
+                    features: FeatureSet {
+                        utf8_validation: Some(Utf8Validation::None),
+                        ..FeatureSet::default()
+                    },
+                    ..desc::field("title", 1, FieldType::String)
+                }],
+                ..desc::message("M")
+            }],
+            ..desc::proto_file("a.proto", "ed")
+        };
+        let file_set = resolve_with(&arena, &[file], Utf8Validation::Verify).unwrap();
+        let title = lookup_message(&file_set, ".ed.M")
+            .unwrap()
+            .fields()
+            .next()
+            .unwrap();
         assert_eq!(title.utf8_validation(), Some(Utf8Validation::None));
     }
 

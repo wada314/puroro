@@ -67,18 +67,21 @@ pub enum WireTypeKind<'a> {
 
 /// Catalog marker for a protobuf `string` field.
 ///
-/// Plan decides the marker; emit only quotes it. `utf8_validation=NONE` stays
-/// [`Self::ProtoString`] until NONE is implemented or rejected.
+/// Plan decides the marker; emit only quotes it.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum StringCatalogMarker {
-    /// `::puroro_rt::ProtoString` (VERIFY semantics).
+    /// `::puroro_rt::ProtoString` (`utf8_validation=VERIFY`).
     ProtoString,
+    /// `::puroro_rt::ProtoStringUnchecked` (`utf8_validation=NONE`).
+    /// Bytes views (`&[u8]`); still a valid map key (unlike `bytes`).
+    ProtoStringUnchecked,
 }
 
 impl StringCatalogMarker {
     pub fn from_utf8(utf8: Utf8Validation) -> Self {
         match utf8 {
-            Utf8Validation::Verify | Utf8Validation::None => Self::ProtoString,
+            Utf8Validation::Verify => Self::ProtoString,
+            Utf8Validation::None => Self::ProtoStringUnchecked,
         }
     }
 }
@@ -249,14 +252,14 @@ mod tests {
     use super::*;
 
     #[test]
-    fn string_catalog_marker_is_proto_string_for_verify_and_none() {
+    fn string_catalog_marker_follows_utf8_validation() {
         assert_eq!(
             StringCatalogMarker::from_utf8(Utf8Validation::Verify),
             StringCatalogMarker::ProtoString
         );
         assert_eq!(
             StringCatalogMarker::from_utf8(Utf8Validation::None),
-            StringCatalogMarker::ProtoString
+            StringCatalogMarker::ProtoStringUnchecked
         );
     }
 }

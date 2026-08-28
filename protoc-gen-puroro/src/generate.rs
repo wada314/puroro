@@ -5,17 +5,59 @@
 //! and renders plugin files.
 
 use crate::descriptor::CodegenRequest;
+use crate::descriptor::features::Utf8Validation;
 use crate::emit::{generated_file_attrs, prepare_file};
 use crate::error::{Error, Result};
 use crate::module_tree::ModuleForest;
 use crate::module_tree::layout::{ModuleLayout, render};
 use crate::plugin_io::CodeGeneratorResponse;
-use crate::resolved::{Arena, resolve};
+use crate::resolved::{Arena, resolve_with};
+
+/// Generate-time knobs parsed from [`CodegenRequest`] `parameter`.
+struct GenerateOptions {
+    /// proto2 syntax default for `utf8_validation` (spec default is `NONE`).
+    proto2_utf8: Utf8Validation,
+}
+
+fn parse_generate_options(parameter: Option<&str>) -> Result<GenerateOptions> {
+    let mut options = GenerateOptions {
+        proto2_utf8: Utf8Validation::None,
+    };
+    let Some(raw) = parameter else {
+        return Ok(options);
+    };
+    for part in raw.split(',') {
+        let part = part.trim();
+        if part.is_empty() {
+            continue;
+        }
+        let Some((key, value)) = part.split_once('=') else {
+            continue;
+        };
+        let key = key.trim();
+        let value = value.trim();
+        if key == "proto2_utf8" {
+            options.proto2_utf8 = parse_proto2_utf8(value)?;
+        }
+    }
+    Ok(options)
+}
+
+fn parse_proto2_utf8(value: &str) -> Result<Utf8Validation> {
+    match value {
+        "none" | "NONE" => Ok(Utf8Validation::None),
+        "verify" | "VERIFY" | "str" => Ok(Utf8Validation::Verify),
+        other => Err(Error::Codegen(format!(
+            "unknown `proto2_utf8` value `{other}` (expected `none` or `verify`)"
+        ))),
+    }
+}
 
 /// Generate plugin response files from a decoded request.
 pub fn generate(request: &CodegenRequest) -> Result<CodeGeneratorResponse> {
+    let options = parse_generate_options(request.meta.parameter.as_deref())?;
     let arena = Arena::new();
-    let file_set = resolve(&arena, &request.proto_files)?;
+    let file_set = resolve_with(&arena, &request.proto_files, options.proto2_utf8)?;
 
     if request.meta.file_to_generate.is_empty() {
         return Ok(CodeGeneratorResponse::from_files(vec![]));
@@ -219,9 +261,9 @@ mod tests {
     }
 
     #[test]
-    fn utf8_validation_none_still_emits_proto_string() {
-        // Contract: IR records utf8_validation=NONE; plan maps both VERIFY and
-        // NONE to `ProtoString` until NONE is implemented or rejected.
+    fn utf8_validation_none_emits_unchecked_marker() {
+        // Contract: IR records utf8_validation=NONE; plan selects
+        // `ProtoStringUnchecked` (VERIFY keeps `ProtoString`).
         let request = desc::request(vec![ProtoFile {
             syntax: Syntax::Editions(Edition::Edition2023),
             messages: vec![MessageDesc {
@@ -237,8 +279,64 @@ mod tests {
             ..desc::proto_file("t.proto", "")
         }]);
         let content = generate_lib(&request);
-        assert!(content.contains("ProtoString"));
+        assert!(content.contains("ProtoStringUnchecked"));
         assert!(!content.contains("ProtoBytes"));
+        assert!(content.contains("BytesMut"));
+    }
+
+    #[test]
+    fn proto2_string_emits_unchecked_bytes_views() {
+        let mut request = empty_request("M");
+        request.proto_files[0].syntax = Syntax::Proto2;
+        request.proto_files[0].messages[0].fields =
+            vec![desc::field("title", 1, FieldType::String)];
+        let content = generate_lib(&request);
+        assert!(content.contains("ProtoStringUnchecked"));
+        assert!(content.contains("BytesMut"));
+        assert!(!content.contains("StringMut"));
+    }
+
+    #[test]
+    fn proto2_utf8_verify_emits_proto_string() {
+        let mut request = empty_request("M");
+        request.proto_files[0].syntax = Syntax::Proto2;
+        request.proto_files[0].messages[0].fields =
+            vec![desc::field("title", 1, FieldType::String)];
+        request.meta.parameter = Some("proto2_utf8=verify".into());
+        let content = generate_lib(&request);
+        assert!(!content.contains("ProtoStringUnchecked"));
+        assert!(content.contains("ProtoString"));
+        assert!(content.contains("StringMut"));
+    }
+
+    #[test]
+    fn proto2_utf8_does_not_override_editions_none() {
+        let mut request = desc::request(vec![ProtoFile {
+            syntax: Syntax::Editions(Edition::Edition2023),
+            messages: vec![MessageDesc {
+                fields: vec![FieldDesc {
+                    features: FeatureSet {
+                        utf8_validation: Some(Utf8Validation::None),
+                        ..FeatureSet::default()
+                    },
+                    ..desc::field("title", 1, FieldType::String)
+                }],
+                ..desc::message("M")
+            }],
+            ..desc::proto_file("t.proto", "")
+        }]);
+        request.meta.parameter = Some("proto2_utf8=verify".into());
+        let content = generate_lib(&request);
+        assert!(content.contains("ProtoStringUnchecked"));
+        assert!(content.contains("BytesMut"));
+    }
+
+    #[test]
+    fn proto2_utf8_unknown_value_is_error() {
+        let mut request = empty_request("M");
+        request.meta.parameter = Some("proto2_utf8=utf8".into());
+        let err = generate(&request).unwrap_err();
+        assert!(err.to_string().contains("proto2_utf8"));
     }
 
     #[test]
