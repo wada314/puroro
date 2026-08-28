@@ -3,6 +3,7 @@
 use super::message::SingularMutStyle;
 use crate::default_value::CustomDefault;
 use crate::error::Result;
+use crate::module_tree::nested_root_alias;
 use ::proc_macro2::{Ident, Span, TokenStream};
 use ::quote::quote;
 use ::syn::{Item, Type, parse_quote};
@@ -297,12 +298,9 @@ fn render_module_body(oneof: &OneofEmit, bits_ty: &TokenStream) -> Result<TokenS
         })
         .collect();
 
+    let root_alias = nested_root_alias();
     Ok(quote! {
-        // Same `_root` chain as forest modules so `self::_root::…` type paths work.
-        #[allow(unused)]
-        mod _root {
-            pub(super) use super::super::_root::*;
-        }
+        #root_alias
 
         use ::allocator_api2::alloc::Allocator;
         use ::bytes::BufMut;

@@ -65,6 +65,24 @@ pub enum WireTypeKind<'a> {
     },
 }
 
+/// Catalog marker for a protobuf `string` field.
+///
+/// Plan decides the marker; emit only quotes it. `utf8_validation=NONE` stays
+/// [`Self::ProtoString`] until NONE is implemented or rejected.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum StringCatalogMarker {
+    /// `::puroro_rt::ProtoString` (VERIFY semantics).
+    ProtoString,
+}
+
+impl StringCatalogMarker {
+    pub fn from_utf8(utf8: Utf8Validation) -> Self {
+        match utf8 {
+            Utf8Validation::Verify | Utf8Validation::None => Self::ProtoString,
+        }
+    }
+}
+
 /// `FieldPresence` marker baked into `SingularField<…, P, …>`.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum PlannedPresence {
@@ -224,4 +242,21 @@ pub fn sso_bit_const(proto_name: &str) -> String {
 /// Byte length of `BitArray<[u8; N], Lsb0>` for `bit_count` bits (`N == 0` allowed).
 pub fn bit_array_byte_len(bit_count: usize) -> usize {
     bit_count.div_ceil(8)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn string_catalog_marker_is_proto_string_for_verify_and_none() {
+        assert_eq!(
+            StringCatalogMarker::from_utf8(Utf8Validation::Verify),
+            StringCatalogMarker::ProtoString
+        );
+        assert_eq!(
+            StringCatalogMarker::from_utf8(Utf8Validation::None),
+            StringCatalogMarker::ProtoString
+        );
+    }
 }

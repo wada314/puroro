@@ -56,7 +56,7 @@ fn render_node_items(node: &ModuleNode, is_forest_root: bool) -> Vec<Item> {
         items.push(root_alias_item(true));
         items.extend(node.children().iter().map(render_child_mod));
     } else {
-        items.push(root_alias_item(false));
+        items.push(nested_root_alias());
         items.extend(node.items().iter().cloned());
         items.extend(node.children().iter().map(render_child_mod));
     }
@@ -76,6 +76,14 @@ fn render_child_mod(child: &ModuleNode) -> Item {
             #(#items)*
         }
     }
+}
+
+/// `_root` alias for a module nested inside the forest (`mod foo { mod _root { … } }`).
+///
+/// Also used by quote-time nested modules that are not forest children (oneof
+/// bodies, `defaults`) so `self::_root::…` paths work at any depth.
+pub(crate) fn nested_root_alias() -> Item {
+    root_alias_item(false)
 }
 
 /// Private alias of the generated forest root, visible as `self::_root` everywhere.

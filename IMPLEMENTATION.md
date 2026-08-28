@@ -56,7 +56,7 @@ Internal implementation of **generated** protobuf message code: storage, wire I/
 | **`protobuf-core`** | Wire primitives (`Varint`, `Tag`, `WireType`). Used by `puroro` and `puroro-rt`; generated code does not import it. |
 | **`puroro`** | Stable user API: `Message`, `Optional`, `HasDefault`, errors, `WireType`, `UnknownField`. |
 | **`puroro-rt`** | Generated-code runtime: [`fields`](puroro-rt/src/fields.rs), wire `encode` / `decode` helpers, `ProtoDefault`. Depends on `puroro` for shared types. |
-| **`protoc-gen-puroro`** | `protoc` plugin: decode `CodeGeneratorRequest`, resolve types, emit Rust per [DESIGN.md §0](DESIGN.md#0-project-architecture). |
+| **`protoc-gen-puroro`** | `protoc` plugin: decode `CodeGeneratorRequest`, resolve types, generate Rust per [DESIGN.md §0](DESIGN.md#0-project-architecture). |
 
 ---
 
@@ -64,7 +64,25 @@ Internal implementation of **generated** protobuf message code: storage, wire I/
 
 Protobuf fields (except **oneof**) are **independent**: each getter/setter/encode/merge arm touches only its own struct member plus shared [`MessageCommon`](#4-shared-infrastructure). The plugin **composes** runtime catalog types — it does not hand-write per-field logic.
 
-### Layer stack
+### Generator layer stack
+
+`generate()` orchestrates; `emit` only prepares `syn::Item` / `Prepared*` and installs them into the forest.
+
+```
+plugin_io          CodeGeneratorRequest / Response (wire)
+  │
+descriptor         protoc subset (FQN strings, sparse features)
+  │
+resolved           type graph, occurrence, edition features
+  │
+plan               per-message catalog shape + bits + member order
+  │
+prepare (emit)     plan + names → syn::Item + Prepared*
+  │
+forest + layout    ModuleForest → prettyprinted files
+```
+
+### Runtime layer stack
 
 ```
 protoc plugin

@@ -11,6 +11,8 @@
 
 pub mod layout;
 
+pub(crate) use layout::nested_root_alias;
+
 use crate::case::to_snake_case;
 use crate::descriptor::ProtoFqn;
 use ::proc_macro2::Ident;
@@ -51,11 +53,6 @@ pub enum ModuleOrigin {
     Message {
         /// Absolute protobuf FQN (e.g. `.example.Task`).
         proto_fqn: ProtoFqn,
-    },
-    /// Oneof submodule under a message module.
-    Oneof {
-        message_fqn: ProtoFqn,
-        oneof_name: String,
     },
 }
 

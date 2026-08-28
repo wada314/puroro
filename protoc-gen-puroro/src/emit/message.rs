@@ -14,8 +14,9 @@ use crate::descriptor::features::EnumType;
 use crate::error::{Error, Result};
 use crate::field_kind::{
     FieldKind, MessageFieldPlan, MessageMember, PlannedField, PlannedLayout, PlannedOneof,
-    PlannedPresence, RepeatedEncodingKind, WireTypeKind, bit_array_byte_len,
+    PlannedPresence, RepeatedEncodingKind, StringCatalogMarker, WireTypeKind, bit_array_byte_len,
 };
+use crate::module_tree::nested_root_alias;
 use ::proc_macro2::{Ident, Span, TokenStream};
 use ::quote::quote;
 use ::syn::{Item, Lifetime, Type, parse_quote};
@@ -848,13 +849,10 @@ fn render_defaults_module(fields: &[FieldEmit]) -> Option<Item> {
     if items.is_empty() {
         return None;
     }
+    let root_alias = nested_root_alias();
     Some(parse_quote! {
         pub(crate) mod defaults {
-            // Same `_root` chain as oneof submodules so `self::_root::…` enum paths work.
-            #[allow(unused)]
-            mod _root {
-                pub(super) use super::super::_root::*;
-            }
+            #root_alias
             #(#items)*
         }
     })
@@ -988,7 +986,9 @@ fn wire_marker_path(wire: &WireTypeKind<'_>) -> Result<Type> {
         WireTypeKind::Fixed64 => parse_quote! { ::puroro_rt::ProtoFixed64 },
         WireTypeKind::Fixed32 => parse_quote! { ::puroro_rt::ProtoFixed32 },
         WireTypeKind::Bool => parse_quote! { ::puroro_rt::ProtoBool },
-        WireTypeKind::String { .. } => parse_quote! { ::puroro_rt::ProtoString },
+        WireTypeKind::String { utf8 } => match StringCatalogMarker::from_utf8(*utf8) {
+            StringCatalogMarker::ProtoString => parse_quote! { ::puroro_rt::ProtoString },
+        },
         WireTypeKind::Bytes { .. } => parse_quote! { ::puroro_rt::ProtoBytes },
         WireTypeKind::UInt32 => parse_quote! { ::puroro_rt::ProtoUInt32 },
         WireTypeKind::SFixed32 => parse_quote! { ::puroro_rt::ProtoSFixed32 },
