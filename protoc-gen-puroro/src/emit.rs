@@ -215,12 +215,15 @@ impl ModuleNode {
 
 #[cfg(test)]
 mod tests {
+    // Plugin plumbing, codegen errors, and tokens that must not appear.
+    // Behaviour of generated types: `puroro-codegen-tests`. Field planning:
+    // `field_kind::plan`.
     use super::*;
-    use crate::descriptor::features::{EnumType, Utf8Validation};
+    use crate::descriptor::features::Utf8Validation;
     use crate::descriptor::test_helpers as desc;
     use crate::descriptor::{
-        BytesLayout, CodegenRequest, Edition, EnumDesc, FeatureSet, FieldDesc, FieldLabel,
-        FieldType, MessageDesc, ProtoFile, ProtoFqn, StringLayout, Syntax,
+        BytesLayout, CodegenRequest, Edition, FeatureSet, FieldDesc, FieldLabel, FieldType,
+        MessageDesc, ProtoFile, ProtoFqn, StringLayout, Syntax,
     };
     use crate::plugin_io::decode_request;
     use ::protobuf_core::{AsRefExtProtobuf, Field, FieldNumber, FieldValue, WriteExtProtobuf};
@@ -287,261 +290,40 @@ mod tests {
         }])
     }
 
-    #[test]
-    fn emit_empty_message_mentions_type_name() {
-        let response = emit(&empty_request("Empty")).unwrap();
+    fn emit_lib(request: &CodegenRequest) -> String {
+        let response = emit(request).unwrap();
         assert_eq!(response.files.len(), 1);
         assert_eq!(response.files[0].name, "lib.rs");
-        assert!(response.files[0].content.contains("struct Empty"));
-        assert!(response.files[0].content.contains("@generated"));
-        assert!(response.files[0].content.contains("- `empty.proto`"));
+        response.files[0].content.clone()
     }
 
     #[test]
-    fn emit_empty_message_nests_package_modules() {
-        let response = emit(&empty_request_with_package("Empty", "example.v1")).unwrap();
-        let content = &response.files[0].content;
-        assert!(content.contains("pub mod example"));
-        assert!(content.contains("pub mod v1"));
+    fn plugin_response_is_single_lib_rs_with_generated_header() {
+        let content = emit_lib(&empty_request("Empty"));
+        assert!(content.contains("@generated"));
+        assert!(content.contains("- `empty.proto`"));
+    }
+
+    #[test]
+    fn empty_companion_module_is_omitted() {
+        let content = emit_lib(&empty_request_with_package("Empty", "example.v1"));
         assert!(!content.contains("pub mod empty"));
         assert!(!content.contains("pub use empty::Empty"));
-        assert!(content.contains("struct Empty"));
-        let example_idx = content.find("pub mod example").expect("example mod");
-        let struct_idx = content.find("struct Empty").expect("struct Empty");
-        assert!(
-            struct_idx > example_idx,
-            "struct Empty should appear inside the package module tree"
-        );
     }
 
     #[test]
-    fn emit_singular_scalar_fields() {
-        let mut request = empty_request("Scalars");
-        request.meta.file_to_generate = vec!["scalars.proto".into()];
-        request.proto_files[0].name = "scalars.proto".into();
-        request.proto_files[0].messages[0].name = "Scalars".into();
-        request.proto_files[0].messages[0].fields = vec![
-            desc::field("score", 1, FieldType::Int32),
-            FieldDesc {
-                proto3_optional: true,
-                ..desc::field("title", 2, FieldType::String)
-            },
-            desc::field("done", 3, FieldType::Bool),
-            FieldDesc {
-                proto3_optional: true,
-                ..desc::field("payload", 4, FieldType::Bytes)
-            },
-            desc::field("zigzag", 5, FieldType::SInt32),
-        ];
+    fn empty_file_to_generate_yields_no_files() {
+        let mut request = empty_request("Empty");
+        request.meta.file_to_generate.clear();
         let response = emit(&request).unwrap();
-        let content = &response.files[0].content;
-        assert!(content.contains("struct Scalars"));
-        assert!(content.contains("pub const FIELD_SCORE"));
-        assert!(content.contains("ProtoInt32"));
-        assert!(content.contains("ProtoBytes"));
-        assert!(content.contains("ProtoSInt32"));
-        assert!(content.contains("BitPacked"));
-        assert!(content.contains("BIT_PAYLOAD_SSO"));
-        assert!(content.contains("impl ::puroro::BytesMut<A>"));
+        assert!(response.files.is_empty());
     }
 
     #[test]
-    fn emit_string_layout_heap_uses_inline_not_sso() {
-        let mut request = empty_request("HeapString");
-        request.meta.file_to_generate = vec!["t.proto".into()];
-        request.proto_files[0].name = "t.proto".into();
-        request.proto_files[0].messages[0].name = "HeapString".into();
-        request.proto_files[0].messages[0].fields = vec![FieldDesc {
-            proto3_optional: true,
-            string_layout: Some(StringLayout::Heap),
-            ..desc::field("body", 1, FieldType::String)
-        }];
-        let response = emit(&request).unwrap();
-        let content = &response.files[0].content;
-        assert!(content.contains("ProtoString"));
-        assert!(
-            !content.contains("InlineOrHeap"),
-            "string_layout=HEAP must not emit SSO layout: {content}"
-        );
-        assert!(
-            !content.contains("BIT_BODY_SSO"),
-            "string_layout=HEAP must not allocate an SSO bit: {content}"
-        );
-        assert!(content.contains("impl ::core::ops::DerefMut<Target = ::puroro::String<A>>"));
-    }
-
-    #[test]
-    fn emit_bytes_layout_heap_uses_inline_not_sso() {
-        let mut request = empty_request("HeapBytes");
-        request.meta.file_to_generate = vec!["t.proto".into()];
-        request.proto_files[0].name = "t.proto".into();
-        request.proto_files[0].messages[0].name = "HeapBytes".into();
-        request.proto_files[0].messages[0].fields = vec![FieldDesc {
-            proto3_optional: true,
-            bytes_layout: Some(BytesLayout::Heap),
-            ..desc::field("body", 1, FieldType::Bytes)
-        }];
-        let response = emit(&request).unwrap();
-        let content = &response.files[0].content;
-        assert!(content.contains("ProtoBytes"));
-        assert!(
-            !content.contains("InlineOrHeap"),
-            "bytes_layout=HEAP must not emit SSO layout: {content}"
-        );
-        assert!(
-            !content.contains("BIT_BODY_SSO"),
-            "bytes_layout=HEAP must not allocate an SSO bit: {content}"
-        );
-        assert!(
-            content.contains("DerefMut") && content.contains("::allocator_api2::vec::Vec<u8, A>"),
-            "bytes_layout=HEAP must emit DerefMut to Vec: {content}"
-        );
-    }
-
-    #[test]
-    fn emit_open_enum_field() {
-        let request = desc::request(vec![ProtoFile {
-            messages: vec![MessageDesc {
-                fields: vec![FieldDesc {
-                    type_name: Some(ProtoFqn::parse(".demo.Status")),
-                    ..desc::field("status", 1, FieldType::Enum)
-                }],
-                ..desc::message("Holder")
-            }],
-            enums: vec![desc::enumeration(
-                "Status",
-                vec![
-                    desc::enum_value("STATUS_UNSPECIFIED", 0),
-                    desc::enum_value("STATUS_PENDING", 1),
-                ],
-            )],
-            ..desc::proto_file("t.proto", "demo")
-        }]);
-        let response = emit(&request).unwrap();
-        let content = &response.files[0].content;
-        assert!(content.contains("pub struct Status"));
-        assert!(content.contains("pub const UNSPECIFIED"));
-        assert!(content.contains("pub const PENDING"));
-        assert!(content.contains("OpenEnum"));
-        assert!(content.contains("ProtoEnum"));
-        assert!(
-            content.contains("self :: _root :: demo :: Status")
-                || content.contains("self::_root::demo::Status")
-        );
-        assert!(content.contains("::puroro_rt::Open"));
-        assert!(content.contains("::puroro_rt::Implicit"));
-        assert!(content.contains(".optional()"));
-    }
-
-    #[test]
-    fn emit_cross_file_open_and_closed_enums() {
-        let closed = FeatureSet {
-            enum_type: Some(EnumType::Closed),
-            ..FeatureSet::default()
-        };
-        let request = desc::request(vec![
-            ProtoFile {
-                syntax: Syntax::Editions(Edition::Edition2023),
-                enums: vec![desc::enumeration(
-                    "Status",
-                    vec![
-                        desc::enum_value("STATUS_UNSPECIFIED", 0),
-                        desc::enum_value("STATUS_PENDING", 1),
-                    ],
-                )],
-                ..desc::proto_file("status.proto", "demo")
-            },
-            ProtoFile {
-                syntax: Syntax::Editions(Edition::Edition2024),
-                enums: vec![EnumDesc {
-                    features: closed,
-                    ..desc::enumeration(
-                        "Priority",
-                        vec![
-                            desc::enum_value("PRIORITY_UNSPECIFIED", 0),
-                            desc::enum_value("PRIORITY_HIGH", 1),
-                        ],
-                    )
-                }],
-                ..desc::proto_file("priority.proto", "demo")
-            },
-            ProtoFile {
-                syntax: Syntax::Editions(Edition::Edition2023),
-                dependency: vec!["status.proto".into(), "priority.proto".into()],
-                messages: vec![MessageDesc {
-                    fields: vec![
-                        FieldDesc {
-                            type_name: Some(ProtoFqn::parse(".demo.Status")),
-                            ..desc::field("status", 1, FieldType::Enum)
-                        },
-                        FieldDesc {
-                            type_name: Some(ProtoFqn::parse(".demo.Priority")),
-                            ..desc::field("priority", 2, FieldType::Enum)
-                        },
-                    ],
-                    ..desc::message("Holder")
-                }],
-                ..desc::proto_file("holder.proto", "demo")
-            },
-        ]);
-        let response = emit(&request).unwrap();
-        assert_eq!(response.files.len(), 1);
-        assert_eq!(response.files[0].name, "lib.rs");
-        let content = &response.files[0].content;
-        assert!(content.contains("pub struct Status"));
-        assert!(content.contains("pub struct Priority"));
-        assert!(content.contains("OpenEnum"));
-        assert!(content.contains("ClosedEnum"));
-        assert!(content.contains("struct Holder"));
-        assert!(content.contains("::puroro_rt::Open"));
-        assert!(content.contains("::puroro_rt::Closed"));
-    }
-
-    #[test]
-    fn emit_repeated_and_nested_types() {
-        let request = desc::request(vec![ProtoFile {
-            messages: vec![MessageDesc {
-                fields: vec![
-                    FieldDesc {
-                        label: FieldLabel::Repeated,
-                        ..desc::field("tag_ids", 1, FieldType::Int32)
-                    },
-                    FieldDesc {
-                        label: FieldLabel::Repeated,
-                        type_name: Some(ProtoFqn::parse(".demo.Outer.Inner")),
-                        ..desc::field("inners", 2, FieldType::Message)
-                    },
-                    FieldDesc {
-                        type_name: Some(ProtoFqn::parse(".demo.Outer.Kind")),
-                        ..desc::field("kind", 3, FieldType::Enum)
-                    },
-                ],
-                nested_messages: vec![desc::message("Inner")],
-                nested_enums: vec![desc::enumeration(
-                    "Kind",
-                    vec![
-                        desc::enum_value("KIND_UNSPECIFIED", 0),
-                        desc::enum_value("KIND_A", 1),
-                    ],
-                )],
-                ..desc::message("Outer")
-            }],
-            ..desc::proto_file("t.proto", "demo")
-        }]);
-        let response = emit(&request).unwrap();
-        let content = &response.files[0].content;
-        assert!(content.contains("RepeatedField"));
-        assert!(content.contains("::puroro_rt::Packed"));
-        assert!(content.contains("pub struct Inner"));
-        assert!(content.contains("pub struct Kind"));
-        assert!(
-            content.contains("self :: _root :: demo :: outer :: Inner")
-                || content.contains("self::_root::demo::outer::Inner")
-        );
-        assert!(
-            content.contains("self :: _root :: demo :: outer :: Kind")
-                || content.contains("self::_root::demo::outer::Kind")
-        );
+    fn unknown_parameter_is_ignored() {
+        let mut request = empty_request("Empty");
+        request.meta.parameter = Some("not_a_real_option=1".into());
+        let _ = emit_lib(&request);
     }
 
     #[test]
@@ -560,184 +342,41 @@ mod tests {
     }
 
     #[test]
-    fn emit_zero_less_nested_enum() {
-        let request = desc::request(vec![ProtoFile {
-            syntax: Syntax::Proto2,
-            messages: vec![MessageDesc {
-                nested_enums: vec![desc::enumeration(
-                    "Type",
-                    vec![
-                        desc::enum_value("TYPE_DOUBLE", 1),
-                        desc::enum_value("TYPE_FLOAT", 2),
-                    ],
-                )],
-                ..desc::message("Field")
-            }],
-            ..desc::proto_file("t.proto", "demo")
-        }]);
-        let response = emit(&request).unwrap();
-        let content = &response.files[0].content;
-        assert!(content.contains("pub struct Type"));
-        assert!(content.contains("pub const DOUBLE: Self = Self(1i32)"));
-        // proto2 default = first defined enumerator, not wire 0.
-        assert!(content.contains("Self :: DOUBLE") || content.contains("Self::DOUBLE"));
-        assert!(content.contains("Type :: DOUBLE") || content.contains("Type::DOUBLE"));
-        assert!(!content.contains("Self(0)"));
-    }
-
-    #[test]
-    fn emit_peer_message_field() {
-        let request = desc::request(vec![ProtoFile {
-            messages: vec![
-                desc::message("Address"),
-                MessageDesc {
-                    fields: vec![FieldDesc {
-                        type_name: Some(ProtoFqn::parse(".demo.Address")),
-                        ..desc::field("assignee", 1, FieldType::Message)
-                    }],
-                    ..desc::message("Task")
-                },
-            ],
-            ..desc::proto_file("t.proto", "demo")
-        }]);
-        let response = emit(&request).unwrap();
-        let content = &response.files[0].content;
-        assert!(content.contains("pub struct Address"));
-        assert!(content.contains("pub struct Task"));
-        assert!(content.contains("ProtoMessage"));
-        assert!(content.contains("::puroro_rt::Message"));
+    fn heap_string_layout_does_not_emit_sso() {
+        let mut request = empty_request("HeapString");
+        request.proto_files[0].messages[0].fields = vec![FieldDesc {
+            proto3_optional: true,
+            string_layout: Some(StringLayout::Heap),
+            ..desc::field("body", 1, FieldType::String)
+        }];
+        let content = emit_lib(&request);
         assert!(
-            content.contains("self :: _root :: demo :: Address")
-                || content.contains("self::_root::demo::Address")
+            !content.contains("InlineOrHeap"),
+            "string_layout=HEAP must not emit SSO layout: {content}"
         );
-        assert!(content.contains("fn assignee("));
-        assert!(content.contains(".get()"));
-        assert!(content.contains(".get_mut()"));
+        assert!(
+            !content.contains("BIT_BODY_SSO"),
+            "string_layout=HEAP must not allocate an SSO bit: {content}"
+        );
     }
 
     #[test]
-    fn empty_file_to_generate_yields_no_files() {
-        let mut request = empty_request("Empty");
-        request.meta.file_to_generate.clear();
-        let response = emit(&request).unwrap();
-        assert!(response.files.is_empty());
-    }
-
-    #[test]
-    fn unknown_parameter_is_ignored() {
-        let mut request = empty_request("Empty");
-        request.meta.parameter = Some("not_a_real_option=1".into());
-        let response = emit(&request).unwrap();
-        assert_eq!(response.files.len(), 1);
-        assert!(response.files[0].content.contains("struct Empty"));
-    }
-
-    #[test]
-    fn emit_real_oneof_group() {
-        let request = desc::request(vec![ProtoFile {
-            messages: vec![
-                desc::message("Peer"),
-                MessageDesc {
-                    fields: vec![
-                        FieldDesc {
-                            oneof_index: Some(0),
-                            ..desc::field("email", 1, FieldType::String)
-                        },
-                        FieldDesc {
-                            oneof_index: Some(0),
-                            ..desc::field("code", 2, FieldType::Int32)
-                        },
-                        FieldDesc {
-                            oneof_index: Some(0),
-                            ..desc::field("urgent", 3, FieldType::Bool)
-                        },
-                        FieldDesc {
-                            type_name: Some(ProtoFqn::parse(".Peer")),
-                            oneof_index: Some(0),
-                            ..desc::field("peer", 4, FieldType::Message)
-                        },
-                    ],
-                    oneofs: vec![desc::oneof("choice")],
-                    ..desc::message("Holder")
-                },
-            ],
-            ..desc::proto_file("t.proto", "")
-        }]);
-        let response = emit(&request).unwrap();
-        let content = &response.files[0].content;
-        assert!(content.contains("OneofSlot"));
-        assert!(content.contains("OneofGroup"));
-        assert!(content.contains("ChoiceCase"));
-        assert!(content.contains("ChoiceStorage"));
-        assert!(content.contains("BitPacked"));
-        assert!(content.contains("fn email"));
-        assert!(content.contains("fn peer"));
-        assert!(content.contains("fn choice"));
-    }
-
-    #[test]
-    fn emit_map_string_int32() {
-        let request = desc::request(vec![ProtoFile {
-            messages: vec![MessageDesc {
-                fields: vec![FieldDesc {
-                    label: FieldLabel::Repeated,
-                    type_name: Some(ProtoFqn::parse(".Holder.AttributesEntry")),
-                    ..desc::field("attributes", 1, FieldType::Message)
-                }],
-                nested_messages: vec![desc::map_entry(
-                    "AttributesEntry",
-                    desc::field("key", 1, FieldType::String),
-                    desc::field("value", 2, FieldType::Int32),
-                )],
-                ..desc::message("Holder")
-            }],
-            ..desc::proto_file("t.proto", "")
-        }]);
-        let response = emit(&request).unwrap();
-        let content = &response.files[0].content;
-        assert!(content.contains("MapField"));
-        assert!(content.contains("ProtoString"));
-        assert!(content.contains("ProtoInt32"));
-        assert!(content.contains("MapRef"));
-        assert!(content.contains("::puroro::MapMut"));
-        assert!(content.contains("fn attributes"));
-        assert!(content.contains("clear_attributes"));
-        // Synthetic map-entry message must not be emitted as a user type.
-        assert!(!content.contains("struct AttributesEntry"));
-        assert!(!content.contains("RepeatedField"));
-        assert!(!content.contains("MapStrInsert"));
-        assert!(!content.contains("MapEntryInsert"));
-        assert!(!content.contains("MapEntryMut"));
-    }
-
-    #[test]
-    fn emit_map_int32_bool_uses_entry_mut() {
-        let request = desc::request(vec![ProtoFile {
-            messages: vec![MessageDesc {
-                fields: vec![FieldDesc {
-                    label: FieldLabel::Repeated,
-                    type_name: Some(ProtoFqn::parse(".Holder.FlagsEntry")),
-                    ..desc::field("flags", 1, FieldType::Message)
-                }],
-                nested_messages: vec![desc::map_entry(
-                    "FlagsEntry",
-                    desc::field("key", 1, FieldType::Int32),
-                    desc::field("value", 2, FieldType::Bool),
-                )],
-                ..desc::message("Holder")
-            }],
-            ..desc::proto_file("t.proto", "")
-        }]);
-        let response = emit(&request).unwrap();
-        let content = &response.files[0].content;
-        assert!(content.contains("MapField"));
-        assert!(content.contains("::puroro::MapMut"));
-        assert!(content.contains("ProtoInt32"));
-        assert!(content.contains("ProtoBool"));
-        assert!(!content.contains("MapEntryInsert"));
-        assert!(!content.contains("MapStrInsert"));
-        assert!(!content.contains("MapEntryMut"));
-        assert!(!content.contains("struct FlagsEntry"));
+    fn heap_bytes_layout_does_not_emit_sso() {
+        let mut request = empty_request("HeapBytes");
+        request.proto_files[0].messages[0].fields = vec![FieldDesc {
+            proto3_optional: true,
+            bytes_layout: Some(BytesLayout::Heap),
+            ..desc::field("body", 1, FieldType::Bytes)
+        }];
+        let content = emit_lib(&request);
+        assert!(
+            !content.contains("InlineOrHeap"),
+            "bytes_layout=HEAP must not emit SSO layout: {content}"
+        );
+        assert!(
+            !content.contains("BIT_BODY_SSO"),
+            "bytes_layout=HEAP must not allocate an SSO bit: {content}"
+        );
     }
 
     #[test]
@@ -759,48 +398,46 @@ mod tests {
             }],
             ..desc::proto_file("t.proto", "")
         }]);
-        let response = emit(&request).unwrap();
-        let content = &response.files[0].content;
+        let content = emit_lib(&request);
         assert!(content.contains("ProtoString"));
         assert!(!content.contains("ProtoBytes"));
     }
 
     #[test]
-    fn emit_custom_defaults_on_singular_and_oneof() {
+    fn map_does_not_emit_entry_struct_or_retired_apis() {
+        let request = desc::request(vec![ProtoFile {
+            messages: vec![MessageDesc {
+                fields: vec![FieldDesc {
+                    label: FieldLabel::Repeated,
+                    type_name: Some(ProtoFqn::parse(".Holder.AttributesEntry")),
+                    ..desc::field("attributes", 1, FieldType::Message)
+                }],
+                nested_messages: vec![desc::map_entry(
+                    "AttributesEntry",
+                    desc::field("key", 1, FieldType::String),
+                    desc::field("value", 2, FieldType::Int32),
+                )],
+                ..desc::message("Holder")
+            }],
+            ..desc::proto_file("t.proto", "")
+        }]);
+        let content = emit_lib(&request);
+        assert!(!content.contains("struct AttributesEntry"));
+        assert!(!content.contains("RepeatedField"));
+        assert!(!content.contains("MapStrInsert"));
+        assert!(!content.contains("MapEntryInsert"));
+        assert!(!content.contains("MapEntryMut"));
+    }
+
+    #[test]
+    fn type_zero_default_does_not_emit_custom_marker() {
         let mut request = empty_request("Holder");
-        request.meta.file_to_generate = vec!["defaults.proto".into()];
-        request.proto_files[0].name = "defaults.proto".into();
         request.proto_files[0].syntax = Syntax::Proto2;
-        request.proto_files[0].messages[0].name = "Holder".into();
-        request.proto_files[0].messages[0].oneofs = vec![desc::oneof("choice")];
-        request.proto_files[0].messages[0].fields = vec![
-            FieldDesc {
-                default_value: Some("3".into()),
-                ..desc::field("max_retries", 1, FieldType::Int32)
-            },
-            FieldDesc {
-                default_value: Some("0".into()),
-                ..desc::field("zero_int", 2, FieldType::Int32)
-            },
-            FieldDesc {
-                oneof_index: Some(0),
-                default_value: Some("-1".into()),
-                ..desc::field("webhook_id", 3, FieldType::Int32)
-            },
-            FieldDesc {
-                oneof_index: Some(0),
-                ..desc::field("note", 4, FieldType::String)
-            },
-        ];
-        let response = emit(&request).unwrap();
-        let content = &response.files[0].content;
-        assert!(content.contains("mod defaults"));
-        assert!(content.contains("struct MaxRetriesDefault"));
-        assert!(content.contains("const DEFAULT: i32 = 3i32"));
-        assert!(content.contains("MaxRetriesDefault"));
-        assert!(content.contains("struct WebhookIdDefault"));
-        assert!(content.contains("WebhookIdDefault"));
-        // Type-zero `[default = 0]` must not invent a custom marker.
+        request.proto_files[0].messages[0].fields = vec![FieldDesc {
+            default_value: Some("0".into()),
+            ..desc::field("zero_int", 1, FieldType::Int32)
+        }];
+        let content = emit_lib(&request);
         assert!(!content.contains("ZeroIntDefault"));
     }
 
@@ -896,18 +533,5 @@ mod tests {
         let response = emit(&request).unwrap();
         assert_eq!(response.files.len(), 1);
         assert_eq!(response.files[0].name, "lib.rs");
-        let content = &response.files[0].content;
-        assert!(
-            content.contains("struct FileDescriptorProto"),
-            "descriptor.proto types missing: {content}"
-        );
-        assert!(
-            content.contains("struct CodeGeneratorRequest"),
-            "plugin.proto types missing: {content}"
-        );
-        assert!(
-            content.contains("struct CodeGeneratorResponse"),
-            "plugin.proto types missing: {content}"
-        );
     }
 }
