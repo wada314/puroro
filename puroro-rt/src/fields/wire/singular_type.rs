@@ -53,7 +53,9 @@ use super::wire_payload::CopyWirePayload;
 /// types are on [`ValueLayout`](crate::fields::shared::value_layout::ValueLayout):
 /// - [`Inline`](crate::fields::shared::value_layout::Inline) + [`PayloadAccess`]:
 ///   numerics / enums / bool (`i32` / `E` / `bool`), heap string (`UnmanagedString`),
-///   bytes (`UnmanagedVec`), nested messages (`UnmanagedBox<M, A>`)
+///   bytes (`UnmanagedVec`), inlined nested messages (`M`)
+/// - [`Boxed`](crate::fields::shared::value_layout::Boxed): nested message
+///   [`UnmanagedBox<M, A>`](::unmanaged::UnmanagedBox)
 /// - [`BitPacked`](crate::fields::shared::value_layout::BitPacked): `()` + bit handle
 ///   (packed singular / oneof `bool`)
 /// - [`InlineOrHeap`](crate::fields::shared::value_layout::InlineOrHeap):

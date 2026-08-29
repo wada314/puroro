@@ -7,8 +7,10 @@
 //! Mapping table: [IMPLEMENTATION.md §8](../../IMPLEMENTATION.md#8-proto-field--catalog-mapping).
 
 mod plan;
+mod storage;
 
 pub use plan::{MessageFieldPlan, MessageMember, PlannedField, PlannedOneof, plan_fields};
+pub use storage::{MessageStoragePlan, plan_message_storage};
 
 use crate::case::to_upper_snake;
 use crate::default_value::CustomDefault;
@@ -105,10 +107,12 @@ pub enum PlannedPresence {
     Message,
 }
 
-/// `ValueLayout` on `SingularField` (`Inline` default vs `BitPacked` / SSO).
+/// `ValueLayout` on `SingularField` (`Inline` default vs `Boxed` / `BitPacked` / SSO).
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum PlannedLayout {
     Inline,
+    /// Nested message behind `UnmanagedBox` (`SingularField<…, Boxed>`).
+    Boxed,
     BitPacked {
         value_bit: usize,
         /// e.g. `BIT_DONE_VALUE`

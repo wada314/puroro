@@ -18,7 +18,7 @@ pub use arena::Arena;
 pub use resolve::{resolve, resolve_with};
 
 use crate::descriptor::features::{EnumType, RepeatedFieldEncoding, Utf8Validation};
-use crate::descriptor::{BytesLayout, ProtoFqn, StringLayout, Syntax};
+use crate::descriptor::{BytesLayout, MessageLayout, ProtoFqn, StringLayout, Syntax};
 use ::std::fmt;
 
 /// Cardinality + singular presence after resolve.
@@ -97,6 +97,10 @@ pub struct Field<'a> {
     string_layout: Option<StringLayout>,
     /// `(puroro.bytes_layout)`, if set.
     bytes_layout: Option<BytesLayout>,
+    /// `(puroro.message_layout)`, if set.
+    message_layout: Option<MessageLayout>,
+    /// proto2 / editions `LEGACY_REQUIRED` (needed when inlining a message).
+    legacy_required: bool,
 }
 
 /// Resolved type of a field.
@@ -259,6 +263,16 @@ impl<'a> Field<'a> {
     /// `(puroro.bytes_layout)`, if set on the descriptor.
     pub fn bytes_layout(&self) -> Option<BytesLayout> {
         self.bytes_layout
+    }
+
+    /// `(puroro.message_layout)`, if set on the descriptor.
+    pub fn message_layout(&self) -> Option<MessageLayout> {
+        self.message_layout
+    }
+
+    /// Whether this field is proto2 / editions `LEGACY_REQUIRED`.
+    pub fn is_legacy_required(&self) -> bool {
+        self.legacy_required
     }
 }
 

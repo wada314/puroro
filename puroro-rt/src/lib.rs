@@ -34,10 +34,11 @@ pub use fields::oneof_variant::OneofVariant;
 pub use fields::repeated::{Expanded, Packed, RepeatedField, RepeatedFieldMut, RepeatedFieldRef};
 pub use fields::shared::field_presence::{Explicit, Implicit, LegacyRequired, Message, Oneof};
 pub use fields::shared::{
-    BitPacked, CloneFieldsVisitor, DebugStructVisitor, EncodeRawVisitor, EncodedLenVisitor,
-    FieldCloneIn, FieldDeallocVisitor, FieldDeallocate, FieldEncode, FieldEqVisitor,
-    FieldPairVisitor, FieldPairVisitorMut, FieldVisitor, FieldVisitorMut, Inline, InlineOrHeap,
-    MessageCommon, MessageCommonAlloc, MessageCommonBits, SSO_HEAP, SSO_INLINE, ValueLayout,
+    AddressableSlot, BitPacked, Boxed, CloneFieldsVisitor, DebugStructVisitor, EncodeRawVisitor,
+    EncodedLenVisitor, FieldCloneIn, FieldDeallocVisitor, FieldDeallocate, FieldEncode,
+    FieldEqVisitor, FieldPairVisitor, FieldPairVisitorMut, FieldVisitor, FieldVisitorMut, Inline,
+    InlineOrHeap, MessageCommon, MessageCommonAlloc, MessageCommonBits, SSO_HEAP, SSO_INLINE,
+    ValueLayout,
 };
 pub use fields::singular::{
     SingularField, SingularFieldAccess, SingularFieldMut, SingularFieldRef,

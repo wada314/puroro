@@ -26,10 +26,11 @@ fn allocator_is_stored_once() {
     let padded = mem::size_of::<Task<Padded>>();
     let delta = padded - global;
     // MessageCommon stores one `A`. Map fields also own a HashMap-embedded `A`
-    // (by design — maps are uncommon). Other heap fields do not embed `A`.
-    // Expect: MessageCommon + one map ≈ 2× sizeof(Padded).
+    // (by design — maps are uncommon). An **inlined** nested message embeds its
+    // own `MessageCommon` (and therefore another `A`) — not a field-wrapper leak.
+    // Expect: parent common + map + inlined `Point` ≈ 3× sizeof(Padded).
     assert!(
-        delta <= 128 + 16,
-        "Task<Padded> grew by {delta} bytes over Task<Global>; allocator appears duplicated beyond MessageCommon + map"
+        delta <= 192 + 16,
+        "Task<Padded> grew by {delta} bytes over Task<Global>; allocator appears duplicated beyond MessageCommon + map + inlined origin"
     );
 }

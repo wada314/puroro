@@ -7,7 +7,7 @@ use ::bytes::{Buf, BufMut};
 use ::puroro::{DecodeBuf, DecodeError, Message};
 use ::puroro_rt::decode::{decode_tag, skip_field_and_save};
 use ::puroro_rt::{
-    EncodeCtx, Explicit, FieldDeallocate, FieldEncode, Implicit, InlineOrHeap,
+    Boxed, EncodeCtx, Explicit, FieldDeallocate, FieldEncode, Implicit, InlineOrHeap,
     Message as MessagePresence, MessageCommon, MessageEncode, MessageMerge, Packed, ProtoBytes,
     ProtoInt32, ProtoMessage, ProtoString, ProtoUInt64, RepeatedField, SingularField,
 };
@@ -218,7 +218,7 @@ impl<A: Allocator + Clone> Message for FlatScalars<A> {
 /// Self-referential optional child (field 1) plus a leaf `value`.
 pub struct Nest<A: Allocator + Clone = Global> {
     _common: MessageCommon<BitArray<[u8; 1], Lsb0>, A>,
-    child: SingularField<ProtoMessage<Nest<A>>, MessagePresence, 1, A>,
+    child: SingularField<ProtoMessage<Nest<A>>, MessagePresence, 1, A, Boxed>,
     value: SingularField<ProtoInt32, Implicit, 2, A>,
 }
 

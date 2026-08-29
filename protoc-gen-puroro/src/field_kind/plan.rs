@@ -1,8 +1,8 @@
 //! Build a [`MessageFieldPlan`] from a resolved message.
 
 use super::{
-    FieldKind, PlannedLayout, PlannedPresence, RepeatedEncodingKind, WireTypeKind,
-    field_number_const, value_bit_const,
+    FieldKind, MessageStoragePlan, PlannedLayout, PlannedPresence, RepeatedEncodingKind,
+    WireTypeKind, field_number_const, value_bit_const,
 };
 use crate::default_value::interpret_custom_default;
 use crate::descriptor::{BytesLayout, StringLayout};
@@ -94,8 +94,12 @@ impl<'a> PlannedOneof<'a> {
 /// Map fields become [`FieldKind::Map`]; synthetic map-entry nested messages are
 /// still present on the resolved graph but skipped at emit. Editions
 /// `enum_type`, `repeated_field_encoding`, and `utf8_validation` come from the
-/// resolved field / enum.
-pub fn plan_fields<'a>(message: &'a Message<'a>) -> Result<MessageFieldPlan<'a>> {
+/// resolved field / enum. Nested-message boxed vs inline comes from
+/// [`MessageStoragePlan`] (SCC + `(puroro.message_layout)` + heuristic).
+pub fn plan_fields<'a>(
+    message: &'a Message<'a>,
+    storage: &MessageStoragePlan,
+) -> Result<MessageFieldPlan<'a>> {
     let mut fields: Vec<&'a Field<'a>> = message.fields().collect();
     fields.sort_by_key(|f| f.number());
 
@@ -103,7 +107,7 @@ pub fn plan_fields<'a>(message: &'a Message<'a>) -> Result<MessageFieldPlan<'a>>
     let mut next_bit = 0usize;
     let mut planned_by_number: HashMap<i32, PlannedField<'a>> = HashMap::new();
     for field in &fields {
-        let planned = plan_field(field, &mut next_bit)?;
+        let planned = plan_field(message, field, &mut next_bit, storage)?;
         if planned_by_number.insert(field.number(), planned).is_some() {
             return Err(Error::Codegen(format!(
                 "duplicate field number {} in `{}`",
@@ -187,7 +191,12 @@ pub fn plan_fields<'a>(message: &'a Message<'a>) -> Result<MessageFieldPlan<'a>>
     })
 }
 
-fn plan_field<'a>(field: &'a Field<'a>, next_bit: &mut usize) -> Result<PlannedField<'a>> {
+fn plan_field<'a>(
+    owner: &'a Message<'a>,
+    field: &'a Field<'a>,
+    next_bit: &mut usize,
+    storage: &MessageStoragePlan,
+) -> Result<PlannedField<'a>> {
     let field_const = field_number_const(field.name());
 
     if field.number() <= 0 {
@@ -226,8 +235,26 @@ fn plan_field<'a>(field: &'a Field<'a>, next_bit: &mut usize) -> Result<PlannedF
         }
         FieldOccurrence::Singular(presence) => {
             let wire = WireTypeKind::from_field(field);
-            let planned_presence = PlannedPresence::from_singular(presence, field.name(), next_bit);
-            let layout = if matches!(wire, WireTypeKind::Bool) {
+            let inline_nested = matches!(wire, WireTypeKind::Message(_))
+                && !matches!(presence, SingularPresence::Oneof)
+                && storage.is_inline(owner, field.number());
+            let planned_presence = if inline_nested {
+                let bit_presence = if field.is_legacy_required() {
+                    SingularPresence::LegacyRequired
+                } else {
+                    SingularPresence::Explicit
+                };
+                PlannedPresence::from_singular(bit_presence, field.name(), next_bit)
+            } else {
+                PlannedPresence::from_singular(presence, field.name(), next_bit)
+            };
+            let layout = if matches!(wire, WireTypeKind::Message(_)) {
+                if inline_nested {
+                    PlannedLayout::Inline
+                } else {
+                    PlannedLayout::Boxed
+                }
+            } else if matches!(wire, WireTypeKind::Bool) {
                 let value_bit = *next_bit;
                 *next_bit += 1;
                 PlannedLayout::BitPacked {
@@ -364,10 +391,12 @@ mod tests {
     };
     use crate::descriptor::test_helpers as desc;
     use crate::descriptor::{
-        BytesLayout, Edition, EnumDesc, FieldDesc, FieldLabel, FieldType, MessageDesc, ProtoFile,
-        ProtoFqn, StringLayout, Syntax,
+        BytesLayout, Edition, EnumDesc, FieldDesc, FieldLabel, FieldType, MessageDesc,
+        MessageLayout, ProtoFile, ProtoFqn, StringLayout, Syntax,
     };
-    use crate::field_kind::{PlannedLayout, PlannedPresence, bit_array_byte_len};
+    use crate::field_kind::{
+        PlannedLayout, PlannedPresence, bit_array_byte_len, plan_message_storage,
+    };
     use crate::resolved::{Arena, FileSet, resolve};
 
     fn message<'a>(set: &FileSet<'a>, name: &str) -> &'a Message<'a> {
@@ -396,7 +425,7 @@ mod tests {
         let files = [proto3_file(vec![desc::message("Empty")])];
         let set = resolve(&arena, &files).unwrap();
         let msg = message(&set, "Empty");
-        let plan = plan_fields(msg).unwrap();
+        let plan = plan_fields(msg, &plan_message_storage(&set)).unwrap();
         assert!(plan.members().is_empty());
         assert_eq!(plan.bit_count(), 0);
         assert_eq!(bit_array_byte_len(plan.bit_count()), 0);
@@ -429,7 +458,7 @@ mod tests {
         }])];
         let set = resolve(&arena, &files).unwrap();
         let msg = message(&set, "Address");
-        let plan = plan_fields(msg).unwrap();
+        let plan = plan_fields(msg, &plan_message_storage(&set)).unwrap();
         // street/city: presence + SSO heap bit each; postal_code/latitude: presence only.
         assert_eq!(plan.bit_count(), 6);
         assert_eq!(bit_array_byte_len(6), 1);
@@ -488,7 +517,7 @@ mod tests {
         }])];
         let set = resolve(&arena, &files).unwrap();
         let msg = message(&set, "M");
-        let plan = plan_fields(msg).unwrap();
+        let plan = plan_fields(msg, &plan_message_storage(&set)).unwrap();
         // Presence + SSO heap bit — same as an absent option.
         assert_eq!(plan.bit_count(), 2);
         let MessageMember::Field(body) = &plan.members()[0] else {
@@ -517,7 +546,7 @@ mod tests {
         }])];
         let set = resolve(&arena, &files).unwrap();
         let msg = message(&set, "M");
-        let plan = plan_fields(msg).unwrap();
+        let plan = plan_fields(msg, &plan_message_storage(&set)).unwrap();
         // Presence bit only — no SSO heap bit.
         assert_eq!(plan.bit_count(), 1);
         let MessageMember::Field(body) = &plan.members()[0] else {
@@ -546,7 +575,7 @@ mod tests {
         }])];
         let set = resolve(&arena, &files).unwrap();
         let msg = message(&set, "M");
-        let plan = plan_fields(msg).unwrap();
+        let plan = plan_fields(msg, &plan_message_storage(&set)).unwrap();
         assert_eq!(plan.bit_count(), 2);
         let MessageMember::Field(body) = &plan.members()[0] else {
             panic!("expected field");
@@ -574,7 +603,7 @@ mod tests {
         }])];
         let set = resolve(&arena, &files).unwrap();
         let msg = message(&set, "M");
-        let plan = plan_fields(msg).unwrap();
+        let plan = plan_fields(msg, &plan_message_storage(&set)).unwrap();
         assert_eq!(plan.bit_count(), 1);
         let MessageMember::Field(body) = &plan.members()[0] else {
             panic!("expected field");
@@ -615,7 +644,7 @@ mod tests {
         }])];
         let set = resolve(&arena, &files).unwrap();
         let msg = message(&set, "Task");
-        let plan = plan_fields(msg).unwrap();
+        let plan = plan_fields(msg, &plan_message_storage(&set)).unwrap();
 
         // score: no bits
         // email_address (oneof string): SSO heap bit 0
@@ -725,7 +754,7 @@ mod tests {
         }])];
         let set = resolve(&arena, &files).unwrap();
         let msg = message(&set, "R");
-        let plan = plan_fields(msg).unwrap();
+        let plan = plan_fields(msg, &plan_message_storage(&set)).unwrap();
         let MessageMember::Field(tags) = &plan.members()[0] else {
             panic!();
         };
@@ -794,7 +823,7 @@ mod tests {
         };
         let set = resolve(&arena, &[file]).unwrap();
         let msg = message(&set, "T");
-        let plan = plan_fields(msg).unwrap();
+        let plan = plan_fields(msg, &plan_message_storage(&set)).unwrap();
 
         let MessageMember::Field(scores) = &plan.members()[0] else {
             panic!();
@@ -851,7 +880,7 @@ mod tests {
         }])];
         let set = resolve(&arena, &files).unwrap();
         let msg = message(&set, "T");
-        let plan = plan_fields(msg).unwrap();
+        let plan = plan_fields(msg, &plan_message_storage(&set)).unwrap();
         assert_eq!(plan.members().len(), 1);
         let MessageMember::Field(score) = &plan.members()[0] else {
             panic!("proto3 optional must stay a top-level field, not OneofSlot");
@@ -886,7 +915,7 @@ mod tests {
         }];
         let set = resolve(&arena, &files).unwrap();
         let msg = message(&set, "T");
-        let plan = plan_fields(msg).unwrap();
+        let plan = plan_fields(msg, &plan_message_storage(&set)).unwrap();
         let MessageMember::Field(status) = &plan.members()[0] else {
             panic!();
         };
@@ -919,7 +948,7 @@ mod tests {
         }])];
         let set = resolve(&arena, &files).unwrap();
         let msg = message(&set, "Holder");
-        let plan = plan_fields(msg).unwrap();
+        let plan = plan_fields(msg, &plan_message_storage(&set)).unwrap();
         assert_eq!(plan.bit_count(), 0);
         let MessageMember::Field(attrs) = &plan.members()[0] else {
             panic!("map must be a top-level field");
@@ -951,7 +980,7 @@ mod tests {
         }])];
         let set = resolve(&arena, &files).unwrap();
         let msg = message(&set, "Holder");
-        let plan = plan_fields(msg).unwrap();
+        let plan = plan_fields(msg, &plan_message_storage(&set)).unwrap();
         let MessageMember::Field(labels) = &plan.members()[0] else {
             panic!("map must be a top-level field");
         };
@@ -982,7 +1011,7 @@ mod tests {
         }])];
         let set = resolve(&arena, &files).unwrap();
         let msg = message(&set, "Holder");
-        let plan = plan_fields(msg).unwrap();
+        let plan = plan_fields(msg, &plan_message_storage(&set)).unwrap();
         let MessageMember::Field(flags) = &plan.members()[0] else {
             panic!("map must be a top-level field");
         };
@@ -990,6 +1019,266 @@ mod tests {
             FieldKind::Map {
                 key: WireTypeKind::Int32,
                 value: WireTypeKind::Bool,
+            } => {}
+            other => panic!("{other:?}"),
+        }
+    }
+
+    fn msg_field(name: &str, number: i32, type_name: &str) -> FieldDesc {
+        FieldDesc {
+            type_name: Some(ProtoFqn::parse(type_name)),
+            ..desc::field(name, number, FieldType::Message)
+        }
+    }
+
+    fn point_message() -> MessageDesc {
+        MessageDesc {
+            fields: vec![
+                desc::field("x", 1, FieldType::Int32),
+                desc::field("y", 2, FieldType::Int32),
+            ],
+            ..desc::message("Point")
+        }
+    }
+
+    fn address_message() -> MessageDesc {
+        MessageDesc {
+            fields: vec![
+                FieldDesc {
+                    proto3_optional: true,
+                    ..desc::field("street", 1, FieldType::String)
+                },
+                FieldDesc {
+                    proto3_optional: true,
+                    ..desc::field("city", 2, FieldType::String)
+                },
+            ],
+            ..desc::message("Address")
+        }
+    }
+
+    #[test]
+    fn tiny_scalar_child_is_auto_inlined() {
+        let arena = Arena::new();
+        let files = [proto3_file(vec![
+            point_message(),
+            MessageDesc {
+                fields: vec![msg_field("origin", 1, ".example.Point")],
+                ..desc::message("Task")
+            },
+        ])];
+        let set = resolve(&arena, &files).unwrap();
+        let plan = plan_fields(message(&set, "Task"), &plan_message_storage(&set)).unwrap();
+        assert_eq!(plan.bit_count(), 1);
+        let MessageMember::Field(origin) = &plan.members()[0] else {
+            panic!();
+        };
+        match origin.kind() {
+            FieldKind::Singular {
+                wire: WireTypeKind::Message(_),
+                presence: PlannedPresence::Explicit { bit: 0, bit_const },
+                layout: PlannedLayout::Inline,
+                custom_default: None,
+            } => assert_eq!(bit_const, "BIT_ORIGIN"),
+            other => panic!("{other:?}"),
+        }
+    }
+
+    #[test]
+    fn address_like_child_stays_boxed() {
+        let arena = Arena::new();
+        let files = [proto3_file(vec![
+            address_message(),
+            MessageDesc {
+                fields: vec![msg_field("assignee", 1, ".example.Address")],
+                ..desc::message("Task")
+            },
+        ])];
+        let set = resolve(&arena, &files).unwrap();
+        let plan = plan_fields(message(&set, "Task"), &plan_message_storage(&set)).unwrap();
+        assert_eq!(plan.bit_count(), 0);
+        let MessageMember::Field(assignee) = &plan.members()[0] else {
+            panic!();
+        };
+        match assignee.kind() {
+            FieldKind::Singular {
+                presence: PlannedPresence::Message,
+                layout: PlannedLayout::Boxed,
+                ..
+            } => {}
+            other => panic!("{other:?}"),
+        }
+    }
+
+    #[test]
+    fn message_layout_force_inline_and_boxed() {
+        let arena = Arena::new();
+        let files = [proto3_file(vec![
+            point_message(),
+            address_message(),
+            MessageDesc {
+                fields: vec![
+                    FieldDesc {
+                        message_layout: Some(MessageLayout::Boxed),
+                        ..msg_field("forced_box", 1, ".example.Point")
+                    },
+                    FieldDesc {
+                        message_layout: Some(MessageLayout::Inline),
+                        ..msg_field("forced_inline", 2, ".example.Address")
+                    },
+                ],
+                ..desc::message("Holder")
+            },
+        ])];
+        let set = resolve(&arena, &files).unwrap();
+        let plan = plan_fields(message(&set, "Holder"), &plan_message_storage(&set)).unwrap();
+        assert_eq!(plan.bit_count(), 1);
+        let MessageMember::Field(boxed) = &plan.members()[0] else {
+            panic!();
+        };
+        match boxed.kind() {
+            FieldKind::Singular {
+                presence: PlannedPresence::Message,
+                layout: PlannedLayout::Boxed,
+                ..
+            } => {}
+            other => panic!("{other:?}"),
+        }
+        let MessageMember::Field(inlined) = &plan.members()[1] else {
+            panic!();
+        };
+        match inlined.kind() {
+            FieldKind::Singular {
+                presence: PlannedPresence::Explicit { bit: 0, .. },
+                layout: PlannedLayout::Inline,
+                ..
+            } => {}
+            other => panic!("{other:?}"),
+        }
+    }
+
+    #[test]
+    fn recursive_inline_hint_is_ignored() {
+        let arena = Arena::new();
+        let files = [proto3_file(vec![MessageDesc {
+            fields: vec![FieldDesc {
+                message_layout: Some(MessageLayout::Inline),
+                ..msg_field("child", 1, ".example.Nest")
+            }],
+            ..desc::message("Nest")
+        }])];
+        let set = resolve(&arena, &files).unwrap();
+        let plan = plan_fields(message(&set, "Nest"), &plan_message_storage(&set)).unwrap();
+        assert_eq!(plan.bit_count(), 0);
+        let MessageMember::Field(child) = &plan.members()[0] else {
+            panic!();
+        };
+        match child.kind() {
+            FieldKind::Singular {
+                presence: PlannedPresence::Message,
+                layout: PlannedLayout::Boxed,
+                ..
+            } => {}
+            other => panic!("{other:?}"),
+        }
+    }
+
+    #[test]
+    fn mutual_recursion_stays_boxed() {
+        let arena = Arena::new();
+        let files = [proto3_file(vec![
+            MessageDesc {
+                fields: vec![FieldDesc {
+                    message_layout: Some(MessageLayout::Inline),
+                    ..msg_field("b", 1, ".example.B")
+                }],
+                ..desc::message("A")
+            },
+            MessageDesc {
+                fields: vec![FieldDesc {
+                    message_layout: Some(MessageLayout::Inline),
+                    ..msg_field("a", 1, ".example.A")
+                }],
+                ..desc::message("B")
+            },
+        ])];
+        let set = resolve(&arena, &files).unwrap();
+        let storage = plan_message_storage(&set);
+        for name in ["A", "B"] {
+            let plan = plan_fields(message(&set, name), &storage).unwrap();
+            let MessageMember::Field(f) = &plan.members()[0] else {
+                panic!();
+            };
+            match f.kind() {
+                FieldKind::Singular {
+                    layout: PlannedLayout::Boxed,
+                    ..
+                } => {}
+                other => panic!("{name}: {other:?}"),
+            }
+        }
+    }
+
+    #[test]
+    fn oneof_message_variant_is_always_boxed() {
+        let arena = Arena::new();
+        let files = [proto3_file(vec![
+            point_message(),
+            MessageDesc {
+                fields: vec![FieldDesc {
+                    oneof_index: Some(0),
+                    message_layout: Some(MessageLayout::Inline),
+                    ..msg_field("postal", 1, ".example.Point")
+                }],
+                oneofs: vec![desc::oneof("note")],
+                ..desc::message("Holder")
+            },
+        ])];
+        let set = resolve(&arena, &files).unwrap();
+        let plan = plan_fields(message(&set, "Holder"), &plan_message_storage(&set)).unwrap();
+        assert_eq!(plan.bit_count(), 0);
+        let MessageMember::Oneof(note) = &plan.members()[0] else {
+            panic!("expected oneof");
+        };
+        match note.variants()[0].kind() {
+            FieldKind::Singular {
+                presence: PlannedPresence::Oneof,
+                layout: PlannedLayout::Boxed,
+                ..
+            } => {}
+            other => panic!("{other:?}"),
+        }
+    }
+
+    #[test]
+    fn five_scalars_are_not_auto_inlined() {
+        let arena = Arena::new();
+        let files = [proto3_file(vec![
+            MessageDesc {
+                fields: vec![
+                    desc::field("a", 1, FieldType::Int32),
+                    desc::field("b", 2, FieldType::Int32),
+                    desc::field("c", 3, FieldType::Int32),
+                    desc::field("d", 4, FieldType::Int32),
+                    desc::field("e", 5, FieldType::Int32),
+                ],
+                ..desc::message("Wide")
+            },
+            MessageDesc {
+                fields: vec![msg_field("wide", 1, ".example.Wide")],
+                ..desc::message("Holder")
+            },
+        ])];
+        let set = resolve(&arena, &files).unwrap();
+        let plan = plan_fields(message(&set, "Holder"), &plan_message_storage(&set)).unwrap();
+        let MessageMember::Field(wide) = &plan.members()[0] else {
+            panic!();
+        };
+        match wide.kind() {
+            FieldKind::Singular {
+                layout: PlannedLayout::Boxed,
+                presence: PlannedPresence::Message,
+                ..
             } => {}
             other => panic!("{other:?}"),
         }

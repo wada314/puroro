@@ -13,7 +13,7 @@ use ::puroro_rt::INLINE_CAP;
 use ::puroro_rt::Varint;
 use ::puroro_rt::encode::{encode_varint_field, field_number_const};
 use ::puroro_sample_generated::task::{Notification, NotificationCase};
-use ::puroro_sample_generated::{Address, Priority, Status, Task};
+use ::puroro_sample_generated::{Address, Point, Priority, Status, Task};
 
 /// Appends `v` as a base-128 varint (test helper; mirrors wire encoding).
 fn encode_u64_varint(mut v: u64, buf: &mut Vec<u8>) {
@@ -660,4 +660,54 @@ fn open_enum_unknown_stays_in_field() {
     assert!(task.status().is_set());
     assert_eq!(task.status().get(), Status::from(99));
     assert!(task.unknown_fields().next().is_none());
+}
+
+#[test]
+fn inlined_origin_unset_omits_from_wire() {
+    let mut task = Task::new();
+    task.owner_id_mut().push_str("x");
+    assert!(task.origin().is_none());
+    let decoded: Task = Task::decode(&task.encode_to_vec()[..]).expect("decode");
+    assert!(decoded.origin().is_none());
+}
+
+#[test]
+fn inlined_origin_roundtrip_and_assign() {
+    let mut task = Task::new();
+    task.owner_id_mut().push_str("x");
+    *task.origin_mut().x_mut() = 3;
+    *task.origin_mut().y_mut() = 7;
+
+    let decoded: Task = Task::decode(&task.encode_to_vec()[..]).expect("decode");
+    let o = decoded.origin().expect("origin set");
+    assert_eq!(o.x(), 3);
+    assert_eq!(o.y(), 7);
+
+    let mut p = Point::new();
+    *p.x_mut() = 11;
+    *p.y_mut() = 13;
+    *task.origin_mut() = p;
+    assert_eq!(task.origin().unwrap().x(), 11);
+    assert_eq!(task.origin().unwrap().y(), 13);
+}
+
+#[test]
+fn inlined_origin_merge_into_and_clear() {
+    let mut task = Task::new();
+    task.owner_id_mut().push_str("x");
+    *task.origin_mut().x_mut() = 1;
+
+    let mut other = Task::new();
+    other.owner_id_mut().push_str("x");
+    *other.origin_mut().y_mut() = 2;
+
+    task.merge_from(&mut &other.encode_to_vec()[..]).unwrap();
+    let o = task.origin().unwrap();
+    assert_eq!(o.x(), 1);
+    assert_eq!(o.y(), 2);
+
+    task.clear_origin();
+    assert!(task.origin().is_none());
+    let decoded: Task = Task::decode(&task.encode_to_vec()[..]).expect("decode");
+    assert!(decoded.origin().is_none());
 }

@@ -26,8 +26,21 @@ enum BytesLayout {
   BYTES_LAYOUT_HEAP = 2;
 }
 
+// Layout of a singular nested message field in generated Rust.
+//
+// Unset and `MESSAGE_LAYOUT_UNSPECIFIED` let the generator pick (auto-inline
+// a tiny scalar-only child, otherwise boxed). `MESSAGE_LAYOUT_INLINE` requests
+// embedding; `MESSAGE_LAYOUT_BOXED` pins a heap box. Oneof / repeated / map /
+// same-SCC (recursive) fields always box and ignore INLINE.
+enum MessageLayout {
+  MESSAGE_LAYOUT_UNSPECIFIED = 0;
+  MESSAGE_LAYOUT_INLINE = 1;
+  MESSAGE_LAYOUT_BOXED = 2;
+}
+
 extend google.protobuf.FieldOptions {
   // Custom-option numbers 50000–99999 are for internal use.
   optional StringLayout string_layout = 51400;
   optional BytesLayout bytes_layout = 51401;
+  optional MessageLayout message_layout = 51402;
 }

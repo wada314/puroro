@@ -24,8 +24,6 @@ use ::protobuf_core::Varint;
 
 use ::puroro::DecodeError;
 
-use crate::fields::shared::value_slot::AddressableSlot;
-
 use super::wire_payload::{CopyWirePayload, Fixed32Payload, Fixed64Payload, VarintPayload};
 
 // ---------------------------------------------------------------------------
@@ -49,8 +47,6 @@ pub trait OpenEnum: ProtoEnumStorage + From<i32> {}
 
 /// Closed enum: unknown wire values fail [`TryFrom`]`<i32>` and become unknowns.
 pub trait ClosedEnum: ProtoEnumStorage + TryFrom<i32, Error = i32> {}
-
-impl<E: ProtoEnumStorage> AddressableSlot for E {}
 
 // Enum storage types are `Copy` + `Default`; `CloneIn` / `DefaultIn` /
 // `DeallocateIn` come from `unmanaged` blankets.

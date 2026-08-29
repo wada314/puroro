@@ -316,6 +316,8 @@ impl<'a, 'd> ResolveCtx<'a, 'd> {
             utf8_validation: Utf8Validation::resolve(field, &features),
             string_layout: field.string_layout,
             bytes_layout: field.bytes_layout,
+            message_layout: field.message_layout,
+            legacy_required: features.field_presence == FieldPresence::LegacyRequired,
         })
     }
 

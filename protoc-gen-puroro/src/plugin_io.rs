@@ -6,8 +6,9 @@
 use crate::descriptor::features::FeatureSet;
 use crate::descriptor::{
     BYTES_LAYOUT_OPTION_NUMBER, BytesLayout, CodegenMeta, CodegenRequest, Edition, EnumDesc,
-    EnumValueDesc, FieldDesc, FieldLabel, FieldType, MessageDesc, OneofDesc, ProtoFile, ProtoFqn,
-    STRING_LAYOUT_OPTION_NUMBER, StringLayout, Syntax,
+    EnumValueDesc, FieldDesc, FieldLabel, FieldType, MESSAGE_LAYOUT_OPTION_NUMBER, MessageDesc,
+    MessageLayout, OneofDesc, ProtoFile, ProtoFqn, STRING_LAYOUT_OPTION_NUMBER, StringLayout,
+    Syntax,
 };
 use crate::error::{Error, Result};
 use ::protobuf_core::{
@@ -266,6 +267,7 @@ fn decode_field(bytes: &[u8]) -> Result<FieldDesc> {
         let mut packed = None;
         let mut string_layout = None;
         let mut bytes_layout = None;
+        let mut message_layout = None;
         let mut features = FeatureSet::default();
 
         for field in AsRefExtProtobuf::read_protobuf_fields(&bytes) {
@@ -290,6 +292,7 @@ fn decode_field(bytes: &[u8]) -> Result<FieldDesc> {
                     packed = decoded.packed;
                     string_layout = decoded.string_layout;
                     bytes_layout = decoded.bytes_layout;
+                    message_layout = decoded.message_layout;
                 }
                 // optional int32 oneof_index = 9;
                 9 => oneof_index = Some(expect_int32(&field)?),
@@ -311,6 +314,7 @@ fn decode_field(bytes: &[u8]) -> Result<FieldDesc> {
             packed,
             string_layout,
             bytes_layout,
+            message_layout,
             features,
         })
     })
@@ -343,6 +347,7 @@ struct DecodedFieldOptions {
     packed: Option<bool>,
     string_layout: Option<StringLayout>,
     bytes_layout: Option<BytesLayout>,
+    message_layout: Option<MessageLayout>,
 }
 
 /// `FieldOptions`: `packed` (2), `features` (21), and puroro layout extensions.
@@ -352,6 +357,7 @@ fn decode_field_options(bytes: &[u8]) -> Result<DecodedFieldOptions> {
         let mut packed = None;
         let mut string_layout = None;
         let mut bytes_layout = None;
+        let mut message_layout = None;
         for field in AsRefExtProtobuf::read_protobuf_fields(&bytes) {
             let field = field?;
             match field.field_number.as_u32() {
@@ -367,6 +373,10 @@ fn decode_field_options(bytes: &[u8]) -> Result<DecodedFieldOptions> {
                 BYTES_LAYOUT_OPTION_NUMBER => {
                     bytes_layout = Some(expect_enum(&field)?);
                 }
+                // extend FieldOptions { optional MessageLayout message_layout = 51402; }
+                MESSAGE_LAYOUT_OPTION_NUMBER => {
+                    message_layout = Some(expect_enum(&field)?);
+                }
                 _ => {}
             }
         }
@@ -375,6 +385,7 @@ fn decode_field_options(bytes: &[u8]) -> Result<DecodedFieldOptions> {
             packed,
             string_layout,
             bytes_layout,
+            message_layout,
         })
     })
 }
@@ -791,6 +802,41 @@ mod tests {
         assert_eq!(
             decoded.proto_files[0].messages[0].fields[0].bytes_layout,
             Some(BytesLayout::Heap)
+        );
+    }
+
+    #[test]
+    fn decode_field_options_message_layout_extension() {
+        use crate::descriptor::{MESSAGE_LAYOUT_OPTION_NUMBER, MessageLayout};
+
+        // FieldOptions { (puroro.message_layout) = MESSAGE_LAYOUT_INLINE }
+        let field_options =
+            encode_varint_field(MESSAGE_LAYOUT_OPTION_NUMBER, MessageLayout::Inline as i32);
+
+        let mut field = Vec::new();
+        field.extend(encode_string_field(1, "child"));
+        field.extend(encode_varint_field(3, 1));
+        field.extend(encode_varint_field(4, FieldLabel::Optional as i32));
+        field.extend(encode_varint_field(5, FieldType::Message as i32));
+        field.extend(encode_string_field(6, ".Point"));
+        field.extend(encode_message_field(8, &field_options));
+
+        let mut message = Vec::new();
+        message.extend(encode_string_field(1, "M"));
+        message.extend(encode_message_field(2, &field));
+
+        let mut file = Vec::new();
+        file.extend(encode_string_field(1, "t.proto"));
+        file.extend(encode_message_field(4, &message));
+
+        let mut request = Vec::new();
+        request.extend(encode_string_field(1, "t.proto"));
+        request.extend(encode_message_field(15, &file));
+
+        let decoded = decode_request(&request).unwrap();
+        assert_eq!(
+            decoded.proto_files[0].messages[0].fields[0].message_layout,
+            Some(MessageLayout::Inline)
         );
     }
 

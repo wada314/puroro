@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+import "puroro/options.proto";
+
+// 1..=4 Copy scalars → auto-inlined when used as a singular child.
+message Point {
+  int32 x = 1;
+  int32 y = 2;
+}
+
+// String fields → heuristic fails; stays boxed unless INLINE is forced.
+message Address {
+  optional string street = 1;
+  optional string city = 2;
+}
+
+message Tiny {
+  int32 n = 1;
+}
+
+// Same-SCC edge: INLINE is ignored.
+message Recurse {
+  Recurse child = 1 [(puroro.message_layout) = MESSAGE_LAYOUT_INLINE];
+}
+
+message Holder {
+  Point origin = 1;
+  Address assignee = 2;
+  Tiny forced_box = 3 [(puroro.message_layout) = MESSAGE_LAYOUT_BOXED];
+  Address forced_inline = 4 [(puroro.message_layout) = MESSAGE_LAYOUT_INLINE];
+  oneof note {
+    Point postal = 5 [(puroro.message_layout) = MESSAGE_LAYOUT_INLINE];
+    int32 rank = 6;
+  }
+}

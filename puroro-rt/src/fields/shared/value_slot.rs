@@ -28,24 +28,16 @@ use super::{
     DefaultIn, MessageCommon, MessageCommonBits,
     slot_init::{SlotInitMut, SlotInitView},
 };
-use crate::fields::wire::sso_buf::SsoBuf;
 
 /// Marker for payloads stored as addressable `T` / [`MaybeUninit<T>`] in the
 /// field slot.
+///
+/// Blanket over all `T`. Callers must deref [`ManuallyDrop`] field wrappers
+/// before invoking [`ValueSlot`] methods so resolution does not treat the
+/// wrapper as the slot type.
 pub trait AddressableSlot {}
 
-impl AddressableSlot for u32 {}
-impl AddressableSlot for u64 {}
-impl AddressableSlot for i32 {}
-impl AddressableSlot for i64 {}
-impl AddressableSlot for f32 {}
-impl AddressableSlot for f64 {}
-impl AddressableSlot for bool {}
-impl AddressableSlot for () {}
-
-impl<A: Allocator> AddressableSlot for ::unmanaged::UnmanagedString<A> {}
-impl<A: Allocator> AddressableSlot for ::unmanaged::UnmanagedVec<u8, A> {}
-impl<H> AddressableSlot for SsoBuf<H> {}
+impl<T> AddressableSlot for T {}
 
 /// Storage construction, live-payload extract/rebuild, and view binding for a
 /// singular field value slot.

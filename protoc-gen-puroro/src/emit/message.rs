@@ -53,6 +53,8 @@ struct ScalarEmit {
     value_bit: Option<(Ident, usize)>,
     /// Which getter / mutator shape to emit.
     style: AccessorStyle,
+    /// `validate_required` — `LegacyRequired` scalars and inlined required messages.
+    required: bool,
     /// Use `.optional()` instead of `.value()`. Enums always do (DESIGN §4.6).
     optional_getter: bool,
     /// `_mut` `DerefMut` target — `i32`, `::puroro::String<A>`, `Address<A>`.
@@ -598,6 +600,7 @@ fn emit_oneof_variant(field: &PlannedField<'_>, index: usize) -> Result<OneofVar
                 .then(|| parse_quote! { ::puroro_rt::Inline }),
             None,
         ),
+        PlannedLayout::Boxed => (Some(parse_quote! { ::puroro_rt::Boxed }), None),
         PlannedLayout::BitPacked {
             value_bit,
             bit_const,
@@ -744,6 +747,8 @@ fn emit_scalar(field: &PlannedField<'_>, companion: &Ident) -> Result<ScalarEmit
     let field_const = field.field_const();
     let number = field.number();
     let custom_default = custom_default.as_ref();
+    let is_message_wire = matches!(wire, WireTypeKind::Message(_));
+    let required = matches!(presence, PlannedPresence::LegacyRequired { .. });
     let (style, presence_ty, presence_bit) = match presence {
         PlannedPresence::Implicit => (
             AccessorStyle::Implicit,
@@ -753,7 +758,11 @@ fn emit_scalar(field: &PlannedField<'_>, companion: &Ident) -> Result<ScalarEmit
         PlannedPresence::Explicit { bit, bit_const } => {
             let ident = Ident::new(bit_const, Span::call_site());
             (
-                AccessorStyle::Explicit,
+                if is_message_wire {
+                    AccessorStyle::Message
+                } else {
+                    AccessorStyle::Explicit
+                },
                 parse_quote! { ::puroro_rt::Explicit<{ #companion::#ident }> },
                 Some((ident, *bit)),
             )
@@ -761,7 +770,11 @@ fn emit_scalar(field: &PlannedField<'_>, companion: &Ident) -> Result<ScalarEmit
         PlannedPresence::LegacyRequired { bit, bit_const } => {
             let ident = Ident::new(bit_const, Span::call_site());
             (
-                AccessorStyle::LegacyRequired,
+                if is_message_wire {
+                    AccessorStyle::Message
+                } else {
+                    AccessorStyle::LegacyRequired
+                },
                 parse_quote! { ::puroro_rt::LegacyRequired<{ #companion::#ident }> },
                 Some((ident, *bit)),
             )
@@ -781,6 +794,7 @@ fn emit_scalar(field: &PlannedField<'_>, companion: &Ident) -> Result<ScalarEmit
                 .then(|| parse_quote! { ::puroro_rt::Inline }),
             None,
         ),
+        PlannedLayout::Boxed => (Some(parse_quote! { ::puroro_rt::Boxed }), None),
         PlannedLayout::BitPacked {
             value_bit,
             bit_const,
@@ -805,7 +819,6 @@ fn emit_scalar(field: &PlannedField<'_>, companion: &Ident) -> Result<ScalarEmit
 
     let views = wire_views(wire)?;
     let is_enum = matches!(wire, WireTypeKind::Enum { .. });
-    let is_message = matches!(style, AccessorStyle::Message);
     Ok(ScalarEmit {
         name: escape_ident(name),
         name_str: name.to_owned(),
@@ -817,8 +830,9 @@ fn emit_scalar(field: &PlannedField<'_>, companion: &Ident) -> Result<ScalarEmit
         presence_bit,
         value_bit,
         style,
+        required,
         // DESIGN §4.6: enum getters always project through Optional.
-        optional_getter: !is_message
+        optional_getter: !is_message_wire
             && (is_enum
                 || matches!(
                     style,
@@ -1334,7 +1348,7 @@ fn render_validate(fields: &[FieldEmit]) -> TokenStream {
     let required: Vec<_> = fields
         .iter()
         .filter_map(|f| match f {
-            FieldEmit::Singular(f) if matches!(f.style, AccessorStyle::LegacyRequired) => {
+            FieldEmit::Singular(f) if f.required => {
                 let name = &f.name;
                 Some(quote! {
                     self.#name.validate_required(&self._common)?;

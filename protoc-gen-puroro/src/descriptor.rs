@@ -103,6 +103,9 @@ pub struct FieldDesc {
     pub string_layout: Option<StringLayout>,
     /// `(puroro.bytes_layout)`, if set. Singular `bytes` uses this to pick SSO vs heap.
     pub bytes_layout: Option<BytesLayout>,
+    /// `(puroro.message_layout)`, if set. Singular nested messages use this to
+    /// pick boxed vs inlined storage.
+    pub message_layout: Option<MessageLayout>,
     /// Field-level `options.features` (`FeatureSet`), if any fields were set.
     pub features: FeatureSet,
 }
@@ -180,6 +183,27 @@ pub enum BytesLayout {
     Unspecified = 0,
     Sso = 1,
     Heap = 2,
+}
+
+/// Field number of `(puroro.message_layout)` on `google.protobuf.FieldOptions`.
+///
+/// Matches `proto/puroro/options.proto`. Numbers 50000–99999 are the internal
+/// custom-option range.
+pub const MESSAGE_LAYOUT_OPTION_NUMBER: u32 = 51402;
+
+/// `(puroro.message_layout)` — singular nested-message value layout in generated Rust.
+///
+/// [`Unspecified`](Self::Unspecified) (and an absent option) uses the generator
+/// heuristic (tiny scalar-only children inlined, otherwise boxed).
+/// [`Inline`](Self::Inline) requests embedding; [`Boxed`](Self::Boxed) pins a
+/// heap box. Illegal cases (oneof / repeated / map / same-SCC) always box.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, TryFrom)]
+#[try_from(repr)]
+#[repr(i32)]
+pub enum MessageLayout {
+    Unspecified = 0,
+    Inline = 1,
+    Boxed = 2,
 }
 
 /// A oneof declaration (`OneofDescriptorProto` subset).

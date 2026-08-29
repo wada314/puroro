@@ -7,7 +7,7 @@
 
 use crate::descriptor::ProtoFqn;
 use crate::error::{Error, Result};
-use crate::field_kind::plan_fields;
+use crate::field_kind::{MessageStoragePlan, plan_fields};
 use crate::module_tree::{ModuleForest, ModuleNode, ModuleOrigin, type_name_to_module_ident};
 use crate::resolved::{Enum, File, Message};
 use ::proc_macro2::Ident;
@@ -82,7 +82,7 @@ pub(crate) struct PreparedFile {
     messages: Vec<PreparedMessage>,
 }
 
-fn prepare_message(message: &Message<'_>) -> Result<PreparedMessage> {
+fn prepare_message(message: &Message<'_>, storage: &MessageStoragePlan) -> Result<PreparedMessage> {
     if !ident::is_simple_ident(message.name()) {
         return Err(Error::Codegen(format!(
             "cannot use message name `{}` as a Rust identifier",
@@ -91,7 +91,7 @@ fn prepare_message(message: &Message<'_>) -> Result<PreparedMessage> {
     }
     let module_name = type_name_to_module_ident(message.name());
     let type_name = ident::escape_ident(message.name());
-    let field_plan = plan_fields(message)?;
+    let field_plan = plan_fields(message, storage)?;
     let rendered = message::render_items(&field_plan, &type_name, message.name(), &module_name)?;
 
     let nested_enums = message
@@ -101,7 +101,7 @@ fn prepare_message(message: &Message<'_>) -> Result<PreparedMessage> {
     let nested = message
         .nested_messages()
         .filter(|m| !m.is_map_entry())
-        .map(prepare_message)
+        .map(|m| prepare_message(m, storage))
         .collect::<Result<Vec<_>>>()?;
 
     Ok(PreparedMessage {
@@ -120,13 +120,13 @@ fn prepare_enum(enumeration: &Enum<'_>) -> Result<PreparedEnum> {
     })
 }
 
-pub(crate) fn prepare_file(file: &File<'_>) -> Result<PreparedFile> {
+pub(crate) fn prepare_file(file: &File<'_>, storage: &MessageStoragePlan) -> Result<PreparedFile> {
     Ok(PreparedFile {
         package: file.package().to_owned(),
         enums: file.enums().map(prepare_enum).collect::<Result<Vec<_>>>()?,
         messages: file
             .messages()
-            .map(prepare_message)
+            .map(|m| prepare_message(m, storage))
             .collect::<Result<Vec<_>>>()?,
     })
 }

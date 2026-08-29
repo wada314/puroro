@@ -1,9 +1,11 @@
 //! Nested-message type marker for [`SingularType`](super::singular_type::SingularType).
 //!
-//! [`ProtoMessage`] supplies merge-into wire semantics; physical storage is
-//! [`UnmanagedBox<M, A>`] via [`PayloadAccess`](super::singular_type::PayloadAccess)
-//! / [`Inline`](crate::fields::shared::value_layout::Inline). Presence policy
-//! (`Message` / `Oneof`) lives on
+//! [`ProtoMessage`] supplies merge-into wire semantics. Physical storage is
+//! chosen by [`ValueLayout`](crate::fields::shared::value_layout::ValueLayout):
+//! [`Inline`](crate::fields::shared::value_layout::Inline) stores `M` in the
+//! slot (inlined child); [`Boxed`](crate::fields::shared::value_layout::Boxed)
+//! stores [`UnmanagedBox<M, A>`](::unmanaged::UnmanagedBox). Presence policy
+//! (`Message` / `Explicit` / `Oneof`) lives on
 //! [`FieldPresence`](crate::fields::shared::field_presence::FieldPresence).
 //!
 //! The marker is allocator-free; `M` typically still mentions `A` (e.g.
@@ -11,9 +13,7 @@
 
 use ::allocator_api2::alloc::Allocator;
 use ::core::marker::PhantomData;
-use ::core::ops::{Deref, DerefMut};
 use ::protobuf_core::FieldNumber;
-use ::unmanaged::UnmanagedBox;
 
 use ::puroro::{DecodeBuf, DecodeError, WireType};
 
@@ -31,7 +31,8 @@ use crate::fields::wire::singular_type::{PayloadAccess, PayloadMerge, SingularTy
 
 /// Type marker for a singular nested message `M`.
 ///
-/// Physical slot is [`UnmanagedBox<M, A>`] via [`PayloadAccess`].
+/// [`PayloadAccess::Slot`] is `M` (inlined). Heap boxing is
+/// [`Boxed`](crate::fields::shared::value_layout::Boxed).
 pub struct ProtoMessage<M>(PhantomData<fn() -> M>);
 
 impl<M> Default for ProtoMessage<M> {
@@ -48,26 +49,19 @@ impl<M> Clone for ProtoMessage<M> {
 
 impl<M> Copy for ProtoMessage<M> {}
 
-// `UnmanagedBox<M, A>: DefaultIn<A>` / `DeallocateIn<A>` come from unmanaged
-// when `M: DefaultIn<A>` / `DeallocateIn<A>` (generated messages impl both).
-
-impl<M, A: Allocator> AddressableSlot for UnmanagedBox<M, A> {}
 impl<M: MessageEncode> SingularType for ProtoMessage<M> {}
 
 impl<M: MessageEncode> PayloadAccess for ProtoMessage<M> {
-    type Slot<A: Allocator> = UnmanagedBox<M, A>;
+    type Slot<A: Allocator> = M;
     type Mut<'a, A: Allocator>
         = &'a mut M
     where
         Self: 'a,
         A: 'a;
-    type Written<A: Allocator> = UnmanagedBox<M, A>;
+    type Written<A: Allocator> = M;
 
     #[inline]
-    fn is_proto_empty<A: Allocator, Pb>(
-        _slot: &UnmanagedBox<M, A>,
-        _common: &MessageCommon<Pb, A>,
-    ) -> bool
+    fn is_proto_empty<A: Allocator, Pb>(_slot: &M, _common: &MessageCommon<Pb, A>) -> bool
     where
         MessageCommon<Pb, A>: MessageCommonBits,
     {
@@ -75,14 +69,11 @@ impl<M: MessageEncode> PayloadAccess for ProtoMessage<M> {
     }
 
     #[inline]
-    fn get<'a, A: Allocator + 'a, Pb>(
-        slot: &'a UnmanagedBox<M, A>,
-        _common: &'a MessageCommon<Pb, A>,
-    ) -> &'a M
+    fn get<'a, A: Allocator + 'a, Pb>(slot: &'a M, _common: &'a MessageCommon<Pb, A>) -> &'a M
     where
         MessageCommon<Pb, A>: MessageCommonBits,
     {
-        Deref::deref(slot)
+        slot
     }
 
     #[inline]
@@ -93,25 +84,21 @@ impl<M: MessageEncode> PayloadAccess for ProtoMessage<M> {
     ) -> &'a mut M
     where
         A: Allocator + Clone + 'a,
-        UnmanagedBox<M, A>: AddressableSlot + DefaultIn<A>,
-        VS: ValueSlot<UnmanagedBox<M, A>, A>,
+        M: AddressableSlot + DefaultIn<A>,
+        VS: ValueSlot<M, A>,
         I: SlotInitMut,
         MessageCommon<Pb, A>: MessageCommonBits,
         Self: 'a,
     {
-        DerefMut::deref_mut(ValueSlot::with_mut(slot, init, common).get_mut())
+        ValueSlot::with_mut(slot, init, common).get_mut()
     }
 
     #[inline]
-    fn write<A, VS, I, Pb>(
-        slot: &mut VS,
-        init: I,
-        common: &mut MessageCommon<Pb, A>,
-        value: UnmanagedBox<M, A>,
-    ) where
+    fn write<A, VS, I, Pb>(slot: &mut VS, init: I, common: &mut MessageCommon<Pb, A>, value: M)
+    where
         A: Allocator + Clone,
-        UnmanagedBox<M, A>: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
-        VS: ValueSlot<UnmanagedBox<M, A>, A>,
+        M: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
+        VS: ValueSlot<M, A>,
         I: SlotInitMut,
         MessageCommon<Pb, A>: MessageCommonBits,
     {
@@ -126,8 +113,8 @@ impl<M: MessageEncode> PayloadAccess for ProtoMessage<M> {
     fn clear<A, VS, I, Pb>(slot: &mut VS, init: I, common: &mut MessageCommon<Pb, A>)
     where
         A: Allocator + Clone,
-        UnmanagedBox<M, A>: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
-        VS: ValueSlot<UnmanagedBox<M, A>, A>,
+        M: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
+        VS: ValueSlot<M, A>,
         I: SlotInitMut,
         MessageCommon<Pb, A>: MessageCommonBits,
     {
@@ -165,6 +152,6 @@ impl<M: MessageEncode + MessageMerge> PayloadMerge for ProtoMessage<M> {
         // `Take<…>` monomorphization or `copy_to_bytes`.
         let mut guard = buf.push_limit_guard(len)?;
         let child = ValueSlot::with_mut(slot, init, common).get_mut();
-        MessageMerge::merge_from_with_depth(DerefMut::deref_mut(child), &mut *guard, depth + 1)
+        MessageMerge::merge_from_with_depth(child, &mut *guard, depth + 1)
     }
 }

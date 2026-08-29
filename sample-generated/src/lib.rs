@@ -32,11 +32,14 @@
 
 pub mod address;
 pub mod enums;
+pub mod point;
 pub mod task;
 
 mod address_type;
+mod point_type;
 mod task_type;
 
 pub use address_type::Address;
 pub use enums::{Priority, Status};
+pub use point_type::Point;
 pub use task_type::Task;

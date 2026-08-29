@@ -235,8 +235,7 @@ where
     where
         MessageCommon<Pb, A>: MessageCommonBits,
     {
-        let slot = self
-            .value
+        let slot = (*self.value)
             .with(AlwaysInitialized, common)
             .get()
             .expect("always-initialized slot");
@@ -258,8 +257,7 @@ where
     where
         MessageCommon<Pb, A>: MessageCommonBits,
     {
-        let slot = self
-            .value
+        let slot = (*self.value)
             .with(AlwaysInitialized, common)
             .get()
             .expect("always-initialized slot");
@@ -322,7 +320,7 @@ where
     {
         LegacyRequired::<BIT>::validate_present(common, FIELD, || {
             let init = <LegacyRequired<BIT> as FieldPresence>::slot_init_view();
-            match self.value.with(init, common).get() {
+            match (*self.value).with(init, common).get() {
                 Some(slot) => L::is_proto_empty(slot, common),
                 None => true,
             }
@@ -384,9 +382,7 @@ where
     /// Returns the logical value when the field is present.
     pub fn get(self) -> Option<T::View<'a, A>> {
         if P::is_set(self.common, || {
-            match self
-                .field
-                .value
+            match (*self.field.value)
                 .with(P::slot_init_view(), self.common)
                 .get()
             {
@@ -394,9 +390,7 @@ where
                 None => true,
             }
         }) {
-            let slot = self
-                .field
-                .value
+            let slot = (*self.field.value)
                 .with(P::slot_init_view(), self.common)
                 .get()
                 .expect("is_set implies initialized slot");
@@ -601,14 +595,13 @@ where
     fn encoded_len(&self, common: &MessageCommon<Pb, A>, ctx: &mut EncodeCtx) -> usize {
         if P::should_emit(common, || {
             let init = P::slot_init_view();
-            match self.value.with(init, common).get() {
+            match (*self.value).with(init, common).get() {
                 Some(slot) => L::is_proto_empty(slot, common),
                 None => true,
             }
         }) {
             let init = P::slot_init_view();
-            let slot = self
-                .value
+            let slot = (*self.value)
                 .with(init, common)
                 .get()
                 .expect("should_emit implies initialized slot");
@@ -626,14 +619,13 @@ where
     ) {
         if P::should_emit(common, || {
             let init = P::slot_init_view();
-            match self.value.with(init, common).get() {
+            match (*self.value).with(init, common).get() {
                 Some(slot) => L::is_proto_empty(slot, common),
                 None => true,
             }
         }) {
             let init = P::slot_init_view();
-            let slot = self
-                .value
+            let slot = (*self.value)
                 .with(init, common)
                 .get()
                 .expect("should_emit implies initialized slot");

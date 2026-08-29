@@ -1,4 +1,5 @@
-//! Value-storage layout for singular fields (`Inline`, bit-packed bool, SSO string / bytes).
+//! Value-storage layout for singular fields (`Inline`, `Boxed` nested message,
+//! bit-packed bool, SSO string / bytes).
 //!
 //! Orthogonal to [`FieldPresence`](super::field_presence::FieldPresence):
 //! presence decides *whether* a field is set; layout decides *where the value
@@ -11,10 +12,10 @@ use ::bitvec::{
     ptr::{BitRef, Mut},
 };
 use ::bytes::Buf;
-use ::core::ops::Deref;
+use ::core::ops::{Deref, DerefMut};
 use ::protobuf_core::FieldNumber;
 use ::puroro::{DecodeBuf, DecodeError, WireType};
-use ::unmanaged::{CloneIn, DeallocateIn, UnmanagedString, UnmanagedVec};
+use ::unmanaged::{CloneIn, DeallocateIn, UnmanagedBox, UnmanagedString, UnmanagedVec};
 
 use super::{
     DefaultIn, MessageCommon, MessageCommonBits,
@@ -25,6 +26,7 @@ use crate::decode;
 use crate::fields::wire::len::{BytesLikeLenCodec, LenScalar, ProtoString};
 use crate::fields::wire::numerical::ProtoBool;
 use crate::fields::wire::numerical::{BoolCodec, NumericalType};
+use crate::fields::wire::proto_message::ProtoMessage;
 use crate::fields::wire::singular_type::{PayloadAccess, PayloadMerge, SingularType};
 use crate::fields::wire::sso_buf::pack_inline;
 use crate::fields::wire::sso_bytes::{SsoBytes, SsoBytesMut, pack_written as pack_written_bytes};
@@ -32,6 +34,8 @@ use crate::fields::wire::sso_string::{
     INLINE_CAP, SsoString, SsoStringMut, pack_inline_utf8, pack_written,
 };
 use crate::fields::wire::wire_payload::{CopyWirePayload, VarintPayload};
+use crate::message_encode::MessageEncode;
+use crate::message_merge::MessageMerge;
 
 /// Where a singular field's logical value is stored.
 ///
@@ -143,8 +147,20 @@ pub trait ValueLayoutClone<T: SingularType, A: Allocator + Clone>: ValueLayout<T
 }
 
 /// Value lives in the field slot payload ([`PayloadAccess::Slot`]).
+///
+/// For [`ProtoMessage`](crate::ProtoMessage) this is the nested message `M`
+/// itself (inlined child). Heap boxing uses [`Boxed`].
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
 pub struct Inline;
+
+/// Nested message stored behind [`UnmanagedBox`](::unmanaged::UnmanagedBox).
+///
+/// Singular fields pair this with [`Message`](super::field_presence::Message)
+/// presence (`Option<UnmanagedBox<M, A>>`). Oneof variants use
+/// [`Oneof`](super::field_presence::Oneof) (always-present box). Contrast
+/// [`Inline`], which stores `M` in the slot.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
+pub struct Boxed;
 
 impl<T: PayloadAccess, A: Allocator> ValueLayout<T, A> for Inline
 where
@@ -261,6 +277,133 @@ where
         T::Slot<A>: DefaultIn<A>,
     {
         T::merge(slot, init, common, wire_type, buf, field, depth)
+    }
+}
+
+impl<M, A: Allocator> ValueLayout<ProtoMessage<M>, A> for Boxed
+where
+    M: MessageEncode + DeallocateIn<A>,
+{
+    type Slot = UnmanagedBox<M, A>;
+    type Mut<'a>
+        = &'a mut M
+    where
+        M: 'a,
+        A: 'a;
+
+    #[inline]
+    fn is_proto_empty<Pb>(_slot: &UnmanagedBox<M, A>, _common: &MessageCommon<Pb, A>) -> bool
+    where
+        MessageCommon<Pb, A>: MessageCommonBits,
+    {
+        false
+    }
+
+    #[inline]
+    fn get<'a, Pb>(slot: &'a UnmanagedBox<M, A>, _common: &'a MessageCommon<Pb, A>) -> &'a M
+    where
+        MessageCommon<Pb, A>: MessageCommonBits,
+    {
+        Deref::deref(slot)
+    }
+
+    #[inline]
+    fn with_mut<'a, VS, I, Pb>(
+        slot: &'a mut VS,
+        init: I,
+        common: &'a mut MessageCommon<Pb, A>,
+    ) -> &'a mut M
+    where
+        VS: ValueSlot<UnmanagedBox<M, A>, A>,
+        I: SlotInitMut,
+        MessageCommon<Pb, A>: MessageCommonBits,
+        M: 'a,
+        A: 'a + Clone,
+        UnmanagedBox<M, A>: DefaultIn<A>,
+    {
+        DerefMut::deref_mut(ValueSlot::with_mut(slot, init, common).get_mut())
+    }
+
+    #[inline]
+    fn clear<VS, I, Pb>(slot: &mut VS, init: I, common: &mut MessageCommon<Pb, A>)
+    where
+        VS: ValueSlot<UnmanagedBox<M, A>, A>,
+        I: SlotInitMut,
+        MessageCommon<Pb, A>: MessageCommonBits,
+        A: Clone,
+        UnmanagedBox<M, A>: DefaultIn<A>,
+    {
+        let alloc = common.alloc.clone();
+        if let Some(old) = ValueSlot::with_mut(slot, init, common).take_clear() {
+            // SAFETY: `clear` contract — `common` is this field's parent.
+            unsafe { DeallocateIn::deallocate_in(old, &alloc) };
+        }
+    }
+
+    #[inline]
+    fn deallocate_slot<VS, Pb>(slot: VS, initialized: bool, common: &MessageCommon<Pb, A>)
+    where
+        VS: ValueSlot<UnmanagedBox<M, A>, A>,
+        MessageCommon<Pb, A>: MessageCommonBits,
+    {
+        if let Some(v) = slot.take_value(initialized) {
+            // SAFETY: `deallocate_slot` contract — `common` is this field's parent.
+            unsafe { DeallocateIn::deallocate_in(v, &common.alloc) };
+        }
+    }
+}
+
+impl<M, A: Allocator> ValueLayoutMerge<ProtoMessage<M>, A> for Boxed
+where
+    M: MessageEncode + MessageMerge + DeallocateIn<A>,
+{
+    #[inline]
+    fn merge<VS, I, Pb, B>(
+        slot: &mut VS,
+        init: I,
+        common: &mut MessageCommon<Pb, A>,
+        wire_type: ::puroro::WireType,
+        buf: &mut B,
+        _field: FieldNumber,
+        depth: usize,
+    ) -> Result<(), DecodeError>
+    where
+        VS: ValueSlot<UnmanagedBox<M, A>, A>,
+        I: SlotInitMut,
+        MessageCommon<Pb, A>: MessageCommonBits,
+        B: DecodeBuf,
+        A: Clone,
+        UnmanagedBox<M, A>: DefaultIn<A>,
+    {
+        if wire_type != WireType::Len {
+            return Err(DecodeError::InvalidTag);
+        }
+        let len = decode::decode_varint(buf)? as usize;
+        let mut guard = buf.push_limit_guard(len)?;
+        let child = ValueSlot::with_mut(slot, init, common).get_mut();
+        MessageMerge::merge_from_with_depth(DerefMut::deref_mut(child), &mut *guard, depth + 1)
+    }
+}
+
+impl<M, A: Allocator + Clone> ValueLayoutClone<ProtoMessage<M>, A> for Boxed
+where
+    M: MessageEncode + DeallocateIn<A> + CloneIn<A>,
+{
+    #[inline]
+    fn clone_slot<VS, Pb>(
+        slot: &VS,
+        initialized: bool,
+        _common: &MessageCommon<Pb, A>,
+        alloc: A,
+    ) -> VS
+    where
+        VS: ValueSlot<UnmanagedBox<M, A>, A>,
+        MessageCommon<Pb, A>: MessageCommonBits,
+    {
+        VS::from_optional(
+            slot.get_value(initialized)
+                .map(|v| CloneIn::clone_in(v, alloc)),
+        )
     }
 }
 

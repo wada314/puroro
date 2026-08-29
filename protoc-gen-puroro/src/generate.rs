@@ -8,6 +8,7 @@ use crate::descriptor::CodegenRequest;
 use crate::descriptor::features::Utf8Validation;
 use crate::emit::{generated_file_attrs, prepare_file};
 use crate::error::{Error, Result};
+use crate::field_kind::plan_message_storage;
 use crate::module_tree::ModuleForest;
 use crate::module_tree::layout::{ModuleLayout, render};
 use crate::plugin_io::CodeGeneratorResponse;
@@ -78,8 +79,9 @@ pub fn generate(request: &CodegenRequest) -> Result<CodeGeneratorResponse> {
         .root_mut()
         .append_inner_attrs(generated_file_attrs(&targets)?);
 
+    let storage = plan_message_storage(&file_set);
     for file in &targets {
-        forest.install_file(prepare_file(file)?);
+        forest.install_file(prepare_file(file, &storage)?);
     }
 
     let mut files = render(
@@ -104,7 +106,7 @@ mod tests {
     use crate::descriptor::test_helpers as desc;
     use crate::descriptor::{
         BytesLayout, CodegenRequest, Edition, FeatureSet, FieldDesc, FieldLabel, FieldType,
-        MessageDesc, ProtoFile, ProtoFqn, StringLayout, Syntax,
+        MessageDesc, MessageLayout, ProtoFile, ProtoFqn, StringLayout, Syntax,
     };
     use crate::plugin_io::decode_request;
     use ::protobuf_core::{AsRefExtProtobuf, Field, FieldNumber, FieldValue, WriteExtProtobuf};
@@ -257,6 +259,129 @@ mod tests {
         assert!(
             !content.contains("BIT_BODY_SSO"),
             "bytes_layout=HEAP must not allocate an SSO bit: {content}"
+        );
+    }
+
+    fn msg_field(name: &str, number: i32, type_name: &str) -> FieldDesc {
+        FieldDesc {
+            type_name: Some(ProtoFqn::parse(type_name)),
+            ..desc::field(name, number, FieldType::Message)
+        }
+    }
+
+    #[test]
+    fn nested_message_auto_inline_emits_explicit_bit() {
+        let request = desc::request(vec![ProtoFile {
+            messages: vec![
+                MessageDesc {
+                    fields: vec![
+                        desc::field("x", 1, FieldType::Int32),
+                        desc::field("y", 2, FieldType::Int32),
+                    ],
+                    ..desc::message("Point")
+                },
+                MessageDesc {
+                    fields: vec![msg_field("origin", 1, ".Point")],
+                    ..desc::message("Holder")
+                },
+            ],
+            ..desc::proto_file("t.proto", "")
+        }]);
+        let content = generate_lib(&request);
+        assert!(
+            content.contains("Explicit<{ holder::BIT_ORIGIN }>"),
+            "auto-inlined origin must use a presence bit: {content}"
+        );
+        assert!(
+            !content.contains("Boxed"),
+            "auto-inlined origin must not emit Boxed: {content}"
+        );
+    }
+
+    #[test]
+    fn nested_message_default_boxed_emits_boxed_layout() {
+        let request = desc::request(vec![ProtoFile {
+            messages: vec![
+                MessageDesc {
+                    fields: vec![FieldDesc {
+                        proto3_optional: true,
+                        ..desc::field("street", 1, FieldType::String)
+                    }],
+                    ..desc::message("Address")
+                },
+                MessageDesc {
+                    fields: vec![msg_field("assignee", 1, ".Address")],
+                    ..desc::message("Holder")
+                },
+            ],
+            ..desc::proto_file("t.proto", "")
+        }]);
+        let content = generate_lib(&request);
+        assert!(
+            content.contains("::puroro_rt::Boxed"),
+            "Address-like child must emit Boxed: {content}"
+        );
+        assert!(
+            content.contains("::puroro_rt::Message"),
+            "boxed singular must use Message presence: {content}"
+        );
+        assert!(
+            !content.contains("BIT_ASSIGNEE"),
+            "boxed assignee must not allocate a presence bit: {content}"
+        );
+    }
+
+    #[test]
+    fn recursive_inline_hint_still_emits_boxed() {
+        let request = desc::request(vec![ProtoFile {
+            messages: vec![MessageDesc {
+                fields: vec![FieldDesc {
+                    message_layout: Some(MessageLayout::Inline),
+                    ..msg_field("child", 1, ".Nest")
+                }],
+                ..desc::message("Nest")
+            }],
+            ..desc::proto_file("t.proto", "")
+        }]);
+        let content = generate_lib(&request);
+        assert!(
+            content.contains("::puroro_rt::Boxed"),
+            "recursive Nest.child must stay Boxed: {content}"
+        );
+        assert!(
+            content.contains("::puroro_rt::Message"),
+            "recursive child must use Message presence: {content}"
+        );
+    }
+
+    #[test]
+    fn oneof_message_variant_emits_boxed() {
+        let request = desc::request(vec![ProtoFile {
+            messages: vec![
+                MessageDesc {
+                    fields: vec![desc::field("x", 1, FieldType::Int32)],
+                    ..desc::message("Point")
+                },
+                MessageDesc {
+                    fields: vec![FieldDesc {
+                        oneof_index: Some(0),
+                        message_layout: Some(MessageLayout::Inline),
+                        ..msg_field("postal", 1, ".Point")
+                    }],
+                    oneofs: vec![desc::oneof("note")],
+                    ..desc::message("Holder")
+                },
+            ],
+            ..desc::proto_file("t.proto", "")
+        }]);
+        let content = generate_lib(&request);
+        assert!(
+            content.contains("::puroro_rt::Boxed"),
+            "oneof message variant must emit Boxed: {content}"
+        );
+        assert!(
+            !content.contains("BIT_POSTAL"),
+            "oneof message variant must not allocate a presence bit: {content}"
         );
     }
 

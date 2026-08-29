@@ -26,6 +26,7 @@ pub(crate) fn field(name: impl Into<String>, number: i32, type_: FieldType) -> F
         packed: None,
         string_layout: None,
         bytes_layout: None,
+        message_layout: None,
         features: FeatureSet::default(),
     }
 }

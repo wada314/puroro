@@ -59,9 +59,9 @@ use ::bitvec::array::BitArray;
 use ::bitvec::order::Lsb0;
 use ::bytes::BufMut;
 use ::puroro_rt::{
-    BitPacked, FieldCloneIn, FieldDeallocate, FieldEncode, Inline, InlineOrHeap, MessageCommon,
-    MessageCommonAlloc, MessageCommonBits, Oneof, OneofDeallocate, OneofEncodable, OneofGroup,
-    OneofVariant, ProtoBool, ProtoInt32, ProtoMessage, ProtoString, SingularField,
+    BitPacked, Boxed, FieldCloneIn, FieldDeallocate, FieldEncode, Inline, InlineOrHeap,
+    MessageCommon, MessageCommonAlloc, MessageCommonBits, Oneof, OneofDeallocate, OneofEncodable,
+    OneofGroup, OneofVariant, ProtoBool, ProtoInt32, ProtoMessage, ProtoString, SingularField,
     SingularFieldAccess,
 };
 
@@ -113,7 +113,8 @@ type PhoneNumberField<A> = SingularField<
 >;
 type WebhookIdField<A> =
     SingularField<ProtoInt32, Oneof, { super::FIELD_WEBHOOK_ID }, A, Inline, WebhookIdDefault>;
-type PostalField<A> = SingularField<ProtoMessage<Address<A>>, Oneof, { super::FIELD_POSTAL }, A>;
+type PostalField<A> =
+    SingularField<ProtoMessage<Address<A>>, Oneof, { super::FIELD_POSTAL }, A, Boxed>;
 type UrgentField<A> = SingularField<
     ProtoBool,
     Oneof,

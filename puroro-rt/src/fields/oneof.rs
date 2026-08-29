@@ -23,7 +23,8 @@ use ::unmanaged::UnmanagedBox;
 use crate::fields::oneof_variant::OneofVariant;
 use crate::fields::shared::field_inspect::{FieldCloneIn, FieldDebug, FieldEncode, FieldPartialEq};
 use crate::fields::shared::{
-    DefaultIn, FieldDeallocate, MessageCommon, MessageCommonAlloc, MessageCommonBits, ValueLayout,
+    Boxed, DefaultIn, FieldDeallocate, MessageCommon, MessageCommonAlloc, MessageCommonBits,
+    ValueLayout,
     field_presence::{FieldPresence, Oneof},
     value_slot::{AddressableSlot, ValueSlot},
 };
@@ -458,7 +459,7 @@ where
 }
 
 impl<'a, M, const FIELD: u32, A: Allocator, Pb>
-    OneofVariantRef<'a, SingularField<ProtoMessage<M>, Oneof, FIELD, A>, Pb, A>
+    OneofVariantRef<'a, SingularField<ProtoMessage<M>, Oneof, FIELD, A, Boxed>, Pb, A>
 where
     M: MessageEncode + ::unmanaged::DeallocateIn<A>,
     MessageCommon<Pb, A>: MessageCommonBits,

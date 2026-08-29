@@ -22,7 +22,7 @@ use puroro::{
 };
 use puroro_rt::decode::{decode_tag, skip_field_and_save};
 use puroro_rt::{
-    BitPacked, CloneFieldsVisitor, CloneIn, Closed, DebugStructVisitor, EncodeCtx,
+    BitPacked, Boxed, CloneFieldsVisitor, CloneIn, Closed, DebugStructVisitor, EncodeCtx,
     EncodeRawVisitor, EncodedLenVisitor, Expanded, Explicit, FieldDeallocVisitor, FieldEqVisitor,
     FieldPairVisitor, FieldPairVisitorMut, FieldVisitor, FieldVisitorMut, Implicit, Inline,
     InlineOrHeap, LegacyRequired, MapField, Message as MessagePresence, MessageCommon,
@@ -31,16 +31,18 @@ use puroro_rt::{
 };
 
 use crate::Address;
+use crate::Point;
 use crate::enums::{Priority, Status};
 use crate::task::defaults::MaxRetriesDefault;
 use crate::task::notification::NotificationStorage;
 use crate::task::{
-    BIT_DONE_VALUE, BIT_FLAG, BIT_FLAG_VALUE, BIT_MAX_RETRIES, BIT_OWNER_ID, BIT_OWNER_ID_SSO,
-    BIT_PAYLOAD, BIT_PAYLOAD_SSO, BIT_PRIORITY, BIT_TITLE, BIT_TITLE_SSO, FIELD_ASSIGNEE,
-    FIELD_ATTRIBUTES, FIELD_DONE, FIELD_EMAIL_ADDRESS, FIELD_FLAG, FIELD_LABELS, FIELD_MAX_RETRIES,
-    FIELD_OWNER_ID, FIELD_PAYLOAD, FIELD_PHONE_NUMBER, FIELD_POSTAL, FIELD_PRIORITY, FIELD_SCORE,
-    FIELD_SCORES, FIELD_STATUS, FIELD_TAG_IDS, FIELD_TITLE, FIELD_URGENT, FIELD_VOTES,
-    FIELD_WATCHERS, FIELD_WEBHOOK_ID, Notification, NotificationCase,
+    BIT_DONE_VALUE, BIT_FLAG, BIT_FLAG_VALUE, BIT_MAX_RETRIES, BIT_ORIGIN, BIT_OWNER_ID,
+    BIT_OWNER_ID_SSO, BIT_PAYLOAD, BIT_PAYLOAD_SSO, BIT_PRIORITY, BIT_TITLE, BIT_TITLE_SSO,
+    FIELD_ASSIGNEE, FIELD_ATTRIBUTES, FIELD_DONE, FIELD_EMAIL_ADDRESS, FIELD_FLAG, FIELD_LABELS,
+    FIELD_MAX_RETRIES, FIELD_ORIGIN, FIELD_OWNER_ID, FIELD_PAYLOAD, FIELD_PHONE_NUMBER,
+    FIELD_POSTAL, FIELD_PRIORITY, FIELD_SCORE, FIELD_SCORES, FIELD_STATUS, FIELD_TAG_IDS,
+    FIELD_TITLE, FIELD_URGENT, FIELD_VOTES, FIELD_WATCHERS, FIELD_WEBHOOK_ID, Notification,
+    NotificationCase,
 };
 
 // ---------------------------------------------------------------------------
@@ -90,7 +92,8 @@ pub struct Task<A: Allocator = Global> {
         { FIELD_PRIORITY },
         A,
     >, // proto: Priority priority = 10;
-    assignee: SingularField<ProtoMessage<Address<A>>, MessagePresence, { FIELD_ASSIGNEE }, A>, // proto: Address assignee = 11;
+    assignee:
+        SingularField<ProtoMessage<Address<A>>, MessagePresence, { FIELD_ASSIGNEE }, A, Boxed>, // proto: Address assignee = 11;
     // proto: oneof notification { string email_address=12; string phone_number=13;
     //                             int32 webhook_id=14 [default=-1]; Address postal=15;
     //                             bool urgent=18; }
@@ -106,6 +109,7 @@ pub struct Task<A: Allocator = Global> {
     watchers: RepeatedField<ProtoMessage<Address<A>>, Expanded, { FIELD_WATCHERS }, A>, // proto: repeated Address watchers = 19;
     votes: RepeatedField<ProtoBool, Packed, { FIELD_VOTES }, A>, // proto: repeated bool votes = 20;
     attributes: MapField<ProtoString, ProtoInt32, { FIELD_ATTRIBUTES }, A>, // proto: map<string, int32> attributes = 21;
+    origin: SingularField<ProtoMessage<Point<A>>, Explicit<{ BIT_ORIGIN }>, { FIELD_ORIGIN }, A>, // proto: Point origin = 22 (inlined)
 }
 
 impl<A: Allocator> Task<A> {
@@ -194,6 +198,10 @@ impl<A: Allocator> Task<A> {
         self.attributes.bind(&self._common)
     }
 
+    pub fn origin(&self) -> Option<&Point<A>> {
+        self.origin.bind(&self._common).get()
+    }
+
     /// Bound shared view of the oneof group (always available, including when unset).
     ///
     /// Discriminant: `notification().case() -> Option<NotificationCase>`.
@@ -275,6 +283,7 @@ impl<A: Allocator> Task<A> {
         v.visit("watchers", &self.watchers)?;
         v.visit("votes", &self.votes)?;
         v.visit("attributes", &self.attributes)?;
+        v.visit("origin", &self.origin)?;
         ControlFlow::Continue(())
     }
 
@@ -301,6 +310,7 @@ impl<A: Allocator> Task<A> {
         v.visit("watchers", &self.watchers, &other.watchers)?;
         v.visit("votes", &self.votes, &other.votes)?;
         v.visit("attributes", &self.attributes, &other.attributes)?;
+        v.visit("origin", &self.origin, &other.origin)?;
         ControlFlow::Continue(())
     }
 
@@ -333,6 +343,7 @@ impl<A: Allocator> Task<A> {
         v.visit("watchers", &self.watchers, &mut dst.watchers)?;
         v.visit("votes", &self.votes, &mut dst.votes)?;
         v.visit("attributes", &self.attributes, &mut dst.attributes)?;
+        v.visit("origin", &self.origin, &mut dst.origin)?;
         ControlFlow::Continue(())
     }
 
@@ -358,6 +369,7 @@ impl<A: Allocator> Task<A> {
         v.visit("watchers", &mut self.watchers)?;
         v.visit("votes", &mut self.votes)?;
         v.visit("attributes", &mut self.attributes)?;
+        v.visit("origin", &mut self.origin)?;
         ControlFlow::Continue(())
     }
 }
@@ -365,7 +377,7 @@ impl<A: Allocator> Task<A> {
 impl<A: Allocator + Clone> Task<A> {
     pub fn new_in(alloc: A) -> Self {
         // Each field initializer gets its own clone of the allocator; the last
-        // heap field (`attributes`) takes the original by move.
+        // field (`origin`) takes the original by move.
         Self {
             _common: MessageCommon::new_in(BitArray::ZERO, alloc.clone()),
             title: SingularField::new_in(alloc.clone()),
@@ -384,7 +396,8 @@ impl<A: Allocator + Clone> Task<A> {
             flag: SingularField::new_in(alloc.clone()),
             watchers: RepeatedField::new_in(alloc.clone()),
             votes: RepeatedField::new_in(alloc.clone()),
-            attributes: MapField::new_in(alloc),
+            attributes: MapField::new_in(alloc.clone()),
+            origin: SingularField::new_in(alloc),
         }
     }
 
@@ -548,6 +561,16 @@ impl<A: Allocator + Clone> Task<A> {
 
     pub fn clear_attributes(&mut self) {
         MapMut::clear(&mut self.attributes_mut());
+    }
+
+    // -- origin (inlined nested Point, proto field 22) ----------------------
+
+    pub fn origin_mut(&mut self) -> &mut Point<A> {
+        self.origin.bind_mut(&mut self._common).get_mut()
+    }
+
+    pub fn clear_origin(&mut self) {
+        self.origin.bind_mut(&mut self._common).clear();
     }
 
     // -- oneof notification (proto fields 12 / 13 / 14 / 15 / 18) ------------
@@ -869,6 +892,12 @@ impl<A: Allocator + Clone> MessageMerge for Task<A> {
                 FIELD_ATTRIBUTES => {
                     // attributes = 21, map<string, int32>
                     self.attributes
+                        .bind_mut(&mut self._common)
+                        .merge(wire_type, buf, depth)?;
+                }
+                FIELD_ORIGIN => {
+                    // origin = 22, inlined nested Point
+                    self.origin
                         .bind_mut(&mut self._common)
                         .merge(wire_type, buf, depth)?;
                 }

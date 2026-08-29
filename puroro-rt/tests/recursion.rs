@@ -12,14 +12,14 @@ use ::bytes::BufMut;
 use ::puroro::{DecodeBuf, DecodeError, Message, RECURSION_LIMIT};
 use ::puroro_rt::decode::{decode_tag, skip_field_and_save};
 use ::puroro_rt::{
-    EncodeCtx, FieldCloneIn, FieldDeallocate, FieldEncode, Message as MessagePresence,
+    Boxed, EncodeCtx, FieldCloneIn, FieldDeallocate, FieldEncode, Message as MessagePresence,
     MessageCommon, MessageEncode, MessageMerge, ProtoMessage, SingularField,
 };
 
 /// Self-referential message: optional `child` of the same type (field 1).
 struct Nest<A: Allocator + Clone = Global> {
     _common: MessageCommon<BitArray<[u8; 1], Lsb0>, A>,
-    child: SingularField<ProtoMessage<Nest<A>>, MessagePresence, 1, A>,
+    child: SingularField<ProtoMessage<Nest<A>>, MessagePresence, 1, A, Boxed>,
 }
 
 impl<A: Allocator + Clone> Nest<A> {

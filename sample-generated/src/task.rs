@@ -27,6 +27,7 @@ pub const BIT_DONE_VALUE: usize = 10; // done (IMPLICIT bool value)
 pub const BIT_FLAG: usize = 11; // flag (EXPLICIT presence)
 pub const BIT_FLAG_VALUE: usize = 12; // flag (EXPLICIT bool value)
 pub const BIT_URGENT_VALUE: usize = 13; // notification.urgent (oneof bool value)
+pub const BIT_ORIGIN: usize = 14; // origin (inlined nested Point, EXPLICIT presence)
 
 // ---------------------------------------------------------------------------
 // Proto field numbers
@@ -53,3 +54,4 @@ pub const FIELD_URGENT: u32 = 18; // notification.urgent (oneof bool)
 pub const FIELD_WATCHERS: u32 = 19; // watchers (repeated Address)
 pub const FIELD_VOTES: u32 = 20; // votes (repeated bool PACKED)
 pub const FIELD_ATTRIBUTES: u32 = 21; // attributes (map<string, int32>)
+pub const FIELD_ORIGIN: u32 = 22; // origin (inlined Point)
