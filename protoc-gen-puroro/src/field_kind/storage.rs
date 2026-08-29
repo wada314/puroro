@@ -1,9 +1,9 @@
 //! FileSet-wide nested-message storage (boxed vs inlined).
 
+use super::tarjan::tarjan;
 use crate::descriptor::MessageLayout;
 use crate::descriptor::ProtoFqn;
 use crate::resolved::{Field, FieldOccurrence, FileSet, Message, SingularPresence, TypeRef};
-use ::std::cmp::min;
 use ::std::collections::{HashMap, HashSet};
 
 /// Per-field nested-message storage chosen for this [`FileSet`].
@@ -143,9 +143,19 @@ fn is_copy_scalar_or_enum(field: &Field<'_>) -> bool {
     }
 }
 
-/// Tarjan SCC ids, one per `messages` index. Isolated nodes (including a
-/// self-referential message, whose parent and child share an index) get distinct
-/// component ids except when a cycle joins them.
+/// Assign a strongly-connected-component (SCC) id to each message.
+///
+/// The graph is: node = message type, edge `Owner → Child` for each singular
+/// non-oneof field whose type is `Child`. Inlining `Child` into `Owner` embeds
+/// `Child`'s struct in `Owner`. That is only possible when there is **no cycle**
+/// through that edge (`Owner` cannot reach itself by following nested-message
+/// fields). Two types are in the same SCC iff each can reach the other
+/// (`A → B → A`, or a longer cycle). A self-field `Nest.child: Nest` is the
+/// same node as parent and child, so `scc[i] == scc[i]` and we refuse to inline.
+///
+/// Isolated types (no message edges) each get their own component.
+///
+/// Implemented with Tarjan's SCC algorithm (one DFS; see [`super::tarjan`]).
 fn scc_ids(messages: &[&Message<'_>]) -> Vec<usize> {
     let n = messages.len();
     let mut index_by_fqn = HashMap::with_capacity(n);
@@ -169,63 +179,189 @@ fn scc_ids(messages: &[&Message<'_>]) -> Vec<usize> {
     tarjan(&adj)
 }
 
-fn tarjan(adj: &[Vec<usize>]) -> Vec<usize> {
-    let n = adj.len();
-    let mut state = Tarjan {
-        adj,
-        dfs_index: 0,
-        next_scc: 0,
-        stack: Vec::new(),
-        indices: vec![None; n],
-        lowlink: vec![0usize; n],
-        on_stack: vec![false; n],
-        scc_id: vec![0usize; n],
+#[cfg(test)]
+mod tests {
+    use super::{collect_messages, index_of, plan_message_storage, scc_ids};
+    use crate::descriptor::test_helpers as desc;
+    use crate::descriptor::{
+        FieldDesc, FieldType, MessageDesc, MessageLayout, ProtoFile, ProtoFqn,
     };
-    for v in 0..n {
-        if state.indices[v].is_none() {
-            state.strongconnect(v);
+    use crate::resolved::{Arena, FileSet, Message, resolve};
+    use ::std::collections::HashSet;
+
+    fn proto3_file(messages: Vec<MessageDesc>) -> ProtoFile {
+        ProtoFile {
+            messages,
+            ..desc::proto_file("t.proto", "example")
         }
     }
-    state.scc_id
-}
 
-struct Tarjan<'a> {
-    adj: &'a [Vec<usize>],
-    dfs_index: usize,
-    next_scc: usize,
-    stack: Vec<usize>,
-    indices: Vec<Option<usize>>,
-    lowlink: Vec<usize>,
-    on_stack: Vec<bool>,
-    scc_id: Vec<usize>,
-}
+    fn msg_field(name: &str, number: i32, type_name: &str) -> FieldDesc {
+        FieldDesc {
+            type_name: Some(ProtoFqn::parse(type_name)),
+            ..desc::field(name, number, FieldType::Message)
+        }
+    }
 
-impl Tarjan<'_> {
-    fn strongconnect(&mut self, v: usize) {
-        self.indices[v] = Some(self.dfs_index);
-        self.lowlink[v] = self.dfs_index;
-        self.dfs_index += 1;
-        self.stack.push(v);
-        self.on_stack[v] = true;
-        let neighbors = self.adj[v].clone();
-        for w in neighbors {
-            if self.indices[w].is_none() {
-                self.strongconnect(w);
-                self.lowlink[v] = min(self.lowlink[v], self.lowlink[w]);
-            } else if self.on_stack[w] {
-                self.lowlink[v] = min(self.lowlink[v], self.indices[w].unwrap());
-            }
+    fn force_inline(name: &str, number: i32, type_name: &str) -> FieldDesc {
+        FieldDesc {
+            message_layout: Some(MessageLayout::Inline),
+            ..msg_field(name, number, type_name)
         }
-        if self.lowlink[v] == self.indices[v].unwrap() {
-            loop {
-                let w = self.stack.pop().expect("SCC stack");
-                self.on_stack[w] = false;
-                self.scc_id[w] = self.next_scc;
-                if w == v {
-                    break;
-                }
-            }
-            self.next_scc += 1;
-        }
+    }
+
+    fn message<'a>(set: &'a FileSet<'a>, name: &str) -> &'a Message<'a> {
+        set.files()
+            .flat_map(|f| f.messages())
+            .find(|m| m.name() == name)
+            .unwrap_or_else(|| panic!("missing message {name}"))
+    }
+
+    fn same_component(ids: &[usize], nodes: &[usize]) -> bool {
+        let first = ids[nodes[0]];
+        nodes.iter().all(|&n| ids[n] == first)
+    }
+
+    /// `ids[a] != ids[b]` for every pair (each node is its own SCC).
+    fn all_singleton(ids: &[usize]) -> bool {
+        let mut seen = HashSet::new();
+        ids.iter().all(|id| seen.insert(*id))
+    }
+
+    fn scc_of<'a>(set: &'a FileSet<'a>) -> (Vec<&'a Message<'a>>, Vec<usize>) {
+        let messages = collect_messages(set);
+        let ids = scc_ids(&messages);
+        (messages, ids)
+    }
+
+    fn msg_idx<'a>(messages: &[&'a Message<'a>], name: &str) -> usize {
+        index_of(messages, message_in(messages, name)).expect("index")
+    }
+
+    fn message_in<'a>(messages: &[&'a Message<'a>], name: &str) -> &'a Message<'a> {
+        messages
+            .iter()
+            .copied()
+            .find(|m| m.name() == name)
+            .unwrap_or_else(|| panic!("missing {name}"))
+    }
+
+    #[test]
+    fn scc_self_reference_same_component_as_itself() {
+        let arena = Arena::new();
+        let files = [proto3_file(vec![MessageDesc {
+            fields: vec![force_inline("child", 1, ".example.Nest")],
+            ..desc::message("Nest")
+        }])];
+        let set = resolve(&arena, &files).unwrap();
+        let (messages, ids) = scc_of(&set);
+        let i = msg_idx(&messages, "Nest");
+        assert_eq!(ids[i], ids[i]);
+        let storage = plan_message_storage(&set);
+        assert!(!storage.is_inline(message(&set, "Nest"), 1));
+    }
+
+    #[test]
+    fn scc_mutual_pair_shares_component() {
+        let arena = Arena::new();
+        let files = [proto3_file(vec![
+            MessageDesc {
+                fields: vec![force_inline("b", 1, ".example.B")],
+                ..desc::message("A")
+            },
+            MessageDesc {
+                fields: vec![force_inline("a", 1, ".example.A")],
+                ..desc::message("B")
+            },
+        ])];
+        let set = resolve(&arena, &files).unwrap();
+        let (messages, ids) = scc_of(&set);
+        let a = msg_idx(&messages, "A");
+        let b = msg_idx(&messages, "B");
+        assert_eq!(ids[a], ids[b]);
+        let storage = plan_message_storage(&set);
+        assert!(!storage.is_inline(message(&set, "A"), 1));
+        assert!(!storage.is_inline(message(&set, "B"), 1));
+    }
+
+    #[test]
+    fn scc_three_cycle_shares_component() {
+        let arena = Arena::new();
+        let files = [proto3_file(vec![
+            MessageDesc {
+                fields: vec![force_inline("b", 1, ".example.B")],
+                ..desc::message("A")
+            },
+            MessageDesc {
+                fields: vec![force_inline("c", 1, ".example.C")],
+                ..desc::message("B")
+            },
+            MessageDesc {
+                fields: vec![force_inline("a", 1, ".example.A")],
+                ..desc::message("C")
+            },
+        ])];
+        let set = resolve(&arena, &files).unwrap();
+        let (messages, ids) = scc_of(&set);
+        let a = msg_idx(&messages, "A");
+        let b = msg_idx(&messages, "B");
+        let c = msg_idx(&messages, "C");
+        assert!(same_component(&ids, &[a, b, c]));
+        let storage = plan_message_storage(&set);
+        assert!(!storage.is_inline(message(&set, "A"), 1));
+        assert!(!storage.is_inline(message(&set, "B"), 1));
+        assert!(!storage.is_inline(message(&set, "C"), 1));
+    }
+
+    #[test]
+    fn scc_dag_chain_distinct_so_force_inline_succeeds() {
+        // Leaf has no message fields; INLINE on the chain is legal (not same SCC).
+        let arena = Arena::new();
+        let files = [proto3_file(vec![
+            MessageDesc {
+                fields: vec![force_inline("mid", 1, ".example.Mid")],
+                ..desc::message("Top")
+            },
+            MessageDesc {
+                fields: vec![force_inline("leaf", 1, ".example.Leaf")],
+                ..desc::message("Mid")
+            },
+            desc::message("Leaf"),
+        ])];
+        let set = resolve(&arena, &files).unwrap();
+        let (messages, ids) = scc_of(&set);
+        let top = msg_idx(&messages, "Top");
+        let mid = msg_idx(&messages, "Mid");
+        let leaf = msg_idx(&messages, "Leaf");
+        assert!(all_singleton(&[ids[top], ids[mid], ids[leaf]]));
+        let storage = plan_message_storage(&set);
+        assert!(storage.is_inline(message(&set, "Top"), 1));
+        assert!(storage.is_inline(message(&set, "Mid"), 1));
+    }
+
+    #[test]
+    fn scc_ignores_oneof_edges() {
+        // Oneof A { B b } is not a graph edge today, so INLINE is still ignored
+        // at plan_fields — but SCC treats A and B as distinct (no cycle).
+        let arena = Arena::new();
+        let files = [proto3_file(vec![
+            MessageDesc {
+                fields: vec![FieldDesc {
+                    oneof_index: Some(0),
+                    message_layout: Some(MessageLayout::Inline),
+                    ..msg_field("b", 1, ".example.B")
+                }],
+                oneofs: vec![desc::oneof("choice")],
+                ..desc::message("A")
+            },
+            desc::message("B"),
+        ])];
+        let set = resolve(&arena, &files).unwrap();
+        let (messages, ids) = scc_of(&set);
+        let a = msg_idx(&messages, "A");
+        let b = msg_idx(&messages, "B");
+        assert_ne!(ids[a], ids[b]);
+        let storage = plan_message_storage(&set);
+        assert!(!storage.is_inline(message(&set, "A"), 1));
     }
 }

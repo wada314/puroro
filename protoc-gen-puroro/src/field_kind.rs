@@ -8,6 +8,7 @@
 
 mod plan;
 mod storage;
+mod tarjan;
 
 pub use plan::{MessageFieldPlan, MessageMember, PlannedField, PlannedOneof, plan_fields};
 pub use storage::{MessageStoragePlan, plan_message_storage};
