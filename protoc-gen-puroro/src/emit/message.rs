@@ -748,7 +748,8 @@ fn emit_scalar(field: &PlannedField<'_>, companion: &Ident) -> Result<ScalarEmit
     let number = field.number();
     let custom_default = custom_default.as_ref();
     let is_message_wire = matches!(wire, WireTypeKind::Message(_));
-    let required = matches!(presence, PlannedPresence::LegacyRequired { .. });
+    let required = matches!(presence, PlannedPresence::LegacyRequired { .. })
+        || (matches!(presence, PlannedPresence::Message) && field.field().is_legacy_required());
     let (style, presence_ty, presence_bit) = match presence {
         PlannedPresence::Implicit => (
             AccessorStyle::Implicit,

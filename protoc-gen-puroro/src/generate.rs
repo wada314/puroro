@@ -422,6 +422,40 @@ mod tests {
     }
 
     #[test]
+    fn proto2_required_boxed_message_emits_validate() {
+        let request = desc::request(vec![ProtoFile {
+            syntax: Syntax::Proto2,
+            messages: vec![
+                MessageDesc {
+                    fields: vec![desc::field("street", 1, FieldType::String)],
+                    ..desc::message("Address")
+                },
+                MessageDesc {
+                    fields: vec![FieldDesc {
+                        label: FieldLabel::Required,
+                        ..msg_field("addr", 1, ".Address")
+                    }],
+                    ..desc::message("Holder")
+                },
+            ],
+            ..desc::proto_file("t.proto", "")
+        }]);
+        let content = generate_lib(&request);
+        assert!(
+            content.contains("::puroro_rt::Boxed"),
+            "required Address stays boxed: {content}"
+        );
+        assert!(
+            content.contains("validate_required"),
+            "boxed required message must participate in validate(): {content}"
+        );
+        assert!(
+            !content.contains("BIT_ADDR"),
+            "boxed required message must not allocate a presence bit: {content}"
+        );
+    }
+
+    #[test]
     fn proto2_utf8_verify_emits_proto_string() {
         let mut request = empty_request("M");
         request.proto_files[0].syntax = Syntax::Proto2;

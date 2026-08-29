@@ -1,6 +1,17 @@
 syntax = "proto2";
 
+message Point {
+  optional int32 x = 1;
+  optional int32 y = 2;
+}
+
+message Address {
+  optional string street = 1;
+}
+
 message RequiredOwner {
   required string owner = 1;
   optional int32 score = 2;
+  required Address addr = 3;
+  required Point pos = 4;
 }

@@ -288,6 +288,17 @@ where
     pub fn is_present(&self) -> bool {
         (*self.value).is_some()
     }
+
+    /// proto2 / editions `required` message — pointer presence, no bit.
+    pub fn validate_required<Pb>(&self, _common: &MessageCommon<Pb, A>) -> Result<(), DecodeError> {
+        if self.is_present() {
+            Ok(())
+        } else {
+            Err(DecodeError::MissingRequiredField {
+                field_number: FIELD,
+            })
+        }
+    }
 }
 
 impl<T, P, const FIELD: u32, A, L, D> DefaultIn<A> for SingularField<T, P, FIELD, A, L, D>
