@@ -355,7 +355,7 @@ mod tests {
     }
 
     #[test]
-    fn oneof_message_variant_emits_boxed() {
+    fn oneof_tiny_message_variant_emits_inline() {
         let request = desc::request(vec![ProtoFile {
             messages: vec![
                 MessageDesc {
@@ -365,7 +365,6 @@ mod tests {
                 MessageDesc {
                     fields: vec![FieldDesc {
                         oneof_index: Some(0),
-                        message_layout: Some(MessageLayout::Inline),
                         ..msg_field("postal", 1, ".Point")
                     }],
                     oneofs: vec![desc::oneof("note")],
@@ -376,11 +375,73 @@ mod tests {
         }]);
         let content = generate_lib(&request);
         assert!(
-            content.contains("::puroro_rt::Boxed"),
-            "oneof message variant must emit Boxed: {content}"
+            !content.contains("Boxed"),
+            "auto-inlined oneof Point must not emit Boxed: {content}"
         );
         assert!(
             !content.contains("BIT_POSTAL"),
+            "oneof message variant must not allocate a presence bit: {content}"
+        );
+        assert!(
+            content.contains("::puroro_rt::Oneof"),
+            "oneof message variant must keep Oneof presence: {content}"
+        );
+    }
+
+    #[test]
+    fn oneof_address_variant_emits_boxed() {
+        let request = desc::request(vec![ProtoFile {
+            messages: vec![
+                MessageDesc {
+                    fields: vec![FieldDesc {
+                        proto3_optional: true,
+                        ..desc::field("street", 1, FieldType::String)
+                    }],
+                    ..desc::message("Address")
+                },
+                MessageDesc {
+                    fields: vec![FieldDesc {
+                        oneof_index: Some(0),
+                        ..msg_field("postal", 1, ".Address")
+                    }],
+                    oneofs: vec![desc::oneof("note")],
+                    ..desc::message("Holder")
+                },
+            ],
+            ..desc::proto_file("t.proto", "")
+        }]);
+        let content = generate_lib(&request);
+        assert!(
+            content.contains("::puroro_rt::Boxed"),
+            "Address-like oneof variant must emit Boxed: {content}"
+        );
+        assert!(
+            !content.contains("BIT_POSTAL"),
+            "oneof message variant must not allocate a presence bit: {content}"
+        );
+    }
+
+    #[test]
+    fn oneof_recursive_inline_hint_still_emits_boxed() {
+        let request = desc::request(vec![ProtoFile {
+            messages: vec![MessageDesc {
+                fields: vec![FieldDesc {
+                    oneof_index: Some(0),
+                    message_layout: Some(MessageLayout::Inline),
+                    ..msg_field("child", 1, ".Nest")
+                }],
+                oneofs: vec![desc::oneof("nest")],
+                ..desc::message("Nest")
+            }],
+            ..desc::proto_file("t.proto", "")
+        }]);
+        let content = generate_lib(&request);
+        assert!(
+            content.contains("::puroro_rt::Boxed"),
+            "recursive oneof Nest.child must stay Boxed: {content}"
+        );
+        assert!(
+            !content.contains("BIT_CHILD"),
             "oneof message variant must not allocate a presence bit: {content}"
         );
     }

@@ -196,7 +196,8 @@ pub const MESSAGE_LAYOUT_OPTION_NUMBER: u32 = 51402;
 /// [`Unspecified`](Self::Unspecified) (and an absent option) uses the generator
 /// heuristic (tiny scalar-only children inlined, otherwise boxed).
 /// [`Inline`](Self::Inline) requests embedding; [`Boxed`](Self::Boxed) pins a
-/// heap box. Illegal cases (oneof / repeated / map / same-SCC) always box.
+/// heap box. Illegal cases (repeated / map / same-SCC) always box. Oneof
+/// message variants follow the same rules as ordinary singular messages.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, TryFrom)]
 #[try_from(repr)]
 #[repr(i32)]

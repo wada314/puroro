@@ -8,7 +8,7 @@ use ::std::collections::{HashMap, HashSet};
 
 /// Per-field nested-message storage chosen for this [`FileSet`].
 ///
-/// Missing keys are boxed (oneof / repeated / map / ineligible / default).
+/// Missing keys are boxed (repeated / map / ineligible / default).
 #[derive(Debug, Default)]
 pub struct MessageStoragePlan {
     /// Owner FQN → field numbers stored inline in the parent struct.
@@ -24,7 +24,8 @@ impl MessageStoragePlan {
     }
 }
 
-/// Decide boxed vs inlined storage for every singular non-oneof message field.
+/// Decide boxed vs inlined storage for every singular message field
+/// (including oneof variants).
 ///
 /// Same-SCC edges (self / mutual recursion) always box. `(puroro.message_layout)
 /// = BOXED` is always honored; `INLINE` is ignored when illegal. Unspecified
@@ -35,7 +36,7 @@ pub fn plan_message_storage<'a>(file_set: &FileSet<'a>) -> MessageStoragePlan {
     let mut plan = MessageStoragePlan::default();
     for (idx, owner) in messages.iter().enumerate() {
         for field in owner.fields() {
-            if !is_singular_non_oneof_message(field) {
+            if !is_singular_message(field) {
                 continue;
             }
             let TypeRef::Message(child) = field.type_ref() else {
@@ -81,11 +82,9 @@ fn index_of<'a>(messages: &[&'a Message<'a>], target: &'a Message<'a>) -> Option
     messages.iter().position(|m| m.fqn() == target.fqn())
 }
 
-fn is_singular_non_oneof_message(field: &Field<'_>) -> bool {
-    matches!(
-        field.occurrence(),
-        FieldOccurrence::Singular(presence) if !matches!(presence, SingularPresence::Oneof)
-    ) && matches!(field.type_ref(), TypeRef::Message(_))
+fn is_singular_message(field: &Field<'_>) -> bool {
+    matches!(field.occurrence(), FieldOccurrence::Singular(_))
+        && matches!(field.type_ref(), TypeRef::Message(_))
 }
 
 fn decide_inline(field: &Field<'_>, child: &Message<'_>, same_scc: bool) -> bool {
@@ -146,12 +145,13 @@ fn is_copy_scalar_or_enum(field: &Field<'_>) -> bool {
 /// Assign a strongly-connected-component (SCC) id to each message.
 ///
 /// The graph is: node = message type, edge `Owner → Child` for each singular
-/// non-oneof field whose type is `Child`. Inlining `Child` into `Owner` embeds
-/// `Child`'s struct in `Owner`. That is only possible when there is **no cycle**
-/// through that edge (`Owner` cannot reach itself by following nested-message
-/// fields). Two types are in the same SCC iff each can reach the other
-/// (`A → B → A`, or a longer cycle). A self-field `Nest.child: Nest` is the
-/// same node as parent and child, so `scc[i] == scc[i]` and we refuse to inline.
+/// field (including oneof variants) whose type is `Child`. Inlining `Child`
+/// into `Owner` embeds `Child`'s struct in `Owner` (or in a oneof variant).
+/// That is only possible when there is **no cycle** through that edge
+/// (`Owner` cannot reach itself by following nested-message fields). Two types
+/// are in the same SCC iff each can reach the other (`A → B → A`, or a longer
+/// cycle). A self-field `Nest.child: Nest` is the same node as parent and
+/// child, so `scc[i] == scc[i]` and we refuse to inline.
 ///
 /// Isolated types (no message edges) each get their own component.
 ///
@@ -165,7 +165,7 @@ fn scc_ids(messages: &[&Message<'_>]) -> Vec<usize> {
     let mut adj = vec![Vec::new(); n];
     for (i, owner) in messages.iter().enumerate() {
         for field in owner.fields() {
-            if !is_singular_non_oneof_message(field) {
+            if !is_singular_message(field) {
                 continue;
             }
             let TypeRef::Message(child) = field.type_ref() else {
@@ -340,9 +340,9 @@ mod tests {
     }
 
     #[test]
-    fn scc_ignores_oneof_edges() {
-        // Oneof A { B b } is not a graph edge today, so INLINE is still ignored
-        // at plan_fields — but SCC treats A and B as distinct (no cycle).
+    fn scc_includes_oneof_edges_and_can_inline() {
+        // Oneof A { B b } is a graph edge. No back-edge → distinct SCCs, INLINE
+        // is legal (B has no fields, so the hint is what enables inline).
         let arena = Arena::new();
         let files = [proto3_file(vec![
             MessageDesc {
@@ -362,6 +362,35 @@ mod tests {
         let b = msg_idx(&messages, "B");
         assert_ne!(ids[a], ids[b]);
         let storage = plan_message_storage(&set);
+        assert!(storage.is_inline(message(&set, "A"), 1));
+    }
+
+    #[test]
+    fn scc_oneof_mutual_pair_shares_component() {
+        // A.oneof { B b } and B.a: A stay boxed (same SCC).
+        let arena = Arena::new();
+        let files = [proto3_file(vec![
+            MessageDesc {
+                fields: vec![FieldDesc {
+                    oneof_index: Some(0),
+                    message_layout: Some(MessageLayout::Inline),
+                    ..msg_field("b", 1, ".example.B")
+                }],
+                oneofs: vec![desc::oneof("choice")],
+                ..desc::message("A")
+            },
+            MessageDesc {
+                fields: vec![force_inline("a", 1, ".example.A")],
+                ..desc::message("B")
+            },
+        ])];
+        let set = resolve(&arena, &files).unwrap();
+        let (messages, ids) = scc_of(&set);
+        let a = msg_idx(&messages, "A");
+        let b = msg_idx(&messages, "B");
+        assert_eq!(ids[a], ids[b]);
+        let storage = plan_message_storage(&set);
         assert!(!storage.is_inline(message(&set, "A"), 1));
+        assert!(!storage.is_inline(message(&set, "B"), 1));
     }
 }

@@ -30,8 +30,9 @@ enum BytesLayout {
 //
 // Unset and `MESSAGE_LAYOUT_UNSPECIFIED` let the generator pick (auto-inline
 // a tiny scalar-only child, otherwise boxed). `MESSAGE_LAYOUT_INLINE` requests
-// embedding; `MESSAGE_LAYOUT_BOXED` pins a heap box. Oneof / repeated / map /
-// same-SCC (recursive) fields always box and ignore INLINE.
+// embedding; `MESSAGE_LAYOUT_BOXED` pins a heap box. Repeated / map /
+// same-SCC (recursive) fields always box and ignore INLINE. Oneof message
+// variants use the same boxed-vs-inline rules as ordinary singular messages.
 enum MessageLayout {
   MESSAGE_LAYOUT_UNSPECIFIED = 0;
   MESSAGE_LAYOUT_INLINE = 1;

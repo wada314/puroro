@@ -236,9 +236,11 @@ fn plan_field<'a>(
         FieldOccurrence::Singular(presence) => {
             let wire = WireTypeKind::from_field(field);
             let inline_nested = matches!(wire, WireTypeKind::Message(_))
-                && !matches!(presence, SingularPresence::Oneof)
                 && storage.is_inline(owner, field.number());
-            let planned_presence = if inline_nested {
+            // Oneof variants keep `Oneof` presence (no extra bit). Non-oneof
+            // inlined children need an Explicit / LegacyRequired presence bit.
+            let planned_presence = if inline_nested && !matches!(presence, SingularPresence::Oneof)
+            {
                 let bit_presence = if field.is_legacy_required() {
                     SingularPresence::LegacyRequired
                 } else {
@@ -1220,14 +1222,13 @@ mod tests {
     }
 
     #[test]
-    fn oneof_message_variant_is_always_boxed() {
+    fn oneof_tiny_message_variant_is_auto_inlined() {
         let arena = Arena::new();
         let files = [proto3_file(vec![
             point_message(),
             MessageDesc {
                 fields: vec![FieldDesc {
                     oneof_index: Some(0),
-                    message_layout: Some(MessageLayout::Inline),
                     ..msg_field("postal", 1, ".example.Point")
                 }],
                 oneofs: vec![desc::oneof("note")],
@@ -1241,6 +1242,92 @@ mod tests {
             panic!("expected oneof");
         };
         match note.variants()[0].kind() {
+            FieldKind::Singular {
+                presence: PlannedPresence::Oneof,
+                layout: PlannedLayout::Inline,
+                ..
+            } => {}
+            other => panic!("{other:?}"),
+        }
+    }
+
+    #[test]
+    fn oneof_message_layout_force_boxed() {
+        let arena = Arena::new();
+        let files = [proto3_file(vec![
+            point_message(),
+            MessageDesc {
+                fields: vec![FieldDesc {
+                    oneof_index: Some(0),
+                    message_layout: Some(MessageLayout::Boxed),
+                    ..msg_field("postal", 1, ".example.Point")
+                }],
+                oneofs: vec![desc::oneof("note")],
+                ..desc::message("Holder")
+            },
+        ])];
+        let set = resolve(&arena, &files).unwrap();
+        let plan = plan_fields(message(&set, "Holder"), &plan_message_storage(&set)).unwrap();
+        let MessageMember::Oneof(note) = &plan.members()[0] else {
+            panic!("expected oneof");
+        };
+        match note.variants()[0].kind() {
+            FieldKind::Singular {
+                layout: PlannedLayout::Boxed,
+                ..
+            } => {}
+            other => panic!("{other:?}"),
+        }
+    }
+
+    #[test]
+    fn oneof_address_like_variant_stays_boxed() {
+        let arena = Arena::new();
+        let files = [proto3_file(vec![
+            address_message(),
+            MessageDesc {
+                fields: vec![FieldDesc {
+                    oneof_index: Some(0),
+                    ..msg_field("postal", 1, ".example.Address")
+                }],
+                oneofs: vec![desc::oneof("note")],
+                ..desc::message("Holder")
+            },
+        ])];
+        let set = resolve(&arena, &files).unwrap();
+        let plan = plan_fields(message(&set, "Holder"), &plan_message_storage(&set)).unwrap();
+        let MessageMember::Oneof(note) = &plan.members()[0] else {
+            panic!("expected oneof");
+        };
+        match note.variants()[0].kind() {
+            FieldKind::Singular {
+                presence: PlannedPresence::Oneof,
+                layout: PlannedLayout::Boxed,
+                ..
+            } => {}
+            other => panic!("{other:?}"),
+        }
+    }
+
+    #[test]
+    fn oneof_recursive_inline_hint_is_ignored() {
+        let arena = Arena::new();
+        let files = [proto3_file(vec![MessageDesc {
+            fields: vec![FieldDesc {
+                oneof_index: Some(0),
+                message_layout: Some(MessageLayout::Inline),
+                ..msg_field("child", 1, ".example.Nest")
+            }],
+            oneofs: vec![desc::oneof("nest")],
+            ..desc::message("Nest")
+        }])];
+        let set = resolve(&arena, &files).unwrap();
+        let plan = plan_fields(message(&set, "Nest"), &plan_message_storage(&set)).unwrap();
+        assert_eq!(plan.bit_count(), 0);
+        let MessageMember::Oneof(nest) = &plan.members()[0] else {
+            panic!("expected oneof");
+        };
+        match nest.variants()[0].kind() {
             FieldKind::Singular {
                 presence: PlannedPresence::Oneof,
                 layout: PlannedLayout::Boxed,

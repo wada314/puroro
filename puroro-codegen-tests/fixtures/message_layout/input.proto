@@ -18,9 +18,16 @@ message Tiny {
   int32 n = 1;
 }
 
-// Same-SCC edge: INLINE is ignored.
+// Same-SCC edge: INLINE is ignored (singular and oneof).
 message Recurse {
   Recurse child = 1 [(puroro.message_layout) = MESSAGE_LAYOUT_INLINE];
+}
+
+message RecurseOneof {
+  oneof nest {
+    RecurseOneof child = 1 [(puroro.message_layout) = MESSAGE_LAYOUT_INLINE];
+    int32 tag = 2;
+  }
 }
 
 message Holder {
@@ -28,8 +35,10 @@ message Holder {
   Address assignee = 2;
   Tiny forced_box = 3 [(puroro.message_layout) = MESSAGE_LAYOUT_BOXED];
   Address forced_inline = 4 [(puroro.message_layout) = MESSAGE_LAYOUT_INLINE];
+  // Point auto-inlines; Address stays boxed. Mixed layouts in one group.
   oneof note {
-    Point postal = 5 [(puroro.message_layout) = MESSAGE_LAYOUT_INLINE];
+    Point postal = 5;
+    Address boxed_postal = 7;
     int32 rank = 6;
   }
 }

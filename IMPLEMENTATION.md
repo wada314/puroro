@@ -364,7 +364,7 @@ Rust payload type alone does **not** identify protobuf encoding (`i32` can be in
 
 **“Singular” means non-repeated** — both presence-tracked (“optional” / `EXPLICIT`) and non-presence-tracked (`IMPLICIT`) fields. It is *not* limited to proto `optional`. Cardinality is singular vs repeated; presence is a separate axis (`FieldPresence`).
 
-Varint and LEN singular scalars share one wrapper, parametrised by [`SingularType`](puroro-rt/src/fields/wire/singular_type.rs) `T`, presence `P`, and allocator `A`. `FIELD: u32` is a **struct** const generic; `BIT` lives on `Explicit<BIT>` / `LegacyRequired<BIT>`. Markers (`ProtoString`, `ProtoInt32`, …) are allocator-free; `A` sits on the field wrapper. Nested messages use the same wrapper: boxed `SingularField<ProtoMessage<M>, Message|Oneof, FIELD, A, Boxed>` (typically `M = Address<A>`); inlined singular `SingularField<ProtoMessage<M>, Explicit<BIT>, FIELD, A>` (`Slot = M`).
+Varint and LEN singular scalars share one wrapper, parametrised by [`SingularType`](puroro-rt/src/fields/wire/singular_type.rs) `T`, presence `P`, and allocator `A`. `FIELD: u32` is a **struct** const generic; `BIT` lives on `Explicit<BIT>` / `LegacyRequired<BIT>`. Markers (`ProtoString`, `ProtoInt32`, …) are allocator-free; `A` sits on the field wrapper. Nested messages use the same wrapper: boxed `SingularField<ProtoMessage<M>, Message|Oneof, FIELD, A, Boxed>` (typically `M = Address<A>`); inlined singular `SingularField<ProtoMessage<M>, Explicit<BIT>, FIELD, A>` (`Slot = M`); inlined oneof `SingularField<ProtoMessage<M>, Oneof, FIELD, A>` (`Slot = M`).
 
 | Wrapper | Module | Params | Aliases (ergonomics) |
 |---|---|---|---|
@@ -372,7 +372,8 @@ Varint and LEN singular scalars share one wrapper, parametrised by [`SingularTyp
 | `SingularField<ProtoBool, P, FIELD, A, BitPacked<VALUE_BIT>>` | same | `Slot = ()`; value at `VALUE_BIT` via layout | — |
 | `SingularField<ProtoMessage<M>, Message, FIELD, A, Boxed>` | same | `Slot = UnmanagedBox<M, A>`; `Message` → `Option` | boxed singular |
 | `SingularField<ProtoMessage<M>, Explicit<BIT>, FIELD, A>` | same | `Slot = M`; presence bit + `MaybeUninit<M>` | inlined singular |
-| `SingularField<ProtoMessage<M>, Oneof, FIELD, A, Boxed>` | same | always-present `UnmanagedBox<M, A>` | oneof message variant |
+| `SingularField<ProtoMessage<M>, Oneof, FIELD, A, Boxed>` | same | always-present `UnmanagedBox<M, A>` | boxed oneof message variant |
+| `SingularField<ProtoMessage<M>, Oneof, FIELD, A>` | same | always-present `M` | inlined oneof message variant |
 | `RepeatedField<T, E, FIELD, A>` | [`repeated/field.rs`](puroro-rt/src/fields/repeated/field.rs) | `T: RepeatedElement`, `E: RepeatedEncoding<T, A>`, stores `T::Element<A>` | — |
 | `MapField<K, V, FIELD, A>` | [`map/field.rs`](puroro-rt/src/fields/map/field.rs) | `K: MapKey`, `V: RepeatedElement`, stores `HashMap<K::Element, V::Element, A>` | — |
 | `OneofSlot<E>` | [`oneof.rs`](puroro-rt/src/fields/oneof.rs) | mutually exclusive variants | — |
@@ -771,6 +772,7 @@ Same wrapper as other singular fields. [`ProtoMessage`](puroro-rt/src/fields/wir
 - [`Boxed`](puroro-rt/src/fields/shared/value_layout.rs) + [`Message`](puroro-rt/src/fields/shared/field_presence.rs) → `Option<UnmanagedBox<M, A>>` (typical singular; sample `Task.assignee`)
 - [`Boxed`](puroro-rt/src/fields/shared/value_layout.rs) + [`Oneof`](puroro-rt/src/fields/shared/field_presence.rs) → always-present `UnmanagedBox<M, A>` (sample `notification.postal`)
 - [`Inline`](puroro-rt/src/fields/shared/value_layout.rs) + [`Explicit<BIT>`](puroro-rt/src/fields/shared/field_presence.rs) → `MaybeUninit<M>` (sample `Task.origin` / `Point`)
+- [`Inline`](puroro-rt/src/fields/shared/value_layout.rs) + [`Oneof`](puroro-rt/src/fields/shared/field_presence.rs) → always-present `M` (tiny oneof message variant)
 
 Child type bound is `M: Message<Alloc = A>` (empty children via [`Message::new_in`](src/message.rs)). An inlined child still owns its own [`MessageCommon`](#4-shared-infrastructure) (no sharing). Wire merge / encode / clear go through [`ValueLayout`](puroro-rt/src/fields/shared/value_layout.rs) (`Boxed` vs `Inline` + [`PayloadMerge`](puroro-rt/src/fields/wire/singular_type.rs)). Accessors stay `Option<&M>` / `&mut M` (`bind` / `bind_mut` → `get` / `get_mut` / `merge` / `clear`). Recursion limit: enforced (`RECURSION_LIMIT`).
 
@@ -797,7 +799,7 @@ The sample `oneof notification` is deliberately **heterogeneous** — LEN, VARIN
 
 The oneof drives each variant with the **field's own** primitives. Empty construction is [`DefaultIn`](puroro-rt/src/fields/shared.rs) on the variant field wrapper (`SingularField::default_in`). Merging is `slot.bind_mut(common).variant_mut::<FIELD_…>().bind_mut(common).merge(wire, buf)`. Read getters use `slot.bind(common).variant_of::<FIELD_…>().optional()` / `.get()`. [`OneofVariant`](puroro-rt/src/fields/oneof_variant.rs) is keyed by proto field number (no per-variant marker ZSTs).
 
-**The message variant uses `SingularField<ProtoMessage<…>, Oneof, …, Boxed>` — always-present `UnmanagedBox<M, A>`, not `Option`.**
+**A boxed message variant uses `SingularField<ProtoMessage<…>, Oneof, …, Boxed>` — always-present `UnmanagedBox<M, A>`, not `Option`. An inlined oneof message variant uses default `Inline` (`Slot = M`), still under `Oneof` (no presence bit).**
 
 Parent `_mut` accessors are:
 `slot.bind_mut(common).variant_mut::<FIELD_…>().bind_mut(common).value_mut()`.
@@ -837,9 +839,9 @@ The `set_*` per-variant setters are removed, matching the other field families.
 
 ### 17.1 Submessage inline optimisation
 
-**Status (runtime, no common sharing): done.** Singular nested messages use [`Boxed`](puroro-rt/src/fields/shared/value_layout.rs) (`UnmanagedBox<M, A>`) or [`Inline`](puroro-rt/src/fields/shared/value_layout.rs) (`M` in the parent slot + `Explicit` / `LegacyRequired` presence bit). Public accessors stay `Option<&M>`. The inlined child still owns its own [`MessageCommon`](#4-shared-infrastructure) (allocator clone, unknown fields, bits). Oneof / repeated stay boxed / `Element = M`. Same-SCC singular edges (self / mutual recursion) stay `Boxed`.
+**Status (runtime, no common sharing): done.** Singular nested messages use [`Boxed`](puroro-rt/src/fields/shared/value_layout.rs) (`UnmanagedBox<M, A>`) or [`Inline`](puroro-rt/src/fields/shared/value_layout.rs) (`M` in the parent slot + `Explicit` / `LegacyRequired` presence bit). Public accessors stay `Option<&M>`. The inlined child still owns its own [`MessageCommon`](#4-shared-infrastructure) (allocator clone, unknown fields, bits). Oneof message variants use the same boxed-vs-inline choice (still `Oneof` presence — always-present `M` or box, no extra bit). Repeated stay `Element = M`. Same-SCC singular edges (self / mutual recursion, including oneof) stay `Boxed`.
 
-**Codegen.** [`(puroro.message_layout)`](proto/puroro/options.proto) (`UNSPECIFIED` / `INLINE` / `BOXED`, field 51402) plus [`plan_message_storage`](protoc-gen-puroro/src/field_kind/storage.rs): graph of singular non-oneof message edges → Tarjan SCCs ineligible for inline → `BOXED` honored, `INLINE` ignored when illegal, unspecified uses the auto-inline heuristic (child has 1..=4 non-repeated Copy scalars / enums). Sample `Task.origin` is the hand-written inlined path; plugin fixtures live in [`puroro-codegen-tests/fixtures/message_layout`](puroro-codegen-tests/fixtures/message_layout/).
+**Codegen.** [`(puroro.message_layout)`](proto/puroro/options.proto) (`UNSPECIFIED` / `INLINE` / `BOXED`, field 51402) plus [`plan_message_storage`](protoc-gen-puroro/src/field_kind/storage.rs): graph of singular message edges (including oneof variants) → Tarjan SCCs ineligible for inline → `BOXED` honored, `INLINE` ignored when illegal, unspecified uses the auto-inline heuristic (child has 1..=4 non-repeated Copy scalars / enums). Sample `Task.origin` is the hand-written inlined path; plugin fixtures live in [`puroro-codegen-tests/fixtures/message_layout`](puroro-codegen-tests/fixtures/message_layout/).
 
 **Sharing `MessageCommon` (future).** A smaller inlined child would share the parent's common (bits offset, allocator, unknown buffer) rather than embedding a second `MessageCommon`. That remains future work: generic-over-common message types and scoped `bind` views.
 

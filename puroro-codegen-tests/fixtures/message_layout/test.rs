@@ -1,6 +1,6 @@
 //! `(puroro.message_layout)` and the auto-inline heuristic.
 
-use crate::message_layout::{Address, Holder, Point, Recurse, Tiny};
+use crate::message_layout::{Address, Holder, Point, Recurse, RecurseOneof, Tiny};
 use ::core::mem::size_of;
 use ::puroro::{Message, StringMut};
 
@@ -55,12 +55,27 @@ fn recursive_inline_hint_still_round_trips() {
 }
 
 #[test]
-fn oneof_postal_ignores_inline_hint() {
+fn oneof_postal_auto_inlines_and_round_trips() {
     let mut holder = Holder::new();
     *holder.postal_mut().x_mut() = 1;
     assert!(holder.postal().is_some());
     let decoded: Holder = Holder::decode(&holder.encode_to_vec()[..]).expect("decode");
     assert_eq!(decoded.postal().unwrap().x(), 1);
+
+    holder.boxed_postal_mut().city_mut().push_str("Osaka");
+    let decoded: Holder = Holder::decode(&holder.encode_to_vec()[..]).expect("decode");
+    assert!(decoded.postal().is_none());
+    assert_eq!(decoded.boxed_postal().unwrap().city().get(), "Osaka");
+}
+
+#[test]
+fn oneof_recursive_inline_hint_still_round_trips() {
+    let mut nest = RecurseOneof::new();
+    let _ = nest.child_mut().child_mut();
+    let decoded: RecurseOneof = RecurseOneof::decode(&nest.encode_to_vec()[..]).expect("decode");
+    assert!(decoded.child().is_some());
+    assert!(decoded.child().unwrap().child().is_some());
+    assert!(decoded.child().unwrap().child().unwrap().child().is_none());
 }
 
 #[test]

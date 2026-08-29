@@ -12,19 +12,10 @@
 //! released through [`OneofDeallocate::deallocate`] before the slot is
 //! overwritten.
 
-use ::allocator_api2::alloc::Allocator;
-use ::bytes::BufMut;
-use ::core::fmt::{self, Debug, Formatter, Result as FmtResult};
-use ::puroro::{
-    HasDefault, OneofView as OneofViewTrait, OneofViewMut as OneofViewMutTrait, Optional,
-};
-use ::unmanaged::UnmanagedBox;
-
 use crate::fields::oneof_variant::OneofVariant;
 use crate::fields::shared::field_inspect::{FieldCloneIn, FieldDebug, FieldEncode, FieldPartialEq};
 use crate::fields::shared::{
-    Boxed, DefaultIn, FieldDeallocate, MessageCommon, MessageCommonAlloc, MessageCommonBits,
-    ValueLayout,
+    DefaultIn, FieldDeallocate, MessageCommon, MessageCommonAlloc, MessageCommonBits, ValueLayout,
     field_presence::{FieldPresence, Oneof},
     value_slot::{AddressableSlot, ValueSlot},
 };
@@ -32,6 +23,12 @@ use crate::fields::singular::field::SingularField;
 use crate::fields::wire::proto_message::ProtoMessage;
 use crate::fields::wire::singular_type::SingularType;
 use crate::message_encode::{EncodeCtx, MessageEncode};
+use ::allocator_api2::alloc::Allocator;
+use ::bytes::BufMut;
+use ::core::fmt::{self, Debug, Formatter, Result as FmtResult};
+use ::puroro::{
+    HasDefault, OneofView as OneofViewTrait, OneofViewMut as OneofViewMutTrait, Optional,
+};
 
 /// Explicit release of a generated `oneof` storage enum.
 ///
@@ -458,14 +455,16 @@ where
     }
 }
 
-impl<'a, M, const FIELD: u32, A: Allocator, Pb>
-    OneofVariantRef<'a, SingularField<ProtoMessage<M>, Oneof, FIELD, A, Boxed>, Pb, A>
+impl<'a, M, const FIELD: u32, A: Allocator, L, Pb>
+    OneofVariantRef<'a, SingularField<ProtoMessage<M>, Oneof, FIELD, A, L>, Pb, A>
 where
-    M: MessageEncode + ::unmanaged::DeallocateIn<A>,
+    M: MessageEncode,
+    L: ValueLayout<ProtoMessage<M>, A>,
+    L::Slot: AddressableSlot,
     MessageCommon<Pb, A>: MessageCommonBits,
-    <Oneof as FieldPresence>::ValueSlot<UnmanagedBox<M, A>>: ValueSlot<UnmanagedBox<M, A>, A>,
+    <Oneof as FieldPresence>::ValueSlot<L::Slot>: ValueSlot<L::Slot, A>,
 {
-    /// Returns the child when this message variant is active.
+    /// Returns the child when this message variant is active (`Boxed` or `Inline`).
     pub fn get(self) -> Option<&'a M> {
         self.field.map(|f| f.bind(self.common).value())
     }
