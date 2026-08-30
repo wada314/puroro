@@ -894,7 +894,9 @@ fn unknown_fields(&self) -> impl Iterator<Item = UnknownField<'_>> + '_;
 
 This shape is the **common public contract**: it does not require contiguous wire storage, so future policies (discard, alternate layouts, custom handlers) can keep the same accessor. A common-trait `as_bytes()` is intentionally not provided.
 
-**Default implementation (today):** `MessageCommon` still stores a contiguous partial protobuf stream (`UnmanagedVec<u8>`), filled by `skip_field_and_save` / closed-enum diversion. Encode re-emits that blob verbatim at the end of the message. The public iterator parses the blob via `puroro_rt::decode::iter_unknown_fields`.
+**Default implementation (today):** [`UnknownFields`](puroro-rt/src/unknown_fields.rs) in `MessageCommon` (about one word when empty). The first unknown allocates a heap node: a **self** blob (same wire trailer as before) plus a map of proto field number → child `UnknownFields`. `skip_field_and_save` / closed-enum diversion append the self blob. Encode re-emits that blob via `Deref` to `[u8]`. The public iterator parses it via `puroro_rt::decode::iter_unknown_fields`. Child entries are for **inlined** singular / oneof message variants (unused by codegen until common sharing); repeated and map elements keep their own `MessageCommon`.
+
+`Message::unknown_fields()` stays the self-blob iterator. Unknowns recorded while merging an inlined child live in that child’s subtree and re-encode **inside the child’s LEN**, not as parent-level unknowns. `clear_*` / oneof switch / Drop of an inlined slot removes that field-number entry. Sharing `MessageCommon` for inlined bodies depends on this store ([IMPLEMENTATION.md §17.1](IMPLEMENTATION.md#171-submessage-inline-optimisation)).
 
 **Future policies (not yet implemented):**
 

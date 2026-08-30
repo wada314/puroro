@@ -20,6 +20,8 @@ use ::puroro::wire_type;
 use ::puroro::{DecodeError, UnknownField, UnknownPayload, WireType};
 use ::unmanaged::{UnmanagedString, UnmanagedVec};
 
+use crate::unknown_fields::UnknownFields;
+
 use crate::encode;
 
 /// Decodes a base-128 varint from `buf` with [`ChunkScanHot4`].
@@ -126,16 +128,17 @@ pub(crate) fn skip_field<B: Buf>(wire_type: WireType, buf: &mut B) -> Result<(),
 /// Skips one field payload and appends its tag + wire bytes to `unknown_fields`.
 ///
 /// Used by message `merge` unknown arms so unrecognized tags round-trip on encode.
-pub fn skip_field_and_save<B: Buf, A: Allocator>(
+pub fn skip_field_and_save<B: Buf, A: Allocator + Clone>(
     field_number: FieldNumber,
     wire_type: WireType,
     buf: &mut B,
-    unknown_fields: &mut UnmanagedVec<u8, A>,
+    unknown_fields: &mut UnknownFields<A>,
     alloc: A,
 ) -> Result<(), DecodeError> {
+    let blob = unknown_fields.self_blob_vec_mut(alloc.clone());
     // SAFETY: the owned `alloc` (an `alloc.clone()` from the caller) is
     // interchangeable with the allocator that owns this vector's buffer.
-    let mut g = unsafe { unknown_fields.with_alloc(alloc) };
+    let mut g = unsafe { blob.with_alloc(alloc) };
     encode::write_tag_to_vec(field_number, wire_type, &mut *g);
 
     match wire_type {
@@ -173,15 +176,16 @@ pub fn skip_field_and_save<B: Buf, A: Allocator>(
     Ok(())
 }
 
-pub(crate) fn save_unknown_varint_field<A: Allocator>(
+pub(crate) fn save_unknown_varint_field<A: Allocator + Clone>(
     field_number: FieldNumber,
     value: u64,
-    unknown_fields: &mut UnmanagedVec<u8, A>,
+    unknown_fields: &mut UnknownFields<A>,
     alloc: A,
 ) {
+    let blob = unknown_fields.self_blob_vec_mut(alloc.clone());
     // SAFETY: the owned `alloc` (an `alloc.clone()` from the caller) is
     // interchangeable with the allocator that owns this vector's buffer.
-    let mut g = unsafe { unknown_fields.with_alloc(alloc) };
+    let mut g = unsafe { blob.with_alloc(alloc) };
     encode::write_tag_to_vec(field_number, WireType::Varint, &mut *g);
     encode::write_varint_to_vec(Varint::from_uint64(value), &mut *g);
 }

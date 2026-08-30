@@ -19,6 +19,7 @@ pub mod encode;
 pub(crate) mod fields;
 pub mod message_encode;
 pub mod message_merge;
+pub(crate) mod unknown_fields;
 
 pub use ::protobuf_core::{FieldNumber, Varint};
 /// Generator-facing re-exports from `unmanaged`.
@@ -38,7 +39,7 @@ pub use fields::shared::{
     EncodedLenVisitor, FieldCloneIn, FieldDeallocVisitor, FieldDeallocate, FieldEncode,
     FieldEqVisitor, FieldPairVisitor, FieldPairVisitorMut, FieldVisitor, FieldVisitorMut, Inline,
     InlineOrHeap, MessageCommon, MessageCommonAlloc, MessageCommonBits, SSO_HEAP, SSO_INLINE,
-    ValueLayout,
+    UnknownFields, ValueLayout,
 };
 pub use fields::singular::{
     SingularField, SingularFieldAccess, SingularFieldMut, SingularFieldRef,

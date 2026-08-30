@@ -19,6 +19,7 @@ pub(crate) mod slot_init;
 pub(crate) mod value_layout;
 pub(crate) mod value_slot;
 
+pub use crate::unknown_fields::UnknownFields;
 pub use ::unmanaged::DefaultIn;
 pub use field_deallocate::FieldDeallocate;
 pub use field_inspect::{
@@ -31,6 +32,7 @@ pub use value_slot::AddressableSlot;
 
 use ::core::mem::ManuallyDrop;
 
+use crate::decode::{UnknownFieldsIter, iter_unknown_fields};
 use ::allocator_api2::alloc::Allocator;
 use ::bitvec::{
     array::BitArray,
@@ -38,9 +40,6 @@ use ::bitvec::{
     ptr::{BitRef, Mut},
     slice::BitSlice,
 };
-use ::unmanaged::UnmanagedVec;
-
-use crate::decode::{UnknownFieldsIter, iter_unknown_fields};
 
 // ---------------------------------------------------------------------------
 // Private bit-storage helper (not a catalog bound)
@@ -136,8 +135,9 @@ pub struct MessageCommon<B, A: Allocator> {
     /// Common bits (`BitArray` sized by codegen): presence, packed bool values,
     /// and string / bytes SSO heap-arm bits.
     pub bits: B,
-    /// Contiguous unknown-field wire blob (`ManuallyDrop` — freed by the message).
-    pub unknown_fields: ManuallyDrop<UnmanagedVec<u8, A>>,
+    /// Unknown-field store (`ManuallyDrop` — freed by the message). Empty is
+    /// one word; the self-blob / child tree is allocated on first use.
+    pub unknown_fields: ManuallyDrop<UnknownFields<A>>,
     /// Canonical allocator for the whole message (cloned for growth / clone;
     /// teardown borrows `&self.alloc`).
     pub alloc: A,
@@ -146,7 +146,7 @@ pub struct MessageCommon<B, A: Allocator> {
 impl<B, A: Allocator + Clone> MessageCommon<B, A> {
     /// Creates common state with the given common bits and allocator.
     pub fn new_in(bits: B, alloc: A) -> Self {
-        let unknown_fields = ManuallyDrop::new(UnmanagedVec::new(alloc.clone()));
+        let unknown_fields = ManuallyDrop::new(UnknownFields::new());
         Self {
             bits,
             unknown_fields,
@@ -175,13 +175,13 @@ impl<B, A: Allocator> MessageCommon<B, A> {
     /// public accessor shape.
     #[inline]
     pub fn iter_unknown_fields(&self) -> UnknownFieldsIter<'_> {
-        iter_unknown_fields(&self.unknown_fields)
+        iter_unknown_fields(self.unknown_fields.self_blob())
     }
 
     /// Byte-equality of the preserved unknown-field blob (for message `PartialEq`).
     #[inline]
     pub fn unknown_fields_eq(&self, other: &Self) -> bool {
-        self.unknown_fields.as_ref() == other.unknown_fields.as_ref()
+        (*self.unknown_fields).eq_tree(&other.unknown_fields)
     }
 
     /// Releases the unknown-field buffer. Must be called exactly once from the

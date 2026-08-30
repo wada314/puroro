@@ -210,7 +210,7 @@ Live plugin emits the eager-path field families shown by [`sample-generated/`](s
 | Member | Role |
 |---|---|
 | `bits: B` | `BitArray<[u8; N], Lsb0>` **common bits**: EXPLICIT / LEGACY_REQUIRED presence, packed bool values, and string / bytes SSO heap-arm bits |
-| `unknown_fields: ManuallyDrop<UnmanagedVec<u8, A>>` | Preserve policy: round-trip unknown wire blob; closed-enum unknowns. Public view via `iter_unknown_fields`. Freed by `MessageCommon::deallocate` |
+| `unknown_fields: ManuallyDrop<`[`UnknownFields`](puroro-rt/src/unknown_fields.rs)`<A>>` | Preserve: empty ≈ 1 word; first use allocates self-blob + child map. Public iterator is the **self** blob only |
 | `alloc: A` | The single canonical allocator instance; cloned (by value) into every field operation that (de)allocates |
 
 Field catalog methods take `&MessageCommon` / `&mut MessageCommon`, not `&Task`, so wrappers stay decoupled from the parent message type.
@@ -814,7 +814,7 @@ The `set_*` per-variant setters are removed, matching the other field families.
 
 ### Unknown
 
-**Storage (default Preserve):** `_common.unknown_fields` — contiguous partial wire stream via `puroro_rt::decode::skip_field_and_save` / `save_unknown_varint_field`; re-emitted on encode. `SGroup` / `EGroup` not preserved.
+**Storage (default Preserve):** [`UnknownFields`](puroro-rt/src/unknown_fields.rs) — empty is one word; `skip_field_and_save` / `save_unknown_varint_field` append the **self** blob. Encode uses `Deref` to that blob. Child subtrees (inlined messages) are stored by field number and are **not** listed on `unknown_fields()`. `SGroup` / `EGroup` not preserved.
 
 **Public accessor:** `Message::unknown_fields()` returns `impl Iterator<Item = ::puroro::UnknownField<'_>>` by parsing that blob with [`iter_unknown_fields`](puroro-rt/src/decode.rs) (also `MessageCommon::iter_unknown_fields`). Encode paths read the blob directly and do not go through the iterator.
 
@@ -834,7 +834,7 @@ The `set_*` per-variant setters are removed, matching the other field families.
 | Zero-copy views | — | `TaskView<'buf>` (DESIGN.md §8) |
 | `TaskLazy` | DESIGN only | Wire buffer + on-demand decode |
 | `Hash` / `serde` | Deferred | Opt-in features |
-| Submessage inline | Runtime + codegen: `Boxed` vs `Inline`+presence bit (`(puroro.message_layout)`, SCC, 1..=4 scalar heuristic) | `MessageCommon` sharing ([§17.1](#171-submessage-inline-optimisation)) |
+| Submessage inline | Runtime + codegen: `Boxed` vs `Inline`+presence bit; child still has its own `MessageCommon` | Nested unknown store, then shared common ([§17.1](#171-submessage-inline-optimisation)) |
 | String / Bytes inline | Singular `string` / `bytes` use SSO (`SsoString` / `SsoBytes` + `InlineOrHeap`); repeated / map stay heap | Repeated / map SSO deferred ([§17.2](#172-string--bytes-inline-optimisation)) |
 
 ### 17.1 Submessage inline optimisation
@@ -843,7 +843,9 @@ The `set_*` per-variant setters are removed, matching the other field families.
 
 **Codegen.** [`(puroro.message_layout)`](proto/puroro/options.proto) (`UNSPECIFIED` / `INLINE` / `BOXED`, field 51402) plus [`plan_message_storage`](protoc-gen-puroro/src/field_kind/storage.rs): graph of singular message edges (including oneof variants) → Tarjan SCCs ineligible for inline → `BOXED` honored, `INLINE` ignored when illegal, unspecified uses the auto-inline heuristic (child has 1..=4 non-repeated Copy scalars / enums). Sample `Task.origin` is the hand-written inlined path; plugin fixtures live in [`puroro-codegen-tests/fixtures/message_layout`](puroro-codegen-tests/fixtures/message_layout/).
 
-**Sharing `MessageCommon` (future).** A smaller inlined child would share the parent's common (bits offset, allocator, unknown buffer) rather than embedding a second `MessageCommon`. That remains future work: generic-over-common message types and scoped `bind` views.
+**Sharing `MessageCommon` (future).** Locked discussion: [`.cursor/plans/shared-message-common.md`](.cursor/plans/shared-message-common.md). Inlined **slot** is field body only; getters return a bound view (`Window` + `&`/`&mut` body), not `&M`. Users name `impl StudentMessage` (DESIGN §8), not `Student<Ref<…>>`. Every singular message getter (boxed and inlined) uses that view so layout hints can change. Bits stay child-local; `Window` adds a parent bit-base. `merge_from` is valid on a **mut** view; `decode` / `new_in` stay owned-only.
+
+**Next task:** replace the always-present 3-word unknown `UnmanagedVec` with a compact tree that can store per-child blobs ([DESIGN.md §4.9](DESIGN.md#49-unknown-fields)). Sharing bits/alloc without that store is a weak `Global` win. Catalog GAT split (`Slot` = body, `View`/`Mut` = bound) follows the store.
 
 ### 17.2 String / Bytes inline optimisation
 
