@@ -18,6 +18,7 @@ pub(crate) mod field_presence;
 pub(crate) mod slot_init;
 pub(crate) mod value_layout;
 pub(crate) mod value_slot;
+pub(crate) mod window;
 
 pub use crate::unknown_fields::UnknownFields;
 pub use ::unmanaged::DefaultIn;
@@ -29,6 +30,8 @@ pub use field_inspect::{
 };
 pub use value_layout::{BitPacked, Boxed, Inline, InlineOrHeap, SSO_HEAP, SSO_INLINE, ValueLayout};
 pub use value_slot::AddressableSlot;
+pub use window::{Window, WindowMut};
+// MessageBinding / MessageBindingMut are defined in this module.
 
 use ::core::mem::ManuallyDrop;
 
@@ -68,6 +71,23 @@ impl<const N: usize> BitStorage for BitArray<[u8; N], Lsb0> {
     #[inline]
     fn bit_mut(&mut self, bit: usize) -> BitRef<'_, Mut, u8, Lsb0> {
         self.get_mut(bit).expect("common bit index in range")
+    }
+}
+
+impl<B: BitStorage + ?Sized> MessageCommonBits for B {
+    #[inline]
+    fn is_bit_set(&self, bit: usize) -> bool {
+        self.is_set(bit)
+    }
+
+    #[inline]
+    fn set_bit(&mut self, bit: usize, value: bool) {
+        BitStorage::set(self, bit, value);
+    }
+
+    #[inline]
+    fn bit_mut(&mut self, bit: usize) -> BitRef<'_, Mut, u8, Lsb0> {
+        BitStorage::bit_mut(self, bit)
     }
 }
 
@@ -219,6 +239,71 @@ impl<B, A: Allocator> MessageCommonAlloc for MessageCommon<B, A> {
     #[inline]
     fn alloc(&self) -> &A {
         &self.alloc
+    }
+}
+
+/// Read-side catalog binding: bits, allocator, and unknown-field store.
+///
+/// [`MessageCommon`] and [`Window`] / [`WindowMut`] implement this so field
+/// accessors can bind to either an owned common or a parent window.
+pub trait MessageBinding<A: Allocator>: MessageCommonAlloc<Alloc = A> + MessageCommonBits {
+    /// Unknown-field store for this binding (owned self-blob, or an inlined child).
+    fn unknown_fields(&self) -> &UnknownFields<A>;
+
+    /// One-level inlined-child window (bits at `bit_base`, unknowns at `field`).
+    #[inline]
+    fn child_window(&self, bit_base: usize, field: u32) -> Window<'_, A>
+    where
+        Self: Sized,
+    {
+        Window::from_binding(self, bit_base, field)
+    }
+}
+
+/// Write-side catalog binding.
+pub trait MessageBindingMut<A: Allocator>: MessageBinding<A> {
+    /// Mutable unknown-field store for this binding.
+    fn unknown_fields_mut(&mut self) -> &mut UnknownFields<A>;
+}
+
+/// Parent that can open an inlined-child [`WindowMut`].
+pub trait InlinedMessageParent<A: Allocator>: MessageBindingMut<A> {
+    /// One-level inlined-child mut window.
+    fn child_window_mut(&mut self, bit_base: usize, field: u32) -> WindowMut<'_, A>
+    where
+        A: Clone;
+}
+
+impl<B, A: Allocator> MessageBinding<A> for MessageCommon<B, A>
+where
+    Self: MessageCommonBits,
+{
+    #[inline]
+    fn unknown_fields(&self) -> &UnknownFields<A> {
+        &self.unknown_fields
+    }
+}
+
+impl<B, A: Allocator> MessageBindingMut<A> for MessageCommon<B, A>
+where
+    Self: MessageCommonBits,
+{
+    #[inline]
+    fn unknown_fields_mut(&mut self) -> &mut UnknownFields<A> {
+        &mut self.unknown_fields
+    }
+}
+
+impl<B: BitStorage, A: Allocator> InlinedMessageParent<A> for MessageCommon<B, A>
+where
+    Self: MessageCommonBits,
+{
+    #[inline]
+    fn child_window_mut(&mut self, bit_base: usize, field: u32) -> WindowMut<'_, A>
+    where
+        A: Clone,
+    {
+        WindowMut::for_child(self, bit_base, field)
     }
 }
 

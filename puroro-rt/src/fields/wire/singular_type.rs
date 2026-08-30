@@ -36,7 +36,7 @@ use ::unmanaged::DeallocateIn;
 
 use crate::decode;
 use crate::fields::shared::{
-    DefaultIn, MessageCommon, MessageCommonBits,
+    DefaultIn, InlinedMessageParent, MessageBindingMut,
     slot_init::SlotInitMut,
     value_slot::{AddressableSlot, ValueSlot, ValueSlotMutAccess},
 };
@@ -93,33 +93,27 @@ pub trait PayloadAccess: SingularType {
     ///
     /// Numerics / enums compare to [`Default`]; string / bytes use `is_empty`;
     /// a present nested message is never empty (absence is the presence layer).
-    fn is_proto_empty<A: Allocator, Pb>(
-        slot: &Self::Slot<A>,
-        common: &MessageCommon<Pb, A>,
-    ) -> bool
+    fn is_proto_empty<A: Allocator, Cx>(slot: &Self::Slot<A>, common: &Cx) -> bool
     where
-        MessageCommon<Pb, A>: MessageCommonBits;
+        Cx: MessageBindingMut<A>;
 
     /// Reads the logical getter view from the slot and/or `common`.
-    fn get<'a, A: Allocator + 'a, Pb>(
-        slot: &'a Self::Slot<A>,
-        common: &'a MessageCommon<Pb, A>,
-    ) -> Self::View<'a, A>
+    fn get<'a, A: Allocator + 'a, Cx>(slot: &'a Self::Slot<A>, common: &'a Cx) -> Self::View<'a, A>
     where
-        MessageCommon<Pb, A>: MessageCommonBits;
+        Cx: MessageBindingMut<A>;
 
     /// Ensures the slot is present and returns a mutable accessor handle.
-    fn with_mut<'a, A, VS, I, Pb>(
+    fn with_mut<'a, A, VS, I, Cx>(
         slot: &'a mut VS,
         init: I,
-        common: &'a mut MessageCommon<Pb, A>,
+        common: &'a mut Cx,
     ) -> Self::Mut<'a, A>
     where
         A: Allocator + Clone + 'a,
         Self::Slot<A>: AddressableSlot + DefaultIn<A>,
         VS: ValueSlot<Self::Slot<A>, A>,
         I: SlotInitMut,
-        MessageCommon<Pb, A>: MessageCommonBits,
+        Cx: InlinedMessageParent<A>,
         Self: 'a;
 
     /// Writes `value`, ensuring slot presence when applicable.
@@ -127,29 +121,25 @@ pub trait PayloadAccess: SingularType {
     /// Any previous payload is released with `common.alloc`. `common` must be
     /// the parent [`MessageCommon`] that owns the existing slot (same pairing
     /// as [`ValueLayout::deallocate_slot`](crate::fields::shared::value_layout::ValueLayout::deallocate_slot)).
-    fn write<A, VS, I, Pb>(
-        slot: &mut VS,
-        init: I,
-        common: &mut MessageCommon<Pb, A>,
-        value: Self::Written<A>,
-    ) where
-        A: Allocator + Clone,
-        Self::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
-        VS: ValueSlot<Self::Slot<A>, A>,
-        I: SlotInitMut,
-        MessageCommon<Pb, A>: MessageCommonBits;
-
-    /// Clears the logical value and slot presence / payload.
-    ///
-    /// Releases the previous payload with `common.alloc`. `common` must be the
-    /// parent [`MessageCommon`] that owns the slot.
-    fn clear<A, VS, I, Pb>(slot: &mut VS, init: I, common: &mut MessageCommon<Pb, A>)
+    fn write<A, VS, I, Cx>(slot: &mut VS, init: I, common: &mut Cx, value: Self::Written<A>)
     where
         A: Allocator + Clone,
         Self::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
         VS: ValueSlot<Self::Slot<A>, A>,
         I: SlotInitMut,
-        MessageCommon<Pb, A>: MessageCommonBits;
+        Cx: InlinedMessageParent<A>;
+
+    /// Clears the logical value and slot presence / payload.
+    ///
+    /// Releases the previous payload with `common.alloc`. `common` must be the
+    /// parent [`MessageCommon`] that owns the slot.
+    fn clear<A, VS, I, Cx>(slot: &mut VS, init: I, common: &mut Cx)
+    where
+        A: Allocator + Clone,
+        Self::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
+        VS: ValueSlot<Self::Slot<A>, A>,
+        I: SlotInitMut,
+        Cx: InlinedMessageParent<A>;
 }
 
 /// Wire-decode merge for inline payloads. Kept off [`PayloadAccess`] so nested
@@ -161,10 +151,10 @@ pub trait PayloadMerge: PayloadAccess {
     /// Scalars / string / bytes typically last-win [`PayloadAccess::write`];
     /// nested messages merge recursively into the present child. Closed-enum
     /// unknowns are parked in `common.unknown_fields`.
-    fn merge<A, VS, I, Pb, B>(
+    fn merge<A, VS, I, Cx, B>(
         slot: &mut VS,
         init: I,
-        common: &mut MessageCommon<Pb, A>,
+        common: &mut Cx,
         wire_type: WireType,
         buf: &mut B,
         field: FieldNumber,
@@ -175,7 +165,7 @@ pub trait PayloadMerge: PayloadAccess {
         Self::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
         VS: ValueSlot<Self::Slot<A>, A>,
         I: SlotInitMut,
-        MessageCommon<Pb, A>: MessageCommonBits,
+        Cx: InlinedMessageParent<A>,
         B: DecodeBuf;
 }
 
@@ -199,59 +189,49 @@ where
     type Written<A: Allocator> = C::NativeType;
 
     #[inline]
-    fn is_proto_empty<A: Allocator, Pb>(
-        slot: &C::NativeType,
-        _common: &MessageCommon<Pb, A>,
-    ) -> bool
+    fn is_proto_empty<A: Allocator, Cx>(slot: &C::NativeType, _common: &Cx) -> bool
     where
-        MessageCommon<Pb, A>: MessageCommonBits,
+        Cx: MessageBindingMut<A>,
     {
         // Type-zero / default: floats treat `-0.0` as empty and `NaN` as non-empty.
         *slot == C::NativeType::default()
     }
 
     #[inline]
-    fn get<'a, A: Allocator + 'a, Pb>(
-        slot: &'a C::NativeType,
-        _common: &'a MessageCommon<Pb, A>,
-    ) -> C::NativeType
+    fn get<'a, A: Allocator + 'a, Cx>(slot: &'a C::NativeType, _common: &'a Cx) -> C::NativeType
     where
-        MessageCommon<Pb, A>: MessageCommonBits,
+        Cx: MessageBindingMut<A>,
     {
         *slot
     }
 
     #[inline]
-    fn with_mut<'a, A, VS, I, Pb>(
+    fn with_mut<'a, A, VS, I, Cx>(
         slot: &'a mut VS,
         init: I,
-        common: &'a mut MessageCommon<Pb, A>,
+        common: &'a mut Cx,
     ) -> &'a mut C::NativeType
     where
         A: Allocator + Clone + 'a,
         C::NativeType: AddressableSlot + DefaultIn<A>,
         VS: ValueSlot<C::NativeType, A>,
         I: SlotInitMut,
-        MessageCommon<Pb, A>: MessageCommonBits,
+        Cx: InlinedMessageParent<A>,
         Self: 'a,
     {
         ValueSlot::with_mut(slot, init, common).get_mut()
     }
 
     #[inline]
-    fn write<A, VS, I, Pb>(
-        slot: &mut VS,
-        init: I,
-        common: &mut MessageCommon<Pb, A>,
-        value: C::NativeType,
-    ) where
+    fn write<A, VS, I, Cx>(slot: &mut VS, init: I, common: &mut Cx, value: C::NativeType)
+    where
         A: Allocator + Clone,
         C::NativeType: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
         VS: ValueSlot<C::NativeType, A>,
         I: SlotInitMut,
-        MessageCommon<Pb, A>: MessageCommonBits,
+        Cx: InlinedMessageParent<A>,
     {
-        let alloc = common.alloc.clone();
+        let alloc = common.clone_alloc();
         if let Some(old) = ValueSlot::with_mut(slot, init, common).replace(value) {
             // SAFETY: `write` contract — `common` is this field's parent.
             unsafe { DeallocateIn::deallocate_in(old, &alloc) };
@@ -259,15 +239,15 @@ where
     }
 
     #[inline]
-    fn clear<A, VS, I, Pb>(slot: &mut VS, init: I, common: &mut MessageCommon<Pb, A>)
+    fn clear<A, VS, I, Cx>(slot: &mut VS, init: I, common: &mut Cx)
     where
         A: Allocator + Clone,
         C::NativeType: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
         VS: ValueSlot<C::NativeType, A>,
         I: SlotInitMut,
-        MessageCommon<Pb, A>: MessageCommonBits,
+        Cx: InlinedMessageParent<A>,
     {
-        let alloc = common.alloc.clone();
+        let alloc = common.clone_alloc();
         if let Some(old) = ValueSlot::with_mut(slot, init, common).take_clear() {
             // SAFETY: `clear` contract — `common` is this field's parent.
             unsafe { DeallocateIn::deallocate_in(old, &alloc) };
@@ -281,10 +261,10 @@ where
     C::NativeType: AddressableSlot,
 {
     #[inline]
-    fn merge<A, VS, I, Pb, B>(
+    fn merge<A, VS, I, Cx, B>(
         slot: &mut VS,
         init: I,
-        common: &mut MessageCommon<Pb, A>,
+        common: &mut Cx,
         wire_type: WireType,
         buf: &mut B,
         field: FieldNumber,
@@ -295,7 +275,7 @@ where
         Self::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
         VS: ValueSlot<Self::Slot<A>, A>,
         I: SlotInitMut,
-        MessageCommon<Pb, A>: MessageCommonBits,
+        Cx: InlinedMessageParent<A>,
         B: DecodeBuf,
     {
         match C::from_wire_body(C::WireBody::decode(wire_type, buf)?) {
@@ -304,12 +284,8 @@ where
                 Ok(())
             }
             Err(DecodeError::UnknownClosedEnum { raw }) => {
-                decode::save_unknown_varint_field(
-                    field,
-                    raw,
-                    &mut common.unknown_fields,
-                    common.alloc.clone(),
-                );
+                let alloc = common.clone_alloc();
+                decode::save_unknown_varint_field(field, raw, common.unknown_fields_mut(), alloc);
                 Ok(())
             }
             Err(e) => Err(e),
@@ -334,55 +310,44 @@ impl<C: LenCodec> PayloadAccess for LenScalar<C> {
     type Written<A: Allocator> = C::Slot<A>;
 
     #[inline]
-    fn is_proto_empty<A: Allocator, Pb>(slot: &C::Slot<A>, _common: &MessageCommon<Pb, A>) -> bool
+    fn is_proto_empty<A: Allocator, Cx>(slot: &C::Slot<A>, _common: &Cx) -> bool
     where
-        MessageCommon<Pb, A>: MessageCommonBits,
+        Cx: MessageBindingMut<A>,
     {
         C::as_wire_bytes(Deref::deref(slot)).is_empty()
     }
 
     #[inline]
-    fn get<'a, A: Allocator + 'a, Pb>(
-        slot: &'a C::Slot<A>,
-        _common: &'a MessageCommon<Pb, A>,
-    ) -> &'a C::RefView
+    fn get<'a, A: Allocator + 'a, Cx>(slot: &'a C::Slot<A>, _common: &'a Cx) -> &'a C::RefView
     where
-        MessageCommon<Pb, A>: MessageCommonBits,
+        Cx: MessageBindingMut<A>,
     {
         Deref::deref(slot)
     }
 
     #[inline]
-    fn with_mut<'a, A, VS, I, Pb>(
-        slot: &'a mut VS,
-        init: I,
-        common: &'a mut MessageCommon<Pb, A>,
-    ) -> C::Mut<'a, A>
+    fn with_mut<'a, A, VS, I, Cx>(slot: &'a mut VS, init: I, common: &'a mut Cx) -> C::Mut<'a, A>
     where
         A: Allocator + Clone + 'a,
         VS: ValueSlot<C::Slot<A>, A>,
         I: SlotInitMut,
-        MessageCommon<Pb, A>: MessageCommonBits,
+        Cx: InlinedMessageParent<A>,
         Self: 'a,
     {
-        let alloc = common.alloc.clone();
+        let alloc = common.clone_alloc();
         // SAFETY: message allocator owns this LEN scalar buffer.
         unsafe { C::slot_with_alloc(ValueSlot::with_mut(slot, init, common).get_mut(), alloc) }
     }
 
     #[inline]
-    fn write<A, VS, I, Pb>(
-        slot: &mut VS,
-        init: I,
-        common: &mut MessageCommon<Pb, A>,
-        value: C::Slot<A>,
-    ) where
+    fn write<A, VS, I, Cx>(slot: &mut VS, init: I, common: &mut Cx, value: C::Slot<A>)
+    where
         A: Allocator + Clone,
         VS: ValueSlot<C::Slot<A>, A>,
         I: SlotInitMut,
-        MessageCommon<Pb, A>: MessageCommonBits,
+        Cx: InlinedMessageParent<A>,
     {
-        let alloc = common.alloc.clone();
+        let alloc = common.clone_alloc();
         if let Some(old) = ValueSlot::with_mut(slot, init, common).replace(value) {
             // SAFETY: `write` contract — `common` is this field's parent.
             unsafe { DeallocateIn::deallocate_in(old, &alloc) };
@@ -390,14 +355,14 @@ impl<C: LenCodec> PayloadAccess for LenScalar<C> {
     }
 
     #[inline]
-    fn clear<A, VS, I, Pb>(slot: &mut VS, init: I, common: &mut MessageCommon<Pb, A>)
+    fn clear<A, VS, I, Cx>(slot: &mut VS, init: I, common: &mut Cx)
     where
         A: Allocator + Clone,
         VS: ValueSlot<C::Slot<A>, A>,
         I: SlotInitMut,
-        MessageCommon<Pb, A>: MessageCommonBits,
+        Cx: InlinedMessageParent<A>,
     {
-        let alloc = common.alloc.clone();
+        let alloc = common.clone_alloc();
         if let Some(old) = ValueSlot::with_mut(slot, init, common).take_clear() {
             // SAFETY: `clear` contract — `common` is this field's parent.
             unsafe { DeallocateIn::deallocate_in(old, &alloc) };
@@ -407,10 +372,10 @@ impl<C: LenCodec> PayloadAccess for LenScalar<C> {
 
 impl<C: LenCodec> PayloadMerge for LenScalar<C> {
     #[inline]
-    fn merge<A, VS, I, Pb, B>(
+    fn merge<A, VS, I, Cx, B>(
         slot: &mut VS,
         init: I,
-        common: &mut MessageCommon<Pb, A>,
+        common: &mut Cx,
         wire_type: WireType,
         buf: &mut B,
         _field: FieldNumber,
@@ -421,13 +386,13 @@ impl<C: LenCodec> PayloadMerge for LenScalar<C> {
         Self::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
         VS: ValueSlot<Self::Slot<A>, A>,
         I: SlotInitMut,
-        MessageCommon<Pb, A>: MessageCommonBits,
+        Cx: InlinedMessageParent<A>,
         B: DecodeBuf,
     {
         if wire_type != WireType::Len {
             return Err(DecodeError::InvalidTag);
         }
-        let new = C::decode_in(buf, common.alloc.clone())?;
+        let new = C::decode_in(buf, common.clone_alloc())?;
         Self::write(slot, init, common, new);
         Ok(())
     }

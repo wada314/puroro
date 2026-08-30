@@ -27,12 +27,13 @@ use puroro_rt::{
     FieldPairVisitor, FieldPairVisitorMut, FieldVisitor, FieldVisitorMut, Implicit, Inline,
     InlineOrHeap, LegacyRequired, MapField, Message as MessagePresence, MessageCommon,
     MessageEncode, MessageMerge, OneofSlot, Open, Packed, ProtoBool, ProtoBytes, ProtoEnum,
-    ProtoInt32, ProtoMessage, ProtoString, RepeatedField, SingularField,
+    ProtoInt32, ProtoMessage, ProtoString, RepeatedField, SharedMessage, SingularField,
 };
 
 use crate::Address;
 use crate::Point;
 use crate::enums::{Priority, Status};
+use crate::point_type::{PointBody, PointMut, PointView};
 use crate::task::defaults::MaxRetriesDefault;
 use crate::task::notification::NotificationStorage;
 use crate::task::{
@@ -109,7 +110,12 @@ pub struct Task<A: Allocator = Global> {
     watchers: RepeatedField<ProtoMessage<Address<A>>, Expanded, { FIELD_WATCHERS }, A>, // proto: repeated Address watchers = 19;
     votes: RepeatedField<ProtoBool, Packed, { FIELD_VOTES }, A>, // proto: repeated bool votes = 20;
     attributes: MapField<ProtoString, ProtoInt32, { FIELD_ATTRIBUTES }, A>, // proto: map<string, int32> attributes = 21;
-    origin: SingularField<ProtoMessage<Point<A>>, Explicit<{ BIT_ORIGIN }>, { FIELD_ORIGIN }, A>, // proto: Point origin = 22 (inlined)
+    origin: SingularField<
+        SharedMessage<PointBody<A>, { FIELD_ORIGIN }>,
+        Explicit<{ BIT_ORIGIN }>,
+        { FIELD_ORIGIN },
+        A,
+    >, // proto: Point origin = 22 (inlined, body-only slot)
 }
 
 impl<A: Allocator> Task<A> {
@@ -198,7 +204,7 @@ impl<A: Allocator> Task<A> {
         self.attributes.bind(&self._common)
     }
 
-    pub fn origin(&self) -> Option<&Point<A>> {
+    pub fn origin(&self) -> Option<PointView<'_, A>> {
         self.origin.bind(&self._common).get()
     }
 
@@ -565,8 +571,12 @@ impl<A: Allocator + Clone> Task<A> {
 
     // -- origin (inlined nested Point, proto field 22) ----------------------
 
-    pub fn origin_mut(&mut self) -> &mut Point<A> {
+    pub fn origin_mut(&mut self) -> PointMut<'_, A> {
         self.origin.bind_mut(&mut self._common).get_mut()
+    }
+
+    pub fn set_origin(&mut self, src: Point<A>) {
+        self.origin_mut().copy_from(&src);
     }
 
     pub fn clear_origin(&mut self) {

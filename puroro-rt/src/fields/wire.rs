@@ -15,6 +15,7 @@ pub(crate) mod numerical;
 pub(crate) mod proto_message;
 pub(crate) mod proto_ref_ops;
 pub(crate) mod repeated_element;
+pub(crate) mod shared_message;
 pub(crate) mod singular_type;
 pub(crate) mod sso_buf;
 pub(crate) mod sso_bytes;
@@ -29,6 +30,7 @@ pub use numerical::{
 };
 pub use proto_message::ProtoMessage;
 pub use repeated_element::RepeatedElement;
+pub use shared_message::{SharedMessage, SharedMessageBody};
 pub use singular_type::{PayloadAccess, SingularType};
 pub use sso_bytes::{SsoBytes, SsoBytesMut};
 pub use sso_string::{INLINE_CAP, SsoString, SsoStringMut};

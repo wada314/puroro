@@ -78,7 +78,7 @@ Child field types keep **local** bit indices (`Explicit<0>`, …).
 Standalone `Student` uses a short bit array; `StudentBody` is the same
 type everywhere.
 
-### Catalog (next, after unknown store)
+### Catalog (Task 2 — sample `Task.origin`)
 
 `ProtoMessage` today: `Slot = View = Mut = M`. After sharing:
 
@@ -203,3 +203,19 @@ calls `skip_field_and_save` on **that** sink.
 - `Window` / `StudentBody` / `ProtoMessage` GAT split.
 - Discard-policy codegen.
 - Changing `UnknownField` / the public iterator item type.
+
+---
+
+## Task 2 (this slice): catalog GAT + `Window`
+
+Runtime proof of the dual catalog, hand-written `Point` / `Task.origin` only.
+
+**Done.**
+
+- [`Window`](../../puroro-rt/src/fields/shared/window.rs) / `WindowMut` (`bit_base`, resolved child unknowns).
+- [`MessageBinding`](../../puroro-rt/src/fields/shared.rs) / `InlinedMessageParent`; `SingularField::bind` and `PayloadAccess` take that context.
+- [`SharedMessage<B, FIELD>`](../../puroro-rt/src/fields/wire/shared_message.rs): `Slot = B`, `View`/`Mut` from `SharedMessageBody`. `ProtoMessage<M>` unchanged.
+- Sample `PointBody` + `PointView` / `PointMut`; `Task.origin` is `SharedMessage<PointBody<A>, FIELD_ORIGIN>`. Assignment is `set_origin` / `copy_from`.
+- Tests: origin round-trip / merge / clear / unset omit, unknown isolation inside origin LEN, `Task<Padded>` size ≈ parent common + map (no extra `A` in the slot), `Window` `bit_base` unit test.
+
+**Not this slice:** codegen / fixtures, `Address` Body split, boxed `assignee` as a view, oneof subtree clear, `Student<C>`, `Window::nest`.

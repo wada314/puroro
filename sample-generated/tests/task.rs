@@ -686,9 +686,16 @@ fn inlined_origin_roundtrip_and_assign() {
     let mut p = Point::new();
     *p.x_mut() = 11;
     *p.y_mut() = 13;
-    *task.origin_mut() = p;
+    task.origin_mut().copy_from(&p);
     assert_eq!(task.origin().unwrap().x(), 11);
     assert_eq!(task.origin().unwrap().y(), 13);
+
+    let mut p2 = Point::new();
+    *p2.x_mut() = 21;
+    *p2.y_mut() = 22;
+    task.set_origin(p2);
+    assert_eq!(task.origin().unwrap().x(), 21);
+    assert_eq!(task.origin().unwrap().y(), 22);
 }
 
 #[test]
@@ -710,4 +717,139 @@ fn inlined_origin_merge_into_and_clear() {
     assert!(task.origin().is_none());
     let decoded: Task = Task::decode(&task.encode_to_vec()[..]).expect("decode");
     assert!(decoded.origin().is_none());
+}
+
+#[test]
+fn inlined_origin_unknown_stays_inside_child_len() {
+    let mut task = Task::new();
+    task.owner_id_mut().push_str("x");
+
+    let mut origin_payload = Vec::new();
+    encode_varint_field(
+        field_number_const::<1>(),
+        Varint::from_uint64(1),
+        &mut origin_payload,
+    );
+    encode_varint_field(
+        field_number_const::<99>(),
+        Varint::from_uint64(5),
+        &mut origin_payload,
+    );
+
+    let mut bytes = Vec::new();
+    encode_u64_varint((22u64) << 3 | 2, &mut bytes);
+    encode_u64_varint(origin_payload.len() as u64, &mut bytes);
+    bytes.extend_from_slice(&origin_payload);
+
+    task.merge_from(&mut &bytes[..]).unwrap();
+    assert!(task.unknown_fields().next().is_none());
+    let o = task.origin().expect("origin set");
+    assert_eq!(o.x(), 1);
+
+    let encoded = task.encode_to_vec();
+    let origin_len = find_len_field(&encoded, 22).expect("origin LEN on wire");
+    assert!(
+        contains_varint_field(origin_len, 99, 5),
+        "unknown tag 99 must round-trip inside origin LEN, got {origin_len:?}"
+    );
+    assert!(
+        !top_level_has_varint_field(&encoded, 99),
+        "origin unknown must not surface as a top-level Task field"
+    );
+
+    task.clear_origin();
+    assert!(task.origin().is_none());
+    assert!(task.unknown_fields().next().is_none());
+    let cleared = task.encode_to_vec();
+    assert!(find_len_field(&cleared, 22).is_none());
+    assert!(!top_level_has_varint_field(&cleared, 99));
+}
+
+/// Decodes a base-128 varint at `bytes[i..]`. Returns `(value, bytes_consumed)`.
+fn decode_u64_varint_at(bytes: &[u8], i: usize) -> Option<(u64, usize)> {
+    let mut v = 0u64;
+    let mut shift = 0;
+    for (n, &b) in bytes[i..].iter().enumerate() {
+        v |= u64::from(b & 0x7f) << shift;
+        if b & 0x80 == 0 {
+            return Some((v, n + 1));
+        }
+        shift += 7;
+        if shift > 63 {
+            return None;
+        }
+    }
+    None
+}
+
+/// Returns the LEN payload of the first occurrence of `field_number` (wire type 2).
+fn find_len_field(bytes: &[u8], field_number: u32) -> Option<&[u8]> {
+    let mut i = 0;
+    while i < bytes.len() {
+        let (tag, n) = decode_u64_varint_at(bytes, i)?;
+        i += n;
+        let num = (tag >> 3) as u32;
+        let wt = tag & 7;
+        match wt {
+            0 => {
+                let (_, n) = decode_u64_varint_at(bytes, i)?;
+                i += n;
+            }
+            2 => {
+                let (len, n) = decode_u64_varint_at(bytes, i)?;
+                i += n;
+                let end = i + usize::try_from(len).ok()?;
+                if end > bytes.len() {
+                    return None;
+                }
+                let payload = &bytes[i..end];
+                i = end;
+                if num == field_number {
+                    return Some(payload);
+                }
+            }
+            _ => return None,
+        }
+    }
+    None
+}
+
+fn contains_varint_field(bytes: &[u8], field_number: u32, value: u64) -> bool {
+    let mut encoded = Vec::new();
+    encode_u64_varint(u64::from(field_number) << 3, &mut encoded);
+    encode_u64_varint(value, &mut encoded);
+    bytes
+        .windows(encoded.len())
+        .any(|w| w == encoded.as_slice())
+}
+
+fn top_level_has_varint_field(bytes: &[u8], field_number: u32) -> bool {
+    let mut i = 0;
+    while i < bytes.len() {
+        let Some((tag, n)) = decode_u64_varint_at(bytes, i) else {
+            return false;
+        };
+        i += n;
+        let num = (tag >> 3) as u32;
+        let wt = tag & 7;
+        match wt {
+            0 => {
+                let Some((_, n)) = decode_u64_varint_at(bytes, i) else {
+                    return false;
+                };
+                i += n;
+                if num == field_number {
+                    return true;
+                }
+            }
+            2 => {
+                let Some((len, n)) = decode_u64_varint_at(bytes, i) else {
+                    return false;
+                };
+                i += n + usize::try_from(len).unwrap_or(0);
+            }
+            _ => return false,
+        }
+    }
+    false
 }

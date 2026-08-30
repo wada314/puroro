@@ -29,7 +29,8 @@ use crate::encode::field_number_const;
 use crate::fields::shared::FieldDeallocate;
 use crate::fields::shared::field_inspect::{FieldCloneIn, FieldDebug, FieldEncode, FieldPartialEq};
 use crate::fields::shared::{
-    DefaultIn, MessageCommon, MessageCommonAlloc, MessageCommonBits,
+    DefaultIn, InlinedMessageParent, MessageBindingMut, MessageCommon, MessageCommonAlloc,
+    MessageCommonBits,
     field_presence::{
         Explicit, FieldPresence, Implicit, LegacyRequired, Message, Oneof, RequiredFieldPresence,
     },
@@ -151,19 +152,19 @@ where
 
     /// Binds this field to `common` for read access.
     #[inline]
-    pub fn bind<'a, Pb>(
+    pub fn bind<'a, Cx: MessageBindingMut<A>>(
         &'a self,
-        common: &'a MessageCommon<Pb, A>,
-    ) -> SingularFieldRef<'a, T, P, FIELD, A, L, D, Pb> {
+        common: &'a Cx,
+    ) -> SingularFieldRef<'a, T, P, FIELD, A, L, D, Cx> {
         SingularFieldRef::new(self, common)
     }
 
     /// Binds this field to `common` for mutation.
     #[inline]
-    pub fn bind_mut<'f, 'c, Pb>(
+    pub fn bind_mut<'f, 'c, Cx: InlinedMessageParent<A>>(
         &'f mut self,
-        common: &'c mut MessageCommon<Pb, A>,
-    ) -> SingularFieldMut<'f, 'c, T, P, FIELD, A, L, D, Pb> {
+        common: &'c mut Cx,
+    ) -> SingularFieldMut<'f, 'c, T, P, FIELD, A, L, D, Cx> {
         SingularFieldMut::new(self, common)
     }
 }
@@ -231,10 +232,7 @@ where
 {
     /// Low-level borrow of the always-initialized slot's logical value.
     #[inline]
-    pub fn value<'a, Pb>(&'a self, common: &'a MessageCommon<Pb, A>) -> T::View<'a, A>
-    where
-        MessageCommon<Pb, A>: MessageCommonBits,
-    {
+    pub fn value<'a, Cx: MessageBindingMut<A>>(&'a self, common: &'a Cx) -> T::View<'a, A> {
         let slot = (*self.value)
             .with(AlwaysInitialized, common)
             .get()
@@ -253,10 +251,7 @@ where
 {
     /// Low-level borrow of the always-initialized oneof-variant slot's logical value.
     #[inline]
-    pub fn value<'a, Pb>(&'a self, common: &'a MessageCommon<Pb, A>) -> T::View<'a, A>
-    where
-        MessageCommon<Pb, A>: MessageCommonBits,
-    {
+    pub fn value<'a, Cx: MessageBindingMut<A>>(&'a self, common: &'a Cx) -> T::View<'a, A> {
         let slot = (*self.value)
             .with(AlwaysInitialized, common)
             .get()
@@ -265,9 +260,11 @@ where
     }
 
     /// Mutable accessor for a oneof variant (slot is always initialized).
-    pub fn value_mut<'a, Pb>(&'a mut self, common: &'a mut MessageCommon<Pb, A>) -> L::Mut<'a>
+    pub fn value_mut<'a, Cx: InlinedMessageParent<A>>(
+        &'a mut self,
+        common: &'a mut Cx,
+    ) -> L::Mut<'a>
     where
-        MessageCommon<Pb, A>: MessageCommonBits,
         A: Clone,
         L::Slot: DefaultIn<A>,
     {
@@ -325,10 +322,10 @@ where
     L::Slot: AddressableSlot,
     <LegacyRequired<BIT> as FieldPresence>::ValueSlot<L::Slot>: ValueSlot<L::Slot, A>,
 {
-    pub fn validate_required<Pb>(&self, common: &MessageCommon<Pb, A>) -> Result<(), DecodeError>
-    where
-        MessageCommon<Pb, A>: MessageCommonBits,
-    {
+    pub fn validate_required<Cx: MessageBindingMut<A>>(
+        &self,
+        common: &Cx,
+    ) -> Result<(), DecodeError> {
         LegacyRequired::<BIT>::validate_present(common, FIELD, || {
             let init = <LegacyRequired<BIT> as FieldPresence>::slot_init_view();
             match (*self.value).with(init, common).get() {
@@ -353,16 +350,16 @@ pub struct SingularFieldRef<
     A: Allocator,
     L: ValueLayout<T, A>,
     D,
-    Pb,
+    Cx,
 > where
     L::Slot: AddressableSlot,
     P::ValueSlot<L::Slot>: ValueSlot<L::Slot, A>,
 {
     field: &'a SingularField<T, P, FIELD, A, L, D>,
-    common: &'a MessageCommon<Pb, A>,
+    common: &'a Cx,
 }
 
-impl<'a, T, P, const FIELD: u32, A, L, D, Pb> SingularFieldRef<'a, T, P, FIELD, A, L, D, Pb>
+impl<'a, T, P, const FIELD: u32, A, L, D, Cx> SingularFieldRef<'a, T, P, FIELD, A, L, D, Cx>
 where
     T: SingularType,
     P: FieldPresence,
@@ -372,21 +369,18 @@ where
     P::ValueSlot<L::Slot>: ValueSlot<L::Slot, A>,
 {
     #[inline]
-    pub(crate) fn new(
-        field: &'a SingularField<T, P, FIELD, A, L, D>,
-        common: &'a MessageCommon<Pb, A>,
-    ) -> Self {
+    pub(crate) fn new(field: &'a SingularField<T, P, FIELD, A, L, D>, common: &'a Cx) -> Self {
         Self { field, common }
     }
 }
 
-impl<'a, T, P, const FIELD: u32, A, L, D, Pb> SingularFieldRef<'a, T, P, FIELD, A, L, D, Pb>
+impl<'a, T, P, const FIELD: u32, A, L, D, Cx> SingularFieldRef<'a, T, P, FIELD, A, L, D, Cx>
 where
     T: SingularType,
     P: FieldPresence,
     A: Allocator,
     L: ValueLayout<T, A>,
-    MessageCommon<Pb, A>: MessageCommonBits,
+    Cx: MessageBindingMut<A>,
     L::Slot: AddressableSlot,
     P::ValueSlot<L::Slot>: ValueSlot<L::Slot, A>,
 {
@@ -412,13 +406,13 @@ where
     }
 }
 
-impl<'a, T, P, const FIELD: u32, A, L, D, Pb> SingularFieldRef<'a, T, P, FIELD, A, L, D, Pb>
+impl<'a, T, P, const FIELD: u32, A, L, D, Cx> SingularFieldRef<'a, T, P, FIELD, A, L, D, Cx>
 where
     T: SingularType,
     P: FieldPresence,
     A: Allocator,
     L: ValueLayout<T, A>,
-    MessageCommon<Pb, A>: MessageCommonBits,
+    Cx: MessageBindingMut<A>,
     L::Slot: AddressableSlot,
     P::ValueSlot<L::Slot>: ValueSlot<L::Slot, A>,
     T::View<'a, A>: Copy,
@@ -429,12 +423,12 @@ where
     }
 }
 
-impl<'a, T, const FIELD: u32, A, L, D, Pb> SingularFieldRef<'a, T, Implicit, FIELD, A, L, D, Pb>
+impl<'a, T, const FIELD: u32, A, L, D, Cx> SingularFieldRef<'a, T, Implicit, FIELD, A, L, D, Cx>
 where
     T: SingularType,
     A: Allocator,
     L: ValueLayout<T, A>,
-    MessageCommon<Pb, A>: MessageCommonBits,
+    Cx: MessageBindingMut<A>,
     L::Slot: AddressableSlot,
     <Implicit as FieldPresence>::ValueSlot<L::Slot>: ValueSlot<L::Slot, A>,
 {
@@ -444,12 +438,12 @@ where
     }
 }
 
-impl<'a, T, const FIELD: u32, A, L, D, Pb> SingularFieldRef<'a, T, Oneof, FIELD, A, L, D, Pb>
+impl<'a, T, const FIELD: u32, A, L, D, Cx> SingularFieldRef<'a, T, Oneof, FIELD, A, L, D, Cx>
 where
     T: SingularType,
     A: Allocator,
     L: ValueLayout<T, A>,
-    MessageCommon<Pb, A>: MessageCommonBits,
+    Cx: MessageBindingMut<A>,
     L::Slot: AddressableSlot,
     <Oneof as FieldPresence>::ValueSlot<L::Slot>: ValueSlot<L::Slot, A>,
 {
@@ -474,16 +468,16 @@ pub struct SingularFieldMut<
     A: Allocator,
     L: ValueLayout<T, A>,
     D,
-    Pb,
+    Cx,
 > where
     L::Slot: AddressableSlot,
     P::ValueSlot<L::Slot>: ValueSlot<L::Slot, A>,
 {
     field: &'f mut SingularField<T, P, FIELD, A, L, D>,
-    common: &'c mut MessageCommon<Pb, A>,
+    common: &'c mut Cx,
 }
 
-impl<'f, 'c, T, P, const FIELD: u32, A, L, D, Pb> SingularFieldMut<'f, 'c, T, P, FIELD, A, L, D, Pb>
+impl<'f, 'c, T, P, const FIELD: u32, A, L, D, Cx> SingularFieldMut<'f, 'c, T, P, FIELD, A, L, D, Cx>
 where
     T: SingularType,
     P: FieldPresence,
@@ -495,19 +489,19 @@ where
     #[inline]
     pub(crate) fn new(
         field: &'f mut SingularField<T, P, FIELD, A, L, D>,
-        common: &'c mut MessageCommon<Pb, A>,
+        common: &'c mut Cx,
     ) -> Self {
         Self { field, common }
     }
 }
 
-impl<'f, 'c, T, P, const FIELD: u32, A, L, D, Pb> SingularFieldMut<'f, 'c, T, P, FIELD, A, L, D, Pb>
+impl<'f, 'c, T, P, const FIELD: u32, A, L, D, Cx> SingularFieldMut<'f, 'c, T, P, FIELD, A, L, D, Cx>
 where
     T: SingularType,
     P: FieldPresence,
     A: Allocator,
     L: ValueLayout<T, A>,
-    MessageCommon<Pb, A>: MessageCommonBits,
+    Cx: InlinedMessageParent<A>,
     L::Slot: AddressableSlot,
     P::ValueSlot<L::Slot>: ValueSlot<L::Slot, A>,
 {
@@ -569,41 +563,34 @@ where
 // FieldPartialEq / FieldDebug / FieldEncode / FieldCloneIn (message field visitors)
 // ---------------------------------------------------------------------------
 
-impl<T, P, const FIELD: u32, A, L, D, Pb> FieldPartialEq<MessageCommon<Pb, A>>
-    for SingularField<T, P, FIELD, A, L, D>
+impl<T, P, const FIELD: u32, A, L, D, Cx> FieldPartialEq<Cx> for SingularField<T, P, FIELD, A, L, D>
 where
     T: SingularType + ProtoRefEq<A>,
     P: FieldPresence,
     A: Allocator,
     L: ValueLayout<T, A>,
-    MessageCommon<Pb, A>: MessageCommonBits,
+    Cx: MessageBindingMut<A>,
     L::Slot: AddressableSlot,
     P::ValueSlot<L::Slot>: ValueSlot<L::Slot, A>,
 {
     #[inline]
-    fn field_eq(
-        &self,
-        common: &MessageCommon<Pb, A>,
-        other: &Self,
-        other_common: &MessageCommon<Pb, A>,
-    ) -> bool {
+    fn field_eq(&self, common: &Cx, other: &Self, other_common: &Cx) -> bool {
         // Option equality matches getter semantics (IMPLICIT zero ≡ unset).
         T::option_eq(self.bind(common).get(), other.bind(other_common).get())
     }
 }
 
-impl<T, P, const FIELD: u32, A, L, D, Pb> FieldEncode<MessageCommon<Pb, A>>
-    for SingularField<T, P, FIELD, A, L, D>
+impl<T, P, const FIELD: u32, A, L, D, Cx> FieldEncode<Cx> for SingularField<T, P, FIELD, A, L, D>
 where
     T: SingularType,
     P: FieldPresence,
     A: Allocator,
     L: ValueLayout<T, A>,
-    MessageCommon<Pb, A>: MessageCommonBits + MessageCommonAlloc,
+    Cx: MessageBindingMut<A>,
     L::Slot: AddressableSlot,
     P::ValueSlot<L::Slot>: ValueSlot<L::Slot, A>,
 {
-    fn encoded_len(&self, common: &MessageCommon<Pb, A>, ctx: &mut EncodeCtx) -> usize {
+    fn encoded_len(&self, common: &Cx, ctx: &mut EncodeCtx) -> usize {
         if P::should_emit(common, || {
             let init = P::slot_init_view();
             match (*self.value).with(init, common).get() {
@@ -622,12 +609,7 @@ where
         }
     }
 
-    fn encode_raw<B: BufMut>(
-        &self,
-        common: &MessageCommon<Pb, A>,
-        ctx: &mut EncodeCtx,
-        buf: &mut B,
-    ) {
+    fn encode_raw<B: BufMut>(&self, common: &Cx, ctx: &mut EncodeCtx, buf: &mut B) {
         if P::should_emit(common, || {
             let init = P::slot_init_view();
             match (*self.value).with(init, common).get() {
@@ -650,18 +632,17 @@ where
     }
 }
 
-impl<T, P, const FIELD: u32, A, L, D, Pb> FieldCloneIn<MessageCommon<Pb, A>>
-    for SingularField<T, P, FIELD, A, L, D>
+impl<T, P, const FIELD: u32, A, L, D, Cx> FieldCloneIn<Cx> for SingularField<T, P, FIELD, A, L, D>
 where
     T: SingularType,
     P: FieldPresence,
     A: Allocator + Clone,
     L: ValueLayoutClone<T, A>,
-    MessageCommon<Pb, A>: MessageCommonBits,
+    Cx: MessageBindingMut<A> + MessageCommonAlloc<Alloc = A>,
     L::Slot: AddressableSlot,
     P::ValueSlot<L::Slot>: ValueSlot<L::Slot, A>,
 {
-    fn clone_field(&self, common: &MessageCommon<Pb, A>, alloc: A) -> Self {
+    fn clone_field(&self, common: &Cx, alloc: A) -> Self {
         let init = P::slot_init_view();
         let initialized = init.is_initialized(|b| common.is_bit_set(b));
         Self {
@@ -671,66 +652,64 @@ where
     }
 }
 
-impl<T, const FIELD: u32, A, L, D, Pb> FieldDebug<MessageCommon<Pb, A>>
-    for SingularField<T, Implicit, FIELD, A, L, D>
+impl<T, const FIELD: u32, A, L, D, Cx> FieldDebug<Cx> for SingularField<T, Implicit, FIELD, A, L, D>
 where
     T: SingularType + ProtoRefDebug<A>,
     A: Allocator,
     L: ValueLayout<T, A>,
-    MessageCommon<Pb, A>: MessageCommonBits,
+    Cx: MessageBindingMut<A>,
     L::Slot: AddressableSlot,
     <Implicit as FieldPresence>::ValueSlot<L::Slot>: ValueSlot<L::Slot, A>,
 {
     #[inline]
-    fn fmt_debug(&self, common: &MessageCommon<Pb, A>, f: &mut Formatter<'_>) -> FmtResult {
+    fn fmt_debug(&self, common: &Cx, f: &mut Formatter<'_>) -> FmtResult {
         T::fmt_ref(&self.value(common), f)
     }
 }
 
-impl<T, const BIT: usize, const FIELD: u32, A, L, D, Pb> FieldDebug<MessageCommon<Pb, A>>
+impl<T, const BIT: usize, const FIELD: u32, A, L, D, Cx> FieldDebug<Cx>
     for SingularField<T, Explicit<BIT>, FIELD, A, L, D>
 where
     T: SingularType + ProtoRefDebug<A>,
     A: Allocator,
     L: ValueLayout<T, A>,
-    MessageCommon<Pb, A>: MessageCommonBits,
+    Cx: MessageBindingMut<A>,
     L::Slot: AddressableSlot,
     <Explicit<BIT> as FieldPresence>::ValueSlot<L::Slot>: ValueSlot<L::Slot, A>,
 {
     #[inline]
-    fn fmt_debug(&self, common: &MessageCommon<Pb, A>, f: &mut Formatter<'_>) -> FmtResult {
+    fn fmt_debug(&self, common: &Cx, f: &mut Formatter<'_>) -> FmtResult {
         T::fmt_option(self.bind(common).get(), f)
     }
 }
 
-impl<T, const BIT: usize, const FIELD: u32, A, L, D, Pb> FieldDebug<MessageCommon<Pb, A>>
+impl<T, const BIT: usize, const FIELD: u32, A, L, D, Cx> FieldDebug<Cx>
     for SingularField<T, LegacyRequired<BIT>, FIELD, A, L, D>
 where
     T: SingularType + ProtoRefDebug<A>,
     A: Allocator,
     L: ValueLayout<T, A>,
-    MessageCommon<Pb, A>: MessageCommonBits,
+    Cx: MessageBindingMut<A>,
     L::Slot: AddressableSlot,
     <LegacyRequired<BIT> as FieldPresence>::ValueSlot<L::Slot>: ValueSlot<L::Slot, A>,
 {
     #[inline]
-    fn fmt_debug(&self, common: &MessageCommon<Pb, A>, f: &mut Formatter<'_>) -> FmtResult {
+    fn fmt_debug(&self, common: &Cx, f: &mut Formatter<'_>) -> FmtResult {
         T::fmt_option(self.bind(common).get(), f)
     }
 }
 
-impl<T, const FIELD: u32, A, L, D, Pb> FieldDebug<MessageCommon<Pb, A>>
-    for SingularField<T, Message, FIELD, A, L, D>
+impl<T, const FIELD: u32, A, L, D, Cx> FieldDebug<Cx> for SingularField<T, Message, FIELD, A, L, D>
 where
     T: SingularType + ProtoRefDebug<A>,
     A: Allocator,
     L: ValueLayout<T, A>,
-    MessageCommon<Pb, A>: MessageCommonBits,
+    Cx: MessageBindingMut<A>,
     L::Slot: AddressableSlot,
     <Message as FieldPresence>::ValueSlot<L::Slot>: ValueSlot<L::Slot, A>,
 {
     #[inline]
-    fn fmt_debug(&self, common: &MessageCommon<Pb, A>, f: &mut Formatter<'_>) -> FmtResult {
+    fn fmt_debug(&self, common: &Cx, f: &mut Formatter<'_>) -> FmtResult {
         T::fmt_option(self.bind(common).get(), f)
     }
 }

@@ -23,7 +23,7 @@ use crate::message_merge::MessageMerge;
 use ::unmanaged::DeallocateIn;
 
 use crate::fields::shared::{
-    DefaultIn, MessageCommon, MessageCommonBits,
+    DefaultIn, InlinedMessageParent, MessageBindingMut,
     slot_init::SlotInitMut,
     value_slot::{AddressableSlot, ValueSlot, ValueSlotMutAccess},
 };
@@ -61,48 +61,44 @@ impl<M: MessageEncode> PayloadAccess for ProtoMessage<M> {
     type Written<A: Allocator> = M;
 
     #[inline]
-    fn is_proto_empty<A: Allocator, Pb>(_slot: &M, _common: &MessageCommon<Pb, A>) -> bool
+    fn is_proto_empty<A: Allocator, Cx>(_slot: &M, _common: &Cx) -> bool
     where
-        MessageCommon<Pb, A>: MessageCommonBits,
+        Cx: MessageBindingMut<A>,
     {
         false
     }
 
     #[inline]
-    fn get<'a, A: Allocator + 'a, Pb>(slot: &'a M, _common: &'a MessageCommon<Pb, A>) -> &'a M
+    fn get<'a, A: Allocator + 'a, Cx>(slot: &'a M, _common: &'a Cx) -> &'a M
     where
-        MessageCommon<Pb, A>: MessageCommonBits,
+        Cx: MessageBindingMut<A>,
     {
         slot
     }
 
     #[inline]
-    fn with_mut<'a, A, VS, I, Pb>(
-        slot: &'a mut VS,
-        init: I,
-        common: &'a mut MessageCommon<Pb, A>,
-    ) -> &'a mut M
+    fn with_mut<'a, A, VS, I, Cx>(slot: &'a mut VS, init: I, common: &'a mut Cx) -> &'a mut M
     where
         A: Allocator + Clone + 'a,
         M: AddressableSlot + DefaultIn<A>,
         VS: ValueSlot<M, A>,
         I: SlotInitMut,
-        MessageCommon<Pb, A>: MessageCommonBits,
+        Cx: InlinedMessageParent<A>,
         Self: 'a,
     {
         ValueSlot::with_mut(slot, init, common).get_mut()
     }
 
     #[inline]
-    fn write<A, VS, I, Pb>(slot: &mut VS, init: I, common: &mut MessageCommon<Pb, A>, value: M)
+    fn write<A, VS, I, Cx>(slot: &mut VS, init: I, common: &mut Cx, value: M)
     where
         A: Allocator + Clone,
         M: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
         VS: ValueSlot<M, A>,
         I: SlotInitMut,
-        MessageCommon<Pb, A>: MessageCommonBits,
+        Cx: InlinedMessageParent<A>,
     {
-        let alloc = common.alloc.clone();
+        let alloc = common.clone_alloc();
         if let Some(old) = ValueSlot::with_mut(slot, init, common).replace(value) {
             // SAFETY: `write` contract — `common` is this field's parent.
             unsafe { DeallocateIn::deallocate_in(old, &alloc) };
@@ -110,15 +106,15 @@ impl<M: MessageEncode> PayloadAccess for ProtoMessage<M> {
     }
 
     #[inline]
-    fn clear<A, VS, I, Pb>(slot: &mut VS, init: I, common: &mut MessageCommon<Pb, A>)
+    fn clear<A, VS, I, Cx>(slot: &mut VS, init: I, common: &mut Cx)
     where
         A: Allocator + Clone,
         M: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
         VS: ValueSlot<M, A>,
         I: SlotInitMut,
-        MessageCommon<Pb, A>: MessageCommonBits,
+        Cx: InlinedMessageParent<A>,
     {
-        let alloc = common.alloc.clone();
+        let alloc = common.clone_alloc();
         if let Some(old) = ValueSlot::with_mut(slot, init, common).take_clear() {
             // SAFETY: `clear` contract — `common` is this field's parent.
             unsafe { DeallocateIn::deallocate_in(old, &alloc) };
@@ -127,10 +123,10 @@ impl<M: MessageEncode> PayloadAccess for ProtoMessage<M> {
 }
 
 impl<M: MessageEncode + MessageMerge> PayloadMerge for ProtoMessage<M> {
-    fn merge<A, VS, I, Pb, B>(
+    fn merge<A, VS, I, Cx, B>(
         slot: &mut VS,
         init: I,
-        common: &mut MessageCommon<Pb, A>,
+        common: &mut Cx,
         wire_type: WireType,
         buf: &mut B,
         _field: FieldNumber,
@@ -141,7 +137,7 @@ impl<M: MessageEncode + MessageMerge> PayloadMerge for ProtoMessage<M> {
         Self::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
         VS: ValueSlot<Self::Slot<A>, A>,
         I: SlotInitMut,
-        MessageCommon<Pb, A>: MessageCommonBits,
+        Cx: InlinedMessageParent<A>,
         B: DecodeBuf,
     {
         if wire_type != WireType::Len {
