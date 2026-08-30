@@ -17,8 +17,8 @@ use puroro_rt::{
     CloneFieldsVisitor, CloneIn, DeallocateIn, DebugStructVisitor, DefaultIn, EncodeCtx,
     EncodeRawVisitor, EncodedLenVisitor, FieldDeallocVisitor, FieldEqVisitor, FieldPairVisitor,
     FieldPairVisitorMut, FieldVisitor, FieldVisitorMut, Implicit, InlinedMessageParent,
-    MessageBinding, MessageBindingMut, MessageCommon, MessageEncode, MessageMerge, ProtoInt32,
-    SharedMessageBody, SingularField, Window, WindowMut,
+    MessageBinding, MessageBindingMut, MessageCommon, MessageEncode, MessageMerge, NestedMessage,
+    ProtoInt32, SingularField, Window, WindowMut,
 };
 
 use crate::point::{FIELD_X, FIELD_Y};
@@ -451,6 +451,10 @@ impl<A: Allocator + Clone> PointMut<'_, A> {
         *self.x_mut() = src.x();
         *self.y_mut() = src.y();
     }
+
+    pub fn merge_from<B: DecodeBuf>(&mut self, buf: &mut B) -> Result<(), DecodeError> {
+        self.body.merge_into(&mut self.window, buf, 0)
+    }
 }
 
 impl<A: Allocator + Clone> PointMessage for PointMut<'_, A> {
@@ -479,7 +483,9 @@ impl<A: Allocator> Deref for PointMut<'_, A> {
     }
 }
 
-impl<A: Allocator> SharedMessageBody for PointBody<A> {
+impl<A: Allocator> NestedMessage for Point<A> {
+    type Alloc = A;
+    type Body = PointBody<A>;
     type View<'a>
         = PointView<'a, A>
     where
@@ -489,39 +495,50 @@ impl<A: Allocator> SharedMessageBody for PointBody<A> {
     where
         A: 'a;
 
-    fn bind_view<'a, Ax: Allocator>(body: &'a Self, window: Window<'a, Ax>) -> PointView<'a, A>
+    fn as_view(&self) -> PointView<'_, A> {
+        PointView {
+            window: Window::for_owned(&self._common),
+            body: &self.body,
+        }
+    }
+
+    fn as_mut(&mut self) -> PointMut<'_, A> {
+        let Point { _common, body } = self;
+        PointMut {
+            window: WindowMut::for_owned(_common),
+            body,
+        }
+    }
+
+    fn bind_view<'a>(body: &'a PointBody<A>, window: Window<'a, A>) -> PointView<'a, A>
     where
-        A: 'a,
+        Self: 'a,
     {
-        // Catalog `A` is this body's allocator. `Ax` is the same type at
-        // every `SharedMessage` call site (`Window` is two words of pointers).
-        let window: Window<'a, A> = unsafe { mem::transmute_copy(&window) };
         PointView { window, body }
     }
 
-    fn bind_mut<'a, Ax: Allocator>(body: &'a mut Self, window: WindowMut<'a, Ax>) -> PointMut<'a, A>
+    fn bind_mut<'a>(body: &'a mut PointBody<A>, window: WindowMut<'a, A>) -> PointMut<'a, A>
     where
-        A: 'a,
+        Self: 'a,
     {
-        let window: WindowMut<'a, A> = unsafe { mem::transmute(window) };
         PointMut { window, body }
     }
 
-    fn body_len(view: PointView<'_, A>, ctx: &mut EncodeCtx) -> usize {
+    fn view_len(view: PointView<'_, A>, ctx: &mut EncodeCtx) -> usize {
         let mut v = EncodedLenVisitor::new(&view.window, ctx);
         let _ = view.body.visit_fields(&mut v);
         v.len + view.window.unknown_fields().len()
     }
 
-    fn encode_body<B: BufMut>(view: PointView<'_, A>, ctx: &mut EncodeCtx, buf: &mut B) {
+    fn encode_view<B: BufMut>(view: PointView<'_, A>, ctx: &mut EncodeCtx, buf: &mut B) {
         let _ = view
             .body
             .visit_fields(&mut EncodeRawVisitor::new(&view.window, ctx, buf));
         buf.put_slice(view.window.unknown_fields().self_blob());
     }
 
-    fn merge_from<Ax, Buf>(
-        body: &mut Self,
+    fn merge_inline<Ax, Buf>(
+        body: &mut PointBody<A>,
         window: &mut WindowMut<'_, Ax>,
         buf: &mut Buf,
         depth: usize,
@@ -530,18 +547,7 @@ impl<A: Allocator> SharedMessageBody for PointBody<A> {
         Ax: Allocator + Clone,
         Buf: DecodeBuf,
     {
-        // `Ax` is `A` at every call site; match `merge_into`'s allocator.
         let body: &mut PointBody<Ax> = unsafe { mem::transmute(body) };
         body.merge_into(window, buf, depth)
-    }
-
-    fn default_in<Ax: Allocator + Clone>(alloc: Ax) -> Self {
-        let body: PointBody<Ax> = DefaultIn::default_in(alloc);
-        unsafe { mem::transmute(body) }
-    }
-
-    unsafe fn deallocate_in<Ax: Allocator>(body: Self, alloc: &Ax) {
-        let body: PointBody<Ax> = unsafe { mem::transmute(body) };
-        unsafe { DeallocateIn::deallocate_in(body, alloc) };
     }
 }

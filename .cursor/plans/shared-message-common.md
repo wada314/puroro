@@ -219,3 +219,27 @@ Runtime proof of the dual catalog, hand-written `Point` / `Task.origin` only.
 - Tests: origin round-trip / merge / clear / unset omit, unknown isolation inside origin LEN, `Task<Padded>` size ≈ parent common + map (no extra `A` in the slot), `Window` `bit_base` unit test.
 
 **Not this slice:** codegen / fixtures, `Address` Body split, boxed `assignee` as a view, oneof subtree clear, `Student<C>`, `Window::nest`.
+
+---
+
+## Task 3: `Address` Body + boxed `assignee` view
+
+**Done.**
+
+- Sample `AddressBody` + `AddressView` / `AddressMut`. Owned `Address` still has its own `MessageCommon`.
+- Storage stays `ProtoMessage<Address>` (boxed slot is the full message).
+- `Task.assignee` / `assignee_mut` return the view (`Window` onto the **child** common, `bit_base = 0`). `set_assignee` moves into the box; `copy_from` copies fields.
+- `watchers` / `postal` still `&Address` / `&mut Address`.
+
+**Still later:** oneof subtree clear, repeated / map as views, codegen, `Student<C>`.
+
+---
+
+## Task 4: unify singular catalog (`SharedMessage<M>`)
+
+**Done.**
+
+- [`NestedMessage`](../../puroro-rt/src/fields/wire/shared_message.rs) on owned `Point` / `Address`.
+- [`SharedMessage<M, FIELD>`](../../puroro-rt/src/fields/wire/shared_message.rs): inline slot = `M::Body`, boxed slot = `UnmanagedBox<M>`, `View`/`Mut` always window + body.
+- `Task.origin` and `Task.assignee` use the same marker. `ProtoMessage` remains for fixtures / `watchers` / `postal`.
+- Mut-view `merge_from`, `FieldDeallocate` on `MessageBindingMut`, [`Window::nest`](../../puroro-rt/src/fields/shared/window.rs).

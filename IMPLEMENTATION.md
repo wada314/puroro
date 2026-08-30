@@ -834,21 +834,21 @@ The `set_*` per-variant setters are removed, matching the other field families.
 | Zero-copy views | — | `TaskView<'buf>` (DESIGN.md §8) |
 | `TaskLazy` | DESIGN only | Wire buffer + on-demand decode |
 | `Hash` / `serde` | Deferred | Opt-in features |
-| Submessage inline | Runtime + codegen: `Boxed` vs `Inline`+presence bit. Shared-common catalog (`SharedMessage` + `Window`) on sample `Task.origin` only | Address / boxed / oneof / codegen ([§17.1](#171-submessage-inline-optimisation)) |
+| Submessage inline | Sample singular messages use one catalog [`SharedMessage<M>`](puroro-rt/src/fields/wire/shared_message.rs) (`NestedMessage`): inline slot = body, boxed slot = owned `M`, getters always `Window`+body | oneof / repeated / codegen ([§17.1](#171-submessage-inline-optimisation)) |
 | String / Bytes inline | Singular `string` / `bytes` use SSO (`SsoString` / `SsoBytes` + `InlineOrHeap`); repeated / map stay heap | Repeated / map SSO deferred ([§17.2](#172-string--bytes-inline-optimisation)) |
 
 ### 17.1 Submessage inline optimisation
 
 **Status (runtime + sample shared common).** Singular nested messages use [`Boxed`](puroro-rt/src/fields/shared/value_layout.rs) (`UnmanagedBox<M, A>`) or [`Inline`](puroro-rt/src/fields/shared/value_layout.rs). Two catalog markers:
 
-- [`ProtoMessage<M>`](puroro-rt/src/fields/wire/proto_message.rs): `Slot = M`, `View = &M`. Still used by `Address`, boxed `assignee`, repeated `watchers`, oneof `postal`, and generated fixtures.
-- [`SharedMessage<B, FIELD>`](puroro-rt/src/fields/wire/shared_message.rs): `Slot = B` (body only), `View`/`Mut` = [`Window`](puroro-rt/src/fields/shared/window.rs) / [`WindowMut`](puroro-rt/src/fields/shared/window.rs) + `&`/`&mut` body. Sample [`Task.origin`](sample-generated/src/task_type.rs) is the only call site (`PointBody` + `PointView` / `PointMut`). `*origin_mut() = p` is gone; use `set_origin` / `origin_mut().copy_from`. Scalar `_mut` (`*origin_mut().x_mut() = 3`) stays.
+- [`SharedMessage<M, FIELD>`](puroro-rt/src/fields/wire/shared_message.rs) + [`NestedMessage`](puroro-rt/src/fields/wire/shared_message.rs): catalog `View`/`Mut` are always a window + body. **Inline** (`Task.origin`): slot = `M::Body`. **Boxed** (`Task.assignee`): slot = `UnmanagedBox<M>`. `set_origin` / `set_assignee` / `copy_from` / view `merge_from`. `*x_mut() =` on scalars stays.
+- [`ProtoMessage<M>`](puroro-rt/src/fields/wire/proto_message.rs): `Slot = M`, catalog `View = &M`. Compatibility path for generated fixtures, repeated `watchers`, and oneof `postal`.
 
 The nested unknown store ([`UnknownFields`](puroro-rt/src/unknown_fields.rs)) is in: origin LEN unknowns live under `child(FIELD_ORIGIN)`, not `Task::unknown_fields()`. `Window` adds a parent `bit_base` (Point x/y are Implicit; the offset is unit-tested). Nested `Window::nest` / compose is not implemented.
 
 **Codegen.** [`(puroro.message_layout)`](proto/puroro/options.proto) (`UNSPECIFIED` / `INLINE` / `BOXED`, field 51402) plus [`plan_message_storage`](protoc-gen-puroro/src/field_kind/storage.rs): graph of singular message edges (including oneof variants) → Tarjan SCCs ineligible for inline → `BOXED` honored, `INLINE` ignored when illegal, unspecified uses the auto-inline heuristic (child has 1..=4 non-repeated Copy scalars / enums). Plugin fixtures still emit the old `ProtoMessage` + full `M` slot ([`puroro-codegen-tests/fixtures/message_layout`](puroro-codegen-tests/fixtures/message_layout/)). `Student<C>` / one accessor impl is deferred to codegen.
 
-**Sharing `MessageCommon` (locked shape).** [`.cursor/plans/shared-message-common.md`](.cursor/plans/shared-message-common.md). Inlined **slot** is field body only; getters return a bound view, not `&M`. Users will name `impl StudentMessage` (DESIGN §8). Every singular message getter (boxed and inlined) should eventually use that view so layout hints can change. `merge_from` is valid on a **mut** view; `decode` / `new_in` stay owned-only. Not yet: `Address` body split, boxed `assignee` as a view, oneof subtree + bit range, repeated / map (`Element = M`).
+**Sharing `MessageCommon` (locked shape).** [`.cursor/plans/shared-message-common.md`](.cursor/plans/shared-message-common.md). Inlined **slot** is field body only; getters return a bound view, not `&M`. Users will name `impl StudentMessage` (DESIGN §8). Sample singular `origin` / `assignee` share [`SharedMessage<M>`](puroro-rt/src/fields/wire/shared_message.rs). `merge_from` is on the mut view; `decode` / `new_in` stay owned-only. [`Window::nest`](puroro-rt/src/fields/shared/window.rs) exists for a later second inline hop. Not yet: oneof subtree + bit range, repeated / map (`Element = M`), codegen.
 
 ### 17.2 String / Bytes inline optimisation
 

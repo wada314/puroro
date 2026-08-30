@@ -55,7 +55,7 @@ fn task_clone_and_eq() {
     let mut addr = Address::new();
     addr.street_mut().set("St");
     *addr.latitude_mut() = 1.5;
-    *task.assignee_mut() = addr;
+    task.set_assignee(addr);
 
     let mut cloned = task.clone();
     assert_eq!(task, cloned);
@@ -135,7 +135,7 @@ fn task_fields_roundtrip() {
     assignee.city_mut().set("Tokyo");
     *assignee.postal_code_mut() = 1000001;
     *assignee.latitude_mut() = 35.6812;
-    *task.assignee_mut() = assignee;
+    task.set_assignee(assignee);
 
     let mut watcher = Address::new();
     watcher.street_mut().set("2 Side Rd");

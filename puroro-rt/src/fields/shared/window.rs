@@ -98,6 +98,17 @@ impl<'a, A: Allocator> Window<'a, A> {
     pub fn bit_base(&self) -> usize {
         self.bit_base
     }
+
+    /// One more inlined-child hop (`bit_base` added, unknowns at `field`).
+    #[inline]
+    pub fn nest(&self, bit_base: usize, field: u32) -> Window<'a, A> {
+        Window {
+            bits: self.bits,
+            bit_base: self.bit_base + bit_base,
+            alloc: self.alloc,
+            unknowns: self.unknowns.and_then(|fields| fields.child(field)),
+        }
+    }
 }
 
 impl<A: Allocator> MessageCommonAlloc for Window<'_, A> {
@@ -284,5 +295,16 @@ mod tests {
             window.set_bit(1, true);
         }
         assert!(common.is_bit_set(4));
+    }
+
+    #[test]
+    fn nest_adds_bit_base() {
+        let mut common =
+            MessageCommon::<BitArray<[u8; 1], Lsb0>, Global>::new_in(BitArray::ZERO, Global);
+        common.set_bit(5, true);
+        let child = Window::for_child(&common, 3, 1);
+        let nested = child.nest(2, 2);
+        assert_eq!(nested.bit_base(), 5);
+        assert!(nested.is_bit_set(0));
     }
 }

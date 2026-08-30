@@ -39,7 +39,9 @@ mod address_type;
 mod point_type;
 mod task_type;
 
-pub use address_type::Address;
+pub use address_type::{
+    Address, AddressBody, AddressMessage, AddressMessageMut, AddressMut, AddressView,
+};
 pub use enums::{Priority, Status};
 pub use point_type::{Point, PointBody, PointMessage, PointMessageMut, PointMut, PointView};
 pub use task_type::Task;

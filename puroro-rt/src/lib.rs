@@ -46,10 +46,10 @@ pub use fields::singular::{
     SingularField, SingularFieldAccess, SingularFieldMut, SingularFieldRef,
 };
 pub use fields::wire::{
-    Closed, ClosedEnum, INLINE_CAP, Open, OpenEnum, PayloadAccess, ProtoBool, ProtoBytes,
-    ProtoDouble, ProtoEnum, ProtoEnumStorage, ProtoFixed32, ProtoFixed64, ProtoFloat, ProtoInt32,
-    ProtoInt64, ProtoMessage, ProtoSFixed32, ProtoSFixed64, ProtoSInt32, ProtoSInt64, ProtoString,
-    ProtoStringUnchecked, ProtoUInt32, ProtoUInt64, SharedMessage, SharedMessageBody, SingularType,
+    Closed, ClosedEnum, INLINE_CAP, NestedMessage, Open, OpenEnum, PayloadAccess, ProtoBool,
+    ProtoBytes, ProtoDouble, ProtoEnum, ProtoEnumStorage, ProtoFixed32, ProtoFixed64, ProtoFloat,
+    ProtoInt32, ProtoInt64, ProtoMessage, ProtoSFixed32, ProtoSFixed64, ProtoSInt32, ProtoSInt64,
+    ProtoString, ProtoStringUnchecked, ProtoUInt32, ProtoUInt64, SharedMessage, SingularType,
     SsoBytes, SsoBytesMut, SsoString, SsoStringMut,
 };
 pub use message_encode::{EncodeCtx, MessageEncode, encode_message, encode_message_to_vec};

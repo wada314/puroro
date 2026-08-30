@@ -32,8 +32,9 @@ use puroro_rt::{
 
 use crate::Address;
 use crate::Point;
+use crate::address_type::{AddressMut, AddressView};
 use crate::enums::{Priority, Status};
-use crate::point_type::{PointBody, PointMut, PointView};
+use crate::point_type::{PointMut, PointView};
 use crate::task::defaults::MaxRetriesDefault;
 use crate::task::notification::NotificationStorage;
 use crate::task::{
@@ -93,8 +94,13 @@ pub struct Task<A: Allocator = Global> {
         { FIELD_PRIORITY },
         A,
     >, // proto: Priority priority = 10;
-    assignee:
-        SingularField<ProtoMessage<Address<A>>, MessagePresence, { FIELD_ASSIGNEE }, A, Boxed>, // proto: Address assignee = 11;
+    assignee: SingularField<
+        SharedMessage<Address<A>, { FIELD_ASSIGNEE }>,
+        MessagePresence,
+        { FIELD_ASSIGNEE },
+        A,
+        Boxed,
+    >, // proto: Address assignee = 11 (boxed; getter is AddressView)
     // proto: oneof notification { string email_address=12; string phone_number=13;
     //                             int32 webhook_id=14 [default=-1]; Address postal=15;
     //                             bool urgent=18; }
@@ -111,7 +117,7 @@ pub struct Task<A: Allocator = Global> {
     votes: RepeatedField<ProtoBool, Packed, { FIELD_VOTES }, A>, // proto: repeated bool votes = 20;
     attributes: MapField<ProtoString, ProtoInt32, { FIELD_ATTRIBUTES }, A>, // proto: map<string, int32> attributes = 21;
     origin: SingularField<
-        SharedMessage<PointBody<A>, { FIELD_ORIGIN }>,
+        SharedMessage<Point<A>, { FIELD_ORIGIN }>,
         Explicit<{ BIT_ORIGIN }>,
         { FIELD_ORIGIN },
         A,
@@ -177,7 +183,7 @@ impl<A: Allocator> Task<A> {
         self.priority.bind(&self._common).optional()
     }
 
-    pub fn assignee(&self) -> Option<&Address<A>> {
+    pub fn assignee(&self) -> Option<AddressView<'_, A>> {
         self.assignee.bind(&self._common).get()
     }
 
@@ -511,8 +517,13 @@ impl<A: Allocator + Clone> Task<A> {
 
     // -- assignee (nested message, proto field 11) --------------------------
 
-    pub fn assignee_mut(&mut self) -> &mut Address<A> {
+    pub fn assignee_mut(&mut self) -> AddressMut<'_, A> {
         self.assignee.bind_mut(&mut self._common).get_mut()
+    }
+
+    /// Copies `src` into the boxed assignee (view API; not a pointer replace).
+    pub fn set_assignee(&mut self, src: Address<A>) {
+        self.assignee_mut().copy_from(&src);
     }
 
     pub fn clear_assignee(&mut self) {

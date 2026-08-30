@@ -30,7 +30,7 @@ pub use numerical::{
 };
 pub use proto_message::ProtoMessage;
 pub use repeated_element::RepeatedElement;
-pub use shared_message::{SharedMessage, SharedMessageBody};
+pub use shared_message::{NestedMessage, SharedMessage};
 pub use singular_type::{PayloadAccess, SingularType};
 pub use sso_bytes::{SsoBytes, SsoBytesMut};
 pub use sso_string::{INLINE_CAP, SsoString, SsoStringMut};

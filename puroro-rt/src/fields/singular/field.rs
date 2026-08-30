@@ -30,7 +30,6 @@ use crate::fields::shared::FieldDeallocate;
 use crate::fields::shared::field_inspect::{FieldCloneIn, FieldDebug, FieldEncode, FieldPartialEq};
 use crate::fields::shared::{
     DefaultIn, InlinedMessageParent, MessageBindingMut, MessageCommon, MessageCommonAlloc,
-    MessageCommonBits,
     field_presence::{
         Explicit, FieldPresence, Implicit, LegacyRequired, Message, Oneof, RequiredFieldPresence,
     },
@@ -172,18 +171,18 @@ where
 /// Always-initialized presence policies do not read the bitfield.
 macro_rules! impl_singular_deallocate_always {
     ($presence:ty) => {
-        impl<T, const FIELD: u32, A, L, D, P> FieldDeallocate<MessageCommon<P, A>>
+        impl<T, const FIELD: u32, A, L, D, Cx> FieldDeallocate<Cx>
             for SingularField<T, $presence, FIELD, A, L, D>
         where
             T: SingularType,
             A: Allocator,
             L: ValueLayout<T, A>,
-            MessageCommon<P, A>: MessageCommonBits,
+            Cx: MessageBindingMut<A>,
             L::Slot: AddressableSlot,
             <$presence as FieldPresence>::ValueSlot<L::Slot>: ValueSlot<L::Slot, A>,
         {
             #[inline]
-            fn deallocate(&mut self, common: &MessageCommon<P, A>) {
+            fn deallocate(&mut self, common: &Cx) {
                 let slot = unsafe { ManuallyDrop::take(&mut self.value) };
                 L::deallocate_slot(slot, true, common);
             }
@@ -198,18 +197,18 @@ impl_singular_deallocate_always!(Message);
 /// Bit-tracked presence policies consult the init bit via a probe.
 macro_rules! impl_singular_deallocate_bit {
     ($presence:ty) => {
-        impl<T, const BIT: usize, const FIELD: u32, A, L, D, P> FieldDeallocate<MessageCommon<P, A>>
+        impl<T, const BIT: usize, const FIELD: u32, A, L, D, Cx> FieldDeallocate<Cx>
             for SingularField<T, $presence, FIELD, A, L, D>
         where
             T: SingularType,
             A: Allocator,
             L: ValueLayout<T, A>,
-            MessageCommon<P, A>: MessageCommonBits,
+            Cx: MessageBindingMut<A>,
             L::Slot: AddressableSlot,
             <$presence as FieldPresence>::ValueSlot<L::Slot>: ValueSlot<L::Slot, A>,
         {
             #[inline]
-            fn deallocate(&mut self, common: &MessageCommon<P, A>) {
+            fn deallocate(&mut self, common: &Cx) {
                 let init = <$presence as FieldPresence>::slot_init_view();
                 let initialized = init.is_initialized(|b| common.is_bit_set(b));
                 let slot = unsafe { ManuallyDrop::take(&mut self.value) };
