@@ -17,8 +17,8 @@ use puroro_rt::{
     CloneBound, CloneFieldsVisitor, CloneIn, DeallocateBound, DeallocateIn, DebugStructVisitor,
     DefaultIn, EncodeCtx, EncodeRawVisitor, EncodedLenVisitor, FieldCloneIn, FieldDeallocVisitor,
     FieldEqVisitor, FieldPairVisitor, FieldPairVisitorMut, FieldVisitor, FieldVisitorMut, Implicit,
-    InlinedMessageParent, MessageBinding, MessageBindingMut, MessageCommon, MessageCommonAlloc,
-    MessageEncode, MessageMerge, NestedMessage, ProtoInt32, SingularField, Window, WindowMut,
+    InlinedMessageParent, MessageBinding, MessageBindingMut, MessageCommon, MessageEncode,
+    MessageMerge, NestedMessage, ProtoInt32, SingularField, Window, WindowMut,
 };
 
 use crate::point::{BIT_COUNT as POINT_BIT_COUNT, FIELD_X, FIELD_Y};
@@ -327,24 +327,16 @@ impl<A: Allocator + Clone> DefaultIn<A> for PointBody<A> {
     }
 }
 
-impl<A, Cx> DeallocateBound<A, Cx> for PointBody<A>
-where
-    A: Allocator,
-    Cx: MessageBindingMut<A>,
-{
-    fn deallocate_bound(self, common: &Cx) {
+impl<A: Allocator> DeallocateBound<A> for PointBody<A> {
+    fn deallocate_bound<Cx: MessageBindingMut<A>>(self, common: &Cx) {
         let mut body = self;
         let mut v = FieldDeallocVisitor::new(common);
         let _ = body.visit_fields_mut(&mut v);
     }
 }
 
-impl<A, Cx> CloneBound<A, Cx> for PointBody<A>
-where
-    A: Allocator + Clone,
-    Cx: MessageBindingMut<A> + MessageCommonAlloc<Alloc = A>,
-{
-    fn clone_bound(&self, common: &Cx, alloc: A) -> Self {
+impl<A: Allocator + Clone> CloneBound<A> for PointBody<A> {
+    fn clone_bound<Cx: MessageBindingMut<A>>(&self, common: &Cx, alloc: A) -> Self {
         PointBody {
             x: self.x.clone_field(common, alloc.clone()),
             y: self.y.clone_field(common, alloc),
@@ -558,20 +550,5 @@ impl<A: Allocator> NestedMessage for Point<A> {
     {
         let body: &mut PointBody<Ax> = unsafe { mem::transmute(body) };
         body.merge_into(window, buf, depth)
-    }
-
-    fn deallocate_body<Cx>(body: PointBody<A>, window: &Cx)
-    where
-        Cx: MessageBindingMut<A>,
-    {
-        body.deallocate_bound(window);
-    }
-
-    fn clone_body<Cx>(body: &PointBody<A>, window: &Cx, alloc: A) -> PointBody<A>
-    where
-        Cx: MessageBindingMut<A>,
-        A: Clone,
-    {
-        body.clone_bound(window, alloc)
     }
 }

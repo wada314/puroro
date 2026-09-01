@@ -24,8 +24,8 @@ use puroro_rt::{
     EncodeRawVisitor, EncodedLenVisitor, Explicit, FieldCloneIn, FieldDeallocVisitor,
     FieldEqVisitor, FieldPairVisitor, FieldPairVisitorMut, FieldVisitor, FieldVisitorMut,
     InlineOrHeap, InlinedMessageParent, MessageBinding, MessageBindingMut, MessageCommon,
-    MessageCommonAlloc, MessageEncode, MessageMerge, NestedMessage, ProtoDouble, ProtoFixed32,
-    ProtoString, SingularField, Window, WindowMut,
+    MessageEncode, MessageMerge, NestedMessage, ProtoDouble, ProtoFixed32, ProtoString,
+    SingularField, Window, WindowMut,
 };
 
 use crate::address::{
@@ -434,24 +434,16 @@ impl<A: Allocator + Clone> ::puroro_rt::DefaultIn<A> for AddressBody<A> {
     }
 }
 
-impl<A, Cx> DeallocateBound<A, Cx> for AddressBody<A>
-where
-    A: Allocator,
-    Cx: MessageBindingMut<A>,
-{
-    fn deallocate_bound(self, common: &Cx) {
+impl<A: Allocator> DeallocateBound<A> for AddressBody<A> {
+    fn deallocate_bound<Cx: MessageBindingMut<A>>(self, common: &Cx) {
         let mut body = self;
         let mut v = FieldDeallocVisitor::new(common);
         let _ = body.visit_fields_mut(&mut v);
     }
 }
 
-impl<A, Cx> CloneBound<A, Cx> for AddressBody<A>
-where
-    A: Allocator + Clone,
-    Cx: MessageBindingMut<A> + MessageCommonAlloc<Alloc = A>,
-{
-    fn clone_bound(&self, common: &Cx, alloc: A) -> Self {
+impl<A: Allocator + Clone> CloneBound<A> for AddressBody<A> {
+    fn clone_bound<Cx: MessageBindingMut<A>>(&self, common: &Cx, alloc: A) -> Self {
         AddressBody {
             street: self.street.clone_field(common, alloc.clone()),
             city: self.city.clone_field(common, alloc.clone()),
@@ -751,20 +743,5 @@ impl<A: Allocator> NestedMessage for Address<A> {
     {
         let body: &mut AddressBody<Ax> = unsafe { mem::transmute(body) };
         body.merge_into(window, buf, depth)
-    }
-
-    fn deallocate_body<Cx>(body: AddressBody<A>, window: &Cx)
-    where
-        Cx: MessageBindingMut<A>,
-    {
-        body.deallocate_bound(window);
-    }
-
-    fn clone_body<Cx>(body: &AddressBody<A>, window: &Cx, alloc: A) -> AddressBody<A>
-    where
-        Cx: MessageBindingMut<A>,
-        A: Clone,
-    {
-        body.clone_bound(window, alloc)
     }
 }

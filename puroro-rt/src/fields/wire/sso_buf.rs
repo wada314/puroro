@@ -13,8 +13,6 @@ use ::core::mem::{self, ManuallyDrop};
 use ::core::str;
 use ::unmanaged::{CloneIn, DefaultIn, String as AllocString, UnmanagedString, UnmanagedVec};
 
-use crate::fields::shared::{CloneBound, DeallocateBound, MessageBindingMut};
-
 /// Max inline byte length (one byte of the 3-word slot is the length).
 pub const INLINE_CAP: usize = mem::size_of::<usize>() * 3 - 1;
 
@@ -308,29 +306,5 @@ impl<H, A: Allocator> DefaultIn<A> for SsoBuf<H> {
     #[inline]
     fn default_in(_alloc: A) -> Self {
         Self::empty_inline()
-    }
-}
-
-/// Bound-only: arm selection is `HEAP_BIT`. Real teardown / clone go through
-/// [`InlineOrHeap`](crate::fields::shared::value_layout::InlineOrHeap).
-impl<H, A, Cx> DeallocateBound<A, Cx> for SsoBuf<H>
-where
-    A: Allocator,
-    Cx: MessageBindingMut<A>,
-{
-    #[inline]
-    fn deallocate_bound(self, _common: &Cx) {
-        mem::forget(self);
-    }
-}
-
-impl<H, A, Cx> CloneBound<A, Cx> for SsoBuf<H>
-where
-    A: Allocator + Clone,
-    Cx: MessageBindingMut<A>,
-{
-    #[inline]
-    fn clone_bound(&self, _common: &Cx, _alloc: A) -> Self {
-        unimplemented!("SSO clone goes through InlineOrHeap::clone_slot")
     }
 }

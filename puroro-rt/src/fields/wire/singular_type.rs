@@ -34,7 +34,7 @@ use ::puroro::{DecodeBuf, DecodeError, WireType};
 
 use crate::decode;
 use crate::fields::shared::{
-    CloneBound, DeallocateBound, DefaultIn, InlinedMessageParent, MessageBindingMut, Window,
+    CloneBound, DeallocateBound, DefaultIn, InlinedMessageParent, MessageBindingMut,
     slot_init::SlotInitMut,
     value_slot::{AddressableSlot, ValueSlot, ValueSlotMutAccess},
 };
@@ -122,7 +122,7 @@ pub trait PayloadAccess: SingularType {
     fn write<A, VS, I, Cx>(slot: &mut VS, init: I, common: &mut Cx, value: Self::Written<A>)
     where
         A: Allocator + Clone,
-        Self::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateBound<A, Cx>,
+        Self::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateBound<A>,
         VS: ValueSlot<Self::Slot<A>, A>,
         I: SlotInitMut,
         Cx: InlinedMessageParent<A>;
@@ -134,7 +134,7 @@ pub trait PayloadAccess: SingularType {
     fn clear<A, VS, I, Cx>(slot: &mut VS, init: I, common: &mut Cx)
     where
         A: Allocator + Clone,
-        Self::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateBound<A, Cx>,
+        Self::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateBound<A>,
         VS: ValueSlot<Self::Slot<A>, A>,
         I: SlotInitMut,
         Cx: InlinedMessageParent<A>;
@@ -144,15 +144,14 @@ pub trait PayloadAccess: SingularType {
     where
         A: Allocator,
         Cx: MessageBindingMut<A>,
-        Self::Slot<A>: DeallocateBound<A, Cx>;
+        Self::Slot<A>: DeallocateBound<A>;
 
     /// Deep-copies an extracted inline slot using `common` for bits / tags.
     fn clone_payload<A, Cx>(slot: &Self::Slot<A>, common: &Cx, alloc: A) -> Self::Slot<A>
     where
         A: Allocator + Clone,
         Cx: MessageBindingMut<A>,
-        Self::Slot<A>: CloneBound<A, Cx>,
-        for<'w> Self::Slot<A>: CloneBound<A, Window<'w, A>>;
+        Self::Slot<A>: CloneBound<A>;
 }
 
 /// Wire-decode merge for inline payloads. Kept off [`PayloadAccess`] so nested
@@ -175,7 +174,7 @@ pub trait PayloadMerge: PayloadAccess {
     ) -> Result<(), DecodeError>
     where
         A: Allocator + Clone,
-        Self::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateBound<A, Cx>,
+        Self::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateBound<A>,
         VS: ValueSlot<Self::Slot<A>, A>,
         I: SlotInitMut,
         Cx: InlinedMessageParent<A>,
@@ -239,7 +238,7 @@ where
     fn write<A, VS, I, Cx>(slot: &mut VS, init: I, common: &mut Cx, value: C::NativeType)
     where
         A: Allocator + Clone,
-        C::NativeType: AddressableSlot + DefaultIn<A> + DeallocateBound<A, Cx>,
+        C::NativeType: AddressableSlot + DefaultIn<A> + DeallocateBound<A>,
         VS: ValueSlot<C::NativeType, A>,
         I: SlotInitMut,
         Cx: InlinedMessageParent<A>,
@@ -253,7 +252,7 @@ where
     fn clear<A, VS, I, Cx>(slot: &mut VS, init: I, common: &mut Cx)
     where
         A: Allocator + Clone,
-        C::NativeType: AddressableSlot + DefaultIn<A> + DeallocateBound<A, Cx>,
+        C::NativeType: AddressableSlot + DefaultIn<A> + DeallocateBound<A>,
         VS: ValueSlot<C::NativeType, A>,
         I: SlotInitMut,
         Cx: InlinedMessageParent<A>,
@@ -268,7 +267,7 @@ where
     where
         A: Allocator,
         Cx: MessageBindingMut<A>,
-        C::NativeType: DeallocateBound<A, Cx>,
+        C::NativeType: DeallocateBound<A>,
     {
         slot.deallocate_bound(common);
     }
@@ -278,8 +277,7 @@ where
     where
         A: Allocator + Clone,
         Cx: MessageBindingMut<A>,
-        C::NativeType: CloneBound<A, Cx>,
-        for<'w> C::NativeType: CloneBound<A, Window<'w, A>>,
+        C::NativeType: CloneBound<A>,
     {
         slot.clone_bound(common, alloc)
     }
@@ -302,7 +300,7 @@ where
     ) -> Result<(), DecodeError>
     where
         A: Allocator + Clone,
-        Self::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateBound<A, Cx>,
+        Self::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateBound<A>,
         VS: ValueSlot<Self::Slot<A>, A>,
         I: SlotInitMut,
         Cx: InlinedMessageParent<A>,
@@ -374,7 +372,7 @@ impl<C: LenCodec> PayloadAccess for LenScalar<C> {
     fn write<A, VS, I, Cx>(slot: &mut VS, init: I, common: &mut Cx, value: C::Slot<A>)
     where
         A: Allocator + Clone,
-        C::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateBound<A, Cx>,
+        C::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateBound<A>,
         VS: ValueSlot<C::Slot<A>, A>,
         I: SlotInitMut,
         Cx: InlinedMessageParent<A>,
@@ -388,7 +386,7 @@ impl<C: LenCodec> PayloadAccess for LenScalar<C> {
     fn clear<A, VS, I, Cx>(slot: &mut VS, init: I, common: &mut Cx)
     where
         A: Allocator + Clone,
-        C::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateBound<A, Cx>,
+        C::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateBound<A>,
         VS: ValueSlot<C::Slot<A>, A>,
         I: SlotInitMut,
         Cx: InlinedMessageParent<A>,
@@ -403,7 +401,7 @@ impl<C: LenCodec> PayloadAccess for LenScalar<C> {
     where
         A: Allocator,
         Cx: MessageBindingMut<A>,
-        C::Slot<A>: DeallocateBound<A, Cx>,
+        C::Slot<A>: DeallocateBound<A>,
     {
         slot.deallocate_bound(common);
     }
@@ -413,8 +411,7 @@ impl<C: LenCodec> PayloadAccess for LenScalar<C> {
     where
         A: Allocator + Clone,
         Cx: MessageBindingMut<A>,
-        C::Slot<A>: CloneBound<A, Cx>,
-        for<'w> C::Slot<A>: CloneBound<A, Window<'w, A>>,
+        C::Slot<A>: CloneBound<A>,
     {
         slot.clone_bound(common, alloc)
     }
@@ -433,7 +430,7 @@ impl<C: LenCodec> PayloadMerge for LenScalar<C> {
     ) -> Result<(), DecodeError>
     where
         A: Allocator + Clone,
-        Self::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateBound<A, Cx>,
+        Self::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateBound<A>,
         VS: ValueSlot<Self::Slot<A>, A>,
         I: SlotInitMut,
         Cx: InlinedMessageParent<A>,

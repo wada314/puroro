@@ -23,8 +23,8 @@ use puroro_rt::{
     DefaultIn, EncodeCtx, EncodeRawVisitor, EncodedLenVisitor, Explicit, FieldCloneIn,
     FieldDeallocVisitor, FieldEqVisitor, FieldPairVisitor, FieldPairVisitorMut, FieldVisitor,
     FieldVisitorMut, InlinedMessageParent, MessageBinding, MessageBindingMut, MessageCommon,
-    MessageCommonAlloc, MessageEncode, MessageMerge, NestedMessage, ProtoInt32, SharedMessage,
-    SingularField, Window, WindowMut,
+    MessageEncode, MessageMerge, NestedMessage, ProtoInt32, SharedMessage, SingularField, Window,
+    WindowMut,
 };
 
 use crate::Address;
@@ -384,24 +384,16 @@ impl<A: Allocator + Clone> DefaultIn<A> for StudentBody<A> {
     }
 }
 
-impl<A, Cx> DeallocateBound<A, Cx> for StudentBody<A>
-where
-    A: Allocator,
-    Cx: MessageBindingMut<A>,
-{
-    fn deallocate_bound(self, common: &Cx) {
+impl<A: Allocator> DeallocateBound<A> for StudentBody<A> {
+    fn deallocate_bound<Cx: MessageBindingMut<A>>(self, common: &Cx) {
         let mut body = self;
         let mut v = FieldDeallocVisitor::new(common);
         let _ = body.visit_fields_mut(&mut v);
     }
 }
 
-impl<A, Cx> CloneBound<A, Cx> for StudentBody<A>
-where
-    A: Allocator + Clone,
-    Cx: MessageBindingMut<A> + MessageCommonAlloc<Alloc = A>,
-{
-    fn clone_bound(&self, common: &Cx, alloc: A) -> Self {
+impl<A: Allocator + Clone> CloneBound<A> for StudentBody<A> {
+    fn clone_bound<Cx: MessageBindingMut<A>>(&self, common: &Cx, alloc: A) -> Self {
         StudentBody {
             year: self.year.clone_field(common, alloc.clone()),
             location: self.location.clone_field(common, alloc.clone()),
@@ -699,20 +691,5 @@ impl<A: Allocator> NestedMessage for Student<A> {
     {
         let body: &mut StudentBody<Ax> = unsafe { mem::transmute(body) };
         body.merge_into(window, buf, depth)
-    }
-
-    fn deallocate_body<Cx>(body: StudentBody<A>, window: &Cx)
-    where
-        Cx: MessageBindingMut<A>,
-    {
-        body.deallocate_bound(window);
-    }
-
-    fn clone_body<Cx>(body: &StudentBody<A>, window: &Cx, alloc: A) -> StudentBody<A>
-    where
-        Cx: MessageBindingMut<A>,
-        A: Clone,
-    {
-        body.clone_bound(window, alloc)
     }
 }

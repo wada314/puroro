@@ -19,7 +19,7 @@ use ::puroro::{DecodeBuf, DecodeError, WireType};
 
 use crate::decode;
 use crate::fields::shared::{
-    CloneBound, DeallocateBound, DefaultIn, InlinedMessageParent, MessageBindingMut, Window,
+    CloneBound, DeallocateBound, DefaultIn, InlinedMessageParent, MessageBindingMut,
     slot_init::SlotInitMut,
     value_slot::{AddressableSlot, ValueSlot, ValueSlotMutAccess},
 };
@@ -91,7 +91,7 @@ impl<M: MessageEncode> PayloadAccess for ProtoMessage<M> {
     fn write<A, VS, I, Cx>(slot: &mut VS, init: I, common: &mut Cx, value: M)
     where
         A: Allocator + Clone,
-        M: AddressableSlot + DefaultIn<A> + DeallocateBound<A, Cx>,
+        M: AddressableSlot + DefaultIn<A> + DeallocateBound<A>,
         VS: ValueSlot<M, A>,
         I: SlotInitMut,
         Cx: InlinedMessageParent<A>,
@@ -105,7 +105,7 @@ impl<M: MessageEncode> PayloadAccess for ProtoMessage<M> {
     fn clear<A, VS, I, Cx>(slot: &mut VS, init: I, common: &mut Cx)
     where
         A: Allocator + Clone,
-        M: AddressableSlot + DefaultIn<A> + DeallocateBound<A, Cx>,
+        M: AddressableSlot + DefaultIn<A> + DeallocateBound<A>,
         VS: ValueSlot<M, A>,
         I: SlotInitMut,
         Cx: InlinedMessageParent<A>,
@@ -120,7 +120,7 @@ impl<M: MessageEncode> PayloadAccess for ProtoMessage<M> {
     where
         A: Allocator,
         Cx: MessageBindingMut<A>,
-        M: DeallocateBound<A, Cx>,
+        M: DeallocateBound<A>,
     {
         slot.deallocate_bound(common);
     }
@@ -130,8 +130,7 @@ impl<M: MessageEncode> PayloadAccess for ProtoMessage<M> {
     where
         A: Allocator + Clone,
         Cx: MessageBindingMut<A>,
-        M: CloneBound<A, Cx>,
-        for<'w> M: CloneBound<A, Window<'w, A>>,
+        M: CloneBound<A>,
     {
         slot.clone_bound(common, alloc)
     }
@@ -149,7 +148,7 @@ impl<M: MessageEncode + MessageMerge> PayloadMerge for ProtoMessage<M> {
     ) -> Result<(), DecodeError>
     where
         A: Allocator + Clone,
-        Self::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateBound<A, Cx>,
+        Self::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateBound<A>,
         VS: ValueSlot<Self::Slot<A>, A>,
         I: SlotInitMut,
         Cx: InlinedMessageParent<A>,

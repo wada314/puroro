@@ -86,30 +86,11 @@ pub trait NestedMessage: Sized {
     /// field's `BIT_BASE` (this message's local bits plus nested inlined
     /// children). Boxed children do not add to the parent count.
     ///
-    /// [`clear`](PayloadAccess::clear) / first [`with_mut`](PayloadAccess::with_mut)
-    /// after `take_clear` zero this range. `deallocate_body` reads SSO / presence
-    /// bits and must run **before** the range is cleared; leftover `HEAP_BIT`
-    /// plus a fresh empty-inline body is unsound.
+    /// After [`DeallocateBound`] on the body (which **reads** SSO / presence
+    /// bits), [`clear`](PayloadAccess::clear) and a first
+    /// [`with_mut`](PayloadAccess::with_mut) on an empty slot zero this range
+    /// so a fresh empty-inline body is not paired with a leftover `HEAP_BIT`.
     const BIT_COUNT: usize;
-
-    /// Teardown of an inlined [`Self::Body`] through the parent window.
-    ///
-    /// `window` is this child's binding (`bit_base` already applied) so inner
-    /// Explicit / SSO bits resolve. Used when the body is dropped as a slot
-    /// (parent `Drop` / `clear`) without an owned [`crate::MessageCommon`].
-    /// Generated impls forward to [`DeallocateBound`].
-    fn deallocate_body<Cx>(body: Self::Body, window: &Cx)
-    where
-        Cx: MessageBindingMut<Self::Alloc>;
-
-    /// Deep-copy of an inlined [`Self::Body`] through the **source** window.
-    ///
-    /// Destination bits are installed later on the parent `MessageCommon`.
-    /// Generated impls forward to [`CloneBound`].
-    fn clone_body<Cx>(body: &Self::Body, window: &Cx, alloc: Self::Alloc) -> Self::Body
-    where
-        Cx: MessageBindingMut<Self::Alloc>,
-        Self::Alloc: Clone;
 }
 
 /// Type marker for a nested message whose getters are [`NestedMessage::View`].
@@ -245,15 +226,14 @@ where
     fn write<A, VS, I, Cx>(slot: &mut VS, init: I, common: &mut Cx, value: M::Body)
     where
         A: Allocator + Clone,
-        M::Body: AddressableSlot + DefaultIn<A> + DeallocateBound<A, Cx>,
+        M::Body: AddressableSlot + DefaultIn<A> + DeallocateBound<A>,
         VS: ValueSlot<M::Body, A>,
         I: SlotInitMut,
         Cx: InlinedMessageParent<A>,
     {
         if let Some(old) = ValueSlot::with_mut(slot, init, common).replace(value) {
             let window = common.child_window(BIT_BASE, FIELD);
-            let window: Window<M::Alloc> = unsafe { mem::transmute_copy(&window) };
-            M::deallocate_body(old, &window);
+            old.deallocate_bound(&window);
         }
     }
 
@@ -261,7 +241,7 @@ where
     fn clear<A, VS, I, Cx>(slot: &mut VS, init: I, common: &mut Cx)
     where
         A: Allocator + Clone,
-        M::Body: AddressableSlot + DefaultIn<A> + DeallocateBound<A, Cx>,
+        M::Body: AddressableSlot + DefaultIn<A> + DeallocateBound<A>,
         VS: ValueSlot<M::Body, A>,
         I: SlotInitMut,
         Cx: InlinedMessageParent<A>,
@@ -269,8 +249,7 @@ where
         let alloc = common.clone_alloc();
         if let Some(old) = ValueSlot::with_mut(slot, init, common).take_clear() {
             let window = common.child_window(BIT_BASE, FIELD);
-            let window: Window<M::Alloc> = unsafe { mem::transmute_copy(&window) };
-            M::deallocate_body(old, &window);
+            old.deallocate_bound(&window);
         }
         // Presence is already clear; drop child SSO / nested presence bits so a
         // later DefaultIn body is not paired with a leftover HEAP_BIT.
@@ -283,11 +262,10 @@ where
     where
         A: Allocator,
         Cx: MessageBindingMut<A>,
-        M::Body: DeallocateBound<A, Cx>,
+        M::Body: DeallocateBound<A>,
     {
         let window = common.child_window(BIT_BASE, FIELD);
-        let window: Window<M::Alloc> = unsafe { mem::transmute_copy(&window) };
-        M::deallocate_body(slot, &window);
+        slot.deallocate_bound(&window);
     }
 
     #[inline]
@@ -295,8 +273,7 @@ where
     where
         A: Allocator + Clone,
         Cx: MessageBindingMut<A>,
-        M::Body: CloneBound<A, Cx>,
-        for<'w> M::Body: CloneBound<A, Window<'w, A>>,
+        M::Body: CloneBound<A>,
     {
         let window = common.child_window(BIT_BASE, FIELD);
         slot.clone_bound(&window, alloc)
@@ -317,7 +294,7 @@ impl<M: NestedMessage, const FIELD: u32, const BIT_BASE: usize> PayloadMerge
     ) -> Result<(), DecodeError>
     where
         A: Allocator + Clone,
-        Self::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateBound<A, Cx>,
+        Self::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateBound<A>,
         VS: ValueSlot<Self::Slot<A>, A>,
         I: SlotInitMut,
         Cx: InlinedMessageParent<A>,

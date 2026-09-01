@@ -242,8 +242,9 @@ Runtime proof of the dual catalog, hand-written `Point` / `Task.origin` only.
 - [`NestedMessage`](../../puroro-rt/src/fields/wire/shared_message.rs) on owned `Point` / `Address`.
 - [`SharedMessage<M, FIELD>`](../../puroro-rt/src/fields/wire/shared_message.rs): inline slot = `M::Body`, boxed slot = `UnmanagedBox<M>`, `View`/`Mut` always window + body.
 - `Task.origin` and `Task.assignee` use the same marker. `ProtoMessage` remains for fixtures / `watchers` / `postal`.
-- Mut-view `merge_from`, `FieldDeallocate` on `MessageBindingMut`, [`Window::nest`](../../puroro-rt/src/fields/shared/window.rs).
-- Sample `School → Student → Point`: Student has local bits (`year`) + inlined `Point`; School inlines Student at `BIT_STUDENT_BASE`. Tests: two-hop round-trip, year bit does not collide with School `name`, location unknowns stay inside nested LEN.
+- Mut-view `merge_from`, `FieldDeallocate` on catalog wrappers (`MessageBindingMut`), [`Window::nest`](../../puroro-rt/src/fields/shared/window.rs).
+- Inlined Body teardown/clone: [`DeallocateBound`](../../puroro-rt/src/fields/shared/slot_bound.rs) / [`CloneBound`](../../puroro-rt/src/fields/shared/slot_bound.rs) on the extracted Body after `child_window` (not `NestedMessage` methods). After clear, `NestedMessage::BIT_COUNT` bits from `BIT_BASE` are zeroed. SSO does not impl those traits (`InlineOrHeap` + `HEAP_BIT`).
+- Sample `School → Student → Point` / inlined `Address.home`: Student has local bits + inlined Point / Address; School inlines Student at `BIT_STUDENT_BASE`. Tests: two-hop round-trip, year bit does not collide with School `name`, location unknowns stay inside nested LEN, heap street clone/clear/`set_student`.
 
 ---
 
