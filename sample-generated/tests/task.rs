@@ -6,7 +6,7 @@
 
 use ::allocator_api2::alloc::Global;
 use ::puroro::{
-    BytesMut, MapMut, MapRef, Message, OneofView, OneofViewMut, RepeatedStringMut,
+    BytesMut, MapMut, MapRef, Message, OneofView, OneofViewMut, RepeatedRef, RepeatedStringMut,
     String as AllocString, StringMut, UnknownPayload,
 };
 use ::puroro_rt::INLINE_CAP;
@@ -142,7 +142,7 @@ fn task_fields_roundtrip() {
     watcher.city_mut().set("Osaka");
     *watcher.postal_code_mut() = 5300001;
     *watcher.latitude_mut() = 34.6937;
-    task.watchers_mut().push(watcher);
+    task.watchers_mut().push().copy_from(&watcher);
     task.votes_mut().push(true);
     task.votes_mut().push(false);
     *task.attributes_mut().entry_mut("region") = 81;
@@ -179,8 +179,11 @@ fn task_fields_roundtrip() {
     assert_eq!(a.postal_code().get(), 1000001);
     assert!((a.latitude().get() - 35.6812).abs() < 1e-9);
     assert_eq!(decoded.watchers().len(), 1);
-    assert_eq!(decoded.watchers()[0].street().get(), "2 Side Rd");
-    assert_eq!(decoded.watchers()[0].city().get(), "Osaka");
+    assert_eq!(
+        decoded.watchers().get(0).unwrap().street().get(),
+        "2 Side Rd"
+    );
+    assert_eq!(decoded.watchers().get(0).unwrap().city().get(), "Osaka");
     assert_eq!(decoded.votes(), &[true, false]);
     assert_eq!(decoded.attributes().len(), 2);
     assert_eq!(decoded.attributes().get("region").copied(), Some(81));
@@ -203,6 +206,25 @@ fn map_attributes_last_wins_on_merge() {
     let bytes = task.encode_to_vec();
     let decoded: Task = Task::decode(&bytes[..]).unwrap();
     assert_eq!(decoded.attributes().get("k").copied(), Some(3));
+}
+
+#[test]
+fn map_message_values_return_views() {
+    use ::bitvec::array::BitArray;
+    use ::bitvec::order::Lsb0;
+    use ::puroro::MapMessageMut;
+    use ::puroro_rt::{FieldDeallocate, MapField, MessageCommon, ProtoMessage, ProtoString};
+
+    let mut common = MessageCommon::<BitArray<[u8; 1], Lsb0>, _>::new_in(BitArray::ZERO, Global);
+    let mut field = MapField::<ProtoString, ProtoMessage<Address>, 1, _>::new_in(Global);
+    {
+        let mut map = field.bind_mut(&mut common).messages_mut();
+        map.entry_mut("home").street_mut().set("1 Main");
+    }
+    let homes = field.bind(&common).message_map();
+    assert_eq!(homes.len(), 1);
+    assert_eq!(homes.get("home").unwrap().street().get(), "1 Main");
+    field.deallocate(&common);
 }
 
 #[test]
@@ -412,7 +434,7 @@ fn repeated_merge_appends() {
     task.labels_mut().push().push_str("a");
     let mut w0 = Address::new();
     w0.city_mut().push_str("A");
-    task.watchers_mut().push(w0);
+    task.watchers_mut().push().copy_from(&w0);
     task.votes_mut().push(true);
 
     let mut other = Task::new();
@@ -422,7 +444,7 @@ fn repeated_merge_appends() {
     other.labels_mut().push().push_str("b");
     let mut w1 = Address::new();
     w1.city_mut().push_str("B");
-    other.watchers_mut().push(w1);
+    other.watchers_mut().push().copy_from(&w1);
     other.votes_mut().push(false);
     let bytes = other.encode_to_vec();
 
@@ -434,8 +456,8 @@ fn repeated_merge_appends() {
     assert_eq!(&*task.labels()[0], "a");
     assert_eq!(&*task.labels()[1], "b");
     assert_eq!(task.watchers().len(), 2);
-    assert_eq!(task.watchers()[0].city().get(), "A");
-    assert_eq!(task.watchers()[1].city().get(), "B");
+    assert_eq!(task.watchers().get(0).unwrap().city().get(), "A");
+    assert_eq!(task.watchers().get(1).unwrap().city().get(), "B");
     assert_eq!(task.votes(), &[true, false]);
 }
 
@@ -448,7 +470,7 @@ fn repeated_clear_omits_from_wire() {
     task.labels_mut().push().push_str("x");
     let mut w = Address::new();
     w.street_mut().push_str("gone");
-    task.watchers_mut().push(w);
+    task.watchers_mut().push().copy_from(&w);
     task.votes_mut().push(true);
 
     task.clear_tag_ids();
@@ -496,17 +518,17 @@ fn repeated_message_roundtrip() {
     let mut b = Address::new();
     b.street_mut().push_str("2 Oak");
     b.city_mut().push_str("Kyoto");
-    task.watchers_mut().push(a);
-    task.watchers_mut().push(b);
+    task.watchers_mut().push().copy_from(&a);
+    task.watchers_mut().push().copy_from(&b);
 
     let bytes = task.encode_to_vec();
     let decoded: Task = Task::decode(&bytes[..]).unwrap();
 
     assert_eq!(decoded.watchers().len(), 2);
-    assert_eq!(decoded.watchers()[0].street().get(), "1 Main");
-    assert_eq!(decoded.watchers()[0].city().get(), "Tokyo");
-    assert_eq!(decoded.watchers()[1].street().get(), "2 Oak");
-    assert_eq!(decoded.watchers()[1].city().get(), "Kyoto");
+    assert_eq!(decoded.watchers().get(0).unwrap().street().get(), "1 Main");
+    assert_eq!(decoded.watchers().get(0).unwrap().city().get(), "Tokyo");
+    assert_eq!(decoded.watchers().get(1).unwrap().street().get(), "2 Oak");
+    assert_eq!(decoded.watchers().get(1).unwrap().city().get(), "Kyoto");
 }
 
 // ---------------------------------------------------------------------------

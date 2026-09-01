@@ -8,13 +8,14 @@
 use ::core::borrow::Borrow;
 use ::core::fmt::{Debug, Formatter, Result as FmtResult};
 use ::core::hash::Hash;
+use ::core::marker::PhantomData;
 use ::core::mem;
 
 use ::allocator_api2::alloc::Allocator;
 use ::bytes::BufMut;
 use ::hashbrown::hash_map::Iter as HashMapIter;
 use ::hashbrown::{DefaultHashBuilder, Equivalent, HashMap};
-use ::puroro::{DecodeBuf, DecodeError, MapMut, MapRef, WireType};
+use ::puroro::{DecodeBuf, DecodeError, MapMessageMut, MapMut, MapRef, Message, WireType};
 use ::unmanaged::{CloneIn, ToOwnedIn};
 
 use super::MapKey;
@@ -22,10 +23,14 @@ use crate::decode;
 use crate::encode::{self, field_number_const};
 use crate::fields::shared::field_inspect::{FieldCloneIn, FieldDebug, FieldEncode, FieldPartialEq};
 use crate::fields::shared::{FieldDeallocate, MessageCommon};
+use crate::fields::wire::proto_message::ProtoMessage;
 use crate::fields::wire::repeated_element::{
     RepeatedElement, RepeatedElementMerge, RepeatedElementMut,
 };
+use crate::fields::wire::shared_message::NestedMessage;
 use crate::message_encode::EncodeCtx;
+use crate::message_encode::MessageEncode;
+use crate::message_merge::MessageMerge;
 
 use super::entry::{decode_map_entry, encode_map_entry, entry_payload_len};
 
@@ -434,6 +439,148 @@ where
     #[inline]
     fn clear(&mut self) {
         MapFieldMut::clear(self);
+    }
+}
+
+/// Shared bound-view map when values are [`NestedMessage`].
+pub struct MapMessageRef<'a, K, M, const FIELD: u32, A, Pb>
+where
+    K: MapKey,
+    M: NestedMessage + MessageEncode,
+    A: Allocator,
+{
+    field: &'a MapField<K, ProtoMessage<M>, FIELD, A>,
+    _common: PhantomData<&'a MessageCommon<Pb, A>>,
+}
+
+impl<'a, K, M, const FIELD: u32, A, Pb> MapFieldRef<'a, K, ProtoMessage<M>, FIELD, A, Pb>
+where
+    K: MapKey,
+    M: NestedMessage<Alloc = A> + MessageEncode,
+    A: Allocator,
+{
+    /// Projects each stored `M` as [`NestedMessage::View`].
+    #[inline]
+    pub fn message_map(self) -> MapMessageRef<'a, K, M, FIELD, A, Pb> {
+        MapMessageRef {
+            field: self.field,
+            _common: PhantomData,
+        }
+    }
+}
+
+impl<'a, K, M, const FIELD: u32, A, Pb> MapMessageRef<'a, K, M, FIELD, A, Pb>
+where
+    K: MapKey,
+    M: NestedMessage<Alloc = A> + MessageEncode,
+    A: Allocator,
+    K::RefView: Hash + Eq,
+    K::Element<A>: Hash + Eq + Borrow<K::RefView>,
+{
+    #[inline]
+    pub fn len(&self) -> usize {
+        self.field.len()
+    }
+
+    #[inline]
+    pub fn is_empty(&self) -> bool {
+        self.field.is_empty()
+    }
+
+    /// Bound view of the value for `key`, or [`None`] if absent.
+    #[inline]
+    pub fn get(&self, key: impl Borrow<K::RefView>) -> Option<M::View<'a>> {
+        self.field
+            .entries
+            .get(key.borrow())
+            .map(NestedMessage::as_view)
+    }
+}
+
+/// Mutable bound-view map when values are [`NestedMessage`].
+pub struct MapMessagesMut<'f, 'c, K, M, const FIELD: u32, A, Pb>
+where
+    K: MapKey,
+    M: NestedMessage + MessageEncode,
+    A: Allocator,
+{
+    inner: MapFieldMut<'f, 'c, K, ProtoMessage<M>, FIELD, A, Pb>,
+}
+
+impl<'f, 'c, K, M, const FIELD: u32, A, Pb> MapFieldMut<'f, 'c, K, ProtoMessage<M>, FIELD, A, Pb>
+where
+    K: MapKey,
+    M: NestedMessage<Alloc = A>
+        + Message<Alloc = A>
+        + MessageEncode
+        + MessageMerge
+        + ::unmanaged::DeallocateIn<A>,
+    A: Allocator + Clone,
+{
+    /// Bound-view mutator (`AddressMut`, …). Storage stays owned `M`.
+    #[inline]
+    pub fn messages_mut(self) -> MapMessagesMut<'f, 'c, K, M, FIELD, A, Pb> {
+        MapMessagesMut { inner: self }
+    }
+}
+
+impl<'f, 'c, K, M, const FIELD: u32, A, Pb> MapMessageMut<K::RefView>
+    for MapMessagesMut<'f, 'c, K, M, FIELD, A, Pb>
+where
+    K: MapKey,
+    M: NestedMessage<Alloc = A>
+        + Message<Alloc = A>
+        + MessageEncode
+        + MessageMerge
+        + ::unmanaged::DeallocateIn<A>,
+    A: Allocator + Clone,
+    K::RefView: Hash + Eq + ToOwnedIn<A, Owned = K::Element<A>>,
+    K::Element<A>: Hash + Eq + Borrow<K::RefView>,
+{
+    type Value<'a>
+        = M::View<'a>
+    where
+        Self: 'a;
+
+    type Mut<'a>
+        = M::Mut<'a>
+    where
+        Self: 'a;
+
+    #[inline]
+    fn len(&self) -> usize {
+        self.inner.field.len()
+    }
+
+    #[inline]
+    fn get(&self, key: impl Borrow<K::RefView>) -> Option<M::View<'_>> {
+        self.inner
+            .field
+            .entries
+            .get(key.borrow())
+            .map(NestedMessage::as_view)
+    }
+
+    #[inline]
+    fn get_mut(&mut self, key: impl Borrow<K::RefView>) -> Option<M::Mut<'_>> {
+        self.inner
+            .get_element_mut(key.borrow())
+            .map(NestedMessage::as_mut)
+    }
+
+    #[inline]
+    fn entry_mut(&mut self, key: impl Borrow<K::RefView>) -> M::Mut<'_> {
+        NestedMessage::as_mut(&mut *self.inner.entry_element_mut_view(key.borrow()))
+    }
+
+    #[inline]
+    fn remove(&mut self, key: impl Borrow<K::RefView>) {
+        MapFieldMut::remove(&mut self.inner, key.borrow());
+    }
+
+    #[inline]
+    fn clear(&mut self) {
+        MapFieldMut::clear(&mut self.inner);
     }
 }
 

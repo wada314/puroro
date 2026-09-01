@@ -262,4 +262,27 @@ Runtime proof of the dual catalog, hand-written `Point` / `Task.origin` only.
 - Task bits: `BIT_POSTAL_BASE = 10` (Address 6 bits), `BIT_ORIGIN = 20`, `BitArray<[u8; 3]>`.
 - Tests: heap street switch/clone, heap email SSO leftover, unknown tag 99 inside postal LEN cleared on switch.
 
-**Still later:** repeated / map as views, codegen, `Student<C>`.
+**Still later:** codegen.
+
+---
+
+## Task 8: sample `StudentBound<A, C, B>` (one accessor impl)
+
+**Done.**
+
+- Accessors live on `StudentBound<A, C, B>`. `Student` / `Student<A>` is an owned wrapper (`Drop` / `Message` / deep `Clone`) that `Deref`s to the bound.
+- `StudentView` / `StudentMut` are aliases of the bound (`Window` + `&Body` / `WindowMut` + `&mut Body`) and stay `Copy`.
+- A single `Student<A, C, B>` cannot both `Drop` (owned teardown) and be `Copy` (NLL for views); this is the plan’s `Student` + `StudentBound` spelling.
+- Field getters / mutators / `copy_from` / view `merge_from` live in one pair of `impl`s over `C` + `B`.
+- `StudentMessage` / `StudentMessageMut` are blankets over the bound, plus owned. Full `Message` stays owned-only.
+
+---
+
+## Task 7: repeated / map getters as views
+
+**Done.**
+
+- Storage unchanged: `Element = M` with each element’s own `MessageCommon`.
+- Sample `watchers()` → `impl RepeatedRef<AddressView>`; `watchers_mut()` → `AddressListMut` (`RepeatedMessagesMut`; `push()` empty, then fill / `copy_from`).
+- Scalar maps stay `MapRef<K, V>` / `Option<&V>`. Message values use `message_map` / `messages_mut` → `AddressView` / `AddressMut` (`MapMessageMut`).
+- Codegen fixtures still emit `&[M]` / `Vec<M>` / `MapRef<K, M>`.

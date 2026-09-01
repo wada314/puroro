@@ -10,8 +10,9 @@
 //!   The window looks into the **child’s** own common (`bit_base = 0`).
 //!
 //! [`ProtoMessage`](super::proto_message::ProtoMessage) (`View = &M`) remains for
-//! generated fixtures and repeated elements that still store a full `M`
-//! without a body split.
+//! generated fixtures. Repeated / map elements still store a full `M` (own
+//! `MessageCommon`); sample getters project [`NestedMessage::View`] /
+//! [`NestedMessage::Mut`].
 
 use crate::decode;
 use crate::encode::{encode_varint, encoded_len_varint};

@@ -2,16 +2,24 @@
 //! scalar, an Explicit inlined [`Point`](crate::Point), and an Explicit inlined
 //! [`Address`](crate::Address) (SSO / heap bits).
 //!
-//! Owned [`Student`] has its own [`MessageCommon`]. When inlined into
-//! [`School`](crate::School), teardown / clone of this body go through
-//! [`DeallocateBound`](::puroro_rt::DeallocateBound) /
-//! [`CloneBound`](::puroro_rt::CloneBound) with the parent [`Window`].
+//! Field accessors live on [`StudentBound`] (`C` / `B`). Owned [`Student`]
+//! wraps that binding and is the only spelling that [`Drop`]s fields. Views
+//! ([`StudentView`] / [`StudentMut`]) are the same bound type with a parent
+//! [`Window`] / [`WindowMut`] — they stay [`Copy`] so NLL ends the parent
+//! borrow after last use. A single `Student<A, C, B>` cannot both `Drop`
+//! (owned) and be `Copy` (views).
+//!
+//! When inlined into [`School`](crate::School), teardown / clone of this body
+//! go through [`DeallocateBound`](::puroro_rt::DeallocateBound) /
+//! [`CloneBound`](::puroro_rt::CloneBound) with the parent window.
 
 use allocator_api2::alloc::{Allocator, Global};
 use bitvec::array::BitArray;
 use bitvec::order::Lsb0;
 use bytes::{Buf, BufMut};
+use core::borrow::{Borrow, BorrowMut};
 use core::fmt;
+use core::marker::PhantomData;
 use core::mem;
 use core::ops::ControlFlow;
 use core::ops::{Deref, DerefMut};
@@ -53,17 +61,31 @@ pub struct StudentBody<A: Allocator = Global> {
     >,
 }
 
-/// Owned `Student` (own [`MessageCommon`] + [`StudentBody`]).
+/// Owned common for a standalone [`Student`].
+pub type StudentOwnedCommon<A = Global> = MessageCommon<BitArray<[u8; 2], Lsb0>, A>;
+
+/// Common + body binding. One accessor `impl` for owned, shared view, and mut.
+///
+/// - Owned inner: `C = StudentOwnedCommon<A>`, `B = StudentBody<A>`
+/// - [`StudentView`]: `C = Window`, `B = &StudentBody`
+/// - [`StudentMut`]: `C = WindowMut`, `B = &mut StudentBody`
+pub struct StudentBound<A: Allocator, C, B> {
+    common: C,
+    body: B,
+    _alloc: PhantomData<A>,
+}
+
+/// Owned message (`Drop` / `Message` / deep `Clone`). Field accessors via
+/// [`Deref`] to [`StudentBound`].
 pub struct Student<A: Allocator = Global> {
-    _common: MessageCommon<BitArray<[u8; 2], Lsb0>, A>,
-    body: StudentBody<A>,
+    inner: StudentBound<A, StudentOwnedCommon<A>, StudentBody<A>>,
 }
 
 /// Shared view: parent [`Window`] + `&StudentBody`.
-pub struct StudentView<'a, A: Allocator> {
-    window: Window<'a, A>,
-    body: &'a StudentBody<A>,
-}
+pub type StudentView<'a, A = Global> = StudentBound<A, Window<'a, A>, &'a StudentBody<A>>;
+
+/// Mutable view: parent [`WindowMut`] + `&mut StudentBody`.
+pub type StudentMut<'a, A = Global> = StudentBound<A, WindowMut<'a, A>, &'a mut StudentBody<A>>;
 
 impl<A: Allocator> Copy for StudentView<'_, A> {}
 
@@ -71,12 +93,6 @@ impl<A: Allocator> Clone for StudentView<'_, A> {
     fn clone(&self) -> Self {
         *self
     }
-}
-
-/// Mutable view: parent [`WindowMut`] + `&mut StudentBody`.
-pub struct StudentMut<'a, A: Allocator> {
-    window: WindowMut<'a, A>,
-    body: &'a mut StudentBody<A>,
 }
 
 /// Infallible field getters (owned + views).
@@ -183,24 +199,137 @@ impl<A: Allocator> StudentBody<A> {
     }
 }
 
-impl<A: Allocator> Student<A> {
+impl<A, C, B> StudentBound<A, C, B>
+where
+    A: Allocator,
+    C: MessageBindingMut<A>,
+    B: Borrow<StudentBody<A>>,
+{
     pub fn year(&self) -> Optional<i32, impl HasDefault<i32>> {
-        self.body.year.bind(&self._common).optional()
+        self.body.borrow().year.bind(&self.common).optional()
     }
 
     pub fn location(&self) -> Option<PointView<'_, A>> {
-        self.body.location.bind(&self._common).get()
+        self.body.borrow().location.bind(&self.common).get()
     }
 
     pub fn home(&self) -> Option<AddressView<'_, A>> {
-        self.body.home.bind(&self._common).get()
+        self.body.borrow().home.bind(&self.common).get()
+    }
+}
+
+impl<A, C, B> StudentBound<A, C, B>
+where
+    A: Allocator + Clone,
+    C: InlinedMessageParent<A>,
+    B: BorrowMut<StudentBody<A>>,
+{
+    pub fn year_mut(&mut self) -> impl DerefMut<Target = i32> + '_ {
+        self.body
+            .borrow_mut()
+            .year
+            .bind_mut(&mut self.common)
+            .value_mut()
     }
 
+    pub fn clear_year(&mut self) {
+        self.body
+            .borrow_mut()
+            .year
+            .bind_mut(&mut self.common)
+            .clear();
+    }
+
+    pub fn location_mut(&mut self) -> PointMut<'_, A> {
+        self.body
+            .borrow_mut()
+            .location
+            .bind_mut(&mut self.common)
+            .get_mut()
+    }
+
+    pub fn set_location(&mut self, src: Point<A>) {
+        self.location_mut().copy_from(&src);
+    }
+
+    pub fn clear_location(&mut self) {
+        self.body
+            .borrow_mut()
+            .location
+            .bind_mut(&mut self.common)
+            .clear();
+    }
+
+    pub fn home_mut(&mut self) -> AddressMut<'_, A> {
+        self.body
+            .borrow_mut()
+            .home
+            .bind_mut(&mut self.common)
+            .get_mut()
+    }
+
+    pub fn set_home(&mut self, src: Address<A>) {
+        self.home_mut().copy_from(&src);
+    }
+
+    pub fn clear_home(&mut self) {
+        self.body
+            .borrow_mut()
+            .home
+            .bind_mut(&mut self.common)
+            .clear();
+    }
+
+    /// Copies field values from an owned [`Student`] into this binding.
+    pub fn copy_from(&mut self, src: &Student<A>) {
+        if src.year().is_set() {
+            *self.year_mut() = src.year().get();
+        } else {
+            self.clear_year();
+        }
+        if let Some(loc) = src.location() {
+            *self.location_mut().x_mut() = loc.x();
+            *self.location_mut().y_mut() = loc.y();
+        } else {
+            self.clear_location();
+        }
+        if let Some(home) = src.home() {
+            if home.street().is_set() {
+                self.home_mut().street_mut().set(home.street().get());
+            } else {
+                self.home_mut().clear_street();
+            }
+            if home.city().is_set() {
+                self.home_mut().city_mut().set(home.city().get());
+            } else {
+                self.home_mut().clear_city();
+            }
+            if home.postal_code().is_set() {
+                *self.home_mut().postal_code_mut() = home.postal_code().get();
+            } else {
+                self.home_mut().clear_postal_code();
+            }
+            if home.latitude().is_set() {
+                *self.home_mut().latitude_mut() = home.latitude().get();
+            } else {
+                self.home_mut().clear_latitude();
+            }
+        } else {
+            self.clear_home();
+        }
+    }
+
+    pub fn merge_from<Buf: DecodeBuf>(&mut self, buf: &mut Buf) -> Result<(), DecodeError> {
+        self.body.borrow_mut().merge_into(&mut self.common, buf, 0)
+    }
+}
+
+impl<A: Allocator> Student<A> {
     fn visit_fields<V: FieldVisitor<MessageCommon<BitArray<[u8; 2], Lsb0>, A>>>(
         &self,
         v: &mut V,
     ) -> ControlFlow<V::Break> {
-        self.body.visit_fields(v)
+        self.inner.body.visit_fields(v)
     }
 
     fn visit_field_pairs<V: FieldPairVisitor<MessageCommon<BitArray<[u8; 2], Lsb0>, A>>>(
@@ -208,7 +337,7 @@ impl<A: Allocator> Student<A> {
         other: &Self,
         v: &mut V,
     ) -> ControlFlow<V::Break> {
-        self.body.visit_field_pairs(&other.body, v)
+        self.inner.body.visit_field_pairs(&other.inner.body, v)
     }
 
     fn visit_field_pairs_mut<V: FieldPairVisitorMut<MessageCommon<BitArray<[u8; 2], Lsb0>, A>>>(
@@ -219,59 +348,32 @@ impl<A: Allocator> Student<A> {
     where
         A: Clone,
     {
-        self.body.visit_field_pairs_mut(&mut dst.body, v)
+        self.inner
+            .body
+            .visit_field_pairs_mut(&mut dst.inner.body, v)
     }
 
     fn visit_fields_mut<V: FieldVisitorMut<MessageCommon<BitArray<[u8; 2], Lsb0>, A>>>(
         &mut self,
         v: &mut V,
     ) -> ControlFlow<V::Break> {
-        self.body.visit_fields_mut(v)
+        self.inner.body.visit_fields_mut(v)
     }
 }
 
 impl<A: Allocator + Clone> Student<A> {
     pub fn new_in(alloc: A) -> Self {
         Self {
-            _common: MessageCommon::new_in(BitArray::ZERO, alloc.clone()),
-            body: StudentBody {
-                year: SingularField::new_in(alloc.clone()),
-                location: SingularField::new_in(alloc.clone()),
-                home: SingularField::new_in(alloc),
+            inner: StudentBound {
+                common: MessageCommon::new_in(BitArray::ZERO, alloc.clone()),
+                body: StudentBody {
+                    year: SingularField::new_in(alloc.clone()),
+                    location: SingularField::new_in(alloc.clone()),
+                    home: SingularField::new_in(alloc),
+                },
+                _alloc: PhantomData,
             },
         }
-    }
-
-    pub fn year_mut(&mut self) -> impl DerefMut<Target = i32> + '_ {
-        self.body.year.bind_mut(&mut self._common).value_mut()
-    }
-
-    pub fn clear_year(&mut self) {
-        self.body.year.bind_mut(&mut self._common).clear();
-    }
-
-    pub fn location_mut(&mut self) -> PointMut<'_, A> {
-        self.body.location.bind_mut(&mut self._common).get_mut()
-    }
-
-    pub fn set_location(&mut self, src: Point<A>) {
-        self.location_mut().copy_from(&src);
-    }
-
-    pub fn clear_location(&mut self) {
-        self.body.location.bind_mut(&mut self._common).clear();
-    }
-
-    pub fn home_mut(&mut self) -> AddressMut<'_, A> {
-        self.body.home.bind_mut(&mut self._common).get_mut()
-    }
-
-    pub fn set_home(&mut self, src: Address<A>) {
-        self.home_mut().copy_from(&src);
-    }
-
-    pub fn clear_home(&mut self) {
-        self.body.home.bind_mut(&mut self._common).clear();
     }
 }
 
@@ -290,9 +392,9 @@ impl<A: Allocator + Clone + Default> Default for Student<A> {
 impl<A: Allocator + Clone> CloneIn<A> for Student<A> {
     fn clone_in(&self, alloc: A) -> Self {
         let mut dst = Self::new_in(alloc.clone());
-        let mut v = CloneFieldsVisitor::new(&self._common, &dst._common);
+        let mut v = CloneFieldsVisitor::new(&self.inner.common, &dst.inner.common);
         let _ = self.visit_field_pairs_mut(&mut dst, &mut v);
-        let mut old = mem::replace(&mut dst._common, self._common.clone_in(alloc));
+        let mut old = mem::replace(&mut dst.inner.common, self.inner.common.clone_in(alloc));
         old.deallocate();
         dst
     }
@@ -301,7 +403,7 @@ impl<A: Allocator + Clone> CloneIn<A> for Student<A> {
 impl<A: Allocator + Clone> Clone for Student<A> {
     #[inline]
     fn clone(&self) -> Self {
-        self.clone_in(self._common.alloc.clone())
+        self.clone_in(self.inner.common.alloc.clone())
     }
 }
 
@@ -310,16 +412,16 @@ impl<A: Allocator> PartialEq for Student<A> {
         matches!(
             self.visit_field_pairs(
                 other,
-                &mut FieldEqVisitor::new(&self._common, &other._common)
+                &mut FieldEqVisitor::new(&self.inner.common, &other.inner.common)
             ),
             ControlFlow::Continue(())
-        ) && self._common.unknown_fields_eq(&other._common)
+        ) && self.inner.common.unknown_fields_eq(&other.inner.common)
     }
 }
 
 impl<A: Allocator> fmt::Debug for Student<A> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let mut v = DebugStructVisitor::new(f.debug_struct("Student"), &self._common);
+        let mut v = DebugStructVisitor::new(f.debug_struct("Student"), &self.inner.common);
         let _ = self.visit_fields(&mut v);
         v.finish()
     }
@@ -327,9 +429,23 @@ impl<A: Allocator> fmt::Debug for Student<A> {
 
 impl<A: Allocator> Drop for Student<A> {
     fn drop(&mut self) {
-        let mut v = FieldDeallocVisitor::new(&self._common);
-        let _ = self.visit_fields_mut(&mut v);
-        self._common.deallocate();
+        let mut v = FieldDeallocVisitor::new(&self.inner.common);
+        let _ = self.inner.body.visit_fields_mut(&mut v);
+        self.inner.common.deallocate();
+    }
+}
+
+impl<A: Allocator> Deref for Student<A> {
+    type Target = StudentBound<A, StudentOwnedCommon<A>, StudentBody<A>>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.inner
+    }
+}
+
+impl<A: Allocator> DerefMut for Student<A> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.inner
     }
 }
 
@@ -344,14 +460,14 @@ impl<A: Allocator> DeallocateIn<A> for Student<A> {
 
 impl<A: Allocator> MessageEncode for Student<A> {
     fn encoded_len(&self, ctx: &mut EncodeCtx) -> usize {
-        let mut v = EncodedLenVisitor::new(&self._common, ctx);
+        let mut v = EncodedLenVisitor::new(&self.inner.common, ctx);
         let _ = self.visit_fields(&mut v);
-        v.len + self._common.unknown_fields.len()
+        v.len + self.inner.common.unknown_fields.len()
     }
 
     fn encode_raw<B: BufMut>(&self, ctx: &mut EncodeCtx, buf: &mut B) {
-        let _ = self.visit_fields(&mut EncodeRawVisitor::new(&self._common, ctx, buf));
-        let unknown: &[u8] = &self._common.unknown_fields;
+        let _ = self.visit_fields(&mut EncodeRawVisitor::new(&self.inner.common, ctx, buf));
+        let unknown: &[u8] = &self.inner.common.unknown_fields;
         buf.put_slice(unknown);
     }
 }
@@ -362,7 +478,9 @@ impl<A: Allocator + Clone> MessageMerge for Student<A> {
         buf: &mut B,
         depth: usize,
     ) -> Result<(), DecodeError> {
-        self.body.merge_into(&mut self._common, buf, depth)
+        self.inner
+            .body
+            .merge_into(&mut self.inner.common, buf, depth)
     }
 }
 
@@ -428,7 +546,7 @@ impl<A: Allocator> Message for Student<A> {
     }
 
     fn unknown_fields(&self) -> impl Iterator<Item = ::puroro::UnknownField<'_>> + '_ {
-        self._common.iter_unknown_fields()
+        self.inner.common.iter_unknown_fields()
     }
 
     fn validate(&self) -> Result<(), DecodeError> {
@@ -436,53 +554,61 @@ impl<A: Allocator> Message for Student<A> {
     }
 }
 
-impl<A: Allocator> StudentMessage<A> for Student<A> {
+impl<A, C, B> StudentMessage<A> for StudentBound<A, C, B>
+where
+    A: Allocator,
+    C: MessageBindingMut<A>,
+    B: Borrow<StudentBody<A>>,
+{
     fn year(&self) -> Optional<i32, impl HasDefault<i32>> {
-        Student::year(self)
+        StudentBound::year(self)
     }
     fn location(&self) -> Option<PointView<'_, A>> {
-        Student::location(self)
+        StudentBound::location(self)
     }
     fn home(&self) -> Option<AddressView<'_, A>> {
-        Student::home(self)
+        StudentBound::home(self)
+    }
+}
+
+impl<A: Allocator> StudentMessage<A> for Student<A> {
+    fn year(&self) -> Optional<i32, impl HasDefault<i32>> {
+        StudentBound::year(&self.inner)
+    }
+    fn location(&self) -> Option<PointView<'_, A>> {
+        StudentBound::location(&self.inner)
+    }
+    fn home(&self) -> Option<AddressView<'_, A>> {
+        StudentBound::home(&self.inner)
+    }
+}
+
+impl<A, C, B> StudentMessageMut<A> for StudentBound<A, C, B>
+where
+    A: Allocator + Clone,
+    C: InlinedMessageParent<A>,
+    B: BorrowMut<StudentBody<A>>,
+{
+    fn year_mut(&mut self) -> impl DerefMut<Target = i32> + '_ {
+        StudentBound::year_mut(self)
+    }
+    fn location_mut(&mut self) -> PointMut<'_, A> {
+        StudentBound::location_mut(self)
+    }
+    fn home_mut(&mut self) -> AddressMut<'_, A> {
+        StudentBound::home_mut(self)
     }
 }
 
 impl<A: Allocator + Clone> StudentMessageMut<A> for Student<A> {
     fn year_mut(&mut self) -> impl DerefMut<Target = i32> + '_ {
-        Student::year_mut(self)
+        StudentBound::year_mut(&mut self.inner)
     }
     fn location_mut(&mut self) -> PointMut<'_, A> {
-        Student::location_mut(self)
+        StudentBound::location_mut(&mut self.inner)
     }
     fn home_mut(&mut self) -> AddressMut<'_, A> {
-        Student::home_mut(self)
-    }
-}
-
-impl<A: Allocator> StudentView<'_, A> {
-    pub fn year(&self) -> Optional<i32, impl HasDefault<i32>> {
-        self.body.year.bind(&self.window).optional()
-    }
-
-    pub fn location(&self) -> Option<PointView<'_, A>> {
-        self.body.location.bind(&self.window).get()
-    }
-
-    pub fn home(&self) -> Option<AddressView<'_, A>> {
-        self.body.home.bind(&self.window).get()
-    }
-}
-
-impl<A: Allocator> StudentMessage<A> for StudentView<'_, A> {
-    fn year(&self) -> Optional<i32, impl HasDefault<i32>> {
-        StudentView::year(self)
-    }
-    fn location(&self) -> Option<PointView<'_, A>> {
-        StudentView::location(self)
-    }
-    fn home(&self) -> Option<AddressView<'_, A>> {
-        StudentView::home(self)
+        StudentBound::home_mut(&mut self.inner)
     }
 }
 
@@ -497,122 +623,9 @@ impl<A: Allocator> PartialEq for StudentView<'_, A> {
 
 impl<A: Allocator> fmt::Debug for StudentView<'_, A> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let mut v = DebugStructVisitor::new(f.debug_struct("Student"), &self.window);
+        let mut v = DebugStructVisitor::new(f.debug_struct("Student"), &self.common);
         let _ = self.body.visit_fields(&mut v);
         v.finish()
-    }
-}
-
-impl<A: Allocator + Clone> StudentMut<'_, A> {
-    pub fn year(&self) -> Optional<i32, impl HasDefault<i32>> {
-        self.body.year.bind(&self.window).optional()
-    }
-
-    pub fn location(&self) -> Option<PointView<'_, A>> {
-        self.body.location.bind(&self.window).get()
-    }
-
-    pub fn home(&self) -> Option<AddressView<'_, A>> {
-        self.body.home.bind(&self.window).get()
-    }
-
-    pub fn year_mut(&mut self) -> impl DerefMut<Target = i32> + '_ {
-        self.body.year.bind_mut(&mut self.window).value_mut()
-    }
-
-    pub fn clear_year(&mut self) {
-        self.body.year.bind_mut(&mut self.window).clear();
-    }
-
-    pub fn location_mut(&mut self) -> PointMut<'_, A> {
-        self.body.location.bind_mut(&mut self.window).get_mut()
-    }
-
-    pub fn set_location(&mut self, src: Point<A>) {
-        self.location_mut().copy_from(&src);
-    }
-
-    pub fn clear_location(&mut self) {
-        self.body.location.bind_mut(&mut self.window).clear();
-    }
-
-    pub fn home_mut(&mut self) -> AddressMut<'_, A> {
-        self.body.home.bind_mut(&mut self.window).get_mut()
-    }
-
-    pub fn set_home(&mut self, src: Address<A>) {
-        self.home_mut().copy_from(&src);
-    }
-
-    pub fn clear_home(&mut self) {
-        self.body.home.bind_mut(&mut self.window).clear();
-    }
-
-    /// Copies field values from an owned [`Student`] into this inlined slot.
-    pub fn copy_from(&mut self, src: &Student<A>) {
-        if src.year().is_set() {
-            *self.year_mut() = src.year().get();
-        } else {
-            self.clear_year();
-        }
-        if let Some(loc) = src.location() {
-            *self.location_mut().x_mut() = loc.x();
-            *self.location_mut().y_mut() = loc.y();
-        } else {
-            self.clear_location();
-        }
-        if let Some(home) = src.home() {
-            if home.street().is_set() {
-                self.home_mut().street_mut().set(home.street().get());
-            } else {
-                self.home_mut().clear_street();
-            }
-            if home.city().is_set() {
-                self.home_mut().city_mut().set(home.city().get());
-            } else {
-                self.home_mut().clear_city();
-            }
-            if home.postal_code().is_set() {
-                *self.home_mut().postal_code_mut() = home.postal_code().get();
-            } else {
-                self.home_mut().clear_postal_code();
-            }
-            if home.latitude().is_set() {
-                *self.home_mut().latitude_mut() = home.latitude().get();
-            } else {
-                self.home_mut().clear_latitude();
-            }
-        } else {
-            self.clear_home();
-        }
-    }
-
-    pub fn merge_from<B: DecodeBuf>(&mut self, buf: &mut B) -> Result<(), DecodeError> {
-        self.body.merge_into(&mut self.window, buf, 0)
-    }
-}
-
-impl<A: Allocator + Clone> StudentMessage<A> for StudentMut<'_, A> {
-    fn year(&self) -> Optional<i32, impl HasDefault<i32>> {
-        StudentMut::year(self)
-    }
-    fn location(&self) -> Option<PointView<'_, A>> {
-        StudentMut::location(self)
-    }
-    fn home(&self) -> Option<AddressView<'_, A>> {
-        StudentMut::home(self)
-    }
-}
-
-impl<A: Allocator + Clone> StudentMessageMut<A> for StudentMut<'_, A> {
-    fn year_mut(&mut self) -> impl DerefMut<Target = i32> + '_ {
-        StudentMut::year_mut(self)
-    }
-    fn location_mut(&mut self) -> PointMut<'_, A> {
-        StudentMut::location_mut(self)
-    }
-    fn home_mut(&mut self) -> AddressMut<'_, A> {
-        StudentMut::home_mut(self)
     }
 }
 
@@ -638,17 +651,23 @@ impl<A: Allocator> NestedMessage for Student<A> {
         A: 'a;
 
     fn as_view(&self) -> StudentView<'_, A> {
-        StudentView {
-            window: Window::for_owned(&self._common),
-            body: &self.body,
+        StudentBound {
+            common: Window::for_owned(&self.inner.common),
+            body: &self.inner.body,
+            _alloc: PhantomData,
         }
     }
 
     fn as_mut(&mut self) -> StudentMut<'_, A> {
-        let Student { _common, body } = self;
-        StudentMut {
-            window: WindowMut::for_owned(_common),
+        let StudentBound {
+            common,
             body,
+            _alloc,
+        } = &mut self.inner;
+        StudentBound {
+            common: WindowMut::for_owned(common),
+            body,
+            _alloc: PhantomData,
         }
     }
 
@@ -656,27 +675,35 @@ impl<A: Allocator> NestedMessage for Student<A> {
     where
         Self: 'a,
     {
-        StudentView { window, body }
+        StudentBound {
+            common: window,
+            body,
+            _alloc: PhantomData,
+        }
     }
 
     fn bind_mut<'a>(body: &'a mut StudentBody<A>, window: WindowMut<'a, A>) -> StudentMut<'a, A>
     where
         Self: 'a,
     {
-        StudentMut { window, body }
+        StudentBound {
+            common: window,
+            body,
+            _alloc: PhantomData,
+        }
     }
 
     fn view_len(view: StudentView<'_, A>, ctx: &mut EncodeCtx) -> usize {
-        let mut v = EncodedLenVisitor::new(&view.window, ctx);
+        let mut v = EncodedLenVisitor::new(&view.common, ctx);
         let _ = view.body.visit_fields(&mut v);
-        v.len + view.window.unknown_fields().len()
+        v.len + view.common.unknown_fields().len()
     }
 
     fn encode_view<B: BufMut>(view: StudentView<'_, A>, ctx: &mut EncodeCtx, buf: &mut B) {
         let _ = view
             .body
-            .visit_fields(&mut EncodeRawVisitor::new(&view.window, ctx, buf));
-        buf.put_slice(view.window.unknown_fields().self_blob());
+            .visit_fields(&mut EncodeRawVisitor::new(&view.common, ctx, buf));
+        buf.put_slice(view.common.unknown_fields().self_blob());
     }
 
     fn merge_inline<Ax, Buf>(

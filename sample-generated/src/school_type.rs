@@ -1,7 +1,8 @@
 //! Sample parent for two-hop inlined storage: [`School.student`] is
 //! [`SharedMessage<Student>`](::puroro_rt::SharedMessage) with
 //! [`BIT_STUDENT_BASE`](crate::school::BIT_STUDENT_BASE) so `Student`'s local
-//! bits land in this message's array.
+//! bits land in this message's array. Getters return [`StudentView`] /
+//! [`StudentMut`] (aliases of [`StudentBound`](crate::StudentBound)).
 
 use allocator_api2::alloc::{Allocator, Global};
 use bitvec::array::BitArray;

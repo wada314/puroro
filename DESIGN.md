@@ -312,7 +312,7 @@ If a new public API would need a `puroro-rt` name, **add or reexport a stable st
 
 ### 4.0 Inherent accessors (current)
 
-The normative generated API is the concrete message struct's inherent `impl` block. Per-message traits (`AddressMessage` / `AddressMessageMut`, …) exist on the hand-written [`sample-generated`](sample-generated/) messages; codegen of a single `Student<C>` / one accessor impl is still [§8](#8-future-work). Callers of today's generated plugin output use the concrete type (or [`Message`](#message) for codec / infrastructure).
+The normative generated API is the concrete message struct's inherent `impl` block. Per-message traits (`AddressMessage` / `AddressMessageMut`, …) exist on the hand-written [`sample-generated`](sample-generated/) messages. Sample [`Student`](sample-generated/src/student_type.rs) is owned-only (`Drop` / `Message`); field accessors live on [`StudentBound`](sample-generated/src/student_type.rs) (`C` / `B`), and [`StudentView`] / [`StudentMut`] are aliases of that bound. Owned `Student` `Deref`s to the bound. A single `Student<A, C, B>` cannot both `Drop` and stay `Copy` (views need `Copy` for NLL). Codegen of that spelling is still [§8](#8-future-work). Callers of today's generated plugin output use the concrete type (or [`Message`](#message) for codec / infrastructure).
 
 **Read / write shape (eager `Task<A>`):**
 
@@ -325,10 +325,12 @@ The normative generated API is the concrete message struct's inherent `impl` blo
 | Singular bytes (default SSO) | `Optional<&[u8], …>` or `&[u8]` | `*_mut()` → `impl BytesMut<A>` | `clear_*()` |
 | IMPLICIT open enum (`status`) | `Optional` (`is_set` when non-zero) | `*_mut()` → `impl DerefMut<Target = E>` | `clear_*()` |
 | Nested message (`assignee`, `origin`) | `Option<AddressView<'_, A>>` / `Option<PointView<'_, A>>` | `*_mut()` → `AddressMut` / `PointMut` (creates if absent) | `clear_*()` (+ `set_*` copies via `copy_from`) |
-| Repeated packable / message | `&[T]` / `&[M<A>]` | `*_mut()` → `impl DerefMut<Target = Vec<T, A>>` (`allocator_api2`) | `clear_*()` |
+| Repeated packable | `&[T]` | `*_mut()` → `impl DerefMut<Target = Vec<T, A>>` (`allocator_api2`) | `clear_*()` |
+| Repeated message (`watchers`) | `impl RepeatedRef<AddressView<'_, A>>` (`get` / `iter`) | `AddressListMut` / [`RepeatedMessageMut`](src/repeated.rs) (`push()` then fill / `copy_from`) | `clear_*()` |
 | Repeated string (VERIFY) / bytes | `&[impl Deref<Target = str>]` / `&[impl Deref<Target = [u8]>]` | `*_mut()` → `impl RepeatedStringMut<A>` / `impl RepeatedBytesMut<A>` (`push` then fill) | `clear_*()` |
 | Repeated string (`utf8_validation=NONE`) | `&[impl Deref<Target = [u8]>]` | `*_mut()` → `impl RepeatedBytesMut<A>` | `clear_*()` |
-| Map | `impl MapRef<K, V>` | `impl MapMut<K, V>` (see [§4.10](#410-map-fields)) | `clear_*()` (or `*_mut().clear()`) |
+| Map (scalar / string value) | `impl MapRef<K, V>` (`get` → `Option<&V>`) | `impl MapMut<K, V, MutTarget = …>` | `clear_*()` (or `*_mut().clear()`) |
+| Map (message value) | bound `*View` via `message_map()` (`get` → `Option<AddressView>`) | [`MapMessageMut`](src/map.rs) (`entry_mut` → `AddressMut`) | `clear_*()` |
 | Oneof group | `impl OneofView` (`case()` / `as_ref()`); `postal()` → `Option<AddressView>` | `impl OneofViewMut` + per-variant `*_mut()` (`postal_mut()` → `AddressMut`) | `clear_notification()` |
 
 Presence for EXPLICIT fields is checked with `field().is_set()` / `field().get()` — there are **no** generated `has_*`, `*_raw`, or `push_*` helpers. Nested messages use `set_*` as `copy_from` into the view (the slot is not an `M` place). Mutation is otherwise via `_mut` (+ `clear_*`); see also [§5.1 Mutation API](#51-chosen-design-single-type-parameter).
@@ -610,12 +612,16 @@ Library users import [`RepeatedStringMut`](src/repeated.rs) / [`String`](src/lib
 **Repeated message (`watchers: repeated Address`, field 19):**
 
 ```rust
-pub fn watchers(&self) -> &[Address<A>];
-pub fn watchers_mut(&mut self) -> impl DerefMut<Target = Vec<Address<A>, A>> + '_;
+pub fn watchers(&self) -> impl RepeatedRef<AddressView<'_, A>> + '_;
+pub fn watchers_mut(&mut self) -> AddressListMut<'_, A>; // push() -> AddressMut
 pub fn clear_watchers(&mut self);
+
+// Append: push an empty element, then fill it (or copy_from an owned Address)
+task.watchers_mut().push().street_mut().set("2 Side Rd");
+assert_eq!(task.watchers().get(0).unwrap().street().get(), "2 Side Rd");
 ```
 
-Each wire occurrence **appends** a newly decoded message. Unlike singular nested messages, repeated elements are not merge-into at a list index. Messages cannot be packed; encode always uses one LEN record per element.
+Each element is a stored `Address` with its **own** `MessageCommon` (not a parent window). Getters still return the same bound views as singular `assignee()`. There is no `&[AddressView]` — views are not stored, so [`Index`] is unavailable; use [`RepeatedRef::get`](src/repeated.rs) / [`iter`](src/repeated.rs). Each wire occurrence **appends** a newly decoded message. Unlike singular nested messages, repeated elements are not merge-into at a list index. Messages cannot be packed; encode always uses one LEN record per element.
 
 **Repeated bool (`votes: repeated bool`, field 20):**
 
@@ -940,8 +946,9 @@ Same layering as singular fields (`EncodeType::View` / `ValueLayout::Mut` → ge
 | [`RepeatedElement::RefView`](puroro-rt/src/fields/wire/repeated_element.rs) | Shared key/value view + `as_ref_view` (identity vs string/bytes `Deref`) |
 | [`RepeatedElementMut::MutTarget`](puroro-rt/src/fields/wire/repeated_element.rs) | `_mut` target (`i32`, `String<A>`, …) |
 | [`MapRef`](src/map.rs) / [`MapMut`](src/map.rs) | User API: `get` / `get_mut` / `entry_mut` / `remove` take `impl Borrow<K>` |
+| [`MapMessageMut`](src/map.rs) | Message-valued maps (`entry_mut` → `AddressMut`; no `DerefMut`) |
 
-There is no separate `insert` API: set values with `entry_mut` then assign / fill. Codegen pins `MutTarget` on the mutator return type so those methods resolve through `impl Trait`.
+There is no separate `insert` API: set values with `entry_mut` then assign / fill. Codegen pins `MutTarget` on the mutator return type so those methods resolve through `impl Trait`. Message-valued maps use [`MapMessageMut`](src/map.rs) / `message_map()` so `get` can return `AddressView` by value. Stored values remain owned `M` (own `MessageCommon`).
 
 Generated accessors (`tag_ids` / `watchers` idiom):
 
@@ -1016,11 +1023,11 @@ impl<A: Allocator + Clone + Default> Default for Task<A> { … }
 
 **Derived traits.** Generated messages implement `Default` (for `A: Allocator + Clone + Default`) plus a custom `Drop` (for `A: Allocator + Clone`). `Task::new()` is a `Global`-only convenience so `Task::new()` infers (`new()` delegates to `Default`; custom allocators use `new_in` / `Task::<A>::default()`). `Clone` / `PartialEq` / `Debug` are hand-written (not `#[derive]`): `Clone` delegates to field-wise [`FieldCloneIn`](puroro-rt/src/fields/shared/field_inspect.rs) (which uses [`CloneIn`](unmanaged/) for heap payloads); `PartialEq` / `Debug` compare / format via semantic getters. Wire bytes are not deterministic across encodes. Full matrix: [IMPLEMENTATION.md §13](IMPLEMENTATION.md#13-derived-traits).
 
-**Mutation API (`_mut`).** Mutation is unified under `_mut` accessors (RPIT). Default singular `string` / `bytes` yield `impl ::puroro::StringMut<A>` / `impl ::puroro::BytesMut<A>` (SSO; heap layout via `(puroro.string_layout)` / `(puroro.bytes_layout) = HEAP` is `impl DerefMut<Target = ::puroro::String<A>>` / `impl DerefMut<Target = Vec<u8, A>>`). Packable repeated `*_mut()` yield `impl DerefMut<Target = Vec<_, A>>` (`allocator_api2`); scalar/enum `_mut` accessors return `impl DerefMut<Target = T>`. The guard **owns** a clone of the message allocator when the payload is heap-backed. Acquiring an explicit-presence `_mut` sets the presence bit. There are no generated `set_*` / `push_*` helpers **for scalars**: append packable elements with `tag_ids_mut().push(…)`; for repeated `string` / `bytes`, use `labels_mut()` / `*_mut()` → [`RepeatedStringMut`](src/repeated.rs) / [`RepeatedBytesMut`](src/repeated.rs) (`push()` then fill the empty element). Nested messages use `set_assignee` / `set_origin` as `copy_from` into the view. Library users of generated messages depend on `puroro` (+ the generated crate), not on `puroro-rt`.
+**Mutation API (`_mut`).** Mutation is unified under `_mut` accessors (RPIT). Default singular `string` / `bytes` yield `impl ::puroro::StringMut<A>` / `impl ::puroro::BytesMut<A>` (SSO; heap layout via `(puroro.string_layout)` / `(puroro.bytes_layout) = HEAP` is `impl DerefMut<Target = ::puroro::String<A>>` / `impl DerefMut<Target = Vec<u8, A>>`). Packable repeated `*_mut()` yield `impl DerefMut<Target = Vec<_, A>>` (`allocator_api2`); scalar/enum `_mut` accessors return `impl DerefMut<Target = T>`. The guard **owns** a clone of the message allocator when the payload is heap-backed. Acquiring an explicit-presence `_mut` sets the presence bit. There are no generated `set_*` / `push_*` helpers **for scalars**: append packable elements with `tag_ids_mut().push(…)`; for repeated `string` / `bytes`, use `labels_mut()` / `*_mut()` → [`RepeatedStringMut`](src/repeated.rs) / [`RepeatedBytesMut`](src/repeated.rs) (`push()` then fill the empty element); for repeated messages, `watchers_mut()` → [`RepeatedMessageMut`](src/repeated.rs) (`push()` then fill / `copy_from`). Nested singular messages use `set_assignee` / `set_origin` as `copy_from` into the view. Library users of generated messages depend on `puroro` (+ the generated crate), not on `puroro-rt`.
 
 **Bound-view accessors (`bind` / `bind_mut`).** Every field family — [`SingularField`](puroro-rt/src/fields/singular/field.rs), [`RepeatedField`](puroro-rt/src/fields/repeated/field.rs), and [`OneofSlot`](puroro-rt/src/fields/oneof.rs) — uses the same inherent call shape (`field.bind(&self._common)` / `field.bind_mut(&mut self._common)`). Each returns a short-lived view (`SingularFieldRef` / `SingularFieldMut`, `RepeatedFieldRef` / `RepeatedFieldMut`, `OneofSlotRef` / `OneofSlotMut`) that carries `(field, common)` together. The actual operation (`optional` / `value` / `as_slice` / `get` / `value_mut` / `merge` / `clear` / …) is a consuming method on that view. This keeps the field struct a pure storage holder and collapses each generated accessor to a single call — e.g. `self.owner_id.bind(&self._common).optional()` or `self.priority.bind_mut(&mut self._common).clear()`. Binding happens even when a particular accessor does not consult `common` (e.g. `IMPLICIT` `value()`, repeated `as_slice()`), so read and write share one shape. The presence bit index for EXPLICIT / LEGACY_REQUIRED fields is a **const generic on the field type** (`Explicit<BIT>`), not a runtime argument to `bind` / `bind_mut`. Encode / `deallocate` / `validate_required` stay as plain field methods that take `&common` directly (they are not generated getters). Getter / `_mut` payload types (`Ref` / `Mut`) live on [`ValueLayout`](puroro-rt/src/fields/shared/value_layout.rs) (`EncodeType::View` / `ValueLayout::Mut`), not on a separate singular-access trait.
 
-Varint and LEN singular fields share one runtime type, [`SingularField`](puroro-rt/src/fields/singular/field.rs), parametrised by allocator-free [`SingularType`](puroro-rt/src/fields/wire/singular_type.rs) markers such as `ProtoInt32` / `ProtoString` / `ProtoBool`, field allocator `A`, and value layout `L` (`Inline` default, [`BitPacked<VALUE_BIT>`](puroro-rt/src/fields/shared/value_layout.rs) for singular/oneof `bool`, or [`InlineOrHeap<SSO_BIT>`](puroro-rt/src/fields/shared/value_layout.rs) for default singular `string` / `bytes` — see [IMPLEMENTATION.md §7](IMPLEMENTATION.md#7-field-wrappers) / [§14](IMPLEMENTATION.md#14-singular-fields) / [§17.2](IMPLEMENTATION.md#172-string--bytes-inline-optimisation)). The field stores `L::Slot` (bare scalars / unmanaged payloads / SSO). **`repeated bool` must not use `BitPacked`** — store plain `bool` elements with no MessageCommon bit index (see [IMPLEMENTATION.md § Bit-packed bool](IMPLEMENTATION.md#bit-packed-bool-protobool)). Nested messages use the same wrapper with `T = SharedMessage<M, FIELD, BIT_BASE>` (sample `origin` / `assignee` / `postal`) or `T = ProtoMessage<M>` for repeated elements and generated fixtures (`View = &M`).
+Varint and LEN singular fields share one runtime type, [`SingularField`](puroro-rt/src/fields/singular/field.rs), parametrised by allocator-free [`SingularType`](puroro-rt/src/fields/wire/singular_type.rs) markers such as `ProtoInt32` / `ProtoString` / `ProtoBool`, field allocator `A`, and value layout `L` (`Inline` default, [`BitPacked<VALUE_BIT>`](puroro-rt/src/fields/shared/value_layout.rs) for singular/oneof `bool`, or [`InlineOrHeap<SSO_BIT>`](puroro-rt/src/fields/shared/value_layout.rs) for default singular `string` / `bytes` — see [IMPLEMENTATION.md §7](IMPLEMENTATION.md#7-field-wrappers) / [§14](IMPLEMENTATION.md#14-singular-fields) / [§17.2](IMPLEMENTATION.md#172-string--bytes-inline-optimisation)). The field stores `L::Slot` (bare scalars / unmanaged payloads / SSO). **`repeated bool` must not use `BitPacked`** — store plain `bool` elements with no MessageCommon bit index (see [IMPLEMENTATION.md § Bit-packed bool](IMPLEMENTATION.md#bit-packed-bool-protobool)). Nested messages use the same wrapper with `T = SharedMessage<M, FIELD, BIT_BASE>` (sample `origin` / `assignee` / `postal`) or `T = ProtoMessage<M>` for repeated / map **storage** and generated fixtures (`Slot = M`). Sample repeated / map getters still project `NestedMessage::View` / `Mut` (`watchers()` → `AddressView`).
 
 **Decode API:**
 
@@ -1238,7 +1245,7 @@ Planned interoperability traits, emitted per message once specialized layouts la
 - **`FooMessage`** — infallible getters matching the inherent shapes in [§4.0](#40-inherent-accessors-current) (for eager implementations).
 - **`FooMessageFallible`** — `Result`-returning getters for lazy / view layouts (`Error = DecodeError` or `Infallible` on eager).
 
-These traits are **not** yet emitted by `protoc-gen-puroro`. The hand-written [`sample-generated`](sample-generated/) crate already has `PointMessage` / `AddressMessage` / `StudentMessage` (and `*Mut`) as the generic face over owned + view + mut. When the generator adds them, explicit-presence fields should keep `Optional` as the primary read API; convenience `has_*` / `*_raw` wrappers (if any) would be trait defaults, not a second required surface on the concrete struct.
+These traits are **not** yet emitted by `protoc-gen-puroro`. The hand-written [`sample-generated`](sample-generated/) crate already has `PointMessage` / `AddressMessage` / `StudentMessage` (and `*Mut`) as the generic face over owned + view + mut. Sample `Student` accessors live on `StudentBound`; `StudentMessage` is a blanket over the bound plus owned. When the generator adds the traits, explicit-presence fields should keep `Optional` as the primary read API; convenience `has_*` / `*_raw` wrappers (if any) would be trait defaults, not a second required surface on the concrete struct.
 
 ### Specialized message implementations
 

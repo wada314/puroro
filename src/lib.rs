@@ -6,7 +6,8 @@
 //! - [`Message`] — encode / decode / merge / validate / unknown fields
 //! - [`Optional`] / [`HasDefault`] — explicit-presence singular accessors
 //! - [`StringMut`] / [`BytesMut`] — singular `string` / `bytes` mutators
-//! - [`MapRef`] / [`MapMut`], [`RepeatedContainerMut`] / [`RepeatedStringMut`] /
+//! - [`MapRef`] / [`MapMut`] / [`MapMessageMut`], [`RepeatedRef`] / [`RepeatedMessageMut`] /
+//!   [`RepeatedContainerMut`] / [`RepeatedStringMut`] /
 //!   [`RepeatedBytesMut`] — map and repeated mutators
 //! - [`OneofView`] / [`OneofViewMut`] — oneof group views
 //! - [`DecodeError`], [`UnknownField`], [`WireType`]
@@ -51,11 +52,13 @@ pub mod wire_type;
 pub use ::unmanaged::String;
 pub use bytes_mut::BytesMut;
 pub use error::DecodeError;
-pub use map::{MapMut, MapRef};
+pub use map::{MapMessageMut, MapMut, MapRef};
 pub use message::{Message, RECURSION_LIMIT};
 pub use oneof::{OneofView, OneofViewMut};
 pub use optional::{HasDefault, Optional};
-pub use repeated::{RepeatedBytesMut, RepeatedContainerMut, RepeatedStringMut};
+pub use repeated::{
+    RepeatedBytesMut, RepeatedContainerMut, RepeatedMessageMut, RepeatedRef, RepeatedStringMut,
+};
 pub use scoped_buf::{DecodeBuf, LimitGuard, ScopedBuf};
 pub use string_mut::StringMut;
 pub use unknown::{UnknownField, UnknownPayload};

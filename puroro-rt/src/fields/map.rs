@@ -11,7 +11,7 @@
 pub(crate) mod entry;
 pub(crate) mod field;
 
-pub use field::{MapField, MapFieldMut, MapFieldRef};
+pub use field::{MapField, MapFieldMut, MapFieldRef, MapMessageRef, MapMessagesMut};
 
 use crate::fields::wire::{
     ProtoBool, ProtoFixed32, ProtoFixed64, ProtoInt32, ProtoInt64, ProtoSFixed32, ProtoSFixed64,

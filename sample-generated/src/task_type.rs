@@ -18,7 +18,7 @@ use core::ops::{Deref, DerefMut};
 
 use puroro::{
     DecodeBuf, DecodeError, HasDefault, MapMut, MapRef, Message, OneofView, OneofViewMut, Optional,
-    RepeatedStringMut,
+    RepeatedRef, RepeatedStringMut,
 };
 use puroro_rt::decode::{decode_tag, skip_field_and_save};
 use puroro_rt::{
@@ -113,7 +113,7 @@ pub struct Task<A: Allocator = Global> {
         A,
         BitPacked<{ BIT_FLAG_VALUE }>,
     >, // proto: bool flag = 17;
-    watchers: RepeatedField<ProtoMessage<Address<A>>, Expanded, { FIELD_WATCHERS }, A>, // proto: repeated Address watchers = 19;
+    watchers: RepeatedField<ProtoMessage<Address<A>>, Expanded, { FIELD_WATCHERS }, A>, // proto: repeated Address watchers = 19 (Element = Address; getters are AddressView / AddressMut)
     votes: RepeatedField<ProtoBool, Packed, { FIELD_VOTES }, A>, // proto: repeated bool votes = 20;
     attributes: MapField<ProtoString, ProtoInt32, { FIELD_ATTRIBUTES }, A>, // proto: map<string, int32> attributes = 21;
     origin: SingularField<
@@ -198,8 +198,8 @@ impl<A: Allocator> Task<A> {
         self.flag.bind(&self._common).optional()
     }
 
-    pub fn watchers(&self) -> &[Address<A>] {
-        self.watchers.bind(&self._common).as_slice()
+    pub fn watchers(&self) -> impl RepeatedRef<AddressView<'_, A>> + '_ {
+        self.watchers.bind(&self._common).message_views()
     }
 
     pub fn votes(&self) -> &[bool] {
@@ -552,8 +552,8 @@ impl<A: Allocator + Clone> Task<A> {
 
     // -- watchers (repeated Address, proto field 19) -------------------------
 
-    pub fn watchers_mut<'s>(&'s mut self) -> impl DerefMut<Target = AllocVec<Address<A>, A>> + 's {
-        self.watchers.bind_mut(&mut self._common).values_mut()
+    pub fn watchers_mut(&mut self) -> crate::AddressListMut<'_, A> {
+        self.watchers.bind_mut(&mut self._common).messages_mut()
     }
 
     pub fn clear_watchers(&mut self) {

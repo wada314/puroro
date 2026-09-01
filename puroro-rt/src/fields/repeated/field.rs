@@ -25,6 +25,12 @@ use crate::message_encode::EncodeCtx;
 
 use super::container::RepeatedElementsMut;
 use super::encoding::RepeatedEncoding;
+use super::message::{RepeatedMessageRef, RepeatedMessagesMut};
+use crate::fields::wire::proto_message::ProtoMessage;
+use crate::fields::wire::shared_message::NestedMessage;
+use crate::message_encode::MessageEncode;
+use crate::message_merge::MessageMerge;
+use ::puroro::Message;
 
 /// Repeated field parametrised by type marker `T`, encode policy `E`, and allocator `A`.
 ///
@@ -145,6 +151,19 @@ where
     }
 }
 
+impl<'a, M, E, const FIELD: u32, A, Pb> RepeatedFieldRef<'a, ProtoMessage<M>, E, FIELD, A, Pb>
+where
+    M: NestedMessage<Alloc = A> + MessageEncode,
+    E: RepeatedEncoding<ProtoMessage<M>, A>,
+    A: Allocator,
+{
+    /// Element-wise bound views (`AddressView`, …). Storage stays `&[M]`.
+    #[inline]
+    pub fn message_views(self) -> RepeatedMessageRef<'a, M> {
+        RepeatedMessageRef::new(self.as_slice())
+    }
+}
+
 // ---------------------------------------------------------------------------
 // Mutation view
 // ---------------------------------------------------------------------------
@@ -241,6 +260,26 @@ where
         T::merge_occurrence(wire_type, buf, alloc, depth, |elem| {
             g.push(elem);
         })
+    }
+}
+
+impl<'f, 'c, M, E, const FIELD: u32, A, Pb>
+    RepeatedFieldMut<'f, 'c, ProtoMessage<M>, E, FIELD, A, Pb>
+where
+    M: NestedMessage<Alloc = A>
+        + Message<Alloc = A>
+        + MessageEncode
+        + MessageMerge
+        + ::unmanaged::DeallocateIn<A>,
+    E: RepeatedEncoding<ProtoMessage<M>, A>,
+    A: Allocator + Clone,
+{
+    /// Bound-view mutator (`AddressMut`, …). Storage stays `Vec<M>`.
+    pub fn messages_mut(self) -> RepeatedMessagesMut<'f, M, A> {
+        let alloc = self.common.alloc.clone();
+        // SAFETY: an owned clone of the message allocator owns this vector's
+        // buffer.
+        RepeatedMessagesMut::new(unsafe { self.field.values.with_alloc(alloc) })
     }
 }
 

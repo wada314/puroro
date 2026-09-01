@@ -26,13 +26,16 @@ pub use ::protobuf_core::{FieldNumber, Varint};
 pub use ::unmanaged::{CloneIn, DeallocateIn, DefaultIn};
 pub use defaults::ProtoDefault;
 pub use encode::field_number_const;
-pub use fields::map::{MapField, MapFieldMut, MapFieldRef};
+pub use fields::map::{MapField, MapFieldMut, MapFieldRef, MapMessageRef, MapMessagesMut};
 pub use fields::oneof::{
     OneofDeallocate, OneofEncodable, OneofGroup, OneofSlot, OneofSlotMut, OneofSlotRef,
     OneofVariantRef, OneofView, OneofViewMut,
 };
 pub use fields::oneof_variant::OneofVariant;
-pub use fields::repeated::{Expanded, Packed, RepeatedField, RepeatedFieldMut, RepeatedFieldRef};
+pub use fields::repeated::{
+    Expanded, Packed, RepeatedField, RepeatedFieldMut, RepeatedFieldRef, RepeatedMessageRef,
+    RepeatedMessagesMut,
+};
 pub use fields::shared::field_presence::{Explicit, Implicit, LegacyRequired, Message, Oneof};
 pub use fields::shared::{
     AddressableSlot, BitPacked, Boxed, CloneBound, CloneFieldsVisitor, DeallocateBound,
