@@ -780,7 +780,7 @@ pub fn notification_mut(&mut self) -> impl ::puroro::OneofViewMut<Case = Notific
 pub fn email_address_mut(&mut self) -> impl ::puroro::StringMut<A> + '_;
 pub fn phone_number_mut(&mut self) -> impl ::puroro::StringMut<A> + '_;
 pub fn webhook_id_mut(&mut self) -> impl DerefMut<Target = i32> + '_; // VARINT variant
-pub fn postal_mut(&mut self) -> &mut Address<A>;       // message variant
+pub fn postal_mut(&mut self) -> AddressMut<'_, A>;     // inlined SharedMessage view
 pub fn urgent_mut(&mut self) -> impl DerefMut<Target = bool> + '_; // bool variant
 
 // Clears whichever variant is active (freeing it):
@@ -789,7 +789,7 @@ pub fn clear_notification(&mut self); // = notification_mut().clear()
 
 Note: enums cannot carry unused lifetime/allocator parameters via `PhantomData` (unlike a struct). Integer-only oneofs therefore omit `'a` / `A` from the shape and from `Ref`/`Mut` aliases when no variant payload needs them.
 
-**Variants own field wrappers, not raw storage.** A oneof member of a given kind reuses the exact field wrapper an ordinary singular field of that kind uses (`SingularField` / aliases — including [`ProtoBool`](puroro-rt/src/fields/wire/numerical.rs) for `bool` and [`ProtoMessage`](puroro-rt/src/fields/wire/proto_message.rs) for messages), so the storage / `value` / `value_mut` / `deallocate` machinery is shared rather than reimplemented. The wrapper's *presence* is inert for a oneof — presence is tracked by the enclosing `OneofSlot` — so `FieldPresence::Oneof` is used (omit rules never consulted; bool still reads/writes its value bit).
+**Variants own field wrappers, not raw storage.** A oneof member of a given kind reuses the exact field wrapper an ordinary singular field of that kind uses (`SingularField` / aliases — including [`ProtoBool`](puroro-rt/src/fields/wire/numerical.rs) for `bool` and [`SharedMessage`](puroro-rt/src/fields/wire/shared_message.rs) / [`ProtoMessage`](puroro-rt/src/fields/wire/proto_message.rs) for messages), so the storage / `value` / `value_mut` / `deallocate` machinery is shared rather than reimplemented. The wrapper's *presence* is inert for a oneof — presence is tracked by the enclosing `OneofSlot` — so `FieldPresence::Oneof` is used (omit rules never consulted; bool still reads/writes its value bit).
 
 To keep generated code thin, each wrapper is driven with the **field's own** construction, merge, and access primitives — no bespoke helpers on the oneof enum. Empty construction uses [`DefaultIn`](puroro-rt/src/fields/shared.rs) on the variant's field wrapper (`SingularField::default_in` / `new_in`); mut paths use a single bind:
 
@@ -798,13 +798,13 @@ To keep generated code thin, each wrapper is driven with the **field's own** con
 | LEN | `SingularField::default_in(alloc)` | `slot.bind_mut(common).variant_mut::<FIELD_…>().bind_mut(common).merge(…)` | `…variant_mut::<FIELD_…>().bind_mut(common).value_mut()` |
 | VARINT | same | same | same |
 | bool | same (`ProtoBool` + `BitPacked`) | same | same → `impl DerefMut<Target = bool>` |
-| message | same (`ProtoMessage`, always-present box) | same | same → `&mut M` |
+| message | same (`SharedMessage` inlined body, or `ProtoMessage` boxed) | same | same → `AddressMut` / `&mut M` |
 
 Every variant merges through the **same** `slot.bind_mut(common).variant_mut::<FIELD_…>().bind_mut(common).merge(wire, buf)` shape. The message variant merges *into* the present child rather than replacing it.
 
 The VARINT variant owns no heap: its `DeallocateIn` is a no-op.
 
-**The message variant uses `Oneof` storage — always-present box, not `Option`.** An ordinary message field (`SingularField<ProtoMessage<…>, Message, …>`) stores `Option<UnmanagedBox<M, A>>` via `FieldPresence::Message`. A *oneof* message variant uses `SingularField<ProtoMessage<…>, Oneof, …>`, whose storage is always-present `UnmanagedBox<M, A>` under `ManuallyDrop`, so accessors are plain `value(common)` / `value_mut(common)`; `ManuallyDrop` enables uniform [`FieldDeallocate`](puroro-rt/src/fields/shared/field_deallocate.rs) from `&mut self`.
+**The sample message variant uses `Oneof` storage — always-present inlined body, not `Option`.** Ordinary boxed `assignee` is `SingularField<SharedMessage<…>, Message, …, Boxed>` (`Option<UnmanagedBox<M, A>>`). Oneof `postal` is `SingularField<SharedMessage<Address, FIELD_POSTAL, BIT_POSTAL_BASE>, Oneof, …>` (`Slot = AddressBody`). Accessors are `value(common)` / `value_mut(common)` (`AddressView` / `AddressMut`). Switching the case deallocates the body, then [`OneofGroup::after_deallocate`](puroro-rt/src/fields/oneof.rs) clears every bit and unknown subtree the group owns. `ManuallyDrop` enables uniform [`FieldDeallocate`](puroro-rt/src/fields/shared/field_deallocate.rs) from `&mut self`.
 
 **Why these types, and why Storage is not public under the `Notification` name alone.** The storage alias's payloads are `unmanaged`-backed field wrappers, which panic on implicit drop and need the message allocator to free. Exposing that alias publicly would let a caller own one and hit that footgun, and would leak `unmanaged` / `puroro-rt` into the API. So `NotificationStorage` is `pub(crate)`. The public surface is the shape `Notification`, `NotificationCase`, and [`puroro::OneofView`](src/oneof.rs) / [`puroro::OneofViewMut`](src/oneof.rs) (RPIT; runtime structs in `puroro-rt` implement those traits). There are no public Ref/Mut aliases — shared `notification()` names the concrete Ref shape; `notification_mut()` keeps Mut opaque. Shared getters live on `OneofView`; while holding a mut view, call `as_view()` (not `Deref` — a by-value reborrowed view cannot be returned from `Deref::deref`).
 

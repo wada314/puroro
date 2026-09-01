@@ -23,11 +23,13 @@ pub const BIT_PAYLOAD_SSO: usize = 6; // payload (SSO: 1 = heap)
 pub const BIT_PRIORITY: usize = 7; // priority (EXPLICIT presence)
 pub const BIT_EMAIL_ADDRESS_SSO: usize = 8; // notification.email_address (SSO: 1 = heap)
 pub const BIT_PHONE_NUMBER_SSO: usize = 9; // notification.phone_number (SSO: 1 = heap)
-pub const BIT_DONE_VALUE: usize = 10; // done (IMPLICIT bool value)
-pub const BIT_FLAG: usize = 11; // flag (EXPLICIT presence)
-pub const BIT_FLAG_VALUE: usize = 12; // flag (EXPLICIT bool value)
-pub const BIT_URGENT_VALUE: usize = 13; // notification.urgent (oneof bool value)
-pub const BIT_ORIGIN: usize = 14; // origin (inlined nested Point, EXPLICIT presence)
+/// Parent bit index of inlined `notification.postal` (`Address`) local bit 0.
+pub const BIT_POSTAL_BASE: usize = 10; // notification.postal (inlined Address, 6 bits)
+pub const BIT_DONE_VALUE: usize = 16; // done (IMPLICIT bool value)
+pub const BIT_FLAG: usize = 17; // flag (EXPLICIT presence)
+pub const BIT_FLAG_VALUE: usize = 18; // flag (EXPLICIT bool value)
+pub const BIT_URGENT_VALUE: usize = 19; // notification.urgent (oneof bool value)
+pub const BIT_ORIGIN: usize = 20; // origin (inlined nested Point, EXPLICIT presence)
 
 // ---------------------------------------------------------------------------
 // Proto field numbers

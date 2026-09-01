@@ -53,7 +53,7 @@ use crate::task::{
 
 /// Reference `Task` message from `DESIGN.md`.
 pub struct Task<A: Allocator = Global> {
-    _common: MessageCommon<BitArray<[u8; 2], Lsb0>, A>,
+    _common: MessageCommon<BitArray<[u8; 3], Lsb0>, A>,
     title: SingularField<
         ProtoString,
         Explicit<{ BIT_TITLE }>,
@@ -221,7 +221,7 @@ impl<A: Allocator> Task<A> {
         &'a self,
     ) -> impl OneofView<
         Case = NotificationCase,
-        Ref = Notification<&'a str, &'a str, i32, &'a Address<A>, bool>,
+        Ref = Notification<&'a str, &'a str, i32, AddressView<'a, A>, bool>,
     > + 'a {
         ::puroro_rt::OneofView::<NotificationStorage<A>>::new(&self.notification, &self._common)
     }
@@ -257,7 +257,7 @@ impl<A: Allocator> Task<A> {
             .optional()
     }
 
-    pub fn postal(&self) -> Option<&Address<A>> {
+    pub fn postal(&self) -> Option<AddressView<'_, A>> {
         self.notification
             .bind(&self._common)
             .variant_of::<FIELD_POSTAL>()
@@ -274,7 +274,7 @@ impl<A: Allocator> Task<A> {
             .optional()
     }
 
-    fn visit_fields<V: FieldVisitor<MessageCommon<BitArray<[u8; 2], Lsb0>, A>>>(
+    fn visit_fields<V: FieldVisitor<MessageCommon<BitArray<[u8; 3], Lsb0>, A>>>(
         &self,
         v: &mut V,
     ) -> ControlFlow<V::Break> {
@@ -300,7 +300,7 @@ impl<A: Allocator> Task<A> {
     }
 
     /// Pair / shared: walk matching fields of `self` and `other`.
-    fn visit_field_pairs<V: FieldPairVisitor<MessageCommon<BitArray<[u8; 2], Lsb0>, A>>>(
+    fn visit_field_pairs<V: FieldPairVisitor<MessageCommon<BitArray<[u8; 3], Lsb0>, A>>>(
         &self,
         other: &Self,
         v: &mut V,
@@ -330,7 +330,7 @@ impl<A: Allocator> Task<A> {
     ///
     /// For [`CloneIn`], `dst` must start as [`Self::new_in`] so placeholders
     /// match empty common bits; install the cloned [`MessageCommon`] afterwards.
-    fn visit_field_pairs_mut<V: FieldPairVisitorMut<MessageCommon<BitArray<[u8; 2], Lsb0>, A>>>(
+    fn visit_field_pairs_mut<V: FieldPairVisitorMut<MessageCommon<BitArray<[u8; 3], Lsb0>, A>>>(
         &self,
         dst: &mut Self,
         v: &mut V,
@@ -360,7 +360,7 @@ impl<A: Allocator> Task<A> {
     }
 
     /// Scalar / mut: invoke `v` once per catalog field.
-    fn visit_fields_mut<V: FieldVisitorMut<MessageCommon<BitArray<[u8; 2], Lsb0>, A>>>(
+    fn visit_fields_mut<V: FieldVisitorMut<MessageCommon<BitArray<[u8; 3], Lsb0>, A>>>(
         &mut self,
         v: &mut V,
     ) -> ControlFlow<V::Break> {
@@ -650,7 +650,7 @@ impl<A: Allocator + Clone> Task<A> {
 
     /// Switches the group to `postal` (freeing any other variant) and returns a
     /// mutable handle to the nested message, creating an empty one if needed.
-    pub fn postal_mut(&mut self) -> &mut Address<A> {
+    pub fn postal_mut(&mut self) -> AddressMut<'_, A> {
         self.notification
             .bind_mut(&mut self._common)
             .variant_mut::<FIELD_POSTAL>()

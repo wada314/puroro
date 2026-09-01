@@ -25,7 +25,7 @@
 //! |---|---|---|---|---|
 //! | `email_address` / `phone_number` | `string` | [`SingularField`] (+ `ProtoDefault`) | `&str` | string guard |
 //! | `webhook_id` | `int32` `[default = -1]` | [`SingularField`] + [`WebhookIdDefault`] | `i32` (by value) | `&mut i32` |
-//! | `postal` | `Address` message | [`SingularField`] + [`ProtoMessage`] | `&Address<A>` | `&mut Address<A>` |
+//! | `postal` | `Address` message | [`SingularField`] + [`SharedMessage`] (inlined body) | [`AddressView`](crate::address_type::AddressView) | [`AddressMut`](crate::address_type::AddressMut) |
 //! | `urgent` | `bool` | [`SingularField`] + [`ProtoBool`] | `bool` | `SingularFieldAccess::Mut` (named bit handle) |
 //!
 //! Per-variant **immutable** getters return [`Optional`](::puroro::Optional) whose
@@ -59,13 +59,14 @@ use ::bitvec::array::BitArray;
 use ::bitvec::order::Lsb0;
 use ::bytes::BufMut;
 use ::puroro_rt::{
-    BitPacked, Boxed, FieldCloneIn, FieldDeallocate, FieldEncode, Inline, InlineOrHeap,
-    MessageCommon, MessageCommonAlloc, MessageCommonBits, Oneof, OneofDeallocate, OneofEncodable,
-    OneofGroup, OneofVariant, ProtoBool, ProtoInt32, ProtoMessage, ProtoString, SingularField,
+    BitPacked, FieldCloneIn, FieldDeallocate, FieldEncode, Inline, InlineOrHeap, MessageCommon,
+    MessageCommonAlloc, MessageCommonBits, Oneof, OneofDeallocate, OneofEncodable, OneofGroup,
+    OneofVariant, ProtoBool, ProtoInt32, ProtoString, SharedMessage, SingularField,
     SingularFieldAccess,
 };
 
 use crate::Address;
+use crate::address_type::AddressView;
 
 use super::defaults::WebhookIdDefault;
 
@@ -113,8 +114,12 @@ type PhoneNumberField<A> = SingularField<
 >;
 type WebhookIdField<A> =
     SingularField<ProtoInt32, Oneof, { super::FIELD_WEBHOOK_ID }, A, Inline, WebhookIdDefault>;
-type PostalField<A> =
-    SingularField<ProtoMessage<Address<A>>, Oneof, { super::FIELD_POSTAL }, A, Boxed>;
+type PostalField<A> = SingularField<
+    SharedMessage<Address<A>, { super::FIELD_POSTAL }, { super::BIT_POSTAL_BASE }>,
+    Oneof,
+    { super::FIELD_POSTAL },
+    A,
+>;
 type UrgentField<A> = SingularField<
     ProtoBool,
     Oneof,
@@ -135,7 +140,7 @@ pub(crate) type NotificationStorage<A> = Notification<
 impl<A: Allocator> OneofGroup for NotificationStorage<A> {
     type Case = NotificationCase;
     type Ref<'a>
-        = Notification<&'a str, &'a str, i32, &'a Address<A>, bool>
+        = Notification<&'a str, &'a str, i32, AddressView<'a, A>, bool>
     where
         A: 'a;
     type Mut<'a>
@@ -148,7 +153,7 @@ impl<A: Allocator> OneofGroup for NotificationStorage<A> {
     >
     where
         A: 'a;
-    type Bits = BitArray<[u8; 2], Lsb0>;
+    type Bits = BitArray<[u8; 3], Lsb0>;
     type Alloc = A;
 
     fn case(storage: &Self) -> Self::Case {
@@ -207,6 +212,18 @@ impl<A: Allocator> OneofGroup for NotificationStorage<A> {
             Self::Postal(f) => Self::Postal(FieldCloneIn::clone_field(f, common, alloc)),
             Self::Urgent(f) => Self::Urgent(FieldCloneIn::clone_field(f, common, alloc)),
         }
+    }
+
+    fn after_deallocate(common: &mut MessageCommon<Self::Bits, Self::Alloc>)
+    where
+        A: Clone,
+    {
+        common.set_bit(super::BIT_EMAIL_ADDRESS_SSO, false);
+        common.set_bit(super::BIT_PHONE_NUMBER_SSO, false);
+        common.set_bit(super::BIT_URGENT_VALUE, false);
+        SharedMessage::<Address<A>, { super::FIELD_POSTAL }, { super::BIT_POSTAL_BASE }>::after_oneof_release(
+            common,
+        );
     }
 }
 

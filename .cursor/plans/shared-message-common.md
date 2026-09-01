@@ -107,11 +107,12 @@ for the caller — same as today’s `origin_mut() -> &mut Point`. A mut view
 holds `&mut` parent common, so two mut getters cannot coexist. Two
 shared views can: both hold `&` common.
 
-### Oneof (later)
+### Oneof (sample `postal` — done)
 
 Inlined variant stores body only. Active variant uses a parent window.
-Switching cases must deallocate the body, **clear that field’s unknown
-subtree**, and drop that child’s bit range in the parent array.
+Switching cases deallocates the body, **clears that field’s unknown
+subtree**, and drops that child’s bit range in the parent array
+([`OneofGroup::after_deallocate`](../../puroro-rt/src/fields/oneof.rs)).
 
 ### Out of scope for sharing
 
@@ -229,9 +230,9 @@ Runtime proof of the dual catalog, hand-written `Point` / `Task.origin` only.
 - Sample `AddressBody` + `AddressView` / `AddressMut`. Owned `Address` still has its own `MessageCommon`.
 - Storage stays `ProtoMessage<Address>` (boxed slot is the full message).
 - `Task.assignee` / `assignee_mut` return the view (`Window` onto the **child** common, `bit_base = 0`). `set_assignee` moves into the box; `copy_from` copies fields.
-- `watchers` / `postal` still `&Address` / `&mut Address`.
+- `watchers` still `&Address`. Oneof `postal` is Task 6.
 
-**Still later:** oneof subtree clear, repeated / map as views, codegen, `Student<C>`.
+**Still later (at the time):** oneof subtree clear, repeated / map as views, codegen, `Student<C>`.
 
 ---
 
@@ -241,7 +242,7 @@ Runtime proof of the dual catalog, hand-written `Point` / `Task.origin` only.
 
 - [`NestedMessage`](../../puroro-rt/src/fields/wire/shared_message.rs) on owned `Point` / `Address`.
 - [`SharedMessage<M, FIELD>`](../../puroro-rt/src/fields/wire/shared_message.rs): inline slot = `M::Body`, boxed slot = `UnmanagedBox<M>`, `View`/`Mut` always window + body.
-- `Task.origin` and `Task.assignee` use the same marker. `ProtoMessage` remains for fixtures / `watchers` / `postal`.
+- `Task.origin` and `Task.assignee` use the same marker. `ProtoMessage` remains for fixtures / `watchers`.
 - Mut-view `merge_from`, `FieldDeallocate` on catalog wrappers (`MessageBindingMut`), [`Window::nest`](../../puroro-rt/src/fields/shared/window.rs).
 - Inlined Body teardown/clone: [`DeallocateBound`](../../puroro-rt/src/fields/shared/slot_bound.rs) / [`CloneBound`](../../puroro-rt/src/fields/shared/slot_bound.rs) on the extracted Body after `child_window` (not `NestedMessage` methods). After clear, `NestedMessage::BIT_COUNT` bits from `BIT_BASE` are zeroed. SSO does not impl those traits (`InlineOrHeap` + `HEAP_BIT`).
 - Sample `School → Student → Point` / inlined `Address.home`: Student has local bits + inlined Point / Address; School inlines Student at `BIT_STUDENT_BASE`. Tests: two-hop round-trip, year bit does not collide with School `name`, location unknowns stay inside nested LEN, heap street clone/clear/`set_student`.
@@ -251,3 +252,16 @@ Runtime proof of the dual catalog, hand-written `Point` / `Task.origin` only.
 ## Task 5: two-hop inline (`School → Student → Point`)
 
 **Done.** See Task 4 notes.
+
+---
+
+## Task 6: inlined oneof message variant (`notification.postal`)
+
+**Done.**
+
+- Sample `postal` is `SingularField<SharedMessage<Address, FIELD_POSTAL, BIT_POSTAL_BASE>, Oneof, …>` (`Inline`, slot = `AddressBody`). Getters are `AddressView` / `AddressMut`.
+- [`OneofGroup::after_deallocate`](../../puroro-rt/src/fields/oneof.rs) runs from [`OneofSlotMut`](../../puroro-rt/src/fields/oneof.rs) only (`set` / `variant_mut` / `clear`), after `OneofDeallocate`. It clears every bit / unknown subtree the group owns (not a per-case match). `Drop` does not wipe bits.
+- Task bits: `BIT_POSTAL_BASE = 10` (Address 6 bits), `BIT_ORIGIN = 20`, `BitArray<[u8; 3]>`.
+- Tests: heap street switch/clone, heap email SSO leftover, unknown tag 99 inside postal LEN cleared on switch.
+
+**Still later:** repeated / map as views, codegen, `Student<C>`.

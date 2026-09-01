@@ -10,7 +10,8 @@
 //! repeated field families: the slot is bound to the message [`MessageCommon`]
 //! (for the allocator on the mut path), and the previously-active variant is
 //! released through [`OneofDeallocate::deallocate`] before the slot is
-//! overwritten.
+//! overwritten. Switching also runs [`OneofGroup::after_deallocate`] so leftover
+//! SSO / inlined-child bits are not reused with a fresh empty slot.
 
 use crate::fields::oneof_variant::OneofVariant;
 use crate::fields::shared::field_inspect::{FieldCloneIn, FieldDebug, FieldEncode, FieldPartialEq};
@@ -20,9 +21,8 @@ use crate::fields::shared::{
     value_slot::{AddressableSlot, ValueSlot},
 };
 use crate::fields::singular::field::SingularField;
-use crate::fields::wire::proto_message::ProtoMessage;
 use crate::fields::wire::singular_type::SingularType;
-use crate::message_encode::{EncodeCtx, MessageEncode};
+use crate::message_encode::EncodeCtx;
 use ::allocator_api2::alloc::Allocator;
 use ::bytes::BufMut;
 use ::core::fmt::{self, Debug, Formatter, Result as FmtResult};
@@ -260,12 +260,10 @@ impl<'f, 'c, E, Pb, A: Allocator> OneofSlotMut<'f, 'c, E, Pb, A> {
     /// variant first (last wins on the wire). Backs the decode arms.
     pub fn set(self, value: E)
     where
-        E: OneofDeallocate<MessageCommon<Pb, A>>,
+        E: OneofGroup<Bits = Pb, Alloc = A>,
+        A: Clone,
     {
-        if let Some(old) = self.slot.take() {
-            // SAFETY: `common.alloc` owns the previous variant's buffers.
-            unsafe { old.deallocate(self.common) };
-        }
+        release_active::<E, Pb, A>(self.slot, self.common);
         self.slot.set(value);
     }
 
@@ -285,7 +283,7 @@ impl<'f, 'c, E, Pb, A: Allocator> OneofSlotMut<'f, 'c, E, Pb, A> {
     /// `.merge(…)`.
     pub fn variant_mut<const FIELD: u32>(self) -> &'f mut <E as OneofVariant<FIELD>>::Value
     where
-        E: OneofVariant<FIELD> + OneofDeallocate<MessageCommon<Pb, A>>,
+        E: OneofVariant<FIELD> + OneofGroup<Bits = Pb, Alloc = A>,
         <E as OneofVariant<FIELD>>::Value: DefaultIn<A>,
         A: Clone,
     {
@@ -298,10 +296,7 @@ impl<'f, 'c, E, Pb, A: Allocator> OneofSlotMut<'f, 'c, E, Pb, A> {
         );
 
         if needs_install {
-            if let Some(old) = slot.take() {
-                // SAFETY: `common.alloc` owns the previous variant's buffers.
-                unsafe { old.deallocate(common) };
-            }
+            release_active::<E, Pb, A>(slot, common);
             slot.set(<E as OneofVariant<FIELD>>::from_variant(
                 DefaultIn::default_in(common.alloc.clone()),
             ));
@@ -314,12 +309,26 @@ impl<'f, 'c, E, Pb, A: Allocator> OneofSlotMut<'f, 'c, E, Pb, A> {
     /// Frees the active variant (if any), leaving the slot empty.
     pub fn clear(self)
     where
-        E: OneofDeallocate<MessageCommon<Pb, A>>,
+        E: OneofGroup<Bits = Pb, Alloc = A>,
+        A: Clone,
     {
-        if let Some(old) = self.slot.take() {
-            // SAFETY: `common.alloc` owns the active variant's buffers.
-            unsafe { old.deallocate(self.common) };
-        }
+        release_active::<E, Pb, A>(self.slot, self.common);
+    }
+}
+
+/// Takes the active variant, deallocates it, then runs [`OneofGroup::after_deallocate`].
+///
+/// Message [`Drop`] uses [`FieldDeallocate`] on [`OneofSlot`] instead, which
+/// does **not** wipe leftover bits (the whole common is going away).
+fn release_active<E, Pb, A>(slot: &mut OneofSlot<E>, common: &mut MessageCommon<Pb, A>)
+where
+    E: OneofGroup<Bits = Pb, Alloc = A>,
+    A: Allocator + Clone,
+{
+    if let Some(old) = slot.take() {
+        // SAFETY: `common.alloc` owns the previous variant's buffers.
+        unsafe { old.deallocate(common) };
+        E::after_deallocate(common);
     }
 }
 
@@ -455,17 +464,21 @@ where
     }
 }
 
-impl<'a, M, const FIELD: u32, A: Allocator, L, Pb>
-    OneofVariantRef<'a, SingularField<ProtoMessage<M>, Oneof, FIELD, A, L>, Pb, A>
+impl<'a, T: SingularType, const FIELD: u32, A: Allocator, L: ValueLayout<T, A>, D, Pb>
+    OneofVariantRef<'a, SingularField<T, Oneof, FIELD, A, L, D>, Pb, A>
 where
-    M: MessageEncode,
-    L: ValueLayout<ProtoMessage<M>, A>,
-    L::Slot: AddressableSlot,
+    T::View<'a, A>: Copy,
     MessageCommon<Pb, A>: MessageCommonBits,
+    L::Slot: AddressableSlot,
     <Oneof as FieldPresence>::ValueSlot<L::Slot>: ValueSlot<L::Slot, A>,
 {
-    /// Returns the child when this message variant is active (`Boxed` or `Inline`).
-    pub fn get(self) -> Option<&'a M> {
+    /// Returns the child when this variant is active.
+    ///
+    /// Unlike [`SingularFieldRef::get`](crate::fields::singular::field::SingularFieldRef::get),
+    /// this is `None` when another variant (or none) is selected — oneof
+    /// presence is always-initialized, so the field wrapper's `get` is not a
+    /// case check.
+    pub fn get(self) -> Option<T::View<'a, A>> {
         self.field.map(|f| f.bind(self.common).value())
     }
 }
@@ -534,6 +547,20 @@ where
     ) -> Self
     where
         Self::Alloc: Clone;
+
+    /// Parent-side cleanup after [`OneofDeallocate`].
+    ///
+    /// Called from [`OneofSlotMut`] after the variant body is freed. Wipes every
+    /// bit and unknown subtree the group owns so leftover SSO / inlined-child
+    /// state is not paired with a fresh empty slot. The active case is not
+    /// needed: inactive variants' bits should already be clear, and clearing
+    /// them again is a no-op. Default is a no-op. Message [`Drop`] does not
+    /// call this ([`FieldDeallocate`] on the slot is enough).
+    fn after_deallocate(_common: &mut MessageCommon<Self::Bits, Self::Alloc>)
+    where
+        Self::Alloc: Clone,
+    {
+    }
 }
 
 /// Shared bound view of a oneof group (slot + [`MessageCommon`]).
@@ -646,7 +673,10 @@ where
 
     /// Clears whichever variant is active (freeing it through the message allocator).
     #[inline]
-    pub fn clear(self) {
+    pub fn clear(self)
+    where
+        G::Alloc: Clone,
+    {
         self.slot.bind_mut(self.common).clear();
     }
 }

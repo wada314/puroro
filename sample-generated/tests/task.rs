@@ -234,7 +234,7 @@ fn oneof_message_variant_roundtrip() {
     let mut task = Task::new();
     task.owner_id_mut().push_str("user-1");
     {
-        let postal = task.postal_mut();
+        let mut postal = task.postal_mut();
         postal.street_mut().push_str("5 Oak Ave");
         postal.city_mut().push_str("Kyoto");
     }
@@ -564,6 +564,89 @@ fn oneof_switching_frees_previous_variant() {
         task.notification().as_ref(),
         Some(Notification::WebhookId(3))
     ));
+}
+
+#[test]
+fn oneof_inlined_postal_heap_string_switch_and_clone() {
+    // AlwaysInitialized oneof + leftover HEAP_BIT would SIGSEGV on the next
+    // empty-inline body without after_deallocate wiping the Address bit range.
+    let heap_street = "S".repeat(INLINE_CAP + 8);
+    let mut task = Task::new();
+    task.owner_id_mut().push_str("user-1");
+    task.postal_mut().street_mut().set(&heap_street);
+    assert_eq!(task.postal().unwrap().street().get(), heap_street);
+
+    let cloned = task.clone();
+    assert_eq!(cloned.postal().unwrap().street().get(), heap_street);
+
+    task.email_address_mut().set("a@example.com");
+    assert!(task.postal().is_none());
+    assert_eq!(task.email_address().get(), "a@example.com");
+
+    {
+        let mut postal = task.postal_mut();
+        assert!(!postal.street().is_set());
+        postal.street_mut().set(&heap_street);
+    }
+    assert_eq!(task.postal().unwrap().street().get(), heap_street);
+
+    *task.urgent_mut() = true;
+    assert!(task.postal().is_none());
+    assert!(task.urgent().get());
+    *task.webhook_id_mut() = 1;
+    assert!(!task.urgent().is_set());
+    assert!(!*task.urgent_mut());
+}
+
+#[test]
+fn oneof_heap_email_switch_clears_sso_bit() {
+    let heap_email = "a".repeat(INLINE_CAP + 8);
+    let mut task = Task::new();
+    task.owner_id_mut().push_str("user-1");
+    task.email_address_mut().set(&heap_email);
+    *task.webhook_id_mut() = 7;
+    assert_eq!(task.email_address().get(), "");
+    task.email_address_mut().set(&heap_email);
+    assert_eq!(task.email_address().get(), heap_email);
+}
+
+#[test]
+fn oneof_inlined_postal_unknown_cleared_on_switch() {
+    let mut task = Task::new();
+    task.owner_id_mut().push_str("x");
+
+    let mut postal_payload = Vec::new();
+    let street = b"Oak";
+    encode_u64_varint((1u64) << 3 | 2, &mut postal_payload);
+    encode_u64_varint(street.len() as u64, &mut postal_payload);
+    postal_payload.extend_from_slice(street);
+    encode_varint_field(
+        field_number_const::<99>(),
+        Varint::from_uint64(5),
+        &mut postal_payload,
+    );
+
+    let mut bytes = Vec::new();
+    encode_u64_varint((15u64) << 3 | 2, &mut bytes);
+    encode_u64_varint(postal_payload.len() as u64, &mut bytes);
+    bytes.extend_from_slice(&postal_payload);
+
+    task.merge_from(&mut &bytes[..]).unwrap();
+    assert!(task.unknown_fields().next().is_none());
+    assert_eq!(task.postal().unwrap().street().get(), "Oak");
+    let encoded = task.encode_to_vec();
+    let postal_len = find_len_field(&encoded, 15).expect("postal LEN on wire");
+    assert!(
+        contains_varint_field(postal_len, 99, 5),
+        "unknown tag 99 must round-trip inside postal LEN, got {postal_len:?}"
+    );
+
+    task.email_address_mut().set("a@example.com");
+    assert!(task.postal().is_none());
+    assert!(task.unknown_fields().next().is_none());
+    let switched = task.encode_to_vec();
+    assert!(find_len_field(&switched, 15).is_none());
+    assert!(!top_level_has_varint_field(&switched, 99));
 }
 
 #[test]

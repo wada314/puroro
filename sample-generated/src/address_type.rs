@@ -6,7 +6,9 @@
 //! [`MessageCommon`]. [`Task.assignee`](crate::Task) uses
 //! [`SharedMessage<Address>`](::puroro_rt::SharedMessage) + [`Boxed`](::puroro_rt::Boxed):
 //! the slot is the owned message; getters are [`AddressView`] / [`AddressMut`]
-//! (`Window` onto the child’s common, `bit_base = 0`).
+//! (`Window` onto the child’s common, `bit_base = 0`). Oneof
+//! [`Task.postal`](crate::Task::postal) inlines [`AddressBody`] via the same
+//! catalog (`Inline`, parent `BIT_POSTAL_BASE`).
 
 use allocator_api2::alloc::{Allocator, Global};
 use bitvec::array::BitArray;

@@ -10,8 +10,8 @@
 //!   The window looks into the **child’s** own common (`bit_base = 0`).
 //!
 //! [`ProtoMessage`](super::proto_message::ProtoMessage) (`View = &M`) remains for
-//! generated fixtures, repeated elements, and oneof variants that still store a
-//! full `M` without a body split.
+//! generated fixtures and repeated elements that still store a full `M`
+//! without a body split.
 
 use crate::decode;
 use crate::encode::{encode_varint, encoded_len_varint};
@@ -110,6 +110,25 @@ where
 {
     for i in 0..count {
         common.set_bit(bit_base + i, false);
+    }
+}
+
+impl<M: NestedMessage, const FIELD: u32, const BIT_BASE: usize> SharedMessage<M, FIELD, BIT_BASE> {
+    /// After an inlined oneof body has been [`DeallocateBound`], zero
+    /// `[BIT_BASE, BIT_BASE + BIT_COUNT)` and drop the unknown subtree for
+    /// `FIELD`.
+    ///
+    /// Oneof presence is always-initialized, so [`with_mut`](PayloadAccess::with_mut)
+    /// never treats a newly selected variant as `fresh` and will not wipe leftover
+    /// `HEAP_BIT`s itself.
+    pub fn after_oneof_release<A, Cx>(common: &mut Cx)
+    where
+        A: Allocator + Clone,
+        Cx: MessageBindingMut<A>,
+    {
+        let alloc = common.clone_alloc();
+        clear_inlined_bits(common, BIT_BASE, M::BIT_COUNT);
+        common.unknown_fields_mut().remove_child(FIELD, &alloc);
     }
 }
 
