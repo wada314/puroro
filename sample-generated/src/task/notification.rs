@@ -35,6 +35,10 @@
 //!
 //! The scalar variant owns no heap, so its `OneofDeallocate` arm is a no-op; the
 //! LEN and message variants free their storage through the message allocator.
+//! After that, [`OneofGroup::after_deallocate`](::puroro_rt::OneofGroup::after_deallocate)
+//! clears **every** bit and unknown subtree this group owns (email/phone SSO,
+//! `urgent` value, inlined postal range + `remove_child`) — not a per-case
+//! match, and not a contiguous parent range that would clobber `done` / `flag`.
 //!
 //! Variant proto field numbers are fixed for this generated oneof, so
 //! [`NotificationStorage`] is *not* parametrised by them: each variant's field

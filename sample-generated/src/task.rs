@@ -10,7 +10,8 @@ pub use notification::{Notification, NotificationCase};
 
 // ---------------------------------------------------------------------------
 // Bit indices — presence, string / bytes SSO heap bits (1 = heap / 0 = inline),
-// then bool value bits, assigned by ascending field number in one pass.
+// bool value bits, then inlined nested `BIT_COUNT` ranges, assigned by
+// ascending field number in one pass.
 // ---------------------------------------------------------------------------
 
 pub const BIT_TITLE: usize = 0; // title (EXPLICIT presence)

@@ -110,9 +110,7 @@ shared views can: both hold `&` common.
 ### Oneof (sample `postal` — done)
 
 Inlined variant stores body only. Active variant uses a parent window.
-Switching cases deallocates the body, **clears that field’s unknown
-subtree**, and drops that child’s bit range in the parent array
-([`OneofGroup::after_deallocate`](../../puroro-rt/src/fields/oneof.rs)).
+Switching deallocates the body, then [`OneofGroup::after_deallocate`](../../puroro-rt/src/fields/oneof.rs) clears **every** bit and unknown subtree the group owns (not a per-case match; do not zero neighbouring non-oneof bits).
 
 ### Out of scope for sharing
 
