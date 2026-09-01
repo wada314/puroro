@@ -1,13 +1,19 @@
 //! Sample of a tiny nested message used to exercise **shared-common** inlined
 //! storage: slot is [`PointBody`], getters return [`PointView`] / [`PointMut`].
 //!
+//! Field accessors live on [`PointBound`] (`C` / `B`). Owned [`Point`] wraps
+//! that binding and is the only spelling that [`Drop`]s fields. Views stay
+//! [`Copy`] so NLL ends the parent borrow after last use.
+//!
 //! Two IMPLICIT `int32` fields. Not part of the DESIGN.md reference schema.
 
 use allocator_api2::alloc::{Allocator, Global};
 use bitvec::array::BitArray;
 use bitvec::order::Lsb0;
 use bytes::{Buf, BufMut};
+use core::borrow::{Borrow, BorrowMut};
 use core::fmt;
+use core::marker::PhantomData;
 use core::mem;
 use core::ops::{ControlFlow, Deref, DerefMut};
 
@@ -29,17 +35,31 @@ pub struct PointBody<A: Allocator = Global> {
     y: SingularField<ProtoInt32, Implicit, { FIELD_Y }, A>,
 }
 
-/// Owned `Point` (own [`MessageCommon`] + [`PointBody`]).
+/// Owned common for a standalone [`Point`].
+pub type PointOwnedCommon<A = Global> = MessageCommon<BitArray<[u8; 1], Lsb0>, A>;
+
+/// Common + body binding. One accessor `impl` for owned, shared view, and mut.
+///
+/// - Owned inner: `C = PointOwnedCommon<A>`, `B = PointBody<A>`
+/// - [`PointView`]: `C = Window`, `B = &PointBody`
+/// - [`PointMut`]: `C = WindowMut`, `B = &mut PointBody`
+pub struct PointBound<A: Allocator, C, B> {
+    common: C,
+    body: B,
+    _alloc: PhantomData<A>,
+}
+
+/// Owned message (`Drop` / `Message` / deep `Clone`). Field accessors via
+/// [`Deref`] to [`PointBound`].
 pub struct Point<A: Allocator = Global> {
-    _common: MessageCommon<BitArray<[u8; 1], Lsb0>, A>,
-    body: PointBody<A>,
+    inner: PointBound<A, PointOwnedCommon<A>, PointBody<A>>,
 }
 
 /// Shared view: parent [`Window`] + `&PointBody`.
-pub struct PointView<'a, A: Allocator> {
-    window: Window<'a, A>,
-    body: &'a PointBody<A>,
-}
+pub type PointView<'a, A = Global> = PointBound<A, Window<'a, A>, &'a PointBody<A>>;
+
+/// Mutable view: parent [`WindowMut`] + `&mut PointBody`.
+pub type PointMut<'a, A = Global> = PointBound<A, WindowMut<'a, A>, &'a mut PointBody<A>>;
 
 impl<A: Allocator> Copy for PointView<'_, A> {}
 
@@ -47,12 +67,6 @@ impl<A: Allocator> Clone for PointView<'_, A> {
     fn clone(&self) -> Self {
         *self
     }
-}
-
-/// Mutable view: parent [`WindowMut`] + `&mut PointBody`.
-pub struct PointMut<'a, A: Allocator> {
-    window: WindowMut<'a, A>,
-    body: &'a mut PointBody<A>,
 }
 
 /// Infallible field getters (owned + views).
@@ -148,20 +162,68 @@ impl<A: Allocator> PointBody<A> {
     }
 }
 
-impl<A: Allocator> Point<A> {
+impl<A, C, B> PointBound<A, C, B>
+where
+    A: Allocator,
+    C: MessageBindingMut<A>,
+    B: Borrow<PointBody<A>>,
+{
     pub fn x(&self) -> i32 {
-        self.body.x.bind(&self._common).value()
+        self.body.borrow().x.bind(&self.common).value()
     }
 
     pub fn y(&self) -> i32 {
-        self.body.y.bind(&self._common).value()
+        self.body.borrow().y.bind(&self.common).value()
+    }
+}
+
+impl<A, C, B> PointBound<A, C, B>
+where
+    A: Allocator + Clone,
+    C: InlinedMessageParent<A>,
+    B: BorrowMut<PointBody<A>>,
+{
+    pub fn x_mut(&mut self) -> impl DerefMut<Target = i32> + '_ {
+        self.body
+            .borrow_mut()
+            .x
+            .bind_mut(&mut self.common)
+            .value_mut()
     }
 
+    pub fn clear_x(&mut self) {
+        self.body.borrow_mut().x.bind_mut(&mut self.common).clear();
+    }
+
+    pub fn y_mut(&mut self) -> impl DerefMut<Target = i32> + '_ {
+        self.body
+            .borrow_mut()
+            .y
+            .bind_mut(&mut self.common)
+            .value_mut()
+    }
+
+    pub fn clear_y(&mut self) {
+        self.body.borrow_mut().y.bind_mut(&mut self.common).clear();
+    }
+
+    /// Copies field values from an owned [`Point`] into this binding.
+    pub fn copy_from(&mut self, src: &Point<A>) {
+        *self.x_mut() = src.x();
+        *self.y_mut() = src.y();
+    }
+
+    pub fn merge_from<Buf: DecodeBuf>(&mut self, buf: &mut Buf) -> Result<(), DecodeError> {
+        self.body.borrow_mut().merge_into(&mut self.common, buf, 0)
+    }
+}
+
+impl<A: Allocator> Point<A> {
     fn visit_fields<V: FieldVisitor<MessageCommon<BitArray<[u8; 1], Lsb0>, A>>>(
         &self,
         v: &mut V,
     ) -> ControlFlow<V::Break> {
-        self.body.visit_fields(v)
+        self.inner.body.visit_fields(v)
     }
 
     fn visit_field_pairs<V: FieldPairVisitor<MessageCommon<BitArray<[u8; 1], Lsb0>, A>>>(
@@ -169,7 +231,7 @@ impl<A: Allocator> Point<A> {
         other: &Self,
         v: &mut V,
     ) -> ControlFlow<V::Break> {
-        self.body.visit_field_pairs(&other.body, v)
+        self.inner.body.visit_field_pairs(&other.inner.body, v)
     }
 
     fn visit_field_pairs_mut<V: FieldPairVisitorMut<MessageCommon<BitArray<[u8; 1], Lsb0>, A>>>(
@@ -180,42 +242,31 @@ impl<A: Allocator> Point<A> {
     where
         A: Clone,
     {
-        self.body.visit_field_pairs_mut(&mut dst.body, v)
+        self.inner
+            .body
+            .visit_field_pairs_mut(&mut dst.inner.body, v)
     }
 
     fn visit_fields_mut<V: FieldVisitorMut<MessageCommon<BitArray<[u8; 1], Lsb0>, A>>>(
         &mut self,
         v: &mut V,
     ) -> ControlFlow<V::Break> {
-        self.body.visit_fields_mut(v)
+        self.inner.body.visit_fields_mut(v)
     }
 }
 
 impl<A: Allocator + Clone> Point<A> {
     pub fn new_in(alloc: A) -> Self {
         Self {
-            _common: MessageCommon::new_in(BitArray::ZERO, alloc.clone()),
-            body: PointBody {
-                x: SingularField::new_in(alloc.clone()),
-                y: SingularField::new_in(alloc),
+            inner: PointBound {
+                common: MessageCommon::new_in(BitArray::ZERO, alloc.clone()),
+                body: PointBody {
+                    x: SingularField::new_in(alloc.clone()),
+                    y: SingularField::new_in(alloc),
+                },
+                _alloc: PhantomData,
             },
         }
-    }
-
-    pub fn x_mut(&mut self) -> impl DerefMut<Target = i32> + '_ {
-        self.body.x.bind_mut(&mut self._common).value_mut()
-    }
-
-    pub fn clear_x(&mut self) {
-        self.body.x.bind_mut(&mut self._common).clear();
-    }
-
-    pub fn y_mut(&mut self) -> impl DerefMut<Target = i32> + '_ {
-        self.body.y.bind_mut(&mut self._common).value_mut()
-    }
-
-    pub fn clear_y(&mut self) {
-        self.body.y.bind_mut(&mut self._common).clear();
     }
 }
 
@@ -234,9 +285,9 @@ impl<A: Allocator + Clone + Default> Default for Point<A> {
 impl<A: Allocator + Clone> CloneIn<A> for Point<A> {
     fn clone_in(&self, alloc: A) -> Self {
         let mut dst = Self::new_in(alloc.clone());
-        let mut v = CloneFieldsVisitor::new(&self._common, &dst._common);
+        let mut v = CloneFieldsVisitor::new(&self.inner.common, &dst.inner.common);
         let _ = self.visit_field_pairs_mut(&mut dst, &mut v);
-        let mut old = mem::replace(&mut dst._common, self._common.clone_in(alloc));
+        let mut old = mem::replace(&mut dst.inner.common, self.inner.common.clone_in(alloc));
         old.deallocate();
         dst
     }
@@ -245,7 +296,7 @@ impl<A: Allocator + Clone> CloneIn<A> for Point<A> {
 impl<A: Allocator + Clone> Clone for Point<A> {
     #[inline]
     fn clone(&self) -> Self {
-        self.clone_in(self._common.alloc.clone())
+        self.clone_in(self.inner.common.alloc.clone())
     }
 }
 
@@ -254,16 +305,16 @@ impl<A: Allocator> PartialEq for Point<A> {
         matches!(
             self.visit_field_pairs(
                 other,
-                &mut FieldEqVisitor::new(&self._common, &other._common)
+                &mut FieldEqVisitor::new(&self.inner.common, &other.inner.common)
             ),
             ControlFlow::Continue(())
-        ) && self._common.unknown_fields_eq(&other._common)
+        ) && self.inner.common.unknown_fields_eq(&other.inner.common)
     }
 }
 
 impl<A: Allocator> fmt::Debug for Point<A> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let mut v = DebugStructVisitor::new(f.debug_struct("Point"), &self._common);
+        let mut v = DebugStructVisitor::new(f.debug_struct("Point"), &self.inner.common);
         let _ = self.visit_fields(&mut v);
         v.finish()
     }
@@ -271,9 +322,23 @@ impl<A: Allocator> fmt::Debug for Point<A> {
 
 impl<A: Allocator> Drop for Point<A> {
     fn drop(&mut self) {
-        let mut v = FieldDeallocVisitor::new(&self._common);
-        let _ = self.visit_fields_mut(&mut v);
-        self._common.deallocate();
+        let mut v = FieldDeallocVisitor::new(&self.inner.common);
+        let _ = self.inner.body.visit_fields_mut(&mut v);
+        self.inner.common.deallocate();
+    }
+}
+
+impl<A: Allocator> Deref for Point<A> {
+    type Target = PointBound<A, PointOwnedCommon<A>, PointBody<A>>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.inner
+    }
+}
+
+impl<A: Allocator> DerefMut for Point<A> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.inner
     }
 }
 
@@ -288,14 +353,14 @@ impl<A: Allocator> DeallocateIn<A> for Point<A> {
 
 impl<A: Allocator> MessageEncode for Point<A> {
     fn encoded_len(&self, ctx: &mut EncodeCtx) -> usize {
-        let mut v = EncodedLenVisitor::new(&self._common, ctx);
+        let mut v = EncodedLenVisitor::new(&self.inner.common, ctx);
         let _ = self.visit_fields(&mut v);
-        v.len + self._common.unknown_fields.len()
+        v.len + self.inner.common.unknown_fields.len()
     }
 
     fn encode_raw<B: BufMut>(&self, ctx: &mut EncodeCtx, buf: &mut B) {
-        let _ = self.visit_fields(&mut EncodeRawVisitor::new(&self._common, ctx, buf));
-        let unknown: &[u8] = &self._common.unknown_fields;
+        let _ = self.visit_fields(&mut EncodeRawVisitor::new(&self.inner.common, ctx, buf));
+        let unknown: &[u8] = &self.inner.common.unknown_fields;
         buf.put_slice(unknown);
     }
 }
@@ -306,7 +371,9 @@ impl<A: Allocator + Clone> MessageMerge for Point<A> {
         buf: &mut B,
         depth: usize,
     ) -> Result<(), DecodeError> {
-        self.body.merge_into(&mut self._common, buf, depth)
+        self.inner
+            .body
+            .merge_into(&mut self.inner.common, buf, depth)
     }
 }
 
@@ -370,7 +437,7 @@ impl<A: Allocator> Message for Point<A> {
     }
 
     fn unknown_fields(&self) -> impl Iterator<Item = ::puroro::UnknownField<'_>> + '_ {
-        self._common.iter_unknown_fields()
+        self.inner.common.iter_unknown_fields()
     }
 
     fn validate(&self) -> Result<(), DecodeError> {
@@ -378,40 +445,49 @@ impl<A: Allocator> Message for Point<A> {
     }
 }
 
-impl<A: Allocator> PointMessage for Point<A> {
+impl<A, C, B> PointMessage for PointBound<A, C, B>
+where
+    A: Allocator,
+    C: MessageBindingMut<A>,
+    B: Borrow<PointBody<A>>,
+{
     fn x(&self) -> i32 {
-        Point::x(self)
+        PointBound::x(self)
     }
     fn y(&self) -> i32 {
-        Point::y(self)
+        PointBound::y(self)
+    }
+}
+
+impl<A: Allocator> PointMessage for Point<A> {
+    fn x(&self) -> i32 {
+        PointBound::x(&self.inner)
+    }
+    fn y(&self) -> i32 {
+        PointBound::y(&self.inner)
+    }
+}
+
+impl<A, C, B> PointMessageMut for PointBound<A, C, B>
+where
+    A: Allocator + Clone,
+    C: InlinedMessageParent<A>,
+    B: BorrowMut<PointBody<A>>,
+{
+    fn x_mut(&mut self) -> impl DerefMut<Target = i32> + '_ {
+        PointBound::x_mut(self)
+    }
+    fn y_mut(&mut self) -> impl DerefMut<Target = i32> + '_ {
+        PointBound::y_mut(self)
     }
 }
 
 impl<A: Allocator + Clone> PointMessageMut for Point<A> {
     fn x_mut(&mut self) -> impl DerefMut<Target = i32> + '_ {
-        Point::x_mut(self)
+        PointBound::x_mut(&mut self.inner)
     }
     fn y_mut(&mut self) -> impl DerefMut<Target = i32> + '_ {
-        Point::y_mut(self)
-    }
-}
-
-impl<A: Allocator> PointView<'_, A> {
-    pub fn x(&self) -> i32 {
-        self.body.x.bind(&self.window).value()
-    }
-
-    pub fn y(&self) -> i32 {
-        self.body.y.bind(&self.window).value()
-    }
-}
-
-impl<A: Allocator> PointMessage for PointView<'_, A> {
-    fn x(&self) -> i32 {
-        PointView::x(self)
-    }
-    fn y(&self) -> i32 {
-        PointView::y(self)
+        PointBound::y_mut(&mut self.inner)
     }
 }
 
@@ -423,55 +499,9 @@ impl<A: Allocator> PartialEq for PointView<'_, A> {
 
 impl<A: Allocator> fmt::Debug for PointView<'_, A> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let mut v = DebugStructVisitor::new(f.debug_struct("Point"), &self.window);
+        let mut v = DebugStructVisitor::new(f.debug_struct("Point"), &self.common);
         let _ = self.body.visit_fields(&mut v);
         v.finish()
-    }
-}
-
-impl<A: Allocator + Clone> PointMut<'_, A> {
-    pub fn x(&self) -> i32 {
-        self.body.x.bind(&self.window).value()
-    }
-
-    pub fn y(&self) -> i32 {
-        self.body.y.bind(&self.window).value()
-    }
-
-    pub fn x_mut(&mut self) -> impl DerefMut<Target = i32> + '_ {
-        self.body.x.bind_mut(&mut self.window).value_mut()
-    }
-
-    pub fn y_mut(&mut self) -> impl DerefMut<Target = i32> + '_ {
-        self.body.y.bind_mut(&mut self.window).value_mut()
-    }
-
-    /// Copies field values from an owned [`Point`] into this inlined slot.
-    pub fn copy_from(&mut self, src: &Point<A>) {
-        *self.x_mut() = src.x();
-        *self.y_mut() = src.y();
-    }
-
-    pub fn merge_from<B: DecodeBuf>(&mut self, buf: &mut B) -> Result<(), DecodeError> {
-        self.body.merge_into(&mut self.window, buf, 0)
-    }
-}
-
-impl<A: Allocator + Clone> PointMessage for PointMut<'_, A> {
-    fn x(&self) -> i32 {
-        PointMut::x(self)
-    }
-    fn y(&self) -> i32 {
-        PointMut::y(self)
-    }
-}
-
-impl<A: Allocator + Clone> PointMessageMut for PointMut<'_, A> {
-    fn x_mut(&mut self) -> impl DerefMut<Target = i32> + '_ {
-        PointMut::x_mut(self)
-    }
-    fn y_mut(&mut self) -> impl DerefMut<Target = i32> + '_ {
-        PointMut::y_mut(self)
     }
 }
 
@@ -497,17 +527,23 @@ impl<A: Allocator> NestedMessage for Point<A> {
         A: 'a;
 
     fn as_view(&self) -> PointView<'_, A> {
-        PointView {
-            window: Window::for_owned(&self._common),
-            body: &self.body,
+        PointBound {
+            common: Window::for_owned(&self.inner.common),
+            body: &self.inner.body,
+            _alloc: PhantomData,
         }
     }
 
     fn as_mut(&mut self) -> PointMut<'_, A> {
-        let Point { _common, body } = self;
-        PointMut {
-            window: WindowMut::for_owned(_common),
+        let PointBound {
+            common,
             body,
+            _alloc,
+        } = &mut self.inner;
+        PointBound {
+            common: WindowMut::for_owned(common),
+            body,
+            _alloc: PhantomData,
         }
     }
 
@@ -515,27 +551,35 @@ impl<A: Allocator> NestedMessage for Point<A> {
     where
         Self: 'a,
     {
-        PointView { window, body }
+        PointBound {
+            common: window,
+            body,
+            _alloc: PhantomData,
+        }
     }
 
     fn bind_mut<'a>(body: &'a mut PointBody<A>, window: WindowMut<'a, A>) -> PointMut<'a, A>
     where
         Self: 'a,
     {
-        PointMut { window, body }
+        PointBound {
+            common: window,
+            body,
+            _alloc: PhantomData,
+        }
     }
 
     fn view_len(view: PointView<'_, A>, ctx: &mut EncodeCtx) -> usize {
-        let mut v = EncodedLenVisitor::new(&view.window, ctx);
+        let mut v = EncodedLenVisitor::new(&view.common, ctx);
         let _ = view.body.visit_fields(&mut v);
-        v.len + view.window.unknown_fields().len()
+        v.len + view.common.unknown_fields().len()
     }
 
     fn encode_view<B: BufMut>(view: PointView<'_, A>, ctx: &mut EncodeCtx, buf: &mut B) {
         let _ = view
             .body
-            .visit_fields(&mut EncodeRawVisitor::new(&view.window, ctx, buf));
-        buf.put_slice(view.window.unknown_fields().self_blob());
+            .visit_fields(&mut EncodeRawVisitor::new(&view.common, ctx, buf));
+        buf.put_slice(view.common.unknown_fields().self_blob());
     }
 
     fn merge_inline<Ax, Buf>(

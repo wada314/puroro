@@ -46,10 +46,14 @@ mod student_type;
 mod task_type;
 
 pub use address_type::{
-    Address, AddressBody, AddressMessage, AddressMessageMut, AddressMut, AddressView,
+    Address, AddressBody, AddressBound, AddressMessage, AddressMessageMut, AddressMut,
+    AddressOwnedCommon, AddressView,
 };
 pub use enums::{Priority, Status};
-pub use point_type::{Point, PointBody, PointMessage, PointMessageMut, PointMut, PointView};
+pub use point_type::{
+    Point, PointBody, PointBound, PointMessage, PointMessageMut, PointMut, PointOwnedCommon,
+    PointView,
+};
 pub use school_type::School;
 pub use student_type::{
     Student, StudentBody, StudentBound, StudentMessage, StudentMessageMut, StudentMut,

@@ -312,7 +312,7 @@ If a new public API would need a `puroro-rt` name, **add or reexport a stable st
 
 ### 4.0 Inherent accessors (current)
 
-The normative generated API is the concrete message struct's inherent `impl` block. Per-message traits (`AddressMessage` / `AddressMessageMut`, …) exist on the hand-written [`sample-generated`](sample-generated/) messages. Sample [`Student`](sample-generated/src/student_type.rs) is owned-only (`Drop` / `Message`); field accessors live on [`StudentBound`](sample-generated/src/student_type.rs) (`C` / `B`), and [`StudentView`] / [`StudentMut`] are aliases of that bound. Owned `Student` `Deref`s to the bound. A single `Student<A, C, B>` cannot both `Drop` and stay `Copy` (views need `Copy` for NLL). Codegen of that spelling is still [§8](#8-future-work). Callers of today's generated plugin output use the concrete type (or [`Message`](#message) for codec / infrastructure).
+The normative generated API is the concrete message struct's inherent `impl` block. Per-message traits (`AddressMessage` / `AddressMessageMut`, …) exist on the hand-written [`sample-generated`](sample-generated/) messages. Sample nested messages ([`Student`](sample-generated/src/student_type.rs) / [`Point`](sample-generated/src/point_type.rs) / [`Address`](sample-generated/src/address_type.rs)) are owned-only (`Drop` / `Message`); field accessors live on `*Bound` (`C` / `B`), and `*View` / `*Mut` are aliases of that bound. Owned messages `Deref` to the bound. A single `M<A, C, B>` cannot both `Drop` and stay `Copy` (views need `Copy` for NLL). Top-level sample `Task` / `School` stay owned-only (they are not inlined children). Codegen of that spelling is still [§8](#8-future-work). Callers of today's generated plugin output use the concrete type (or [`Message`](#message) for codec / infrastructure).
 
 **Read / write shape (eager `Task<A>`):**
 
@@ -1245,7 +1245,7 @@ Planned interoperability traits, emitted per message once specialized layouts la
 - **`FooMessage`** — infallible getters matching the inherent shapes in [§4.0](#40-inherent-accessors-current) (for eager implementations).
 - **`FooMessageFallible`** — `Result`-returning getters for lazy / view layouts (`Error = DecodeError` or `Infallible` on eager).
 
-These traits are **not** yet emitted by `protoc-gen-puroro`. The hand-written [`sample-generated`](sample-generated/) crate already has `PointMessage` / `AddressMessage` / `StudentMessage` (and `*Mut`) as the generic face over owned + view + mut. Sample `Student` accessors live on `StudentBound`; `StudentMessage` is a blanket over the bound plus owned. When the generator adds the traits, explicit-presence fields should keep `Optional` as the primary read API; convenience `has_*` / `*_raw` wrappers (if any) would be trait defaults, not a second required surface on the concrete struct.
+These traits are **not** yet emitted by `protoc-gen-puroro`. The hand-written [`sample-generated`](sample-generated/) crate already has `PointMessage` / `AddressMessage` / `StudentMessage` (and `*Mut`) as the generic face over owned + view + mut. Sample nested-message accessors live on `*Bound`; `*Message` is a blanket over the bound plus owned. When the generator adds the traits, explicit-presence fields should keep `Optional` as the primary read API; convenience `has_*` / `*_raw` wrappers (if any) would be trait defaults, not a second required surface on the concrete struct.
 
 ### Specialized message implementations
 

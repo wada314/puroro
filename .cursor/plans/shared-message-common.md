@@ -266,15 +266,16 @@ Runtime proof of the dual catalog, hand-written `Point` / `Task.origin` only.
 
 ---
 
-## Task 8: sample `StudentBound<A, C, B>` (one accessor impl)
+## Task 8: sample `*Bound<A, C, B>` (one accessor impl)
 
 **Done.**
 
-- Accessors live on `StudentBound<A, C, B>`. `Student` / `Student<A>` is an owned wrapper (`Drop` / `Message` / deep `Clone`) that `Deref`s to the bound.
-- `StudentView` / `StudentMut` are aliases of the bound (`Window` + `&Body` / `WindowMut` + `&mut Body`) and stay `Copy`.
-- A single `Student<A, C, B>` cannot both `Drop` (owned teardown) and be `Copy` (NLL for views); this is the plan’s `Student` + `StudentBound` spelling.
+- Accessors live on `StudentBound` / `PointBound` / `AddressBound`. Owned `Student` / `Point` / `Address` wrap the bound (`Drop` / `Message` / deep `Clone`) and `Deref` to it.
+- `*View` / `*Mut` are aliases of the bound (`Window` + `&Body` / `WindowMut` + `&mut Body`) and stay `Copy`.
+- A single `M<A, C, B>` cannot both `Drop` (owned teardown) and be `Copy` (NLL for views); this is the plan’s `Student` + `StudentBound` spelling.
 - Field getters / mutators / `copy_from` / view `merge_from` live in one pair of `impl`s over `C` + `B`.
-- `StudentMessage` / `StudentMessageMut` are blankets over the bound, plus owned. Full `Message` stays owned-only.
+- `*Message` / `*MessageMut` are blankets over the bound, plus owned. Full `Message` stays owned-only.
+- Sample `Task` / `School` stay owned-only (not inlined children).
 
 ---
 

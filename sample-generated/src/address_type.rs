@@ -2,8 +2,11 @@
 //! (from `example.proto`). The public type is re-exported at the crate root so
 //! it sits beside companion module [`crate::address`].
 //!
-//! Field wrappers live in [`AddressBody`]. Owned [`Address`] keeps its own
-//! [`MessageCommon`]. [`Task.assignee`](crate::Task) uses
+//! Field wrappers live in [`AddressBody`]. Field accessors live on
+//! [`AddressBound`] (`C` / `B`). Owned [`Address`] wraps that binding and is
+//! the only spelling that [`Drop`]s fields. Views stay [`Copy`].
+//!
+//! [`Task.assignee`](crate::Task) uses
 //! [`SharedMessage<Address>`](::puroro_rt::SharedMessage) + [`Boxed`](::puroro_rt::Boxed):
 //! the slot is the owned message; getters are [`AddressView`] / [`AddressMut`]
 //! (`Window` onto the child’s common, `bit_base = 0`). Oneof
@@ -14,7 +17,9 @@ use allocator_api2::alloc::{Allocator, Global};
 use bitvec::array::BitArray;
 use bitvec::order::Lsb0;
 use bytes::{Buf, BufMut};
+use core::borrow::{Borrow, BorrowMut};
 use core::fmt;
+use core::marker::PhantomData;
 use core::mem;
 use core::ops::ControlFlow;
 use core::ops::{Deref, DerefMut};
@@ -56,17 +61,31 @@ pub struct AddressBody<A: Allocator = Global> {
     latitude: SingularField<ProtoDouble, Explicit<{ BIT_LATITUDE }>, { FIELD_LATITUDE }, A>, // proto: double latitude = 4;
 }
 
-/// Owned `Address` (own [`MessageCommon`] + [`AddressBody`]).
-pub struct Address<A: Allocator = Global> {
-    _common: MessageCommon<BitArray<[u8; 1], Lsb0>, A>,
-    body: AddressBody<A>,
+/// Owned common for a standalone [`Address`].
+pub type AddressOwnedCommon<A = Global> = MessageCommon<BitArray<[u8; 1], Lsb0>, A>;
+
+/// Common + body binding. One accessor `impl` for owned, shared view, and mut.
+///
+/// - Owned inner: `C = AddressOwnedCommon<A>`, `B = AddressBody<A>`
+/// - [`AddressView`]: `C = Window`, `B = &AddressBody`
+/// - [`AddressMut`]: `C = WindowMut`, `B = &mut AddressBody`
+pub struct AddressBound<A: Allocator, C, B> {
+    common: C,
+    body: B,
+    _alloc: PhantomData<A>,
 }
 
-/// Shared view: [`Window`] onto this message's common + `&AddressBody`.
-pub struct AddressView<'a, A: Allocator> {
-    window: Window<'a, A>,
-    body: &'a AddressBody<A>,
+/// Owned message (`Drop` / `Message` / deep `Clone`). Field accessors via
+/// [`Deref`] to [`AddressBound`].
+pub struct Address<A: Allocator = Global> {
+    inner: AddressBound<A, AddressOwnedCommon<A>, AddressBody<A>>,
 }
+
+/// Shared view: [`Window`] + `&AddressBody`.
+pub type AddressView<'a, A = Global> = AddressBound<A, Window<'a, A>, &'a AddressBody<A>>;
+
+/// Mutable view: [`WindowMut`] + `&mut AddressBody`.
+pub type AddressMut<'a, A = Global> = AddressBound<A, WindowMut<'a, A>, &'a mut AddressBody<A>>;
 
 impl<A: Allocator> Copy for AddressView<'_, A> {}
 
@@ -74,12 +93,6 @@ impl<A: Allocator> Clone for AddressView<'_, A> {
     fn clone(&self) -> Self {
         *self
     }
-}
-
-/// Mutable view: [`WindowMut`] + `&mut AddressBody`.
-pub struct AddressMut<'a, A: Allocator> {
-    window: WindowMut<'a, A>,
-    body: &'a mut AddressBody<A>,
 }
 
 /// Field getters (owned + views).
@@ -197,57 +210,144 @@ impl<A: Allocator> AddressBody<A> {
     }
 }
 
+impl<A, C, B> AddressBound<A, C, B>
+where
+    A: Allocator,
+    C: MessageBindingMut<A>,
+    B: Borrow<AddressBody<A>>,
+{
+    pub fn street(&self) -> Optional<&str, impl HasDefault<&str>> {
+        self.body.borrow().street.bind(&self.common).optional()
+    }
+
+    pub fn city(&self) -> Optional<&str, impl HasDefault<&str>> {
+        self.body.borrow().city.bind(&self.common).optional()
+    }
+
+    pub fn postal_code(&self) -> Optional<u32, impl HasDefault<u32>> {
+        self.body.borrow().postal_code.bind(&self.common).optional()
+    }
+
+    pub fn latitude(&self) -> Optional<f64, impl HasDefault<f64>> {
+        self.body.borrow().latitude.bind(&self.common).optional()
+    }
+}
+
+impl<A, C, B> AddressBound<A, C, B>
+where
+    A: Allocator + Clone,
+    C: InlinedMessageParent<A>,
+    B: BorrowMut<AddressBody<A>>,
+{
+    pub fn street_mut(&mut self) -> impl ::puroro::StringMut<A> + '_ {
+        self.body
+            .borrow_mut()
+            .street
+            .bind_mut(&mut self.common)
+            .value_mut()
+    }
+
+    pub fn clear_street(&mut self) {
+        self.body
+            .borrow_mut()
+            .street
+            .bind_mut(&mut self.common)
+            .clear();
+    }
+
+    pub fn city_mut(&mut self) -> impl ::puroro::StringMut<A> + '_ {
+        self.body
+            .borrow_mut()
+            .city
+            .bind_mut(&mut self.common)
+            .value_mut()
+    }
+
+    pub fn clear_city(&mut self) {
+        self.body
+            .borrow_mut()
+            .city
+            .bind_mut(&mut self.common)
+            .clear();
+    }
+
+    pub fn postal_code_mut(&mut self) -> impl DerefMut<Target = u32> + '_ {
+        self.body
+            .borrow_mut()
+            .postal_code
+            .bind_mut(&mut self.common)
+            .value_mut()
+    }
+
+    pub fn clear_postal_code(&mut self) {
+        self.body
+            .borrow_mut()
+            .postal_code
+            .bind_mut(&mut self.common)
+            .clear();
+    }
+
+    pub fn latitude_mut(&mut self) -> impl DerefMut<Target = f64> + '_ {
+        self.body
+            .borrow_mut()
+            .latitude
+            .bind_mut(&mut self.common)
+            .value_mut()
+    }
+
+    pub fn clear_latitude(&mut self) {
+        self.body
+            .borrow_mut()
+            .latitude
+            .bind_mut(&mut self.common)
+            .clear();
+    }
+
+    /// Copies field values from an owned [`Address`] into this binding.
+    pub fn copy_from(&mut self, src: &Address<A>) {
+        if src.street().is_set() {
+            self.street_mut().set(src.street().get());
+        } else {
+            self.clear_street();
+        }
+        if src.city().is_set() {
+            self.city_mut().set(src.city().get());
+        } else {
+            self.clear_city();
+        }
+        if src.postal_code().is_set() {
+            *self.postal_code_mut() = src.postal_code().get();
+        } else {
+            self.clear_postal_code();
+        }
+        if src.latitude().is_set() {
+            *self.latitude_mut() = src.latitude().get();
+        } else {
+            self.clear_latitude();
+        }
+    }
+
+    pub fn merge_from<Buf: DecodeBuf>(&mut self, buf: &mut Buf) -> Result<(), DecodeError> {
+        self.body.borrow_mut().merge_into(&mut self.common, buf, 0)
+    }
+}
+
 impl<A: Allocator> Address<A> {
-    pub fn street<'a>(&'a self) -> Optional<&'a str, impl HasDefault<&'a str>>
-    where
-        A: 'a,
-    {
-        self.body.street.bind(&self._common).optional()
-    }
-
-    pub fn city<'a>(&'a self) -> Optional<&'a str, impl HasDefault<&'a str>>
-    where
-        A: 'a,
-    {
-        self.body.city.bind(&self._common).optional()
-    }
-
-    pub fn postal_code<'a>(&'a self) -> Optional<u32, impl HasDefault<u32>>
-    where
-        A: 'a,
-    {
-        self.body.postal_code.bind(&self._common).optional()
-    }
-
-    pub fn latitude<'a>(&'a self) -> Optional<f64, impl HasDefault<f64>>
-    where
-        A: 'a,
-    {
-        self.body.latitude.bind(&self._common).optional()
-    }
-
     /// Window onto this owned message's common (`bit_base = 0`).
     pub fn as_view(&self) -> AddressView<'_, A> {
-        AddressView {
-            window: Window::for_owned(&self._common),
-            body: &self.body,
-        }
+        ::puroro_rt::NestedMessage::as_view(self)
     }
 
     /// Mutable window onto this owned message's common (`bit_base = 0`).
     pub fn as_mut(&mut self) -> AddressMut<'_, A> {
-        let Address { _common, body } = self;
-        AddressMut {
-            window: WindowMut::for_owned(_common),
-            body,
-        }
+        ::puroro_rt::NestedMessage::as_mut(self)
     }
 
     fn visit_fields<V: FieldVisitor<MessageCommon<BitArray<[u8; 1], Lsb0>, A>>>(
         &self,
         v: &mut V,
     ) -> ControlFlow<V::Break> {
-        self.body.visit_fields(v)
+        self.inner.body.visit_fields(v)
     }
 
     fn visit_field_pairs<V: FieldPairVisitor<MessageCommon<BitArray<[u8; 1], Lsb0>, A>>>(
@@ -255,7 +355,7 @@ impl<A: Allocator> Address<A> {
         other: &Self,
         v: &mut V,
     ) -> ControlFlow<V::Break> {
-        self.body.visit_field_pairs(&other.body, v)
+        self.inner.body.visit_field_pairs(&other.inner.body, v)
     }
 
     fn visit_field_pairs_mut<V: FieldPairVisitorMut<MessageCommon<BitArray<[u8; 1], Lsb0>, A>>>(
@@ -266,63 +366,33 @@ impl<A: Allocator> Address<A> {
     where
         A: Clone,
     {
-        self.body.visit_field_pairs_mut(&mut dst.body, v)
+        self.inner
+            .body
+            .visit_field_pairs_mut(&mut dst.inner.body, v)
     }
 
     fn visit_fields_mut<V: FieldVisitorMut<MessageCommon<BitArray<[u8; 1], Lsb0>, A>>>(
         &mut self,
         v: &mut V,
     ) -> ControlFlow<V::Break> {
-        self.body.visit_fields_mut(v)
+        self.inner.body.visit_fields_mut(v)
     }
 }
 
 impl<A: Allocator + Clone> Address<A> {
     pub fn new_in(alloc: A) -> Self {
         Self {
-            _common: MessageCommon::new_in(BitArray::ZERO, alloc.clone()),
-            body: AddressBody {
-                street: SingularField::new_in(alloc.clone()),
-                city: SingularField::new_in(alloc.clone()),
-                postal_code: SingularField::new_in(alloc.clone()),
-                latitude: SingularField::new_in(alloc),
+            inner: AddressBound {
+                common: MessageCommon::new_in(BitArray::ZERO, alloc.clone()),
+                body: AddressBody {
+                    street: SingularField::new_in(alloc.clone()),
+                    city: SingularField::new_in(alloc.clone()),
+                    postal_code: SingularField::new_in(alloc.clone()),
+                    latitude: SingularField::new_in(alloc),
+                },
+                _alloc: PhantomData,
             },
         }
-    }
-
-    pub fn street_mut(&mut self) -> impl ::puroro::StringMut<A> + '_ {
-        self.body.street.bind_mut(&mut self._common).value_mut()
-    }
-
-    pub fn clear_street(&mut self) {
-        self.body.street.bind_mut(&mut self._common).clear();
-    }
-
-    pub fn city_mut(&mut self) -> impl ::puroro::StringMut<A> + '_ {
-        self.body.city.bind_mut(&mut self._common).value_mut()
-    }
-
-    pub fn clear_city(&mut self) {
-        self.body.city.bind_mut(&mut self._common).clear();
-    }
-
-    pub fn postal_code_mut(&mut self) -> impl DerefMut<Target = u32> + '_ {
-        self.body
-            .postal_code
-            .bind_mut(&mut self._common)
-            .value_mut()
-    }
-
-    pub fn clear_postal_code(&mut self) {
-        self.body.postal_code.bind_mut(&mut self._common).clear();
-    }
-
-    pub fn latitude_mut(&mut self) -> impl DerefMut<Target = f64> + '_ {
-        self.body.latitude.bind_mut(&mut self._common).value_mut()
-    }
-
-    pub fn clear_latitude(&mut self) {
-        self.body.latitude.bind_mut(&mut self._common).clear();
     }
 }
 
@@ -341,9 +411,9 @@ impl<A: Allocator + Clone + Default> Default for Address<A> {
 impl<A: Allocator + Clone> CloneIn<A> for Address<A> {
     fn clone_in(&self, alloc: A) -> Self {
         let mut dst = Self::new_in(alloc.clone());
-        let mut v = CloneFieldsVisitor::new(&self._common, &dst._common);
+        let mut v = CloneFieldsVisitor::new(&self.inner.common, &dst.inner.common);
         let _ = self.visit_field_pairs_mut(&mut dst, &mut v);
-        let mut old = mem::replace(&mut dst._common, self._common.clone_in(alloc));
+        let mut old = mem::replace(&mut dst.inner.common, self.inner.common.clone_in(alloc));
         old.deallocate();
         dst
     }
@@ -352,7 +422,7 @@ impl<A: Allocator + Clone> CloneIn<A> for Address<A> {
 impl<A: Allocator + Clone> Clone for Address<A> {
     #[inline]
     fn clone(&self) -> Self {
-        self.clone_in(self._common.alloc.clone())
+        self.clone_in(self.inner.common.alloc.clone())
     }
 }
 
@@ -361,16 +431,16 @@ impl<A: Allocator> PartialEq for Address<A> {
         matches!(
             self.visit_field_pairs(
                 other,
-                &mut FieldEqVisitor::new(&self._common, &other._common)
+                &mut FieldEqVisitor::new(&self.inner.common, &other.inner.common)
             ),
             ControlFlow::Continue(())
-        ) && self._common.unknown_fields_eq(&other._common)
+        ) && self.inner.common.unknown_fields_eq(&other.inner.common)
     }
 }
 
 impl<A: Allocator> fmt::Debug for Address<A> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let mut v = DebugStructVisitor::new(f.debug_struct("Address"), &self._common);
+        let mut v = DebugStructVisitor::new(f.debug_struct("Address"), &self.inner.common);
         let _ = self.visit_fields(&mut v);
         v.finish()
     }
@@ -378,9 +448,23 @@ impl<A: Allocator> fmt::Debug for Address<A> {
 
 impl<A: Allocator> Drop for Address<A> {
     fn drop(&mut self) {
-        let mut v = FieldDeallocVisitor::new(&self._common);
-        let _ = self.visit_fields_mut(&mut v);
-        self._common.deallocate();
+        let mut v = FieldDeallocVisitor::new(&self.inner.common);
+        let _ = self.inner.body.visit_fields_mut(&mut v);
+        self.inner.common.deallocate();
+    }
+}
+
+impl<A: Allocator> Deref for Address<A> {
+    type Target = AddressBound<A, AddressOwnedCommon<A>, AddressBody<A>>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.inner
+    }
+}
+
+impl<A: Allocator> DerefMut for Address<A> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.inner
     }
 }
 
@@ -395,14 +479,14 @@ impl<A: Allocator> ::puroro_rt::DeallocateIn<A> for Address<A> {
 
 impl<A: Allocator> MessageEncode for Address<A> {
     fn encoded_len(&self, ctx: &mut EncodeCtx) -> usize {
-        let mut v = EncodedLenVisitor::new(&self._common, ctx);
+        let mut v = EncodedLenVisitor::new(&self.inner.common, ctx);
         let _ = self.visit_fields(&mut v);
-        v.len + self._common.unknown_fields.len()
+        v.len + self.inner.common.unknown_fields.len()
     }
 
     fn encode_raw<B: BufMut>(&self, ctx: &mut EncodeCtx, buf: &mut B) {
-        let _ = self.visit_fields(&mut EncodeRawVisitor::new(&self._common, ctx, buf));
-        let unknown: &[u8] = &self._common.unknown_fields;
+        let _ = self.visit_fields(&mut EncodeRawVisitor::new(&self.inner.common, ctx, buf));
+        let unknown: &[u8] = &self.inner.common.unknown_fields;
         buf.put_slice(unknown);
     }
 }
@@ -413,7 +497,9 @@ impl<A: Allocator + Clone> MessageMerge for Address<A> {
         buf: &mut B,
         depth: usize,
     ) -> Result<(), DecodeError> {
-        self.body.merge_into(&mut self._common, buf, depth)
+        self.inner
+            .body
+            .merge_into(&mut self.inner.common, buf, depth)
     }
 }
 
@@ -481,7 +567,7 @@ impl<A: Allocator> Message for Address<A> {
     }
 
     fn unknown_fields(&self) -> impl Iterator<Item = ::puroro::UnknownField<'_>> + '_ {
-        self._common.iter_unknown_fields()
+        self.inner.common.iter_unknown_fields()
     }
 
     fn validate(&self) -> Result<(), DecodeError> {
@@ -489,66 +575,73 @@ impl<A: Allocator> Message for Address<A> {
     }
 }
 
-impl<A: Allocator> AddressMessage for Address<A> {
+impl<A, C, B> AddressMessage for AddressBound<A, C, B>
+where
+    A: Allocator,
+    C: MessageBindingMut<A>,
+    B: Borrow<AddressBody<A>>,
+{
     fn street(&self) -> Optional<&str, impl HasDefault<&str>> {
-        Address::street(self)
+        AddressBound::street(self)
     }
     fn city(&self) -> Optional<&str, impl HasDefault<&str>> {
-        Address::city(self)
+        AddressBound::city(self)
     }
     fn postal_code(&self) -> Optional<u32, impl HasDefault<u32>> {
-        Address::postal_code(self)
+        AddressBound::postal_code(self)
     }
     fn latitude(&self) -> Optional<f64, impl HasDefault<f64>> {
-        Address::latitude(self)
+        AddressBound::latitude(self)
+    }
+}
+
+impl<A: Allocator> AddressMessage for Address<A> {
+    fn street(&self) -> Optional<&str, impl HasDefault<&str>> {
+        AddressBound::street(&self.inner)
+    }
+    fn city(&self) -> Optional<&str, impl HasDefault<&str>> {
+        AddressBound::city(&self.inner)
+    }
+    fn postal_code(&self) -> Optional<u32, impl HasDefault<u32>> {
+        AddressBound::postal_code(&self.inner)
+    }
+    fn latitude(&self) -> Optional<f64, impl HasDefault<f64>> {
+        AddressBound::latitude(&self.inner)
+    }
+}
+
+impl<A, C, B> AddressMessageMut<A> for AddressBound<A, C, B>
+where
+    A: Allocator + Clone,
+    C: InlinedMessageParent<A>,
+    B: BorrowMut<AddressBody<A>>,
+{
+    fn street_mut(&mut self) -> impl ::puroro::StringMut<A> + '_ {
+        AddressBound::street_mut(self)
+    }
+    fn city_mut(&mut self) -> impl ::puroro::StringMut<A> + '_ {
+        AddressBound::city_mut(self)
+    }
+    fn postal_code_mut(&mut self) -> impl DerefMut<Target = u32> + '_ {
+        AddressBound::postal_code_mut(self)
+    }
+    fn latitude_mut(&mut self) -> impl DerefMut<Target = f64> + '_ {
+        AddressBound::latitude_mut(self)
     }
 }
 
 impl<A: Allocator + Clone> AddressMessageMut<A> for Address<A> {
     fn street_mut(&mut self) -> impl ::puroro::StringMut<A> + '_ {
-        Address::street_mut(self)
+        AddressBound::street_mut(&mut self.inner)
     }
     fn city_mut(&mut self) -> impl ::puroro::StringMut<A> + '_ {
-        Address::city_mut(self)
+        AddressBound::city_mut(&mut self.inner)
     }
     fn postal_code_mut(&mut self) -> impl DerefMut<Target = u32> + '_ {
-        Address::postal_code_mut(self)
+        AddressBound::postal_code_mut(&mut self.inner)
     }
     fn latitude_mut(&mut self) -> impl DerefMut<Target = f64> + '_ {
-        Address::latitude_mut(self)
-    }
-}
-
-impl<A: Allocator> AddressView<'_, A> {
-    pub fn street(&self) -> Optional<&str, impl HasDefault<&str>> {
-        self.body.street.bind(&self.window).optional()
-    }
-
-    pub fn city(&self) -> Optional<&str, impl HasDefault<&str>> {
-        self.body.city.bind(&self.window).optional()
-    }
-
-    pub fn postal_code(&self) -> Optional<u32, impl HasDefault<u32>> {
-        self.body.postal_code.bind(&self.window).optional()
-    }
-
-    pub fn latitude(&self) -> Optional<f64, impl HasDefault<f64>> {
-        self.body.latitude.bind(&self.window).optional()
-    }
-}
-
-impl<A: Allocator> AddressMessage for AddressView<'_, A> {
-    fn street(&self) -> Optional<&str, impl HasDefault<&str>> {
-        AddressView::street(self)
-    }
-    fn city(&self) -> Optional<&str, impl HasDefault<&str>> {
-        AddressView::city(self)
-    }
-    fn postal_code(&self) -> Optional<u32, impl HasDefault<u32>> {
-        AddressView::postal_code(self)
-    }
-    fn latitude(&self) -> Optional<f64, impl HasDefault<f64>> {
-        AddressView::latitude(self)
+        AddressBound::latitude_mut(&mut self.inner)
     }
 }
 
@@ -563,117 +656,9 @@ impl<A: Allocator> PartialEq for AddressView<'_, A> {
 
 impl<A: Allocator> fmt::Debug for AddressView<'_, A> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let mut v = DebugStructVisitor::new(f.debug_struct("Address"), &self.window);
+        let mut v = DebugStructVisitor::new(f.debug_struct("Address"), &self.common);
         let _ = self.body.visit_fields(&mut v);
         v.finish()
-    }
-}
-
-impl<A: Allocator + Clone> AddressMut<'_, A> {
-    pub fn street(&self) -> Optional<&str, impl HasDefault<&str>> {
-        self.body.street.bind(&self.window).optional()
-    }
-
-    pub fn city(&self) -> Optional<&str, impl HasDefault<&str>> {
-        self.body.city.bind(&self.window).optional()
-    }
-
-    pub fn postal_code(&self) -> Optional<u32, impl HasDefault<u32>> {
-        self.body.postal_code.bind(&self.window).optional()
-    }
-
-    pub fn latitude(&self) -> Optional<f64, impl HasDefault<f64>> {
-        self.body.latitude.bind(&self.window).optional()
-    }
-
-    pub fn street_mut(&mut self) -> impl ::puroro::StringMut<A> + '_ {
-        self.body.street.bind_mut(&mut self.window).value_mut()
-    }
-
-    pub fn clear_street(&mut self) {
-        self.body.street.bind_mut(&mut self.window).clear();
-    }
-
-    pub fn city_mut(&mut self) -> impl ::puroro::StringMut<A> + '_ {
-        self.body.city.bind_mut(&mut self.window).value_mut()
-    }
-
-    pub fn clear_city(&mut self) {
-        self.body.city.bind_mut(&mut self.window).clear();
-    }
-
-    pub fn postal_code_mut(&mut self) -> impl DerefMut<Target = u32> + '_ {
-        self.body.postal_code.bind_mut(&mut self.window).value_mut()
-    }
-
-    pub fn clear_postal_code(&mut self) {
-        self.body.postal_code.bind_mut(&mut self.window).clear();
-    }
-
-    pub fn latitude_mut(&mut self) -> impl DerefMut<Target = f64> + '_ {
-        self.body.latitude.bind_mut(&mut self.window).value_mut()
-    }
-
-    pub fn clear_latitude(&mut self) {
-        self.body.latitude.bind_mut(&mut self.window).clear();
-    }
-
-    /// Copies field values from an owned [`Address`] into this view.
-    pub fn copy_from(&mut self, src: &Address<A>) {
-        if src.street().is_set() {
-            self.street_mut().set(src.street().get());
-        } else {
-            self.clear_street();
-        }
-        if src.city().is_set() {
-            self.city_mut().set(src.city().get());
-        } else {
-            self.clear_city();
-        }
-        if src.postal_code().is_set() {
-            *self.postal_code_mut() = src.postal_code().get();
-        } else {
-            self.clear_postal_code();
-        }
-        if src.latitude().is_set() {
-            *self.latitude_mut() = src.latitude().get();
-        } else {
-            self.clear_latitude();
-        }
-    }
-
-    pub fn merge_from<B: DecodeBuf>(&mut self, buf: &mut B) -> Result<(), DecodeError> {
-        self.body.merge_into(&mut self.window, buf, 0)
-    }
-}
-
-impl<A: Allocator + Clone> AddressMessage for AddressMut<'_, A> {
-    fn street(&self) -> Optional<&str, impl HasDefault<&str>> {
-        AddressMut::street(self)
-    }
-    fn city(&self) -> Optional<&str, impl HasDefault<&str>> {
-        AddressMut::city(self)
-    }
-    fn postal_code(&self) -> Optional<u32, impl HasDefault<u32>> {
-        AddressMut::postal_code(self)
-    }
-    fn latitude(&self) -> Optional<f64, impl HasDefault<f64>> {
-        AddressMut::latitude(self)
-    }
-}
-
-impl<A: Allocator + Clone> AddressMessageMut<A> for AddressMut<'_, A> {
-    fn street_mut(&mut self) -> impl ::puroro::StringMut<A> + '_ {
-        AddressMut::street_mut(self)
-    }
-    fn city_mut(&mut self) -> impl ::puroro::StringMut<A> + '_ {
-        AddressMut::city_mut(self)
-    }
-    fn postal_code_mut(&mut self) -> impl DerefMut<Target = u32> + '_ {
-        AddressMut::postal_code_mut(self)
-    }
-    fn latitude_mut(&mut self) -> impl DerefMut<Target = f64> + '_ {
-        AddressMut::latitude_mut(self)
     }
 }
 
@@ -699,38 +684,59 @@ impl<A: Allocator> NestedMessage for Address<A> {
         A: 'a;
 
     fn as_view(&self) -> AddressView<'_, A> {
-        Address::as_view(self)
+        AddressBound {
+            common: Window::for_owned(&self.inner.common),
+            body: &self.inner.body,
+            _alloc: PhantomData,
+        }
     }
 
     fn as_mut(&mut self) -> AddressMut<'_, A> {
-        Address::as_mut(self)
+        let AddressBound {
+            common,
+            body,
+            _alloc,
+        } = &mut self.inner;
+        AddressBound {
+            common: WindowMut::for_owned(common),
+            body,
+            _alloc: PhantomData,
+        }
     }
 
     fn bind_view<'a>(body: &'a AddressBody<A>, window: Window<'a, A>) -> AddressView<'a, A>
     where
         Self: 'a,
     {
-        AddressView { window, body }
+        AddressBound {
+            common: window,
+            body,
+            _alloc: PhantomData,
+        }
     }
 
     fn bind_mut<'a>(body: &'a mut AddressBody<A>, window: WindowMut<'a, A>) -> AddressMut<'a, A>
     where
         Self: 'a,
     {
-        AddressMut { window, body }
+        AddressBound {
+            common: window,
+            body,
+            _alloc: PhantomData,
+        }
     }
 
     fn view_len(view: AddressView<'_, A>, ctx: &mut EncodeCtx) -> usize {
-        let mut v = EncodedLenVisitor::new(&view.window, ctx);
+        let mut v = EncodedLenVisitor::new(&view.common, ctx);
         let _ = view.body.visit_fields(&mut v);
-        v.len + view.window.unknown_fields().len()
+        v.len + view.common.unknown_fields().len()
     }
 
     fn encode_view<B: BufMut>(view: AddressView<'_, A>, ctx: &mut EncodeCtx, buf: &mut B) {
         let _ = view
             .body
-            .visit_fields(&mut EncodeRawVisitor::new(&view.window, ctx, buf));
-        buf.put_slice(view.window.unknown_fields().self_blob());
+            .visit_fields(&mut EncodeRawVisitor::new(&view.common, ctx, buf));
+        buf.put_slice(view.common.unknown_fields().self_blob());
     }
 
     fn merge_inline<Ax, Buf>(

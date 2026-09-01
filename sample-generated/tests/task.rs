@@ -13,7 +13,9 @@ use ::puroro_rt::INLINE_CAP;
 use ::puroro_rt::Varint;
 use ::puroro_rt::encode::{encode_varint_field, field_number_const};
 use ::puroro_sample_generated::task::{Notification, NotificationCase};
-use ::puroro_sample_generated::{Address, Point, Priority, Status, Task};
+use ::puroro_sample_generated::{
+    Address, AddressMessage, Point, PointMessage, Priority, Status, Task,
+};
 
 /// Appends `v` as a base-128 varint (test helper; mirrors wire encoding).
 fn encode_u64_varint(mut v: u64, buf: &mut Vec<u8>) {
@@ -868,6 +870,39 @@ fn inlined_origin_unknown_stays_inside_child_len() {
     let cleared = task.encode_to_vec();
     assert!(find_len_field(&cleared, 22).is_none());
     assert!(!top_level_has_varint_field(&cleared, 99));
+}
+
+fn x_of(p: &impl PointMessage) -> i32 {
+    p.x()
+}
+
+fn street_of(a: &impl AddressMessage) -> &str {
+    a.street().get()
+}
+
+#[test]
+fn point_bound_one_impl_covers_owned_and_inlined_view() {
+    let mut owned = Point::new();
+    *owned.x_mut() = 3;
+    assert_eq!(x_of(&owned), 3);
+
+    let mut task = Task::new();
+    *task.origin_mut().x_mut() = 4;
+    assert_eq!(x_of(&task.origin().unwrap()), 4);
+}
+
+#[test]
+fn address_bound_one_impl_covers_owned_boxed_and_inlined_view() {
+    let mut owned = Address::new();
+    owned.street_mut().set("A");
+    assert_eq!(street_of(&owned), "A");
+
+    let mut task = Task::new();
+    task.assignee_mut().street_mut().set("B");
+    assert_eq!(street_of(&task.assignee().unwrap()), "B");
+
+    task.postal_mut().street_mut().set("C");
+    assert_eq!(street_of(&task.postal().unwrap()), "C");
 }
 
 /// Decodes a base-128 varint at `bytes[i..]`. Returns `(value, bytes_consumed)`.
