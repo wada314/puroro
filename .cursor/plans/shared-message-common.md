@@ -243,3 +243,10 @@ Runtime proof of the dual catalog, hand-written `Point` / `Task.origin` only.
 - [`SharedMessage<M, FIELD>`](../../puroro-rt/src/fields/wire/shared_message.rs): inline slot = `M::Body`, boxed slot = `UnmanagedBox<M>`, `View`/`Mut` always window + body.
 - `Task.origin` and `Task.assignee` use the same marker. `ProtoMessage` remains for fixtures / `watchers` / `postal`.
 - Mut-view `merge_from`, `FieldDeallocate` on `MessageBindingMut`, [`Window::nest`](../../puroro-rt/src/fields/shared/window.rs).
+- Sample `School → Student → Point`: Student has local bits (`year`) + inlined `Point`; School inlines Student at `BIT_STUDENT_BASE`. Tests: two-hop round-trip, year bit does not collide with School `name`, location unknowns stay inside nested LEN.
+
+---
+
+## Task 5: two-hop inline (`School → Student → Point`)
+
+**Done.** See Task 4 notes.

@@ -29,7 +29,8 @@ use crate::encode::field_number_const;
 use crate::fields::shared::FieldDeallocate;
 use crate::fields::shared::field_inspect::{FieldCloneIn, FieldDebug, FieldEncode, FieldPartialEq};
 use crate::fields::shared::{
-    DefaultIn, InlinedMessageParent, MessageBindingMut, MessageCommon, MessageCommonAlloc,
+    CloneBound, DeallocateBound, DefaultIn, InlinedMessageParent, MessageBindingMut, MessageCommon,
+    MessageCommonAlloc, Window,
     field_presence::{
         Explicit, FieldPresence, Implicit, LegacyRequired, Message, Oneof, RequiredFieldPresence,
     },
@@ -178,7 +179,7 @@ macro_rules! impl_singular_deallocate_always {
             A: Allocator,
             L: ValueLayout<T, A>,
             Cx: MessageBindingMut<A>,
-            L::Slot: AddressableSlot,
+            L::Slot: AddressableSlot + DeallocateBound<A, Cx>,
             <$presence as FieldPresence>::ValueSlot<L::Slot>: ValueSlot<L::Slot, A>,
         {
             #[inline]
@@ -204,7 +205,7 @@ macro_rules! impl_singular_deallocate_bit {
             A: Allocator,
             L: ValueLayout<T, A>,
             Cx: MessageBindingMut<A>,
-            L::Slot: AddressableSlot,
+            L::Slot: AddressableSlot + DeallocateBound<A, Cx>,
             <$presence as FieldPresence>::ValueSlot<L::Slot>: ValueSlot<L::Slot, A>,
         {
             #[inline]
@@ -535,7 +536,7 @@ where
     where
         A: Clone,
         L: ValueLayoutMerge<T, A>,
-        L::Slot: DefaultIn<A>,
+        L::Slot: DefaultIn<A> + DeallocateBound<A, Cx>,
     {
         L::merge(
             &mut *self.field.value,
@@ -552,7 +553,7 @@ where
     pub fn clear(self)
     where
         A: Clone,
-        L::Slot: DefaultIn<A>,
+        L::Slot: DefaultIn<A> + DeallocateBound<A, Cx>,
     {
         L::clear(&mut *self.field.value, P::slot_init_mut(), self.common);
     }
@@ -638,7 +639,8 @@ where
     A: Allocator + Clone,
     L: ValueLayoutClone<T, A>,
     Cx: MessageBindingMut<A> + MessageCommonAlloc<Alloc = A>,
-    L::Slot: AddressableSlot,
+    L::Slot: AddressableSlot + CloneBound<A, Cx>,
+    for<'w> L::Slot: CloneBound<A, Window<'w, A>>,
     P::ValueSlot<L::Slot>: ValueSlot<L::Slot, A>,
 {
     fn clone_field(&self, common: &Cx, alloc: A) -> Self {

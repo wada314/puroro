@@ -18,7 +18,7 @@ use ::puroro::{DecodeBuf, DecodeError, WireType};
 use ::unmanaged::{CloneIn, DeallocateIn, UnmanagedBox, UnmanagedString, UnmanagedVec};
 
 use super::{
-    DefaultIn, InlinedMessageParent, MessageBindingMut,
+    CloneBound, DeallocateBound, DefaultIn, InlinedMessageParent, MessageBindingMut, Window,
     slot_init::SlotInitMut,
     value_slot::{AddressableSlot, ValueSlot, ValueSlotMutAccess},
 };
@@ -86,7 +86,7 @@ pub trait ValueLayout<T: SingularType, A: Allocator>: Copy {
         I: SlotInitMut,
         Cx: InlinedMessageParent<A>,
         A: Clone,
-        Self::Slot: DefaultIn<A>;
+        Self::Slot: DefaultIn<A> + DeallocateBound<A, Cx>;
 
     /// Message / oneof teardown for this field's value slot.
     ///
@@ -97,7 +97,8 @@ pub trait ValueLayout<T: SingularType, A: Allocator>: Copy {
     fn deallocate_slot<VS, Cx>(slot: VS, initialized: bool, common: &Cx)
     where
         VS: ValueSlot<Self::Slot, A>,
-        Cx: MessageBindingMut<A>;
+        Cx: MessageBindingMut<A>,
+        Self::Slot: DeallocateBound<A, Cx>;
 }
 
 /// Wire-decode merge for a layout. Kept off [`ValueLayout`] so nested-message
@@ -118,7 +119,7 @@ pub trait ValueLayoutMerge<T: SingularType, A: Allocator>: ValueLayout<T, A> {
         Cx: InlinedMessageParent<A>,
         B: DecodeBuf,
         A: Clone,
-        Self::Slot: DefaultIn<A>;
+        Self::Slot: DefaultIn<A> + DeallocateBound<A, Cx>;
 }
 
 /// Slot deep-copy for layouts whose payload can be cloned.
@@ -135,7 +136,9 @@ pub trait ValueLayoutClone<T: SingularType, A: Allocator + Clone>: ValueLayout<T
     fn clone_slot<VS, Cx>(slot: &VS, initialized: bool, common: &Cx, alloc: A) -> VS
     where
         VS: ValueSlot<Self::Slot, A>,
-        Cx: MessageBindingMut<A>;
+        Cx: MessageBindingMut<A>,
+        Self::Slot: CloneBound<A, Cx>,
+        for<'w> Self::Slot: CloneBound<A, Window<'w, A>>;
 }
 
 /// Value lives in the field slot payload ([`PayloadAccess::Slot`]).
@@ -156,7 +159,7 @@ pub struct Boxed;
 
 impl<T: PayloadAccess, A: Allocator> ValueLayout<T, A> for Inline
 where
-    T::Slot<A>: AddressableSlot + DeallocateIn<A>,
+    T::Slot<A>: AddressableSlot,
 {
     type Slot = T::Slot<A>;
     type Mut<'a>
@@ -201,7 +204,7 @@ where
         I: SlotInitMut,
         Cx: InlinedMessageParent<A>,
         A: Clone,
-        T::Slot<A>: DefaultIn<A>,
+        T::Slot<A>: DefaultIn<A> + DeallocateBound<A, Cx>,
     {
         T::clear(slot, init, common);
     }
@@ -211,35 +214,36 @@ where
     where
         VS: ValueSlot<T::Slot<A>, A>,
         Cx: MessageBindingMut<A>,
+        T::Slot<A>: DeallocateBound<A, Cx>,
     {
         if let Some(v) = slot.take_value(initialized) {
-            // SAFETY: `deallocate_slot` contract — `common` is this field's parent.
-            unsafe { DeallocateIn::deallocate_in(v, common.alloc()) };
+            T::deallocate_payload(v, common);
         }
     }
 }
 
 impl<T: PayloadAccess, A: Allocator + Clone> ValueLayoutClone<T, A> for Inline
 where
-    T::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateIn<A> + CloneIn<A>,
+    T::Slot<A>: AddressableSlot + DefaultIn<A>,
 {
     #[inline]
     fn clone_slot<VS, Cx>(slot: &VS, initialized: bool, common: &Cx, alloc: A) -> VS
     where
         VS: ValueSlot<T::Slot<A>, A>,
         Cx: MessageBindingMut<A>,
+        T::Slot<A>: CloneBound<A, Cx>,
+        for<'w> T::Slot<A>: CloneBound<A, Window<'w, A>>,
     {
-        let _ = common;
         VS::from_optional(
             slot.get_value(initialized)
-                .map(|v| CloneIn::clone_in(v, alloc)),
+                .map(|v| T::clone_payload(v, common, alloc)),
         )
     }
 }
 
 impl<T: PayloadMerge, A: Allocator> ValueLayoutMerge<T, A> for Inline
 where
-    T::Slot<A>: AddressableSlot + DeallocateIn<A>,
+    T::Slot<A>: AddressableSlot,
 {
     #[inline]
     fn merge<VS, I, Cx, B>(
@@ -257,7 +261,7 @@ where
         Cx: InlinedMessageParent<A>,
         B: DecodeBuf,
         A: Clone,
-        T::Slot<A>: DefaultIn<A>,
+        T::Slot<A>: DefaultIn<A> + DeallocateBound<A, Cx>,
     {
         T::merge(slot, init, common, wire_type, buf, field, depth)
     }
@@ -310,7 +314,7 @@ where
         I: SlotInitMut,
         Cx: InlinedMessageParent<A>,
         A: Clone,
-        UnmanagedBox<M, A>: DefaultIn<A>,
+        UnmanagedBox<M, A>: DefaultIn<A> + DeallocateBound<A, Cx>,
     {
         let alloc = common.clone_alloc();
         if let Some(old) = ValueSlot::with_mut(slot, init, common).take_clear() {
@@ -324,6 +328,7 @@ where
     where
         VS: ValueSlot<UnmanagedBox<M, A>, A>,
         Cx: MessageBindingMut<A>,
+        UnmanagedBox<M, A>: DeallocateBound<A, Cx>,
     {
         if let Some(v) = slot.take_value(initialized) {
             // SAFETY: `deallocate_slot` contract — `common` is this field's parent.
@@ -352,7 +357,7 @@ where
         Cx: InlinedMessageParent<A>,
         B: DecodeBuf,
         A: Clone,
-        UnmanagedBox<M, A>: DefaultIn<A>,
+        UnmanagedBox<M, A>: DefaultIn<A> + DeallocateBound<A, Cx>,
     {
         if wire_type != WireType::Len {
             return Err(DecodeError::InvalidTag);
@@ -373,6 +378,8 @@ where
     where
         VS: ValueSlot<UnmanagedBox<M, A>, A>,
         Cx: MessageBindingMut<A>,
+        UnmanagedBox<M, A>: CloneBound<A, Cx>,
+        for<'w> UnmanagedBox<M, A>: CloneBound<A, Window<'w, A>>,
     {
         VS::from_optional(
             slot.get_value(initialized)
@@ -432,7 +439,7 @@ where
         I: SlotInitMut,
         Cx: InlinedMessageParent<A>,
         A: Clone,
-        UnmanagedBox<M, A>: DefaultIn<A>,
+        UnmanagedBox<M, A>: DefaultIn<A> + DeallocateBound<A, Cx>,
     {
         let alloc = common.clone_alloc();
         if let Some(old) = ValueSlot::with_mut(slot, init, common).take_clear() {
@@ -446,6 +453,7 @@ where
     where
         VS: ValueSlot<UnmanagedBox<M, A>, A>,
         Cx: MessageBindingMut<A>,
+        UnmanagedBox<M, A>: DeallocateBound<A, Cx>,
     {
         if let Some(v) = slot.take_value(initialized) {
             // SAFETY: `deallocate_slot` contract — `common` is this field's parent.
@@ -476,7 +484,7 @@ where
         Cx: InlinedMessageParent<A>,
         B: DecodeBuf,
         A: Clone,
-        UnmanagedBox<M, A>: DefaultIn<A>,
+        UnmanagedBox<M, A>: DefaultIn<A> + DeallocateBound<A, Cx>,
     {
         if wire_type != WireType::Len {
             return Err(DecodeError::InvalidTag);
@@ -499,6 +507,8 @@ where
     where
         VS: ValueSlot<UnmanagedBox<M, A>, A>,
         Cx: MessageBindingMut<A>,
+        UnmanagedBox<M, A>: CloneBound<A, Cx>,
+        for<'w> UnmanagedBox<M, A>: CloneBound<A, Window<'w, A>>,
     {
         VS::from_optional(
             slot.get_value(initialized)
@@ -563,7 +573,7 @@ impl<A: Allocator, const VALUE_BIT: usize> ValueLayout<ProtoBool, A> for BitPack
         I: SlotInitMut,
         Cx: InlinedMessageParent<A>,
         A: Clone,
-        Self::Slot: DefaultIn<A>,
+        Self::Slot: DefaultIn<A> + DeallocateBound<A, Cx>,
     {
         common.set_bit(VALUE_BIT, false);
         let _ = ValueSlot::with_mut(slot, init, common).take_clear();
@@ -574,6 +584,7 @@ impl<A: Allocator, const VALUE_BIT: usize> ValueLayout<ProtoBool, A> for BitPack
     where
         VS: ValueSlot<(), A>,
         Cx: MessageBindingMut<A>,
+        (): DeallocateBound<A, Cx>,
     {
         let _ = slot.take_value(initialized);
     }
@@ -596,7 +607,7 @@ impl<A: Allocator, const VALUE_BIT: usize> ValueLayoutMerge<ProtoBool, A> for Bi
         Cx: InlinedMessageParent<A>,
         B: DecodeBuf,
         A: Clone,
-        Self::Slot: DefaultIn<A>,
+        Self::Slot: DefaultIn<A> + DeallocateBound<A, Cx>,
     {
         match BoolCodec::from_wire_body(VarintPayload::decode(wire_type, buf)?) {
             Ok(new) => {
@@ -622,6 +633,8 @@ impl<A: Allocator + Clone, const VALUE_BIT: usize> ValueLayoutClone<ProtoBool, A
     where
         VS: ValueSlot<(), A>,
         Cx: MessageBindingMut<A>,
+        (): CloneBound<A, Cx>,
+        for<'w> (): CloneBound<A, Window<'w, A>>,
     {
         VS::from_optional(slot.get_value(initialized).copied())
     }
@@ -714,7 +727,7 @@ impl<A: Allocator, const HEAP_BIT: usize> ValueLayout<ProtoString, A> for Inline
         I: SlotInitMut,
         Cx: InlinedMessageParent<A>,
         A: Clone,
-        Self::Slot: DefaultIn<A>,
+        Self::Slot: DefaultIn<A> + DeallocateBound<A, Cx>,
     {
         if !init.is_initialized(|b| common.is_bit_set(b)) {
             Self::set_heap(common, SSO_INLINE);
@@ -739,6 +752,7 @@ impl<A: Allocator, const HEAP_BIT: usize> ValueLayout<ProtoString, A> for Inline
     where
         VS: ValueSlot<SsoString<A>, A>,
         Cx: MessageBindingMut<A>,
+        SsoString<A>: DeallocateBound<A, Cx>,
     {
         let is_heap = Self::is_heap(common);
         if let Some(s) = slot.take_value(initialized) {
@@ -767,7 +781,7 @@ impl<A: Allocator, const HEAP_BIT: usize> ValueLayoutMerge<ProtoString, A>
         Cx: InlinedMessageParent<A>,
         B: DecodeBuf,
         A: Clone,
-        Self::Slot: DefaultIn<A>,
+        Self::Slot: DefaultIn<A> + DeallocateBound<A, Cx>,
     {
         if wire_type != WireType::Len {
             return Err(DecodeError::InvalidTag);
@@ -793,6 +807,8 @@ impl<A: Allocator + Clone, const HEAP_BIT: usize> ValueLayoutClone<ProtoString, 
     where
         VS: ValueSlot<SsoString<A>, A>,
         Cx: MessageBindingMut<A>,
+        SsoString<A>: CloneBound<A, Cx>,
+        for<'w> SsoString<A>: CloneBound<A, Window<'w, A>>,
     {
         let is_heap = Self::is_heap(common);
         VS::from_optional(
@@ -853,7 +869,7 @@ impl<A: Allocator, const HEAP_BIT: usize, C: BytesLikeLenCodec> ValueLayout<LenS
         I: SlotInitMut,
         Cx: InlinedMessageParent<A>,
         A: Clone,
-        Self::Slot: DefaultIn<A>,
+        Self::Slot: DefaultIn<A> + DeallocateBound<A, Cx>,
     {
         if !init.is_initialized(|b| common.is_bit_set(b)) {
             Self::set_heap(common, SSO_INLINE);
@@ -877,6 +893,7 @@ impl<A: Allocator, const HEAP_BIT: usize, C: BytesLikeLenCodec> ValueLayout<LenS
     where
         VS: ValueSlot<SsoBytes<A>, A>,
         Cx: MessageBindingMut<A>,
+        SsoBytes<A>: DeallocateBound<A, Cx>,
     {
         let is_heap = Self::is_heap(common);
         if let Some(s) = slot.take_value(initialized) {
@@ -905,7 +922,7 @@ impl<A: Allocator, const HEAP_BIT: usize, C: BytesLikeLenCodec> ValueLayoutMerge
         Cx: InlinedMessageParent<A>,
         B: DecodeBuf,
         A: Clone,
-        Self::Slot: DefaultIn<A>,
+        Self::Slot: DefaultIn<A> + DeallocateBound<A, Cx>,
     {
         if wire_type != WireType::Len {
             return Err(DecodeError::InvalidTag);
@@ -931,6 +948,8 @@ impl<A: Allocator + Clone, const HEAP_BIT: usize, C: BytesLikeLenCodec>
     where
         VS: ValueSlot<SsoBytes<A>, A>,
         Cx: MessageBindingMut<A>,
+        SsoBytes<A>: CloneBound<A, Cx>,
+        for<'w> SsoBytes<A>: CloneBound<A, Window<'w, A>>,
     {
         let is_heap = Self::is_heap(common);
         VS::from_optional(

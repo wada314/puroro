@@ -1,6 +1,7 @@
 //! Hand-written sample of code the puroro `protoc` plugin is expected to emit.
 //!
-//! Source schema: `DESIGN.md` reference `Task` / `Address` messages (edition 2024).
+//! Source schema: `DESIGN.md` reference `Task` / `Address` messages (edition 2024),
+//! plus a sample-only `School` → `Student` → `Point` chain for two-hop inline.
 //! This crate exists to compile-check the [`puroro`] user API and the
 //! [`puroro_rt`] field catalog against realistic generated accessors,
 //! encode/decode glue, and presence bit indices.
@@ -16,8 +17,9 @@
 //! `DESIGN.md` § "Path qualification".
 //!
 //! **Module layout.** Message structs are public at this crate root (`Address`,
-//! `Task`) — the parent of their snake_case companion modules (`address`,
-//! `task`) which hold `FIELD_*` / `BIT_*`, defaults, and oneofs. Production
+//! `Task`, `School`, `Student`, `Point`) — the parent of their snake_case
+//! companion modules (`address`, `task`, `school`, `student`, `point`) which
+//! hold `FIELD_*` / `BIT_*`, defaults, and oneofs. Production
 //! output follows the same rule under the protobuf `package` module. This sample
 //! stays flat (no `example::v1` prefix) for readability. The `*_type` files are
 //! a hand-written split so the crate root stays small; they are not a public
@@ -33,10 +35,14 @@
 pub mod address;
 pub mod enums;
 pub mod point;
+pub mod school;
+pub mod student;
 pub mod task;
 
 mod address_type;
 mod point_type;
+mod school_type;
+mod student_type;
 mod task_type;
 
 pub use address_type::{
@@ -44,4 +50,8 @@ pub use address_type::{
 };
 pub use enums::{Priority, Status};
 pub use point_type::{Point, PointBody, PointMessage, PointMessageMut, PointMut, PointView};
+pub use school_type::School;
+pub use student_type::{
+    Student, StudentBody, StudentMessage, StudentMessageMut, StudentMut, StudentView,
+};
 pub use task_type::Task;

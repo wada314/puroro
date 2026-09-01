@@ -3,7 +3,7 @@ use ::core::alloc::Layout;
 use ::core::mem;
 use ::core::ptr::NonNull;
 
-use ::puroro_sample_generated::{Point, PointBody, Task};
+use ::puroro_sample_generated::{Point, PointBody, School, Student, StudentBody, Task};
 
 // A deliberately fat (64-byte), non-ZST allocator that just forwards to Global.
 #[derive(Clone)]
@@ -41,5 +41,27 @@ fn allocator_is_stored_once() {
     assert!(
         mem::size_of::<PointBody<Padded>>() < mem::size_of::<Point<Padded>>(),
         "owned Point keeps MessageCommon; the inlined slot does not"
+    );
+}
+
+#[test]
+fn school_inlined_chain_stores_allocator_once() {
+    let global = mem::size_of::<School<Global>>();
+    let padded = mem::size_of::<School<Padded>>();
+    let delta = padded - global;
+    // School has no map; only MessageCommon should carry `A`.
+    assert_eq!(
+        delta,
+        mem::size_of::<Padded>(),
+        "School<Padded> grew by {delta} bytes; expected one allocator in MessageCommon"
+    );
+    assert_eq!(
+        mem::size_of::<StudentBody<Padded>>(),
+        mem::size_of::<StudentBody<Global>>(),
+        "StudentBody must not embed an allocator"
+    );
+    assert!(
+        mem::size_of::<StudentBody<Padded>>() < mem::size_of::<Student<Padded>>(),
+        "owned Student keeps MessageCommon; the inlined slot does not"
     );
 }

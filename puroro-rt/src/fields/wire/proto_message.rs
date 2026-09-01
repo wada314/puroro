@@ -18,16 +18,14 @@ use ::protobuf_core::FieldNumber;
 use ::puroro::{DecodeBuf, DecodeError, WireType};
 
 use crate::decode;
-use crate::message_encode::MessageEncode;
-use crate::message_merge::MessageMerge;
-use ::unmanaged::DeallocateIn;
-
 use crate::fields::shared::{
-    DefaultIn, InlinedMessageParent, MessageBindingMut,
+    CloneBound, DeallocateBound, DefaultIn, InlinedMessageParent, MessageBindingMut, Window,
     slot_init::SlotInitMut,
     value_slot::{AddressableSlot, ValueSlot, ValueSlotMutAccess},
 };
 use crate::fields::wire::singular_type::{PayloadAccess, PayloadMerge, SingularType};
+use crate::message_encode::MessageEncode;
+use crate::message_merge::MessageMerge;
 
 /// Type marker for a singular nested message `M`.
 ///
@@ -93,15 +91,13 @@ impl<M: MessageEncode> PayloadAccess for ProtoMessage<M> {
     fn write<A, VS, I, Cx>(slot: &mut VS, init: I, common: &mut Cx, value: M)
     where
         A: Allocator + Clone,
-        M: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
+        M: AddressableSlot + DefaultIn<A> + DeallocateBound<A, Cx>,
         VS: ValueSlot<M, A>,
         I: SlotInitMut,
         Cx: InlinedMessageParent<A>,
     {
-        let alloc = common.clone_alloc();
         if let Some(old) = ValueSlot::with_mut(slot, init, common).replace(value) {
-            // SAFETY: `write` contract — `common` is this field's parent.
-            unsafe { DeallocateIn::deallocate_in(old, &alloc) };
+            old.deallocate_bound(common);
         }
     }
 
@@ -109,16 +105,35 @@ impl<M: MessageEncode> PayloadAccess for ProtoMessage<M> {
     fn clear<A, VS, I, Cx>(slot: &mut VS, init: I, common: &mut Cx)
     where
         A: Allocator + Clone,
-        M: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
+        M: AddressableSlot + DefaultIn<A> + DeallocateBound<A, Cx>,
         VS: ValueSlot<M, A>,
         I: SlotInitMut,
         Cx: InlinedMessageParent<A>,
     {
-        let alloc = common.clone_alloc();
         if let Some(old) = ValueSlot::with_mut(slot, init, common).take_clear() {
-            // SAFETY: `clear` contract — `common` is this field's parent.
-            unsafe { DeallocateIn::deallocate_in(old, &alloc) };
+            old.deallocate_bound(common);
         }
+    }
+
+    #[inline]
+    fn deallocate_payload<A, Cx>(slot: M, common: &Cx)
+    where
+        A: Allocator,
+        Cx: MessageBindingMut<A>,
+        M: DeallocateBound<A, Cx>,
+    {
+        slot.deallocate_bound(common);
+    }
+
+    #[inline]
+    fn clone_payload<A, Cx>(slot: &M, common: &Cx, alloc: A) -> M
+    where
+        A: Allocator + Clone,
+        Cx: MessageBindingMut<A>,
+        M: CloneBound<A, Cx>,
+        for<'w> M: CloneBound<A, Window<'w, A>>,
+    {
+        slot.clone_bound(common, alloc)
     }
 }
 
@@ -134,7 +149,7 @@ impl<M: MessageEncode + MessageMerge> PayloadMerge for ProtoMessage<M> {
     ) -> Result<(), DecodeError>
     where
         A: Allocator + Clone,
-        Self::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
+        Self::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateBound<A, Cx>,
         VS: ValueSlot<Self::Slot<A>, A>,
         I: SlotInitMut,
         Cx: InlinedMessageParent<A>,

@@ -20,16 +20,17 @@ use core::ops::{Deref, DerefMut};
 use puroro::{DecodeBuf, DecodeError, HasDefault, Message, Optional, StringMut};
 use puroro_rt::decode::{decode_tag, skip_field_and_save};
 use puroro_rt::{
-    CloneFieldsVisitor, CloneIn, DebugStructVisitor, EncodeCtx, EncodeRawVisitor,
-    EncodedLenVisitor, Explicit, FieldDeallocVisitor, FieldEqVisitor, FieldPairVisitor,
-    FieldPairVisitorMut, FieldVisitor, FieldVisitorMut, InlineOrHeap, InlinedMessageParent,
-    MessageBinding, MessageBindingMut, MessageCommon, MessageEncode, MessageMerge, NestedMessage,
-    ProtoDouble, ProtoFixed32, ProtoString, SingularField, Window, WindowMut,
+    CloneBound, CloneFieldsVisitor, CloneIn, DeallocateBound, DebugStructVisitor, EncodeCtx,
+    EncodeRawVisitor, EncodedLenVisitor, Explicit, FieldCloneIn, FieldDeallocVisitor,
+    FieldEqVisitor, FieldPairVisitor, FieldPairVisitorMut, FieldVisitor, FieldVisitorMut,
+    InlineOrHeap, InlinedMessageParent, MessageBinding, MessageBindingMut, MessageCommon,
+    MessageCommonAlloc, MessageEncode, MessageMerge, NestedMessage, ProtoDouble, ProtoFixed32,
+    ProtoString, SingularField, Window, WindowMut,
 };
 
 use crate::address::{
-    BIT_CITY, BIT_CITY_SSO, BIT_LATITUDE, BIT_POSTAL_CODE, BIT_STREET, BIT_STREET_SSO, FIELD_CITY,
-    FIELD_LATITUDE, FIELD_POSTAL_CODE, FIELD_STREET,
+    BIT_CITY, BIT_CITY_SSO, BIT_COUNT as ADDRESS_BIT_COUNT, BIT_LATITUDE, BIT_POSTAL_CODE,
+    BIT_STREET, BIT_STREET_SSO, FIELD_CITY, FIELD_LATITUDE, FIELD_POSTAL_CODE, FIELD_STREET,
 };
 
 /// Field wrappers only — no [`MessageCommon`].
@@ -134,9 +135,10 @@ impl<A: Allocator> AddressBody<A> {
         ControlFlow::Continue(())
     }
 
-    fn visit_fields_mut<V>(&mut self, v: &mut V) -> ControlFlow<V::Break>
+    fn visit_fields_mut<C, V>(&mut self, v: &mut V) -> ControlFlow<V::Break>
     where
-        V: FieldVisitorMut<MessageCommon<BitArray<[u8; 1], Lsb0>, A>>,
+        V: FieldVisitorMut<C>,
+        C: MessageBindingMut<A>,
     {
         v.visit("street", &mut self.street)?;
         v.visit("city", &mut self.city)?;
@@ -387,6 +389,8 @@ impl<A: Allocator> ::puroro_rt::DeallocateIn<A> for Address<A> {
     }
 }
 
+::puroro_rt::impl_owned_slot_bounds!(Address);
+
 impl<A: Allocator> MessageEncode for Address<A> {
     fn encoded_len(&self, ctx: &mut EncodeCtx) -> usize {
         let mut v = EncodedLenVisitor::new(&self._common, ctx);
@@ -415,6 +419,45 @@ impl<A: Allocator + Clone> ::puroro_rt::DefaultIn<A> for Address<A> {
     #[inline]
     fn default_in(alloc: A) -> Self {
         Self::new_in(alloc)
+    }
+}
+
+impl<A: Allocator + Clone> ::puroro_rt::DefaultIn<A> for AddressBody<A> {
+    #[inline]
+    fn default_in(alloc: A) -> Self {
+        Self {
+            street: SingularField::new_in(alloc.clone()),
+            city: SingularField::new_in(alloc.clone()),
+            postal_code: SingularField::new_in(alloc.clone()),
+            latitude: SingularField::new_in(alloc),
+        }
+    }
+}
+
+impl<A, Cx> DeallocateBound<A, Cx> for AddressBody<A>
+where
+    A: Allocator,
+    Cx: MessageBindingMut<A>,
+{
+    fn deallocate_bound(self, common: &Cx) {
+        let mut body = self;
+        let mut v = FieldDeallocVisitor::new(common);
+        let _ = body.visit_fields_mut(&mut v);
+    }
+}
+
+impl<A, Cx> CloneBound<A, Cx> for AddressBody<A>
+where
+    A: Allocator + Clone,
+    Cx: MessageBindingMut<A> + MessageCommonAlloc<Alloc = A>,
+{
+    fn clone_bound(&self, common: &Cx, alloc: A) -> Self {
+        AddressBody {
+            street: self.street.clone_field(common, alloc.clone()),
+            city: self.city.clone_field(common, alloc.clone()),
+            postal_code: self.postal_code.clone_field(common, alloc.clone()),
+            latitude: self.latitude.clone_field(common, alloc),
+        }
     }
 }
 
@@ -651,6 +694,7 @@ impl<A: Allocator> Deref for AddressMut<'_, A> {
 impl<A: Allocator> NestedMessage for Address<A> {
     type Alloc = A;
     type Body = AddressBody<A>;
+    const BIT_COUNT: usize = ADDRESS_BIT_COUNT;
     type View<'a>
         = AddressView<'a, A>
     where
@@ -707,5 +751,20 @@ impl<A: Allocator> NestedMessage for Address<A> {
     {
         let body: &mut AddressBody<Ax> = unsafe { mem::transmute(body) };
         body.merge_into(window, buf, depth)
+    }
+
+    fn deallocate_body<Cx>(body: AddressBody<A>, window: &Cx)
+    where
+        Cx: MessageBindingMut<A>,
+    {
+        body.deallocate_bound(window);
+    }
+
+    fn clone_body<Cx>(body: &AddressBody<A>, window: &Cx, alloc: A) -> AddressBody<A>
+    where
+        Cx: MessageBindingMut<A>,
+        A: Clone,
+    {
+        body.clone_bound(window, alloc)
     }
 }

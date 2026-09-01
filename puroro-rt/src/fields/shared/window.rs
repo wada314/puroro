@@ -143,6 +143,12 @@ impl<A: Allocator> MessageBinding<A> for Window<'_, A> {
             None => empty_unknown_fields(),
         }
     }
+
+    /// Compose onto this window (`bit_base` added, unknowns at `field`).
+    #[inline]
+    fn child_window(&self, bit_base: usize, field: u32) -> Window<'_, A> {
+        self.nest(bit_base, field)
+    }
 }
 
 impl<A: Allocator> MessageBindingMut<A> for Window<'_, A> {
@@ -303,7 +309,7 @@ mod tests {
             MessageCommon::<BitArray<[u8; 1], Lsb0>, Global>::new_in(BitArray::ZERO, Global);
         common.set_bit(5, true);
         let child = Window::for_child(&common, 3, 1);
-        let nested = child.nest(2, 2);
+        let nested = child.child_window(2, 2);
         assert_eq!(nested.bit_base(), 5);
         assert!(nested.is_bit_set(0));
     }

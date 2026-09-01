@@ -16,6 +16,9 @@ pub const BIT_CITY_SSO: usize = 3; // city (SSO: 1 = heap)
 pub const BIT_POSTAL_CODE: usize = 4; // postal_code (EXPLICIT fixed32)
 pub const BIT_LATITUDE: usize = 5; // latitude (EXPLICIT double)
 
+/// Parent bits occupied by an inlined `Address` (`0..=BIT_LATITUDE`).
+pub const BIT_COUNT: usize = 6;
+
 // ---------------------------------------------------------------------------
 // Proto field numbers
 // ---------------------------------------------------------------------------

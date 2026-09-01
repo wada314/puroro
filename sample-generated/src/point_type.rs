@@ -14,14 +14,14 @@ use core::ops::{ControlFlow, Deref, DerefMut};
 use puroro::{DecodeBuf, DecodeError, Message};
 use puroro_rt::decode::{decode_tag, skip_field_and_save};
 use puroro_rt::{
-    CloneFieldsVisitor, CloneIn, DeallocateIn, DebugStructVisitor, DefaultIn, EncodeCtx,
-    EncodeRawVisitor, EncodedLenVisitor, FieldDeallocVisitor, FieldEqVisitor, FieldPairVisitor,
-    FieldPairVisitorMut, FieldVisitor, FieldVisitorMut, Implicit, InlinedMessageParent,
-    MessageBinding, MessageBindingMut, MessageCommon, MessageEncode, MessageMerge, NestedMessage,
-    ProtoInt32, SingularField, Window, WindowMut,
+    CloneBound, CloneFieldsVisitor, CloneIn, DeallocateBound, DeallocateIn, DebugStructVisitor,
+    DefaultIn, EncodeCtx, EncodeRawVisitor, EncodedLenVisitor, FieldCloneIn, FieldDeallocVisitor,
+    FieldEqVisitor, FieldPairVisitor, FieldPairVisitorMut, FieldVisitor, FieldVisitorMut, Implicit,
+    InlinedMessageParent, MessageBinding, MessageBindingMut, MessageCommon, MessageCommonAlloc,
+    MessageEncode, MessageMerge, NestedMessage, ProtoInt32, SingularField, Window, WindowMut,
 };
 
-use crate::point::{FIELD_X, FIELD_Y};
+use crate::point::{BIT_COUNT as POINT_BIT_COUNT, FIELD_X, FIELD_Y};
 
 /// Field wrappers only — the inlined slot type (no [`MessageCommon`]).
 pub struct PointBody<A: Allocator = Global> {
@@ -100,9 +100,10 @@ impl<A: Allocator> PointBody<A> {
         ControlFlow::Continue(())
     }
 
-    fn visit_fields_mut<V>(&mut self, v: &mut V) -> ControlFlow<V::Break>
+    fn visit_fields_mut<C, V>(&mut self, v: &mut V) -> ControlFlow<V::Break>
     where
-        V: FieldVisitorMut<MessageCommon<BitArray<[u8; 1], Lsb0>, A>>,
+        V: FieldVisitorMut<C>,
+        C: MessageBindingMut<A>,
     {
         v.visit("x", &mut self.x)?;
         v.visit("y", &mut self.y)?;
@@ -241,15 +242,6 @@ impl<A: Allocator + Clone> CloneIn<A> for Point<A> {
     }
 }
 
-impl<A: Allocator + Clone> CloneIn<A> for PointBody<A> {
-    fn clone_in(&self, _alloc: A) -> Self {
-        Self {
-            x: self.x,
-            y: self.y,
-        }
-    }
-}
-
 impl<A: Allocator + Clone> Clone for Point<A> {
     #[inline]
     fn clone(&self) -> Self {
@@ -292,16 +284,7 @@ impl<A: Allocator> DeallocateIn<A> for Point<A> {
     }
 }
 
-impl<A: Allocator> DeallocateIn<A> for PointBody<A> {
-    #[inline]
-    unsafe fn deallocate_in(self, alloc: &A) {
-        let PointBody { x, y } = self;
-        unsafe {
-            DeallocateIn::deallocate_in(x, alloc);
-            DeallocateIn::deallocate_in(y, alloc);
-        }
-    }
-}
+::puroro_rt::impl_owned_slot_bounds!(Point);
 
 impl<A: Allocator> MessageEncode for Point<A> {
     fn encoded_len(&self, ctx: &mut EncodeCtx) -> usize {
@@ -340,6 +323,31 @@ impl<A: Allocator + Clone> DefaultIn<A> for PointBody<A> {
         Self {
             x: SingularField::new_in(alloc.clone()),
             y: SingularField::new_in(alloc),
+        }
+    }
+}
+
+impl<A, Cx> DeallocateBound<A, Cx> for PointBody<A>
+where
+    A: Allocator,
+    Cx: MessageBindingMut<A>,
+{
+    fn deallocate_bound(self, common: &Cx) {
+        let mut body = self;
+        let mut v = FieldDeallocVisitor::new(common);
+        let _ = body.visit_fields_mut(&mut v);
+    }
+}
+
+impl<A, Cx> CloneBound<A, Cx> for PointBody<A>
+where
+    A: Allocator + Clone,
+    Cx: MessageBindingMut<A> + MessageCommonAlloc<Alloc = A>,
+{
+    fn clone_bound(&self, common: &Cx, alloc: A) -> Self {
+        PointBody {
+            x: self.x.clone_field(common, alloc.clone()),
+            y: self.y.clone_field(common, alloc),
         }
     }
 }
@@ -486,6 +494,7 @@ impl<A: Allocator> Deref for PointMut<'_, A> {
 impl<A: Allocator> NestedMessage for Point<A> {
     type Alloc = A;
     type Body = PointBody<A>;
+    const BIT_COUNT: usize = POINT_BIT_COUNT;
     type View<'a>
         = PointView<'a, A>
     where
@@ -549,5 +558,20 @@ impl<A: Allocator> NestedMessage for Point<A> {
     {
         let body: &mut PointBody<Ax> = unsafe { mem::transmute(body) };
         body.merge_into(window, buf, depth)
+    }
+
+    fn deallocate_body<Cx>(body: PointBody<A>, window: &Cx)
+    where
+        Cx: MessageBindingMut<A>,
+    {
+        body.deallocate_bound(window);
+    }
+
+    fn clone_body<Cx>(body: &PointBody<A>, window: &Cx, alloc: A) -> PointBody<A>
+    where
+        Cx: MessageBindingMut<A>,
+        A: Clone,
+    {
+        body.clone_bound(window, alloc)
     }
 }

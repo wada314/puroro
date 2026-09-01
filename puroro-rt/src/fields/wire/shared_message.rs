@@ -13,6 +13,18 @@
 //! generated fixtures, repeated elements, and oneof variants that still store a
 //! full `M` without a body split.
 
+use crate::decode;
+use crate::encode::{encode_varint, encoded_len_varint};
+use crate::fields::shared::{
+    CloneBound, DeallocateBound, DefaultIn, InlinedMessageParent, MessageBindingMut, Window,
+    WindowMut,
+    slot_init::SlotInitMut,
+    value_slot::{AddressableSlot, ValueSlot, ValueSlotMutAccess},
+};
+use crate::fields::wire::encode_type::EncodeType;
+use crate::fields::wire::proto_ref_ops::{ProtoRefDebug, ProtoRefEq};
+use crate::fields::wire::singular_type::{PayloadAccess, PayloadMerge, SingularType};
+use crate::message_encode::EncodeCtx;
 use ::allocator_api2::alloc::Allocator;
 use ::bytes::BufMut;
 use ::core::fmt::{Debug, Formatter, Result as FmtResult};
@@ -21,19 +33,6 @@ use ::core::mem;
 use ::core::ops::Deref;
 use ::protobuf_core::{FieldNumber, Varint};
 use ::puroro::{DecodeBuf, DecodeError, WireType};
-use ::unmanaged::DeallocateIn;
-
-use crate::decode;
-use crate::encode::{encode_varint, encoded_len_varint};
-use crate::fields::shared::{
-    DefaultIn, InlinedMessageParent, MessageBindingMut, Window, WindowMut,
-    slot_init::SlotInitMut,
-    value_slot::{AddressableSlot, ValueSlot, ValueSlotMutAccess},
-};
-use crate::fields::wire::encode_type::EncodeType;
-use crate::fields::wire::proto_ref_ops::{ProtoRefDebug, ProtoRefEq};
-use crate::fields::wire::singular_type::{PayloadAccess, PayloadMerge, SingularType};
-use crate::message_encode::EncodeCtx;
 
 /// Owned nested message that can bind a [`Window`] over its body.
 ///
@@ -82,6 +81,35 @@ pub trait NestedMessage: Sized {
     where
         Ax: Allocator + Clone,
         Buf: DecodeBuf;
+
+    /// Number of parent bits this inlined body occupies, starting at the
+    /// field's `BIT_BASE` (this message's local bits plus nested inlined
+    /// children). Boxed children do not add to the parent count.
+    ///
+    /// [`clear`](PayloadAccess::clear) / first [`with_mut`](PayloadAccess::with_mut)
+    /// after `take_clear` zero this range. `deallocate_body` reads SSO / presence
+    /// bits and must run **before** the range is cleared; leftover `HEAP_BIT`
+    /// plus a fresh empty-inline body is unsound.
+    const BIT_COUNT: usize;
+
+    /// Teardown of an inlined [`Self::Body`] through the parent window.
+    ///
+    /// `window` is this child's binding (`bit_base` already applied) so inner
+    /// Explicit / SSO bits resolve. Used when the body is dropped as a slot
+    /// (parent `Drop` / `clear`) without an owned [`crate::MessageCommon`].
+    /// Generated impls forward to [`DeallocateBound`].
+    fn deallocate_body<Cx>(body: Self::Body, window: &Cx)
+    where
+        Cx: MessageBindingMut<Self::Alloc>;
+
+    /// Deep-copy of an inlined [`Self::Body`] through the **source** window.
+    ///
+    /// Destination bits are installed later on the parent `MessageCommon`.
+    /// Generated impls forward to [`CloneBound`].
+    fn clone_body<Cx>(body: &Self::Body, window: &Cx, alloc: Self::Alloc) -> Self::Body
+    where
+        Cx: MessageBindingMut<Self::Alloc>,
+        Self::Alloc: Clone;
 }
 
 /// Type marker for a nested message whose getters are [`NestedMessage::View`].
@@ -90,6 +118,19 @@ pub trait NestedMessage: Sized {
 /// unknown-store child key). `BIT_BASE` is the parent bit index of this child’s
 /// local bit 0 (0 when the child has no bits, and for boxed).
 pub struct SharedMessage<M, const FIELD: u32, const BIT_BASE: usize = 0>(PhantomData<fn() -> M>);
+
+/// Clears `[bit_base, bit_base + count)` on `common` (parent indices, or a
+/// [`WindowMut`] local index that already applies `bit_base`).
+#[inline]
+fn clear_inlined_bits<A, Cx>(common: &mut Cx, bit_base: usize, count: usize)
+where
+    A: Allocator,
+    Cx: MessageBindingMut<A>,
+{
+    for i in 0..count {
+        common.set_bit(bit_base + i, false);
+    }
+}
 
 impl<M, const FIELD: u32, const BIT_BASE: usize> Default for SharedMessage<M, FIELD, BIT_BASE> {
     fn default() -> Self {
@@ -188,8 +229,12 @@ where
         Cx: InlinedMessageParent<A> + MessageBindingMut<A>,
         Self: 'a,
     {
+        let fresh = !init.is_initialized(|b| common.is_bit_set(b));
         let body = ValueSlot::with_mut(slot, init, common).get_mut();
         let body = body as *mut M::Body;
+        if fresh {
+            clear_inlined_bits(common, BIT_BASE, M::BIT_COUNT);
+        }
         let window = common.child_window_mut(BIT_BASE, FIELD);
         let window: WindowMut<'a, M::Alloc> = unsafe { mem::transmute(window) };
         // SAFETY: `body` is the field slot; `window` borrows only `common`.
@@ -200,15 +245,15 @@ where
     fn write<A, VS, I, Cx>(slot: &mut VS, init: I, common: &mut Cx, value: M::Body)
     where
         A: Allocator + Clone,
-        M::Body: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
+        M::Body: AddressableSlot + DefaultIn<A> + DeallocateBound<A, Cx>,
         VS: ValueSlot<M::Body, A>,
         I: SlotInitMut,
         Cx: InlinedMessageParent<A>,
     {
-        let alloc = common.clone_alloc();
         if let Some(old) = ValueSlot::with_mut(slot, init, common).replace(value) {
-            // SAFETY: `write` contract — `common` is this field's parent.
-            unsafe { DeallocateIn::deallocate_in(old, &alloc) };
+            let window = common.child_window(BIT_BASE, FIELD);
+            let window: Window<M::Alloc> = unsafe { mem::transmute_copy(&window) };
+            M::deallocate_body(old, &window);
         }
     }
 
@@ -216,17 +261,45 @@ where
     fn clear<A, VS, I, Cx>(slot: &mut VS, init: I, common: &mut Cx)
     where
         A: Allocator + Clone,
-        M::Body: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
+        M::Body: AddressableSlot + DefaultIn<A> + DeallocateBound<A, Cx>,
         VS: ValueSlot<M::Body, A>,
         I: SlotInitMut,
         Cx: InlinedMessageParent<A>,
     {
         let alloc = common.clone_alloc();
         if let Some(old) = ValueSlot::with_mut(slot, init, common).take_clear() {
-            // SAFETY: `clear` contract — `common` is this field's parent.
-            unsafe { DeallocateIn::deallocate_in(old, &alloc) };
+            let window = common.child_window(BIT_BASE, FIELD);
+            let window: Window<M::Alloc> = unsafe { mem::transmute_copy(&window) };
+            M::deallocate_body(old, &window);
         }
+        // Presence is already clear; drop child SSO / nested presence bits so a
+        // later DefaultIn body is not paired with a leftover HEAP_BIT.
+        clear_inlined_bits(common, BIT_BASE, M::BIT_COUNT);
         common.unknown_fields_mut().remove_child(FIELD, &alloc);
+    }
+
+    #[inline]
+    fn deallocate_payload<A, Cx>(slot: M::Body, common: &Cx)
+    where
+        A: Allocator,
+        Cx: MessageBindingMut<A>,
+        M::Body: DeallocateBound<A, Cx>,
+    {
+        let window = common.child_window(BIT_BASE, FIELD);
+        let window: Window<M::Alloc> = unsafe { mem::transmute_copy(&window) };
+        M::deallocate_body(slot, &window);
+    }
+
+    #[inline]
+    fn clone_payload<A, Cx>(slot: &M::Body, common: &Cx, alloc: A) -> M::Body
+    where
+        A: Allocator + Clone,
+        Cx: MessageBindingMut<A>,
+        M::Body: CloneBound<A, Cx>,
+        for<'w> M::Body: CloneBound<A, Window<'w, A>>,
+    {
+        let window = common.child_window(BIT_BASE, FIELD);
+        slot.clone_bound(&window, alloc)
     }
 }
 
@@ -244,7 +317,7 @@ impl<M: NestedMessage, const FIELD: u32, const BIT_BASE: usize> PayloadMerge
     ) -> Result<(), DecodeError>
     where
         A: Allocator + Clone,
-        Self::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateIn<A>,
+        Self::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateBound<A, Cx>,
         VS: ValueSlot<Self::Slot<A>, A>,
         I: SlotInitMut,
         Cx: InlinedMessageParent<A>,

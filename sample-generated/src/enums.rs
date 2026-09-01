@@ -58,6 +58,8 @@ impl ProtoEnumStorage for Status {
 
 impl OpenEnum for Status {}
 
+::puroro_rt::impl_copy_slot_bounds!(Status);
+
 impl HasDefault<Status> for ProtoDefault {
     const DEFAULT: Status = Status::UNSPECIFIED;
 }
@@ -103,6 +105,8 @@ impl ProtoEnumStorage for Priority {
 }
 
 impl ClosedEnum for Priority {}
+
+::puroro_rt::impl_copy_slot_bounds!(Priority);
 
 impl HasDefault<Priority> for ProtoDefault {
     const DEFAULT: Priority = Priority::UNSPECIFIED;

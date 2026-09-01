@@ -15,6 +15,7 @@
 pub(crate) mod field_deallocate;
 pub(crate) mod field_inspect;
 pub(crate) mod field_presence;
+pub(crate) mod slot_bound;
 pub(crate) mod slot_init;
 pub(crate) mod value_layout;
 pub(crate) mod value_slot;
@@ -28,6 +29,7 @@ pub use field_inspect::{
     FieldDeallocVisitor, FieldEncode, FieldEqVisitor, FieldPairVisitor, FieldPairVisitorMut,
     FieldVisitor, FieldVisitorMut,
 };
+pub use slot_bound::{CloneBound, DeallocateBound};
 pub use value_layout::{BitPacked, Boxed, Inline, InlineOrHeap, SSO_HEAP, SSO_INLINE, ValueLayout};
 pub use value_slot::AddressableSlot;
 pub use window::{Window, WindowMut};
