@@ -45,28 +45,9 @@ mod school_type;
 mod student_type;
 mod task_type;
 
-pub use address_type::{
-    Address, AddressBody, AddressBound, AddressMessage, AddressMessageMut, AddressMut,
-    AddressOwnedCommon, AddressView,
-};
+pub use address_type::Address;
 pub use enums::{Priority, Status};
-pub use point_type::{
-    Point, PointBody, PointBound, PointMessage, PointMessageMut, PointMut, PointOwnedCommon,
-    PointView,
-};
+pub use point_type::Point;
 pub use school_type::School;
-pub use student_type::{
-    Student, StudentBody, StudentBound, StudentMessage, StudentMessageMut, StudentMut,
-    StudentOwnedCommon, StudentView,
-};
+pub use student_type::Student;
 pub use task_type::Task;
-
-use ::allocator_api2::alloc::Global;
-use ::puroro_rt::RepeatedMessagesMut;
-
-/// Mutator handle for a `repeated Address` field (sample `Task.watchers`).
-///
-/// Concrete so `watchers_mut().push()` returns [`AddressMut`] with a short
-/// reborrow (RPIT + GAT pin would force the container lifetime and break
-/// `push().copy_from(...)` chains).
-pub type AddressListMut<'a, A = Global> = RepeatedMessagesMut<'a, Address<A>, A>;

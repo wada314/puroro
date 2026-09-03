@@ -1,8 +1,6 @@
-//! Sample parent for two-hop inlined storage: [`School.student`] is
-//! [`SharedMessage<Student>`](::puroro_rt::SharedMessage) with
-//! [`BIT_STUDENT_BASE`](crate::school::BIT_STUDENT_BASE) so `Student`'s local
-//! bits land in this message's array. Getters return [`StudentView`] /
-//! [`StudentMut`] (aliases of [`StudentBound`](crate::StudentBound)).
+//! Sample parent for two-hop inlined storage: [`School.student`] is a full
+//! [`Student`](crate::Student) (`ProtoMessage` + `Inline`). Getters return
+//! `Option<&Student>` / `&mut Student`.
 
 use allocator_api2::alloc::{Allocator, Global};
 use bitvec::array::BitArray;
@@ -18,18 +16,15 @@ use puroro_rt::{
     CloneFieldsVisitor, CloneIn, DebugStructVisitor, EncodeCtx, EncodeRawVisitor,
     EncodedLenVisitor, Explicit, FieldDeallocVisitor, FieldEqVisitor, FieldPairVisitor,
     FieldPairVisitorMut, FieldVisitor, FieldVisitorMut, InlineOrHeap, MessageCommon, MessageEncode,
-    MessageMerge, ProtoString, SharedMessage, SingularField,
+    MessageMerge, ProtoMessage, ProtoString, SingularField,
 };
 
 use crate::Student;
-use crate::school::{
-    BIT_NAME, BIT_NAME_SSO, BIT_STUDENT, BIT_STUDENT_BASE, FIELD_NAME, FIELD_STUDENT,
-};
-use crate::student_type::{StudentMut, StudentView};
+use crate::school::{BIT_NAME, BIT_NAME_SSO, BIT_STUDENT, FIELD_NAME, FIELD_STUDENT};
 
 /// Sample `School` — owned root with one inlined [`Student`].
 pub struct School<A: Allocator = Global> {
-    _common: MessageCommon<BitArray<[u8; 2], Lsb0>, A>,
+    _common: MessageCommon<BitArray<[u8; 1], Lsb0>, A>,
     name: SingularField<
         ProtoString,
         Explicit<{ BIT_NAME }>,
@@ -37,12 +32,8 @@ pub struct School<A: Allocator = Global> {
         A,
         InlineOrHeap<{ BIT_NAME_SSO }>,
     >,
-    student: SingularField<
-        SharedMessage<Student<A>, { FIELD_STUDENT }, { BIT_STUDENT_BASE }>,
-        Explicit<{ BIT_STUDENT }>,
-        { FIELD_STUDENT },
-        A,
-    >,
+    student:
+        SingularField<ProtoMessage<Student<A>>, Explicit<{ BIT_STUDENT }>, { FIELD_STUDENT }, A>,
 }
 
 impl<A: Allocator> School<A> {
@@ -53,11 +44,11 @@ impl<A: Allocator> School<A> {
         self.name.bind(&self._common).optional()
     }
 
-    pub fn student(&self) -> Option<StudentView<'_, A>> {
+    pub fn student(&self) -> Option<&Student<A>> {
         self.student.bind(&self._common).get()
     }
 
-    fn visit_fields<V: FieldVisitor<MessageCommon<BitArray<[u8; 2], Lsb0>, A>>>(
+    fn visit_fields<V: FieldVisitor<MessageCommon<BitArray<[u8; 1], Lsb0>, A>>>(
         &self,
         v: &mut V,
     ) -> ControlFlow<V::Break> {
@@ -66,7 +57,7 @@ impl<A: Allocator> School<A> {
         ControlFlow::Continue(())
     }
 
-    fn visit_field_pairs<V: FieldPairVisitor<MessageCommon<BitArray<[u8; 2], Lsb0>, A>>>(
+    fn visit_field_pairs<V: FieldPairVisitor<MessageCommon<BitArray<[u8; 1], Lsb0>, A>>>(
         &self,
         other: &Self,
         v: &mut V,
@@ -76,7 +67,7 @@ impl<A: Allocator> School<A> {
         ControlFlow::Continue(())
     }
 
-    fn visit_field_pairs_mut<V: FieldPairVisitorMut<MessageCommon<BitArray<[u8; 2], Lsb0>, A>>>(
+    fn visit_field_pairs_mut<V: FieldPairVisitorMut<MessageCommon<BitArray<[u8; 1], Lsb0>, A>>>(
         &self,
         dst: &mut Self,
         v: &mut V,
@@ -89,7 +80,7 @@ impl<A: Allocator> School<A> {
         ControlFlow::Continue(())
     }
 
-    fn visit_fields_mut<V: FieldVisitorMut<MessageCommon<BitArray<[u8; 2], Lsb0>, A>>>(
+    fn visit_fields_mut<V: FieldVisitorMut<MessageCommon<BitArray<[u8; 1], Lsb0>, A>>>(
         &mut self,
         v: &mut V,
     ) -> ControlFlow<V::Break> {
@@ -116,12 +107,12 @@ impl<A: Allocator + Clone> School<A> {
         self.name.bind_mut(&mut self._common).clear();
     }
 
-    pub fn student_mut(&mut self) -> StudentMut<'_, A> {
+    pub fn student_mut(&mut self) -> &mut Student<A> {
         self.student.bind_mut(&mut self._common).get_mut()
     }
 
     pub fn set_student(&mut self, src: Student<A>) {
-        self.student_mut().copy_from(&src);
+        *self.student_mut() = src;
     }
 
     pub fn clear_student(&mut self) {

@@ -1,5 +1,7 @@
 # Shared `MessageCommon` + nested unknown store
 
+**Superseded (2026-09-03).** Sharing `MessageCommon` (Body / Bound / View / always-view getters) was reverted. Inlined children are a full `M` again (`ProtoMessage` + `Option<&M>`). Keep this note as history of why we tried it and why we stopped.
+
 Discussion lock (2026-08-30). Inline storage without sharing is already shipped
 ([IMPLEMENTATION.md §17.1](../../IMPLEMENTATION.md#171-submessage-inline-optimisation)).
 This note records what we agreed for **sharing** the parent common, and the
@@ -270,11 +272,11 @@ Runtime proof of the dual catalog, hand-written `Point` / `Task.origin` only.
 
 **Done.**
 
-- Accessors live on `StudentBound` / `PointBound` / `AddressBound`. Owned `Student` / `Point` / `Address` wrap the bound (`Drop` / `Message` / deep `Clone`) and `Deref` to it.
-- `*View` / `*Mut` are aliases of the bound (`Window` + `&Body` / `WindowMut` + `&mut Body`) and stay `Copy`.
+- Accessors live on `#[doc(hidden)]` `StudentBound` / `PointBound` / `AddressBound`. Owned `Student` / `Point` / `Address` wrap the bound (`Drop` / `Message` / deep `Clone`) and `Deref` to it.
+- `*View` / `*Mut` are newtypes over the bound (`Window` + `&Body` / `WindowMut` + `&mut Body`), `Deref` to it, and stay `Copy`. Bound is not crate-root exported (`Deref::Target` still requires it `pub`).
 - A single `M<A, C, B>` cannot both `Drop` (owned teardown) and be `Copy` (NLL for views); this is the plan’s `Student` + `StudentBound` spelling.
 - Field getters / mutators / `copy_from` / view `merge_from` live in one pair of `impl`s over `C` + `B`.
-- `*Message` / `*MessageMut` are blankets over the bound, plus owned. Full `Message` stays owned-only.
+- `*Message` / `*MessageMut` are blankets over the bound, plus owned / view / mut. Full `Message` stays owned-only.
 - Sample `Task` / `School` stay owned-only (not inlined children).
 
 ---

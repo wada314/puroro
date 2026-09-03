@@ -184,6 +184,11 @@ impl<A: Allocator + Clone> Address<A> {
     pub fn clear_latitude(&mut self) {
         self.latitude.bind_mut(&mut self._common).clear();
     }
+
+    /// Replaces `self` with a clone of `src` (same allocator family).
+    pub fn copy_from(&mut self, src: &Self) {
+        *self = src.clone();
+    }
 }
 
 impl Address<Global> {
@@ -264,6 +269,8 @@ impl<A: Allocator> ::puroro_rt::DeallocateIn<A> for Address<A> {
         drop(self);
     }
 }
+
+::puroro_rt::impl_owned_slot_bounds!(Address);
 
 // ---------------------------------------------------------------------------
 // Message

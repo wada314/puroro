@@ -1,13 +1,12 @@
 //! Two-hop inlined `School → Student → Point`.
 
-use ::allocator_api2::alloc::Global;
 use ::puroro::{Message, StringMut};
 use ::puroro_rt::INLINE_CAP;
 use ::puroro_rt::Varint;
 use ::puroro_rt::encode::{encode_varint_field, field_number_const};
-use ::puroro_sample_generated::school::{BIT_NAME, BIT_STUDENT_BASE, FIELD_STUDENT};
+use ::puroro_sample_generated::school::{BIT_NAME, FIELD_STUDENT};
 use ::puroro_sample_generated::student::FIELD_LOCATION;
-use ::puroro_sample_generated::{Address, Point, School, Student, StudentMessage};
+use ::puroro_sample_generated::{Address, Point, School, Student};
 
 /// Appends `v` as a base-128 varint.
 fn encode_u64_varint(mut v: u64, buf: &mut Vec<u8>) {
@@ -165,10 +164,9 @@ fn two_hop_roundtrip_and_assign() {
     assert_eq!(school.student().unwrap().location().unwrap().y(), 13);
 }
 
-/// Student's local bit 0 (`year`) is parent bit `BIT_STUDENT_BASE`, not `BIT_NAME`.
+/// Student's `year` presence lives on `Student`, not on `School.name`.
 #[test]
 fn student_year_does_not_set_school_name_bit() {
-    assert_eq!(BIT_STUDENT_BASE, 3);
     assert_eq!(BIT_NAME, 0);
 
     let mut school = School::new();
@@ -330,17 +328,17 @@ fn inlined_home_heap_string_clone_and_clear() {
     }
 }
 
-fn year_of(s: &impl StudentMessage<Global>) -> i32 {
+fn year_of(s: &Student) -> i32 {
     s.year().get()
 }
 
 #[test]
-fn student_c_one_impl_covers_owned_and_inlined_view() {
+fn owned_and_inlined_student_share_the_same_type() {
     let mut owned = Student::new();
     *owned.year_mut() = 11;
     assert_eq!(year_of(&owned), 11);
 
     let mut school = School::new();
     *school.student_mut().year_mut() = 12;
-    assert_eq!(year_of(&school.student().unwrap()), 12);
+    assert_eq!(year_of(school.student().unwrap()), 12);
 }

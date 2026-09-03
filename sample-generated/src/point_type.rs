@@ -104,6 +104,11 @@ impl<A: Allocator + Clone> Point<A> {
     pub fn clear_y(&mut self) {
         self.y.bind_mut(&mut self._common).clear();
     }
+
+    /// Replaces `self` with a clone of `src` (same allocator family).
+    pub fn copy_from(&mut self, src: &Self) {
+        *self = src.clone();
+    }
 }
 
 impl Point<Global> {
@@ -170,6 +175,8 @@ impl<A: Allocator> ::puroro_rt::DeallocateIn<A> for Point<A> {
         drop(self);
     }
 }
+
+::puroro_rt::impl_owned_slot_bounds!(Point);
 
 impl<A: Allocator> MessageEncode for Point<A> {
     fn encoded_len(&self, ctx: &mut EncodeCtx) -> usize {

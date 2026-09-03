@@ -3,7 +3,7 @@ use ::core::alloc::Layout;
 use ::core::mem;
 use ::core::ptr::NonNull;
 
-use ::puroro_sample_generated::{Point, PointBody, School, Student, StudentBody, Task};
+use ::puroro_sample_generated::{Point, School, Student, Task};
 
 // A deliberately fat (64-byte), non-ZST allocator that just forwards to Global.
 #[derive(Clone)]
@@ -21,47 +21,39 @@ unsafe impl Allocator for Padded {
 }
 
 #[test]
-fn allocator_is_stored_once() {
+fn allocator_is_stored_per_inlined_message() {
     let global = mem::size_of::<Task<Global>>();
     let padded = mem::size_of::<Task<Padded>>();
     let delta = padded - global;
-    // MessageCommon stores one `A`. Map fields also own a HashMap-embedded `A`
-    // (by design — maps are uncommon). The inlined `origin` slot is `PointBody`
-    // (no child `MessageCommon` / extra `A`).
-    // Expect: parent common + map ≈ 2× sizeof(Padded).
-    assert!(
-        delta <= 128 + 16,
-        "Task<Padded> grew by {delta} bytes over Task<Global>; allocator appears duplicated beyond MessageCommon + map"
-    );
+    // MessageCommon stores one `A` per message. Map fields also own a
+    // HashMap-embedded `A`. Inlined `origin` is a full `Point`. The oneof
+    // `postal` variant is an inlined `Address`, so the enum slot also embeds
+    // `A`. Expect: parent + map + origin + postal ≈ 4× sizeof(Padded).
     assert_eq!(
-        mem::size_of::<PointBody<Padded>>(),
-        mem::size_of::<PointBody<Global>>(),
-        "PointBody must not embed an allocator"
+        delta,
+        4 * mem::size_of::<Padded>(),
+        "Task<Padded> grew by {delta} bytes over Task<Global>; allocator copies exceeded MessageCommon + map + inlined origin + oneof postal"
     );
     assert!(
-        mem::size_of::<PointBody<Padded>>() < mem::size_of::<Point<Padded>>(),
-        "owned Point keeps MessageCommon; the inlined slot does not"
+        mem::size_of::<Point<Padded>>() > mem::size_of::<Point<Global>>(),
+        "owned Point keeps MessageCommon and therefore embeds A"
     );
 }
 
 #[test]
-fn school_inlined_chain_stores_allocator_once() {
+fn school_inlined_chain_stores_allocator_per_message() {
     let global = mem::size_of::<School<Global>>();
     let padded = mem::size_of::<School<Padded>>();
     let delta = padded - global;
-    // School has no map; only MessageCommon should carry `A`.
+    // School + inlined Student + inlined Point + inlined Address (home).
+    // Each has its own MessageCommon `A`.
     assert_eq!(
         delta,
-        mem::size_of::<Padded>(),
-        "School<Padded> grew by {delta} bytes; expected one allocator in MessageCommon"
-    );
-    assert_eq!(
-        mem::size_of::<StudentBody<Padded>>(),
-        mem::size_of::<StudentBody<Global>>(),
-        "StudentBody must not embed an allocator"
+        4 * mem::size_of::<Padded>(),
+        "School<Padded> grew by {delta} bytes; expected one allocator per inlined message on the chain"
     );
     assert!(
-        mem::size_of::<StudentBody<Padded>>() < mem::size_of::<Student<Padded>>(),
-        "owned Student keeps MessageCommon; the inlined slot does not"
+        mem::size_of::<Student<Padded>>() > mem::size_of::<Student<Global>>(),
+        "owned Student keeps MessageCommon and therefore embeds A"
     );
 }

@@ -6,16 +6,14 @@
 
 use ::allocator_api2::alloc::Global;
 use ::puroro::{
-    BytesMut, MapMut, MapRef, Message, OneofView, OneofViewMut, RepeatedRef, RepeatedStringMut,
+    BytesMut, MapMut, MapRef, Message, OneofView, OneofViewMut, RepeatedStringMut,
     String as AllocString, StringMut, UnknownPayload,
 };
 use ::puroro_rt::INLINE_CAP;
 use ::puroro_rt::Varint;
 use ::puroro_rt::encode::{encode_varint_field, field_number_const};
 use ::puroro_sample_generated::task::{Notification, NotificationCase};
-use ::puroro_sample_generated::{
-    Address, AddressMessage, Point, PointMessage, Priority, Status, Task,
-};
+use ::puroro_sample_generated::{Address, Point, Priority, Status, Task};
 
 /// Appends `v` as a base-128 varint (test helper; mirrors wire encoding).
 fn encode_u64_varint(mut v: u64, buf: &mut Vec<u8>) {
@@ -144,7 +142,7 @@ fn task_fields_roundtrip() {
     watcher.city_mut().set("Osaka");
     *watcher.postal_code_mut() = 5300001;
     *watcher.latitude_mut() = 34.6937;
-    task.watchers_mut().push().copy_from(&watcher);
+    task.watchers_mut().push(watcher);
     task.votes_mut().push(true);
     task.votes_mut().push(false);
     *task.attributes_mut().entry_mut("region") = 81;
@@ -182,10 +180,10 @@ fn task_fields_roundtrip() {
     assert!((a.latitude().get() - 35.6812).abs() < 1e-9);
     assert_eq!(decoded.watchers().len(), 1);
     assert_eq!(
-        decoded.watchers().get(0).unwrap().street().get(),
+        decoded.watchers().first().unwrap().street().get(),
         "2 Side Rd"
     );
-    assert_eq!(decoded.watchers().get(0).unwrap().city().get(), "Osaka");
+    assert_eq!(decoded.watchers().first().unwrap().city().get(), "Osaka");
     assert_eq!(decoded.votes(), &[true, false]);
     assert_eq!(decoded.attributes().len(), 2);
     assert_eq!(decoded.attributes().get("region").copied(), Some(81));
@@ -211,19 +209,18 @@ fn map_attributes_last_wins_on_merge() {
 }
 
 #[test]
-fn map_message_values_return_views() {
+fn map_message_values_are_owned_messages() {
     use ::bitvec::array::BitArray;
     use ::bitvec::order::Lsb0;
-    use ::puroro::MapMessageMut;
     use ::puroro_rt::{FieldDeallocate, MapField, MessageCommon, ProtoMessage, ProtoString};
 
     let mut common = MessageCommon::<BitArray<[u8; 1], Lsb0>, _>::new_in(BitArray::ZERO, Global);
     let mut field = MapField::<ProtoString, ProtoMessage<Address>, 1, _>::new_in(Global);
     {
-        let mut map = field.bind_mut(&mut common).messages_mut();
+        let mut map = field.bind_mut(&mut common);
         map.entry_mut("home").street_mut().set("1 Main");
     }
-    let homes = field.bind(&common).message_map();
+    let homes = field.bind(&common);
     assert_eq!(homes.len(), 1);
     assert_eq!(homes.get("home").unwrap().street().get(), "1 Main");
     field.deallocate(&common);
@@ -258,7 +255,7 @@ fn oneof_message_variant_roundtrip() {
     let mut task = Task::new();
     task.owner_id_mut().push_str("user-1");
     {
-        let mut postal = task.postal_mut();
+        let postal = task.postal_mut();
         postal.street_mut().push_str("5 Oak Ave");
         postal.city_mut().push_str("Kyoto");
     }
@@ -436,7 +433,7 @@ fn repeated_merge_appends() {
     task.labels_mut().push().push_str("a");
     let mut w0 = Address::new();
     w0.city_mut().push_str("A");
-    task.watchers_mut().push().copy_from(&w0);
+    task.watchers_mut().push(w0);
     task.votes_mut().push(true);
 
     let mut other = Task::new();
@@ -446,7 +443,7 @@ fn repeated_merge_appends() {
     other.labels_mut().push().push_str("b");
     let mut w1 = Address::new();
     w1.city_mut().push_str("B");
-    other.watchers_mut().push().copy_from(&w1);
+    other.watchers_mut().push(w1);
     other.votes_mut().push(false);
     let bytes = other.encode_to_vec();
 
@@ -458,7 +455,7 @@ fn repeated_merge_appends() {
     assert_eq!(&*task.labels()[0], "a");
     assert_eq!(&*task.labels()[1], "b");
     assert_eq!(task.watchers().len(), 2);
-    assert_eq!(task.watchers().get(0).unwrap().city().get(), "A");
+    assert_eq!(task.watchers().first().unwrap().city().get(), "A");
     assert_eq!(task.watchers().get(1).unwrap().city().get(), "B");
     assert_eq!(task.votes(), &[true, false]);
 }
@@ -472,7 +469,7 @@ fn repeated_clear_omits_from_wire() {
     task.labels_mut().push().push_str("x");
     let mut w = Address::new();
     w.street_mut().push_str("gone");
-    task.watchers_mut().push().copy_from(&w);
+    task.watchers_mut().push(w);
     task.votes_mut().push(true);
 
     task.clear_tag_ids();
@@ -520,15 +517,15 @@ fn repeated_message_roundtrip() {
     let mut b = Address::new();
     b.street_mut().push_str("2 Oak");
     b.city_mut().push_str("Kyoto");
-    task.watchers_mut().push().copy_from(&a);
-    task.watchers_mut().push().copy_from(&b);
+    task.watchers_mut().push(a);
+    task.watchers_mut().push(b);
 
     let bytes = task.encode_to_vec();
     let decoded: Task = Task::decode(&bytes[..]).unwrap();
 
     assert_eq!(decoded.watchers().len(), 2);
-    assert_eq!(decoded.watchers().get(0).unwrap().street().get(), "1 Main");
-    assert_eq!(decoded.watchers().get(0).unwrap().city().get(), "Tokyo");
+    assert_eq!(decoded.watchers().first().unwrap().street().get(), "1 Main");
+    assert_eq!(decoded.watchers().first().unwrap().city().get(), "Tokyo");
     assert_eq!(decoded.watchers().get(1).unwrap().street().get(), "2 Oak");
     assert_eq!(decoded.watchers().get(1).unwrap().city().get(), "Kyoto");
 }
@@ -608,7 +605,7 @@ fn oneof_inlined_postal_heap_string_switch_and_clone() {
     assert_eq!(task.email_address().get(), "a@example.com");
 
     {
-        let mut postal = task.postal_mut();
+        let postal = task.postal_mut();
         assert!(!postal.street().is_set());
         postal.street_mut().set(&heap_street);
     }
@@ -872,37 +869,37 @@ fn inlined_origin_unknown_stays_inside_child_len() {
     assert!(!top_level_has_varint_field(&cleared, 99));
 }
 
-fn x_of(p: &impl PointMessage) -> i32 {
+fn x_of(p: &Point) -> i32 {
     p.x()
 }
 
-fn street_of(a: &impl AddressMessage) -> &str {
+fn street_of(a: &Address) -> &str {
     a.street().get()
 }
 
 #[test]
-fn point_bound_one_impl_covers_owned_and_inlined_view() {
+fn owned_and_inlined_point_share_the_same_type() {
     let mut owned = Point::new();
     *owned.x_mut() = 3;
     assert_eq!(x_of(&owned), 3);
 
     let mut task = Task::new();
     *task.origin_mut().x_mut() = 4;
-    assert_eq!(x_of(&task.origin().unwrap()), 4);
+    assert_eq!(x_of(task.origin().unwrap()), 4);
 }
 
 #[test]
-fn address_bound_one_impl_covers_owned_boxed_and_inlined_view() {
+fn owned_boxed_and_inlined_address_share_the_same_type() {
     let mut owned = Address::new();
     owned.street_mut().set("A");
     assert_eq!(street_of(&owned), "A");
 
     let mut task = Task::new();
     task.assignee_mut().street_mut().set("B");
-    assert_eq!(street_of(&task.assignee().unwrap()), "B");
+    assert_eq!(street_of(task.assignee().unwrap()), "B");
 
     task.postal_mut().street_mut().set("C");
-    assert_eq!(street_of(&task.postal().unwrap()), "C");
+    assert_eq!(street_of(task.postal().unwrap()), "C");
 }
 
 /// Decodes a base-128 varint at `bytes[i..]`. Returns `(value, bytes_consumed)`.

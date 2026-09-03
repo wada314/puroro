@@ -26,16 +26,13 @@ pub use ::protobuf_core::{FieldNumber, Varint};
 pub use ::unmanaged::{CloneIn, DeallocateIn, DefaultIn};
 pub use defaults::ProtoDefault;
 pub use encode::field_number_const;
-pub use fields::map::{MapField, MapFieldMut, MapFieldRef, MapMessageRef, MapMessagesMut};
+pub use fields::map::{MapField, MapFieldMut, MapFieldRef};
 pub use fields::oneof::{
     OneofDeallocate, OneofEncodable, OneofGroup, OneofSlot, OneofSlotMut, OneofSlotRef,
     OneofVariantRef, OneofView, OneofViewMut,
 };
 pub use fields::oneof_variant::OneofVariant;
-pub use fields::repeated::{
-    Expanded, Packed, RepeatedField, RepeatedFieldMut, RepeatedFieldRef, RepeatedMessageRef,
-    RepeatedMessagesMut,
-};
+pub use fields::repeated::{Expanded, Packed, RepeatedField, RepeatedFieldMut, RepeatedFieldRef};
 pub use fields::shared::field_presence::{Explicit, Implicit, LegacyRequired, Message, Oneof};
 pub use fields::shared::{
     AddressableSlot, BitPacked, Boxed, CloneBound, CloneFieldsVisitor, DeallocateBound,
@@ -49,11 +46,11 @@ pub use fields::singular::{
     SingularField, SingularFieldAccess, SingularFieldMut, SingularFieldRef,
 };
 pub use fields::wire::{
-    Closed, ClosedEnum, INLINE_CAP, NestedMessage, Open, OpenEnum, PayloadAccess, ProtoBool,
-    ProtoBytes, ProtoDouble, ProtoEnum, ProtoEnumStorage, ProtoFixed32, ProtoFixed64, ProtoFloat,
-    ProtoInt32, ProtoInt64, ProtoMessage, ProtoSFixed32, ProtoSFixed64, ProtoSInt32, ProtoSInt64,
-    ProtoString, ProtoStringUnchecked, ProtoUInt32, ProtoUInt64, SharedMessage, SingularType,
-    SsoBytes, SsoBytesMut, SsoString, SsoStringMut,
+    Closed, ClosedEnum, INLINE_CAP, Open, OpenEnum, PayloadAccess, ProtoBool, ProtoBytes,
+    ProtoDouble, ProtoEnum, ProtoEnumStorage, ProtoFixed32, ProtoFixed64, ProtoFloat, ProtoInt32,
+    ProtoInt64, ProtoMessage, ProtoSFixed32, ProtoSFixed64, ProtoSInt32, ProtoSInt64, ProtoString,
+    ProtoStringUnchecked, ProtoUInt32, ProtoUInt64, SingularType, SsoBytes, SsoBytesMut, SsoString,
+    SsoStringMut,
 };
 pub use message_encode::{EncodeCtx, MessageEncode, encode_message, encode_message_to_vec};
 pub use message_merge::{MessageMerge, merge_message};

@@ -18,7 +18,7 @@ use core::ops::{Deref, DerefMut};
 
 use puroro::{
     DecodeBuf, DecodeError, HasDefault, MapMut, MapRef, Message, OneofView, OneofViewMut, Optional,
-    RepeatedRef, RepeatedStringMut,
+    RepeatedStringMut,
 };
 use puroro_rt::decode::{decode_tag, skip_field_and_save};
 use puroro_rt::{
@@ -27,14 +27,12 @@ use puroro_rt::{
     FieldPairVisitor, FieldPairVisitorMut, FieldVisitor, FieldVisitorMut, Implicit, Inline,
     InlineOrHeap, LegacyRequired, MapField, Message as MessagePresence, MessageCommon,
     MessageEncode, MessageMerge, OneofSlot, Open, Packed, ProtoBool, ProtoBytes, ProtoEnum,
-    ProtoInt32, ProtoMessage, ProtoString, RepeatedField, SharedMessage, SingularField,
+    ProtoInt32, ProtoMessage, ProtoString, RepeatedField, SingularField,
 };
 
 use crate::Address;
 use crate::Point;
-use crate::address_type::{AddressMut, AddressView};
 use crate::enums::{Priority, Status};
-use crate::point_type::{PointMut, PointView};
 use crate::task::defaults::MaxRetriesDefault;
 use crate::task::notification::NotificationStorage;
 use crate::task::{
@@ -53,7 +51,7 @@ use crate::task::{
 
 /// Reference `Task` message from `DESIGN.md`.
 pub struct Task<A: Allocator = Global> {
-    _common: MessageCommon<BitArray<[u8; 3], Lsb0>, A>,
+    _common: MessageCommon<BitArray<[u8; 2], Lsb0>, A>,
     title: SingularField<
         ProtoString,
         Explicit<{ BIT_TITLE }>,
@@ -94,13 +92,8 @@ pub struct Task<A: Allocator = Global> {
         { FIELD_PRIORITY },
         A,
     >, // proto: Priority priority = 10;
-    assignee: SingularField<
-        SharedMessage<Address<A>, { FIELD_ASSIGNEE }>,
-        MessagePresence,
-        { FIELD_ASSIGNEE },
-        A,
-        Boxed,
-    >, // proto: Address assignee = 11 (boxed; getter is AddressView)
+    assignee:
+        SingularField<ProtoMessage<Address<A>>, MessagePresence, { FIELD_ASSIGNEE }, A, Boxed>, // proto: Address assignee = 11
     // proto: oneof notification { string email_address=12; string phone_number=13;
     //                             int32 webhook_id=14 [default=-1]; Address postal=15;
     //                             bool urgent=18; }
@@ -113,15 +106,10 @@ pub struct Task<A: Allocator = Global> {
         A,
         BitPacked<{ BIT_FLAG_VALUE }>,
     >, // proto: bool flag = 17;
-    watchers: RepeatedField<ProtoMessage<Address<A>>, Expanded, { FIELD_WATCHERS }, A>, // proto: repeated Address watchers = 19 (Element = Address; getters are AddressView / AddressMut)
+    watchers: RepeatedField<ProtoMessage<Address<A>>, Expanded, { FIELD_WATCHERS }, A>, // proto: repeated Address watchers = 19
     votes: RepeatedField<ProtoBool, Packed, { FIELD_VOTES }, A>, // proto: repeated bool votes = 20;
     attributes: MapField<ProtoString, ProtoInt32, { FIELD_ATTRIBUTES }, A>, // proto: map<string, int32> attributes = 21;
-    origin: SingularField<
-        SharedMessage<Point<A>, { FIELD_ORIGIN }>,
-        Explicit<{ BIT_ORIGIN }>,
-        { FIELD_ORIGIN },
-        A,
-    >, // proto: Point origin = 22 (inlined, body-only slot)
+    origin: SingularField<ProtoMessage<Point<A>>, Explicit<{ BIT_ORIGIN }>, { FIELD_ORIGIN }, A>, // proto: Point origin = 22 (inlined)
 }
 
 impl<A: Allocator> Task<A> {
@@ -183,7 +171,7 @@ impl<A: Allocator> Task<A> {
         self.priority.bind(&self._common).optional()
     }
 
-    pub fn assignee(&self) -> Option<AddressView<'_, A>> {
+    pub fn assignee(&self) -> Option<&Address<A>> {
         self.assignee.bind(&self._common).get()
     }
 
@@ -198,8 +186,8 @@ impl<A: Allocator> Task<A> {
         self.flag.bind(&self._common).optional()
     }
 
-    pub fn watchers(&self) -> impl RepeatedRef<AddressView<'_, A>> + '_ {
-        self.watchers.bind(&self._common).message_views()
+    pub fn watchers(&self) -> &[Address<A>] {
+        self.watchers.bind(&self._common).as_slice()
     }
 
     pub fn votes(&self) -> &[bool] {
@@ -210,7 +198,7 @@ impl<A: Allocator> Task<A> {
         self.attributes.bind(&self._common)
     }
 
-    pub fn origin(&self) -> Option<PointView<'_, A>> {
+    pub fn origin(&self) -> Option<&Point<A>> {
         self.origin.bind(&self._common).get()
     }
 
@@ -221,7 +209,7 @@ impl<A: Allocator> Task<A> {
         &'a self,
     ) -> impl OneofView<
         Case = NotificationCase,
-        Ref = Notification<&'a str, &'a str, i32, AddressView<'a, A>, bool>,
+        Ref = Notification<&'a str, &'a str, i32, &'a Address<A>, bool>,
     > + 'a {
         ::puroro_rt::OneofView::<NotificationStorage<A>>::new(&self.notification, &self._common)
     }
@@ -257,7 +245,7 @@ impl<A: Allocator> Task<A> {
             .optional()
     }
 
-    pub fn postal(&self) -> Option<AddressView<'_, A>> {
+    pub fn postal(&self) -> Option<&Address<A>> {
         self.notification
             .bind(&self._common)
             .variant_of::<FIELD_POSTAL>()
@@ -274,7 +262,7 @@ impl<A: Allocator> Task<A> {
             .optional()
     }
 
-    fn visit_fields<V: FieldVisitor<MessageCommon<BitArray<[u8; 3], Lsb0>, A>>>(
+    fn visit_fields<V: FieldVisitor<MessageCommon<BitArray<[u8; 2], Lsb0>, A>>>(
         &self,
         v: &mut V,
     ) -> ControlFlow<V::Break> {
@@ -300,7 +288,7 @@ impl<A: Allocator> Task<A> {
     }
 
     /// Pair / shared: walk matching fields of `self` and `other`.
-    fn visit_field_pairs<V: FieldPairVisitor<MessageCommon<BitArray<[u8; 3], Lsb0>, A>>>(
+    fn visit_field_pairs<V: FieldPairVisitor<MessageCommon<BitArray<[u8; 2], Lsb0>, A>>>(
         &self,
         other: &Self,
         v: &mut V,
@@ -330,7 +318,7 @@ impl<A: Allocator> Task<A> {
     ///
     /// For [`CloneIn`], `dst` must start as [`Self::new_in`] so placeholders
     /// match empty common bits; install the cloned [`MessageCommon`] afterwards.
-    fn visit_field_pairs_mut<V: FieldPairVisitorMut<MessageCommon<BitArray<[u8; 3], Lsb0>, A>>>(
+    fn visit_field_pairs_mut<V: FieldPairVisitorMut<MessageCommon<BitArray<[u8; 2], Lsb0>, A>>>(
         &self,
         dst: &mut Self,
         v: &mut V,
@@ -360,7 +348,7 @@ impl<A: Allocator> Task<A> {
     }
 
     /// Scalar / mut: invoke `v` once per catalog field.
-    fn visit_fields_mut<V: FieldVisitorMut<MessageCommon<BitArray<[u8; 3], Lsb0>, A>>>(
+    fn visit_fields_mut<V: FieldVisitorMut<MessageCommon<BitArray<[u8; 2], Lsb0>, A>>>(
         &mut self,
         v: &mut V,
     ) -> ControlFlow<V::Break> {
@@ -517,13 +505,12 @@ impl<A: Allocator + Clone> Task<A> {
 
     // -- assignee (nested message, proto field 11) --------------------------
 
-    pub fn assignee_mut(&mut self) -> AddressMut<'_, A> {
+    pub fn assignee_mut(&mut self) -> &mut Address<A> {
         self.assignee.bind_mut(&mut self._common).get_mut()
     }
 
-    /// Copies `src` into the boxed assignee (view API; not a pointer replace).
     pub fn set_assignee(&mut self, src: Address<A>) {
-        self.assignee_mut().copy_from(&src);
+        *self.assignee_mut() = src;
     }
 
     pub fn clear_assignee(&mut self) {
@@ -552,8 +539,8 @@ impl<A: Allocator + Clone> Task<A> {
 
     // -- watchers (repeated Address, proto field 19) -------------------------
 
-    pub fn watchers_mut(&mut self) -> crate::AddressListMut<'_, A> {
-        self.watchers.bind_mut(&mut self._common).messages_mut()
+    pub fn watchers_mut(&mut self) -> impl DerefMut<Target = AllocVec<Address<A>, A>> + '_ {
+        self.watchers.bind_mut(&mut self._common).values_mut()
     }
 
     pub fn clear_watchers(&mut self) {
@@ -582,12 +569,12 @@ impl<A: Allocator + Clone> Task<A> {
 
     // -- origin (inlined nested Point, proto field 22) ----------------------
 
-    pub fn origin_mut(&mut self) -> PointMut<'_, A> {
+    pub fn origin_mut(&mut self) -> &mut Point<A> {
         self.origin.bind_mut(&mut self._common).get_mut()
     }
 
     pub fn set_origin(&mut self, src: Point<A>) {
-        self.origin_mut().copy_from(&src);
+        *self.origin_mut() = src;
     }
 
     pub fn clear_origin(&mut self) {
@@ -650,7 +637,7 @@ impl<A: Allocator + Clone> Task<A> {
 
     /// Switches the group to `postal` (freeing any other variant) and returns a
     /// mutable handle to the nested message, creating an empty one if needed.
-    pub fn postal_mut(&mut self) -> AddressMut<'_, A> {
+    pub fn postal_mut(&mut self) -> &mut Address<A> {
         self.notification
             .bind_mut(&mut self._common)
             .variant_mut::<FIELD_POSTAL>()
