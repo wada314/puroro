@@ -18,7 +18,7 @@ use ::puroro::{DecodeBuf, DecodeError, WireType};
 use ::unmanaged::{CloneIn, DeallocateIn, UnmanagedBox, UnmanagedString, UnmanagedVec};
 
 use super::{
-    CloneBound, DeallocateBound, DefaultIn, InlinedMessageParent, MessageBindingMut,
+    CloneBound, DeallocateBound, DefaultIn, MessageBindingMut,
     slot_init::SlotInitMut,
     value_slot::{AddressableSlot, ValueSlot, ValueSlotMutAccess},
 };
@@ -70,7 +70,7 @@ pub trait ValueLayout<T: SingularType, A: Allocator>: Copy {
     where
         VS: ValueSlot<Self::Slot, A>,
         I: SlotInitMut,
-        Cx: InlinedMessageParent<A>,
+        Cx: MessageBindingMut<A>,
         T: 'a,
         A: 'a + Clone,
         Self::Slot: DefaultIn<A>;
@@ -83,7 +83,7 @@ pub trait ValueLayout<T: SingularType, A: Allocator>: Copy {
     where
         VS: ValueSlot<Self::Slot, A>,
         I: SlotInitMut,
-        Cx: InlinedMessageParent<A>,
+        Cx: MessageBindingMut<A>,
         A: Clone,
         Self::Slot: DefaultIn<A>;
 
@@ -114,7 +114,7 @@ pub trait ValueLayoutMerge<T: SingularType, A: Allocator>: ValueLayout<T, A> {
     where
         VS: ValueSlot<Self::Slot, A>,
         I: SlotInitMut,
-        Cx: InlinedMessageParent<A>,
+        Cx: MessageBindingMut<A>,
         B: DecodeBuf,
         A: Clone,
         Self::Slot: DefaultIn<A>;
@@ -185,7 +185,7 @@ where
     where
         VS: ValueSlot<T::Slot<A>, A>,
         I: SlotInitMut,
-        Cx: InlinedMessageParent<A>,
+        Cx: MessageBindingMut<A>,
         T: 'a,
         A: 'a + Clone,
         T::Slot<A>: DefaultIn<A>,
@@ -198,7 +198,7 @@ where
     where
         VS: ValueSlot<T::Slot<A>, A>,
         I: SlotInitMut,
-        Cx: InlinedMessageParent<A>,
+        Cx: MessageBindingMut<A>,
         A: Clone,
         T::Slot<A>: DefaultIn<A>,
     {
@@ -251,7 +251,7 @@ where
     where
         VS: ValueSlot<T::Slot<A>, A>,
         I: SlotInitMut,
-        Cx: InlinedMessageParent<A>,
+        Cx: MessageBindingMut<A>,
         B: DecodeBuf,
         A: Clone,
         T::Slot<A>: DefaultIn<A>,
@@ -292,7 +292,7 @@ where
     where
         VS: ValueSlot<UnmanagedBox<M, A>, A>,
         I: SlotInitMut,
-        Cx: InlinedMessageParent<A>,
+        Cx: MessageBindingMut<A>,
         M: 'a,
         A: 'a + Clone,
         UnmanagedBox<M, A>: DefaultIn<A>,
@@ -305,7 +305,7 @@ where
     where
         VS: ValueSlot<UnmanagedBox<M, A>, A>,
         I: SlotInitMut,
-        Cx: InlinedMessageParent<A>,
+        Cx: MessageBindingMut<A>,
         A: Clone,
         UnmanagedBox<M, A>: DefaultIn<A>,
     {
@@ -346,7 +346,7 @@ where
     where
         VS: ValueSlot<UnmanagedBox<M, A>, A>,
         I: SlotInitMut,
-        Cx: InlinedMessageParent<A>,
+        Cx: MessageBindingMut<A>,
         B: DecodeBuf,
         A: Clone,
         UnmanagedBox<M, A>: DefaultIn<A>,
@@ -418,7 +418,7 @@ impl<A: Allocator, const VALUE_BIT: usize> ValueLayout<ProtoBool, A> for BitPack
     where
         VS: ValueSlot<(), A>,
         I: SlotInitMut,
-        Cx: InlinedMessageParent<A>,
+        Cx: MessageBindingMut<A>,
         ProtoBool: 'a,
         A: 'a + Clone,
         Self::Slot: DefaultIn<A>,
@@ -432,7 +432,7 @@ impl<A: Allocator, const VALUE_BIT: usize> ValueLayout<ProtoBool, A> for BitPack
     where
         VS: ValueSlot<(), A>,
         I: SlotInitMut,
-        Cx: InlinedMessageParent<A>,
+        Cx: MessageBindingMut<A>,
         A: Clone,
         Self::Slot: DefaultIn<A>,
     {
@@ -464,7 +464,7 @@ impl<A: Allocator, const VALUE_BIT: usize> ValueLayoutMerge<ProtoBool, A> for Bi
     where
         VS: ValueSlot<(), A>,
         I: SlotInitMut,
-        Cx: InlinedMessageParent<A>,
+        Cx: MessageBindingMut<A>,
         B: DecodeBuf,
         A: Clone,
         Self::Slot: DefaultIn<A>,
@@ -563,7 +563,7 @@ impl<A: Allocator, const HEAP_BIT: usize> ValueLayout<ProtoString, A> for Inline
     where
         VS: ValueSlot<SsoString<A>, A>,
         I: SlotInitMut,
-        Cx: InlinedMessageParent<A>,
+        Cx: MessageBindingMut<A>,
         ProtoString: 'a,
         A: 'a + Clone,
         Self::Slot: DefaultIn<A>,
@@ -583,7 +583,7 @@ impl<A: Allocator, const HEAP_BIT: usize> ValueLayout<ProtoString, A> for Inline
     where
         VS: ValueSlot<SsoString<A>, A>,
         I: SlotInitMut,
-        Cx: InlinedMessageParent<A>,
+        Cx: MessageBindingMut<A>,
         A: Clone,
         Self::Slot: DefaultIn<A>,
     {
@@ -635,7 +635,7 @@ impl<A: Allocator, const HEAP_BIT: usize> ValueLayoutMerge<ProtoString, A>
     where
         VS: ValueSlot<SsoString<A>, A>,
         I: SlotInitMut,
-        Cx: InlinedMessageParent<A>,
+        Cx: MessageBindingMut<A>,
         B: DecodeBuf,
         A: Clone,
         Self::Slot: DefaultIn<A>,
@@ -704,7 +704,7 @@ impl<A: Allocator, const HEAP_BIT: usize, C: BytesLikeLenCodec> ValueLayout<LenS
     where
         VS: ValueSlot<SsoBytes<A>, A>,
         I: SlotInitMut,
-        Cx: InlinedMessageParent<A>,
+        Cx: MessageBindingMut<A>,
         LenScalar<C>: 'a,
         A: 'a + Clone,
         Self::Slot: DefaultIn<A>,
@@ -722,7 +722,7 @@ impl<A: Allocator, const HEAP_BIT: usize, C: BytesLikeLenCodec> ValueLayout<LenS
     where
         VS: ValueSlot<SsoBytes<A>, A>,
         I: SlotInitMut,
-        Cx: InlinedMessageParent<A>,
+        Cx: MessageBindingMut<A>,
         A: Clone,
         Self::Slot: DefaultIn<A>,
     {
@@ -773,7 +773,7 @@ impl<A: Allocator, const HEAP_BIT: usize, C: BytesLikeLenCodec> ValueLayoutMerge
     where
         VS: ValueSlot<SsoBytes<A>, A>,
         I: SlotInitMut,
-        Cx: InlinedMessageParent<A>,
+        Cx: MessageBindingMut<A>,
         B: DecodeBuf,
         A: Clone,
         Self::Slot: DefaultIn<A>,

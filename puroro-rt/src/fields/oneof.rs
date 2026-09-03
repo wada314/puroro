@@ -551,11 +551,11 @@ where
     /// Parent-side cleanup after [`OneofDeallocate`].
     ///
     /// Called from [`OneofSlotMut`] after the variant body is freed. Wipes every
-    /// bit and unknown subtree the group owns so leftover SSO / inlined-child
-    /// state is not paired with a fresh empty slot. The active case is not
-    /// needed: inactive variants' bits should already be clear, and clearing
-    /// them again is a no-op. Default is a no-op. Message [`Drop`] does not
-    /// call this ([`FieldDeallocate`] on the slot is enough).
+    /// bit the group owns so leftover SSO heap-arm bits are not paired with a
+    /// fresh empty slot. The active case is not needed: inactive variants'
+    /// bits should already be clear, and clearing them again is a no-op.
+    /// Default is a no-op. Message [`Drop`] does not call this
+    /// ([`FieldDeallocate`] on the slot is enough).
     fn after_deallocate(_common: &mut MessageCommon<Self::Bits, Self::Alloc>)
     where
         Self::Alloc: Clone,

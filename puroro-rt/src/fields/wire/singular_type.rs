@@ -34,7 +34,7 @@ use ::puroro::{DecodeBuf, DecodeError, WireType};
 
 use crate::decode;
 use crate::fields::shared::{
-    CloneBound, DeallocateBound, DefaultIn, InlinedMessageParent, MessageBindingMut,
+    CloneBound, DeallocateBound, DefaultIn, MessageBindingMut,
     slot_init::SlotInitMut,
     value_slot::{AddressableSlot, ValueSlot, ValueSlotMutAccess},
 };
@@ -111,7 +111,7 @@ pub trait PayloadAccess: SingularType {
         Self::Slot<A>: AddressableSlot + DefaultIn<A>,
         VS: ValueSlot<Self::Slot<A>, A>,
         I: SlotInitMut,
-        Cx: InlinedMessageParent<A>,
+        Cx: MessageBindingMut<A>,
         Self: 'a;
 
     /// Writes `value`, ensuring slot presence when applicable.
@@ -125,7 +125,7 @@ pub trait PayloadAccess: SingularType {
         Self::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateBound<A>,
         VS: ValueSlot<Self::Slot<A>, A>,
         I: SlotInitMut,
-        Cx: InlinedMessageParent<A>;
+        Cx: MessageBindingMut<A>;
 
     /// Clears the logical value and slot presence / payload.
     ///
@@ -137,7 +137,7 @@ pub trait PayloadAccess: SingularType {
         Self::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateBound<A>,
         VS: ValueSlot<Self::Slot<A>, A>,
         I: SlotInitMut,
-        Cx: InlinedMessageParent<A>;
+        Cx: MessageBindingMut<A>;
 
     /// Releases an extracted inline slot. `common` is the field's parent binding.
     fn deallocate_payload<A, Cx>(slot: Self::Slot<A>, common: &Cx)
@@ -177,7 +177,7 @@ pub trait PayloadMerge: PayloadAccess {
         Self::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateBound<A>,
         VS: ValueSlot<Self::Slot<A>, A>,
         I: SlotInitMut,
-        Cx: InlinedMessageParent<A>,
+        Cx: MessageBindingMut<A>,
         B: DecodeBuf;
 }
 
@@ -228,7 +228,7 @@ where
         C::NativeType: AddressableSlot + DefaultIn<A>,
         VS: ValueSlot<C::NativeType, A>,
         I: SlotInitMut,
-        Cx: InlinedMessageParent<A>,
+        Cx: MessageBindingMut<A>,
         Self: 'a,
     {
         ValueSlot::with_mut(slot, init, common).get_mut()
@@ -241,7 +241,7 @@ where
         C::NativeType: AddressableSlot + DefaultIn<A> + DeallocateBound<A>,
         VS: ValueSlot<C::NativeType, A>,
         I: SlotInitMut,
-        Cx: InlinedMessageParent<A>,
+        Cx: MessageBindingMut<A>,
     {
         if let Some(old) = ValueSlot::with_mut(slot, init, common).replace(value) {
             old.deallocate_bound(common);
@@ -255,7 +255,7 @@ where
         C::NativeType: AddressableSlot + DefaultIn<A> + DeallocateBound<A>,
         VS: ValueSlot<C::NativeType, A>,
         I: SlotInitMut,
-        Cx: InlinedMessageParent<A>,
+        Cx: MessageBindingMut<A>,
     {
         if let Some(old) = ValueSlot::with_mut(slot, init, common).take_clear() {
             old.deallocate_bound(common);
@@ -303,7 +303,7 @@ where
         Self::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateBound<A>,
         VS: ValueSlot<Self::Slot<A>, A>,
         I: SlotInitMut,
-        Cx: InlinedMessageParent<A>,
+        Cx: MessageBindingMut<A>,
         B: DecodeBuf,
     {
         match C::from_wire_body(C::WireBody::decode(wire_type, buf)?) {
@@ -360,7 +360,7 @@ impl<C: LenCodec> PayloadAccess for LenScalar<C> {
         C::Slot<A>: AddressableSlot + DefaultIn<A>,
         VS: ValueSlot<C::Slot<A>, A>,
         I: SlotInitMut,
-        Cx: InlinedMessageParent<A>,
+        Cx: MessageBindingMut<A>,
         Self: 'a,
     {
         let alloc = common.clone_alloc();
@@ -375,7 +375,7 @@ impl<C: LenCodec> PayloadAccess for LenScalar<C> {
         C::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateBound<A>,
         VS: ValueSlot<C::Slot<A>, A>,
         I: SlotInitMut,
-        Cx: InlinedMessageParent<A>,
+        Cx: MessageBindingMut<A>,
     {
         if let Some(old) = ValueSlot::with_mut(slot, init, common).replace(value) {
             old.deallocate_bound(common);
@@ -389,7 +389,7 @@ impl<C: LenCodec> PayloadAccess for LenScalar<C> {
         C::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateBound<A>,
         VS: ValueSlot<C::Slot<A>, A>,
         I: SlotInitMut,
-        Cx: InlinedMessageParent<A>,
+        Cx: MessageBindingMut<A>,
     {
         if let Some(old) = ValueSlot::with_mut(slot, init, common).take_clear() {
             old.deallocate_bound(common);
@@ -433,7 +433,7 @@ impl<C: LenCodec> PayloadMerge for LenScalar<C> {
         Self::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateBound<A>,
         VS: ValueSlot<Self::Slot<A>, A>,
         I: SlotInitMut,
-        Cx: InlinedMessageParent<A>,
+        Cx: MessageBindingMut<A>,
         B: DecodeBuf,
     {
         if wire_type != WireType::Len {

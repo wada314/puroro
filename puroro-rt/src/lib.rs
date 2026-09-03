@@ -38,9 +38,9 @@ pub use fields::shared::{
     AddressableSlot, BitPacked, Boxed, CloneBound, CloneFieldsVisitor, DeallocateBound,
     DebugStructVisitor, EncodeRawVisitor, EncodedLenVisitor, FieldCloneIn, FieldDeallocVisitor,
     FieldDeallocate, FieldEncode, FieldEqVisitor, FieldPairVisitor, FieldPairVisitorMut,
-    FieldVisitor, FieldVisitorMut, Inline, InlineOrHeap, InlinedMessageParent, MessageBinding,
-    MessageBindingMut, MessageCommon, MessageCommonAlloc, MessageCommonBits, SSO_HEAP, SSO_INLINE,
-    UnknownFields, ValueLayout, Window, WindowMut,
+    FieldVisitor, FieldVisitorMut, Inline, InlineOrHeap, MessageBinding, MessageBindingMut,
+    MessageCommon, MessageCommonAlloc, MessageCommonBits, SSO_HEAP, SSO_INLINE, UnknownFields,
+    ValueLayout,
 };
 pub use fields::singular::{
     SingularField, SingularFieldAccess, SingularFieldMut, SingularFieldRef,

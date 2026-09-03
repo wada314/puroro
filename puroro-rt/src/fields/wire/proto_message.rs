@@ -19,7 +19,7 @@ use ::puroro::{DecodeBuf, DecodeError, WireType};
 
 use crate::decode;
 use crate::fields::shared::{
-    CloneBound, DeallocateBound, DefaultIn, InlinedMessageParent, MessageBindingMut,
+    CloneBound, DeallocateBound, DefaultIn, MessageBindingMut,
     slot_init::SlotInitMut,
     value_slot::{AddressableSlot, ValueSlot, ValueSlotMutAccess},
 };
@@ -81,7 +81,7 @@ impl<M: MessageEncode> PayloadAccess for ProtoMessage<M> {
         M: AddressableSlot + DefaultIn<A>,
         VS: ValueSlot<M, A>,
         I: SlotInitMut,
-        Cx: InlinedMessageParent<A>,
+        Cx: MessageBindingMut<A>,
         Self: 'a,
     {
         ValueSlot::with_mut(slot, init, common).get_mut()
@@ -94,7 +94,7 @@ impl<M: MessageEncode> PayloadAccess for ProtoMessage<M> {
         M: AddressableSlot + DefaultIn<A> + DeallocateBound<A>,
         VS: ValueSlot<M, A>,
         I: SlotInitMut,
-        Cx: InlinedMessageParent<A>,
+        Cx: MessageBindingMut<A>,
     {
         if let Some(old) = ValueSlot::with_mut(slot, init, common).replace(value) {
             old.deallocate_bound(common);
@@ -108,7 +108,7 @@ impl<M: MessageEncode> PayloadAccess for ProtoMessage<M> {
         M: AddressableSlot + DefaultIn<A> + DeallocateBound<A>,
         VS: ValueSlot<M, A>,
         I: SlotInitMut,
-        Cx: InlinedMessageParent<A>,
+        Cx: MessageBindingMut<A>,
     {
         if let Some(old) = ValueSlot::with_mut(slot, init, common).take_clear() {
             old.deallocate_bound(common);
@@ -151,7 +151,7 @@ impl<M: MessageEncode + MessageMerge> PayloadMerge for ProtoMessage<M> {
         Self::Slot<A>: AddressableSlot + DefaultIn<A> + DeallocateBound<A>,
         VS: ValueSlot<Self::Slot<A>, A>,
         I: SlotInitMut,
-        Cx: InlinedMessageParent<A>,
+        Cx: MessageBindingMut<A>,
         B: DecodeBuf,
     {
         if wire_type != WireType::Len {

@@ -187,8 +187,7 @@ Live plugin emits the eager-path field families shown by [`sample-generated/`](s
 | [`shared/value_layout.rs`](puroro-rt/src/fields/shared/value_layout.rs) | `ValueLayout` (`Slot` / `Mut`), `Inline`, `Boxed`, `BitPacked`, `InlineOrHeap` |
 | [`wire/repeated_element.rs`](puroro-rt/src/fields/wire/repeated_element.rs) | `RepeatedElement` / `RepeatedElementMerge` (`Element` for repeated buffers) |
 | [`wire/map_element.rs`](puroro-rt/src/fields/wire/map_element.rs) | `MapKey` (subset of `RepeatedElement`) |
-| [`wire/proto_message.rs`](puroro-rt/src/fields/wire/proto_message.rs) | `ProtoMessage` (nested message marker, `View = &M`) |
-| [`wire/proto_message.rs`](puroro-rt/src/fields/wire/proto_message.rs) | `ProtoMessage` (slot = `M` or `UnmanagedBox<M>`) |
+| [`wire/proto_message.rs`](puroro-rt/src/fields/wire/proto_message.rs) | `ProtoMessage` (slot = `M` or `UnmanagedBox<M>`, `View = &M`) |
 | [`wire/numerical.rs`](puroro-rt/src/fields/wire/numerical.rs) | `Numerical<C>`, `NumericalType` codecs, `ProtoInt32` / … / fixed / `ProtoEnum` + enum kind traits |
 | [`wire/len.rs`](puroro-rt/src/fields/wire/len.rs) | `LenScalar<C>`, `LenCodec`, `ProtoString`, `ProtoBytes` |
 | [`wire/sso_buf.rs`](puroro-rt/src/fields/wire/sso_buf.rs) | Shared 3-word untagged SSO union (`SsoBuf`) |
@@ -213,14 +212,14 @@ Live plugin emits the eager-path field families shown by [`sample-generated/`](s
 | Member | Role |
 |---|---|
 | `bits: B` | `BitArray<[u8; N], Lsb0>` **common bits**: EXPLICIT / LEGACY_REQUIRED presence, packed bool values, and string / bytes SSO heap-arm bits |
-| `unknown_fields: ManuallyDrop<`[`UnknownFields`](puroro-rt/src/unknown_fields.rs)`<A>>` | Preserve: empty ≈ 1 word; first use allocates self-blob + child map. Public iterator is the **self** blob only |
+| `unknown_fields: ManuallyDrop<`[`UnknownFields`](puroro-rt/src/unknown_fields.rs)`<A>>` | Preserve: empty ≈ 1 word; first use allocates this message’s wire blob. Public iterator parses that blob |
 | `alloc: A` | The single canonical allocator instance; cloned (by value) into every field operation that (de)allocates |
 
 Field catalog methods take `&MessageCommon` / `&mut MessageCommon`, not `&Task`, so wrappers stay decoupled from the parent message type.
 
-[`FieldDeallocate`](puroro-rt/src/fields/shared/field_deallocate.rs) — every catalog field (and [`OneofSlot`](puroro-rt/src/fields/oneof.rs)) implements `deallocate(&mut self, common: &MessageCommon<…>)`. Generated message `Drop` calls this on **each direct child** with the same shape. Copy / bit-packed fields are no-ops. Oneof **variants** are released inside the group's deallocate via [`OneofDeallocate`](puroro-rt/src/fields/oneof.rs) (`deallocate(self, common)`), which forwards to the same field `deallocate(common)`. Switching the active variant from [`OneofSlotMut`](puroro-rt/src/fields/oneof.rs) then runs [`OneofGroup::after_deallocate`](puroro-rt/src/fields/oneof.rs), which clears **every** bit and inlined unknown subtree the group owns (not a per-case match; do not zero neighbouring non-oneof bits such as `done` / `flag`). `Drop` does not call `after_deallocate` (the whole common is going away).
+[`FieldDeallocate`](puroro-rt/src/fields/shared/field_deallocate.rs) — every catalog field (and [`OneofSlot`](puroro-rt/src/fields/oneof.rs)) implements `deallocate(&mut self, common: &MessageCommon<…>)`. Generated message `Drop` calls this on **each direct child** with the same shape. Copy / bit-packed fields are no-ops. Oneof **variants** are released inside the group's deallocate via [`OneofDeallocate`](puroro-rt/src/fields/oneof.rs) (`deallocate(self, common)`), which forwards to the same field `deallocate(common)`. Switching the active variant from [`OneofSlotMut`](puroro-rt/src/fields/oneof.rs) then runs [`OneofGroup::after_deallocate`](puroro-rt/src/fields/oneof.rs), which clears **every** bit the group owns (not a per-case match; do not zero neighbouring non-oneof bits such as `done` / `flag`). `Drop` does not call `after_deallocate` (the whole common is going away).
 
-[`DeallocateBound`](puroro-rt/src/fields/shared/slot_bound.rs) / [`CloneBound`](puroro-rt/src/fields/shared/slot_bound.rs) — teardown / deep-copy of an **extracted** slot value (`take_value`), not of a catalog wrapper. `Cx` is a method parameter so [`Inline`](puroro-rt/src/fields/shared/value_layout.rs) can require `Slot: DeallocateBound<A>` while [`InlineOrHeap`](puroro-rt/src/fields/shared/value_layout.rs) does not (SSO arm selection is `HEAP_BIT`). Inlined nested Bodies impl these traits and walk child fields with a parent [`Window`](puroro-rt/src/fields/shared/window.rs). There is no blanket over `DeallocateIn` (a generated Body must not impl `DeallocateIn`).
+[`DeallocateBound`](puroro-rt/src/fields/shared/slot_bound.rs) / [`CloneBound`](puroro-rt/src/fields/shared/slot_bound.rs) — teardown / deep-copy of an **extracted** slot value (`take_value`), not of a catalog wrapper. `Cx` is a method parameter so [`Inline`](puroro-rt/src/fields/shared/value_layout.rs) can require `Slot: DeallocateBound<A>` while [`InlineOrHeap`](puroro-rt/src/fields/shared/value_layout.rs) does not (SSO arm selection is `HEAP_BIT`). Owned nested messages use [`impl_owned_slot_bounds`](puroro-rt/src/fields/shared/slot_bound.rs) (`DeallocateIn` / `CloneIn`). There is no blanket over `DeallocateIn`.
 
 [`MessageCommonBits`](puroro-rt/src/fields/shared.rs) / [`MessageCommonAlloc`](puroro-rt/src/fields/shared.rs) — catalog bounds on the common context (not on the bit-storage type). Common bits cover EXPLICIT / LEGACY_REQUIRED **presence**, packed **bool values**, and string / bytes **SSO heap-arm** bits. `MessageCommon` implements both; inherent `is_bit_set` / `set_bit` / `bit_mut` forward to `MessageCommonBits` (`bit_mut` returns bitvec's `BitRef<'_, Mut, u8, Lsb0>`). Generated messages store `BitArray<[u8; N], Lsb0>` in `_common.bits` with no per-message newtype.
 
@@ -776,15 +775,15 @@ Sample: `Task.attributes` — `map<string, int32>` → `MapField<ProtoString, Pr
 
 ## 16. Nested messages, oneof, unknown fields
 
-### Nested (`SharedMessage<M, FIELD, BIT_BASE>` / `ProtoMessage<M>`)
+### Nested (`ProtoMessage<M>`)
 
-Same wrapper as other singular fields. [`SharedMessage`](puroro-rt/src/fields/wire/shared_message.rs) getters are always a [`Window`](puroro-rt/src/fields/shared/window.rs) + body:
+Same wrapper as other singular fields. [`ProtoMessage`](puroro-rt/src/fields/wire/proto_message.rs) getters are `&M` / `&mut M`:
 
-- [`Boxed`](puroro-rt/src/fields/shared/value_layout.rs) + [`Message`](puroro-rt/src/fields/shared/field_presence.rs) → `Option<UnmanagedBox<M, A>>` (sample `Task.assignee`; window onto the **child** common)
-- [`Inline`](puroro-rt/src/fields/shared/value_layout.rs) + [`Explicit<BIT>`](puroro-rt/src/fields/shared/field_presence.rs) → `MaybeUninit<M::Body>` (sample `Task.origin`; window onto the **parent** at `BIT_BASE`)
-- [`Inline`](puroro-rt/src/fields/shared/value_layout.rs) + [`Oneof`](puroro-rt/src/fields/shared/field_presence.rs) → always-present `M::Body` (sample `notification.postal`; `BIT_BASE` = `BIT_POSTAL_BASE`)
+- [`Boxed`](puroro-rt/src/fields/shared/value_layout.rs) + [`Message`](puroro-rt/src/fields/shared/field_presence.rs) → `Option<UnmanagedBox<M, A>>` (sample `Task.assignee`)
+- [`Inline`](puroro-rt/src/fields/shared/value_layout.rs) + [`Explicit<BIT>`](puroro-rt/src/fields/shared/field_presence.rs) → `MaybeUninit<M>` (sample `Task.origin`)
+- [`Inline`](puroro-rt/src/fields/shared/value_layout.rs) + [`Oneof`](puroro-rt/src/fields/shared/field_presence.rs) → always-present `M` (sample `notification.postal`)
 
-[`ProtoMessage`](puroro-rt/src/fields/wire/proto_message.rs) (`View = &M`) remains for repeated `watchers` and generated fixtures. Recursion limit: enforced (`RECURSION_LIMIT`).
+An inlined child is a full message with its own `MessageCommon`. Recursion limit: enforced (`RECURSION_LIMIT`).
 
 ### Oneof (`OneofSlot<E>`)
 
@@ -805,11 +804,11 @@ The sample `oneof notification` is deliberately **heterogeneous** — LEN, VARIN
 
 **Ref/Mut payloads are not hard-coded in generated aliases.** Ref uses concrete getter types (`&str`, `i32`, …). Mut projects [`SingularFieldAccess::Mut`](puroro-rt/src/fields/singular/field.rs) from each variant's private field type alias (`EmailAddressField<A>`, …), which already carries the marker and [`ValueLayout`](puroro-rt/src/fields/shared/value_layout.rs). Per-variant private field type aliases remain the single source for Storage.
 
-**Variants own field wrappers, not raw storage.** Each variant holds the same field wrapper an ordinary singular field of that kind uses (`SingularField` — including `ProtoBool` + `BitPacked<VALUE_BIT>` for `bool` and `SharedMessage<M, FIELD, BIT_BASE>` for inlined messages), so `value` / `value_mut` / `deallocate` are reused. The wrapper's presence is inert here (`Oneof` / `FieldPresence::Oneof`), so presence-aware omit rules are never consulted; bool still packs its value into `_common.bits`. Markers are allocator-free; unmanaged payloads and field wrappers carry `A` (type only / `PhantomData`); the owned allocator instance stays on the message.
+**Variants own field wrappers, not raw storage.** Each variant holds the same field wrapper an ordinary singular field of that kind uses (`SingularField` — including `ProtoBool` + `BitPacked<VALUE_BIT>` for `bool` and `ProtoMessage<M>` for messages), so `value` / `value_mut` / `deallocate` are reused. The wrapper's presence is inert here (`Oneof` / `FieldPresence::Oneof`), so presence-aware omit rules are never consulted; bool still packs its value into `_common.bits`. Markers are allocator-free; unmanaged payloads and field wrappers carry `A` (type only / `PhantomData`); the owned allocator instance stays on the message.
 
 The oneof drives each variant with the **field's own** primitives. Empty construction is [`DefaultIn`](puroro-rt/src/fields/shared.rs) on the variant field wrapper (`SingularField::default_in`). Merging is `slot.bind_mut(common).variant_mut::<FIELD_…>().bind_mut(common).merge(wire, buf)`. Read getters use `slot.bind(common).variant_of::<FIELD_…>().optional()` / `.get()`. [`OneofVariant`](puroro-rt/src/fields/oneof_variant.rs) is keyed by proto field number (no per-variant marker ZSTs).
 
-**A boxed message variant uses `SingularField<ProtoMessage<…>, Oneof, …, Boxed>` — always-present `UnmanagedBox<M, A>`, not `Option`. An inlined oneof message variant uses `SharedMessage` + default `Inline` (`Slot = M::Body`), still under `Oneof` (no presence bit).** Switching away deallocates the body then [`OneofGroup::after_deallocate`](puroro-rt/src/fields/oneof.rs), which clears **all** bits and unknown subtrees the group owns (sample: email/phone SSO, `urgent` value, `[BIT_POSTAL_BASE, + Address::BIT_COUNT)`, `remove_child(FIELD_POSTAL)`). Do not zero a contiguous parent range that includes neighbouring non-oneof bits (`done` / `flag`). `with_mut` does not wipe on oneof install because presence is always-initialized.
+**A boxed message variant uses `SingularField<ProtoMessage<…>, Oneof, …, Boxed>` — always-present `UnmanagedBox<M, A>`, not `Option`. An inlined oneof message variant uses `ProtoMessage` + default `Inline` (`Slot = M`), still under `Oneof` (no presence bit).** Switching away deallocates the child (its own `Drop` releases its unknowns) then [`OneofGroup::after_deallocate`](puroro-rt/src/fields/oneof.rs), which clears bits the group owns on the parent (sample: email/phone SSO, `urgent` value). Do not zero a contiguous parent range that includes neighbouring non-oneof bits (`done` / `flag`). `with_mut` does not wipe on oneof install because presence is always-initialized.
 
 Parent `_mut` accessors are:
 `slot.bind_mut(common).variant_mut::<FIELD_…>().bind_mut(common).value_mut()`.
@@ -824,7 +823,7 @@ The `set_*` per-variant setters are removed, matching the other field families.
 
 ### Unknown
 
-**Storage (default Preserve):** [`UnknownFields`](puroro-rt/src/unknown_fields.rs) — empty is one word; `skip_field_and_save` / `save_unknown_varint_field` append the **self** blob. Encode uses `Deref` to that blob. Child subtrees (inlined messages) are stored by field number and are **not** listed on `unknown_fields()`. `SGroup` / `EGroup` not preserved.
+**Storage (default Preserve):** [`UnknownFields`](puroro-rt/src/unknown_fields.rs) — empty is one word; `skip_field_and_save` / `save_unknown_varint_field` append this message’s blob. Encode uses `Deref` to that blob. Inlined children keep a separate store on their own `MessageCommon`. `SGroup` / `EGroup` not preserved.
 
 **Public accessor:** `Message::unknown_fields()` returns `impl Iterator<Item = ::puroro::UnknownField<'_>>` by parsing that blob with [`iter_unknown_fields`](puroro-rt/src/decode.rs) (also `MessageCommon::iter_unknown_fields`). Encode paths read the blob directly and do not go through the iterator.
 

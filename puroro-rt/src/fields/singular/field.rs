@@ -29,7 +29,7 @@ use crate::encode::field_number_const;
 use crate::fields::shared::FieldDeallocate;
 use crate::fields::shared::field_inspect::{FieldCloneIn, FieldDebug, FieldEncode, FieldPartialEq};
 use crate::fields::shared::{
-    DefaultIn, InlinedMessageParent, MessageBindingMut, MessageCommon, MessageCommonAlloc,
+    DefaultIn, MessageBindingMut, MessageCommon, MessageCommonAlloc,
     field_presence::{
         Explicit, FieldPresence, Implicit, LegacyRequired, Message, Oneof, RequiredFieldPresence,
     },
@@ -160,7 +160,7 @@ where
 
     /// Binds this field to `common` for mutation.
     #[inline]
-    pub fn bind_mut<'f, 'c, Cx: InlinedMessageParent<A>>(
+    pub fn bind_mut<'f, 'c, Cx: MessageBindingMut<A>>(
         &'f mut self,
         common: &'c mut Cx,
     ) -> SingularFieldMut<'f, 'c, T, P, FIELD, A, L, D, Cx> {
@@ -259,10 +259,7 @@ where
     }
 
     /// Mutable accessor for a oneof variant (slot is always initialized).
-    pub fn value_mut<'a, Cx: InlinedMessageParent<A>>(
-        &'a mut self,
-        common: &'a mut Cx,
-    ) -> L::Mut<'a>
+    pub fn value_mut<'a, Cx: MessageBindingMut<A>>(&'a mut self, common: &'a mut Cx) -> L::Mut<'a>
     where
         A: Clone,
         L::Slot: DefaultIn<A>,
@@ -500,7 +497,7 @@ where
     P: FieldPresence,
     A: Allocator,
     L: ValueLayout<T, A>,
-    Cx: InlinedMessageParent<A>,
+    Cx: MessageBindingMut<A>,
     L::Slot: AddressableSlot,
     P::ValueSlot<L::Slot>: ValueSlot<L::Slot, A>,
 {
