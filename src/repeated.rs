@@ -6,64 +6,6 @@ use ::core::ops::DerefMut;
 
 use crate::String;
 
-/// Shared element-wise view of a repeated field.
-///
-/// Used when elements are **bound views** (nested messages) rather than a
-/// stored slice. [`get`](Self::get) returns [`Item`] by value (`AddressView`
-/// is `Copy`). Packable scalars stay `&[T]`; this trait is not that path.
-pub trait RepeatedRef<Item> {
-    /// Number of elements.
-    fn len(&self) -> usize;
-
-    /// `true` when there are no elements.
-    #[inline]
-    fn is_empty(&self) -> bool {
-        self.len() == 0
-    }
-
-    /// Shared view of the element at `index`, or [`None`] if out of range.
-    fn get(&self, index: usize) -> Option<Item>;
-
-    /// Iterator of element views (same items as successive [`get`](Self::get)).
-    fn iter(&self) -> impl Iterator<Item = Item> + '_;
-}
-
-/// Mutator API for a `repeated message` field whose elements are bound views.
-///
-/// [`Mut`](Self::Mut) is a generated `*Mut` (`AddressMut`, …), not `&mut M`.
-/// [`push`](Self::push) appends a default / empty message (C++ `add_foo()`).
-/// There is no `IndexMut`; out-of-range access goes through [`get_mut`](Self::get_mut).
-///
-/// Unlike [`RepeatedContainerMut`], this trait does **not** require
-/// [`DerefMut`] — a message mut view is not a place of type `M`.
-pub trait RepeatedMessageMut {
-    /// Mutable handle for one element (`AddressMut`, …).
-    type Mut<'a>
-    where
-        Self: 'a;
-
-    /// Number of elements.
-    fn len(&self) -> usize;
-
-    /// `true` when there are no elements.
-    #[inline]
-    fn is_empty(&self) -> bool {
-        self.len() == 0
-    }
-
-    /// Appends a default / empty element and returns a mutator for it.
-    fn push(&mut self) -> Self::Mut<'_>;
-
-    /// Mutable handle for the element at `index`, or [`None`] if out of range.
-    fn get_mut(&mut self, index: usize) -> Option<Self::Mut<'_>>;
-
-    /// Removes all elements (heap payloads are released).
-    fn clear(&mut self);
-
-    /// Removes the last element (and releases it). Returns whether one existed.
-    fn pop(&mut self) -> bool;
-}
-
 /// Minimal mutator API for a repeated field container.
 ///
 /// Generated repeated `_mut` accessors may return `impl RepeatedContainerMut`
