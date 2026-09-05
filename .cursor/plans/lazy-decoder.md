@@ -159,18 +159,26 @@ applied numericals / promoted SSO; unpromoted LEN stays offsets.
 One hard piece per step. Each step ends with tests that do not require the
 next step. Do not start the plugin until step 9.
 
-### Step 1 — `TaskMessageFallible` on eager `Task`
+### Step 1 — `TaskMessageFallible` on eager `Task` (done 2026-09-06)
 
 Sample only. Getters match inherent shapes wrapped in `Result<_, Infallible>`
 (or an associated `Error`). No `_mut` on the trait.
 
+Handwritten: [`sample-generated/src/task/fallible.rs`](../../sample-generated/src/task/fallible.rs).
+Test: [`sample-generated/tests/task_fallible.rs`](../../sample-generated/tests/task_fallible.rs).
+
 Done when a generic helper can read `Task` through the trait only.
 
-### Step 2 — Record scanner in `puroro-rt`
+### Step 2 — Record scanner in `puroro-rt` (done 2026-09-06)
 
 No message type. Input: `Buf` / chunks. Output: complete
 `(field_number, wire_type, payload)` or `NeedMore`. Leftover holds an
 incomplete tag, length varint, or LEN prefix.
+
+Implemented: [`puroro-rt/src/decode/record.rs`](../../puroro-rt/src/decode/record.rs)
+(`RecordScanner` → [`protobuf_core::Field`](../../protobuf-core/src/field.rs)).
+`push` returns complete fields; leftover means need more; `finish` is
+`TruncatedMessage` if leftover remains.
 
 Tests: mid-varint, mid-fixed, mid-LEN, empty chunk, two chunks that form one
 record, trailing garbage after `finish` (error).

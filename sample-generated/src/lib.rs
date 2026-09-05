@@ -53,4 +53,5 @@ pub use marker_type::Marker;
 pub use point_type::Point;
 pub use school_type::School;
 pub use student_type::Student;
+pub use task::TaskMessageFallible;
 pub use task_type::Task;

@@ -4,8 +4,10 @@
 //! The `Task` struct itself lives in the crate root (the parent module).
 
 pub(crate) mod defaults;
+mod fallible;
 pub mod notification;
 
+pub use fallible::TaskMessageFallible;
 pub use notification::{Notification, NotificationCase};
 
 // ---------------------------------------------------------------------------

@@ -1245,7 +1245,7 @@ Planned interoperability traits, emitted per message once specialized layouts la
 - **`FooMessage`** — infallible getters matching the inherent shapes in [§4.0](#40-inherent-accessors-current) (for eager implementations).
 - **`FooMessageFallible`** — `Result`-returning getters for lazy / view layouts (`Error = DecodeError` or `Infallible` on eager).
 
-These traits are **not** yet emitted by `protoc-gen-puroro`, and the hand-written [`sample-generated`](sample-generated/) crate does not implement them either. When the generator adds the traits, explicit-presence fields should keep `Optional` as the primary read API; convenience `has_*` / `*_raw` wrappers (if any) would be trait defaults, not a second required surface on the concrete struct.
+These traits are **not** yet emitted by `protoc-gen-puroro`. The hand-written [`sample-generated`](sample-generated/) crate implements [`TaskMessageFallible`](sample-generated/src/task/fallible.rs) on eager `Task` (`Error = Infallible`) as the first lazy-decoder step; other sample messages do not implement the traits yet. When the generator adds the traits, explicit-presence fields should keep `Optional` as the primary read API; convenience `has_*` / `*_raw` wrappers (if any) would be trait defaults, not a second required surface on the concrete struct.
 
 ### Specialized message implementations
 
