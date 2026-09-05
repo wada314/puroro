@@ -2,5 +2,9 @@
 //!
 //! Sample-only inlined nested-message experiment (not in DESIGN.md yet).
 
+mod lazy;
+
+pub use lazy::PointLazy;
+
 pub const FIELD_X: u32 = 1; // x
 pub const FIELD_Y: u32 = 2; // y

@@ -33,6 +33,7 @@ pub use value_layout::{BitPacked, Boxed, Inline, InlineOrHeap, SSO_HEAP, SSO_INL
 pub use value_slot::AddressableSlot;
 // MessageBinding / MessageBindingMut are defined in this module.
 
+use ::core::cell::UnsafeCell;
 use ::core::mem::ManuallyDrop;
 
 use crate::decode::{UnknownFieldsIter, iter_unknown_fields};
@@ -71,6 +72,73 @@ impl<const N: usize> BitStorage for BitArray<[u8; N], Lsb0> {
     #[inline]
     fn bit_mut(&mut self, bit: usize) -> BitRef<'_, Mut, u8, Lsb0> {
         self.get_mut(bit).expect("common bit index in range")
+    }
+}
+
+/// [`BitArray`] behind [`UnsafeCell`] so lazy promotion can update arm bits
+/// through `&self`.
+///
+/// Catalog `bit_mut` still requires `&mut self`. Shared writes go through
+/// [`set_shared`](Self::set_shared).
+pub struct InteriorBitArray<const N: usize> {
+    bits: UnsafeCell<BitArray<[u8; N], Lsb0>>,
+}
+
+impl<const N: usize> InteriorBitArray<N> {
+    pub fn zero() -> Self {
+        Self {
+            bits: UnsafeCell::new(BitArray::ZERO),
+        }
+    }
+
+    #[inline]
+    pub fn is_set(&self, bit: usize) -> bool {
+        // SAFETY: only bit cells are written; readers see a single-byte store.
+        unsafe { (&(*self.bits.get()))[bit] }
+    }
+
+    #[inline]
+    pub fn set_shared(&self, bit: usize, value: bool) {
+        // SAFETY: callers serialize with `&self` promotion or exclusive `&mut`.
+        unsafe {
+            BitSlice::set(&mut *self.bits.get(), bit, value);
+        }
+    }
+}
+
+impl<const N: usize> Clone for InteriorBitArray<N> {
+    fn clone(&self) -> Self {
+        Self {
+            bits: UnsafeCell::new(unsafe { *self.bits.get() }),
+        }
+    }
+}
+
+impl<const N: usize> Default for InteriorBitArray<N> {
+    fn default() -> Self {
+        Self::zero()
+    }
+}
+
+impl<const N: usize> BitStorage for InteriorBitArray<N> {
+    #[inline]
+    fn is_set(&self, bit: usize) -> bool {
+        InteriorBitArray::is_set(self, bit)
+    }
+
+    #[inline]
+    fn set(&mut self, bit: usize, value: bool) {
+        self.set_shared(bit, value);
+    }
+
+    #[inline]
+    fn bit_mut(&mut self, bit: usize) -> BitRef<'_, Mut, u8, Lsb0> {
+        // SAFETY: exclusive `&mut self`.
+        unsafe {
+            (*self.bits.get())
+                .get_mut(bit)
+                .expect("common bit index in range")
+        }
     }
 }
 

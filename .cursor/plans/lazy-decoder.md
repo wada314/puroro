@@ -209,7 +209,9 @@ each time. No arm switch, no `UnsafeCell`.
 Tests: last-wins string, `InvalidUtf8` before `Optional` is built, presence
 vs semantic decode, missing field.
 
-Done when fallible LEN getters are correct without unsafe layout.
+Done (2026-09-06): singular `title` / `owner_id` / `payload` store `WireSpan`
+into `_wire`; getter decodes every time (`InvalidUtf8` before `Optional`).
+`has_*` is presence-only. No union / `UnsafeCell`.
 
 ### Step 5 — Replace the LEN slot with `WireOrSso`
 
@@ -217,7 +219,9 @@ Only this step may add the union, the extra common bits, and `&self`
 promotion. Second get must not re-validate. `Failed` is sticky. `Drop` /
 `Clone` honour the live arm.
 
-Done when step 4 tests still pass and promote/drop tests are added.
+Done (2026-09-06): `WireOrSsoSlot` + two common arm bits + `&self`
+promotion (`InteriorBitArray`). Second get does not re-validate. `Failed`
+is sticky. `Drop` / `clone_in` honour the live arm.
 
 ### Step 6 — Nested messages as offsets → `AddressLazy` / `PointLazy`
 
@@ -242,6 +246,11 @@ behaviour matches eager `merge`. That requires the child scanner to accept
 a complete LEN as a finished input. Do that rather than “last slice only”
 if both are easy; if not, last-slice-only is acceptable for a first nested
 cut and must be called out in the test name.
+
+Done (2026-09-06): `AddressLazy` / `PointLazy`. During the parent scan each
+complete message LEN is `merge_from`'d into a still-lazy child (proto
+submessage merge, not last-slice-only). Repeated `watchers` appends one
+child per occurrence.
 
 ### Step 7 — Map as offset list
 

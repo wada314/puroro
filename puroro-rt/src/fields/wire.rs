@@ -19,6 +19,7 @@ pub(crate) mod singular_type;
 pub(crate) mod sso_buf;
 pub(crate) mod sso_bytes;
 pub(crate) mod sso_string;
+pub(crate) mod wire_or_sso;
 pub(crate) mod wire_payload;
 
 pub use len::{ProtoBytes, ProtoString, ProtoStringUnchecked};
@@ -32,3 +33,4 @@ pub use repeated_element::RepeatedElement;
 pub use singular_type::{PayloadAccess, SingularType};
 pub use sso_bytes::{SsoBytes, SsoBytesMut};
 pub use sso_string::{INLINE_CAP, SsoString, SsoStringMut};
+pub use wire_or_sso::{LazyBytesSlot, LazyStringSlot, WireOrSsoArm, WireOrSsoSlot};

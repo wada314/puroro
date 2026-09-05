@@ -38,19 +38,19 @@ pub use fields::shared::{
     AddressableSlot, BitPacked, Boxed, CloneBound, CloneFieldsVisitor, DeallocateBound,
     DebugStructVisitor, DiscardUnknowns, EncodeRawVisitor, EncodedLenVisitor, FieldCloneIn,
     FieldDeallocVisitor, FieldDeallocate, FieldEncode, FieldEqVisitor, FieldPairVisitor,
-    FieldPairVisitorMut, FieldVisitor, FieldVisitorMut, Inline, InlineOrHeap, MessageBinding,
-    MessageBindingMut, MessageCommon, MessageCommonAlloc, MessageCommonBits, SSO_HEAP, SSO_INLINE,
-    UnknownFields, UnknownStore, ValueLayout,
+    FieldPairVisitorMut, FieldVisitor, FieldVisitorMut, Inline, InlineOrHeap, InteriorBitArray,
+    MessageBinding, MessageBindingMut, MessageCommon, MessageCommonAlloc, MessageCommonBits,
+    SSO_HEAP, SSO_INLINE, UnknownFields, UnknownStore, ValueLayout,
 };
 pub use fields::singular::{
     SingularField, SingularFieldAccess, SingularFieldMut, SingularFieldRef,
 };
 pub use fields::wire::{
-    Closed, ClosedEnum, INLINE_CAP, Open, OpenEnum, PayloadAccess, ProtoBool, ProtoBytes,
-    ProtoDouble, ProtoEnum, ProtoEnumStorage, ProtoFixed32, ProtoFixed64, ProtoFloat, ProtoInt32,
-    ProtoInt64, ProtoMessage, ProtoSFixed32, ProtoSFixed64, ProtoSInt32, ProtoSInt64, ProtoString,
-    ProtoStringUnchecked, ProtoUInt32, ProtoUInt64, SingularType, SsoBytes, SsoBytesMut, SsoString,
-    SsoStringMut,
+    Closed, ClosedEnum, INLINE_CAP, LazyBytesSlot, LazyStringSlot, Open, OpenEnum, PayloadAccess,
+    ProtoBool, ProtoBytes, ProtoDouble, ProtoEnum, ProtoEnumStorage, ProtoFixed32, ProtoFixed64,
+    ProtoFloat, ProtoInt32, ProtoInt64, ProtoMessage, ProtoSFixed32, ProtoSFixed64, ProtoSInt32,
+    ProtoSInt64, ProtoString, ProtoStringUnchecked, ProtoUInt32, ProtoUInt64, SingularType,
+    SsoBytes, SsoBytesMut, SsoString, SsoStringMut, WireOrSsoArm, WireOrSsoSlot,
 };
 pub use message_encode::{EncodeCtx, MessageEncode, encode_message, encode_message_to_vec};
 pub use message_merge::{MessageMerge, merge_message};

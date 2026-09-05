@@ -1,33 +1,48 @@
 //! Read-oriented `Task` that applies numericals during a resumable scan.
 //!
-//! LEN / map / nested / oneof records are skipped. Numerical getters require a
-//! finished input stream so last-wins is final.
+//! Singular string / bytes use [`LazyStringSlot`] / [`LazyBytesSlot`]: Wire
+//! spans promote to Inline / Heap on first get. Failed UTF-8 is sticky.
+//! Nested `assignee` / `origin` merge each complete LEN into a child lazy
+//! message during the parent scan. Repeated `watchers` appends one child per
+//! occurrence. Map / oneof / repeated string are still skipped. Getters
+//! require a finished input stream so last-wins is final.
 
 use ::allocator_api2::alloc::{Allocator, Global};
-use ::bitvec::array::BitArray;
-use ::bitvec::order::Lsb0;
+use ::allocator_api2::vec::Vec as AllocVec;
 use ::bytes::Buf;
 use ::core::ops::ControlFlow;
 use ::puroro::{DecodeError, HasDefault, Optional};
-use ::puroro_rt::decode::{RecordScanner, merge_scanned_field};
+use ::puroro_rt::decode::{
+    LazyScan, ScannedRecord, merge_scanned_field, scanned_len_payload, scanned_len_span,
+};
 use ::puroro_rt::{
     BitPacked, Closed, Expanded, Explicit, FieldDeallocVisitor, FieldVisitorMut, Implicit, Inline,
-    MessageCommon, Open, Packed, ProtoBool, ProtoEnum, ProtoInt32, RepeatedField, SingularField,
+    InteriorBitArray, LazyBytesSlot, LazyStringSlot, MessageCommon, Open, Packed, ProtoBool,
+    ProtoDefault, ProtoEnum, ProtoInt32, RepeatedField, SingularField, WireOrSsoArm,
 };
 
+use crate::address::AddressLazy;
 use crate::enums::{Priority, Status};
+use crate::point::PointLazy;
 use crate::task::defaults::MaxRetriesDefault;
 use crate::task::{
-    BIT_DONE_VALUE, BIT_FLAG, BIT_FLAG_VALUE, BIT_MAX_RETRIES, BIT_PRIORITY, FIELD_DONE,
-    FIELD_FLAG, FIELD_MAX_RETRIES, FIELD_PRIORITY, FIELD_SCORE, FIELD_SCORES, FIELD_STATUS,
-    FIELD_TAG_IDS, FIELD_VOTES,
+    BIT_DONE_VALUE, BIT_FLAG, BIT_FLAG_VALUE, BIT_MAX_RETRIES, BIT_OWNER_ID, BIT_OWNER_ID_ARM1,
+    BIT_OWNER_ID_SSO, BIT_PAYLOAD, BIT_PAYLOAD_ARM1, BIT_PAYLOAD_SSO, BIT_PRIORITY, BIT_TITLE,
+    BIT_TITLE_ARM1, BIT_TITLE_SSO, FIELD_ASSIGNEE, FIELD_DONE, FIELD_FLAG, FIELD_MAX_RETRIES,
+    FIELD_ORIGIN, FIELD_OWNER_ID, FIELD_PAYLOAD, FIELD_PRIORITY, FIELD_SCORE, FIELD_SCORES,
+    FIELD_STATUS, FIELD_TAG_IDS, FIELD_TITLE, FIELD_VOTES, FIELD_WATCHERS,
 };
 
-/// Lazy `Task` with numerical catalog slots; LEN fields are not stored yet.
+/// Lazy `Task` with numerical catalog slots and singular `WireOrSso` LEN.
 pub struct TaskLazy<A: Allocator = Global> {
-    scanner: RecordScanner<A>,
-    finished: bool,
-    _common: MessageCommon<BitArray<[u8; 2], Lsb0>, A>,
+    scan: LazyScan<A>,
+    _common: MessageCommon<InteriorBitArray<3>, A>,
+    title: LazyStringSlot<A>,
+    owner_id: LazyStringSlot<A>,
+    payload: LazyBytesSlot<A>,
+    assignee: Option<AddressLazy<A>>,
+    origin: Option<PointLazy<A>>,
+    watchers: AllocVec<AddressLazy<A>, A>,
     score: SingularField<ProtoInt32, Implicit, { FIELD_SCORE }, A>,
     max_retries: SingularField<
         ProtoInt32,
@@ -76,6 +91,74 @@ impl TaskLazy<Global> {
 }
 
 impl<A: Allocator> TaskLazy<A> {
+    pub fn title(&self) -> Result<Optional<&str, impl HasDefault<&str>>, DecodeError>
+    where
+        A: Clone,
+    {
+        self.require_finished()?;
+        if !self._common.is_bit_set(BIT_TITLE) {
+            return Ok(Optional::<&str, ProtoDefault>::new(None));
+        }
+        let s = self.title.get_str(
+            self.arm(BIT_TITLE_SSO, BIT_TITLE_ARM1),
+            self.scan.wire(),
+            self._common.alloc.clone(),
+            |arm| self.set_arm(BIT_TITLE_SSO, BIT_TITLE_ARM1, arm),
+        )?;
+        Ok(Optional::new(Some(s)))
+    }
+
+    /// Wire presence only; does not UTF-8-check the payload.
+    pub fn has_title(&self) -> Result<bool, DecodeError> {
+        self.require_finished()?;
+        Ok(self._common.is_bit_set(BIT_TITLE))
+    }
+
+    pub fn owner_id(&self) -> Result<Optional<&str, impl HasDefault<&str>>, DecodeError>
+    where
+        A: Clone,
+    {
+        self.require_finished()?;
+        if !self._common.is_bit_set(BIT_OWNER_ID) {
+            return Ok(Optional::<&str, ProtoDefault>::new(None));
+        }
+        let s = self.owner_id.get_str(
+            self.arm(BIT_OWNER_ID_SSO, BIT_OWNER_ID_ARM1),
+            self.scan.wire(),
+            self._common.alloc.clone(),
+            |arm| self.set_arm(BIT_OWNER_ID_SSO, BIT_OWNER_ID_ARM1, arm),
+        )?;
+        Ok(Optional::new(Some(s)))
+    }
+
+    /// Wire presence only; does not UTF-8-check the payload.
+    pub fn has_owner_id(&self) -> Result<bool, DecodeError> {
+        self.require_finished()?;
+        Ok(self._common.is_bit_set(BIT_OWNER_ID))
+    }
+
+    pub fn payload(&self) -> Result<Optional<&[u8], impl HasDefault<&[u8]>>, DecodeError>
+    where
+        A: Clone,
+    {
+        self.require_finished()?;
+        if !self._common.is_bit_set(BIT_PAYLOAD) {
+            return Ok(Optional::<&[u8], ProtoDefault>::new(None));
+        }
+        let bytes = self.payload.get_bytes(
+            self.arm(BIT_PAYLOAD_SSO, BIT_PAYLOAD_ARM1),
+            self.scan.wire(),
+            self._common.alloc.clone(),
+            |arm| self.set_arm(BIT_PAYLOAD_SSO, BIT_PAYLOAD_ARM1, arm),
+        )?;
+        Ok(Optional::new(Some(bytes)))
+    }
+
+    pub fn has_payload(&self) -> Result<bool, DecodeError> {
+        self.require_finished()?;
+        Ok(self._common.is_bit_set(BIT_PAYLOAD))
+    }
+
     pub fn score(&self) -> Result<i32, DecodeError> {
         self.require_finished()?;
         Ok(self.score.bind(&self._common).value())
@@ -135,17 +218,39 @@ impl<A: Allocator> TaskLazy<A> {
         Ok(self.votes.bind(&self._common).as_slice())
     }
 
-    fn require_finished(&self) -> Result<(), DecodeError> {
-        if self.finished {
-            Ok(())
-        } else if self.scanner.needs_more() {
-            Err(DecodeError::TruncatedMessage)
-        } else {
-            Err(DecodeError::UnfinishedMessage)
-        }
+    pub fn assignee(&self) -> Result<Option<&AddressLazy<A>>, DecodeError> {
+        self.require_finished()?;
+        Ok(self.assignee.as_ref())
     }
 
-    fn visit_fields_mut<V: FieldVisitorMut<MessageCommon<BitArray<[u8; 2], Lsb0>, A>>>(
+    pub fn origin(&self) -> Result<Option<&PointLazy<A>>, DecodeError> {
+        self.require_finished()?;
+        Ok(self.origin.as_ref())
+    }
+
+    pub fn watchers(&self) -> Result<&[AddressLazy<A>], DecodeError> {
+        self.require_finished()?;
+        Ok(&self.watchers)
+    }
+
+    fn require_finished(&self) -> Result<(), DecodeError> {
+        self.scan.require_finished()
+    }
+
+    fn arm(&self, arm0: usize, arm1: usize) -> WireOrSsoArm {
+        WireOrSsoArm::from_bits(
+            self._common.bits.is_set(arm0),
+            self._common.bits.is_set(arm1),
+        )
+    }
+
+    fn set_arm(&self, arm0: usize, arm1: usize, arm: WireOrSsoArm) {
+        let (b0, b1) = arm.bits();
+        self._common.bits.set_shared(arm0, b0);
+        self._common.bits.set_shared(arm1, b1);
+    }
+
+    fn visit_fields_mut<V: FieldVisitorMut<MessageCommon<InteriorBitArray<3>, A>>>(
         &mut self,
         v: &mut V,
     ) -> ControlFlow<V::Break> {
@@ -165,9 +270,14 @@ impl<A: Allocator> TaskLazy<A> {
 impl<A: Allocator + Clone> TaskLazy<A> {
     pub fn new_in(alloc: A) -> Self {
         Self {
-            scanner: RecordScanner::new_in(alloc.clone()),
-            finished: true,
-            _common: MessageCommon::new_in(BitArray::ZERO, alloc.clone()),
+            scan: LazyScan::new_in(alloc.clone()),
+            _common: MessageCommon::new_in(InteriorBitArray::zero(), alloc.clone()),
+            title: LazyStringSlot::empty(),
+            owner_id: LazyStringSlot::empty(),
+            payload: LazyBytesSlot::empty(),
+            assignee: None,
+            origin: None,
+            watchers: AllocVec::new_in(alloc.clone()),
             score: SingularField::new_in(alloc.clone()),
             max_retries: SingularField::new_in(alloc.clone()),
             tag_ids: RepeatedField::new_in(alloc.clone()),
@@ -180,21 +290,20 @@ impl<A: Allocator + Clone> TaskLazy<A> {
         }
     }
 
-    /// Feed one I/O chunk. Complete numerical records are merged immediately.
+    /// Feed one I/O chunk. Complete numerical records are merged immediately;
+    /// singular LEN records store a span into `_wire`. Nested message LENs are
+    /// merged into a child lazy message.
     pub fn push(&mut self, chunk: &[u8]) -> Result<(), DecodeError> {
-        self.finished = false;
-        let records = self.scanner.push(chunk)?;
-        for field in records {
-            self.apply_record(&field)?;
+        let (origin, records) = self.scan.push(chunk)?;
+        for rec in records {
+            self.apply_record(&rec, origin)?;
         }
         Ok(())
     }
 
     /// Close the current input stream. Non-empty leftover is truncated input.
     pub fn finish(&mut self) -> Result<(), DecodeError> {
-        self.scanner.finish()?;
-        self.finished = true;
-        Ok(())
+        self.scan.finish()
     }
 
     /// Merge one complete message body (push remaining bytes, then finish).
@@ -215,52 +324,94 @@ impl<A: Allocator + Clone> TaskLazy<A> {
         self.finish()
     }
 
-    fn apply_record<L: AsRef<[u8]>>(
-        &mut self,
-        field: &::puroro_rt::Field<L>,
-    ) -> Result<(), DecodeError> {
-        match field.field_number.as_u32() {
-            FIELD_SCORE => merge_scanned_field(field, |wire_type, buf| {
+    fn apply_record(&mut self, rec: &ScannedRecord<A>, origin: usize) -> Result<(), DecodeError> {
+        match rec.field_number.as_u32() {
+            FIELD_TITLE => {
+                let span = scanned_len_span(origin, rec)?;
+                let old = self.arm(BIT_TITLE_SSO, BIT_TITLE_ARM1);
+                self.title.store_wire(span, old, &self._common.alloc);
+                self._common.set_bit(BIT_TITLE, true);
+                self.set_arm(BIT_TITLE_SSO, BIT_TITLE_ARM1, WireOrSsoArm::Wire);
+                Ok(())
+            }
+            FIELD_OWNER_ID => {
+                let span = scanned_len_span(origin, rec)?;
+                let old = self.arm(BIT_OWNER_ID_SSO, BIT_OWNER_ID_ARM1);
+                self.owner_id.store_wire(span, old, &self._common.alloc);
+                self._common.set_bit(BIT_OWNER_ID, true);
+                self.set_arm(BIT_OWNER_ID_SSO, BIT_OWNER_ID_ARM1, WireOrSsoArm::Wire);
+                Ok(())
+            }
+            FIELD_PAYLOAD => {
+                let span = scanned_len_span(origin, rec)?;
+                let old = self.arm(BIT_PAYLOAD_SSO, BIT_PAYLOAD_ARM1);
+                self.payload.store_wire(span, old, &self._common.alloc);
+                self._common.set_bit(BIT_PAYLOAD, true);
+                self.set_arm(BIT_PAYLOAD_SSO, BIT_PAYLOAD_ARM1, WireOrSsoArm::Wire);
+                Ok(())
+            }
+            FIELD_ASSIGNEE => {
+                let payload = scanned_len_payload(rec)?;
+                let child = self
+                    .assignee
+                    .get_or_insert_with(|| AddressLazy::new_in(self._common.alloc.clone()));
+                child.merge_from(&mut &payload[..])
+            }
+            FIELD_ORIGIN => {
+                let payload = scanned_len_payload(rec)?;
+                let child = self
+                    .origin
+                    .get_or_insert_with(|| PointLazy::new_in(self._common.alloc.clone()));
+                child.merge_from(&mut &payload[..])
+            }
+            FIELD_WATCHERS => {
+                let payload = scanned_len_payload(rec)?;
+                let mut child = AddressLazy::new_in(self._common.alloc.clone());
+                child.merge_from(&mut &payload[..])?;
+                self.watchers.push(child);
+                Ok(())
+            }
+            FIELD_SCORE => merge_scanned_field(&rec.field, |wire_type, buf| {
                 self.score
                     .bind_mut(&mut self._common)
                     .merge(wire_type, buf, 0)
             }),
-            FIELD_MAX_RETRIES => merge_scanned_field(field, |wire_type, buf| {
+            FIELD_MAX_RETRIES => merge_scanned_field(&rec.field, |wire_type, buf| {
                 self.max_retries
                     .bind_mut(&mut self._common)
                     .merge(wire_type, buf, 0)
             }),
-            FIELD_TAG_IDS => merge_scanned_field(field, |wire_type, buf| {
+            FIELD_TAG_IDS => merge_scanned_field(&rec.field, |wire_type, buf| {
                 self.tag_ids
                     .bind_mut(&mut self._common)
                     .merge(wire_type, buf, 0)
             }),
-            FIELD_SCORES => merge_scanned_field(field, |wire_type, buf| {
+            FIELD_SCORES => merge_scanned_field(&rec.field, |wire_type, buf| {
                 self.scores
                     .bind_mut(&mut self._common)
                     .merge(wire_type, buf, 0)
             }),
-            FIELD_STATUS => merge_scanned_field(field, |wire_type, buf| {
+            FIELD_STATUS => merge_scanned_field(&rec.field, |wire_type, buf| {
                 self.status
                     .bind_mut(&mut self._common)
                     .merge(wire_type, buf, 0)
             }),
-            FIELD_PRIORITY => merge_scanned_field(field, |wire_type, buf| {
+            FIELD_PRIORITY => merge_scanned_field(&rec.field, |wire_type, buf| {
                 self.priority
                     .bind_mut(&mut self._common)
                     .merge(wire_type, buf, 0)
             }),
-            FIELD_DONE => merge_scanned_field(field, |wire_type, buf| {
+            FIELD_DONE => merge_scanned_field(&rec.field, |wire_type, buf| {
                 self.done
                     .bind_mut(&mut self._common)
                     .merge(wire_type, buf, 0)
             }),
-            FIELD_FLAG => merge_scanned_field(field, |wire_type, buf| {
+            FIELD_FLAG => merge_scanned_field(&rec.field, |wire_type, buf| {
                 self.flag
                     .bind_mut(&mut self._common)
                     .merge(wire_type, buf, 0)
             }),
-            FIELD_VOTES => merge_scanned_field(field, |wire_type, buf| {
+            FIELD_VOTES => merge_scanned_field(&rec.field, |wire_type, buf| {
                 self.votes
                     .bind_mut(&mut self._common)
                     .merge(wire_type, buf, 0)
@@ -272,6 +423,16 @@ impl<A: Allocator + Clone> TaskLazy<A> {
 
 impl<A: Allocator> Drop for TaskLazy<A> {
     fn drop(&mut self) {
+        self.title
+            .deallocate(self.arm(BIT_TITLE_SSO, BIT_TITLE_ARM1), &self._common.alloc);
+        self.owner_id.deallocate(
+            self.arm(BIT_OWNER_ID_SSO, BIT_OWNER_ID_ARM1),
+            &self._common.alloc,
+        );
+        self.payload.deallocate(
+            self.arm(BIT_PAYLOAD_SSO, BIT_PAYLOAD_ARM1),
+            &self._common.alloc,
+        );
         let mut v = FieldDeallocVisitor::new(&self._common);
         let _ = self.visit_fields_mut(&mut v);
         self._common.deallocate();

@@ -5,10 +5,15 @@
 //! [`ChunkScanLikely1`]. Tags are unpacked here into a validated [`FieldNumber`]
 //! plus [`WireType`].
 
+mod lazy_scan;
 mod record;
 mod varint;
 
-pub use self::record::{RecordScanner, merge_scanned_field};
+pub use self::lazy_scan::LazyScan;
+pub use self::record::{
+    RecordScanner, ScannedRecord, WireSpan, merge_scanned_field, scanned_len_payload,
+    scanned_len_span,
+};
 pub use self::varint::{
     ByteIterator, BytePair, ByteQuad, ChunkScan, ChunkScan1, ChunkScan2, ChunkScan4, ChunkScanHot2,
     ChunkScanHot4, ChunkScanHot8, ChunkScanHot10, ChunkScanHotAdapt, ChunkScanLikely1,

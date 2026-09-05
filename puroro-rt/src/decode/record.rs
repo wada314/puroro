@@ -6,6 +6,7 @@
 
 use ::allocator_api2::alloc::{Allocator, Global};
 use ::allocator_api2::vec::Vec as AllocVec;
+use ::core::ops::Deref;
 use ::protobuf_core::{
     Field, FieldNumber, FieldValue, MAX_VARINT_BYTES, VARINT_CONTINUATION_BIT, VARINT_PAYLOAD_MASK,
     Varint,
@@ -13,6 +14,66 @@ use ::protobuf_core::{
 use ::puroro::wire_type;
 use ::puroro::{DecodeError, ScopedBuf, WireType};
 use ::std::vec::Vec;
+
+/// Byte range of one field payload inside a parent `_wire` buffer.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct WireSpan {
+    pub offset: usize,
+    pub len: usize,
+}
+
+impl WireSpan {
+    /// Returns the span as a subslice of `wire`.
+    pub fn slice(self, wire: &[u8]) -> Result<&[u8], DecodeError> {
+        let end = self
+            .offset
+            .checked_add(self.len)
+            .ok_or(DecodeError::TruncatedMessage)?;
+        wire.get(self.offset..end)
+            .ok_or(DecodeError::TruncatedMessage)
+    }
+}
+
+/// One complete record from [`RecordScanner::push`], with its position in
+/// `leftover || chunk`.
+#[derive(Debug)]
+pub struct ScannedRecord<A: Allocator> {
+    pub field: Field<AllocVec<u8, A>>,
+    pub start: usize,
+    pub len: usize,
+}
+
+impl<A: Allocator> Deref for ScannedRecord<A> {
+    type Target = Field<AllocVec<u8, A>>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.field
+    }
+}
+
+/// LEN payload range in `_wire`, given `origin` of `leftover || chunk`.
+///
+/// The payload is the last `Len` bytes of the record (after tag + length).
+pub fn scanned_len_span<A: Allocator>(
+    origin: usize,
+    rec: &ScannedRecord<A>,
+) -> Result<WireSpan, DecodeError> {
+    match &rec.field.value {
+        FieldValue::Len(payload) => Ok(WireSpan {
+            offset: origin + rec.start + rec.len - payload.len(),
+            len: payload.len(),
+        }),
+        _ => Err(DecodeError::InvalidTag),
+    }
+}
+
+/// LEN payload bytes from a scanned record (content only).
+pub fn scanned_len_payload<A: Allocator>(rec: &ScannedRecord<A>) -> Result<&[u8], DecodeError> {
+    match &rec.field.value {
+        FieldValue::Len(payload) => Ok(payload.as_slice()),
+        _ => Err(DecodeError::InvalidTag),
+    }
+}
 
 /// Leftover-holding scanner over vectored / chunked input.
 #[derive(Debug)]
@@ -65,10 +126,7 @@ impl<A: Allocator + Clone> RecordScanner<A> {
     /// Complete records are read in place. Only the unfinished tail is copied
     /// into leftover. Incomplete input is not an error here — call
     /// [`finish`](Self::finish) when no more bytes will arrive.
-    pub fn push(
-        &mut self,
-        chunk: &[u8],
-    ) -> Result<AllocVec<Field<AllocVec<u8, A>>, A>, DecodeError> {
+    pub fn push(&mut self, chunk: &[u8]) -> Result<AllocVec<ScannedRecord<A>, A>, DecodeError> {
         let alloc = self.leftover.allocator().clone();
         let mut records = AllocVec::new_in(alloc.clone());
         let src = TwoSlice {
@@ -77,7 +135,11 @@ impl<A: Allocator + Clone> RecordScanner<A> {
         };
         let mut pos = 0usize;
         while let TryRecord::Done { field, len } = try_record_at(&src, pos, alloc.clone())? {
-            records.push(field);
+            records.push(ScannedRecord {
+                field,
+                start: pos,
+                len,
+            });
             pos += len;
         }
         keep_unparsed_tail(&mut self.leftover, chunk, pos);
@@ -365,7 +427,12 @@ mod tests {
         let recs = s.push(&wire).unwrap();
         s.finish().unwrap();
         assert_eq!(recs.len(), 1);
-        assert_eq!(recs[0], Field::new(field(1), FieldValue::from_uint64(42)));
+        assert_eq!(
+            recs[0].field,
+            Field::new(field(1), FieldValue::from_uint64(42))
+        );
+        assert_eq!(recs[0].start, 0);
+        assert_eq!(recs[0].len, wire.len());
     }
 
     #[test]
@@ -430,6 +497,8 @@ mod tests {
         s.finish().unwrap();
         assert_eq!(recs.len(), 1);
         assert_eq!(recs[0].value, len_bytes(b"hello"));
+        let span = scanned_len_span(0, &recs[0]).unwrap();
+        assert_eq!(&wire[span.offset..span.offset + span.len], b"hello");
     }
 
     #[test]
@@ -472,7 +541,7 @@ mod tests {
         let mut buf = Vec::new();
         encode_tag(field(1), WireType::SGroup, &mut buf);
         let mut s = RecordScanner::new();
-        assert_eq!(s.push(&buf), Err(DecodeError::InvalidTag));
+        assert_eq!(s.push(&buf).err(), Some(DecodeError::InvalidTag));
     }
 
     #[test]
