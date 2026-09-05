@@ -1,14 +1,14 @@
 //! `TaskLazy` ingest: scanner, catalog merge, WireOrSso, nested lazy children.
 
-use ::puroro::{DecodeError, Message, StringMut};
+use ::puroro::{BytesMut, DecodeError, MapMut, MapRef, Message, RepeatedStringMut, StringMut};
 use ::puroro_rt::INLINE_CAP;
 use ::puroro_rt::Varint;
 use ::puroro_rt::encode::{encode_varint_field, field_number_const};
 use ::puroro_sample_generated::task::{
-    FIELD_ASSIGNEE, FIELD_LABELS, FIELD_ORIGIN, FIELD_OWNER_ID, FIELD_PAYLOAD, FIELD_SCORE,
-    FIELD_SCORES, FIELD_TAG_IDS, FIELD_TITLE, FIELD_WATCHERS,
+    FIELD_ASSIGNEE, FIELD_ATTRIBUTES, FIELD_LABELS, FIELD_ORIGIN, FIELD_OWNER_ID, FIELD_PAYLOAD,
+    FIELD_SCORE, FIELD_SCORES, FIELD_TAG_IDS, FIELD_TITLE, FIELD_WATCHERS,
 };
-use ::puroro_sample_generated::{Address, Point, Priority, Status, TaskLazy};
+use ::puroro_sample_generated::{Address, Point, Priority, Status, Task, TaskLazy};
 
 fn encode_u64_varint(mut v: u64, buf: &mut Vec<u8>) {
     loop {
@@ -62,6 +62,7 @@ fn empty_message_is_implicit_zero() {
     assert!(lazy.assignee().unwrap().is_none());
     assert!(lazy.origin().unwrap().is_none());
     assert!(lazy.watchers().unwrap().is_empty());
+    assert!(lazy.attributes().unwrap().is_empty());
 }
 
 #[test]
@@ -479,4 +480,248 @@ fn second_parent_merge_from_merges_child() {
     let addr = lazy.assignee().unwrap().unwrap();
     assert_eq!(addr.street().unwrap().get(), "A");
     assert_eq!(addr.city().unwrap().get(), "B");
+}
+
+fn encode_map_string_i32(key: &str, value: i32, buf: &mut Vec<u8>) {
+    let mut entry = Vec::new();
+    encode_len_bytes(1, key.as_bytes(), &mut entry);
+    encode_varint_field(
+        field_number_const::<2>(),
+        Varint::from_int32(value),
+        &mut entry,
+    );
+    encode_len_bytes(FIELD_ATTRIBUTES, &entry, buf);
+}
+
+#[test]
+fn attributes_empty_map() {
+    let mut bytes = Vec::new();
+    encode_varint_field(
+        field_number_const::<FIELD_SCORE>(),
+        Varint::from_int32(1),
+        &mut bytes,
+    );
+
+    let lazy = TaskLazy::decode(&bytes[..]).unwrap();
+    assert!(lazy.attributes().unwrap().is_empty());
+    assert_eq!(lazy.attributes().unwrap().get("k"), None);
+}
+
+#[test]
+fn attributes_last_wins_per_key() {
+    let mut bytes = Vec::new();
+    encode_map_string_i32("k", 1, &mut bytes);
+    encode_map_string_i32("k", 2, &mut bytes);
+    encode_map_string_i32("other", 9, &mut bytes);
+
+    let lazy = TaskLazy::decode(&bytes[..]).unwrap();
+    let attrs = lazy.attributes().unwrap();
+    assert_eq!(attrs.len(), 2);
+    assert_eq!(attrs.get("k").copied(), Some(2));
+    assert_eq!(attrs.get("other").copied(), Some(9));
+}
+
+#[test]
+fn attributes_missing_key_and_value_defaults() {
+    let mut value_only = Vec::new();
+    encode_varint_field(
+        field_number_const::<2>(),
+        Varint::from_int32(7),
+        &mut value_only,
+    );
+    let mut key_only = Vec::new();
+    encode_len_bytes(1, b"solo", &mut key_only);
+
+    let mut bytes = Vec::new();
+    encode_len_bytes(FIELD_ATTRIBUTES, &value_only, &mut bytes);
+    encode_len_bytes(FIELD_ATTRIBUTES, &key_only, &mut bytes);
+
+    let lazy = TaskLazy::decode(&bytes[..]).unwrap();
+    let attrs = lazy.attributes().unwrap();
+    assert_eq!(attrs.len(), 2);
+    assert_eq!(attrs.get("").copied(), Some(7));
+    assert_eq!(attrs.get("solo").copied(), Some(0));
+}
+
+#[test]
+fn attributes_second_get_uses_materialised_map() {
+    let mut bytes = Vec::new();
+    encode_map_string_i32("region", 81, &mut bytes);
+
+    let lazy = TaskLazy::decode(&bytes[..]).unwrap();
+    assert_eq!(lazy.attributes().unwrap().get("region").copied(), Some(81));
+    assert_eq!(lazy.attributes().unwrap().get("region").copied(), Some(81));
+}
+
+#[test]
+fn attributes_merge_from_after_first_get() {
+    let mut first = Vec::new();
+    encode_map_string_i32("a", 1, &mut first);
+    let mut second = Vec::new();
+    encode_map_string_i32("a", 2, &mut second);
+    encode_map_string_i32("b", 3, &mut second);
+
+    let mut lazy = TaskLazy::new();
+    lazy.merge_from(&mut first.as_slice()).unwrap();
+    assert_eq!(lazy.attributes().unwrap().get("a").copied(), Some(1));
+    lazy.merge_from(&mut second.as_slice()).unwrap();
+    let attrs = lazy.attributes().unwrap();
+    assert_eq!(attrs.len(), 2);
+    assert_eq!(attrs.get("a").copied(), Some(2));
+    assert_eq!(attrs.get("b").copied(), Some(3));
+}
+
+#[test]
+fn incremental_map_entry_chunks() {
+    let mut bytes = Vec::new();
+    encode_map_string_i32("split", 5, &mut bytes);
+    assert!(bytes.len() >= 3);
+
+    let mut lazy = TaskLazy::new();
+    lazy.push(&bytes[..1]).unwrap();
+    lazy.push(&bytes[1..3]).unwrap();
+    lazy.push(&bytes[3..]).unwrap();
+    lazy.finish().unwrap();
+    assert_eq!(lazy.attributes().unwrap().get("split").copied(), Some(5));
+}
+
+#[test]
+fn attributes_rejects_non_len_wire() {
+    let mut bytes = Vec::new();
+    encode_varint_field(
+        field_number_const::<FIELD_ATTRIBUTES>(),
+        Varint::from_int32(1),
+        &mut bytes,
+    );
+
+    assert_eq!(
+        TaskLazy::decode(&bytes[..]).err(),
+        Some(DecodeError::InvalidTag)
+    );
+}
+
+#[test]
+fn attributes_invalid_utf8_key() {
+    let mut entry = Vec::new();
+    encode_len_bytes(1, &[0xff, 0xfe], &mut entry);
+    encode_varint_field(field_number_const::<2>(), Varint::from_int32(1), &mut entry);
+    let mut bytes = Vec::new();
+    encode_len_bytes(FIELD_ATTRIBUTES, &entry, &mut bytes);
+
+    let lazy = TaskLazy::decode(&bytes[..]).unwrap();
+    assert_eq!(lazy.attributes().err(), Some(DecodeError::InvalidUtf8));
+}
+
+fn sample_task() -> Task {
+    let mut task = Task::new();
+    task.title_mut().set("Write docs");
+    *task.score_mut() = 42;
+    *task.max_retries_mut() = 5;
+    task.owner_id_mut().set("user-1");
+    task.payload_mut().extend_from_slice(b"data");
+    task.tag_ids_mut().push(10);
+    task.tag_ids_mut().push(20);
+    task.scores_mut().push(1);
+    task.labels_mut().push().push_str("urgent");
+    *task.status_mut() = Status::PENDING;
+    *task.priority_mut() = Priority::HIGH;
+    *task.done_mut() = true;
+    *task.flag_mut() = false;
+    task.email_address_mut().set("a@example.com");
+
+    let mut assignee = Address::new();
+    assignee.street_mut().set("1 Main St");
+    assignee.city_mut().set("Tokyo");
+    *assignee.postal_code_mut() = 1000001;
+    *assignee.latitude_mut() = 35.6812;
+    task.set_assignee(assignee);
+
+    let mut origin = Point::new();
+    *origin.x_mut() = 3;
+    *origin.y_mut() = 4;
+    task.set_origin(origin);
+
+    let mut watcher = Address::new();
+    watcher.street_mut().set("2 Side Rd");
+    task.watchers_mut().push(watcher);
+    task.votes_mut().push(true);
+    *task.attributes_mut().entry_mut("region") = 81;
+    task
+}
+
+#[test]
+fn into_eager_matches_eager_decode() {
+    let task = sample_task();
+    let bytes = task.encode_to_vec();
+    let lazy = TaskLazy::decode(&bytes[..]).unwrap();
+    assert_eq!(lazy.into_eager().unwrap(), task);
+}
+
+#[test]
+fn encode_as_wire_matches_single_buffer() {
+    let task = sample_task();
+    let bytes = task.encode_to_vec();
+    let lazy = TaskLazy::decode(&bytes[..]).unwrap();
+    let _ = lazy.title().unwrap();
+    assert_eq!(lazy.encoded_len().unwrap(), bytes.len());
+    assert_eq!(lazy.encode_to_vec().unwrap(), bytes);
+}
+
+#[test]
+fn empty_into_eager_and_encode() {
+    let lazy = TaskLazy::new();
+    assert_eq!(lazy.encoded_len().unwrap(), 0);
+    assert!(lazy.encode_to_vec().unwrap().is_empty());
+    assert_eq!(lazy.into_eager().unwrap(), Task::new());
+}
+
+#[test]
+fn into_eager_before_finish_errors() {
+    let mut lazy = TaskLazy::new();
+    lazy.push(&[0x08]).unwrap();
+    assert_eq!(lazy.into_eager().err(), Some(DecodeError::TruncatedMessage));
+}
+
+#[test]
+fn two_merge_from_into_eager_matches_eager_merge() {
+    let mut first = Task::new();
+    first.owner_id_mut().set("u");
+    *first.score_mut() = 1;
+    first.tag_ids_mut().push(1);
+    let mut second = Task::new();
+    second.owner_id_mut().set("u");
+    *second.score_mut() = 2;
+    second.tag_ids_mut().push(2);
+
+    let w1 = first.encode_to_vec();
+    let w2 = second.encode_to_vec();
+
+    let mut expected = Task::new();
+    expected.merge_from(&mut w1.as_slice()).unwrap();
+    expected.merge_from(&mut w2.as_slice()).unwrap();
+
+    let mut lazy = TaskLazy::new();
+    lazy.merge_from(&mut w1.as_slice()).unwrap();
+    lazy.merge_from(&mut w2.as_slice()).unwrap();
+    assert_eq!(lazy.encoded_len().unwrap(), w1.len() + w2.len());
+    assert_eq!(lazy.into_eager().unwrap(), expected);
+}
+
+#[test]
+fn address_and_point_into_eager() {
+    let mut addr = Address::new();
+    addr.street_mut().set("Oak");
+    *addr.postal_code_mut() = 100;
+    let addr_bytes = addr.encode_to_vec();
+    let addr_lazy = ::puroro_sample_generated::AddressLazy::decode(&addr_bytes[..]).unwrap();
+    assert_eq!(addr_lazy.encode_to_vec().unwrap(), addr_bytes);
+    assert_eq!(addr_lazy.into_eager().unwrap(), addr);
+
+    let mut point = Point::new();
+    *point.x_mut() = 1;
+    *point.y_mut() = 2;
+    let point_bytes = point.encode_to_vec();
+    let point_lazy = ::puroro_sample_generated::PointLazy::decode(&point_bytes[..]).unwrap();
+    assert_eq!(point_lazy.encode_to_vec().unwrap(), point_bytes);
+    assert_eq!(point_lazy.into_eager().unwrap(), point);
 }

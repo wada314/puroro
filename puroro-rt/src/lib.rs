@@ -26,7 +26,7 @@ pub use ::protobuf_core::{Field, FieldNumber, Varint};
 pub use ::unmanaged::{CloneIn, DeallocateIn, DefaultIn};
 pub use defaults::ProtoDefault;
 pub use encode::field_number_const;
-pub use fields::map::{MapField, MapFieldMut, MapFieldRef};
+pub use fields::map::{LazyMapField, MapField, MapFieldMut, MapFieldRef};
 pub use fields::oneof::{
     OneofDeallocate, OneofEncodable, OneofGroup, OneofSlot, OneofSlotMut, OneofSlotRef,
     OneofVariantRef, OneofView, OneofViewMut,

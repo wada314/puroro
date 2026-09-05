@@ -2,6 +2,7 @@
 
 use ::allocator_api2::alloc::{Allocator, Global};
 use ::allocator_api2::vec::Vec as AllocVec;
+use ::bytes::BufMut;
 use ::puroro::DecodeError;
 
 use super::record::{RecordScanner, ScannedRecord};
@@ -26,6 +27,19 @@ impl<A: Allocator> LazyScan<A> {
         } else {
             Err(DecodeError::UnfinishedMessage)
         }
+    }
+
+    /// Byte length of the gathered input. Requires a finished stream.
+    pub fn encoded_len(&self) -> Result<usize, DecodeError> {
+        self.require_finished()?;
+        Ok(self.wire.len())
+    }
+
+    /// Write the gathered input as-is. Requires a finished stream.
+    pub fn encode<B: BufMut>(&self, buf: &mut B) -> Result<(), DecodeError> {
+        self.require_finished()?;
+        buf.put_slice(&self.wire);
+        Ok(())
     }
 }
 

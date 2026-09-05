@@ -11,10 +11,10 @@ use ::core::hash::Hash;
 use ::core::mem;
 
 use ::allocator_api2::alloc::Allocator;
-use ::bytes::BufMut;
+use ::bytes::{Buf, BufMut};
 use ::hashbrown::hash_map::Iter as HashMapIter;
 use ::hashbrown::{DefaultHashBuilder, Equivalent, HashMap};
-use ::puroro::{DecodeBuf, DecodeError, MapMut, MapRef, WireType};
+use ::puroro::{DecodeBuf, DecodeError, MapMut, MapRef, ScopedBuf, WireType};
 use ::unmanaged::{CloneIn, ToOwnedIn};
 
 use super::MapKey;
@@ -83,6 +83,50 @@ where
         common: &'c mut MessageCommon<Pb, A>,
     ) -> MapFieldMut<'f, 'c, K, V, FIELD, A, Pb> {
         MapFieldMut::new(self, common)
+    }
+
+    /// Inserts with last-wins. Replaced value and discarded key are released.
+    ///
+    /// On key collision, keeps the stored key and frees the incoming key —
+    /// [`HashMap::insert`] would drop the incoming key, which is unsafe for
+    /// `Unmanaged*` payloads.
+    pub fn insert_last_wins(&mut self, key: K::Element<A>, value: V::Element<A>, alloc: &A)
+    where
+        K::Element<A>: Eq + Hash,
+    {
+        let discarded = if let Some(slot) = self.entries.get_mut(&key) {
+            let previous = mem::replace(slot, value);
+            Some((key, previous))
+        } else {
+            self.entries.insert(key, value);
+            None
+        };
+        if let Some((discarded_key, old_value)) = discarded {
+            // SAFETY: message allocator owns discarded key / replaced value.
+            unsafe {
+                K::deallocate_element(discarded_key, alloc);
+                V::deallocate_element(old_value, alloc);
+            }
+        }
+    }
+
+    /// Decode one map-entry message body (no length prefix) and insert last-wins.
+    pub fn merge_entry_body<B: Buf>(
+        &mut self,
+        buf: &mut B,
+        alloc: A,
+        depth: usize,
+    ) -> Result<(), DecodeError>
+    where
+        K: RepeatedElementMerge<A>,
+        V: RepeatedElementMerge<A>,
+        A: Clone,
+        K::Element<A>: Eq + Hash,
+    {
+        let mut scoped = ScopedBuf::new(buf);
+        let (key, value) = decode_map_entry::<K, V, A, _>(&mut scoped, alloc.clone(), depth)?;
+        self.insert_last_wins(key, value, &alloc);
+        Ok(())
     }
 }
 
@@ -299,21 +343,7 @@ where
     where
         K::Element<A>: Eq + Hash,
     {
-        let discarded = if let Some(slot) = self.field.entries.get_mut(&key) {
-            let previous = mem::replace(slot, value);
-            Some((key, previous))
-        } else {
-            self.field.entries.insert(key, value);
-            None
-        };
-        if let Some((discarded_key, old_value)) = discarded {
-            let alloc = &self.common.alloc;
-            // SAFETY: message allocator owns discarded key / replaced value.
-            unsafe {
-                K::deallocate_element(discarded_key, alloc);
-                V::deallocate_element(old_value, alloc);
-            }
-        }
+        self.field.insert_last_wins(key, value, &self.common.alloc);
     }
 
     pub fn remove<Q>(&mut self, key: &Q)

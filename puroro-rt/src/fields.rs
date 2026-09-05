@@ -23,7 +23,7 @@
 //! | [`wire`] | `SingularType`, markers, repeated-element traits |
 //! | [`singular`] | `SingularField` (+ bound views) |
 //! | [`repeated`] | `RepeatedField`, `Packed` / `Expanded` |
-//! | [`map`] | `MapField`, `MapKey` |
+//! | [`map`] | `MapField`, `LazyMapField`, `MapKey` |
 //! | [`oneof`] | `OneofSlot`, `OneofView` |
 //! | [`oneof_variant`] | `OneofVariant` (field-number dispatch) |
 

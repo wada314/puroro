@@ -3,14 +3,15 @@
 use ::allocator_api2::alloc::{Allocator, Global};
 use ::bitvec::array::BitArray;
 use ::bitvec::order::Lsb0;
-use ::bytes::Buf;
+use ::bytes::{Buf, BufMut};
 use ::core::ops::ControlFlow;
-use ::puroro::DecodeError;
+use ::puroro::{DecodeError, Message};
 use ::puroro_rt::decode::{LazyScan, ScannedRecord, merge_scanned_field};
 use ::puroro_rt::{
     FieldDeallocVisitor, FieldVisitorMut, Implicit, MessageCommon, ProtoInt32, SingularField,
 };
 
+use crate::Point;
 use crate::point::{FIELD_X, FIELD_Y};
 
 /// Lazy `Point` with catalog numerical slots.
@@ -48,6 +49,20 @@ impl<A: Allocator> PointLazy<A> {
     pub fn y(&self) -> Result<i32, DecodeError> {
         self.scan.require_finished()?;
         Ok(self.y.bind(&self._common).value())
+    }
+
+    pub fn encoded_len(&self) -> Result<usize, DecodeError> {
+        self.scan.encoded_len()
+    }
+
+    pub fn encode<B: BufMut>(&self, buf: &mut B) -> Result<(), DecodeError> {
+        self.scan.encode(buf)
+    }
+
+    pub fn encode_to_vec(&self) -> Result<Vec<u8>, DecodeError> {
+        let mut out = Vec::with_capacity(self.encoded_len()?);
+        self.encode(&mut out)?;
+        Ok(out)
     }
 
     fn visit_fields_mut<V: FieldVisitorMut<MessageCommon<BitArray<[u8; 1], Lsb0>, A>>>(
@@ -94,6 +109,15 @@ impl<A: Allocator + Clone> PointLazy<A> {
             buf.advance(n);
         }
         self.finish()
+    }
+
+    /// Decode every field from `_wire` into an eager [`Point`].
+    pub fn into_eager(self) -> Result<Point<A>, DecodeError> {
+        self.scan.require_finished()?;
+        let mut eager = Point::new_in(self._common.alloc.clone());
+        let mut buf = self.scan.wire();
+        Message::merge_from(&mut eager, &mut buf)?;
+        Ok(eager)
     }
 
     fn apply_record(&mut self, rec: &ScannedRecord<A>) -> Result<(), DecodeError> {

@@ -1,15 +1,16 @@
 //! Read-oriented `Address`. Numericals apply during scan; strings use WireOrSso.
 
 use ::allocator_api2::alloc::{Allocator, Global};
-use ::bytes::Buf;
+use ::bytes::{Buf, BufMut};
 use ::core::ops::ControlFlow;
-use ::puroro::{DecodeError, HasDefault, Optional};
+use ::puroro::{DecodeError, HasDefault, Message, Optional};
 use ::puroro_rt::decode::{LazyScan, ScannedRecord, merge_scanned_field, scanned_len_span};
 use ::puroro_rt::{
     Explicit, FieldDeallocVisitor, FieldVisitorMut, InteriorBitArray, LazyStringSlot,
     MessageCommon, ProtoDefault, ProtoDouble, ProtoFixed32, SingularField, WireOrSsoArm,
 };
 
+use crate::Address;
 use crate::address::{
     BIT_CITY, BIT_CITY_ARM1, BIT_CITY_SSO, BIT_LATITUDE, BIT_POSTAL_CODE, BIT_STREET,
     BIT_STREET_ARM1, BIT_STREET_SSO, FIELD_CITY, FIELD_LATITUDE, FIELD_POSTAL_CODE, FIELD_STREET,
@@ -99,6 +100,20 @@ impl<A: Allocator> AddressLazy<A> {
         Ok(self.latitude.bind(&self._common).optional())
     }
 
+    pub fn encoded_len(&self) -> Result<usize, DecodeError> {
+        self.scan.encoded_len()
+    }
+
+    pub fn encode<B: BufMut>(&self, buf: &mut B) -> Result<(), DecodeError> {
+        self.scan.encode(buf)
+    }
+
+    pub fn encode_to_vec(&self) -> Result<Vec<u8>, DecodeError> {
+        let mut out = Vec::with_capacity(self.encoded_len()?);
+        self.encode(&mut out)?;
+        Ok(out)
+    }
+
     fn arm(&self, arm0: usize, arm1: usize) -> WireOrSsoArm {
         WireOrSsoArm::from_bits(
             self._common.bits.is_set(arm0),
@@ -158,6 +173,15 @@ impl<A: Allocator + Clone> AddressLazy<A> {
             buf.advance(n);
         }
         self.finish()
+    }
+
+    /// Decode every field from `_wire` into an eager [`Address`].
+    pub fn into_eager(self) -> Result<Address<A>, DecodeError> {
+        self.scan.require_finished()?;
+        let mut eager = Address::new_in(self._common.alloc.clone());
+        let mut buf = self.scan.wire();
+        Message::merge_from(&mut eager, &mut buf)?;
+        Ok(eager)
     }
 
     fn apply_record(&mut self, rec: &ScannedRecord<A>, origin: usize) -> Result<(), DecodeError> {

@@ -258,6 +258,11 @@ No `HashMap` during scan. First map getter may materialise.
 
 Tests: last-wins per key, missing key/value defaults, empty map.
 
+Done (2026-09-06): `LazyMapField` stores `WireSpan`s during the parent scan
+and builds `MapField` on the first `attributes()`. A later parent
+`merge_from` after that get merges the new entry into the ready map.
+Missing key / value use proto defaults (`""` / `0`). Empty map is empty.
+
 ### Step 8 — `into_eager` and read-only encode
 
 `into_eager` applies remaining LEN promotions / decodes and builds `Task<A>`.
@@ -265,6 +270,11 @@ Encode of a finished lazy message may write `_wire` as-is.
 
 Tests: eager-vs-lazy `PartialEq` after `into_eager`; encode length equals
 `_wire` len when no extra merge after construction from one buffer.
+
+Done (2026-09-06): `into_eager` merges `_wire` into eager `Task` / `Address` /
+`Point` (so skipped oneof / `labels` still land). Finished encode writes
+`_wire` as-is. After two parent `merge_from`s, encode length is the
+concatenated ingest; `into_eager` matches eager merge of the same bodies.
 
 ### Step 9 — `TaskImpl<A, L>` only if needed, then plugin
 
