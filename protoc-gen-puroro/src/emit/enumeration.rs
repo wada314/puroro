@@ -135,6 +135,8 @@ pub(super) fn render_enum(e: &Enum<'_>) -> Result<Vec<Item>> {
             }
         }
 
+        ::puroro_rt::impl_copy_slot_bounds!(#name);
+
         // `CloneIn` / `DefaultIn` / `DeallocateIn`: `Copy` (+ `Default`) blankets
         // in `unmanaged`.
 

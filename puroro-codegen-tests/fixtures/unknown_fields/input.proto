@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+import "puroro/options.proto";
+
+// Default / unspecified: preserve unrecognized tags.
+message Keep {
+  optional int32 n = 1;
+}
+
+message Discard {
+  option (puroro.unknown_fields) = UNKNOWN_FIELDS_DISCARD;
+  optional int32 n = 1;
+}
+
+// Discard + oneof must type-check (OneofGroup Unknown = DiscardUnknowns).
+message DiscardChoice {
+  option (puroro.unknown_fields) = UNKNOWN_FIELDS_DISCARD;
+  oneof choice {
+    int32 a = 1;
+    string b = 2;
+  }
+}

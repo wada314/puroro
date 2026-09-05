@@ -9,7 +9,7 @@
 
 use super::{
     CodegenMeta, CodegenRequest, EnumDesc, EnumValueDesc, FeatureSet, FieldDesc, FieldLabel,
-    FieldType, MessageDesc, OneofDesc, ProtoFile, Syntax,
+    FieldType, MessageDesc, OneofDesc, ProtoFile, Syntax, UnknownFieldsPolicy,
 };
 
 /// Optional field with empty options (`label = Optional`, no type name / oneof).
@@ -40,6 +40,7 @@ pub(crate) fn message(name: impl Into<String>) -> MessageDesc {
         nested_enums: vec![],
         oneofs: vec![],
         map_entry: false,
+        unknown_fields: UnknownFieldsPolicy::Unspecified,
     }
 }
 
@@ -68,6 +69,7 @@ pub(crate) fn map_entry(name: impl Into<String>, key: FieldDesc, value: FieldDes
     MessageDesc {
         fields: vec![key, value],
         map_entry: true,
+        unknown_fields: UnknownFieldsPolicy::Unspecified,
         ..message(name)
     }
 }

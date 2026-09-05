@@ -638,7 +638,7 @@ fn encode_raw<B: BufMut>(&self, buf: &mut B) {
 
 1. Loop: `puroro_rt::decode::decode_tag` → `(field_number, wire_type)`.
 2. `match field_number` — one catalog `merge` per arm (closed-enum unknowns are diverted inside `merge` via `DecodeError::UnknownClosedEnum`).
-3. Unknown → `puroro_rt::decode::skip_field_and_save` into `_common.unknown_fields`.
+3. Unknown → `puroro_rt::decode::skip_field_and_save_in` into `_common.unknown_fields`.
 4. Singular: last wins. Repeated: append. Map: insert entry (last-wins on key). Nested: merge sub-buffer.
 
 ```rust
@@ -822,7 +822,7 @@ The `set_*` per-variant setters are removed, matching the other field families.
 
 ### Unknown
 
-**Storage:** [`MessageCommon<B, A, U>`](puroro-rt/src/fields/shared.rs) with [`UnknownStore`](puroro-rt/src/unknown_fields.rs). Default `U = UnknownFields<A>` — empty is one word; `skip_field_and_save` / `save_unknown_varint_field` append this message’s blob. [`DiscardUnknowns`](puroro-rt/src/unknown_fields.rs) is a ZST (decode skips, encode / iterator empty). Generated / sample messages bake `U` into `Foo<A>` (`impl<A>` only). Sample `Point` preserves; sample `Marker` bakes discard. Encode uses `Deref` to `[u8]`. Inlined children keep a separate store on their own `MessageCommon`. `SGroup` / `EGroup` not preserved.
+**Storage:** [`MessageCommon<B, A, U>`](puroro-rt/src/fields/shared.rs) with [`UnknownStore`](puroro-rt/src/unknown_fields.rs). Default `U = UnknownFields<A>` — empty is one word; `skip_field_and_save` / `save_unknown_varint_field` append this message’s blob. [`DiscardUnknowns`](puroro-rt/src/unknown_fields.rs) is a ZST (decode skips, encode / iterator empty). Generated / sample messages bake `U` into `Foo<A>` (`impl<A>` only). Sample `Point` preserves; sample `Marker` bakes discard. Plugin: `(puroro.unknown_fields) = DISCARD` emits `MessageCommon<Bits, A, DiscardUnknowns>` and `skip_field_and_save_in`. Encode uses `Deref` to `[u8]`. Inlined children keep a separate store on their own `MessageCommon`. `SGroup` / `EGroup` not preserved.
 
 **Public accessor:** `Message::unknown_fields()` returns `impl Iterator<Item = ::puroro::UnknownField<'_>>` by parsing that blob with [`iter_unknown_fields`](puroro-rt/src/decode.rs) (also `MessageCommon::iter_unknown_fields`). Encode paths read the blob directly and do not go through the iterator.
 

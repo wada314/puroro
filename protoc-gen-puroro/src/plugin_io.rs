@@ -8,7 +8,7 @@ use crate::descriptor::{
     BYTES_LAYOUT_OPTION_NUMBER, BytesLayout, CodegenMeta, CodegenRequest, Edition, EnumDesc,
     EnumValueDesc, FieldDesc, FieldLabel, FieldType, MESSAGE_LAYOUT_OPTION_NUMBER, MessageDesc,
     MessageLayout, OneofDesc, ProtoFile, ProtoFqn, STRING_LAYOUT_OPTION_NUMBER, StringLayout,
-    Syntax,
+    Syntax, UNKNOWN_FIELDS_OPTION_NUMBER, UnknownFieldsPolicy,
 };
 use crate::error::{Error, Result};
 use ::protobuf_core::{
@@ -208,6 +208,7 @@ fn decode_descriptor(bytes: &[u8]) -> Result<MessageDesc> {
         let mut nested_enums = Vec::new();
         let mut oneofs = Vec::new();
         let mut map_entry = false;
+        let mut unknown_fields = UnknownFieldsPolicy::Unspecified;
 
         for field in AsRefExtProtobuf::read_protobuf_fields(&bytes) {
             let field = field?;
@@ -221,7 +222,11 @@ fn decode_descriptor(bytes: &[u8]) -> Result<MessageDesc> {
                 // repeated EnumDescriptorProto enum_type = 4;
                 4 => nested_enums.push(decode_enum(expect_len(&field)?)?),
                 // optional MessageOptions options = 7;
-                7 => map_entry = decode_message_options_map_entry(expect_len(&field)?)?,
+                7 => {
+                    let decoded = decode_message_options(expect_len(&field)?)?;
+                    map_entry = decoded.map_entry;
+                    unknown_fields = decoded.unknown_fields;
+                }
                 // repeated OneofDescriptorProto oneof_decl = 8;
                 8 => oneofs.push(decode_oneof(expect_len(&field)?)?),
                 _ => {}
@@ -235,22 +240,36 @@ fn decode_descriptor(bytes: &[u8]) -> Result<MessageDesc> {
             nested_enums,
             oneofs,
             map_entry,
+            unknown_fields,
         })
     })
 }
 
-/// `MessageOptions`: only `map_entry` (7) is consumed today.
-fn decode_message_options_map_entry(bytes: &[u8]) -> Result<bool> {
+struct DecodedMessageOptions {
+    map_entry: bool,
+    unknown_fields: UnknownFieldsPolicy,
+}
+
+/// `MessageOptions`: `map_entry` (7) and `(puroro.unknown_fields)` (51403).
+fn decode_message_options(bytes: &[u8]) -> Result<DecodedMessageOptions> {
     with_decoding_context("MessageOptions", || {
         let mut map_entry = false;
+        let mut unknown_fields = UnknownFieldsPolicy::Unspecified;
         for field in AsRefExtProtobuf::read_protobuf_fields(&bytes) {
             let field = field?;
-            // optional bool map_entry = 7;
-            if field.field_number.as_u32() == 7 {
-                map_entry = expect_bool(&field)?;
+            match field.field_number.as_u32() {
+                // optional bool map_entry = 7;
+                7 => map_entry = expect_bool(&field)?,
+                UNKNOWN_FIELDS_OPTION_NUMBER => {
+                    unknown_fields = expect_enum(&field)?;
+                }
+                _ => {}
             }
         }
-        Ok(map_entry)
+        Ok(DecodedMessageOptions {
+            map_entry,
+            unknown_fields,
+        })
     })
 }
 
@@ -837,6 +856,35 @@ mod tests {
         assert_eq!(
             decoded.proto_files[0].messages[0].fields[0].message_layout,
             Some(MessageLayout::Inline)
+        );
+    }
+
+    #[test]
+    fn decode_message_options_unknown_fields_extension() {
+        use crate::descriptor::{UNKNOWN_FIELDS_OPTION_NUMBER, UnknownFieldsPolicy};
+
+        // MessageOptions { (puroro.unknown_fields) = UNKNOWN_FIELDS_DISCARD }
+        let options = encode_varint_field(
+            UNKNOWN_FIELDS_OPTION_NUMBER,
+            UnknownFieldsPolicy::Discard as i32,
+        );
+
+        let mut message = Vec::new();
+        message.extend(encode_string_field(1, "M"));
+        message.extend(encode_message_field(7, &options));
+
+        let mut file = Vec::new();
+        file.extend(encode_string_field(1, "t.proto"));
+        file.extend(encode_message_field(4, &message));
+
+        let mut request = Vec::new();
+        request.extend(encode_string_field(1, "t.proto"));
+        request.extend(encode_message_field(15, &file));
+
+        let decoded = decode_request(&request).unwrap();
+        assert_eq!(
+            decoded.proto_files[0].messages[0].unknown_fields,
+            UnknownFieldsPolicy::Discard
         );
     }
 

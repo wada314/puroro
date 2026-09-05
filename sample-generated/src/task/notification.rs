@@ -66,7 +66,7 @@ use ::puroro_rt::{
     BitPacked, FieldCloneIn, FieldDeallocate, FieldEncode, Inline, InlineOrHeap, MessageCommon,
     MessageCommonAlloc, MessageCommonBits, Oneof, OneofDeallocate, OneofEncodable, OneofGroup,
     OneofVariant, ProtoBool, ProtoInt32, ProtoMessage, ProtoString, SingularField,
-    SingularFieldAccess,
+    SingularFieldAccess, UnknownFields, UnknownStore,
 };
 
 use crate::Address;
@@ -153,6 +153,7 @@ impl<A: Allocator> OneofGroup for NotificationStorage<A> {
         A: 'a;
     type Bits = BitArray<[u8; 2], Lsb0>;
     type Alloc = A;
+    type Unknown = UnknownFields<A>;
 
     fn case(storage: &Self) -> Self::Case {
         match storage {
@@ -166,7 +167,7 @@ impl<A: Allocator> OneofGroup for NotificationStorage<A> {
 
     fn to_ref<'a>(
         storage: &'a Self,
-        common: &'a MessageCommon<Self::Bits, Self::Alloc>,
+        common: &'a MessageCommon<Self::Bits, Self::Alloc, Self::Unknown>,
     ) -> Self::Ref<'a> {
         match storage {
             Self::EmailAddress(f) => Notification::EmailAddress(f.value(common)),
@@ -179,7 +180,7 @@ impl<A: Allocator> OneofGroup for NotificationStorage<A> {
 
     fn to_mut<'a>(
         storage: &'a mut Self,
-        common: &'a mut MessageCommon<Self::Bits, Self::Alloc>,
+        common: &'a mut MessageCommon<Self::Bits, Self::Alloc, Self::Unknown>,
     ) -> Self::Mut<'a>
     where
         A: Clone,
@@ -195,7 +196,7 @@ impl<A: Allocator> OneofGroup for NotificationStorage<A> {
 
     fn clone_storage_in(
         storage: &Self,
-        common: &MessageCommon<Self::Bits, Self::Alloc>,
+        common: &MessageCommon<Self::Bits, Self::Alloc, Self::Unknown>,
         alloc: Self::Alloc,
     ) -> Self
     where
@@ -212,7 +213,7 @@ impl<A: Allocator> OneofGroup for NotificationStorage<A> {
         }
     }
 
-    fn after_deallocate(common: &mut MessageCommon<Self::Bits, Self::Alloc>)
+    fn after_deallocate(common: &mut MessageCommon<Self::Bits, Self::Alloc, Self::Unknown>)
     where
         A: Clone,
     {
@@ -333,13 +334,13 @@ impl<A: Allocator> OneofVariant<{ super::FIELD_URGENT }> for NotificationStorage
 }
 
 impl<A: Allocator> OneofEncodable<A> for NotificationStorage<A> {
-    fn encoded_len<P>(
+    fn encoded_len<P, U: UnknownStore<A>>(
         &self,
-        common: &MessageCommon<P, A>,
+        common: &MessageCommon<P, A, U>,
         ctx: &mut ::puroro_rt::EncodeCtx,
     ) -> usize
     where
-        MessageCommon<P, A>: MessageCommonBits + MessageCommonAlloc<Alloc = A>,
+        MessageCommon<P, A, U>: MessageCommonBits + MessageCommonAlloc<Alloc = A>,
     {
         match self {
             Self::EmailAddress(f) => FieldEncode::encoded_len(f, common, ctx),
@@ -350,13 +351,13 @@ impl<A: Allocator> OneofEncodable<A> for NotificationStorage<A> {
         }
     }
 
-    fn encode_raw<P, B: BufMut>(
+    fn encode_raw<P, U: UnknownStore<A>, B: BufMut>(
         &self,
-        common: &MessageCommon<P, A>,
+        common: &MessageCommon<P, A, U>,
         ctx: &mut ::puroro_rt::EncodeCtx,
         buf: &mut B,
     ) where
-        MessageCommon<P, A>: MessageCommonBits + MessageCommonAlloc<Alloc = A>,
+        MessageCommon<P, A, U>: MessageCommonBits + MessageCommonAlloc<Alloc = A>,
     {
         match self {
             Self::EmailAddress(f) => FieldEncode::encode_raw(f, common, ctx, buf),
@@ -368,14 +369,15 @@ impl<A: Allocator> OneofEncodable<A> for NotificationStorage<A> {
     }
 }
 
-impl<A: Allocator, P> OneofDeallocate<MessageCommon<P, A>> for NotificationStorage<A>
+impl<A: Allocator, P, U: UnknownStore<A>> OneofDeallocate<MessageCommon<P, A, U>>
+    for NotificationStorage<A>
 where
-    MessageCommon<P, A>: MessageCommonBits,
+    MessageCommon<P, A, U>: MessageCommonBits,
 {
     /// # Safety
     ///
     /// `common.alloc` must be the allocator that owns the variant's buffer.
-    unsafe fn deallocate(self, common: &MessageCommon<P, A>) {
+    unsafe fn deallocate(self, common: &MessageCommon<P, A, U>) {
         match self {
             Self::EmailAddress(mut f) => f.deallocate(common),
             Self::PhoneNumber(mut f) => f.deallocate(common),

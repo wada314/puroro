@@ -17,6 +17,8 @@ pub struct MessageFieldPlan<'a> {
     /// Bits consumed in `MessageCommon` (presence + bool values + string / bytes
     /// SSO heap bits; SSO bit set means heap arm).
     bit_count: usize,
+    /// Bake [`DiscardUnknowns`] into `MessageCommon`.
+    discard_unknowns: bool,
 }
 
 /// One direct struct member of the generated message.
@@ -49,6 +51,11 @@ impl<'a> MessageFieldPlan<'a> {
 
     pub fn bit_count(&self) -> usize {
         self.bit_count
+    }
+
+    /// Whether generated code should bake `DiscardUnknowns`.
+    pub fn discard_unknowns(&self) -> bool {
+        self.discard_unknowns
     }
 }
 
@@ -188,6 +195,7 @@ pub fn plan_fields<'a>(
     Ok(MessageFieldPlan {
         members,
         bit_count: next_bit,
+        discard_unknowns: message.discard_unknowns(),
     })
 }
 

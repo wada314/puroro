@@ -39,9 +39,26 @@ enum MessageLayout {
   MESSAGE_LAYOUT_BOXED = 2;
 }
 
+// Unknown-field store for a generated message.
+//
+// Unset and `UNKNOWN_FIELDS_UNSPECIFIED` preserve unrecognized tags (default
+// `UnknownFields` blob). `UNKNOWN_FIELDS_PRESERVE` pins that. `UNKNOWN_FIELDS_DISCARD`
+// bakes `DiscardUnknowns` into the message type (ZST; decode consumes, encode
+// omits). Nested children keep their own option; a parent discard does not
+// discard a child's unknowns.
+enum UnknownFieldsPolicy {
+  UNKNOWN_FIELDS_UNSPECIFIED = 0;
+  UNKNOWN_FIELDS_PRESERVE = 1;
+  UNKNOWN_FIELDS_DISCARD = 2;
+}
+
 extend google.protobuf.FieldOptions {
   // Custom-option numbers 50000–99999 are for internal use.
   optional StringLayout string_layout = 51400;
   optional BytesLayout bytes_layout = 51401;
   optional MessageLayout message_layout = 51402;
+}
+
+extend google.protobuf.MessageOptions {
+  optional UnknownFieldsPolicy unknown_fields = 51403;
 }

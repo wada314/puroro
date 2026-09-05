@@ -81,6 +81,9 @@ pub struct MessageDesc {
     pub oneofs: Vec<OneofDesc>,
     /// `MessageOptions.map_entry` — synthetic map entry type (not user-facing).
     pub map_entry: bool,
+    /// `(puroro.unknown_fields)`, if set. Unspecified / Preserve keep the
+    /// default store; Discard bakes `DiscardUnknowns` into the message.
+    pub unknown_fields: UnknownFieldsPolicy,
 }
 
 /// A field (`FieldDescriptorProto` subset).
@@ -205,6 +208,33 @@ pub enum MessageLayout {
     Unspecified = 0,
     Inline = 1,
     Boxed = 2,
+}
+
+/// Field number of `(puroro.unknown_fields)` on `google.protobuf.MessageOptions`.
+///
+/// Matches `proto/puroro/options.proto`.
+pub const UNKNOWN_FIELDS_OPTION_NUMBER: u32 = 51403;
+
+/// `(puroro.unknown_fields)` — unknown-field store baked into the message type.
+///
+/// [`Unspecified`](Self::Unspecified) (and an absent option) preserves
+/// unrecognized tags. [`Preserve`](Self::Preserve) pins that.
+/// [`Discard`](Self::Discard) emits `MessageCommon<…, DiscardUnknowns>`.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, TryFrom)]
+#[try_from(repr)]
+#[repr(i32)]
+pub enum UnknownFieldsPolicy {
+    #[default]
+    Unspecified = 0,
+    Preserve = 1,
+    Discard = 2,
+}
+
+impl UnknownFieldsPolicy {
+    /// Whether generated code should bake `DiscardUnknowns`.
+    pub fn discard(self) -> bool {
+        matches!(self, Self::Discard)
+    }
 }
 
 /// A oneof declaration (`OneofDescriptorProto` subset).

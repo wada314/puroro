@@ -227,6 +227,13 @@ pub(super) fn render_items(
     let bits_ty = quote! {
         ::bitvec::array::BitArray<[u8; #bits_bytes], ::bitvec::order::Lsb0>
     };
+    let common_ty = if field_plan.discard_unknowns() {
+        quote! {
+            ::puroro_rt::MessageCommon<#bits_ty, A, ::puroro_rt::DiscardUnknowns>
+        }
+    } else {
+        quote! { ::puroro_rt::MessageCommon<#bits_ty, A> }
+    };
 
     let bit_consts = render_bit_consts(&fields);
     let field_consts = render_field_consts(&fields);
@@ -242,7 +249,7 @@ pub(super) fn render_items(
     let visit_mut = render_visit_calls(&fields, VisitKind::Mut);
     let merge_arms = render_merge_arms(&fields, companion);
     let validate_body = render_validate(&fields);
-    let oneof_modules = render_oneof_modules(&fields, &bits_ty)?;
+    let oneof_modules = render_oneof_modules(&fields, &bits_ty, field_plan.discard_unknowns())?;
 
     let companion_items = bit_consts
         .into_iter()
@@ -257,7 +264,7 @@ pub(super) fn render_items(
         pub struct #name<
             A: ::allocator_api2::alloc::Allocator = ::allocator_api2::alloc::Global,
         > {
-            _common: ::puroro_rt::MessageCommon<#bits_ty, A>,
+            _common: #common_ty,
             #(#struct_fields)*
         }
 
@@ -266,7 +273,7 @@ pub(super) fn render_items(
 
             // Internal field walks for codec / Clone / Eq / Drop — not part of the
             // public message API (must not surface `puroro_rt` in pub signatures).
-            fn visit_fields<V: ::puroro_rt::FieldVisitor<::puroro_rt::MessageCommon<#bits_ty, A>>>(
+            fn visit_fields<V: ::puroro_rt::FieldVisitor<#common_ty>>(
                 &self,
                 #[allow(unused)] v: &mut V,
             ) -> ::core::ops::ControlFlow<V::Break> {
@@ -275,7 +282,7 @@ pub(super) fn render_items(
             }
 
             fn visit_field_pairs<
-                V: ::puroro_rt::FieldPairVisitor<::puroro_rt::MessageCommon<#bits_ty, A>>,
+                V: ::puroro_rt::FieldPairVisitor<#common_ty>,
             >(
                 &self,
                 #[allow(unused)] other: &Self,
@@ -286,7 +293,7 @@ pub(super) fn render_items(
             }
 
             fn visit_field_pairs_mut<
-                V: ::puroro_rt::FieldPairVisitorMut<::puroro_rt::MessageCommon<#bits_ty, A>>,
+                V: ::puroro_rt::FieldPairVisitorMut<#common_ty>,
             >(
                 &self,
                 #[allow(unused)] dst: &mut Self,
@@ -300,7 +307,7 @@ pub(super) fn render_items(
             }
 
             fn visit_fields_mut<
-                V: ::puroro_rt::FieldVisitorMut<::puroro_rt::MessageCommon<#bits_ty, A>>,
+                V: ::puroro_rt::FieldVisitorMut<#common_ty>,
             >(
                 &mut self,
                 #[allow(unused)] v: &mut V,
@@ -404,6 +411,8 @@ pub(super) fn render_items(
             }
         }
 
+        ::puroro_rt::impl_owned_slot_bounds!(#name);
+
         impl<A: ::allocator_api2::alloc::Allocator> ::puroro_rt::MessageEncode
             for #name<A>
         {
@@ -440,11 +449,11 @@ pub(super) fn render_items(
                     match field_number.as_u32() {
                         #(#merge_arms)*
                         _ => {
-                            ::puroro_rt::decode::skip_field_and_save(
+                            ::puroro_rt::decode::skip_field_and_save_in(
                                 field_number,
                                 wire_type,
                                 buf,
-                                &mut self._common.unknown_fields,
+                                &mut *self._common.unknown_fields,
                                 self._common.alloc.clone(),
                             )?;
                         }
@@ -989,11 +998,19 @@ fn render_struct_fields(fields: &[FieldEmit], companion: &Ident) -> Vec<TokenStr
         .collect()
 }
 
-fn render_oneof_modules(fields: &[FieldEmit], bits_ty: &TokenStream) -> Result<Vec<Item>> {
+fn render_oneof_modules(
+    fields: &[FieldEmit],
+    bits_ty: &TokenStream,
+    discard_unknowns: bool,
+) -> Result<Vec<Item>> {
     let mut out = Vec::new();
     for field in fields {
         if let FieldEmit::Oneof(o) = field {
-            out.extend(oneof::render_module_and_exports(o, bits_ty)?);
+            out.extend(oneof::render_module_and_exports(
+                o,
+                bits_ty,
+                discard_unknowns,
+            )?);
         }
     }
     Ok(out)

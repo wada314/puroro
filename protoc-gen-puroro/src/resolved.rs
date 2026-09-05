@@ -18,7 +18,9 @@ pub use arena::Arena;
 pub use resolve::{resolve, resolve_with};
 
 use crate::descriptor::features::{EnumType, RepeatedFieldEncoding, Utf8Validation};
-use crate::descriptor::{BytesLayout, MessageLayout, ProtoFqn, StringLayout, Syntax};
+use crate::descriptor::{
+    BytesLayout, MessageLayout, ProtoFqn, StringLayout, Syntax, UnknownFieldsPolicy,
+};
 use ::std::fmt;
 
 /// Cardinality + singular presence after resolve.
@@ -77,6 +79,8 @@ pub struct Message<'a> {
     oneofs: Vec<Oneof>,
     /// Synthetic map entry (`MessageOptions.map_entry = true`).
     map_entry: bool,
+    /// `(puroro.unknown_fields)` — Discard bakes `DiscardUnknowns`.
+    unknown_fields: UnknownFieldsPolicy,
 }
 
 /// A field with a resolved [`TypeRef`].
@@ -221,6 +225,11 @@ impl<'a> Message<'a> {
     /// Whether this is a synthetic map-entry message (not emitted as a user type).
     pub fn is_map_entry(&self) -> bool {
         self.map_entry
+    }
+
+    /// Whether generated code should bake `DiscardUnknowns`.
+    pub fn discard_unknowns(&self) -> bool {
+        self.unknown_fields.discard()
     }
 }
 

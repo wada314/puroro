@@ -192,6 +192,7 @@ impl<'a, 'd> ResolveCtx<'a, 'd> {
             nested_enums: Vec::new(),
             oneofs,
             map_entry: desc.map_entry,
+            unknown_fields: desc.unknown_fields,
         });
         self.messages_by_fqn.insert(fqn.clone(), message);
         self.pending.push(PendingFields {

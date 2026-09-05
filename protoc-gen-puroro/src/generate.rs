@@ -106,7 +106,7 @@ mod tests {
     use crate::descriptor::test_helpers as desc;
     use crate::descriptor::{
         BytesLayout, CodegenRequest, Edition, FeatureSet, FieldDesc, FieldLabel, FieldType,
-        MessageDesc, MessageLayout, ProtoFile, ProtoFqn, StringLayout, Syntax,
+        MessageDesc, MessageLayout, ProtoFile, ProtoFqn, StringLayout, Syntax, UnknownFieldsPolicy,
     };
     use crate::plugin_io::decode_request;
     use ::protobuf_core::{AsRefExtProtobuf, Field, FieldNumber, FieldValue, WriteExtProtobuf};
@@ -240,6 +240,22 @@ mod tests {
         assert!(
             !content.contains("BIT_BODY_SSO"),
             "string_layout=HEAP must not allocate an SSO bit: {content}"
+        );
+    }
+
+    #[test]
+    fn discard_unknowns_bakes_store_and_generic_skip() {
+        let mut request = empty_request("Marker");
+        request.proto_files[0].messages[0].unknown_fields = UnknownFieldsPolicy::Discard;
+        request.proto_files[0].messages[0].fields = vec![desc::field("n", 1, FieldType::Int32)];
+        let content = generate_lib(&request);
+        assert!(
+            content.contains("DiscardUnknowns"),
+            "discard must bake DiscardUnknowns: {content}"
+        );
+        assert!(
+            content.contains("skip_field_and_save_in"),
+            "discard must use the generic skip: {content}"
         );
     }
 

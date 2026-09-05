@@ -68,13 +68,14 @@ pub(super) struct OneofVariantEmit {
 pub(super) fn render_module_and_exports(
     oneof: &OneofEmit,
     bits_ty: &TokenStream,
+    discard_unknowns: bool,
 ) -> Result<Vec<Item>> {
     let mod_name = &oneof.mod_name;
     let shape_name = &oneof.shape_name;
     let case_name = &oneof.case_name;
     let storage_name = &oneof.storage_name;
 
-    let module_body = render_module_body(oneof, bits_ty)?;
+    let module_body = render_module_body(oneof, bits_ty, discard_unknowns)?;
     super::parse::parse_items(quote! {
         mod #mod_name {
             #module_body
@@ -85,7 +86,11 @@ pub(super) fn render_module_and_exports(
     })
 }
 
-fn render_module_body(oneof: &OneofEmit, bits_ty: &TokenStream) -> Result<TokenStream> {
+fn render_module_body(
+    oneof: &OneofEmit,
+    bits_ty: &TokenStream,
+    discard_unknowns: bool,
+) -> Result<TokenStream> {
     let shape_name = &oneof.shape_name;
     let case_name = &oneof.case_name;
     let storage_name = &oneof.storage_name;
@@ -298,6 +303,12 @@ fn render_module_body(oneof: &OneofEmit, bits_ty: &TokenStream) -> Result<TokenS
         })
         .collect();
 
+    let unknown_assoc = if discard_unknowns {
+        quote! { type Unknown = ::puroro_rt::DiscardUnknowns; }
+    } else {
+        quote! { type Unknown = ::puroro_rt::UnknownFields<A>; }
+    };
+
     let root_alias = nested_root_alias();
     Ok(quote! {
         #root_alias
@@ -306,7 +317,7 @@ fn render_module_body(oneof: &OneofEmit, bits_ty: &TokenStream) -> Result<TokenS
         use ::bytes::BufMut;
         use ::puroro_rt::{
             FieldDeallocate, MessageCommon, MessageCommonAlloc, MessageCommonBits, OneofDeallocate,
-            OneofEncodable, OneofGroup,
+            OneofEncodable, OneofGroup, UnknownStore,
         };
 
         #[derive(Clone, Copy, PartialEq)]
@@ -337,6 +348,7 @@ fn render_module_body(oneof: &OneofEmit, bits_ty: &TokenStream) -> Result<TokenS
                 A: 'a;
             type Bits = #bits_ty;
             type Alloc = A;
+            #unknown_assoc
 
             fn case(storage: &Self) -> Self::Case {
                 match storage {
@@ -346,7 +358,7 @@ fn render_module_body(oneof: &OneofEmit, bits_ty: &TokenStream) -> Result<TokenS
 
             fn to_ref<'a>(
                 storage: &'a Self,
-                common: &'a MessageCommon<Self::Bits, Self::Alloc>,
+                common: &'a MessageCommon<Self::Bits, Self::Alloc, Self::Unknown>,
             ) -> Self::Ref<'a> {
                 match storage {
                     #(#to_ref_arms)*
@@ -355,7 +367,7 @@ fn render_module_body(oneof: &OneofEmit, bits_ty: &TokenStream) -> Result<TokenS
 
             fn to_mut<'a>(
                 storage: &'a mut Self,
-                common: &'a mut MessageCommon<Self::Bits, Self::Alloc>,
+                common: &'a mut MessageCommon<Self::Bits, Self::Alloc, Self::Unknown>,
             ) -> Self::Mut<'a>
             where
                 A: ::core::clone::Clone,
@@ -367,7 +379,7 @@ fn render_module_body(oneof: &OneofEmit, bits_ty: &TokenStream) -> Result<TokenS
 
             fn clone_storage_in(
                 storage: &Self,
-                common: &MessageCommon<Self::Bits, Self::Alloc>,
+                common: &MessageCommon<Self::Bits, Self::Alloc, Self::Unknown>,
                 alloc: Self::Alloc,
             ) -> Self
             where
@@ -382,26 +394,26 @@ fn render_module_body(oneof: &OneofEmit, bits_ty: &TokenStream) -> Result<TokenS
         #(#oneof_variant_impls)*
 
         impl<A: Allocator> OneofEncodable<A> for #storage_name<A> {
-            fn encoded_len<P>(
+            fn encoded_len<P, U: UnknownStore<A>>(
                 &self,
-                common: &MessageCommon<P, A>,
+                common: &MessageCommon<P, A, U>,
                 ctx: &mut ::puroro_rt::EncodeCtx,
             ) -> usize
             where
-                MessageCommon<P, A>: MessageCommonBits + MessageCommonAlloc<Alloc = A>,
+                MessageCommon<P, A, U>: MessageCommonBits + MessageCommonAlloc<Alloc = A>,
             {
                 match self {
                     #(#encode_len_arms)*
                 }
             }
 
-            fn encode_raw<P, B: BufMut>(
+            fn encode_raw<P, U: UnknownStore<A>, B: BufMut>(
                 &self,
-                common: &MessageCommon<P, A>,
+                common: &MessageCommon<P, A, U>,
                 ctx: &mut ::puroro_rt::EncodeCtx,
                 buf: &mut B,
             ) where
-                MessageCommon<P, A>: MessageCommonBits + MessageCommonAlloc<Alloc = A>,
+                MessageCommon<P, A, U>: MessageCommonBits + MessageCommonAlloc<Alloc = A>,
             {
                 match self {
                     #(#encode_raw_arms)*
@@ -409,12 +421,12 @@ fn render_module_body(oneof: &OneofEmit, bits_ty: &TokenStream) -> Result<TokenS
             }
         }
 
-        impl<A: Allocator, P> OneofDeallocate<MessageCommon<P, A>>
+        impl<A: Allocator, P, U: UnknownStore<A>> OneofDeallocate<MessageCommon<P, A, U>>
             for #storage_name<A>
         where
-            MessageCommon<P, A>: MessageCommonBits,
+            MessageCommon<P, A, U>: MessageCommonBits,
         {
-            unsafe fn deallocate(self, common: &MessageCommon<P, A>) {
+            unsafe fn deallocate(self, common: &MessageCommon<P, A, U>) {
                 match self {
                     #(#dealloc_arms)*
                 }
