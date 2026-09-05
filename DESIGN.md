@@ -1253,6 +1253,8 @@ In addition to the primary `Task<A>` struct, the following specialized implement
 
 #### `TaskLazy<A>` — lazy parse timing
 
+Implementation lock (2026-09-06): [`.cursor/plans/lazy-decoder.md`](.cursor/plans/lazy-decoder.md). That note supersedes the per-field rescan / `FieldCache` machine below until this section is rewritten.
+
 `TaskLazy<A>` would implement the same field surface as `Task<A>` via `TaskMessageFallible` (`Error = DecodeError`).  All decoding — wire scanning **and** semantic interpretation — is deferred until a getter runs.
 
 ##### Wire buffer: `bytes::Bytes` (shared, sliceable)
