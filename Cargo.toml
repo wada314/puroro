@@ -27,9 +27,12 @@ unmanaged = { path = "unmanaged" }
 
 [dev-dependencies]
 bitvec = "1"
+# DESIGN.md §5: arena pattern is `A = &Bump` (`Copy`, deallocate is a no-op).
+bumpalo = { version = "3", features = ["allocator-api2"] }
 # Same stack as the historical `puroro/benches/variant.rs` setup.
 criterion = { version = "0.5.1", features = ["html_reports"] }
 puroro-rt = { path = "puroro-rt" }
+puroro-sample-generated = { path = "sample-generated" }
 rand = { version = "0.9", features = ["small_rng"] }
 rand_distr = "0.5"
 
@@ -43,4 +46,12 @@ harness = false
 
 [[bench]]
 name = "string_layout"
+harness = false
+
+[[bench]]
+name = "allocator"
+harness = false
+
+[[bench]]
+name = "generated"
 harness = false

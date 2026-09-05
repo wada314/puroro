@@ -43,16 +43,7 @@ impl FlatScalars<Global> {
 
     /// Fills every field with non-default values.
     pub fn sample() -> Self {
-        let mut m = Self::new();
-        *m.a.bind_mut(&mut m._common).value_mut() = 1;
-        *m.b.bind_mut(&mut m._common).value_mut() = 22;
-        *m.c.bind_mut(&mut m._common).value_mut() = 333;
-        *m.d.bind_mut(&mut m._common).value_mut() = 4444;
-        *m.e.bind_mut(&mut m._common).value_mut() = 1 << 20;
-        *m.f.bind_mut(&mut m._common).value_mut() = u64::from(u32::MAX) + 99;
-        *m.g.bind_mut(&mut m._common).value_mut() = -7;
-        *m.h.bind_mut(&mut m._common).value_mut() = 42;
-        m
+        Self::sample_in(Global)
     }
 }
 
@@ -75,6 +66,20 @@ impl<A: Allocator + Clone> FlatScalars<A> {
             g: SingularField::new_in(alloc.clone()),
             h: SingularField::new_in(alloc),
         }
+    }
+
+    /// Fills every field with non-default values.
+    pub fn sample_in(alloc: A) -> Self {
+        let mut m = Self::new_in(alloc);
+        *m.a.bind_mut(&mut m._common).value_mut() = 1;
+        *m.b.bind_mut(&mut m._common).value_mut() = 22;
+        *m.c.bind_mut(&mut m._common).value_mut() = 333;
+        *m.d.bind_mut(&mut m._common).value_mut() = 4444;
+        *m.e.bind_mut(&mut m._common).value_mut() = 1 << 20;
+        *m.f.bind_mut(&mut m._common).value_mut() = u64::from(u32::MAX) + 99;
+        *m.g.bind_mut(&mut m._common).value_mut() = -7;
+        *m.h.bind_mut(&mut m._common).value_mut() = 42;
+        m
     }
 }
 
@@ -229,12 +234,7 @@ impl Nest<Global> {
 
     /// Chain of `depth` nested children; each level sets `value = depth`.
     pub fn sample(depth: usize) -> Self {
-        let mut root = Self::new();
-        *root.value.bind_mut(&mut root._common).value_mut() = depth as i32;
-        if depth > 0 {
-            *root.child.bind_mut(&mut root._common).get_mut() = Self::sample(depth - 1);
-        }
-        root
+        Self::sample_in(Global, depth)
     }
 }
 
@@ -251,6 +251,16 @@ impl<A: Allocator + Clone> Nest<A> {
             child: SingularField::new_in(alloc.clone()),
             value: SingularField::new_in(alloc),
         }
+    }
+
+    /// Chain of `depth` nested children; each level sets `value = depth`.
+    pub fn sample_in(alloc: A, depth: usize) -> Self {
+        let mut root = Self::new_in(alloc.clone());
+        *root.value.bind_mut(&mut root._common).value_mut() = depth as i32;
+        if depth > 0 {
+            *root.child.bind_mut(&mut root._common).get_mut() = Self::sample_in(alloc, depth - 1);
+        }
+        root
     }
 }
 
@@ -364,14 +374,7 @@ impl PackedInts<Global> {
     }
 
     pub fn sample(n: usize) -> Self {
-        let mut m = Self::new();
-        {
-            let mut g = m.values.bind_mut(&mut m._common).values_mut();
-            for i in 0..n {
-                g.push(i as i32);
-            }
-        }
-        m
+        Self::sample_in(Global, n)
     }
 }
 
@@ -387,6 +390,17 @@ impl<A: Allocator + Clone> PackedInts<A> {
             _common: MessageCommon::new_in(BitArray::ZERO, alloc.clone()),
             values: RepeatedField::new_in(alloc),
         }
+    }
+
+    pub fn sample_in(alloc: A, n: usize) -> Self {
+        let mut m = Self::new_in(alloc);
+        {
+            let mut g = m.values.bind_mut(&mut m._common).values_mut();
+            for i in 0..n {
+                g.push(i as i32);
+            }
+        }
+        m
     }
 }
 
@@ -512,24 +526,7 @@ impl StringHeavy<Global> {
     }
 
     pub fn sample() -> Self {
-        let mut m = Self::new();
-        m.s0.bind_mut(&mut m._common)
-            .value_mut()
-            .push_str("alpha-benchmark-string-000");
-        m.s1.bind_mut(&mut m._common)
-            .value_mut()
-            .push_str("bravo-benchmark-string-111");
-        m.s2.bind_mut(&mut m._common)
-            .value_mut()
-            .push_str("charlie-benchmark-string-222");
-        m.s3.bind_mut(&mut m._common)
-            .value_mut()
-            .push_str("delta-benchmark-string-333");
-        m.blob
-            .bind_mut(&mut m._common)
-            .value_mut()
-            .extend_from_slice(&[0u8; 64]);
-        m
+        Self::sample_in(Global)
     }
 }
 
@@ -549,6 +546,27 @@ impl<A: Allocator + Clone> StringHeavy<A> {
             s3: SingularField::new_in(alloc.clone()),
             blob: SingularField::new_in(alloc),
         }
+    }
+
+    pub fn sample_in(alloc: A) -> Self {
+        let mut m = Self::new_in(alloc);
+        m.s0.bind_mut(&mut m._common)
+            .value_mut()
+            .push_str("alpha-benchmark-string-000");
+        m.s1.bind_mut(&mut m._common)
+            .value_mut()
+            .push_str("bravo-benchmark-string-111");
+        m.s2.bind_mut(&mut m._common)
+            .value_mut()
+            .push_str("charlie-benchmark-string-222");
+        m.s3.bind_mut(&mut m._common)
+            .value_mut()
+            .push_str("delta-benchmark-string-333");
+        m.blob
+            .bind_mut(&mut m._common)
+            .value_mut()
+            .extend_from_slice(&[0u8; 64]);
+        m
     }
 }
 
@@ -673,16 +691,7 @@ impl ShortStrings<Global> {
     }
 
     pub fn sample() -> Self {
-        let mut m = Self::new();
-        m.s0.bind_mut(&mut m._common).value_mut().set("id");
-        m.s1.bind_mut(&mut m._common).value_mut().set("ok");
-        m.s2.bind_mut(&mut m._common).value_mut().set("us");
-        m.s3.bind_mut(&mut m._common).value_mut().set("v1");
-        m.s4.bind_mut(&mut m._common).value_mut().set("name");
-        m.s5.bind_mut(&mut m._common).value_mut().set("code");
-        m.s6.bind_mut(&mut m._common).value_mut().set("short");
-        m.s7.bind_mut(&mut m._common).value_mut().set("label");
-        m
+        Self::sample_in(Global)
     }
 }
 
@@ -705,6 +714,19 @@ impl<A: Allocator + Clone> ShortStrings<A> {
             s6: SingularField::new_in(alloc.clone()),
             s7: SingularField::new_in(alloc),
         }
+    }
+
+    pub fn sample_in(alloc: A) -> Self {
+        let mut m = Self::new_in(alloc);
+        m.s0.bind_mut(&mut m._common).value_mut().set("id");
+        m.s1.bind_mut(&mut m._common).value_mut().set("ok");
+        m.s2.bind_mut(&mut m._common).value_mut().set("us");
+        m.s3.bind_mut(&mut m._common).value_mut().set("v1");
+        m.s4.bind_mut(&mut m._common).value_mut().set("name");
+        m.s5.bind_mut(&mut m._common).value_mut().set("code");
+        m.s6.bind_mut(&mut m._common).value_mut().set("short");
+        m.s7.bind_mut(&mut m._common).value_mut().set("label");
+        m
     }
 }
 
