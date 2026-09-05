@@ -919,7 +919,7 @@ Codegen: [`(puroro.unknown_fields)`](proto/puroro/options.proto) on `google.prot
 |---|---|
 | **Preserve** (default) | Keep unknowns for round-trip; expose via the iterator |
 | **Discard** | Opt-in store type; omit the buffer; iterator is empty. Spec prefers preserve; discard is a deliberate size/privacy trade-off |
-| **Custom** | Later hook / additional `UnknownStore` impl |
+| **Custom** | Later hook / additional `UnknownStore` impl (not reject-on-decode; see [§8.2](#other-future-work)) |
 
 ---
 
@@ -1402,6 +1402,7 @@ Generic code that only reads fields can be written once against `TaskMessageFall
 - **UTF-8 validation (`NONE` path).** Expose an unchecked decode helper; wire per-field dispatch in generated code. (`VERIFY` path exists today.)
 - **Recursion limit enforcement.** Thread depth through nested `merge_from`; return `DecodeError::RecursionLimitExceeded`. (Error variant exists; enforcement is a stub.)
 - **Unknown-field preservation opt-out.** Runtime + plugin: `(puroro.unknown_fields) = DISCARD` bakes [`DiscardUnknowns`](puroro-rt/src/unknown_fields.rs). File-level / package default is not wired.
+- **Unknown-field reject-on-decode.** Possible later option (e.g. `REJECT`) that returns `DecodeError` on an unrecognized tag. This is decode control flow, not a third store — `UnknownStore` would need a `Result` path. Preserve + `unknown_fields().next().is_none()` covers post-decode checks. A baked ZST reject is only warranted for “no store word **and** fail”. Closed-enum unknowns stay a separate decision (default: still divert; do not treat as a bad tag). Parent / child independent, same as Discard.
 - **Service / RPC definitions.** Out of scope for the runtime library.
 - **Well-known types.** `google.protobuf.Timestamp`, `Duration`, `Any`, etc.
 - **Reflection / descriptors.** Runtime introspection of message schema.

@@ -842,6 +842,7 @@ The `set_*` per-variant setters are removed, matching the other field families.
 | Zero-copy views | — | `TaskView<'buf>` (DESIGN.md §8) |
 | `TaskLazy` | DESIGN only | Wire buffer + on-demand decode |
 | `Hash` / `serde` | Deferred | Opt-in features |
+| Unknown-field reject-on-decode | Preserve / Discard only (`UnknownStore` is write-or-drop) | Optional `REJECT` (DESIGN.md §8.2): `DecodeError` on unknown tag; not a third blob store |
 | Submessage inline | Sample singular **and** oneof nested messages use [`ProtoMessage<M>`](puroro-rt/src/fields/wire/proto_message.rs): inline slot = full `M`, boxed slot = `UnmanagedBox<M>`, getters are `&M` / `&mut M`. Repeated / map store `M` | codegen ([§17.1](#171-submessage-inline-optimisation)) |
 | String / Bytes inline | Singular `string` / `bytes` use SSO (`SsoString` / `SsoBytes` + `InlineOrHeap`); repeated / map stay heap | Repeated / map SSO deferred ([§17.2](#172-string--bytes-inline-optimisation)) |
 
