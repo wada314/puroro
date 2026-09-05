@@ -36,11 +36,11 @@ pub use fields::repeated::{Expanded, Packed, RepeatedField, RepeatedFieldMut, Re
 pub use fields::shared::field_presence::{Explicit, Implicit, LegacyRequired, Message, Oneof};
 pub use fields::shared::{
     AddressableSlot, BitPacked, Boxed, CloneBound, CloneFieldsVisitor, DeallocateBound,
-    DebugStructVisitor, EncodeRawVisitor, EncodedLenVisitor, FieldCloneIn, FieldDeallocVisitor,
-    FieldDeallocate, FieldEncode, FieldEqVisitor, FieldPairVisitor, FieldPairVisitorMut,
-    FieldVisitor, FieldVisitorMut, Inline, InlineOrHeap, MessageBinding, MessageBindingMut,
-    MessageCommon, MessageCommonAlloc, MessageCommonBits, SSO_HEAP, SSO_INLINE, UnknownFields,
-    ValueLayout,
+    DebugStructVisitor, DiscardUnknowns, EncodeRawVisitor, EncodedLenVisitor, FieldCloneIn,
+    FieldDeallocVisitor, FieldDeallocate, FieldEncode, FieldEqVisitor, FieldPairVisitor,
+    FieldPairVisitorMut, FieldVisitor, FieldVisitorMut, Inline, InlineOrHeap, MessageBinding,
+    MessageBindingMut, MessageCommon, MessageCommonAlloc, MessageCommonBits, SSO_HEAP, SSO_INLINE,
+    UnknownFields, UnknownStore, ValueLayout,
 };
 pub use fields::singular::{
     SingularField, SingularFieldAccess, SingularFieldMut, SingularFieldRef,

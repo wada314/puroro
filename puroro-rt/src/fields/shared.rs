@@ -20,7 +20,7 @@ pub(crate) mod slot_init;
 pub(crate) mod value_layout;
 pub(crate) mod value_slot;
 
-pub use crate::unknown_fields::UnknownFields;
+pub use crate::unknown_fields::{DiscardUnknowns, UnknownFields, UnknownStore};
 pub use ::unmanaged::DefaultIn;
 pub use field_deallocate::FieldDeallocate;
 pub use field_inspect::{
@@ -149,24 +149,25 @@ pub trait MessageCommonAlloc {
 /// [`ManuallyDrop`], so it never frees itself implicitly; the owning message
 /// releases it via [`deallocate`](Self::deallocate) in its `Drop`.
 ///
-/// Catalog bounds use [`MessageCommonBits`] / [`MessageCommonAlloc`] on `&Self`
-/// rather than constraining the storage type parameter `B` directly.
-pub struct MessageCommon<B, A: Allocator> {
+/// `U` selects preserve ([`UnknownFields`], default) or discard
+/// ([`DiscardUnknowns`]). Catalog bounds use [`MessageCommonBits`] /
+/// [`MessageCommonAlloc`] on `&Self` rather than constraining `B` directly.
+pub struct MessageCommon<B, A: Allocator, U: UnknownStore<A> = UnknownFields<A>> {
     /// Common bits (`BitArray` sized by codegen): presence, packed bool values,
     /// and string / bytes SSO heap-arm bits.
     pub bits: B,
-    /// Unknown-field store (`ManuallyDrop` — freed by the message). Empty is
-    /// one word; the wire blob is allocated on first use.
-    pub unknown_fields: ManuallyDrop<UnknownFields<A>>,
+    /// Unknown-field store (`ManuallyDrop` — freed by the message). Preserve
+    /// empty is one word; discard is a ZST.
+    pub unknown_fields: ManuallyDrop<U>,
     /// Canonical allocator for the whole message (cloned for growth / clone;
     /// teardown borrows `&self.alloc`).
     pub alloc: A,
 }
 
-impl<B, A: Allocator + Clone> MessageCommon<B, A> {
+impl<B, A: Allocator + Clone, U: UnknownStore<A>> MessageCommon<B, A, U> {
     /// Creates common state with the given common bits and allocator.
     pub fn new_in(bits: B, alloc: A) -> Self {
-        let unknown_fields = ManuallyDrop::new(UnknownFields::new());
+        let unknown_fields = ManuallyDrop::new(U::new());
         Self {
             bits,
             unknown_fields,
@@ -182,26 +183,30 @@ impl<B, A: Allocator + Clone> MessageCommon<B, A> {
     {
         Self {
             bits: self.bits.clone(),
-            unknown_fields: ManuallyDrop::new(self.unknown_fields.clone_in(alloc.clone())),
+            unknown_fields: ManuallyDrop::new(UnknownStore::clone_in(
+                &*self.unknown_fields,
+                alloc.clone(),
+            )),
             alloc,
         }
     }
 }
 
-impl<B, A: Allocator> MessageCommon<B, A> {
+impl<B, A: Allocator, U: UnknownStore<A>> MessageCommon<B, A, U> {
     /// Iterates preserved unknown fields as structured views.
     ///
-    /// Storage remains a contiguous wire blob; this only parses it for the
-    /// public accessor shape.
+    /// Storage remains a contiguous wire blob when preserving; this only
+    /// parses it for the public accessor shape. Discard yields an empty
+    /// iterator.
     #[inline]
     pub fn iter_unknown_fields(&self) -> UnknownFieldsIter<'_> {
-        iter_unknown_fields(self.unknown_fields.self_blob())
+        iter_unknown_fields(self.unknown_fields.as_bytes())
     }
 
-    /// Byte-equality of the preserved unknown-field blob (for message `PartialEq`).
+    /// Byte-equality of the unknown-field store (for message `PartialEq`).
     #[inline]
     pub fn unknown_fields_eq(&self, other: &Self) -> bool {
-        *self.unknown_fields == *other.unknown_fields
+        self.unknown_fields.as_bytes() == other.unknown_fields.as_bytes()
     }
 
     /// Releases the unknown-field buffer. Must be called exactly once from the
@@ -216,7 +221,7 @@ impl<B, A: Allocator> MessageCommon<B, A> {
     }
 }
 
-impl<B: BitStorage, A: Allocator> MessageCommonBits for MessageCommon<B, A> {
+impl<B: BitStorage, A: Allocator, U: UnknownStore<A>> MessageCommonBits for MessageCommon<B, A, U> {
     #[inline]
     fn is_bit_set(&self, bit: usize) -> bool {
         self.bits.is_set(bit)
@@ -233,7 +238,7 @@ impl<B: BitStorage, A: Allocator> MessageCommonBits for MessageCommon<B, A> {
     }
 }
 
-impl<B, A: Allocator> MessageCommonAlloc for MessageCommon<B, A> {
+impl<B, A: Allocator, U: UnknownStore<A>> MessageCommonAlloc for MessageCommon<B, A, U> {
     type Alloc = A;
 
     #[inline]
@@ -247,39 +252,44 @@ impl<B, A: Allocator> MessageCommonAlloc for MessageCommon<B, A> {
 /// [`MessageCommon`] implements this so field accessors can bind without
 /// naming the bit-array type parameter.
 pub trait MessageBinding<A: Allocator>: MessageCommonAlloc<Alloc = A> + MessageCommonBits {
+    /// Unknown-field store for this binding (preserve or discard).
+    type Unknown: UnknownStore<A>;
+
     /// Unknown-field store for this binding.
-    fn unknown_fields(&self) -> &UnknownFields<A>;
+    fn unknown_fields(&self) -> &Self::Unknown;
 }
 
 /// Write-side catalog binding.
 pub trait MessageBindingMut<A: Allocator>: MessageBinding<A> {
     /// Mutable unknown-field store for this binding.
-    fn unknown_fields_mut(&mut self) -> &mut UnknownFields<A>;
+    fn unknown_fields_mut(&mut self) -> &mut Self::Unknown;
 }
 
-impl<B, A: Allocator> MessageBinding<A> for MessageCommon<B, A>
+impl<B, A: Allocator, U: UnknownStore<A>> MessageBinding<A> for MessageCommon<B, A, U>
 where
     Self: MessageCommonBits,
 {
+    type Unknown = U;
+
     #[inline]
-    fn unknown_fields(&self) -> &UnknownFields<A> {
+    fn unknown_fields(&self) -> &U {
         &self.unknown_fields
     }
 }
 
-impl<B, A: Allocator> MessageBindingMut<A> for MessageCommon<B, A>
+impl<B, A: Allocator, U: UnknownStore<A>> MessageBindingMut<A> for MessageCommon<B, A, U>
 where
     Self: MessageCommonBits,
 {
     #[inline]
-    fn unknown_fields_mut(&mut self) -> &mut UnknownFields<A> {
+    fn unknown_fields_mut(&mut self) -> &mut U {
         &mut self.unknown_fields
     }
 }
 
 /// Inherent bit helpers — same as [`MessageCommonBits`], for call sites that
 /// already have a concrete [`MessageCommon`].
-impl<B, A: Allocator> MessageCommon<B, A> {
+impl<B, A: Allocator, U: UnknownStore<A>> MessageCommon<B, A, U> {
     /// Returns whether bit `bit` is set.
     #[inline]
     pub fn is_bit_set(&self, bit: usize) -> bool

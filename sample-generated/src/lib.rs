@@ -17,13 +17,13 @@
 //! `DESIGN.md` § "Path qualification".
 //!
 //! **Module layout.** Message structs are public at this crate root (`Address`,
-//! `Task`, `School`, `Student`, `Point`) — the parent of their snake_case
-//! companion modules (`address`, `task`, `school`, `student`, `point`) which
-//! hold `FIELD_*` / `BIT_*`, defaults, and oneofs. Production
-//! output follows the same rule under the protobuf `package` module. This sample
-//! stays flat (no `example::v1` prefix) for readability. The `*_type` files are
-//! a hand-written split so the crate root stays small; they are not a public
-//! module path.
+//! `Task`, `School`, `Student`, `Point`, `Marker`) — the parent of their
+//! snake_case companion modules (`address`, `task`, `school`, `student`,
+//! `point`, `marker`) which hold `FIELD_*` / `BIT_*`, defaults, and oneofs.
+//! Production output follows the same rule under the protobuf `package`
+//! module. This sample stays flat (no `example::v1` prefix) for readability.
+//! The `*_type` files are a hand-written split so the crate root stays small;
+//! they are not a public module path.
 //!
 //! These files are maintained by hand as a readable reference; in a real project
 //! the equivalent sources would come from the plugin instead. Comments here are
@@ -34,12 +34,14 @@
 
 pub mod address;
 pub mod enums;
+pub mod marker;
 pub mod point;
 pub mod school;
 pub mod student;
 pub mod task;
 
 mod address_type;
+mod marker_type;
 mod point_type;
 mod school_type;
 mod student_type;
@@ -47,6 +49,7 @@ mod task_type;
 
 pub use address_type::Address;
 pub use enums::{Priority, Status};
+pub use marker_type::Marker;
 pub use point_type::Point;
 pub use school_type::School;
 pub use student_type::Student;

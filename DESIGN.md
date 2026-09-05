@@ -911,13 +911,13 @@ This shape is the **common public contract**: it does not require contiguous wir
 
 `Message::unknown_fields()` stays the self-blob iterator. An inlined child is a full `M`, so unknowns recorded while merging that child live on the child’s own store and re-encode **inside the child’s LEN**. `clear_*` / oneof switch / Drop of an inlined slot drops that child (and its unknowns).
 
-**Future policies (not yet implemented):**
+**Policies:** [`UnknownStore`](puroro-rt/src/unknown_fields.rs) is the third type parameter on [`MessageCommon`](puroro-rt/src/fields/shared.rs) (`U = UnknownFields<A>` by default). [`DiscardUnknowns`](puroro-rt/src/unknown_fields.rs) is a ZST: decode still consumes unrecognized payloads; the iterator is empty; encode emits nothing. Public messages stay `Foo<A>` — the store is **baked** into that type (`MessageCommon<Bits, A>` or `MessageCommon<Bits, A, DiscardUnknowns>`), so impls are `impl<A> Foo<A>` with no `U:` bound. Sample [`Point`](sample-generated/src/point_type.rs) preserves; sample [`Marker`](sample-generated/src/marker_type.rs) bakes discard. A proto MessageOptions switch is not wired yet.
 
 | Policy | Behaviour |
 |---|---|
 | **Preserve** (default) | Keep unknowns for round-trip; expose via the iterator |
-| **Discard** | Opt-in (e.g. `#[puroro(no_unknown_fields)]`); omit the buffer; iterator is empty. Spec prefers preserve; discard is a deliberate size/privacy trade-off |
-| **Custom** | Later hook / type-parameterised storage owned by the message |
+| **Discard** | Opt-in store type; omit the buffer; iterator is empty. Spec prefers preserve; discard is a deliberate size/privacy trade-off |
+| **Custom** | Later hook / additional `UnknownStore` impl |
 
 ---
 
@@ -1399,7 +1399,7 @@ Generic code that only reads fields can be written once against `TaskMessageFall
 
 - **UTF-8 validation (`NONE` path).** Expose an unchecked decode helper; wire per-field dispatch in generated code. (`VERIFY` path exists today.)
 - **Recursion limit enforcement.** Thread depth through nested `merge_from`; return `DecodeError::RecursionLimitExceeded`. (Error variant exists; enforcement is a stub.)
-- **Unknown-field preservation opt-out.** A per-message attribute to discard unknowns (`Discard` policy in §4.9); public accessor remains an empty iterator.
+- **Unknown-field preservation opt-out (codegen).** Runtime store types exist (`UnknownStore` / `DiscardUnknowns`); a proto MessageOptions switch and plugin emission are not wired yet.
 - **Service / RPC definitions.** Out of scope for the runtime library.
 - **Well-known types.** `google.protobuf.Timestamp`, `Duration`, `Any`, etc.
 - **Reflection / descriptors.** Runtime introspection of message schema.

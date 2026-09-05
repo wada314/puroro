@@ -822,7 +822,7 @@ The `set_*` per-variant setters are removed, matching the other field families.
 
 ### Unknown
 
-**Storage (default Preserve):** [`UnknownFields`](puroro-rt/src/unknown_fields.rs) — empty is one word; `skip_field_and_save` / `save_unknown_varint_field` append this message’s blob. Encode uses `Deref` to that blob. Inlined children keep a separate store on their own `MessageCommon`. `SGroup` / `EGroup` not preserved.
+**Storage:** [`MessageCommon<B, A, U>`](puroro-rt/src/fields/shared.rs) with [`UnknownStore`](puroro-rt/src/unknown_fields.rs). Default `U = UnknownFields<A>` — empty is one word; `skip_field_and_save` / `save_unknown_varint_field` append this message’s blob. [`DiscardUnknowns`](puroro-rt/src/unknown_fields.rs) is a ZST (decode skips, encode / iterator empty). Generated / sample messages bake `U` into `Foo<A>` (`impl<A>` only). Sample `Point` preserves; sample `Marker` bakes discard. Encode uses `Deref` to `[u8]`. Inlined children keep a separate store on their own `MessageCommon`. `SGroup` / `EGroup` not preserved.
 
 **Public accessor:** `Message::unknown_fields()` returns `impl Iterator<Item = ::puroro::UnknownField<'_>>` by parsing that blob with [`iter_unknown_fields`](puroro-rt/src/decode.rs) (also `MessageCommon::iter_unknown_fields`). Encode paths read the blob directly and do not go through the iterator.
 

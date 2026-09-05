@@ -725,10 +725,11 @@ mod tests {
     use ::puroro::{DecodeError, ScopedBuf, WireType};
 
     type Bits1 = BitArray<[u8; 1], Lsb0>;
+    type TestCommon = MessageCommon<Bits1, Global>;
 
     #[test]
     fn proto_bool_inline_implicit_set_and_omit() {
-        let mut common = MessageCommon::new_in(Bits1::ZERO, Global);
+        let mut common = TestCommon::new_in(Bits1::ZERO, Global);
         let mut field = SingularField::<ProtoBool, Implicit, 1, Global, Inline>::new_in(Global);
         assert_eq!(field.bind(&common).get(), None);
         *field.bind_mut(&mut common).value_mut() = true;
@@ -741,7 +742,7 @@ mod tests {
 
     #[test]
     fn proto_bool_inline_explicit_can_store_false() {
-        let mut common = MessageCommon::new_in(Bits1::ZERO, Global);
+        let mut common = TestCommon::new_in(Bits1::ZERO, Global);
         let mut field = SingularField::<ProtoBool, Explicit<0>, 1, Global, Inline>::new_in(Global);
         assert_eq!(field.bind(&common).get(), None);
         *field.bind_mut(&mut common).value_mut() = false;
@@ -752,7 +753,7 @@ mod tests {
 
     #[test]
     fn proto_bool_inline_merges_varint_true() {
-        let mut common = MessageCommon::new_in(Bits1::ZERO, Global);
+        let mut common = TestCommon::new_in(Bits1::ZERO, Global);
         let mut field = SingularField::<ProtoBool, Implicit, 1, Global, Inline>::new_in(Global);
         let mut data: &[u8] = &[1];
         let mut buf = ScopedBuf::new(&mut data);
@@ -767,7 +768,7 @@ mod tests {
 
     #[test]
     fn proto_bool_bitpacked_still_uses_value_bit() {
-        let mut common = MessageCommon::new_in(Bits1::ZERO, Global);
+        let mut common = TestCommon::new_in(Bits1::ZERO, Global);
         let mut field =
             SingularField::<ProtoBool, Implicit, 1, Global, BitPacked<0>>::new_in(Global);
         assert_eq!(field.bind(&common).get(), None);
@@ -780,7 +781,7 @@ mod tests {
 
     #[test]
     fn proto_bytes_sso_set_and_promote() {
-        let mut common = MessageCommon::new_in(Bits1::ZERO, Global);
+        let mut common = TestCommon::new_in(Bits1::ZERO, Global);
         let mut field =
             SingularField::<ProtoBytes, Explicit<0>, 1, Global, InlineOrHeap<1>>::new_in(Global);
         assert_eq!(field.bind(&common).get(), None);
@@ -801,7 +802,7 @@ mod tests {
 
     #[test]
     fn proto_string_sso_rejects_invalid_utf8() {
-        let mut common = MessageCommon::new_in(Bits1::ZERO, Global);
+        let mut common = TestCommon::new_in(Bits1::ZERO, Global);
         let mut field =
             SingularField::<ProtoString, Explicit<0>, 1, Global, InlineOrHeap<1>>::new_in(Global);
         let mut data: &[u8] = &[1, 0xff];
@@ -817,7 +818,7 @@ mod tests {
 
     #[test]
     fn proto_string_unchecked_sso_accepts_invalid_utf8() {
-        let mut common = MessageCommon::new_in(Bits1::ZERO, Global);
+        let mut common = TestCommon::new_in(Bits1::ZERO, Global);
         let mut field =
             SingularField::<ProtoStringUnchecked, Explicit<0>, 1, Global, InlineOrHeap<1>>::new_in(
                 Global,
@@ -836,7 +837,7 @@ mod tests {
 
     #[test]
     fn proto_string_unchecked_inline_accepts_invalid_utf8() {
-        let mut common = MessageCommon::new_in(Bits1::ZERO, Global);
+        let mut common = TestCommon::new_in(Bits1::ZERO, Global);
         let mut field =
             SingularField::<ProtoStringUnchecked, Explicit<0>, 1, Global, Inline>::new_in(Global);
         let mut data: &[u8] = &[1, 0xff];
@@ -853,7 +854,7 @@ mod tests {
 
     #[test]
     fn proto_string_unchecked_sso_heap_arm_accepts_invalid_utf8() {
-        let mut common = MessageCommon::new_in(Bits1::ZERO, Global);
+        let mut common = TestCommon::new_in(Bits1::ZERO, Global);
         let mut field =
             SingularField::<ProtoStringUnchecked, Explicit<0>, 1, Global, InlineOrHeap<1>>::new_in(
                 Global,

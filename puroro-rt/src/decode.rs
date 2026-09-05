@@ -20,7 +20,7 @@ use ::puroro::wire_type;
 use ::puroro::{DecodeError, UnknownField, UnknownPayload, WireType};
 use ::unmanaged::{UnmanagedString, UnmanagedVec};
 
-use crate::unknown_fields::UnknownFields;
+use crate::unknown_fields::{UnknownFields, UnknownStore};
 
 use crate::encode;
 
@@ -125,9 +125,10 @@ pub(crate) fn skip_field<B: Buf>(wire_type: WireType, buf: &mut B) -> Result<(),
     Ok(())
 }
 
-/// Skips one field payload and appends its tag + wire bytes to `unknown_fields`.
+/// Skips one field payload and appends its tag + wire bytes to a preserve store.
 ///
-/// Used by message `merge` unknown arms so unrecognized tags round-trip on encode.
+/// Used by message `merge` unknown arms. Discard messages call
+/// [`skip_field_and_save_in`] instead.
 pub fn skip_field_and_save<B: Buf, A: Allocator + Clone>(
     field_number: FieldNumber,
     wire_type: WireType,
@@ -135,7 +136,20 @@ pub fn skip_field_and_save<B: Buf, A: Allocator + Clone>(
     unknown_fields: &mut UnknownFields<A>,
     alloc: A,
 ) -> Result<(), DecodeError> {
-    let blob = unknown_fields.self_blob_vec_mut(alloc.clone());
+    skip_field_and_save_in(field_number, wire_type, buf, unknown_fields, alloc)
+}
+
+/// [`skip_field_and_save`] for any [`UnknownStore`] (preserve or discard).
+pub fn skip_field_and_save_in<B: Buf, A: Allocator + Clone, U: UnknownStore<A>>(
+    field_number: FieldNumber,
+    wire_type: WireType,
+    buf: &mut B,
+    unknown_fields: &mut U,
+    alloc: A,
+) -> Result<(), DecodeError> {
+    let Some(blob) = unknown_fields.append_blob_mut(alloc.clone()) else {
+        return skip_field(wire_type, buf);
+    };
     // SAFETY: the owned `alloc` (an `alloc.clone()` from the caller) is
     // interchangeable with the allocator that owns this vector's buffer.
     let mut g = unsafe { blob.with_alloc(alloc) };
@@ -176,13 +190,15 @@ pub fn skip_field_and_save<B: Buf, A: Allocator + Clone>(
     Ok(())
 }
 
-pub(crate) fn save_unknown_varint_field<A: Allocator + Clone>(
+pub(crate) fn save_unknown_varint_field<A: Allocator + Clone, U: UnknownStore<A>>(
     field_number: FieldNumber,
     value: u64,
-    unknown_fields: &mut UnknownFields<A>,
+    unknown_fields: &mut U,
     alloc: A,
 ) {
-    let blob = unknown_fields.self_blob_vec_mut(alloc.clone());
+    let Some(blob) = unknown_fields.append_blob_mut(alloc.clone()) else {
+        return;
+    };
     // SAFETY: the owned `alloc` (an `alloc.clone()` from the caller) is
     // interchangeable with the allocator that owns this vector's buffer.
     let mut g = unsafe { blob.with_alloc(alloc) };

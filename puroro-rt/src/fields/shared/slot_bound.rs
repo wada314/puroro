@@ -83,6 +83,9 @@ macro_rules! impl_copy_slot_bounds {
 }
 
 /// For generated owned messages that already impl [`DeallocateIn`] / [`CloneIn`].
+///
+/// `$t<A>` only — the unknown store is baked into the message type, not a
+/// second generic on `$t`.
 #[macro_export]
 macro_rules! impl_owned_slot_bounds {
     ($t:ident) => {

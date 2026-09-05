@@ -458,7 +458,7 @@ mod tests {
     #[test]
     fn map_field_int_markers() {
         let mut common =
-            MessageCommon::<BitArray<[u8; 1], Lsb0>, _>::new_in(BitArray::ZERO, Global);
+            MessageCommon::<BitArray<[u8; 1], Lsb0>, Global>::new_in(BitArray::ZERO, Global);
         let mut field = MapField::<ProtoInt32, ProtoInt32, 1, _>::new_in(Global);
         field.bind_mut(&mut common).insert(1, 10);
         field.bind_mut(&mut common).insert(1, 11);
@@ -472,7 +472,7 @@ mod tests {
     #[test]
     fn map_int_roundtrip_and_last_wins() {
         let mut common =
-            MessageCommon::<BitArray<[u8; 1], Lsb0>, _>::new_in(BitArray::ZERO, Global);
+            MessageCommon::<BitArray<[u8; 1], Lsb0>, Global>::new_in(BitArray::ZERO, Global);
         let mut field = MapField::<ProtoInt32, ProtoInt32, 7, _>::new_in(Global);
         field.bind_mut(&mut common).insert(1, 10);
         field.bind_mut(&mut common).insert(2, 20);
@@ -522,7 +522,7 @@ mod tests {
     #[test]
     fn map_entry_missing_key_defaults_to_zero() {
         let mut common =
-            MessageCommon::<BitArray<[u8; 1], Lsb0>, _>::new_in(BitArray::ZERO, Global);
+            MessageCommon::<BitArray<[u8; 1], Lsb0>, Global>::new_in(BitArray::ZERO, Global);
         let mut field = MapField::<ProtoInt32, ProtoInt32, 1, _>::new_in(Global);
 
         // Entry body: only value=2 with 42 (tag 0x10, varint 42).
@@ -556,7 +556,7 @@ mod tests {
     #[test]
     fn map_string_key_roundtrip() {
         let mut common =
-            MessageCommon::<BitArray<[u8; 1], Lsb0>, _>::new_in(BitArray::ZERO, Global);
+            MessageCommon::<BitArray<[u8; 1], Lsb0>, Global>::new_in(BitArray::ZERO, Global);
         let mut field = MapField::<ProtoString, ProtoInt32, 3, _>::new_in(Global);
         field.bind_mut(&mut common).insert(unmanaged_str("ab"), 7);
 
@@ -583,7 +583,7 @@ mod tests {
     #[test]
     fn insert_duplicate_string_key_releases_incoming_key() {
         let mut common =
-            MessageCommon::<BitArray<[u8; 1], Lsb0>, _>::new_in(BitArray::ZERO, Global);
+            MessageCommon::<BitArray<[u8; 1], Lsb0>, Global>::new_in(BitArray::ZERO, Global);
         let mut field = MapField::<ProtoString, ProtoInt32, 1, _>::new_in(Global);
 
         field.bind_mut(&mut common).insert(unmanaged_str("k"), 1);
@@ -600,7 +600,7 @@ mod tests {
     #[test]
     fn merge_duplicate_string_key_releases_incoming_key() {
         let mut common =
-            MessageCommon::<BitArray<[u8; 1], Lsb0>, _>::new_in(BitArray::ZERO, Global);
+            MessageCommon::<BitArray<[u8; 1], Lsb0>, Global>::new_in(BitArray::ZERO, Global);
 
         let encode_entry =
             |common: &mut MessageCommon<BitArray<[u8; 1], Lsb0>, Global>, value: i32| -> BytesMut {
@@ -634,7 +634,7 @@ mod tests {
     #[test]
     fn insert_duplicate_string_key_releases_previous_string_value() {
         let mut common =
-            MessageCommon::<BitArray<[u8; 1], Lsb0>, _>::new_in(BitArray::ZERO, Global);
+            MessageCommon::<BitArray<[u8; 1], Lsb0>, Global>::new_in(BitArray::ZERO, Global);
         let mut field = MapField::<ProtoString, ProtoString, 1, _>::new_in(Global);
 
         field
