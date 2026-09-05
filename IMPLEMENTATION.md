@@ -207,12 +207,12 @@ Live plugin emits the eager-path field families shown by [`sample-generated/`](s
 
 ## 4. Shared infrastructure
 
-[`MessageCommon<B, A>`](puroro-rt/src/fields/shared.rs) — one per generated message:
+[`MessageCommon<B, A, U = UnknownFields<A>>`](puroro-rt/src/fields/shared.rs) — one per generated message (owned or inlined). It is **not** shared with inlined children; each child is a full `M` with its own common. A parent-`Window` + child-`Body` design (`SharedMessage` / `*Bound` / `*View`) was tried and **taken down** — see [§17.1](#171-submessage-inline-optimisation).
 
 | Member | Role |
 |---|---|
 | `bits: B` | `BitArray<[u8; N], Lsb0>` **common bits**: EXPLICIT / LEGACY_REQUIRED presence, packed bool values, and string / bytes SSO heap-arm bits |
-| `unknown_fields: ManuallyDrop<`[`UnknownFields`](puroro-rt/src/unknown_fields.rs)`<A>>` | Preserve: empty ≈ 1 word; first use allocates this message’s wire blob. Public iterator parses that blob |
+| `unknown_fields: ManuallyDrop<U>` | [`UnknownStore`](puroro-rt/src/unknown_fields.rs). Default `U = UnknownFields<A>`: empty ≈ 1 word; first use allocates this message’s wire blob. [`DiscardUnknowns`](puroro-rt/src/unknown_fields.rs) is a ZST (omits the word). Public iterator parses `U::as_bytes()`. Generated / sample messages bake `U` into `Foo<A>` (`impl<A>` only) |
 | `alloc: A` | The single canonical allocator instance; cloned (by value) into every field operation that (de)allocates |
 
 Field catalog methods take `&MessageCommon` / `&mut MessageCommon`, not `&Task`, so wrappers stay decoupled from the parent message type.
@@ -847,7 +847,13 @@ The `set_*` per-variant setters are removed, matching the other field families.
 
 ### 17.1 Submessage inline optimisation
 
-**Status (runtime + sample; sharing reverted).** Singular nested messages use [`Boxed`](puroro-rt/src/fields/shared/value_layout.rs) (`UnmanagedBox<M, A>`) or [`Inline`](puroro-rt/src/fields/shared/value_layout.rs) (`Slot = M`). One catalog marker: [`ProtoMessage<M>`](puroro-rt/src/fields/wire/proto_message.rs). Getters are `Option<&M>` / `&mut M`. **Inline** (`Task.origin`, oneof `postal`, `School.student`): the child is a full message with its own `MessageCommon`. **Boxed** (`Task.assignee`): heap `UnmanagedBox<M>`. `set_*` move-replaces the slot. Sharing `MessageCommon` / `*Body` / `*Bound` / `*View` was tried and reverted — the generated-type split was too expensive for the size win.
+**Status (runtime + sample).** Singular nested messages use [`Boxed`](puroro-rt/src/fields/shared/value_layout.rs) (`UnmanagedBox<M, A>`) or [`Inline`](puroro-rt/src/fields/shared/value_layout.rs) (`Slot = M`). One catalog marker: [`ProtoMessage<M>`](puroro-rt/src/fields/wire/proto_message.rs). Getters are `Option<&M>` / `&mut M`. **Inline** (`Task.origin`, oneof `postal`, `School.student`): the child is a full message with its own `MessageCommon`. **Boxed** (`Task.assignee`): heap `UnmanagedBox<M>`. `set_*` move-replaces the slot.
+
+**Shared `MessageCommon` — taken down.** Sharing the parent common (child `Body` + parent `Window` / `*Bound` / `*View` / `SharedMessage`, always-view getters) was implemented on the sample and then reverted. Do not revive it unless the product lock below is reopened. Reasons:
+
+1. **Same-type API.** Owned and inlined children must stay one `M`. Getters are `Option<&M>` / `&mut M`; `school.student()` is `&Student`. Sharing makes the inlined slot a Body, so that assignment does not type-check. Unifying boxed and inlined getters then forced always-view types and `FooMessage` traits on every message.
+2. **Generated-type split.** Every message grew Body / Bound / View / Mut, bit-base bookkeeping, oneof subtree ranges, and a second catalog marker. That surface was too expensive for the size win.
+3. **The size win was the unknown word.** Sharing only bits + alloc barely helps `Global`. A real shrink needed the parent to hold the child’s unknowns (a child map). That store leaked into encode / isolation / `clear_*` / oneof and was removed; each message now has its own flat [`UnknownFields`](puroro-rt/src/unknown_fields.rs) blob (or baked [`DiscardUnknowns`](puroro-rt/src/unknown_fields.rs)).
 
 Each inlined child keeps its own unknown-field store. Unknowns decoded inside a child LEN stay on that child and re-encode inside that LEN (sample `School → Student → Point` and `Task.origin`). Oneof switch deallocates the previous variant (the child's `Drop` releases its bits / SSO / unknowns), then [`OneofGroup::after_deallocate`](puroro-rt/src/fields/oneof.rs) clears bits the **group** owns on the parent (email/phone SSO, `urgent` value) — not a contiguous range that would clobber `done` / `flag`. Repeated / map **storage** stays `Element = M`. Sample `watchers` is `&[Address]` / `Vec<Address, A>`.
 
