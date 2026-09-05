@@ -8,7 +8,7 @@
 mod record;
 mod varint;
 
-pub use self::record::RecordScanner;
+pub use self::record::{RecordScanner, merge_scanned_field};
 pub use self::varint::{
     ByteIterator, BytePair, ByteQuad, ChunkScan, ChunkScan1, ChunkScan2, ChunkScan4, ChunkScanHot2,
     ChunkScanHot4, ChunkScanHot8, ChunkScanHot10, ChunkScanHotAdapt, ChunkScanLikely1,

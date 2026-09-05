@@ -25,6 +25,13 @@ pub enum DecodeError {
     InvalidUtf8,
     /// A nested message's declared length exceeded the remaining buffer.
     TruncatedMessage,
+    /// A lazy getter ran before the current input stream was finished.
+    ///
+    /// Incremental ingest can apply complete records as they arrive, but
+    /// last-wins is only final after `finish`. Distinct from
+    /// [`TruncatedMessage`](Self::TruncatedMessage), which means leftover bytes
+    /// of an incomplete record remain.
+    UnfinishedMessage,
     /// Decode recursion exceeded the implementation-defined limit.
     RecursionLimitExceeded,
     /// A proto2 `required` field was absent from the wire.
@@ -57,6 +64,9 @@ impl fmt::Display for DecodeError {
             DecodeError::InvalidTag => write!(f, "tag contains an unknown wire type"),
             DecodeError::InvalidUtf8 => write!(f, "string field is not valid UTF-8"),
             DecodeError::TruncatedMessage => write!(f, "message was truncated"),
+            DecodeError::UnfinishedMessage => {
+                write!(f, "message input has not been finished")
+            }
             DecodeError::RecursionLimitExceeded => write!(f, "recursion limit exceeded"),
             DecodeError::MissingRequiredField { field_number } => {
                 write!(f, "proto2 required field {field_number} was not present")

@@ -5,9 +5,11 @@
 
 pub(crate) mod defaults;
 mod fallible;
+mod lazy;
 pub mod notification;
 
 pub use fallible::TaskMessageFallible;
+pub use lazy::TaskLazy;
 pub use notification::{Notification, NotificationCase};
 
 // ---------------------------------------------------------------------------

@@ -21,7 +21,7 @@ pub mod message_encode;
 pub mod message_merge;
 pub(crate) mod unknown_fields;
 
-pub use ::protobuf_core::{FieldNumber, Varint};
+pub use ::protobuf_core::{Field, FieldNumber, Varint};
 /// Generator-facing re-exports from `unmanaged`.
 pub use ::unmanaged::{CloneIn, DeallocateIn, DefaultIn};
 pub use defaults::ProtoDefault;

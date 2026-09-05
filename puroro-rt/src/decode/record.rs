@@ -8,9 +8,11 @@ use ::allocator_api2::alloc::{Allocator, Global};
 use ::allocator_api2::vec::Vec as AllocVec;
 use ::protobuf_core::{
     Field, FieldNumber, FieldValue, MAX_VARINT_BYTES, VARINT_CONTINUATION_BIT, VARINT_PAYLOAD_MASK,
+    Varint,
 };
 use ::puroro::wire_type;
-use ::puroro::{DecodeError, WireType};
+use ::puroro::{DecodeError, ScopedBuf, WireType};
+use ::std::vec::Vec;
 
 /// Leftover-holding scanner over vectored / chunked input.
 #[derive(Debug)]
@@ -30,7 +32,7 @@ impl RecordScanner<Global> {
     }
 }
 
-impl<A: Allocator + Clone> RecordScanner<A> {
+impl<A: Allocator> RecordScanner<A> {
     pub fn new_in(alloc: A) -> Self {
         Self {
             leftover: AllocVec::new_in(alloc),
@@ -47,6 +49,17 @@ impl<A: Allocator + Clone> RecordScanner<A> {
         !self.leftover.is_empty()
     }
 
+    /// End of the logical stream. Non-empty leftover is truncated input.
+    pub fn finish(&mut self) -> Result<(), DecodeError> {
+        if self.leftover.is_empty() {
+            Ok(())
+        } else {
+            Err(DecodeError::TruncatedMessage)
+        }
+    }
+}
+
+impl<A: Allocator + Clone> RecordScanner<A> {
     /// Parse every complete field in `leftover || chunk`.
     ///
     /// Complete records are read in place. Only the unfinished tail is copied
@@ -70,13 +83,44 @@ impl<A: Allocator + Clone> RecordScanner<A> {
         keep_unparsed_tail(&mut self.leftover, chunk, pos);
         Ok(records)
     }
+}
 
-    /// End of the logical stream. Non-empty leftover is truncated input.
-    pub fn finish(&mut self) -> Result<(), DecodeError> {
-        if self.leftover.is_empty() {
-            Ok(())
-        } else {
-            Err(DecodeError::TruncatedMessage)
+/// Reconstructs the post-tag body of a scanned [`Field`] for catalog `merge`.
+///
+/// [`FieldValue::Len`] is payload only; packed / LEN catalog paths still read a
+/// length varint, so that arm prefixes the length before calling `merge`.
+pub fn merge_scanned_field<L, F>(field: &Field<L>, merge: F) -> Result<(), DecodeError>
+where
+    L: AsRef<[u8]>,
+    F: FnOnce(WireType, &mut ScopedBuf<'_, &[u8]>) -> Result<(), DecodeError>,
+{
+    match &field.value {
+        FieldValue::Varint(v) => {
+            let (bytes, n) = v.encode();
+            let mut slice = &bytes[..n];
+            let mut scoped = ScopedBuf::new(&mut slice);
+            merge(WireType::Varint, &mut scoped)
+        }
+        FieldValue::I32(bytes) => {
+            let mut slice = bytes.as_slice();
+            let mut scoped = ScopedBuf::new(&mut slice);
+            merge(WireType::Int32, &mut scoped)
+        }
+        FieldValue::I64(bytes) => {
+            let mut slice = bytes.as_slice();
+            let mut scoped = ScopedBuf::new(&mut slice);
+            merge(WireType::Int64, &mut scoped)
+        }
+        FieldValue::Len(payload) => {
+            let payload = payload.as_ref();
+            let (len_bytes, n) = Varint::from_uint64(payload.len() as u64).encode();
+            let total = n + payload.len();
+            let mut body = Vec::with_capacity(total);
+            body.extend_from_slice(&len_bytes[..n]);
+            body.extend_from_slice(payload);
+            let mut slice = body.as_slice();
+            let mut scoped = ScopedBuf::new(&mut slice);
+            merge(WireType::Len, &mut scoped)
         }
     }
 }

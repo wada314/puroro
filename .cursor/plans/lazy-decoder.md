@@ -197,7 +197,9 @@ A sample `TaskLazy` (or a smaller fixture if `Task` is too wide) that:
 Tests: last-wins scalar, implicit zero, packed + expanded mixed, truncated
 input, second `merge_from` of a complete message (real protobuf merge).
 
-Done when incremental numerical apply reuses catalog code.
+Done (2026-09-06): `TaskLazy` + `RecordScanner` + catalog `merge` via
+`merge_scanned_field`. LEN / map / nested / oneof skipped. Getters require
+`finish` (`UnfinishedMessage` / `TruncatedMessage`).
 
 ### Step 4 — LEN as offset, decode every get (no union)
 
