@@ -2,8 +2,8 @@
 //!
 //! Singular string / bytes use [`LazyStringSlot`] / [`LazyBytesSlot`]: Wire
 //! spans promote to Inline / Heap on first get. Failed UTF-8 is sticky.
-//! Nested `assignee` / `origin` merge each complete LEN into a child lazy
-//! message during the parent scan. Repeated `watchers` appends one child per
+//! Nested `assignee` / `origin` merge each complete LEN into a child that
+//! shares the island-root buffer. Repeated `watchers` appends one child per
 //! occurrence. `attributes` stores map-entry spans and materialises on first
 //! get. Oneof / repeated string are still skipped. Getters require a finished
 //! input stream so last-wins is final. `into_eager` re-merges `_wire` into
@@ -14,9 +14,7 @@ use ::allocator_api2::vec::Vec as AllocVec;
 use ::bytes::{Buf, BufMut};
 use ::core::ops::ControlFlow;
 use ::puroro::{DecodeError, HasDefault, MapRef, Message, Optional};
-use ::puroro_rt::decode::{
-    LazyScan, ScannedRecord, merge_scanned_field, scanned_len_payload, scanned_len_span,
-};
+use ::puroro_rt::decode::{LazyScan, ScannedRecord, merge_scanned_field, scanned_len_span};
 use ::puroro_rt::{
     BitPacked, Closed, Expanded, Explicit, FieldDeallocVisitor, FieldVisitorMut, Implicit, Inline,
     InteriorBitArray, LazyBytesSlot, LazyMapField, LazyStringSlot, MessageCommon, Open, Packed,
@@ -361,8 +359,10 @@ impl<A: Allocator + Clone> TaskLazy<A> {
     pub fn into_eager(self) -> Result<Task<A>, DecodeError> {
         self.require_finished()?;
         let mut eager = Task::new_in(self._common.alloc.clone());
-        let mut buf = self.scan.wire();
-        Message::merge_from(&mut eager, &mut buf)?;
+        self.scan.for_each_body(|chunk| {
+            let mut buf = chunk;
+            Message::merge_from(&mut eager, &mut buf)
+        })?;
         Ok(eager)
     }
 
@@ -393,23 +393,23 @@ impl<A: Allocator + Clone> TaskLazy<A> {
                 Ok(())
             }
             FIELD_ASSIGNEE => {
-                let payload = scanned_len_payload(rec)?;
+                let span = scanned_len_span(origin, rec)?;
                 let child = self
                     .assignee
                     .get_or_insert_with(|| AddressLazy::new_in(self._common.alloc.clone()));
-                child.merge_from(&mut &payload[..])
+                child.merge_shared(self.scan.shared(), span)
             }
             FIELD_ORIGIN => {
-                let payload = scanned_len_payload(rec)?;
+                let span = scanned_len_span(origin, rec)?;
                 let child = self
                     .origin
                     .get_or_insert_with(|| PointLazy::new_in(self._common.alloc.clone()));
-                child.merge_from(&mut &payload[..])
+                child.merge_shared(self.scan.shared(), span)
             }
             FIELD_WATCHERS => {
-                let payload = scanned_len_payload(rec)?;
+                let span = scanned_len_span(origin, rec)?;
                 let mut child = AddressLazy::new_in(self._common.alloc.clone());
-                child.merge_from(&mut &payload[..])?;
+                child.merge_shared(self.scan.shared(), span)?;
                 self.watchers.push(child);
                 Ok(())
             }

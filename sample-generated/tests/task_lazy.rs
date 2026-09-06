@@ -725,3 +725,18 @@ fn address_and_point_into_eager() {
     assert_eq!(point_lazy.encode_to_vec().unwrap(), point_bytes);
     assert_eq!(point_lazy.into_eager().unwrap(), point);
 }
+
+#[test]
+fn nested_child_encode_is_body_only() {
+    let mut addr = Address::new();
+    addr.street_mut().set("Oak");
+    let mut task = Task::new();
+    task.owner_id_mut().set("u");
+    *task.score_mut() = 9;
+    task.set_assignee(addr.clone());
+    let bytes = task.encode_to_vec();
+    let lazy = TaskLazy::decode(&bytes[..]).unwrap();
+    let child = lazy.assignee().unwrap().unwrap();
+    assert_eq!(child.encode_to_vec().unwrap(), addr.encode_to_vec());
+    assert_ne!(child.encode_to_vec().unwrap(), bytes);
+}

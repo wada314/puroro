@@ -6,7 +6,7 @@ use ::bitvec::order::Lsb0;
 use ::bytes::{Buf, BufMut};
 use ::core::ops::ControlFlow;
 use ::puroro::{DecodeError, Message};
-use ::puroro_rt::decode::{LazyScan, ScannedRecord, merge_scanned_field};
+use ::puroro_rt::decode::{LazyScan, ScannedRecord, SharedWire, WireSpan, merge_scanned_field};
 use ::puroro_rt::{
     FieldDeallocVisitor, FieldVisitorMut, Implicit, MessageCommon, ProtoInt32, SingularField,
 };
@@ -115,9 +115,27 @@ impl<A: Allocator + Clone> PointLazy<A> {
     pub fn into_eager(self) -> Result<Point<A>, DecodeError> {
         self.scan.require_finished()?;
         let mut eager = Point::new_in(self._common.alloc.clone());
-        let mut buf = self.scan.wire();
-        Message::merge_from(&mut eager, &mut buf)?;
+        self.scan.for_each_body(|chunk| {
+            let mut buf = chunk;
+            Message::merge_from(&mut eager, &mut buf)
+        })?;
         Ok(eager)
+    }
+
+    /// Merge one complete Point body that already lives in `root`.
+    pub(crate) fn merge_shared(
+        &mut self,
+        root: &SharedWire<A>,
+        span: WireSpan,
+    ) -> Result<(), DecodeError> {
+        self.scan.adopt(root);
+        self.scan.record_region(span);
+        let payload = span.slice(root.as_bytes())?;
+        let records = self.scan.scan_complete(payload)?;
+        for rec in records {
+            self.apply_record(&rec)?;
+        }
+        Ok(())
     }
 
     fn apply_record(&mut self, rec: &ScannedRecord<A>) -> Result<(), DecodeError> {

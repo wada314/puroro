@@ -4,7 +4,9 @@ use ::allocator_api2::alloc::{Allocator, Global};
 use ::bytes::{Buf, BufMut};
 use ::core::ops::ControlFlow;
 use ::puroro::{DecodeError, HasDefault, Message, Optional};
-use ::puroro_rt::decode::{LazyScan, ScannedRecord, merge_scanned_field, scanned_len_span};
+use ::puroro_rt::decode::{
+    LazyScan, ScannedRecord, SharedWire, WireSpan, merge_scanned_field, scanned_len_span,
+};
 use ::puroro_rt::{
     Explicit, FieldDeallocVisitor, FieldVisitorMut, InteriorBitArray, LazyStringSlot,
     MessageCommon, ProtoDefault, ProtoDouble, ProtoFixed32, SingularField, WireOrSsoArm,
@@ -179,9 +181,27 @@ impl<A: Allocator + Clone> AddressLazy<A> {
     pub fn into_eager(self) -> Result<Address<A>, DecodeError> {
         self.scan.require_finished()?;
         let mut eager = Address::new_in(self._common.alloc.clone());
-        let mut buf = self.scan.wire();
-        Message::merge_from(&mut eager, &mut buf)?;
+        self.scan.for_each_body(|chunk| {
+            let mut buf = chunk;
+            Message::merge_from(&mut eager, &mut buf)
+        })?;
         Ok(eager)
+    }
+
+    /// Merge one complete Address body that already lives in `root`.
+    pub(crate) fn merge_shared(
+        &mut self,
+        root: &SharedWire<A>,
+        span: WireSpan,
+    ) -> Result<(), DecodeError> {
+        self.scan.adopt(root);
+        self.scan.record_region(span);
+        let payload = span.slice(root.as_bytes())?;
+        let records = self.scan.scan_complete(payload)?;
+        for rec in records {
+            self.apply_record(&rec, span.offset)?;
+        }
+        Ok(())
     }
 
     fn apply_record(&mut self, rec: &ScannedRecord<A>, origin: usize) -> Result<(), DecodeError> {

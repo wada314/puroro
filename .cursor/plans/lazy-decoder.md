@@ -248,9 +248,13 @@ if both are easy; if not, last-slice-only is acceptable for a first nested
 cut and must be called out in the test name.
 
 Done (2026-09-06): `AddressLazy` / `PointLazy`. During the parent scan each
-complete message LEN is `merge_from`'d into a still-lazy child (proto
-submessage merge, not last-slice-only). Repeated `watchers` appends one
-child per occurrence.
+complete message LEN is merged into a still-lazy child (proto submessage
+merge, not last-slice-only). Repeated `watchers` appends one child per
+occurrence.
+
+Updated (2026-09-07): nested children `adopt` the island-root
+[`SharedWire`](../../puroro-rt/src/decode/shared_wire.rs) (v1: `Bytes` +
+stored `A`) and record payload spans. No second copy of the LEN body.
 
 ### Step 7 — Map as offset list
 
