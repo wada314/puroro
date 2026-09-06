@@ -40,17 +40,14 @@ use crate::message_merge::MessageMerge;
 /// Where a singular field's logical value is stored.
 ///
 /// Associated [`Slot`](Self::Slot) is the physical storage for this `(T, L)`
-/// pair. Mutable `_mut` handles live on [`ValueLayoutMut`].
+/// pair. Infallible views live on [`ValueLayoutGet`]; mutable `_mut` handles
+/// live on [`ValueLayoutMut`].
 pub trait ValueLayout<T: SingularType, A: Allocator>: Copy {
     /// Physical value stored in the singular field slot (excluding
     /// [`MessageCommon`] bits).
     type Slot: AddressableSlot;
 
     fn is_proto_empty<Cx>(slot: &Self::Slot, common: &Cx) -> bool
-    where
-        Cx: MessageBindingMut<A>;
-
-    fn get<'a, Cx>(slot: &'a Self::Slot, common: &'a Cx) -> T::View<'a, A>
     where
         Cx: MessageBindingMut<A>;
 
@@ -75,6 +72,15 @@ pub trait ValueLayout<T: SingularType, A: Allocator>: Copy {
     fn deallocate_slot<VS, Cx>(slot: VS, initialized: bool, common: &Cx)
     where
         VS: ValueSlot<Self::Slot, A>,
+        Cx: MessageBindingMut<A>;
+}
+
+/// Infallible slot view. Kept off [`ValueLayout`] so layouts that need an
+/// island buffer ([`WireOrSso`](crate::WireOrSso)) promote via `try_str` /
+/// `try_bytes` instead of returning a dummy empty view.
+pub trait ValueLayoutGet<T: SingularType, A: Allocator>: ValueLayout<T, A> {
+    fn get<'a, Cx>(slot: &'a Self::Slot, common: &'a Cx) -> T::View<'a, A>
+    where
         Cx: MessageBindingMut<A>;
 }
 
@@ -172,14 +178,6 @@ where
     }
 
     #[inline]
-    fn get<'a, Cx>(slot: &'a T::Slot<A>, common: &'a Cx) -> T::View<'a, A>
-    where
-        Cx: MessageBindingMut<A>,
-    {
-        T::get(slot, common)
-    }
-
-    #[inline]
     fn clear<VS, I, Cx>(slot: &mut VS, init: I, common: &mut Cx)
     where
         VS: ValueSlot<T::Slot<A>, A>,
@@ -200,6 +198,19 @@ where
         if let Some(v) = slot.take_value(initialized) {
             T::deallocate_payload(v, common);
         }
+    }
+}
+
+impl<T: PayloadAccess, A: Allocator> ValueLayoutGet<T, A> for Inline
+where
+    T::Slot<A>: AddressableSlot + DeallocateBound<A>,
+{
+    #[inline]
+    fn get<'a, Cx>(slot: &'a T::Slot<A>, common: &'a Cx) -> T::View<'a, A>
+    where
+        Cx: MessageBindingMut<A>,
+    {
+        T::get(slot, common)
     }
 }
 
@@ -285,14 +296,6 @@ where
     }
 
     #[inline]
-    fn get<'a, Cx>(slot: &'a UnmanagedBox<M, A>, _common: &'a Cx) -> &'a M
-    where
-        Cx: MessageBindingMut<A>,
-    {
-        Deref::deref(slot)
-    }
-
-    #[inline]
     fn clear<VS, I, Cx>(slot: &mut VS, init: I, common: &mut Cx)
     where
         VS: ValueSlot<UnmanagedBox<M, A>, A>,
@@ -318,6 +321,19 @@ where
             // SAFETY: `deallocate_slot` contract — `common` is this field's parent.
             unsafe { DeallocateIn::deallocate_in(v, common.alloc()) };
         }
+    }
+}
+
+impl<M, A: Allocator> ValueLayoutGet<ProtoMessage<M>, A> for Boxed
+where
+    M: MessageEncode + DeallocateIn<A>,
+{
+    #[inline]
+    fn get<'a, Cx>(slot: &'a UnmanagedBox<M, A>, _common: &'a Cx) -> &'a M
+    where
+        Cx: MessageBindingMut<A>,
+    {
+        Deref::deref(slot)
     }
 }
 
@@ -414,14 +430,6 @@ impl<A: Allocator, const VALUE_BIT: usize> ValueLayout<ProtoBool, A> for BitPack
     }
 
     #[inline]
-    fn get<'a, Cx>(_slot: &'a (), common: &'a Cx) -> bool
-    where
-        Cx: MessageBindingMut<A>,
-    {
-        common.is_bit_set(VALUE_BIT)
-    }
-
-    #[inline]
     fn clear<VS, I, Cx>(slot: &mut VS, init: I, common: &mut Cx)
     where
         VS: ValueSlot<(), A>,
@@ -441,6 +449,16 @@ impl<A: Allocator, const VALUE_BIT: usize> ValueLayout<ProtoBool, A> for BitPack
         Cx: MessageBindingMut<A>,
     {
         let _ = slot.take_value(initialized);
+    }
+}
+
+impl<A: Allocator, const VALUE_BIT: usize> ValueLayoutGet<ProtoBool, A> for BitPacked<VALUE_BIT> {
+    #[inline]
+    fn get<'a, Cx>(_slot: &'a (), common: &'a Cx) -> bool
+    where
+        Cx: MessageBindingMut<A>,
+    {
+        common.is_bit_set(VALUE_BIT)
     }
 }
 
@@ -566,14 +584,6 @@ impl<A: Allocator, const HEAP_BIT: usize> ValueLayout<ProtoString, A> for Inline
     }
 
     #[inline]
-    fn get<'a, Cx>(slot: &'a SsoString<A>, common: &'a Cx) -> &'a str
-    where
-        Cx: MessageBindingMut<A>,
-    {
-        slot.as_str(Self::is_heap(common))
-    }
-
-    #[inline]
     fn clear<VS, I, Cx>(slot: &mut VS, init: I, common: &mut Cx)
     where
         VS: ValueSlot<SsoString<A>, A>,
@@ -611,6 +621,18 @@ impl<A: Allocator, const HEAP_BIT: usize> ValueLayout<ProtoString, A> for Inline
             // SAFETY: HEAP_BIT / `alloc` come from this field's parent `common`.
             unsafe { s.deallocate(is_heap, common.alloc()) };
         }
+    }
+}
+
+impl<A: Allocator, const HEAP_BIT: usize> ValueLayoutGet<ProtoString, A>
+    for InlineOrHeap<HEAP_BIT>
+{
+    #[inline]
+    fn get<'a, Cx>(slot: &'a SsoString<A>, common: &'a Cx) -> &'a str
+    where
+        Cx: MessageBindingMut<A>,
+    {
+        slot.as_str(Self::is_heap(common))
     }
 }
 
@@ -711,14 +733,6 @@ impl<A: Allocator, const HEAP_BIT: usize, C: BytesLikeLenCodec> ValueLayout<LenS
     }
 
     #[inline]
-    fn get<'a, Cx>(slot: &'a SsoBytes<A>, common: &'a Cx) -> &'a [u8]
-    where
-        Cx: MessageBindingMut<A>,
-    {
-        slot.as_bytes(Self::is_heap(common))
-    }
-
-    #[inline]
     fn clear<VS, I, Cx>(slot: &mut VS, init: I, common: &mut Cx)
     where
         VS: ValueSlot<SsoBytes<A>, A>,
@@ -755,6 +769,18 @@ impl<A: Allocator, const HEAP_BIT: usize, C: BytesLikeLenCodec> ValueLayout<LenS
             // SAFETY: HEAP_BIT / `alloc` come from this field's parent `common`.
             unsafe { s.deallocate(is_heap, common.alloc()) };
         }
+    }
+}
+
+impl<A: Allocator, const HEAP_BIT: usize, C: BytesLikeLenCodec> ValueLayoutGet<LenScalar<C>, A>
+    for InlineOrHeap<HEAP_BIT>
+{
+    #[inline]
+    fn get<'a, Cx>(slot: &'a SsoBytes<A>, common: &'a Cx) -> &'a [u8]
+    where
+        Cx: MessageBindingMut<A>,
+    {
+        slot.as_bytes(Self::is_heap(common))
     }
 }
 

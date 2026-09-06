@@ -315,17 +315,6 @@ impl<A: Allocator, const KIND: usize> ValueLayout<ProtoString, A> for WireOrSso<
         slot.is_empty::<A>(Self::kind(common))
     }
 
-    fn get<'a, Cx>(slot: &'a Self::Slot, common: &'a Cx) -> &'a str
-    where
-        Cx: MessageBindingMut<A>,
-    {
-        match Self::kind(common) {
-            WireOrSsoKind::Inline => unsafe { inline_str(&*slot.inner.get()) },
-            WireOrSsoKind::Heap => unsafe { heap_str(&*slot.inner.get()) },
-            WireOrSsoKind::Wire | WireOrSsoKind::Failed => "",
-        }
-    }
-
     fn clear<VS, I, Cx>(slot: &mut VS, init: I, common: &mut Cx)
     where
         VS: ValueSlot<Self::Slot, A>,
@@ -380,17 +369,6 @@ impl<A: Allocator, const KIND: usize, C: BytesLikeLenCodec> ValueLayout<LenScala
         Cx: MessageBindingMut<A>,
     {
         slot.is_empty::<A>(Self::kind(common))
-    }
-
-    fn get<'a, Cx>(slot: &'a Self::Slot, common: &'a Cx) -> &'a [u8]
-    where
-        Cx: MessageBindingMut<A>,
-    {
-        match Self::kind(common) {
-            WireOrSsoKind::Inline => unsafe { (*slot.inner.get()).inline.as_bytes() },
-            WireOrSsoKind::Heap => unsafe { (*(*slot.inner.get()).heap).as_slice() },
-            WireOrSsoKind::Wire | WireOrSsoKind::Failed => &[],
-        }
     }
 
     fn clear<VS, I, Cx>(slot: &mut VS, init: I, common: &mut Cx)

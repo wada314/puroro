@@ -16,8 +16,9 @@
 use crate::fields::oneof_variant::OneofVariant;
 use crate::fields::shared::field_inspect::{FieldCloneIn, FieldDebug, FieldEncode, FieldPartialEq};
 use crate::fields::shared::{
-    DefaultIn, FieldDeallocate, MessageCommon, MessageCommonAlloc, MessageCommonBits, ValueLayout,
+    DefaultIn, FieldDeallocate, MessageCommon, MessageCommonAlloc, MessageCommonBits,
     field_presence::{FieldPresence, Oneof},
+    value_layout::ValueLayoutGet,
     value_slot::{AddressableSlot, ValueSlot},
 };
 use crate::fields::singular::field::SingularField;
@@ -463,7 +464,7 @@ impl<
     T: SingularType,
     const FIELD: u32,
     A: Allocator,
-    L: ValueLayout<T, A>,
+    L: ValueLayoutGet<T, A>,
     D,
     Pb,
     U: UnknownStore<A>,
@@ -488,7 +489,7 @@ impl<
     T: SingularType,
     const FIELD: u32,
     A: Allocator,
-    L: ValueLayout<T, A>,
+    L: ValueLayoutGet<T, A>,
     D,
     Pb,
     U: UnknownStore<A>,

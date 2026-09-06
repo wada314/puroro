@@ -35,7 +35,9 @@ use crate::fields::shared::{
         Explicit, FieldPresence, Implicit, LegacyRequired, Message, Oneof, RequiredFieldPresence,
     },
     slot_init::{AlwaysInitialized, SlotInitView},
-    value_layout::{Inline, ValueLayout, ValueLayoutClone, ValueLayoutMerge, ValueLayoutMut},
+    value_layout::{
+        Inline, ValueLayout, ValueLayoutClone, ValueLayoutGet, ValueLayoutMerge, ValueLayoutMut,
+    },
     value_slot::{
         AddressableSlot, ValueSlot, ValueSlotMutAccess, ValueSlotNew, ValueSlotRefAccess,
     },
@@ -236,7 +238,10 @@ where
 {
     /// Low-level borrow of the always-initialized slot's logical value.
     #[inline]
-    pub fn value<'a, Cx: MessageBindingMut<A>>(&'a self, common: &'a Cx) -> T::View<'a, A> {
+    pub fn value<'a, Cx: MessageBindingMut<A>>(&'a self, common: &'a Cx) -> T::View<'a, A>
+    where
+        L: ValueLayoutGet<T, A>,
+    {
         let slot = (*self.value)
             .with(AlwaysInitialized, common)
             .get()
@@ -255,7 +260,10 @@ where
 {
     /// Low-level borrow of the always-initialized oneof-variant slot's logical value.
     #[inline]
-    pub fn value<'a, Cx: MessageBindingMut<A>>(&'a self, common: &'a Cx) -> T::View<'a, A> {
+    pub fn value<'a, Cx: MessageBindingMut<A>>(&'a self, common: &'a Cx) -> T::View<'a, A>
+    where
+        L: ValueLayoutGet<T, A>,
+    {
         let slot = (*self.value)
             .with(AlwaysInitialized, common)
             .get()
@@ -381,7 +389,7 @@ where
     T: SingularType,
     P: FieldPresence,
     A: Allocator,
-    L: ValueLayout<T, A>,
+    L: ValueLayoutGet<T, A>,
     Cx: MessageBindingMut<A>,
     L::Slot: AddressableSlot,
     P::ValueSlot<L::Slot>: ValueSlot<L::Slot, A>,
@@ -413,7 +421,7 @@ where
     T: SingularType,
     P: FieldPresence,
     A: Allocator,
-    L: ValueLayout<T, A>,
+    L: ValueLayoutGet<T, A>,
     Cx: MessageBindingMut<A>,
     L::Slot: AddressableSlot,
     P::ValueSlot<L::Slot>: ValueSlot<L::Slot, A>,
@@ -429,7 +437,7 @@ impl<'a, T, const FIELD: u32, A, L, D, Cx> SingularFieldRef<'a, T, Implicit, FIE
 where
     T: SingularType,
     A: Allocator,
-    L: ValueLayout<T, A>,
+    L: ValueLayoutGet<T, A>,
     Cx: MessageBindingMut<A>,
     L::Slot: AddressableSlot,
     <Implicit as FieldPresence>::ValueSlot<L::Slot>: ValueSlot<L::Slot, A>,
@@ -444,7 +452,7 @@ impl<'a, T, const FIELD: u32, A, L, D, Cx> SingularFieldRef<'a, T, Oneof, FIELD,
 where
     T: SingularType,
     A: Allocator,
-    L: ValueLayout<T, A>,
+    L: ValueLayoutGet<T, A>,
     Cx: MessageBindingMut<A>,
     L::Slot: AddressableSlot,
     <Oneof as FieldPresence>::ValueSlot<L::Slot>: ValueSlot<L::Slot, A>,
@@ -679,7 +687,7 @@ where
     T: SingularType + ProtoRefEq<A>,
     P: FieldPresence,
     A: Allocator,
-    L: ValueLayout<T, A>,
+    L: ValueLayoutGet<T, A>,
     Cx: MessageBindingMut<A>,
     L::Slot: AddressableSlot,
     P::ValueSlot<L::Slot>: ValueSlot<L::Slot, A>,
@@ -696,7 +704,7 @@ where
     T: SingularType,
     P: FieldPresence,
     A: Allocator,
-    L: ValueLayout<T, A>,
+    L: ValueLayoutGet<T, A>,
     Cx: MessageBindingMut<A>,
     L::Slot: AddressableSlot,
     P::ValueSlot<L::Slot>: ValueSlot<L::Slot, A>,
@@ -767,7 +775,7 @@ impl<T, const FIELD: u32, A, L, D, Cx> FieldDebug<Cx> for SingularField<T, Impli
 where
     T: SingularType + ProtoRefDebug<A>,
     A: Allocator,
-    L: ValueLayout<T, A>,
+    L: ValueLayoutGet<T, A>,
     Cx: MessageBindingMut<A>,
     L::Slot: AddressableSlot,
     <Implicit as FieldPresence>::ValueSlot<L::Slot>: ValueSlot<L::Slot, A>,
@@ -783,7 +791,7 @@ impl<T, const BIT: usize, const FIELD: u32, A, L, D, Cx> FieldDebug<Cx>
 where
     T: SingularType + ProtoRefDebug<A>,
     A: Allocator,
-    L: ValueLayout<T, A>,
+    L: ValueLayoutGet<T, A>,
     Cx: MessageBindingMut<A>,
     L::Slot: AddressableSlot,
     <Explicit<BIT> as FieldPresence>::ValueSlot<L::Slot>: ValueSlot<L::Slot, A>,
@@ -799,7 +807,7 @@ impl<T, const BIT: usize, const FIELD: u32, A, L, D, Cx> FieldDebug<Cx>
 where
     T: SingularType + ProtoRefDebug<A>,
     A: Allocator,
-    L: ValueLayout<T, A>,
+    L: ValueLayoutGet<T, A>,
     Cx: MessageBindingMut<A>,
     L::Slot: AddressableSlot,
     <LegacyRequired<BIT> as FieldPresence>::ValueSlot<L::Slot>: ValueSlot<L::Slot, A>,
@@ -814,7 +822,7 @@ impl<T, const FIELD: u32, A, L, D, Cx> FieldDebug<Cx> for SingularField<T, Messa
 where
     T: SingularType + ProtoRefDebug<A>,
     A: Allocator,
-    L: ValueLayout<T, A>,
+    L: ValueLayoutGet<T, A>,
     Cx: MessageBindingMut<A>,
     L::Slot: AddressableSlot,
     <Message as FieldPresence>::ValueSlot<L::Slot>: ValueSlot<L::Slot, A>,
